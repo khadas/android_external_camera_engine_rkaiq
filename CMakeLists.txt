@@ -23,7 +23,7 @@ set_property(GLOBAL PROPERTY PREDEFINED_TARGETS_FOLDER "CMakeTargets")
 set(BUILROOT_BUILD_PROJECT true)
 
 #set RK_SIMULATOR_HW
-set(RK_SIMULATOR_HW true)
+#set(RK_SIMULATOR_HW true)
 
 # ----------------------------------------------------------------------------
 # SET THE COMPILER PATH
