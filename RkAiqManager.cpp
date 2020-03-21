@@ -307,30 +307,13 @@ RkAiqManager::applyAnalyzerResult(SmartPtr<RkAiqFullParamsProxy>& results)
     RkAiqFullParams* aiqParams = results->data().ptr();
 
     if (aiqParams->mIspParams.ptr()) {
-        /* TODO: just for test */
-        /*int lite_wnd_num = aiqParams->mIspParams->data()->aec_meas.rawaelite.wnd_num;
-        if (lite_wnd_num > 0)
-        {*/
-        /*
-             * printf("manager params: win size: [%dx%d]-[%dx%d]-[%dx%d]-[%dx%d]\n",
-             *        aiqParams->mIspParams->data()->aec_meas.rawaelite.win.h_size,
-             *        aiqParams->mIspParams->data()->aec_meas.rawaelite.win.v_size,
-             *        aiqParams->mIspParams->data()->aec_meas.rawaebig1.win._size,
-             *        aiqParams->mIspParams->data()->aec_meas.rawaebig1.win.v_size,
-             *        aiqParams->mIspParams->data()->aec_meas.rawaebig2.win.h_size,
-             *        aiqParams->mIspParams->data()->aec_meas.rawaebig2.win.v_size,
-             *        aiqParams->mIspParams->data()->aec_meas.rawaebig3.win.h_size,
-             *        aiqParams->mIspParams->data()->aec_meas.rawaebig3.win.v_size);
-         */
-
         ret = mCamHw->setIspParams(aiqParams->mIspParams);
-        //}
         RKAIQMNG_CHECK_RET(ret, "setIspParams error %d", ret);
     }
 
     if (aiqParams->mIsppParams.ptr()) {
-        ret = mCamHw->setIsppParams(aiqParams->mIsppParams);
-        RKAIQMNG_CHECK_RET(ret, "setIsppParams error %d", ret);
+	ret = mCamHw->setIsppParams(aiqParams->mIsppParams);
+	RKAIQMNG_CHECK_RET(ret, "setIsppParams error %d", ret);
     }
 
     if (aiqParams->mExposureParams.ptr()) {
@@ -353,9 +336,23 @@ RkAiqManager::applyAnalyzerResult(SmartPtr<RkAiqFullParamsProxy>& results)
          *           aiqParams->mExposureParams->data()->LinearExp.exp_sensor_params.coarse_integration_time);
          */
 
+// #define DEBUG_FIXED_EXPOSURE
+#ifdef DEBUG_FIXED_EXPOSURE
+	/* test aec with fixed sensor exposure */
+	aiqParams->mExposureParams->data()->HdrExp[2].exp_sensor_params.coarse_integration_time = 0x1d0;
+	aiqParams->mExposureParams->data()->HdrExp[2].exp_sensor_params.analog_gain_code_global = 0x1cd;
+	aiqParams->mExposureParams->data()->HdrExp[1].exp_sensor_params.coarse_integration_time = 0x135;
+	aiqParams->mExposureParams->data()->HdrExp[1].exp_sensor_params.analog_gain_code_global = 0x394;
+	aiqParams->mExposureParams->data()->HdrExp[0].exp_sensor_params.coarse_integration_time = 0x47;
+	aiqParams->mExposureParams->data()->HdrExp[0].exp_sensor_params.analog_gain_code_global = 0x80;
 
-        ret = mCamHw->setExposureParams(aiqParams->mExposureParams);
-        RKAIQMNG_CHECK_RET(ret, "setExposureParams error %d", ret);
+
+	ret = mCamHw->setExposureParams(aiqParams->mExposureParams);
+	RKAIQMNG_CHECK_RET(ret, "setExposureParams error %d", ret);
+#else
+	ret = mCamHw->setExposureParams(aiqParams->mExposureParams);
+	RKAIQMNG_CHECK_RET(ret, "setExposureParams error %d", ret);
+#endif
     }
 
     if (aiqParams->mFocusParams.ptr()) {

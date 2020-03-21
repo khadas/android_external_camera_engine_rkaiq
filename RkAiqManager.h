@@ -106,6 +106,7 @@ private:
     const char* mSnsEntName;
     const CamCalibDbContext_t* mCalibDb;
     rk_aiq_working_mode_t mWorkingMode;
+
 };
 
 }; //namespace RkCam

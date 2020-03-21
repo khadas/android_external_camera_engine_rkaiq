@@ -18,14 +18,14 @@
 #include <linux/v4l2-subdev.h>
 #include "SensorHw.h"
 
-// #define ADD_LOCK
-#define IS_HDR_SENSOR
+#define ADD_LOCK
 
 namespace RkCam {
 
 SensorHw::SensorHw(const char* name)
     : V4l2SubDevice (name)
     , _first(true)
+    , _working_mode(RK_AIQ_WORKING_MODE_NORMAL)
 {
     ENTER_CAMHW_FUNCTION();
     EXIT_CAMHW_FUNCTION();
@@ -275,11 +275,10 @@ SensorHw::setExposureParams(SmartPtr<RkAiqExpParamsProxy>& expPar)
 #endif
 
     if (_first) {
-#ifdef IS_HDR_SENSOR
-	setHdrSensorExposure(expPar);
-#else
-        setLinearSensorExposure(expPar);
-#endif
+	if (_working_mode == RK_AIQ_WORKING_MODE_NORMAL)
+            setLinearSensorExposure(expPar);
+	else
+	    setHdrSensorExposure(expPar);
 
 	_effecting_exp_map[2] = expPar;
 	_first = false;
@@ -408,11 +407,11 @@ SensorHw::handle_sof(int64_t time, int frameid)
 	_mutex.unlock();
 #endif
 
-#ifdef IS_HDR_SENSOR
-	setHdrSensorExposure(exp);
-#else
-        setLinearSensorExposure(exp);
-#endif
+	if (_working_mode == RK_AIQ_WORKING_MODE_NORMAL)
+            setLinearSensorExposure(exp);
+	else
+	    setHdrSensorExposure(exp);
+
 #ifdef ADD_LOCK
         _mutex.lock();
 #endif
@@ -486,4 +485,14 @@ SensorHw::get_v4l2_pixelformat(uint32_t pixelcode)
     }
     return pixelformat;
 }
+
+void
+SensorHw::set_working_mode(int mode)
+{
+   _working_mode = mode;
+
+   XCAM_LOG_ERROR ("%s _working_mode: %d\n",
+      __func__, _working_mode);
+}
+
 }; //namespace RkCam

@@ -155,11 +155,13 @@ public:
     XCamReturn get_sensor_mode_data (struct isp_supplemental_sensor_mode_data &sensor_mode_data,
                                      int frame_id = -1);
     XCamReturn getEffectiveParams(SmartPtr<RkAiqExpParamsProxy>& ExpParams, int frame_id);
+    void set_working_mode(int mode);
 
 private:
     XCAM_DEAD_COPY (SensorHw);
     Mutex _mutex;
     const int _exp_delay = 3;
+    int _working_mode;
     std::list<SmartPtr<RkAiqExpParamsProxy>> _exp_list;
     std::map<int, SmartPtr<RkAiqExpParamsProxy>> _effecting_exp_map;
     bool _first;

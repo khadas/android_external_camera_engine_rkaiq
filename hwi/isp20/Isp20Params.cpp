@@ -30,7 +30,6 @@ Isp20Params::convertAiqAeToIsp20Params(struct isp2x_isp_params_cfg& isp_cfg,
     memcpy(&isp_cfg.meas.rawae2, &aec_meas.rawae2, sizeof(aec_meas.rawae2));
     memcpy(&isp_cfg.meas.rawae0, &aec_meas.rawae0, sizeof(aec_meas.rawae0));
     memcpy(&isp_cfg.meas.yuvae, &aec_meas.yuvae, sizeof(aec_meas.yuvae));
-
     /*
      *     printf("xuhf-debug: hist_meas-isp_cfg size: [%dx%d]-[%dx%d]-[%dx%d]-[%dx%d]\n",
      *                     sizeof(aec_meas.rawae3),
@@ -192,6 +191,8 @@ Isp20Params::convertAiqAwbToIsp20Params(struct isp2x_isp_params_cfg& isp_cfg,
     awb_cfg_v200->rawawb_sel                        =    awb_meas.frameChoose;
     awb_cfg_v200->sw_rawawb_xy_en                   =    awb_meas.xyDetectionEnable;
     awb_cfg_v200->sw_rawawb_uv_en                   =    awb_meas.uvDetectionEnable;
+    /* TODO: bypass the lsc modude before the rawawb*/
+    awb_cfg_v200->sw_rawlsc_bypass_en               =     true;
     awb_cfg_v200->sw_rawawb_3dyuv_ls_idx0           =     awb_meas.threeDyuvIllu[0];
     awb_cfg_v200->sw_rawawb_3dyuv_ls_idx1           =     awb_meas.threeDyuvIllu[1];
     awb_cfg_v200->sw_rawawb_3dyuv_ls_idx2           =     awb_meas.threeDyuvIllu[2];
@@ -1060,8 +1061,6 @@ void Isp20Params::convertAiqAdehazeToIsp20Params(struct isp2x_isp_params_cfg& is
     int rawWidth = 1920;
     int rawHeight = 1080;
     struct isp2x_dhaz_cfg *  cfg = &isp_cfg.others.dhaz_cfg;
-
-
 
     //cfg->       = int(rk_aiq_dehaze_cfg_t->dehaze_en[0]);  //0~1  , (1bit) dehaze_en
     cfg->dc_en    = int(dhaze.dehaze_en[1]);  //0~1  , (1bit) dc_en
@@ -2068,18 +2067,24 @@ Isp20Params::convertAiqResultsToIsp20Params(struct isp2x_isp_params_cfg& isp_cfg
     convertAiqAhdrToIsp20Params(isp_cfg, aiq_results->data()->ahdr_proc_res);
     convertAiqAwbGainToIsp20Params(isp_cfg, aiq_results->data()->awb_gain);
     convertAiqAwbToIsp20Params(isp_cfg, aiq_results->data()->awb_cfg_v200);
-    convertAiqAhdrToIsp20Params(isp_cfg, aiq_results->data()->ahdr_proc_res);
-    convertAiqAfToIsp20Params(isp_cfg, aiq_results->data()->af_meas);
-    convertAiqAdehazeToIsp20Params(isp_cfg, aiq_results->data()->adhaz_config);
     convertAiqLscToIsp20Params(isp_cfg, aiq_results->data()->lsc);
     convertAiqCcmToIsp20Params(isp_cfg, aiq_results->data()->ccm);
     convertAiqAgammaToIsp20Params(isp_cfg, aiq_results->data()->agamma_config);
-    convertAiqAdemosaicToIsp20Params(isp_cfg, aiq_results);
     convertAiqBlcToIsp20Params(isp_cfg, aiq_results);
     convertAiqDpccToIsp20Params(isp_cfg, aiq_results);
     convertAiqRawnrToIsp20Params(isp_cfg, aiq_results->data()->rawnr);
+
+    /*
+     * enable the modules that has been verified to work properly on the board
+     * TODO: enable all modules after validation in isp
+     */
+#if 0
+    convertAiqAfToIsp20Params(isp_cfg, aiq_results->data()->af_meas);
+    convertAiqAdehazeToIsp20Params(isp_cfg, aiq_results->data()->adhaz_config);
+    convertAiqAdemosaicToIsp20Params(isp_cfg, aiq_results);
     convertAiqCpToIsp20Params(isp_cfg, aiq_results->data()->cp);
     convertAiqIeToIsp20Params(isp_cfg, aiq_results->data()->ie);
+#endif
 
     return ret;
 }

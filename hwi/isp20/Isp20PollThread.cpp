@@ -105,6 +105,7 @@ Isp20PollThread::set_event_handle_dev(SmartPtr<SensorHw> &dev)
 
 Isp20PollThread::Isp20PollThread()
     : PollThread()
+    , _first_trigger(true)
 {
     for (int i = 0; i < 3; i++) {
         SmartPtr<MipiPollThread> mipi_poll = new MipiPollThread(this, ISP_POLL_MIPI_TX, i);
@@ -545,8 +546,14 @@ Isp20PollThread::trigger_readback(uint32_t sequence)
             .frame_id = sequence,
             .times = times - 1,
         };
+
+	if (_first_trigger) {
+	    tg.times = 1;
+	    _first_trigger = false;
+	}
+
         XCAM_LOG_DEBUG ("%s frame id:%d times:%d\n",
-            __func__, sequence, times);
+            __func__, sequence, tg.times);
         for (i = 0; i < _mipi_dev_max; i++) {
                 buf_proxy = _isp_mipi_rx_infos[i].cache_list.pop(-1);
                 _isp_mipi_rx_infos[i].buf_list.push(buf_proxy);
