@@ -28,9 +28,8 @@ endif()
 # ----------------------------------------------------------------------------
 # ADD SYMBOL TABLE FOR GDB
 # ----------------------------------------------------------------------------
-SET(CMAKE_CXX_FLAGS_DEBUG "$ENV{CXXFLAGS} -O0 -Wall -g -ggdb")
-SET(CMAKE_CXX_FLAGS_RELEASE "$ENV{CXXFLAGS} -O0 -Wall -g -ggdb")
-# SET(CMAKE_CXX_FLAGS_RELEASE "$ENV{CXXFLAGS} -O3 -Wall")
+# SET(CMAKE_CXX_FLAGS_DEBUG "$ENV{CXXFLAGS} -ggdb")
+# SET(CMAKE_CXX_FLAGS_RELEASE "$ENV{CXXFLAGS} -ggdb")
 
 # ----------------------------------------------------------------------------
 # set property to classify library kinds
@@ -50,6 +49,7 @@ message("rkaiq src path" ${RK_AIQ_SOURCE_DIR})
 if(ADD_RK_AIQ)
 add_compile_options(-std=c++11)
 add_compile_options(-DADD_RK_AIQ)
+add_compile_options(-O0)
 # add_compile_options(-v)
 SET(RK_AIQ_LIB_DIR ${RK_AIQ_SOURCE_DIR}/build/linux/all_lib/${CMAKE_BUILD_TYPE})
 message("rkaiq lib path" ${RK_AIQ_LIB_DIR})

@@ -753,12 +753,21 @@ CamHwIsp20::prepare(uint32_t width, uint32_t height, int mode)
     ENTER_CAMHW_FUNCTION();
 
     _hdr_mode = mode;
+
+    /*
+     * Segmentation fault occur during executing this code
+     * TODO: Execute this code after verifying on the board
+     */
+#if 0
     if (_hdr_mode != RK_AIQ_WORKING_MODE_NORMAL)
         setupHdrLink(_hdr_mode, 0, true);
+#endif
+
+    sensorHw = mSensorDev.dynamic_cast_ptr<SensorHw>();
+    sensorHw->set_working_mode(mode);
 
     isp20Pollthread = mPollthread.dynamic_cast_ptr<Isp20PollThread>();
     isp20Pollthread->set_working_mode(mode);
-    sensorHw = mSensorDev.dynamic_cast_ptr<SensorHw>();
     ret = isp20Pollthread->hdr_mipi_start(sensorHw);
     if (ret < 0) {
         LOGE("hdr mipi start err: %d\n", ret);
@@ -786,7 +795,7 @@ CamHwIsp20::prepare(uint32_t width, uint32_t height, int mode)
 
     mIsppParamsDev->start();
     if (ret < 0) {
-        LOGE("start ispp params dev err: %d\n", ret);
+	LOGE("start ispp params dev err: %d\n", ret);
     }
 
     EXIT_CAMHW_FUNCTION();
@@ -825,8 +834,15 @@ XCamReturn CamHwIsp20::stop()
     if (ret < 0) {
         LOGE("hdr mipi stop err: %d\n", ret);
     }
+
+    /*
+     * Segmentation fault occur during executing this code
+     * TODO: Execute this code after verifying on the board
+     */
+#if 0
     if (_hdr_mode != RK_AIQ_WORKING_MODE_NORMAL)
         setupHdrLink(_hdr_mode, 0, false);
+#endif
     EXIT_CAMHW_FUNCTION();
     return ret;
 }
@@ -840,18 +856,18 @@ CamHwIsp20::gen_full_isp_params(const struct isp2x_isp_params_cfg* update_params
     int i = 0;
 
     ENTER_CAMHW_FUNCTION();
-    for (; i <= RK_ISP2X_3DLUT_ID; i++)
-        if (update_params->module_en_update & (1 << i)) {
-            full_params->module_en_update |= 1 << i;
+    for (; i <= RK_ISP2X_MAX_ID; i++)
+        if (update_params->module_en_update & (1LL << i)) {
+            full_params->module_en_update |= 1LL << i;
             // clear old bit value
-            full_params->module_ens &= ~(1 << i);
+            full_params->module_ens &= ~(1LL << i);
             // set new bit value
-            full_params->module_ens |= update_params->module_ens & (1 << i);
+            full_params->module_ens |= update_params->module_ens & (1LL << i);
         }
 
-    for (i = 0; i <= RK_ISP2X_3DLUT_ID; i++) {
-        if (update_params->module_cfg_update & (1 << i)) {
-            full_params->module_cfg_update |= 1 << i;
+    for (i = 0; i <= RK_ISP2X_MAX_ID; i++) {
+        if (update_params->module_cfg_update & (1LL << i)) {
+            full_params->module_cfg_update |= 1LL << i;
             switch (i) {
             case RK_ISP2X_RAWAE_BIG1_ID:
                 full_params->meas.rawae3 = update_params->meas.rawae3;
@@ -894,6 +910,33 @@ CamHwIsp20::gen_full_isp_params(const struct isp2x_isp_params_cfg* update_params
                 break;
             case RK_ISP2X_HDRTMO_ID:
                 full_params->others.hdrtmo_cfg = update_params->others.hdrtmo_cfg;
+                break;
+            case RK_ISP2X_CTK_ID:
+                full_params->others.ccm_cfg = update_params->others.ccm_cfg;
+                break;
+            case RK_ISP2X_LSC_ID:
+                full_params->others.lsc_cfg = update_params->others.lsc_cfg;
+                break;
+            case RK_ISP2X_GOC_ID:
+                full_params->others.gammaout_cfg = update_params->others.gammaout_cfg;
+                break;
+            case RK_ISP2X_3DLUT_ID:
+                full_params->others.isp3dlut_cfg = update_params->others.isp3dlut_cfg;
+                break;
+            case RK_ISP2X_DPCC_ID:
+                full_params->others.dpcc_cfg = update_params->others.dpcc_cfg;
+                break;
+            case RK_ISP2X_BLS_ID:
+                full_params->others.bls_cfg = update_params->others.bls_cfg;
+                break;
+            case RK_ISP2X_DEBAYER_ID:
+                full_params->others.debayer_cfg = update_params->others.debayer_cfg;
+                break;
+            case RK_ISP2X_DHAZ_ID:
+                full_params->others.dhaz_cfg = update_params->others.dhaz_cfg;
+                break;
+            case RK_ISP2X_RAWNR_ID:
+                full_params->others.rawnr_cfg = update_params->others.rawnr_cfg;
                 break;
             default:
                 break;
@@ -991,62 +1034,56 @@ CamHwIsp20::setIspParamsSync()
 
 #if 1 // for test
         /* ae/hist update */
-        update_params.module_en_update |= 1 << RK_ISP2X_RAWAE_LITE_ID;
-        update_params.module_ens |= 1 << RK_ISP2X_RAWAE_LITE_ID;
-        update_params.module_cfg_update |= 1 << RK_ISP2X_RAWAE_LITE_ID;
+        update_params.module_en_update |= 1LL << RK_ISP2X_RAWAE_LITE_ID;
+        update_params.module_ens |= 1LL << RK_ISP2X_RAWAE_LITE_ID;
+        update_params.module_cfg_update |= 1LL << RK_ISP2X_RAWAE_LITE_ID;
 
-        /*
-         * update_params.module_en_update |= 1 << RK_ISP2X_RAWAE_BIG1_ID;
-         * update_params.module_ens |= 1 << RK_ISP2X_RAWAE_BIG1_ID;
-         * update_params.module_cfg_update |= 1 << RK_ISP2X_RAWAE_BIG1_ID;
-         */
+	update_params.module_en_update |= 1LL << RK_ISP2X_RAWAE_BIG1_ID;
+	update_params.module_ens |= 1LL << RK_ISP2X_RAWAE_BIG1_ID;
+	update_params.module_cfg_update |= 1LL << RK_ISP2X_RAWAE_BIG1_ID;
 
-        update_params.module_en_update |= 1 << RK_ISP2X_RAWAE_BIG2_ID;
-        update_params.module_ens |= 1 << RK_ISP2X_RAWAE_BIG2_ID;
-        update_params.module_cfg_update |= 1 << RK_ISP2X_RAWAE_BIG2_ID;
+        update_params.module_en_update |= 1LL << RK_ISP2X_RAWAE_BIG2_ID;
+        update_params.module_ens |= 1LL << RK_ISP2X_RAWAE_BIG2_ID;
+        update_params.module_cfg_update |= 1LL << RK_ISP2X_RAWAE_BIG2_ID;
 
-        update_params.module_en_update |= 1 << RK_ISP2X_RAWAE_BIG3_ID;
-        update_params.module_ens |= 1 << RK_ISP2X_RAWAE_BIG3_ID;
-        update_params.module_cfg_update |= 1 << RK_ISP2X_RAWAE_BIG3_ID;
+        update_params.module_en_update |= 1LL << RK_ISP2X_RAWAE_BIG3_ID;
+        update_params.module_ens |= 1LL << RK_ISP2X_RAWAE_BIG3_ID;
+        update_params.module_cfg_update |= 1LL << RK_ISP2X_RAWAE_BIG3_ID;
 
 
-        update_params.module_en_update |= 1 << RK_ISP2X_RAWHIST_LITE_ID;
-        update_params.module_ens |= 1 << RK_ISP2X_RAWHIST_LITE_ID;
-        update_params.module_cfg_update |= 1 << RK_ISP2X_RAWHIST_LITE_ID;
+        update_params.module_en_update |= 1LL << RK_ISP2X_RAWHIST_LITE_ID;
+        update_params.module_ens |= 1LL << RK_ISP2X_RAWHIST_LITE_ID;
+        update_params.module_cfg_update |= 1LL << RK_ISP2X_RAWHIST_LITE_ID;
 
-        /*
-         * update_params.module_en_update |= 1 << RK_ISP2X_RAWHIST_BIG1_ID;
-         * update_params.module_ens |= 1 << RK_ISP2X_RAWHIST_BIG1_ID;
-         * update_params.module_cfg_update |= 1 << RK_ISP2X_RAWHIST_BIG1_ID;
-         */
+	update_params.module_en_update |= 1LL << RK_ISP2X_RAWHIST_BIG1_ID;
+	update_params.module_ens |= 1LL << RK_ISP2X_RAWHIST_BIG1_ID;
+	update_params.module_cfg_update |= 1LL << RK_ISP2X_RAWHIST_BIG1_ID;
 
-        update_params.module_en_update |= 1 << RK_ISP2X_RAWHIST_BIG2_ID;
-        update_params.module_ens |= 1 << RK_ISP2X_RAWHIST_BIG2_ID;
-        update_params.module_cfg_update |= 1 << RK_ISP2X_RAWHIST_BIG2_ID;
+        update_params.module_en_update |= 1LL << RK_ISP2X_RAWHIST_BIG2_ID;
+        update_params.module_ens |= 1LL << RK_ISP2X_RAWHIST_BIG2_ID;
+        update_params.module_cfg_update |= 1LL << RK_ISP2X_RAWHIST_BIG2_ID;
 
-        update_params.module_en_update |= 1 << RK_ISP2X_RAWHIST_BIG3_ID;
-        update_params.module_ens |= 1 << RK_ISP2X_RAWHIST_BIG3_ID;
-        update_params.module_cfg_update |= 1 << RK_ISP2X_RAWHIST_BIG3_ID;
+        update_params.module_en_update |= 1LL << RK_ISP2X_RAWHIST_BIG3_ID;
+        update_params.module_ens |= 1LL << RK_ISP2X_RAWHIST_BIG3_ID;
+        update_params.module_cfg_update |= 1LL << RK_ISP2X_RAWHIST_BIG3_ID;
+
+	update_params.module_en_update |= 1LL << RK_ISP2X_HDRMGE_ID;
+	update_params.module_ens |= 1LL << RK_ISP2X_HDRMGE_ID;
+	update_params.module_cfg_update |= 1LL << RK_ISP2X_HDRMGE_ID;
+
+	update_params.module_en_update |= 1LL << RK_ISP2X_HDRTMO_ID;
+	update_params.module_ens |= 1LL << RK_ISP2X_HDRTMO_ID;
+	update_params.module_cfg_update |= 1LL << RK_ISP2X_HDRTMO_ID;
 
         /* awb update */
-        /*
-         *         update_params.module_en_update |= 1 << RK_ISP2X_AWB_GAIN_ID;
-         *         update_params.module_ens |= 1 << RK_ISP2X_AWB_GAIN_ID;
-         *         update_params.module_cfg_update |= 1 << RK_ISP2X_AWB_GAIN_ID;
-         *
-         *         update_params.module_en_update |= 1 << RK_ISP2X_RAWAWB_ID;
-         *         update_params.module_ens |= 1 << RK_ISP2X_RAWAWB_ID;
-         *         update_params.module_cfg_update |= 1 << RK_ISP2X_RAWAWB_ID;
-         */
+	update_params.module_en_update |= 1LL << RK_ISP2X_AWB_GAIN_ID;
+	update_params.module_ens |= 1LL << RK_ISP2X_AWB_GAIN_ID;
+	update_params.module_cfg_update |= 1LL << RK_ISP2X_AWB_GAIN_ID;
+
+	update_params.module_en_update |= 1LL << RK_ISP2X_RAWAWB_ID;
+	update_params.module_ens |= 1LL << RK_ISP2X_RAWAWB_ID;
+	update_params.module_cfg_update |= 1LL << RK_ISP2X_RAWAWB_ID;
 #endif
-
-        update_params.module_en_update |= 1 << RK_ISP2X_HDRMGE_ID;
-        update_params.module_ens |= 1 << RK_ISP2X_HDRMGE_ID;
-        update_params.module_cfg_update |= 1 << RK_ISP2X_HDRMGE_ID;
-
-        update_params.module_en_update |= 1 << RK_ISP2X_HDRTMO_ID;
-        update_params.module_ens |= 1 << RK_ISP2X_HDRTMO_ID;
-        update_params.module_cfg_update |= 1 << RK_ISP2X_HDRTMO_ID;
         gen_full_isp_params(&update_params, &_full_active_isp_params);
 
         dump_isp_config(&_full_active_isp_params, aiq_results);
@@ -1072,6 +1109,8 @@ CamHwIsp20::setIspParamsSync()
             XCAM_LOG_DEBUG ("device(%s) queue buffer index %d, queue cnt %d, check exit status again[exit: %d]",
                             XCAM_STR (mIspParamsDev->get_device_name()),
                             buf_index, mIspParamsDev->get_queued_bufcnt(), _is_exit);
+        } else {
+            XCAM_LOG_ERROR ("Can not get buffer\n");
         }
 
         if (_is_exit)

@@ -37,7 +37,7 @@ public:
     virtual ~Isp20StatsBuffer() {};
 
     SmartPtr<RkAiqExpParamsProxy>& get_exp_params () {
-        XCAM_ASSERT (_expParams.ptr ());
+        // XCAM_ASSERT (_expParams.ptr ());
         return _expParams;
     }
 

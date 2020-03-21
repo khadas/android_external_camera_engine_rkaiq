@@ -28,8 +28,6 @@
 
 #define BUFFER_COUNT 4
 
-// #define DRM_DISPLAY
-
 struct buffer {
         void *start;
         size_t length;
@@ -47,6 +45,9 @@ static unsigned int n_buffers;
 static int frame_count = 5;
 FILE *fp;
 static int silent = 0;
+static int vop = 0;
+static int rkaiq = 0;
+static int writeFile = 0;
 
 
 #define DBG(...) do { if(!silent) printf(__VA_ARGS__); } while(0)
@@ -69,9 +70,8 @@ static int xioctl(int fh, int request, void *arg)
 
 static void process_image(const void *p, int size)
 {
-    // printf("process_image size: %d\n",size);
-    //fwrite(p, size, 1, fp);
-    //fflush(fp);
+	fwrite(p, size, 1, fp);
+	fflush(fp);
 }
 
 static int read_frame()
@@ -90,7 +90,7 @@ static int read_frame()
             buf.length = FMT_NUM_PLANES;
         }
 
-        if (-1 == xioctl(fd, VIDIOC_DQBUF, &buf)) 
+        if (-1 == xioctl(fd, VIDIOC_DQBUF, &buf))
                 errno_exit("VIDIOC_DQBUF");
 
         i = buf.index;
@@ -100,13 +100,17 @@ static int read_frame()
         else
             bytesused = buf.bytesused;
 
-#ifdef DRM_DISPLAY
-	drmDspFrame(width, height, buffers[i].start, DRM_FORMAT_NV12);
-#endif
-        process_image(buffers[i].start, bytesused);
+	if (vop) {
+	    drmDspFrame(width, height, buffers[i].start, DRM_FORMAT_NV12);
+	}
+
+	if (writeFile && buf.sequence > 50 && buf.sequence <= 52) {
+	    printf("---->>>>Write frame[%d] to file!\n", buf.sequence);
+	    process_image(buffers[i].start, bytesused);
+	}
 
         if (-1 == xioctl(fd, VIDIOC_QBUF, &buf))
-            errno_exit("VIDIOC_QBUF"); 
+            errno_exit("VIDIOC_QBUF");
 
         return 1;
 }
@@ -323,6 +327,9 @@ void parse_args(int argc, char **argv)
            //{"count",    required_argument, 0, 'c' },
            {"help",     no_argument,       0, 'p' },
            {"silent",   no_argument,       0, 's' },
+           {"vop",   no_argument,       0, 'v' },
+           {"rkaiq",   no_argument,       0, 'r' },
+           {"writefile",   no_argument,       0, 'e' },
            {0,          0,                 0,  0  }
        };
 
@@ -354,6 +361,15 @@ void parse_args(int argc, char **argv)
        case 's':
            silent = 1;
            break;
+       case 'v':
+           vop = 1;
+           break;
+       case 'r':
+           rkaiq = 1;
+           break;
+       case 'e':
+           writeFile = 1;
+           break;
        case '?':
        case 'p':
            ERR("Usage: %s to capture rkisp1 frames\n"
@@ -379,52 +395,62 @@ void parse_args(int argc, char **argv)
 
 }
 
-#ifndef ADD_RK_AIQ
-extern void start_iq();
-extern void stop_iq();
-#endif
 int main(int argc, char **argv)
 {
-        parse_args(argc, argv);
+	rk_aiq_sys_ctx_t* aiq_ctx = NULL;
 
-#ifdef DRM_DISPLAY
-	if (initDrmDsp() < 0) {
-		printf("DRM display init failed\n");
-		exit(0);
-	}
-#endif
+        parse_args(argc, argv);
 
         open_device();
         init_device();
-#ifdef ADD_RK_AIQ
-	rk_aiq_sys_ctx_t* aiq_ctx = rk_aiq_uapi_sysctl_init("ov4689", NULL, NULL, NULL);
-	if (aiq_ctx ) {
-		XCamReturn ret = rk_aiq_uapi_sysctl_prepare(aiq_ctx, width, height, RK_AIQ_WORKING_MODE_NORMAL);
-		if (ret != XCAM_RETURN_NO_ERROR)
-			ERR("rk_aiq_uapi_sysctl_prepare failed: %d\n", ret);
-		else {
-			start_capturing();
-			ret = rk_aiq_uapi_sysctl_start(aiq_ctx );
+
+
+	if (rkaiq) {
+		rk_aiq_sys_ctx_t* aiq_ctx = rk_aiq_uapi_sysctl_init("ov4689", NULL, NULL, NULL);
+
+		if (aiq_ctx) {
+			XCamReturn ret = rk_aiq_uapi_sysctl_prepare(aiq_ctx, width, height, RK_AIQ_WORKING_MODE_ISP_HDR3);
+			if (ret != XCAM_RETURN_NO_ERROR)
+				ERR("rk_aiq_uapi_sysctl_prepare failed: %d\n", ret);
+			else {
+				start_capturing();
+				if (writeFile)
+				    fp = fopen( "/tmp/capture_yuv.yuv", "a" );
+				ret = rk_aiq_uapi_sysctl_start(aiq_ctx );
+			}
+
+			if (vop) {
+				if (initDrmDsp() < 0) {
+					printf("DRM display init failed\n");
+					exit(0);
+				}
+			}
+
+			usleep(500 * 1000);
 		}
-		//wait poll thread started
+	} else {
+		if (vop) {
+			if (initDrmDsp() < 0) {
+				printf("DRM display init failed\n");
+				exit(0);
+			}
+		}
+
 		usleep(500 * 1000);
-		//TODO: set stats to g_simisp_stats
-		//analyze_sim_stats();
+
+		start_capturing();
 	}
-#else
-        start_capturing();
-	start_iq();
-#endif
+
         mainloop();
-#ifdef ADD_RK_AIQ
+
 	if (aiq_ctx) {
 		rk_aiq_uapi_sysctl_stop(aiq_ctx);
 		rk_aiq_uapi_sysctl_deinit(aiq_ctx);
 	}
-#else
-	stop_iq();
-#endif
+
         stop_capturing();
+	if (writeFile)
+	    fclose(fp);
         uninit_device();
         close_device();
         return 0;

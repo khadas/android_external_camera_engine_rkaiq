@@ -86,6 +86,7 @@ private:
     int _mipi_dev_max;
     Mutex _mipi_buf_mutex;
     Mutex _mipi_trigger_mutex;
+    bool _first_trigger;
 private:
     XCAM_DEAD_COPY(Isp20PollThread);
     SmartPtr<SensorHw> _event_handle_dev;

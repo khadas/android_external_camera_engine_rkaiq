@@ -1606,8 +1606,24 @@ RkAiqCore::addDefaultAlgos()
     ADD_ALGO_HANDLE(Ar2y, AR2Y);
     ADD_ALGO_HANDLE(Awdr, AWDR);
 
+    /*
+     * enable the modules that has been verified to work properly on the board
+     * TODO: enable all modules after validation in isp
+     */
+#if 0
     for (int i = 0; i < RK_AIQ_ALGO_TYPE_MAX; i++)
         enableAlgo(i, 0, true);
+#else
+    enableAlgo(RK_AIQ_ALGO_TYPE_AE, 0, true);
+    enableAlgo(RK_AIQ_ALGO_TYPE_AHDR, 0, true);
+    enableAlgo(RK_AIQ_ALGO_TYPE_AGAMMA, 0, true);
+    enableAlgo(RK_AIQ_ALGO_TYPE_AWB, 0, true);
+    enableAlgo(RK_AIQ_ALGO_TYPE_ABLC, 0, true);
+    enableAlgo(RK_AIQ_ALGO_TYPE_ACCM, 0, true);
+    enableAlgo(RK_AIQ_ALGO_TYPE_ALSC, 0, true);
+    enableAlgo(RK_AIQ_ALGO_TYPE_ADPCC, 0, true);
+    enableAlgo(RK_AIQ_ALGO_TYPE_ANR, 0, true);
+#endif
 }
 
 SmartPtr<RkAiqHandle>
@@ -1926,17 +1942,21 @@ RkAiqCore::convertIspstatsToAlgo(const SmartPtr<VideoBuffer> &buffer)
             }
         }
 
-        /*
-         * unsigned long chn0_mean = 0, chn1_mean = 0, chn2_mean = 0;
-         * for(int i = 0; i < ISP2X_RAWAEBIG_MEAN_NUM; i++) {
-         *     chn0_mean += stats->params.rawae2.data[i].channelr_xy;
-         *     chn2_mean += stats->params.rawae1.data[i].channelr_xy;
-         *      for(int i = 0; i < ISP2X_RAWAELITE_MEAN_NUM; i++)
-         *          chn1_mean += stats->params.rawae0.data[i].channelr_xy;
-         * }
-         * printf("chn[0]: chn_r_mean_xy: %ld\n", chn0_mean);
-         * printf("chn[1]: chn_r_mean_xy: %ld\n", chn1_mean);
-         * printf("chn[2]: chn_r_mean_xy: %ld\n", chn2_mean);     */
+/*
+ *         unsigned long chn0_mean = 0, chn1_mean = 0, chn2_mean = 0;
+ *         for(int i = 0; i < ISP2X_RAWAEBIG_MEAN_NUM; i++) {
+ *             chn0_mean += stats->params.rawae1.data[i].channelg_xy;
+ *             chn2_mean += stats->params.rawae2.data[i].channelg_xy;
+ *         }
+ *
+ *         for(int i = 0; i < ISP2X_RAWAELITE_MEAN_NUM; i++)
+ *                 chn1_mean += stats->params.rawae0.data[i].channelg_xy;
+ *
+ *         printf("frame[%d]: chn[0-1-2]_g_mean_xy: %ld-%ld-%ld\n",
+ *                 stats->frame_id, chn0_mean/ISP2X_RAWAEBIG_MEAN_NUM,
+ *                 chn1_mean/ISP2X_RAWAELITE_MEAN_NUM,
+ *                 chn2_mean/ISP2X_RAWAEBIG_MEAN_NUM);
+ */
 
 
         memcpy(mAlogsSharedParams.ispStats.aec_stats.ae_data.chn[0].rawhist_big.bins, stats->params.rawhist1.hist_bin, ISP2X_HIST_BIN_N_MAX * sizeof(u32));
@@ -1998,6 +2018,16 @@ RkAiqCore::convertIspstatsToAlgo(const SmartPtr<VideoBuffer> &buffer)
         mAlogsSharedParams.ispStats.aec_stats.ae_exp.LinearExp = expParams->data()->LinearExp;
         memcpy(mAlogsSharedParams.ispStats.aec_stats.ae_exp.HdrExp,
                expParams->data()->HdrExp, sizeof(expParams->data()->HdrExp));
+	/*
+	 * printf("%s: L: [0x%x-0x%x], M: [0x%x-0x%x], S: [0x%x-0x%x]\n",
+	 *        __func__,
+	 *        expParams->data()->HdrExp[2].exp_sensor_params.coarse_integration_time,
+	 *        expParams->data()->HdrExp[2].exp_sensor_params.analog_gain_code_global,
+	 *        expParams->data()->HdrExp[1].exp_sensor_params.coarse_integration_time,
+	 *        expParams->data()->HdrExp[1].exp_sensor_params.analog_gain_code_global,
+	 *        expParams->data()->HdrExp[0].exp_sensor_params.coarse_integration_time,
+	 *        expParams->data()->HdrExp[0].exp_sensor_params.analog_gain_code_global);
+	 */
     }
 
 
