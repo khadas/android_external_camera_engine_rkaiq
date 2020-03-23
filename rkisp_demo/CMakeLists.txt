@@ -78,9 +78,7 @@ SET(RK_AIQ_LIB rkaiq)
 endif()
 
 ##set extern libraries
-if(NOT BUILROOT_BUILD_PROJECT)
-    SET(RK_DRM_LIB_DIR ${PROJECT_SOURCE_DIR}/demo/libs/arm32/)
-endif()
+SET(RK_DRM_LIB_DIR ${PROJECT_SOURCE_DIR}/demo/libs/arm32/)
 SET(RK_DRM_LIB drm)
 
 #head file path
