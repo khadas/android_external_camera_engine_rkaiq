@@ -82,51 +82,54 @@ RESULT MergeGetCurrIOData
     RESULT result = AHDR_RET_SUCCESS;
     int OECurve[17];
 
-    pAhdrCtx->AhdrIOData.MergeData.sw_hdrmge_mode = pAhdrCtx->CurrHandleData.MergeMode;
-    CalibrateOECurve(pAhdrCtx->CurrHandleData.CurrMergeHandleData.OECurve_smooth, pAhdrCtx->CurrHandleData.CurrMergeHandleData.OECurve_offset, pAhdrCtx->AhdrIOData.MergeData.sw_hdrmge_e_y) ;
-    CalibrateMDCurve(pAhdrCtx->CurrHandleData.CurrMergeHandleData.MDCurveLM_smooth, pAhdrCtx->CurrHandleData.CurrMergeHandleData.MDCurveLM_offset, pAhdrCtx->AhdrIOData.MergeData.sw_hdrmge_l1_y);
-    CalibrateMDCurve(pAhdrCtx->CurrHandleData.CurrMergeHandleData.MDCurveMS_smooth, pAhdrCtx->CurrHandleData.CurrMergeHandleData.MDCurveMS_offset, pAhdrCtx->AhdrIOData.MergeData.sw_hdrmge_l0_y);
-    pAhdrCtx->AhdrIOData.MergeData.sw_hdrmge_lm_dif_0p9 = 230;
-    pAhdrCtx->AhdrIOData.MergeData.sw_hdrmge_ms_dif_0p8 = 205;
-    pAhdrCtx->AhdrIOData.MergeData.sw_hdrmge_lm_dif_0p15 = (int)pAhdrCtx->CurrHandleData.CurrMergeHandleData.MDCurveLM_offset;
-    pAhdrCtx->AhdrIOData.MergeData.sw_hdrmge_ms_dif_0p15 = (int)pAhdrCtx->CurrHandleData.CurrMergeHandleData.MDCurveMS_offset;
+    pAhdrCtx->AhdrProcRes.MgeProcRes.sw_hdrmge_mode = pAhdrCtx->CurrHandleData.MergeMode;
+    CalibrateOECurve(pAhdrCtx->CurrHandleData.CurrMergeHandleData.OECurve_smooth,
+                     pAhdrCtx->CurrHandleData.CurrMergeHandleData.OECurve_offset, pAhdrCtx->AhdrProcRes.MgeProcRes.sw_hdrmge_e_y) ;
+    CalibrateMDCurve(pAhdrCtx->CurrHandleData.CurrMergeHandleData.MDCurveLM_smooth,
+                     pAhdrCtx->CurrHandleData.CurrMergeHandleData.MDCurveLM_offset, pAhdrCtx->AhdrProcRes.MgeProcRes.sw_hdrmge_l1_y);
+    CalibrateMDCurve(pAhdrCtx->CurrHandleData.CurrMergeHandleData.MDCurveMS_smooth,
+                     pAhdrCtx->CurrHandleData.CurrMergeHandleData.MDCurveMS_offset, pAhdrCtx->AhdrProcRes.MgeProcRes.sw_hdrmge_l0_y);
+    pAhdrCtx->AhdrProcRes.MgeProcRes.sw_hdrmge_lm_dif_0p9 = 230;
+    pAhdrCtx->AhdrProcRes.MgeProcRes.sw_hdrmge_ms_dif_0p8 = 205;
+    pAhdrCtx->AhdrProcRes.MgeProcRes.sw_hdrmge_lm_dif_0p15 = (int)pAhdrCtx->CurrHandleData.CurrMergeHandleData.MDCurveLM_offset;
+    pAhdrCtx->AhdrProcRes.MgeProcRes.sw_hdrmge_ms_dif_0p15 = (int)pAhdrCtx->CurrHandleData.CurrMergeHandleData.MDCurveMS_offset;
 
 
 #if 1
     //when gainX = 1, gainX_inv = 1/gainX -1
-    pAhdrCtx->AhdrIOData.MergeData.sw_hdrmge_gain0 = (int)SHIFT6BIT(pAhdrCtx->CurrHandleData.CurrL2S_Ratio);
+    pAhdrCtx->AhdrProcRes.MgeProcRes.sw_hdrmge_gain0 = (int)SHIFT6BIT(pAhdrCtx->CurrHandleData.CurrL2S_Ratio);
     if(pAhdrCtx->CurrHandleData.CurrL2S_Ratio == 1)
-        pAhdrCtx->AhdrIOData.MergeData.sw_hdrmge_gain0_inv = (int)(SHIFT12BIT(1 / pAhdrCtx->CurrHandleData.CurrL2S_Ratio) - 1);
+        pAhdrCtx->AhdrProcRes.MgeProcRes.sw_hdrmge_gain0_inv = (int)(SHIFT12BIT(1 / pAhdrCtx->CurrHandleData.CurrL2S_Ratio) - 1);
     else
-        pAhdrCtx->AhdrIOData.MergeData.sw_hdrmge_gain0_inv = (int)SHIFT12BIT(1 / pAhdrCtx->CurrHandleData.CurrL2S_Ratio);
+        pAhdrCtx->AhdrProcRes.MgeProcRes.sw_hdrmge_gain0_inv = (int)SHIFT12BIT(1 / pAhdrCtx->CurrHandleData.CurrL2S_Ratio);
 
-    pAhdrCtx->AhdrIOData.MergeData.sw_hdrmge_gain1 = (int)SHIFT6BIT(pAhdrCtx->CurrHandleData.CurrL2M_Ratio);
+    pAhdrCtx->AhdrProcRes.MgeProcRes.sw_hdrmge_gain1 = (int)SHIFT6BIT(pAhdrCtx->CurrHandleData.CurrL2M_Ratio);
     if(pAhdrCtx->CurrHandleData.CurrL2M_Ratio == 1)
-        pAhdrCtx->AhdrIOData.MergeData.sw_hdrmge_gain1_inv = (int)(SHIFT12BIT(1 / pAhdrCtx->CurrHandleData.CurrL2M_Ratio) - 1);
+        pAhdrCtx->AhdrProcRes.MgeProcRes.sw_hdrmge_gain1_inv = (int)(SHIFT12BIT(1 / pAhdrCtx->CurrHandleData.CurrL2M_Ratio) - 1);
     else
-        pAhdrCtx->AhdrIOData.MergeData.sw_hdrmge_gain1_inv = (int)SHIFT12BIT(1 / pAhdrCtx->CurrHandleData.CurrL2M_Ratio);
+        pAhdrCtx->AhdrProcRes.MgeProcRes.sw_hdrmge_gain1_inv = (int)SHIFT12BIT(1 / pAhdrCtx->CurrHandleData.CurrL2M_Ratio);
 
-    pAhdrCtx->AhdrIOData.MergeData.sw_hdrmge_gain2 = (int)SHIFT6BIT(pAhdrCtx->CurrHandleData.CurrL2L_Ratio);
+    pAhdrCtx->AhdrProcRes.MgeProcRes.sw_hdrmge_gain2 = (int)SHIFT6BIT(pAhdrCtx->CurrHandleData.CurrL2L_Ratio);
 #endif
 
 #if LRK_DEBUG_LOG
     LOGE_AHDR("%s:lrk  Merge set IOdata to register:\n", __FUNCTION__);
-    LOGE_AHDR("%s:lrk  sw_hdrmge_mode:%d \n", __FUNCTION__, pAhdrCtx->AhdrIOData.MergeData.sw_hdrmge_mode);
-    LOGE_AHDR("%s:lrk  sw_hdrmge_ms_dif_0p8:%d \n", __FUNCTION__, pAhdrCtx->AhdrIOData.MergeData.sw_hdrmge_ms_dif_0p8);
-    LOGE_AHDR("%s:lrk  sw_hdrmge_lm_dif_0p9:%d \n", __FUNCTION__, pAhdrCtx->AhdrIOData.MergeData.sw_hdrmge_lm_dif_0p9);
-    LOGE_AHDR("%s:lrk  sw_hdrmge_ms_dif_0p15:%d \n", __FUNCTION__, pAhdrCtx->AhdrIOData.MergeData.sw_hdrmge_ms_dif_0p15);
-    LOGE_AHDR("%s:lrk  sw_hdrmge_gain1:%d \n", __FUNCTION__, pAhdrCtx->AhdrIOData.MergeData.sw_hdrmge_gain1);
-    LOGE_AHDR("%s:lrk  sw_hdrmge_gain1_inv:%d \n", __FUNCTION__, pAhdrCtx->AhdrIOData.MergeData.sw_hdrmge_gain1_inv);
-    LOGE_AHDR("%s:lrk  sw_hdrmge_gain2:%d \n", __FUNCTION__, pAhdrCtx->AhdrIOData.MergeData.sw_hdrmge_gain2);
-    LOGE_AHDR("%s:lrk  sw_hdrmge_gain0:%d \n", __FUNCTION__, pAhdrCtx->AhdrIOData.MergeData.sw_hdrmge_gain0);
-    LOGE_AHDR("%s:lrk  sw_hdrmge_gain0_inv:%d \n", __FUNCTION__, pAhdrCtx->AhdrIOData.MergeData.sw_hdrmge_gain0_inv);
-    LOGE_AHDR("%s:lrk  sw_hdrmge_lm_dif_0p15:%d \n", __FUNCTION__, pAhdrCtx->AhdrIOData.MergeData.sw_hdrmge_lm_dif_0p15);
+    LOGE_AHDR("%s:lrk  sw_hdrmge_mode:%d \n", __FUNCTION__, pAhdrCtx->AhdrProcRes.MgeProcRes.sw_hdrmge_mode);
+    LOGE_AHDR("%s:lrk  sw_hdrmge_ms_dif_0p8:%d \n", __FUNCTION__, pAhdrCtx->AhdrProcRes.MgeProcRes.sw_hdrmge_ms_dif_0p8);
+    LOGE_AHDR("%s:lrk  sw_hdrmge_lm_dif_0p9:%d \n", __FUNCTION__, pAhdrCtx->AhdrProcRes.MgeProcRes.sw_hdrmge_lm_dif_0p9);
+    LOGE_AHDR("%s:lrk  sw_hdrmge_ms_dif_0p15:%d \n", __FUNCTION__, pAhdrCtx->AhdrProcRes.MgeProcRes.sw_hdrmge_ms_dif_0p15);
+    LOGE_AHDR("%s:lrk  sw_hdrmge_gain1:%d \n", __FUNCTION__, pAhdrCtx->AhdrProcRes.MgeProcRes.sw_hdrmge_gain1);
+    LOGE_AHDR("%s:lrk  sw_hdrmge_gain1_inv:%d \n", __FUNCTION__, pAhdrCtx->AhdrProcRes.MgeProcRes.sw_hdrmge_gain1_inv);
+    LOGE_AHDR("%s:lrk  sw_hdrmge_gain2:%d \n", __FUNCTION__, pAhdrCtx->AhdrProcRes.MgeProcRes.sw_hdrmge_gain2);
+    LOGE_AHDR("%s:lrk  sw_hdrmge_gain0:%d \n", __FUNCTION__, pAhdrCtx->AhdrProcRes.MgeProcRes.sw_hdrmge_gain0);
+    LOGE_AHDR("%s:lrk  sw_hdrmge_gain0_inv:%d \n", __FUNCTION__, pAhdrCtx->AhdrProcRes.MgeProcRes.sw_hdrmge_gain0_inv);
+    LOGE_AHDR("%s:lrk  sw_hdrmge_lm_dif_0p15:%d \n", __FUNCTION__, pAhdrCtx->AhdrProcRes.MgeProcRes.sw_hdrmge_lm_dif_0p15);
     for(int i = 0; i < 17; i++)
-        LOGE_AHDR("%s:lrk  sw_hdrmge_e_y[%d]:%d \n", __FUNCTION__, i, pAhdrCtx->AhdrIOData.MergeData.sw_hdrmge_e_y[i]);
+        LOGE_AHDR("%s:lrk  sw_hdrmge_e_y[%d]:%d \n", __FUNCTION__, i, pAhdrCtx->AhdrProcRes.MgeProcRes.sw_hdrmge_e_y[i]);
     for(int i = 0; i < 17; i++)
-        LOGE_AHDR("%s:lrk  sw_hdrmge_l0_y[%d]:%d \n", __FUNCTION__, i, pAhdrCtx->AhdrIOData.MergeData.sw_hdrmge_l0_y[i]);
+        LOGE_AHDR("%s:lrk  sw_hdrmge_l0_y[%d]:%d \n", __FUNCTION__, i, pAhdrCtx->AhdrProcRes.MgeProcRes.sw_hdrmge_l0_y[i]);
     for(int i = 0; i < 17; i++)
-        LOGE_AHDR("%s:lrk  sw_hdrmge_l1_y[%d]:%d \n", __FUNCTION__, i, pAhdrCtx->AhdrIOData.MergeData.sw_hdrmge_l1_y[i]);
+        LOGE_AHDR("%s:lrk  sw_hdrmge_l1_y[%d]:%d \n", __FUNCTION__, i, pAhdrCtx->AhdrProcRes.MgeProcRes.sw_hdrmge_l1_y[i]);
 #endif
 
     LOGI_AHDR("%s:Eixt!\n", __FUNCTION__);
@@ -149,15 +152,33 @@ RESULT MergeProcessing
     float MDDampMS = pAhdrCtx->CurrHandleData.MergeMDDampMS;
 
     //get finnal current data
-    pAhdrCtx->CurrHandleData.CurrMergeHandleData.OECurve_smooth = OEDamp * pAhdrCtx->CurrHandleData.CurrMergeHandleData.OECurve_smooth + (1 - OEDamp) * pAhdrCtx->AhdrPrevData.PrevMergeHandleData.OECurve_smooth;
-    pAhdrCtx->CurrHandleData.CurrMergeHandleData.OECurve_offset = OEDamp * pAhdrCtx->CurrHandleData.CurrMergeHandleData.OECurve_offset + (1 - OEDamp) * pAhdrCtx->AhdrPrevData.PrevMergeHandleData.OECurve_offset;
-    pAhdrCtx->CurrHandleData.CurrMergeHandleData.MDCurveLM_smooth = MDDampLM * pAhdrCtx->CurrHandleData.CurrMergeHandleData.MDCurveLM_smooth + (1 - MDDampLM) * pAhdrCtx->AhdrPrevData.PrevMergeHandleData.MDCurveLM_smooth;
-    pAhdrCtx->CurrHandleData.CurrMergeHandleData.MDCurveLM_offset = MDDampLM * pAhdrCtx->CurrHandleData.CurrMergeHandleData.MDCurveLM_offset + (1 - MDDampLM) * pAhdrCtx->AhdrPrevData.PrevMergeHandleData.MDCurveLM_offset;
-    pAhdrCtx->CurrHandleData.CurrMergeHandleData.MDCurveMS_smooth = MDDampMS * pAhdrCtx->CurrHandleData.CurrMergeHandleData.MDCurveMS_smooth + (1 - MDDampMS) * pAhdrCtx->AhdrPrevData.PrevMergeHandleData.MDCurveMS_smooth;
-    pAhdrCtx->CurrHandleData.CurrMergeHandleData.MDCurveMS_offset = MDDampMS * pAhdrCtx->CurrHandleData.CurrMergeHandleData.MDCurveMS_offset + (1 - MDDampMS) * pAhdrCtx->AhdrPrevData.PrevMergeHandleData.MDCurveMS_offset;
+    if (pAhdrCtx->frameCnt != 0)
+    {
+        pAhdrCtx->CurrHandleData.CurrMergeHandleData.OECurve_smooth = OEDamp * pAhdrCtx->CurrHandleData.CurrMergeHandleData.OECurve_smooth
+                + (1 - OEDamp) * pAhdrCtx->AhdrPrevData.PrevMergeHandleData.OECurve_smooth;
+        pAhdrCtx->CurrHandleData.CurrMergeHandleData.OECurve_offset = OEDamp * pAhdrCtx->CurrHandleData.CurrMergeHandleData.OECurve_offset
+                + (1 - OEDamp) * pAhdrCtx->AhdrPrevData.PrevMergeHandleData.OECurve_offset;
+        pAhdrCtx->CurrHandleData.CurrMergeHandleData.MDCurveLM_smooth = MDDampLM * pAhdrCtx->CurrHandleData.CurrMergeHandleData.MDCurveLM_smooth
+                + (1 - MDDampLM) * pAhdrCtx->AhdrPrevData.PrevMergeHandleData.MDCurveLM_smooth;
+        pAhdrCtx->CurrHandleData.CurrMergeHandleData.MDCurveLM_offset = MDDampLM * pAhdrCtx->CurrHandleData.CurrMergeHandleData.MDCurveLM_offset
+                + (1 - MDDampLM) * pAhdrCtx->AhdrPrevData.PrevMergeHandleData.MDCurveLM_offset;
+        pAhdrCtx->CurrHandleData.CurrMergeHandleData.MDCurveMS_smooth = MDDampMS * pAhdrCtx->CurrHandleData.CurrMergeHandleData.MDCurveMS_smooth
+                + (1 - MDDampMS) * pAhdrCtx->AhdrPrevData.PrevMergeHandleData.MDCurveMS_smooth;
+        pAhdrCtx->CurrHandleData.CurrMergeHandleData.MDCurveMS_offset = MDDampMS * pAhdrCtx->CurrHandleData.CurrMergeHandleData.MDCurveMS_offset
+                + (1 - MDDampMS) * pAhdrCtx->AhdrPrevData.PrevMergeHandleData.MDCurveMS_offset;
+    }
 
     //get current IO data
     result = MergeGetCurrIOData(pAhdrCtx);
+
+#if LRK_DEBUG_LOG
+    LOGE_AHDR("%s:lrk  Current damp OECurve_smooth:%f \n", __FUNCTION__, pAhdrCtx->CurrHandleData.CurrMergeHandleData.OECurve_smooth);
+    LOGE_AHDR("%s:lrk  Current damp OECurve_offset:%f \n", __FUNCTION__, pAhdrCtx->CurrHandleData.CurrMergeHandleData.OECurve_offset);
+    LOGE_AHDR("%s:lrk  Current damp MDCurveLM_smooth:%f \n", __FUNCTION__, pAhdrCtx->CurrHandleData.CurrMergeHandleData.MDCurveLM_smooth);
+    LOGE_AHDR("%s:lrk  Current damp MDCurveLM_offset:%f \n", __FUNCTION__, pAhdrCtx->CurrHandleData.CurrMergeHandleData.MDCurveLM_offset);
+    LOGE_AHDR("%s:lrk  Current damp MDCurveMS_smooth:%f \n", __FUNCTION__, pAhdrCtx->CurrHandleData.CurrMergeHandleData.MDCurveMS_smooth);
+    LOGE_AHDR("%s:lrk  Current damp MDCurveMS_offset:%f \n", __FUNCTION__, pAhdrCtx->CurrHandleData.CurrMergeHandleData.MDCurveMS_offset);
+#endif
 
     LOGI_AHDR("%s:Eixt!\n", __FUNCTION__);
     return(result);

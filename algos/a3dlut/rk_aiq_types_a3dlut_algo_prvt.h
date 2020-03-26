@@ -31,9 +31,18 @@ RKAIQ_BEGIN_DECLARE
 typedef struct alut3d_context_s {
     const CalibDb_Lut3d_t *calib_lut3d;
     rk_aiq_lut3d_cfg_t lut3d_hw_conf;
+    //ctrl & api
+    rk_aiq_lut3d_attrib_t mCurAtt;
+    rk_aiq_lut3d_attrib_t mNewAtt;
+    bool updateAtt;
 } alut3d_context_t ;
 
 typedef alut3d_context_t* alut3d_handle_t ;
+
+typedef struct _RkAiqAlgoContext {
+    void* place_holder[0];
+    alut3d_handle_t a3dlut_para;
+} RkAiqAlgoContext;
 
 
 RKAIQ_END_DECLARE

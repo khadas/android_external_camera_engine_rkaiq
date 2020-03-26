@@ -202,6 +202,26 @@
 #define CALIB_SENSOR_AEC_AECOPTYPE_AUTO                          "AUTO"
 #define CALIB_SENSOR_AEC_AECOPTYPE_MANUAL                        "MANUAL"
 
+#define CALIB_SENSOR_AEC_AECDNSWITCH                             "AecDNSwitch"
+#define CALIB_SENSOR_AEC_AECDNSWITCH_DNTRIGGER                   "DNTrigger"
+#define CALIB_SENSOR_AEC_AECDNSWITCH_DNMODE                      "DNMode"
+#define CALIB_SENSOR_AEC_AECDNSWITCH_DNMODE_DAY                  "DAY"
+#define CALIB_SENSOR_AEC_AECDNSWITCH_DNMODE_NIGHT                "NIGHT"
+#define CALIB_SENSOR_AEC_AECDNSWITCH_NIGHTMODE                   "NightMode"
+#define CALIB_SENSOR_AEC_AECDNSWITCH_D2NFACTH                    "D2NFacTh"
+#define CALIB_SENSOR_AEC_AECDNSWITCH_D2NFRMCNT                   "D2NFrmCnt"
+#define CALIB_SENSOR_AEC_AECDNSWITCH_VBNIGHTMODE                 "VBNightMode"
+#define CALIB_SENSOR_AEC_ENABLE                                  "Enable"
+
+#define CALIB_SENSOR_AEC_AECDNSWITCH_N2DFRMCNT                   "N2DFrmCnt"
+#define CALIB_SENSOR_AEC_AECDNSWITCH_N2DFACTH                    "N2DFacTh"
+
+#define CALIB_SENSOR_AEC_AECDNSWITCH_IRNIGHTMODE                 "IRNightMode"
+#define CALIB_SENSOR_AEC_AECDNSWITCH_IR_RG                       "IR_rg"
+#define CALIB_SENSOR_AEC_AECDNSWITCH_IR_BG                       "IR_bg"
+#define CALIB_SENSOR_AEC_AECDNSWITCH_MAX_DIS                     "Max_Dis"
+#define CALIB_SENSOR_AEC_AECDNSWITCH_VB_PERCENT                  "VBPercent"
+
 #define CALIB_SENSOR_AEC_AECSPEED                                "AecSpeed"
 #define CALIB_SENSOR_AEC_DAMPOVER                                "DampOver"
 #define CALIB_SENSOR_AEC_DAMPUNDER                               "DampUnder"
@@ -209,14 +229,17 @@
 #define CALIB_SENSOR_AEC_DAMPBRIGHT2DARK                         "DampBright2Dark"
 #define CALIB_SENSOR_AEC_DAMPOVERVIDEO                           "DampOverVideo"
 #define CALIB_SENSOR_AEC_DAMPUNDERVIDEO                          "DampUnderVideo"
+
 #define CALIB_SENSOR_AEC_AECDELAYFRMNUM                          "AecDelayFrmNum"
 #define CALIB_SENSOR_AEC_BLACKDELAY                              "BlackDelay"
 #define CALIB_SENSOR_AEC_WHITEDELAY                              "WhiteDelay"
+
 #define CALIB_SENSOR_AEC_AECFRAMERATEMODE                        "AecFrameRateMode"
 #define CALIB_SENSOR_AEC_ISFPSFIX                                "isFpsFix"
 #define CALIB_SENSOR_AEC_FPSVALUE                                "FpsValue"
 #define CALIB_SENSOR_AEC_FPSFIX_LINTIMEDOT                       "FpsFix_LinTimeDot"
 #define CALIB_SENSOR_AEC_FPSFIX_HDRTIMEDOT                       "FpsFix_HdrTimeDot"
+
 #define CALIB_SENSOR_AEC_AECRANGE                                "AecRange"
 #define CALIB_SENSOR_AEC_LINEARAE                                "LinearAE"
 #define CALIB_SENSOR_AEC_TIMERANGE                               "TimeRange"
@@ -226,7 +249,6 @@
 #define CALIB_SENSOR_AEC_DGAINRANGE                              "DGainRange"
 #define CALIB_SENSOR_AEC_ISPDGAINRANGE                           "IspDgainRange"
 #define CALIB_SENSOR_AEC_PIRISRANGE                              "PIrisRange"
-
 #define CALIB_SENSOR_AEC_HDRAE                                   "HdrAE"
 #define CALIB_SENSOR_AEC_HDR_TIMERANGE_MIN                       "TimeRangeMin"
 #define CALIB_SENSOR_AEC_HDR_TIMERANGE_MAX                       "TimeRangeMax"
@@ -245,7 +267,7 @@
 #define CALIB_SENSOR_AEC_INITISPDGAINVALUE                       "InitIspDgainValue"
 #define CALIB_SENSOR_AEC_INITPIRISVALUE                          "InitPIrisValue"
 #define CALIB_SENSOR_AEC_AECGRIDWEIGHT                           "AecGridWeight"
-#define CALIB_SENSOR_AEC_NORMALGRIDWEIGHTS                       "NormalGridWeights"
+#define CALIB_SENSOR_AEC_DAYGRIDWEIGHTS                          "DayGridWeights"
 #define CALIB_SENSOR_AEC_NIGHTGRIDWEIGHTS                        "NightGridWeights"
 #define CALIB_SENSOR_AEC_AECROUTE                                "AecRoute"
 #define CALIB_SENSOR_AEC_NAME                                    "name"
@@ -276,13 +298,12 @@
 #define CALIB_SENSOR_AEC_DYNAMICSETPOINT                         "DynamicSetpoint"
 #define CALIB_SENSOR_AEC_EXPLEVEL                                "ExpLevel"
 #define CALIB_SENSOR_AEC_DYSETPOINT                              "DySetpoint"
-
 #define CALIB_SENSOR_AEC_TOLERANCE                               "Tolerance"
 #define CALIB_SENSOR_AEC_STRATEGYMODE                            "StrategyMode"
 #define CALIB_SENSOR_AEC_STRATEGYMODE_LOWLIGHT                   "LOWLIGHT_PRIOR"
 #define CALIB_SENSOR_AEC_STRATEGYMODE_HIGHLIGHT                  "HIGHLIGHT_PRIOR"
-
 #define CALIB_SENSOR_AEC_EVBIAS                                  "Evbias"
+
 #define CALIB_SENSOR_AEC_AOE                                     "AOE"
 #define CALIB_SENSOR_AEC_AOE_ENABLE                              "AOE_Enable"
 #define CALIB_SENSOR_AEC_AOE_MAX_POINT                           "AOE_Max_point"
@@ -314,26 +335,6 @@
 #define CALIB_SENSOR_LINAECTRL_BACKLIGHT_EXPLEVEL                "ExpLevel"
 #define CALIB_SENSOR_LINAECTRL_BACKLIGHT_DYLOCALSETPOINT         "DyLocalSetPoint"
 #define CALIB_SENSOR_LINAECTRL_BACKLIGHT_MAXLUMADISTTH           "MaxLumaDistTh"
-
-
-#define CALIB_SENSOR_AEC_DON                                     "DON"
-#define CALIB_SENSOR_AEC_NIGHTTRIGGER                            "NightTrigger"
-#define CALIB_SENSOR_AEC_NIGHTMODE                               "NightMode"
-#define CALIB_SENSOR_AEC_DON_DAY2NIGHT_FAC_TH                    "DON_Day2Night_Fac_th"
-#define CALIB_SENSOR_AEC_DON_NIGHT2DAY_FAC_TH                    "DON_Night2Day_Fac_th"
-#define CALIB_SENSOR_AEC_DON_BOUNCING_TH                         "DON_Bouncing_th"
-
-#define CALIB_SENSOR_AEC_NLSC_CONFIG                             "NLSC"
-#define CALIB_SENSOR_AEC_ENABLE                                  "Enable"
-#define CALIB_SENSOR_AEC_IR_RG                                   "IR_rg"
-#define CALIB_SENSOR_AEC_IR_BG                                   "IR_bg"
-#define CALIB_SENSOR_AEC_MAX_DIS                                 "Max_Dis"
-#define CALIB_SENSOR_AEC_COLOR2BLACK_COUNT                       "Color2Black_count"
-#define CALIB_SENSOR_AEC_COLOR2BLACK_THRESH                      "Color2Black_thresh"
-#define CALIB_SENSOR_AEC_BLACK2COLOR_COUNT                       "Black2Color_count"
-#define CALIB_SENSOR_AEC_BLACK2COLOR_THRESH                      "Black2Color_thresh"
-#define CALIB_SENSOR_AEC_BLACK2COLOR_VB_PERCENT                  "Black2Color_vb_percent"
-#define CALIB_SENSOR_AEC_COLOR2BLACK_STABLE_FPS                  "Color2Black_stable_fps"
 
 #define CALIB_SENSOR_AEC_AEC_INTERVAL_ADJUST_STRATEGY            "IntervalAdjustStrategy"
 //#define CALIB_SENSOR_AEC_ENABLE                                  "Enable"
@@ -390,31 +391,35 @@
 #define CALIB_SENSOR_AHDR_MERGE_OECURVE_DAMP                     "OECurve_damp"
 #define CALIB_SENSOR_AHDR_MERGE_MDCURVELM_DAMP                   "MDCurveLM_damp"
 #define CALIB_SENSOR_AHDR_MERGE_MDCURVEMS_DAMP                   "MDCurveMS_damp"
-
 #define CALIB_SENSOR_AHDR_TMO                                    "Tmo"
 #define CALIB_SENSOR_AHDR_TMO_ENVLV                              "EnvLv"
+#define CALIB_SENSOR_AHDR_TMO_ENVLVTOLERANCE                              "EnvLvTolerance"
 #define CALIB_SENSOR_AHDR_TMO_GLOBALMAXLUMA                      "GlobalMaxLuma"
 #define CALIB_SENSOR_AHDR_TMO_GLOBALLUMA                         "GlobalLuma"
 #define CALIB_SENSOR_AHDR_TMO_OEPDF                              "OEPdf"
+#define CALIB_SENSOR_AHDR_TMO_OETOLERANCE                              "OETolerance"
 #define CALIB_SENSOR_AHDR_TMO_DETAILSHIGHLIGHT                   "DetailsHighLight"
 #define CALIB_SENSOR_AHDR_TMO_ENLUMAWEIGHT                       "enLumaWeight"
 #define CALIB_SENSOR_AHDR_TMO_LUMAWEIGHT                         "LumaWeight"
 #define CALIB_SENSOR_AHDR_TMO_DARKPDFTH                          "DarkPdfTH"
 #define CALIB_SENSOR_AHDR_TMO_DARKTEXTUREPDF                     "DarkTexturePdf"
+#define CALIB_SENSOR_AHDR_TMO_DTPDFTOLERANCE                     "DTPdfTolerance"
 #define CALIB_SENSOR_AHDR_TMO_DETAILSLOWLIGHT                    "DetailsLowLight"
 #define CALIB_SENSOR_AHDR_TMO_ENPOSWEIGHT                        "enPosWeight"
 #define CALIB_SENSOR_AHDR_TMO_POSWEIGHT                          "PosWeight"
 #define CALIB_SENSOR_AHDR_TMO_POSCOEF                            "PosCoef"
+#define CALIB_SENSOR_AHDR_TMO_POSCOEFTOLERANCE                  "PosCoefTolerance"
 #define CALIB_SENSOR_AHDR_TMO_NOISELOWLIGHT                      "NoiseLowLight"
 #define CALIB_SENSOR_AHDR_TMO_DYNAMICRANGE                       "DynamicRange"
+#define CALIB_SENSOR_AHDR_TMO_DRTOLERANCE                       "DRTolerance"
 #define CALIB_SENSOR_AHDR_TMO_DAYTH                              "DayTh"
-#define CALIB_SENSOR_AHDR_TMO_SMOOTHCONTROLCOEF1                 "SmoothControlCoef1"
-#define CALIB_SENSOR_AHDR_TMO_SMOOTHCONTROLCOEF2                 "SmoothControlCoef2"
+#define CALIB_SENSOR_AHDR_TMO_SMOOTHCTRLCOEF                 "SmoothCtrlCoef"
 #define CALIB_SENSOR_AHDR_TMO_DAMP                               "Damp"
 /******************************************************************************
  * XML BLC section
  *****************************************************************************/
 #define CALIB_SENSOR_BLC                                        "BLC"
+#define CALIB_SENSOR_BLC_ENABLE                                 "Enable"
 #define CALIB_SENSOR_BLC_BLACK_LEVEL                            "black_level"
 
 /******************************************************************************
@@ -445,18 +450,18 @@
 #define CALIB_SENSOR_DPCC_STAGE1_USE_SET3                        "stage1_use_set3"
 #define CALIB_SENSOR_DPCC_STAGE1_USE_SET2                        "stage1_use_set2"
 #define CALIB_SENSOR_DPCC_STAGE1_USE_SET1                        "stage1_use_set1"
-#define CALIB_SENSOR_DPCC_SET_CELL                        		 "set_cell"
+#define CALIB_SENSOR_DPCC_SET_CELL                               "set_cell"
 #define CALIB_SENSOR_DPCC_RED_BLUE_ENABLE                        "red_blue_enable"
 #define CALIB_SENSOR_DPCC_GREEN_ENABLE                           "green_enable"
 #define CALIB_SENSOR_DPCC_LINE_THRESH                            "line_thresh"
 #define CALIB_SENSOR_DPCC_LINE_MAD_FAC                           "line_mad_fac"
-#define CALIB_SENSOR_DPCC_PG_FAC                           		 "pg_fac"
+#define CALIB_SENSOR_DPCC_PG_FAC                                 "pg_fac"
 #define CALIB_SENSOR_DPCC_RND_THRESH                             "rnd_thresh"
-#define CALIB_SENSOR_DPCC_RG_FAC                           		 "rg_fac"
-#define CALIB_SENSOR_DPCC_RG_LIM                           		 "rg_lim"
+#define CALIB_SENSOR_DPCC_RG_FAC                                 "rg_fac"
+#define CALIB_SENSOR_DPCC_RG_LIM                                 "rg_lim"
 #define CALIB_SENSOR_DPCC_RND_OFFS                               "rnd_offs"
 
-#define CALIB_SENSOR_DPCC_PDAF                              	 "dpcc_pdaf"
+#define CALIB_SENSOR_DPCC_PDAF                                   "dpcc_pdaf"
 #define CALIB_SENSOR_DPCC_PDAF_ENABLE                            "pdaf_en"
 #define CALIB_SENSOR_DPCC_PDAF_POINT_ENABLE                      "pdaf_point_en"
 #define CALIB_SENSOR_DPCC_PDAF_OFFSETX                           "pdaf_offsetx"
@@ -957,6 +962,10 @@
  * XML system section
  *****************************************************************************/
 #define CALIB_SYSTEM_TAG                                    "system"
+#define CALIB_SYSTEM_HDR                                    "HDR"
+#define CALIB_SYSTEM_HDR_ENABLE                             "enable"
+#define CALIB_SYSTEM_HDR_SUPPORT_MODE                       "support_mode"
+#define CALIB_SYSTEM_HDR_LINE_MODE                          "line_mode"
 
 
 /******************************************************************************

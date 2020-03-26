@@ -24,10 +24,6 @@
 
 RKAIQ_BEGIN_DECLARE
 
-typedef struct _RkAiqAlgoContext {
-    void* place_holder[0];
-    alsc_handle_t alsc_para;
-} RkAiqAlgoContext;
 
 static RkAiqAlgoContext ctx;
 
@@ -35,8 +31,9 @@ static XCamReturn
 create_context(RkAiqAlgoContext **context, const AlgoCtxInstanceCfg* cfg)
 {
     LOGI_ALSC( "%s: (enter)\n", __FUNCTION__);
+    AlgoCtxInstanceCfgInt *cfgInt = (AlgoCtxInstanceCfgInt*)cfg;
 
-    AlscInit(&ctx.alsc_para);
+    AlscInit(&ctx.alsc_para,cfgInt->calib);
     *context = &ctx;
     LOGI_ALSC( "%s: (exit)\n", __FUNCTION__);
     return XCAM_RETURN_NO_ERROR;
@@ -60,15 +57,7 @@ prepare(RkAiqAlgoCom* params)
     alsc_handle_t hAlsc = (alsc_handle_t)(params->ctx->alsc_para);
 
     RkAiqAlgoConfigAlscInt *para = (RkAiqAlgoConfigAlscInt *)params;
-    if(para->rk_com.u.prepare.calib == NULL) {
-        return XCAM_RETURN_ERROR_FAILED;
-    }
-    CamCalibDbContext_t* calib = para->rk_com.u.prepare.calib;
-    const CalibDb_Lsc_t *calib_lsc = &calib->lsc;
-    if(calib_lsc ==NULL){
-        return XCAM_RETURN_ERROR_FAILED;
-    }
-    hAlsc->calibLsc = calib_lsc;
+
     sprintf(hAlsc->curResName,"%dx%d",para->alsc_config_com.com.u.prepare.sns_op_width,
        para->alsc_config_com.com.u.prepare.sns_op_height );
 

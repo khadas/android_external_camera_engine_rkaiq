@@ -21,16 +21,16 @@
 #include "awb/rk_aiq_types_awb_algo_int.h"
 #include "ae/rk_aiq_types_ae_algo.h"
 #include "af/rk_aiq_af_hw_v200.h"
-#include "anr/anr.h"
-#include "asharp/asharp.h"
-#include "adehaze/dehaze.h"
+#include "adehaze/rk_aiq_types_adehaze_algo_prvt.h"
+#include "anr/rk_aiq_types_anr_algo_int.h"
+#include "asharp/rk_aiq_types_asharp_algo_int.h"
 #include "adebayer/rk_aiq_types_algo_adebayer.h"
-#include "aorb/rk_aiq_orb.h"
 #include "ahdr/rk_aiq_types_ahdr_algo_int.h"
 #include "ahdr/rk_aiq_types_ahdr_algo.h"
-#include "agamma/agamma.h"
-#include "adpcc/adpcc.h"
-#include "ablc/ablc.h"
+#include "agamma/rk_aiq_types_agamma_algo_prvt.h"
+#include "aorb/rk_aiq_orb_hw.h"
+#include "adpcc/rk_aiq_types_adpcc_algo_int.h"
+#include "ablc/rk_aiq_types_ablc_algo_int.h"
 #include "alsc/rk_aiq_types_alsc_algo.h"
 #include "accm/rk_aiq_types_accm_algo.h"
 #include "rk_aiq_luma.h"
@@ -56,7 +56,7 @@ typedef struct rk_sim_isp_v200_stats_s {
     int iso;
     //orb
     bool valid_orb;
-    orb_stat_t orb;
+    sim_orb_stat_t orb;
     //ahdr
     unsigned short  rawWidth;               // rawÍ¼¿í
     unsigned short  rawHeight;
@@ -72,25 +72,27 @@ typedef struct rk_sim_isp_v200_params_s {
     //ae
     RkAiqAecHwConfig_t ae_hw_config;
     //anr
-    rkaiq_anr_procRes_t rkaiq_anr_proc_res;
-    rkaiq_asharp_procRes_t rkaiq_asharp_proc_res;
+    ANRProcResult_t rkaiq_anr_proc_res;
+    AsharpProcResult_t rkaiq_asharp_proc_res;
     //adhaz
-    RKAiqAdhazConfig_t adhaz_config;
+    rk_aiq_dehaze_cfg_t adhaz_config;
     //agamma
-    RKAiqAgammaHwConfig_t agamma_config;
+    rk_aiq_gamma_cfg_t agamma_config;
     //ahdr
     RkAiqAhdrProcResult_t ahdr_proc_res;
     //adpcc
-    rk_aiq_isp_dpcc_t   dpcc;
+    AdpccProcResult_t   dpcc;
     //adebayer
     AdebayerConfig_t adebayer_config;
     //ablc
-    rk_aiq_isp_blc_t blc;
+    AblcProcResult_t blc;
 
     rk_aiq_lsc_cfg_t lscHwConf;
     rk_aiq_ccm_cfg_t ccmHwConf;
 
     rk_aiq_lut3d_cfg_t lut3d_hw_conf;
+    unsigned short  rawWidth;               // rawÍ¼¿í
+    unsigned short  rawHeight;
 } rk_sim_isp_v200_params_t;
 
 #endif

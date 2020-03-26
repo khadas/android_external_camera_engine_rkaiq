@@ -44,7 +44,9 @@ protected:
     virtual void deInit();
     enum {
        RKAIQ_CONFIG_COM_PREPARE, 
+       RKAIQ_CONFIG_COM_PRE, 
        RKAIQ_CONFIG_COM_PROC, 
+       RKAIQ_CONFIG_COM_POST, 
     };
     virtual XCamReturn configInparamsCom(RkAiqAlgoCom* com, int type);
     RkAiqAlgoCom*     mConfig;

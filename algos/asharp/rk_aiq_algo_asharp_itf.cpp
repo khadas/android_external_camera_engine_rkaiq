@@ -19,7 +19,7 @@
 
 #include "rk_aiq_algo_types_int.h"
 #include "asharp/rk_aiq_algo_asharp_itf.h"
-#include "asharp/asharp.h"
+#include "asharp/rk_aiq_asharp_algo.h"
 
 RKAIQ_BEGIN_DECLARE
 
@@ -34,12 +34,12 @@ create_context(RkAiqAlgoContext **context, const AlgoCtxInstanceCfg* cfg)
 {
 	 
 	XCamReturn result = XCAM_RETURN_NO_ERROR;
-
+	AlgoCtxInstanceCfgInt *cfgInt = (AlgoCtxInstanceCfgInt*)cfg;
 	LOGI_ASHARP("%s: (enter)\n", __FUNCTION__ );
 	 
 #if 1
 	AsharpContext_t* pAsharpCtx = NULL;
-    AsharpResult_t ret = AsharpInit(&pAsharpCtx);
+    AsharpResult_t ret = AsharpInit(&pAsharpCtx, cfgInt->calib);
 	if(ret != ASHARP_RET_SUCCESS){
 		result = XCAM_RETURN_ERROR_FAILED;
 		LOGE_ASHARP("%s: Initializaion Asharp failed (%d)\n", __FUNCTION__, ret);
@@ -82,12 +82,8 @@ prepare(RkAiqAlgoCom* params)
 #if 1
     AsharpContext_t* pAsharpCtx = (AsharpContext_t *)params->ctx;
     RkAiqAlgoConfigAsharpInt* pCfgParam = (RkAiqAlgoConfigAsharpInt*)params;
-	AsharpConfig_t* pAsharpConfig = &pCfgParam->stAsharpConfig;
-
-	pAsharpConfig->stSharpCalib = pCfgParam->rk_com.u.prepare.calib->sharp;
-	pAsharpConfig->stEdgeFltCalib = pCfgParam->rk_com.u.prepare.calib->edgeFilter;
 	
-	AsharpResult_t ret = AsharpConfig(pAsharpCtx, &pCfgParam->stAsharpConfig);
+	AsharpResult_t ret = AsharpPrepare(pAsharpCtx, &pCfgParam->stAsharpConfig);
 	if(ret != ASHARP_RET_SUCCESS){
 		result = XCAM_RETURN_ERROR_FAILED;
 		LOGE_ASHARP("%s: config Asharp failed (%d)\n", __FUNCTION__, ret);
@@ -128,10 +124,14 @@ processing(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outparams)
 
 	LOGD_ASHARP("%s:%d init:%d \n", __FUNCTION__, __LINE__, inparams->u.proc.init);
 
+	#if 0
 	if(inparams->u.proc.init)
 		iso = 50;
 	else
 		iso = pAsharpProcParams->rk_com.u.proc.iso;
+	#else
+		iso = 50;
+	#endif
 	
 	AsharpResult_t ret = AsharpProcess(pAsharpCtx, iso);
 	if(ret != ASHARP_RET_SUCCESS){

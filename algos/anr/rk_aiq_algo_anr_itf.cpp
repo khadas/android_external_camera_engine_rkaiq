@@ -19,7 +19,7 @@
 
 #include "rk_aiq_algo_types_int.h"
 #include "anr/rk_aiq_algo_anr_itf.h"
-#include "anr/anr.h"
+#include "anr/rk_aiq_anr_algo.h"
 
 RKAIQ_BEGIN_DECLARE
 
@@ -34,12 +34,12 @@ create_context(RkAiqAlgoContext **context, const AlgoCtxInstanceCfg* cfg)
 {
 	 
 	XCamReturn result = XCAM_RETURN_NO_ERROR;
-
+	AlgoCtxInstanceCfgInt *cfgInt = (AlgoCtxInstanceCfgInt*)cfg;
 	LOGI_ANR("%s: (enter)\n", __FUNCTION__ );
 	 
 #if 1
 	ANRContext_t* pAnrCtx = NULL;
-    ANRresult_t ret = ANRInit(&pAnrCtx);
+    ANRresult_t ret = ANRInit(&pAnrCtx, cfgInt->calib);
 	if(ret != ANR_RET_SUCCESS){
 		result = XCAM_RETURN_ERROR_FAILED;
 		LOGE_ANR("%s: Initializaion ANR failed (%d)\n", __FUNCTION__, ret);
@@ -79,28 +79,14 @@ prepare(RkAiqAlgoCom* params)
 
 	LOGI_ANR("%s: (enter)\n", __FUNCTION__ );
 	
-#if 1
     ANRContext_t* pAnrCtx = (ANRContext_t *)params->ctx;
     RkAiqAlgoConfigAnrInt* pCfgParam = (RkAiqAlgoConfigAnrInt*)params;
 
-	#if 1
-	//read params from xml
-	ANRConfig_t *pAnrCfg = &pCfgParam->stANRConfig;	
-	pAnrCfg->refYuvBit = 8;
-	pAnrCfg->eMode = ANR_OP_MODE_AUTO;
-	pAnrCfg->stBayernrCalib = pCfgParam->rk_com.u.prepare.calib->bayerNr;
-	pAnrCfg->stUvnrCalib = pCfgParam->rk_com.u.prepare.calib->uvnr;
-	pAnrCfg->stYnrCalib = pCfgParam->rk_com.u.prepare.calib->ynr;
-	pAnrCfg->stMfnrCalib = pCfgParam->rk_com.u.prepare.calib->mfnr;
-	#endif
-	
-	ANRresult_t ret = ANRConfig(pAnrCtx, pAnrCfg);
+	ANRresult_t ret = ANRPrepare(pAnrCtx, &pCfgParam->stANRConfig);
 	if(ret != ANR_RET_SUCCESS){
 		result = XCAM_RETURN_ERROR_FAILED;
 		LOGE_ANR("%s: config ANR failed (%d)\n", __FUNCTION__, ret);
 	}
-	
-#endif
 
 	LOGI_ANR("%s: (exit)\n", __FUNCTION__ );
     return result;
@@ -135,10 +121,14 @@ processing(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outparams)
 
 	LOGD_ANR("%s:%d init:%d \n", __FUNCTION__, __LINE__, inparams->u.proc.init);
 
+	#if 0
 	if(inparams->u.proc.init)
 		iso = 50;
 	else
 		iso = pAnrProcParams->rk_com.u.proc.iso;
+	#else
+		iso = 50;
+	#endif
 	
 	ANRresult_t ret = ANRProcess(pAnrCtx, iso);
 	if(ret != ANR_RET_SUCCESS){

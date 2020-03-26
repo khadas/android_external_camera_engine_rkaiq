@@ -23,7 +23,8 @@
 RKAIQ_BEGIN_DECLARE
 
 typedef struct _RkAiqAlgoContext {
-    void* place_holder[0];
+    CamCalibDbContext_t* calib;
+    rk_aiq_acp_params_t params;
 } RkAiqAlgoContext;
 
 static RkAiqAlgoContext ctx;
@@ -31,7 +32,18 @@ static RkAiqAlgoContext ctx;
 static XCamReturn
 create_context(RkAiqAlgoContext **context, const AlgoCtxInstanceCfg* cfg)
 {
+    const AlgoCtxInstanceCfgInt* cfg_int = (const AlgoCtxInstanceCfgInt*)cfg;
+
+    ctx.calib = cfg_int->calib;
+    // TODO: get initial params from calib
+    rk_aiq_acp_params_t* params = &ctx.params;
+    params->brightness = 0;
+    params->hue = 0.0f;
+    params->saturation = 0.0f;
+    params->contrast = 0.0f;
+
     *context = &ctx;
+
     return XCAM_RETURN_NO_ERROR;
 }
 
@@ -56,6 +68,12 @@ pre_process(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outparams)
 static XCamReturn
 processing(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outparams)
 {
+    RkAiqAlgoProcResAcp* res_com = (RkAiqAlgoProcResAcp*)outparams;
+    RkAiqAlgoProcResAcpInt* res_int = (RkAiqAlgoProcResAcpInt*)outparams;
+    RkAiqAlgoContext* ctx = inparams->ctx;
+
+    res_com->acp_res = ctx->params;
+
     return XCAM_RETURN_NO_ERROR;
 }
 

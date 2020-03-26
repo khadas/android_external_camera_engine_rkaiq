@@ -28,8 +28,7 @@ rk_aiq_uapi_ahdr_SetAttrib(RkAiqAlgoContext *ctx,
 
 XCamReturn
 rk_aiq_uapi_ahdr_GetAttrib(RkAiqAlgoContext *ctx,
-                           ahdr_attrib_t attr,
-                           bool need_sync = true);
+                           ahdr_attrib_t *attr);
 
 
 #endif

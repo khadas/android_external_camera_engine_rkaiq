@@ -24,7 +24,7 @@
 
 RKAIQ_BEGIN_DECLARE
 
-XCamReturn AccmInit(accm_handle_t *hAccm);
+XCamReturn AccmInit(accm_handle_t *hAccm,const CamCalibDbContext_t* calib);
 XCamReturn AccmRelease(accm_handle_t hAccm);
 XCamReturn AccmPrepare(accm_handle_t hAccm);
 XCamReturn AccmConfig(accm_handle_t hAccm);

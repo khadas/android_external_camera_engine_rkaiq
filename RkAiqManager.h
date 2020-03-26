@@ -57,6 +57,7 @@ private:
 
 class RkAiqManager
     : public IspStatsListener
+    , public IsppStatsListener
     , public IspLumaListener
     , public IspEvtsListener
     , public RkAiqAnalyzerCb
@@ -67,7 +68,6 @@ public:
                           rk_aiq_error_cb err_cb,
                           rk_aiq_metas_cb metas_cb);
     virtual ~RkAiqManager();
-    static XCamReturn getAiqStaticInfos();
     void setCamHw(SmartPtr<ICamHw>& camhw);
     void setAnalyzer(SmartPtr<RkAiqCore> analyzer);
     void setAiqCalibDb(const CamCalibDbContext_t* calibDb);
@@ -77,6 +77,8 @@ public:
     XCamReturn start();
     XCamReturn stop();
     XCamReturn deInit();
+    // from IsppStatsListener
+    XCamReturn isppStatsCb(SmartPtr<VideoBuffer>& isppStats);
     // from IspLumaListener
     XCamReturn ispLumaCb(SmartPtr<VideoBuffer>& ispLuma);
     // from IspStatsListener

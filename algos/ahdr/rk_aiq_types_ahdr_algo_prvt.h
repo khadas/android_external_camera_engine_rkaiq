@@ -25,9 +25,6 @@
 #include "rk_aiq_uapi_ahdr_int.h"
 
 
-#define MIN(a,b)             ((a) <= (b) ? (a):(b))
-#define MAX(a,b)             ((a) >= (b) ? (a):(b))
-
 #define LIMIT_VALUE(value,max_value,min_value)      (value > max_value? max_value : value < min_value ? min_value : value)
 #define SHIFT6BIT(A)         (A*64)
 #define SHIFT7BIT(A)         (A*128)
@@ -79,6 +76,9 @@
 #define DAYTHMIN     (0.0)
 #define DARKPDFTHMAX     (1.0)
 #define DARKPDFTHMIN     (0.0)
+#define TOLERANCEMAX     (20.0)
+#define TOLERANCEMIN     (0.0)
+
 
 #define GLOBEMAXLUMAMAX     (737)
 #define GLOBEMAXLUMAMIN     (46)
@@ -119,8 +119,7 @@ typedef struct TmoHandleData_s
     float DetailsHighLight;
     float DetailsLowLight;
     float NoiseLowLight;
-    float SmoothControlCoef1;
-    float SmoothControlCoef2;
+    float SmoothCtrlCoef;
 
 } TmoHandleData_t;
 
@@ -138,6 +137,12 @@ typedef struct AhdrPrevData_s
 {
     float PreL2S_ratio;
     float PreLExpo;
+	float PreEnvlv;
+	float PreMoveCoef;
+	float PreOEPdf;
+	float PreDarkTexturePdf;
+	float PrePosCoef;
+	float PreDynamicRange;
     MergeHandleData_t PrevMergeHandleData;
     TmoHandleData_t PrevTmoHandleData;
     unsigned short ro_hdrtmo_lgmean_all[16];
@@ -202,19 +207,21 @@ typedef struct CurrHandleData_s
     TmoHandleData_t CurrTmoHandleData;
 } CurrHandleData_t;
 
+typedef struct AhdrProcResData_s
+{
+    TmoProcRes_t TmoProcRes;
+    MgeProcRes_t MgeProcRes;
+} AhdrProcResData_t;
 
 typedef struct AhdrContext_s
 {
     //api
-    bool      bEnable;
-    OpMode_t Mode;
-    ahdrAttr_t    stAuto;
-    mhdrAttr_t stManual;
+    hdrAttr_t hdrAttr;
 
     AhdrState_t state;
     AhdrConfig_t AhdrConfig;
     AhdrPrevData_t AhdrPrevData ;
-    AhdrIOData_t AhdrIOData;
+    AhdrProcResData_t AhdrProcRes;
     CurrAeResult_t CurrAeResult;
     CurrAfResult_t CurrAfResult;
     CurrHandleData_t CurrHandleData;
@@ -222,6 +229,7 @@ typedef struct AhdrContext_s
     uint32_t width;
     uint32_t height;
     int frameCnt;
+    int hdr_mode;
 } AhdrContext_t;
 
 typedef struct AhdrContext_s* AhdrHandle_t;

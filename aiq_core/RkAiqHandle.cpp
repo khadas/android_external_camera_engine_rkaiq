@@ -58,12 +58,10 @@ XCamReturn RkAiqHandle::configInparamsCom(RkAiqAlgoCom* com, int type)
         com->u.prepare.working_mode = shared->working_mode;
         com->u.prepare.sns_op_width = shared->snsDes.sensor_output_width;
         com->u.prepare.sns_op_height = shared->snsDes.sensor_output_height;
-    } else if (type == RKAIQ_CONFIG_COM_PROC) {
+    } else {
         com->ctx = mAlgoCtx;
         com->frame_id = shared->frameId;
         com->u.proc.init = shared->init;
-    } else {
-
     }
 
     EXIT_ANALYZER_FUNCTION();
@@ -96,7 +94,7 @@ RkAiqHandle::preProcess()
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
     RkAiqAlgoCom* preParam = mPreInParam;
 
-    configInparamsCom(preParam, RKAIQ_CONFIG_COM_PROC);
+    configInparamsCom(preParam, RKAIQ_CONFIG_COM_PRE);
 
     EXIT_ANALYZER_FUNCTION();
 
@@ -126,7 +124,7 @@ RkAiqHandle::postProcess()
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
     RkAiqAlgoCom* postParam = mPostInParam;
 
-    configInparamsCom(postParam, RKAIQ_CONFIG_COM_PROC);
+    configInparamsCom(postParam, RKAIQ_CONFIG_COM_POST);
 
     EXIT_ANALYZER_FUNCTION();
 

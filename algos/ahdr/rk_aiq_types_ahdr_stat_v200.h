@@ -11,7 +11,14 @@
 #ifndef __RK_AIQ_TYPES_AHDR_ALGO_V200_H__
 #define __RK_AIQ_TYPES_AHDR_ALGO_V200_H__
 
-typedef struct rkisp_ahdr_stats_s {
+typedef struct other_stats_s {
+    unsigned short tmo_luma[225];
+    unsigned short short_luma[225];
+    unsigned short middle_luma[25];
+    unsigned short long_luma[225];
+} other_stats_t;
+
+typedef struct hdrtmo_stats_s {
     unsigned short ro_hdrtmo_lgmin;
     unsigned short ro_hdrtmo_lglow;
     unsigned short ro_hdrtmo_lgmax;
@@ -24,6 +31,11 @@ typedef struct rkisp_ahdr_stats_s {
     unsigned short ro_hdrtmo_palpha;
     unsigned short ro_hdrtmo_linecnt;
     unsigned int ro_array_min_max[32];
+} hdrtmo_stats_t;
+
+typedef struct rkisp_ahdr_stats_s {
+    hdrtmo_stats_t tmo_stats;
+    other_stats_t other_stats;
 } rkisp_ahdr_stats_t;
 
 

@@ -73,7 +73,8 @@ Isp20PollThread::new_video_buffer(SmartPtr<V4l2Buffer> buf,
         // TODO: get ispParams from isp dev;
 
         video_buf = new Isp20StatsBuffer(buf, dev, ispParams, expParams);
-    }
+    } else
+        return PollThread::new_video_buffer(buf, dev, type);
     EXIT_CAMHW_FUNCTION();
 
     return video_buf;

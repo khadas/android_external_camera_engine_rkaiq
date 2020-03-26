@@ -29,78 +29,90 @@ XCamReturn RkAiqHandleIntCom::configInparamsCom(RkAiqAlgoCom* com, int type)
     RkAiqCore::RkAiqAlgosShared_t* shared = &mAiqCore->mAlogsSharedParams;
     RkAiqAlgoComInt* rk_com = NULL;
 
+#define GET_RK_COM(algo) \
+    { \
+        if (type == RKAIQ_CONFIG_COM_PREPARE) \
+            rk_com = &(((RkAiqAlgoConfig##algo##Int*)com)->rk_com); \
+        else if (type == RKAIQ_CONFIG_COM_PRE) \
+            rk_com = &(((RkAiqAlgoPre##algo##Int*)com)->rk_com); \
+        else if (type == RKAIQ_CONFIG_COM_PROC) \
+            rk_com = &(((RkAiqAlgoProc##algo##Int*)com)->rk_com); \
+        else if (type == RKAIQ_CONFIG_COM_POST) \
+            rk_com = &(((RkAiqAlgoPost##algo##Int*)com)->rk_com); \
+    } \
+
     switch (mDes->type) {
     case RK_AIQ_ALGO_TYPE_AE:
-        rk_com = &(((RkAiqAlgoConfigAeInt*)com)->rk_com);
+        GET_RK_COM(Ae);
         break;
     case RK_AIQ_ALGO_TYPE_AWB:
-        rk_com = &(((RkAiqAlgoConfigAwbInt*)com)->rk_com);
+        GET_RK_COM(Awb);
         break;
     case RK_AIQ_ALGO_TYPE_AF:
-        rk_com = &(((RkAiqAlgoConfigAfInt*)com)->rk_com);
+        GET_RK_COM(Af);
         break;
     case RK_AIQ_ALGO_TYPE_ABLC:
-        rk_com = &(((RkAiqAlgoConfigAblcInt*)com)->rk_com);
+        GET_RK_COM(Ablc);
         break;
     case RK_AIQ_ALGO_TYPE_ADPCC:
-        rk_com = &(((RkAiqAlgoConfigAdpccInt*)com)->rk_com);
+        GET_RK_COM(Adpcc);
         break;
     case RK_AIQ_ALGO_TYPE_AHDR:
-        rk_com = &(((RkAiqAlgoConfigAhdrInt*)com)->rk_com);
+        GET_RK_COM(Ahdr);
         break;
     case RK_AIQ_ALGO_TYPE_ANR:
-        rk_com = &(((RkAiqAlgoConfigAnrInt*)com)->rk_com);
+        GET_RK_COM(Anr);
         break;
     case RK_AIQ_ALGO_TYPE_ALSC:
-        rk_com = &(((RkAiqAlgoConfigAlscInt*)com)->rk_com);
+        GET_RK_COM(Alsc);
         break;
     case RK_AIQ_ALGO_TYPE_AGIC:
-        rk_com = &(((RkAiqAlgoConfigAgicInt*)com)->rk_com);
+        GET_RK_COM(Agic);
         break;
     case RK_AIQ_ALGO_TYPE_ADEBAYER:
-        rk_com = &(((RkAiqAlgoConfigAdebayerInt*)com)->rk_com);
+        GET_RK_COM(Adebayer);
         break;
     case RK_AIQ_ALGO_TYPE_ACCM:
-        rk_com = &(((RkAiqAlgoConfigAccmInt*)com)->rk_com);
+        GET_RK_COM(Accm);
         break;
     case RK_AIQ_ALGO_TYPE_AGAMMA:
-        rk_com = &(((RkAiqAlgoConfigAgammaInt*)com)->rk_com);
+        GET_RK_COM(Agamma);
         break;
     case RK_AIQ_ALGO_TYPE_AWDR:
-        rk_com = &(((RkAiqAlgoConfigAwdrInt*)com)->rk_com);
+        GET_RK_COM(Awdr);
         break;
     case RK_AIQ_ALGO_TYPE_ADHAZ:
-        rk_com = &(((RkAiqAlgoConfigAdhazInt*)com)->rk_com);
+        GET_RK_COM(Adhaz);
         break;
     case RK_AIQ_ALGO_TYPE_A3DLUT:
-        rk_com = &(((RkAiqAlgoConfigA3dlutInt*)com)->rk_com);
+        GET_RK_COM(A3dlut);
         break;
     case RK_AIQ_ALGO_TYPE_ALDCH:
-        rk_com = &(((RkAiqAlgoConfigAldchInt*)com)->rk_com);
+        GET_RK_COM(Aldch);
         break;
     case RK_AIQ_ALGO_TYPE_AR2Y:
-        rk_com = &(((RkAiqAlgoConfigAr2yInt*)com)->rk_com);
+        GET_RK_COM(Ar2y);
         break;
     case RK_AIQ_ALGO_TYPE_ACP:
-        rk_com = &(((RkAiqAlgoConfigAcpInt*)com)->rk_com);
+        GET_RK_COM(Acp);
         break;
     case RK_AIQ_ALGO_TYPE_AIE:
-        rk_com = &(((RkAiqAlgoConfigAieInt*)com)->rk_com);
+        GET_RK_COM(Aie);
         break;
     case RK_AIQ_ALGO_TYPE_ASHARP:
-        rk_com = &(((RkAiqAlgoConfigAsharpInt*)com)->rk_com);
+        GET_RK_COM(Asharp);
         break;
     case RK_AIQ_ALGO_TYPE_AORB:
-        rk_com = &(((RkAiqAlgoConfigAorbInt*)com)->rk_com);
+        GET_RK_COM(Aorb);
         break;
     case RK_AIQ_ALGO_TYPE_AFEC:
-        rk_com = &(((RkAiqAlgoConfigAfecInt*)com)->rk_com);
+        GET_RK_COM(Afec);
         break;
     case RK_AIQ_ALGO_TYPE_ACGC:
-        rk_com = &(((RkAiqAlgoConfigAcgcInt*)com)->rk_com);
+        GET_RK_COM(Acgc);
         break;
     case RK_AIQ_ALGO_TYPE_ASD:
-        rk_com = &(((RkAiqAlgoConfigAsdInt*)com)->rk_com);
+        GET_RK_COM(Asd);
         break;
     default:
         LOGE_ANALYZER("wrong algo type !");
@@ -113,13 +125,11 @@ XCamReturn RkAiqHandleIntCom::configInparamsCom(RkAiqAlgoCom* com, int type)
 
     if (type == RkAiqHandle::RKAIQ_CONFIG_COM_PREPARE) {
         rk_com->u.prepare.calib = (CamCalibDbContext_t*)(shared->calib);
-    } else if (type == RkAiqHandle::RKAIQ_CONFIG_COM_PROC) {
+    } else {
         rk_com->u.proc.pre_res_comb = &shared->preResComb;
         rk_com->u.proc.proc_res_comb = &shared->procResComb;
         rk_com->u.proc.post_res_comb = &shared->postResComb;
         rk_com->u.proc.iso = shared->iso;
-    } else {
-
     }
 
     EXIT_ANALYZER_FUNCTION();
@@ -478,8 +488,8 @@ RkAiqAeHandleInt::processing()
 
     comb->ae_proc_res = (RkAiqAlgoProcResAe*)ae_proc_res_int;
 
-    LOGE("AeProc HwCofing,rawaebig2.wnd_num=%d,rawaebig3.win.h_size=%d,rawhist2.weight[25]=%d", ae_proc_res_int->ae_proc_res_com.ae_meas.rawaebig2.wnd_num,
-         ae_proc_res_int->ae_proc_res_com.ae_meas.rawaebig3.win.h_size, ae_proc_res_int->ae_proc_res_com.hist_meas.rawhstbig2.weight[25]);
+    LOGE("AeProc HwCofing,rawae1.wnd_num=%d,rawae2.win.h_size=%d,rawhist2.weight[25]=%d", ae_proc_res_int->ae_proc_res_com.ae_meas.rawae1.wnd_num,
+         ae_proc_res_int->ae_proc_res_com.ae_meas.rawae2.win.h_size, ae_proc_res_int->ae_proc_res_com.hist_meas.rawhist1.weight[25]);
 
     EXIT_ANALYZER_FUNCTION();
     return ret;
@@ -614,6 +624,32 @@ RkAiqAwbHandleInt::queryWBInfo(rk_aiq_wb_querry_info_t *wb_querry_info )
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
 
     rk_aiq_uapi_awb_QueryWBInfo(mAlgoCtx, wb_querry_info);
+
+    EXIT_ANALYZER_FUNCTION();
+    return ret;
+}
+
+XCamReturn
+RkAiqAwbHandleInt::lock()
+{
+    ENTER_ANALYZER_FUNCTION();
+
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+
+    rk_aiq_uapi_awb_Lock(mAlgoCtx);
+
+    EXIT_ANALYZER_FUNCTION();
+    return ret;
+}
+
+XCamReturn
+RkAiqAwbHandleInt::unlock()
+{
+    ENTER_ANALYZER_FUNCTION();
+
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+
+    rk_aiq_uapi_awb_Unlock(mAlgoCtx);
 
     EXIT_ANALYZER_FUNCTION();
     return ret;
@@ -947,6 +983,68 @@ RkAiqAnrHandleInt::init()
 }
 
 XCamReturn
+RkAiqAnrHandleInt::updateConfig()
+{
+    ENTER_ANALYZER_FUNCTION();
+
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    //TODO
+    mCfgMutex.lock();
+    // if something changed
+    if (updateAtt) {
+        mCurAtt = mNewAtt;
+        updateAtt = false;
+        // TODO
+        rk_aiq_uapi_anr_SetAttrib(mAlgoCtx, &mCurAtt, false);
+    }
+
+    mCfgMutex.unlock();
+
+
+    EXIT_ANALYZER_FUNCTION();
+    return ret;
+}
+
+XCamReturn
+RkAiqAnrHandleInt::setAttrib(rk_aiq_nr_attrib_t *att)
+{
+    ENTER_ANALYZER_FUNCTION();
+
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    mCfgMutex.lock();
+    //TODO
+    // check if there is different between att & mCurAtt
+    // if something changed, set att to mNewAtt, and
+    // the new params will be effective later when updateConfig
+    // called by RkAiqCore
+
+    // if something changed
+    if (0 != memcmp(&mCurAtt, att, sizeof(rk_aiq_nr_attrib_t))) {
+        mNewAtt = *att;
+        updateAtt = true;
+    }
+
+    mCfgMutex.unlock();
+
+    EXIT_ANALYZER_FUNCTION();
+    return ret;
+}
+
+XCamReturn
+RkAiqAnrHandleInt::getAttrib(rk_aiq_nr_attrib_t *att)
+{
+    ENTER_ANALYZER_FUNCTION();
+
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+
+    rk_aiq_uapi_anr_GetAttrib(mAlgoCtx, att);
+
+    EXIT_ANALYZER_FUNCTION();
+    return ret;
+}
+
+
+XCamReturn
 RkAiqAnrHandleInt::prepare()
 {
     ENTER_ANALYZER_FUNCTION();
@@ -957,43 +1055,6 @@ RkAiqAnrHandleInt::prepare()
     RKAIQCORE_CHECK_RET(ret, "anr handle prepare failed");
 
     RkAiqAlgoConfigAnrInt* anr_config_int = (RkAiqAlgoConfigAnrInt*)mConfig;
-    RkAiqCore::RkAiqAlgosShared_t* shared = &mAiqCore->mAlogsSharedParams;
-    ANRConfig_t *pANRConfig = &anr_config_int->stANRConfig;
-
-#if RK_SIMULATOR_HW
-    rkaiq_anr_htmlparmas_t* pAnrHtmlParams = (rkaiq_anr_htmlparmas_t*) malloc(sizeof(rkaiq_anr_htmlparmas_t));;
-#if 1
-    FILE *fp2 = fopen("rkaiq_anr_html_params.bin", "rb");
-    if(fp2 != NULL) {
-        memset(&pAnrHtmlParams->stBayernrParams, 0, sizeof(RKAnr_Bayernr_Params_t));
-        fread(&pAnrHtmlParams->stBayernrParams, 1, sizeof(RKAnr_Bayernr_Params_t), fp2);
-        memset(&pAnrHtmlParams->stMfnrParams, 0, sizeof(RKAnr_Mfnr_Params_t));
-        fread(&pAnrHtmlParams->stMfnrParams, 1, sizeof(RKAnr_Mfnr_Params_t), fp2);
-        memset(&pAnrHtmlParams->stUvnrParams, 0, sizeof(RKAnr_Uvnr_Params_t));
-        fread(&pAnrHtmlParams->stUvnrParams, 1, sizeof(RKAnr_Uvnr_Params_t), fp2);
-        memset(&pAnrHtmlParams->stYnrParams, 0, sizeof(RKAnr_Ynr_Params_t));
-        fread(&pAnrHtmlParams->stYnrParams, 1, sizeof(RKAnr_Ynr_Params_t), fp2);
-        LOGD_ANR("oyyf: %s:(%d) read anr param file sucess! \n", __FUNCTION__, __LINE__);
-    } else {
-        LOGE_ANR("oyyf: %s:(%d) read anr param file failed! \n", __FUNCTION__, __LINE__);
-        return XCAM_RETURN_ERROR_FAILED;
-    }
-#endif
-    //convert html params to anr config params
-    if(pAnrHtmlParams != NULL)
-    {
-        pANRConfig->eMode = ANR_OP_MODE_AUTO;
-        memcpy(&pANRConfig->stHtmlParams.stBayernrParams, &pAnrHtmlParams->stBayernrParams, sizeof(RKAnr_Bayernr_Params_t));
-        memcpy(&pANRConfig->stHtmlParams.stMfnrParams, &pAnrHtmlParams->stMfnrParams, sizeof(RKAnr_Mfnr_Params_t));
-        memcpy(&pANRConfig->stHtmlParams.stUvnrParams, &pAnrHtmlParams->stUvnrParams, sizeof(RKAnr_Uvnr_Params_t));
-        memcpy(&pANRConfig->stHtmlParams.stYnrParams, &pAnrHtmlParams->stYnrParams, sizeof(RKAnr_Ynr_Params_t));
-
-        pANRConfig->refYuvBit = 8;
-    } else {
-        LOGE_ANR("oyyf: %s:(%d) exit \n", __FUNCTION__, __LINE__);
-        return XCAM_RETURN_ERROR_FAILED;
-    }
-#endif
 
     RkAiqAlgoDescription* des = (RkAiqAlgoDescription*)mDes;
     ret = des->prepare(mConfig);
@@ -1118,6 +1179,69 @@ RkAiqAsharpHandleInt::init()
     EXIT_ANALYZER_FUNCTION();
 }
 
+
+XCamReturn
+RkAiqAsharpHandleInt::updateConfig()
+{
+    ENTER_ANALYZER_FUNCTION();
+
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    //TODO
+    mCfgMutex.lock();
+    // if something changed
+    if (updateAtt) {
+        mCurAtt = mNewAtt;
+        updateAtt = false;
+        // TODO
+        rk_aiq_uapi_asharp_SetAttrib(mAlgoCtx, &mCurAtt, false);
+    }
+
+    mCfgMutex.unlock();
+
+
+    EXIT_ANALYZER_FUNCTION();
+    return ret;
+}
+
+XCamReturn
+RkAiqAsharpHandleInt::setAttrib(rk_aiq_sharp_attrib_t *att)
+{
+    ENTER_ANALYZER_FUNCTION();
+
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    mCfgMutex.lock();
+    //TODO
+    // check if there is different between att & mCurAtt
+    // if something changed, set att to mNewAtt, and
+    // the new params will be effective later when updateConfig
+    // called by RkAiqCore
+
+    // if something changed
+    if (0 != memcmp(&mCurAtt, att, sizeof(rk_aiq_sharp_attrib_t))) {
+        mNewAtt = *att;
+        updateAtt = true;
+    }
+
+    mCfgMutex.unlock();
+
+    EXIT_ANALYZER_FUNCTION();
+    return ret;
+}
+
+XCamReturn
+RkAiqAsharpHandleInt::getAttrib(rk_aiq_sharp_attrib_t *att)
+{
+    ENTER_ANALYZER_FUNCTION();
+
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+
+    rk_aiq_uapi_asharp_GetAttrib(mAlgoCtx, att);
+
+    EXIT_ANALYZER_FUNCTION();
+    return ret;
+}
+
+
 XCamReturn
 RkAiqAsharpHandleInt::prepare()
 {
@@ -1129,36 +1253,6 @@ RkAiqAsharpHandleInt::prepare()
     RKAIQCORE_CHECK_RET(ret, "asharp handle prepare failed");
 
     RkAiqAlgoConfigAsharpInt* asharp_config_int = (RkAiqAlgoConfigAsharpInt*)mConfig;
-    RkAiqCore::RkAiqAlgosShared_t* shared = &mAiqCore->mAlogsSharedParams;
-    AsharpConfig_t *pAsharpConfig = &asharp_config_int->stAsharpConfig;
-
-#if RK_SIMULATOR_HW
-    rkaiq_asharp_htmlparmas_t* pAsharpHtmlParams = (rkaiq_asharp_htmlparmas_t *)malloc(sizeof(rkaiq_asharp_htmlparmas_t));
-#if 1
-    FILE *fp2 = fopen("rkaiq_asharp_html_params.bin", "rb");
-    if(fp2 != NULL) {
-        memset(&pAsharpHtmlParams->stSharpParam, 0, sizeof(RKAsharp_Sharp_Params_t));
-        fread(&pAsharpHtmlParams->stSharpParam, 1, sizeof(RKAsharp_Sharp_Params_t), fp2);
-        memset(&pAsharpHtmlParams->stEdgefilterParams, 0, sizeof(RKAsharp_EdgeFilter_Params_t));
-        fread(&pAsharpHtmlParams->stEdgefilterParams, 1, sizeof(RKAsharp_EdgeFilter_Params_t), fp2);
-        fclose(fp2);
-        LOGD_ASHARP("oyyf: %s:(%d) read sharp param file sucess! \n", __FUNCTION__, __LINE__);
-    } else {
-        LOGE_ASHARP("oyyf: %s:(%d) read sharp param file failed! \n", __FUNCTION__, __LINE__);
-        return XCAM_RETURN_ERROR_FAILED;
-    }
-#endif
-    //convert html params to anr config params
-    if(pAsharpHtmlParams != NULL)
-    {
-        pAsharpConfig->eMode = ASHARP_OP_MODE_AUTO;
-        memcpy(&pAsharpConfig->stHtmlParams.stSharpParam, &pAsharpHtmlParams->stSharpParam, sizeof(RKAsharp_Sharp_Params_t));
-        memcpy(&pAsharpConfig->stHtmlParams.stEdgefilterParams, &pAsharpHtmlParams->stEdgefilterParams, sizeof(RKAsharp_EdgeFilter_Params_t));
-    } else {
-        LOGE_ASHARP("oyyf: %s:(%d) exit \n", __FUNCTION__, __LINE__);
-        return XCAM_RETURN_ERROR_FAILED;
-    }
-#endif
 
     RkAiqAlgoDescription* des = (RkAiqAlgoDescription*)mDes;
     ret = des->prepare(mConfig);
@@ -1408,6 +1502,67 @@ RkAiqAdhazHandleInt::postProcess()
     return ret;
 }
 
+XCamReturn
+RkAiqAdhazHandleInt::updateConfig()
+{
+    ENTER_ANALYZER_FUNCTION();
+
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    //TODO
+    mCfgMutex.lock();
+    // if something changed
+    if (updateAtt) {
+        mCurAtt = mNewAtt;
+        updateAtt = false;
+        // TODO
+        rk_aiq_uapi_adehaze_SetAttrib(mAlgoCtx, mCurAtt, false);
+    }
+
+    mCfgMutex.unlock();
+
+
+    EXIT_ANALYZER_FUNCTION();
+    return ret;
+}
+
+XCamReturn
+RkAiqAdhazHandleInt::setSwAttrib(adehaze_sw_s att)
+{
+    ENTER_ANALYZER_FUNCTION();
+
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    mCfgMutex.lock();
+    //TODO
+    // check if there is different between att & mCurAtt
+    // if something changed, set att to mNewAtt, and
+    // the new params will be effective later when updateConfig
+    // called by RkAiqCore
+
+    // if something changed
+    if (0 != memcmp(&mCurAtt, &att, sizeof(adehaze_sw_s))) {
+        mNewAtt = att;
+        updateAtt = true;
+    }
+
+    mCfgMutex.unlock();
+
+    EXIT_ANALYZER_FUNCTION();
+    return ret;
+}
+
+XCamReturn
+RkAiqAdhazHandleInt::getSwAttrib(adehaze_sw_s *att)
+{
+    ENTER_ANALYZER_FUNCTION();
+
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+
+    //rk_aiq_uapi_alsc_GetAttrib(mAlgoCtx, att);
+
+    EXIT_ANALYZER_FUNCTION();
+    return ret;
+}
+
 void
 RkAiqAhdrHandleInt::init()
 {
@@ -1461,8 +1616,23 @@ RkAiqAhdrHandleInt::setAttrib(ahdr_attrib_t att)
     // called by RkAiqCore
 
     // if something changed
-    updateAtt = true;
+    if (0 != memcmp(&mCurAtt, &att, sizeof(Uapi_ExpSwAttr_t))) {
+        mCurAtt = att;
+        updateAtt = true;
+    }
     mCfgMutex.unlock();
+
+    EXIT_ANALYZER_FUNCTION();
+    return ret;
+}
+XCamReturn
+RkAiqAhdrHandleInt::getAttrib(ahdr_attrib_t att)
+{
+    ENTER_ANALYZER_FUNCTION();
+
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+
+    rk_aiq_uapi_ahdr_GetAttrib(mAlgoCtx, &att);
 
     EXIT_ANALYZER_FUNCTION();
     return ret;
@@ -1484,6 +1654,7 @@ RkAiqAhdrHandleInt::prepare()
     //TODO
     ahdr_config_int->rawHeight = shared->snsDes.sensor_output_height;
     ahdr_config_int->rawWidth = shared->snsDes.sensor_output_width;
+    ahdr_config_int->working_mode = shared->working_mode;
 
     RkAiqAlgoDescription* des = (RkAiqAlgoDescription*)mDes;
     ret = des->prepare(mConfig);
@@ -1546,6 +1717,7 @@ RkAiqAhdrHandleInt::processing()
     RkAiqProcResComb* comb = &shared->procResComb;
     RkAiqIspStats* ispStats = &shared->ispStats;
 
+
     ret = RkAiqAhdrHandle::processing();
     if (ret) {
         comb->ahdr_proc_res = NULL;
@@ -1559,7 +1731,28 @@ RkAiqAhdrHandleInt::processing()
         //
         return XCAM_RETURN_BYPASS;
     } else {
-        memcpy(&ahdr_proc_int->ispAhdrStats, &ispStats->ahdr_stats, sizeof(rkisp_ahdr_stats_t));
+        memcpy(&ahdr_proc_int->ispAhdrStats.tmo_stats, &ispStats->ahdr_stats.tmo_stats, sizeof(hdrtmo_stats_t));
+        memcpy(ahdr_proc_int->ispAhdrStats.other_stats.tmo_luma,
+               ispStats->aec_stats.ae_data.extra.rawae_big.channelg_xy, sizeof(ahdr_proc_int->ispAhdrStats.other_stats.tmo_luma));
+
+        if(shared->working_mode == RK_AIQ_ISP_HDR_MODE_3_FRAME_HDR || shared->working_mode == RK_AIQ_ISP_HDR_MODE_3_LINE_HDR)
+        {
+            memcpy(ahdr_proc_int->ispAhdrStats.other_stats.short_luma,
+                   ispStats->aec_stats.ae_data.chn[0].rawae_big.channelg_xy, sizeof(ahdr_proc_int->ispAhdrStats.other_stats.short_luma));
+            memcpy(ahdr_proc_int->ispAhdrStats.other_stats.middle_luma,
+                   ispStats->aec_stats.ae_data.chn[1].rawae_lite.channelg_xy, sizeof(ahdr_proc_int->ispAhdrStats.other_stats.middle_luma));
+            memcpy(ahdr_proc_int->ispAhdrStats.other_stats.long_luma,
+                   ispStats->aec_stats.ae_data.chn[2].rawae_big.channelg_xy, sizeof(ahdr_proc_int->ispAhdrStats.other_stats.long_luma));
+        }
+        else if(shared->working_mode == RK_AIQ_ISP_HDR_MODE_2_FRAME_HDR || shared->working_mode == RK_AIQ_ISP_HDR_MODE_2_LINE_HDR)
+        {
+            memcpy(ahdr_proc_int->ispAhdrStats.other_stats.short_luma,
+                   ispStats->aec_stats.ae_data.chn[0].rawae_big.channelg_xy, sizeof(ahdr_proc_int->ispAhdrStats.other_stats.short_luma));
+            memcpy(ahdr_proc_int->ispAhdrStats.other_stats.long_luma,
+                   ispStats->aec_stats.ae_data.chn[1].rawae_big.channelg_xy, sizeof(ahdr_proc_int->ispAhdrStats.other_stats.long_luma));
+        }
+        else
+            LOGD("Wrong working mode!!!");
     }
 
     comb->ahdr_proc_res = NULL;
@@ -1895,6 +2088,81 @@ RkAiqA3dlutHandleInt::init()
 }
 
 XCamReturn
+RkAiqA3dlutHandleInt::updateConfig()
+{
+    ENTER_ANALYZER_FUNCTION();
+
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    //TODO
+    mCfgMutex.lock();
+    // if something changed
+    if (updateAtt) {
+        mCurAtt = mNewAtt;
+        updateAtt = false;
+        // TODO
+        rk_aiq_uapi_a3dlut_SetAttrib(mAlgoCtx, mCurAtt, false);
+    }
+
+    mCfgMutex.unlock();
+
+
+    EXIT_ANALYZER_FUNCTION();
+    return ret;
+}
+
+XCamReturn
+RkAiqA3dlutHandleInt::setAttrib(rk_aiq_lut3d_attrib_t att)
+{
+    ENTER_ANALYZER_FUNCTION();
+
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    mCfgMutex.lock();
+    //TODO
+    // check if there is different between att & mCurAtt
+    // if something changed, set att to mNewAtt, and
+    // the new params will be effective later when updateConfig
+    // called by RkAiqCore
+
+    // if something changed
+    if (0 != memcmp(&mCurAtt, &att, sizeof(rk_aiq_lut3d_attrib_t))) {
+        mNewAtt = att;
+        updateAtt = true;
+    }
+
+    mCfgMutex.unlock();
+
+    EXIT_ANALYZER_FUNCTION();
+    return ret;
+}
+
+XCamReturn
+RkAiqA3dlutHandleInt::getAttrib(rk_aiq_lut3d_attrib_t *att)
+{
+    ENTER_ANALYZER_FUNCTION();
+
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+
+    rk_aiq_uapi_a3dlut_GetAttrib(mAlgoCtx, att);
+
+    EXIT_ANALYZER_FUNCTION();
+    return ret;
+}
+
+XCamReturn
+RkAiqA3dlutHandleInt::query3dlutInfo(rk_aiq_lut3d_querry_info_t *lut3d_querry_info )
+{
+    ENTER_ANALYZER_FUNCTION();
+
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+
+    rk_aiq_uapi_a3dlut_Query3dlutInfo(mAlgoCtx, lut3d_querry_info);
+
+    EXIT_ANALYZER_FUNCTION();
+    return ret;
+}
+
+
+XCamReturn
 RkAiqA3dlutHandleInt::prepare()
 {
     ENTER_ANALYZER_FUNCTION();
@@ -2025,6 +2293,68 @@ RkAiqAblcHandleInt::init()
 
     EXIT_ANALYZER_FUNCTION();
 }
+
+XCamReturn
+RkAiqAblcHandleInt::updateConfig()
+{
+    ENTER_ANALYZER_FUNCTION();
+
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    //TODO
+    mCfgMutex.lock();
+    // if something changed
+    if (updateAtt) {
+        mCurAtt = mNewAtt;
+        updateAtt = false;
+        // TODO
+        rk_aiq_uapi_ablc_SetAttrib(mAlgoCtx, &mCurAtt, false);
+    }
+
+    mCfgMutex.unlock();
+
+
+    EXIT_ANALYZER_FUNCTION();
+    return ret;
+}
+
+XCamReturn
+RkAiqAblcHandleInt::setAttrib(rk_aiq_blc_attrib_t *att)
+{
+    ENTER_ANALYZER_FUNCTION();
+
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    mCfgMutex.lock();
+    //TODO
+    // check if there is different between att & mCurAtt
+    // if something changed, set att to mNewAtt, and
+    // the new params will be effective later when updateConfig
+    // called by RkAiqCore
+
+    // if something changed
+    if (0 != memcmp(&mCurAtt, att, sizeof(rk_aiq_blc_attrib_t))) {
+        mNewAtt = *att;
+        updateAtt = true;
+    }
+
+    mCfgMutex.unlock();
+
+    EXIT_ANALYZER_FUNCTION();
+    return ret;
+}
+
+XCamReturn
+RkAiqAblcHandleInt::getAttrib(rk_aiq_blc_attrib_t *att)
+{
+    ENTER_ANALYZER_FUNCTION();
+
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+
+    rk_aiq_uapi_ablc_GetAttrib(mAlgoCtx, att);
+
+    EXIT_ANALYZER_FUNCTION();
+    return ret;
+}
+
 
 XCamReturn
 RkAiqAblcHandleInt::prepare()
@@ -2158,6 +2488,81 @@ RkAiqAccmHandleInt::init()
 
     EXIT_ANALYZER_FUNCTION();
 }
+
+XCamReturn
+RkAiqAccmHandleInt::updateConfig()
+{
+    ENTER_ANALYZER_FUNCTION();
+
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    //TODO
+    mCfgMutex.lock();
+    // if something changed
+    if (updateAtt) {
+        mCurAtt = mNewAtt;
+        updateAtt = false;
+        // TODO
+        rk_aiq_uapi_accm_SetAttrib(mAlgoCtx, mCurAtt, false);
+    }
+
+    mCfgMutex.unlock();
+
+
+    EXIT_ANALYZER_FUNCTION();
+    return ret;
+}
+
+XCamReturn
+RkAiqAccmHandleInt::setAttrib(rk_aiq_ccm_attrib_t att)
+{
+    ENTER_ANALYZER_FUNCTION();
+
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    mCfgMutex.lock();
+    //TODO
+    // check if there is different between att & mCurAtt
+    // if something changed, set att to mNewAtt, and
+    // the new params will be effective later when updateConfig
+    // called by RkAiqCore
+
+    // if something changed
+    if (0 != memcmp(&mCurAtt, &att, sizeof(rk_aiq_ccm_attrib_t))) {
+        mNewAtt = att;
+        updateAtt = true;
+    }
+
+    mCfgMutex.unlock();
+
+    EXIT_ANALYZER_FUNCTION();
+    return ret;
+}
+
+XCamReturn
+RkAiqAccmHandleInt::getAttrib(rk_aiq_ccm_attrib_t *att)
+{
+    ENTER_ANALYZER_FUNCTION();
+
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+
+    rk_aiq_uapi_accm_GetAttrib(mAlgoCtx, att);
+
+    EXIT_ANALYZER_FUNCTION();
+    return ret;
+}
+
+XCamReturn
+RkAiqAccmHandleInt::queryCcmInfo(rk_aiq_ccm_querry_info_t *ccm_querry_info )
+{
+    ENTER_ANALYZER_FUNCTION();
+
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+
+    rk_aiq_uapi_accm_QueryCcmInfo(mAlgoCtx, ccm_querry_info);
+
+    EXIT_ANALYZER_FUNCTION();
+    return ret;
+}
+
 
 XCamReturn
 RkAiqAccmHandleInt::prepare()
@@ -2577,8 +2982,8 @@ RkAiqAdebayerHandleInt::processing()
 
     comb->adebayer_proc_res = NULL;
     // TODO: fill procParam
-    adebayer_proc_int->iso = shared->iso;
-    adebayer_proc_int->pCalibDb = shared->calib;
+    //adebayer_proc_int->iso = shared->iso;
+    //adebayer_proc_int->pCalibDb = shared->calib;
 
     RkAiqAlgoDescription* des = (RkAiqAlgoDescription*)mDes;
     ret = des->processing(mProcInParam, mProcOutParam);
@@ -2637,6 +3042,69 @@ RkAiqAdpccHandleInt::init()
 
     EXIT_ANALYZER_FUNCTION();
 }
+
+XCamReturn
+RkAiqAdpccHandleInt::updateConfig()
+{
+    ENTER_ANALYZER_FUNCTION();
+
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    //TODO
+    mCfgMutex.lock();
+    // if something changed
+    if (updateAtt) {
+        mCurAtt = mNewAtt;
+        updateAtt = false;
+        // TODO
+        rk_aiq_uapi_adpcc_SetAttrib(mAlgoCtx, &mCurAtt, false);
+    }
+
+    mCfgMutex.unlock();
+
+
+    EXIT_ANALYZER_FUNCTION();
+    return ret;
+}
+
+XCamReturn
+RkAiqAdpccHandleInt::setAttrib(rk_aiq_dpcc_attrib_t *att)
+{
+    ENTER_ANALYZER_FUNCTION();
+
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    mCfgMutex.lock();
+    //TODO
+    // check if there is different between att & mCurAtt
+    // if something changed, set att to mNewAtt, and
+    // the new params will be effective later when updateConfig
+    // called by RkAiqCore
+
+    // if something changed
+    if (0 != memcmp(&mCurAtt, att, sizeof(rk_aiq_dpcc_attrib_t))) {
+        mNewAtt = *att;
+        updateAtt = true;
+    }
+
+    mCfgMutex.unlock();
+
+    EXIT_ANALYZER_FUNCTION();
+    return ret;
+}
+
+XCamReturn
+RkAiqAdpccHandleInt::getAttrib(rk_aiq_dpcc_attrib_t *att)
+{
+    ENTER_ANALYZER_FUNCTION();
+
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+
+    rk_aiq_uapi_adpcc_GetAttrib(mAlgoCtx, att);
+
+    EXIT_ANALYZER_FUNCTION();
+    return ret;
+}
+
+
 
 XCamReturn
 RkAiqAdpccHandleInt::prepare()
@@ -2911,6 +3379,68 @@ RkAiqAgammaHandleInt::init()
 
     EXIT_ANALYZER_FUNCTION();
 }
+
+XCamReturn
+RkAiqAgammaHandleInt::updateConfig()
+{
+    ENTER_ANALYZER_FUNCTION();
+
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    //TODO
+    mCfgMutex.lock();
+    // if something changed
+    if (updateAtt) {
+        mCurAtt = mNewAtt;
+        updateAtt = false;
+        // TODO
+        rk_aiq_uapi_agamma_SetAttrib(mAlgoCtx, mCurAtt, false);
+    }
+
+    mCfgMutex.unlock();
+
+
+    EXIT_ANALYZER_FUNCTION();
+    return ret;
+}
+
+XCamReturn
+RkAiqAgammaHandleInt::setAttrib(rk_aiq_gamma_attrib_t att)
+{
+    ENTER_ANALYZER_FUNCTION();
+
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    mCfgMutex.lock();
+    //TODO
+    // check if there is different between att & mCurAtt
+    // if something changed, set att to mNewAtt, and
+    // the new params will be effective later when updateConfig
+    // called by RkAiqCore
+
+    // if something changed
+    if (0 != memcmp(&mCurAtt, &att, sizeof(rk_aiq_gamma_attrib_t))) {
+        mNewAtt = att;
+        updateAtt = true;
+    }
+
+    mCfgMutex.unlock();
+
+    EXIT_ANALYZER_FUNCTION();
+    return ret;
+}
+
+XCamReturn
+RkAiqAgammaHandleInt::getAttrib(rk_aiq_gamma_attrib_t *att)
+{
+    ENTER_ANALYZER_FUNCTION();
+
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+
+    rk_aiq_uapi_agamma_GetAttrib(mAlgoCtx, att);
+
+    EXIT_ANALYZER_FUNCTION();
+    return ret;
+}
+
 
 XCamReturn
 RkAiqAgammaHandleInt::prepare()
@@ -3449,6 +3979,80 @@ RkAiqAlscHandleInt::init()
 }
 
 XCamReturn
+RkAiqAlscHandleInt::updateConfig()
+{
+    ENTER_ANALYZER_FUNCTION();
+
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    //TODO
+    mCfgMutex.lock();
+    // if something changed
+    if (updateAtt) {
+        mCurAtt = mNewAtt;
+        updateAtt = false;
+        // TODO
+        rk_aiq_uapi_alsc_SetAttrib(mAlgoCtx, mCurAtt, false);
+    }
+
+    mCfgMutex.unlock();
+
+
+    EXIT_ANALYZER_FUNCTION();
+    return ret;
+}
+
+XCamReturn
+RkAiqAlscHandleInt::setAttrib(rk_aiq_lsc_attrib_t att)
+{
+    ENTER_ANALYZER_FUNCTION();
+
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    mCfgMutex.lock();
+    //TODO
+    // check if there is different between att & mCurAtt
+    // if something changed, set att to mNewAtt, and
+    // the new params will be effective later when updateConfig
+    // called by RkAiqCore
+
+    // if something changed
+    if (0 != memcmp(&mCurAtt, &att, sizeof(rk_aiq_lsc_attrib_t))) {
+        mNewAtt = att;
+        updateAtt = true;
+    }
+
+    mCfgMutex.unlock();
+
+    EXIT_ANALYZER_FUNCTION();
+    return ret;
+}
+
+XCamReturn
+RkAiqAlscHandleInt::getAttrib(rk_aiq_lsc_attrib_t *att)
+{
+    ENTER_ANALYZER_FUNCTION();
+
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+
+    rk_aiq_uapi_alsc_GetAttrib(mAlgoCtx, att);
+
+    EXIT_ANALYZER_FUNCTION();
+    return ret;
+}
+
+XCamReturn
+RkAiqAlscHandleInt::queryLscInfo(rk_aiq_lsc_querry_info_t *lsc_querry_info )
+{
+    ENTER_ANALYZER_FUNCTION();
+
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+
+    rk_aiq_uapi_alsc_QueryLscInfo(mAlgoCtx, lsc_querry_info);
+
+    EXIT_ANALYZER_FUNCTION();
+    return ret;
+}
+
+XCamReturn
 RkAiqAlscHandleInt::prepare()
 {
     ENTER_ANALYZER_FUNCTION();
@@ -3661,6 +4265,8 @@ RkAiqAorbHandleInt::preProcess()
     }
 
     comb->aorb_pre_res = NULL;
+
+    aorb_pre_int->orb_stats = ispStats->orb_stats;
 
     RkAiqAlgoDescription* des = (RkAiqAlgoDescription*)mDes;
     ret = des->pre_process(mPreInParam, mPreOutParam);

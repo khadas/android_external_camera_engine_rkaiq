@@ -93,6 +93,10 @@ static XCamReturn AhdrPrepare(RkAiqAlgoCom* params)
     pAhdrCtx->width = AhdrCfgParam->rawWidth;
     pAhdrCtx->height = AhdrCfgParam->rawHeight;
 #endif
+    if (AhdrCfgParam->working_mode < RK_AIQ_WORKING_MODE_ISP_HDR3)
+        pAhdrCtx->hdr_mode = 2;
+    else
+        pAhdrCtx->hdr_mode = 3;
 
 
 #if 0
@@ -163,8 +167,8 @@ static XCamReturn AhdrProcess(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* out
         SetFirstPara(pAhdrCtx);
     }
 
-    memcpy(&AhdrProcResParams->AhdrIOData.MergeData, &pAhdrCtx->AhdrIOData.MergeData, sizeof(MergeIOData_s));
-    memcpy(&AhdrProcResParams->AhdrIOData.TmoData, &pAhdrCtx->AhdrIOData.TmoData, sizeof(TmoIOData_s));
+    memcpy(&AhdrProcResParams->AhdrProcRes.MgeProcRes, &pAhdrCtx->AhdrProcRes.MgeProcRes, sizeof(MgeProcRes_t));
+    memcpy(&AhdrProcResParams->AhdrProcRes.TmoProcRes, &pAhdrCtx->AhdrProcRes.TmoProcRes, sizeof(TmoProcRes_t));
 
     LOGI_AHDR("%s:Exit!\n", __FUNCTION__);
     return(XCAM_RETURN_NO_ERROR);

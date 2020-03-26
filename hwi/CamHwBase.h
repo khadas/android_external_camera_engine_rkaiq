@@ -46,30 +46,36 @@ public:
     virtual XCamReturn setIspParams(SmartPtr<RkAiqIspParamsProxy>& ispParams);
     virtual XCamReturn setExposureParams(SmartPtr<RkAiqExpParamsProxy>& expPar);
     virtual XCamReturn setFocusParams(SmartPtr<RkAiqFocusParamsProxy>& focus_params);
+    virtual XCamReturn setIsppParams(SmartPtr<RkAiqIsppParamsProxy>& isppParams);
+    virtual XCamReturn setIsppStatsListener(IsppStatsListener* isppStatsListener);
     virtual XCamReturn setIspLumaListener(IspLumaListener* lumaListener);
     virtual XCamReturn setIspStatsListener(IspStatsListener* statsListener);
     virtual XCamReturn setEvtsListener(IspEvtsListener* evtListener);
-    virtual XCamReturn setHdrProcessCount(int frame_id, int count) { return XCAM_RETURN_ERROR_FAILED; };
+    virtual XCamReturn setHdrProcessCount(int frame_id, int count) {
+        return XCAM_RETURN_ERROR_FAILED;
+    };
     // from PollCallback
     virtual XCamReturn poll_buffer_ready (SmartPtr<VideoBuffer> &buf, int type);
     virtual XCamReturn poll_buffer_failed (int64_t timestamp, const char *msg);
+
 protected:
-    static XCamReturn getCamHwInfos();
-protected:
+    SmartPtr<V4l2Device> mIsppStatsDev;
+    SmartPtr<V4l2Device> mIsppParamsDev;
     SmartPtr<V4l2Device> mIspLumaDev;
     SmartPtr<V4l2Device> mIspStatsDev;
     SmartPtr<V4l2Device> mIspParamsDev;
-    SmartPtr<V4l2Device> mIspPostParamsDev;
     SmartPtr<V4l2SubDevice> mIspCoreDev;
     SmartPtr<V4l2SubDevice> mSensorDev;
     SmartPtr<V4l2SubDevice> mLensDev;
-    SmartPtr<PollThread> mPollthread;    
+    SmartPtr<PollThread> mPollthread;
     SmartPtr<PollThread> mPollLumathread;
+    SmartPtr<PollThread> mPollIsppthread;
+    IsppStatsListener* mIsppStatsListener;
     IspLumaListener* mIspLumaListener;
     IspStatsListener* mIspStatsLintener;
     IspEvtsListener* mIspEvtsListener;
-    static std::map<std::string, SmartPtr<rk_aiq_static_info_t>> mCamHwInfos;
     int mWorkingMode;
+
 private:
     XCAM_DEAD_COPY (CamHwBase);
 };

@@ -112,16 +112,17 @@ uint16_t RkAiqCore::DEFAULT_POOL_SIZE = 20;
 
 RkAiqCore::RkAiqCore()
     : mRkAiqCoreTh(new RkAiqCoreThread(this))
+    , mRkAiqCorePpTh(new RkAiqCoreThread(this))
     , mState(RK_AIQ_CORE_STATE_INVALID)
     , mCb(NULL)
     , mAiqParamsPool(new RkAiqFullParamsPool("RkAiqFullParams", RkAiqCore::DEFAULT_POOL_SIZE))
-    , mAiqCurParams(NULL)
     , mAiqExpParamsPool(new RkAiqExpParamsPool("RkAiqExpParams", RkAiqCore::DEFAULT_POOL_SIZE))
     , mAiqIspParamsPool(new RkAiqIspParamsPool("RkAiqIspParams", RkAiqCore::DEFAULT_POOL_SIZE))
+    , mAiqIsppParamsPool(new RkAiqIsppParamsPool("RkAiqIspParams", RkAiqCore::DEFAULT_POOL_SIZE))
     , mAiqFocusParamsPool(new RkAiqFocusParamsPool("RkAiqFocusParams", RkAiqCore::DEFAULT_POOL_SIZE))
 {
     ENTER_ANALYZER_FUNCTION();
-    xcam_mem_clear(mAlogsSharedParams);
+    mAlogsSharedParams.reset();
     mCurAhdrAlgoHdl = NULL;
     mCurAnrAlgoHdl = NULL;
     mCurAdhazAlgoHdl = NULL;
@@ -146,6 +147,9 @@ RkAiqCore::RkAiqCore()
     mCurAeAlgoHdl = NULL;
     mCurAwbAlgoHdl = NULL;
     mCurAfAlgoHdl = NULL;
+
+    SmartPtr<RkAiqFullParams> fullParam = new RkAiqFullParams();
+    mAiqCurParams = new RkAiqFullParamsProxy(fullParam );
 
     EXIT_ANALYZER_FUNCTION();
 }
@@ -205,6 +209,7 @@ RkAiqCore::start()
     }
 
     mRkAiqCoreTh->start();
+    mRkAiqCorePpTh->start();
     mState = RK_AIQ_CORE_STATE_STARTED;
 
     EXIT_ANALYZER_FUNCTION();
@@ -224,6 +229,8 @@ RkAiqCore::stop()
 
     mRkAiqCoreTh->triger_stop();
     mRkAiqCoreTh->stop();
+    mRkAiqCorePpTh->triger_stop();
+    mRkAiqCorePpTh->stop();
     mState = RK_AIQ_CORE_STATE_STOPED;
 
     EXIT_ANALYZER_FUNCTION();
@@ -291,6 +298,7 @@ RkAiqCore::prepare(const rk_aiq_exposure_sensor_descriptor* sensor_des,
 
     mAlogsSharedParams.init = true;
     analyzeInternal();
+    analyzeInternalPp();
 
     mState = RK_AIQ_CORE_STATE_PREPARED;
 
@@ -299,7 +307,7 @@ RkAiqCore::prepare(const rk_aiq_exposure_sensor_descriptor* sensor_des,
     return XCAM_RETURN_NO_ERROR;
 }
 
-XCamReturn
+SmartPtr<RkAiqFullParamsProxy>
 RkAiqCore::analyzeInternal()
 {
     ENTER_ANALYZER_FUNCTION();
@@ -312,7 +320,6 @@ RkAiqCore::analyzeInternal()
         mAlogsSharedParams.ispStats.aec_stats_valid = false;
         mAlogsSharedParams.ispStats.awb_stats_valid = false;
         mAlogsSharedParams.ispStats.af_stats_valid = false;
-        mAlogsSharedParams.ispStats.orb_stats_valid = false;
         mAlogsSharedParams.ispStats.ahdr_stats_valid = false;
     }
 
@@ -320,37 +327,44 @@ RkAiqCore::analyzeInternal()
 
     if (!aiqParamProxy.ptr()) {
         LOGE_ANALYZER("no free aiq params buffer!");
-        return XCAM_RETURN_ERROR_MEM;
+        return NULL;
     }
 
     RkAiqFullParams* aiqParams = aiqParamProxy->data().ptr();
+    aiqParams->reset();
 
     aiqParams->mIspParams = mAiqIspParamsPool->get_item();
     if (!aiqParams->mIspParams.ptr()) {
         LOGE_ANALYZER("no free isp params buffer!");
-        return XCAM_RETURN_ERROR_MEM;
+        return NULL;
     }
 
     aiqParams->mExposureParams = mAiqExpParamsPool->get_item();
     if (!aiqParams->mExposureParams.ptr()) {
         LOGE_ANALYZER("no free exposure params buffer!");
-        return XCAM_RETURN_ERROR_MEM;
+        return NULL;
     }
 
     aiqParams->mFocusParams = mAiqFocusParamsPool->get_item();
     if (!aiqParams->mFocusParams.ptr()) {
         LOGE_ANALYZER("no free focus params buffer!");
-        return XCAM_RETURN_ERROR_MEM;
+        return NULL;
+    }
+
+    aiqParams->mIsppParams = mAiqIsppParamsPool->get_item();
+    if (!aiqParams->mIsppParams.ptr()) {
+        LOGE_ANALYZER("no free ispp params buffer!");
+        return NULL;
     }
 
     ret = preProcess();
-    RKAIQCORE_CHECK_RET(ret, "preprocess failed");
+    RKAIQCORE_CHECK_RET_NULL(ret, "preprocess failed");
 
     ret = processing();
-    RKAIQCORE_CHECK_RET(ret, "processing failed");
+    RKAIQCORE_CHECK_RET_NULL(ret, "processing failed");
 
     ret = postProcess();
-    RKAIQCORE_CHECK_RET(ret, "post process failed");
+    RKAIQCORE_CHECK_RET_NULL(ret, "post process failed");
 
     genIspAeResult(aiqParams);
     genIspAwbResult(aiqParams);
@@ -373,15 +387,68 @@ RkAiqCore::analyzeInternal()
     genIspAgicResult(aiqParams);
     genIspAldchResult(aiqParams);
     genIspAlscResult(aiqParams);
-    genIspAorbResult(aiqParams);
     genIspAr2yResult(aiqParams);
     genIspAwdrResult(aiqParams);
 
-    mAiqCurParams = aiqParamProxy;
+    mAiqCurParams->data()->mIspParams = aiqParams->mIspParams;
+    mAiqCurParams->data()->mExposureParams = aiqParams->mExposureParams;
+    mAiqCurParams->data()->mFocusParams = aiqParams->mFocusParams;
+    mAiqCurParams->data()->mIsppParams = aiqParams->mIsppParams;
 
     EXIT_ANALYZER_FUNCTION();
 
-    return ret;
+    return aiqParamProxy;
+}
+
+SmartPtr<RkAiqFullParamsProxy>
+RkAiqCore::analyzeInternalPp()
+{
+    ENTER_ANALYZER_FUNCTION();
+
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+
+    if (mAlogsSharedParams.init) {
+        // run algos without stats to generate
+        // initial params
+        mAlogsSharedParams.ispStats.orb_stats_valid = false;
+    }
+
+    SmartPtr<RkAiqFullParamsProxy> aiqParamProxy = mAiqParamsPool->get_item();
+
+    if (!aiqParamProxy.ptr()) {
+        LOGE_ANALYZER("no free aiq params buffer!");
+        return NULL;
+    }
+
+    RkAiqFullParams* aiqParams = aiqParamProxy->data().ptr();
+    aiqParams->reset();
+
+    aiqParams->mIsppParams = mAiqIsppParamsPool->get_item();
+    if (!aiqParams->mIsppParams.ptr()) {
+        LOGE_ANALYZER("no free ispp params buffer!");
+        return NULL;
+    }
+
+    ret = preProcessPp();
+    RKAIQCORE_CHECK_RET_NULL(ret, "preprocessPp failed");
+
+    ret = processingPp();
+    RKAIQCORE_CHECK_RET_NULL(ret, "processingPp failed");
+
+    ret = postProcessPp();
+    RKAIQCORE_CHECK_RET_NULL(ret, "post processPp failed");
+
+    genIspAorbResult(aiqParams);
+
+    if (!mAiqCurParams->data()->mIsppParams.ptr())
+        mAiqCurParams->data()->mIsppParams = aiqParams->mIsppParams;
+    else
+        mAiqCurParams->data()->mIsppParams->data()->orb =
+            aiqParams->mIsppParams->data()->orb;
+
+    EXIT_ANALYZER_FUNCTION();
+
+    return aiqParamProxy;
 }
 
 XCamReturn
@@ -416,9 +483,9 @@ RkAiqCore::genIspAeResult(RkAiqFullParams* params)
     isp_param->aec_meas = ae_com->ae_meas;
     isp_param->hist_meas = ae_com->hist_meas;
 
-    LOGD_ANALYZER("%s:genIspAeResult test,rawaebig2.wnd_num=%d,rawaebig3.win,h_size=%d,rawhist2.weight0=%d", __FUNCTION__,
-                  isp_param->aec_meas.rawaebig2.wnd_num, isp_param->aec_meas.rawaebig3.win.h_size,
-                  isp_param->hist_meas.rawhstbig2.weight[0]);
+    LOGD_ANALYZER("%s:genIspAeResult test,rawae1.wnd_num=%d,rawae2.win,h_size=%d,rawhist2.weight0=%d", __FUNCTION__,
+                  isp_param->aec_meas.rawae1.wnd_num, isp_param->aec_meas.rawae2.win.h_size,
+                  isp_param->hist_meas.rawhist1.weight[0]);
 
 
     // gen rk ae result
@@ -528,110 +595,110 @@ RkAiqCore::genIspAhdrResult(RkAiqFullParams* params)
     if (algo_id == 0) {
         RkAiqAlgoProcResAhdrInt* ahdr_rk = (RkAiqAlgoProcResAhdrInt*)ahdr_com;
 
-        isp_param->ahdr_proc_res.MergeData.sw_hdrmge_mode =
-            ahdr_rk->AhdrIOData.MergeData.sw_hdrmge_mode;
-        isp_param->ahdr_proc_res.MergeData.sw_hdrmge_lm_dif_0p9 =
-            ahdr_rk->AhdrIOData.MergeData.sw_hdrmge_lm_dif_0p9;
-        isp_param->ahdr_proc_res.MergeData.sw_hdrmge_ms_dif_0p8 =
-            ahdr_rk->AhdrIOData.MergeData.sw_hdrmge_ms_dif_0p8;
-        isp_param->ahdr_proc_res.MergeData.sw_hdrmge_lm_dif_0p15 =
-            ahdr_rk->AhdrIOData.MergeData.sw_hdrmge_lm_dif_0p15;
-        isp_param->ahdr_proc_res.MergeData.sw_hdrmge_ms_dif_0p15 =
-            ahdr_rk->AhdrIOData.MergeData.sw_hdrmge_ms_dif_0p15;
-        isp_param->ahdr_proc_res.MergeData.sw_hdrmge_gain0 =
-            ahdr_rk->AhdrIOData.MergeData.sw_hdrmge_gain0;
-        isp_param->ahdr_proc_res.MergeData.sw_hdrmge_gain0_inv =
-            ahdr_rk->AhdrIOData.MergeData.sw_hdrmge_gain0_inv;
-        isp_param->ahdr_proc_res.MergeData.sw_hdrmge_gain1 =
-            ahdr_rk->AhdrIOData.MergeData.sw_hdrmge_gain1;
-        isp_param->ahdr_proc_res.MergeData.sw_hdrmge_gain1_inv =
-            ahdr_rk->AhdrIOData.MergeData.sw_hdrmge_gain1_inv;
-        isp_param->ahdr_proc_res.MergeData.sw_hdrmge_gain2 =
-            ahdr_rk->AhdrIOData.MergeData.sw_hdrmge_gain2;
+        isp_param->ahdr_proc_res.MgeProcRes.sw_hdrmge_mode =
+            ahdr_rk->AhdrProcRes.MgeProcRes.sw_hdrmge_mode;
+        isp_param->ahdr_proc_res.MgeProcRes.sw_hdrmge_lm_dif_0p9 =
+            ahdr_rk->AhdrProcRes.MgeProcRes.sw_hdrmge_lm_dif_0p9;
+        isp_param->ahdr_proc_res.MgeProcRes.sw_hdrmge_ms_dif_0p8 =
+            ahdr_rk->AhdrProcRes.MgeProcRes.sw_hdrmge_ms_dif_0p8;
+        isp_param->ahdr_proc_res.MgeProcRes.sw_hdrmge_lm_dif_0p15 =
+            ahdr_rk->AhdrProcRes.MgeProcRes.sw_hdrmge_lm_dif_0p15;
+        isp_param->ahdr_proc_res.MgeProcRes.sw_hdrmge_ms_dif_0p15 =
+            ahdr_rk->AhdrProcRes.MgeProcRes.sw_hdrmge_ms_dif_0p15;
+        isp_param->ahdr_proc_res.MgeProcRes.sw_hdrmge_gain0 =
+            ahdr_rk->AhdrProcRes.MgeProcRes.sw_hdrmge_gain0;
+        isp_param->ahdr_proc_res.MgeProcRes.sw_hdrmge_gain0_inv =
+            ahdr_rk->AhdrProcRes.MgeProcRes.sw_hdrmge_gain0_inv;
+        isp_param->ahdr_proc_res.MgeProcRes.sw_hdrmge_gain1 =
+            ahdr_rk->AhdrProcRes.MgeProcRes.sw_hdrmge_gain1;
+        isp_param->ahdr_proc_res.MgeProcRes.sw_hdrmge_gain1_inv =
+            ahdr_rk->AhdrProcRes.MgeProcRes.sw_hdrmge_gain1_inv;
+        isp_param->ahdr_proc_res.MgeProcRes.sw_hdrmge_gain2 =
+            ahdr_rk->AhdrProcRes.MgeProcRes.sw_hdrmge_gain2;
         for(int i = 0; i < 17; i++)
         {
-            isp_param->ahdr_proc_res.MergeData.sw_hdrmge_e_y[i] =
-                ahdr_rk->AhdrIOData.MergeData.sw_hdrmge_e_y[i];
-            isp_param->ahdr_proc_res.MergeData.sw_hdrmge_l1_y[i] =
-                ahdr_rk->AhdrIOData.MergeData.sw_hdrmge_l1_y[i];
-            isp_param->ahdr_proc_res.MergeData.sw_hdrmge_l0_y[i] =
-                ahdr_rk->AhdrIOData.MergeData.sw_hdrmge_l0_y[i];
+            isp_param->ahdr_proc_res.MgeProcRes.sw_hdrmge_e_y[i] =
+                ahdr_rk->AhdrProcRes.MgeProcRes.sw_hdrmge_e_y[i];
+            isp_param->ahdr_proc_res.MgeProcRes.sw_hdrmge_l1_y[i] =
+                ahdr_rk->AhdrProcRes.MgeProcRes.sw_hdrmge_l1_y[i];
+            isp_param->ahdr_proc_res.MgeProcRes.sw_hdrmge_l0_y[i] =
+                ahdr_rk->AhdrProcRes.MgeProcRes.sw_hdrmge_l0_y[i];
         }
 
-        isp_param->ahdr_proc_res.TmoData.sw_hdrtmo_lgmax =
-            ahdr_rk->AhdrIOData.TmoData.sw_hdrtmo_lgmax;
-        isp_param->ahdr_proc_res.TmoData.sw_hdrtmo_lgscl =
-            ahdr_rk->AhdrIOData.TmoData.sw_hdrtmo_lgscl;
-        isp_param->ahdr_proc_res.TmoData.sw_hdrtmo_lgscl_inv =
-            ahdr_rk->AhdrIOData.TmoData.sw_hdrtmo_lgscl_inv;
-        isp_param->ahdr_proc_res.TmoData.sw_hdrtmo_clipratio0 =
-            ahdr_rk->AhdrIOData.TmoData.sw_hdrtmo_clipratio0;
-        isp_param->ahdr_proc_res.TmoData.sw_hdrtmo_clipratio1 =
-            ahdr_rk->AhdrIOData.TmoData.sw_hdrtmo_clipratio1;
-        isp_param->ahdr_proc_res.TmoData.sw_hdrtmo_clipgap0 =
-            ahdr_rk->AhdrIOData.TmoData.sw_hdrtmo_clipgap0;
-        isp_param->ahdr_proc_res.TmoData.sw_hdrtmo_clipgap1 =
-            ahdr_rk->AhdrIOData.TmoData.sw_hdrtmo_clipgap1;
-        isp_param->ahdr_proc_res.TmoData.sw_hdrtmo_ratiol =
-            ahdr_rk->AhdrIOData.TmoData.sw_hdrtmo_ratiol;
-        isp_param->ahdr_proc_res.TmoData.sw_hdrtmo_hist_min =
-            ahdr_rk->AhdrIOData.TmoData.sw_hdrtmo_hist_min;
-        isp_param->ahdr_proc_res.TmoData.sw_hdrtmo_hist_low =
-            ahdr_rk->AhdrIOData.TmoData.sw_hdrtmo_hist_low;
-        isp_param->ahdr_proc_res.TmoData.sw_hdrtmo_hist_high =
-            ahdr_rk->AhdrIOData.TmoData.sw_hdrtmo_hist_high;
-        isp_param->ahdr_proc_res.TmoData.sw_hdrtmo_hist_0p3 =
-            ahdr_rk->AhdrIOData.TmoData.sw_hdrtmo_hist_0p3;
-        isp_param->ahdr_proc_res.TmoData.sw_hdrtmo_hist_shift =
-            ahdr_rk->AhdrIOData.TmoData.sw_hdrtmo_hist_shift;
-        isp_param->ahdr_proc_res.TmoData.sw_hdrtmo_palpha_0p18 =
-            ahdr_rk->AhdrIOData.TmoData.sw_hdrtmo_palpha_0p18;
-        isp_param->ahdr_proc_res.TmoData.sw_hdrtmo_palpha_lw0p5 =
-            ahdr_rk->AhdrIOData.TmoData.sw_hdrtmo_palpha_lw0p5;
-        isp_param->ahdr_proc_res.TmoData.sw_hdrtmo_palpha_lwscl =
-            ahdr_rk->AhdrIOData.TmoData.sw_hdrtmo_palpha_lwscl;
-        isp_param->ahdr_proc_res.TmoData.sw_hdrtmo_maxpalpha =
-            ahdr_rk->AhdrIOData.TmoData.sw_hdrtmo_maxpalpha;
-        isp_param->ahdr_proc_res.TmoData.sw_hdrtmo_maxgain =
-            ahdr_rk->AhdrIOData.TmoData.sw_hdrtmo_maxgain;
-        isp_param->ahdr_proc_res.TmoData.sw_hdrtmo_cfg_alpha =
-            ahdr_rk->AhdrIOData.TmoData.sw_hdrtmo_cfg_alpha;
-        isp_param->ahdr_proc_res.TmoData.sw_hdrtmo_set_gainoff =
-            ahdr_rk->AhdrIOData.TmoData.sw_hdrtmo_set_gainoff;
-        isp_param->ahdr_proc_res.TmoData.sw_hdrtmo_set_lgmin =
-            ahdr_rk->AhdrIOData.TmoData.sw_hdrtmo_set_lgmin;
-        isp_param->ahdr_proc_res.TmoData.sw_hdrtmo_set_lgmax =
-            ahdr_rk->AhdrIOData.TmoData.sw_hdrtmo_set_lgmax;
-        isp_param->ahdr_proc_res.TmoData.sw_hdrtmo_set_lgmean =
-            ahdr_rk->AhdrIOData.TmoData.sw_hdrtmo_set_lgmean;
-        isp_param->ahdr_proc_res.TmoData.sw_hdrtmo_set_weightkey =
-            ahdr_rk->AhdrIOData.TmoData.sw_hdrtmo_set_weightkey;
-        isp_param->ahdr_proc_res.TmoData.sw_hdrtmo_set_lgrange0 =
-            ahdr_rk->AhdrIOData.TmoData.sw_hdrtmo_set_lgrange0;
-        isp_param->ahdr_proc_res.TmoData.sw_hdrtmo_set_lgrange1 =
-            ahdr_rk->AhdrIOData.TmoData.sw_hdrtmo_set_lgrange1;
-        isp_param->ahdr_proc_res.TmoData.sw_hdrtmo_set_lgavgmax =
-            ahdr_rk->AhdrIOData.TmoData.sw_hdrtmo_set_lgavgmax;
-        isp_param->ahdr_proc_res.TmoData.sw_hdrtmo_set_palpha =
-            ahdr_rk->AhdrIOData.TmoData.sw_hdrtmo_set_palpha;
-        isp_param->ahdr_proc_res.TmoData.sw_hdrtmo_gain_ld_off1 =
-            ahdr_rk->AhdrIOData.TmoData.sw_hdrtmo_gain_ld_off1;
-        isp_param->ahdr_proc_res.TmoData.sw_hdrtmo_gain_ld_off2 =
-            ahdr_rk->AhdrIOData.TmoData.sw_hdrtmo_gain_ld_off2;
-        isp_param->ahdr_proc_res.TmoData.sw_hdrtmo_cnt_vsize =
-            ahdr_rk->AhdrIOData.TmoData.sw_hdrtmo_cnt_vsize;
-        isp_param->ahdr_proc_res.TmoData.sw_hdrtmo_big_en =
-            ahdr_rk->AhdrIOData.TmoData.sw_hdrtmo_big_en;
-        isp_param->ahdr_proc_res.TmoData.sw_hdrtmo_nobig_en =
-            ahdr_rk->AhdrIOData.TmoData.sw_hdrtmo_nobig_en;
-        isp_param->ahdr_proc_res.TmoData.sw_hdrtmo_newhist_en =
-            ahdr_rk->AhdrIOData.TmoData.sw_hdrtmo_newhist_en;
-        isp_param->ahdr_proc_res.TmoData.sw_hdrtmo_cnt_mode =
-            ahdr_rk->AhdrIOData.TmoData.sw_hdrtmo_cnt_mode;
-        isp_param->ahdr_proc_res.TmoData.sw_hdrtmo_expl_lgratio =
-            ahdr_rk->AhdrIOData.TmoData.sw_hdrtmo_expl_lgratio;
-        isp_param->ahdr_proc_res.TmoData.sw_hdrtmo_lgscl_ratio =
-            ahdr_rk->AhdrIOData.TmoData.sw_hdrtmo_lgscl_ratio;
+        isp_param->ahdr_proc_res.TmoProcRes.sw_hdrtmo_lgmax =
+            ahdr_rk->AhdrProcRes.TmoProcRes.sw_hdrtmo_lgmax;
+        isp_param->ahdr_proc_res.TmoProcRes.sw_hdrtmo_lgscl =
+            ahdr_rk->AhdrProcRes.TmoProcRes.sw_hdrtmo_lgscl;
+        isp_param->ahdr_proc_res.TmoProcRes.sw_hdrtmo_lgscl_inv =
+            ahdr_rk->AhdrProcRes.TmoProcRes.sw_hdrtmo_lgscl_inv;
+        isp_param->ahdr_proc_res.TmoProcRes.sw_hdrtmo_clipratio0 =
+            ahdr_rk->AhdrProcRes.TmoProcRes.sw_hdrtmo_clipratio0;
+        isp_param->ahdr_proc_res.TmoProcRes.sw_hdrtmo_clipratio1 =
+            ahdr_rk->AhdrProcRes.TmoProcRes.sw_hdrtmo_clipratio1;
+        isp_param->ahdr_proc_res.TmoProcRes.sw_hdrtmo_clipgap0 =
+            ahdr_rk->AhdrProcRes.TmoProcRes.sw_hdrtmo_clipgap0;
+        isp_param->ahdr_proc_res.TmoProcRes.sw_hdrtmo_clipgap1 =
+            ahdr_rk->AhdrProcRes.TmoProcRes.sw_hdrtmo_clipgap1;
+        isp_param->ahdr_proc_res.TmoProcRes.sw_hdrtmo_ratiol =
+            ahdr_rk->AhdrProcRes.TmoProcRes.sw_hdrtmo_ratiol;
+        isp_param->ahdr_proc_res.TmoProcRes.sw_hdrtmo_hist_min =
+            ahdr_rk->AhdrProcRes.TmoProcRes.sw_hdrtmo_hist_min;
+        isp_param->ahdr_proc_res.TmoProcRes.sw_hdrtmo_hist_low =
+            ahdr_rk->AhdrProcRes.TmoProcRes.sw_hdrtmo_hist_low;
+        isp_param->ahdr_proc_res.TmoProcRes.sw_hdrtmo_hist_high =
+            ahdr_rk->AhdrProcRes.TmoProcRes.sw_hdrtmo_hist_high;
+        isp_param->ahdr_proc_res.TmoProcRes.sw_hdrtmo_hist_0p3 =
+            ahdr_rk->AhdrProcRes.TmoProcRes.sw_hdrtmo_hist_0p3;
+        isp_param->ahdr_proc_res.TmoProcRes.sw_hdrtmo_hist_shift =
+            ahdr_rk->AhdrProcRes.TmoProcRes.sw_hdrtmo_hist_shift;
+        isp_param->ahdr_proc_res.TmoProcRes.sw_hdrtmo_palpha_0p18 =
+            ahdr_rk->AhdrProcRes.TmoProcRes.sw_hdrtmo_palpha_0p18;
+        isp_param->ahdr_proc_res.TmoProcRes.sw_hdrtmo_palpha_lw0p5 =
+            ahdr_rk->AhdrProcRes.TmoProcRes.sw_hdrtmo_palpha_lw0p5;
+        isp_param->ahdr_proc_res.TmoProcRes.sw_hdrtmo_palpha_lwscl =
+            ahdr_rk->AhdrProcRes.TmoProcRes.sw_hdrtmo_palpha_lwscl;
+        isp_param->ahdr_proc_res.TmoProcRes.sw_hdrtmo_maxpalpha =
+            ahdr_rk->AhdrProcRes.TmoProcRes.sw_hdrtmo_maxpalpha;
+        isp_param->ahdr_proc_res.TmoProcRes.sw_hdrtmo_maxgain =
+            ahdr_rk->AhdrProcRes.TmoProcRes.sw_hdrtmo_maxgain;
+        isp_param->ahdr_proc_res.TmoProcRes.sw_hdrtmo_cfg_alpha =
+            ahdr_rk->AhdrProcRes.TmoProcRes.sw_hdrtmo_cfg_alpha;
+        isp_param->ahdr_proc_res.TmoProcRes.sw_hdrtmo_set_gainoff =
+            ahdr_rk->AhdrProcRes.TmoProcRes.sw_hdrtmo_set_gainoff;
+        isp_param->ahdr_proc_res.TmoProcRes.sw_hdrtmo_set_lgmin =
+            ahdr_rk->AhdrProcRes.TmoProcRes.sw_hdrtmo_set_lgmin;
+        isp_param->ahdr_proc_res.TmoProcRes.sw_hdrtmo_set_lgmax =
+            ahdr_rk->AhdrProcRes.TmoProcRes.sw_hdrtmo_set_lgmax;
+        isp_param->ahdr_proc_res.TmoProcRes.sw_hdrtmo_set_lgmean =
+            ahdr_rk->AhdrProcRes.TmoProcRes.sw_hdrtmo_set_lgmean;
+        isp_param->ahdr_proc_res.TmoProcRes.sw_hdrtmo_set_weightkey =
+            ahdr_rk->AhdrProcRes.TmoProcRes.sw_hdrtmo_set_weightkey;
+        isp_param->ahdr_proc_res.TmoProcRes.sw_hdrtmo_set_lgrange0 =
+            ahdr_rk->AhdrProcRes.TmoProcRes.sw_hdrtmo_set_lgrange0;
+        isp_param->ahdr_proc_res.TmoProcRes.sw_hdrtmo_set_lgrange1 =
+            ahdr_rk->AhdrProcRes.TmoProcRes.sw_hdrtmo_set_lgrange1;
+        isp_param->ahdr_proc_res.TmoProcRes.sw_hdrtmo_set_lgavgmax =
+            ahdr_rk->AhdrProcRes.TmoProcRes.sw_hdrtmo_set_lgavgmax;
+        isp_param->ahdr_proc_res.TmoProcRes.sw_hdrtmo_set_palpha =
+            ahdr_rk->AhdrProcRes.TmoProcRes.sw_hdrtmo_set_palpha;
+        isp_param->ahdr_proc_res.TmoProcRes.sw_hdrtmo_gain_ld_off1 =
+            ahdr_rk->AhdrProcRes.TmoProcRes.sw_hdrtmo_gain_ld_off1;
+        isp_param->ahdr_proc_res.TmoProcRes.sw_hdrtmo_gain_ld_off2 =
+            ahdr_rk->AhdrProcRes.TmoProcRes.sw_hdrtmo_gain_ld_off2;
+        isp_param->ahdr_proc_res.TmoProcRes.sw_hdrtmo_cnt_vsize =
+            ahdr_rk->AhdrProcRes.TmoProcRes.sw_hdrtmo_cnt_vsize;
+        isp_param->ahdr_proc_res.TmoProcRes.sw_hdrtmo_big_en =
+            ahdr_rk->AhdrProcRes.TmoProcRes.sw_hdrtmo_big_en;
+        isp_param->ahdr_proc_res.TmoProcRes.sw_hdrtmo_nobig_en =
+            ahdr_rk->AhdrProcRes.TmoProcRes.sw_hdrtmo_nobig_en;
+        isp_param->ahdr_proc_res.TmoProcRes.sw_hdrtmo_newhist_en =
+            ahdr_rk->AhdrProcRes.TmoProcRes.sw_hdrtmo_newhist_en;
+        isp_param->ahdr_proc_res.TmoProcRes.sw_hdrtmo_cnt_mode =
+            ahdr_rk->AhdrProcRes.TmoProcRes.sw_hdrtmo_cnt_mode;
+        isp_param->ahdr_proc_res.TmoProcRes.sw_hdrtmo_expl_lgratio =
+            ahdr_rk->AhdrProcRes.TmoProcRes.sw_hdrtmo_expl_lgratio;
+        isp_param->ahdr_proc_res.TmoProcRes.sw_hdrtmo_lgscl_ratio =
+            ahdr_rk->AhdrProcRes.TmoProcRes.sw_hdrtmo_lgscl_ratio;
 
     }
 
@@ -650,6 +717,8 @@ RkAiqCore::genIspAnrResult(RkAiqFullParams* params)
         mAlogsSharedParams.procResComb.anr_proc_res;
     SmartPtr<rk_aiq_isp_params_t> isp_param =
         params->mIspParams->data();
+    SmartPtr<rk_aiq_ispp_params_t> ispp_param =
+        params->mIsppParams->data();
 
     if (!anr_com) {
         LOGD_ANALYZER("no anr result");
@@ -686,20 +755,22 @@ RkAiqCore::genIspAnrResult(RkAiqFullParams* params)
 #else
         LOGD_ANR("oyyf: %s:%d output isp param start\n", __FUNCTION__, __LINE__);
         memcpy(&isp_param->rawnr,
-               &anr_rk->stAnrProcResult.stBayernrParamSelect,
-               sizeof(RKAnr_Bayernr_Params_Select_t));
+               &anr_rk->stAnrProcResult.stBayernrFix,
+               sizeof(rk_aiq_isp_rawnr_t));
 
-        memcpy(&isp_param->uvnr,
-               &anr_rk->stAnrProcResult.stUvnrParamSelect,
-               sizeof(RKAnr_Uvnr_Params_Select_t));
+        ispp_param->update_mask |= RKAIQ_ISPP_NR_ID;
+        memcpy(&ispp_param->uvnr,
+               &anr_rk->stAnrProcResult.stUvnrFix,
+               sizeof(RKAnr_Uvnr_Fix_t));
 
-        memcpy(&isp_param->tnr,
-               &anr_rk->stAnrProcResult.stMfnrParamSelect,
-               sizeof(RKAnr_Mfnr_Params_Select_t));
+        memcpy(&ispp_param->ynr,
+               &anr_rk->stAnrProcResult.stYnrFix,
+               sizeof(RKAnr_Ynr_Fix_t));
 
-        memcpy(&isp_param->ynr,
-               &anr_rk->stAnrProcResult.stYnrParamSelect,
-               sizeof(RKAnr_Ynr_Params_Select_t));
+        ispp_param->update_mask |= RKAIQ_ISPP_TNR_ID;
+        memcpy(&ispp_param->tnr,
+               &anr_rk->stAnrProcResult.stMfnrFix,
+               sizeof(RKAnr_Mfnr_Fix_t));
 
         LOGD_ANR("oyyf: %s:%d output isp param end \n", __FUNCTION__, __LINE__);
 
@@ -728,6 +799,9 @@ RkAiqCore::genIspAdhazResult(RkAiqFullParams* params)
     }
 
     // TODO: gen adhaz common result
+    RkAiqAlgoProcResAdhaz* adhaz_rk = (RkAiqAlgoProcResAdhaz*)adhaz_com;
+
+    isp_param->adhaz_config = adhaz_rk->adhaz_config;
 
     SmartPtr<RkAiqHandle>* handle = getCurAlgoTypeHandle(RK_AIQ_ALGO_TYPE_ADHAZ);
     int algo_id = (*handle)->getAlgoId();
@@ -736,7 +810,7 @@ RkAiqCore::genIspAdhazResult(RkAiqFullParams* params)
     if (algo_id == 0) {
         RkAiqAlgoProcResAdhazInt* adhaz_rk = (RkAiqAlgoProcResAdhazInt*)adhaz_com;
 
-        isp_param->adhaz_config = adhaz_rk->adhaz_config;
+
     }
 
     EXIT_ANALYZER_FUNCTION();
@@ -796,6 +870,9 @@ RkAiqCore::genIspAcpResult(RkAiqFullParams* params)
     }
 
     // TODO: gen acp common result
+    rk_aiq_acp_params_t* isp_cp = &isp_param->cp;
+
+    *isp_cp = acp_com->acp_res;
 
     SmartPtr<RkAiqHandle>* handle = getCurAlgoTypeHandle(RK_AIQ_ALGO_TYPE_ACP);
     int algo_id = (*handle)->getAlgoId();
@@ -831,7 +908,8 @@ RkAiqCore::genIspAieResult(RkAiqFullParams* params)
     }
 
     // TODO: gen aie common result
-
+    rk_aiq_isp_ie_t* isp_ie = &isp_param->ie;
+    isp_ie->base = aie_com->params;
     SmartPtr<RkAiqHandle>* handle = getCurAlgoTypeHandle(RK_AIQ_ALGO_TYPE_AIE);
     int algo_id = (*handle)->getAlgoId();
 
@@ -839,6 +917,7 @@ RkAiqCore::genIspAieResult(RkAiqFullParams* params)
     if (algo_id == 0) {
         RkAiqAlgoProcResAieInt* aie_rk = (RkAiqAlgoProcResAieInt*)aie_com;
 
+        isp_ie->extra = aie_rk->params;
 #ifdef RK_SIMULATOR_HW
 #else
 #endif
@@ -859,6 +938,8 @@ RkAiqCore::genIspAsharpResult(RkAiqFullParams* params)
         mAlogsSharedParams.procResComb.asharp_proc_res;
     SmartPtr<rk_aiq_isp_params_t> isp_param =
         params->mIspParams->data();
+    SmartPtr<rk_aiq_ispp_params_t> ispp_param =
+        params->mIsppParams->data();
 
     if (!asharp_com) {
         LOGD_ANALYZER("no asharp result");
@@ -895,21 +976,16 @@ RkAiqCore::genIspAsharpResult(RkAiqFullParams* params)
         LOGD_ASHARP("oyyf: %s:%d output isp param end \n", __FUNCTION__, __LINE__);
 #else
         LOGD_ASHARP("oyyf: %s:%d output isp param start\n", __FUNCTION__, __LINE__);
-        memcpy(&isp_param->sharpen.rk_sharpen_params_selected_V1,
-               &asharp_rk->stAsharpProcResult.stSharpParamSelect.rk_sharpen_params_selected_V1,
-               sizeof(RKAsharp_Sharp_HW_Params_Select_t));
 
-        memcpy(&isp_param->sharpen.rk_sharpen_params_selected_V2,
-               &asharp_rk->stAsharpProcResult.stSharpParamSelect.rk_sharpen_params_selected_V2,
-               sizeof(RKAsharp_Sharp_HW_V2_Params_Select_t));
+        ispp_param->update_mask |= RKAIQ_ISPP_SHARP_ID;
+        memcpy(&ispp_param->sharpen,
+               &asharp_rk->stAsharpProcResult.stSharpFix,
+               sizeof(rk_aiq_isp_sharpen_t));
 
-        memcpy(&isp_param->sharpen.rk_sharpen_params_selected_V3,
-               &asharp_rk->stAsharpProcResult.stSharpParamSelect.rk_sharpen_params_selected_V3,
-               sizeof(RKAsharp_Sharp_HW_V3_Params_Select_t));
+        memcpy(&ispp_param->edgeflt,
+               &asharp_rk->stAsharpProcResult.stEdgefltFix,
+               sizeof(rk_aiq_isp_edgeflt_t));
 
-        memcpy(&isp_param->edgeflt,
-               &asharp_rk->stAsharpProcResult.stEdgefilterParamSelect,
-               sizeof(RKAsharp_EdgeFilter_Params_Select_t));
         LOGD_ASHARP("oyyf: %s:%d output isp param end \n", __FUNCTION__, __LINE__);
 #endif
     }
@@ -1135,8 +1211,8 @@ RkAiqCore::genIspAfecResult(RkAiqFullParams* params)
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
     RkAiqAlgoProcResAfec* afec_com =
         mAlogsSharedParams.procResComb.afec_proc_res;
-    SmartPtr<rk_aiq_isp_params_t> isp_param =
-        params->mIspParams->data();
+    SmartPtr<rk_aiq_ispp_params_t> ispp_param =
+        params->mIsppParams->data();
 
     if (!afec_com) {
         LOGD_ANALYZER("no afec result");
@@ -1148,6 +1224,7 @@ RkAiqCore::genIspAfecResult(RkAiqFullParams* params)
     SmartPtr<RkAiqHandle>* handle = getCurAlgoTypeHandle(RK_AIQ_ALGO_TYPE_AFEC);
     int algo_id = (*handle)->getAlgoId();
 
+    ispp_param->update_mask |= RKAIQ_ISPP_FEC_ID;
     // gen rk afec result
     if (algo_id == 0) {
         RkAiqAlgoProcResAfecInt* afec_rk = (RkAiqAlgoProcResAfecInt*)afec_com;
@@ -1179,6 +1256,9 @@ RkAiqCore::genIspAgammaResult(RkAiqFullParams* params)
     }
 
     // TODO: gen agamma common result
+    RkAiqAlgoProcResAgamma* agamma_rk = (RkAiqAlgoProcResAgamma*)agamma_com;
+
+    isp_param->agamma_config = agamma_rk->agamma_config;
 
     SmartPtr<RkAiqHandle>* handle = getCurAlgoTypeHandle(RK_AIQ_ALGO_TYPE_AGAMMA);
     int algo_id = (*handle)->getAlgoId();
@@ -1186,8 +1266,6 @@ RkAiqCore::genIspAgammaResult(RkAiqFullParams* params)
     // gen rk agamma result
     if (algo_id == 0) {
         RkAiqAlgoProcResAgammaInt* agamma_rk = (RkAiqAlgoProcResAgammaInt*)agamma_com;
-
-        isp_param->agamma_config = agamma_rk->agamma_config;
     }
 
     EXIT_ANALYZER_FUNCTION();
@@ -1306,8 +1384,8 @@ RkAiqCore::genIspAorbResult(RkAiqFullParams* params)
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
     RkAiqAlgoProcResAorb* aorb_com =
         mAlogsSharedParams.procResComb.aorb_proc_res;
-    SmartPtr<rk_aiq_isp_params_t> isp_param =
-        params->mIspParams->data();
+    SmartPtr<rk_aiq_ispp_params_t> ispp_param =
+        params->mIsppParams->data();
 
     if (!aorb_com) {
         LOGD_ANALYZER("no aorb result");
@@ -1319,6 +1397,7 @@ RkAiqCore::genIspAorbResult(RkAiqFullParams* params)
     SmartPtr<RkAiqHandle>* handle = getCurAlgoTypeHandle(RK_AIQ_ALGO_TYPE_AORB);
     int algo_id = (*handle)->getAlgoId();
 
+    ispp_param->update_mask |= RKAIQ_ISPP_ORB_ID;
     // gen rk aorb result
     if (algo_id == 0) {
         RkAiqAlgoProcResAorbInt* aorb_rk = (RkAiqAlgoProcResAorbInt*)aorb_com;
@@ -1409,7 +1488,10 @@ RkAiqCore::pushStats(SmartPtr<VideoBuffer> &buffer)
     ENTER_ANALYZER_FUNCTION();
 
     XCAM_ASSERT(buffer.ptr());
-    mRkAiqCoreTh->push_stats(buffer);
+    if (buffer->get_video_info().format == V4L2_META_FMT_RK_ISP1_STAT_3A)
+        mRkAiqCoreTh->push_stats(buffer);
+    else
+        mRkAiqCorePpTh->push_stats(buffer);
 
     EXIT_ANALYZER_FUNCTION();
 
@@ -1773,54 +1855,73 @@ RkAiqCore::convertIspstatsToAlgo(const SmartPtr<VideoBuffer> &buffer)
 
     //ahdr
     mAlogsSharedParams.ispStats.ahdr_stats_valid = stats->meas_type >> 16 & 1;
-    mAlogsSharedParams.ispStats.ahdr_stats.ro_hdrtmo_lglow = stats->params.hdrtmo.lglow;
-    mAlogsSharedParams.ispStats.ahdr_stats.ro_hdrtmo_lgmin = stats->params.hdrtmo.lgmin;
-    mAlogsSharedParams.ispStats.ahdr_stats.ro_hdrtmo_lghigh = stats->params.hdrtmo.lghigh;
-    mAlogsSharedParams.ispStats.ahdr_stats.ro_hdrtmo_lgmax = stats->params.hdrtmo.lgmax;
-    mAlogsSharedParams.ispStats.ahdr_stats.ro_hdrtmo_weightkey = stats->params.hdrtmo.weightkey;
-    mAlogsSharedParams.ispStats.ahdr_stats.ro_hdrtmo_lgmean = stats->params.hdrtmo.lgmean;
-    mAlogsSharedParams.ispStats.ahdr_stats.ro_hdrtmo_lgrange0 = stats->params.hdrtmo.lgrange0;
-    mAlogsSharedParams.ispStats.ahdr_stats.ro_hdrtmo_lgrange1 = stats->params.hdrtmo.lgrange1;
-    mAlogsSharedParams.ispStats.ahdr_stats.ro_hdrtmo_palpha = stats->params.hdrtmo.palpha;
-    mAlogsSharedParams.ispStats.ahdr_stats.ro_hdrtmo_lgavgmax = stats->params.hdrtmo.lgavgmax;
-    mAlogsSharedParams.ispStats.ahdr_stats.ro_hdrtmo_linecnt = stats->params.hdrtmo.linecnt;
+    mAlogsSharedParams.ispStats.ahdr_stats.tmo_stats.ro_hdrtmo_lglow = stats->params.hdrtmo.lglow;
+    mAlogsSharedParams.ispStats.ahdr_stats.tmo_stats.ro_hdrtmo_lgmin = stats->params.hdrtmo.lgmin;
+    mAlogsSharedParams.ispStats.ahdr_stats.tmo_stats.ro_hdrtmo_lghigh = stats->params.hdrtmo.lghigh;
+    mAlogsSharedParams.ispStats.ahdr_stats.tmo_stats.ro_hdrtmo_lgmax = stats->params.hdrtmo.lgmax;
+    mAlogsSharedParams.ispStats.ahdr_stats.tmo_stats.ro_hdrtmo_weightkey = stats->params.hdrtmo.weightkey;
+    mAlogsSharedParams.ispStats.ahdr_stats.tmo_stats.ro_hdrtmo_lgmean = stats->params.hdrtmo.lgmean;
+    mAlogsSharedParams.ispStats.ahdr_stats.tmo_stats.ro_hdrtmo_lgrange0 = stats->params.hdrtmo.lgrange0;
+    mAlogsSharedParams.ispStats.ahdr_stats.tmo_stats.ro_hdrtmo_lgrange1 = stats->params.hdrtmo.lgrange1;
+    mAlogsSharedParams.ispStats.ahdr_stats.tmo_stats.ro_hdrtmo_palpha = stats->params.hdrtmo.palpha;
+    mAlogsSharedParams.ispStats.ahdr_stats.tmo_stats.ro_hdrtmo_lgavgmax = stats->params.hdrtmo.lgavgmax;
+    mAlogsSharedParams.ispStats.ahdr_stats.tmo_stats.ro_hdrtmo_linecnt = stats->params.hdrtmo.linecnt;
+    for(int i = 0; i < 32; i++)
+        mAlogsSharedParams.ispStats.ahdr_stats.tmo_stats.ro_array_min_max[i] = stats->params.hdrtmo.min_max[i];
 
-    // TODO: for AEC FPGA test, default setting is hdr-3frame. You can modify working_mode in RkAiqManager !!
+    // TODO: for AEC FPGA test, default setting is hdr-3frame. You can modify working_mode in IQ xml !!
     for(int i = 0; i < ISP2X_YUVAE_MEAN_NUM; i++) {
         mAlogsSharedParams.ispStats.aec_stats.ae_data.yuv.mean[i] = stats->params.yuvae.mean[i];
         if(i < ISP2X_YUVAE_SUBWIN_NUM)
             mAlogsSharedParams.ispStats.aec_stats.ae_data.yuv.ro_yuvae_sumy[i] = stats->params.yuvae.ro_yuvae_sumy[i];
     }
-    int FrameNum = (mAlogsSharedParams.working_mode == 0 || mAlogsSharedParams.working_mode == 10) ? 1
-                   : ((mAlogsSharedParams.working_mode % 2) ? 2 : 3);
+
+    int FrameNum;
+    switch (mAlogsSharedParams.working_mode)
+    {
+    case RK_AIQ_WORKING_MODE_NORMAL:
+        FrameNum = 1;
+        break;
+    case RK_AIQ_ISP_HDR_MODE_2_FRAME_HDR:
+    case RK_AIQ_ISP_HDR_MODE_2_LINE_HDR:
+        FrameNum = 2;
+        break;
+    case RK_AIQ_ISP_HDR_MODE_3_FRAME_HDR:
+    case RK_AIQ_ISP_HDR_MODE_3_LINE_HDR:
+        FrameNum = 3;
+        break;
+    default:
+        FrameNum = 1;
+        break;
+    }
 
     if(FrameNum == 3) {
         mAlogsSharedParams.ispStats.aec_stats_valid = (stats->meas_type >> 11) & (0x01) ? true : false;
         for(int i = 0; i < ISP2X_RAWAEBIG_MEAN_NUM; i++) {
-            mAlogsSharedParams.ispStats.aec_stats.ae_data.chn[0].rawae_big.channelr_xy[i] = stats->params.rawaebig2.data[i].channelr_xy;
-            mAlogsSharedParams.ispStats.aec_stats.ae_data.chn[0].rawae_big.channelg_xy[i] = stats->params.rawaebig2.data[i].channelg_xy;
-            mAlogsSharedParams.ispStats.aec_stats.ae_data.chn[0].rawae_big.channelb_xy[i] = stats->params.rawaebig2.data[i].channelb_xy;
-            mAlogsSharedParams.ispStats.aec_stats.ae_data.chn[2].rawae_big.channelr_xy[i] = stats->params.rawaebig3.data[i].channelr_xy;
-            mAlogsSharedParams.ispStats.aec_stats.ae_data.chn[2].rawae_big.channelg_xy[i] = stats->params.rawaebig3.data[i].channelg_xy;
-            mAlogsSharedParams.ispStats.aec_stats.ae_data.chn[2].rawae_big.channelb_xy[i] = stats->params.rawaebig3.data[i].channelb_xy;
-            mAlogsSharedParams.ispStats.aec_stats.ae_data.extra.rawae_big.channelr_xy[i] = stats->params.rawaebig1.data[i].channelr_xy;
-            mAlogsSharedParams.ispStats.aec_stats.ae_data.extra.rawae_big.channelg_xy[i] = stats->params.rawaebig1.data[i].channelg_xy;
-            mAlogsSharedParams.ispStats.aec_stats.ae_data.extra.rawae_big.channelb_xy[i] = stats->params.rawaebig1.data[i].channelb_xy;
+            mAlogsSharedParams.ispStats.aec_stats.ae_data.chn[0].rawae_big.channelr_xy[i] = stats->params.rawae1.data[i].channelr_xy;
+            mAlogsSharedParams.ispStats.aec_stats.ae_data.chn[0].rawae_big.channelg_xy[i] = stats->params.rawae1.data[i].channelg_xy;
+            mAlogsSharedParams.ispStats.aec_stats.ae_data.chn[0].rawae_big.channelb_xy[i] = stats->params.rawae1.data[i].channelb_xy;
+            mAlogsSharedParams.ispStats.aec_stats.ae_data.chn[2].rawae_big.channelr_xy[i] = stats->params.rawae2.data[i].channelr_xy;
+            mAlogsSharedParams.ispStats.aec_stats.ae_data.chn[2].rawae_big.channelg_xy[i] = stats->params.rawae2.data[i].channelg_xy;
+            mAlogsSharedParams.ispStats.aec_stats.ae_data.chn[2].rawae_big.channelb_xy[i] = stats->params.rawae2.data[i].channelb_xy;
+            mAlogsSharedParams.ispStats.aec_stats.ae_data.extra.rawae_big.channelr_xy[i] = stats->params.rawae3.data[i].channelr_xy;
+            mAlogsSharedParams.ispStats.aec_stats.ae_data.extra.rawae_big.channelg_xy[i] = stats->params.rawae3.data[i].channelg_xy;
+            mAlogsSharedParams.ispStats.aec_stats.ae_data.extra.rawae_big.channelb_xy[i] = stats->params.rawae3.data[i].channelb_xy;
             if(i < ISP2X_RAWAELITE_MEAN_NUM) {
-                mAlogsSharedParams.ispStats.aec_stats.ae_data.chn[1].rawae_lite.channelr_xy[i] = stats->params.rawaelite.data[i].channelr_xy;
-                mAlogsSharedParams.ispStats.aec_stats.ae_data.chn[1].rawae_lite.channelg_xy[i] = stats->params.rawaelite.data[i].channelg_xy;
-                mAlogsSharedParams.ispStats.aec_stats.ae_data.chn[1].rawae_lite.channelb_xy[i] = stats->params.rawaelite.data[i].channelb_xy;
+                mAlogsSharedParams.ispStats.aec_stats.ae_data.chn[1].rawae_lite.channelr_xy[i] = stats->params.rawae0.data[i].channelr_xy;
+                mAlogsSharedParams.ispStats.aec_stats.ae_data.chn[1].rawae_lite.channelg_xy[i] = stats->params.rawae0.data[i].channelg_xy;
+                mAlogsSharedParams.ispStats.aec_stats.ae_data.chn[1].rawae_lite.channelb_xy[i] = stats->params.rawae0.data[i].channelb_xy;
             }
             if(i < ISP2X_RAWAEBIG_SUBWIN_NUM) {
-                mAlogsSharedParams.ispStats.aec_stats.ae_data.chn[0].rawae_big.wndx_sumr[i] = stats->params.rawaebig2.sumr[i];
-                mAlogsSharedParams.ispStats.aec_stats.ae_data.chn[0].rawae_big.wndx_sumg[i] = stats->params.rawaebig2.sumg[i];
-                mAlogsSharedParams.ispStats.aec_stats.ae_data.chn[0].rawae_big.wndx_sumb[i] = stats->params.rawaebig2.sumb[i];
-                mAlogsSharedParams.ispStats.aec_stats.ae_data.chn[2].rawae_big.wndx_sumr[i] = stats->params.rawaebig3.sumr[i];
-                mAlogsSharedParams.ispStats.aec_stats.ae_data.chn[2].rawae_big.wndx_sumg[i] = stats->params.rawaebig3.sumg[i];
-                mAlogsSharedParams.ispStats.aec_stats.ae_data.chn[2].rawae_big.wndx_sumb[i] = stats->params.rawaebig3.sumb[i];
-                mAlogsSharedParams.ispStats.aec_stats.ae_data.extra.rawae_big.wndx_sumr[i] = stats->params.rawaebig1.sumr[i];
-                mAlogsSharedParams.ispStats.aec_stats.ae_data.extra.rawae_big.wndx_sumg[i] = stats->params.rawaebig1.sumg[i];
-                mAlogsSharedParams.ispStats.aec_stats.ae_data.extra.rawae_big.wndx_sumb[i] = stats->params.rawaebig1.sumb[i];
+                mAlogsSharedParams.ispStats.aec_stats.ae_data.chn[0].rawae_big.wndx_sumr[i] = stats->params.rawae1.sumr[i];
+                mAlogsSharedParams.ispStats.aec_stats.ae_data.chn[0].rawae_big.wndx_sumg[i] = stats->params.rawae1.sumg[i];
+                mAlogsSharedParams.ispStats.aec_stats.ae_data.chn[0].rawae_big.wndx_sumb[i] = stats->params.rawae1.sumb[i];
+                mAlogsSharedParams.ispStats.aec_stats.ae_data.chn[2].rawae_big.wndx_sumr[i] = stats->params.rawae2.sumr[i];
+                mAlogsSharedParams.ispStats.aec_stats.ae_data.chn[2].rawae_big.wndx_sumg[i] = stats->params.rawae2.sumg[i];
+                mAlogsSharedParams.ispStats.aec_stats.ae_data.chn[2].rawae_big.wndx_sumb[i] = stats->params.rawae2.sumb[i];
+                mAlogsSharedParams.ispStats.aec_stats.ae_data.extra.rawae_big.wndx_sumr[i] = stats->params.rawae3.sumr[i];
+                mAlogsSharedParams.ispStats.aec_stats.ae_data.extra.rawae_big.wndx_sumg[i] = stats->params.rawae3.sumg[i];
+                mAlogsSharedParams.ispStats.aec_stats.ae_data.extra.rawae_big.wndx_sumb[i] = stats->params.rawae3.sumb[i];
 
             }
         }
@@ -1828,69 +1929,69 @@ RkAiqCore::convertIspstatsToAlgo(const SmartPtr<VideoBuffer> &buffer)
         /*
          * unsigned long chn0_mean = 0, chn1_mean = 0, chn2_mean = 0;
          * for(int i = 0; i < ISP2X_RAWAEBIG_MEAN_NUM; i++) {
-         *     chn0_mean += stats->params.rawaebig3.data[i].channelr_xy;
-         *     chn2_mean += stats->params.rawaebig2.data[i].channelr_xy;
+         *     chn0_mean += stats->params.rawae2.data[i].channelr_xy;
+         *     chn2_mean += stats->params.rawae1.data[i].channelr_xy;
          *      for(int i = 0; i < ISP2X_RAWAELITE_MEAN_NUM; i++)
-         *          chn1_mean += stats->params.rawaelite.data[i].channelr_xy;
+         *          chn1_mean += stats->params.rawae0.data[i].channelr_xy;
          * }
          * printf("chn[0]: chn_r_mean_xy: %ld\n", chn0_mean);
          * printf("chn[1]: chn_r_mean_xy: %ld\n", chn1_mean);
          * printf("chn[2]: chn_r_mean_xy: %ld\n", chn2_mean);     */
 
 
-        memcpy(mAlogsSharedParams.ispStats.aec_stats.ae_data.chn[0].rawhist_big.bins, stats->params.rawhistbig2.hist_bin, ISP2X_HIST_BIN_N_MAX * sizeof(u32));
-        memcpy(mAlogsSharedParams.ispStats.aec_stats.ae_data.chn[1].rawhist_lite.bins, stats->params.rawhistlite.hist_bin, ISP2X_HIST_BIN_N_MAX * sizeof(u32));
-        memcpy(mAlogsSharedParams.ispStats.aec_stats.ae_data.chn[2].rawhist_big.bins, stats->params.rawhistbig3.hist_bin, ISP2X_HIST_BIN_N_MAX * sizeof(u32));
-        memcpy(mAlogsSharedParams.ispStats.aec_stats.ae_data.extra.rawhist_big.bins, stats->params.rawhistbig1.hist_bin, ISP2X_HIST_BIN_N_MAX * sizeof(u32));
+        memcpy(mAlogsSharedParams.ispStats.aec_stats.ae_data.chn[0].rawhist_big.bins, stats->params.rawhist1.hist_bin, ISP2X_HIST_BIN_N_MAX * sizeof(u32));
+        memcpy(mAlogsSharedParams.ispStats.aec_stats.ae_data.chn[1].rawhist_lite.bins, stats->params.rawhist0.hist_bin, ISP2X_HIST_BIN_N_MAX * sizeof(u32));
+        memcpy(mAlogsSharedParams.ispStats.aec_stats.ae_data.chn[2].rawhist_big.bins, stats->params.rawhist2.hist_bin, ISP2X_HIST_BIN_N_MAX * sizeof(u32));
+        memcpy(mAlogsSharedParams.ispStats.aec_stats.ae_data.extra.rawhist_big.bins, stats->params.rawhist3.hist_bin, ISP2X_HIST_BIN_N_MAX * sizeof(u32));
     } else {
         mAlogsSharedParams.ispStats.aec_stats_valid = (stats->meas_type >> 11) & (0x01) ? true : false;
         for(int i = 0; i < ISP2X_RAWAEBIG_MEAN_NUM; i++) {
-            mAlogsSharedParams.ispStats.aec_stats.ae_data.chn[0].rawae_big.channelr_xy[i] = stats->params.rawaebig3.data[i].channelr_xy;
-            mAlogsSharedParams.ispStats.aec_stats.ae_data.chn[0].rawae_big.channelg_xy[i] = stats->params.rawaebig3.data[i].channelg_xy;
-            mAlogsSharedParams.ispStats.aec_stats.ae_data.chn[0].rawae_big.channelb_xy[i] = stats->params.rawaebig3.data[i].channelb_xy;
-            mAlogsSharedParams.ispStats.aec_stats.ae_data.chn[1].rawae_big.channelr_xy[i] = stats->params.rawaebig2.data[i].channelr_xy;
-            mAlogsSharedParams.ispStats.aec_stats.ae_data.chn[1].rawae_big.channelg_xy[i] = stats->params.rawaebig2.data[i].channelg_xy;
-            mAlogsSharedParams.ispStats.aec_stats.ae_data.chn[1].rawae_big.channelb_xy[i] = stats->params.rawaebig2.data[i].channelb_xy;
-            mAlogsSharedParams.ispStats.aec_stats.ae_data.extra.rawae_big.channelr_xy[i] = stats->params.rawaebig1.data[i].channelr_xy;
-            mAlogsSharedParams.ispStats.aec_stats.ae_data.extra.rawae_big.channelg_xy[i] = stats->params.rawaebig1.data[i].channelg_xy;
-            mAlogsSharedParams.ispStats.aec_stats.ae_data.extra.rawae_big.channelb_xy[i] = stats->params.rawaebig1.data[i].channelb_xy;
+            mAlogsSharedParams.ispStats.aec_stats.ae_data.chn[0].rawae_big.channelr_xy[i] = stats->params.rawae2.data[i].channelr_xy;
+            mAlogsSharedParams.ispStats.aec_stats.ae_data.chn[0].rawae_big.channelg_xy[i] = stats->params.rawae2.data[i].channelg_xy;
+            mAlogsSharedParams.ispStats.aec_stats.ae_data.chn[0].rawae_big.channelb_xy[i] = stats->params.rawae2.data[i].channelb_xy;
+            mAlogsSharedParams.ispStats.aec_stats.ae_data.chn[1].rawae_big.channelr_xy[i] = stats->params.rawae1.data[i].channelr_xy;
+            mAlogsSharedParams.ispStats.aec_stats.ae_data.chn[1].rawae_big.channelg_xy[i] = stats->params.rawae1.data[i].channelg_xy;
+            mAlogsSharedParams.ispStats.aec_stats.ae_data.chn[1].rawae_big.channelb_xy[i] = stats->params.rawae1.data[i].channelb_xy;
+            mAlogsSharedParams.ispStats.aec_stats.ae_data.extra.rawae_big.channelr_xy[i] = stats->params.rawae3.data[i].channelr_xy;
+            mAlogsSharedParams.ispStats.aec_stats.ae_data.extra.rawae_big.channelg_xy[i] = stats->params.rawae3.data[i].channelg_xy;
+            mAlogsSharedParams.ispStats.aec_stats.ae_data.extra.rawae_big.channelb_xy[i] = stats->params.rawae3.data[i].channelb_xy;
 
             if(i < ISP2X_RAWAELITE_MEAN_NUM) {
-                mAlogsSharedParams.ispStats.aec_stats.ae_data.chn[2].rawae_lite.channelr_xy[i] = stats->params.rawaelite.data[i].channelr_xy;
-                mAlogsSharedParams.ispStats.aec_stats.ae_data.chn[2].rawae_lite.channelg_xy[i] = stats->params.rawaelite.data[i].channelg_xy;
-                mAlogsSharedParams.ispStats.aec_stats.ae_data.chn[2].rawae_lite.channelb_xy[i] = stats->params.rawaelite.data[i].channelb_xy;
+                mAlogsSharedParams.ispStats.aec_stats.ae_data.chn[2].rawae_lite.channelr_xy[i] = stats->params.rawae0.data[i].channelr_xy;
+                mAlogsSharedParams.ispStats.aec_stats.ae_data.chn[2].rawae_lite.channelg_xy[i] = stats->params.rawae0.data[i].channelg_xy;
+                mAlogsSharedParams.ispStats.aec_stats.ae_data.chn[2].rawae_lite.channelb_xy[i] = stats->params.rawae0.data[i].channelb_xy;
             }
 
             if(i < ISP2X_RAWAEBIG_SUBWIN_NUM) {
-                mAlogsSharedParams.ispStats.aec_stats.ae_data.chn[0].rawae_big.wndx_sumr[i] = stats->params.rawaebig3.sumr[i];
-                mAlogsSharedParams.ispStats.aec_stats.ae_data.chn[0].rawae_big.wndx_sumg[i] = stats->params.rawaebig3.sumg[i];
-                mAlogsSharedParams.ispStats.aec_stats.ae_data.chn[0].rawae_big.wndx_sumb[i] = stats->params.rawaebig3.sumb[i];
-                mAlogsSharedParams.ispStats.aec_stats.ae_data.chn[1].rawae_big.wndx_sumr[i] = stats->params.rawaebig2.sumr[i];
-                mAlogsSharedParams.ispStats.aec_stats.ae_data.chn[1].rawae_big.wndx_sumg[i] = stats->params.rawaebig2.sumg[i];
-                mAlogsSharedParams.ispStats.aec_stats.ae_data.chn[1].rawae_big.wndx_sumb[i] = stats->params.rawaebig2.sumb[i];
+                mAlogsSharedParams.ispStats.aec_stats.ae_data.chn[0].rawae_big.wndx_sumr[i] = stats->params.rawae2.sumr[i];
+                mAlogsSharedParams.ispStats.aec_stats.ae_data.chn[0].rawae_big.wndx_sumg[i] = stats->params.rawae2.sumg[i];
+                mAlogsSharedParams.ispStats.aec_stats.ae_data.chn[0].rawae_big.wndx_sumb[i] = stats->params.rawae2.sumb[i];
+                mAlogsSharedParams.ispStats.aec_stats.ae_data.chn[1].rawae_big.wndx_sumr[i] = stats->params.rawae1.sumr[i];
+                mAlogsSharedParams.ispStats.aec_stats.ae_data.chn[1].rawae_big.wndx_sumg[i] = stats->params.rawae1.sumg[i];
+                mAlogsSharedParams.ispStats.aec_stats.ae_data.chn[1].rawae_big.wndx_sumb[i] = stats->params.rawae1.sumb[i];
 
-                mAlogsSharedParams.ispStats.aec_stats.ae_data.extra.rawae_big.wndx_sumr[i] = stats->params.rawaebig1.sumr[i];
-                mAlogsSharedParams.ispStats.aec_stats.ae_data.extra.rawae_big.wndx_sumg[i] = stats->params.rawaebig1.sumg[i];
-                mAlogsSharedParams.ispStats.aec_stats.ae_data.extra.rawae_big.wndx_sumb[i] = stats->params.rawaebig1.sumb[i];
+                mAlogsSharedParams.ispStats.aec_stats.ae_data.extra.rawae_big.wndx_sumr[i] = stats->params.rawae3.sumr[i];
+                mAlogsSharedParams.ispStats.aec_stats.ae_data.extra.rawae_big.wndx_sumg[i] = stats->params.rawae3.sumg[i];
+                mAlogsSharedParams.ispStats.aec_stats.ae_data.extra.rawae_big.wndx_sumb[i] = stats->params.rawae3.sumb[i];
             }
         }
 
         /*
          * unsigned long chn0_mean = 0, chn1_mean = 0, chn2_mean = 0;
          * for(int i = 0; i < ISP2X_RAWAEBIG_MEAN_NUM; i++) {
-         *     chn0_mean += stats->params.rawaebig3.data[i].channelr_xy;
-         *     chn1_mean += stats->params.rawaebig2.data[i].channelr_xy;
+         *     chn0_mean += stats->params.rawae2.data[i].channelr_xy;
+         *     chn1_mean += stats->params.rawae1.data[i].channelr_xy;
          *      for(int i = 0; i < ISP2X_RAWAELITE_MEAN_NUM; i++)
-         *               chn2_mean += stats->params.rawaelite.data[i].channelr_xy;
+         *               chn2_mean += stats->params.rawae0.data[i].channelr_xy;
          * }
          * printf("chn[0]: chn_r_mean_xy: %ld\n", chn0_mean);
          * printf("chn[1]: chn_r_mean_xy: %ld\n", chn1_mean);
          * printf("chn[2]: chn_r_mean_xy: %ld\n", chn2_mean);
          */
-        memcpy(mAlogsSharedParams.ispStats.aec_stats.ae_data.chn[0].rawhist_big.bins, stats->params.rawhistbig3.hist_bin, ISP2X_HIST_BIN_N_MAX * sizeof(u32));
-        memcpy(mAlogsSharedParams.ispStats.aec_stats.ae_data.chn[1].rawhist_big.bins, stats->params.rawhistbig2.hist_bin, ISP2X_HIST_BIN_N_MAX * sizeof(u32));
-        memcpy(mAlogsSharedParams.ispStats.aec_stats.ae_data.chn[2].rawhist_lite.bins, stats->params.rawhistlite.hist_bin, ISP2X_HIST_BIN_N_MAX * sizeof(u32));
-        memcpy(mAlogsSharedParams.ispStats.aec_stats.ae_data.extra.rawhist_big.bins, stats->params.rawhistbig1.hist_bin, ISP2X_HIST_BIN_N_MAX * sizeof(u32));
+        memcpy(mAlogsSharedParams.ispStats.aec_stats.ae_data.chn[0].rawhist_big.bins, stats->params.rawhist2.hist_bin, ISP2X_HIST_BIN_N_MAX * sizeof(u32));
+        memcpy(mAlogsSharedParams.ispStats.aec_stats.ae_data.chn[1].rawhist_big.bins, stats->params.rawhist1.hist_bin, ISP2X_HIST_BIN_N_MAX * sizeof(u32));
+        memcpy(mAlogsSharedParams.ispStats.aec_stats.ae_data.chn[2].rawhist_lite.bins, stats->params.rawhist0.hist_bin, ISP2X_HIST_BIN_N_MAX * sizeof(u32));
+        memcpy(mAlogsSharedParams.ispStats.aec_stats.ae_data.extra.rawhist_big.bins, stats->params.rawhist3.hist_bin, ISP2X_HIST_BIN_N_MAX * sizeof(u32));
     }
 
     if (expParams.ptr()) {
@@ -1919,8 +2020,24 @@ XCamReturn
 RkAiqCore::analyze(const SmartPtr<VideoBuffer> &buffer)
 {
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    SmartPtr<RkAiqFullParamsProxy> fullParam;
+    SmartPtr<RkAiqFullParamsProxy> fullPparam;
+    bool has_orb_stats = false;
+    bool has_3a_stats = false;
 
     mAlogsSharedParams.init = false;
+
+#ifdef RK_SIMULATOR_HW
+    has_orb_stats = true;
+    has_3a_stats = true;
+#else
+    if (buffer->get_video_info().format == V4L2_META_FMT_RK_ISP1_STAT_3A) {
+        has_3a_stats = true;
+    } else {
+        has_orb_stats = true;
+    }
+#endif
+
 #ifdef RK_SIMULATOR_HW
     const SmartPtr<V4l2BufferProxy> buf =
         buffer.dynamic_cast_ptr<V4l2BufferProxy>();
@@ -1945,30 +2062,41 @@ RkAiqCore::analyze(const SmartPtr<VideoBuffer> &buffer)
     LOGD_ANR("oyyf: %s:%d input stats param end\n", __FUNCTION__, __LINE__);
 #endif
 
-    mAlogsSharedParams.ispStats.orb_stats = stats->orb;
-    mAlogsSharedParams.ispStats.orb_stats_valid = stats->valid_orb;
-
     //Ahdr
     mAlogsSharedParams.ispStats.ahdr_stats_valid = true;
     mAlogsSharedParams.ispStats.ahdr_stats = stats->ahdr;
 
+    mAlogsSharedParams.ispStats.orb_stats = stats->orb;
+    mAlogsSharedParams.ispStats.orb_stats_valid = stats->valid_orb;
 #else
-    convertIspstatsToAlgo(buffer);
+    if (has_3a_stats) {
+        convertIspstatsToAlgo(buffer);
+    } else if (has_orb_stats) {
+        // TODO
+    } else {
+        LOGW_ANALYZER("no orb or 3a stats !", __FUNCTION__, __LINE__);
+    }
 #endif
-    ret = analyzeInternal();
-    if (ret == XCAM_RETURN_NO_ERROR)
-        if (mCb)
-            mCb->rkAiqCalcDone(mAiqCurParams);
+
+    if (has_3a_stats)
+        fullParam = analyzeInternal();
+    if (has_orb_stats)
+        fullPparam = analyzeInternalPp();
+
+#ifdef RK_SIMULATOR_HW
+    // merge results for simulator
+    fullParam->data()->mIsppParams->data()->orb =
+        fullPparam->data()->mIsppParams->data()->orb;
+#endif
+
+    if (fullParam.ptr() && mCb)
+        mCb->rkAiqCalcDone(fullParam);
+    else if (fullPparam.ptr() && mCb)
+        mCb->rkAiqCalcDone(fullPparam);
+
     return ret;
 }
 
-XCamReturn
-RkAiqCore::preProcess()
-{
-    ENTER_ANALYZER_FUNCTION();
-
-    XCamReturn ret = XCAM_RETURN_NO_ERROR;
-    // TODO: may adjust the preprocess order
 #define PREPROCESS_ALGO(at) \
     if (mCur##at##AlgoHdl.ptr() && mCur##at##AlgoHdl->getEnable()) { \
         /* TODO, should be called before all algos preProcess ? */ \
@@ -1978,6 +2106,28 @@ RkAiqCore::preProcess()
         RKAIQCORE_CHECK_BYPASS(ret, "%s preProcess failed", #at); \
     } \
 
+XCamReturn
+RkAiqCore::preProcessPp()
+{
+    ENTER_ANALYZER_FUNCTION();
+
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    // TODO: may adjust the preprocess order
+
+    PREPROCESS_ALGO(Aorb);
+
+    EXIT_ANALYZER_FUNCTION();
+
+    return XCAM_RETURN_NO_ERROR;
+}
+
+XCamReturn
+RkAiqCore::preProcess()
+{
+    ENTER_ANALYZER_FUNCTION();
+
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    // TODO: may adjust the preprocess order
     PREPROCESS_ALGO(Ae);
     PREPROCESS_ALGO(Awb);
     PREPROCESS_ALGO(Af);
@@ -2008,6 +2158,25 @@ RkAiqCore::preProcess()
     return XCAM_RETURN_NO_ERROR;
 }
 
+#define PROCESSING_ALGO(at) \
+    if (mCur##at##AlgoHdl.ptr() && mCur##at##AlgoHdl->getEnable()) \
+        ret = mCur##at##AlgoHdl->processing(); \
+    RKAIQCORE_CHECK_BYPASS(ret, "%s processing failed", #at);
+
+XCamReturn
+RkAiqCore::processingPp()
+{
+    ENTER_ANALYZER_FUNCTION();
+
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+
+    PROCESSING_ALGO(Aorb);
+
+    EXIT_ANALYZER_FUNCTION();
+
+    return XCAM_RETURN_NO_ERROR;
+}
+
 XCamReturn
 RkAiqCore::processing()
 {
@@ -2016,10 +2185,6 @@ RkAiqCore::processing()
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
 
     // TODO: may adjust the processing order
-#define PROCESSING_ALGO(at) \
-    if (mCur##at##AlgoHdl.ptr() && mCur##at##AlgoHdl->getEnable()) \
-        ret = mCur##at##AlgoHdl->processing(); \
-    RKAIQCORE_CHECK_BYPASS(ret, "%s processing failed", #at);
 
     PROCESSING_ALGO(Ae);
     PROCESSING_ALGO(Awb);
@@ -2051,17 +2216,31 @@ RkAiqCore::processing()
     return XCAM_RETURN_NO_ERROR;
 }
 
+#define POSTPROCESS_ALGO(at) \
+    if (mCur##at##AlgoHdl.ptr() && mCur##at##AlgoHdl->getEnable()) \
+        ret = mCur##at##AlgoHdl->postProcess(); \
+    RKAIQCORE_CHECK_BYPASS(ret, "%s postProcess failed", #at);
+
+XCamReturn
+RkAiqCore::postProcessPp()
+{
+    ENTER_ANALYZER_FUNCTION();
+
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+
+    POSTPROCESS_ALGO(Aorb);
+
+    EXIT_ANALYZER_FUNCTION();
+
+    return XCAM_RETURN_NO_ERROR;
+}
+
 XCamReturn
 RkAiqCore::postProcess()
 {
     ENTER_ANALYZER_FUNCTION();
 
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
-
-#define POSTPROCESS_ALGO(at) \
-    if (mCur##at##AlgoHdl.ptr() && mCur##at##AlgoHdl->getEnable()) \
-        ret = mCur##at##AlgoHdl->postProcess(); \
-    RKAIQCORE_CHECK_BYPASS(ret, "%s postProcess failed", #at);
 
     POSTPROCESS_ALGO(Ae);
     POSTPROCESS_ALGO(Awb);
