@@ -147,11 +147,12 @@ endif()
 # ----------------------------------------------------------------------------
 set (ANR_SRC
 	anr/rk_aiq_algo_anr_itf.cpp
-	anr/anr.cpp
-	anr/bayernr.cpp
-	anr/mfnr.cpp
-	anr/uvnr.cpp
-	anr/ynr.cpp
+	anr/rk_aiq_anr_algo.cpp
+	anr/rk_aiq_anr_algo_bayernr.cpp
+	anr/rk_aiq_anr_algo_mfnr.cpp
+	anr/rk_aiq_anr_algo_uvnr.cpp
+	anr/rk_aiq_anr_algo_ynr.cpp
+	anr/rk_aiq_uapi_anr_int.cpp
     )
 
 if(EXISTS "${CMAKE_SOURCE_DIR}/algos/anr/rk_aiq_algo_anr_itf.cpp")
@@ -175,9 +176,10 @@ endif()
 # ----------------------------------------------------------------------------
 set (ASHARP_SRC
 	asharp/rk_aiq_algo_asharp_itf.cpp
-	asharp/asharp.cpp
-	asharp/edgefilter.cpp
-	asharp/sharp.cpp
+	asharp/rk_aiq_asharp_algo.cpp
+	asharp/rk_aiq_asharp_algo_edgefilter.cpp
+	asharp/rk_aiq_asharp_algo_sharp.cpp
+	asharp/rk_aiq_uapi_asharp_int.cpp
     )
 
 if(EXISTS "${CMAKE_SOURCE_DIR}/algos/asharp/rk_aiq_algo_asharp_itf.cpp")
@@ -201,6 +203,7 @@ endif()
 # ----------------------------------------------------------------------------
 set (ASD_SRC
 	asd/rk_aiq_algo_asd_itf.cpp
+    asd/scene_detector.cpp
     )
 
 if(EXISTS "${CMAKE_SOURCE_DIR}/algos/asd/rk_aiq_algo_asd_itf.cpp")
@@ -248,8 +251,9 @@ endif()
 # ----------------------------------------------------------------------------
 set (ADHAZ_SRC
 	adehaze/rk_aiq_algo_adhaz_itf.cpp
-                adehaze/dehaze.cpp
-
+    adehaze/rk_aiq_adehaze_algo.cpp
+   
+    adehaze/rk_aiq_uapi_adehaze_int.cpp
 
     )
 
@@ -276,6 +280,7 @@ endif()
 set (A3DLUT_SRC
 	a3dlut/rk_aiq_algo_a3dlut_itf.cpp
 	a3dlut/rk_aiq_a3dlut_algo.cpp
+	a3dlut/rk_aiq_uapi_a3dlut_int.cpp
     )
 
 if(EXISTS "${CMAKE_SOURCE_DIR}/algos/a3dlut/rk_aiq_algo_a3dlut_itf.cpp")
@@ -299,7 +304,8 @@ endif()
 # ----------------------------------------------------------------------------
 set (ABLC_SRC
 	ablc/rk_aiq_algo_ablc_itf.cpp
-	ablc/ablc.cpp
+	ablc/rk_aiq_ablc_algo.cpp
+	ablc/rk_aiq_uapi_ablc_int.cpp
     )
 
 if(EXISTS "${CMAKE_SOURCE_DIR}/algos/ablc/rk_aiq_algo_ablc_itf.cpp")
@@ -324,6 +330,7 @@ endif()
 set (ACCM_SRC
 	accm/rk_aiq_algo_accm_itf.cpp
 	accm/rk_aiq_accm_algo.cpp
+	accm/rk_aiq_uapi_accm_int.cpp
     )
 
 if(EXISTS "${CMAKE_SOURCE_DIR}/algos/accm/rk_aiq_algo_accm_itf.cpp")
@@ -395,7 +402,8 @@ endif()
 # ----------------------------------------------------------------------------
 set (ADPCC_SRC
 	adpcc/rk_aiq_algo_adpcc_itf.cpp
-	adpcc/adpcc.cpp
+	adpcc/rk_aiq_adpcc_algo.cpp
+	adpcc/rk_aiq_uapi_adpcc_int.cpp
     )
 
 if(EXISTS "${CMAKE_SOURCE_DIR}/algos/adpcc/rk_aiq_algo_adpcc_itf.cpp")
@@ -442,7 +450,9 @@ endif()
 # ----------------------------------------------------------------------------
 set (AGAMMA_SRC
 	agamma/rk_aiq_algo_agamma_itf.cpp
-	agamma/agamma.cpp
+	agamma/rk_aiq_agamma_algo.cpp
+    agamma/rk_aiq_uapi_agamma_int.cpp
+	
     )
 
 
@@ -537,6 +547,7 @@ endif()
 set (ALSC_SRC
 	alsc/rk_aiq_algo_alsc_itf.cpp
 	alsc/rk_aiq_alsc_algo.cpp
+	alsc/rk_aiq_uapi_alsc_int.cpp
     )
 
 if(EXISTS "${CMAKE_SOURCE_DIR}/algos/alsc/rk_aiq_algo_alsc_itf.cpp")
@@ -560,6 +571,8 @@ endif()
 # ----------------------------------------------------------------------------
 set (AORB_SRC
 	aorb/rk_aiq_algo_aorb_itf.cpp
+    aorb/orb_algos.cpp
+    aorb/orb_algos_opencv.cpp
     )
 
 if(EXISTS "${CMAKE_SOURCE_DIR}/algos/aorb/rk_aiq_algo_aorb_itf.cpp")

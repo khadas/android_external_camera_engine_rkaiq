@@ -21,6 +21,9 @@
 #define _RK_AIQ_TYPE_ALSC_HW_H_
 #include "rk_aiq_comm.h"
 #define LSC_DATA_TBL_SIZE           289
+#define LSC_GRAD_TBL_SIZE           8
+#define LSC_SIZE_TBL_SIZE           8
+
 
 RKAIQ_BEGIN_DECLARE
 
@@ -30,10 +33,10 @@ typedef struct rk_aiq_lsc_cfg_s {
     unsigned short gr_data_tbl[LSC_DATA_TBL_SIZE];
     unsigned short gb_data_tbl[LSC_DATA_TBL_SIZE];
     unsigned short b_data_tbl[LSC_DATA_TBL_SIZE];
-    unsigned short x_grad_tbl[LSC_DATA_TBL_SIZE];
-    unsigned short y_grad_tbl[LSC_DATA_TBL_SIZE];
-    unsigned short x_size_tbl[LSC_DATA_TBL_SIZE];
-    unsigned short y_size_tbl[LSC_DATA_TBL_SIZE];
+    unsigned short x_grad_tbl[LSC_GRAD_TBL_SIZE];
+    unsigned short y_grad_tbl[LSC_GRAD_TBL_SIZE];
+    unsigned short x_size_tbl[LSC_SIZE_TBL_SIZE];
+    unsigned short y_size_tbl[LSC_SIZE_TBL_SIZE];
 } rk_aiq_lsc_cfg_t;
 
 

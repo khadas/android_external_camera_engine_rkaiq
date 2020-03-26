@@ -53,3 +53,30 @@ rk_aiq_user_api_awb_QueryWBInfo(rk_aiq_sys_ctx_t* sys_ctx, rk_aiq_wb_querry_info
     return XCAM_RETURN_NO_ERROR;
 }
 
+XCamReturn
+rk_aiq_user_api_awb_Lock(rk_aiq_sys_ctx_t* sys_ctx)
+{
+    RkAiqAwbHandleInt* algo_handle =
+        algoHandle<RkAiqAwbHandleInt>(sys_ctx, RK_AIQ_ALGO_TYPE_AWB);
+
+    if (algo_handle) {
+        return algo_handle->lock();
+    }
+
+    return XCAM_RETURN_NO_ERROR;
+}
+
+XCamReturn
+rk_aiq_user_api_awb_Unlock(rk_aiq_sys_ctx_t* sys_ctx)
+{
+    RkAiqAwbHandleInt* algo_handle =
+        algoHandle<RkAiqAwbHandleInt>(sys_ctx, RK_AIQ_ALGO_TYPE_AWB);
+
+    if (algo_handle) {
+        return algo_handle->unlock();
+    }
+
+    return XCAM_RETURN_NO_ERROR;
+}
+
+

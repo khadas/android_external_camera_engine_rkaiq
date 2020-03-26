@@ -47,10 +47,17 @@ typedef struct accm_context_s {
     accm_rest_t accmRest;
     rk_aiq_ccm_cfg_t ccmHwConf; //hw para
     unsigned int count;
+    //ctrl & api
+    rk_aiq_ccm_attrib_t mCurAtt;
+    rk_aiq_ccm_attrib_t mNewAtt;
+    bool updateAtt;
 } accm_context_t ;
 
 typedef accm_context_t* accm_handle_t ;
 
+typedef struct _RkAiqAlgoContext {
+    accm_handle_t accm_para;
+} RkAiqAlgoContext;
 
 RKAIQ_END_DECLARE
 

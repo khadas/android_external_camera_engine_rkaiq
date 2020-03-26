@@ -31,6 +31,36 @@ typedef struct alsc_sw_info_s {
     float awbIIRDampCoef;
 } alsc_sw_info_t;
 
+typedef struct rk_aiq_lsc_mlsc_attrib_s {
+    unsigned short r_data_tbl[LSC_DATA_TBL_SIZE];
+    unsigned short gr_data_tbl[LSC_DATA_TBL_SIZE];
+    unsigned short gb_data_tbl[LSC_DATA_TBL_SIZE];
+    unsigned short b_data_tbl[LSC_DATA_TBL_SIZE];
+
+} rk_aiq_lsc_mlsc_attrib_t;
+
+typedef enum rk_aiq_lsc_op_mode_s{
+    RK_AIQ_LSC_MODE_INVALID                     = 0,        /**< initialization value */
+    RK_AIQ_LSC_MODE_MANUAL                      = 1,        /**< run manual lens shading correction */
+    RK_AIQ_LSC_MODE_AUTO                        = 2,        /**< run auto lens shading correction */
+    RK_AIQ_LSC_MODE_MAX
+} rk_aiq_lsc_op_mode_t;
+
+
+typedef struct rk_aiq_lsc_attrib_s{
+    bool byPass;
+    rk_aiq_lsc_op_mode_t mode;
+    rk_aiq_lsc_mlsc_attrib_t stManual;
+
+}rk_aiq_lsc_attrib_t;
+
+typedef struct rk_aiq_lsc_querry_info_s {
+    bool lsc_en;
+    unsigned short r_data_tbl[LSC_DATA_TBL_SIZE];
+    unsigned short gr_data_tbl[LSC_DATA_TBL_SIZE];
+    unsigned short gb_data_tbl[LSC_DATA_TBL_SIZE];
+    unsigned short b_data_tbl[LSC_DATA_TBL_SIZE];
+} rk_aiq_lsc_querry_info_t;
 
 RKAIQ_END_DECLARE
 

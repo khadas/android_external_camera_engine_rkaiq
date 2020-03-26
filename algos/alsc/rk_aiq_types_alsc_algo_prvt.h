@@ -46,9 +46,17 @@ typedef struct alsc_context_s {
     alsc_rest_t alscRest;
     rk_aiq_lsc_cfg_t lscHwConf; //hw para
     unsigned int count;
+    //ctrl & api
+    rk_aiq_lsc_attrib_t mCurAtt;
+    rk_aiq_lsc_attrib_t mNewAtt;
+    bool updateAtt;
 } alsc_context_t ;
 
 typedef alsc_context_t* alsc_handle_t ;
+
+typedef struct _RkAiqAlgoContext {
+    alsc_handle_t alsc_para;
+} RkAiqAlgoContext;
 
 
 RKAIQ_END_DECLARE

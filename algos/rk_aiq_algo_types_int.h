@@ -1,7 +1,7 @@
 /*
  * rk_aiq_algo_types_int.h
  *
- *  Copyright (c) 2019 Intel Corporation
+ *  Copyright (c) 2019 Rockchip Corporation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,26 +24,24 @@
 #include "rk_aiq_algo_des.h"
 #include "rk_aiq_types.h"
 #include "rk_aiq_algo_types.h"
-
-#include "anr/anr.h"
-#include "asharp/asharp.h"
-#include "adehaze/dehaze.h"
-#include "aorb/rk_aiq_orb.h"
-
+#include "adehaze/rk_aiq_types_adehaze_algo_int.h"
+#include "anr/rk_aiq_types_anr_algo_int.h"
+#include "asharp/rk_aiq_types_asharp_algo_int.h"
 #include "ahdr/rk_aiq_types_ahdr_algo_int.h"
 #include "ae/rk_aiq_types_ae_algo_int.h"
 #include "af/rk_aiq_types_af_algo_int.h"
-
+#include "aorb/rk_aiq_types_orb_algo.h"
 #include "awb/rk_aiq_types_awb_algo_int.h"
-#include "agamma/agamma.h"
-#include "adpcc/adpcc.h"
+#include "agamma/rk_aiq_types_agamma_algo_int.h"
+#include "adpcc/rk_aiq_types_adpcc_algo_int.h"
 #include "adebayer/rk_aiq_types_algo_adebayer_int.h"
 #include "RkAiqCalibDbTypes.h"
-#include "ablc/ablc.h"
+#include "ablc/rk_aiq_types_ablc_algo_int.h"
 #include "alsc/rk_aiq_types_alsc_algo_int.h"
 #include "accm/rk_aiq_types_accm_algo_int.h"
 #include "a3dlut/rk_aiq_types_a3dlut_algo_int.h"
-
+#include "acp/rk_aiq_types_acp_algo_int.h"
+#include "aie/rk_aiq_types_aie_algo_int.h"
 
 
 
@@ -445,6 +443,7 @@ typedef struct _RkAiqAlgoPreAsdInt {
 
 typedef struct _RkAiqAlgoPreResAsdInt {
     RkAiqAlgoPreResAsd asd_pre_res_com;
+    asd_preprocess_result_t asd_result;
 } RkAiqAlgoPreResAsdInt;
 
 typedef struct _RkAiqAlgoProcAsdInt {
@@ -471,6 +470,7 @@ typedef struct _RkAiqAlgoConfigAhdrInt {
     RkAiqAlgoComInt rk_com;
     //todo
     AhdrConfig_t* ahdrCfg;
+    int working_mode;
     unsigned short  rawWidth;               // rawÍ¼¿í
     unsigned short  rawHeight;
 } RkAiqAlgoConfigAhdrInt;
@@ -495,7 +495,7 @@ typedef struct _RkAiqAlgoProcAhdrInt {
 typedef struct _RkAiqAlgoProcResAhdrInt {
     RkAiqAlgoProcResAhdr ahdr_proc_res_com;
     //todo lrk
-    RkAiqAhdrProcResult_t AhdrIOData;
+    RkAiqAhdrProcResult_t AhdrProcRes;
 } RkAiqAlgoProcResAhdrInt;
 
 typedef struct _RkAiqAlgoPostAhdrInt {
@@ -565,7 +565,7 @@ typedef struct _RkAiqAlgoProcAdhazInt {
 
 typedef struct _RkAiqAlgoProcResAdhazInt {
     RkAiqAlgoProcResAdhaz adhaz_proc_res_com;
-    RKAiqAdhazConfig_t adhaz_config;
+
 } RkAiqAlgoProcResAdhazInt;
 
 
@@ -732,8 +732,8 @@ typedef struct _RkAiqAlgoPreResAdebayerInt {
 typedef struct _RkAiqAlgoProcAdebayerInt {
     RkAiqAlgoProcAdebayer adebayer_proc_com;
     RkAiqAlgoComInt rk_com;
-    const CamCalibDbContext_t *pCalibDb;
-    int iso;
+//    const CamCalibDbContext_t *pCalibDb;
+//    int iso;
 } RkAiqAlgoProcAdebayerInt;
 
 typedef struct _RkAiqAlgoProcResAdebayerInt {
@@ -851,7 +851,7 @@ typedef struct _RkAiqAlgoPreAgammaInt {
 
 typedef struct _RkAiqAlgoPreResAgammaInt {
     RkAiqAlgoPreResAgamma agamma_pre_res_com;
-    RKAiqAgammaHwConfig_t agamma_config;
+    rk_aiq_gamma_cfg_t agamma_config;
 } RkAiqAlgoPreResAgammaInt;
 
 typedef struct _RkAiqAlgoProcAgammaInt {
@@ -862,7 +862,7 @@ typedef struct _RkAiqAlgoProcAgammaInt {
 
 typedef struct _RkAiqAlgoProcResAgammaInt {
     RkAiqAlgoProcResAgamma agamma_proc_res_com;
-    RKAiqAgammaHwConfig_t agamma_config;
+
 } RkAiqAlgoProcResAgammaInt;
 
 typedef struct _RkAiqAlgoPostAgammaInt {
@@ -929,6 +929,7 @@ typedef struct _RkAiqAlgoProcAieInt {
 
 typedef struct _RkAiqAlgoProcResAieInt {
     RkAiqAlgoProcResAie aie_proc_res_com;
+    rk_aiq_aie_params_int_t params;
 } RkAiqAlgoProcResAieInt;
 
 typedef struct _RkAiqAlgoPostAieInt {
@@ -1020,6 +1021,8 @@ typedef struct _RkAiqAlgoConfigAorbInt {
     RkAiqAlgoConfigAorb aorb_config_com;
     RkAiqAlgoComInt rk_com;
     CalibDb_ORB_t orb_calib_cfg;
+    unsigned int output_width;
+    unsigned int output_height;
 } RkAiqAlgoConfigAorbInt;
 
 typedef struct _RkAiqAlgoPreAorbInt {
@@ -1041,9 +1044,7 @@ typedef struct _RkAiqAlgoProcAorbInt {
 
 typedef struct _RkAiqAlgoProcResAorbInt {
     RkAiqAlgoProcResAorb aorb_proc_res_com;
-    int orb_en;
-    int limit_value;
-    int max_feature;
+    rk_aiq_isp_orb_meas_t aorb_meas;
 } RkAiqAlgoProcResAorbInt;
 
 typedef struct _RkAiqAlgoPostAorbInt {

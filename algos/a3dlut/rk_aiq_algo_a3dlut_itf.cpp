@@ -24,10 +24,6 @@
 
 RKAIQ_BEGIN_DECLARE
 
-typedef struct _RkAiqAlgoContext {
-    void* place_holder[0];
-    alut3d_handle_t a3dlut_para;
-} RkAiqAlgoContext;
 
 static RkAiqAlgoContext ctx;
 
@@ -35,8 +31,8 @@ static XCamReturn
 create_context(RkAiqAlgoContext **context, const AlgoCtxInstanceCfg* cfg)
 {
     LOGI_A3DLUT( "%s: (enter)\n", __FUNCTION__);
-
-    Alut3dInit(&ctx.a3dlut_para);
+    AlgoCtxInstanceCfgInt *cfgInt = (AlgoCtxInstanceCfgInt*)cfg;
+    Alut3dInit(&ctx.a3dlut_para,cfgInt->calib);
     *context = &ctx;
 
     LOGI_A3DLUT( "%s: (exit)\n", __FUNCTION__);
@@ -60,11 +56,7 @@ prepare(RkAiqAlgoCom* params)
     LOGI_A3DLUT( "%s: (enter)\n", __FUNCTION__);
     alut3d_handle_t hAlut3d = (alut3d_handle_t)(params->ctx->a3dlut_para);
     RkAiqAlgoConfigA3dlutInt *para = (RkAiqAlgoConfigA3dlutInt*)params;
-    if(para->rk_com.u.prepare.calib == NULL) {
-        return XCAM_RETURN_ERROR_FAILED;
-    }
-    const CalibDb_Lut3d_t *calib_lut3d = &para->rk_com.u.prepare.calib->lut3d;
-    Alut3dPrepare(calib_lut3d, (alut3d_handle_t)(params->ctx->a3dlut_para));
+    Alut3dPrepare((alut3d_handle_t)(params->ctx->a3dlut_para));
 
     LOGI_A3DLUT( "%s: (exit)\n", __FUNCTION__);
     return XCAM_RETURN_NO_ERROR;

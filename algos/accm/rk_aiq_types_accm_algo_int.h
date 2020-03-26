@@ -31,6 +31,35 @@ typedef struct accm_sw_info_s {
     float awbIIRDampCoef;
 } accm_sw_info_t;
 
+typedef struct rk_aiq_ccm_mccm_attrib_s {
+    float  matrix[9];
+    float  offs[3];
+    float  alp_y[CCM_CURVE_DOT_NUM];
+    float bound_bit;
+} rk_aiq_ccm_mccm_attrib_t;
+
+typedef enum rk_aiq_ccm_op_mode_s{
+    RK_AIQ_CCM_MODE_INVALID                     = 0,        /**< initialization value */
+    RK_AIQ_CCM_MODE_MANUAL                      = 1,        /**< run manual lens shading correction */
+    RK_AIQ_CCM_MODE_AUTO                        = 2,        /**< run auto lens shading correction */
+    RK_AIQ_CCM_MODE_MAX
+} rk_aiq_ccm_op_mode_t;
+
+typedef struct rk_aiq_ccm_attrib_s{
+    bool byPass;
+    rk_aiq_ccm_op_mode_t mode;
+    rk_aiq_ccm_mccm_attrib_t stManual;
+
+}rk_aiq_ccm_attrib_t;
+
+typedef struct rk_aiq_ccm_querry_info_s {
+    bool ccm_en;
+    float  matrix[9];
+    float  offs[3];
+    float  alp_y[CCM_CURVE_DOT_NUM];
+    float bound_bit;
+} rk_aiq_ccm_querry_info_t;
+
 RKAIQ_END_DECLARE
 
 #endif

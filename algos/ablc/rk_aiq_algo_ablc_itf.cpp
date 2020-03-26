@@ -19,7 +19,7 @@
 
 #include "rk_aiq_algo_types_int.h"
 #include "ablc/rk_aiq_algo_ablc_itf.h"
-#include "ablc/ablc.h"
+#include "ablc/rk_aiq_ablc_algo.h"
 
 RKAIQ_BEGIN_DECLARE
 
@@ -34,10 +34,10 @@ create_context(RkAiqAlgoContext **context, const AlgoCtxInstanceCfg* cfg)
 {XCamReturn result = XCAM_RETURN_NO_ERROR;
 
 	LOGI_ABLC("%s: (enter)\n", __FUNCTION__ );
-	 
+	AlgoCtxInstanceCfgInt *cfgInt = (AlgoCtxInstanceCfgInt*)cfg;
 #if 1
 	AblcContext_t* pAblcCtx = NULL;
-    AblcResult_t ret = AblcInit(&pAblcCtx);
+    AblcResult_t ret = AblcInit(&pAblcCtx, cfgInt->calib);
 	if(ret != ABLC_RET_SUCCESS){
 		result = XCAM_RETURN_ERROR_FAILED;
 		LOGE_ABLC("%s: Initializaion Ablc failed (%d)\n", __FUNCTION__, ret);
@@ -84,8 +84,6 @@ prepare(RkAiqAlgoCom* params)
     AblcContext_t* pAblcCtx = (AblcContext_t *)params->ctx;
     RkAiqAlgoConfigAblcInt* pCfgParam = (RkAiqAlgoConfigAblcInt*)params;
 	AblcConfig_t *pAblc_config = &pCfgParam->ablc_config;
-
-	pAblc_config->stBlcCalib = pCfgParam->rk_com.u.prepare.calib->blc;
 	
 	AblcResult_t ret = AblcConfig(pAblcCtx, pAblc_config);
 	if(ret != ABLC_RET_SUCCESS){
@@ -120,10 +118,14 @@ processing(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outparams)
 
 	LOGI_ABLC("%s:%d init:%d \n", __FUNCTION__, __LINE__, inparams->u.proc.init);
 
+	#if 0
 	if(inparams->u.proc.init)
 		iso = 50;
 	else
 		iso = pAblcProcParams->rk_com.u.proc.iso;
+	#else
+		iso = 50;
+	#endif
 	
 	AblcResult_t ret = AblcProcess(pAblcCtx, iso);
 	if(ret != ABLC_RET_SUCCESS){

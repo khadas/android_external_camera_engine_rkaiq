@@ -24,10 +24,6 @@
 
 RKAIQ_BEGIN_DECLARE
 
-typedef struct _RkAiqAlgoContext {
-    void* place_holder[0];
-    accm_handle_t accm_para;
-} RkAiqAlgoContext;
 
 static RkAiqAlgoContext ctx;
 
@@ -35,8 +31,8 @@ static XCamReturn
 create_context(RkAiqAlgoContext **context, const AlgoCtxInstanceCfg* cfg)
 {
     LOGI_ACCM( "%s: (enter)\n", __FUNCTION__);
-
-    AccmInit(&ctx.accm_para);
+    AlgoCtxInstanceCfgInt *cfgInt = (AlgoCtxInstanceCfgInt*)cfg;
+    AccmInit(&ctx.accm_para,cfgInt->calib);
     *context = &ctx;
 
     LOGI_ACCM( "%s: (exit)\n", __FUNCTION__);
@@ -61,16 +57,6 @@ prepare(RkAiqAlgoCom* params)
     accm_handle_t hAccm = (accm_handle_t)(params->ctx->accm_para);
 
     RkAiqAlgoConfigAccmInt *para = (RkAiqAlgoConfigAccmInt*)params;
-    if(para->rk_com.u.prepare.calib == NULL) {
-        return XCAM_RETURN_ERROR_FAILED;
-    }
-    CamCalibDbContext_t* calib = para->rk_com.u.prepare.calib;
-    const CalibDb_Ccm_t *calib_ccm = &calib->ccm;
-
-    if(calib_ccm == NULL) {
-        return XCAM_RETURN_ERROR_FAILED;
-    }
-    hAccm->calibCcm = calib_ccm;
     AccmPrepare((accm_handle_t)(params->ctx->accm_para));
 
     LOGI_ACCM( "%s: (exit)\n", __FUNCTION__);

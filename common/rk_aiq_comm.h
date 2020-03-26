@@ -65,7 +65,15 @@ typedef enum RKAiqOPMode_e {
   RK_AIQ_OP_MODE_MAX                                      /**< max */
 } RKAiqOPMode_t;
 
-#define ABS(a)								(((a) > 0) ? (a) : (-(a)))
+#define ABS(a) (((a) > 0) ? (a) : (-(a)))
+#define MAX(a,b)  ((a) >= (b) ? (a):(b))
+#define MIN(a,b)  ((a) <= (b) ? (a):(b))
+#define ROUND_D(x) (long)(((double)x)+(((x) > 0) ? 0.5 : (-0.5)))
+#define ROUND_F(x) (int)(((float)x)+(((x) > 0) ? 0.5 : (-0.5)))
+#define	FLOOR(a)   (int)( ((double)(a) < (int)(a)) ? (int)((a)-1) : (int)(a) )
+#define	FLOOR_INT64(a) (long)( ((double)(a) < (long)(a)) ? (long)((a)-1) : (long)(a) )
+#define INTERP1(x0, x1, ratio)	((ratio) * ((x1) - (x0)) + x0)
+#define CLIPBIT(a,b) ((a)>((1<<(b))-1)?((1<<(b))-1):(a))
 
 
 #define RETURN_RESULT_IF_DIFFERENT( cur_res, exp_res ) if ( exp_res != cur_res ) { return ( cur_res ); }
@@ -396,5 +404,26 @@ typedef struct Cam1x17UShortMatrix_s {
 typedef struct Cam17x17UShortMatrix_s {
     uint16_t uCoeff[17 * 17];
 } Cam17x17UShortMatrix_t;
+
+typedef enum {
+    RK_AIQ_WORKING_MODE_NORMAL,
+    RK_AIQ_WORKING_MODE_ISP_HDR2    = 0x10,
+    RK_AIQ_WORKING_MODE_ISP_HDR3    = 0x20,
+//    RK_AIQ_WORKING_MODE_SENSOR_HDR = 10, // sensor built-in hdr mode
+} rk_aiq_working_mode_t;
+
+typedef enum {
+    RK_AIQ_ISP_HDR_MODE_2_FRAME_HDR = RK_AIQ_WORKING_MODE_ISP_HDR2 + 1,
+    RK_AIQ_ISP_HDR_MODE_2_LINE_HDR = RK_AIQ_WORKING_MODE_ISP_HDR2 + 2,
+    RK_AIQ_ISP_HDR_MODE_3_FRAME_HDR = RK_AIQ_WORKING_MODE_ISP_HDR3 + 1,
+    RK_AIQ_ISP_HDR_MODE_3_LINE_HDR = RK_AIQ_WORKING_MODE_ISP_HDR3 + 2,
+} rk_aiq_isp_hdr_mode_t;
+
+typedef enum {
+    RK_AIQ_SENSOR_HDR_LINE_MODE_DCG,
+    RK_AIQ_SENSOR_HDR_LINE_MODE_STAGGER,
+} rk_aiq_sensor_hdr_line_mode_t;
+
+#define RK_AIQ_HDR_GET_WORKING_MODE(mode) (mode & 0xF0)
 
 #endif

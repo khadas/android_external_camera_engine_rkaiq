@@ -194,6 +194,9 @@ V4l2Device::open ()
     if (_name && strstr(_name, "video"))
         query_cap(cap);
 
+    // get default foramt
+    get_format (_format);
+
     return XCAM_RETURN_NO_ERROR;
 }
 

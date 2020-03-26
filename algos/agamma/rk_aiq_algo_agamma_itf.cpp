@@ -19,7 +19,7 @@
 
 #include "rk_aiq_algo_types_int.h"
 #include "agamma/rk_aiq_algo_agamma_itf.h"
-#include "agamma/agamma.h"
+#include "agamma/rk_aiq_agamma_algo.h"
 RKAIQ_BEGIN_DECLARE
 
 typedef struct _RkAiqAlgoContext {
@@ -58,10 +58,9 @@ prepare(RkAiqAlgoCom* params)
 
 		int work_mode;
 		AgammaHandle_t * AgammaHandle = (AgammaHandle_t *)params->ctx;
-		RKAiqAgammaHtmlConfig_t agamma_html_para;
         CamCalibDbContext_t* calib = config->rk_com.u.prepare.calib;
 	    const CalibDb_Gamma_t *calib_gamma = &calib->gamma;
-	    
+
 		ret = AgammaConfigV200(calib_gamma,AgammaHandle);
 		return XCAM_RETURN_NO_ERROR;
 }
@@ -75,19 +74,19 @@ pre_process(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outparams)
 static XCamReturn
 processing(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outparams)
 {
-   
+
 	XCamReturn ret;
     AgammaHandle_t * AgammaHandle = (AgammaHandle_t *)inparams->ctx;
     RkAiqAlgoProcAgammaInt* procPara = (RkAiqAlgoProcAgammaInt*)inparams;
-    RkAiqAlgoProcResAgammaInt* procResPara = (RkAiqAlgoProcResAgammaInt*)outparams;
-    RKAiqAgammaHwConfig_t* agamma_config;
-    agamma_config = (RKAiqAgammaHwConfig_t*)&procResPara->agamma_config;
+    RkAiqAlgoProcResAgamma* procResPara = (RkAiqAlgoProcResAgamma*)outparams;
+    rk_aiq_gamma_cfg_t* agamma_config;
+    agamma_config = (rk_aiq_gamma_cfg_t*)&procResPara->agamma_config;
 	const CalibDb_Gamma_t *calib_gamma = AgammaHandle->calib_gamma;
 
     if(inparams->u.proc.init == false) {
         ret = AgammaReConfigV200(AgammaHandle,calib_gamma);
     }
-    memcpy(agamma_config, &AgammaHandle->agamma_config, sizeof(RKAiqAgammaHwConfig_t));
+    memcpy(agamma_config, &AgammaHandle->agamma_config, sizeof(rk_aiq_gamma_cfg_t));
     return XCAM_RETURN_NO_ERROR;
 }
 

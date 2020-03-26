@@ -171,7 +171,7 @@ int RkAiqCalibParser::ParseFloatArray
     }
     else if (xmlParseReadWrite == XML_PARSER_WRITE) // write
     {
-        char cmd[16] = {"%s%.0f \0"};
+        char cmd[16] = {"%s%.0f "};
         if (printAccuracy > 9)
             printAccuracy = 9;
         cmd[4] = '0' + printAccuracy;
@@ -180,16 +180,17 @@ int RkAiqCalibParser::ParseFloatArray
         int cols = XmlTag(pNode->ToElement()).SizeCol();
         int rows = XmlTag(pNode->ToElement()).SizeRow();
         char str[8192];
-        sprintf(str, "\n%s[\0", autoTabStr);
+        char* strp = str;
+        snprintf(str, sizeof(str), "\n%s[", autoTabStr);
         for (int i = 0; i < rows; i++)
         {
             for (int k = 0; k < cols; k++)
-                sprintf(str, cmd, str, values[i * cols + k]);
+                snprintf(str, sizeof(str), cmd, strp, values[i * cols + k]);
             if (i < rows - 1)
-                sprintf(str, "%s\n%s\0", str, autoTabStr);
+                snprintf(str, sizeof(str), "%s\n%s", strp, autoTabStr);
         }
         autoTabBackward();
-        sprintf(str, "%s]\n%s\0", str, autoTabStr);
+        snprintf(str, sizeof(str), "%s]\n%s", strp, autoTabStr);
 
         XMLNode* pComment = (XMLNode*)pNode->ToElement()->FirstChild();
         pComment->SetValue((const char *)str);
@@ -289,16 +290,17 @@ int RkAiqCalibParser::ParseDoubleArray
         int cols = XmlTag(pNode->ToElement()).SizeCol();
         int rows = XmlTag(pNode->ToElement()).SizeRow();
         char str[8192];
-        sprintf(str, "\n%s[\0", autoTabStr);
+        char* strp = str;
+        snprintf(str, sizeof(str), "\n%s[", autoTabStr);
         for (int i = 0; i < rows; i++)
         {
             for (int k = 0; k < cols; k++)
-                sprintf(str, "%s%.14e \0", str, values[i * cols + k]);
+                snprintf(str, sizeof(str), "%s%.14e ", strp, values[i * cols + k]);
             if (i < rows - 1)
-                sprintf(str, "%s\n%s\0", str, autoTabStr);
+                snprintf(str, sizeof(str), "%s\n%s", strp, autoTabStr);
         }
         autoTabBackward();
-        sprintf(str, "%s]\n%s\0", str, autoTabStr);
+        snprintf(str, sizeof(str), "%s]\n%s", strp, autoTabStr);
 
         XMLNode* pComment = (XMLNode*)pNode->ToElement()->FirstChild();
         pComment->SetValue((const char *)str);
@@ -399,16 +401,17 @@ int RkAiqCalibParser::ParseUintArray
         int cols = XmlTag(pNode->ToElement()).SizeCol();
         int rows = XmlTag(pNode->ToElement()).SizeRow();
         char str[8192];
-        sprintf(str, "\n%s[\0", autoTabStr);
+        char* strp = str;
+        snprintf(str, sizeof(str), "\n%s[", autoTabStr);
         for (int i = 0; i < rows; i++)
         {
             for (int k = 0; k < cols; k++)
-                sprintf(str, "%s%d \0", str, values[i * cols + k]);
+                snprintf(str, sizeof(str), "%s%d ", strp, values[i * cols + k]);
             if (i < rows - 1)
-                sprintf(str, "%s\n%s\0", str, autoTabStr);
+                snprintf(str, sizeof(str), "%s\n%s", strp, autoTabStr);
         }
         autoTabBackward();
-        sprintf(str, "%s]\n%s\0", str, autoTabStr);
+        snprintf(str, sizeof(str), "%s]\n%s", strp, autoTabStr);
 
         XMLNode* pComment = (XMLNode*)pNode->ToElement()->FirstChild();
         pComment->SetValue((const char *)str);
@@ -507,16 +510,17 @@ int RkAiqCalibParser::ParseIntArray
         int cols = XmlTag(pNode->ToElement()).SizeCol();
         int rows = XmlTag(pNode->ToElement()).SizeRow();
         char str[8192];
-        sprintf(str, "\n%s[\0", autoTabStr);
+        char* strp = str;
+        snprintf(str, sizeof(str), "\n%s[", autoTabStr);
         for (int i = 0; i < rows; i++)
         {
             for (int k = 0; k < cols; k++)
-                sprintf(str, "%s%d \0", str, values[i * cols + k]);
+                snprintf(str, sizeof(str), "%s%d ", strp, values[i * cols + k]);
             if (i < rows - 1)
-                sprintf(str, "%s\n%s\0", str, autoTabStr);
+                snprintf(str, sizeof(str), "%s\n%s", strp, autoTabStr);
         }
         autoTabBackward();
-        sprintf(str, "%s]\n%s\0", str, autoTabStr);
+        snprintf(str, sizeof(str), "%s]\n%s", strp, autoTabStr);
 
         XMLNode* pComment = (XMLNode*)pNode->ToElement()->FirstChild();
         pComment->SetValue((const char *)str);
@@ -618,16 +622,17 @@ int RkAiqCalibParser::ParseUcharArray
         int cols = XmlTag(pNode->ToElement()).SizeCol();
         int rows = XmlTag(pNode->ToElement()).SizeRow();
         char str[8192];
-        sprintf(str, "\n%s[\0", autoTabStr);
+        char* strp = str;
+        snprintf(str, sizeof(str), "\n%s[", autoTabStr);
         for (int i = 0; i < rows; i++)
         {
             for (int k = 0; k < cols; k++)
-                sprintf(str, "%s%d \0", str, values[i * cols + k]);
+                snprintf(str, sizeof(str), "%s%d ", strp, values[i * cols + k]);
             if (i < rows - 1)
-                sprintf(str, "%s\n%s\0", str, autoTabStr);
+                snprintf(str, sizeof(str), "%s\n%s", strp, autoTabStr);
         }
         autoTabBackward();
-        sprintf(str, "%s]\n%s\0", str, autoTabStr);
+        snprintf(str, sizeof(str), "%s]\n%s", strp, autoTabStr);
 
         XMLNode* pComment = (XMLNode*)pNode->ToElement()->FirstChild();
         pComment->SetValue((const char *)str);
@@ -728,16 +733,17 @@ int RkAiqCalibParser::ParseCharArray
         int cols = XmlTag(pNode->ToElement()).SizeCol();
         int rows = XmlTag(pNode->ToElement()).SizeRow();
         char str[8192];
-        sprintf(str, "\n%s[\0", autoTabStr);
+        char* strp = str;
+        snprintf(str, sizeof(str), "\n%s[", autoTabStr);
         for (int i = 0; i < rows; i++)
         {
             for (int k = 0; k < cols; k++)
-                sprintf(str, "%s%d \0", str, values[i * cols + k]);
+                snprintf(str, sizeof(str), "%s%d ", strp, values[i * cols + k]);
             if (i < rows - 1)
-                sprintf(str, "%s\n%s\0", str, autoTabStr);
+                snprintf(str, sizeof(str), "%s\n%s", strp, autoTabStr);
         }
         autoTabBackward();
-        sprintf(str, "%s]\n%s\0", str, autoTabStr);
+        snprintf(str, sizeof(str), "%s]\n%s", strp, autoTabStr);
 
         XMLNode* pComment = (XMLNode*)pNode->ToElement()->FirstChild();
         pComment->SetValue((const char *)str);
@@ -841,16 +847,17 @@ int RkAiqCalibParser::ParseUshortArray
         int cols = XmlTag(pNode->ToElement()).SizeCol();
         int rows = XmlTag(pNode->ToElement()).SizeRow();
         char str[8192];
-        sprintf(str, "\n%s[\0", autoTabStr);
+        char* strp = str;
+        snprintf(str, sizeof(str), "\n%s[", autoTabStr);
         for (int i = 0; i < rows; i++)
         {
             for (int k = 0; k < cols; k++)
-                sprintf(str, "%s%d \0", str, values[i * cols + k]);
+                snprintf(str, sizeof(str), "%s%d ", strp, values[i * cols + k]);
             if (i < rows - 1)
-                sprintf(str, "%s\n%s\0", str, autoTabStr);
+                snprintf(str, sizeof(str), "%s\n%s", strp, autoTabStr);
         }
         autoTabBackward();
-        sprintf(str, "%s]\n%s\0", str, autoTabStr);
+        snprintf(str, sizeof(str), "%s]\n%s", strp, autoTabStr);
 
         XMLNode* pComment = (XMLNode*)pNode->ToElement()->FirstChild();
         pComment->SetValue((const char *)str);
@@ -954,16 +961,17 @@ int RkAiqCalibParser::ParseShortArray
         int cols = XmlTag(pNode->ToElement()).SizeCol();
         int rows = XmlTag(pNode->ToElement()).SizeRow();
         char str[8192];
-        sprintf(str, "\n%s[\0", autoTabStr);
+        char* strp = str;
+        snprintf(str, sizeof(str), "\n%s[", autoTabStr);
         for (int i = 0; i < rows; i++)
         {
             for (int k = 0; k < cols; k++)
-                sprintf(str, "%s%d \0", str, values[i * cols + k]);
+                snprintf(str, sizeof(str), "%s%d ", strp, values[i * cols + k]);
             if (i < rows - 1)
-                sprintf(str, "%s\n%s\0", str, autoTabStr);
+                snprintf(str, sizeof(str), "%s\n%s", strp, autoTabStr);
         }
         autoTabBackward();
-        sprintf(str, "%s]\n%s\0", str, autoTabStr);
+        snprintf(str, sizeof(str), "%s]\n%s", strp, autoTabStr);
 
         XMLNode* pComment = (XMLNode*)pNode->ToElement()->FirstChild();
         pComment->SetValue((const char *)str);
@@ -1069,16 +1077,17 @@ int RkAiqCalibParser::ParseByteArray
         int cols = XmlTag(pNode->ToElement()).SizeCol();
         int rows = XmlTag(pNode->ToElement()).SizeRow();
         char str[8192];
-        sprintf(str, "\n%s[\0", autoTabStr);
+        char* strp = str;
+        snprintf(str, sizeof(str), "\n%s[", autoTabStr);
         for (int i = 0; i < rows; i++)
         {
             for (int k = 0; k < cols; k++)
-                sprintf(str, "%s%d \0", str, values[i * cols + k]);
+                snprintf(str, sizeof(str), "%s%d ", strp, values[i * cols + k]);
             if (i < rows - 1)
-                sprintf(str, "%s\n%s\0", str, autoTabStr);
+                snprintf(str, sizeof(str), "%s\n%s", strp, autoTabStr);
         }
         autoTabBackward();
-        sprintf(str, "%s]\n%s\0", str, autoTabStr);
+        snprintf(str, sizeof(str), "%s]\n%s", strp, autoTabStr);
 
         XMLNode* pComment = (XMLNode*)pNode->ToElement()->FirstChild();
         pComment->SetValue((const char *)str);
@@ -1119,23 +1128,24 @@ int RkAiqCalibParser::ParseString
 
         memset(values, 0, size);
         strncpy(values, str, size - 1);
-        //values[size] = '\0';
+        //values[size] = '';
 
         return 0;
     }
     else if (xmlParseReadWrite == XML_PARSER_WRITE)
     {
         char str[8192];
-        //sprintf(str, "[%s]\0", values);
+        char* strp = str;
+        //sprintf(str, "[%s]", values);
         autoTabForward();
         autoTabForward();
-        sprintf(str, "\n%s%s\0", autoTabStr, values);
+        snprintf(str, sizeof(str), "\n%s%s", autoTabStr, values);
         autoTabBackward();
-        sprintf(str, "%s\n%s\0", str, autoTabStr);
+        snprintf(str, sizeof(str), "%s\n%s", strp, autoTabStr);
         autoTabBackward();
         XMLNode* pComment = (XMLNode*)pNode->ToElement()->FirstChild();
         pComment->SetValue((const char *)str);
-        sprintf(str, "[1 %d]", strlen(values));
+        snprintf(str, sizeof(str), "[1 %zu]", strlen(values));
         XMLElement* pElement = (((XMLNode*)pNode)->ToElement());
         pElement->SetAttribute(CALIB_ATTRIBUTE_SIZE, str);
         return 0;
@@ -1227,21 +1237,22 @@ int RkAiqCalibParser::ParseLscProfileArray
         autoTabForward();
         autoTabForward();
         char str[8192];
-        sprintf(str, "\n%s\0", autoTabStr);
+        char* strp = str;
+        snprintf(str, sizeof(str), "\n%s", autoTabStr);
         int i = 0;
         size_t str_len = 0;
         while (values[i][0] != 0)
         {
             str_len += strlen(values[i]);
-            sprintf(str, "%s%s \0", str, values[i++]);
+            snprintf(str, sizeof(str), "%s%s ", strp, values[i++]);
             str_len++;
         }
         autoTabBackward();
-        sprintf(str, "%s\n%s\0", str, autoTabStr);
+        snprintf(str, sizeof(str), "%s\n%s", strp, autoTabStr);
         XMLNode* pComment = (XMLNode*)pNode->ToElement()->FirstChild();
         pComment->SetValue((const char *)str);
 
-        sprintf(str, "[1 %d]", str_len - 1);
+        snprintf(str, sizeof(str), "[1 %zu]", str_len - 1);
         pComment = (XMLNode *)pNode;
         pComment->ToElement()->SetAttribute(CALIB_ATTRIBUTE_SIZE, str);
         autoTabBackward();
@@ -1498,15 +1509,16 @@ bool RkAiqCalibParser::parseEntryHeader
             if (xmlParseReadWrite == XML_PARSER_WRITE)
             {
                 char str[256];
+                char* strp = str;
                 autoTabForward();
                 autoTabForward();
-                sprintf(str, "\n%s%s\0", autoTabStr, value);
+                snprintf(str, sizeof(str), "\n%s%s", autoTabStr, value);
                 autoTabBackward();
-                sprintf(str, "%s\n%s\0", str, autoTabStr);
+                snprintf(str, sizeof(str), "%s\n%s", strp, autoTabStr);
                 autoTabBackward();
                 XMLNode* pComment = (XMLNode*)pchild->ToElement()->FirstChild();
                 pComment->SetValue((const char *)str);
-                sprintf(str, "[1 %d]", strlen(value));
+                snprintf(str, sizeof(str), "[1 %zu]", strlen(value));
                 XMLElement* pElement = (((XMLNode*)pchild)->ToElement());
                 pElement->SetAttribute(CALIB_ATTRIBUTE_SIZE, str);
             }
@@ -1517,15 +1529,16 @@ bool RkAiqCalibParser::parseEntryHeader
             if (xmlParseReadWrite == XML_PARSER_WRITE)
             {
                 char str[256];
+                char* strp = str;
                 autoTabForward();
                 autoTabForward();
-                sprintf(str, "\n%s%s\0", autoTabStr, value);
+                snprintf(str, sizeof(str), "\n%s%s", autoTabStr, value);
                 autoTabBackward();
-                sprintf(str, "%s\n%s\0", str, autoTabStr);
+                snprintf(str, sizeof(str), "%s\n%s", strp, autoTabStr);
                 autoTabBackward();
                 XMLNode* pComment = (XMLNode*)pchild->ToElement()->FirstChild();
                 pComment->SetValue((const char *)str);
-                sprintf(str, "[1 %d]", strlen(value));
+                snprintf(str, sizeof(str), "[1 %zu]", strlen(value));
                 XMLElement* pElement = (((XMLNode*)pchild)->ToElement());
                 pElement->SetAttribute(CALIB_ATTRIBUTE_SIZE, str);
             }
@@ -1536,15 +1549,16 @@ bool RkAiqCalibParser::parseEntryHeader
             if (xmlParseReadWrite == XML_PARSER_WRITE)
             {
                 char str[256];
+                char* strp = str;
                 autoTabForward();
                 autoTabForward();
-                sprintf(str, "\n%s%s\0", autoTabStr, value);
+                snprintf(str, sizeof(str), "\n%s%s", autoTabStr, value);
                 autoTabBackward();
-                sprintf(str, "%s\n%s\0", str, autoTabStr);
+                snprintf(str, sizeof(str), "%s\n%s", strp, autoTabStr);
                 autoTabBackward();
                 XMLNode* pComment = (XMLNode*)pchild->ToElement()->FirstChild();
                 pComment->SetValue((const char *)str);
-                sprintf(str, "[1 %d]", strlen(value));
+                snprintf(str, sizeof(str), "[1 %zu]", strlen(value));
                 XMLElement* pElement = (((XMLNode*)pchild)->ToElement());
                 pElement->SetAttribute(CALIB_ATTRIBUTE_SIZE, str);
             }
@@ -1555,15 +1569,16 @@ bool RkAiqCalibParser::parseEntryHeader
             if (xmlParseReadWrite == XML_PARSER_WRITE)
             {
                 char str[256];
+                char* strp = str;
                 autoTabForward();
                 autoTabForward();
-                sprintf(str, "\n%s%s\0", autoTabStr, value);
+                snprintf(str, sizeof(str), "\n%s%s", autoTabStr, value);
                 autoTabBackward();
-                sprintf(str, "%s\n%s\0", str, autoTabStr);
+                snprintf(str, sizeof(str), "%s\n%s", strp, autoTabStr);
                 autoTabBackward();
                 XMLNode* pComment = (XMLNode*)pchild->ToElement()->FirstChild();
                 pComment->SetValue((const char *)str);
-                sprintf(str, "[1 %d]", strlen(value));
+                snprintf(str, sizeof(str), "[1 %zu]", strlen(value));
                 XMLElement* pElement = (((XMLNode*)pchild)->ToElement());
                 pElement->SetAttribute(CALIB_ATTRIBUTE_SIZE, str);
             }
@@ -1574,15 +1589,16 @@ bool RkAiqCalibParser::parseEntryHeader
             if (xmlParseReadWrite == XML_PARSER_WRITE)
             {
                 char str[256];
+                char* strp = str;
                 autoTabForward();
                 autoTabForward();
-                sprintf(str, "\n%s%s\0", autoTabStr, value);
+                snprintf(str, sizeof(str), "\n%s%s", autoTabStr, value);
                 autoTabBackward();
-                sprintf(str, "%s\n%s\0", str, autoTabStr);
+                snprintf(str, sizeof(str), "%s\n%s", strp, autoTabStr);
                 autoTabBackward();
                 XMLNode* pComment = (XMLNode*)pchild->ToElement()->FirstChild();
                 pComment->SetValue((const char *)str);
-                sprintf(str, "[1 %d]", strlen(value));
+                snprintf(str, sizeof(str), "[1 %zu]", strlen(value));
                 XMLElement* pElement = (((XMLNode*)pchild)->ToElement());
                 pElement->SetAttribute(CALIB_ATTRIBUTE_SIZE, str);
             }
@@ -1593,15 +1609,16 @@ bool RkAiqCalibParser::parseEntryHeader
             if (xmlParseReadWrite == XML_PARSER_WRITE)
             {
                 char str[256];
+                char* strp = str;
                 autoTabForward();
                 autoTabForward();
-                sprintf(str, "\n%s%s\0", autoTabStr, value);
+                snprintf(str, sizeof(str), "\n%s%s", autoTabStr, value);
                 autoTabBackward();
-                sprintf(str, "%s\n%s\0", str, autoTabStr);
+                snprintf(str, sizeof(str), "%s\n%s", strp, autoTabStr);
                 autoTabBackward();
                 XMLNode* pComment = (XMLNode*)pchild->ToElement()->FirstChild();
                 pComment->SetValue((const char *)str);
-                sprintf(str, "[1 %d]", strlen(value));
+                snprintf(str, sizeof(str), "[1 %zu]", strlen(value));
                 XMLElement* pElement = (((XMLNode*)pchild)->ToElement());
                 pElement->SetAttribute(CALIB_ATTRIBUTE_SIZE, str);
             }
@@ -3825,6 +3842,177 @@ bool RkAiqCalibParser::parseEntrySensorAec
             }
             autoTabBackward();
         }
+        else if (tagname == CALIB_SENSOR_AEC_AECDNSWITCH) {
+            const XMLNode* psubchild = pchild->ToElement()->FirstChild();
+            autoTabForward();
+#ifdef DEBUG_LOG
+            LOGE("%s(%d): Tagname = %s\n", __FUNCTION__, __LINE__, tagname);
+#endif
+            while (psubchild) {
+                XmlTag subTag = XmlTag(psubchild->ToElement());
+                std::string subTagname(psubchild->ToElement()->Name());
+
+#ifdef DEBUG_LOG
+                LOGE("%s(%d): subTagname = %s\n", __FUNCTION__, __LINE__, subTagname);
+#endif
+                if ((subTagname == CALIB_SENSOR_AEC_AECDNSWITCH_DNTRIGGER)
+                        && (subTag.isType(XmlTag::TAG_TYPE_DOUBLE))
+                        && (subTag.Size() > 0)) {
+                    int no = ParseUcharArray(psubchild, &mCalibDb->aec.CommCtrl.stDNSwitch.DNTrigger, subTag.Size());
+                    DCT_ASSERT((no == subTag.Size()));
+                }
+                else if ((subTagname == CALIB_SENSOR_AEC_AECDNSWITCH_DNMODE)
+                         && (subTag.isType(XmlTag::TAG_TYPE_CHAR))
+                         && (subTag.Size() > 0)) {
+                    char* value = Toupper(subTag.Value());
+                    std::string s_value(value);
+                    if (xmlParseReadWrite == XML_PARSER_READ)
+                    {
+                        if (s_value == CALIB_SENSOR_AEC_AECDNSWITCH_DNMODE_DAY) {
+                            mCalibDb->aec.CommCtrl.stDNSwitch.DNMode = AEC_DNMODE_DAY;
+                        }
+                        else if (s_value == CALIB_SENSOR_AEC_AECDNSWITCH_DNMODE_NIGHT) {
+                            mCalibDb->aec.CommCtrl.stDNSwitch.DNMode = AEC_DNMODE_NIGHT;
+                        }
+                        else {
+                            mCalibDb->aec.CommCtrl.stDNSwitch.DNMode = AEC_DNMODE_MIN;
+                            LOGE("%s(%d): invalid AEC DNSwitch-DNMode = %s\n", __FUNCTION__, __LINE__, s_value);
+                        }
+                    }
+                    else if (xmlParseReadWrite == XML_PARSER_WRITE)
+                    {
+                        XMLNode *pNode = (XMLNode*)psubchild;
+                        if (mCalibDb->aec.CommCtrl.stDNSwitch.DNMode == AEC_DNMODE_DAY) {
+                            pNode->FirstChild()->SetValue(CALIB_SENSOR_AEC_AECDNSWITCH_DNMODE_DAY);
+                        }
+                        else if (mCalibDb->aec.CommCtrl.stDNSwitch.DNMode == AEC_DNMODE_NIGHT) {
+                            pNode->FirstChild()->SetValue(CALIB_SENSOR_AEC_AECDNSWITCH_DNMODE_NIGHT);
+                        }
+                        else {
+                            pNode->FirstChild()->SetValue("Invalid");
+                            LOGE("%s(%d): (XML Write)invalid AEC DNSwitch-DNMode = %d\n", __FUNCTION__, __LINE__, mCalibDb->aec.CommCtrl.stDNSwitch.DNMode);
+                        }
+
+                    }
+                }
+                else if ((subTagname == CALIB_SENSOR_AEC_AECDNSWITCH_NIGHTMODE)
+                         && (subTag.isType(XmlTag::TAG_TYPE_DOUBLE))
+                         && (subTag.Size() > 0)) {
+                    int no = ParseUcharArray(psubchild, &mCalibDb->aec.CommCtrl.stDNSwitch.NightMode, subTag.Size());
+                    DCT_ASSERT((no == subTag.Size()));
+                }
+                else if ((subTagname == CALIB_SENSOR_AEC_AECDNSWITCH_D2NFACTH)
+                         && (subTag.isType(XmlTag::TAG_TYPE_DOUBLE))
+                         && (subTag.Size() > 0)) {
+                    int no = ParseFloatArray(psubchild, &mCalibDb->aec.CommCtrl.stDNSwitch.Day2NightFacTh, subTag.Size());
+                    DCT_ASSERT((no == subTag.Size()));
+                } else if ((subTagname == CALIB_SENSOR_AEC_AECDNSWITCH_D2NFRMCNT)
+                           && (subTag.isType(XmlTag::TAG_TYPE_DOUBLE))
+                           && (subTag.Size() > 0)) {
+                    int no = ParseUcharArray(psubchild, &mCalibDb->aec.CommCtrl.stDNSwitch.Day2NightFrmCnt, subTag.Size());
+                    DCT_ASSERT((no == subTag.Size()));
+                } else if ((subTagname == CALIB_SENSOR_AEC_AECDNSWITCH_VBNIGHTMODE)
+                           && (subTag.isType(XmlTag::TAG_TYPE_STRUCT))
+                           && (subTag.Size() > 0)) {
+                    const XMLNode* psubsubchild = psubchild->ToElement()->FirstChild();
+                    autoTabForward();
+                    while (psubsubchild) {
+                        XmlTag subsubTag = XmlTag(psubsubchild->ToElement());
+                        std::string subsubTagname(psubsubchild->ToElement()->Name());
+#ifdef DEBUG_LOG
+                        LOGE("%s(%d): subsubTagname = %s\n", __FUNCTION__, __LINE__, subsubTagname);
+#endif
+                        if ((subsubTagname == CALIB_SENSOR_AEC_ENABLE)
+                                && (subsubTag.isType(XmlTag::TAG_TYPE_DOUBLE))
+                                && (subsubTag.Size() > 0)) {
+                            int no = ParseUcharArray(psubsubchild, &mCalibDb->aec.CommCtrl.stDNSwitch.stVBNightMode.enable, subTag.Size());
+                            DCT_ASSERT((no == subsubTag.Size()));
+                        }
+                        else if ((subsubTagname == CALIB_SENSOR_AEC_AECDNSWITCH_N2DFRMCNT)
+                                 && (subsubTag.isType(XmlTag::TAG_TYPE_DOUBLE))
+                                 && (subsubTag.Size() > 0)) {
+                            int no = ParseUcharArray(psubsubchild, &mCalibDb->aec.CommCtrl.stDNSwitch.stVBNightMode.Night2DayFrmCnt, subTag.Size());
+                            DCT_ASSERT((no == subsubTag.Size()));
+                        }
+                        else if ((subsubTagname == CALIB_SENSOR_AEC_AECDNSWITCH_N2DFACTH)
+                                 && (subsubTag.isType(XmlTag::TAG_TYPE_DOUBLE))
+                                 && (subsubTag.Size() > 0)) {
+                            int no = ParseFloatArray(psubsubchild, &mCalibDb->aec.CommCtrl.stDNSwitch.stVBNightMode.Night2DayFacTh, subTag.Size());
+                            DCT_ASSERT((no == subsubTag.Size()));
+                        }
+                        else {
+                            LOGE("%s(%d): parse error in DNSwitch - VBNightMode(unknow tag: %s )\n", __FUNCTION__, __LINE__, subsubTagname);
+                        }
+                        psubsubchild = psubsubchild->NextSibling();
+                    }
+                    autoTabBackward();
+                }
+                else if ((subTagname == CALIB_SENSOR_AEC_AECDNSWITCH_IRNIGHTMODE)
+                         && (subTag.isType(XmlTag::TAG_TYPE_STRUCT))
+                         && (subTag.Size() > 0)) {
+                    const XMLNode* psubsubchild = psubchild->ToElement()->FirstChild();
+                    autoTabForward();
+                    while (psubsubchild) {
+                        XmlTag subsubTag = XmlTag(psubsubchild->ToElement());
+                        std::string subsubTagname(psubsubchild->ToElement()->Name());
+#ifdef DEBUG_LOG
+                        LOGE("%s(%d): subsubTagname = %s\n", __FUNCTION__, __LINE__, subsubTagname);
+#endif
+                        if ((subsubTagname == CALIB_SENSOR_AEC_ENABLE)
+                                && (subsubTag.isType(XmlTag::TAG_TYPE_DOUBLE))
+                                && (subsubTag.Size() > 0)) {
+                            int no = ParseUcharArray(psubsubchild, &mCalibDb->aec.CommCtrl.stDNSwitch.stIRNightMode.enable, subTag.Size());
+                            DCT_ASSERT((no == subsubTag.Size()));
+                        }
+                        else if ((subsubTagname == CALIB_SENSOR_AEC_AECDNSWITCH_N2DFRMCNT)
+                                 && (subsubTag.isType(XmlTag::TAG_TYPE_DOUBLE))
+                                 && (subsubTag.Size() > 0)) {
+                            int no = ParseUcharArray(psubsubchild, &mCalibDb->aec.CommCtrl.stDNSwitch.stIRNightMode.Night2DayFrmCnt, subTag.Size());
+                            DCT_ASSERT((no == subsubTag.Size()));
+                        }
+                        else if ((subsubTagname == CALIB_SENSOR_AEC_AECDNSWITCH_N2DFACTH)
+                                 && (subsubTag.isType(XmlTag::TAG_TYPE_DOUBLE))
+                                 && (subsubTag.Size() > 0)) {
+                            int no = ParseFloatArray(psubsubchild, &mCalibDb->aec.CommCtrl.stDNSwitch.stIRNightMode.Night2DayFacTh, subTag.Size());
+                            DCT_ASSERT((no == subsubTag.Size()));
+                        }
+                        else if ((subsubTagname == CALIB_SENSOR_AEC_AECDNSWITCH_IR_RG)
+                                 && (subsubTag.isType(XmlTag::TAG_TYPE_DOUBLE))
+                                 && (subsubTag.Size() > 0)) {
+                            int no = ParseFloatArray(psubsubchild, &mCalibDb->aec.CommCtrl.stDNSwitch.stIRNightMode.IRRgain, subTag.Size());
+                            DCT_ASSERT((no == subsubTag.Size()));
+                        }
+                        else if ((subsubTagname == CALIB_SENSOR_AEC_AECDNSWITCH_IR_BG)
+                                 && (subsubTag.isType(XmlTag::TAG_TYPE_DOUBLE))
+                                 && (subsubTag.Size() > 0)) {
+                            int no = ParseFloatArray(psubsubchild, &mCalibDb->aec.CommCtrl.stDNSwitch.stIRNightMode.IRBgain, subTag.Size());
+                            DCT_ASSERT((no == subsubTag.Size()));
+                        }
+                        else if ((subsubTagname == CALIB_SENSOR_AEC_AECDNSWITCH_MAX_DIS)
+                                 && (subsubTag.isType(XmlTag::TAG_TYPE_DOUBLE))
+                                 && (subsubTag.Size() > 0)) {
+                            int no = ParseFloatArray(psubsubchild, &mCalibDb->aec.CommCtrl.stDNSwitch.stIRNightMode.MaxWbDis, subTag.Size());
+                            DCT_ASSERT((no == subsubTag.Size()));
+                        }
+                        else if ((subsubTagname == CALIB_SENSOR_AEC_AECDNSWITCH_VB_PERCENT)
+                                 && (subsubTag.isType(XmlTag::TAG_TYPE_DOUBLE))
+                                 && (subsubTag.Size() > 0)) {
+                            int no = ParseFloatArray(psubsubchild, &mCalibDb->aec.CommCtrl.stDNSwitch.stIRNightMode.VbPercent, subTag.Size());
+                            DCT_ASSERT((no == subsubTag.Size()));
+                        } else {
+                            LOGE("%s(%d): parse error in DNSwitch - IRNightMode(unknow tag: %s )\n", __FUNCTION__, __LINE__, subsubTagname);
+                        }
+                        psubsubchild = psubsubchild->NextSibling();
+                    }
+                    autoTabBackward();
+                }
+                else {
+                    LOGE("%s(%d): parse error in DNSwitch (unknow tag: %s )\n", __FUNCTION__, __LINE__, subTagname);
+                }
+                psubchild = psubchild->NextSibling();
+            }
+            autoTabBackward();
+        }
         else if (tagname == CALIB_SENSOR_AEC_AECFRAMERATEMODE) {
             const XMLNode* psubchild = pchild->ToElement()->FirstChild();
             autoTabForward();
@@ -3864,7 +4052,7 @@ bool RkAiqCalibParser::parseEntrySensorAec
                     {
                         char str[16];
                         XMLNode* pNode = (XMLNode *)psubchild;
-                        sprintf(str, "[1 %d]\0", mCalibDb->aec.CommCtrl.stAuto.stFrmRate.LinFps_arraysize);
+                        snprintf(str, sizeof(str), "[1 %d]", mCalibDb->aec.CommCtrl.stAuto.stFrmRate.LinFps_arraysize);
                         pNode->ToElement()->SetAttribute(CALIB_ATTRIBUTE_SIZE, str);
                     }
                 }
@@ -3881,16 +4069,15 @@ bool RkAiqCalibParser::parseEntrySensorAec
                     {
                         char str[16];
                         XMLNode* pNode = (XMLNode *)psubchild;
-                        sprintf(str, "[1 %d]\0", mCalibDb->aec.CommCtrl.stAuto.stFrmRate.HdrFps_arraysize);
+                        snprintf(str, sizeof(str), "[1 %d]", mCalibDb->aec.CommCtrl.stAuto.stFrmRate.HdrFps_arraysize);
                         pNode->ToElement()->SetAttribute(CALIB_ATTRIBUTE_SIZE, str);
                     }
                 }
                 else {
-                    redirectOut
-                            << "parse error in  stFrmRate (unknow tag: "
-                            << subTagname
-                            << ")"
-                            << std::endl;
+                    redirectOut << "parse error in  stFrmRate (unknow tag: "
+                                << subTagname
+                                << ")"
+                                << std::endl;
                 }
                 psubchild = psubchild->NextSibling();
             }
@@ -4231,10 +4418,10 @@ bool RkAiqCalibParser::parseEntrySensorAec
 #ifdef DEBUG_LOG
                 LOGE("%s(%d): subTagname = %s\n", __FUNCTION__, __LINE__, subTagname);
 #endif
-                if ((subTagname == CALIB_SENSOR_AEC_NORMALGRIDWEIGHTS)
+                if ((subTagname == CALIB_SENSOR_AEC_DAYGRIDWEIGHTS)
                         && (subTag.isType(XmlTag::TAG_TYPE_DOUBLE))
                         && (subTag.Size() > 0)) {
-                    int no = ParseUcharArray(psubchild, mCalibDb->aec.CommCtrl.NormalGridWeights.uCoeff, subTag.Size());
+                    int no = ParseUcharArray(psubchild, mCalibDb->aec.CommCtrl.DayGridWeights.uCoeff, subTag.Size());
                     DCT_ASSERT((no == subTag.Size()));
                 }
                 else if ((subTagname == CALIB_SENSOR_AEC_NIGHTGRIDWEIGHTS)
@@ -4612,136 +4799,6 @@ bool RkAiqCalibParser::parseEntrySensorAec
                                     << std::endl;
                         }
                         psecsubchild = psecsubchild->NextSibling();
-                    }
-                    autoTabBackward();
-                }
-                else if (subTagname == CALIB_SENSOR_AEC_DON) {
-                    const XMLNode* psubsubchild = psubchild->ToElement()->FirstChild();
-                    autoTabForward();
-                    while (psubsubchild) {
-                        XmlTag subsubTag = XmlTag(psubsubchild->ToElement());
-                        std::string subsubTagname(psubsubchild->ToElement()->Name());
-#ifdef DEBUG_LOG
-                        LOGE("%s(%d): subsubTagname = %s\n", __FUNCTION__, __LINE__, subsubTagname);
-#endif
-                        if ((subsubTagname == CALIB_SENSOR_AEC_NIGHTTRIGGER)
-                                && (subsubTag.isType(XmlTag::TAG_TYPE_DOUBLE))
-                                && (subsubTag.Size() > 0)) {
-                            int no = ParseUcharArray(psubsubchild, &mCalibDb->aec.LinearAeCtrl.DON_Night_Trigger, subsubTag.Size());
-                            DCT_ASSERT((no == subsubTag.Size()));
-                        }
-                        else if ((subsubTagname == CALIB_SENSOR_AEC_NIGHTMODE)
-                                 && (subsubTag.isType(XmlTag::TAG_TYPE_DOUBLE))
-                                 && (subsubTag.Size() > 0)) {
-                            int no = ParseUcharArray(psubsubchild, &mCalibDb->aec.LinearAeCtrl.DON_Night_Mode, subsubTag.Size());
-                            DCT_ASSERT((no == subsubTag.Size()));
-                        }
-                        else if ((subsubTagname == CALIB_SENSOR_AEC_DON_DAY2NIGHT_FAC_TH)
-                                 && (subsubTag.isType(XmlTag::TAG_TYPE_DOUBLE))
-                                 && (subsubTag.Size() > 0)) {
-                            int no = ParseFloatArray(psubsubchild, &mCalibDb->aec.LinearAeCtrl.DON_Day2Night_Fac_th, subsubTag.Size());
-                            DCT_ASSERT((no == subsubTag.Size()));
-                        }
-                        else if ((subsubTagname == CALIB_SENSOR_AEC_DON_NIGHT2DAY_FAC_TH)
-                                 && (subsubTag.isType(XmlTag::TAG_TYPE_DOUBLE))
-                                 && (subsubTag.Size() > 0)) {
-                            int no = ParseFloatArray(psubsubchild, &mCalibDb->aec.LinearAeCtrl.DON_Night2Day_Fac_th, subsubTag.Size());
-                            DCT_ASSERT((no == subsubTag.Size()));
-                        }
-                        else if ((subsubTagname == CALIB_SENSOR_AEC_DON_BOUNCING_TH)
-                                 && (subsubTag.isType(XmlTag::TAG_TYPE_DOUBLE))
-                                 && (subsubTag.Size() > 0)) {
-                            int no = ParseUcharArray(psubsubchild, &mCalibDb->aec.LinearAeCtrl.DON_Bouncing_th, subsubTag.Size());
-                            DCT_ASSERT((no == subsubTag.Size()));
-                        }
-                        else {
-                            redirectOut
-                                    << "parse error in AEC LinearAeCtrl DON section (unknow tag: "
-                                    << subsubTagname
-                                    << ")"
-                                    << std::endl;
-                        }
-                        psubsubchild = psubsubchild->NextSibling();
-                    }
-                    autoTabBackward();
-                }
-                else if (subTagname == CALIB_SENSOR_AEC_NLSC_CONFIG) {
-                    const XMLNode* psubsubchild = psubchild->ToElement()->FirstChild();
-                    autoTabForward();
-                    while (psubsubchild) {
-                        XmlTag subsubTag = XmlTag(psubsubchild->ToElement());
-                        std::string subsubTagname(psubsubchild->ToElement()->Name());
-#ifdef DEBUG_LOG
-                        LOGE("%s(%d): subsubTagname = %s\n", __FUNCTION__, __LINE__, subsubTagname);
-#endif
-                        if ((subsubTagname == CALIB_SENSOR_AEC_ENABLE)
-                                && (subsubTag.isType(XmlTag::TAG_TYPE_DOUBLE))
-                                && (subsubTag.Size() > 0)) {
-                            int no = ParseUcharArray(psubsubchild, &mCalibDb->aec.LinearAeCtrl.NLSC_config.enable, subsubTag.Size());
-                            DCT_ASSERT((no == subsubTag.Size()));
-                        }
-                        else if ((subsubTagname == CALIB_SENSOR_AEC_IR_RG)
-                                 && (subsubTag.isType(XmlTag::TAG_TYPE_DOUBLE))
-                                 && (subsubTag.Size() > 0)) {
-                            int no = ParseFloatArray(psubsubchild, &mCalibDb->aec.LinearAeCtrl.NLSC_config.IR_rg, subsubTag.Size());
-                            DCT_ASSERT((no == subsubTag.Size()));
-                        }
-                        else if ((subsubTagname == CALIB_SENSOR_AEC_IR_BG)
-                                 && (subsubTag.isType(XmlTag::TAG_TYPE_DOUBLE))
-                                 && (subsubTag.Size() > 0)) {
-                            int no = ParseFloatArray(psubsubchild, &mCalibDb->aec.LinearAeCtrl.NLSC_config.IR_bg, subsubTag.Size());
-                            DCT_ASSERT((no == subsubTag.Size()));
-                        }
-                        else if ((subsubTagname == CALIB_SENSOR_AEC_MAX_DIS)
-                                 && (subsubTag.isType(XmlTag::TAG_TYPE_DOUBLE))
-                                 && (subsubTag.Size() > 0)) {
-                            int no = ParseFloatArray(psubsubchild, &mCalibDb->aec.LinearAeCtrl.NLSC_config.Max_dis, subsubTag.Size());
-                            DCT_ASSERT((no == subsubTag.Size()));
-                        }
-                        else if ((subsubTagname == CALIB_SENSOR_AEC_COLOR2BLACK_COUNT)
-                                 && (subsubTag.isType(XmlTag::TAG_TYPE_DOUBLE))
-                                 && (subsubTag.Size() > 0)) {
-                            int no = ParseUcharArray(psubsubchild, &mCalibDb->aec.LinearAeCtrl.NLSC_config.C2B_count, subsubTag.Size());
-                            DCT_ASSERT((no == subsubTag.Size()));
-                        }
-                        else if ((subsubTagname == CALIB_SENSOR_AEC_COLOR2BLACK_THRESH)
-                                 && (subsubTag.isType(XmlTag::TAG_TYPE_DOUBLE))
-                                 && (subsubTag.Size() > 0)) {
-                            int no = ParseFloatArray(psubsubchild, &mCalibDb->aec.LinearAeCtrl.NLSC_config.C2B_thresh, subsubTag.Size());
-                            DCT_ASSERT((no == subsubTag.Size()));
-                        }
-                        else if ((subsubTagname == CALIB_SENSOR_AEC_BLACK2COLOR_COUNT)
-                                 && (subsubTag.isType(XmlTag::TAG_TYPE_DOUBLE))
-                                 && (subsubTag.Size() > 0)) {
-                            int no = ParseUcharArray(psubsubchild, &mCalibDb->aec.LinearAeCtrl.NLSC_config.B2C_count, subsubTag.Size());
-                            DCT_ASSERT((no == subsubTag.Size()));
-                        }
-                        else if ((subsubTagname == CALIB_SENSOR_AEC_BLACK2COLOR_THRESH)
-                                 && (subsubTag.isType(XmlTag::TAG_TYPE_DOUBLE))
-                                 && (subsubTag.Size() > 0)) {
-                            int no = ParseFloatArray(psubsubchild, &mCalibDb->aec.LinearAeCtrl.NLSC_config.B2C_thresh, subsubTag.Size());
-                            DCT_ASSERT((no == subsubTag.Size()));
-                        }
-                        else if ((subsubTagname == CALIB_SENSOR_AEC_BLACK2COLOR_VB_PERCENT)
-                                 && (subsubTag.isType(XmlTag::TAG_TYPE_DOUBLE))
-                                 && (subsubTag.Size() > 0)) {
-                            int no = ParseFloatArray(psubsubchild, &mCalibDb->aec.LinearAeCtrl.NLSC_config.B2C_vb_percent, subsubTag.Size());
-                            DCT_ASSERT((no == subsubTag.Size()));
-                        }
-                        else if ((subsubTagname == CALIB_SENSOR_AEC_COLOR2BLACK_STABLE_FPS)
-                                 && (subsubTag.isType(XmlTag::TAG_TYPE_DOUBLE))
-                                 && (subsubTag.Size() > 0)) {
-                            int no = ParseUcharArray(psubsubchild, &mCalibDb->aec.LinearAeCtrl.NLSC_config.C2B_stable_fps, subsubTag.Size());
-                            DCT_ASSERT((no == subsubTag.Size()));
-                        }
-                        else {
-                            redirectOut
-                                    << "parse error in AEC LinearAeCtrl NLSC_config (unknow tag: "
-                                    << subsubTagname
-                                    << ")"
-                                    << std::endl;
-                        }
-                        psubsubchild = psubsubchild->NextSibling();
                     }
                     autoTabBackward();
                 }
@@ -5661,6 +5718,12 @@ bool RkAiqCalibParser::parseEntrySensorAhdrTmo
             int no = ParseFloatArray(pchild, mCalibDb->ahdr.tmo.envLevel, tag.Size());
             DCT_ASSERT((no == tag.Size()));
         }
+		else if ((Tagname == CALIB_SENSOR_AHDR_TMO_ENVLVTOLERANCE)
+                 && (tag.isType(XmlTag::TAG_TYPE_DOUBLE))
+                 && (tag.Size() > 0)) {
+            int no = ParseFloatArray(pchild, &mCalibDb->ahdr.tmo.EnvLvTolerance, tag.Size());
+            DCT_ASSERT((no == tag.Size()));
+        }
         else if ((Tagname == CALIB_SENSOR_AHDR_TMO_GLOBALMAXLUMA)
                  && (tag.isType(XmlTag::TAG_TYPE_DOUBLE))
                  && (tag.Size() > 0)) {
@@ -5677,6 +5740,12 @@ bool RkAiqCalibParser::parseEntrySensorAhdrTmo
                  && (tag.isType(XmlTag::TAG_TYPE_DOUBLE))
                  && (tag.Size() > 0)) {
             int no = ParseFloatArray(pchild, mCalibDb->ahdr.tmo.OEPdf, tag.Size());
+            DCT_ASSERT((no == tag.Size()));
+        }
+		else if ((Tagname == CALIB_SENSOR_AHDR_TMO_OETOLERANCE)
+                 && (tag.isType(XmlTag::TAG_TYPE_DOUBLE))
+                 && (tag.Size() > 0)) {
+            int no = ParseFloatArray(pchild, &mCalibDb->ahdr.tmo.OETolerance, tag.Size());
             DCT_ASSERT((no == tag.Size()));
         }
         else if ((Tagname == CALIB_SENSOR_AHDR_TMO_DETAILSHIGHLIGHT)
@@ -5709,6 +5778,12 @@ bool RkAiqCalibParser::parseEntrySensorAhdrTmo
             int no = ParseFloatArray(pchild, mCalibDb->ahdr.tmo.DarkTexturePdf, tag.Size());
             DCT_ASSERT((no == tag.Size()));
         }
+		else if ((Tagname == CALIB_SENSOR_AHDR_TMO_DTPDFTOLERANCE)
+                 && (tag.isType(XmlTag::TAG_TYPE_DOUBLE))
+                 && (tag.Size() > 0)) {
+            int no = ParseFloatArray(pchild, &mCalibDb->ahdr.tmo.DTPdfTolerance, tag.Size());
+            DCT_ASSERT((no == tag.Size()));
+        }
         else if ((Tagname == CALIB_SENSOR_AHDR_TMO_DETAILSLOWLIGHT)
                  && (tag.isType(XmlTag::TAG_TYPE_DOUBLE))
                  && (tag.Size() > 0)) {
@@ -5733,6 +5808,12 @@ bool RkAiqCalibParser::parseEntrySensorAhdrTmo
             int no = ParseFloatArray(pchild, mCalibDb->ahdr.tmo.PosCoef, tag.Size());
             DCT_ASSERT((no == tag.Size()));
         }
+		else if ((Tagname == CALIB_SENSOR_AHDR_TMO_POSCOEFTOLERANCE)
+                 && (tag.isType(XmlTag::TAG_TYPE_DOUBLE))
+                 && (tag.Size() > 0)) {
+            int no = ParseFloatArray(pchild, &mCalibDb->ahdr.tmo.PosCoefTolerance, tag.Size());
+            DCT_ASSERT((no == tag.Size()));
+        }
         else if ((Tagname == CALIB_SENSOR_AHDR_TMO_NOISELOWLIGHT)
                  && (tag.isType(XmlTag::TAG_TYPE_DOUBLE))
                  && (tag.Size() > 0)) {
@@ -5745,22 +5826,22 @@ bool RkAiqCalibParser::parseEntrySensorAhdrTmo
             int no = ParseFloatArray(pchild, mCalibDb->ahdr.tmo.DynamicRange, tag.Size());
             DCT_ASSERT((no == tag.Size()));
         }
+		else if ((Tagname == CALIB_SENSOR_AHDR_TMO_DRTOLERANCE)
+                 && (tag.isType(XmlTag::TAG_TYPE_DOUBLE))
+                 && (tag.Size() > 0)) {
+            int no = ParseFloatArray(pchild, &mCalibDb->ahdr.tmo.DRTolerance, tag.Size());
+            DCT_ASSERT((no == tag.Size()));
+        }
         else if ((Tagname == CALIB_SENSOR_AHDR_TMO_DAYTH)
                  && (tag.isType(XmlTag::TAG_TYPE_DOUBLE))
                  && (tag.Size() > 0)) {
             int no = ParseFloatArray(pchild, &mCalibDb->ahdr.tmo.DayTh, tag.Size());
             DCT_ASSERT((no == tag.Size()));
         }
-        else if ((Tagname == CALIB_SENSOR_AHDR_TMO_SMOOTHCONTROLCOEF1)
+        else if ((Tagname == CALIB_SENSOR_AHDR_TMO_SMOOTHCTRLCOEF)
                  && (tag.isType(XmlTag::TAG_TYPE_DOUBLE))
                  && (tag.Size() > 0)) {
-            int no = ParseFloatArray(pchild, mCalibDb->ahdr.tmo.smoothControlCoef1, tag.Size());
-            DCT_ASSERT((no == tag.Size()));
-        }
-        else if ((Tagname == CALIB_SENSOR_AHDR_TMO_SMOOTHCONTROLCOEF2)
-                 && (tag.isType(XmlTag::TAG_TYPE_DOUBLE))
-                 && (tag.Size() > 0)) {
-            int no = ParseFloatArray(pchild, mCalibDb->ahdr.tmo.smoothControlCoef2, tag.Size());
+            int no = ParseFloatArray(pchild, mCalibDb->ahdr.tmo.smoothCtrlCoef, tag.Size());
             DCT_ASSERT((no == tag.Size()));
         }
         else if ((Tagname == CALIB_SENSOR_AHDR_TMO_DAMP)
@@ -5793,7 +5874,10 @@ bool RkAiqCalibParser::parseEntrySensorBlc
         XmlTag tag = XmlTag(pchild->ToElement());
         std::string tagname(pchild->ToElement()->Name());
 
-        if (tagname == CALIB_SENSOR_BLC_BLACK_LEVEL) {
+        if (tagname == CALIB_SENSOR_BLC_ENABLE) {
+            int no = ParseIntArray(pchild, &mCalibDb->blc.enable, tag.Size());
+            DCT_ASSERT((no == tag.Size()));
+        }else if (tagname == CALIB_SENSOR_BLC_BLACK_LEVEL) {
             int no = ParseFloatArray(pchild, mCalibDb->blc.level, tag.Size());
             DCT_ASSERT((no == tag.Size()));
         }
@@ -5888,6 +5972,11 @@ bool RkAiqCalibParser::parseEntrySensorDpcc
                    && (tag.isType(XmlTag::TAG_TYPE_DOUBLE))
                    && (tag.Size() > 0)) {
             int no = ParseUcharArray(pchild, mCalibDb->dpcc.rk_out_sel, tag.Size());
+            DCT_ASSERT((no == tag.Size()));
+        } else if ((tagname == CALIB_SENSOR_DPCC_DPCC_OUT_SEL)
+                   && (tag.isType(XmlTag::TAG_TYPE_DOUBLE))
+                   && (tag.Size() > 0)) {
+            int no = ParseUcharArray(pchild, mCalibDb->dpcc.dpcc_out_sel, tag.Size());
             DCT_ASSERT((no == tag.Size()));
         } else if ((tagname == CALIB_SENSOR_DPCC_STAGE1_RB_3X3)
                    && (tag.isType(XmlTag::TAG_TYPE_DOUBLE))
@@ -8569,13 +8658,13 @@ bool RkAiqCalibParser::parseEntrySensorEdgeFilterISO
             int no = ParseFloatArray(pchild, mCalibDb->edgeFilter.edgeFilter_iso[index].dog_kernel_row2, tag.Size(), 6);
             DCT_ASSERT((no == tag.Size()));
         }
-        else if ((tagname == CALIB_SENSOR_EDGEFILTER_EDGEFILTER_ISO_DOG_KERNEL_ROW3, 6)
+        else if ((tagname == CALIB_SENSOR_EDGEFILTER_EDGEFILTER_ISO_DOG_KERNEL_ROW3)
                  && (tag.isType(XmlTag::TAG_TYPE_DOUBLE))
                  && (tag.Size() > 0)) {
             int no = ParseFloatArray(pchild, mCalibDb->edgeFilter.edgeFilter_iso[index].dog_kernel_row3, tag.Size(), 6);
             DCT_ASSERT((no == tag.Size()));
         }
-        else if ((tagname == CALIB_SENSOR_EDGEFILTER_EDGEFILTER_ISO_DOG_KERNEL_ROW4, 6)
+        else if ((tagname == CALIB_SENSOR_EDGEFILTER_EDGEFILTER_ISO_DOG_KERNEL_ROW4)
                  && (tag.isType(XmlTag::TAG_TYPE_DOUBLE))
                  && (tag.Size() > 0)) {
             int no = ParseFloatArray(pchild, mCalibDb->edgeFilter.edgeFilter_iso[index].dog_kernel_row4, tag.Size(), 6);
@@ -8671,240 +8760,240 @@ bool RkAiqCalibParser::parseEntrySensorDehazeISO
         if ((tagname == CALIB_SENSOR_DEHAZE_ISO_ISO)
                 && (tag.isType(XmlTag::TAG_TYPE_DOUBLE))
                 && (tag.Size() > 0)) {
-            int no = ParseFloatArray(pchild, &mCalibDb->dehaze.dehaze_iso[index].iso, tag.Size());
+            int no = ParseFloatArray(pchild, &mCalibDb->dehaze.dehaze_iso.iso[index], tag.Size());
             DCT_ASSERT((no == tag.Size()));
         }
         else if ((tagname == CALIB_SENSOR_DEHAZE_ISO_DEHAZE_EN)
                  && (tag.isType(XmlTag::TAG_TYPE_DOUBLE))
                  && (tag.Size() > 0)) {
-            int no = ParseUcharArray(pchild, &mCalibDb->dehaze.dehaze_iso[index].dehaze_en, tag.Size());
+            int no = ParseUcharArray(pchild, &mCalibDb->dehaze.dehaze_iso.dehaze_en[index], tag.Size());
             DCT_ASSERT((no == tag.Size()));
         }
         else if ((tagname == CALIB_SENSOR_DEHAZE_ISO_DC_EN)
                  && (tag.isType(XmlTag::TAG_TYPE_DOUBLE))
                  && (tag.Size() > 0)) {
-            int no = ParseUcharArray(pchild, &mCalibDb->dehaze.dehaze_iso[index].dc_en, tag.Size());
+            int no = ParseUcharArray(pchild, &mCalibDb->dehaze.dehaze_iso.dc_en[index], tag.Size());
             DCT_ASSERT((no == tag.Size()));
         }
         else if ((tagname == CALIB_SENSOR_DEHAZE_ISO_HIST_EN)
                  && (tag.isType(XmlTag::TAG_TYPE_DOUBLE))
                  && (tag.Size() > 0)) {
-            int no = ParseUcharArray(pchild, &mCalibDb->dehaze.dehaze_iso[index].hist_en, tag.Size());
+            int no = ParseUcharArray(pchild, &mCalibDb->dehaze.dehaze_iso.hist_en[index], tag.Size());
             DCT_ASSERT((no == tag.Size()));
         }
         else if ((tagname == CALIB_SENSOR_DEHAZE_ISO_HIST_CHANNEL)
                  && (tag.isType(XmlTag::TAG_TYPE_DOUBLE))
                  && (tag.Size() > 0)) {
-            int no = ParseUcharArray(pchild, &mCalibDb->dehaze.dehaze_iso[index].hist_channel, tag.Size());
+            int no = ParseUcharArray(pchild, &mCalibDb->dehaze.dehaze_iso.hist_channel[index], tag.Size());
             DCT_ASSERT((no == tag.Size()));
         }
         else if ((tagname == CALIB_SENSOR_DEHAZE_ISO_GAIN_EN)
                  && (tag.isType(XmlTag::TAG_TYPE_DOUBLE))
                  && (tag.Size() > 0)) {
-            int no = ParseUcharArray(pchild, &mCalibDb->dehaze.dehaze_iso[index].gain_en, tag.Size());
+            int no = ParseUcharArray(pchild, &mCalibDb->dehaze.dehaze_iso.gain_en[index], tag.Size());
             DCT_ASSERT((no == tag.Size()));
         }
         else if ((tagname == CALIB_SENSOR_DEHAZE_ISO_DC_MIN_TH)
                  && (tag.isType(XmlTag::TAG_TYPE_DOUBLE))
                  && (tag.Size() > 0)) {
-            int no = ParseFloatArray(pchild, &mCalibDb->dehaze.dehaze_iso[index].dc_min_th, tag.Size());
+            int no = ParseFloatArray(pchild, &mCalibDb->dehaze.dehaze_iso.dc_min_th[index], tag.Size());
             DCT_ASSERT((no == tag.Size()));
         }
         else if ((tagname == CALIB_SENSOR_DEHAZE_ISO_DC_MAX_TH)
                  && (tag.isType(XmlTag::TAG_TYPE_DOUBLE))
                  && (tag.Size() > 0)) {
-            int no = ParseFloatArray(pchild, &mCalibDb->dehaze.dehaze_iso[index].dc_max_th, tag.Size());
+            int no = ParseFloatArray(pchild, &mCalibDb->dehaze.dehaze_iso.dc_max_th[index], tag.Size());
             DCT_ASSERT((no == tag.Size()));
         }
         else if ((tagname == CALIB_SENSOR_DEHAZE_ISO_YHIST_TH)
                  && (tag.isType(XmlTag::TAG_TYPE_DOUBLE))
                  && (tag.Size() > 0)) {
-            int no = ParseFloatArray(pchild, &mCalibDb->dehaze.dehaze_iso[index].yhist_th, tag.Size());
+            int no = ParseFloatArray(pchild, &mCalibDb->dehaze.dehaze_iso.yhist_th[index], tag.Size());
             DCT_ASSERT((no == tag.Size()));
         }
         else if ((tagname == CALIB_SENSOR_DEHAZE_ISO_YBLK_TH)
                  && (tag.isType(XmlTag::TAG_TYPE_DOUBLE))
                  && (tag.Size() > 0)) {
-            int no = ParseFloatArray(pchild, &mCalibDb->dehaze.dehaze_iso[index].yblk_th, tag.Size());
+            int no = ParseFloatArray(pchild, &mCalibDb->dehaze.dehaze_iso.yblk_th[index], tag.Size());
             DCT_ASSERT((no == tag.Size()));
         }
         else if ((tagname == CALIB_SENSOR_DEHAZE_ISO_DARK_TH)
                  && (tag.isType(XmlTag::TAG_TYPE_DOUBLE))
                  && (tag.Size() > 0)) {
-            int no = ParseFloatArray(pchild, &mCalibDb->dehaze.dehaze_iso[index].dark_th, tag.Size());
+            int no = ParseFloatArray(pchild, &mCalibDb->dehaze.dehaze_iso.dark_th[index], tag.Size());
             DCT_ASSERT((no == tag.Size()));
         }
         else if ((tagname == CALIB_SENSOR_DEHAZE_ISO_BRIGHT_MIN)
                  && (tag.isType(XmlTag::TAG_TYPE_DOUBLE))
                  && (tag.Size() > 0)) {
-            int no = ParseFloatArray(pchild, &mCalibDb->dehaze.dehaze_iso[index].bright_min, tag.Size());
+            int no = ParseFloatArray(pchild, &mCalibDb->dehaze.dehaze_iso.bright_min[index], tag.Size());
             DCT_ASSERT((no == tag.Size()));
         }
         else if ((tagname == CALIB_SENSOR_DEHAZE_ISO_BRIGHT_MAX)
                  && (tag.isType(XmlTag::TAG_TYPE_DOUBLE))
                  && (tag.Size() > 0)) {
-            int no = ParseFloatArray(pchild, &mCalibDb->dehaze.dehaze_iso[index].bright_max, tag.Size());
+            int no = ParseFloatArray(pchild, &mCalibDb->dehaze.dehaze_iso.bright_max[index], tag.Size());
             DCT_ASSERT((no == tag.Size()));
         }
         else if ((tagname == CALIB_SENSOR_DEHAZE_ISO_WT_MAX)
                  && (tag.isType(XmlTag::TAG_TYPE_DOUBLE))
                  && (tag.Size() > 0)) {
-            int no = ParseFloatArray(pchild, &mCalibDb->dehaze.dehaze_iso[index].wt_max, tag.Size());
+            int no = ParseFloatArray(pchild, &mCalibDb->dehaze.dehaze_iso.wt_max[index], tag.Size());
             DCT_ASSERT((no == tag.Size()));
         }
         else if ((tagname == CALIB_SENSOR_DEHAZE_ISO_AIR_MIN)
                  && (tag.isType(XmlTag::TAG_TYPE_DOUBLE))
                  && (tag.Size() > 0)) {
-            int no = ParseFloatArray(pchild, &mCalibDb->dehaze.dehaze_iso[index].air_min, tag.Size());
+            int no = ParseFloatArray(pchild, &mCalibDb->dehaze.dehaze_iso.air_min[index], tag.Size());
             DCT_ASSERT((no == tag.Size()));
         }
         else if ((tagname == CALIB_SENSOR_DEHAZE_ISO_AIR_MAX)
                  && (tag.isType(XmlTag::TAG_TYPE_DOUBLE))
                  && (tag.Size() > 0)) {
-            int no = ParseFloatArray(pchild, &mCalibDb->dehaze.dehaze_iso[index].air_max, tag.Size());
+            int no = ParseFloatArray(pchild, &mCalibDb->dehaze.dehaze_iso.air_max[index], tag.Size());
             DCT_ASSERT((no == tag.Size()));
         }
         else if ((tagname == CALIB_SENSOR_DEHAZE_ISO_TMAX_BASE)
                  && (tag.isType(XmlTag::TAG_TYPE_DOUBLE))
                  && (tag.Size() > 0)) {
-            int no = ParseFloatArray(pchild, &mCalibDb->dehaze.dehaze_iso[index].tmax_base, tag.Size());
+            int no = ParseFloatArray(pchild, &mCalibDb->dehaze.dehaze_iso.tmax_base[index], tag.Size());
             DCT_ASSERT((no == tag.Size()));
         }
         else if ((tagname == CALIB_SENSOR_DEHAZE_ISO_TMAX_OFF)
                  && (tag.isType(XmlTag::TAG_TYPE_DOUBLE))
                  && (tag.Size() > 0)) {
-            int no = ParseFloatArray(pchild, &mCalibDb->dehaze.dehaze_iso[index].tmax_off, tag.Size());
+            int no = ParseFloatArray(pchild, &mCalibDb->dehaze.dehaze_iso.tmax_off[index], tag.Size());
             DCT_ASSERT((no == tag.Size()));
         }
         else if ((tagname == CALIB_SENSOR_DEHAZE_ISO_TMAX_MAX)
                  && (tag.isType(XmlTag::TAG_TYPE_DOUBLE))
                  && (tag.Size() > 0)) {
-            int no = ParseFloatArray(pchild, &mCalibDb->dehaze.dehaze_iso[index].tmax_max, tag.Size());
+            int no = ParseFloatArray(pchild, &mCalibDb->dehaze.dehaze_iso.tmax_max[index], tag.Size());
             DCT_ASSERT((no == tag.Size()));
         }
         else if ((tagname == CALIB_SENSOR_DEHAZE_ISO_HIST_GRATIO)
                  && (tag.isType(XmlTag::TAG_TYPE_DOUBLE))
                  && (tag.Size() > 0)) {
-            int no = ParseFloatArray(pchild, &mCalibDb->dehaze.dehaze_iso[index].hist_gratio, tag.Size());
+            int no = ParseFloatArray(pchild, &mCalibDb->dehaze.dehaze_iso.hist_gratio[index], tag.Size());
             DCT_ASSERT((no == tag.Size()));
         }
         else if ((tagname == CALIB_SENSOR_DEHAZE_ISO_HIST_TH_OFF)
                  && (tag.isType(XmlTag::TAG_TYPE_DOUBLE))
                  && (tag.Size() > 0)) {
-            int no = ParseFloatArray(pchild, &mCalibDb->dehaze.dehaze_iso[index].hist_th_off, tag.Size());
+            int no = ParseFloatArray(pchild, &mCalibDb->dehaze.dehaze_iso.hist_th_off[index], tag.Size());
             DCT_ASSERT((no == tag.Size()));
         }
         else if ((tagname == CALIB_SENSOR_DEHAZE_ISO_HIST_K)
                  && (tag.isType(XmlTag::TAG_TYPE_DOUBLE))
                  && (tag.Size() > 0)) {
-            int no = ParseFloatArray(pchild, &mCalibDb->dehaze.dehaze_iso[index].hist_k, tag.Size());
+            int no = ParseFloatArray(pchild, &mCalibDb->dehaze.dehaze_iso.hist_k[index], tag.Size());
             DCT_ASSERT((no == tag.Size()));
         }
         else if ((tagname == CALIB_SENSOR_DEHAZE_ISO_HIST_MIN)
                  && (tag.isType(XmlTag::TAG_TYPE_DOUBLE))
                  && (tag.Size() > 0)) {
-            int no = ParseFloatArray(pchild, &mCalibDb->dehaze.dehaze_iso[index].hist_min, tag.Size());
+            int no = ParseFloatArray(pchild, &mCalibDb->dehaze.dehaze_iso.hist_min[index], tag.Size());
             DCT_ASSERT((no == tag.Size()));
         }
         else if ((tagname == CALIB_SENSOR_DEHAZE_ISO_ENHANCE_EN)
                  && (tag.isType(XmlTag::TAG_TYPE_DOUBLE))
                  && (tag.Size() > 0)) {
-            int no = ParseUcharArray(pchild, &mCalibDb->dehaze.dehaze_iso[index].enhance_en, tag.Size());
+            int no = ParseUcharArray(pchild, &mCalibDb->dehaze.dehaze_iso.enhance_en[index], tag.Size());
             DCT_ASSERT((no == tag.Size()));
         }
         else if ((tagname == CALIB_SENSOR_DEHAZE_ISO_ENHANCE_VALUE)
                  && (tag.isType(XmlTag::TAG_TYPE_DOUBLE))
                  && (tag.Size() > 0)) {
-            int no = ParseFloatArray(pchild, &mCalibDb->dehaze.dehaze_iso[index].enhance_value, tag.Size());
+            int no = ParseFloatArray(pchild, &mCalibDb->dehaze.dehaze_iso.enhance_value[index], tag.Size());
             DCT_ASSERT((no == tag.Size()));
         }
         else if ((tagname == CALIB_SENSOR_DEHAZE_ISO_HIST_PARA_EN)
                  && (tag.isType(XmlTag::TAG_TYPE_DOUBLE))
                  && (tag.Size() > 0)) {
-            int no = ParseUcharArray(pchild, &mCalibDb->dehaze.dehaze_iso[index].hist_para_en, tag.Size());
+            int no = ParseUcharArray(pchild, &mCalibDb->dehaze.dehaze_iso.hist_para_en[index], tag.Size());
             DCT_ASSERT((no == tag.Size()));
         }
         else if ((tagname == CALIB_SENSOR_DEHAZE_ISO_HIST_SCALE)
                  && (tag.isType(XmlTag::TAG_TYPE_DOUBLE))
                  && (tag.Size() > 0)) {
-            int no = ParseFloatArray(pchild, &mCalibDb->dehaze.dehaze_iso[index].hist_scale, tag.Size());
+            int no = ParseFloatArray(pchild, &mCalibDb->dehaze.dehaze_iso.hist_scale[index], tag.Size());
             DCT_ASSERT((no == tag.Size()));
         }
         else if ((tagname == CALIB_SENSOR_DEHAZE_ISO_STAB_FNUM)
                  && (tag.isType(XmlTag::TAG_TYPE_DOUBLE))
                  && (tag.Size() > 0)) {
-            int no = ParseFloatArray(pchild, &mCalibDb->dehaze.dehaze_iso[index].stab_fnum, tag.Size());
+            int no = ParseFloatArray(pchild, &mCalibDb->dehaze.dehaze_iso.stab_fnum[index], tag.Size());
             DCT_ASSERT((no == tag.Size()));
         }
         else if ((tagname == CALIB_SENSOR_DEHAZE_ISO_SIGMA)
                  && (tag.isType(XmlTag::TAG_TYPE_DOUBLE))
                  && (tag.Size() > 0)) {
-            int no = ParseFloatArray(pchild, &mCalibDb->dehaze.dehaze_iso[index].sigma, tag.Size());
+            int no = ParseFloatArray(pchild, &mCalibDb->dehaze.dehaze_iso.sigma[index], tag.Size());
             DCT_ASSERT((no == tag.Size()));
         }
         else if ((tagname == CALIB_SENSOR_DEHAZE_ISO_WT_SIGMA)
                  && (tag.isType(XmlTag::TAG_TYPE_DOUBLE))
                  && (tag.Size() > 0)) {
-            int no = ParseFloatArray(pchild, &mCalibDb->dehaze.dehaze_iso[index].wt_sigma, tag.Size());
+            int no = ParseFloatArray(pchild, &mCalibDb->dehaze.dehaze_iso.wt_sigma[index], tag.Size());
             DCT_ASSERT((no == tag.Size()));
         }
         else if ((tagname == CALIB_SENSOR_DEHAZE_ISO_AIR_SIGMA)
                  && (tag.isType(XmlTag::TAG_TYPE_DOUBLE))
                  && (tag.Size() > 0)) {
-            int no = ParseFloatArray(pchild, &mCalibDb->dehaze.dehaze_iso[index].air_sigma, tag.Size());
+            int no = ParseFloatArray(pchild, &mCalibDb->dehaze.dehaze_iso.air_sigma[index], tag.Size());
             DCT_ASSERT((no == tag.Size()));
         }
         else if ((tagname == CALIB_SENSOR_DEHAZE_ISO_TMAX_SIGMA)
                  && (tag.isType(XmlTag::TAG_TYPE_DOUBLE))
                  && (tag.Size() > 0)) {
-            int no = ParseFloatArray(pchild, &mCalibDb->dehaze.dehaze_iso[index].tmax_sigma, tag.Size());
+            int no = ParseFloatArray(pchild, &mCalibDb->dehaze.dehaze_iso.tmax_sigma[index], tag.Size());
             DCT_ASSERT((no == tag.Size()));
         }
         else if ((tagname == CALIB_SENSOR_DEHAZE_ISO_CFG_ALPHA)
                  && (tag.isType(XmlTag::TAG_TYPE_DOUBLE))
                  && (tag.Size() > 0)) {
-            int no = ParseFloatArray(pchild, &mCalibDb->dehaze.dehaze_iso[index].cfg_alpha, tag.Size());
+            int no = ParseFloatArray(pchild, &mCalibDb->dehaze.dehaze_iso.cfg_alpha[index], tag.Size());
             DCT_ASSERT((no == tag.Size()));
         }
         else if ((tagname == CALIB_SENSOR_DEHAZE_ISO_CFG_WT)
                  && (tag.isType(XmlTag::TAG_TYPE_DOUBLE))
                  && (tag.Size() > 0)) {
-            int no = ParseFloatArray(pchild, &mCalibDb->dehaze.dehaze_iso[index].cfg_wt, tag.Size());
+            int no = ParseFloatArray(pchild, &mCalibDb->dehaze.dehaze_iso.cfg_wt[index], tag.Size());
             DCT_ASSERT((no == tag.Size()));
         } else if ((tagname == CALIB_SENSOR_DEHAZE_ISO_CFG_AIR)
                    && (tag.isType(XmlTag::TAG_TYPE_DOUBLE))
                    && (tag.Size() > 0)) {
-            int no = ParseFloatArray(pchild, &mCalibDb->dehaze.dehaze_iso[index].cfg_air, tag.Size());
+            int no = ParseFloatArray(pchild, &mCalibDb->dehaze.dehaze_iso.cfg_air[index], tag.Size());
             DCT_ASSERT((no == tag.Size()));
         } else if ((tagname == CALIB_SENSOR_DEHAZE_ISO_CFG_TMAX)
                    && (tag.isType(XmlTag::TAG_TYPE_DOUBLE))
                    && (tag.Size() > 0)) {
-            int no = ParseFloatArray(pchild, &mCalibDb->dehaze.dehaze_iso[index].cfg_tmax, tag.Size());
+            int no = ParseFloatArray(pchild, &mCalibDb->dehaze.dehaze_iso.cfg_tmax[index], tag.Size());
             DCT_ASSERT((no == tag.Size()));
         } else if ((tagname == CALIB_SENSOR_DEHAZE_ISO_CFG_GRATIO)
                    && (tag.isType(XmlTag::TAG_TYPE_DOUBLE))
                    && (tag.Size() > 0)) {
-            int no = ParseFloatArray(pchild, &mCalibDb->dehaze.dehaze_iso[index].cfg_gratio, tag.Size());
+            int no = ParseFloatArray(pchild, &mCalibDb->dehaze.dehaze_iso.cfg_gratio[index], tag.Size());
             DCT_ASSERT((no == tag.Size()));
         } else if ((tagname == CALIB_SENSOR_DEHAZE_ISO_DC_THED)
                    && (tag.isType(XmlTag::TAG_TYPE_DOUBLE))
                    && (tag.Size() > 0)) {
-            int no = ParseFloatArray(pchild, &mCalibDb->dehaze.dehaze_iso[index].dc_thed, tag.Size());
+            int no = ParseFloatArray(pchild, &mCalibDb->dehaze.dehaze_iso.dc_thed[index], tag.Size());
             DCT_ASSERT((no == tag.Size()));
         } else if ((tagname == CALIB_SENSOR_DEHAZE_ISO_DC_WEITCUR)
                    && (tag.isType(XmlTag::TAG_TYPE_DOUBLE))
                    && (tag.Size() > 0)) {
-            int no = ParseFloatArray(pchild, &mCalibDb->dehaze.dehaze_iso[index].dc_weitcur, tag.Size());
+            int no = ParseFloatArray(pchild, &mCalibDb->dehaze.dehaze_iso.dc_weitcur[index], tag.Size());
             DCT_ASSERT((no == tag.Size()));
         } else if ((tagname == CALIB_SENSOR_DEHAZE_ISO_AIR_THED)
                    && (tag.isType(XmlTag::TAG_TYPE_DOUBLE))
                    && (tag.Size() > 0)) {
-            int no = ParseFloatArray(pchild, &mCalibDb->dehaze.dehaze_iso[index].air_thed, tag.Size());
+            int no = ParseFloatArray(pchild, &mCalibDb->dehaze.dehaze_iso.air_thed[index], tag.Size());
             DCT_ASSERT((no == tag.Size()));
         } else if ((tagname == CALIB_SENSOR_DEHAZE_ISO_AIR_WEITCUR)
                    && (tag.isType(XmlTag::TAG_TYPE_DOUBLE))
                    && (tag.Size() > 0)) {
-            int no = ParseFloatArray(pchild, &mCalibDb->dehaze.dehaze_iso[index].air_weitcur, tag.Size());
+            int no = ParseFloatArray(pchild, &mCalibDb->dehaze.dehaze_iso.air_weitcur[index], tag.Size());
             DCT_ASSERT((no == tag.Size()));
         }
         pchild = pchild->NextSibling();
@@ -8939,24 +9028,25 @@ bool RkAiqCalibParser::parseEntrySensorAf
                 if (secsubTagname == CALIB_SENSOR_AF_H_OFFS
                         && (secsubtag.isType(XmlTag::TAG_TYPE_DOUBLE))
                         && (secsubtag.Size() > 0)) {
-                    int no = ParseUshortArray(pchild, &mCalibDb->af.win_h_offs, tag.Size());
+                    int no = ParseUshortArray(psecsubchild, &mCalibDb->af.win_h_offs, tag.Size());
                     DCT_ASSERT((no == tag.Size()));
                 } else if (secsubTagname == CALIB_SENSOR_AF_V_OFFS
                            && (secsubtag.isType(XmlTag::TAG_TYPE_DOUBLE))
                            && (secsubtag.Size() > 0)) {
-                    int no = ParseUshortArray(pchild, &mCalibDb->af.win_v_offs, tag.Size());
+                    int no = ParseUshortArray(psecsubchild, &mCalibDb->af.win_v_offs, tag.Size());
                     DCT_ASSERT((no == tag.Size()));
                 } else if (secsubTagname == CALIB_SENSOR_AF_H_SIZE
                            && (secsubtag.isType(XmlTag::TAG_TYPE_DOUBLE))
                            && (secsubtag.Size() > 0)) {
-                    int no = ParseUshortArray(pchild, &mCalibDb->af.win_h_size, tag.Size());
+                    int no = ParseUshortArray(psecsubchild, &mCalibDb->af.win_h_size, tag.Size());
                     DCT_ASSERT((no == tag.Size()));
                 } else if (secsubTagname == CALIB_SENSOR_AF_V_SIZE
                            && (secsubtag.isType(XmlTag::TAG_TYPE_DOUBLE))
                            && (secsubtag.Size() > 0)) {
-                    int no = ParseUshortArray(pchild, &mCalibDb->af.win_v_size, tag.Size());
+                    int no = ParseUshortArray(psecsubchild, &mCalibDb->af.win_v_size, tag.Size());
                     DCT_ASSERT((no == tag.Size()));
                 }
+                psecsubchild = psecsubchild->NextSibling();
             }
         } else if ((tagname == CALIB_SENSOR_AF_FIXED_MODE)
                    && (tag.isType(XmlTag::TAG_TYPE_STRUCT))
@@ -8968,9 +9058,10 @@ bool RkAiqCalibParser::parseEntrySensorAf
                 if (secsubTagname == CALIB_SENSOR_AF_DEF_CODE
                         && (secsubtag.isType(XmlTag::TAG_TYPE_DOUBLE))
                         && (secsubtag.Size() > 0)) {
-                    int no = ParseUcharArray(pchild, &mCalibDb->af.fixed_mode.code, tag.Size());
+                    int no = ParseUcharArray(psecsubchild, &mCalibDb->af.fixed_mode.code, tag.Size());
                     DCT_ASSERT((no == tag.Size()));
                 }
+                psecsubchild = psecsubchild->NextSibling();
             }
         } else if ((tagname == CALIB_SENSOR_AF_MACRO_MODE)
                    && (tag.isType(XmlTag::TAG_TYPE_STRUCT))
@@ -8982,9 +9073,10 @@ bool RkAiqCalibParser::parseEntrySensorAf
                 if (secsubTagname == CALIB_SENSOR_AF_DEF_CODE
                         && (secsubtag.isType(XmlTag::TAG_TYPE_DOUBLE))
                         && (secsubtag.Size() > 0)) {
-                    int no = ParseUcharArray(pchild, &mCalibDb->af.macro_mode.code, tag.Size());
+                    int no = ParseUcharArray(psecsubchild, &mCalibDb->af.macro_mode.code, tag.Size());
                     DCT_ASSERT((no == tag.Size()));
                 }
+                psecsubchild = psecsubchild->NextSibling();
             }
         } else if ((tagname == CALIB_SENSOR_AF_INFINITY_MODE)
                    && (tag.isType(XmlTag::TAG_TYPE_STRUCT))
@@ -8996,9 +9088,10 @@ bool RkAiqCalibParser::parseEntrySensorAf
                 if (secsubTagname == CALIB_SENSOR_AF_DEF_CODE
                         && (secsubtag.isType(XmlTag::TAG_TYPE_DOUBLE))
                         && (secsubtag.Size() > 0)) {
-                    int no = ParseUcharArray(pchild, &mCalibDb->af.infinity_mode.code, tag.Size());
+                    int no = ParseUcharArray(psecsubchild, &mCalibDb->af.infinity_mode.code, tag.Size());
                     DCT_ASSERT((no == tag.Size()));
                 }
+                psecsubchild = psecsubchild->NextSibling();
             }
         } else if ((tagname == CALIB_SENSOR_AF_CONTRAST_AF)
                    && (tag.isType(XmlTag::TAG_TYPE_STRUCT))
@@ -9010,7 +9103,7 @@ bool RkAiqCalibParser::parseEntrySensorAf
                 if (secsubTagname == CALIB_SENSOR_AF_CONTRAST_ENABLE
                         && (secsubtag.isType(XmlTag::TAG_TYPE_DOUBLE))
                         && (secsubtag.Size() > 0)) {
-                    int no = ParseUcharArray(pchild, &mCalibDb->af.contrast_af.enable, tag.Size());
+                    int no = ParseUcharArray(psecsubchild, &mCalibDb->af.contrast_af.enable, tag.Size());
                     DCT_ASSERT((no == tag.Size()));
                 } else if (secsubTagname == CALIB_SENSOR_AF_SEARCH_STRATEGY
                            && (secsubtag.isType(XmlTag::TAG_TYPE_CHAR))
@@ -9047,7 +9140,7 @@ bool RkAiqCalibParser::parseEntrySensorAf
                         LOGE("%s(%d): af full range table malloc fail! \n",  __FUNCTION__, __LINE__ );
                     }
                     MEMSET(mCalibDb->af.contrast_af.FullRangeTbl, 0, (ArraySize * sizeof( uint16_t )));
-                    int no = ParseUshortArray(pchild, mCalibDb->af.contrast_af.FullRangeTbl, ArraySize );
+                    int no = ParseUshortArray(psecsubchild, mCalibDb->af.contrast_af.FullRangeTbl, ArraySize );
                     DCT_ASSERT((no == tag.Size()));
                 } else if (secsubTagname == CALIB_SENSOR_AF_ADAPTIVE_DIR
                            && (secsubtag.isType(XmlTag::TAG_TYPE_CHAR))
@@ -9072,84 +9165,85 @@ bool RkAiqCalibParser::parseEntrySensorAf
                         LOGE("%s(%d): af adaptive range table malloc fail! \n",  __FUNCTION__, __LINE__ );
                     }
                     MEMSET(mCalibDb->af.contrast_af.AdaptRangeTbl, 0, (ArraySize * sizeof( uint16_t )));
-                    int no = ParseUshortArray(pchild, mCalibDb->af.contrast_af.AdaptRangeTbl, ArraySize );
+                    int no = ParseUshortArray(psecsubchild, mCalibDb->af.contrast_af.AdaptRangeTbl, ArraySize );
                     DCT_ASSERT((no == tag.Size()));
                 } else if (secsubTagname == CALIB_SENSOR_AF_TRIG_THERS
                            && (secsubtag.isType(XmlTag::TAG_TYPE_DOUBLE))
                            && (secsubtag.Size() > 0)) {
-                    int no = ParseFloatArray(pchild, &mCalibDb->af.contrast_af.TrigThers, tag.Size());
+                    int no = ParseFloatArray(psecsubchild, &mCalibDb->af.contrast_af.TrigThers, tag.Size());
                     DCT_ASSERT((no == tag.Size()));
                 } else if (secsubTagname == CALIB_SENSOR_AF_TRIG_VALUE
                            && (secsubtag.isType(XmlTag::TAG_TYPE_DOUBLE))
                            && (secsubtag.Size() > 0)) {
-                    int no = ParseUshortArray(pchild, &mCalibDb->af.contrast_af.TrigValue, tag.Size());
+                    int no = ParseUshortArray(psecsubchild, &mCalibDb->af.contrast_af.TrigValue, tag.Size());
                     DCT_ASSERT((no == tag.Size()));
                 } else if (secsubTagname == CALIB_SENSOR_AF_TRIG_FRAMES
                            && (secsubtag.isType(XmlTag::TAG_TYPE_DOUBLE))
                            && (secsubtag.Size() > 0)) {
-                    int no = ParseUshortArray(pchild, &mCalibDb->af.contrast_af.TrigFrames, tag.Size());
+                    int no = ParseUshortArray(psecsubchild, &mCalibDb->af.contrast_af.TrigFrames, tag.Size());
                     DCT_ASSERT((no == tag.Size()));
                 } else if (secsubTagname == CALIB_SENSOR_AF_TRIG_ANTI_FLASH
                            && (secsubtag.isType(XmlTag::TAG_TYPE_DOUBLE))
                            && (secsubtag.Size() > 0)) {
-                    int no = ParseUshortArray(pchild, &mCalibDb->af.contrast_af.TrigAntiFlash, tag.Size());
+                    int no = ParseUshortArray(psecsubchild, &mCalibDb->af.contrast_af.TrigAntiFlash, tag.Size());
                     DCT_ASSERT((no == tag.Size()));
                 } else if (secsubTagname == CALIB_SENSOR_AF_FINISH_THERS_MAIN
                            && (secsubtag.isType(XmlTag::TAG_TYPE_DOUBLE))
                            && (secsubtag.Size() > 0)) {
-                    int no = ParseFloatArray(pchild, &mCalibDb->af.contrast_af.FinishThersMain, tag.Size());
+                    int no = ParseFloatArray(psecsubchild, &mCalibDb->af.contrast_af.FinishThersMain, tag.Size());
                     DCT_ASSERT((no == tag.Size()));
                 } else if (secsubTagname == CALIB_SENSOR_AF_FINISH_THERS_SUB
                            && (secsubtag.isType(XmlTag::TAG_TYPE_DOUBLE))
                            && (secsubtag.Size() > 0)) {
-                    int no = ParseFloatArray(pchild, &mCalibDb->af.contrast_af.FinishThersSub, tag.Size());
+                    int no = ParseFloatArray(psecsubchild, &mCalibDb->af.contrast_af.FinishThersSub, tag.Size());
                     DCT_ASSERT((no == tag.Size()));
                 } else if (secsubTagname == CALIB_SENSOR_AF_FINISH_THERS_OFFSET
                            && (secsubtag.isType(XmlTag::TAG_TYPE_DOUBLE))
                            && (secsubtag.Size() > 0)) {
-                    int no = ParseUshortArray(pchild, &mCalibDb->af.contrast_af.FinishThersOffset, tag.Size());
+                    int no = ParseUshortArray(psecsubchild, &mCalibDb->af.contrast_af.FinishThersOffset, tag.Size());
                     DCT_ASSERT((no == tag.Size()));
                 } else if (secsubTagname == CALIB_SENSOR_AF_STABLE_VALUE
                            && (secsubtag.isType(XmlTag::TAG_TYPE_DOUBLE))
                            && (secsubtag.Size() > 0)) {
-                    int no = ParseUshortArray(pchild, &mCalibDb->af.contrast_af.StableValue, tag.Size());
+                    int no = ParseUshortArray(psecsubchild, &mCalibDb->af.contrast_af.StableValue, tag.Size());
                     DCT_ASSERT((no == tag.Size()));
                 } else if (secsubTagname == CALIB_SENSOR_AF_STABLE_FRAMES
                            && (secsubtag.isType(XmlTag::TAG_TYPE_DOUBLE))
                            && (secsubtag.Size() > 0)) {
-                    int no = ParseUshortArray(pchild, &mCalibDb->af.contrast_af.StableFrames, tag.Size());
+                    int no = ParseUshortArray(psecsubchild, &mCalibDb->af.contrast_af.StableFrames, tag.Size());
                     DCT_ASSERT((no == tag.Size()));
                 } else if (secsubTagname == CALIB_SENSOR_AF_STABLE_TIME
                            && (secsubtag.isType(XmlTag::TAG_TYPE_DOUBLE))
                            && (secsubtag.Size() > 0)) {
-                    int no = ParseUshortArray(pchild, &mCalibDb->af.contrast_af.StableTime, tag.Size());
+                    int no = ParseUshortArray(psecsubchild, &mCalibDb->af.contrast_af.StableTime, tag.Size());
                     DCT_ASSERT((no == tag.Size()));
                 } else if (secsubTagname == CALIB_SENSOR_AF_OUT_FOCUS_VALUE
                            && (secsubtag.isType(XmlTag::TAG_TYPE_DOUBLE))
                            && (secsubtag.Size() > 0)) {
-                    int no = ParseFloatArray(pchild, &mCalibDb->af.contrast_af.OutFocusValue, tag.Size());
+                    int no = ParseFloatArray(psecsubchild, &mCalibDb->af.contrast_af.OutFocusValue, tag.Size());
                     DCT_ASSERT((no == tag.Size()));
                 } else if (secsubTagname == CALIB_SENSOR_AF_OUT_FOCUS_LUMA
                            && (secsubtag.isType(XmlTag::TAG_TYPE_DOUBLE))
                            && (secsubtag.Size() > 0)) {
-                    int no = ParseUshortArray(pchild, &mCalibDb->af.contrast_af.OutFocusLuma, tag.Size());
+                    int no = ParseUshortArray(psecsubchild, &mCalibDb->af.contrast_af.OutFocusLuma, tag.Size());
                     DCT_ASSERT((no == tag.Size()));
                 } else if (secsubTagname == CALIB_SENSOR_AF_OUT_FOCUS_POS
                            && (secsubtag.isType(XmlTag::TAG_TYPE_DOUBLE))
                            && (secsubtag.Size() > 0)) {
-                    int no = ParseUshortArray(pchild, &mCalibDb->af.contrast_af.OutFocusPos, tag.Size());
+                    int no = ParseUshortArray(psecsubchild, &mCalibDb->af.contrast_af.OutFocusPos, tag.Size());
                     DCT_ASSERT((no == tag.Size()));
                 } else if (secsubTagname == CALIB_SENSOR_AF_GAMMA_Y
                            && (secsubtag.isType(XmlTag::TAG_TYPE_DOUBLE))
                            && (secsubtag.Size() > 0)) {
-                    int no = ParseUshortArray(pchild, mCalibDb->af.contrast_af.gammaY, tag.Size());
+                    int no = ParseUshortArray(psecsubchild, mCalibDb->af.contrast_af.gammaY, tag.Size());
                     DCT_ASSERT((no == tag.Size()));
                 } else if (secsubTagname == CALIB_SENSOR_AF_GAUSS_WEIGHT
                            && (secsubtag.isType(XmlTag::TAG_TYPE_CHAR))
                            && (secsubtag.Size() > 0)) {
-                    int no = ParseUcharArray(pchild, mCalibDb->af.contrast_af.gaussWeight, tag.Size());
+                    int no = ParseUcharArray(psecsubchild, mCalibDb->af.contrast_af.gaussWeight, tag.Size());
                     DCT_ASSERT((no == tag.Size()));
                 }
+                psecsubchild = psecsubchild->NextSibling();
             }
         } else if ((tagname == CALIB_SENSOR_AF_LASER_AF)
                    && (tag.isType(XmlTag::TAG_TYPE_STRUCT))
@@ -9161,19 +9255,20 @@ bool RkAiqCalibParser::parseEntrySensorAf
                 if (secsubTagname == CALIB_SENSOR_AF_LASERAF_ENABLE
                         && (secsubtag.isType(XmlTag::TAG_TYPE_DOUBLE))
                         && (secsubtag.Size() > 0)) {
-                    int no = ParseUcharArray(pchild, &mCalibDb->af.laser_af.enable, tag.Size());
+                    int no = ParseUcharArray(psecsubchild, &mCalibDb->af.laser_af.enable, tag.Size());
                     DCT_ASSERT((no == tag.Size()));
                 } else if (secsubTagname == CALIB_SENSOR_AF_LASER_AF_VCMDOT
                            && (secsubtag.isType(XmlTag::TAG_TYPE_CHAR))
                            && (secsubtag.Size() > 0)) {
-                    int no = ParseFloatArray(pchild, mCalibDb->af.laser_af.vcmDot, tag.Size());
+                    int no = ParseFloatArray(psecsubchild, mCalibDb->af.laser_af.vcmDot, tag.Size());
                     DCT_ASSERT((no == tag.Size()));
                 } else if (secsubTagname == CALIB_SENSOR_AF_LASER_AF_DISTANCEDOT
                            && (secsubtag.isType(XmlTag::TAG_TYPE_DOUBLE))
                            && (secsubtag.Size() > 0)) {
-                    int no = ParseFloatArray(pchild, mCalibDb->af.laser_af.distanceDot, tag.Size());
+                    int no = ParseFloatArray(psecsubchild, mCalibDb->af.laser_af.distanceDot, tag.Size());
                     DCT_ASSERT((no == tag.Size()));
                 }
+                psecsubchild = psecsubchild->NextSibling();
             }
         } else if ((tagname == CALIB_SENSOR_AF_PDAF)
                    && (tag.isType(XmlTag::TAG_TYPE_STRUCT))
@@ -9185,9 +9280,10 @@ bool RkAiqCalibParser::parseEntrySensorAf
                 if (secsubTagname == CALIB_SENSOR_AF_PDAF_ENABLE
                         && (secsubtag.isType(XmlTag::TAG_TYPE_DOUBLE))
                         && (secsubtag.Size() > 0)) {
-                    int no = ParseUcharArray(pchild, &mCalibDb->af.pdaf.enable, tag.Size());
+                    int no = ParseUcharArray(psecsubchild, &mCalibDb->af.pdaf.enable, tag.Size());
                     DCT_ASSERT((no == tag.Size()));
                 }
+                psecsubchild = psecsubchild->NextSibling();
             }
         }
         pchild = pchild->NextSibling();
@@ -9202,13 +9298,53 @@ bool RkAiqCalibParser::parseEntrySystem
     const XMLElement*   pelement,
     void*                param
 ) {
-    LOGD("%s(%d): (enter)\n", __FUNCTION__, __LINE__);
+    LOGD( "%s(%d): (enter)\n", __FUNCTION__, __LINE__);
     autoTabForward();
+    const XMLNode* pchild = pelement->FirstChild();
+    while (pchild) {
+        XmlTag tag = XmlTag(pchild->ToElement());
+        std::string tagname(pchild->ToElement()->Name());
+        if (tagname == CALIB_SYSTEM_HDR) {
+            const XMLNode* psecsubchild = pchild->ToElement()->FirstChild();
+            while (psecsubchild) {
+                XmlTag subTag = XmlTag(psecsubchild->ToElement());
+                const char* value = subTag.Value();
+                std::string subTagname(psecsubchild->ToElement()->Name());
+                if ((subTagname == CALIB_SYSTEM_HDR_ENABLE)
+                        && (subTag.isType(XmlTag::TAG_TYPE_DOUBLE))
+                        && (subTag.Size() > 0)) {
+                    INFO_PRINT(tagname);
+                    int no = ParseUcharArray(psecsubchild, &mCalibDb->sysContrl.hdr_en, subTag.Size());
+                    DCT_ASSERT((no == subTag.Size()));
+                } else if (subTagname == CALIB_SYSTEM_HDR_SUPPORT_MODE) {
+                    INFO_PRINT(tagname);
+                    char hdr_mode[32];
+                    ParseString(psecsubchild, hdr_mode, sizeof(hdr_mode));
+                    if (0 == strcasecmp(hdr_mode, HDR_MODE_2_FRAME_STR))
+                        mCalibDb->sysContrl.hdr_mode = RK_AIQ_ISP_HDR_MODE_2_FRAME_HDR;
+                    else if (0 == strcasecmp(hdr_mode, HDR_MODE_2_LINE_STR))
+                        mCalibDb->sysContrl.hdr_mode = RK_AIQ_ISP_HDR_MODE_2_LINE_HDR;
+                    else if (0 == strcasecmp(hdr_mode, HDR_MODE_3_FRAME_STR))
+                        mCalibDb->sysContrl.hdr_mode = RK_AIQ_ISP_HDR_MODE_3_FRAME_HDR;
+                    else if (0 == strcasecmp(hdr_mode, HDR_MODE_3_LINE_STR))
+                        mCalibDb->sysContrl.hdr_mode = RK_AIQ_ISP_HDR_MODE_3_LINE_HDR;
+                } else if (subTagname == CALIB_SYSTEM_HDR_LINE_MODE) {
+                    INFO_PRINT(tagname);
+                    char line_mode[16];
+                    ParseString(psecsubchild, line_mode, sizeof(line_mode));
+                    if (0 == strcasecmp(line_mode, HDR_LINE_MODE_DCG_STR))
+                        mCalibDb->sysContrl.line_mode = RK_AIQ_SENSOR_HDR_LINE_MODE_DCG;
+                    else if (0 == strcasecmp(line_mode, HDR_LINE_MODE_STAGGER_STR))
+                        mCalibDb->sysContrl.line_mode = RK_AIQ_SENSOR_HDR_LINE_MODE_STAGGER;
+                }
+                psecsubchild = psecsubchild->NextSibling();
+            }
+        }
+        pchild = pchild->NextSibling();
+    }
 
-
-    (void)param;
-    LOGD("%s(%d): (exit)\n", __FUNCTION__, __LINE__);
     autoTabBackward();
+    LOGD( "%s(%d): (exit)\n", __FUNCTION__, __LINE__);
     return (true);
 }
 

@@ -296,10 +296,8 @@ static XCamReturn CamCalibDbGetCcmProfileByName(const CalibDb_Ccm_t *calibCcm, c
 }
 
 
-/******************************************************************************
- * AwbAccmProcessFrame()
- *****************************************************************************/
-XCamReturn AccmConfig
+
+XCamReturn AccmAutoConfig
 (
     accm_handle_t hAccm
 ) {
@@ -386,75 +384,177 @@ XCamReturn AccmConfig
 
    // 7 set to ic  to do bit check
 
-    hAccm->ccmHwConf.ccmEnable = hAccm->calibCcm->enable;
+    //hAccm->ccmHwConf.ccmEnable = hAccm->calibCcm->enable;
     memcpy(hAccm->ccmHwConf.matrix,&hAccm->accmRest.dampedCcmMatrix,sizeof(Cam3x3FloatMatrix_t));
     memcpy(hAccm->ccmHwConf.offs,&hAccm->accmRest.dampedCcOffset,sizeof(Cam1x3FloatMatrix_t));
     for(int i=0; i<CCM_CURVE_DOT_NUM;i++){
         hAccm->ccmHwConf.alp_y[i] = fScale * hAccm->calibCcm->luma_ccm.y_alpha_curve[i];
     }
-    hAccm->ccmHwConf.bound_bit = hAccm->calibCcm->luma_ccm.low_bound_pos_bit;
-    memcpy( hAccm->ccmHwConf.rgb2y_para,hAccm->calibCcm->luma_ccm.rgb2y_para,
-        sizeof(hAccm->calibCcm->luma_ccm.rgb2y_para));
-
-   LOGD_ACCM( " set to ic ccmEnable :%d  bound_bit:%f\n",hAccm->ccmHwConf.ccmEnable,hAccm->ccmHwConf.bound_bit);
-
-   LOGD_ACCM( " set to ic CcmMatrix: %f,%f,%f,%f,%f,%f,%f,%f,%f  CcOffset:%f,%f,%f  \n",
-        hAccm->ccmHwConf.matrix[0],
-        hAccm->ccmHwConf.matrix[1],
-        hAccm->ccmHwConf.matrix[2],
-        hAccm->ccmHwConf.matrix[3],
-        hAccm->ccmHwConf.matrix[4],
-        hAccm->ccmHwConf.matrix[5],
-        hAccm->ccmHwConf.matrix[6],
-        hAccm->ccmHwConf.matrix[7],
-        hAccm->ccmHwConf.matrix[8],
-        hAccm->ccmHwConf.offs[0],
-        hAccm->ccmHwConf.offs[1],
-        hAccm->ccmHwConf.offs[2]
-   );
-
-   LOGD_ACCM( " set to ic rgb2y_para: %f,%f,%f\n",
-         hAccm->ccmHwConf.rgb2y_para[0],
-         hAccm->ccmHwConf.rgb2y_para[1],
-         hAccm->ccmHwConf.rgb2y_para[2]
-
-    );
-
-   LOGD_ACCM( " set to ic alp_y: %f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f  \n",
-         hAccm->ccmHwConf.alp_y[0],
-         hAccm->ccmHwConf.alp_y[1],
-         hAccm->ccmHwConf.alp_y[2],
-         hAccm->ccmHwConf.alp_y[3],
-         hAccm->ccmHwConf.alp_y[4],
-         hAccm->ccmHwConf.alp_y[5],
-         hAccm->ccmHwConf.alp_y[6],
-         hAccm->ccmHwConf.alp_y[7],
-         hAccm->ccmHwConf.alp_y[8],
-         hAccm->ccmHwConf.alp_y[9],
-         hAccm->ccmHwConf.alp_y[10],
-         hAccm->ccmHwConf.alp_y[11],
-         hAccm->ccmHwConf.alp_y[12],
-         hAccm->ccmHwConf.alp_y[13],
-         hAccm->ccmHwConf.alp_y[14],
-         hAccm->ccmHwConf.alp_y[15],
-         hAccm->ccmHwConf.alp_y[16]
-    );
 
 
-    hAccm->count = ((hAccm->count+2) >(65536))? 2 : (hAccm->count+1);
     LOGI_ACCM("%s: (exit)\n", __FUNCTION__);
 
     return (ret);
 }
 
+XCamReturn AccmManualConfig
+(
+    accm_handle_t hAccm
+){
+    LOGI_ACCM("%s: (enter)\n", __FUNCTION__);
 
-XCamReturn AccmInit(accm_handle_t *hAccm)
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+
+    memcpy(hAccm->ccmHwConf.matrix,hAccm->mCurAtt.stManual.matrix,sizeof(hAccm->mCurAtt.stManual.matrix));
+    memcpy(hAccm->ccmHwConf.offs,hAccm->mCurAtt.stManual.offs,sizeof(hAccm->mCurAtt.stManual.offs));
+    memcpy(hAccm->ccmHwConf.alp_y,hAccm->mCurAtt.stManual.alp_y,sizeof(hAccm->mCurAtt.stManual.alp_y));
+
+    LOGI_ACCM("%s: (exit)\n", __FUNCTION__);
+    return ret;
+
+}
+
+XCamReturn AccmConfig
+(
+    accm_handle_t hAccm
+){
+    LOGI_ACCM("%s: (enter)\n", __FUNCTION__);
+
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+
+    LOGD_ACCM("%s: updateAtt: %d\n", __FUNCTION__,hAccm->updateAtt);
+    if(hAccm->updateAtt){
+        hAccm->mCurAtt = hAccm->mNewAtt;
+    }
+    LOGD_ACCM("%s: byPass: %d  mode:%d \n", __FUNCTION__,hAccm->mCurAtt.byPass,hAccm->mCurAtt.mode);
+    if(hAccm->mCurAtt.byPass != true){
+         hAccm->ccmHwConf.ccmEnable = true;
+        if(hAccm->mCurAtt.mode == RK_AIQ_CCM_MODE_AUTO){
+            AccmAutoConfig(hAccm);
+        }else if(hAccm->mCurAtt.mode == RK_AIQ_CCM_MODE_MANUAL){
+            AccmManualConfig(hAccm);
+        }else{
+            LOGE_ACCM("%s: hAccm->mCurAtt.mode(%d) is invalid \n", __FUNCTION__,hAccm->mCurAtt.mode);
+        }
+        memcpy(hAccm->mCurAtt.stManual.matrix,hAccm->ccmHwConf.matrix,sizeof(hAccm->ccmHwConf.matrix));
+        memcpy(hAccm->mCurAtt.stManual.offs,hAccm->ccmHwConf.offs,sizeof(hAccm->ccmHwConf.offs));
+        memcpy(hAccm->mCurAtt.stManual.alp_y,hAccm->ccmHwConf.alp_y,sizeof(hAccm->ccmHwConf.alp_y));
+
+    }else{
+        hAccm->ccmHwConf.ccmEnable = false;
+    }
+
+    LOGD_ACCM( " set to ic ccmEnable :%d  bound_bit:%f\n",hAccm->ccmHwConf.ccmEnable,hAccm->ccmHwConf.bound_bit);
+
+    LOGD_ACCM( " set to ic CcmMatrix: %f,%f,%f,%f,%f,%f,%f,%f,%f  CcOffset:%f,%f,%f  \n",
+         hAccm->ccmHwConf.matrix[0],
+         hAccm->ccmHwConf.matrix[1],
+         hAccm->ccmHwConf.matrix[2],
+         hAccm->ccmHwConf.matrix[3],
+         hAccm->ccmHwConf.matrix[4],
+         hAccm->ccmHwConf.matrix[5],
+         hAccm->ccmHwConf.matrix[6],
+         hAccm->ccmHwConf.matrix[7],
+         hAccm->ccmHwConf.matrix[8],
+         hAccm->ccmHwConf.offs[0],
+         hAccm->ccmHwConf.offs[1],
+         hAccm->ccmHwConf.offs[2]
+    );
+
+    LOGD_ACCM( " set to ic rgb2y_para: %f,%f,%f\n",
+          hAccm->ccmHwConf.rgb2y_para[0],
+          hAccm->ccmHwConf.rgb2y_para[1],
+          hAccm->ccmHwConf.rgb2y_para[2]
+
+     );
+
+    LOGD_ACCM( " set to ic alp_y: %f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f  \n",
+          hAccm->ccmHwConf.alp_y[0],
+          hAccm->ccmHwConf.alp_y[1],
+          hAccm->ccmHwConf.alp_y[2],
+          hAccm->ccmHwConf.alp_y[3],
+          hAccm->ccmHwConf.alp_y[4],
+          hAccm->ccmHwConf.alp_y[5],
+          hAccm->ccmHwConf.alp_y[6],
+          hAccm->ccmHwConf.alp_y[7],
+          hAccm->ccmHwConf.alp_y[8],
+          hAccm->ccmHwConf.alp_y[9],
+          hAccm->ccmHwConf.alp_y[10],
+          hAccm->ccmHwConf.alp_y[11],
+          hAccm->ccmHwConf.alp_y[12],
+          hAccm->ccmHwConf.alp_y[13],
+          hAccm->ccmHwConf.alp_y[14],
+          hAccm->ccmHwConf.alp_y[15],
+          hAccm->ccmHwConf.alp_y[16]
+     );
+
+
+     hAccm->count = ((hAccm->count+2) >(65536))? 2 : (hAccm->count+1);
+
+    LOGI_ACCM("%s: (exit)\n", __FUNCTION__);
+    return ret;
+
+}
+
+
+XCamReturn AccmInit(accm_handle_t *hAccm,const CamCalibDbContext_t* calib)
 {
     LOGI_ACCM("%s: (enter)\n", __FUNCTION__);
 
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
     *hAccm = (accm_context_t*)malloc(sizeof(accm_context_t));
-    (*hAccm)->accmSwInfo.sensorGain=1.0;
+    accm_context_t* accm_context = *hAccm;
+    memset(accm_context, 0 ,sizeof(accm_context_t));
+
+    if(calib == NULL) {
+        return XCAM_RETURN_ERROR_FAILED;
+    }
+    const CalibDb_Ccm_t *calib_ccm = &calib->ccm;
+    accm_context->calibCcm= calib_ccm;
+    accm_context->accmSwInfo.sensorGain=1.0;
+
+    LOGI_ACCM("%s: accm illunum:%d", __FUNCTION__, calib_ccm->aCcmCof.illuNum);
+    // 1) gtet and reorder para
+    for(int i = 0; i < calib_ccm->aCcmCof.illuNum; i++) {
+            for (int j = 0; j < calib_ccm->aCcmCof.illAll[i].matrixUsedNO; j++) {
+                char name[CCM_PROFILE_NAME];
+                sprintf(name,"%s", calib_ccm->aCcmCof.illAll[i].matrixUsed[j]);
+                const CalibDb_CcmMatrixProfile_t* pCcmMatrixProfile = NULL;
+                // get a ccm-profile from database
+                ret = CamCalibDbGetCcmProfileByName(calib_ccm, name, &pCcmMatrixProfile);
+                RETURN_RESULT_IF_DIFFERENT(ret, XCAM_RETURN_NO_ERROR);
+                // store ccm-profile in pointer array
+                accm_context->pCcmMatrixAll[i][j] = pCcmMatrixProfile;
+                LOGD_ACCM("CCM name  %s coef:%f,%f,%f  %f,%f,%f  %f,%f,%f  \n",name,
+                    accm_context->pCcmMatrixAll[i][j]->CrossTalkCoeff.fCoeff[0],
+                    accm_context->pCcmMatrixAll[i][j]->CrossTalkCoeff.fCoeff[1],
+                    accm_context->pCcmMatrixAll[i][j]->CrossTalkCoeff.fCoeff[2],
+                    accm_context->pCcmMatrixAll[i][j]->CrossTalkCoeff.fCoeff[3],
+                    accm_context->pCcmMatrixAll[i][j]->CrossTalkCoeff.fCoeff[4],
+                    accm_context->pCcmMatrixAll[i][j]->CrossTalkCoeff.fCoeff[5],
+                    accm_context->pCcmMatrixAll[i][j]->CrossTalkCoeff.fCoeff[6],
+                    accm_context->pCcmMatrixAll[i][j]->CrossTalkCoeff.fCoeff[7],
+                    accm_context->pCcmMatrixAll[i][j]->CrossTalkCoeff.fCoeff[8]);
+                LOGD_ACCM("CCM name  %s off:%f,%f,%f  \n",name,
+                    accm_context->pCcmMatrixAll[i][j]->CrossTalkOffset.fCoeff[0],
+                    accm_context->pCcmMatrixAll[i][j]->CrossTalkOffset.fCoeff[1],
+                    accm_context->pCcmMatrixAll[i][j]->CrossTalkOffset.fCoeff[2]);
+
+            }
+            // order ccm-profiles by saturation
+            ret = AwbOrderCcmProfilesBySaturation(accm_context->pCcmMatrixAll[i],
+            calib_ccm->aCcmCof.illAll[i].matrixUsedNO);
+            //RETURN_RESULT_IF_DIFFERENT(result, XCAM_RETURN_NO_ERROR);
+
+    }
+    accm_context->count = 0;
+
+    accm_context->ccmHwConf.bound_bit = accm_context->calibCcm->luma_ccm.low_bound_pos_bit;
+    memcpy( accm_context->ccmHwConf.rgb2y_para,accm_context->calibCcm->luma_ccm.rgb2y_para,
+        sizeof(accm_context->calibCcm->luma_ccm.rgb2y_para));
+
+    accm_context->mCurAtt.byPass = !(calib_ccm->enable);
+    accm_context->mCurAtt.mode = RK_AIQ_CCM_MODE_AUTO;
 
     LOGI_ACCM("%s: (exit)\n", __FUNCTION__);
     return(ret);
@@ -479,42 +579,7 @@ XCamReturn AccmPrepare(accm_handle_t hAccm)
     LOGI_ACCM("%s: (enter)\n", __FUNCTION__);
 
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
-    LOGI_ACCM("%s: accm illunum:%d", __FUNCTION__, hAccm->calibCcm->aCcmCof.illuNum);
-    // 1) gtet and reorder para
-    const CalibDb_Ccm_t *pAccmProfile = hAccm->calibCcm;
-    for(int i = 0; i < pAccmProfile->aCcmCof.illuNum; i++) {
-            for (int j = 0; j < pAccmProfile->aCcmCof.illAll[i].matrixUsedNO; j++) {
-                char name[CCM_PROFILE_NAME];
-                sprintf(name,"%s", pAccmProfile->aCcmCof.illAll[i].matrixUsed[j]);
-                const CalibDb_CcmMatrixProfile_t* pCcmMatrixProfile = NULL;
-                // get a ccm-profile from database
-                ret = CamCalibDbGetCcmProfileByName(pAccmProfile, name, &pCcmMatrixProfile);
-                RETURN_RESULT_IF_DIFFERENT(ret, XCAM_RETURN_NO_ERROR);
-                // store ccm-profile in pointer array
-                hAccm->pCcmMatrixAll[i][j] = pCcmMatrixProfile;
-                LOGD_ACCM("CCM name  %s coef:%f,%f,%f  %f,%f,%f  %f,%f,%f  \n",name,
-                    hAccm->pCcmMatrixAll[i][j]->CrossTalkCoeff.fCoeff[0],
-                    hAccm->pCcmMatrixAll[i][j]->CrossTalkCoeff.fCoeff[1],
-                    hAccm->pCcmMatrixAll[i][j]->CrossTalkCoeff.fCoeff[2],
-                    hAccm->pCcmMatrixAll[i][j]->CrossTalkCoeff.fCoeff[3],
-                    hAccm->pCcmMatrixAll[i][j]->CrossTalkCoeff.fCoeff[4],
-                    hAccm->pCcmMatrixAll[i][j]->CrossTalkCoeff.fCoeff[5],
-                    hAccm->pCcmMatrixAll[i][j]->CrossTalkCoeff.fCoeff[6],
-                    hAccm->pCcmMatrixAll[i][j]->CrossTalkCoeff.fCoeff[7],
-                    hAccm->pCcmMatrixAll[i][j]->CrossTalkCoeff.fCoeff[8]);
-                LOGD_ACCM("CCM name  %s off:%f,%f,%f  \n",name,
-                    hAccm->pCcmMatrixAll[i][j]->CrossTalkOffset.fCoeff[0],
-                    hAccm->pCcmMatrixAll[i][j]->CrossTalkOffset.fCoeff[1],
-                    hAccm->pCcmMatrixAll[i][j]->CrossTalkOffset.fCoeff[2]);
 
-            }
-            // order ccm-profiles by saturation
-            ret = AwbOrderCcmProfilesBySaturation(hAccm->pCcmMatrixAll[i],
-            hAccm->calibCcm->aCcmCof.illAll[i].matrixUsedNO);
-            //RETURN_RESULT_IF_DIFFERENT(result, XCAM_RETURN_NO_ERROR);
-
-    }
-    hAccm->count = 0;
 
     LOGI_ACCM("%s: (exit)\n", __FUNCTION__);
     return ret;

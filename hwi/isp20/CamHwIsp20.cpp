@@ -17,19 +17,529 @@
 
 #include "CamHwIsp20.h"
 #include "Isp20PollThread.h"
-#include "SensorHw.h"
 #include "rk_isp20_hw.h"
+#include "mediactl/mediactl-priv.h"
+#include <linux/v4l2-subdev.h>
 
 namespace RkCam {
+std::map<std::string, SmartPtr<rk_aiq_static_info_t>> CamHwIsp20::mCamHwInfos;
+std::map<std::string, SmartPtr<rk_sensor_full_info_t>> CamHwIsp20::mSensorHwInfos;
+rk_aiq_isp_hw_info_t CamHwIsp20::mIspHwInfos;
 
 CamHwIsp20::CamHwIsp20()
     : _is_exit(false)
     , _first(true)
+    , _hdr_mode(0)
 {}
 
 CamHwIsp20::~CamHwIsp20()
 {}
 
+static XCamReturn get_isp_ver(rk_aiq_isp_hw_info_t *hw_info) {
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    struct v4l2_capability cap;
+    V4l2Device vdev(hw_info->isp_info[0].stats_path);
+
+
+    ret = vdev.open();
+    if (ret != XCAM_RETURN_NO_ERROR) {
+        LOGE("failed to open dev (%s)", hw_info->isp_info[0].stats_path);
+        return XCAM_RETURN_ERROR_FAILED;
+    }
+
+    if (vdev.query_cap(cap) == XCAM_RETURN_NO_ERROR) {
+        char *p;
+        p = strrchr((char*)cap.driver, '_');
+        if (p == NULL) {
+            ret = XCAM_RETURN_ERROR_FAILED;
+            goto out;
+        }
+
+        if (*(p + 1) != 'v') {
+            ret = XCAM_RETURN_ERROR_FAILED;
+            goto out;
+        }
+
+        hw_info->hw_ver_info.isp_ver = atoi(p + 2);
+        //awb/aec version?
+        vdev.close();
+        return XCAM_RETURN_NO_ERROR;
+    } else {
+        ret = XCAM_RETURN_ERROR_FAILED;
+        goto out;
+    }
+
+out:
+    vdev.close();
+    LOGE("get isp version failed !");
+    return ret;
+}
+
+static XCamReturn get_sensor_caps(rk_sensor_full_info_t *sensor_info) {
+    struct v4l2_subdev_frame_size_enum fsize_enum;
+    struct v4l2_subdev_mbus_code_enum  code_enum;
+    std::vector<uint32_t> formats;
+    rk_frame_fmt_t frameSize;
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+
+    V4l2SubDevice vdev(sensor_info->device_name.c_str());
+    ret = vdev.open();
+    if (ret != XCAM_RETURN_NO_ERROR) {
+        LOGE("failed to open dev (%s)", sensor_info->device_name.c_str());
+        return XCAM_RETURN_ERROR_FAILED;
+    }
+    //get module info
+    struct rkmodule_inf *minfo = &(sensor_info->mod_info);
+    if(vdev.io_control(RKMODULE_GET_MODULE_INFO, minfo) < 0) {
+        LOGE("@%s %s: Get sensor module info failed", __FUNCTION__, sensor_info->device_name);
+        return XCAM_RETURN_ERROR_FAILED;
+    }
+    memset(&code_enum, 0, sizeof(code_enum));
+    while (vdev.io_control(VIDIOC_SUBDEV_ENUM_MBUS_CODE, &code_enum) == 0) {
+        formats.push_back(code_enum.code);
+        code_enum.index++;
+    };
+
+    for (auto it = formats.begin(); it != formats.end(); ++it) {
+        fsize_enum.pad = 0;
+        fsize_enum.index = 0;
+        fsize_enum.code = *it;
+        while (vdev.io_control(VIDIOC_SUBDEV_ENUM_FRAME_SIZE, &fsize_enum) == 0) {
+            frameSize.format = (rk_aiq_format_t)fsize_enum.code;
+            frameSize.width = fsize_enum.max_width;
+            frameSize.height = fsize_enum.max_height;
+            sensor_info->frame_size.push_back(frameSize);
+            fsize_enum.index++;
+        };
+    }
+    if(!formats.size() || !sensor_info->frame_size.size()) {
+        LOGE("@%s %s: Enum sensor frame size failed", __FUNCTION__, sensor_info->device_name);
+        ret = XCAM_RETURN_ERROR_FAILED;
+    }
+    vdev.close();
+
+    return ret;
+}
+
+static XCamReturn
+parse_module_info(rk_sensor_full_info_t *sensor_info)
+{
+    // sensor entity name format SHOULD be like this:
+    // m00_b_ov13850 1-0010
+    std::string entity_name(sensor_info->sensor_name);
+
+    if (entity_name.empty())
+        return XCAM_RETURN_ERROR_SENSOR;
+
+    int parse_index = 0;
+
+    if (entity_name.at(parse_index) != 'm') {
+        LOGE("%d:parse sensor entity name %s error at %d, please check sensor driver !",
+             __LINE__, entity_name.c_str(), parse_index);
+        return XCAM_RETURN_ERROR_SENSOR;
+    }
+
+    std::string index_str = entity_name.substr (parse_index, 3);
+    sensor_info->module_index_str = index_str;
+
+    parse_index += 3;
+
+    if (entity_name.at(parse_index) != '_') {
+        LOGE("%d:parse sensor entity name %s error at %d, please check sensor driver !",
+             __LINE__, entity_name.c_str(), parse_index);
+        return XCAM_RETURN_ERROR_SENSOR;
+    }
+
+    parse_index++;
+
+    if (entity_name.at(parse_index) != 'b' &&
+            entity_name.at(parse_index) != 'f') {
+        LOGE("%d:parse sensor entity name %s error at %d, please check sensor driver !",
+             __LINE__, entity_name.c_str(), parse_index);
+        return XCAM_RETURN_ERROR_SENSOR;
+    }
+    sensor_info->phy_module_orient = entity_name.at(parse_index);
+
+    parse_index++;
+
+    if (entity_name.at(parse_index) != '_') {
+        LOGE("%d:parse sensor entity name %s error at %d, please check sensor driver !",
+             __LINE__, entity_name.c_str(), parse_index);
+        return XCAM_RETURN_ERROR_SENSOR;
+    }
+
+    parse_index++;
+
+    std::size_t real_name_end = std::string::npos;
+    if ((real_name_end = entity_name.find(' ')) == std::string::npos) {
+        LOGE("%d:parse sensor entity name %s error at %d, please check sensor driver !",
+             __LINE__, entity_name.c_str(), parse_index);
+        return XCAM_RETURN_ERROR_SENSOR;
+    }
+
+    std::string real_name_str = entity_name.substr(parse_index, real_name_end - parse_index);
+    sensor_info->module_real_sensor_name = real_name_str;
+
+    LOGD("%s:%d, real sensor name %s, module ori %c, module id %s",
+         __FUNCTION__, __LINE__, sensor_info->module_real_sensor_name.c_str(),
+         sensor_info->phy_module_orient, sensor_info->module_index_str.c_str());
+
+    return XCAM_RETURN_NO_ERROR;
+}
+
+static XCamReturn
+get_ispp_subdevs(struct media_device *device, const char *devpath, rk_aiq_ispp_t* ispp_info)
+{
+    media_entity *entity = NULL;
+    const char *entity_name = NULL;
+
+    if(!device || !ispp_info || !devpath)
+        return XCAM_RETURN_ERROR_SENSOR;
+
+    strncpy(ispp_info->media_dev_path, devpath, sizeof(ispp_info->media_dev_path));
+
+    entity = media_get_entity_by_name(device, "rkispp_input_image", strlen("rkispp_input_image"));
+    if(entity) {
+        entity_name = media_entity_get_devname (entity);
+        if(entity_name) {
+            strncpy(ispp_info->pp_input_image_path, entity_name, sizeof(ispp_info->pp_input_image_path));
+        }
+    }
+    entity = media_get_entity_by_name(device, "rkispp_m_bypass", strlen("rkispp_m_bypass"));
+    if(entity) {
+        entity_name = media_entity_get_devname (entity);
+        if(entity_name) {
+            strncpy(ispp_info->pp_m_bypass_path, entity_name, sizeof(ispp_info->pp_m_bypass_path));
+        }
+    }
+    entity = media_get_entity_by_name(device, "rkispp_scale0", strlen("rkispp_scale0"));
+    if(entity) {
+        entity_name = media_entity_get_devname (entity);
+        if(entity_name) {
+            strncpy(ispp_info->pp_scale0_path, entity_name, sizeof(ispp_info->pp_scale0_path));
+        }
+    }
+    entity = media_get_entity_by_name(device, "rkispp_scale1", strlen("rkispp_scale1"));
+    if(entity) {
+        entity_name = media_entity_get_devname (entity);
+        if(entity_name) {
+            strncpy(ispp_info->pp_scale1_path, entity_name, sizeof(ispp_info->pp_scale1_path));
+        }
+    }
+    entity = media_get_entity_by_name(device, "rkispp_scale2", strlen("rkispp_scale2"));
+    if(entity) {
+        entity_name = media_entity_get_devname (entity);
+        if(entity_name) {
+            strncpy(ispp_info->pp_scale2_path, entity_name, sizeof(ispp_info->pp_scale2_path));
+        }
+    }
+    entity = media_get_entity_by_name(device, "rkispp_input_params", strlen("rkispp_input_params"));
+    if(entity) {
+        entity_name = media_entity_get_devname (entity);
+        if(entity_name) {
+            strncpy(ispp_info->pp_input_params_path, entity_name, sizeof(ispp_info->pp_input_params_path));
+        }
+    }
+    entity = media_get_entity_by_name(device, "rkispp-stats", strlen("rkispp-stats"));
+    if(entity) {
+        entity_name = media_entity_get_devname (entity);
+        if(entity_name) {
+            strncpy(ispp_info->pp_stats_path, entity_name, sizeof(ispp_info->pp_stats_path));
+        }
+    }
+    entity = media_get_entity_by_name(device, "rkispp-subdev", strlen("rkispp-subdev"));
+    if(entity) {
+        entity_name = media_entity_get_devname (entity);
+        if(entity_name) {
+            strncpy(ispp_info->pp_dev_path, entity_name, sizeof(ispp_info->pp_dev_path));
+        }
+    }
+
+    return XCAM_RETURN_NO_ERROR;
+
+}
+
+static rk_aiq_isp_t*
+get_isp_subdevs(struct media_device *device, const char *devpath, rk_aiq_isp_t* isp_info)
+{
+    media_entity *entity = NULL;
+    const char *entity_name = NULL;
+    int index = 0;
+    if(!device || !isp_info || !devpath)
+        return NULL;
+
+    for(index = 0; index < 2; index++) {
+        if (0 == strlen(isp_info[index].media_dev_path))
+            break;
+        if (0 == strncmp(isp_info[index].media_dev_path, devpath, sizeof(isp_info[index].media_dev_path))) {
+            LOGD("isp info of path %s exists!", devpath);
+            return &isp_info[index];
+        }
+    }
+    if (index >= 2)
+        return NULL;
+    strncpy(isp_info[index].media_dev_path, devpath, sizeof(isp_info[index].media_dev_path));
+
+    entity = media_get_entity_by_name(device, "rkisp-isp-subdev", strlen("rkisp-isp-subdev"));
+    if(entity) {
+        entity_name = media_entity_get_devname (entity);
+        if(entity_name) {
+            strncpy(isp_info[index].isp_dev_path, entity_name, sizeof(isp_info[index].isp_dev_path));
+        }
+    }
+
+    entity = media_get_entity_by_name(device, "rkisp-csi-subdev", strlen("rkisp-csi-subdev"));
+    if(entity) {
+        entity_name = media_entity_get_devname (entity);
+        if(entity_name) {
+            strncpy(isp_info[index].csi_dev_path, entity_name, sizeof(isp_info[index].csi_dev_path));
+        }
+    }
+    entity = media_get_entity_by_name(device, "rkisp-mpfbc-subdev", strlen("rkisp-mpfbc-subdev"));
+    if(entity) {
+        entity_name = media_entity_get_devname (entity);
+        if(entity_name) {
+            strncpy(isp_info[index].mpfbc_dev_path, entity_name, sizeof(isp_info[index].mpfbc_dev_path));
+        }
+    }
+    entity = media_get_entity_by_name(device, "rkisp_mainpath", strlen("rkisp_mainpath"));
+    if(entity) {
+        entity_name = media_entity_get_devname (entity);
+        if(entity_name) {
+            strncpy(isp_info[index].main_path, entity_name, sizeof(isp_info[index].main_path));
+        }
+    }
+    entity = media_get_entity_by_name(device, "rkisp_selfpath", strlen("rkisp_selfpath"));
+    if(entity) {
+        entity_name = media_entity_get_devname (entity);
+        if(entity_name) {
+            strncpy(isp_info[index].self_path, entity_name, sizeof(isp_info[index].self_path));
+        }
+    }
+    entity = media_get_entity_by_name(device, "rkisp_rawwr0", strlen("rkisp_rawwr0"));
+    if(entity) {
+        entity_name = media_entity_get_devname (entity);
+        if(entity_name) {
+            strncpy(isp_info[index].rawwr0_path, entity_name, sizeof(isp_info[index].rawwr0_path));
+        }
+    }
+    entity = media_get_entity_by_name(device, "rkisp_rawwr1", strlen("rkisp_rawwr1"));
+    if(entity) {
+        entity_name = media_entity_get_devname (entity);
+        if(entity_name) {
+            strncpy(isp_info[index].rawwr1_path, entity_name, sizeof(isp_info[index].rawwr1_path));
+        }
+    }
+    entity = media_get_entity_by_name(device, "rkisp_rawwr2", strlen("rkisp_rawwr2"));
+    if(entity) {
+        entity_name = media_entity_get_devname (entity);
+        if(entity_name) {
+            strncpy(isp_info[index].rawwr2_path, entity_name, sizeof(isp_info[index].rawwr2_path));
+        }
+    }
+    entity = media_get_entity_by_name(device, "rkisp_rawwr3", strlen("rkisp_rawwr3"));
+    if(entity) {
+        entity_name = media_entity_get_devname (entity);
+        if(entity_name) {
+            strncpy(isp_info[index].rawwr3_path, entity_name, sizeof(isp_info[index].rawwr3_path));
+        }
+    }
+    entity = media_get_entity_by_name(device, "rkisp_dmapath", strlen("rkisp_dmapath"));
+    if(entity) {
+        entity_name = media_entity_get_devname (entity);
+        if(entity_name) {
+            strncpy(isp_info[index].dma_path, entity_name, sizeof(isp_info[index].dma_path));
+        }
+    }
+    entity = media_get_entity_by_name(device, "rkisp_rawrd0_m", strlen("rkisp_rawrd0_m"));
+    if(entity) {
+        entity_name = media_entity_get_devname (entity);
+        if(entity_name) {
+            strncpy(isp_info[index].rawrd0_m_path, entity_name, sizeof(isp_info[index].rawrd0_m_path));
+        }
+    }
+    entity = media_get_entity_by_name(device, "rkisp_rawrd1_l", strlen("rkisp_rawrd1_l"));
+    if(entity) {
+        entity_name = media_entity_get_devname (entity);
+        if(entity_name) {
+            strncpy(isp_info[index].rawrd1_l_path, entity_name, sizeof(isp_info[index].rawrd1_l_path));
+        }
+    }
+    entity = media_get_entity_by_name(device, "rkisp_rawrd2_s", strlen("rkisp_rawrd2_s"));
+    if(entity) {
+        entity_name = media_entity_get_devname (entity);
+        if(entity_name) {
+            strncpy(isp_info[index].rawrd2_s_path, entity_name, sizeof(isp_info[index].rawrd2_s_path));
+        }
+    }
+    entity = media_get_entity_by_name(device, "rkisp-statistics", strlen("rkisp-statistics"));
+    if(entity) {
+        entity_name = media_entity_get_devname (entity);
+        if(entity_name) {
+            strncpy(isp_info[index].stats_path, entity_name, sizeof(isp_info[index].stats_path));
+        }
+    }
+    entity = media_get_entity_by_name(device, "rkisp-input-params", strlen("rkisp-input-params"));
+    if(entity) {
+        entity_name = media_entity_get_devname (entity);
+        if(entity_name) {
+            strncpy(isp_info[index].input_params_path, entity_name, sizeof(isp_info[index].input_params_path));
+        }
+    }
+    entity = media_get_entity_by_name(device, "rkisp-mipi-luma", strlen("rkisp-mipi-luma"));
+    if(entity) {
+        entity_name = media_entity_get_devname (entity);
+        if(entity_name) {
+            strncpy(isp_info[index].mipi_luma_path, entity_name, sizeof(isp_info[index].mipi_luma_path));
+        }
+    }
+    entity = media_get_entity_by_name(device, "rockchip-mipi-dphy-rx", strlen("rockchip-mipi-dphy-rx"));
+    if(entity) {
+        entity_name = media_entity_get_devname (entity);
+        if(entity_name) {
+            strncpy(isp_info[index].mipi_dphy_rx_path, entity_name, sizeof(isp_info[index].mipi_dphy_rx_path));
+        }
+    }
+
+
+    return &isp_info[index];
+}
+
+static
+XCamReturn
+SensorInfoCopy(rk_sensor_full_info_t *finfo, rk_aiq_sensor_info_t *sinfo) {
+    int fs_num;
+
+    strncpy(sinfo->sensor_name, finfo->sensor_name.c_str(), sizeof(sinfo->sensor_name));
+    fs_num = finfo->frame_size.size();
+    sinfo->support_fmt = new rk_frame_fmt_t[fs_num];
+    sinfo->num = fs_num;
+    for (auto iter = finfo->frame_size.begin(); iter != finfo->frame_size.end(); ++iter) {
+        sinfo->support_fmt->width = (*iter).width;
+        sinfo->support_fmt->height = (*iter).height;
+        sinfo->support_fmt->format = (*iter).format;
+        sinfo->support_fmt++;
+    }
+    return XCAM_RETURN_NO_ERROR;
+}
+
+XCamReturn
+CamHwIsp20::selectIqFile(const char* sns_ent_name, char* iqfile_name)
+{
+    if (!sns_ent_name || !iqfile_name)
+        return XCAM_RETURN_ERROR_SENSOR;
+    std::map<std::string, SmartPtr<rk_sensor_full_info_t>>::iterator it;
+    const struct rkmodule_base_inf* base_inf = NULL;
+    const char *sensor_name, *module_name, *lens_name;
+    char sensor_name_full[32];
+    std::string str(sns_ent_name);
+
+    if ((it = CamHwIsp20::mSensorHwInfos.find(str)) == CamHwIsp20::mSensorHwInfos.end()) {
+        LOGE("can't find sensor %s", sns_ent_name);
+        return XCAM_RETURN_ERROR_SENSOR;
+    }
+    base_inf = &(it->second.ptr()->mod_info.base);
+    if (!strlen(base_inf->module) || !strlen(base_inf->sensor) ||
+        !strlen(base_inf->lens)) {
+        LOGE("no camera module info, check the drv !");
+        return XCAM_RETURN_ERROR_SENSOR;
+    }
+    sensor_name = base_inf->sensor;
+    strncpy(sensor_name_full, sensor_name, 32);
+
+    module_name = base_inf->module;
+    lens_name = base_inf->lens;
+    sprintf(iqfile_name, "%s_%s_%s.xml",
+            sensor_name_full, module_name, lens_name);
+    return XCAM_RETURN_NO_ERROR;
+}
+
+rk_aiq_static_info_t*
+CamHwIsp20::getStaticCamHwInfo(const char* sns_ent_name)
+{
+    std::map<std::string, SmartPtr<rk_aiq_static_info_t>>::iterator it;
+
+    std::string str(sns_ent_name);
+
+    it = mCamHwInfos.find(str);
+    if (it != mCamHwInfos.end()) {
+        LOGD("find camerainfo of %s!", sns_ent_name);
+        it->second.ptr();
+    } else {
+        LOGE("camerainfo of %s not fount!", sns_ent_name);
+    }
+    return NULL;
+}
+
+XCamReturn
+CamHwIsp20::clearStaticCamHwInfo()
+{
+    std::map<std::string, SmartPtr<rk_aiq_static_info_t>>::iterator it1;
+    std::map<std::string, SmartPtr<rk_sensor_full_info_t>>::iterator it2;
+
+    for (it1 = mCamHwInfos.begin(); it1 != mCamHwInfos.end(); it1++) {
+        rk_aiq_static_info_t *ptr = it1->second.ptr();
+        delete ptr;
+    }
+    for (it2 = mSensorHwInfos.begin(); it2 != mSensorHwInfos.end(); it2++) {
+        rk_sensor_full_info_t *ptr = it2->second.ptr();
+        delete ptr;
+    }
+    return XCAM_RETURN_NO_ERROR;
+}
+
+XCamReturn
+CamHwIsp20::initCamHwInfos()
+{
+    // TODO
+    // (1) all sensor info
+    // (2) all pipeline entity infos belonged to
+    //     the sensor
+
+    char sys_path[64], devpath[32];
+    FILE *fp = NULL;
+    struct media_device *device = NULL;
+    uint32_t nents, j = 0, i = 0;
+    const struct media_entity_desc *entity_info = NULL;
+    struct media_entity *entity = NULL;
+
+    while (i < MAX_MEDIA_INDEX) {
+        snprintf (sys_path, 64, "/dev/media%d", i++);
+        fp = fopen (sys_path, "r");
+        if (!fp)
+            continue;
+        fclose (fp);
+        device = media_device_new (sys_path);
+
+        /* Enumerate entities, pads and links. */
+        media_device_enumerate (device);
+
+        get_ispp_subdevs(device, sys_path, &CamHwIsp20::mIspHwInfos.ispp_info);
+
+        nents = media_get_entities_count (device);
+        for (j = 0; j < nents; ++j) {
+            entity = media_get_entity (device, j);
+            entity_info = media_entity_get_info(entity);
+            if ((NULL != entity_info) && (entity_info->type == MEDIA_ENT_T_V4L2_SUBDEV_SENSOR)) {
+                rk_aiq_static_info_t *info = new rk_aiq_static_info_t;
+                rk_sensor_full_info_t *s_full_info = new rk_sensor_full_info_t;
+                strncpy(devpath, media_entity_get_devname(entity), sizeof(devpath));
+                s_full_info->device_name = std::string(devpath);
+                s_full_info->sensor_name = std::string(entity_info->name);
+                s_full_info->parent_media_dev = std::string(sys_path);
+                parse_module_info(s_full_info);
+                get_sensor_caps(s_full_info);
+                s_full_info->isp_info = get_isp_subdevs(device, sys_path, CamHwIsp20::mIspHwInfos.isp_info);
+                SensorInfoCopy(s_full_info, &info->sensor_info);
+                CamHwIsp20::mSensorHwInfos[s_full_info->sensor_name] = s_full_info;
+                CamHwIsp20::mCamHwInfos[s_full_info->sensor_name] = info;
+            }
+        }
+        media_device_unref (device);
+    }
+    get_isp_ver(&CamHwIsp20::mIspHwInfos);
+    return XCAM_RETURN_NO_ERROR;
+}
 
 XCamReturn
 CamHwIsp20::init(const char* sns_ent_name)
@@ -37,11 +547,60 @@ CamHwIsp20::init(const char* sns_ent_name)
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
     SmartPtr<Isp20PollThread> isp20Pollthread;
     SmartPtr<PollThread> isp20LumaPollthread;
+    SmartPtr<PollThread> isp20IsppPollthread;
     SmartPtr<SensorHw> sensorHw;
     SmartPtr<V4l2Device> mipi_tx_devs[3];
     SmartPtr<V4l2Device> mipi_rx_devs[3];
+    std::string sensor_name(sns_ent_name);
 
     ENTER_CAMHW_FUNCTION();
+    #if 0
+    std::map<std::string, SmartPtr<rk_sensor_full_info_t>>::iterator it;
+    if ((it=mCamHwInfos.find(sensor_name)) == mCamHwInfos.end()) {
+        LOGE("can't find sensor %s", sns_ent_name);
+        return XCAM_RETURN_ERROR_SENSOR;
+    }
+    rk_sensor_full_info_t *s_info = it->second.ptr();
+    sensorHw = new SensorHw(s_info->device_name);
+    mSensorDev = sensorHw;
+    mSensorDev->open();
+
+    mIspCoreDev = new V4l2SubDevice(s_info->isp_info->isp_dev_path);
+    mIspCoreDev->open();
+    mIspCoreDev->subscribe_event(V4L2_EVENT_FRAME_SYNC);
+
+    mIspLumaDev = new V4l2Device(s_info->isp_info->mipi_luma_path);
+    mIspLumaDev->open();
+
+    mIsppStatsDev = new V4l2Device(CamHwIsp20::mIspHwInfos.ispp_info.pp_stats_path);
+    mIsppStatsDev->open();
+    mIsppParamsDev = new V4l2Device (CamHwIsp20::mIspHwInfos.ispp_info.pp_input_params_path);
+    mIsppParamsDev->open();
+
+    mIspStatsDev = new V4l2Device (s_info->isp_info->stats_path);
+    mIspStatsDev->open();
+    mIspParamsDev = new V4l2Device (s_info->isp_info->input_params_path);
+    mIspParamsDev->open();
+
+    //short frame
+    mipi_tx_devs[0] = new V4l2Device (s_info->isp_info->rawwr2_path);//rkisp_rawwr2
+    mipi_tx_devs[0]->open();
+    mipi_rx_devs[0] = new V4l2Device (s_info->isp_info->rawrd2_s_path);//rkisp_rawrd2_s
+    mipi_rx_devs[0]->open();
+    mipi_rx_devs[0]->set_mem_type(V4L2_MEMORY_DMABUF);
+    //mid frame
+    mipi_tx_devs[1] = new V4l2Device (s_info->isp_info->rawwr0_path);//rkisp_rawwr0
+    mipi_tx_devs[1]->open();
+    mipi_rx_devs[1] = new V4l2Device (s_info->isp_info->rawrd0_m_path);//rkisp_rawrd0_m
+    mipi_rx_devs[1]->open();
+    mipi_rx_devs[1]->set_mem_type(V4L2_MEMORY_DMABUF);
+    //long frame
+    mipi_tx_devs[2] = new V4l2Device (s_info->isp_info->rawwr1_path);//rkisp_rawwr1
+    mipi_tx_devs[2]->open();
+    mipi_rx_devs[2] = new V4l2Device (s_info->isp_info->rawrd1_l_path);//rkisp_rawrd1_l
+    mipi_rx_devs[2]->open();
+
+    #else
     sensorHw = new SensorHw("/dev/v4l-subdev4");
     mSensorDev = sensorHw;
     mSensorDev->open();
@@ -53,12 +612,15 @@ CamHwIsp20::init(const char* sns_ent_name)
     mIspLumaDev = new V4l2Device("/dev/video12");
     mIspLumaDev->open();
 
+    mIsppStatsDev = new V4l2Device("/dev/video19");
+    mIsppStatsDev->open();
+    mIsppParamsDev = new V4l2Device ("/dev/video18");
+    mIsppParamsDev->open();
+
     mIspStatsDev = new V4l2Device ("/dev/video10");
     mIspStatsDev->open();
     mIspParamsDev = new V4l2Device ("/dev/video11");
     mIspParamsDev->open();
-    mIspPostParamsDev = new V4l2Device ("/dev/video13");
-    mIspPostParamsDev->open();
 
     //short frame
     mipi_tx_devs[0] = new V4l2Device ("/dev/video4");//rkisp_rawwr2
@@ -77,6 +639,7 @@ CamHwIsp20::init(const char* sns_ent_name)
     mipi_tx_devs[2]->open();
     mipi_rx_devs[2] = new V4l2Device ("/dev/video8");//rkisp_rawrd1_l
     mipi_rx_devs[2]->open();
+    #endif
     mipi_rx_devs[2]->set_mem_type(V4L2_MEMORY_DMABUF);
     for (int i = 0; i < 3; i++) {
         mipi_tx_devs[i]->set_buffer_count(8);
@@ -89,13 +652,18 @@ CamHwIsp20::init(const char* sns_ent_name)
     mPollthread = isp20Pollthread;
     mPollthread->set_event_device(mIspCoreDev);
     mPollthread->set_isp_stats_device(mIspStatsDev);
-    mPollthread->set_isp_params_devices(mIspParamsDev, mIspPostParamsDev);
+    mPollthread->set_isp_params_devices(mIspParamsDev, mIsppParamsDev);
     mPollthread->set_poll_callback (this);
 
     isp20LumaPollthread = new PollThread();
     mPollLumathread = isp20LumaPollthread;
     mPollLumathread->set_isp_luma_device(mIspLumaDev);
     mPollLumathread->set_poll_callback (this);
+
+    isp20IsppPollthread = new PollThread();
+    mPollIsppthread = isp20IsppPollthread;
+    mPollIsppthread->set_ispp_stats_device(mIsppStatsDev);
+    mPollIsppthread->set_poll_callback (this);
 
     EXIT_CAMHW_FUNCTION();
 
@@ -109,6 +677,73 @@ CamHwIsp20::deInit()
 }
 
 XCamReturn
+CamHwIsp20::setupHdrLink(int hdr_mode, int isp_index, bool enable)
+{
+    media_device *device = NULL;
+    media_entity *entity = NULL;
+    media_pad *src_pad_s = NULL, *src_pad_m = NULL, *src_pad_l = NULL, *sink_pad = NULL;
+
+    device = media_device_new (mIspHwInfos.isp_info[isp_index].media_dev_path);
+
+    /* Enumerate entities, pads and links. */
+    media_device_enumerate (device);
+    entity = media_get_entity_by_name(device, "rkisp-isp-subdev", strlen("rkisp-isp-subdev"));
+    if(entity) {
+        sink_pad = (media_pad *)media_entity_get_pad(entity, 0);
+        if (!sink_pad) {
+            LOGE("get HDR sink pad failed!\n");
+            goto FAIL;
+        }
+    }
+
+    entity = media_get_entity_by_name(device, "rkisp_rawrd2_s", strlen("rkisp_rawrd2_s"));
+    if(entity) {
+        src_pad_s = (media_pad *)media_entity_get_pad(entity, 0);
+        if (!src_pad_s) {
+            LOGE("get HDR source pad s failed!\n");
+            goto FAIL;
+        }
+    }
+    if (enable)
+        media_setup_link(device, src_pad_s, sink_pad, MEDIA_LNK_FL_ENABLED);
+    else
+        media_setup_link(device, src_pad_s, sink_pad, ~MEDIA_LNK_FL_ENABLED);
+
+    entity = media_get_entity_by_name(device, "rkisp_rawrd2_m", strlen("rkisp_rawrd2_m"));
+    if(entity) {
+        src_pad_m = (media_pad *)media_entity_get_pad(entity, 0);
+        if (!src_pad_m) {
+            LOGE("get HDR source pad m failed!\n");
+            goto FAIL;
+        }
+    }
+    if (enable)
+        media_setup_link(device, src_pad_m, sink_pad, MEDIA_LNK_FL_ENABLED);
+    else
+        media_setup_link(device, src_pad_m, sink_pad, ~MEDIA_LNK_FL_ENABLED);
+
+    if (RK_AIQ_HDR_GET_WORKING_MODE(hdr_mode) == RK_AIQ_WORKING_MODE_ISP_HDR3) {
+        entity = media_get_entity_by_name(device, "rkisp_rawrd2_l", strlen("rkisp_rawrd2_l"));
+        if(entity) {
+            src_pad_l = (media_pad *)media_entity_get_pad(entity, 0);
+            if (!src_pad_l) {
+                LOGE("get HDR source pad l failed!\n");
+                goto FAIL;
+            }
+        }
+        if (enable)
+            media_setup_link(device, src_pad_l, sink_pad, MEDIA_LNK_FL_ENABLED);
+        else
+            media_setup_link(device, src_pad_l, sink_pad, ~MEDIA_LNK_FL_ENABLED);
+    }
+    media_device_unref (device);
+    return XCAM_RETURN_NO_ERROR;
+FAIL:
+    media_device_unref (device);
+    return XCAM_RETURN_ERROR_FAILED;
+}
+
+XCamReturn
 CamHwIsp20::prepare(uint32_t width, uint32_t height, int mode)
 {
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
@@ -117,7 +752,9 @@ CamHwIsp20::prepare(uint32_t width, uint32_t height, int mode)
 
     ENTER_CAMHW_FUNCTION();
 
-    // TODO, set working mode to sensor
+    _hdr_mode = mode;
+    if (_hdr_mode != RK_AIQ_WORKING_MODE_NORMAL)
+        setupHdrLink(_hdr_mode, 0, true);
 
     isp20Pollthread = mPollthread.dynamic_cast_ptr<Isp20PollThread>();
     isp20Pollthread->set_working_mode(mode);
@@ -147,6 +784,11 @@ CamHwIsp20::prepare(uint32_t width, uint32_t height, int mode)
         LOGE("start isp params dev err: %d\n", ret);
     }
 
+    mIsppParamsDev->start();
+    if (ret < 0) {
+        LOGE("start ispp params dev err: %d\n", ret);
+    }
+
     EXIT_CAMHW_FUNCTION();
     return ret;
 }
@@ -160,6 +802,7 @@ CamHwIsp20::start()
 
     mPollthread->start();
     mPollLumathread->start();
+    mPollIsppthread->start();
     if (ret < 0) {
         LOGE("start isp Poll thread err: %d\n", ret);
     }
@@ -182,7 +825,8 @@ XCamReturn CamHwIsp20::stop()
     if (ret < 0) {
         LOGE("hdr mipi stop err: %d\n", ret);
     }
-
+    if (_hdr_mode != RK_AIQ_WORKING_MODE_NORMAL)
+        setupHdrLink(_hdr_mode, 0, false);
     EXIT_CAMHW_FUNCTION();
     return ret;
 }
@@ -210,28 +854,28 @@ CamHwIsp20::gen_full_isp_params(const struct isp2x_isp_params_cfg* update_params
             full_params->module_cfg_update |= 1 << i;
             switch (i) {
             case RK_ISP2X_RAWAE_BIG1_ID:
-                full_params->meas.rawaebig1 = update_params->meas.rawaebig1;
+                full_params->meas.rawae3 = update_params->meas.rawae3;
                 break;
             case RK_ISP2X_RAWAE_BIG2_ID:
-                full_params->meas.rawaebig2 = update_params->meas.rawaebig2;
+                full_params->meas.rawae1 = update_params->meas.rawae1;
                 break;
             case RK_ISP2X_RAWAE_BIG3_ID:
-                full_params->meas.rawaebig3 = update_params->meas.rawaebig3;
+                full_params->meas.rawae2 = update_params->meas.rawae2;
                 break;
             case RK_ISP2X_RAWAE_LITE_ID:
-                full_params->meas.rawaelite = update_params->meas.rawaelite;
+                full_params->meas.rawae0 = update_params->meas.rawae0;
                 break;
             case RK_ISP2X_RAWHIST_BIG1_ID:
-                full_params->meas.rawhstbig1 = update_params->meas.rawhstbig1;
+                full_params->meas.rawhist3 = update_params->meas.rawhist3;
                 break;
             case RK_ISP2X_RAWHIST_BIG2_ID:
-                full_params->meas.rawhstbig2 = update_params->meas.rawhstbig2;
+                full_params->meas.rawhist1 = update_params->meas.rawhist1;
                 break;
             case RK_ISP2X_RAWHIST_BIG3_ID:
-                full_params->meas.rawhstbig3 = update_params->meas.rawhstbig3;
+                full_params->meas.rawhist2 = update_params->meas.rawhist2;
                 break;
             case RK_ISP2X_RAWHIST_LITE_ID:
-                full_params->meas.rawhstlite = update_params->meas.rawhstlite;
+                full_params->meas.rawhist0 = update_params->meas.rawhist0;
                 break;
             case RK_ISP2X_SIAWB_ID:
                 full_params->meas.siawb = update_params->meas.siawb;
@@ -263,60 +907,60 @@ void CamHwIsp20::dump_isp_config(struct isp2x_isp_params_cfg* isp_params,
                                  SmartPtr<RkAiqIspParamsProxy> aiq_results)
 {
     LOGD("isp_params mask: 0x%llx-0x%llx-0x%llx\n",
-		    isp_params->module_en_update,
-		    isp_params->module_ens,
-		    isp_params->module_cfg_update);
+         isp_params->module_en_update,
+         isp_params->module_ens,
+         isp_params->module_cfg_update);
 
     LOGD("aiq_results: ae-lite.winnum=%d; ae-big2.winnum=%d, sub[1].size: [%dx%d]\n",
-	   aiq_results->data()->aec_meas.rawaelite.wnd_num,
-	   aiq_results->data()->aec_meas.rawaebig2.wnd_num,
-	   aiq_results->data()->aec_meas.rawaebig2.subwin[1].h_size,
-	   aiq_results->data()->aec_meas.rawaebig2.subwin[1].v_size);
+         aiq_results->data()->aec_meas.rawae0.wnd_num,
+         aiq_results->data()->aec_meas.rawae1.wnd_num,
+         aiq_results->data()->aec_meas.rawae1.subwin[1].h_size,
+         aiq_results->data()->aec_meas.rawae1.subwin[1].v_size);
 
     LOGD("isp_params: ae-lite.winnum=%d; ae-big2.winnum=%d, sub[1].size: [%dx%d]\n",
-	   isp_params->meas.rawaelite.wnd_num,
-	   isp_params->meas.rawaebig2.wnd_num,
-	   isp_params->meas.rawaebig2.subwin[1].h_size,
-	   isp_params->meas.rawaebig2.subwin[1].v_size);
+         isp_params->meas.rawae0.wnd_num,
+         isp_params->meas.rawae1.wnd_num,
+         isp_params->meas.rawae1.subwin[1].h_size,
+         isp_params->meas.rawae1.subwin[1].v_size);
 
     LOGD("isp_params: win size: [%dx%d]-[%dx%d]-[%dx%d]-[%dx%d]\n",
-	   isp_params->meas.rawaelite.win.h_size,
-	   isp_params->meas.rawaelite.win.v_size,
-	   isp_params->meas.rawaebig1.win.h_size,
-	   isp_params->meas.rawaebig1.win.v_size,
-	   isp_params->meas.rawaebig2.win.h_size,
-	   isp_params->meas.rawaebig2.win.v_size,
-	   isp_params->meas.rawaebig3.win.h_size,
-	   isp_params->meas.rawaebig3.win.v_size);
-	LOGD("isp_params: debayer: \n"
-	    "clip_en:%d, dist_scale:%d, filter_c_en:%d, filter_g_en:%d\n"
-	    "gain_offset:%d,hf_offset:%d,max_ratio:%d,offset:%d,order_max:%d\n"
-	    "order_min:%d, shift_num:%d, thed0:%d, thed1:%d\n"
-	    "filter1:[%d, %d, %d, %d, %d]\n",
-	    "filter2:[%d, %d, %d, %d, %d]\n",
-	    isp_params->others.debayer_cfg.clip_en,
-	    isp_params->others.debayer_cfg.dist_scale,
-	    isp_params->others.debayer_cfg.filter_c_en,
-	    isp_params->others.debayer_cfg.filter_g_en,
-	    isp_params->others.debayer_cfg.gain_offset,
-	    isp_params->others.debayer_cfg.hf_offset,
-	    isp_params->others.debayer_cfg.max_ratio,
-	    isp_params->others.debayer_cfg.offset,
-	    isp_params->others.debayer_cfg.order_max,
-	    isp_params->others.debayer_cfg.order_min,
-	    isp_params->others.debayer_cfg.shift_num,
-	    isp_params->others.debayer_cfg.thed0,
-	    isp_params->others.debayer_cfg.thed1,
-	    isp_params->others.debayer_cfg.filter1_coe1,
-	    isp_params->others.debayer_cfg.filter1_coe2,
-	    isp_params->others.debayer_cfg.filter1_coe3,
-	    isp_params->others.debayer_cfg.filter1_coe4,
-	    isp_params->others.debayer_cfg.filter1_coe5,
-	    isp_params->others.debayer_cfg.filter2_coe1,
-	    isp_params->others.debayer_cfg.filter2_coe2,
-	    isp_params->others.debayer_cfg.filter2_coe3,
-	    isp_params->others.debayer_cfg.filter2_coe4,
-	    isp_params->others.debayer_cfg.filter2_coe5);
+         isp_params->meas.rawae0.win.h_size,
+         isp_params->meas.rawae0.win.v_size,
+         isp_params->meas.rawae3.win.h_size,
+         isp_params->meas.rawae3.win.v_size,
+         isp_params->meas.rawae1.win.h_size,
+         isp_params->meas.rawae1.win.v_size,
+         isp_params->meas.rawae2.win.h_size,
+         isp_params->meas.rawae2.win.v_size);
+    LOGD("isp_params: debayer: \n"
+         "clip_en:%d, dist_scale:%d, filter_c_en:%d, filter_g_en:%d\n"
+         "gain_offset:%d,hf_offset:%d,max_ratio:%d,offset:%d,order_max:%d\n"
+         "order_min:%d, shift_num:%d, thed0:%d, thed1:%d\n"
+         "filter1:[%d, %d, %d, %d, %d]\n",
+         "filter2:[%d, %d, %d, %d, %d]\n",
+         isp_params->others.debayer_cfg.clip_en,
+         isp_params->others.debayer_cfg.dist_scale,
+         isp_params->others.debayer_cfg.filter_c_en,
+         isp_params->others.debayer_cfg.filter_g_en,
+         isp_params->others.debayer_cfg.gain_offset,
+         isp_params->others.debayer_cfg.hf_offset,
+         isp_params->others.debayer_cfg.max_ratio,
+         isp_params->others.debayer_cfg.offset,
+         isp_params->others.debayer_cfg.order_max,
+         isp_params->others.debayer_cfg.order_min,
+         isp_params->others.debayer_cfg.shift_num,
+         isp_params->others.debayer_cfg.thed0,
+         isp_params->others.debayer_cfg.thed1,
+         isp_params->others.debayer_cfg.filter1_coe1,
+         isp_params->others.debayer_cfg.filter1_coe2,
+         isp_params->others.debayer_cfg.filter1_coe3,
+         isp_params->others.debayer_cfg.filter1_coe4,
+         isp_params->others.debayer_cfg.filter1_coe5,
+         isp_params->others.debayer_cfg.filter2_coe1,
+         isp_params->others.debayer_cfg.filter2_coe2,
+         isp_params->others.debayer_cfg.filter2_coe3,
+         isp_params->others.debayer_cfg.filter2_coe4,
+         isp_params->others.debayer_cfg.filter2_coe5);
 }
 
 XCamReturn
@@ -336,7 +980,7 @@ CamHwIsp20::setIspParamsSync()
 
         xcam_mem_clear (update_params);
         xcam_mem_clear (_full_active_isp_params);
-	LOGD("merge isp params num %d\n", _pending_ispparams_queue.size());
+        LOGD("merge isp params num %d\n", _pending_ispparams_queue.size());
         aiq_results = _pending_ispparams_queue.front();
         _pending_ispparams_queue.pop_front();
 
@@ -346,54 +990,54 @@ CamHwIsp20::setIspParamsSync()
         }
 
 #if 1 // for test
-	/* ae/hist update */
-	update_params.module_en_update |= 1 << RK_ISP2X_RAWAE_LITE_ID;
-	update_params.module_ens |= 1 << RK_ISP2X_RAWAE_LITE_ID;
-	update_params.module_cfg_update |= 1 << RK_ISP2X_RAWAE_LITE_ID;
+        /* ae/hist update */
+        update_params.module_en_update |= 1 << RK_ISP2X_RAWAE_LITE_ID;
+        update_params.module_ens |= 1 << RK_ISP2X_RAWAE_LITE_ID;
+        update_params.module_cfg_update |= 1 << RK_ISP2X_RAWAE_LITE_ID;
 
-	/*
-	 * update_params.module_en_update |= 1 << RK_ISP2X_RAWAE_BIG1_ID;
-	 * update_params.module_ens |= 1 << RK_ISP2X_RAWAE_BIG1_ID;
-	 * update_params.module_cfg_update |= 1 << RK_ISP2X_RAWAE_BIG1_ID;
-	 */
+        /*
+         * update_params.module_en_update |= 1 << RK_ISP2X_RAWAE_BIG1_ID;
+         * update_params.module_ens |= 1 << RK_ISP2X_RAWAE_BIG1_ID;
+         * update_params.module_cfg_update |= 1 << RK_ISP2X_RAWAE_BIG1_ID;
+         */
 
-	update_params.module_en_update |= 1 << RK_ISP2X_RAWAE_BIG2_ID;
-	update_params.module_ens |= 1 << RK_ISP2X_RAWAE_BIG2_ID;
-	update_params.module_cfg_update |= 1 << RK_ISP2X_RAWAE_BIG2_ID;
+        update_params.module_en_update |= 1 << RK_ISP2X_RAWAE_BIG2_ID;
+        update_params.module_ens |= 1 << RK_ISP2X_RAWAE_BIG2_ID;
+        update_params.module_cfg_update |= 1 << RK_ISP2X_RAWAE_BIG2_ID;
 
         update_params.module_en_update |= 1 << RK_ISP2X_RAWAE_BIG3_ID;
         update_params.module_ens |= 1 << RK_ISP2X_RAWAE_BIG3_ID;
         update_params.module_cfg_update |= 1 << RK_ISP2X_RAWAE_BIG3_ID;
 
 
-	update_params.module_en_update |= 1 << RK_ISP2X_RAWHIST_LITE_ID;
-	update_params.module_ens |= 1 << RK_ISP2X_RAWHIST_LITE_ID;
-	update_params.module_cfg_update |= 1 << RK_ISP2X_RAWHIST_LITE_ID;
+        update_params.module_en_update |= 1 << RK_ISP2X_RAWHIST_LITE_ID;
+        update_params.module_ens |= 1 << RK_ISP2X_RAWHIST_LITE_ID;
+        update_params.module_cfg_update |= 1 << RK_ISP2X_RAWHIST_LITE_ID;
 
-	/*
-	 * update_params.module_en_update |= 1 << RK_ISP2X_RAWHIST_BIG1_ID;
-	 * update_params.module_ens |= 1 << RK_ISP2X_RAWHIST_BIG1_ID;
-	 * update_params.module_cfg_update |= 1 << RK_ISP2X_RAWHIST_BIG1_ID;
-	 */
+        /*
+         * update_params.module_en_update |= 1 << RK_ISP2X_RAWHIST_BIG1_ID;
+         * update_params.module_ens |= 1 << RK_ISP2X_RAWHIST_BIG1_ID;
+         * update_params.module_cfg_update |= 1 << RK_ISP2X_RAWHIST_BIG1_ID;
+         */
 
-	update_params.module_en_update |= 1 << RK_ISP2X_RAWHIST_BIG2_ID;
-	update_params.module_ens |= 1 << RK_ISP2X_RAWHIST_BIG2_ID;
-	update_params.module_cfg_update |= 1 << RK_ISP2X_RAWHIST_BIG2_ID;
+        update_params.module_en_update |= 1 << RK_ISP2X_RAWHIST_BIG2_ID;
+        update_params.module_ens |= 1 << RK_ISP2X_RAWHIST_BIG2_ID;
+        update_params.module_cfg_update |= 1 << RK_ISP2X_RAWHIST_BIG2_ID;
 
         update_params.module_en_update |= 1 << RK_ISP2X_RAWHIST_BIG3_ID;
         update_params.module_ens |= 1 << RK_ISP2X_RAWHIST_BIG3_ID;
         update_params.module_cfg_update |= 1 << RK_ISP2X_RAWHIST_BIG3_ID;
 
-	/* awb update */
-/*
- *         update_params.module_en_update |= 1 << RK_ISP2X_AWB_GAIN_ID;
- *         update_params.module_ens |= 1 << RK_ISP2X_AWB_GAIN_ID;
- *         update_params.module_cfg_update |= 1 << RK_ISP2X_AWB_GAIN_ID;
- *
- *         update_params.module_en_update |= 1 << RK_ISP2X_RAWAWB_ID;
- *         update_params.module_ens |= 1 << RK_ISP2X_RAWAWB_ID;
- *         update_params.module_cfg_update |= 1 << RK_ISP2X_RAWAWB_ID;
- */
+        /* awb update */
+        /*
+         *         update_params.module_en_update |= 1 << RK_ISP2X_AWB_GAIN_ID;
+         *         update_params.module_ens |= 1 << RK_ISP2X_AWB_GAIN_ID;
+         *         update_params.module_cfg_update |= 1 << RK_ISP2X_AWB_GAIN_ID;
+         *
+         *         update_params.module_en_update |= 1 << RK_ISP2X_RAWAWB_ID;
+         *         update_params.module_ens |= 1 << RK_ISP2X_RAWAWB_ID;
+         *         update_params.module_cfg_update |= 1 << RK_ISP2X_RAWAWB_ID;
+         */
 #endif
 
         update_params.module_en_update |= 1 << RK_ISP2X_HDRMGE_ID;
@@ -463,6 +1107,52 @@ CamHwIsp20::setIspParams(SmartPtr<RkAiqIspParamsProxy>& ispParams)
 }
 
 XCamReturn
+CamHwIsp20::setIsppParams(SmartPtr<RkAiqIsppParamsProxy>& isppParams)
+{
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    SmartLock locker (_mutex);
+
+    ENTER_CAMHW_FUNCTION();
+    if (_is_exit) {
+        XCAM_LOG_DEBUG ("check if ia engine has stop");
+        return XCAM_RETURN_BYPASS;
+    }
+
+    if (mIsppParamsDev.ptr()) {
+        struct rkispp_params_cfg* ispp_params;
+        SmartPtr<V4l2Buffer> v4l2buf;
+
+        ret = mIsppParamsDev->get_buffer(v4l2buf);
+        if (!ret) {
+            int buf_index = v4l2buf->get_buf().index;
+
+            ispp_params = (struct rkispp_params_cfg*)v4l2buf->get_buf().m.userptr;
+            convertAiqResultsToIsp20PpParams(*ispp_params, isppParams);
+
+            //TODO set update bits
+
+            if (mIsppParamsDev->queue_buffer (v4l2buf) != 0) {
+                XCAM_LOG_ERROR ("RKISP1: failed to ioctl VIDIOC_QBUF for index %d, %d %s.\n",
+                                buf_index, errno, strerror(errno));
+                return ret;
+            }
+
+            XCAM_LOG_DEBUG ("device(%s) queue buffer index %d, queue cnt %d, check exit status again[exit: %d]",
+                            XCAM_STR (mIsppParamsDev->get_device_name()),
+                            buf_index, mIsppParamsDev->get_queued_bufcnt(), _is_exit);
+        } else {
+            XCAM_LOG_ERROR ("RKISP1: Can not get buffer.\n");
+        }
+
+        if (_is_exit)
+            return XCAM_RETURN_BYPASS;
+    }
+
+    EXIT_CAMHW_FUNCTION();
+    return ret;
+}
+
+XCamReturn
 CamHwIsp20::getSensorModeData(const char* sns_ent_name,
                               rk_aiq_exposure_sensor_descriptor& sns_des)
 {
@@ -511,670 +1201,671 @@ CamHwIsp20::setHdrProcessCount(int frame_id, int count)
 
 void CamHwIsp20::dumpRawnrFixValue(struct isp2x_rawnr_cfg * pRawnrCfg )
 {
-	printf("%s:(%d)  enter \n", __FUNCTION__, __LINE__);
-	int i = 0;
+    printf("%s:(%d)  enter \n", __FUNCTION__, __LINE__);
+    int i = 0;
 
-	//(0x0004)
-	printf("(0x0004) gauss_en:%d log_bypass:%d \n", 
-		pRawnrCfg->gauss_en,
-		pRawnrCfg->log_bypass);
+    //(0x0004)
+    printf("(0x0004) gauss_en:%d log_bypass:%d \n",
+           pRawnrCfg->gauss_en,
+           pRawnrCfg->log_bypass);
 
-	//(0x0008 - 0x0010)
-	printf("(0x0008 - 0x0010) filtpar0-2:%d %d %d \n", 
-		pRawnrCfg->filtpar0,
-		pRawnrCfg->filtpar1,
-		pRawnrCfg->filtpar2);
+    //(0x0008 - 0x0010)
+    printf("(0x0008 - 0x0010) filtpar0-2:%d %d %d \n",
+           pRawnrCfg->filtpar0,
+           pRawnrCfg->filtpar1,
+           pRawnrCfg->filtpar2);
 
-	//(0x0014 - 0x001c)
-	printf("(0x0014 - 0x001c) dgain0-2:%d %d %d \n", 
-		pRawnrCfg->dgain0,
-		pRawnrCfg->dgain1,
-		pRawnrCfg->dgain2);
+    //(0x0014 - 0x001c)
+    printf("(0x0014 - 0x001c) dgain0-2:%d %d %d \n",
+           pRawnrCfg->dgain0,
+           pRawnrCfg->dgain1,
+           pRawnrCfg->dgain2);
 
-	//(0x0020 - 0x002c)
-	for(int i=0; i<ISP2X_RAWNR_LUMA_RATION_NUM; i++){
-		printf("(0x0020 - 0x002c) luration[%d]:%d \n", 
-		i, pRawnrCfg->luration[i]);
-	}
+    //(0x0020 - 0x002c)
+    for(int i = 0; i < ISP2X_RAWNR_LUMA_RATION_NUM; i++) {
+        printf("(0x0020 - 0x002c) luration[%d]:%d \n",
+               i, pRawnrCfg->luration[i]);
+    }
 
-	//(0x0030 - 0x003c)
-	for(int i=0; i<ISP2X_RAWNR_LUMA_RATION_NUM; i++){
-		printf("(0x0030 - 0x003c) lulevel[%d]:%d \n", 
-		i, pRawnrCfg->lulevel[i]);
-	}
+    //(0x0030 - 0x003c)
+    for(int i = 0; i < ISP2X_RAWNR_LUMA_RATION_NUM; i++) {
+        printf("(0x0030 - 0x003c) lulevel[%d]:%d \n",
+               i, pRawnrCfg->lulevel[i]);
+    }
 
-	//(0x0040)
-	printf("(0x0040) gauss:%d \n", 
-		pRawnrCfg->gauss);
+    //(0x0040)
+    printf("(0x0040) gauss:%d \n",
+           pRawnrCfg->gauss);
 
-	//(0x0044)
-	printf("(0x0044) sigma:%d \n", 
-		pRawnrCfg->sigma);
+    //(0x0044)
+    printf("(0x0044) sigma:%d \n",
+           pRawnrCfg->sigma);
 
-	//(0x0048)
-	printf("(0x0048) pix_diff:%d \n", 
-		pRawnrCfg->pix_diff);
+    //(0x0048)
+    printf("(0x0048) pix_diff:%d \n",
+           pRawnrCfg->pix_diff);
 
-	//(0x004c)
-	printf("(0x004c) thld_diff:%d \n", 
-		pRawnrCfg->thld_diff);
+    //(0x004c)
+    printf("(0x004c) thld_diff:%d \n",
+           pRawnrCfg->thld_diff);
 
-	//(0x0050)
-	printf("(0x0050) gas_weig_scl1:%d  gas_weig_scl2:%d  thld_chanelw:%d \n", 
-		pRawnrCfg->gas_weig_scl1,
-		pRawnrCfg->gas_weig_scl2,
-		pRawnrCfg->thld_chanelw);
+    //(0x0050)
+    printf("(0x0050) gas_weig_scl1:%d  gas_weig_scl2:%d  thld_chanelw:%d \n",
+           pRawnrCfg->gas_weig_scl1,
+           pRawnrCfg->gas_weig_scl2,
+           pRawnrCfg->thld_chanelw);
 
-	//(0x0054)
-	printf("(0x0054) lamda:%d \n", 
-		pRawnrCfg->lamda);
+    //(0x0054)
+    printf("(0x0054) lamda:%d \n",
+           pRawnrCfg->lamda);
 
-	//(0x0058 - 0x005c)
-	printf("(0x0058 - 0x005c) fixw0-3:%d %d %d %d\n", 
-		pRawnrCfg->fixw0,
-		pRawnrCfg->fixw1,
-		pRawnrCfg->fixw2,
-		pRawnrCfg->fixw3);
+    //(0x0058 - 0x005c)
+    printf("(0x0058 - 0x005c) fixw0-3:%d %d %d %d\n",
+           pRawnrCfg->fixw0,
+           pRawnrCfg->fixw1,
+           pRawnrCfg->fixw2,
+           pRawnrCfg->fixw3);
 
-	//(0x0060 - 0x0068)
-	printf("(0x0060 - 0x0068) wlamda0-2:%d %d %d\n", 
-		pRawnrCfg->wlamda0,
-		pRawnrCfg->wlamda1,
-		pRawnrCfg->wlamda2);
+    //(0x0060 - 0x0068)
+    printf("(0x0060 - 0x0068) wlamda0-2:%d %d %d\n",
+           pRawnrCfg->wlamda0,
+           pRawnrCfg->wlamda1,
+           pRawnrCfg->wlamda2);
 
-	
-	//(0x006c)
-	printf("(0x006c) rgain_filp-2:%d bgain_filp:%d\n", 
-		pRawnrCfg->rgain_filp,
-		pRawnrCfg->bgain_filp);
 
-	
-	printf("%s:(%d)  exit \n", __FUNCTION__, __LINE__);
+    //(0x006c)
+    printf("(0x006c) rgain_filp-2:%d bgain_filp:%d\n",
+           pRawnrCfg->rgain_filp,
+           pRawnrCfg->bgain_filp);
+
+
+    printf("%s:(%d)  exit \n", __FUNCTION__, __LINE__);
 }
 
 
 
 void CamHwIsp20::dumpTnrFixValue(struct rkispp_tnr_config  * pTnrCfg)
 {
-	int i = 0;
-	printf("%s:(%d) enter \n", __FUNCTION__, __LINE__);
-	//0x0080
-	printf("(0x0080) opty_en:%d optc_en:%d gain_en:%d\n", 
-		pTnrCfg->opty_en,
-		pTnrCfg->optc_en,
-		pTnrCfg->gain_en);
+    int i = 0;
+    printf("%s:(%d) enter \n", __FUNCTION__, __LINE__);
+    //0x0080
+    printf("(0x0080) moode:%d opty_en:%d optc_en:%d gain_en:%d\n",
+           pTnrCfg->mode,
+           pTnrCfg->opty_en,
+           pTnrCfg->optc_en,
+           pTnrCfg->gain_en);
 
-	//0x0088
-	printf("(0x0088) pk0_y:%d pk1_y:%d pk0_c:%d pk1_c:%d \n", 
-		pTnrCfg->pk0_y,
-		pTnrCfg->pk1_y,
-		pTnrCfg->pk0_c,
-		pTnrCfg->pk1_c);
-		
-	//0x008c
-	printf("(0x008c) glb_gain_cur:%d glb_gain_nxt:%d \n", 
-		pTnrCfg->glb_gain_cur,
-		pTnrCfg->glb_gain_nxt);
+    //0x0088
+    printf("(0x0088) pk0_y:%d pk1_y:%d pk0_c:%d pk1_c:%d \n",
+           pTnrCfg->pk0_y,
+           pTnrCfg->pk1_y,
+           pTnrCfg->pk0_c,
+           pTnrCfg->pk1_c);
 
-	//0x0090
-	printf("(0x0090) glb_gain_cur_div:%d gain_glb_filt_sqrt:%d \n", 
-		pTnrCfg->glb_gain_cur_div,
-		pTnrCfg->glb_gain_cur_sqrt);
-	
-	//0x0094 - 0x0098
-	for(i=0; i<TNR_SIGMA_CURVE_SIZE - 1; i++){
-		printf("(0x0094 - 0x0098) sigma_x[%d]:%d \n", 
-			i, pTnrCfg->sigma_x[i]);
-	}
+    //0x008c
+    printf("(0x008c) glb_gain_cur:%d glb_gain_nxt:%d \n",
+           pTnrCfg->glb_gain_cur,
+           pTnrCfg->glb_gain_nxt);
 
-	//0x009c - 0x00bc
-	for(i=0; i<TNR_SIGMA_CURVE_SIZE; i++){
-		printf("(0x009c - 0x00bc) sigma_y[%d]:%d \n", 
-			i, pTnrCfg->sigma_y[i]);
-	}
+    //0x0090
+    printf("(0x0090) glb_gain_cur_div:%d gain_glb_filt_sqrt:%d \n",
+           pTnrCfg->glb_gain_cur_div,
+           pTnrCfg->glb_gain_cur_sqrt);
 
-	//0x00c4 - 0x00cc
-	//dir_idx = 0;
-	for(i=0; i<TNR_LUMA_CURVE_SIZE; i++){
-		printf("(0x00c4 - 0x00cc) luma_curve[%d]:%d \n", 
-			i, pTnrCfg->luma_curve[i]);
-	}
+    //0x0094 - 0x0098
+    for(i = 0; i < TNR_SIGMA_CURVE_SIZE - 1; i++) {
+        printf("(0x0094 - 0x0098) sigma_x[%d]:%d \n",
+               i, pTnrCfg->sigma_x[i]);
+    }
 
-	//0x00d0
-	printf("(0x00d0) txt_th0_y:%d txt_th1_y:%d \n", 
-		pTnrCfg->txt_th0_y,
-		pTnrCfg->txt_th1_y);
-	
-	//0x00d4
-	printf("(0x00d0) txt_th0_c:%d txt_th1_c:%d \n", 
-		pTnrCfg->txt_th0_c,
-		pTnrCfg->txt_th1_c);
+    //0x009c - 0x00bc
+    for(i = 0; i < TNR_SIGMA_CURVE_SIZE; i++) {
+        printf("(0x009c - 0x00bc) sigma_y[%d]:%d \n",
+               i, pTnrCfg->sigma_y[i]);
+    }
 
-	//0x00d8
-	printf("(0x00d8) txt_thy_dlt:%d txt_thc_dlt:%d \n", 
-		pTnrCfg->txt_thy_dlt,
-		pTnrCfg->txt_thc_dlt);
+    //0x00c4 - 0x00cc
+    //dir_idx = 0;
+    for(i = 0; i < TNR_LUMA_CURVE_SIZE; i++) {
+        printf("(0x00c4 - 0x00cc) luma_curve[%d]:%d \n",
+               i, pTnrCfg->luma_curve[i]);
+    }
 
-	//0x00dc - 0x00ec
-	for(i=0; i<TNR_GFCOEF6_SIZE; i++){
-		printf("(0x00dc - 0x00ec) gfcoef_y0[%d]:%d \n", 
-			i, pTnrCfg->gfcoef_y0[i]);
-	}
-	for(i=0; i<TNR_GFCOEF3_SIZE; i++){
-		printf("(0x00dc - 0x00ec) gfcoef_y1[%d]:%d \n", 
-			i, pTnrCfg->gfcoef_y1[i]);
-	}
-	for(i=0; i<TNR_GFCOEF3_SIZE; i++){
-		printf("(0x00dc - 0x00ec) gfcoef_y2[%d]:%d \n", 
-			i, pTnrCfg->gfcoef_y2[i]);
-	}
-	for(i=0; i<TNR_GFCOEF3_SIZE; i++){
-		printf("(0x00dc - 0x00ec) gfcoef_y3[%d]:%d \n", 
-			i, pTnrCfg->gfcoef_y3[i]);
-	}
+    //0x00d0
+    printf("(0x00d0) txt_th0_y:%d txt_th1_y:%d \n",
+           pTnrCfg->txt_th0_y,
+           pTnrCfg->txt_th1_y);
 
-	//0x00f0 - 0x0100
-	for(i=0; i<TNR_GFCOEF6_SIZE; i++){
-		printf("(0x00f0 - 0x0100) gfcoef_yg0[%d]:%d \n", 
-			i, pTnrCfg->gfcoef_yg0[i]);
-	}
-	for(i=0; i<TNR_GFCOEF3_SIZE; i++){
-		printf("(0x00f0 - 0x0100) gfcoef_yg1[%d]:%d \n", 
-			i, pTnrCfg->gfcoef_yg1[i]);
-	}
-	for(i=0; i<TNR_GFCOEF3_SIZE; i++){
-		printf("(0x00f0 - 0x0100) gfcoef_yg2[%d]:%d \n", 
-			i, pTnrCfg->gfcoef_yg2[i]);
-	}
-	for(i=0; i<TNR_GFCOEF3_SIZE; i++){
-		printf("(0x00f0 - 0x0100) gfcoef_yg3[%d]:%d \n", 
-			i, pTnrCfg->gfcoef_yg3[i]);
-	}
+    //0x00d4
+    printf("(0x00d0) txt_th0_c:%d txt_th1_c:%d \n",
+           pTnrCfg->txt_th0_c,
+           pTnrCfg->txt_th1_c);
 
+    //0x00d8
+    printf("(0x00d8) txt_thy_dlt:%d txt_thc_dlt:%d \n",
+           pTnrCfg->txt_thy_dlt,
+           pTnrCfg->txt_thc_dlt);
 
-	//0x0104 - 0x0110
-	for(i=0; i<TNR_GFCOEF6_SIZE; i++){
-		printf("(0x0104 - 0x0110) gfcoef_yl0[%d]:%d \n", 
-			i, pTnrCfg->gfcoef_yl0[i]);
-	}
-	for(i=0; i<TNR_GFCOEF3_SIZE; i++){
-		printf("(0x0104 - 0x0110) gfcoef_yl1[%d]:%d \n", 
-			i, pTnrCfg->gfcoef_yl1[i]);
-	}
-	for(i=0; i<TNR_GFCOEF3_SIZE; i++){
-		printf("(0x0104 - 0x0110) gfcoef_yl2[%d]:%d \n", 
-			i, pTnrCfg->gfcoef_yl2[i]);
-	}
+    //0x00dc - 0x00ec
+    for(i = 0; i < TNR_GFCOEF6_SIZE; i++) {
+        printf("(0x00dc - 0x00ec) gfcoef_y0[%d]:%d \n",
+               i, pTnrCfg->gfcoef_y0[i]);
+    }
+    for(i = 0; i < TNR_GFCOEF3_SIZE; i++) {
+        printf("(0x00dc - 0x00ec) gfcoef_y1[%d]:%d \n",
+               i, pTnrCfg->gfcoef_y1[i]);
+    }
+    for(i = 0; i < TNR_GFCOEF3_SIZE; i++) {
+        printf("(0x00dc - 0x00ec) gfcoef_y2[%d]:%d \n",
+               i, pTnrCfg->gfcoef_y2[i]);
+    }
+    for(i = 0; i < TNR_GFCOEF3_SIZE; i++) {
+        printf("(0x00dc - 0x00ec) gfcoef_y3[%d]:%d \n",
+               i, pTnrCfg->gfcoef_y3[i]);
+    }
 
-	//0x0114 - 0x0120
-	for(i=0; i<TNR_GFCOEF6_SIZE; i++){
-		printf("(0x0114 - 0x0120) gfcoef_cg0[%d]:%d \n", 
-			i, pTnrCfg->gfcoef_cg0[i]);
-	}
-	for(i=0; i<TNR_GFCOEF3_SIZE; i++){
-		printf("(0x0114 - 0x0120) gfcoef_cg1[%d]:%d \n", 
-			i, pTnrCfg->gfcoef_cg1[i]);
-	}
-	for(i=0; i<TNR_GFCOEF3_SIZE; i++){
-		printf("(0x0114 - 0x0120) gfcoef_cg2[%d]:%d \n", 
-			i, pTnrCfg->gfcoef_cg2[i]);
-	}
+    //0x00f0 - 0x0100
+    for(i = 0; i < TNR_GFCOEF6_SIZE; i++) {
+        printf("(0x00f0 - 0x0100) gfcoef_yg0[%d]:%d \n",
+               i, pTnrCfg->gfcoef_yg0[i]);
+    }
+    for(i = 0; i < TNR_GFCOEF3_SIZE; i++) {
+        printf("(0x00f0 - 0x0100) gfcoef_yg1[%d]:%d \n",
+               i, pTnrCfg->gfcoef_yg1[i]);
+    }
+    for(i = 0; i < TNR_GFCOEF3_SIZE; i++) {
+        printf("(0x00f0 - 0x0100) gfcoef_yg2[%d]:%d \n",
+               i, pTnrCfg->gfcoef_yg2[i]);
+    }
+    for(i = 0; i < TNR_GFCOEF3_SIZE; i++) {
+        printf("(0x00f0 - 0x0100) gfcoef_yg3[%d]:%d \n",
+               i, pTnrCfg->gfcoef_yg3[i]);
+    }
 
 
-	//0x0124 - 0x012c
-	for(i=0; i<TNR_GFCOEF6_SIZE; i++){
-		printf("(0x0124 - 0x012c) gfcoef_cl0[%d]:%d \n", 
-			i, pTnrCfg->gfcoef_cl0[i]);
-	}
-	for(i=0; i<TNR_GFCOEF3_SIZE; i++){
-		printf("(0x0124 - 0x012c) gfcoef_cl1[%d]:%d \n", 
-			i, pTnrCfg->gfcoef_cl1[i]);
-	}
+    //0x0104 - 0x0110
+    for(i = 0; i < TNR_GFCOEF6_SIZE; i++) {
+        printf("(0x0104 - 0x0110) gfcoef_yl0[%d]:%d \n",
+               i, pTnrCfg->gfcoef_yl0[i]);
+    }
+    for(i = 0; i < TNR_GFCOEF3_SIZE; i++) {
+        printf("(0x0104 - 0x0110) gfcoef_yl1[%d]:%d \n",
+               i, pTnrCfg->gfcoef_yl1[i]);
+    }
+    for(i = 0; i < TNR_GFCOEF3_SIZE; i++) {
+        printf("(0x0104 - 0x0110) gfcoef_yl2[%d]:%d \n",
+               i, pTnrCfg->gfcoef_yl2[i]);
+    }
+
+    //0x0114 - 0x0120
+    for(i = 0; i < TNR_GFCOEF6_SIZE; i++) {
+        printf("(0x0114 - 0x0120) gfcoef_cg0[%d]:%d \n",
+               i, pTnrCfg->gfcoef_cg0[i]);
+    }
+    for(i = 0; i < TNR_GFCOEF3_SIZE; i++) {
+        printf("(0x0114 - 0x0120) gfcoef_cg1[%d]:%d \n",
+               i, pTnrCfg->gfcoef_cg1[i]);
+    }
+    for(i = 0; i < TNR_GFCOEF3_SIZE; i++) {
+        printf("(0x0114 - 0x0120) gfcoef_cg2[%d]:%d \n",
+               i, pTnrCfg->gfcoef_cg2[i]);
+    }
 
 
-	//0x0130 - 0x0134
-	//dir_idx = 0;  i = lvl;
-	for(i=0; i<TNR_SCALE_YG_SIZE; i++){
-		printf("(0x0130 - 0x0134) scale_yg[%d]:%d \n", 
-			i, pTnrCfg->scale_yg[i]);
-	}
+    //0x0124 - 0x012c
+    for(i = 0; i < TNR_GFCOEF6_SIZE; i++) {
+        printf("(0x0124 - 0x012c) gfcoef_cl0[%d]:%d \n",
+               i, pTnrCfg->gfcoef_cl0[i]);
+    }
+    for(i = 0; i < TNR_GFCOEF3_SIZE; i++) {
+        printf("(0x0124 - 0x012c) gfcoef_cl1[%d]:%d \n",
+               i, pTnrCfg->gfcoef_cl1[i]);
+    }
 
-	//0x0138 - 0x013c
-	//dir_idx = 1;  i = lvl;
-	for(i=0; i<TNR_SCALE_YL_SIZE; i++){
-		printf("(0x0138 - 0x013c) scale_yl[%d]:%d \n", 
-			i, pTnrCfg->scale_yl[i]);
-	}
 
-	//0x0140 - 0x0148
-	//dir_idx = 0;  i = lvl;
-	for(i=0; i<TNR_SCALE_CG_SIZE; i++){
-		printf("(0x0140 - 0x0148) scale_cg[%d]:%d \n", 
-			i, pTnrCfg->scale_cg[i]);
-		printf("(0x0140 - 0x0148) scale_y2cg[%d]:%d \n", 
-			i, pTnrCfg->scale_y2cg[i]);	
-	}
+    //0x0130 - 0x0134
+    //dir_idx = 0;  i = lvl;
+    for(i = 0; i < TNR_SCALE_YG_SIZE; i++) {
+        printf("(0x0130 - 0x0134) scale_yg[%d]:%d \n",
+               i, pTnrCfg->scale_yg[i]);
+    }
 
-	//0x014c - 0x0154
-	//dir_idx = 1;  i = lvl;
-	for(i=0; i<TNR_SCALE_CL_SIZE; i++){
-		printf("(0x014c - 0x0154) scale_cl[%d]:%d \n", 
-			i, pTnrCfg->scale_cl[i]);
-	}
-	for(i=0; i<TNR_SCALE_Y2CL_SIZE; i++){
-		printf("(0x014c - 0x0154) scale_y2cl[%d]:%d \n", 
-			i, pTnrCfg->scale_y2cl[i]);
-	}
+    //0x0138 - 0x013c
+    //dir_idx = 1;  i = lvl;
+    for(i = 0; i < TNR_SCALE_YL_SIZE; i++) {
+        printf("(0x0138 - 0x013c) scale_yl[%d]:%d \n",
+               i, pTnrCfg->scale_yl[i]);
+    }
 
-	//0x0158 
-	for(i=0; i<TNR_WEIGHT_Y_SIZE; i++){
-		printf("(0x0158) weight_y[%d]:%d \n", 
-			i, pTnrCfg->weight_y[i]);
-	}
+    //0x0140 - 0x0148
+    //dir_idx = 0;  i = lvl;
+    for(i = 0; i < TNR_SCALE_CG_SIZE; i++) {
+        printf("(0x0140 - 0x0148) scale_cg[%d]:%d \n",
+               i, pTnrCfg->scale_cg[i]);
+        printf("(0x0140 - 0x0148) scale_y2cg[%d]:%d \n",
+               i, pTnrCfg->scale_y2cg[i]);
+    }
 
-	printf("%s:(%d) exit \n", __FUNCTION__, __LINE__);
+    //0x014c - 0x0154
+    //dir_idx = 1;  i = lvl;
+    for(i = 0; i < TNR_SCALE_CL_SIZE; i++) {
+        printf("(0x014c - 0x0154) scale_cl[%d]:%d \n",
+               i, pTnrCfg->scale_cl[i]);
+    }
+    for(i = 0; i < TNR_SCALE_Y2CL_SIZE; i++) {
+        printf("(0x014c - 0x0154) scale_y2cl[%d]:%d \n",
+               i, pTnrCfg->scale_y2cl[i]);
+    }
+
+    //0x0158
+    for(i = 0; i < TNR_WEIGHT_Y_SIZE; i++) {
+        printf("(0x0158) weight_y[%d]:%d \n",
+               i, pTnrCfg->weight_y[i]);
+    }
+
+    printf("%s:(%d) exit \n", __FUNCTION__, __LINE__);
 }
 
 
 void CamHwIsp20::dumpUvnrFixValue(struct rkispp_nr_config  * pNrCfg)
 {
-	int i = 0;
-	printf("%s:(%d) exit \n", __FUNCTION__, __LINE__);
-	//0x0080
-	printf("(0x0088) uvnr_step1_en:%d uvnr_step2_en:%d nr_gain_en:%d uvnr_nobig_en:%d uvnr_big_en:%d\n", 
-		pNrCfg->uvnr_step1_en,
-		pNrCfg->uvnr_step2_en,
-		pNrCfg->nr_gain_en ,
-		pNrCfg->uvnr_nobig_en,
-		pNrCfg->uvnr_big_en);	
+    int i = 0;
+    printf("%s:(%d) exit \n", __FUNCTION__, __LINE__);
+    //0x0080
+    printf("(0x0088) uvnr_step1_en:%d uvnr_step2_en:%d nr_gain_en:%d uvnr_nobig_en:%d uvnr_big_en:%d\n",
+           pNrCfg->uvnr_step1_en,
+           pNrCfg->uvnr_step2_en,
+           pNrCfg->nr_gain_en,
+           pNrCfg->uvnr_nobig_en,
+           pNrCfg->uvnr_big_en);
 
-	//0x0084
-	printf("(0x0084) uvnr_gain_1sigma:%d \n", 
-		pNrCfg->uvnr_gain_1sigma);
-		
-	//0x0088
-	printf("(0x0088) uvnr_gain_offset:%d \n", 
-		pNrCfg->uvnr_gain_offset);
-	
-	//0x008c
-	printf("(0x008c) uvnr_gain_uvgain:%d uvnr_step2_en:%d uvnr_gain_t2gen:%d uvnr_gain_iso:%d\n", 
-		pNrCfg->uvnr_gain_uvgain[0],
-		pNrCfg->uvnr_gain_uvgain[1],
-		pNrCfg->uvnr_gain_t2gen,
-		pNrCfg->uvnr_gain_iso);
-		
+    //0x0084
+    printf("(0x0084) uvnr_gain_1sigma:%d \n",
+           pNrCfg->uvnr_gain_1sigma);
 
-	//0x0090
-	printf("(0x0090) uvnr_t1gen_m3alpha:%d \n", 
-		pNrCfg->uvnr_t1gen_m3alpha);
+    //0x0088
+    printf("(0x0088) uvnr_gain_offset:%d \n",
+           pNrCfg->uvnr_gain_offset);
 
-	//0x0094
-	printf("(0x0094) uvnr_t1flt_mode:%d \n", 
-		pNrCfg->uvnr_t1flt_mode);
+    //0x008c
+    printf("(0x008c) uvnr_gain_uvgain:%d uvnr_step2_en:%d uvnr_gain_t2gen:%d uvnr_gain_iso:%d\n",
+           pNrCfg->uvnr_gain_uvgain[0],
+           pNrCfg->uvnr_gain_uvgain[1],
+           pNrCfg->uvnr_gain_t2gen,
+           pNrCfg->uvnr_gain_iso);
 
-	//0x0098
-	printf("(0x0098) uvnr_t1flt_msigma:%d \n", 
-		pNrCfg->uvnr_t1flt_msigma);
 
-	//0x009c
-	printf("(0x009c) uvnr_t1flt_wtp:%d \n", 
-		pNrCfg->uvnr_t1flt_wtp);
+    //0x0090
+    printf("(0x0090) uvnr_t1gen_m3alpha:%d \n",
+           pNrCfg->uvnr_t1gen_m3alpha);
 
-	//0x00a0-0x00a4
-	for(i=0; i<NR_UVNR_T1FLT_WTQ_SIZE; i++){
-		printf("(0x00a0-0x00a4) uvnr_t1flt_wtq[%d]:%d \n", 
-			i, pNrCfg->uvnr_t1flt_wtq[i]);
-	}
+    //0x0094
+    printf("(0x0094) uvnr_t1flt_mode:%d \n",
+           pNrCfg->uvnr_t1flt_mode);
 
-	//0x00a8
-	printf("(0x00a8) uvnr_t2gen_m3alpha:%d \n", 
-		pNrCfg->uvnr_t2gen_m3alpha);
+    //0x0098
+    printf("(0x0098) uvnr_t1flt_msigma:%d \n",
+           pNrCfg->uvnr_t1flt_msigma);
 
-	//0x00ac
-	printf("(0x00ac) uvnr_t2gen_msigma:%d \n", 
-		pNrCfg->uvnr_t2gen_msigma);
+    //0x009c
+    printf("(0x009c) uvnr_t1flt_wtp:%d \n",
+           pNrCfg->uvnr_t1flt_wtp);
 
-	//0x00b0
-	printf("(0x00b0) uvnr_t2gen_wtp:%d \n", 
-		pNrCfg->uvnr_t2gen_wtp);
+    //0x00a0-0x00a4
+    for(i = 0; i < NR_UVNR_T1FLT_WTQ_SIZE; i++) {
+        printf("(0x00a0-0x00a4) uvnr_t1flt_wtq[%d]:%d \n",
+               i, pNrCfg->uvnr_t1flt_wtq[i]);
+    }
 
-	//0x00b4
-	for(i=0; i<NR_UVNR_T2GEN_WTQ_SIZE; i++){
-		printf("(0x00b4) uvnr_t2gen_wtq[%d]:%d \n", 
-			i, pNrCfg->uvnr_t2gen_wtq[i]);
-	}
+    //0x00a8
+    printf("(0x00a8) uvnr_t2gen_m3alpha:%d \n",
+           pNrCfg->uvnr_t2gen_m3alpha);
 
-	//0x00b8
-	printf("(0x00b8) uvnr_t2flt_msigma:%d \n", 
-		pNrCfg->uvnr_t2flt_msigma);
+    //0x00ac
+    printf("(0x00ac) uvnr_t2gen_msigma:%d \n",
+           pNrCfg->uvnr_t2gen_msigma);
 
-	//0x00bc
-	printf("(0x00bc) uvnr_t2flt_wtp:%d \n", 
-		pNrCfg->uvnr_t2flt_wtp);
-	for(i=0; i<NR_UVNR_T2FLT_WT_SIZE; i++){
-		printf("(0x00bc) uvnr_t2flt_wt[%d]:%d \n", 
-			i, pNrCfg->uvnr_t2flt_wt[i]);
-	}
+    //0x00b0
+    printf("(0x00b0) uvnr_t2gen_wtp:%d \n",
+           pNrCfg->uvnr_t2gen_wtp);
 
-		
-	printf("%s:(%d) entor \n", __FUNCTION__, __LINE__);
+    //0x00b4
+    for(i = 0; i < NR_UVNR_T2GEN_WTQ_SIZE; i++) {
+        printf("(0x00b4) uvnr_t2gen_wtq[%d]:%d \n",
+               i, pNrCfg->uvnr_t2gen_wtq[i]);
+    }
+
+    //0x00b8
+    printf("(0x00b8) uvnr_t2flt_msigma:%d \n",
+           pNrCfg->uvnr_t2flt_msigma);
+
+    //0x00bc
+    printf("(0x00bc) uvnr_t2flt_wtp:%d \n",
+           pNrCfg->uvnr_t2flt_wtp);
+    for(i = 0; i < NR_UVNR_T2FLT_WT_SIZE; i++) {
+        printf("(0x00bc) uvnr_t2flt_wt[%d]:%d \n",
+               i, pNrCfg->uvnr_t2flt_wt[i]);
+    }
+
+
+    printf("%s:(%d) entor \n", __FUNCTION__, __LINE__);
 }
 
 
 void CamHwIsp20::dumpYnrFixValue(struct rkispp_nr_config  * pNrCfg)
 {
-	printf("%s:(%d) enter \n", __FUNCTION__, __LINE__);
-	
-	int i = 0;
-	
-	//0x0104 - 0x0108
-	for(i=0; i<NR_YNR_SGM_DX_SIZE; i++){
-		printf("(0x0104 - 0x0108) ynr_sgm_dx[%d]:%d \n",
-			i, pNrCfg->ynr_sgm_dx[i]);
-	}
+    printf("%s:(%d) enter \n", __FUNCTION__, __LINE__);
 
-	//0x010c - 0x012c
-	for(i = 0; i < NR_YNR_SGM_Y_SIZE; i++){
-		printf("(0x010c - 0x012c) ynr_lsgm_y[%d]:%d \n",
-			i, pNrCfg->ynr_lsgm_y[i]);
-	}
+    int i = 0;
 
-	//0x0130
-	for(i=0; i<NR_YNR_CI_SIZE; i++){
-		printf("(0x0130) ynr_lci[%d]:%d \n",
-			i, pNrCfg->ynr_lci[i]);
-	}
+    //0x0104 - 0x0108
+    for(i = 0; i < NR_YNR_SGM_DX_SIZE; i++) {
+        printf("(0x0104 - 0x0108) ynr_sgm_dx[%d]:%d \n",
+               i, pNrCfg->ynr_sgm_dx[i]);
+    }
 
-	//0x0134
-	for(i=0; i<NR_YNR_LGAIN_MIN_SIZE; i++){
-		printf("(0x0134) ynr_lgain_min[%d]:%d \n",
-			i, pNrCfg->ynr_lgain_min[i]);
-	}
+    //0x010c - 0x012c
+    for(i = 0; i < NR_YNR_SGM_Y_SIZE; i++) {
+        printf("(0x010c - 0x012c) ynr_lsgm_y[%d]:%d \n",
+               i, pNrCfg->ynr_lsgm_y[i]);
+    }
 
-	//0x0138
-	printf("(0x0138) ynr_lgain_max:%d \n",
-			pNrCfg->ynr_lgain_max);
-	
-	
-	//0x013c
-	printf("(0x013c) ynr_lmerge_bound:%d ynr_lmerge_ratio:%d\n",
-			pNrCfg->ynr_lmerge_bound,
-			pNrCfg->ynr_lmerge_ratio);
+    //0x0130
+    for(i = 0; i < NR_YNR_CI_SIZE; i++) {
+        printf("(0x0130) ynr_lci[%d]:%d \n",
+               i, pNrCfg->ynr_lci[i]);
+    }
 
-	//0x0140
-	for(i=0; i<NR_YNR_LWEIT_FLT_SIZE; i++){
-		printf("(0x0140) ynr_lweit_flt[%d]:%d \n",
-			i, pNrCfg->ynr_lweit_flt[i]);
-	}
+    //0x0134
+    for(i = 0; i < NR_YNR_LGAIN_MIN_SIZE; i++) {
+        printf("(0x0134) ynr_lgain_min[%d]:%d \n",
+               i, pNrCfg->ynr_lgain_min[i]);
+    }
 
-	//0x0144 - 0x0164
-	for(i = 0; i < NR_YNR_SGM_Y_SIZE; i++){
-		printf("(0x0144 - 0x0164) ynr_hsgm_y[%d]:%d \n",
-			i, pNrCfg->ynr_hsgm_y[i]);
-	}
+    //0x0138
+    printf("(0x0138) ynr_lgain_max:%d \n",
+           pNrCfg->ynr_lgain_max);
 
-	//0x0168
-	for(i=0; i<NR_YNR_CI_SIZE; i++){
-		printf("(0x0168) ynr_hlci[%d]:%d \n",
-			i, pNrCfg->ynr_hlci[i]);
-	}
 
-	//0x016c
-	for(i=0; i<NR_YNR_CI_SIZE; i++){
-		printf("(0x016c) ynr_lhci[%d]:%d \n",
-			i, pNrCfg->ynr_lhci[i]);
-	}
+    //0x013c
+    printf("(0x013c) ynr_lmerge_bound:%d ynr_lmerge_ratio:%d\n",
+           pNrCfg->ynr_lmerge_bound,
+           pNrCfg->ynr_lmerge_ratio);
 
-	//0x0170
-	for(i=0; i<NR_YNR_CI_SIZE; i++){
-		printf("(0x0170) ynr_hhci[%d]:%d \n",
-			i, pNrCfg->ynr_hhci[i]);
-	}
+    //0x0140
+    for(i = 0; i < NR_YNR_LWEIT_FLT_SIZE; i++) {
+        printf("(0x0140) ynr_lweit_flt[%d]:%d \n",
+               i, pNrCfg->ynr_lweit_flt[i]);
+    }
 
-	//0x0174
-	for(i=0; i<NR_YNR_HGAIN_SGM_SIZE; i++){
-		printf("(0x0174) ynr_hgain_sgm[%d]:%d \n",
-			i, pNrCfg->ynr_hgain_sgm[i]);
-	}
+    //0x0144 - 0x0164
+    for(i = 0; i < NR_YNR_SGM_Y_SIZE; i++) {
+        printf("(0x0144 - 0x0164) ynr_hsgm_y[%d]:%d \n",
+               i, pNrCfg->ynr_hsgm_y[i]);
+    }
 
-	//0x0178 - 0x0188
-    for(i=0; i<5; i++){
-		printf("(0x0178 - 0x0188) ynr_hweit_d[%d - %d]:%d %d %d %d \n",
-			i*4 + 0, i*4 + 3,
-			pNrCfg->ynr_hweit_d[i*4 + 0],
-			pNrCfg->ynr_hweit_d[i*4 + 1],
-			pNrCfg->ynr_hweit_d[i*4 + 2],
-			pNrCfg->ynr_hweit_d[i*4 + 3]);
-	}
-		
+    //0x0168
+    for(i = 0; i < NR_YNR_CI_SIZE; i++) {
+        printf("(0x0168) ynr_hlci[%d]:%d \n",
+               i, pNrCfg->ynr_hlci[i]);
+    }
 
-	//0x018c - 0x01a0
-	for(i = 0; i < 6; i++){
-		printf("(0x018c - 0x01a0) ynr_hgrad_y[%d - %d]:%d %d %d %d \n",
-			i*4 + 0, i*4 + 3,
-			pNrCfg->ynr_hgrad_y[i*4 + 0],
-			pNrCfg->ynr_hgrad_y[i*4 + 1],
-			pNrCfg->ynr_hgrad_y[i*4 + 2],
-			pNrCfg->ynr_hgrad_y[i*4 + 3]);
-	}
+    //0x016c
+    for(i = 0; i < NR_YNR_CI_SIZE; i++) {
+        printf("(0x016c) ynr_lhci[%d]:%d \n",
+               i, pNrCfg->ynr_lhci[i]);
+    }
 
-	//0x01a4 -0x01a8
-	for(i=0; i<NR_YNR_HWEIT_SIZE; i++){
-		printf("(0x01a4 -0x01a8) ynr_hweit[%d]:%d \n",
-			i, pNrCfg->ynr_hweit[i]);
-	}
+    //0x0170
+    for(i = 0; i < NR_YNR_CI_SIZE; i++) {
+        printf("(0x0170) ynr_hhci[%d]:%d \n",
+               i, pNrCfg->ynr_hhci[i]);
+    }
 
-	//0x01b0
-	printf("(0x01b0) ynr_hmax_adjust:%d \n",
-			pNrCfg->ynr_hmax_adjust);
+    //0x0174
+    for(i = 0; i < NR_YNR_HGAIN_SGM_SIZE; i++) {
+        printf("(0x0174) ynr_hgain_sgm[%d]:%d \n",
+               i, pNrCfg->ynr_hgain_sgm[i]);
+    }
 
-	//0x01b4
-	printf("(0x01b4) ynr_hstrength:%d \n",
-			pNrCfg->ynr_hstrength);
+    //0x0178 - 0x0188
+    for(i = 0; i < 5; i++) {
+        printf("(0x0178 - 0x0188) ynr_hweit_d[%d - %d]:%d %d %d %d \n",
+               i * 4 + 0, i * 4 + 3,
+               pNrCfg->ynr_hweit_d[i * 4 + 0],
+               pNrCfg->ynr_hweit_d[i * 4 + 1],
+               pNrCfg->ynr_hweit_d[i * 4 + 2],
+               pNrCfg->ynr_hweit_d[i * 4 + 3]);
+    }
 
-	//0x01b8
-	printf("(0x01b8) ynr_lweit_cmp0-1:%d %d\n",
-			pNrCfg->ynr_lweit_cmp[0],
-			pNrCfg->ynr_lweit_cmp[1]);
 
-	//0x01bc
-	printf("(0x01bc) ynr_lmaxgain_lv4:%d \n",
-			pNrCfg->ynr_lmaxgain_lv4);
+    //0x018c - 0x01a0
+    for(i = 0; i < 6; i++) {
+        printf("(0x018c - 0x01a0) ynr_hgrad_y[%d - %d]:%d %d %d %d \n",
+               i * 4 + 0, i * 4 + 3,
+               pNrCfg->ynr_hgrad_y[i * 4 + 0],
+               pNrCfg->ynr_hgrad_y[i * 4 + 1],
+               pNrCfg->ynr_hgrad_y[i * 4 + 2],
+               pNrCfg->ynr_hgrad_y[i * 4 + 3]);
+    }
 
-	//0x01c0 - 0x01e0 
-	for(i=0; i<NR_YNR_HSTV_Y_SIZE; i++){
-		printf("(0x01c0 - 0x01e0 ) ynr_hstv_y[%d]:%d \n",
-			i, pNrCfg->ynr_hstv_y[i]);
-	}
-	
-	//0x01e4  - 0x01e8
-	for(i=0; i<NR_YNR_ST_SCALE_SIZE; i++){
-		printf("(0x01e4  - 0x01e8 ) ynr_st_scale[%d]:%d \n",
-			i, pNrCfg->ynr_st_scale[i]);
-	}
+    //0x01a4 -0x01a8
+    for(i = 0; i < NR_YNR_HWEIT_SIZE; i++) {
+        printf("(0x01a4 -0x01a8) ynr_hweit[%d]:%d \n",
+               i, pNrCfg->ynr_hweit[i]);
+    }
 
-	printf("%s:(%d) exit \n", __FUNCTION__, __LINE__);
-	
+    //0x01b0
+    printf("(0x01b0) ynr_hmax_adjust:%d \n",
+           pNrCfg->ynr_hmax_adjust);
+
+    //0x01b4
+    printf("(0x01b4) ynr_hstrength:%d \n",
+           pNrCfg->ynr_hstrength);
+
+    //0x01b8
+    printf("(0x01b8) ynr_lweit_cmp0-1:%d %d\n",
+           pNrCfg->ynr_lweit_cmp[0],
+           pNrCfg->ynr_lweit_cmp[1]);
+
+    //0x01bc
+    printf("(0x01bc) ynr_lmaxgain_lv4:%d \n",
+           pNrCfg->ynr_lmaxgain_lv4);
+
+    //0x01c0 - 0x01e0
+    for(i = 0; i < NR_YNR_HSTV_Y_SIZE; i++) {
+        printf("(0x01c0 - 0x01e0 ) ynr_hstv_y[%d]:%d \n",
+               i, pNrCfg->ynr_hstv_y[i]);
+    }
+
+    //0x01e4  - 0x01e8
+    for(i = 0; i < NR_YNR_ST_SCALE_SIZE; i++) {
+        printf("(0x01e4  - 0x01e8 ) ynr_st_scale[%d]:%d \n",
+               i, pNrCfg->ynr_st_scale[i]);
+    }
+
+    printf("%s:(%d) exit \n", __FUNCTION__, __LINE__);
+
 }
 
 
 void CamHwIsp20::dumpSharpFixValue(struct rkispp_sharp_config  * pSharpCfg)
 {
-	printf("%s:(%d) enter \n", __FUNCTION__, __LINE__);
-	int i = 0;
-	
-	//0x0080
-	printf("(0x0080) alpha_adp_en:%d yin_flt_en:%d edge_avg_en:%d\n",
-			pSharpCfg->alpha_adp_en,
-			pSharpCfg->yin_flt_en,
-			pSharpCfg->edge_avg_en);
-	
-	
-	//0x0084
-	printf("(0x0084) hbf_ratio:%d ehf_th:%d pbf_ratio:%d\n",
-			pSharpCfg->hbf_ratio,
-			pSharpCfg->ehf_th,
-			pSharpCfg->pbf_ratio);
+    printf("%s:(%d) enter \n", __FUNCTION__, __LINE__);
+    int i = 0;
 
-	//0x0088
-	printf("(0x0088) edge_thed:%d dir_min:%d smoth_th4:%d\n",
-			pSharpCfg->edge_thed,
-			pSharpCfg->dir_min,
-			pSharpCfg->smoth_th4);
-
-	//0x008c
-	printf("(0x008c) l_alpha:%d g_alpha:%d \n",
-			pSharpCfg->l_alpha,
-			pSharpCfg->g_alpha);
-	
-
-	//0x0090
-	for(i = 0; i < 3; i++){
-		printf("(0x0090) pbf_k[%d]:%d  \n",
-			i, pSharpCfg->pbf_k[i]);
-	}
-
-	
-
-	//0x0094 - 0x0098
-	for(i = 0; i < 6; i++){
-		printf("(0x0094 - 0x0098) mrf_k[%d]:%d  \n",
-			i, pSharpCfg->mrf_k[i]);
-	}
-	
-
-	//0x009c -0x00a4
-	for(i = 0; i < 12; i++){
-		printf("(0x009c -0x00a4) mbf_k[%d]:%d  \n",
-			i, pSharpCfg->mbf_k[i]);
-	}
-	
-	
-	//0x00a8 -0x00ac
-	for(i = 0; i < 6; i++){
-		printf("(0x00a8 -0x00ac) hrf_k[%d]:%d  \n",
-			i, pSharpCfg->hrf_k[i]);
-	}
-	
-
-	//0x00b0
-	for(i = 0; i < 3; i++){
-		printf("(0x00b0) hbf_k[%d]:%d  \n",
-			i, pSharpCfg->hbf_k[i]);
-	}
-
-	
-	//0x00b4
-	for(i = 0; i < 3; i++){
-		printf("(0x00b4) eg_coef[%d]:%d  \n",
-			i, pSharpCfg->eg_coef[i]);
-	}
-
-	//0x00b8
-	for(i = 0; i < 3; i++){
-		printf("(0x00b8) eg_smoth[%d]:%d  \n",
-			i, pSharpCfg->eg_smoth[i]);
-	}
+    //0x0080
+    printf("(0x0080) alpha_adp_en:%d yin_flt_en:%d edge_avg_en:%d\n",
+           pSharpCfg->alpha_adp_en,
+           pSharpCfg->yin_flt_en,
+           pSharpCfg->edge_avg_en);
 
 
-	//0x00bc - 0x00c0
-	for(i = 0; i < 6; i++){
-		printf("(0x00bc - 0x00c0) eg_gaus[%d]:%d  \n",
-			i, pSharpCfg->eg_gaus[i]);
-	}
-	
+    //0x0084
+    printf("(0x0084) hbf_ratio:%d ehf_th:%d pbf_ratio:%d\n",
+           pSharpCfg->hbf_ratio,
+           pSharpCfg->ehf_th,
+           pSharpCfg->pbf_ratio);
 
-	//0x00c4 - 0x00c8
-	for(i = 0; i < 6; i++){
-		printf("(0x00c4 - 0x00c8) dog_k[%d]:%d  \n",
-			i, pSharpCfg->dog_k[i]);
-	}
+    //0x0088
+    printf("(0x0088) edge_thed:%d dir_min:%d smoth_th4:%d\n",
+           pSharpCfg->edge_thed,
+           pSharpCfg->dir_min,
+           pSharpCfg->smoth_th4);
+
+    //0x008c
+    printf("(0x008c) l_alpha:%d g_alpha:%d \n",
+           pSharpCfg->l_alpha,
+           pSharpCfg->g_alpha);
 
 
-	//0x00cc - 0x00d0
-	for(i=0; i<SHP_LUM_POINT_SIZE; i++){
-		printf("(0x00cc - 0x00d0) lum_point[%d]:%d  \n",
-			i, pSharpCfg->lum_point[i]);
-	}
-	
-	//0x00d4
-	printf("(0x00d4) pbf_shf_bits:%d  mbf_shf_bits:%d hbf_shf_bits:%d\n",
-		pSharpCfg->pbf_shf_bits,
-		pSharpCfg->mbf_shf_bits,
-		pSharpCfg->hbf_shf_bits);
-	
+    //0x0090
+    for(i = 0; i < 3; i++) {
+        printf("(0x0090) pbf_k[%d]:%d  \n",
+               i, pSharpCfg->pbf_k[i]);
+    }
 
-	//0x00d8 - 0x00dc
-	for(i=0; i<SHP_SIGMA_SIZE; i++){
-		printf("(0x00d8 - 0x00dc) pbf_sigma[%d]:%d  \n",
-			i, pSharpCfg->pbf_sigma[i]);
-	}
 
-	//0x00e0 - 0x00e4
-	for(i=0; i<SHP_LUM_CLP_SIZE; i++){
-		printf("(0x00e0 - 0x00e4) lum_clp_m[%d]:%d  \n",
-			i, pSharpCfg->lum_clp_m[i]);
-	}
 
-	//0x00e8 - 0x00ec
-	for(i=0; i<SHP_LUM_MIN_SIZE; i++){
-		printf("(0x00e8 - 0x00ec) lum_min_m[%d]:%d  \n",
-			i, pSharpCfg->lum_min_m[i]);	
-	}
+    //0x0094 - 0x0098
+    for(i = 0; i < 6; i++) {
+        printf("(0x0094 - 0x0098) mrf_k[%d]:%d  \n",
+               i, pSharpCfg->mrf_k[i]);
+    }
 
-	//0x00f0 - 0x00f4
-	for(i=0; i<SHP_SIGMA_SIZE; i++){
-		printf("(0x00f0 - 0x00f4) mbf_sigma[%d]:%d  \n",
-			i, pSharpCfg->mbf_sigma[i]);	
-	}
 
-	//0x00f8 - 0x00fc
-	for(i=0; i<SHP_LUM_CLP_SIZE; i++){
-		printf("(0x00f8 - 0x00fc) lum_clp_h[%d]:%d  \n",
-			i, pSharpCfg->lum_clp_h[i]);	
-	}
+    //0x009c -0x00a4
+    for(i = 0; i < 12; i++) {
+        printf("(0x009c -0x00a4) mbf_k[%d]:%d  \n",
+               i, pSharpCfg->mbf_k[i]);
+    }
 
-	//0x0100 - 0x0104
-	for(i=0; i<SHP_SIGMA_SIZE; i++){
-		printf("(0x0100 - 0x0104) hbf_sigma[%d]:%d  \n",
-			i, pSharpCfg->hbf_sigma[i]);
-	}
 
-	//0x0108 - 0x010c
-	for(i=0; i<SHP_EDGE_LUM_THED_SIZE; i++){
-		printf("(0x0108 - 0x010c) edge_lum_thed[%d]:%d  \n",
-			i, pSharpCfg->edge_lum_thed[i]);
-	}
+    //0x00a8 -0x00ac
+    for(i = 0; i < 6; i++) {
+        printf("(0x00a8 -0x00ac) hrf_k[%d]:%d  \n",
+               i, pSharpCfg->hrf_k[i]);
+    }
 
-	//0x0110 - 0x0114
-	for(i=0; i<SHP_CLAMP_SIZE; i++){
-		printf("(0x0110 - 0x0114) clamp_pos[%d]:%d  \n",
-			i, pSharpCfg->clamp_pos[i]);
-	}
 
-	//0x0118 - 0x011c
-	for(i=0; i<SHP_CLAMP_SIZE; i++){
-		printf("(0x0118 - 0x011c) clamp_neg[%d]:%d  \n",
-			i, pSharpCfg->clamp_neg[i]);
-	}
+    //0x00b0
+    for(i = 0; i < 3; i++) {
+        printf("(0x00b0) hbf_k[%d]:%d  \n",
+               i, pSharpCfg->hbf_k[i]);
+    }
 
-	//0x0120 - 0x0124
-	for(i=0; i<SHP_DETAIL_ALPHA_SIZE; i++){
-		printf("(0x0120 - 0x0124) detail_alpha[%d]:%d  \n",
-			i, pSharpCfg->detail_alpha[i]);
-	}
 
-	//0x0128
-	printf("(0x0128) rfl_ratio:%d  rfh_ratio:%d\n",
-			pSharpCfg->rfl_ratio, pSharpCfg->rfh_ratio);
-	
-	// mf/hf ratio
+    //0x00b4
+    for(i = 0; i < 3; i++) {
+        printf("(0x00b4) eg_coef[%d]:%d  \n",
+               i, pSharpCfg->eg_coef[i]);
+    }
 
-	//0x012C
-	printf("(0x012C) m_ratio:%d  h_ratio:%d\n",
-			pSharpCfg->m_ratio, pSharpCfg->h_ratio);
-	
-	printf("%s:(%d) exit \n", __FUNCTION__, __LINE__);
+    //0x00b8
+    for(i = 0; i < 3; i++) {
+        printf("(0x00b8) eg_smoth[%d]:%d  \n",
+               i, pSharpCfg->eg_smoth[i]);
+    }
+
+
+    //0x00bc - 0x00c0
+    for(i = 0; i < 6; i++) {
+        printf("(0x00bc - 0x00c0) eg_gaus[%d]:%d  \n",
+               i, pSharpCfg->eg_gaus[i]);
+    }
+
+
+    //0x00c4 - 0x00c8
+    for(i = 0; i < 6; i++) {
+        printf("(0x00c4 - 0x00c8) dog_k[%d]:%d  \n",
+               i, pSharpCfg->dog_k[i]);
+    }
+
+
+    //0x00cc - 0x00d0
+    for(i = 0; i < SHP_LUM_POINT_SIZE; i++) {
+        printf("(0x00cc - 0x00d0) lum_point[%d]:%d  \n",
+               i, pSharpCfg->lum_point[i]);
+    }
+
+    //0x00d4
+    printf("(0x00d4) pbf_shf_bits:%d  mbf_shf_bits:%d hbf_shf_bits:%d\n",
+           pSharpCfg->pbf_shf_bits,
+           pSharpCfg->mbf_shf_bits,
+           pSharpCfg->hbf_shf_bits);
+
+
+    //0x00d8 - 0x00dc
+    for(i = 0; i < SHP_SIGMA_SIZE; i++) {
+        printf("(0x00d8 - 0x00dc) pbf_sigma[%d]:%d  \n",
+               i, pSharpCfg->pbf_sigma[i]);
+    }
+
+    //0x00e0 - 0x00e4
+    for(i = 0; i < SHP_LUM_CLP_SIZE; i++) {
+        printf("(0x00e0 - 0x00e4) lum_clp_m[%d]:%d  \n",
+               i, pSharpCfg->lum_clp_m[i]);
+    }
+
+    //0x00e8 - 0x00ec
+    for(i = 0; i < SHP_LUM_MIN_SIZE; i++) {
+        printf("(0x00e8 - 0x00ec) lum_min_m[%d]:%d  \n",
+               i, pSharpCfg->lum_min_m[i]);
+    }
+
+    //0x00f0 - 0x00f4
+    for(i = 0; i < SHP_SIGMA_SIZE; i++) {
+        printf("(0x00f0 - 0x00f4) mbf_sigma[%d]:%d  \n",
+               i, pSharpCfg->mbf_sigma[i]);
+    }
+
+    //0x00f8 - 0x00fc
+    for(i = 0; i < SHP_LUM_CLP_SIZE; i++) {
+        printf("(0x00f8 - 0x00fc) lum_clp_h[%d]:%d  \n",
+               i, pSharpCfg->lum_clp_h[i]);
+    }
+
+    //0x0100 - 0x0104
+    for(i = 0; i < SHP_SIGMA_SIZE; i++) {
+        printf("(0x0100 - 0x0104) hbf_sigma[%d]:%d  \n",
+               i, pSharpCfg->hbf_sigma[i]);
+    }
+
+    //0x0108 - 0x010c
+    for(i = 0; i < SHP_EDGE_LUM_THED_SIZE; i++) {
+        printf("(0x0108 - 0x010c) edge_lum_thed[%d]:%d  \n",
+               i, pSharpCfg->edge_lum_thed[i]);
+    }
+
+    //0x0110 - 0x0114
+    for(i = 0; i < SHP_CLAMP_SIZE; i++) {
+        printf("(0x0110 - 0x0114) clamp_pos[%d]:%d  \n",
+               i, pSharpCfg->clamp_pos[i]);
+    }
+
+    //0x0118 - 0x011c
+    for(i = 0; i < SHP_CLAMP_SIZE; i++) {
+        printf("(0x0118 - 0x011c) clamp_neg[%d]:%d  \n",
+               i, pSharpCfg->clamp_neg[i]);
+    }
+
+    //0x0120 - 0x0124
+    for(i = 0; i < SHP_DETAIL_ALPHA_SIZE; i++) {
+        printf("(0x0120 - 0x0124) detail_alpha[%d]:%d  \n",
+               i, pSharpCfg->detail_alpha[i]);
+    }
+
+    //0x0128
+    printf("(0x0128) rfl_ratio:%d  rfh_ratio:%d\n",
+           pSharpCfg->rfl_ratio, pSharpCfg->rfh_ratio);
+
+    // mf/hf ratio
+
+    //0x012C
+    printf("(0x012C) m_ratio:%d  h_ratio:%d\n",
+           pSharpCfg->m_ratio, pSharpCfg->h_ratio);
+
+    printf("%s:(%d) exit \n", __FUNCTION__, __LINE__);
 }
 
 }; //namspace RkCam

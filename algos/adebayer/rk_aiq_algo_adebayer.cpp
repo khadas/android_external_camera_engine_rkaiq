@@ -127,6 +127,7 @@ AdebayerFullParamsInit
     pAdebayerCtx->full_param.shift_num = pAdebayerCtx->pCalibDb->dm.debayer_shift_num;
     pAdebayerCtx->full_param.cnr_strength = pAdebayerCtx->pCalibDb->dm.debayer_cnr_strength;
 
+    return 0;
 }
 
 //debayer inint

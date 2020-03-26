@@ -62,6 +62,7 @@ RkAiqManager::RkAiqManager(const char* sns_ent_name,
     , mMetasCb(metas_cb)
     , mSnsEntName(sns_ent_name)
     , mWorkingMode(RK_AIQ_WORKING_MODE_NORMAL)
+    , mCalibDb(NULL)
 {
     ENTER_XCORE_FUNCTION();
     EXIT_XCORE_FUNCTION();
@@ -71,13 +72,6 @@ RkAiqManager::~RkAiqManager()
 {
     ENTER_XCORE_FUNCTION();
     EXIT_XCORE_FUNCTION();
-}
-
-XCamReturn
-RkAiqManager::getAiqStaticInfos()
-{
-    // TODO
-    return XCAM_RETURN_ERROR_UNKNOWN;
 }
 
 void
@@ -157,26 +151,24 @@ RkAiqManager::prepare(uint32_t width, uint32_t height, rk_aiq_working_mode_t mod
 
     XCAM_ASSERT (mCalibDb);
 
-    // TODO: get specific hdr mode from iq
-    int working_mode_hw = mode;
+    int working_mode_hw;
+    if (mode == RK_AIQ_WORKING_MODE_NORMAL) {
+        working_mode_hw = mode;
+    } else {
+        if (mode != RK_AIQ_HDR_GET_WORKING_MODE(mCalibDb->sysContrl.hdr_mode)) {
+            ret = XCAM_RETURN_ERROR_PARAM;
+            RKAIQMNG_CHECK_RET(ret, "Not supported HDR mode!");
+        } else {
+            working_mode_hw = mCalibDb->sysContrl.hdr_mode;
+        }
+    }
     ret = mCamHw->prepare(width, height, working_mode_hw);
     RKAIQMNG_CHECK_RET(ret, "camhw prepare error %d", ret);
 
     xcam_mem_clear(sensor_des);
     ret = mCamHw->getSensorModeData(mSnsEntName, sensor_des);
-    RKAIQMNG_CHECK_RET(ret, "getSensorModeData error %d", ret);
 
-    // TODO: for test
-#ifdef RK_SIMULATOR_HW
-    //imx347
-    sensor_des.sensor_output_width = 2712;
-    sensor_des.sensor_output_height = 1536;
-    working_mode_hw = RK_AIQ_ISP_HDR_MODE_2_LINE_HDR;
-#else
-    sensor_des.sensor_output_width = 672;
-    sensor_des.sensor_output_height = 380;
-    working_mode_hw = RK_AIQ_ISP_HDR_MODE_3_LINE_HDR; // RK_AIQ_WORKING_MODE_NORMAL
-#endif
+    RKAIQMNG_CHECK_RET(ret, "getSensorModeData error %d", ret);
     ret = mRkAiqAnalyzer->prepare(&sensor_des, working_mode_hw);
     RKAIQMNG_CHECK_RET(ret, "analyzer prepare error %d", ret);
 
@@ -263,6 +255,14 @@ RkAiqManager::deInit()
 }
 
 XCamReturn
+RkAiqManager::isppStatsCb(SmartPtr<VideoBuffer>& isppStats)
+{
+    ENTER_XCORE_FUNCTION();
+    return ispStatsCb(isppStats);
+    EXIT_XCORE_FUNCTION();
+}
+
+XCamReturn
 RkAiqManager::ispLumaCb(SmartPtr<VideoBuffer>& ispLuma)
 {
     ENTER_XCORE_FUNCTION();
@@ -326,6 +326,11 @@ RkAiqManager::applyAnalyzerResult(SmartPtr<RkAiqFullParamsProxy>& results)
         ret = mCamHw->setIspParams(aiqParams->mIspParams);
         //}
         RKAIQMNG_CHECK_RET(ret, "setIspParams error %d", ret);
+    }
+
+    if (aiqParams->mIsppParams.ptr()) {
+        ret = mCamHw->setIsppParams(aiqParams->mIsppParams);
+        RKAIQMNG_CHECK_RET(ret, "setIsppParams error %d", ret);
     }
 
     if (aiqParams->mExposureParams.ptr()) {

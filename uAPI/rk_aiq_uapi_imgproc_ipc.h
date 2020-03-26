@@ -24,6 +24,12 @@
 #include "rk_aiq_uapi_anr.h"
 #include "rk_aiq_uapi_ahdr.h"
 #include "rk_aiq_uapi_adhz.h"
+#include "rk_aiq_user_api_alsc.h"
+#include "rk_aiq_user_api_accm.h"
+#include "rk_aiq_user_api_a3dlut.h"
+#include "rk_aiq_user_api_agamma.h"
+
+
 
 /*
 *****************************

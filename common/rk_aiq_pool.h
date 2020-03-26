@@ -48,12 +48,15 @@ typedef SharedItemPool<rk_aiq_isp_params_t> RkAiqIspParamsPool;
 typedef SharedItemProxy<rk_aiq_isp_params_t> RkAiqIspParamsProxy;
 typedef SharedItemPool<rk_aiq_focus_params_t> RkAiqFocusParamsPool;
 typedef SharedItemProxy<rk_aiq_focus_params_t> RkAiqFocusParamsProxy;
+typedef SharedItemPool<rk_aiq_ispp_params_t> RkAiqIsppParamsPool;
+typedef SharedItemProxy<rk_aiq_ispp_params_t> RkAiqIsppParamsProxy;
 
 class RkAiqFullParams {
 public:
     explicit RkAiqFullParams()
         : mExposureParams(NULL)
         , mIspParams(NULL)
+        , mIsppParams(NULL)
         , mFocusParams(NULL) {
     };
     ~RkAiqFullParams() {};
@@ -61,10 +64,12 @@ public:
     void reset() {
         mExposureParams.release();
         mIspParams.release();
+        mIsppParams.release();
         mFocusParams.release();
     };
     SmartPtr<RkAiqExpParamsProxy> mExposureParams;
     SmartPtr<RkAiqIspParamsProxy> mIspParams;
+    SmartPtr<RkAiqIsppParamsProxy> mIsppParams;
     SmartPtr<RkAiqFocusParamsProxy> mFocusParams;
 
 private:

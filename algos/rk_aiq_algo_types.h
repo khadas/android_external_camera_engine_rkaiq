@@ -1,7 +1,7 @@
 /*
  * rk_aiq_algo_types.h
  *
- *  Copyright (c) 2019 Intel Corporation
+ *  Copyright (c) 2019 Rockchip Corporation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -274,6 +274,7 @@ typedef struct _RkAiqAlgoProcAcp {
 
 typedef struct _RkAiqAlgoProcResAcp {
     RkAiqAlgoResCom proc_res_com;
+    rk_aiq_acp_params_t acp_res;
 } RkAiqAlgoProcResAcp;
 
 typedef struct _RkAiqAlgoPostAcp {
@@ -303,6 +304,7 @@ typedef struct _RkAiqAlgoProcAdhaz {
 
 typedef struct _RkAiqAlgoProcResAdhaz {
     RkAiqAlgoResCom proc_res_com;
+	 rk_aiq_dehaze_cfg_t adhaz_config;
 } RkAiqAlgoProcResAdhaz;
 
 typedef struct _RkAiqAlgoPostAdhaz {
@@ -538,6 +540,7 @@ typedef struct _RkAiqAlgoProcAgamma {
 
 typedef struct _RkAiqAlgoProcResAgamma {
     RkAiqAlgoResCom proc_res_com;
+	rk_aiq_gamma_cfg_t agamma_config;
 } RkAiqAlgoProcResAgamma;
 
 typedef struct _RkAiqAlgoPostAgamma {
@@ -596,6 +599,7 @@ typedef struct _RkAiqAlgoProcAie {
 
 typedef struct _RkAiqAlgoProcResAie {
     RkAiqAlgoResCom proc_res_com;
+    rk_aiq_aie_params_t params;
 } RkAiqAlgoProcResAie;
 
 typedef struct _RkAiqAlgoPostAie {
@@ -684,6 +688,7 @@ typedef struct _RkAiqAlgoProcAorb {
 
 typedef struct _RkAiqAlgoProcResAorb {
     RkAiqAlgoResCom proc_res_com;
+    rk_aiq_orb_algo_meas_t aorb_meas;
 } RkAiqAlgoProcResAorb;
 
 typedef struct _RkAiqAlgoPostAorb {

@@ -262,10 +262,10 @@ CamHwSimulator::setIspParams(SmartPtr<RkAiqIspParamsProxy>& ispParams)
     //ae
     g_simisp_params.ae_hw_config.ae_meas = ispParams->data()->aec_meas;
     g_simisp_params.ae_hw_config.hist_meas = ispParams->data()->hist_meas;
-    LOGE("return new AeHwConfig,rawaebig2.wnd_num=%d,rawaebig3.win.h_size=%d,rawhist2.weight[25]=%d",
-         g_simisp_params.ae_hw_config.ae_meas.rawaebig2.wnd_num,
-         g_simisp_params.ae_hw_config.ae_meas.rawaebig3.win.h_size,
-         g_simisp_params.ae_hw_config.hist_meas.rawhstbig2.weight[25]);
+    LOGE("return new AeHwConfig,rawae1.wnd_num=%d,rawae2.win.h_size=%d,rawhist2.weight[25]=%d",
+         g_simisp_params.ae_hw_config.ae_meas.rawae1.wnd_num,
+         g_simisp_params.ae_hw_config.ae_meas.rawae2.win.h_size,
+         g_simisp_params.ae_hw_config.hist_meas.rawhist1.weight[25]);
 
 #if 1
     g_simisp_params.rkaiq_anr_proc_res = ispParams->data()->rkaiq_anr_proc_res;
@@ -377,7 +377,10 @@ XCamReturn
 CamHwSimulator::getSensorModeData(const char* sns_ent_name,
                                   rk_aiq_exposure_sensor_descriptor& sns_des)
 {
-    return CamHwBase::getSensorModeData(sns_ent_name, sns_des);
+    sns_des.sensor_output_width = g_simisp_params.rawWidth;
+    sns_des.sensor_output_height = g_simisp_params.rawHeight;
+
+    return XCAM_RETURN_NO_ERROR;
 }
 XCamReturn
 CamHwSimulator::setExposureParams(SmartPtr<RkAiqExpParamsProxy>& expPar)

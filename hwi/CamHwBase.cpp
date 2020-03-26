@@ -20,36 +20,15 @@
 
 namespace RkCam {
 
-std::map<std::string, SmartPtr<rk_aiq_static_info_t>> CamHwBase::mCamHwInfos;
-
 CamHwBase::CamHwBase()
 {}
 
 CamHwBase::~CamHwBase()
 {}
 
-//static
-XCamReturn
-CamHwBase::getCamHwInfos()
-{
-    // TODO
-    // (1) all sensor info
-    // (2) all pipeline entity infos belonged to
-    //     the sensor
-    return XCAM_RETURN_NO_ERROR;
-}
-
 XCamReturn
 CamHwBase::init(const char* sns_ent_name)
 {
-    if (mCamHwInfos.empty())
-        getCamHwInfos();
-
-    std::string sensor_name(sns_ent_name);
-    if (mCamHwInfos.find(sensor_name) != mCamHwInfos.end()) {
-        LOGE("can't find sensor %s", sns_ent_name);
-        return XCAM_RETURN_ERROR_SENSOR;
-    }
     // TODO: new all subdevices and open
     return XCAM_RETURN_NO_ERROR;
 }
@@ -100,6 +79,7 @@ CamHwBase::getSensorModeData(const char* sns_ent_name,
 {
     // TODO
     // get from SensorHw
+
     return XCAM_RETURN_NO_ERROR;
 }
 
@@ -122,9 +102,23 @@ CamHwBase::setFocusParams(SmartPtr<RkAiqFocusParamsProxy>& focus_params)
 }
 
 XCamReturn
+CamHwBase::setIsppParams(SmartPtr<RkAiqIsppParamsProxy>& isppParams)
+{
+    return XCAM_RETURN_NO_ERROR;
+}
+
+XCamReturn
 CamHwBase::setIspLumaListener(IspLumaListener* lumaListener)
 {
     mIspLumaListener = lumaListener;
+
+    return XCAM_RETURN_NO_ERROR;
+}
+
+XCamReturn
+CamHwBase::setIsppStatsListener(IsppStatsListener* isppStatsListener)
+{
+    mIsppStatsListener = isppStatsListener;
 
     return XCAM_RETURN_NO_ERROR;
 }

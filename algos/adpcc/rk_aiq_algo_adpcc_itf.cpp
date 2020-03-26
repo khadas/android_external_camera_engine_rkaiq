@@ -19,7 +19,7 @@
 
 #include "rk_aiq_algo_types_int.h"
 #include "adpcc/rk_aiq_algo_adpcc_itf.h"
-#include "adpcc/adpcc.h"
+#include "adpcc/rk_aiq_adpcc_algo.h"
 
 RKAIQ_BEGIN_DECLARE
 
@@ -35,10 +35,11 @@ create_context(RkAiqAlgoContext **context, const AlgoCtxInstanceCfg* cfg)
 	XCamReturn result = XCAM_RETURN_NO_ERROR;
 
 	LOGI_ADPCC("%s: (enter)\n", __FUNCTION__ );
-	 
+	AlgoCtxInstanceCfgInt *cfgInt = (AlgoCtxInstanceCfgInt*)cfg;
+	
 #if 1
 	AdpccContext_t* pAdpccCtx = NULL;
-    AdpccResult_t ret = AdpccInit(&pAdpccCtx);
+    AdpccResult_t ret = AdpccInit(&pAdpccCtx, cfgInt->calib);
 	if(ret != ADPCC_RET_SUCCESS){
 		result = XCAM_RETURN_ERROR_FAILED;
 		LOGE_ADPCC("%s: Initializaion Adpcc failed (%d)\n", __FUNCTION__, ret);
@@ -82,8 +83,6 @@ prepare(RkAiqAlgoCom* params)
     AdpccContext_t* pAdpccCtx = (AdpccContext_t *)params->ctx;
     RkAiqAlgoConfigAdpccInt* pCfgParam = (RkAiqAlgoConfigAdpccInt*)params;
 	AdpccConfig_t* pAdpccConfig = &pCfgParam->stAdpccConfig;
-
-	pAdpccConfig->stDpccCalib = pCfgParam->rk_com.u.prepare.calib->dpcc;
 	
 	AdpccResult_t ret = AdpccConfig(pAdpccCtx, pAdpccConfig);
 	if(ret != ADPCC_RET_SUCCESS){
@@ -116,12 +115,17 @@ processing(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outparams)
 	RkAiqAlgoProcResAdpccInt* pAdpccProcResParams = (RkAiqAlgoProcResAdpccInt*)outparams;
 	AdpccContext_t* pAdpccCtx = (AdpccContext_t *)inparams->ctx;
 
-	LOGD_ADPCC("%s:%d init:%d iso:%d \n", __FUNCTION__, __LINE__, inparams->u.proc.init, iso);
+	LOGD_ADPCC("%s:%d init:%d iso:%d \n", __FUNCTION__, __LINE__,
+               inparams->u.proc.init, pAdpccProcParams->rk_com.u.proc.iso);
 
+	#if 0
 	if(inparams->u.proc.init)
 		iso = 50;
 	else
 		iso = pAdpccProcParams->rk_com.u.proc.iso;
+	#else
+		iso = 50;
+	#endif
 	
 	AdpccResult_t ret = AdpccProcess(pAdpccCtx, iso);
 	if(ret != ADPCC_RET_SUCCESS){

@@ -34,6 +34,15 @@ typedef struct ispHwEvt_s {
     } msg;
 } ispHwEvt_t;
 
+class IsppStatsListener {
+public:
+    IsppStatsListener() {};
+    virtual ~IsppStatsListener() {};
+    virtual XCamReturn isppStatsCb(SmartPtr<VideoBuffer>& isppStats) = 0;
+private:
+    XCAM_DEAD_COPY (IsppStatsListener);
+};
+
 class IspLumaListener {
 public:
     IspLumaListener() {};
@@ -76,6 +85,8 @@ public:
     virtual XCamReturn setHdrProcessCount(int frame_id, int count) = 0;
     virtual XCamReturn setExposureParams(SmartPtr<RkAiqExpParamsProxy>& expPar) = 0;
     virtual XCamReturn setFocusParams(SmartPtr<RkAiqFocusParamsProxy>& focus_params) = 0;
+    virtual XCamReturn setIsppParams(SmartPtr<RkAiqIsppParamsProxy>& isppParams) = 0;
+    virtual XCamReturn setIsppStatsListener(IsppStatsListener* isppStatsListener) = 0;
     virtual XCamReturn setIspLumaListener(IspLumaListener* lumaListener) = 0;
     virtual XCamReturn setIspStatsListener(IspStatsListener* statsListener) = 0;
     virtual XCamReturn setEvtsListener(IspEvtsListener* evtListener) = 0;

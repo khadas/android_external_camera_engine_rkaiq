@@ -128,18 +128,12 @@ pCalibDb->ahdr.tmo.DynamicRange[3] = 72;
 pCalibDb->ahdr.tmo.DynamicRange[4] = 78;
 pCalibDb->ahdr.tmo.DynamicRange[5] = 84;
 pCalibDb->ahdr.tmo.DayTh = 0.5;
-pCalibDb->ahdr.tmo.smoothControlCoef1[0] = 0;
-pCalibDb->ahdr.tmo.smoothControlCoef1[1] = 0;
-pCalibDb->ahdr.tmo.smoothControlCoef1[2] = 128;
-pCalibDb->ahdr.tmo.smoothControlCoef1[3] = 235;
-pCalibDb->ahdr.tmo.smoothControlCoef1[4] = 255;
-pCalibDb->ahdr.tmo.smoothControlCoef1[5] = 255;
-pCalibDb->ahdr.tmo.smoothControlCoef2[0] = 76;
-pCalibDb->ahdr.tmo.smoothControlCoef2[1] = 76;
-pCalibDb->ahdr.tmo.smoothControlCoef2[2] = 76;
-pCalibDb->ahdr.tmo.smoothControlCoef2[3] = 76;
-pCalibDb->ahdr.tmo.smoothControlCoef2[4] = 76;
-pCalibDb->ahdr.tmo.smoothControlCoef2[5] = 76;
+pCalibDb->ahdr.tmo.smoothCtrlCoef[0] = 76;
+pCalibDb->ahdr.tmo.smoothCtrlCoef[1] = 76;
+pCalibDb->ahdr.tmo.smoothCtrlCoef[2] = 76;
+pCalibDb->ahdr.tmo.smoothCtrlCoef[3] = 76;
+pCalibDb->ahdr.tmo.smoothCtrlCoef[4] = 76;
+pCalibDb->ahdr.tmo.smoothCtrlCoef[5] = 76;
 
 pCalibDb->ahdr.tmo.damp = 0.3;
 

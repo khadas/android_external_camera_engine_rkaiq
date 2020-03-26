@@ -19,10 +19,16 @@
 /* for rockchip v2.0.0*/
 
 #include "rk_aiq_algo_types_int.h"
+
+
 #include "rk_aiq_algo_adhaz_itf.h"
 #include "RkAiqCalibDbTypes.h"
-#include "adehaze/dehaze.h"
+#include "adehaze/rk_aiq_adehaze_algo.h"
 #include "RkAiqCalibDbTypes.h"
+
+
+
+
 
 RKAIQ_BEGIN_DECLARE
 
@@ -49,45 +55,58 @@ destroy_context(RkAiqAlgoContext *context)
 }
 
 static XCamReturn
-prepare(RkAiqAlgoCom* params)
-{
-    XCamReturn ret;
-	RkAiqAlgoConfigAdhazInt* config = (RkAiqAlgoConfigAdhazInt*)params;
-    AdehazeHandle_t * AdehazeHandle = (AdehazeHandle_t *)params->ctx;
-    RKAiqAdhazHtmlConfig_t adhaz_html_para;
-    CamCalibDbContext_t* calib = config->rk_com.u.prepare.calib;
-	const CalibDb_Dehaze_t *calib_dehaze = &calib->dehaze;
-    //TO DO
+	prepare(RkAiqAlgoCom* params)
+	{
 
-    ret = AdehazeConfigV200(calib_dehaze, AdehazeHandle);
-    return XCAM_RETURN_NO_ERROR;
+		XCamReturn ret;
+		int iso;
 
-}
+		RkAiqAlgoConfigAdhazInt* config = (RkAiqAlgoConfigAdhazInt*)params;
+		AdehazeHandle_t * AdehazeHandle = (AdehazeHandle_t *)params->ctx;
+		RKAiqAdhazHtmlConfig_t adhaz_html_para;
+		CamCalibDbContext_t* calib = config->rk_com.u.prepare.calib;
+		const CalibDb_Dehaze_t *calib_dehaze = &calib->dehaze;
+		//TO DO
+		iso = 50;
+		ret = AdehazeConfigV200(calib_dehaze, AdehazeHandle,iso);
+		return XCAM_RETURN_NO_ERROR;
 
-static XCamReturn
-pre_process(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outparams)
-{
-    return XCAM_RETURN_NO_ERROR;
-}
+	}
 
-static XCamReturn
-processing(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outparams)
-{
-    XCamReturn ret;
-    AdehazeHandle_t * AdehazeHandle = (AdehazeHandle_t *)inparams->ctx;
-    RkAiqAlgoProcAdhazInt* procPara = (RkAiqAlgoProcAdhazInt*)inparams;
-    RkAiqAlgoProcResAdhazInt* procResPara = (RkAiqAlgoProcResAdhazInt*)outparams;
-    RKAiqAdhazConfig_t* adhaz_config;
-	const CalibDb_Dehaze_t *calib_dehaze = AdehazeHandle->calib_dehaz;
-    adhaz_config = (RKAiqAdhazConfig_t*)&procResPara->adhaz_config;
+	static XCamReturn
+	pre_process(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outparams)
+	{
+		return XCAM_RETURN_NO_ERROR;
+	}
 
-    if(inparams->u.proc.init == false) {
-        ret = AdehazeReConfigV200(AdehazeHandle, calib_dehaze);
-    }
-    memcpy(adhaz_config, &AdehazeHandle->adhaz_config, sizeof(RKAiqAdhazConfig_t));
-    return XCAM_RETURN_NO_ERROR;
+	static XCamReturn
+	processing(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outparams)
+	{
 
-}
+		XCamReturn ret;
+		int iso;
+
+		AdehazeHandle_t * AdehazeHandle = (AdehazeHandle_t *)inparams->ctx;
+		RkAiqAlgoProcAdhazInt* procPara = (RkAiqAlgoProcAdhazInt*)inparams;
+		RkAiqAlgoProcResAdhaz* procResPara = (RkAiqAlgoProcResAdhaz*)outparams;
+		rk_aiq_dehaze_cfg_t* adhaz_config;
+		const CalibDb_Dehaze_t *calib_dehaze = AdehazeHandle->calib_dehaz;
+		adhaz_config = (rk_aiq_dehaze_cfg_t*)&procResPara->adhaz_config;
+
+
+		if(inparams->u.proc.init == false) {
+			iso = procPara->rk_com.u.proc.iso;
+			//todo
+			ret = AdehazeReConfigV200(AdehazeHandle,calib_dehaze,iso);
+		}
+
+		memcpy(adhaz_config, &AdehazeHandle->adhaz_config, sizeof(rk_aiq_dehaze_cfg_t));
+		return XCAM_RETURN_NO_ERROR;
+
+
+
+
+	}
 
 static XCamReturn
 post_process(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outparams)

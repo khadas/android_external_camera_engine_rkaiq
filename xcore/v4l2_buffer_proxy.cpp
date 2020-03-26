@@ -81,7 +81,12 @@ void
 V4l2BufferProxy::v4l2_format_to_video_info (
     const struct v4l2_format &format, VideoBufferInfo &info)
 {
-    info.format = format.fmt.pix.pixelformat;
+    if (format.type == V4L2_BUF_TYPE_META_CAPTURE ||
+        format.type == V4L2_BUF_TYPE_META_OUTPUT) {
+        info.format = format.fmt.meta.dataformat;
+    } else {
+        info.format = format.fmt.pix.pixelformat;
+    }
     info.color_bits = 8;
     info.width = format.fmt.pix.width;
     info.height = format.fmt.pix.height;

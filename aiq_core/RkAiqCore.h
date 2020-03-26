@@ -46,6 +46,17 @@ namespace RkCam {
         } \
     } while (0)
 
+#define RKAIQCORE_CHECK_RET_NULL(ret, format, ...) \
+    do { \
+        if (ret < 0) { \
+            LOGE_ANALYZER(format, ##__VA_ARGS__); \
+            return NULL; \
+        } else if (ret == XCAM_RETURN_BYPASS) { \
+            LOGW_ANALYZER("bypass !", __FUNCTION__, __LINE__); \
+            return NULL; \
+        } \
+    } while (0)
+
 #define RKAIQCORE_CHECK_BYPASS(ret, format, ...) \
     do { \
         if (ret < 0) { \
@@ -178,15 +189,32 @@ public:
         uint32_t hardware_version;
         int iso;
         AlgoCtxInstanceCfgInt ctxCfigs[RK_AIQ_ALGO_TYPE_MAX];
+        void reset() {
+            xcam_mem_clear(preResComb);
+            xcam_mem_clear(procResComb);
+            xcam_mem_clear(postResComb);
+            xcam_mem_clear(ctxCfigs);
+            calib = NULL;
+            frameId = -1;
+            working_mode = 0;
+            init = false;
+            reConfig = false;
+            hardware_version = 0;
+            iso = 0;
+        }
     } RkAiqAlgosShared_t;
     RkAiqAlgosShared_t mAlogsSharedParams;
 private:
     // in analyzer thread
     XCamReturn analyze(const SmartPtr<VideoBuffer> &buffer);
-    XCamReturn analyzeInternal();
+    SmartPtr<RkAiqFullParamsProxy> analyzeInternal();
+    SmartPtr<RkAiqFullParamsProxy> analyzeInternalPp();
     XCamReturn preProcess();
+    XCamReturn preProcessPp();
     XCamReturn processing();
+    XCamReturn processingPp();
     XCamReturn postProcess();
+    XCamReturn postProcessPp();
     XCamReturn convertIspstatsToAlgo(const SmartPtr<VideoBuffer> &buffer);
     SmartPtr<RkAiqHandle>* getCurAlgoTypeHandle(int algo_type);
     std::map<int, SmartPtr<RkAiqHandle>>* getAlgoTypeHandleMap(int algo_type);
@@ -225,6 +253,7 @@ private:
         RK_AIQ_CORE_STATE_STOPED,
     };
     SmartPtr<RkAiqCoreThread> mRkAiqCoreTh;
+    SmartPtr<RkAiqCoreThread> mRkAiqCorePpTh;
     int mState;
     RkAiqAnalyzerCb* mCb;
     std::map<int, SmartPtr<RkAiqHandle>> mAeAlgoHandleMap;
@@ -279,6 +308,7 @@ private:
     SmartPtr<RkAiqFullParamsProxy> mAiqCurParams;
     SmartPtr<RkAiqExpParamsPool> mAiqExpParamsPool;
     SmartPtr<RkAiqIspParamsPool> mAiqIspParamsPool;
+    SmartPtr<RkAiqIsppParamsPool> mAiqIsppParamsPool;
     SmartPtr<RkAiqFocusParamsPool> mAiqFocusParamsPool;
     static uint16_t DEFAULT_POOL_SIZE;
 };

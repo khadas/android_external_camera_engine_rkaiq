@@ -90,7 +90,7 @@ rk_aiq_uapi_sysctl_start(const rk_aiq_sys_ctx_t* ctx);
 XCamReturn
 rk_aiq_uapi_sysctl_stop(const rk_aiq_sys_ctx_t* ctx);
 
-rk_aiq_static_metas_t*
+rk_aiq_static_info_t*
 rk_aiq_uapi_sysctl_getStaticMetas(const char* sns_ent_name);
 
 rk_aiq_metas_t*

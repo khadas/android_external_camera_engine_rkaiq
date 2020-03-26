@@ -27,9 +27,44 @@ RKAIQ_BEGIN_DECLARE
 
 
 
-/******************************************************************************
- * Alut3dConfig()
- *****************************************************************************/
+
+XCamReturn Alut3dAutoConfig
+(
+    alut3d_handle_t hAlut3d
+) {
+
+    LOGI_A3DLUT("%s: (enter)\n", __FUNCTION__);
+
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+
+
+    LOGI_A3DLUT("%s: (exit)\n", __FUNCTION__);
+
+    return (ret);
+}
+
+XCamReturn Alut3dManualConfig
+(
+    alut3d_handle_t hAlut3d
+) {
+
+    LOGI_A3DLUT("%s: (enter)\n", __FUNCTION__);
+
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+
+
+    memcpy(hAlut3d->lut3d_hw_conf.look_up_table_r, hAlut3d->mCurAtt.stManual.look_up_table_r,
+           sizeof(hAlut3d->mCurAtt.stManual.look_up_table_r));
+    memcpy(hAlut3d->lut3d_hw_conf.look_up_table_g, hAlut3d->mCurAtt.stManual.look_up_table_g,
+           sizeof(hAlut3d->mCurAtt.stManual.look_up_table_g));
+    memcpy(hAlut3d->lut3d_hw_conf.look_up_table_b, hAlut3d->mCurAtt.stManual.look_up_table_b,
+           sizeof(hAlut3d->mCurAtt.stManual.look_up_table_b));
+
+    LOGI_A3DLUT("%s: (exit)\n", __FUNCTION__);
+
+    return (ret);
+}
+
 XCamReturn Alut3dConfig
 (
     alut3d_handle_t hAlut3d
@@ -42,20 +77,36 @@ XCamReturn Alut3dConfig
     if (hAlut3d == NULL) {
         return XCAM_RETURN_ERROR_PARAM;
     }
-    if(hAlut3d->calib_lut3d->enable == true) {
-        hAlut3d->lut3d_hw_conf.enable = true;
-        hAlut3d->lut3d_hw_conf.bypass_en = false;
-    } else {
-        hAlut3d->lut3d_hw_conf.enable = false;
-        hAlut3d->lut3d_hw_conf.bypass_en = true;
-    }
-    hAlut3d->lut3d_hw_conf.lut3d_lut_wsize = 0x2d9;
-    memcpy(hAlut3d->lut3d_hw_conf.look_up_table_r, hAlut3d->calib_lut3d->look_up_table_r,
-           sizeof(hAlut3d->calib_lut3d->look_up_table_r));
-    memcpy(hAlut3d->lut3d_hw_conf.look_up_table_g, hAlut3d->calib_lut3d->look_up_table_g,
-           sizeof(hAlut3d->calib_lut3d->look_up_table_g));
-    memcpy(hAlut3d->lut3d_hw_conf.look_up_table_b, hAlut3d->calib_lut3d->look_up_table_b,
-           sizeof(hAlut3d->calib_lut3d->look_up_table_b));
+
+    LOGD_A3DLUT("%s: updateAtt: %d\n", __FUNCTION__,hAlut3d->updateAtt);
+     if(hAlut3d->updateAtt){
+         hAlut3d->mCurAtt = hAlut3d->mNewAtt;
+     }
+     LOGD_A3DLUT("%s: byPass: %d  mode:%d \n", __FUNCTION__,hAlut3d->mCurAtt.byPass,hAlut3d->mCurAtt.mode);
+     if(hAlut3d->mCurAtt.byPass != true){
+          hAlut3d->lut3d_hw_conf.enable = true;
+          hAlut3d->lut3d_hw_conf.bypass_en = false;
+         if(hAlut3d->mCurAtt.mode == RK_AIQ_LUT3D_MODE_AUTO){
+             Alut3dAutoConfig(hAlut3d);
+         }else if(hAlut3d->mCurAtt.mode == RK_AIQ_LUT3D_MODE_MANUAL){
+             Alut3dManualConfig(hAlut3d);
+         }else{
+             LOGE_A3DLUT("%s: hAlut3d->mCurAtt.mode(%d) is invalid \n", __FUNCTION__,hAlut3d->mCurAtt.mode);
+         }
+         memcpy(hAlut3d->mCurAtt.stManual.look_up_table_r,hAlut3d->lut3d_hw_conf.look_up_table_r,
+                sizeof(hAlut3d->mCurAtt.stManual.look_up_table_r));
+         memcpy( hAlut3d->mCurAtt.stManual.look_up_table_g,hAlut3d->lut3d_hw_conf.look_up_table_g,
+                sizeof(hAlut3d->mCurAtt.stManual.look_up_table_g));
+         memcpy(hAlut3d->mCurAtt.stManual.look_up_table_b, hAlut3d->lut3d_hw_conf.look_up_table_b,
+                sizeof(hAlut3d->mCurAtt.stManual.look_up_table_b));
+     }else{
+         hAlut3d->lut3d_hw_conf.enable = false;
+         hAlut3d->lut3d_hw_conf.bypass_en = true;
+     }
+
+    LOGD_A3DLUT("%s: enable:(%d),bypass_en(%d) \n", __FUNCTION__,
+        hAlut3d->lut3d_hw_conf.enable,
+        hAlut3d->lut3d_hw_conf.bypass_en);
 
     LOGI_A3DLUT("%s: (exit)\n", __FUNCTION__);
 
@@ -63,12 +114,32 @@ XCamReturn Alut3dConfig
 }
 
 
-XCamReturn Alut3dInit(alut3d_handle_t *hAlut3d)
+XCamReturn Alut3dInit(alut3d_handle_t *hAlut3d,const CamCalibDbContext_t* calib)
 {
     LOGI_A3DLUT("%s: (enter)\n", __FUNCTION__);
 
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
     *hAlut3d = (alut3d_context_t*)malloc(sizeof(alut3d_context_t));
+    alut3d_context_t* alut3d_contex = *hAlut3d;
+    memset(alut3d_contex, 0 ,sizeof(alut3d_context_t));
+
+     if(calib == NULL) {
+        return XCAM_RETURN_ERROR_FAILED;
+    }
+    const CalibDb_Lut3d_t *calib_lut3d = &calib->lut3d;
+    alut3d_contex->calib_lut3d = calib_lut3d;
+
+    alut3d_contex->lut3d_hw_conf.lut3d_lut_wsize = 0x2d9;
+    memcpy(alut3d_contex->lut3d_hw_conf.look_up_table_r, alut3d_contex->calib_lut3d->look_up_table_r,
+           sizeof(alut3d_contex->calib_lut3d->look_up_table_r));
+    memcpy(alut3d_contex->lut3d_hw_conf.look_up_table_g, alut3d_contex->calib_lut3d->look_up_table_g,
+           sizeof(alut3d_contex->calib_lut3d->look_up_table_g));
+    memcpy(alut3d_contex->lut3d_hw_conf.look_up_table_b, alut3d_contex->calib_lut3d->look_up_table_b,
+           sizeof(alut3d_contex->calib_lut3d->look_up_table_b));
+
+
+    alut3d_contex->mCurAtt.byPass = !(calib_lut3d->enable);
+    alut3d_contex->mCurAtt.mode = RK_AIQ_LUT3D_MODE_AUTO;
 
     LOGI_A3DLUT("%s: (exit)\n", __FUNCTION__);
     return(ret);
@@ -88,13 +159,12 @@ XCamReturn Alut3dRelease(alut3d_handle_t hAlut3d)
 
 }
 
-XCamReturn Alut3dPrepare(const CalibDb_Lut3d_t *calib_lut3d, alut3d_handle_t hAlut3d)
+XCamReturn Alut3dPrepare(alut3d_handle_t hAlut3d)
 {
     LOGI_A3DLUT("%s: (enter)\n", __FUNCTION__);
 
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
 
-    hAlut3d->calib_lut3d = calib_lut3d;
 
     LOGI_A3DLUT("%s: (exit)\n", __FUNCTION__);
     return ret;

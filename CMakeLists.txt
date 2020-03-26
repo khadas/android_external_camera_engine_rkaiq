@@ -31,18 +31,18 @@ set(BUILROOT_BUILD_PROJECT true)
 if(RK_SIMULATOR_HW)
     add_compile_options(-DRK_SIMULATOR_HW)
 elseif(BUILROOT_BUILD_PROJECT)
-    SET(CMAKE_C_COMPILER "/home/xuhf/isp2.0-hal/buildroot/output/host/bin/arm-buildroot-linux-uclibcgnueabihf-gcc")
-    SET(CMAKE_CXX_COMPILER "/home/xuhf/isp2.0-hal/buildroot/output/host/bin/arm-buildroot-linux-uclibcgnueabihf-g++")
+	SET(CMAKE_C_COMPILER "${PROJECT_SOURCE_DIR}/../puma/prebuilts/gcc/linux-x86/arm/gcc-arm-8.3-2019.03-x86_64-arm-linux-gnueabihf/bin/arm-linux-gnueabihf-gcc")
+	SET(CMAKE_CXX_COMPILER "${PROJECT_SOURCE_DIR}/../puma/prebuilts/gcc/linux-x86/arm/gcc-arm-8.3-2019.03-x86_64-arm-linux-gnueabihf/bin/arm-linux-gnueabihf-g++")
 else()
-    SET(CMAKE_C_COMPILER "/home/hkj/isp2-fpga/fpga-ramdisk/toolchains/host/bin/arm-buildroot-linux-gnueabi-gcc")
-    SET(CMAKE_CXX_COMPILER "/home/hkj/isp2-fpga/fpga-ramdisk/toolchains/host/bin/arm-buildroot-linux-gnueabi-g++")
+	SET(CMAKE_C_COMPILER "${PROJECT_SOURCE_DIR}/../puma/prebuilts/gcc/linux-x86/arm/gcc-arm-8.3-2019.03-x86_64-arm-linux-gnueabihf/bin/arm-linux-gnueabihf-gcc")
+	SET(CMAKE_CXX_COMPILER "${PROJECT_SOURCE_DIR}/../puma/prebuilts/gcc/linux-x86/arm/gcc-arm-8.3-2019.03-x86_64-arm-linux-gnueabihf/bin/arm-linux-gnueabihf-g++")
 endif()
 
 # ----------------------------------------------------------------------------
 # ADD SYMBOL TABLE FOR GDB
 # ----------------------------------------------------------------------------
-SET(CMAKE_CXX_FLAGS_DEBUG "$ENV{CXXFLAGS} -O0 -Wall -g -ggdb")
-SET(CMAKE_CXX_FLAGS_RELEASE "$ENV{CXXFLAGS} -O0 -Wall -g -ggdb")
+SET(CMAKE_CXX_FLAGS_DEBUG "$ENV{CXXFLAGS} -std=c++11 -Wno-reorder -O0 -Werror -g -ggdb")
+SET(CMAKE_CXX_FLAGS_RELEASE "$ENV{CXXFLAGS} -std=c++11 -O0 -Wall -Wno-reorder -g -ggdb")
 # SET(CMAKE_CXX_FLAGS_RELEASE "$ENV{CXXFLAGS} -O3 -Wall")
 
 #head file path
@@ -77,6 +77,7 @@ set (ALGO_COMMON_SRC
 	algos/interpolation.cpp
 	)
 set (COMMON_SRC
+	common/mediactl/mediactl.c
 	)
 if(RK_SIMULATOR_HW)
 set (HWI_SRC
@@ -179,11 +180,9 @@ message(${CMAKE_LIBRARY_PATH})
 message(${LIBRARY_OUTPUT_PATH})
 
 # add C++11 option
-add_compile_options(-std=c++11)
 add_compile_options(-fPIC)
 add_compile_options(-Wno-unused-variable
 					-Wno-unused-but-set-variable
-					-Wno-reorder
 					-Wno-unused-function)
 # add_compile_options(-v)
 add_definitions(-D_CRT_SECURE_NO_WARNINGS)

@@ -30,7 +30,8 @@ enum {
     ISP_POLL_LUMA,
     ISP_POLL_3A_STATS,
     ISP_POLL_PARAMS,
-    ISP_POLL_POST_PARAMS,
+    ISP_POLL_POST_PARAMS,    
+    ISPP_POLL_STATS,
     ISP_POLL_POST_MAX,
 };
 
@@ -68,6 +69,7 @@ public:
                                  SmartPtr<V4l2Device> &post_params_dev);
     bool set_event_device (SmartPtr<V4l2SubDevice> &sub_dev);
     bool set_isp_luma_device (SmartPtr<V4l2Device> &dev);
+    bool set_ispp_stats_device (SmartPtr<V4l2Device> &dev);
     bool set_isp_stats_device (SmartPtr<V4l2Device> &dev);
     bool set_poll_callback (PollCallback *callback);
 
@@ -96,6 +98,7 @@ private:
 protected:
     static const int default_poll_timeout;
 
+    SmartPtr<Thread>      _ispp_stats_loop;
     SmartPtr<Thread>      _isp_luma_loop;
     SmartPtr<Thread>      _isp_stats_loop;
     SmartPtr<Thread>      _event_loop;
@@ -107,12 +110,14 @@ protected:
     SmartPtr<V4l2Device>             _isp_pparams_dev;
     SmartPtr<V4l2Device>             _isp_stats_dev;
     SmartPtr<V4l2Device>             _isp_luma_dev;
+    SmartPtr<V4l2Device>             _ispp_stats_dev;
 
     PollCallback                    *_poll_callback;
 
     //frame syncronization
     int frameid;
-    
+
+    int _ispp_poll_stop_fd[2];
     int _luma_poll_stop_fd[2];
     int _3a_stats_poll_stop_fd[2];
     int _event_poll_stop_fd[2];

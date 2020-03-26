@@ -32,6 +32,7 @@ const char*
 PollThread::isp_poll_type_to_str[ISP_POLL_POST_MAX] =
 {
     "luma_poll",
+    "ispp_poll",
     "stats_poll",
     "params_poll",
     "pparams_poll",
@@ -110,7 +111,12 @@ PollThread::PollThread ()
     XCAM_ASSERT (isp_pparams_loop.ptr ());
     _isp_pparams_loop = isp_pparams_loop;
 
-    
+    SmartPtr<IspPollThread> ispp_stats_loop = new IspPollThread(this, ISPP_POLL_STATS);
+        XCAM_ASSERT (ispp_stats_loop.ptr ());
+        _ispp_stats_loop = ispp_stats_loop;
+
+    _ispp_poll_stop_fd[0] =  -1;
+    _ispp_poll_stop_fd[1] =  -1;
     _luma_poll_stop_fd[0] =  -1;
     _luma_poll_stop_fd[1] =  -1;
     _3a_stats_poll_stop_fd[0] =  -1;
@@ -157,6 +163,14 @@ PollThread::set_isp_luma_device (SmartPtr<V4l2Device> &dev)
 }
 
 bool
+PollThread::set_ispp_stats_device (SmartPtr<V4l2Device> &dev)
+{
+    XCAM_ASSERT (!_ispp_stats_dev.ptr());
+    _ispp_stats_dev = dev;
+    return true;
+}
+
+bool
 PollThread::set_isp_params_devices (SmartPtr<V4l2Device> &params_dev,
                                     SmartPtr<V4l2Device> &post_params_dev)
 {
@@ -176,6 +190,13 @@ PollThread::set_poll_callback (PollCallback *callback)
 }
 
 void PollThread::destroy_stop_fds () {
+    if (_ispp_poll_stop_fd[1] != -1 || _ispp_poll_stop_fd[0] != -1) {
+        close(_ispp_poll_stop_fd[0]);
+        close(_ispp_poll_stop_fd[1]);
+        _ispp_poll_stop_fd[0] = -1;
+        _ispp_poll_stop_fd[1] = -1;
+    }
+
     if (_luma_poll_stop_fd[1] != -1 || _luma_poll_stop_fd[0] != -1) {
         close(_luma_poll_stop_fd[0]);
         close(_luma_poll_stop_fd[1]);
@@ -217,6 +238,25 @@ XCamReturn PollThread::create_stop_fds () {
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
 
     destroy_stop_fds ();
+
+    status = pipe(_ispp_poll_stop_fd);
+    if (status < 0) {
+        XCAM_LOG_ERROR ("Failed to create ispp poll stop pipe: %s", strerror(errno));
+        ret = XCAM_RETURN_ERROR_UNKNOWN;
+        goto exit_error;
+    }
+
+    /**
+     * make the reading end of the pipe non blocking.
+     * This helps during flush to read any information left there without
+     * blocking
+     */
+    status = fcntl(_ispp_poll_stop_fd[0], F_SETFL, O_NONBLOCK);
+    if (status < 0) {
+        XCAM_LOG_ERROR ("Fail to set event ispp stop pipe flag: %s", strerror(errno));
+        ret = XCAM_RETURN_ERROR_UNKNOWN;
+        goto exit_error;
+    }
 
     status = pipe(_luma_poll_stop_fd);
     if (status < 0) {
@@ -341,11 +381,13 @@ XCamReturn PollThread::start ()
         return XCAM_RETURN_ERROR_THREAD;
     }
 
-    /*
-     * if (_isp_pparams_dev.ptr () && !_isp_pparams_loop->start ()) {
-     *     return XCAM_RETURN_ERROR_THREAD;
-     * }
-     */
+    if (_ispp_stats_dev.ptr () && !_ispp_stats_dev->start ()) {
+        return XCAM_RETURN_ERROR_THREAD;
+    }
+
+    if (_isp_pparams_dev.ptr () && !_isp_pparams_loop->start ()) {
+        return XCAM_RETURN_ERROR_THREAD;
+    }
 
     return XCAM_RETURN_NO_ERROR;
 }
@@ -364,14 +406,14 @@ XCamReturn PollThread::stop ()
         _event_loop->stop ();
     }
 
-    if (_isp_luma_dev.ptr ()) {
-        if (_luma_poll_stop_fd[1] != -1) {
+    if (_ispp_stats_dev.ptr ()) {
+        if (_ispp_poll_stop_fd[1] != -1) {
             char buf = 0xf;  // random value to write to flush fd.
-            unsigned int size = write(_luma_poll_stop_fd[1], &buf, sizeof(char));
+            unsigned int size = write(_ispp_poll_stop_fd[1], &buf, sizeof(char));
             if (size != sizeof(char))
                 XCAM_LOG_WARNING("Flush write not completed");
         }
-        _isp_luma_loop->stop ();
+        _ispp_stats_loop->stop ();
     }
 
     if (_isp_stats_dev.ptr ()) {
@@ -517,6 +559,9 @@ PollThread::poll_buffer_loop (int type)
     if (type == ISP_POLL_LUMA) {
         dev = _isp_luma_dev;
         stop_fd = _luma_poll_stop_fd[0];
+    } else if (type == ISPP_POLL_STATS) {
+        dev = _ispp_stats_dev;
+        stop_fd = _ispp_poll_stop_fd[0];
     } else if (type == ISP_POLL_3A_STATS) {
         dev = _isp_stats_dev;
         stop_fd = _3a_stats_poll_stop_fd[0];
@@ -554,7 +599,7 @@ PollThread::poll_buffer_loop (int type)
     XCAM_ASSERT (_poll_callback);
 
     if (_poll_callback &&
-        (type == ISP_POLL_3A_STATS || type == ISP_POLL_LUMA)) {
+        (type == ISP_POLL_3A_STATS || type == ISP_POLL_LUMA || type == ISPP_POLL_STATS)) {
         SmartPtr<VideoBuffer> video_buf = new_video_buffer(buf, dev, type);
 
         return _poll_callback->poll_buffer_ready (video_buf, type);

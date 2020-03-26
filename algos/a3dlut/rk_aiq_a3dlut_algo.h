@@ -24,9 +24,9 @@
 
 RKAIQ_BEGIN_DECLARE
 
-XCamReturn Alut3dInit(alut3d_handle_t *hAlut3d);
+XCamReturn Alut3dInit(alut3d_handle_t *hAlut3d,const CamCalibDbContext_t* calib);
 XCamReturn Alut3dRelease(alut3d_handle_t hAlut3d);
-XCamReturn Alut3dPrepare(const CalibDb_Lut3d_t *calib_lut3d, alut3d_handle_t hAlut3d);
+XCamReturn Alut3dPrepare(alut3d_handle_t hAlut3d);
 XCamReturn Alut3dConfig(alut3d_handle_t hAlut3d);
 XCamReturn Alut3dPreProc(alut3d_handle_t hAlut3d);
 XCamReturn Alut3dProcessing(alut3d_handle_t hAlut3d);
