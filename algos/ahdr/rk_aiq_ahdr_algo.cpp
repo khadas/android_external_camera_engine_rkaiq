@@ -92,7 +92,6 @@ void SetFirstPara
     float GlobeLuma = 184;
     float DetailsHighLight = 512;
     float DetailsLowLight  = 16;
-    float NoiseLowLight = 10;
     float SmoothCtrlCoef = 76;
 
     //merge
@@ -121,7 +120,7 @@ void SetFirstPara
     pAhdrCtx->AhdrProcRes.TmoProcRes.sw_hdrtmo_clipgap1 = 12;
     pAhdrCtx->AhdrProcRes.TmoProcRes.sw_hdrtmo_ratiol = 32;
     pAhdrCtx->AhdrProcRes.TmoProcRes.sw_hdrtmo_hist_min = 0;
-    pAhdrCtx->AhdrProcRes.TmoProcRes.sw_hdrtmo_hist_low = (int)(NoiseLowLight * pAhdrCtx->height * pAhdrCtx->width / (16.0 * 1000.0) + 0.5);
+    pAhdrCtx->AhdrProcRes.TmoProcRes.sw_hdrtmo_hist_low = 0;
     pAhdrCtx->AhdrProcRes.TmoProcRes.sw_hdrtmo_hist_high = (int)(pAhdrCtx->height * pAhdrCtx->width * 0.01 / 16);
     pAhdrCtx->AhdrProcRes.TmoProcRes.sw_hdrtmo_hist_0p3 = 614;
     pAhdrCtx->AhdrProcRes.TmoProcRes.sw_hdrtmo_hist_shift = 3;
@@ -157,17 +156,16 @@ void SetFirstPara
     pAhdrCtx->AhdrPrevData.PrevTmoHandleData.GlobeMaxLuma = GlobeMaxLuma;
     pAhdrCtx->AhdrPrevData.PrevTmoHandleData.DetailsHighLight = DetailsHighLight;
     pAhdrCtx->AhdrPrevData.PrevTmoHandleData.DetailsLowLight = DetailsLowLight;
-    pAhdrCtx->AhdrPrevData.PrevTmoHandleData.NoiseLowLight = NoiseLowLight;
     pAhdrCtx->AhdrPrevData.PrevTmoHandleData.SmoothCtrlCoef = SmoothCtrlCoef;
 
-	pAhdrCtx->AhdrPrevData.PreL2S_ratio = 1;
-	pAhdrCtx->AhdrPrevData.PreLExpo = 1*0.03;
-	pAhdrCtx->AhdrPrevData.PreEnvlv = 1;
-	pAhdrCtx->AhdrPrevData.PreMoveCoef = 1;
-	pAhdrCtx->AhdrPrevData.PreOEPdf = 1;
-	pAhdrCtx->AhdrPrevData.PreDarkTexturePdf = 1;
-	pAhdrCtx->AhdrPrevData.PrePosCoef = 1;
-	pAhdrCtx->AhdrPrevData.PreDynamicRange = 1;
+    pAhdrCtx->AhdrPrevData.PreL2S_ratio = 1;
+    pAhdrCtx->AhdrPrevData.PreLExpo = 1 * 0.03;
+    pAhdrCtx->AhdrPrevData.PreEnvlv = 1;
+    pAhdrCtx->AhdrPrevData.PreMoveCoef = 1;
+    pAhdrCtx->AhdrPrevData.PreOEPdf = 0.5;
+    pAhdrCtx->AhdrPrevData.PreTotalFocusLuma = 50;
+    pAhdrCtx->AhdrPrevData.PreDarkPdf = 0.5;
+    pAhdrCtx->AhdrPrevData.PreDynamicRange = 1;
 
 #if LRK_DEBUG_LOG
     LOGE_AHDR("%s:lrk  Merge set IOdata to register:\n", __FUNCTION__);
@@ -346,33 +344,30 @@ void AhdrConfig
     pAhdrCtx->AhdrConfig.tmo_para.EnvLv[3] = 0.3 ;
     pAhdrCtx->AhdrConfig.tmo_para.EnvLv[4] = 0.9 ;
     pAhdrCtx->AhdrConfig.tmo_para.EnvLv[5] = 1.0 ;
-	pAhdrCtx->AhdrConfig.tmo_para.EnvLvTolerance = 0 ;
+    pAhdrCtx->AhdrConfig.tmo_para.EnvLvTolerance = 0 ;
     pAhdrCtx->AhdrConfig.tmo_para.OEPdf[0] = 0;
     pAhdrCtx->AhdrConfig.tmo_para.OEPdf[1] = 0.1;
     pAhdrCtx->AhdrConfig.tmo_para.OEPdf[2] = 0.2;
     pAhdrCtx->AhdrConfig.tmo_para.OEPdf[3] = 0.3;
     pAhdrCtx->AhdrConfig.tmo_para.OEPdf[4] = 0.4;
     pAhdrCtx->AhdrConfig.tmo_para.OEPdf[5] = 0.5;
-	 pAhdrCtx->AhdrConfig.tmo_para.OETolerance = 0;
-    pAhdrCtx->AhdrConfig.tmo_para.enLumaWeight = 0;
-    pAhdrCtx->AhdrConfig.tmo_para.DarkPdfTH = 0.7;
-	pAhdrCtx->AhdrConfig.tmo_para.DTPdfTolerance = 0;
-    pAhdrCtx->AhdrConfig.tmo_para.DarkTexturePdf[0] = 0;
-    pAhdrCtx->AhdrConfig.tmo_para.DarkTexturePdf[1] = 0.1;
-    pAhdrCtx->AhdrConfig.tmo_para.DarkTexturePdf[2] = 0.2;
-    pAhdrCtx->AhdrConfig.tmo_para.DarkTexturePdf[3] = 0.3;
-    pAhdrCtx->AhdrConfig.tmo_para.DarkTexturePdf[4] = 0.4;
-    pAhdrCtx->AhdrConfig.tmo_para.DarkTexturePdf[5] = 0.1;
-    pAhdrCtx->AhdrConfig.tmo_para.enPosWeight = 0;
-    pAhdrCtx->AhdrConfig.tmo_para.PosCoefTolerance = 0;
-	pAhdrCtx->AhdrConfig.tmo_para.PosCoef[0] = 0;
-    pAhdrCtx->AhdrConfig.tmo_para.PosCoef[1] = 0.1;
-    pAhdrCtx->AhdrConfig.tmo_para.PosCoef[2] = 0.2;
-    pAhdrCtx->AhdrConfig.tmo_para.PosCoef[3] = 0.3;
-    pAhdrCtx->AhdrConfig.tmo_para.PosCoef[4] = 0.4;
-    pAhdrCtx->AhdrConfig.tmo_para.PosCoef[5] = 0.1;
+    pAhdrCtx->AhdrConfig.tmo_para.OETolerance = 0;
+    pAhdrCtx->AhdrConfig.tmo_para.enFocusLuma = 0;
+    pAhdrCtx->AhdrConfig.tmo_para.DTPdfTolerance = 0;
+    pAhdrCtx->AhdrConfig.tmo_para.FocusLuma[0] = 0;
+    pAhdrCtx->AhdrConfig.tmo_para.FocusLuma[1] = 0.1;
+    pAhdrCtx->AhdrConfig.tmo_para.FocusLuma[2] = 0.2;
+    pAhdrCtx->AhdrConfig.tmo_para.FocusLuma[3] = 0.3;
+    pAhdrCtx->AhdrConfig.tmo_para.FocusLuma[4] = 0.4;
+    pAhdrCtx->AhdrConfig.tmo_para.FocusLuma[5] = 0.1;
+    pAhdrCtx->AhdrConfig.tmo_para.DarkPdf[0] = 0;
+    pAhdrCtx->AhdrConfig.tmo_para.DarkPdf[1] = 0.1;
+    pAhdrCtx->AhdrConfig.tmo_para.DarkPdf[2] = 0.2;
+    pAhdrCtx->AhdrConfig.tmo_para.DarkPdf[3] = 0.3;
+    pAhdrCtx->AhdrConfig.tmo_para.DarkPdf[4] = 0.4;
+    pAhdrCtx->AhdrConfig.tmo_para.DarkPdf[5] = 0.5;
     pAhdrCtx->AhdrConfig.tmo_para.DRTolerance = 0;
-	pAhdrCtx->AhdrConfig.tmo_para.DynamicRange[0] = 1;
+    pAhdrCtx->AhdrConfig.tmo_para.DynamicRange[0] = 1;
     pAhdrCtx->AhdrConfig.tmo_para.DynamicRange[1] = 1;
     pAhdrCtx->AhdrConfig.tmo_para.DynamicRange[2] = 1;
     pAhdrCtx->AhdrConfig.tmo_para.DynamicRange[3] = 1;
@@ -385,18 +380,10 @@ void AhdrConfig
         pAhdrCtx->AhdrConfig.tmo_para.GlobeLuma[i] = 184 ;
         pAhdrCtx->AhdrConfig.tmo_para.DetailsHighLight[i] = 512;
         pAhdrCtx->AhdrConfig.tmo_para.DetailsLowLight[i] = 16;
-        pAhdrCtx->AhdrConfig.tmo_para.NoiseLowLight[i] = 10;//lrk need to check
         pAhdrCtx->AhdrConfig.tmo_para.SmoothCtrlCoef[i] = 76;
-    }
-    for(int i = 0; i < 225; i++)
-    {
-        pAhdrCtx->AhdrConfig.tmo_para.PosWeight[i] = 1;
-        pAhdrCtx->AhdrConfig.tmo_para.LumaWeight[i] = 1;
     }
 
     //config default AhdrPrevData data
-
-
     for(int i = 0; i < 16; i++)
         pAhdrCtx->AhdrPrevData.ro_hdrtmo_lgmean_all[i] = 128;
 
@@ -474,7 +461,6 @@ void AhdrGetXmlParas
     DCT_ASSERT(pCalibDb != NULL);
 
     //merge
-    pAhdrCtx->AhdrConfig.merge_para.MergeMode = pCalibDb->ahdr.merge.mode;
     pAhdrCtx->AhdrConfig.merge_para.OECurve_damp = LIMIT_VALUE(pCalibDb->ahdr.merge.oeCurve_damp, DAMPMAX, DAMPMIN);
     pAhdrCtx->AhdrConfig.merge_para.MDCurveLM_damp = LIMIT_VALUE(pCalibDb->ahdr.merge.mdCurveLm_damp, DAMPMAX, DAMPMIN);
     pAhdrCtx->AhdrConfig.merge_para.MDCurveMS_damp = LIMIT_VALUE(pCalibDb->ahdr.merge.mdCurveMs_damp, DAMPMAX, DAMPMIN);
@@ -491,16 +477,13 @@ void AhdrGetXmlParas
     }
 
     //TMO
-    pAhdrCtx->AhdrConfig.tmo_para.enLumaWeight = LIMIT_VALUE(pCalibDb->ahdr.tmo.enLumaWeight, ENMAX, ENMIN);
-    pAhdrCtx->AhdrConfig.tmo_para.enPosWeight = LIMIT_VALUE(pCalibDb->ahdr.tmo.enPosWeight, ENMAX, ENMIN);
-    pAhdrCtx->AhdrConfig.tmo_para.DarkPdfTH = LIMIT_VALUE(pCalibDb->ahdr.tmo.DarkPdfTH, ENMAX, ENMIN);
+    pAhdrCtx->AhdrConfig.tmo_para.enFocusLuma = LIMIT_VALUE(pCalibDb->ahdr.tmo.enFocusLuma, ENMAX, ENMIN);
     pAhdrCtx->AhdrConfig.tmo_para.DayTh = LIMIT_VALUE(pCalibDb->ahdr.tmo.DayTh, DARKPDFTHMAX, DARKPDFTHMIN);
     pAhdrCtx->AhdrConfig.tmo_para.damp = LIMIT_VALUE(pCalibDb->ahdr.tmo.damp, DAMPMAX, DAMPMIN);
-	pAhdrCtx->AhdrConfig.tmo_para.EnvLvTolerance = LIMIT_VALUE(pCalibDb->ahdr.tmo.EnvLvTolerance, TOLERANCEMAX, TOLERANCEMIN);
-	pAhdrCtx->AhdrConfig.tmo_para.OETolerance = LIMIT_VALUE(pCalibDb->ahdr.tmo.OETolerance, TOLERANCEMAX, TOLERANCEMIN);
-	pAhdrCtx->AhdrConfig.tmo_para.DTPdfTolerance = LIMIT_VALUE(pCalibDb->ahdr.tmo.DTPdfTolerance, TOLERANCEMAX, TOLERANCEMIN);
-	pAhdrCtx->AhdrConfig.tmo_para.DRTolerance = LIMIT_VALUE(pCalibDb->ahdr.tmo.DRTolerance, TOLERANCEMAX, TOLERANCEMIN);
-	pAhdrCtx->AhdrConfig.tmo_para.PosCoefTolerance = LIMIT_VALUE(pCalibDb->ahdr.tmo.PosCoefTolerance, TOLERANCEMAX, TOLERANCEMIN);
+    pAhdrCtx->AhdrConfig.tmo_para.EnvLvTolerance = LIMIT_VALUE(pCalibDb->ahdr.tmo.EnvLvTolerance, TOLERANCEMAX, TOLERANCEMIN);
+    pAhdrCtx->AhdrConfig.tmo_para.OETolerance = LIMIT_VALUE(pCalibDb->ahdr.tmo.OETolerance, TOLERANCEMAX, TOLERANCEMIN);
+    pAhdrCtx->AhdrConfig.tmo_para.DTPdfTolerance = LIMIT_VALUE(pCalibDb->ahdr.tmo.DTPdfTolerance, TOLERANCEMAX, TOLERANCEMIN);
+    pAhdrCtx->AhdrConfig.tmo_para.DRTolerance = LIMIT_VALUE(pCalibDb->ahdr.tmo.DRTolerance, TOLERANCEMAX, TOLERANCEMIN);
     for(int i = 0; i < 6; i++)
     {
         pAhdrCtx->AhdrConfig.tmo_para.EnvLv[i] = LIMIT_VALUE(pCalibDb->ahdr.tmo.envLevel[i], ENVLVMAX, ENVLVMIN);
@@ -510,23 +493,13 @@ void AhdrGetXmlParas
         pAhdrCtx->AhdrConfig.tmo_para.OEPdf[i] = LIMIT_VALUE(pCalibDb->ahdr.tmo.OEPdf[i], OEPDFMAX, OEPDFMIN) ;
         pAhdrCtx->AhdrConfig.tmo_para.DetailsHighLight[i] = LIMIT_VALUE(pCalibDb->ahdr.tmo.detailsHighLight[i], DETAILSHIGHLIGHTMAX, DETAILSHIGHLIGHTMIN) ;
 
-        pAhdrCtx->AhdrConfig.tmo_para.DarkTexturePdf[i] = LIMIT_VALUE(pCalibDb->ahdr.tmo.DarkTexturePdf[i], DARKTEXTUREPDFMAX, DARKTEXTUREPDFMIN) ;
+        pAhdrCtx->AhdrConfig.tmo_para.FocusLuma[i] = LIMIT_VALUE(pCalibDb->ahdr.tmo.FocusLuma[i], FOCUSLUMAMAX, FOCUSLUMAMIN) ;
+        pAhdrCtx->AhdrConfig.tmo_para.DarkPdf[i] = LIMIT_VALUE(pCalibDb->ahdr.tmo.DarkPdf[i], DARKPDFMAX, DARKPDFMIN) ;
         pAhdrCtx->AhdrConfig.tmo_para.DetailsLowLight[i] = LIMIT_VALUE(pCalibDb->ahdr.tmo.detailsLowLight[i], DETAILSLOWLIGHTMAX, DETAILSLOWLIGHTMIN) ;
-
-        pAhdrCtx->AhdrConfig.tmo_para.PosCoef[i] = LIMIT_VALUE(pCalibDb->ahdr.tmo.PosCoef[i], POSCOEFMAX, POSCOEFMIN) ;
-        pAhdrCtx->AhdrConfig.tmo_para.NoiseLowLight[i] = LIMIT_VALUE(pCalibDb->ahdr.tmo.noiseLowLight[i], NOISELOWLIGHTMAX, NOISELOWLIGHTMIN) ;
 
         pAhdrCtx->AhdrConfig.tmo_para.DynamicRange[i] = LIMIT_VALUE(pCalibDb->ahdr.tmo.DynamicRange[i], DYNAMICRANGEMAX, DYNAMICRANGEMIN) ;
         pAhdrCtx->AhdrConfig.tmo_para.SmoothCtrlCoef[i] = LIMIT_VALUE(pCalibDb->ahdr.tmo.smoothCtrlCoef[i], SMOOTHCONTROLCOEFMAX, SMOOTHCONTROLCOEFMIN) ;
     }
-    for(int i = 0; i < 225; i++)
-    {
-        pAhdrCtx->AhdrConfig.tmo_para.PosWeight[i] = LIMIT_VALUE(pCalibDb->ahdr.tmo.PosWeight[i], POSWEIGHTMAX, POSWEIGHTMIN) ;
-        pAhdrCtx->AhdrConfig.tmo_para.LumaWeight[i] = LIMIT_VALUE(pCalibDb->ahdr.tmo.LumaWeight[i], LUMAWEIGHTMAX, LUMAWEIGHTMIN) ;
-    }
-
-    //check hdr frame mode
-
 
 #if LRK_DEBUG_LOG
     LOGE_AHDR("%s:lrk  Ahdr comfig data from xml:\n", __FUNCTION__);
@@ -561,17 +534,13 @@ void AhdrGetXmlParas
               , pAhdrCtx->AhdrConfig.tmo_para.OEPdf[3], pAhdrCtx->AhdrConfig.tmo_para.OEPdf[4], pAhdrCtx->AhdrConfig.tmo_para.OEPdf[5]);
     LOGE_AHDR("%s:lrk  Tmo DetailsHighLight:%f %f %f %f %f %f:\n", __FUNCTION__, pAhdrCtx->AhdrConfig.tmo_para.DetailsHighLight[0], pAhdrCtx->AhdrConfig.tmo_para.DetailsHighLight[1], pAhdrCtx->AhdrConfig.tmo_para.DetailsHighLight[2]
               , pAhdrCtx->AhdrConfig.tmo_para.DetailsHighLight[3], pAhdrCtx->AhdrConfig.tmo_para.DetailsHighLight[4], pAhdrCtx->AhdrConfig.tmo_para.DetailsHighLight[5]);
-    LOGE_AHDR("%s:lrk  Tmo enLumaWeight:%f:\n", __FUNCTION__, pAhdrCtx->AhdrConfig.tmo_para.enLumaWeight);
-    LOGE_AHDR("%s:lrk  Tmo DarkPdfTH:%f:\n", __FUNCTION__, pAhdrCtx->AhdrConfig.tmo_para.DarkPdfTH);
-    LOGE_AHDR("%s:lrk  Tmo DarkTexturePdf:%f %f %f %f %f %f:\n", __FUNCTION__, pAhdrCtx->AhdrConfig.tmo_para.DarkTexturePdf[0], pAhdrCtx->AhdrConfig.tmo_para.DarkTexturePdf[1], pAhdrCtx->AhdrConfig.tmo_para.DarkTexturePdf[2]
-              , pAhdrCtx->AhdrConfig.tmo_para.DarkTexturePdf[3], pAhdrCtx->AhdrConfig.tmo_para.DarkTexturePdf[4], pAhdrCtx->AhdrConfig.tmo_para.DarkTexturePdf[5]);
+    LOGE_AHDR("%s:lrk  Tmo enFocusLuma:%f:\n", __FUNCTION__, pAhdrCtx->AhdrConfig.tmo_para.enFocusLuma);
+    LOGE_AHDR("%s:lrk  Tmo FocusLuma:%f %f %f %f %f %f:\n", __FUNCTION__, pAhdrCtx->AhdrConfig.tmo_para.FocusLuma[0], pAhdrCtx->AhdrConfig.tmo_para.FocusLuma[1], pAhdrCtx->AhdrConfig.tmo_para.FocusLuma[2]
+              , pAhdrCtx->AhdrConfig.tmo_para.FocusLuma[3], pAhdrCtx->AhdrConfig.tmo_para.FocusLuma[4], pAhdrCtx->AhdrConfig.tmo_para.FocusLuma[5]);
+    LOGE_AHDR("%s:lrk  Tmo DarkPdf:%f %f %f %f %f %f:\n", __FUNCTION__, pAhdrCtx->AhdrConfig.tmo_para.DarkPdf[0], pAhdrCtx->AhdrConfig.tmo_para.DarkPdf[1], pAhdrCtx->AhdrConfig.tmo_para.DarkPdf[2]
+              , pAhdrCtx->AhdrConfig.tmo_para.DarkPdf[3], pAhdrCtx->AhdrConfig.tmo_para.DarkPdf[4], pAhdrCtx->AhdrConfig.tmo_para.DarkPdf[5]);
     LOGE_AHDR("%s:lrk  Tmo DetailsLowLight:%f %f %f %f %f %f:\n", __FUNCTION__, pAhdrCtx->AhdrConfig.tmo_para.DetailsLowLight[0], pAhdrCtx->AhdrConfig.tmo_para.DetailsLowLight[1], pAhdrCtx->AhdrConfig.tmo_para.DetailsLowLight[2]
               , pAhdrCtx->AhdrConfig.tmo_para.DetailsLowLight[3], pAhdrCtx->AhdrConfig.tmo_para.DetailsLowLight[4], pAhdrCtx->AhdrConfig.tmo_para.DetailsLowLight[5]);
-    LOGE_AHDR("%s:lrk  Tmo enPosWeight:%f:\n", __FUNCTION__, pAhdrCtx->AhdrConfig.tmo_para.enPosWeight);
-    LOGE_AHDR("%s:lrk  Tmo PosCoef:%f %f %f %f %f %f:\n", __FUNCTION__, pAhdrCtx->AhdrConfig.tmo_para.PosCoef[0], pAhdrCtx->AhdrConfig.tmo_para.PosCoef[1], pAhdrCtx->AhdrConfig.tmo_para.PosCoef[2]
-              , pAhdrCtx->AhdrConfig.tmo_para.PosCoef[3], pAhdrCtx->AhdrConfig.tmo_para.PosCoef[4], pAhdrCtx->AhdrConfig.tmo_para.PosCoef[5]);
-    LOGE_AHDR("%s:lrk  Tmo NoiseLowLight:%f %f %f %f %f %f:\n", __FUNCTION__, pAhdrCtx->AhdrConfig.tmo_para.NoiseLowLight[0], pAhdrCtx->AhdrConfig.tmo_para.NoiseLowLight[1], pAhdrCtx->AhdrConfig.tmo_para.NoiseLowLight[2]
-              , pAhdrCtx->AhdrConfig.tmo_para.NoiseLowLight[3], pAhdrCtx->AhdrConfig.tmo_para.NoiseLowLight[4], pAhdrCtx->AhdrConfig.tmo_para.NoiseLowLight[5]);
     LOGE_AHDR("%s:lrk  Tmo DynamicRange:%f %f %f %f %f %f:\n", __FUNCTION__, pAhdrCtx->AhdrConfig.tmo_para.DynamicRange[0], pAhdrCtx->AhdrConfig.tmo_para.DynamicRange[1], pAhdrCtx->AhdrConfig.tmo_para.DynamicRange[2]
               , pAhdrCtx->AhdrConfig.tmo_para.DynamicRange[3], pAhdrCtx->AhdrConfig.tmo_para.DynamicRange[4], pAhdrCtx->AhdrConfig.tmo_para.DynamicRange[5]);
     LOGE_AHDR("%s:lrk  Tmo DayTh:%f:\n", __FUNCTION__, pAhdrCtx->AhdrConfig.tmo_para.DayTh);
@@ -603,6 +572,18 @@ void AhdrUpdateConfig
     pAhdrCtx->CurrAeResult.L2M_Ratio = pAhdrCtx->CurrAeResult.L2M_Ratio < 1 ? 1 : pAhdrCtx->CurrAeResult.L2M_Ratio;
     pAhdrCtx->CurrAeResult.DynamicRange = AecHdrPreResult.DynamicRange;
     pAhdrCtx->CurrAeResult.OEPdf = AecHdrPreResult.MaxLumaROIPdf;
+    pAhdrCtx->CurrAeResult.DarkPdf = AecHdrPreResult.DarkROIPdf;
+    for(int i = 0; i < 225; i++)
+    {
+        pAhdrCtx->CurrAeResult.BlockLumaS[i] = pAhdrCtx->CurrStatsData.other_stats.short_luma[i];
+        pAhdrCtx->CurrAeResult.BlockLumaL[i] = pAhdrCtx->CurrStatsData.other_stats.long_luma[i];
+    }
+    if(pAhdrCtx->hdr_mode == 3)
+        for(int i = 0; i < 25; i++)
+            pAhdrCtx->CurrAeResult.BlockLumaM[i] = pAhdrCtx->CurrStatsData.other_stats.middle_luma[i];
+    else
+        for(int i = 0; i < 25; i++)
+            pAhdrCtx->CurrAeResult.BlockLumaM[i] = 0;
 
     //Normalize the current envLv for AEC
     float maxEnvLuma = 65 / (1 * 0.01);
@@ -613,7 +594,7 @@ void AhdrUpdateConfig
 
     //transfer CurrAeResult data into AhdrHandle
     //get Curren hdr mode
-    pAhdrCtx->CurrHandleData.MergeMode = pAhdrCtx->AhdrConfig.merge_para.MergeMode;
+    pAhdrCtx->CurrHandleData.MergeMode = pAhdrCtx->hdr_mode - 1;
 
     switch (pAhdrCtx->CurrHandleData.MergeMode)
     {
@@ -673,6 +654,7 @@ void AhdrUpdateConfig
     pAhdrCtx->CurrHandleData.CurrTmoHandleData.GlobeMaxLuma = GetCurrPara(pAhdrCtx->CurrHandleData.CurrEnvLv,
             pAhdrCtx->AhdrConfig.tmo_para.EnvLv,
             pAhdrCtx->AhdrConfig.tmo_para.GlobeMaxLuma);
+
     //get Current tmo SmoothCtrlCoef
     pAhdrCtx->CurrHandleData.DayTh = pAhdrCtx->AhdrConfig.tmo_para.DayTh;
     if(pAhdrCtx->CurrHandleData.CurrEnvLv > pAhdrCtx->CurrHandleData.DayTh)
@@ -686,139 +668,41 @@ void AhdrUpdateConfig
     else
         pAhdrCtx->CurrHandleData.CurrTmoHandleData.SmoothCtrlCoef = 76;
 
-
     //get Current tmo DetailsHighLight
     pAhdrCtx->CurrHandleData.CurrOEPdf = pAhdrCtx->CurrAeResult.OEPdf;
     pAhdrCtx->CurrHandleData.CurrOEPdf = LIMIT_VALUE(pAhdrCtx->CurrHandleData.CurrOEPdf, OEPDFMAX, OEPDFMIN);
     pAhdrCtx->CurrHandleData.CurrTmoHandleData.DetailsHighLight = GetCurrPara(pAhdrCtx->CurrHandleData.CurrOEPdf,
             pAhdrCtx->AhdrConfig.tmo_para.OEPdf,
             pAhdrCtx->AhdrConfig.tmo_para.DetailsHighLight);
-    //get Current tmo NoiseLowLight
-#if 0
-    if(pAhdrCtx->AhdrConfig.tmo_para.enPosWeight > 0)
-    {
 
-        int Block_Width = (int)(pAhdrCtx->width / 15);
-        int Block_Height = (int)(pAhdrCtx->height / 15);
-
-        pAhdrCtx->CurrAfResult.CurrAfTargetPos = AfPreResult.af_target_info.af_target_pos;
-        pAhdrCtx->CurrAfResult.CurrAfTargetHeight = AfPreResult.af_target_info.af_target_height;
-        pAhdrCtx->CurrAfResult.CurrAfTargetWidth = AfPreResult.af_target_info.af_target_width;
-        int Block_Cnt_W = (int)(pAhdrCtx->CurrAfResult.CurrAfTargetWidth / Block_Width);
-        int Block_Cnt_H = (int)(pAhdrCtx->CurrAfResult.CurrAfTargetWidth / Block_Height);
-        int TargetCnt = Block_Cnt_H * Block_Cnt_W;
-        int Af_Matrix[225] = {0};
-        if(Block_Cnt_W == 1 && Block_Cnt_H == 1 )
-            Af_Matrix[AfPreResult.af_target_info.af_target_pos] = 1;
-        else if (Block_Cnt_W == 1 && Block_Cnt_H == 2 )
-        {
-            Af_Matrix[AfPreResult.af_target_info.af_target_pos] = 1;
-            Af_Matrix[AfPreResult.af_target_info.af_target_pos + 15] = 1;
-        }
-        else if (Block_Cnt_W == 1 && Block_Cnt_H == 3 )
-        {
-            Af_Matrix[AfPreResult.af_target_info.af_target_pos] = 1;
-            Af_Matrix[AfPreResult.af_target_info.af_target_pos + 15] = 1;
-            Af_Matrix[AfPreResult.af_target_info.af_target_pos + 15 * 2] = 1;
-        }
-        else if (Block_Cnt_W == 2 && Block_Cnt_H == 1 )
-        {
-            Af_Matrix[AfPreResult.af_target_info.af_target_pos] = 1;
-            Af_Matrix[AfPreResult.af_target_info.af_target_pos + 1] = 1;
-        }
-        else if (Block_Cnt_W == 2 && Block_Cnt_H == 2 )
-        {
-            Af_Matrix[AfPreResult.af_target_info.af_target_pos] = 1;
-            Af_Matrix[AfPreResult.af_target_info.af_target_pos + 1] = 1;
-            Af_Matrix[AfPreResult.af_target_info.af_target_pos + 15] = 1;
-            Af_Matrix[AfPreResult.af_target_info.af_target_pos + 15 + 1] = 1;
-        }
-        else if (Block_Cnt_W == 2 && Block_Cnt_H == 3 )
-        {
-            Af_Matrix[AfPreResult.af_target_info.af_target_pos] = 1;
-            Af_Matrix[AfPreResult.af_target_info.af_target_pos + 1] = 1;
-            Af_Matrix[AfPreResult.af_target_info.af_target_pos + 15] = 1;
-            Af_Matrix[AfPreResult.af_target_info.af_target_pos + 15 + 1] = 1;
-            Af_Matrix[AfPreResult.af_target_info.af_target_pos + 15 * 2] = 1;
-            Af_Matrix[AfPreResult.af_target_info.af_target_pos + 15 * 2 + 1] = 1;
-        }
-        else if (Block_Cnt_W == 3 && Block_Cnt_H == 1 )
-        {
-            Af_Matrix[AfPreResult.af_target_info.af_target_pos] = 1;
-            Af_Matrix[AfPreResult.af_target_info.af_target_pos + 1] = 1;
-            Af_Matrix[AfPreResult.af_target_info.af_target_pos + 2] = 1;
-        }
-        else if (Block_Cnt_W == 3 && Block_Cnt_H == 2 )
-        {
-            Af_Matrix[AfPreResult.af_target_info.af_target_pos] = 1;
-            Af_Matrix[AfPreResult.af_target_info.af_target_pos + 1] = 1;
-            Af_Matrix[AfPreResult.af_target_info.af_target_pos + 2] = 1;
-            Af_Matrix[AfPreResult.af_target_info.af_target_pos + 15] = 1;
-            Af_Matrix[AfPreResult.af_target_info.af_target_pos + 15 + 1] = 1;
-            Af_Matrix[AfPreResult.af_target_info.af_target_pos + 15 + 2] = 1;
-        }
-        else if (Block_Cnt_W == 3 && Block_Cnt_H == 3 )
-        {
-            Af_Matrix[AfPreResult.af_target_info.af_target_pos] = 1;
-            Af_Matrix[AfPreResult.af_target_info.af_target_pos + 1] = 1;
-            Af_Matrix[AfPreResult.af_target_info.af_target_pos + 2] = 1;
-            Af_Matrix[AfPreResult.af_target_info.af_target_pos + 15] = 1;
-            Af_Matrix[AfPreResult.af_target_info.af_target_pos + 15 + 1] = 1;
-            Af_Matrix[AfPreResult.af_target_info.af_target_pos + 15 + 2] = 1;
-            Af_Matrix[AfPreResult.af_target_info.af_target_pos + 15 * 2] = 1;
-            Af_Matrix[AfPreResult.af_target_info.af_target_pos + 15 * 2 + 1] = 1;
-            Af_Matrix[AfPreResult.af_target_info.af_target_pos + 15 * 2 + 2] = 1;
-        }
-        float total_weight = 0;
-        float total_PosWeight = 0;
-        for(int i = 0; i < 225; i++)
-        {
-            pAhdrCtx->CurrHandleData.PosWeight[i] = pAhdrCtx->AhdrConfig.tmo_para.PosWeight[i];
-            total_weight += pAhdrCtx->CurrHandleData.PosWeight[i];
-        }
-        for(int i = 0; i < 225; i++)
-        {
-            pAhdrCtx->CurrHandleData.PosWeight[i] = pAhdrCtx->CurrHandleData.PosWeight[i] / total_weight;
-            total_PosWeight += pAhdrCtx->CurrHandleData.PosWeight[i] * Af_Matrix[i];
-        }
-        pAhdrCtx->CurrHandleData.CurrTotalPosWeight = total_PosWeight;
-        else
-            pAhdrCtx->CurrHandleData.CurrTotalPosWeight = 1;
-    }
-#endif
-    pAhdrCtx->CurrHandleData.CurrTotalPosWeight = 10;
-    pAhdrCtx->CurrHandleData.CurrTotalPosWeight = LIMIT_VALUE(pAhdrCtx->CurrHandleData.CurrTotalPosWeight, 100, 1);
-    pAhdrCtx->CurrHandleData.CurrTmoHandleData.NoiseLowLight = GetCurrPara(pAhdrCtx->CurrHandleData.CurrTotalPosWeight,
-            pAhdrCtx->AhdrConfig.tmo_para.PosCoef,
-            pAhdrCtx->AhdrConfig.tmo_para.NoiseLowLight);
     //get Current tmo DetailsLowLight
-#if 0
-    pAhdrCtx->CurrHandleData.DarkPdfTH = pAhdrCtx->AhdrConfig.tmo_para.DarkPdfTH;
-    if(pAhdrCtx->CurrHandleData.CurrDarkPdf > pAhdrCtx->CurrHandleData.DarkPdfTH )
+    if (pAhdrCtx->AhdrConfig.tmo_para.enFocusLuma == 1)
     {
-        float TotalLumaWeight;
-        float Sharpness = 0;
-        for(int i = 0; i < 225; i++)
-        {
-            pAhdrCtx.CurrHandleData.LumaWeight[i] = pAhdrCtx->AhdrConfig.tmo_para.LumaWeight[i];
-            TotalLumaWeight += pAhdrCtx.CurrHandleData.LumaWeight[i];
-        }
-        for(int i = 0; i < 225; i++)
-        {
-            pAhdrCtx.CurrHandleData.LumaWeight[i] = pAhdrCtx.CurrHandleData.LumaWeight[i] / TotalLumaWeight;
-            pAhdrCtx->CurrAfResult.GlobalSharpnessCompensated[i] = AfPreResult.global_sharpness_compensated[i];
-            Sharpness += pAhdrCtx.CurrHandleData.LumaWeight[i] * pAhdrCtx->CurrAfResult.GlobalSharpnessCompensated[i];
-        }
-        pAhdrCtx->CurrHandleData.CurrTotalSharpness = Sharpness;
+#if 0
+        int focs = pAhdrCtx->CurrAfResult.CurrAfTargetPos;
+        int focs_width = pAhdrCtx->CurrAfResult.CurrAfTargetWidth / (pAhdrCtx->width / 15);
+        int focs_height = pAhdrCtx->CurrAfResult.CurrAfTargetHeight / (pAhdrCtx->height / 15);
+        float focs_luma = 0;
+        for(int i = 0; i < focs_height; i++)
+            for(int j = 0; j < focs_width; j++)
+                focs_luma += pAhdrCtx->CurrAeResult.BlockLumaL[focs + i + 15 * j];
+        focs_luma = focs_luma / (focs_width * focs_height);
+        pAhdrCtx->CurrHandleData.CurrTotalFocusLuma = focs_luma / 15;
+        pAhdrCtx->CurrHandleData.CurrTotalFocusLuma = LIMIT_VALUE(pAhdrCtx->CurrHandleData.CurrTotalFocusLuma, FOCUSLUMAMAX, FOCUSLUMAMIN);
+        pAhdrCtx->CurrHandleData.CurrTmoHandleData.DetailsLowLight = GetCurrPara(pAhdrCtx->CurrHandleData.CurrTotalFocusLuma,
+                pAhdrCtx->AhdrConfig.tmo_para.FocusLuma,
+                pAhdrCtx->AhdrConfig.tmo_para.DetailsLowLight);
+
+#endif
     }
     else
-        pAhdrCtx->CurrHandleData.CurrTotalSharpness = 1;
-#endif
-    pAhdrCtx->CurrHandleData.CurrTotalSharpness = 0;
-    pAhdrCtx->CurrHandleData.CurrTotalSharpness = LIMIT_VALUE(pAhdrCtx->CurrHandleData.CurrTotalSharpness, 1, 0);
-    pAhdrCtx->CurrHandleData.CurrTmoHandleData.DetailsLowLight = GetCurrPara(pAhdrCtx->CurrHandleData.CurrTotalSharpness,
-            pAhdrCtx->AhdrConfig.tmo_para.DarkTexturePdf,
-            pAhdrCtx->AhdrConfig.tmo_para.DetailsLowLight);
+    {
+        pAhdrCtx->CurrHandleData.CurrDarkPdf = pAhdrCtx->CurrAeResult.DarkPdf;
+        pAhdrCtx->CurrHandleData.CurrDarkPdf = LIMIT_VALUE(pAhdrCtx->CurrHandleData.CurrDarkPdf, 0.5, 0);
+        pAhdrCtx->CurrHandleData.CurrTmoHandleData.DetailsLowLight = GetCurrPara(pAhdrCtx->CurrHandleData.CurrDarkPdf,
+                pAhdrCtx->AhdrConfig.tmo_para.DarkPdf,
+                pAhdrCtx->AhdrConfig.tmo_para.DetailsLowLight);
+    }
 
     //get Current tmo TmoDamp
     pAhdrCtx->CurrHandleData.TmoDamp = pAhdrCtx->AhdrConfig.tmo_para.damp;
@@ -850,23 +734,19 @@ void AhdrUpdateConfig
     unsigned long short_mean = 0, middle_mean = 0, long_mean = 0;
     for (int i = 0; i < 225; i++)
     {
-        short_mean += pAhdrCtx->CurrStatsData.other_stats.short_luma[i];
-        long_mean += pAhdrCtx->CurrStatsData.other_stats.long_luma[i];
+        short_mean += pAhdrCtx->CurrAeResult.BlockLumaS[i];
+        long_mean += pAhdrCtx->CurrAeResult.BlockLumaL[i];
     }
     short_mean = short_mean / 225;
     long_mean = long_mean / 225;
     short_mean = short_mean / 16;
     long_mean = long_mean / 16;
 
-    if(pAhdrCtx->hdr_mode == 3)
-    {
-        for(int i = 0; i < 25; i++)
-            middle_mean += pAhdrCtx->CurrStatsData.other_stats.middle_luma[i];
-        middle_mean = middle_mean / 25;
-        middle_mean = middle_mean / 16;
-    }
-    else
-        middle_mean = 0;
+    for(int i = 0; i < 25; i++)
+        middle_mean += pAhdrCtx->CurrAeResult.BlockLumaM[i];
+    middle_mean = middle_mean / 25;
+    middle_mean = middle_mean / 16;
+
 
 #if LRK_DEBUG_LOG
     LOGE_AHDR("%s:lrk  Ahdr Current frame cnt:%d:\n",  __FUNCTION__, pAhdrCtx->frameCnt);
@@ -877,12 +757,12 @@ void AhdrUpdateConfig
     LOGE_AHDR("%s:lrk  Current CurrL2L_Ratio:     %f \n", __FUNCTION__, pAhdrCtx->CurrHandleData.CurrL2L_Ratio);
     LOGE_AHDR("%s:lrk  Current CurrLExpo:         %f \n", __FUNCTION__, pAhdrCtx->CurrHandleData.CurrLExpo);
     LOGE_AHDR("%s:lrk  Current CurrEnvLv:         %f \n", __FUNCTION__, pAhdrCtx->CurrHandleData.CurrEnvLv);
-    LOGE_AHDR("%s:lrk  Current CurrTotalPosWeight:%f \n", __FUNCTION__, pAhdrCtx->CurrHandleData.CurrTotalPosWeight);
+    LOGE_AHDR("%s:lrk  Current CurrTotalFocusLuma:%f \n", __FUNCTION__, pAhdrCtx->CurrHandleData.CurrTotalFocusLuma);
     LOGE_AHDR("%s:lrk  Current CurrMoveCoef:      %f \n", __FUNCTION__, pAhdrCtx->CurrHandleData.CurrMoveCoef);
     LOGE_AHDR("%s:lrk  Current CurrDynamicRange:  %f \n", __FUNCTION__, pAhdrCtx->CurrHandleData.CurrDynamicRange);
     LOGE_AHDR("%s:lrk  Current CurrOEPdf:         %f \n", __FUNCTION__, pAhdrCtx->CurrHandleData.CurrOEPdf);
     LOGE_AHDR("%s:lrk  Current CurrDarkPdf:       %f \n", __FUNCTION__, pAhdrCtx->CurrHandleData.CurrDarkPdf);
-    LOGE_AHDR("%s:lrk  Current CurrTotalSharpness:%f \n", __FUNCTION__, pAhdrCtx->CurrHandleData.CurrTotalSharpness);
+    LOGE_AHDR("%s:lrk  Current CurrTotalFocusLuma:%f \n", __FUNCTION__, pAhdrCtx->CurrHandleData.CurrTotalFocusLuma);
     LOGE_AHDR("%s:lrk  Current OECurve_smooth:    %f \n", __FUNCTION__, pAhdrCtx->CurrHandleData.CurrMergeHandleData.OECurve_smooth);
     LOGE_AHDR("%s:lrk  Current OECurve_offset:    %f \n", __FUNCTION__, pAhdrCtx->CurrHandleData.CurrMergeHandleData.OECurve_offset);
     LOGE_AHDR("%s:lrk  Current MDCurveLM_smooth:  %f \n", __FUNCTION__, pAhdrCtx->CurrHandleData.CurrMergeHandleData.MDCurveLM_smooth);
@@ -893,7 +773,6 @@ void AhdrUpdateConfig
     LOGE_AHDR("%s:lrk  Current GlobeMaxLuma:      %f \n", __FUNCTION__, pAhdrCtx->CurrHandleData.CurrTmoHandleData.GlobeMaxLuma);
     LOGE_AHDR("%s:lrk  Current DetailsHighLight:  %f \n", __FUNCTION__, pAhdrCtx->CurrHandleData.CurrTmoHandleData.DetailsHighLight);
     LOGE_AHDR("%s:lrk  Current DetailsLowLight:   %f \n", __FUNCTION__, pAhdrCtx->CurrHandleData.CurrTmoHandleData.DetailsLowLight);
-    LOGE_AHDR("%s:lrk  Current NoiseLowLight:     %f \n", __FUNCTION__, pAhdrCtx->CurrHandleData.CurrTmoHandleData.NoiseLowLight);
     LOGE_AHDR("%s:lrk  Current SmoothCtrlCoef:%f \n", __FUNCTION__, pAhdrCtx->CurrHandleData.CurrTmoHandleData.SmoothCtrlCoef);
     LOGE_AHDR("%s:lrk  preFrame lg Merge mean Luma:%f \n", __FUNCTION__, lgmean);
     LOGE_AHDR("%s:lrk  preFrame Merge mean Luma(8bit):%f \n", __FUNCTION__, MergeLuma);
@@ -1004,12 +883,12 @@ void AhdrProcessing
     // store current handle data to pre data for next loop
     pAhdrCtx->AhdrPrevData.PreL2S_ratio = pAhdrCtx->CurrHandleData.CurrL2S_Ratio;
     pAhdrCtx->AhdrPrevData.PreLExpo = pAhdrCtx->CurrHandleData.CurrLExpo;
-	pAhdrCtx->AhdrPrevData.PreEnvlv = pAhdrCtx->CurrHandleData.CurrEnvLv;
-	pAhdrCtx->AhdrPrevData.PreMoveCoef = pAhdrCtx->CurrHandleData.CurrMoveCoef;
-	pAhdrCtx->AhdrPrevData.PreOEPdf = pAhdrCtx->CurrHandleData.CurrOEPdf;
-	pAhdrCtx->AhdrPrevData.PreDarkTexturePdf = pAhdrCtx->CurrHandleData.CurrTotalSharpness;
-	pAhdrCtx->AhdrPrevData.PreDynamicRange = pAhdrCtx->CurrHandleData.CurrDynamicRange;
-	pAhdrCtx->AhdrPrevData.PrePosCoef = pAhdrCtx->CurrHandleData.CurrTotalPosWeight;
+    pAhdrCtx->AhdrPrevData.PreEnvlv = pAhdrCtx->CurrHandleData.CurrEnvLv;
+    pAhdrCtx->AhdrPrevData.PreMoveCoef = pAhdrCtx->CurrHandleData.CurrMoveCoef;
+    pAhdrCtx->AhdrPrevData.PreOEPdf = pAhdrCtx->CurrHandleData.CurrOEPdf;
+    pAhdrCtx->AhdrPrevData.PreTotalFocusLuma = pAhdrCtx->CurrHandleData.CurrTotalFocusLuma;
+    pAhdrCtx->AhdrPrevData.PreDarkPdf = pAhdrCtx->CurrHandleData.CurrDarkPdf;
+    pAhdrCtx->AhdrPrevData.PreDynamicRange = pAhdrCtx->CurrHandleData.CurrDynamicRange;
     memcpy(&pAhdrCtx->AhdrPrevData.PrevMergeHandleData, &pAhdrCtx->CurrHandleData.CurrMergeHandleData, sizeof(MergeHandleData_s));
     memcpy(&pAhdrCtx->AhdrPrevData.PrevTmoHandleData, &pAhdrCtx->CurrHandleData.CurrTmoHandleData, sizeof(TmoHandleData_s));
     ++pAhdrCtx->frameCnt;

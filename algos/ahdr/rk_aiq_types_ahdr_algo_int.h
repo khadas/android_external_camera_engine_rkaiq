@@ -14,29 +14,22 @@
 typedef struct tmo_config_s
 {
     float EnvLv[6];
-	float EnvLvTolerance;
+    float EnvLvTolerance;
     float GlobeLuma[6];
     float GlobeMaxLuma[6];
 
     float OEPdf[6];
-	float OETolerance;
+    float OETolerance;
     float DetailsHighLight[6];
 
-    float enLumaWeight;
-    float LumaWeight[225];
-    float DarkPdfTH;
-    float DarkTexturePdf[6];
-	float DTPdfTolerance;
+    float enFocusLuma;
+    float FocusLuma[6];
+    float DarkPdf[6];
+    float DTPdfTolerance;
     float DetailsLowLight[6];
 
-    float enPosWeight;
-    float PosWeight[225];//最多9块可以赋值为非0
-    float PosCoef[6];
-	float PosCoefTolerance;
-    float NoiseLowLight[6];
-
     float DynamicRange[6];
-	float DRTolerance;
+    float DRTolerance;
     float DayTh;
     float SmoothCtrlCoef[6];
 
@@ -96,7 +89,6 @@ typedef struct atmoAttr_S
     tmoCtrlData_t stGlobeLuma;
     tmoCtrlData_t stDtlsLL;
     tmoCtrlData_t stDtlsHL;
-    tmoCtrlData_t stNosLL;
     tmoCtrlData_t stSmthCtrlCoef;
 } atmoAttr_t;
 
@@ -113,7 +105,6 @@ typedef struct mtmoAttr_S
     float stGlobeLuma;
     float stDtlsHL;
     float stDtlsLL;
-    float stNosLL;
     float stSmthCtrlCoef;
 
 } mtmoAttr_t;

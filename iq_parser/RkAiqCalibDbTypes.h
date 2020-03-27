@@ -747,7 +747,6 @@ typedef struct CalibDb_Awb_Para_s
 
 typedef struct CalibDb_HdrMerge_s
 {
-    unsigned char mode;
     float envLevel[6];
     float oeCurve_smooth[6];
     float oeCurve_offset[6];
@@ -764,25 +763,19 @@ typedef struct CalibDb_HdrMerge_s
 typedef struct CalibDb_HdrTmo_s
 {
     float envLevel[6];
-	float EnvLvTolerance;
+    float EnvLvTolerance;
     float globalMaxLuma[6];
     float globalLuma[6];
     float OEPdf[6];
-	float OETolerance;
+    float OETolerance;
     float detailsHighLight[6];
-    float enLumaWeight;
-    float LumaWeight[225];
-    float DarkPdfTH;
-    float DarkTexturePdf[6];
-	float DTPdfTolerance;
+    float enFocusLuma;
+    float FocusLuma[6];
+    float DarkPdf[6];
+    float DTPdfTolerance;
     float detailsLowLight[6];
-    float enPosWeight;
-    float PosWeight[225];
-    float PosCoef[6];
-	float PosCoefTolerance;
-    float noiseLowLight[6];
     float DynamicRange[6];
-	float DRTolerance;
+    float DRTolerance;
     float DayTh;
     float smoothCtrlCoef[6];
     float damp;
@@ -794,7 +787,7 @@ typedef struct CalibDb_Ahdr_Para_s {
 } CalibDb_Ahdr_Para_t;
 
 typedef struct CalibDb_Blc_s {
-	int enable;
+    int enable;
     float level[4];
 } CalibDb_Blc_t;
 

@@ -51,12 +51,16 @@
 #define AHDR_RET_PENDING            14   //!< command pending
 #define AHDR_RET_WRONG_CONFIG       15   //!< given configuration is invalid
 
+#define BIGMODE     (2560)
+
 #define ENVLVMAX     (1.0)
 #define ENVLVMIN     (0.0)
 #define MOVECOEFMAX     (1.0)
 #define MOVECOEFMIN     (0.0)
 #define OEPDFMAX     (0.5)
 #define OEPDFMIN     (0.0)
+#define FOCUSLUMAMAX     (100)
+#define FOCUSLUMAMIN     (1)
 #define OECURVESMOOTHMAX     (200)
 #define OECURVESMOOTHMIN     (20)
 #define OECURVEOFFSETMAX     (230)
@@ -65,9 +69,6 @@
 #define MDCURVESMOOTHMIN     (20)
 #define MDCURVEOFFSETMAX     (103)
 #define MDCURVEOFFSETMIN     (26)
-#define NOISELOWLIGHTMAX    (100)
-#define NOISELOWLIGHTMIN     (1)
-
 #define DAMPMAX     (1.0)
 #define DAMPMIN     (0.0)
 #define ENMAX     (1.0)
@@ -78,28 +79,18 @@
 #define DARKPDFTHMIN     (0.0)
 #define TOLERANCEMAX     (20.0)
 #define TOLERANCEMIN     (0.0)
-
-
 #define GLOBEMAXLUMAMAX     (737)
 #define GLOBEMAXLUMAMIN     (46)
 #define GLOBELUMAMAX     (737)
 #define GLOBELUMAMIN     (46)
 #define DETAILSHIGHLIGHTMAX     (737)
 #define DETAILSHIGHLIGHTMIN     (46)
-#define DARKTEXTUREPDFMAX     (1)
-#define DARKTEXTUREPDFMIN     (0)
-
+#define DARKPDFMAX     (0.5)
+#define DARKPDFMIN     (0)
 #define DETAILSLOWLIGHTMAX     (63)
 #define DETAILSLOWLIGHTMIN     (16)
-#define POSCOEFMAX     (1)
-#define POSCOEFMIN     (0)
 #define DYNAMICRANGEMAX     (84)
 #define DYNAMICRANGEMIN     (1)
-#define POSWEIGHTMAX     (1)
-#define POSWEIGHTMIN     (0)
-#define LUMAWEIGHTMAX     (1)
-#define LUMAWEIGHTMIN     (0)
-
 #define SMOOTHCONTROLCOEFMAX     (255)
 #define SMOOTHCONTROLCOEFMIN     (0)
 
@@ -118,9 +109,7 @@ typedef struct TmoHandleData_s
     float GlobeLuma;
     float DetailsHighLight;
     float DetailsLowLight;
-    float NoiseLowLight;
     float SmoothCtrlCoef;
-
 } TmoHandleData_t;
 
 typedef struct MergeHandleData_s
@@ -137,12 +126,12 @@ typedef struct AhdrPrevData_s
 {
     float PreL2S_ratio;
     float PreLExpo;
-	float PreEnvlv;
-	float PreMoveCoef;
-	float PreOEPdf;
-	float PreDarkTexturePdf;
-	float PrePosCoef;
-	float PreDynamicRange;
+    float PreEnvlv;
+    float PreMoveCoef;
+    float PreOEPdf;
+    float PreTotalFocusLuma;
+    float PreDarkPdf;
+    float PreDynamicRange;
     MergeHandleData_t PrevMergeHandleData;
     TmoHandleData_t PrevTmoHandleData;
     unsigned short ro_hdrtmo_lgmean_all[16];
@@ -160,11 +149,15 @@ typedef struct CurrAeResult_s {
     float L2M_Ratio;
     float M2S_Ratio;
     float DynamicRange;
-    float OEPdf;
+    float OEPdf; //the pdf of over exposure in long frame
+    float DarkPdf; //the pdf of dark region in long frame
 
     float Lv_fac;
     float DarkPdf_fac;
     float Contrast_fac;
+    float BlockLumaS[225];
+    float BlockLumaM[25];
+    float BlockLumaL[225];
 } CurrAeResult_t;
 
 typedef struct {
@@ -189,17 +182,15 @@ typedef struct CurrHandleData_s
     float CurrL2L_Ratio;
     float CurrLExpo;
     float CurrEnvLv;
-    float CurrTotalPosWeight;
     float CurrMoveCoef;
     float CurrDynamicRange;
     float CurrOEPdf;
     float CurrDarkPdf;
     float DayTh;
     float DarkPdfTH;
-    float CurrTotalSharpness;
+    float CurrTotalFocusLuma;
     float TmoDamp;
     float LumaWeight[225];
-    float PosWeight[225];
     float MergeOEDamp;
     float MergeMDDampLM;
     float MergeMDDampMS;
@@ -242,6 +233,5 @@ typedef struct _RkAiqAlgoContext {
     AhdrInstanceConfig_t AhdrInstConfig;
     //void* place_holder[0];
 } RkAiqAlgoContext;
-
 
 #endif

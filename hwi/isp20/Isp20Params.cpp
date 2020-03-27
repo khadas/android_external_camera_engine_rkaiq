@@ -778,11 +778,6 @@ void Isp20Params::convertAiqAhdrToIsp20Params(struct isp2x_isp_params_cfg& isp_c
         isp_cfg.others.hdrtmo_cfg.palpha_0p18   = (int)(value + 0.5);
 
         value = 0;
-        value = LIMIT_PARA(ahdr_data.hdrAttr.stAuto.stTmoAuto.stNosLL.stCoef, ahdr_data.hdrAttr.stAuto.stTmoAuto.stNosLL.stMax, ahdr_data.hdrAttr.stAuto.stTmoAuto.stNosLL.stMin,
-                           ahdr_data.hdrAttr.stAuto.stTmoAuto.stNosLL.stCoefMax, ahdr_data.hdrAttr.stAuto.stTmoAuto.stNosLL.stMin);
-        isp_cfg.others.hdrtmo_cfg.hist_low      = (int)(value + 0.5);
-
-        value = 0;
         value = LIMIT_PARA(ahdr_data.hdrAttr.stAuto.stTmoAuto.stGlobeMaxLuma.stCoef, ahdr_data.hdrAttr.stAuto.stTmoAuto.stGlobeMaxLuma.stMax, ahdr_data.hdrAttr.stAuto.stTmoAuto.stGlobeMaxLuma.stMin,
                            ahdr_data.hdrAttr.stAuto.stTmoAuto.stGlobeMaxLuma.stCoefMax, ahdr_data.hdrAttr.stAuto.stTmoAuto.stGlobeMaxLuma.stMin);
         isp_cfg.others.hdrtmo_cfg.maxpalpha     = (int)(value + 0.5);
@@ -812,7 +807,6 @@ void Isp20Params::convertAiqAhdrToIsp20Params(struct isp2x_isp_params_cfg& isp_c
         isp_cfg.others.hdrtmo_cfg.palpha_lwscl  = (int)(ahdr_data.hdrAttr.stManual.stTmoManual.stDtlsLL + 0.5);
         isp_cfg.others.hdrtmo_cfg.palpha_lw0p5  = (int)(ahdr_data.hdrAttr.stManual.stTmoManual.stDtlsHL + 0.5);
         isp_cfg.others.hdrtmo_cfg.palpha_0p18   = (int)(ahdr_data.hdrAttr.stManual.stTmoManual.stGlobeLuma + 0.5);
-        isp_cfg.others.hdrtmo_cfg.hist_low      = (int)(ahdr_data.hdrAttr.stManual.stTmoManual.stNosLL + 0.5);
         isp_cfg.others.hdrtmo_cfg.set_weightkey = (int)(ahdr_data.hdrAttr.stManual.stTmoManual.stSmthCtrlCoef + 0.5);
         isp_cfg.others.hdrtmo_cfg.maxpalpha     = (int)(ahdr_data.hdrAttr.stManual.stTmoManual.stGlobeMaxLuma + 0.5);
     }
