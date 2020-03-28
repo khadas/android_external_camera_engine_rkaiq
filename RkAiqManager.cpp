@@ -311,11 +311,12 @@ RkAiqManager::applyAnalyzerResult(SmartPtr<RkAiqFullParamsProxy>& results)
         RKAIQMNG_CHECK_RET(ret, "setIspParams error %d", ret);
     }
 
+#ifndef DISABLE_PP 
     if (aiqParams->mIsppParams.ptr()) {
 	ret = mCamHw->setIsppParams(aiqParams->mIsppParams);
 	RKAIQMNG_CHECK_RET(ret, "setIsppParams error %d", ret);
     }
-
+#endif
     if (aiqParams->mExposureParams.ptr()) {
         /*
          * printf("lexp: 0x%x-0x%x, mexp: 0x%x-0x%x, sexp: 0x%x-0x%x\n",

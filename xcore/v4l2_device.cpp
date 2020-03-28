@@ -32,7 +32,7 @@
 
 namespace XCam {
 
-#define XCAM_V4L2_DEFAULT_BUFFER_COUNT  6
+#define XCAM_V4L2_DEFAULT_BUFFER_COUNT  4
 
 V4l2Device::V4l2Device (const char *name)
     : _name (NULL)
@@ -170,7 +170,7 @@ V4l2Device::open ()
     }
     _fd = ::open (_name, O_RDWR);
     if (_fd == -1) {
-        XCAM_LOG_DEBUG ("open device(%s) failed", _name);
+        XCAM_LOG_ERROR ("open device(%s) failed", _name);
         return XCAM_RETURN_ERROR_IOCTL;
     } else {
         XCAM_LOG_DEBUG ("open device(%s) successed, fd: %d", _name, _fd);
@@ -191,11 +191,11 @@ V4l2Device::open ()
 #endif
     struct v4l2_capability cap;
     // only video node cay query cap
-    if (_name && strstr(_name, "video"))
+    if (_name && strstr(_name, "video")) {
         query_cap(cap);
-
-    // get default foramt
-    get_format (_format);
+        // get default foramt
+        get_format (_format);
+    }
 
     return XCAM_RETURN_NO_ERROR;
 }
@@ -546,10 +546,9 @@ V4l2Device::stop ()
         if (io_control (VIDIOC_STREAMOFF, &_buf_type) < 0) {
             XCAM_LOG_WARNING ("device(%s) steamoff failed", XCAM_STR (_name));
         }
+        fini_buffer_pool ();
         _active = false;
     }
-
-    fini_buffer_pool ();
 
     return XCAM_RETURN_NO_ERROR;
 }
@@ -699,6 +698,7 @@ V4l2Device::release_buffer (SmartPtr<V4l2Buffer> &buf)
             V4L2_BUF_TYPE_VIDEO_OUTPUT_MPLANE == _buf_type) {
             XCAM_LOG_DEBUG("release multi planar buffer length: %d", buf->get_buf().m.planes[0].length);
             ret = munmap((void*)buf->get_buf().m.planes[0].m.userptr, buf->get_buf().m.planes[0].length);
+            ::close(buf->get_expbuf_fd());
         } else {
             XCAM_LOG_DEBUG("release buffer length: %d", buf->get_buf().length);
             ret = munmap((void*)buf->get_buf().m.userptr, buf->get_buf().length);
@@ -884,17 +884,23 @@ V4l2Device::queue_buffer (SmartPtr<V4l2Buffer> &buf)
     buf->reset ();
 
     struct v4l2_buffer v4l2_buf = buf->get_buf ();
+    struct v4l2_plane planes[FMT_NUM_PLANES];
+
     XCAM_ASSERT (v4l2_buf.index < _buf_count);
 
     if (V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE == _buf_type ||
-        V4L2_BUF_TYPE_VIDEO_OUTPUT_MPLANE == _buf_type)
+        V4L2_BUF_TYPE_VIDEO_OUTPUT_MPLANE == _buf_type) {
         XCAM_LOG_DEBUG ("device(%s) queue buffer index:%d, memory:%d, type:%d, multiply planar:%d, length:%d, fd:%d",
             XCAM_STR (_name), v4l2_buf.index, v4l2_buf.memory,
             v4l2_buf.type, v4l2_buf.length, v4l2_buf.m.planes[0].length, buf->get_expbuf_fd());
-    else
+        memset(planes, 0, sizeof(struct v4l2_plane) * FMT_NUM_PLANES);
+        v4l2_buf.m.planes = planes;
+        planes[0] = buf->get_buf ().m.planes[0];
+    } else {
         XCAM_LOG_DEBUG ("device(%s) queue buffer index:%d, memory:%d, type:%d, length:%d, fd:%d",
             XCAM_STR (_name), v4l2_buf.index, v4l2_buf.memory,
             v4l2_buf.type, v4l2_buf.length, buf->get_expbuf_fd());
+    }
 
     if (v4l2_buf.type == V4L2_BUF_TYPE_META_OUTPUT)
         v4l2_buf.bytesused = v4l2_buf.length;

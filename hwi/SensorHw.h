@@ -22,7 +22,7 @@
 #include <list>
 #include "v4l2_device.h"
 #include "rk_aiq_pool.h"
-
+#include "linux/rk-camera-module.h"
 /* test hdr function */
 /*
 * struct hdrae_exp_s - hdrae exposure
@@ -43,94 +43,8 @@ struct hdrae_exp_s {
     unsigned int short_gain_val;
 };
 
-/**
- * struct rkmodule_base_inf - module base information
- *
- */
- #define RKMODULE_NAME_LEN   32
-struct rkmodule_base_inf {
-    char sensor[RKMODULE_NAME_LEN];
-    char module[RKMODULE_NAME_LEN];
-    char lens[RKMODULE_NAME_LEN];
-} __attribute__ ((packed));
-#if 0
-/**
- * struct rkmodule_fac_inf - module factory information
- *
- */
-struct rkmodule_fac_inf {
-    unsigned int flag;
-
-    char module[RKMODULE_NAME_LEN];
-    char lens[RKMODULE_NAME_LEN];
-    unsigned int year;
-    unsigned int month;
-    unsigned int day;
-} __attribute__ ((packed));
-
-/**
- * struct rkmodule_awb_inf - module awb information
- *
- */
-struct rkmodule_awb_inf {
-    unsigned int flag;
-
-    unsigned int r_value;
-    unsigned int b_value;
-    unsigned int gr_value;
-    unsigned int gb_value;
-
-    unsigned int golden_r_value;
-    unsigned int golden_b_value;
-    unsigned int golden_gr_value;
-    unsigned int golden_gb_value;
-} __attribute__ ((packed));
-
-/**
- * struct rkmodule_lsc_inf - module lsc information
- *
- */
-struct rkmodule_lsc_inf {
-    unsigned int flag;
-
-    unsigned short lsc_w;
-    unsigned short lsc_h;
-    unsigned short decimal_bits;
-
-    unsigned short lsc_r[RKMODULE_LSCDATA_LEN];
-    unsigned short lsc_b[RKMODULE_LSCDATA_LEN];
-    unsigned short lsc_gr[RKMODULE_LSCDATA_LEN];
-    unsigned short lsc_gb[RKMODULE_LSCDATA_LEN];
-} __attribute__ ((packed));
-
-/**
- * struct rkmodule_af_inf - module af information
- *
- */
-struct rkmodule_af_inf {
-    unsigned int flag;
-
-    unsigned int vcm_start;
-    unsigned int vcm_end;
-    unsigned int vcm_dir;
-} __attribute__ ((packed));
-#endif
-/**
- * struct rkmodule_inf - module information
- *
- */
-struct rkmodule_inf {
-    struct rkmodule_base_inf base;
-    //struct rkmodule_fac_inf fac;
-    //struct rkmodule_awb_inf awb;
-    //struct rkmodule_lsc_inf lsc;
-    //struct rkmodule_af_inf af;
-} __attribute__ ((packed));
-
 #define SENSOR_CMD_SET_HDRAE_EXP        \
 	_IOW('V', BASE_VIDIOC_PRIVATE + 0, struct hdrae_exp_s)
-#define RKMODULE_GET_MODULE_INFO    \
-    _IOR('V', BASE_VIDIOC_PRIVATE + 1, struct rkmodule_inf)
 
 using namespace XCam;
 

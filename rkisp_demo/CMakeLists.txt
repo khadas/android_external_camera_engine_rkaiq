@@ -13,6 +13,7 @@ PROJECT(rkisp_demo)
 
 #set BUILROOT_BUILD_PROJECT
 set(BUILROOT_BUILD_PROJECT true)
+#set(ENABLE_ASAN true)
 
 # ----------------------------------------------------------------------------
 # SET THE COMPILER PATH
@@ -45,6 +46,11 @@ set(ADD_RK_AIQ true)
 #SET RK_AIQ SOURCE DIR
 set(RK_AIQ_SOURCE_DIR ${PROJECT_SOURCE_DIR}/..)
 message("rkaiq src path" ${RK_AIQ_SOURCE_DIR})
+
+if(ENABLE_ASAN)
+add_compile_options(-fsanitize=address -fno-omit-frame-pointer -g)
+SET(LINK_ASAN asan)
+endif()
 
 if(ADD_RK_AIQ)
 add_compile_options(-std=c++11)
@@ -79,6 +85,7 @@ endif()
 
 ##set extern libraries
 SET(RK_DRM_LIB_DIR ${PROJECT_SOURCE_DIR}/demo/libs/arm32/)
+
 SET(RK_DRM_LIB drm)
 
 #head file path
@@ -116,4 +123,4 @@ add_definitions(-D_CRT_SECURE_NO_WARNINGS)
 link_directories("${LIBRARY_OUTPUT_PATH}" "${RK_AIQ_LIB_DIR}" "${RK_DRM_LIB_DIR}")
 #add executable file
 ADD_EXECUTABLE(rkisp_demo ${DIR_SRCS})
-target_link_libraries(rkisp_demo ${RK_AIQ_LIB} ${RK_DRM_LIB} pthread)
+target_link_libraries(rkisp_demo ${RK_AIQ_LIB} ${RK_DRM_LIB} ${LINK_ASAN} pthread)

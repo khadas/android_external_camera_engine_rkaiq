@@ -42,7 +42,7 @@ static int fd = -1;
 static enum v4l2_buf_type buf_type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
 struct buffer *buffers;
 static unsigned int n_buffers;
-static int frame_count = 5;
+static int frame_count = 1000;
 FILE *fp;
 static int silent = 0;
 static int vop = 0;
@@ -84,8 +84,8 @@ static int read_frame()
         buf.type = buf_type;
         buf.memory = V4L2_MEMORY_MMAP;
 
+        struct v4l2_plane planes[FMT_NUM_PLANES];
         if (V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE == buf_type) {
-            struct v4l2_plane planes[FMT_NUM_PLANES];
             buf.m.planes = planes;
             buf.length = FMT_NUM_PLANES;
         }
@@ -117,9 +117,7 @@ static int read_frame()
 
 static void mainloop(void)
 {
-        //unsigned int count = frame_count;
-
-        while (true) {
+        while (frame_count-- > 0) {
             read_frame();
         }
 }
@@ -324,7 +322,7 @@ void parse_args(int argc, char **argv)
            {"format",   required_argument, 0, 'f' },
            {"device",   required_argument, 0, 'd' },
            //{"output",   required_argument, 0, 'o' },
-           //{"count",    required_argument, 0, 'c' },
+           {"count",    required_argument, 0, 'c' },
            {"help",     no_argument,       0, 'p' },
            {"silent",   no_argument,       0, 's' },
            {"vop",   no_argument,       0, 'v' },
@@ -340,9 +338,9 @@ void parse_args(int argc, char **argv)
            break;
 
        switch (c) {
-       /*case 'c':
+       case 'c':
            frame_count = atoi(optarg);
-           break;*/
+           break;
        case 'w':
            width = atoi(optarg);
            break;
@@ -376,9 +374,11 @@ void parse_args(int argc, char **argv)
                   "         --width,  default 640,             optional, width of image\n"
                   "         --height, default 480,             optional, height of image\n"
                   "         --format, default NV12,            optional, fourcc of format\n"
-                  "         --count,  default    5,            optional, how many frames to capture\n"
+                  "         --count,  default 1000,            optional, how many frames to capture\n"
                   "         --device,                          required, path of video device\n"
                   "         --output,                          required, output file path, if <file> is '-', then the data is written to stdout\n"
+                  "         --vop,                             optional, drm display\n"
+                  "         --rkaiq,                           optional, auto image quality\n",
                   "         --silent,                          optional, subpress debug log\n",
                   argv[0]);
            exit(-1);
@@ -406,7 +406,7 @@ int main(int argc, char **argv)
 
 
 	if (rkaiq) {
-		rk_aiq_sys_ctx_t* aiq_ctx = rk_aiq_uapi_sysctl_init("ov4689", NULL, NULL, NULL);
+		aiq_ctx = rk_aiq_uapi_sysctl_init("m01_f_ov4689 1-0036", NULL, NULL, NULL);
 
 		if (aiq_ctx) {
 			XCamReturn ret = rk_aiq_uapi_sysctl_prepare(aiq_ctx, width, height, RK_AIQ_WORKING_MODE_ISP_HDR3);
@@ -444,8 +444,11 @@ int main(int argc, char **argv)
         mainloop();
 
 	if (aiq_ctx) {
+        printf("-------- stop aiq -------------\n");
 		rk_aiq_uapi_sysctl_stop(aiq_ctx);
+        printf("-------- deinit aiq -------------\n");
 		rk_aiq_uapi_sysctl_deinit(aiq_ctx);
+        printf("-------- deinit aiq end -------------\n");
 	}
 
         stop_capturing();

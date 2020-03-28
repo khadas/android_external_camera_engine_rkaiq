@@ -362,20 +362,21 @@ Isp20PollThread::mipi_poll_buffer_loop (int type, int dev_index)
                                 stop_fd);
 
     if (poll_ret == POLL_STOP_RET) {
-        XCAM_LOG_DEBUG ("poll %s buffer stop success !", isp_poll_type_to_str[type]);
+        XCAM_LOG_DEBUG ("poll %s buffer stop success !", mipi_poll_type_to_str[type]);
         // stop success, return error to stop the poll thread
         return XCAM_RETURN_ERROR_UNKNOWN;
     }
 
     if (poll_ret <= 0) {
-        XCAM_LOG_DEBUG ("poll %s buffer event got error(0x%x) but continue\n", isp_poll_type_to_str[type], poll_ret);
+        XCAM_LOG_ERROR ("mipi_dev_index %d poll %s buffer event got error(0x%x) but continue\n",
+                        dev_index, mipi_poll_type_to_str[type], poll_ret);
         ::usleep (10000); // 10ms
         return XCAM_RETURN_ERROR_TIMEOUT;
     }
 
     ret = dev->dequeue_buffer (buf);
     if (ret != XCAM_RETURN_NO_ERROR) {
-        XCAM_LOG_WARNING ("dequeue %s buffer failed", isp_poll_type_to_str[type]);
+        XCAM_LOG_WARNING ("dequeue %s buffer failed", mipi_poll_type_to_str[type]);
         return ret;
     }
 

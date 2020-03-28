@@ -29,6 +29,7 @@ rk_aiq_isp_hw_info_t CamHwIsp20::mIspHwInfos;
 CamHwIsp20::CamHwIsp20()
     : _is_exit(false)
     , _first(true)
+    , _state(CAM_HW_STATE_INVALID)
     , _hdr_mode(0)
 {}
 
@@ -91,7 +92,7 @@ static XCamReturn get_sensor_caps(rk_sensor_full_info_t *sensor_info) {
     //get module info
     struct rkmodule_inf *minfo = &(sensor_info->mod_info);
     if(vdev.io_control(RKMODULE_GET_MODULE_INFO, minfo) < 0) {
-        LOGE("@%s %s: Get sensor module info failed", __FUNCTION__, sensor_info->device_name);
+        LOGE("@%s %s: Get sensor module info failed", __FUNCTION__, sensor_info->device_name.c_str());
         return XCAM_RETURN_ERROR_FAILED;
     }
     memset(&code_enum, 0, sizeof(code_enum));
@@ -113,7 +114,7 @@ static XCamReturn get_sensor_caps(rk_sensor_full_info_t *sensor_info) {
         };
     }
     if(!formats.size() || !sensor_info->frame_size.size()) {
-        LOGE("@%s %s: Enum sensor frame size failed", __FUNCTION__, sensor_info->device_name);
+        LOGE("@%s %s: Enum sensor frame size failed", __FUNCTION__, sensor_info->device_name.c_str());
         ret = XCAM_RETURN_ERROR_FAILED;
     }
     vdev.close();
@@ -412,14 +413,17 @@ SensorInfoCopy(rk_sensor_full_info_t *finfo, rk_aiq_sensor_info_t *sinfo) {
 
     strncpy(sinfo->sensor_name, finfo->sensor_name.c_str(), sizeof(sinfo->sensor_name));
     fs_num = finfo->frame_size.size();
-    sinfo->support_fmt = new rk_frame_fmt_t[fs_num];
-    sinfo->num = fs_num;
-    for (auto iter = finfo->frame_size.begin(); iter != finfo->frame_size.end(); ++iter) {
-        sinfo->support_fmt->width = (*iter).width;
-        sinfo->support_fmt->height = (*iter).height;
-        sinfo->support_fmt->format = (*iter).format;
-        sinfo->support_fmt++;
+    if (fs_num) {
+        sinfo->support_fmt = new rk_frame_fmt_t[fs_num]();
+        sinfo->num = fs_num;
+        for (auto iter = finfo->frame_size.begin(); iter != finfo->frame_size.end(); ++iter) {
+            sinfo->support_fmt->width = (*iter).width;
+            sinfo->support_fmt->height = (*iter).height;
+            sinfo->support_fmt->format = (*iter).format;
+            sinfo->support_fmt++;
+        }
     }
+
     return XCAM_RETURN_NO_ERROR;
 }
 
@@ -474,17 +478,20 @@ CamHwIsp20::getStaticCamHwInfo(const char* sns_ent_name)
 XCamReturn
 CamHwIsp20::clearStaticCamHwInfo()
 {
-    std::map<std::string, SmartPtr<rk_aiq_static_info_t>>::iterator it1;
-    std::map<std::string, SmartPtr<rk_sensor_full_info_t>>::iterator it2;
+    /* std::map<std::string, SmartPtr<rk_aiq_static_info_t>>::iterator it1; */
+    /* std::map<std::string, SmartPtr<rk_sensor_full_info_t>>::iterator it2; */
 
-    for (it1 = mCamHwInfos.begin(); it1 != mCamHwInfos.end(); it1++) {
-        rk_aiq_static_info_t *ptr = it1->second.ptr();
-        delete ptr;
-    }
-    for (it2 = mSensorHwInfos.begin(); it2 != mSensorHwInfos.end(); it2++) {
-        rk_sensor_full_info_t *ptr = it2->second.ptr();
-        delete ptr;
-    }
+    /* for (it1 = mCamHwInfos.begin(); it1 != mCamHwInfos.end(); it1++) { */
+    /*     rk_aiq_static_info_t *ptr = it1->second.ptr(); */
+    /*     delete ptr; */
+    /* } */
+    /* for (it2 = mSensorHwInfos.begin(); it2 != mSensorHwInfos.end(); it2++) { */
+    /*     rk_sensor_full_info_t *ptr = it2->second.ptr(); */
+    /*     delete ptr; */
+    /* } */
+    mCamHwInfos.clear();
+    mSensorHwInfos.clear();
+
     return XCAM_RETURN_NO_ERROR;
 }
 
@@ -514,7 +521,15 @@ CamHwIsp20::initCamHwInfos()
         /* Enumerate entities, pads and links. */
         media_device_enumerate (device);
 
-        get_ispp_subdevs(device, sys_path, &CamHwIsp20::mIspHwInfos.ispp_info);
+        rk_aiq_isp_t* isp_info = NULL;
+        if (strcmp(device->info.model, "rkispp") == 0) {
+            get_ispp_subdevs(device, sys_path, &CamHwIsp20::mIspHwInfos.ispp_info);
+            goto media_unref;
+        } else if (strcmp(device->info.model, "rkisp") == 0) {
+            isp_info = get_isp_subdevs(device, sys_path, CamHwIsp20::mIspHwInfos.isp_info);
+        } else {
+            goto media_unref;
+        }
 
         nents = media_get_entities_count (device);
         for (j = 0; j < nents; ++j) {
@@ -529,12 +544,13 @@ CamHwIsp20::initCamHwInfos()
                 s_full_info->parent_media_dev = std::string(sys_path);
                 parse_module_info(s_full_info);
                 get_sensor_caps(s_full_info);
-                s_full_info->isp_info = get_isp_subdevs(device, sys_path, CamHwIsp20::mIspHwInfos.isp_info);
+                s_full_info->isp_info = isp_info;
                 SensorInfoCopy(s_full_info, &info->sensor_info);
                 CamHwIsp20::mSensorHwInfos[s_full_info->sensor_name] = s_full_info;
                 CamHwIsp20::mCamHwInfos[s_full_info->sensor_name] = info;
             }
         }
+media_unref:
         media_device_unref (device);
     }
     get_isp_ver(&CamHwIsp20::mIspHwInfos);
@@ -554,14 +570,14 @@ CamHwIsp20::init(const char* sns_ent_name)
     std::string sensor_name(sns_ent_name);
 
     ENTER_CAMHW_FUNCTION();
-    #if 0
+
     std::map<std::string, SmartPtr<rk_sensor_full_info_t>>::iterator it;
-    if ((it=mCamHwInfos.find(sensor_name)) == mCamHwInfos.end()) {
+    if ((it=mSensorHwInfos.find(sensor_name)) == mSensorHwInfos.end()) {
         LOGE("can't find sensor %s", sns_ent_name);
         return XCAM_RETURN_ERROR_SENSOR;
     }
     rk_sensor_full_info_t *s_info = it->second.ptr();
-    sensorHw = new SensorHw(s_info->device_name);
+    sensorHw = new SensorHw(s_info->device_name.c_str());
     mSensorDev = sensorHw;
     mSensorDev->open();
 
@@ -600,50 +616,10 @@ CamHwIsp20::init(const char* sns_ent_name)
     mipi_rx_devs[2] = new V4l2Device (s_info->isp_info->rawrd1_l_path);//rkisp_rawrd1_l
     mipi_rx_devs[2]->open();
 
-    #else
-    sensorHw = new SensorHw("/dev/v4l-subdev4");
-    mSensorDev = sensorHw;
-    mSensorDev->open();
-
-    mIspCoreDev = new V4l2SubDevice("/dev/v4l-subdev1");
-    mIspCoreDev->open();
-    mIspCoreDev->subscribe_event(V4L2_EVENT_FRAME_SYNC);
-
-    mIspLumaDev = new V4l2Device("/dev/video12");
-    mIspLumaDev->open();
-
-    mIsppStatsDev = new V4l2Device("/dev/video19");
-    mIsppStatsDev->open();
-    mIsppParamsDev = new V4l2Device ("/dev/video18");
-    mIsppParamsDev->open();
-
-    mIspStatsDev = new V4l2Device ("/dev/video10");
-    mIspStatsDev->open();
-    mIspParamsDev = new V4l2Device ("/dev/video11");
-    mIspParamsDev->open();
-
-    //short frame
-    mipi_tx_devs[0] = new V4l2Device ("/dev/video4");//rkisp_rawwr2
-    mipi_tx_devs[0]->open();
-    mipi_rx_devs[0] = new V4l2Device ("/dev/video9");//rkisp_rawrd2_s
-    mipi_rx_devs[0]->open();
-    mipi_rx_devs[0]->set_mem_type(V4L2_MEMORY_DMABUF);
-    //mid frame
-    mipi_tx_devs[1] = new V4l2Device ("/dev/video2");//rkisp_rawwr0
-    mipi_tx_devs[1]->open();
-    mipi_rx_devs[1] = new V4l2Device ("/dev/video7");//rkisp_rawrd0_m
-    mipi_rx_devs[1]->open();
-    mipi_rx_devs[1]->set_mem_type(V4L2_MEMORY_DMABUF);
-    //long frame
-    mipi_tx_devs[2] = new V4l2Device ("/dev/video3");//rkisp_rawwr1
-    mipi_tx_devs[2]->open();
-    mipi_rx_devs[2] = new V4l2Device ("/dev/video8");//rkisp_rawrd1_l
-    mipi_rx_devs[2]->open();
-    #endif
     mipi_rx_devs[2]->set_mem_type(V4L2_MEMORY_DMABUF);
     for (int i = 0; i < 3; i++) {
-        mipi_tx_devs[i]->set_buffer_count(8);
-        mipi_rx_devs[i]->set_buffer_count(8);
+        mipi_tx_devs[i]->set_buffer_count(4);
+        mipi_rx_devs[i]->set_buffer_count(4);
     }
 
     isp20Pollthread = new Isp20PollThread();
@@ -660,11 +636,13 @@ CamHwIsp20::init(const char* sns_ent_name)
     mPollLumathread->set_isp_luma_device(mIspLumaDev);
     mPollLumathread->set_poll_callback (this);
 
+#ifndef DISABLE_PP 
     isp20IsppPollthread = new PollThread();
     mPollIsppthread = isp20IsppPollthread;
     mPollIsppthread->set_ispp_stats_device(mIsppStatsDev);
     mPollIsppthread->set_poll_callback (this);
-
+#endif
+    _state = CAM_HW_STATE_INITED;
     EXIT_CAMHW_FUNCTION();
 
     return XCAM_RETURN_NO_ERROR;
@@ -673,6 +651,7 @@ CamHwIsp20::init(const char* sns_ent_name)
 XCamReturn
 CamHwIsp20::deInit()
 {
+    _state = CAM_HW_STATE_INVALID;
     return XCAM_RETURN_NO_ERROR;
 }
 
@@ -709,7 +688,7 @@ CamHwIsp20::setupHdrLink(int hdr_mode, int isp_index, bool enable)
     else
         media_setup_link(device, src_pad_s, sink_pad, ~MEDIA_LNK_FL_ENABLED);
 
-    entity = media_get_entity_by_name(device, "rkisp_rawrd2_m", strlen("rkisp_rawrd2_m"));
+    entity = media_get_entity_by_name(device, "rkisp_rawrd0_m", strlen("rkisp_rawrd0_m"));
     if(entity) {
         src_pad_m = (media_pad *)media_entity_get_pad(entity, 0);
         if (!src_pad_m) {
@@ -723,7 +702,7 @@ CamHwIsp20::setupHdrLink(int hdr_mode, int isp_index, bool enable)
         media_setup_link(device, src_pad_m, sink_pad, ~MEDIA_LNK_FL_ENABLED);
 
     if (RK_AIQ_HDR_GET_WORKING_MODE(hdr_mode) == RK_AIQ_WORKING_MODE_ISP_HDR3) {
-        entity = media_get_entity_by_name(device, "rkisp_rawrd2_l", strlen("rkisp_rawrd2_l"));
+        entity = media_get_entity_by_name(device, "rkisp_rawrd1_l", strlen("rkisp_rawrd1_l"));
         if(entity) {
             src_pad_l = (media_pad *)media_entity_get_pad(entity, 0);
             if (!src_pad_l) {
@@ -754,20 +733,15 @@ CamHwIsp20::prepare(uint32_t width, uint32_t height, int mode)
 
     _hdr_mode = mode;
 
-    /*
-     * Segmentation fault occur during executing this code
-     * TODO: Execute this code after verifying on the board
-     */
-#if 0
     if (_hdr_mode != RK_AIQ_WORKING_MODE_NORMAL)
         setupHdrLink(_hdr_mode, 0, true);
-#endif
 
     sensorHw = mSensorDev.dynamic_cast_ptr<SensorHw>();
     sensorHw->set_working_mode(mode);
 
     isp20Pollthread = mPollthread.dynamic_cast_ptr<Isp20PollThread>();
     isp20Pollthread->set_working_mode(mode);
+    // TODO: may start devices in start() ? 
     ret = isp20Pollthread->hdr_mipi_start(sensorHw);
     if (ret < 0) {
         LOGE("hdr mipi start err: %d\n", ret);
@@ -793,11 +767,14 @@ CamHwIsp20::prepare(uint32_t width, uint32_t height, int mode)
         LOGE("start isp params dev err: %d\n", ret);
     }
 
+#ifndef DISABLE_PP 
     mIsppParamsDev->start();
     if (ret < 0) {
 	LOGE("start ispp params dev err: %d\n", ret);
     }
+#endif
 
+    _state = CAM_HW_STATE_PREPARED;
     EXIT_CAMHW_FUNCTION();
     return ret;
 }
@@ -806,17 +783,56 @@ XCamReturn
 CamHwIsp20::start()
 {
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    SmartPtr<SensorHw> sensorHw;
+    SmartPtr<Isp20PollThread> isp20Pollthread;
 
     ENTER_CAMHW_FUNCTION();
 
-    mPollthread->start();
-    mPollLumathread->start();
-    mPollIsppthread->start();
-    if (ret < 0) {
-        LOGE("start isp Poll thread err: %d\n", ret);
+    isp20Pollthread = mPollthread.dynamic_cast_ptr<Isp20PollThread>();
+    sensorHw = mSensorDev.dynamic_cast_ptr<SensorHw>();
+    
+    // restart if in stop state
+    if (_state == CAM_HW_STATE_STOPED) {
+        ret = isp20Pollthread->hdr_mipi_start(sensorHw);
+        if (ret < 0) {
+            LOGE("hdr mipi start err: %d\n", ret);
+        }
+
+        ret = mIspLumaDev->start();
+        if (ret < 0) {
+            LOGE("start isp luma dev err: %d\n", ret);
+        }
+
+        ret = mIspCoreDev->start();
+        if (ret < 0) {
+            LOGE("start isp core dev err: %d\n", ret);
+        }
+
+        mIspStatsDev->start();
+        if (ret < 0) {
+            LOGE("start isp stats dev err: %d\n", ret);
+        }
+
+        mIspParamsDev->start();
+        if (ret < 0) {
+            LOGE("start isp params dev err: %d\n", ret);
+        }
+
+#ifndef DISABLE_PP 
+        mIsppParamsDev->start();
+        if (ret < 0) {
+        LOGE("start ispp params dev err: %d\n", ret);
+        }
+#endif
     }
 
+    mPollthread->start();
+    mPollLumathread->start();
+#ifndef DISABLE_PP 
+    mPollIsppthread->start();
+#endif
     _is_exit = false;
+    _state = CAM_HW_STATE_STARTED;
 
     EXIT_CAMHW_FUNCTION();
     return ret;
@@ -828,21 +844,47 @@ XCamReturn CamHwIsp20::stop()
     SmartPtr<Isp20PollThread> isp20Pollthread;
 
     ENTER_CAMHW_FUNCTION();
-
     isp20Pollthread = mPollthread.dynamic_cast_ptr<Isp20PollThread>();
+    mPollthread->stop();
+    mPollLumathread->stop();
+#ifndef DISABLE_PP 
+    mPollIsppthread->stop();
+#endif
+    ret = mIspLumaDev->stop();
+    if (ret < 0) {
+        LOGE("stop isp luma dev err: %d\n", ret);
+    }
+
+    ret = mIspCoreDev->stop();
+    if (ret < 0) {
+        LOGE("stop isp core dev err: %d\n", ret);
+    }
+
+    mIspStatsDev->stop();
+    if (ret < 0) {
+        LOGE("stop isp stats dev err: %d\n", ret);
+    }
+
+    mIspParamsDev->stop();
+    if (ret < 0) {
+        LOGE("stop isp params dev err: %d\n", ret);
+    }
+
+#ifndef DISABLE_PP 
+    mIsppParamsDev->stop();
+    if (ret < 0) {
+	LOGE("stop ispp params dev err: %d\n", ret);
+    }
+#endif
     ret = isp20Pollthread->hdr_mipi_stop();
     if (ret < 0) {
         LOGE("hdr mipi stop err: %d\n", ret);
     }
 
-    /*
-     * Segmentation fault occur during executing this code
-     * TODO: Execute this code after verifying on the board
-     */
-#if 0
     if (_hdr_mode != RK_AIQ_WORKING_MODE_NORMAL)
         setupHdrLink(_hdr_mode, 0, false);
-#endif
+
+    _state = CAM_HW_STATE_STOPED;
     EXIT_CAMHW_FUNCTION();
     return ret;
 }

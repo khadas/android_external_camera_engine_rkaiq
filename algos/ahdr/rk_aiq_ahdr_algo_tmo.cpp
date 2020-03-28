@@ -54,10 +54,9 @@ unsigned short GetSetLgmean(AhdrHandle_t pAhdrCtx)
     LOGE_AHDR( "%s:lrk frameCnt:%d value:%f returnValue:%d\n", __FUNCTION__, pAhdrCtx->frameCnt, value, returnValue);
 #endif
 
-    return returnValue;
-
     LOGI_AHDR( "%s:exit!\n", __FUNCTION__);
 
+    return returnValue;
 }
 /******************************************************************************
  * GetSetLgAvgMax()

@@ -78,7 +78,7 @@ static char log_file_name[XCAM_MAX_STR_SIZE] = {0};
  *    Linux:
  *      export persist_camera_engine_log=0x4014
  */
-static unsigned long long g_cam_engine_log_level = 0xfffffffffffffff5;
+static unsigned long long g_cam_engine_log_level = 0xff0;
 
 typedef struct xcore_cam_log_module_info_s {
     const char* module_name;
