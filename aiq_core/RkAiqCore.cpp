@@ -1606,6 +1606,10 @@ RkAiqCore::addDefaultAlgos()
     ADD_ALGO_HANDLE(Ar2y, AR2Y);
     ADD_ALGO_HANDLE(Awdr, AWDR);
 
+#ifdef RK_SIMULATOR_HW
+    for (int i = 0; i < RK_AIQ_ALGO_TYPE_MAX; i++)
+        enableAlgo(i, 0, true);
+#else
     /*
      * enable the modules that has been verified to work properly on the board
      * TODO: enable all modules after validation in isp
@@ -1623,6 +1627,7 @@ RkAiqCore::addDefaultAlgos()
     enableAlgo(RK_AIQ_ALGO_TYPE_ALSC, 0, true);
     enableAlgo(RK_AIQ_ALGO_TYPE_ADPCC, 0, true);
     enableAlgo(RK_AIQ_ALGO_TYPE_ANR, 0, true);
+#endif
 #endif
 }
 

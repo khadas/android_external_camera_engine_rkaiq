@@ -132,8 +132,16 @@ public:
     static XCamReturn selectIqFile(const char* sns_ent_name, char* iqfile_name);
 private:
     XCAM_DEAD_COPY(CamHwIsp20);
+    enum cam_hw_state_e {
+        CAM_HW_STATE_INVALID,
+        CAM_HW_STATE_INITED,
+        CAM_HW_STATE_PREPARED,
+        CAM_HW_STATE_STARTED,
+        CAM_HW_STATE_STOPED,
+    };
     int _hdr_mode;
     Mutex _mutex;
+    int _state;
     bool _first;
     volatile bool _is_exit;
     SmartPtr<RkAiqIspParamsProxy> _last_aiq_results;

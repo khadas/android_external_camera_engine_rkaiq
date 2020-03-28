@@ -85,7 +85,7 @@ private:
     PollThread   *_poll;
 };
 
-const int PollThread::default_poll_timeout = 100; // ms
+const int PollThread::default_poll_timeout = 300; // ms
 
 PollThread::PollThread ()
     : _poll_callback (NULL)
@@ -522,7 +522,7 @@ PollThread::poll_subdev_event_loop ()
 
     /* timeout */
     if (poll_ret == 0) {
-        XCAM_LOG_DEBUG ("poll event timeout and continue");
+        XCAM_LOG_ERROR ("poll event timeout and continue");
         return XCAM_RETURN_ERROR_TIMEOUT;
     }
 

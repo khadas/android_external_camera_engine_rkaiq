@@ -31,7 +31,7 @@ Isp20Params::convertAiqAeToIsp20Params(struct isp2x_isp_params_cfg& isp_cfg,
     memcpy(&isp_cfg.meas.rawae0, &aec_meas.rawae0, sizeof(aec_meas.rawae0));
     memcpy(&isp_cfg.meas.yuvae, &aec_meas.yuvae, sizeof(aec_meas.yuvae));
     /*
-     *     printf("xuhf-debug: hist_meas-isp_cfg size: [%dx%d]-[%dx%d]-[%dx%d]-[%dx%d]\n",
+     *     LOGD("xuhf-debug: hist_meas-isp_cfg size: [%dx%d]-[%dx%d]-[%dx%d]-[%dx%d]\n",
      *                     sizeof(aec_meas.rawae3),
      *                     sizeof(isp_cfg.meas.rawae3),
      *                     sizeof(aec_meas.rawae1),
@@ -41,7 +41,7 @@ Isp20Params::convertAiqAeToIsp20Params(struct isp2x_isp_params_cfg& isp_cfg,
      *                     sizeof(aec_meas.rawae0),
      *                     sizeof(isp_cfg.meas.rawae0));
      *
-     *     printf("xuhf-debug: aec_meas: win size: [%dx%d]-[%dx%d]-[%dx%d]-[%dx%d]\n",
+     *     LOGD("xuhf-debug: aec_meas: win size: [%dx%d]-[%dx%d]-[%dx%d]-[%dx%d]\n",
      *            aec_meas.rawae0.win.h_size,
      *            aec_meas.rawae0.win.v_size,
      *            aec_meas.rawae3.win.h_size,
@@ -51,7 +51,7 @@ Isp20Params::convertAiqAeToIsp20Params(struct isp2x_isp_params_cfg& isp_cfg,
      *            aec_meas.rawae2.win.h_size,
      *            aec_meas.rawae2.win.v_size);
      *
-     *     printf("xuhf-debug: isp_cfg: win size: [%dx%d]-[%dx%d]-[%dx%d]-[%dx%d]\n",
+     *     LOGD("xuhf-debug: isp_cfg: win size: [%dx%d]-[%dx%d]-[%dx%d]-[%dx%d]\n",
      *            isp_cfg.meas.rawae0.win.h_size,
      *            isp_cfg.meas.rawae0.win.v_size,
      *            isp_cfg.meas.rawae3.win.h_size,
@@ -118,7 +118,7 @@ Isp20Params::convertAiqHistToIsp20Params(struct isp2x_isp_params_cfg& isp_cfg,
     // convertAiqSiHstWndSize(isp_cfg.meas.sihst);
 
     /*
-     *     printf("xuhf-debug: hist_meas-isp_cfg size: [%dx%d]-[%dx%d]-[%dx%d]-[%dx%d]\n",
+     *     LOGD("xuhf-debug: hist_meas-isp_cfg size: [%dx%d]-[%dx%d]-[%dx%d]-[%dx%d]\n",
      *                     sizeof(hist_meas.rawhist3),
      *                     sizeof(isp_cfg.meas.rawhist3),
      *                     sizeof(hist_meas.rawhist1),
@@ -128,7 +128,7 @@ Isp20Params::convertAiqHistToIsp20Params(struct isp2x_isp_params_cfg& isp_cfg,
      *                     sizeof(hist_meas.rawhist0),
      *                     sizeof(isp_cfg.meas.rawhist0));
      *
-     *     printf("xuhf-debug: hist_meas: hist win size: [%dx%d]-[%dx%d]-[%dx%d]-[%dx%d]\n",
+     *     LOGD("xuhf-debug: hist_meas: hist win size: [%dx%d]-[%dx%d]-[%dx%d]-[%dx%d]\n",
      *                     hist_meas.rawhist0.win.h_size,
      *                     hist_meas.rawhist0.win.v_size,
      *                     hist_meas.rawhist3.win.h_size,
@@ -138,7 +138,7 @@ Isp20Params::convertAiqHistToIsp20Params(struct isp2x_isp_params_cfg& isp_cfg,
      *                     hist_meas.rawhist2.win.h_size,
      *                     hist_meas.rawhist2.win.v_size);
      *
-     *     printf("xuhf-debug: isp_cfg: hist win size: [%dx%d]-[%dx%d]-[%dx%d]-[%dx%d]\n",
+     *     LOGD("xuhf-debug: isp_cfg: hist win size: [%dx%d]-[%dx%d]-[%dx%d]-[%dx%d]\n",
      *                     isp_cfg.meas.rawhist0.win.h_size,
      *                     isp_cfg.meas.rawhist0.win.v_size,
      *                     isp_cfg.meas.rawhist3.win.h_size,
@@ -1134,7 +1134,7 @@ void
 Isp20Params::convertAiqBlcToIsp20Params(struct isp2x_isp_params_cfg& isp_cfg,
                                         SmartPtr<RkAiqIspParamsProxy> aiq_results)
 {
-    printf("%s:(%d) enter \n", __FUNCTION__, __LINE__);
+    LOGD("%s:(%d) enter \n", __FUNCTION__, __LINE__);
 
 	if(aiq_results->data()->blc.stResult.enable){
 	    isp_cfg.module_ens |= ISP2X_MODULE_BLS;
@@ -1162,7 +1162,7 @@ Isp20Params::convertAiqBlcToIsp20Params(struct isp2x_isp_params_cfg& isp_cfg,
     isp_cfg.others.bls_cfg.fixed_val.gb = aiq_results->data()->blc.stResult.blc_gr;
     isp_cfg.others.bls_cfg.fixed_val.b = aiq_results->data()->blc.stResult.blc_gr;
 
-    printf("%s:(%d) exit \n", __FUNCTION__, __LINE__);
+    LOGD("%s:(%d) exit \n", __FUNCTION__, __LINE__);
 }
 
 
@@ -1170,7 +1170,7 @@ void
 Isp20Params::convertAiqDpccToIsp20Params(struct isp2x_isp_params_cfg& isp_cfg,
         SmartPtr<RkAiqIspParamsProxy> aiq_results)
 {
-    printf("%s:(%d) enter \n", __FUNCTION__, __LINE__);
+    LOGD("%s:(%d) enter \n", __FUNCTION__, __LINE__);
 
     struct isp2x_dpcc_cfg * pDpccCfg = &isp_cfg.others.dpcc_cfg;
     rk_aiq_isp_dpcc_t *pDpccRst = &aiq_results->data()->dpcc;
@@ -1387,7 +1387,7 @@ Isp20Params::convertAiqDpccToIsp20Params(struct isp2x_isp_params_cfg& isp_cfg,
     pDpccCfg->pdaf_forward_med = pDpccRst->stPdaf.pdaf_forward_med;
 
 
-    printf("%s:(%d) exit \n", __FUNCTION__, __LINE__);
+    LOGD("%s:(%d) exit \n", __FUNCTION__, __LINE__);
 }
 
 
@@ -1475,7 +1475,7 @@ Isp20Params::convertAiqRawnrToIsp20Params(struct isp2x_isp_params_cfg& isp_cfg,
         rk_aiq_isp_rawnr_t& rawnr)
 {
 
-    printf("%s:(%d) enter \n", __FUNCTION__, __LINE__);
+    LOGD("%s:(%d) enter \n", __FUNCTION__, __LINE__);
 
     struct isp2x_rawnr_cfg * pRawnrCfg = &isp_cfg.others.rawnr_cfg;
 
@@ -1547,14 +1547,14 @@ Isp20Params::convertAiqRawnrToIsp20Params(struct isp2x_isp_params_cfg& isp_cfg,
     pRawnrCfg->rgain_filp = rawnr.rgain_filp;
     pRawnrCfg->bgain_filp = rawnr.bgain_filp;
 
-    printf("%s:(%d) exit \n", __FUNCTION__, __LINE__);
+    LOGD("%s:(%d) exit \n", __FUNCTION__, __LINE__);
 }
 
 void
 Isp20Params::convertAiqTnrToIsp20Params(struct rkispp_params_cfg& pp_cfg,
                                         rk_aiq_isp_tnr_t& tnr)
 {
-    printf("%s:(%d) enter \n", __FUNCTION__, __LINE__);
+    LOGD("%s:(%d) enter \n", __FUNCTION__, __LINE__);
     int i = 0;
 
 	if(tnr.tnr_en){
@@ -1699,7 +1699,7 @@ Isp20Params::convertAiqTnrToIsp20Params(struct rkispp_params_cfg& pp_cfg,
         pTnrCfg->weight_y[i] = tnr.weight_y[i];
     }
 
-    printf("%s:(%d) exit \n", __FUNCTION__, __LINE__);
+    LOGD("%s:(%d) exit \n", __FUNCTION__, __LINE__);
 }
 
 
@@ -1707,7 +1707,7 @@ void
 Isp20Params::convertAiqUvnrToIsp20Params(struct rkispp_params_cfg& pp_cfg,
         rk_aiq_isp_uvnr_t& uvnr)
 {
-    printf("%s:(%d) enter \n", __FUNCTION__, __LINE__);
+    LOGD("%s:(%d) enter \n", __FUNCTION__, __LINE__);
 
     int i = 0;
     struct rkispp_nr_config  * pNrCfg = &pp_cfg.nr_cfg;
@@ -1780,7 +1780,7 @@ Isp20Params::convertAiqUvnrToIsp20Params(struct rkispp_params_cfg& pp_cfg,
     }
 
 
-    printf("%s:(%d) exit \n", __FUNCTION__, __LINE__);
+    LOGD("%s:(%d) exit \n", __FUNCTION__, __LINE__);
 }
 
 
@@ -1788,7 +1788,7 @@ void
 Isp20Params::convertAiqYnrToIsp20Params(struct rkispp_params_cfg& pp_cfg,
                                         rk_aiq_isp_ynr_t& ynr)
 {
-    printf("%s:(%d) enter \n", __FUNCTION__, __LINE__);
+    LOGD("%s:(%d) enter \n", __FUNCTION__, __LINE__);
 
     int i = 0;
     struct rkispp_nr_config  * pNrCfg = &pp_cfg.nr_cfg;
@@ -1898,7 +1898,7 @@ Isp20Params::convertAiqYnrToIsp20Params(struct rkispp_params_cfg& pp_cfg,
         pNrCfg->ynr_st_scale[i] = ynr.ynr_st_scale[i];
     }
 
-    printf("%s:(%d) exit \n", __FUNCTION__, __LINE__);
+    LOGD("%s:(%d) exit \n", __FUNCTION__, __LINE__);
 
 }
 

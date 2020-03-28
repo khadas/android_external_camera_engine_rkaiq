@@ -326,8 +326,8 @@ SensorHw::getEffectiveParams(SmartPtr<RkAiqExpParamsProxy>& expParams, int frame
 	      int i = 0;
 
               rit = _effecting_exp_map.rbegin();
-	      while (i++ < 3 && rit->first > search_id)
-                  rit++;
+	      /* while (i++ < 3 && rit->first > search_id) */
+                  /* rit++; */
 	      expParams = rit->second;
 	      /*
 	       * printf("debug-hdr: %d: get-last %d, lexp: %d from map\n",
@@ -491,7 +491,7 @@ SensorHw::set_working_mode(int mode)
 {
    _working_mode = mode;
 
-   XCAM_LOG_ERROR ("%s _working_mode: %d\n",
+   XCAM_LOG_DEBUG ("%s _working_mode: %d\n",
       __func__, _working_mode);
 }
 
