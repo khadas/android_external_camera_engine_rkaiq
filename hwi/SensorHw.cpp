@@ -486,13 +486,34 @@ SensorHw::get_v4l2_pixelformat(uint32_t pixelcode)
     return pixelformat;
 }
 
-void
+XCamReturn
 SensorHw::set_working_mode(int mode)
 {
-   _working_mode = mode;
+    rkmodule_hdr_cfg hdr_cfg;
+    __u32 hdr_mode;
 
-   XCAM_LOG_DEBUG ("%s _working_mode: %d\n",
-      __func__, _working_mode);
+    xcam_mem_clear(hdr_cfg);
+    if (mode == RK_AIQ_WORKING_MODE_NORMAL) {
+        hdr_mode = NO_HDR;
+    } else if (mode == RK_AIQ_ISP_HDR_MODE_2_FRAME_HDR ||
+               mode == RK_AIQ_ISP_HDR_MODE_2_LINE_HDR) {
+        hdr_mode = HDR_X2;
+    } else if (mode == RK_AIQ_ISP_HDR_MODE_3_FRAME_HDR ||
+               mode == RK_AIQ_ISP_HDR_MODE_3_LINE_HDR) {
+        hdr_mode = HDR_X3;
+    }
+    hdr_cfg.hdr_mode = hdr_mode;
+    if (io_control(RKMODULE_SET_HDR_CFG, &hdr_cfg) < 0) {
+        XCAM_LOG_ERROR ("failed to set hdr mode");
+        return XCAM_RETURN_ERROR_IOCTL;
+    }
+
+    _working_mode = mode;
+
+    XCAM_LOG_DEBUG ("%s _working_mode: %d\n",
+                    __func__, _working_mode);
+
+    return XCAM_RETURN_NO_ERROR;
 }
 
 }; //namespace RkCam
