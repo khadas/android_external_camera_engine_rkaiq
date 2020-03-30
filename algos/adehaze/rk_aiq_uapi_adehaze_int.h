@@ -3,14 +3,7 @@
 
 #include "base/xcam_common.h" 
 #include "rk_aiq_algo_des.h" 
-// TODO: move the structs define to a separate file,
-// eg. rk_aiq_uapi_awb_types.h ?
 #include "adehaze/rk_aiq_types_adehaze_algo_int.h"
-
-
-
-
-
 
 // need_sync means the implementation should consider
 // the thread synchronization

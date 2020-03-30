@@ -1,6 +1,5 @@
 #ifndef _RK_AIQ_CALIB_TYPES_H_
 #define _RK_AIQ_CALIB_TYPES_H_
-#include <string>
 #include "rk_aiq_algo_des.h"
 
 #define CALIBDB_MAX_ISO_LEVEL 9
@@ -841,7 +840,7 @@ typedef struct CalibDb_Dpcc_s {
     unsigned char stage1_use_set3[CALIBDB_DPCC_MAX_ISO_LEVEL];
     unsigned char stage1_use_set2[CALIBDB_DPCC_MAX_ISO_LEVEL];
     unsigned char stage1_use_set1[CALIBDB_DPCC_MAX_ISO_LEVEL];
-    CalibDb_Dpcc_set_s set[3];
+    CalibDb_Dpcc_set_t set[3];
     CalibDb_Dpcc_Pdaf_t pdaf;
 } CalibDb_Dpcc_t;
 

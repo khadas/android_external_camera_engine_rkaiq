@@ -19,7 +19,6 @@
 
 #ifndef _RK_AIQ_TYPE_ASHARP_ALGO_INT_H_
 #define _RK_AIQ_TYPE_ASHARP_ALGO_INT_H_
-#include "base/xcam_log.h"
 #include "rk_aiq_comm.h"
 #include "RkAiqCalibDbTypes.h"
 #include "asharp/rk_aiq_types_asharp_algo.h"

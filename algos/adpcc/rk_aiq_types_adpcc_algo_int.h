@@ -21,7 +21,6 @@
 #define _RK_AIQ_TYPE_ADPCC_ALGO_INT_H_
 #include "RkAiqCalibDbTypes.h"
 #include "adpcc/rk_aiq_types_adpcc_algo.h"
-#include "base/xcam_log.h"
 #include "base/xcam_common.h"
 
 

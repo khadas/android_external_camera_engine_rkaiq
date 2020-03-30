@@ -242,7 +242,7 @@ typedef struct {
 } rk_aiq_sensor_info_t;
 
 typedef struct {
-
+    int UNKNOWN;
 } rk_aiq_lens_info_t;
 
 typedef struct {
@@ -339,11 +339,11 @@ typedef struct {
 #endif
 
 typedef struct {
-
+    int UNKNOWN;
 } rk_aiq_isp_drc_t;
 
 typedef struct {
-
+    int UNKNOWN;
 } rk_aiq_isp_gic_t;
 
 /*typedef struct {
@@ -471,33 +471,26 @@ typedef struct {
 //typedef rk_aiq_gamma_cfg_t rk_aiq_gamma_cfg_t;
 
 
-
-
 typedef struct {
-
-
     unsigned char  equ_segm;
     unsigned short offset;
     unsigned short gamma_y[45];
-
-
-
 } rk_aiq_isp_goc_t;
 
 typedef struct {
-
+    int UNKNOWN;
 } rk_aiq_isp_wdr_t;
 
 typedef struct {
-
+    int UNKNOWN;
 } rk_aiq_isp_csm_t;
 
 typedef struct {
-
+    int UNKNOWN;
 } rk_aiq_isp_conv422_t;
 
 typedef struct {
-
+    int UNKNOWN;
 } rk_aiq_isp_yuvconv_t;
 
 typedef struct {
@@ -543,7 +536,7 @@ typedef struct {
 #endif
 
 typedef struct {
-
+    int UNKNOWN;
 } rk_aiq_isp_cgc_t;
 
 #if 0

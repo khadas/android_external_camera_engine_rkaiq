@@ -23,7 +23,6 @@
 #include <math.h>
 #include <string.h>
 #include <stdlib.h>
-#include "base/xcam_log.h"
 #include "rk_aiq_comm.h"
 #include "RkAiqCalibDbTypes.h"
 #include "anr/rk_aiq_types_anr_algo.h"

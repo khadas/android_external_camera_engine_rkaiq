@@ -21,7 +21,6 @@
 #define _RK_AIQ_TYPES_AGAMMA_ALGO_H_
 
 #include "agamma/rk_aiq_types_agamma_hw.h"
-//#include "agamma/rk_aiq_types_agamma_algo_prvt.h"
 
 
 RKAIQ_BEGIN_DECLARE
