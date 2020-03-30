@@ -224,7 +224,7 @@ void TmoGetCurrIOData
         pAhdrCtx->AhdrProcRes.TmoProcRes.sw_hdrtmo_set_palpha = 1;
     }
 #if 1
-    pAhdrCtx->AhdrProcRes.TmoProcRes.sw_hdrtmo_big_en = pAhdrCtx->height >= 2560 ? 1 : 0;
+    pAhdrCtx->AhdrProcRes.TmoProcRes.sw_hdrtmo_big_en = pAhdrCtx->width >= 2560 ? 1 : 0;
     pAhdrCtx->AhdrProcRes.TmoProcRes.sw_hdrtmo_nobig_en = (int)(1 - pAhdrCtx->AhdrProcRes.TmoProcRes.sw_hdrtmo_big_en);
     pAhdrCtx->AhdrProcRes.TmoProcRes.sw_hdrtmo_newhist_en = 0;
     pAhdrCtx->AhdrProcRes.TmoProcRes.sw_hdrtmo_cnt_mode = 0;
