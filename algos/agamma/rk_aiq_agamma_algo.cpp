@@ -99,12 +99,12 @@ XCamReturn AgammaReleaseV200(AgammaHandle_t* para)
     return(ret);
 
 }
-XCamReturn AgammaConfigV200(const CalibDb_Gamma_t *          AgammaHtmlPara, AgammaHandle_t* para)
+XCamReturn AgammaConfigV200(const CalibDb_Gamma_t * AgammaHtmlPara, AgammaHandle_t* para)
 {
 
     printf("ENTER: %s \n", __func__);
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
-    int workmode = 1;//to do
+    int workmode = AgammaHtmlPara->gamma_out_mode;
 
 
 	select_RkGamma_params(AgammaHtmlPara, (RKAiqAgammaHtmlConfig_Select_t*)&para->agamma_config,  workmode);
@@ -138,7 +138,7 @@ XCamReturn  AgammaReConfigV200(AgammaHandle_t *para,const CalibDb_Gamma_t * gamm
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
     printf("ENTER: %s \n", __func__);
 
-	int workmode = 1;//to do
+	int workmode = gamma_calib->gamma_out_mode;
 
 
     select_RkGamma_params(gamma_calib, (RKAiqAgammaHtmlConfig_Select_t*)&para->agamma_config,	workmode);
