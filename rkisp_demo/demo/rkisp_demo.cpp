@@ -17,7 +17,7 @@
 #include <sys/mman.h>
 #include <sys/ioctl.h>
 #include <dlfcn.h>
-
+#include <signal.h>
 #include <linux/videodev2.h>
 
 #include "drmDsp.h"
@@ -42,8 +42,9 @@ static int fd = -1;
 static enum v4l2_buf_type buf_type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
 struct buffer *buffers;
 static unsigned int n_buffers;
-static int frame_count = 1000;
+static int frame_count = -1;
 FILE *fp;
+static rk_aiq_sys_ctx_t* aiq_ctx = NULL;
 static int silent = 0;
 static int vop = 0;
 static int rkaiq = 0;
@@ -117,9 +118,11 @@ static int read_frame()
 
 static void mainloop(void)
 {
-        while (frame_count-- > 0) {
-            read_frame();
-        }
+    bool loop_inf = frame_count == -1 ? true : false;
+
+    while (loop_inf || (frame_count-- > 0)) {
+        read_frame();
+    }
 }
 
 static void stop_capturing(void)
@@ -395,15 +398,32 @@ void parse_args(int argc, char **argv)
 
 }
 
+static void signal_handle(int signo)
+{
+    printf("force exit !!!\n");
+	if (aiq_ctx) {
+        printf("-------- stop aiq -------------\n");
+		rk_aiq_uapi_sysctl_stop(aiq_ctx);
+        printf("-------- deinit aiq -------------\n");
+		rk_aiq_uapi_sysctl_deinit(aiq_ctx);
+        printf("-------- deinit aiq end -------------\n");
+	}
+
+    stop_capturing();
+	if (writeFile)
+	    fclose(fp);
+    uninit_device();
+    close_device();
+    exit(0);
+}
+
 int main(int argc, char **argv)
 {
-	rk_aiq_sys_ctx_t* aiq_ctx = NULL;
+    signal(SIGINT, signal_handle);
+    parse_args(argc, argv);
 
-        parse_args(argc, argv);
-
-        open_device();
-        init_device();
-
+    open_device();
+    init_device();
 
 	if (rkaiq) {
 		aiq_ctx = rk_aiq_uapi_sysctl_init("m01_f_ov4689 1-0036", NULL, NULL, NULL);
@@ -451,10 +471,10 @@ int main(int argc, char **argv)
         printf("-------- deinit aiq end -------------\n");
 	}
 
-        stop_capturing();
+    stop_capturing();
 	if (writeFile)
 	    fclose(fp);
-        uninit_device();
-        close_device();
-        return 0;
+    uninit_device();
+    close_device();
+    return 0;
 }
