@@ -21,8 +21,6 @@
 #define _RK_AIQ_TYPES_ADEHAZE_ALGO_H_
 
 #include "adehaze/rk_aiq_types_adehaze_hw.h"
-//#include "adehaze/rk_aiq_types_adehaze_algo_prvt.h"
-
 
 RKAIQ_BEGIN_DECLARE
 	

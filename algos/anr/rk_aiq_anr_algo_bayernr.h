@@ -1,11 +1,7 @@
-/*
-
- */
 
 #ifndef _RKAIQ_BAYERNR_H_
 #define _RKAIQ_BAYERNR_H_
 
-//在此处包含其它头文件
 #include "stdio.h"
 #include "math.h"
 #include "stdlib.h"
