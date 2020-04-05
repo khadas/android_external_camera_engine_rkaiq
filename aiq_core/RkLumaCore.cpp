@@ -19,7 +19,9 @@
 
 #include "RkLumaCore.h"
 #include "v4l2_buffer_proxy.h"
-//#include "simulator/isp20_hw_simulator.h"
+#ifdef RK_SIMULATOR_HW
+#include "simulator/isp20_hw_simulator.h"
+#endif
 #include "isp20/rkisp2-config.h"
 
 namespace RkCam {

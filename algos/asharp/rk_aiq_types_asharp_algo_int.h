@@ -358,6 +358,13 @@ typedef struct rk_aiq_sharp_attrib_s{
 	Asharp_Manual_Attr_t stManual;	
 }rk_aiq_sharp_attrib_t;
 
+typedef struct AsharpExpInfo_s{
+	int hdr_mode;
+	float arTime[3];
+	float arAGain[3];
+	float arDGain[3];
+	int   arIso[3];
+}AsharpExpInfo_t;
 
 RKAIQ_END_DECLARE
 

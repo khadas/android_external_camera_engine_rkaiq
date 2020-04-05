@@ -22,7 +22,7 @@ AblcResult_t AblcReConfig(AblcContext_t *pAblcCtx, AblcConfig_t* pAblcConfig);
 
 AblcResult_t AblcPreProcess(AblcContext_t *pAblcCtx);
 
-AblcResult_t AblcProcess(AblcContext_t *pAblcCtx, int isoValue);
+AblcResult_t AblcProcess(AblcContext_t *pAblcCtx, AblcExpInfo_t *pExpInfo);
 
 AblcResult_t AblcGetProcResult(AblcContext_t *pAblcCtx, AblcProcResult_t* pAblcResult);
 

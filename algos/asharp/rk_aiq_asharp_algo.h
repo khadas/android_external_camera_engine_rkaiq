@@ -22,7 +22,7 @@ AsharpResult_t AsharpReConfig(AsharpContext_t *pAsharpCtx, AsharpConfig_t* pAsha
 
 AsharpResult_t AsharpPreProcess(AsharpContext_t *pAsharpCtx);
 
-AsharpResult_t AsharpProcess(AsharpContext_t *pAsharpCtx, int ISO);
+AsharpResult_t AsharpProcess(AsharpContext_t *pAsharpCtx, AsharpExpInfo_t *pExpInfo);
 
 AsharpResult_t AsharpGetProcResult(AsharpContext_t *pAsharpCtx, AsharpProcResult_t* pAsharpResult);
 

@@ -231,6 +231,7 @@ typedef struct CalibDb_AeAttr_s {
     uint8_t                  BlackDelayFrame;
     uint8_t                  WhiteDelayFrame;
     //AeRange
+    bool                     SetAeRangeEn;
     CalibDb_LinAeRange_t     stLinAeRange;
     CalibDb_HdrAeRange_t     stHdrAeRange;
     //Auto/Fixed fps
@@ -363,15 +364,15 @@ typedef struct CalibDb_AecBacklight_s {
     float               LvLowTh;
     float               LvHightTh;
     Cam1x6FloatMatrix_t NonOEPdfTh;
-    Cam1x6FloatMatrix_t DarkPdfTh;
+    Cam1x6FloatMatrix_t LowLightPdfTh;
     Cam1x6FloatMatrix_t ExpLevel;
-    Cam1x6FloatMatrix_t DarkROISetPoint;
-    float               MaxLumaDistTh;
+    Cam1x6FloatMatrix_t TargetLLLuma;
+    float               LumaDistTh;
 } CalibDb_AecBacklight_t;
 
 typedef struct CalibDb_AecHist2Hal_s {
-    uint8_t   enable;
-    uint8_t   lowHistBinTh;
+    uint8_t             enable;
+    uint8_t             lowHistBinTh;
 } CalibDb_AecHist2Hal_t;
 
 typedef struct CalibDb_LinearAE_Attr_s {
@@ -404,9 +405,9 @@ typedef struct CalibDb_LFrameCtrl_s
     float                   LvHighTh;
     Cam1x6FloatMatrix_t     LExpLevel;
     Cam1x6FloatMatrix_t     LSetPoint;
-    Cam1x6FloatMatrix_t     TargetDarkROILuma;
+    Cam1x6FloatMatrix_t     TargetLLLuma;
     Cam1x6FloatMatrix_t     NonOEPdfTh;
-    Cam1x6FloatMatrix_t     DarkPdfTh;
+    Cam1x6FloatMatrix_t     LowLightPdfTh;
 } CalibDb_LFrameCtrl_t;
 
 typedef struct CalibDb_MFrameCtrl_s
@@ -419,10 +420,9 @@ typedef struct CalibDb_MFrameCtrl_s
 typedef struct CalibDb_SFrameCtrl_s
 {
     //SframeCtrl
-    float                   MaxLumaTolerance;
-    float                   MaxLumaDistTh;
+    float                   HLLumaTolerance;
     Cam1x6FloatMatrix_t     SExpLevel;
-    Cam1x6FloatMatrix_t     TargetMaxLuma;
+    Cam1x6FloatMatrix_t     TargetHLLuma;
     Cam1x6FloatMatrix_t     SSetPoint;
 } CalibDb_SFrameCtrl_t;
 
@@ -438,6 +438,7 @@ typedef struct CalibDb_HdrAE_Attr_s {
     Cam1x6FloatMatrix_t             M2SRatioMax;
     Cam1x6FloatMatrix_t             L2MRatioMax;
 
+    float                           LumaDistTh; //used for area-growing
     CalibDb_LFrameCtrl_t            LframeCtrl;
     CalibDb_MFrameCtrl_t            MframeCtrl;
     CalibDb_SFrameCtrl_t            SframeCtrl;
@@ -488,6 +489,8 @@ typedef struct CalibDb_Sensor_Para_s {
 #define CALD_AWB_ILLUMINATION_NAME       ( 20U )
 #define CALD_AWB_RES_NAME       ( 20U )
 #define CALD_AWB_TEMPORAL_GAIN_SIZE_MAX 4
+#define CALD_AWB_XY_TYPE_MAX_V201 2
+#define CALD_AWB_GRID_NUM_TOTAL 225
 
 typedef struct _CalibDb_ExcRange_s {
     unsigned char domain;/*0uv domain,1 xy domain*/
@@ -579,6 +582,10 @@ typedef struct CalibDb_Awb_Measure_Para_V200_s {
     bool                uvDetectionEnable;
     bool                xyDetectionEnable;
     bool                yuvDetectionEnable;
+    bool                wpDiffWeiEnable;
+    bool                blkWeightEnable;//the different weight in WP sum
+    bool                blkStatisticsEnable;
+
     int                 lsUsedForYuvDetNum;
     char                lsUsedForYuvDet[CALD_AWB_LS_NUM_MAX][CALD_AWB_ILLUMINATION_NAME];
     unsigned char       dsMode;
@@ -616,19 +623,21 @@ typedef struct CalibDb_Awb_Measure_Para_V200_s {
 
 typedef struct CalibDb_Awb_Measure_Para_V201_s {
 
-    unsigned char       hdrFrameChooseMode;
-    unsigned char       hdrFrameChoose;
     bool                lscBypEnable;
     bool                uvDetectionEnable;
     bool                xyDetectionEnable;
     bool                yuvDetectionEnable;
     int                 lsUsedForYuvDetNum;
     char                lsUsedForYuvDet[CALD_AWB_LS_NUM_MAX][CALD_AWB_ILLUMINATION_NAME];
+    bool                wpDiffWeiEnable;
+    bool                blkWeightEnable;
+    bool                blkStatisticsEnable;
     unsigned char       dsMode;
     unsigned char       blkMeasureMode;
-    CalibDb_StatWindow_t measeureWindow;
     bool                multiwindow_en;
-    bool                wpDiffWeiEnable;
+    unsigned char       hdrFrameChooseMode;
+    unsigned char       hdrFrameChoose;
+    CalibDb_StatWindow_t measeureWindow;
     unsigned char       lightNum;
     char                lightName[CALD_AWB_LS_NUM_MAX][CALD_AWB_ILLUMINATION_NAME];
     unsigned short      maxR;
@@ -659,7 +668,7 @@ typedef struct CalibDb_Awb_Measure_Para_V201_s {
     float wpDiffWeiRatioTh[3];
     float wpDiffweiSet_w_HigLV[3][9];
     float wpDiffweiSet_w_LowLV[3][9];
-    unsigned char xyRangeTypeForWpHist; //to do
+    unsigned short blkWeight[CALD_AWB_GRID_NUM_TOTAL];
 } CalibDb_Awb_Measure_Para_V201_t;
 
 typedef struct CalibDb_Awb_line_s {
@@ -727,12 +736,10 @@ typedef struct CalibDb_Awb_Stategy_Para_s {
     float lineRgProjCCT[3];
 
     //wbgain shift to do
-    /*float gs_wpRgBgLine[3];//A,B,C,A*Rg+B*Bg-C =0;
-    float gs_cl_Rg;//ÅäÖÃÀäÉ«µ÷µÍÉ«ÎÂÏò×óÆ«ÒÆ¦¤x_cl
-    float gs_ch_Rg;//¸ßÉ«ÎÂÏò×óÆ«ÒÆ¦¤x_ch
-    float gs_wl_Rg;//ÅäÖÃÅ¯É«µ÷µÍÉ«ÎÂÏò×óÆ«ÒÆ¦¤x_wl
-    float gs_wh_Rg;//¸ßÉ«ÎÂÏò×óÆ«ÒÆ¦¤x_wh*/
+
     CalibDb_Awb_Light_Info2_t    awb_light_info[CALD_AWB_LS_NUM_MAX];
+
+    bool xyType2ForColBalEnable;// to do for awb2.1
 } CalibDb_Awb_Stategy_Para_t;
 
 
@@ -764,7 +771,6 @@ typedef struct CalibDb_HdrTmo_s
 {
     float envLevel[6];
     float EnvLvTolerance;
-    float globalMaxLuma[6];
     float globalLuma[6];
     float OEPdf[6];
     float OETolerance;
@@ -777,7 +783,7 @@ typedef struct CalibDb_HdrTmo_s
     float DynamicRange[6];
     float DRTolerance;
     float DayTh;
-    float smoothCtrlCoef[6];
+    float TmoContrast[6];
     float damp;
 } CalibDb_HdrTmo_t;
 
@@ -1354,26 +1360,12 @@ typedef struct CalibDb_Af_Contrast_s {
     unsigned char           AdaptiveSteps;
     unsigned short*         AdaptRangeTbl;                /**< adaptive range search table*/
     float                   TrigThers;                    /**< AF trigger threshold */
-    unsigned short          TrigValue;                    /**< AF trigger Value */
-    unsigned short          TrigFrames;                   /**< AF trigger status must hold frames */
-    unsigned short          TrigAntiFlash;                /**< AF trigger anti one or some figures flash but not target figures*/
-
-    float                   FirstStableThers;             /**< first time AF stable threshold */
-    unsigned short          FirstStableValue;             /**< first time AF stable value */
-    unsigned short          FirstStableFrames;            /**< first time AF stable status must hold frames */
-    unsigned short          FirstStableTime;              /**< first time AF stable status must hold time */
 
     float                   StableThers;                  /**< AF stable threshold */
-    unsigned short          StableValue;                  /**< AF stable value */
     unsigned short          StableFrames;                 /**< AF stable  status must hold frames */
     unsigned short          StableTime;                   /**< AF stable status must hold time */
 
-    float                   FinishThersMain;              /**< AF find clearest position main thershold*/
-    float                   FinishThersSub;               /**< AF find clearest position subject thershold*/
-    unsigned short          FinishThersOffset;            /**< AF find clearest position offset thershold*/
-
     float                   OutFocusValue;                /**< out of focus vlaue*/
-    unsigned short          OutFocusLuma;                 /**< out of focus luma*/
     unsigned short          OutFocusPos;                  /**< out of focus position*/
 
     unsigned short          gammaY[17];

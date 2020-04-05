@@ -114,20 +114,67 @@ processing(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outparams)
 	RkAiqAlgoProcAdpccInt* pAdpccProcParams = (RkAiqAlgoProcAdpccInt*)inparams;
 	RkAiqAlgoProcResAdpccInt* pAdpccProcResParams = (RkAiqAlgoProcResAdpccInt*)outparams;
 	AdpccContext_t* pAdpccCtx = (AdpccContext_t *)inparams->ctx;
+	AdpccExpInfo_t stExpInfo;
+	memset(&stExpInfo, 0x00, sizeof(AdpccExpInfo_t));
 
-	LOGD_ADPCC("%s:%d init:%d iso:%d \n", __FUNCTION__, __LINE__,
-               inparams->u.proc.init, pAdpccProcParams->rk_com.u.proc.iso);
+	LOGD_ADPCC("%s:%d init:%d hdr mode:%d  \n", 
+		__FUNCTION__, __LINE__, 
+		inparams->u.proc.init, 
+		pAdpccProcParams->hdr_mode);
 
-	#if 0
-	if(inparams->u.proc.init)
-		iso = 50;
-	else
-		iso = pAdpccProcParams->rk_com.u.proc.iso;
-	#else
-		iso = 50;
+	stExpInfo.hdr_mode = 0; //pAnrProcParams->hdr_mode;
+	for(int i=0; i<3; i++){
+		stExpInfo.arIso[i] = 50;
+		stExpInfo.arAGain[i] = 1.0;
+		stExpInfo.arDGain[i] = 1.0;
+		stExpInfo.arTime[i] = 0.01;
+	}
+
+	if(pAdpccProcParams->hdr_mode == RK_AIQ_WORKING_MODE_NORMAL){
+			stExpInfo.hdr_mode = 0;
+	}else if(pAdpccProcParams->hdr_mode == RK_AIQ_ISP_HDR_MODE_2_FRAME_HDR 
+		|| pAdpccProcParams->hdr_mode == RK_AIQ_ISP_HDR_MODE_2_LINE_HDR ){
+		stExpInfo.hdr_mode = 1; 
+	}else if(pAdpccProcParams->hdr_mode == RK_AIQ_ISP_HDR_MODE_3_FRAME_HDR 
+		|| pAdpccProcParams->hdr_mode == RK_AIQ_ISP_HDR_MODE_3_LINE_HDR ){
+		stExpInfo.hdr_mode = 2;
+	}
+	
+	#if 1	
+	if(!inparams->u.proc.init){	
+		RkAiqAlgoPreResAeInt* pAEPreRes =
+	    	(RkAiqAlgoPreResAeInt*)(pAdpccProcParams->rk_com.u.proc.pre_res_comb->ae_pre_res);
+
+		if(pAEPreRes != NULL){
+			if(pAdpccProcParams->hdr_mode == RK_AIQ_WORKING_MODE_NORMAL){
+				stExpInfo.arAGain[0] = pAEPreRes->ae_pre_res_rk.LinearExp.exp_real_params.analog_gain;
+				stExpInfo.arDGain[0] = pAEPreRes->ae_pre_res_rk.LinearExp.exp_real_params.digital_gain;
+				stExpInfo.arTime[0] = pAEPreRes->ae_pre_res_rk.LinearExp.exp_real_params.integration_time;
+				stExpInfo.arIso[0] = stExpInfo.arAGain[0]* 50;
+			}else{		
+				for(int i=0; i<3; i++){				
+					stExpInfo.arAGain[i] = pAEPreRes->ae_pre_res_rk.HdrExp[i].exp_real_params.analog_gain;
+					stExpInfo.arDGain[i] = pAEPreRes->ae_pre_res_rk.HdrExp[i].exp_real_params.digital_gain;
+					stExpInfo.arTime[i] = pAEPreRes->ae_pre_res_rk.HdrExp[i].exp_real_params.integration_time;
+					stExpInfo.arIso[i] = stExpInfo.arAGain[i] * 50;
+
+					LOGD_ADPCC("%s:%d index:%d again:%f dgain:%f time:%f iso:%d hdr_mode:%d\n",
+						__FUNCTION__, __LINE__,
+						i,
+						stExpInfo.arAGain[i],
+						stExpInfo.arDGain[i],
+						stExpInfo.arTime[i],
+						stExpInfo.arIso[i],
+						stExpInfo.hdr_mode);
+				}	
+			}
+		}else{
+			LOGE_ADPCC("%s:%d pAEPreRes is NULL, so use default instead \n", __FUNCTION__, __LINE__);
+		}		
+	}
 	#endif
 	
-	AdpccResult_t ret = AdpccProcess(pAdpccCtx, iso);
+	AdpccResult_t ret = AdpccProcess(pAdpccCtx, &stExpInfo);
 	if(ret != ADPCC_RET_SUCCESS){
 		result = XCAM_RETURN_ERROR_FAILED;
 		LOGE_ADPCC("%s: processing Adpcc failed (%d)\n", __FUNCTION__, ret);

@@ -545,6 +545,15 @@ typedef struct rk_aiq_nr_attrib_s{
 }rk_aiq_nr_attrib_t;
 
 
+typedef struct ANRExpInfo_s{
+	int hdr_mode;
+	float arTime[3];
+	float arAGain[3];
+	float arDGain[3];
+	int   arIso[3];
+}ANRExpInfo_t;
+
+
 RKAIQ_END_DECLARE
 
 #endif

@@ -34,7 +34,7 @@ set (AE_SRC
     ae/rk_aiq_ae_algo_hdrecm.cpp
     ae/rk_aiq_ae_algo_ecm.cpp
     ae/rk_aiq_ae_algo_clm.cpp
-    ae/rk_aiq_ae_algo_ppm.cpp
+    ae/rk_aiq_ae_algo_ldm.cpp
     ae/rk_aiq_uapi_ae_int.cpp
 )
 
@@ -96,6 +96,9 @@ endif()
 set (AF_SRC
 	af/rk_aiq_algo_af_itf.cpp
 	af/af.cpp
+	af/af_search.cpp
+	af/af_trigger.cpp
+	af/af_utils.cpp
     )
 
 if(EXISTS "${CMAKE_SOURCE_DIR}/algos/af/rk_aiq_algo_af_itf.cpp")

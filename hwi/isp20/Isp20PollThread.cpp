@@ -527,18 +527,23 @@ Isp20PollThread::trigger_readback(uint32_t sequence)
         sequence = it_ready->first;
         XCAM_LOG_WARNING("%s image loss, the lates id:%d.\n",
             __func__, sequence);
-        _isp_hdr_fid2times_map.erase(it_times);
+        if (it_times != _isp_hdr_fid2times_map.end())
+            _isp_hdr_fid2times_map.erase(it_times);
         for (it_times = _isp_hdr_fid2times_map.begin();
-             it_times != _isp_hdr_fid2times_map.end(); it_times++) {
+             it_times != _isp_hdr_fid2times_map.end(); ) {
+            std::map<uint32_t, int>::iterator it_times_del;
              if (it_times->first < sequence) {
-                 _isp_hdr_fid2times_map.erase(it_times);
+                 it_times_del = it_times++;
+                 _isp_hdr_fid2times_map.erase(it_times_del);
              } else if (it_times->first == sequence) {
                  times = it_times->second;
                  trigger = true;
-                 _isp_hdr_fid2times_map.erase(it_times);
+                 it_times_del = it_times;
+                 _isp_hdr_fid2times_map.erase(it_times_del);
                  _isp_hdr_fid2ready_map.erase(it_ready);
                  break;
-             }
+             } else
+                it_times++;
         }
     }
     _mipi_trigger_mutex.unlock();

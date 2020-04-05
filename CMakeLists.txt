@@ -30,9 +30,9 @@ set(BUILROOT_BUILD_PROJECT true)
 # SET THE COMPILER PATH
 # ----------------------------------------------------------------------------
 if(RK_SIMULATOR_HW)
-    add_compile_options(-DRK_SIMULATOR_HW)
+	add_compile_options(-DRK_SIMULATOR_HW)
 elseif(BUILROOT_BUILD_PROJECT)
-	add_compile_options(-DDISABLE_PP)
+	#add_compile_options(-DDISABLE_PP)
 	SET(CMAKE_C_COMPILER "/home/camera/camera/rv1109_sdk/buildroot/output/rockchip_puma/host/bin/arm-linux-gnueabihf-gcc")
 	SET(CMAKE_CXX_COMPILER "/home/camera/camera/rv1109_sdk/buildroot/output/rockchip_puma/host/bin/arm-linux-gnueabihf-g++")
 	#SET(CMAKE_C_COMPILER "/home/xuhf/isp2.0-hal/buildroot/output/host/bin/arm-buildroot-linux-uclibcgnueabihf-gcc")

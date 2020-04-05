@@ -181,7 +181,7 @@ AsharpResult_t init_sharp_params_v1(RKAsharp_Sharp_HW_Params_t *pParams, CalibDb
 AsharpResult_t select_rk_sharpen_hw_params_by_ISO(				
 	RKAsharp_Sharp_HW_Params_t *strksharpenParams, 	
 	RKAsharp_Sharp_HW_Params_Select_t *strksharpenParamsSelected, 
-	int iso
+	AsharpExpInfo_t *pExpInfo
 )
 {
     int i;
@@ -191,6 +191,7 @@ AsharpResult_t select_rk_sharpen_hw_params_by_ISO(
 	int iso_div 			= 50;
     int max_iso_step        = MAX_ISO_STEP;
 	AsharpResult_t res = ASHARP_RET_SUCCESS;
+	int iso = 50;
 
 	if(strksharpenParams == NULL){
 		LOGE_ASHARP("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
@@ -201,7 +202,13 @@ AsharpResult_t select_rk_sharpen_hw_params_by_ISO(
 		LOGE_ASHARP("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
 		return ASHARP_RET_NULL_POINTER;
 	}
-	
+
+	if(pExpInfo == NULL){
+		LOGE_ASHARP("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
+		return ASHARP_RET_NULL_POINTER;
+	}
+
+	iso = pExpInfo->arIso[pExpInfo->hdr_mode];
 	for (i = max_iso_step - 1; i >= 0; i--)
 	{
 		if (iso < iso_div * (2 << i))
@@ -275,7 +282,7 @@ AsharpResult_t select_rk_sharpen_hw_params_by_ISO(
 AsharpResult_t select_rk_sharpen_hw_v2_params_by_ISO(
 	RKAsharp_Sharp_HW_V2_Params_t *strksharpenParams, 
 	RKAsharp_Sharp_HW_V2_Params_Select_t *strksharpenParamsSelected, 
-	int iso
+	AsharpExpInfo_t *pExpInfo
 )
 {
 	int i;
@@ -285,6 +292,7 @@ AsharpResult_t select_rk_sharpen_hw_v2_params_by_ISO(
 	int iso_div 			= 50;
 	int max_iso_step        = MAX_ISO_STEP;
 	AsharpResult_t res = ASHARP_RET_SUCCESS;
+	int iso = 50;
 
 	if(strksharpenParams == NULL){
 		LOGE_ASHARP("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
@@ -295,7 +303,13 @@ AsharpResult_t select_rk_sharpen_hw_v2_params_by_ISO(
 		LOGE_ASHARP("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
 		return ASHARP_RET_NULL_POINTER;
 	}
-	
+
+	if(pExpInfo == NULL){
+		LOGE_ASHARP("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
+		return ASHARP_RET_NULL_POINTER;
+	}
+
+	iso = pExpInfo->arIso[pExpInfo->hdr_mode];
 	for (i = max_iso_step - 1; i >= 0; i--)
 	{
 		if (iso < iso_div * (2 << i))
@@ -361,7 +375,7 @@ AsharpResult_t select_rk_sharpen_hw_v2_params_by_ISO(
 AsharpResult_t select_rk_sharpen_hw_v3_params_by_ISO(
 	RKAsharp_Sharp_HW_V3_Params_t *strksharpenParams, 
 	RKAsharp_Sharp_HW_V3_Params_Select_t *strksharpenParamsSelected, 
-	int iso
+	AsharpExpInfo_t *pExpInfo
 )
 {
 	int i;
@@ -371,6 +385,7 @@ AsharpResult_t select_rk_sharpen_hw_v3_params_by_ISO(
 	int iso_div 			= 50;
 	int max_iso_step        = MAX_ISO_STEP;
 	AsharpResult_t res = ASHARP_RET_SUCCESS;
+	int iso = 50;
 
 	if(strksharpenParams == NULL){
 		LOGE_ASHARP("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
@@ -381,7 +396,13 @@ AsharpResult_t select_rk_sharpen_hw_v3_params_by_ISO(
 		LOGE_ASHARP("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
 		return ASHARP_RET_NULL_POINTER;
 	}
-	
+
+	if(pExpInfo == NULL){
+		LOGE_ASHARP("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
+		return ASHARP_RET_NULL_POINTER;
+	}
+
+	iso = pExpInfo->arIso[pExpInfo->hdr_mode];
 	for (i = max_iso_step - 1; i >= 0; i--)
 	{
 		if (iso < iso_div * (2 << i))
@@ -427,14 +448,14 @@ AsharpResult_t select_rk_sharpen_hw_v3_params_by_ISO(
 void select_sharpen_params_by_ISO	(
 	RKAsharp_Sharp_Params_t *strksharpenParams,		
 	RKAsharp_Sharp_Params_Select_t *strksharpenParamsSelected, 
-	int iso
+	AsharpExpInfo_t *pExpInfo
 )
 {
-	select_rk_sharpen_hw_params_by_ISO(&strksharpenParams->rk_sharpen_params_V1, &strksharpenParamsSelected->rk_sharpen_params_selected_V1, iso);
+	select_rk_sharpen_hw_params_by_ISO(&strksharpenParams->rk_sharpen_params_V1, &strksharpenParamsSelected->rk_sharpen_params_selected_V1, pExpInfo);
 	
-	select_rk_sharpen_hw_v2_params_by_ISO(&strksharpenParams->rk_sharpen_params_V2, &strksharpenParamsSelected->rk_sharpen_params_selected_V2, iso);
+	select_rk_sharpen_hw_v2_params_by_ISO(&strksharpenParams->rk_sharpen_params_V2, &strksharpenParamsSelected->rk_sharpen_params_selected_V2, pExpInfo);
 	
-	select_rk_sharpen_hw_v3_params_by_ISO(&strksharpenParams->rk_sharpen_params_V3, &strksharpenParamsSelected->rk_sharpen_params_selected_V3, iso);
+	select_rk_sharpen_hw_v3_params_by_ISO(&strksharpenParams->rk_sharpen_params_V3, &strksharpenParamsSelected->rk_sharpen_params_selected_V3, pExpInfo);
 }
 
 

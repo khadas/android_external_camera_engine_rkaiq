@@ -169,11 +169,10 @@ RKAIQ_BEGIN_DECLARE
 
 
 
-
 //anr context
 typedef struct ANRContext_s{
-	int ISO;
-	float fISO;
+	ANRExpInfo_t stExpInfo;
+	
 	float fEnvLight;
 	ANRState_t eState;
 	ANROPMode_t eMode;

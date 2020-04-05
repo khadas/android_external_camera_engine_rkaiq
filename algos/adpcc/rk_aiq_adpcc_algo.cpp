@@ -556,7 +556,7 @@ AdpccResult_t dpcc_pdaf_params_init(Adpcc_pdaf_params_t *pPdaf, CalibDb_Dpcc_Pda
 AdpccResult_t select_basic_params_by_ISO(
 	Adpcc_basic_params_t *pParams, 
 	Adpcc_basic_params_select_t *pSelect, 
-	int iso)
+	AdpccExpInfo_t *pExpInfo)
 {
 	AdpccResult_t ret = ADPCC_RET_SUCCESS;
 	int lowLevel = 0;
@@ -564,6 +564,7 @@ AdpccResult_t select_basic_params_by_ISO(
 	int lowIso = 0;
 	int highIso = 0;
 	float ratio = 0.0;
+	int iso = 50;
 
 	LOGI_ADPCC("%s(%d): enter!\n", __FUNCTION__, __LINE__);
 	
@@ -579,8 +580,16 @@ AdpccResult_t select_basic_params_by_ISO(
 		return ret;
 	}
 
+	if(pExpInfo == NULL){
+		ret = ADPCC_RET_NULL_POINTER;
+		LOGE_ADPCC("%s(%d): invalid inputparams\n", __FUNCTION__, __LINE__);
+		return ret;
+	}
+
+	iso = pExpInfo->arIso[pExpInfo->hdr_mode];
+
 	for(int i=0; i<DPCC_MAX_ISO_LEVEL-1; i++){
-		printf("%s:(%d) iso:%d %d %d\n", __FUNCTION__, __LINE__,
+		LOGD_ADPCC("%s:(%d) iso:%d %d %d\n", __FUNCTION__, __LINE__,
 			iso, pParams->arBasic[i].iso, pParams->arBasic[i+1].iso);
 		if(iso >= pParams->arBasic[i].iso && iso <= pParams->arBasic[i+1].iso){
 			lowLevel= i;
@@ -605,7 +614,7 @@ AdpccResult_t select_basic_params_by_ISO(
 		ratio = 1.0;
 	}
 
-	printf("%s:(%d) iso:%d lowLevel:%d hightLevel:%d lowIso:%d HighIso:%d ratio:%f\n",
+	LOGD_ADPCC("%s:(%d) iso:%d lowLevel:%d hightLevel:%d lowIso:%d HighIso:%d ratio:%f\n",
 		__FUNCTION__, __LINE__, iso, lowLevel, highLevel, lowIso, highIso, ratio);
 
 	//mode 0x0000
@@ -771,7 +780,7 @@ AdpccResult_t select_basic_params_by_ISO(
 AdpccResult_t select_bpt_params_by_ISO(
 	Adpcc_bpt_params_t *pParams, 
 	Adpcc_bpt_params_select_t *pSelect, 
-	int iso)
+	AdpccExpInfo_t *pExpInfo)
 {
 	AdpccResult_t ret = ADPCC_RET_SUCCESS;
 
@@ -789,6 +798,12 @@ AdpccResult_t select_bpt_params_by_ISO(
 		return ret;
 	}
 
+	if(pExpInfo == NULL){
+		ret = ADPCC_RET_NULL_POINTER;
+		LOGE_ADPCC("%s(%d): invalid inputparams\n", __FUNCTION__, __LINE__);
+		return ret;
+	}
+	
 	memcpy(pSelect, pParams, sizeof(Adpcc_bpt_params_select_t));
 
 	LOGI_ADPCC("%s(%d): exit!\n", __FUNCTION__, __LINE__);
@@ -798,7 +813,7 @@ AdpccResult_t select_bpt_params_by_ISO(
 AdpccResult_t select_pdaf_params_by_ISO(
 	Adpcc_pdaf_params_t *pParams, 
 	Adpcc_pdaf_params_select_t *pSelect, 
-	int iso)
+	AdpccExpInfo_t *pExpInfo)
 {
 	AdpccResult_t ret = ADPCC_RET_SUCCESS;
 
@@ -816,6 +831,12 @@ AdpccResult_t select_pdaf_params_by_ISO(
 		return ret;
 	}
 
+	if(pExpInfo == NULL){
+		ret = ADPCC_RET_NULL_POINTER;
+		LOGE_ADPCC("%s(%d): invalid inputparams\n", __FUNCTION__, __LINE__);
+		return ret;
+	}
+	
 	memcpy(pSelect, pParams, sizeof(Adpcc_pdaf_params_select_t));
 
 	LOGI_ADPCC("%s(%d): exit!\n", __FUNCTION__, __LINE__);
@@ -916,7 +937,7 @@ AdpccResult_t AdpccPreProcess(AdpccContext_t *pAdpccCtx)
 	return ADPCC_RET_SUCCESS;
 }
 
-AdpccResult_t AdpccProcess(AdpccContext_t *pAdpccCtx, int iso)
+AdpccResult_t AdpccProcess(AdpccContext_t *pAdpccCtx, AdpccExpInfo_t *pExpInfo)
 {
 	LOGI_ADPCC("%s(%d): enter!\n", __FUNCTION__, __LINE__);
 	AdpccResult_t ret = ADPCC_RET_SUCCESS;
@@ -925,18 +946,18 @@ AdpccResult_t AdpccProcess(AdpccContext_t *pAdpccCtx, int iso)
 		LOGE_ADPCC("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
 		return ADPCC_RET_INVALID_PARM;
 	}
-
-	if(iso < 0){
-		LOGE_ADPCC("%s(%d): invalid iso:%d \n", __FUNCTION__, __LINE__, iso);
+	
+	if(pExpInfo == NULL){
+		LOGE_ADPCC("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
 		return ADPCC_RET_INVALID_PARM;
 	}
 
-	printf("%s(%d): ISO:%d \n", __FUNCTION__, __LINE__, iso);
+	memcpy(&pAdpccCtx->stExpInfo, pExpInfo, sizeof(AdpccExpInfo_t));
 	
 	if(pAdpccCtx->eMode == ADPCC_OP_MODE_AUTO){
-		ret = select_basic_params_by_ISO(&pAdpccCtx->stAuto.stBasicParams, &pAdpccCtx->stAuto.stBasicSelect, iso);	
-		ret = select_bpt_params_by_ISO(&pAdpccCtx->stAuto.stBptParams, &pAdpccCtx->stAuto.stBptSelect, iso);
-		ret = select_pdaf_params_by_ISO(&pAdpccCtx->stAuto.stPdafParams, &pAdpccCtx->stAuto.stPdafSelect, iso);
+		ret = select_basic_params_by_ISO(&pAdpccCtx->stAuto.stBasicParams, &pAdpccCtx->stAuto.stBasicSelect, pExpInfo);	
+		ret = select_bpt_params_by_ISO(&pAdpccCtx->stAuto.stBptParams, &pAdpccCtx->stAuto.stBptSelect, pExpInfo);
+		ret = select_pdaf_params_by_ISO(&pAdpccCtx->stAuto.stPdafParams, &pAdpccCtx->stAuto.stPdafSelect, pExpInfo);
 		
 	}else if(pAdpccCtx->eMode == ADPCC_OP_MODE_MANUAL){
 		//TODO

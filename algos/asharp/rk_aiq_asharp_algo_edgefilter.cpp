@@ -126,7 +126,7 @@ AsharpResult_t init_edgefilter_params(RKAsharp_EdgeFilter_Params_t *pParams, Cal
 }
 
 
-AsharpResult_t select_edgefilter_params_by_ISO(RKAsharp_EdgeFilter_Params_t *strkedgefilterParams, RKAsharp_EdgeFilter_Params_Select_t *strkedgefilterParamsSelected, int iso)
+AsharpResult_t select_edgefilter_params_by_ISO(RKAsharp_EdgeFilter_Params_t *strkedgefilterParams, RKAsharp_EdgeFilter_Params_Select_t *strkedgefilterParamsSelected, AsharpExpInfo_t *pExpInfo)
 {
     int i;
 	int iso_low, iso_high;
@@ -134,7 +134,8 @@ AsharpResult_t select_edgefilter_params_by_ISO(RKAsharp_EdgeFilter_Params_t *str
 	float ratio;
 	int iso_div 			= 50;
     int max_iso_step        = MAX_ISO_STEP;
-
+	int iso = 50;
+	
 	AsharpResult_t res = ASHARP_RET_SUCCESS;
 
 	if(strkedgefilterParams == NULL){
@@ -147,7 +148,12 @@ AsharpResult_t select_edgefilter_params_by_ISO(RKAsharp_EdgeFilter_Params_t *str
 		return ASHARP_RET_NULL_POINTER;
 	}
 
-	
+	if(pExpInfo == NULL){
+		LOGE_ASHARP("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
+		return ASHARP_RET_NULL_POINTER;
+	}
+
+	iso = pExpInfo->arIso[pExpInfo->hdr_mode];
 	for (i = max_iso_step - 1; i >= 0; i--)
 	{
 		if (iso < iso_div * (2 << i))

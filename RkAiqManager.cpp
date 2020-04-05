@@ -48,7 +48,8 @@ RkAiqRstApplyThread::loop ()
     XCAM_LOG_ERROR ("RkAiqCoreThread failed to apply 3a results");
     EXIT_XCORE_FUNCTION();
 
-    return false;
+    // always true
+    return true;
 }
 
 RkAiqManager::RkAiqManager(const char* sns_ent_name,
@@ -308,13 +309,15 @@ RkAiqManager::applyAnalyzerResult(SmartPtr<RkAiqFullParamsProxy>& results)
 
     if (aiqParams->mIspParams.ptr()) {
         ret = mCamHw->setIspParams(aiqParams->mIspParams);
-        RKAIQMNG_CHECK_RET(ret, "setIspParams error %d", ret);
+        if (ret)
+            LOGE_ANALYZER("setIspParams error %d", ret);
     }
 
 #ifndef DISABLE_PP 
     if (aiqParams->mIsppParams.ptr()) {
-	ret = mCamHw->setIsppParams(aiqParams->mIsppParams);
-	RKAIQMNG_CHECK_RET(ret, "setIsppParams error %d", ret);
+        ret = mCamHw->setIsppParams(aiqParams->mIsppParams);
+        if (ret)
+            LOGE_ANALYZER("setIsppParams error %d", ret);
     }
 #endif
     if (aiqParams->mExposureParams.ptr()) {
@@ -349,16 +352,19 @@ RkAiqManager::applyAnalyzerResult(SmartPtr<RkAiqFullParamsProxy>& results)
 
 
 	ret = mCamHw->setExposureParams(aiqParams->mExposureParams);
-	RKAIQMNG_CHECK_RET(ret, "setExposureParams error %d", ret);
+    if (ret)
+        LOGE_ANALYZER("setExposureParams error %d", ret);
 #else
 	ret = mCamHw->setExposureParams(aiqParams->mExposureParams);
-	RKAIQMNG_CHECK_RET(ret, "setExposureParams error %d", ret);
+    if (ret)
+        LOGE_ANALYZER("setExposureParams error %d", ret);
 #endif
     }
 
     if (aiqParams->mFocusParams.ptr()) {
         ret = mCamHw->setFocusParams(aiqParams->mFocusParams);
-        RKAIQMNG_CHECK_RET(ret, "setFocusParams error %d", ret);
+        if (ret)
+            LOGE_ANALYZER("setFocusParams error %d", ret);
     }
 
     EXIT_XCORE_FUNCTION();

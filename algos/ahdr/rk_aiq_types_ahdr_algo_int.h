@@ -16,7 +16,6 @@ typedef struct tmo_config_s
     float EnvLv[6];
     float EnvLvTolerance;
     float GlobeLuma[6];
-    float GlobeMaxLuma[6];
 
     float OEPdf[6];
     float OETolerance;
@@ -31,7 +30,7 @@ typedef struct tmo_config_s
     float DynamicRange[6];
     float DRTolerance;
     float DayTh;
-    float SmoothCtrlCoef[6];
+    float TmoContrast[6];
 
     float damp;
 } tmo_config_t ;
@@ -85,11 +84,10 @@ typedef struct amgeAttr_s
 
 typedef struct atmoAttr_S
 {
-    tmoCtrlData_t stGlobeMaxLuma;
     tmoCtrlData_t stGlobeLuma;
     tmoCtrlData_t stDtlsLL;
     tmoCtrlData_t stDtlsHL;
-    tmoCtrlData_t stSmthCtrlCoef;
+    tmoCtrlData_t stTmoContrast;
 } atmoAttr_t;
 
 typedef struct mmgeAttr_S
@@ -101,12 +99,10 @@ typedef struct mmgeAttr_S
 
 typedef struct mtmoAttr_S
 {
-    float stGlobeMaxLuma;
     float stGlobeLuma;
     float stDtlsHL;
     float stDtlsLL;
-    float stSmthCtrlCoef;
-
+    float stTmoContrast;
 } mtmoAttr_t;
 
 typedef struct ahdrAttr_S
@@ -115,7 +111,6 @@ typedef struct ahdrAttr_S
     bool      bUpdateMge;
     amgeAttr_t stMgeAuto;
     atmoAttr_t stTmoAuto;
-
 } ahdrAttr_t;
 
 typedef struct mhdrAttr_s

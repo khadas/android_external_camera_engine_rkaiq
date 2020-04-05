@@ -119,10 +119,10 @@ float interpISO(int ISO_low, int ISO_high, float value_low, float value_high, in
 }
 
 
-ANRresult_t select_uvnr_params_by_ISO(RKAnr_Uvnr_Params_t *stRKUVNrParams, RKAnr_Uvnr_Params_Select_t *stRKUVNrParamsSelected, int iso)
+ANRresult_t select_uvnr_params_by_ISO(RKAnr_Uvnr_Params_t *stRKUVNrParams, RKAnr_Uvnr_Params_Select_t *stRKUVNrParamsSelected, ANRExpInfo_t *pExpInfo)
 {
 	ANRresult_t res = ANR_RET_SUCCESS;
-
+	int iso = 50;
 	if(stRKUVNrParams == NULL){
 		LOGE_ANR("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
 		return ANR_RET_NULL_POINTER;
@@ -132,6 +132,13 @@ ANRresult_t select_uvnr_params_by_ISO(RKAnr_Uvnr_Params_t *stRKUVNrParams, RKAnr
 		LOGE_ANR("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
 		return ANR_RET_NULL_POINTER;
 	}
+
+	if(pExpInfo == NULL){
+		LOGE_ANR("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
+		return ANR_RET_NULL_POINTER;
+	}
+
+	iso = pExpInfo->arIso[pExpInfo->hdr_mode];
 	
 	//确定iso等级
 	//rkuvnriso@50 100 200 400 800 1600 3200  6400 12800
@@ -278,9 +285,9 @@ ANRresult_t uvnr_fix_transfer(RKAnr_Uvnr_Params_Select_t *uvnr, RKAnr_Uvnr_Fix_t
 	}
 
 	//0x0080
-	pNrCfg->uvnr_step1_en = 0;
-	pNrCfg->uvnr_step2_en = 0;
-	pNrCfg->nr_gain_en = 0;
+	pNrCfg->uvnr_step1_en = 1;
+	pNrCfg->uvnr_step2_en = 1;
+	pNrCfg->nr_gain_en = 1;
 	pNrCfg->uvnr_nobig_en = 0;
 	pNrCfg->uvnr_big_en = 0;
 	
@@ -296,7 +303,7 @@ ANRresult_t uvnr_fix_transfer(RKAnr_Uvnr_Params_Select_t *uvnr, RKAnr_Uvnr_Fix_t
 	pNrCfg->uvnr_gain_uvgain[1] = (unsigned char)(uvnr->uvgain3 * (1 << RKUVNR_uvgain));
 	pNrCfg->uvnr_gain_t2gen = (unsigned char)(uvnr->uvgain2 * (1 << RKUVNR_uvgain));
 	// no need set
-	//pNrCfg->uvnr_gain_iso = uvnr->bfRatio1;
+	pNrCfg->uvnr_gain_iso = 0x20;
 
 	//0x0090
 	pNrCfg->uvnr_t1gen_m3alpha = (uvnr->medRatio1 * (1 << RKUVNR_medRatio));
@@ -305,7 +312,7 @@ ANRresult_t uvnr_fix_transfer(RKAnr_Uvnr_Params_Select_t *uvnr, RKAnr_Uvnr_Fix_t
 	pNrCfg->uvnr_t1flt_mode = uvnr->kernel_9x9_num;
 
 	//0x0098
-	pNrCfg->uvnr_t1flt_msigma = (unsigned short)(uvnr->sigmaR1 * (1 << RKUVNR_sigmaR));
+	pNrCfg->uvnr_t1flt_msigma = (unsigned short)(uvnr->sigmaR1 * (1 << RKUVNR_sigmaR) * 54);
 
 	//0x009c
 	pNrCfg->uvnr_t1flt_wtp = (unsigned char)(uvnr->bfRatio1 * (1 << RKUVNR_bfRatio));
@@ -319,7 +326,7 @@ ANRresult_t uvnr_fix_transfer(RKAnr_Uvnr_Params_Select_t *uvnr, RKAnr_Uvnr_Fix_t
 	pNrCfg->uvnr_t2gen_m3alpha = (unsigned char)(uvnr->medRatio2 * (1 << RKUVNR_medRatio));
 
 	//0x00ac
-	pNrCfg->uvnr_t2gen_msigma = (unsigned short)(uvnr->sigmaR2 * (1 << RKUVNR_sigmaR));
+	pNrCfg->uvnr_t2gen_msigma = (unsigned short)(uvnr->sigmaR2 * (1 << RKUVNR_sigmaR) * 54);
 
 	//0x00b0
 	pNrCfg->uvnr_t2gen_wtp = (unsigned char)(uvnr->kernel_5x5_table[0] * (1 << RKUVNR_kernels));
@@ -330,7 +337,7 @@ ANRresult_t uvnr_fix_transfer(RKAnr_Uvnr_Params_Select_t *uvnr, RKAnr_Uvnr_Fix_t
 	}
 
 	//0x00b8
-	pNrCfg->uvnr_t2flt_msigma = (unsigned short)(uvnr->sigmaR3 * (1 << RKUVNR_sigmaR));
+	pNrCfg->uvnr_t2flt_msigma = (unsigned short)(uvnr->sigmaR3 * (1 << RKUVNR_sigmaR) * 54);
 
 	//0x00bc
 	pNrCfg->uvnr_t2flt_wtp = (unsigned char)(uvnr->bfRatio3 * (1 << RKUVNR_bfRatio));
@@ -351,7 +358,7 @@ ANRresult_t uvnr_fix_transfer(RKAnr_Uvnr_Params_Select_t *uvnr, RKAnr_Uvnr_Fix_t
 ANRresult_t uvnr_fix_Printf(RKAnr_Uvnr_Fix_t  * pNrCfg)
 {
 	int i = 0;
-	printf("%s:(%d) enter \n", __FUNCTION__, __LINE__);
+	LOGI_ANR("%s:(%d) enter \n", __FUNCTION__, __LINE__);
 
 	ANRresult_t res = ANR_RET_SUCCESS;
 
@@ -361,7 +368,7 @@ ANRresult_t uvnr_fix_Printf(RKAnr_Uvnr_Fix_t  * pNrCfg)
 	}
 	
 	//0x0080
-	printf("(0x0080) uvnr_step1_en:%d uvnr_step2_en:%d nr_gain_en:%d uvnr_nobig_en:%d uvnr_big_en:%d\n", 
+	LOGD_ANR("(0x0080) uvnr_step1_en:%d uvnr_step2_en:%d nr_gain_en:%d uvnr_nobig_en:%d uvnr_big_en:%d\n", 
 		pNrCfg->uvnr_step1_en,
 		pNrCfg->uvnr_step2_en,
 		pNrCfg->nr_gain_en ,
@@ -369,15 +376,15 @@ ANRresult_t uvnr_fix_Printf(RKAnr_Uvnr_Fix_t  * pNrCfg)
 		pNrCfg->uvnr_big_en);	
 
 	//0x0084
-	printf("(0x0084) uvnr_gain_1sigma:%d \n", 
+	LOGD_ANR("(0x0084) uvnr_gain_1sigma:%d \n", 
 		pNrCfg->uvnr_gain_1sigma);
 		
 	//0x0088
-	printf("(0x0088) uvnr_gain_offset:%d \n", 
+	LOGD_ANR("(0x0088) uvnr_gain_offset:%d \n", 
 		pNrCfg->uvnr_gain_offset);
 	
 	//0x008c
-	printf("(0x008c) uvnr_gain_uvgain:%d uvnr_step2_en:%d uvnr_gain_t2gen:%d uvnr_gain_iso:%d\n", 
+	LOGD_ANR("(0x008c) uvnr_gain_uvgain:%d uvnr_step2_en:%d uvnr_gain_t2gen:%d uvnr_gain_iso:%d\n", 
 		pNrCfg->uvnr_gain_uvgain[0],
 		pNrCfg->uvnr_gain_uvgain[1],
 		pNrCfg->uvnr_gain_t2gen,
@@ -385,59 +392,59 @@ ANRresult_t uvnr_fix_Printf(RKAnr_Uvnr_Fix_t  * pNrCfg)
 		
 
 	//0x0090
-	printf("(0x0090) uvnr_t1gen_m3alpha:%d \n", 
+	LOGD_ANR("(0x0090) uvnr_t1gen_m3alpha:%d \n", 
 		pNrCfg->uvnr_t1gen_m3alpha);
 
 	//0x0094
-	printf("(0x0094) uvnr_t1flt_mode:%d \n", 
+	LOGD_ANR("(0x0094) uvnr_t1flt_mode:%d \n", 
 		pNrCfg->uvnr_t1flt_mode);
 
 	//0x0098
-	printf("(0x0098) uvnr_t1flt_msigma:%d \n", 
+	LOGD_ANR("(0x0098) uvnr_t1flt_msigma:%d \n", 
 		pNrCfg->uvnr_t1flt_msigma);
 
 	//0x009c
-	printf("(0x009c) uvnr_t1flt_wtp:%d \n", 
+	LOGD_ANR("(0x009c) uvnr_t1flt_wtp:%d \n", 
 		pNrCfg->uvnr_t1flt_wtp);
 
 	//0x00a0-0x00a4
 	for(i=0; i<8; i++){
-		printf("(0x00a0-0x00a4) uvnr_t1flt_wtq[%d]:%d \n", 
+		LOGD_ANR("(0x00a0-0x00a4) uvnr_t1flt_wtq[%d]:%d \n", 
 			i, pNrCfg->uvnr_t1flt_wtq[i]);
 	}
 
 	//0x00a8
-	printf("(0x00a8) uvnr_t2gen_m3alpha:%d \n", 
+	LOGD_ANR("(0x00a8) uvnr_t2gen_m3alpha:%d \n", 
 		pNrCfg->uvnr_t2gen_m3alpha);
 
 	//0x00ac
-	printf("(0x00ac) uvnr_t2gen_msigma:%d \n", 
+	LOGD_ANR("(0x00ac) uvnr_t2gen_msigma:%d \n", 
 		pNrCfg->uvnr_t2gen_msigma);
 
 	//0x00b0
-	printf("(0x00b0) uvnr_t2gen_wtp:%d \n", 
+	LOGD_ANR("(0x00b0) uvnr_t2gen_wtp:%d \n", 
 		pNrCfg->uvnr_t2gen_wtp);
 
 	//0x00b4
 	for(i=0; i<4; i++){
-		printf("(0x00b4) uvnr_t2gen_wtq[%d]:%d \n", 
+		LOGD_ANR("(0x00b4) uvnr_t2gen_wtq[%d]:%d \n", 
 			i, pNrCfg->uvnr_t2gen_wtq[i]);
 	}
 
 	//0x00b8
-	printf("(0x00b8) uvnr_t2flt_msigma:%d \n", 
+	LOGD_ANR("(0x00b8) uvnr_t2flt_msigma:%d \n", 
 		pNrCfg->uvnr_t2flt_msigma);
 
 	//0x00bc
-	printf("(0x00bc) uvnr_t2flt_wtp:%d \n", 
+	LOGD_ANR("(0x00bc) uvnr_t2flt_wtp:%d \n", 
 		pNrCfg->uvnr_t2flt_wtp);
 	for(i=0; i<3; i++){
-		printf("(0x00bc) uvnr_t2flt_wt[%d]:%d \n", 
+		LOGD_ANR("(0x00bc) uvnr_t2flt_wt[%d]:%d \n", 
 			i, pNrCfg->uvnr_t2flt_wt[i]);
 	}
 
 		
-	printf("%s:(%d) exit \n", __FUNCTION__, __LINE__);
+	LOGD_ANR("%s:(%d) exit \n", __FUNCTION__, __LINE__);
 
 	return ANR_RET_SUCCESS;
 }

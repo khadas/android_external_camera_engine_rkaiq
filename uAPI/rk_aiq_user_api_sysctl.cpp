@@ -277,7 +277,11 @@ static void rk_aiq_init_lib(void)
 {
     xcam_get_log_level();
     ENTER_XCORE_FUNCTION();
+#ifdef RK_SIMULATOR_HW
+/* nothing to do now */
+#else
     CamHwIsp20::initCamHwInfos();
+#endif
     EXIT_XCORE_FUNCTION();
 
 }

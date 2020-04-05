@@ -1125,6 +1125,10 @@ CamHwIsp20::setIspParamsSync()
 	update_params.module_en_update |= 1LL << RK_ISP2X_RAWAWB_ID;
 	update_params.module_ens |= 1LL << RK_ISP2X_RAWAWB_ID;
 	update_params.module_cfg_update |= 1LL << RK_ISP2X_RAWAWB_ID;
+
+    update_params.module_en_update |= 1LL << RK_ISP2X_RAWAF_ID;
+    update_params.module_ens |= 1LL << RK_ISP2X_RAWAF_ID;
+    update_params.module_cfg_update |= 1LL << RK_ISP2X_RAWAF_ID;
 #endif
         gen_full_isp_params(&update_params, &_full_active_isp_params);
 

@@ -98,6 +98,14 @@ typedef struct rk_aiq_blc_attrib_s{
 	AblcManualAttr_t stManual;	
 }rk_aiq_blc_attrib_t;
 
+typedef struct AblcExpInfo_s{
+	int hdr_mode;
+	float arTime[3];
+	float arAGain[3];
+	float arDGain[3];
+	int   arIso[3];
+}AblcExpInfo_t;
+
 RKAIQ_END_DECLARE
 
 #endif
