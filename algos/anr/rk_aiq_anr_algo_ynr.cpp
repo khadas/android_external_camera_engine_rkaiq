@@ -136,11 +136,11 @@ ANRresult_t init_ynr_params(RKAnr_Ynr_Params_s *pYnrParams, CalibDb_YNR_t* pYnrC
 }
 
 
-ANRresult_t select_ynr_params_by_ISO(RKAnr_Ynr_Params_t *stYnrParam, RKAnr_Ynr_Params_Select_t *stYnrParamSelected, short isoValue, short bitValue)
+ANRresult_t select_ynr_params_by_ISO(RKAnr_Ynr_Params_t *stYnrParam, RKAnr_Ynr_Params_Select_t *stYnrParamSelected, ANRExpInfo_t *pExpInfo, short bitValue)
 {
 	short multBit;
 	float ratio;
-
+	int isoValue = 50;
 	RKAnr_Ynr_Params_Select_t *pstYNrTuneParamHi;
 	RKAnr_Ynr_Params_Select_t *pstYNrTuneParamLo;
 
@@ -153,6 +153,11 @@ ANRresult_t select_ynr_params_by_ISO(RKAnr_Ynr_Params_t *stYnrParam, RKAnr_Ynr_P
 	}
 
 	if(stYnrParamSelected == NULL){
+		LOGE_ANR("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
+		return ANR_RET_NULL_POINTER;
+	}
+
+	if(pExpInfo == NULL){
 		LOGE_ANR("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
 		return ANR_RET_NULL_POINTER;
 	}
@@ -242,17 +247,19 @@ ANRresult_t select_ynr_params_by_ISO(RKAnr_Ynr_Params_t *stYnrParam, RKAnr_Ynr_P
 	}
 	#endif
 
+	isoValue = pExpInfo->arIso[pExpInfo->hdr_mode];
+	
 	int iso_div = 50;
 	for(int i=0; i<MAX_ISO_STEP-1; i++){
 		int lowIso = iso_div * (1 << i);
 		int highIso = iso_div * (1 << (i+1));
-		printf("oyyf %s:%d  iso:%d low:%d hight:%d \n", __FUNCTION__, __LINE__,
+		LOGD_ANR("oyyf %s:%d  iso:%d low:%d hight:%d \n", __FUNCTION__, __LINE__,
 				isoValue, lowIso, highIso);
 		if(isoValue >= lowIso && isoValue <= highIso){
 			ratio = (isoValue -lowIso ) / (float)(highIso - lowIso);
 			pstYNrTuneParamHi = &stYnrParam->aYnrParamsISO[i+1];
 			pstYNrTuneParamLo = &stYnrParam->aYnrParamsISO[i];
-			printf("oyyf %s:%d  iso:%d low:%d hight:%d ratio:%f\n", __FUNCTION__, __LINE__,
+			LOGD_ANR("oyyf %s:%d  iso:%d low:%d hight:%d ratio:%f\n", __FUNCTION__, __LINE__,
 				isoValue, lowIso, highIso, ratio);
 			break;
 		}
@@ -576,7 +583,7 @@ ANRresult_t ynr_fix_transfer(RKAnr_Ynr_Params_Select_t* ynr, RKAnr_Ynr_Fix_t *pN
 	}
 
 	#if YNR_FIX_VALUE_PRINTF
-	ynr_fix_printf(pNrCfg);
+	ynr_fix_LOGD_ANR(pNrCfg);
 	#endif
 
 	LOGI_ANR("%s:(%d) exit \n", __FUNCTION__, __LINE__);
@@ -584,9 +591,9 @@ ANRresult_t ynr_fix_transfer(RKAnr_Ynr_Params_Select_t* ynr, RKAnr_Ynr_Fix_t *pN
 	return res;
 }
 
-ANRresult_t ynr_fix_printf(RKAnr_Ynr_Fix_t * pNrCfg)
+ANRresult_t ynr_fix_LOGD_ANR(RKAnr_Ynr_Fix_t * pNrCfg)
 {
-	printf("%s:(%d) enter \n", __FUNCTION__, __LINE__);
+	LOGD_ANR("%s:(%d) enter \n", __FUNCTION__, __LINE__);
 
 	ANRresult_t res = ANR_RET_SUCCESS;
 	
@@ -599,77 +606,77 @@ ANRresult_t ynr_fix_printf(RKAnr_Ynr_Fix_t * pNrCfg)
 	
 	//0x0104 - 0x0108
 	for(i=0; i<16; i++){
-		printf("(0x0104 - 0x0108) ynr_sgm_dx[%d]:%d \n",
+		LOGD_ANR("(0x0104 - 0x0108) ynr_sgm_dx[%d]:%d \n",
 			i, pNrCfg->ynr_sgm_dx[i]);
 	}
 
 	//0x010c - 0x012c
 	for(i = 0; i < 17; i++){
-		printf("(0x010c - 0x012c) ynr_lsgm_y[%d]:%d \n",
+		LOGD_ANR("(0x010c - 0x012c) ynr_lsgm_y[%d]:%d \n",
 			i, pNrCfg->ynr_lsgm_y[i]);
 	}
 
 	//0x0130
 	for(i=0; i<4; i++){
-		printf("(0x0130) ynr_lci[%d]:%d \n",
+		LOGD_ANR("(0x0130) ynr_lci[%d]:%d \n",
 			i, pNrCfg->ynr_lci[i]);
 	}
 
 	//0x0134
 	for(i=0; i<4; i++){
-		printf("(0x0134) ynr_lgain_min[%d]:%d \n",
+		LOGD_ANR("(0x0134) ynr_lgain_min[%d]:%d \n",
 			i, pNrCfg->ynr_lgain_min[i]);
 	}
 
 	//0x0138
-	printf("(0x0138) ynr_lgain_max:%d \n",
+	LOGD_ANR("(0x0138) ynr_lgain_max:%d \n",
 			pNrCfg->ynr_lgain_max);
 	
 	
 	//0x013c
-	printf("(0x013c) ynr_lmerge_bound:%d ynr_lmerge_ratio:%d\n",
+	LOGD_ANR("(0x013c) ynr_lmerge_bound:%d ynr_lmerge_ratio:%d\n",
 			pNrCfg->ynr_lmerge_bound,
 			pNrCfg->ynr_lmerge_ratio);
 
 	//0x0140
 	for(i=0; i<4; i++){
-		printf("(0x0140) ynr_lweit_flt[%d]:%d \n",
+		LOGD_ANR("(0x0140) ynr_lweit_flt[%d]:%d \n",
 			i, pNrCfg->ynr_lweit_flt[i]);
 	}
 
 	//0x0144 - 0x0164
 	for(i = 0; i < 17; i++){
-		printf("(0x0144 - 0x0164) ynr_hsgm_y[%d]:%d \n",
+		LOGD_ANR("(0x0144 - 0x0164) ynr_hsgm_y[%d]:%d \n",
 			i, pNrCfg->ynr_hsgm_y[i]);
 	}
 
 	//0x0168
 	for(i=0; i<4; i++){
-		printf("(0x0168) ynr_hlci[%d]:%d \n",
+		LOGD_ANR("(0x0168) ynr_hlci[%d]:%d \n",
 			i, pNrCfg->ynr_hlci[i]);
 	}
 
 	//0x016c
 	for(i=0; i<4; i++){
-		printf("(0x016c) ynr_lhci[%d]:%d \n",
+		LOGD_ANR("(0x016c) ynr_lhci[%d]:%d \n",
 			i, pNrCfg->ynr_lhci[i]);
 	}
 
 	//0x0170
 	for(i=0; i<4; i++){
-		printf("(0x0170) ynr_hhci[%d]:%d \n",
+		LOGD_ANR("(0x0170) ynr_hhci[%d]:%d \n",
 			i, pNrCfg->ynr_hhci[i]);
 	}
 
 	//0x0174
 	for(i=0; i<4; i++){
-		printf("(0x0174) ynr_hgain_sgm[%d]:%d \n",
+		LOGD_ANR("(0x0174) ynr_hgain_sgm[%d]:%d \n",
 			i, pNrCfg->ynr_hgain_sgm[i]);
 	}
 
 	//0x0178 - 0x0188
     for(i=0; i<5; i++){
-		printf("(0x0178 - 0x0188) ynr_hweit_d[%d - %d]:%d %d %d %d \n",
+		LOGD_ANR("(0x0178 - 0x0188) ynr_hweit_d[%d - %d]:%d %d %d %d \n",
 			i*4+ 0, i*4 + 3,
 			pNrCfg->ynr_hweit_d[i*4 + 0],
 			pNrCfg->ynr_hweit_d[i*4 + 1],
@@ -680,7 +687,7 @@ ANRresult_t ynr_fix_printf(RKAnr_Ynr_Fix_t * pNrCfg)
 
 	//0x018c - 0x01a0
 	for(i = 0; i < 6; i++){
-		printf("(0x018c - 0x01a0) ynr_hgrad_y[%d - %d]:%d %d %d %d \n",
+		LOGD_ANR("(0x018c - 0x01a0) ynr_hgrad_y[%d - %d]:%d %d %d %d \n",
 			i*4 + 0, i*4 + 3,
 			pNrCfg->ynr_hgrad_y[i*4 + 0],
 			pNrCfg->ynr_hgrad_y[i*4 + 1],
@@ -690,40 +697,40 @@ ANRresult_t ynr_fix_printf(RKAnr_Ynr_Fix_t * pNrCfg)
 
 	//0x01a4 -0x01a8
 	for(i=0; i<4; i++){
-		printf("(0x01a4 -0x01a8) ynr_hweit[%d]:%d \n",
+		LOGD_ANR("(0x01a4 -0x01a8) ynr_hweit[%d]:%d \n",
 			i, pNrCfg->ynr_hweit[i]);
 	}
 
 	//0x01b0
-	printf("(0x01b0) ynr_hmax_adjust:%d \n",
+	LOGD_ANR("(0x01b0) ynr_hmax_adjust:%d \n",
 			pNrCfg->ynr_hmax_adjust);
 
 	//0x01b4
-	printf("(0x01b4) ynr_hstrength:%d \n",
+	LOGD_ANR("(0x01b4) ynr_hstrength:%d \n",
 			pNrCfg->ynr_hstrength);
 
 	//0x01b8
-	printf("(0x01b8) ynr_lweit_cmp0-1:%d %d\n",
+	LOGD_ANR("(0x01b8) ynr_lweit_cmp0-1:%d %d\n",
 			pNrCfg->ynr_lweit_cmp[0],
 			pNrCfg->ynr_lweit_cmp[1]);
 
 	//0x01bc
-	printf("(0x01bc) ynr_lmaxgain_lv4:%d \n",
+	LOGD_ANR("(0x01bc) ynr_lmaxgain_lv4:%d \n",
 			pNrCfg->ynr_lmaxgain_lv4);
 
 	//0x01c0 - 0x01e0 
 	for(i=0; i<17; i++){
-		printf("(0x01c0 - 0x01e0 ) ynr_hstv_y[%d]:%d \n",
+		LOGD_ANR("(0x01c0 - 0x01e0 ) ynr_hstv_y[%d]:%d \n",
 			i, pNrCfg->ynr_hstv_y[i]);
 	}
 	
 	//0x01e4  - 0x01e8
 	for(i=0; i<3; i++){
-		printf("(0x01e4  - 0x01e8 ) ynr_st_scale[%d]:%d \n",
+		LOGD_ANR("(0x01e4  - 0x01e8 ) ynr_st_scale[%d]:%d \n",
 			i, pNrCfg->ynr_st_scale[i]);
 	}
 
-	printf("%s:(%d) exit \n", __FUNCTION__, __LINE__);
+	LOGD_ANR("%s:(%d) exit \n", __FUNCTION__, __LINE__);
 
 	return res;
 }

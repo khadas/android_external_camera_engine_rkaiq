@@ -52,6 +52,8 @@
 #define AHDR_RET_WRONG_CONFIG       15   //!< given configuration is invalid
 
 #define BIGMODE     (2560)
+#define MAXLUMAK     (1.5)
+#define MAXLUMAB     (30)
 
 #define ENVLVMAX     (1.0)
 #define ENVLVMIN     (0.0)
@@ -67,7 +69,7 @@
 #define OECURVEOFFSETMIN     (154)
 #define MDCURVESMOOTHMAX     (200)
 #define MDCURVESMOOTHMIN     (20)
-#define MDCURVEOFFSETMAX     (103)
+#define MDCURVEOFFSETMAX     (100)
 #define MDCURVEOFFSETMIN     (26)
 #define DAMPMAX     (1.0)
 #define DAMPMIN     (0.0)
@@ -79,20 +81,26 @@
 #define DARKPDFTHMIN     (0.0)
 #define TOLERANCEMAX     (20.0)
 #define TOLERANCEMIN     (0.0)
-#define GLOBEMAXLUMAMAX     (737)
-#define GLOBEMAXLUMAMIN     (46)
+#define GLOBEMAXLUMAMAX     (1023)
+#define GLOBEMAXLUMAMIN     (51)
 #define GLOBELUMAMAX     (737)
-#define GLOBELUMAMIN     (46)
-#define DETAILSHIGHLIGHTMAX     (737)
-#define DETAILSHIGHLIGHTMIN     (46)
+#define GLOBELUMAMIN     (51)
+#define DETAILSHIGHLIGHTMAX     (1023)
+#define DETAILSHIGHLIGHTMIN     (51)
 #define DARKPDFMAX     (0.5)
 #define DARKPDFMIN     (0)
 #define DETAILSLOWLIGHTMAX     (63)
 #define DETAILSLOWLIGHTMIN     (16)
 #define DYNAMICRANGEMAX     (84)
 #define DYNAMICRANGEMIN     (1)
-#define SMOOTHCONTROLCOEFMAX     (255)
-#define SMOOTHCONTROLCOEFMIN     (0)
+#define TMOCONTRASTMAX     (153)
+#define TMOCONTRASTMIN     (0)
+#define IQPARAMAX     (1)
+#define IQPARAMIN     (0)
+#define IQDETAILSLOWLIGHTMAX     (4)
+#define IQDETAILSLOWLIGHTMIN     (1)
+
+
 
 typedef enum AhdrState_e {
     AHDR_STATE_INVALID       = 0,
@@ -109,7 +117,7 @@ typedef struct TmoHandleData_s
     float GlobeLuma;
     float DetailsHighLight;
     float DetailsLowLight;
-    float SmoothCtrlCoef;
+    float TmoContrast;
 } TmoHandleData_t;
 
 typedef struct MergeHandleData_s

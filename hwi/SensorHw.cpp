@@ -87,8 +87,7 @@ SensorHw::setLinearSensorExposure(SmartPtr<RkAiqExpParamsProxy>& expPar)
 	   expPar->data()->LinearExp.exp_sensor_params.coarse_integration_time);
 
     // set vts before exposure time firstly
-    // get_sensor_descriptor (&sensor_desc);
-    sensor_desc = _sensor_desc;
+    get_sensor_descriptor (&sensor_desc);
 
     frame_line_length = sensor_desc.line_periods_per_field;
     memset(&ctrl, 0, sizeof(ctrl));
@@ -354,10 +353,7 @@ SensorHw::getSensorModeData(const char* sns_ent_name,
 {
     rk_aiq_exposure_sensor_descriptor sensor_desc;
 
-    if (_first)
-        get_sensor_descriptor (&sensor_desc);
-    else
-        sensor_desc = _sensor_desc;
+    get_sensor_descriptor (&sensor_desc);
 
     sns_des.coarse_integration_time_min =
         sensor_desc.coarse_integration_time_min;

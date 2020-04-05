@@ -189,9 +189,6 @@ RkAiqAeHandle::prepare()
     ae_config->PixelPeriodsPerLine = (float)shared->snsDes.line_length_pck;
     ae_config->PixelClockFreqMHZ = (float) shared->snsDes.pixel_clock_freq_mhz;
 
-    /*****************AecConfig working mode params*****************/
-    ae_config->com.u.prepare.working_mode = shared->working_mode;
-
     // id != 0 means the thirdparty's algo
     if (mDes->id != 0) {
         ret = des->prepare(mConfig);
@@ -216,7 +213,7 @@ RkAiqAeHandle::preProcess()
     RKAIQCORE_CHECK_RET(ret, "ae handle preProcess failed");
 
     if (!ispStats->aec_stats_valid && !shared->init) {
-        LOGD("no aec stats, ignore!");
+        LOGE("no aec stats, ignore!");
         return XCAM_RETURN_BYPASS;
     }
 
@@ -245,7 +242,7 @@ RkAiqAeHandle::processing()
     RKAIQCORE_CHECK_RET(ret, "ae handle processing failed");
 
     if (!ispStats->aec_stats_valid && !shared->init) {
-        LOGD("no aec stats, ignore!");
+        LOGE("no aec stats, ignore!");
         return XCAM_RETURN_BYPASS;
     }
 
@@ -276,7 +273,7 @@ RkAiqAeHandle::postProcess()
     RKAIQCORE_CHECK_RET(ret, "ae handle postProcess failed");
 
     if (!ispStats->aec_stats_valid && !shared->init) {
-        LOGD("no aec stats, ignore!");
+        LOGE("no aec stats, ignore!");
         return XCAM_RETURN_BYPASS;
     }
 
@@ -348,7 +345,7 @@ RkAiqAwbHandle::preProcess()
     RKAIQCORE_CHECK_RET(ret, "awb handle preProcess failed");
 
     if (!ispStats->awb_stats_valid && !shared->init) {
-        LOGD("no awb stats, ignore!");
+        LOGE("no awb stats, ignore!");
         return XCAM_RETURN_BYPASS;
     }
     // TODO config common awb preprocess params
@@ -377,7 +374,7 @@ RkAiqAwbHandle::processing()
     RKAIQCORE_CHECK_RET(ret, "awb handle processing failed");
 
     if (!ispStats->awb_stats_valid && !shared->init) {
-        LOGD("no awb stats, ignore!");
+        LOGE("no awb stats, ignore!");
         return XCAM_RETURN_BYPASS;
     }
 
@@ -407,7 +404,7 @@ RkAiqAwbHandle::postProcess()
     RKAIQCORE_CHECK_RET(ret, "awb handle postProcess failed");
 
     if (!ispStats->awb_stats_valid && !shared->init) {
-        LOGD("no awb stats, ignore!");
+        LOGE("no awb stats, ignore!");
         return XCAM_RETURN_BYPASS;
     }
 
@@ -477,7 +474,7 @@ RkAiqAfHandle::preProcess()
     RKAIQCORE_CHECK_RET(ret, "af handle preProcess failed");
 
     if (!ispStats->af_stats_valid && !shared->init) {
-        LOGD("no af stats, ignore!");
+        LOGE("no af stats, ignore!");
         return XCAM_RETURN_BYPASS;
     }
 
@@ -506,7 +503,7 @@ RkAiqAfHandle::processing()
     RKAIQCORE_CHECK_RET(ret, "af handle processing failed");
 
     if (!ispStats->af_stats_valid && !shared->init) {
-        LOGD("no af stats, ignore!");
+        LOGE("no af stats, ignore!");
         return XCAM_RETURN_BYPASS;
     }
 
@@ -536,7 +533,7 @@ RkAiqAfHandle::postProcess()
     RKAIQCORE_CHECK_RET(ret, "af handle postProcess failed");
 
     if (!ispStats->af_stats_valid && !shared->init) {
-        LOGD("no af stats, ignore!");
+        LOGE("no af stats, ignore!");
         return XCAM_RETURN_BYPASS;
     }
 
@@ -609,7 +606,7 @@ RkAiqAhdrHandle::preProcess()
     RkAiqIspStats* ispStats = &shared->ispStats;
 
     if(!shared->ispStats.ahdr_stats_valid && !shared->init) {
-        LOGD("no ahdr stats, ignore!");
+        LOGE("no ahdr stats, ignore!");
         // TODO: keep last result ?
         //         comb->ahdr_proc_res = NULL;
         //
@@ -641,7 +638,7 @@ RkAiqAhdrHandle::processing()
     RkAiqIspStats* ispStats = &shared->ispStats;
 
     if(!shared->ispStats.ahdr_stats_valid && !shared->init) {
-        LOGD("no ahdr stats, ignore!");
+        LOGE("no ahdr stats, ignore!");
         // TODO: keep last result ?
         //         comb->ahdr_proc_res = NULL;
         //
@@ -674,7 +671,7 @@ RkAiqAhdrHandle::postProcess()
     RkAiqIspStats* ispStats = &shared->ispStats;
 
     if(!shared->ispStats.ahdr_stats_valid && !shared->init) {
-        LOGD("no ahdr stats, ignore!");
+        LOGE("no ahdr stats, ignore!");
         // TODO: keep last result ?
         //         comb->ahdr_proc_res = NULL;
         //
@@ -2799,7 +2796,7 @@ RkAiqAorbHandle::preProcess()
     RKAIQCORE_CHECK_RET(ret, "aorb handle preProcess failed");
 
     if (!ispStats->orb_stats_valid && !shared->init) {
-        LOGD("no orb stats, ignore!");
+        LOGE("no orb stats, ignore!");
         return XCAM_RETURN_BYPASS;
     }
 
@@ -2828,7 +2825,7 @@ RkAiqAorbHandle::processing()
     RKAIQCORE_CHECK_RET(ret, "aorb handle processing failed");
 
     if (!ispStats->orb_stats_valid && !shared->init) {
-        LOGD("no orb stats, ignore!");
+        LOGE("no orb stats, ignore!");
         return XCAM_RETURN_BYPASS;
     }
 
@@ -2858,7 +2855,7 @@ RkAiqAorbHandle::postProcess()
     RKAIQCORE_CHECK_RET(ret, "aorb handle postProcess failed");
 
     if (!ispStats->orb_stats_valid && !shared->init) {
-        LOGD("no orb stats, ignore!");
+        LOGE("no orb stats, ignore!");
         return XCAM_RETURN_BYPASS;
     }
 

@@ -409,12 +409,6 @@ RkAiqAeHandleInt::prepare()
     RkAiqAlgoConfigAeInt* ae_config_int = (RkAiqAlgoConfigAeInt*)mConfig;
     RkAiqCore::RkAiqAlgosShared_t* shared = &mAiqCore->mAlogsSharedParams;
 
-    /*****************AecConfig algo params*****************/
-    ae_config_int->rk_com.u.prepare.calib->aec.CommCtrl = shared->calib->aec.CommCtrl;
-    ae_config_int->rk_com.u.prepare.calib->aec.HdrAeCtrl = shared->calib->aec.HdrAeCtrl;
-    ae_config_int->rk_com.u.prepare.calib->aec.LinearAeCtrl = shared->calib->aec.LinearAeCtrl;
-    ae_config_int->rk_com.u.prepare.calib->sensor = shared->calib->sensor;
-
     /*****************AecConfig pic-info params*****************/
     ae_config_int->RawWidth = shared->snsDes.sensor_output_width;
     ae_config_int->RawHeight = shared->snsDes.sensor_output_height;
@@ -860,6 +854,10 @@ RkAiqAfHandleInt::prepare()
     RkAiqAlgoConfigAfInt* af_config_int = (RkAiqAlgoConfigAfInt*)mConfig;
 
     af_config_int->af_config_com.af_mode = 6;
+    af_config_int->af_config_com.win_h_offs = 0;
+    af_config_int->af_config_com.win_v_offs = 0;
+    af_config_int->af_config_com.win_h_size = 0;
+    af_config_int->af_config_com.win_v_size = 0;
 
     RkAiqAlgoDescription* des = (RkAiqAlgoDescription*)mDes;
     ret = des->prepare(mConfig);
@@ -923,6 +921,8 @@ RkAiqAfHandleInt::processing()
 
     comb->af_proc_res = NULL;
     af_proc_int->af_proc_com.af_stats = ispStats->af_stats;
+    af_proc_int->af_proc_com.aec_stats = ispStats->aec_stats;
+    af_proc_int->af_proc_com.com.u.prepare.working_mode = shared->working_mode;
 
     RkAiqAlgoDescription* des = (RkAiqAlgoDescription*)mDes;
     ret = des->processing(mProcInParam, mProcOutParam);
@@ -1121,6 +1121,11 @@ RkAiqAnrHandleInt::processing()
     // TODO: fill procParam
     anr_proc_int->iso = shared->iso;
 
+	anr_proc_int->hdr_mode = shared->working_mode;
+
+	printf("%s:%d anr hdr_mode:%d  \n", __FUNCTION__, __LINE__, anr_proc_int->hdr_mode);
+	
+
     RkAiqAlgoDescription* des = (RkAiqAlgoDescription*)mDes;
     ret = des->processing(mProcInParam, mProcOutParam);
     RKAIQCORE_CHECK_RET(ret, "anr algo processing failed");
@@ -1318,6 +1323,7 @@ RkAiqAsharpHandleInt::processing()
 
     // TODO: fill procParam
     asharp_proc_int->iso = shared->iso;
+	asharp_proc_int->hdr_mode = shared->working_mode;
 
     RkAiqAlgoDescription* des = (RkAiqAlgoDescription*)mDes;
     ret = des->processing(mProcInParam, mProcOutParam);
@@ -2430,7 +2436,8 @@ RkAiqAblcHandleInt::processing()
 
     comb->ablc_proc_res = NULL;
     ablc_proc_int->iso = shared->iso;
-
+	ablc_proc_int->hdr_mode = shared->working_mode;
+	
     RkAiqAlgoDescription* des = (RkAiqAlgoDescription*)mDes;
     ret = des->processing(mProcInParam, mProcOutParam);
     RKAIQCORE_CHECK_RET(ret, "ablc algo processing failed");
@@ -3180,7 +3187,8 @@ RkAiqAdpccHandleInt::processing()
 
     comb->adpcc_proc_res = NULL;
     // TODO: fill procParam
-    adpcc_proc_int->iso = shared->iso;
+    adpcc_proc_int->iso = shared->iso;	
+	adpcc_proc_int->hdr_mode = shared->working_mode;
 
     RkAiqAlgoDescription* des = (RkAiqAlgoDescription*)mDes;
     ret = des->processing(mProcInParam, mProcOutParam);

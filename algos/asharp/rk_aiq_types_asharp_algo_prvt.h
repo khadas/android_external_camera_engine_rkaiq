@@ -54,7 +54,7 @@ RKAIQ_BEGIN_DECLARE
 #define	reg_smoth4_fix_bits						8	
 
 typedef struct AsharpContext_s{
-	float fGain;
+	AsharpExpInfo_t stExpInfo;
 	float fEnvLight;
 	AsharpState_t eState;
 	AsharpOPMode_t eMode;

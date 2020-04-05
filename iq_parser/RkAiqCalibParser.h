@@ -103,6 +103,7 @@ private:
     bool parseEntrySensorAwbWindowV201(const XMLElement*, void* param = NULL);
     bool parseEntrySensorAwbMeasureWindowV201(const XMLElement*, void* param = NULL);
     bool parseEntrySensorAwbFrameChoose(const XMLElement*, void* param = NULL);
+    bool parseEntrySensorAwbFrameChooseV201(const XMLElement*, void* param = NULL);
     bool parseEntrySensorAwbMeasureWindow(const XMLElement*, void* param = NULL);
     bool parseEntrySensorAwbWindow(const XMLElement*, void* param = NULL);
     bool parseEntrySensorAwbSingleColor(const XMLElement*, void* param = NULL);

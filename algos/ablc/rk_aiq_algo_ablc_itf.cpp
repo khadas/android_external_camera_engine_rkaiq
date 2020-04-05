@@ -115,22 +115,70 @@ processing(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outparams)
 	RkAiqAlgoProcAblcInt* pAblcProcParams = (RkAiqAlgoProcAblcInt*)inparams;
 	RkAiqAlgoProcResAblcInt* pAblcProcResParams = (RkAiqAlgoProcResAblcInt*)outparams;
 	AblcContext_t* pAblcCtx = (AblcContext_t *)inparams->ctx;
+	AblcExpInfo_t stExpInfo;
+	memset(&stExpInfo, 0x00, sizeof(AblcExpInfo_t));
 
-	LOGI_ABLC("%s:%d init:%d \n", __FUNCTION__, __LINE__, inparams->u.proc.init);
+	LOGD_ABLC("%s:%d init:%d hdr mode:%d  \n", 
+		__FUNCTION__, __LINE__, 
+		inparams->u.proc.init, 
+		pAblcProcParams->hdr_mode);
 
-	#if 0
-	if(inparams->u.proc.init)
-		iso = 50;
-	else
-		iso = pAblcProcParams->rk_com.u.proc.iso;
-	#else
-		iso = 50;
+	stExpInfo.hdr_mode = 0; //pAnrProcParams->hdr_mode;
+	for(int i=0; i<3; i++){
+		stExpInfo.arIso[i] = 50;
+		stExpInfo.arAGain[i] = 1.0;
+		stExpInfo.arDGain[i] = 1.0;
+		stExpInfo.arTime[i] = 0.01;
+	}
+
+	if(pAblcProcParams->hdr_mode == RK_AIQ_WORKING_MODE_NORMAL){
+			stExpInfo.hdr_mode = 0;
+	}else if(pAblcProcParams->hdr_mode == RK_AIQ_ISP_HDR_MODE_2_FRAME_HDR 
+		|| pAblcProcParams->hdr_mode == RK_AIQ_ISP_HDR_MODE_2_LINE_HDR ){
+		stExpInfo.hdr_mode = 1; 
+	}else if(pAblcProcParams->hdr_mode == RK_AIQ_ISP_HDR_MODE_3_FRAME_HDR 
+		|| pAblcProcParams->hdr_mode == RK_AIQ_ISP_HDR_MODE_3_LINE_HDR ){
+		stExpInfo.hdr_mode = 2;
+	}
+	
+	#if 1	
+	if(!inparams->u.proc.init){	
+		RkAiqAlgoPreResAeInt* pAEPreRes =
+	    	(RkAiqAlgoPreResAeInt*)(pAblcProcParams->rk_com.u.proc.pre_res_comb->ae_pre_res);
+
+		if(pAEPreRes != NULL){
+			if(pAblcProcParams->hdr_mode == RK_AIQ_WORKING_MODE_NORMAL){
+				stExpInfo.arAGain[0] = pAEPreRes->ae_pre_res_rk.LinearExp.exp_real_params.analog_gain;
+				stExpInfo.arDGain[0] = pAEPreRes->ae_pre_res_rk.LinearExp.exp_real_params.digital_gain;
+				stExpInfo.arTime[0] = pAEPreRes->ae_pre_res_rk.LinearExp.exp_real_params.integration_time;
+				stExpInfo.arIso[0] = stExpInfo.arAGain[0]* 50;
+			}else{		
+				for(int i=0; i<3; i++){				
+					stExpInfo.arAGain[i] = pAEPreRes->ae_pre_res_rk.HdrExp[i].exp_real_params.analog_gain;
+					stExpInfo.arDGain[i] = pAEPreRes->ae_pre_res_rk.HdrExp[i].exp_real_params.digital_gain;
+					stExpInfo.arTime[i] = pAEPreRes->ae_pre_res_rk.HdrExp[i].exp_real_params.integration_time;
+					stExpInfo.arIso[i] = stExpInfo.arAGain[i] * 50;
+
+					LOGD_ABLC("%s:%d index:%d again:%f dgain:%f time:%f iso:%d hdr_mode:%d\n",
+						__FUNCTION__, __LINE__,
+						i,
+						stExpInfo.arAGain[i],
+						stExpInfo.arDGain[i],
+						stExpInfo.arTime[i],
+						stExpInfo.arIso[i],
+						stExpInfo.hdr_mode);
+				}	
+			}
+		}else{
+			LOGE_ABLC("%s:%d pAEPreRes is NULL, so use default instead \n", __FUNCTION__, __LINE__);
+		}	
+	}
 	#endif
 	
-	AblcResult_t ret = AblcProcess(pAblcCtx, iso);
+	AblcResult_t ret = AblcProcess(pAblcCtx, &stExpInfo);
 	if(ret != ABLC_RET_SUCCESS){
 		result = XCAM_RETURN_ERROR_FAILED;
-		LOGE_ABLC("%s: processing ANR failed (%d)\n", __FUNCTION__, ret);
+		LOGE_ABLC("%s: processing ABLC failed (%d)\n", __FUNCTION__, ret);
 	}
 
 	AblcGetProcResult(pAblcCtx, &pAblcProcResParams->ablc_proc_res);	

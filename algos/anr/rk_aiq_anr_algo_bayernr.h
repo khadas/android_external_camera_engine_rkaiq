@@ -15,7 +15,7 @@ RKAIQ_BEGIN_DECLARE
 
 ANRresult_t init_bayernr_params(RKAnr_Bayernr_Params_t *pParams, CalibDb_BayerNr_t *pCalibdb);
 
-ANRresult_t select_bayernr_params_by_ISO(RKAnr_Bayernr_Params_t *stBayerNrParams, RKAnr_Bayernr_Params_Select_t *stBayerNrParamsSelected,int iso);
+ANRresult_t select_bayernr_params_by_ISO(RKAnr_Bayernr_Params_t *stBayerNrParams, RKAnr_Bayernr_Params_Select_t *stBayerNrParamsSelected, ANRExpInfo_t *pExpInfo);
 
 unsigned short bayernr_get_trans(int tmpfix);
 

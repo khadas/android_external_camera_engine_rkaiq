@@ -63,13 +63,14 @@ AblcResult_t Ablc_xml_params_init(AblcParams_t *pParams, CalibDb_Blc_t* pBlcCali
 }
 
 
-AblcResult_t Ablc_Select_Params_By_ISO(AblcParams_t *pParams, AblcParamsSelect_t *pSelect, int isoValue)
+AblcResult_t Ablc_Select_Params_By_ISO(AblcParams_t *pParams, AblcParamsSelect_t *pSelect, AblcExpInfo_t *pExpInfo)
 {
 	int isoLowlevel = 0;
 	int isoHighlevel = 0;
 	int lowIso = 0;
 	int highIso = 0;
 	float ratio =0.0f;
+	int isoValue = 50;
 
 	LOGI_ABLC("%s(%d): enter!\n", __FUNCTION__, __LINE__);
 
@@ -83,6 +84,13 @@ AblcResult_t Ablc_Select_Params_By_ISO(AblcParams_t *pParams, AblcParamsSelect_t
 		return ABLC_RET_NULL_POINTER;
 	}
 
+	if(pExpInfo == NULL){
+		LOGE_ABLC("%s(%d): NULL pointer\n", __FUNCTION__, __LINE__);
+		return ABLC_RET_NULL_POINTER;
+	}
+
+	
+	isoValue = pExpInfo->arIso[pExpInfo->hdr_mode];
 	for(int i=0; i<BLC_MAX_ISO_LEVEL-1; i++)
 	{
 		if(isoValue >= pParams->iso[i] && isoValue <= pParams->iso[i+1])
@@ -158,7 +166,7 @@ AblcResult_t AblcInit(AblcContext_t **ppAblcCtx, CamCalibDbContext_t *pCalibDb)
 	Ablc_html_params_init(&pAblcCtx->stAuto.stParams);
 	#endif
 	
-	LOGE_ABLC("%s(%d): Ablc en:%d blc:%d %d %d %d \n", 
+	LOGD_ABLC("%s(%d): Ablc en:%d blc:%d %d %d %d \n", 
 		__FUNCTION__, __LINE__, 
 		pAblcCtx->stAuto.stParams.enable,
 		pAblcCtx->stAuto.stParams.blc_r[0],
@@ -230,7 +238,7 @@ AblcResult_t AblcPreProcess(AblcContext_t *pAblcCtx)
 
 }
 
-AblcResult_t AblcProcess(AblcContext_t *pAblcCtx, int isoValue)
+AblcResult_t AblcProcess(AblcContext_t *pAblcCtx, AblcExpInfo_t *pExpInfo)
 {
 	LOGI_ABLC("%s(%d): enter!\n", __FUNCTION__, __LINE__);
 	AblcResult_t ret = ABLC_RET_SUCCESS;
@@ -240,13 +248,14 @@ AblcResult_t AblcProcess(AblcContext_t *pAblcCtx, int isoValue)
 		return ABLC_RET_NULL_POINTER;
 	}
 
-	if(isoValue < 0){
-		LOGE_ABLC("%s(%d): invalid param\n", __FUNCTION__, __LINE__);
-		return ABLC_RET_INVALID_PARM;
+	if(pExpInfo == NULL){
+		LOGE_ABLC("%s(%d): null pointer \n", __FUNCTION__, __LINE__);
+		return ABLC_RET_NULL_POINTER;
 	}
-
+	memcpy(&pAblcCtx->stExpInfo, pExpInfo, sizeof(AblcExpInfo_t));
+	
 	if(pAblcCtx->eMode == ABLC_OP_MODE_AUTO){
-		ret = Ablc_Select_Params_By_ISO(&pAblcCtx->stAuto.stParams, &pAblcCtx->stAuto.stSelect, isoValue);
+		ret = Ablc_Select_Params_By_ISO(&pAblcCtx->stAuto.stParams, &pAblcCtx->stAuto.stSelect, pExpInfo);
 	}
 	
 	LOGI_ABLC("%s(%d): exit!\n", __FUNCTION__, __LINE__);

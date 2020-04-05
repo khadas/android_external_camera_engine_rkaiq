@@ -30,7 +30,7 @@ ANRresult_t ANRReConfig(ANRContext_t *pANRCtx, ANRConfig_t* pANRConfig);
 ANRresult_t ANRPreProcess(ANRContext_t *pANRCtx);
 
 //anr process
-ANRresult_t ANRProcess(ANRContext_t *pANRCtx, int ISO);
+ANRresult_t ANRProcess(ANRContext_t *pANRCtx, ANRExpInfo_t *pExpInfo);
 
 //anr get result
 ANRresult_t ANRGetProcResult(ANRContext_t *pANRCtx, ANRProcResult_t* pANRResult);

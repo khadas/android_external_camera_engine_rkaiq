@@ -190,11 +190,13 @@ void TmoGetCurrIOData
     pAhdrCtx->AhdrProcRes.TmoProcRes.sw_hdrtmo_maxpalpha = (int)(pAhdrCtx->CurrHandleData.CurrTmoHandleData.GlobeMaxLuma + 0.5);
     pAhdrCtx->AhdrProcRes.TmoProcRes.sw_hdrtmo_palpha_0p18 =  (int)(pAhdrCtx->CurrHandleData.CurrTmoHandleData.GlobeLuma + 0.5);
     pAhdrCtx->AhdrProcRes.TmoProcRes.sw_hdrtmo_palpha_lw0p5 = (int)(pAhdrCtx->CurrHandleData.CurrTmoHandleData.DetailsHighLight + 0.5);
-    pAhdrCtx->AhdrProcRes.TmoProcRes.sw_hdrtmo_palpha_lwscl = (int)(pAhdrCtx->CurrHandleData.CurrTmoHandleData.DetailsLowLight + 0.5);
-    pAhdrCtx->AhdrProcRes.TmoProcRes.sw_hdrtmo_set_weightkey = (int)(pAhdrCtx->CurrHandleData.CurrTmoHandleData.SmoothCtrlCoef + 0.5);
+    pAhdrCtx->AhdrProcRes.TmoProcRes.sw_hdrtmo_set_weightkey = (int)(pAhdrCtx->CurrHandleData.CurrTmoHandleData.TmoContrast + 0.5);
+    float lwscl = pAhdrCtx->CurrHandleData.CurrTmoHandleData.DetailsLowLight;
+    pAhdrCtx->AhdrProcRes.TmoProcRes.sw_hdrtmo_palpha_lwscl = (int)(lwscl + 0.5);
+    pAhdrCtx->AhdrProcRes.TmoProcRes.sw_hdrtmo_maxgain = (int)(SHIFT12BIT(lwscl / 16) + 0.5);
 
     //calc other IO data
-    pAhdrCtx->AhdrProcRes.TmoProcRes.sw_hdrtmo_big_en = pAhdrCtx->width >= BIGMODE ? 1 : 0;
+    pAhdrCtx->AhdrProcRes.TmoProcRes.sw_hdrtmo_big_en = pAhdrCtx->width > BIGMODE ? 1 : 0;
     pAhdrCtx->AhdrProcRes.TmoProcRes.sw_hdrtmo_nobig_en = (int)(1 - pAhdrCtx->AhdrProcRes.TmoProcRes.sw_hdrtmo_big_en);
     pAhdrCtx->AhdrProcRes.TmoProcRes.sw_hdrtmo_expl_lgratio = (int)SHIFT11BIT(log(pAhdrCtx->AhdrPrevData.PreLExpo / pAhdrCtx->CurrHandleData.CurrLExpo) / log(2));
     pAhdrCtx->AhdrProcRes.TmoProcRes.sw_hdrtmo_lgscl_ratio = (int)SHIFT7BIT(log(pAhdrCtx->CurrHandleData.CurrL2S_Ratio) / log(pAhdrCtx->AhdrPrevData.PreL2S_ratio));
@@ -202,12 +204,11 @@ void TmoGetCurrIOData
     pAhdrCtx->AhdrProcRes.TmoProcRes.sw_hdrtmo_lgmax = (int)SHIFT11BIT(lgmax);
     pAhdrCtx->AhdrProcRes.TmoProcRes.sw_hdrtmo_lgscl = (int)SHIFT12BIT(16 / lgmax);
     pAhdrCtx->AhdrProcRes.TmoProcRes.sw_hdrtmo_lgscl_inv = (int)SHIFT12BIT(lgmax / 16);
-    pAhdrCtx->AhdrProcRes.TmoProcRes.sw_hdrtmo_maxgain = 4096;
     float set_lgmin = 0;
     float set_lgmax = lgmax;
     pAhdrCtx->AhdrProcRes.TmoProcRes.sw_hdrtmo_set_lgmin = (int)SHIFT11BIT(set_lgmin) ;
     pAhdrCtx->AhdrProcRes.TmoProcRes.sw_hdrtmo_set_lgmax = pAhdrCtx->AhdrProcRes.TmoProcRes.sw_hdrtmo_lgmax;
-    pAhdrCtx->AhdrProcRes.TmoProcRes.sw_hdrtmo_set_gainoff = 1;
+    pAhdrCtx->AhdrProcRes.TmoProcRes.sw_hdrtmo_set_gainoff = pow(2, set_lgmin);
     pAhdrCtx->AhdrProcRes.TmoProcRes.sw_hdrtmo_set_lgmean = GetSetLgmean(pAhdrCtx);
     pAhdrCtx->AhdrProcRes.TmoProcRes.sw_hdrtmo_set_lgrange0 = GetSetLgRange0(pAhdrCtx, set_lgmin, set_lgmax);
     pAhdrCtx->AhdrProcRes.TmoProcRes.sw_hdrtmo_set_lgrange1 = GetSetLgRange1(pAhdrCtx, set_lgmin, set_lgmax);
@@ -305,8 +306,8 @@ void TmoProcessing
         enDampDtlslowLgt = true;
 
 
-    diff = ABS(pAhdrCtx->CurrHandleData.CurrTmoHandleData.SmoothCtrlCoef - pAhdrCtx->AhdrPrevData.PrevTmoHandleData.SmoothCtrlCoef);
-    diff = diff / pAhdrCtx->AhdrPrevData.PrevTmoHandleData.SmoothCtrlCoef;
+    diff = ABS(pAhdrCtx->CurrHandleData.CurrDynamicRange - pAhdrCtx->AhdrPrevData.PreDynamicRange);
+    diff = diff / pAhdrCtx->AhdrPrevData.PreDynamicRange;
     if (diff < pAhdrCtx->AhdrConfig.tmo_para.DRTolerance)
         enDampSmoothCtrl = false;
     else
@@ -331,8 +332,8 @@ void TmoProcessing
                 + (1 - tmo_damp) * pAhdrCtx->AhdrPrevData.PrevTmoHandleData.DetailsLowLight;
 
     if (enDampSmoothCtrl == true)
-        pAhdrCtx->CurrHandleData.CurrTmoHandleData.SmoothCtrlCoef = tmo_damp * pAhdrCtx->CurrHandleData.CurrTmoHandleData.SmoothCtrlCoef
-                + (1 - tmo_damp) * pAhdrCtx->AhdrPrevData.PrevTmoHandleData.SmoothCtrlCoef;
+        pAhdrCtx->CurrHandleData.CurrTmoHandleData.TmoContrast = tmo_damp * pAhdrCtx->CurrHandleData.CurrTmoHandleData.TmoContrast
+                + (1 - tmo_damp) * pAhdrCtx->AhdrPrevData.PrevTmoHandleData.TmoContrast;
 
 
 
@@ -344,7 +345,7 @@ void TmoProcessing
     LOGE_AHDR("%s:lrk  Current damp GlobeMaxLuma:%f \n", __FUNCTION__, pAhdrCtx->CurrHandleData.CurrTmoHandleData.GlobeMaxLuma);
     LOGE_AHDR("%s:lrk  Current damp DetailsHighLight:%f \n", __FUNCTION__, pAhdrCtx->CurrHandleData.CurrTmoHandleData.DetailsHighLight);
     LOGE_AHDR("%s:lrk  Current damp DetailsLowLight:%f \n", __FUNCTION__, pAhdrCtx->CurrHandleData.CurrTmoHandleData.DetailsLowLight);
-    LOGE_AHDR("%s:lrk  Current damp SmoothCtrlCoef:%f \n", __FUNCTION__, pAhdrCtx->CurrHandleData.CurrTmoHandleData.SmoothCtrlCoef);
+    LOGE_AHDR("%s:lrk  Current damp TmoContrast:%f \n", __FUNCTION__, pAhdrCtx->CurrHandleData.CurrTmoHandleData.TmoContrast);
 #endif
 
     LOGI_AHDR("%s:Eixt!\n", __FUNCTION__);

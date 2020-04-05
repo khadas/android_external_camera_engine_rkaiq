@@ -80,7 +80,6 @@ private:
     std::map<int, SmartPtr<RkAiqExpParamsProxy>> _effecting_exp_map;
     bool _first;
     int _frame_sequence;
-    rk_aiq_exposure_sensor_descriptor _sensor_desc;
 
     int get_sensor_fps(float& fps);
     XCamReturn setLinearSensorExposure(SmartPtr<RkAiqExpParamsProxy>& expPar);

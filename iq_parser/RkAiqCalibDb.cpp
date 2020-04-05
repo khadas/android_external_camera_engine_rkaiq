@@ -37,7 +37,7 @@ CamCalibDbContext_t* RkAiqCalibDb::createCalibDb(char* iqFile)
         LOGD("use cached calibdb for %s!", iqFile);
         return it->second;
     } else {
-        CamCalibDbContext_t *pCalibDb = new CamCalibDbContext_t;
+        CamCalibDbContext_t *pCalibDb = new CamCalibDbContext_t();
         if (pCalibDb) {
             RkAiqCalibParser  parser(pCalibDb);
             if (parser.doParse(iqFile)) {

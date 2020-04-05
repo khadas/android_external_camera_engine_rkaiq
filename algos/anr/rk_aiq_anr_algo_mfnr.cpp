@@ -200,9 +200,10 @@ ANRresult_t init_mfnr_params(RKAnr_Mfnr_Params_t *pParams, CalibDb_MFNR_t *pCali
 }
 
 
-ANRresult_t select_mfnr_params_by_ISO(RKAnr_Mfnr_Params_t *stmfnrParams, 	RKAnr_Mfnr_Params_Select_t *stmfnrParamsSelected, int iso, int bits_proc)
+ANRresult_t select_mfnr_params_by_ISO(RKAnr_Mfnr_Params_t *stmfnrParams, 	RKAnr_Mfnr_Params_Select_t *stmfnrParamsSelected, ANRExpInfo_t *pExpInfo, int bits_proc)
 {
 	ANRresult_t res = ANR_RET_SUCCESS;
+	int iso = 50;
 
 	if(stmfnrParams == NULL){
 		LOGE_ANR("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
@@ -213,6 +214,13 @@ ANRresult_t select_mfnr_params_by_ISO(RKAnr_Mfnr_Params_t *stmfnrParams, 	RKAnr_
 		LOGE_ANR("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
 		return ANR_RET_NULL_POINTER;
 	}
+
+	if(pExpInfo == NULL){
+		LOGE_ANR("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
+		return ANR_RET_NULL_POINTER;
+	}
+
+	iso = pExpInfo->arIso[pExpInfo->hdr_mode];
 	
     int i, j;
 	int iso_low, iso_high;
@@ -608,7 +616,7 @@ void mfnr_gfcoef_fix(int rad, double *gfcoef, unsigned char* gfcoef_fix)
 }
 
 
-ANRresult_t mfnr_fix_transfer(RKAnr_Mfnr_Params_Select_t* tnr, RKAnr_Mfnr_Fix_t *pMfnrCfg)
+ANRresult_t mfnr_fix_transfer(RKAnr_Mfnr_Params_Select_t* tnr, RKAnr_Mfnr_Fix_t *pMfnrCfg, ANRExpInfo_t *pExpInfo)
 {
 	LOGI_ANR("%s:(%d) enter \n", __FUNCTION__, __LINE__);
 
@@ -623,11 +631,16 @@ ANRresult_t mfnr_fix_transfer(RKAnr_Mfnr_Params_Select_t* tnr, RKAnr_Mfnr_Fix_t 
 		LOGE_ANR("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
 		return ANR_RET_NULL_POINTER;
 	}
+
+	if(pExpInfo == NULL){
+		LOGE_ANR("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
+		return ANR_RET_NULL_POINTER;
+	}
 	
 	int i = 0;
 	unsigned long tmp = 0;
-	int mIso_last = 50;
-	int mIso = 50;	
+	int mIso_last = pExpInfo->arIso[pExpInfo->hdr_mode];
+	int mIso = pExpInfo->arIso[pExpInfo->hdr_mode];	
 	double gain_glb_filt;
     double gain_glb_ref1;
     double gain_glb_filt_sqrt;
@@ -660,7 +673,7 @@ ANRresult_t mfnr_fix_transfer(RKAnr_Mfnr_Params_Select_t* tnr, RKAnr_Mfnr_Fix_t 
 	}
 
 	//0x0080
-	pMfnrCfg->mode = 1;
+	pMfnrCfg->mode = 0;
 	pMfnrCfg->opty_en = 1;
 	pMfnrCfg->optc_en = 1;
 	pMfnrCfg->gain_en = 1;
@@ -819,138 +832,138 @@ ANRresult_t mfnr_fix_Printf(RKAnr_Mfnr_Fix_t  * pMfnrCfg)
 		return ANR_RET_NULL_POINTER;
 	}
 	
-	printf("%s:(%d) enter \n", __FUNCTION__, __LINE__);
+	LOGD_ANR("%s:(%d) enter \n", __FUNCTION__, __LINE__);
 	//0x0080
-	printf("(0x0080) mode:%d opty_en:%d optc_en:%d gain_en:%d\n", 
+	LOGD_ANR("(0x0080) mode:%d opty_en:%d optc_en:%d gain_en:%d\n", 
 		pMfnrCfg->mode,
 		pMfnrCfg->opty_en,
 		pMfnrCfg->optc_en,
 		pMfnrCfg->gain_en);
 
 	//0x0088
-	printf("(0x0088) pk0_y:%d pk1_y:%d pk0_c:%d pk1_c:%d \n", 
+	LOGD_ANR("(0x0088) pk0_y:%d pk1_y:%d pk0_c:%d pk1_c:%d \n", 
 		pMfnrCfg->pk0_y,
 		pMfnrCfg->pk1_y,
 		pMfnrCfg->pk0_c,
 		pMfnrCfg->pk1_c);
 		
 	//0x008c
-	printf("(0x008c) glb_gain_cur:%d glb_gain_nxt:%d \n", 
+	LOGD_ANR("(0x008c) glb_gain_cur:%d glb_gain_nxt:%d \n", 
 		pMfnrCfg->glb_gain_cur,
 		pMfnrCfg->glb_gain_nxt);
 
 	//0x0090
-	printf("(0x0090) glb_gain_cur_div:%d gain_glb_filt_sqrt:%d \n", 
+	LOGD_ANR("(0x0090) glb_gain_cur_div:%d gain_glb_filt_sqrt:%d \n", 
 		pMfnrCfg->glb_gain_cur_div,
 		pMfnrCfg->glb_gain_cur_sqrt);
 	
 	//0x0094 - 0x0098
 	for(i=0; i<17 - 1; i++){
-		printf("(0x0094 - 0x0098) sigma_x[%d]:%d \n", 
+		LOGD_ANR("(0x0094 - 0x0098) sigma_x[%d]:%d \n", 
 			i, pMfnrCfg->sigma_x[i]);
 	}
 
 	//0x009c - 0x00bc
 	for(i=0; i<17; i++){
-		printf("(0x009c - 0x00bc) sigma_y[%d]:%d \n", 
+		LOGD_ANR("(0x009c - 0x00bc) sigma_y[%d]:%d \n", 
 			i, pMfnrCfg->sigma_y[i]);
 	}
 
 	//0x00c4 - 0x00cc
 	//dir_idx = 0;
 	for(i=0; i<6; i++){
-		printf("(0x00c4 - 0x00cc) luma_curve[%d]:%d \n", 
+		LOGD_ANR("(0x00c4 - 0x00cc) luma_curve[%d]:%d \n", 
 			i, pMfnrCfg->luma_curve[i]);
 	}
 
 	//0x00d0
-	printf("(0x00d0) txt_th0_y:%d txt_th1_y:%d \n", 
+	LOGD_ANR("(0x00d0) txt_th0_y:%d txt_th1_y:%d \n", 
 		pMfnrCfg->txt_th0_y,
 		pMfnrCfg->txt_th1_y);
 	
 	//0x00d4
-	printf("(0x00d0) txt_th0_c:%d txt_th1_c:%d \n", 
+	LOGD_ANR("(0x00d0) txt_th0_c:%d txt_th1_c:%d \n", 
 		pMfnrCfg->txt_th0_c,
 		pMfnrCfg->txt_th1_c);
 
 	//0x00d8
-	printf("(0x00d8) txt_thy_dlt:%d txt_thc_dlt:%d \n", 
+	LOGD_ANR("(0x00d8) txt_thy_dlt:%d txt_thc_dlt:%d \n", 
 		pMfnrCfg->txt_thy_dlt,
 		pMfnrCfg->txt_thc_dlt);
 
 	//0x00dc - 0x00ec
 	for(i=0; i<6; i++){
-		printf("(0x00dc - 0x00ec) gfcoef_y0[%d]:%d \n", 
+		LOGD_ANR("(0x00dc - 0x00ec) gfcoef_y0[%d]:%d \n", 
 			i, pMfnrCfg->gfcoef_y0[i]);
 	}
 	for(i=0; i<3; i++){
-		printf("(0x00dc - 0x00ec) gfcoef_y1[%d]:%d \n", 
+		LOGD_ANR("(0x00dc - 0x00ec) gfcoef_y1[%d]:%d \n", 
 			i, pMfnrCfg->gfcoef_y1[i]);
 	}
 	for(i=0; i<3; i++){
-		printf("(0x00dc - 0x00ec) gfcoef_y2[%d]:%d \n", 
+		LOGD_ANR("(0x00dc - 0x00ec) gfcoef_y2[%d]:%d \n", 
 			i, pMfnrCfg->gfcoef_y2[i]);
 	}
 	for(i=0; i<3; i++){
-		printf("(0x00dc - 0x00ec) gfcoef_y3[%d]:%d \n", 
+		LOGD_ANR("(0x00dc - 0x00ec) gfcoef_y3[%d]:%d \n", 
 			i, pMfnrCfg->gfcoef_y3[i]);
 	}
 
 	//0x00f0 - 0x0100
 	for(i=0; i<6; i++){
-		printf("(0x00f0 - 0x0100) gfcoef_yg0[%d]:%d \n", 
+		LOGD_ANR("(0x00f0 - 0x0100) gfcoef_yg0[%d]:%d \n", 
 			i, pMfnrCfg->gfcoef_yg0[i]);
 	}
 	for(i=0; i<3; i++){
-		printf("(0x00f0 - 0x0100) gfcoef_yg1[%d]:%d \n", 
+		LOGD_ANR("(0x00f0 - 0x0100) gfcoef_yg1[%d]:%d \n", 
 			i, pMfnrCfg->gfcoef_yg1[i]);
 	}
 	for(i=0; i<3; i++){
-		printf("(0x00f0 - 0x0100) gfcoef_yg2[%d]:%d \n", 
+		LOGD_ANR("(0x00f0 - 0x0100) gfcoef_yg2[%d]:%d \n", 
 			i, pMfnrCfg->gfcoef_yg2[i]);
 	}
 	for(i=0; i<3; i++){
-		printf("(0x00f0 - 0x0100) gfcoef_yg3[%d]:%d \n", 
+		LOGD_ANR("(0x00f0 - 0x0100) gfcoef_yg3[%d]:%d \n", 
 			i, pMfnrCfg->gfcoef_yg3[i]);
 	}
 
 
 	//0x0104 - 0x0110
 	for(i=0; i<6; i++){
-		printf("(0x0104 - 0x0110) gfcoef_yl0[%d]:%d \n", 
+		LOGD_ANR("(0x0104 - 0x0110) gfcoef_yl0[%d]:%d \n", 
 			i, pMfnrCfg->gfcoef_yl0[i]);
 	}
 	for(i=0; i<3; i++){
-		printf("(0x0104 - 0x0110) gfcoef_yl1[%d]:%d \n", 
+		LOGD_ANR("(0x0104 - 0x0110) gfcoef_yl1[%d]:%d \n", 
 			i, pMfnrCfg->gfcoef_yl1[i]);
 	}
 	for(i=0; i<3; i++){
-		printf("(0x0104 - 0x0110) gfcoef_yl2[%d]:%d \n", 
+		LOGD_ANR("(0x0104 - 0x0110) gfcoef_yl2[%d]:%d \n", 
 			i, pMfnrCfg->gfcoef_yl2[i]);
 	}
 
 	//0x0114 - 0x0120
 	for(i=0; i<6; i++){
-		printf("(0x0114 - 0x0120) gfcoef_cg0[%d]:%d \n", 
+		LOGD_ANR("(0x0114 - 0x0120) gfcoef_cg0[%d]:%d \n", 
 			i, pMfnrCfg->gfcoef_cg0[i]);
 	}
 	for(i=0; i<3; i++){
-		printf("(0x0114 - 0x0120) gfcoef_cg1[%d]:%d \n", 
+		LOGD_ANR("(0x0114 - 0x0120) gfcoef_cg1[%d]:%d \n", 
 			i, pMfnrCfg->gfcoef_cg1[i]);
 	}
 	for(i=0; i<3; i++){
-		printf("(0x0114 - 0x0120) gfcoef_cg2[%d]:%d \n", 
+		LOGD_ANR("(0x0114 - 0x0120) gfcoef_cg2[%d]:%d \n", 
 			i, pMfnrCfg->gfcoef_cg2[i]);
 	}
 
 
 	//0x0124 - 0x012c
 	for(i=0; i<6; i++){
-		printf("(0x0124 - 0x012c) gfcoef_cl0[%d]:%d \n", 
+		LOGD_ANR("(0x0124 - 0x012c) gfcoef_cl0[%d]:%d \n", 
 			i, pMfnrCfg->gfcoef_cl0[i]);
 	}
 	for(i=0; i<3; i++){
-		printf("(0x0124 - 0x012c) gfcoef_cl1[%d]:%d \n", 
+		LOGD_ANR("(0x0124 - 0x012c) gfcoef_cl1[%d]:%d \n", 
 			i, pMfnrCfg->gfcoef_cl1[i]);
 	}
 
@@ -958,44 +971,44 @@ ANRresult_t mfnr_fix_Printf(RKAnr_Mfnr_Fix_t  * pMfnrCfg)
 	//0x0130 - 0x0134
 	//dir_idx = 0;  i = lvl;
 	for(i=0; i<4; i++){
-		printf("(0x0130 - 0x0134) scale_yg[%d]:%d \n", 
+		LOGD_ANR("(0x0130 - 0x0134) scale_yg[%d]:%d \n", 
 			i, pMfnrCfg->scale_yg[i]);
 	}
 
 	//0x0138 - 0x013c
 	//dir_idx = 1;  i = lvl;
 	for(i=0; i<3; i++){
-		printf("(0x0138 - 0x013c) scale_yl[%d]:%d \n", 
+		LOGD_ANR("(0x0138 - 0x013c) scale_yl[%d]:%d \n", 
 			i, pMfnrCfg->scale_yl[i]);
 	}
 
 	//0x0140 - 0x0148
 	//dir_idx = 0;  i = lvl;
 	for(i=0; i<3; i++){
-		printf("(0x0140 - 0x0148) scale_cg[%d]:%d \n", 
+		LOGD_ANR("(0x0140 - 0x0148) scale_cg[%d]:%d \n", 
 			i, pMfnrCfg->scale_cg[i]);
-		printf("(0x0140 - 0x0148) scale_y2cg[%d]:%d \n", 
+		LOGD_ANR("(0x0140 - 0x0148) scale_y2cg[%d]:%d \n", 
 			i, pMfnrCfg->scale_y2cg[i]);	
 	}
 
 	//0x014c - 0x0154
 	//dir_idx = 1;  i = lvl;
 	for(i=0; i<2; i++){
-		printf("(0x014c - 0x0154) scale_cl[%d]:%d \n", 
+		LOGD_ANR("(0x014c - 0x0154) scale_cl[%d]:%d \n", 
 			i, pMfnrCfg->scale_cl[i]);
 	}
 	for(i=0; i<3; i++){
-		printf("(0x014c - 0x0154) scale_y2cl[%d]:%d \n", 
+		LOGD_ANR("(0x014c - 0x0154) scale_y2cl[%d]:%d \n", 
 			i, pMfnrCfg->scale_y2cl[i]);
 	}
 
 	//0x0158 
 	for(i=0; i<3; i++){
-		printf("(0x0158) weight_y[%d]:%d \n", 
+		LOGD_ANR("(0x0158) weight_y[%d]:%d \n", 
 			i, pMfnrCfg->weight_y[i]);
 	}
 
-	printf("%s:(%d) exit \n", __FUNCTION__, __LINE__);
+	LOGD_ANR("%s:(%d) exit \n", __FUNCTION__, __LINE__);
 
 	return res;
 }

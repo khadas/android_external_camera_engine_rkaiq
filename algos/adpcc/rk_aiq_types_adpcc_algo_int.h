@@ -320,6 +320,16 @@ typedef struct rk_aiq_dpcc_attrib_s{
 	Adpcc_Manual_Attr_t stManual;	
 }rk_aiq_dpcc_attrib_t;
 
+typedef struct AdpccExpInfo_s{
+	int hdr_mode;
+	float arTime[3];
+	float arAGain[3];
+	float arDGain[3];
+	int   arIso[3];
+}AdpccExpInfo_t;
+
+	
+
 RKAIQ_END_DECLARE
 
 #endif

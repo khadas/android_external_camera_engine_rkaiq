@@ -31,7 +31,7 @@ typedef struct AdpccContext_s{
 	AdpccOPMode_t eMode;
 	AdpccState_t eState;
 	
-	int iso;
+	AdpccExpInfo_t stExpInfo;
 	
 	Adpcc_Auto_Attr_t stAuto;
 	Adpcc_Manual_Attr_t stManual;

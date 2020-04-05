@@ -77,21 +77,37 @@ ANRresult_t init_bayernr_params(RKAnr_Bayernr_Params_t *pParams, CalibDb_BayerNr
 }
 
 
-void selsec_hdr_parmas_by_ISO(RKAnr_Bayernr_Params_t *stBayerNrParams, RKAnr_Bayernr_Params_Select_t *stBayerNrParamsSelected)
+ANRresult_t selsec_hdr_parmas_by_ISO(RKAnr_Bayernr_Params_t *stBayerNrParams, RKAnr_Bayernr_Params_Select_t *stBayerNrParamsSelected, ANRExpInfo_t *pExpInfo)
 {
-	int framenum = 2;
 	float frameiso[3];
 	float frameEt[3];
 	float fdgain[3];
 	int i = 0;
 
-	frameiso[0] = 1.0;
-	frameiso[1] = 1.0;
-	frameiso[2] = 1.0;
+	if(stBayerNrParams == NULL){
+		LOGE_ANR("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
+		return ANR_RET_NULL_POINTER;
+	}
+
+	if(stBayerNrParamsSelected == NULL){
+		LOGE_ANR("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
+		return ANR_RET_NULL_POINTER;
+	}
+
+	if(pExpInfo == NULL){
+		LOGE_ANR("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
+		return ANR_RET_NULL_POINTER;
+	}
+
+	int framenum = pExpInfo->hdr_mode + 1;
 	
-	frameEt[0] = 0.00002;
-	frameEt[1] = 0.00008;
-	frameEt[2] = 0.0;
+	frameiso[0] = pExpInfo->arAGain[0];
+	frameiso[1] = pExpInfo->arAGain[1];
+	frameiso[2] = pExpInfo->arAGain[2];
+	
+	frameEt[0] = pExpInfo->arTime[0];
+	frameEt[1] = pExpInfo->arTime[1];
+	frameEt[2] = pExpInfo->arTime[2];
 	
 	for(int j=0; j<framenum; j++)
     {
@@ -155,7 +171,7 @@ void selsec_hdr_parmas_by_ISO(RKAnr_Bayernr_Params_t *stBayerNrParams, RKAnr_Bay
 		float gainsqrt = sqrt(fdgain[i]);
 		float par = (stBayerNrParamsSelected->filtPar[i] * filtParDiscount);
 
-		printf("gainsqrt:%f filtpar:%f, total:%f\n", 
+		LOGD_ANR("gainsqrt:%f filtpar:%f, total:%f\n", 
 			gainsqrt, stBayerNrParamsSelected->filtPar[i], par*gainsqrt);
 		stBayerNrParamsSelected->filtPar[i] = par * gainsqrt;
 	}
@@ -166,12 +182,14 @@ void selsec_hdr_parmas_by_ISO(RKAnr_Bayernr_Params_t *stBayerNrParams, RKAnr_Bay
 	stBayerNrParamsSelected->thld_chanelw = int(0.1*float(1<<FIXNLMCALC));
 	stBayerNrParamsSelected->pix_diff = FIXDIFMAX - 1;
 	stBayerNrParamsSelected->log_bypass = 0;	//0 is none, 1 is G and RB all en,  2 only en G, 3 only RB;
-	
+
+	return ANR_RET_SUCCESS;
 }
 
-ANRresult_t select_bayernr_params_by_ISO(RKAnr_Bayernr_Params_t *stBayerNrParams, RKAnr_Bayernr_Params_Select_t *stBayerNrParamsSelected, int iso)
+ANRresult_t select_bayernr_params_by_ISO(RKAnr_Bayernr_Params_t *stBayerNrParams, RKAnr_Bayernr_Params_Select_t *stBayerNrParamsSelected, ANRExpInfo_t *pExpInfo)
 {
 	ANRresult_t res = ANR_RET_SUCCESS;
+	int iso = 50;
 	
 	if(stBayerNrParams == NULL){
 		LOGE_ANR("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
@@ -182,6 +200,15 @@ ANRresult_t select_bayernr_params_by_ISO(RKAnr_Bayernr_Params_t *stBayerNrParams
 		LOGE_ANR("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
 		return ANR_RET_NULL_POINTER;
 	}
+
+	if(pExpInfo == NULL){
+		LOGE_ANR("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
+		return ANR_RET_NULL_POINTER;
+	}
+
+	iso = pExpInfo->arIso[pExpInfo->hdr_mode];
+
+	LOGD_ANR("%s:%d iso:%d \n", __FUNCTION__, __LINE__, iso);
 	
 	////降噪参数获取
 	//确定iso等级
@@ -231,9 +258,9 @@ ANRresult_t select_bayernr_params_by_ISO(RKAnr_Bayernr_Params_t *stBayerNrParams
 	+float(isoGain-isoGainLow)/float(isoGainHig-isoGainLow)*stBayerNrParams->filtpar[isoLevelHig];
 
 #ifdef BAYER_NR_DEBUG
-	printf("Patch=%d*%d\n",stBayerNrParamsSelected->halfPatch*2+1,stBayerNrParamsSelected->halfPatch*2+1);
-	printf("Block=%d*%d\n",stBayerNrParamsSelected->halfBlock*2+1,stBayerNrParamsSelected->halfBlock*2+1);
-	printf("filPar=%f\n",stBayerNrParamsSelected->filtPar);
+	LOGD_ANR("Patch=%d*%d\n",stBayerNrParamsSelected->halfPatch*2+1,stBayerNrParamsSelected->halfPatch*2+1);
+	LOGD_ANR("Block=%d*%d\n",stBayerNrParamsSelected->halfBlock*2+1,stBayerNrParamsSelected->halfBlock*2+1);
+	LOGD_ANR("filPar=%f\n",stBayerNrParamsSelected->filtPar);
 #endif
 
 	for (i=0;i<7;i++)
@@ -297,7 +324,7 @@ ANRresult_t select_bayernr_params_by_ISO(RKAnr_Bayernr_Params_t *stBayerNrParams
 	stBayerNrParamsSelected->log_bypass = 0;	//0 is none, 1 is G and RB all en,  2 only en G, 3 only RB;
 
 	//oyyf: if hdr open
-	selsec_hdr_parmas_by_ISO(stBayerNrParams, stBayerNrParamsSelected);
+	selsec_hdr_parmas_by_ISO(stBayerNrParams, stBayerNrParamsSelected, pExpInfo);
 
 	return res;
 }
@@ -463,76 +490,76 @@ ANRresult_t bayernr_fix_printf(RKAnr_Bayernr_Fix_t * pRawnrCfg)
 		return ANR_RET_NULL_POINTER;
 	}
 	
-	printf("%s:(%d) ############# rawnr enter######################## \n", __FUNCTION__, __LINE__);
+	LOGD_ANR("%s:(%d) ############# rawnr enter######################## \n", __FUNCTION__, __LINE__);
 
 	//(0x0004)
-	printf("gauss_en:%d log_bypass:%d \n", 
+	LOGD_ANR("gauss_en:%d log_bypass:%d \n", 
 		pRawnrCfg->gauss_en, 
 		pRawnrCfg->log_bypass);
 
 	//(0x0008 - 0x00010)
-	printf("filtpar0-2:%d %d %d \n", 
+	LOGD_ANR("filtpar0-2:%d %d %d \n", 
 		pRawnrCfg->filtpar0, 
 		pRawnrCfg->filtpar1, 
 		pRawnrCfg->filtpar2);
 
 	//(0x0014 - 0x0001c)
-	printf("dgain0-2:%d %d %d \n", 
+	LOGD_ANR("dgain0-2:%d %d %d \n", 
 		pRawnrCfg->dgain0, 
 		pRawnrCfg->dgain1, 
 		pRawnrCfg->dgain2);
 
 	//(0x0020 - 0x0002c)
 	for(int i=0; i<8; i++){
-		printf("luration[%d]:%d \n", i, pRawnrCfg->luration[i]);
+		LOGD_ANR("luration[%d]:%d \n", i, pRawnrCfg->luration[i]);
 	}
 
 	//(0x0030 - 0x0003c)
 	for(int i=0; i<8; i++){		
-		printf("lulevel[%d]:%d \n", i, pRawnrCfg->lulevel[i]);
+		LOGD_ANR("lulevel[%d]:%d \n", i, pRawnrCfg->lulevel[i]);
 	}
 
 	//(0x0040)
-	printf("gauss:%d \n", pRawnrCfg->gauss);
+	LOGD_ANR("gauss:%d \n", pRawnrCfg->gauss);
 
 	//(0x0044)
-	printf("sigma:%d \n", pRawnrCfg->sigma);
+	LOGD_ANR("sigma:%d \n", pRawnrCfg->sigma);
 
 	//(0x0048)
-	printf("pix_diff:%d \n", pRawnrCfg->pix_diff);
+	LOGD_ANR("pix_diff:%d \n", pRawnrCfg->pix_diff);
 
 	//(0x004c)
-	printf("thld_diff:%d \n", pRawnrCfg->thld_diff);
+	LOGD_ANR("thld_diff:%d \n", pRawnrCfg->thld_diff);
 
 	//(0x0050)
-	printf("gas_weig_scl1:%d gas_weig_scl2:%d thld_chanelw:%d \n", 
+	LOGD_ANR("gas_weig_scl1:%d gas_weig_scl2:%d thld_chanelw:%d \n", 
 		pRawnrCfg->gas_weig_scl1, 
 		pRawnrCfg->gas_weig_scl2, 
 		pRawnrCfg->thld_chanelw);
 
 	//(0x0054)
-	printf("lamda:%d \n", pRawnrCfg->lamda);
+	LOGD_ANR("lamda:%d \n", pRawnrCfg->lamda);
 
 	//(0x0058 - 0x0005c)
-	printf("fixw0-3:%d %d %d %d\n", 
+	LOGD_ANR("fixw0-3:%d %d %d %d\n", 
 		pRawnrCfg->fixw0, 
 		pRawnrCfg->fixw1, 
 		pRawnrCfg->fixw2,
 		pRawnrCfg->fixw3);
 
 	//(0x0060 - 0x00068)
-	printf("wlamda0-2:%d %d %d \n", 
+	LOGD_ANR("wlamda0-2:%d %d %d \n", 
 		pRawnrCfg->wlamda0, 
 		pRawnrCfg->wlamda1, 
 		pRawnrCfg->wlamda2);
 
 	//(0x006c)
-	printf("rgain_filp:%d bgain_filp:%d \n", 
+	LOGD_ANR("rgain_filp:%d bgain_filp:%d \n", 
 		pRawnrCfg->rgain_filp, 
 		pRawnrCfg->bgain_filp);
 
-	printf("%s:(%d) ############# rawnr exit ######################## \n", __FUNCTION__, __LINE__);
-	printf("%s:(%d) exit \n", __FUNCTION__, __LINE__);
+	LOGD_ANR("%s:(%d) ############# rawnr exit ######################## \n", __FUNCTION__, __LINE__);
+	LOGD_ANR("%s:(%d) exit \n", __FUNCTION__, __LINE__);
 
 	return res;
 }

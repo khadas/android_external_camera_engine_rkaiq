@@ -28,7 +28,7 @@
 RKAIQ_BEGIN_DECLARE
 
 typedef struct AblcContext_s{	
-	int iso;
+	AblcExpInfo_t stExpInfo;
 	AblcState_t eState;
 	AblcOPMode_t eMode;
 

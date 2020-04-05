@@ -333,26 +333,30 @@ RkAiqCore::analyzeInternal()
     RkAiqFullParams* aiqParams = aiqParamProxy->data().ptr();
     aiqParams->reset();
 
-    aiqParams->mIspParams = mAiqIspParamsPool->get_item();
-    if (!aiqParams->mIspParams.ptr()) {
-        LOGE_ANALYZER("no free isp params buffer!");
-        return NULL;
+    if (mAiqIspParamsPool->has_free_items()) {
+        aiqParams->mIspParams = mAiqIspParamsPool->get_item();
+    } else {
+            LOGE_ANALYZER("no free isp params buffer!");
+            return NULL;
     }
 
-    aiqParams->mExposureParams = mAiqExpParamsPool->get_item();
-    if (!aiqParams->mExposureParams.ptr()) {
+    if (mAiqExpParamsPool->has_free_items()) {
+        aiqParams->mExposureParams = mAiqExpParamsPool->get_item();
+    } else {
         LOGE_ANALYZER("no free exposure params buffer!");
         return NULL;
     }
 
-    aiqParams->mFocusParams = mAiqFocusParamsPool->get_item();
-    if (!aiqParams->mFocusParams.ptr()) {
+    if (mAiqFocusParamsPool->has_free_items()) {
+        aiqParams->mFocusParams = mAiqFocusParamsPool->get_item();
+    } else {
         LOGE_ANALYZER("no free focus params buffer!");
         return NULL;
     }
 
-    aiqParams->mIsppParams = mAiqIsppParamsPool->get_item();
-    if (!aiqParams->mIsppParams.ptr()) {
+    if (mAiqIsppParamsPool->has_free_items()) {
+        aiqParams->mIsppParams = mAiqIsppParamsPool->get_item();
+    } else {
         LOGE_ANALYZER("no free ispp params buffer!");
         return NULL;
     }
@@ -423,8 +427,13 @@ RkAiqCore::analyzeInternalPp()
     RkAiqFullParams* aiqParams = aiqParamProxy->data().ptr();
     aiqParams->reset();
 
-    aiqParams->mIsppParams = mAiqIsppParamsPool->get_item();
-    if (!aiqParams->mIsppParams.ptr()) {
+    if (mAiqIsppParamsPool->has_free_items()) {
+        aiqParams->mIsppParams = mAiqIsppParamsPool->get_item();
+        if (!aiqParams->mIsppParams.ptr()) {
+            LOGE_ANALYZER("no free ispp params buffer!");
+            return NULL;
+        }
+    } else {
         LOGE_ANALYZER("no free ispp params buffer!");
         return NULL;
     }
@@ -1627,6 +1636,9 @@ RkAiqCore::addDefaultAlgos()
     enableAlgo(RK_AIQ_ALGO_TYPE_ALSC, 0, true);
     enableAlgo(RK_AIQ_ALGO_TYPE_ADPCC, 0, true);
     enableAlgo(RK_AIQ_ALGO_TYPE_ANR, 0, true);
+    enableAlgo(RK_AIQ_ALGO_TYPE_AF, 0, true);
+    enableAlgo(RK_AIQ_ALGO_TYPE_ASHARP, 0, true);
+	  enableAlgo(RK_AIQ_ALGO_TYPE_ADHAZ, 0, true);
 #endif
 #endif
 }
@@ -2044,6 +2056,10 @@ RkAiqCore::convertIspstatsToAlgo(const SmartPtr<VideoBuffer> &buffer)
             stats->params.rawaf.afm_sum[0];
         mAlogsSharedParams.ispStats.af_stats.roia_luminance =
             stats->params.rawaf.afm_lum[0];
+        mAlogsSharedParams.ispStats.af_stats.roib_sharpness =
+            stats->params.rawaf.afm_sum[1];
+        mAlogsSharedParams.ispStats.af_stats.roib_luminance =
+            stats->params.rawaf.afm_lum[1];
         memcpy(mAlogsSharedParams.ispStats.af_stats.global_sharpness,
                stats->params.rawaf.ramdata, ISP2X_RAWAF_SUMDATA_NUM * sizeof(u32));
     }

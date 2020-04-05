@@ -59,7 +59,7 @@ ANRresult_t ANRInit(ANRContext_t **ppANRCtx, CamCalibDbContext_t *pCalibDb)
 	init_uvnr_params(&pANRCtx->stAuto.stUvnrParams, &pANRCtx->stUvnrCalib);
 	pANRCtx->stAuto.ynrEn = pANRCtx->stYnrCalib.enable;
 	init_ynr_params(&pANRCtx->stAuto.stYnrParams, &pANRCtx->stYnrCalib);
-	pANRCtx->stAuto.ynrEn = pANRCtx->stMfnrCalib.enable;
+	pANRCtx->stAuto.mfnrEn = pANRCtx->stMfnrCalib.enable;
 	init_mfnr_params(&pANRCtx->stAuto.stMfnrParams, &pANRCtx->stMfnrCalib);
 	#endif
 
@@ -136,7 +136,7 @@ ANRresult_t ANRPreProcess(ANRContext_t *pANRCtx)
 }
 
 //anr process
-ANRresult_t ANRProcess(ANRContext_t *pANRCtx, int ISO)
+ANRresult_t ANRProcess(ANRContext_t *pANRCtx, ANRExpInfo_t *pExpInfo)
 {	
 	LOGI_ANR("%s(%d): enter!\n", __FUNCTION__, __LINE__);
 
@@ -144,18 +144,23 @@ ANRresult_t ANRProcess(ANRContext_t *pANRCtx, int ISO)
 		LOGE_ANR("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
 		return ANR_RET_INVALID_PARM;
 	}
+
+	if(pExpInfo == NULL){
+		LOGE_ANR("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
+		return ANR_RET_INVALID_PARM;
+	}
 	
 	if(pANRCtx->eMode == ANR_OP_MODE_AUTO){
 
-		LOGD_ANR("%s(%d): ISO:%d refYuvBit:%d\n", __FUNCTION__, __LINE__,
-			ISO, pANRCtx->refYuvBit);
-		//select param
-		select_bayernr_params_by_ISO(&pANRCtx->stAuto.stBayernrParams, &pANRCtx->stAuto.stBayernrParamSelect, ISO);
-		select_mfnr_params_by_ISO(&pANRCtx->stAuto.stMfnrParams, &pANRCtx->stAuto.stMfnrParamSelect, ISO, pANRCtx->refYuvBit);
-		select_ynr_params_by_ISO(&pANRCtx->stAuto.stYnrParams, &pANRCtx->stAuto.stYnrParamSelect, ISO, pANRCtx->refYuvBit);
-		select_uvnr_params_by_ISO(&pANRCtx->stAuto.stUvnrParams, &pANRCtx->stAuto.stUvnrParamSelect, ISO);
+		LOGD_ANR("%s(%d): refYuvBit:%d\n", __FUNCTION__, __LINE__, pANRCtx->refYuvBit);
 
-		pANRCtx->ISO = ISO;
+		memcpy(&pANRCtx->stExpInfo, pExpInfo, sizeof(ANRExpInfo_t));
+		
+		//select param
+		select_bayernr_params_by_ISO(&pANRCtx->stAuto.stBayernrParams, &pANRCtx->stAuto.stBayernrParamSelect, pExpInfo);
+		select_mfnr_params_by_ISO(&pANRCtx->stAuto.stMfnrParams, &pANRCtx->stAuto.stMfnrParamSelect, pExpInfo, pANRCtx->refYuvBit);
+		select_ynr_params_by_ISO(&pANRCtx->stAuto.stYnrParams, &pANRCtx->stAuto.stYnrParamSelect, pExpInfo, pANRCtx->refYuvBit);
+		select_uvnr_params_by_ISO(&pANRCtx->stAuto.stUvnrParams, &pANRCtx->stAuto.stUvnrParamSelect, pExpInfo);	
 		
 	}else if(pANRCtx->eMode == ANR_OP_MODE_MANUAL){
 		//TODO
@@ -209,7 +214,7 @@ ANRresult_t ANRGetProcResult(ANRContext_t *pANRCtx, ANRProcResult_t* pANRResult)
 
 	//transfer to reg value
 	bayernr_fix_tranfer(&pANRResult->stBayernrParamSelect, &pANRResult->stBayernrFix);
-	mfnr_fix_transfer(&pANRResult->stMfnrParamSelect, &pANRResult->stMfnrFix);
+	mfnr_fix_transfer(&pANRResult->stMfnrParamSelect, &pANRResult->stMfnrFix, &pANRCtx->stExpInfo);
 	ynr_fix_transfer(&pANRResult->stYnrParamSelect, &pANRResult->stYnrFix);
 	uvnr_fix_transfer(&pANRResult->stUvnrParamSelect, &pANRResult->stUvnrFix);
 	pANRResult->stBayernrFix.rawnr_en = pANRResult->bayernrEn;

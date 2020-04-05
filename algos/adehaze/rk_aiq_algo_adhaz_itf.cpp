@@ -68,7 +68,8 @@ static XCamReturn
 		const CalibDb_Dehaze_t *calib_dehaze = &calib->dehaze;
 		//TO DO
 		iso = 50;
-		ret = AdehazeConfigV200(calib_dehaze, AdehazeHandle,iso);
+		ret = AdehazeConfigV200(calib_dehaze,AdehazeHandle, iso);
+		
 		return XCAM_RETURN_NO_ERROR;
 
 	}
