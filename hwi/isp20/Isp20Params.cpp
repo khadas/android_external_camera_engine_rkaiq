@@ -1038,9 +1038,10 @@ void Isp20Params::convertAiqAgammaToIsp20Params(struct isp2x_isp_params_cfg& isp
 {
     if(gamma_out_cfg.gamma_en) {
         isp_cfg.module_ens |= ISP2X_MODULE_GOC;
+		isp_cfg.module_en_update |= ISP2X_MODULE_GOC;
+        isp_cfg.module_cfg_update |= ISP2X_MODULE_GOC;
     }
-    isp_cfg.module_en_update |= ISP2X_MODULE_GOC;
-    isp_cfg.module_cfg_update |= ISP2X_MODULE_GOC;
+    
 
     struct isp2x_gammaout_cfg* cfg = &isp_cfg.others.gammaout_cfg;
     cfg->offset = gamma_out_cfg.gamma_out_offset;
@@ -1059,13 +1060,15 @@ void Isp20Params::convertAiqAdehazeToIsp20Params(struct isp2x_isp_params_cfg& is
 
     int rawWidth = 1920;
     int rawHeight = 1080;
+    
+    if(dhaze.dehaze_en[0]){
+	    isp_cfg.module_ens |= ISP2X_MODULE_DHAZ;
+	    isp_cfg.module_en_update |= ISP2X_MODULE_DHAZ;
+	    isp_cfg.module_cfg_update |= ISP2X_MODULE_DHAZ;
+    	}
     struct isp2x_dhaz_cfg *  cfg = &isp_cfg.others.dhaz_cfg;
 
-    isp_cfg.module_ens |= ISP2X_MODULE_DHAZ;
-    isp_cfg.module_en_update |= ISP2X_MODULE_DHAZ;
-    isp_cfg.module_cfg_update |= ISP2X_MODULE_DHAZ;
-
-    //cfg->       = int(rk_aiq_dehaze_cfg_t->dehaze_en[0]);  //0~1  , (1bit) dehaze_en
+   // cfg->dehaze_en      = int(dhaze.dehaze_en[0]);  //0~1  , (1bit) dehaze_en
     cfg->dc_en    = int(dhaze.dehaze_en[1]);  //0~1  , (1bit) dc_en
     cfg->hist_en          = int(dhaze.dehaze_en[2]);  //0~1  , (1bit) hist_en
     cfg->hist_chn         = int(dhaze.dehaze_en[3]);  //0~1  , (1bit) hist_channel
@@ -2083,6 +2086,7 @@ Isp20Params::convertAiqResultsToIsp20Params(struct isp2x_isp_params_cfg& isp_cfg
     convertAiqRawnrToIsp20Params(isp_cfg, aiq_results->data()->rawnr);
     convertAiqAfToIsp20Params(isp_cfg, aiq_results->data()->af_meas);
     convertAiqAdehazeToIsp20Params(isp_cfg, aiq_results->data()->adhaz_config);
+    convertAiqA3dlutToIsp20Params(isp_cfg, aiq_results->data()->lut3d);
 
     /*
      * enable the modules that has been verified to work properly on the board

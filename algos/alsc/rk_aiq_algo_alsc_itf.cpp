@@ -88,7 +88,8 @@ processing(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outparams)
     alsc_handle_t hAlsc = (alsc_handle_t)(inparams->ctx->alsc_para);
     hAlsc->alscSwInfo = procAlsc->alsc_sw_info;
     LOGI_ALSC( "%s alsc_proc_com.u.init:%d \n", __FUNCTION__, inparams->u.proc.init);
-    LOGD_ALSC( "%s: awbGain:%f,%f, resName:%s, awbIIRDampCoef:%f\n", __FUNCTION__,
+    LOGD_ALSC( "%s: sensorGain:%f, awbGain:%f,%f, resName:%s, awbIIRDampCoef:%f\n", __FUNCTION__,
+        hAlsc->alscSwInfo.sensorGain,
         hAlsc->alscSwInfo.awbGain[0], hAlsc->alscSwInfo.awbGain[1],
         hAlsc->curResName, hAlsc->alscSwInfo.awbIIRDampCoef);
 

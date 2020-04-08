@@ -145,7 +145,7 @@ static XCamReturn VignInterpolateMatrices
         float f1 = (fVigB - fVignetting) / (fVigB - fVigA);
         /* FLOAT f2 = ( fVigB - fVignetting ) / ( fVigB - fVigA ); */
         float f2 = 1.0f - f1;
-        LOGD_ALSC( "select:%s :%d  and %s :%d", pLscProfile1->name,
+        LOGD_ALSC( "select:%s :%f  and %s :%f", pLscProfile1->name,
             f1, pLscProfile2->name, f2);
 
         /* left shift 16 */
@@ -492,6 +492,22 @@ XCamReturn AlscInit(alsc_handle_t *hAlsc,const CamCalibDbContext_t* calib)
     alsc_context->calibLsc = calib_lsc;
 
     alsc_context->alscSwInfo.sensorGain=1.0;
+    alsc_context->alscSwInfo.awbIIRDampCoef = 0;
+    bool lsFound;
+    for(int i = 0; i < calib_lsc->aLscCof.illuNum; i++) {
+        if(strcmp(calib_lsc->aLscCof.illAll[i].illuName,calib->awb.stategy_cfg.lsForFirstFrame)==0){
+            memcpy(alsc_context->alscSwInfo.awbGain, calib_lsc->aLscCof.illAll[i].awbGain,
+                sizeof(alsc_context->alscSwInfo.awbGain));
+            lsFound = true;
+            LOGD_ALSC("%s: alsc lsForFirstFrame:%s", __FUNCTION__, calib_lsc->aLscCof.illAll[i].illuName);
+            break;
+        }
+    }
+    if(calib_lsc->aLscCof.illuNum>0 && lsFound == false){
+        memcpy(alsc_context->alscSwInfo.awbGain, calib_lsc->aLscCof.illAll[0].awbGain,
+        sizeof(alsc_context->alscSwInfo.awbGain));
+        LOGD_ALSC("%s: alsc lsForFirstFrame:%s", __FUNCTION__, calib_lsc->aLscCof.illAll[0].illuName);
+    }
     LOGI_ALSC("%s: alsc illunum:%d", __FUNCTION__, calib_lsc->aLscCof.illuNum);
     // 1) gtet and reorder para
     //const CalibDb_Lsc_t *pAlscProfile = calib->lsc;

@@ -84,7 +84,8 @@ processing(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outparams)
     accm_handle_t hAccm = (accm_handle_t)(inparams->ctx->accm_para);
     hAccm->accmSwInfo = procAccm->accm_sw_info;
     LOGI_ACCM( "%s accm_proc_com.u.init:%d \n", __FUNCTION__, inparams->u.proc.init);
-    LOGD_ACCM( "%s: awbGain:%f,%f,  awbIIRDampCoef:%f\n", __FUNCTION__,
+    LOGD_ACCM( "%s: sensorGain:%f, awbGain:%f,%f,  awbIIRDampCoef:%f\n", __FUNCTION__,
+               hAccm->accmSwInfo.sensorGain,
                hAccm->accmSwInfo.awbGain[0], hAccm->accmSwInfo.awbGain[1],
                hAccm->accmSwInfo.awbIIRDampCoef);
 

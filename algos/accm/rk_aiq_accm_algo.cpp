@@ -512,6 +512,22 @@ XCamReturn AccmInit(accm_handle_t *hAccm,const CamCalibDbContext_t* calib)
     const CalibDb_Ccm_t *calib_ccm = &calib->ccm;
     accm_context->calibCcm= calib_ccm;
     accm_context->accmSwInfo.sensorGain=1.0;
+    accm_context->accmSwInfo.awbIIRDampCoef = 0;
+    bool lsFound;
+    for(int i = 0; i < calib_ccm->aCcmCof.illuNum; i++) {
+        if(strcmp(calib_ccm->aCcmCof.illAll[i].illuName,calib->awb.stategy_cfg.lsForFirstFrame)==0){
+            memcpy(accm_context->accmSwInfo.awbGain, calib_ccm->aCcmCof.illAll[i].awbGain,
+                sizeof(accm_context->accmSwInfo.awbGain));
+            lsFound = true;
+            LOGD_ACCM("%s: accm lsForFirstFrame:%s", __FUNCTION__, calib_ccm->aCcmCof.illAll[i].illuName);
+            break;
+        }
+    }
+    if(calib_ccm->aCcmCof.illuNum>0 && lsFound == false){
+        memcpy(accm_context->accmSwInfo.awbGain, calib_ccm->aCcmCof.illAll[0].awbGain,
+        sizeof(accm_context->accmSwInfo.awbGain));
+        LOGD_ACCM("%s: accm lsForFirstFrame:%s", __FUNCTION__, calib_ccm->aCcmCof.illAll[0].illuName);
+    }
 
     LOGI_ACCM("%s: accm illunum:%d", __FUNCTION__, calib_ccm->aCcmCof.illuNum);
     // 1) gtet and reorder para

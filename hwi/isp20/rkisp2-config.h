@@ -658,6 +658,7 @@ struct isp2x_wdr_cfg {
 } __attribute__ ((packed));
 
 struct isp2x_dhaz_cfg {
+	//u8 dehaze_en;
     u8 enhance_en;
     u8 hist_chn;
     u8 hpara_en;

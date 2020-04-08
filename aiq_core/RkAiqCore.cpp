@@ -1638,7 +1638,8 @@ RkAiqCore::addDefaultAlgos()
     enableAlgo(RK_AIQ_ALGO_TYPE_ANR, 0, true);
     enableAlgo(RK_AIQ_ALGO_TYPE_AF, 0, true);
     enableAlgo(RK_AIQ_ALGO_TYPE_ASHARP, 0, true);
-	  enableAlgo(RK_AIQ_ALGO_TYPE_ADHAZ, 0, true);
+    enableAlgo(RK_AIQ_ALGO_TYPE_ADHAZ, 0, true);
+    enableAlgo(RK_AIQ_ALGO_TYPE_A3DLUT, 0, true);
 #endif
 #endif
 }

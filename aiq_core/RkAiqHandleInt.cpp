@@ -661,7 +661,6 @@ RkAiqAwbHandleInt::prepare()
 
     RkAiqAlgoConfigAwbInt* awb_config_int = (RkAiqAlgoConfigAwbInt*)mConfig;
     RkAiqCore::RkAiqAlgosShared_t* shared = &mAiqCore->mAlogsSharedParams;
-
     // TODO
     //awb_config_int->rawBit;
 
@@ -2653,34 +2652,29 @@ RkAiqAccmHandleInt::processing()
     if(awb_res ) {
         if(awb_res->awb_gain_algo.grgain < DIVMIN ||
                 awb_res->awb_gain_algo.gbgain < DIVMIN ) {
-            ret = XCAM_RETURN_ERROR_FAILED;
+            LOGE("get wrong awb gain from AWB module ,use default value ");
         } else {
             accm_proc_int->accm_sw_info.awbGain[0] =
                 awb_res->awb_gain_algo.rgain / awb_res->awb_gain_algo.grgain;
 
             accm_proc_int->accm_sw_info.awbGain[1] = awb_res->awb_gain_algo.bgain / awb_res->awb_gain_algo.gbgain;
-            ret = XCAM_RETURN_NO_ERROR;
         }
         accm_proc_int->accm_sw_info.awbIIRDampCoef =  awb_res_int->awb_smooth_factor;
+    }else {
+        LOGE("fail to get awb gain form AWB module,use default value ");
     }
-    RKAIQCORE_CHECK_RET(ret, "fail to get awb_gain_algo");
-#if 0
     RkAiqAlgoPreResAeInt *ae_int = (RkAiqAlgoPreResAeInt*)shared->preResComb.ae_pre_res;
-    ret = XCAM_RETURN_ERROR_FAILED;
-    if( shared->preResComb.ae_pre_res) {
-        int fNormalIndex =  ae_int->aecPreResult.NormalIndex;
-        if(shared->working_mode == RK_AIQ_WORKING_MODE_NORMAL || shared->working_mode == RK_AIQ_WORKING_MODE_SENSOR_HDR) {
-            accm_proc_int->accm_sw_info.sensorGain = ae_int->aecPreResult.LinearExp.exp_real_params.analog_gain;
+    if( ae_int) {
+        int fNormalIndex =  ae_int->ae_pre_res_rk.NormalIndex;
+        if(shared->working_mode == RK_AIQ_WORKING_MODE_NORMAL) {
+            accm_proc_int->accm_sw_info.sensorGain = ae_int->ae_pre_res_rk.LinearExp.exp_real_params.analog_gain;
         } else {
-            accm_proc_int->accm_sw_info.sensorGain = ae_int->aecPreResult.HdrExp[fNormalIndex].exp_real_params.analog_gain;
+            accm_proc_int->accm_sw_info.sensorGain = ae_int->ae_pre_res_rk.HdrExp[fNormalIndex].exp_real_params.analog_gain;
         }
-        ret = XCAM_RETURN_NO_ERROR;
+    }else{
+        LOGE("fail to get sensor gain form AE module,use default value ");
     }
-    RKAIQCORE_CHECK_RET(ret, "fail to get sensor gain ");
-#else
-    // to do
-    accm_proc_int->accm_sw_info.sensorGain = 1.0;
-#endif
+
     RkAiqAlgoDescription* des = (RkAiqAlgoDescription*)mDes;
     ret = des->processing(mProcInParam, mProcOutParam);
     RKAIQCORE_CHECK_RET(ret, "accm algo processing failed");
@@ -4142,36 +4136,30 @@ RkAiqAlscHandleInt::processing()
     if(awb_res) {
         if(awb_res->awb_gain_algo.grgain < DIVMIN ||
                 awb_res->awb_gain_algo.gbgain < DIVMIN ) {
-            ret = XCAM_RETURN_ERROR_FAILED;
+            LOGE("get wrong awb gain from AWB module ,use default value ");
         } else {
             alsc_proc_int->alsc_sw_info.awbGain[0] =
                 awb_res->awb_gain_algo.rgain / awb_res->awb_gain_algo.grgain;
 
             alsc_proc_int->alsc_sw_info.awbGain[1] =
                 awb_res->awb_gain_algo.bgain / awb_res->awb_gain_algo.gbgain;
-            ret = XCAM_RETURN_NO_ERROR;
         }
         alsc_proc_int->alsc_sw_info.awbIIRDampCoef = awb_res_int->awb_smooth_factor;
+    }else{
+        LOGE("fail to get awb gain form AWB module,use default value ");
     }
-#if 0
-    //sprintf(alsc_proc_int->alsc_sw_info.resName, "%d_%d", shared->width, shared->height);
     RkAiqAlgoPreResAeInt *ae_int = (RkAiqAlgoPreResAeInt*)shared->preResComb.ae_pre_res;
-    ret = XCAM_RETURN_ERROR_FAILED;
-    if( shared->preResComb.ae_pre_res) {
-        int fNormalIndex =  ae_int->aecPreResult.NormalIndex;
-        if(shared->working_mode == RK_AIQ_WORKING_MODE_NORMAL || shared->working_mode == RK_AIQ_WORKING_MODE_SENSOR_HDR) {
-            alsc_proc_int->alsc_sw_info.sensorGain = ae_int->aecPreResult.LinearExp.exp_real_params.analog_gain;
+    if( ae_int) {
+        int fNormalIndex =  ae_int->ae_pre_res_rk.NormalIndex;
+        if((rk_aiq_working_mode_t)shared->working_mode == RK_AIQ_WORKING_MODE_NORMAL){
+            alsc_proc_int->alsc_sw_info.sensorGain = ae_int->ae_pre_res_rk.LinearExp.exp_real_params.analog_gain;
         } else {
-            alsc_proc_int->alsc_sw_info.sensorGain = ae_int->aecPreResult.HdrExp[fNormalIndex].exp_real_params.analog_gain;
+            alsc_proc_int->alsc_sw_info.sensorGain = ae_int->ae_pre_res_rk.HdrExp[fNormalIndex].exp_real_params.analog_gain;
         }
-        ret = XCAM_RETURN_NO_ERROR;
+    }else{
+        LOGE("fail to get sensor gain form AE module,use default value ");
     }
-    RKAIQCORE_CHECK_RET(ret, "fail to get sensor gain ");
-#else
-    // to do
-    alsc_proc_int->alsc_sw_info.sensorGain = 1.0;
-    //strcpy(alsc_proc_int->alsc_sw_info.resName, "2712x1536");
-#endif
+
     RkAiqAlgoDescription* des = (RkAiqAlgoDescription*)mDes;
     ret = des->processing(mProcInParam, mProcOutParam);
     RKAIQCORE_CHECK_RET(ret, "alsc algo processing failed");
