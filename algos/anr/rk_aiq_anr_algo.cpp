@@ -63,6 +63,8 @@ ANRresult_t ANRInit(ANRContext_t **ppANRCtx, CamCalibDbContext_t *pCalibDb)
 	init_mfnr_params(&pANRCtx->stAuto.stMfnrParams, &pANRCtx->stMfnrCalib);
 	#endif
 
+	pANRCtx->stAuto.gainTableEn = 1;
+
 	LOGD_ANR("%s(%d): bayernr %f %f %f %d %d %f", __FUNCTION__, __LINE__, 
 			pANRCtx->stAuto.stBayernrParams.filtpar[0],
 			pANRCtx->stAuto.stBayernrParams.filtpar[4],
@@ -171,6 +173,28 @@ ANRresult_t ANRProcess(ANRContext_t *pANRCtx, ANRExpInfo_t *pExpInfo)
 
 }
 
+ANRresult_t ANRSetGainMode(ANRProcResult_t* pANRResult)
+{
+	LOGI_ANR("%s(%d): enter!\n", __FUNCTION__, __LINE__);
+
+	if(pANRResult == NULL){
+		LOGE_ANR("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
+		return ANR_RET_INVALID_PARM;
+	}
+
+	if(pANRResult->stGainFix.gain_table_en){
+		pANRResult->stMfnrFix.gain_en = 0;
+		pANRResult->stUvnrFix.nr_gain_en = 1;
+		
+	}else{
+		pANRResult->stMfnrFix.gain_en = 1;
+		pANRResult->stUvnrFix.nr_gain_en = 1;
+	}
+
+	return ANR_RET_SUCCESS;
+}
+
+
 //anr get result
 ANRresult_t ANRGetProcResult(ANRContext_t *pANRCtx, ANRProcResult_t* pANRResult)
 {
@@ -197,6 +221,7 @@ ANRresult_t ANRGetProcResult(ANRContext_t *pANRCtx, ANRProcResult_t* pANRResult)
 		pANRResult->mfnrEn = pANRCtx->stAuto.mfnrEn;
 		pANRResult->ynrEN = pANRCtx->stAuto.ynrEn;
 		pANRResult->uvnrEn = pANRCtx->stAuto.uvnrEn;
+		pANRResult->gainTableEn = pANRCtx->stAuto.gainTableEn;
 		
 		
 	}else if(pANRCtx->eMode == ANR_OP_MODE_MANUAL){
@@ -209,7 +234,7 @@ ANRresult_t ANRGetProcResult(ANRContext_t *pANRCtx, ANRProcResult_t* pANRResult)
 		pANRResult->stYnrParamSelect = pANRCtx->stManual.stYnrParamSelect;
 		pANRResult->uvnrEn = pANRCtx->stManual.uvnrEn;
 		pANRResult->stUvnrParamSelect = pANRCtx->stManual.stUvnrParamSelect;
-		
+		pANRResult->gainTableEn = pANRCtx->stManual.gainTableEn;
 	}
 
 	//transfer to reg value
@@ -217,10 +242,13 @@ ANRresult_t ANRGetProcResult(ANRContext_t *pANRCtx, ANRProcResult_t* pANRResult)
 	mfnr_fix_transfer(&pANRResult->stMfnrParamSelect, &pANRResult->stMfnrFix, &pANRCtx->stExpInfo);
 	ynr_fix_transfer(&pANRResult->stYnrParamSelect, &pANRResult->stYnrFix);
 	uvnr_fix_transfer(&pANRResult->stUvnrParamSelect, &pANRResult->stUvnrFix);
+	gain_fix_transfer(&pANRResult->stMfnrParamSelect, &pANRResult->stGainFix, &pANRCtx->stExpInfo);
 	pANRResult->stBayernrFix.rawnr_en = pANRResult->bayernrEn;
 	pANRResult->stMfnrFix.tnr_en = pANRResult->mfnrEn;
 	pANRResult->stYnrFix.ynr_en = pANRResult->ynrEN;
 	pANRResult->stUvnrFix.uvnr_en = pANRResult->uvnrEn;
+	pANRResult->stGainFix.gain_table_en = pANRResult->gainTableEn;
+	ANRSetGainMode(pANRResult);	
 	
 	LOGI_ANR("%s(%d): exit!\n", __FUNCTION__, __LINE__);
 	return ANR_RET_SUCCESS;

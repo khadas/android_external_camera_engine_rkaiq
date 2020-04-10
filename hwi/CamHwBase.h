@@ -38,7 +38,7 @@ public:
     // from ICamHw
     virtual XCamReturn init(const char* sns_ent_name);
     virtual XCamReturn deInit();
-    virtual XCamReturn prepare(uint32_t width, uint32_t height, int mode);
+    virtual XCamReturn prepare(uint32_t width, uint32_t height, int mode, int t_dealy, int g_delay);
     virtual XCamReturn start();
     virtual XCamReturn stop();
     virtual XCamReturn getSensorModeData(const char* sns_ent_name,

@@ -40,7 +40,7 @@ CamHwBase::deInit()
 }
 
 XCamReturn
-CamHwBase::prepare(uint32_t width, uint32_t height, int mode)
+CamHwBase::prepare(uint32_t width, uint32_t height, int mode, int t_delay, int g_delay)
 {
     // TODO
     // check sensor's output width,height

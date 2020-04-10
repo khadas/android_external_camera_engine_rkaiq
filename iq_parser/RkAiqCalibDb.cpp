@@ -94,7 +94,7 @@ void RkAiqCalibDb::releaseCalibDb()
             if(pCalibDb->sensor.GainRange.pGainRange != NULL)
                 free(pCalibDb->sensor.GainRange.pGainRange);
 
-            LOGE("releaseCalibDb!");
+            LOGI("releaseCalibDb!");
             delete pCalibDb;
         }
     }

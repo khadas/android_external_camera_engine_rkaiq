@@ -942,10 +942,16 @@ Isp20Params::convertAiqAwbGainToIsp20Params(struct isp2x_isp_params_cfg& isp_cfg
         const rk_aiq_wb_gain_t& awb_gain)
 {
     struct isp2x_awb_gain_cfg *  cfg = &isp_cfg.others.awb_gain_cfg;
-    cfg->gain_red       = (uint16_t)(0.5 + awb_gain.rgain * (1 << ISP2X_WBGAIN_FIXSCALE_BIT));
-    cfg->gain_blue      = (uint16_t)(0.5 + awb_gain.bgain * (1 << ISP2X_WBGAIN_FIXSCALE_BIT));
-    cfg->gain_green_r   = (uint16_t)(0.5 + awb_gain.grgain * (1 << ISP2X_WBGAIN_FIXSCALE_BIT));
-    cfg->gain_green_b   = (uint16_t)(0.5 + awb_gain.gbgain * (1 << ISP2X_WBGAIN_FIXSCALE_BIT));
+    uint16_t max_wb_gain = (1 << (ISP2X_WBGAIN_FIXSCALE_BIT+2))-1;
+    //LOGE("max_wb_gain:%d\n",max_wb_gain);
+    uint16_t R = (uint16_t)(0.5 + awb_gain.rgain * (1 << ISP2X_WBGAIN_FIXSCALE_BIT));
+    uint16_t B = (uint16_t)(0.5 + awb_gain.bgain * (1 << ISP2X_WBGAIN_FIXSCALE_BIT));
+    uint16_t Gr = (uint16_t)(0.5 + awb_gain.grgain * (1 << ISP2X_WBGAIN_FIXSCALE_BIT));
+    uint16_t Gb = (uint16_t)(0.5 + awb_gain.gbgain * (1 << ISP2X_WBGAIN_FIXSCALE_BIT));
+    cfg->gain_red       = R > max_wb_gain ? max_wb_gain : R;
+    cfg->gain_blue      = B > max_wb_gain ? max_wb_gain : B;
+    cfg->gain_green_r   = Gr > max_wb_gain ? max_wb_gain : Gr ;
+    cfg->gain_green_b   = Gb > max_wb_gain ? max_wb_gain : Gb;
 }
 /*
 
@@ -1041,7 +1047,7 @@ void Isp20Params::convertAiqAgammaToIsp20Params(struct isp2x_isp_params_cfg& isp
 		isp_cfg.module_en_update |= ISP2X_MODULE_GOC;
         isp_cfg.module_cfg_update |= ISP2X_MODULE_GOC;
     }
-    
+
 
     struct isp2x_gammaout_cfg* cfg = &isp_cfg.others.gammaout_cfg;
     cfg->offset = gamma_out_cfg.gamma_out_offset;
@@ -1060,7 +1066,7 @@ void Isp20Params::convertAiqAdehazeToIsp20Params(struct isp2x_isp_params_cfg& is
 
     int rawWidth = 1920;
     int rawHeight = 1080;
-    
+
     if(dhaze.dehaze_en[0]){
 	    isp_cfg.module_ens |= ISP2X_MODULE_DHAZ;
 	    isp_cfg.module_en_update |= ISP2X_MODULE_DHAZ;
@@ -2066,6 +2072,70 @@ Isp20Params::convertAiqSharpenToIsp20Params(struct rkispp_params_cfg& pp_cfg,
 
 
 
+void
+Isp20Params::convertAiqGainToIsp20Params(struct isp2x_isp_params_cfg& isp_cfg,
+        rk_aiq_isp_gain_t& gain)
+{
+    LOGD("%s:(%d) enter \n", __FUNCTION__, __LINE__);
+
+    int i = 0;
+    struct isp2x_gain_cfg * pGainCfg = &isp_cfg.others.gain_cfg;
+
+    LOGD("gain table en %d \n", gain.gain_table_en);
+	if(gain.gain_table_en){
+    	isp_cfg.module_ens |= ISP2X_MODULE_GAIN;
+        isp_cfg.module_en_update |= ISP2X_MODULE_GAIN;
+        isp_cfg.module_cfg_update |= ISP2X_MODULE_GAIN;
+	}
+
+	#if 0
+	pGainCfg->dhaz_en = 0;
+	pGainCfg->wdr_en = 0;
+	pGainCfg->tmo_en = 0;
+	pGainCfg->lsc_en = 0;
+	pGainCfg->mge_en = 0;
+
+	if(isp_cfg.module_ens & ISP2X_MODULE_DHAZ){
+		pGainCfg->dhaz_en = 1;
+	}
+
+	if(isp_cfg.module_ens & ISP2X_MODULE_WDR){
+		pGainCfg->wdr_en = 1;
+	}
+
+	if(isp_cfg.others.hdrmge_cfg.mode){
+		pGainCfg->tmo_en = 1;
+		pGainCfg->mge_en = 1;
+	}
+
+	if(isp_cfg.module_ens & ISP2X_MODULE_LSC){
+		pGainCfg->lsc_en = 1;
+	}
+
+
+	LOGD("%s:%d gain en: %d %d %d %d %d\n",
+		__FUNCTION__, __LINE__,
+		pGainCfg->dhaz_en, pGainCfg->wdr_en,
+		pGainCfg->tmo_en, pGainCfg->lsc_en,
+		pGainCfg->mge_en);
+	#endif
+
+	for(i=0; i<ISP2X_GAIN_HDRMGE_GAIN_NUM; i++){
+		pGainCfg->mge_gain[i] = gain.mge_gain[i];
+	}
+
+  	for(i=0; i<ISP2X_GAIN_IDX_NUM; i++){
+		pGainCfg->idx[i] = gain.idx[i];
+	}
+
+   	for(i=0; i<ISP2X_GAIN_LUT_NUM; i++){
+		pGainCfg->lut[i] = gain.lut[i];
+	}
+
+    LOGD("%s:(%d) exit \n", __FUNCTION__, __LINE__);
+}
+
+
 XCamReturn
 Isp20Params::convertAiqResultsToIsp20Params(struct isp2x_isp_params_cfg& isp_cfg,
         SmartPtr<RkAiqIspParamsProxy> aiq_results,
@@ -2088,6 +2158,8 @@ Isp20Params::convertAiqResultsToIsp20Params(struct isp2x_isp_params_cfg& isp_cfg
     convertAiqAdehazeToIsp20Params(isp_cfg, aiq_results->data()->adhaz_config);
     convertAiqA3dlutToIsp20Params(isp_cfg, aiq_results->data()->lut3d);
 
+	//must be at the end of isp module
+	convertAiqGainToIsp20Params(isp_cfg, aiq_results->data()->gain_config);
     /*
      * enable the modules that has been verified to work properly on the board
      * TODO: enable all modules after validation in isp

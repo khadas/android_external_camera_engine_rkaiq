@@ -102,6 +102,8 @@ public:
     XCamReturn stop();
 
     XCamReturn pushStats(SmartPtr<VideoBuffer> &buffer);
+
+    XCamReturn prepare(int mode);
 private:
     // in analyzer thread
     XCamReturn analyze(const SmartPtr<VideoBuffer> &buffer);
@@ -115,6 +117,7 @@ private:
     };
     
     int mState;
+    int mWorkingMode;
     RkLumaAnalyzerCb* mCb;
     SmartPtr<RkLumaCoreThread> mRkLumaCoreTh;
     SafeList<isp_luma_stat_t> mLumaQueueFIFO;

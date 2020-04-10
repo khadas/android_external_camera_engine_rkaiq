@@ -379,6 +379,8 @@ CamHwSimulator::getSensorModeData(const char* sns_ent_name,
 {
     sns_des.sensor_output_width = g_simisp_params.rawWidth;
     sns_des.sensor_output_height = g_simisp_params.rawHeight;
+    sns_des.isp_acq_width = g_simisp_params.rawWidth;
+    sns_des.isp_acq_height = g_simisp_params.rawHeight;
 
     return XCAM_RETURN_NO_ERROR;
 }

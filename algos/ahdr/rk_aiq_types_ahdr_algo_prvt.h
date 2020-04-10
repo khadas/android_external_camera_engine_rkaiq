@@ -32,7 +32,7 @@
 #define SHIFT11BIT(A)         (A*2048)
 #define SHIFT12BIT(A)         (A*4096)
 
-#define LRK_DEBUG_LOG  (0)
+#define LRK_DEBUG_LOG  (1)
 
 #define AHDR_RET_SUCCESS             0   //!< this has to be 0, if clauses rely on it
 #define AHDR_RET_FAILURE             1   //!< general failure

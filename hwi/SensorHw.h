@@ -70,22 +70,31 @@ public:
                                      int frame_id = -1);
     XCamReturn getEffectiveParams(SmartPtr<RkAiqExpParamsProxy>& ExpParams, int frame_id);
     XCamReturn set_working_mode(int mode);
+    XCamReturn set_exp_delay_info(int time_delay, int gain_delay);
+    XCamReturn start();
+    XCamReturn stop();
 
 private:
     XCAM_DEAD_COPY (SensorHw);
     Mutex _mutex;
-    const int _exp_delay = 3;
     int _working_mode;
     std::list<SmartPtr<RkAiqExpParamsProxy>> _exp_list;
     std::map<int, SmartPtr<RkAiqExpParamsProxy>> _effecting_exp_map;
     bool _first;
     int _frame_sequence;
-
+    rk_aiq_exposure_sensor_descriptor _sensor_desc;
+    std::list<SmartPtr<RkAiqExpParamsProxy>> _delayed_gain_list;
+    SmartPtr<RkAiqExpParamsProxy> _last_exp_time;
+    SmartPtr<RkAiqExpParamsProxy> _last_exp_gain;
+    int _gain_delay;
+    int _time_delay;
+    bool _gain_delayed;
     int get_sensor_fps(float& fps);
-    XCamReturn setLinearSensorExposure(SmartPtr<RkAiqExpParamsProxy>& expPar);
-    XCamReturn setHdrSensorExposure(SmartPtr<RkAiqExpParamsProxy>& expPar);
+    XCamReturn setLinearSensorExposure(RKAiqAecExpInfo_t* expPar);
+    XCamReturn setHdrSensorExposure(RKAiqAecExpInfo_t* expPar);
     XCamReturn setExposure(int frameid);
     uint32_t get_v4l2_pixelformat(uint32_t pixelcode);
+    XCamReturn composeExpParam(SmartPtr<RkAiqExpParamsProxy>& timeValid,SmartPtr<RkAiqExpParamsProxy>& gainValid, RKAiqAecExpInfo_t* newExp);
 };
 
 }; //namespace RkCam

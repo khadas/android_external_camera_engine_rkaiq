@@ -16,6 +16,7 @@
  */
 
 #include "RkAiqManager.h"
+#include "isp20/Isp20_module_dbg.h"
 
 using namespace XCam;
 namespace RkCam {
@@ -32,22 +33,26 @@ RkAiqRstApplyThread::loop ()
     ENTER_XCORE_FUNCTION();
 
     const static int32_t timeout = -1;
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
     SmartPtr<RkAiqFullParamsProxy> results = mAiqRstQueue.pop (timeout);
 
     XCAM_ASSERT (mAiqMng);
 
     if (!results.ptr()) {
-        XCAM_LOG_ERROR("RkAiqRstApplyThread got empty result, stop thread");
+        XCAM_LOG_WARNING("RkAiqRstApplyThread got empty result, stop thread");
         return false;
     }
 
-    XCamReturn ret = mAiqMng->applyAnalyzerResult(results);
+#ifdef RUNTIME_MODULE_DEBUG
+    if (g_apply_init_params_only)
+        goto out;
+#endif
+    ret = mAiqMng->applyAnalyzerResult(results);
     if (ret == XCAM_RETURN_NO_ERROR)
         return true;
 
-    XCAM_LOG_ERROR ("RkAiqCoreThread failed to apply 3a results");
     EXIT_XCORE_FUNCTION();
-
+out:
     // always true
     return true;
 }
@@ -151,7 +156,9 @@ RkAiqManager::prepare(uint32_t width, uint32_t height, rk_aiq_working_mode_t mod
     rk_aiq_exposure_sensor_descriptor sensor_des;
 
     XCAM_ASSERT (mCalibDb);
-
+#ifdef RUNTIME_MODULE_DEBUG
+    get_dbg_force_disable_mods_env();
+#endif
     int working_mode_hw;
     if (mode == RK_AIQ_WORKING_MODE_NORMAL) {
         working_mode_hw = mode;
@@ -163,11 +170,13 @@ RkAiqManager::prepare(uint32_t width, uint32_t height, rk_aiq_working_mode_t mod
             working_mode_hw = mCalibDb->sysContrl.hdr_mode;
         }
     }
-    ret = mCamHw->prepare(width, height, working_mode_hw);
+    ret = mCamHw->prepare(width, height, working_mode_hw, mCalibDb->sysContrl.time_delay, mCalibDb->sysContrl.gain_delay);
     RKAIQMNG_CHECK_RET(ret, "camhw prepare error %d", ret);
 
     xcam_mem_clear(sensor_des);
     ret = mCamHw->getSensorModeData(mSnsEntName, sensor_des);
+
+    ret = mRkLumaAnalyzer->prepare(working_mode_hw);
 
     RKAIQMNG_CHECK_RET(ret, "getSensorModeData error %d", ret);
     ret = mRkAiqAnalyzer->prepare(&sensor_des, working_mode_hw);
@@ -299,19 +308,32 @@ RkAiqManager::applyAnalyzerResult(SmartPtr<RkAiqFullParamsProxy>& results)
     ENTER_XCORE_FUNCTION();
 
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    RkAiqFullParams* aiqParams = NULL; 
 
     if (!results.ptr()) {
         LOGW_ANALYZER("empty aiq params results!");
         return ret;
     }
 
-    RkAiqFullParams* aiqParams = results->data().ptr();
+    aiqParams = results->data().ptr();
+
+#ifdef RUNTIME_MODULE_DEBUG
+    get_dbg_force_disable_mods_env();
+    if (g_bypass_isp_params)
+        goto set_isp_end;
+#endif
 
     if (aiqParams->mIspParams.ptr()) {
         ret = mCamHw->setIspParams(aiqParams->mIspParams);
         if (ret)
             LOGE_ANALYZER("setIspParams error %d", ret);
     }
+set_isp_end:
+
+#ifdef RUNTIME_MODULE_DEBUG
+    if (g_bypass_ispp_params)
+        goto set_ispp_end;
+#endif
 
 #ifndef DISABLE_PP 
     if (aiqParams->mIsppParams.ptr()) {
@@ -319,6 +341,13 @@ RkAiqManager::applyAnalyzerResult(SmartPtr<RkAiqFullParamsProxy>& results)
         if (ret)
             LOGE_ANALYZER("setIsppParams error %d", ret);
     }
+#endif
+
+set_ispp_end:
+
+#ifdef RUNTIME_MODULE_DEBUG
+    if (g_bypass_exp_params)
+        goto set_exp_end;
 #endif
     if (aiqParams->mExposureParams.ptr()) {
         /*
@@ -361,6 +390,7 @@ RkAiqManager::applyAnalyzerResult(SmartPtr<RkAiqFullParamsProxy>& results)
 #endif
     }
 
+set_exp_end:
     if (aiqParams->mFocusParams.ptr()) {
         ret = mCamHw->setFocusParams(aiqParams->mFocusParams);
         if (ret)
@@ -368,7 +398,7 @@ RkAiqManager::applyAnalyzerResult(SmartPtr<RkAiqFullParamsProxy>& results)
     }
 
     EXIT_XCORE_FUNCTION();
-
+out:
     return ret;
 }
 

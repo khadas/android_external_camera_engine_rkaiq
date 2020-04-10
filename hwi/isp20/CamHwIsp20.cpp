@@ -18,6 +18,7 @@
 #include "CamHwIsp20.h"
 #include "Isp20PollThread.h"
 #include "rk_isp20_hw.h"
+#include "Isp20_module_dbg.h"
 #include "mediactl/mediactl-priv.h"
 #include <linux/v4l2-subdev.h>
 
@@ -444,7 +445,7 @@ CamHwIsp20::selectIqFile(const char* sns_ent_name, char* iqfile_name)
     }
     base_inf = &(it->second.ptr()->mod_info.base);
     if (!strlen(base_inf->module) || !strlen(base_inf->sensor) ||
-        !strlen(base_inf->lens)) {
+            !strlen(base_inf->lens)) {
         LOGE("no camera module info, check the drv !");
         return XCAM_RETURN_ERROR_SENSOR;
     }
@@ -572,7 +573,7 @@ CamHwIsp20::init(const char* sns_ent_name)
     ENTER_CAMHW_FUNCTION();
 
     std::map<std::string, SmartPtr<rk_sensor_full_info_t>>::iterator it;
-    if ((it=mSensorHwInfos.find(sensor_name)) == mSensorHwInfos.end()) {
+    if ((it = mSensorHwInfos.find(sensor_name)) == mSensorHwInfos.end()) {
         LOGE("can't find sensor %s", sns_ent_name);
         return XCAM_RETURN_ERROR_SENSOR;
     }
@@ -636,7 +637,7 @@ CamHwIsp20::init(const char* sns_ent_name)
     mPollLumathread->set_isp_luma_device(mIspLumaDev);
     mPollLumathread->set_poll_callback (this);
 
-#ifndef DISABLE_PP 
+#ifndef DISABLE_PP
     isp20IsppPollthread = new PollThread();
     mPollIsppthread = isp20IsppPollthread;
     mPollIsppthread->set_ispp_stats_device(mIsppStatsDev);
@@ -686,7 +687,7 @@ CamHwIsp20::setupHdrLink(int hdr_mode, int isp_index, bool enable)
     if (enable)
         media_setup_link(device, src_pad_s, sink_pad, MEDIA_LNK_FL_ENABLED);
     else
-        media_setup_link(device, src_pad_s, sink_pad, ~MEDIA_LNK_FL_ENABLED);
+        media_setup_link(device, src_pad_s, sink_pad, 0);
 
     entity = media_get_entity_by_name(device, "rkisp_rawrd0_m", strlen("rkisp_rawrd0_m"));
     if(entity) {
@@ -699,7 +700,7 @@ CamHwIsp20::setupHdrLink(int hdr_mode, int isp_index, bool enable)
     if (enable)
         media_setup_link(device, src_pad_m, sink_pad, MEDIA_LNK_FL_ENABLED);
     else
-        media_setup_link(device, src_pad_m, sink_pad, ~MEDIA_LNK_FL_ENABLED);
+        media_setup_link(device, src_pad_m, sink_pad, 0);
 
     if (RK_AIQ_HDR_GET_WORKING_MODE(hdr_mode) == RK_AIQ_WORKING_MODE_ISP_HDR3) {
         entity = media_get_entity_by_name(device, "rkisp_rawrd1_l", strlen("rkisp_rawrd1_l"));
@@ -713,7 +714,7 @@ CamHwIsp20::setupHdrLink(int hdr_mode, int isp_index, bool enable)
         if (enable)
             media_setup_link(device, src_pad_l, sink_pad, MEDIA_LNK_FL_ENABLED);
         else
-            media_setup_link(device, src_pad_l, sink_pad, ~MEDIA_LNK_FL_ENABLED);
+            media_setup_link(device, src_pad_l, sink_pad, 0);
     }
     media_device_unref (device);
     return XCAM_RETURN_NO_ERROR;
@@ -723,7 +724,18 @@ FAIL:
 }
 
 XCamReturn
-CamHwIsp20::prepare(uint32_t width, uint32_t height, int mode)
+CamHwIsp20::setExpDelayInfo(int time_delay, int gain_delay)
+{
+    ENTER_CAMHW_FUNCTION();
+    SmartPtr<SensorHw> sensorHw;
+    sensorHw = mSensorDev.dynamic_cast_ptr<SensorHw>();
+    sensorHw->set_exp_delay_info(time_delay, gain_delay);
+    EXIT_CAMHW_FUNCTION();
+    return XCAM_RETURN_NO_ERROR;
+}
+
+XCamReturn
+CamHwIsp20::prepare(uint32_t width, uint32_t height, int mode, int t_delay, int g_delay)
 {
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
     SmartPtr<Isp20PollThread> isp20Pollthread;
@@ -738,10 +750,10 @@ CamHwIsp20::prepare(uint32_t width, uint32_t height, int mode)
 
     sensorHw = mSensorDev.dynamic_cast_ptr<SensorHw>();
     sensorHw->set_working_mode(mode);
-
+    sensorHw->set_exp_delay_info(t_delay, g_delay);
     isp20Pollthread = mPollthread.dynamic_cast_ptr<Isp20PollThread>();
     isp20Pollthread->set_working_mode(mode);
-    // TODO: may start devices in start() ? 
+    // TODO: may start devices in start() ?
     ret = isp20Pollthread->hdr_mipi_start(sensorHw);
     if (ret < 0) {
         LOGE("hdr mipi start err: %d\n", ret);
@@ -767,10 +779,10 @@ CamHwIsp20::prepare(uint32_t width, uint32_t height, int mode)
         LOGE("start isp params dev err: %d\n", ret);
     }
 
-#ifndef DISABLE_PP 
+#ifndef DISABLE_PP
     mIsppParamsDev->start();
     if (ret < 0) {
-	LOGE("start ispp params dev err: %d\n", ret);
+        LOGE("start ispp params dev err: %d\n", ret);
     }
 #endif
 
@@ -790,7 +802,7 @@ CamHwIsp20::start()
 
     isp20Pollthread = mPollthread.dynamic_cast_ptr<Isp20PollThread>();
     sensorHw = mSensorDev.dynamic_cast_ptr<SensorHw>();
-    
+
     // restart if in stop state
     if (_state == CAM_HW_STATE_STOPED) {
         ret = isp20Pollthread->hdr_mipi_start(sensorHw);
@@ -818,19 +830,20 @@ CamHwIsp20::start()
             LOGE("start isp params dev err: %d\n", ret);
         }
 
-#ifndef DISABLE_PP 
+#ifndef DISABLE_PP
         mIsppParamsDev->start();
         if (ret < 0) {
-        LOGE("start ispp params dev err: %d\n", ret);
+            LOGE("start ispp params dev err: %d\n", ret);
         }
 #endif
     }
 
     mPollthread->start();
     mPollLumathread->start();
-#ifndef DISABLE_PP 
+#ifndef DISABLE_PP
     mPollIsppthread->start();
 #endif
+    sensorHw->start();
     _is_exit = false;
     _state = CAM_HW_STATE_STARTED;
 
@@ -842,12 +855,15 @@ XCamReturn CamHwIsp20::stop()
 {
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
     SmartPtr<Isp20PollThread> isp20Pollthread;
+    SmartPtr<SensorHw> sensorHw;
 
     ENTER_CAMHW_FUNCTION();
     isp20Pollthread = mPollthread.dynamic_cast_ptr<Isp20PollThread>();
+    sensorHw = mSensorDev.dynamic_cast_ptr<SensorHw>();
+    sensorHw->stop();
     mPollthread->stop();
     mPollLumathread->stop();
-#ifndef DISABLE_PP 
+#ifndef DISABLE_PP
     mPollIsppthread->stop();
 #endif
     ret = mIspLumaDev->stop();
@@ -870,10 +886,10 @@ XCamReturn CamHwIsp20::stop()
         LOGE("stop isp params dev err: %d\n", ret);
     }
 
-#ifndef DISABLE_PP 
+#ifndef DISABLE_PP
     mIsppParamsDev->stop();
     if (ret < 0) {
-	LOGE("stop ispp params dev err: %d\n", ret);
+        LOGE("stop ispp params dev err: %d\n", ret);
     }
 #endif
     ret = isp20Pollthread->hdr_mipi_stop();
@@ -980,6 +996,9 @@ CamHwIsp20::gen_full_isp_params(const struct isp2x_isp_params_cfg* update_params
             case RK_ISP2X_RAWNR_ID:
                 full_params->others.rawnr_cfg = update_params->others.rawnr_cfg;
                 break;
+			case RK_ISP2X_GAIN_ID:
+                full_params->others.gain_cfg = update_params->others.gain_cfg;
+                break;
             default:
                 break;
             }
@@ -1080,9 +1099,9 @@ CamHwIsp20::setIspParamsSync()
         update_params.module_ens |= 1LL << RK_ISP2X_RAWAE_LITE_ID;
         update_params.module_cfg_update |= 1LL << RK_ISP2X_RAWAE_LITE_ID;
 
-	update_params.module_en_update |= 1LL << RK_ISP2X_RAWAE_BIG1_ID;
-	update_params.module_ens |= 1LL << RK_ISP2X_RAWAE_BIG1_ID;
-	update_params.module_cfg_update |= 1LL << RK_ISP2X_RAWAE_BIG1_ID;
+        update_params.module_en_update |= 1LL << RK_ISP2X_RAWAE_BIG1_ID;
+        update_params.module_ens |= 1LL << RK_ISP2X_RAWAE_BIG1_ID;
+        update_params.module_cfg_update |= 1LL << RK_ISP2X_RAWAE_BIG1_ID;
 
         update_params.module_en_update |= 1LL << RK_ISP2X_RAWAE_BIG2_ID;
         update_params.module_ens |= 1LL << RK_ISP2X_RAWAE_BIG2_ID;
@@ -1097,9 +1116,9 @@ CamHwIsp20::setIspParamsSync()
         update_params.module_ens |= 1LL << RK_ISP2X_RAWHIST_LITE_ID;
         update_params.module_cfg_update |= 1LL << RK_ISP2X_RAWHIST_LITE_ID;
 
-	update_params.module_en_update |= 1LL << RK_ISP2X_RAWHIST_BIG1_ID;
-	update_params.module_ens |= 1LL << RK_ISP2X_RAWHIST_BIG1_ID;
-	update_params.module_cfg_update |= 1LL << RK_ISP2X_RAWHIST_BIG1_ID;
+        update_params.module_en_update |= 1LL << RK_ISP2X_RAWHIST_BIG1_ID;
+        update_params.module_ens |= 1LL << RK_ISP2X_RAWHIST_BIG1_ID;
+        update_params.module_cfg_update |= 1LL << RK_ISP2X_RAWHIST_BIG1_ID;
 
         update_params.module_en_update |= 1LL << RK_ISP2X_RAWHIST_BIG2_ID;
         update_params.module_ens |= 1LL << RK_ISP2X_RAWHIST_BIG2_ID;
@@ -1109,29 +1128,34 @@ CamHwIsp20::setIspParamsSync()
         update_params.module_ens |= 1LL << RK_ISP2X_RAWHIST_BIG3_ID;
         update_params.module_cfg_update |= 1LL << RK_ISP2X_RAWHIST_BIG3_ID;
 
-	update_params.module_en_update |= 1LL << RK_ISP2X_HDRMGE_ID;
-	update_params.module_ens |= 1LL << RK_ISP2X_HDRMGE_ID;
-	update_params.module_cfg_update |= 1LL << RK_ISP2X_HDRMGE_ID;
+        update_params.module_en_update |= 1LL << RK_ISP2X_HDRMGE_ID;
+        update_params.module_ens |= 1LL << RK_ISP2X_HDRMGE_ID;
+        update_params.module_cfg_update |= 1LL << RK_ISP2X_HDRMGE_ID;
 
-	update_params.module_en_update |= 1LL << RK_ISP2X_HDRTMO_ID;
-	update_params.module_ens |= 1LL << RK_ISP2X_HDRTMO_ID;
-	update_params.module_cfg_update |= 1LL << RK_ISP2X_HDRTMO_ID;
+        update_params.module_en_update |= 1LL << RK_ISP2X_HDRTMO_ID;
+        update_params.module_ens |= 1LL << RK_ISP2X_HDRTMO_ID;
+        update_params.module_cfg_update |= 1LL << RK_ISP2X_HDRTMO_ID;
 
         /* awb update */
-	update_params.module_en_update |= 1LL << RK_ISP2X_AWB_GAIN_ID;
-	update_params.module_ens |= 1LL << RK_ISP2X_AWB_GAIN_ID;
-	update_params.module_cfg_update |= 1LL << RK_ISP2X_AWB_GAIN_ID;
+        update_params.module_en_update |= 1LL << RK_ISP2X_AWB_GAIN_ID;
+        update_params.module_ens |= 1LL << RK_ISP2X_AWB_GAIN_ID;
+        update_params.module_cfg_update |= 1LL << RK_ISP2X_AWB_GAIN_ID;
 
-	update_params.module_en_update |= 1LL << RK_ISP2X_RAWAWB_ID;
-	update_params.module_ens |= 1LL << RK_ISP2X_RAWAWB_ID;
-	update_params.module_cfg_update |= 1LL << RK_ISP2X_RAWAWB_ID;
+        update_params.module_en_update |= 1LL << RK_ISP2X_RAWAWB_ID;
+        update_params.module_ens |= 1LL << RK_ISP2X_RAWAWB_ID;
+        update_params.module_cfg_update |= 1LL << RK_ISP2X_RAWAWB_ID;
 
-    update_params.module_en_update |= 1LL << RK_ISP2X_RAWAF_ID;
-    update_params.module_ens |= 1LL << RK_ISP2X_RAWAF_ID;
-    update_params.module_cfg_update |= 1LL << RK_ISP2X_RAWAF_ID;
+        update_params.module_en_update |= 1LL << RK_ISP2X_RAWAF_ID;
+        update_params.module_ens |= 1LL << RK_ISP2X_RAWAF_ID;
+        update_params.module_cfg_update |= 1LL << RK_ISP2X_RAWAF_ID;
 #endif
         gen_full_isp_params(&update_params, &_full_active_isp_params);
 
+#ifdef RUNTIME_MODULE_DEBUG
+        _full_active_isp_params.module_en_update &= ~g_disable_isp_modules_en;
+        _full_active_isp_params.module_ens |= g_disable_isp_modules_en;
+        _full_active_isp_params.module_cfg_update &= ~g_disable_isp_modules_cfg_update;
+#endif
         dump_isp_config(&_full_active_isp_params, aiq_results);
     }
 
@@ -1214,6 +1238,11 @@ CamHwIsp20::setIsppParams(SmartPtr<RkAiqIsppParamsProxy>& isppParams)
             ispp_params = (struct rkispp_params_cfg*)v4l2buf->get_buf().m.userptr;
             convertAiqResultsToIsp20PpParams(*ispp_params, isppParams);
 
+#ifdef RUNTIME_MODULE_DEBUG
+            ispp_params->module_en_update &= ~g_disable_ispp_modules_en;
+            ispp_params->module_ens |= g_disable_ispp_modules_en;
+            ispp_params->module_cfg_update &= ~g_disable_ispp_modules_cfg_update;
+#endif
             //TODO set update bits
 
             if (mIsppParamsDev->queue_buffer (v4l2buf) != 0) {
@@ -1241,9 +1270,32 @@ XCamReturn
 CamHwIsp20::getSensorModeData(const char* sns_ent_name,
                               rk_aiq_exposure_sensor_descriptor& sns_des)
 {
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
     const SmartPtr<SensorHw> mSensorSubdev = mSensorDev.dynamic_cast_ptr<SensorHw>();
+    struct v4l2_subdev_selection select;
 
-    return mSensorSubdev->getSensorModeData(sns_ent_name, sns_des);
+    ret = mSensorSubdev->getSensorModeData(sns_ent_name, sns_des);
+    if (ret) {
+        XCAM_LOG_ERROR ("getSensorModeData failed \n");
+        return ret;
+    }
+
+    xcam_mem_clear (select);
+    ret = mIspCoreDev->get_selection(0, select);
+    if (ret == XCAM_RETURN_NO_ERROR) {
+        sns_des.isp_acq_width = select.r.width;
+        sns_des.isp_acq_height = select.r.height;
+        XCAM_LOG_DEBUG("get isp acq,w: %d, h: %d\n",
+                       sns_des.isp_acq_width,
+                       sns_des.isp_acq_height);
+    } else {
+        XCAM_LOG_WARNING("get selecttion error \n");
+        sns_des.isp_acq_width = sns_des.sensor_output_width;
+        sns_des.isp_acq_height = sns_des.sensor_output_height;
+        ret = XCAM_RETURN_NO_ERROR;
+    }
+
+    return ret;
 }
 
 XCamReturn

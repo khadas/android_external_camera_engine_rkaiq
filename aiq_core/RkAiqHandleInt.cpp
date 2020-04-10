@@ -410,8 +410,8 @@ RkAiqAeHandleInt::prepare()
     RkAiqCore::RkAiqAlgosShared_t* shared = &mAiqCore->mAlogsSharedParams;
 
     /*****************AecConfig pic-info params*****************/
-    ae_config_int->RawWidth = shared->snsDes.sensor_output_width;
-    ae_config_int->RawHeight = shared->snsDes.sensor_output_height;
+    ae_config_int->RawWidth = shared->snsDes.isp_acq_width;
+    ae_config_int->RawHeight = shared->snsDes.isp_acq_height;
 
     RkAiqAlgoDescription* des = (RkAiqAlgoDescription*)mDes;
     ret = des->prepare(mConfig);
@@ -481,9 +481,6 @@ RkAiqAeHandleInt::processing()
     RKAIQCORE_CHECK_RET(ret, "ae algo processing failed");
 
     comb->ae_proc_res = (RkAiqAlgoProcResAe*)ae_proc_res_int;
-
-    LOGE("AeProc HwCofing,rawae1.wnd_num=%d,rawae2.win.h_size=%d,rawhist2.weight[25]=%d", ae_proc_res_int->ae_proc_res_com.ae_meas.rawae1.wnd_num,
-         ae_proc_res_int->ae_proc_res_com.ae_meas.rawae2.win.h_size, ae_proc_res_int->ae_proc_res_com.hist_meas.rawhist1.weight[25]);
 
     EXIT_ANALYZER_FUNCTION();
     return ret;
@@ -1122,7 +1119,7 @@ RkAiqAnrHandleInt::processing()
 
 	anr_proc_int->hdr_mode = shared->working_mode;
 
-	printf("%s:%d anr hdr_mode:%d  \n", __FUNCTION__, __LINE__, anr_proc_int->hdr_mode);
+	LOGD("%s:%d anr hdr_mode:%d  \n", __FUNCTION__, __LINE__, anr_proc_int->hdr_mode);
 	
 
     RkAiqAlgoDescription* des = (RkAiqAlgoDescription*)mDes;
@@ -1657,8 +1654,8 @@ RkAiqAhdrHandleInt::prepare()
     RkAiqCore::RkAiqAlgosShared_t* shared = &mAiqCore->mAlogsSharedParams;
 
     //TODO
-    ahdr_config_int->rawHeight = shared->snsDes.sensor_output_height;
-    ahdr_config_int->rawWidth = shared->snsDes.sensor_output_width;
+    ahdr_config_int->rawHeight = shared->snsDes.isp_acq_height;
+    ahdr_config_int->rawWidth = shared->snsDes.isp_acq_width;
     ahdr_config_int->working_mode = shared->working_mode;
 
     RkAiqAlgoDescription* des = (RkAiqAlgoDescription*)mDes;
@@ -3255,8 +3252,8 @@ RkAiqAfecHandleInt::prepare()
     RkAiqAlgoConfigAfecInt* afec_config_int = (RkAiqAlgoConfigAfecInt*)mConfig;
     RkAiqCore::RkAiqAlgosShared_t* shared = &mAiqCore->mAlogsSharedParams;
 
-    afec_config_int->output_width = shared->snsDes.sensor_output_width;
-    afec_config_int->output_height = shared->snsDes.sensor_output_height;
+    afec_config_int->output_width = shared->snsDes.isp_acq_width;
+    afec_config_int->output_height = shared->snsDes.isp_acq_height;
 
     memcpy(&afec_config_int->afec_calib_cfg, &shared->calib->afec, sizeof(CalibDb_FEC_t));
 
@@ -3321,8 +3318,8 @@ RkAiqAfecHandleInt::processing()
 
     comb->afec_proc_res = NULL;
     //fill procParam
-    afec_proc_int->output_width = shared->snsDes.sensor_output_width;
-    afec_proc_int->output_height = shared->snsDes.sensor_output_height;
+    afec_proc_int->output_width = shared->snsDes.isp_acq_width;
+    afec_proc_int->output_height = shared->snsDes.isp_acq_height;
 
     RkAiqAlgoDescription* des = (RkAiqAlgoDescription*)mDes;
     ret = des->processing(mProcInParam, mProcOutParam);
@@ -3856,8 +3853,8 @@ RkAiqAldchHandleInt::prepare()
     RkAiqAlgoConfigAldchInt* aldch_config_int = (RkAiqAlgoConfigAldchInt*)mConfig;
     RkAiqCore::RkAiqAlgosShared_t* shared = &mAiqCore->mAlogsSharedParams;
     // build configs
-    aldch_config_int->output_width = shared->snsDes.sensor_output_width;
-    aldch_config_int->output_height = shared->snsDes.sensor_output_height;
+    aldch_config_int->output_width = shared->snsDes.isp_acq_width;
+    aldch_config_int->output_height = shared->snsDes.isp_acq_height;
 
     memcpy(&aldch_config_int->aldch_calib_cfg, &shared->calib->aldch, sizeof(CalibDb_LDCH_t));
 

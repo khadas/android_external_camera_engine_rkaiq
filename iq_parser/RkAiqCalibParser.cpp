@@ -9525,6 +9525,23 @@ bool RkAiqCalibParser::parseEntrySystem
                 }
                 psecsubchild = psecsubchild->NextSibling();
             }
+        }else if(tagname == CALIB_SYSTEM_EXP_DELAY) {
+            const XMLNode* psecsubchild = pchild->ToElement()->FirstChild();
+            while (psecsubchild) {
+                XmlTag subTag = XmlTag(psecsubchild->ToElement());
+                const char* value = subTag.Value();
+                std::string subTagname(psecsubchild->ToElement()->Name());
+                if ((subTagname == CALIB_SYSTEM_EXP_DELAY_TIME)
+                        && (subTag.isType(XmlTag::TAG_TYPE_DOUBLE))
+                        && (subTag.Size() > 0)) {
+                    int no = ParseIntArray(psecsubchild, &mCalibDb->sysContrl.time_delay, subTag.Size());
+                    DCT_ASSERT((no == subTag.Size()));
+                } else if (subTagname == CALIB_SYSTEM_EXP_DELAY_GAIN) {
+                    int no = ParseIntArray(psecsubchild, &mCalibDb->sysContrl.gain_delay, subTag.Size());
+                    DCT_ASSERT((no == subTag.Size()));
+                }
+                psecsubchild = psecsubchild->NextSibling();
+            }
         }
         pchild = pchild->NextSibling();
     }

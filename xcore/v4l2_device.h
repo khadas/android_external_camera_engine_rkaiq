@@ -23,6 +23,7 @@
 
 #include <xcam_std.h>
 #include <linux/videodev2.h>
+#include <linux/v4l2-subdev.h>
 #include <list>
 #include <vector>
 
@@ -171,6 +172,7 @@ public:
     XCamReturn subscribe_event (int event);
     XCamReturn unsubscribe_event (int event);
     XCamReturn dequeue_event (struct v4l2_event &event);
+    XCamReturn get_selection (int pad, struct v4l2_subdev_selection &select);
 
     virtual XCamReturn start ();
     virtual XCamReturn stop ();

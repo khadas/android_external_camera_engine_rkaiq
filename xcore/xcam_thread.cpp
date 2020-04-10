@@ -21,6 +21,7 @@
 #include "xcam_thread.h"
 #include "xcam_mutex.h"
 #include <errno.h>
+#include <signal.h>
 
 namespace XCam {
 
@@ -57,6 +58,15 @@ Thread::thread_func (void *user_data)
     }
     ret = thread->started ();
 
+    sigset_t set;
+
+    /* Block SIGQUIT and SIGTERM */
+
+    sigemptyset(&set);
+    sigaddset(&set, SIGQUIT);
+    sigaddset(&set, SIGINT);
+    sigaddset(&set, SIGTERM);
+    pthread_sigmask(SIG_BLOCK, &set, NULL);
     while (true) {
         {
             SmartLock locker(thread->_mutex);

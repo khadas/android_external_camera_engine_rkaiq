@@ -30,8 +30,8 @@ typedef enum {
     XCORE_LOG_LEVEL_ERR,
     XCORE_LOG_LEVEL_WARNING,
     XCORE_LOG_LEVEL_INFO,
-    XCORE_LOG_LEVEL_VERBOSE,
     XCORE_LOG_LEVEL_DEBUG,
+    XCORE_LOG_LEVEL_VERBOSE,
     XCORE_LOG_LEVEL_LOW1,
 } xcore_log_level_t;
 
@@ -72,6 +72,7 @@ extern "C" {
 void xcam_set_log (const char* file_name);
 void xcam_print_log (int module, int sub_modules, int level, const char* format, ...);
 int xcam_get_log_level();
+bool xcam_get_enviroment_value(const char* variable, unsigned long long* value);
 #ifdef  __cplusplus
 }
 #endif

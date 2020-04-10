@@ -522,7 +522,7 @@ PollThread::poll_subdev_event_loop ()
 
     /* timeout */
     if (poll_ret == 0) {
-        XCAM_LOG_ERROR ("poll event timeout and continue");
+        XCAM_LOG_WARNING ("poll event timeout and continue");
         return XCAM_RETURN_ERROR_TIMEOUT;
     }
 

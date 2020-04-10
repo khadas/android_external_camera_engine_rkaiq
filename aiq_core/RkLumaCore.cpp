@@ -22,6 +22,7 @@
 #ifdef RK_SIMULATOR_HW
 #include "simulator/isp20_hw_simulator.h"
 #endif
+#include "common/rk_aiq_comm.h"
 #include "isp20/rkisp2-config.h"
 
 namespace RkCam {
@@ -56,7 +57,8 @@ RkLumaCoreThread::loop()
 uint16_t RkLumaCore::DEFAULT_POOL_SIZE = 20;
 
 RkLumaCore::RkLumaCore()
-    : mRkLumaCoreTh(new RkLumaCoreThread(this))    
+    : mRkLumaCoreTh(new RkLumaCoreThread(this))
+    , mWorkingMode(RK_AIQ_WORKING_MODE_NORMAL)
     , mCb(NULL)
     , mState(RK_AIQ_CORE_STATE_INVALID)
 {
@@ -157,6 +159,13 @@ RkLumaCore::pushStats(SmartPtr<VideoBuffer> &buffer)
 }
 
 XCamReturn
+RkLumaCore::prepare(int mode)
+{
+    mWorkingMode = mode;
+    return XCAM_RETURN_NO_ERROR;
+}
+
+XCamReturn
 RkLumaCore::analyze(const SmartPtr<VideoBuffer> &buffer)
 {
     uint16_t hdrProcessCnt = 1;
@@ -204,6 +213,24 @@ RkLumaCore::analyze(const SmartPtr<VideoBuffer> &buffer)
             (rkisp_isp2x_luma_buffer*)(buf->get_v4l2_userptr());
 
     int raw_channal = 1;
+    switch (mWorkingMode)
+    {
+        case RK_AIQ_WORKING_MODE_NORMAL:
+            raw_channal = 1;
+            break;
+        case RK_AIQ_ISP_HDR_MODE_2_FRAME_HDR:
+        case RK_AIQ_ISP_HDR_MODE_2_LINE_HDR:
+            raw_channal = 0;
+            break;
+        case RK_AIQ_ISP_HDR_MODE_3_FRAME_HDR:
+        case RK_AIQ_ISP_HDR_MODE_3_LINE_HDR:
+            raw_channal = 1;
+            break;
+        default:
+            raw_channal = 1;
+            break;
+    }
+
     unsigned int mean_luma = 0;
     for (int i = 0; i < ISP2X_MIPI_LUMA_MEAN_MAX; i++) {
         mean_luma += lumaStat->luma[raw_channal].exp_mean[i];
@@ -219,8 +246,8 @@ RkLumaCore::analyze(const SmartPtr<VideoBuffer> &buffer)
         float dluma2 = int(luma_frame_pre1->mean_luma[raw_channal] - luma_frame_pre2->mean_luma[raw_channal]) /
                         float(luma_frame_pre1->mean_luma[raw_channal] + luma_frame_pre2->mean_luma[raw_channal]);
         /*
-        LOGD_ANALYZER("lumatest now pre1 pre2: %d-%d-%d, datasize: %d\n",
-            mean_luma,
+        LOGE_ANALYZER("lumatest(%d) now pre1 pre2: %d-%d-%d, datasize: %d\n",
+            mWorkingMode, mean_luma,
             luma_frame_pre1->mean_luma[raw_channal],
             luma_frame_pre2->mean_luma[raw_channal],
             mLumaQueueFIFO.size());
