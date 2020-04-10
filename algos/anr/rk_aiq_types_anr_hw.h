@@ -188,6 +188,19 @@ typedef struct RKAnr_Mfnr_Fix_s {
 	unsigned char weight_y[3];
 }RKAnr_Mfnr_Fix_t;
 
+typedef struct RKAnr_Gain_Fix_s{
+	unsigned char gain_table_en;
+    unsigned char dhaz_en;
+    unsigned char wdr_en;
+    unsigned char tmo_en;
+    unsigned char lsc_en;
+    unsigned char mge_en;
+
+    unsigned int mge_gain[3];
+    unsigned short int idx[15];
+    unsigned short int lut[17];
+} RKAnr_Gain_Fix_t;
+
 
 RKAIQ_END_DECLARE
 

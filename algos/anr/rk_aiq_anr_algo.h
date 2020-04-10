@@ -11,6 +11,7 @@
 #include "rk_aiq_anr_algo_mfnr.h"
 #include "rk_aiq_anr_algo_bayernr.h"
 #include "rk_aiq_types_anr_algo_prvt.h"
+#include "rk_aiq_anr_algo_gain.h"
 
 RKAIQ_BEGIN_DECLARE
 

@@ -583,7 +583,7 @@ ANRresult_t ynr_fix_transfer(RKAnr_Ynr_Params_Select_t* ynr, RKAnr_Ynr_Fix_t *pN
 	}
 
 	#if YNR_FIX_VALUE_PRINTF
-	ynr_fix_LOGD_ANR(pNrCfg);
+	ynr_fix_printf(pNrCfg);
 	#endif
 
 	LOGI_ANR("%s:(%d) exit \n", __FUNCTION__, __LINE__);
@@ -591,7 +591,7 @@ ANRresult_t ynr_fix_transfer(RKAnr_Ynr_Params_Select_t* ynr, RKAnr_Ynr_Fix_t *pN
 	return res;
 }
 
-ANRresult_t ynr_fix_LOGD_ANR(RKAnr_Ynr_Fix_t * pNrCfg)
+ANRresult_t ynr_fix_printf(RKAnr_Ynr_Fix_t * pNrCfg)
 {
 	LOGD_ANR("%s:(%d) enter \n", __FUNCTION__, __LINE__);
 

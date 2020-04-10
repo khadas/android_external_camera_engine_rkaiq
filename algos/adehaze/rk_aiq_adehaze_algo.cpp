@@ -273,7 +273,7 @@ void select_RkDehaze_params(const CalibDb_Dehaze_t * stRKDehazeParam, rk_aiq_deh
 
 XCamReturn AdehazeInitV200(AdehazeHandle_t** para)
 {
-    printf("ENTER: %s \n", __func__);
+    LOGD_ADEHAZE("ENTER: %s \n", __func__);
 
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
     *para = (AdehazeHandle_t*)malloc(sizeof(AdehazeHandle_t));
@@ -283,7 +283,7 @@ XCamReturn AdehazeInitV200(AdehazeHandle_t** para)
 
 XCamReturn AdehazeReleaseV200(AdehazeHandle_t* para)
 {
-    printf("ENTER: %s \n", __func__);
+    LOGD_ADEHAZE("ENTER: %s \n", __func__);
 
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
 
@@ -294,7 +294,7 @@ XCamReturn AdehazeReleaseV200(AdehazeHandle_t* para)
 XCamReturn AdehazeConfigV200(const CalibDb_Dehaze_t * adhaz_html_para, AdehazeHandle_t* para, int iso)
 {
 
-    printf("ENTER: %s \n", __func__);
+    LOGD_ADEHAZE("ENTER: %s \n", __func__);
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
 #if 0
     // memset(&adhaz_html_para, 0, sizeof(RKAiqAdhazHtmlConfig_t));
@@ -312,7 +312,7 @@ XCamReturn AdehazeConfigV200(const CalibDb_Dehaze_t * adhaz_html_para, AdehazeHa
 }
 XCamReturn AdehazePreProcV200(AdehazeHandle_t* para)
 {
-    printf("ENTER: %s \n", __func__);
+    LOGD_ADEHAZE("ENTER: %s \n", __func__);
 
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
 
@@ -323,7 +323,7 @@ XCamReturn AdehazePreProcV200(AdehazeHandle_t* para)
 XCamReturn AdehazeProcessingV200(AdehazeHandle_t* para)
 {
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
-    printf("ENTER: %s \n", __func__);
+    LOGD_ADEHAZE("ENTER: %s \n", __func__);
 
     ret = AdehazeReConfigV200(para);
 
@@ -336,7 +336,7 @@ XCamReturn AdehazeReConfigV200(AdehazeHandle_t* para, const CalibDb_Dehaze_t *ca
 
 {
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
-    printf("ENTER: %s \n", __func__);
+    LOGD_ADEHAZE("ENTER: %s \n", __func__);
 
 
     //int iso = 50;//TODO
@@ -376,7 +376,7 @@ XCamReturn AdehazeReConfigV200(AdehazeHandle_t* para, const CalibDb_Dehaze_t *ca
 XCamReturn rk_aiq_uapi_getDhzMode(const rk_aiq_sys_ctx_t* ctx, opMode_t *mode)
 {
     XCamReturn  ret = XCAM_RETURN_NO_ERROR;
-    printf("ENTER: %s \n", __func__);
+    LOGD_ADEHAZE("ENTER: %s \n", __func__);
 
     //TO DO
 
@@ -387,7 +387,7 @@ XCamReturn rk_aiq_uapi_setDehazeManu(const rk_aiq_sys_ctx_t* ctx, float wt, int 
 {
     XCamReturn  ret = XCAM_RETURN_NO_ERROR;
 
-    printf("ENTER: %s \n", __func__);
+    LOGD_ADEHAZE("ENTER: %s \n", __func__);
 
     //TO DO
 
@@ -398,7 +398,7 @@ XCamReturn rk_aiq_uapi_setDehazeManu(const rk_aiq_sys_ctx_t* ctx, float wt, int 
 XCamReturn rk_aiq_uapi_getDehazeManu(const rk_aiq_sys_ctx_t* ctx, float *wt, int *air, float *tmax, float *gratio)
 {
     XCamReturn  ret = XCAM_RETURN_NO_ERROR;
-    printf("ENTER: %s \n", __func__);
+    LOGD_ADEHAZE("ENTER: %s \n", __func__);
 
     //TO DO
 
@@ -409,7 +409,7 @@ XCamReturn rk_aiq_uapi_getDehazeManu(const rk_aiq_sys_ctx_t* ctx, float *wt, int
 XCamReturn rk_aiq_uapi_setIircontral(const rk_aiq_sys_ctx_t* ctx, int fnum, int sigma, float wt, float air, float tmax)//(fnum,sigma,wt,air,tmax)
 {
     XCamReturn  ret = XCAM_RETURN_NO_ERROR;
-    printf("ENTER: %s \n", __func__);
+    LOGD_ADEHAZE("ENTER: %s \n", __func__);
 
     //TO DO
 
@@ -420,7 +420,7 @@ XCamReturn rk_aiq_uapi_setIircontral(const rk_aiq_sys_ctx_t* ctx, int fnum, int 
 XCamReturn rk_aiq_uapi_getIircontral(const rk_aiq_sys_ctx_t* ctx, int *fnum, int *sigma, float *wt, float *air, float *tmax)
 {
     XCamReturn  ret = XCAM_RETURN_NO_ERROR;
-    printf("ENTER: %s \n", __func__);
+    LOGD_ADEHAZE("ENTER: %s \n", __func__);
 
     //TO DO
 
@@ -431,7 +431,7 @@ XCamReturn rk_aiq_uapi_getIircontral(const rk_aiq_sys_ctx_t* ctx, int *fnum, int
 XCamReturn rk_aiq_uapi_setHisEqMode(const rk_aiq_sys_ctx_t* ctx, opMode_t mode)
 {
     XCamReturn  ret = XCAM_RETURN_NO_ERROR;
-    printf("ENTER: %s \n", __func__);
+    LOGD_ADEHAZE("ENTER: %s \n", __func__);
 
     //TO DO
 
@@ -442,7 +442,7 @@ XCamReturn rk_aiq_uapi_setHisEqMode(const rk_aiq_sys_ctx_t* ctx, opMode_t mode)
 XCamReturn rk_aiq_uapi_getHisEqMode(const rk_aiq_sys_ctx_t* ctx, opMode_t *mode)
 {
     XCamReturn  ret = XCAM_RETURN_NO_ERROR;
-    printf("ENTER: %s \n", __func__);
+    LOGD_ADEHAZE("ENTER: %s \n", __func__);
 
     //TO DO
 
@@ -453,7 +453,7 @@ XCamReturn rk_aiq_uapi_getHisEqMode(const rk_aiq_sys_ctx_t* ctx, opMode_t *mode)
 XCamReturn rk_aiq_uapi_setHisEqualManu(const rk_aiq_sys_ctx_t* ctx, float strength)//
 {
     XCamReturn  ret = XCAM_RETURN_NO_ERROR;
-    printf("ENTER: %s \n", __func__);
+    LOGD_ADEHAZE("ENTER: %s \n", __func__);
 
     //TO DO
 
@@ -464,7 +464,7 @@ XCamReturn rk_aiq_uapi_setHisEqualManu(const rk_aiq_sys_ctx_t* ctx, float streng
 XCamReturn rk_aiq_uapi_getHisEqualManu(const rk_aiq_sys_ctx_t* ctx, float *strength)
 {
     XCamReturn  ret = XCAM_RETURN_NO_ERROR;
-    printf("ENTER: %s \n", __func__);
+    LOGD_ADEHAZE("ENTER: %s \n", __func__);
 
     //TO DO
 
@@ -475,7 +475,7 @@ XCamReturn rk_aiq_uapi_getHisEqualManu(const rk_aiq_sys_ctx_t* ctx, float *stren
 XCamReturn rk_aiq_uapi_enableEnhanceMode(const rk_aiq_sys_ctx_t* ctx, opMode_t mode)//
 {
     XCamReturn  ret = XCAM_RETURN_NO_ERROR;
-    printf("ENTER: %s \n", __func__);
+    LOGD_ADEHAZE("ENTER: %s \n", __func__);
 
     //TO DO
 
@@ -486,7 +486,7 @@ XCamReturn rk_aiq_uapi_enableEnhanceMode(const rk_aiq_sys_ctx_t* ctx, opMode_t m
 XCamReturn rk_aiq_uapi_disableEnhanceMode(const rk_aiq_sys_ctx_t* ctx, opMode_t* mode)
 {
     XCamReturn  ret = XCAM_RETURN_NO_ERROR;
-    printf("ENTER: %s \n", __func__);
+    LOGD_ADEHAZE("ENTER: %s \n", __func__);
 
     //TO DO
 
@@ -497,7 +497,7 @@ XCamReturn rk_aiq_uapi_disableEnhanceMode(const rk_aiq_sys_ctx_t* ctx, opMode_t*
 XCamReturn rk_aiq_uapi_setEnhance(const rk_aiq_sys_ctx_t* ctx, float strength)//
 {
     XCamReturn  ret = XCAM_RETURN_NO_ERROR;
-    printf("ENTER: %s \n", __func__);
+    LOGD_ADEHAZE("ENTER: %s \n", __func__);
 
     //TO DO
 
@@ -508,7 +508,7 @@ XCamReturn rk_aiq_uapi_setEnhance(const rk_aiq_sys_ctx_t* ctx, float strength)//
 XCamReturn rk_aiq_uapi_getEnhance(const rk_aiq_sys_ctx_t* ctx, float *strength)
 {
     XCamReturn  ret = XCAM_RETURN_NO_ERROR;
-    printf("ENTER: %s \n", __func__);
+    LOGD_ADEHAZE("ENTER: %s \n", __func__);
 
     //TO DO
 
@@ -519,7 +519,7 @@ XCamReturn rk_aiq_uapi_getEnhance(const rk_aiq_sys_ctx_t* ctx, float *strength)
 XCamReturn rk_aiq_uapi_getDehazeAdpOut(const rk_aiq_sys_ctx_t* ctx, float *wt, float *air, float *tmax, float *gratio)//(wt,air_base,tmax,gratio)//dehaze
 {
     XCamReturn  ret = XCAM_RETURN_NO_ERROR;
-    printf("ENTER: %s \n", __func__);
+    LOGD_ADEHAZE("ENTER: %s \n", __func__);
 
     //TO DO
 

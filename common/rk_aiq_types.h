@@ -272,6 +272,8 @@ typedef struct {
     uint32_t sensor_output_width;
     uint32_t sensor_output_height;
     uint32_t sensor_pixelformat;
+    uint32_t isp_acq_width;
+    uint32_t isp_acq_height;
 } rk_aiq_exposure_sensor_descriptor;
 
 // exposure
@@ -572,6 +574,7 @@ typedef AsharpProcResult_t rkaiq_asharp_procRes_t;
 typedef AblcProcResult_t rk_aiq_isp_blc_t;
 typedef AdpccProcResult_t rk_aiq_isp_dpcc_t;
 
+typedef RKAnr_Gain_Fix_t rk_aiq_isp_gain_t;
 
 #if 0
 typedef struct {
@@ -639,6 +642,7 @@ typedef struct {
     rk_aiq_isp_cgc_t        cgc;
     rk_aiq_isp_conv422_t    conv22;
     rk_aiq_isp_yuvconv_t    yuvconv;
+	rk_aiq_isp_gain_t       gain_config;
     //anr result
     rkaiq_anr_procRes_t     rkaiq_anr_proc_res;
     rkaiq_asharp_procRes_t  rkaiq_asharp_proc_res;

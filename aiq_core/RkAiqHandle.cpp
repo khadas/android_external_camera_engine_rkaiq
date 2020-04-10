@@ -56,8 +56,8 @@ XCamReturn RkAiqHandle::configInparamsCom(RkAiqAlgoCom* com, int type)
         com->ctx = mAlgoCtx;
         com->frame_id = shared->frameId;
         com->u.prepare.working_mode = shared->working_mode;
-        com->u.prepare.sns_op_width = shared->snsDes.sensor_output_width;
-        com->u.prepare.sns_op_height = shared->snsDes.sensor_output_height;
+        com->u.prepare.sns_op_width = shared->snsDes.isp_acq_width;
+        com->u.prepare.sns_op_height = shared->snsDes.isp_acq_height;
     } else {
         com->ctx = mAlgoCtx;
         com->frame_id = shared->frameId;

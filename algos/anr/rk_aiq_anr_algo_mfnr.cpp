@@ -349,6 +349,7 @@ ANRresult_t select_mfnr_params_by_ISO(RKAnr_Mfnr_Params_t *stmfnrParams, 	RKAnr_
     int min_idx = 0;
     int intep_num = 0;
     int intep_num_1 = 0;
+	#if 1
     for(i = 1; i < MAX(stmfnrParams->curve_x0[gain_high], stmfnrParams->curve_x0[gain_low]); i++)
     {
         if(noise_sigma_tmp[i] > noise_sigma_tmp[i - 1] && noise_sigma_tmp[i] > noise_sigma_tmp[i + 1])
@@ -383,9 +384,10 @@ ANRresult_t select_mfnr_params_by_ISO(RKAnr_Mfnr_Params_t *stmfnrParams, 	RKAnr_
     }
 
 	intep_pos[intep_num++]		= range;
-
+	#endif
 
 #if 1
+	#if 1
     for (i = 1; i < intep_num; i++)
     {
         if(i == 1)
@@ -455,21 +457,28 @@ ANRresult_t select_mfnr_params_by_ISO(RKAnr_Mfnr_Params_t *stmfnrParams, 	RKAnr_
 
     }
 	fix_x_pos[intep_num_1++]		= range;
-
-
+	#else
+	for(int i = 0, idx = 1; i < MAX_INTEPORATATION_LUMAPOINT; i++)
+		fix_x_pos[intep_num_1++]		= i * (range / (MAX_INTEPORATATION_LUMAPOINT - 1));
+	#endif
+	
 
 
     for (i = 0; i < range; i+= step_x)
         stmfnrParamsSelected->noise_sigma[i/step_x]             = noise_sigma_tmp[i]                    / step_y;
 
-    for (i = 0; i < MAX_INTEPORATATION_LUMAPOINT; i++)
+    for (i = 0; i < MAX_INTEPORATATION_LUMAPOINT; i++){
         stmfnrParamsSelected->noise_sigma_sample[i]             = noise_sigma_tmp[fix_x_pos[i]]       / step_y;
+		stmfnrParamsSelected->noise_sigma_sample[i] = ABS(stmfnrParamsSelected->noise_sigma_sample[i]);
+    }
     for (i = 0; i < MAX_INTEPORATATION_LUMAPOINT; i++)
         stmfnrParamsSelected->fix_x_pos[i]                    = fix_x_pos[i]                        / step_x;
 
 
-    for (i = 0; i < MAX_INTEPORATATION_LUMAPOINT; i++)
+    for (i = 0; i < MAX_INTEPORATATION_LUMAPOINT; i++){
         stmfnrParamsSelected->noise_sigma_dehaze[i]             = noise_sigma_tmp[fix_x_pos[i]]       / step_y;
+		stmfnrParamsSelected->noise_sigma_dehaze[i] = ABS(stmfnrParamsSelected->noise_sigma_dehaze[i]);
+    }
     for (i = 0; i < MAX_INTEPORATATION_LUMAPOINT; i++)
         stmfnrParamsSelected->fix_x_pos_dehaze[i]               = fix_x_pos[i]                        / step_x_dehz;
 
@@ -551,12 +560,29 @@ template<typename T1, typename T2>
 T1 FIX_FLOAT(T1 data0,  int bits, T2 &dst, int flag = 0)
 {
     if(flag == 0)
-        dst = ROUND_D(data0 * (1 << bits));
+        dst = (T2)ROUND_D(data0 * (1 << bits));
     else
-        dst = FLOOR_INT64(data0 * (1 << bits));
+        dst = (T2)FLOOR_INT64(data0 * (1 << bits));
     return  ((T1)dst / (1 << bits));
 
 }
+
+
+template<typename T1>
+T1 FX_CLP(T1 data0, int inte_bit, int deci_bit)
+{
+    int64_t tmp0;
+	int64_t max_val;
+	int64_t min_val;
+    int64_t out;
+    tmp0        = (int64_t)(data0 * (1 << deci_bit));
+    max_val     = (((int64_t)1 << (deci_bit + inte_bit)) - 1);
+    min_val     = (-((int64_t)1 << (deci_bit + inte_bit)) + 1);
+    out         = MIN(MAX(min_val, tmp0), max_val);
+    return (T1)out / (1 << deci_bit);//->dst_shr_off64, round_val64, and_val64, round_bits);
+
+}
+
 
 int get_matrix_idx(int i, int j, int rad)
 {
@@ -588,7 +614,7 @@ int get_matrix_idx(int i, int j, int rad)
         }
 	}
 
-    return 0;
+    return -1;
 }
 
 
@@ -603,6 +629,9 @@ void mfnr_gfcoef_fix(int rad, double *gfcoef, unsigned char* gfcoef_fix)
     for(int i = 0; i <  (rad * 2 + 1); i++){
         for(int j = 0; j < (rad * 2 + 1); j++){
             int src_i = get_matrix_idx(i, j, rad);
+			if(src_i == -1){
+				LOGE_ANR("get_matrix_idx is error \n");
+			}
             h[i * (rad * 2 + 1) + j] = FIX_FLOAT((double)gfcoef[src_i], F_DECI_PIXEL_SIGMA_CONV_WEIGHT, tmp);
 			gfcoef_fix[src_i] = tmp;
             sum_d2 += h[i * (rad * 2 + 1) + j];
@@ -691,6 +720,7 @@ ANRresult_t mfnr_fix_transfer(RKAnr_Mfnr_Params_Select_t* tnr, RKAnr_Mfnr_Fix_t 
 	pMfnrCfg->glb_gain_nxt = tmp;
 
 	//0x0090
+	gain_glb_filt_sqrt_inv = FX_CLP(gain_glb_filt_sqrt_inv, F_INTE_GAIN_GLB_SQRT_INV, F_DECI_GAIN_GLB_SQRT_INV);
 	FIX_FLOAT(gain_glb_filt_sqrt_inv, F_DECI_GAIN_GLB_SQRT_INV, tmp);
 	pMfnrCfg->glb_gain_cur_div = tmp;
 	FIX_FLOAT(gain_glb_filt_sqrt, F_DECI_GAIN_GLB_SQRT, tmp);

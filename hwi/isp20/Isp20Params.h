@@ -87,6 +87,8 @@ private:
         rk_aiq_isp_sharpen_t& sharp, rk_aiq_isp_edgeflt_t& edgeflt);
     void convertAiqAfToIsp20Params(struct isp2x_isp_params_cfg& isp_cfg,
                                    const rk_aiq_isp_af_meas_t& af_data);
+	void convertAiqGainToIsp20Params(struct isp2x_isp_params_cfg& isp_cfg,
+        rk_aiq_isp_gain_t& gain);
 };
 };
 #endif

@@ -968,6 +968,9 @@
 #define CALIB_SYSTEM_HDR_ENABLE                             "enable"
 #define CALIB_SYSTEM_HDR_SUPPORT_MODE                       "support_mode"
 #define CALIB_SYSTEM_HDR_LINE_MODE                          "line_mode"
+#define CALIB_SYSTEM_EXP_DELAY                              "EXP_DELAY"
+#define CALIB_SYSTEM_EXP_DELAY_TIME                         "time_delay"
+#define CALIB_SYSTEM_EXP_DELAY_GAIN                         "gain_delay"
 
 
 /******************************************************************************

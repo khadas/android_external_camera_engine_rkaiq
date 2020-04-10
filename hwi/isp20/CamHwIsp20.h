@@ -115,7 +115,7 @@ public:
     // from CamHwBase
     virtual XCamReturn init(const char* sns_ent_name);
     virtual XCamReturn deInit();
-    virtual XCamReturn prepare(uint32_t width, uint32_t height, int mode);
+    virtual XCamReturn prepare(uint32_t width, uint32_t height, int mode, int t_delay, int g_delay);
     virtual XCamReturn start();
     virtual XCamReturn stop();
     virtual XCamReturn getSensorModeData(const char* sns_ent_name,
@@ -130,6 +130,7 @@ public:
     static XCamReturn initCamHwInfos();
     XCamReturn setupHdrLink(int mode, int isp_index, bool enable);
     static XCamReturn selectIqFile(const char* sns_ent_name, char* iqfile_name);
+    XCamReturn setExpDelayInfo(int time_delay, int gain_delay);
 private:
     XCAM_DEAD_COPY(CamHwIsp20);
     enum cam_hw_state_e {

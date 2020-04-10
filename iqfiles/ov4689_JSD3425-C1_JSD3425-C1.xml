@@ -997,16 +997,7 @@
             <LumaDistTh index="1" type="double" size="[1 1]">               [10]            </LumaDistTh>
             <LframeCtrl index="1" type="struct" size="[1 1]">
 	     <OEROILowTh index="1" type="double" size="[1 1]">               	[150.0]               </OEROILowTh>               <LvHighTh index="1" type="double" size="[1 1]">               	[3]               </LvHighTh>               <LvLowTh index="1" type="double" size="[1 1]">               	[0.25]               </LvLowTh>               <LExpLevel index="1" type="double" size="[1 6]">                  [0.05 0.1 0.2 0.5 0.7 1]               </LExpLevel>               <LSetPoint index="1" type="double" size="[1 6]">                  [75 75 70 65 55 45]               </LSetPoint>               <TargetLLLuma index="1" type="double" size="[1 6]">                  [45 42 40 35 28 20]               </TargetLLLuma>               <NonOEPdfTh index="1" type="double" size="[1 6]">               	[0.35 0.35 0.45 0.5 0.6 0.7]               </NonOEPdfTh>               <LowLightPdfTh index="1" type="double" size="[1 6]">               	[0.20 0.20 0.22 0.25 0.3 0.35]               </LowLightPdfTh>             </LframeCtrl>            <MframeCtrl index="1" type="struct" size="[1 1]">               <MExpLevel index="1" type="double" size="[1 6]">                  [0.05 0.1 0.2 0.5 0.7 1]               </MExpLevel>               <MSetPoint index="1" type="double" size="[1 6]">                  [60 60 55 50 45 40]               </MSetPoint>            </MframeCtrl>            <SframeCtrl index="1" type="struct" size="[1 1]">               <SExpLevel index="1" type="double" size="[1 6]">                  [0 0.1 0.3 0.5 0.75 1]               </SExpLevel>               <TargetHLLuma index="1" type="double" size="[1 6]">                  [130 130 120 110 100 90]               </TargetHLLuma>               <SSetPoint index="1" type="double" size="[1 6]">                  [50 50 45 40 35 30]               </SSetPoint>               <HLLumaTolerance index="1" type="double" size="[1 1]">                  [15]               </HLLumaTolerance>            </SframeCtrl>         </HdrAECtrl>      </AEC>
-      <AF index="1" type="struct" size="[1 1]">
-         <fixed_mode_code index="1" type="double" size="[1 1]">            [8]         </fixed_mode_code>
-         <macro_mode_code index="1" type="double" size="[1 1]">            [16]         </macro_mode_code>
-         <infinity_mode index="1" type="double" size="[1 1]">            [16]         </infinity_mode>
-         <contrast_af_en index="1" type="double" size="[1 1]">            [1]         </contrast_af_en>
-         <laser_af_en index="1" type="double" size="[1 1]">            [0]         </laser_af_en>
-         <pdaf_en index="1" type="double" size="[1 1]">            [0]         </pdaf_en>
-         <vcm_dot index="1" type="double" size="[1 7]">            [0   16    32    40   48    56    64]         </vcm_dot>
-         <distance_dot index="1" type="double" size="[1 7]">            [0.2   0.24    0.34    0.4   0.66   1   3]         </distance_dot>      </AF>
-      <AHDR index="1" type="struct" size="[1 1]">         <Merge index="1" type="struct" size="[1 1]">               <EnvLv index="1" type="double" size="[1 6]">                  [0 0.1 0.2 0.3 0.7 1.0]               </EnvLv>               <OECurve_smooth index="1" type="double" size="[1 6]">                  [0.4 0.4 0.4 0.4 0.4 0.4]               </OECurve_smooth>               <OECurve_offset index="1" type="double" size="[1 6]">                  [0.9 0.9 0.9 0.9 0.9 0.9]               </OECurve_offset>               <MoveCoef index="1" type="double" size="[1 6]">                  [0 0.1 0.2 0.3 0.7 1.0]               </MoveCoef>               <MDCurveLM_smooth index="1" type="double" size="[1 6]">
+      <AF index="1" type="struct" size="[1 1]">         <Window index="1" type="struct" size="[1 1]">            <h_offs index="1" type="double" size="[1 1]">               [0]            </h_offs>            <v_offs index="1" type="double" size="[1 1]">               [0]            </v_offs>            <h_size index="1" type="double" size="[1 1]">               [0]            </h_size>            <v_size index="1" type="double" size="[1 1]">               [0]            </v_size>         </Window>         <fixed_mode index="1" type="struct" size="[1 1]">            <code index="1" type="double" size="[1 1]">               [8]            </code>         </fixed_mode>         <macro_mode index="1" type="struct" size="[1 1]">            <code index="1" type="double" size="[1 1]">               [32]            </code>         </macro_mode>         <infinity_mode index="1" type="struct" size="[1 1]">            <code index="1" type="double" size="[1 1]">               [32]            </code>         </infinity_mode>         <contrast_af index="1" type="struct" size="[1 1]">            <enable index="1" type="double" size="[1 1]">               [1]            </enable>            <AfSearchStrategy index="1" type="char" size="[1 14]">               ADAPTIVE_RANGE            </AfSearchStrategy>            <FullDir index="1" type="char" size="[1 8]">               ADAPTIVE            </FullDir>            <FullRangeTbl index="1" type="double" size="[1 9]">               [0 8 16 24 32 40 48 56 64]            </FullRangeTbl>            <AdaptiveDir index="1" type="char" size="[1 8]">               ADAPTIVE            </AdaptiveDir>            <AdaptRangeTbl index="1" type="double" size="[1 9]">               [0 8 16 24 32 40 48 56 64]            </AdaptRangeTbl>            <TrigThers index="1" type="double" size="[1 1]">               [0.075]            </TrigThers>            <StableThers index="1" type="double" size="[1 1]">               [0.02]            </StableThers>            <StableFrames index="1" type="double" size="[1 1]">               [3]            </StableFrames>            <StableTime index="1" type="double" size="[1 1]">               [200]            </StableTime>            <OutFocusValue index="1" type="double" size="[1 1]">               [50]            </OutFocusValue>            <OutFocusPos index="1" type="double" size="[1 1]">               [30]            </OutFocusPos>            <gammaY index="1" type="double" size="[1 17]">               [0 45 108 179 245 344 409 459 500 567 622 676 759 833 896 962 1023]            </gammaY>            <gaussWeight index="1" type="double" size="[1 3]">               [32 16 8]            </gaussWeight>         </contrast_af>         <laser_af index="1" type="struct" size="[1 3]">            <enable index="1" type="double" size="[1 1]">               [0]            </enable>            <vcmDot index="1" type="double" size="[1 7]">               [0 16 32 40 48 56 64]            </vcmDot>            <distanceDot index="1" type="double" size="[1 7]">               [0.2 0.24 0.34 0.4 0.66 1 3]            </distanceDot>         </laser_af>         <pdaf index="1" type="struct" size="[1 1]">            <enable index="1" type="double" size="[1 1]">               [0]            </enable>         </pdaf>      </AF>      <AHDR index="1" type="struct" size="[1 1]">         <Merge index="1" type="struct" size="[1 1]">               <EnvLv index="1" type="double" size="[1 6]">                  [0 0.1 0.2 0.3 0.7 1.0]               </EnvLv>               <OECurve_smooth index="1" type="double" size="[1 6]">                  [0.4 0.4 0.4 0.4 0.4 0.4]               </OECurve_smooth>               <OECurve_offset index="1" type="double" size="[1 6]">                  [0.9 0.9 0.9 0.9 0.9 0.9]               </OECurve_offset>               <MoveCoef index="1" type="double" size="[1 6]">                  [0 0.1 0.2 0.3 0.7 1.0]               </MoveCoef>               <MDCurveLM_smooth index="1" type="double" size="[1 6]">
 		[0.4 0.4 0.4 0.4 0.4 0.4]
 	      </MDCurveLM_smooth>               <MDCurveLM_offset index="1" type="double" size="[1 6]">                 [0.38 0.38 0.38 0.38 0.38 0.38 ]               </MDCurveLM_offset>               <MDCurveMS_smooth index="1" type="double" size="[1 6]">                 [0.4 0.4 0.4 0.4 0.4 0.4]               </MDCurveMS_smooth>               <MDCurveMS_offset index="1" type="double" size="[1 6]">                  [0.38 0.38 0.38 0.38 0.38 0.38 ]               </MDCurveMS_offset>               <OECurve_damp index="1" type="double" size="[1 1]">                  [0.3]               </OECurve_damp>               <MDCurveLM_damp index="1" type="double" size="[1 1]">                 [0.3]               </MDCurveLM_damp>               <MDCurveMS_damp index="1" type="double" size="[1 1]">                  [0.3]               </MDCurveMS_damp>         </Merge>         <Tmo index="1" type="struct" size="[1 1]">              <EnvLv index="1" type="double" size="[1 6]">                  [0 0.2 0.4 0.6 0.8 1.0]               </EnvLv> 
 	      <EnvLvTolerance index="1" type="double" size="[1 1]">                  [0]               </EnvLvTolerance>                 <GlobalLuma index="1" type="double" size="[1 6]">                   [0.25 0.25 0.25 0.25 0.25 0.25]                 </GlobalLuma>                 <OEPdf index="1" type="double" size="[1 6]">                    [0 0.1 0.2 0.3 0.4 0.5]                 </OEPdf>                 <OETolerance index="1" type="double" size="[1 1]">                    [0]                 </OETolerance>                 <DetailsHighLight index="1" type="double" size="[1 6]">                    [0.5 0.5 0.5 0.5 0.5 0.5]                 </DetailsHighLight>                <enFocusLuma index="1" type="double" size="[1 1]">                    [0]                 </enFocusLuma>                  <FocusLuma index="1" type="double" size="[1 6]">                    [1 20 30 40 50 60]                 </FocusLuma>                 <DarkPdf index="1" type="double" size="[1 6]">                    [0 0.1 0.2 0.3 0.4 0.5]                 </DarkPdf>                 <DTPdfTolerance index="1" type="double" size="[1 1]">                    [0]                 </DTPdfTolerance>                 <DetailsLowLight index="1" type="double" size="[1 6]">                    [1 1 1 1 1 1]                 </DetailsLowLight>                 <DynamicRange index="1" type="double" size="[1 6]">                    [1 44 66 72 78 84]                 </DynamicRange> 		<DRTolerance index="1" type="double" size="[1 1]">                    [0]                 </DRTolerance>                 <DayTh index="1" type="double" size="[1 1]">                    [0.5]                 </DayTh>                 <TmoContrast index="1" type="double" size="[1 6]">                    [0.5 0.5 0.5 0.5 0.5 0.5]                 </TmoContrast>                 <Damp index="1" type="double" size="[1 1]">                     [0.3]                 </Damp>         </Tmo>      </AHDR>
@@ -3637,76 +3628,387 @@
 	         </air_weitcur>
              </cell>
              <cell index="7" type="struct" size="[1 1]">
-	         <iso index="1" type="double" size="[1 1]">	            [3200]
-	         </iso>
-	         <dehaze_en index="1" type="double" size="[1 1]">	            [1]
-	         </dehaze_en>
-	         <dc_en index="1" type="double" size="[1 1]">
-	            [1]
-	         </dc_en>
-	         <hist_en index="1" type="double" size="[1 1]">
-	            [1]
-	         </hist_en>
-	         <hist_channel index="1" type="double" size="[1 1]">
-	            [1]
-	         </hist_channel>
-	         <gain_en index="1" type="double" size="[1 1]">
-	            [1]
-	         </gain_en>
-	         <dc_min_th index="1" type="double" size="[1 1]">
-	            [64.0]
-	         </dc_min_th>
-	         <dc_max_th index="1" type="double" size="[1 1]">
-	            [192.0]
-	         </dc_max_th>
-	         <yhist_th index="1" type="double" size="[1 1]">
-	            [249.0]
-	         </yhist_th>
-	         <yblk_th index="1" type="double" size="[1 1]">
-	            [0.002]
-	         </yblk_th>
-	         <dark_th index="1" type="double" size="[1 1]">
-	            [250.0]
-	         </dark_th>
-	         <bright_min index="1" type="double" size="[1 1]">
-	            [180.0]
-	         </bright_min>
-	         <bright_max index="1" type="double" size="[1 1]">
-	            [240.0]
-	         </bright_max>
-	         <wt_max index="1" type="double" size="[1 1]">
-	            [0.9]
-	         </wt_max>
-	         <air_min index="1" type="double" size="[1 1]">
-	            [200.0]
-	         </air_min>
-	         <air_max index="1" type="double" size="[1 1]">
-	            [250.0]
-	         </air_max>
-	         <tmax_base index="1" type="double" size="[1 1]">
-	            [125.0]
-	         </tmax_base>
-	         <tmax_off index="1" type="double" size="[1 1]">
-	            [0.1]
-	         </tmax_off>
-	         <tmax_max index="1" type="double" size="[1 1]">
-	            [0.5]
-	         </tmax_max>
-	         <hist_gratio index="1" type="double" size="[1 1]">
-	            [2.0]
-	         </hist_gratio>
-	         <hist_th_off index="1" type="double" size="[1 1]">
-	            [64.0]
-	         </hist_th_off>
-	         <hist_k index="1" type="double" size="[1 1]">
-	            [2.0]
-	         </hist_k>
-	         <hist_min index="1" type="double" size="[1 1]">
-	            [0.015]
-	         </hist_min>
-	         <enhance_en index="1" type="double" size="[1 1]">
-	            [0]
-	         </enhance_en>
-	         <enhance_value index="1" type="double" size="[1 1]">
-	            [1.5]
-	         </enhance_value>	         <hist_para_en index="1" type="double" size="[1 1]">	            [1]	         </hist_para_en>	         <hist_scale index="1" type="double" size="[1 1]">	            [0.9]	         </hist_scale>	         <stab_fnum index="1" type="double" size="[1 1]">	            [1.0]	         </stab_fnum>	         <sigma index="1" type="double" size="[1 1]">	            [6.0]	         </sigma>	         <wt_sigma index="1" type="double" size="[1 1]">	            [8.0]	         </wt_sigma>	         <air_sigma index="1" type="double" size="[1 1]">	            [120.0]	         </air_sigma>	         <tmax_sigma index="1" type="double" size="[1 1]">	            [0.01]	         </tmax_sigma>	         <cfg_alpha index="1" type="double" size="[1 1]">	            [0.0]	         </cfg_alpha>	         <cfg_wt index="1" type="double" size="[1 1]">	            [0.8]	         </cfg_wt>	         <cfg_air index="1" type="double" size="[1 1]">	            [210.0]	         </cfg_air>	         <cfg_tmax	 index="1" type="double" size="[1 1]">	            [0.2]	         </cfg_tmax>	         <cfg_gratio index="1" type="double" size="[1 1]">	            [2.0]	         </cfg_gratio>	         <dc_thed index="1" type="double" size="[1 1]">	            [31.0]	         </dc_thed>	         <dc_weitcur index="1" type="double" size="[1 1]">	            [1.0]	         </dc_weitcur>	         <air_thed	 index="1" type="double" size="[1 1]">	            [31.0]	         </air_thed>	         <air_weitcur index="1" type="double" size="[1 1]">	            [0.14]	         </air_weitcur>             </cell>             <cell index="8" type="struct" size="[1 1]">	         <iso index="1" type="double" size="[1 1]">	            [6400]	         </iso>	         <dehaze_en index="1" type="double" size="[1 1]">	            [1]	         </dehaze_en>	         <dc_en index="1" type="double" size="[1 1]">	            [1]	         </dc_en>	         <hist_en index="1" type="double" size="[1 1]">	            [1]	         </hist_en>	         <hist_channel index="1" type="double" size="[1 1]">	            [1]	         </hist_channel>	         <gain_en index="1" type="double" size="[1 1]">	            [1]	         </gain_en>	         <dc_min_th index="1" type="double" size="[1 1]">	            [64.0]	         </dc_min_th>	         <dc_max_th index="1" type="double" size="[1 1]">	            [192.0]	         </dc_max_th>	         <yhist_th index="1" type="double" size="[1 1]">	            [249.0]	         </yhist_th>	         <yblk_th index="1" type="double" size="[1 1]">	            [0.002]	         </yblk_th>	         <dark_th index="1" type="double" size="[1 1]">	            [250.0]	         </dark_th>	         <bright_min index="1" type="double" size="[1 1]">	            [180.0]	         </bright_min>	         <bright_max index="1" type="double" size="[1 1]">	            [240.0]	         </bright_max>	         <wt_max index="1" type="double" size="[1 1]">	            [0.9]	         </wt_max>	         <air_min index="1" type="double" size="[1 1]">	            [200.0]	         </air_min>	         <air_max index="1" type="double" size="[1 1]">	            [250.0]	         </air_max>	         <tmax_base index="1" type="double" size="[1 1]">	            [125.0]	         </tmax_base>	         <tmax_off index="1" type="double" size="[1 1]">	            [0.1]	         </tmax_off>	         <tmax_max index="1" type="double" size="[1 1]">	            [0.5]	         </tmax_max>	         <hist_gratio index="1" type="double" size="[1 1]">	            [2.0]	         </hist_gratio>	         <hist_th_off index="1" type="double" size="[1 1]">	            [64.0]	         </hist_th_off>	         <hist_k index="1" type="double" size="[1 1]">	            [2.0]	         </hist_k>	         <hist_min index="1" type="double" size="[1 1]">	            [0.015]	         </hist_min>	         <enhance_en index="1" type="double" size="[1 1]">	            [0]	         </enhance_en>	         <enhance_value index="1" type="double" size="[1 1]">	            [1.5]	         </enhance_value>	         <hist_para_en index="1" type="double" size="[1 1]">	            [1]	         </hist_para_en>	         <hist_scale index="1" type="double" size="[1 1]">	            [0.9]	         </hist_scale>	         <stab_fnum index="1" type="double" size="[1 1]">	            [1.0]	         </stab_fnum>	         <sigma index="1" type="double" size="[1 1]">	            [6.0]	         </sigma>	         <wt_sigma index="1" type="double" size="[1 1]">	            [8.0]	         </wt_sigma>	         <air_sigma index="1" type="double" size="[1 1]">	            [120.0]	         </air_sigma>	         <tmax_sigma index="1" type="double" size="[1 1]">	            [0.01]	         </tmax_sigma>	         <cfg_alpha index="1" type="double" size="[1 1]">	            [0.0]	         </cfg_alpha>	         <cfg_wt index="1" type="double" size="[1 1]">	            [0.8]	         </cfg_wt>	         <cfg_air index="1" type="double" size="[1 1]">	            [210.0]	         </cfg_air>	         <cfg_tmax	 index="1" type="double" size="[1 1]">	            [0.2]	         </cfg_tmax>	         <cfg_gratio index="1" type="double" size="[1 1]">	            [2.0]	         </cfg_gratio>	         <dc_thed index="1" type="double" size="[1 1]">	            [31.0]	         </dc_thed>	         <dc_weitcur index="1" type="double" size="[1 1]">	            [1.0]	         </dc_weitcur>	         <air_thed	 index="1" type="double" size="[1 1]">	            [31.0]	         </air_thed>	         <air_weitcur index="1" type="double" size="[1 1]">	            [0.14]	         </air_weitcur>             </cell>             <cell index="9" type="struct" size="[1 1]">	         <iso index="1" type="double" size="[1 1]">	            [12800]	         </iso>	         <dehaze_en index="1" type="double" size="[1 1]">	            [1]	         </dehaze_en>	         <dc_en index="1" type="double" size="[1 1]">	            [1]	         </dc_en>	         <hist_en index="1" type="double" size="[1 1]">	            [1]	         </hist_en>	         <hist_channel index="1" type="double" size="[1 1]">	            [1]	         </hist_channel>	         <gain_en index="1" type="double" size="[1 1]">	            [1]	         </gain_en>	         <dc_min_th index="1" type="double" size="[1 1]">	            [64.0]	         </dc_min_th>	         <dc_max_th index="1" type="double" size="[1 1]">	            [192.0]	         </dc_max_th>	         <yhist_th index="1" type="double" size="[1 1]">	            [249.0]	         </yhist_th>	         <yblk_th index="1" type="double" size="[1 1]">	            [0.002]	         </yblk_th>	         <dark_th index="1" type="double" size="[1 1]">	            [250.0]	         </dark_th>	         <bright_min index="1" type="double" size="[1 1]">	            [180.0]	         </bright_min>	         <bright_max index="1" type="double" size="[1 1]">	            [240.0]	         </bright_max>	         <wt_max index="1" type="double" size="[1 1]">	            [0.9]	         </wt_max>	         <air_min index="1" type="double" size="[1 1]">	            [200.0]	         </air_min>	         <air_max index="1" type="double" size="[1 1]">	            [250.0]	         </air_max>	         <tmax_base index="1" type="double" size="[1 1]">	            [125.0]	         </tmax_base>	         <tmax_off index="1" type="double" size="[1 1]">	            [0.1]	         </tmax_off>	         <tmax_max index="1" type="double" size="[1 1]">	            [0.5]	         </tmax_max>	         <hist_gratio index="1" type="double" size="[1 1]">	            [2.0]	         </hist_gratio>	         <hist_th_off index="1" type="double" size="[1 1]">	            [64.0]	         </hist_th_off>	         <hist_k index="1" type="double" size="[1 1]">	            [2.0]	         </hist_k>	         <hist_min index="1" type="double" size="[1 1]">	            [0.015]	         </hist_min>	         <enhance_en index="1" type="double" size="[1 1]">	            [0]	         </enhance_en>	         <enhance_value index="1" type="double" size="[1 1]">	            [1.5]	         </enhance_value>	         <hist_para_en index="1" type="double" size="[1 1]">	            [1]	         </hist_para_en>	         <hist_scale index="1" type="double" size="[1 1]">	            [0.9]	         </hist_scale>	         <stab_fnum index="1" type="double" size="[1 1]">	            [1.0]	         </stab_fnum>	         <sigma index="1" type="double" size="[1 1]">	            [6.0]	         </sigma>	         <wt_sigma index="1" type="double" size="[1 1]">	            [8.0]	         </wt_sigma>	         <air_sigma index="1" type="double" size="[1 1]">	            [120.0]	         </air_sigma>	         <tmax_sigma index="1" type="double" size="[1 1]">	            [0.01]	         </tmax_sigma>	         <cfg_alpha index="1" type="double" size="[1 1]">	            [0.0]	         </cfg_alpha>	         <cfg_wt index="1" type="double" size="[1 1]">	            [0.8]	         </cfg_wt>	         <cfg_air index="1" type="double" size="[1 1]">	            [210.0]	         </cfg_air>	         <cfg_tmax	 index="1" type="double" size="[1 1]">	            [0.2]	         </cfg_tmax>	         <cfg_gratio index="1" type="double" size="[1 1]">	            [2.0]	         </cfg_gratio>	         <dc_thed index="1" type="double" size="[1 1]">	            [31.0]	         </dc_thed>	         <dc_weitcur index="1" type="double" size="[1 1]">	            [1.0]	         </dc_weitcur>	         <air_thed	 index="1" type="double" size="[1 1]">	            [31.0]	         </air_thed>	         <air_weitcur index="1" type="double" size="[1 1]">	            [0.14]	         </air_weitcur>             </cell>         </DEHAZE_ISO>      </DEHAZE>      <SENSORINFO index="1" type="struct" size="[1 1]">         <GainRange index="1" type="double" size="[4 7]">	   [1 2 128 0 1 128 255	    2 4 64 -248 1 376 504	    4 8 32 -756 1 884 1012	    8 16 16 -1784 1 1912 2040]         </GainRange>         <TimeFactor index="1" type="double" size="[1 4]">            [0 0 1 0.5]         </TimeFactor>         <DCGRatio index="1" type="double" size="[1 1]">            [1]         </DCGRatio>         <EachGainSetEn index="1" type="double" size="[1 1]">            [1]         </EachGainSetEn>         <EachTimeSetEn index="1" type="double" size="[1 1]">            [1]         </EachTimeSetEn>         <CISTimeRegSumFac index="1" type="double" size="[1 2]">           [1 4]         </CISTimeRegSumFac>         <CISTimeRegOdevity index="1" type="double" size="[1 2]">           [1 0]         </CISTimeRegOdevity>         <CISTimeRegUnEqualEn index="1" type="double" size="[1 1]">            [1]         </CISTimeRegUnEqualEn>         <CISTimeRegMin index="1" type="double" size="[1 1]">            [3]         </CISTimeRegMin>         <CISAgainRange index="1" type="double" size="[1 2]">            [1 16]         </CISAgainRange>         <CISExtraAgainRange index="1" type="double" size="[1 2]">            [1 16]         </CISExtraAgainRange>         <CISDgainRange index="1" type="double" size="[1 2]">            [1 1]         </CISDgainRange>         <CISIspDgainRange index="1" type="double" size="[1 2]">            [1 1]         </CISIspDgainRange>     </SENSORINFO>      <LUT3D  index="1" type="struct" size="[1 1]">         <enable index="1" type="double" size="[1 1]">            [1]         </enable>         <look_up_table_r index="1" type="double" size="[1 729]">            [  0   20  205  415  626  829 1023 1023 1023               0   20  205  415  626  829 1023 1023 1023               0   20  205  415  626  829 1023 1023 1023               0   20  205  416  626  829 1023 1023 1023               0   20  205  415  626  829 1023 1023 1023               0   20  205  416  626  829 1023 1023 1023               0   20  205  415  626  829 1023 1023 1023             509  511  541  616  724  850  971 1023 1023             677  678  687  714  759  821  897  983 1023               0   20  205  415  626  829 1023 1023 1023               0   17  202  413  623  826 1023 1023 1023               0   17  202  413  623  826 1023 1023 1023               0   17  202  413  623  826 1023 1023 1023               0   17  202  413  623  826 1023 1023 1023               0   17  202  413  623  826 1023 1023 1023               0   17  202  413  623  826 1023 1023 1023             509  510  541  616  724  850  970 1023 1023             677  678  687  714  759  821  897  983 1023               0   20  205  415  626  829 1023 1023 1023               0   17  202  413  623  826 1023 1023 1023               0   17  178  386  596  800  997 1023 1023               0   17  178  386  596  800  997 1023 1023               0   17  178  386  596  800  997 1023 1023               0   17  178  386  596  800  997 1023 1023               0   17  178  386  596  800  997 1023 1023             511  512  539  614  723  849  969 1023 1023             677  678  686  713  758  820  896  982 1023               0   20  205  416  626  829 1023 1023 1023               0   17  202  413  623  826 1023 1023 1023               0   17  178  386  596  800  997 1023 1023               0   17  178  357  567  773  971 1023 1023               0   17  178  357  567  773  971 1023 1023               0   17  178  357  567  773  971 1023 1023               1   17  178  357  567  773  971 1023 1023             516  518  544  610  718  845  965 1023 1023             678  679  687  710  755  817  893  979 1023               0   20  205  415  626  829 1023 1023 1023               0   17  202  413  623  826 1023 1023 1023               0   17  178  386  596  800  997 1023 1023               0   17  178  357  567  773  971 1023 1023               0   17  178  357  537  745  944 1023 1023               0   17  178  357  537  745  944 1023 1023               0   17  178  357  537  745  944 1023 1023             526  528  554  618  713  841  957 1023 1023             680  680  688  711  750  811  888  974 1023               0   20  205  416  626  829 1023 1023 1023               0   17  202  413  623  826 1023 1023 1023               0   17  178  386  596  800  997 1023 1023               0   17  178  357  567  773  971 1023 1023               0   17  178  357  537  745  944 1023 1023               0   17  178  357  537  715  916 1023 1023               0   17  178  357  537  715  916 1023 1023             543  544  569  632  725  838  947 1023 1023             682  682  691  713  751  804  880  967 1023               0   20  205  415  626  829 1023 1023 1023               0   17  202  413  623  826 1023 1023 1023               0   17  178  386  596  800  997 1023 1023               1   17  178  357  567  773  971 1023 1023               0   17  178  357  537  745  944 1023 1023               0   17  178  357  537  715  916 1023 1023               1   17  178  357  537  715  886 1023 1023             569  570  594  654  745  853  935 1023 1023             685  686  694  716  754  806  871  957 1023              71   83  214  402  599  791  976 1023 1023              72   82  212  401  597  790  975 1023 1023              84   93  201  386  582  776  963 1023 1023             114  121  215  368  561  755  942 1023 1023             161  166  243  384  544  735  920 1023 1023             230  234  293  415  563  719  900 1023 1023             344  347  388  482  608  747  889 1023 1023             608  610  632  689  776  855  936 1023 1023             689  690  698  720  757  808  872  945 1023             247  250  299  407  545  693  840  978 1023             248  251  299  407  545  693  840  978 1023             268  271  311  413  547  693  837  975 1023             321  323  356  435  558  695  833  968 1023             402  403  428  489  578  700  830  960 1023             478  479  498  546  620  711  829  951 1023             556  557  571  608  667  743  832  943 1023             630  630  641  669  715  777  853  936 1023             695  695  703  725  761  811  874  946 1023 ]         </look_up_table_r>         <look_up_table_g index="1" type="double" size="[1 729]">            [  0    0    0    1    0    1    1  637 1771              78   78   78   78   78   78   78  663 1778             821  820  821  821  821  821  821 1036 1899            1662 1662 1662 1662 1662 1662 1662 1703 2192            2503 2503 2503 2503 2503 2503 2503 2442 2596            3317 3317 3317 3317 3317 3317 3317 3170 3049            4095 4095 4095 4095 4095 4095 4095 3837 3501            4095 4095 4095 4095 4095 4095 4095 4095 3923            4095 4095 4095 4095 4095 4095 4095 4095 4095               0    0    1    1    1    0    0  637 1771              78   69   69   69   69   69   69  660 1778             820  810  810  810  810  810  810 1033 1898            1662 1650 1650 1650 1650 1650 1650 1700 2191            2503 2491 2491 2491 2491 2491 2491 2439 2595            3317 3305 3305 3305 3305 3305 3305 3168 3049            4095 4091 4091 4091 4091 4091 4091 3836 3501            4095 4095 4095 4095 4095 4095 4095 4095 3923            4095 4095 4095 4095 4095 4095 4095 4095 4095               0    1    0    1    1    1    0  640 1775              78   69   69   69   69   69   69  663 1781             821  810  713  713  713  713  713  990 1890            1662 1650 1543 1543 1543 1543 1543 1658 2183            2503 2491 2383 2383 2383 2383 2383 2404 2587            3317 3305 3202 3202 3202 3202 3202 3143 3042            4095 4091 3990 3990 3990 3990 3990 3821 3495            4095 4095 4095 4095 4095 4095 4095 4095 3918            4095 4095 4095 4095 4095 4095 4095 4095 4095               1    1    1    0    1    0    2  650 1786              78   69   69   69   69   69   69  673 1792             821  810  713  713  713  713  713  996 1899            1662 1650 1543 1428 1428 1428 1428 1579 2161            2503 2491 2383 2267 2267 2267 2267 2331 2567            3317 3305 3202 3091 3091 3091 3091 3085 3023            4095 4091 3990 3882 3882 3882 3882 3783 3479            4095 4095 4095 4095 4095 4095 4095 4095 3904            4095 4095 4095 4095 4095 4095 4095 4095 4095               0    1    1    1    0    1    0  668 1805              78   69   69   69   69   69   69  690 1811             821  810  713  713  713  713  713 1008 1916            1662 1650 1543 1428 1428 1428 1428 1587 2174            2503 2491 2383 2267 2149 2149 2149 2242 2534            3317 3305 3202 3091 2978 2978 2978 3008 2993            4095 4091 3990 3882 3775 3775 3775 3727 3452            4095 4095 4095 4095 4095 4095 4095 4095 3881            4095 4095 4095 4095 4095 4095 4095 4095 4095               1    0    1    0    1    1    0  697 1834              78   69   69   69   69   69   69  718 1840             821  810  713  713  713  713  713 1028 1942            1662 1650 1543 1428 1428 1428 1428 1599 2194            2503 2491 2383 2267 2149 2149 2149 2251 2548            3317 3305 3202 3091 2978 2860 2860 2920 2952            4095 4091 3990 3882 3775 3663 3663 3660 3415            4095 4095 4095 4095 4095 4095 4095 4095 3848            4095 4095 4095 4095 4095 4095 4095 4095 4095               1    0    0    2    0    0    3  737 1874              78   69   69   69   69   69   69  758 1880             821  810  713  713  713  713  713 1056 1979            1662 1650 1543 1428 1428 1428 1428 1618 2223            2503 2491 2383 2267 2149 2149 2149 2264 2567            3317 3305 3202 3091 2978 2860 2860 2931 2964            4095 4091 3990 3882 3775 3663 3545 3586 3368            4095 4095 4095 4095 4095 4095 4095 4095 3805            4095 4095 4095 4095 4095 4095 4095 4095 4095             283  284  299  339  405  501  628  793 1927             334  328  342  378  439  529  651  812 1932             866  861  802  820  852  903  981 1096 2026            1624 1619 1561 1474 1492 1522 1570 1645 2260            2403 2400 2351 2268 2177 2197 2230 2284 2593            3155 3152 3117 3047 2964 2877 2903 2948 2980            3847 3846 3823 3771 3702 3627 3557 3606 3377            4095 4095 4095 4095 4095 4095 4095 4095 3754            4095 4095 4095 4095 4095 4095 4095 4095 4095             988  989 1014 1082 1198 1367 1588 1785 1992            1003 1003 1027 1094 1209 1377 1596 1791 1997            1245 1244 1243 1299 1396 1543 1724 1899 2086            1751 1750 1745 1741 1813 1918 2029 2161 2307            2354 2354 2347 2330 2313 2366 2437 2525 2626            2923 2923 2916 2898 2873 2846 2887 2939 3000            3449 3449 3442 3425 3399 3365 3328 3355 3387            3916 3915 3910 3894 3869 3834 3792 3745 3758            4095 4095 4095 4095 4095 4095 4095 4095 4095 ]         </look_up_table_g>         <look_up_table_b index="1" type="double" size="[1 729]">            [  0    0    0    0    0    0    0  159  443               0    0    0    0    0    0    0  160  443               0    0    0    0    0    0    0  168  452               0    0    0    0    0    0    1  193  476               0    0    0    0    0    0    0  237  514               0    0    0    0    0    0    0  313  563               0    0    0    1    0    0    1  461  617             509  509  515  531  563  623  709  724  673             677  677  678  680  684  691  700  711  725              20   20   20   20   20   20   20  165  444              20   17   17   17   17   17   17  165  444              20   17   17   17   17   17   17  173  453              20   17   17   17   17   17   17  197  477              20   17   17   17   17   17   17  240  515              20   17   17   17   17   17   17  316  564              20   17   17   17   17   17   17  462  618             510  510  516  532  565  623  709  725  673             678  678  678  681  685  691  700  711  725             205  205  205  205  205  205  205  254  467             205  202  202  202  202  202  202  253  467             205  202  178  178  178  178  178  247  472             205  202  178  178  178  178  178  264  495             205  202  178  178  178  178  178  297  530             205  202  178  178  178  178  178  359  576             205  202  178  178  178  178  178  490  628             537  537  539  554  584  640  720  734  681             687  687  686  689  693  699  707  718  731             415  415  415  416  415  416  415  417  525             415  413  413  413  413  413  413  416  525             415  413  386  386  386  386  386  407  529             416  413  386  357  357  357  357  395  540             415  413  386  357  357  357  357  415  570             416  413  386  357  357  357  357  458  610             415  413  386  357  357  357  357  557  656             606  606  606  610  636  684  747  760  704             712  712  712  710  714  719  727  737  749             626  626  626  626  626  626  626  601  614             626  623  623  623  623  623  623  600  614             626  623  596  596  596  596  596  590  616             626  623  596  567  567  567  567  573  622             626  623  596  567  537  537  537  560  634             626  623  596  567  537  537  537  587  665             626  623  596  567  537  537  537  654  702             706  706  706  707  713  752  793  803  741             755  755  755  753  750  754  761  769  780             829  829  829  829  829  829  829  789  724             829  826  826  826  826  826  826  788  724             829  826  800  800  800  800  800  777  724             829  826  800  773  773  773  773  759  726             829  826  800  773  745  745  745  741  730             829  826  800  773  745  715  715  730  738             829  826  800  773  745  715  715  771  765             829  829  827  825  825  838  856  863  794             816  816  815  813  809  804  809  816  823            1023 1023 1023 1023 1023 1023 1023  973  848            1023 1023 1023 1023 1023 1023 1023  972  848            1023 1023  997  997  997  997  997  961  846            1023 1023  997  971  971  971  971  942  843            1023 1023  997  971  944  944  944  921  841            1023 1023  997  971  944  916  916  902  840            1023 1023  997  971  944  916  886  897  842             961  961  959  953  947  946  935  938  861             893  893  892  889  884  878  871  875  880            1023 1023 1023 1023 1023 1023 1023 1023  977            1023 1023 1023 1023 1023 1023 1023 1023  977            1023 1023 1023 1023 1023 1023 1023 1023  975            1023 1023 1023 1023 1023 1023 1023 1023  969            1023 1023 1023 1023 1023 1023 1023 1023  961            1023 1023 1023 1023 1023 1023 1023 1023  952            1023 1023 1023 1023 1023 1023 1023 1023  945            1023 1023 1023 1023 1023 1023 1023 1023  938             982  982  980  977  972  965  956  945  948            1023 1023 1023 1023 1023 1023 1023 1023 1023            1023 1023 1023 1023 1023 1023 1023 1023 1023            1023 1023 1023 1023 1023 1023 1023 1023 1023            1023 1023 1023 1023 1023 1023 1023 1023 1023            1023 1023 1023 1023 1023 1023 1023 1023 1023            1023 1023 1023 1023 1023 1023 1023 1023 1023            1023 1023 1023 1023 1023 1023 1023 1023 1023            1023 1023 1023 1023 1023 1023 1023 1023 1023            1023 1023 1023 1023 1023 1023 1023 1023 1023 ]         </look_up_table_b>      </LUT3D>   </sensor>   <system type="struct" size="[1 1]">         <HDR index="1" type="struct" size="[1 1]">	     <enable index="1" type="double" size="[1 1]">	        [1]	     </enable>	     <support_mode index="1" type="char" size="[1 1]">	        MODE_3_LINE	     </support_mode>	     <line_mode index="1" type="char" size="[1 1]">	        STAGGER	     </line_mode>         </HDR>   </system></matfile>
+	         <iso index="1" type="double" size="[1 1]">	            [3200]	         </iso>
+	         <dehaze_en index="1" type="double" size="[1 1]">	            [1]	         </dehaze_en>
+	         <dc_en index="1" type="double" size="[1 1]">	            [1]	         </dc_en>
+	         <hist_en index="1" type="double" size="[1 1]">	            [1]	         </hist_en>
+	         <hist_channel index="1" type="double" size="[1 1]">	            [1]	         </hist_channel>
+	         <gain_en index="1" type="double" size="[1 1]">	            [1]	         </gain_en>
+	         <dc_min_th index="1" type="double" size="[1 1]">	            [64.0]	         </dc_min_th>
+	         <dc_max_th index="1" type="double" size="[1 1]">	            [192.0]	         </dc_max_th>
+	         <yhist_th index="1" type="double" size="[1 1]">	            [249.0]	         </yhist_th>
+	         <yblk_th index="1" type="double" size="[1 1]">	            [0.002]	         </yblk_th>
+	         <dark_th index="1" type="double" size="[1 1]">	            [250.0]	         </dark_th>
+	         <bright_min index="1" type="double" size="[1 1]">	            [180.0]	         </bright_min>
+	         <bright_max index="1" type="double" size="[1 1]">	            [240.0]	         </bright_max>
+	         <wt_max index="1" type="double" size="[1 1]">	            [0.9]	         </wt_max>
+	         <air_min index="1" type="double" size="[1 1]">	            [200.0]	         </air_min>
+	         <air_max index="1" type="double" size="[1 1]">	            [250.0]	         </air_max>
+	         <tmax_base index="1" type="double" size="[1 1]">	            [125.0]	         </tmax_base>
+	         <tmax_off index="1" type="double" size="[1 1]">	            [0.1]	         </tmax_off>
+	         <tmax_max index="1" type="double" size="[1 1]">	            [0.5]	         </tmax_max>
+	         <hist_gratio index="1" type="double" size="[1 1]">	            [2.0]	         </hist_gratio>
+	         <hist_th_off index="1" type="double" size="[1 1]">	            [64.0]	         </hist_th_off>
+	         <hist_k index="1" type="double" size="[1 1]">	            [2.0]	         </hist_k>
+	         <hist_min index="1" type="double" size="[1 1]">	            [0.015]	         </hist_min>
+	         <enhance_en index="1" type="double" size="[1 1]">	            [0]	         </enhance_en>
+	         <enhance_value index="1" type="double" size="[1 1]">	            [1.5]	         </enhance_value>
+	         <hist_para_en index="1" type="double" size="[1 1]">	            [1]	         </hist_para_en>
+	         <hist_scale index="1" type="double" size="[1 1]">	            [0.9]	         </hist_scale>
+	         <stab_fnum index="1" type="double" size="[1 1]">	            [1.0]	         </stab_fnum>
+	         <sigma index="1" type="double" size="[1 1]">	            [6.0]	         </sigma>
+	         <wt_sigma index="1" type="double" size="[1 1]">	            [8.0]	         </wt_sigma>
+	         <air_sigma index="1" type="double" size="[1 1]">	            [120.0]	         </air_sigma>
+	         <tmax_sigma index="1" type="double" size="[1 1]">	            [0.01]	         </tmax_sigma>
+	         <cfg_alpha index="1" type="double" size="[1 1]">	            [0.0]	         </cfg_alpha>
+	         <cfg_wt index="1" type="double" size="[1 1]">	            [0.8]	         </cfg_wt>
+	         <cfg_air index="1" type="double" size="[1 1]">	            [210.0]	         </cfg_air>
+	         <cfg_tmax	 index="1" type="double" size="[1 1]">	            [0.2]	         </cfg_tmax>
+	         <cfg_gratio index="1" type="double" size="[1 1]">	            [2.0]	         </cfg_gratio>
+	         <dc_thed index="1" type="double" size="[1 1]">	            [31.0]	         </dc_thed>
+	         <dc_weitcur index="1" type="double" size="[1 1]">	            [1.0]	         </dc_weitcur>
+	         <air_thed	 index="1" type="double" size="[1 1]">	            [31.0]	         </air_thed>
+	         <air_weitcur index="1" type="double" size="[1 1]">	            [0.14]	         </air_weitcur>
+             </cell>
+             <cell index="8" type="struct" size="[1 1]">
+	         <iso index="1" type="double" size="[1 1]">	            [6400]	         </iso>
+	         <dehaze_en index="1" type="double" size="[1 1]">	            [1]	         </dehaze_en>
+	         <dc_en index="1" type="double" size="[1 1]">	            [1]	         </dc_en>
+	         <hist_en index="1" type="double" size="[1 1]">	            [1]	         </hist_en>
+	         <hist_channel index="1" type="double" size="[1 1]">	            [1]	         </hist_channel>
+	         <gain_en index="1" type="double" size="[1 1]">	            [1]	         </gain_en>
+	         <dc_min_th index="1" type="double" size="[1 1]">	            [64.0]	         </dc_min_th>
+	         <dc_max_th index="1" type="double" size="[1 1]">	            [192.0]	         </dc_max_th>
+	         <yhist_th index="1" type="double" size="[1 1]">	            [249.0]	         </yhist_th>
+	         <yblk_th index="1" type="double" size="[1 1]">	            [0.002]	         </yblk_th>
+	         <dark_th index="1" type="double" size="[1 1]">	            [250.0]	         </dark_th>
+	         <bright_min index="1" type="double" size="[1 1]">	            [180.0]	         </bright_min>
+	         <bright_max index="1" type="double" size="[1 1]">	            [240.0]	         </bright_max>
+	         <wt_max index="1" type="double" size="[1 1]">	            [0.9]	         </wt_max>
+	         <air_min index="1" type="double" size="[1 1]">	            [200.0]	         </air_min>
+	         <air_max index="1" type="double" size="[1 1]">	            [250.0]	         </air_max>
+	         <tmax_base index="1" type="double" size="[1 1]">	            [125.0]	         </tmax_base>
+	         <tmax_off index="1" type="double" size="[1 1]">	            [0.1]	         </tmax_off>
+	         <tmax_max index="1" type="double" size="[1 1]">	            [0.5]	         </tmax_max>
+	         <hist_gratio index="1" type="double" size="[1 1]">	            [2.0]	         </hist_gratio>
+	         <hist_th_off index="1" type="double" size="[1 1]">	            [64.0]	         </hist_th_off>
+	         <hist_k index="1" type="double" size="[1 1]">	            [2.0]	         </hist_k>
+	         <hist_min index="1" type="double" size="[1 1]">	            [0.015]	         </hist_min>
+	         <enhance_en index="1" type="double" size="[1 1]">	            [0]	         </enhance_en>
+	         <enhance_value index="1" type="double" size="[1 1]">	            [1.5]	         </enhance_value>
+	         <hist_para_en index="1" type="double" size="[1 1]">	            [1]	         </hist_para_en>
+	         <hist_scale index="1" type="double" size="[1 1]">	            [0.9]	         </hist_scale>
+	         <stab_fnum index="1" type="double" size="[1 1]">	            [1.0]	         </stab_fnum>
+	         <sigma index="1" type="double" size="[1 1]">	            [6.0]	         </sigma>
+	         <wt_sigma index="1" type="double" size="[1 1]">	            [8.0]	         </wt_sigma>
+	         <air_sigma index="1" type="double" size="[1 1]">	            [120.0]	         </air_sigma>
+	         <tmax_sigma index="1" type="double" size="[1 1]">	            [0.01]	         </tmax_sigma>
+	         <cfg_alpha index="1" type="double" size="[1 1]">	            [0.0]	         </cfg_alpha>
+	         <cfg_wt index="1" type="double" size="[1 1]">	            [0.8]	         </cfg_wt>
+	         <cfg_air index="1" type="double" size="[1 1]">	            [210.0]	         </cfg_air>
+	         <cfg_tmax	 index="1" type="double" size="[1 1]">	            [0.2]	         </cfg_tmax>
+	         <cfg_gratio index="1" type="double" size="[1 1]">	            [2.0]	         </cfg_gratio>
+	         <dc_thed index="1" type="double" size="[1 1]">	            [31.0]	         </dc_thed>
+	         <dc_weitcur index="1" type="double" size="[1 1]">	            [1.0]	         </dc_weitcur>
+	         <air_thed	 index="1" type="double" size="[1 1]">	            [31.0]	         </air_thed>
+	         <air_weitcur index="1" type="double" size="[1 1]">	            [0.14]	         </air_weitcur>
+             </cell>
+             <cell index="9" type="struct" size="[1 1]">
+	         <iso index="1" type="double" size="[1 1]">	            [12800]	         </iso>
+	         <dehaze_en index="1" type="double" size="[1 1]">	            [1]	         </dehaze_en>
+	         <dc_en index="1" type="double" size="[1 1]">	            [1]	         </dc_en>
+	         <hist_en index="1" type="double" size="[1 1]">	            [1]	         </hist_en>
+	         <hist_channel index="1" type="double" size="[1 1]">	            [1]	         </hist_channel>
+	         <gain_en index="1" type="double" size="[1 1]">	            [1]	         </gain_en>
+	         <dc_min_th index="1" type="double" size="[1 1]">	            [64.0]	         </dc_min_th>
+	         <dc_max_th index="1" type="double" size="[1 1]">	            [192.0]	         </dc_max_th>
+	         <yhist_th index="1" type="double" size="[1 1]">	            [249.0]	         </yhist_th>
+	         <yblk_th index="1" type="double" size="[1 1]">	            [0.002]	         </yblk_th>
+	         <dark_th index="1" type="double" size="[1 1]">	            [250.0]	         </dark_th>
+	         <bright_min index="1" type="double" size="[1 1]">	            [180.0]	         </bright_min>
+	         <bright_max index="1" type="double" size="[1 1]">	            [240.0]	         </bright_max>
+	         <wt_max index="1" type="double" size="[1 1]">	            [0.9]	         </wt_max>
+	         <air_min index="1" type="double" size="[1 1]">	            [200.0]	         </air_min>
+	         <air_max index="1" type="double" size="[1 1]">	            [250.0]	         </air_max>
+	         <tmax_base index="1" type="double" size="[1 1]">	            [125.0]	         </tmax_base>
+	         <tmax_off index="1" type="double" size="[1 1]">	            [0.1]	         </tmax_off>
+	         <tmax_max index="1" type="double" size="[1 1]">	            [0.5]	         </tmax_max>
+	         <hist_gratio index="1" type="double" size="[1 1]">	            [2.0]	         </hist_gratio>
+	         <hist_th_off index="1" type="double" size="[1 1]">	            [64.0]	         </hist_th_off>
+	         <hist_k index="1" type="double" size="[1 1]">	            [2.0]	         </hist_k>
+	         <hist_min index="1" type="double" size="[1 1]">	            [0.015]	         </hist_min>
+	         <enhance_en index="1" type="double" size="[1 1]">	            [0]	         </enhance_en>
+	         <enhance_value index="1" type="double" size="[1 1]">	            [1.5]	         </enhance_value>
+	         <hist_para_en index="1" type="double" size="[1 1]">	            [1]	         </hist_para_en>
+	         <hist_scale index="1" type="double" size="[1 1]">	            [0.9]	         </hist_scale>
+	         <stab_fnum index="1" type="double" size="[1 1]">	            [1.0]	         </stab_fnum>
+	         <sigma index="1" type="double" size="[1 1]">	            [6.0]	         </sigma>
+	         <wt_sigma index="1" type="double" size="[1 1]">	            [8.0]	         </wt_sigma>
+	         <air_sigma index="1" type="double" size="[1 1]">	            [120.0]	         </air_sigma>
+	         <tmax_sigma index="1" type="double" size="[1 1]">	            [0.01]	         </tmax_sigma>
+	         <cfg_alpha index="1" type="double" size="[1 1]">	            [0.0]	         </cfg_alpha>
+	         <cfg_wt index="1" type="double" size="[1 1]">	            [0.8]	         </cfg_wt>
+	         <cfg_air index="1" type="double" size="[1 1]">	            [210.0]	         </cfg_air>
+	         <cfg_tmax	 index="1" type="double" size="[1 1]">	            [0.2]	         </cfg_tmax>
+	         <cfg_gratio index="1" type="double" size="[1 1]">	            [2.0]	         </cfg_gratio>
+	         <dc_thed index="1" type="double" size="[1 1]">	            [31.0]	         </dc_thed>
+	         <dc_weitcur index="1" type="double" size="[1 1]">	            [1.0]	         </dc_weitcur>
+	         <air_thed	 index="1" type="double" size="[1 1]">	            [31.0]	         </air_thed>
+	         <air_weitcur index="1" type="double" size="[1 1]">	            [0.14]	         </air_weitcur>
+             </cell>
+         </DEHAZE_ISO>
+      </DEHAZE>
+      <SENSORINFO index="1" type="struct" size="[1 1]">
+         <GainRange index="1" type="double" size="[4 7]">	   [1 2 128 0 1 128 255	    2 4 64 -248 1 376 504	    4 8 32 -756 1 884 1012	    8 16 16 -1784 1 1912 2040]         </GainRange>         <TimeFactor index="1" type="double" size="[1 4]">            [0 0 1 0.5]         </TimeFactor>
+         <DCGRatio index="1" type="double" size="[1 1]">            [1]         </DCGRatio>
+         <EachGainSetEn index="1" type="double" size="[1 1]">            [1]         </EachGainSetEn>         <EachTimeSetEn index="1" type="double" size="[1 1]">            [1]         </EachTimeSetEn>
+         <CISTimeRegSumFac index="1" type="double" size="[1 2]">           [2 4]         </CISTimeRegSumFac>         <CISTimeRegOdevity index="1" type="double" size="[1 2]">           [1 0]         </CISTimeRegOdevity>
+         <CISTimeRegUnEqualEn index="1" type="double" size="[1 1]">            [1]         </CISTimeRegUnEqualEn>
+         <CISTimeRegMin index="1" type="double" size="[1 1]">            [2]         </CISTimeRegMin>         <CISAgainRange index="1" type="double" size="[1 2]">            [1 16]         </CISAgainRange>
+         <CISExtraAgainRange index="1" type="double" size="[1 2]">            [1 16]         </CISExtraAgainRange>         <CISDgainRange index="1" type="double" size="[1 2]">            [1 1]         </CISDgainRange>         <CISIspDgainRange index="1" type="double" size="[1 2]">            [1 1]         </CISIspDgainRange>     </SENSORINFO>      <LUT3D  index="1" type="struct" size="[1 1]">
+         <enable index="1" type="double" size="[1 1]">            [1]         </enable>
+         <look_up_table_r index="1" type="double" size="[1 729]">            [  0   20  205  415  626  829 1023 1023 1023
+               0   20  205  415  626  829 1023 1023 1023
+               0   20  205  415  626  829 1023 1023 1023
+               0   20  205  416  626  829 1023 1023 1023
+               0   20  205  415  626  829 1023 1023 1023
+               0   20  205  416  626  829 1023 1023 1023
+               0   20  205  415  626  829 1023 1023 1023
+             509  511  541  616  724  850  971 1023 1023
+             677  678  687  714  759  821  897  983 1023
+               0   20  205  415  626  829 1023 1023 1023
+               0   17  202  413  623  826 1023 1023 1023
+               0   17  202  413  623  826 1023 1023 1023
+               0   17  202  413  623  826 1023 1023 1023
+               0   17  202  413  623  826 1023 1023 1023
+               0   17  202  413  623  826 1023 1023 1023
+               0   17  202  413  623  826 1023 1023 1023
+             509  510  541  616  724  850  970 1023 1023
+             677  678  687  714  759  821  897  983 1023
+               0   20  205  415  626  829 1023 1023 1023
+               0   17  202  413  623  826 1023 1023 1023
+               0   17  178  386  596  800  997 1023 1023
+               0   17  178  386  596  800  997 1023 1023
+               0   17  178  386  596  800  997 1023 1023
+               0   17  178  386  596  800  997 1023 1023
+               0   17  178  386  596  800  997 1023 1023
+             511  512  539  614  723  849  969 1023 1023
+             677  678  686  713  758  820  896  982 1023
+               0   20  205  416  626  829 1023 1023 1023
+               0   17  202  413  623  826 1023 1023 1023
+               0   17  178  386  596  800  997 1023 1023
+               0   17  178  357  567  773  971 1023 1023
+               0   17  178  357  567  773  971 1023 1023
+               0   17  178  357  567  773  971 1023 1023
+               1   17  178  357  567  773  971 1023 1023
+             516  518  544  610  718  845  965 1023 1023
+             678  679  687  710  755  817  893  979 1023
+               0   20  205  415  626  829 1023 1023 1023
+               0   17  202  413  623  826 1023 1023 1023
+               0   17  178  386  596  800  997 1023 1023
+               0   17  178  357  567  773  971 1023 1023
+               0   17  178  357  537  745  944 1023 1023
+               0   17  178  357  537  745  944 1023 1023
+               0   17  178  357  537  745  944 1023 1023
+             526  528  554  618  713  841  957 1023 1023
+             680  680  688  711  750  811  888  974 1023
+               0   20  205  416  626  829 1023 1023 1023
+               0   17  202  413  623  826 1023 1023 1023
+               0   17  178  386  596  800  997 1023 1023
+               0   17  178  357  567  773  971 1023 1023
+               0   17  178  357  537  745  944 1023 1023
+               0   17  178  357  537  715  916 1023 1023
+               0   17  178  357  537  715  916 1023 1023
+             543  544  569  632  725  838  947 1023 1023
+             682  682  691  713  751  804  880  967 1023
+               0   20  205  415  626  829 1023 1023 1023
+               0   17  202  413  623  826 1023 1023 1023
+               0   17  178  386  596  800  997 1023 1023
+               1   17  178  357  567  773  971 1023 1023
+               0   17  178  357  537  745  944 1023 1023
+               0   17  178  357  537  715  916 1023 1023
+               1   17  178  357  537  715  886 1023 1023
+             569  570  594  654  745  853  935 1023 1023
+             685  686  694  716  754  806  871  957 1023
+              71   83  214  402  599  791  976 1023 1023
+              72   82  212  401  597  790  975 1023 1023
+              84   93  201  386  582  776  963 1023 1023
+             114  121  215  368  561  755  942 1023 1023
+             161  166  243  384  544  735  920 1023 1023
+             230  234  293  415  563  719  900 1023 1023
+             344  347  388  482  608  747  889 1023 1023
+             608  610  632  689  776  855  936 1023 1023
+             689  690  698  720  757  808  872  945 1023
+             247  250  299  407  545  693  840  978 1023
+             248  251  299  407  545  693  840  978 1023
+             268  271  311  413  547  693  837  975 1023
+             321  323  356  435  558  695  833  968 1023
+             402  403  428  489  578  700  830  960 1023
+             478  479  498  546  620  711  829  951 1023
+             556  557  571  608  667  743  832  943 1023
+             630  630  641  669  715  777  853  936 1023
+             695  695  703  725  761  811  874  946 1023 ]         </look_up_table_r>
+         <look_up_table_g index="1" type="double" size="[1 729]">            [  0    0    0    1    0    1    1  637 1771
+              78   78   78   78   78   78   78  663 1778
+             821  820  821  821  821  821  821 1036 1899
+            1662 1662 1662 1662 1662 1662 1662 1703 2192
+            2503 2503 2503 2503 2503 2503 2503 2442 2596
+            3317 3317 3317 3317 3317 3317 3317 3170 3049
+            4095 4095 4095 4095 4095 4095 4095 3837 3501
+            4095 4095 4095 4095 4095 4095 4095 4095 3923
+            4095 4095 4095 4095 4095 4095 4095 4095 4095
+               0    0    1    1    1    0    0  637 1771
+              78   69   69   69   69   69   69  660 1778
+             820  810  810  810  810  810  810 1033 1898
+            1662 1650 1650 1650 1650 1650 1650 1700 2191
+            2503 2491 2491 2491 2491 2491 2491 2439 2595
+            3317 3305 3305 3305 3305 3305 3305 3168 3049
+            4095 4091 4091 4091 4091 4091 4091 3836 3501
+            4095 4095 4095 4095 4095 4095 4095 4095 3923
+            4095 4095 4095 4095 4095 4095 4095 4095 4095
+               0    1    0    1    1    1    0  640 1775
+              78   69   69   69   69   69   69  663 1781
+             821  810  713  713  713  713  713  990 1890
+            1662 1650 1543 1543 1543 1543 1543 1658 2183
+            2503 2491 2383 2383 2383 2383 2383 2404 2587
+            3317 3305 3202 3202 3202 3202 3202 3143 3042
+            4095 4091 3990 3990 3990 3990 3990 3821 3495
+            4095 4095 4095 4095 4095 4095 4095 4095 3918
+            4095 4095 4095 4095 4095 4095 4095 4095 4095
+               1    1    1    0    1    0    2  650 1786
+              78   69   69   69   69   69   69  673 1792
+             821  810  713  713  713  713  713  996 1899
+            1662 1650 1543 1428 1428 1428 1428 1579 2161
+            2503 2491 2383 2267 2267 2267 2267 2331 2567
+            3317 3305 3202 3091 3091 3091 3091 3085 3023
+            4095 4091 3990 3882 3882 3882 3882 3783 3479
+            4095 4095 4095 4095 4095 4095 4095 4095 3904
+            4095 4095 4095 4095 4095 4095 4095 4095 4095
+               0    1    1    1    0    1    0  668 1805
+              78   69   69   69   69   69   69  690 1811
+             821  810  713  713  713  713  713 1008 1916
+            1662 1650 1543 1428 1428 1428 1428 1587 2174
+            2503 2491 2383 2267 2149 2149 2149 2242 2534
+            3317 3305 3202 3091 2978 2978 2978 3008 2993
+            4095 4091 3990 3882 3775 3775 3775 3727 3452
+            4095 4095 4095 4095 4095 4095 4095 4095 3881
+            4095 4095 4095 4095 4095 4095 4095 4095 4095
+               1    0    1    0    1    1    0  697 1834
+              78   69   69   69   69   69   69  718 1840
+             821  810  713  713  713  713  713 1028 1942
+            1662 1650 1543 1428 1428 1428 1428 1599 2194
+            2503 2491 2383 2267 2149 2149 2149 2251 2548
+            3317 3305 3202 3091 2978 2860 2860 2920 2952
+            4095 4091 3990 3882 3775 3663 3663 3660 3415
+            4095 4095 4095 4095 4095 4095 4095 4095 3848
+            4095 4095 4095 4095 4095 4095 4095 4095 4095
+               1    0    0    2    0    0    3  737 1874
+              78   69   69   69   69   69   69  758 1880
+             821  810  713  713  713  713  713 1056 1979
+            1662 1650 1543 1428 1428 1428 1428 1618 2223
+            2503 2491 2383 2267 2149 2149 2149 2264 2567
+            3317 3305 3202 3091 2978 2860 2860 2931 2964
+            4095 4091 3990 3882 3775 3663 3545 3586 3368
+            4095 4095 4095 4095 4095 4095 4095 4095 3805
+            4095 4095 4095 4095 4095 4095 4095 4095 4095
+             283  284  299  339  405  501  628  793 1927
+             334  328  342  378  439  529  651  812 1932
+             866  861  802  820  852  903  981 1096 2026
+            1624 1619 1561 1474 1492 1522 1570 1645 2260
+            2403 2400 2351 2268 2177 2197 2230 2284 2593
+            3155 3152 3117 3047 2964 2877 2903 2948 2980
+            3847 3846 3823 3771 3702 3627 3557 3606 3377
+            4095 4095 4095 4095 4095 4095 4095 4095 3754
+            4095 4095 4095 4095 4095 4095 4095 4095 4095
+             988  989 1014 1082 1198 1367 1588 1785 1992
+            1003 1003 1027 1094 1209 1377 1596 1791 1997
+            1245 1244 1243 1299 1396 1543 1724 1899 2086
+            1751 1750 1745 1741 1813 1918 2029 2161 2307
+            2354 2354 2347 2330 2313 2366 2437 2525 2626
+            2923 2923 2916 2898 2873 2846 2887 2939 3000
+            3449 3449 3442 3425 3399 3365 3328 3355 3387
+            3916 3915 3910 3894 3869 3834 3792 3745 3758
+            4095 4095 4095 4095 4095 4095 4095 4095 4095 ]         </look_up_table_g>
+         <look_up_table_b index="1" type="double" size="[1 729]">            [  0    0    0    0    0    0    0  159  443
+               0    0    0    0    0    0    0  160  443
+               0    0    0    0    0    0    0  168  452
+               0    0    0    0    0    0    1  193  476
+               0    0    0    0    0    0    0  237  514
+               0    0    0    0    0    0    0  313  563
+               0    0    0    1    0    0    1  461  617
+             509  509  515  531  563  623  709  724  673
+             677  677  678  680  684  691  700  711  725
+              20   20   20   20   20   20   20  165  444
+              20   17   17   17   17   17   17  165  444
+              20   17   17   17   17   17   17  173  453
+              20   17   17   17   17   17   17  197  477
+              20   17   17   17   17   17   17  240  515
+              20   17   17   17   17   17   17  316  564
+              20   17   17   17   17   17   17  462  618
+             510  510  516  532  565  623  709  725  673
+             678  678  678  681  685  691  700  711  725
+             205  205  205  205  205  205  205  254  467
+             205  202  202  202  202  202  202  253  467
+             205  202  178  178  178  178  178  247  472
+             205  202  178  178  178  178  178  264  495
+             205  202  178  178  178  178  178  297  530
+             205  202  178  178  178  178  178  359  576
+             205  202  178  178  178  178  178  490  628
+             537  537  539  554  584  640  720  734  681
+             687  687  686  689  693  699  707  718  731
+             415  415  415  416  415  416  415  417  525
+             415  413  413  413  413  413  413  416  525
+             415  413  386  386  386  386  386  407  529
+             416  413  386  357  357  357  357  395  540
+             415  413  386  357  357  357  357  415  570
+             416  413  386  357  357  357  357  458  610
+             415  413  386  357  357  357  357  557  656
+             606  606  606  610  636  684  747  760  704
+             712  712  712  710  714  719  727  737  749
+             626  626  626  626  626  626  626  601  614
+             626  623  623  623  623  623  623  600  614
+             626  623  596  596  596  596  596  590  616
+             626  623  596  567  567  567  567  573  622
+             626  623  596  567  537  537  537  560  634
+             626  623  596  567  537  537  537  587  665
+             626  623  596  567  537  537  537  654  702
+             706  706  706  707  713  752  793  803  741
+             755  755  755  753  750  754  761  769  780
+             829  829  829  829  829  829  829  789  724
+             829  826  826  826  826  826  826  788  724
+             829  826  800  800  800  800  800  777  724
+             829  826  800  773  773  773  773  759  726
+             829  826  800  773  745  745  745  741  730
+             829  826  800  773  745  715  715  730  738
+             829  826  800  773  745  715  715  771  765
+             829  829  827  825  825  838  856  863  794
+             816  816  815  813  809  804  809  816  823
+            1023 1023 1023 1023 1023 1023 1023  973  848
+            1023 1023 1023 1023 1023 1023 1023  972  848
+            1023 1023  997  997  997  997  997  961  846
+            1023 1023  997  971  971  971  971  942  843
+            1023 1023  997  971  944  944  944  921  841
+            1023 1023  997  971  944  916  916  902  840
+            1023 1023  997  971  944  916  886  897  842
+             961  961  959  953  947  946  935  938  861
+             893  893  892  889  884  878  871  875  880
+            1023 1023 1023 1023 1023 1023 1023 1023  977
+            1023 1023 1023 1023 1023 1023 1023 1023  977
+            1023 1023 1023 1023 1023 1023 1023 1023  975
+            1023 1023 1023 1023 1023 1023 1023 1023  969
+            1023 1023 1023 1023 1023 1023 1023 1023  961
+            1023 1023 1023 1023 1023 1023 1023 1023  952
+            1023 1023 1023 1023 1023 1023 1023 1023  945
+            1023 1023 1023 1023 1023 1023 1023 1023  938
+             982  982  980  977  972  965  956  945  948
+            1023 1023 1023 1023 1023 1023 1023 1023 1023
+            1023 1023 1023 1023 1023 1023 1023 1023 1023
+            1023 1023 1023 1023 1023 1023 1023 1023 1023
+            1023 1023 1023 1023 1023 1023 1023 1023 1023
+            1023 1023 1023 1023 1023 1023 1023 1023 1023
+            1023 1023 1023 1023 1023 1023 1023 1023 1023
+            1023 1023 1023 1023 1023 1023 1023 1023 1023
+            1023 1023 1023 1023 1023 1023 1023 1023 1023
+            1023 1023 1023 1023 1023 1023 1023 1023 1023 ]         </look_up_table_b>      </LUT3D>
+   </sensor>   <system type="struct" size="[1 1]">         <HDR index="1" type="struct" size="[1 1]">	     <enable index="1" type="double" size="[1 1]">	        [1]	     </enable>	     <support_mode index="1" type="char" size="[1 1]">	        MODE_3_LINE	     </support_mode>	     <line_mode index="1" type="char" size="[1 1]">	        STAGGER	     </line_mode>         </HDR>
+         <EXP_DELAY index="1" type="struct" size="[1 1]">	     <time_delay index="1" type="double" size="[1 1]">	        [2]	     </time_delay>	     <gain_delay index="1" type="double" size="[1 1]">	        [2]	     </gain_delay>         </EXP_DELAY>   </system></matfile>

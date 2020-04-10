@@ -120,6 +120,11 @@ RKAIQ_BEGIN_DECLARE
 #define F_DECI_TXT_THRD_RATIO_ACCURATE              (16)
 #define F_DECI_TXT_THRD_RATIO_REAL                  (6)		//(8)	
 #define F_DECI_TXT_THRD_RATIO                       (F_ACCURATE_FLG_TXT_THRD_RATIO ? F_DECI_TXT_THRD_RATIO_ACCURATE : F_DECI_TXT_THRD_RATIO_REAL)
+#define F_INTE_GAIN_GLB_SQRT_INV                    0
+#define F_DECI_GAIN_GLB_SQRT_INV                    13
+#define GAIN_SIGMA_BITS_ACT		10
+#define MAX_INTEPORATATION_LUMAPOINT 	17
+#define	GAIN_HDR_MERGE_IN_FIX_BITS_DECI		        6
 
 
 /************uvnr fix***************/

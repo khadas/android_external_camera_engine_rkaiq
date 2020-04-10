@@ -171,7 +171,7 @@ RkAiqCore::init(const char* sns_ent_name, const CamCalibDbContext_t* aiqCalib)
     }
 
     mAlogsSharedParams.calib = aiqCalib;
-    // TODO, set AlgoCtxInstanceCfgInt ctxCfigs[RK_AIQ_ALGO_TYPE_MAX];
+
     addDefaultAlgos();
 
     mState = RK_AIQ_CORE_STATE_INITED;
@@ -254,11 +254,9 @@ RkAiqCore::prepare(const rk_aiq_exposure_sensor_descriptor* sensor_des,
     mAlogsSharedParams.snsDes = *sensor_des;
     mAlogsSharedParams.working_mode = mode;
 
-#ifdef RK_SIMULATOR_HW
     // for not hdr mode
-    if (mAlogsSharedParams.working_mode < 1)
+    if (mAlogsSharedParams.working_mode < RK_AIQ_WORKING_MODE_ISP_HDR2)
         enableAlgo(RK_AIQ_ALGO_TYPE_AHDR, 0, false);
-#endif
 
 #define PREPARE_ALGO(at) \
     LOGD_ANALYZER("%s handle prepare start ....", #at); \
@@ -336,8 +334,8 @@ RkAiqCore::analyzeInternal()
     if (mAiqIspParamsPool->has_free_items()) {
         aiqParams->mIspParams = mAiqIspParamsPool->get_item();
     } else {
-            LOGE_ANALYZER("no free isp params buffer!");
-            return NULL;
+        LOGE_ANALYZER("no free isp params buffer!");
+        return NULL;
     }
 
     if (mAiqExpParamsPool->has_free_items()) {
@@ -780,6 +778,10 @@ RkAiqCore::genIspAnrResult(RkAiqFullParams* params)
         memcpy(&ispp_param->tnr,
                &anr_rk->stAnrProcResult.stMfnrFix,
                sizeof(RKAnr_Mfnr_Fix_t));
+
+		memcpy(&isp_param->gain_config,
+               &anr_rk->stAnrProcResult.stGainFix,
+               sizeof(rk_aiq_isp_gain_t));
 
         LOGD_ANR("oyyf: %s:%d output isp param end \n", __FUNCTION__, __LINE__);
 
@@ -1629,17 +1631,17 @@ RkAiqCore::addDefaultAlgos()
 #else
     enableAlgo(RK_AIQ_ALGO_TYPE_AE, 0, true);
     enableAlgo(RK_AIQ_ALGO_TYPE_AHDR, 0, true);
-    enableAlgo(RK_AIQ_ALGO_TYPE_AGAMMA, 0, true);
     enableAlgo(RK_AIQ_ALGO_TYPE_AWB, 0, true);
+    enableAlgo(RK_AIQ_ALGO_TYPE_AGAMMA, 0, true);
     enableAlgo(RK_AIQ_ALGO_TYPE_ABLC, 0, true);
     enableAlgo(RK_AIQ_ALGO_TYPE_ACCM, 0, true);
     enableAlgo(RK_AIQ_ALGO_TYPE_ALSC, 0, true);
     enableAlgo(RK_AIQ_ALGO_TYPE_ADPCC, 0, true);
     enableAlgo(RK_AIQ_ALGO_TYPE_ANR, 0, true);
-    enableAlgo(RK_AIQ_ALGO_TYPE_AF, 0, true);
-    enableAlgo(RK_AIQ_ALGO_TYPE_ASHARP, 0, true);
-    enableAlgo(RK_AIQ_ALGO_TYPE_ADHAZ, 0, true);
-    enableAlgo(RK_AIQ_ALGO_TYPE_A3DLUT, 0, true);
+    /* enableAlgo(RK_AIQ_ALGO_TYPE_AF, 0, true); */
+    enableAlgo(RK_AIQ_ALGO_TYPE_ASHARP, 0, true); 
+    /* enableAlgo(RK_AIQ_ALGO_TYPE_ADHAZ, 0, true); */ 
+     /*enableAlgo(RK_AIQ_ALGO_TYPE_A3DLUT, 0, true); */
 #endif
 #endif
 }
@@ -1814,8 +1816,11 @@ RkAiqCore::convertIspstatsToAlgo(const SmartPtr<VideoBuffer> &buffer)
     SmartPtr<RkAiqExpParamsProxy> expParams = buf->get_exp_params();
     SmartPtr<RkAiqIspParamsProxy> ispParams = buf->get_isp_params();
     stats = (struct rkisp_isp2x_stat_buffer *)(buf->get_v4l2_userptr());
-    LOGE_ANALYZER("stats: frame_id: %d,  meas_type; 0x%x",
+    LOGI_ANALYZER("stats: frame_id: %d,  meas_type; 0x%x",
                   stats->frame_id, stats->meas_type);
+
+    mAlogsSharedParams.frameId = stats->frame_id;
+
     //awb2.0
     for(int i = 0; i < RK_AIQ_AWB_MAX_WHITEREGIONS_NUM; i++) {
         mAlogsSharedParams.ispStats.awb_stats.light[i].xYType[RK_AIQ_AWB_XY_TYPE_NORMAL_V200].Rvalue =
@@ -1960,21 +1965,21 @@ RkAiqCore::convertIspstatsToAlgo(const SmartPtr<VideoBuffer> &buffer)
             }
         }
 
-/*
- *         unsigned long chn0_mean = 0, chn1_mean = 0, chn2_mean = 0;
- *         for(int i = 0; i < ISP2X_RAWAEBIG_MEAN_NUM; i++) {
- *             chn0_mean += stats->params.rawae1.data[i].channelg_xy;
- *             chn2_mean += stats->params.rawae2.data[i].channelg_xy;
- *         }
- *
- *         for(int i = 0; i < ISP2X_RAWAELITE_MEAN_NUM; i++)
- *                 chn1_mean += stats->params.rawae0.data[i].channelg_xy;
- *
- *         printf("frame[%d]: chn[0-1-2]_g_mean_xy: %ld-%ld-%ld\n",
- *                 stats->frame_id, chn0_mean/ISP2X_RAWAEBIG_MEAN_NUM,
- *                 chn1_mean/ISP2X_RAWAELITE_MEAN_NUM,
- *                 chn2_mean/ISP2X_RAWAEBIG_MEAN_NUM);
- */
+        /*
+         *         unsigned long chn0_mean = 0, chn1_mean = 0, chn2_mean = 0;
+         *         for(int i = 0; i < ISP2X_RAWAEBIG_MEAN_NUM; i++) {
+         *             chn0_mean += stats->params.rawae1.data[i].channelg_xy;
+         *             chn2_mean += stats->params.rawae2.data[i].channelg_xy;
+         *         }
+         *
+         *         for(int i = 0; i < ISP2X_RAWAELITE_MEAN_NUM; i++)
+         *                 chn1_mean += stats->params.rawae0.data[i].channelg_xy;
+         *
+         *         printf("frame[%d]: chn[0-1-2]_g_mean_xy: %ld-%ld-%ld\n",
+         *                 stats->frame_id, chn0_mean/ISP2X_RAWAEBIG_MEAN_NUM,
+         *                 chn1_mean/ISP2X_RAWAELITE_MEAN_NUM,
+         *                 chn2_mean/ISP2X_RAWAEBIG_MEAN_NUM);
+         */
 
 
         memcpy(mAlogsSharedParams.ispStats.aec_stats.ae_data.chn[0].rawhist_big.bins, stats->params.rawhist1.hist_bin, ISP2X_HIST_BIN_N_MAX * sizeof(u32));
@@ -2036,16 +2041,16 @@ RkAiqCore::convertIspstatsToAlgo(const SmartPtr<VideoBuffer> &buffer)
         mAlogsSharedParams.ispStats.aec_stats.ae_exp.LinearExp = expParams->data()->LinearExp;
         memcpy(mAlogsSharedParams.ispStats.aec_stats.ae_exp.HdrExp,
                expParams->data()->HdrExp, sizeof(expParams->data()->HdrExp));
-	/*
-	 * printf("%s: L: [0x%x-0x%x], M: [0x%x-0x%x], S: [0x%x-0x%x]\n",
-	 *        __func__,
-	 *        expParams->data()->HdrExp[2].exp_sensor_params.coarse_integration_time,
-	 *        expParams->data()->HdrExp[2].exp_sensor_params.analog_gain_code_global,
-	 *        expParams->data()->HdrExp[1].exp_sensor_params.coarse_integration_time,
-	 *        expParams->data()->HdrExp[1].exp_sensor_params.analog_gain_code_global,
-	 *        expParams->data()->HdrExp[0].exp_sensor_params.coarse_integration_time,
-	 *        expParams->data()->HdrExp[0].exp_sensor_params.analog_gain_code_global);
-	 */
+        /*
+         * printf("%s: L: [0x%x-0x%x], M: [0x%x-0x%x], S: [0x%x-0x%x]\n",
+         *        __func__,
+         *        expParams->data()->HdrExp[2].exp_sensor_params.coarse_integration_time,
+         *        expParams->data()->HdrExp[2].exp_sensor_params.analog_gain_code_global,
+         *        expParams->data()->HdrExp[1].exp_sensor_params.coarse_integration_time,
+         *        expParams->data()->HdrExp[1].exp_sensor_params.analog_gain_code_global,
+         *        expParams->data()->HdrExp[0].exp_sensor_params.coarse_integration_time,
+         *        expParams->data()->HdrExp[0].exp_sensor_params.analog_gain_code_global);
+         */
     }
 
 

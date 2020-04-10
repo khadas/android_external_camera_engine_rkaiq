@@ -1441,6 +1441,8 @@ typedef struct {
     unsigned char hdr_en;
     rk_aiq_isp_hdr_mode_t hdr_mode;
     rk_aiq_sensor_hdr_line_mode_t line_mode;
+    int time_delay;
+    int gain_delay;
 } CalibDb_System_t;
 
 typedef struct CamCalibDbContext_s {

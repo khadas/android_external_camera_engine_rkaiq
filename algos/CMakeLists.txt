@@ -156,6 +156,7 @@ set (ANR_SRC
 	anr/rk_aiq_anr_algo_uvnr.cpp
 	anr/rk_aiq_anr_algo_ynr.cpp
 	anr/rk_aiq_uapi_anr_int.cpp
+	anr/rk_aiq_anr_algo_gain.cpp
     )
 
 if(EXISTS "${CMAKE_SOURCE_DIR}/algos/anr/rk_aiq_algo_anr_itf.cpp")

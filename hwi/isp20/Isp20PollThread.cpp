@@ -368,7 +368,7 @@ Isp20PollThread::mipi_poll_buffer_loop (int type, int dev_index)
     }
 
     if (poll_ret <= 0) {
-        XCAM_LOG_ERROR ("mipi_dev_index %d poll %s buffer event got error(0x%x) but continue\n",
+        XCAM_LOG_WARNING ("mipi_dev_index %d poll %s buffer event got error(0x%x) but continue\n",
                         dev_index, mipi_poll_type_to_str[type], poll_ret);
         ::usleep (10000); // 10ms
         return XCAM_RETURN_ERROR_TIMEOUT;

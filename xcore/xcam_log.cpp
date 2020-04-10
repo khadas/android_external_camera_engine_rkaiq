@@ -57,8 +57,8 @@ static char log_file_name[XCAM_MAX_STR_SIZE] = {0};
  *          0: error
  *          1: warning
  *          2: info
- *          3: verbose
- *          4: debug
+ *          3: debug
+ *          4: verbose
  *          5: low1
  *          6-7: unused, now the same as debug
  * [sub modules]: use bits 4-11 to define the sub modules of each module, the
@@ -87,7 +87,7 @@ typedef struct xcore_cam_log_module_info_s {
 } xcore_cam_log_module_info_t;
 
 static xcore_cam_log_module_info_t g_xcore_log_infos[XCORE_LOG_MODULE_MAX] = {
-    { "AEC", XCORE_LOG_LEVEL_ERR, 0x01}, // XCORE_LOG_MODULE_AEC
+    { "AEC", XCORE_LOG_LEVEL_ERR, 0xff}, // XCORE_LOG_MODULE_AEC
     { "AWB", XCORE_LOG_LEVEL_ERR, 0xff}, // XCORE_LOG_MODULE_AWB
     { "AF", XCORE_LOG_LEVEL_ERR, 0xff}, // XCORE_LOG_MODULE_AF
     { "ABLC", XCORE_LOG_LEVEL_ERR, 0xff}, // XCORE_LOG_MODULE_ABLC
@@ -119,7 +119,7 @@ static xcore_cam_log_module_info_t g_xcore_log_infos[XCORE_LOG_MODULE_MAX] = {
 bool xcam_get_enviroment_value(const char* variable, unsigned long long* value)
 {
     if (!variable || !value) {
-         return false;
+        return false;
 
     }
 
@@ -157,7 +157,7 @@ int xcam_get_log_level() {
 
 void xcam_print_log (int module, int sub_modules, int level, const char* format, ...) {
     if (level <= g_xcore_log_infos[module].log_level &&
-        (sub_modules & g_xcore_log_infos[module].sub_modules)) {
+            (sub_modules & g_xcore_log_infos[module].sub_modules)) {
         char buffer[XCAM_MAX_STR_SIZE] = {0};
         va_list va_list;
         va_start (va_list, format);
