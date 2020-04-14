@@ -1579,7 +1579,15 @@ Isp20Params::convertAiqTnrToIsp20Params(struct rkispp_params_cfg& pp_cfg,
     struct rkispp_tnr_config  * pTnrCfg = &pp_cfg.tnr_cfg;
 
     //0x0080
-    pTnrCfg->mode = tnr.mode;
+    if (tnr.mode > 0) {
+        pp_cfg.module_init_ens |= ISPP_MODULE_TNR_3TO1;
+    } else {
+        pp_cfg.module_init_ens |= ISPP_MODULE_TNR;
+    }
+
+    LOGD("mode:%d  pp_cfg:0x%x\n", tnr.mode, pp_cfg.module_init_ens);
+
+    /* pTnrCfg->mode = tnr.mode; */
     pTnrCfg->opty_en = tnr.opty_en;
     pTnrCfg->optc_en = tnr.optc_en;
     pTnrCfg->gain_en = tnr.gain_en;
@@ -2180,8 +2188,8 @@ Isp20Params::convertAiqResultsToIsp20PpParams(struct rkispp_params_cfg& pp_cfg,
         SmartPtr<RkAiqIsppParamsProxy> aiq_results)
 {
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
-
-    // TODO: this will casue no 3A stats
+    /* reinit, this may override by driver, enable nr & sharp default */
+    pp_cfg.module_init_ens = ISPP_MODULE_NR | ISPP_MODULE_SHP;
     convertAiqTnrToIsp20Params(pp_cfg, aiq_results->data()->tnr);
     convertAiqUvnrToIsp20Params(pp_cfg, aiq_results->data()->uvnr);
     convertAiqYnrToIsp20Params(pp_cfg, aiq_results->data()->ynr);

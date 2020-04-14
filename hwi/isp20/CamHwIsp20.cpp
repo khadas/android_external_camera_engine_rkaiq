@@ -32,6 +32,7 @@ CamHwIsp20::CamHwIsp20()
     , _first(true)
     , _state(CAM_HW_STATE_INVALID)
     , _hdr_mode(0)
+    , _ispp_module_init_ens(0)
 {}
 
 CamHwIsp20::~CamHwIsp20()
@@ -785,7 +786,7 @@ CamHwIsp20::prepare(uint32_t width, uint32_t height, int mode, int t_delay, int 
         LOGE("start ispp params dev err: %d\n", ret);
     }
 #endif
-
+    _ispp_module_init_ens = 0;
     _state = CAM_HW_STATE_PREPARED;
     EXIT_CAMHW_FUNCTION();
     return ret;
@@ -1243,8 +1244,20 @@ CamHwIsp20::setIsppParams(SmartPtr<RkAiqIsppParamsProxy>& isppParams)
             ispp_params->module_ens |= g_disable_ispp_modules_en;
             ispp_params->module_cfg_update &= ~g_disable_ispp_modules_cfg_update;
 #endif
-            //TODO set update bits
+            if (_state == CAM_HW_STATE_PREPARED)
+                _ispp_module_init_ens = ispp_params->module_init_ens;
+            else {
+                if (_ispp_module_init_ens != ispp_params->module_init_ens) {
+                    XCAM_LOG_ERROR ("ispp working mode changed from 0x%x to 0x%x\n",
+                                    _ispp_module_init_ens, ispp_params->module_init_ens);
+                    ispp_params->module_init_ens = _ispp_module_init_ens;
+                }
+            }
 
+			LOGD("%s:%d state:%d pp:init 0x%x  0x%x\n", 
+				__FUNCTION__, __LINE__, _state,
+				_ispp_module_init_ens, ispp_params->module_init_ens );
+            //TODO set update bits
             if (mIsppParamsDev->queue_buffer (v4l2buf) != 0) {
                 XCAM_LOG_ERROR ("RKISP1: failed to ioctl VIDIOC_QBUF for index %d, %d %s.\n",
                                 buf_index, errno, strerror(errno));
@@ -1426,8 +1439,7 @@ void CamHwIsp20::dumpTnrFixValue(struct rkispp_tnr_config  * pTnrCfg)
     int i = 0;
     printf("%s:(%d) enter \n", __FUNCTION__, __LINE__);
     //0x0080
-    printf("(0x0080) moode:%d opty_en:%d optc_en:%d gain_en:%d\n",
-           pTnrCfg->mode,
+    printf("(0x0080) opty_en:%d optc_en:%d gain_en:%d\n",
            pTnrCfg->opty_en,
            pTnrCfg->optc_en,
            pTnrCfg->gain_en);

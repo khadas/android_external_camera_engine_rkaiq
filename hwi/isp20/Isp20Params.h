@@ -39,7 +39,6 @@ public:
             SmartPtr<RkAiqIspParamsProxy>& last_aiq_results);
     virtual XCamReturn convertAiqResultsToIsp20PpParams(struct rkispp_params_cfg& pp_cfg,
             SmartPtr<RkAiqIsppParamsProxy> aiq_results);
-
 private:
     XCAM_DEAD_COPY(Isp20Params);
     void convertAiqLiteHstWndSize(struct isp2x_rawhistlite_cfg & hst_lite);

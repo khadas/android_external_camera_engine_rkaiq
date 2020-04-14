@@ -8211,6 +8211,18 @@ bool RkAiqCalibParser::parseEntrySensorMFNR
                  && (tag.Size() > 0)) {
             ParseString(pchild, mCalibDb->mfnr.version, sizeof(mCalibDb->mfnr.version));
         }
+		else if ((tagname == CALIB_SENSOR_MFNR_LOCAL_GAIN_EN)
+                 && (tag.isType(XmlTag::TAG_TYPE_DOUBLE))
+                 && (tag.Size() > 0)) {
+            int no = ParseUcharArray(pchild, &mCalibDb->mfnr.local_gain_en, tag.Size());
+            DCT_ASSERT((no == tag.Size()));
+        } 
+		else if ((tagname == CALIB_SENSOR_MFNR_MODE)
+                 && (tag.isType(XmlTag::TAG_TYPE_DOUBLE))
+                 && (tag.Size() > 0)) {
+            int no = ParseUcharArray(pchild, &mCalibDb->mfnr.mode, tag.Size());
+            DCT_ASSERT((no == tag.Size()));
+        }
         else if ((tagname == CALIB_SENSOR_MFNR_MAX_LEVEL)
                  && (tag.isType(XmlTag::TAG_TYPE_CHAR))
                  && (tag.Size() > 0)) {

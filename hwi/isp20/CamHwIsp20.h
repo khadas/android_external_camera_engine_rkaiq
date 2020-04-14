@@ -147,6 +147,7 @@ private:
     volatile bool _is_exit;
     SmartPtr<RkAiqIspParamsProxy> _last_aiq_results;
     struct isp2x_isp_params_cfg _full_active_isp_params;
+	uint32_t _ispp_module_init_ens;
     std::list<SmartPtr<RkAiqIspParamsProxy>> _pending_ispparams_queue;
     std::map<int, SmartPtr<RkAiqIspParamsPool>> _effecting_ispparm_map;
     static std::map<std::string, SmartPtr<rk_aiq_static_info_t>> mCamHwInfos;

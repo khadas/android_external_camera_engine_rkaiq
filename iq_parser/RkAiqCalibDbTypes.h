@@ -1220,6 +1220,8 @@ struct CalibDb_MFNR_ISO_s {
 typedef struct CalibDb_MFNR_s {
     int enable;
     char version[64];
+	unsigned char local_gain_en;
+	unsigned char mode;
     unsigned char max_level;
     unsigned char max_level_uv;
     unsigned char back_ref_num;
