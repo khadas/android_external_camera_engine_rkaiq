@@ -63,8 +63,6 @@ ANRresult_t ANRInit(ANRContext_t **ppANRCtx, CamCalibDbContext_t *pCalibDb)
 	init_mfnr_params(&pANRCtx->stAuto.stMfnrParams, &pANRCtx->stMfnrCalib);
 	#endif
 
-	pANRCtx->stAuto.gainTableEn = 1;
-
 	LOGD_ANR("%s(%d): bayernr %f %f %f %d %d %f", __FUNCTION__, __LINE__, 
 			pANRCtx->stAuto.stBayernrParams.filtpar[0],
 			pANRCtx->stAuto.stBayernrParams.filtpar[4],
@@ -221,7 +219,6 @@ ANRresult_t ANRGetProcResult(ANRContext_t *pANRCtx, ANRProcResult_t* pANRResult)
 		pANRResult->mfnrEn = pANRCtx->stAuto.mfnrEn;
 		pANRResult->ynrEN = pANRCtx->stAuto.ynrEn;
 		pANRResult->uvnrEn = pANRCtx->stAuto.uvnrEn;
-		pANRResult->gainTableEn = pANRCtx->stAuto.gainTableEn;
 		
 		
 	}else if(pANRCtx->eMode == ANR_OP_MODE_MANUAL){
@@ -234,7 +231,6 @@ ANRresult_t ANRGetProcResult(ANRContext_t *pANRCtx, ANRProcResult_t* pANRResult)
 		pANRResult->stYnrParamSelect = pANRCtx->stManual.stYnrParamSelect;
 		pANRResult->uvnrEn = pANRCtx->stManual.uvnrEn;
 		pANRResult->stUvnrParamSelect = pANRCtx->stManual.stUvnrParamSelect;
-		pANRResult->gainTableEn = pANRCtx->stManual.gainTableEn;
 	}
 
 	//transfer to reg value
@@ -245,11 +241,19 @@ ANRresult_t ANRGetProcResult(ANRContext_t *pANRCtx, ANRProcResult_t* pANRResult)
 	gain_fix_transfer(&pANRResult->stMfnrParamSelect, &pANRResult->stGainFix, &pANRCtx->stExpInfo);
 	pANRResult->stBayernrFix.rawnr_en = pANRResult->bayernrEn;
 	pANRResult->stMfnrFix.tnr_en = pANRResult->mfnrEn;
+	pANRResult->stMfnrFix.mode = pANRCtx->stMfnrCalib.mode;
 	pANRResult->stYnrFix.ynr_en = pANRResult->ynrEN;
 	pANRResult->stUvnrFix.uvnr_en = pANRResult->uvnrEn;
-	pANRResult->stGainFix.gain_table_en = pANRResult->gainTableEn;
+	pANRResult->stGainFix.gain_table_en = pANRCtx->stMfnrCalib.local_gain_en;
 	ANRSetGainMode(pANRResult);	
-	
+
+	LOGD_ANR("%s:%d xml:local:%d mode:%d  reg: local gain:%d  mfnr gain:%d mode:%d\n", 
+		__FUNCTION__, __LINE__,
+		pANRCtx->stMfnrCalib.local_gain_en,
+		pANRCtx->stMfnrCalib.mode,
+		pANRResult->stGainFix.gain_table_en,
+		pANRResult->stMfnrFix.gain_en,
+		pANRResult->stMfnrFix.mode);
 	LOGI_ANR("%s(%d): exit!\n", __FUNCTION__, __LINE__);
 	return ANR_RET_SUCCESS;
 }

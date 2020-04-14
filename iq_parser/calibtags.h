@@ -742,6 +742,8 @@
 #define CALIB_SENSOR_MFNR                                                 "MFNR"
 #define CALIB_SENSOR_MFNR_ENABLE                                          "Enable"
 #define CALIB_SENSOR_MFNR_VERSION                                         "Version"
+#define CALIB_SENSOR_MFNR_LOCAL_GAIN_EN                                   "local_gain_en"
+#define CALIB_SENSOR_MFNR_MODE                                            "mode"
 #define CALIB_SENSOR_MFNR_MAX_LEVEL                                       "max_level"
 #define CALIB_SENSOR_MFNR_MAX_LEVEL_UV                                    "max_level_uv"
 #define CALIB_SENSOR_MFNR_BACK_REF_NUM                                    "back_ref_num"

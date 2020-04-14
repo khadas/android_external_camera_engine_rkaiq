@@ -426,4 +426,14 @@ typedef enum {
 
 #define RK_AIQ_HDR_GET_WORKING_MODE(mode) (mode & 0xF0)
 
+typedef enum {
+    RK_AIQ_ISPP_STATIC_TNR_WORKING_MODE_2TO1,
+    RK_AIQ_ISPP_STATIC_TNR_WORKING_MODE_3TO1,
+} rk_aiq_ispp_static_tnr_working_mode_t;
+
+typedef enum {
+    RK_AIQ_ISPP_STATIC_FEC_WORKING_MODE_STABLIZATION,
+    RK_AIQ_ISPP_STATIC_FEC_WORKING_MODE_FISHEYE,
+} rk_aiq_ispp_static_fec_working_mode_t;
+
 #endif

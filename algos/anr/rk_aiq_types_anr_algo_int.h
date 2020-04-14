@@ -477,8 +477,6 @@ typedef struct ANR_Manual_Attr_s
 	RKAnr_Uvnr_Params_Select_t stUvnrParamSelect;
 
 	
-	int gainTableEn;
-	
 }ANR_Manual_Attr_t;
 
 typedef struct ANR_Auto_Attr_s
@@ -505,8 +503,6 @@ typedef struct ANR_Auto_Attr_s
 	RKAnr_Uvnr_Params_Select_t stUvnrParamSelect;
 
 	
-	int gainTableEn;
-	
 }ANR_Auto_Attr_t;
 
 typedef struct ANRProcResult_s{
@@ -514,7 +510,6 @@ typedef struct ANRProcResult_s{
 	int mfnrEn;
 	int ynrEN;
 	int uvnrEn;
-	int gainTableEn;
 
 	//for sw simultaion
 	RKAnr_Bayernr_Params_Select_t stBayernrParamSelect;	

@@ -1743,14 +1743,14 @@
 	<Enable index="1" type="double" size="[1 1]">
             [1]
          </Enable>
-	<Version index="1" type="double" size="[1 1]">
+	<Version index="1" type="char" size="[1 1]">
 	   V1
 	</Version>
          <ISO index="1" type="double" size="[1 9]">
             [50 100 200 400 800 1600 3200 6400 12800]
          </ISO>
          <step0_uvgrad_ratio index="1" type="double" size="[1 9]">
-            [40.0	35.0	30.0	25.0	15.0	8.0	5.0	3.0	3.0]
+            [40.0	40.0	40.0	50.0	60.0	60.0	60.0	60.0	60.0]
          </step0_uvgrad_ratio>
          <step0_uvgrad_offset index="1" type="double" size="[1 9]">
             [0.8	0.8	0.8	0.8	0.8	0.8	0.8	0.8	0.8]
@@ -1780,10 +1780,10 @@
             [0	0	0	0	0	0	0	0	0]
          </step1_median_IIR>
          <step1_bf_sigmaR index="1" type="double" size="[1 9]">
-            [30	25	20	15	10	8	6	4	3]
+            [30	25	25	25	20	20	20	20	20]
          </step1_bf_sigmaR>
          <step1_bf_uvgain index="1" type="double" size="[1 9]">
-            [1.5	1.5	1.5	1.5	1.5	1.5	1.5	1.5	1.5]
+            [1.5	1.5	1.5	1.8	2.5	3.0	3.0	3.0	3.0]
          </step1_bf_uvgain>
          <step1_bf_ratio index="1" type="double" size="[1 9]">
             [0.00	0.00	0.00	0.00	0.00	0.00	0.00	0.00	0.00]
@@ -1818,7 +1818,7 @@
             [8	  8	8	8	8	8	8	8	8]
          </step2_downSample_meansize>
          <step2_median_ratio index="1" type="double" size="[1 9]">
-            [0.2  0.2	0.3	0.4	0.5	0.6	0.7	0.8	0.9]
+            [0.2 0.2 0.2 0.2 0.2 0.2 0.2 0.2 0.2 ]
          </step2_median_ratio>
          <step2_median_size index="1" type="double" size="[1 9]">
             [3	3	3	3	3	3	3	3	3]
@@ -1827,7 +1827,7 @@
             [0	0	0	0	0	0	0	0	0]
          </step2_median_IIR>
          <step2_bf_sigmaR index="1" type="double" size="[1 9]">
-            [50	  40	30	20	15	10	6	3	2]
+            [50	40	30	25	25	20	20	20	20]
          </step2_bf_sigmaR>
          <step2_bf_uvgain index="1" type="double" size="[1 9]">
             [2.0  2.0	2.0	2.0	2.0	2.0	2.0	2.0	2.0]
@@ -1851,10 +1851,10 @@
             [32	  32	32   32]
          </step3_nonBf3>
          <step3_bf_sigmaR index="1" type="double" size="[1 9]">
-            [75   60	45	36	30	24	17	13	9]
+            [75	60	45	36	30	20	20	20	20]
          </step3_bf_sigmaR>
          <step3_bf_uvgain index="1" type="double" size="[1 9]">
-            [4.0  4.0	4.0	3.0	2.0	2.0	1.8	1.6	1.4]
+            [4.0	4.0	4.0	4.0	4.0	4.0	4.0	4.0	4.0]
          </step3_bf_uvgain>
          <step3_bf_ratio index="1" type="double" size="[1 9]">
             [1.00    1.00	1.00	1.00	1.00	1.00	1.00	1.00	1.00]
@@ -1926,7 +1926,7 @@
       <YNR index="1" type="struct" size="[1 1]">	    <Enable index="1" type="double" size="[1 1]">
 	        [1]
 	    </Enable>
-	    <Version index="1" type="double" size="[1 1]">
+	    <Version index="1" type="char" size="[1 1]">
 	        V1
 	    </Version>
 	   <YNR_ISO index="1" type="cell" size="[1 9]">             <cell index="1" type="struct" size="[1 1]">	         <iso index="1" type="double" size="[1 1]">
@@ -2537,7 +2537,9 @@
 	<noise_cut_en	 index="1" type="char" size="[1 1]">	    [0]	</noise_cut_en>
       </GIC>      <MFNR index="1" type="struct" size="[1 1]">
 	<Enable index="1" type="double" size="[1 1]">	    [1]	</Enable>
-	<Version index="1" type="double" size="[1 1]">	    V1	</Version>
+	<Version index="1" type="char" size="[1 1]">	    V1	</Version>
+	<local_gain_en index="1" type="double" size="[1 1]">	    [1]	</local_gain_en>
+	<mode index="1" type="double" size="[1 1]">	    [1]	</mode>
 	<max_level index="1" type="char" size="[1 1]">	    [4]	</max_level>
 	<max_level_uv index="1" type="char" size="[1 1]">	    [3]	</max_level_uv>
 	<back_ref_num index="1" type="char" size="[1 1]">	    [1]	</back_ref_num>
@@ -2936,7 +2938,7 @@
 	         <lvl3_gfsigma index="1" type="double" size="[1 3]">	            [0.12500	0.10938	0.10938]	         </lvl3_gfsigma>
              </cell>         </MFNR_ISO>      </MFNR>
       <SHARP index="1" type="struct" size="[1 1]">	<Enable index="1" type="double" size="[1 1]">	     [1]	</Enable>
-	<Version index="1" type="double" size="[1 1]">	     V1	</Version>
+	<Version index="1" type="char" size="[1 1]">	     V1	</Version>
          <luma_point index="1" type="double" size="[1 8]">	     [0	16	32	64	96	160	224	256]         </luma_point>
          <SHARP_ISO index="1" type="cell" size="[1 9]">             <cell index="1" type="struct" size="[1 1]">	         <iso index="1" type="double" size="[1 1]">	            [50]	         </iso>
 	         <lratio index="1" type="double" size="[1 1]">	            [0.67]	         </lratio>
@@ -3119,7 +3121,7 @@
 	         <local_sharp_strength index="1" type="double" size="[1 1]">	            [16]	         </local_sharp_strength>
              </cell>         </SHARP_ISO>      </SHARP>
       <EDGEFILTER index="1" type="struct" size="[1 1]">	<Enable index="1" type="double" size="[1 1]">	     [1]	</Enable>
-	<Version index="1" type="double" size="[1 1]">	     V1	</Version>
+	<Version index="1" type="char" size="[1 1]">	     V1	</Version>
          <luma_point index="1" type="double" size="[1 8]">	     [0	16	32	64	96	160	224	256]         </luma_point>
          <EDGEFILTER_ISO index="1" type="cell" size="[1 9]">             <cell index="1" type="struct" size="[1 1]">
 	         <iso index="1" type="double" size="[1 1]">	            [50]	         </iso>
