@@ -19,7 +19,7 @@
 
 #include "rk_aiq_algo_types_int.h"
 #include "ahdr/rk_aiq_algo_ahdr_itf.h"
-
+#include "xcam_log.h"
 #include "ahdr/rk_aiq_ahdr_algo.h"
 #include "ahdr/rk_aiq_types_ahdr_algo_prvt.h"
 

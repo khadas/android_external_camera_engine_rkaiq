@@ -1450,6 +1450,8 @@ RkAiqAdhazHandleInt::processing()
     RkAiqProcResComb* comb = &shared->procResComb;
     RkAiqIspStats* ispStats = &shared->ispStats;
 
+	adhaz_proc_int->hdr_mode = shared->working_mode;
+
     ret = RkAiqAdhazHandle::processing();
     if (ret) {
         comb->adhaz_proc_res = NULL;

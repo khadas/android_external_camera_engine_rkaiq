@@ -655,7 +655,7 @@ void Isp20Params::convertAiqAhdrToIsp20Params(struct isp2x_isp_params_cfg& isp_c
     isp_cfg.others.hdrtmo_cfg.cnt_mode      = ahdr_data.TmoProcRes.sw_hdrtmo_cnt_mode;
     isp_cfg.others.hdrtmo_cfg.expl_lgratio  = ahdr_data.TmoProcRes.sw_hdrtmo_expl_lgratio;
     isp_cfg.others.hdrtmo_cfg.lgscl_ratio   = ahdr_data.TmoProcRes.sw_hdrtmo_lgscl_ratio;
-    isp_cfg.others.hdrtmo_cfg.cfg_alpha     = ahdr_data.TmoProcRes.sw_hdrtmo_cfg_alpha;
+    isp_cfg.others.hdrtmo_cfg.cfg_alpha     = 0; //ahdr_data.TmoProcRes.sw_hdrtmo_cfg_alpha;
     isp_cfg.others.hdrtmo_cfg.set_gainoff   = ahdr_data.TmoProcRes.sw_hdrtmo_set_gainoff;
     isp_cfg.others.hdrtmo_cfg.set_palpha    = ahdr_data.TmoProcRes.sw_hdrtmo_set_palpha;
     isp_cfg.others.hdrtmo_cfg.set_lgmax     = ahdr_data.TmoProcRes.sw_hdrtmo_set_lgmax;
@@ -953,91 +953,6 @@ Isp20Params::convertAiqAwbGainToIsp20Params(struct isp2x_isp_params_cfg& isp_cfg
     cfg->gain_green_r   = Gr > max_wb_gain ? max_wb_gain : Gr ;
     cfg->gain_green_b   = Gb > max_wb_gain ? max_wb_gain : Gb;
 }
-/*
-
-
-        void Isp20Params::convertAiqAdehazeToIsp20Params(struct isp2x_isp_params_cfg& isp_cfg,
-                const isp2x_dhaz_cfg& dhaze                     )
-        {
-        int i;
-
-             int rawWidth = 1920;
-             int rawHeight =1080;
-             struct isp2x_dhaz_cfg *  cfg = &isp_cfg.others.dhaz_cfg;
-
-
-
-                 //cfg->       = int(rk_aiq_dehaze_cfg_t->dehaze_en[0]);  //0~1  , (1bit) dehaze_en
-                 cfg->dc_en    = int(dhaze.dc_en);  //0~1  , (1bit) dc_en
-                 cfg->hist_en          = int(dhaze.hist_en);  //0~1  , (1bit) hist_en
-                 cfg->hist_chn         = int(dhaze.hist_chn);  //0~1  , (1bit) hist_channel
-                 cfg->gain_en          = int(dhaze.gain_en);  //0~1  , (1bit) gain_en
-                 cfg->dc_min_th    = int(dhaze.dc_min_th); //0~255, (8bit) dc_min_th
-                 cfg->dc_max_th    = int(dhaze.dc_max_th                );  //0~255, (8bit) dc_max_th
-                 cfg->yhist_th    = int(dhaze.yhist_th              );  //0~255, (8bit) yhist_th
-                 cfg->yblk_th    = int(dhaze.yblk_th*((rawWidth+15) / 16)*((rawHeight+15) / 16)); //default:28,(9bit) yblk_th
-                 cfg->dark_th    = int(dhaze.dark_th            );  //0~255, (8bit) dark_th
-                 cfg->bright_min   = int(dhaze.bright_min               );  //0~255, (8bit) bright_min
-                 cfg->bright_max   = int(dhaze.bright_max               );  //0~255, (8bit) bright_max
-                 cfg->wt_max   = int(dhaze.wt_max*256           );  //0~255, (9bit) wt_max
-                 cfg->air_min   = int(dhaze.air_min         );  //0~255, (8bit) air_min
-                 cfg->air_max   = int(dhaze.air_max             );  //0~256, (8bit) air_max
-                 cfg->tmax_base   = int(dhaze.tmax_base             );  //0~255, (8bit) tmax_base
-                 cfg->tmax_off   = int(dhaze.tmax_off*1024          );  //0~1024,(11bit) tmax_off
-                 cfg->tmax_max   = int(dhaze.tmax_max*1024          );  //0~1024,(11bit) tmax_max
-                 cfg->hist_gratio   = int(dhaze.hist_gratio*8           );  //       (8bit) hist_gratio
-                 cfg->hist_th_off   = int(dhaze.hist_th_off             );  //       (8bit) hist_th_off
-                 cfg->hist_k   = int(dhaze.hist_k * 4 + 0.5 );  //0~7    (5bit),3bit+2bit, hist_k
-                 cfg->hist_min   = int(dhaze.hist_min * 256     );  //       (9bit) hist_min
-                 cfg->enhance_en       = int(dhaze.enhance_en               );  //0~1  , (1bit) enhance_en
-                 cfg->enhance_value    = int(dhaze.enhance_value * 1024 + 0.5   );  //       (14bit),4bit + 10bit, enhance_value
-                 cfg->hpara_en     = int(dhaze.hpara_en             );  //0~1  , (1bit) sw_hist_para_en
-                 cfg->hist_scale       = int(dhaze.hist_scale * 256 + 0.5   );  //       (13bit),5bit + 8bit, sw_hist_scale
-                 cfg->stab_fnum = int(dhaze.stab_fnum           );  //1~31,  (5bit) stab_fnum
-                 cfg->iir_sigma = int(dhaze.iir_sigma           );  //0~255, (8bit) sigma
-                 cfg->iir_wt_sigma = int(dhaze.iir_wt_sigma*8+0.5       );  //       (11bit),8bit+3bit, wt_sigma
-                 cfg->iir_air_sigma = int(dhaze.iir_air_sigma           );  //       (8bit) air_sigma
-                 cfg->iir_tmax_sigma = int(dhaze.iir_tmax_sigma * 1024 + 0.5);  //       (11bit) tmax_sigma
-                 cfg->cfg_alpha = int(MIN(dhaze.cfg_alpha*256,255));    //0~255, (8bit) cfg_alpha
-                 cfg->cfg_wt = int(dhaze.cfg_wt*256         );  //0~256, (9bit) cfg_wt
-                 cfg->cfg_air = int(dhaze.cfg_air           );  //0~255, (8bit) cfg_air
-                 cfg->cfg_tmax = int(dhaze.cfg_tmax*1024        );  //0~1024,(11bit) cfg_tmax
-                 cfg->cfg_gratio = int(dhaze.cfg_gratio*256     );  //       (13bit),5bit+8bit, cfg_gratio
-                 cfg->dc_thed      = int(dhaze.dc_thed              );  //0~255, (8bit) dc_thed
-                 cfg->dc_weitcur       = int(dhaze.dc_weitcur * 256 + 0.5   );  //0~256, (9bit) dc_weitcur
-                 cfg->air_thed     = int(dhaze.air_thed             );  //0~255, (8bit) air_thed
-                 cfg->air_weitcur      = int(dhaze.air_weitcur * 256 + 0.5  );  //0~256, (9bit) air_weitcur
-
-
-                     cfg->sw_dhaz_dc_bf_h0   = int(dhaze.sw_dhaz_dc_bf_h0);//h0~h5  从大到小
-                     cfg->sw_dhaz_dc_bf_h1   = int(dhaze.sw_dhaz_dc_bf_h1);
-                     cfg->sw_dhaz_dc_bf_h2   = int(dhaze.sw_dhaz_dc_bf_h2);
-                     cfg->sw_dhaz_dc_bf_h3   = int(dhaze.sw_dhaz_dc_bf_h3);
-                     cfg->sw_dhaz_dc_bf_h4   = int(dhaze.sw_dhaz_dc_bf_h4);
-                     cfg->sw_dhaz_dc_bf_h5   = int(dhaze.sw_dhaz_dc_bf_h5);
-
-
-                     cfg->air_bf_h0  = int(dhaze.air_bf_h0);//h0~h2  从大到小
-                     cfg->air_bf_h1  = int(dhaze.air_bf_h1);
-                     cfg->air_bf_h2  = int(dhaze.air_bf_h2);
-
-                     cfg->gaus_h0    = int(dhaze.gaus_h0);//h0~h2   从大到小
-                     cfg->gaus_h1    = int(dhaze.gaus_h1);
-                     cfg->gaus_h2    = int(dhaze.gaus_h2);
-
-               for (int i = 0; i < 6; i++)
-                 {
-                     cfg->conv_t0[i]     = int(dhaze.conv_t0[i]);
-                     cfg->conv_t1[i]     = int(dhaze.conv_t1[i]);
-                     cfg->conv_t2[i]     = int(dhaze.conv_t2[i]);
-                 }
-
-
-
-
-        }*/
-
-
 
 void Isp20Params::convertAiqAgammaToIsp20Params(struct isp2x_isp_params_cfg& isp_cfg,
         const rk_aiq_gamma_cfg_t& gamma_out_cfg)
@@ -1087,8 +1002,8 @@ void Isp20Params::convertAiqAdehazeToIsp20Params(struct isp2x_isp_params_cfg& is
     cfg->bright_min   = int(dhaze.dehaze_self_adp[5]               );  //0~255, (8bit) bright_min
     cfg->bright_max   = int(dhaze.dehaze_self_adp[6]               );  //0~255, (8bit) bright_max
     cfg->wt_max   = int(dhaze.dehaze_range_adj[0] * 256          ); //0~255, (9bit) wt_max
-    cfg->air_min   = int(dhaze.dehaze_range_adj[1]             );  //0~255, (8bit) air_min
-    cfg->air_max   = int(dhaze.dehaze_range_adj[2]             );  //0~256, (8bit) air_max
+    cfg->air_min   = int(dhaze.dehaze_range_adj[2]             );  //0~255, (8bit) air_min
+    cfg->air_max   = int(dhaze.dehaze_range_adj[1]             );  //0~256, (8bit) air_max
     cfg->tmax_base   = int(dhaze.dehaze_range_adj[3]               );  //0~255, (8bit) tmax_base
     cfg->tmax_off   = int(dhaze.dehaze_range_adj[4] * 1024           ); //0~1024,(11bit) tmax_off
     cfg->tmax_max   = int(dhaze.dehaze_range_adj[5] * 1024           ); //0~1024,(11bit) tmax_max
@@ -1106,7 +1021,7 @@ void Isp20Params::convertAiqAdehazeToIsp20Params(struct isp2x_isp_params_cfg& is
     cfg->iir_air_sigma = int(dhaze.dehaze_iir_control[3]           );  //       (8bit) air_sigma
     cfg->iir_tmax_sigma = int(dhaze.dehaze_iir_control[4] * 1024 + 0.5);   //       (11bit) tmax_sigma
     cfg->cfg_alpha = int(MIN(dhaze.dehaze_user_config[0] * 256, 255)); //0~255, (8bit) cfg_alpha
-    cfg->cfg_air = int(dhaze.dehaze_user_config[1] * 256         ); //0~256, (9bit) cfg_wt
+    cfg->cfg_wt = int(dhaze.dehaze_user_config[1] * 256         ); //0~256, (9bit) cfg_wt
     cfg->cfg_air = int(dhaze.dehaze_user_config[2]             );  //0~255, (8bit) cfg_air
     cfg->cfg_tmax = int(dhaze.dehaze_user_config[3] * 1024       ); //0~1024,(11bit) cfg_tmax
     cfg->cfg_gratio = int(dhaze.dehaze_user_config[4] * 256      ); //       (13bit),5bit+8bit, cfg_gratio
@@ -2179,6 +2094,8 @@ Isp20Params::convertAiqResultsToIsp20Params(struct isp2x_isp_params_cfg& isp_cfg
     convertAiqCpToIsp20Params(isp_cfg, aiq_results->data()->cp);
     convertAiqIeToIsp20Params(isp_cfg, aiq_results->data()->ie);
 #endif
+
+    last_aiq_results = aiq_results;
 
     return ret;
 }

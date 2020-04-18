@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><matfile>   <header type="struct" size="[1 1]">      <code_xml_parse_version index="1" type="char" size="[1 6]">         v1.0.0      </code_xml_parse_version>      <creation_date index="1" type="char" size="[1 11]">         2020-01-14      </creation_date>      <creator index="1" type="char" size="[1 2]">         DALON      </creator>      <sensor_name index="1" type="char" size="[1 7]">         IMX347      </sensor_name>      <sample_name index="1" type="char" size="[1 9]">         UNKNOWN      </sample_name>      <generator_version index="1" type="char" size="[1 4]">         v1.0.0      </generator_version>   </header>   <sensor type="struct" size="[1 1]">
+<?xml version="1.0" encoding="utf-8"?><matfile>   <header type="struct" size="[1 1]">      <code_xml_parse_version index="1" type="char" size="[1 6]">         v1.0.0      </code_xml_parse_version>      <creation_date index="1" type="char" size="[1 11]">         2020-04-16      </creation_date>      <creator index="1" type="char" size="[1 2]">         sandy      </creator>      <sensor_name index="1" type="char" size="[1 7]">         IMX347      </sensor_name>      <sample_name index="1" type="char" size="[1 9]">         JSD3425-C1      </sample_name>      <generator_version index="1" type="char" size="[1 4]">         v1.0.0      </generator_version>   </header>   <sensor type="struct" size="[1 1]">
       <AWB index="1" type="struct" size="[1 1]">
 	 <wbBypass index="1" type="double" size="[1 1]">	   [0]	 </wbBypass>
 	<awbEnable index="1" type="double" size="[1 1]">	   [1]	 </awbEnable>
@@ -6,7 +6,7 @@
          <Globals index="1" type="struct" size="[1 1]">
 		<hdrFrameChoose index="1" type="struct" size="[1 1]">
                   	<mode index="1" type="double" size="[1 1]">
-                 		 [0]
+                 		 [1]
 			</mode>
 	         	<frameChoose index="1" type="double" size="[1 1]">	           	 [1]	         	</frameChoose>
 		</hdrFrameChoose >
@@ -761,7 +761,7 @@
          <LightSources index="1" type="cell" size="[1 7]">             <cell index="1" type="struct" size="[1 1]">                  <name index="1" type="char" size="[1 9]">                     A                  </name>
 	         <doorType index="1" type="double" size="[1 1]">	            [1]	         </doorType>
 	         <standardGainValue index="1" type="double" size="[1 4]">	            [1.2766	1.0000	1.0000	2.9218]	         </standardGainValue>
-	         <staWeigthSet index="1" type="double" size="[1 16]">	            [40	50	60	60	70	80	100	100	100	100	100	100	100	100	90	75]	         </staWeigthSet>
+	         <staWeigthSet index="1" type="double" size="[1 16]">	            [100 100	100	100	100	100	100	100	100	100	100	100	100	100	90	75]	         </staWeigthSet>
 	         <spatialGain_LV_THSet index="1" type="double" size="[1 2]">	            [1024  8192]	         </spatialGain_LV_THSet>
 	         <xyType2Enable index="1" type="double" size="[1 1]">	            [1]	         </xyType2Enable>
 	         <weightCurve_ratio index="1" type="double" size="[1 4]">	            [0.2	0.4	0.8	1]	         </weightCurve_ratio>
@@ -770,7 +770,7 @@
              <cell index="2" type="struct" size="[1 1]">                  <name index="1" type="char" size="[1 9]">                     CWF                  </name>
 	         <doorType index="1" type="double" size="[1 1]">	            [1]	         </doorType>
 	         <standardGainValue index="1" type="double" size="[1 4]">	            [1.7393 1.0000 1.0000 2.5359]	         </standardGainValue>
-	         <staWeigthSet index="1" type="double" size="[1 16]">	            [90 90 90 90 100 100 100 100 100 100 100 100 70 60 50 40]	         </staWeigthSet>
+	         <staWeigthSet index="1" type="double" size="[1 16]">	            [100 100 100 100 100 100 100 100 100 100 100 100 70 60 50 40]	         </staWeigthSet>
 	         <spatialGain_LV_THSet index="1" type="double" size="[1 2]">	            [1024  8192]	         </spatialGain_LV_THSet>
 	         <xyType2Enable index="1" type="double" size="[1 1]">	            [1]	         </xyType2Enable>
 	         <weightCurve_ratio index="1" type="double" size="[1 4]">	            [0.2	0.4	0.8	1]	         </weightCurve_ratio>
@@ -779,7 +779,7 @@
              <cell index="3" type="struct" size="[1 1]">                  <name index="1" type="char" size="[1 9]">                     D50                  </name>
 	         <doorType index="1" type="double" size="[1 1]">	            [2]	         </doorType>
 	         <standardGainValue index="1" type="double" size="[1 4]">	            [1.7459 1.0000 1.0000 1.7844]	         </standardGainValue>
-	         <staWeigthSet index="1" type="double" size="[1 16]">	            [90 90 90 90 100 100 100 100 100 100 100 100 100 100 100 100]	         </staWeigthSet>
+	         <staWeigthSet index="1" type="double" size="[1 16]">	            [100 100 100 100 100 100 100 100 100 100 100 100 100 100 100 100]	         </staWeigthSet>
 	         <spatialGain_LV_THSet index="1" type="double" size="[1 2]">	            [1024  8192]	         </spatialGain_LV_THSet>
 	         <xyType2Enable index="1" type="double" size="[1 1]">	            [1]	         </xyType2Enable>
 	         <weightCurve_ratio index="1" type="double" size="[1 4]">	            [0.2	0.4	0.8	1]	         </weightCurve_ratio>
@@ -788,7 +788,7 @@
              <cell index="4" type="struct" size="[1 1]">                  <name index="1" type="char" size="[1 9]">                     D65                  </name>
 	         <doorType index="1" type="double" size="[1 1]">	            [3]	         </doorType>
 	         <standardGainValue index="1" type="double" size="[1 4]">	            [2.0341 1.0000 1.0000 1.5012]	         </standardGainValue>
-	         <staWeigthSet index="1" type="double" size="[1 16]">	            [90 90 90 90 100 100 100 100 100 100 100 100 100 90 80 70]	         </staWeigthSet>
+	         <staWeigthSet index="1" type="double" size="[1 16]">	            [100 100 100 100 100 100 100 100 100 100 100 100 100 90 80 70]	         </staWeigthSet>
 	         <spatialGain_LV_THSet index="1" type="double" size="[1 2]">	            [1024  8192]	         </spatialGain_LV_THSet>
 	         <xyType2Enable index="1" type="double" size="[1 1]">	            [1]	         </xyType2Enable>
 	         <weightCurve_ratio index="1" type="double" size="[1 4]">	            [0.2	0.4	0.8	1]	         </weightCurve_ratio>
@@ -797,7 +797,7 @@
              <cell index="5" type="struct" size="[1 1]">                  <name index="1" type="char" size="[1 9]">                     D75                  </name>
 	         <doorType index="1" type="double" size="[1 1]">	            [3]	         </doorType>
 	         <standardGainValue index="1" type="double" size="[1 4]">	            [2.1355 1.0000 1.0000 1.4029]	         </standardGainValue>
-	         <staWeigthSet index="1" type="double" size="[1 16]">	            [90 90 90 90 100 100 100 100 100 100 100 100 90 80 70 50]	         </staWeigthSet>
+	         <staWeigthSet index="1" type="double" size="[1 16]">	            [100 100 100 100 100 100 100 100 100 100 100 100 90 80 70 50]	         </staWeigthSet>
 	         <spatialGain_LV_THSet index="1" type="double" size="[1 2]">	            [1024  8192]	         </spatialGain_LV_THSet>
 	         <xyType2Enable index="1" type="double" size="[1 1]">	            [1]	         </xyType2Enable>
 	         <weightCurve_ratio index="1" type="double" size="[1 4]">	            [0.2	0.4	0.8	1]	         </weightCurve_ratio>
@@ -806,7 +806,7 @@
              <cell index="6" type="struct" size="[1 1]">                  <name index="1" type="char" size="[1 9]">                     HZ                  </name>
 	         <doorType index="1" type="double" size="[1 1]">	            [1]	         </doorType>
 	         <standardGainValue index="1" type="double" size="[1 4]">	            [1.0645 1.0000 1.0000 3.5166]	         </standardGainValue>
-	         <staWeigthSet index="1" type="double" size="[1 16]">	            [40 50 60 70 70 80 90 100 100 100 100 100 100 90 75 50]	         </staWeigthSet>
+	         <staWeigthSet index="1" type="double" size="[1 16]">	            [100 100 100 100 100 80 90 100 100 100 100 100 100 90 75 50]	         </staWeigthSet>
 	         <spatialGain_LV_THSet index="1" type="double" size="[1 2]">	            [1024  8192]	         </spatialGain_LV_THSet>
 	         <xyType2Enable index="1" type="double" size="[1 1]">	            [1]	         </xyType2Enable>
 	         <weightCurve_ratio index="1" type="double" size="[1 4]">	            [0.2	0.4	0.8	1]	         </weightCurve_ratio>
@@ -815,7 +815,7 @@
              <cell index="7" type="struct" size="[1 1]">                  <name index="1" type="char" size="[1 9]">                     TL84                  </name>
 	         <doorType index="1" type="double" size="[1 1]">	            [1]	         </doorType>
 	         <standardGainValue index="1" type="double" size="[1 4]">	            [1.4163 1.0000 1.0000 2.4326]	         </standardGainValue>
-	         <staWeigthSet index="1" type="double" size="[1 16]">	            [40 50 60 60 70 80 100 100 100 100 100 90 80 70 60 60]	         </staWeigthSet>
+	         <staWeigthSet index="1" type="double" size="[1 16]">	            [100 100 100 100 100 100 100 100 100 100 100 90 80 70 60 60]	         </staWeigthSet>
 	         <spatialGain_LV_THSet index="1" type="double" size="[1 2]">	            [1024  8192]	         </spatialGain_LV_THSet>
 	         <xyType2Enable index="1" type="double" size="[1 1]">	            [1]	         </xyType2Enable>
 	         <weightCurve_ratio index="1" type="double" size="[1 4]">	            [0.2	0.4	0.8	1]	         </weightCurve_ratio>
@@ -918,7 +918,7 @@
 		<IspDGainDot index="1" type="double" size="[1 6]">		    [1 1 1 1 1 1]		</IspDGainDot>
 		<PIrisDot index="1" type="double" size="[1 6]">		    [2.4 2.2 2.0 1.8 1.6 1.4]		</PIrisDot>                                 </cell>            </LinearAE>            <HdrAE index="1" type="cell" size="[1 2]">
 	      <cell index="1" type="struct" size="[1 1]">
-	      <name index="1" type="char" size="[1 8]">                  day               </name>	      <LTimeDot index="1" type="double" size="[1 6]">                  [0 0.03 0.03 0.03 0.03 0.03]               </LTimeDot>               <MTimeDot index="1" type="double" size="[1 6]">                  [0 0.02 0.02 0.02 0.02 0.02]               </MTimeDot>               <STimeDot index="1" type="double" size="[1 6]">                  [0 0.010 0.010 0.010 0.010 0.010]               </STimeDot>               <LAgainDot index="1" type="double" size="[1 6]">                  [1 1 4 8 12 16]               </LAgainDot>               <MAgainDot index="1" type="double" size="[1 6]">                  [1 1 4 8 12 16]               </MAgainDot>               <SAgainDot index="1" type="double" size="[1 6]">                  [1 1 4 8 12 16]               </SAgainDot>
+	      <name index="1" type="char" size="[1 8]">                  day               </name>	      <LTimeDot index="1" type="double" size="[1 6]">                  [0 0.03 0.03 0.03 0.03 0.04]               </LTimeDot>               <MTimeDot index="1" type="double" size="[1 6]">                  [0 0.03 0.03 0.03 0.03 0.03]               </MTimeDot>               <STimeDot index="1" type="double" size="[1 6]">                  [0 0.010 0.010 0.010 0.010 0.010]               </STimeDot>               <LAgainDot index="1" type="double" size="[1 6]">                  [1 1 4 8 12 32]               </LAgainDot>               <MAgainDot index="1" type="double" size="[1 6]">                  [1 1 4 8 16 32]               </MAgainDot>               <SAgainDot index="1" type="double" size="[1 6]">                  [1 1 4 8 16 32]               </SAgainDot>
 	      <LDgainDot index="1" type="double" size="[1 6]">                  [1 1 4 8 12 16]               </LDgainDot>               <MDgainDot index="1" type="double" size="[1 6]">                  [1 1 4 10 16 25]               </MDgainDot>               <SDgainDot index="1" type="double" size="[1 6]">                  [1 1 2 12 24 64]               </SDgainDot>
 	      <LIspDGainDot index="1" type="double" size="[1 6]">                  [1 1 1 1 1 1]               </LIspDGainDot>
 	      <MIspDGainDot index="1" type="double" size="[1 6]">                  [1 1 1 1 1 1]               </MIspDGainDot>
@@ -953,7 +953,7 @@
 	   </ExpRatioCtrl>
             <LumaDistTh index="1" type="double" size="[1 1]">               [10]            </LumaDistTh>            <LframeCtrl index="1" type="struct" size="[1 1]">
 	     <OEROILowTh index="1" type="double" size="[1 1]">               	[150.0]               </OEROILowTh>               <LvHighTh index="1" type="double" size="[1 1]">               	[3]               </LvHighTh>               <LvLowTh index="1" type="double" size="[1 1]">               	[0.25]               </LvLowTh>               <LExpLevel index="1" type="double" size="[1 6]">                  [0.05 0.1 0.2 0.5 0.7 1]               </LExpLevel>               <LSetPoint index="1" type="double" size="[1 6]">                  [75 75 70 65 55 45]               </LSetPoint>               <TargetLLLuma index="1" type="double" size="[1 6]">                  [45 42 40 35 28 20]               </TargetLLLuma>               <NonOEPdfTh index="1" type="double" size="[1 6]">               	[0.35 0.35 0.45 0.5 0.6 0.7]               </NonOEPdfTh>               <LowLightPdfTh index="1" type="double" size="[1 6]">               	[0.20 0.20 0.22 0.25 0.3 0.35]               </LowLightPdfTh>             </LframeCtrl>
-            <MframeCtrl index="1" type="struct" size="[1 1]">               <MExpLevel index="1" type="double" size="[1 6]">                  [0.05 0.1 0.2 0.5 0.7 1]               </MExpLevel>               <MSetPoint index="1" type="double" size="[1 6]">                  [60 60 55 50 45 40]               </MSetPoint>            </MframeCtrl>            <SframeCtrl index="1" type="struct" size="[1 1]">               <SExpLevel index="1" type="double" size="[1 6]">                  [0 0.1 0.3 0.5 0.75 1]               </SExpLevel>               <TargetHLLuma index="1" type="double" size="[1 6]">                  [130 130 120 110 100 90]               </TargetHLLuma>               <SSetPoint index="1" type="double" size="[1 6]">                  [60 60 55 50 40 30]               </SSetPoint>               <HLLumaTolerance index="1" type="double" size="[1 1]">                  [15]               </HLLumaTolerance>            </SframeCtrl>         </HdrAECtrl>      </AEC>
+            <MframeCtrl index="1" type="struct" size="[1 1]">               <MExpLevel index="1" type="double" size="[1 6]">                  [0.05 0.1 0.2 0.5 0.7 1]               </MExpLevel>               <MSetPoint index="1" type="double" size="[1 6]">                  [60 60 55 50 45 40]               </MSetPoint>            </MframeCtrl>            <SframeCtrl index="1" type="struct" size="[1 1]">               <SExpLevel index="1" type="double" size="[1 6]">                  [0 0.1 0.3 0.5 0.75 1]               </SExpLevel>               <TargetHLLuma index="1" type="double" size="[1 6]">                  [130 130 120 110 100 90]               </TargetHLLuma>               <SSetPoint index="1" type="double" size="[1 6]">                  [50 50 45 40 35 30]               </SSetPoint>               <HLLumaTolerance index="1" type="double" size="[1 1]">                  [15]               </HLLumaTolerance>            </SframeCtrl>         </HdrAECtrl>      </AEC>
       <AF index="1" type="struct" size="[1 1]">         <Window index="1" type="struct" size="[1 1]">            <h_offs index="1" type="double" size="[1 1]">               [0]            </h_offs>            <v_offs index="1" type="double" size="[1 1]">               [0]            </v_offs>            <h_size index="1" type="double" size="[1 1]">               [0]            </h_size>            <v_size index="1" type="double" size="[1 1]">               [0]            </v_size>         </Window>
          <fixed_mode index="1" type="struct" size="[1 1]">            <code index="1" type="double" size="[1 1]">               [8]            </code>         </fixed_mode>
          <macro_mode index="1" type="struct" size="[1 1]">            <code index="1" type="double" size="[1 1]">               [32]            </code>         </macro_mode>
@@ -2352,8 +2352,7 @@
       </GIC>
       <MFNR index="1" type="struct" size="[1 1]">
 	<Enable index="1" type="double" size="[1 1]">	    [1]	</Enable>	<Version index="1" type="char" size="[1 1]">	    V1	</Version>
-	<local_gain_en index="1" type="double" size="[1 1]">	    [1]	</local_gain_en>
-	<mode index="1" type="double" size="[1 1]">	    [1]	</mode>	<max_level index="1" type="char" size="[1 1]">	    [4]	</max_level>
+	<local_gain_en index="1" type="double" size="[1 1]">	    [1]	</local_gain_en>	<mode index="1" type="double" size="[1 1]">	    [1]	</mode>	<max_level index="1" type="char" size="[1 1]">	    [4]	</max_level>
 	<max_level_uv index="1" type="char" size="[1 1]">	    [3]	</max_level_uv>
 	<back_ref_num index="1" type="char" size="[1 1]">	    [1]	</back_ref_num>
          <awb_uv_ratio index="1" type="cell" size="[1 4]">
@@ -3167,10 +3166,10 @@
                2	         -4	2]         </hist_conv_t2>
          <DEHAZE_ISO index="1" type="cell" size="[1 9]">             <cell index="1" type="struct" size="[1 1]">
 	         <iso index="1" type="double" size="[1 1]">	            [50]	         </iso>
-	         <dehaze_en index="1" type="double" size="[1 1]">	            [0]	         </dehaze_en>
+	         <dehaze_en index="1" type="double" size="[1 1]">	            [1]	         </dehaze_en>
 	         <dc_en index="1" type="double" size="[1 1]">	            [0]	         </dc_en>
-	         <hist_en index="1" type="double" size="[1 1]">	            [0]	         </hist_en>
-	         <hist_channel index="1" type="double" size="[1 1]">	            [1]	         </hist_channel>
+	         <hist_en index="1" type="double" size="[1 1]">	            [1]	         </hist_en>
+	         <hist_channel index="1" type="double" size="[1 1]">	            [0]	         </hist_channel>
 	         <gain_en index="1" type="double" size="[1 1]">	            [1]	         </gain_en>
 	         <dc_min_th index="1" type="double" size="[1 1]">	            [64.0]	         </dc_min_th>
 	         <dc_max_th index="1" type="double" size="[1 1]">	            [192.0]	         </dc_max_th>
@@ -3193,7 +3192,7 @@
 	         <enhance_value index="1" type="double" size="[1 1]">	            [1.5]	         </enhance_value>
 	         <hist_para_en index="1" type="double" size="[1 1]">	            [1]	         </hist_para_en>
 	         <hist_scale index="1" type="double" size="[1 1]">	            [0.9]	         </hist_scale>
-	         <stab_fnum index="1" type="double" size="[1 1]">	            [1.0]	         </stab_fnum>
+	         <stab_fnum index="1" type="double" size="[1 1]">	            [8.0]	         </stab_fnum>
 	         <sigma index="1" type="double" size="[1 1]">	            [6.0]	         </sigma>
 	         <wt_sigma index="1" type="double" size="[1 1]">	            [8.0]	         </wt_sigma>
 	         <air_sigma index="1" type="double" size="[1 1]">	            [120.0]	         </air_sigma>
@@ -3210,10 +3209,10 @@
              </cell>
              <cell index="2" type="struct" size="[1 1]">
 	         <iso index="1" type="double" size="[1 1]">	            [100]	         </iso>
-	         <dehaze_en index="1" type="double" size="[1 1]">	            [0]	         </dehaze_en>
+	         <dehaze_en index="1" type="double" size="[1 1]">	            [1]	         </dehaze_en>
 	         <dc_en index="1" type="double" size="[1 1]">	            [0]	         </dc_en>
-	         <hist_en index="1" type="double" size="[1 1]">	            [0]	         </hist_en>
-	         <hist_channel index="1" type="double" size="[1 1]">	            [1]	         </hist_channel>
+	         <hist_en index="1" type="double" size="[1 1]">	            [1]	         </hist_en>
+	         <hist_channel index="1" type="double" size="[1 1]">	            [0]	         </hist_channel>
 	         <gain_en index="1" type="double" size="[1 1]">	            [1]	         </gain_en>
 	         <dc_min_th index="1" type="double" size="[1 1]">	            [64.0]	         </dc_min_th>
 	         <dc_max_th index="1" type="double" size="[1 1]">	            [192.0]	         </dc_max_th>
@@ -3236,7 +3235,7 @@
 	         <enhance_value index="1" type="double" size="[1 1]">	            [1.5]	         </enhance_value>
 	         <hist_para_en index="1" type="double" size="[1 1]">	            [1]	         </hist_para_en>
 	         <hist_scale index="1" type="double" size="[1 1]">	            [0.9]	         </hist_scale>
-	         <stab_fnum index="1" type="double" size="[1 1]">	            [1.0]	         </stab_fnum>
+	         <stab_fnum index="1" type="double" size="[1 1]">	            [8.0]	         </stab_fnum>
 	         <sigma index="1" type="double" size="[1 1]">	            [6.0]	         </sigma>
 	         <wt_sigma index="1" type="double" size="[1 1]">	            [8.0]	         </wt_sigma>
 	         <air_sigma index="1" type="double" size="[1 1]">	            [120.0]	         </air_sigma>
@@ -3253,10 +3252,10 @@
              </cell>
              <cell index="3" type="struct" size="[1 1]">
 	         <iso index="1" type="double" size="[1 1]">	            [200]	         </iso>
-	         <dehaze_en index="1" type="double" size="[1 1]">	            [0]	         </dehaze_en>
+	         <dehaze_en index="1" type="double" size="[1 1]">	            [1]	         </dehaze_en>
 	         <dc_en index="1" type="double" size="[1 1]">	            [0]	         </dc_en>
-	         <hist_en index="1" type="double" size="[1 1]">	            [0]	         </hist_en>
-	         <hist_channel index="1" type="double" size="[1 1]">	            [1]	         </hist_channel>
+	         <hist_en index="1" type="double" size="[1 1]">	            [1]	         </hist_en>
+	         <hist_channel index="1" type="double" size="[1 1]">	            [0]	         </hist_channel>
 	         <gain_en index="1" type="double" size="[1 1]">	            [1]	         </gain_en>
 	         <dc_min_th index="1" type="double" size="[1 1]">	            [64.0]	         </dc_min_th>
 	         <dc_max_th index="1" type="double" size="[1 1]">	            [192.0]	         </dc_max_th>
@@ -3279,7 +3278,7 @@
 	         <enhance_value index="1" type="double" size="[1 1]">	            [1.5]	         </enhance_value>
 	         <hist_para_en index="1" type="double" size="[1 1]">	            [1]	         </hist_para_en>
 	         <hist_scale index="1" type="double" size="[1 1]">	            [0.9]	         </hist_scale>
-	         <stab_fnum index="1" type="double" size="[1 1]">	            [1.0]	         </stab_fnum>
+	         <stab_fnum index="1" type="double" size="[1 1]">	            [8.0]	         </stab_fnum>
 	         <sigma index="1" type="double" size="[1 1]">	            [6.0]	         </sigma>
 	         <wt_sigma index="1" type="double" size="[1 1]">	            [8.0]	         </wt_sigma>
 	         <air_sigma index="1" type="double" size="[1 1]">	            [120.0]	         </air_sigma>
@@ -3296,10 +3295,10 @@
              </cell>
              <cell index="4" type="struct" size="[1 1]">
 	         <iso index="1" type="double" size="[1 1]">	            [400]	         </iso>
-	         <dehaze_en index="1" type="double" size="[1 1]">	            [0]	         </dehaze_en>
+	         <dehaze_en index="1" type="double" size="[1 1]">	            [1]	         </dehaze_en>
 	         <dc_en index="1" type="double" size="[1 1]">	            [0]	         </dc_en>
-	         <hist_en index="1" type="double" size="[1 1]">	            [0]	         </hist_en>
-	         <hist_channel index="1" type="double" size="[1 1]">	            [1]	         </hist_channel>
+	         <hist_en index="1" type="double" size="[1 1]">	            [1]	         </hist_en>
+	         <hist_channel index="1" type="double" size="[1 1]">	            [0]	         </hist_channel>
 	         <gain_en index="1" type="double" size="[1 1]">	            [1]	         </gain_en>
 	         <dc_min_th index="1" type="double" size="[1 1]">	            [64.0]	         </dc_min_th>
 	         <dc_max_th index="1" type="double" size="[1 1]">	            [192.0]	         </dc_max_th>
@@ -3322,7 +3321,7 @@
 	         <enhance_value index="1" type="double" size="[1 1]">	            [1.5]	         </enhance_value>
 	         <hist_para_en index="1" type="double" size="[1 1]">	            [1]	         </hist_para_en>
 	         <hist_scale index="1" type="double" size="[1 1]">	            [0.9]	         </hist_scale>
-	         <stab_fnum index="1" type="double" size="[1 1]">	            [1.0]	         </stab_fnum>
+	         <stab_fnum index="1" type="double" size="[1 1]">	            [8.0]	         </stab_fnum>
 	         <sigma index="1" type="double" size="[1 1]">	            [6.0]	         </sigma>
 	         <wt_sigma index="1" type="double" size="[1 1]">	            [8.0]	         </wt_sigma>
 	         <air_sigma index="1" type="double" size="[1 1]">	            [120.0]	         </air_sigma>
@@ -3339,10 +3338,10 @@
              </cell>
              <cell index="5" type="struct" size="[1 1]">
 	         <iso index="1" type="double" size="[1 1]">	            [800]	         </iso>
-	         <dehaze_en index="1" type="double" size="[1 1]">	            [0]	         </dehaze_en>
+	         <dehaze_en index="1" type="double" size="[1 1]">	            [1]	         </dehaze_en>
 	         <dc_en index="1" type="double" size="[1 1]">	            [0]	         </dc_en>
-	         <hist_en index="1" type="double" size="[1 1]">	            [0]	         </hist_en>
-	         <hist_channel index="1" type="double" size="[1 1]">	            [1]	         </hist_channel>
+	         <hist_en index="1" type="double" size="[1 1]">	            [1]	         </hist_en>
+	         <hist_channel index="1" type="double" size="[1 1]">	            [0]	         </hist_channel>
 	         <gain_en index="1" type="double" size="[1 1]">	            [1]	         </gain_en>
 	         <dc_min_th index="1" type="double" size="[1 1]">	            [64.0]	         </dc_min_th>
 	         <dc_max_th index="1" type="double" size="[1 1]">	            [192.0]	         </dc_max_th>
@@ -3365,7 +3364,7 @@
 	         <enhance_value index="1" type="double" size="[1 1]">	            [1.5]	         </enhance_value>
 	         <hist_para_en index="1" type="double" size="[1 1]">	            [1]	         </hist_para_en>
 	         <hist_scale index="1" type="double" size="[1 1]">	            [0.9]	         </hist_scale>
-	         <stab_fnum index="1" type="double" size="[1 1]">	            [1.0]	         </stab_fnum>
+	         <stab_fnum index="1" type="double" size="[1 1]">	            [8.0]	         </stab_fnum>
 	         <sigma index="1" type="double" size="[1 1]">	            [6.0]	         </sigma>
 	         <wt_sigma index="1" type="double" size="[1 1]">	            [8.0]	         </wt_sigma>
 	         <air_sigma index="1" type="double" size="[1 1]">	            [120.0]	         </air_sigma>
@@ -3382,10 +3381,10 @@
              </cell>
              <cell index="6" type="struct" size="[1 1]">
 	         <iso index="1" type="double" size="[1 1]">	            [1600]	         </iso>
-	         <dehaze_en index="1" type="double" size="[1 1]">	            [0]	         </dehaze_en>
+	         <dehaze_en index="1" type="double" size="[1 1]">	            [1]	         </dehaze_en>
 	         <dc_en index="1" type="double" size="[1 1]">	            [0]	         </dc_en>
-	         <hist_en index="1" type="double" size="[1 1]">	            [0]	         </hist_en>
-	         <hist_channel index="1" type="double" size="[1 1]">	            [1]	         </hist_channel>
+	         <hist_en index="1" type="double" size="[1 1]">	            [1]	         </hist_en>
+	         <hist_channel index="1" type="double" size="[1 1]">	            [0]	         </hist_channel>
 	         <gain_en index="1" type="double" size="[1 1]">	            [1]	         </gain_en>
 	         <dc_min_th index="1" type="double" size="[1 1]">	            [64.0]	         </dc_min_th>
 	         <dc_max_th index="1" type="double" size="[1 1]">	            [192.0]	         </dc_max_th>
@@ -3408,7 +3407,7 @@
 	         <enhance_value index="1" type="double" size="[1 1]">	            [1.5]	         </enhance_value>
 	         <hist_para_en index="1" type="double" size="[1 1]">	            [1]	         </hist_para_en>
 	         <hist_scale index="1" type="double" size="[1 1]">	            [0.9]	         </hist_scale>
-	         <stab_fnum index="1" type="double" size="[1 1]">	            [1.0]	         </stab_fnum>
+	         <stab_fnum index="1" type="double" size="[1 1]">	            [8.0]	         </stab_fnum>
 	         <sigma index="1" type="double" size="[1 1]">	            [6.0]	         </sigma>
 	         <wt_sigma index="1" type="double" size="[1 1]">	            [8.0]	         </wt_sigma>
 	         <air_sigma index="1" type="double" size="[1 1]">	            [120.0]	         </air_sigma>
@@ -3425,10 +3424,10 @@
              </cell>
              <cell index="7" type="struct" size="[1 1]">
 	         <iso index="1" type="double" size="[1 1]">	            [3200]	         </iso>
-	         <dehaze_en index="1" type="double" size="[1 1]">	            [0]	         </dehaze_en>
+	         <dehaze_en index="1" type="double" size="[1 1]">	            [1]	         </dehaze_en>
 	         <dc_en index="1" type="double" size="[1 1]">	            [0]	         </dc_en>
-	         <hist_en index="1" type="double" size="[1 1]">	            [0]	         </hist_en>
-	         <hist_channel index="1" type="double" size="[1 1]">	            [1]	         </hist_channel>
+	         <hist_en index="1" type="double" size="[1 1]">	            [1]	         </hist_en>
+	         <hist_channel index="1" type="double" size="[1 1]">	            [0]	         </hist_channel>
 	         <gain_en index="1" type="double" size="[1 1]">	            [1]	         </gain_en>
 	         <dc_min_th index="1" type="double" size="[1 1]">	            [64.0]	         </dc_min_th>
 	         <dc_max_th index="1" type="double" size="[1 1]">	            [192.0]	         </dc_max_th>
@@ -3451,7 +3450,7 @@
 	         <enhance_value index="1" type="double" size="[1 1]">	            [1.5]	         </enhance_value>
 	         <hist_para_en index="1" type="double" size="[1 1]">	            [1]	         </hist_para_en>
 	         <hist_scale index="1" type="double" size="[1 1]">	            [0.9]	         </hist_scale>
-	         <stab_fnum index="1" type="double" size="[1 1]">	            [1.0]	         </stab_fnum>
+	         <stab_fnum index="1" type="double" size="[1 1]">	            [8.0]	         </stab_fnum>
 	         <sigma index="1" type="double" size="[1 1]">	            [6.0]	         </sigma>
 	         <wt_sigma index="1" type="double" size="[1 1]">	            [8.0]	         </wt_sigma>
 	         <air_sigma index="1" type="double" size="[1 1]">	            [120.0]	         </air_sigma>
@@ -3468,10 +3467,10 @@
              </cell>
              <cell index="8" type="struct" size="[1 1]">
 	         <iso index="1" type="double" size="[1 1]">	            [6400]	         </iso>
-	         <dehaze_en index="1" type="double" size="[1 1]">	            [0]	         </dehaze_en>
+	         <dehaze_en index="1" type="double" size="[1 1]">	            [1]	         </dehaze_en>
 	         <dc_en index="1" type="double" size="[1 1]">	            [0]	         </dc_en>
-	         <hist_en index="1" type="double" size="[1 1]">	            [0]	         </hist_en>
-	         <hist_channel index="1" type="double" size="[1 1]">	            [1]	         </hist_channel>
+	         <hist_en index="1" type="double" size="[1 1]">	            [1]	         </hist_en>
+	         <hist_channel index="1" type="double" size="[1 1]">	            [0]	         </hist_channel>
 	         <gain_en index="1" type="double" size="[1 1]">	            [1]	         </gain_en>
 	         <dc_min_th index="1" type="double" size="[1 1]">	            [64.0]	         </dc_min_th>
 	         <dc_max_th index="1" type="double" size="[1 1]">	            [192.0]	         </dc_max_th>
@@ -3494,7 +3493,7 @@
 	         <enhance_value index="1" type="double" size="[1 1]">	            [1.5]	         </enhance_value>
 	         <hist_para_en index="1" type="double" size="[1 1]">	            [1]	         </hist_para_en>
 	         <hist_scale index="1" type="double" size="[1 1]">	            [0.9]	         </hist_scale>
-	         <stab_fnum index="1" type="double" size="[1 1]">	            [1.0]	         </stab_fnum>
+	         <stab_fnum index="1" type="double" size="[1 1]">	            [8.0]	         </stab_fnum>
 	         <sigma index="1" type="double" size="[1 1]">	            [6.0]	         </sigma>
 	         <wt_sigma index="1" type="double" size="[1 1]">	            [8.0]	         </wt_sigma>
 	         <air_sigma index="1" type="double" size="[1 1]">	            [120.0]	         </air_sigma>
@@ -3511,10 +3510,10 @@
              </cell>
              <cell index="9" type="struct" size="[1 1]">
 	         <iso index="1" type="double" size="[1 1]">	            [12800]	         </iso>
-	         <dehaze_en index="1" type="double" size="[1 1]">	            [0]	         </dehaze_en>
+	         <dehaze_en index="1" type="double" size="[1 1]">	            [1]	         </dehaze_en>
 	         <dc_en index="1" type="double" size="[1 1]">	            [0]	         </dc_en>
-	         <hist_en index="1" type="double" size="[1 1]">	            [0]	         </hist_en>
-	         <hist_channel index="1" type="double" size="[1 1]">	            [1]	         </hist_channel>
+	         <hist_en index="1" type="double" size="[1 1]">	            [1]	         </hist_en>
+	         <hist_channel index="1" type="double" size="[1 1]">	            [0]	         </hist_channel>
 	         <gain_en index="1" type="double" size="[1 1]">	            [1]	         </gain_en>
 	         <dc_min_th index="1" type="double" size="[1 1]">	            [64.0]	         </dc_min_th>
 	         <dc_max_th index="1" type="double" size="[1 1]">	            [192.0]	         </dc_max_th>
@@ -3537,7 +3536,7 @@
 	         <enhance_value index="1" type="double" size="[1 1]">	            [1.5]	         </enhance_value>
 	         <hist_para_en index="1" type="double" size="[1 1]">	            [1]	         </hist_para_en>
 	         <hist_scale index="1" type="double" size="[1 1]">	            [0.9]	         </hist_scale>
-	         <stab_fnum index="1" type="double" size="[1 1]">	            [1.0]	         </stab_fnum>
+	         <stab_fnum index="1" type="double" size="[1 1]">	            [8.0]	         </stab_fnum>
 	         <sigma index="1" type="double" size="[1 1]">	            [6.0]	         </sigma>
 	         <wt_sigma index="1" type="double" size="[1 1]">	            [8.0]	         </wt_sigma>
 	         <air_sigma index="1" type="double" size="[1 1]">	            [120.0]	         </air_sigma>
@@ -3558,10 +3557,10 @@
          <GainRange index="1" type="double" size="[6 7]">            [1 2 20 20 1 0 20 2 4 10 0 1 20 40 4 8 5 -20 1 40 60 8 16 2.5 -40 1 60 80 16 32 1.25 -60 1 80 100 32 64  0.625 -80 1 100 120]         </GainRange>         <TimeFactor index="1" type="double" size="[1 4]">            [0 0 1 0.5]         </TimeFactor>
          <DCGRatio index="1" type="double" size="[1 1]">            [1]         </DCGRatio>
          <EachGainSetEn index="1" type="double" size="[1 1]">            [1]         </EachGainSetEn>         <EachTimeSetEn index="1" type="double" size="[1 1]">            [1]         </EachTimeSetEn>
-         <CISTimeRegSumFac index="1" type="double" size="[1 2]">           [2 4]         </CISTimeRegSumFac>         <CISTimeRegOdevity index="1" type="double" size="[1 2]">           [1 0]         </CISTimeRegOdevity>
-         <CISTimeRegUnEqualEn index="1" type="double" size="[1 1]">            [1]         </CISTimeRegUnEqualEn>
-         <CISTimeRegMin index="1" type="double" size="[1 1]">            [2]         </CISTimeRegMin>         <CISAgainRange index="1" type="double" size="[1 2]">            [1 16]         </CISAgainRange>
-         <CISExtraAgainRange index="1" type="double" size="[1 2]">            [1 16]         </CISExtraAgainRange>         <CISDgainRange index="1" type="double" size="[1 2]">            [1 1]         </CISDgainRange>         <CISIspDgainRange index="1" type="double" size="[1 2]">            [1 1]         </CISIspDgainRange>     </SENSORINFO>      <LUT3D  index="1" type="struct" size="[1 1]">
+         <CISTimeRegSumFac index="1" type="double" size="[1 2]">           [2 4]         </CISTimeRegSumFac>         <CISTimeRegOdevity index="1" type="double" size="[1 2]">           [2 0]         </CISTimeRegOdevity>
+         <CISTimeRegUnEqualEn index="1" type="double" size="[1 1]">            [0]         </CISTimeRegUnEqualEn>
+         <CISTimeRegMin index="1" type="double" size="[1 1]">            [2]         </CISTimeRegMin>         <CISAgainRange index="1" type="double" size="[1 2]">            [1 32]         </CISAgainRange>
+         <CISExtraAgainRange index="1" type="double" size="[1 2]">            [1 1]         </CISExtraAgainRange>         <CISDgainRange index="1" type="double" size="[1 2]">            [1 1]         </CISDgainRange>         <CISIspDgainRange index="1" type="double" size="[1 2]">            [1 1]         </CISIspDgainRange>     </SENSORINFO>      <LUT3D  index="1" type="struct" size="[1 1]">
          <enable index="1" type="double" size="[1 1]">            [1]         </enable>
          <look_up_table_r index="1" type="double" size="[1 729]">            [  0   20  205  415  626  829 1023 1023 1023
                0   20  205  415  626  829 1023 1023 1023

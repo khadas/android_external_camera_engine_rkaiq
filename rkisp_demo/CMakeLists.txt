@@ -60,25 +60,11 @@ add_compile_options(-O0)
 SET(RK_AIQ_LIB_DIR ${RK_AIQ_SOURCE_DIR}/build/linux/all_lib/${CMAKE_BUILD_TYPE})
 message("rkaiq lib path" ${RK_AIQ_LIB_DIR})
 SET(RK_AIQ_INCLUDE_DIR
-${RK_AIQ_SOURCE_DIR}/xcore/
-${RK_AIQ_SOURCE_DIR}/xcore/base/
-#${RK_AIQ_SOURCE_DIR}/aiq_core/
-${RK_AIQ_SOURCE_DIR}/algos/
-${RK_AIQ_SOURCE_DIR}/common/
-${RK_AIQ_SOURCE_DIR}/common/linux/
-#${RK_AIQ_SOURCE_DIR}/hwi/
-${RK_AIQ_SOURCE_DIR}/ipc/
-${RK_AIQ_SOURCE_DIR}/iq_parser/
-${RK_AIQ_SOURCE_DIR}/uAPI/
-#${RK_AIQ_SOURCE_DIR}/algos/awb/
-#${RK_AIQ_SOURCE_DIR}/algos/af/
-#${RK_AIQ_SOURCE_DIR}/algos/aorb/
-#${RK_AIQ_SOURCE_DIR}/../core/inc/luma/
-#${RK_AIQ_SOURCE_DIR}/../core/inc/stat_3a_ae/
-#${RK_AIQ_SOURCE_DIR}/../core/inc/stat_3a_af/
-#${RK_AIQ_SOURCE_DIR}/../core/inc/orb/
-#${RK_AIQ_SOURCE_DIR}/../core/inc/common/
-${RK_AIQ_SOURCE_DIR}/
+${RK_AIQ_SOURCE_DIR}/include/uAPI
+${RK_AIQ_SOURCE_DIR}/include/xcore/
+${RK_AIQ_SOURCE_DIR}/include/algos/
+${RK_AIQ_SOURCE_DIR}/include/common/
+${RK_AIQ_SOURCE_DIR}/include/iq_parser/
 )
 SET(RK_AIQ_LIB rkaiq)
 endif()

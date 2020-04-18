@@ -20,6 +20,7 @@
 #include "rk_aiq_algo_types_int.h"
 #include "rk_aiq_algo_aorb_itf.h"
 #include "orb_algos.h"
+#include "xcam_log.h"
 
 #if OPENCV_SUPPORT
 #include "orb_algos_opencv.h"

@@ -15,7 +15,7 @@
 XCamReturn
 rk_aiq_uapi_anr_SetAttrib(RkAiqAlgoContext *ctx,
                           rk_aiq_nr_attrib_t *attr,
-                          bool need_sync = true);
+                          bool need_sync);
 
 XCamReturn
 rk_aiq_uapi_anr_GetAttrib(const RkAiqAlgoContext *ctx,

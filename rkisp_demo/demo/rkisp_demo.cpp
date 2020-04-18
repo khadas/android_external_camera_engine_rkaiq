@@ -53,6 +53,7 @@ static int rkaiq = 0;
 static int writeFile = 0;
 static int pponeframe = 0;
 static int hdrmode = 0;
+static char sensor[64];
 
 static int fd_pp_input = -1;
 static int fd_isp_mp = -1;
@@ -61,10 +62,6 @@ static int outputCnt = 3;
 static int skipCnt = 30;
 
 //TODO: get active sensor from driver
-//#define ov4689
-#define os04a10
-//#define gc4c33 
-//#define imx347
 
 #define DBG(...) do { if(!silent) printf(__VA_ARGS__); } while(0)
 #define ERR(...) do { fprintf(stderr, __VA_ARGS__); } while (0)
@@ -602,6 +599,7 @@ void parse_args(int argc, char **argv)
            {"rkaiq",   no_argument,       0, 'r' },
            {"pponeframe",   no_argument,       0, 'm' },
            {"hdr",   no_argument,       0, 'a' },
+           {"sensor",   required_argument,       0, 'b' },
            {0,          0,                 0,  0  }
        };
 
@@ -652,6 +650,9 @@ void parse_args(int argc, char **argv)
        case 'a':
            hdrmode = 1;
            break;
+       case 'b':
+           strcpy(sensor, optarg);
+           break;
        case '?':
        case 'p':
            ERR("Usage: %s to capture rkisp1 frames\n"
@@ -668,6 +669,7 @@ void parse_args(int argc, char **argv)
                   "         --silent,                          optional, subpress debug log\n",
                   "         --pponeframe,                      optional, pp oneframe readback mode\n",
                   "         --hdr,                             optional, hdr mode\n",
+                  "         --sensor,  default os04a10,        optional, sensor names\n",
                   argv[0]);
            exit(-1);
 
@@ -720,6 +722,7 @@ int main(int argc, char **argv)
     signal(SIGQUIT, signal_handle);
     signal(SIGTERM, signal_handle);
 
+    strcpy(sensor, "os04a10");
     parse_args(argc, argv);
 
     printf("-------- open output dev -------------\n");
@@ -737,30 +740,28 @@ int main(int argc, char **argv)
         }
     }
 
-#ifdef ov4689
-    const char* sns_entity_name = "m01_f_ov4689 1-0036";
+    const char* sns_entity_name = NULL;
     rk_aiq_working_mode_t work_mode = RK_AIQ_WORKING_MODE_NORMAL;
-    if (hdrmode)
-        work_mode = RK_AIQ_WORKING_MODE_ISP_HDR3;
-#elif defined(os04a10)
-    const char* sns_entity_name = "m01_f_os04a10 1-0036";
-    rk_aiq_working_mode_t work_mode = RK_AIQ_WORKING_MODE_NORMAL;
-    if (hdrmode)
-        work_mode = RK_AIQ_WORKING_MODE_ISP_HDR2;
-#elif defined(imx347)
-    const char* sns_entity_name = "m01_f_imx347 1-0037";
-    rk_aiq_working_mode_t work_mode = RK_AIQ_WORKING_MODE_NORMAL;
-    if (hdrmode)
-        work_mode = RK_AIQ_WORKING_MODE_ISP_HDR2;
-#elif defined(gc4c33)
-    const char* sns_entity_name = "m01_f_gc4c33 1-0029";
-    rk_aiq_working_mode_t work_mode = RK_AIQ_WORKING_MODE_NORMAL;
-    if (hdrmode)
-        work_mode = RK_AIQ_WORKING_MODE_ISP_HDR2;
-#else
-    #error("not define sensor!")
-#endif
 
+    if (strcasecmp(sensor, "ov4689") == 0) {
+        if (hdrmode)
+            work_mode = RK_AIQ_WORKING_MODE_ISP_HDR3;
+        sns_entity_name = "m01_f_ov4689 1-0036";
+    } else if (strcasecmp(sensor, "os04a10") == 0) {
+        if (hdrmode)
+            work_mode = RK_AIQ_WORKING_MODE_ISP_HDR2;
+        sns_entity_name = "m01_f_os04a10 1-0036";
+    } else if (strcasecmp(sensor, "gc4c33") == 0) {
+        if (hdrmode)
+            work_mode = RK_AIQ_WORKING_MODE_ISP_HDR2;
+        sns_entity_name = "m01_f_gc4c33 1-0029";
+    } else if (strcasecmp(sensor, "imx347") == 0) {
+        if (hdrmode)
+            work_mode = RK_AIQ_WORKING_MODE_ISP_HDR2;
+        sns_entity_name = "m01_f_imx347 1-0037";
+    }
+
+    printf("sns_entity_name %s\n", sns_entity_name);
 	if (rkaiq) {
 		aiq_ctx = rk_aiq_uapi_sysctl_init(sns_entity_name, NULL, NULL, NULL);
 

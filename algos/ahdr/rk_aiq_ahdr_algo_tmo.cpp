@@ -143,12 +143,15 @@ unsigned short GetSetPalhpa(AhdrHandle_t pAhdrCtx, float set_lgmin, float set_lg
     float value = 0.0;
     float set_lgmean = pAhdrCtx->AhdrProcRes.TmoProcRes.sw_hdrtmo_set_lgmean / 2048.0;
     float palpha_0p18 = pAhdrCtx->AhdrProcRes.TmoProcRes.sw_hdrtmo_palpha_0p18 / 1024.0;
+    int value_int = 0;
     unsigned short returnValue;
 
     index = 2 * set_lgmean - set_lgmin - set_lgmax;
     index = index / (set_lgmax - set_lgmin);
     value = palpha_0p18 * pow(4, index);
-    returnValue = (int)SHIFT10BIT(value);
+    value_int = (int)SHIFT10BIT(value);
+    value_int = MIN(value_int,pAhdrCtx->AhdrProcRes.TmoProcRes.sw_hdrtmo_maxpalpha);
+    returnValue = value_int;
 
 #if LRK_DEBUG_LOG
     LOGD_AHDR( "%s:lrk set_lgmin:%f set_lgmax:%f set_lgmean:%f palpha_0p18:%f value:%f returnValue:%d\n", __FUNCTION__, set_lgmin, set_lgmax, set_lgmean, palpha_0p18, value, returnValue);
@@ -183,7 +186,7 @@ void TmoGetCurrIOData
     pAhdrCtx->AhdrProcRes.TmoProcRes.sw_hdrtmo_gain_ld_off2 = 5;
     pAhdrCtx->AhdrProcRes.TmoProcRes.sw_hdrtmo_newhist_en = 1;
     pAhdrCtx->AhdrProcRes.TmoProcRes.sw_hdrtmo_cnt_mode = 0;
-    pAhdrCtx->AhdrProcRes.TmoProcRes.sw_hdrtmo_cnt_vsize = (int)(pAhdrCtx->height * 0.9);
+    pAhdrCtx->AhdrProcRes.TmoProcRes.sw_hdrtmo_cnt_vsize = (int)(pAhdrCtx->height - 32);
     pAhdrCtx->AhdrProcRes.TmoProcRes.sw_hdrtmo_cfg_alpha = 255;
 
     //IO data from IQ

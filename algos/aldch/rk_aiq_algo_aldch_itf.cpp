@@ -19,6 +19,7 @@
 
 #include "rk_aiq_algo_types_int.h"
 #include "aldch/rk_aiq_algo_aldch_itf.h"
+#include "xcam_log.h"
 
 RKAIQ_BEGIN_DECLARE
 
@@ -46,7 +47,7 @@ create_context(RkAiqAlgoContext **context, const AlgoCtxInstanceCfg* cfg)
 {
     XCamReturn result = XCAM_RETURN_NO_ERROR;
 
-    LOGI_ORB("%s: (enter)\n", __FUNCTION__ );
+    LOGI_AHDR("%s: (enter)\n", __FUNCTION__ );
 
     /* setup config */
     memset( &gLDCHCtx, 0, sizeof(gLDCHCtx) );

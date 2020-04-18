@@ -318,6 +318,56 @@ RkAiqManager::applyAnalyzerResult(SmartPtr<RkAiqFullParamsProxy>& results)
     aiqParams = results->data().ptr();
 
 #ifdef RUNTIME_MODULE_DEBUG
+    if (g_bypass_exp_params)
+        goto set_exp_end;
+#endif
+    if (aiqParams->mExposureParams.ptr()) {
+// #define DEBUG_FIXED_EXPOSURE
+#ifdef DEBUG_FIXED_EXPOSURE
+	/* test aec with fixed sensor exposure */
+	int cnt = aiqParams->mIspParams->data()->frame_id ;
+	if(cnt % 40 <= 19){
+	    aiqParams->mExposureParams->data()->HdrExp[2].exp_sensor_params.coarse_integration_time = 984;
+	    aiqParams->mExposureParams->data()->HdrExp[2].exp_sensor_params.analog_gain_code_global = 48;
+	    aiqParams->mExposureParams->data()->HdrExp[1].exp_sensor_params.coarse_integration_time = 984;
+	    aiqParams->mExposureParams->data()->HdrExp[1].exp_sensor_params.analog_gain_code_global = 48;
+	    aiqParams->mExposureParams->data()->HdrExp[0].exp_sensor_params.coarse_integration_time = 246;
+	    aiqParams->mExposureParams->data()->HdrExp[0].exp_sensor_params.analog_gain_code_global = 16;
+
+	    aiqParams->mExposureParams->data()->HdrExp[2].exp_real_params.integration_time = 0.02;
+	    aiqParams->mExposureParams->data()->HdrExp[2].exp_real_params.analog_gain = 3;
+	    aiqParams->mExposureParams->data()->HdrExp[1].exp_real_params.integration_time = 0.02;
+	    aiqParams->mExposureParams->data()->HdrExp[1].exp_real_params.analog_gain = 3;
+	    aiqParams->mExposureParams->data()->HdrExp[0].exp_real_params.integration_time = 0.005;
+	    aiqParams->mExposureParams->data()->HdrExp[0].exp_real_params.analog_gain = 1;
+	}else{
+	    aiqParams->mExposureParams->data()->HdrExp[2].exp_sensor_params.coarse_integration_time = 1475;
+	    aiqParams->mExposureParams->data()->HdrExp[2].exp_sensor_params.analog_gain_code_global = 144;
+	    aiqParams->mExposureParams->data()->HdrExp[1].exp_sensor_params.coarse_integration_time = 1475;
+	    aiqParams->mExposureParams->data()->HdrExp[1].exp_sensor_params.analog_gain_code_global = 144;
+	    aiqParams->mExposureParams->data()->HdrExp[0].exp_sensor_params.coarse_integration_time = 492;
+	    aiqParams->mExposureParams->data()->HdrExp[0].exp_sensor_params.analog_gain_code_global = 48;
+
+	    aiqParams->mExposureParams->data()->HdrExp[2].exp_real_params.integration_time = 0.03;
+	    aiqParams->mExposureParams->data()->HdrExp[2].exp_real_params.analog_gain = 9;
+	    aiqParams->mExposureParams->data()->HdrExp[1].exp_real_params.integration_time = 0.03;
+	    aiqParams->mExposureParams->data()->HdrExp[1].exp_real_params.analog_gain = 9;
+	    aiqParams->mExposureParams->data()->HdrExp[0].exp_real_params.integration_time = 0.01;
+	    aiqParams->mExposureParams->data()->HdrExp[0].exp_real_params.analog_gain = 3;
+	}
+
+	ret = mCamHw->setExposureParams(aiqParams->mExposureParams);
+    if (ret)
+        LOGE_ANALYZER("setExposureParams error %d", ret);
+#else
+	ret = mCamHw->setExposureParams(aiqParams->mExposureParams);
+    if (ret)
+        LOGE_ANALYZER("setExposureParams error %d", ret);
+#endif
+    }
+set_exp_end:
+
+#ifdef RUNTIME_MODULE_DEBUG
     get_dbg_force_disable_mods_env();
     if (g_bypass_isp_params)
         goto set_isp_end;
@@ -342,55 +392,8 @@ set_isp_end:
             LOGE_ANALYZER("setIsppParams error %d", ret);
     }
 #endif
-
 set_ispp_end:
 
-#ifdef RUNTIME_MODULE_DEBUG
-    if (g_bypass_exp_params)
-        goto set_exp_end;
-#endif
-    if (aiqParams->mExposureParams.ptr()) {
-        /*
-         * printf("lexp: 0x%x-0x%x, mexp: 0x%x-0x%x, sexp: 0x%x-0x%x\n",
-         *        aiqParams->mExposureParams->data()->HdrExp[2].exp_sensor_params.analog_gain_code_global,
-         *        aiqParams->mExposureParams->data()->HdrExp[2].exp_sensor_params.coarse_integration_time,
-         *        aiqParams->mExposureParams->data()->HdrExp[1].exp_sensor_params.analog_gain_code_global,
-         *        aiqParams->mExposureParams->data()->HdrExp[1].exp_sensor_params.coarse_integration_time,
-         *        aiqParams->mExposureParams->data()->HdrExp[0].exp_sensor_params.analog_gain_code_global,
-         *        aiqParams->mExposureParams->data()->HdrExp[0].exp_sensor_params.coarse_integration_time);
-         */
-
-        /*
-         *
-         *         printf("%s: debug-exp: gain: %d-%d, time: %d\n",
-         *           __func__,
-         *           aiqParams->mExposureParams->data()->LinearExp.exp_sensor_params.analog_gain_code_global,
-         *           aiqParams->mExposureParams->data()->LinearExp.exp_sensor_params.digital_gain_global ,
-         *           aiqParams->mExposureParams->data()->LinearExp.exp_sensor_params.coarse_integration_time);
-         */
-
-// #define DEBUG_FIXED_EXPOSURE
-#ifdef DEBUG_FIXED_EXPOSURE
-	/* test aec with fixed sensor exposure */
-	aiqParams->mExposureParams->data()->HdrExp[2].exp_sensor_params.coarse_integration_time = 0x1d0;
-	aiqParams->mExposureParams->data()->HdrExp[2].exp_sensor_params.analog_gain_code_global = 0x1cd;
-	aiqParams->mExposureParams->data()->HdrExp[1].exp_sensor_params.coarse_integration_time = 0x135;
-	aiqParams->mExposureParams->data()->HdrExp[1].exp_sensor_params.analog_gain_code_global = 0x394;
-	aiqParams->mExposureParams->data()->HdrExp[0].exp_sensor_params.coarse_integration_time = 0x47;
-	aiqParams->mExposureParams->data()->HdrExp[0].exp_sensor_params.analog_gain_code_global = 0x80;
-
-
-	ret = mCamHw->setExposureParams(aiqParams->mExposureParams);
-    if (ret)
-        LOGE_ANALYZER("setExposureParams error %d", ret);
-#else
-	ret = mCamHw->setExposureParams(aiqParams->mExposureParams);
-    if (ret)
-        LOGE_ANALYZER("setExposureParams error %d", ret);
-#endif
-    }
-
-set_exp_end:
     if (aiqParams->mFocusParams.ptr()) {
         ret = mCamHw->setFocusParams(aiqParams->mFocusParams);
         if (ret)

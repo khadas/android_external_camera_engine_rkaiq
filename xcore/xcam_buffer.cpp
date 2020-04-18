@@ -19,6 +19,7 @@
  */
 
 #include <base/xcam_buffer.h>
+#include <xcam_log.h>
 
 XCamReturn
 xcam_video_buffer_info_reset (

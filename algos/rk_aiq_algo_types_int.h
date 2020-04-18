@@ -563,6 +563,8 @@ typedef struct _RkAiqAlgoProcAdhazInt {
     RkAiqAlgoComInt rk_com;
     const CamCalibDbContext_t *pCalibDehaze;
     int iso;
+	int hdr_mode;	
+	
 } RkAiqAlgoProcAdhazInt;
 
 typedef struct _RkAiqAlgoProcResAdhazInt {

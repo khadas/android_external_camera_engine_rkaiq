@@ -29,7 +29,7 @@ rk_aiq_uapi_adebayer_SetAttrib
 (
     RkAiqAlgoContext* ctx,
     adebayer_attrib_t attr,
-    bool need_sync = true
+    bool need_sync
 );
 
 XCamReturn

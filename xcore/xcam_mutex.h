@@ -24,6 +24,7 @@
 #include <xcam_std.h>
 #include <pthread.h>
 #include <sys/time.h>
+#include <xcam_log.h>
 
 namespace XCam {
 
