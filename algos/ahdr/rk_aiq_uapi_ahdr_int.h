@@ -23,7 +23,7 @@ typedef hdrAttr_t ahdr_attrib_t;
 XCamReturn
 rk_aiq_uapi_ahdr_SetAttrib(RkAiqAlgoContext *ctx,
                            ahdr_attrib_t attr,
-                           bool need_sync = true);
+                           bool need_sync);
 
 
 XCamReturn

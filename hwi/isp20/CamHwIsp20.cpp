@@ -22,6 +22,10 @@
 #include "mediactl/mediactl-priv.h"
 #include <linux/v4l2-subdev.h>
 
+
+
+
+
 namespace RkCam {
 std::map<std::string, SmartPtr<rk_aiq_static_info_t>> CamHwIsp20::mCamHwInfos;
 std::map<std::string, SmartPtr<rk_sensor_full_info_t>> CamHwIsp20::mSensorHwInfos;
@@ -46,7 +50,7 @@ static XCamReturn get_isp_ver(rk_aiq_isp_hw_info_t *hw_info) {
 
     ret = vdev.open();
     if (ret != XCAM_RETURN_NO_ERROR) {
-        LOGE("failed to open dev (%s)", hw_info->isp_info[0].stats_path);
+        LOGE_CAMHW("failed to open dev (%s)", hw_info->isp_info[0].stats_path);
         return XCAM_RETURN_ERROR_FAILED;
     }
 
@@ -74,7 +78,7 @@ static XCamReturn get_isp_ver(rk_aiq_isp_hw_info_t *hw_info) {
 
 out:
     vdev.close();
-    LOGE("get isp version failed !");
+    LOGE_CAMHW("get isp version failed !");
     return ret;
 }
 
@@ -88,13 +92,13 @@ static XCamReturn get_sensor_caps(rk_sensor_full_info_t *sensor_info) {
     V4l2SubDevice vdev(sensor_info->device_name.c_str());
     ret = vdev.open();
     if (ret != XCAM_RETURN_NO_ERROR) {
-        LOGE("failed to open dev (%s)", sensor_info->device_name.c_str());
+        LOGE_CAMHW("failed to open dev (%s)", sensor_info->device_name.c_str());
         return XCAM_RETURN_ERROR_FAILED;
     }
     //get module info
     struct rkmodule_inf *minfo = &(sensor_info->mod_info);
     if(vdev.io_control(RKMODULE_GET_MODULE_INFO, minfo) < 0) {
-        LOGE("@%s %s: Get sensor module info failed", __FUNCTION__, sensor_info->device_name.c_str());
+        LOGE_CAMHW("@%s %s: Get sensor module info failed", __FUNCTION__, sensor_info->device_name.c_str());
         return XCAM_RETURN_ERROR_FAILED;
     }
     memset(&code_enum, 0, sizeof(code_enum));
@@ -103,6 +107,8 @@ static XCamReturn get_sensor_caps(rk_sensor_full_info_t *sensor_info) {
         code_enum.index++;
     };
 
+    //TODO: sensor driver not supported now
+#if 0
     for (auto it = formats.begin(); it != formats.end(); ++it) {
         fsize_enum.pad = 0;
         fsize_enum.index = 0;
@@ -116,9 +122,10 @@ static XCamReturn get_sensor_caps(rk_sensor_full_info_t *sensor_info) {
         };
     }
     if(!formats.size() || !sensor_info->frame_size.size()) {
-        LOGE("@%s %s: Enum sensor frame size failed", __FUNCTION__, sensor_info->device_name.c_str());
+        LOGE_CAMHW("@%s %s: Enum sensor frame size failed", __FUNCTION__, sensor_info->device_name.c_str());
         ret = XCAM_RETURN_ERROR_FAILED;
     }
+#endif
     vdev.close();
 
     return ret;
@@ -137,7 +144,7 @@ parse_module_info(rk_sensor_full_info_t *sensor_info)
     int parse_index = 0;
 
     if (entity_name.at(parse_index) != 'm') {
-        LOGE("%d:parse sensor entity name %s error at %d, please check sensor driver !",
+        LOGE_CAMHW("%d:parse sensor entity name %s error at %d, please check sensor driver !",
              __LINE__, entity_name.c_str(), parse_index);
         return XCAM_RETURN_ERROR_SENSOR;
     }
@@ -148,7 +155,7 @@ parse_module_info(rk_sensor_full_info_t *sensor_info)
     parse_index += 3;
 
     if (entity_name.at(parse_index) != '_') {
-        LOGE("%d:parse sensor entity name %s error at %d, please check sensor driver !",
+        LOGE_CAMHW("%d:parse sensor entity name %s error at %d, please check sensor driver !",
              __LINE__, entity_name.c_str(), parse_index);
         return XCAM_RETURN_ERROR_SENSOR;
     }
@@ -157,7 +164,7 @@ parse_module_info(rk_sensor_full_info_t *sensor_info)
 
     if (entity_name.at(parse_index) != 'b' &&
             entity_name.at(parse_index) != 'f') {
-        LOGE("%d:parse sensor entity name %s error at %d, please check sensor driver !",
+        LOGE_CAMHW("%d:parse sensor entity name %s error at %d, please check sensor driver !",
              __LINE__, entity_name.c_str(), parse_index);
         return XCAM_RETURN_ERROR_SENSOR;
     }
@@ -166,7 +173,7 @@ parse_module_info(rk_sensor_full_info_t *sensor_info)
     parse_index++;
 
     if (entity_name.at(parse_index) != '_') {
-        LOGE("%d:parse sensor entity name %s error at %d, please check sensor driver !",
+        LOGE_CAMHW("%d:parse sensor entity name %s error at %d, please check sensor driver !",
              __LINE__, entity_name.c_str(), parse_index);
         return XCAM_RETURN_ERROR_SENSOR;
     }
@@ -175,7 +182,7 @@ parse_module_info(rk_sensor_full_info_t *sensor_info)
 
     std::size_t real_name_end = std::string::npos;
     if ((real_name_end = entity_name.find(' ')) == std::string::npos) {
-        LOGE("%d:parse sensor entity name %s error at %d, please check sensor driver !",
+        LOGE_CAMHW("%d:parse sensor entity name %s error at %d, please check sensor driver !",
              __LINE__, entity_name.c_str(), parse_index);
         return XCAM_RETURN_ERROR_SENSOR;
     }
@@ -183,7 +190,7 @@ parse_module_info(rk_sensor_full_info_t *sensor_info)
     std::string real_name_str = entity_name.substr(parse_index, real_name_end - parse_index);
     sensor_info->module_real_sensor_name = real_name_str;
 
-    LOGD("%s:%d, real sensor name %s, module ori %c, module id %s",
+    LOGD_CAMHW("%s:%d, real sensor name %s, module ori %c, module id %s",
          __FUNCTION__, __LINE__, sensor_info->module_real_sensor_name.c_str(),
          sensor_info->phy_module_orient, sensor_info->module_index_str.c_str());
 
@@ -275,7 +282,7 @@ get_isp_subdevs(struct media_device *device, const char *devpath, rk_aiq_isp_t* 
         if (0 == strlen(isp_info[index].media_dev_path))
             break;
         if (0 == strncmp(isp_info[index].media_dev_path, devpath, sizeof(isp_info[index].media_dev_path))) {
-            LOGD("isp info of path %s exists!", devpath);
+            LOGD_CAMHW("isp info of path %s exists!", devpath);
             return &isp_info[index];
         }
     }
@@ -441,13 +448,13 @@ CamHwIsp20::selectIqFile(const char* sns_ent_name, char* iqfile_name)
     std::string str(sns_ent_name);
 
     if ((it = CamHwIsp20::mSensorHwInfos.find(str)) == CamHwIsp20::mSensorHwInfos.end()) {
-        LOGE("can't find sensor %s", sns_ent_name);
+        LOGE_CAMHW("can't find sensor %s", sns_ent_name);
         return XCAM_RETURN_ERROR_SENSOR;
     }
     base_inf = &(it->second.ptr()->mod_info.base);
     if (!strlen(base_inf->module) || !strlen(base_inf->sensor) ||
             !strlen(base_inf->lens)) {
-        LOGE("no camera module info, check the drv !");
+        LOGE_CAMHW("no camera module info, check the drv !");
         return XCAM_RETURN_ERROR_SENSOR;
     }
     sensor_name = base_inf->sensor;
@@ -469,10 +476,10 @@ CamHwIsp20::getStaticCamHwInfo(const char* sns_ent_name)
 
     it = mCamHwInfos.find(str);
     if (it != mCamHwInfos.end()) {
-        LOGD("find camerainfo of %s!", sns_ent_name);
+        LOGD_CAMHW("find camerainfo of %s!", sns_ent_name);
         it->second.ptr();
     } else {
-        LOGE("camerainfo of %s not fount!", sns_ent_name);
+        LOGE_CAMHW("camerainfo of %s not fount!", sns_ent_name);
     }
     return NULL;
 }
@@ -575,7 +582,7 @@ CamHwIsp20::init(const char* sns_ent_name)
 
     std::map<std::string, SmartPtr<rk_sensor_full_info_t>>::iterator it;
     if ((it = mSensorHwInfos.find(sensor_name)) == mSensorHwInfos.end()) {
-        LOGE("can't find sensor %s", sns_ent_name);
+        LOGE_CAMHW("can't find sensor %s", sns_ent_name);
         return XCAM_RETURN_ERROR_SENSOR;
     }
     rk_sensor_full_info_t *s_info = it->second.ptr();
@@ -626,6 +633,7 @@ CamHwIsp20::init(const char* sns_ent_name)
 
     isp20Pollthread = new Isp20PollThread();
     isp20Pollthread->set_event_handle_dev(sensorHw);
+    isp20Pollthread->set_rx_handle_dev(this);
     isp20Pollthread->set_mipi_devs(mipi_tx_devs, mipi_rx_devs, mIspCoreDev);
     mPollthread = isp20Pollthread;
     mPollthread->set_event_device(mIspCoreDev);
@@ -672,7 +680,7 @@ CamHwIsp20::setupHdrLink(int hdr_mode, int isp_index, bool enable)
     if(entity) {
         sink_pad = (media_pad *)media_entity_get_pad(entity, 0);
         if (!sink_pad) {
-            LOGE("get HDR sink pad failed!\n");
+            LOGE_CAMHW("get HDR sink pad failed!\n");
             goto FAIL;
         }
     }
@@ -681,7 +689,7 @@ CamHwIsp20::setupHdrLink(int hdr_mode, int isp_index, bool enable)
     if(entity) {
         src_pad_s = (media_pad *)media_entity_get_pad(entity, 0);
         if (!src_pad_s) {
-            LOGE("get HDR source pad s failed!\n");
+            LOGE_CAMHW("get HDR source pad s failed!\n");
             goto FAIL;
         }
     }
@@ -694,7 +702,7 @@ CamHwIsp20::setupHdrLink(int hdr_mode, int isp_index, bool enable)
     if(entity) {
         src_pad_m = (media_pad *)media_entity_get_pad(entity, 0);
         if (!src_pad_m) {
-            LOGE("get HDR source pad m failed!\n");
+            LOGE_CAMHW("get HDR source pad m failed!\n");
             goto FAIL;
         }
     }
@@ -708,7 +716,7 @@ CamHwIsp20::setupHdrLink(int hdr_mode, int isp_index, bool enable)
         if(entity) {
             src_pad_l = (media_pad *)media_entity_get_pad(entity, 0);
             if (!src_pad_l) {
-                LOGE("get HDR source pad l failed!\n");
+                LOGE_CAMHW("get HDR source pad l failed!\n");
                 goto FAIL;
             }
         }
@@ -757,33 +765,33 @@ CamHwIsp20::prepare(uint32_t width, uint32_t height, int mode, int t_delay, int 
     // TODO: may start devices in start() ?
     ret = isp20Pollthread->hdr_mipi_start(sensorHw);
     if (ret < 0) {
-        LOGE("hdr mipi start err: %d\n", ret);
+        LOGE_CAMHW("hdr mipi start err: %d\n", ret);
     }
 
     ret = mIspLumaDev->start();
     if (ret < 0) {
-        LOGE("start isp luma dev err: %d\n", ret);
+        LOGE_CAMHW("start isp luma dev err: %d\n", ret);
     }
 
     ret = mIspCoreDev->start();
     if (ret < 0) {
-        LOGE("start isp core dev err: %d\n", ret);
+        LOGE_CAMHW("start isp core dev err: %d\n", ret);
     }
 
     mIspStatsDev->start();
     if (ret < 0) {
-        LOGE("start isp stats dev err: %d\n", ret);
+        LOGE_CAMHW("start isp stats dev err: %d\n", ret);
     }
 
     mIspParamsDev->start();
     if (ret < 0) {
-        LOGE("start isp params dev err: %d\n", ret);
+        LOGE_CAMHW("start isp params dev err: %d\n", ret);
     }
 
 #ifndef DISABLE_PP
     mIsppParamsDev->start();
     if (ret < 0) {
-        LOGE("start ispp params dev err: %d\n", ret);
+        LOGE_CAMHW("start ispp params dev err: %d\n", ret);
     }
 #endif
     _ispp_module_init_ens = 0;
@@ -808,33 +816,33 @@ CamHwIsp20::start()
     if (_state == CAM_HW_STATE_STOPED) {
         ret = isp20Pollthread->hdr_mipi_start(sensorHw);
         if (ret < 0) {
-            LOGE("hdr mipi start err: %d\n", ret);
+            LOGE_CAMHW("hdr mipi start err: %d\n", ret);
         }
 
         ret = mIspLumaDev->start();
         if (ret < 0) {
-            LOGE("start isp luma dev err: %d\n", ret);
+            LOGE_CAMHW("start isp luma dev err: %d\n", ret);
         }
 
         ret = mIspCoreDev->start();
         if (ret < 0) {
-            LOGE("start isp core dev err: %d\n", ret);
+            LOGE_CAMHW("start isp core dev err: %d\n", ret);
         }
 
         mIspStatsDev->start();
         if (ret < 0) {
-            LOGE("start isp stats dev err: %d\n", ret);
+            LOGE_CAMHW("start isp stats dev err: %d\n", ret);
         }
 
         mIspParamsDev->start();
         if (ret < 0) {
-            LOGE("start isp params dev err: %d\n", ret);
+            LOGE_CAMHW("start isp params dev err: %d\n", ret);
         }
 
 #ifndef DISABLE_PP
         mIsppParamsDev->start();
         if (ret < 0) {
-            LOGE("start ispp params dev err: %d\n", ret);
+            LOGE_CAMHW("start ispp params dev err: %d\n", ret);
         }
 #endif
     }
@@ -869,33 +877,33 @@ XCamReturn CamHwIsp20::stop()
 #endif
     ret = mIspLumaDev->stop();
     if (ret < 0) {
-        LOGE("stop isp luma dev err: %d\n", ret);
+        LOGE_CAMHW("stop isp luma dev err: %d\n", ret);
     }
 
     ret = mIspCoreDev->stop();
     if (ret < 0) {
-        LOGE("stop isp core dev err: %d\n", ret);
+        LOGE_CAMHW("stop isp core dev err: %d\n", ret);
     }
 
     mIspStatsDev->stop();
     if (ret < 0) {
-        LOGE("stop isp stats dev err: %d\n", ret);
+        LOGE_CAMHW("stop isp stats dev err: %d\n", ret);
     }
 
     mIspParamsDev->stop();
     if (ret < 0) {
-        LOGE("stop isp params dev err: %d\n", ret);
+        LOGE_CAMHW("stop isp params dev err: %d\n", ret);
     }
 
 #ifndef DISABLE_PP
     mIsppParamsDev->stop();
     if (ret < 0) {
-        LOGE("stop ispp params dev err: %d\n", ret);
+        LOGE_CAMHW("stop ispp params dev err: %d\n", ret);
     }
 #endif
     ret = isp20Pollthread->hdr_mipi_stop();
     if (ret < 0) {
-        LOGE("hdr mipi stop err: %d\n", ret);
+        LOGE_CAMHW("hdr mipi stop err: %d\n", ret);
     }
 
     if (_hdr_mode != RK_AIQ_WORKING_MODE_NORMAL)
@@ -903,6 +911,199 @@ XCamReturn CamHwIsp20::stop()
 
     _state = CAM_HW_STATE_STOPED;
     EXIT_CAMHW_FUNCTION();
+    return ret;
+}
+
+/*
+ * some module(HDR/TNR) parameters are related to the next frame exposure
+ * and can only be easily obtained at the hwi layer,
+ * so these parameters are calculated at hwi and the result is overwritten.
+ */
+XCamReturn
+CamHwIsp20::overrideExpRatioToAiqResults(const sint32_t frameId,
+					int module_id,
+					SmartPtr<RkAiqIspParamsProxy>& aiq_results)
+{
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    SmartPtr<RkAiqExpParamsProxy> curFrameExpParam;
+    SmartPtr<RkAiqExpParamsProxy> nextFrameExpParam;
+    SmartPtr<SensorHw> mSensorSubdev = mSensorDev.dynamic_cast_ptr<SensorHw>();
+
+    if (mSensorSubdev.ptr()) {
+	ret = mSensorSubdev->getEffectiveExpParams(curFrameExpParam, frameId);
+	if (ret != XCAM_RETURN_NO_ERROR) {
+	    LOGE_CAMHW("exp-sync: module_id: 0x%x, rx id: %d, ispparams id: %d\n",
+		       module_id,
+		       frameId,
+		       aiq_results->data()->frame_id);
+	    return ret;
+	}
+
+	ret = mSensorSubdev->getEffectiveExpParams(nextFrameExpParam, frameId + 1);
+	if (ret != XCAM_RETURN_NO_ERROR) {
+	    LOGE_CAMHW("exp-sync: module_id: 0x%x, rx id: %d, ispparams id: %d\n",
+		       module_id,
+		       frameId + 1,
+		       aiq_results->data()->frame_id);
+	    return ret;
+	}
+    }
+
+    LOGD_CAMHW("exp-sync: module_id: 0x%x, rx id: %d, ispparams id: %d\n"
+	       "curFrame: lexp: 0x%x-0x%x, mexp: 0x%x-0x%x, sexp: 0x%x-0x%x\n"
+	       "nextFrame: lexp: 0x%x-0x%x, mexp: 0x%x-0x%x, sexp: 0x%x-0x%x\n",
+	       module_id,
+	       frameId,
+	       aiq_results->data()->frame_id,
+	       curFrameExpParam->data()->HdrExp[2].exp_sensor_params.analog_gain_code_global,
+	       curFrameExpParam->data()->HdrExp[2].exp_sensor_params.coarse_integration_time,
+	       curFrameExpParam->data()->HdrExp[1].exp_sensor_params.analog_gain_code_global,
+	       curFrameExpParam->data()->HdrExp[1].exp_sensor_params.coarse_integration_time,
+	       curFrameExpParam->data()->HdrExp[0].exp_sensor_params.analog_gain_code_global,
+	       curFrameExpParam->data()->HdrExp[0].exp_sensor_params.coarse_integration_time,
+	       nextFrameExpParam->data()->HdrExp[2].exp_sensor_params.analog_gain_code_global,
+	       nextFrameExpParam->data()->HdrExp[2].exp_sensor_params.coarse_integration_time,
+	       nextFrameExpParam->data()->HdrExp[1].exp_sensor_params.analog_gain_code_global,
+	       nextFrameExpParam->data()->HdrExp[1].exp_sensor_params.coarse_integration_time,
+	       nextFrameExpParam->data()->HdrExp[0].exp_sensor_params.analog_gain_code_global,
+	       nextFrameExpParam->data()->HdrExp[0].exp_sensor_params.coarse_integration_time);
+
+    switch (module_id) {
+    case RK_ISP2X_HDRTMO_ID:
+    {
+	float nextLExpo =0;
+	float curLExpo =0;
+	float nextMExpo =0;
+	float curMExpo = 0;
+	if (RK_AIQ_HDR_GET_WORKING_MODE(_hdr_mode) == RK_AIQ_WORKING_MODE_ISP_HDR2) {
+	    nextLExpo = nextFrameExpParam->data()->HdrExp[1].exp_real_params.analog_gain * \
+		       nextFrameExpParam->data()->HdrExp[1].exp_real_params.integration_time;
+	    curLExpo = curFrameExpParam->data()->HdrExp[1].exp_real_params.analog_gain * \
+		       curFrameExpParam->data()->HdrExp[1].exp_real_params.integration_time;
+	    nextMExpo = nextLExpo;
+	    curMExpo = curLExpo;
+	} else if (RK_AIQ_HDR_GET_WORKING_MODE(_hdr_mode) == RK_AIQ_WORKING_MODE_ISP_HDR3) {
+	    nextLExpo = nextFrameExpParam->data()->HdrExp[2].exp_real_params.analog_gain * \
+		       nextFrameExpParam->data()->HdrExp[2].exp_real_params.integration_time;
+	    curLExpo = curFrameExpParam->data()->HdrExp[2].exp_real_params.analog_gain * \
+		       curFrameExpParam->data()->HdrExp[2].exp_real_params.integration_time;
+		nextMExpo = nextFrameExpParam->data()->HdrExp[1].exp_real_params.analog_gain * \
+		       nextFrameExpParam->data()->HdrExp[1].exp_real_params.integration_time;
+		curMExpo = curFrameExpParam->data()->HdrExp[1].exp_real_params.analog_gain * \
+		       curFrameExpParam->data()->HdrExp[1].exp_real_params.integration_time;
+	}
+
+	float nextSExpo = nextFrameExpParam->data()->HdrExp[0].exp_real_params.analog_gain * \
+			 nextFrameExpParam->data()->HdrExp[0].exp_real_params.integration_time;
+	float curSExpo = curFrameExpParam->data()->HdrExp[0].exp_real_params.analog_gain * \
+			 curFrameExpParam->data()->HdrExp[0].exp_real_params.integration_time;
+	float nextRatioLS = nextLExpo/nextSExpo;
+	float nextRatioLM = nextLExpo/nextMExpo;
+	float curRatioLS = curLExpo/curSExpo;
+	float nextLgmax = 12 + log(nextRatioLS) / log(2);
+	float curLgmax = 12 + log(curRatioLS) / log(2);
+	float lgmin = 0;
+
+	//tmo
+	// shadow resgister,needs to set a frame before, for ctrl_cfg/lg_scl reg
+	aiq_results->data()->ahdr_proc_res.TmoProcRes.sw_hdrtmo_expl_lgratio = \
+		(int)(2048*(log(curLExpo / nextLExpo) / log(2)));
+	aiq_results->data()->ahdr_proc_res.TmoProcRes.sw_hdrtmo_lgscl_ratio = \
+		(int)(128*(log(nextRatioLS) / log(curRatioLS)));
+	aiq_results->data()->ahdr_proc_res.TmoProcRes.sw_hdrtmo_lgscl = (int)(4096*16/nextLgmax);
+	aiq_results->data()->ahdr_proc_res.TmoProcRes.sw_hdrtmo_lgscl_inv = (int)(4096*nextLgmax/16);
+
+	// not shadow resgister
+	aiq_results->data()->ahdr_proc_res.TmoProcRes.sw_hdrtmo_lgmax = (int)(2048*curLgmax);
+	aiq_results->data()->ahdr_proc_res.TmoProcRes.sw_hdrtmo_set_lgmax = \
+		aiq_results->data()->ahdr_proc_res.TmoProcRes.sw_hdrtmo_lgmax;
+
+	//sw_hdrtmo_set_lgrange0
+	float value = 0.0;
+	float clipratio0 = aiq_results->data()->ahdr_proc_res.TmoProcRes.sw_hdrtmo_clipratio0 / 256.0;
+	float clipgap0 = aiq_results->data()->ahdr_proc_res.TmoProcRes.sw_hdrtmo_clipgap0 / 4.0;
+	value = lgmin * (1 - clipratio0) + curLgmax * clipratio0;
+	value = MIN(value, (lgmin + clipgap0));
+	aiq_results->data()->ahdr_proc_res.TmoProcRes.sw_hdrtmo_set_lgrange0 = (int)(2048*value);
+
+	//sw_hdrtmo_set_lgrange1
+	value = 0.0;
+	float clipratio1 = aiq_results->data()->ahdr_proc_res.TmoProcRes.sw_hdrtmo_clipratio1 / 256.0;
+	float clipgap1 = aiq_results->data()->ahdr_proc_res.TmoProcRes.sw_hdrtmo_clipgap1 / 4.0;
+	value = lgmin * (1 - clipratio1) + curLgmax * clipratio1;
+	value = MAX(value, (curLgmax - clipgap1));
+	aiq_results->data()->ahdr_proc_res.TmoProcRes.sw_hdrtmo_set_lgrange1 = (int)(2048*value);
+
+	//sw_hdrtmo_set_lgavgmax
+	float WeightKey = 0.0;
+	value = 0.0;
+	float set_lgmean = aiq_results->data()->ahdr_proc_res.TmoProcRes.sw_hdrtmo_set_lgmean / 2048.0;
+	float lgrange1 = aiq_results->data()->ahdr_proc_res.TmoProcRes.sw_hdrtmo_set_lgrange1 / 2048.0;
+	WeightKey = MIN(2 / (curLgmax - set_lgmean), 2 / (1 - lgmin));
+	WeightKey = MIN((1 - WeightKey), 0.6);
+	WeightKey = MAX(WeightKey, 0);
+	value = WeightKey * curLgmax + (1 - WeightKey) * set_lgmean;
+	value = MIN(value, lgrange1);
+	aiq_results->data()->ahdr_proc_res.TmoProcRes.sw_hdrtmo_set_lgavgmax = (int)(2048*value);
+
+	//sw_hdrtmo_set_palpha
+	float index = 0.0;
+	value = 0.0;
+	float palpha_0p18 = aiq_results->data()->ahdr_proc_res.TmoProcRes.sw_hdrtmo_palpha_0p18 / 1024.0;
+	index = 2 * set_lgmean - lgmin - curLgmax;
+	index = index / (curLgmax - lgmin);
+	value = palpha_0p18 * pow(4, index);
+	int value_int = (int)(1024*value);
+	value_int = MIN(value_int,aiq_results->data()->ahdr_proc_res.TmoProcRes.sw_hdrtmo_maxpalpha);
+	aiq_results->data()->ahdr_proc_res.TmoProcRes.sw_hdrtmo_set_palpha = value_int;
+	LOGD_CAMHW("palpha_0p18:%f set_lgmean:%f lgmin:%f lgmax:%f\n",
+		   palpha_0p18,
+		   set_lgmean,
+		   lgmin,
+		   curLgmax);
+
+	//merge
+	// shadow resgister,needs to set a frame before, for gain0/1/2 reg
+	aiq_results->data()->ahdr_proc_res.MgeProcRes.sw_hdrmge_gain0 = (int)(64*nextRatioLS);
+	if(nextRatioLS == 1)
+		aiq_results->data()->ahdr_proc_res.MgeProcRes.sw_hdrmge_gain0_inv = (int)(4096*(1 / nextRatioLS) - 1);
+	else
+		aiq_results->data()->ahdr_proc_res.MgeProcRes.sw_hdrmge_gain0_inv = (int)(4096*(1 / nextRatioLS));
+	aiq_results->data()->ahdr_proc_res.MgeProcRes.sw_hdrmge_gain1 = (int)(64*nextRatioLM);
+	if(nextRatioLM == 1)
+		aiq_results->data()->ahdr_proc_res.MgeProcRes.sw_hdrmge_gain1_inv = (int)(4096*(1 / nextRatioLM) - 1);
+	else
+		aiq_results->data()->ahdr_proc_res.MgeProcRes.sw_hdrmge_gain1_inv = (int)(4096*(1 / nextRatioLM));
+
+	LOGD_CAMHW("sw_hdrtmo_expl_lgratio:%d sw_hdrtmo_lgscl_ratio:%d "
+		   "sw_hdrtmo_lgmax:%d sw_hdrtmo_set_lgmax:%d sw_hdrtmo_lgscl:%d sw_hdrtmo_lgscl_inv:%d\n",
+		   aiq_results->data()->ahdr_proc_res.TmoProcRes.sw_hdrtmo_expl_lgratio,
+		   aiq_results->data()->ahdr_proc_res.TmoProcRes.sw_hdrtmo_lgscl_ratio,
+		   aiq_results->data()->ahdr_proc_res.TmoProcRes.sw_hdrtmo_lgmax,
+		   aiq_results->data()->ahdr_proc_res.TmoProcRes.sw_hdrtmo_set_lgmax,
+		   aiq_results->data()->ahdr_proc_res.TmoProcRes.sw_hdrtmo_lgscl,
+		   aiq_results->data()->ahdr_proc_res.TmoProcRes.sw_hdrtmo_lgscl_inv);
+	LOGD_CAMHW("sw_hdrtmo_set_lgrange0:%d sw_hdrtmo_set_lgrange1:%d "
+		   "sw_hdrtmo_set_lgavgmax:%d sw_hdrtmo_palpha_0p18:%d sw_hdrtmo_set_palpha:%d\n",
+		   aiq_results->data()->ahdr_proc_res.TmoProcRes.sw_hdrtmo_set_lgrange0,
+		   aiq_results->data()->ahdr_proc_res.TmoProcRes.sw_hdrtmo_set_lgrange1,
+		   aiq_results->data()->ahdr_proc_res.TmoProcRes.sw_hdrtmo_set_lgavgmax,
+		   aiq_results->data()->ahdr_proc_res.TmoProcRes.sw_hdrtmo_palpha_0p18,
+		   aiq_results->data()->ahdr_proc_res.TmoProcRes.sw_hdrtmo_set_palpha);
+	LOGD_CAMHW("sw_hdrmge_gain0:%d sw_hdrmge_gain0_inv:%d sw_hdrmge_gain1:%d sw_hdrmge_gain1_inv:%d\n",
+		   aiq_results->data()->ahdr_proc_res.MgeProcRes.sw_hdrmge_gain0,
+		   aiq_results->data()->ahdr_proc_res.MgeProcRes.sw_hdrmge_gain0_inv,
+		   aiq_results->data()->ahdr_proc_res.MgeProcRes.sw_hdrmge_gain1,
+		   aiq_results->data()->ahdr_proc_res.MgeProcRes.sw_hdrmge_gain1_inv);
+	break;
+    }
+    case RK_ISP2X_PP_TNR_ID:
+	break;
+    default:
+	LOGW_CAMHW("unkown module id: 0x%x!\n", module_id);
+	break;
+    }
+
     return ret;
 }
 
@@ -1011,24 +1212,24 @@ CamHwIsp20::gen_full_isp_params(const struct isp2x_isp_params_cfg* update_params
 void CamHwIsp20::dump_isp_config(struct isp2x_isp_params_cfg* isp_params,
                                  SmartPtr<RkAiqIspParamsProxy> aiq_results)
 {
-    LOGD("isp_params mask: 0x%llx-0x%llx-0x%llx\n",
+    LOGD_CAMHW("isp_params mask: 0x%llx-0x%llx-0x%llx\n",
          isp_params->module_en_update,
          isp_params->module_ens,
          isp_params->module_cfg_update);
 
-    LOGD("aiq_results: ae-lite.winnum=%d; ae-big2.winnum=%d, sub[1].size: [%dx%d]\n",
+    LOGD_CAMHW("aiq_results: ae-lite.winnum=%d; ae-big2.winnum=%d, sub[1].size: [%dx%d]\n",
          aiq_results->data()->aec_meas.rawae0.wnd_num,
          aiq_results->data()->aec_meas.rawae1.wnd_num,
          aiq_results->data()->aec_meas.rawae1.subwin[1].h_size,
          aiq_results->data()->aec_meas.rawae1.subwin[1].v_size);
 
-    LOGD("isp_params: ae-lite.winnum=%d; ae-big2.winnum=%d, sub[1].size: [%dx%d]\n",
+    LOGD_CAMHW("isp_params: ae-lite.winnum=%d; ae-big2.winnum=%d, sub[1].size: [%dx%d]\n",
          isp_params->meas.rawae0.wnd_num,
          isp_params->meas.rawae1.wnd_num,
          isp_params->meas.rawae1.subwin[1].h_size,
          isp_params->meas.rawae1.subwin[1].v_size);
 
-    LOGD("isp_params: win size: [%dx%d]-[%dx%d]-[%dx%d]-[%dx%d]\n",
+    LOGD_CAMHW("isp_params: win size: [%dx%d]-[%dx%d]-[%dx%d]-[%dx%d]\n",
          isp_params->meas.rawae0.win.h_size,
          isp_params->meas.rawae0.win.v_size,
          isp_params->meas.rawae3.win.h_size,
@@ -1037,7 +1238,7 @@ void CamHwIsp20::dump_isp_config(struct isp2x_isp_params_cfg* isp_params,
          isp_params->meas.rawae1.win.v_size,
          isp_params->meas.rawae2.win.h_size,
          isp_params->meas.rawae2.win.v_size);
-    LOGD("isp_params: debayer: \n"
+    LOGD_CAMHW("isp_params: debayer: \n"
          "clip_en:%d, dist_scale:%d, filter_c_en:%d, filter_g_en:%d\n"
          "gain_offset:%d,hf_offset:%d,max_ratio:%d,offset:%d,order_max:%d\n"
          "order_min:%d, shift_num:%d, thed0:%d, thed1:%d\n"
@@ -1069,96 +1270,111 @@ void CamHwIsp20::dump_isp_config(struct isp2x_isp_params_cfg* isp_params,
 }
 
 XCamReturn
-CamHwIsp20::setIspParamsSync()
+CamHwIsp20::setIspParamsSync(int frameId)
 {
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
 
     ENTER_CAMHW_FUNCTION();
+    _mutex.lock();
     while (_effecting_ispparm_map.size() > 10)
         _effecting_ispparm_map.erase(_effecting_ispparm_map.begin());
 
+    if (_pending_ispparams_queue.empty()) {
+	LOGE_CAMHW("no new isp params !");
+
+	_mutex.unlock();
+	return ret;
+    }
+
     // merge all pending params
-    if (!_pending_ispparams_queue.empty()) {
-        struct isp2x_isp_params_cfg update_params;
-        SmartPtr<RkAiqIspParamsProxy> aiq_results;
+    struct isp2x_isp_params_cfg update_params;
+    SmartPtr<RkAiqIspParamsProxy> aiq_results;
 
+    xcam_mem_clear (update_params);
+    xcam_mem_clear (_full_active_isp_params);
+    LOGD_CAMHW("merge isp params num %d\n", _pending_ispparams_queue.size());
+    aiq_results = _pending_ispparams_queue.back();
+    _pending_ispparams_queue.pop_back();
+    _mutex.unlock();
 
-        xcam_mem_clear (update_params);
-        xcam_mem_clear (_full_active_isp_params);
-        LOGD("merge isp params num %d\n", _pending_ispparams_queue.size());
-        aiq_results = _pending_ispparams_queue.front();
-        _pending_ispparams_queue.pop_front();
+    if (RK_AIQ_HDR_GET_WORKING_MODE(_hdr_mode) != RK_AIQ_WORKING_MODE_NORMAL) {
+        ret = overrideExpRatioToAiqResults(frameId, RK_ISP2X_HDRTMO_ID, aiq_results);
+	if (ret != XCAM_RETURN_NO_ERROR) {
+		LOGE_CAMHW("convertExpRatioToAiqResults error!\n");
+	}
+    }
 
-        ret = convertAiqResultsToIsp20Params(update_params, aiq_results, _last_aiq_results);
-        if (ret != XCAM_RETURN_NO_ERROR) {
-            LOGE("rkisp1_convert_results error\n");
-        }
+    ret = convertAiqResultsToIsp20Params(update_params, aiq_results, _last_aiq_results);
+    if (ret != XCAM_RETURN_NO_ERROR) {
+        LOGE_CAMHW("rkisp1_convert_results error\n");
+    }
 
 #if 1 // for test
-        /* ae/hist update */
-        update_params.module_en_update |= 1LL << RK_ISP2X_RAWAE_LITE_ID;
-        update_params.module_ens |= 1LL << RK_ISP2X_RAWAE_LITE_ID;
-        update_params.module_cfg_update |= 1LL << RK_ISP2X_RAWAE_LITE_ID;
+    /* ae/hist update */
+    update_params.module_en_update |= 1LL << RK_ISP2X_RAWAE_LITE_ID;
+    update_params.module_ens |= 1LL << RK_ISP2X_RAWAE_LITE_ID;
+    update_params.module_cfg_update |= 1LL << RK_ISP2X_RAWAE_LITE_ID;
 
-        update_params.module_en_update |= 1LL << RK_ISP2X_RAWAE_BIG1_ID;
-        update_params.module_ens |= 1LL << RK_ISP2X_RAWAE_BIG1_ID;
-        update_params.module_cfg_update |= 1LL << RK_ISP2X_RAWAE_BIG1_ID;
+    update_params.module_en_update |= 1LL << RK_ISP2X_RAWAE_BIG1_ID;
+    update_params.module_ens |= 1LL << RK_ISP2X_RAWAE_BIG1_ID;
+    update_params.module_cfg_update |= 1LL << RK_ISP2X_RAWAE_BIG1_ID;
 
-        update_params.module_en_update |= 1LL << RK_ISP2X_RAWAE_BIG2_ID;
-        update_params.module_ens |= 1LL << RK_ISP2X_RAWAE_BIG2_ID;
-        update_params.module_cfg_update |= 1LL << RK_ISP2X_RAWAE_BIG2_ID;
+    update_params.module_en_update |= 1LL << RK_ISP2X_RAWAE_BIG2_ID;
+    update_params.module_ens |= 1LL << RK_ISP2X_RAWAE_BIG2_ID;
+    update_params.module_cfg_update |= 1LL << RK_ISP2X_RAWAE_BIG2_ID;
 
-        update_params.module_en_update |= 1LL << RK_ISP2X_RAWAE_BIG3_ID;
-        update_params.module_ens |= 1LL << RK_ISP2X_RAWAE_BIG3_ID;
-        update_params.module_cfg_update |= 1LL << RK_ISP2X_RAWAE_BIG3_ID;
+    update_params.module_en_update |= 1LL << RK_ISP2X_RAWAE_BIG3_ID;
+    update_params.module_ens |= 1LL << RK_ISP2X_RAWAE_BIG3_ID;
+    update_params.module_cfg_update |= 1LL << RK_ISP2X_RAWAE_BIG3_ID;
 
 
-        update_params.module_en_update |= 1LL << RK_ISP2X_RAWHIST_LITE_ID;
-        update_params.module_ens |= 1LL << RK_ISP2X_RAWHIST_LITE_ID;
-        update_params.module_cfg_update |= 1LL << RK_ISP2X_RAWHIST_LITE_ID;
+    update_params.module_en_update |= 1LL << RK_ISP2X_RAWHIST_LITE_ID;
+    update_params.module_ens |= 1LL << RK_ISP2X_RAWHIST_LITE_ID;
+    update_params.module_cfg_update |= 1LL << RK_ISP2X_RAWHIST_LITE_ID;
 
-        update_params.module_en_update |= 1LL << RK_ISP2X_RAWHIST_BIG1_ID;
-        update_params.module_ens |= 1LL << RK_ISP2X_RAWHIST_BIG1_ID;
-        update_params.module_cfg_update |= 1LL << RK_ISP2X_RAWHIST_BIG1_ID;
+    update_params.module_en_update |= 1LL << RK_ISP2X_RAWHIST_BIG1_ID;
+    update_params.module_ens |= 1LL << RK_ISP2X_RAWHIST_BIG1_ID;
+    update_params.module_cfg_update |= 1LL << RK_ISP2X_RAWHIST_BIG1_ID;
 
-        update_params.module_en_update |= 1LL << RK_ISP2X_RAWHIST_BIG2_ID;
-        update_params.module_ens |= 1LL << RK_ISP2X_RAWHIST_BIG2_ID;
-        update_params.module_cfg_update |= 1LL << RK_ISP2X_RAWHIST_BIG2_ID;
+    update_params.module_en_update |= 1LL << RK_ISP2X_RAWHIST_BIG2_ID;
+    update_params.module_ens |= 1LL << RK_ISP2X_RAWHIST_BIG2_ID;
+    update_params.module_cfg_update |= 1LL << RK_ISP2X_RAWHIST_BIG2_ID;
 
-        update_params.module_en_update |= 1LL << RK_ISP2X_RAWHIST_BIG3_ID;
-        update_params.module_ens |= 1LL << RK_ISP2X_RAWHIST_BIG3_ID;
-        update_params.module_cfg_update |= 1LL << RK_ISP2X_RAWHIST_BIG3_ID;
+    update_params.module_en_update |= 1LL << RK_ISP2X_RAWHIST_BIG3_ID;
+    update_params.module_ens |= 1LL << RK_ISP2X_RAWHIST_BIG3_ID;
+    update_params.module_cfg_update |= 1LL << RK_ISP2X_RAWHIST_BIG3_ID;
 
-        update_params.module_en_update |= 1LL << RK_ISP2X_HDRMGE_ID;
-        update_params.module_ens |= 1LL << RK_ISP2X_HDRMGE_ID;
-        update_params.module_cfg_update |= 1LL << RK_ISP2X_HDRMGE_ID;
+    update_params.module_en_update |= 1LL << RK_ISP2X_HDRMGE_ID;
+    update_params.module_ens |= 1LL << RK_ISP2X_HDRMGE_ID;
+    update_params.module_cfg_update |= 1LL << RK_ISP2X_HDRMGE_ID;
 
-        update_params.module_en_update |= 1LL << RK_ISP2X_HDRTMO_ID;
-        update_params.module_ens |= 1LL << RK_ISP2X_HDRTMO_ID;
-        update_params.module_cfg_update |= 1LL << RK_ISP2X_HDRTMO_ID;
+    update_params.module_en_update |= 1LL << RK_ISP2X_HDRTMO_ID;
+    update_params.module_ens |= 1LL << RK_ISP2X_HDRTMO_ID;
+    update_params.module_cfg_update |= 1LL << RK_ISP2X_HDRTMO_ID;
 
-        /* awb update */
-        update_params.module_en_update |= 1LL << RK_ISP2X_AWB_GAIN_ID;
-        update_params.module_ens |= 1LL << RK_ISP2X_AWB_GAIN_ID;
-        update_params.module_cfg_update |= 1LL << RK_ISP2X_AWB_GAIN_ID;
+    /* awb update */
+    update_params.module_en_update |= 1LL << RK_ISP2X_AWB_GAIN_ID;
+    update_params.module_ens |= 1LL << RK_ISP2X_AWB_GAIN_ID;
+    update_params.module_cfg_update |= 1LL << RK_ISP2X_AWB_GAIN_ID;
 
-        update_params.module_en_update |= 1LL << RK_ISP2X_RAWAWB_ID;
-        update_params.module_ens |= 1LL << RK_ISP2X_RAWAWB_ID;
-        update_params.module_cfg_update |= 1LL << RK_ISP2X_RAWAWB_ID;
+    update_params.module_en_update |= 1LL << RK_ISP2X_RAWAWB_ID;
+    update_params.module_ens |= 1LL << RK_ISP2X_RAWAWB_ID;
+    update_params.module_cfg_update |= 1LL << RK_ISP2X_RAWAWB_ID;
 
-        update_params.module_en_update |= 1LL << RK_ISP2X_RAWAF_ID;
-        update_params.module_ens |= 1LL << RK_ISP2X_RAWAF_ID;
-        update_params.module_cfg_update |= 1LL << RK_ISP2X_RAWAF_ID;
+    update_params.module_en_update |= 1LL << RK_ISP2X_RAWAF_ID;
+    update_params.module_ens |= 1LL << RK_ISP2X_RAWAF_ID;
+    update_params.module_cfg_update |= 1LL << RK_ISP2X_RAWAF_ID;
 #endif
-        gen_full_isp_params(&update_params, &_full_active_isp_params);
+    gen_full_isp_params(&update_params, &_full_active_isp_params);
 
 #ifdef RUNTIME_MODULE_DEBUG
-        _full_active_isp_params.module_en_update &= ~g_disable_isp_modules_en;
-        _full_active_isp_params.module_ens |= g_disable_isp_modules_en;
-        _full_active_isp_params.module_cfg_update &= ~g_disable_isp_modules_cfg_update;
+    _full_active_isp_params.module_en_update &= ~g_disable_isp_modules_en;
+    _full_active_isp_params.module_ens |= g_disable_isp_modules_en;
+    _full_active_isp_params.module_cfg_update &= ~g_disable_isp_modules_cfg_update;
 #endif
-        dump_isp_config(&_full_active_isp_params, aiq_results);
-    }
+    dump_isp_config(&_full_active_isp_params, aiq_results);
+
+    _mutex.unlock();
 
     if (mIspParamsDev.ptr()) {
         struct isp2x_isp_params_cfg* isp_params;
@@ -1170,18 +1386,19 @@ CamHwIsp20::setIspParamsSync()
 
             isp_params = (struct isp2x_isp_params_cfg*)v4l2buf->get_buf().m.userptr;
             *isp_params = _full_active_isp_params;
+	    isp_params->frame_id = frameId;
 
             if (mIspParamsDev->queue_buffer (v4l2buf) != 0) {
-                XCAM_LOG_ERROR ("RKISP1: failed to ioctl VIDIOC_QBUF for index %d, %d %s.\n",
+                LOGE_CAMHW("RKISP1: failed to ioctl VIDIOC_QBUF for index %d, %d %s.\n",
                                 buf_index, errno, strerror(errno));
                 return ret;
             }
 
-            XCAM_LOG_DEBUG ("device(%s) queue buffer index %d, queue cnt %d, check exit status again[exit: %d]",
+            LOGD_CAMHW ("device(%s) queue buffer index %d, queue cnt %d, check exit status again[exit: %d]",
                             XCAM_STR (mIspParamsDev->get_device_name()),
                             buf_index, mIspParamsDev->get_queued_bufcnt(), _is_exit);
         } else {
-            XCAM_LOG_ERROR ("Can not get buffer\n");
+            LOGE_CAMHW("Can not get buffer\n");
         }
 
         if (_is_exit)
@@ -1196,21 +1413,30 @@ XCamReturn
 CamHwIsp20::setIspParams(SmartPtr<RkAiqIspParamsProxy>& ispParams)
 {
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
-    SmartLock locker (_mutex);
 
     ENTER_CAMHW_FUNCTION();
     if (_is_exit) {
-        XCAM_LOG_DEBUG ("set 3a config bypass since ia engine has stop");
+        LOGD_CAMHW ("set 3a config bypass since ia engine has stop");
         return XCAM_RETURN_BYPASS;
     }
 
+    _mutex.lock();
     if (_pending_ispparams_queue.size() > 8) {
-        XCAM_LOG_DEBUG ("too many pending isp params:%d !", _pending_ispparams_queue.size());
+        LOGD_CAMHW ("too many pending isp params:%d !", _pending_ispparams_queue.size());
         _pending_ispparams_queue.erase(_pending_ispparams_queue.begin());
     }
     _pending_ispparams_queue.push_back(ispParams);
+    _mutex.unlock();
 
-    setIspParamsSync();
+    if (_first) {
+	 LOGD_CAMHW("hdr-debug: %s: first set ispparams id[%d]\n",
+	       __func__, ispParams->data()->frame_id);
+        setIspParamsSync(ispParams->data()->frame_id);
+	_first = false;
+    }
+
+    if (RK_AIQ_HDR_GET_WORKING_MODE(_hdr_mode) == RK_AIQ_WORKING_MODE_NORMAL)
+        setIspParamsSync(ispParams->data()->frame_id);
 
     EXIT_CAMHW_FUNCTION();
     return ret;
@@ -1224,7 +1450,7 @@ CamHwIsp20::setIsppParams(SmartPtr<RkAiqIsppParamsProxy>& isppParams)
 
     ENTER_CAMHW_FUNCTION();
     if (_is_exit) {
-        XCAM_LOG_DEBUG ("check if ia engine has stop");
+        LOGD_CAMHW ("check if ia engine has stop");
         return XCAM_RETURN_BYPASS;
     }
 
@@ -1248,27 +1474,28 @@ CamHwIsp20::setIsppParams(SmartPtr<RkAiqIsppParamsProxy>& isppParams)
                 _ispp_module_init_ens = ispp_params->module_init_ens;
             else {
                 if (_ispp_module_init_ens != ispp_params->module_init_ens) {
-                    XCAM_LOG_ERROR ("ispp working mode changed from 0x%x to 0x%x\n",
+                    LOGE_CAMHW("ispp working mode changed from 0x%x to 0x%x\n",
                                     _ispp_module_init_ens, ispp_params->module_init_ens);
                     ispp_params->module_init_ens = _ispp_module_init_ens;
                 }
             }
 
-			LOGD("%s:%d state:%d pp:init 0x%x  0x%x\n", 
-				__FUNCTION__, __LINE__, _state,
-				_ispp_module_init_ens, ispp_params->module_init_ens );
+	    LOGD_CAMHW("%s:%d state:%d pp:init 0x%x  0x%x\n", 
+		       __FUNCTION__, __LINE__, _state,
+		       _ispp_module_init_ens, ispp_params->module_init_ens );
+
             //TODO set update bits
             if (mIsppParamsDev->queue_buffer (v4l2buf) != 0) {
-                XCAM_LOG_ERROR ("RKISP1: failed to ioctl VIDIOC_QBUF for index %d, %d %s.\n",
+                LOGE_CAMHW("RKISP1: failed to ioctl VIDIOC_QBUF for index %d, %d %s.\n",
                                 buf_index, errno, strerror(errno));
                 return ret;
             }
 
-            XCAM_LOG_DEBUG ("device(%s) queue buffer index %d, queue cnt %d, check exit status again[exit: %d]",
+            LOGD_CAMHW ("device(%s) queue buffer index %d, queue cnt %d, check exit status again[exit: %d]",
                             XCAM_STR (mIsppParamsDev->get_device_name()),
                             buf_index, mIsppParamsDev->get_queued_bufcnt(), _is_exit);
         } else {
-            XCAM_LOG_ERROR ("RKISP1: Can not get buffer.\n");
+            LOGE_CAMHW("RKISP1: Can not get buffer.\n");
         }
 
         if (_is_exit)
@@ -1289,7 +1516,7 @@ CamHwIsp20::getSensorModeData(const char* sns_ent_name,
 
     ret = mSensorSubdev->getSensorModeData(sns_ent_name, sns_des);
     if (ret) {
-        XCAM_LOG_ERROR ("getSensorModeData failed \n");
+        LOGE_CAMHW("getSensorModeData failed \n");
         return ret;
     }
 
@@ -1298,11 +1525,11 @@ CamHwIsp20::getSensorModeData(const char* sns_ent_name,
     if (ret == XCAM_RETURN_NO_ERROR) {
         sns_des.isp_acq_width = select.r.width;
         sns_des.isp_acq_height = select.r.height;
-        XCAM_LOG_DEBUG("get isp acq,w: %d, h: %d\n",
+        LOGD_CAMHW("get isp acq,w: %d, h: %d\n",
                        sns_des.isp_acq_width,
                        sns_des.isp_acq_height);
     } else {
-        XCAM_LOG_WARNING("get selecttion error \n");
+        LOGW_CAMHW("get selecttion error \n");
         sns_des.isp_acq_width = sns_des.sensor_output_width;
         sns_des.isp_acq_height = sns_des.sensor_output_height;
         ret = XCAM_RETURN_NO_ERROR;

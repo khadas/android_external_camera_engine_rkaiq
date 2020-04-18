@@ -68,6 +68,37 @@ uAPI
 #../core/inc/orb
 #../core/inc/common
 ./
+include
+include/common
+include/iq_parser
+include/uAPI
+include/xcore
+include/xcore/base
+include/algos
+include/algos/a3dlut
+include/algos/ablc
+include/algos/accm
+include/algos/acgc
+include/algos/acp
+include/algos/adebayer
+include/algos/adehaze
+include/algos/adpcc
+include/algos/ae
+include/algos/af
+include/algos/afec
+include/algos/agamma
+include/algos/agic
+include/algos/ahdr
+include/algos/aie
+include/algos/aldch
+include/algos/alsc
+include/algos/anr
+include/algos/aorb
+include/algos/ar2y
+include/algos/asd
+include/algos/asharp
+include/algos/awb
+include/algos/awdr
 )
 #source directory
 #AUX_SOURCE_DIRECTORY(demo/src DIR_SRCS)

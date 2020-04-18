@@ -43,6 +43,8 @@ typedef struct rk_aiq_sys_ctx_s {
 
 #define RKAIQ_DEFAULT_IQ_PATH "/etc/iqfiles/"
 
+RKAIQ_BEGIN_DECLARE
+
 rk_aiq_sys_ctx_t*
 rk_aiq_uapi_sysctl_init(const char* sns_ent_name,
                         const char* config_file_dir,
@@ -245,6 +247,8 @@ rk_aiq_uapi_sysctl_getEnabledAxlibCtx(const rk_aiq_sys_ctx_t* ctx, const int alg
     return ctx->_analyzer->getEnabledAxlibCtx(algo_type);
 }
 
+RKAIQ_END_DECLARE
+
 template<typename T> static T*
 algoHandle(const rk_aiq_sys_ctx_t* ctx, const int algo_type)
 {
@@ -271,6 +275,12 @@ algoHandle(const rk_aiq_sys_ctx_t* ctx, const int algo_type)
 #include "rk_aiq_user_api_a3dlut.cpp"
 #include "rk_aiq_user_api_adehaze.cpp"
 #include "rk_aiq_user_api_agamma.cpp"
+#include "rk_aiq_user_api_ablc.cpp"
+#include "rk_aiq_user_api_adpcc.cpp"
+#include "rk_aiq_user_api_ae.cpp"
+#include "rk_aiq_user_api_anr.cpp"
+#include "rk_aiq_user_api_asharp.cpp"
+#include "rk_aiq_user_api_imgproc.cpp"
 
 static void rk_aiq_init_lib(void) __attribute__((constructor));
 static void rk_aiq_init_lib(void)

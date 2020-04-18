@@ -5,7 +5,7 @@
 #include "base/xcam_common.h"
 #include "rk_aiq_types_algo_adebayer_int.h"
 #include "RkAiqCalibDbTypes.h"
-
+#include "xcam_log.h"
 typedef enum AdebayerState_e {
     ADEBAYER_STATE_INVALID           = 0,
     ADEBAYER_STATE_INITIALIZED       = 1,

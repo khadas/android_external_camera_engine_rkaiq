@@ -84,7 +84,7 @@
                        </cell>
 	              <cell index="4" type="struct" size="[1 1]">
 		             <Domain index="1" type="double" size="[1 1]">		                [1]		             </Domain>
-		             <mode index="1" type="double" size="[1 1]">		                [1]		             </mode>		             <window index="1" type="double" size="[1 4]">		                [0 0 0 0 ]		             </window>
+		             <mode index="1" type="double" size="[1 1]">		                [1]		             </mode>		             <window index="1" type="double" size="[1 4]">                        [617 803 146 100]		             </window>
                        </cell>
 	              <cell index="5" type="struct" size="[1 1]">
 		             <Domain index="1" type="double" size="[1 1]">		                [0]		             </Domain>
@@ -104,7 +104,7 @@
                      [123 44 53.5 122.5 123]
                   </lightURegion>
                   <lightVRegion index="1" type="double" size="[1 5]">
-                     [129 123 101 126.5 129]
+                     [129 123 101 126 129]
                   </lightVRegion>
                   <lightXYRegion index="1" type="struct" size="[1 1]">
                       <normal index="1" type="double" size="[1 4]">
@@ -125,16 +125,16 @@
 		         <b_ydisSet index="1" type="double" size="[1 1]">		            [-1]		         </b_ydisSet>
 		         <uRefSet index="1" type="double" size="[1 1]">		            [128]		         </uRefSet>
 		         <vRefSet index="1" type="double" size="[1 1]">		            [126]		         </vRefSet>
-		         <disSet index="1" type="double" size="[1 6]">		            [ 97   225   353   609  1121  1249]		         </disSet>
-		         <tHSet index="1" type="double" size="[1 6]">		            [11	14	17	20	23	26]		         </tHSet>
+		         <disSet index="1" type="double" size="[1 6]">                        [97 225 353 609 1121 1249]		         </disSet>
+		         <tHSet index="1" type="double" size="[1 6]">                        [3 4 5 5 23 26]		         </tHSet>
                   </yuvRegion>
               </cell>
              <cell index="2" type="struct" size="[1 1]">                  <name index="1" type="char" size="[1 9]">                     CWF                  </name>
                   <lightURegion index="1" type="double" size="[1 5]">
-                     [58.5 62.5 123.5 123 58.5]
+                     [58.5 63 123.5 123 58.5]
                   </lightURegion>
                   <lightVRegion index="1" type="double" size="[1 5]">
-                     [86 76 123.5 125.5 86]
+                     [85 76.5 123.5 125.5 85]
                   </lightVRegion>
                   <lightXYRegion index="1" type="double" size="[1 1]">
                      <normal index="1" type="double" size="[1 4]">
@@ -161,17 +161,17 @@
               </cell>
              <cell index="3" type="struct" size="[1 1]">                  <name index="1" type="char" size="[1 9]">                     D50                  </name>
                   <lightURegion index="1" type="double" size="[1 5]">
-                     [63 76 125 124 63]
+                     [58.5 76 125 123.5 58.5]
                   </lightURegion>
                   <lightVRegion index="1" type="double" size="[1 5]">
-                     [76 53 123 124 76]
+                     [86 53 123 126 86]
                   </lightVRegion>
                   <lightXYRegion index="1" type="double" size="[1 1]">
                      <normal index="1" type="double" size="[1 4]">
-                        [0.550179199272816 1.13321384558709 0.0942813884315032 -0.0704053113732943]
+                        [0.719185185185185 1.1262962962963 0.19499294015423 -0.0659389594873466]
                      </normal>
                      <big index="1" type="double" size="[1 4]">
-                        [0.5493102939416 1.1340827509183 0.179396692414732 -0.0733403218554746]
+                        [0.717407407407407 1.13056255247691 0.223584905660377 -0.0750624524818073]
                      </big>
                      <small index="1" type="double" size="[1 4]">
                         [0.849444443964296 1.01851850508529 0.0945409429280397 -0.0244234804858031]
@@ -186,7 +186,7 @@
 		         <uRefSet index="1" type="double" size="[1 1]">		            [128]		         </uRefSet>
 		         <vRefSet index="1" type="double" size="[1 1]">		            [128]		         </vRefSet>
 		         <disSet index="1" type="double" size="[1 6]">		            [68   132   260   388   644  1156]		         </disSet>
-		         <tHSet index="1" type="double" size="[1 6]">                        [2 2 4 20 23 26]		         </tHSet>
+		         <tHSet index="1" type="double" size="[1 6]">                        [11 14 17 20 23 26]		         </tHSet>
                   </yuvRegion>
               </cell>
              <cell index="4" type="struct" size="[1 1]">                  <name index="1" type="char" size="[1 9]">                     D65                  </name>
@@ -198,10 +198,10 @@
                   </lightVRegion>
                   <lightXYRegion index="1" type="double" size="[1 1]">
                      <normal index="1" type="double" size="[1 4]">
-                        [1.14979544549437 1.33833333219091 0.0903680409969718 -0.166004961684679]
+                        [1.12985185185185 1.33833333219091 0.0891604214184859 -0.166004961684679]
                      </normal>
                      <big index="1" type="double" size="[1 4]">
-                        [1.14805763730495 1.33611111063096 0.160545905707196 -0.242266480316795]
+                        [1.12629629503135 1.33611111063096 0.160545905707196 -0.23928532658894]
                      </big>
                      <small index="1" type="double" size="[1 4]">
                         [1.1894444439643 1.33388888840874 0.0377998341204611 -0.135897436351003]
@@ -281,20 +281,20 @@
               </cell>
              <cell index="7" type="struct" size="[1 1]">                  <name index="1" type="char" size="[1 9]">                     TL84                  </name>
                   <lightURegion index="1" type="double" size="[1 5]">
-                     [122.5 53.5 58.5 123 122.5]
+                     [122.5 53.5 58.5 123.5 122.5]
                   </lightURegion>
                   <lightVRegion index="1" type="double" size="[1 5]">
-                     [126.5 100.5 86 125.5 126.5]
+                     [126 100.5 86 126 126]
                   </lightVRegion>
                   <lightXYRegion index="1" type="double" size="[1 1]">
                      <normal index="1" type="double" size="[1 4]">
-                        [0.219126739188098 0.554523718509864 0.0737363150562412 -0.0586652694445731]
+                        [0.214296295031354 0.719185185185185 0.191343542749607 -0.0622895622895623]
                      </normal>
                      <big index="1" type="double" size="[1 4]">
-                        [0.223471258425146 0.550179211469531 0.188201723736315 -0.088015374266376]
+                        [0.214296295031354 0.720822837951302 0.232389937106918 -0.0860106442819993]
                      </big>
                      <small index="1" type="double" size="[1 4]">
-                        [0.372922763951864 0.541490157089205 0.0649312836097004 -0.0586652694445731]
+                        [0.372922763951864 0.550296296296296 0.0649312836097004 -0.0495166720973172]
                        </small>
                   </lightXYRegion>
 	         <yuvRegion index="1" type="struct" size="[1 1]">
@@ -306,7 +306,7 @@
 		         <uRefSet index="1" type="double" size="[1 1]">		            [128]		         </uRefSet>
 		         <vRefSet index="1" type="double" size="[1 1]">		            [128]		         </vRefSet>
 		         <disSet index="1" type="double" size="[1 6]">		            [72   104   232   360   616   872]		         </disSet>
-		         <tHSet index="1" type="double" size="[1 6]">		            [11	14	17	20	23	26]		         </tHSet>
+		         <tHSet index="1" type="double" size="[1 6]">                        [11 14 17 40 50 60]		         </tHSet>
                   </yuvRegion>
               </cell>
          </LightSources>
@@ -5564,7 +5564,7 @@
          <DEHAZE_ISO index="1" type="cell" size="[1 9]">             <cell index="1" type="struct" size="[1 1]">
 	         <iso index="1" type="double" size="[1 1]">	            [50]	         </iso>
 	         <dehaze_en index="1" type="double" size="[1 1]">	            [1]	         </dehaze_en>
-	         <dc_en index="1" type="double" size="[1 1]">	            [1]	         </dc_en>
+	         <dc_en index="1" type="double" size="[1 1]">	            [0]	         </dc_en>
 	         <hist_en index="1" type="double" size="[1 1]">	            [1]	         </hist_en>
 	         <hist_channel index="1" type="double" size="[1 1]">	            [0]	         </hist_channel>
 	         <gain_en index="1" type="double" size="[1 1]">	            [1]	         </gain_en>
@@ -5589,7 +5589,7 @@
 	         <enhance_value index="1" type="double" size="[1 1]">	            [1.5]	         </enhance_value>
 	         <hist_para_en index="1" type="double" size="[1 1]">	            [1]	         </hist_para_en>
 	         <hist_scale index="1" type="double" size="[1 1]">	            [0.9]	         </hist_scale>
-	         <stab_fnum index="1" type="double" size="[1 1]">	            [6.0]	         </stab_fnum>
+	         <stab_fnum index="1" type="double" size="[1 1]">	            [8.0]	         </stab_fnum>
 	         <sigma index="1" type="double" size="[1 1]">	            [6.0]	         </sigma>
 	         <wt_sigma index="1" type="double" size="[1 1]">	            [8.0]	         </wt_sigma>
 	         <air_sigma index="1" type="double" size="[1 1]">	            [120.0]	         </air_sigma>
@@ -5607,7 +5607,7 @@
              <cell index="2" type="struct" size="[1 1]">
 	         <iso index="1" type="double" size="[1 1]">	            [100]	         </iso>
 	         <dehaze_en index="1" type="double" size="[1 1]">	            [1]	         </dehaze_en>
-	         <dc_en index="1" type="double" size="[1 1]">	            [1]	         </dc_en>
+	         <dc_en index="1" type="double" size="[1 1]">	            [0]	         </dc_en>
 	         <hist_en index="1" type="double" size="[1 1]">	            [1]	         </hist_en>
 	         <hist_channel index="1" type="double" size="[1 1]">	            [0]	         </hist_channel>
 	         <gain_en index="1" type="double" size="[1 1]">	            [1]	         </gain_en>
@@ -5632,7 +5632,7 @@
 	         <enhance_value index="1" type="double" size="[1 1]">	            [1.5]	         </enhance_value>
 	         <hist_para_en index="1" type="double" size="[1 1]">	            [1]	         </hist_para_en>
 	         <hist_scale index="1" type="double" size="[1 1]">	            [0.9]	         </hist_scale>
-	         <stab_fnum index="1" type="double" size="[1 1]">	            [6.0]	         </stab_fnum>
+	         <stab_fnum index="1" type="double" size="[1 1]">	            [8.0]	         </stab_fnum>
 	         <sigma index="1" type="double" size="[1 1]">	            [6.0]	         </sigma>
 	         <wt_sigma index="1" type="double" size="[1 1]">	            [8.0]	         </wt_sigma>
 	         <air_sigma index="1" type="double" size="[1 1]">	            [120.0]	         </air_sigma>
@@ -5650,7 +5650,7 @@
              <cell index="3" type="struct" size="[1 1]">
 	         <iso index="1" type="double" size="[1 1]">	            [200]	         </iso>
 	         <dehaze_en index="1" type="double" size="[1 1]">	            [1]	         </dehaze_en>
-	         <dc_en index="1" type="double" size="[1 1]">	            [1]	         </dc_en>
+	         <dc_en index="1" type="double" size="[1 1]">	            [0]	         </dc_en>
 	         <hist_en index="1" type="double" size="[1 1]">	            [1]	         </hist_en>
 	         <hist_channel index="1" type="double" size="[1 1]">	            [0]	         </hist_channel>
 	         <gain_en index="1" type="double" size="[1 1]">	            [1]	         </gain_en>
@@ -5675,7 +5675,7 @@
 	         <enhance_value index="1" type="double" size="[1 1]">	            [1.5]	         </enhance_value>
 	         <hist_para_en index="1" type="double" size="[1 1]">	            [1]	         </hist_para_en>
 	         <hist_scale index="1" type="double" size="[1 1]">	            [0.9]	         </hist_scale>
-	         <stab_fnum index="1" type="double" size="[1 1]">	            [6.0]	         </stab_fnum>
+	         <stab_fnum index="1" type="double" size="[1 1]">	            [8.0]	         </stab_fnum>
 	         <sigma index="1" type="double" size="[1 1]">	            [6.0]	         </sigma>
 	         <wt_sigma index="1" type="double" size="[1 1]">	            [8.0]	         </wt_sigma>
 	         <air_sigma index="1" type="double" size="[1 1]">	            [120.0]	         </air_sigma>
@@ -5693,7 +5693,7 @@
              <cell index="4" type="struct" size="[1 1]">
 	         <iso index="1" type="double" size="[1 1]">	            [400]	         </iso>
 	         <dehaze_en index="1" type="double" size="[1 1]">	            [1]	         </dehaze_en>
-	         <dc_en index="1" type="double" size="[1 1]">	            [1]	         </dc_en>
+	         <dc_en index="1" type="double" size="[1 1]">	            [0]	         </dc_en>
 	         <hist_en index="1" type="double" size="[1 1]">	            [1]	         </hist_en>
 	         <hist_channel index="1" type="double" size="[1 1]">	            [0]	         </hist_channel>
 	         <gain_en index="1" type="double" size="[1 1]">	            [1]	         </gain_en>
@@ -5718,7 +5718,7 @@
 	         <enhance_value index="1" type="double" size="[1 1]">	            [1.5]	         </enhance_value>
 	         <hist_para_en index="1" type="double" size="[1 1]">	            [1]	         </hist_para_en>
 	         <hist_scale index="1" type="double" size="[1 1]">	            [0.9]	         </hist_scale>
-	         <stab_fnum index="1" type="double" size="[1 1]">	            [6.0]	         </stab_fnum>
+	         <stab_fnum index="1" type="double" size="[1 1]">	            [8.0]	         </stab_fnum>
 	         <sigma index="1" type="double" size="[1 1]">	            [6.0]	         </sigma>
 	         <wt_sigma index="1" type="double" size="[1 1]">	            [8.0]	         </wt_sigma>
 	         <air_sigma index="1" type="double" size="[1 1]">	            [120.0]	         </air_sigma>
@@ -5736,7 +5736,7 @@
              <cell index="5" type="struct" size="[1 1]">
 	         <iso index="1" type="double" size="[1 1]">	            [800]	         </iso>
 	         <dehaze_en index="1" type="double" size="[1 1]">	            [1]	         </dehaze_en>
-	         <dc_en index="1" type="double" size="[1 1]">	            [1]	         </dc_en>
+	         <dc_en index="1" type="double" size="[1 1]">	            [0]	         </dc_en>
 	         <hist_en index="1" type="double" size="[1 1]">	            [1]	         </hist_en>
 	         <hist_channel index="1" type="double" size="[1 1]">	            [0]	         </hist_channel>
 	         <gain_en index="1" type="double" size="[1 1]">	            [1]	         </gain_en>
@@ -5761,7 +5761,7 @@
 	         <enhance_value index="1" type="double" size="[1 1]">	            [1.5]	         </enhance_value>
 	         <hist_para_en index="1" type="double" size="[1 1]">	            [1]	         </hist_para_en>
 	         <hist_scale index="1" type="double" size="[1 1]">	            [0.9]	         </hist_scale>
-	         <stab_fnum index="1" type="double" size="[1 1]">	            [6.0]	         </stab_fnum>
+	         <stab_fnum index="1" type="double" size="[1 1]">	            [8.0]	         </stab_fnum>
 	         <sigma index="1" type="double" size="[1 1]">	            [6.0]	         </sigma>
 	         <wt_sigma index="1" type="double" size="[1 1]">	            [8.0]	         </wt_sigma>
 	         <air_sigma index="1" type="double" size="[1 1]">	            [120.0]	         </air_sigma>
@@ -5779,7 +5779,7 @@
              <cell index="6" type="struct" size="[1 1]">
 	         <iso index="1" type="double" size="[1 1]">	            [1600]	         </iso>
 	         <dehaze_en index="1" type="double" size="[1 1]">	            [1]	         </dehaze_en>
-	         <dc_en index="1" type="double" size="[1 1]">	            [1]	         </dc_en>
+	         <dc_en index="1" type="double" size="[1 1]">	            [0]	         </dc_en>
 	         <hist_en index="1" type="double" size="[1 1]">	            [1]	         </hist_en>
 	         <hist_channel index="1" type="double" size="[1 1]">	            [0]	         </hist_channel>
 	         <gain_en index="1" type="double" size="[1 1]">	            [1]	         </gain_en>
@@ -5804,7 +5804,7 @@
 	         <enhance_value index="1" type="double" size="[1 1]">	            [1.5]	         </enhance_value>
 	         <hist_para_en index="1" type="double" size="[1 1]">	            [1]	         </hist_para_en>
 	         <hist_scale index="1" type="double" size="[1 1]">	            [0.9]	         </hist_scale>
-	         <stab_fnum index="1" type="double" size="[1 1]">	            [6.0]	         </stab_fnum>
+	         <stab_fnum index="1" type="double" size="[1 1]">	            [8.0]	         </stab_fnum>
 	         <sigma index="1" type="double" size="[1 1]">	            [6.0]	         </sigma>
 	         <wt_sigma index="1" type="double" size="[1 1]">	            [8.0]	         </wt_sigma>
 	         <air_sigma index="1" type="double" size="[1 1]">	            [120.0]	         </air_sigma>
@@ -5822,7 +5822,7 @@
              <cell index="7" type="struct" size="[1 1]">
 	         <iso index="1" type="double" size="[1 1]">	            [3200]	         </iso>
 	         <dehaze_en index="1" type="double" size="[1 1]">	            [1]	         </dehaze_en>
-	         <dc_en index="1" type="double" size="[1 1]">	            [1]	         </dc_en>
+	         <dc_en index="1" type="double" size="[1 1]">	            [0]	         </dc_en>
 	         <hist_en index="1" type="double" size="[1 1]">	            [1]	         </hist_en>
 	         <hist_channel index="1" type="double" size="[1 1]">	            [0]	         </hist_channel>
 	         <gain_en index="1" type="double" size="[1 1]">	            [1]	         </gain_en>
@@ -5847,7 +5847,7 @@
 	         <enhance_value index="1" type="double" size="[1 1]">	            [1.5]	         </enhance_value>
 	         <hist_para_en index="1" type="double" size="[1 1]">	            [1]	         </hist_para_en>
 	         <hist_scale index="1" type="double" size="[1 1]">	            [0.9]	         </hist_scale>
-	         <stab_fnum index="1" type="double" size="[1 1]">	            [6.0]	         </stab_fnum>
+	         <stab_fnum index="1" type="double" size="[1 1]">	            [8.0]	         </stab_fnum>
 	         <sigma index="1" type="double" size="[1 1]">	            [6.0]	         </sigma>
 	         <wt_sigma index="1" type="double" size="[1 1]">	            [8.0]	         </wt_sigma>
 	         <air_sigma index="1" type="double" size="[1 1]">	            [120.0]	         </air_sigma>
@@ -5865,7 +5865,7 @@
              <cell index="8" type="struct" size="[1 1]">
 	         <iso index="1" type="double" size="[1 1]">	            [6400]	         </iso>
 	         <dehaze_en index="1" type="double" size="[1 1]">	            [1]	         </dehaze_en>
-	         <dc_en index="1" type="double" size="[1 1]">	            [1]	         </dc_en>
+	         <dc_en index="1" type="double" size="[1 1]">	            [0]	         </dc_en>
 	         <hist_en index="1" type="double" size="[1 1]">	            [1]	         </hist_en>
 	         <hist_channel index="1" type="double" size="[1 1]">	            [0]	         </hist_channel>
 	         <gain_en index="1" type="double" size="[1 1]">	            [1]	         </gain_en>
@@ -5890,7 +5890,7 @@
 	         <enhance_value index="1" type="double" size="[1 1]">	            [1.5]	         </enhance_value>
 	         <hist_para_en index="1" type="double" size="[1 1]">	            [1]	         </hist_para_en>
 	         <hist_scale index="1" type="double" size="[1 1]">	            [0.9]	         </hist_scale>
-	         <stab_fnum index="1" type="double" size="[1 1]">	            [6.0]	         </stab_fnum>
+	         <stab_fnum index="1" type="double" size="[1 1]">	            [8.0]	         </stab_fnum>
 	         <sigma index="1" type="double" size="[1 1]">	            [6.0]	         </sigma>
 	         <wt_sigma index="1" type="double" size="[1 1]">	            [8.0]	         </wt_sigma>
 	         <air_sigma index="1" type="double" size="[1 1]">	            [120.0]	         </air_sigma>
@@ -5908,7 +5908,7 @@
              <cell index="9" type="struct" size="[1 1]">
 	         <iso index="1" type="double" size="[1 1]">	            [12800]	         </iso>
 	         <dehaze_en index="1" type="double" size="[1 1]">	            [1]	         </dehaze_en>
-	         <dc_en index="1" type="double" size="[1 1]">	            [1]	         </dc_en>
+	         <dc_en index="1" type="double" size="[1 1]">	            [0]	         </dc_en>
 	         <hist_en index="1" type="double" size="[1 1]">	            [1]	         </hist_en>
 	         <hist_channel index="1" type="double" size="[1 1]">	            [0]	         </hist_channel>
 	         <gain_en index="1" type="double" size="[1 1]">	            [1]	         </gain_en>
@@ -5933,7 +5933,7 @@
 	         <enhance_value index="1" type="double" size="[1 1]">	            [1.5]	         </enhance_value>
 	         <hist_para_en index="1" type="double" size="[1 1]">	            [1]	         </hist_para_en>
 	         <hist_scale index="1" type="double" size="[1 1]">	            [0.9]	         </hist_scale>
-	         <stab_fnum index="1" type="double" size="[1 1]">	            [6.0]	         </stab_fnum>
+	         <stab_fnum index="1" type="double" size="[1 1]">	            [8.0]	         </stab_fnum>
 	         <sigma index="1" type="double" size="[1 1]">	            [6.0]	         </sigma>
 	         <wt_sigma index="1" type="double" size="[1 1]">	            [8.0]	         </wt_sigma>
 	         <air_sigma index="1" type="double" size="[1 1]">	            [120.0]	         </air_sigma>

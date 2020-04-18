@@ -18,7 +18,7 @@ rk_aiq_uapi_a3dlut_GetAttrib(const RkAiqAlgoContext *ctx,
                           rk_aiq_lut3d_attrib_t *attr)
 {
 
-    alut3d_context_t* alut3d_context = (alut3d_context_t*)ctx;
+    alut3d_context_t* alut3d_context = (alut3d_context_t*)ctx->a3dlut_para;
 
     memcpy(attr,&alut3d_context->mCurAtt,sizeof(rk_aiq_lut3d_attrib_t));
 
@@ -30,7 +30,7 @@ rk_aiq_uapi_a3dlut_Query3dlutInfo(const RkAiqAlgoContext *ctx,
                           rk_aiq_lut3d_querry_info_t *lut3d_querry_info )
 {
 
-    alut3d_context_t* alut3d_context = (alut3d_context_t*)ctx;
+    alut3d_context_t* alut3d_context = (alut3d_context_t*)ctx->a3dlut_para;
     memcpy(lut3d_querry_info->look_up_table_b,alut3d_context->lut3d_hw_conf.look_up_table_b,
         sizeof(lut3d_querry_info->look_up_table_b));
     memcpy(lut3d_querry_info->look_up_table_g,alut3d_context->lut3d_hw_conf.look_up_table_g,

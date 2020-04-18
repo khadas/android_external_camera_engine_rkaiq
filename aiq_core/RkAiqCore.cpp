@@ -498,6 +498,8 @@ RkAiqCore::genIspAeResult(RkAiqFullParams* params)
     // gen rk ae result
     if (algo_id == 0) {
         RkAiqAlgoProcResAeInt* ae_rk = (RkAiqAlgoProcResAeInt*)ae_com;
+        memcpy(exp_param->exp_tbl, ae_rk->ae_proc_res_rk.exp_set_tbl, sizeof(exp_param->exp_tbl));
+        exp_param->exp_cnt = ae_rk->ae_proc_res_rk.exp_set_cnt;
     }
 
     EXIT_ANALYZER_FUNCTION();
@@ -779,7 +781,7 @@ RkAiqCore::genIspAnrResult(RkAiqFullParams* params)
                &anr_rk->stAnrProcResult.stMfnrFix,
                sizeof(RKAnr_Mfnr_Fix_t));
 
-		memcpy(&isp_param->gain_config,
+        memcpy(&isp_param->gain_config,
                &anr_rk->stAnrProcResult.stGainFix,
                sizeof(rk_aiq_isp_gain_t));
 
@@ -1639,9 +1641,9 @@ RkAiqCore::addDefaultAlgos()
     enableAlgo(RK_AIQ_ALGO_TYPE_ADPCC, 0, true);
     enableAlgo(RK_AIQ_ALGO_TYPE_ANR, 0, true);
     /* enableAlgo(RK_AIQ_ALGO_TYPE_AF, 0, true); */
-    enableAlgo(RK_AIQ_ALGO_TYPE_ASHARP, 0, true); 
-    /* enableAlgo(RK_AIQ_ALGO_TYPE_ADHAZ, 0, true); */ 
-     /*enableAlgo(RK_AIQ_ALGO_TYPE_A3DLUT, 0, true); */
+    enableAlgo(RK_AIQ_ALGO_TYPE_ASHARP, 0, true);
+    enableAlgo(RK_AIQ_ALGO_TYPE_ADHAZ, 0, true);
+    /*enableAlgo(RK_AIQ_ALGO_TYPE_A3DLUT, 0, true); */
 #endif
 #endif
 }
@@ -2020,17 +2022,19 @@ RkAiqCore::convertIspstatsToAlgo(const SmartPtr<VideoBuffer> &buffer)
         }
 
         /*
-         * unsigned long chn0_mean = 0, chn1_mean = 0, chn2_mean = 0;
-         * for(int i = 0; i < ISP2X_RAWAEBIG_MEAN_NUM; i++) {
-         *     chn0_mean += stats->params.rawae2.data[i].channelr_xy;
-         *     chn1_mean += stats->params.rawae1.data[i].channelr_xy;
-         *      for(int i = 0; i < ISP2X_RAWAELITE_MEAN_NUM; i++)
-         *               chn2_mean += stats->params.rawae0.data[i].channelr_xy;
-         * }
-         * printf("chn[0]: chn_r_mean_xy: %ld\n", chn0_mean);
-         * printf("chn[1]: chn_r_mean_xy: %ld\n", chn1_mean);
-         * printf("chn[2]: chn_r_mean_xy: %ld\n", chn2_mean);
+         *         unsigned long chn0_mean = 0, chn1_mean = 0, chn2_mean = 0;
+         *         for(int i = 0; i < ISP2X_RAWAEBIG_MEAN_NUM; i++) {
+         *             chn0_mean += stats->params.rawae2.data[i].channelg_xy;
+         *             chn1_mean += stats->params.rawae1.data[i].channelg_xy;
+         *             chn2_mean += stats->params.rawae3.data[i].channelg_xy;
+         *         }
+         *
+         *         printf("frame[%d]: chn[0-1-2]_g_mean_xy: %ld-%ld-%ld\n",
+         *                stats->frame_id, chn0_mean/(ISP2X_RAWAEBIG_MEAN_NUM*16),
+         *                chn1_mean/(ISP2X_RAWAEBIG_MEAN_NUM*16),
+         *                chn2_mean/(ISP2X_RAWAEBIG_MEAN_NUM*16));
          */
+
         memcpy(mAlogsSharedParams.ispStats.aec_stats.ae_data.chn[0].rawhist_big.bins, stats->params.rawhist2.hist_bin, ISP2X_HIST_BIN_N_MAX * sizeof(u32));
         memcpy(mAlogsSharedParams.ispStats.aec_stats.ae_data.chn[1].rawhist_big.bins, stats->params.rawhist1.hist_bin, ISP2X_HIST_BIN_N_MAX * sizeof(u32));
         memcpy(mAlogsSharedParams.ispStats.aec_stats.ae_data.chn[2].rawhist_lite.bins, stats->params.rawhist0.hist_bin, ISP2X_HIST_BIN_N_MAX * sizeof(u32));
@@ -2146,10 +2150,13 @@ RkAiqCore::analyze(const SmartPtr<VideoBuffer> &buffer)
         fullPparam->data()->mIsppParams->data()->orb;
 #endif
 
-    if (fullParam.ptr() && mCb)
+    if (fullParam.ptr() && mCb) {
+        fullParam->data()->mIspParams->data()->frame_id = buffer->get_sequence() + 1;
         mCb->rkAiqCalcDone(fullParam);
-    else if (fullPparam.ptr() && mCb)
+    } else if (fullPparam.ptr() && mCb) {
+        fullParam->data()->mIsppParams->data()->frame_id = buffer->get_sequence() + 1;
         mCb->rkAiqCalcDone(fullPparam);
+    }
 
     return ret;
 }

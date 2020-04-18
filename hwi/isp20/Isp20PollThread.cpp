@@ -69,7 +69,7 @@ Isp20PollThread::new_video_buffer(SmartPtr<V4l2Buffer> buf,
         SmartPtr<RkAiqIspParamsProxy> ispParams = nullptr;
         SmartPtr<RkAiqExpParamsProxy> expParams = nullptr;
 
-        _event_handle_dev->getEffectiveParams(expParams, buf->get_buf().sequence);
+        _event_handle_dev->getEffectiveExpParams(expParams, buf->get_buf().sequence);
         // TODO: get ispParams from isp dev;
 
         video_buf = new Isp20StatsBuffer(buf, dev, ispParams, expParams);
@@ -99,6 +99,16 @@ Isp20PollThread::set_event_handle_dev(SmartPtr<SensorHw> &dev)
     ENTER_CAMHW_FUNCTION();
     XCAM_ASSERT (dev.ptr());
     _event_handle_dev = dev;
+    EXIT_CAMHW_FUNCTION();
+    return true;
+}
+
+bool
+Isp20PollThread::set_rx_handle_dev(CamHwIsp20* dev)
+{
+    ENTER_CAMHW_FUNCTION();
+    XCAM_ASSERT (dev);
+    _rx_handle_dev = dev;
     EXIT_CAMHW_FUNCTION();
     return true;
 }
@@ -393,9 +403,11 @@ Isp20PollThread::mipi_poll_buffer_loop (int type, int dev_index)
 void
 Isp20PollThread::handle_rx_buf(SmartPtr<V4l2BufferProxy> &rx_buf, int dev_index)
 {
+
     SmartPtr<V4l2BufferProxy> buf = _isp_mipi_rx_infos[dev_index].buf_list.pop(-1);
     XCAM_LOG_DEBUG ("%s dev_index:%d index:%d fd:%d\n",
         __func__, dev_index, buf->get_v4l2_buf_index(), buf->get_expbuf_fd());
+
 }
 
 void Isp20PollThread::sync_tx_buf()
@@ -558,8 +570,6 @@ Isp20PollThread::trigger_readback(uint32_t sequence)
 	    _first_trigger = false;
 	}
 
-        XCAM_LOG_DEBUG ("%s frame id:%d times:%d\n",
-            __func__, sequence, tg.times);
         for (i = 0; i < _mipi_dev_max; i++) {
                 buf_proxy = _isp_mipi_rx_infos[i].cache_list.pop(-1);
                 _isp_mipi_rx_infos[i].buf_list.push(buf_proxy);
@@ -568,7 +578,23 @@ Isp20PollThread::trigger_readback(uint32_t sequence)
                 v4l2buf->set_expbuf_fd(buf_proxy->get_expbuf_fd());
                 _isp_mipi_rx_infos[i].dev->queue_buffer(v4l2buf);
         }
-        _isp_core_dev->io_control(RKISP_CMD_TRIGGER_READ_BACK, &tg);
+
+	/* TODO: fix the trigger time for ahdr temporarily */
+	tg.times = 1;
+	LOGW_CAMHW("%s fix the trigger to %d time for ahdr temporarily\n",
+			   __func__,
+			   tg.times);
+
+	LOGD_CAMHW("%s set frame[%d] isp params to %d times\n",
+			   __func__, sequence, tg.times);
+
+	if (_rx_handle_dev) {
+	    if (_rx_handle_dev->setIspParamsSync(sequence))
+		LOGE_CAMHW("%s frame[%d] set isp params failed, don't read back!\n",
+			       __func__, sequence);
+	    else
+		_isp_core_dev->io_control(RKISP_CMD_TRIGGER_READ_BACK, &tg);
+	}
     }
 }
 }; //namspace RkCam

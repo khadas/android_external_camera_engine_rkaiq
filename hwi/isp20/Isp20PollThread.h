@@ -22,6 +22,7 @@
 #include "xcam_thread.h"
 #include "poll_thread.h"
 #include "SensorHw.h"
+#include "CamHwIsp20.h"
 
 using namespace XCam;
 
@@ -35,6 +36,7 @@ public:
     virtual ~Isp20PollThread();
 
     bool set_event_handle_dev(SmartPtr<SensorHw> &dev);
+    bool set_rx_handle_dev(CamHwIsp20* dev);
     void set_mipi_devs(SmartPtr<V4l2Device> mipi_tx_devs[3],
                        SmartPtr<V4l2Device> mipi_rx_devs[3],
                        SmartPtr<V4l2SubDevice> isp_dev);
@@ -90,6 +92,7 @@ private:
 private:
     XCAM_DEAD_COPY(Isp20PollThread);
     SmartPtr<SensorHw> _event_handle_dev;
+    CamHwIsp20* _rx_handle_dev;
 };
 }
 #endif

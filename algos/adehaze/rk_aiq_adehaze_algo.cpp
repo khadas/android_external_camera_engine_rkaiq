@@ -17,23 +17,24 @@
  *
  */
 #include <string.h>
-#include "../../xcore/base/xcam_common.h"
 #include "rk_aiq_adehaze_algo.h"
+#include "xcam_log.h"
+
 RKAIQ_BEGIN_DECLARE
 /*
 //useless
 void select_dehzae_params_by_ISO(RKAiqAdhazHtmlConfig_t stRKdehazePara, RKAiqAdhazHwConfig_Select_t  *stRKdehazeParamsSelected, int iso)
 {
-    //确定iso等级
-    //共有7个iso等级：50 100 200 400 800 1600 3200  6400 12800
+    //脠路露篓iso碌脠录露
+    //鹿虏脫脨7赂枚iso碌脠录露拢潞50 100 200 400 800 1600 3200  6400 12800
     //       isogain: 1   2   4   8   16   32  64  128  256
     //      isolevel: 0   1   2   3   4    5   6   7    8
     int isoGainStd[9] = {1, 2, 4, 8, 16, 32, 64, 128, 256};
     int isoGain = MAX(int(iso / 50), 1);
-    int isoGainLow = 0; //向下一个isoGain,用做参数插值：y=float(isoGainHig-isoGain)/float(isoGainHig-isoGainLow)*y[isoLevelLow]
+    int isoGainLow = 0; //脧貌脧脗脪禄赂枚isoGain,脫脙脳枚虏脦脢媒虏氓脰碌拢潞y=float(isoGainHig-isoGain)/float(isoGainHig-isoGainLow)*y[isoLevelLow]
     //                                  +float(isoGain-isoGainLow)/float(isoGainHig-isoGainLow)*y[isoLevelHig];
-    int isoGainHig = 0; //向上一个isoGain
-    int isoGainCorrect = 1; //选择最近的一档iso的配置
+    int isoGainHig = 0; //脧貌脡脧脪禄赂枚isoGain
+    int isoGainCorrect = 1; //脩隆脭帽脳卯陆眉碌脛脪禄碌碌iso碌脛脜盲脰脙
 
     int isoLevelLow = 0;
     int isoLevelHig = 0;
@@ -52,13 +53,13 @@ void select_dehzae_params_by_ISO(RKAiqAdhazHtmlConfig_t stRKdehazePara, RKAiqAdh
             isoLevelCorrect = ((isoGain - isoGainStd[i]) <= (isoGainStd[i + 1] - isoGain)) ? i : (i + 1);
         }
     }
-//使能参数赋值
+//脢鹿脛脺虏脦脢媒赂鲁脰碌
     stRKdehazeParamsSelected->sw_dhaz_en = stRKdehazePara.dehaze_en[0][isoLevelCorrect];
     stRKdehazeParamsSelected->sw_dhaz_dc_en = stRKdehazePara.dehaze_en[1][isoLevelCorrect];
     stRKdehazeParamsSelected->sw_dhaz_hist_en = stRKdehazePara.dehaze_en[2][isoLevelCorrect];
     stRKdehazeParamsSelected->sw_dhaz_hist_chn = stRKdehazePara.dehaze_en[3][isoLevelCorrect];
     stRKdehazeParamsSelected->sw_dhaz_gain_en = stRKdehazePara.dehaze_en[4][isoLevelCorrect];
-    //阈值赋值
+    //茫脨脰碌赂鲁脰碌
     stRKdehazeParamsSelected->sw_dhaz_dc_min_th = stRKdehazePara.dehaze_self_adp[0][isoLevelCorrect];
     stRKdehazeParamsSelected->sw_dhaz_dc_max_th = stRKdehazePara.dehaze_self_adp[1][isoLevelCorrect];
     stRKdehazeParamsSelected->sw_dhaz_yhist_th = stRKdehazePara.dehaze_self_adp[2][isoLevelCorrect];
@@ -75,12 +76,12 @@ void select_dehzae_params_by_ISO(RKAiqAdhazHtmlConfig_t stRKdehazePara, RKAiqAdh
     stRKdehazeParamsSelected->sw_dhaz_tmax_off = stRKdehazePara.dehaze_range_adj[4][isoLevelCorrect];
     stRKdehazeParamsSelected->sw_dhaz_tmax_max = stRKdehazePara.dehaze_range_adj[5][isoLevelCorrect];
 
-    //直方图阈值
+    //脰卤路陆脥录茫脨脰碌
     stRKdehazeParamsSelected->sw_dhaz_hist_gratio = stRKdehazePara.dehaze_hist_para[0][isoLevelCorrect];
     stRKdehazeParamsSelected->sw_dhaz_hist_th_off = stRKdehazePara.dehaze_hist_para[1][isoLevelCorrect];
     stRKdehazeParamsSelected->sw_dhaz_hist_k = stRKdehazePara.dehaze_hist_para[2][isoLevelCorrect];
     stRKdehazeParamsSelected->sw_dhaz_hist_min = stRKdehazePara.dehaze_hist_para[3][isoLevelCorrect];
-    //对比度增强使能与阈值
+    //露脭卤脠露脠脭枚脟驴脢鹿脛脺脫毛茫脨脰碌
     stRKdehazeParamsSelected->sw_dhaz_enhance_en = stRKdehazePara.dehaze_enhance[0][isoLevelCorrect];
     stRKdehazeParamsSelected->sw_dhaz_enhance_value = stRKdehazePara.dehaze_enhance[1][isoLevelCorrect];
     stRKdehazeParamsSelected->sw_dhaz_hpara_en = stRKdehazePara.dehaze_enhance[2][isoLevelCorrect];
@@ -93,7 +94,7 @@ void select_dehzae_params_by_ISO(RKAiqAdhazHtmlConfig_t stRKdehazePara, RKAiqAdh
     stRKdehazeParamsSelected->sw_dhaz_iir_air_sigma = stRKdehazePara.dehaze_iir_control[3][isoLevelCorrect];
     stRKdehazeParamsSelected->sw_dhaz_iir_tmax_sigma = stRKdehazePara.dehaze_iir_control[4][isoLevelCorrect];
 
-    //用户配置
+    //脫脙禄搂脜盲脰脙
     stRKdehazeParamsSelected->sw_dhaz_cfg_alpha = stRKdehazePara.dehaze_user_config[0][isoLevelCorrect];
     stRKdehazeParamsSelected->sw_dhaz_cfg_wt = stRKdehazePara.dehaze_user_config[1][isoLevelCorrect];
     stRKdehazeParamsSelected->sw_dhaz_cfg_air = stRKdehazePara.dehaze_user_config[2][isoLevelCorrect];
@@ -106,7 +107,7 @@ void select_dehzae_params_by_ISO(RKAiqAdhazHtmlConfig_t stRKdehazePara, RKAiqAdh
     stRKdehazeParamsSelected->sw_dhaz_air_weitcur = stRKdehazePara.dehaze_bi_para[3][isoLevelCorrect];
 
 
-    //矩阵赋值
+    //戮脴脮贸赂鲁脰碌
     memcpy(stRKdehazeParamsSelected->sw_dhaz_dc_bf_h, stRKdehazePara.dehaze_dc_bf_h, sizeof(stRKdehazePara.dehaze_dc_bf_h));
     memcpy(stRKdehazeParamsSelected->sw_dhaz_air_bf_h, stRKdehazePara.dehaze_air_bf_h, sizeof(stRKdehazePara.dehaze_air_bf_h));
     memcpy(stRKdehazeParamsSelected->sw_dhaz_gaus_h, stRKdehazePara.dehaze_gaus_h, sizeof(stRKdehazePara.dehaze_gaus_h));

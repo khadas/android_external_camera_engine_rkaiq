@@ -22,6 +22,7 @@
 
 #include "agamma/rk_aiq_types_agamma_algo_int.h"
 #include "RkAiqCalibDbTypes.h"
+#include "xcam_log.h"
 
 RKAIQ_BEGIN_DECLARE
 

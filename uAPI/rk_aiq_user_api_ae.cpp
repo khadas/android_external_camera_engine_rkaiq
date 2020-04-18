@@ -13,11 +13,12 @@
 #include "rk_aiq_user_api_ae.h"
 #include "RkAiqHandleInt.h"
 
+RKAIQ_BEGIN_DECLARE
 
 XCamReturn rk_aiq_user_api_ae_setExpSwAttr
 (
     const rk_aiq_sys_ctx_t* sys_ctx,
-    const Uapi_ExpSwAttr_t*  pExpSwAttr
+    const Uapi_ExpSwAttr_t expSwAttr
 ) {
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
 
@@ -25,7 +26,7 @@ XCamReturn rk_aiq_user_api_ae_setExpSwAttr
         algoHandle<RkAiqAeHandleInt>(sys_ctx, RK_AIQ_ALGO_TYPE_AE);
 
     if (algo_handle) {
-        return algo_handle->setExpSwAttr(pExpSwAttr);
+        return algo_handle->setExpSwAttr(expSwAttr);
     }
 
     return (ret);
@@ -50,7 +51,7 @@ XCamReturn rk_aiq_user_api_ae_getExpSwAttr
 XCamReturn rk_aiq_user_api_ae_setLinAeRouteAttr
 (
     const rk_aiq_sys_ctx_t* sys_ctx,
-    const Uapi_LinAeRouteAttr_t* pLinAeRouteAttr
+    const Uapi_LinAeRouteAttr_t linAeRouteAttr
 ) {
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
 
@@ -58,7 +59,7 @@ XCamReturn rk_aiq_user_api_ae_setLinAeRouteAttr
         algoHandle<RkAiqAeHandleInt>(sys_ctx, RK_AIQ_ALGO_TYPE_AE);
 
     if (algo_handle) {
-        return algo_handle->setLinAeRouteAttr(pLinAeRouteAttr);
+        return algo_handle->setLinAeRouteAttr(linAeRouteAttr);
     }
 
     return(ret);
@@ -83,7 +84,7 @@ XCamReturn rk_aiq_user_api_ae_getLinAeRouteAttr
 XCamReturn rk_aiq_user_api_ae_setHdrAeRouteAttr
 (
     const rk_aiq_sys_ctx_t* sys_ctx,
-    const Uapi_HdrAeRouteAttr_t* pHdrAeRouteAttr
+    const Uapi_HdrAeRouteAttr_t hdrAeRouteAttr
 ) {
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
 
@@ -91,7 +92,7 @@ XCamReturn rk_aiq_user_api_ae_setHdrAeRouteAttr
         algoHandle<RkAiqAeHandleInt>(sys_ctx, RK_AIQ_ALGO_TYPE_AE);
 
     if (algo_handle) {
-        return algo_handle->setHdrAeRouteAttr(pHdrAeRouteAttr);
+        return algo_handle->setHdrAeRouteAttr(hdrAeRouteAttr);
     }
 
     return(ret);
@@ -125,7 +126,7 @@ XCamReturn rk_aiq_user_api_ae_queryExpResInfo
         algoHandle<RkAiqAeHandleInt>(sys_ctx, RK_AIQ_ALGO_TYPE_AE);
 
     if (algo_handle) {
-        return algo_handle->queryExpResInfo(pExpResInfo);
+        return algo_handle->queryExpInfo(pExpResInfo);
     }
 
     return(ret);
@@ -135,7 +136,7 @@ XCamReturn rk_aiq_user_api_ae_queryExpResInfo
 XCamReturn rk_aiq_user_api_ae_setLinExpAttr
 (
     const rk_aiq_sys_ctx_t* sys_ctx,
-    const Uapi_LinExpAttr_t* pLinExpAttr
+    const Uapi_LinExpAttr_t linExpAttr
 ) {
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
 
@@ -143,7 +144,7 @@ XCamReturn rk_aiq_user_api_ae_setLinExpAttr
         algoHandle<RkAiqAeHandleInt>(sys_ctx, RK_AIQ_ALGO_TYPE_AE);
 
     if (algo_handle) {
-        return algo_handle->setLinExpAttr(pLinExpAttr);
+        return algo_handle->setLinExpAttr(linExpAttr);
     }
 
     return(ret);
@@ -169,7 +170,7 @@ XCamReturn rk_aiq_user_api_ae_getLinExpAttr
 XCamReturn rk_aiq_user_api_ae_setHdrExpAttr
 (
     const rk_aiq_sys_ctx_t* sys_ctx,
-    const Uapi_HdrExpAttr_t* pHdrExpAttr
+    const Uapi_HdrExpAttr_t hdrExpAttr
 ) {
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
 
@@ -177,7 +178,7 @@ XCamReturn rk_aiq_user_api_ae_setHdrExpAttr
         algoHandle<RkAiqAeHandleInt>(sys_ctx, RK_AIQ_ALGO_TYPE_AE);
 
     if (algo_handle) {
-        return algo_handle->setHdrExpAttr(pHdrExpAttr);
+        return algo_handle->setHdrExpAttr(hdrExpAttr);
     }
 
     return(ret);
@@ -200,4 +201,6 @@ XCamReturn rk_aiq_user_api_ae_getHdrExpAttr
     return(ret);
 
 }
+
+RKAIQ_END_DECLARE
 

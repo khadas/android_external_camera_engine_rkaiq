@@ -19,6 +19,7 @@
 #include "rk_aiq_types_ahdr_algo_int.h"
 #include "rk_aiq_ahdr_algo_merge.h"
 #include "rk_aiq_ahdr_algo_tmo.h"
+#include "xcam_log.h"
 
 /******************************************************************************
  * AhdrStart()

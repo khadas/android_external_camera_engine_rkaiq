@@ -18,7 +18,7 @@
 #include "af/rk_aiq_types_af_algo_int.h"
 #include "rk_aiq_algo_types.h"
 #include "RkAiqCalibDbTypes.h"
-
+#include "xcam_log.h"
 #include "ae/rk_aiq_types_ae_algo_int.h"
 #include "af/rk_aiq_af_hw_v200.h"
 #include "rk_aiq_types_ahdr_stat_v200.h"

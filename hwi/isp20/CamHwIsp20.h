@@ -120,6 +120,7 @@ public:
     virtual XCamReturn stop();
     virtual XCamReturn getSensorModeData(const char* sns_ent_name,
                                          rk_aiq_exposure_sensor_descriptor& sns_des);
+    XCamReturn setIspParamsSync(int frameId);
     virtual XCamReturn setIspParams(SmartPtr<RkAiqIspParamsProxy>& ispParams);
     virtual XCamReturn setExposureParams(SmartPtr<RkAiqExpParamsProxy>& expPar);
     virtual XCamReturn setHdrProcessCount(int frame_id, int count);
@@ -131,6 +132,7 @@ public:
     XCamReturn setupHdrLink(int mode, int isp_index, bool enable);
     static XCamReturn selectIqFile(const char* sns_ent_name, char* iqfile_name);
     XCamReturn setExpDelayInfo(int time_delay, int gain_delay);
+
 private:
     XCAM_DEAD_COPY(CamHwIsp20);
     enum cam_hw_state_e {
@@ -155,9 +157,11 @@ private:
     static std::map<std::string, SmartPtr<rk_sensor_full_info_t>> mSensorHwInfos;
     void gen_full_isp_params(const struct isp2x_isp_params_cfg* update_params,
                              struct isp2x_isp_params_cfg* full_params);
+    XCamReturn overrideExpRatioToAiqResults(const sint32_t frameId,
+					   int module_id,
+					   SmartPtr<RkAiqIspParamsProxy>& aiq_results);
     void dump_isp_config(struct isp2x_isp_params_cfg* isp_params,
                          SmartPtr<RkAiqIspParamsProxy> aiq_results);
-    XCamReturn setIspParamsSync();
     void dumpRawnrFixValue(struct isp2x_rawnr_cfg * pRawnrCfg );
     void dumpTnrFixValue(struct rkispp_tnr_config  * pTnrCfg);
     void dumpUvnrFixValue(struct rkispp_nr_config  * pNrCfg);
