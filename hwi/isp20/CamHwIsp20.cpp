@@ -1446,7 +1446,7 @@ XCamReturn
 CamHwIsp20::setIsppParams(SmartPtr<RkAiqIsppParamsProxy>& isppParams)
 {
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
-    SmartLock locker (_mutex);
+    /* SmartLock locker (_mutex); */
 
     ENTER_CAMHW_FUNCTION();
     if (_is_exit) {
