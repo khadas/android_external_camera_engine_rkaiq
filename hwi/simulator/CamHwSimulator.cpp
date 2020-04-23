@@ -294,6 +294,8 @@ CamHwSimulator::setIspParams(SmartPtr<RkAiqIspParamsProxy>& ispParams)
 
     //debayer
     g_simisp_params.adebayer_config = ispParams->data()->demosaic;
+    //agic
+    g_simisp_params.agic_config = ispParams->data()->gic;
 
     {
         SmartLock locker(g_3a_mutex);

@@ -772,12 +772,15 @@ typedef struct CalibDb_HdrTmo_s
     float envLevel[6];
     float EnvLvTolerance;
     float globalLuma[6];
+    float DetailsHighLightMode;
     float OEPdf[6];
+    float EnvLv2[6];
     float OETolerance;
     float detailsHighLight[6];
-    float enFocusLuma;
+    float DetailsLowLightMode;
     float FocusLuma[6];
     float DarkPdf[6];
+    float ISO[6];
     float DTPdfTolerance;
     float detailsLowLight[6];
     float DynamicRange[6];
@@ -970,7 +973,7 @@ typedef char                        CalibDb_Ccm_ProfileName_t[CCM_PROFILE_NAME];
 typedef char                        CalibDb_IlluminationName_t[CCM_ILLUMINATION_NAME];
 #define CCM_PROFILES_NUM_MAX         ( 5 )
 #define CCM_RESOLUTIONS_NUM_MAX      ( 4 )
-
+#define CALIBDB_ISO_NUM              ( 9 )
 typedef enum Cam3ChColorComponent_e
 {
     CAM_3CH_COLOR_COMPONENT_RED     = 0,
@@ -1163,7 +1166,7 @@ typedef struct CalibDb_Gic_s {
     unsigned char edge_en;
     unsigned char gr_ration;
     unsigned char noise_cut_en;
-    struct CalibDb_Gic_ISO_s gic_iso[9];
+    struct CalibDb_Gic_ISO_s gic_iso[CALIBDB_ISO_NUM];
 } CalibDb_Gic_t;
 
 struct CalibDb_awb_uv_ratio_s {
@@ -1220,8 +1223,8 @@ struct CalibDb_MFNR_ISO_s {
 typedef struct CalibDb_MFNR_s {
     int enable;
     char version[64];
-	unsigned char local_gain_en;
-	unsigned char mode;
+    unsigned char local_gain_en;
+    unsigned char mode;
     unsigned char max_level;
     unsigned char max_level_uv;
     unsigned char back_ref_num;

@@ -1117,10 +1117,10 @@ RkAiqAnrHandleInt::processing()
     // TODO: fill procParam
     anr_proc_int->iso = shared->iso;
 
-	anr_proc_int->hdr_mode = shared->working_mode;
+    anr_proc_int->hdr_mode = shared->working_mode;
 
-	LOGD("%s:%d anr hdr_mode:%d  \n", __FUNCTION__, __LINE__, anr_proc_int->hdr_mode);
-	
+    LOGD("%s:%d anr hdr_mode:%d  \n", __FUNCTION__, __LINE__, anr_proc_int->hdr_mode);
+
 
     RkAiqAlgoDescription* des = (RkAiqAlgoDescription*)mDes;
     ret = des->processing(mProcInParam, mProcOutParam);
@@ -1319,7 +1319,7 @@ RkAiqAsharpHandleInt::processing()
 
     // TODO: fill procParam
     asharp_proc_int->iso = shared->iso;
-	asharp_proc_int->hdr_mode = shared->working_mode;
+    asharp_proc_int->hdr_mode = shared->working_mode;
 
     RkAiqAlgoDescription* des = (RkAiqAlgoDescription*)mDes;
     ret = des->processing(mProcInParam, mProcOutParam);
@@ -2434,8 +2434,8 @@ RkAiqAblcHandleInt::processing()
 
     comb->ablc_proc_res = NULL;
     ablc_proc_int->iso = shared->iso;
-	ablc_proc_int->hdr_mode = shared->working_mode;
-	
+    ablc_proc_int->hdr_mode = shared->working_mode;
+
     RkAiqAlgoDescription* des = (RkAiqAlgoDescription*)mDes;
     ret = des->processing(mProcInParam, mProcOutParam);
     RKAIQCORE_CHECK_RET(ret, "ablc algo processing failed");
@@ -2659,7 +2659,7 @@ RkAiqAccmHandleInt::processing()
             accm_proc_int->accm_sw_info.awbGain[1] = awb_res->awb_gain_algo.bgain / awb_res->awb_gain_algo.gbgain;
         }
         accm_proc_int->accm_sw_info.awbIIRDampCoef =  awb_res_int->awb_smooth_factor;
-    }else {
+    } else {
         LOGE("fail to get awb gain form AWB module,use default value ");
     }
     RkAiqAlgoPreResAeInt *ae_int = (RkAiqAlgoPreResAeInt*)shared->preResComb.ae_pre_res;
@@ -2670,7 +2670,7 @@ RkAiqAccmHandleInt::processing()
         } else {
             accm_proc_int->accm_sw_info.sensorGain = ae_int->ae_pre_res_rk.HdrExp[fNormalIndex].exp_real_params.analog_gain;
         }
-    }else{
+    } else {
         LOGE("fail to get sensor gain form AE module,use default value ");
     }
 
@@ -2907,7 +2907,6 @@ RkAiqAdebayerHandleInt::setAttrib(adebayer_attrib_t att)
     return ret;
 }
 
-
 XCamReturn
 RkAiqAdebayerHandleInt::prepare()
 {
@@ -2982,8 +2981,7 @@ RkAiqAdebayerHandleInt::processing()
 
     comb->adebayer_proc_res = NULL;
     // TODO: fill procParam
-    //adebayer_proc_int->iso = shared->iso;
-    //adebayer_proc_int->pCalibDb = shared->calib;
+    adebayer_proc_int->hdr_mode = shared->working_mode;
 
     RkAiqAlgoDescription* des = (RkAiqAlgoDescription*)mDes;
     ret = des->processing(mProcInParam, mProcOutParam);
@@ -3180,8 +3178,8 @@ RkAiqAdpccHandleInt::processing()
 
     comb->adpcc_proc_res = NULL;
     // TODO: fill procParam
-    adpcc_proc_int->iso = shared->iso;	
-	adpcc_proc_int->hdr_mode = shared->working_mode;
+    adpcc_proc_int->iso = shared->iso;
+    adpcc_proc_int->hdr_mode = shared->working_mode;
 
     RkAiqAlgoDescription* des = (RkAiqAlgoDescription*)mDes;
     ret = des->processing(mProcInParam, mProcOutParam);
@@ -3579,6 +3577,49 @@ RkAiqAgicHandleInt::init()
 }
 
 XCamReturn
+RkAiqAgicHandleInt::updateConfig()
+{
+    ENTER_ANALYZER_FUNCTION();
+
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    //TODO
+    mCfgMutex.lock();
+    // if something changed
+    if (updateAtt) {
+        mCurAtt = mNewAtt;
+        updateAtt = false;
+        rk_aiq_uapi_agic_SetAttrib(mAlgoCtx, mCurAtt, false);
+    }
+    mCfgMutex.unlock();
+
+    EXIT_ANALYZER_FUNCTION();
+    return ret;
+}
+
+XCamReturn
+RkAiqAgicHandleInt::setAttrib(agic_attrib_t att)
+{
+    ENTER_ANALYZER_FUNCTION();
+
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    mCfgMutex.lock();
+    //TODO
+    // check if there is different between att & mCurAtt
+    // if something changed, set att to mNewAtt, and
+    // the new params will be effective later when updateConfig
+    // called by RkAiqCore
+    if (0 != memcmp(&mCurAtt, &att, sizeof(agic_attrib_t))) {
+        mNewAtt = att;
+        updateAtt = true;
+    }
+
+    mCfgMutex.unlock();
+
+    EXIT_ANALYZER_FUNCTION();
+    return ret;
+}
+
+XCamReturn
 RkAiqAgicHandleInt::prepare()
 {
     ENTER_ANALYZER_FUNCTION();
@@ -3651,6 +3692,7 @@ RkAiqAgicHandleInt::processing()
     }
 
     comb->agic_proc_res = NULL;
+    agic_proc_int->hdr_mode = shared->working_mode;
 
     RkAiqAlgoDescription* des = (RkAiqAlgoDescription*)mDes;
     ret = des->processing(mProcInParam, mProcOutParam);
@@ -4144,18 +4186,18 @@ RkAiqAlscHandleInt::processing()
                 awb_res->awb_gain_algo.bgain / awb_res->awb_gain_algo.gbgain;
         }
         alsc_proc_int->alsc_sw_info.awbIIRDampCoef = awb_res_int->awb_smooth_factor;
-    }else{
+    } else {
         LOGE("fail to get awb gain form AWB module,use default value ");
     }
     RkAiqAlgoPreResAeInt *ae_int = (RkAiqAlgoPreResAeInt*)shared->preResComb.ae_pre_res;
     if( ae_int) {
         int fNormalIndex =  ae_int->ae_pre_res_rk.NormalIndex;
-        if((rk_aiq_working_mode_t)shared->working_mode == RK_AIQ_WORKING_MODE_NORMAL){
+        if((rk_aiq_working_mode_t)shared->working_mode == RK_AIQ_WORKING_MODE_NORMAL) {
             alsc_proc_int->alsc_sw_info.sensorGain = ae_int->ae_pre_res_rk.LinearExp.exp_real_params.analog_gain;
         } else {
             alsc_proc_int->alsc_sw_info.sensorGain = ae_int->ae_pre_res_rk.HdrExp[fNormalIndex].exp_real_params.analog_gain;
         }
-    }else{
+    } else {
         LOGE("fail to get sensor gain form AE module,use default value ");
     }
 

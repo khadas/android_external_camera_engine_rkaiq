@@ -286,22 +286,37 @@ void TmoProcessing
     else
         enDampLuma = true;
 
-    diff = ABS(pAhdrCtx->CurrHandleData.CurrOEPdf - pAhdrCtx->AhdrPrevData.PreOEPdf);
-    diff = diff / pAhdrCtx->AhdrPrevData.PreOEPdf;
+    int DetailsHighLight_mode = (int)pAhdrCtx->AhdrConfig.tmo_para.DetailsHighLightMode;
+    if(DetailsHighLight_mode == 0)
+    {
+        diff = ABS(pAhdrCtx->CurrHandleData.CurrOEPdf - pAhdrCtx->AhdrPrevData.PreOEPdf);
+        diff = diff / pAhdrCtx->AhdrPrevData.PreOEPdf;
+    }
+    else if(DetailsHighLight_mode == 1)
+    {
+        diff = ABS(pAhdrCtx->CurrHandleData.CurrEnvLv - pAhdrCtx->AhdrPrevData.PreEnvlv);
+        diff = diff / pAhdrCtx->AhdrPrevData.PreEnvlv;
+    }
     if (diff < pAhdrCtx->AhdrConfig.tmo_para.OETolerance)
         enDampDtlsHighLgt = false;
     else
         enDampDtlsHighLgt = true;
 
-    if(pAhdrCtx->AhdrConfig.tmo_para.enFocusLuma == 1)
+    int DetailsLowLight_mode = (int)pAhdrCtx->AhdrConfig.tmo_para.DetailsLowLightMode;
+    if(DetailsLowLight_mode == 0)
     {
         diff = ABS(pAhdrCtx->CurrHandleData.CurrTotalFocusLuma - pAhdrCtx->AhdrPrevData.PreTotalFocusLuma);
         diff = diff / pAhdrCtx->AhdrPrevData.PreTotalFocusLuma;
     }
-    else
+    else if(DetailsLowLight_mode == 1)
     {
         diff = ABS(pAhdrCtx->CurrHandleData.CurrDarkPdf - pAhdrCtx->AhdrPrevData.PreDarkPdf);
         diff = diff / pAhdrCtx->AhdrPrevData.PreDarkPdf;
+    }
+    else if(DetailsLowLight_mode == 2)
+    {
+        diff = ABS(pAhdrCtx->CurrHandleData.CurrISO - pAhdrCtx->AhdrPrevData.PreISO);
+        diff = diff / pAhdrCtx->AhdrPrevData.PreISO;
     }
     if (diff < pAhdrCtx->AhdrConfig.tmo_para.DTPdfTolerance)
         enDampDtlslowLgt = false;

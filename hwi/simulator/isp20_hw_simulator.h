@@ -33,6 +33,7 @@
 #include "ablc/rk_aiq_types_ablc_algo_int.h"
 #include "alsc/rk_aiq_types_alsc_algo.h"
 #include "accm/rk_aiq_types_accm_algo.h"
+#include "agic/rk_aiq_types_algo_agic.h"
 #include "rk_aiq_luma.h"
 #include "a3dlut/rk_aiq_types_a3dlut_algo_int.h"
 typedef struct rk_sim_isp_v200_luma_s {
@@ -86,7 +87,8 @@ typedef struct rk_sim_isp_v200_params_s {
     AdebayerConfig_t adebayer_config;
     //ablc
     AblcProcResult_t blc;
-
+    //agic
+    AgicConfig_t agic_config;
     rk_aiq_lsc_cfg_t lscHwConf;
     rk_aiq_ccm_cfg_t ccmHwConf;
 

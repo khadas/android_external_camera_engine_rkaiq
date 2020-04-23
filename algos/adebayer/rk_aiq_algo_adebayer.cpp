@@ -8,7 +8,7 @@
 #define MAX(a,b)             ((a) >= (b) ? (a):(b))
 #endif
 
-static int 
+static int
 calibDbParamConvertion
 (
     const CamCalibDbContext_t *pCalib,
@@ -107,12 +107,12 @@ AdebayerFullParamsInit
     AdebayerContext_t *pAdebayerCtx
 )
 {
-    for (int i=0; i<9; i++) {
+    for (int i = 0; i < 9; i++) {
         pAdebayerCtx->full_param.iso[i] = pAdebayerCtx->pCalibDb->dm.ISO[i];
         pAdebayerCtx->full_param.hf_offset[i] = pAdebayerCtx->pCalibDb->dm.debayer_hf_offset[i];
         pAdebayerCtx->full_param.sharp_strength[i] = pAdebayerCtx->pCalibDb->dm.sharp_strength[i];
     }
-    for (int i=0; i<5; i++) {
+    for (int i = 0; i < 5; i++) {
         pAdebayerCtx->full_param.filter1[i] = pAdebayerCtx->pCalibDb->dm.debayer_filter1[i];
         pAdebayerCtx->full_param.filter2[i] = pAdebayerCtx->pCalibDb->dm.debayer_filter2[i];
     }
@@ -257,10 +257,10 @@ XCamReturn
 AdebayerProcess
 (
     AdebayerContext_t *pAdebayerCtx,
-                  int ISO
+    int ISO
 )
 {
-    LOGI_ADEBAYER("%s(%d): enter!\n", __FUNCTION__, __LINE__);
+    LOGI_ADEBAYER("%s(%d): enter! ISO=%d\n", __FUNCTION__, __LINE__, ISO);
 
     if(pAdebayerCtx == NULL) {
         LOGE_ADEBAYER("%s(%d): null pointer\n", __FUNCTION__, __LINE__);

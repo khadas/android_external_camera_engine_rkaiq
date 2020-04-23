@@ -44,7 +44,7 @@
 #include "adpcc/rk_aiq_types_adpcc_algo_int.h"
 #include "ablc/rk_aiq_types_ablc_algo.h"
 #include "ablc/rk_aiq_types_ablc_algo_int.h"
-
+#include "agic/rk_aiq_types_algo_agic.h"
 
 #ifdef RK_SIMULATOR_HW
 #include "simulator/isp20_hw_simulator.h"
@@ -344,9 +344,7 @@ typedef struct {
     int UNKNOWN;
 } rk_aiq_isp_drc_t;
 
-typedef struct {
-    int UNKNOWN;
-} rk_aiq_isp_gic_t;
+typedef AgicConfig_t rk_aiq_isp_gic_t;
 
 /*typedef struct {
 

@@ -182,7 +182,7 @@ ANRresult_t ANRSetGainMode(ANRProcResult_t* pANRResult)
 
 	if(pANRResult->stGainFix.gain_table_en){
 		pANRResult->stMfnrFix.gain_en = 0;
-		pANRResult->stUvnrFix.nr_gain_en = 1;
+		pANRResult->stUvnrFix.nr_gain_en = 0;
 		
 	}else{
 		pANRResult->stMfnrFix.gain_en = 1;

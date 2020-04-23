@@ -31,14 +31,14 @@ create_context
     RkAiqAlgoContext **context,
     const AlgoCtxInstanceCfg* cfg
 )
-{	 
-	XCamReturn result = XCAM_RETURN_NO_ERROR;
+{
+    XCamReturn result = XCAM_RETURN_NO_ERROR;
 
-	LOGI_ADEBAYER("%s: (enter)\n", __FUNCTION__ );
+    LOGI_ADEBAYER("%s: (enter)\n", __FUNCTION__ );
     AdebayerInit(&ctx.adebayerCtx);
-	*context = &ctx;
-	LOGI_ADEBAYER("%s: (exit)\n", __FUNCTION__ );
-	return result;
+    *context = &ctx;
+    LOGI_ADEBAYER("%s: (exit)\n", __FUNCTION__ );
+    return result;
 }
 
 static XCamReturn
@@ -46,13 +46,13 @@ destroy_context
 (
     RkAiqAlgoContext *context
 )
-{	
-	XCamReturn result = XCAM_RETURN_NO_ERROR;
-	
-	LOGI_ADEBAYER("%s: (enter)\n", __FUNCTION__ );
-	AdebayerContext_t* pAdebayerCtx = (AdebayerContext_t*)&context->adebayerCtx;
+{
+    XCamReturn result = XCAM_RETURN_NO_ERROR;
+
+    LOGI_ADEBAYER("%s: (enter)\n", __FUNCTION__ );
+    AdebayerContext_t* pAdebayerCtx = (AdebayerContext_t*)&context->adebayerCtx;
     AdebayerRelease(pAdebayerCtx);
-	LOGI_ADEBAYER("%s: (exit)\n", __FUNCTION__ );
+    LOGI_ADEBAYER("%s: (exit)\n", __FUNCTION__ );
     return result;
 }
 
@@ -62,14 +62,14 @@ prepare
     RkAiqAlgoCom* params
 )
 {
-	XCamReturn result = XCAM_RETURN_NO_ERROR;
+    XCamReturn result = XCAM_RETURN_NO_ERROR;
 
-	LOGI_ADEBAYER("%s: (enter)\n", __FUNCTION__ );
+    LOGI_ADEBAYER("%s: (enter)\n", __FUNCTION__ );
     AdebayerContext_t* pAdebayerCtx = (AdebayerContext_t *)&params->ctx->adebayerCtx;
     RkAiqAlgoConfigAdebayerInt* pCfgParam = (RkAiqAlgoConfigAdebayerInt*)params;
     pAdebayerCtx->pCalibDb = pCfgParam->rk_com.u.prepare.calib;
-	AdebayerStart(pAdebayerCtx);
-	LOGI_ADEBAYER("%s: (exit)\n", __FUNCTION__ );
+    AdebayerStart(pAdebayerCtx);
+    LOGI_ADEBAYER("%s: (exit)\n", __FUNCTION__ );
     return result;
 }
 
@@ -80,9 +80,9 @@ pre_process
     RkAiqAlgoResCom* outparams
 )
 {
-	LOGI_ADEBAYER("%s: (enter)\n", __FUNCTION__ );
+    LOGI_ADEBAYER("%s: (enter)\n", __FUNCTION__ );
 
-	LOGI_ADEBAYER("%s: (exit)\n", __FUNCTION__ );
+    LOGI_ADEBAYER("%s: (exit)\n", __FUNCTION__ );
     return XCAM_RETURN_NO_ERROR;
 }
 
@@ -93,23 +93,44 @@ processing
     RkAiqAlgoResCom* outparams
 )
 {
-	XCamReturn result = XCAM_RETURN_NO_ERROR;
-	int iso;
-    RkAiqAlgoProcAdebayerInt* pAdebayerProcParams = (RkAiqAlgoProcAdebayerInt*)inparams; 
+    XCamReturn result = XCAM_RETURN_NO_ERROR;
+    int iso;
+    RkAiqAlgoProcAdebayerInt* pAdebayerProcParams = (RkAiqAlgoProcAdebayerInt*)inparams;
     RkAiqAlgoProcResAdebayerInt* pAdebayerProcResParams = (RkAiqAlgoProcResAdebayerInt*)outparams;
     AdebayerContext_t* pAdebayerCtx = (AdebayerContext_t *)&inparams->ctx->adebayerCtx;
 
-	LOGI_ADEBAYER("%s: (enter)\n", __FUNCTION__ );
+    LOGI_ADEBAYER("%s: (enter)\n", __FUNCTION__ );
 
-	if(inparams->u.proc.init)
-		iso = 50;
-	else
-		iso = pAdebayerProcParams->rk_com.u.proc.iso;
+    if(inparams->u.proc.init) {
+        iso = 50;
+    } else {
+        RkAiqAlgoPreResAeInt* pAEPreRes =
+            (RkAiqAlgoPreResAeInt*)(pAdebayerProcParams->rk_com.u.proc.pre_res_comb->ae_pre_res);
+
+        if(pAEPreRes != NULL) {
+            if(pAdebayerProcParams->hdr_mode == RK_AIQ_WORKING_MODE_NORMAL) {
+                iso = pAEPreRes->ae_pre_res_rk.LinearExp.exp_real_params.analog_gain * 50;
+                LOGD_ADEBAYER("%s:NORMAL:iso=%d,again=%f\n", __FUNCTION__, iso,
+                              pAEPreRes->ae_pre_res_rk.LinearExp.exp_real_params.analog_gain);
+            } else if(RK_AIQ_HDR_GET_WORKING_MODE(pAdebayerProcParams->hdr_mode) == RK_AIQ_WORKING_MODE_ISP_HDR2) {
+                iso = pAEPreRes->ae_pre_res_rk.HdrExp[1].exp_real_params.analog_gain * 50;
+                LOGD_ADEBAYER("%s:HDR2:iso=%d,again=%f\n", __FUNCTION__, iso,
+                              pAEPreRes->ae_pre_res_rk.HdrExp[1].exp_real_params.analog_gain);
+            } else if(RK_AIQ_HDR_GET_WORKING_MODE(pAdebayerProcParams->hdr_mode) == RK_AIQ_WORKING_MODE_ISP_HDR3) {
+                iso = pAEPreRes->ae_pre_res_rk.HdrExp[2].exp_real_params.analog_gain * 50;
+                LOGD_ADEBAYER("%s:HDR3:iso=%d,again=%f\n", __FUNCTION__, iso,
+                              pAEPreRes->ae_pre_res_rk.HdrExp[2].exp_real_params.analog_gain);
+            }
+        } else {
+            iso = 50;
+            LOGE_ADEBAYER("%s: pAEPreRes is NULL, so use default instead \n", __FUNCTION__);
+        }
+    }
 
     AdebayerProcess(pAdebayerCtx, iso);
     AdebayerGetProcResult(pAdebayerCtx, &pAdebayerProcResParams->debayerRes);
 
-	LOGI_ADEBAYER("%s: (exit)\n", __FUNCTION__ );
+    LOGI_ADEBAYER("%s: (exit)\n", __FUNCTION__ );
     return XCAM_RETURN_NO_ERROR;
 }
 
@@ -120,10 +141,10 @@ post_process
     RkAiqAlgoResCom* outparams
 )
 {
-	LOGI_ADEBAYER("%s: (enter)\n", __FUNCTION__ );
+    LOGI_ADEBAYER("%s: (enter)\n", __FUNCTION__ );
 
-	LOGI_ADEBAYER("%s: (exit)\n", __FUNCTION__ );
-    return XCAM_RETURN_NO_ERROR;	
+    LOGI_ADEBAYER("%s: (exit)\n", __FUNCTION__ );
+    return XCAM_RETURN_NO_ERROR;
 }
 
 RkAiqAlgoDescription g_RkIspAlgoDescAdebayer = {

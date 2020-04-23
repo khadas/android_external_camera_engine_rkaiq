@@ -621,7 +621,7 @@ Isp20Params::convertAiqAwbToIsp20Params(struct isp2x_isp_params_cfg& isp_cfg,
 }
 
 
-#define ISP2X_WBGAIN_FIXSCALE_BIT  8
+
 
 void Isp20Params::convertAiqAhdrToIsp20Params(struct isp2x_isp_params_cfg& isp_cfg,
         const rk_aiq_isp_hdr_t& ahdr_data)
@@ -685,7 +685,6 @@ void Isp20Params::convertAiqAhdrToIsp20Params(struct isp2x_isp_params_cfg& isp_c
     isp_cfg.others.hdrtmo_cfg.maxpalpha     = ahdr_data.TmoProcRes.sw_hdrtmo_maxpalpha;
 
     //api setting
-    ahdr_data.hdrAttr.bEnable == false;
     //update merge data in Auto mode
     if(ahdr_data.hdrAttr.bEnable == true && ahdr_data.hdrAttr.stAuto.bUpdateMge == true )
     {
@@ -785,7 +784,7 @@ void Isp20Params::convertAiqAhdrToIsp20Params(struct isp2x_isp_params_cfg& isp_c
 
 
         value = 0;
-        value = value = LIMIT_PARA(ahdr_data.hdrAttr.stAuto.stTmoAuto.stTmoContrast.stCoef, ahdr_data.hdrAttr.stAuto.stTmoAuto.stTmoContrast.stMax, ahdr_data.hdrAttr.stAuto.stTmoAuto.stTmoContrast.stMin,
+        value = LIMIT_PARA(ahdr_data.hdrAttr.stAuto.stTmoAuto.stTmoContrast.stCoef, ahdr_data.hdrAttr.stAuto.stTmoAuto.stTmoContrast.stMax, ahdr_data.hdrAttr.stAuto.stTmoAuto.stTmoContrast.stMin,
                                    ahdr_data.hdrAttr.stAuto.stTmoAuto.stTmoContrast.stCoefMax, ahdr_data.hdrAttr.stAuto.stTmoAuto.stTmoContrast.stMin);
         isp_cfg.others.hdrtmo_cfg.set_weightkey = (int)(value + 0.5);
 
@@ -937,17 +936,27 @@ Isp20Params::convertAiqAfToIsp20Params(struct isp2x_isp_params_cfg& isp_cfg,
     isp_cfg.meas.rawaf.win[1].v_size = af_data.winb_v_size;
 }
 
+
+#define ISP2X_WBGAIN_FIXSCALE_BIT  8
+#define ISP2X_BLC_BIT_MAX 12
 void
 Isp20Params::convertAiqAwbGainToIsp20Params(struct isp2x_isp_params_cfg& isp_cfg,
-        const rk_aiq_wb_gain_t& awb_gain)
+        const rk_aiq_wb_gain_t& awb_gain, const rk_aiq_isp_blc_t &blc)
 {
     struct isp2x_awb_gain_cfg *  cfg = &isp_cfg.others.awb_gain_cfg;
     uint16_t max_wb_gain = (1 << (ISP2X_WBGAIN_FIXSCALE_BIT+2))-1;
+    rk_aiq_wb_gain_t awb_gain1 = awb_gain;
+    if(blc.stResult.enable){
+        awb_gain1.bgain *= (float)((1<<ISP2X_BLC_BIT_MAX)-1)/((1<<ISP2X_BLC_BIT_MAX)-1-blc.stResult.blc_b);
+        awb_gain1.gbgain *= (float)((1<<ISP2X_BLC_BIT_MAX)-1)/((1<<ISP2X_BLC_BIT_MAX)-1-blc.stResult.blc_gb);
+        awb_gain1.rgain *= (float)((1<<ISP2X_BLC_BIT_MAX)-1)/((1<<ISP2X_BLC_BIT_MAX)-1-blc.stResult.blc_r);
+        awb_gain1.grgain *= (float)((1<<ISP2X_BLC_BIT_MAX)-1)/((1<<ISP2X_BLC_BIT_MAX)-1-blc.stResult.blc_gr);
+    }
     //LOGE("max_wb_gain:%d\n",max_wb_gain);
-    uint16_t R = (uint16_t)(0.5 + awb_gain.rgain * (1 << ISP2X_WBGAIN_FIXSCALE_BIT));
-    uint16_t B = (uint16_t)(0.5 + awb_gain.bgain * (1 << ISP2X_WBGAIN_FIXSCALE_BIT));
-    uint16_t Gr = (uint16_t)(0.5 + awb_gain.grgain * (1 << ISP2X_WBGAIN_FIXSCALE_BIT));
-    uint16_t Gb = (uint16_t)(0.5 + awb_gain.gbgain * (1 << ISP2X_WBGAIN_FIXSCALE_BIT));
+    uint16_t R = (uint16_t)(0.5 + awb_gain1.rgain * (1 << ISP2X_WBGAIN_FIXSCALE_BIT));
+    uint16_t B = (uint16_t)(0.5 + awb_gain1.bgain * (1 << ISP2X_WBGAIN_FIXSCALE_BIT));
+    uint16_t Gr = (uint16_t)(0.5 + awb_gain1.grgain * (1 << ISP2X_WBGAIN_FIXSCALE_BIT));
+    uint16_t Gb = (uint16_t)(0.5 + awb_gain1.gbgain * (1 << ISP2X_WBGAIN_FIXSCALE_BIT));
     cfg->gain_red       = R > max_wb_gain ? max_wb_gain : R;
     cfg->gain_blue      = B > max_wb_gain ? max_wb_gain : B;
     cfg->gain_green_r   = Gr > max_wb_gain ? max_wb_gain : Gr ;
@@ -2069,7 +2078,7 @@ Isp20Params::convertAiqResultsToIsp20Params(struct isp2x_isp_params_cfg& isp_cfg
     convertAiqHistToIsp20Params(isp_cfg, aiq_results->data()->hist_meas);
     convertAiqAeToIsp20Params(isp_cfg, aiq_results->data()->aec_meas);
     convertAiqAhdrToIsp20Params(isp_cfg, aiq_results->data()->ahdr_proc_res);
-    convertAiqAwbGainToIsp20Params(isp_cfg, aiq_results->data()->awb_gain);
+    convertAiqAwbGainToIsp20Params(isp_cfg, aiq_results->data()->awb_gain, aiq_results->data()->blc);
     convertAiqAwbToIsp20Params(isp_cfg, aiq_results->data()->awb_cfg_v200);
     convertAiqLscToIsp20Params(isp_cfg, aiq_results->data()->lsc);
     convertAiqCcmToIsp20Params(isp_cfg, aiq_results->data()->ccm);

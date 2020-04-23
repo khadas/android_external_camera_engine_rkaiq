@@ -481,6 +481,8 @@ endif()
 # ----------------------------------------------------------------------------
 set (AGIC_SRC
 	agic/rk_aiq_algo_agic_itf.cpp
+	agic/rk_aiq_algo_agic.cpp
+	agic/rk_aiq_uapi_agic_int.cpp
     )
 
 if(EXISTS "${CMAKE_SOURCE_DIR}/algos/agic/rk_aiq_algo_agic_itf.cpp")

@@ -24,7 +24,6 @@
 
 #define LIMIT_PARA(a,b,c,d,e)      (c+(a-e)*(b-c)/(d -e))
 
-
 namespace RkCam {
 
 
@@ -51,7 +50,7 @@ private:
     void convertAiqAwbToIsp20Params(struct isp2x_isp_params_cfg& isp_cfg,
                                     const rk_aiq_awb_stat_cfg_v200_t& awb_meas);
     void convertAiqAwbGainToIsp20Params(struct isp2x_isp_params_cfg& isp_cfg,
-                                        const rk_aiq_wb_gain_t& awb_gain);
+                                        const rk_aiq_wb_gain_t& awb_gain, const rk_aiq_isp_blc_t &blc);
     void convertAiqAhdrToIsp20Params(struct isp2x_isp_params_cfg& isp_cfg,
                                      const rk_aiq_isp_hdr_t& ahdr_data);
     void convertAiqAdehazeToIsp20Params(struct isp2x_isp_params_cfg& isp_cfg,

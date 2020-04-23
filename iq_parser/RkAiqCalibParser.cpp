@@ -5998,10 +5998,22 @@ bool RkAiqCalibParser::parseEntrySensorAhdrTmo
             int no = ParseFloatArray(pchild, mCalibDb->ahdr.tmo.globalLuma, tag.Size());
             DCT_ASSERT((no == tag.Size()));
         }
+        else if ((Tagname == CALIB_SENSOR_AHDR_TMO_DETAILSHIGHLIGHTMODE)
+                 && (tag.isType(XmlTag::TAG_TYPE_DOUBLE))
+                 && (tag.Size() > 0)) {
+            int no = ParseFloatArray(pchild, &mCalibDb->ahdr.tmo.DetailsHighLightMode, tag.Size());
+            DCT_ASSERT((no == tag.Size()));
+        }
         else if ((Tagname == CALIB_SENSOR_AHDR_TMO_OEPDF)
                  && (tag.isType(XmlTag::TAG_TYPE_DOUBLE))
                  && (tag.Size() > 0)) {
             int no = ParseFloatArray(pchild, mCalibDb->ahdr.tmo.OEPdf, tag.Size());
+            DCT_ASSERT((no == tag.Size()));
+        }
+        else if ((Tagname == CALIB_SENSOR_AHDR_TMO_ENVLV2)
+                 && (tag.isType(XmlTag::TAG_TYPE_DOUBLE))
+                 && (tag.Size() > 0)) {
+            int no = ParseFloatArray(pchild, mCalibDb->ahdr.tmo.EnvLv2, tag.Size());
             DCT_ASSERT((no == tag.Size()));
         }
         else if ((Tagname == CALIB_SENSOR_AHDR_TMO_OETOLERANCE)
@@ -6016,10 +6028,10 @@ bool RkAiqCalibParser::parseEntrySensorAhdrTmo
             int no = ParseFloatArray(pchild, mCalibDb->ahdr.tmo.detailsHighLight, tag.Size());
             DCT_ASSERT((no == tag.Size()));
         }
-        else if ((Tagname == CALIB_SENSOR_AHDR_TMO_ENFOCUSLUMA)
+        else if ((Tagname == CALIB_SENSOR_AHDR_TMO_DETAILSLOWLIGHTMODE)
                  && (tag.isType(XmlTag::TAG_TYPE_DOUBLE))
                  && (tag.Size() > 0)) {
-            int no = ParseFloatArray(pchild, &mCalibDb->ahdr.tmo.enFocusLuma, tag.Size());
+            int no = ParseFloatArray(pchild, &mCalibDb->ahdr.tmo.DetailsLowLightMode, tag.Size());
             DCT_ASSERT((no == tag.Size()));
         }
         else if ((Tagname == CALIB_SENSOR_AHDR_TMO_FOCUSLUMA)
@@ -6029,6 +6041,12 @@ bool RkAiqCalibParser::parseEntrySensorAhdrTmo
             DCT_ASSERT((no == tag.Size()));
         }
         else if ((Tagname == CALIB_SENSOR_AHDR_TMO_DARKPDF)
+                 && (tag.isType(XmlTag::TAG_TYPE_DOUBLE))
+                 && (tag.Size() > 0)) {
+            int no = ParseFloatArray(pchild, mCalibDb->ahdr.tmo.DarkPdf, tag.Size());
+            DCT_ASSERT((no == tag.Size()));
+        }
+        else if ((Tagname == CALIB_SENSOR_AHDR_TMO_ISO)
                  && (tag.isType(XmlTag::TAG_TYPE_DOUBLE))
                  && (tag.Size() > 0)) {
             int no = ParseFloatArray(pchild, mCalibDb->ahdr.tmo.DarkPdf, tag.Size());
@@ -8211,13 +8229,13 @@ bool RkAiqCalibParser::parseEntrySensorMFNR
                  && (tag.Size() > 0)) {
             ParseString(pchild, mCalibDb->mfnr.version, sizeof(mCalibDb->mfnr.version));
         }
-		else if ((tagname == CALIB_SENSOR_MFNR_LOCAL_GAIN_EN)
+        else if ((tagname == CALIB_SENSOR_MFNR_LOCAL_GAIN_EN)
                  && (tag.isType(XmlTag::TAG_TYPE_DOUBLE))
                  && (tag.Size() > 0)) {
             int no = ParseUcharArray(pchild, &mCalibDb->mfnr.local_gain_en, tag.Size());
             DCT_ASSERT((no == tag.Size()));
-        } 
-		else if ((tagname == CALIB_SENSOR_MFNR_MODE)
+        }
+        else if ((tagname == CALIB_SENSOR_MFNR_MODE)
                  && (tag.isType(XmlTag::TAG_TYPE_DOUBLE))
                  && (tag.Size() > 0)) {
             int no = ParseUcharArray(pchild, &mCalibDb->mfnr.mode, tag.Size());
@@ -9537,7 +9555,7 @@ bool RkAiqCalibParser::parseEntrySystem
                 }
                 psecsubchild = psecsubchild->NextSibling();
             }
-        }else if(tagname == CALIB_SYSTEM_EXP_DELAY) {
+        } else if(tagname == CALIB_SYSTEM_EXP_DELAY) {
             const XMLNode* psecsubchild = pchild->ToElement()->FirstChild();
             while (psecsubchild) {
                 XmlTag subTag = XmlTag(psecsubchild->ToElement());

@@ -551,9 +551,9 @@ XCamReturn rk_aiq_uapi_getWBMode(const rk_aiq_sys_ctx_t* ctx, opMode_t *mode)
     rk_aiq_wb_attrib_t attr;
     ret = rk_aiq_user_api_awb_GetAttrib(ctx, &attr);
     RKAIQ_IMGPROC_CHECK_RET(ret, "setWBMode failed!");
-    if (attr.mode = RK_AIQ_WB_MODE_AUTO) {
+    if (attr.mode == RK_AIQ_WB_MODE_AUTO) {
         *mode = OP_AUTO;
-    }else if (attr.mode = RK_AIQ_WB_MODE_MANUAL) {
+    }else if (attr.mode == RK_AIQ_WB_MODE_MANUAL) {
         *mode = OP_MANUALl;
     }else {
         *mode = OP_INVAL;

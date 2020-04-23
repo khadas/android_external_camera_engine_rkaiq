@@ -17,13 +17,16 @@ typedef struct tmo_config_s
     float EnvLvTolerance;
     float GlobeLuma[6];
 
+    float DetailsHighLightMode;
     float OEPdf[6];
+    float EnvLv2[6];
     float OETolerance;
     float DetailsHighLight[6];
 
-    float enFocusLuma;
+    float DetailsLowLightMode;
     float FocusLuma[6];
     float DarkPdf[6];
+    float ISO[6];//use long frame
     float DTPdfTolerance;
     float DetailsLowLight[6];
 

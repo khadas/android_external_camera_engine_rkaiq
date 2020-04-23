@@ -346,14 +346,21 @@ void AhdrConfig
     pAhdrCtx->AhdrConfig.tmo_para.EnvLv[4] = 0.9 ;
     pAhdrCtx->AhdrConfig.tmo_para.EnvLv[5] = 1.0 ;
     pAhdrCtx->AhdrConfig.tmo_para.EnvLvTolerance = 0 ;
+    pAhdrCtx->AhdrConfig.tmo_para.DetailsHighLightMode = 0;
     pAhdrCtx->AhdrConfig.tmo_para.OEPdf[0] = 0;
     pAhdrCtx->AhdrConfig.tmo_para.OEPdf[1] = 0.1;
     pAhdrCtx->AhdrConfig.tmo_para.OEPdf[2] = 0.2;
     pAhdrCtx->AhdrConfig.tmo_para.OEPdf[3] = 0.3;
     pAhdrCtx->AhdrConfig.tmo_para.OEPdf[4] = 0.4;
     pAhdrCtx->AhdrConfig.tmo_para.OEPdf[5] = 0.5;
+    pAhdrCtx->AhdrConfig.tmo_para.EnvLv2[0] = 0;
+    pAhdrCtx->AhdrConfig.tmo_para.EnvLv2[1] = 0.1;
+    pAhdrCtx->AhdrConfig.tmo_para.EnvLv2[2] = 0.2;
+    pAhdrCtx->AhdrConfig.tmo_para.EnvLv2[3] = 0.3;
+    pAhdrCtx->AhdrConfig.tmo_para.EnvLv2[4] = 0.4;
+    pAhdrCtx->AhdrConfig.tmo_para.EnvLv2[5] = 1;
     pAhdrCtx->AhdrConfig.tmo_para.OETolerance = 0;
-    pAhdrCtx->AhdrConfig.tmo_para.enFocusLuma = 0;
+    pAhdrCtx->AhdrConfig.tmo_para.DetailsLowLightMode = 0;
     pAhdrCtx->AhdrConfig.tmo_para.DTPdfTolerance = 0;
     pAhdrCtx->AhdrConfig.tmo_para.FocusLuma[0] = 0;
     pAhdrCtx->AhdrConfig.tmo_para.FocusLuma[1] = 0.1;
@@ -367,6 +374,12 @@ void AhdrConfig
     pAhdrCtx->AhdrConfig.tmo_para.DarkPdf[3] = 0.3;
     pAhdrCtx->AhdrConfig.tmo_para.DarkPdf[4] = 0.4;
     pAhdrCtx->AhdrConfig.tmo_para.DarkPdf[5] = 0.5;
+    pAhdrCtx->AhdrConfig.tmo_para.ISO[0] = 50;
+    pAhdrCtx->AhdrConfig.tmo_para.ISO[1] = 50;
+    pAhdrCtx->AhdrConfig.tmo_para.ISO[2] = 50;
+    pAhdrCtx->AhdrConfig.tmo_para.ISO[3] = 50;
+    pAhdrCtx->AhdrConfig.tmo_para.ISO[4] = 50;
+    pAhdrCtx->AhdrConfig.tmo_para.ISO[5] = 50;
     pAhdrCtx->AhdrConfig.tmo_para.DRTolerance = 0;
     pAhdrCtx->AhdrConfig.tmo_para.DynamicRange[0] = 1;
     pAhdrCtx->AhdrConfig.tmo_para.DynamicRange[1] = 1;
@@ -477,7 +490,8 @@ void AhdrGetXmlParas
     }
 
     //TMO
-    pAhdrCtx->AhdrConfig.tmo_para.enFocusLuma = LIMIT_VALUE(pCalibDb->ahdr.tmo.enFocusLuma, ENMAX, ENMIN);
+    pAhdrCtx->AhdrConfig.tmo_para.DetailsLowLightMode = LIMIT_VALUE(pCalibDb->ahdr.tmo.DetailsLowLightMode, DETAILSLOWLIGHTMODEMAX, DETAILSLOWLIGHTMODEMIN);
+    pAhdrCtx->AhdrConfig.tmo_para.DetailsHighLightMode = LIMIT_VALUE(pCalibDb->ahdr.tmo.DetailsHighLightMode, DETAILSHIGHLIGHTMODEMAX, DETAILSHIGHLIGHTMODEMIN);
     pAhdrCtx->AhdrConfig.tmo_para.DayTh = LIMIT_VALUE(pCalibDb->ahdr.tmo.DayTh, DARKPDFTHMAX, DARKPDFTHMIN);
     pAhdrCtx->AhdrConfig.tmo_para.damp = LIMIT_VALUE(pCalibDb->ahdr.tmo.damp, DAMPMAX, DAMPMIN);
     pAhdrCtx->AhdrConfig.tmo_para.EnvLvTolerance = LIMIT_VALUE(pCalibDb->ahdr.tmo.EnvLvTolerance, TOLERANCEMAX, TOLERANCEMIN);
@@ -490,10 +504,12 @@ void AhdrGetXmlParas
         pAhdrCtx->AhdrConfig.tmo_para.GlobeLuma[i] = LIMIT_VALUE(pCalibDb->ahdr.tmo.globalLuma[i], IQPARAMAX, IQPARAMIN) ;
 
         pAhdrCtx->AhdrConfig.tmo_para.OEPdf[i] = LIMIT_VALUE(pCalibDb->ahdr.tmo.OEPdf[i], OEPDFMAX, OEPDFMIN) ;
+        pAhdrCtx->AhdrConfig.tmo_para.EnvLv2[i] = LIMIT_VALUE(pCalibDb->ahdr.tmo.EnvLv2[i], ENVLVMAX, ENVLVMIN);
         pAhdrCtx->AhdrConfig.tmo_para.DetailsHighLight[i] = LIMIT_VALUE(pCalibDb->ahdr.tmo.detailsHighLight[i], IQPARAMAX, IQPARAMIN) ;
 
         pAhdrCtx->AhdrConfig.tmo_para.FocusLuma[i] = LIMIT_VALUE(pCalibDb->ahdr.tmo.FocusLuma[i], FOCUSLUMAMAX, FOCUSLUMAMIN) ;
         pAhdrCtx->AhdrConfig.tmo_para.DarkPdf[i] = LIMIT_VALUE(pCalibDb->ahdr.tmo.DarkPdf[i], DARKPDFMAX, DARKPDFMIN) ;
+        pAhdrCtx->AhdrConfig.tmo_para.ISO[i] = LIMIT_VALUE(pCalibDb->ahdr.tmo.ISO[i], ISOMAX, ISOMIN) ;
         pAhdrCtx->AhdrConfig.tmo_para.DetailsLowLight[i] = LIMIT_VALUE(pCalibDb->ahdr.tmo.detailsLowLight[i], IQDETAILSLOWLIGHTMAX, IQDETAILSLOWLIGHTMIN) ;
 
         pAhdrCtx->AhdrConfig.tmo_para.DynamicRange[i] = LIMIT_VALUE(pCalibDb->ahdr.tmo.DynamicRange[i], DYNAMICRANGEMAX, DYNAMICRANGEMIN) ;
@@ -528,16 +544,21 @@ void AhdrGetXmlParas
     LOGD_AHDR("%s:lrk  Tmo EnvLvTolerance:%f:\n", __FUNCTION__, pAhdrCtx->AhdrConfig.tmo_para.EnvLvTolerance);
     LOGD_AHDR("%s:lrk  Tmo GlobeLuma:%f %f %f %f %f %f:\n", __FUNCTION__, pAhdrCtx->AhdrConfig.tmo_para.GlobeLuma[0], pAhdrCtx->AhdrConfig.tmo_para.GlobeLuma[1], pAhdrCtx->AhdrConfig.tmo_para.GlobeLuma[2]
               , pAhdrCtx->AhdrConfig.tmo_para.GlobeLuma[3], pAhdrCtx->AhdrConfig.tmo_para.GlobeLuma[4], pAhdrCtx->AhdrConfig.tmo_para.GlobeLuma[5]);
+    LOGD_AHDR("%s:lrk  Tmo DetailsHighLightMode:%f:\n", __FUNCTION__, pAhdrCtx->AhdrConfig.tmo_para.DetailsHighLightMode);
     LOGD_AHDR("%s:lrk  Tmo OEPdf:%f %f %f %f %f %f:\n", __FUNCTION__, pAhdrCtx->AhdrConfig.tmo_para.OEPdf[0], pAhdrCtx->AhdrConfig.tmo_para.OEPdf[1], pAhdrCtx->AhdrConfig.tmo_para.OEPdf[2]
               , pAhdrCtx->AhdrConfig.tmo_para.OEPdf[3], pAhdrCtx->AhdrConfig.tmo_para.OEPdf[4], pAhdrCtx->AhdrConfig.tmo_para.OEPdf[5]);
+    LOGD_AHDR("%s:lrk  Tmo EnvLv2:%f %f %f %f %f %f:\n", __FUNCTION__, pAhdrCtx->AhdrConfig.tmo_para.EnvLv2[0], pAhdrCtx->AhdrConfig.tmo_para.EnvLv2[1], pAhdrCtx->AhdrConfig.tmo_para.EnvLv2[2]
+              , pAhdrCtx->AhdrConfig.tmo_para.EnvLv2[3], pAhdrCtx->AhdrConfig.tmo_para.EnvLv2[4], pAhdrCtx->AhdrConfig.tmo_para.EnvLv2[5]);
     LOGD_AHDR("%s:lrk  Tmo OETolerance:%f:\n", __FUNCTION__, pAhdrCtx->AhdrConfig.tmo_para.OETolerance);
     LOGD_AHDR("%s:lrk  Tmo DetailsHighLight:%f %f %f %f %f %f:\n", __FUNCTION__, pAhdrCtx->AhdrConfig.tmo_para.DetailsHighLight[0], pAhdrCtx->AhdrConfig.tmo_para.DetailsHighLight[1], pAhdrCtx->AhdrConfig.tmo_para.DetailsHighLight[2]
               , pAhdrCtx->AhdrConfig.tmo_para.DetailsHighLight[3], pAhdrCtx->AhdrConfig.tmo_para.DetailsHighLight[4], pAhdrCtx->AhdrConfig.tmo_para.DetailsHighLight[5]);
-    LOGD_AHDR("%s:lrk  Tmo enFocusLuma:%f:\n", __FUNCTION__, pAhdrCtx->AhdrConfig.tmo_para.enFocusLuma);
+    LOGD_AHDR("%s:lrk  Tmo DetailsLowLightMode:%f:\n", __FUNCTION__, pAhdrCtx->AhdrConfig.tmo_para.DetailsLowLightMode);
     LOGD_AHDR("%s:lrk  Tmo FocusLuma:%f %f %f %f %f %f:\n", __FUNCTION__, pAhdrCtx->AhdrConfig.tmo_para.FocusLuma[0], pAhdrCtx->AhdrConfig.tmo_para.FocusLuma[1], pAhdrCtx->AhdrConfig.tmo_para.FocusLuma[2]
               , pAhdrCtx->AhdrConfig.tmo_para.FocusLuma[3], pAhdrCtx->AhdrConfig.tmo_para.FocusLuma[4], pAhdrCtx->AhdrConfig.tmo_para.FocusLuma[5]);
     LOGD_AHDR("%s:lrk  Tmo DarkPdf:%f %f %f %f %f %f:\n", __FUNCTION__, pAhdrCtx->AhdrConfig.tmo_para.DarkPdf[0], pAhdrCtx->AhdrConfig.tmo_para.DarkPdf[1], pAhdrCtx->AhdrConfig.tmo_para.DarkPdf[2]
               , pAhdrCtx->AhdrConfig.tmo_para.DarkPdf[3], pAhdrCtx->AhdrConfig.tmo_para.DarkPdf[4], pAhdrCtx->AhdrConfig.tmo_para.DarkPdf[5]);
+    LOGD_AHDR("%s:lrk  Tmo ISO:%f %f %f %f %f %f:\n", __FUNCTION__, pAhdrCtx->AhdrConfig.tmo_para.ISO[0], pAhdrCtx->AhdrConfig.tmo_para.ISO[1], pAhdrCtx->AhdrConfig.tmo_para.ISO[2]
+              , pAhdrCtx->AhdrConfig.tmo_para.ISO[3], pAhdrCtx->AhdrConfig.tmo_para.ISO[4], pAhdrCtx->AhdrConfig.tmo_para.ISO[5]);
     LOGD_AHDR("%s:lrk  Tmo DTPdfTolerance:%f:\n", __FUNCTION__, pAhdrCtx->AhdrConfig.tmo_para.DTPdfTolerance);
     LOGD_AHDR("%s:lrk  Tmo DetailsLowLight:%f %f %f %f %f %f:\n", __FUNCTION__, pAhdrCtx->AhdrConfig.tmo_para.DetailsLowLight[0], pAhdrCtx->AhdrConfig.tmo_para.DetailsLowLight[1], pAhdrCtx->AhdrConfig.tmo_para.DetailsLowLight[2]
               , pAhdrCtx->AhdrConfig.tmo_para.DetailsLowLight[3], pAhdrCtx->AhdrConfig.tmo_para.DetailsLowLight[4], pAhdrCtx->AhdrConfig.tmo_para.DetailsLowLight[5]);
@@ -661,12 +682,14 @@ void AhdrUpdateConfig
         pAhdrCtx->CurrHandleData.CurrL2M_Ratio = pAhdrCtx->CurrAeResult.L2M_Ratio;
         pAhdrCtx->CurrHandleData.CurrL2L_Ratio = 1;
         pAhdrCtx->CurrHandleData.CurrLExpo = AecHdrPreResult.HdrExp[1].exp_real_params.analog_gain * AecHdrPreResult.HdrExp[1].exp_real_params.integration_time;
+        pAhdrCtx->CurrAeResult.ISO = AecHdrPreResult.HdrExp[1].exp_real_params.analog_gain * 50.0;
         break;
     case 2:
         pAhdrCtx->CurrHandleData.CurrL2S_Ratio = pAhdrCtx->CurrAeResult.L2M_Ratio * pAhdrCtx->CurrAeResult.M2S_Ratio;
         pAhdrCtx->CurrHandleData.CurrL2M_Ratio = pAhdrCtx->CurrAeResult.L2M_Ratio;
         pAhdrCtx->CurrHandleData.CurrL2L_Ratio = 1;
         pAhdrCtx->CurrHandleData.CurrLExpo = AecHdrPreResult.HdrExp[2].exp_real_params.analog_gain * AecHdrPreResult.HdrExp[2].exp_real_params.integration_time;
+        pAhdrCtx->CurrAeResult.ISO = AecHdrPreResult.HdrExp[2].exp_real_params.analog_gain * 50.0;
         break;
     default:
         LOGE_AHDR("%s:lrk  Wrong frame number in HDR mode!!!\n", __FUNCTION__);
@@ -726,14 +749,25 @@ void AhdrUpdateConfig
         pAhdrCtx->CurrHandleData.CurrTmoHandleData.TmoContrast = 76;
 
     //get Current tmo DetailsHighLight
-    pAhdrCtx->CurrHandleData.CurrOEPdf = pAhdrCtx->CurrAeResult.OEPdf;
-    pAhdrCtx->CurrHandleData.CurrOEPdf = LIMIT_VALUE(pAhdrCtx->CurrHandleData.CurrOEPdf, OEPDFMAX, OEPDFMIN);
-    pAhdrCtx->CurrHandleData.CurrTmoHandleData.DetailsHighLight = GetCurrPara(pAhdrCtx->CurrHandleData.CurrOEPdf,
-            pAhdrCtx->AhdrConfig.tmo_para.OEPdf,
-            pAhdrCtx->AhdrConfig.tmo_para.DetailsHighLight);
+    int DetailsHighLight_mode = (int)pAhdrCtx->AhdrConfig.tmo_para.DetailsHighLightMode;
+    if(DetailsHighLight_mode == 0)
+    {
+        pAhdrCtx->CurrHandleData.CurrOEPdf = pAhdrCtx->CurrAeResult.OEPdf;
+        pAhdrCtx->CurrHandleData.CurrOEPdf = LIMIT_VALUE(pAhdrCtx->CurrHandleData.CurrOEPdf, OEPDFMAX, OEPDFMIN);
+        pAhdrCtx->CurrHandleData.CurrTmoHandleData.DetailsHighLight = GetCurrPara(pAhdrCtx->CurrHandleData.CurrOEPdf,
+                pAhdrCtx->AhdrConfig.tmo_para.OEPdf,
+                pAhdrCtx->AhdrConfig.tmo_para.DetailsHighLight);
+    }
+    else if(DetailsHighLight_mode == 1)
+    {
+        pAhdrCtx->CurrHandleData.CurrTmoHandleData.DetailsHighLight = GetCurrPara(pAhdrCtx->CurrHandleData.CurrEnvLv,
+                pAhdrCtx->AhdrConfig.tmo_para.EnvLv2,
+                pAhdrCtx->AhdrConfig.tmo_para.DetailsHighLight);
+    }
 
     //get Current tmo DetailsLowLight
-    if (pAhdrCtx->AhdrConfig.tmo_para.enFocusLuma == 1)
+    int DetailsLowLight_mode = (int)pAhdrCtx->AhdrConfig.tmo_para.DetailsLowLightMode;
+    if (DetailsLowLight_mode == 0)
     {
 #if 0
         int focs = pAhdrCtx->CurrAfResult.CurrAfTargetPos;
@@ -752,12 +786,20 @@ void AhdrUpdateConfig
 
 #endif
     }
-    else
+    else if (DetailsLowLight_mode == 1)
     {
         pAhdrCtx->CurrHandleData.CurrDarkPdf = pAhdrCtx->CurrAeResult.DarkPdf;
         pAhdrCtx->CurrHandleData.CurrDarkPdf = LIMIT_VALUE(pAhdrCtx->CurrHandleData.CurrDarkPdf, 0.5, 0);
         pAhdrCtx->CurrHandleData.CurrTmoHandleData.DetailsLowLight = GetCurrPara(pAhdrCtx->CurrHandleData.CurrDarkPdf,
                 pAhdrCtx->AhdrConfig.tmo_para.DarkPdf,
+                pAhdrCtx->AhdrConfig.tmo_para.DetailsLowLight);
+    }
+    else if (DetailsLowLight_mode == 2)
+    {
+        pAhdrCtx->CurrHandleData.CurrISO = pAhdrCtx->CurrAeResult.ISO;
+        pAhdrCtx->CurrHandleData.CurrISO = LIMIT_VALUE(pAhdrCtx->CurrHandleData.CurrISO, ISOMAX, ISOMIN);
+        pAhdrCtx->CurrHandleData.CurrTmoHandleData.DetailsLowLight = GetCurrPara(pAhdrCtx->CurrHandleData.CurrISO,
+                pAhdrCtx->AhdrConfig.tmo_para.ISO,
                 pAhdrCtx->AhdrConfig.tmo_para.DetailsLowLight);
     }
 
@@ -945,6 +987,7 @@ void AhdrProcessing
     pAhdrCtx->AhdrPrevData.PreOEPdf = pAhdrCtx->CurrHandleData.CurrOEPdf;
     pAhdrCtx->AhdrPrevData.PreTotalFocusLuma = pAhdrCtx->CurrHandleData.CurrTotalFocusLuma;
     pAhdrCtx->AhdrPrevData.PreDarkPdf = pAhdrCtx->CurrHandleData.CurrDarkPdf;
+    pAhdrCtx->AhdrPrevData.PreISO = pAhdrCtx->CurrHandleData.CurrISO;
     pAhdrCtx->AhdrPrevData.PreDynamicRange = pAhdrCtx->CurrHandleData.CurrDynamicRange;
     memcpy(&pAhdrCtx->AhdrPrevData.PrevMergeHandleData, &pAhdrCtx->CurrHandleData.CurrMergeHandleData, sizeof(MergeHandleData_s));
     memcpy(&pAhdrCtx->AhdrPrevData.PrevTmoHandleData, &pAhdrCtx->CurrHandleData.CurrTmoHandleData, sizeof(TmoHandleData_s));

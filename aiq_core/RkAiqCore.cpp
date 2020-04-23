@@ -1310,10 +1310,7 @@ RkAiqCore::genIspAgicResult(RkAiqFullParams* params)
     // gen rk agic result
     if (algo_id == 0) {
         RkAiqAlgoProcResAgicInt* agic_rk = (RkAiqAlgoProcResAgicInt*)agic_com;
-
-#ifdef RK_SIMULATOR_HW
-#else
-#endif
+        memcpy(&isp_param->gic, &agic_rk->gicRes.config, sizeof(AgicConfig_t));
     }
 
     EXIT_ANALYZER_FUNCTION();

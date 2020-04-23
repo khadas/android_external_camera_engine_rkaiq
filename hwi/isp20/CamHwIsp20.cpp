@@ -627,8 +627,8 @@ CamHwIsp20::init(const char* sns_ent_name)
 
     mipi_rx_devs[2]->set_mem_type(V4L2_MEMORY_DMABUF);
     for (int i = 0; i < 3; i++) {
-        mipi_tx_devs[i]->set_buffer_count(4);
-        mipi_rx_devs[i]->set_buffer_count(4);
+        mipi_tx_devs[i]->set_buffer_count(8);
+        mipi_rx_devs[i]->set_buffer_count(8);
     }
 
     isp20Pollthread = new Isp20PollThread();
@@ -1238,6 +1238,7 @@ void CamHwIsp20::dump_isp_config(struct isp2x_isp_params_cfg* isp_params,
          isp_params->meas.rawae1.win.v_size,
          isp_params->meas.rawae2.win.h_size,
          isp_params->meas.rawae2.win.v_size);
+
     LOGD_CAMHW("isp_params: debayer: \n"
          "clip_en:%d, dist_scale:%d, filter_c_en:%d, filter_g_en:%d\n"
          "gain_offset:%d,hf_offset:%d,max_ratio:%d,offset:%d,order_max:%d\n"
@@ -1267,6 +1268,87 @@ void CamHwIsp20::dump_isp_config(struct isp2x_isp_params_cfg* isp_params,
          isp_params->others.debayer_cfg.filter2_coe3,
          isp_params->others.debayer_cfg.filter2_coe4,
          isp_params->others.debayer_cfg.filter2_coe5);
+    LOGD("aiq_results: debayer: \n"
+         "clip_en:%d, dist_scale:%d, filter_c_en:%d, filter_g_en:%d\n"
+         "gain_offset:%d,hf_offset:%d,max_ratio:%d,offset:%d,order_max:%d\n"
+         "order_min:%d, shift_num:%d, thed0:%d, thed1:%d\n"
+         "filter1:[%d, %d, %d, %d, %d]\n",
+         "filter2:[%d, %d, %d, %d, %d]\n",
+         aiq_results->data()->demosaic.clip_en,
+         aiq_results->data()->demosaic.dist_scale,
+         aiq_results->data()->demosaic.filter_c_en,
+         aiq_results->data()->demosaic.filter_g_en,
+         aiq_results->data()->demosaic.gain_offset,
+         aiq_results->data()->demosaic.hf_offset,
+         aiq_results->data()->demosaic.max_ratio,
+         aiq_results->data()->demosaic.max_ratio,
+         aiq_results->data()->demosaic.offset,
+         aiq_results->data()->demosaic.order_max,
+         aiq_results->data()->demosaic.order_min,
+         aiq_results->data()->demosaic.shift_num,
+         aiq_results->data()->demosaic.thed0,
+         aiq_results->data()->demosaic.thed1,
+         aiq_results->data()->demosaic.filter1_coe[0],
+         aiq_results->data()->demosaic.filter1_coe[1],
+         aiq_results->data()->demosaic.filter1_coe[2],
+         aiq_results->data()->demosaic.filter1_coe[3],
+         aiq_results->data()->demosaic.filter1_coe[4],
+         aiq_results->data()->demosaic.filter2_coe[0],
+         aiq_results->data()->demosaic.filter2_coe[1],
+         aiq_results->data()->demosaic.filter2_coe[2],
+         aiq_results->data()->demosaic.filter2_coe[3],
+         aiq_results->data()->demosaic.filter2_coe[4]);
+
+    LOGD("isp_params: gic: \n"
+         "edge_open:%d, regmingradthrdark2:%d, regmingradthrdark1:%d, regminbusythre:%d\n"
+         "regdarkthre:%d,regmaxcorvboth:%d,regdarktthrehi:%d,regkgrad2dark:%d,regkgrad1dark:%d\n"
+         "regstrengthglobal_fix:%d, regdarkthrestep:%d, regkgrad2:%d, regkgrad1:%d\n"
+         "reggbthre:%d, regmaxcorv:%d, regmingradthr2:%d, regmingradthr1:%d, gr_ratio:%d\n"
+         "dnloscale:%d, dnhiscale:%d, reglumapointsstep:%d, gvaluelimitlo:%d, gvaluelimithi:%d\n"
+         "fratiohilimt1:%d, strength_fix:%d, noise_cuten:%d, noise_coe_a:%d, noise_coe_b:%d, diff_clip:%d\n",
+         isp_params->others.gic_cfg.edge_open,
+         isp_params->others.gic_cfg.regmingradthrdark2,
+         isp_params->others.gic_cfg.regmingradthrdark1,
+         isp_params->others.gic_cfg.regminbusythre,
+         isp_params->others.gic_cfg.regdarkthre,
+         isp_params->others.gic_cfg.regmaxcorvboth,
+         isp_params->others.gic_cfg.regdarktthrehi,
+         isp_params->others.gic_cfg.regkgrad2dark,
+         isp_params->others.gic_cfg.regkgrad1dark,
+         isp_params->others.gic_cfg.regstrengthglobal_fix,
+         isp_params->others.gic_cfg.regdarkthrestep,
+         isp_params->others.gic_cfg.regkgrad2,
+         isp_params->others.gic_cfg.regkgrad1,
+         isp_params->others.gic_cfg.reggbthre,
+         isp_params->others.gic_cfg.regmaxcorv,
+         isp_params->others.gic_cfg.regmingradthr2,
+         isp_params->others.gic_cfg.regmingradthr1,
+         isp_params->others.gic_cfg.gr_ratio,
+         isp_params->others.gic_cfg.dnloscale,
+         isp_params->others.gic_cfg.dnhiscale,
+         isp_params->others.gic_cfg.reglumapointsstep,
+         isp_params->others.gic_cfg.gvaluelimitlo,
+         isp_params->others.gic_cfg.gvaluelimithi,
+         isp_params->others.gic_cfg.fusionratiohilimt1,
+         isp_params->others.gic_cfg.regstrengthglobal_fix,
+         isp_params->others.gic_cfg.noise_cut_en,
+         isp_params->others.gic_cfg.noise_coe_a,
+         isp_params->others.gic_cfg.noise_coe_b,
+         isp_params->others.gic_cfg.diff_clip);
+    for(int i = 0; i < ISP2X_GIC_SIGMA_Y_NUM; i++) {
+        LOGD("sigma_y[%d]=%d\n", i, isp_params->others.gic_cfg.sigma_y[i]);
+    }
+    LOGD("aiq_results: gic: dnloscale=%f, dnhiscale=%f,gvaluelimitlo=%f,gvaluelimithi=%f,fusionratiohilimt1=%f"
+         "textureStrength=%f,globalStrength=%f,noiseCurve_0=%f,noiseCurve_1=%f",
+         aiq_results->data()->gic.dnloscale, aiq_results->data()->gic.dnhiscale,
+         aiq_results->data()->gic.gvaluelimitlo, aiq_results->data()->gic.gvaluelimithi,
+         aiq_results->data()->gic.fusionratiohilimt1, aiq_results->data()->gic.textureStrength,
+         aiq_results->data()->gic.globalStrength, aiq_results->data()->gic.noiseCurve_0,
+         aiq_results->data()->gic.noiseCurve_1);
+    for(int i = 0; i < ISP2X_GIC_SIGMA_Y_NUM; i++) {
+        LOGD("sigma[%d]=%f\n", i, aiq_results->data()->gic.sigma_y[i]);
+    }
+
 }
 
 XCamReturn
