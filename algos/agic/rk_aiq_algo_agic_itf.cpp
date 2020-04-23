@@ -19,32 +19,51 @@
 
 #include "rk_aiq_algo_types_int.h"
 #include "agic/rk_aiq_algo_agic_itf.h"
+#include "agic/rk_aiq_types_algo_agic_prvt.h"
 
 RKAIQ_BEGIN_DECLARE
-
-typedef struct _RkAiqAlgoContext {
-    void* place_holder[0];
-} RkAiqAlgoContext;
 
 static RkAiqAlgoContext ctx;
 
 static XCamReturn
 create_context(RkAiqAlgoContext **context, const AlgoCtxInstanceCfg* cfg)
 {
+    XCamReturn result = XCAM_RETURN_NO_ERROR;
+
+    LOGI_AGIC("%s: (enter)\n", __FUNCTION__ );
+    AgicInit(&ctx.agicCtx);
     *context = &ctx;
-    return XCAM_RETURN_NO_ERROR;
+    LOGI_AGIC("%s: (exit)\n", __FUNCTION__ );
+    return result;
+
 }
 
 static XCamReturn
 destroy_context(RkAiqAlgoContext *context)
 {
-    return XCAM_RETURN_NO_ERROR;
+    XCamReturn result = XCAM_RETURN_NO_ERROR;
+
+    LOGI_AGIC("%s: (enter)\n", __FUNCTION__ );
+    AgicContext_t* pAgicCtx = (AgicContext_t*)&context->agicCtx;
+    AgicRelease(pAgicCtx);
+    LOGI_AGIC("%s: (exit)\n", __FUNCTION__ );
+    return result;
+
 }
 
 static XCamReturn
 prepare(RkAiqAlgoCom* params)
 {
-    return XCAM_RETURN_NO_ERROR;
+    XCamReturn result = XCAM_RETURN_NO_ERROR;
+
+    LOGI_AGIC("%s: (enter)\n", __FUNCTION__ );
+    AgicContext_t* pAgicCtx = (AgicContext_t *)&params->ctx->agicCtx;
+    RkAiqAlgoConfigAgicInt* pCfgParam = (RkAiqAlgoConfigAgicInt*)params;
+    pAgicCtx->pCalibDb = pCfgParam->rk_com.u.prepare.calib;
+    AgicStart(pAgicCtx);
+    LOGI_AGIC("%s: (exit)\n", __FUNCTION__ );
+    return result;
+
 }
 
 static XCamReturn
@@ -56,7 +75,43 @@ pre_process(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outparams)
 static XCamReturn
 processing(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outparams)
 {
-    return XCAM_RETURN_NO_ERROR;
+    XCamReturn result = XCAM_RETURN_NO_ERROR;
+    int iso = 50;
+    RkAiqAlgoProcAgicInt* pAgicProcParams = (RkAiqAlgoProcAgicInt*)inparams;
+    RkAiqAlgoProcResAgicInt* pAgicProcResParams = (RkAiqAlgoProcResAgicInt*)outparams;
+    AgicContext_t* pAgicCtx = (AgicContext_t *)&inparams->ctx->agicCtx;
+
+    LOGI_AGIC("%s: (enter)\n", __FUNCTION__ );
+
+    if(!inparams->u.proc.init) {
+        RkAiqAlgoPreResAeInt* pAEPreRes =
+            (RkAiqAlgoPreResAeInt*)(pAgicProcParams->rk_com.u.proc.pre_res_comb->ae_pre_res);
+
+        if(pAEPreRes != NULL) {
+            if(pAgicProcParams->hdr_mode == RK_AIQ_WORKING_MODE_NORMAL) {
+                iso = pAEPreRes->ae_pre_res_rk.LinearExp.exp_real_params.analog_gain * 50;
+                LOGD_AGIC("%s:NORMAL:iso=%d,again=%f\n", __FUNCTION__, iso,
+                              pAEPreRes->ae_pre_res_rk.LinearExp.exp_real_params.analog_gain);
+            } else if(RK_AIQ_HDR_GET_WORKING_MODE(pAgicProcParams->hdr_mode) == RK_AIQ_WORKING_MODE_ISP_HDR2) {
+                iso = pAEPreRes->ae_pre_res_rk.HdrExp[1].exp_real_params.analog_gain * 50;
+                LOGD_AGIC("%s:HDR2:iso=%d,again=%f\n", __FUNCTION__, iso,
+                              pAEPreRes->ae_pre_res_rk.HdrExp[1].exp_real_params.analog_gain);
+            } else if(RK_AIQ_HDR_GET_WORKING_MODE(pAgicProcParams->hdr_mode) == RK_AIQ_WORKING_MODE_ISP_HDR3) {
+                iso = pAEPreRes->ae_pre_res_rk.HdrExp[2].exp_real_params.analog_gain * 50;
+                LOGD_AGIC("%s:HDR3:iso=%d,again=%f\n", __FUNCTION__, iso,
+                              pAEPreRes->ae_pre_res_rk.HdrExp[2].exp_real_params.analog_gain);
+            }
+        } else {
+            LOGE_AGIC("%s: pAEPreRes is NULL, so use default instead \n", __FUNCTION__);
+        }
+    }
+
+    AgicProcess(pAgicCtx, iso);
+    AgicGetProcResult(pAgicCtx, &pAgicProcResParams->gicRes);
+
+    LOGI_AGIC("%s: (exit)\n", __FUNCTION__ );
+    return result;
+
 }
 
 static XCamReturn

@@ -141,6 +141,7 @@ ANRresult_t select_ynr_params_by_ISO(RKAnr_Ynr_Params_t *stYnrParam, RKAnr_Ynr_P
 	short multBit;
 	float ratio;
 	int isoValue = 50;
+	float global_gain = 1.0;
 	RKAnr_Ynr_Params_Select_t *pstYNrTuneParamHi;
 	RKAnr_Ynr_Params_Select_t *pstYNrTuneParamLo;
 
@@ -248,6 +249,7 @@ ANRresult_t select_ynr_params_by_ISO(RKAnr_Ynr_Params_t *stYnrParam, RKAnr_Ynr_P
 	#endif
 
 	isoValue = pExpInfo->arIso[pExpInfo->hdr_mode];
+	global_gain = (float)pExpInfo->arAGain[pExpInfo->hdr_mode];
 	
 	int iso_div = 50;
 	for(int i=0; i<MAX_ISO_STEP-1; i++){
@@ -284,9 +286,19 @@ ANRresult_t select_ynr_params_by_ISO(RKAnr_Ynr_Params_t *stYnrParam, RKAnr_Ynr_P
 	}
 
 	for(int i = 0; i < ISO_CURVE_POINT_NUM; i++)
-	{
+	{		
 		stYnrParamSelected->noiseSigma[i] = ratio * (pstYNrTuneParamHi->noiseSigma[i] - pstYNrTuneParamLo->noiseSigma[i]) + pstYNrTuneParamLo->noiseSigma[i];
+		LOGD_ANR("%s:%d ori sigma:%f \n", 
+			__FUNCTION__, __LINE__,
+			stYnrParamSelected->noiseSigma[i]);
 		stYnrParamSelected->lumaPoints[i] = (short)(ratio * (pstYNrTuneParamHi->lumaPoints[i] - pstYNrTuneParamLo->lumaPoints[i]) + pstYNrTuneParamLo->lumaPoints[i]);
+		#ifndef RK_SIMULATOR_HW
+		stYnrParamSelected->noiseSigma[i] /= (sqrt(global_gain)); 
+		#endif
+		LOGD_ANR("%s:%d  gain:%f sqrt:%f correct sigma:%f \n", 
+			__FUNCTION__, __LINE__,
+			global_gain, sqrt(global_gain), 
+			stYnrParamSelected->noiseSigma[i]);
 	}
 
 	//小波低频层去噪tuning参数

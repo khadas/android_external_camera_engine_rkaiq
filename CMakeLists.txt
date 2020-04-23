@@ -45,8 +45,8 @@ endif()
 # ----------------------------------------------------------------------------
 # ADD SYMBOL TABLE FOR GDB
 # ----------------------------------------------------------------------------
-SET(CMAKE_CXX_FLAGS_DEBUG "$ENV{CXXFLAGS} -std=c++11 -Wno-reorder -O0 -Werror -g -ggdb")
-SET(CMAKE_CXX_FLAGS_RELEASE "$ENV{CXXFLAGS} -std=c++11 -O0 -Wall -Wno-reorder -g -ggdb")
+SET(CMAKE_CXX_FLAGS_DEBUG "$ENV{CXXFLAGS} -std=c++11 -Wno-reorder -Werror")
+SET(CMAKE_CXX_FLAGS_RELEASE "$ENV{CXXFLAGS} -std=c++11 -Werror -Wno-reorder")
 # SET(CMAKE_CXX_FLAGS_RELEASE "$ENV{CXXFLAGS} -O3 -Wall")
 
 #head file path
@@ -222,10 +222,12 @@ endif()
 
 # add C++11 option
 #add_compile_options(-std=c++11)
-add_compile_options(-fPIC)
+add_compile_options(-fPIC -Wall -Wno-error)
 add_compile_options(-Wno-unused-variable
 					-Wno-unused-but-set-variable
-					-Wno-unused-function)
+					-Wno-unused-function
+					-Wno-misleading-indentation
+					-Wno-unused-label)
 # add_compile_options(-v)
 add_definitions(-D_CRT_SECURE_NO_WARNINGS)
 

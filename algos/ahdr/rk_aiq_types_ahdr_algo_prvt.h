@@ -73,8 +73,10 @@
 #define MDCURVEOFFSETMIN     (26)
 #define DAMPMAX     (1.0)
 #define DAMPMIN     (0.0)
-#define ENMAX     (1.0)
-#define ENMIN     (0.0)
+#define DETAILSLOWLIGHTMODEMAX     (2.0)
+#define DETAILSLOWLIGHTMODEMIN     (0.0)
+#define DETAILSHIGHLIGHTMODEMAX     (1.0)
+#define DETAILSHIGHLIGHTMODEMIN     (0.0)
 #define DAYTHMAX     (1.0)
 #define DAYTHMIN     (0.0)
 #define DARKPDFTHMAX     (1.0)
@@ -88,6 +90,8 @@
 #define DETAILSHIGHLIGHTMAX     (1023)
 #define DETAILSHIGHLIGHTMIN     (51)
 #define DARKPDFMAX     (0.5)
+#define ISOMIN     (50)
+#define ISOMAX     (12800)
 #define DARKPDFMIN     (0)
 #define DETAILSLOWLIGHTMAX     (63)
 #define DETAILSLOWLIGHTMIN     (16)
@@ -139,6 +143,7 @@ typedef struct AhdrPrevData_s
     float PreOEPdf;
     float PreTotalFocusLuma;
     float PreDarkPdf;
+    float PreISO;
     float PreDynamicRange;
     MergeHandleData_t PrevMergeHandleData;
     TmoHandleData_t PrevTmoHandleData;
@@ -159,6 +164,7 @@ typedef struct CurrAeResult_s {
     float DynamicRange;
     float OEPdf; //the pdf of over exposure in long frame
     float DarkPdf; //the pdf of dark region in long frame
+    float ISO; //use long frame
 
     float Lv_fac;
     float DarkPdf_fac;
@@ -194,6 +200,7 @@ typedef struct CurrHandleData_s
     float CurrDynamicRange;
     float CurrOEPdf;
     float CurrDarkPdf;
+    float CurrISO;
     float DayTh;
     float DarkPdfTH;
     float CurrTotalFocusLuma;

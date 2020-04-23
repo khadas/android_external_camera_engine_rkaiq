@@ -377,7 +377,7 @@ typedef struct _RkAiqAlgoProcAnrInt {
     RkAiqAlgoProcAnr anr_proc_com;
     RkAiqAlgoComInt rk_com;
     int iso;
-	int hdr_mode;
+    int hdr_mode;
 } RkAiqAlgoProcAnrInt;
 
 typedef struct _RkAiqAlgoProcResAnrInt {
@@ -414,7 +414,7 @@ typedef struct _RkAiqAlgoProcAsharpInt {
     RkAiqAlgoProcAsharp asharp_proc_com;
     RkAiqAlgoComInt rk_com;
     int iso;
-	int hdr_mode;
+    int hdr_mode;
 } RkAiqAlgoProcAsharpInt;
 
 typedef struct _RkAiqAlgoProcResAsharpInt {
@@ -563,8 +563,8 @@ typedef struct _RkAiqAlgoProcAdhazInt {
     RkAiqAlgoComInt rk_com;
     const CamCalibDbContext_t *pCalibDehaze;
     int iso;
-	int hdr_mode;	
-	
+    int hdr_mode;
+
 } RkAiqAlgoProcAdhazInt;
 
 typedef struct _RkAiqAlgoProcResAdhazInt {
@@ -635,7 +635,7 @@ typedef struct _RkAiqAlgoProcAblcInt {
     RkAiqAlgoProcAblc ablc_proc_com;
     RkAiqAlgoComInt rk_com;
     int iso;
-	int hdr_mode;
+    int hdr_mode;
 } RkAiqAlgoProcAblcInt;
 
 typedef struct _RkAiqAlgoProcResAblcInt {
@@ -737,8 +737,7 @@ typedef struct _RkAiqAlgoPreResAdebayerInt {
 typedef struct _RkAiqAlgoProcAdebayerInt {
     RkAiqAlgoProcAdebayer adebayer_proc_com;
     RkAiqAlgoComInt rk_com;
-//    const CamCalibDbContext_t *pCalibDb;
-//    int iso;
+    int hdr_mode;
 } RkAiqAlgoProcAdebayerInt;
 
 typedef struct _RkAiqAlgoProcResAdebayerInt {
@@ -775,7 +774,7 @@ typedef struct _RkAiqAlgoProcAdpccInt {
     RkAiqAlgoProcAdpcc adpcc_proc_com;
     RkAiqAlgoComInt rk_com;
     int iso;
-	int hdr_mode;
+    int hdr_mode;
 } RkAiqAlgoProcAdpccInt;
 
 typedef struct _RkAiqAlgoProcResAdpccInt {
@@ -898,10 +897,12 @@ typedef struct _RkAiqAlgoPreResAgicInt {
 typedef struct _RkAiqAlgoProcAgicInt {
     RkAiqAlgoProcAgic agic_proc_com;
     RkAiqAlgoComInt rk_com;
+    int hdr_mode;
 } RkAiqAlgoProcAgicInt;
 
 typedef struct _RkAiqAlgoProcResAgicInt {
     RkAiqAlgoProcResAgic agic_proc_res_com;
+    AgicProcResult_t gicRes;
 } RkAiqAlgoProcResAgicInt;
 
 typedef struct _RkAiqAlgoPostAgicInt {

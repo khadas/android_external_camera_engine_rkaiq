@@ -17,6 +17,10 @@ rk_aiq_uapi_ahdr_SetAttrib
 
     AhdrContext_t* pAhdrCtx = (AhdrContext_t*)(ctx->AhdrInstConfig.hAhdr);
 
+	//Todo
+	pAhdrCtx->hdrAttr.bEnable = attr.bEnable;
+	pAhdrCtx->hdrAttr.bEnable = false;
+
     if (need_sync == true)
     {
         pAhdrCtx->hdrAttr.stAuto.bUpdateMge = attr.stAuto.bUpdateMge;
