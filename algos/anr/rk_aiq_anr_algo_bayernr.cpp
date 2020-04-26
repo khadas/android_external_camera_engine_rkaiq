@@ -344,7 +344,7 @@ unsigned short bayernr_get_trans(int tmpfix)
     int logscalebit = 12;
 	int logfixmul = (1<<logfixbit);
 	long long x8, one = 1;
-	long long gx, n, ix1, ix2, dp;
+	long long gx, n = 0, ix1, ix2, dp;
 	long long lt1, lt2, dx, fx;
 	int i, j = 1;
 	

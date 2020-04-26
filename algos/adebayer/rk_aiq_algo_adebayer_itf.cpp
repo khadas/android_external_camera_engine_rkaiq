@@ -94,7 +94,7 @@ processing
 )
 {
     XCamReturn result = XCAM_RETURN_NO_ERROR;
-    int iso;
+    int iso = 50;
     RkAiqAlgoProcAdebayerInt* pAdebayerProcParams = (RkAiqAlgoProcAdebayerInt*)inparams;
     RkAiqAlgoProcResAdebayerInt* pAdebayerProcResParams = (RkAiqAlgoProcResAdebayerInt*)outparams;
     AdebayerContext_t* pAdebayerCtx = (AdebayerContext_t *)&inparams->ctx->adebayerCtx;

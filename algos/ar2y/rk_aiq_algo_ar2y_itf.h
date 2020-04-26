@@ -22,7 +22,7 @@
 
 #include "rk_aiq_algo_des.h"
 
-#define RKISP_ALGO_AR2Y_VERSION     "v2.0.0"
+#define RKISP_ALGO_AR2Y_VERSION     "v0.0.9"
 #define RKISP_ALGO_AR2Y_VENDOR      "Rockchip"
 #define RKISP_ALGO_AR2Y_DESCRIPTION "Rockchip Ar2y algo for ISP2.0"
 

@@ -1847,7 +1847,7 @@ RkAiqCore::convertIspstatsToAlgo(const SmartPtr<VideoBuffer> &buffer)
         mAlogsSharedParams.ispStats.awb_stats.light[i].xYType[RK_AIQ_AWB_XY_TYPE_SMALL_V200].WpNo =
             stats->params.rawawb.ro_rawawb_wp_num_sma[i];
     }
-    for(int i = 0; i < RK_AIQ_AWB_MULTIWINDOW_NUM; i++) {
+    for(int i = 0; i < RK_AIQ_AWB_MAX_WHITEREGIONS_NUM; i++) {
         mAlogsSharedParams.ispStats.awb_stats.multiwindowLightResult[i].xYType[RK_AIQ_AWB_XY_TYPE_NORMAL_V200].Rvalue =
             stats->params.rawawb.ro_sum_r_nor_multiwindow[i];
         mAlogsSharedParams.ispStats.awb_stats.multiwindowLightResult[i].xYType[RK_AIQ_AWB_XY_TYPE_NORMAL_V200].Gvalue =

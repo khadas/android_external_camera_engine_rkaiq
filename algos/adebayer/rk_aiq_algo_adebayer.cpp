@@ -316,9 +316,9 @@ AdebayerProcess
     pAdebayerCtx->config.order_max = false_color_remove_strength_table[index][1];
     pAdebayerCtx->config.shift_num = pAdebayerCtx->full_param.shift_num;
     //select sharp params
-    int iso_low, iso_high;
+    int iso_low = ISO, iso_high = ISO;
     int gain_high, gain_low;
-    float ratio;
+    float ratio = 0.0f;
     int iso_div             = 50;
     int max_iso_step        = 9;
     for (int i = max_iso_step - 1; i >= 0; i--)

@@ -44,8 +44,10 @@ RkAiqRstApplyThread::loop ()
     }
 
 #ifdef RUNTIME_MODULE_DEBUG
+#ifndef RK_SIMULATOR_HW
     if (g_apply_init_params_only)
         goto out;
+#endif
 #endif
     ret = mAiqMng->applyAnalyzerResult(results);
     if (ret == XCAM_RETURN_NO_ERROR)
@@ -157,7 +159,9 @@ RkAiqManager::prepare(uint32_t width, uint32_t height, rk_aiq_working_mode_t mod
 
     XCAM_ASSERT (mCalibDb);
 #ifdef RUNTIME_MODULE_DEBUG
+#ifndef RK_SIMULATOR_HW
     get_dbg_force_disable_mods_env();
+#endif
 #endif
     int working_mode_hw;
     if (mode == RK_AIQ_WORKING_MODE_NORMAL) {
@@ -289,6 +293,11 @@ RkAiqManager::ispStatsCb(SmartPtr<VideoBuffer>& ispStats)
 {
     ENTER_XCORE_FUNCTION();
     XCamReturn ret = mRkAiqAnalyzer->pushStats(ispStats);
+#ifndef RK_SIMULATOR_HW
+    if (get_rkaiq_runtime_dbg() > 0) {
+        XCAM_STATIC_FPS_CALCULATION(STATS_FPS, 60);
+    }
+#endif
     EXIT_XCORE_FUNCTION();
 
     return ret;
@@ -315,11 +324,18 @@ RkAiqManager::applyAnalyzerResult(SmartPtr<RkAiqFullParamsProxy>& results)
         return ret;
     }
 
+    // TODO: couldn't get dynamic debug env now
+#if 0//def RUNTIME_MODULE_DEBUG
+    get_dbg_force_disable_mods_env();
+#endif
+
     aiqParams = results->data().ptr();
 
 #ifdef RUNTIME_MODULE_DEBUG
+#ifndef RK_SIMULATOR_HW
     if (g_bypass_exp_params)
         goto set_exp_end;
+#endif
 #endif
     if (aiqParams->mExposureParams.ptr()) {
 // #define DEBUG_FIXED_EXPOSURE
@@ -368,9 +384,10 @@ RkAiqManager::applyAnalyzerResult(SmartPtr<RkAiqFullParamsProxy>& results)
 set_exp_end:
 
 #ifdef RUNTIME_MODULE_DEBUG
-    get_dbg_force_disable_mods_env();
+#ifndef RK_SIMULATOR_HW
     if (g_bypass_isp_params)
         goto set_isp_end;
+#endif
 #endif
 
     if (aiqParams->mIspParams.ptr()) {
@@ -381,8 +398,10 @@ set_exp_end:
 set_isp_end:
 
 #ifdef RUNTIME_MODULE_DEBUG
+#ifndef RK_SIMULATOR_HW
     if (g_bypass_ispp_params)
         goto set_ispp_end;
+#endif
 #endif
 
 #ifndef DISABLE_PP 

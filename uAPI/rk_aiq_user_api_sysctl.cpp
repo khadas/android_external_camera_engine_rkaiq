@@ -282,6 +282,93 @@ algoHandle(const rk_aiq_sys_ctx_t* ctx, const int algo_type)
 #include "rk_aiq_user_api_asharp.cpp"
 #include "rk_aiq_user_api_imgproc.cpp"
 
+#include "RkAiqVersion.h"
+#include "RkAiqCalibVersion.h"
+static void _print_versions()
+{
+    extern RkAiqAlgoDescription g_RkIspAlgoDescA3dlut;
+    extern RkAiqAlgoDescription g_RkIspAlgoDescAblc;
+    extern RkAiqAlgoDescription g_RkIspAlgoDescAccm;
+    extern RkAiqAlgoDescription g_RkIspAlgoDescAcgc;
+    extern RkAiqAlgoDescription g_RkIspAlgoDescAcp;
+    extern RkAiqAlgoDescription g_RkIspAlgoDescAdebayer;
+    extern RkAiqAlgoDescription g_RkIspAlgoDescAdhaz;
+    extern RkAiqAlgoDescription g_RkIspAlgoDescAdpcc;
+    extern RkAiqAlgoDescription g_RkIspAlgoDescAe;
+    extern RkAiqAlgoDescription g_RkIspAlgoDescAf;
+    extern RkAiqAlgoDescription g_RkIspAlgoDescAfec;
+    extern RkAiqAlgoDescription g_RkIspAlgoDescAgamma;
+    extern RkAiqAlgoDescription g_RkIspAlgoDescAgic;
+    extern RkAiqAlgoDescription g_RkIspAlgoDescAhdr;
+    extern RkAiqAlgoDescription g_RkIspAlgoDescAie;
+    extern RkAiqAlgoDescription g_RkIspAlgoDescAldch;
+    extern RkAiqAlgoDescription g_RkIspAlgoDescAlsc;
+    extern RkAiqAlgoDescription g_RkIspAlgoDescAnr;
+    extern RkAiqAlgoDescription g_RkIspAlgoDescAorb;
+    extern RkAiqAlgoDescription g_RkIspAlgoDescAr2y;
+    extern RkAiqAlgoDescription g_RkIspAlgoDescAsd;
+    extern RkAiqAlgoDescription g_RkIspAlgoDescAsharp;
+    extern RkAiqAlgoDescription g_RkIspAlgoDescAwb;
+    extern RkAiqAlgoDescription g_RkIspAlgoDescAwdr;
+    LOGI("\n"
+        "************************** VERSION INFOS **************************\n"
+        "version release date: 2020-04-24\n"
+        "         AIQ:       %s\n"
+        "   IQ PARSER:       %s\n"
+        "   RK INTEGRATED ALGO MODULES:\n"
+        "         AWB:       %s\n"
+        "         AEC:       %s\n"
+        "          AF:       %s\n"
+        "        AHDR:       %s\n"
+        "         ANR:       %s\n"
+        "      ASHARP:       %s\n"
+        "     ADEHAZE:       %s\n"
+        "      AGAMMA:       %s\n"
+        "      A3DLUT:       %s\n"
+        "        ABLC:       %s\n"
+        "        ACCM:       %s\n"
+        "        ACGC:       %s\n"
+        "         ACP:       %s\n"
+        "    ADEBAYER:       %s\n"
+        "       ADPCC:       %s\n"
+        "        AGIC:       %s\n"
+        "         AIE:       %s\n"
+        "       ALDCH:       %s\n"
+        "        ALSC:       %s\n"
+        "        AORB:       %s\n"
+        "        AR2Y:       %s\n"
+        "         ASD:       %s\n"
+        "        AWDR:       %s\n"
+        "************************ VERSION INFOS END ************************\n"
+        , RK_AIQ_VERSION 
+        , RK_AIQ_CALIB_VERSION 
+        , g_RkIspAlgoDescAwb.common.version
+        , g_RkIspAlgoDescAe.common.version
+        , g_RkIspAlgoDescAf.common.version
+        , g_RkIspAlgoDescAhdr.common.version
+        , g_RkIspAlgoDescAnr.common.version
+        , g_RkIspAlgoDescAsharp.common.version
+        , g_RkIspAlgoDescAdhaz.common.version
+        , g_RkIspAlgoDescAgamma.common.version
+        , g_RkIspAlgoDescA3dlut.common.version
+        , g_RkIspAlgoDescAblc.common.version
+        , g_RkIspAlgoDescAccm.common.version
+        , g_RkIspAlgoDescAcgc.common.version
+        , g_RkIspAlgoDescAcp.common.version
+        , g_RkIspAlgoDescAdebayer.common.version
+        , g_RkIspAlgoDescAdpcc.common.version
+        , g_RkIspAlgoDescAfec.common.version
+        , g_RkIspAlgoDescAgic.common.version
+        , g_RkIspAlgoDescAie.common.version
+        , g_RkIspAlgoDescAldch.common.version
+        , g_RkIspAlgoDescAlsc.common.version
+        , g_RkIspAlgoDescAorb.common.version
+        , g_RkIspAlgoDescAr2y.common.version
+        , g_RkIspAlgoDescAsd.common.version
+        , g_RkIspAlgoDescAwdr.common.version
+        );
+}
+
 static void rk_aiq_init_lib(void) __attribute__((constructor));
 static void rk_aiq_init_lib(void)
 {
@@ -292,6 +379,7 @@ static void rk_aiq_init_lib(void)
 #else
     CamHwIsp20::initCamHwInfos();
 #endif
+    _print_versions();
     EXIT_XCORE_FUNCTION();
 
 }

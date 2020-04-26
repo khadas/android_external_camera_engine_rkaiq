@@ -185,13 +185,13 @@ AsharpResult_t select_rk_sharpen_hw_params_by_ISO(
 )
 {
     int i;
-	int iso_low, iso_high;
 	int gain_high, gain_low;
-	float ratio;
+	float ratio = 0.0f;
 	int iso_div 			= 50;
     int max_iso_step        = MAX_ISO_STEP;
 	AsharpResult_t res = ASHARP_RET_SUCCESS;
 	int iso = 50;
+	int iso_low = iso, iso_high = iso;
 
 	if(strksharpenParams == NULL){
 		LOGE_ASHARP("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
@@ -286,13 +286,13 @@ AsharpResult_t select_rk_sharpen_hw_v2_params_by_ISO(
 )
 {
 	int i;
-	int iso_low, iso_high;
 	int gain_high, gain_low;
-	float ratio;
+	float ratio = 0.0f;
 	int iso_div 			= 50;
 	int max_iso_step        = MAX_ISO_STEP;
 	AsharpResult_t res = ASHARP_RET_SUCCESS;
 	int iso = 50;
+	int iso_low = iso, iso_high = iso;
 
 	if(strksharpenParams == NULL){
 		LOGE_ASHARP("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
@@ -379,13 +379,13 @@ AsharpResult_t select_rk_sharpen_hw_v3_params_by_ISO(
 )
 {
 	int i;
-	int iso_low, iso_high;
 	int gain_high, gain_low;
-	float ratio;
+	float ratio = 0.0f;
 	int iso_div 			= 50;
 	int max_iso_step        = MAX_ISO_STEP;
 	AsharpResult_t res = ASHARP_RET_SUCCESS;
 	int iso = 50;
+	int iso_low = iso, iso_high = iso;
 
 	if(strksharpenParams == NULL){
 		LOGE_ASHARP("%s(%d): null pointer\n", __FUNCTION__, __LINE__);

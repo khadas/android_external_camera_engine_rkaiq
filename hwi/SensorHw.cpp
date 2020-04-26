@@ -595,7 +595,7 @@ XCamReturn
 SensorHw::set_working_mode(int mode)
 {
     rkmodule_hdr_cfg hdr_cfg;
-    __u32 hdr_mode;
+    __u32 hdr_mode = NO_HDR;
 
     xcam_mem_clear(hdr_cfg);
     if (mode == RK_AIQ_WORKING_MODE_NORMAL) {
@@ -606,6 +606,9 @@ SensorHw::set_working_mode(int mode)
     } else if (mode == RK_AIQ_ISP_HDR_MODE_3_FRAME_HDR ||
                mode == RK_AIQ_ISP_HDR_MODE_3_LINE_HDR) {
         hdr_mode = HDR_X3;
+    } else {
+        LOGE_CAMHW("failed to set hdr mode to %d", mode);
+        return XCAM_RETURN_ERROR_FAILED;
     }
     hdr_cfg.hdr_mode = hdr_mode;
     if (io_control(RKMODULE_SET_HDR_CFG, &hdr_cfg) < 0) {

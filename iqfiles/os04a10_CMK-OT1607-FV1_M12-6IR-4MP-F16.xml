@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><matfile>   <header type="struct" size="[1 1]">      <code_xml_parse_version index="1" type="char" size="[1 6]">         v1.0.1      </code_xml_parse_version>      <creation_date index="1" type="char" size="[1 11]">         2020-01-14      </creation_date>      <creator index="1" type="char" size="[1 2]">         DALON      </creator>      <sensor_name index="1" type="char" size="[1 7]">         OS04a10      </sensor_name>      <sample_name index="1" type="char" size="[1 9]">         UNKNOWN      </sample_name>      <generator_version index="1" type="char" size="[1 4]">         v1.0.1      </generator_version>   </header>   <sensor type="struct" size="[1 1]">
+<?xml version="1.0" encoding="utf-8"?><matfile>   <header type="struct" size="[1 1]">      <code_xml_parse_version index="1" type="char" size="[1 6]">         v1.0.1      </code_xml_parse_version>      <creation_date index="1" type="char" size="[1 11]">         2020-04-24      </creation_date>      <creator index="1" type="char" size="[1 2]">         sandy      </creator>      <sensor_name index="1" type="char" size="[1 7]">         OS04a10      </sensor_name>      <sample_name index="1" type="char" size="[1 9]">         UNKNOWN      </sample_name>      <generator_version index="1" type="char" size="[1 4]">         v1.0.1      </generator_version>   </header>   <sensor type="struct" size="[1 1]">
       <AWB index="1" type="struct" size="[1 1]">
 	 <wbBypass index="1" type="double" size="[1 1]">	   [0]	 </wbBypass>
 	<awbEnable index="1" type="double" size="[1 1]">	   [1]	 </awbEnable>
@@ -5543,7 +5543,7 @@
              </cell>
          </EDGEFILTER_ISO>
       </EDGEFILTER>
-      <DEHAZE index="1" type="struct" size="[1 1]">
+<DEHAZE index="1" type="struct" size="[1 1]">
          <dc_bf_h index="1" type="double" size="[5 5]">	     [12	17	19	17	12
                17	25	28	25	17
                19	28	32	28	19
@@ -5564,8 +5564,8 @@
          <DEHAZE_ISO index="1" type="cell" size="[1 9]">             <cell index="1" type="struct" size="[1 1]">
 	         <iso index="1" type="double" size="[1 1]">	            [50]	         </iso>
 	         <dehaze_en index="1" type="double" size="[1 1]">	            [1]	         </dehaze_en>
-	         <dc_en index="1" type="double" size="[1 1]">	            [0]	         </dc_en>
-	         <hist_en index="1" type="double" size="[1 1]">	            [1]	         </hist_en>
+	         <dc_en index="1" type="double" size="[1 1]">	            [1]	         </dc_en>
+	         <hist_en index="1" type="double" size="[1 1]">	            [0]	         </hist_en>
 	         <hist_channel index="1" type="double" size="[1 1]">	            [0]	         </hist_channel>
 	         <gain_en index="1" type="double" size="[1 1]">	            [1]	         </gain_en>
 	         <dc_min_th index="1" type="double" size="[1 1]">	            [64.0]	         </dc_min_th>
@@ -5585,7 +5585,7 @@
 	         <hist_th_off index="1" type="double" size="[1 1]">	            [64.0]	         </hist_th_off>
 	         <hist_k index="1" type="double" size="[1 1]">	            [2.0]	         </hist_k>
 	         <hist_min index="1" type="double" size="[1 1]">	            [0.015]	         </hist_min>
-	         <enhance_en index="1" type="double" size="[1 1]">	            [0]	         </enhance_en>
+	         <enhance_en index="1" type="double" size="[1 1]">	            [1]	         </enhance_en>
 	         <enhance_value index="1" type="double" size="[1 1]">	            [1.5]	         </enhance_value>
 	         <hist_para_en index="1" type="double" size="[1 1]">	            [1]	         </hist_para_en>
 	         <hist_scale index="1" type="double" size="[1 1]">	            [0.9]	         </hist_scale>
@@ -5599,16 +5599,16 @@
 	         <cfg_air index="1" type="double" size="[1 1]">	            [210.0]	         </cfg_air>
 	         <cfg_tmax	 index="1" type="double" size="[1 1]">	            [0.2]	         </cfg_tmax>
 	         <cfg_gratio index="1" type="double" size="[1 1]">	            [2.0]	         </cfg_gratio>
-	         <dc_thed index="1" type="double" size="[1 1]">	            [31.0]	         </dc_thed>
+	         <dc_thed index="1" type="double" size="[1 1]">	            [2.0]	         </dc_thed>
 	         <dc_weitcur index="1" type="double" size="[1 1]">	            [1.0]	         </dc_weitcur>
-	         <air_thed	 index="1" type="double" size="[1 1]">	            [31.0]	         </air_thed>
+	         <air_thed	 index="1" type="double" size="[1 1]">	            [2.0]	         </air_thed>
 	         <air_weitcur index="1" type="double" size="[1 1]">	            [0.14]	         </air_weitcur>
              </cell>
              <cell index="2" type="struct" size="[1 1]">
 	         <iso index="1" type="double" size="[1 1]">	            [100]	         </iso>
 	         <dehaze_en index="1" type="double" size="[1 1]">	            [1]	         </dehaze_en>
-	         <dc_en index="1" type="double" size="[1 1]">	            [0]	         </dc_en>
-	         <hist_en index="1" type="double" size="[1 1]">	            [1]	         </hist_en>
+	         <dc_en index="1" type="double" size="[1 1]">	            [1]	         </dc_en>
+	         <hist_en index="1" type="double" size="[1 1]">	            [0]	         </hist_en>
 	         <hist_channel index="1" type="double" size="[1 1]">	            [0]	         </hist_channel>
 	         <gain_en index="1" type="double" size="[1 1]">	            [1]	         </gain_en>
 	         <dc_min_th index="1" type="double" size="[1 1]">	            [64.0]	         </dc_min_th>
@@ -5628,7 +5628,7 @@
 	         <hist_th_off index="1" type="double" size="[1 1]">	            [64.0]	         </hist_th_off>
 	         <hist_k index="1" type="double" size="[1 1]">	            [2.0]	         </hist_k>
 	         <hist_min index="1" type="double" size="[1 1]">	            [0.015]	         </hist_min>
-	         <enhance_en index="1" type="double" size="[1 1]">	            [0]	         </enhance_en>
+	         <enhance_en index="1" type="double" size="[1 1]">	            [1]	         </enhance_en>
 	         <enhance_value index="1" type="double" size="[1 1]">	            [1.5]	         </enhance_value>
 	         <hist_para_en index="1" type="double" size="[1 1]">	            [1]	         </hist_para_en>
 	         <hist_scale index="1" type="double" size="[1 1]">	            [0.9]	         </hist_scale>
@@ -5642,16 +5642,16 @@
 	         <cfg_air index="1" type="double" size="[1 1]">	            [210.0]	         </cfg_air>
 	         <cfg_tmax	 index="1" type="double" size="[1 1]">	            [0.2]	         </cfg_tmax>
 	         <cfg_gratio index="1" type="double" size="[1 1]">	            [2.0]	         </cfg_gratio>
-	         <dc_thed index="1" type="double" size="[1 1]">	            [31.0]	         </dc_thed>
+	         <dc_thed index="1" type="double" size="[1 1]">	            [2.0]	         </dc_thed>
 	         <dc_weitcur index="1" type="double" size="[1 1]">	            [1.0]	         </dc_weitcur>
-	         <air_thed	 index="1" type="double" size="[1 1]">	            [31.0]	         </air_thed>
+	         <air_thed	 index="1" type="double" size="[1 1]">	            [2.0]	         </air_thed>
 	         <air_weitcur index="1" type="double" size="[1 1]">	            [0.14]	         </air_weitcur>
              </cell>
              <cell index="3" type="struct" size="[1 1]">
 	         <iso index="1" type="double" size="[1 1]">	            [200]	         </iso>
 	         <dehaze_en index="1" type="double" size="[1 1]">	            [1]	         </dehaze_en>
-	         <dc_en index="1" type="double" size="[1 1]">	            [0]	         </dc_en>
-	         <hist_en index="1" type="double" size="[1 1]">	            [1]	         </hist_en>
+	         <dc_en index="1" type="double" size="[1 1]">	            [1]	         </dc_en>
+	         <hist_en index="1" type="double" size="[1 1]">	            [0]	         </hist_en>
 	         <hist_channel index="1" type="double" size="[1 1]">	            [0]	         </hist_channel>
 	         <gain_en index="1" type="double" size="[1 1]">	            [1]	         </gain_en>
 	         <dc_min_th index="1" type="double" size="[1 1]">	            [64.0]	         </dc_min_th>
@@ -5671,8 +5671,8 @@
 	         <hist_th_off index="1" type="double" size="[1 1]">	            [64.0]	         </hist_th_off>
 	         <hist_k index="1" type="double" size="[1 1]">	            [2.0]	         </hist_k>
 	         <hist_min index="1" type="double" size="[1 1]">	            [0.015]	         </hist_min>
-	         <enhance_en index="1" type="double" size="[1 1]">	            [0]	         </enhance_en>
-	         <enhance_value index="1" type="double" size="[1 1]">	            [1.5]	         </enhance_value>
+	         <enhance_en index="1" type="double" size="[1 1]">	            [1]	         </enhance_en>
+	         <enhance_value index="1" type="double" size="[1 1]">	            [1.4]	         </enhance_value>
 	         <hist_para_en index="1" type="double" size="[1 1]">	            [1]	         </hist_para_en>
 	         <hist_scale index="1" type="double" size="[1 1]">	            [0.9]	         </hist_scale>
 	         <stab_fnum index="1" type="double" size="[1 1]">	            [8.0]	         </stab_fnum>
@@ -5685,16 +5685,16 @@
 	         <cfg_air index="1" type="double" size="[1 1]">	            [210.0]	         </cfg_air>
 	         <cfg_tmax	 index="1" type="double" size="[1 1]">	            [0.2]	         </cfg_tmax>
 	         <cfg_gratio index="1" type="double" size="[1 1]">	            [2.0]	         </cfg_gratio>
-	         <dc_thed index="1" type="double" size="[1 1]">	            [31.0]	         </dc_thed>
+	         <dc_thed index="1" type="double" size="[1 1]">	            [2.0]	         </dc_thed>
 	         <dc_weitcur index="1" type="double" size="[1 1]">	            [1.0]	         </dc_weitcur>
-	         <air_thed	 index="1" type="double" size="[1 1]">	            [31.0]	         </air_thed>
+	         <air_thed	 index="1" type="double" size="[1 1]">	            [2.0]	         </air_thed>
 	         <air_weitcur index="1" type="double" size="[1 1]">	            [0.14]	         </air_weitcur>
              </cell>
              <cell index="4" type="struct" size="[1 1]">
 	         <iso index="1" type="double" size="[1 1]">	            [400]	         </iso>
 	         <dehaze_en index="1" type="double" size="[1 1]">	            [1]	         </dehaze_en>
-	         <dc_en index="1" type="double" size="[1 1]">	            [0]	         </dc_en>
-	         <hist_en index="1" type="double" size="[1 1]">	            [1]	         </hist_en>
+	         <dc_en index="1" type="double" size="[1 1]">	            [1]	         </dc_en>
+	         <hist_en index="1" type="double" size="[1 1]">	            [0]	         </hist_en>
 	         <hist_channel index="1" type="double" size="[1 1]">	            [0]	         </hist_channel>
 	         <gain_en index="1" type="double" size="[1 1]">	            [1]	         </gain_en>
 	         <dc_min_th index="1" type="double" size="[1 1]">	            [64.0]	         </dc_min_th>
@@ -5714,8 +5714,8 @@
 	         <hist_th_off index="1" type="double" size="[1 1]">	            [64.0]	         </hist_th_off>
 	         <hist_k index="1" type="double" size="[1 1]">	            [2.0]	         </hist_k>
 	         <hist_min index="1" type="double" size="[1 1]">	            [0.015]	         </hist_min>
-	         <enhance_en index="1" type="double" size="[1 1]">	            [0]	         </enhance_en>
-	         <enhance_value index="1" type="double" size="[1 1]">	            [1.5]	         </enhance_value>
+	         <enhance_en index="1" type="double" size="[1 1]">	            [1]	         </enhance_en>
+	         <enhance_value index="1" type="double" size="[1 1]">	            [1.3]	         </enhance_value>
 	         <hist_para_en index="1" type="double" size="[1 1]">	            [1]	         </hist_para_en>
 	         <hist_scale index="1" type="double" size="[1 1]">	            [0.9]	         </hist_scale>
 	         <stab_fnum index="1" type="double" size="[1 1]">	            [8.0]	         </stab_fnum>
@@ -5728,16 +5728,16 @@
 	         <cfg_air index="1" type="double" size="[1 1]">	            [210.0]	         </cfg_air>
 	         <cfg_tmax	 index="1" type="double" size="[1 1]">	            [0.2]	         </cfg_tmax>
 	         <cfg_gratio index="1" type="double" size="[1 1]">	            [2.0]	         </cfg_gratio>
-	         <dc_thed index="1" type="double" size="[1 1]">	            [31.0]	         </dc_thed>
+	         <dc_thed index="1" type="double" size="[1 1]">	            [2.0]	         </dc_thed>
 	         <dc_weitcur index="1" type="double" size="[1 1]">	            [1.0]	         </dc_weitcur>
-	         <air_thed	 index="1" type="double" size="[1 1]">	            [31.0]	         </air_thed>
+	         <air_thed	 index="1" type="double" size="[1 1]">	            [2.0]	         </air_thed>
 	         <air_weitcur index="1" type="double" size="[1 1]">	            [0.14]	         </air_weitcur>
              </cell>
              <cell index="5" type="struct" size="[1 1]">
 	         <iso index="1" type="double" size="[1 1]">	            [800]	         </iso>
 	         <dehaze_en index="1" type="double" size="[1 1]">	            [1]	         </dehaze_en>
-	         <dc_en index="1" type="double" size="[1 1]">	            [0]	         </dc_en>
-	         <hist_en index="1" type="double" size="[1 1]">	            [1]	         </hist_en>
+	         <dc_en index="1" type="double" size="[1 1]">	            [1]	         </dc_en>
+	         <hist_en index="1" type="double" size="[1 1]">	            [0]	         </hist_en>
 	         <hist_channel index="1" type="double" size="[1 1]">	            [0]	         </hist_channel>
 	         <gain_en index="1" type="double" size="[1 1]">	            [1]	         </gain_en>
 	         <dc_min_th index="1" type="double" size="[1 1]">	            [64.0]	         </dc_min_th>
@@ -5757,8 +5757,8 @@
 	         <hist_th_off index="1" type="double" size="[1 1]">	            [64.0]	         </hist_th_off>
 	         <hist_k index="1" type="double" size="[1 1]">	            [2.0]	         </hist_k>
 	         <hist_min index="1" type="double" size="[1 1]">	            [0.015]	         </hist_min>
-	         <enhance_en index="1" type="double" size="[1 1]">	            [0]	         </enhance_en>
-	         <enhance_value index="1" type="double" size="[1 1]">	            [1.5]	         </enhance_value>
+	         <enhance_en index="1" type="double" size="[1 1]">	            [1]	         </enhance_en>
+	         <enhance_value index="1" type="double" size="[1 1]">	            [1.3]	         </enhance_value>
 	         <hist_para_en index="1" type="double" size="[1 1]">	            [1]	         </hist_para_en>
 	         <hist_scale index="1" type="double" size="[1 1]">	            [0.9]	         </hist_scale>
 	         <stab_fnum index="1" type="double" size="[1 1]">	            [8.0]	         </stab_fnum>
@@ -5771,16 +5771,16 @@
 	         <cfg_air index="1" type="double" size="[1 1]">	            [210.0]	         </cfg_air>
 	         <cfg_tmax	 index="1" type="double" size="[1 1]">	            [0.2]	         </cfg_tmax>
 	         <cfg_gratio index="1" type="double" size="[1 1]">	            [2.0]	         </cfg_gratio>
-	         <dc_thed index="1" type="double" size="[1 1]">	            [31.0]	         </dc_thed>
+	         <dc_thed index="1" type="double" size="[1 1]">	            [2.0]	         </dc_thed>
 	         <dc_weitcur index="1" type="double" size="[1 1]">	            [1.0]	         </dc_weitcur>
-	         <air_thed	 index="1" type="double" size="[1 1]">	            [31.0]	         </air_thed>
+	         <air_thed	 index="1" type="double" size="[1 1]">	            [2.0]	         </air_thed>
 	         <air_weitcur index="1" type="double" size="[1 1]">	            [0.14]	         </air_weitcur>
              </cell>
              <cell index="6" type="struct" size="[1 1]">
 	         <iso index="1" type="double" size="[1 1]">	            [1600]	         </iso>
 	         <dehaze_en index="1" type="double" size="[1 1]">	            [1]	         </dehaze_en>
-	         <dc_en index="1" type="double" size="[1 1]">	            [0]	         </dc_en>
-	         <hist_en index="1" type="double" size="[1 1]">	            [1]	         </hist_en>
+	         <dc_en index="1" type="double" size="[1 1]">	            [1]	         </dc_en>
+	         <hist_en index="1" type="double" size="[1 1]">	            [0]	         </hist_en>
 	         <hist_channel index="1" type="double" size="[1 1]">	            [0]	         </hist_channel>
 	         <gain_en index="1" type="double" size="[1 1]">	            [1]	         </gain_en>
 	         <dc_min_th index="1" type="double" size="[1 1]">	            [64.0]	         </dc_min_th>
@@ -5800,8 +5800,8 @@
 	         <hist_th_off index="1" type="double" size="[1 1]">	            [64.0]	         </hist_th_off>
 	         <hist_k index="1" type="double" size="[1 1]">	            [2.0]	         </hist_k>
 	         <hist_min index="1" type="double" size="[1 1]">	            [0.015]	         </hist_min>
-	         <enhance_en index="1" type="double" size="[1 1]">	            [0]	         </enhance_en>
-	         <enhance_value index="1" type="double" size="[1 1]">	            [1.5]	         </enhance_value>
+	         <enhance_en index="1" type="double" size="[1 1]">	            [1]	         </enhance_en>
+	         <enhance_value index="1" type="double" size="[1 1]">	            [1.0]	         </enhance_value>
 	         <hist_para_en index="1" type="double" size="[1 1]">	            [1]	         </hist_para_en>
 	         <hist_scale index="1" type="double" size="[1 1]">	            [0.9]	         </hist_scale>
 	         <stab_fnum index="1" type="double" size="[1 1]">	            [8.0]	         </stab_fnum>
@@ -5814,15 +5814,15 @@
 	         <cfg_air index="1" type="double" size="[1 1]">	            [210.0]	         </cfg_air>
 	         <cfg_tmax	 index="1" type="double" size="[1 1]">	            [0.2]	         </cfg_tmax>
 	         <cfg_gratio index="1" type="double" size="[1 1]">	            [2.0]	         </cfg_gratio>
-	         <dc_thed index="1" type="double" size="[1 1]">	            [31.0]	         </dc_thed>
+	         <dc_thed index="1" type="double" size="[1 1]">	            [2.0]	         </dc_thed>
 	         <dc_weitcur index="1" type="double" size="[1 1]">	            [1.0]	         </dc_weitcur>
-	         <air_thed	 index="1" type="double" size="[1 1]">	            [31.0]	         </air_thed>
+	         <air_thed	 index="1" type="double" size="[1 1]">	            [2.0]	         </air_thed>
 	         <air_weitcur index="1" type="double" size="[1 1]">	            [0.14]	         </air_weitcur>
              </cell>
              <cell index="7" type="struct" size="[1 1]">
 	         <iso index="1" type="double" size="[1 1]">	            [3200]	         </iso>
 	         <dehaze_en index="1" type="double" size="[1 1]">	            [1]	         </dehaze_en>
-	         <dc_en index="1" type="double" size="[1 1]">	            [0]	         </dc_en>
+	         <dc_en index="1" type="double" size="[1 1]">	            [1]	         </dc_en>
 	         <hist_en index="1" type="double" size="[1 1]">	            [1]	         </hist_en>
 	         <hist_channel index="1" type="double" size="[1 1]">	            [0]	         </hist_channel>
 	         <gain_en index="1" type="double" size="[1 1]">	            [1]	         </gain_en>
@@ -5843,8 +5843,8 @@
 	         <hist_th_off index="1" type="double" size="[1 1]">	            [64.0]	         </hist_th_off>
 	         <hist_k index="1" type="double" size="[1 1]">	            [2.0]	         </hist_k>
 	         <hist_min index="1" type="double" size="[1 1]">	            [0.015]	         </hist_min>
-	         <enhance_en index="1" type="double" size="[1 1]">	            [0]	         </enhance_en>
-	         <enhance_value index="1" type="double" size="[1 1]">	            [1.5]	         </enhance_value>
+	         <enhance_en index="1" type="double" size="[1 1]">	            [1]	         </enhance_en>
+	         <enhance_value index="1" type="double" size="[1 1]">	            [1.0]	         </enhance_value>
 	         <hist_para_en index="1" type="double" size="[1 1]">	            [1]	         </hist_para_en>
 	         <hist_scale index="1" type="double" size="[1 1]">	            [0.9]	         </hist_scale>
 	         <stab_fnum index="1" type="double" size="[1 1]">	            [8.0]	         </stab_fnum>
@@ -5857,15 +5857,15 @@
 	         <cfg_air index="1" type="double" size="[1 1]">	            [210.0]	         </cfg_air>
 	         <cfg_tmax	 index="1" type="double" size="[1 1]">	            [0.2]	         </cfg_tmax>
 	         <cfg_gratio index="1" type="double" size="[1 1]">	            [2.0]	         </cfg_gratio>
-	         <dc_thed index="1" type="double" size="[1 1]">	            [31.0]	         </dc_thed>
+	         <dc_thed index="1" type="double" size="[1 1]">	            [2.0]	         </dc_thed>
 	         <dc_weitcur index="1" type="double" size="[1 1]">	            [1.0]	         </dc_weitcur>
-	         <air_thed	 index="1" type="double" size="[1 1]">	            [31.0]	         </air_thed>
+	         <air_thed	 index="1" type="double" size="[1 1]">	            [2.0]	         </air_thed>
 	         <air_weitcur index="1" type="double" size="[1 1]">	            [0.14]	         </air_weitcur>
              </cell>
              <cell index="8" type="struct" size="[1 1]">
 	         <iso index="1" type="double" size="[1 1]">	            [6400]	         </iso>
 	         <dehaze_en index="1" type="double" size="[1 1]">	            [1]	         </dehaze_en>
-	         <dc_en index="1" type="double" size="[1 1]">	            [0]	         </dc_en>
+	         <dc_en index="1" type="double" size="[1 1]">	            [1]	         </dc_en>
 	         <hist_en index="1" type="double" size="[1 1]">	            [1]	         </hist_en>
 	         <hist_channel index="1" type="double" size="[1 1]">	            [0]	         </hist_channel>
 	         <gain_en index="1" type="double" size="[1 1]">	            [1]	         </gain_en>
@@ -5886,8 +5886,8 @@
 	         <hist_th_off index="1" type="double" size="[1 1]">	            [64.0]	         </hist_th_off>
 	         <hist_k index="1" type="double" size="[1 1]">	            [2.0]	         </hist_k>
 	         <hist_min index="1" type="double" size="[1 1]">	            [0.015]	         </hist_min>
-	         <enhance_en index="1" type="double" size="[1 1]">	            [0]	         </enhance_en>
-	         <enhance_value index="1" type="double" size="[1 1]">	            [1.5]	         </enhance_value>
+	         <enhance_en index="1" type="double" size="[1 1]">	            [1]	         </enhance_en>
+	         <enhance_value index="1" type="double" size="[1 1]">	            [1.0]	         </enhance_value>
 	         <hist_para_en index="1" type="double" size="[1 1]">	            [1]	         </hist_para_en>
 	         <hist_scale index="1" type="double" size="[1 1]">	            [0.9]	         </hist_scale>
 	         <stab_fnum index="1" type="double" size="[1 1]">	            [8.0]	         </stab_fnum>
@@ -5900,15 +5900,15 @@
 	         <cfg_air index="1" type="double" size="[1 1]">	            [210.0]	         </cfg_air>
 	         <cfg_tmax	 index="1" type="double" size="[1 1]">	            [0.2]	         </cfg_tmax>
 	         <cfg_gratio index="1" type="double" size="[1 1]">	            [2.0]	         </cfg_gratio>
-	         <dc_thed index="1" type="double" size="[1 1]">	            [31.0]	         </dc_thed>
+	         <dc_thed index="1" type="double" size="[1 1]">	            [2.0]	         </dc_thed>
 	         <dc_weitcur index="1" type="double" size="[1 1]">	            [1.0]	         </dc_weitcur>
-	         <air_thed	 index="1" type="double" size="[1 1]">	            [31.0]	         </air_thed>
+	         <air_thed	 index="1" type="double" size="[1 1]">	            [2.0]	         </air_thed>
 	         <air_weitcur index="1" type="double" size="[1 1]">	            [0.14]	         </air_weitcur>
              </cell>
              <cell index="9" type="struct" size="[1 1]">
 	         <iso index="1" type="double" size="[1 1]">	            [12800]	         </iso>
 	         <dehaze_en index="1" type="double" size="[1 1]">	            [1]	         </dehaze_en>
-	         <dc_en index="1" type="double" size="[1 1]">	            [0]	         </dc_en>
+	         <dc_en index="1" type="double" size="[1 1]">	            [1]	         </dc_en>
 	         <hist_en index="1" type="double" size="[1 1]">	            [1]	         </hist_en>
 	         <hist_channel index="1" type="double" size="[1 1]">	            [0]	         </hist_channel>
 	         <gain_en index="1" type="double" size="[1 1]">	            [1]	         </gain_en>
@@ -5929,8 +5929,8 @@
 	         <hist_th_off index="1" type="double" size="[1 1]">	            [64.0]	         </hist_th_off>
 	         <hist_k index="1" type="double" size="[1 1]">	            [2.0]	         </hist_k>
 	         <hist_min index="1" type="double" size="[1 1]">	            [0.015]	         </hist_min>
-	         <enhance_en index="1" type="double" size="[1 1]">	            [0]	         </enhance_en>
-	         <enhance_value index="1" type="double" size="[1 1]">	            [1.5]	         </enhance_value>
+	         <enhance_en index="1" type="double" size="[1 1]">	            [1]	         </enhance_en>
+	         <enhance_value index="1" type="double" size="[1 1]">	            [1.0]	         </enhance_value>
 	         <hist_para_en index="1" type="double" size="[1 1]">	            [1]	         </hist_para_en>
 	         <hist_scale index="1" type="double" size="[1 1]">	            [0.9]	         </hist_scale>
 	         <stab_fnum index="1" type="double" size="[1 1]">	            [8.0]	         </stab_fnum>
@@ -5943,13 +5943,13 @@
 	         <cfg_air index="1" type="double" size="[1 1]">	            [210.0]	         </cfg_air>
 	         <cfg_tmax	 index="1" type="double" size="[1 1]">	            [0.2]	         </cfg_tmax>
 	         <cfg_gratio index="1" type="double" size="[1 1]">	            [2.0]	         </cfg_gratio>
-	         <dc_thed index="1" type="double" size="[1 1]">	            [31.0]	         </dc_thed>
+	         <dc_thed index="1" type="double" size="[1 1]">	            [2.0]	         </dc_thed>
 	         <dc_weitcur index="1" type="double" size="[1 1]">	            [1.0]	         </dc_weitcur>
-	         <air_thed	 index="1" type="double" size="[1 1]">	            [31.0]	         </air_thed>
+	         <air_thed	 index="1" type="double" size="[1 1]">	            [2.0]	         </air_thed>
 	         <air_weitcur index="1" type="double" size="[1 1]">	            [0.14]	         </air_weitcur>
              </cell>
          </DEHAZE_ISO>
-      </DEHAZE>
+      </DEHAZE>      
       <SENSORINFO index="1" type="struct" size="[1 1]">
          <GainRange index="1" type="double" size="[4 7]">	   [1 2 16 0 1 16 32	    2 4 16 0 1 32 64	    4 8 16 0 1 64 128	    8 16 16 0 1 128 256]         </GainRange>         <TimeFactor index="1" type="double" size="[1 4]">            [0 0 1 0.5]         </TimeFactor>
          <DCGRatio index="1" type="double" size="[1 1]">            [1]         </DCGRatio>

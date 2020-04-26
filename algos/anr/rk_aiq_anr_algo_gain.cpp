@@ -5,6 +5,7 @@ typedef	double              FLOAT_GAIN;
 
 uint32_t FLOAT_LIM2_INT(float In, int bit_deci_dst, int type = 0)
 {
+    // would trigger strict-aliasing compile warning on -Os level
 	int exp_val = (((uint32_t*)(&In))[0] >> 23) & 0xff;
 	uint32_t dst;
 	int shf_bit;
@@ -80,7 +81,7 @@ ANRresult_t gain_fix_transfer(RKAnr_Mfnr_Params_Select_t *pMfnrSelect, RKAnr_Gai
 	//pGainFix->gain_table_en = 1;
     memcpy(noise_sigma_dehaze, pMfnrSelect->noise_sigma_dehaze, sizeof(pMfnrSelect->noise_sigma_dehaze));
 
-	for(i = 0; i < MAX_INTEPORATATION_LUMAPOINT - 1; i++){
+	for(i = 0; i < MAX_INTEPORATATION_LUMAPOINT - 2; i++){
 		pGainFix->idx[i] = pMfnrSelect->fix_x_pos_dehaze[i+1];
 		if(pGainFix->idx[i] > 255){
 			pGainFix->idx[i] = 255;

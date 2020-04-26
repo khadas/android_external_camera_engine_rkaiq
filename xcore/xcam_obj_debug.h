@@ -45,7 +45,7 @@
                     (cur_sys_time.tv_usec - first_sys_time.tv_usec)/1000000.0f;  \
                 current = (cur_sys_time.tv_sec - last_sys_time.tv_sec)*1.0f +    \
                     (cur_sys_time.tv_usec - last_sys_time.tv_usec)/1000000.0f;   \
-                printf("%s Current fps: %.2f, Total avg fps: %.2f\n",            \
+                LOGI("%s Current fps: %.2f, Total avg fps: %.2f\n",            \
                     #objname, ((float)(count))/current, (float)num_frame/total); \
                 last_sys_time = cur_sys_time;       \
             }                                       \
@@ -66,7 +66,7 @@
     name##_sum_time += (name##_end_time.tv_sec - name##_start_time.tv_sec)*1000.0f +  \
                    (name##_end_time.tv_usec - name##_start_time.tv_usec)/1000.0f; \
     if (name##_times >= times_of_print) {               \
-        printf ("profiling %s, fps:%.2f duration:%.2fms\n", #name, \
+        LOGI("profiling %s, fps:%.2f duration:%.2fms\n", #name, \
             (name##_times*1000.0f/name##_sum_time), name##_sum_time/name##_times); \
         name##_times = 0;                               \
         name##_sum_time = 0.0;                          \
@@ -97,7 +97,7 @@
         char buf[1024];                     \
         snprintf (buf, 1024, "profiling %s,average duration:%.2fms\n", \
         (name), (_profiling_sum_duration/times)); \
-        printf ("%s", buf);                 \
+        LOGI("%s", buf);                 \
         _profiling_times = 0;               \
         _profiling_sum_duration = 0.0;      \
     }

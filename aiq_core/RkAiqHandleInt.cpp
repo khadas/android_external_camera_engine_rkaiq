@@ -1620,7 +1620,7 @@ RkAiqAhdrHandleInt::setAttrib(ahdr_attrib_t att)
     // called by RkAiqCore
 
     // if something changed
-    if (0 != memcmp(&mCurAtt, &att, sizeof(Uapi_ExpSwAttr_t))) {
+    if (0 != memcmp(&mCurAtt, &att, sizeof(ahdr_attrib_t))) {
         mCurAtt = att;
         updateAtt = true;
     }

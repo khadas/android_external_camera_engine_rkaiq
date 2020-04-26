@@ -22,7 +22,7 @@
 
 #include "rk_aiq_algo_des.h"
 
-#define RKISP_ALGO_ADEBAYER_VERSION     "v2.0.0"
+#define RKISP_ALGO_ADEBAYER_VERSION     "v0.0.1"
 #define RKISP_ALGO_ADEBAYER_VENDOR      "Rockchip"
 #define RKISP_ALGO_ADEBAYER_DESCRIPTION "Rockchip Adebayer algo for ISP2.0"
 
