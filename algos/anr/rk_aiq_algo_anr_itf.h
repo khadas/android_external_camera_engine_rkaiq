@@ -22,7 +22,7 @@
 
 #include "rk_aiq_algo_des.h"
 
-#define RKISP_ALGO_ANR_VERSION     "v2.0.0"
+#define RKISP_ALGO_ANR_VERSION     "v0.0.9"
 #define RKISP_ALGO_ANR_VENDOR      "Rockchip"
 #define RKISP_ALGO_ANR_DESCRIPTION "Rockchip Anr algo for ISP2.0"
 

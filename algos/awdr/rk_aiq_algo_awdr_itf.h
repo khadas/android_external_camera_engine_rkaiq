@@ -22,7 +22,7 @@
 
 #include "rk_aiq_algo_des.h"
 
-#define RKISP_ALGO_AWDR_VERSION     "v2.0.0"
+#define RKISP_ALGO_AWDR_VERSION     "v0.0.9"
 #define RKISP_ALGO_AWDR_VENDOR      "Rockchip"
 #define RKISP_ALGO_AWDR_DESCRIPTION "Rockchip Awdr algo for ISP2.0"
 

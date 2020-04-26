@@ -18,7 +18,7 @@
 #ifndef _ISP20_MODULE_DBG_H_
 #define _ISP20_MODULE_DBG_H_ 
 
-//#define RUNTIME_MODULE_DEBUG
+#define RUNTIME_MODULE_DEBUG
 #ifdef RUNTIME_MODULE_DEBUG
 extern unsigned long long g_disable_isp_modules_en;
 extern unsigned long long g_disable_isp_modules_cfg_update;
@@ -28,7 +28,8 @@ extern int g_bypass_exp_params;
 extern int g_bypass_isp_params;
 extern int g_bypass_ispp_params;
 extern int g_apply_init_params_only;
-void get_dbg_force_disable_mods_env();
+extern void get_dbg_force_disable_mods_env();
+extern int get_rkaiq_runtime_dbg();
 #endif
 
 #endif

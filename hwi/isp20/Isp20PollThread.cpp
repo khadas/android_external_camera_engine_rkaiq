@@ -19,6 +19,7 @@
 #include "Isp20StatsBuffer.h"
 #include "rkisp2-config.h"
 #include "SensorHw.h"
+#include "Isp20_module_dbg.h"
 #include <fcntl.h>
 
 namespace RkCam {
@@ -88,6 +89,9 @@ Isp20PollThread::notify_sof (int64_t time, int frameid)
 
     XCAM_ASSERT(_event_handle_dev.ptr());
     ret = _event_handle_dev->handle_sof(time, frameid);
+    if (get_rkaiq_runtime_dbg() > 0) {
+        XCAM_STATIC_FPS_CALCULATION(SOF_FPS, 60);
+    }
     EXIT_CAMHW_FUNCTION();
 
     return ret;
@@ -580,7 +584,7 @@ Isp20PollThread::trigger_readback(uint32_t sequence)
         }
 
 	/* TODO: fix the trigger time for ahdr temporarily */
-	tg.times = 1;
+	tg.times = 2;
 	LOGW_CAMHW("%s fix the trigger to %d time for ahdr temporarily\n",
 			   __func__,
 			   tg.times);

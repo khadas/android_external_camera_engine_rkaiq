@@ -139,11 +139,11 @@ ANRresult_t init_ynr_params(RKAnr_Ynr_Params_s *pYnrParams, CalibDb_YNR_t* pYnrC
 ANRresult_t select_ynr_params_by_ISO(RKAnr_Ynr_Params_t *stYnrParam, RKAnr_Ynr_Params_Select_t *stYnrParamSelected, ANRExpInfo_t *pExpInfo, short bitValue)
 {
 	short multBit;
-	float ratio;
+	float ratio = 0.0f;
 	int isoValue = 50;
 	float global_gain = 1.0;
-	RKAnr_Ynr_Params_Select_t *pstYNrTuneParamHi;
-	RKAnr_Ynr_Params_Select_t *pstYNrTuneParamLo;
+	RKAnr_Ynr_Params_Select_t *pstYNrTuneParamHi = NULL;
+	RKAnr_Ynr_Params_Select_t *pstYNrTuneParamLo = NULL;
 
 	
 	ANRresult_t res = ANR_RET_SUCCESS;

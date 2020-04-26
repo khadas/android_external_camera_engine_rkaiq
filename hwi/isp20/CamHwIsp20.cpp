@@ -22,10 +22,6 @@
 #include "mediactl/mediactl-priv.h"
 #include <linux/v4l2-subdev.h>
 
-
-
-
-
 namespace RkCam {
 std::map<std::string, SmartPtr<rk_aiq_static_info_t>> CamHwIsp20::mCamHwInfos;
 std::map<std::string, SmartPtr<rk_sensor_full_info_t>> CamHwIsp20::mSensorHwInfos;
@@ -1362,10 +1358,10 @@ CamHwIsp20::setIspParamsSync(int frameId)
         _effecting_ispparm_map.erase(_effecting_ispparm_map.begin());
 
     if (_pending_ispparams_queue.empty()) {
-	LOGE_CAMHW("no new isp params !");
+        LOGW_CAMHW("no new isp params for frame %d !", frameId);
+        _mutex.unlock();
 
-	_mutex.unlock();
-	return ret;
+        return ret;
     }
 
     // merge all pending params

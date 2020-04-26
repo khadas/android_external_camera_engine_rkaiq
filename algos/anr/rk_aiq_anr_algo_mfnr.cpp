@@ -223,7 +223,7 @@ ANRresult_t select_mfnr_params_by_ISO(RKAnr_Mfnr_Params_t *stmfnrParams, 	RKAnr_
 	iso = pExpInfo->arIso[pExpInfo->hdr_mode];
 	
     int i, j;
-	int iso_low, iso_high;
+	int iso_low = iso, iso_high = iso;
 	int gain_high, gain_low;
 	double ratio;
 	int iso_div 			= 50;

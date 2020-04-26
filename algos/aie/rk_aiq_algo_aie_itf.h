@@ -22,7 +22,7 @@
 
 #include "rk_aiq_algo_des.h"
 
-#define RKISP_ALGO_AIE_VERSION     "v2.0.0"
+#define RKISP_ALGO_AIE_VERSION     "v0.0.9"
 #define RKISP_ALGO_AIE_VENDOR      "Rockchip"
 #define RKISP_ALGO_AIE_DESCRIPTION "Rockchip Aie algo for ISP2.0"
 

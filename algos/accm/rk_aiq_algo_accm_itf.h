@@ -22,7 +22,7 @@
 
 #include "rk_aiq_algo_types_int.h"
 
-#define RKISP_ALGO_ACCM_VERSION     "v2.0.0"
+#define RKISP_ALGO_ACCM_VERSION     "v0.0.9"
 #define RKISP_ALGO_ACCM_VENDOR      "Rockchip"
 #define RKISP_ALGO_ACCM_DESCRIPTION "Rockchip Accm algo for ISP2.0"
 

@@ -222,12 +222,13 @@ endif()
 
 # add C++11 option
 #add_compile_options(-std=c++11)
-add_compile_options(-fPIC -Wall -Wno-error)
+add_compile_options(-fPIC -Wall -Wno-error -Os -g)
 add_compile_options(-Wno-unused-variable
 					-Wno-unused-but-set-variable
 					-Wno-unused-function
 					-Wno-misleading-indentation
-					-Wno-unused-label)
+					-Wno-unused-label
+					-fno-strict-aliasing)
 # add_compile_options(-v)
 add_definitions(-D_CRT_SECURE_NO_WARNINGS)
 

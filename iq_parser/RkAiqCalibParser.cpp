@@ -186,11 +186,14 @@ int RkAiqCalibParser::ParseFloatArray
         {
             for (int k = 0; k < cols; k++)
                 snprintf(str, sizeof(str), cmd, strp, values[i * cols + k]);
-            if (i < rows - 1)
-                snprintf(str, sizeof(str), "%s\n%s", strp, autoTabStr);
+            if (i < rows - 1) {
+                strcat(str, "\n");
+                strcat(str, autoTabStr);
+            }
         }
         autoTabBackward();
-        snprintf(str, sizeof(str), "%s]\n%s", strp, autoTabStr);
+        strcat(str, "]\n");
+        strcat(str, autoTabStr);
 
         XMLNode* pComment = (XMLNode*)pNode->ToElement()->FirstChild();
         pComment->SetValue((const char *)str);
@@ -290,17 +293,22 @@ int RkAiqCalibParser::ParseDoubleArray
         int cols = XmlTag(pNode->ToElement()).SizeCol();
         int rows = XmlTag(pNode->ToElement()).SizeRow();
         char str[8192];
-        char* strp = str;
         snprintf(str, sizeof(str), "\n%s[", autoTabStr);
+        char tmp_val_str[25];
         for (int i = 0; i < rows; i++)
         {
-            for (int k = 0; k < cols; k++)
-                snprintf(str, sizeof(str), "%s%.14e ", strp, values[i * cols + k]);
-            if (i < rows - 1)
-                snprintf(str, sizeof(str), "%s\n%s", strp, autoTabStr);
+            for (int k = 0; k < cols; k++) {
+                snprintf(tmp_val_str, sizeof(tmp_val_str), "%.14e ", values[i * cols + k]);
+                strcat(str, tmp_val_str);
+            }
+            if (i < rows - 1) {
+                strcat(str, "\n");
+                strcat(str, autoTabStr);
+            }
         }
         autoTabBackward();
-        snprintf(str, sizeof(str), "%s]\n%s", strp, autoTabStr);
+        strcat(str, "]\n");
+        strcat(str, autoTabStr);
 
         XMLNode* pComment = (XMLNode*)pNode->ToElement()->FirstChild();
         pComment->SetValue((const char *)str);
@@ -401,17 +409,22 @@ int RkAiqCalibParser::ParseUintArray
         int cols = XmlTag(pNode->ToElement()).SizeCol();
         int rows = XmlTag(pNode->ToElement()).SizeRow();
         char str[8192];
-        char* strp = str;
         snprintf(str, sizeof(str), "\n%s[", autoTabStr);
+        char tmp_val_str[25];
         for (int i = 0; i < rows; i++)
         {
-            for (int k = 0; k < cols; k++)
-                snprintf(str, sizeof(str), "%s%d ", strp, values[i * cols + k]);
-            if (i < rows - 1)
-                snprintf(str, sizeof(str), "%s\n%s", strp, autoTabStr);
+            for (int k = 0; k < cols; k++) {
+                snprintf(tmp_val_str, sizeof(tmp_val_str), "%d ", values[i * cols + k]);
+                strcat(str, tmp_val_str);
+            }
+            if (i < rows - 1) {
+                strcat(str, "\n");
+                strcat(str, autoTabStr);
+            }
         }
         autoTabBackward();
-        snprintf(str, sizeof(str), "%s]\n%s", strp, autoTabStr);
+        strcat(str, "]\n");
+        strcat(str, autoTabStr);
 
         XMLNode* pComment = (XMLNode*)pNode->ToElement()->FirstChild();
         pComment->SetValue((const char *)str);
@@ -510,17 +523,23 @@ int RkAiqCalibParser::ParseIntArray
         int cols = XmlTag(pNode->ToElement()).SizeCol();
         int rows = XmlTag(pNode->ToElement()).SizeRow();
         char str[8192];
-        char* strp = str;
         snprintf(str, sizeof(str), "\n%s[", autoTabStr);
+        char tmp_val_str[25];
         for (int i = 0; i < rows; i++)
         {
-            for (int k = 0; k < cols; k++)
-                snprintf(str, sizeof(str), "%s%d ", strp, values[i * cols + k]);
-            if (i < rows - 1)
-                snprintf(str, sizeof(str), "%s\n%s", strp, autoTabStr);
+            for (int k = 0; k < cols; k++) {
+                snprintf(tmp_val_str, sizeof(tmp_val_str), "%d", values[i * cols + k]);
+                strcat(str, tmp_val_str);
+            }
+
+            if (i < rows - 1) {
+                strcat(str, "\n");
+                strcat(str, autoTabStr);
+            }
         }
         autoTabBackward();
-        snprintf(str, sizeof(str), "%s]\n%s", strp, autoTabStr);
+        strcat(str, "]\n");
+        strcat(str, autoTabStr);
 
         XMLNode* pComment = (XMLNode*)pNode->ToElement()->FirstChild();
         pComment->SetValue((const char *)str);
@@ -622,17 +641,23 @@ int RkAiqCalibParser::ParseUcharArray
         int cols = XmlTag(pNode->ToElement()).SizeCol();
         int rows = XmlTag(pNode->ToElement()).SizeRow();
         char str[8192];
-        char* strp = str;
         snprintf(str, sizeof(str), "\n%s[", autoTabStr);
+        char tmp_val_str[25];
         for (int i = 0; i < rows; i++)
         {
-            for (int k = 0; k < cols; k++)
-                snprintf(str, sizeof(str), "%s%d ", strp, values[i * cols + k]);
-            if (i < rows - 1)
-                snprintf(str, sizeof(str), "%s\n%s", strp, autoTabStr);
+            for (int k = 0; k < cols; k++) {
+                snprintf(tmp_val_str, sizeof(tmp_val_str), "%d ", values[i * cols + k]);
+                strcat(str, tmp_val_str);
+            }
+
+            if (i < rows - 1) {
+                strcat(str, "\n");
+                strcat(str, autoTabStr);
+            }
         }
         autoTabBackward();
-        snprintf(str, sizeof(str), "%s]\n%s", strp, autoTabStr);
+        strcat(str, "]\n");
+        strcat(str, autoTabStr);
 
         XMLNode* pComment = (XMLNode*)pNode->ToElement()->FirstChild();
         pComment->SetValue((const char *)str);
@@ -732,18 +757,25 @@ int RkAiqCalibParser::ParseCharArray
         autoTabForward();
         int cols = XmlTag(pNode->ToElement()).SizeCol();
         int rows = XmlTag(pNode->ToElement()).SizeRow();
+
         char str[8192];
-        char* strp = str;
         snprintf(str, sizeof(str), "\n%s[", autoTabStr);
+        char tmp_val_str[25];
         for (int i = 0; i < rows; i++)
         {
-            for (int k = 0; k < cols; k++)
-                snprintf(str, sizeof(str), "%s%d ", strp, values[i * cols + k]);
-            if (i < rows - 1)
-                snprintf(str, sizeof(str), "%s\n%s", strp, autoTabStr);
+            for (int k = 0; k < cols; k++) {
+                snprintf(tmp_val_str, sizeof(tmp_val_str), "%d ", values[i * cols + k]);
+                strcat(str, tmp_val_str);
+            }
+
+            if (i < rows - 1) {
+                strcat(str, "\n");
+                strcat(str, autoTabStr);
+            }
         }
         autoTabBackward();
-        snprintf(str, sizeof(str), "%s]\n%s", strp, autoTabStr);
+        strcat(str, "]\n");
+        strcat(str, autoTabStr);
 
         XMLNode* pComment = (XMLNode*)pNode->ToElement()->FirstChild();
         pComment->SetValue((const char *)str);
@@ -847,17 +879,23 @@ int RkAiqCalibParser::ParseUshortArray
         int cols = XmlTag(pNode->ToElement()).SizeCol();
         int rows = XmlTag(pNode->ToElement()).SizeRow();
         char str[8192];
-        char* strp = str;
         snprintf(str, sizeof(str), "\n%s[", autoTabStr);
+        char tmp_val_str[25];
         for (int i = 0; i < rows; i++)
         {
-            for (int k = 0; k < cols; k++)
-                snprintf(str, sizeof(str), "%s%d ", strp, values[i * cols + k]);
-            if (i < rows - 1)
-                snprintf(str, sizeof(str), "%s\n%s", strp, autoTabStr);
+            for (int k = 0; k < cols; k++) {
+                snprintf(tmp_val_str, sizeof(tmp_val_str), "%d ", values[i * cols + k]);
+                strcat(str, tmp_val_str);
+            }
+
+            if (i < rows - 1) {
+                strcat(str, "\n");
+                strcat(str, autoTabStr);
+            }
         }
         autoTabBackward();
-        snprintf(str, sizeof(str), "%s]\n%s", strp, autoTabStr);
+        strcat(str, "]\n");
+        strcat(str, autoTabStr);
 
         XMLNode* pComment = (XMLNode*)pNode->ToElement()->FirstChild();
         pComment->SetValue((const char *)str);
@@ -961,17 +999,23 @@ int RkAiqCalibParser::ParseShortArray
         int cols = XmlTag(pNode->ToElement()).SizeCol();
         int rows = XmlTag(pNode->ToElement()).SizeRow();
         char str[8192];
-        char* strp = str;
         snprintf(str, sizeof(str), "\n%s[", autoTabStr);
+        char tmp_val_str[25];
         for (int i = 0; i < rows; i++)
         {
-            for (int k = 0; k < cols; k++)
-                snprintf(str, sizeof(str), "%s%d ", strp, values[i * cols + k]);
-            if (i < rows - 1)
-                snprintf(str, sizeof(str), "%s\n%s", strp, autoTabStr);
+            for (int k = 0; k < cols; k++) {
+                snprintf(tmp_val_str, sizeof(tmp_val_str), "%d ", values[i * cols + k]);
+                strcat(str, tmp_val_str);
+            }
+
+            if (i < rows - 1) {
+                strcat(str, "\n");
+                strcat(str, autoTabStr);
+            }
         }
         autoTabBackward();
-        snprintf(str, sizeof(str), "%s]\n%s", strp, autoTabStr);
+        strcat(str, "]\n");
+        strcat(str, autoTabStr);
 
         XMLNode* pComment = (XMLNode*)pNode->ToElement()->FirstChild();
         pComment->SetValue((const char *)str);
@@ -1077,17 +1121,23 @@ int RkAiqCalibParser::ParseByteArray
         int cols = XmlTag(pNode->ToElement()).SizeCol();
         int rows = XmlTag(pNode->ToElement()).SizeRow();
         char str[8192];
-        char* strp = str;
         snprintf(str, sizeof(str), "\n%s[", autoTabStr);
+        char tmp_val_str[25];
         for (int i = 0; i < rows; i++)
         {
-            for (int k = 0; k < cols; k++)
-                snprintf(str, sizeof(str), "%s%d ", strp, values[i * cols + k]);
-            if (i < rows - 1)
-                snprintf(str, sizeof(str), "%s\n%s", strp, autoTabStr);
+            for (int k = 0; k < cols; k++) {
+                snprintf(tmp_val_str, sizeof(tmp_val_str), "%d ", values[i * cols + k]);
+                strcat(str, tmp_val_str);
+            }
+
+            if (i < rows - 1) {
+                strcat(str, "\n");
+                strcat(str, autoTabStr);
+            }
         }
         autoTabBackward();
-        snprintf(str, sizeof(str), "%s]\n%s", strp, autoTabStr);
+        strcat(str, "]\n");
+        strcat(str, autoTabStr);
 
         XMLNode* pComment = (XMLNode*)pNode->ToElement()->FirstChild();
         pComment->SetValue((const char *)str);
@@ -1135,13 +1185,13 @@ int RkAiqCalibParser::ParseString
     else if (xmlParseReadWrite == XML_PARSER_WRITE)
     {
         char str[8192];
-        char* strp = str;
         //sprintf(str, "[%s]", values);
         autoTabForward();
         autoTabForward();
         snprintf(str, sizeof(str), "\n%s%s", autoTabStr, values);
         autoTabBackward();
-        snprintf(str, sizeof(str), "%s\n%s", strp, autoTabStr);
+        strcat(str,"\n");
+        strcat(str, autoTabStr);
         autoTabBackward();
         XMLNode* pComment = (XMLNode*)pNode->ToElement()->FirstChild();
         pComment->SetValue((const char *)str);
@@ -1237,18 +1287,18 @@ int RkAiqCalibParser::ParseLscProfileArray
         autoTabForward();
         autoTabForward();
         char str[8192];
-        char* strp = str;
         snprintf(str, sizeof(str), "\n%s", autoTabStr);
         int i = 0;
         size_t str_len = 0;
         while (values[i][0] != 0)
         {
             str_len += strlen(values[i]);
-            snprintf(str, sizeof(str), "%s%s ", strp, values[i++]);
+            strcat(str, values[i++]);
             str_len++;
         }
         autoTabBackward();
-        snprintf(str, sizeof(str), "%s\n%s", strp, autoTabStr);
+        strcat(str, "\n");
+        strcat(str, autoTabStr);
         XMLNode* pComment = (XMLNode*)pNode->ToElement()->FirstChild();
         pComment->SetValue((const char *)str);
 
@@ -1509,12 +1559,12 @@ bool RkAiqCalibParser::parseEntryHeader
             if (xmlParseReadWrite == XML_PARSER_WRITE)
             {
                 char str[256];
-                char* strp = str;
                 autoTabForward();
                 autoTabForward();
                 snprintf(str, sizeof(str), "\n%s%s", autoTabStr, value);
                 autoTabBackward();
-                snprintf(str, sizeof(str), "%s\n%s", strp, autoTabStr);
+                strcat(str, "\n");
+                strcat(str, autoTabStr);
                 autoTabBackward();
                 XMLNode* pComment = (XMLNode*)pchild->ToElement()->FirstChild();
                 pComment->SetValue((const char *)str);
@@ -1529,12 +1579,12 @@ bool RkAiqCalibParser::parseEntryHeader
             if (xmlParseReadWrite == XML_PARSER_WRITE)
             {
                 char str[256];
-                char* strp = str;
                 autoTabForward();
                 autoTabForward();
                 snprintf(str, sizeof(str), "\n%s%s", autoTabStr, value);
                 autoTabBackward();
-                snprintf(str, sizeof(str), "%s\n%s", strp, autoTabStr);
+                strcat(str, "\n");
+                strcat(str, autoTabStr);
                 autoTabBackward();
                 XMLNode* pComment = (XMLNode*)pchild->ToElement()->FirstChild();
                 pComment->SetValue((const char *)str);
@@ -1549,12 +1599,12 @@ bool RkAiqCalibParser::parseEntryHeader
             if (xmlParseReadWrite == XML_PARSER_WRITE)
             {
                 char str[256];
-                char* strp = str;
                 autoTabForward();
                 autoTabForward();
                 snprintf(str, sizeof(str), "\n%s%s", autoTabStr, value);
                 autoTabBackward();
-                snprintf(str, sizeof(str), "%s\n%s", strp, autoTabStr);
+                strcat(str, "\n");
+                strcat(str, autoTabStr);
                 autoTabBackward();
                 XMLNode* pComment = (XMLNode*)pchild->ToElement()->FirstChild();
                 pComment->SetValue((const char *)str);
@@ -1569,12 +1619,12 @@ bool RkAiqCalibParser::parseEntryHeader
             if (xmlParseReadWrite == XML_PARSER_WRITE)
             {
                 char str[256];
-                char* strp = str;
                 autoTabForward();
                 autoTabForward();
                 snprintf(str, sizeof(str), "\n%s%s", autoTabStr, value);
                 autoTabBackward();
-                snprintf(str, sizeof(str), "%s\n%s", strp, autoTabStr);
+                strcat(str, "\n");
+                strcat(str, autoTabStr);
                 autoTabBackward();
                 XMLNode* pComment = (XMLNode*)pchild->ToElement()->FirstChild();
                 pComment->SetValue((const char *)str);
@@ -1589,12 +1639,12 @@ bool RkAiqCalibParser::parseEntryHeader
             if (xmlParseReadWrite == XML_PARSER_WRITE)
             {
                 char str[256];
-                char* strp = str;
                 autoTabForward();
                 autoTabForward();
                 snprintf(str, sizeof(str), "\n%s%s", autoTabStr, value);
                 autoTabBackward();
-                snprintf(str, sizeof(str), "%s\n%s", strp, autoTabStr);
+                strcat(str, "\n");
+                strcat(str, autoTabStr);
                 autoTabBackward();
                 XMLNode* pComment = (XMLNode*)pchild->ToElement()->FirstChild();
                 pComment->SetValue((const char *)str);
@@ -1609,12 +1659,12 @@ bool RkAiqCalibParser::parseEntryHeader
             if (xmlParseReadWrite == XML_PARSER_WRITE)
             {
                 char str[256];
-                char* strp = str;
                 autoTabForward();
                 autoTabForward();
                 snprintf(str, sizeof(str), "\n%s%s", autoTabStr, value);
                 autoTabBackward();
-                snprintf(str, sizeof(str), "%s\n%s", strp, autoTabStr);
+                strcat(str, "\n");
+                strcat(str, autoTabStr);
                 autoTabBackward();
                 XMLNode* pComment = (XMLNode*)pchild->ToElement()->FirstChild();
                 pComment->SetValue((const char *)str);

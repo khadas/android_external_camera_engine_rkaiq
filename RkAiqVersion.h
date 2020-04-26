@@ -1,6 +1,4 @@
 /*
- * rk_aiq_algo_ablc_itf.h
- *
  *  Copyright (c) 2019 Rockchip Corporation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,19 +15,18 @@
  *
  */
 
-#ifndef _RK_AIQ_ALGO_ABLC_ITF_H_
-#define _RK_AIQ_ALGO_ABLC_ITF_H_
+#ifndef _RK_AIQ_VERSION_H_
+/*!
+ * ==================== AIQ VERSION HISTORY ==================== 
+ * 
+ * v0.0.9
+ *  - initial version, support HDR
+ *  - optimized tnr,nr in low light condition 
+ *  - optimized imx347 iq
+ *  - FEC,ORB,LDCH not enabled 
+ *  - set compile optimized level to Os 
+ */
 
-#include "rk_aiq_algo_des.h"
+#define RK_AIQ_VERSION "v0.0.9"
 
-#define RKISP_ALGO_ABLC_VERSION     "v0.0.9"
-#define RKISP_ALGO_ABLC_VENDOR      "Rockchip"
-#define RKISP_ALGO_ABLC_DESCRIPTION "Rockchip Ablc algo for ISP2.0"
-
-XCAM_BEGIN_DECLARE
-
-extern RkAiqAlgoDescription g_RkIspAlgoDescAblc;
-
-XCAM_END_DECLARE
-
-#endif //_RK_AIQ_ALGO_ABLC_ITF_H_ 
+#endif

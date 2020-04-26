@@ -245,7 +245,7 @@ float GetCurrPara
     float x2;
     float value1;
     float value2;
-    float outPara;
+    float outPara = 0.0f;
 
     if(inPara < inMatrixX[0])
         outPara = inMatrixY[0];
