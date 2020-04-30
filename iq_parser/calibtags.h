@@ -428,6 +428,11 @@
 #define CALIB_SENSOR_AHDR_TMO_DAYTH                              "DayTh"
 #define CALIB_SENSOR_AHDR_TMO_TMOCONTRAST                       "TmoContrast"
 #define CALIB_SENSOR_AHDR_TMO_DAMP                               "Damp"
+#define CALIB_SENSOR_AHDR_TMO_CLIPGAP0                               "clipgap0"
+#define CALIB_SENSOR_AHDR_TMO_CLIPGAP1                               "clipgap1"
+#define CALIB_SENSOR_AHDR_TMO_CLIPRATIO0                               "clipratio0"
+#define CALIB_SENSOR_AHDR_TMO_CLIPRATIO1                               "clipratio1"
+
 /******************************************************************************
  * XML BLC section
  *****************************************************************************/
@@ -964,6 +969,19 @@
 #define    CALIB_SENSOR_AF_LASER_AF_DISTANCEDOT        "distanceDot"
 //PDAF
 #define    CALIB_SENSOR_AF_PDAF_ENABLE                 "enable"
+
+/******************************************************************************
+ * XML LDCH section
+ *****************************************************************************/
+#define    CALIB_SENSOR_LDCH                             "LDCH"
+#define    CALIB_SENSOR_LDCH_ENABLE              "enable"
+/******************************************************************************
+ * XML FEC section
+ *****************************************************************************/
+#define    CALIB_SENSOR_FEC                             "FEC"
+#define    CALIB_SENSOR_FEC_ENABLE                      "enable"
+#define    CALIB_SENSOR_FEC_MESH_FILE                   "mesh_file"
+
 
 /******************************************************************************
  * XML system section

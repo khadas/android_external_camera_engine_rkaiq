@@ -372,36 +372,62 @@ XCamReturn
 SensorHw::getEffectiveExpParams(SmartPtr<RkAiqExpParamsProxy>& expParams, int frame_id)
 {
     ENTER_CAMHW_FUNCTION();
-    std::map<int, SmartPtr<RkAiqExpParamsProxy>>::reverse_iterator rit;
-    int search_id = frame_id < 0 ? 0 : frame_id;
-    SmartLock locker (_mutex);
 
-    for(rit = _effecting_exp_map.rbegin(); rit != _effecting_exp_map.rend(); rit++) {
-        if(rit->first <= search_id) {
-            break;
-        }
-    }
+    std::map<int, SmartPtr<RkAiqExpParamsProxy>>::iterator it;
+    int search_id = frame_id < 0 ? 0 : frame_id;
+#ifdef ADD_LOCK
+    SmartLock locker (_mutex);
+#endif
+
+    it = _effecting_exp_map.find(search_id);
 
     // havn't found
-    if (rit == _effecting_exp_map.rend()) {
-        LOGE_CAMHW("can't find the latest effecting exposure for id %d, impossible case !", search_id);
-        return  XCAM_RETURN_ERROR_PARAM;
-    } else {
+    if (it == _effecting_exp_map.end()) {
+        /* use the latest */
+        std::map<int, SmartPtr<RkAiqExpParamsProxy>>::reverse_iterator rit;
+
+        for (rit = _effecting_exp_map.rbegin(); rit != _effecting_exp_map.rend(); rit++) {
+            if (rit->first <= search_id)
+                break;
+        }
+
+        if (rit == _effecting_exp_map.rend()) {
+            XCAM_LOG_ERROR("can't find the latest effecting exposure for id %d, impossible case !", search_id);
+            return  XCAM_RETURN_ERROR_PARAM;
+        }
+
         expParams = rit->second;
         if (_working_mode == RK_AIQ_WORKING_MODE_NORMAL) {
-            LOGD_CAMHW("%s: search_id: %d, get-find %d, a-gain: %d, time: %d\n",
-                       __FUNCTION__, search_id, rit->first,
-                       expParams->data()->LinearExp.exp_sensor_params.analog_gain_code_global,
-                       expParams->data()->LinearExp.exp_sensor_params.coarse_integration_time);
+            XCAM_LOG_DEBUG("%s: search_id: %d, get-last %d, a-gain: %d, time: %d\n",
+                           __FUNCTION__, search_id, rit->first,
+                           expParams->data()->LinearExp.exp_sensor_params.analog_gain_code_global,
+                           expParams->data()->LinearExp.exp_sensor_params.coarse_integration_time);
         } else {
-            LOGD_CAMHW("%s: search_id: %d, get-find %d, lexp: 0x%x-0x%x, mexp: 0x%x-0x%x, sexp: 0x%x-0x%x\n",
-                       __FUNCTION__, search_id, rit->first,
-                       expParams->data()->HdrExp[2].exp_sensor_params.analog_gain_code_global,
-                       expParams->data()->HdrExp[2].exp_sensor_params.coarse_integration_time,
-                       expParams->data()->HdrExp[1].exp_sensor_params.analog_gain_code_global,
-                       expParams->data()->HdrExp[1].exp_sensor_params.coarse_integration_time,
-                       expParams->data()->HdrExp[0].exp_sensor_params.analog_gain_code_global,
-                       expParams->data()->HdrExp[0].exp_sensor_params.coarse_integration_time);
+            XCAM_LOG_DEBUG("%s: search_id: %d, get-last %d, lexp: 0x%x-0x%x, mexp: 0x%x-0x%x, sexp: 0x%x-0x%x\n",
+                           __FUNCTION__, search_id, rit->first,
+                           expParams->data()->HdrExp[2].exp_sensor_params.analog_gain_code_global,
+                           expParams->data()->HdrExp[2].exp_sensor_params.coarse_integration_time,
+                           expParams->data()->HdrExp[1].exp_sensor_params.analog_gain_code_global,
+                           expParams->data()->HdrExp[1].exp_sensor_params.coarse_integration_time,
+                           expParams->data()->HdrExp[0].exp_sensor_params.analog_gain_code_global,
+                           expParams->data()->HdrExp[0].exp_sensor_params.coarse_integration_time);
+        }
+    } else {
+        expParams = it->second;
+        if (_working_mode == RK_AIQ_WORKING_MODE_NORMAL) {
+            XCAM_LOG_DEBUG("%s: search_id: %d, get-find %d, a-gain: %d, time: %d\n",
+                           __FUNCTION__, search_id, it->first,
+                           expParams->data()->LinearExp.exp_sensor_params.analog_gain_code_global,
+                           expParams->data()->LinearExp.exp_sensor_params.coarse_integration_time);
+        } else {
+            XCAM_LOG_DEBUG("%s: search_id: %d, get-find %d, lexp: 0x%x-0x%x, mexp: 0x%x-0x%x, sexp: 0x%x-0x%x\n",
+                           __FUNCTION__, search_id, it->first,
+                           expParams->data()->HdrExp[2].exp_sensor_params.analog_gain_code_global,
+                           expParams->data()->HdrExp[2].exp_sensor_params.coarse_integration_time,
+                           expParams->data()->HdrExp[1].exp_sensor_params.analog_gain_code_global,
+                           expParams->data()->HdrExp[1].exp_sensor_params.coarse_integration_time,
+                           expParams->data()->HdrExp[0].exp_sensor_params.analog_gain_code_global,
+                           expParams->data()->HdrExp[0].exp_sensor_params.coarse_integration_time);
         }
     }
 

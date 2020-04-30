@@ -93,7 +93,7 @@ V4l2BufferProxy::v4l2_format_to_video_info (
     info.aligned_width = 0;
     info.aligned_height = 0;
     info.size = format.fmt.pix.sizeimage;
-    switch (format.fmt.pix.pixelformat) {
+    switch (info.format) {
     case V4L2_PIX_FMT_NV12:  // 420
     case V4L2_PIX_FMT_NV21:
         info.components = 2;
@@ -134,6 +134,14 @@ V4l2BufferProxy::v4l2_format_to_video_info (
         info.components = 1;
         info.strides [0] = format.fmt.pix.bytesperline;
         info.offsets[0] = 0;
+        break;
+    case V4L2_META_FMT_RK_ISP1_PARAMS:
+    case V4L2_META_FMT_RK_ISP1_STAT_3A:
+    case V4L2_META_FMT_RK_ISPP_PARAMS:
+    case V4L2_META_FMT_RK_ISP1_STAT_LUMA :
+    case V4L2_PIX_FMT_FBC2:
+    case V4L2_PIX_FMT_FBC0:
+        // TODO
         break;
     default:
         XCAM_LOG_WARNING (

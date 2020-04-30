@@ -29,7 +29,7 @@ namespace RkCam {
 
 class Isp20Params {
 public:
-    explicit Isp20Params() {};
+    explicit Isp20Params() : _last_pp_module_init_ens(0) {};
     virtual ~Isp20Params() {};
 
     virtual XCamReturn checkIsp20Params(struct isp2x_isp_params_cfg& isp_cfg);
@@ -87,6 +87,11 @@ private:
                                    const rk_aiq_isp_af_meas_t& af_data);
 	void convertAiqGainToIsp20Params(struct isp2x_isp_params_cfg& isp_cfg,
         rk_aiq_isp_gain_t& gain);
+    void convertAiqAldchToIsp20Params(struct isp2x_isp_params_cfg& isp_cfg,
+                                      const rk_aiq_isp_ldch_t& ldch_cfg);
+    void convertAiqFecToIsp20Params(struct rkispp_params_cfg& pp_cfg,
+                                   rk_aiq_isp_fec_t& fec);
+    uint32_t _last_pp_module_init_ens;
 };
 };
 #endif

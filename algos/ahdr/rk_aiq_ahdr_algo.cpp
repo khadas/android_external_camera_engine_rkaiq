@@ -123,7 +123,7 @@ void SetFirstPara
     pAhdrCtx->AhdrProcRes.TmoProcRes.sw_hdrtmo_hist_min = 0;
     pAhdrCtx->AhdrProcRes.TmoProcRes.sw_hdrtmo_hist_low = 0;
     pAhdrCtx->AhdrProcRes.TmoProcRes.sw_hdrtmo_hist_high = (int)(pAhdrCtx->height * pAhdrCtx->width * 0.01 / 16);
-    pAhdrCtx->AhdrProcRes.TmoProcRes.sw_hdrtmo_hist_0p3 = 614;
+    pAhdrCtx->AhdrProcRes.TmoProcRes.sw_hdrtmo_hist_0p3 = 0;
     pAhdrCtx->AhdrProcRes.TmoProcRes.sw_hdrtmo_hist_shift = 3;
     pAhdrCtx->AhdrProcRes.TmoProcRes.sw_hdrtmo_palpha_0p18 = (int)(GlobeLuma + 0.5);
     pAhdrCtx->AhdrProcRes.TmoProcRes.sw_hdrtmo_palpha_lw0p5 = (int)(DetailsHighLight + 0.5);
@@ -168,7 +168,6 @@ void SetFirstPara
     pAhdrCtx->AhdrPrevData.PreDarkPdf = 0.5;
     pAhdrCtx->AhdrPrevData.PreDynamicRange = 1;
 
-#if LRK_DEBUG_LOG
     LOGD_AHDR("%s:lrk  Merge set IOdata to register:\n", __FUNCTION__);
     LOGD_AHDR("%s:lrk  sw_hdrmge_mode:%d \n", __FUNCTION__, pAhdrCtx->AhdrProcRes.MgeProcRes.sw_hdrmge_mode);
     LOGD_AHDR("%s:lrk  sw_hdrmge_ms_dif_0p8:%d \n", __FUNCTION__, pAhdrCtx->AhdrProcRes.MgeProcRes.sw_hdrmge_ms_dif_0p8);
@@ -225,9 +224,6 @@ void SetFirstPara
     LOGD_AHDR("%s:lrk  sw_hdrtmo_lgscl_ratio:%d\n", __FUNCTION__, pAhdrCtx->AhdrProcRes.TmoProcRes.sw_hdrtmo_lgscl_ratio);
     LOGD_AHDR("%s:lrk  sw_hdrtmo_gain_ld_off1:%d\n", __FUNCTION__, pAhdrCtx->AhdrProcRes.TmoProcRes.sw_hdrtmo_gain_ld_off1);
     LOGD_AHDR("%s:lrk  sw_hdrtmo_gain_ld_off2:%d\n", __FUNCTION__, pAhdrCtx->AhdrProcRes.TmoProcRes.sw_hdrtmo_gain_ld_off2);
-
-#endif
-
 
     LOGI_AHDR( "%s:exit!\n", __FUNCTION__);
 }
@@ -397,8 +393,7 @@ void AhdrConfig
     }
 
     //config default AhdrPrevData data
-    for(int i = 0; i < 16; i++)
-        pAhdrCtx->AhdrPrevData.ro_hdrtmo_lgmean_all[i] = 128;
+    pAhdrCtx->AhdrPrevData.ro_hdrtmo_lgmean = 20000;
 
     LOGI_AHDR( "%s:exit!\n", __FUNCTION__);
 }
@@ -437,7 +432,6 @@ void AhdrGetROData
             pAhdrCtx->CurrStatsData.other_stats.middle_luma[i] = ROData->other_stats.middle_luma[i];
     }
 
-#if LRK_DEBUG_LOG
     LOGD_AHDR("%s:lrk  Ahdr RO data from register:\n", __FUNCTION__);
     LOGD_AHDR("%s:lrk  ro_hdrtmo_lglow:%d:\n", __FUNCTION__, pAhdrCtx->CurrStatsData.tmo_stats.ro_hdrtmo_lglow);
     LOGD_AHDR("%s:lrk  ro_hdrtmo_lgmin:%d:\n", __FUNCTION__, pAhdrCtx->CurrStatsData.tmo_stats.ro_hdrtmo_lgmin);
@@ -452,8 +446,6 @@ void AhdrGetROData
     LOGD_AHDR("%s:lrk  ro_hdrtmo_linecnt:%d:\n", __FUNCTION__, pAhdrCtx->CurrStatsData.tmo_stats.ro_hdrtmo_linecnt);
     for(int i = 0; i < 32; i++)
         LOGD_AHDR("%s:lrk  ro_array_min_max[%d]:%d:\n", __FUNCTION__, i, pAhdrCtx->CurrStatsData.tmo_stats.ro_array_min_max[i]);
-
-#endif
 
     LOGI_AHDR( "%s:exit!\n", __FUNCTION__);
 }
@@ -498,6 +490,10 @@ void AhdrGetXmlParas
     pAhdrCtx->AhdrConfig.tmo_para.OETolerance = LIMIT_VALUE(pCalibDb->ahdr.tmo.OETolerance, TOLERANCEMAX, TOLERANCEMIN);
     pAhdrCtx->AhdrConfig.tmo_para.DTPdfTolerance = LIMIT_VALUE(pCalibDb->ahdr.tmo.DTPdfTolerance, TOLERANCEMAX, TOLERANCEMIN);
     pAhdrCtx->AhdrConfig.tmo_para.DRTolerance = LIMIT_VALUE(pCalibDb->ahdr.tmo.DRTolerance, TOLERANCEMAX, TOLERANCEMIN);
+    pAhdrCtx->AhdrConfig.tmo_para.clipgap0 = pCalibDb->ahdr.tmo.clipgap0;
+    pAhdrCtx->AhdrConfig.tmo_para.clipgap1 = pCalibDb->ahdr.tmo.clipgap1;
+    pAhdrCtx->AhdrConfig.tmo_para.clipratio0 = pCalibDb->ahdr.tmo.clipratio0;
+    pAhdrCtx->AhdrConfig.tmo_para.clipratio1 = pCalibDb->ahdr.tmo.clipratio1;
     for(int i = 0; i < 6; i++)
     {
         pAhdrCtx->AhdrConfig.tmo_para.EnvLv[i] = LIMIT_VALUE(pCalibDb->ahdr.tmo.envLevel[i], ENVLVMAX, ENVLVMIN);
@@ -516,7 +512,6 @@ void AhdrGetXmlParas
         pAhdrCtx->AhdrConfig.tmo_para.TmoContrast[i] = LIMIT_VALUE(pCalibDb->ahdr.tmo.TmoContrast[i], IQPARAMAX, IQPARAMIN) ;
     }
 
-#if LRK_DEBUG_LOG
     LOGD_AHDR("%s:lrk  Ahdr comfig data from xml:\n", __FUNCTION__);
     LOGD_AHDR("%s:lrk  Merge MergeMode:%d:\n", __FUNCTION__, pAhdrCtx->AhdrConfig.merge_para.MergeMode);
     LOGD_AHDR("%s:lrk  Merge EnvLv:%f %f %f %f %f %f:\n", __FUNCTION__, pAhdrCtx->AhdrConfig.merge_para.EnvLv[0], pAhdrCtx->AhdrConfig.merge_para.EnvLv[1], pAhdrCtx->AhdrConfig.merge_para.EnvLv[2],
@@ -569,7 +564,6 @@ void AhdrGetXmlParas
     LOGD_AHDR("%s:lrk  Tmo TmoContrast:%f %f %f %f %f %f:\n", __FUNCTION__, pAhdrCtx->AhdrConfig.tmo_para.TmoContrast[0], pAhdrCtx->AhdrConfig.tmo_para.TmoContrast[1], pAhdrCtx->AhdrConfig.tmo_para.TmoContrast[2]
               , pAhdrCtx->AhdrConfig.tmo_para.TmoContrast[3], pAhdrCtx->AhdrConfig.tmo_para.TmoContrast[4], pAhdrCtx->AhdrConfig.tmo_para.TmoContrast[5]);
     LOGD_AHDR("%s:lrk  Tmo Damp:%f:\n", __FUNCTION__, pAhdrCtx->AhdrConfig.tmo_para.damp);
-#endif
 
     //turn the IQ paras into algo paras
     for(int i = 0; i < 6; i++)
@@ -604,7 +598,6 @@ void AhdrGetXmlParas
     }
 
 
-#if LRK_DEBUG_LOG
     LOGD_AHDR("%s:lrk  Merge algo OECurve_smooth:%f %f %f %f %f %f:\n", __FUNCTION__, pAhdrCtx->AhdrConfig.merge_para.OECurve_smooth[0], pAhdrCtx->AhdrConfig.merge_para.OECurve_smooth[1], pAhdrCtx->AhdrConfig.merge_para.OECurve_smooth[2],
               pAhdrCtx->AhdrConfig.merge_para.OECurve_smooth[3], pAhdrCtx->AhdrConfig.merge_para.OECurve_smooth[4], pAhdrCtx->AhdrConfig.merge_para.OECurve_smooth[5]);
     LOGD_AHDR("%s:lrk  Merge algo OECurve_offset:%f %f %f %f %f %f:\n", __FUNCTION__, pAhdrCtx->AhdrConfig.merge_para.OECurve_offset[0], pAhdrCtx->AhdrConfig.merge_para.OECurve_offset[1], pAhdrCtx->AhdrConfig.merge_para.OECurve_offset[2],
@@ -625,7 +618,6 @@ void AhdrGetXmlParas
               , pAhdrCtx->AhdrConfig.tmo_para.DetailsLowLight[3], pAhdrCtx->AhdrConfig.tmo_para.DetailsLowLight[4], pAhdrCtx->AhdrConfig.tmo_para.DetailsLowLight[5]);
     LOGD_AHDR("%s:lrk  Tmo algo TmoContrast:%f %f %f %f %f %f:\n", __FUNCTION__, pAhdrCtx->AhdrConfig.tmo_para.TmoContrast[0], pAhdrCtx->AhdrConfig.tmo_para.TmoContrast[1], pAhdrCtx->AhdrConfig.tmo_para.TmoContrast[2]
               , pAhdrCtx->AhdrConfig.tmo_para.TmoContrast[3], pAhdrCtx->AhdrConfig.tmo_para.TmoContrast[4], pAhdrCtx->AhdrConfig.tmo_para.TmoContrast[5]);
-#endif
 
     LOGI_AHDR( "%s:exit!\n", __FUNCTION__);
 }
@@ -803,16 +795,16 @@ void AhdrUpdateConfig
                 pAhdrCtx->AhdrConfig.tmo_para.DetailsLowLight);
     }
 
+    pAhdrCtx->CurrHandleData.CurrTmoHandleData.clipgap0 = pAhdrCtx->AhdrConfig.tmo_para.clipgap0;
+    pAhdrCtx->CurrHandleData.CurrTmoHandleData.clipgap1 = pAhdrCtx->AhdrConfig.tmo_para.clipgap1;
+    pAhdrCtx->CurrHandleData.CurrTmoHandleData.clipratio0 = pAhdrCtx->AhdrConfig.tmo_para.clipratio0;
+    pAhdrCtx->CurrHandleData.CurrTmoHandleData.clipratio1 = pAhdrCtx->AhdrConfig.tmo_para.clipratio1;
+
     //get Current tmo TmoDamp
     pAhdrCtx->CurrHandleData.TmoDamp = pAhdrCtx->AhdrConfig.tmo_para.damp;
 
-    //read curren rodata
-    int data[16];
-    data[0] = pAhdrCtx->CurrStatsData.tmo_stats.ro_hdrtmo_lgmean;
-    for(int j = 0; j < 15; j++)
-        data[j + 1] = pAhdrCtx->AhdrPrevData.ro_hdrtmo_lgmean_all[j];
-    for(int k = 0; k < 16; k++)
-        pAhdrCtx->AhdrPrevData.ro_hdrtmo_lgmean_all[k] = data[k];
+    //read current rodata
+    pAhdrCtx->CurrHandleData.CurrLgMean = pAhdrCtx->CurrStatsData.tmo_stats.ro_hdrtmo_lgmean / 2048.0;
 
     //calc the current merge luma
     float MergeLuma = (float)pAhdrCtx->CurrStatsData.tmo_stats.ro_hdrtmo_lgmean;
@@ -847,7 +839,6 @@ void AhdrUpdateConfig
     middle_mean = middle_mean / 16;
 
 
-#if LRK_DEBUG_LOG
     LOGD_AHDR("%s:lrk  Ahdr Current frame cnt:%d:\n",  __FUNCTION__, pAhdrCtx->frameCnt);
     LOGD_AHDR("%s:lrk  Ahdr Current Handle data:\n", __FUNCTION__);
     LOGD_AHDR("%s:lrk  Current MergeMode:         %d \n", __FUNCTION__, pAhdrCtx->CurrHandleData.MergeMode);
@@ -879,7 +870,6 @@ void AhdrUpdateConfig
     LOGD_AHDR("%s:lrk  preFrame short mean Luma(8bit):%d \n", __FUNCTION__, short_mean);
     LOGD_AHDR("%s:lrk  preFrame middle mean Luma(8bit):%d \n", __FUNCTION__, middle_mean);
     LOGD_AHDR("%s:lrk  preFrame long mean Luma(8bit):%d \n", __FUNCTION__, long_mean);
-#endif
 
     LOGI_AHDR( "%s:exit!\n", __FUNCTION__);
 }
@@ -980,6 +970,7 @@ void AhdrProcessing
     TmoProcessing(pAhdrCtx);
 
     // store current handle data to pre data for next loop
+    pAhdrCtx->AhdrPrevData.ro_hdrtmo_lgmean = pAhdrCtx->AhdrProcRes.TmoProcRes.sw_hdrtmo_set_lgmean;
     pAhdrCtx->AhdrPrevData.PreL2S_ratio = pAhdrCtx->CurrHandleData.CurrL2S_Ratio;
     pAhdrCtx->AhdrPrevData.PreLExpo = pAhdrCtx->CurrHandleData.CurrLExpo;
     pAhdrCtx->AhdrPrevData.PreEnvlv = pAhdrCtx->CurrHandleData.CurrEnvLv;

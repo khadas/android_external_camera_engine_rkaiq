@@ -15,6 +15,7 @@
  *
  */
 
+#include <sys/stat.h>
 #include "Isp20PollThread.h"
 #include "Isp20StatsBuffer.h"
 #include "rkisp2-config.h"
@@ -22,7 +23,172 @@
 #include "Isp20_module_dbg.h"
 #include <fcntl.h>
 
+#ifndef DIV_ROUND_UP
+#define DIV_ROUND_UP(n, d) (((n) + (d) - 1) / (d))
+#endif
+
+#define CAPTURE_RAW_PATH "/tmp"
+#define CAPTURE_CNT_FILENAME "capture_cnt"
+// #define WRITE_ISP_REG
+// #define WRITE_ISPP_REG
+#define RAW_FILE_IDENT 0x8080
+#define HEADER_LEN 128U
+static int g_cam_engine_capture_raw_num = 0x0;
+
+/*
+ * Raw file structure:
+ *
++------------+-----------------+-------------+-----------------+---------------------------+
+|    ITEM    |    PARAMETER    |  DATA TYPE  |  LENGTH(Bytes)  |        DESCRIPTION        |
++------------+-----------------+-------------+-----------------+---------------------------+
+|            |     Identifier  |  uint16_t   |       2         |  fixed 0x8080             |
+|            +-----------------+-------------+-----------------+---------------------------+
+|            |  Header length  |  uint16_t   |       2         |  fixed 128U               |
+|            +-----------------+-------------+-----------------+---------------------------+
+|            |  Frame  number  |  uint32_t   |       4         |                           |
+|            +-----------------+-------------+-----------------+---------------------------+
+|            |          Width  |  uint16_t   |       2         |  image width              |
+|            +-----------------+-------------+-----------------+---------------------------+
+|            |         Height  |  uint16_t   |       2         |  image height             |
+|            +-----------------+-------------+-----------------+---------------------------+
+|            |      Bit depth  |   uint8_t   |       1         |  image bit depth          |
+|            +-----------------+-------------+-----------------+---------------------------+
+|            |                 |             |                 |  0: BGGR;  1: GBRG;       |
+|            |   Bayer format  |   uint8_t   |       1         |  2: GRBG;  3: RGGB;       |
+|            +-----------------+-------------+-----------------+---------------------------+
+|            |                 |             |                 |  1: linear                |
+|    FRAME   |  Number of HDR  |             |                 |  2: long + short          |
+|   HEADER   |      frame      |   uint8_t   |       1         |  3: long + mid + short    |
+|            +-----------------+-------------+-----------------+---------------------------+
+|            |                 |             |                 |  1: short                 |
+|            |  Current frame  |             |                 |  2: mid                   |
+|            |       type      |   uint8_t   |       1         |  3: long                  |
+|            +-----------------+-------------+-----------------+---------------------------+
+|            |   Storage type  |   uint8_t   |       1         |  0: packed; 1: unpacked   |
+|            +-----------------+-------------+-----------------+---------------------------+
+|            |    Line stride  |  uint16_t   |       2         |  In bytes                 |
+|            +-----------------+-------------+-----------------+---------------------------+
+|            |     Effective   |             |                 |                           |
+|            |    line stride  |  uint16_t   |       2         |  In bytes                 |
+|            +-----------------+-------------+-----------------+---------------------------+
+|            |       Reserved  |   uint8_t   |      43         |                           |
++------------+-----------------+-------------+-----------------+---------------------------+
+|            |                 |             |                 |                           |
+|  RAW DATA  |       RAW DATA  |    RAW      |  W * H * bpp    |  RAW DATA                 |
+|            |                 |             |                 |                           |
++------------+-----------------+-------------+-----------------+---------------------------+
+
+ */
+
+/*
+ * the structure of measuure parameters from isp in meta_data file:
+ *
+ * "frame%d-l_m_s-gain[%.5f_%.5f_%.5f]-time[%.5f_%.5f_%.5f]-awbGain[%.4f_%.4f_%.4f_%.4f]-dgain[%d]\n"
+ *
+ */
+
 namespace RkCam {
+
+bool get_value_from_file(const char* path, int* value)
+{
+    char buffer[8] = {0};
+    int fp;
+
+    fp = open(path, O_RDWR|O_CREAT|O_SYNC);
+    if (fp) {
+	if (read(fp, buffer, sizeof(buffer)) < 0)
+	    printf("%s read %s failed!\n", __func__, path);
+	*value = atoi(buffer);
+	close(fp);
+	return true;
+    }
+
+    return false;
+}
+
+
+bool set_value_to_file(const char* path, int value)
+{
+    char buffer[8] = {0};
+    int fp;
+
+    fp = open(path, O_RDWR|O_CREAT|O_SYNC);
+    if (fp) {
+	ftruncate(fp,0);
+	lseek(fp, 0, SEEK_SET);
+	snprintf(buffer, sizeof(buffer), "%d", g_cam_engine_capture_raw_num);
+	if (write(fp, buffer, sizeof(buffer)) < 0)
+		printf("%s write %s failed!\n", __func__, path);
+	close(fp);
+	return true;
+    }
+
+    return false;
+}
+
+const struct capture_fmt Isp20PollThread::csirx_fmts[] =
+{
+    /* raw */
+    {
+	.fourcc = V4L2_PIX_FMT_SRGGB8,
+	.bayer_fmt = 3,
+	.pcpp = 1,
+	.bpp = { 8 },
+    }, {
+	.fourcc = V4L2_PIX_FMT_SGRBG8,
+	.bayer_fmt = 2,
+	.pcpp = 1,
+	.bpp = { 8 },
+    }, {
+	.fourcc = V4L2_PIX_FMT_SGBRG8,
+	.bayer_fmt = 1,
+	.pcpp = 1,
+	.bpp = { 8 },
+    }, {
+	.fourcc = V4L2_PIX_FMT_SBGGR8,
+	.bayer_fmt = 0,
+	.pcpp = 1,
+	.bpp = { 8 },
+    }, {
+	.fourcc = V4L2_PIX_FMT_SRGGB10,
+	.bayer_fmt = 3,
+	.pcpp = 4,
+	.bpp = { 10 },
+    }, {
+	.fourcc = V4L2_PIX_FMT_SGRBG10,
+	.bayer_fmt = 2,
+	.pcpp = 4,
+	.bpp = { 10 },
+    }, {
+	.fourcc = V4L2_PIX_FMT_SGBRG10,
+	.bayer_fmt = 1,
+	.pcpp = 4,
+	.bpp = { 10 },
+    }, {
+	.fourcc = V4L2_PIX_FMT_SBGGR10,
+	.bayer_fmt = 0,
+	.pcpp = 4,
+	.bpp = { 10 },
+    }, {
+	.fourcc = V4L2_PIX_FMT_SRGGB12,
+	.pcpp = 2,
+	.bpp = { 12 },
+    }, {
+	.fourcc = V4L2_PIX_FMT_SGRBG12,
+	.pcpp = 2,
+	.bpp = { 12 },
+    }, {
+	.fourcc = V4L2_PIX_FMT_SGBRG12,
+	.bayer_fmt = 1,
+	.pcpp = 2,
+	.bpp = { 12 },
+    }, {
+	.fourcc = V4L2_PIX_FMT_SBGGR12,
+	.bayer_fmt = 0,
+	.pcpp = 2,
+	.bpp = { 12 },
+    },
+};
 
 const char*
 Isp20PollThread::mipi_poll_type_to_str[ISP_POLL_MIPI_MAX] =
@@ -71,6 +237,30 @@ Isp20PollThread::new_video_buffer(SmartPtr<V4l2Buffer> buf,
         SmartPtr<RkAiqExpParamsProxy> expParams = nullptr;
 
         _event_handle_dev->getEffectiveExpParams(expParams, buf->get_buf().sequence);
+	if (_rx_handle_dev)
+		_rx_handle_dev->getEffectiveIspParams(ispParams, buf->get_buf().sequence);
+
+	if (g_cam_engine_capture_raw_num >= 0 && \
+	    g_cam_engine_capture_raw_num < 5000) {
+	    if (_is_raw_dir_exist && ispParams.ptr() && expParams.ptr())
+		write_metadata_to_file(raw_dir_path,
+				       buf->get_buf().sequence,
+				       ispParams, expParams);
+
+	    if (!g_cam_engine_capture_raw_num) {
+		char file_name[32] = {0};
+
+		g_cam_engine_capture_raw_num = 5000;
+
+		snprintf(file_name, sizeof(file_name), "%s/%s",
+			 CAPTURE_RAW_PATH, CAPTURE_CNT_FILENAME);
+		set_value_to_file(file_name, g_cam_engine_capture_raw_num);
+
+		_is_raw_dir_exist = false;
+		LOGD_CAMHW("stop capturing raw!\n");
+	    }
+	}
+
         // TODO: get ispParams from isp dev;
 
         video_buf = new Isp20StatsBuffer(buf, dev, ispParams, expParams);
@@ -120,6 +310,9 @@ Isp20PollThread::set_rx_handle_dev(CamHwIsp20* dev)
 Isp20PollThread::Isp20PollThread()
     : PollThread()
     , _first_trigger(true)
+    , sns_width(0)
+    , sns_height(0)
+    , _is_raw_dir_exist(false)
 {
     for (int i = 0; i < 3; i++) {
         SmartPtr<MipiPollThread> mipi_poll = new MipiPollThread(this, ISP_POLL_MIPI_TX, i);
@@ -137,14 +330,14 @@ Isp20PollThread::Isp20PollThread()
 
     }
 
-    XCAM_LOG_DEBUG ("Isp20PollThread constructed");
+    LOGD_CAMHW("Isp20PollThread constructed");
 }
 
 Isp20PollThread::~Isp20PollThread()
 {
     stop();
 
-    XCAM_LOG_DEBUG ("~Isp20PollThread destructed");
+    LOGD_CAMHW("~Isp20PollThread destructed");
 }
 
 
@@ -152,7 +345,7 @@ XCamReturn
 Isp20PollThread::start ()
 {
     if (create_stop_fds_mipi()) {
-        XCAM_LOG_ERROR("create mipi stop fds failed !");
+        LOGE_CAMHW("create mipi stop fds failed !");
         return XCAM_RETURN_ERROR_UNKNOWN;
     }
 
@@ -172,7 +365,7 @@ Isp20PollThread::stop ()
                 char buf = 0xf;  // random value to write to flush fd.
                 unsigned int size = write(_isp_mipi_tx_infos[i].stop_fds[1], &buf, sizeof(char));
                 if (size != sizeof(char))
-                    XCAM_LOG_WARNING("Flush write not completed");
+                    LOGW_CAMHW("Flush write not completed");
             }
             _isp_mipi_tx_infos[i].loop->stop ();
             _isp_mipi_tx_infos[i].buf_list.clear ();
@@ -184,7 +377,7 @@ Isp20PollThread::stop ()
                 char buf = 0xf;  // random value to write to flush fd.
                 unsigned int size = write(_isp_mipi_rx_infos[i].stop_fds[1], &buf, sizeof(char));
                 if (size != sizeof(char))
-                    XCAM_LOG_WARNING("Flush write not completed");
+                    LOGW_CAMHW("Flush write not completed");
             }
             _isp_mipi_rx_infos[i].loop->stop ();
             _isp_mipi_rx_infos[i].buf_list.clear ();
@@ -234,7 +427,6 @@ XCamReturn
 Isp20PollThread::hdr_mipi_start(SmartPtr<SensorHw> sensor)
 {
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
-    uint32_t width, height, pixelformat;
 
     if (!sensor.ptr()) {
         //TODO no sensor case
@@ -242,24 +434,24 @@ Isp20PollThread::hdr_mipi_start(SmartPtr<SensorHw> sensor)
     } else {
         rk_aiq_exposure_sensor_descriptor sns_des;
         sensor->get_format(&sns_des);
-        width = sns_des.sensor_output_width;
-        height = sns_des.sensor_output_height;
+	sns_width = sns_des.sensor_output_width;
+	sns_height = sns_des.sensor_output_height;
         pixelformat = sns_des.sensor_pixelformat;
     }
 
     // mipi rx/tx format should match to sensor.
     for (int i = 0; i < _mipi_dev_max; i++) {
-        _isp_mipi_tx_infos[i].dev->set_format(width, height, pixelformat,
+        _isp_mipi_tx_infos[i].dev->set_format(sns_width, sns_height, pixelformat,
                                               V4L2_FIELD_NONE, 0);
         ret = _isp_mipi_tx_infos[i].dev->start();
         if (ret < 0)
-            LOGE("mipi tx:%d start err: %d\n", ret);
+            LOGE_CAMHW("mipi tx:%d start err: %d\n", ret);
 
-        _isp_mipi_rx_infos[i].dev->set_format(width, height, pixelformat,
+        _isp_mipi_rx_infos[i].dev->set_format(sns_width, sns_height, pixelformat,
                                               V4L2_FIELD_NONE, 0);
         ret = _isp_mipi_rx_infos[i].dev->start();
         if (ret < 0)
-            LOGE("mipi rx:%d start err: %d\n", ret);
+            LOGE_CAMHW("mipi rx:%d start err: %d\n", ret);
     }
 
     return ret;
@@ -273,10 +465,10 @@ Isp20PollThread::hdr_mipi_stop()
     for (int i = 0; i < _mipi_dev_max; i++) {
         ret = _isp_mipi_tx_infos[i].dev->stop();
         if (ret < 0)
-            LOGE("mipi tx:%d stop err: %d\n", ret);
+            LOGE_CAMHW("mipi tx:%d stop err: %d\n", ret);
         ret = _isp_mipi_rx_infos[i].dev->stop();
         if (ret < 0)
-            LOGE("mipi rx:%d stop err: %d\n", ret);
+            LOGE_CAMHW("mipi rx:%d stop err: %d\n", ret);
     }
 
     return ret;
@@ -287,8 +479,9 @@ Isp20PollThread::set_hdr_frame_readback_infos(int frame_id, int times)
 {
     _mipi_trigger_mutex.lock();
     _isp_hdr_fid2times_map[frame_id] = times;
+    LOGD_CAMHW("rdtimes seq %d \n", frame_id);
     _mipi_trigger_mutex.unlock();
-    trigger_readback(frame_id);
+    trigger_readback();
 }
 
 XCamReturn
@@ -301,28 +494,28 @@ Isp20PollThread::create_stop_fds_mipi () {
     for (i = 0; i < _mipi_dev_max; i++) {
         status = pipe(_isp_mipi_tx_infos[i].stop_fds);
         if (status < 0) {
-            XCAM_LOG_ERROR ("Failed to create mipi tx:%d poll stop pipe: %s",
+            LOGE_CAMHW("Failed to create mipi tx:%d poll stop pipe: %s",
                             i, strerror(errno));
             ret = XCAM_RETURN_ERROR_UNKNOWN;
             goto exit_error;
         }
         status = fcntl(_isp_mipi_tx_infos[0].stop_fds[0], F_SETFL, O_NONBLOCK);
         if (status < 0) {
-            XCAM_LOG_ERROR ("Fail to set event mipi tx:%d stop pipe flag: %s",
+            LOGE_CAMHW("Fail to set event mipi tx:%d stop pipe flag: %s",
                             i, strerror(errno));
             goto exit_error;
         }
 
         status = pipe(_isp_mipi_rx_infos[i].stop_fds);
         if (status < 0) {
-            XCAM_LOG_ERROR ("Failed to create mipi rx:%d poll stop pipe: %s",
+            LOGE_CAMHW("Failed to create mipi rx:%d poll stop pipe: %s",
                             i, strerror(errno));
             ret = XCAM_RETURN_ERROR_UNKNOWN;
             goto exit_error;
         }
         status = fcntl(_isp_mipi_rx_infos[0].stop_fds[0], F_SETFL, O_NONBLOCK);
         if (status < 0) {
-            XCAM_LOG_ERROR ("Fail to set event mipi rx:%d stop pipe flag: %s",
+            LOGE_CAMHW("Fail to set event mipi rx:%d stop pipe flag: %s",
                             i, strerror(errno));
             goto exit_error;
         }
@@ -376,13 +569,13 @@ Isp20PollThread::mipi_poll_buffer_loop (int type, int dev_index)
                                 stop_fd);
 
     if (poll_ret == POLL_STOP_RET) {
-        XCAM_LOG_DEBUG ("poll %s buffer stop success !", mipi_poll_type_to_str[type]);
+        LOGW_CAMHW("poll %s buffer stop success !", mipi_poll_type_to_str[type]);
         // stop success, return error to stop the poll thread
         return XCAM_RETURN_ERROR_UNKNOWN;
     }
 
     if (poll_ret <= 0) {
-        XCAM_LOG_WARNING ("mipi_dev_index %d poll %s buffer event got error(0x%x) but continue\n",
+        LOGW_CAMHW("mipi_dev_index %d poll %s buffer event got error(0x%x) but continue\n",
                         dev_index, mipi_poll_type_to_str[type], poll_ret);
         ::usleep (10000); // 10ms
         return XCAM_RETURN_ERROR_TIMEOUT;
@@ -390,7 +583,7 @@ Isp20PollThread::mipi_poll_buffer_loop (int type, int dev_index)
 
     ret = dev->dequeue_buffer (buf);
     if (ret != XCAM_RETURN_NO_ERROR) {
-        XCAM_LOG_WARNING ("dequeue %s buffer failed", mipi_poll_type_to_str[type]);
+        LOGW_CAMHW("dequeue %s buffer failed", mipi_poll_type_to_str[type]);
         return ret;
     }
 
@@ -409,7 +602,7 @@ Isp20PollThread::handle_rx_buf(SmartPtr<V4l2BufferProxy> &rx_buf, int dev_index)
 {
 
     SmartPtr<V4l2BufferProxy> buf = _isp_mipi_rx_infos[dev_index].buf_list.pop(-1);
-    XCAM_LOG_DEBUG ("%s dev_index:%d index:%d fd:%d\n",
+    LOGD_CAMHW("%s dev_index:%d index:%d fd:%d\n",
         __func__, dev_index, buf->get_v4l2_buf_index(), buf->get_expbuf_fd());
 
 }
@@ -420,7 +613,6 @@ void Isp20PollThread::sync_tx_buf()
     uint32_t sequence_s = -1, sequence_m = -1, sequence_l = -1;
 
     _mipi_buf_mutex.lock();
-
     for (int i = 0; i < _mipi_dev_max; i++) {
         if (_isp_mipi_tx_infos[i].buf_list.is_empty()) {
             _mipi_buf_mutex.unlock();
@@ -437,28 +629,9 @@ void Isp20PollThread::sync_tx_buf()
         sequence_m = buf_m->get_sequence();
 
     buf_s = _isp_mipi_tx_infos[ISP_MIPI_HDR_S].buf_list.front();
+
     if (buf_s.ptr()) {
         sequence_s = buf_s->get_sequence();
-        // drop mid frame buf if mid frame id less than short frame id
-        while (buf_m.ptr() && sequence_m < sequence_s) {
-            // drop mid frame buf if mid frame id less than mid frame id
-            XCAM_LOG_WARNING("%s drop mid frame:%d < short frame:%d\n",
-                __func__, sequence_m, sequence_s);
-            _isp_mipi_tx_infos[ISP_MIPI_HDR_M].buf_list.erase(buf_m);
-            buf_m = _isp_mipi_tx_infos[ISP_MIPI_HDR_M].buf_list.front();
-            if (buf_m.ptr())
-                sequence_m = buf_m->get_sequence();
-        }
-        // drop long frame buf if long frame id less than short frame id
-        while (buf_l.ptr() && sequence_l < sequence_s) {
-            XCAM_LOG_WARNING("%s drop long frame:%d < short frame:%d\n",
-                __func__, sequence_l, sequence_s);
-            _isp_mipi_tx_infos[ISP_MIPI_HDR_L].buf_list.erase(buf_l);
-            buf_l = _isp_mipi_tx_infos[ISP_MIPI_HDR_L].buf_list.front();
-            if (buf_l.ptr())
-                sequence_l = buf_l->get_sequence();
-        }
-
         if ((_working_mode == RK_AIQ_ISP_HDR_MODE_3_FRAME_HDR ||
              _working_mode == RK_AIQ_ISP_HDR_MODE_3_LINE_HDR) &&
             buf_m.ptr() && buf_l.ptr() && buf_s.ptr() &&
@@ -473,7 +646,8 @@ void Isp20PollThread::sync_tx_buf()
             _mipi_trigger_mutex.lock();
             _isp_hdr_fid2ready_map[sequence_s] = true;
             _mipi_trigger_mutex.unlock();
-            trigger_readback(sequence_s);
+            LOGD_CAMHW("trigger readback %d", sequence_s);
+            trigger_readback();
         } else if ((_working_mode == RK_AIQ_ISP_HDR_MODE_2_FRAME_HDR ||
                     _working_mode == RK_AIQ_ISP_HDR_MODE_2_LINE_HDR) &&
                    buf_m.ptr() && buf_s.ptr() && sequence_m == sequence_s) {
@@ -485,9 +659,11 @@ void Isp20PollThread::sync_tx_buf()
             _mipi_trigger_mutex.lock();
             _isp_hdr_fid2ready_map[sequence_s] = true;
             _mipi_trigger_mutex.unlock();
-            trigger_readback(sequence_s);
+            LOGD_CAMHW("trigger readback %d", sequence_s);
+            trigger_readback();
         } else {
-            _isp_mipi_tx_infos[ISP_MIPI_HDR_S].buf_list.erase(buf_s);
+            LOGW_CAMHW("do nothing, sequence not match l: %d, s: %d, m: %d !!!",
+                           sequence_l, sequence_s, sequence_m);
         }
     }
     _mipi_buf_mutex.unlock();
@@ -496,109 +672,347 @@ void Isp20PollThread::sync_tx_buf()
 void
 Isp20PollThread::handle_tx_buf(SmartPtr<V4l2BufferProxy> &tx_buf, int dev_index)
 {
-    XCAM_LOG_DEBUG ("%s dev_index:%d sequence:%d\n",
+    LOGD_CAMHW("%s dev_index:%d sequence:%d\n",
         __func__, dev_index, tx_buf->get_sequence());
     _isp_mipi_tx_infos[dev_index].buf_list.push(tx_buf);
     sync_tx_buf();
 }
 
 void
-Isp20PollThread::trigger_readback(uint32_t sequence)
+Isp20PollThread::trigger_readback()
 {
-    std::map<uint32_t, int>::iterator it_times;
     std::map<uint32_t, bool>::iterator it_ready;
     SmartPtr<V4l2Buffer> v4l2buf;
     SmartPtr<V4l2BufferProxy> buf_proxy;
-    bool buf_ready = false, trigger = false;
-    int i, times = -1;
+    uint32_t sequence = -1;
+    int times = -1;
 
     _mipi_trigger_mutex.lock();
-    it_ready = _isp_hdr_fid2ready_map.find(sequence);
-    if (it_ready != _isp_hdr_fid2ready_map.end())
-        buf_ready = _isp_hdr_fid2ready_map[sequence];
+    _isp_hdr_fid2ready_map.size();
+    if (_isp_hdr_fid2ready_map.size() == 0) {
+        LOGD_CAMHW("%s buf not ready !", __func__);
+        _mipi_trigger_mutex.unlock();
+        return;
+    }
 
-    it_times = _isp_hdr_fid2times_map.find(sequence);
-    if (it_times != _isp_hdr_fid2times_map.end())
-        times = _isp_hdr_fid2times_map[sequence];
+    it_ready = _isp_hdr_fid2ready_map.begin();
+    sequence = it_ready->first;
 
-    if (times > 0 && buf_ready) {
-        trigger = true;
-        _isp_hdr_fid2ready_map.erase(it_ready);
-        _isp_hdr_fid2times_map.erase(it_times);
-    } else if (buf_ready && times == -1 &&
-               _isp_hdr_fid2times_map.begin() != _isp_hdr_fid2times_map.end() &&
-               _isp_hdr_fid2times_map.begin()->first > sequence) {
-        // fid2times loss of frame, the latest sequence > image sequence,
-        // the image no times match, just readback 2 time
-        times = 2;
-        trigger = true;
-        XCAM_LOG_WARNING("%s fid2times loss, the lates id:%d. the image id:%d\n",
-            __func__, _isp_hdr_fid2times_map.begin()->first, sequence);
-    } else if (times >= 0 && !buf_ready &&
-               _isp_hdr_fid2ready_map.begin() != _isp_hdr_fid2ready_map.end() &&
-               _isp_hdr_fid2ready_map.begin()->first > sequence) {
-        // image loss of frame, the latest sequence > fid2times sequence,
-        // drop fid2times sequence
-        it_ready = _isp_hdr_fid2ready_map.begin();
-        sequence = it_ready->first;
-        XCAM_LOG_WARNING("%s image loss, the lates id:%d.\n",
-            __func__, sequence);
-        if (it_times != _isp_hdr_fid2times_map.end())
-            _isp_hdr_fid2times_map.erase(it_times);
-        for (it_times = _isp_hdr_fid2times_map.begin();
-             it_times != _isp_hdr_fid2times_map.end(); ) {
-            std::map<uint32_t, int>::iterator it_times_del;
-             if (it_times->first < sequence) {
-                 it_times_del = it_times++;
-                 _isp_hdr_fid2times_map.erase(it_times_del);
-             } else if (it_times->first == sequence) {
-                 times = it_times->second;
-                 trigger = true;
-                 it_times_del = it_times;
-                 _isp_hdr_fid2times_map.erase(it_times_del);
-                 _isp_hdr_fid2ready_map.erase(it_ready);
-                 break;
-             } else
-                it_times++;
+    std::map<uint32_t, int>::iterator it_times_del;
+    for (std::map<uint32_t, int>::iterator iter = _isp_hdr_fid2times_map.begin();
+         iter != _isp_hdr_fid2times_map.end();) {
+        if (iter->first < sequence) {
+            it_times_del = iter++;
+            LOGD_CAMHW("del seq %d", it_times_del->first);
+            _isp_hdr_fid2times_map.erase(it_times_del);
+        } else if (iter->first == sequence) {
+            times = iter->second;
+            it_times_del = iter++;
+            LOGD_CAMHW("del seq %d", it_times_del->first);
+            _isp_hdr_fid2times_map.erase(it_times_del);
+            break;
+        } else {
+            LOGW_CAMHW("%s missing rdtimes for buf_seq %d, min rdtimes_seq %d !",
+                           __func__, sequence, iter->first);
+            times = 0;
+            break;
         }
     }
+
+    if (times == -1) {
+        LOGD_CAMHW("%s rdtimes not ready for seq %d !", __func__, sequence);
+        _mipi_trigger_mutex.unlock();
+        return;
+    }
+
+    _isp_hdr_fid2ready_map.erase(it_ready);
+
     _mipi_trigger_mutex.unlock();
-    if (trigger) {
-        struct isp2x_csi_trigger tg = {
-            .frame_id = sequence,
-            .times = times - 1,
-        };
 
-	if (_first_trigger) {
-	    tg.times = 1;
-	    _first_trigger = false;
-	}
+    struct isp2x_csi_trigger tg = {
+        .frame_id = sequence,
+        .times = times - 1,
+    };
 
-        for (i = 0; i < _mipi_dev_max; i++) {
+    if (_first_trigger) {
+        tg.times = 1;
+        _first_trigger = false;
+    }
+
+    /* TODO: fix the trigger time for ahdr temporarily */
+    tg.times = 2;
+    LOGW_CAMHW("%s fix the trigger to %d time for ahdr temporarily\n",
+	       __func__,
+	       tg.times);
+
+    LOGD_CAMHW("%s set frame[%d] isp params, readback %d times, capturing on frame%d\n",
+	       __func__, sequence, tg.times,
+	       g_cam_engine_capture_raw_num);
+
+    if (_rx_handle_dev) {
+        if (_rx_handle_dev->setIspParamsSync(sequence)) {
+            LOGE_CAMHW("%s frame[%d] set isp params failed, don't read back!\n",
+                       __func__, sequence);
+            // drop frame, return buf to tx
+            for (int i = 0; i < _mipi_dev_max; i++) {
+                _isp_mipi_rx_infos[i].cache_list.pop(-1);
+            }
+        } else {
+            char file_name[32] = {0};
+	    int ret = XCAM_RETURN_NO_ERROR;
+
+            snprintf(file_name, sizeof(file_name), "%s/%s",
+		     CAPTURE_RAW_PATH, CAPTURE_CNT_FILENAME);
+            get_value_from_file(file_name, &g_cam_engine_capture_raw_num);
+
+            for (int i = 0; i < _mipi_dev_max; i++) {
                 buf_proxy = _isp_mipi_rx_infos[i].cache_list.pop(-1);
                 _isp_mipi_rx_infos[i].buf_list.push(buf_proxy);
 
                 _isp_mipi_rx_infos[i].dev->get_buffer(v4l2buf);
                 v4l2buf->set_expbuf_fd(buf_proxy->get_expbuf_fd());
-                _isp_mipi_rx_infos[i].dev->queue_buffer(v4l2buf);
-        }
+                ret = _isp_mipi_rx_infos[i].dev->queue_buffer(v4l2buf);
+		if (ret != XCAM_RETURN_NO_ERROR) {
+		    _isp_mipi_rx_infos[i].buf_list.pop(-1);
+		    break;
+		}
 
-	/* TODO: fix the trigger time for ahdr temporarily */
-	tg.times = 2;
-	LOGW_CAMHW("%s fix the trigger to %d time for ahdr temporarily\n",
-			   __func__,
-			   tg.times);
+                if (g_cam_engine_capture_raw_num > 0 && \
+                    g_cam_engine_capture_raw_num < 5000) {
 
-	LOGD_CAMHW("%s set frame[%d] isp params to %d times\n",
-			   __func__, sequence, tg.times);
+                    if (!_is_raw_dir_exist)
+                        creat_raw_dir(CAPTURE_RAW_PATH);
 
-	if (_rx_handle_dev) {
-	    if (_rx_handle_dev->setIspParamsSync(sequence))
-		LOGE_CAMHW("%s frame[%d] set isp params failed, don't read back!\n",
-			       __func__, sequence);
+                    if (_is_raw_dir_exist) {
+			char raw_name[128] = {0};
+			FILE *fp = nullptr;
+
+                        XCAM_STATIC_PROFILING_START(write_raw);
+			snprintf(raw_name, sizeof(raw_name),
+				 "%s/frame%d_%dx%d_%s.raw",
+				 raw_dir_path,
+				 sequence,
+				 sns_width,
+				 sns_height,
+				 i == 0 ? "short" : "long");
+
+			fp = fopen(raw_name, "wb+");
+			if (fp != nullptr) {
+			    write_frame_header_to_raw(fp, i, sequence);
+			    write_raw_to_file(fp, i, sequence,
+					      (void *)(buf_proxy->get_v4l2_userptr()),
+					      v4l2buf->get_buf().m.planes[0].bytesused);
+			    fclose(fp);
+			}
+                        XCAM_STATIC_PROFILING_END(write_raw, 0);
+                    }
+                }
+            }
+
+            if (g_cam_engine_capture_raw_num > 0 && \
+                g_cam_engine_capture_raw_num < 5000) {
+                g_cam_engine_capture_raw_num--;
+                set_value_to_file(file_name, g_cam_engine_capture_raw_num);
+            }
+
+	    if (ret == XCAM_RETURN_NO_ERROR)
+                _isp_core_dev->io_control(RKISP_CMD_TRIGGER_READ_BACK, &tg);
 	    else
-		_isp_core_dev->io_control(RKISP_CMD_TRIGGER_READ_BACK, &tg);
-	}
+		LOGE_CAMHW("%s frame[%d] queue  failed, don't read back!\n",
+			   __func__, sequence);
+        }
     }
 }
+
+void
+Isp20PollThread::write_metadata_to_file(const char* dir_path,
+		int frame_id,
+		SmartPtr<RkAiqIspParamsProxy>& ispParams,
+		SmartPtr<RkAiqExpParamsProxy>& expParams)
+{
+    FILE *fp = nullptr;
+    char file_name[64] = {0};
+    char buffer[256] = {0};
+
+    snprintf(file_name, sizeof(file_name), "%s/meta_data", dir_path);
+
+    fp = fopen(file_name, "ab+");
+    if (fp != nullptr) {
+	    snprintf(buffer,
+		     sizeof(buffer),
+		     "frame%d-l_m_s-gain[%.5f_%.5f_%.5f]-time[%.5f_%.5f_%.5f]-awbGain[%.4f_%.4f_%.4f_%.4f]-dgain[%d]\n",
+		     frame_id,
+		     expParams->data()->HdrExp[2].exp_real_params.analog_gain,
+		     expParams->data()->HdrExp[1].exp_real_params.analog_gain,
+		     expParams->data()->HdrExp[0].exp_real_params.analog_gain,
+		     expParams->data()->HdrExp[2].exp_real_params.integration_time,
+		     expParams->data()->HdrExp[1].exp_real_params.integration_time,
+		     expParams->data()->HdrExp[0].exp_real_params.integration_time,
+		     ispParams->data()->awb_gain.rgain,
+		     ispParams->data()->awb_gain.grgain,
+		     ispParams->data()->awb_gain.gbgain,
+		     ispParams->data()->awb_gain.bgain,
+		     1);
+	    fwrite((void *)buffer, strlen(buffer), 1, fp);
+	    fflush(fp);
+	    fclose(fp);
+    }
+}
+
+const struct capture_fmt* Isp20PollThread::find_fmt(const uint32_t pixelformat)
+{
+    const struct capture_fmt *fmt;
+    unsigned int i;
+
+    for (i = 0; i < sizeof(csirx_fmts); i++) {
+	fmt = &csirx_fmts[i];
+	if (fmt->fourcc == pixelformat)
+	    return fmt;
+    }
+
+    return NULL;
+}
+
+int Isp20PollThread::calculate_stride_per_line(const struct capture_fmt& fmt,
+					   uint32_t& bytesPerLine)
+{
+    uint32_t pixelsPerLine = 0, stridePerLine = 0;
+    /* The actual size stored in the memory */
+    uint32_t actualBytesPerLine = 0;
+
+    bytesPerLine = sns_width * fmt.bpp[0] / 8;
+
+    pixelsPerLine = fmt.pcpp * DIV_ROUND_UP(sns_width, fmt.pcpp);
+    actualBytesPerLine = pixelsPerLine * fmt.bpp[0] / 8;
+
+    /* mipi wc(Word count) must be 4 byte aligned */
+    stridePerLine = 4 * DIV_ROUND_UP(actualBytesPerLine, 4);
+
+    LOGD_CAMHW("sns_width: %d, pixelsPerLine: %d, bytesPerLine: %d, stridePerLine: %d\n",
+	   sns_width,
+	   pixelsPerLine,
+	   bytesPerLine,
+	   stridePerLine);
+
+    return stridePerLine;
+}
+
+/*
+ * Refer to "Raw file structure" in the header of this file
+ */
+XCamReturn
+Isp20PollThread::write_frame_header_to_raw(FILE *fp, int dev_index,
+					   int sequence)
+{
+    uint8_t buffer[128] = {0};
+    uint32_t stridePerLine = 0, bytesPerLine = 0;
+    const struct capture_fmt* fmt = nullptr;
+    uint8_t mode = 0;
+    uint8_t frame_type = 0, storage_type = 0;
+
+    if (fp == nullptr)
+	return XCAM_RETURN_ERROR_PARAM;
+
+    if ((fmt = find_fmt(pixelformat)))
+        stridePerLine = calculate_stride_per_line(*fmt, bytesPerLine);
+
+    if (_working_mode == RK_AIQ_ISP_HDR_MODE_3_FRAME_HDR || \
+	 _working_mode == RK_AIQ_ISP_HDR_MODE_3_LINE_HDR)
+	mode = 3;
+    else if (_working_mode == RK_AIQ_ISP_HDR_MODE_2_FRAME_HDR || \
+	     _working_mode == RK_AIQ_ISP_HDR_MODE_2_LINE_HDR)
+	mode = 2;
+    else
+	mode = 1;
+
+    frame_type = dev_index == 0 ? 3 : 0;
+
+    *((uint16_t* )buffer) = RAW_FILE_IDENT;	  // Identifier
+    *((uint16_t* )(buffer + 2)) = HEADER_LEN;	  // Header length
+    *((uint32_t* )(buffer + 4)) = sequence;	  // Frame number
+    *((uint16_t* )(buffer + 8)) = sns_width;	  // Image width
+    *((uint16_t* )(buffer + 10)) = sns_height;    // Image height
+    *(buffer + 12) = fmt->bpp[0];		  // Bit depth
+    *(buffer + 13) = fmt->bayer_fmt;		  // Bayer format
+    *(buffer + 14) = mode;			  // Number of HDR frame
+    *(buffer + 15) = frame_type;		  // Current frame type
+    *(buffer + 16) = storage_type;		  // Storage type
+    *((uint16_t* )(buffer + 17)) = stridePerLine; // Line stride
+    *((uint16_t* )(buffer + 18)) = bytesPerLine;  // Effective line stride
+
+    fwrite(buffer, sizeof(buffer), 1, fp);
+    fflush(fp);
+
+    LOGD_CAMHW("frame%d: image rect: %dx%d, %d bit depth, Bayer fmt: %d, "
+	   "hdr frame number: %d, frame type: %d, Storage type: %d, "
+	   "line stride: %d, Effective line stride: %d\n",
+	   sequence, sns_width, sns_height,
+	   fmt->bpp[0], fmt->bayer_fmt, mode,
+	   frame_type, storage_type, stridePerLine,
+	   bytesPerLine);
+
+    return XCAM_RETURN_NO_ERROR;
+}
+
+XCamReturn
+Isp20PollThread::write_raw_to_file(FILE* fp, int dev_index,
+				   int sequence, void* userptr, int size)
+{
+    if (fp == nullptr)
+	return XCAM_RETURN_ERROR_PARAM;
+
+    fwrite(userptr, size, 1, fp);
+    fflush(fp);
+
+    if (!dev_index) {
+#ifdef WRITE_ISP_REG
+	snprintf(file_name, sizeof(file_name),
+		 "io -4 -l 0x6000 0xffb50000 > %s/frame%d_isp_reg",
+		 dir_path,
+		 sequence);
+	system(file_name);
+#endif
+
+        for (int i = 0; i < g_cam_engine_capture_raw_num; i++)
+            printf(">");
+
+	printf("\n");
+    }
+
+    return XCAM_RETURN_NO_ERROR;
+}
+
+XCamReturn
+Isp20PollThread::creat_raw_dir(const char* path)
+{
+    time_t now;
+    struct tm* timenow;
+
+    if (!path)
+	return XCAM_RETURN_ERROR_FAILED;
+
+    time(&now);
+    timenow = localtime(&now);
+    snprintf(raw_dir_path, sizeof(raw_dir_path), "%s/%04d-%02d-%02d_%02d-%02d-%02d",
+	     path,
+	     timenow->tm_year + 1900,
+	     timenow->tm_mon + 1,
+	     timenow->tm_mday,
+	     timenow->tm_hour,
+	     timenow->tm_min,
+	     timenow->tm_sec);
+
+    LOGD_CAMHW("mkdir %s for capturing %d frames raw!\n",
+	       raw_dir_path, g_cam_engine_capture_raw_num);
+
+    if(mkdir(raw_dir_path, 0755) < 0) {
+        LOGE_CAMHW("mkdir %s error!!!\n", raw_dir_path);
+	return XCAM_RETURN_ERROR_PARAM;
+    }
+
+    _is_raw_dir_exist = true;
+
+    return XCAM_RETURN_ERROR_PARAM;
+}
+
 }; //namspace RkCam

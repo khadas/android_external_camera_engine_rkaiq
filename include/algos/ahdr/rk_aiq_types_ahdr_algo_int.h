@@ -35,6 +35,10 @@ typedef struct tmo_config_s
     float DayTh;
     float TmoContrast[6];
 
+	float clipgap0;
+	float clipgap1;
+	float clipratio0;
+	float clipratio1;
     float damp;
 } tmo_config_t ;
 

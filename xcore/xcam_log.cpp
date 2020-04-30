@@ -27,6 +27,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <time.h>
+#include <sys/time.h>
 #ifdef ANDROID_OS
 #include <cutils/properties.h>
 #ifdef ALOGV
@@ -155,6 +157,15 @@ int xcam_get_log_level() {
     return 0;
 }
 
+char* timeString() {
+    struct timeval tv;
+    gettimeofday(&tv, NULL);
+    struct tm * timeinfo = localtime(&tv.tv_sec);
+    static char timeStr[64];
+    sprintf(timeStr, "%.2d:%.2d:%.2d.%ld", timeinfo->tm_hour, timeinfo->tm_min, timeinfo->tm_sec, tv.tv_usec);
+    return timeStr;
+}
+
 void xcam_print_log (int module, int sub_modules, int level, const char* format, ...) {
     if (level <= g_xcore_log_infos[module].log_level &&
             (sub_modules & g_xcore_log_infos[module].sub_modules)) {
@@ -194,7 +205,7 @@ void xcam_print_log (int module, int sub_modules, int level, const char* format,
             break;
         }
 #else
-        printf ("[%s]:%s", g_xcore_log_infos[module].module_name, buffer);
+        printf ("[%s][%s]:%s", timeString(), g_xcore_log_infos[module].module_name, buffer);
 #endif
     }
 }

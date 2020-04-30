@@ -132,6 +132,7 @@ public:
     XCamReturn setupHdrLink(int mode, int isp_index, bool enable);
     static XCamReturn selectIqFile(const char* sns_ent_name, char* iqfile_name);
     XCamReturn setExpDelayInfo(int time_delay, int gain_delay);
+    XCamReturn getEffectiveIspParams(SmartPtr<RkAiqIspParamsProxy>& ispParams, int frame_id);
 
 private:
     XCAM_DEAD_COPY(CamHwIsp20);
@@ -151,7 +152,7 @@ private:
     struct isp2x_isp_params_cfg _full_active_isp_params;
 	uint32_t _ispp_module_init_ens;
     std::list<SmartPtr<RkAiqIspParamsProxy>> _pending_ispparams_queue;
-    std::map<int, SmartPtr<RkAiqIspParamsPool>> _effecting_ispparm_map;
+    std::map<int, SmartPtr<RkAiqIspParamsProxy>> _effecting_ispparm_map;
     static std::map<std::string, SmartPtr<rk_aiq_static_info_t>> mCamHwInfos;
     static rk_aiq_isp_hw_info_t mIspHwInfos;
     static std::map<std::string, SmartPtr<rk_sensor_full_info_t>> mSensorHwInfos;

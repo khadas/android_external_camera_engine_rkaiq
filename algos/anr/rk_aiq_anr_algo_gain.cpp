@@ -152,6 +152,10 @@ ANRresult_t gain_fix_transfer(RKAnr_Mfnr_Params_Select_t *pMfnrSelect, RKAnr_Gai
 				__FUNCTION__, __LINE__, i,
 				frame_exp_ratio[i], dGain[i]);
             pGainFix->mge_gain[i]	= FLOAT_LIM2_INT(dGain[i] , GAIN_HDR_MERGE_IN_FIX_BITS_DECI, 1);        // 12:6
+            if(i==0)
+				pGainFix->mge_gain[i] = MIN(pGainFix->mge_gain[i], (1 << (GAIN_HDR_MERGE_IN2_FIX_BITS_INTE + GAIN_HDR_MERGE_IN_FIX_BITS_DECI)) - 1);
+			else 
+				pGainFix->mge_gain[i] = MIN(pGainFix->mge_gain[i], (1 << (GAIN_HDR_MERGE_IN0_FIX_BITS_INTE + GAIN_HDR_MERGE_IN_FIX_BITS_DECI)) - 1);
     	}
     }
     else

@@ -26,33 +26,19 @@ unsigned short GetSetLgmean(AhdrHandle_t pAhdrCtx)
 {
     LOGI_AHDR( "%s:enter!\n", __FUNCTION__);
 
-    float weight[16] = {16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1};
     float value = 0;
-    float lgmean_all[16];
     unsigned short returnValue;
+    int iir_frame = 64;
+    int iir_frame_real = MIN(pAhdrCtx->frameCnt + 1, iir_frame);
 
-    for(int i = 0; i < 16; i++)
-        lgmean_all[i] = pAhdrCtx->AhdrPrevData.ro_hdrtmo_lgmean_all[i] / 2048.0;
-
-    if(pAhdrCtx->frameCnt >= 16)
-    {
-        for(int i = 0; i < 16; i++)
-            value = value + weight[i] * lgmean_all[i];
-        value = value / 136;
-    }
-
-    else
-    {
-        for(int i = 0; i < pAhdrCtx->frameCnt; i++)
-            value = value + weight[i] * lgmean_all[i];
-        value = value / ((pAhdrCtx->frameCnt + 1) * (32 - pAhdrCtx->frameCnt) / 2.0);
-    }
+    float PrevLgMean = pAhdrCtx->AhdrPrevData.ro_hdrtmo_lgmean / 2048.0;
+    float CurrLgMean = pAhdrCtx->CurrHandleData.CurrLgMean;
+    value = (iir_frame_real - 1) * PrevLgMean / iir_frame_real + CurrLgMean / iir_frame_real;
 
     returnValue = (int)SHIFT11BIT(value) ;
 
-#if LRK_DEBUG_LOG
-    LOGD_AHDR( "%s:lrk frameCnt:%d value:%f returnValue:%d\n", __FUNCTION__, pAhdrCtx->frameCnt, value, returnValue);
-#endif
+    LOGD_AHDR( "%s:lrk frameCnt:%d iir_frame:%d set_lgmean_float:%f set_lgmean_return:%d\n", __FUNCTION__,
+               pAhdrCtx->frameCnt, iir_frame, value, returnValue);
 
     LOGI_AHDR( "%s:exit!\n", __FUNCTION__);
 
@@ -64,22 +50,17 @@ unsigned short GetSetLgmean(AhdrHandle_t pAhdrCtx)
 unsigned short GetSetLgAvgMax(AhdrHandle_t pAhdrCtx, float set_lgmin, float set_lgmax)
 {
     LOGI_AHDR("%s:Enter!\n", __FUNCTION__);
-    float WeightKey = 0.0;
+    float WeightKey = pAhdrCtx->AhdrProcRes.TmoProcRes.sw_hdrtmo_set_weightkey / 256.0;
     float value = 0.0;
     float set_lgmean = pAhdrCtx->AhdrProcRes.TmoProcRes.sw_hdrtmo_set_lgmean / 2048.0;
     float lgrange1 = pAhdrCtx->AhdrProcRes.TmoProcRes.sw_hdrtmo_set_lgrange1 / 2048.0;
     unsigned short returnValue;
 
-    WeightKey = MIN(2 / (set_lgmax - set_lgmean), 2 / (1 - set_lgmin));
-    WeightKey = MIN((1 - WeightKey), 0.6);
-    WeightKey = MAX(WeightKey, 0);
     value = WeightKey * set_lgmax + (1 - WeightKey) * set_lgmean;
     value = MIN(value, lgrange1);
     returnValue = (int)SHIFT11BIT(value);
 
-#if LRK_DEBUG_LOG
     LOGD_AHDR( "%s:lrk set_lgmin:%f set_lgmax:%f set_lgmean:%f lgrange1:%f value:%f returnValue:%d\n", __FUNCTION__, set_lgmin, set_lgmax, set_lgmean, lgrange1, value, returnValue);
-#endif
 
     return returnValue;
     LOGI_AHDR("%s:Eixt!\n", __FUNCTION__);
@@ -101,9 +82,7 @@ unsigned short GetSetLgRange0(AhdrHandle_t pAhdrCtx, float set_lgmin, float set_
     value = MIN(value, (set_lgmin + clipgap0));
     returnValue = (int)SHIFT11BIT(value);
 
-#if LRK_DEBUG_LOG
     LOGD_AHDR( "%s:lrk set_lgmin:%f set_lgmax:%f clipratio0:%f clipgap0:%f value:%f returnValue:%d\n", __FUNCTION__, set_lgmin, set_lgmax, clipratio0, clipgap0, value, returnValue);
-#endif
 
     return returnValue;
     LOGI_AHDR("%s:Eixt!\n", __FUNCTION__);
@@ -124,9 +103,7 @@ unsigned short GetSetLgRange1(AhdrHandle_t pAhdrCtx, float set_lgmin, float set_
     value = MAX(value, (set_lgmax - clipgap1));
     returnValue = (int)SHIFT11BIT(value);
 
-#if LRK_DEBUG_LOG
     LOGD_AHDR( "%s:lrk set_lgmin:%f set_lgmax:%f clipratio1:%f clipgap1:%f value:%f returnValue:%d\n", __FUNCTION__, set_lgmin, set_lgmax, clipratio1, clipgap1, value, returnValue);
-#endif
 
     return returnValue;
     LOGI_AHDR("%s:Eixt!\n", __FUNCTION__);
@@ -150,12 +127,10 @@ unsigned short GetSetPalhpa(AhdrHandle_t pAhdrCtx, float set_lgmin, float set_lg
     index = index / (set_lgmax - set_lgmin);
     value = palpha_0p18 * pow(4, index);
     value_int = (int)SHIFT10BIT(value);
-    value_int = MIN(value_int,pAhdrCtx->AhdrProcRes.TmoProcRes.sw_hdrtmo_maxpalpha);
+    value_int = MIN(value_int, pAhdrCtx->AhdrProcRes.TmoProcRes.sw_hdrtmo_maxpalpha);
     returnValue = value_int;
 
-#if LRK_DEBUG_LOG
     LOGD_AHDR( "%s:lrk set_lgmin:%f set_lgmax:%f set_lgmean:%f palpha_0p18:%f value:%f returnValue:%d\n", __FUNCTION__, set_lgmin, set_lgmax, set_lgmean, palpha_0p18, value, returnValue);
-#endif
 
     return returnValue;
     LOGI_AHDR("%s:Eixt!\n", __FUNCTION__);
@@ -172,15 +147,15 @@ void TmoGetCurrIOData
     LOGI_AHDR("%s:Enter!\n", __FUNCTION__);
 
     //default IO data
-    pAhdrCtx->AhdrProcRes.TmoProcRes.sw_hdrtmo_clipratio0 = 64;
-    pAhdrCtx->AhdrProcRes.TmoProcRes.sw_hdrtmo_clipratio1 = 166;
-    pAhdrCtx->AhdrProcRes.TmoProcRes.sw_hdrtmo_clipgap0 = 12;
-    pAhdrCtx->AhdrProcRes.TmoProcRes.sw_hdrtmo_clipgap1 = 12;
+    pAhdrCtx->AhdrProcRes.TmoProcRes.sw_hdrtmo_clipratio0 = (int)(pAhdrCtx->CurrHandleData.CurrTmoHandleData.clipratio0 + 0.5);
+    pAhdrCtx->AhdrProcRes.TmoProcRes.sw_hdrtmo_clipratio1 = (int)(pAhdrCtx->CurrHandleData.CurrTmoHandleData.clipratio0 + 0.5);
+    pAhdrCtx->AhdrProcRes.TmoProcRes.sw_hdrtmo_clipgap0 = (int)(pAhdrCtx->CurrHandleData.CurrTmoHandleData.clipgap0 + 0.5);
+    pAhdrCtx->AhdrProcRes.TmoProcRes.sw_hdrtmo_clipgap1 = (int)(pAhdrCtx->CurrHandleData.CurrTmoHandleData.clipgap1 + 0.5);
     pAhdrCtx->AhdrProcRes.TmoProcRes.sw_hdrtmo_ratiol = 32;
     pAhdrCtx->AhdrProcRes.TmoProcRes.sw_hdrtmo_hist_high = (int)(pAhdrCtx->height * pAhdrCtx->width * 0.01 / 16);
     pAhdrCtx->AhdrProcRes.TmoProcRes.sw_hdrtmo_hist_min = 0;
     pAhdrCtx->AhdrProcRes.TmoProcRes.sw_hdrtmo_hist_low = 0;
-    pAhdrCtx->AhdrProcRes.TmoProcRes.sw_hdrtmo_hist_0p3 = 614;
+    pAhdrCtx->AhdrProcRes.TmoProcRes.sw_hdrtmo_hist_0p3 = 0;
     pAhdrCtx->AhdrProcRes.TmoProcRes.sw_hdrtmo_hist_shift = 3;
     pAhdrCtx->AhdrProcRes.TmoProcRes.sw_hdrtmo_gain_ld_off1 = 10;
     pAhdrCtx->AhdrProcRes.TmoProcRes.sw_hdrtmo_gain_ld_off2 = 5;
@@ -218,7 +193,6 @@ void TmoGetCurrIOData
     pAhdrCtx->AhdrProcRes.TmoProcRes.sw_hdrtmo_set_lgavgmax = GetSetLgAvgMax(pAhdrCtx, set_lgmin, set_lgmax);
     pAhdrCtx->AhdrProcRes.TmoProcRes.sw_hdrtmo_set_palpha = GetSetPalhpa(pAhdrCtx, set_lgmin, set_lgmax);
 
-#if LRK_DEBUG_LOG
     LOGD_AHDR("%s:lrk  Tmo set IOdata to register:\n", __FUNCTION__);
     LOGD_AHDR("%s:lrk lrk  float lgmax:%f\n", __FUNCTION__, lgmax);
     LOGD_AHDR("%s:lrk  sw_hdrtmo_lgmax:%d\n", __FUNCTION__, pAhdrCtx->AhdrProcRes.TmoProcRes.sw_hdrtmo_lgmax);
@@ -258,7 +232,6 @@ void TmoGetCurrIOData
     LOGD_AHDR("%s:lrk  sw_hdrtmo_lgscl_ratio:%d\n", __FUNCTION__, pAhdrCtx->AhdrProcRes.TmoProcRes.sw_hdrtmo_lgscl_ratio);
     LOGD_AHDR("%s:lrk  sw_hdrtmo_gain_ld_off1:%d\n", __FUNCTION__, pAhdrCtx->AhdrProcRes.TmoProcRes.sw_hdrtmo_gain_ld_off1);
     LOGD_AHDR("%s:lrk  sw_hdrtmo_gain_ld_off2:%d\n", __FUNCTION__, pAhdrCtx->AhdrProcRes.TmoProcRes.sw_hdrtmo_gain_ld_off2);
-#endif
 
     LOGI_AHDR("%s:Eixt!\n", __FUNCTION__);
 }
@@ -358,13 +331,11 @@ void TmoProcessing
     //get current IO data
     TmoGetCurrIOData(pAhdrCtx);
 
-#if LRK_DEBUG_LOG
     LOGD_AHDR("%s:lrk  Current damp GlobeLuma:%f \n", __FUNCTION__, pAhdrCtx->CurrHandleData.CurrTmoHandleData.GlobeLuma);
     LOGD_AHDR("%s:lrk  Current damp GlobeMaxLuma:%f \n", __FUNCTION__, pAhdrCtx->CurrHandleData.CurrTmoHandleData.GlobeMaxLuma);
     LOGD_AHDR("%s:lrk  Current damp DetailsHighLight:%f \n", __FUNCTION__, pAhdrCtx->CurrHandleData.CurrTmoHandleData.DetailsHighLight);
     LOGD_AHDR("%s:lrk  Current damp DetailsLowLight:%f \n", __FUNCTION__, pAhdrCtx->CurrHandleData.CurrTmoHandleData.DetailsLowLight);
     LOGD_AHDR("%s:lrk  Current damp TmoContrast:%f \n", __FUNCTION__, pAhdrCtx->CurrHandleData.CurrTmoHandleData.TmoContrast);
-#endif
 
     LOGI_AHDR("%s:Eixt!\n", __FUNCTION__);
 }

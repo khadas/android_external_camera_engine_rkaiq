@@ -715,15 +715,27 @@ ANRresult_t mfnr_fix_transfer(RKAnr_Mfnr_Params_Select_t* tnr, RKAnr_Mfnr_Fix_t 
 		
 	//0x008c
 	FIX_FLOAT(gain_glb_filt, F_DECI_GAIN, tmp, 0);
+	if(tmp > 0xffff){
+		tmp = 0xffff;
+	}
 	pMfnrCfg->glb_gain_cur = tmp;
     FIX_FLOAT(gain_glb_ref1, F_DECI_GAIN, tmp);
+	if(tmp > 0xffff){
+		tmp = 0xffff;
+	}
 	pMfnrCfg->glb_gain_nxt = tmp;
 
 	//0x0090
 	gain_glb_filt_sqrt_inv = FX_CLP(gain_glb_filt_sqrt_inv, F_INTE_GAIN_GLB_SQRT_INV, F_DECI_GAIN_GLB_SQRT_INV);
 	FIX_FLOAT(gain_glb_filt_sqrt_inv, F_DECI_GAIN_GLB_SQRT_INV, tmp);
+	if(tmp > 0x1fff){
+		tmp = 0x1fff;
+	}
 	pMfnrCfg->glb_gain_cur_div = tmp;
 	FIX_FLOAT(gain_glb_filt_sqrt, F_DECI_GAIN_GLB_SQRT, tmp);
+	if(tmp > 0xff){
+		tmp = 0xff;
+	}
 	pMfnrCfg->glb_gain_cur_sqrt = tmp;
 	
 	//0x0094 - 0x0098

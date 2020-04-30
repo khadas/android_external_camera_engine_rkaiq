@@ -3252,9 +3252,6 @@ RkAiqAfecHandleInt::prepare()
     RkAiqAlgoConfigAfecInt* afec_config_int = (RkAiqAlgoConfigAfecInt*)mConfig;
     RkAiqCore::RkAiqAlgosShared_t* shared = &mAiqCore->mAlogsSharedParams;
 
-    afec_config_int->output_width = shared->snsDes.isp_acq_width;
-    afec_config_int->output_height = shared->snsDes.isp_acq_height;
-
     memcpy(&afec_config_int->afec_calib_cfg, &shared->calib->afec, sizeof(CalibDb_FEC_t));
 
     RkAiqAlgoDescription* des = (RkAiqAlgoDescription*)mDes;
@@ -3318,9 +3315,6 @@ RkAiqAfecHandleInt::processing()
 
     comb->afec_proc_res = NULL;
     //fill procParam
-    afec_proc_int->output_width = shared->snsDes.isp_acq_width;
-    afec_proc_int->output_height = shared->snsDes.isp_acq_height;
-
     RkAiqAlgoDescription* des = (RkAiqAlgoDescription*)mDes;
     ret = des->processing(mProcInParam, mProcOutParam);
     RKAIQCORE_CHECK_RET(ret, "afec algo processing failed");
@@ -3896,9 +3890,6 @@ RkAiqAldchHandleInt::prepare()
 
     RkAiqAlgoConfigAldchInt* aldch_config_int = (RkAiqAlgoConfigAldchInt*)mConfig;
     RkAiqCore::RkAiqAlgosShared_t* shared = &mAiqCore->mAlogsSharedParams;
-    // build configs
-    aldch_config_int->output_width = shared->snsDes.isp_acq_width;
-    aldch_config_int->output_height = shared->snsDes.isp_acq_height;
 
     memcpy(&aldch_config_int->aldch_calib_cfg, &shared->calib->aldch, sizeof(CalibDb_LDCH_t));
 

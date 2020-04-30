@@ -25,6 +25,8 @@ RKAIQ_BEGIN_DECLARE
 
 typedef struct LDCHContext_s {
     unsigned char initialized;
+    unsigned int pic_width;
+    unsigned int pic_height;
     unsigned int ldch_en;
     unsigned int lut_h_size;
     unsigned int lut_v_size;
@@ -62,6 +64,14 @@ create_context(RkAiqAlgoContext **context, const AlgoCtxInstanceCfg* cfg)
 static XCamReturn
 destroy_context(RkAiqAlgoContext *context)
 {
+    LDCHHandle_t hLDCH = (LDCHHandle_t)context->hLDCH;
+    LDCHContext_t* ldchCtx = (LDCHContext_t*)hLDCH;
+
+    if (ldchCtx->lut_mapxy != NULL) {
+        free(ldchCtx->lut_mapxy);
+        ldchCtx->lut_mapxy = NULL;
+    }
+    context = NULL;
     return XCAM_RETURN_NO_ERROR;
 }
 
@@ -73,11 +83,43 @@ prepare(RkAiqAlgoCom* params)
     RkAiqAlgoConfigAldchInt* rkaiqAldchConfig = (RkAiqAlgoConfigAldchInt*)params;
 
     ldchCtx->ldch_en = rkaiqAldchConfig->aldch_calib_cfg.ldch_en;
-    ldchCtx->lut_h_size = rkaiqAldchConfig->aldch_calib_cfg.lut_h_size;
-    ldchCtx->lut_v_size = rkaiqAldchConfig->aldch_calib_cfg.lut_v_size;
-    ldchCtx->lut_mapxy_size = rkaiqAldchConfig->aldch_calib_cfg.lut_mapxy_size;
-    memcpy(ldchCtx->lut_mapxy, rkaiqAldchConfig->aldch_calib_cfg.lut_mapxy,
-        ldchCtx->lut_mapxy_size*sizeof(unsigned short));
+    LOGI_ALDCH("ldch en from xml file: %d", rkaiqAldchConfig->aldch_calib_cfg.ldch_en);
+
+    ldchCtx->pic_width = params->u.prepare.sns_op_width;
+    ldchCtx->pic_height = params->u.prepare.sns_op_height;
+
+    FILE* ofp;
+    ofp = fopen("/userdata/meshxy.bin", "rb");
+    if (ofp != NULL) {
+        unsigned short hpic, vpic, hsize, vsize, hstep, vstep = 0;
+
+        fread(&hpic, sizeof(unsigned short), 1, ofp);
+        fread(&vpic, sizeof(unsigned short), 1, ofp);
+        fread(&hsize, sizeof(unsigned short), 1, ofp);
+        fread(&vsize, sizeof(unsigned short), 1, ofp);
+        fread(&hstep, sizeof(unsigned short), 1, ofp);
+        fread(&vstep, sizeof(unsigned short), 1, ofp);
+        //fseek(ofp, 0, SEEK_SET);
+        LOGI_ALDCH("lut info: [%d-%d-%d-%d-%d-%d]", hpic, vpic, hsize, vsize, hstep, vstep);
+
+        ldchCtx->lut_h_size = hsize;
+        ldchCtx->lut_v_size = vsize;
+        ldchCtx->lut_mapxy_size = ldchCtx->lut_h_size * ldchCtx->lut_v_size * sizeof(unsigned short);
+        ldchCtx->lut_mapxy = (unsigned short*)malloc(ldchCtx->lut_mapxy_size);
+        ldchCtx->lut_h_size = hsize / 2; //word unit
+
+        unsigned int num = fread(ldchCtx->lut_mapxy, 1, ldchCtx->lut_mapxy_size, ofp);
+        fclose(ofp);
+
+        if (num != ldchCtx->lut_mapxy_size) {
+            ldchCtx->ldch_en = 0;
+            LOGE_ALDCH("mismatched lut calib file");
+        }
+        LOGE_ALDCH("check calib file, size: %d, num: %d", ldchCtx->lut_mapxy_size, num);
+    } else {
+        LOGW_ALDCH("lut calib file not exist");
+        ldchCtx->ldch_en = 0;
+    }
 
     return XCAM_RETURN_NO_ERROR;
 }
@@ -95,12 +137,18 @@ processing(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outparams)
     LDCHContext_t* ldchCtx = (LDCHContext_t*)hLDCH;
 
     RkAiqAlgoProcResAldchInt* ldchPreOut = (RkAiqAlgoProcResAldchInt*)outparams;
-    ldchPreOut->sw_ldch_en = ldchCtx->ldch_en;
-    ldchPreOut->lut_h_size = ldchCtx->lut_h_size;
-    ldchPreOut->lut_v_size = ldchCtx->lut_v_size;
-    ldchPreOut->lut_mapxy_size = ldchCtx->lut_mapxy_size;
-    memcpy(ldchPreOut->lut_mapxy, ldchCtx->lut_mapxy,
-        ldchCtx->lut_mapxy_size*sizeof(unsigned short));
+    ldchPreOut->ldch_result.sw_ldch_en = ldchCtx->ldch_en;
+    // TODO: add update flag for ldch
+    if (ldchCtx->ldch_en) {
+        ldchPreOut->ldch_result.lut_h_size = ldchCtx->lut_h_size;
+        ldchPreOut->ldch_result.lut_v_size = ldchCtx->lut_v_size;
+        ldchPreOut->ldch_result.lut_map_size = ldchCtx->lut_mapxy_size;
+        if (ldchCtx->lut_mapxy != NULL) {
+            memcpy(ldchPreOut->ldch_result.lut_mapxy, ldchCtx->lut_mapxy,
+                ldchCtx->lut_mapxy_size);
+        }
+        ldchCtx->ldch_en = 0;
+    }
 
     return XCAM_RETURN_NO_ERROR;
 }
