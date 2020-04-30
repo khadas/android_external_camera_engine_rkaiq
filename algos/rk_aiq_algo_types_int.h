@@ -42,8 +42,8 @@
 #include "a3dlut/rk_aiq_types_a3dlut_algo_int.h"
 #include "acp/rk_aiq_types_acp_algo_int.h"
 #include "aie/rk_aiq_types_aie_algo_int.h"
-
-
+#include "aldch/rk_aiq_types_aldch_algo_int.h"
+#include "afec/rk_aiq_types_afec_algo_int.h"
 
 // forward declare
 typedef struct _RkAiqAlgoPreResAe     RkAiqAlgoPreResAe;
@@ -795,9 +795,7 @@ typedef struct _RkAiqAlgoPostResAdpccInt {
 typedef struct _RkAiqAlgoConfigAfecInt {
     RkAiqAlgoConfigAfec afec_config_com;
     RkAiqAlgoComInt rk_com;
-    CalibDb_FEC_t      afec_calib_cfg;
-    unsigned int       output_width;
-    unsigned int       output_height;
+    CalibDb_FEC_t afec_calib_cfg;
 } RkAiqAlgoConfigAfecInt;
 
 typedef struct _RkAiqAlgoPreAfecInt {
@@ -812,24 +810,11 @@ typedef struct _RkAiqAlgoPreResAfecInt {
 typedef struct _RkAiqAlgoProcAfecInt {
     RkAiqAlgoProcAfec afec_proc_com;
     RkAiqAlgoComInt rk_com;
-    unsigned int       output_width;
-    unsigned int       output_height;
 } RkAiqAlgoProcAfecInt;
 
 typedef struct _RkAiqAlgoProcResAfecInt {
     RkAiqAlgoProcResAfec afec_proc_res_com;
-    unsigned int sw_fec_en;
-    unsigned int pic_width;
-    unsigned int pic_height;
-    unsigned int sw_rd_vir_stride;
-    unsigned int sw_wr_yuv_format;
-    unsigned int sw_wr_vir_stride;
-    unsigned int fec_mesh_h_size;
-    unsigned int fec_mesh_v_size;
-    unsigned short meshxi[512];// 8192/16
-    unsigned char meshxf[512];// 8192/16
-    unsigned short meshyi[1024];// 8192/8
-    unsigned char meshyf[1024];// 8192/8
+    fec_preprocess_result_t afec_result;
 } RkAiqAlgoProcResAfecInt;
 
 typedef struct _RkAiqAlgoPostAfecInt {
@@ -952,9 +937,7 @@ typedef struct _RkAiqAlgoPostResAieInt {
 typedef struct _RkAiqAlgoConfigAldchInt {
     RkAiqAlgoConfigAldch aldch_config_com;
     RkAiqAlgoComInt rk_com;
-    CalibDb_LDCH_t     aldch_calib_cfg;
-    unsigned int       output_width;
-    unsigned int       output_height;
+    CalibDb_LDCH_t aldch_calib_cfg;
 } RkAiqAlgoConfigAldchInt;
 
 typedef struct _RkAiqAlgoPreAldchInt {
@@ -973,11 +956,7 @@ typedef struct _RkAiqAlgoProcAldchInt {
 
 typedef struct _RkAiqAlgoProcResAldchInt {
     RkAiqAlgoProcResAldch aldch_proc_res_com;
-    unsigned int sw_ldch_en;
-    unsigned int lut_h_size;
-    unsigned int lut_v_size;
-    unsigned int lut_mapxy_size;
-    unsigned short* lut_mapxy;
+    ldch_process_result_t ldch_result;
 } RkAiqAlgoProcResAldchInt;
 
 typedef struct _RkAiqAlgoPostAldchInt {

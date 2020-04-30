@@ -32,8 +32,6 @@
 #define SHIFT11BIT(A)         (A*2048)
 #define SHIFT12BIT(A)         (A*4096)
 
-#define LRK_DEBUG_LOG  (1)
-
 #define AHDR_RET_SUCCESS             0   //!< this has to be 0, if clauses rely on it
 #define AHDR_RET_FAILURE             1   //!< general failure
 #define AHDR_RET_NOTSUPP             2   //!< feature not supported
@@ -122,6 +120,11 @@ typedef struct TmoHandleData_s
     float DetailsHighLight;
     float DetailsLowLight;
     float TmoContrast;
+
+    float clipgap0;
+    float clipgap1;
+    float clipratio0;
+    float clipratio1;
 } TmoHandleData_t;
 
 typedef struct MergeHandleData_s
@@ -147,7 +150,7 @@ typedef struct AhdrPrevData_s
     float PreDynamicRange;
     MergeHandleData_t PrevMergeHandleData;
     TmoHandleData_t PrevTmoHandleData;
-    unsigned short ro_hdrtmo_lgmean_all[16];
+    unsigned short ro_hdrtmo_lgmean;
 } AhdrPrevData_t;
 
 typedef struct CurrAeResult_s {
@@ -205,6 +208,7 @@ typedef struct CurrHandleData_s
     float DarkPdfTH;
     float CurrTotalFocusLuma;
     float TmoDamp;
+    float CurrLgMean;
     float LumaWeight[225];
     float MergeOEDamp;
     float MergeMDDampLM;

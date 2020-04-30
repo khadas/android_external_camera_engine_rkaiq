@@ -97,7 +97,7 @@ typedef unsigned long long u64;
 #define ORB_DUMMY_NUM			13
 
 #define FEC_MESH_XY_POINT_SIZE		6
-#define FEC_MESH_XY_NUM			5120
+#define FEC_MESH_XY_NUM			131072
 
 struct rkispp_tnr_config {
 	u8 opty_en;

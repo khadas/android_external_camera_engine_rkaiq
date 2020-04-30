@@ -896,6 +896,11 @@ XCamReturn CamHwIsp20::stop()
     if (ret < 0) {
         LOGE_CAMHW("stop ispp params dev err: %d\n", ret);
     }
+
+    mIsppStatsDev->stop();
+    if (ret < 0) {
+        LOGE_CAMHW("stop ispp stats dev err: %d\n", ret);
+    }
 #endif
     ret = isp20Pollthread->hdr_mipi_stop();
     if (ret < 0) {
@@ -1031,13 +1036,10 @@ CamHwIsp20::overrideExpRatioToAiqResults(const sint32_t frameId,
 	aiq_results->data()->ahdr_proc_res.TmoProcRes.sw_hdrtmo_set_lgrange1 = (int)(2048*value);
 
 	//sw_hdrtmo_set_lgavgmax
-	float WeightKey = 0.0;
+	float WeightKey = aiq_results->data()->ahdr_proc_res.TmoProcRes.sw_hdrtmo_set_weightkey / 256.0;
 	value = 0.0;
 	float set_lgmean = aiq_results->data()->ahdr_proc_res.TmoProcRes.sw_hdrtmo_set_lgmean / 2048.0;
 	float lgrange1 = aiq_results->data()->ahdr_proc_res.TmoProcRes.sw_hdrtmo_set_lgrange1 / 2048.0;
-	WeightKey = MIN(2 / (curLgmax - set_lgmean), 2 / (1 - lgmin));
-	WeightKey = MIN((1 - WeightKey), 0.6);
-	WeightKey = MAX(WeightKey, 0);
 	value = WeightKey * curLgmax + (1 - WeightKey) * set_lgmean;
 	value = MIN(value, lgrange1);
 	aiq_results->data()->ahdr_proc_res.TmoProcRes.sw_hdrtmo_set_lgavgmax = (int)(2048*value);
@@ -1196,6 +1198,9 @@ CamHwIsp20::gen_full_isp_params(const struct isp2x_isp_params_cfg* update_params
                 break;
 			case RK_ISP2X_GAIN_ID:
                 full_params->others.gain_cfg = update_params->others.gain_cfg;
+                break;
+            case RK_ISP2X_LDCH_ID:
+                full_params->others.ldch_cfg= update_params->others.ldch_cfg;
                 break;
             default:
                 break;
@@ -1368,8 +1373,14 @@ CamHwIsp20::setIspParamsSync(int frameId)
     struct isp2x_isp_params_cfg update_params;
     SmartPtr<RkAiqIspParamsProxy> aiq_results;
 
-    xcam_mem_clear (update_params);
-    xcam_mem_clear (_full_active_isp_params);
+    /* xcam_mem_clear (update_params); */
+    /* xcam_mem_clear (_full_active_isp_params); */
+    update_params.module_en_update = 0;
+    update_params.module_ens = 0;
+    update_params.module_cfg_update = 0;
+    _full_active_isp_params.module_en_update = 0;
+    _full_active_isp_params.module_ens = 0;
+    _full_active_isp_params.module_cfg_update = 0;
     LOGD_CAMHW("merge isp params num %d\n", _pending_ispparams_queue.size());
     aiq_results = _pending_ispparams_queue.back();
     _pending_ispparams_queue.pop_back();
@@ -1472,6 +1483,8 @@ CamHwIsp20::setIspParamsSync(int frameId)
                 return ret;
             }
 
+	    _effecting_ispparm_map[frameId] = aiq_results;
+
             LOGD_CAMHW ("device(%s) queue buffer index %d, queue cnt %d, check exit status again[exit: %d]",
                             XCAM_STR (mIspParamsDev->get_device_name()),
                             buf_index, mIspParamsDev->get_queued_bufcnt(), _is_exit);
@@ -1541,6 +1554,7 @@ CamHwIsp20::setIsppParams(SmartPtr<RkAiqIsppParamsProxy>& isppParams)
             int buf_index = v4l2buf->get_buf().index;
 
             ispp_params = (struct rkispp_params_cfg*)v4l2buf->get_buf().m.userptr;
+            LOGD("module_init_ens frome drv 0x%x\n", ispp_params->module_init_ens);
             convertAiqResultsToIsp20PpParams(*ispp_params, isppParams);
 
 #ifdef RUNTIME_MODULE_DEBUG
@@ -1653,6 +1667,52 @@ CamHwIsp20::setHdrProcessCount(int frame_id, int count)
     return ret;
 }
 
+
+XCamReturn
+CamHwIsp20::getEffectiveIspParams(SmartPtr<RkAiqIspParamsProxy>& ispParams, int frame_id)
+{
+    ENTER_CAMHW_FUNCTION();
+    std::map<int, SmartPtr<RkAiqIspParamsProxy>>::iterator it;
+    int search_id = frame_id < 0 ? 0 : frame_id;
+    SmartLock locker (_mutex);
+
+    if (_effecting_ispparm_map.size() == 0) {
+        LOGE_CAMHW("can't search id %d,  _effecting_exp_mapsize is %d\n",
+                   frame_id, _effecting_ispparm_map.size());
+        return  XCAM_RETURN_ERROR_PARAM;
+    }
+
+    it = _effecting_ispparm_map.find(search_id);
+
+    // havn't found
+    if (it == _effecting_ispparm_map.end()) {
+	std::map<int, SmartPtr<RkAiqIspParamsProxy>>::reverse_iterator rit;
+
+	rit = _effecting_ispparm_map.rbegin();
+	do {
+            LOGD_CAMHW("traverse _effecting_ispparm_map to find id %d, current id is [%d]\n",
+                       search_id, rit->first);
+            if (search_id >= rit->first ) {
+                LOGD_CAMHW("exp-sync: can't find id %d, get latest id %d in _effecting_ispparm_map\n",
+                           search_id, rit->first);
+                break;
+            }
+        } while (++rit != _effecting_ispparm_map.rend());
+
+        if (rit == _effecting_ispparm_map.rend()) {
+            LOGE_CAMHW("can't find the latest effecting exposure for id %d, impossible case !", frame_id);
+            return XCAM_RETURN_ERROR_PARAM;
+        }
+
+        ispParams= rit->second;
+    } else {
+        ispParams= it->second;
+    }
+
+    EXIT_CAMHW_FUNCTION();
+
+    return XCAM_RETURN_NO_ERROR;
+}
 
 void CamHwIsp20::dumpRawnrFixValue(struct isp2x_rawnr_cfg * pRawnrCfg )
 {

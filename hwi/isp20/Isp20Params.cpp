@@ -655,7 +655,7 @@ void Isp20Params::convertAiqAhdrToIsp20Params(struct isp2x_isp_params_cfg& isp_c
     isp_cfg.others.hdrtmo_cfg.cnt_mode      = ahdr_data.TmoProcRes.sw_hdrtmo_cnt_mode;
     isp_cfg.others.hdrtmo_cfg.expl_lgratio  = ahdr_data.TmoProcRes.sw_hdrtmo_expl_lgratio;
     isp_cfg.others.hdrtmo_cfg.lgscl_ratio   = ahdr_data.TmoProcRes.sw_hdrtmo_lgscl_ratio;
-    isp_cfg.others.hdrtmo_cfg.cfg_alpha     = 0; //ahdr_data.TmoProcRes.sw_hdrtmo_cfg_alpha;
+    isp_cfg.others.hdrtmo_cfg.cfg_alpha     = ahdr_data.TmoProcRes.sw_hdrtmo_cfg_alpha;
     isp_cfg.others.hdrtmo_cfg.set_gainoff   = ahdr_data.TmoProcRes.sw_hdrtmo_set_gainoff;
     isp_cfg.others.hdrtmo_cfg.set_palpha    = ahdr_data.TmoProcRes.sw_hdrtmo_set_palpha;
     isp_cfg.others.hdrtmo_cfg.set_lgmax     = ahdr_data.TmoProcRes.sw_hdrtmo_set_lgmax;
@@ -1865,7 +1865,7 @@ Isp20Params::convertAiqSharpenToIsp20Params(struct rkispp_params_cfg& pp_cfg,
         pp_cfg.module_en_update |= ISPP_MODULE_SHP;
         pp_cfg.module_cfg_update |= ISPP_MODULE_SHP;
 	}
-
+#if 1
     //0x0080
     pSharpCfg->alpha_adp_en = edgeflt.alpha_adp_en;
     pSharpCfg->yin_flt_en = pSharpV1->yin_flt_en;
@@ -1998,7 +1998,7 @@ Isp20Params::convertAiqSharpenToIsp20Params(struct rkispp_params_cfg& pp_cfg,
     //0x012C
     pSharpCfg->m_ratio = pSharpV1->m_ratio;
     pSharpCfg->h_ratio = pSharpV1->h_ratio;
-
+#endif
 }
 
 
@@ -2089,6 +2089,7 @@ Isp20Params::convertAiqResultsToIsp20Params(struct isp2x_isp_params_cfg& isp_cfg
     convertAiqAfToIsp20Params(isp_cfg, aiq_results->data()->af_meas);
     convertAiqAdehazeToIsp20Params(isp_cfg, aiq_results->data()->adhaz_config);
     convertAiqA3dlutToIsp20Params(isp_cfg, aiq_results->data()->lut3d);
+    convertAiqAldchToIsp20Params(isp_cfg, aiq_results->data()->ldch);
 
 	//must be at the end of isp module
 	convertAiqGainToIsp20Params(isp_cfg, aiq_results->data()->gain_config);
@@ -2109,6 +2110,42 @@ Isp20Params::convertAiqResultsToIsp20Params(struct isp2x_isp_params_cfg& isp_cfg
     return ret;
 }
 
+void
+Isp20Params::convertAiqFecToIsp20Params(struct rkispp_params_cfg& pp_cfg,
+        rk_aiq_isp_fec_t& fec)
+{
+    /* FEC module can't be enable/disable dynamically, the mode should
+     * be decided in init params. we'll check if the module_init_ens
+     * changed in CamIsp20Hw.cpp
+     */
+
+    LOGD("fec update params, enable %d ", fec.fec_en);
+	if(fec.fec_en){
+    	pp_cfg.module_ens |= ISPP_MODULE_FEC;
+        pp_cfg.module_en_update |= ISPP_MODULE_FEC;
+        pp_cfg.module_cfg_update |= ISPP_MODULE_FEC;
+        /* TODO: get init fec mode from iq */
+        if (0/*TODO*/) {
+            pp_cfg.module_init_ens |= ISPP_MODULE_FEC_ST;
+        } else {
+            pp_cfg.module_init_ens |= ISPP_MODULE_FEC;
+        }
+        struct rkispp_fec_config  *pFecCfg = &pp_cfg.fec_cfg;
+
+        pFecCfg->crop_en = fec.crop_en;
+        pFecCfg->crop_width = fec.crop_width;
+        pFecCfg->crop_height = fec.crop_height;
+        pFecCfg->mesh_density = fec.mesh_density;
+        pFecCfg->mesh_size = fec.mesh_size;
+        memcpy(pFecCfg->meshxf, fec.sw_mesh_xf, sizeof(pFecCfg->meshxf));
+        memcpy(pFecCfg->meshyf, fec.sw_mesh_yf, sizeof(pFecCfg->meshyf));
+        memcpy(pFecCfg->meshxi, fec.sw_mesh_xi, sizeof(pFecCfg->meshxi));
+        memcpy(pFecCfg->meshyi, fec.sw_mesh_yi, sizeof(pFecCfg->meshyi));
+    } else {
+        pp_cfg.module_init_ens &= ~(ISPP_MODULE_FEC_ST | ISPP_MODULE_FEC);
+    }
+}
+
 XCamReturn
 Isp20Params::convertAiqResultsToIsp20PpParams(struct rkispp_params_cfg& pp_cfg,
         SmartPtr<RkAiqIsppParamsProxy> aiq_results)
@@ -2121,6 +2158,12 @@ Isp20Params::convertAiqResultsToIsp20PpParams(struct rkispp_params_cfg& pp_cfg,
     convertAiqYnrToIsp20Params(pp_cfg, aiq_results->data()->ynr);
     convertAiqSharpenToIsp20Params(pp_cfg, aiq_results->data()->sharpen,
                                    aiq_results->data()->edgeflt);
+                                   
+    if(aiq_results->data()->update_mask & RKAIQ_ISPP_FEC_ID){
+        convertAiqFecToIsp20Params(pp_cfg, aiq_results->data()->fec);
+    } else
+        pp_cfg.module_init_ens |= _last_pp_module_init_ens & (ISPP_MODULE_FEC_ST | ISPP_MODULE_FEC_ST);
+    _last_pp_module_init_ens = pp_cfg.module_init_ens;
 
     return ret;
 }
@@ -2262,6 +2305,24 @@ Isp20Params::convertAiqIeToIsp20Params(struct isp2x_isp_params_cfg& isp_cfg,
     break;
     default:
         break;
+    }
+}
+
+void
+Isp20Params::convertAiqAldchToIsp20Params(struct isp2x_isp_params_cfg& isp_cfg,
+                                       const rk_aiq_isp_ldch_t& ldch_cfg)
+{
+    struct isp2x_ldch_cfg  *pLdchCfg = &isp_cfg.others.ldch_cfg;
+
+    // TODO: add update flag for ldch
+    if (ldch_cfg.ldch_en) {
+        isp_cfg.module_ens |= ISP2X_MODULE_LDCH;
+        isp_cfg.module_en_update |= ISP2X_MODULE_LDCH;
+        isp_cfg.module_cfg_update |= ISP2X_MODULE_LDCH;
+
+        pLdchCfg->hsize = ldch_cfg.lut_h_size;
+        pLdchCfg->vsize = ldch_cfg.lut_v_size;
+        memcpy(pLdchCfg->data, ldch_cfg.lut_mapxy, ldch_cfg.lut_size);
     }
 }
 

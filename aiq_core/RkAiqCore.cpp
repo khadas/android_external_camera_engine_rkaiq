@@ -1236,15 +1236,26 @@ RkAiqCore::genIspAfecResult(RkAiqFullParams* params)
 
     SmartPtr<RkAiqHandle>* handle = getCurAlgoTypeHandle(RK_AIQ_ALGO_TYPE_AFEC);
     int algo_id = (*handle)->getAlgoId();
-
-    ispp_param->update_mask |= RKAIQ_ISPP_FEC_ID;
     // gen rk afec result
     if (algo_id == 0) {
         RkAiqAlgoProcResAfecInt* afec_rk = (RkAiqAlgoProcResAfecInt*)afec_com;
 
-#ifdef RK_SIMULATOR_HW
-#else
-#endif
+        if (afec_rk->afec_result.update) {
+            ispp_param->update_mask |= RKAIQ_ISPP_FEC_ID;
+            ispp_param->fec.fec_en = afec_rk->afec_result.sw_fec_en;
+            if (ispp_param->fec.fec_en) {
+                ispp_param->fec.crop_en = afec_rk->afec_result.crop_en;
+                ispp_param->fec.crop_width = afec_rk->afec_result.crop_width;
+                ispp_param->fec.crop_height = afec_rk->afec_result.crop_height;
+                ispp_param->fec.mesh_density = afec_rk->afec_result.mesh_density;
+                ispp_param->fec.mesh_size = afec_rk->afec_result.mesh_size;
+                memcpy(ispp_param->fec.sw_mesh_xi, afec_rk->afec_result.meshxi, sizeof(ispp_param->fec.sw_mesh_xi));
+                memcpy(ispp_param->fec.sw_mesh_xf, afec_rk->afec_result.meshxf, sizeof(ispp_param->fec.sw_mesh_xf));
+                memcpy(ispp_param->fec.sw_mesh_yi, afec_rk->afec_result.meshyi, sizeof(ispp_param->fec.sw_mesh_yi));
+                memcpy(ispp_param->fec.sw_mesh_yf, afec_rk->afec_result.meshyf, sizeof(ispp_param->fec.sw_mesh_yf));
+            }
+        } else
+            ispp_param->update_mask &= ~RKAIQ_ISPP_FEC_ID;
     }
 
     EXIT_ANALYZER_FUNCTION();
@@ -1334,7 +1345,15 @@ RkAiqCore::genIspAldchResult(RkAiqFullParams* params)
         return XCAM_RETURN_NO_ERROR;
     }
 
-    // TODO: gen aldch common result
+    // TODO: add update flag for ldch
+    RkAiqAlgoProcResAldchInt* aldch_rk = (RkAiqAlgoProcResAldchInt*)aldch_com;
+    isp_param->ldch.ldch_en = aldch_rk->ldch_result.sw_ldch_en;
+    if (isp_param->ldch.ldch_en) {
+        isp_param->ldch.lut_h_size = aldch_rk->ldch_result.lut_h_size;
+        isp_param->ldch.lut_v_size = aldch_rk->ldch_result.lut_v_size;
+        isp_param->ldch.lut_size = aldch_rk->ldch_result.lut_map_size;
+        memcpy(isp_param->ldch.lut_mapxy, aldch_rk->ldch_result.lut_mapxy, aldch_rk->ldch_result.lut_map_size);
+    }
 
     SmartPtr<RkAiqHandle>* handle = getCurAlgoTypeHandle(RK_AIQ_ALGO_TYPE_ALDCH);
     int algo_id = (*handle)->getAlgoId();
@@ -1342,10 +1361,6 @@ RkAiqCore::genIspAldchResult(RkAiqFullParams* params)
     // gen rk aldch result
     if (algo_id == 0) {
         RkAiqAlgoProcResAldchInt* aldch_rk = (RkAiqAlgoProcResAldchInt*)aldch_com;
-
-#ifdef RK_SIMULATOR_HW
-#else
-#endif
     }
 
     EXIT_ANALYZER_FUNCTION();
@@ -1641,6 +1656,8 @@ RkAiqCore::addDefaultAlgos()
     enableAlgo(RK_AIQ_ALGO_TYPE_ASHARP, 0, true);
     enableAlgo(RK_AIQ_ALGO_TYPE_ADHAZ, 0, true);
     /*enableAlgo(RK_AIQ_ALGO_TYPE_A3DLUT, 0, true); */
+    enableAlgo(RK_AIQ_ALGO_TYPE_ALDCH, 0, true);
+    enableAlgo(RK_AIQ_ALGO_TYPE_AFEC, 0, true);
 #endif
 #endif
 }

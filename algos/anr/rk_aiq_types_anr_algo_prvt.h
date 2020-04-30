@@ -125,6 +125,8 @@ RKAIQ_BEGIN_DECLARE
 #define GAIN_SIGMA_BITS_ACT		10
 #define MAX_INTEPORATATION_LUMAPOINT 	17
 #define	GAIN_HDR_MERGE_IN_FIX_BITS_DECI		        6
+#define	GAIN_HDR_MERGE_IN2_FIX_BITS_INTE		    12
+#define	GAIN_HDR_MERGE_IN0_FIX_BITS_INTE		    8
 
 
 /************uvnr fix***************/
@@ -171,6 +173,7 @@ RKAIQ_BEGIN_DECLARE
 #define WAVELET_LEVEL_3 2
 #define WAVELET_LEVEL_4 3
 #define YNR_SIGMA_BITS  10
+
 
 
 

@@ -112,7 +112,6 @@ RESULT MergeGetCurrIOData
     pAhdrCtx->AhdrProcRes.MgeProcRes.sw_hdrmge_gain2 = (int)SHIFT6BIT(pAhdrCtx->CurrHandleData.CurrL2L_Ratio);
 #endif
 
-#if LRK_DEBUG_LOG
     LOGD_AHDR("%s:lrk  Merge set IOdata to register:\n", __FUNCTION__);
     LOGD_AHDR("%s:lrk  sw_hdrmge_mode:%d \n", __FUNCTION__, pAhdrCtx->AhdrProcRes.MgeProcRes.sw_hdrmge_mode);
     LOGD_AHDR("%s:lrk  sw_hdrmge_ms_dif_0p8:%d \n", __FUNCTION__, pAhdrCtx->AhdrProcRes.MgeProcRes.sw_hdrmge_ms_dif_0p8);
@@ -130,7 +129,6 @@ RESULT MergeGetCurrIOData
         LOGD_AHDR("%s:lrk  sw_hdrmge_l0_y[%d]:%d \n", __FUNCTION__, i, pAhdrCtx->AhdrProcRes.MgeProcRes.sw_hdrmge_l0_y[i]);
     for(int i = 0; i < 17; i++)
         LOGD_AHDR("%s:lrk  sw_hdrmge_l1_y[%d]:%d \n", __FUNCTION__, i, pAhdrCtx->AhdrProcRes.MgeProcRes.sw_hdrmge_l1_y[i]);
-#endif
 
     LOGI_AHDR("%s:Eixt!\n", __FUNCTION__);
     return(result);
@@ -171,14 +169,12 @@ RESULT MergeProcessing
     //get current IO data
     result = MergeGetCurrIOData(pAhdrCtx);
 
-#if LRK_DEBUG_LOG
     LOGD_AHDR("%s:lrk  Current damp OECurve_smooth:%f \n", __FUNCTION__, pAhdrCtx->CurrHandleData.CurrMergeHandleData.OECurve_smooth);
     LOGD_AHDR("%s:lrk  Current damp OECurve_offset:%f \n", __FUNCTION__, pAhdrCtx->CurrHandleData.CurrMergeHandleData.OECurve_offset);
     LOGD_AHDR("%s:lrk  Current damp MDCurveLM_smooth:%f \n", __FUNCTION__, pAhdrCtx->CurrHandleData.CurrMergeHandleData.MDCurveLM_smooth);
     LOGD_AHDR("%s:lrk  Current damp MDCurveLM_offset:%f \n", __FUNCTION__, pAhdrCtx->CurrHandleData.CurrMergeHandleData.MDCurveLM_offset);
     LOGD_AHDR("%s:lrk  Current damp MDCurveMS_smooth:%f \n", __FUNCTION__, pAhdrCtx->CurrHandleData.CurrMergeHandleData.MDCurveMS_smooth);
     LOGD_AHDR("%s:lrk  Current damp MDCurveMS_offset:%f \n", __FUNCTION__, pAhdrCtx->CurrHandleData.CurrMergeHandleData.MDCurveMS_offset);
-#endif
 
     LOGI_AHDR("%s:Eixt!\n", __FUNCTION__);
     return(result);

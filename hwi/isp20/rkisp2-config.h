@@ -140,6 +140,8 @@
 
 #define ISP2X_3DLUT_DATA_NUM        729
 
+#define ISP2X_LDCH_MESH_XY_NUM        524288
+
 struct isp2x_csi_trigger {
     u32 frame_id;
     int times;
@@ -845,7 +847,7 @@ struct isp2x_3dlut_cfg {
 struct isp2x_ldch_cfg {
     u32 hsize;
     u32 vsize;
-    u32 data[1];
+    u16 data[ISP2X_LDCH_MESH_XY_NUM];
 } __attribute__ ((packed));
 
 struct isp2x_awb_gain_cfg {

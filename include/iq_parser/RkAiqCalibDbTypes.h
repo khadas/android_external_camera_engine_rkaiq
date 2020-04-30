@@ -787,7 +787,11 @@ typedef struct CalibDb_HdrTmo_s
     float DRTolerance;
     float DayTh;
     float TmoContrast[6];
-    float damp;
+    float clipgap0;
+	float clipgap1;
+	float clipratio0;
+	float clipratio1;
+	float damp;
 } CalibDb_HdrTmo_t;
 
 typedef struct CalibDb_Ahdr_Para_s {
@@ -1409,24 +1413,12 @@ typedef struct CalibDb_ORB_s {
 } CalibDb_ORB_t;
 
 typedef struct CalibDb_FEC_s {
-    unsigned int fec_en;
-    unsigned int mesh_density; //0:16x8 1:32x16
-    unsigned int yuv_format; //0:YUV420 1:YUV422
-    unsigned int fbce_mode; //0:normal 1:fbec
-    unsigned int fec_mesh_h_size;
-    unsigned int fec_mesh_v_size;
-    unsigned short* meshxi;
-    unsigned char* meshxf;
-    unsigned short* meshyi;
-    unsigned char* meshyf;
+    unsigned char fec_en;
+    char meshfile[256];
 } CalibDb_FEC_t;
 
 typedef struct CalibDb_LDCH_s {
-    unsigned int ldch_en;
-    unsigned int lut_h_size;
-    unsigned int lut_v_size;
-    unsigned int lut_mapxy_size;
-    unsigned short* lut_mapxy;
+    unsigned char ldch_en;
 } CalibDb_LDCH_t;
 typedef struct {
     bool enable;

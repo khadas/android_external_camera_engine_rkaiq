@@ -45,6 +45,8 @@
 #include "ablc/rk_aiq_types_ablc_algo.h"
 #include "ablc/rk_aiq_types_ablc_algo_int.h"
 #include "agic/rk_aiq_types_algo_agic.h"
+#include "aldch/rk_aiq_types_aldch_algo.h"
+#include "afec/rk_aiq_types_afec_algo.h"
 
 #ifdef RK_SIMULATOR_HW
 #include "simulator/isp20_hw_simulator.h"
@@ -497,19 +499,21 @@ typedef struct {
     int ldch_en;
     int lut_h_size;
     int lut_v_size;
+    int lut_size;
+    unsigned short lut_mapxy[LDCH_MESH_XY_NUM_ALGO];
 } rk_aiq_isp_ldch_t;
 
 typedef struct {
-    int fec_en;
-    int pic_width;
-    int pic_height;
-    int sw_rd_vir_stride;
-    int sw_wr_yuv_format;
-    int sw_wr_vir_stride;
-    unsigned short sw_mesh_xi[512];
-    unsigned char sw_mesh_xf[512];
-    unsigned short sw_mesh_yi[1024];
-    unsigned char sw_mesh_yf[1024];
+    unsigned char fec_en;
+    unsigned char crop_en;
+    unsigned int crop_width;
+    unsigned int crop_height;
+    unsigned char mesh_density;
+    unsigned int mesh_size;
+    unsigned short sw_mesh_xi[FEC_MESH_XY_NUM_ALGO];
+    unsigned char sw_mesh_xf[FEC_MESH_XY_NUM_ALGO];
+    unsigned short sw_mesh_yi[FEC_MESH_XY_NUM_ALGO];
+    unsigned char sw_mesh_yf[FEC_MESH_XY_NUM_ALGO];
 } rk_aiq_isp_fec_t;
 
 #if 0
@@ -629,7 +633,7 @@ typedef struct {
     rk_aiq_lsc_cfg_t        lsc;
     rk_aiq_isp_demosaic_t   demosaic;
     rk_aiq_isp_ldch_t       ldch;
-    rk_aiq_isp_fec_t        fec;
+    //rk_aiq_isp_fec_t        fec;
     rk_aiq_lut3d_cfg_t      lut3d;
     //rk_aiq_isp_dehaze_t     dehaze;
     rk_aiq_dehaze_cfg_t     adhaz_config;
@@ -688,6 +692,7 @@ typedef struct {
     rk_aiq_isp_sharpen_t    sharpen;
     rk_aiq_isp_edgeflt_t    edgeflt;
     rk_aiq_isp_orb_t        orb;
+    rk_aiq_isp_fec_t        fec;
 } rk_aiq_ispp_params_t;
 
 #endif

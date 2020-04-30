@@ -20,7 +20,7 @@
 #define HIST_WEIGHT_NUM     225
 #define HIST_BIN_N_MAX      256
 
-#define MAX_AEC_EFFECT_FNUM 4
+#define MAX_AEC_EFFECT_FNUM 5
 
 typedef enum _RAWAE_WND_NUM {
     RAWAE_WND_1X1 = 0,
