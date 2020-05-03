@@ -1683,7 +1683,7 @@ Isp20Params::convertAiqUvnrToIsp20Params(struct rkispp_params_cfg& pp_cfg,
     pNrCfg->uvnr_gain_uvgain[1] = uvnr.uvnr_gain_uvgain[1];
     pNrCfg->uvnr_gain_t2gen = uvnr.uvnr_gain_t2gen;
     // no need set
-    //pNrCfg->uvnr_gain_iso = uvnr.bfRatio1;
+    pNrCfg->uvnr_gain_iso = uvnr.uvnr_gain_iso;
 
     //0x0090
     pNrCfg->uvnr_t1gen_m3alpha = uvnr.uvnr_t1gen_m3alpha;

@@ -267,7 +267,7 @@ ANRresult_t select_uvnr_params_by_ISO(RKAnr_Uvnr_Params_t *stRKUVNrParams, RKAnr
 }
 
 
-ANRresult_t uvnr_fix_transfer(RKAnr_Uvnr_Params_Select_t *uvnr, RKAnr_Uvnr_Fix_t *pNrCfg)
+ANRresult_t uvnr_fix_transfer(RKAnr_Uvnr_Params_Select_t *uvnr, RKAnr_Uvnr_Fix_t *pNrCfg, ANRExpInfo_t *pExpInfo)
 {
 	LOGI_ANR("%s:(%d) enter \n", __FUNCTION__, __LINE__);
 
@@ -283,6 +283,13 @@ ANRresult_t uvnr_fix_transfer(RKAnr_Uvnr_Params_Select_t *uvnr, RKAnr_Uvnr_Fix_t
 		LOGE_ANR("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
 		return ANR_RET_NULL_POINTER;
 	}
+
+	if(pExpInfo == NULL){
+		LOGE_ANR("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
+		return ANR_RET_NULL_POINTER;
+	}
+
+	int iso = pExpInfo->arIso[pExpInfo->hdr_mode];
 
 	//0x0080
 	pNrCfg->uvnr_step1_en = 1;
@@ -303,7 +310,17 @@ ANRresult_t uvnr_fix_transfer(RKAnr_Uvnr_Params_Select_t *uvnr, RKAnr_Uvnr_Fix_t
 	pNrCfg->uvnr_gain_uvgain[1] = (unsigned char)(uvnr->uvgain3 * (1 << RKUVNR_uvgain));
 	pNrCfg->uvnr_gain_t2gen = (unsigned char)(uvnr->uvgain2 * (1 << RKUVNR_uvgain));
 	// no need set
-	pNrCfg->uvnr_gain_iso = 0x20;
+	pNrCfg->uvnr_gain_iso = (int)(sqrt(50.0 / (float)(iso)) * (1 << RKUVNR_gainRatio));
+	if(pNrCfg->uvnr_gain_iso > 0x80){
+		pNrCfg->uvnr_gain_iso = 0x80;
+	}
+	
+	if(pNrCfg->uvnr_gain_iso < 0x8){
+		pNrCfg->uvnr_gain_iso = 0x8;
+	}
+	LOGD_ANR("%s:%d uvnr iso:%d  reg:0x%x\n", 
+		__FUNCTION__, __LINE__,
+		iso, pNrCfg->uvnr_gain_iso);
 
 	//0x0090
 	pNrCfg->uvnr_t1gen_m3alpha = (uvnr->medRatio1 * (1 << RKUVNR_medRatio));

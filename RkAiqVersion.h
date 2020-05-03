@@ -30,8 +30,13 @@
  *  - optimize hdr image quality
  *  - fix circular flicker of image luma
  *  - add fec and ldch, default disabled
+ * v0.1.1
+ *  - fix some bugs of bayer nr, ynr, uvnr 
+ *  - optimize imx347 hdr mode image quality
+ *  - workaround for imx347 ae flicker when the
+ *    luma changed dramatically
  */
 
-#define RK_AIQ_VERSION "v0.1.0"
+#define RK_AIQ_VERSION "v0.1.1"
 
 #endif

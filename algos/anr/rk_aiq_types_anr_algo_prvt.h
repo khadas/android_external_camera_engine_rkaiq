@@ -138,6 +138,8 @@ RKAIQ_BEGIN_DECLARE
 #define RKUVNR_uvgain 4  
 #define RKUVNR_exp2_lut_y 7 
 #define RKUVNR_bfRatio RKUVNR_exp2_lut_y
+#define RKUVNR_gainRatio 7
+
 
 /************ynr fix***************/
 #define FIX_BIT_CI                     5//7

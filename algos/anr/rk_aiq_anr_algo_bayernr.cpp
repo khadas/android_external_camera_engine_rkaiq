@@ -162,18 +162,26 @@ ANRresult_t selsec_hdr_parmas_by_ISO(RKAnr_Bayernr_Params_t *stBayerNrParams, RK
 
 	for (i=0;i<framenum;i++){
 		fdgain[i] = fdgain[framenum-1]/fdgain[i];
+		#if 0
 		stBayerNrParamsSelected->sw_dgain[i] = fdgain[i];
+		#else
+		stBayerNrParamsSelected->sw_dgain[i] = sqrt(fdgain[i]);
+		#endif
 	}
 
 	float filtParDiscount = (float)0.1;
 	for (i=0; i<framenum; i++)
 	{
 		float gainsqrt = sqrt(fdgain[i]);
+		#if 0
 		float par = (stBayerNrParamsSelected->filtPar[i] * filtParDiscount);
 
 		LOGD_ANR("gainsqrt:%f filtpar:%f, total:%f\n", 
 			gainsqrt, stBayerNrParamsSelected->filtPar[i], par*gainsqrt);
 		stBayerNrParamsSelected->filtPar[i] = par * gainsqrt;
+		#else
+		stBayerNrParamsSelected->filtPar[i] = stBayerNrParamsSelected->filtPar[i] * gainsqrt;
+		#endif
 	}
 
 	stBayerNrParamsSelected->gausskparsq = int((1*1)*float(1<<(FIXNLMCALC)));

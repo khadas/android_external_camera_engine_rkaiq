@@ -90,12 +90,14 @@ private:
     int _time_delay;
     bool _gain_delayed;
     SmartPtr<RkAiqExpParamsPool> _expParamsPool;
+    static uint16_t DEFAULT_POOL_SIZE;
+    std::string _sns_entity_name;
     int get_sensor_fps(float& fps);
     XCamReturn setLinearSensorExposure(RKAiqAecExpInfo_t* expPar);
     XCamReturn setHdrSensorExposure(RKAiqAecExpInfo_t* expPar);
     XCamReturn setExposure(int frameid);
     uint32_t get_v4l2_pixelformat(uint32_t pixelcode);
-    XCamReturn composeExpParam(SmartPtr<RkAiqExpParamsProxy>& timeValid, SmartPtr<RkAiqExpParamsProxy>& gainValid, RKAiqAecExpInfo_t* newExp);
+    XCamReturn composeExpParam( RKAiqAecExpInfo_t* timeValid, RKAiqAecExpInfo_t* gainValid, RKAiqAecExpInfo_t* newExp);
 };
 
 }; //namespace RkCam

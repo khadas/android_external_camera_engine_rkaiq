@@ -468,7 +468,7 @@ RkAiqCore::genIspAeResult(RkAiqFullParams* params)
         mAlogsSharedParams.procResComb.ae_proc_res;
     SmartPtr<rk_aiq_isp_params_t> isp_param =
         params->mIspParams->data();
-    SmartPtr<rk_aiq_exposure_params_t> exp_param =
+    SmartPtr<rk_aiq_exposure_params_wrapper_t> exp_param =
         params->mExposureParams->data();
 
     if (!ae_com) {
@@ -481,11 +481,11 @@ RkAiqCore::genIspAeResult(RkAiqFullParams* params)
     int algo_id = (*handle)->getAlgoId();
     // gen common result
 
-    exp_param->LinearExp = ae_com->new_ae_exp.LinearExp;
-    memcpy(exp_param->HdrExp, ae_com->new_ae_exp.HdrExp, sizeof(ae_com->new_ae_exp.HdrExp));
-    exp_param->frame_length_lines = ae_com->new_ae_exp.frame_length_lines;
-    exp_param->line_length_pixels = ae_com->new_ae_exp.line_length_pixels;
-    exp_param->pixel_clock_freq_mhz = ae_com->new_ae_exp.pixel_clock_freq_mhz;
+    exp_param->aecExpInfo.LinearExp = ae_com->new_ae_exp.LinearExp;
+    memcpy(exp_param->aecExpInfo.HdrExp, ae_com->new_ae_exp.HdrExp, sizeof(ae_com->new_ae_exp.HdrExp));
+    exp_param->aecExpInfo.frame_length_lines = ae_com->new_ae_exp.frame_length_lines;
+    exp_param->aecExpInfo.line_length_pixels = ae_com->new_ae_exp.line_length_pixels;
+    exp_param->aecExpInfo.pixel_clock_freq_mhz = ae_com->new_ae_exp.pixel_clock_freq_mhz;
 
     isp_param->aec_meas = ae_com->ae_meas;
     isp_param->hist_meas = ae_com->hist_meas;
@@ -499,7 +499,8 @@ RkAiqCore::genIspAeResult(RkAiqFullParams* params)
     if (algo_id == 0) {
         RkAiqAlgoProcResAeInt* ae_rk = (RkAiqAlgoProcResAeInt*)ae_com;
         memcpy(exp_param->exp_tbl, ae_rk->ae_proc_res_rk.exp_set_tbl, sizeof(exp_param->exp_tbl));
-        exp_param->exp_cnt = ae_rk->ae_proc_res_rk.exp_set_cnt;
+        exp_param->exp_tbl_size = ae_rk->ae_proc_res_rk.exp_set_cnt;
+        exp_param->algo_id = algo_id;
     }
 
     EXIT_ANALYZER_FUNCTION();
@@ -2056,18 +2057,18 @@ RkAiqCore::convertIspstatsToAlgo(const SmartPtr<VideoBuffer> &buffer)
     }
 
     if (expParams.ptr()) {
-        mAlogsSharedParams.ispStats.aec_stats.ae_exp.LinearExp = expParams->data()->LinearExp;
+        mAlogsSharedParams.ispStats.aec_stats.ae_exp.LinearExp = expParams->data()->aecExpInfo.LinearExp;
         memcpy(mAlogsSharedParams.ispStats.aec_stats.ae_exp.HdrExp,
-               expParams->data()->HdrExp, sizeof(expParams->data()->HdrExp));
+               expParams->data()->aecExpInfo.HdrExp, sizeof(expParams->data()->aecExpInfo.HdrExp));
         /*
          * printf("%s: L: [0x%x-0x%x], M: [0x%x-0x%x], S: [0x%x-0x%x]\n",
          *        __func__,
-         *        expParams->data()->HdrExp[2].exp_sensor_params.coarse_integration_time,
-         *        expParams->data()->HdrExp[2].exp_sensor_params.analog_gain_code_global,
-         *        expParams->data()->HdrExp[1].exp_sensor_params.coarse_integration_time,
-         *        expParams->data()->HdrExp[1].exp_sensor_params.analog_gain_code_global,
-         *        expParams->data()->HdrExp[0].exp_sensor_params.coarse_integration_time,
-         *        expParams->data()->HdrExp[0].exp_sensor_params.analog_gain_code_global);
+         *        expParams->data()->aecExpInfo.HdrExp[2].exp_sensor_params.coarse_integration_time,
+         *        expParams->data()->aecExpInfo.HdrExp[2].exp_sensor_params.analog_gain_code_global,
+         *        expParams->data()->aecExpInfo.HdrExp[1].exp_sensor_params.coarse_integration_time,
+         *        expParams->data()->aecExpInfo.HdrExp[1].exp_sensor_params.analog_gain_code_global,
+         *        expParams->data()->aecExpInfo.HdrExp[0].exp_sensor_params.coarse_integration_time,
+         *        expParams->data()->aecExpInfo.HdrExp[0].exp_sensor_params.analog_gain_code_global);
          */
     }
 
