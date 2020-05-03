@@ -335,7 +335,8 @@ XCamReturn AccmAutoConfig
     ret = SatSelectCcmProfiles(fSaturation, pDomIlluProfile->matrixUsedNO, hAccm->pCcmMatrixAll[dominateIlluProfileIdx],
                                 &pCcmProfile1, &pCcmProfile2);
     if (ret == XCAM_RETURN_NO_ERROR) {
-        LOGD_ACCM("fSaturation: %f (%f .. %f)\n",  fSaturation, pCcmProfile1->saturation, pCcmProfile2->saturation);
+        if (pCcmProfile1 && pCcmProfile2)
+            LOGD_ACCM("fSaturation: %f (%f .. %f)\n",  fSaturation, pCcmProfile1->saturation, pCcmProfile2->saturation);
         ret = SatInterpolateMatrices(fSaturation, pCcmProfile1, pCcmProfile2,
                                       &hAccm->accmRest.undampedCcmMatrix);
 

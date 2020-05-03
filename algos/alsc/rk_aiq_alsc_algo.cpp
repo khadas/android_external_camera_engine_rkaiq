@@ -360,7 +360,8 @@ XCamReturn AlscAutoConfig
     ret = VignSelectLscProfiles(fVignetting, pDomIlluProfile->tableUsedNO, hAlsc->pLscTableAll[resIdx][dominateIlluProfileIdx],
                                 &pLscProfile1, &pLscProfile2);
     if (ret == XCAM_RETURN_NO_ERROR) {
-        LOGD_ALSC("fVignetting: %f (%f .. %f)\n",  fVignetting, pLscProfile1->vignetting, pLscProfile2->vignetting);
+        if (pLscProfile1 && pLscProfile2)
+            LOGD_ALSC("fVignetting: %f (%f .. %f)\n",  fVignetting, pLscProfile1->vignetting, pLscProfile2->vignetting);
         ret = VignInterpolateMatrices(fVignetting, pLscProfile1, pLscProfile2,
                                       &hAlsc->alscRest.undampedLscMatrixTable);
         if (ret != XCAM_RETURN_NO_ERROR) {

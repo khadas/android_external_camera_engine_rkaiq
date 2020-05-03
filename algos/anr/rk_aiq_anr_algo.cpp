@@ -237,7 +237,7 @@ ANRresult_t ANRGetProcResult(ANRContext_t *pANRCtx, ANRProcResult_t* pANRResult)
 	bayernr_fix_tranfer(&pANRResult->stBayernrParamSelect, &pANRResult->stBayernrFix);
 	mfnr_fix_transfer(&pANRResult->stMfnrParamSelect, &pANRResult->stMfnrFix, &pANRCtx->stExpInfo);
 	ynr_fix_transfer(&pANRResult->stYnrParamSelect, &pANRResult->stYnrFix);
-	uvnr_fix_transfer(&pANRResult->stUvnrParamSelect, &pANRResult->stUvnrFix);
+	uvnr_fix_transfer(&pANRResult->stUvnrParamSelect, &pANRResult->stUvnrFix, &pANRCtx->stExpInfo);
 	gain_fix_transfer(&pANRResult->stMfnrParamSelect, &pANRResult->stGainFix, &pANRCtx->stExpInfo);
 	pANRResult->stBayernrFix.rawnr_en = pANRResult->bayernrEn;
 	pANRResult->stMfnrFix.tnr_en = pANRResult->mfnrEn;

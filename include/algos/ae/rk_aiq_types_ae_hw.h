@@ -247,8 +247,6 @@ typedef struct RKAiqAecExpInfo_s {
     unsigned short line_length_pixels;
     unsigned short frame_length_lines;
     float pixel_clock_freq_mhz;
-    RkAiqExpParam_t exp_tbl[MAX_AEC_EFFECT_FNUM];
-    int exp_cnt;
 } RKAiqAecExpInfo_t;
 
 /*****************************************************************************/

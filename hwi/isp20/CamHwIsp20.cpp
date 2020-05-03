@@ -864,13 +864,15 @@ XCamReturn CamHwIsp20::stop()
 
     ENTER_CAMHW_FUNCTION();
     isp20Pollthread = mPollthread.dynamic_cast_ptr<Isp20PollThread>();
-    sensorHw = mSensorDev.dynamic_cast_ptr<SensorHw>();
-    sensorHw->stop();
     mPollthread->stop();
     mPollLumathread->stop();
 #ifndef DISABLE_PP
     mPollIsppthread->stop();
 #endif
+    // stop after pollthread, ensure that no new events
+    // come into snesorHw
+    sensorHw = mSensorDev.dynamic_cast_ptr<SensorHw>();
+    sensorHw->stop();
     ret = mIspLumaDev->stop();
     if (ret < 0) {
         LOGE_CAMHW("stop isp luma dev err: %d\n", ret);
@@ -956,18 +958,18 @@ CamHwIsp20::overrideExpRatioToAiqResults(const sint32_t frameId,
 	       module_id,
 	       frameId,
 	       aiq_results->data()->frame_id,
-	       curFrameExpParam->data()->HdrExp[2].exp_sensor_params.analog_gain_code_global,
-	       curFrameExpParam->data()->HdrExp[2].exp_sensor_params.coarse_integration_time,
-	       curFrameExpParam->data()->HdrExp[1].exp_sensor_params.analog_gain_code_global,
-	       curFrameExpParam->data()->HdrExp[1].exp_sensor_params.coarse_integration_time,
-	       curFrameExpParam->data()->HdrExp[0].exp_sensor_params.analog_gain_code_global,
-	       curFrameExpParam->data()->HdrExp[0].exp_sensor_params.coarse_integration_time,
-	       nextFrameExpParam->data()->HdrExp[2].exp_sensor_params.analog_gain_code_global,
-	       nextFrameExpParam->data()->HdrExp[2].exp_sensor_params.coarse_integration_time,
-	       nextFrameExpParam->data()->HdrExp[1].exp_sensor_params.analog_gain_code_global,
-	       nextFrameExpParam->data()->HdrExp[1].exp_sensor_params.coarse_integration_time,
-	       nextFrameExpParam->data()->HdrExp[0].exp_sensor_params.analog_gain_code_global,
-	       nextFrameExpParam->data()->HdrExp[0].exp_sensor_params.coarse_integration_time);
+	       curFrameExpParam->data()->aecExpInfo.HdrExp[2].exp_sensor_params.analog_gain_code_global,
+	       curFrameExpParam->data()->aecExpInfo.HdrExp[2].exp_sensor_params.coarse_integration_time,
+	       curFrameExpParam->data()->aecExpInfo.HdrExp[1].exp_sensor_params.analog_gain_code_global,
+	       curFrameExpParam->data()->aecExpInfo.HdrExp[1].exp_sensor_params.coarse_integration_time,
+	       curFrameExpParam->data()->aecExpInfo.HdrExp[0].exp_sensor_params.analog_gain_code_global,
+	       curFrameExpParam->data()->aecExpInfo.HdrExp[0].exp_sensor_params.coarse_integration_time,
+	       nextFrameExpParam->data()->aecExpInfo.HdrExp[2].exp_sensor_params.analog_gain_code_global,
+	       nextFrameExpParam->data()->aecExpInfo.HdrExp[2].exp_sensor_params.coarse_integration_time,
+	       nextFrameExpParam->data()->aecExpInfo.HdrExp[1].exp_sensor_params.analog_gain_code_global,
+	       nextFrameExpParam->data()->aecExpInfo.HdrExp[1].exp_sensor_params.coarse_integration_time,
+	       nextFrameExpParam->data()->aecExpInfo.HdrExp[0].exp_sensor_params.analog_gain_code_global,
+	       nextFrameExpParam->data()->aecExpInfo.HdrExp[0].exp_sensor_params.coarse_integration_time);
 
     switch (module_id) {
     case RK_ISP2X_HDRTMO_ID:
@@ -977,27 +979,27 @@ CamHwIsp20::overrideExpRatioToAiqResults(const sint32_t frameId,
 	float nextMExpo =0;
 	float curMExpo = 0;
 	if (RK_AIQ_HDR_GET_WORKING_MODE(_hdr_mode) == RK_AIQ_WORKING_MODE_ISP_HDR2) {
-	    nextLExpo = nextFrameExpParam->data()->HdrExp[1].exp_real_params.analog_gain * \
-		       nextFrameExpParam->data()->HdrExp[1].exp_real_params.integration_time;
-	    curLExpo = curFrameExpParam->data()->HdrExp[1].exp_real_params.analog_gain * \
-		       curFrameExpParam->data()->HdrExp[1].exp_real_params.integration_time;
+	    nextLExpo = nextFrameExpParam->data()->aecExpInfo.HdrExp[1].exp_real_params.analog_gain * \
+		       nextFrameExpParam->data()->aecExpInfo.HdrExp[1].exp_real_params.integration_time;
+	    curLExpo = curFrameExpParam->data()->aecExpInfo.HdrExp[1].exp_real_params.analog_gain * \
+		       curFrameExpParam->data()->aecExpInfo.HdrExp[1].exp_real_params.integration_time;
 	    nextMExpo = nextLExpo;
 	    curMExpo = curLExpo;
 	} else if (RK_AIQ_HDR_GET_WORKING_MODE(_hdr_mode) == RK_AIQ_WORKING_MODE_ISP_HDR3) {
-	    nextLExpo = nextFrameExpParam->data()->HdrExp[2].exp_real_params.analog_gain * \
-		       nextFrameExpParam->data()->HdrExp[2].exp_real_params.integration_time;
-	    curLExpo = curFrameExpParam->data()->HdrExp[2].exp_real_params.analog_gain * \
-		       curFrameExpParam->data()->HdrExp[2].exp_real_params.integration_time;
-		nextMExpo = nextFrameExpParam->data()->HdrExp[1].exp_real_params.analog_gain * \
-		       nextFrameExpParam->data()->HdrExp[1].exp_real_params.integration_time;
-		curMExpo = curFrameExpParam->data()->HdrExp[1].exp_real_params.analog_gain * \
-		       curFrameExpParam->data()->HdrExp[1].exp_real_params.integration_time;
+	    nextLExpo = nextFrameExpParam->data()->aecExpInfo.HdrExp[2].exp_real_params.analog_gain * \
+		       nextFrameExpParam->data()->aecExpInfo.HdrExp[2].exp_real_params.integration_time;
+	    curLExpo = curFrameExpParam->data()->aecExpInfo.HdrExp[2].exp_real_params.analog_gain * \
+		       curFrameExpParam->data()->aecExpInfo.HdrExp[2].exp_real_params.integration_time;
+		nextMExpo = nextFrameExpParam->data()->aecExpInfo.HdrExp[1].exp_real_params.analog_gain * \
+		       nextFrameExpParam->data()->aecExpInfo.HdrExp[1].exp_real_params.integration_time;
+		curMExpo = curFrameExpParam->data()->aecExpInfo.HdrExp[1].exp_real_params.analog_gain * \
+		       curFrameExpParam->data()->aecExpInfo.HdrExp[1].exp_real_params.integration_time;
 	}
 
-	float nextSExpo = nextFrameExpParam->data()->HdrExp[0].exp_real_params.analog_gain * \
-			 nextFrameExpParam->data()->HdrExp[0].exp_real_params.integration_time;
-	float curSExpo = curFrameExpParam->data()->HdrExp[0].exp_real_params.analog_gain * \
-			 curFrameExpParam->data()->HdrExp[0].exp_real_params.integration_time;
+	float nextSExpo = nextFrameExpParam->data()->aecExpInfo.HdrExp[0].exp_real_params.analog_gain * \
+			 nextFrameExpParam->data()->aecExpInfo.HdrExp[0].exp_real_params.integration_time;
+	float curSExpo = curFrameExpParam->data()->aecExpInfo.HdrExp[0].exp_real_params.analog_gain * \
+			 curFrameExpParam->data()->aecExpInfo.HdrExp[0].exp_real_params.integration_time;
 	float nextRatioLS = nextLExpo/nextSExpo;
 	float nextRatioLM = nextLExpo/nextMExpo;
 	float curRatioLS = curLExpo/curSExpo;

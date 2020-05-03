@@ -485,8 +485,8 @@ ANRresult_t ynr_fix_transfer(RKAnr_Ynr_Params_Select_t* ynr, RKAnr_Ynr_Fix_t *pN
 	
 	
 	//0x013c
-	pNrCfg->ynr_lmerge_bound = (unsigned char)((ynr->loFreqDenoiseStrength[0]) * (1 << FIX_BIT_DENOISE_STRENGTH));
-	pNrCfg->ynr_lmerge_ratio = (unsigned char)((ynr->loFreqDenoiseStrength[1]) * (1 << FIX_BIT_DENOISE_STRENGTH));
+	pNrCfg->ynr_lmerge_bound = (unsigned char)((ynr->loFreqDenoiseStrength[1]) * (1 << FIX_BIT_DENOISE_STRENGTH));
+	pNrCfg->ynr_lmerge_ratio = (unsigned char)((ynr->loFreqDenoiseStrength[0]) * (1 << FIX_BIT_DENOISE_STRENGTH));
 
 	//0x0140
 	for(i=0; i<4; i++){

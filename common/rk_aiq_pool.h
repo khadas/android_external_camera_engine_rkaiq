@@ -41,9 +41,17 @@ private:
     XCAM_DEAD_COPY (RkAiqPartResults);
 };
 #endif
+typedef struct RKAiqAecExpInfoWrapper_s {
+    RKAiqAecExpInfo_t aecExpInfo;
+    RkAiqExpParam_t exp_tbl[MAX_AEC_EFFECT_FNUM];
+    int exp_tbl_size;
+    int algo_id;
+}RKAiqAecExpInfoWrapper_t;
 
-typedef SharedItemPool<rk_aiq_exposure_params_t> RkAiqExpParamsPool;
-typedef SharedItemProxy<rk_aiq_exposure_params_t> RkAiqExpParamsProxy;
+typedef RKAiqAecExpInfoWrapper_t rk_aiq_exposure_params_wrapper_t;
+
+typedef SharedItemPool<rk_aiq_exposure_params_wrapper_t> RkAiqExpParamsPool;
+typedef SharedItemProxy<rk_aiq_exposure_params_wrapper_t> RkAiqExpParamsProxy;
 typedef SharedItemPool<rk_aiq_isp_params_t> RkAiqIspParamsPool;
 typedef SharedItemProxy<rk_aiq_isp_params_t> RkAiqIspParamsProxy;
 typedef SharedItemPool<rk_aiq_focus_params_t> RkAiqFocusParamsPool;
