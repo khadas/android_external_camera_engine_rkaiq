@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><matfile>   <header type="struct" size="[1 1]">      <code_xml_parse_version index="1" type="char" size="[1 6]">         v1.0.0      </code_xml_parse_version>      <creation_date index="1" type="char" size="[1 11]">         2020-04-24      </creation_date>      <creator index="1" type="char" size="[1 2]">         sandy      </creator>      <sensor_name index="1" type="char" size="[1 7]">         IMX347      </sensor_name>      <sample_name index="1" type="char" size="[1 9]">         JSD3425-C1      </sample_name>      <generator_version index="1" type="char" size="[1 4]">         v1.0.2      </generator_version>   </header>   <sensor type="struct" size="[1 1]">
+<?xml version="1.0" encoding="utf-8"?><matfile>   <header type="struct" size="[1 1]">      <code_xml_parse_version index="1" type="char" size="[1 6]">         v1.0.0      </code_xml_parse_version>      <creation_date index="1" type="char" size="[1 11]">         2020-04-24      </creation_date>      <creator index="1" type="char" size="[1 2]">         sandy      </creator>      <sensor_name index="1" type="char" size="[1 7]">         IMX347      </sensor_name>      <sample_name index="1" type="char" size="[1 9]">         JSD3425-C1      </sample_name>      <generator_version index="1" type="char" size="[1 4]">         v1.0.3      </generator_version>   </header>   <sensor type="struct" size="[1 1]">
       <AWB index="1" type="struct" size="[1 1]">
 	 <wbBypass index="1" type="double" size="[1 1]">	   [0]	 </wbBypass>
 	<awbEnable index="1" type="double" size="[1 1]">	   [1]	 </awbEnable>
@@ -1097,7 +1097,7 @@
 	</dpcc_pdaf>      </DPCC>
       <BAYERNR index="1" type="struct" size="[1 1]">
 	<Enable index="1" type="double" size="[1 1]">            [1]         </Enable>	<Version index="1" type="char" size="[1 2]">            V1         </Version>         <ISO index="1" type="double" size="[1 9]">            [50 100 200 400 800 1600 3200 6400 12800]         </ISO>
-         <filtPara index="1" type="double" size="[1 9]">            [0.11	0.11	0.15	0.15	0.17	0.2	0.25	0.2	0.25]         </filtPara>
+         <filtPara index="1" type="double" size="[1 9]">            [0.05	0.05	0.07	0.09	0.12	0.15	0.20	0.25	0.3]         </filtPara>
         <luLevel index="1" type="double" size="[1 8]">            [0 1 2 3 4 5 6 7]         </luLevel>
          <luLevelVal index="1" type="double" size="[1 8]">            [16	32	48	80	112	144	208	255]         </luLevelVal>
          <luRatio index="1" type="double" size="[8 9]">            [1.445622	1.368280	1.370848	1.459016	1.404780	1.447028	1.500000	1.500000	1.500000
@@ -1285,11 +1285,11 @@
          <step1_downSample_w index="1" type="double" size="[1 9]">            [4	4	4	4	4	4	4	4	4]         </step1_downSample_w>
          <step1_downSample_h index="1" type="double" size="[1 9]">            [4	4	4	4	4	4	4	4	4]         </step1_downSample_h>
          <step1_downSample_meansize index="1" type="double" size="[1 9]">            [4	4	4	4	4	4	4	4	4]         </step1_downSample_meansize>
-         <step1_median_ratio index="1" type="double" size="[1 9]">            [0.2	0.2	0.2	0.2	0.2	0.2	0.2	0.2	0.5]         </step1_median_ratio>
+         <step1_median_ratio index="1" type="double" size="[1 9]">            [0.2	0.2	0.2	0.2	0.2	0.2	0.2	0.5	0.5]         </step1_median_ratio>
          <step1_median_size index="1" type="double" size="[1 9]">            [3	3	3	3	3	3	3	3	3]         </step1_median_size>
          <step1_median_IIR index="1" type="double" size="[1 9]">            [0	0	0	0	0	0	0	0	0]         </step1_median_IIR>
-         <step1_bf_sigmaR index="1" type="double" size="[1 9]">            [30	25	25	25	20	20	20	20	15]         </step1_bf_sigmaR>
-         <step1_bf_uvgain index="1" type="double" size="[1 9]">            [1.5	1.5	1.5	1.8	2.5	3.0	3.0	3.0	3.0]         </step1_bf_uvgain>
+         <step1_bf_sigmaR index="1" type="double" size="[1 9]">            [30	25	25	25	20	20	15	10	10]         </step1_bf_sigmaR>
+         <step1_bf_uvgain index="1" type="double" size="[1 9]">            [1.5	1.5	1.5	1.5	1.5	1.5	1.5	1.5	1.0]         </step1_bf_uvgain>
          <step1_bf_ratio index="1" type="double" size="[1 9]">            [0.00	0.00	0.00	0.00	0.00	0.00	0.00	0.00	0.00]         </step1_bf_ratio>
          <step1_bf_size index="1" type="double" size="[1 9]">            [5	5	5	5	5	5	5	5	5]         </step1_bf_size>
          <step1_bf_sigmaD index="1" type="double" size="[1 9]">            [16	16	16	16	16	16	16	16	16]         </step1_bf_sigmaD>
@@ -1304,7 +1304,7 @@
          <step2_median_ratio index="1" type="double" size="[1 9]">            [0.2 0.2 0.2 0.2 0.2 0.2 0.2 0.2 0.2 ]         </step2_median_ratio>
          <step2_median_size index="1" type="double" size="[1 9]">            [3	3	3	3	3	3	3	3	3]         </step2_median_size>
          <step2_median_IIR index="1" type="double" size="[1 9]">            [0	0	0	0	0	0	0	0	0]         </step2_median_IIR>
-         <step2_bf_sigmaR index="1" type="double" size="[1 9]">            [50	40	30	25	25	20	20	20	20]         </step2_bf_sigmaR>
+         <step2_bf_sigmaR index="1" type="double" size="[1 9]">            [50	40	30	25	25	20	20	20	15]         </step2_bf_sigmaR>
          <step2_bf_uvgain index="1" type="double" size="[1 9]">            [2.0  2.0	2.0	2.0	2.0	2.0	2.0	2.0	2.0]         </step2_bf_uvgain>
          <step2_bf_ratio index="1" type="double" size="[1 9]">            [0.00	0.00	0.00	0.00	0.00	0.00	0.00	0.00	0.00]         </step2_bf_ratio>
          <step2_bf_size index="1" type="double" size="[1 9]">            [5	5	5	5	5	5	5	5	5]         </step2_bf_size>
@@ -1312,8 +1312,8 @@
          <step2_bf_isRowIIR index="1" type="double" size="[1 9]">            [0	0	0	0	0	0	0	0	0]         </step2_bf_isRowIIR>
          <step2_bf_isYcopy index="1" type="double" size="[1 9]">            [1	1	1	1	1	1	1	1	1]         </step2_bf_isYcopy>
          <step3_nonBf3 index="1" type="double" size="[1 4]">            [32	  32	32   32]         </step3_nonBf3>
-         <step3_bf_sigmaR index="1" type="double" size="[1 9]">            [75	60	45	36	30	20	20	20	15]         </step3_bf_sigmaR>
-         <step3_bf_uvgain index="1" type="double" size="[1 9]">            [4.0	4.0	4.0	4.0	4.0	4.0	4.0	4.0	3.0]         </step3_bf_uvgain>
+         <step3_bf_sigmaR index="1" type="double" size="[1 9]">            [75	60	45	35	25	20	15	15	10]         </step3_bf_sigmaR>
+         <step3_bf_uvgain index="1" type="double" size="[1 9]">            [4.0	4.0	4.0	3.0	3.0	3.0	3.0	2.5	2.0]         </step3_bf_uvgain>
          <step3_bf_ratio index="1" type="double" size="[1 9]">            [1.00    1.00	1.00	1.00	1.00	1.00	1.00	1.00	1.00]         </step3_bf_ratio>
          <step3_bf_size index="1" type="double" size="[1 9]">            [3	3	3	3	3	3	3	3	3]         </step3_bf_size>
          <step3_bf_sigmaD index="1" type="double" size="[1 9]">            [8	8	8	8	8	8	8	8	8]         </step3_bf_sigmaD>
@@ -1530,13 +1530,13 @@
 	            [0 32 64 128 192 256]
 	         </lo_lumaPoint>
 	         <lo_lumaRatio index="1" type="double" size="[1 6]">
-	            [1.0 1.00 1.5 1.0 1.0 1.0]
+	            [1.2 1.20 1.5 1.0 1.0 1.0]
 	         </lo_lumaRatio>
 	         <lo_directionStrength index="1" type="double" size="[1 1]">
 	            [0.5]
 	         </lo_directionStrength>
 	         <lo_bfScale index="1" type="double" size="[1 4]">
-	            [0.2 0.5 0.5 1.0]
+	            [0.2 0.5 0.6 1.0]
 	         </lo_bfScale>
 	         <imerge_ratio index="1" type="double" size="[1 1]">
 	            [0.40]
@@ -1551,10 +1551,10 @@
 	            [0 32 64 128 192 256]
 	         </hi_lumaPoint>
 	         <hi_lumaRatio index="1" type="double" size="[1 6]">
-	            [1.1 1.10 1.5 1.0 1.0 1.0]
+	            [1.2 1.20 1.5 1.1 1.0 1.0]
 	         </hi_lumaRatio>
 	         <hi_bfScale index="1" type="double" size="[1 4]">
-	            [1.10 1.00 1.00 0.80]
+	            [1.00 1.00 1.00 1.00]
 	         </hi_bfScale>
 	         <hwith_d index="1" type="double" size="[1 4]">
 	            [4.00 4.00 2.00 1.20]
@@ -1566,7 +1566,7 @@
 	            [0.2]
 	         </hi_detailMinAdjDnW>
 	         <hi_denoiseWeight index="1" type="double" size="[1 4]">
-	            [0.75 0.70 0.60 0.30]
+	            [0.75 0.70 0.60 0.40]
 	         </hi_denoiseWeight>
 	         <y_luma_point index="1" type="double" size="[1 6]">
 	            [64	128	192	256	384	512]
@@ -1616,7 +1616,7 @@
 	            [0.5]
 	         </lo_directionStrength>
 	         <lo_bfScale index="1" type="double" size="[1 4]">
-	            [0.10 0.25 1.00 1.00]
+	            [0.20 0.35 0.60 1.00]
 	         </lo_bfScale>
 	         <imerge_ratio index="1" type="double" size="[1 1]">
 	            [0.4]
@@ -1634,7 +1634,7 @@
 	            [1.1 1.20 1.5 1.5 1.0 1.0]
 	         </hi_lumaRatio>
 	         <hi_bfScale index="1" type="double" size="[1 4]">
-	            [1.10 1.00 0.90 0.80]
+	            [1.00 1.00 1.00 1.00]
 	         </hi_bfScale>
 	         <hwith_d index="1" type="double" size="[1 4]">
 	            [6.00 6.00 4.00 2.00]
@@ -1646,7 +1646,7 @@
 	            [0.2]
 	         </hi_detailMinAdjDnW>
 	         <hi_denoiseWeight index="1" type="double" size="[1 4]">
-	            [0.75 0.70 0.60 0.30]
+	            [0.75 0.70 0.70 0.70]
 	         </hi_denoiseWeight>
 	         <y_luma_point index="1" type="double" size="[1 6]">
 	            [64	128	192	256	384	512]
@@ -2845,8 +2845,8 @@
 	         <iso index="1" type="double" size="[1 1]">	            [200]	         </iso>
 	         <lratio index="1" type="double" size="[1 1]">	            [0.67]	         </lratio>
 	         <hratio index="1" type="double" size="[1 1]">	            [1.50]	         </hratio>
-	         <mf_sharp_ratio index="1" type="double" size="[1 1]">	            [3.5]	         </mf_sharp_ratio>
-	         <hf_sharp_ratio index="1" type="double" size="[1 1]">	            [4.00]	         </hf_sharp_ratio>
+	         <mf_sharp_ratio index="1" type="double" size="[1 1]">	            [3.3]	         </mf_sharp_ratio>
+	         <hf_sharp_ratio index="1" type="double" size="[1 1]">	            [3.80]	         </hf_sharp_ratio>
 	         <luma_sigma index="1" type="double" size="[1 8]">	             [3.0	4.0	5.0	6.0	6.0	5.0	4.0	3.0]	         </luma_sigma>
 	         <pbf_gain index="1" type="double" size="[1 1]">	            [0.4]	         </pbf_gain>
 	         <pbf_ratio index="1" type="double" size="[1 1]">	            [0.3]	         </pbf_ratio>
