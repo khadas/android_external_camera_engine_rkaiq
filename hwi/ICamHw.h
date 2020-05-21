@@ -76,6 +76,7 @@ public:
     virtual ~ICamHw() {};
     virtual XCamReturn init(const char* sns_ent_name) = 0;
     virtual XCamReturn deInit() = 0;
+    virtual void setCalib(const CamCalibDbContext_t* calib) = 0;
     virtual XCamReturn prepare(uint32_t width, uint32_t height, int mode, int t_delay, int g_delay) = 0;
     virtual XCamReturn start() = 0;
     virtual XCamReturn stop() = 0;

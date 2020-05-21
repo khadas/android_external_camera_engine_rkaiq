@@ -62,7 +62,7 @@ rk_aiq_uapi_sysctl_init(const char* sns_ent_name,
         is_ent_name = false;
 
     if (!is_ent_name) {
-        if (config_file_dir)
+        if (config_file_dir && (strlen(config_file_dir) > 0))
             sprintf(config_file, "%s/%s.xml", config_file_dir, sns_ent_name);
         else
             sprintf(config_file, "%s/%s.xml", RKAIQ_DEFAULT_IQ_PATH, sns_ent_name);
@@ -84,10 +84,34 @@ rk_aiq_uapi_sysctl_init(const char* sns_ent_name,
     if (is_ent_name) {
         char iq_file[128] = {'\0'};
         CamHwIsp20::selectIqFile(sns_ent_name, iq_file);
-        if (config_file_dir)
+
+        char* hdr_mode = getenv("HDR_MODE");
+        int start = strlen(iq_file) - strlen(".xml");
+        if (hdr_mode) {
+            iq_file[start] = '\0';
+            if (*hdr_mode == '1')
+                strcat(iq_file, "_hdr.xml");
+            else
+                strcat(iq_file, "_normal.xml");
+        }
+
+        if (config_file_dir) {
             sprintf(config_file, "%s/%s", config_file_dir, iq_file);
-        else
+        } else {
             sprintf(config_file, "%s/%s", RKAIQ_DEFAULT_IQ_PATH, iq_file);
+        }
+
+        // use default iq file
+        if (hdr_mode && access(config_file, F_OK)) {
+            LOGW("%s not exist, will use the default !", config_file);
+            if (*hdr_mode == '1')
+                start = strlen(config_file) - strlen("_hdr.xml");
+            else
+                start = strlen(config_file) - strlen("_normal.xml");
+            config_file[start] = '\0';
+            strcat(config_file, ".xml");
+        }
+        LOGI("use iq file %s", config_file);
     }
 #endif
     ctx->_rkAiqManager->setCamHw(ctx->_camHw);
@@ -177,22 +201,25 @@ rk_aiq_uapi_sysctl_stop(const rk_aiq_sys_ctx_t* ctx)
     return ret;
 }
 
-rk_aiq_static_info_t*
-rk_aiq_uapi_sysctl_getStaticMetas(const char* sns_ent_name)
+XCamReturn
+rk_aiq_uapi_sysctl_getStaticMetas(const char* sns_ent_name, rk_aiq_static_info_t* static_info)
 {
+    if (!sns_ent_name || !static_info)
+        return XCAM_RETURN_ERROR_FAILED;
 #ifdef RK_SIMULATOR_HW
     /* nothing to do now*/
-    return NULL;
+    static_info = NULL;
 #else
-   return CamHwIsp20::getStaticCamHwInfo(sns_ent_name);
+   memcpy(static_info, CamHwIsp20::getStaticCamHwInfo(sns_ent_name), sizeof(rk_aiq_static_info_t));
 #endif
+    return XCAM_RETURN_NO_ERROR;
 }
 
-rk_aiq_metas_t*
-rk_aiq_uapi_sysctl_getMetaData(const rk_aiq_sys_ctx_t* ctx, uint32_t frame_id)
+XCamReturn
+rk_aiq_uapi_sysctl_getMetaData(const rk_aiq_sys_ctx_t* ctx, uint32_t frame_id, rk_aiq_metas_t* metas)
 {
     // TODO
-    return NULL;
+    return XCAM_RETURN_ERROR_FAILED;
 }
 
 XCamReturn
@@ -312,7 +339,7 @@ static void _print_versions()
     extern RkAiqAlgoDescription g_RkIspAlgoDescAwdr;
     LOGI("\n"
         "************************** VERSION INFOS **************************\n"
-        "version release date: 2020-04-24\n"
+        "version release date: %s\n"
         "         AIQ:       %s\n"
         "   IQ PARSER:       %s\n"
         "   RK INTEGRATED ALGO MODULES:\n"
@@ -340,6 +367,7 @@ static void _print_versions()
         "         ASD:       %s\n"
         "        AWDR:       %s\n"
         "************************ VERSION INFOS END ************************\n"
+        , RK_AIQ_RELEASE_DATE
         , RK_AIQ_VERSION 
         , RK_AIQ_CALIB_VERSION 
         , g_RkIspAlgoDescAwb.common.version

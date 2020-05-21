@@ -70,6 +70,7 @@ uAPI
 ./
 include
 include/common
+include/common/mediactl
 include/iq_parser
 include/uAPI
 include/xcore

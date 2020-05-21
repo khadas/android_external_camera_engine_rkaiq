@@ -75,6 +75,9 @@
 #define DETAILSLOWLIGHTMODEMIN     (0.0)
 #define DETAILSHIGHLIGHTMODEMAX     (1.0)
 #define DETAILSHIGHLIGHTMODEMIN     (0.0)
+#define TMOCONTRASTMODEMAX     (1.0)
+#define TMOCONTRASTMODEMIN     (0.0)
+
 #define DAYTHMAX     (1.0)
 #define DAYTHMIN     (0.0)
 #define DARKPDFTHMAX     (1.0)

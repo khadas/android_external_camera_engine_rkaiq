@@ -62,27 +62,27 @@ private:
     // parse helper
     bool parseEntryCell(const XMLElement*, int, parseCellContent, void* param = NULL);
 
-	// parse read/write control
-	bool xmlParseReadWrite;
-	char autoTabStr[128];
-	int  autoTabIdx;
-	void parseReadWriteCtrl(bool ctrl);
-	void autoTabForward();
-	void autoTabBackward();
+    // parse read/write control
+    bool xmlParseReadWrite;
+    char autoTabStr[128];
+    int  autoTabIdx;
+    void parseReadWriteCtrl(bool ctrl);
+    void autoTabForward();
+    void autoTabBackward();
 
-	// parse Kit
-	int ParseCharToHex(XmlTag* tag, uint32_t* reg_value);
-	int ParseByteArray(const XMLNode *pNode, uint8_t* values, const int num);
-	int ParseFloatArray(const XMLNode *pNode, float* values, const int num, int printAccuracy = 4);
-	int ParseDoubleArray(const XMLNode *pNode, double* values, const int num);
-	int ParseUintArray(const XMLNode *pNode, uint32_t* values, const int num);
-	int ParseIntArray(const XMLNode *pNode, int32_t* values, const int num);
-	int ParseUcharArray(const XMLNode *pNode, uint8_t* values, const int num);
-	int ParseCharArray(const XMLNode *pNode, int8_t* values, const int num);
-	int ParseUshortArray(const XMLNode *pNode, uint16_t* values, const int num);
-	int ParseShortArray(const XMLNode *pNode, int16_t* values, const int num);
-	int ParseString(const XMLNode *pNode, char* values, const int size);
-	int ParseLscProfileArray(const XMLNode *pNode, CalibDb_Lsc_ProfileName_t values[], const int num);
+    // parse Kit
+    int ParseCharToHex(XmlTag* tag, uint32_t* reg_value);
+    int ParseByteArray(const XMLNode *pNode, uint8_t* values, const int num);
+    int ParseFloatArray(const XMLNode *pNode, float* values, const int num, int printAccuracy = 4);
+    int ParseDoubleArray(const XMLNode *pNode, double* values, const int num);
+    int ParseUintArray(const XMLNode *pNode, uint32_t* values, const int num);
+    int ParseIntArray(const XMLNode *pNode, int32_t* values, const int num);
+    int ParseUcharArray(const XMLNode *pNode, uint8_t* values, const int num);
+    int ParseCharArray(const XMLNode *pNode, int8_t* values, const int num);
+    int ParseUshortArray(const XMLNode *pNode, uint16_t* values, const int num);
+    int ParseShortArray(const XMLNode *pNode, int16_t* values, const int num);
+    int ParseString(const XMLNode *pNode, char* values, const int size);
+    int ParseLscProfileArray(const XMLNode *pNode, CalibDb_Lsc_ProfileName_t values[], const int num);
 
 
     // parse Header
@@ -119,11 +119,16 @@ private:
     bool parseEntrySensorAhdr(const XMLElement* pelement, void* param = NULL);
     bool parseEntrySensorAhdrMerge(const XMLElement* pelement, void* param = NULL);
     bool parseEntrySensorAhdrTmo(const XMLElement* pelement, void* param = NULL);
+    bool parseEntrySensorAhdrTmoGlobalLuma(const XMLElement* pelement, void* param = NULL);
+    bool parseEntrySensorAhdrTmoDetailsHighLight(const XMLElement* pelement, void* param = NULL);
+    bool parseEntrySensorAhdrTmoDetailsLowLight(const XMLElement* pelement, void* param = NULL);
+    bool parseEntrySensorAhdrTmoContrast(const XMLElement* pelement, void* param = NULL);
+    bool parseEntrySensorAhdrTmoMoreSetting(const XMLElement* pelement, void* param = NULL);
     bool parseEntrySensorBlc(const XMLElement* pelement, void* param = NULL);
     bool parseEntrySensorLut3d(const XMLElement* pelement, void* param = NULL);
     bool parseEntrySensorDpcc(const XMLElement* pelement, void* param = NULL);
-	bool parseEntrySensorDpccSetCell(const XMLElement* pelement, void* param = NULL);
-	bool parseEntrySensorDpccPdaf(const XMLElement* pelement, void* param = NULL);
+    bool parseEntrySensorDpccSetCell(const XMLElement* pelement, void* param = NULL);
+    bool parseEntrySensorDpccPdaf(const XMLElement* pelement, void* param = NULL);
     bool parseEntrySensorBayerNr(const XMLElement* pelement, void* param = NULL);
     bool parseEntrySensorLsc(const XMLElement* pelement, void* param = NULL);
     bool parseEntrySensorLscAlscCof(const XMLElement* pelement, void* param = NULL);
@@ -138,7 +143,7 @@ private:
     bool parseEntrySensorUVNR(const XMLElement* pelement, void* param = NULL);
     bool parseEntrySensorGamma(const XMLElement* pelement, void* param = NULL);
     bool parseEntrySensorYnr(const XMLElement* pelement, void* param = NULL);
-	bool parseEntrySensorYnrISO(const XMLElement* pelement, void* param = NULL);
+    bool parseEntrySensorYnrISO(const XMLElement* pelement, void* param = NULL);
     bool parseEntrySensorGic(const XMLElement* pelement, void* param = NULL);
     bool parseEntrySensorGicISO(const XMLElement* pelement, void* param = NULL);
     bool parseEntrySensorMFNR(const XMLElement* pelement, void* param = NULL);
@@ -161,7 +166,7 @@ public:
     explicit RkAiqCalibParser(CamCalibDbContext_t *pCalibDb);
     virtual ~RkAiqCalibParser();
     bool doParse(const char* device);
-	bool doGenerate(const char* deviceRef, const char* deviceOutput);
+    bool doGenerate(const char* deviceRef, const char* deviceOutput);
 
 
 private:

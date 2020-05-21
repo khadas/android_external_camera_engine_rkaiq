@@ -73,6 +73,8 @@ void xcam_set_log (const char* file_name);
 void xcam_print_log (int module, int sub_modules, int level, const char* format, ...);
 int xcam_get_log_level();
 bool xcam_get_enviroment_value(const char* variable, unsigned long long* value);
+void xcam_get_awb_log_level(unsigned char *log_level, unsigned char *sub_modules);
+
 #ifdef  __cplusplus
 }
 #endif
@@ -179,12 +181,12 @@ bool xcam_get_enviroment_value(const char* variable, unsigned long long* value);
 #define LOG1_ORB(...) XCAM_MODULE_LOG_LOW1(XCORE_LOG_MODULE_AORB, 0xff, ##__VA_ARGS__)
 
 // define ahdr module logs
-#define LOGD_AHDR(...) XCAM_MODULE_LOG_DEBUG(XCORE_LOG_MODULE_AHDR, 0xff, ##__VA_ARGS__)
+#define LOGD_AHDR(...) XCAM_MODULE_LOG_DEBUG(XCORE_LOG_MODULE_AHDR, 0xff, ##__VA_ARGS__)//AHDR algo para
 #define LOGE_AHDR(...) XCAM_MODULE_LOG_ERROR(XCORE_LOG_MODULE_AHDR, 0xff, ##__VA_ARGS__)
 #define LOGW_AHDR(...) XCAM_MODULE_LOG_WARNING(XCORE_LOG_MODULE_AHDR, 0xff, ##__VA_ARGS__)
-#define LOGV_AHDR(...) XCAM_MODULE_LOG_VERBOSE(XCORE_LOG_MODULE_AHDR, 0xff, ##__VA_ARGS__)
+#define LOGV_AHDR(...) XCAM_MODULE_LOG_VERBOSE(XCORE_LOG_MODULE_AHDR, 0xff, ##__VA_ARGS__)//AHDR register data
 #define LOGI_AHDR(...) XCAM_MODULE_LOG_INFO(XCORE_LOG_MODULE_AHDR, 0xff, ##__VA_ARGS__)
-#define LOG1_AHDR(...) XCAM_MODULE_LOG_LOW1(XCORE_LOG_MODULE_AHDR, 0xff, ##__VA_ARGS__)
+#define LOG1_AHDR(...) XCAM_MODULE_LOG_LOW1(XCORE_LOG_MODULE_AHDR, 0xff, ##__VA_ARGS__)//AHDR calc data
 
 // define anr module logs
 #define LOGD_ANR(...) XCAM_MODULE_LOG_DEBUG(XCORE_LOG_MODULE_ANR, 0xff, ##__VA_ARGS__)

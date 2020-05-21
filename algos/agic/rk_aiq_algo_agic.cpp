@@ -135,7 +135,7 @@ AgicProcess
         {
             iso_lo = (int)(pAgicCtx->full_param.gic_iso[index].iso);
             iso_hi = (int)(pAgicCtx->full_param.gic_iso[index + 1].iso);
-            printf("index=%d,  iso_lo=%d, iso_hi=%d\n", index, iso_lo, iso_hi);
+            LOGD_AGIC("index=%d,  iso_lo=%d, iso_hi=%d\n", index, iso_lo, iso_hi);
             if (ISO > iso_lo && ISO <= iso_hi)
             {
                 break;
@@ -270,6 +270,7 @@ AgicProcess
     pAgicCtx->config.edge_open = pAgicCtx->full_param.edge_en;
     pAgicCtx->config.gr_ratio = pAgicCtx->full_param.gr_ration;
     pAgicCtx->config.noise_cut_en = pAgicCtx->full_param.noise_cut_en;
+    pAgicCtx->config.gic_en = pAgicCtx->full_param.gic_en;
 
     LOGI_AGIC("%s(%d): exit!\n", __FUNCTION__, __LINE__);
     return XCAM_RETURN_NO_ERROR;

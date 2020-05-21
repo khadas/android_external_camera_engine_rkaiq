@@ -38,6 +38,8 @@ typedef struct accm_rest_s {
     Cam3x3FloatMatrix_t dampedCcmMatrix;
     Cam1x3FloatMatrix_t undampedCcOffset;
     Cam1x3FloatMatrix_t dampedCcOffset;
+    float color_inhibition_level;
+    float color_saturation_level;
 } accm_rest_t;
 
 typedef struct accm_context_s {

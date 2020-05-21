@@ -93,8 +93,12 @@ typedef enum expPwrLineFreq_e {
        EXP_PWR_LINE_FREQ_DIS   = 0,
        EXP_PWR_LINE_FREQ_50HZ  = 1,
        EXP_PWR_LINE_FREQ_60HZ  = 2,
-       EXP_PWR_LINE_FREQ_AUTO  = 3,
 } expPwrLineFreq_t;
+
+typedef enum antiFlickerMode_e {
+    ANTIFLICKER_NORMAL_MODE = 0,
+    ANTIFLICKER_AUTO_MODE = 1,
+} antiFlickerMode_t;
 
 RKAIQ_BEGIN_DECLARE
 
@@ -212,6 +216,9 @@ XCamReturn rk_aiq_uapi_getLExpMode(const rk_aiq_sys_ctx_t* ctx, opMode_t *mode);
 */
 XCamReturn rk_aiq_uapi_setMLExp(const rk_aiq_sys_ctx_t* ctx, unsigned int ratio);
 XCamReturn rk_aiq_uapi_getMLExp(const rk_aiq_sys_ctx_t* ctx, unsigned int *ratio);
+
+XCamReturn rk_aiq_uapi_setAntiFlickerMode(const rk_aiq_sys_ctx_t* ctx, antiFlickerMode_t mode);
+XCamReturn rk_aiq_uapi_getAntiFlickerMode(const rk_aiq_sys_ctx_t* ctx, antiFlickerMode_t *mode);
 
 /*
 *****************************

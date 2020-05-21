@@ -38,6 +38,9 @@ public:
     // from ICamHw
     virtual XCamReturn init(const char* sns_ent_name);
     virtual XCamReturn deInit();
+    virtual void setCalib(const CamCalibDbContext_t* calib) {
+        mCalibDb = calib;
+    }
     virtual XCamReturn prepare(uint32_t width, uint32_t height, int mode, int t_dealy, int g_delay);
     virtual XCamReturn start();
     virtual XCamReturn stop();
@@ -75,6 +78,7 @@ protected:
     IspStatsListener* mIspStatsLintener;
     IspEvtsListener* mIspEvtsListener;
     int mWorkingMode;
+    const CamCalibDbContext_t* mCalibDb;
 
 private:
     XCAM_DEAD_COPY (CamHwBase);

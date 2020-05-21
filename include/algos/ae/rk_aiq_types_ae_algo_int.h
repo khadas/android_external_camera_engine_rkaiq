@@ -64,6 +64,33 @@
 
 /*****************************************************************************/
 /**
+ * predefined flicker period values for ECM module
+ */
+/*****************************************************************************/
+#define ECM_TFLICKER_50HZ (1.0/100.0)                                  //!< predefined flicker period value for ECM module
+#define ECM_TFLICKER_60HZ (1.0/120.0)                                  //!< predefined flicker period value for ECM module
+#define ECM_TFLICKER_OFF   ((ECM_TFLICKER_50HZ+ECM_TFLICKER_60HZ)/2)  //!< predefined flicker period value for ECM module
+#define ECM_DOT_NO         (6)
+
+/*****************************************************************************/
+/**
+ * @brief   This typedef represents the histogram which is measured by the
+ *          CamerIC ISP histogram module.
+ *
+ *****************************************************************************/
+typedef uint32_t CamerIcHistBins_t[ISP2_RAWHIST_BINNUM_MAX];//the same with BIG/LITE
+
+/*****************************************************************************/
+/**
+ * @brief   Array type for ISP EXP measurment values.
+ *          CamerIC ISP RawAe grid-luma module.
+ *
+ *****************************************************************************/
+typedef uint8_t CamerIcLiteMeanLuma_t[ISP2_RAWAE_LITE_GRIDNUM];
+typedef uint8_t CamerIcBigMeanLuma_t[ISP2_RAWAE_BIG_GRIDNUM];
+
+/*****************************************************************************/
+/**
  * @brief   log level of ae
  */
 /*****************************************************************************/
@@ -182,23 +209,15 @@ typedef enum {
 } IspHdrMode_t;
 
 typedef enum {
-    AEC_LINEHDR_MODE_DCG       = 0,        /* HDR DCG MODE (only one integration time value) */
-    AEC_LINEHDR_MODE_STAGGER   = 1,     /* HDR STAGGER MODE (independent integration time value) */
+    AEC_LINEHDR_MODE_DCG     = 0,       /* HDR DCG MODE,2frame (only one integration time value),3frame=DCG+VS */
+    AEC_LINEHDR_MODE_STAGGER = 1,       /* HDR STAGGER MODE,2/3frame (independent integration time value) */
 } AecLineHdrMode_t;
 
-/*****************************************************************************/
-/**
- *          AecEcmMode_t
- *
- * @brief   mode type of AEC Exposure Conversion
- *
- */
-/*****************************************************************************/
 typedef enum {
-    AEC_EXPOSURE_CONVERSION_INVALID = 0,        /* invalid (only used for initialization) */
-    AEC_EXPOSURE_CONVERSION_LINEAR  = 1,         /* Exposure Conversion uses a linear function (eq. 38) */
-    AEC_EXPOSURE_CONVERSION_MAX
-} AecEcmMode_t;
+    AEC_DCG_MODE_INVALID     = -1,       /*invalid, not support dcg configuration*/
+    AEC_DCG_MODE_LCG         = 0,       /* LCG, use lower conversion gain*/
+    AEC_DCG_MODE_HCG         = 1,       /* HCG, use higher conversion gain*/
+} AecDcgMode_t;
 
 /*****************************************************************************/
 /**
@@ -296,6 +315,7 @@ typedef struct AecConfig_s {
     CalibDb_HdrAE_Attr_t          HdrAeCtrl;
     RkAiqAecHwConfig_t            HwCtrl;
     CalibDb_Sensor_Para_t         SensorInfo;
+    CalibDb_System_t              SystemCtrl;
 
     int                           Workingmode;
     int                           LineHdrMode;
@@ -312,10 +332,8 @@ typedef struct AecConfig_s {
     int                           RawWidth;
     int                           RawHeight;
 
-    int                           LinExpEffectNum;
-    int                           HdrExpEffectNum;
-    /*api update attr flag*/
-    bool                          ApiReconfig;
+    /*update attr flag*/
+    bool                          IsReconfig;
 } AecConfig_t;
 /*****************************************************************************/
 /**
@@ -355,6 +373,8 @@ typedef struct AecPreResult_s {
 
     RkAiqExpParamComb_t LinearExp;
     RkAiqExpParamComb_t HdrExp[MAX_HDR_FRAMENUM];
+
+    CamerIcHistBins_t AeHistBin[3];
 } AecPreResult_t;
 
 /*****************************************************************************/
@@ -380,7 +400,7 @@ typedef struct AecProcResult_s {
     CalibDb_AecDayNightMode_t     DNMode;
     float                         DON_Fac;
     uint8_t                       DNTrigger;
-    uint8_t                       NightMode;
+    uint8_t                       FillLightMode;
 
     /*AE interpolation results to make ae more smooth*/
     RkAiqExpParamComb_t           InterpLinAe[MAX_AEC_EFFECT_FNUM];

@@ -197,7 +197,7 @@ RkAiqAeHandleInt::updateConfig()
     // once any params are changed, run reconfig to convert aecCfg to paectx
     AeInstanceConfig_t* pAeInstConfig = (AeInstanceConfig_t*)mAlgoCtx;
     AeConfig_t pAecCfg = pAeInstConfig->aecCfg;
-    pAecCfg->ApiReconfig = updateAtt;
+    pAecCfg->IsReconfig |= updateAtt;
     updateAtt = false;
 
     mCfgMutex.unlock();
@@ -691,11 +691,15 @@ RkAiqAwbHandleInt::preProcess()
 #ifdef RK_SIMULATOR_HW
     if(shared->hardware_version == 0) {
         awb_pre_int->awb_hw0_statis = ispStats->awb_stats;
+        awb_pre_int->awb_cfg_effect_v200 = ispStats->awb_cfg_effect_v200;
     } else {
         awb_pre_int->awb_hw1_statis = ispStats->awb_stats_v201;
+        awb_pre_int->awb_cfg_effect_v201 = ispStats->awb_cfg_effect_v201;
     }
 #else
     if(shared->hardware_version == 0) {
+        awb_pre_int->awb_cfg_effect_v200 = ispStats->awb_cfg_effect_v200;
+
         for(int i = 0; i < RK_AIQ_AWB_MAX_WHITEREGIONS_NUM; i++) {
             //mAwbPreParam.awb_hw0_statis.light,
             for(int j = 0; j < RK_AIQ_AWB_XY_TYPE_MAX_V200; j++) {
@@ -745,6 +749,7 @@ RkAiqAwbHandleInt::preProcess()
 
     } else {
         //V201 TO DO
+        awb_pre_int->awb_cfg_effect_v201 = ispStats->awb_cfg_effect_v201;
     }
 #endif
     RkAiqAlgoDescription* des = (RkAiqAlgoDescription*)mDes;
@@ -1450,7 +1455,7 @@ RkAiqAdhazHandleInt::processing()
     RkAiqProcResComb* comb = &shared->procResComb;
     RkAiqIspStats* ispStats = &shared->ispStats;
 
-	adhaz_proc_int->hdr_mode = shared->working_mode;
+    adhaz_proc_int->hdr_mode = shared->working_mode;
 
     ret = RkAiqAdhazHandle::processing();
     if (ret) {
@@ -2664,11 +2669,25 @@ RkAiqAccmHandleInt::processing()
     }
     RkAiqAlgoPreResAeInt *ae_int = (RkAiqAlgoPreResAeInt*)shared->preResComb.ae_pre_res;
     if( ae_int) {
-        int fNormalIndex =  ae_int->ae_pre_res_rk.NormalIndex;
         if(shared->working_mode == RK_AIQ_WORKING_MODE_NORMAL) {
-            accm_proc_int->accm_sw_info.sensorGain = ae_int->ae_pre_res_rk.LinearExp.exp_real_params.analog_gain;
+            accm_proc_int->accm_sw_info.sensorGain = ae_int->ae_pre_res_rk.LinearExp.exp_real_params.analog_gain
+                    * ae_int->ae_pre_res_rk.LinearExp.exp_real_params.digital_gain
+                    * ae_int->ae_pre_res_rk.LinearExp.exp_real_params.isp_dgain;
+        } else if((rk_aiq_working_mode_t)shared->working_mode >= RK_AIQ_WORKING_MODE_ISP_HDR2
+                  && (rk_aiq_working_mode_t)shared->working_mode < RK_AIQ_WORKING_MODE_ISP_HDR3)  {
+            LOGD("%sensor gain choose from second hdr frame for accm");
+            accm_proc_int->accm_sw_info.sensorGain = ae_int->ae_pre_res_rk.HdrExp[1].exp_real_params.analog_gain
+                    * ae_int->ae_pre_res_rk.HdrExp[1].exp_real_params.digital_gain
+                    * ae_int->ae_pre_res_rk.HdrExp[1].exp_real_params.isp_dgain;
+        } else if((rk_aiq_working_mode_t)shared->working_mode >= RK_AIQ_WORKING_MODE_ISP_HDR2
+                  && (rk_aiq_working_mode_t)shared->working_mode >= RK_AIQ_WORKING_MODE_ISP_HDR3)  {
+            LOGD("sensor gain choose from third hdr frame for accm");
+            accm_proc_int->accm_sw_info.sensorGain = ae_int->ae_pre_res_rk.HdrExp[2].exp_real_params.analog_gain
+                    * ae_int->ae_pre_res_rk.HdrExp[2].exp_real_params.digital_gain
+                    * ae_int->ae_pre_res_rk.HdrExp[2].exp_real_params.isp_dgain;
         } else {
-            accm_proc_int->accm_sw_info.sensorGain = ae_int->ae_pre_res_rk.HdrExp[fNormalIndex].exp_real_params.analog_gain;
+            LOGE("working_mode (%d) is invaild ,fail to get sensor gain form AE module,use default value ",
+                 shared->working_mode);
         }
     } else {
         LOGE("fail to get sensor gain form AE module,use default value ");
@@ -2902,6 +2921,19 @@ RkAiqAdebayerHandleInt::setAttrib(adebayer_attrib_t att)
     }
 
     mCfgMutex.unlock();
+
+    EXIT_ANALYZER_FUNCTION();
+    return ret;
+}
+
+XCamReturn
+RkAiqAdebayerHandleInt::getAttrib(adebayer_attrib_t *att)
+{
+    ENTER_ANALYZER_FUNCTION();
+
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+
+    rk_aiq_uapi_adebayer_GetAttrib(mAlgoCtx, att);
 
     EXIT_ANALYZER_FUNCTION();
     return ret;
@@ -3614,6 +3646,19 @@ RkAiqAgicHandleInt::setAttrib(agic_attrib_t att)
 }
 
 XCamReturn
+RkAiqAgicHandleInt::getAttrib(agic_attrib_t *att)
+{
+    ENTER_ANALYZER_FUNCTION();
+
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+
+    rk_aiq_uapi_agic_GetAttrib(mAlgoCtx, att);
+
+    EXIT_ANALYZER_FUNCTION();
+    return ret;
+}
+
+XCamReturn
 RkAiqAgicHandleInt::prepare()
 {
     ENTER_ANALYZER_FUNCTION();
@@ -4182,11 +4227,25 @@ RkAiqAlscHandleInt::processing()
     }
     RkAiqAlgoPreResAeInt *ae_int = (RkAiqAlgoPreResAeInt*)shared->preResComb.ae_pre_res;
     if( ae_int) {
-        int fNormalIndex =  ae_int->ae_pre_res_rk.NormalIndex;
         if((rk_aiq_working_mode_t)shared->working_mode == RK_AIQ_WORKING_MODE_NORMAL) {
-            alsc_proc_int->alsc_sw_info.sensorGain = ae_int->ae_pre_res_rk.LinearExp.exp_real_params.analog_gain;
+            alsc_proc_int->alsc_sw_info.sensorGain = ae_int->ae_pre_res_rk.LinearExp.exp_real_params.analog_gain
+                    * ae_int->ae_pre_res_rk.LinearExp.exp_real_params.digital_gain
+                    * ae_int->ae_pre_res_rk.LinearExp.exp_real_params.isp_dgain;
+        } else if((rk_aiq_working_mode_t)shared->working_mode >= RK_AIQ_WORKING_MODE_ISP_HDR2
+                  && (rk_aiq_working_mode_t)shared->working_mode < RK_AIQ_WORKING_MODE_ISP_HDR3)  {
+            LOGD("sensor gain choose from second hdr frame for alsc");
+            alsc_proc_int->alsc_sw_info.sensorGain = ae_int->ae_pre_res_rk.HdrExp[1].exp_real_params.analog_gain
+                    * ae_int->ae_pre_res_rk.HdrExp[1].exp_real_params.digital_gain
+                    * ae_int->ae_pre_res_rk.HdrExp[1].exp_real_params.isp_dgain;
+        } else if((rk_aiq_working_mode_t)shared->working_mode >= RK_AIQ_WORKING_MODE_ISP_HDR2
+                  && (rk_aiq_working_mode_t)shared->working_mode >= RK_AIQ_WORKING_MODE_ISP_HDR3)  {
+            LOGD("sensor gain choose from third hdr frame for alsc");
+            alsc_proc_int->alsc_sw_info.sensorGain = ae_int->ae_pre_res_rk.HdrExp[2].exp_real_params.analog_gain
+                    * ae_int->ae_pre_res_rk.HdrExp[2].exp_real_params.digital_gain
+                    * ae_int->ae_pre_res_rk.HdrExp[2].exp_real_params.isp_dgain;
         } else {
-            alsc_proc_int->alsc_sw_info.sensorGain = ae_int->ae_pre_res_rk.HdrExp[fNormalIndex].exp_real_params.analog_gain;
+            LOGE("working_mode (%d) is invaild ,fail to get sensor gain form AE module,use default value ",
+                 shared->working_mode);
         }
     } else {
         LOGE("fail to get sensor gain form AE module,use default value ");

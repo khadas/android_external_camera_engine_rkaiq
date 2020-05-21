@@ -22,11 +22,16 @@
 
 #include "drmDsp.h"
 #include "rk_aiq_user_api_sysctl.h"
+#include "rk_aiq_user_api_imgproc.h"
+#include <termios.h>
 
 #define CLEAR(x) memset(&(x), 0, sizeof(x))
 #define FMT_NUM_PLANES 1
 
 #define BUFFER_COUNT 4
+#define CAPTURE_RAW_PATH "/tmp"
+#define CAPTURE_CNT_FILENAME "capture_cnt"
+//#define ENABLE_UAPI_TEST
 
 struct buffer {
         void *start;
@@ -51,9 +56,9 @@ static int silent = 0;
 static int vop = 0;
 static int rkaiq = 0;
 static int writeFile = 0;
+static int writeFileSync = 0;
 static int pponeframe = 0;
 static int hdrmode = 0;
-static char sensor[64];
 
 static int fd_pp_input = -1;
 static int fd_isp_mp = -1;
@@ -61,10 +66,216 @@ struct buffer *buffers_mp;
 static int outputCnt = 3;
 static int skipCnt = 30;
 
+static char yuv_dir_path[64];
+static bool _is_yuv_dir_exist = false;
+static int g_capture_yuv_num = 0x0;
+static bool _is_capture_yuv;
+static struct termios oldt;
 //TODO: get active sensor from driver
 
 #define DBG(...) do { if(!silent) printf(__VA_ARGS__); } while(0)
 #define ERR(...) do { fprintf(stderr, __VA_ARGS__); } while (0)
+
+
+//restore terminal settings
+void restore_terminal_settings(void)
+{
+    // Apply saved settings
+    tcsetattr(0, TCSANOW, &oldt); 
+}
+
+//make terminal read 1 char at a time
+void disable_terminal_return(void)
+{
+    struct termios newt;
+    
+    //save terminal settings
+    tcgetattr(0, &oldt); 
+    //init new settings
+    newt = oldt;  
+    //change settings
+    newt.c_lflag &= ~(ICANON | ECHO);
+    //apply settings
+    tcsetattr(0, TCSANOW, &newt);
+    
+    //make sure settings will be restored when program ends
+    atexit(restore_terminal_settings);
+}
+
+void test_imgproc(const rk_aiq_sys_ctx_t* ctx) {
+    
+   if (ctx == NULL) {
+      return;
+   }
+
+   int key =getchar();
+   printf("press key=[%c]\n",key);
+
+    opMode_t mode;
+    paRange_t range;
+    expPwrLineFreq_t freq;
+    rk_aiq_wb_scene_t scene;
+    rk_aiq_wb_gain_t gain;
+    rk_aiq_wb_cct_t ct;
+    antiFlickerMode_t flicker;
+    switch (key)
+    {
+    case '0':
+       rk_aiq_uapi_setExpMode(ctx, OP_MANUALl);
+       printf("set exp manual\n");
+       break;
+    case '.':
+       rk_aiq_uapi_setExpMode(ctx, OP_AUTO);
+       printf("set exp auto\n");
+       break;
+    case '1':
+       rk_aiq_uapi_getExpMode(ctx, &mode);
+       printf("exp mode=%d\n",mode);
+       break;
+    case '2':
+        range.min = 5.0f;
+        range.max = 8.0f;
+        rk_aiq_uapi_setExpGainRange(ctx, &range);
+        printf("set gain range\n");
+        break;
+    case '3':
+        rk_aiq_uapi_getExpGainRange(ctx, &range);
+        printf("get gain range[%f,%f]\n",range.min,range.max);
+        break;
+    case '4':
+        range.min = 10.0f;
+        range.max = 30.0f;
+        rk_aiq_uapi_setExpTimeRange(ctx, &range);
+        printf("set time range\n");
+      break;
+    case '5':
+        rk_aiq_uapi_getExpTimeRange(ctx, &range);
+        printf("get time range[%f,%f]\n",range.min,range.max);
+        break;
+    case '6':
+        rk_aiq_uapi_setExpPwrLineFreqMode(ctx, EXP_PWR_LINE_FREQ_50HZ);
+        printf("setExpPwrLineFreqMode 50hz\n");
+        break;
+    case ',':
+        rk_aiq_uapi_setExpPwrLineFreqMode(ctx, EXP_PWR_LINE_FREQ_60HZ);
+        printf("setExpPwrLineFreqMode 60hz\n");
+        break;
+    case '7':
+        rk_aiq_uapi_getExpPwrLineFreqMode(ctx, &freq);
+        printf("getExpPwrLineFreqMode=%d\n",freq);
+        break;
+    case '8':
+        rk_aiq_uapi_setWBMode(ctx, OP_MANUALl);
+        printf("setWBMode manual\n");
+        break;
+    case '/':
+        rk_aiq_uapi_setWBMode(ctx, OP_AUTO);
+        printf("setWBMode auto\n");
+        break;
+    case '9':
+        rk_aiq_uapi_getWBMode(ctx, &mode);
+        printf("getWBMode=%d\n",mode);
+        break;
+    case 'a':
+        rk_aiq_uapi_lockAWB(ctx);
+        printf("lockAWB\n");
+        break;
+    case 'b':
+        rk_aiq_uapi_unlockAWB(ctx);
+        printf("unlockAWB\n");
+        break;
+    case 'c':
+        rk_aiq_uapi_setMWBScene(ctx,RK_AIQ_WBCT_TWILIGHT);
+        printf("setMWBScene\n");
+        break;
+    case 'd':
+        rk_aiq_uapi_getMWBScene(ctx,&scene);
+        printf("getMWBScene=%d\n",scene);
+        break;
+    case 'e':
+        gain.rgain = 0.5f;
+        gain.grgain = 0.5f;
+        gain.gbgain = 0.5f;
+        gain.bgain = 0.5f;
+        rk_aiq_uapi_setMWBGain(ctx,&gain);
+        printf("setMWBGain\n");
+        break;
+    case 'f':
+        rk_aiq_uapi_getMWBGain(ctx,&gain);
+        printf("getMWBGain=[%f %f %f %f]\n",gain.rgain,gain.grgain,gain.gbgain,gain.bgain);
+        break;
+    case 'g':
+        ct.CCT = 0.5f;
+        ct.CCRI = 0.5f;
+        rk_aiq_uapi_setMWBCT(ctx,ct);
+        printf("setMWBCT\n");
+        break;
+    case 'h':
+        rk_aiq_uapi_getMWBCT(ctx,&ct);
+        printf("getMWBCT=[%f %f]\n",ct.CCT,ct.CCRI);
+        break;
+    case 'i':
+        rk_aiq_uapi_setAntiFlickerMode(ctx,ANTIFLICKER_NORMAL_MODE);
+        printf("setAntiFlickerMode normal\n");
+        break;
+    case 'j':
+        rk_aiq_uapi_setAntiFlickerMode(ctx,ANTIFLICKER_AUTO_MODE);
+        printf("setAntiFlickerMode auto\n");
+        break;
+    case 'k':
+        rk_aiq_uapi_getAntiFlickerMode(ctx, &flicker);
+        printf("getAntiFlickerMode=%d\n",flicker);
+        break;
+    case 'l':
+        rk_aiq_uapi_setSaturation(ctx, 50.0);
+        printf("setSaturation\n");
+        break;
+    case 'm':
+        float level1;
+        rk_aiq_uapi_getSaturation(ctx, &level1);
+        printf("getSaturation=%f\n",level1);
+        break;
+    case 'n':
+        rk_aiq_uapi_setCrSuppsn(ctx, 50.0);
+        printf("setCrSuppsn\n");
+        break;
+    case 'o':
+        unsigned int level2;
+        rk_aiq_uapi_getCrSuppsn(ctx, &level2);
+        printf("getCrSuppsn=%d\n",level2);
+        break;
+    case 'p':
+        rk_aiq_uapi_setHDRMode(ctx, OP_AUTO);
+        printf("setHDRMode\n");
+        break;
+    case 'q':
+        rk_aiq_uapi_setHDRMode(ctx, OP_MANUALl);
+        printf("setHDRMode\n");
+        break;
+    case 'r':
+        rk_aiq_uapi_getHDRMode(ctx, &mode);
+        printf("getHDRMode=%d\n",mode);
+        break;
+    case 's':
+        rk_aiq_uapi_setNRMode(ctx, OP_MANUALl);
+        printf("setNRMode\n");
+        break;
+    case 't':
+        rk_aiq_uapi_getNRMode(ctx, &mode);
+        printf("getNRMode=%d\n",mode);
+        break;
+     case 'u':
+        rk_aiq_uapi_setDhzMode(ctx, OP_MANUALl);
+        printf("setDhzMode\n");
+        break;
+    case 'v':
+        rk_aiq_uapi_getDhzMode(ctx, &mode);
+        printf("getDhzMode=%d\n",mode);
+        break;
+    default:
+        break;
+    }
+}
 
 static void errno_exit(const char *s)
 {
@@ -81,12 +292,125 @@ static int xioctl(int fh, int request, void *arg)
         return r;
 }
 
+bool get_value_from_file(const char* path, int* value)
+{
+    char buffer[8] = {0};
+    int fp;
+
+    fp = open(path, O_RDONLY | O_SYNC);
+    if (fp) {
+	if (read(fp, buffer, sizeof(buffer)) <= 0)
+	    printf("%s read %s failed!\n", __func__, path);
+	else
+	    *value = atoi(buffer);
+	close(fp);
+	return true;
+    }
+
+    return false;
+}
+
+static int write_yuv_to_file(const void *p,
+			     int size, int sequence)
+{
+	char file_name[64] = {0};
+
+	snprintf(file_name, sizeof(file_name),
+			"%s/frame%d.yuv",
+			yuv_dir_path,
+			sequence);
+	fp = fopen(file_name, "wb+");
+	if (fp == NULL) {
+		ERR("fopen yuv file %s failed!\n", file_name);
+		return -1;
+	}
+
+	fwrite(p, size, 1, fp);
+	fflush(fp);
+
+	if (fp) {
+		fclose(fp);
+		fp = NULL;
+	}
+
+        for (int i = 0; i < g_capture_yuv_num; i++)
+            printf("<");
+
+	printf("\n");
+	// printf("write frame%d yuv\n", sequence);
+
+	return 0;
+}
+
+static int creat_yuv_dir(const char* path)
+{
+	time_t now;
+	struct tm* timenow;
+
+	if (!path)
+		return -1;
+
+	time(&now);
+	timenow = localtime(&now);
+	snprintf(yuv_dir_path, sizeof(yuv_dir_path),
+			"%s/yuv_%04d-%02d-%02d_%02d-%02d-%02d",
+			path,
+			timenow->tm_year + 1900,
+			timenow->tm_mon + 1,
+			timenow->tm_mday,
+			timenow->tm_hour,
+			timenow->tm_min,
+			timenow->tm_sec);
+
+	// printf("mkdir %s for capturing yuv!\n", yuv_dir_path);
+
+	if(mkdir(yuv_dir_path, 0755) < 0) {
+		printf("mkdir %s error!!!\n", yuv_dir_path);
+		return -1;
+	}
+
+	_is_yuv_dir_exist = true;
+
+	return 0;
+}
+
 static void process_image(const void *p, int sequence,int size)
 {
-	if (fp && sequence > skipCnt && outputCnt-- > 0) {
-	    printf(">\n");
-	    fwrite(p, size, 1, fp);
-	    fflush(fp);
+	if (fp && sequence >= skipCnt && outputCnt-- > 0) {
+		printf(">\n");
+		fwrite(p, size, 1, fp);
+		fflush(fp);
+	} else if (writeFileSync) {
+		int ret = 0;
+
+		if (!_is_capture_yuv) {
+		    char file_name[32] = {0};
+
+		    snprintf(file_name, sizeof(file_name), "%s/%s",
+			     CAPTURE_RAW_PATH, CAPTURE_CNT_FILENAME);
+		    get_value_from_file(file_name, &g_capture_yuv_num);
+
+		    if (g_capture_yuv_num > 0)
+			_is_capture_yuv = true;
+
+		    if (sequence != 0)
+			return;
+		}
+
+		if (_is_capture_yuv) {
+		    if (!_is_yuv_dir_exist) {
+		        creat_yuv_dir(CAPTURE_RAW_PATH);
+		    }
+
+		    if (_is_yuv_dir_exist) {
+			write_yuv_to_file(p, size, sequence);
+		    }
+
+		    if (--g_capture_yuv_num == 0) {
+			_is_capture_yuv = false;
+			_is_yuv_dir_exist = false;
+		    }
+		}
 	}
 }
 
@@ -599,12 +923,12 @@ void parse_args(int argc, char **argv)
            {"rkaiq",   no_argument,       0, 'r' },
            {"pponeframe",   no_argument,       0, 'm' },
            {"hdr",   no_argument,       0, 'a' },
-           {"sensor",   required_argument,       0, 'b' },
+           {"sync-to-raw", no_argument, 0, 'e' },
            {0,          0,                 0,  0  }
        };
 
        //c = getopt_long(argc, argv, "w:h:f:i:d:o:c:ps",
-       c = getopt_long(argc, argv, "w:h:f:i:d:o:c:n:k:m:ps",
+       c = getopt_long(argc, argv, "w:h:f:i:d:o:c:n:k:m:pse",
            long_options, &option_index);
        if (c == -1)
            break;
@@ -650,8 +974,8 @@ void parse_args(int argc, char **argv)
        case 'a':
            hdrmode = 1;
            break;
-       case 'b':
-           strcpy(sensor, optarg);
+       case 'e':
+	   writeFileSync = 1;
            break;
        case '?':
        case 'p':
@@ -662,14 +986,14 @@ void parse_args(int argc, char **argv)
                   "         --count,  default 1000,            optional, how many frames to capture\n"
                   "         --device,                          required, path of video device\n"
                   "         --stream-to,                       optional, output file path, if <file> is '-', then the data is written to stdout\n"
-                  "         --stream-count, default 3		   optional, how many frames to write files\n"
-                  "         --stream-skip, default 30		   optional, how many frames to skip befor writing file\n"
+                  "         --stream-count, default 3	       optional, how many frames to write files\n"
+                  "         --stream-skip, default 30	       optional, how many frames to skip befor writing file\n"
                   "         --vop,                             optional, drm display\n"
                   "         --rkaiq,                           optional, auto image quality\n",
                   "         --silent,                          optional, subpress debug log\n",
                   "         --pponeframe,                      optional, pp oneframe readback mode\n",
                   "         --hdr,                             optional, hdr mode\n",
-                  "         --sensor,  default os04a10,        optional, sensor names\n",
+                  "         --sync-to-raw,		       optional, write yuv files in sync with raw\n",
                   argv[0]);
            exit(-1);
 
@@ -716,13 +1040,23 @@ static void signal_handle(int signo)
     exit(0);
 }
 
+void* test_thread(void* args) {
+    pthread_detach (pthread_self());
+    disable_terminal_return();
+    printf("begin test imgproc\n");
+    while(1) {
+        test_imgproc(aiq_ctx);
+    }
+    printf("end test imgproc\n");
+    restore_terminal_settings();
+}
+
 int main(int argc, char **argv)
 {
     signal(SIGINT, signal_handle);
     signal(SIGQUIT, signal_handle);
     signal(SIGTERM, signal_handle);
 
-    strcpy(sensor, "os04a10");
     parse_args(argc, argv);
 
     printf("-------- open output dev -------------\n");
@@ -733,34 +1067,34 @@ int main(int argc, char **argv)
     if (pponeframe)
         init_device_pp_oneframe();
     if (writeFile) {
-        fp = fopen(out_file, "w+");
-        if (fp == NULL) {
-            ERR("fopen output file %s failed!\n", out_file);
-            exit(-1);
-        }
+	fp = fopen(out_file, "w+");
+	if (fp == NULL) {
+	    ERR("fopen output file %s failed!\n", out_file);
+	    exit(-1);
+	}
     }
 
-    const char* sns_entity_name = NULL;
+    char sns_entity_name[64];
     rk_aiq_working_mode_t work_mode = RK_AIQ_WORKING_MODE_NORMAL;
-
-    if (strcasecmp(sensor, "ov4689") == 0) {
-        if (hdrmode)
-            work_mode = RK_AIQ_WORKING_MODE_ISP_HDR3;
-        sns_entity_name = "m01_f_ov4689 1-0036";
-    } else if (strcasecmp(sensor, "os04a10") == 0) {
-        if (hdrmode)
-            work_mode = RK_AIQ_WORKING_MODE_ISP_HDR2;
-        sns_entity_name = "m01_f_os04a10 1-0036";
-    } else if (strcasecmp(sensor, "gc4c33") == 0) {
-        if (hdrmode)
-            work_mode = RK_AIQ_WORKING_MODE_ISP_HDR2;
-        sns_entity_name = "m01_f_gc4c33 1-0029";
-    } else if (strcasecmp(sensor, "imx347") == 0) {
-        if (hdrmode)
-            work_mode = RK_AIQ_WORKING_MODE_ISP_HDR2;
-        sns_entity_name = "m01_f_imx347 1-0037";
+    const char *cmd = "media-ctl -p | grep sensor -i -B 1 | cut -d ' ' -f 4,5 | grep -e \"^.*[0-9]\" > /tmp/sensor_entity";
+    system(cmd);
+    FILE* tmp = fopen("/tmp/sensor_entity", "r");
+    if (tmp) {
+        size_t n = 64;
+        char *lineptr = sns_entity_name;
+        if (getline(&lineptr, &n, tmp) > 0) {
+            printf("sensor entity name :%s", lineptr);
+            int len = strlen(lineptr);
+            if (lineptr[len - 1] == '\r' || lineptr[len - 1] == '\n')
+                lineptr[len - 1] = '\0';
+        }
+         
+        fclose(tmp);
+        remove("/tmp/sensor_entity");
+    } else {
+        errno_exit("can't find snesor entity!");
     }
-
+    
     printf("sns_entity_name %s\n", sns_entity_name);
 	if (rkaiq) {
 		aiq_ctx = rk_aiq_uapi_sysctl_init(sns_entity_name, NULL, NULL, NULL);
@@ -803,7 +1137,10 @@ int main(int argc, char **argv)
         if (pponeframe)
             start_capturing_pp_oneframe();
 	}
-
+#ifdef ENABLE_UAPI_TEST    
+    pthread_t tid;
+    pthread_create(&tid, NULL, test_thread, NULL);
+#endif
     mainloop();
 
     deinit();

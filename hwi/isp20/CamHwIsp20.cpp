@@ -141,7 +141,7 @@ parse_module_info(rk_sensor_full_info_t *sensor_info)
 
     if (entity_name.at(parse_index) != 'm') {
         LOGE_CAMHW("%d:parse sensor entity name %s error at %d, please check sensor driver !",
-             __LINE__, entity_name.c_str(), parse_index);
+                   __LINE__, entity_name.c_str(), parse_index);
         return XCAM_RETURN_ERROR_SENSOR;
     }
 
@@ -152,7 +152,7 @@ parse_module_info(rk_sensor_full_info_t *sensor_info)
 
     if (entity_name.at(parse_index) != '_') {
         LOGE_CAMHW("%d:parse sensor entity name %s error at %d, please check sensor driver !",
-             __LINE__, entity_name.c_str(), parse_index);
+                   __LINE__, entity_name.c_str(), parse_index);
         return XCAM_RETURN_ERROR_SENSOR;
     }
 
@@ -161,7 +161,7 @@ parse_module_info(rk_sensor_full_info_t *sensor_info)
     if (entity_name.at(parse_index) != 'b' &&
             entity_name.at(parse_index) != 'f') {
         LOGE_CAMHW("%d:parse sensor entity name %s error at %d, please check sensor driver !",
-             __LINE__, entity_name.c_str(), parse_index);
+                   __LINE__, entity_name.c_str(), parse_index);
         return XCAM_RETURN_ERROR_SENSOR;
     }
     sensor_info->phy_module_orient = entity_name.at(parse_index);
@@ -170,7 +170,7 @@ parse_module_info(rk_sensor_full_info_t *sensor_info)
 
     if (entity_name.at(parse_index) != '_') {
         LOGE_CAMHW("%d:parse sensor entity name %s error at %d, please check sensor driver !",
-             __LINE__, entity_name.c_str(), parse_index);
+                   __LINE__, entity_name.c_str(), parse_index);
         return XCAM_RETURN_ERROR_SENSOR;
     }
 
@@ -179,7 +179,7 @@ parse_module_info(rk_sensor_full_info_t *sensor_info)
     std::size_t real_name_end = std::string::npos;
     if ((real_name_end = entity_name.find(' ')) == std::string::npos) {
         LOGE_CAMHW("%d:parse sensor entity name %s error at %d, please check sensor driver !",
-             __LINE__, entity_name.c_str(), parse_index);
+                   __LINE__, entity_name.c_str(), parse_index);
         return XCAM_RETURN_ERROR_SENSOR;
     }
 
@@ -187,8 +187,8 @@ parse_module_info(rk_sensor_full_info_t *sensor_info)
     sensor_info->module_real_sensor_name = real_name_str;
 
     LOGD_CAMHW("%s:%d, real sensor name %s, module ori %c, module id %s",
-         __FUNCTION__, __LINE__, sensor_info->module_real_sensor_name.c_str(),
-         sensor_info->phy_module_orient, sensor_info->module_index_str.c_str());
+               __FUNCTION__, __LINE__, sensor_info->module_real_sensor_name.c_str(),
+               sensor_info->phy_module_orient, sensor_info->module_index_str.c_str());
 
     return XCAM_RETURN_NO_ERROR;
 }
@@ -414,19 +414,20 @@ get_isp_subdevs(struct media_device *device, const char *devpath, rk_aiq_isp_t* 
 static
 XCamReturn
 SensorInfoCopy(rk_sensor_full_info_t *finfo, rk_aiq_sensor_info_t *sinfo) {
-    int fs_num;
+    int fs_num, i = 0;
 
     strncpy(sinfo->sensor_name, finfo->sensor_name.c_str(), sizeof(sinfo->sensor_name));
     fs_num = finfo->frame_size.size();
     if (fs_num) {
-        sinfo->support_fmt = new rk_frame_fmt_t[fs_num]();
-        sinfo->num = fs_num;
-        for (auto iter = finfo->frame_size.begin(); iter != finfo->frame_size.end(); ++iter) {
-            sinfo->support_fmt->width = (*iter).width;
-            sinfo->support_fmt->height = (*iter).height;
-            sinfo->support_fmt->format = (*iter).format;
-            sinfo->support_fmt++;
+        //sinfo->support_fmt = new rk_frame_fmt_t[fs_num]();
+        //sinfo->num = fs_num;
+        for (auto iter = finfo->frame_size.begin(); iter != finfo->frame_size.end() && i < 10; ++iter, i++) {
+            sinfo->support_fmt[i].width = (*iter).width;
+            sinfo->support_fmt[i].height = (*iter).height;
+            sinfo->support_fmt[i].format = (*iter).format;
+            //sinfo->support_fmt++;
         }
+        sinfo->num = i;
     }
 
     return XCAM_RETURN_NO_ERROR;
@@ -623,8 +624,8 @@ CamHwIsp20::init(const char* sns_ent_name)
 
     mipi_rx_devs[2]->set_mem_type(V4L2_MEMORY_DMABUF);
     for (int i = 0; i < 3; i++) {
-        mipi_tx_devs[i]->set_buffer_count(8);
-        mipi_rx_devs[i]->set_buffer_count(8);
+        mipi_tx_devs[i]->set_buffer_count(4);
+        mipi_rx_devs[i]->set_buffer_count(4);
     }
 
     isp20Pollthread = new Isp20PollThread();
@@ -694,18 +695,21 @@ CamHwIsp20::setupHdrLink(int hdr_mode, int isp_index, bool enable)
     else
         media_setup_link(device, src_pad_s, sink_pad, 0);
 
-    entity = media_get_entity_by_name(device, "rkisp_rawrd0_m", strlen("rkisp_rawrd0_m"));
-    if(entity) {
-        src_pad_m = (media_pad *)media_entity_get_pad(entity, 0);
-        if (!src_pad_m) {
-            LOGE_CAMHW("get HDR source pad m failed!\n");
-            goto FAIL;
+    if (RK_AIQ_HDR_GET_WORKING_MODE(hdr_mode) >= RK_AIQ_WORKING_MODE_ISP_HDR2) {
+        entity = media_get_entity_by_name(device, "rkisp_rawrd0_m", strlen("rkisp_rawrd0_m"));
+        if(entity) {
+            src_pad_m = (media_pad *)media_entity_get_pad(entity, 0);
+            if (!src_pad_m) {
+                LOGE_CAMHW("get HDR source pad m failed!\n");
+                goto FAIL;
+            }
         }
+
+        if (enable)
+            media_setup_link(device, src_pad_m, sink_pad, MEDIA_LNK_FL_ENABLED);
+        else
+            media_setup_link(device, src_pad_m, sink_pad, 0);
     }
-    if (enable)
-        media_setup_link(device, src_pad_m, sink_pad, MEDIA_LNK_FL_ENABLED);
-    else
-        media_setup_link(device, src_pad_m, sink_pad, 0);
 
     if (RK_AIQ_HDR_GET_WORKING_MODE(hdr_mode) == RK_AIQ_WORKING_MODE_ISP_HDR3) {
         entity = media_get_entity_by_name(device, "rkisp_rawrd1_l", strlen("rkisp_rawrd1_l"));
@@ -734,7 +738,7 @@ CamHwIsp20::setExpDelayInfo(int time_delay, int gain_delay)
     ENTER_CAMHW_FUNCTION();
     SmartPtr<SensorHw> sensorHw;
     sensorHw = mSensorDev.dynamic_cast_ptr<SensorHw>();
-    sensorHw->set_exp_delay_info(time_delay, gain_delay);
+    sensorHw->set_exp_delay_info(time_delay, gain_delay, mCalibDb->sysContrl.dcg_delay);
     EXIT_CAMHW_FUNCTION();
     return XCAM_RETURN_NO_ERROR;
 }
@@ -748,14 +752,18 @@ CamHwIsp20::prepare(uint32_t width, uint32_t height, int mode, int t_delay, int 
 
     ENTER_CAMHW_FUNCTION();
 
+    XCAM_ASSERT (mCalibDb);
+
     _hdr_mode = mode;
 
-    if (_hdr_mode != RK_AIQ_WORKING_MODE_NORMAL)
-        setupHdrLink(_hdr_mode, 0, true);
+    /* if (_hdr_mode != RK_AIQ_WORKING_MODE_NORMAL) */
+    setupHdrLink(_hdr_mode, 0, true);
+
+    Isp20Params::set_working_mode(_hdr_mode);
 
     sensorHw = mSensorDev.dynamic_cast_ptr<SensorHw>();
     sensorHw->set_working_mode(mode);
-    sensorHw->set_exp_delay_info(t_delay, g_delay);
+    sensorHw->set_exp_delay_info(t_delay, g_delay, mCalibDb->sysContrl.dcg_delay);
     isp20Pollthread = mPollthread.dynamic_cast_ptr<Isp20PollThread>();
     isp20Pollthread->set_working_mode(mode);
     // TODO: may start devices in start() ?
@@ -909,8 +917,8 @@ XCamReturn CamHwIsp20::stop()
         LOGE_CAMHW("hdr mipi stop err: %d\n", ret);
     }
 
-    if (_hdr_mode != RK_AIQ_WORKING_MODE_NORMAL)
-        setupHdrLink(_hdr_mode, 0, false);
+    /* if (_hdr_mode != RK_AIQ_WORKING_MODE_NORMAL) */
+    setupHdrLink(_hdr_mode, 0, false);
 
     _state = CAM_HW_STATE_STOPED;
     EXIT_CAMHW_FUNCTION();
@@ -924,8 +932,8 @@ XCamReturn CamHwIsp20::stop()
  */
 XCamReturn
 CamHwIsp20::overrideExpRatioToAiqResults(const sint32_t frameId,
-					int module_id,
-					SmartPtr<RkAiqIspParamsProxy>& aiq_results)
+        int module_id,
+        SmartPtr<RkAiqIspParamsProxy>& aiq_results)
 {
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
     SmartPtr<RkAiqExpParamsProxy> curFrameExpParam;
@@ -933,175 +941,175 @@ CamHwIsp20::overrideExpRatioToAiqResults(const sint32_t frameId,
     SmartPtr<SensorHw> mSensorSubdev = mSensorDev.dynamic_cast_ptr<SensorHw>();
 
     if (mSensorSubdev.ptr()) {
-	ret = mSensorSubdev->getEffectiveExpParams(curFrameExpParam, frameId);
-	if (ret != XCAM_RETURN_NO_ERROR) {
-	    LOGE_CAMHW("exp-sync: module_id: 0x%x, rx id: %d, ispparams id: %d\n",
-		       module_id,
-		       frameId,
-		       aiq_results->data()->frame_id);
-	    return ret;
-	}
+        ret = mSensorSubdev->getEffectiveExpParams(curFrameExpParam, frameId);
+        if (ret != XCAM_RETURN_NO_ERROR) {
+            LOGE_CAMHW("exp-sync: module_id: 0x%x, rx id: %d, ispparams id: %d\n",
+                       module_id,
+                       frameId,
+                       aiq_results->data()->frame_id);
+            return ret;
+        }
 
-	ret = mSensorSubdev->getEffectiveExpParams(nextFrameExpParam, frameId + 1);
-	if (ret != XCAM_RETURN_NO_ERROR) {
-	    LOGE_CAMHW("exp-sync: module_id: 0x%x, rx id: %d, ispparams id: %d\n",
-		       module_id,
-		       frameId + 1,
-		       aiq_results->data()->frame_id);
-	    return ret;
-	}
+        ret = mSensorSubdev->getEffectiveExpParams(nextFrameExpParam, frameId + 1);
+        if (ret != XCAM_RETURN_NO_ERROR) {
+            LOGE_CAMHW("exp-sync: module_id: 0x%x, rx id: %d, ispparams id: %d\n",
+                       module_id,
+                       frameId + 1,
+                       aiq_results->data()->frame_id);
+            return ret;
+        }
     }
 
     LOGD_CAMHW("exp-sync: module_id: 0x%x, rx id: %d, ispparams id: %d\n"
-	       "curFrame: lexp: 0x%x-0x%x, mexp: 0x%x-0x%x, sexp: 0x%x-0x%x\n"
-	       "nextFrame: lexp: 0x%x-0x%x, mexp: 0x%x-0x%x, sexp: 0x%x-0x%x\n",
-	       module_id,
-	       frameId,
-	       aiq_results->data()->frame_id,
-	       curFrameExpParam->data()->aecExpInfo.HdrExp[2].exp_sensor_params.analog_gain_code_global,
-	       curFrameExpParam->data()->aecExpInfo.HdrExp[2].exp_sensor_params.coarse_integration_time,
-	       curFrameExpParam->data()->aecExpInfo.HdrExp[1].exp_sensor_params.analog_gain_code_global,
-	       curFrameExpParam->data()->aecExpInfo.HdrExp[1].exp_sensor_params.coarse_integration_time,
-	       curFrameExpParam->data()->aecExpInfo.HdrExp[0].exp_sensor_params.analog_gain_code_global,
-	       curFrameExpParam->data()->aecExpInfo.HdrExp[0].exp_sensor_params.coarse_integration_time,
-	       nextFrameExpParam->data()->aecExpInfo.HdrExp[2].exp_sensor_params.analog_gain_code_global,
-	       nextFrameExpParam->data()->aecExpInfo.HdrExp[2].exp_sensor_params.coarse_integration_time,
-	       nextFrameExpParam->data()->aecExpInfo.HdrExp[1].exp_sensor_params.analog_gain_code_global,
-	       nextFrameExpParam->data()->aecExpInfo.HdrExp[1].exp_sensor_params.coarse_integration_time,
-	       nextFrameExpParam->data()->aecExpInfo.HdrExp[0].exp_sensor_params.analog_gain_code_global,
-	       nextFrameExpParam->data()->aecExpInfo.HdrExp[0].exp_sensor_params.coarse_integration_time);
+               "curFrame: lexp: 0x%x-0x%x, mexp: 0x%x-0x%x, sexp: 0x%x-0x%x\n"
+               "nextFrame: lexp: 0x%x-0x%x, mexp: 0x%x-0x%x, sexp: 0x%x-0x%x\n",
+               module_id,
+               frameId,
+               aiq_results->data()->frame_id,
+               curFrameExpParam->data()->aecExpInfo.HdrExp[2].exp_sensor_params.analog_gain_code_global,
+               curFrameExpParam->data()->aecExpInfo.HdrExp[2].exp_sensor_params.coarse_integration_time,
+               curFrameExpParam->data()->aecExpInfo.HdrExp[1].exp_sensor_params.analog_gain_code_global,
+               curFrameExpParam->data()->aecExpInfo.HdrExp[1].exp_sensor_params.coarse_integration_time,
+               curFrameExpParam->data()->aecExpInfo.HdrExp[0].exp_sensor_params.analog_gain_code_global,
+               curFrameExpParam->data()->aecExpInfo.HdrExp[0].exp_sensor_params.coarse_integration_time,
+               nextFrameExpParam->data()->aecExpInfo.HdrExp[2].exp_sensor_params.analog_gain_code_global,
+               nextFrameExpParam->data()->aecExpInfo.HdrExp[2].exp_sensor_params.coarse_integration_time,
+               nextFrameExpParam->data()->aecExpInfo.HdrExp[1].exp_sensor_params.analog_gain_code_global,
+               nextFrameExpParam->data()->aecExpInfo.HdrExp[1].exp_sensor_params.coarse_integration_time,
+               nextFrameExpParam->data()->aecExpInfo.HdrExp[0].exp_sensor_params.analog_gain_code_global,
+               nextFrameExpParam->data()->aecExpInfo.HdrExp[0].exp_sensor_params.coarse_integration_time);
 
     switch (module_id) {
     case RK_ISP2X_HDRTMO_ID:
     {
-	float nextLExpo =0;
-	float curLExpo =0;
-	float nextMExpo =0;
-	float curMExpo = 0;
-	if (RK_AIQ_HDR_GET_WORKING_MODE(_hdr_mode) == RK_AIQ_WORKING_MODE_ISP_HDR2) {
-	    nextLExpo = nextFrameExpParam->data()->aecExpInfo.HdrExp[1].exp_real_params.analog_gain * \
-		       nextFrameExpParam->data()->aecExpInfo.HdrExp[1].exp_real_params.integration_time;
-	    curLExpo = curFrameExpParam->data()->aecExpInfo.HdrExp[1].exp_real_params.analog_gain * \
-		       curFrameExpParam->data()->aecExpInfo.HdrExp[1].exp_real_params.integration_time;
-	    nextMExpo = nextLExpo;
-	    curMExpo = curLExpo;
-	} else if (RK_AIQ_HDR_GET_WORKING_MODE(_hdr_mode) == RK_AIQ_WORKING_MODE_ISP_HDR3) {
-	    nextLExpo = nextFrameExpParam->data()->aecExpInfo.HdrExp[2].exp_real_params.analog_gain * \
-		       nextFrameExpParam->data()->aecExpInfo.HdrExp[2].exp_real_params.integration_time;
-	    curLExpo = curFrameExpParam->data()->aecExpInfo.HdrExp[2].exp_real_params.analog_gain * \
-		       curFrameExpParam->data()->aecExpInfo.HdrExp[2].exp_real_params.integration_time;
-		nextMExpo = nextFrameExpParam->data()->aecExpInfo.HdrExp[1].exp_real_params.analog_gain * \
-		       nextFrameExpParam->data()->aecExpInfo.HdrExp[1].exp_real_params.integration_time;
-		curMExpo = curFrameExpParam->data()->aecExpInfo.HdrExp[1].exp_real_params.analog_gain * \
-		       curFrameExpParam->data()->aecExpInfo.HdrExp[1].exp_real_params.integration_time;
-	}
+        float nextLExpo = 0;
+        float curLExpo = 0;
+        float nextMExpo = 0;
+        float curMExpo = 0;
+        if (RK_AIQ_HDR_GET_WORKING_MODE(_hdr_mode) == RK_AIQ_WORKING_MODE_ISP_HDR2) {
+            nextLExpo = nextFrameExpParam->data()->aecExpInfo.HdrExp[1].exp_real_params.analog_gain * \
+                        nextFrameExpParam->data()->aecExpInfo.HdrExp[1].exp_real_params.integration_time;
+            curLExpo = curFrameExpParam->data()->aecExpInfo.HdrExp[1].exp_real_params.analog_gain * \
+                       curFrameExpParam->data()->aecExpInfo.HdrExp[1].exp_real_params.integration_time;
+            nextMExpo = nextLExpo;
+            curMExpo = curLExpo;
+        } else if (RK_AIQ_HDR_GET_WORKING_MODE(_hdr_mode) == RK_AIQ_WORKING_MODE_ISP_HDR3) {
+            nextLExpo = nextFrameExpParam->data()->aecExpInfo.HdrExp[2].exp_real_params.analog_gain * \
+                        nextFrameExpParam->data()->aecExpInfo.HdrExp[2].exp_real_params.integration_time;
+            curLExpo = curFrameExpParam->data()->aecExpInfo.HdrExp[2].exp_real_params.analog_gain * \
+                       curFrameExpParam->data()->aecExpInfo.HdrExp[2].exp_real_params.integration_time;
+            nextMExpo = nextFrameExpParam->data()->aecExpInfo.HdrExp[1].exp_real_params.analog_gain * \
+                        nextFrameExpParam->data()->aecExpInfo.HdrExp[1].exp_real_params.integration_time;
+            curMExpo = curFrameExpParam->data()->aecExpInfo.HdrExp[1].exp_real_params.analog_gain * \
+                       curFrameExpParam->data()->aecExpInfo.HdrExp[1].exp_real_params.integration_time;
+        }
 
-	float nextSExpo = nextFrameExpParam->data()->aecExpInfo.HdrExp[0].exp_real_params.analog_gain * \
-			 nextFrameExpParam->data()->aecExpInfo.HdrExp[0].exp_real_params.integration_time;
-	float curSExpo = curFrameExpParam->data()->aecExpInfo.HdrExp[0].exp_real_params.analog_gain * \
-			 curFrameExpParam->data()->aecExpInfo.HdrExp[0].exp_real_params.integration_time;
-	float nextRatioLS = nextLExpo/nextSExpo;
-	float nextRatioLM = nextLExpo/nextMExpo;
-	float curRatioLS = curLExpo/curSExpo;
-	float nextLgmax = 12 + log(nextRatioLS) / log(2);
-	float curLgmax = 12 + log(curRatioLS) / log(2);
-	float lgmin = 0;
+        float nextSExpo = nextFrameExpParam->data()->aecExpInfo.HdrExp[0].exp_real_params.analog_gain * \
+                          nextFrameExpParam->data()->aecExpInfo.HdrExp[0].exp_real_params.integration_time;
+        float curSExpo = curFrameExpParam->data()->aecExpInfo.HdrExp[0].exp_real_params.analog_gain * \
+                         curFrameExpParam->data()->aecExpInfo.HdrExp[0].exp_real_params.integration_time;
+        float nextRatioLS = nextLExpo / nextSExpo;
+        float nextRatioLM = nextLExpo / nextMExpo;
+        float curRatioLS = curLExpo / curSExpo;
+        float nextLgmax = 12 + log(nextRatioLS) / log(2);
+        float curLgmax = 12 + log(curRatioLS) / log(2);
+        float lgmin = 0;
 
-	//tmo
-	// shadow resgister,needs to set a frame before, for ctrl_cfg/lg_scl reg
-	aiq_results->data()->ahdr_proc_res.TmoProcRes.sw_hdrtmo_expl_lgratio = \
-		(int)(2048*(log(curLExpo / nextLExpo) / log(2)));
-	aiq_results->data()->ahdr_proc_res.TmoProcRes.sw_hdrtmo_lgscl_ratio = \
-		(int)(128*(log(nextRatioLS) / log(curRatioLS)));
-	aiq_results->data()->ahdr_proc_res.TmoProcRes.sw_hdrtmo_lgscl = (int)(4096*16/nextLgmax);
-	aiq_results->data()->ahdr_proc_res.TmoProcRes.sw_hdrtmo_lgscl_inv = (int)(4096*nextLgmax/16);
+        //tmo
+        // shadow resgister,needs to set a frame before, for ctrl_cfg/lg_scl reg
+        aiq_results->data()->ahdr_proc_res.TmoProcRes.sw_hdrtmo_expl_lgratio = \
+                (int)(2048 * (log(curLExpo / nextLExpo) / log(2)));
+        aiq_results->data()->ahdr_proc_res.TmoProcRes.sw_hdrtmo_lgscl_ratio = \
+                (int)(128 * (log(nextRatioLS) / log(curRatioLS)));
+        aiq_results->data()->ahdr_proc_res.TmoProcRes.sw_hdrtmo_lgscl = (int)(4096 * 16 / nextLgmax);
+        aiq_results->data()->ahdr_proc_res.TmoProcRes.sw_hdrtmo_lgscl_inv = (int)(4096 * nextLgmax / 16);
 
-	// not shadow resgister
-	aiq_results->data()->ahdr_proc_res.TmoProcRes.sw_hdrtmo_lgmax = (int)(2048*curLgmax);
-	aiq_results->data()->ahdr_proc_res.TmoProcRes.sw_hdrtmo_set_lgmax = \
-		aiq_results->data()->ahdr_proc_res.TmoProcRes.sw_hdrtmo_lgmax;
+        // not shadow resgister
+        aiq_results->data()->ahdr_proc_res.TmoProcRes.sw_hdrtmo_lgmax = (int)(2048 * curLgmax);
+        aiq_results->data()->ahdr_proc_res.TmoProcRes.sw_hdrtmo_set_lgmax = \
+                aiq_results->data()->ahdr_proc_res.TmoProcRes.sw_hdrtmo_lgmax;
 
-	//sw_hdrtmo_set_lgrange0
-	float value = 0.0;
-	float clipratio0 = aiq_results->data()->ahdr_proc_res.TmoProcRes.sw_hdrtmo_clipratio0 / 256.0;
-	float clipgap0 = aiq_results->data()->ahdr_proc_res.TmoProcRes.sw_hdrtmo_clipgap0 / 4.0;
-	value = lgmin * (1 - clipratio0) + curLgmax * clipratio0;
-	value = MIN(value, (lgmin + clipgap0));
-	aiq_results->data()->ahdr_proc_res.TmoProcRes.sw_hdrtmo_set_lgrange0 = (int)(2048*value);
+        //sw_hdrtmo_set_lgrange0
+        float value = 0.0;
+        float clipratio0 = aiq_results->data()->ahdr_proc_res.TmoProcRes.sw_hdrtmo_clipratio0 / 256.0;
+        float clipgap0 = aiq_results->data()->ahdr_proc_res.TmoProcRes.sw_hdrtmo_clipgap0 / 4.0;
+        value = lgmin * (1 - clipratio0) + curLgmax * clipratio0;
+        value = MIN(value, (lgmin + clipgap0));
+        aiq_results->data()->ahdr_proc_res.TmoProcRes.sw_hdrtmo_set_lgrange0 = (int)(2048 * value);
 
-	//sw_hdrtmo_set_lgrange1
-	value = 0.0;
-	float clipratio1 = aiq_results->data()->ahdr_proc_res.TmoProcRes.sw_hdrtmo_clipratio1 / 256.0;
-	float clipgap1 = aiq_results->data()->ahdr_proc_res.TmoProcRes.sw_hdrtmo_clipgap1 / 4.0;
-	value = lgmin * (1 - clipratio1) + curLgmax * clipratio1;
-	value = MAX(value, (curLgmax - clipgap1));
-	aiq_results->data()->ahdr_proc_res.TmoProcRes.sw_hdrtmo_set_lgrange1 = (int)(2048*value);
+        //sw_hdrtmo_set_lgrange1
+        value = 0.0;
+        float clipratio1 = aiq_results->data()->ahdr_proc_res.TmoProcRes.sw_hdrtmo_clipratio1 / 256.0;
+        float clipgap1 = aiq_results->data()->ahdr_proc_res.TmoProcRes.sw_hdrtmo_clipgap1 / 4.0;
+        value = lgmin * (1 - clipratio1) + curLgmax * clipratio1;
+        value = MAX(value, (curLgmax - clipgap1));
+        aiq_results->data()->ahdr_proc_res.TmoProcRes.sw_hdrtmo_set_lgrange1 = (int)(2048 * value);
 
-	//sw_hdrtmo_set_lgavgmax
-	float WeightKey = aiq_results->data()->ahdr_proc_res.TmoProcRes.sw_hdrtmo_set_weightkey / 256.0;
-	value = 0.0;
-	float set_lgmean = aiq_results->data()->ahdr_proc_res.TmoProcRes.sw_hdrtmo_set_lgmean / 2048.0;
-	float lgrange1 = aiq_results->data()->ahdr_proc_res.TmoProcRes.sw_hdrtmo_set_lgrange1 / 2048.0;
-	value = WeightKey * curLgmax + (1 - WeightKey) * set_lgmean;
-	value = MIN(value, lgrange1);
-	aiq_results->data()->ahdr_proc_res.TmoProcRes.sw_hdrtmo_set_lgavgmax = (int)(2048*value);
+        //sw_hdrtmo_set_lgavgmax
+        float WeightKey = aiq_results->data()->ahdr_proc_res.TmoProcRes.sw_hdrtmo_set_weightkey / 256.0;
+        value = 0.0;
+        float set_lgmean = aiq_results->data()->ahdr_proc_res.TmoProcRes.sw_hdrtmo_set_lgmean / 2048.0;
+        float lgrange1 = aiq_results->data()->ahdr_proc_res.TmoProcRes.sw_hdrtmo_set_lgrange1 / 2048.0;
+        value = WeightKey * curLgmax + (1 - WeightKey) * set_lgmean;
+        value = MIN(value, lgrange1);
+        aiq_results->data()->ahdr_proc_res.TmoProcRes.sw_hdrtmo_set_lgavgmax = (int)(2048 * value);
 
-	//sw_hdrtmo_set_palpha
-	float index = 0.0;
-	value = 0.0;
-	float palpha_0p18 = aiq_results->data()->ahdr_proc_res.TmoProcRes.sw_hdrtmo_palpha_0p18 / 1024.0;
-	index = 2 * set_lgmean - lgmin - curLgmax;
-	index = index / (curLgmax - lgmin);
-	value = palpha_0p18 * pow(4, index);
-	int value_int = (int)(1024*value);
-	value_int = MIN(value_int,aiq_results->data()->ahdr_proc_res.TmoProcRes.sw_hdrtmo_maxpalpha);
-	aiq_results->data()->ahdr_proc_res.TmoProcRes.sw_hdrtmo_set_palpha = value_int;
-	LOGD_CAMHW("palpha_0p18:%f set_lgmean:%f lgmin:%f lgmax:%f\n",
-		   palpha_0p18,
-		   set_lgmean,
-		   lgmin,
-		   curLgmax);
+        //sw_hdrtmo_set_palpha
+        float index = 0.0;
+        value = 0.0;
+        float palpha_0p18 = aiq_results->data()->ahdr_proc_res.TmoProcRes.sw_hdrtmo_palpha_0p18 / 1024.0;
+        index = 2 * set_lgmean - lgmin - curLgmax;
+        index = index / (curLgmax - lgmin);
+        value = palpha_0p18 * pow(4, index);
+        int value_int = (int)(1024 * value);
+        value_int = MIN(value_int, aiq_results->data()->ahdr_proc_res.TmoProcRes.sw_hdrtmo_maxpalpha);
+        aiq_results->data()->ahdr_proc_res.TmoProcRes.sw_hdrtmo_set_palpha = value_int;
+        LOGD_CAMHW("palpha_0p18:%f set_lgmean:%f lgmin:%f lgmax:%f\n",
+                   palpha_0p18,
+                   set_lgmean,
+                   lgmin,
+                   curLgmax);
 
-	//merge
-	// shadow resgister,needs to set a frame before, for gain0/1/2 reg
-	aiq_results->data()->ahdr_proc_res.MgeProcRes.sw_hdrmge_gain0 = (int)(64*nextRatioLS);
-	if(nextRatioLS == 1)
-		aiq_results->data()->ahdr_proc_res.MgeProcRes.sw_hdrmge_gain0_inv = (int)(4096*(1 / nextRatioLS) - 1);
-	else
-		aiq_results->data()->ahdr_proc_res.MgeProcRes.sw_hdrmge_gain0_inv = (int)(4096*(1 / nextRatioLS));
-	aiq_results->data()->ahdr_proc_res.MgeProcRes.sw_hdrmge_gain1 = (int)(64*nextRatioLM);
-	if(nextRatioLM == 1)
-		aiq_results->data()->ahdr_proc_res.MgeProcRes.sw_hdrmge_gain1_inv = (int)(4096*(1 / nextRatioLM) - 1);
-	else
-		aiq_results->data()->ahdr_proc_res.MgeProcRes.sw_hdrmge_gain1_inv = (int)(4096*(1 / nextRatioLM));
+        //merge
+        // shadow resgister,needs to set a frame before, for gain0/1/2 reg
+        aiq_results->data()->ahdr_proc_res.MgeProcRes.sw_hdrmge_gain0 = (int)(64 * nextRatioLS);
+        if(nextRatioLS == 1)
+            aiq_results->data()->ahdr_proc_res.MgeProcRes.sw_hdrmge_gain0_inv = (int)(4096 * (1 / nextRatioLS) - 1);
+        else
+            aiq_results->data()->ahdr_proc_res.MgeProcRes.sw_hdrmge_gain0_inv = (int)(4096 * (1 / nextRatioLS));
+        aiq_results->data()->ahdr_proc_res.MgeProcRes.sw_hdrmge_gain1 = (int)(64 * nextRatioLM);
+        if(nextRatioLM == 1)
+            aiq_results->data()->ahdr_proc_res.MgeProcRes.sw_hdrmge_gain1_inv = (int)(4096 * (1 / nextRatioLM) - 1);
+        else
+            aiq_results->data()->ahdr_proc_res.MgeProcRes.sw_hdrmge_gain1_inv = (int)(4096 * (1 / nextRatioLM));
 
-	LOGD_CAMHW("sw_hdrtmo_expl_lgratio:%d sw_hdrtmo_lgscl_ratio:%d "
-		   "sw_hdrtmo_lgmax:%d sw_hdrtmo_set_lgmax:%d sw_hdrtmo_lgscl:%d sw_hdrtmo_lgscl_inv:%d\n",
-		   aiq_results->data()->ahdr_proc_res.TmoProcRes.sw_hdrtmo_expl_lgratio,
-		   aiq_results->data()->ahdr_proc_res.TmoProcRes.sw_hdrtmo_lgscl_ratio,
-		   aiq_results->data()->ahdr_proc_res.TmoProcRes.sw_hdrtmo_lgmax,
-		   aiq_results->data()->ahdr_proc_res.TmoProcRes.sw_hdrtmo_set_lgmax,
-		   aiq_results->data()->ahdr_proc_res.TmoProcRes.sw_hdrtmo_lgscl,
-		   aiq_results->data()->ahdr_proc_res.TmoProcRes.sw_hdrtmo_lgscl_inv);
-	LOGD_CAMHW("sw_hdrtmo_set_lgrange0:%d sw_hdrtmo_set_lgrange1:%d "
-		   "sw_hdrtmo_set_lgavgmax:%d sw_hdrtmo_palpha_0p18:%d sw_hdrtmo_set_palpha:%d\n",
-		   aiq_results->data()->ahdr_proc_res.TmoProcRes.sw_hdrtmo_set_lgrange0,
-		   aiq_results->data()->ahdr_proc_res.TmoProcRes.sw_hdrtmo_set_lgrange1,
-		   aiq_results->data()->ahdr_proc_res.TmoProcRes.sw_hdrtmo_set_lgavgmax,
-		   aiq_results->data()->ahdr_proc_res.TmoProcRes.sw_hdrtmo_palpha_0p18,
-		   aiq_results->data()->ahdr_proc_res.TmoProcRes.sw_hdrtmo_set_palpha);
-	LOGD_CAMHW("sw_hdrmge_gain0:%d sw_hdrmge_gain0_inv:%d sw_hdrmge_gain1:%d sw_hdrmge_gain1_inv:%d\n",
-		   aiq_results->data()->ahdr_proc_res.MgeProcRes.sw_hdrmge_gain0,
-		   aiq_results->data()->ahdr_proc_res.MgeProcRes.sw_hdrmge_gain0_inv,
-		   aiq_results->data()->ahdr_proc_res.MgeProcRes.sw_hdrmge_gain1,
-		   aiq_results->data()->ahdr_proc_res.MgeProcRes.sw_hdrmge_gain1_inv);
-	break;
+        LOGD_CAMHW("sw_hdrtmo_expl_lgratio:%d sw_hdrtmo_lgscl_ratio:%d "
+                   "sw_hdrtmo_lgmax:%d sw_hdrtmo_set_lgmax:%d sw_hdrtmo_lgscl:%d sw_hdrtmo_lgscl_inv:%d\n",
+                   aiq_results->data()->ahdr_proc_res.TmoProcRes.sw_hdrtmo_expl_lgratio,
+                   aiq_results->data()->ahdr_proc_res.TmoProcRes.sw_hdrtmo_lgscl_ratio,
+                   aiq_results->data()->ahdr_proc_res.TmoProcRes.sw_hdrtmo_lgmax,
+                   aiq_results->data()->ahdr_proc_res.TmoProcRes.sw_hdrtmo_set_lgmax,
+                   aiq_results->data()->ahdr_proc_res.TmoProcRes.sw_hdrtmo_lgscl,
+                   aiq_results->data()->ahdr_proc_res.TmoProcRes.sw_hdrtmo_lgscl_inv);
+        LOGD_CAMHW("sw_hdrtmo_set_lgrange0:%d sw_hdrtmo_set_lgrange1:%d "
+                   "sw_hdrtmo_set_lgavgmax:%d sw_hdrtmo_palpha_0p18:%d sw_hdrtmo_set_palpha:%d\n",
+                   aiq_results->data()->ahdr_proc_res.TmoProcRes.sw_hdrtmo_set_lgrange0,
+                   aiq_results->data()->ahdr_proc_res.TmoProcRes.sw_hdrtmo_set_lgrange1,
+                   aiq_results->data()->ahdr_proc_res.TmoProcRes.sw_hdrtmo_set_lgavgmax,
+                   aiq_results->data()->ahdr_proc_res.TmoProcRes.sw_hdrtmo_palpha_0p18,
+                   aiq_results->data()->ahdr_proc_res.TmoProcRes.sw_hdrtmo_set_palpha);
+        LOGD_CAMHW("sw_hdrmge_gain0:%d sw_hdrmge_gain0_inv:%d sw_hdrmge_gain1:%d sw_hdrmge_gain1_inv:%d\n",
+                   aiq_results->data()->ahdr_proc_res.MgeProcRes.sw_hdrmge_gain0,
+                   aiq_results->data()->ahdr_proc_res.MgeProcRes.sw_hdrmge_gain0_inv,
+                   aiq_results->data()->ahdr_proc_res.MgeProcRes.sw_hdrmge_gain1,
+                   aiq_results->data()->ahdr_proc_res.MgeProcRes.sw_hdrmge_gain1_inv);
+        break;
     }
     case RK_ISP2X_PP_TNR_ID:
-	break;
+        break;
     default:
-	LOGW_CAMHW("unkown module id: 0x%x!\n", module_id);
-	break;
+        LOGW_CAMHW("unkown module id: 0x%x!\n", module_id);
+        break;
     }
 
     return ret;
@@ -1153,6 +1161,9 @@ CamHwIsp20::gen_full_isp_params(const struct isp2x_isp_params_cfg* update_params
             case RK_ISP2X_RAWHIST_LITE_ID:
                 full_params->meas.rawhist0 = update_params->meas.rawhist0;
                 break;
+            case RK_ISP2X_YUVAE_ID:
+                full_params->meas.yuvae = update_params->meas.yuvae;
+                break;
             case RK_ISP2X_SIAWB_ID:
                 full_params->meas.siawb = update_params->meas.siawb;
                 break;
@@ -1198,11 +1209,14 @@ CamHwIsp20::gen_full_isp_params(const struct isp2x_isp_params_cfg* update_params
             case RK_ISP2X_RAWNR_ID:
                 full_params->others.rawnr_cfg = update_params->others.rawnr_cfg;
                 break;
-			case RK_ISP2X_GAIN_ID:
+            case RK_ISP2X_GAIN_ID:
                 full_params->others.gain_cfg = update_params->others.gain_cfg;
                 break;
             case RK_ISP2X_LDCH_ID:
-                full_params->others.ldch_cfg= update_params->others.ldch_cfg;
+                full_params->others.ldch_cfg = update_params->others.ldch_cfg;
+                break;
+            case RK_ISP2X_GIC_ID:
+                full_params->others.gic_cfg = update_params->others.gic_cfg;
                 break;
             default:
                 break;
@@ -1216,140 +1230,110 @@ void CamHwIsp20::dump_isp_config(struct isp2x_isp_params_cfg* isp_params,
                                  SmartPtr<RkAiqIspParamsProxy> aiq_results)
 {
     LOGD_CAMHW("isp_params mask: 0x%llx-0x%llx-0x%llx\n",
-         isp_params->module_en_update,
-         isp_params->module_ens,
-         isp_params->module_cfg_update);
+               isp_params->module_en_update,
+               isp_params->module_ens,
+               isp_params->module_cfg_update);
 
     LOGD_CAMHW("aiq_results: ae-lite.winnum=%d; ae-big2.winnum=%d, sub[1].size: [%dx%d]\n",
-         aiq_results->data()->aec_meas.rawae0.wnd_num,
-         aiq_results->data()->aec_meas.rawae1.wnd_num,
-         aiq_results->data()->aec_meas.rawae1.subwin[1].h_size,
-         aiq_results->data()->aec_meas.rawae1.subwin[1].v_size);
+               aiq_results->data()->aec_meas.rawae0.wnd_num,
+               aiq_results->data()->aec_meas.rawae1.wnd_num,
+               aiq_results->data()->aec_meas.rawae1.subwin[1].h_size,
+               aiq_results->data()->aec_meas.rawae1.subwin[1].v_size);
 
     LOGD_CAMHW("isp_params: ae-lite.winnum=%d; ae-big2.winnum=%d, sub[1].size: [%dx%d]\n",
-         isp_params->meas.rawae0.wnd_num,
-         isp_params->meas.rawae1.wnd_num,
-         isp_params->meas.rawae1.subwin[1].h_size,
-         isp_params->meas.rawae1.subwin[1].v_size);
+               isp_params->meas.rawae0.wnd_num,
+               isp_params->meas.rawae1.wnd_num,
+               isp_params->meas.rawae1.subwin[1].h_size,
+               isp_params->meas.rawae1.subwin[1].v_size);
 
     LOGD_CAMHW("isp_params: win size: [%dx%d]-[%dx%d]-[%dx%d]-[%dx%d]\n",
-         isp_params->meas.rawae0.win.h_size,
-         isp_params->meas.rawae0.win.v_size,
-         isp_params->meas.rawae3.win.h_size,
-         isp_params->meas.rawae3.win.v_size,
-         isp_params->meas.rawae1.win.h_size,
-         isp_params->meas.rawae1.win.v_size,
-         isp_params->meas.rawae2.win.h_size,
-         isp_params->meas.rawae2.win.v_size);
+               isp_params->meas.rawae0.win.h_size,
+               isp_params->meas.rawae0.win.v_size,
+               isp_params->meas.rawae3.win.h_size,
+               isp_params->meas.rawae3.win.v_size,
+               isp_params->meas.rawae1.win.h_size,
+               isp_params->meas.rawae1.win.v_size,
+               isp_params->meas.rawae2.win.h_size,
+               isp_params->meas.rawae2.win.v_size);
 
-    LOGD_CAMHW("isp_params: debayer: \n"
-         "clip_en:%d, dist_scale:%d, filter_c_en:%d, filter_g_en:%d\n"
-         "gain_offset:%d,hf_offset:%d,max_ratio:%d,offset:%d,order_max:%d\n"
-         "order_min:%d, shift_num:%d, thed0:%d, thed1:%d\n"
-         "filter1:[%d, %d, %d, %d, %d]\n",
-         "filter2:[%d, %d, %d, %d, %d]\n",
-         isp_params->others.debayer_cfg.clip_en,
-         isp_params->others.debayer_cfg.dist_scale,
-         isp_params->others.debayer_cfg.filter_c_en,
-         isp_params->others.debayer_cfg.filter_g_en,
-         isp_params->others.debayer_cfg.gain_offset,
-         isp_params->others.debayer_cfg.hf_offset,
-         isp_params->others.debayer_cfg.max_ratio,
-         isp_params->others.debayer_cfg.offset,
-         isp_params->others.debayer_cfg.order_max,
-         isp_params->others.debayer_cfg.order_min,
-         isp_params->others.debayer_cfg.shift_num,
-         isp_params->others.debayer_cfg.thed0,
-         isp_params->others.debayer_cfg.thed1,
-         isp_params->others.debayer_cfg.filter1_coe1,
-         isp_params->others.debayer_cfg.filter1_coe2,
-         isp_params->others.debayer_cfg.filter1_coe3,
-         isp_params->others.debayer_cfg.filter1_coe4,
-         isp_params->others.debayer_cfg.filter1_coe5,
-         isp_params->others.debayer_cfg.filter2_coe1,
-         isp_params->others.debayer_cfg.filter2_coe2,
-         isp_params->others.debayer_cfg.filter2_coe3,
-         isp_params->others.debayer_cfg.filter2_coe4,
-         isp_params->others.debayer_cfg.filter2_coe5);
-    LOGD("aiq_results: debayer: \n"
-         "clip_en:%d, dist_scale:%d, filter_c_en:%d, filter_g_en:%d\n"
-         "gain_offset:%d,hf_offset:%d,max_ratio:%d,offset:%d,order_max:%d\n"
-         "order_min:%d, shift_num:%d, thed0:%d, thed1:%d\n"
-         "filter1:[%d, %d, %d, %d, %d]\n",
-         "filter2:[%d, %d, %d, %d, %d]\n",
-         aiq_results->data()->demosaic.clip_en,
-         aiq_results->data()->demosaic.dist_scale,
-         aiq_results->data()->demosaic.filter_c_en,
-         aiq_results->data()->demosaic.filter_g_en,
-         aiq_results->data()->demosaic.gain_offset,
-         aiq_results->data()->demosaic.hf_offset,
-         aiq_results->data()->demosaic.max_ratio,
-         aiq_results->data()->demosaic.max_ratio,
-         aiq_results->data()->demosaic.offset,
-         aiq_results->data()->demosaic.order_max,
-         aiq_results->data()->demosaic.order_min,
-         aiq_results->data()->demosaic.shift_num,
-         aiq_results->data()->demosaic.thed0,
-         aiq_results->data()->demosaic.thed1,
-         aiq_results->data()->demosaic.filter1_coe[0],
-         aiq_results->data()->demosaic.filter1_coe[1],
-         aiq_results->data()->demosaic.filter1_coe[2],
-         aiq_results->data()->demosaic.filter1_coe[3],
-         aiq_results->data()->demosaic.filter1_coe[4],
-         aiq_results->data()->demosaic.filter2_coe[0],
-         aiq_results->data()->demosaic.filter2_coe[1],
-         aiq_results->data()->demosaic.filter2_coe[2],
-         aiq_results->data()->demosaic.filter2_coe[3],
-         aiq_results->data()->demosaic.filter2_coe[4]);
+    LOGD_CAMHW("isp_params: debayer:");
+    LOGD_CAMHW("clip_en:%d, dist_scale:%d, filter_c_en:%d, filter_g_en:%d",
+               isp_params->others.debayer_cfg.clip_en,
+               isp_params->others.debayer_cfg.dist_scale,
+               isp_params->others.debayer_cfg.filter_c_en,
+               isp_params->others.debayer_cfg.filter_g_en);
+    LOGD_CAMHW("gain_offset:%d,hf_offset:%d,max_ratio:%d,offset:%d,order_max:%d",
+               isp_params->others.debayer_cfg.gain_offset,
+               isp_params->others.debayer_cfg.hf_offset,
+               isp_params->others.debayer_cfg.max_ratio,
+               isp_params->others.debayer_cfg.offset,
+               isp_params->others.debayer_cfg.order_max);
+    LOGD_CAMHW("order_min:%d, shift_num:%d, thed0:%d, thed1:%d",
+               isp_params->others.debayer_cfg.order_min,
+               isp_params->others.debayer_cfg.shift_num,
+               isp_params->others.debayer_cfg.thed0,
+               isp_params->others.debayer_cfg.thed1);
+    LOGD_CAMHW("filter1:[%d, %d, %d, %d, %d]",
+               isp_params->others.debayer_cfg.filter1_coe1,
+               isp_params->others.debayer_cfg.filter1_coe2,
+               isp_params->others.debayer_cfg.filter1_coe3,
+               isp_params->others.debayer_cfg.filter1_coe4,
+               isp_params->others.debayer_cfg.filter1_coe5);
+    LOGD_CAMHW("filter2:[%d, %d, %d, %d, %d]",
+               isp_params->others.debayer_cfg.filter2_coe1,
+               isp_params->others.debayer_cfg.filter2_coe2,
+               isp_params->others.debayer_cfg.filter2_coe3,
+               isp_params->others.debayer_cfg.filter2_coe4,
+               isp_params->others.debayer_cfg.filter2_coe5);
 
-    LOGD("isp_params: gic: \n"
-         "edge_open:%d, regmingradthrdark2:%d, regmingradthrdark1:%d, regminbusythre:%d\n"
-         "regdarkthre:%d,regmaxcorvboth:%d,regdarktthrehi:%d,regkgrad2dark:%d,regkgrad1dark:%d\n"
-         "regstrengthglobal_fix:%d, regdarkthrestep:%d, regkgrad2:%d, regkgrad1:%d\n"
-         "reggbthre:%d, regmaxcorv:%d, regmingradthr2:%d, regmingradthr1:%d, gr_ratio:%d\n"
-         "dnloscale:%d, dnhiscale:%d, reglumapointsstep:%d, gvaluelimitlo:%d, gvaluelimithi:%d\n"
-         "fratiohilimt1:%d, strength_fix:%d, noise_cuten:%d, noise_coe_a:%d, noise_coe_b:%d, diff_clip:%d\n",
-         isp_params->others.gic_cfg.edge_open,
-         isp_params->others.gic_cfg.regmingradthrdark2,
-         isp_params->others.gic_cfg.regmingradthrdark1,
-         isp_params->others.gic_cfg.regminbusythre,
-         isp_params->others.gic_cfg.regdarkthre,
-         isp_params->others.gic_cfg.regmaxcorvboth,
-         isp_params->others.gic_cfg.regdarktthrehi,
-         isp_params->others.gic_cfg.regkgrad2dark,
-         isp_params->others.gic_cfg.regkgrad1dark,
-         isp_params->others.gic_cfg.regstrengthglobal_fix,
-         isp_params->others.gic_cfg.regdarkthrestep,
-         isp_params->others.gic_cfg.regkgrad2,
-         isp_params->others.gic_cfg.regkgrad1,
-         isp_params->others.gic_cfg.reggbthre,
-         isp_params->others.gic_cfg.regmaxcorv,
-         isp_params->others.gic_cfg.regmingradthr2,
-         isp_params->others.gic_cfg.regmingradthr1,
-         isp_params->others.gic_cfg.gr_ratio,
-         isp_params->others.gic_cfg.dnloscale,
-         isp_params->others.gic_cfg.dnhiscale,
-         isp_params->others.gic_cfg.reglumapointsstep,
-         isp_params->others.gic_cfg.gvaluelimitlo,
-         isp_params->others.gic_cfg.gvaluelimithi,
-         isp_params->others.gic_cfg.fusionratiohilimt1,
-         isp_params->others.gic_cfg.regstrengthglobal_fix,
-         isp_params->others.gic_cfg.noise_cut_en,
-         isp_params->others.gic_cfg.noise_coe_a,
-         isp_params->others.gic_cfg.noise_coe_b,
-         isp_params->others.gic_cfg.diff_clip);
+    LOGD_CAMHW("isp_params: gic: \n"
+               "edge_open:%d, regmingradthrdark2:%d, regmingradthrdark1:%d, regminbusythre:%d\n"
+               "regdarkthre:%d,regmaxcorvboth:%d,regdarktthrehi:%d,regkgrad2dark:%d,regkgrad1dark:%d\n"
+               "regstrengthglobal_fix:%d, regdarkthrestep:%d, regkgrad2:%d, regkgrad1:%d\n"
+               "reggbthre:%d, regmaxcorv:%d, regmingradthr2:%d, regmingradthr1:%d, gr_ratio:%d\n"
+               "dnloscale:%d, dnhiscale:%d, reglumapointsstep:%d, gvaluelimitlo:%d, gvaluelimithi:%d\n"
+               "fratiohilimt1:%d, strength_fix:%d, noise_cuten:%d, noise_coe_a:%d, noise_coe_b:%d, diff_clip:%d\n",
+               isp_params->others.gic_cfg.edge_open,
+               isp_params->others.gic_cfg.regmingradthrdark2,
+               isp_params->others.gic_cfg.regmingradthrdark1,
+               isp_params->others.gic_cfg.regminbusythre,
+               isp_params->others.gic_cfg.regdarkthre,
+               isp_params->others.gic_cfg.regmaxcorvboth,
+               isp_params->others.gic_cfg.regdarktthrehi,
+               isp_params->others.gic_cfg.regkgrad2dark,
+               isp_params->others.gic_cfg.regkgrad1dark,
+               isp_params->others.gic_cfg.regstrengthglobal_fix,
+               isp_params->others.gic_cfg.regdarkthrestep,
+               isp_params->others.gic_cfg.regkgrad2,
+               isp_params->others.gic_cfg.regkgrad1,
+               isp_params->others.gic_cfg.reggbthre,
+               isp_params->others.gic_cfg.regmaxcorv,
+               isp_params->others.gic_cfg.regmingradthr2,
+               isp_params->others.gic_cfg.regmingradthr1,
+               isp_params->others.gic_cfg.gr_ratio,
+               isp_params->others.gic_cfg.dnloscale,
+               isp_params->others.gic_cfg.dnhiscale,
+               isp_params->others.gic_cfg.reglumapointsstep,
+               isp_params->others.gic_cfg.gvaluelimitlo,
+               isp_params->others.gic_cfg.gvaluelimithi,
+               isp_params->others.gic_cfg.fusionratiohilimt1,
+               isp_params->others.gic_cfg.regstrengthglobal_fix,
+               isp_params->others.gic_cfg.noise_cut_en,
+               isp_params->others.gic_cfg.noise_coe_a,
+               isp_params->others.gic_cfg.noise_coe_b,
+               isp_params->others.gic_cfg.diff_clip);
     for(int i = 0; i < ISP2X_GIC_SIGMA_Y_NUM; i++) {
-        LOGD("sigma_y[%d]=%d\n", i, isp_params->others.gic_cfg.sigma_y[i]);
+        LOGD_CAMHW("sigma_y[%d]=%d\n", i, isp_params->others.gic_cfg.sigma_y[i]);
     }
-    LOGD("aiq_results: gic: dnloscale=%f, dnhiscale=%f,gvaluelimitlo=%f,gvaluelimithi=%f,fusionratiohilimt1=%f"
-         "textureStrength=%f,globalStrength=%f,noiseCurve_0=%f,noiseCurve_1=%f",
-         aiq_results->data()->gic.dnloscale, aiq_results->data()->gic.dnhiscale,
-         aiq_results->data()->gic.gvaluelimitlo, aiq_results->data()->gic.gvaluelimithi,
-         aiq_results->data()->gic.fusionratiohilimt1, aiq_results->data()->gic.textureStrength,
-         aiq_results->data()->gic.globalStrength, aiq_results->data()->gic.noiseCurve_0,
-         aiq_results->data()->gic.noiseCurve_1);
+    LOGD_CAMHW("aiq_results: gic: dnloscale=%f, dnhiscale=%f,gvaluelimitlo=%f,gvaluelimithi=%f,fusionratiohilimt1=%f"
+               "textureStrength=%f,globalStrength=%f,noiseCurve_0=%f,noiseCurve_1=%f",
+               aiq_results->data()->gic.dnloscale, aiq_results->data()->gic.dnhiscale,
+               aiq_results->data()->gic.gvaluelimitlo, aiq_results->data()->gic.gvaluelimithi,
+               aiq_results->data()->gic.fusionratiohilimt1, aiq_results->data()->gic.textureStrength,
+               aiq_results->data()->gic.globalStrength, aiq_results->data()->gic.noiseCurve_0,
+               aiq_results->data()->gic.noiseCurve_1);
     for(int i = 0; i < ISP2X_GIC_SIGMA_Y_NUM; i++) {
-        LOGD("sigma[%d]=%f\n", i, aiq_results->data()->gic.sigma_y[i]);
+        LOGD_CAMHW("sigma[%d]=%f\n", i, aiq_results->data()->gic.sigma_y[i]);
     }
 
 }
@@ -1390,9 +1374,9 @@ CamHwIsp20::setIspParamsSync(int frameId)
 
     if (RK_AIQ_HDR_GET_WORKING_MODE(_hdr_mode) != RK_AIQ_WORKING_MODE_NORMAL) {
         ret = overrideExpRatioToAiqResults(frameId, RK_ISP2X_HDRTMO_ID, aiq_results);
-	if (ret != XCAM_RETURN_NO_ERROR) {
-		LOGE_CAMHW("convertExpRatioToAiqResults error!\n");
-	}
+        if (ret != XCAM_RETURN_NO_ERROR) {
+            LOGE_CAMHW("convertExpRatioToAiqResults error!\n");
+        }
     }
 
     ret = convertAiqResultsToIsp20Params(update_params, aiq_results, _last_aiq_results);
@@ -1400,62 +1384,6 @@ CamHwIsp20::setIspParamsSync(int frameId)
         LOGE_CAMHW("rkisp1_convert_results error\n");
     }
 
-#if 1 // for test
-    /* ae/hist update */
-    update_params.module_en_update |= 1LL << RK_ISP2X_RAWAE_LITE_ID;
-    update_params.module_ens |= 1LL << RK_ISP2X_RAWAE_LITE_ID;
-    update_params.module_cfg_update |= 1LL << RK_ISP2X_RAWAE_LITE_ID;
-
-    update_params.module_en_update |= 1LL << RK_ISP2X_RAWAE_BIG1_ID;
-    update_params.module_ens |= 1LL << RK_ISP2X_RAWAE_BIG1_ID;
-    update_params.module_cfg_update |= 1LL << RK_ISP2X_RAWAE_BIG1_ID;
-
-    update_params.module_en_update |= 1LL << RK_ISP2X_RAWAE_BIG2_ID;
-    update_params.module_ens |= 1LL << RK_ISP2X_RAWAE_BIG2_ID;
-    update_params.module_cfg_update |= 1LL << RK_ISP2X_RAWAE_BIG2_ID;
-
-    update_params.module_en_update |= 1LL << RK_ISP2X_RAWAE_BIG3_ID;
-    update_params.module_ens |= 1LL << RK_ISP2X_RAWAE_BIG3_ID;
-    update_params.module_cfg_update |= 1LL << RK_ISP2X_RAWAE_BIG3_ID;
-
-
-    update_params.module_en_update |= 1LL << RK_ISP2X_RAWHIST_LITE_ID;
-    update_params.module_ens |= 1LL << RK_ISP2X_RAWHIST_LITE_ID;
-    update_params.module_cfg_update |= 1LL << RK_ISP2X_RAWHIST_LITE_ID;
-
-    update_params.module_en_update |= 1LL << RK_ISP2X_RAWHIST_BIG1_ID;
-    update_params.module_ens |= 1LL << RK_ISP2X_RAWHIST_BIG1_ID;
-    update_params.module_cfg_update |= 1LL << RK_ISP2X_RAWHIST_BIG1_ID;
-
-    update_params.module_en_update |= 1LL << RK_ISP2X_RAWHIST_BIG2_ID;
-    update_params.module_ens |= 1LL << RK_ISP2X_RAWHIST_BIG2_ID;
-    update_params.module_cfg_update |= 1LL << RK_ISP2X_RAWHIST_BIG2_ID;
-
-    update_params.module_en_update |= 1LL << RK_ISP2X_RAWHIST_BIG3_ID;
-    update_params.module_ens |= 1LL << RK_ISP2X_RAWHIST_BIG3_ID;
-    update_params.module_cfg_update |= 1LL << RK_ISP2X_RAWHIST_BIG3_ID;
-
-    update_params.module_en_update |= 1LL << RK_ISP2X_HDRMGE_ID;
-    update_params.module_ens |= 1LL << RK_ISP2X_HDRMGE_ID;
-    update_params.module_cfg_update |= 1LL << RK_ISP2X_HDRMGE_ID;
-
-    update_params.module_en_update |= 1LL << RK_ISP2X_HDRTMO_ID;
-    update_params.module_ens |= 1LL << RK_ISP2X_HDRTMO_ID;
-    update_params.module_cfg_update |= 1LL << RK_ISP2X_HDRTMO_ID;
-
-    /* awb update */
-    update_params.module_en_update |= 1LL << RK_ISP2X_AWB_GAIN_ID;
-    update_params.module_ens |= 1LL << RK_ISP2X_AWB_GAIN_ID;
-    update_params.module_cfg_update |= 1LL << RK_ISP2X_AWB_GAIN_ID;
-
-    update_params.module_en_update |= 1LL << RK_ISP2X_RAWAWB_ID;
-    update_params.module_ens |= 1LL << RK_ISP2X_RAWAWB_ID;
-    update_params.module_cfg_update |= 1LL << RK_ISP2X_RAWAWB_ID;
-
-    update_params.module_en_update |= 1LL << RK_ISP2X_RAWAF_ID;
-    update_params.module_ens |= 1LL << RK_ISP2X_RAWAF_ID;
-    update_params.module_cfg_update |= 1LL << RK_ISP2X_RAWAF_ID;
-#endif
     gen_full_isp_params(&update_params, &_full_active_isp_params);
 
 #ifdef RUNTIME_MODULE_DEBUG
@@ -1477,19 +1405,19 @@ CamHwIsp20::setIspParamsSync(int frameId)
 
             isp_params = (struct isp2x_isp_params_cfg*)v4l2buf->get_buf().m.userptr;
             *isp_params = _full_active_isp_params;
-	    isp_params->frame_id = frameId;
+            isp_params->frame_id = frameId;
 
             if (mIspParamsDev->queue_buffer (v4l2buf) != 0) {
                 LOGE_CAMHW("RKISP1: failed to ioctl VIDIOC_QBUF for index %d, %d %s.\n",
-                                buf_index, errno, strerror(errno));
+                           buf_index, errno, strerror(errno));
                 return ret;
             }
 
-	    _effecting_ispparm_map[frameId] = aiq_results;
+            _effecting_ispparm_map[frameId] = aiq_results;
 
             LOGD_CAMHW ("device(%s) queue buffer index %d, queue cnt %d, check exit status again[exit: %d]",
-                            XCAM_STR (mIspParamsDev->get_device_name()),
-                            buf_index, mIspParamsDev->get_queued_bufcnt(), _is_exit);
+                        XCAM_STR (mIspParamsDev->get_device_name()),
+                        buf_index, mIspParamsDev->get_queued_bufcnt(), _is_exit);
         } else {
             LOGE_CAMHW("Can not get buffer\n");
         }
@@ -1522,14 +1450,14 @@ CamHwIsp20::setIspParams(SmartPtr<RkAiqIspParamsProxy>& ispParams)
     _mutex.unlock();
 
     if (_first) {
-	 LOGD_CAMHW("hdr-debug: %s: first set ispparams id[%d]\n",
-	       __func__, ispParams->data()->frame_id);
+        LOGD_CAMHW("hdr-debug: %s: first set ispparams id[%d]\n",
+                   __func__, ispParams->data()->frame_id);
         setIspParamsSync(ispParams->data()->frame_id);
-	_first = false;
+        _first = false;
     }
 
-    if (RK_AIQ_HDR_GET_WORKING_MODE(_hdr_mode) == RK_AIQ_WORKING_MODE_NORMAL)
-        setIspParamsSync(ispParams->data()->frame_id);
+    /* if (RK_AIQ_HDR_GET_WORKING_MODE(_hdr_mode) == RK_AIQ_WORKING_MODE_NORMAL) */
+    /*     setIspParamsSync(ispParams->data()->frame_id); */
 
     EXIT_CAMHW_FUNCTION();
     return ret;
@@ -1569,25 +1497,25 @@ CamHwIsp20::setIsppParams(SmartPtr<RkAiqIsppParamsProxy>& isppParams)
             else {
                 if (_ispp_module_init_ens != ispp_params->module_init_ens) {
                     LOGE_CAMHW("ispp working mode changed from 0x%x to 0x%x\n",
-                                    _ispp_module_init_ens, ispp_params->module_init_ens);
+                               _ispp_module_init_ens, ispp_params->module_init_ens);
                     ispp_params->module_init_ens = _ispp_module_init_ens;
                 }
             }
 
-	    LOGD_CAMHW("%s:%d state:%d pp:init 0x%x  0x%x\n", 
-		       __FUNCTION__, __LINE__, _state,
-		       _ispp_module_init_ens, ispp_params->module_init_ens );
+            LOGD_CAMHW("%s:%d state:%d pp:init 0x%x  0x%x\n",
+                       __FUNCTION__, __LINE__, _state,
+                       _ispp_module_init_ens, ispp_params->module_init_ens );
 
             //TODO set update bits
             if (mIsppParamsDev->queue_buffer (v4l2buf) != 0) {
                 LOGE_CAMHW("RKISP1: failed to ioctl VIDIOC_QBUF for index %d, %d %s.\n",
-                                buf_index, errno, strerror(errno));
+                           buf_index, errno, strerror(errno));
                 return ret;
             }
 
             LOGD_CAMHW ("device(%s) queue buffer index %d, queue cnt %d, check exit status again[exit: %d]",
-                            XCAM_STR (mIsppParamsDev->get_device_name()),
-                            buf_index, mIsppParamsDev->get_queued_bufcnt(), _is_exit);
+                        XCAM_STR (mIsppParamsDev->get_device_name()),
+                        buf_index, mIsppParamsDev->get_queued_bufcnt(), _is_exit);
         } else {
             LOGE_CAMHW("RKISP1: Can not get buffer.\n");
         }
@@ -1620,8 +1548,8 @@ CamHwIsp20::getSensorModeData(const char* sns_ent_name,
         sns_des.isp_acq_width = select.r.width;
         sns_des.isp_acq_height = select.r.height;
         LOGD_CAMHW("get isp acq,w: %d, h: %d\n",
-                       sns_des.isp_acq_width,
-                       sns_des.isp_acq_height);
+                   sns_des.isp_acq_width,
+                   sns_des.isp_acq_height);
     } else {
         LOGW_CAMHW("get selecttion error \n");
         sns_des.isp_acq_width = sns_des.sensor_output_width;
@@ -1688,10 +1616,10 @@ CamHwIsp20::getEffectiveIspParams(SmartPtr<RkAiqIspParamsProxy>& ispParams, int 
 
     // havn't found
     if (it == _effecting_ispparm_map.end()) {
-	std::map<int, SmartPtr<RkAiqIspParamsProxy>>::reverse_iterator rit;
+        std::map<int, SmartPtr<RkAiqIspParamsProxy>>::reverse_iterator rit;
 
-	rit = _effecting_ispparm_map.rbegin();
-	do {
+        rit = _effecting_ispparm_map.rbegin();
+        do {
             LOGD_CAMHW("traverse _effecting_ispparm_map to find id %d, current id is [%d]\n",
                        search_id, rit->first);
             if (search_id >= rit->first ) {
@@ -1706,11 +1634,10 @@ CamHwIsp20::getEffectiveIspParams(SmartPtr<RkAiqIspParamsProxy>& ispParams, int 
             return XCAM_RETURN_ERROR_PARAM;
         }
 
-        ispParams= rit->second;
+        ispParams = rit->second;
     } else {
-        ispParams= it->second;
+        ispParams = it->second;
     }
-
     EXIT_CAMHW_FUNCTION();
 
     return XCAM_RETURN_NO_ERROR;

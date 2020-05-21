@@ -21,11 +21,12 @@
 #ifndef _RK_AIQ_TYPE_ABLC_ALGO_INT_H_
 #define _RK_AIQ_TYPE_ABLC_ALGO_INT_H_
 #include "ablc/rk_aiq_types_ablc_algo.h"
+#include "RkAiqCalibDbTypes.h"
 
 
 RKAIQ_BEGIN_DECLARE
 	
-#define BLC_MAX_ISO_LEVEL (9)
+#define BLC_MAX_ISO_LEVEL CALIBDB_BLC_MAX_ISO_LEVEL
 	
 typedef enum AblcResult_e {
 	ABLC_RET_SUCCESS			= 0,   // this has to be 0, if clauses rely on it

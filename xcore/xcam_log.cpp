@@ -216,3 +216,9 @@ void xcam_set_log (const char* file_name) {
         strncpy (log_file_name, file_name, XCAM_MAX_STR_SIZE);
     }
 }
+void xcam_get_awb_log_level(unsigned char *log_level, unsigned char *sub_modules)
+{
+    //xcam_get_log_level();
+    *log_level = g_xcore_log_infos[XCORE_LOG_MODULE_AWB].log_level;
+    *sub_modules = g_xcore_log_infos[XCORE_LOG_MODULE_AWB].sub_modules;
+}

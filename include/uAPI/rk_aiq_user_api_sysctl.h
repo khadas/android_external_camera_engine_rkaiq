@@ -90,11 +90,11 @@ rk_aiq_uapi_sysctl_start(const rk_aiq_sys_ctx_t* ctx);
 XCamReturn
 rk_aiq_uapi_sysctl_stop(const rk_aiq_sys_ctx_t* ctx);
 
-rk_aiq_static_info_t*
-rk_aiq_uapi_sysctl_getStaticMetas(const char* sns_ent_name);
+XCamReturn
+rk_aiq_uapi_sysctl_getStaticMetas(const char* sns_ent_name, rk_aiq_static_info_t* static_info);
 
-rk_aiq_metas_t*
-rk_aiq_uapi_sysctl_getMetaData(const rk_aiq_sys_ctx_t* ctx, uint32_t frame_id);
+XCamReturn
+rk_aiq_uapi_sysctl_getMetaData(const rk_aiq_sys_ctx_t* ctx, uint32_t frame_id, rk_aiq_metas_t* metas);
 
 #if 0
 int32_t
@@ -179,7 +179,7 @@ rk_aiq_uapi_sysctl_getAxlibStatus(const rk_aiq_sys_ctx_t* ctx,
  *
  * \param[in] ctx             context
  * \param[in] algo_type       algo type defined by RkAiqAlgoDesComm.type
- * \return return current enabled algo context if success or NULL.
+ * \return return 0 if success
  */
 const RkAiqAlgoContext*
 rk_aiq_uapi_sysctl_getEnabledAxlibCtx(const rk_aiq_sys_ctx_t* ctx, const int algo_type);

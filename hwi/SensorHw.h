@@ -23,11 +23,20 @@
 #include "v4l2_device.h"
 #include "rk_aiq_pool.h"
 #include "linux/rk-camera-module.h"
+
+/************ BELOW FROM kernel/include/uapi/linux/rk-preisp.h ************/
+
 /* test hdr function */
 /*
 * struct hdrae_exp_s - hdrae exposure
 *
 */
+
+enum cg_mode_e {
+    GAIN_MODE_LCG,
+    GAIN_MODE_HCG,
+};
+
 struct hdrae_exp_s {
     unsigned int long_exp_reg;
     unsigned int long_gain_reg;
@@ -41,10 +50,15 @@ struct hdrae_exp_s {
     unsigned int middle_gain_val;
     unsigned int short_exp_val;
     unsigned int short_gain_val;
+    unsigned char long_cg_mode;
+    unsigned char middle_cg_mode;
+    unsigned char short_cg_mode;
 };
 
 #define SENSOR_CMD_SET_HDRAE_EXP        \
     _IOW('V', BASE_VIDIOC_PRIVATE + 0, struct hdrae_exp_s)
+
+/************ UPPER FROM kernel/include/uapi/linux/rk-preisp.h ************/
 
 using namespace XCam;
 
@@ -70,7 +84,7 @@ public:
                                      int frame_id = -1);
     XCamReturn getEffectiveExpParams(SmartPtr<RkAiqExpParamsProxy>& ExpParams, int frame_id);
     XCamReturn set_working_mode(int mode);
-    XCamReturn set_exp_delay_info(int time_delay, int gain_delay);
+    XCamReturn set_exp_delay_info(int time_delay, int gain_delay, int hcg_lcg_mode_delay);
     XCamReturn start();
     XCamReturn stop();
 
@@ -84,11 +98,16 @@ private:
     int _frame_sequence;
     rk_aiq_exposure_sensor_descriptor _sensor_desc;
     std::list<SmartPtr<RkAiqExpParamsProxy>> _delayed_gain_list;
+    std::list<SmartPtr<RkAiqExpParamsProxy>> _delayed_dcg_gain_mode_list;
     SmartPtr<RkAiqExpParamsProxy> _last_exp_time;
     SmartPtr<RkAiqExpParamsProxy> _last_exp_gain;
+    SmartPtr<RkAiqExpParamsProxy> _last_dcg_gain_mode;
     int _gain_delay;
     int _time_delay;
     bool _gain_delayed;
+    int _dcg_gain_mode_delay;
+    bool _dcg_gain_mode_delayed;
+    bool _dcg_gain_mode_with_time;
     SmartPtr<RkAiqExpParamsPool> _expParamsPool;
     static uint16_t DEFAULT_POOL_SIZE;
     std::string _sns_entity_name;
@@ -97,7 +116,7 @@ private:
     XCamReturn setHdrSensorExposure(RKAiqAecExpInfo_t* expPar);
     XCamReturn setExposure(int frameid);
     uint32_t get_v4l2_pixelformat(uint32_t pixelcode);
-    XCamReturn composeExpParam( RKAiqAecExpInfo_t* timeValid, RKAiqAecExpInfo_t* gainValid, RKAiqAecExpInfo_t* newExp);
+    XCamReturn composeExpParam( RKAiqAecExpInfo_t* timeValid, RKAiqAecExpInfo_t* gainValid, RKAiqAecExpInfo_t* dcgGainModeValid, RKAiqAecExpInfo_t* newExp);
 };
 
 }; //namespace RkCam

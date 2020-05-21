@@ -11,35 +11,63 @@
 #ifndef __RK_AIQ_TYPES_AHDR_ALGO_INT_H__
 #define __RK_AIQ_TYPES_AHDR_ALGO_INT_H__
 
-typedef struct tmo_config_s
+typedef struct globalLuma_s
 {
     float EnvLv[6];
-    float EnvLvTolerance;
+    float Tolerance;
     float GlobeLuma[6];
 
+} globalLuma_t ;
+
+typedef struct detailsHighLight_s
+{
     float DetailsHighLightMode;
     float OEPdf[6];
-    float EnvLv2[6];
-    float OETolerance;
+    float EnvLv[6];
+    float Tolerance;
     float DetailsHighLight[6];
 
+} detailsHighLight_t ;
+
+typedef struct detailsLowLight_s
+{
     float DetailsLowLightMode;
     float FocusLuma[6];
     float DarkPdf[6];
     float ISO[6];//use long frame
-    float DTPdfTolerance;
+    float Tolerance;
     float DetailsLowLight[6];
 
+} detailsLowLight_t ;
+
+typedef struct tmoContrast_s
+{
+    float TmoContrastMode;
     float DynamicRange[6];
-    float DRTolerance;
-    float DayTh;
+    float EnvLv[6];
+    float Tolerance;
     float TmoContrast[6];
 
-	float clipgap0;
-	float clipgap1;
-	float clipratio0;
-	float clipratio1;
+} tmoContrast_t ;
+
+typedef struct moreSetting_s
+{
+    float clipgap0;
+    float clipgap1;
+    float clipratio0;
+    float clipratio1;
     float damp;
+
+} moreSetting_t ;
+
+typedef struct tmo_config_s
+{
+    globalLuma_t Luma;
+    detailsHighLight_t DtsHiLit;
+    detailsLowLight_t DtsLoLit;
+    tmoContrast_t Contrast;
+    moreSetting_t More;
+
 } tmo_config_t ;
 
 typedef struct merge_config_s {

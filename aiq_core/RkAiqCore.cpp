@@ -317,6 +317,7 @@ RkAiqCore::analyzeInternal()
         // initial params
         mAlogsSharedParams.ispStats.aec_stats_valid = false;
         mAlogsSharedParams.ispStats.awb_stats_valid = false;
+        mAlogsSharedParams.ispStats.awb_cfg_effect_valid = false;
         mAlogsSharedParams.ispStats.af_stats_valid = false;
         mAlogsSharedParams.ispStats.ahdr_stats_valid = false;
     }
@@ -526,6 +527,8 @@ RkAiqCore::genIspAwbResult(RkAiqFullParams* params)
 
     // TODO: gen awb common result
     RkAiqAlgoProcResAwb* awb_rk = (RkAiqAlgoProcResAwb*)awb_com;
+    isp_param->awb_gain_update = awb_rk->awb_gain_update;
+    isp_param->awb_cfg_update = awb_rk->awb_cfg_update;
     isp_param->awb_gain = awb_rk->awb_gain_algo;
     isp_param->awb_cfg_v200 = awb_rk->awb_hw0_para;
     isp_param->awb_cfg_v201 = awb_rk->awb_hw1_para;
@@ -1659,6 +1662,8 @@ RkAiqCore::addDefaultAlgos()
     /*enableAlgo(RK_AIQ_ALGO_TYPE_A3DLUT, 0, true); */
     enableAlgo(RK_AIQ_ALGO_TYPE_ALDCH, 0, true);
     enableAlgo(RK_AIQ_ALGO_TYPE_AFEC, 0, true);
+    enableAlgo(RK_AIQ_ALGO_TYPE_AGIC, 0, true);
+    enableAlgo(RK_AIQ_ALGO_TYPE_ADEBAYER, 0, true);
 #endif
 #endif
 }
@@ -1833,12 +1838,25 @@ RkAiqCore::convertIspstatsToAlgo(const SmartPtr<VideoBuffer> &buffer)
     SmartPtr<RkAiqExpParamsProxy> expParams = buf->get_exp_params();
     SmartPtr<RkAiqIspParamsProxy> ispParams = buf->get_isp_params();
     stats = (struct rkisp_isp2x_stat_buffer *)(buf->get_v4l2_userptr());
+    if(stats == NULL){
+        LOGE("fail to get stats ,ignore\n");
+        return XCAM_RETURN_BYPASS;
+    }
     LOGI_ANALYZER("stats: frame_id: %d,  meas_type; 0x%x",
                   stats->frame_id, stats->meas_type);
 
     mAlogsSharedParams.frameId = stats->frame_id;
 
+    if(ispParams.ptr() == NULL){
+        LOGE("fail to get ispParams ,ignore\n");
+        return XCAM_RETURN_BYPASS;
+    }
+
     //awb2.0
+
+    mAlogsSharedParams.ispStats.awb_cfg_effect_v200 = ispParams->data()->awb_cfg_v200;
+    mAlogsSharedParams.ispStats.awb_cfg_effect_valid = true;
+
     for(int i = 0; i < RK_AIQ_AWB_MAX_WHITEREGIONS_NUM; i++) {
         mAlogsSharedParams.ispStats.awb_stats.light[i].xYType[RK_AIQ_AWB_XY_TYPE_NORMAL_V200].Rvalue =
             stats->params.rawawb.ro_rawawb_sum_r_nor[i];
@@ -2117,13 +2135,17 @@ RkAiqCore::analyze(const SmartPtr<VideoBuffer> &buffer)
 #ifdef RK_SIMULATOR_HW
     const SmartPtr<V4l2BufferProxy> buf =
         buffer.dynamic_cast_ptr<V4l2BufferProxy>();
+    //SmartPtr<RkAiqIspParamsProxy> ispParams = buf->get_isp_params();
 
     rk_sim_isp_v200_stats_t* stats =
         (rk_sim_isp_v200_stats_t*)(buf->get_v4l2_userptr());
     // copy directly for simulator
     mAlogsSharedParams.ispStats.awb_stats = stats->awb;
     mAlogsSharedParams.ispStats.awb_stats_valid = stats->valid_awb;
+    //mAlogsSharedParams.ispStats.awb_cfg_effect_v200 = ispParams->data()->awb_cfg_v200;
+    mAlogsSharedParams.ispStats.awb_cfg_effect_valid = true;
     mAlogsSharedParams.ispStats.awb_stats_v201 = stats->awb_v201;
+    //mAlogsSharedParams.ispStats.awb_cfg_effect_v201 = ispParams->data()->awb_cfg_v201;
 
     mAlogsSharedParams.ispStats.aec_stats = stats->ae;
     mAlogsSharedParams.ispStats.aec_stats_valid = stats->valid_ae;

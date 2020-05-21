@@ -50,6 +50,8 @@ AblcResult_t Ablc_xml_params_init(AblcParams_t *pParams, CalibDb_Blc_t* pBlcCali
 	int isoBase = 50;
 
 	pParams->enable = pBlcCalib->enable;
+
+	#if 0
 	for(int i=0; i<BLC_MAX_ISO_LEVEL; i++){
 		pParams->iso[i] = isoBase * (1 << i);
 		pParams->blc_r[i] = (short int)(pBlcCalib->level[0]);
@@ -57,6 +59,15 @@ AblcResult_t Ablc_xml_params_init(AblcParams_t *pParams, CalibDb_Blc_t* pBlcCali
 		pParams->blc_gb[i] = (short int)(pBlcCalib->level[2]);
 		pParams->blc_b[i] = (short int)(pBlcCalib->level[3]);
 	}
+	#else
+	for(int i=0; i<BLC_MAX_ISO_LEVEL; i++){
+		pParams->iso[i] = (int)(pBlcCalib->iso[i]);
+		pParams->blc_r[i] = (short int)(pBlcCalib->level[0][i]);
+		pParams->blc_gr[i] = (short int)(pBlcCalib->level[1][i]);
+		pParams->blc_gb[i] = (short int)(pBlcCalib->level[2][i]);
+		pParams->blc_b[i] = (short int)(pBlcCalib->level[3][i]);
+	}
+	#endif
 
 	LOGI_ABLC("%s(%d): exit!\n", __FUNCTION__, __LINE__);
     return ret;
@@ -97,8 +108,13 @@ AblcResult_t Ablc_Select_Params_By_ISO(AblcParams_t *pParams, AblcParamsSelect_t
 		{
 			isoLowlevel = i;
 			isoHighlevel = i+1;
-			//ratio = (isoValue -lowIso ) / (float)(highIso - lowIso);
-			ratio = 0;
+			lowIso = pParams->iso[i];
+			highIso = pParams->iso[i+1];
+			ratio = (isoValue -lowIso ) / (float)(highIso - lowIso);
+
+			LOGD_ABLC("%s:%d iso: %d %d isovalue:%d ratio:%f \n",
+				__FUNCTION__, __LINE__,
+				lowIso, highIso, isoValue, ratio);
 			break;
 		}
 	}
@@ -128,8 +144,9 @@ AblcResult_t Ablc_Select_Params_By_ISO(AblcParams_t *pParams, AblcParamsSelect_t
 	pSelect->blc_b = ratio *(pParams->blc_b[isoHighlevel] - pParams->blc_b[isoLowlevel]) 
 					+ pParams->blc_b[isoLowlevel];
 
-	LOGD_ABLC("%s:(%d) Ablc iso:%d rggb: %d %d %d %d \n", 
-		__FUNCTION__, __LINE__, isoValue,
+	LOGD_ABLC("%s:(%d) Ablc iso:%d H:%d L:%d ratio:%f rggb: %d %d %d %d \n", 
+		__FUNCTION__, __LINE__, 
+		isoValue, highIso, lowIso, ratio,
 		pSelect->blc_r, pSelect->blc_gr,
 		pSelect->blc_gb, pSelect->blc_b);
 

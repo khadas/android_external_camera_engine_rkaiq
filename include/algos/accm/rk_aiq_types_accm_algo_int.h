@@ -24,7 +24,8 @@
 
 RKAIQ_BEGIN_DECLARE
 
-//add more here
+#define RK_AIQ_ACCM_COLOR_GAIN_NUM 4
+
 typedef struct accm_sw_info_s {
     float sensorGain;
     float awbGain[2];
@@ -38,19 +39,34 @@ typedef struct rk_aiq_ccm_mccm_attrib_s {
     float bound_bit;
 } rk_aiq_ccm_mccm_attrib_t;
 
-typedef enum rk_aiq_ccm_op_mode_s{
+typedef struct rk_aiq_ccm_color_inhibition_s {
+    float sensorGain[RK_AIQ_ACCM_COLOR_GAIN_NUM];
+    float level[RK_AIQ_ACCM_COLOR_GAIN_NUM];//max value 100,default value 0
+} rk_aiq_ccm_color_inhibition_t;
+
+typedef struct rk_aiq_ccm_color_saturation_s {
+    float sensorGain[RK_AIQ_ACCM_COLOR_GAIN_NUM];
+    float level[RK_AIQ_ACCM_COLOR_GAIN_NUM];//max value 100, default value 100
+} rk_aiq_ccm_color_saturation_t;
+
+typedef struct rk_aiq_ccm_accm_attrib_s {
+    rk_aiq_ccm_color_inhibition_t color_inhibition;
+    rk_aiq_ccm_color_saturation_t color_saturation;
+} rk_aiq_ccm_accm_attrib_t;
+
+typedef enum rk_aiq_ccm_op_mode_s {
     RK_AIQ_CCM_MODE_INVALID                     = 0,        /**< initialization value */
     RK_AIQ_CCM_MODE_MANUAL                      = 1,        /**< run manual lens shading correction */
     RK_AIQ_CCM_MODE_AUTO                        = 2,        /**< run auto lens shading correction */
     RK_AIQ_CCM_MODE_MAX
 } rk_aiq_ccm_op_mode_t;
 
-typedef struct rk_aiq_ccm_attrib_s{
+typedef struct rk_aiq_ccm_attrib_s {
     bool byPass;
     rk_aiq_ccm_op_mode_t mode;
     rk_aiq_ccm_mccm_attrib_t stManual;
-
-}rk_aiq_ccm_attrib_t;
+    rk_aiq_ccm_accm_attrib_t stAuto;
+} rk_aiq_ccm_attrib_t;
 
 typedef struct rk_aiq_ccm_querry_info_s {
     bool ccm_en;
@@ -58,6 +74,8 @@ typedef struct rk_aiq_ccm_querry_info_s {
     float  offs[3];
     float  alp_y[CCM_CURVE_DOT_NUM];
     float bound_bit;
+    float color_inhibition_level;
+    float color_saturation_level;
 } rk_aiq_ccm_querry_info_t;
 
 RKAIQ_END_DECLARE

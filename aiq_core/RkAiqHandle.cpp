@@ -348,6 +348,10 @@ RkAiqAwbHandle::preProcess()
         LOGE("no awb stats, ignore!");
         return XCAM_RETURN_BYPASS;
     }
+    if (!ispStats->awb_cfg_effect_valid && !shared->init) {
+        LOGE("no effective awb cfg, ignore!");
+        return XCAM_RETURN_BYPASS;
+    }
     // TODO config common awb preprocess params
 
 
@@ -375,6 +379,10 @@ RkAiqAwbHandle::processing()
 
     if (!ispStats->awb_stats_valid && !shared->init) {
         LOGE("no awb stats, ignore!");
+        return XCAM_RETURN_BYPASS;
+    }
+    if (!ispStats->awb_cfg_effect_valid && !shared->init) {
+        LOGE("no effective awb cfg, ignore!");
         return XCAM_RETURN_BYPASS;
     }
 
@@ -405,6 +413,10 @@ RkAiqAwbHandle::postProcess()
 
     if (!ispStats->awb_stats_valid && !shared->init) {
         LOGE("no awb stats, ignore!");
+        return XCAM_RETURN_BYPASS;
+    }
+    if (!ispStats->awb_cfg_effect_valid && !shared->init) {
+        LOGE("no effective awb cfg, ignore!");
         return XCAM_RETURN_BYPASS;
     }
 

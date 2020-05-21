@@ -127,35 +127,31 @@ static XCamReturn AhdrProcess(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* out
     // pAhdrCtx->frameCnt = inparams->frame_id;
     AhdrGetROData(pAhdrCtx, &AhdrParams->ispAhdrStats);
 
-    if(!inparams->u.proc.init)
-    {
-        RkAiqAlgoPreResAeInt* ae_pre_res_int =
-            (RkAiqAlgoPreResAeInt*)(AhdrParams->rk_com.u.proc.pre_res_comb->ae_pre_res);
-        RkAiqAlgoPreResAfInt* af_pre_res_int =
-            (RkAiqAlgoPreResAfInt*)(AhdrParams->rk_com.u.proc.pre_res_comb->af_pre_res);
-        if (ae_pre_res_int && af_pre_res_int)
-            AhdrUpdateConfig(pAhdrCtx,
-                             ae_pre_res_int->ae_pre_res_rk,
-                             af_pre_res_int->af_pre_result);
-        else if (ae_pre_res_int) {
-            af_preprocess_result_t AfPreResult;
-            LOGW_AHDR("%s: af result is null!!!\n", __FUNCTION__);
-            AhdrUpdateConfig(pAhdrCtx,
-                             ae_pre_res_int->ae_pre_res_rk,
-                             AfPreResult);
-        }
-        else {
-            AecPreResult_t AecHdrPreResult;
-            af_preprocess_result_t AfPreResult;
-            LOGW_AHDR("%s: ae/af result is null!!!\n", __FUNCTION__);
-            AhdrUpdateConfig(pAhdrCtx,
-                             AecHdrPreResult,
-                             AfPreResult);
-        }
-        AhdrProcessing(pAhdrCtx);
-    } else {
-        SetFirstPara(pAhdrCtx);
+    RkAiqAlgoPreResAeInt* ae_pre_res_int =
+        (RkAiqAlgoPreResAeInt*)(AhdrParams->rk_com.u.proc.pre_res_comb->ae_pre_res);
+    RkAiqAlgoPreResAfInt* af_pre_res_int =
+        (RkAiqAlgoPreResAfInt*)(AhdrParams->rk_com.u.proc.pre_res_comb->af_pre_res);
+    if (ae_pre_res_int && af_pre_res_int)
+        AhdrUpdateConfig(pAhdrCtx,
+                         ae_pre_res_int->ae_pre_res_rk,
+                         af_pre_res_int->af_pre_result);
+    else if (ae_pre_res_int) {
+        af_preprocess_result_t AfPreResult;
+        LOGW_AHDR("%s: af result is null!!!\n", __FUNCTION__);
+        AhdrUpdateConfig(pAhdrCtx,
+                         ae_pre_res_int->ae_pre_res_rk,
+                         AfPreResult);
     }
+    else {
+        AecPreResult_t AecHdrPreResult;
+        af_preprocess_result_t AfPreResult;
+        LOGW_AHDR("%s: ae/af result is null!!!\n", __FUNCTION__);
+        AhdrUpdateConfig(pAhdrCtx,
+                         AecHdrPreResult,
+                         AfPreResult);
+    }
+    AhdrProcessing(pAhdrCtx);
+
 
     memcpy(&AhdrProcResParams->AhdrProcRes.MgeProcRes, &pAhdrCtx->AhdrProcRes.MgeProcRes, sizeof(MgeProcRes_t));
     memcpy(&AhdrProcResParams->AhdrProcRes.TmoProcRes, &pAhdrCtx->AhdrProcRes.TmoProcRes, sizeof(TmoProcRes_t));

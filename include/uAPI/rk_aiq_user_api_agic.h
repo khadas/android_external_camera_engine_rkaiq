@@ -6,4 +6,6 @@
 XCamReturn
 rk_aiq_user_api_agic_SetAttrib(rk_aiq_sys_ctx_t* sys_ctx, agic_attrib_t attr);
 
+XCamReturn
+rk_aiq_user_api_agic_GetAttrib(rk_aiq_sys_ctx_t* sys_ctx, agic_attrib_t *attr);
 #endif

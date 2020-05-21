@@ -38,6 +38,7 @@ public:
             SmartPtr<RkAiqIspParamsProxy>& last_aiq_results);
     virtual XCamReturn convertAiqResultsToIsp20PpParams(struct rkispp_params_cfg& pp_cfg,
             SmartPtr<RkAiqIsppParamsProxy> aiq_results);
+    void set_working_mode(int mode);
 private:
     XCAM_DEAD_COPY(Isp20Params);
     void convertAiqLiteHstWndSize(struct isp2x_rawhistlite_cfg & hst_lite);
@@ -48,9 +49,11 @@ private:
     void convertAiqHistToIsp20Params(struct isp2x_isp_params_cfg& isp_cfg,
                                      const rk_aiq_isp_hist_meas_t& hist_meas);
     void convertAiqAwbToIsp20Params(struct isp2x_isp_params_cfg& isp_cfg,
-                                    const rk_aiq_awb_stat_cfg_v200_t& awb_meas);
+                                    const rk_aiq_awb_stat_cfg_v200_t& awb_meas,
+                                    bool awb_cfg_udpate);
     void convertAiqAwbGainToIsp20Params(struct isp2x_isp_params_cfg& isp_cfg,
-                                        const rk_aiq_wb_gain_t& awb_gain, const rk_aiq_isp_blc_t &blc);
+                                        const rk_aiq_wb_gain_t& awb_gain, const rk_aiq_isp_blc_t &blc,
+                                        bool awb_gain_update);
     void convertAiqAhdrToIsp20Params(struct isp2x_isp_params_cfg& isp_cfg,
                                      const rk_aiq_isp_hdr_t& ahdr_data);
     void convertAiqAdehazeToIsp20Params(struct isp2x_isp_params_cfg& isp_cfg,
@@ -91,7 +94,10 @@ private:
                                       const rk_aiq_isp_ldch_t& ldch_cfg);
     void convertAiqFecToIsp20Params(struct rkispp_params_cfg& pp_cfg,
                                    rk_aiq_isp_fec_t& fec);
+    void convertAiqGicToIsp20Params(struct isp2x_isp_params_cfg& isp_cfg,
+                                          const rk_aiq_isp_gic_t& gic_cfg);
     uint32_t _last_pp_module_init_ens;
+    int _working_mode;
 };
 };
 #endif
