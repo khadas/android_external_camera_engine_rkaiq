@@ -36,33 +36,33 @@ typedef enum {
 typedef int RESULT;
 
 typedef enum RKAiqResult_e {
-    RK_AIQ_RET_SUCCESS				= 0,   // this has to be 0, if clauses rely on it
-    RK_AIQ_RET_FAILURE				= 1,   // process failure
-    RK_AIQ_RET_INVALID_PARM	    = 2,   // invalid parameter
-    RK_AIQ_RET_WRONG_CONFIG		= 3,   // feature not supported
-    RK_AIQ_RET_BUSY				= 4,   // there's already something going on...
-    RK_AIQ_RET_CANCELED			= 5,   // operation canceled
-    RK_AIQ_RET_OUTOFMEM			= 6,   // out of memory
-    RK_AIQ_RET_OUTOFRANGE			= 7,   // parameter/value out of range
-    RK_AIQ_RET_NULL_POINTER		= 8,   // the/one/all parameter(s) is a(are) NULL pointer(s)
-    RK_AIQ_RET_DIVISION_BY_ZERO	= 9,   // a divisor equals ZERO
-    RK_AIQ_RET_NO_INPUTIMAGE		= 10   // no input image
+    RK_AIQ_RET_SUCCESS              = 0,   // this has to be 0, if clauses rely on it
+    RK_AIQ_RET_FAILURE              = 1,   // process failure
+    RK_AIQ_RET_INVALID_PARM     = 2,   // invalid parameter
+    RK_AIQ_RET_WRONG_CONFIG     = 3,   // feature not supported
+    RK_AIQ_RET_BUSY             = 4,   // there's already something going on...
+    RK_AIQ_RET_CANCELED         = 5,   // operation canceled
+    RK_AIQ_RET_OUTOFMEM         = 6,   // out of memory
+    RK_AIQ_RET_OUTOFRANGE           = 7,   // parameter/value out of range
+    RK_AIQ_RET_NULL_POINTER     = 8,   // the/one/all parameter(s) is a(are) NULL pointer(s)
+    RK_AIQ_RET_DIVISION_BY_ZERO = 9,   // a divisor equals ZERO
+    RK_AIQ_RET_NO_INPUTIMAGE        = 10   // no input image
 } RKAiqResult_t;
 
 typedef enum RKAiqState_e {
-  RK_AIQ_STATE_INVALID           = 0,                   /**< initialization value */
-  RK_AIQ_STATE_INITIALIZED       = 1,                   /**< instance is created, but not initialized */
-  RK_AIQ_STATE_STOPPED           = 2,                   /**< instance is confiured (ready to start) or stopped */
-  RK_AIQ_STATE_RUNNING           = 3,                   /**< instance is running (processes frames) */
-  RK_AIQ_STATE_LOCKED            = 4,                   /**< instance is locked (for taking snapshots) */
-  RK_AIQ_STATE_MAX                                      /**< max */
+    RK_AIQ_STATE_INVALID           = 0,                   /**< initialization value */
+    RK_AIQ_STATE_INITIALIZED       = 1,                   /**< instance is created, but not initialized */
+    RK_AIQ_STATE_STOPPED           = 2,                   /**< instance is confiured (ready to start) or stopped */
+    RK_AIQ_STATE_RUNNING           = 3,                   /**< instance is running (processes frames) */
+    RK_AIQ_STATE_LOCKED            = 4,                   /**< instance is locked (for taking snapshots) */
+    RK_AIQ_STATE_MAX                                      /**< max */
 } RKAiqState_t;
 
 typedef enum RKAiqOPMode_e {
-  RK_AIQ_OP_MODE_INVALID           = 0,                   /**< initialization value */
-  RK_AIQ_OP_MODE_AUTO       		= 1,                   /**< instance is created, but not initialized */
-  RK_AIQ_OP_MODE_MANUAL           	= 2,                   /**< instance is confiured (ready to start) or stopped */
-  RK_AIQ_OP_MODE_MAX                                      /**< max */
+    RK_AIQ_OP_MODE_INVALID           = 0,                   /**< initialization value */
+    RK_AIQ_OP_MODE_AUTO               = 1,                   /**< instance is created, but not initialized */
+    RK_AIQ_OP_MODE_MANUAL             = 2,                   /**< instance is confiured (ready to start) or stopped */
+    RK_AIQ_OP_MODE_MAX                                      /**< max */
 } RKAiqOPMode_t;
 
 #define ABS(a) (((a) > 0) ? (a) : (-(a)))
@@ -70,9 +70,9 @@ typedef enum RKAiqOPMode_e {
 #define MIN(a,b)  ((a) <= (b) ? (a):(b))
 #define ROUND_D(x) (long)(((double)x)+(((x) > 0) ? 0.5 : (-0.5)))
 #define ROUND_F(x) (int)(((float)x)+(((x) > 0) ? 0.5 : (-0.5)))
-#define	FLOOR(a)   (int)( ((double)(a) < (int)(a)) ? (int)((a)-1) : (int)(a) )
-#define	FLOOR_INT64(a) (long)( ((double)(a) < (long)(a)) ? (long)((a)-1) : (long)(a) )
-#define INTERP1(x0, x1, ratio)	((ratio) * ((x1) - (x0)) + x0)
+#define FLOOR(a)   (int)( ((double)(a) < (int)(a)) ? (int)((a)-1) : (int)(a) )
+#define FLOOR_INT64(a) (long)( ((double)(a) < (long)(a)) ? (long)((a)-1) : (long)(a) )
+#define INTERP1(x0, x1, ratio)  ((ratio) * ((x1) - (x0)) + x0)
 #define CLIPBIT(a,b) ((a)>((1<<(b))-1)?((1<<(b))-1):(a))
 
 
@@ -114,6 +114,11 @@ typedef unsigned long long  uint64t;
 typedef struct Cam5x5UCharMatrix_s {
     uint8_t uCoeff[5 * 5];            /**< array of 5x5 unsigned char values */
 } Cam5x5UCharMatrix_t;
+
+typedef struct Cam1x3IntMatrix_s
+{
+    int Coeff[3];
+} Cam1x3IntMatrix_t;
 
 typedef struct Cam1x4IntMatrix_s
 {
@@ -420,8 +425,8 @@ typedef enum {
 } rk_aiq_isp_hdr_mode_t;
 
 typedef enum {
-    RK_AIQ_SENSOR_HDR_LINE_MODE_DCG,
-    RK_AIQ_SENSOR_HDR_LINE_MODE_STAGGER,
+    RK_AIQ_SENSOR_HDR_LINE_MODE_DCG, // 2frame: share the same exptime, use dual conversion gain; 3frame: DCG+VS, VS frame use individual gain & time
+    RK_AIQ_SENSOR_HDR_LINE_MODE_STAGGER, // 2frame or 3frame
 } rk_aiq_sensor_hdr_line_mode_t;
 
 #define RK_AIQ_HDR_GET_WORKING_MODE(mode) (mode & 0xF0)

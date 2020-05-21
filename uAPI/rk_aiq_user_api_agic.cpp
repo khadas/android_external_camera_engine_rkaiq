@@ -13,3 +13,17 @@ rk_aiq_user_api_agic_SetAttrib(rk_aiq_sys_ctx_t* sys_ctx, agic_attrib_t attr)
 
     return XCAM_RETURN_NO_ERROR;
 }
+
+XCamReturn
+rk_aiq_user_api_agic_GetAttrib(rk_aiq_sys_ctx_t* sys_ctx, agic_attrib_t *attr)
+{
+    RkAiqAgicHandleInt* algo_handle =
+        algoHandle<RkAiqAgicHandleInt>(sys_ctx, RK_AIQ_ALGO_TYPE_AGIC);
+
+    if (algo_handle) {
+        return algo_handle->getAttrib(attr);
+    }
+
+    return XCAM_RETURN_NO_ERROR;
+}
+

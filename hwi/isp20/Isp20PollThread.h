@@ -24,15 +24,6 @@
 #include "SensorHw.h"
 #include "CamHwIsp20.h"
 
-#ifdef  __cplusplus
-extern "C" {
-#endif
-bool get_value_from_file(const char* path, int* value);
-bool set_value_to_file(const char* path, int value);
-#ifdef  __cplusplus
-}
-#endif
-
 using namespace XCam;
 
 namespace RkCam {
@@ -121,6 +112,9 @@ private:
     uint32_t pixelformat;
     char raw_dir_path[64];
     bool _is_raw_dir_exist;
+    bool _is_capture_raw;
+    sint32_t _capture_raw_num;
+    sint32_t _capture_metadata_num;
     static const struct capture_fmt csirx_fmts[];
 
     int calculate_stride_per_line(const struct capture_fmt& fmt,
@@ -131,9 +125,13 @@ private:
 		    int dev_index, int sequence);
     XCamReturn write_raw_to_file(FILE* fp, int dev_index,
 		    int sequence, void* userptr, int size);
+    void write_reg_to_file(uint32_t base_addr, uint32_t offset_addr,
+		    int len, int sequence);
     void write_metadata_to_file(const char* dir_path, int frame_id,
 		    SmartPtr<RkAiqIspParamsProxy>& ispParams,
 		    SmartPtr<RkAiqExpParamsProxy>& expParams);
+    bool get_value_from_file(const char* path, int* value);
+    bool set_value_to_file(const char* path, int value);
 };
 }
 #endif

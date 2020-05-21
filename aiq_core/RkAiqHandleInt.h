@@ -211,6 +211,7 @@ public:
     virtual XCamReturn postProcess();
     // TODO add algo specific methords, this is a sample
     XCamReturn setAttrib(adebayer_attrib_t att);
+    XCamReturn getAttrib(adebayer_attrib_t *att);
 protected:
     virtual void init();
     virtual void deInit() {
@@ -274,6 +275,7 @@ public:
     virtual XCamReturn processing();
     virtual XCamReturn postProcess();
     XCamReturn setAttrib(agic_attrib_t att);
+    XCamReturn getAttrib(agic_attrib_t *att);
 protected:
     virtual void init();
     virtual void deInit() {

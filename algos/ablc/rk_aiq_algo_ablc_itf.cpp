@@ -142,37 +142,35 @@ processing(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outparams)
 	}
 	
 	#if 1	
-	if(!inparams->u.proc.init){	
-		RkAiqAlgoPreResAeInt* pAEPreRes =
-	    	(RkAiqAlgoPreResAeInt*)(pAblcProcParams->rk_com.u.proc.pre_res_comb->ae_pre_res);
+	RkAiqAlgoPreResAeInt* pAEPreRes =
+    	(RkAiqAlgoPreResAeInt*)(pAblcProcParams->rk_com.u.proc.pre_res_comb->ae_pre_res);
 
-		if(pAEPreRes != NULL){
-			if(pAblcProcParams->hdr_mode == RK_AIQ_WORKING_MODE_NORMAL){
-				stExpInfo.arAGain[0] = pAEPreRes->ae_pre_res_rk.LinearExp.exp_real_params.analog_gain;
-				stExpInfo.arDGain[0] = pAEPreRes->ae_pre_res_rk.LinearExp.exp_real_params.digital_gain;
-				stExpInfo.arTime[0] = pAEPreRes->ae_pre_res_rk.LinearExp.exp_real_params.integration_time;
-				stExpInfo.arIso[0] = stExpInfo.arAGain[0]* 50;
-			}else{		
-				for(int i=0; i<3; i++){				
-					stExpInfo.arAGain[i] = pAEPreRes->ae_pre_res_rk.HdrExp[i].exp_real_params.analog_gain;
-					stExpInfo.arDGain[i] = pAEPreRes->ae_pre_res_rk.HdrExp[i].exp_real_params.digital_gain;
-					stExpInfo.arTime[i] = pAEPreRes->ae_pre_res_rk.HdrExp[i].exp_real_params.integration_time;
-					stExpInfo.arIso[i] = stExpInfo.arAGain[i] * 50;
+	if(pAEPreRes != NULL){
+		if(pAblcProcParams->hdr_mode == RK_AIQ_WORKING_MODE_NORMAL){
+			stExpInfo.arAGain[0] = pAEPreRes->ae_pre_res_rk.LinearExp.exp_real_params.analog_gain;
+			stExpInfo.arDGain[0] = pAEPreRes->ae_pre_res_rk.LinearExp.exp_real_params.digital_gain;
+			stExpInfo.arTime[0] = pAEPreRes->ae_pre_res_rk.LinearExp.exp_real_params.integration_time;
+			stExpInfo.arIso[0] = stExpInfo.arAGain[0]* 50;
+		}else{		
+			for(int i=0; i<3; i++){				
+				stExpInfo.arAGain[i] = pAEPreRes->ae_pre_res_rk.HdrExp[i].exp_real_params.analog_gain;
+				stExpInfo.arDGain[i] = pAEPreRes->ae_pre_res_rk.HdrExp[i].exp_real_params.digital_gain;
+				stExpInfo.arTime[i] = pAEPreRes->ae_pre_res_rk.HdrExp[i].exp_real_params.integration_time;
+				stExpInfo.arIso[i] = stExpInfo.arAGain[i] * stExpInfo.arDGain[i] * 50;
 
-					LOGD_ABLC("%s:%d index:%d again:%f dgain:%f time:%f iso:%d hdr_mode:%d\n",
-						__FUNCTION__, __LINE__,
-						i,
-						stExpInfo.arAGain[i],
-						stExpInfo.arDGain[i],
-						stExpInfo.arTime[i],
-						stExpInfo.arIso[i],
-						stExpInfo.hdr_mode);
-				}	
-			}
-		}else{
-			LOGE_ABLC("%s:%d pAEPreRes is NULL, so use default instead \n", __FUNCTION__, __LINE__);
-		}	
-	}
+				LOGD_ABLC("%s:%d index:%d again:%f dgain:%f time:%f iso:%d hdr_mode:%d\n",
+					__FUNCTION__, __LINE__,
+					i,
+					stExpInfo.arAGain[i],
+					stExpInfo.arDGain[i],
+					stExpInfo.arTime[i],
+					stExpInfo.arIso[i],
+					stExpInfo.hdr_mode);
+			}	
+		}
+	}else{
+		LOGE_ABLC("%s:%d pAEPreRes is NULL, so use default instead \n", __FUNCTION__, __LINE__);
+	}	
 	#endif
 	
 	AblcResult_t ret = AblcProcess(pAblcCtx, &stExpInfo);

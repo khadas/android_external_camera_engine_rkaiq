@@ -41,6 +41,17 @@ typedef struct rk_aiq_wb_cct_s {
     float CCRI;
 } rk_aiq_wb_cct_t;
 
+typedef struct color_tempture_info_s {
+    bool valid;
+    float CCT;
+    float CCRI;
+} color_tempture_info_t;
+
+typedef struct awb_measure_blk_res_fl_s {
+    float R;//mean r value and normalize to 0~1
+    float G;
+    float B;
+} awb_measure_blk_res_fl_t;
 
 typedef enum rk_aiq_wb_mwb_mode_e {
     RK_AIQ_MWB_MODE_INVAILD              = 0,
@@ -68,6 +79,7 @@ typedef enum rk_aiq_wb_awb_alg_method_s {
 
 typedef struct rk_aiq_wb_awb_attrib_s {
     rk_aiq_wb_awb_alg_method_t algMethod;
+    float tolerance;//wb gain diff th for awb gain update, set 0 to disable this function
     unsigned int runInterval;
     bool sceneAdjustEn;//to do
     bool colorBalanceEn;//to do

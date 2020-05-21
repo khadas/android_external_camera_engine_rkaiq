@@ -174,6 +174,7 @@ RkAiqManager::prepare(uint32_t width, uint32_t height, rk_aiq_working_mode_t mod
             working_mode_hw = mCalibDb->sysContrl.hdr_mode;
         }
     }
+    mCamHw->setCalib(mCalibDb);
     ret = mCamHw->prepare(width, height, working_mode_hw, mCalibDb->sysContrl.time_delay, mCalibDb->sysContrl.gain_delay);
     RKAIQMNG_CHECK_RET(ret, "camhw prepare error %d", ret);
 
@@ -317,7 +318,7 @@ RkAiqManager::applyAnalyzerResult(SmartPtr<RkAiqFullParamsProxy>& results)
     ENTER_XCORE_FUNCTION();
 
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
-    RkAiqFullParams* aiqParams = NULL; 
+    RkAiqFullParams* aiqParams = NULL;
 
     if (!results.ptr()) {
         LOGW_ANALYZER("empty aiq params results!");
@@ -340,48 +341,48 @@ RkAiqManager::applyAnalyzerResult(SmartPtr<RkAiqFullParamsProxy>& results)
     if (aiqParams->mExposureParams.ptr()) {
 //#define DEBUG_FIXED_EXPOSURE
 #ifdef DEBUG_FIXED_EXPOSURE
-	/* test aec with fixed sensor exposure */
-	int cnt = aiqParams->mIspParams->data()->frame_id ;
-    if (aiqParams->mExposureParams->data()->algo_id == 0) {
-        aiqParams->mExposureParams->data()->exp_tbl_size = 1;
-        RkAiqExpParam_t* exp_tbl = &aiqParams->mExposureParams->data()->exp_tbl[0];
-        if(cnt % 40 <= 19){
-            exp_tbl->HdrExp[2].exp_sensor_params.coarse_integration_time = 984;
-            exp_tbl->HdrExp[2].exp_sensor_params.analog_gain_code_global = 48;
-            exp_tbl->HdrExp[1].exp_sensor_params.coarse_integration_time = 984;
-            exp_tbl->HdrExp[1].exp_sensor_params.analog_gain_code_global = 48;
-            exp_tbl->HdrExp[0].exp_sensor_params.coarse_integration_time = 246;
-            exp_tbl->HdrExp[0].exp_sensor_params.analog_gain_code_global = 16;
+        /* test aec with fixed sensor exposure */
+        int cnt = aiqParams->mIspParams->data()->frame_id ;
+        if (aiqParams->mExposureParams->data()->algo_id == 0) {
+            aiqParams->mExposureParams->data()->exp_tbl_size = 1;
+            RkAiqExpParam_t* exp_tbl = &aiqParams->mExposureParams->data()->exp_tbl[0];
+            if(cnt % 40 <= 19) {
+                exp_tbl->HdrExp[2].exp_sensor_params.coarse_integration_time = 984;
+                exp_tbl->HdrExp[2].exp_sensor_params.analog_gain_code_global = 48;
+                exp_tbl->HdrExp[1].exp_sensor_params.coarse_integration_time = 984;
+                exp_tbl->HdrExp[1].exp_sensor_params.analog_gain_code_global = 48;
+                exp_tbl->HdrExp[0].exp_sensor_params.coarse_integration_time = 246;
+                exp_tbl->HdrExp[0].exp_sensor_params.analog_gain_code_global = 16;
 
-            exp_tbl->HdrExp[2].exp_real_params.integration_time = 0.02;
-            exp_tbl->HdrExp[2].exp_real_params.analog_gain = 3;
-            exp_tbl->HdrExp[1].exp_real_params.integration_time = 0.02;
-            exp_tbl->HdrExp[1].exp_real_params.analog_gain = 3;
-            exp_tbl->HdrExp[0].exp_real_params.integration_time = 0.005;
-            exp_tbl->HdrExp[0].exp_real_params.analog_gain = 1;
-        }else{
-            exp_tbl->HdrExp[2].exp_sensor_params.coarse_integration_time = 1475;
-            exp_tbl->HdrExp[2].exp_sensor_params.analog_gain_code_global = 144;
-            exp_tbl->HdrExp[1].exp_sensor_params.coarse_integration_time = 1475;
-            exp_tbl->HdrExp[1].exp_sensor_params.analog_gain_code_global = 144;
-            exp_tbl->HdrExp[0].exp_sensor_params.coarse_integration_time = 492;
-            exp_tbl->HdrExp[0].exp_sensor_params.analog_gain_code_global = 48;
+                exp_tbl->HdrExp[2].exp_real_params.integration_time = 0.02;
+                exp_tbl->HdrExp[2].exp_real_params.analog_gain = 3;
+                exp_tbl->HdrExp[1].exp_real_params.integration_time = 0.02;
+                exp_tbl->HdrExp[1].exp_real_params.analog_gain = 3;
+                exp_tbl->HdrExp[0].exp_real_params.integration_time = 0.005;
+                exp_tbl->HdrExp[0].exp_real_params.analog_gain = 1;
+            } else {
+                exp_tbl->HdrExp[2].exp_sensor_params.coarse_integration_time = 1475;
+                exp_tbl->HdrExp[2].exp_sensor_params.analog_gain_code_global = 144;
+                exp_tbl->HdrExp[1].exp_sensor_params.coarse_integration_time = 1475;
+                exp_tbl->HdrExp[1].exp_sensor_params.analog_gain_code_global = 144;
+                exp_tbl->HdrExp[0].exp_sensor_params.coarse_integration_time = 492;
+                exp_tbl->HdrExp[0].exp_sensor_params.analog_gain_code_global = 48;
 
-            exp_tbl->HdrExp[2].exp_real_params.integration_time = 0.03;
-            exp_tbl->HdrExp[2].exp_real_params.analog_gain = 9;
-            exp_tbl->HdrExp[1].exp_real_params.integration_time = 0.03;
-            exp_tbl->HdrExp[1].exp_real_params.analog_gain = 9;
-            exp_tbl->HdrExp[0].exp_real_params.integration_time = 0.01;
-            exp_tbl->HdrExp[0].exp_real_params.analog_gain = 3;
+                exp_tbl->HdrExp[2].exp_real_params.integration_time = 0.03;
+                exp_tbl->HdrExp[2].exp_real_params.analog_gain = 9;
+                exp_tbl->HdrExp[1].exp_real_params.integration_time = 0.03;
+                exp_tbl->HdrExp[1].exp_real_params.analog_gain = 9;
+                exp_tbl->HdrExp[0].exp_real_params.integration_time = 0.01;
+                exp_tbl->HdrExp[0].exp_real_params.analog_gain = 3;
+            }
         }
-    }
-	ret = mCamHw->setExposureParams(aiqParams->mExposureParams);
-    if (ret)
-        LOGE_ANALYZER("setExposureParams error %d", ret);
+        ret = mCamHw->setExposureParams(aiqParams->mExposureParams);
+        if (ret)
+            LOGE_ANALYZER("setExposureParams error %d", ret);
 #else
-	ret = mCamHw->setExposureParams(aiqParams->mExposureParams);
-    if (ret)
-        LOGE_ANALYZER("setExposureParams error %d", ret);
+        ret = mCamHw->setExposureParams(aiqParams->mExposureParams);
+        if (ret)
+            LOGE_ANALYZER("setExposureParams error %d", ret);
 #endif
     }
 set_exp_end:
@@ -407,7 +408,7 @@ set_isp_end:
 #endif
 #endif
 
-#ifndef DISABLE_PP 
+#ifndef DISABLE_PP
     if (aiqParams->mIsppParams.ptr()) {
         ret = mCamHw->setIsppParams(aiqParams->mIsppParams);
         if (ret)

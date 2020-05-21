@@ -101,9 +101,9 @@ ANRresult_t selsec_hdr_parmas_by_ISO(RKAnr_Bayernr_Params_t *stBayerNrParams, RK
 
 	int framenum = pExpInfo->hdr_mode + 1;
 	
-	frameiso[0] = pExpInfo->arAGain[0];
-	frameiso[1] = pExpInfo->arAGain[1];
-	frameiso[2] = pExpInfo->arAGain[2];
+	frameiso[0] = pExpInfo->arAGain[0] * pExpInfo->arDGain[0];
+	frameiso[1] = pExpInfo->arAGain[1] * pExpInfo->arDGain[1];
+	frameiso[2] = pExpInfo->arAGain[2] * pExpInfo->arDGain[2];
 	
 	frameEt[0] = pExpInfo->arTime[0];
 	frameEt[1] = pExpInfo->arTime[1];
@@ -184,7 +184,11 @@ ANRresult_t selsec_hdr_parmas_by_ISO(RKAnr_Bayernr_Params_t *stBayerNrParams, RK
 		#endif
 	}
 
-	stBayerNrParamsSelected->gausskparsq = int((1*1)*float(1<<(FIXNLMCALC)));
+	if(framenum <= 1 ){
+		stBayerNrParamsSelected->gausskparsq = int((1*1)*float(1<<(FIXNLMCALC)))*(1 << 7);
+	}else{
+		stBayerNrParamsSelected->gausskparsq = int((1*1)*float(1<<(FIXNLMCALC)));
+	}
 	stBayerNrParamsSelected->sigmaPar = 0*(1<<FIXNLMCALC);
 	stBayerNrParamsSelected->thld_diff = (int(LUTMAXM1_FIX*LUTPRECISION_FIX));
 	stBayerNrParamsSelected->thld_chanelw = int(0.1*float(1<<FIXNLMCALC));

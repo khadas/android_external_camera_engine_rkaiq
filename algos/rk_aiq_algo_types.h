@@ -86,10 +86,12 @@ typedef struct _RkAiqAlgoProcAwb {
 
 typedef struct _RkAiqAlgoProcResAwb {
     RkAiqAlgoResCom proc_res_com;
+    bool awb_cfg_update;
     union {
         rk_aiq_awb_stat_cfg_v200_t awb_hw0_para;
         rk_aiq_awb_stat_cfg_v201_t awb_hw1_para;
     };
+    bool awb_gain_update;
     rk_aiq_wb_gain_t awb_gain_algo;
 } RkAiqAlgoProcResAwb;
 

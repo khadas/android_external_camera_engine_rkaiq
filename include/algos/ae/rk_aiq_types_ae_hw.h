@@ -221,6 +221,7 @@ typedef struct RkAiqExpRealParam_s {
     float digital_gain;
     float isp_dgain;
     int   iso;
+    int   dcg_mode;
 } RkAiqExpRealParam_t;
 
 typedef struct RkAiqExpSensorParam_s {

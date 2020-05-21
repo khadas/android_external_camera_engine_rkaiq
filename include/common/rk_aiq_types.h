@@ -237,9 +237,10 @@ typedef struct rk_frame_fmt_s {
     rk_aiq_format_t format;
 } rk_frame_fmt_t;
 
+#define SUPPORT_FMT_MAX 10
 typedef struct {
     char sensor_name[32];
-    rk_frame_fmt_t  *support_fmt;
+    rk_frame_fmt_t  support_fmt[SUPPORT_FMT_MAX];
     int num;
 } rk_aiq_sensor_info_t;
 
@@ -619,8 +620,10 @@ typedef struct {
     uint32_t module_enable_mask;
     sint32_t frame_id;
     rk_aiq_isp_aec_meas_t   aec_meas;
+    bool awb_cfg_update;
     rk_aiq_awb_stat_cfg_v200_t   awb_cfg_v200;
     rk_aiq_awb_stat_cfg_v201_t   awb_cfg_v201;
+    bool awb_gain_update;
     rk_aiq_wb_gain_t       awb_gain;
     rk_aiq_isp_af_meas_t    af_meas;
     rk_aiq_isp_hist_meas_t  hist_meas;

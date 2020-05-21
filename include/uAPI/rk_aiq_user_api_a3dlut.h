@@ -17,6 +17,7 @@
 
 #ifndef _RK_AIQ_USER_API_A3DLUT_H_
 #define _RK_AIQ_USER_API_A3DLUT_H_
+#include "a3dlut/rk_aiq_uapi_a3dlut_int.h"
 
 
 

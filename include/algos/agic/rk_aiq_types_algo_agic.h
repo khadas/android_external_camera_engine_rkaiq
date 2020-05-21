@@ -3,6 +3,7 @@
 #define __RKAIQ_TYPES_ALGO_AGIC_H__
 
 typedef struct AgicConfig_s {
+    unsigned char gic_en;
     unsigned char edge_open;
 
     unsigned short regmingradthrdark2;

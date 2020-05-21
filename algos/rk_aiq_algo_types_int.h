@@ -277,22 +277,24 @@ typedef struct _RkAiqAlgoPreAwbInt {
         rk_aiq_awb_stat_res_v200_t awb_hw0_statis;
         rk_aiq_awb_stat_res_v201_t awb_hw1_statis;
     };
+    union {
+        rk_aiq_awb_stat_cfg_v200_t  awb_cfg_effect_v200;
+        rk_aiq_awb_stat_cfg_v201_t  awb_cfg_effect_v201;
+    };
 } RkAiqAlgoPreAwbInt;
-
-typedef struct color_tempture_info_s {
-    bool valid;
-    float CCT;
-    float CCRI;
-} color_tempture_info_t;
 
 typedef struct _RkAiqAlgoPreResAwbInt {
     RkAiqAlgoPreResAwb awb_pre_res_com;
     color_tempture_info_t cctGloabl;
     color_tempture_info_t cctFirst[4];
-    color_tempture_info_t cctBlk[RK_AIQ_AWB_GRID_NUM_TOTAL];
     float awb_smooth_factor;
     rk_aiq_wb_gain_t awb_gain_algo;
     bool awbConverged;
+    //blk
+    bool blkWpFlagVaLid[RK_AIQ_AWB_GRID_NUM_TOTAL][3];
+    int  blkWpFlag[RK_AIQ_AWB_GRID_NUM_TOTAL][3];
+    bool blkSgcResVaLid;
+    awb_measure_blk_res_fl_t blkSgcResult[RK_AIQ_AWB_GRID_NUM_TOTAL];
 } RkAiqAlgoPreResAwbInt;
 
 typedef struct _RkAiqAlgoProcAwbInt {
@@ -308,6 +310,12 @@ typedef struct _RkAiqAlgoProcResAwbInt {
     color_tempture_info_t cctBlk[RK_AIQ_AWB_GRID_NUM_TOTAL];
     float awb_smooth_factor;
     bool awbConverged;
+    //blk
+    bool blkWpFlagVaLid[RK_AIQ_AWB_GRID_NUM_TOTAL];
+    int  blkWpFlag[RK_AIQ_AWB_GRID_NUM_TOTAL][3];
+    bool blkSgcResVaLid;
+    awb_measure_blk_res_fl_t blkSgcResult[RK_AIQ_AWB_GRID_NUM_TOTAL];
+
 } RkAiqAlgoProcResAwbInt;
 
 typedef struct _RkAiqAlgoPostAwbInt {

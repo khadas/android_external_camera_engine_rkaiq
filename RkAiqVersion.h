@@ -35,8 +35,28 @@
  *  - optimize imx347 hdr mode image quality
  *  - workaround for imx347 ae flicker when the
  *    luma changed dramatically
+ * v0.1.2
+ *  - hdr: fix clipRatio error,and redefine tmo params
+ *  - fix some bugs in ae smoot
+ *  - fix high iso blc problem and uvnr / 3dnr parameters
+ *  - fix mmap memory leak
+ *  - fix gic bugs
+ *  - add color saturation level and color inhibition level setting and getting in accm module
+ *  - update imx347 and os04a10 xml
+ *  - add gc4c33 xml
+ * v0.1.3
+ *  - IMX347: update hdr & normal IQ files
+ *  - add dcg setting in aiq
+ *  - ablc: iq xml support diff iso diff blc value
+ *  - use different iq file for mode hdr and normal
+ *  - implement uapi and test
+ *  - add Antiflicker-Mode
+ *  - add the switch whether to enable HDR module
+ *  - using mipi read back mode for normal mode
+ *  - enable adebayer module
+ *  - update dpcc setting in GC4C33 xml
  */
 
-#define RK_AIQ_VERSION "v0.1.1"
-
+#define RK_AIQ_VERSION "v0.1.3"
+#define RK_AIQ_RELEASE_DATE "2020-05-21"
 #endif

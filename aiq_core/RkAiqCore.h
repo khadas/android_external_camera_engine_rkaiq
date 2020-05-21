@@ -78,6 +78,7 @@ public:
         xcam_mem_clear(af_stats);
         aec_stats_valid = false;
         awb_stats_valid = false;
+        awb_cfg_effect_valid = false;
         af_stats_valid = false;
         frame_id = -1;
     };
@@ -85,9 +86,12 @@ public:
     rk_aiq_isp_aec_stats_t aec_stats;
     bool aec_stats_valid;
     rk_aiq_awb_stat_res_v200_t awb_stats;
+    rk_aiq_awb_stat_cfg_v200_t  awb_cfg_effect_v200;
     rk_aiq_awb_stat_res_v201_t awb_stats_v201;
+    rk_aiq_awb_stat_cfg_v201_t  awb_cfg_effect_v201;
 
     bool awb_stats_valid;
+    bool awb_cfg_effect_valid;
     rk_aiq_isp_af_stats_t af_stats;
     bool af_stats_valid;
     rk_aiq_isp_orb_stats_t orb_stats;

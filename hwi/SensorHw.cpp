@@ -34,6 +34,8 @@ SensorHw::SensorHw(const char* name)
     _time_delay = 0;
     _gain_delayed = false;
     _frame_sequence = 0;
+    _dcg_gain_mode_delay = 0;
+    _dcg_gain_mode_delayed = false;
     _expParamsPool = new RkAiqExpParamsPool("SensorLocalExpParams", SensorHw::DEFAULT_POOL_SIZE);
     EXIT_CAMHW_FUNCTION();
 }
@@ -49,15 +51,45 @@ SensorHw::setHdrSensorExposure(RKAiqAecExpInfo_t* expPar)
 {
     ENTER_CAMHW_FUNCTION();
     struct hdrae_exp_s hdrExp;
+    int frame_line_length;
+    struct v4l2_control ctrl;
+    rk_aiq_exposure_sensor_descriptor sensor_desc;
 
-    LOGD_CAMHW("%s: lexp: 0x%x-0x%x, mexp: 0x%x-0x%x, sexp: 0x%x-0x%x\n",
+    LOGD_CAMHW("%s: lexp: 0x%x-0x%x, mexp: 0x%x-0x%x, sexp: 0x%x-0x%x,\n"
+               "l-dcg %d, m-dcg %d, s-dcg %d\n",
                __FUNCTION__,
                expPar->HdrExp[2].exp_sensor_params.analog_gain_code_global,
                expPar->HdrExp[2].exp_sensor_params.coarse_integration_time,
                expPar->HdrExp[1].exp_sensor_params.analog_gain_code_global,
                expPar->HdrExp[1].exp_sensor_params.coarse_integration_time,
                expPar->HdrExp[0].exp_sensor_params.analog_gain_code_global,
-               expPar->HdrExp[0].exp_sensor_params.coarse_integration_time);
+               expPar->HdrExp[0].exp_sensor_params.coarse_integration_time,
+               expPar->HdrExp[2].exp_real_params.dcg_mode,
+               expPar->HdrExp[1].exp_real_params.dcg_mode,
+               expPar->HdrExp[0].exp_real_params.dcg_mode);
+
+    get_sensor_descriptor (&sensor_desc);
+
+    frame_line_length = expPar->frame_length_lines > sensor_desc.line_periods_per_field ?
+                        expPar->frame_length_lines : sensor_desc.line_periods_per_field;
+
+    memset(&ctrl, 0, sizeof(ctrl));
+    ctrl.id = V4L2_CID_VBLANK;
+    ctrl.value = frame_line_length - sensor_desc.sensor_output_height;
+    if (io_control(VIDIOC_S_CTRL, &ctrl) < 0) {
+        LOGE_CAMHW("failed to set vblank result(val: %d)", ctrl.value);
+        return XCAM_RETURN_ERROR_IOCTL;
+    }
+
+    if (expPar->LinearExp.exp_sensor_params.analog_gain_code_global >= 0) {
+        memset(&ctrl, 0, sizeof(ctrl));
+        ctrl.id = V4L2_CID_ANALOGUE_GAIN;
+        ctrl.value = expPar->LinearExp.exp_sensor_params.analog_gain_code_global;
+        if (io_control(VIDIOC_S_CTRL, &ctrl) < 0) {
+            LOGE_CAMHW ("failed to  set again result(val: %d)", ctrl.value);
+            return XCAM_RETURN_ERROR_IOCTL;
+        }
+    }
 
     memset(&hdrExp, 0, sizeof(hdrExp));
     hdrExp.long_exp_reg =
@@ -72,6 +104,33 @@ SensorHw::setHdrSensorExposure(RKAiqAecExpInfo_t* expPar)
         expPar->HdrExp[0].exp_sensor_params.coarse_integration_time;
     hdrExp.short_gain_reg =
         expPar->HdrExp[0].exp_sensor_params.analog_gain_code_global;
+
+    int dcg_mode = expPar->HdrExp[2].exp_real_params.dcg_mode;
+
+    if (dcg_mode == 1/*AEC_DCG_MODE_HCG*/)
+        hdrExp.long_cg_mode = GAIN_MODE_HCG;
+    else if (dcg_mode == 0/*AEC_DCG_MODE_LCG*/)
+        hdrExp.long_cg_mode = GAIN_MODE_LCG;
+    else //default
+        hdrExp.long_cg_mode = GAIN_MODE_LCG;
+
+    dcg_mode = expPar->HdrExp[1].exp_real_params.dcg_mode;
+
+    if (dcg_mode == 1/*AEC_DCG_MODE_HCG*/)
+        hdrExp.middle_cg_mode = GAIN_MODE_HCG;
+    else if (dcg_mode == 0/*AEC_DCG_MODE_LCG*/)
+        hdrExp.middle_cg_mode = GAIN_MODE_LCG;
+    else //default
+        hdrExp.middle_cg_mode = GAIN_MODE_LCG;
+
+    dcg_mode = expPar->HdrExp[0].exp_real_params.dcg_mode;
+
+    if (dcg_mode == 1/*AEC_DCG_MODE_HCG*/)
+        hdrExp.short_cg_mode = GAIN_MODE_HCG;
+    else if (dcg_mode == 0/*AEC_DCG_MODE_LCG*/)
+        hdrExp.short_cg_mode = GAIN_MODE_LCG;
+    else //default
+        hdrExp.short_cg_mode = GAIN_MODE_LCG;
 
     if (io_control(SENSOR_CMD_SET_HDRAE_EXP, &hdrExp) < 0) {
         LOGE_CAMHW ("failed to set hdrExp exp");
@@ -90,22 +149,42 @@ SensorHw::setLinearSensorExposure(RKAiqAecExpInfo_t* expPar)
     struct v4l2_control ctrl;
     rk_aiq_exposure_sensor_descriptor sensor_desc;
 
-    LOGD_CAMHW("%s: frameid: %d, a-gain: %d, time: %d\n",
+    LOGD_CAMHW("%s: frameid: %d, a-gain: %d, time: %d, dcg: %d\n",
                __FUNCTION__,
                _frame_sequence,
                expPar->LinearExp.exp_sensor_params.analog_gain_code_global,
-               expPar->LinearExp.exp_sensor_params.coarse_integration_time);
+               expPar->LinearExp.exp_sensor_params.coarse_integration_time,
+               expPar->LinearExp.exp_real_params.dcg_mode);
 
     // set vts before exposure time firstly
     get_sensor_descriptor (&sensor_desc);
 
-    frame_line_length = sensor_desc.line_periods_per_field;
+    frame_line_length = expPar->frame_length_lines > sensor_desc.line_periods_per_field ?
+                        expPar->frame_length_lines : sensor_desc.line_periods_per_field;
+
     memset(&ctrl, 0, sizeof(ctrl));
     ctrl.id = V4L2_CID_VBLANK;
     ctrl.value = frame_line_length - sensor_desc.sensor_output_height;
     if (io_control(VIDIOC_S_CTRL, &ctrl) < 0) {
         LOGE_CAMHW("failed to set vblank result(val: %d)", ctrl.value);
         return XCAM_RETURN_ERROR_IOCTL;
+    }
+
+    int dcg_mode = expPar->LinearExp.exp_real_params.dcg_mode;
+    int dcg_mode_drv;
+
+    if (dcg_mode == 1/*AEC_DCG_MODE_HCG*/)
+        dcg_mode_drv = GAIN_MODE_HCG;
+    else if (dcg_mode == 0/*AEC_DCG_MODE_LCG*/)
+        dcg_mode_drv = GAIN_MODE_LCG;
+    else //default
+        dcg_mode_drv = -1;
+
+    if (dcg_mode_drv != -1 ) {
+        if (io_control(RKMODULE_SET_CONVERSION_GAIN, &dcg_mode_drv) < 0) {
+            LOGE_CAMHW ("failed to set conversion gain !");
+            return XCAM_RETURN_ERROR_IOCTL;
+        }
     }
 
     if (expPar->LinearExp.exp_sensor_params.analog_gain_code_global >= 0) {
@@ -225,7 +304,6 @@ SensorHw::get_format(rk_aiq_exposure_sensor_descriptor* sns_des)
     sns_des->sensor_output_width = fmt.format.width;
     sns_des->sensor_output_height = fmt.format.height;
     sns_des->sensor_pixelformat = get_v4l2_pixelformat(fmt.format.code);
-
     return 0;
 }
 
@@ -300,6 +378,7 @@ SensorHw::setExposureParams(SmartPtr<RkAiqExpParamsProxy>& expPar)
         _first = false;
         _last_exp_time = expPar;
         _last_exp_gain = expPar;
+        _last_dcg_gain_mode = expPar;
         LOGD_CAMHW("exp-sync: first set exp, add id[0] to the effected exp map\n");
     } else {
         if (expPar->data()->algo_id == 0) {
@@ -404,35 +483,35 @@ SensorHw::getEffectiveExpParams(SmartPtr<RkAiqExpParamsProxy>& expParams, int fr
         expParams = rit->second;
         if (_working_mode == RK_AIQ_WORKING_MODE_NORMAL) {
             LOGD_CAMHW("%s: search_id: %d, get-last %d, a-gain: %d, time: %d\n",
-                           __FUNCTION__, search_id, rit->first,
-                           expParams->data()->aecExpInfo.LinearExp.exp_sensor_params.analog_gain_code_global,
-                           expParams->data()->aecExpInfo.LinearExp.exp_sensor_params.coarse_integration_time);
+                       __FUNCTION__, search_id, rit->first,
+                       expParams->data()->aecExpInfo.LinearExp.exp_sensor_params.analog_gain_code_global,
+                       expParams->data()->aecExpInfo.LinearExp.exp_sensor_params.coarse_integration_time);
         } else {
             LOGD_CAMHW("%s: search_id: %d, get-last %d, lexp: 0x%x-0x%x, mexp: 0x%x-0x%x, sexp: 0x%x-0x%x\n",
-                           __FUNCTION__, search_id, rit->first,
-                           expParams->data()->aecExpInfo.HdrExp[2].exp_sensor_params.analog_gain_code_global,
-                           expParams->data()->aecExpInfo.HdrExp[2].exp_sensor_params.coarse_integration_time,
-                           expParams->data()->aecExpInfo.HdrExp[1].exp_sensor_params.analog_gain_code_global,
-                           expParams->data()->aecExpInfo.HdrExp[1].exp_sensor_params.coarse_integration_time,
-                           expParams->data()->aecExpInfo.HdrExp[0].exp_sensor_params.analog_gain_code_global,
-                           expParams->data()->aecExpInfo.HdrExp[0].exp_sensor_params.coarse_integration_time);
+                       __FUNCTION__, search_id, rit->first,
+                       expParams->data()->aecExpInfo.HdrExp[2].exp_sensor_params.analog_gain_code_global,
+                       expParams->data()->aecExpInfo.HdrExp[2].exp_sensor_params.coarse_integration_time,
+                       expParams->data()->aecExpInfo.HdrExp[1].exp_sensor_params.analog_gain_code_global,
+                       expParams->data()->aecExpInfo.HdrExp[1].exp_sensor_params.coarse_integration_time,
+                       expParams->data()->aecExpInfo.HdrExp[0].exp_sensor_params.analog_gain_code_global,
+                       expParams->data()->aecExpInfo.HdrExp[0].exp_sensor_params.coarse_integration_time);
         }
     } else {
         expParams = it->second;
         if (_working_mode == RK_AIQ_WORKING_MODE_NORMAL) {
             LOGD_CAMHW("%s: search_id: %d, get-find %d, a-gain: %d, time: %d\n",
-                           __FUNCTION__, search_id, it->first,
-                           expParams->data()->aecExpInfo.LinearExp.exp_sensor_params.analog_gain_code_global,
-                           expParams->data()->aecExpInfo.LinearExp.exp_sensor_params.coarse_integration_time);
+                       __FUNCTION__, search_id, it->first,
+                       expParams->data()->aecExpInfo.LinearExp.exp_sensor_params.analog_gain_code_global,
+                       expParams->data()->aecExpInfo.LinearExp.exp_sensor_params.coarse_integration_time);
         } else {
             LOGD_CAMHW("%s: search_id: %d, get-find %d, lexp: 0x%x-0x%x, mexp: 0x%x-0x%x, sexp: 0x%x-0x%x\n",
-                           __FUNCTION__, search_id, it->first,
-                           expParams->data()->aecExpInfo.HdrExp[2].exp_sensor_params.analog_gain_code_global,
-                           expParams->data()->aecExpInfo.HdrExp[2].exp_sensor_params.coarse_integration_time,
-                           expParams->data()->aecExpInfo.HdrExp[1].exp_sensor_params.analog_gain_code_global,
-                           expParams->data()->aecExpInfo.HdrExp[1].exp_sensor_params.coarse_integration_time,
-                           expParams->data()->aecExpInfo.HdrExp[0].exp_sensor_params.analog_gain_code_global,
-                           expParams->data()->aecExpInfo.HdrExp[0].exp_sensor_params.coarse_integration_time);
+                       __FUNCTION__, search_id, it->first,
+                       expParams->data()->aecExpInfo.HdrExp[2].exp_sensor_params.analog_gain_code_global,
+                       expParams->data()->aecExpInfo.HdrExp[2].exp_sensor_params.coarse_integration_time,
+                       expParams->data()->aecExpInfo.HdrExp[1].exp_sensor_params.analog_gain_code_global,
+                       expParams->data()->aecExpInfo.HdrExp[1].exp_sensor_params.coarse_integration_time,
+                       expParams->data()->aecExpInfo.HdrExp[0].exp_sensor_params.analog_gain_code_global,
+                       expParams->data()->aecExpInfo.HdrExp[0].exp_sensor_params.coarse_integration_time);
         }
     }
 
@@ -465,6 +544,7 @@ SensorHw::getSensorModeData(const char* sns_ent_name,
 
     sns_des.sensor_output_width = sensor_desc.sensor_output_width;
     sns_des.sensor_output_height = sensor_desc.sensor_output_height;
+    sns_des.sensor_pixelformat = sensor_desc.sensor_pixelformat;
 
     LOGD_CAMHW("vts-hts-pclk: %d-%d-%d-%f, rect: [%dx%d]\n",
                sns_des.frame_length_lines,
@@ -476,11 +556,6 @@ SensorHw::getSensorModeData(const char* sns_ent_name,
 
     return XCAM_RETURN_NO_ERROR;
 }
-
-enum imx347_gain_mode_e {
-    IMX347_GAIN_MODE_LCG,
-    IMX347_GAIN_MODE_HCG,
-}; 
 
 XCamReturn
 SensorHw::handle_sof(int64_t time, int frameid)
@@ -499,24 +574,14 @@ SensorHw::handle_sof(int64_t time, int frameid)
 
     SmartPtr<RkAiqExpParamsProxy> exp_time = nullptr;
     SmartPtr<RkAiqExpParamsProxy> exp_gain = nullptr;
-    bool set_time = false, set_gain = false;
+    SmartPtr<RkAiqExpParamsProxy> dcg_gain_mode = nullptr;
+    bool set_time = false, set_gain = false, set_dcg_gain_mode = false;
 
     while (_effecting_exp_map.size() > 10)
         _effecting_exp_map.erase(_effecting_exp_map.begin());
 
-    static int32_t last_long_gain = IMX347_GAIN_MODE_LCG;
     if(!_exp_list.empty()) {
         exp_time = _last_exp_time = _exp_list.front().first;
-        if (_sns_entity_name.find("imx347") != std::string::npos) {
-            int32_t mid_gain = exp_time->data()->aecExpInfo.HdrExp[1].exp_sensor_params.analog_gain_code_global;
-            if (mid_gain > 100)
-                last_long_gain = IMX347_GAIN_MODE_HCG;
-            else if (mid_gain < 44)
-                last_long_gain = IMX347_GAIN_MODE_LCG;
-            LOGD_CAMHW("%s: frameid=%d, new gain_mode: %s",
-                      __FUNCTION__, frameid, last_long_gain == 0 ? "LCG" : "HCG");
-
-        }
         set_time = true;
         _exp_list.pop_front();
     } else {
@@ -531,20 +596,43 @@ SensorHw::handle_sof(int64_t time, int frameid)
         exp_gain = _last_exp_gain;
     }
 
+    if(!_delayed_dcg_gain_mode_list.empty()) {
+        dcg_gain_mode = _last_dcg_gain_mode = _delayed_dcg_gain_mode_list.front();
+        set_dcg_gain_mode = true;
+        _delayed_dcg_gain_mode_list.pop_front();
+    } else {
+        dcg_gain_mode = _last_dcg_gain_mode;
+    }
+
     _mutex.unlock();
     LOGD_CAMHW("%s: working_mode=%d,frameid=%d, status: set_time=%d,set_gain=%d\n",
                __FUNCTION__, _working_mode, frameid, set_time, set_gain);
 
-    if (set_time || set_gain) {
+    if (set_time || set_gain || set_dcg_gain_mode) {
         RKAiqAecExpInfo_t *ptr_new_exp = NULL, new_exp;
-        if (_gain_delayed) {
-            composeExpParam(&exp_time->data()->aecExpInfo, &exp_gain->data()->aecExpInfo, &new_exp);
+        if (_dcg_gain_mode_delayed) {
+            // _gain_delayed should be false
+            composeExpParam(&exp_time->data()->aecExpInfo,
+                            &exp_time->data()->aecExpInfo,
+                            &dcg_gain_mode->data()->aecExpInfo,
+                            &new_exp);
             ptr_new_exp = &new_exp;
-            if (_sns_entity_name.find("imx347") != std::string::npos)
-                ptr_new_exp ->HdrExp[2].exp_sensor_params.analog_gain_code_global = last_long_gain;
         } else {
-            ptr_new_exp = &exp_time->data()->aecExpInfo;
+            if (_gain_delayed) {
+                if (_dcg_gain_mode_with_time)
+                    dcg_gain_mode = exp_time;
+                else
+                    dcg_gain_mode = exp_gain;
+                composeExpParam(&exp_time->data()->aecExpInfo,
+                                &exp_gain->data()->aecExpInfo,
+                                &dcg_gain_mode->data()->aecExpInfo,
+                                &new_exp);
+                ptr_new_exp = &new_exp;
+            } else {
+                ptr_new_exp = &exp_time->data()->aecExpInfo;
+            }
         }
+
         if(_working_mode == RK_AIQ_WORKING_MODE_NORMAL) {
             ret = setLinearSensorExposure(ptr_new_exp);
         } else {
@@ -563,6 +651,10 @@ SensorHw::handle_sof(int64_t time, int frameid)
 
         if(_gain_delayed) {
             _delayed_gain_list.push_back(exp_time);
+        }
+
+        if(_dcg_gain_mode_delayed) {
+            _delayed_dcg_gain_mode_list.push_back(exp_time);
         }
         effecting_frame_id = frameid + _time_delay;
         _effecting_exp_map[effecting_frame_id] = exp_time;
@@ -674,10 +766,11 @@ SensorHw::set_working_mode(int mode)
 }
 
 XCamReturn
-SensorHw::set_exp_delay_info(int time_delay, int gain_delay)
+SensorHw::set_exp_delay_info(int time_delay, int gain_delay, int hcg_lcg_mode_delay)
 {
     _time_delay = time_delay;
     _gain_delay = gain_delay;
+    _dcg_gain_mode_delay = hcg_lcg_mode_delay;
 
     LOGD_CAMHW ("%s _time_delay: %d, _gain_delay:%d\n",
                 __func__, _time_delay, _gain_delay);
@@ -688,6 +781,22 @@ SensorHw::set_exp_delay_info(int time_delay, int gain_delay)
     } else {
         LOGE_CAMHW("Not support gain's delay greater than time's delay!");
         return XCAM_RETURN_ERROR_PARAM;
+    }
+
+    if (_dcg_gain_mode_delay > time_delay) {
+        LOGE_CAMHW("Not support dcg gain's delay %d, greater than time_delay %d!",
+                   _dcg_gain_mode_delay, time_delay);
+        return XCAM_RETURN_ERROR_PARAM;
+    }
+
+    if (_dcg_gain_mode_delay != time_delay &&
+            _dcg_gain_mode_delay != _gain_delay) {
+        _dcg_gain_mode_delayed = true;
+    }  else {
+        if (_dcg_gain_mode_delay == time_delay)
+            _dcg_gain_mode_with_time = true;
+        else
+            _dcg_gain_mode_with_time = false;
     }
 
     return XCAM_RETURN_NO_ERROR;
@@ -708,6 +817,7 @@ SensorHw::stop()
     _exp_list.clear();
     _effecting_exp_map.clear();
     _delayed_gain_list.clear();
+    _delayed_dcg_gain_mode_list.clear();
     EXIT_CAMHW_FUNCTION();
     return XCAM_RETURN_NO_ERROR;
 }
@@ -717,27 +827,37 @@ SensorHw::composeExpParam
 (
     RKAiqAecExpInfo_t* timeValid,
     RKAiqAecExpInfo_t* gainValid,
+    RKAiqAecExpInfo_t* dcgGainModeValid,
     RKAiqAecExpInfo_t* newExp
 )
 {
+    *newExp = *timeValid;
     if(_working_mode == RK_AIQ_WORKING_MODE_NORMAL) {
         newExp->LinearExp.exp_sensor_params.analog_gain_code_global =
             gainValid->LinearExp.exp_sensor_params.analog_gain_code_global;
         newExp->LinearExp.exp_sensor_params.coarse_integration_time =
             timeValid->LinearExp.exp_sensor_params.coarse_integration_time;
+        newExp->LinearExp.exp_real_params.dcg_mode =
+            dcgGainModeValid->LinearExp.exp_real_params.dcg_mode;
     } else {
         newExp->HdrExp[2].exp_sensor_params.analog_gain_code_global =
             gainValid->HdrExp[2].exp_sensor_params.analog_gain_code_global;
         newExp->HdrExp[2].exp_sensor_params.coarse_integration_time =
             timeValid->HdrExp[2].exp_sensor_params.coarse_integration_time;
+        newExp->HdrExp[2].exp_real_params.dcg_mode =
+            dcgGainModeValid->HdrExp[2].exp_real_params.dcg_mode;
         newExp->HdrExp[1].exp_sensor_params.analog_gain_code_global =
             gainValid->HdrExp[1].exp_sensor_params.analog_gain_code_global;
         newExp->HdrExp[1].exp_sensor_params.coarse_integration_time =
             timeValid->HdrExp[1].exp_sensor_params.coarse_integration_time;
+        newExp->HdrExp[1].exp_real_params.dcg_mode =
+            dcgGainModeValid->HdrExp[1].exp_real_params.dcg_mode;
         newExp->HdrExp[0].exp_sensor_params.analog_gain_code_global =
             gainValid->HdrExp[0].exp_sensor_params.analog_gain_code_global;
         newExp->HdrExp[0].exp_sensor_params.coarse_integration_time =
             timeValid->HdrExp[0].exp_sensor_params.coarse_integration_time;
+        newExp->HdrExp[0].exp_real_params.dcg_mode =
+            dcgGainModeValid->HdrExp[0].exp_real_params.dcg_mode;
     }
     return XCAM_RETURN_NO_ERROR;
 }

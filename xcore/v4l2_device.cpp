@@ -702,6 +702,7 @@ V4l2Device::release_buffer (SmartPtr<V4l2Buffer> &buf)
         } else {
             XCAM_LOG_DEBUG("release buffer length: %d", buf->get_buf().length);
             ret = munmap((void*)buf->get_buf().m.userptr, buf->get_buf().length);
+            ::close(buf->get_expbuf_fd());
         }
         if (ret != 0) {
             XCAM_LOG_ERROR (

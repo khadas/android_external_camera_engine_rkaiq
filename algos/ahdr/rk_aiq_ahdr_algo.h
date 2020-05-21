@@ -22,7 +22,6 @@
 
 RESULT AhdrStart(AhdrHandle_t pAhdrCtx);
 RESULT AhdrStop(AhdrHandle_t pAhdrCtx);
-void SetFirstPara(AhdrHandle_t pAhdrCtx);
 void AhdrConfig(AhdrHandle_t pAhdrCtx);
 void AhdrGetROData(AhdrHandle_t pAhdrCtx, rkisp_ahdr_stats_t* ROData) ;
 void AhdrGetXmlParas(AhdrHandle_t pAhdrCtx, const CamCalibDbContext_t* pConfig);
