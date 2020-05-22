@@ -177,6 +177,9 @@
 #define CALIB_SENSOR_AWB_WPDIFFBLKWEIENABLE                     "wpDiffBlkWeiEnable"
 #define CALIB_SENSOR_AWB_BLKSTATISTICSENABLE                    "blkStatisticsEnable"
 #define CALIB_SENSOR_AWB_WPDIFFBLKWEIGHT                        "wpDiffBlkWeight"
+#define CALIB_SENSOR_AWB_REMOSAICPARA                           "remosaicPara"
+#define CALIB_SENSOR_AWB_REMOSAICPARA_ENABLE                    "enable"
+#define CALIB_SENSOR_AWB_REMOSAICPARA_WBGAIN                    "sensorWbGain"
 
 /*****************************************************************************
 * XML AEC section

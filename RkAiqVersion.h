@@ -45,7 +45,7 @@
  *  - update imx347 and os04a10 xml
  *  - add gc4c33 xml
  * v0.1.3
- *  - IMX347: update hdr & normal IQ files
+ *  - IMX347: split iqfile to hdr and normal, enable fec default
  *  - add dcg setting in aiq
  *  - ablc: iq xml support diff iso diff blc value
  *  - use different iq file for mode hdr and normal

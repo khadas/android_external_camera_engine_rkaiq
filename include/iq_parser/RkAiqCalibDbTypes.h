@@ -737,6 +737,11 @@ typedef struct CalibDb_Awb_Stategy_Para_s {
     bool xyType2ForColBalEnable;// to do for awb2.1
 } CalibDb_Awb_Stategy_Para_t;
 
+typedef struct CalibDb_Awb_Remosaic_Para_s
+{
+    bool enable;
+    float sensor_awb_gain[4];
+} CalibDb_Awb_Remosaic_Para_t;
 
 typedef struct CalibDb_Awb_Para_s
 {
@@ -745,6 +750,7 @@ typedef struct CalibDb_Awb_Para_s
     CalibDb_Awb_Measure_Para_V200_t measure_para_v200;
     CalibDb_Awb_Measure_Para_V201_t measure_para_v201;
     CalibDb_Awb_Stategy_Para_t stategy_cfg;
+    CalibDb_Awb_Remosaic_Para_t remosaic_cfg;
 } CalibDb_Awb_Para_t;
 
 typedef struct CalibDb_HdrMerge_s
