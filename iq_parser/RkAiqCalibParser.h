@@ -112,6 +112,7 @@ private:
     bool parseEntrySensorAwbGlobalsExclude(const XMLElement*, void* param = NULL);
     bool parseEntrySensorAwbGlobalsExcludeV201(const XMLElement*, void* param = NULL);
     bool parseEntrySensorAwbLightSources(const XMLElement*, void* param = NULL);
+    bool parseEntrySensorAwbRemosaicPara(const XMLElement*, void* param = NULL);
     bool parseEntrySensorAec(const XMLElement*, void* param = NULL);
     bool parseEntrySensorAecLinearAeRoute(const XMLElement*, void* param = NULL);
     bool parseEntrySensorAecHdrAeRoute(const XMLElement*, void* param = NULL);

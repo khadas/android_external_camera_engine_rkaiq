@@ -1834,7 +1834,7 @@ bool RkAiqCalibParser::parseEntrySensorAwb
 
     LOGD("%s(%d): (enter)\n", __FUNCTION__, __LINE__);
     autoTabForward();
-
+    memset(&mCalibDb->awb, 0, sizeof(mCalibDb->awb));
     const XMLNode* pchild = pelement->FirstChild();
     while (pchild) {
         XmlTag tag = XmlTag(pchild->ToElement());
@@ -1869,6 +1869,11 @@ bool RkAiqCalibParser::parseEntrySensorAwb
         }
         else if (tagname == CALIB_SENSOR_AWB_STATEGYPARA_TAG) {
             if (!parseEntrySensorAwbStategyPara(pchild->ToElement())) {
+                LOGE("parse error in AWB (%s)", tagname);
+                return (false);
+            }
+        } else if (tagname == CALIB_SENSOR_AWB_REMOSAICPARA ) {
+            if (!parseEntrySensorAwbRemosaicPara(pchild->ToElement())) {
                 LOGE("parse error in AWB (%s)", tagname);
                 return (false);
             }
@@ -3624,6 +3629,51 @@ bool RkAiqCalibParser::parseEntrySensorAwbGlobalsExcludeV201
     }
     DCT_ASSERT((index <= CALD_AWB_EXCRANGE_NUM_MAX));
     LOGD("%s(%d): (exit)\n", __FUNCTION__, __LINE__);
+    return (true);
+}
+
+bool RkAiqCalibParser::parseEntrySensorAwbRemosaicPara
+(
+    const XMLElement*   pelement,
+    void*                param
+) {
+    (void)param;
+
+    LOGD("%s(%d): (enter)\n", __FUNCTION__, __LINE__);
+    autoTabForward();
+
+
+    const XMLNode* pchild = pelement->FirstChild();
+    while (pchild) {
+        XmlTag tag = XmlTag(pchild->ToElement());
+        std::string tagname(pchild->ToElement()->Name());
+
+        if ((tagname == CALIB_SENSOR_AWB_REMOSAICPARA_ENABLE)
+                && (tag.isType(XmlTag::TAG_TYPE_DOUBLE))
+                && (tag.Size() > 0)) {
+            unsigned char tempVal = mCalibDb->awb.remosaic_cfg.enable;
+            int no = ParseUcharArray(pchild, &tempVal, 1);
+            DCT_ASSERT((no == tag.Size()));
+            mCalibDb->awb.remosaic_cfg.enable = (tempVal == 0 ? false : true);
+        }
+        else if ((tagname == CALIB_SENSOR_AWB_REMOSAICPARA_WBGAIN)
+                 && (tag.isType(XmlTag::TAG_TYPE_DOUBLE))
+                 && (tag.Size() > 0)) {
+            int no = ParseFloatArray(pchild, mCalibDb->awb.remosaic_cfg.sensor_awb_gain, tag.Size(), 6);
+            DCT_ASSERT((no == tag.Size()));
+        }
+        else {
+            LOGE("parse error in AWB section (unknow tag:%s)", tagname.c_str());
+            //return ( false );
+        }
+
+        pchild = pchild->NextSibling();
+    }
+
+    LOGD("%s(%d): (exit)\n", __FUNCTION__, __LINE__);
+    autoTabBackward();
+
+
     return (true);
 }
 
