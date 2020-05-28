@@ -52,7 +52,7 @@ int gain_find_data_bits(int data)
 	return bits;
 }
 
-ANRresult_t gain_fix_transfer(RKAnr_Mfnr_Params_Select_t *pMfnrSelect, RKAnr_Gain_Fix_t* pGainFix,  ANRExpInfo_t *pExpInfo)
+ANRresult_t gain_fix_transfer(RKAnr_Mfnr_Params_Select_t *pMfnrSelect, RKAnr_Gain_Fix_t* pGainFix,  ANRExpInfo_t *pExpInfo, float gain_ratio)
 {
 	int i;
     double max_val = 0;
@@ -147,11 +147,11 @@ ANRresult_t gain_fix_transfer(RKAnr_Mfnr_Params_Select_t *pMfnrSelect, RKAnr_Gai
     	}
 		
     	for (int i=2; i>=0; i--){
-            dGain[i] = (frame_exp_ratio[i] * pExpInfo->arAGain[i]);
+            dGain[i] = (frame_exp_ratio[i] * pExpInfo->arAGain[i] * pExpInfo->arDGain[i]);
 			LOGD_ANR("%s:%d idx:%d ratio:%f dgain %f\n", 
 				__FUNCTION__, __LINE__, i,
 				frame_exp_ratio[i], dGain[i]);
-            pGainFix->mge_gain[i]	= FLOAT_LIM2_INT(dGain[i] , GAIN_HDR_MERGE_IN_FIX_BITS_DECI, 1);        // 12:6
+            pGainFix->mge_gain[i]	= FLOAT_LIM2_INT(dGain[i]*gain_ratio , GAIN_HDR_MERGE_IN_FIX_BITS_DECI, 1);        // 12:6
             if(i==0)
 				pGainFix->mge_gain[i] = MIN(pGainFix->mge_gain[i], (1 << (GAIN_HDR_MERGE_IN2_FIX_BITS_INTE + GAIN_HDR_MERGE_IN_FIX_BITS_DECI)) - 1);
 			else 
@@ -160,7 +160,7 @@ ANRresult_t gain_fix_transfer(RKAnr_Mfnr_Params_Select_t *pMfnrSelect, RKAnr_Gai
     }
     else
     {
-        pGainFix->mge_gain[0]	= FLOAT_LIM2_INT(pExpInfo->arAGain[0] , GAIN_HDR_MERGE_IN_FIX_BITS_DECI, 1);        // 12:6
+        pGainFix->mge_gain[0]	= FLOAT_LIM2_INT(pExpInfo->arAGain[0] * pExpInfo->arDGain[0] * gain_ratio, GAIN_HDR_MERGE_IN_FIX_BITS_DECI, 1);        // 12:6
         pGainFix->mge_gain[1]	= 0;        // 12:6
         pGainFix->mge_gain[2]	= 0;        // 12:6
     }

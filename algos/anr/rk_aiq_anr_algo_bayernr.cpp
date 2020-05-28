@@ -116,7 +116,7 @@ ANRresult_t selsec_hdr_parmas_by_ISO(RKAnr_Bayernr_Params_t *stBayerNrParams, RK
     	//共有7个iso等级：50 100 200 400 800 1600 3200  6400 12800
     	//		 isogain: 1   2   4   8   16   32  64  128  256
     	//	 	isolevel: 0   1   2   3   4    5   6   7    8
-    	int isoGainStd[9]={1,2,4,8,16,32,64,128,256};
+    	int isoGainStd[MAX_ISO_STEP]={1,2,4,8,16,32,64,128,256,512,1024,2048,4096};
     	int isoGain=int(frameiso[j]);
     	int isoGainLow=0;//向下一个isoGain,用做参数插值：y=float(isoGainHig-isoGain)/float(isoGainHig-isoGainLow)*y[isoLevelLow]
     	//									+float(isoGain-isoGainLow)/float(isoGainHig-isoGainLow)*y[isoLevelHig];
@@ -127,7 +127,7 @@ ANRresult_t selsec_hdr_parmas_by_ISO(RKAnr_Bayernr_Params_t *stBayerNrParams, RK
     	int isoLevelHig=0;
     	int isoLevelCorrect=0;
 
-    	for (i=0; i<8; i++)
+    	for (i=0; i<MAX_ISO_STEP-1; i++)
     	{
     		if (isoGain>=isoGainStd[i] && isoGain<=isoGainStd[i+1])
     		{
@@ -227,7 +227,7 @@ ANRresult_t select_bayernr_params_by_ISO(RKAnr_Bayernr_Params_t *stBayerNrParams
 	//共有7个iso等级：50 100 200 400 800 1600 3200  6400 12800
 	//		 isogain: 1   2   4   8   16   32  64  128  256
 	//	 	isolevel: 0   1   2   3   4    5   6   7    8
-	int isoGainStd[9]={1,2,4,8,16,32,64,128,256};
+	int isoGainStd[MAX_ISO_STEP]={1,2,4,8,16,32,64,128,256,512,1024,2048,4096};
 	int isoGain=MAX(int(iso/50),1);
 	int isoGainLow=0;//向下一个isoGain,用做参数插值：y=float(isoGainHig-isoGain)/float(isoGainHig-isoGainLow)*y[isoLevelLow]
 	//									+float(isoGain-isoGainLow)/float(isoGainHig-isoGainLow)*y[isoLevelHig];
@@ -239,7 +239,7 @@ ANRresult_t select_bayernr_params_by_ISO(RKAnr_Bayernr_Params_t *stBayerNrParams
 	int isoLevelCorrect=0;
 	int i, j;
 	
-	for (i=0; i<8; i++)
+	for (i=0; i< MAX_ISO_STEP - 1; i++)
 	{
 		if (isoGain>=isoGainStd[i] && isoGain<=isoGainStd[i+1])
 		{
@@ -418,12 +418,29 @@ ANRresult_t bayernr_fix_tranfer(RKAnr_Bayernr_Params_Select_t* rawnr, RKAnr_Baye
 	pRawnrCfg->filtpar0 = (unsigned short)(rawnr->filtPar[0] * (1<<FIXNLMCALC));
 	pRawnrCfg->filtpar1 = (unsigned short)(rawnr->filtPar[1] * (1<<FIXNLMCALC));
 	pRawnrCfg->filtpar2 = (unsigned short)(rawnr->filtPar[2] * (1<<FIXNLMCALC));
-	
+	if(pRawnrCfg->filtpar0 > 0x3fff){
+		pRawnrCfg->filtpar0 =  0x3fff;
+	}
+	if(pRawnrCfg->filtpar1 > 0x3fff){
+		pRawnrCfg->filtpar1 =  0x3fff;
+	}
+	if(pRawnrCfg->filtpar2 > 0x3fff){
+		pRawnrCfg->filtpar2 =  0x3fff;
+	}
 
 	//(0x0014 - 0x0001c)
 	pRawnrCfg->dgain0 = (unsigned int)(rawnr->sw_dgain[0] * (1<<FIXNLMCALC));
 	pRawnrCfg->dgain1 = (unsigned int)(rawnr->sw_dgain[1] * (1<<FIXNLMCALC));
 	pRawnrCfg->dgain2 = (unsigned int)(rawnr->sw_dgain[2] * (1<<FIXNLMCALC));
+	if(pRawnrCfg->dgain0 > 0x3ffff){
+		pRawnrCfg->dgain0 =  0x3ffff;
+	}
+	if(pRawnrCfg->dgain1 > 0x3ffff){
+		pRawnrCfg->dgain1 =  0x3ffff;
+	}
+	if(pRawnrCfg->dgain2 > 0x3ffff){
+		pRawnrCfg->dgain2 =  0x3ffff;
+	}
 	
 
 	//(0x0020 - 0x0002c)

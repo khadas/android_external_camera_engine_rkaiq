@@ -2,7 +2,7 @@
 #define _RK_AIQ_CALIB_TYPES_H_
 #include "rk_aiq_algo_des.h"
 
-#define CALIBDB_MAX_ISO_LEVEL 9
+#define CALIBDB_MAX_ISO_LEVEL 13
 #define CALIBDB_NR_SHARP_MAX_ISO_LEVEL CALIBDB_MAX_ISO_LEVEL
 #define CALIBDB_DPCC_MAX_ISO_LEVEL CALIBDB_MAX_ISO_LEVEL
 #define CALIBDB_BLC_MAX_ISO_LEVEL CALIBDB_MAX_ISO_LEVEL
@@ -39,6 +39,12 @@ typedef enum _CalibDb_AeStrategyMode_e {
     RKAIQ_AEC_STRATEGY_MODE_HIGHLIGHT_PRIOR    = 2,
     RKAIQ_AEC_STRATEGY_MODE_MAX
 } CalibDb_AeStrategyMode_t;
+
+typedef enum _CalibDb_AeHdrMode_e {
+    RKAIQ_AEC_HDR_MODE_NORMAL             = 0,		
+    RKAIQ_AEC_HDR_MODE_AUTO_LONG_FRAME    = 1,
+    RKAIQ_AEC_HDR_MODE_LONG_FRAME         = 2,
+} CalibDb_AeHdrMode_t;
 
 typedef enum _CalibDb_AecDayNightMode_e {
     AEC_DNMODE_MIN = -1,
@@ -327,7 +333,8 @@ typedef struct CalibDb_AecInterAdjust_s {
     float       dluma_low_th;
     uint8_t     trigger_frame;
 } CalibDb_AecInterAdjust_t;
-
+#define CALID_AEC_GAIN_LEVEL_MAX_LEN  10
+#define CALID_AEC_MAX_LUMA_MAX_LEN  10
 typedef struct CalibDb_AecOverExpControl_s {
     AecDynamicSetpointName_t      name;                       /**name */
     float K1;
@@ -336,8 +343,8 @@ typedef struct CalibDb_AecOverExpControl_s {
     float OEC_Pdf_max;
     float OEC_Pdf_th;
     float OEC_Tolerance_max;
-    float* pGainLevel;
-    float* pDyMaxLuma;
+    float pGainLevel[CALID_AEC_GAIN_LEVEL_MAX_LEN];
+    float pDyMaxLuma[CALID_AEC_MAX_LUMA_MAX_LEN];
     int   array_size;
 } CalibDb_AecOverExpControl_t;
 
@@ -400,7 +407,8 @@ typedef struct CalibDb_LFrameCtrl_s
     //LframeCtrl
     float                   OEROILowTh;
     float                   LvLowTh;
-    float                   LvHighTh;
+    float                   LvHighTh;	
+    float                   LfrmModeExpTh;
     Cam1x6FloatMatrix_t     LExpLevel;
     Cam1x6FloatMatrix_t     LSetPoint;
     Cam1x6FloatMatrix_t     TargetLLLuma;
@@ -422,10 +430,12 @@ typedef struct CalibDb_SFrameCtrl_s
     Cam1x6FloatMatrix_t     SExpLevel;
     Cam1x6FloatMatrix_t     TargetHLLuma;
     Cam1x6FloatMatrix_t     SSetPoint;
+    bool                    HLROIExpandEn;
 } CalibDb_SFrameCtrl_t;
 
 typedef struct CalibDb_HdrAE_Attr_s {
-    float                           Tolerance;
+    float                           Tolerance;	
+    CalibDb_AeHdrMode_t             HdrMode;
     CalibDb_AeStrategyMode_t        StrategyMode;
     float                           Evbias;
     //ExpRatioCtrl
@@ -454,9 +464,10 @@ typedef struct CalibDb_Aec_Para_s {
     CalibDb_HdrAE_Attr_t          HdrAeCtrl;
 } CalibDb_Aec_Para_t;
 
+#define CALD_AEC_GAIN_RANGE_MAX_LEN  70
 typedef struct CalibDb_AecGainRange_s {
     int array_size;
-    float *pGainRange;
+    float pGainRange[CALD_AEC_GAIN_RANGE_MAX_LEN];
 } CalibDb_AecGainRange_t;
 
 typedef struct CalibDb_Sensor_Para_s {
@@ -468,6 +479,7 @@ typedef struct CalibDb_Sensor_Para_s {
     Cam2x1FloatMatrix_t     CISTimeRegOdevity;
     uint8_t                 CISTimeRegUnEqualEn;
     uint8_t                 CISTimeRegMin;
+    float                   CISMinFps;
     CalibDb_AeRange_t       CISAgainRange; //sensor Again or LCG range
     CalibDb_AeRange_t       CISExtraAgainRange; //add for HDR-DCG MODE, HCG range
     CalibDb_AeRange_t       CISDgainRange; //sensor Dgain
@@ -829,7 +841,7 @@ typedef struct CalibDb_Ahdr_Para_s {
 
 typedef struct CalibDb_Blc_s {
     int enable;
-	float iso[CALIBDB_BLC_MAX_ISO_LEVEL];
+    float iso[CALIBDB_BLC_MAX_ISO_LEVEL];
     float level[4][CALIBDB_BLC_MAX_ISO_LEVEL];
 } CalibDb_Blc_t;
 
@@ -1394,10 +1406,10 @@ typedef struct CalibDb_Af_Contrast_s {
     CalibDb_Af_SS_t         Afss;                         /**< enumeration type for search strategy */
     CalibDb_Af_SearchDir_t  FullDir;
     unsigned char           FullSteps;
-    unsigned short*         FullRangeTbl;                 /**< full range search table*/
+    unsigned short          FullRangeTbl[65];                 /**< full range search table*/
     CalibDb_Af_SearchDir_t  AdaptiveDir;
     unsigned char           AdaptiveSteps;
-    unsigned short*         AdaptRangeTbl;                /**< adaptive range search table*/
+    unsigned short          AdaptRangeTbl[65];                /**< adaptive range search table*/
     float                   TrigThers;                    /**< AF trigger threshold */
 
     float                   StableThers;                  /**< AF stable threshold */
@@ -1439,16 +1451,19 @@ typedef struct CalibDb_AF_s {
 } CalibDb_AF_t;
 
 typedef struct CalibDb_ORB_s {
-    int orb_en;
+    unsigned char orb_en;
 } CalibDb_ORB_t;
 
 typedef struct CalibDb_FEC_s {
     unsigned char fec_en;
     char meshfile[256];
+    double correct_level;
 } CalibDb_FEC_t;
 
 typedef struct CalibDb_LDCH_s {
     unsigned char ldch_en;
+    char meshfile[256];
+    double correct_level;
 } CalibDb_LDCH_t;
 typedef struct {
     bool enable;

@@ -27,6 +27,8 @@
 
 RKAIQ_BEGIN_DECLARE
 
+#define NR_ISO_REG_DIV 1
+
 
 /************bayernr fix***************/
 #define FIXNLMCALC      10	    
@@ -139,6 +141,9 @@ RKAIQ_BEGIN_DECLARE
 #define RKUVNR_exp2_lut_y 7 
 #define RKUVNR_bfRatio RKUVNR_exp2_lut_y
 #define RKUVNR_gainRatio 7
+#define RKUVNR_imgBit_set 8
+#define RKUVNR_log2e 6
+
 
 
 /************ynr fix***************/
@@ -177,7 +182,13 @@ RKAIQ_BEGIN_DECLARE
 #define YNR_SIGMA_BITS  10
 
 
-
+typedef struct ANRGainState_s{
+	int gainState;
+	float gain_th0;
+	float gain_th1;
+	float gain_cur;
+	float ratio;
+}ANRGainState_t;
 
 //anr context
 typedef struct ANRContext_s{
@@ -196,6 +207,8 @@ typedef struct ANRContext_s{
 	CalibDb_MFNR_t stMfnrCalib;
 	CalibDb_UVNR_t stUvnrCalib;
 	CalibDb_YNR_t stYnrCalib;
+
+	ANRGainState_t stGainState;
 
 }ANRContext_t;
 

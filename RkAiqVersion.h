@@ -55,8 +55,19 @@
  *  - using mipi read back mode for normal mode
  *  - enable adebayer module
  *  - update dpcc setting in GC4C33 xml
+ * v0.1.4
+ * - implement module control api
+ * - calibdb fast loaded
+ * - afec dynamic control
+ * - NR: support max 4096x gain for local gain mode
+ * - add HLROIExpandEn in IQ/aiq
+ * - NR,Sharp,BLC,DPCC: support 13 levels iso value
+ * - ORB: bring up
+ * - make sure the media link correctly when streaming on
+ * - UVNR: sigmaR params change to 256/old_sigmaR
+ * - gc4c33: update iqfiles v1.0.3
  */
 
-#define RK_AIQ_VERSION "v0.1.3"
-#define RK_AIQ_RELEASE_DATE "2020-05-21"
+#define RK_AIQ_VERSION "v0.1.4"
+#define RK_AIQ_RELEASE_DATE "2020-05-29"
 #endif

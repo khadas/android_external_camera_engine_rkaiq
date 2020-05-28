@@ -1808,6 +1808,10 @@ bool RkAiqCalibParser::parseEntrySensor
             if (!parseEntrySensorFec(pchild->ToElement())) {
                 return (false);
             }
+        } else if (tagname == CALIB_SENSOR_ORB) {
+            if (!parseEntrySensorOrb(pchild->ToElement())) {
+                return (false);
+            }
         } else if (tagname == CALIB_SENSOR_SENSORINFO) {
             if (!parseEntrySensorInfo(pchild->ToElement())) {
                 return (false);
@@ -5301,6 +5305,49 @@ bool RkAiqCalibParser::parseEntrySensorAec
                     }
 
                 }
+				else if ((subTagname == CALIB_SENSOR_AEC_HDRMODE)
+                         && (subTag.isType(XmlTag::TAG_TYPE_CHAR))
+                         && (subTag.Size() > 0)) {
+                    char* value = Toupper(subTag.Value());
+                    std::string s_value(value);
+#ifdef DEBUG_LOG
+                    redirectOut << "value:" << value << std::endl;
+                    redirectOut << s_value << std::endl;
+#endif
+                    if (xmlParseReadWrite == XML_PARSER_READ)
+                    {
+                        if (s_value == CALIB_SENSOR_AEC_HDRMODE_NORMAL) {
+                            mCalibDb->aec.HdrAeCtrl.HdrMode= RKAIQ_AEC_HDR_MODE_NORMAL;
+                        }
+                        else if (s_value == CALIB_SENSOR_AEC_HDRMODE_LONGFRAME) {
+                            mCalibDb->aec.HdrAeCtrl.HdrMode = RKAIQ_AEC_HDR_MODE_LONG_FRAME;
+                        }
+						else if (s_value == CALIB_SENSOR_AEC_HDRMODE_AUTO_LONGFRAME) {
+                            mCalibDb->aec.HdrAeCtrl.HdrMode = RKAIQ_AEC_HDR_MODE_AUTO_LONG_FRAME;
+                        }
+                        else {
+                            mCalibDb->aec.HdrAeCtrl.HdrMode = RKAIQ_AEC_HDR_MODE_NORMAL;
+                            redirectOut << "invalid AEC HdrAe HdrMode (" << s_value << ")" << std::endl;
+                        }
+                    }
+                    else if (xmlParseReadWrite == XML_PARSER_WRITE)
+                    {
+                        XMLNode *pNode = (XMLNode*)psubchild;
+                        if (mCalibDb->aec.HdrAeCtrl.HdrMode == RKAIQ_AEC_HDR_MODE_NORMAL) {
+                            pNode->FirstChild()->SetValue(CALIB_SENSOR_AEC_HDRMODE_NORMAL);
+                        }
+                        else if (mCalibDb->aec.HdrAeCtrl.HdrMode == RKAIQ_AEC_HDR_MODE_LONG_FRAME) {
+                            pNode->FirstChild()->SetValue(CALIB_SENSOR_AEC_HDRMODE_LONGFRAME);
+                        }
+						else if (mCalibDb->aec.HdrAeCtrl.HdrMode == RKAIQ_AEC_HDR_MODE_AUTO_LONG_FRAME) {
+                            pNode->FirstChild()->SetValue(CALIB_SENSOR_AEC_HDRMODE_AUTO_LONGFRAME);
+                        }
+                        else {
+                            pNode->FirstChild()->SetValue(CALIB_SENSOR_AEC_HDRMODE_NORMAL);
+                            redirectOut << "(XML Write)invalid AEC HdrAe HdrMode (" << mCalibDb->aec.HdrAeCtrl.HdrMode << ")" << std::endl;
+                        }
+                    }
+                }
                 else if (subTagname == CALIB_SENSOR_AEC_HDRAECTRL_EXPRATIOCTRL) {
                     const XMLNode* psubsubchild = psubchild->ToElement()->FirstChild();
                     autoTabForward();
@@ -5402,6 +5449,10 @@ bool RkAiqCalibParser::parseEntrySensorAec
                             int no = ParseFloatArray(psubsubchild, &mCalibDb->aec.HdrAeCtrl.LframeCtrl.LvLowTh, subsubTag.Size());
                             DCT_ASSERT((no == subsubTag.Size()));
                         }
+						else if (subsubTagname == CALIB_SENSOR_AEC_HDRAECTRL_LFRMMODEEXPTH) {
+                            int no = ParseFloatArray(psubsubchild, &mCalibDb->aec.HdrAeCtrl.LframeCtrl.LfrmModeExpTh, subsubTag.Size());
+                            DCT_ASSERT((no == subsubTag.Size()));
+                        }
                         else if (subsubTagname == CALIB_SENSOR_AEC_HDRAECTRL_LEXPLEVEL) {
                             int no = ParseFloatArray(psubsubchild, mCalibDb->aec.HdrAeCtrl.LframeCtrl.LExpLevel.fCoeff, subsubTag.Size());
                             DCT_ASSERT((no == subsubTag.Size()));
@@ -5472,6 +5523,12 @@ bool RkAiqCalibParser::parseEntrySensorAec
 #endif
                         if (subsubTagname == CALIB_SENSOR_AEC_HDRAECTRL_SEXPLEVEL) {
                             int no = ParseFloatArray(psubsubchild, mCalibDb->aec.HdrAeCtrl.SframeCtrl.SExpLevel.fCoeff, subsubTag.Size());
+                            DCT_ASSERT((no == subsubTag.Size()));
+                        }
+                        else if (subsubTagname == CALIB_SENSOR_AEC_HDRAECTRL_HLROIEXPANDEN) {
+                            uint8_t temp = mCalibDb->aec.HdrAeCtrl.SframeCtrl.HLROIExpandEn;
+                            int no = ParseUcharArray(psubsubchild, &temp, subsubTag.Size());
+                            mCalibDb->aec.HdrAeCtrl.SframeCtrl.HLROIExpandEn = (temp == 0) ? false : true;
                             DCT_ASSERT((no == subsubTag.Size()));
                         }
                         else if (subsubTagname == CALIB_SENSOR_AEC_HDRAECTRL_TARGETHLLUMA) {
@@ -5862,13 +5919,9 @@ bool RkAiqCalibParser::parseEntrySensorInfo
         if (tagname == CALIB_SENSOR_SENSORINFO_GAINRANGE
                 && (tag.Size() > 0)) {
             int i = tag.Size();
-            if (xmlParseReadWrite == XML_PARSER_READ)
-                mCalibDb->sensor.GainRange.pGainRange = (float *)malloc(i * sizeof(float));
-            if(mCalibDb->sensor.GainRange.pGainRange == NULL) {
-                std::cout << "aec GainRange malloc fail!" << std::endl;
-            }
             int no = ParseFloatArray(pchild, mCalibDb->sensor.GainRange.pGainRange, i);
-            DCT_ASSERT((no == tag.Size()));
+            DCT_ASSERT((no == tag.Size()));			
+            DCT_ASSERT((no <= CALD_AEC_GAIN_RANGE_MAX_LEN));
             DCT_ASSERT(((i % 7) == 0));
             mCalibDb->sensor.GainRange.array_size = i;
         }
@@ -5897,6 +5950,11 @@ bool RkAiqCalibParser::parseEntrySensorInfo
         else if (tagname == CALIB_SENSOR_SENSORINFO_CISTIMEREG_MIN
                  && (tag.Size() > 0)) {
             int no = ParseUcharArray(pchild, &mCalibDb->sensor.CISTimeRegMin, 1);
+            DCT_ASSERT((no == tag.Size()));
+        }
+        else if (tagname == CALIB_SENSOR_SENSORINFO_CISMINFPS
+                 && (tag.Size() > 0)) {
+            int no = ParseFloatArray(pchild, &mCalibDb->sensor.CISMinFps, 1);
             DCT_ASSERT((no == tag.Size()));
         }
         else if (tagname == CALIB_SENSOR_SENSORINFO_CISAGAIN_RANGE
@@ -6341,7 +6399,7 @@ bool RkAiqCalibParser::parseEntrySensorAhdrTmoMoreSetting
     while (pchild) {
         XmlTag tag = XmlTag(pchild->ToElement());
         std::string Tagname(pchild->ToElement()->Name());
-		
+
         if ((Tagname == CALIB_SENSOR_AHDR_TMO_CLIPGAP0)
                 && (tag.isType(XmlTag::TAG_TYPE_DOUBLE))
                 && (tag.Size() > 0)) {
@@ -6396,17 +6454,17 @@ bool RkAiqCalibParser::parseEntrySensorBlc
     while (pchild) {
         XmlTag tag = XmlTag(pchild->ToElement());
         std::string tagname(pchild->ToElement()->Name());
-		
+
         if (tagname == CALIB_SENSOR_BLC_ENABLE) {
             int no = ParseIntArray(pchild, &mCalibDb->blc.enable, tag.Size());
             DCT_ASSERT((no == tag.Size()));
         } else if (tagname == CALIB_SENSOR_BLC_ISO) {
             int no = ParseFloatArray(pchild, mCalibDb->blc.iso, tag.Size());
             DCT_ASSERT((no == tag.Size()));
-        }else if (tagname == CALIB_SENSOR_BLC_BLACK_LEVEL) {
+        } else if (tagname == CALIB_SENSOR_BLC_BLACK_LEVEL) {
             int no = ParseFloatArray(pchild, (float *)mCalibDb->blc.level, tag.Size());
             DCT_ASSERT((no == tag.Size()));
-			
+
         }
         pchild = pchild->NextSibling();
     }
@@ -9678,12 +9736,6 @@ bool RkAiqCalibParser::parseEntrySensorAf
                            && (secsubtag.Size() > 0)) {
                     int ArraySize     = secsubtag.Size();
                     mCalibDb->af.contrast_af.FullSteps = ArraySize;
-                    mCalibDb->af.contrast_af.FullRangeTbl =
-                        (uint16_t *)malloc(ArraySize * sizeof(uint16_t));
-                    if(mCalibDb->af.contrast_af.FullRangeTbl == NULL) {
-                        LOGE("%s(%d): af full range table malloc fail! \n",  __FUNCTION__, __LINE__ );
-                    }
-                    MEMSET(mCalibDb->af.contrast_af.FullRangeTbl, 0, (ArraySize * sizeof( uint16_t )));
                     int no = ParseUshortArray(psecsubchild, mCalibDb->af.contrast_af.FullRangeTbl, ArraySize );
                     DCT_ASSERT((no == secsubtag.Size()));
                 } else if (secsubTagname == CALIB_SENSOR_AF_ADAPTIVE_DIR
@@ -9703,12 +9755,6 @@ bool RkAiqCalibParser::parseEntrySensorAf
                            && (secsubtag.Size() > 0)) {
                     int ArraySize     = secsubtag.Size();
                     mCalibDb->af.contrast_af.AdaptiveSteps = ArraySize;
-                    mCalibDb->af.contrast_af.AdaptRangeTbl =
-                        (uint16_t *)malloc(ArraySize * sizeof(uint16_t));
-                    if(mCalibDb->af.contrast_af.AdaptRangeTbl == NULL) {
-                        LOGE("%s(%d): af adaptive range table malloc fail! \n",  __FUNCTION__, __LINE__ );
-                    }
-                    MEMSET(mCalibDb->af.contrast_af.AdaptRangeTbl, 0, (ArraySize * sizeof( uint16_t )));
                     int no = ParseUshortArray(psecsubchild, mCalibDb->af.contrast_af.AdaptRangeTbl, ArraySize );
                     DCT_ASSERT((no == secsubtag.Size()));
                 } else if (secsubTagname == CALIB_SENSOR_AF_TRIG_THERS
@@ -9816,6 +9862,14 @@ bool RkAiqCalibParser::parseEntrySensorLdch
                 && (tag.Size() > 0)) {
             int no = ParseUcharArray(pchild, &mCalibDb->aldch.ldch_en, tag.Size());
             DCT_ASSERT((no == tag.Size()));
+        } else if (tagname == CALIB_SENSOR_LDCH_MESH_FILE) {
+            char mesh_filename[256];
+            ParseString(pchild, mCalibDb->aldch.meshfile, sizeof(mesh_filename));
+        } else if (tagname == CALIB_SENSOR_LDCH_CORRECT_LEVEL
+		   && (tag.isType(XmlTag::TAG_TYPE_DOUBLE))
+		   && (tag.Size() > 0)) {
+            int no =  ParseDoubleArray(pchild, &mCalibDb->aldch.correct_level, tag.Size());
+            DCT_ASSERT((no == tag.Size()));
         }
         pchild = pchild->NextSibling();
     }
@@ -9847,6 +9901,38 @@ bool RkAiqCalibParser::parseEntrySensorFec
         } else if (tagname == CALIB_SENSOR_FEC_MESH_FILE) {
             char mesh_filename[256];
             ParseString(pchild, mCalibDb->afec.meshfile, sizeof(mesh_filename));
+        } else if (tagname == CALIB_SENSOR_FEC_CORRECT_LEVEL
+		   && (tag.isType(XmlTag::TAG_TYPE_DOUBLE))
+		   && (tag.Size() > 0)) {
+            int no =  ParseDoubleArray(pchild, &mCalibDb->afec.correct_level, tag.Size());
+            DCT_ASSERT((no == tag.Size()));
+        }
+        pchild = pchild->NextSibling();
+    }
+    LOGD("%s(%d): (exit)\n", __FUNCTION__, __LINE__);
+    autoTabBackward();
+    return (true);
+}
+
+bool RkAiqCalibParser::parseEntrySensorOrb
+(
+    const XMLElement*   pelement,
+    void*               param
+) {
+    (void)param;
+
+    LOGD( "%s(%d): (enter)\n", __FUNCTION__, __LINE__);
+    autoTabForward();
+
+    const XMLNode* pchild = pelement->FirstChild();
+    while (pchild) {
+        XmlTag tag = XmlTag(pchild->ToElement());
+        std::string tagname(pchild->ToElement()->Name());
+        if ((tagname == CALIB_SENSOR_ORB_ENABLE)
+                && (tag.isType(XmlTag::TAG_TYPE_DOUBLE))
+                && (tag.Size() > 0)) {
+            int no = ParseUcharArray(pchild, &mCalibDb->orb.orb_en, tag.Size());
+            DCT_ASSERT((no == tag.Size()));
         }
         pchild = pchild->NextSibling();
     }

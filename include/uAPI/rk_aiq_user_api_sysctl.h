@@ -102,10 +102,10 @@ rk_aiq_uapi_sysctl_getState(const rk_aiq_sys_ctx_t* ctx);
 #endif
 
 XCamReturn
-rk_aiq_uapi_sysctl_setModuleCtl(const rk_aiq_sys_ctx_t* ctx, int32_t mod_en);
+rk_aiq_uapi_sysctl_setModuleCtl(const rk_aiq_sys_ctx_t* ctx, rk_aiq_module_id_t mId, bool mod_en);
 
 int32_t
-rk_aiq_uapi_sysctl_getModuleCtl(const rk_aiq_sys_ctx_t* ctx);
+rk_aiq_uapi_sysctl_getModuleCtl(const rk_aiq_sys_ctx_t* ctx, rk_aiq_module_id_t mId, bool *mod_en);
 
 /*!
  * \brief register customized algo lib

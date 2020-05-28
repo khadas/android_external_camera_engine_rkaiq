@@ -326,9 +326,9 @@ typedef rk_aiq_orb_algo_stat_t rk_aiq_isp_orb_stats_t;
 #endif
 typedef rk_aiq_orb_algo_meas_t rk_aiq_isp_orb_meas_t;
 typedef struct {
-    int orb_en;
-    int limit_value;
-    int max_feature;
+    unsigned char orb_en;
+    unsigned char limit_value;
+    unsigned int max_feature;
 } rk_aiq_isp_orb_t;
 
 #if 0

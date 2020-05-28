@@ -594,8 +594,10 @@ CamHwIsp20::init(const char* sns_ent_name)
     mIspLumaDev = new V4l2Device(s_info->isp_info->mipi_luma_path);
     mIspLumaDev->open();
 
+#ifndef DISABLE_PP_STATS
     mIsppStatsDev = new V4l2Device(CamHwIsp20::mIspHwInfos.ispp_info.pp_stats_path);
     mIsppStatsDev->open();
+#endif
     mIsppParamsDev = new V4l2Device (CamHwIsp20::mIspHwInfos.ispp_info.pp_input_params_path);
     mIsppParamsDev->open();
 
@@ -644,10 +646,12 @@ CamHwIsp20::init(const char* sns_ent_name)
     mPollLumathread->set_poll_callback (this);
 
 #ifndef DISABLE_PP
+#ifndef DISABLE_PP_STATS
     isp20IsppPollthread = new PollThread();
     mPollIsppthread = isp20IsppPollthread;
     mPollIsppthread->set_ispp_stats_device(mIsppStatsDev);
     mPollIsppthread->set_poll_callback (this);
+#endif
 #endif
     _state = CAM_HW_STATE_INITED;
     EXIT_CAMHW_FUNCTION();
@@ -695,36 +699,33 @@ CamHwIsp20::setupHdrLink(int hdr_mode, int isp_index, bool enable)
     else
         media_setup_link(device, src_pad_s, sink_pad, 0);
 
-    if (RK_AIQ_HDR_GET_WORKING_MODE(hdr_mode) >= RK_AIQ_WORKING_MODE_ISP_HDR2) {
-        entity = media_get_entity_by_name(device, "rkisp_rawrd0_m", strlen("rkisp_rawrd0_m"));
-        if(entity) {
-            src_pad_m = (media_pad *)media_entity_get_pad(entity, 0);
-            if (!src_pad_m) {
-                LOGE_CAMHW("get HDR source pad m failed!\n");
-                goto FAIL;
-            }
+    entity = media_get_entity_by_name(device, "rkisp_rawrd0_m", strlen("rkisp_rawrd0_m"));
+    if(entity) {
+        src_pad_m = (media_pad *)media_entity_get_pad(entity, 0);
+        if (!src_pad_m) {
+            LOGE_CAMHW("get HDR source pad m failed!\n");
+            goto FAIL;
         }
-
-        if (enable)
-            media_setup_link(device, src_pad_m, sink_pad, MEDIA_LNK_FL_ENABLED);
-        else
-            media_setup_link(device, src_pad_m, sink_pad, 0);
     }
 
-    if (RK_AIQ_HDR_GET_WORKING_MODE(hdr_mode) == RK_AIQ_WORKING_MODE_ISP_HDR3) {
-        entity = media_get_entity_by_name(device, "rkisp_rawrd1_l", strlen("rkisp_rawrd1_l"));
-        if(entity) {
-            src_pad_l = (media_pad *)media_entity_get_pad(entity, 0);
-            if (!src_pad_l) {
-                LOGE_CAMHW("get HDR source pad l failed!\n");
-                goto FAIL;
-            }
+    if (RK_AIQ_HDR_GET_WORKING_MODE(hdr_mode) >= RK_AIQ_WORKING_MODE_ISP_HDR2 && enable) {
+        media_setup_link(device, src_pad_m, sink_pad, MEDIA_LNK_FL_ENABLED);
+    } else
+        media_setup_link(device, src_pad_m, sink_pad, 0);
+
+    entity = media_get_entity_by_name(device, "rkisp_rawrd1_l", strlen("rkisp_rawrd1_l"));
+    if(entity) {
+        src_pad_l = (media_pad *)media_entity_get_pad(entity, 0);
+        if (!src_pad_l) {
+            LOGE_CAMHW("get HDR source pad l failed!\n");
+            goto FAIL;
         }
-        if (enable)
-            media_setup_link(device, src_pad_l, sink_pad, MEDIA_LNK_FL_ENABLED);
-        else
-            media_setup_link(device, src_pad_l, sink_pad, 0);
     }
+
+    if (RK_AIQ_HDR_GET_WORKING_MODE(hdr_mode) == RK_AIQ_WORKING_MODE_ISP_HDR3 && enable) {
+        media_setup_link(device, src_pad_l, sink_pad, MEDIA_LNK_FL_ENABLED);
+    } else
+        media_setup_link(device, src_pad_l, sink_pad, 0);
     media_device_unref (device);
     return XCAM_RETURN_NO_ERROR;
 FAIL:
@@ -793,7 +794,13 @@ CamHwIsp20::prepare(uint32_t width, uint32_t height, int mode, int t_delay, int 
     }
 
 #ifndef DISABLE_PP
-    mIsppParamsDev->start();
+#ifndef DISABLE_PP_STATS
+    ret = mIsppStatsDev->start();
+    if (ret < 0) {
+    	LOGE_CAMHW("start ispp stats dev err: %d\n", ret);
+    }
+#endif
+    ret = mIsppParamsDev->start();
     if (ret < 0) {
         LOGE_CAMHW("start ispp params dev err: %d\n", ret);
     }
@@ -844,7 +851,13 @@ CamHwIsp20::start()
         }
 
 #ifndef DISABLE_PP
-        mIsppParamsDev->start();
+#ifndef DISABLE_PP_STATS
+        ret = mIsppStatsDev->start();
+        if (ret < 0) {
+            LOGE("start ispp stats dev err: %d\n", ret);
+        }
+#endif
+        ret = mIsppParamsDev->start();
         if (ret < 0) {
             LOGE_CAMHW("start ispp params dev err: %d\n", ret);
         }
@@ -854,7 +867,9 @@ CamHwIsp20::start()
     mPollthread->start();
     mPollLumathread->start();
 #ifndef DISABLE_PP
+#ifndef DISABLE_PP_STATS
     mPollIsppthread->start();
+#endif
 #endif
     sensorHw->start();
     _is_exit = false;
@@ -875,12 +890,15 @@ XCamReturn CamHwIsp20::stop()
     mPollthread->stop();
     mPollLumathread->stop();
 #ifndef DISABLE_PP
+#ifndef DISABLE_PP_STATS
     mPollIsppthread->stop();
+#endif
 #endif
     // stop after pollthread, ensure that no new events
     // come into snesorHw
     sensorHw = mSensorDev.dynamic_cast_ptr<SensorHw>();
     sensorHw->stop();
+
     ret = mIspLumaDev->stop();
     if (ret < 0) {
         LOGE_CAMHW("stop isp luma dev err: %d\n", ret);
@@ -901,22 +919,23 @@ XCamReturn CamHwIsp20::stop()
         LOGE_CAMHW("stop isp params dev err: %d\n", ret);
     }
 
-#ifndef DISABLE_PP
-    mIsppParamsDev->stop();
-    if (ret < 0) {
-        LOGE_CAMHW("stop ispp params dev err: %d\n", ret);
-    }
-
-    mIsppStatsDev->stop();
-    if (ret < 0) {
-        LOGE_CAMHW("stop ispp stats dev err: %d\n", ret);
-    }
-#endif
     ret = isp20Pollthread->hdr_mipi_stop();
     if (ret < 0) {
         LOGE_CAMHW("hdr mipi stop err: %d\n", ret);
     }
 
+#ifndef DISABLE_PP
+#ifndef DISABLE_PP_STATS
+    ret = mIsppStatsDev->stop();
+    if (ret < 0) {
+	    LOGE_CAMHW("stop ispp stats dev err: %d\n", ret);
+    }
+#endif
+    ret = mIsppParamsDev->stop();
+    if (ret < 0) {
+        LOGE_CAMHW("stop ispp params dev err: %d\n", ret);
+    }
+#endif
     /* if (_hdr_mode != RK_AIQ_WORKING_MODE_NORMAL) */
     setupHdrLink(_hdr_mode, 0, false);
 
@@ -1354,7 +1373,6 @@ CamHwIsp20::setIspParamsSync(int frameId)
 
         return ret;
     }
-
     // merge all pending params
     struct isp2x_isp_params_cfg update_params;
     SmartPtr<RkAiqIspParamsProxy> aiq_results;
@@ -1467,25 +1485,77 @@ XCamReturn
 CamHwIsp20::setIsppParams(SmartPtr<RkAiqIsppParamsProxy>& isppParams)
 {
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
-    /* SmartLock locker (_mutex); */
 
     ENTER_CAMHW_FUNCTION();
     if (_is_exit) {
-        LOGD_CAMHW ("check if ia engine has stop");
+        LOGD_CAMHW ("set 3a config bypass since ia engine has stop");
         return XCAM_RETURN_BYPASS;
     }
+
+    _mutex.lock();
+    if (_pending_isppParams_queue.size() > 8) {
+        LOGD_CAMHW ("too many pending ispp params:%d !", _pending_isppParams_queue.size());
+        _pending_isppParams_queue.erase(_pending_isppParams_queue.begin());
+    }
+    _pending_isppParams_queue.push_back(isppParams);
+    _mutex.unlock();
+
+    if (_state == CAM_HW_STATE_PREPARED) {
+        LOGD_CAMHW("hdr-debug: %s: first set isppParams id[%d]\n",
+                   __func__, isppParams->data()->frame_id);
+        setIsppParamsSync(isppParams->data()->frame_id);
+    }
+
+    /* if (RK_AIQ_HDR_GET_WORKING_MODE(_hdr_mode) == RK_AIQ_WORKING_MODE_NORMAL) */
+    /*     setIspParamsSync(ispParams->data()->frame_id); */
+
+    EXIT_CAMHW_FUNCTION();
+    return ret;
+}
+
+XCamReturn
+CamHwIsp20::setIsppParamsSync(int frameId)
+{
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    ENTER_CAMHW_FUNCTION();
+
+
+    _mutex.lock();
+    if (_is_exit) {
+        LOGD_CAMHW ("check if ia engine has stop");
+        _mutex.unlock();
+        return XCAM_RETURN_BYPASS;
+    }
+
+    if (_pending_isppParams_queue.empty()) {
+        LOGW_CAMHW("no new ispp params for frame %d !", frameId);
+        _mutex.unlock();
+        return ret;
+    }
+
+    _mutex.unlock();
 
     if (mIsppParamsDev.ptr()) {
         struct rkispp_params_cfg* ispp_params;
         SmartPtr<V4l2Buffer> v4l2buf;
+        SmartPtr<RkAiqIsppParamsProxy> isppParams;
 
         ret = mIsppParamsDev->get_buffer(v4l2buf);
         if (!ret) {
             int buf_index = v4l2buf->get_buf().index;
 
             ispp_params = (struct rkispp_params_cfg*)v4l2buf->get_buf().m.userptr;
+            // merge all ispp params
+            _mutex.lock();
+            while (!_pending_isppParams_queue.empty()) {
+                isppParams = _pending_isppParams_queue.back();
+                _pending_isppParams_queue.pop_back();
+                convertAiqResultsToIsp20PpParams(*ispp_params, isppParams);
+                forceOverwriteAiqIsppCfg(*ispp_params, isppParams);
+            }
+            _mutex.unlock();
+
             LOGD("module_init_ens frome drv 0x%x\n", ispp_params->module_init_ens);
-            convertAiqResultsToIsp20PpParams(*ispp_params, isppParams);
 
 #ifdef RUNTIME_MODULE_DEBUG
             ispp_params->module_en_update &= ~g_disable_ispp_modules_en;
@@ -2309,6 +2379,22 @@ void CamHwIsp20::dumpSharpFixValue(struct rkispp_sharp_config  * pSharpCfg)
            pSharpCfg->m_ratio, pSharpCfg->h_ratio);
 
     printf("%s:(%d) exit \n", __FUNCTION__, __LINE__);
+}
+
+XCamReturn
+CamHwIsp20::setModuleCtl(rk_aiq_module_id_t moduleId, bool en)
+{
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    setModuleStatus(moduleId, en);
+    return ret;
+}
+
+XCamReturn
+CamHwIsp20::getModuleCtl(rk_aiq_module_id_t moduleId, bool &en)
+{
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    getModuleStatus(moduleId, en);
+    return ret;
 }
 
 }; //namspace RkCam

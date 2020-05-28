@@ -35,7 +35,7 @@ ANRresult_t init_ynr_params(RKAnr_Ynr_Params_s *pYnrParams, CalibDb_YNR_t* pYnrC
 	isoCurveSectValue =  (1 << (bit_calib - ISO_CURVE_POINT_BIT));//rawBit必须大于ISO_CURVE_POINT_BIT
 	isoCurveSectValue1 =  (1 << bit_calib);// - 1;//rawBit必须大于ISO_CURVE_POINT_BIT, max use (1 << bit_calib);
 	
-	for(j=0; j<9; j++){
+	for(j=0; j<MAX_ISO_STEP; j++){
 		for(i = 0; i < WAVELET_LEVEL_NUM; i++){
            pParams[j].loFreqNoiseCi[i] = pCalibdb[j].ynr_lci[i];
            pParams[j].ciISO[i*3 + 0] = pCalibdb[j].ynr_lhci[i];
@@ -300,7 +300,7 @@ ANRresult_t select_ynr_params_by_ISO(RKAnr_Ynr_Params_t *stYnrParam, RKAnr_Ynr_P
        // fix gain table bug
 	//float adj = 16 / sqrt(32.0f) / int(16 / sqrt(32.0f));
 	#ifndef RK_SIMULATOR_HW
-	float isoValue_clip = MIN(isoValue, 12800);
+	float isoValue_clip = MIN(isoValue, iso_div * (2 << MAX_ISO_STEP));
 	float gain_f = sqrt(50.0f / isoValue_clip);
 	if (gain_f < 0.5f) 
 	{

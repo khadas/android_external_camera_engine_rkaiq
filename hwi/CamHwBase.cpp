@@ -142,7 +142,7 @@ CamHwBase::setEvtsListener(IspEvtsListener* evtListener)
 XCamReturn
 CamHwBase::poll_buffer_ready (SmartPtr<VideoBuffer> &buf, int type)
 {
-    if (type == ISP_POLL_3A_STATS && mIspStatsLintener) {
+    if ((type == ISP_POLL_3A_STATS || type == ISPP_POLL_STATS) && mIspStatsLintener) {
         return mIspStatsLintener->ispStatsCb(buf);
     }
 

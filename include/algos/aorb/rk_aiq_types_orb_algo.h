@@ -6,31 +6,35 @@
 #define ORB_FEATURE_DESCRIPTOR_BITS 120
 
 typedef struct {
+    unsigned int x;
+    unsigned int y;
+    unsigned char brief[DESCRIPTOR_SIZE];
+} rk_aiq_orb_featue_point;
+
+typedef struct {
     unsigned int num_points;
-	unsigned short pXs[MAX_POINTS];
-	unsigned short pYs[MAX_POINTS];
-	unsigned char pDescriptors[MAX_POINTS * DESCRIPTOR_SIZE];
-	unsigned char pScores;
+	rk_aiq_orb_featue_point points[MAX_POINTS];
 } rk_aiq_orb_algo_stat_t;
 
 typedef struct {
+    unsigned char update;
     unsigned char orb_en;
     unsigned char limit_value;
     unsigned short max_feature;
 } rk_aiq_orb_algo_meas_t;
 
 typedef struct {
-    int row;
-    int col;
-    bool descriptor[ORB_FEATURE_DESCRIPTOR_BITS];
+    unsigned short row;
+    unsigned short col;
+    unsigned char descriptor[DESCRIPTOR_SIZE];
 } orb_point_t;
 
 typedef struct {
-    unsigned short row1;
-    unsigned short col1;
-    unsigned short row2;
-    unsigned short col2;
-    unsigned short score;
+    unsigned int row1;
+    unsigned int col1;
+    unsigned int row2;
+    unsigned int col2;
+    unsigned int score;
 } orb_matched_point_t;
 
 typedef struct{

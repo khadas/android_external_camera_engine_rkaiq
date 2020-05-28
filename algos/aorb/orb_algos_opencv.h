@@ -7,7 +7,7 @@
 
 #define HOMOGRAPHY_MATRIX_SIZE 9
 
-int push_orbpoint_cv(U32 num_points, U16* pXs, U16* pYs, vector<Point2f> m_Points);
+int push_orbpoint_cv(U32 num_points, U16* points, vector<Point2f> m_Points);
 int get_homography_matrix(
     vector<Point2f> m_queryPoints,
     vector<Point2f> m_trainPoints,

@@ -138,6 +138,7 @@ V4l2BufferProxy::v4l2_format_to_video_info (
     case V4L2_META_FMT_RK_ISP1_PARAMS:
     case V4L2_META_FMT_RK_ISP1_STAT_3A:
     case V4L2_META_FMT_RK_ISPP_PARAMS:
+    case V4L2_META_FMT_RK_ISPP_STAT:
     case V4L2_META_FMT_RK_ISP1_STAT_LUMA :
     case V4L2_PIX_FMT_FBC2:
     case V4L2_PIX_FMT_FBC0:

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><matfile>   <header type="struct" size="[1 1]">      <code_xml_parse_version index="1" type="char" size="[1 6]">         v1.0.0      </code_xml_parse_version>      <creation_date index="1" type="char" size="[1 11]">         2020-04-24      </creation_date>      <creator index="1" type="char" size="[1 2]">         sandy      </creator>      <sensor_name index="1" type="char" size="[1 7]">         IMX347      </sensor_name>      <sample_name index="1" type="char" size="[1 9]">         JSD3425-C1      </sample_name>      <generator_version index="1" type="char" size="[1 4]">         v1.0.4      </generator_version>   </header>   <sensor type="struct" size="[1 1]">
+<?xml version="1.0" encoding="utf-8"?><matfile>   <header type="struct" size="[1 1]">      <code_xml_parse_version index="1" type="char" size="[1 6]">         v1.0.0      </code_xml_parse_version>      <creation_date index="1" type="char" size="[1 11]">         2020-04-24      </creation_date>      <creator index="1" type="char" size="[1 2]">         sandy      </creator>      <sensor_name index="1" type="char" size="[1 7]">         IMX347      </sensor_name>      <sample_name index="1" type="char" size="[1 9]">         JSD3425-C1      </sample_name>      <generator_version index="1" type="char" size="[1 4]">         v1.0.7      </generator_version>   </header>   <sensor type="struct" size="[1 1]">
       <AWB index="1" type="struct" size="[1 1]">
 	 <wbBypass index="1" type="double" size="[1 1]">	   [0]	 </wbBypass>
 	<awbEnable index="1" type="double" size="[1 1]">	   [1]	 </awbEnable>
@@ -72,7 +72,7 @@
 	         <excludeRange index="1" type="cell" size="[1 7]">
 	              <cell index="1" type="struct" size="[1 1]">
 		             <Domain index="1" type="double" size="[1 1]">		                [0]		             </Domain>
-		             <mode index="1" type="double" size="[1 1]">		                [1]		             </mode>		             <window index="1" type="double" size="[1 4]">		                [244	249	228	211]		             </window>
+		             <mode index="1" type="double" size="[1 1]">		                [1]		             </mode>		             <window index="1" type="double" size="[1 4]">                        [0 0 0 0]		             </window>
                        </cell>
 	              <cell index="2" type="struct" size="[1 1]">
 		             <Domain index="1" type="double" size="[1 1]">		                [1]		             </Domain>
@@ -84,7 +84,7 @@
                        </cell>
 	              <cell index="4" type="struct" size="[1 1]">
 		             <Domain index="1" type="double" size="[1 1]">		                [1]		             </Domain>
-		             <mode index="1" type="double" size="[1 1]">		                [1]		             </mode>		             <window index="1" type="double" size="[1 4]">		                [-235 -40 237 80 ]		             </window>
+		             <mode index="1" type="double" size="[1 1]">		                [1]		             </mode>		             <window index="1" type="double" size="[1 4]">                        [0 0 0 0]		             </window>
                        </cell>
 	              <cell index="5" type="struct" size="[1 1]">
 		             <Domain index="1" type="double" size="[1 1]">		                [0]		             </Domain>
@@ -131,20 +131,20 @@
               </cell>
              <cell index="2" type="struct" size="[1 1]">                  <name index="1" type="char" size="[1 9]">                     CWF                  </name>
                   <lightURegion index="1" type="double" size="[1 5]">
-                    [57.5 66.0 123.5 123.0 57.5]
+                     [57.5 70 123 123 57.5]
                   </lightURegion>
                   <lightVRegion index="1" type="double" size="[1 5]">
-                    [93.5 70.5 123.5 125.5 93.5]
+                     [93.5 63 124.5 125.5 93.5]
                   </lightVRegion>
                   <lightXYRegion index="1" type="double" size="[1 1]">
                       <normal index="1" type="double" size="[1 4]">
-                          [-0.859653 -0.589375 -0.022346 -0.154442]
+                        [-0.859652777777777 -0.589375 -0.0223459736586233 -0.15444179262795]
                        </normal>
                       <big index="1" type="double" size="[1 4]">
-                          [-0.902986 -0.567708 -0.020366 -0.183576]
+                        [-0.902986111111111 -0.567708333333333 -0.0203659506762133 -0.183576416511978]
                        </big>
                       <small index="1" type="double" size="[1 4]">
-                          [-0.811085 -0.587708 -0.021793 -0.154442]
+                        [-0.81108500431853 -0.587708333333333 -0.0217928836047213 -0.15444179262795]
                        </small>
                   </lightXYRegion>
 	         <yuvRegion index="1" type="struct" size="[1 1]">
@@ -161,20 +161,20 @@
               </cell>
              <cell index="3" type="struct" size="[1 1]">                  <name index="1" type="char" size="[1 9]">                     D50                  </name>
                   <lightURegion index="1" type="double" size="[1 5]">
-                    [66.0 89.5 125.0 124.0 66.0]
+                     [70 91.5 125 121 70]
                   </lightURegion>
                   <lightVRegion index="1" type="double" size="[1 5]">
-                    [71.0 54.5 123.0 124.0 71.0]
+                     [63 55 123 125 63]
                   </lightVRegion>
                   <lightXYRegion index="1" type="double" size="[1 1]">
                       <normal index="1" type="double" size="[1 4]">
-                        [-0.569976864460924 -0.131027777777778 0.149963171518827 -0.162821766047572]
+                        [-0.582808564231738 -0.125629722921914 0.197169811320755 -0.295283018867925]
                        </normal>
                       <big index="1" type="double" size="[1 4]">
-                        [-0.591027777777778 -0.134421309153721 0.179380655959839 -0.184718149234278]
+                        [-0.586586901763224 -0.129408060453401 0.236792452830189 -0.329245283018868]
                        </big>
                       <small index="1" type="double" size="[1 4]">
-                          [-0.421042 -0.144375 0.151047 -0.039857]
+                        [-0.421041666666667 -0.144375 0.151047467515248 -0.0398568019093078]
                        </small>
                   </lightXYRegion>
 	         <yuvRegion index="1" type="struct" size="[1 1]">
@@ -186,25 +186,25 @@
 		         <uRefSet index="1" type="double" size="[1 1]">		            [128]		         </uRefSet>
 		         <vRefSet index="1" type="double" size="[1 1]">		            [128]		         </vRefSet>
 		         <disSet index="1" type="double" size="[1 6]">		            [36 68 196 324 580 836]		         </disSet>
-		         <tHSet index="1" type="double" size="[1 6]">		            [11	14	17	20	23	26]		         </tHSet>
+		         <tHSet index="1" type="double" size="[1 6]">                        [11 14 17 20 30 40]		         </tHSet>
                   </yuvRegion>
               </cell>
              <cell index="4" type="struct" size="[1 1]">                  <name index="1" type="char" size="[1 9]">                     D65                  </name>
                   <lightURegion index="1" type="double" size="[1 5]">
-                    [89.5 103.5 126.0 125.0 89.5]
+                     [86.5 103.5 126 124.5 86.5]
                   </lightURegion>
                   <lightVRegion index="1" type="double" size="[1 5]">
-                    [54.5 47.5 117.5 123.0 54.5]
+                     [58.5 47.5 117.5 124 58.5]
                   </lightVRegion>
                   <lightXYRegion index="1" type="double" size="[1 1]">
                       <normal index="1" type="double" size="[1 4]">
-                          [-0.133310 0.084972 0.079814 -0.109464]
+                        [-0.13331019804261 0.078400503778338 0.0798137859872414 -0.24622641509434]
                        </normal>
                       <big index="1" type="double" size="[1 4]">
-                          [-0.134421 0.070023 0.116020 -0.139686]
+                        [-0.125629722921914 0.0700231352907232 0.116019920522732 -0.268867924528302]
                        </big>
                       <small index="1" type="double" size="[1 4]">
-                          [-0.132199 0.026690 0.078682 -0.097823]
+                        [-0.132199086931499 0.02668980195739 0.0786823442830074 -0.097822561577507]
                        </small>
                   </lightXYRegion>
 	         <yuvRegion index="1" type="struct" size="[1 1]">
@@ -228,13 +228,13 @@
                   </lightVRegion>
                   <lightXYRegion index="1" type="double" size="[1 1]">
                       <normal index="1" type="double" size="[1 4]">
-                          [0.092141 0.199668 0.076837 -0.120423]
+                        [0.092140802133083 0.199667683853513 0.07683725338158 -0.120423020591023]
                        </normal>
                       <big index="1" type="double" size="[1 4]">
-                          [0.094530 0.255579 0.118283 -0.177409]
+                        [0.0859571788413098 0.255578690846279 0.1182828039312 -0.204716981132076]
                        </big>
                       <small index="1" type="double" size="[1 4]">
-                          [0.089751 0.200023 0.070262 -0.086508]
+                        [0.0897513158726289 0.200023135290723 0.0702619109158267 -0.0865081445351663]
                        </small>
                   </lightXYRegion>
 	         <yuvRegion index="1" type="struct" size="[1 1]">
@@ -288,13 +288,13 @@
                   </lightVRegion>
                   <lightXYRegion index="1" type="double" size="[1 1]">
                       <normal index="1" type="double" size="[1 4]">
-                          [-1.032431 -0.579375 0.121347 -0.052745]
+                        [-1.03243055841989 -0.579374999999999 0.121347122779103 -0.052744630071599]
                        </normal>
                       <big index="1" type="double" size="[1 4]">
-                          [-1.037014 -0.571458 0.179758 -0.045399]
+                        [-1.03701388760573 -0.582808564231738 0.191509433962264 -0.0453990964674877]
                        </big>
                       <small index="1" type="double" size="[1 4]">
-                          [-0.901458 -0.564968 0.119791 -0.059053]
+                        [-0.901458332050177 -0.564967919491768 0.119791392350686 -0.0590531575773241]
                        </small>
                   </lightXYRegion>
 	         <yuvRegion index="1" type="struct" size="[1 1]">
@@ -668,7 +668,7 @@
 	                  [0.05]
 	               </dFStep>
 	              <dFMin index="1" type="double" size="[1 1]">
-	                  [0.7]
+	                  [0.8]
 	               </dFMin>
 	              <dFMax index="1" type="double" size="[1 1]">
 	                  [0.9]
@@ -677,7 +677,7 @@
 	                  [4]
 	               </LvIIRsize>
 	              <LvVarTh index="1" type="double" size="[1 1]">
-	                  [0.04]
+	                  [0.06]
 	               </LvVarTh>
 	          </dampFactor>
 	         <LVMatrix index="1" type="double" size="[1 16]">	            [0	16	32	64	128	256	512	1024	2048	4096	8192	16384	32768	65536	131072	262144]	         </LVMatrix>
@@ -830,13 +830,13 @@
          <YRangeMode index="1" type="char" size="[1 10]">            FULL         </YRangeMode>
          <AecSpeed index="1" type="struct" size="[1 1]">
            <DampOver index="1" type="double" size="[1 1]">
-              [0.45]
+              [0.25]
            </DampOver>
            <DampUnder index="1" type="double" size="[1 1]">
               [0.45]
            </DampUnder>
            <DampDark2Bright index="1" type="double" size="[1 1]">
-              [0.45]
+              [0.15]
            </DampDark2Bright>
            <DampBright2Dark index="1" type="double" size="[1 1]">
               [0.45]
@@ -852,7 +852,7 @@
          </AecDelayFrmNum>
          <AecFrameRateMode index="1" type="struct" size="[1 1]">
             <isFpsFix index="1" type="double" size="[1 1]">
-               [0]
+               [1]
             </isFpsFix>
             <FpsValue index="1" type="double" size="[1 1]">
                [0]
@@ -894,16 +894,16 @@
          </AecGridWeight>
 	<AecRoute index="1" type="struct" size="[1 1]">            <LinearAE index="1" type="cell" size="[1 2]">
                <cell index="1" type="struct" size="[1 1]">
-		<name index="1" type="char" size="[1 8]">		    day		</name>		<TimeDot index="1" type="double" size="[1 6]">		    [0 0.01 0.02 0.03 0.03 0.03]		</TimeDot>
-		<GainDot index="1" type="double" size="[1 6]">		    [1 1 4 8 12 230]		</GainDot>
+		<name index="1" type="char" size="[1 8]">		    day		</name>		<TimeDot index="1" type="double" size="[1 6]">		    [0 0.01 0.02 0.03 0.03 0.04]		</TimeDot>
+		<GainDot index="1" type="double" size="[1 6]">		    [1 1 4 8 12 1024]		</GainDot>
 		<IspDGainDot index="1" type="double" size="[1 6]">		    [1 1 1 1 1 2]		</IspDGainDot>
 		<PIrisDot index="1" type="double" size="[1 6]">		    [2.4 2.2 2.0 1.8 1.6 1.4]		</PIrisDot>                            </cell>               <cell index="2" type="struct" size="[1 1]">
-		<name index="1" type="char" size="[1 8]">		    night		</name>		<TimeDot index="1" type="double" size="[1 6]">		    [0 0.01 0.02 0.03 0.03 0.03]		</TimeDot>
+		<name index="1" type="char" size="[1 8]">		    night		</name>		<TimeDot index="1" type="double" size="[1 6]">		    [0 0.01 0.02 0.03 0.03 0.04]		</TimeDot>
 		<GainDot index="1" type="double" size="[1 6]">		    [1 1 4 8 12 16]		</GainDot>
 		<IspDGainDot index="1" type="double" size="[1 6]">		    [1 1 1 1 1 1]		</IspDGainDot>
 		<PIrisDot index="1" type="double" size="[1 6]">		    [2.4 2.2 2.0 1.8 1.6 1.4]		</PIrisDot>                                 </cell>            </LinearAE>            <HdrAE index="1" type="cell" size="[1 2]">
 	      <cell index="1" type="struct" size="[1 1]">
-	      <name index="1" type="char" size="[1 8]">                  day               </name>	      <LTimeDot index="1" type="double" size="[1 6]">                  [0 0.03 0.03 0.03 0.03 0.04]               </LTimeDot>               <MTimeDot index="1" type="double" size="[1 6]">                  [0 0.01 0.01 0.02 0.02 0.03]               </MTimeDot>               <STimeDot index="1" type="double" size="[1 6]">                  [0 0.003 0.003 0.005 0.001 0.01]               </STimeDot>               <LGainDot index="1" type="double" size="[1 6]">                  [1 1 4 8 16 230]               </LGainDot>               <MGainDot index="1" type="double" size="[1 6]">                  [1 1 4 8 16 230]               </MGainDot>               <SGainDot index="1" type="double" size="[1 6]">                  [1 1 4 8 16 32]               </SGainDot>
+	      <name index="1" type="char" size="[1 8]">                  day               </name>	      <LTimeDot index="1" type="double" size="[1 6]">                  [0 0.03 0.03 0.03 0.03 0.04]               </LTimeDot>               <MTimeDot index="1" type="double" size="[1 6]">                  [0 0.03 0.03 0.03 0.03 0.03]               </MTimeDot>               <STimeDot index="1" type="double" size="[1 6]">                  [0 0.003 0.003 0.005 0.01 0.01]               </STimeDot>               <LGainDot index="1" type="double" size="[1 6]">                  [1 1 4 8 16 230]               </LGainDot>               <MGainDot index="1" type="double" size="[1 6]">                  [1 1 4 8 16 230]               </MGainDot>               <SGainDot index="1" type="double" size="[1 6]">                  [1 1 4 8 16 32]               </SGainDot>
 	      <LIspDGainDot index="1" type="double" size="[1 6]">                  [1 1 1 1 1 1]               </LIspDGainDot>
 	      <MIspDGainDot index="1" type="double" size="[1 6]">                  [1 1 1 1 1 1]               </MIspDGainDot>
 	      <SIspDGainDot index="1" type="double" size="[1 6]">                  [1 1 1 1 1 1]               </SIspDGainDot>	      
@@ -989,10 +989,10 @@
                     day
                  </name>
                  <ExpLevel index="1" type="double" size="[1 6]">
-                    [0.00 0.0025 0.00625 0.0125 0.0375 0.0625]
+                    [0.00 0.001 0.002 0.005 0.01 0.04]
                  </ExpLevel>
                  <DySetpoint index="1" type="double" size="[1 6]">
-                    [35 35 35 30 28 25]
+                    [38 35 35 30 30 30]
                  </DySetpoint>
               </cell>
               <cell index="2" type="struct" size="[1 1]">
@@ -1000,10 +1000,10 @@
                     night
                  </name>
                  <ExpLevel index="1" type="double" size="[1 6]">
-                    [0 0.15 0.35 0.5 0.75 1]
+                    [0.00 0.001 0.002 0.005 0.01 0.04]
                  </ExpLevel>
                  <DySetpoint index="1" type="double" size="[1 6]">
-                    [35 35 35 30 28 25]
+                    [38 35 35 30 30 30]
                  </DySetpoint>
               </cell>
            </DynamicSetpoint>
@@ -1013,16 +1013,17 @@
                  <LumaDistTh index="1" type="double" size="[1 1]">                    [10]                 </LumaDistTh>                 <ExpLevel index="1" type="double" size="[1 6]">                    [0 0.02 0.06 0.1 0.5 1]                 </ExpLevel>                 <NonOEPdfTh index="1" type="double" size="[1 6]">                    [0.05 0.1 0.2 0.5 0.7 1]                 </NonOEPdfTh>                 <LowLightPdfTh index="1" type="double" size="[1 6]">                    [0.20 0.20 0.22 0.25 0.3 0.35]                 </LowLightPdfTh>                 <TargetLLLuma index="1" type="double" size="[1 6]">                    [45 42 40 35 28 20]                 </TargetLLLuma>              </DarkROIMethod>           </BackLight>           <IntervalAdjustStrategy index="1" type="struct" size="[1 1]">              <Enable index="1" type="double" size="[1 1]">                 [0]              </Enable>              <dLuma_high_th index="1" type="double" size="[1 1]">                 [0.5]              </dLuma_high_th>              <dLuma_low_th index="1" type="double" size="[1 1]">                 [0.03]              </dLuma_low_th>              <adjust_trigger_frame index="1" type="double" size="[1 1]">                 [100]              </adjust_trigger_frame>           </IntervalAdjustStrategy>
            <Hist2hal index="1" type="struct" size="[1 1]">              <Enable index="1" type="double" size="[1 1]">                 [0]              </Enable>              <LowHistBinTh index="1" type="double" size="[1 1]">                 [13]              </LowHistBinTh>           </Hist2hal>	</LinearAECtrl>         <HdrAECtrl index="1" type="struct" size="[1 1]">
             <Evbias index="1" type="double" size="[1 1]">               [0]            </Evbias>            <Tolerance index="1" type="double" size="[1 1]">               [10]            </Tolerance>
-      	   <StrategyMode index="1" type="char" size="[1 20]">                LOWLIGHT_PRIOR            </StrategyMode>
+      	   <HdrMode index="1" type="char" size="[1 20]">                NORMAL            </HdrMode>      	   <StrategyMode index="1" type="char" size="[1 20]">                LOWLIGHT_PRIOR            </StrategyMode>
 	   <ExpRatioCtrl index="1" type="struct" size="[1 1]">
               <ExpRatioType index="1" type="char" size="[1 8]">                 AUTO              </ExpRatioType>
-	     <RatioExpDot index="1" type="double" size="[1 6]">	        [0 0.1 0.3 0.5 0.7 1]	     </RatioExpDot>
+	     <RatioExpDot index="1" type="double" size="[1 6]">	        [0.00 0.0025 0.00625 0.0125 0.0375 0.0625]	     </RatioExpDot>
 	     <M2SRatioFix index="1" type="double" size="[1 6]">	        [4 4 4 4 4 4]	     </M2SRatioFix>	     <L2MRatioFix index="1" type="double" size="[1 6]">	        [4 4 4 4 4 4]	     </L2MRatioFix>	     
 	     <M2SRatioMax index="1" type="double" size="[1 6]">	        [64 64 64 64 64 64]	     </M2SRatioMax>	     <L2MRatioMax index="1" type="double" size="[1 6]">	        [32 32 30 28 26 24]	     </L2MRatioMax>
 	   </ExpRatioCtrl>
             <LumaDistTh index="1" type="double" size="[1 1]">               [10]            </LumaDistTh>            <LframeCtrl index="1" type="struct" size="[1 1]">
-	     <OEROILowTh index="1" type="double" size="[1 1]">               	[150.0]               </OEROILowTh>               <LvHighTh index="1" type="double" size="[1 1]">               	[3]               </LvHighTh>               <LvLowTh index="1" type="double" size="[1 1]">               	[0.25]               </LvLowTh>               <LExpLevel index="1" type="double" size="[1 6]">                  [0.00 0.0025 0.00625 0.0125 0.0375 0.0625]               </LExpLevel>               <LSetPoint index="1" type="double" size="[1 6]">                  [75 75 70 60 45 40]               </LSetPoint>               <TargetLLLuma index="1" type="double" size="[1 6]">                  [35 32 30 28 25 20]               </TargetLLLuma>               <NonOEPdfTh index="1" type="double" size="[1 6]">               	[0.4 0.45 0.5 0.6 0.7 0.8]               </NonOEPdfTh>               <LowLightPdfTh index="1" type="double" size="[1 6]">               	[0.20 0.20 0.22 0.25 0.3 0.35]               </LowLightPdfTh>             </LframeCtrl>
-            <MframeCtrl index="1" type="struct" size="[1 1]">               <MExpLevel index="1" type="double" size="[1 6]">                  [0.05 0.1 0.2 0.5 0.7 1]               </MExpLevel>               <MSetPoint index="1" type="double" size="[1 6]">                  [60 60 55 50 45 40]               </MSetPoint>            </MframeCtrl>            <SframeCtrl index="1" type="struct" size="[1 1]">               <SExpLevel index="1" type="double" size="[1 6]">                  [0 0.05 0.1 0.2 0.3 0.5]               </SExpLevel>               <TargetHLLuma index="1" type="double" size="[1 6]">                  [100 100 100 90 80 70]               </TargetHLLuma>               <SSetPoint index="1" type="double" size="[1 6]">                  [18 18 15 12 12 12]               </SSetPoint>               <HLLumaTolerance index="1" type="double" size="[1 1]">                  [12]               </HLLumaTolerance>            </SframeCtrl>         </HdrAECtrl>      </AEC>
+	     <OEROILowTh index="1" type="double" size="[1 1]">               	[150.0]               </OEROILowTh>               <LvHighTh index="1" type="double" size="[1 1]">               	[3]               </LvHighTh>               <LvLowTh index="1" type="double" size="[1 1]">               	[0.25]               </LvLowTh>               <LfrmModeExpTh index="1" type="double" size="[1 1]">               	[0.62]               </LfrmModeExpTh>               <LExpLevel index="1" type="double" size="[1 6]">                  [0.00 0.0025 0.00625 0.0125 0.0375 0.0625]               </LExpLevel>               <LSetPoint index="1" type="double" size="[1 6]">                  [75 75 70 60 45 40]               </LSetPoint>               <TargetLLLuma index="1" type="double" size="[1 6]">                  [35 32 30 28 25 20]               </TargetLLLuma>               <NonOEPdfTh index="1" type="double" size="[1 6]">               	[0.4 0.45 0.5 0.6 0.7 0.8]               </NonOEPdfTh>               <LowLightPdfTh index="1" type="double" size="[1 6]">               	[0.20 0.20 0.22 0.25 0.3 0.35]               </LowLightPdfTh>             </LframeCtrl>
+            <MframeCtrl index="1" type="struct" size="[1 1]">               <MExpLevel index="1" type="double" size="[1 6]">                  [0.05 0.1 0.2 0.5 0.7 1]               </MExpLevel>               <MSetPoint index="1" type="double" size="[1 6]">                  [60 60 55 50 45 40]               </MSetPoint>            </MframeCtrl>            <SframeCtrl index="1" type="struct" size="[1 1]">               <SExpLevel index="1" type="double" size="[1 6]">                  [0 0.05 0.1 0.2 0.3 0.5]               </SExpLevel>               <TargetHLLuma index="1" type="double" size="[1 6]">                  [100 100 100 90 80 70]               </TargetHLLuma>               <SSetPoint index="1" type="double" size="[1 6]">                  [18 18 15 12 12 12]               </SSetPoint>               <HLLumaTolerance index="1" type="double" size="[1 1]">                  [12]               </HLLumaTolerance>
+               <HLROIExpandEn index="1" type="double" size="[1 1]">                  [0]               </HLROIExpandEn>            </SframeCtrl>         </HdrAECtrl>      </AEC>
       <AF index="1" type="struct" size="[1 1]">         <Window index="1" type="struct" size="[1 1]">            <h_offs index="1" type="double" size="[1 1]">               [0]            </h_offs>            <v_offs index="1" type="double" size="[1 1]">               [0]            </v_offs>            <h_size index="1" type="double" size="[1 1]">               [0]            </h_size>            <v_size index="1" type="double" size="[1 1]">               [0]            </v_size>         </Window>
          <fixed_mode index="1" type="struct" size="[1 1]">            <code index="1" type="double" size="[1 1]">               [8]            </code>         </fixed_mode>
          <macro_mode index="1" type="struct" size="[1 1]">            <code index="1" type="double" size="[1 1]">               [32]            </code>         </macro_mode>
@@ -1039,118 +1040,118 @@
               <EnvLv index="1" type="double" size="[1 6]">                  [0 0.2 0.4 0.6 0.8 1.0]               </EnvLv> 		<Tolerance index="1" type="double" size="[1 1]">                    [0]                 </Tolerance>                 <TmoContrast index="1" type="double" size="[1 6]">                    [0.8 0.8 0.8 0.8 0.8 0.8]                 </TmoContrast>         </TmoContrast>         <MoreSetting index="1" type="struct" size="[1 1]">                 <clipgap0 index="1" type="double" size="[1 1]">                     [12]                 </clipgap0>		<clipgap1 index="1" type="double" size="[1 1]">                     [12]                 </clipgap1>		<clipratio0 index="1" type="double" size="[1 1]">                     [64]                 </clipratio0>		<clipratio1 index="1" type="double" size="[1 1]">                     [166]                 </clipratio1>		<Damp index="1" type="double" size="[1 1]">                     [0.3]                 </Damp>         </MoreSetting>         </Tmo>      </AHDR>
       <BLC index="1" type="struct" size="[1 1]">
 	<Enable index="1" type="double" size="[1 1]">            [1]         </Enable>
-	<ISO index="1" type="double" size="[1 9]">            [50 100 200 400 800 1600 3200 6400 12800]         </ISO>         <black_level index="1" type="double" size="[4 9]">            [200 200 200 200 200 200 200 216 216	    200 200 200 200 200 200 200 216 216	    200 200 200 200 200 200 200 216 216	    200 200 200 200 200 200 200 216 216]         </black_level>      </BLC>
+	<ISO index="1" type="double" size="[1 13]">            [50 100 200 400 800 1600 3200 10000 12800 25600 51200 102400  204800]         </ISO>         <black_level index="1" type="double" size="[4 13]">            [200 200 200 200 200 200 200 200 216 216 216 216 216	    200 200 200 200 200 200 200 200 216 216 216 216 216	    200 200 200 200 200 200 200 200 216 216 216 216 216	    200 200 200 200 200 200 200 200 216 216 216 216 216]         </black_level>      </BLC>
       <DPCC index="1" type="struct" size="[1 1]">
 	<Enable index="1" type="double" size="[1 1]">            [1]         </Enable>	<Version index="1" type="char" size="[1 2]">            V1         </Version>
-         <ISO index="1" type="double" size="[1 9]">            [50 100 200 400 800 1600 3200 6400 12800]         </ISO>
-         <Stage1_enable index="1" type="double" size="[1 9]">            [1 1 1 1 1 1 1 1 1]         </Stage1_enable>
-	<grayscale_mode index="1" type="double" size="[1 9]">            [0 0 0 0 0 0 0 0 0]         </grayscale_mode>
-	<rk_out_sel index="1" type="double" size="[1 9]">            [1 1 1 1 1 1 1 1 1]         </rk_out_sel>
-	<dpcc_out_sel index="1" type="double" size="[1 9]">            [1 1 1 1 1 1 1 1 1]         </dpcc_out_sel>
-	<stage1_rb_3x3 index="1" type="double" size="[1 9]">            [0 0 0 0 0 0 0 0 0]         </stage1_rb_3x3>
-	<stage1_g_3x3 index="1" type="double" size="[1 9]">            [0 0 0 0 0 0 0 0 0]         </stage1_g_3x3>
-	<stage1_inc_rb_center index="1" type="double" size="[1 9]">            [1 1 1 1 1 1 1 1 1]         </stage1_inc_rb_center>
-	<stage1_inc_g_center index="1" type="double" size="[1 9]">            [1 1 1 1 1 1 1 1 1]         </stage1_inc_g_center>
-	<stage1_use_fix_set index="1" type="double" size="[1 9]">            [0 0 0 0 0 0 0 0 0]         </stage1_use_fix_set>
-	<stage1_use_set3 index="1" type="double" size="[1 9]">            [0 0 0 0 0 0 0 0 0]         </stage1_use_set3>
-	<stage1_use_set2 index="1" type="double" size="[1 9]">            [1 1 1 1 1 1 1 1 1]         </stage1_use_set2>
-	<stage1_use_set1 index="1" type="double" size="[1 9]">            [0 0 0 0 0 0 0 0 0]         </stage1_use_set1>
+         <ISO index="1" type="double" size="[1 13]">            [50 100 200 400 800 1600 3200 6400 12800 25600 51200 102400  204800]         </ISO>
+         <Stage1_enable index="1" type="double" size="[1 13]">            [1 1 1 1 1 1 1 1 1 1 1 1 1]         </Stage1_enable>
+	<grayscale_mode index="1" type="double" size="[1 13]">            [0 0 0 0 0 0 0 0 0 0 0 0 0]         </grayscale_mode>
+	<rk_out_sel index="1" type="double" size="[1 13]">            [1 1 1 1 1 1 1 1 1 1 1 1 1]         </rk_out_sel>
+	<dpcc_out_sel index="1" type="double" size="[1 13]">            [1 1 1 1 1 1 1 1 1 1 1 1 1]         </dpcc_out_sel>
+	<stage1_rb_3x3 index="1" type="double" size="[1 13]">            [0 0 0 0 0 0 0 0 0 0 0 0 0 ]         </stage1_rb_3x3>
+	<stage1_g_3x3 index="1" type="double" size="[1 13]">            [0 0 0 0 0 0 0 0 0 0 0 0 0]         </stage1_g_3x3>
+	<stage1_inc_rb_center index="1" type="double" size="[1 13]">            [1 1 1 1 1 1 1 1 1 1 1 1 1]         </stage1_inc_rb_center>
+	<stage1_inc_g_center index="1" type="double" size="[1 13]">            [1 1 1 1 1 1 1 1 1 1 1 1 1]         </stage1_inc_g_center>
+	<stage1_use_fix_set index="1" type="double" size="[1 13]">            [0 0 0 0 0 0 0 0 0 0 0 0 0]         </stage1_use_fix_set>
+	<stage1_use_set3 index="1" type="double" size="[1 13]">            [0 0 0 0 0 0 0 0 0 0 0 0 0]         </stage1_use_set3>
+	<stage1_use_set2 index="1" type="double" size="[1 13]">            [1 1 1 1 1 1 1 1 1 1 1 1 1]         </stage1_use_set2>
+	<stage1_use_set1 index="1" type="double" size="[1 13]">            [0 0 0 0 0 0 0 0 0 0 0 0 0]         </stage1_use_set1>
 	<set_cell index="1" type="cell" size="[1 3]">
 	  <cell index="1" type="struct" size="[1 1]">
-		<red_blue_enable index="1" type="double" size="[6 9]">            	[0 0 0 0 0 0 0 0 0
-		1 1 1 1 1 1 1 1 1
-		1 1 1 1 1 1 1 1 1
-		1 1 1 1 1 1 1 1 1
-		0 0 0 0 0 0 0 0 0
-		1 1 1 1 1 1 1 1 1]         	</red_blue_enable>
-		<green_enable index="1" type="double" size="[6 9]">           	 [0 0 0 0 0 0 0 0 0
-		1 1 1 1 1 1 1 1 1
-		1 1 1 1 1 1 1 1 1
-		1 1 1 1 1 1 1 1 1
-		0 0 0 0 0 0 0 0 0
-		1 1 1 1 1 1 1 1 1]         	</green_enable>
-		<line_thresh index="1" type="double" size="[4 9]">           	 [0 0 0 0 0 0 0 0 0
-		0 0 0 0 0 0 0 0 0
-		8 8 8 8 8 8 8 8 8
-		8 8 8 8 8 8 8 8 8]         	</line_thresh>
-		<line_mad_fac index="1" type="double" size="[4 9]">           	 [0 0 0 0 0 0 0 0 0
-		0 0 0 0 0 0 0 0 0
-		4 4 4 4 4 4 4 4 4
-		4 4 4 4 4 4 4 4 4]         	</line_mad_fac>
-		<pg_fac index="1" type="double" size="[2 9]">           	 [8 8 8 8 8 8 8 8 8
-		8 8 8 8 8 8 8 8 8]         	</pg_fac>
-		<rnd_thresh index="1" type="double" size="[2 9]">           	 [10 10 10 10 10 10 10 10 10
-		10 10 10 10 10 10 10 10 10]         	</rnd_thresh>
-		<rg_fac index="1" type="double" size="[2 9]">           	 [32 32 32 32 32 32 32 32 32
-		32 32 32 32 32 32 32 32 32]         	</rg_fac>
-		<rg_lim index="1" type="double" size="[2 9]">           	 [1 1 1 1 1 1 1 1 1
-		1 1 1 1 1 1 1 1 1]         	</rg_lim>
-		<rnd_offs index="1" type="double" size="[2 9]">           	 [2 2 2 2 2 2 2 2 2
-		2 2 2 2 2 2 2 2 2]         	</rnd_offs>
+		<red_blue_enable index="1" type="double" size="[6 13]">                 [0 0 0 0 0 0 0 0 0 0 0 0 0 
+		1 1 1 1 1 1 1 1 1 1 1 1 1
+		1 1 1 1 1 1 1 1 1 1 1 1 1
+		1 1 1 1 1 1 1 1 1 1 1 1 1
+		0 0 0 0 0 0 0 0 0 0 0 0 0
+		1 1 1 1 1 1 1 1 1 1 1 1 1]         	</red_blue_enable>
+		<green_enable index="1" type="double" size="[6 13]">                 [0 0 0 0 0 0 0 0 0 0 0 0 0
+		1 1 1 1 1 1 1 1 1 1 1 1 1
+		1 1 1 1 1 1 1 1 1 1 1 1 1
+		1 1 1 1 1 1 1 1 1 1 1 1 1
+		0 0 0 0 0 0 0 0 0 0 0 0 0
+		1 1 1 1 1 1 1 1 1 1 1 1 1]         	</green_enable>
+		<line_thresh index="1" type="double" size="[4 13]">           	 [0 0 0 0 0 0 0 0 0 0 0 0 0
+		0 0 0 0 0 0 0 0 0 0 0 0 0 
+		8 8 8 8 8 8 8 8 8 8 8 8 8
+		8 8 8 8 8 8 8 8 8 8 8 8 8]         	</line_thresh>
+		<line_mad_fac index="1" type="double" size="[4 13]">           	 [0 0 0 0 0 0 0 0 0 0 0 0 0
+		0 0 0 0 0 0 0 0 0 0 0 0 0 
+		4 4 4 4 4 4 4 4 4 4 4 4 4
+		4 4 4 4 4 4 4 4 4 4 4 4 4]         	</line_mad_fac>
+		<pg_fac index="1" type="double" size="[2 13]">           	 [8 8 8 8 8 8 8 8 8 8 8 8 8
+		8 8 8 8 8 8 8 8 8 8 8 8 8]         	</pg_fac>
+		<rnd_thresh index="1" type="double" size="[2 13]">           	 [10 10 10 10 10 10 10 10 10 10 10 10 10
+		10 10 10 10 10 10 10 10 10 10 10 10 10]         	</rnd_thresh>
+		<rg_fac index="1" type="double" size="[2 13]">           	 [32 32 32 32 32 32 32 32 32 32 32 32 32
+		32 32 32 32 32 32 32 32 32 32 32 32 32]         	</rg_fac>
+		<rg_lim index="1" type="double" size="[2 13]">           	 [1 1 1 1 1 1 1 1 1 1 1 1 1 
+		1 1 1 1 1 1 1 1 1 1 1 1 1 ]         	</rg_lim>
+		<rnd_offs index="1" type="double" size="[2 13]">           	 [2 2 2 2 2 2 2 2 2 2 2 2 2
+		2 2 2 2 2 2 2 2 2 2 2 2 2]         	</rnd_offs>
 	  </cell>
 	  <cell index="2" type="struct" size="[1 1]">
-		<red_blue_enable index="1" type="double" size="[6 9]">            	[1 1 1 1 1 1 1 1 1
-		0 0 0 0 0 0 0 0 0
-		0 0 0 0 0 0 0 0 0
-		1 1 1 1 1 1 1 1 1
-		1 1 1 1 1 1 1 1 1
-		1 1 1 1 1 1 1 1 1]         	</red_blue_enable>
-		<green_enable index="1" type="double" size="[6 9]">           	 [1 1 1 1 1 1 1 1 1
-		0 0 0 0 0 0 0 0 0
-		0 0 0 0 0 0 0 0 0
-		1 1 1 1 1 1 1 1 1
-		1 1 1 1 1 1 1 1 1
-		1 1 1 1 1 1 1 1 1]         	</green_enable>
-		<line_thresh index="1" type="double" size="[4 9]">           	 [20 20 20 20 20 20 20 20 20
-		20 20 20 20 20 20 20 20 20
-		20 20 20 20 20 20 20 20 20
-		20 20 20 20 20 20 20 20 20]         	</line_thresh>
-		<line_mad_fac index="1" type="double" size="[4 9]">           	 [12 12 12 12 12 12 12 12 12
-		12 12 12 12 12 12 12 12 12
-		10 10 10 10 10 10 10 10 10
-		10 10 10 10 10 10 10 10 10]         	</line_mad_fac>
-		<pg_fac index="1" type="double" size="[2 9]">           	 [5 5 5 5 5 5 5 5 5
-		4 4 4 4 4 4 4 4 4]         	</pg_fac>
-		<rnd_thresh index="1" type="double" size="[2 9]">           	 [0 0 0 0 0 0 0 0 0
-		0 0 0 0 0 0 0 0 0]         	</rnd_thresh>
-		<rg_fac index="1" type="double" size="[2 9]">           	 [0 0 0 0 0 0 0 0 0
-		0 0 0 0 0 0 0 0 0]         	</rg_fac>
-		<rg_lim index="1" type="double" size="[2 9]">           	 [2 2 2 2 2 2 2 2 2
-		2 2 2 2 2 2 2 2 2]         	</rg_lim>
-		<rnd_offs index="1" type="double" size="[2 9]">           	[0 0 0 0 0 0 0 0 0
-		0 0 0 0 0 0 0 0 0]         	</rnd_offs>
+		<red_blue_enable index="1" type="double" size="[6 13]">            	[1 1 1 1 1 1 1 1 1 1 1 1 1
+		0 0 0 0 0 0 0 0 0 0 0 0 0
+		0 0 0 0 0 0 0 0 0 0 0 0 0
+		1 1 1 1 1 1 1 1 1 1 1 1 1
+		1 1 1 1 1 1 1 1 1 1 1 1 1
+		1 1 1 1 1 1 1 1 1 1 1 1 1]         	</red_blue_enable>
+		<green_enable index="1" type="double" size="[6 13]">           	 [1 1 1 1 1 1 1 1 1 1 1 1 1
+		0 0 0 0 0 0 0 0 0 0 0 0 0
+		0 0 0 0 0 0 0 0 0 0 0 0 0
+		1 1 1 1 1 1 1 1 1 1 1 1 1
+		1 1 1 1 1 1 1 1 1 1 1 1 1
+		1 1 1 1 1 1 1 1 1 1 1 1 1]         	</green_enable>
+		<line_thresh index="1" type="double" size="[4 13]">           	 [20 20 20 20 20 20 20 20 20 20 20 20 20
+		20 20 20 20 20 20 20 20 20 20 20 20 20
+		20 20 20 20 20 20 20 20 20 20 20 20 20
+		20 20 20 20 20 20 20 20 20 20 20 20 20]         	</line_thresh>
+		<line_mad_fac index="1" type="double" size="[4 13]">           	 [12 12 12 12 12 12 12 12 12 12 12 12 12
+		12 12 12 12 12 12 12 12 12 12 12 12 12
+		10 10 10 10 10 10 10 10 10 10 10 10 10
+		10 10 10 10 10 10 10 10 10 10 10 10 10]         	</line_mad_fac>
+		<pg_fac index="1" type="double" size="[2 13]">           	 [5 5 5 5 5 5 5 5 5 5 5 5 5
+		4 4 4 4 4 4 4 4 4 4 4 4 4]         	</pg_fac>
+		<rnd_thresh index="1" type="double" size="[2 13]">           	 [0 0 0 0 0 0 0 0 0 0 0 0 0
+		0 0 0 0 0 0 0 0 0 0 0 0 0]         	</rnd_thresh>
+		<rg_fac index="1" type="double" size="[2 13]">           	 [0 0 0 0 0 0 0 0 0 0 0 0 0
+		0 0 0 0 0 0 0 0 0 0 0 0 0]         	</rg_fac>
+		<rg_lim index="1" type="double" size="[2 13]">           	 [2 2 2 2 2 2 2 2 2 2 2 2 2
+		2 2 2 2 2 2 2 2 2 2 2 2 2]         	</rg_lim>
+		<rnd_offs index="1" type="double" size="[2 13]">           	[0 0 0 0 0 0 0 0 0 0 0 0 0
+		0 0 0 0 0 0 0 0 0 0 0 0 0]         	</rnd_offs>
 	  </cell>
 	  <cell index="3" type="struct" size="[1 1]">
-		<red_blue_enable index="1" type="double" size="[6 9]">            	[0 0 0 0 0 0 0 0 0
-		1 1 1 1 1 1 1 1 1
-		1 1 1 1 1 1 1 1 1
-		1 1 1 1 1 1 1 1 1
-		1 1 1 1 1 1 1 1 1
-		1 1 1 1 1 1 1 1 1]         	</red_blue_enable>
-		<green_enable index="1" type="double" size="[6 9]">           	[0 0 0 0 0 0 0 0 0
-		1 1 1 1 1 1 1 1 1
-		1 1 1 1 1 1 1 1 1
-		1 1 1 1 1 1 1 1 1
-		1 1 1 1 1 1 1 1 1
-		1 1 1 1 1 1 1 1 1]         	</green_enable>
-		<line_thresh index="1" type="double" size="[4 9]">           	 [0 0 0 0 0 0 0 0 0
-		0 0 0 0 0 0 0 0 0
-		32 32 32 32 32 32 32 32 32
-		32 32 32 32 32 32 32 32 32]         	</line_thresh>
-		<line_mad_fac index="1" type="double" size="[4 9]">           	 [0 0 0 0 0 0 0 0 0
-		0 0 0 0 0 0 0 0 0
-		4 4 4 4 4 4 4 4 4
-		4 4 4 4 4 4 4 4 4]         	</line_mad_fac>
-		<pg_fac index="1" type="double" size="[2 9]">           	 [10 10 10 10 10 10 10 10 10
-		10 10 10 10 10 10 10 10 10]         	</pg_fac>
-		<rnd_thresh index="1" type="double" size="[2 9]">           	 [8 8 8 8 8 8 8 8 8
-		6 6 6 6 6 6 6 6 6]         	</rnd_thresh>
-		<rg_fac index="1" type="double" size="[2 9]">           	 [4 4 4 4 4 4 4 4 4
-		4 4 4 4 4 4 4 4 4]         	</rg_fac>
-		<rg_lim index="1" type="double" size="[2 9]">           	 [2 2 2 2 2 2 2 2 2
-		1 1 1 1 1 1 1 1 1]         	</rg_lim>
-		<rnd_offs index="1" type="double" size="[2 9]">           	 [2 2 2 2 2 2 2 2 2
-		2 2 2 2 2 2 2 2 2]         	</rnd_offs>
+		<red_blue_enable index="1" type="double" size="[6 13]">            	[0 0 0 0 0 0 0 0 0 0 0 0 0
+		1 1 1 1 1 1 1 1 1 1 1 1 1
+		1 1 1 1 1 1 1 1 1 1 1 1 1
+		1 1 1 1 1 1 1 1 1 1 1 1 1
+		1 1 1 1 1 1 1 1 1 1 1 1 1
+		1 1 1 1 1 1 1 1 1 1 1 1 1]         	</red_blue_enable>
+		<green_enable index="1" type="double" size="[6 13]">           	[0 0 0 0 0 0 0 0 0 0 0 0 0
+		1 1 1 1 1 1 1 1 1 1 1 1 1
+		1 1 1 1 1 1 1 1 1 1 1 1 1
+		1 1 1 1 1 1 1 1 1 1 1 1 1
+		1 1 1 1 1 1 1 1 1 1 1 1 1
+		1 1 1 1 1 1 1 1 1 1 1 1 1]         	</green_enable>
+		<line_thresh index="1" type="double" size="[4 13]">           	 [0 0 0 0 0 0 0 0 0 0 0 0 0
+		0 0 0 0 0 0 0 0 0 0 0 0 0
+		32 32 32 32 32 32 32 32 32 32 32 32 32
+		32 32 32 32 32 32 32 32 32 32 32 32 32 ]         	</line_thresh>
+		<line_mad_fac index="1" type="double" size="[4 13]">           	 [0 0 0 0 0 0 0 0 0 0 0 0 0
+		0 0 0 0 0 0 0 0 0 0 0 0 0
+		4 4 4 4 4 4 4 4 4 4 4 4 4
+		4 4 4 4 4 4 4 4 4 4 4 4 4]         	</line_mad_fac>
+		<pg_fac index="1" type="double" size="[2 13]">           	 [10 10 10 10 10 10 10 10 10 10 10 10 10
+		10 10 10 10 10 10 10 10 10 10 10 10 10]         	</pg_fac>
+		<rnd_thresh index="1" type="double" size="[2 13]">           	 [8 8 8 8 8 8 8 8 8 8 8 8 8
+		6 6 6 6 6 6 6 6 6 6 6 6 6]         	</rnd_thresh>
+		<rg_fac index="1" type="double" size="[2 13]">           	 [4 4 4 4 4 4 4 4 4 4 4 4 4
+		4 4 4 4 4 4 4 4 4 4 4 4 4]         	</rg_fac>
+		<rg_lim index="1" type="double" size="[2 13]">           	 [2 2 2 2 2 2 2 2 2 2 2 2 2
+		1 1 1 1 1 1 1 1 1 1 1 1 1]         	</rg_lim>
+		<rnd_offs index="1" type="double" size="[2 13]">           	 [2 2 2 2 2 2 2 2 2 2 2 2 2
+		2 2 2 2 2 2 2 2 2 2 2 2 2]         	</rnd_offs>
 	  </cell>
 	</set_cell>
 	<dpcc_pdaf index="1" type="struct" size="[1 1]">
@@ -1165,22 +1166,22 @@
 	   <point_forword_med index="1" type="double" size="[1 1]">              [0]           </point_forword_med>
 	</dpcc_pdaf>      </DPCC>
       <BAYERNR index="1" type="struct" size="[1 1]">
-	<Enable index="1" type="double" size="[1 1]">            [1]         </Enable>	<Version index="1" type="char" size="[1 2]">            V1         </Version>         <ISO index="1" type="double" size="[1 9]">            [50 100 200 400 800 1600 3200 6400 12800]         </ISO>
-         <filtPara index="1" type="double" size="[1 9]">            [0.05	0.05	0.07	0.09	0.12	0.15	0.20	0.25	0.3]         </filtPara>
+	<Enable index="1" type="double" size="[1 1]">            [1]         </Enable>	<Version index="1" type="char" size="[1 2]">            V1         </Version>         <ISO index="1" type="double" size="[1 13]">            [50 100 200 400 800 1600 3200 6400 12800 25600 51200 102400 204800]         </ISO>
+         <filtPara index="1" type="double" size="[1 13]">            [0.05	0.05	0.07	0.09	0.12	0.15	0.20	0.25	0.3 0.3 0.3 0.3 0.3]         </filtPara>
         <luLevel index="1" type="double" size="[1 8]">            [0 1 2 3 4 5 6 7]         </luLevel>
          <luLevelVal index="1" type="double" size="[1 8]">            [16	32	48	80	112	144	208	255]         </luLevelVal>
-         <luRatio index="1" type="double" size="[8 9]">            [1.445622	1.368280	1.370848	1.459016	1.404780	1.447028	1.500000	1.500000	1.500000
-	1.445622	1.368280	1.370848	1.459016	1.404780	1.447028	1.500000	1.500000	1.500000
-	1.445622	1.368280	1.370848	1.459016	1.404780	1.447028	1.500000	1.500000	1.500000
-	1.409554	1.368280	1.370848	1.459016	1.404780	1.447028	1.500000	1.500000	1.500000
-	1.232335	1.285998	1.284880	1.454242	1.332960	1.447028	1.386788	1.386788	1.386788
-	1.253669	1.195864	1.187041	1.246343	1.273823	1.265364	1.253669	1.253669	1.253669
-	1.000000	1.000000	1.000000	1.000000	1.000000	1.000000	1.000000	1.000000	1.000000
-	1.000000	1.000000	1.000000	1.000000	1.000000	1.000000	1.000000	1.000000	1.000000]         </luRatio>
-	<lamda index="1" type="double" size="[1 1]">            [307]         </lamda>         <fixW index="1" type="double" size="[4 9]">            [0.7	0.6	0.5	0.4	0.3	0.2	0.2	0.2	0.1
-	0.6	0.5	0.4	0.3	0.3	0.3	0.3	0.2	0.1
-	0.6	0.5	0.4	0.3	0.3	0.2	0.2	0.2	0.1
-	0.4	0.3	0.25	0.2	0.2	0.2	0.2	0.2	0.1]         </fixW>         
+         <luRatio index="1" type="double" size="[8 13]">            [1.445622	1.368280	1.370848	1.459016	1.404780	1.447028	1.500000	1.500000	1.500000  1.500000	1.500000	1.500000 1.500000
+	1.445622	1.368280	1.370848	1.459016	1.404780	1.447028	1.500000	1.500000	1.500000  1.500000	1.500000	1.500000  1.500000
+	1.445622	1.368280	1.370848	1.459016	1.404780	1.447028	1.500000	1.500000	1.500000  1.500000	1.500000	1.500000  1.500000
+	1.409554	1.368280	1.370848	1.459016	1.404780	1.447028	1.500000	1.500000	1.500000  1.500000	1.500000	1.500000  1.500000
+	1.232335	1.285998	1.284880	1.454242	1.332960	1.447028	1.386788	1.386788	1.386788  1.386788	1.386788	1.386788  1.386788
+	1.253669	1.195864	1.187041	1.246343	1.273823	1.265364	1.253669	1.253669	1.253669  1.253669	1.253669	1.253669  1.253669
+	1.000000	1.000000	1.000000	1.000000	1.000000	1.000000	1.000000	1.000000	1.000000  1.000000	1.000000	1.000000  1.000000
+	1.000000	1.000000	1.000000	1.000000	1.000000	1.000000	1.000000	1.000000	1.000000  1.000000	1.000000	1.000000  1.000000]         </luRatio>
+	<lamda index="1" type="double" size="[1 1]">            [307]         </lamda>         <fixW index="1" type="double" size="[4 13]">            [0.7	0.6	0.5	0.4	0.3	0.2	0.2	0.2  0.1  0.1  0.1  0.1  0.1
+	0.6	0.5	0.4	0.3	0.3	0.3	0.3	0.2	0.1  0.1  0.1  0.1  0.1
+	0.6	0.5	0.4	0.3	0.3	0.2	0.2	0.2	0.1  0.1  0.1  0.1  0.1
+	0.4	0.3	0.25	0.2	0.2	0.2	0.2	0.2	0.1  0.1  0.1  0.1  0.1]         </fixW>         
          <gauss_en index="1" type="char" size="[1 1]">            [1]         </gauss_en>
          <RGainOff index="1" type="double" size="[1 1]">            [0]         </RGainOff>
          <RGainFilp index="1" type="double" size="[1 1]">            [0]         </RGainFilp>
@@ -1190,7 +1191,7 @@
          <gaussWeight0 index="1" type="double" size="[1 1]">            [0.21]         </gaussWeight0>
          <gaussWeight1 index="1" type="double" size="[1 1]">            [0.56]         </gaussWeight1>
          <bilEdgeFilter index="1" type="double" size="[1 1]">            [1]         </bilEdgeFilter>
-         <bilFilterStreng index="1" type="double" size="[1 9]">            [1 1 1 1 1 1 1 1 1]         </bilFilterStreng>
+         <bilFilterStreng index="1" type="double" size="[1 13]">            [1 1 1 1 1 1 1 1 1 1 1 1 1]         </bilFilterStreng>
          <bilEdgeSoft index="1" type="double" size="[1 1]">            [2.0]         </bilEdgeSoft>
          <bilEdgeSoftRatio index="1" type="double" size="[1 1]">            [0.0]         </bilEdgeSoftRatio>
          <bilRegWgt index="1" type="double" size="[1 1]">            [0.0]         </bilRegWgt>      </BAYERNR>
@@ -1346,48 +1347,48 @@
          <matrixAll index="1" type="cell" size="[1 14]">         <cell index="1" type="struct" size="[1 5]">            <name index="1" type="char" size="[1 5]">               A_90            </name>            <illumination index="1" type="char" size="[1 1]">               A            </illumination>            <saturation index="1" type="double" size="[1 1]">               [90]            </saturation>            <ccMatrix index="1" type="double" size="[3 3]">               [1.2109   -0.1953   -0.0156   -0.2969    1.2813    0.0156    0.1172   -0.9609    1.8359]            </ccMatrix>            <ccOffsets index="1" type="double" size="[1 3]">               [0 0 0]            </ccOffsets>         </cell>         <cell index="2" type="struct" size="[1 5]">            <name index="1" type="char" size="[1 5]">               A_60            </name>            <illumination index="1" type="char" size="[1 1]">               A            </illumination>            <saturation index="1" type="double" size="[1 1]">               [60]            </saturation>            <ccMatrix index="1" type="double" size="[3 3]">               [0.9063    0.0547    0.0391   -0.1328    1.0313    0.1016    0.1641   -0.4609    1.2969]            </ccMatrix>            <ccOffsets index="1" type="double" size="[1 3]">               [0 0 0]            </ccOffsets>         </cell>         <cell index="3" type="struct" size="[1 5]">            <name index="1" type="char" size="[1 5]">               D50_90            </name>            <illumination index="1" type="char" size="[1 1]">               D50            </illumination>            <saturation index="1" type="double" size="[1 1]">               [90]            </saturation>            <ccMatrix index="1" type="double" size="[3 3]">               [1.3047   -0.2813   -0.0234   -0.2188    1.3281   -0.1094    0.0703   -0.4219    1.3516]            </ccMatrix>            <ccOffsets index="1" type="double" size="[1 3]">               [0 0 0]            </ccOffsets>         </cell>         <cell index="4" type="struct" size="[1 5]">            <name index="1" type="char" size="[1 5]">               D50_60            </name>            <illumination index="1" type="char" size="[1 1]">               D50            </illumination>            <saturation index="1" type="double" size="[1 1]">               [60]            </saturation>            <ccMatrix index="1" type="double" size="[3 3]">               [0.9609    0.0313    0.0078   -0.0547    1.1094   -0.0547    0.1406   -0.0469    0.9063]            </ccMatrix>            <ccOffsets index="1" type="double" size="[1 3]">               [0 0 0]            </ccOffsets>         </cell>         <cell index="5" type="struct" size="[1 5]">            <name index="1" type="char" size="[1 5]">               D65_90            </name>            <illumination index="1" type="char" size="[1 1]">               D65            </illumination>            <saturation index="1" type="double" size="[1 1]">               [90]            </saturation>            <ccMatrix index="1" type="double" size="[3 3]">               [1.3828   -0.3516   -0.0313   -0.1875    1.3516   -0.1641    0.0703   -0.3359    1.2656]            </ccMatrix>            <ccOffsets index="1" type="double" size="[1 3]">               [0 0 0]            </ccOffsets>         </cell>         <cell index="6" type="struct" size="[1 5]">            <name index="1" type="char" size="[1 5]">               D65_60            </name>            <illumination index="1" type="char" size="[1 1]">               D65            </illumination>            <saturation index="1" type="double" size="[1 1]">               [60]            </saturation>            <ccMatrix index="1" type="double" size="[3 3]">               [ 1.0469   -0.0234   -0.0156   -0.0234    1.1250   -0.1016    0.1563         0    0.8438]            </ccMatrix>            <ccOffsets index="1" type="double" size="[1 3]">               [0 0 0]            </ccOffsets>         </cell>         <cell index="7" type="struct" size="[1 5]">            <name index="1" type="char" size="[1 5]">               D75_90            </name>            <illumination index="1" type="char" size="[1 1]">               D75            </illumination>            <saturation index="1" type="double" size="[1 1]">               [90]            </saturation>            <ccMatrix index="1" type="double" size="[3 3]">               [1.4688   -0.3984   -0.0625   -0.1719    1.3516   -0.1719    0.0547   -0.2734    1.2188]            </ccMatrix>            <ccOffsets index="1" type="double" size="[1 3]">               [0 0 0]            </ccOffsets>         </cell>         <cell index="8" type="struct" size="[1 5]">            <name index="1" type="char" size="[1 5]">               D75_60            </name>            <illumination index="1" type="char" size="[1 1]">               D75            </illumination>            <saturation index="1" type="double" size="[1 1]">               [60]            </saturation>            <ccMatrix index="1" type="double" size="[3 3]">               [1.0781   -0.0313   -0.0391   -0.0156    1.1484   -0.1328    0.1484    0.0391    0.8125]            </ccMatrix>            <ccOffsets index="1" type="double" size="[1 3]">               [0 0 0]            </ccOffsets>         </cell>         <cell index="9" type="struct" size="[1 5]">            <name index="1" type="char" size="[1 5]">               CWF_90            </name>            <illumination index="1" type="char" size="[1 1]">               CWF            </illumination>            <saturation index="1" type="double" size="[1 1]">               [90]            </saturation>            <ccMatrix index="1" type="double" size="[3 3]">               [1.4766   -0.4531   -0.0156   -0.2344    1.2031    0.0391    0.1172   -0.5625    1.4453]            </ccMatrix>            <ccOffsets index="1" type="double" size="[1 3]">               [0 0 0]            </ccOffsets>         </cell>         <cell index="10" type="struct" size="[1 5]">            <name index="1" type="char" size="[1 5]">               CWF_60            </name>            <illumination index="1" type="char" size="[1 1]">               CWF            </illumination>            <saturation index="1" type="double" size="[1 1]">               [60]            </saturation>            <ccMatrix index="1" type="double" size="[3 3]">               [1.1016   -0.1719    0.0703   -0.0625    0.9844    0.0781    0.1797   -0.1953    1.0156]            </ccMatrix>            <ccOffsets index="1" type="double" size="[1 3]">               [0 0 0]            </ccOffsets>         </cell>         <cell index="11" type="struct" size="[1 5]">            <name index="1" type="char" size="[1 5]">               TL84_90            </name>            <illumination index="1" type="char" size="[1 1]">               TL84            </illumination>            <saturation index="1" type="double" size="[1 1]">               [90]            </saturation>            <ccMatrix index="1" type="double" size="[3 3]">               [1.2031   -0.2188    0.0156   -0.2891    1.2969   -0.0078    0.1094   -0.6094    1.5000]            </ccMatrix>            <ccOffsets index="1" type="double" size="[1 3]">               [0 0 0]            </ccOffsets>         </cell>         <cell index="12" type="struct" size="[1 5]">            <name index="1" type="char" size="[1 5]">               TL84_60            </name>            <illumination index="1" type="char" size="[1 1]">               TL84            </illumination>            <saturation index="1" type="double" size="[1 1]">               [60]            </saturation>            <ccMatrix index="1" type="double" size="[3 3]">               [0.8750    0.0625    0.0625   -0.1328    1.0781    0.0547    0.1328   -0.1797    1.0547]            </ccMatrix>            <ccOffsets index="1" type="double" size="[1 3]">               [0 0 0]            </ccOffsets>         </cell>         <cell index="13" type="struct" size="[1 5]">            <name index="1" type="char" size="[1 5]">               HZ_90            </name>            <illumination index="1" type="char" size="[1 1]">               HZ            </illumination>            <saturation index="1" type="double" size="[1 1]">               [90]            </saturation>            <ccMatrix index="1" type="double" size="[3 3]">               [1.2578   -0.2578         0   -0.4063    1.2188    0.1875    0.0313   -1.3125    2.2813]            </ccMatrix>            <ccOffsets index="1" type="double" size="[1 3]">               [0 0 0]            </ccOffsets>         </cell>         <cell index="14" type="struct" size="[1 5]">            <name index="1" type="char" size="[1 5]">               HZ_60            </name>            <illumination index="1" type="char" size="[1 1]">               HZ            </illumination>            <saturation index="1" type="double" size="[1 1]">               [60]            </saturation>            <ccMatrix index="1" type="double" size="[3 3]">               [0.8750    0.0469    0.0781   -0.2188    1.0000    0.2188    0.0781   -0.7031    1.6172]            </ccMatrix>            <ccOffsets index="1" type="double" size="[1 3]">               [0 0 0]            </ccOffsets>         </cell>	    </matrixAll>
       </CCM>
       <UVNR index="1" type="struct" size="[1 1]">
-	<Enable index="1" type="double" size="[1 1]">            [1]         </Enable>	<Version index="1" type="char" size="[1 1]">	   V1	</Version>         <ISO index="1" type="double" size="[1 9]">            [50 100 200 400 800 1600 3200 6400 12800]         </ISO>
-         <step0_uvgrad_ratio index="1" type="double" size="[1 9]">            [40.0	40.0	40.0	50.0	60.0	60.0	60.0	60.0	60.0]         </step0_uvgrad_ratio>
-         <step0_uvgrad_offset index="1" type="double" size="[1 9]">            [0.8	0.8	0.8	0.8	0.8	0.8	0.8	0.8	0.8]         </step0_uvgrad_offset>
+	<Enable index="1" type="double" size="[1 1]">            [1]         </Enable>	<Version index="1" type="char" size="[1 1]">	   V1	</Version>         <ISO index="1" type="double" size="[1 13]">            [50 100 200 400 800 1600 3200 6400 12800 25600 51200 102400 204800]         </ISO>
+         <step0_uvgrad_ratio index="1" type="double" size="[1 13]">            [40.0	40.0	40.0	50.0	60.0	60.0	60.0	60.0	60.0  60.0	60.0	60.0 60.0]         </step0_uvgrad_ratio>
+         <step0_uvgrad_offset index="1" type="double" size="[1 13]">            [0.8	0.8	0.8	0.8	0.8	0.8	0.8	0.8	0.8  0.8	0.8	0.8  0.8]         </step0_uvgrad_offset>
          <step1_nonMed1 index="1" type="double" size="[1 4]">            [3	3	3	3]         </step1_nonMed1>
          <step1_nonBf1 index="1" type="double" size="[1 4]">            [31	31	31	31]         </step1_nonBf1>
-         <step1_downSample_w index="1" type="double" size="[1 9]">            [4	4	4	4	4	4	4	4	4]         </step1_downSample_w>
-         <step1_downSample_h index="1" type="double" size="[1 9]">            [4	4	4	4	4	4	4	4	4]         </step1_downSample_h>
-         <step1_downSample_meansize index="1" type="double" size="[1 9]">            [4	4	4	4	4	4	4	4	4]         </step1_downSample_meansize>
-         <step1_median_ratio index="1" type="double" size="[1 9]">            [0.2	0.2	0.2	0.2	0.2	0.2	0.2	0.5	0.5]         </step1_median_ratio>
-         <step1_median_size index="1" type="double" size="[1 9]">            [3	3	3	3	3	3	3	3	3]         </step1_median_size>
-         <step1_median_IIR index="1" type="double" size="[1 9]">            [0	0	0	0	0	0	0	0	0]         </step1_median_IIR>
-         <step1_bf_sigmaR index="1" type="double" size="[1 9]">            [30	25	25	25	20	20	15	10	10]         </step1_bf_sigmaR>
-         <step1_bf_uvgain index="1" type="double" size="[1 9]">            [1.5	1.5	1.5	1.5	1.5	1.5	1.5	1.5	1.0]         </step1_bf_uvgain>
-         <step1_bf_ratio index="1" type="double" size="[1 9]">            [0.00	0.00	0.00	0.00	0.00	0.00	0.00	0.00	0.00]         </step1_bf_ratio>
-         <step1_bf_size index="1" type="double" size="[1 9]">            [5	5	5	5	5	5	5	5	5]         </step1_bf_size>
-         <step1_bf_sigmaD index="1" type="double" size="[1 9]">            [16	16	16	16	16	16	16	16	16]         </step1_bf_sigmaD>
-         <step1_bf_isRowIIR index="1" type="double" size="[1 9]">            [0	0	0	0	0	0	0	0	0]         </step1_bf_isRowIIR>
-         <step1_bf_isYcopy index="1" type="double" size="[1 9]">            [1	1	1	1	1	1	1	1	1]         </step1_bf_isYcopy>
+         <step1_downSample_w index="1" type="double" size="[1 13]">            [4	4	4	4	4	4	4	4	4      4	4	4      4]         </step1_downSample_w>
+         <step1_downSample_h index="1" type="double" size="[1 13]">            [4	4	4	4	4	4	4	4	4      4	4	4      4]         </step1_downSample_h>
+         <step1_downSample_meansize index="1" type="double" size="[1 13]">            [4	4	4	4	4	4	4	4	4      4	4	4      4]         </step1_downSample_meansize>
+         <step1_median_ratio index="1" type="double" size="[1 13]">            [0.2	0.2	0.2	0.2	0.2	0.2	0.2	0.5	0.5   0.5	0.5  0.5   0.5]         </step1_median_ratio>
+         <step1_median_size index="1" type="double" size="[1 13]">            [3	3	3	3	3	3	3	3	3      3	3	3     3]         </step1_median_size>
+         <step1_median_IIR index="1" type="double" size="[1 13]">            [0	0	0	0	0	0	0	0	0      0	0	0   0]         </step1_median_IIR>
+         <step1_bf_sigmaR index="1" type="double" size="[1 13]">            [8.53	10.24	10.24	10.24	12.8	12.8	21.3	25.6	25.6  25.6	25.6  25.6	25.6]         </step1_bf_sigmaR>
+         <step1_bf_uvgain index="1" type="double" size="[1 13]">            [1.5	1.5	1.5	1.5	1.5	1.5	1.5	1.5	1.0  1.0	1.0	1.0  1.0]         </step1_bf_uvgain>
+         <step1_bf_ratio index="1" type="double" size="[1 13]">            [0.00	0.00	0.00	0.00	0.00	0.00	0.00	0.00	0.00   0.00	0.00	0.00   0.00]         </step1_bf_ratio>
+         <step1_bf_size index="1" type="double" size="[1 13]">            [5	5	5	5	5	5	5	5	5       5	5	5       5]         </step1_bf_size>
+         <step1_bf_sigmaD index="1" type="double" size="[1 13]">            [16	16	16	16	16	16	16	16	16      16	16	16     16]         </step1_bf_sigmaD>
+         <step1_bf_isRowIIR index="1" type="double" size="[1 13]">            [0	0	0	0	0	0	0	0	0       0	0	0       0]         </step1_bf_isRowIIR>
+         <step1_bf_isYcopy index="1" type="double" size="[1 13]">            [1	1	1	1	1	1	1	1	1       1	1	1      1]         </step1_bf_isYcopy>
          <step2_nonExt_block index="1" type="double" size="[1 4]">            [7	7	7	7]         </step2_nonExt_block>
          <step2_nonMed index="1" type="double" size="[1 4]">            [1	1	1	1]         </step2_nonMed>
          <step2_nonBf index="1" type="double" size="[1 4]">            [3	3	3	3]         </step2_nonBf>
-         <step2_downSample_w index="1" type="double" size="[1 9]">            [32	  32	32	32	32	32	32	32	32]         </step2_downSample_w>
-         <step2_downSample_h index="1" type="double" size="[1 9]">            [32	  32	32	32	32	32	32	32	32]         </step2_downSample_h>
-         <step2_downSample_meansize index="1" type="double" size="[1 9]">            [8	  8	8	8	8	8	8	8	8]         </step2_downSample_meansize>
-         <step2_median_ratio index="1" type="double" size="[1 9]">            [0.2 0.2 0.2 0.2 0.2 0.2 0.2 0.2 0.2 ]         </step2_median_ratio>
-         <step2_median_size index="1" type="double" size="[1 9]">            [3	3	3	3	3	3	3	3	3]         </step2_median_size>
-         <step2_median_IIR index="1" type="double" size="[1 9]">            [0	0	0	0	0	0	0	0	0]         </step2_median_IIR>
-         <step2_bf_sigmaR index="1" type="double" size="[1 9]">            [50	40	30	25	25	20	20	20	15]         </step2_bf_sigmaR>
-         <step2_bf_uvgain index="1" type="double" size="[1 9]">            [2.0  2.0	2.0	2.0	2.0	2.0	2.0	2.0	2.0]         </step2_bf_uvgain>
-         <step2_bf_ratio index="1" type="double" size="[1 9]">            [0.00	0.00	0.00	0.00	0.00	0.00	0.00	0.00	0.00]         </step2_bf_ratio>
-         <step2_bf_size index="1" type="double" size="[1 9]">            [5	5	5	5	5	5	5	5	5]         </step2_bf_size>
-         <step2_bf_sigmaD index="1" type="double" size="[1 9]">            [128 128	 128	128	128	128	128	128	128]         </step2_bf_sigmaD>
-         <step2_bf_isRowIIR index="1" type="double" size="[1 9]">            [0	0	0	0	0	0	0	0	0]         </step2_bf_isRowIIR>
-         <step2_bf_isYcopy index="1" type="double" size="[1 9]">            [1	1	1	1	1	1	1	1	1]         </step2_bf_isYcopy>
+         <step2_downSample_w index="1" type="double" size="[1 13]">            [32	  32	32	32	32	32	32	32	32    32	32	32     32]         </step2_downSample_w>
+         <step2_downSample_h index="1" type="double" size="[1 13]">            [32	  32	32	32	32	32	32	32	32    32	32	32     32]         </step2_downSample_h>
+         <step2_downSample_meansize index="1" type="double" size="[1 13]">            [8	  8	8	8	8	8	8	8	8       8	8	8       8]         </step2_downSample_meansize>
+         <step2_median_ratio index="1" type="double" size="[1 13]">            [0.2 0.2 0.2 0.2 0.2 0.2 0.2 0.2 0.2   0.2 0.2 0.2  0.2]         </step2_median_ratio>
+         <step2_median_size index="1" type="double" size="[1 13]">            [3	3	3	3	3	3	3	3	3       3	3	3     3]         </step2_median_size>
+         <step2_median_IIR index="1" type="double" size="[1 13]">            [0	0	0	0	0	0	0	0	0     0	0	0     0]         </step2_median_IIR>
+         <step2_bf_sigmaR index="1" type="double" size="[1 13]">            [5.12	6.4	8.53	10.24	10.24	12.8	12.8	12.8	17.06  17.06  17.06  17.06  17.06]         </step2_bf_sigmaR>
+         <step2_bf_uvgain index="1" type="double" size="[1 13]">            [2.0  2.0	2.0	2.0	2.0	2.0	2.0	2.0	2.0   2.0	2.0	2.0    2.0]         </step2_bf_uvgain>
+         <step2_bf_ratio index="1" type="double" size="[1 13]">            [0.00	0.00	0.00	0.00	0.00	0.00	0.00	0.00	0.00   0.00	0.00	0.00  0.00]         </step2_bf_ratio>
+         <step2_bf_size index="1" type="double" size="[1 13]">            [5	5	5	5	5	5	5	5	5      5	5	5     5]         </step2_bf_size>
+         <step2_bf_sigmaD index="1" type="double" size="[1 13]">            [128 128	 128	128	128	128	128	128	128    128	128	128   128]         </step2_bf_sigmaD>
+         <step2_bf_isRowIIR index="1" type="double" size="[1 13]">            [0	0	0	0	0	0	0	0	0      0	0	0    0]         </step2_bf_isRowIIR>
+         <step2_bf_isYcopy index="1" type="double" size="[1 13]">            [1	1	1	1	1	1	1	1	1      1	1	1    1]         </step2_bf_isYcopy>
          <step3_nonBf3 index="1" type="double" size="[1 4]">            [32	  32	32   32]         </step3_nonBf3>
-         <step3_bf_sigmaR index="1" type="double" size="[1 9]">            [75	60	45	36	30	30	25	25	25]         </step3_bf_sigmaR>
-         <step3_bf_uvgain index="1" type="double" size="[1 9]">            [4.0	4.0	4.0	3.0	3.0	3.0	3.0	2.5	2.0]         </step3_bf_uvgain>
-         <step3_bf_ratio index="1" type="double" size="[1 9]">            [1.00    1.00	1.00	1.00	1.00	1.00	1.00	1.00	1.00]         </step3_bf_ratio>
-         <step3_bf_size index="1" type="double" size="[1 9]">            [3	3	3	3	3	3	3	3	3]         </step3_bf_size>
-         <step3_bf_sigmaD index="1" type="double" size="[1 9]">            [8	8	8	8	8	8	8	8	8]         </step3_bf_sigmaD>
-         <step3_bf_isRowIIR index="1" type="double" size="[1 9]">            [0	0	0	0	0	0	0	0	0]         </step3_bf_isRowIIR>
-         <step3_bf_isYcopy index="1" type="double" size="[1 9]">            [1	1	1	1	1	1	1	1	1]         </step3_bf_isYcopy>
+         <step3_bf_sigmaR index="1" type="double" size="[1 13]">            [3.413	4.267	5.689	7.11	8.53	8.53	10.24	10.24	10.24  10.24	10.24  10.24	10.24]         </step3_bf_sigmaR>
+         <step3_bf_uvgain index="1" type="double" size="[1 13]">            [4.0	4.0	4.0	3.0	3.0	3.0	3.0	2.5	2.0   2.0  2.0   2.0   2.0]         </step3_bf_uvgain>
+         <step3_bf_ratio index="1" type="double" size="[1 13]">            [1.00    1.00	1.00	1.00	1.00	1.00	1.00	1.00	1.00   1.00	1.00	1.00     1.0]         </step3_bf_ratio>
+         <step3_bf_size index="1" type="double" size="[1 13]">            [3	3	3	3	3	3	3	3	3      3	3	3     3]         </step3_bf_size>
+         <step3_bf_sigmaD index="1" type="double" size="[1 13]">            [8	8	8	8	8	8	8	8	8      8	8	8       8]         </step3_bf_sigmaD>
+         <step3_bf_isRowIIR index="1" type="double" size="[1 13]">            [0	0	0	0	0	0	0	0	0      0	0	0     0]         </step3_bf_isRowIIR>
+         <step3_bf_isYcopy index="1" type="double" size="[1 13]">            [1	1	1	1	1	1	1	1	1      1	1	1     1]         </step3_bf_isYcopy>
          <kernel_3x3 index="1" type="double" size="[1 3]">            [1	0.8825	0.7788]         </kernel_3x3>
          <kernel_5x5 index="1" type="double" size="[1 5]">            [1	0.8825	0.7788	0.6065	0.3679]         </kernel_5x5>
          <kernel_9x9 index="1" type="double" size="[1 8]">            [1	0.8825	0.7788	0.6065	0.3679	0.1969	0.1353	0.0439 ]         </kernel_9x9>
@@ -1415,7 +1416,7 @@
          <curve_user1 index="1" type="double" size="[1 45]">            [0	6	11	17	22	28	33	39	44	55	66	77	88	109	130	150	170	210	248	286	323	393	460	525	586	702	809	909	1002	1172	1325	1462	1588	1811	2004	2174	2327	2590	2813	3006	3177	3467	3708	3915	4095]         </curve_user1>
          <curve_user2 index="1" type="double" size="[1 45]">            [0	6	11	17	22	28	33	39	44	55	66	77	88	109	130	150	170	210	248	286	323	393	460	525	586	702	809	909	1002	1172	1325	1462	1588	1811	2004	2174	2327	2590	2813	3006	3177	3467	3708	3915	4095]         </curve_user2>
       </GAMMA>
-      <YNR index="1" type="struct" size="[1 1]">	    <Enable index="1" type="double" size="[1 1]">	        [1]	    </Enable>	    <Version index="1" type="char" size="[1 1]">	        V1	    </Version>	   <YNR_ISO index="1" type="cell" size="[1 9]">
+      <YNR index="1" type="struct" size="[1 1]">	    <Enable index="1" type="double" size="[1 1]">	        [1]	    </Enable>	    <Version index="1" type="char" size="[1 1]">	        V1	    </Version>	   <YNR_ISO index="1" type="cell" size="[1 13]">
              <cell index="1" type="struct" size="[1 1]">
 	         <iso index="1" type="double" size="[1 1]">
 	            [50]
@@ -2136,7 +2137,35 @@
 	            [0.13  0.30  0.30  0.10]
 	         </hi_soft_thresh_scale>
              </cell>
-	</YNR_ISO>      </YNR>
+	    <cell index="10" type="struct" size="[1 1]">	         <iso index="1" type="double" size="[1 1]">	            [25600]	         </iso>	         <sigma_curve index="1" type="double" size="[1 5]">
+                        [-1.05718201923043e-011 1.15533347659353e-007 -5.11866877267120e-004 8.69391131782777e-001 1.44693306313769e+002 ]
+                    </sigma_curve>
+                    <ynr_lci index="1" type="double" size="[1 4]">
+                        [0.8748 0.6015 0.3611 0.2357 ]
+                    </ynr_lci>
+                    <ynr_lhci index="1" type="double" size="[1 4]">
+                        [0.8750 0.8709 0.6506 0.2839 ]
+                    </ynr_lhci>
+                    <ynr_hlci index="1" type="double" size="[1 4]">
+                        [0.8500 0.8880 0.6475 0.3047 ]
+                    </ynr_hlci>
+                    <ynr_hhci index="1" type="double" size="[1 4]">
+                        [0.7106 1.2623 1.0891 1.3043 ]
+                    </ynr_hhci>	         <lo_lumaPoint index="1" type="double" size="[1 6]">	            [0 32 64 128 192 256]	         </lo_lumaPoint>	         <lo_lumaRatio index="1" type="double" size="[1 6]">	            [1.0 1.00 1.5 1.5 1.0 1.0]	         </lo_lumaRatio>	         <lo_directionStrength index="1" type="double" size="[1 1]">	            [0.2]	         </lo_directionStrength>	         <lo_bfScale index="1" type="double" size="[1 4]">	            [0.15 0.20 0.30 0.30]	         </lo_bfScale>	         <imerge_ratio index="1" type="double" size="[1 1]">	            [0.15]	         </imerge_ratio>	         <imerge_bound index="1" type="double" size="[1 1]">	            [1.25]	         </imerge_bound>	         <denoise_weight index="1" type="double" size="[1 4]">	            [0.50 0.5 0.6 0.6]	         </denoise_weight>	         <hi_lumaPoint index="1" type="double" size="[1 6]">	            [0 32 64 128 192 256]	         </hi_lumaPoint>	         <hi_lumaRatio index="1" type="double" size="[1 6]">	            [1.3 1.30 1.5 1.5 1.0 1.0]	         </hi_lumaRatio>	         <hi_bfScale index="1" type="double" size="[1 4]">	            [0.2 0.2 0.3 0.3]	         </hi_bfScale>	         <hwith_d index="1" type="double" size="[1 4]">	            [6.00 6.00 4.0 2.0]	         </hwith_d>	         <hi_denoiseStrength index="1" type="double" size="[1 1]">	            [1.2]	         </hi_denoiseStrength>	         <hi_detailMinAdjDnW index="1" type="double" size="[1 1]">	            [0.2]	         </hi_detailMinAdjDnW>	         <hi_denoiseWeight index="1" type="double" size="[1 4]">	           [0.60 0.7 0.7 0.7]	         </hi_denoiseWeight>	         <y_luma_point index="1" type="double" size="[1 6]">	            [64	128	192	256	384	512]	         </y_luma_point>	         <hgrad_y_level1 index="1" type="double" size="[1 6]">	            [1.00	0.65	0.55	0.45	0.30	0.20]	         </hgrad_y_level1>	         <hgrad_y_level2 index="1" type="double" size="[1 6]">	            [1.00	0.65	0.55	0.45	0.30	0.20]	         </hgrad_y_level2>	         <hgrad_y_level3 index="1" type="double" size="[1 6]">	            [1.00	0.65	0.55	0.45	0.30	0.20]	         </hgrad_y_level3>	         <hgrad_y_level4 index="1" type="double" size="[1 6]">	            [1.00	0.65	0.55	0.45	0.30	0.20]	         </hgrad_y_level4>	         <hi_soft_thresh_scale index="1" type="double" size="[1 4]">	            [0.13  0.30  0.30  0.10]	         </hi_soft_thresh_scale>             </cell>	    <cell index="11" type="struct" size="[1 1]">	         <iso index="1" type="double" size="[1 1]">	            [51200]	         </iso>	         <sigma_curve index="1" type="double" size="[1 5]">
+                        [-7.33115088337282e-014 -1.55391434969020e-008 -4.22788118381590e-005 3.77873048512811e-001 3.66408125787508e+002 ]
+                    </sigma_curve>
+                    <ynr_lci index="1" type="double" size="[1 4]">
+                        [0.8615 0.6687 0.3942 0.1952 ]
+                    </ynr_lci>
+                    <ynr_lhci index="1" type="double" size="[1 4]">
+                        [0.8598 0.8889 0.6387 0.4597 ]
+                    </ynr_lhci>
+                    <ynr_hlci index="1" type="double" size="[1 4]">
+                        [0.8432 0.8766 0.6137 0.3523 ]
+                    </ynr_hlci>
+                    <ynr_hhci index="1" type="double" size="[1 4]">
+                        [0.6849 1.2270 1.2010 0.7671 ]
+                    </ynr_hhci>	         <lo_lumaPoint index="1" type="double" size="[1 6]">	            [0 32 64 128 192 256]	         </lo_lumaPoint>	         <lo_lumaRatio index="1" type="double" size="[1 6]">	            [1.0 1.00 1.5 1.5 1.0 1.0]	         </lo_lumaRatio>	         <lo_directionStrength index="1" type="double" size="[1 1]">	            [0.2]	         </lo_directionStrength>	         <lo_bfScale index="1" type="double" size="[1 4]">	            [0.15 0.20 0.30 0.30]	         </lo_bfScale>	         <imerge_ratio index="1" type="double" size="[1 1]">	            [0.15]	         </imerge_ratio>	         <imerge_bound index="1" type="double" size="[1 1]">	            [1.25]	         </imerge_bound>	         <denoise_weight index="1" type="double" size="[1 4]">	            [0.50 0.5 0.6 0.6]	         </denoise_weight>	         <hi_lumaPoint index="1" type="double" size="[1 6]">	            [0 32 64 128 192 256]	         </hi_lumaPoint>	         <hi_lumaRatio index="1" type="double" size="[1 6]">	            [1.3 1.30 1.5 1.5 1.0 1.0]	         </hi_lumaRatio>	         <hi_bfScale index="1" type="double" size="[1 4]">	            [0.2 0.2 0.3 0.3]	         </hi_bfScale>	         <hwith_d index="1" type="double" size="[1 4]">	            [6.00 6.00 4.0 2.0]	         </hwith_d>	         <hi_denoiseStrength index="1" type="double" size="[1 1]">	            [1.2]	         </hi_denoiseStrength>	         <hi_detailMinAdjDnW index="1" type="double" size="[1 1]">	            [0.2]	         </hi_detailMinAdjDnW>	         <hi_denoiseWeight index="1" type="double" size="[1 4]">	           [0.60 0.7 0.7 0.7]	         </hi_denoiseWeight>	         <y_luma_point index="1" type="double" size="[1 6]">	            [64	128	192	256	384	512]	         </y_luma_point>	         <hgrad_y_level1 index="1" type="double" size="[1 6]">	            [1.00	0.65	0.55	0.45	0.30	0.20]	         </hgrad_y_level1>	         <hgrad_y_level2 index="1" type="double" size="[1 6]">	            [1.00	0.65	0.55	0.45	0.30	0.20]	         </hgrad_y_level2>	         <hgrad_y_level3 index="1" type="double" size="[1 6]">	            [1.00	0.65	0.55	0.45	0.30	0.20]	         </hgrad_y_level3>	         <hgrad_y_level4 index="1" type="double" size="[1 6]">	            [1.00	0.65	0.55	0.45	0.30	0.20]	         </hgrad_y_level4>	         <hi_soft_thresh_scale index="1" type="double" size="[1 4]">	            [0.13  0.30  0.30  0.10]	         </hi_soft_thresh_scale>             </cell>	    <cell index="12" type="struct" size="[1 1]">	         <iso index="1" type="double" size="[1 1]">	            [102400]	         </iso>	         <sigma_curve index="1" type="double" size="[1 5]">                        [-1.2169239855818176e-011	1.2023589039673974e-007	-4.2967085436979024e-004	5.4163590215125623e-001	1.8329716640531842e+002 ]	         </sigma_curve>	         <ynr_lci index="1" type="double" size="[1 4]">                        [0.936182 0.654274 0.455860 0.403902 ]	         </ynr_lci>	         <ynr_lhci index="1" type="double" size="[1 4]">                        [0.855909 0.979829 0.691382 0.538871 ]	         </ynr_lhci>	         <ynr_hlci index="1" type="double" size="[1 4]">                        [0.885451 0.981653 0.701294 0.551322  ]	         </ynr_hlci>	         <ynr_hhci index="1" type="double" size="[1 4]">                        [0.706894 1.463291 1.102797 0.741516 ]	         </ynr_hhci>	         <lo_lumaPoint index="1" type="double" size="[1 6]">	            [0 32 64 128 192 256]	         </lo_lumaPoint>	         <lo_lumaRatio index="1" type="double" size="[1 6]">	            [1.0 1.00 1.5 1.5 1.0 1.0]	         </lo_lumaRatio>	         <lo_directionStrength index="1" type="double" size="[1 1]">	            [0.2]	         </lo_directionStrength>	         <lo_bfScale index="1" type="double" size="[1 4]">	            [0.15 0.20 0.30 0.30]	         </lo_bfScale>	         <imerge_ratio index="1" type="double" size="[1 1]">	            [0.15]	         </imerge_ratio>	         <imerge_bound index="1" type="double" size="[1 1]">	            [1.25]	         </imerge_bound>	         <denoise_weight index="1" type="double" size="[1 4]">	            [0.50 0.5 0.6 0.6]	         </denoise_weight>	         <hi_lumaPoint index="1" type="double" size="[1 6]">	            [0 32 64 128 192 256]	         </hi_lumaPoint>	         <hi_lumaRatio index="1" type="double" size="[1 6]">	            [1.3 1.30 1.5 1.5 1.0 1.0]	         </hi_lumaRatio>	         <hi_bfScale index="1" type="double" size="[1 4]">	            [0.2 0.2 0.3 0.3]	         </hi_bfScale>	         <hwith_d index="1" type="double" size="[1 4]">	            [6.00 6.00 4.0 2.0]	         </hwith_d>	         <hi_denoiseStrength index="1" type="double" size="[1 1]">	            [1.2]	         </hi_denoiseStrength>	         <hi_detailMinAdjDnW index="1" type="double" size="[1 1]">	            [0.2]	         </hi_detailMinAdjDnW>	         <hi_denoiseWeight index="1" type="double" size="[1 4]">	           [0.60 0.7 0.7 0.7]	         </hi_denoiseWeight>	         <y_luma_point index="1" type="double" size="[1 6]">	            [64	128	192	256	384	512]	         </y_luma_point>	         <hgrad_y_level1 index="1" type="double" size="[1 6]">	            [1.00	0.65	0.55	0.45	0.30	0.20]	         </hgrad_y_level1>	         <hgrad_y_level2 index="1" type="double" size="[1 6]">	            [1.00	0.65	0.55	0.45	0.30	0.20]	         </hgrad_y_level2>	         <hgrad_y_level3 index="1" type="double" size="[1 6]">	            [1.00	0.65	0.55	0.45	0.30	0.20]	         </hgrad_y_level3>	         <hgrad_y_level4 index="1" type="double" size="[1 6]">	            [1.00	0.65	0.55	0.45	0.30	0.20]	         </hgrad_y_level4>	         <hi_soft_thresh_scale index="1" type="double" size="[1 4]">	            [0.13  0.30  0.30  0.10]	         </hi_soft_thresh_scale>             </cell>	    <cell index="13" type="struct" size="[1 1]">	         <iso index="1" type="double" size="[1 1]">	            [204800]	         </iso>	         <sigma_curve index="1" type="double" size="[1 5]">                        [-1.2169239855818176e-011	1.2023589039673974e-007	-4.2967085436979024e-004	5.4163590215125623e-001	1.8329716640531842e+002 ]	         </sigma_curve>	         <ynr_lci index="1" type="double" size="[1 4]">                        [0.936182 0.654274 0.455860 0.403902 ]	         </ynr_lci>	         <ynr_lhci index="1" type="double" size="[1 4]">                        [0.855909 0.979829 0.691382 0.538871 ]	         </ynr_lhci>	         <ynr_hlci index="1" type="double" size="[1 4]">                        [0.885451 0.981653 0.701294 0.551322  ]	         </ynr_hlci>	         <ynr_hhci index="1" type="double" size="[1 4]">                        [0.706894 1.463291 1.102797 0.741516 ]	         </ynr_hhci>	         <lo_lumaPoint index="1" type="double" size="[1 6]">	            [0 32 64 128 192 256]	         </lo_lumaPoint>	         <lo_lumaRatio index="1" type="double" size="[1 6]">	            [1.0 1.00 1.5 1.5 1.0 1.0]	         </lo_lumaRatio>	         <lo_directionStrength index="1" type="double" size="[1 1]">	            [0.2]	         </lo_directionStrength>	         <lo_bfScale index="1" type="double" size="[1 4]">	            [0.15 0.20 0.30 0.30]	         </lo_bfScale>	         <imerge_ratio index="1" type="double" size="[1 1]">	            [0.15]	         </imerge_ratio>	         <imerge_bound index="1" type="double" size="[1 1]">	            [1.25]	         </imerge_bound>	         <denoise_weight index="1" type="double" size="[1 4]">	            [0.50 0.5 0.6 0.6]	         </denoise_weight>	         <hi_lumaPoint index="1" type="double" size="[1 6]">	            [0 32 64 128 192 256]	         </hi_lumaPoint>	         <hi_lumaRatio index="1" type="double" size="[1 6]">	            [1.3 1.30 1.5 1.5 1.0 1.0]	         </hi_lumaRatio>	         <hi_bfScale index="1" type="double" size="[1 4]">	            [0.2 0.2 0.3 0.3]	         </hi_bfScale>	         <hwith_d index="1" type="double" size="[1 4]">	            [6.00 6.00 4.0 2.0]	         </hwith_d>	         <hi_denoiseStrength index="1" type="double" size="[1 1]">	            [1.2]	         </hi_denoiseStrength>	         <hi_detailMinAdjDnW index="1" type="double" size="[1 1]">	            [0.2]	         </hi_detailMinAdjDnW>	         <hi_denoiseWeight index="1" type="double" size="[1 4]">	           [0.60 0.7 0.7 0.7]	         </hi_denoiseWeight>	         <y_luma_point index="1" type="double" size="[1 6]">	            [64	128	192	256	384	512]	         </y_luma_point>	         <hgrad_y_level1 index="1" type="double" size="[1 6]">	            [1.00	0.65	0.55	0.45	0.30	0.20]	         </hgrad_y_level1>	         <hgrad_y_level2 index="1" type="double" size="[1 6]">	            [1.00	0.65	0.55	0.45	0.30	0.20]	         </hgrad_y_level2>	         <hgrad_y_level3 index="1" type="double" size="[1 6]">	            [1.00	0.65	0.55	0.45	0.30	0.20]	         </hgrad_y_level3>	         <hgrad_y_level4 index="1" type="double" size="[1 6]">	            [1.00	0.65	0.55	0.45	0.30	0.20]	         </hgrad_y_level4>	         <hi_soft_thresh_scale index="1" type="double" size="[1 4]">	            [0.13  0.30  0.30  0.10]	         </hi_soft_thresh_scale>             </cell>	</YNR_ISO>      </YNR>
       <GIC index="1" type="struct" size="[1 1]">
 	<enable index="1" type="char" size="[1 1]">	    [1]	</enable>
          <GIC_ISO index="1" type="cell" size="[1 9]">             <cell index="1" type="struct" size="[1 1]">
@@ -2462,7 +2491,7 @@
 		         </ratio>
 		</cell>
          </awb_uv_ratio>
-         <MFNR_ISO index="1" type="cell" size="[1 9]">             <cell index="1" type="struct" size="[1 1]">
+         <MFNR_ISO index="1" type="cell" size="[1 13]">             <cell index="1" type="struct" size="[1 1]">
 	         <iso index="1" type="double" size="[1 1]">	            [50]	         </iso>
 	         <weight_limit_y index="1" type="double" size="[1 4]">	            [64	64	64	64]	         </weight_limit_y>
 	         <weight_limit_uv index="1" type="double" size="[1 3]">	            [64	64	64]	         </weight_limit_uv>
@@ -2867,11 +2896,43 @@
 	         <lvl2_gfsigma index="1" type="double" size="[1 3]">	            [0.12500	0.10938	0.10938]	         </lvl2_gfsigma>
 	         <lvl3_gfsigma index="1" type="double" size="[1 3]">	            [0.12500	0.10938	0.10938]	         </lvl3_gfsigma>
              </cell>
-         </MFNR_ISO>
+   	    <cell index="10" type="struct" size="[1 1]">	         <iso index="1" type="double" size="[1 1]">	            [25600]	         </iso>	         <weight_limit_y index="1" type="double" size="[1 4]">	            [4 4 4 4]	         </weight_limit_y>	         <weight_limit_uv index="1" type="double" size="[1 3]">	            [4 4 64]	         </weight_limit_uv>	         <ratio_frq index="1" type="double" size="[1 4]">	            [0.50000	2.00000	0.50000	2.00000]	         </ratio_frq>	         <luma_w_in_chroma index="1" type="double" size="[1 3]">	            [0.80000	0.80000	0.80000]	         </luma_w_in_chroma>	         <noise_curve index="1" type="double" size="[1 5]">
+                        [-1.05718201923043e-011 1.15533347659353e-007 -5.11866877267120e-004 8.69391131782777e-001 1.44693306313769e+002 ]
+                    </noise_curve>
+                    <noise_curve_x00 index="1" type="double" size="[1 1]">
+                        [3.17000000000000e+003 ]
+                    </noise_curve_x00>
+                    <y_lo_noiseprofile index="1" type="double" size="[1 4]">
+                        [1.00000 0.67172 0.37956 0.20467 ]
+                    </y_lo_noiseprofile>
+                    <y_hi_noiseprofile index="1" type="double" size="[1 4]">
+                        [0.77262 0.57555 0.33207 0.00000 ]
+                    </y_hi_noiseprofile>	         <y_lo_denoiseweight index="1" type="double" size="[1 4]">	            [1.20000	1.20000	1.20000	1.20000]	         </y_lo_denoiseweight>	         <y_hi_denoiseweight index="1" type="double" size="[1 4]">	            [1.50000	1.50000	1.50000	1.50000]	         </y_hi_denoiseweight>	         <y_lo_bfscale index="1" type="double" size="[1 4]">	            [0.40000	0.40000	0.40000	0.40000]	         </y_lo_bfscale>	         <y_hi_bfscale index="1" type="double" size="[1 4]">	            [0.30000	0.30000	0.30000	0.30000]	         </y_hi_bfscale>	         <y_lumanrpoint index="1" type="double" size="[1 6]">	            [0.00000	32.00000	64.00000	192.00000	232.00000	256.00000]	         </y_lumanrpoint>	         <y_lumanrcurve index="1" type="double" size="[1 6]">	            [1.50000	1.50000	1.50000	1.50000	1.50000	1.300000]	         </y_lumanrcurve>	         <y_denoisestrength index="1" type="double" size="[1 1]">	            [2.00000]	         </y_denoisestrength>	         <y_lo_lvl0_gfdelta index="1" type="double" size="[1 6]">	            [0.06250	0.03906	0.03906	0.03906	0.03906	0.03906]	         </y_lo_lvl0_gfdelta>	         <y_hi_lvl0_gfdelta index="1" type="double" size="[1 6]">	            [0.06250	0.03906	0.03906	0.03906	0.03906	0.03906]	         </y_hi_lvl0_gfdelta>	         <y_lo_lvl1_gfdelta index="1" type="double" size="[1 3]">	            [0.12500	0.10938	0.10938]	         </y_lo_lvl1_gfdelta>	         <y_hi_lvl1_gfdelta index="1" type="double" size="[1 3]">	            [0.12500	0.10938	0.10938]	         </y_hi_lvl1_gfdelta>	         <y_lo_lvl2_gfdelta index="1" type="double" size="[1 3]">	            [0.12500	0.10938	0.10938]	         </y_lo_lvl2_gfdelta>	         <y_hi_lvl2_gfdelta index="1" type="double" size="[1 3]">	            [0.12500	0.10938	0.10938]	         </y_hi_lvl2_gfdelta>	         <y_lo_lvl3_gfdelta index="1" type="double" size="[1 3]">	            [0.12500	0.10938	0.10938]	         </y_lo_lvl3_gfdelta>	         <y_hi_lvl3_gfdelta index="1" type="double" size="[1 3]">	            [0.12500	0.10938	0.10938]	         </y_hi_lvl3_gfdelta>	         <uv_lo_noiseprofile index="1" type="double" size="[1 3]">
+                        [1.00000 0.67172 0.37956 ]
+                    </uv_lo_noiseprofile>
+                    <uv_hi_noiseprofile index="1" type="double" size="[1 3]">
+                        [0.77262 0.57555 0.39626 ]
+                    </uv_hi_noiseprofile>	         <uv_lo_denoiseweight index="1" type="double" size="[1 3]">	            [1.50000	1.50000	1.50000]	         </uv_lo_denoiseweight>	         <uv_hi_denoiseweight index="1" type="double" size="[1 3]">	            [1.80000	1.80000	1.80000]	         </uv_hi_denoiseweight>	         <uv_lo_bfscale index="1" type="double" size="[1 3]">	            [0.40000	0.40000	0.40000]	         </uv_lo_bfscale>	         <uv_hi_bfscale index="1" type="double" size="[1 3]">	            [0.30000	0.30000	0.30000]	         </uv_hi_bfscale>	         <uv_lumanrpoint index="1" type="double" size="[1 6]">	            [0.00000	32.00000	64.00000	192.00000	232.00000	256.00000]	         </uv_lumanrpoint>	         <uv_lumanrcurve index="1" type="double" size="[1 6]">	            [1.50000	1.50000	1.50000	1.50000	1.30000	1.20000]	         </uv_lumanrcurve>	         <uv_denoisestrength index="1" type="double" size="[1 1]">	            [2.00000]	         </uv_denoisestrength>	         <uv_lo_lvl0_gfdelta index="1" type="double" size="[1 6]">	            [0.06250	0.03906	0.03906	0.03906	0.03906	0.03906]	         </uv_lo_lvl0_gfdelta>	         <uv_hi_lvl0_gfdelta index="1" type="double" size="[1 6]">	            [0.06250	0.03906	0.03906	0.03906	0.03906	0.03906]	         </uv_hi_lvl0_gfdelta>	         <uv_lo_lvl1_gfdelta index="1" type="double" size="[1 3]">	            [0.12500	0.10938	0.10938]	         </uv_lo_lvl1_gfdelta>	         <uv_hi_lvl1_gfdelta index="1" type="double" size="[1 3]">	            [0.12500	0.10938	0.10938]	         </uv_hi_lvl1_gfdelta>	         <uv_lo_lvl2_gfdelta index="1" type="double" size="[1 3]">	            [0.12500	0.10938	0.10938]	         </uv_lo_lvl2_gfdelta>	         <uv_hi_lvl2_gfdelta index="1" type="double" size="[1 3]">	            [0.12500	0.10938	0.10938]	         </uv_hi_lvl2_gfdelta>	         <lvl0_gfsigma index="1" type="double" size="[1 6]">	            [0.06250	0.03906	0.03906	0.03906	0.03906	0.03906]	         </lvl0_gfsigma>	         <lvl1_gfsigma index="1" type="double" size="[1 3]">	            [0.12500	0.10938	0.10938]	         </lvl1_gfsigma>	         <lvl2_gfsigma index="1" type="double" size="[1 3]">	            [0.12500	0.10938	0.10938]	         </lvl2_gfsigma>	         <lvl3_gfsigma index="1" type="double" size="[1 3]">	            [0.12500	0.10938	0.10938]	         </lvl3_gfsigma>             </cell>	    <cell index="11" type="struct" size="[1 1]">	         <iso index="1" type="double" size="[1 1]">	            [51200]	         </iso>	         <weight_limit_y index="1" type="double" size="[1 4]">	            [4 4 4 4]	         </weight_limit_y>	         <weight_limit_uv index="1" type="double" size="[1 3]">	            [4 4 64]	         </weight_limit_uv>	         <ratio_frq index="1" type="double" size="[1 4]">	            [0.50000	2.00000	0.50000	2.00000]	         </ratio_frq>	         <luma_w_in_chroma index="1" type="double" size="[1 3]">	            [0.80000	0.80000	0.80000]	         </luma_w_in_chroma>	         <noise_curve index="1" type="double" size="[1 5]">
+                        [-7.33115088337282e-014 -1.55391434969020e-008 -4.22788118381590e-005 3.77873048512811e-001 3.66408125787508e+002 ]
+                    </noise_curve>
+                    <noise_curve_x00 index="1" type="double" size="[1 1]">
+                        [3.17000000000000e+003 ]
+                    </noise_curve_x00>
+                    <y_lo_noiseprofile index="1" type="double" size="[1 4]">
+                        [1.00000 0.67473 0.40096 0.21035 ]
+                    </y_lo_noiseprofile>
+                    <y_hi_noiseprofile index="1" type="double" size="[1 4]">
+                        [0.76203 0.57784 0.35390 0.00000 ]
+                    </y_hi_noiseprofile>	         <y_lo_denoiseweight index="1" type="double" size="[1 4]">	            [1.20000	1.20000	1.20000	1.20000]	         </y_lo_denoiseweight>	         <y_hi_denoiseweight index="1" type="double" size="[1 4]">	            [1.50000	1.50000	1.50000	1.50000]	         </y_hi_denoiseweight>	         <y_lo_bfscale index="1" type="double" size="[1 4]">	            [0.40000	0.40000	0.40000	0.40000]	         </y_lo_bfscale>	         <y_hi_bfscale index="1" type="double" size="[1 4]">	            [0.30000	0.30000	0.30000	0.30000]	         </y_hi_bfscale>	         <y_lumanrpoint index="1" type="double" size="[1 6]">	            [0.00000	32.00000	64.00000	192.00000	232.00000	256.00000]	         </y_lumanrpoint>	         <y_lumanrcurve index="1" type="double" size="[1 6]">	            [1.50000	1.50000	1.50000	1.50000	1.50000	1.300000]	         </y_lumanrcurve>	         <y_denoisestrength index="1" type="double" size="[1 1]">	            [2.00000]	         </y_denoisestrength>	         <y_lo_lvl0_gfdelta index="1" type="double" size="[1 6]">	            [0.06250	0.03906	0.03906	0.03906	0.03906	0.03906]	         </y_lo_lvl0_gfdelta>	         <y_hi_lvl0_gfdelta index="1" type="double" size="[1 6]">	            [0.06250	0.03906	0.03906	0.03906	0.03906	0.03906]	         </y_hi_lvl0_gfdelta>	         <y_lo_lvl1_gfdelta index="1" type="double" size="[1 3]">	            [0.12500	0.10938	0.10938]	         </y_lo_lvl1_gfdelta>	         <y_hi_lvl1_gfdelta index="1" type="double" size="[1 3]">	            [0.12500	0.10938	0.10938]	         </y_hi_lvl1_gfdelta>	         <y_lo_lvl2_gfdelta index="1" type="double" size="[1 3]">	            [0.12500	0.10938	0.10938]	         </y_lo_lvl2_gfdelta>	         <y_hi_lvl2_gfdelta index="1" type="double" size="[1 3]">	            [0.12500	0.10938	0.10938]	         </y_hi_lvl2_gfdelta>	         <y_lo_lvl3_gfdelta index="1" type="double" size="[1 3]">	            [0.12500	0.10938	0.10938]	         </y_lo_lvl3_gfdelta>	         <y_hi_lvl3_gfdelta index="1" type="double" size="[1 3]">	            [0.12500	0.10938	0.10938]	         </y_hi_lvl3_gfdelta>	         <uv_lo_noiseprofile index="1" type="double" size="[1 3]">
+                        [1.00000 0.67473 0.40096 ]
+                    </uv_lo_noiseprofile>
+                    <uv_hi_noiseprofile index="1" type="double" size="[1 3]">
+                        [0.76203 0.57784 0.39626 ]
+                    </uv_hi_noiseprofile>	         <uv_lo_denoiseweight index="1" type="double" size="[1 3]">	            [1.50000	1.50000	1.50000]	         </uv_lo_denoiseweight>	         <uv_hi_denoiseweight index="1" type="double" size="[1 3]">	            [1.80000	1.80000	1.80000]	         </uv_hi_denoiseweight>	         <uv_lo_bfscale index="1" type="double" size="[1 3]">	            [0.40000	0.40000	0.40000]	         </uv_lo_bfscale>	         <uv_hi_bfscale index="1" type="double" size="[1 3]">	            [0.30000	0.30000	0.30000]	         </uv_hi_bfscale>	         <uv_lumanrpoint index="1" type="double" size="[1 6]">	            [0.00000	32.00000	64.00000	192.00000	232.00000	256.00000]	         </uv_lumanrpoint>	         <uv_lumanrcurve index="1" type="double" size="[1 6]">	            [1.50000	1.50000	1.50000	1.50000	1.30000	1.20000]	         </uv_lumanrcurve>	         <uv_denoisestrength index="1" type="double" size="[1 1]">	            [2.00000]	         </uv_denoisestrength>	         <uv_lo_lvl0_gfdelta index="1" type="double" size="[1 6]">	            [0.06250	0.03906	0.03906	0.03906	0.03906	0.03906]	         </uv_lo_lvl0_gfdelta>	         <uv_hi_lvl0_gfdelta index="1" type="double" size="[1 6]">	            [0.06250	0.03906	0.03906	0.03906	0.03906	0.03906]	         </uv_hi_lvl0_gfdelta>	         <uv_lo_lvl1_gfdelta index="1" type="double" size="[1 3]">	            [0.12500	0.10938	0.10938]	         </uv_lo_lvl1_gfdelta>	         <uv_hi_lvl1_gfdelta index="1" type="double" size="[1 3]">	            [0.12500	0.10938	0.10938]	         </uv_hi_lvl1_gfdelta>	         <uv_lo_lvl2_gfdelta index="1" type="double" size="[1 3]">	            [0.12500	0.10938	0.10938]	         </uv_lo_lvl2_gfdelta>	         <uv_hi_lvl2_gfdelta index="1" type="double" size="[1 3]">	            [0.12500	0.10938	0.10938]	         </uv_hi_lvl2_gfdelta>	         <lvl0_gfsigma index="1" type="double" size="[1 6]">	            [0.06250	0.03906	0.03906	0.03906	0.03906	0.03906]	         </lvl0_gfsigma>	         <lvl1_gfsigma index="1" type="double" size="[1 3]">	            [0.12500	0.10938	0.10938]	         </lvl1_gfsigma>	         <lvl2_gfsigma index="1" type="double" size="[1 3]">	            [0.12500	0.10938	0.10938]	         </lvl2_gfsigma>	         <lvl3_gfsigma index="1" type="double" size="[1 3]">	            [0.12500	0.10938	0.10938]	         </lvl3_gfsigma>             </cell>	     <cell index="12" type="struct" size="[1 1]">	         <iso index="1" type="double" size="[1 1]">	            [102400]	         </iso>	         <weight_limit_y index="1" type="double" size="[1 4]">	            [4 4 4 4]	         </weight_limit_y>	         <weight_limit_uv index="1" type="double" size="[1 3]">	            [4 4 64]	         </weight_limit_uv>	         <ratio_frq index="1" type="double" size="[1 4]">	            [0.50000	2.00000	0.50000	2.00000]	         </ratio_frq>	         <luma_w_in_chroma index="1" type="double" size="[1 3]">	            [0.80000	0.80000	0.80000]	         </luma_w_in_chroma>	         <noise_curve index="1" type="double" size="[1 5]">	            [-1.37970699152463e-011 1.30999535984444e-007 -4.33066927958539e-004 5.18173537105916e-001 3.34276771179448e+001 ]	         </noise_curve>	         <noise_curve_x00 index="1" type="double" size="[1 1]">	            [3.170000e+03]	         </noise_curve_x00>	         <y_lo_noiseprofile index="1" type="double" size="[1 4]">	            [1.00000	0.72924	0.45749	0.28517]	         </y_lo_noiseprofile>	         <y_hi_noiseprofile index="1" type="double" size="[1 4]">	            [0.72960	0.61071	0.39626	0.00000]	         </y_hi_noiseprofile>	         <y_lo_denoiseweight index="1" type="double" size="[1 4]">	            [1.20000	1.20000	1.20000	1.20000]	         </y_lo_denoiseweight>	         <y_hi_denoiseweight index="1" type="double" size="[1 4]">	            [1.50000	1.50000	1.50000	1.50000]	         </y_hi_denoiseweight>	         <y_lo_bfscale index="1" type="double" size="[1 4]">	            [0.40000	0.40000	0.40000	0.40000]	         </y_lo_bfscale>	         <y_hi_bfscale index="1" type="double" size="[1 4]">	            [0.30000	0.30000	0.30000	0.30000]	         </y_hi_bfscale>	         <y_lumanrpoint index="1" type="double" size="[1 6]">	            [0.00000	32.00000	64.00000	192.00000	232.00000	256.00000]	         </y_lumanrpoint>	         <y_lumanrcurve index="1" type="double" size="[1 6]">	            [1.50000	1.50000	1.50000	1.50000	1.50000	1.300000]	         </y_lumanrcurve>	         <y_denoisestrength index="1" type="double" size="[1 1]">	            [2.00000]	         </y_denoisestrength>	         <y_lo_lvl0_gfdelta index="1" type="double" size="[1 6]">	            [0.06250	0.03906	0.03906	0.03906	0.03906	0.03906]	         </y_lo_lvl0_gfdelta>	         <y_hi_lvl0_gfdelta index="1" type="double" size="[1 6]">	            [0.06250	0.03906	0.03906	0.03906	0.03906	0.03906]	         </y_hi_lvl0_gfdelta>	         <y_lo_lvl1_gfdelta index="1" type="double" size="[1 3]">	            [0.12500	0.10938	0.10938]	         </y_lo_lvl1_gfdelta>	         <y_hi_lvl1_gfdelta index="1" type="double" size="[1 3]">	            [0.12500	0.10938	0.10938]	         </y_hi_lvl1_gfdelta>	         <y_lo_lvl2_gfdelta index="1" type="double" size="[1 3]">	            [0.12500	0.10938	0.10938]	         </y_lo_lvl2_gfdelta>	         <y_hi_lvl2_gfdelta index="1" type="double" size="[1 3]">	            [0.12500	0.10938	0.10938]	         </y_hi_lvl2_gfdelta>	         <y_lo_lvl3_gfdelta index="1" type="double" size="[1 3]">	            [0.12500	0.10938	0.10938]	         </y_lo_lvl3_gfdelta>	         <y_hi_lvl3_gfdelta index="1" type="double" size="[1 3]">	            [0.12500	0.10938	0.10938]	         </y_hi_lvl3_gfdelta>	         <uv_lo_noiseprofile index="1" type="double" size="[1 3]">	            [1.00000	0.72924	0.45749]	         </uv_lo_noiseprofile>	         <uv_hi_noiseprofile index="1" type="double" size="[1 3]">	            [0.72960	0.61071	0.39626]	         </uv_hi_noiseprofile>	         <uv_lo_denoiseweight index="1" type="double" size="[1 3]">	            [1.50000	1.50000	1.50000]	         </uv_lo_denoiseweight>	         <uv_hi_denoiseweight index="1" type="double" size="[1 3]">	            [1.80000	1.80000	1.80000]	         </uv_hi_denoiseweight>	         <uv_lo_bfscale index="1" type="double" size="[1 3]">	            [0.40000	0.40000	0.40000]	         </uv_lo_bfscale>	         <uv_hi_bfscale index="1" type="double" size="[1 3]">	            [0.30000	0.30000	0.30000]	         </uv_hi_bfscale>	         <uv_lumanrpoint index="1" type="double" size="[1 6]">	            [0.00000	32.00000	64.00000	192.00000	232.00000	256.00000]	         </uv_lumanrpoint>	         <uv_lumanrcurve index="1" type="double" size="[1 6]">	            [1.50000	1.50000	1.50000	1.50000	1.30000	1.20000]	         </uv_lumanrcurve>	         <uv_denoisestrength index="1" type="double" size="[1 1]">	            [2.00000]	         </uv_denoisestrength>	         <uv_lo_lvl0_gfdelta index="1" type="double" size="[1 6]">	            [0.06250	0.03906	0.03906	0.03906	0.03906	0.03906]	         </uv_lo_lvl0_gfdelta>	         <uv_hi_lvl0_gfdelta index="1" type="double" size="[1 6]">	            [0.06250	0.03906	0.03906	0.03906	0.03906	0.03906]	         </uv_hi_lvl0_gfdelta>	         <uv_lo_lvl1_gfdelta index="1" type="double" size="[1 3]">	            [0.12500	0.10938	0.10938]	         </uv_lo_lvl1_gfdelta>	         <uv_hi_lvl1_gfdelta index="1" type="double" size="[1 3]">	            [0.12500	0.10938	0.10938]	         </uv_hi_lvl1_gfdelta>	         <uv_lo_lvl2_gfdelta index="1" type="double" size="[1 3]">	            [0.12500	0.10938	0.10938]	         </uv_lo_lvl2_gfdelta>	         <uv_hi_lvl2_gfdelta index="1" type="double" size="[1 3]">	            [0.12500	0.10938	0.10938]	         </uv_hi_lvl2_gfdelta>	         <lvl0_gfsigma index="1" type="double" size="[1 6]">	            [0.06250	0.03906	0.03906	0.03906	0.03906	0.03906]	         </lvl0_gfsigma>	         <lvl1_gfsigma index="1" type="double" size="[1 3]">	            [0.12500	0.10938	0.10938]	         </lvl1_gfsigma>	         <lvl2_gfsigma index="1" type="double" size="[1 3]">	            [0.12500	0.10938	0.10938]	         </lvl2_gfsigma>	         <lvl3_gfsigma index="1" type="double" size="[1 3]">	            [0.12500	0.10938	0.10938]	         </lvl3_gfsigma>             </cell>	    <cell index="13" type="struct" size="[1 1]">	         <iso index="1" type="double" size="[1 1]">	            [204800]	         </iso>	         <weight_limit_y index="1" type="double" size="[1 4]">	            [4 4 4 4]	         </weight_limit_y>	         <weight_limit_uv index="1" type="double" size="[1 3]">	            [4 4 64]	         </weight_limit_uv>	         <ratio_frq index="1" type="double" size="[1 4]">	            [0.50000	2.00000	0.50000	2.00000]	         </ratio_frq>	         <luma_w_in_chroma index="1" type="double" size="[1 3]">	            [0.80000	0.80000	0.80000]	         </luma_w_in_chroma>	         <noise_curve index="1" type="double" size="[1 5]">	            [-1.37970699152463e-011 1.30999535984444e-007 -4.33066927958539e-004 5.18173537105916e-001 3.34276771179448e+001 ]	         </noise_curve>	         <noise_curve_x00 index="1" type="double" size="[1 1]">	            [3.170000e+03]	         </noise_curve_x00>	         <y_lo_noiseprofile index="1" type="double" size="[1 4]">	            [1.00000	0.72924	0.45749	0.28517]	         </y_lo_noiseprofile>	         <y_hi_noiseprofile index="1" type="double" size="[1 4]">	            [0.72960	0.61071	0.39626	0.00000]	         </y_hi_noiseprofile>	         <y_lo_denoiseweight index="1" type="double" size="[1 4]">	            [1.20000	1.20000	1.20000	1.20000]	         </y_lo_denoiseweight>	         <y_hi_denoiseweight index="1" type="double" size="[1 4]">	            [1.50000	1.50000	1.50000	1.50000]	         </y_hi_denoiseweight>	         <y_lo_bfscale index="1" type="double" size="[1 4]">	            [0.40000	0.40000	0.40000	0.40000]	         </y_lo_bfscale>	         <y_hi_bfscale index="1" type="double" size="[1 4]">	            [0.30000	0.30000	0.30000	0.30000]	         </y_hi_bfscale>	         <y_lumanrpoint index="1" type="double" size="[1 6]">	            [0.00000	32.00000	64.00000	192.00000	232.00000	256.00000]	         </y_lumanrpoint>	         <y_lumanrcurve index="1" type="double" size="[1 6]">	            [1.50000	1.50000	1.50000	1.50000	1.50000	1.300000]	         </y_lumanrcurve>	         <y_denoisestrength index="1" type="double" size="[1 1]">	            [2.00000]	         </y_denoisestrength>	         <y_lo_lvl0_gfdelta index="1" type="double" size="[1 6]">	            [0.06250	0.03906	0.03906	0.03906	0.03906	0.03906]	         </y_lo_lvl0_gfdelta>	         <y_hi_lvl0_gfdelta index="1" type="double" size="[1 6]">	            [0.06250	0.03906	0.03906	0.03906	0.03906	0.03906]	         </y_hi_lvl0_gfdelta>	         <y_lo_lvl1_gfdelta index="1" type="double" size="[1 3]">	            [0.12500	0.10938	0.10938]	         </y_lo_lvl1_gfdelta>	         <y_hi_lvl1_gfdelta index="1" type="double" size="[1 3]">	            [0.12500	0.10938	0.10938]	         </y_hi_lvl1_gfdelta>	         <y_lo_lvl2_gfdelta index="1" type="double" size="[1 3]">	            [0.12500	0.10938	0.10938]	         </y_lo_lvl2_gfdelta>	         <y_hi_lvl2_gfdelta index="1" type="double" size="[1 3]">	            [0.12500	0.10938	0.10938]	         </y_hi_lvl2_gfdelta>	         <y_lo_lvl3_gfdelta index="1" type="double" size="[1 3]">	            [0.12500	0.10938	0.10938]	         </y_lo_lvl3_gfdelta>	         <y_hi_lvl3_gfdelta index="1" type="double" size="[1 3]">	            [0.12500	0.10938	0.10938]	         </y_hi_lvl3_gfdelta>	         <uv_lo_noiseprofile index="1" type="double" size="[1 3]">	            [1.00000	0.72924	0.45749]	         </uv_lo_noiseprofile>	         <uv_hi_noiseprofile index="1" type="double" size="[1 3]">	            [0.72960	0.61071	0.39626]	         </uv_hi_noiseprofile>	         <uv_lo_denoiseweight index="1" type="double" size="[1 3]">	            [1.50000	1.50000	1.50000]	         </uv_lo_denoiseweight>	         <uv_hi_denoiseweight index="1" type="double" size="[1 3]">	            [1.80000	1.80000	1.80000]	         </uv_hi_denoiseweight>	         <uv_lo_bfscale index="1" type="double" size="[1 3]">	            [0.40000	0.40000	0.40000]	         </uv_lo_bfscale>	         <uv_hi_bfscale index="1" type="double" size="[1 3]">	            [0.30000	0.30000	0.30000]	         </uv_hi_bfscale>	         <uv_lumanrpoint index="1" type="double" size="[1 6]">	            [0.00000	32.00000	64.00000	192.00000	232.00000	256.00000]	         </uv_lumanrpoint>	         <uv_lumanrcurve index="1" type="double" size="[1 6]">	            [1.50000	1.50000	1.50000	1.50000	1.30000	1.20000]	         </uv_lumanrcurve>	         <uv_denoisestrength index="1" type="double" size="[1 1]">	            [2.00000]	         </uv_denoisestrength>	         <uv_lo_lvl0_gfdelta index="1" type="double" size="[1 6]">	            [0.06250	0.03906	0.03906	0.03906	0.03906	0.03906]	         </uv_lo_lvl0_gfdelta>	         <uv_hi_lvl0_gfdelta index="1" type="double" size="[1 6]">	            [0.06250	0.03906	0.03906	0.03906	0.03906	0.03906]	         </uv_hi_lvl0_gfdelta>	         <uv_lo_lvl1_gfdelta index="1" type="double" size="[1 3]">	            [0.12500	0.10938	0.10938]	         </uv_lo_lvl1_gfdelta>	         <uv_hi_lvl1_gfdelta index="1" type="double" size="[1 3]">	            [0.12500	0.10938	0.10938]	         </uv_hi_lvl1_gfdelta>	         <uv_lo_lvl2_gfdelta index="1" type="double" size="[1 3]">	            [0.12500	0.10938	0.10938]	         </uv_lo_lvl2_gfdelta>	         <uv_hi_lvl2_gfdelta index="1" type="double" size="[1 3]">	            [0.12500	0.10938	0.10938]	         </uv_hi_lvl2_gfdelta>	         <lvl0_gfsigma index="1" type="double" size="[1 6]">	            [0.06250	0.03906	0.03906	0.03906	0.03906	0.03906]	         </lvl0_gfsigma>	         <lvl1_gfsigma index="1" type="double" size="[1 3]">	            [0.12500	0.10938	0.10938]	         </lvl1_gfsigma>	         <lvl2_gfsigma index="1" type="double" size="[1 3]">	            [0.12500	0.10938	0.10938]	         </lvl2_gfsigma>	         <lvl3_gfsigma index="1" type="double" size="[1 3]">	            [0.12500	0.10938	0.10938]	         </lvl3_gfsigma>             </cell>         </MFNR_ISO>
       </MFNR>
       <SHARP index="1" type="struct" size="[1 1]">
 	<Enable index="1" type="double" size="[1 1]">	     [1]	</Enable>	<Version index="1" type="char" size="[1 1]">	     V1	</Version>         <luma_point index="1" type="double" size="[1 8]">	     [0	16	32	64	96	160	224	256]         </luma_point>
-         <SHARP_ISO index="1" type="cell" size="[1 9]">             <cell index="1" type="struct" size="[1 1]">
+         <SHARP_ISO index="1" type="cell" size="[1 13]">             <cell index="1" type="struct" size="[1 1]">
 	         <iso index="1" type="double" size="[1 1]">	            [50]	         </iso>
 	         <lratio index="1" type="double" size="[1 1]">	            [0.67]	         </lratio>
 	         <hratio index="1" type="double" size="[1 1]">	            [1.50]	         </hratio>
@@ -3051,11 +3112,11 @@
 	         <hbf_add index="1" type="double" size="[1 1]">	            [1.00]	         </hbf_add>
 	         <local_sharp_strength index="1" type="double" size="[1 1]">	            [10]	         </local_sharp_strength>
              </cell>
-         </SHARP_ISO>
+	    <cell index="10" type="struct" size="[1 1]">	         <iso index="1" type="double" size="[1 1]">	            [25600]	         </iso>	         <lratio index="1" type="double" size="[1 1]">	            [0.8]	         </lratio>	         <hratio index="1" type="double" size="[1 1]">	            [1.10]	         </hratio>	         <mf_sharp_ratio index="1" type="double" size="[1 1]">	            [3.0]	         </mf_sharp_ratio>	         <hf_sharp_ratio index="1" type="double" size="[1 1]">	            [2.5]	         </hf_sharp_ratio>	         <luma_sigma index="1" type="double" size="[1 8]">	            [8.0	8.0	10.0	12.0	14.0	12.0	12.0	10.0]	         </luma_sigma>	         <pbf_gain index="1" type="double" size="[1 1]">	            [1.0]	         </pbf_gain>	         <pbf_ratio index="1" type="double" size="[1 1]">	            [1.0]	         </pbf_ratio>	         <pbf_add index="1" type="double" size="[1 1]">	            [0.0]	         </pbf_add>	         <mf_clip_pos index="1" type="double" size="[1 8]">	             [4  6  8  14  16  14  9  0]	         </mf_clip_pos>	         <mf_clip_neg index="1" type="double" size="[1 8]">	            [-0.10  -0.10  -0.15  -0.15  -0.15  -0.20  -0.10  -0.00]	         </mf_clip_neg>	         <hf_clip index="1" type="double" size="[1 8]">	            [6  10  12  16  20  20  8  0]	         </hf_clip>	         <mbf_gain index="1" type="double" size="[1 1]">	            [1.0]	         </mbf_gain>	         <hbf_gain index="1" type="double" size="[1 1]">	            [1.00]	         </hbf_gain>	         <hbf_ratio index="1" type="double" size="[1 1]">	            [1.0]	         </hbf_ratio>	         <mbf_add index="1" type="double" size="[1 1]">	            [2.00]	         </mbf_add>	         <hbf_add index="1" type="double" size="[1 1]">	            [1.00]	         </hbf_add>	         <local_sharp_strength index="1" type="double" size="[1 1]">	            [10]	         </local_sharp_strength>             </cell>	     <cell index="11" type="struct" size="[1 1]">	         <iso index="1" type="double" size="[1 1]">	            [51200]	         </iso>	         <lratio index="1" type="double" size="[1 1]">	            [0.8]	         </lratio>	         <hratio index="1" type="double" size="[1 1]">	            [1.10]	         </hratio>	         <mf_sharp_ratio index="1" type="double" size="[1 1]">	            [3.0]	         </mf_sharp_ratio>	         <hf_sharp_ratio index="1" type="double" size="[1 1]">	            [2.5]	         </hf_sharp_ratio>	         <luma_sigma index="1" type="double" size="[1 8]">	            [8.0	8.0	10.0	12.0	14.0	12.0	12.0	10.0]	         </luma_sigma>	         <pbf_gain index="1" type="double" size="[1 1]">	            [1.0]	         </pbf_gain>	         <pbf_ratio index="1" type="double" size="[1 1]">	            [1.0]	         </pbf_ratio>	         <pbf_add index="1" type="double" size="[1 1]">	            [0.0]	         </pbf_add>	         <mf_clip_pos index="1" type="double" size="[1 8]">	             [4  6  8  14  16  14  9  0]	         </mf_clip_pos>	         <mf_clip_neg index="1" type="double" size="[1 8]">	            [-0.10  -0.10  -0.15  -0.15  -0.15  -0.20  -0.10  -0.00]	         </mf_clip_neg>	         <hf_clip index="1" type="double" size="[1 8]">	            [6  10  12  16  20  20  8  0]	         </hf_clip>	         <mbf_gain index="1" type="double" size="[1 1]">	            [1.0]	         </mbf_gain>	         <hbf_gain index="1" type="double" size="[1 1]">	            [1.00]	         </hbf_gain>	         <hbf_ratio index="1" type="double" size="[1 1]">	            [1.0]	         </hbf_ratio>	         <mbf_add index="1" type="double" size="[1 1]">	            [2.00]	         </mbf_add>	         <hbf_add index="1" type="double" size="[1 1]">	            [1.00]	         </hbf_add>	         <local_sharp_strength index="1" type="double" size="[1 1]">	            [10]	         </local_sharp_strength>             </cell>	    <cell index="12" type="struct" size="[1 1]">	         <iso index="1" type="double" size="[1 1]">	            [102400]	         </iso>	         <lratio index="1" type="double" size="[1 1]">	            [0.8]	         </lratio>	         <hratio index="1" type="double" size="[1 1]">	            [1.10]	         </hratio>	         <mf_sharp_ratio index="1" type="double" size="[1 1]">	            [3.0]	         </mf_sharp_ratio>	         <hf_sharp_ratio index="1" type="double" size="[1 1]">	            [2.5]	         </hf_sharp_ratio>	         <luma_sigma index="1" type="double" size="[1 8]">	            [8.0	8.0	10.0	12.0	14.0	12.0	12.0	10.0]	         </luma_sigma>	         <pbf_gain index="1" type="double" size="[1 1]">	            [1.0]	         </pbf_gain>	         <pbf_ratio index="1" type="double" size="[1 1]">	            [1.0]	         </pbf_ratio>	         <pbf_add index="1" type="double" size="[1 1]">	            [0.0]	         </pbf_add>	         <mf_clip_pos index="1" type="double" size="[1 8]">	             [4  6  8  14  16  14  9  0]	         </mf_clip_pos>	         <mf_clip_neg index="1" type="double" size="[1 8]">	            [-0.10  -0.10  -0.15  -0.15  -0.15  -0.20  -0.10  -0.00]	         </mf_clip_neg>	         <hf_clip index="1" type="double" size="[1 8]">	            [6  10  12  16  20  20  8  0]	         </hf_clip>	         <mbf_gain index="1" type="double" size="[1 1]">	            [1.0]	         </mbf_gain>	         <hbf_gain index="1" type="double" size="[1 1]">	            [1.00]	         </hbf_gain>	         <hbf_ratio index="1" type="double" size="[1 1]">	            [1.0]	         </hbf_ratio>	         <mbf_add index="1" type="double" size="[1 1]">	            [2.00]	         </mbf_add>	         <hbf_add index="1" type="double" size="[1 1]">	            [1.00]	         </hbf_add>	         <local_sharp_strength index="1" type="double" size="[1 1]">	            [10]	         </local_sharp_strength>             </cell>	    <cell index="13" type="struct" size="[1 1]">	         <iso index="1" type="double" size="[1 1]">	            [204800]	         </iso>	         <lratio index="1" type="double" size="[1 1]">	            [0.8]	         </lratio>	         <hratio index="1" type="double" size="[1 1]">	            [1.10]	         </hratio>	         <mf_sharp_ratio index="1" type="double" size="[1 1]">	            [3.0]	         </mf_sharp_ratio>	         <hf_sharp_ratio index="1" type="double" size="[1 1]">	            [2.5]	         </hf_sharp_ratio>	         <luma_sigma index="1" type="double" size="[1 8]">	            [8.0	8.0	10.0	12.0	14.0	12.0	12.0	10.0]	         </luma_sigma>	         <pbf_gain index="1" type="double" size="[1 1]">	            [1.0]	         </pbf_gain>	         <pbf_ratio index="1" type="double" size="[1 1]">	            [1.0]	         </pbf_ratio>	         <pbf_add index="1" type="double" size="[1 1]">	            [0.0]	         </pbf_add>	         <mf_clip_pos index="1" type="double" size="[1 8]">	             [4  6  8  14  16  14  9  0]	         </mf_clip_pos>	         <mf_clip_neg index="1" type="double" size="[1 8]">	            [-0.10  -0.10  -0.15  -0.15  -0.15  -0.20  -0.10  -0.00]	         </mf_clip_neg>	         <hf_clip index="1" type="double" size="[1 8]">	            [6  10  12  16  20  20  8  0]	         </hf_clip>	         <mbf_gain index="1" type="double" size="[1 1]">	            [1.0]	         </mbf_gain>	         <hbf_gain index="1" type="double" size="[1 1]">	            [1.00]	         </hbf_gain>	         <hbf_ratio index="1" type="double" size="[1 1]">	            [1.0]	         </hbf_ratio>	         <mbf_add index="1" type="double" size="[1 1]">	            [2.00]	         </mbf_add>	         <hbf_add index="1" type="double" size="[1 1]">	            [1.00]	         </hbf_add>	         <local_sharp_strength index="1" type="double" size="[1 1]">	            [10]	         </local_sharp_strength>             </cell>         </SHARP_ISO>
       </SHARP>
       <EDGEFILTER index="1" type="struct" size="[1 1]">
 	<Enable index="1" type="double" size="[1 1]">	     [1]	</Enable>	<Version index="1" type="char" size="[1 1]">	     V1	</Version>         <luma_point index="1" type="double" size="[1 8]">	     [0	16	32	64	96	160	224	256]         </luma_point>
-         <EDGEFILTER_ISO index="1" type="cell" size="[1 9]">             <cell index="1" type="struct" size="[1 1]">
+         <EDGEFILTER_ISO index="1" type="cell" size="[1 13]">             <cell index="1" type="struct" size="[1 1]">
 	         <iso index="1" type="double" size="[1 1]">	            [50]	         </iso>
 	         <edge_thed index="1" type="double" size="[1 1]">	            [3]	         </edge_thed>
 	         <src_wgt index="1" type="double" size="[1 1]">	            [0.0]	         </src_wgt>
@@ -3217,7 +3278,7 @@
 	         <dog_kernel_row3 index="1" type="double" size="[1 5]">	            [-0.109375	0.078125	0.234375	0.078125	-0.109375]	         </dog_kernel_row3>
 	         <dog_kernel_row4 index="1" type="double" size="[1 5]">	            [-0.062500	-0.109375	-0.140625	-0.109375	-0.062500]	         </dog_kernel_row4>
              </cell>
-         </EDGEFILTER_ISO>
+	    <cell index="10" type="struct" size="[1 1]">	         <iso index="1" type="double" size="[1 1]">	            [25600]	         </iso>	         <edge_thed index="1" type="double" size="[1 1]">	            [32]	         </edge_thed>	         <src_wgt index="1" type="double" size="[1 1]">	            [0.0]	         </src_wgt>	         <alpha_adp_en index="1" type="char" size="[1 1]">	            [0]	         </alpha_adp_en>	         <local_alpha index="1" type="double" size="[1 1]">	            [1.0]	         </local_alpha>	         <global_alpha index="1" type="double" size="[1 1]">	            [1.0]	         </global_alpha>	         <noise_clip index="1" type="double" size="[1 8]">	            [8  16  16  16  16  16  16  16]	         </noise_clip>	         <dog_clip_pos index="1" type="double" size="[1 8]">	            [0  2  2  3  3  3  2  2]	         </dog_clip_pos>	         <dog_clip_neg index="1" type="double" size="[1 8]">	            [0  2  2  3  3  3  2  2]	         </dog_clip_neg>	         <dog_alpha index="1" type="double" size="[1 8]">	             [0  0  0  0  0 0 0  0]	         </dog_alpha>	         <direct_filter_coeff index="1" type="double" size="[1 5]">	            [0.00	0.375	0.125	0.375 0.00]	         </direct_filter_coeff>	         <dog_kernel_row0 index="1" type="double" size="[1 5]">	            [-0.062500	-0.109375	-0.140625	-0.109375	-0.062500]	         </dog_kernel_row0>	         <dog_kernel_row1 index="1" type="double" size="[1 5]">	            [-0.109375	0.078125	0.234375	0.078125	-0.109375]	         </dog_kernel_row1>	         <dog_kernel_row2 index="1" type="double" size="[1 5]">	            [-0.140625	0.234375	0.437500	0.234375	-0.140625]	         </dog_kernel_row2>	         <dog_kernel_row3 index="1" type="double" size="[1 5]">	            [-0.109375	0.078125	0.234375	0.078125	-0.109375]	         </dog_kernel_row3>	         <dog_kernel_row4 index="1" type="double" size="[1 5]">	            [-0.062500	-0.109375	-0.140625	-0.109375	-0.062500]	         </dog_kernel_row4>             </cell>              <cell index="11" type="struct" size="[1 1]">	         <iso index="1" type="double" size="[1 1]">	            [51200]	         </iso>	         <edge_thed index="1" type="double" size="[1 1]">	            [32]	         </edge_thed>	         <src_wgt index="1" type="double" size="[1 1]">	            [0.0]	         </src_wgt>	         <alpha_adp_en index="1" type="char" size="[1 1]">	            [0]	         </alpha_adp_en>	         <local_alpha index="1" type="double" size="[1 1]">	            [1.0]	         </local_alpha>	         <global_alpha index="1" type="double" size="[1 1]">	            [1.0]	         </global_alpha>	         <noise_clip index="1" type="double" size="[1 8]">	            [8  16  16  16  16  16  16  16]	         </noise_clip>	         <dog_clip_pos index="1" type="double" size="[1 8]">	            [0  2  2  3  3  3  2  2]	         </dog_clip_pos>	         <dog_clip_neg index="1" type="double" size="[1 8]">	            [0  2  2  3  3  3  2  2]	         </dog_clip_neg>	         <dog_alpha index="1" type="double" size="[1 8]">	             [0  0  0  0  0 0 0  0]	         </dog_alpha>	         <direct_filter_coeff index="1" type="double" size="[1 5]">	            [0.00	0.375	0.125	0.375 0.00]	         </direct_filter_coeff>	         <dog_kernel_row0 index="1" type="double" size="[1 5]">	            [-0.062500	-0.109375	-0.140625	-0.109375	-0.062500]	         </dog_kernel_row0>	         <dog_kernel_row1 index="1" type="double" size="[1 5]">	            [-0.109375	0.078125	0.234375	0.078125	-0.109375]	         </dog_kernel_row1>	         <dog_kernel_row2 index="1" type="double" size="[1 5]">	            [-0.140625	0.234375	0.437500	0.234375	-0.140625]	         </dog_kernel_row2>	         <dog_kernel_row3 index="1" type="double" size="[1 5]">	            [-0.109375	0.078125	0.234375	0.078125	-0.109375]	         </dog_kernel_row3>	         <dog_kernel_row4 index="1" type="double" size="[1 5]">	            [-0.062500	-0.109375	-0.140625	-0.109375	-0.062500]	         </dog_kernel_row4>             </cell>             <cell index="12" type="struct" size="[1 1]">	         <iso index="1" type="double" size="[1 1]">	            [102400]	         </iso>	         <edge_thed index="1" type="double" size="[1 1]">	            [32]	         </edge_thed>	         <src_wgt index="1" type="double" size="[1 1]">	            [0.0]	         </src_wgt>	         <alpha_adp_en index="1" type="char" size="[1 1]">	            [0]	         </alpha_adp_en>	         <local_alpha index="1" type="double" size="[1 1]">	            [1.0]	         </local_alpha>	         <global_alpha index="1" type="double" size="[1 1]">	            [1.0]	         </global_alpha>	         <noise_clip index="1" type="double" size="[1 8]">	            [8  16  16  16  16  16  16  16]	         </noise_clip>	         <dog_clip_pos index="1" type="double" size="[1 8]">	            [0  2  2  3  3  3  2  2]	         </dog_clip_pos>	         <dog_clip_neg index="1" type="double" size="[1 8]">	            [0  2  2  3  3  3  2  2]	         </dog_clip_neg>	         <dog_alpha index="1" type="double" size="[1 8]">	             [0  0  0  0  0 0 0  0]	         </dog_alpha>	         <direct_filter_coeff index="1" type="double" size="[1 5]">	            [0.00	0.375	0.125	0.375 0.00]	         </direct_filter_coeff>	         <dog_kernel_row0 index="1" type="double" size="[1 5]">	            [-0.062500	-0.109375	-0.140625	-0.109375	-0.062500]	         </dog_kernel_row0>	         <dog_kernel_row1 index="1" type="double" size="[1 5]">	            [-0.109375	0.078125	0.234375	0.078125	-0.109375]	         </dog_kernel_row1>	         <dog_kernel_row2 index="1" type="double" size="[1 5]">	            [-0.140625	0.234375	0.437500	0.234375	-0.140625]	         </dog_kernel_row2>	         <dog_kernel_row3 index="1" type="double" size="[1 5]">	            [-0.109375	0.078125	0.234375	0.078125	-0.109375]	         </dog_kernel_row3>	         <dog_kernel_row4 index="1" type="double" size="[1 5]">	            [-0.062500	-0.109375	-0.140625	-0.109375	-0.062500]	         </dog_kernel_row4>             </cell>             <cell index="13" type="struct" size="[1 1]">	         <iso index="1" type="double" size="[1 1]">	            [204800]	         </iso>	         <edge_thed index="1" type="double" size="[1 1]">	            [32]	         </edge_thed>	         <src_wgt index="1" type="double" size="[1 1]">	            [0.0]	         </src_wgt>	         <alpha_adp_en index="1" type="char" size="[1 1]">	            [0]	         </alpha_adp_en>	         <local_alpha index="1" type="double" size="[1 1]">	            [1.0]	         </local_alpha>	         <global_alpha index="1" type="double" size="[1 1]">	            [1.0]	         </global_alpha>	         <noise_clip index="1" type="double" size="[1 8]">	            [8  16  16  16  16  16  16  16]	         </noise_clip>	         <dog_clip_pos index="1" type="double" size="[1 8]">	            [0  2  2  3  3  3  2  2]	         </dog_clip_pos>	         <dog_clip_neg index="1" type="double" size="[1 8]">	            [0  2  2  3  3  3  2  2]	         </dog_clip_neg>	         <dog_alpha index="1" type="double" size="[1 8]">	             [0  0  0  0  0 0 0  0]	         </dog_alpha>	         <direct_filter_coeff index="1" type="double" size="[1 5]">	            [0.00	0.375	0.125	0.375 0.00]	         </direct_filter_coeff>	         <dog_kernel_row0 index="1" type="double" size="[1 5]">	            [-0.062500	-0.109375	-0.140625	-0.109375	-0.062500]	         </dog_kernel_row0>	         <dog_kernel_row1 index="1" type="double" size="[1 5]">	            [-0.109375	0.078125	0.234375	0.078125	-0.109375]	         </dog_kernel_row1>	         <dog_kernel_row2 index="1" type="double" size="[1 5]">	            [-0.140625	0.234375	0.437500	0.234375	-0.140625]	         </dog_kernel_row2>	         <dog_kernel_row3 index="1" type="double" size="[1 5]">	            [-0.109375	0.078125	0.234375	0.078125	-0.109375]	         </dog_kernel_row3>	         <dog_kernel_row4 index="1" type="double" size="[1 5]">	            [-0.062500	-0.109375	-0.140625	-0.109375	-0.062500]	         </dog_kernel_row4>             </cell>         </EDGEFILTER_ISO>
       </EDGEFILTER>
       <DEHAZE index="1" type="struct" size="[1 1]">
          <dc_bf_h index="1" type="double" size="[5 5]">	     [12	17	19	17	12
@@ -3627,10 +3688,10 @@
          </DEHAZE_ISO>
       </DEHAZE>
       <SENSORINFO index="1" type="struct" size="[1 1]">
-         <GainRange index="1" type="double" size="[8 7]">            [1 2 20 20 1 0 20 2 4 10 0 1 20 40 4 8 5 -20 1 40 60 8 16 2.5 -40 1 60 80 16 32 1.25 -60 1 80 100 32 64  0.625 -80 1 100 120 64 128 0.3125 -100 1 120 140 128 256 0.15625 -120 1 140 160]         </GainRange>         <TimeFactor index="1" type="double" size="[1 4]">            [0 0 1 0.5]         </TimeFactor>
+         <GainRange index="1" type="double" size="[10 7]">            [1 2 20 20 1 0 20 2 4 10 0 1 20 40 4 8 5 -20 1 40 60 8 16 2.5 -40 1 60 80 16 32 1.25 -60 1 80 100 32 64  0.625 -80 1 100 120 64 128 0.3125 -100 1 120 140 128 256 0.15625 -120 1 140 160 256 512 0.078125 -140 1 160 180 512 1024 0.0390625 -160 1 180 200]         </GainRange>         <TimeFactor index="1" type="double" size="[1 4]">            [0 0 1 0.5]         </TimeFactor>
          <CISTimeRegSumFac index="1" type="double" size="[1 2]">           [2 4]         </CISTimeRegSumFac>         <CISTimeRegOdevity index="1" type="double" size="[1 2]">           [2 0]         </CISTimeRegOdevity>
          <CISTimeRegUnEqualEn index="1" type="double" size="[1 1]">            [0]         </CISTimeRegUnEqualEn>
-         <CISTimeRegMin index="1" type="double" size="[1 1]">            [2]         </CISTimeRegMin>         <CISAgainRange index="1" type="double" size="[1 2]">            [1 29.5]         </CISAgainRange>
+         <CISMinFps index="1" type="double" size="[1 1]">            [10]         </CISMinFps>         <CISTimeRegMin index="1" type="double" size="[1 1]">            [2]         </CISTimeRegMin>         <CISAgainRange index="1" type="double" size="[1 2]">            [1 29.5]         </CISAgainRange>
          <CISExtraAgainRange index="1" type="double" size="[1 2]">            [2.6 76.7]         </CISExtraAgainRange>         <CISDgainRange index="1" type="double" size="[1 2]">            [1 256]         </CISDgainRange>         <CISIspDgainRange index="1" type="double" size="[1 2]">            [1 1]         </CISIspDgainRange>     </SENSORINFO>      <LUT3D  index="1" type="struct" size="[1 1]">
          <enable index="1" type="double" size="[1 1]">            [1]         </enable>
          <look_up_table_r index="1" type="double" size="[1 729]">            [  0   20  205  415  626  829 1023 1023 1023
@@ -3880,11 +3941,19 @@
           <enable index="1" type="double" size="[1 1]">
                [0]
           </enable>
+          <mesh_file index="1" type="char" size="[1 1]">               LDCH_mesh_2688_1520_imx347_4IR          </mesh_file>
+          <correct_level index="1" type="double" size="[1 1]">               [1.00]          </correct_level>
       </LDCH>
       <FEC index="1" type="struct" size="[1 1]">
           <enable index="1" type="double" size="[1 1]">               [1]          </enable>
           <mesh_file index="1" type="char" size="[1 1]">               FEC_mesh_2688_1520_imx347_4IR          </mesh_file>
+          <correct_level index="1" type="double" size="[1 1]">               [1.00]          </correct_level>
       </FEC>
+      <ORB index="1" type="struct" size="[1 1]">
+          <enable index="1" type="double" size="[1 1]">
+               [0]
+          </enable>
+      </ORB>
    </sensor>   <system type="struct" size="[1 1]">
          <HDR index="1" type="struct" size="[1 1]">
 	     <enable index="1" type="double" size="[1 1]">	        [1]	     </enable>	     <support_mode index="1" type="char" size="[1 1]">	        MODE_2_LINE	     </support_mode>

@@ -125,7 +125,18 @@ static XCamReturn AhdrProcess(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* out
     RkAiqAlgoProcAhdrInt* AhdrParams = (RkAiqAlgoProcAhdrInt*)inparams;
     RkAiqAlgoProcResAhdrInt* AhdrProcResParams = (RkAiqAlgoProcResAhdrInt*)outparams;
     // pAhdrCtx->frameCnt = inparams->frame_id;
-    AhdrGetROData(pAhdrCtx, &AhdrParams->ispAhdrStats);
+    AhdrGetStats(pAhdrCtx, &AhdrParams->ispAhdrStats);
+
+    RkAiqAlgoProcResAeInt* ae_proc_res_int =
+        (RkAiqAlgoProcResAeInt*)(AhdrParams->rk_com.u.proc.proc_res_comb->ae_proc_res);
+
+    if (ae_proc_res_int)
+        AhdrGetSensorInfo(pAhdrCtx, ae_proc_res_int->ae_proc_res_rk);
+    else {
+        AecProcResult_t AeProcResult;
+        LOGW_AHDR("%s: af Proc result is null!!!\n", __FUNCTION__);
+        AhdrGetSensorInfo(pAhdrCtx, AeProcResult);
+    }
 
     RkAiqAlgoPreResAeInt* ae_pre_res_int =
         (RkAiqAlgoPreResAeInt*)(AhdrParams->rk_com.u.proc.pre_res_comb->ae_pre_res);
@@ -137,7 +148,7 @@ static XCamReturn AhdrProcess(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* out
                          af_pre_res_int->af_pre_result);
     else if (ae_pre_res_int) {
         af_preprocess_result_t AfPreResult;
-        LOGW_AHDR("%s: af result is null!!!\n", __FUNCTION__);
+        LOGW_AHDR("%s: af Pre result is null!!!\n", __FUNCTION__);
         AhdrUpdateConfig(pAhdrCtx,
                          ae_pre_res_int->ae_pre_res_rk,
                          AfPreResult);
@@ -145,7 +156,7 @@ static XCamReturn AhdrProcess(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* out
     else {
         AecPreResult_t AecHdrPreResult;
         af_preprocess_result_t AfPreResult;
-        LOGW_AHDR("%s: ae/af result is null!!!\n", __FUNCTION__);
+        LOGW_AHDR("%s: ae/af Pre result is null!!!\n", __FUNCTION__);
         AhdrUpdateConfig(pAhdrCtx,
                          AecHdrPreResult,
                          AfPreResult);

@@ -33,7 +33,8 @@ unsigned short GetSetLgmean(AhdrHandle_t pAhdrCtx)
 
     float PrevLgMean = pAhdrCtx->AhdrPrevData.ro_hdrtmo_lgmean / 2048.0;
     float CurrLgMean = pAhdrCtx->CurrHandleData.CurrLgMean;
-    value = (iir_frame_real - 1) * PrevLgMean / iir_frame_real + CurrLgMean / iir_frame_real;
+    value = pAhdrCtx->frameCnt == 0 ? 20000 :
+            (iir_frame_real - 1) * PrevLgMean / iir_frame_real + CurrLgMean / iir_frame_real;
 
     returnValue = (int)SHIFT11BIT(value) ;
 

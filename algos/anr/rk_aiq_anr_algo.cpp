@@ -18,6 +18,12 @@ ANRresult_t ANRInit(ANRContext_t **ppANRCtx, CamCalibDbContext_t *pCalibDb)
 	}
 
 	memset(pANRCtx, 0x00, sizeof(ANRContext_t));
+
+	//gain state init
+	pANRCtx->stGainState.gainState = -1;
+	pANRCtx->stGainState.gain_th0 = 32.0;
+	pANRCtx->stGainState.gain_th1 = 128.0;
+	
 	pANRCtx->eState = ANR_STATE_INITIALIZED;
 	*ppANRCtx = pANRCtx;
 	
@@ -155,7 +161,8 @@ ANRresult_t ANRProcess(ANRContext_t *pANRCtx, ANRExpInfo_t *pExpInfo)
 		LOGD_ANR("%s(%d): refYuvBit:%d\n", __FUNCTION__, __LINE__, pANRCtx->refYuvBit);
 
 		memcpy(&pANRCtx->stExpInfo, pExpInfo, sizeof(ANRExpInfo_t));
-		
+
+		ANRGainRatioProcess(&pANRCtx->stGainState, &pANRCtx->stExpInfo);
 		//select param
 		select_bayernr_params_by_ISO(&pANRCtx->stAuto.stBayernrParams, &pANRCtx->stAuto.stBayernrParamSelect, pExpInfo);
 		select_mfnr_params_by_ISO(&pANRCtx->stAuto.stMfnrParams, &pANRCtx->stAuto.stMfnrParamSelect, pExpInfo, pANRCtx->refYuvBit);
@@ -235,10 +242,10 @@ ANRresult_t ANRGetProcResult(ANRContext_t *pANRCtx, ANRProcResult_t* pANRResult)
 
 	//transfer to reg value
 	bayernr_fix_tranfer(&pANRResult->stBayernrParamSelect, &pANRResult->stBayernrFix);
-	mfnr_fix_transfer(&pANRResult->stMfnrParamSelect, &pANRResult->stMfnrFix, &pANRCtx->stExpInfo);
+	mfnr_fix_transfer(&pANRResult->stMfnrParamSelect, &pANRResult->stMfnrFix, &pANRCtx->stExpInfo, pANRCtx->stGainState.ratio);
 	ynr_fix_transfer(&pANRResult->stYnrParamSelect, &pANRResult->stYnrFix);
-	uvnr_fix_transfer(&pANRResult->stUvnrParamSelect, &pANRResult->stUvnrFix, &pANRCtx->stExpInfo);
-	gain_fix_transfer(&pANRResult->stMfnrParamSelect, &pANRResult->stGainFix, &pANRCtx->stExpInfo);
+	uvnr_fix_transfer(&pANRResult->stUvnrParamSelect, &pANRResult->stUvnrFix, &pANRCtx->stExpInfo, pANRCtx->stGainState.ratio);
+	gain_fix_transfer(&pANRResult->stMfnrParamSelect, &pANRResult->stGainFix, &pANRCtx->stExpInfo, pANRCtx->stGainState.ratio);
 	pANRResult->stBayernrFix.rawnr_en = pANRResult->bayernrEn;
 	pANRResult->stMfnrFix.tnr_en = pANRResult->mfnrEn;
 	pANRResult->stMfnrFix.mode = pANRCtx->stMfnrCalib.mode;
@@ -255,6 +262,71 @@ ANRresult_t ANRGetProcResult(ANRContext_t *pANRCtx, ANRProcResult_t* pANRResult)
 		pANRResult->stMfnrFix.gain_en,
 		pANRResult->stMfnrFix.mode);
 	LOGI_ANR("%s(%d): exit!\n", __FUNCTION__, __LINE__);
+	return ANR_RET_SUCCESS;
+}
+
+ANRresult_t ANRGainRatioProcess(ANRGainState_t *pGainState, ANRExpInfo_t *pExpInfo)
+{
+	LOGI_ANR("%s(%d): enter!\n", __FUNCTION__, __LINE__);
+
+	float th;
+	float ratio;
+	
+	if(pGainState == NULL){
+		LOGE_ANR("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
+		return ANR_RET_INVALID_PARM;
+	}
+
+	if(pExpInfo == NULL){
+		LOGE_ANR("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
+		return ANR_RET_INVALID_PARM;
+	}
+
+	int gain_stat = pGainState->gainState;
+	float gain_th0 = pGainState->gain_th0;
+	float gain_th1 = pGainState->gain_th1;
+	float gain_cur = pExpInfo->arAGain[pExpInfo->hdr_mode] * pExpInfo->arDGain[pExpInfo->hdr_mode];
+
+	pGainState->gain_cur = gain_cur;
+	
+	if(gain_stat == -1)
+	{
+	  th = (gain_th0 + gain_th1) / 2;
+	  if(gain_cur > th)
+		  gain_stat = 1;
+	  else
+		  gain_stat = 0;
+	}
+	else if(gain_stat == 0)
+	{
+	  if(gain_cur > gain_th1)
+		  gain_stat = 1;
+	}
+	else if(gain_stat == 1)
+	{
+	  if(gain_cur < gain_th0)
+		  gain_stat = 0;
+	}
+	else{
+	  LOGE_ANR("%s:%d invalid stat\n", __FUNCTION__, __LINE__);
+	  return ANR_RET_INVALID_PARM;
+	}
+
+	
+	if(gain_stat == 0)
+	  pGainState->ratio = 1;
+	else
+	  pGainState->ratio = 1.0/16;
+
+	LOGD_ANR("%s:%d gain_cur:%f th: %f %f ratio:%f \n", 
+		__FUNCTION__, __LINE__, 
+		gain_cur,
+		gain_th0,
+		gain_th1,
+		pGainState->ratio);
+
+	LOGI_ANR("%s(%d): exit!\n", __FUNCTION__, __LINE__);
+
 	return ANR_RET_SUCCESS;
 }
 

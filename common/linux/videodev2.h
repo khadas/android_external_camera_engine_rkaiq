@@ -646,6 +646,7 @@ struct v4l2_pix_format {
 #define V4L2_META_FMT_RK_ISP1_PARAMS	v4l2_fourcc('R', 'K', '1', 'P') /* Rockchip ISP1 params */
 #define V4L2_META_FMT_RK_ISP1_STAT_3A	v4l2_fourcc('R', 'K', '1', 'S') /* Rockchip ISP1 3A statistics */
 #define V4L2_META_FMT_RK_ISPP_PARAMS	v4l2_fourcc('R', 'K', 'P', 'P') /* Rockchip ISPP params */
+#define V4L2_META_FMT_RK_ISPP_STAT  v4l2_fourcc('R', 'K', 'P', 'S') /* Rockchip ISPP statistics */
 #define V4L2_META_FMT_RK_ISP1_STAT_LUMA v4l2_fourcc('R', 'K', '1', 'L') /* Rockchip ISP1 luma statistics */
 
 #define V4L2_PIX_FMT_FBC2     v4l2_fourcc('F', 'B', 'C', '2') /* Rockchip yuv422sp frame buffer compression encoder */
