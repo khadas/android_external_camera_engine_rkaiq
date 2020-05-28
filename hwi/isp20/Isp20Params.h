@@ -29,7 +29,10 @@ namespace RkCam {
 
 class Isp20Params {
 public:
-    explicit Isp20Params() : _last_pp_module_init_ens(0) {};
+    explicit Isp20Params() : _last_pp_module_init_ens(0)
+                               ,_force_isp_module_ens(0)
+                               ,_force_ispp_module_ens(0)
+                               ,_force_module_flags(0) {};
     virtual ~Isp20Params() {};
 
     virtual XCamReturn checkIsp20Params(struct isp2x_isp_params_cfg& isp_cfg);
@@ -39,6 +42,10 @@ public:
     virtual XCamReturn convertAiqResultsToIsp20PpParams(struct rkispp_params_cfg& pp_cfg,
             SmartPtr<RkAiqIsppParamsProxy> aiq_results);
     void set_working_mode(int mode);
+    void setModuleStatus(rk_aiq_module_id_t mId, bool en);
+    void getModuleStatus(rk_aiq_module_id_t mId, bool& en);
+    void forceOverwriteAiqIsppCfg(struct rkispp_params_cfg& pp_cfg, SmartPtr<RkAiqIsppParamsProxy> aiq_results);
+    void forceOverwriteAiqIspCfg(struct isp2x_isp_params_cfg& isp_cfg, SmartPtr<RkAiqIspParamsProxy> aiq_results);
 private:
     XCAM_DEAD_COPY(Isp20Params);
     void convertAiqLiteHstWndSize(struct isp2x_rawhistlite_cfg & hst_lite);
@@ -96,8 +103,19 @@ private:
                                    rk_aiq_isp_fec_t& fec);
     void convertAiqGicToIsp20Params(struct isp2x_isp_params_cfg& isp_cfg,
                                           const rk_aiq_isp_gic_t& gic_cfg);
+    void convertAiqOrbToIsp20Params(struct rkispp_params_cfg& pp_cfg,
+        rk_aiq_isp_orb_t& orb);
+    bool getModuleForceFlag(int module_id);
+    void setModuleForceFlagInverse(int module_id);
+    bool getModuleForceEn(int module_id);
+    void updateIspModuleForceEns(u64 module_ens);
+    void updateIsppModuleForceEns(u32 module_ens);
     uint32_t _last_pp_module_init_ens;
+    u64 _force_isp_module_ens;
+    u32 _force_ispp_module_ens;
+    u64 _force_module_flags;
     int _working_mode;
+    Mutex _mutex;
 };
 };
 #endif

@@ -400,15 +400,15 @@ XCamReturn rk_aiq_uapi_setExpPwrLineFreqMode(const rk_aiq_sys_ctx_t* ctx, expPwr
     RKAIQ_IMGPROC_CHECK_RET(ret, "get exp attr failed!\nsetExpPwrLineFreqMode failed!");
     if (freq == EXP_PWR_LINE_FREQ_50HZ) {
         expSwAttr.stAntiFlicker.enable = true;
-        expSwAttr.stAntiFlicker.Mode = AEC_ANTIFLICKER_AUTO_MODE;
+        //expSwAttr.stAntiFlicker.Mode = AEC_ANTIFLICKER_AUTO_MODE;
         expSwAttr.stAntiFlicker.Frequency = AEC_FLICKER_FREQUENCY_50HZ;
     } else if (freq == EXP_PWR_LINE_FREQ_60HZ) {
         expSwAttr.stAntiFlicker.enable = true;
-        expSwAttr.stAntiFlicker.Mode = AEC_ANTIFLICKER_AUTO_MODE;
+        //expSwAttr.stAntiFlicker.Mode = AEC_ANTIFLICKER_AUTO_MODE;
         expSwAttr.stAntiFlicker.Frequency = AEC_FLICKER_FREQUENCY_60HZ;
     } else if (freq == EXP_PWR_LINE_FREQ_DIS) {
         expSwAttr.stAntiFlicker.enable = true;
-        expSwAttr.stAntiFlicker.Mode = AEC_ANTIFLICKER_AUTO_MODE;
+        //expSwAttr.stAntiFlicker.Mode = AEC_ANTIFLICKER_AUTO_MODE;
         expSwAttr.stAntiFlicker.Frequency = AEC_FLICKER_FREQUENCY_OFF;
     } else {
         ret = XCAM_RETURN_ERROR_PARAM;

@@ -7,7 +7,29 @@
 
 #define EPS 1e-10
 
-ORBList* init_List(U32 bytes){
+#include <time.h>
+double begin_tick;
+double end_tick;
+
+unsigned long getTime()
+{
+    struct timespec ts;
+    clock_gettime(1, &ts);
+    return (ts.tv_sec * 1000 + ts.tv_nsec / 1000000);
+}
+
+void work_begin()
+{
+    begin_tick = getTime();
+}
+
+void work_end(const char* module_name)
+{
+    end_tick = getTime() - begin_tick;
+    LOGE_AORB("[%s] TIME = %lf ms \n", module_name, end_tick);
+}
+
+ORBList* initList(U32 bytes){
     ORBList* list = (ORBList*)malloc(sizeof(ORBList));
     list->bytes = bytes;
     list->start = NULL;
@@ -16,105 +38,133 @@ ORBList* init_List(U32 bytes){
     return list;
 }
 
-/*add a item in the list*/
+void freeList(ORBList* list) {
+    if (list != NULL) {
+        for(Node* item = list->start; item != NULL; item = item->next){
+            if (item->data != NULL) {
+                free(item->data);
+                item->data = NULL;
+            }
+        }
+        free(list);
+        list = NULL;
+    }
+}
+
 int push(ORBList* list, void* data){
+
     Node* node = (Node*)malloc(sizeof(Node));
     node->data = malloc(list->bytes);
     node->next = NULL;
     memcpy(node->data, data, list->bytes);
-    if(list->start == NULL){
+    if (list->start == NULL) {
         list->start = node;
         list->end = node;
-    }
-    else{
+    } else {
         list->end->next = node;
         list->end = node;
     }
+
     list->length++;
-    return 1;
+    return list->length;
 }
 
-orb_point_t* init_orbpoint(U16 row, U16 col, unsigned char descriptor[ORB_FEATURE_DESCRIPTOR_BITS]) {
-    orb_point_t* point = (orb_point_t*)malloc(sizeof(orb_point_t));
-    point->col = col;
-    point->row = row;
-    for(int k=0;k<ORB_FEATURE_DESCRIPTOR_BITS;k++){
-        point->descriptor[k] = descriptor[k];
+void init_matchpoints(orb_matched_point_t* point, U32 row1, U32 col1, U32 row2, U32 col2, U32 score) {
+    if (point == NULL) {
+        return;
     }
-    
-    return point;
-}
 
-orb_matched_point_t* init_matchpoints(U16 row1, U16 col1,U16 row2, U16 col2, U16 score) {
-    orb_matched_point_t* point = (orb_matched_point_t*)malloc(sizeof(orb_matched_point_t));
     point->col1 = col1;
     point->row1 = row1;
     point->col2 = col2;
     point->row2 = row2;
     point->score = score;
-    return point;
 }
 
-ORBList* push_orbpoint(U32 num_points, U16* pXs, U16* pYs, U8* pDescriptors, U32 des_size) {
-    unsigned short row, col;
-    unsigned char descriptor[MAX_POINTS * DESCRIPTOR_SIZE];
-    ORBList* orb_query_descriptor = init_List(sizeof(orb_point_t));
+ORBList* get_roi_points_list (rk_aiq_orb_algo_stat_t* keypoints, orb_rect_t roi)
+{
+    ORBList* roi_points_list = initList(sizeof(rk_aiq_orb_featue_point));
 
-    for (U32 i = 0; i < num_points; i++) {
-        row = pYs[i];
-        col = pXs[i];
-        for (U32 j = 0; j < des_size; j++) {
-            U32 index = i * des_size + j;
-            descriptor[index] = pDescriptors[index];
+    for (unsigned int i = 0; i < keypoints->num_points; i++) {
+        rk_aiq_orb_featue_point* point = keypoints->points+i;
+        if (point->x < roi.left ||
+                point->x > roi.right ||
+                point->y < roi.top ||
+                point->y > roi.bottom) {
+            continue;
         }
-        push(orb_query_descriptor, init_orbpoint(row, col, descriptor));
+
+        push(roi_points_list, point);
     }
 
-    return orb_query_descriptor;
+#if 1
+    FILE* fp = fopen("/tmp/points0.txt", "wb");
+    for (unsigned int i = 0; i < keypoints->num_points; i++) {
+        rk_aiq_orb_featue_point* point = keypoints->points+i;
+        fprintf(fp,"%d, %d\n", point->x, point->y);
+    }
+    fflush(fp);
+    fclose(fp);
+#endif
+    return roi_points_list;
 }
 
-ORBList* matching(ORBList* keypoints1, ORBList* keypoints2) {
-    
-    ORBList* matching_keypoints=init_List(sizeof(orb_matched_point_t));
-    
-    for(Node* pointer1 = keypoints1->start; pointer1 != NULL; pointer1 = pointer1->next){
-        orb_point_t* descriptor1 = (orb_point_t*)pointer1->data;
-        for(Node* pointer2 = keypoints2->start; pointer2 != NULL; pointer2 = pointer2->next){
-            orb_point_t* descriptor2 = (orb_point_t*)pointer2->data;
-            int success_num=0;
-            for(int k=0;k<256;k++){
-                if (descriptor1->descriptor[k] == descriptor2->descriptor[k]){
-                    success_num++;
+ORBList* matching(ORBList* roi_points_list, rk_aiq_orb_algo_stat_t* keypoints2, orb_rect_t roi) {
+    orb_matched_point_t keypoint = {0};
+    ORBList* matched_list = initList(sizeof(orb_matched_point_t));
+
+    for(Node* point = roi_points_list->start; point != NULL; point = point->next){
+        rk_aiq_orb_featue_point* descriptor1 = (rk_aiq_orb_featue_point*)point->data;
+        keypoint.score = 0;
+
+        for (unsigned int j = 0; j < keypoints2->num_points; j++) {
+            rk_aiq_orb_featue_point* descriptor2 = keypoints2->points+j;
+
+            unsigned int success_num = 120;
+            for(int k = 0; k < DESCRIPTOR_SIZE; k++) {
+                U8 xor_val = descriptor1->brief[k] ^ descriptor2->brief[k];
+                while (xor_val) {
+                    if (xor_val & 1) {
+                        success_num--;
+                    }
+                    xor_val = xor_val >> 1;
                 }
             }
-            if(success_num>245){ //225
-                push(matching_keypoints,
-                    init_matchpoints(descriptor1->row,
-                        descriptor1->col,
-                        descriptor2->row,
-                        descriptor2->col,
-                        success_num));
+
+            if(success_num > 110){ //120        
+                if (success_num > keypoint.score) {
+                    init_matchpoints(&keypoint,
+                        descriptor1->y, descriptor1->x,
+                        descriptor2->y, descriptor2->x,
+                        success_num);
+                }
+
+                //orb_matched_point_t* f = (orb_matched_point_t*)(matched_list->start);
+                //LOGE_AORB("found match: (%d-%d)-(%d-%d)",
+                //    f->col1, f->row1, f->col2, f->row2);
             }
         }
-    }
-    return matching_keypoints;
-}
+        
+        if (keypoint.score > 0) {
+            push(matched_list, &keypoint);
+        }
 
-ORBList* get_matched_points_from_roi (orb_rect_t roi, ORBList* matched_keypoints)
-{
-    ORBList* roi_keypoints=init_List(sizeof(orb_matched_point_t));
-
-    for(Node* point = matched_keypoints->start; point != NULL; point = point->next){
-        orb_matched_point_t* keypoints = (orb_matched_point_t*)point->data;
-        if (keypoints->col1 > roi.left &&
-                keypoints->col1 < roi.right &&
-                keypoints->row1 > roi.top &&
-                keypoints->row1 < roi.bottom) {
-            push(roi_keypoints, keypoints);
+        if (matched_list->length > 30) {
+            break;
         }
     }
 
-    return roi_keypoints;
+#if 1
+    FILE* fp = fopen("/tmp/points1.txt", "wb");
+    for (unsigned int i = 0; i < keypoints2->num_points; i++) {
+        rk_aiq_orb_featue_point* point = keypoints2->points+i;
+        fprintf(fp,"%d, %d\n", point->x, point->y);
+    }
+    fflush(fp);
+    fclose(fp);
+#endif
+
+    return matched_list;
 }
 
 void gaussian_elimination(double *input, int n)
@@ -342,6 +392,7 @@ void get_affine_matrix(double m[3][5], int dim, double affineM[9]) {
     int index = 0;
     char res[1024] = {0};
 
+    strcat(res, "\n");
     for(int j = 0; j < dim; j++) {
         char str1[128];
         sprintf(str1, "x%d' = ", j);
@@ -364,8 +415,8 @@ void get_affine_matrix(double m[3][5], int dim, double affineM[9]) {
 
     affineM[8] = 1;
 
-    LOGV_ORB("\n-------------------------------------\n");
-    LOGV_ORB("%s", res);
+    LOGE_ORB("\n-------------------------------------\n");
+    LOGE_ORB("%s", res);
 }
 
 bool gauss_jordan(double m[3][5], int length, int dim) {
@@ -472,32 +523,162 @@ int affine_fit(double fpt[][2], double tpt[][2], int length, int dim, double aff
 int elimate_affine_transform(ORBList* matched_keypoints, double homography[9])
 {
 	int ret = 0;
-	if (matched_keypoints->length <= 0) {
-		LOGE_ORB("matched keypoints is empty");
+	int i = 0, j = 0, k = 0;
+
+	if (matched_keypoints->length < 3) {
+		LOGE_ORB("matched keypoints num(%d) not enough", matched_keypoints->length);
+        k = 0;
+        for(Node* point = matched_keypoints->start; point != NULL; point = point->next) {
+            orb_matched_point_t* keypoint = (orb_matched_point_t*)point->data;
+            LOGE_AORB("<%d>-[%d - %d]-[%d - %d]",
+                keypoint->score,
+                keypoint->col1, keypoint->row1,
+                keypoint->col2, keypoint->row2);
+            k++;
+        }
 		return -1;
     }
 
+    int max, M0, count = 0;
+    int maxLength = 10;
+    int subX, subY;
+    int length = matched_keypoints->length > maxLength ? maxLength : matched_keypoints->length;
+    int distance = -1, distanceAvg = 0;
+    int* distanceArray = (int*)malloc(sizeof(int) * matched_keypoints->length);
+    int* distanceSortedArray = (int*)malloc(sizeof(int) * matched_keypoints->length);
+    int (*M0_stats)[matched_keypoints->length] =
+        (int (*)[matched_keypoints->length])malloc(sizeof(int) * matched_keypoints->length * 2);
+    for (k = 0; k < matched_keypoints->length; k++) {
+        M0_stats[0][k] = M0_stats[1][k] = -1;
+    }
+
     double (*from_pts)[2];
-	from_pts = (double (*)[2])malloc(sizeof(double *)*matched_keypoints->length*2);
+	from_pts = (double (*)[2])malloc(sizeof(double) * length * 2);
 
     double (*to_pts)[2];
-    to_pts = (double (*)[2])malloc(sizeof(double *)*matched_keypoints->length*2);
+    to_pts = (double (*)[2])malloc(sizeof(double) * length * 2);
 
-	int i = 0;
+
+    LOGD_ORB("matched points:");
+    //work_begin();
 	for(Node* point = matched_keypoints->start; point != NULL; point = point->next) {
         orb_matched_point_t* keypoint = (orb_matched_point_t*)point->data;
+
+        subX = (keypoint->col1 - keypoint->col2);
+        subY = (keypoint->row1 - keypoint->row2);
+        distanceArray[i] = subX*subX + subY*subY;
+        distanceSortedArray[i] = distanceArray[i];
+        distanceAvg += distanceArray[i];
+        i++;
+    }
+
+    distanceAvg /= matched_keypoints->length;
+
+    //sort
+    for (k = 0; k < matched_keypoints->length; k++) {
+        for (j = k; j < matched_keypoints->length; j++) {
+            if (distanceSortedArray[k] < distanceSortedArray[j]) {
+                max = distanceSortedArray[j];
+                distanceSortedArray[j] = distanceSortedArray[k];
+                distanceSortedArray[k] = max;
+            }
+        }
+    }
+
+    //find mode
+    for (k = 0, j = 0; k < matched_keypoints->length - 1; k++) {
+        if (distanceSortedArray[k] == distanceSortedArray[k+1]) {
+            M0_stats[0][j] = distanceSortedArray[k];
+            if (M0_stats[1][j] == -1) {
+                M0_stats[1][j] = 2;
+            } else {
+                M0_stats[1][j] += 1;
+            }
+        } else {
+            if(M0_stats[0][j] == -1) {
+                M0_stats[0][j] = distanceSortedArray[k];
+                M0_stats[1][j] = 1;
+            }
+            j++;
+
+            if (k == matched_keypoints->length - 2) {
+                M0_stats[0][j] = distanceSortedArray[k+1];
+                M0_stats[1][j] = 1;
+            }
+        }
+    }
+
+    for (k = 1; k < matched_keypoints->length; k++) {
+        LOGE_AORB("distanceSortedArray[%d]: %d", k, distanceSortedArray[k]);
+
+    }
+
+    max = M0_stats[1][0];
+    distance = M0_stats[0][0];
+    for (k = 1; k < matched_keypoints->length; k++) {
+        LOGE_AORB("M0_stats[%d]: %d, count: %d", k, M0_stats[0][k], M0_stats[1][k]);
+        if (M0_stats[0][k] == -1) {
+            break;
+        }
+
+        if (M0_stats[1][k] >= max) {
+            max = M0_stats[1][k];
+            distance = M0_stats[0][k];
+        }
+    }
+
+    LOGE_AORB("mesured distance: %d, count: %d", distance, max);
+
+    for (k = 0; k < matched_keypoints->length; k++) {
+        if (abs(distanceArray[k] - distance) > distance*10) {
+            distanceArray[k] = -1;
+        }
+    }
+
+    //work_end("calc-dist");
+    //work_begin();
+
+    i = 0;
+    k = 0;
+	for(Node* point = matched_keypoints->start; point != NULL && i < maxLength; point = point->next) {
+        orb_matched_point_t* keypoint = (orb_matched_point_t*)point->data;
+
+        if (distanceArray[k] == -1) {
+            k++;
+            continue;
+        }
+
 		from_pts[i][0] = keypoint->col1;
 		from_pts[i][1] = keypoint->row1;
 		to_pts[i][0] = keypoint->col2;
 		to_pts[i][1] = keypoint->row2;
         i++;
+        k++;
     }
 
-    ret = affine_fit(from_pts, to_pts, matched_keypoints->length, 2, homography);
+	if (i < 3) {
+        k = 0;
+        for(Node* point = matched_keypoints->start; point != NULL; point = point->next) {
+            orb_matched_point_t* keypoint = (orb_matched_point_t*)point->data;
+            LOGE_AORB("<%d>-[%d - %d]-[%d - %d]-<%d>",
+                keypoint->score,
+                keypoint->col1, keypoint->row1,
+                keypoint->col2, keypoint->row2,
+                distanceArray[k]);
+            k++;
+        }
+		LOGE_ORB("valid matched keypoints %d less than 6", i);
+		return -2;
+    }
+
+    ret = affine_fit(from_pts, to_pts, i, 2, homography);
+    //work_end("calc-affine");
 
 	free(from_pts);
 	free(to_pts);
-
+    free(distanceArray);
+    free(distanceSortedArray);
+    free(M0_stats);
     return ret;
 }
 

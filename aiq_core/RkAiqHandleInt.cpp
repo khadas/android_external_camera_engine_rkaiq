@@ -3388,6 +3388,22 @@ RkAiqAfecHandleInt::postProcess()
     return ret;
 }
 
+XCamReturn
+RkAiqAfecHandleInt::enable()
+{
+    ENTER_ANALYZER_FUNCTION();
+
+    return rk_aiq_uapi_afec_enable(mAlgoCtx);
+}
+
+XCamReturn
+RkAiqAfecHandleInt::disable()
+{
+    ENTER_ANALYZER_FUNCTION();
+
+    return rk_aiq_uapi_afec_disable(mAlgoCtx);
+}
+
 void
 RkAiqAgammaHandleInt::init()
 {

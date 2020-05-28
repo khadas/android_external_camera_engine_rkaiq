@@ -2,14 +2,14 @@
 
 #if OPENCV_SUPPORT
 int
-push_orbpoint_cv(U32 num_points, U16* pXs, U16* pYs, vector<Point2f> m_Points) {
+push_orbpoint_cv(U32 num_points, U16* points, vector<Point2f> m_Points) {
     Point2f point;
     m_Points.clear();
     vector<Point2f>(m_Points).swap(m_Points);
 
     for (int i = 0; i < num_points; i++) {
-        point.x = pXs[i];
-        point.y = pYs[i];
+        point.x = points[i].x;
+        point.y = points[i].y;
     
         m_Points.push_back(point);
     }

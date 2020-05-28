@@ -10,7 +10,7 @@
 #include "RkAiqCalibDbTypes.h"
 #include "anr/rk_aiq_types_anr_algo_prvt.h"
 
-ANRresult_t gain_fix_transfer(RKAnr_Mfnr_Params_Select_t *pMfnrSelect, RKAnr_Gain_Fix_t* pGainFix,  ANRExpInfo_t *pExpInfo);
+ANRresult_t gain_fix_transfer(RKAnr_Mfnr_Params_Select_t *pMfnrSelect, RKAnr_Gain_Fix_t* pGainFix,  ANRExpInfo_t *pExpInfo, float gain_ratio);
 
 
 

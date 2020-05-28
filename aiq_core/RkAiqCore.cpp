@@ -49,6 +49,7 @@
 #else
 #include "isp20/Isp20StatsBuffer.h"
 #include "isp20/rkisp2-config.h"
+#include "isp20/rkispp-config.h"
 #endif
 
 namespace RkCam {
@@ -355,6 +356,7 @@ RkAiqCore::analyzeInternal()
 
     if (mAiqIsppParamsPool->has_free_items()) {
         aiqParams->mIsppParams = mAiqIsppParamsPool->get_item();
+        aiqParams->mIsppParams->data()->update_mask = 0;
     } else {
         LOGE_ANALYZER("no free ispp params buffer!");
         return NULL;
@@ -386,6 +388,7 @@ RkAiqCore::analyzeInternal()
     genIspAdebayerResult(aiqParams);
     genIspAdpccResult(aiqParams);
     genIspAfecResult(aiqParams);
+    //genIspAorbResult(aiqParams);
     genIspAgammaResult(aiqParams);
     genIspAgicResult(aiqParams);
     genIspAldchResult(aiqParams);
@@ -432,6 +435,7 @@ RkAiqCore::analyzeInternalPp()
             LOGE_ANALYZER("no free ispp params buffer!");
             return NULL;
         }
+        aiqParams->mIsppParams->data()->update_mask = 0;
     } else {
         LOGE_ANALYZER("no free ispp params buffer!");
         return NULL;
@@ -448,11 +452,15 @@ RkAiqCore::analyzeInternalPp()
 
     genIspAorbResult(aiqParams);
 
-    if (!mAiqCurParams->data()->mIsppParams.ptr())
+    if (!mAiqCurParams->data()->mIsppParams.ptr()) {
         mAiqCurParams->data()->mIsppParams = aiqParams->mIsppParams;
-    else
-        mAiqCurParams->data()->mIsppParams->data()->orb =
-            aiqParams->mIsppParams->data()->orb;
+    } else {
+        if (aiqParams->mIsppParams->data()->update_mask & RKAIQ_ISPP_ORB_ID) {
+            mAiqCurParams->data()->mIsppParams->data()->update_mask |= RKAIQ_ISPP_ORB_ID;
+            mAiqCurParams->data()->mIsppParams->data()->orb =
+                aiqParams->mIsppParams->data()->orb;
+        }
+    }
 
     EXIT_ANALYZER_FUNCTION();
 
@@ -1426,14 +1434,20 @@ RkAiqCore::genIspAorbResult(RkAiqFullParams* params)
     SmartPtr<RkAiqHandle>* handle = getCurAlgoTypeHandle(RK_AIQ_ALGO_TYPE_AORB);
     int algo_id = (*handle)->getAlgoId();
 
-    ispp_param->update_mask |= RKAIQ_ISPP_ORB_ID;
     // gen rk aorb result
     if (algo_id == 0) {
         RkAiqAlgoProcResAorbInt* aorb_rk = (RkAiqAlgoProcResAorbInt*)aorb_com;
 
-#ifdef RK_SIMULATOR_HW
-#else
-#endif
+        if (aorb_rk->aorb_meas.update) {
+            ispp_param->update_mask |= RKAIQ_ISPP_ORB_ID;
+            ispp_param->orb.orb_en = aorb_rk->aorb_meas.orb_en;
+            if (ispp_param->orb.orb_en) {
+                ispp_param->orb.limit_value = aorb_rk->aorb_meas.limit_value;
+                ispp_param->orb.max_feature = aorb_rk->aorb_meas.max_feature;
+            }
+        } else {
+            ispp_param->update_mask &= ~RKAIQ_ISPP_ORB_ID;
+        }
     }
 
     EXIT_ANALYZER_FUNCTION();
@@ -1664,6 +1678,7 @@ RkAiqCore::addDefaultAlgos()
     enableAlgo(RK_AIQ_ALGO_TYPE_AFEC, 0, true);
     enableAlgo(RK_AIQ_ALGO_TYPE_AGIC, 0, true);
     enableAlgo(RK_AIQ_ALGO_TYPE_ADEBAYER, 0, true);
+    enableAlgo(RK_AIQ_ALGO_TYPE_AORB, 0, true);
 #endif
 #endif
 }
@@ -2170,7 +2185,23 @@ RkAiqCore::analyze(const SmartPtr<VideoBuffer> &buffer)
     if (has_3a_stats) {
         convertIspstatsToAlgo(buffer);
     } else if (has_orb_stats) {
-        // TODO
+        const SmartPtr<V4l2BufferProxy> buf =
+            buffer.dynamic_cast_ptr<V4l2BufferProxy>();
+        struct rkispp_stats_buffer *ppstats =
+            (struct rkispp_stats_buffer *)(buf->get_v4l2_userptr());
+
+        mAlogsSharedParams.ispStats.orb_stats_valid =
+            (ppstats->meas_type >> 4) & (0x01) ? true : false;
+        mAlogsSharedParams.ispStats.orb_stats.num_points =
+            ppstats->total_num;
+        for (u32 i = 0; i < ppstats->total_num; i++) {
+            mAlogsSharedParams.ispStats.orb_stats.points[i].x =
+                ppstats->data[i].x;
+            mAlogsSharedParams.ispStats.orb_stats.points[i].y =
+                ppstats->data[i].y;
+            memcpy(mAlogsSharedParams.ispStats.orb_stats.points[i].brief,
+                ppstats->data[i].brief, 15);
+        }
     } else {
         LOGW_ANALYZER("no orb or 3a stats !", __FUNCTION__, __LINE__);
     }
@@ -2189,9 +2220,10 @@ RkAiqCore::analyze(const SmartPtr<VideoBuffer> &buffer)
 
     if (fullParam.ptr() && mCb) {
         fullParam->data()->mIspParams->data()->frame_id = buffer->get_sequence() + 1;
+        fullParam->data()->mIsppParams->data()->frame_id = buffer->get_sequence() + 1;
         mCb->rkAiqCalcDone(fullParam);
     } else if (fullPparam.ptr() && mCb) {
-        fullParam->data()->mIsppParams->data()->frame_id = buffer->get_sequence() + 1;
+        fullPparam->data()->mIsppParams->data()->frame_id = buffer->get_sequence() + 1;
         mCb->rkAiqCalcDone(fullPparam);
     }
 
@@ -2249,7 +2281,6 @@ RkAiqCore::preProcess()
     PREPROCESS_ALGO(Aie);
     PREPROCESS_ALGO(Aldch);
     PREPROCESS_ALGO(Alsc);
-    PREPROCESS_ALGO(Aorb);
     PREPROCESS_ALGO(Ar2y);
     PREPROCESS_ALGO(Awdr);
     PREPROCESS_ALGO(Asd);
@@ -2307,7 +2338,6 @@ RkAiqCore::processing()
     PROCESSING_ALGO(Aie);
     PROCESSING_ALGO(Aldch);
     PROCESSING_ALGO(Alsc);
-    PROCESSING_ALGO(Aorb);
     PROCESSING_ALGO(Ar2y);
     PROCESSING_ALGO(Awdr);
     PROCESSING_ALGO(Asd);
@@ -2363,7 +2393,6 @@ RkAiqCore::postProcess()
     POSTPROCESS_ALGO(Aie);
     POSTPROCESS_ALGO(Aldch);
     POSTPROCESS_ALGO(Alsc);
-    POSTPROCESS_ALGO(Aorb);
     POSTPROCESS_ALGO(Ar2y);
     POSTPROCESS_ALGO(Awdr);
     POSTPROCESS_ALGO(Asd);

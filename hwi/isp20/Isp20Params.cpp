@@ -1483,12 +1483,12 @@ Isp20Params::convertAiqTnrToIsp20Params(struct rkispp_params_cfg& pp_cfg,
     int i = 0;
 
     LOGD("tnr_en %d", tnr.tnr_en);
+
     if(tnr.tnr_en) {
         pp_cfg.module_ens |= ISPP_MODULE_TNR;
         pp_cfg.module_en_update |= ISPP_MODULE_TNR;
         pp_cfg.module_cfg_update |= ISPP_MODULE_TNR;
     }
-
 
     struct rkispp_tnr_config  * pTnrCfg = &pp_cfg.tnr_cfg;
 
@@ -1652,6 +1652,7 @@ Isp20Params::convertAiqUvnrToIsp20Params(struct rkispp_params_cfg& pp_cfg,
         pp_cfg.module_ens |= ISPP_MODULE_NR;
         pp_cfg.module_en_update |= ISPP_MODULE_NR;
         pp_cfg.module_cfg_update |= ISPP_MODULE_NR;
+        pp_cfg.module_init_ens |= ISPP_MODULE_NR;
     }
 
     //0x0080
@@ -1734,6 +1735,7 @@ Isp20Params::convertAiqYnrToIsp20Params(struct rkispp_params_cfg& pp_cfg,
         pp_cfg.module_ens |= ISPP_MODULE_NR;
         pp_cfg.module_en_update |= ISPP_MODULE_NR;
         pp_cfg.module_cfg_update |= ISPP_MODULE_NR;
+        pp_cfg.module_init_ens |= ISPP_MODULE_NR;
     }
 
     //0x0104 - 0x0108
@@ -1854,6 +1856,7 @@ Isp20Params::convertAiqSharpenToIsp20Params(struct rkispp_params_cfg& pp_cfg,
         pp_cfg.module_ens |= ISPP_MODULE_SHP;
         pp_cfg.module_en_update |= ISPP_MODULE_SHP;
         pp_cfg.module_cfg_update |= ISPP_MODULE_SHP;
+        pp_cfg.module_init_ens |= ISPP_MODULE_SHP;
     }
 #if 1
     //0x0080
@@ -2145,17 +2148,27 @@ Isp20Params::convertAiqResultsToIsp20PpParams(struct rkispp_params_cfg& pp_cfg,
 {
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
     /* reinit, this may override by driver, enable nr & sharp default */
-    pp_cfg.module_init_ens = ISPP_MODULE_NR | ISPP_MODULE_SHP;
-    convertAiqTnrToIsp20Params(pp_cfg, aiq_results->data()->tnr);
-    convertAiqUvnrToIsp20Params(pp_cfg, aiq_results->data()->uvnr);
-    convertAiqYnrToIsp20Params(pp_cfg, aiq_results->data()->ynr);
-    convertAiqSharpenToIsp20Params(pp_cfg, aiq_results->data()->sharpen,
-                                   aiq_results->data()->edgeflt);
+    //pp_cfg.module_init_ens = ISPP_MODULE_NR | ISPP_MODULE_SHP;// | ISPP_MODULE_ORB;
+    pp_cfg.module_init_ens = _last_pp_module_init_ens;
 
-    if(aiq_results->data()->update_mask & RKAIQ_ISPP_FEC_ID) {
+    if(aiq_results->data()->update_mask & ISPP_MODULE_TNR)
+        convertAiqTnrToIsp20Params(pp_cfg, aiq_results->data()->tnr);
+
+    if(aiq_results->data()->update_mask & ISPP_MODULE_NR) {
+        convertAiqUvnrToIsp20Params(pp_cfg, aiq_results->data()->uvnr);
+        convertAiqYnrToIsp20Params(pp_cfg, aiq_results->data()->ynr);
+    }
+
+    if(aiq_results->data()->update_mask & ISPP_MODULE_SHP)
+        convertAiqSharpenToIsp20Params(pp_cfg, aiq_results->data()->sharpen,
+                                       aiq_results->data()->edgeflt);
+
+    if(aiq_results->data()->update_mask & RKAIQ_ISPP_FEC_ID)
         convertAiqFecToIsp20Params(pp_cfg, aiq_results->data()->fec);
-    } else
-        pp_cfg.module_init_ens |= _last_pp_module_init_ens & (ISPP_MODULE_FEC_ST | ISPP_MODULE_FEC_ST);
+
+    if(aiq_results->data()->update_mask & RKAIQ_ISPP_ORB_ID)
+        convertAiqOrbToIsp20Params(pp_cfg, aiq_results->data()->orb);
+
     _last_pp_module_init_ens = pp_cfg.module_init_ens;
 
     return ret;
@@ -2408,4 +2421,465 @@ Isp20Params::set_working_mode(int mode)
    _working_mode = mode;
 }
 
+void
+Isp20Params::convertAiqOrbToIsp20Params(struct rkispp_params_cfg& pp_cfg,
+        rk_aiq_isp_orb_t& orb)
+{
+    if(orb.orb_en){
+        pp_cfg.module_ens |= ISPP_MODULE_ORB;
+        pp_cfg.module_en_update |= ISPP_MODULE_ORB;
+        pp_cfg.module_cfg_update |= ISPP_MODULE_ORB;
+        pp_cfg.module_init_ens |= ISPP_MODULE_ORB;
+
+        struct rkispp_orb_config  *pOrbCfg = &pp_cfg.orb_cfg;
+
+        pOrbCfg->limit_value = orb.limit_value;
+        pOrbCfg->max_feature = orb.max_feature;
+    } else {
+        pp_cfg.module_init_ens &= ~ISPP_MODULE_ORB;
+    }
+}
+
+void Isp20Params::setModuleStatus(rk_aiq_module_id_t mId, bool en)
+{
+    #define _ISP_MODULE_CFG_(id)  \
+    {\
+        _force_module_flags |= 1LL << id;\
+        if(en)\
+            _force_isp_module_ens |= 1LL << id;\
+        else\
+            _force_isp_module_ens &= ~(1LL << id);\
+    }
+
+    #define _ISPP_MODULE_CFG_(id, mod_en)  \
+    {\
+        _force_module_flags |= 1LL << id;\
+        if(en)\
+            _force_ispp_module_ens |= mod_en;\
+        else\
+            _force_ispp_module_ens &= ~(mod_en);\
+    }
+
+    SmartLock locker (_mutex);
+    switch (mId){
+        case RK_MODULE_INVAL:
+        break;
+        case RK_MODULE_MAX:
+        break;
+        case RK_MODULE_FEC:
+        break;
+        case RK_MODULE_TNR:
+            _ISPP_MODULE_CFG_(RK_ISP2X_PP_TNR_ID, ISPP_MODULE_TNR);
+        break;
+        case RK_MODULE_NR:
+            _ISPP_MODULE_CFG_(RK_ISP2X_RAWNR_ID, ISPP_MODULE_NR);
+        break;
+        case RK_MODULE_DPCC:
+            _ISP_MODULE_CFG_(RK_ISP2X_DPCC_ID);
+        break;
+        case RK_MODULE_BLS:
+            _ISP_MODULE_CFG_(RK_ISP2X_BLS_ID);
+        break;
+        case RK_MODULE_LSC:
+            _ISP_MODULE_CFG_(RK_ISP2X_LSC_ID);
+        break;
+        case RK_MODULE_CTK:
+            _ISP_MODULE_CFG_(RK_ISP2X_CTK_ID);
+        break;
+        case RK_MODULE_AWB:
+            _ISP_MODULE_CFG_(RK_ISP2X_RAWAWB_ID);
+        break;
+        case RK_MODULE_GOC:
+            _ISP_MODULE_CFG_(RK_ISP2X_GOC_ID);
+        break;
+        case RK_MODULE_3DLUT:
+            _ISP_MODULE_CFG_(RK_ISP2X_3DLUT_ID);
+        break;
+        case RK_MODULE_LDCH:
+            _ISP_MODULE_CFG_(RK_ISP2X_LDCH_ID);
+        break;
+        case RK_MODULE_GIC:
+            _ISP_MODULE_CFG_(RK_ISP2X_GIC_ID);
+        break;
+        case RK_MODULE_AWB_GAIN:
+            _ISP_MODULE_CFG_(RK_ISP2X_GAIN_ID);
+        break;
+        case RK_MODULE_SHARP:
+            _ISP_MODULE_CFG_(RK_ISP2X_RK_IESHARP_ID);
+        break;
+        case RK_MODULE_AE:
+        break;
+        case RK_MODULE_DHAZ:
+            _ISP_MODULE_CFG_(RK_ISP2X_DHAZ_ID);
+        break;
+    }
+}
+
+void Isp20Params::getModuleStatus(rk_aiq_module_id_t mId, bool& en)
+{
+    int mod_id = -1;
+    switch (mId){
+        case RK_MODULE_INVAL:
+        break;
+        case RK_MODULE_MAX:
+        break;
+        case RK_MODULE_TNR:
+            mod_id = RK_ISP2X_PP_TNR_ID;
+        break;
+        case RK_MODULE_DPCC:
+            mod_id = RK_ISP2X_DPCC_ID;
+        break;
+        case RK_MODULE_BLS:
+            mod_id = RK_ISP2X_BLS_ID;
+        break;
+        case RK_MODULE_LSC:
+            mod_id = RK_ISP2X_LSC_ID;
+        break;
+        case RK_MODULE_CTK:
+            mod_id = RK_ISP2X_CTK_ID;
+        break;
+        case RK_MODULE_AWB:
+            mod_id = RK_ISP2X_RAWAWB_ID;
+        break;
+        case RK_MODULE_GOC:
+            mod_id = RK_ISP2X_GOC_ID;
+        break;
+        case RK_MODULE_NR:
+            mod_id = RK_ISP2X_RAWNR_ID;
+        break;
+        case RK_MODULE_3DLUT:
+            mod_id = RK_ISP2X_3DLUT_ID;
+        break;
+        case RK_MODULE_LDCH:
+            mod_id = RK_ISP2X_LDCH_ID;
+        break;
+        case RK_MODULE_GIC:
+            mod_id = RK_ISP2X_GIC_ID;
+        break;
+        case RK_MODULE_AWB_GAIN:
+            mod_id = RK_ISP2X_GAIN_ID;
+        break;
+        case RK_MODULE_SHARP:
+            mod_id = RK_ISP2X_RK_IESHARP_ID;
+        break;
+        case RK_MODULE_AE:
+            mod_id = RK_ISP2X_RAWAE_LITE_ID;
+        break;
+        case RK_MODULE_FEC:
+            mod_id = RK_ISP2X_PP_TFEC_ID;
+        break;
+        case RK_MODULE_DHAZ:
+            mod_id = RK_ISP2X_DHAZ_ID;
+        break;
+    }
+    if (mod_id < 0)
+        LOGE("input param: module ID is wrong!");
+    else
+        en = getModuleForceEn(mod_id);
+}
+
+bool Isp20Params::getModuleForceFlag(int module_id)
+{
+    SmartLock locker (_mutex);
+    return ((_force_module_flags & (1LL << module_id)) >> module_id);
+}
+
+void Isp20Params::setModuleForceFlagInverse(int module_id)
+{
+    SmartLock locker (_mutex);
+    _force_module_flags &= (~(1LL << module_id));
+}
+
+bool Isp20Params::getModuleForceEn(int module_id)
+{
+    SmartLock locker (_mutex);
+    if(module_id == RK_ISP2X_PP_TNR_ID)
+        return (_force_ispp_module_ens & ISPP_MODULE_TNR)>>0;
+    else if(module_id == RK_ISP2X_PP_NR_ID)
+        return (_force_ispp_module_ens & ISPP_MODULE_NR)>>1;
+    else if(module_id == RK_ISP2X_PP_TSHP_ID)
+        return (_force_ispp_module_ens & ISPP_MODULE_SHP)>>2;
+    else if(module_id == RK_ISP2X_PP_TFEC_ID)
+        return (_force_ispp_module_ens & ISPP_MODULE_FEC)>>3;
+    else
+        return ((_force_isp_module_ens & (1LL << module_id)) >> module_id);
+}
+
+void Isp20Params::updateIspModuleForceEns(u64 module_ens)
+{
+    SmartLock locker (_mutex);
+    _force_isp_module_ens = module_ens;
+}
+
+void Isp20Params::updateIsppModuleForceEns(u32 module_ens)
+{
+    SmartLock locker (_mutex);
+    _force_ispp_module_ens = module_ens;
+}
+
+void
+Isp20Params::forceOverwriteAiqIsppCfg(struct rkispp_params_cfg& pp_cfg, SmartPtr<RkAiqIsppParamsProxy> aiq_results)
+{
+    for (int i=RK_ISP2X_PP_TNR_ID; i <= RK_ISP2X_PP_MAX_ID; i++){
+        if (getModuleForceFlag(i)) {
+            switch (i){
+                case RK_ISP2X_PP_TNR_ID:
+                    if (getModuleForceEn(RK_ISP2X_PP_TNR_ID)){
+                        if(aiq_results->data()->tnr.tnr_en){
+                            pp_cfg.module_ens |= ISPP_MODULE_TNR;
+                            pp_cfg.module_en_update |= ISPP_MODULE_TNR;
+                            pp_cfg.module_cfg_update |= ISPP_MODULE_TNR;
+                        }else{
+                            setModuleForceFlagInverse(RK_ISP2X_PP_TNR_ID);
+                            LOGE("algo isn't enabled, so enable module failed!");
+                        }
+                    }else{
+                        pp_cfg.module_ens &= ~ISPP_MODULE_TNR;
+                        pp_cfg.module_en_update |= ISPP_MODULE_TNR;
+                        pp_cfg.module_cfg_update &= ~ISPP_MODULE_TNR;
+                    }
+                break;
+                case RK_ISP2X_PP_NR_ID:
+                    if (getModuleForceEn(RK_ISP2X_PP_NR_ID)){
+                        if(aiq_results->data()->tnr.tnr_en){
+                            pp_cfg.module_ens |= ISPP_MODULE_NR;
+                            pp_cfg.module_en_update |= ISPP_MODULE_NR;
+                            pp_cfg.module_cfg_update |= ISPP_MODULE_NR;
+                        }else{
+                            setModuleForceFlagInverse(RK_ISP2X_PP_NR_ID);
+                            LOGE("algo isn't enabled, so enable module failed!");
+                        }
+                    }else{
+                        pp_cfg.module_ens &= ~ISPP_MODULE_NR;
+                        pp_cfg.module_en_update |= ISPP_MODULE_NR;
+                        pp_cfg.module_cfg_update &= ~ISPP_MODULE_NR;
+                    }
+                break;
+                case RK_ISP2X_PP_TSHP_ID:
+                    if (getModuleForceEn(RK_ISP2X_RK_IESHARP_ID)){
+                        if(aiq_results->data()->sharpen.stSharpFixV1.sharp_en ||
+                           aiq_results->data()->edgeflt.edgeflt_en){
+                            pp_cfg.module_ens |= ISPP_MODULE_SHP;
+                            pp_cfg.module_en_update |= ISPP_MODULE_SHP;
+                            pp_cfg.module_cfg_update |= ISPP_MODULE_SHP;
+                        }else{
+                            setModuleForceFlagInverse(RK_ISP2X_PP_TSHP_ID);
+                            LOGE("algo isn't enabled, so enable module failed!");
+                        }
+                    }else{
+                        pp_cfg.module_ens &= ~ISPP_MODULE_SHP;
+                        pp_cfg.module_en_update |= ISPP_MODULE_SHP;
+                        pp_cfg.module_cfg_update &= ~ISPP_MODULE_SHP;
+                    }
+                break;
+            }
+        }
+    }
+    updateIsppModuleForceEns(pp_cfg.module_ens);
+}
+
+void
+Isp20Params::forceOverwriteAiqIspCfg(struct isp2x_isp_params_cfg& isp_cfg,
+        SmartPtr<RkAiqIspParamsProxy> aiq_results)
+{
+    for (int i=0; i <= RK_ISP2X_MAX_ID; i++){
+        if (getModuleForceFlag(i)) {
+            switch (i){
+                case RK_ISP2X_DPCC_ID:
+                    if (getModuleForceEn(RK_ISP2X_PP_TNR_ID)){
+                        if(aiq_results->data()->dpcc.stBasic.enable){
+                            isp_cfg.module_ens |= ISPP_MODULE_TNR;
+                            isp_cfg.module_en_update |= ISPP_MODULE_TNR;
+                            isp_cfg.module_cfg_update |= ISPP_MODULE_TNR;
+                        }else{
+                            setModuleForceFlagInverse(RK_ISP2X_DPCC_ID);
+                            LOGE("algo isn't enabled, so enable module failed!");
+                        }
+                    }else{
+                        isp_cfg.module_ens &= ~ISPP_MODULE_TNR;
+                        isp_cfg.module_en_update |= ISPP_MODULE_TNR;
+                        isp_cfg.module_cfg_update &= ~ISPP_MODULE_TNR;
+                    }
+                break;
+                case RK_ISP2X_BLS_ID:
+                    if (getModuleForceEn(RK_ISP2X_BLS_ID)){
+                        if(aiq_results->data()->blc.stResult.enable){
+                            isp_cfg.module_ens |= ISP2X_MODULE_BLS;
+                            isp_cfg.module_en_update |= ISP2X_MODULE_BLS;
+                            isp_cfg.module_cfg_update |= ISP2X_MODULE_BLS;
+                        }else{
+                            setModuleForceFlagInverse(RK_ISP2X_BLS_ID);
+                            LOGE("algo isn't enabled, so enable module failed!");
+                        }
+                    }else{
+                        isp_cfg.module_ens &= ~ISP2X_MODULE_BLS;
+                        isp_cfg.module_en_update |= ISP2X_MODULE_BLS;
+                        isp_cfg.module_cfg_update &= ~ISP2X_MODULE_BLS;
+                    }
+                break;
+                case RK_ISP2X_LSC_ID:
+                    if (getModuleForceEn(RK_ISP2X_LSC_ID)){
+                        if(aiq_results->data()->lsc.lsc_en){
+                            isp_cfg.module_ens |= ISP2X_MODULE_LSC;
+                            isp_cfg.module_en_update |= ISP2X_MODULE_LSC;
+                            isp_cfg.module_cfg_update |= ISP2X_MODULE_LSC;
+                        }else{
+                            setModuleForceFlagInverse(RK_ISP2X_LSC_ID);
+                            LOGE("algo isn't enabled, so enable module failed!");
+                        }
+                    }else{
+                        isp_cfg.module_ens &= ~ISP2X_MODULE_LSC;
+                        isp_cfg.module_en_update |= ISP2X_MODULE_LSC;
+                        isp_cfg.module_cfg_update &= ~ISP2X_MODULE_LSC;
+                    }
+                break;
+                case RK_ISP2X_CTK_ID:
+                    if (getModuleForceEn(RK_ISP2X_CTK_ID)){
+                        if(aiq_results->data()->lsc.lsc_en){
+                            isp_cfg.module_ens |= ISP2X_MODULE_CCM;
+                            isp_cfg.module_en_update |= ISP2X_MODULE_CCM;
+                            isp_cfg.module_cfg_update |= ISP2X_MODULE_CCM;
+                        }else{
+                            setModuleForceFlagInverse(RK_ISP2X_CTK_ID);
+                            LOGE("algo isn't enabled, so enable module failed!");
+                        }
+                    }else{
+                        isp_cfg.module_ens &= ~ISP2X_MODULE_CCM;
+                        isp_cfg.module_en_update |= ISP2X_MODULE_CCM;
+                        isp_cfg.module_cfg_update &= ~ISP2X_MODULE_CCM;
+                    }
+                break;
+                case RK_ISP2X_RAWAWB_ID:
+                    if (getModuleForceEn(RK_ISP2X_RAWAWB_ID)){
+                        if(aiq_results->data()->awb_cfg_v200.awbEnable){
+                            isp_cfg.module_ens |= ISP2X_MODULE_RAWAWB;
+                            isp_cfg.module_en_update |= ISP2X_MODULE_RAWAWB;
+                            isp_cfg.module_cfg_update |= ISP2X_MODULE_RAWAWB;
+                        }else{
+                            setModuleForceFlagInverse(RK_ISP2X_RAWAWB_ID);
+                            LOGE("algo isn't enabled, so enable module failed!");
+                        }
+                    }else{
+                        isp_cfg.module_ens &= ~ISP2X_MODULE_RAWAWB;
+                        isp_cfg.module_en_update |= ISP2X_MODULE_RAWAWB;
+                        isp_cfg.module_cfg_update &= ~ISP2X_MODULE_RAWAWB;
+                    }
+                break;
+                case RK_ISP2X_GOC_ID:
+                    if (getModuleForceEn(RK_ISP2X_GOC_ID)){
+                        if(aiq_results->data()->agamma_config.gamma_en){
+                            isp_cfg.module_ens |= ISP2X_MODULE_GOC;
+                            isp_cfg.module_en_update |= ISP2X_MODULE_GOC;
+                            isp_cfg.module_cfg_update |= ISP2X_MODULE_GOC;
+                        }else{
+                            setModuleForceFlagInverse(RK_ISP2X_GOC_ID);
+                            LOGE("algo isn't enabled, so enable module failed!");
+                        }
+                    }else{
+                        isp_cfg.module_ens &= ~ISP2X_MODULE_GOC;
+                        isp_cfg.module_en_update |= ISP2X_MODULE_GOC;
+                        isp_cfg.module_cfg_update &= ~ISP2X_MODULE_GOC;
+                    }
+                break;
+                case RK_ISP2X_RAWNR_ID:
+                    if (getModuleForceEn(RK_ISP2X_RAWNR_ID)){
+                        if(aiq_results->data()->rawnr.rawnr_en){
+                            isp_cfg.module_ens |= ISP2X_MODULE_RAWNR;
+                            isp_cfg.module_en_update |= ISP2X_MODULE_RAWNR;
+                            isp_cfg.module_cfg_update |= ISP2X_MODULE_RAWNR;
+                        }else{
+                            setModuleForceFlagInverse(RK_ISP2X_RAWNR_ID);
+                            LOGE("algo isn't enabled, so enable module failed!");
+                        }
+                    }else{
+                        isp_cfg.module_ens &= ~ISP2X_MODULE_RAWNR;
+                        isp_cfg.module_en_update |= ISP2X_MODULE_RAWNR;
+                        isp_cfg.module_cfg_update &= ~ISP2X_MODULE_RAWNR;
+                    }
+                break;
+                case RK_ISP2X_3DLUT_ID:
+                    if (getModuleForceEn(RK_ISP2X_3DLUT_ID)){
+                        if(aiq_results->data()->rawnr.rawnr_en){
+                            isp_cfg.module_ens |= ISP2X_MODULE_3DLUT;
+                            isp_cfg.module_en_update |= ISP2X_MODULE_3DLUT;
+                            isp_cfg.module_cfg_update |= ISP2X_MODULE_3DLUT;
+                        }else{
+                            setModuleForceFlagInverse(RK_ISP2X_3DLUT_ID);
+                            LOGE("algo isn't enabled, so enable module failed!");
+                        }
+                    }else{
+                        isp_cfg.module_ens &= ~ISP2X_MODULE_3DLUT;
+                        isp_cfg.module_en_update |= ISP2X_MODULE_3DLUT;
+                        isp_cfg.module_cfg_update &= ~ISP2X_MODULE_3DLUT;
+                    }
+                break;
+                case RK_ISP2X_LDCH_ID:
+                    if (getModuleForceEn(RK_ISP2X_LDCH_ID)){
+                        if(aiq_results->data()->ldch.ldch_en){
+                            isp_cfg.module_ens |= ISP2X_MODULE_LDCH;
+                            isp_cfg.module_en_update |= ISP2X_MODULE_LDCH;
+                            isp_cfg.module_cfg_update |= ISP2X_MODULE_LDCH;
+                        }else{
+                            setModuleForceFlagInverse(RK_ISP2X_LDCH_ID);
+                            LOGE("algo isn't enabled, so enable module failed!");
+                        }
+                    }else{
+                        isp_cfg.module_ens &= ~ISP2X_MODULE_LDCH;
+                        isp_cfg.module_en_update |= ISP2X_MODULE_LDCH;
+                        isp_cfg.module_cfg_update &= ~ISP2X_MODULE_LDCH;
+                    }
+                break;
+                case RK_ISP2X_GIC_ID:
+                    if (getModuleForceEn(RK_ISP2X_GIC_ID)){
+                        if(aiq_results->data()->gic.gic_en){
+                            isp_cfg.module_ens |= ISP2X_MODULE_GIC;
+                            isp_cfg.module_en_update |= ISP2X_MODULE_GIC;
+                            isp_cfg.module_cfg_update |= ISP2X_MODULE_GIC;
+                        }else{
+                            setModuleForceFlagInverse(RK_ISP2X_GIC_ID);
+                            LOGE("algo isn't enabled, so enable module failed!");
+                        }
+                    }else{
+                        isp_cfg.module_ens &= ~ISP2X_MODULE_GIC;
+                        isp_cfg.module_en_update |= ISP2X_MODULE_GIC;
+                        isp_cfg.module_cfg_update &= ~ISP2X_MODULE_GIC;
+                    }
+                break;
+                case RK_ISP2X_GAIN_ID:
+                    if (getModuleForceEn(RK_ISP2X_GAIN_ID)){
+                        if(aiq_results->data()->gain_config.gain_table_en){
+                            isp_cfg.module_ens |= ISP2X_MODULE_GAIN;
+                            isp_cfg.module_en_update |= ISP2X_MODULE_GAIN;
+                            isp_cfg.module_cfg_update |= ISP2X_MODULE_GAIN;
+                        }else{
+                            setModuleForceFlagInverse(RK_ISP2X_GAIN_ID);
+                            LOGE("algo isn't enabled, so enable module failed!");
+                        }
+                    }else{
+                        isp_cfg.module_ens &= ~ISP2X_MODULE_GAIN;
+                        isp_cfg.module_en_update |= ISP2X_MODULE_GAIN;
+                        isp_cfg.module_cfg_update &= ~ISP2X_MODULE_GAIN;
+                    }
+                break;
+                case RK_MODULE_DHAZ:
+                    if (getModuleForceEn(RK_ISP2X_DHAZ_ID)){
+                        if(aiq_results->data()->adhaz_config.dehaze_en[0]){
+                            isp_cfg.module_ens |= ISP2X_MODULE_DHAZ;
+                            isp_cfg.module_en_update |= ISP2X_MODULE_DHAZ;
+                            isp_cfg.module_cfg_update |= ISP2X_MODULE_DHAZ;
+                        }else{
+                            setModuleForceFlagInverse(RK_ISP2X_DHAZ_ID);
+                            LOGE("algo isn't enabled, so enable module failed!");
+                        }
+                    }else{
+                        isp_cfg.module_ens &= ~ISP2X_MODULE_DHAZ;
+                        isp_cfg.module_en_update |= ISP2X_MODULE_DHAZ;
+                        isp_cfg.module_cfg_update &= ~ISP2X_MODULE_DHAZ;
+                    }
+                break;
+            }
+        }
+    }
+    updateIsppModuleForceEns(isp_cfg.module_ens);
+}
 }; //namspace RkCam

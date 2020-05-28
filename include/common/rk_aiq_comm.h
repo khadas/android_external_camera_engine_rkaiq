@@ -441,4 +441,24 @@ typedef enum {
     RK_AIQ_ISPP_STATIC_FEC_WORKING_MODE_FISHEYE,
 } rk_aiq_ispp_static_fec_working_mode_t;
 
+typedef enum {
+    RK_MODULE_INVAL = 0,
+    RK_MODULE_DPCC,
+    RK_MODULE_BLS,
+    RK_MODULE_LSC,
+    RK_MODULE_AWB_GAIN,
+    RK_MODULE_CTK,
+    RK_MODULE_GOC,
+    RK_MODULE_SHARP,
+    RK_MODULE_AE,
+    RK_MODULE_AWB,
+    RK_MODULE_NR,
+    RK_MODULE_GIC,
+    RK_MODULE_DHAZ,
+    RK_MODULE_3DLUT,
+    RK_MODULE_LDCH,
+    RK_MODULE_TNR,
+    RK_MODULE_FEC,
+    RK_MODULE_MAX
+}rk_aiq_module_id_t;
 #endif

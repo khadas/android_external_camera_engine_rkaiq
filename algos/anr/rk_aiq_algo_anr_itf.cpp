@@ -153,7 +153,7 @@ processing(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outparams)
 			stExpInfo.arAGain[0] = pAEPreRes->ae_pre_res_rk.LinearExp.exp_real_params.analog_gain;
 			stExpInfo.arDGain[0] = pAEPreRes->ae_pre_res_rk.LinearExp.exp_real_params.digital_gain;
 			stExpInfo.arTime[0] = pAEPreRes->ae_pre_res_rk.LinearExp.exp_real_params.integration_time;
-			stExpInfo.arIso[0] = stExpInfo.arAGain[0]* 50;
+			stExpInfo.arIso[0] = stExpInfo.arAGain[0]*stExpInfo.arDGain[0]* 50;
 		}else{		
 			for(int i=0; i<3; i++){				
 				stExpInfo.arAGain[i] = pAEPreRes->ae_pre_res_rk.HdrExp[i].exp_real_params.analog_gain;
@@ -174,6 +174,25 @@ processing(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outparams)
 	}else{
 		LOGE_ANR("%s:%d pAEPreRes is NULL, so use default instead \n", __FUNCTION__, __LINE__);
 	}		
+
+	#if 0
+	static int anr_cnt = 0;
+	anr_cnt++;
+
+	if(anr_cnt %50 == 0){
+		for(int i=0; i<stExpInfo.hdr_mode + 1; i++){				
+				printf("%s:%d index:%d again:%f dgain:%f time:%f iso:%d hdr_mode:%d\n",
+					__FUNCTION__, __LINE__,
+					i,
+					stExpInfo.arAGain[i],
+					stExpInfo.arDGain[i],
+					stExpInfo.arTime[i],
+					stExpInfo.arIso[i],
+					stExpInfo.hdr_mode);
+			}	
+	}
+	#endif
+	
 
 	#endif
 	

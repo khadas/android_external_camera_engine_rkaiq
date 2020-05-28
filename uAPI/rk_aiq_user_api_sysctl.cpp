@@ -223,20 +223,6 @@ rk_aiq_uapi_sysctl_getMetaData(const rk_aiq_sys_ctx_t* ctx, uint32_t frame_id, r
 }
 
 XCamReturn
-rk_aiq_uapi_sysctl_setModuleCtl(const rk_aiq_sys_ctx_t* ctx, int32_t mod_en)
-{
-    // TODO
-    return XCAM_RETURN_ERROR_FAILED;
-}
-
-int32_t
-rk_aiq_uapi_sysctl_getModuleCtl(const rk_aiq_sys_ctx_t* ctx)
-{
-    // TODO
-    return XCAM_RETURN_ERROR_FAILED;
-}
-
-XCamReturn
 rk_aiq_uapi_sysctl_regLib(const rk_aiq_sys_ctx_t* ctx,
                           RkAiqAlgoDesComm* algo_lib_des)
 {
@@ -294,6 +280,8 @@ algoHandle(const rk_aiq_sys_ctx_t* ctx, const int algo_type)
     return algo_handle;
 }
 
+#include "RkAiqVersion.h"
+#include "RkAiqCalibVersion.h"
 #include "rk_aiq_user_api_awb.cpp"
 #include "rk_aiq_user_api_adebayer.cpp"
 #include "rk_aiq_user_api_ahdr.cpp"
@@ -308,9 +296,49 @@ algoHandle(const rk_aiq_sys_ctx_t* ctx, const int algo_type)
 #include "rk_aiq_user_api_anr.cpp"
 #include "rk_aiq_user_api_asharp.cpp"
 #include "rk_aiq_user_api_imgproc.cpp"
+#include "rk_aiq_user_api_afec.cpp"
 
-#include "RkAiqVersion.h"
-#include "RkAiqCalibVersion.h"
+XCamReturn
+rk_aiq_uapi_sysctl_setModuleCtl(const rk_aiq_sys_ctx_t* ctx, rk_aiq_module_id_t mId, bool mod_en)
+{
+    ENTER_XCORE_FUNCTION();
+
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    if (mId > RK_MODULE_INVAL && mId < RK_MODULE_MAX) {
+        if (mId == RK_MODULE_FEC){
+            if(mod_en) {
+                if(XCAM_RETURN_NO_ERROR != rk_aiq_user_api_afec_enable(ctx))
+                    LOGE("enable fec failed! maybe fec not enable in xml.");
+            } else {
+                if(XCAM_RETURN_NO_ERROR != rk_aiq_user_api_afec_disable(ctx))
+                    LOGE("disable fec failed! maybe fec not enable in xml.");
+            }
+        } else {
+            ret = ctx->_rkAiqManager->setModuleCtl(mId, mod_en);
+        }
+    } else {
+        ret = XCAM_RETURN_ERROR_FAILED;
+    }
+
+    EXIT_XCORE_FUNCTION();
+
+    return ret;
+}
+
+int32_t
+rk_aiq_uapi_sysctl_getModuleCtl(const rk_aiq_sys_ctx_t* ctx, rk_aiq_module_id_t mId, bool *mod_en)
+{
+    ENTER_XCORE_FUNCTION();
+
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    bool en;
+    ret = ctx->_rkAiqManager->getModuleCtl(mId, en);
+    *mod_en = en;
+    EXIT_XCORE_FUNCTION();
+
+    return ret;
+}
+
 static void _print_versions()
 {
     extern RkAiqAlgoDescription g_RkIspAlgoDescA3dlut;

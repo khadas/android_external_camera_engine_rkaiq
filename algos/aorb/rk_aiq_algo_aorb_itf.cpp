@@ -30,16 +30,20 @@ RKAIQ_BEGIN_DECLARE
 
 typedef struct ORBContext_s {
     unsigned char initialized;
-    int orb_en;
-    int limit_value;
-    int max_feature;
-    double homography_roi[9];
+    int output_width;
+    int output_height;
+
+    unsigned char orb_en;
+    unsigned char limit_value;
+    unsigned int max_feature;
+
     double affine_mat_roi[9];
-    unsigned int img_width;
-    unsigned int img_height;
     orb_rect_t roi_rect;
     orb_rect_t ref_roi_rect;
     rk_aiq_isp_orb_stats_t orb_stats;
+
+    ORBList* roi_points_list;
+
 } ORBContext_t;
 
 ORBContext_t gORBCtx;
@@ -53,8 +57,8 @@ typedef struct _RkAiqAlgoContext {
 
 static RkAiqAlgoContext ctx;
 
-#define ORB_LIMIT_VALUE_DEF 50
-#define ORB_MAX_FEATURE_DEF 200
+#define ORB_LIMIT_VALUE_DEF 15
+#define ORB_MAX_FEATURE_DEF 1000
 
 #if OPENCV_SUPPORT
 using namespace cv;
@@ -69,6 +73,7 @@ XCamReturn ORBCreateContext(RkAiqAlgoContext **context, const AlgoCtxInstanceCfg
 
     /* setup config */
     memset( &gORBCtx, 0, sizeof(gORBCtx) );
+
     ctx.hORB = &gORBCtx;
 
     /* return handle */
@@ -101,18 +106,22 @@ XCamReturn ORBPrepare(RkAiqAlgoCom* params)
     RkAiqAlgoConfigAorbInt* rkaiqAorbConfig = (RkAiqAlgoConfigAorbInt*)params;
 
     ORBctx->orb_en = rkaiqAorbConfig->orb_calib_cfg.orb_en;
+
     ORBctx->limit_value = ORB_LIMIT_VALUE_DEF;
     ORBctx->max_feature = ORB_MAX_FEATURE_DEF;
-    ORBctx->img_width = rkaiqAorbConfig->output_width;
-    ORBctx->img_height = rkaiqAorbConfig->output_height;
 
-    ORBctx->roi_rect.left = (ORBctx->img_width/15)*15/2;
-    ORBctx->roi_rect.top = (ORBctx->img_height/15)*15/2;
-    ORBctx->roi_rect.width = (ORBctx->img_width/15);
-    ORBctx->roi_rect.height = (ORBctx->img_height/15);
+    ORBctx->output_width = params->u.prepare.sns_op_width;
+    ORBctx->output_height = params->u.prepare.sns_op_height;
+
+    ORBctx->roi_rect.left = (ORBctx->output_width/15)*5;
+    ORBctx->roi_rect.top = (ORBctx->output_height/15)*5;
+    ORBctx->roi_rect.width = (ORBctx->output_width/15)*5;
+    ORBctx->roi_rect.height = (ORBctx->output_height/15)*5;
+    ORBctx->roi_rect.right = ORBctx->roi_rect.left + ORBctx->roi_rect.width;
+    ORBctx->roi_rect.bottom = ORBctx->roi_rect.top + ORBctx->roi_rect.height;
     ORBctx->ref_roi_rect = ORBctx->roi_rect;
 
-    LOGI_ORB("%s: (enter)\n", __FUNCTION__ );
+    LOGI_ORB("%s: (enter) enable: %d\n", __FUNCTION__, ORBctx->orb_en);
 
     return XCAM_RETURN_NO_ERROR;
 }
@@ -126,9 +135,9 @@ XCamReturn ORBPreProcess(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outparam
     RkAiqAlgoPreAorbInt* rkaiqAorbPreParam = (RkAiqAlgoPreAorbInt*)inparams;
     RkAiqAlgoPreResAorbInt* rkaiqAorbPreOut = (RkAiqAlgoPreResAorbInt*)outparams;
 
+    LOGI_ORB("%s: (enter)\n", __FUNCTION__ );
 
-    LOGI_ORB("%s: (%d)feature point num: %d-%d\n", __FUNCTION__,
-        ORBctx->initialized,
+    LOGD_AORB("point num: %d - %d",
         ORBctx->orb_stats.num_points,
         rkaiqAorbPreParam->orb_stats.num_points);
 
@@ -145,14 +154,12 @@ XCamReturn ORBPreProcess(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outparam
 
             push_orbpoint_cv(
                 rkaiqAorbPreParam->orb_stats.num_points,
-                rkaiqAorbPreParam->orb_stats.pXs,
-                rkaiqAorbPreParam->orb_stats.pYs,
+                rkaiqAorbPreParam->orb_stats.points,
                 m_queryPoints);
 
             push_orbpoint_cv(
                 ORBctx->orb_stats.num_points,
-                ORBctx->orb_stats.pXs,
-                ORBctx->orb_stats.pYs,
+                ORBctx->orb_stats.points,
                 m_trainPoints);
 
             get_homography_matrix(m_queryPoints, m_trainPoints,
@@ -162,56 +169,74 @@ XCamReturn ORBPreProcess(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outparam
             ORBctx->orb_stats.homography_matrix =
                 rkaiqAorbPreOut->orb_pre_result.homography_matrix;
 #else
+
+#if CALC_AFFINE_TRANSFORM
             int ret = 0;
-            ORBList* orb_query_descriptor = push_orbpoint(
-                ORBctx->orb_stats.num_points,
-                ORBctx->orb_stats.pXs,
-                ORBctx->orb_stats.pYs,
-                ORBctx->orb_stats.pDescriptors,
-                DESCRIPTOR_SIZE);
 
-            ORBList* orb_train_descriptor = push_orbpoint(
-                rkaiqAorbPreParam->orb_stats.num_points,
-                rkaiqAorbPreParam->orb_stats.pXs,
-                rkaiqAorbPreParam->orb_stats.pYs,
-                rkaiqAorbPreParam->orb_stats.pDescriptors,
-                DESCRIPTOR_SIZE);
-
-            ORBList* matched_keypoints =
-                matching(orb_query_descriptor, orb_train_descriptor);
-
-            ORBList* roi_keypoints =
-                get_matched_points_from_roi(ORBctx->ref_roi_rect, matched_keypoints);
-            
-            ret = elimate_affine_transform(roi_keypoints, ORBctx->affine_mat_roi);
-            if (ret < 0) {
-                rkaiqAorbPreOut->orb_pre_result.valid = 0;
+            if (ORBctx->roi_points_list == NULL) {
+                ORBctx->roi_points_list =
+                    get_roi_points_list (&ORBctx->orb_stats, ORBctx->roi_rect);
             }
 
-            //fill result params
-            if (rkaiqAorbPreOut->orb_pre_result.valid) {
-                ORBctx->ref_roi_rect = map_rect(ORBctx->affine_mat_roi, &ORBctx->roi_rect);
-                rkaiqAorbPreOut->orb_pre_result.tracking_roi_rect = ORBctx->ref_roi_rect;
-            }else {
-                ORBctx->ref_roi_rect = ORBctx->roi_rect;
+            
+            if ((ORBctx->roi_points_list->length < 6)) {                    
+                LOGD_AORB("reset keypoint_num: %d", ORBctx->roi_points_list->length);
+                freeList(ORBctx->roi_points_list);
+                ORBctx->roi_points_list = NULL;
                 ORBctx->orb_stats = rkaiqAorbPreParam->orb_stats;
-            }
+            } else {
+                ORBList* matched_list =
+                    matching(ORBctx->roi_points_list, &rkaiqAorbPreParam->orb_stats, ORBctx->roi_rect);
 
-            
-            orb_matched_point_t* out_matched_keypoints =
-                rkaiqAorbPreOut->orb_pre_result.matched_keypoints;
-            rkaiqAorbPreOut->orb_pre_result.matched_keypoints_num = 0;
+                ret = elimate_affine_transform(matched_list, ORBctx->affine_mat_roi);
+                if (ret < 0) {
+                    rkaiqAorbPreOut->orb_pre_result.valid = 0;
+                } else {
+                    for (int i=0; i<3; i++) {
+                        LOGD_AORB("---[%f, %f, %f]",
+                            ORBctx->affine_mat_roi[i*3],
+                            ORBctx->affine_mat_roi[i*3+1],
+                            ORBctx->affine_mat_roi[i*3+2]);
+                    }
+                }
 
-            int index = 0;
-            for(Node* point = matched_keypoints->start; point != NULL; point = point->next){
-                orb_matched_point_t* keypoints = (orb_matched_point_t*)point->data;
-                out_matched_keypoints[index] = *keypoints;
-                rkaiqAorbPreOut->orb_pre_result.matched_keypoints_num++;
-                index++;
+                //fill result params
+                if (rkaiqAorbPreOut->orb_pre_result.valid) {
+                    ORBctx->ref_roi_rect = map_rect(ORBctx->affine_mat_roi, &ORBctx->roi_rect);
+                    rkaiqAorbPreOut->orb_pre_result.tracking_roi_rect = ORBctx->ref_roi_rect;
+                    //ORBctx->roi_rect = ORBctx->ref_roi_rect;
+                    
+                    LOGD_AORB("keypoint_num: %d, matched_list: %d, roi=[%d-%d-%d-%d]",
+                        ORBctx->roi_points_list->length, matched_list->length,
+                        ORBctx->ref_roi_rect.left, ORBctx->ref_roi_rect.top,
+                        ORBctx->ref_roi_rect.right, ORBctx->ref_roi_rect.bottom);
+                } else {
+                    ORBctx->ref_roi_rect = ORBctx->roi_rect;
+                    //ORBctx->orb_stats = rkaiqAorbPreParam->orb_stats;
+                }
+
+                orb_matched_point_t* out_matched_keypoints =
+                    rkaiqAorbPreOut->orb_pre_result.matched_keypoints;
+                rkaiqAorbPreOut->orb_pre_result.matched_keypoints_num = 0;
+
+                int index = 0;
+                for(Node* point = matched_list->start; point != NULL; point = point->next){
+                    orb_matched_point_t* keypoints = (orb_matched_point_t*)point->data;
+                    out_matched_keypoints[index] = *keypoints;
+                    rkaiqAorbPreOut->orb_pre_result.matched_keypoints_num++;
+                    index++;
+                }
+
+                freeList(matched_list);
+                //freeList(roi_points_list);
             }
 #endif
+#endif
+         } else {
+            ORBctx->orb_stats = rkaiqAorbPreParam->orb_stats;
         }
     }
+    LOGI_ORB("%s: (exit)\n", __FUNCTION__ );
 
     return XCAM_RETURN_NO_ERROR;
 }
@@ -225,9 +250,15 @@ XCamReturn ORBProcessing(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outparam
     RkAiqAlgoProcAorbInt* rkaiqAorbProcParam = (RkAiqAlgoProcAorbInt*)inparams;
     RkAiqAlgoProcResAorbInt* rkaiqAorbProcOut = (RkAiqAlgoProcResAorbInt*)outparams;
 
-    rkaiqAorbProcOut->aorb_meas.orb_en = ORBctx->orb_en;
-    rkaiqAorbProcOut->aorb_meas.limit_value = ORBctx->limit_value;
-    rkaiqAorbProcOut->aorb_meas.max_feature = ORBctx->max_feature;
+    LOGI_ORB("%s: (enter)\n", __FUNCTION__ );
+
+    if (inparams->u.proc.init) {
+        rkaiqAorbProcOut->aorb_meas.update = 1;
+        rkaiqAorbProcOut->aorb_meas.orb_en = ORBctx->orb_en;
+        rkaiqAorbProcOut->aorb_meas.limit_value = ORBctx->limit_value;
+        rkaiqAorbProcOut->aorb_meas.max_feature = ORBctx->max_feature;
+    } else
+        rkaiqAorbProcOut->aorb_meas.update = 0;
 
     return XCAM_RETURN_NO_ERROR;
 }

@@ -37,6 +37,7 @@
 #include "anr/rk_aiq_uapi_anr_int.h"
 #include "asharp/rk_aiq_uapi_asharp_int.h"
 #include "agic/rk_aiq_uapi_agic_int.h"
+#include "afec/rk_aiq_uapi_afec_int.h"
 
 
 
@@ -93,7 +94,7 @@ RKAIQHANDLEINT(Acp);
 RKAIQHANDLEINT(Acgc);
 //RKAIQHANDLEINT(Adebayer);
 //RKAIQHANDLEINT(Adpcc);
-RKAIQHANDLEINT(Afec);
+// RKAIQHANDLEINT(Afec);
 //RKAIQHANDLEINT(Agamma);
 //RKAIQHANDLEINT(Agic);
 RKAIQHANDLEINT(Aie);
@@ -613,7 +614,36 @@ private:
     rk_aiq_sharp_attrib_t mCurAtt;
     rk_aiq_sharp_attrib_t mNewAtt;
 };
-	
+
+// afec
+class RkAiqAfecHandleInt:
+    virtual public RkAiqAfecHandle,
+    virtual public RkAiqHandleIntCom {
+public:
+    explicit RkAiqAfecHandleInt(RkAiqAlgoDesComm* des, RkAiqCore* aiqCore)
+        : RkAiqHandle(des, aiqCore)
+        , RkAiqAfecHandle(des, aiqCore)
+        , RkAiqHandleIntCom(des, aiqCore) {};
+    virtual ~RkAiqAfecHandleInt() {
+        RkAiqAfecHandle::deInit();
+    };
+    virtual XCamReturn prepare();
+    virtual XCamReturn preProcess();
+    virtual XCamReturn processing();
+    virtual XCamReturn postProcess();
+
+    XCamReturn enable();
+    XCamReturn disable();
+
+protected:
+    virtual void init();
+    virtual void deInit() {
+        RkAiqAfecHandle::deInit();
+    };
+private:
+    // TODO
+};
+
 }; //namespace RkCam
 
 #endif

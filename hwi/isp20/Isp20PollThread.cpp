@@ -758,7 +758,8 @@ Isp20PollThread::trigger_readback()
 	       _capture_raw_num);
 
     if (_rx_handle_dev) {
-        if (_rx_handle_dev->setIspParamsSync(sequence)) {
+        if (_rx_handle_dev->setIspParamsSync(sequence) ||
+            _rx_handle_dev->setIsppParamsSync(sequence)) {
             LOGE_CAMHW("%s frame[%d] set isp params failed, don't read back!\n",
                        __func__, sequence);
             // drop frame, return buf to tx
@@ -895,6 +896,19 @@ Isp20PollThread::write_metadata_to_file(const char* dir_path,
 		     expParams->data()->aecExpInfo.HdrExp[0].exp_real_params.analog_gain,
 		     expParams->data()->aecExpInfo.HdrExp[2].exp_real_params.integration_time,
 		     expParams->data()->aecExpInfo.HdrExp[0].exp_real_params.integration_time,
+		     ispParams->data()->awb_gain.rgain,
+		     ispParams->data()->awb_gain.grgain,
+		     ispParams->data()->awb_gain.gbgain,
+		     ispParams->data()->awb_gain.bgain,
+		     1);
+	} else {
+	    snprintf(buffer,
+		     sizeof(buffer),
+		     "frame%08d-gain[%08.5f]-time[%08.5f]-"
+		     "awbGain[%08.4f_%08.4f_%08.4f_%08.4f]-dgain[%08d]\n",
+		     frame_id,
+		     expParams->data()->aecExpInfo.LinearExp.exp_real_params.analog_gain,
+		     expParams->data()->aecExpInfo.LinearExp.exp_real_params.integration_time,
 		     ispParams->data()->awb_gain.rgain,
 		     ispParams->data()->awb_gain.grgain,
 		     ispParams->data()->awb_gain.gbgain,

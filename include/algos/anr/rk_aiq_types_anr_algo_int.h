@@ -55,6 +55,8 @@ RKAIQ_BEGIN_DECLARE
 #define LUMANRCURVE_STEP 			6		
 #define	MFNR_TILE_W					16
 #define	MFNR_TILE_H					128
+#define MFNR_F_INTE_SIGMA           6
+
 
 
 /************ynr***************/
@@ -296,11 +298,11 @@ typedef struct RKAnr_Uvnr_Params_s
 	int		kernel_9x9_num;
 
 	//curves
-	int		sigmaAdj_x[MAX_ISO_STEP];
-	float	sigamAdj_y[MAX_ISO_STEP];
+	int		sigmaAdj_x[9];
+	float	sigamAdj_y[9];
 
-	int		threAdj_x[MAX_ISO_STEP];
-	int		threAjd_y[MAX_ISO_STEP];
+	int		threAdj_x[9];
+	int		threAjd_y[9];
 
 }RKAnr_Uvnr_Params_t;
 

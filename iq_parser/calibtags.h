@@ -316,6 +316,10 @@
 #define CALIB_SENSOR_AEC_EXPLEVEL                                "ExpLevel"
 #define CALIB_SENSOR_AEC_DYSETPOINT                              "DySetpoint"
 #define CALIB_SENSOR_AEC_TOLERANCE                               "Tolerance"
+#define CALIB_SENSOR_AEC_HDRMODE                                 "HdrMode"
+#define CALIB_SENSOR_AEC_HDRMODE_NORMAL                          "NORMAL"
+#define CALIB_SENSOR_AEC_HDRMODE_LONGFRAME                       "LONGFRAME"
+#define CALIB_SENSOR_AEC_HDRMODE_AUTO_LONGFRAME                  "AUTO_LONGFRAME"
 #define CALIB_SENSOR_AEC_STRATEGYMODE                            "StrategyMode"
 #define CALIB_SENSOR_AEC_STRATEGYMODE_LOWLIGHT                   "LOWLIGHT_PRIOR"
 #define CALIB_SENSOR_AEC_STRATEGYMODE_HIGHLIGHT                  "HIGHLIGHT_PRIOR"
@@ -378,6 +382,7 @@
 #define CALIB_SENSOR_AEC_HDRAECTRL_OEROILOWTH                    "OEROILowTh"
 #define CALIB_SENSOR_AEC_HDRAECTRL_LVHIGHTH                      "LvHighTh"
 #define CALIB_SENSOR_AEC_HDRAECTRL_LVLOWTH                       "LvLowTh"
+#define CALIB_SENSOR_AEC_HDRAECTRL_LFRMMODEEXPTH                 "LfrmModeExpTh"
 #define CALIB_SENSOR_AEC_HDRAECTRL_LEXPLEVEL                     "LExpLevel"
 #define CALIB_SENSOR_AEC_HDRAECTRL_LSETPOINT                     "LSetPoint"
 #define CALIB_SENSOR_AEC_HDRAECTRL_TARGETLLLUMA                  "TargetLLLuma"
@@ -392,6 +397,7 @@
 #define CALIB_SENSOR_AEC_HDRAECTRL_SEXPLEVEL                     "SExpLevel"
 #define CALIB_SENSOR_AEC_HDRAECTRL_SSETPOINT                     "SSetPoint"
 #define CALIB_SENSOR_AEC_HDRAECTRL_TARGETHLLUMA                  "TargetHLLuma"
+#define CALIB_SENSOR_AEC_HDRAECTRL_HLROIEXPANDEN                 "HLROIExpandEn"
 #define CALIB_SENSOR_AEC_HDRAECTRL_HLLUMATOLERANCE               "HLLumaTolerance"
 /******************************************************************************
  * XML AHDR section
@@ -919,7 +925,7 @@
 #define CALIB_SENSOR_SENSORINFO_CISTIMEREG_ODEVITY          "CISTimeRegOdevity"
 #define CALIB_SENSOR_SENSORINFO_CISTIMEREG_UNEQUALEN        "CISTimeRegUnEqualEn"
 #define CALIB_SENSOR_SENSORINFO_CISTIMEREG_MIN              "CISTimeRegMin"
-#define CALIB_SENSOR_SENSORINFO_CISTIMEREG_MAX              "CISTimeRegMax"
+#define CALIB_SENSOR_SENSORINFO_CISMINFPS                   "CISMinFps"
 #define CALIB_SENSOR_SENSORINFO_CISAGAIN_RANGE              "CISAgainRange"
 #define CALIB_SENSOR_SENSORINFO_CISEXTRAAGAIN_RANGE         "CISExtraAgainRange"
 #define CALIB_SENSOR_SENSORINFO_CISDGAIN_RANGE              "CISDgainRange"
@@ -972,15 +978,23 @@
 /******************************************************************************
  * XML LDCH section
  *****************************************************************************/
-#define    CALIB_SENSOR_LDCH                             "LDCH"
-#define    CALIB_SENSOR_LDCH_ENABLE              "enable"
+#define    CALIB_SENSOR_LDCH                            "LDCH"
+#define    CALIB_SENSOR_LDCH_ENABLE			"enable"
+#define    CALIB_SENSOR_LDCH_MESH_FILE                  "mesh_file"
+#define    CALIB_SENSOR_LDCH_CORRECT_LEVEL              "correct_level"
 /******************************************************************************
  * XML FEC section
  *****************************************************************************/
 #define    CALIB_SENSOR_FEC                             "FEC"
 #define    CALIB_SENSOR_FEC_ENABLE                      "enable"
 #define    CALIB_SENSOR_FEC_MESH_FILE                   "mesh_file"
+#define    CALIB_SENSOR_FEC_CORRECT_LEVEL               "correct_level"
 
+/******************************************************************************
+* XML ORB section
+*****************************************************************************/
+#define    CALIB_SENSOR_ORB                            "ORB"
+#define    CALIB_SENSOR_ORB_ENABLE                     "enable"
 
 /******************************************************************************
  * XML system section

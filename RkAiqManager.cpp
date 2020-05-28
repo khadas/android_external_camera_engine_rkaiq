@@ -296,7 +296,11 @@ RkAiqManager::ispStatsCb(SmartPtr<VideoBuffer>& ispStats)
     XCamReturn ret = mRkAiqAnalyzer->pushStats(ispStats);
 #ifndef RK_SIMULATOR_HW
     if (get_rkaiq_runtime_dbg() > 0) {
-        XCAM_STATIC_FPS_CALCULATION(STATS_FPS, 60);
+        if (ispStats->get_video_info().format == V4L2_META_FMT_RK_ISP1_STAT_3A) {
+            XCAM_STATIC_FPS_CALCULATION(ISP_STATS_FPS, 60);
+        } else {
+            XCAM_STATIC_FPS_CALCULATION(PP_STATS_FPS, 60);
+        }
     }
 #endif
     EXIT_XCORE_FUNCTION();
@@ -466,4 +470,23 @@ RkAiqManager::rkLumaCalcFailed(const char* msg)
     return ;
 }
 
+XCamReturn
+RkAiqManager::setModuleCtl(rk_aiq_module_id_t mId, bool mod_en)
+{
+    ENTER_XCORE_FUNCTION();
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    ret = mCamHw->setModuleCtl(mId, mod_en);
+    EXIT_XCORE_FUNCTION();
+    return ret;
+}
+
+XCamReturn
+RkAiqManager::getModuleCtl(rk_aiq_module_id_t mId, bool& mod_en)
+{
+    ENTER_XCORE_FUNCTION();
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    ret = mCamHw->getModuleCtl(mId, mod_en);
+    EXIT_XCORE_FUNCTION();
+    return ret;
+}
 }; //namespace RkCam

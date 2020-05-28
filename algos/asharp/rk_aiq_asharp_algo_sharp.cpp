@@ -232,8 +232,8 @@ AsharpResult_t select_rk_sharpen_hw_params_by_ISO(
 	gain_low 		= (int)(log((float)iso_low / 50) / log((float)2));
 
 
-	gain_low		= MIN(MAX(gain_low, 0), 8);
-	gain_high		= MIN(MAX(gain_high, 0), 8);
+	gain_low		= MIN(MAX(gain_low, 0), max_iso_step - 1);
+	gain_high		= MIN(MAX(gain_high, 0), max_iso_step - 1);
 
 
 
@@ -332,8 +332,8 @@ AsharpResult_t select_rk_sharpen_hw_v2_params_by_ISO(
 	gain_high 		= (int)(log((float)iso_high / 50) /log((float)2));
 	gain_low 		= (int)(log((float)iso_low / 50) / log((float)2));
 
-	gain_low		= MIN(MAX(gain_low, 0), 8);
-	gain_high		= MIN(MAX(gain_high, 0), 8);
+	gain_low		= MIN(MAX(gain_low, 0), max_iso_step - 1);
+	gain_high		= MIN(MAX(gain_high, 0), max_iso_step - 1);
 
 	strksharpenParamsSelected->pbf_gain				= INTERP1(strksharpenParams->pbf_gain	[gain_low],		strksharpenParams->pbf_gain 	[gain_high], 	ratio);
 	strksharpenParamsSelected->pbf_add				= INTERP1(strksharpenParams->pbf_add	[gain_low],		strksharpenParams->pbf_add		[gain_high], 	ratio);
@@ -425,8 +425,8 @@ AsharpResult_t select_rk_sharpen_hw_v3_params_by_ISO(
 	gain_high 		= (int)(log((float)iso_high / 50) /log((float)2));
 	gain_low 		= (int)(log((float)iso_low / 50) / log((float)2));
 
-	gain_low		= MIN(MAX(gain_low, 0), 8);
-	gain_high		= MIN(MAX(gain_high, 0), 8);
+	gain_low		= MIN(MAX(gain_low, 0), max_iso_step - 1);
+	gain_high		= MIN(MAX(gain_high, 0), max_iso_step - 1);
 
 	strksharpenParamsSelected->lratio				= INTERP1(strksharpenParams->lratio		[gain_low],		strksharpenParams->lratio 		[gain_high], 	ratio);
 	strksharpenParamsSelected->hratio				= INTERP1(strksharpenParams->hratio		[gain_low],		strksharpenParams->hratio		[gain_high], 	ratio);
@@ -481,8 +481,8 @@ AsharpResult_t rk_Sharp_V1_fix_transfer(RKAsharp_Sharp_HW_Params_Select_t *pShar
 	
 	
 	//0x0080
-	pSharpCfg->yin_flt_en = 0;
-	pSharpCfg->edge_avg_en = 0;
+	pSharpCfg->yin_flt_en = 1;
+	pSharpCfg->edge_avg_en = 1;
 	
 	//0x0084
 	pSharpCfg->hbf_ratio = (unsigned short)ROUND_F(pSharpV1->hbf_ratio * (1 << reg_sharpenHW_hbf_ratio_fix_bits)); 

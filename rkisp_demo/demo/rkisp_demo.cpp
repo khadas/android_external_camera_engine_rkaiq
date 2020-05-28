@@ -272,6 +272,19 @@ void test_imgproc(const rk_aiq_sys_ctx_t* ctx) {
         rk_aiq_uapi_getDhzMode(ctx, &mode);
         printf("getDhzMode=%d\n",mode);
         break;
+    case 'w':
+        rk_aiq_uapi_sysctl_setModuleCtl(ctx, RK_MODULE_TNR, false);
+        printf("setModuleCtl false\n");
+        break;
+    case 'x':
+        rk_aiq_uapi_sysctl_setModuleCtl(ctx, RK_MODULE_TNR, true);
+        printf("setModuleCtl true\n");
+        break;
+    case 'y':
+        bool mod_en;
+        rk_aiq_uapi_sysctl_getModuleCtl(ctx, RK_MODULE_TNR, &mod_en);
+        printf("getModuleCtl=%d\n",mod_en);
+        break;
     default:
         break;
     }
@@ -299,9 +312,7 @@ bool get_value_from_file(const char* path, int* value)
 
     fp = open(path, O_RDONLY | O_SYNC);
     if (fp) {
-	if (read(fp, buffer, sizeof(buffer)) <= 0)
-	    printf("%s read %s failed!\n", __func__, path);
-	else
+	if (read(fp, buffer, sizeof(buffer)) > 0)
 	    *value = atoi(buffer);
 	close(fp);
 	return true;
@@ -382,7 +393,6 @@ static void process_image(const void *p, int sequence,int size)
 		fflush(fp);
 	} else if (writeFileSync) {
 		int ret = 0;
-
 		if (!_is_capture_yuv) {
 		    char file_name[32] = {0};
 
@@ -1096,8 +1106,21 @@ int main(int argc, char **argv)
     }
     
     printf("sns_entity_name %s\n", sns_entity_name);
+
+    if (hdrmode) {
+        if (strstr(sns_entity_name, "ov4689")) {
+            work_mode = RK_AIQ_WORKING_MODE_ISP_HDR3;
+        } else if (strstr(sns_entity_name, "os04a10")) {
+            work_mode = RK_AIQ_WORKING_MODE_ISP_HDR2;
+        } else if (strstr(sns_entity_name, "gc4c33")) {
+            work_mode = RK_AIQ_WORKING_MODE_ISP_HDR2;
+        } else if (strstr(sns_entity_name, "imx347")) {
+            work_mode = RK_AIQ_WORKING_MODE_ISP_HDR2;
+        }
+    }
+
 	if (rkaiq) {
-		aiq_ctx = rk_aiq_uapi_sysctl_init(sns_entity_name, NULL, NULL, NULL);
+		aiq_ctx = rk_aiq_uapi_sysctl_init(sns_entity_name, "/oem/etc/iqfiles", NULL, NULL);
 
 		if (aiq_ctx) {
             printf("-------- init mipi tx/rx -------------\n");

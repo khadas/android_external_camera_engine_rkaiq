@@ -551,6 +551,50 @@ ANRresult_t select_mfnr_params_by_ISO(RKAnr_Mfnr_Params_t *stmfnrParams, 	RKAnr_
 //for (i = 0; i < range; i++)
 //    noise_sigma_tmp[i]                          = ROUND_F(noise_sigma_tmp[i] * (1 << 12)) >>  ;
 
+	
+	double noise_sigma_max = 0;
+	double noise_sigma_limit = 1 << MFNR_F_INTE_SIGMA;
+	double sigma_ratio = 1.0;
+	double sigma_ratio_inv = 1.0;
+	for(int i = 0; i < MAX_INTEPORATATION_LUMAPOINT; 	  i++)
+	   noise_sigma_max = MAX(stmfnrParamsSelected->noise_sigma_sample[i], noise_sigma_max);
+
+	if(noise_sigma_max > noise_sigma_limit)
+	{
+	   if(noise_sigma_max <= noise_sigma_limit)
+	   {
+		   sigma_ratio		 = 1;
+		   sigma_ratio_inv	 = 1;
+	   }
+	   else if(noise_sigma_max <= noise_sigma_limit * 2)
+	   {
+		   sigma_ratio		 = 2;
+		   sigma_ratio_inv	 = 1.0/2;
+	   }
+	   else if(noise_sigma_max <= noise_sigma_limit * 4)
+	   {
+		   sigma_ratio		 = 4;
+		   sigma_ratio_inv	 = 1.0/4;
+	   }
+	   else
+	   {
+		   LOGE_ANR("%s:%d noise_sigma is too big\n", __FUNCTION__, __LINE__);
+	   }
+	   if(sigma_ratio !=  1)
+	   {
+		   for(int i = 0; i < MAX_INTEPORATATION_LUMAPOINT; 	  i++)
+			   stmfnrParamsSelected->noise_sigma_sample[i]		   = stmfnrParamsSelected->noise_sigma_sample[i]   * sigma_ratio_inv;
+		   for(int i = 0; i < MAX_INTEPORATATION_LUMAPOINT; 	  i++)
+			   stmfnrParamsSelected->noise_sigma_dehaze[i]		   = stmfnrParamsSelected->noise_sigma_dehaze[i]   * sigma_ratio_inv;
+		   for(int dir_idx = 0; dir_idx < dir_num; dir_idx++)
+			   for(int lvl = 0; lvl < max_lvl; lvl++)
+				   stmfnrParamsSelected->scale[dir_idx][lvl]	   = stmfnrParamsSelected->scale[dir_idx][lvl]	   * sigma_ratio;
+		   for(int dir_idx = 0; dir_idx < dir_num; dir_idx++)
+			   for(int lvl = 0; lvl < max_lvl_uv; lvl++)
+				   stmfnrParamsSelected->scale_uv[dir_idx][lvl]    = stmfnrParamsSelected->scale_uv[dir_idx][lvl]  * sigma_ratio;
+	   }
+	}
+
 	return res;
 
 }
@@ -645,7 +689,7 @@ void mfnr_gfcoef_fix(int rad, double *gfcoef, unsigned char* gfcoef_fix)
 }
 
 
-ANRresult_t mfnr_fix_transfer(RKAnr_Mfnr_Params_Select_t* tnr, RKAnr_Mfnr_Fix_t *pMfnrCfg, ANRExpInfo_t *pExpInfo)
+ANRresult_t mfnr_fix_transfer(RKAnr_Mfnr_Params_Select_t* tnr, RKAnr_Mfnr_Fix_t *pMfnrCfg, ANRExpInfo_t *pExpInfo, float gain_ratio)
 {
 	LOGI_ANR("%s:(%d) enter \n", __FUNCTION__, __LINE__);
 
@@ -685,8 +729,8 @@ ANRresult_t mfnr_fix_transfer(RKAnr_Mfnr_Params_Select_t* tnr, RKAnr_Mfnr_Fix_t 
 
 	int rad_isp20[2][5]                = {{2, 1, 1, 1, 1}, {2, 1, 1, 1, 1}};
     int rad_uv_isp20[2][5]             = {{2, 1, 1, 1, 1}, {2, 1, 1, 1, 1}};
-    gain_glb_filt                           = (mIso_last / 50);
-    gain_glb_ref1                           = (mIso / 50);//ref1
+    gain_glb_filt                           = (mIso_last / 50 * gain_ratio);
+    gain_glb_ref1                           = (mIso / 50 * gain_ratio);//ref1
     gain_glb_filt_sqrt                      = sqrt(gain_glb_filt);
     gain_glb_filt_sqrt_inv                  = 1 / sqrt(gain_glb_filt);
 

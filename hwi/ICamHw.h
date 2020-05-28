@@ -91,6 +91,8 @@ public:
     virtual XCamReturn setIspLumaListener(IspLumaListener* lumaListener) = 0;
     virtual XCamReturn setIspStatsListener(IspStatsListener* statsListener) = 0;
     virtual XCamReturn setEvtsListener(IspEvtsListener* evtListener) = 0;
+    virtual XCamReturn setModuleCtl(rk_aiq_module_id_t mId, bool mod_en) = 0;
+    virtual XCamReturn getModuleCtl(rk_aiq_module_id_t mId, bool& mod_en) = 0;
 private:
     XCAM_DEAD_COPY (ICamHw);
 };

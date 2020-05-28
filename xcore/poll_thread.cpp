@@ -381,7 +381,7 @@ XCamReturn PollThread::start ()
         return XCAM_RETURN_ERROR_THREAD;
     }
 
-    if (_ispp_stats_dev.ptr () && !_ispp_stats_dev->start ()) {
+    if (_ispp_stats_dev.ptr () && !_ispp_stats_loop->start ()) {
         return XCAM_RETURN_ERROR_THREAD;
     }
 

@@ -21,7 +21,17 @@
 #include "aldch/rk_aiq_algo_aldch_itf.h"
 #include "xcam_log.h"
 
+#define EPSINON 0.0000001
+
 RKAIQ_BEGIN_DECLARE
+
+typedef enum {
+    LDCH_CORRECT_LEVEL0,		// 100%
+    LDCH_CORRECT_LEVEL1,		// 75%
+    LDCH_CORRECT_LEVEL2,		// 100%
+    LDCH_CORRECT_LEVEL3,		// 75%
+    LDCH_BYPASS
+} LDCHCorrectLevel;
 
 typedef struct LDCHContext_s {
     unsigned char initialized;
@@ -32,6 +42,8 @@ typedef struct LDCHContext_s {
     unsigned int lut_v_size;
     unsigned int lut_mapxy_size;
     unsigned short* lut_mapxy;
+    char meshfile[256];
+    unsigned char correct_level;
 } LDCHContext_t;
 
 typedef struct LDCHContext_s* LDCHHandle_t;
@@ -83,13 +95,38 @@ prepare(RkAiqAlgoCom* params)
     RkAiqAlgoConfigAldchInt* rkaiqAldchConfig = (RkAiqAlgoConfigAldchInt*)params;
 
     ldchCtx->ldch_en = rkaiqAldchConfig->aldch_calib_cfg.ldch_en;
-    LOGI_ALDCH("ldch en from xml file: %d", rkaiqAldchConfig->aldch_calib_cfg.ldch_en);
+    memcpy(ldchCtx->meshfile, rkaiqAldchConfig->aldch_calib_cfg.meshfile, sizeof(ldchCtx->meshfile));
+
+    double correct_level = rkaiqAldchConfig->aldch_calib_cfg.correct_level;
+    if (fabs(correct_level) <= fabs(EPSINON)) {
+	ldchCtx->correct_level = LDCH_BYPASS;
+    } else if (correct_level >= 1.0) {
+	ldchCtx->correct_level = LDCH_CORRECT_LEVEL0;
+    } else if (1 - correct_level <= 0.25) {
+	ldchCtx->correct_level = LDCH_CORRECT_LEVEL1;
+    } else if (1 - correct_level <= 0.50) {
+	ldchCtx->correct_level = LDCH_CORRECT_LEVEL2;
+    } else if (1 - correct_level <= 0.75) {
+	ldchCtx->correct_level = LDCH_CORRECT_LEVEL3;
+    } else {
+	ldchCtx->correct_level = LDCH_BYPASS;
+    }
+
+    LOGI_ALDCH("ldch en %d, meshfile: %s, correct_level: %d-%f from xml file",
+	       rkaiqAldchConfig->aldch_calib_cfg.ldch_en,
+	       ldchCtx->meshfile,
+	       ldchCtx->correct_level,
+	       correct_level);
 
     ldchCtx->pic_width = params->u.prepare.sns_op_width;
     ldchCtx->pic_height = params->u.prepare.sns_op_height;
 
     FILE* ofp;
-    ofp = fopen("/userdata/meshxy.bin", "rb");
+    char filename[512];
+    sprintf(filename, "/oem/etc/iqfiles/%s/mesh_level%d.bin",
+	    ldchCtx->meshfile,
+	    ldchCtx->correct_level);
+    ofp = fopen(filename, "rb");
     if (ofp != NULL) {
         unsigned short hpic, vpic, hsize, vsize, hstep, vstep = 0;
 

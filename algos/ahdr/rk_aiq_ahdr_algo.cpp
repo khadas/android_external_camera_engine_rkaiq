@@ -248,7 +248,7 @@ void AhdrConfig
 
     LOGI_AHDR( "%s:exit!\n", __FUNCTION__);
 }
-void AhdrGetROData
+void AhdrGetStats
 (
     AhdrHandle_t           pAhdrCtx,
     rkisp_ahdr_stats_t*         ROData
@@ -283,7 +283,7 @@ void AhdrGetROData
             pAhdrCtx->CurrStatsData.other_stats.middle_luma[i] = ROData->other_stats.middle_luma[i];
     }
 
-    LOGV_AHDR("%s:  Ahdr RO data from register:\n", __FUNCTION__);
+    LOGV_AHDR("%s:  Ahdr Stats data from register:\n", __FUNCTION__);
     LOGV_AHDR("%s:  ro_hdrtmo_lglow:%d:\n", __FUNCTION__, pAhdrCtx->CurrStatsData.tmo_stats.ro_hdrtmo_lglow);
     LOGV_AHDR("%s:  ro_hdrtmo_lgmin:%d:\n", __FUNCTION__, pAhdrCtx->CurrStatsData.tmo_stats.ro_hdrtmo_lgmin);
     LOGV_AHDR("%s:  ro_hdrtmo_lgmax:%d:\n", __FUNCTION__, pAhdrCtx->CurrStatsData.tmo_stats.ro_hdrtmo_lgmax);
@@ -300,6 +300,48 @@ void AhdrGetROData
 
     LOGI_AHDR( "%s:exit!\n", __FUNCTION__);
 }
+
+void AhdrGetSensorInfo
+(
+    AhdrHandle_t     pAhdrCtx,
+    AecProcResult_t  AecHdrProcResult
+) {
+    LOGI_AHDR( "%s:enter!\n", __FUNCTION__);
+
+    pAhdrCtx->SensorInfo.LongFrmMode = AecHdrProcResult.LongFrmMode;
+
+    for(int i = 0; i < 3; i++)
+    {
+        pAhdrCtx->SensorInfo.HdrMinGain[i] = AecHdrProcResult.HdrMinGain[i];
+        pAhdrCtx->SensorInfo.HdrMaxGain[i] = AecHdrProcResult.HdrMaxGain[i];
+        pAhdrCtx->SensorInfo.HdrMinIntegrationTime[i] = AecHdrProcResult.HdrMinIntegrationTime[i];
+        pAhdrCtx->SensorInfo.HdrMaxIntegrationTime[i] = AecHdrProcResult.HdrMaxIntegrationTime[i];
+    }
+
+    if(pAhdrCtx->hdr_mode == 2)
+    {
+        pAhdrCtx->SensorInfo.MaxExpoL = pAhdrCtx->SensorInfo.HdrMaxGain[1] * pAhdrCtx->SensorInfo.HdrMaxIntegrationTime[1];
+        pAhdrCtx->SensorInfo.MinExpoL = pAhdrCtx->SensorInfo.HdrMinGain[1] * pAhdrCtx->SensorInfo.HdrMinIntegrationTime[1];
+        pAhdrCtx->SensorInfo.MaxExpoM = 0;
+        pAhdrCtx->SensorInfo.MinExpoM = 0;
+
+    }
+    else if(pAhdrCtx->hdr_mode == 3)
+    {
+        pAhdrCtx->SensorInfo.MaxExpoL = pAhdrCtx->SensorInfo.HdrMaxGain[2] * pAhdrCtx->SensorInfo.HdrMaxIntegrationTime[2];
+        pAhdrCtx->SensorInfo.MinExpoL = pAhdrCtx->SensorInfo.HdrMinGain[2] * pAhdrCtx->SensorInfo.HdrMinIntegrationTime[2];
+        pAhdrCtx->SensorInfo.MaxExpoM = pAhdrCtx->SensorInfo.HdrMaxGain[1] * pAhdrCtx->SensorInfo.HdrMaxIntegrationTime[1];
+        pAhdrCtx->SensorInfo.MinExpoM = pAhdrCtx->SensorInfo.HdrMinGain[1] * pAhdrCtx->SensorInfo.HdrMinIntegrationTime[1];
+    }
+
+
+    pAhdrCtx->SensorInfo.MaxExpoL = pAhdrCtx->SensorInfo.HdrMaxGain[0] * pAhdrCtx->SensorInfo.HdrMaxIntegrationTime[0];
+    pAhdrCtx->SensorInfo.MinExpoL = pAhdrCtx->SensorInfo.HdrMinGain[0] * pAhdrCtx->SensorInfo.HdrMinIntegrationTime[0];
+
+
+    LOGI_AHDR( "%s:exit!\n", __FUNCTION__);
+}
+
 
 /******************************************************************************
  * AhdrGetXmlParas()
@@ -485,7 +527,6 @@ void AhdrUpdateConfig
     LOGI_AHDR("%s:enter!\n", __FUNCTION__);
 
     //get current ae data from AecPreRes
-    pAhdrCtx->CurrAeResult.GlobalEnvLv = AecHdrPreResult.GlobalEnvLv[AecHdrPreResult.NormalIndex];
     pAhdrCtx->CurrAeResult.M2S_Ratio = AecHdrPreResult.M2S_ExpRatio;
     pAhdrCtx->CurrAeResult.M2S_Ratio = pAhdrCtx->CurrAeResult.M2S_Ratio < 1 ? 1 : pAhdrCtx->CurrAeResult.M2S_Ratio;
     pAhdrCtx->CurrAeResult.L2M_Ratio = AecHdrPreResult.L2M_ExpRatio;
@@ -504,13 +545,6 @@ void AhdrUpdateConfig
     else
         for(int i = 0; i < 25; i++)
             pAhdrCtx->CurrAeResult.BlockLumaM[i] = 0;
-
-    //Normalize the current envLv for AEC
-    float maxEnvLuma = 65 / (1 * 0.01);
-    float minEnvLuma = 65 / (256 * 0.03);
-    pAhdrCtx->CurrAeResult.GlobalEnvLv = (pAhdrCtx->CurrAeResult.GlobalEnvLv - minEnvLuma) / maxEnvLuma;
-    pAhdrCtx->CurrAeResult.GlobalEnvLv = LIMIT_VALUE(pAhdrCtx->CurrAeResult.GlobalEnvLv, 1, 0);
-    //pAhdrCtx->CurrAeResult.GlobalEnvLv = 1 - pAhdrCtx->CurrAeResult.GlobalEnvLv;
 
     //transfer CurrAeResult data into AhdrHandle
     //get Curren hdr mode
@@ -538,15 +572,37 @@ void AhdrUpdateConfig
         break;
     }
 
+    //Normalize the current envLv for AEC
+    float maxExpo = 0;
+    float minExpo = 0;
+    if(pAhdrCtx->SensorInfo.MinExpoL != 0 && pAhdrCtx->SensorInfo.MaxExpoL != 0)
+    {
+        minExpo = pAhdrCtx->SensorInfo.MinExpoL;
+        maxExpo = pAhdrCtx->SensorInfo.MaxExpoL;
+    }
+    else
+    {
+        minExpo = 1 * 0.001;
+        maxExpo = 32 * 0.03;
+    }
+    pAhdrCtx->CurrAeResult.GlobalEnvLv = (pAhdrCtx->CurrHandleData.CurrLExpo - minExpo) / (maxExpo - minExpo);
+    pAhdrCtx->CurrAeResult.GlobalEnvLv = LIMIT_VALUE(pAhdrCtx->CurrAeResult.GlobalEnvLv, 1, 0);
+    pAhdrCtx->CurrAeResult.GlobalEnvLv = 1 - pAhdrCtx->CurrAeResult.GlobalEnvLv ;
+
+
     //get Current merge OECurve
-    pAhdrCtx->CurrHandleData.CurrEnvLv = pAhdrCtx->CurrAeResult.GlobalEnvLv;
-    pAhdrCtx->CurrHandleData.CurrEnvLv = LIMIT_VALUE(pAhdrCtx->CurrHandleData.CurrEnvLv, ENVLVMAX, ENVLVMIN);
-    pAhdrCtx->CurrHandleData.CurrMergeHandleData.OECurve_smooth = GetCurrPara(pAhdrCtx->CurrHandleData.CurrEnvLv,
-            pAhdrCtx->AhdrConfig.merge_para.EnvLv,
-            pAhdrCtx->AhdrConfig.merge_para.OECurve_smooth);
-    pAhdrCtx->CurrHandleData.CurrMergeHandleData.OECurve_offset = GetCurrPara(pAhdrCtx->CurrHandleData.CurrEnvLv,
-            pAhdrCtx->AhdrConfig.merge_para.EnvLv,
-            pAhdrCtx->AhdrConfig.merge_para.OECurve_offset);
+    if(pAhdrCtx->SensorInfo.LongFrmMode == false)
+    {
+        pAhdrCtx->CurrHandleData.CurrEnvLv = pAhdrCtx->CurrAeResult.GlobalEnvLv;
+        pAhdrCtx->CurrHandleData.CurrEnvLv = LIMIT_VALUE(pAhdrCtx->CurrHandleData.CurrEnvLv, ENVLVMAX, ENVLVMIN);
+        pAhdrCtx->CurrHandleData.CurrMergeHandleData.OECurve_smooth = GetCurrPara(pAhdrCtx->CurrHandleData.CurrEnvLv,
+                pAhdrCtx->AhdrConfig.merge_para.EnvLv,
+                pAhdrCtx->AhdrConfig.merge_para.OECurve_smooth);
+        pAhdrCtx->CurrHandleData.CurrMergeHandleData.OECurve_offset = GetCurrPara(pAhdrCtx->CurrHandleData.CurrEnvLv,
+                pAhdrCtx->AhdrConfig.merge_para.EnvLv,
+                pAhdrCtx->AhdrConfig.merge_para.OECurve_offset);
+    }
+
     //get Current merge MDCurve
     pAhdrCtx->CurrHandleData.CurrMoveCoef = 1;
     pAhdrCtx->CurrHandleData.CurrMoveCoef = LIMIT_VALUE(pAhdrCtx->CurrHandleData.CurrMoveCoef, MOVECOEFMAX, MOVECOEFMIN);

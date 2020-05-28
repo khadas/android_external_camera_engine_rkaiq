@@ -176,8 +176,8 @@ AsharpResult_t select_edgefilter_params_by_ISO(RKAsharp_EdgeFilter_Params_t *str
 	gain_high 		= (int)(log((float)iso_high / 50) /log((float)2));
 	gain_low 		= (int)(log((float)iso_low / 50) / log((float)2));
 
-	gain_low		= MIN(MAX(gain_low, 0), 8);
-	gain_high		= MIN(MAX(gain_high, 0), 8);
+	gain_low		= MIN(MAX(gain_low, 0), max_iso_step - 1);
+	gain_high		= MIN(MAX(gain_high, 0), max_iso_step - 1);
 
     strkedgefilterParamsSelected->edge_thed    = (short)ROUND_F(INTERP1(strkedgefilterParams->edge_thed   [gain_low], strkedgefilterParams->edge_thed   [gain_high], ratio));
     strkedgefilterParamsSelected->dir_min      = INTERP1(strkedgefilterParams->dir_min     [gain_low], strkedgefilterParams->dir_min     [gain_high], ratio);

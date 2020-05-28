@@ -1015,8 +1015,6 @@ typedef struct _RkAiqAlgoConfigAorbInt {
     RkAiqAlgoConfigAorb aorb_config_com;
     RkAiqAlgoComInt rk_com;
     CalibDb_ORB_t orb_calib_cfg;
-    unsigned int output_width;
-    unsigned int output_height;
 } RkAiqAlgoConfigAorbInt;
 
 typedef struct _RkAiqAlgoPreAorbInt {

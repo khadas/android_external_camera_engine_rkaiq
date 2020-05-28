@@ -159,6 +159,7 @@ private:
     bool parseEntrySensorAf(const XMLElement* pelement, void* param = NULL);
     bool parseEntrySensorLdch(const XMLElement* pelement, void* param = NULL);
     bool parseEntrySensorFec(const XMLElement* pelement, void* param = NULL);
+    bool parseEntrySensorOrb(const XMLElement* pelement, void* param = NULL);
     bool parseEntrySensorInfo(const XMLElement* pelement, void* param = NULL);
     bool parseEntrySystem(const XMLElement*, void* param = NULL);
 
