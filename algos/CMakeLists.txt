@@ -431,6 +431,7 @@ endif()
 # ----------------------------------------------------------------------------
 set (AFEC_SRC
 	afec/rk_aiq_algo_afec_itf.cpp
+	afec/rk_aiq_uapi_afec_int.cpp
     )
 
 if(EXISTS "${CMAKE_SOURCE_DIR}/algos/afec/rk_aiq_algo_afec_itf.cpp")
