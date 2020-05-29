@@ -69,6 +69,7 @@
 /*****************************************************************************/
 #define ECM_TFLICKER_50HZ (1.0/100.0)                                  //!< predefined flicker period value for ECM module
 #define ECM_TFLICKER_60HZ (1.0/120.0)                                  //!< predefined flicker period value for ECM module
+#define ECM_TFLICKER_OFF   ((ECM_TFLICKER_50HZ+ECM_TFLICKER_60HZ)/2)  //!< predefined flicker period value for ECM module
 #define ECM_DOT_NO         (6)
 
 /*****************************************************************************/
@@ -427,7 +428,6 @@ typedef struct AecProcResult_s {
     float                         overHistPercent;
 
     /***Hdr results****/
-	bool						  LongFrmMode;
     float                         HdrMeanLuma[3];
     float                         HdrLumaDeviation[MAX_HDR_FRAMENUM];
 

@@ -83,20 +83,12 @@ RESULT MergeGetCurrIOData
     int OECurve[17];
 
     pAhdrCtx->AhdrProcRes.MgeProcRes.sw_hdrmge_mode = pAhdrCtx->CurrHandleData.MergeMode;
-    if(pAhdrCtx->SensorInfo.LongFrmMode == false) {
-        CalibrateOECurve(pAhdrCtx->CurrHandleData.CurrMergeHandleData.OECurve_smooth,
-                         pAhdrCtx->CurrHandleData.CurrMergeHandleData.OECurve_offset, pAhdrCtx->AhdrProcRes.MgeProcRes.sw_hdrmge_e_y) ;
-        CalibrateMDCurve(pAhdrCtx->CurrHandleData.CurrMergeHandleData.MDCurveLM_smooth,
-                         pAhdrCtx->CurrHandleData.CurrMergeHandleData.MDCurveLM_offset, pAhdrCtx->AhdrProcRes.MgeProcRes.sw_hdrmge_l1_y);
-        CalibrateMDCurve(pAhdrCtx->CurrHandleData.CurrMergeHandleData.MDCurveMS_smooth,
-                         pAhdrCtx->CurrHandleData.CurrMergeHandleData.MDCurveMS_offset, pAhdrCtx->AhdrProcRes.MgeProcRes.sw_hdrmge_l0_y);
-    }
-    else
-    {
-        for(int i = 0; i < 17; i++)
-            pAhdrCtx->AhdrProcRes.MgeProcRes.sw_hdrmge_e_y[i] = 0;
-
-    }
+    CalibrateOECurve(pAhdrCtx->CurrHandleData.CurrMergeHandleData.OECurve_smooth,
+                     pAhdrCtx->CurrHandleData.CurrMergeHandleData.OECurve_offset, pAhdrCtx->AhdrProcRes.MgeProcRes.sw_hdrmge_e_y) ;
+    CalibrateMDCurve(pAhdrCtx->CurrHandleData.CurrMergeHandleData.MDCurveLM_smooth,
+                     pAhdrCtx->CurrHandleData.CurrMergeHandleData.MDCurveLM_offset, pAhdrCtx->AhdrProcRes.MgeProcRes.sw_hdrmge_l1_y);
+    CalibrateMDCurve(pAhdrCtx->CurrHandleData.CurrMergeHandleData.MDCurveMS_smooth,
+                     pAhdrCtx->CurrHandleData.CurrMergeHandleData.MDCurveMS_offset, pAhdrCtx->AhdrProcRes.MgeProcRes.sw_hdrmge_l0_y);
     pAhdrCtx->AhdrProcRes.MgeProcRes.sw_hdrmge_lm_dif_0p9 = 230;
     pAhdrCtx->AhdrProcRes.MgeProcRes.sw_hdrmge_ms_dif_0p8 = 205;
     pAhdrCtx->AhdrProcRes.MgeProcRes.sw_hdrmge_lm_dif_0p15 = (int)pAhdrCtx->CurrHandleData.CurrMergeHandleData.MDCurveLM_offset;
