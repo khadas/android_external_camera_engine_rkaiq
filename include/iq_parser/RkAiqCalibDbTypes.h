@@ -40,12 +40,6 @@ typedef enum _CalibDb_AeStrategyMode_e {
     RKAIQ_AEC_STRATEGY_MODE_MAX
 } CalibDb_AeStrategyMode_t;
 
-typedef enum _CalibDb_AeHdrMode_e {
-    RKAIQ_AEC_HDR_MODE_NORMAL             = 0,		
-    RKAIQ_AEC_HDR_MODE_AUTO_LONG_FRAME    = 1,
-    RKAIQ_AEC_HDR_MODE_LONG_FRAME         = 2,
-} CalibDb_AeHdrMode_t;
-
 typedef enum _CalibDb_AecDayNightMode_e {
     AEC_DNMODE_MIN = -1,
     AEC_DNMODE_DAY = 0,
@@ -407,8 +401,7 @@ typedef struct CalibDb_LFrameCtrl_s
     //LframeCtrl
     float                   OEROILowTh;
     float                   LvLowTh;
-    float                   LvHighTh;	
-    float                   LfrmModeExpTh;
+    float                   LvHighTh;
     Cam1x6FloatMatrix_t     LExpLevel;
     Cam1x6FloatMatrix_t     LSetPoint;
     Cam1x6FloatMatrix_t     TargetLLLuma;
@@ -434,8 +427,7 @@ typedef struct CalibDb_SFrameCtrl_s
 } CalibDb_SFrameCtrl_t;
 
 typedef struct CalibDb_HdrAE_Attr_s {
-    float                           Tolerance;	
-    CalibDb_AeHdrMode_t             HdrMode;
+    float                           Tolerance;
     CalibDb_AeStrategyMode_t        StrategyMode;
     float                           Evbias;
     //ExpRatioCtrl
@@ -479,7 +471,6 @@ typedef struct CalibDb_Sensor_Para_s {
     Cam2x1FloatMatrix_t     CISTimeRegOdevity;
     uint8_t                 CISTimeRegUnEqualEn;
     uint8_t                 CISTimeRegMin;
-    float                   CISMinFps;
     CalibDb_AeRange_t       CISAgainRange; //sensor Again or LCG range
     CalibDb_AeRange_t       CISExtraAgainRange; //add for HDR-DCG MODE, HCG range
     CalibDb_AeRange_t       CISDgainRange; //sensor Dgain
