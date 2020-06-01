@@ -13,7 +13,9 @@
 
 typedef struct globalLuma_s
 {
+    float globalLumaMode;
     float EnvLv[6];
+    float ISO[6];
     float Tolerance;
     float GlobeLuma[6];
 

@@ -26,10 +26,10 @@
 RKAIQ_BEGIN_DECLARE
 
 typedef enum {
-    LDCH_CORRECT_LEVEL0,		// 100%
-    LDCH_CORRECT_LEVEL1,		// 75%
-    LDCH_CORRECT_LEVEL2,		// 100%
-    LDCH_CORRECT_LEVEL3,		// 75%
+    LDCH_CORRECT_LEVEL0,        // 100%
+    LDCH_CORRECT_LEVEL1,        // 75%
+    LDCH_CORRECT_LEVEL2,        // 100%
+    LDCH_CORRECT_LEVEL3,        // 75%
     LDCH_BYPASS
 } LDCHCorrectLevel;
 
@@ -61,7 +61,7 @@ create_context(RkAiqAlgoContext **context, const AlgoCtxInstanceCfg* cfg)
 {
     XCamReturn result = XCAM_RETURN_NO_ERROR;
 
-    LOGI_AHDR("%s: (enter)\n", __FUNCTION__ );
+    LOG1_AHDR("%s: (enter)\n", __FUNCTION__ );
 
     /* setup config */
     memset( &gLDCHCtx, 0, sizeof(gLDCHCtx) );
@@ -99,24 +99,24 @@ prepare(RkAiqAlgoCom* params)
 
     double correct_level = rkaiqAldchConfig->aldch_calib_cfg.correct_level;
     if (fabs(correct_level) <= fabs(EPSINON)) {
-	ldchCtx->correct_level = LDCH_BYPASS;
+        ldchCtx->correct_level = LDCH_BYPASS;
     } else if (correct_level >= 1.0) {
-	ldchCtx->correct_level = LDCH_CORRECT_LEVEL0;
+        ldchCtx->correct_level = LDCH_CORRECT_LEVEL0;
     } else if (1 - correct_level <= 0.25) {
-	ldchCtx->correct_level = LDCH_CORRECT_LEVEL1;
+        ldchCtx->correct_level = LDCH_CORRECT_LEVEL1;
     } else if (1 - correct_level <= 0.50) {
-	ldchCtx->correct_level = LDCH_CORRECT_LEVEL2;
+        ldchCtx->correct_level = LDCH_CORRECT_LEVEL2;
     } else if (1 - correct_level <= 0.75) {
-	ldchCtx->correct_level = LDCH_CORRECT_LEVEL3;
+        ldchCtx->correct_level = LDCH_CORRECT_LEVEL3;
     } else {
-	ldchCtx->correct_level = LDCH_BYPASS;
+        ldchCtx->correct_level = LDCH_BYPASS;
     }
 
     LOGI_ALDCH("ldch en %d, meshfile: %s, correct_level: %d-%f from xml file",
-	       rkaiqAldchConfig->aldch_calib_cfg.ldch_en,
-	       ldchCtx->meshfile,
-	       ldchCtx->correct_level,
-	       correct_level);
+               rkaiqAldchConfig->aldch_calib_cfg.ldch_en,
+               ldchCtx->meshfile,
+               ldchCtx->correct_level,
+               correct_level);
 
     ldchCtx->pic_width = params->u.prepare.sns_op_width;
     ldchCtx->pic_height = params->u.prepare.sns_op_height;
@@ -124,8 +124,8 @@ prepare(RkAiqAlgoCom* params)
     FILE* ofp;
     char filename[512];
     sprintf(filename, "/oem/etc/iqfiles/%s/mesh_level%d.bin",
-	    ldchCtx->meshfile,
-	    ldchCtx->correct_level);
+            ldchCtx->meshfile,
+            ldchCtx->correct_level);
     ofp = fopen(filename, "rb");
     if (ofp != NULL) {
         unsigned short hpic, vpic, hsize, vsize, hstep, vstep = 0;
@@ -182,7 +182,7 @@ processing(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outparams)
         ldchPreOut->ldch_result.lut_map_size = ldchCtx->lut_mapxy_size;
         if (ldchCtx->lut_mapxy != NULL) {
             memcpy(ldchPreOut->ldch_result.lut_mapxy, ldchCtx->lut_mapxy,
-                ldchCtx->lut_mapxy_size);
+                   ldchCtx->lut_mapxy_size);
         }
         ldchCtx->ldch_en = 0;
     }

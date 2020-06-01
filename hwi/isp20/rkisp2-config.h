@@ -143,6 +143,7 @@
 #define ISP2X_LDCH_MESH_XY_NUM        524288
 
 struct isp2x_csi_trigger {
+    u64 frame_timestamp;
     u32 frame_id;
     int times;
 } __attribute__ ((packed));

@@ -33,7 +33,7 @@ static RkAiqAlgoContext ctx;
 static XCamReturn AhdrCreateCtx(RkAiqAlgoContext **context, const AlgoCtxInstanceCfg* cfg)
 {
 
-    LOGI_AHDR("%s:Enter!\n", __FUNCTION__);
+    LOG1_AHDR("%s:Enter!\n", __FUNCTION__);
     RESULT ret = AHDR_RET_SUCCESS;
 
     memset(&ctx.AhdrInstConfig, 0x00, sizeof(AhdrInstanceConfig_t));
@@ -46,13 +46,13 @@ static XCamReturn AhdrCreateCtx(RkAiqAlgoContext **context, const AlgoCtxInstanc
 
     *context = &ctx;
 
-    LOGI_AHDR("%s:Exit!\n", __FUNCTION__);
+    LOG1_AHDR("%s:Exit!\n", __FUNCTION__);
     return(XCAM_RETURN_NO_ERROR);
 }
 
 static XCamReturn AhdrDestroyCtx(RkAiqAlgoContext *context)
 {
-    LOGI_AHDR("%s:Enter!\n", __FUNCTION__);
+    LOG1_AHDR("%s:Enter!\n", __FUNCTION__);
     RESULT ret = AHDR_RET_SUCCESS;
 
 
@@ -67,13 +67,13 @@ static XCamReturn AhdrDestroyCtx(RkAiqAlgoContext *context)
         context = NULL;
     }
 
-    LOGI_AHDR("%s:Exit!\n", __FUNCTION__);
+    LOG1_AHDR("%s:Exit!\n", __FUNCTION__);
     return(XCAM_RETURN_NO_ERROR);
 }
 
 static XCamReturn AhdrPrepare(RkAiqAlgoCom* params)
 {
-    LOGI_AHDR("%s:Enter!\n", __FUNCTION__);
+    LOG1_AHDR("%s:Enter!\n", __FUNCTION__);
     RESULT ret = AHDR_RET_SUCCESS;
 
     AhdrHandle_t pAhdrCtx = params->ctx->AhdrInstConfig.hAhdr;
@@ -103,29 +103,29 @@ static XCamReturn AhdrPrepare(RkAiqAlgoCom* params)
         }
     }
 
-    LOGI_AHDR("%s:Exit!\n", __FUNCTION__);
+    LOG1_AHDR("%s:Exit!\n", __FUNCTION__);
     return(XCAM_RETURN_NO_ERROR);
 }
 
 static XCamReturn AhdrPreProcess(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outparams)
 {
-    LOGI_AHDR("%s:Enter!\n", __FUNCTION__);
+    LOG1_AHDR("%s:Enter!\n", __FUNCTION__);
     RESULT ret = AHDR_RET_SUCCESS;
 
-    LOGI_AHDR("%s:Exit!\n", __FUNCTION__);
+    LOG1_AHDR("%s:Exit!\n", __FUNCTION__);
     return(XCAM_RETURN_NO_ERROR);
 }
 
 static XCamReturn AhdrProcess(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outparams)
 {
-    LOGI_AHDR("%s:Enter!\n", __FUNCTION__);
+    LOG1_AHDR("%s:Enter!\n", __FUNCTION__);
     RESULT ret = AHDR_RET_SUCCESS;
 
     AhdrHandle_t pAhdrCtx = (AhdrHandle_t)inparams->ctx->AhdrInstConfig.hAhdr;
     RkAiqAlgoProcAhdrInt* AhdrParams = (RkAiqAlgoProcAhdrInt*)inparams;
     RkAiqAlgoProcResAhdrInt* AhdrProcResParams = (RkAiqAlgoProcResAhdrInt*)outparams;
     // pAhdrCtx->frameCnt = inparams->frame_id;
-    AhdrGetROData(pAhdrCtx, &AhdrParams->ispAhdrStats);
+    AhdrGetStats(pAhdrCtx, &AhdrParams->ispAhdrStats);
 
     RkAiqAlgoPreResAeInt* ae_pre_res_int =
         (RkAiqAlgoPreResAeInt*)(AhdrParams->rk_com.u.proc.pre_res_comb->ae_pre_res);
@@ -137,7 +137,7 @@ static XCamReturn AhdrProcess(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* out
                          af_pre_res_int->af_pre_result);
     else if (ae_pre_res_int) {
         af_preprocess_result_t AfPreResult;
-        LOGW_AHDR("%s: af result is null!!!\n", __FUNCTION__);
+        LOGW_AHDR("%s: af Pre result is null!!!\n", __FUNCTION__);
         AhdrUpdateConfig(pAhdrCtx,
                          ae_pre_res_int->ae_pre_res_rk,
                          AfPreResult);
@@ -145,7 +145,7 @@ static XCamReturn AhdrProcess(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* out
     else {
         AecPreResult_t AecHdrPreResult;
         af_preprocess_result_t AfPreResult;
-        LOGW_AHDR("%s: ae/af result is null!!!\n", __FUNCTION__);
+        LOGW_AHDR("%s: ae/af Pre result is null!!!\n", __FUNCTION__);
         AhdrUpdateConfig(pAhdrCtx,
                          AecHdrPreResult,
                          AfPreResult);
@@ -156,18 +156,18 @@ static XCamReturn AhdrProcess(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* out
     memcpy(&AhdrProcResParams->AhdrProcRes.MgeProcRes, &pAhdrCtx->AhdrProcRes.MgeProcRes, sizeof(MgeProcRes_t));
     memcpy(&AhdrProcResParams->AhdrProcRes.TmoProcRes, &pAhdrCtx->AhdrProcRes.TmoProcRes, sizeof(TmoProcRes_t));
 
-    LOGI_AHDR("%s:Exit!\n", __FUNCTION__);
+    LOG1_AHDR("%s:Exit!\n", __FUNCTION__);
     return(XCAM_RETURN_NO_ERROR);
 }
 
 static XCamReturn AhdrPostProcess(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outparams)
 {
-    LOGI_AHDR("%s:Enter!\n", __FUNCTION__);
+    LOG1_AHDR("%s:Enter!\n", __FUNCTION__);
     RESULT ret = AHDR_RET_SUCCESS;
 
     //TODO
 
-    LOGI_AHDR("%s:Exit!\n", __FUNCTION__);
+    LOG1_AHDR("%s:Exit!\n", __FUNCTION__);
     return(XCAM_RETURN_NO_ERROR);
 }
 
