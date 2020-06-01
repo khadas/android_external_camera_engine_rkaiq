@@ -55,7 +55,7 @@ SensorHw::setHdrSensorExposure(RKAiqAecExpInfo_t* expPar)
     struct v4l2_control ctrl;
     rk_aiq_exposure_sensor_descriptor sensor_desc;
 
-    LOGE_CAMHW("%s: lexp: 0x%x-0x%x, mexp: 0x%x-0x%x, sexp: 0x%x-0x%x,\n"
+    LOGD_CAMHW("%s: lexp: 0x%x-0x%x, mexp: 0x%x-0x%x, sexp: 0x%x-0x%x,\n"
                "l-dcg %d, m-dcg %d, s-dcg %d\n",
                __FUNCTION__,
                expPar->HdrExp[2].exp_sensor_params.analog_gain_code_global,

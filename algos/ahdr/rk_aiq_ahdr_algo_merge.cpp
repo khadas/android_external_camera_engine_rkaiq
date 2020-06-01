@@ -27,7 +27,7 @@ void CalibrateOECurve
     float smooth, float offset, unsigned short *OECurve
 )
 {
-    LOGI_AHDR("%s:Enter!\n", __FUNCTION__);
+    LOG1_AHDR("%s:Enter!\n", __FUNCTION__);
 
     int step = 32 ;
     float curve = 0;
@@ -42,7 +42,7 @@ void CalibrateOECurve
         k += step ;
     }
 
-    LOGI_AHDR("%s:Eixt!\n", __FUNCTION__);
+    LOG1_AHDR("%s:Eixt!\n", __FUNCTION__);
 
 }
 /******************************************************************************
@@ -53,7 +53,7 @@ void CalibrateMDCurve
     float smooth, float offset, unsigned short *MDCurve
 )
 {
-    LOGI_AHDR("%s:Enter!\n", __FUNCTION__);
+    LOG1_AHDR("%s:Enter!\n", __FUNCTION__);
 
     int step = 16;
     float curve;
@@ -68,7 +68,7 @@ void CalibrateMDCurve
         k += step ;
     }
 
-    LOGI_AHDR("%s:Eixt!\n", __FUNCTION__);
+    LOG1_AHDR("%s:Eixt!\n", __FUNCTION__);
 }
 /******************************************************************************
  * GetCurrIOData()
@@ -78,7 +78,7 @@ RESULT MergeGetCurrIOData
     AhdrHandle_t pAhdrCtx
 )
 {
-    LOGI_AHDR("%s:Enter!\n", __FUNCTION__);
+    LOG1_AHDR("%s:Enter!\n", __FUNCTION__);
     RESULT result = AHDR_RET_SUCCESS;
     int OECurve[17];
 
@@ -127,7 +127,7 @@ RESULT MergeGetCurrIOData
     for(int i = 0; i < 17; i++)
         LOGV_AHDR("%s:  sw_hdrmge_l1_y[%d]:%d \n", __FUNCTION__, i, pAhdrCtx->AhdrProcRes.MgeProcRes.sw_hdrmge_l1_y[i]);
 
-    LOGI_AHDR("%s:Eixt!\n", __FUNCTION__);
+    LOG1_AHDR("%s:Eixt!\n", __FUNCTION__);
     return(result);
 }
 
@@ -139,7 +139,7 @@ RESULT MergeProcessing
     AhdrHandle_t pAhdrCtx
 )
 {
-    LOGI_AHDR("%s:Enter!\n", __FUNCTION__);
+    LOG1_AHDR("%s:Enter!\n", __FUNCTION__);
     RESULT result = AHDR_RET_SUCCESS;
 
     float OEDamp = pAhdrCtx->CurrHandleData.MergeOEDamp;
@@ -173,6 +173,6 @@ RESULT MergeProcessing
     LOGD_AHDR("%s:  Current damp MDCurveMS_smooth:%f MDCurveMS_offset:%f\n", __FUNCTION__, pAhdrCtx->CurrHandleData.CurrMergeHandleData.MDCurveMS_smooth
               , pAhdrCtx->CurrHandleData.CurrMergeHandleData.MDCurveMS_offset);
 
-    LOGI_AHDR("%s:Eixt!\n", __FUNCTION__);
+    LOG1_AHDR("%s:Eixt!\n", __FUNCTION__);
     return(result);
 }

@@ -66,8 +66,13 @@
  * - make sure the media link correctly when streaming on
  * - UVNR: sigmaR params change to 256/old_sigmaR
  * - gc4c33: update iqfiles v1.0.3
+ * v0.1.5
+ * - imx347 IQ xml v1.0.9
+ * - update ahdr algo
+ * - modify awb & aec runinterval para & mfnr para for gc4c33
+ * - use VS as unified timestamp 
  */
 
-#define RK_AIQ_VERSION "v0.1.4"
-#define RK_AIQ_RELEASE_DATE "2020-05-29"
+#define RK_AIQ_VERSION "v0.1.5"
+#define RK_AIQ_RELEASE_DATE "2020-06-01"
 #endif

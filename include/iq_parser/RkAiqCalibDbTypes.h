@@ -683,7 +683,8 @@ typedef struct CalibDb_Awb_Stategy_Para_s {
     //multiwindow
     unsigned char multiwindowMode;
     bool uvRange_small_enable;
-
+    float tolerance;//wb gain diff th for awb gain update, set 0 to disable this function
+    unsigned int runInterval;
     //wbgain damp
     float dFStep;
     float dFMin;
@@ -735,6 +736,10 @@ typedef struct CalibDb_Awb_Stategy_Para_s {
 
     //wbgain shift to do
 
+    //make  xyTypeSelect stable
+    int xyTypeListSize;// xyTypeListSize ==0 will disable this function
+    float varianceLumaTh;
+
     CalibDb_Awb_Light_Info2_t    awb_light_info[CALD_AWB_LS_NUM_MAX];
 
     bool xyType2ForColBalEnable;// to do for awb2.1
@@ -773,7 +778,9 @@ typedef struct CalibDb_HdrMerge_s
 
 typedef struct GlobalLuma_s
 {
+    float GlobalLumaMode;
     float envLevel[6];
+    float ISO[6];
     float Tolerance;
     float globalLuma[6];
 } GlobalLuma_t;

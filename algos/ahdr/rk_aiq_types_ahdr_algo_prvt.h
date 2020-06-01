@@ -71,6 +71,8 @@
 #define MDCURVEOFFSETMIN     (26)
 #define DAMPMAX     (1.0)
 #define DAMPMIN     (0.0)
+#define GLOBALLUMAMODEMAX     (1.0)
+#define GLOBALLUMAMODEMIN     (0.0)
 #define DETAILSLOWLIGHTMODEMAX     (2.0)
 #define DETAILSLOWLIGHTMODEMIN     (0.0)
 #define DETAILSHIGHLIGHTMODEMAX     (1.0)
@@ -226,6 +228,22 @@ typedef struct AhdrProcResData_s
     MgeProcRes_t MgeProcRes;
 } AhdrProcResData_t;
 
+typedef struct SensorInfo_s
+{
+    bool  LongFrmMode;
+    float HdrMinGain[MAX_HDR_FRAMENUM];
+    float HdrMaxGain[MAX_HDR_FRAMENUM];
+    float HdrMinIntegrationTime[MAX_HDR_FRAMENUM];
+    float HdrMaxIntegrationTime[MAX_HDR_FRAMENUM];
+
+    float MaxExpoL;
+    float MinExpoL;
+    float MaxExpoM;
+    float MinExpoM;
+    float MaxExpoS;
+    float MinExpoS;
+} SensorInfo_t;
+
 typedef struct AhdrContext_s
 {
     //api
@@ -239,6 +257,7 @@ typedef struct AhdrContext_s
     CurrAfResult_t CurrAfResult;
     CurrHandleData_t CurrHandleData;
     rkisp_ahdr_stats_t CurrStatsData;
+    SensorInfo_t SensorInfo;
     uint32_t width;
     uint32_t height;
     int frameCnt;

@@ -180,6 +180,12 @@
 #define CALIB_SENSOR_AWB_REMOSAICPARA                           "remosaicPara"
 #define CALIB_SENSOR_AWB_REMOSAICPARA_ENABLE                    "enable"
 #define CALIB_SENSOR_AWB_REMOSAICPARA_WBGAIN                    "sensorWbGain"
+#define CALIB_SENSOR_AWB_RUNINTERNAL                            "runInterval"
+#define CALIB_SENSOR_AWB_TOLERANCE                              "tolerance"
+#define CALIB_SENSOR_AWB_XYREGIONSTABLESELECTION                "xyRegionStableSelection"
+#define CALIB_SENSOR_AWB_XYREGIONSIZE                           "xyRegionSize"
+
+
 
 /*****************************************************************************
 * XML AEC section
@@ -420,6 +426,7 @@
 
 #define CALIB_SENSOR_AHDR_TMO_MORESETTING                      "MoreSetting"
 #define CALIB_SENSOR_AHDR_TMO_DETAILSHIGHLIGHTMODE              "DetailsHighLightMode"
+#define CALIB_SENSOR_AHDR_TMO_GLOBALLUMAMODE              "GlobalLumaMode"
 #define CALIB_SENSOR_AHDR_TMO_OEPDF                              "OEPdf"
 #define CALIB_SENSOR_AHDR_TOLERANCE                              "Tolerance"
 #define CALIB_SENSOR_AHDR_TMO_DETAILSLOWLIGHTMODE               "DetailsLowLightMode"
@@ -974,7 +981,7 @@
  * XML LDCH section
  *****************************************************************************/
 #define    CALIB_SENSOR_LDCH                            "LDCH"
-#define    CALIB_SENSOR_LDCH_ENABLE			"enable"
+#define    CALIB_SENSOR_LDCH_ENABLE         "enable"
 #define    CALIB_SENSOR_LDCH_MESH_FILE                  "mesh_file"
 #define    CALIB_SENSOR_LDCH_CORRECT_LEVEL              "correct_level"
 /******************************************************************************

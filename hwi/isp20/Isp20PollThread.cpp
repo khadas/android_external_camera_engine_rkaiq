@@ -752,7 +752,6 @@ Isp20PollThread::trigger_readback()
     LOGW_CAMHW("%s fix the trigger to %d time for ahdr temporarily\n",
 	       __func__,
 	       tg.times);
-
     LOGD_CAMHW("%s set frame[%d] isp params, readback %d times, capturing on frame%d\n",
 	       __func__, sequence, tg.times,
 	       _capture_raw_num);
@@ -841,6 +840,11 @@ Isp20PollThread::trigger_readback()
 		    _is_capture_raw = false;
 		}
 	    }
+
+        tg.frame_timestamp = buf_proxy->get_timestamp () * 1000;
+
+        LOGD_CAMHW("%s set frame[%d]:ts %" PRId64 "ms \n",
+                   __func__, sequence, tg.frame_timestamp / 1000/1000);
 
 	    if (ret == XCAM_RETURN_NO_ERROR)
                 _isp_core_dev->io_control(RKISP_CMD_TRIGGER_READ_BACK, &tg);
