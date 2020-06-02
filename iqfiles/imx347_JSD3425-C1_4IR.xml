@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><matfile>   <header type="struct" size="[1 1]">      <code_xml_parse_version index="1" type="char" size="[1 6]">         v1.0.0      </code_xml_parse_version>      <creation_date index="1" type="char" size="[1 11]">         2020-04-24      </creation_date>      <creator index="1" type="char" size="[1 2]">         sandy      </creator>      <sensor_name index="1" type="char" size="[1 7]">         IMX347      </sensor_name>      <sample_name index="1" type="char" size="[1 9]">         JSD3425-C1      </sample_name>      <generator_version index="1" type="char" size="[1 4]">         v1.0.9      </generator_version>   </header>   <sensor type="struct" size="[1 1]">
+<?xml version="1.0" encoding="utf-8"?><matfile>   <header type="struct" size="[1 1]">      <code_xml_parse_version index="1" type="char" size="[1 6]">         v1.0.0      </code_xml_parse_version>      <creation_date index="1" type="char" size="[1 11]">         2020-04-24      </creation_date>      <creator index="1" type="char" size="[1 2]">         sandy      </creator>      <sensor_name index="1" type="char" size="[1 7]">         IMX347      </sensor_name>      <sample_name index="1" type="char" size="[1 9]">         JSD3425-C1      </sample_name>      <generator_version index="1" type="char" size="[1 4]">         v1.0.a      </generator_version>   </header>   <sensor type="struct" size="[1 1]">
       <AWB index="1" type="struct" size="[1 1]">
 	 <wbBypass index="1" type="double" size="[1 1]">	   [0]	 </wbBypass>
 	<awbEnable index="1" type="double" size="[1 1]">	   [1]	 </awbEnable>
@@ -3901,7 +3901,7 @@
           <correct_level index="1" type="double" size="[1 1]">               [1.00]          </correct_level>
       </LDCH>
       <FEC index="1" type="struct" size="[1 1]">
-          <enable index="1" type="double" size="[1 1]">               [1]          </enable>
+          <enable index="1" type="double" size="[1 1]">               [0]          </enable>
           <mesh_file index="1" type="char" size="[1 1]">               FEC_mesh_2688_1520_imx347_4IR          </mesh_file>
           <correct_level index="1" type="double" size="[1 1]">               [1.00]          </correct_level>
       </FEC>
