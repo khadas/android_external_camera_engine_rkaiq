@@ -25,7 +25,7 @@
 
 #define FUNC_ENTER LOG1("%s enter", __FUNCTION__);
 #define FUNC_EXIT LOG1("%s exit", __FUNCTION__);
-#define CALIBDB_PATH_LEN      64
+#define CALIBDB_PATH_LEN      128
 #define CALIBDB_ENV_PATH_STR  "rkaiq_calibdb_path"
 
 namespace RkCam {
