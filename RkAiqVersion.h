@@ -71,8 +71,14 @@
  * - update ahdr algo
  * - modify awb & aec runinterval para & mfnr para for gc4c33
  * - use VS as unified timestamp 
- */
+ * v0.1.6
+ * - gc4c33 IQ v1.0.7
+ * - imx347 IQ v1.0.a
+ * - NR & sharp: support free iso level on machine
+ * - move paras of wbgain clip and wbgain adjustment to xml
+ * - add awb chromatic adatptation gain adjust funciton
+ * - add rk_aiq_uapi_sysctl_get3AStats interface */
 
-#define RK_AIQ_VERSION "v0.1.5"
-#define RK_AIQ_RELEASE_DATE "2020-06-01"
+#define RK_AIQ_VERSION "v0.1.6"
+#define RK_AIQ_RELEASE_DATE "2020-06-05"
 #endif

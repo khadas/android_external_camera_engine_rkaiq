@@ -21,6 +21,9 @@ ANRresult_t init_uvnr_params(RKAnr_Uvnr_Params_t *pParams, CalibDb_UVNR_t *pCali
 	}
 
 	for(i=0; i<MAX_ISO_STEP; i++){
+		#ifndef RK_SIMULATOR_HW
+		pParams->iso[i] = pCalibdb->ISO[i];
+		#endif
 		pParams->ratio[i] = pCalibdb->step0_uvgrad_ratio[i];
 		pParams->offset[i] = pCalibdb->step0_uvgrad_offset[i];
 		
@@ -146,8 +149,19 @@ ANRresult_t select_uvnr_params_by_ISO(RKAnr_Uvnr_Params_t *stRKUVNrParams, RKAnr
 	//		isogain: 1  2   4   8   16  32   64    128  256
 	//	   isoindex: 0  1   2   3   4   5    6     7    8
 	
-	int isoGainStd[MAX_ISO_STEP] = { 1,2,4,8,16,32,64,128,256,512,1024, 2048, 4096};
+	int isoGainStd[MAX_ISO_STEP] ;
 	int ISO = iso / 50;
+
+	#ifndef RK_SIMULATOR_HW
+	for(int i=0; i<MAX_ISO_STEP; i++){
+		isoGainStd[i] = stRKUVNrParams->iso[i] / 50;
+	}
+	#else
+	for(int i=0; i<MAX_ISO_STEP; i++){
+		isoGainStd[i] = 1 * (1 << i);
+	}
+	#endif
+		
 	if (ISO<1)
 	{
 		ISO = 1;

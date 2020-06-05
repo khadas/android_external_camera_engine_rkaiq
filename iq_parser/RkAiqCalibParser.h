@@ -108,6 +108,8 @@ private:
     bool parseEntrySensorAwbWindow(const XMLElement*, void* param = NULL);
     bool parseEntrySensorAwbSingleColor(const XMLElement*, void* param = NULL);
     bool parseEntrySensorAwbColBlk(const XMLElement*, void* param = NULL);
+    bool parseEntrySensorAwbwbGainAdjust(const XMLElement*, void* param = NULL);
+    bool parseEntrySensorAwbCctLutAll(const XMLElement*, void* param = NULL);
     bool parseEntrySensorAwbLsForEstimation(const XMLElement*, void* param = NULL);
     bool parseEntrySensorAwbGlobalsExclude(const XMLElement*, void* param = NULL);
     bool parseEntrySensorAwbGlobalsExcludeV201(const XMLElement*, void* param = NULL);

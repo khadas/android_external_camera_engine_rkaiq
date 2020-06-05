@@ -21,6 +21,9 @@ AsharpResult_t init_edgefilter_params(RKAsharp_EdgeFilter_Params_t *pParams, Cal
 	}
 
 	for(i=0; i<max_iso_step; i++){
+		#ifndef RK_SIMULATOR_HW
+		pParams->iso[i] = pCalibdb->edgeFilter_iso[i].iso;
+		#endif
 		pParams->edge_thed[i] = pCalibdb->edgeFilter_iso[i].edge_thed;
 		pParams->smoth4[i] = pCalibdb->edgeFilter_iso[i].src_wgt;
 		pParams->alpha_adp_en[i] = pCalibdb->edgeFilter_iso[i].alpha_adp_en;
@@ -154,6 +157,17 @@ AsharpResult_t select_edgefilter_params_by_ISO(RKAsharp_EdgeFilter_Params_t *str
 	}
 
 	iso = pExpInfo->arIso[pExpInfo->hdr_mode];
+
+	#ifndef RK_SIMULATOR_HW
+	for (i = 0; i < max_iso_step - 1; i++)
+	{
+		if (iso>= strkedgefilterParams->iso[i] && iso<= strkedgefilterParams->iso[i+1] )
+		{
+			iso_low = strkedgefilterParams->iso[i];
+			iso_high = strkedgefilterParams->iso[i + 1];
+		}
+	}
+	#else
 	for (i = max_iso_step - 1; i >= 0; i--)
 	{
 		if (iso < iso_div * (2 << i))
@@ -162,6 +176,8 @@ AsharpResult_t select_edgefilter_params_by_ISO(RKAsharp_EdgeFilter_Params_t *str
 			iso_high = iso_div * (2 << i);
 		}
 	}
+	#endif
+	
 	ratio = (float)(iso - iso_low)/(iso_high-iso_low);
 	if (iso_low == iso)
 	{

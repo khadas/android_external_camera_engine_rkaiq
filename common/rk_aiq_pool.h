@@ -48,10 +48,19 @@ typedef struct RKAiqAecExpInfoWrapper_s {
     int algo_id;
 }RKAiqAecExpInfoWrapper_t;
 
+typedef struct RKAiqAfInfoWrapper_s {
+    struct timeval focusStartTim;
+    struct timeval focusEndTim;
+    int64_t sofTime;
+} RKAiqAfInfoWrapper_t;
+
 typedef RKAiqAecExpInfoWrapper_t rk_aiq_exposure_params_wrapper_t;
+typedef RKAiqAfInfoWrapper_t rk_aiq_af_info_wrapper_t;
 
 typedef SharedItemPool<rk_aiq_exposure_params_wrapper_t> RkAiqExpParamsPool;
 typedef SharedItemProxy<rk_aiq_exposure_params_wrapper_t> RkAiqExpParamsProxy;
+typedef SharedItemPool<rk_aiq_af_info_wrapper_t> RkAiqAfInfoPool;
+typedef SharedItemProxy<rk_aiq_af_info_wrapper_t> RkAiqAfInfoProxy;
 typedef SharedItemPool<rk_aiq_isp_params_t> RkAiqIspParamsPool;
 typedef SharedItemProxy<rk_aiq_isp_params_t> RkAiqIspParamsProxy;
 typedef SharedItemPool<rk_aiq_focus_params_t> RkAiqFocusParamsPool;

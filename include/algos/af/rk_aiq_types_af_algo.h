@@ -14,9 +14,13 @@ typedef struct {
     unsigned int roib_sharpness;
     unsigned int roib_luminance;
     unsigned int global_sharpness[RKAIQ_RAWAF_SUMDATA_NUM];
+    struct timeval focus_starttim;
+    struct timeval focus_endtim;
+    int64_t sof_tim;
 } rk_aiq_af_algo_stat_t;
 
 typedef struct {
+    unsigned char contrast_af_en;
     unsigned char rawaf_sel;
 
     unsigned char window_num;

@@ -17,6 +17,7 @@
 
 #include "CamHwBase.h"
 #include "SensorHw.h"
+#include "LensHw.h"
 
 namespace RkCam {
 

@@ -22,6 +22,7 @@
 #include "CamHwBase.h"
 #include "Isp20Params.h"
 #include "SensorHw.h"
+#include "LensHw.h"
 
 namespace RkCam {
 #define MAX_MEDIA_INDEX               16

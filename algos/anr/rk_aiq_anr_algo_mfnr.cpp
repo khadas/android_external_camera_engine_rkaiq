@@ -193,6 +193,12 @@ ANRresult_t init_mfnr_params(RKAnr_Mfnr_Params_t *pParams, CalibDb_MFNR_t *pCali
         }
     }
 
+	#ifndef RK_SIMULATOR_HW
+	for (i=0;i<max_iso_step;i++){
+         pParams->iso[i] = pCalibdb->mfnr_iso[i].iso;
+    	}
+	#endif
+	
 	//memcpy(pParams->mfnr_ver_char, pCalibdb->version, sizeof(pParams->mfnr_ver_char));
 	LOGI_ANR("%s(%d): exit!\n", __FUNCTION__, __LINE__);
 	
@@ -239,7 +245,16 @@ ANRresult_t select_mfnr_params_by_ISO(RKAnr_Mfnr_Params_t *stmfnrParams, 	RKAnr_
     int step_y              = (1 << (Y_CALIBRATION_BITS - bits_proc));
 	int step_x_dehz         = (1 << (Y_CALIBRATION_BITS - Y_SIGMA_TABLE_BITS_DEHAZE));
 	double noise_sigma_tmp[(1 << Y_CALIBRATION_BITS) + 1];
-	
+
+	#ifndef RK_SIMULATOR_HW
+	for (i =0; i < MAX_ISO_STEP -1; i++)
+	{
+		if(iso >= stmfnrParams->iso[i] && iso_low <= stmfnrParams->iso[i + 1]){
+			iso_low = stmfnrParams->iso[i];
+			iso_high = stmfnrParams->iso[i + 1];
+		}
+	}
+	#else
 	for (i = MAX_ISO_STEP - 1; i >= 0; i--)
 	{
 		if (iso < iso_div * (2 << i))
@@ -248,6 +263,8 @@ ANRresult_t select_mfnr_params_by_ISO(RKAnr_Mfnr_Params_t *stmfnrParams, 	RKAnr_
 			iso_high = iso_div * (2 << i);
 		}
 	}
+	#endif
+	
 	ratio = (double)(iso - iso_low)/(iso_high-iso_low);
 	if (iso_low == iso)
 	{

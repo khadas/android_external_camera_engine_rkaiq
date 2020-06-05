@@ -25,7 +25,7 @@
 #include "interpolation.h"
 RKAIQ_BEGIN_DECLARE
 
-static XCamReturn illuminant_index_estimation(int light_num, const CalibDb_AccmCof_ill_t illAll[], float awbGain[2], int* illuminant_index)
+XCamReturn illuminant_index_estimation_ccm(int light_num, const CalibDb_AccmCof_ill_t illAll[], float awbGain[2], int* illuminant_index)
 {
 
     LOGI_ACCM( "%s: (enter)\n", __FUNCTION__);
@@ -274,7 +274,7 @@ static XCamReturn Damping
 
 
 
-static XCamReturn CamCalibDbGetCcmProfileByName(const CalibDb_Ccm_t *calibCcm, char* name, const CalibDb_CcmMatrixProfile_t **pCcmMatrixProfile)
+XCamReturn CamCalibDbGetCcmProfileByName(const CalibDb_Ccm_t *calibCcm, char* name, const CalibDb_CcmMatrixProfile_t **pCcmMatrixProfile)
 {
     LOGI_ACCM("%s: (enter)\n", __FUNCTION__);
 
@@ -316,7 +316,7 @@ XCamReturn AccmAutoConfig
     int dominateIlluProfileIdx;
     int resIdx;
     //1)
-    ret = illuminant_index_estimation(hAccm->calibCcm->aCcmCof.illuNum, hAccm->calibCcm->aCcmCof.illAll,
+    ret = illuminant_index_estimation_ccm(hAccm->calibCcm->aCcmCof.illuNum, hAccm->calibCcm->aCcmCof.illAll,
                                       hAccm->accmSwInfo.awbGain, &dominateIlluProfileIdx);
     RETURN_RESULT_IF_DIFFERENT(ret, XCAM_RETURN_NO_ERROR);
     hAccm->accmRest.dominateIlluProfileIdx = dominateIlluProfileIdx;

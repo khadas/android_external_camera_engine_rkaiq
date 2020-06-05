@@ -288,6 +288,7 @@ typedef RKAiqAecExpInfo_t rk_aiq_exposure_params_t;
 // focus
 typedef struct
 {
+    bool lens_pos_valid;
     unsigned int next_lens_pos;
 } rk_aiq_focus_params_t;
 
@@ -552,9 +553,9 @@ typedef struct {
 
 
 typedef struct {
-    rk_aiq_isp_aec_stats_t* aec_stats;
-    rk_aiq_awb_stat_res_v200_t* awb_stats_v200;
-    rk_aiq_isp_af_stats_t*  af_stats;
+    rk_aiq_isp_aec_stats_t aec_stats;
+    rk_aiq_awb_stat_res_v200_t awb_stats_v200;
+    rk_aiq_isp_af_stats_t  af_stats;
 } rk_aiq_isp_stats_t;
 
 typedef RkAiqAhdrProcResult_t rk_aiq_isp_hdr_t;

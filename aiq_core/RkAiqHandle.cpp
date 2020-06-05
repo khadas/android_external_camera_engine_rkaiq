@@ -486,7 +486,7 @@ RkAiqAfHandle::preProcess()
     RKAIQCORE_CHECK_RET(ret, "af handle preProcess failed");
 
     if (!ispStats->af_stats_valid && !shared->init) {
-        LOGE("no af stats, ignore!");
+        LOGD("no af stats, ignore!");
         return XCAM_RETURN_BYPASS;
     }
 
@@ -515,7 +515,7 @@ RkAiqAfHandle::processing()
     RKAIQCORE_CHECK_RET(ret, "af handle processing failed");
 
     if (!ispStats->af_stats_valid && !shared->init) {
-        LOGE("no af stats, ignore!");
+        LOGD("no af stats, ignore!");
         return XCAM_RETURN_BYPASS;
     }
 
@@ -545,7 +545,7 @@ RkAiqAfHandle::postProcess()
     RKAIQCORE_CHECK_RET(ret, "af handle postProcess failed");
 
     if (!ispStats->af_stats_valid && !shared->init) {
-        LOGE("no af stats, ignore!");
+        LOGD("no af stats, ignore!");
         return XCAM_RETURN_BYPASS;
     }
 

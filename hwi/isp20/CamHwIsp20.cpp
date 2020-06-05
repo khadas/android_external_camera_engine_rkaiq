@@ -556,6 +556,20 @@ CamHwIsp20::initCamHwInfos()
                 CamHwIsp20::mCamHwInfos[s_full_info->sensor_name] = info;
             }
         }
+
+        for (j = 0; j < nents; ++j) {
+            entity = media_get_entity (device, j);
+            entity_info = media_entity_get_info(entity);
+            if ((NULL != entity_info) && (entity_info->type == MEDIA_ENT_T_V4L2_SUBDEV_LENS) && (entity_info->flags == 0)) {
+                strncpy(devpath, media_entity_get_devname(entity), sizeof(devpath));
+                std::map<std::string, SmartPtr<rk_sensor_full_info_t>>::iterator it2;
+                for (it2 = mSensorHwInfos.begin(); it2 != mSensorHwInfos.end(); it2++) {
+                    rk_sensor_full_info_t *s_full_info = it2->second.ptr();
+                    if (0 == strncmp(s_full_info->sensor_name.c_str(), entity_info->name, strlen("m01_b")))
+                        s_full_info->module_lens_dev_name = std::string(devpath);
+                }
+            }
+        }
 media_unref:
         media_device_unref (device);
     }
@@ -571,6 +585,7 @@ CamHwIsp20::init(const char* sns_ent_name)
     SmartPtr<PollThread> isp20LumaPollthread;
     SmartPtr<PollThread> isp20IsppPollthread;
     SmartPtr<SensorHw> sensorHw;
+    SmartPtr<LensHw> lensHw;
     SmartPtr<V4l2Device> mipi_tx_devs[3];
     SmartPtr<V4l2Device> mipi_rx_devs[3];
     std::string sensor_name(sns_ent_name);
@@ -606,6 +621,12 @@ CamHwIsp20::init(const char* sns_ent_name)
     mIspParamsDev = new V4l2Device (s_info->isp_info->input_params_path);
     mIspParamsDev->open();
 
+    if (!s_info->module_lens_dev_name.empty()) {
+        lensHw = new LensHw(s_info->module_lens_dev_name.c_str());
+        mLensDev = lensHw;
+        mLensDev->open();
+    }
+
     //short frame
     mipi_tx_devs[0] = new V4l2Device (s_info->isp_info->rawwr2_path);//rkisp_rawwr2
     mipi_tx_devs[0]->open();
@@ -632,6 +653,8 @@ CamHwIsp20::init(const char* sns_ent_name)
 
     isp20Pollthread = new Isp20PollThread();
     isp20Pollthread->set_event_handle_dev(sensorHw);
+    if(lensHw.ptr())
+        isp20Pollthread->set_focus_handle_dev(lensHw);
     isp20Pollthread->set_rx_handle_dev(this);
     isp20Pollthread->set_mipi_devs(mipi_tx_devs, mipi_rx_devs, mIspCoreDev);
     mPollthread = isp20Pollthread;
@@ -816,12 +839,14 @@ CamHwIsp20::start()
 {
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
     SmartPtr<SensorHw> sensorHw;
+    SmartPtr<LensHw> lensHw;
     SmartPtr<Isp20PollThread> isp20Pollthread;
 
     ENTER_CAMHW_FUNCTION();
 
     isp20Pollthread = mPollthread.dynamic_cast_ptr<Isp20PollThread>();
     sensorHw = mSensorDev.dynamic_cast_ptr<SensorHw>();
+    lensHw = mLensDev.dynamic_cast_ptr<LensHw>();
 
     // restart if in stop state
     if (_state == CAM_HW_STATE_STOPED) {
@@ -872,6 +897,8 @@ CamHwIsp20::start()
 #endif
 #endif
     sensorHw->start();
+    if (lensHw.ptr())
+        lensHw->start();
     _is_exit = false;
     _state = CAM_HW_STATE_STARTED;
 
@@ -884,6 +911,7 @@ XCamReturn CamHwIsp20::stop()
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
     SmartPtr<Isp20PollThread> isp20Pollthread;
     SmartPtr<SensorHw> sensorHw;
+    SmartPtr<LensHw> lensHw;
 
     ENTER_CAMHW_FUNCTION();
     isp20Pollthread = mPollthread.dynamic_cast_ptr<Isp20PollThread>();
@@ -898,6 +926,10 @@ XCamReturn CamHwIsp20::stop()
     // come into snesorHw
     sensorHw = mSensorDev.dynamic_cast_ptr<SensorHw>();
     sensorHw->stop();
+
+    lensHw = mLensDev.dynamic_cast_ptr<LensHw>();
+    if (lensHw.ptr())
+        lensHw->stop();
 
     ret = mIspLumaDev->stop();
     if (ret < 0) {
@@ -1647,6 +1679,17 @@ CamHwIsp20::setFocusParams(SmartPtr<RkAiqFocusParamsProxy>& focus_params)
 {
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
     ENTER_CAMHW_FUNCTION();
+    SmartPtr<LensHw> mLensSubdev = mLensDev.dynamic_cast_ptr<LensHw>();
+    int position = focus_params->data()->next_lens_pos;
+    bool valid = focus_params->data()->lens_pos_valid;
+
+    if (mLensSubdev.ptr() && valid) {
+        LOGD_CAMHW("|||set focus result: %d", position);
+        if (mLensSubdev->setFocusParams(position) < 0) {
+            LOGE_CAMHW("set focus result failed to device");
+            return XCAM_RETURN_ERROR_IOCTL;
+        }
+    }
 
     EXIT_CAMHW_FUNCTION();
     return ret;

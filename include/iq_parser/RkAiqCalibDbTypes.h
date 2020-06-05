@@ -489,6 +489,10 @@ typedef struct CalibDb_Sensor_Para_s {
 #define CALD_AWB_TEMPORAL_GAIN_SIZE_MAX 4
 #define CALD_AWB_XY_TYPE_MAX_V201 2
 #define CALD_AWB_GRID_NUM_TOTAL 225
+#define CALD_AWB_CT_GRID_NUM_MAX 10
+#define CALD_AWB_CRI_GRID_NUM_MAX 10
+#define CALD_AWB_CT_LV_NUM_MAX 3
+#define CALD_AWB_CT_CLIP_GRID_NUM_MAX 7
 
 typedef struct _CalibDb_ExcRange_s {
     unsigned char domain;/*0uv domain,1 xy domain*/
@@ -675,10 +679,30 @@ typedef struct CalibDb_Awb_line_s {
     float c;
 } CalibDb_Awb_line_t;
 
+typedef struct cct_lut_cfg_lv_s {
+    float lv;
+    int ct_grid_num;
+    int cri_grid_num;
+    float ct_range[2];//min,max, equal distance sapmle
+    float cri_range[2];//min,max
+    float ct_lut_out[CALD_AWB_CT_GRID_NUM_MAX * CALD_AWB_CRI_GRID_NUM_MAX];
+    float cri_lut_out[CALD_AWB_CT_GRID_NUM_MAX * CALD_AWB_CRI_GRID_NUM_MAX];
+} cct_lut_cfg_lv_t,CalibDb_Awb_Cct_Lut_Cfg_Lv_t;
+
+typedef struct cct_clip_cfg_s {
+    float outdoor_cct_min;
+    int grid_num;
+    float cct[CALD_AWB_CT_CLIP_GRID_NUM_MAX];
+    float cri_bound_up[CALD_AWB_CT_CLIP_GRID_NUM_MAX];
+    float cri_bound_low[CALD_AWB_CT_CLIP_GRID_NUM_MAX];
+} cct_clip_cfg_t,CalibDb_Awb_Cct_Clip_Cfg_t;
 
 typedef struct CalibDb_Awb_Stategy_Para_s {
     unsigned char lightNum;
     bool ca_enable;
+    bool wbGainAdjustEn;
+    bool wbGainClipEn;
+    bool wbGainDaylightClipEn;
     char lsForFirstFrame[CALD_AWB_ILLUMINATION_NAME];
     //multiwindow
     unsigned char multiwindowMode;
@@ -719,6 +743,10 @@ typedef struct CalibDb_Awb_Stategy_Para_s {
     float ca_targetGain[4];
     float ca_LACalcFactor;
 
+    //wb gain shift 2 //to do  from xml
+    int cct_lut_cfg_num;
+    CalibDb_Awb_Cct_Lut_Cfg_Lv_t cct_lut_cfg[CALD_AWB_CT_LV_NUM_MAX];
+
     //single color
     unsigned short      sSelColorNUM;
     unsigned short      sIndSelColor[CALD_AWB_SGC_NUM_MAX];
@@ -734,7 +762,8 @@ typedef struct CalibDb_Awb_Stategy_Para_s {
     float lineRgBg[3];
     float lineRgProjCCT[3];
 
-    //wbgain shift to do
+    //wbgain clip
+    CalibDb_Awb_Cct_Clip_Cfg_t cct_clip_cfg;
 
     //make  xyTypeSelect stable
     int xyTypeListSize;// xyTypeListSize ==0 will disable this function
