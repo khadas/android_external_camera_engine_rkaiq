@@ -184,6 +184,16 @@ rk_aiq_uapi_sysctl_getAxlibStatus(const rk_aiq_sys_ctx_t* ctx,
 const RkAiqAlgoContext*
 rk_aiq_uapi_sysctl_getEnabledAxlibCtx(const rk_aiq_sys_ctx_t* ctx, const int algo_type);
 
+/*!
+ * \brief get 3a stats
+ *
+ * \param[in] ctx             context
+ * \param[out] stats          stats params
+ * \return return 0 if success
+ */
+XCamReturn
+rk_aiq_uapi_sysctl_get3AStats(const rk_aiq_sys_ctx_t* ctx,
+                                      rk_aiq_isp_stats_t *stats);
 RKAIQ_END_DECLARE
 
 #endif

@@ -26,6 +26,9 @@ ANRresult_t init_bayernr_params(RKAnr_Bayernr_Params_t *pParams, CalibDb_BayerNr
 	//CalibDb_BayerNr_t *pCalibdb = &pANRConfig->stBayernrCalib;
 
 	for(i=0; i<MAX_ISO_STEP; i++){
+		#ifndef RK_SIMULATOR_HW
+		pParams->iso[i] = pCalibdb->iso[i];
+		#endif
 		pParams->a[i] = pCalibdb->iso[i];
 		pParams->b[i] = pCalibdb->iso[i];
 		pParams->filtpar[i] = pCalibdb->filtPara[i];
@@ -221,23 +224,27 @@ ANRresult_t select_bayernr_params_by_ISO(RKAnr_Bayernr_Params_t *stBayerNrParams
 	iso = pExpInfo->arIso[pExpInfo->hdr_mode];
 
 	LOGD_ANR("%s:%d iso:%d \n", __FUNCTION__, __LINE__, iso);
-	
-	////降噪参数获取
-	//确定iso等级
-	//共有7个iso等级：50 100 200 400 800 1600 3200  6400 12800
-	//		 isogain: 1   2   4   8   16   32  64  128  256
-	//	 	isolevel: 0   1   2   3   4    5   6   7    8
-	int isoGainStd[MAX_ISO_STEP]={1,2,4,8,16,32,64,128,256,512,1024,2048,4096};
-	int isoGain=MAX(int(iso/50),1);
-	int isoGainLow=0;//向下一个isoGain,用做参数插值：y=float(isoGainHig-isoGain)/float(isoGainHig-isoGainLow)*y[isoLevelLow]
-	//									+float(isoGain-isoGainLow)/float(isoGainHig-isoGainLow)*y[isoLevelHig];
-	int isoGainHig=0;//向上一个isoGain
-	int isoGainCorrect=1;//选择最近的一档iso的配置
 
+	int isoGainStd[MAX_ISO_STEP];
+	int isoGain=MAX(int(iso/50),1);
+	int isoGainLow=0;
+	int isoGainHig=0;
+	int isoGainCorrect=1;
 	int isoLevelLow=0;
 	int isoLevelHig=0;
 	int isoLevelCorrect=0;
 	int i, j;
+
+	#ifndef RK_SIMULATOR_HW
+	for(int i=0; i<MAX_ISO_STEP; i++){
+		isoGainStd[i] = stBayerNrParams->iso[i] / 50;
+	}
+	#else
+	for(int i=0; i<MAX_ISO_STEP; i++){
+		isoGainStd[i] = 1 * (1 << i);
+	}
+	#endif
+	
 	
 	for (i=0; i< MAX_ISO_STEP - 1; i++)
 	{
@@ -248,9 +255,10 @@ ANRresult_t select_bayernr_params_by_ISO(RKAnr_Bayernr_Params_t *stBayerNrParams
 			isoLevelLow=i;
 			isoLevelHig=i+1;
 			isoGainCorrect = ((isoGain-isoGainStd[i])<=(isoGainStd[i+1]-isoGain)) ? isoGainStd[i] : isoGainStd[i+1];
-            isoLevelCorrect = ((isoGain-isoGainStd[i])<=(isoGainStd[i+1]-isoGain)) ? i : (i+1);
+            		isoLevelCorrect = ((isoGain-isoGainStd[i])<=(isoGainStd[i+1]-isoGain)) ? i : (i+1);
 		}
 	}
+	
 
 	//VST变换参数, bilinear
 	stBayerNrParamsSelected->a[0] = float(isoGainHig-isoGain)/float(isoGainHig-isoGainLow)*stBayerNrParams->a[isoLevelLow]

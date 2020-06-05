@@ -34,6 +34,12 @@ ANRresult_t init_ynr_params(RKAnr_Ynr_Params_s *pYnrParams, CalibDb_YNR_t* pYnrC
     bit_shift = bit_calib - bit_proc;
 	isoCurveSectValue =  (1 << (bit_calib - ISO_CURVE_POINT_BIT));//rawBit必须大于ISO_CURVE_POINT_BIT
 	isoCurveSectValue1 =  (1 << bit_calib);// - 1;//rawBit必须大于ISO_CURVE_POINT_BIT, max use (1 << bit_calib);
+
+	#ifndef RK_SIMULATOR_HW
+	for(j=0; j<MAX_ISO_STEP; j++){
+		pParams[j].iso = pCalibdb[j].iso;
+	}
+	#endif
 	
 	for(j=0; j<MAX_ISO_STEP; j++){
 		for(i = 0; i < WAVELET_LEVEL_NUM; i++){
@@ -251,8 +257,14 @@ ANRresult_t select_ynr_params_by_ISO(RKAnr_Ynr_Params_t *stYnrParam, RKAnr_Ynr_P
 	
 	int iso_div = 50;
 	for(int i=0; i<MAX_ISO_STEP-1; i++){
+		#ifndef RK_SIMULATOR_HW
+		int lowIso = stYnrParam->aYnrParamsISO[i].iso;
+		int highIso = stYnrParam->aYnrParamsISO[i+1].iso;
+		#else
 		int lowIso = iso_div * (1 << i);
 		int highIso = iso_div * (1 << (i+1));
+		#endif
+		
 		LOGD_ANR("oyyf %s:%d  iso:%d low:%d hight:%d \n", __FUNCTION__, __LINE__,
 				isoValue, lowIso, highIso);
 		if(isoValue >= lowIso && isoValue <= highIso){
@@ -265,6 +277,18 @@ ANRresult_t select_ynr_params_by_ISO(RKAnr_Ynr_Params_t *stYnrParam, RKAnr_Ynr_P
 		}
 	}
 
+	#ifndef RK_SIMULATOR_HW
+	if(isoValue < stYnrParam->aYnrParamsISO[0].iso){
+		ratio = 0;
+		pstYNrTuneParamHi = &stYnrParam->aYnrParamsISO[1];
+		pstYNrTuneParamLo = &stYnrParam->aYnrParamsISO[0];
+	}
+	if(isoValue > stYnrParam->aYnrParamsISO[MAX_ISO_STEP-1].iso){
+		ratio = 1;
+		pstYNrTuneParamHi = &stYnrParam->aYnrParamsISO[MAX_ISO_STEP - 1];
+		pstYNrTuneParamLo = &stYnrParam->aYnrParamsISO[MAX_ISO_STEP - 1];
+	}
+	#else
 	if(isoValue < iso_div){
 		ratio = 0;
 		pstYNrTuneParamHi = &stYnrParam->aYnrParamsISO[1];
@@ -276,6 +300,7 @@ ANRresult_t select_ynr_params_by_ISO(RKAnr_Ynr_Params_t *stYnrParam, RKAnr_Ynr_P
 		pstYNrTuneParamHi = &stYnrParam->aYnrParamsISO[MAX_ISO_STEP - 1];
 		pstYNrTuneParamLo = &stYnrParam->aYnrParamsISO[MAX_ISO_STEP - 1];
 	}
+	#endif
 
 	//高频Ci值和亮度噪声曲线
 	for(int i = 0; i < 12; i++)

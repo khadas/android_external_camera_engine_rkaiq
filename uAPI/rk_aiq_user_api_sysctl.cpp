@@ -260,6 +260,13 @@ rk_aiq_uapi_sysctl_getEnabledAxlibCtx(const rk_aiq_sys_ctx_t* ctx, const int alg
     return ctx->_analyzer->getEnabledAxlibCtx(algo_type);
 }
 
+XCamReturn
+rk_aiq_uapi_sysctl_get3AStats(const rk_aiq_sys_ctx_t* ctx,
+                                      rk_aiq_isp_stats_t *stats)
+{
+    return ctx->_analyzer->get3AStatsFromCachedList(*stats);
+}
+
 RKAIQ_END_DECLARE
 
 template<typename T> static T*

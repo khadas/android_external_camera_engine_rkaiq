@@ -84,7 +84,7 @@ typedef struct rk_aiq_wb_awb_attrib_s {
     bool sceneAdjustEn;//to do
     bool colorBalanceEn;//to do
     bool cagaEn;
-    bool wbGainShiftEn;
+    bool wbGainAdjustEn;
     bool wbGainDaylightClipEn;
     bool wbGainClipEn;
     bool extraLightEn;//to do

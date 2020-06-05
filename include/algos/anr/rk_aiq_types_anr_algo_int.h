@@ -73,6 +73,10 @@ RKAIQ_BEGIN_DECLARE
 
 typedef struct RKAnr_Bayernr_Params_s
 {
+	#ifndef RK_SIMULATOR_HW
+	float iso[MAX_ISO_STEP];
+	#endif
+	
 	float a[MAX_ISO_STEP];
 	float b[MAX_ISO_STEP];
 
@@ -164,6 +168,10 @@ typedef struct RKAnr_Bayernr_Params_Select_s
 
 typedef struct RKAnr_Mfnr_Params_s
 {
+	#ifndef RK_SIMULATOR_HW
+	float iso[MAX_ISO_STEP];
+	#endif
+	
 	int back_ref_num;
 
 	int weight_limit_y	[MAX_ISO_STEP][MFNR_MAX_LVL_DEPTH];
@@ -235,6 +243,11 @@ typedef struct RKAnr_Mfnr_Params_Select_s
 
 typedef struct RKAnr_Uvnr_Params_s
 {
+	#ifndef RK_SIMULATOR_HW
+	float iso[MAX_ISO_STEP];
+	#endif
+
+	
 	char	rkuvnrISO[256];
 	
 	//step0:
@@ -380,8 +393,12 @@ typedef struct RKAnr_Uvnr_Params_Select_s
 
 typedef struct RKAnr_Ynr_Params_Select_s
 {
+	#ifndef RK_SIMULATOR_HW
+	float iso;
+	#endif
+
 	float ciISO[12];                              
-    float noiseSigma[ISO_CURVE_POINT_NUM];
+      float noiseSigma[ISO_CURVE_POINT_NUM];
 	short lumaPoints[ISO_CURVE_POINT_NUM];
 
 	float loFreqNoiseCi[WAVELET_LEVEL_NUM];       

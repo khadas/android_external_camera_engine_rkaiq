@@ -232,6 +232,7 @@ RkAiqCore::stop()
     mRkAiqCoreTh->stop();
     mRkAiqCorePpTh->triger_stop();
     mRkAiqCorePpTh->stop();
+    ispStatsCachedList.clear();
     mState = RK_AIQ_CORE_STATE_STOPED;
 
     EXIT_ANALYZER_FUNCTION();
@@ -567,6 +568,7 @@ RkAiqCore::genIspAfResult(RkAiqFullParams* params)
     SmartPtr<rk_aiq_focus_params_t> focus_param =
         params->mFocusParams->data();
 
+    focus_param->lens_pos_valid = false;
     if (!af_com) {
         LOGD_ANALYZER("no af result");
         return XCAM_RETURN_NO_ERROR;
@@ -584,6 +586,7 @@ RkAiqCore::genIspAfResult(RkAiqFullParams* params)
         isp_param->af_meas = af_rk->af_proc_res_com.af_isp_param;
 
         focus_param->next_lens_pos = af_rk->af_proc_res_com.af_focus_param.next_lens_pos;
+        focus_param->lens_pos_valid = true;
     }
 
     EXIT_ANALYZER_FUNCTION();
@@ -1670,10 +1673,10 @@ RkAiqCore::addDefaultAlgos()
     enableAlgo(RK_AIQ_ALGO_TYPE_ALSC, 0, true);
     enableAlgo(RK_AIQ_ALGO_TYPE_ADPCC, 0, true);
     enableAlgo(RK_AIQ_ALGO_TYPE_ANR, 0, true);
-    /* enableAlgo(RK_AIQ_ALGO_TYPE_AF, 0, true); */
+    enableAlgo(RK_AIQ_ALGO_TYPE_AF, 0, true);
     enableAlgo(RK_AIQ_ALGO_TYPE_ASHARP, 0, true);
     enableAlgo(RK_AIQ_ALGO_TYPE_ADHAZ, 0, true);
-    /*enableAlgo(RK_AIQ_ALGO_TYPE_A3DLUT, 0, true); */
+    enableAlgo(RK_AIQ_ALGO_TYPE_A3DLUT, 0, true);
     enableAlgo(RK_AIQ_ALGO_TYPE_ALDCH, 0, true);
     enableAlgo(RK_AIQ_ALGO_TYPE_AFEC, 0, true);
     enableAlgo(RK_AIQ_ALGO_TYPE_AGIC, 0, true);
@@ -1841,6 +1844,31 @@ RkAiqCore::getEnabledAxlibCtx(const int algo_type)
         return NULL;
 }
 
+void
+RkAiqCore::cacheIspStatsToList()
+{
+    SmartLock locker (ispStatsListMutex);
+    rk_aiq_isp_stats_t stats;
+    stats.aec_stats = mAlogsSharedParams.ispStats.aec_stats;
+    stats.awb_stats_v200 = mAlogsSharedParams.ispStats.awb_stats;
+    stats.af_stats = mAlogsSharedParams.ispStats.af_stats;
+    while (ispStatsCachedList.size() > 10)
+        ispStatsCachedList.pop_front();
+    ispStatsCachedList.push_back(stats);
+}
+
+XCamReturn RkAiqCore::get3AStatsFromCachedList(rk_aiq_isp_stats_t &stats)
+{
+    SmartLock locker (ispStatsListMutex);
+    if(!ispStatsCachedList.empty()) {
+        stats = ispStatsCachedList.front();
+        ispStatsCachedList.pop_front();
+        return XCAM_RETURN_NO_ERROR;
+    } else {
+        return XCAM_RETURN_ERROR_FAILED;
+    }
+}
+
 XCamReturn
 RkAiqCore::convertIspstatsToAlgo(const SmartPtr<VideoBuffer> &buffer)
 {
@@ -1852,6 +1880,7 @@ RkAiqCore::convertIspstatsToAlgo(const SmartPtr<VideoBuffer> &buffer)
 
     SmartPtr<RkAiqExpParamsProxy> expParams = buf->get_exp_params();
     SmartPtr<RkAiqIspParamsProxy> ispParams = buf->get_isp_params();
+    SmartPtr<RkAiqAfInfoProxy> afParams = buf->get_af_params();
     stats = (struct rkisp_isp2x_stat_buffer *)(buf->get_v4l2_userptr());
     if(stats == NULL){
         LOGE("fail to get stats ,ignore\n");
@@ -2105,7 +2134,6 @@ RkAiqCore::convertIspstatsToAlgo(const SmartPtr<VideoBuffer> &buffer)
          */
     }
 
-
     //af
     {
         mAlogsSharedParams.ispStats.af_stats_valid =
@@ -2120,6 +2148,12 @@ RkAiqCore::convertIspstatsToAlgo(const SmartPtr<VideoBuffer> &buffer)
             stats->params.rawaf.afm_lum[1];
         memcpy(mAlogsSharedParams.ispStats.af_stats.global_sharpness,
                stats->params.rawaf.ramdata, ISP2X_RAWAF_SUMDATA_NUM * sizeof(u32));
+
+        if(afParams.ptr()) {
+            mAlogsSharedParams.ispStats.af_stats.focus_endtim = afParams->data()->focusEndTim;
+            mAlogsSharedParams.ispStats.af_stats.focus_starttim = afParams->data()->focusStartTim;
+            mAlogsSharedParams.ispStats.af_stats.sof_tim = afParams->data()->sofTime;
+        }
     }
 #endif
     return ret;
@@ -2184,6 +2218,7 @@ RkAiqCore::analyze(const SmartPtr<VideoBuffer> &buffer)
 #else
     if (has_3a_stats) {
         convertIspstatsToAlgo(buffer);
+        cacheIspStatsToList();
     } else if (has_orb_stats) {
         const SmartPtr<V4l2BufferProxy> buf =
             buffer.dynamic_cast_ptr<V4l2BufferProxy>();

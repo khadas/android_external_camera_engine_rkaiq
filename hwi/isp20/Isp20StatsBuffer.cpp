@@ -22,12 +22,14 @@ namespace RkCam {
 Isp20StatsBuffer::Isp20StatsBuffer(SmartPtr<V4l2Buffer> buf,
                                    SmartPtr<V4l2Device> &device,
                                    SmartPtr<RkAiqIspParamsProxy> IspParams,
-                                   SmartPtr<RkAiqExpParamsProxy> ExpParams)
+                                   SmartPtr<RkAiqExpParamsProxy> ExpParams,
+                                   SmartPtr<RkAiqAfInfoProxy> AfParams)
     : V4l2BufferProxy(buf, device)
 {
     ENTER_CAMHW_FUNCTION();
     _expParams = ExpParams;
     _ispParams = IspParams;
+    _afParams = AfParams;
     EXIT_CAMHW_FUNCTION();
 }
 

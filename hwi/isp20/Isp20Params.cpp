@@ -888,6 +888,10 @@ void
 Isp20Params::convertAiqAfToIsp20Params(struct isp2x_isp_params_cfg& isp_cfg,
                                        const rk_aiq_isp_af_meas_t& af_data)
 {
+    if (af_data.contrast_af_en)
+        isp_cfg.module_ens |= ISP2X_MODULE_RAWAF;
+    isp_cfg.module_en_update |= ISP2X_MODULE_RAWAF;
+    isp_cfg.module_cfg_update |= ISP2X_MODULE_RAWAF;
     isp_cfg.meas.rawaf.rawaf_sel = af_data.rawaf_sel;
     isp_cfg.meas.rawaf.gamma_en = af_data.gamma_flt_en;
     isp_cfg.meas.rawaf.gaus_en = af_data.gaus_flt_en;

@@ -20,6 +20,7 @@
 #include "Isp20StatsBuffer.h"
 #include "rkisp2-config.h"
 #include "SensorHw.h"
+#include "LensHw.h"
 #include "Isp20_module_dbg.h"
 #include <fcntl.h>
 
@@ -240,8 +241,12 @@ Isp20PollThread::new_video_buffer(SmartPtr<V4l2Buffer> buf,
     if (type == ISP_POLL_3A_STATS) {
         SmartPtr<RkAiqIspParamsProxy> ispParams = nullptr;
         SmartPtr<RkAiqExpParamsProxy> expParams = nullptr;
+        SmartPtr<RkAiqAfInfoProxy> afParams = nullptr;
 
         _event_handle_dev->getEffectiveExpParams(expParams, buf->get_buf().sequence);
+        if (_focus_handle_dev.ptr())
+            _focus_handle_dev->getAfInfoParams(afParams, buf->get_buf().sequence);
+
 	if (_rx_handle_dev)
 		_rx_handle_dev->getEffectiveIspParams(ispParams, buf->get_buf().sequence);
 
@@ -259,7 +264,7 @@ Isp20PollThread::new_video_buffer(SmartPtr<V4l2Buffer> buf,
 
         // TODO: get ispParams from isp dev;
 
-        video_buf = new Isp20StatsBuffer(buf, dev, ispParams, expParams);
+        video_buf = new Isp20StatsBuffer(buf, dev, ispParams, expParams, afParams);
     } else
         return PollThread::new_video_buffer(buf, dev, type);
     EXIT_CAMHW_FUNCTION();
@@ -278,6 +283,8 @@ Isp20PollThread::notify_sof (int64_t time, int frameid)
     if (get_rkaiq_runtime_dbg() > 0) {
         XCAM_STATIC_FPS_CALCULATION(SOF_FPS, 60);
     }
+    if (_focus_handle_dev.ptr())
+        _focus_handle_dev->handle_sof(time, frameid);
     EXIT_CAMHW_FUNCTION();
 
     return ret;
@@ -289,6 +296,16 @@ Isp20PollThread::set_event_handle_dev(SmartPtr<SensorHw> &dev)
     ENTER_CAMHW_FUNCTION();
     XCAM_ASSERT (dev.ptr());
     _event_handle_dev = dev;
+    EXIT_CAMHW_FUNCTION();
+    return true;
+}
+
+bool
+Isp20PollThread::set_focus_handle_dev(SmartPtr<LensHw> &dev)
+{
+    ENTER_CAMHW_FUNCTION();
+    XCAM_ASSERT (dev.ptr());
+    _focus_handle_dev = dev;
     EXIT_CAMHW_FUNCTION();
     return true;
 }

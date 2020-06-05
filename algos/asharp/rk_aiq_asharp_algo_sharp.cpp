@@ -21,6 +21,9 @@ AsharpResult_t init_sharp_params_v1(RKAsharp_Sharp_HW_Params_t *pParams, CalibDb
 	}
 
 	for (i=0;i<max_iso_step;i++){
+		#ifndef RK_SIMULATOR_HW
+		pParams->iso[i] = pCalibdb->sharp_iso[i].iso;
+		#endif
 		pParams->lratio[i] = pCalibdb->sharp_iso[i].lratio;
 		pParams->hratio[i] = pCalibdb->sharp_iso[i].hratio;
 		pParams->M_ratio[i] = pCalibdb->sharp_iso[i].mf_sharp_ratio;
@@ -209,6 +212,17 @@ AsharpResult_t select_rk_sharpen_hw_params_by_ISO(
 	}
 
 	iso = pExpInfo->arIso[pExpInfo->hdr_mode];
+	
+	#ifndef RK_SIMULATOR_HW
+	for (i = 0; i < max_iso_step-1; i++)
+	{
+		if (iso>= strksharpenParams->iso[i] && iso<= strksharpenParams->iso[i+1] )
+		{
+			iso_low = strksharpenParams->iso[i] ;
+			iso_high = strksharpenParams->iso[i+1];
+		}
+	}
+	#else
 	for (i = max_iso_step - 1; i >= 0; i--)
 	{
 		if (iso < iso_div * (2 << i))
@@ -217,6 +231,8 @@ AsharpResult_t select_rk_sharpen_hw_params_by_ISO(
 			iso_high = iso_div * (2 << i);
 		}
 	}
+	#endif
+	
 	ratio = (float)(iso - iso_low)/(iso_high-iso_low);
 	if (iso_low == iso)
 	{

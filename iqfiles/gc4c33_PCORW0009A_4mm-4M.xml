@@ -17,7 +17,7 @@
             UNKNOWN
         </sample_name>
         <generator_version index="1" type="char" size="[1 6]">
-            v1.0.4
+            v1.0.7
         </generator_version>
     </header>
     <sensor type="struct" size="[1 1]">
@@ -1129,8 +1129,17 @@
                     </cell>
                 </LightSources>
             </MeasureParaV201>
-            <StategyPara index="1" type="struct" size="[1 1]">
+            <StrategyPara index="1" type="struct" size="[1 1]">
                 <Globals index="1" type="struct" size="[1 1]">
+                    <wbGainAdjustEnable index="1" type="double" size="[1 1]">
+                        [0]
+                    </wbGainAdjustEnable>
+                    <wbGainDaylightClipEnable index="1" type="double" size="[1 1]">
+                        [0 ]
+                    </wbGainDaylightClipEnable>
+                    <wbGainClipEnable index="1" type="double" size="[1 1]">
+                        [0 ]
+                    </wbGainClipEnable>
                     <lightSourceForFirstFrame index="1" type="char" size="[1 3]">
                         D50
                     </lightSourceForFirstFrame>
@@ -1139,7 +1148,7 @@
                     </uvRangeSmallEnable>
                     <ca_Enable index="1" type="double" size="[1 1]">
                         [0 ]
-                    </ca_Enable>
+                    </ca_Enable>                    
                     <tolerance index="1" type="double" size="[1 1]">
                         [0 ]
                     </tolerance>
@@ -1230,7 +1239,7 @@
                         [40.0000 ]
                     </ca_LACalcFactor>
                     <ca_TargetGain index="1" type="double" size="[1 4]">
-                        [1.7976 1.0000 1.0000 1.9108 ]
+                        [1.0000    1.0137    1.0137    1.0227 ]
                </ca_TargetGain>
                <singleColorProcess index="1" type="struct" size="[1 1]">
                   <colorBlock index="1" type="cell" size="[1 6]">
@@ -1349,14 +1358,127 @@
                <lineRgProjCCT index="1" type="double" size="[1 3]">
                   [1 -0.000154037916 0.214248613]
                </lineRgProjCCT>
-                    <xyRegionStableSelection index="1" type="struct" size="[1 1]">
-                        <xyRegionSize index="1" type="double" size="[1 1]">
-                            [50]
-                        </xyRegionSize>
-                        <LvVarTh index="1" type="double" size="[1 1]">
-                            [0.0600 ]
-                        </LvVarTh>
-                    </xyRegionStableSelection>
+               <xyRegionStableSelection index="1" type="struct" size="[1 1]">
+                   <xyRegionSize index="1" type="double" size="[1 1]">
+                       [50]
+                   </xyRegionSize>
+                   <LvVarTh index="1" type="double" size="[1 1]">
+                       [0.0600 ]
+                   </LvVarTh>
+               </xyRegionStableSelection>
+               <wbGainAdjust index="1" type="struct" size="[1 1]">
+                    <ct_grid_num index="1" type="double" size="[1 1]">
+                            [7]
+                    </ct_grid_num>
+                   <ct_in_range index="1" type="double" size="[1 2]">
+                            [2000 8000]
+                   </ct_in_range>
+                   <cri_grid_num index="1" type="double" size="[1 1]">
+                            [9]
+                    </cri_grid_num>
+                   <cri_in_range index="1" type="double" size="[1 2]">
+                            [-1 1]
+                    </cri_in_range>
+             <lutAll index="1" type="cell" size="[1 3]">
+                <cell index="1" type="struct" size="[1 5]">
+                    <LvValue index="1" type="double" size="[1 1]">
+                        [128]
+                    </LvValue>
+                    <ct_out index="1" type="double" size="[9 7]">
+ 			[2000, 3000, 4000, 5000, 6000, 7000, 8000,
+                          2000, 3000, 4000, 5000, 6000, 7000, 8000,
+                          2000, 3000, 4000, 5000, 6000, 7000, 8000,
+                          2000, 3000, 4000, 5000, 6000, 7000, 8000,
+                          2000, 3000, 4000, 5000, 6000, 7000, 8000,
+                          2000, 3000, 4000, 5000, 6000, 7000, 8000,
+                          2000, 3000, 4000, 5000, 6000, 7000, 8000,
+                          2000, 3000, 4000, 5000, 6000, 7000, 8000,
+                          2000, 3000, 4000, 5000, 6000, 7000, 8000]
+                    </ct_out>
+                    <cri_out index="1" type="double" size="[9 7]">
+                      [-1, -1, -1, -1, -1, -1, -1,
+                       -0.75, -0.75, -0.75, -0.75, -0.75, -0.75, -0.75,
+                       -0.50, -0.50, -0.50, -0.50, -0.50, -0.50, -0.50,
+                       -0.25, -0.25, -0.25, -0.25, -0.25, -0.25, -0.25,
+                       0, 0, 0, 0, 0, 0, 0,
+                       0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25,
+                       0.50, 0.50, 0.50, 0.50, 0.50, 0.50, 0.50,
+                       0.75, 0.75, 0.75, 0.75, 0.75, 0.75, 0.75,
+                       1, 1, 1, 1, 1, 1, 1]
+                    </cri_out>
+	      </cell>
+                <cell index="1" type="struct" size="[1 5]">
+                    <LvValue index="1" type="double" size="[1 1]">
+                        [8192]
+                    </LvValue>
+                    <ct_out index="1" type="double" size="[9 7]">
+ 			[2000, 3000, 4000, 5000, 6000, 7000, 8000,
+                          2000, 3000, 4000, 5000, 6000, 7000, 8000,
+                          2000, 3000, 4000, 5000, 6000, 7000, 8000,
+                          2000, 3000, 4000, 5000, 6000, 7000, 8000,
+                          2000, 3000, 4000, 5000, 6000, 7000, 8000,
+                          2000, 3000, 4000, 5000, 6000, 7000, 8000,
+                          2000, 3000, 4000, 5000, 6000, 7000, 8000,
+                          2000, 3000, 4000, 5000, 6000, 7000, 8000,
+                          2000, 3000, 4000, 5000, 6000, 7000, 8000]
+                    </ct_out>
+                    <cri_out index="1" type="double" size="[9 7]">
+                      [-1, -1, -1, -1, -1, -1, -1,
+                       -0.75, -0.75, -0.75, -0.75, -0.75, -0.75, -0.75,
+                       -0.50, -0.50, -0.50, -0.50, -0.50, -0.50, -0.50,
+                       -0.25, -0.25, -0.25, -0.25, -0.25, -0.25, -0.25,
+                       0, 0, 0, 0, 0, 0, 0,
+                       0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25,
+                       0.50, 0.50, 0.50, 0.50, 0.50, 0.50, 0.50,
+                       0.75, 0.75, 0.75, 0.75, 0.75, 0.75, 0.75,
+                       1, 1, 1, 1, 1, 1, 1]
+                    </cri_out>
+	      </cell>
+                <cell index="1" type="struct" size="[1 5]">
+                    <LvValue index="1" type="double" size="[1 1]">
+                        [65536]
+                    </LvValue>
+                    <ct_out index="1" type="double" size="[9 7]">
+ 			[2000, 3000, 4000, 5000, 6000, 7000, 8000,
+                          2000, 3000, 4000, 5000, 6000, 7000, 8000,
+                          2000, 3000, 4000, 5000, 6000, 7000, 8000,
+                          2000, 3000, 4000, 5000, 6000, 7000, 8000,
+                          2000, 3000, 4000, 5000, 6000, 7000, 8000,
+                          2000, 3000, 4000, 5000, 6000, 7000, 8000,
+                          2000, 3000, 4000, 5000, 6000, 7000, 8000,
+                          2000, 3000, 4000, 5000, 6000, 7000, 8000,
+                          2000, 3000, 4000, 5000, 6000, 7000, 8000]
+                    </ct_out>
+                    <cri_out index="1" type="double" size="[9 7]">
+                      [-1, -1, -1, -1, -1, -1, -1,
+                       -0.75, -0.75, -0.75, -0.75, -0.75, -0.75, -0.75,
+                       -0.50, -0.50, -0.50, -0.50, -0.50, -0.50, -0.50,
+                       -0.25, -0.25, -0.25, -0.25, -0.25, -0.25, -0.25,
+                       0, 0, 0, 0, 0, 0, 0,
+                       0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25,
+                       0.50, 0.50, 0.50, 0.50, 0.50, 0.50, 0.50,
+                       0.75, 0.75, 0.75, 0.75, 0.75, 0.75, 0.75,
+                       1, 1, 1, 1, 1, 1, 1]
+                    </cri_out>
+	      </cell>
+ 	     </lutAll>
+            </wbGainAdjust>
+            <wbGainDaylightClip index="1" type="struct" size="[1 1]">
+                 <outdoor_cct_min index="1" type="double" size="[1 1]">
+                       [5000]
+                 </outdoor_cct_min>
+             </wbGainDaylightClip>
+             <wbGainClip index="1" type="struct" size="[1 1]">
+                    <cct index="1" type="double" size="[1 5]">
+                        [1000 2856 4100 6500 7500]
+                    </cct>
+                    <cri_bound_up index="1" type="double" size="[1 5]">
+ 	              [0.091 0.091 0.18 0.12 0.12]
+                    </cri_bound_up>
+                    <cri_bound_low index="1" type="double" size="[1 5]">
+                       [0.07 0.07 0.16 0.16 0.16 ]
+                    </cri_bound_low>
+             </wbGainClip>
             </Globals>
             <LightSources index="1" type="cell" size="[1 7]">
                <cell index="1" type="struct" size="[1 1]">
@@ -1542,19 +1664,19 @@
                         </weightCurve_weight>
                     </cell>
                 </LightSources>
-            </StategyPara>
-            <remosaicPara index="1" type="struct" size="[1 1]">
+            </StrategyPara>
+            <RemosaicPara index="1" type="struct" size="[1 1]">
                         <enable index="1" type="double" size="[1 1]">
                             [1]
                         </enable>
                         <sensorWbGain index="1" type="double" size="[1 4]">
                             [1.2822    0.6670    0.6670    1.2246 ]
                         </sensorWbGain>
-            </remosaicPara>
+            </RemosaicPara>
         </AWB>
         <AEC index="1" type="struct" size="[1 1]">
             <AecRunInterval index="1" type="double" size="[1 1]">
-                [15 ]
+                [2]
             </AecRunInterval>
             <AecOpType index="1" type="char" size="[1 6]">
             	AUTO
@@ -1570,21 +1692,21 @@
             </YRangeMode>
             <AecSpeed index="1" type="struct" size="[1 1]">
                 <DampOver index="1" type="double" size="[1 1]">
-                    [0.4500 ]
+                    [0.400 ]
                 </DampOver>
                 <DampUnder index="1" type="double" size="[1 1]">
-                    [0.4500 ]
+                    [0.600 ]
                 </DampUnder>
                 <DampDark2Bright index="1" type="double" size="[1 1]">
-                    [0.1500 ]
+                    [0.2500 ]
                 </DampDark2Bright>
                 <DampBright2Dark index="1" type="double" size="[1 1]">
-                    [0.3500 ]
+                    [0.5500 ]
                 </DampBright2Dark>
             </AecSpeed>
             <AecDelayFrmNum index="1" type="struct" size="[1 1]">
                 <BlackDelay index="1" type="double" size="[1 1]">
-                    [1 ]
+                    [8 ]
                 </BlackDelay>
                 <WhiteDelay index="1" type="double" size="[1 1]">
                     [0 ]
@@ -1926,10 +2048,10 @@
                             DAY
                         </name>
                         <ExpLevel index="1" type="double" size="[1 6]">
-                            [0.0000 0.0400 0.0800 0.1200 0.500 1.0000 ]
+                            [0.0000 0.005 0.01 0.05 0.1 0.25 ]
                         </ExpLevel>
                         <DySetpoint index="1" type="double" size="[1 6]">
-                            [45.0000 45.0000 40.0000 38.0000 35.0000 35.0000 ]
+                            [40.0000 38.0000 35.0000 33.0000 30.0000 25.0000]
                         </DySetpoint>
                     </cell>
                     <cell index="2" type="struct" size="[1 1]">
@@ -2674,7 +2796,7 @@
                             A
                         </name>
                         <wbGain index="1" type="double" size="[1 2]">
-                            [0.5759 1.9403 ]
+                            [ 0.6542    1.7969]
                         </wbGain>
                         <tableUsed index="1" type="char" size="[1 10]">
                             A_100 A_70 
@@ -2691,7 +2813,7 @@
                             CWF
                         </name>
                         <wbGain index="1" type="double" size="[1 2]">
-                            [0.9945 1.5636 ]
+                            [1.0810    1.4837]
                         </wbGain>
                         <tableUsed index="1" type="char" size="[1 14]">
                             CWF_100 CWF_70 
@@ -2708,7 +2830,7 @@
                             D50
                         </name>
                         <wbGain index="1" type="double" size="[1 2]">
-                            [0.8169 1.1260 ]
+                            [0.9865    1.0089]
                         </wbGain>
                         <tableUsed index="1" type="char" size="[1 14]">
                             D50_100 D50_70 
@@ -2725,7 +2847,7 @@
                             D65
                         </name>
                         <wbGain index="1" type="double" size="[1 2]">
-                            [1.0553 0.9217 ]
+                            [1.2155    0.8538]
                         </wbGain>
                         <tableUsed index="1" type="char" size="[1 14]">
                             D65_100 D65_70 
@@ -2742,7 +2864,7 @@
                             D75
                         </name>
                         <wbGain index="1" type="double" size="[1 2]">
-                            [1.0467 0.8919 ]
+                            [1.2627    0.7873]
                         </wbGain>
                         <tableUsed index="1" type="char" size="[1 14]">
                             D75_100 D75_70 
@@ -2759,7 +2881,7 @@
                             HZ
                         </name>
                         <wbGain index="1" type="double" size="[1 2]">
-                            [0.4418 2.5384 ]
+                            [0.5175    2.3547]
                         </wbGain>
                         <tableUsed index="1" type="char" size="[1 12]">
                             HZ_100 HZ_70 
@@ -2776,7 +2898,7 @@
                             TL84
                         </name>
                         <wbGain index="1" type="double" size="[1 2]">
-                            [0.8744 1.5377 ]
+                            [0.9348    1.3877]
                         </wbGain>
                         <tableUsed index="1" type="char" size="[1 16]">
                             TL84_100 TL84_70 
@@ -4346,7 +4468,7 @@
                 [8 ]
             </debayer_dist_scale>
             <debayer_cnr_strength index="1" type="char" size="[1 1]">
-                [5 ]
+                [8 ]
             </debayer_cnr_strength>
             <debayer_shift_num index="1" type="char" size="[1 1]">
                 [2 ]
@@ -4385,7 +4507,7 @@
                             A
                         </name>
                         <wbGain index="1" type="double" size="[1 2]">
-                            [1.0000 2.9847 ]
+                            [0.6542    1.7969]
                         </wbGain>
                         <matrixUsed index="1" type="char" size="[1 10]">
                             A_100 A_74 
@@ -4402,7 +4524,7 @@
                             CWF
                         </name>
                         <wbGain index="1" type="double" size="[1 2]">
-                            [1.0477 1.5168 ]
+                            [1.0810    1.4837 ]
                         </wbGain>
                         <matrixUsed index="1" type="char" size="[1 14]">
                             CWF_100 CWF_74 
@@ -4419,7 +4541,7 @@
                             D50
                         </name>
                         <wbGain index="1" type="double" size="[1 2]">
-                            [1.0000 1.1325 ]
+                            [0.9865    1.0089 ]
                         </wbGain>
                         <matrixUsed index="1" type="char" size="[1 14]">
                             D50_100 D50_74 
@@ -4436,7 +4558,7 @@
                             D65
                         </name>
                         <wbGain index="1" type="double" size="[1 2]">
-                            [1.2797 1.0000 ]
+                            [1.2155    0.8538 ]
                         </wbGain>
                         <matrixUsed index="1" type="char" size="[1 14]">
                             D65_100 D65_74 
@@ -4453,7 +4575,7 @@
                             D75
                         </name>
                         <wbGain index="1" type="double" size="[1 2]">
-                            [1.4322 1.0000 ]
+                            [1.2627    0.7873]
                         </wbGain>
                         <matrixUsed index="1" type="char" size="[1 14]">
                             D75_100 D75_74 
@@ -4470,7 +4592,7 @@
                             HZ
                         </name>
                         <wbGain index="1" type="double" size="[1 2]">
-                            [1.0000 4.8925 ]
+                            [0.5175    2.3547]
                         </wbGain>
                         <matrixUsed index="1" type="char" size="[1 12]">
                             HZ_100 HZ_74 
@@ -4487,7 +4609,7 @@
                             TL84
                         </name>
                         <wbGain index="1" type="double" size="[1 2]">
-                            [1.0000 1.5386 ]
+                            [0.9348    1.3877 ]
                         </wbGain>
                         <matrixUsed index="1" type="char" size="[1 16]">
                             TL84_100 TL84_74 
@@ -4802,7 +4924,7 @@
             [4	4	4	4	4	4	4	4	4      4	4	4      4]
             </step1_downSample_meansize>
             <step1_median_ratio index="1" type="double" size="[1 13]">
-                [0.2000 0.2000 0.2000 0.2000 0.2000 0.2000 0.2000 0.2000 0.2000 0.2000 0.2000 0.2000 0.2000]
+                [1.0000 1.0000 1.0000 1.0000 1.0000 1.0000 1.0000 1.0000 1.0000  1.0000 1.0000 1.0000 1.0000]
             </step1_median_ratio>
          <step1_median_size index="1" type="double" size="[1 13]">
             [3	3	3	3	3	3	3	3	3      3	3	3     3]
@@ -4811,7 +4933,7 @@
             [0	0	0	0	0	0	0	0	0      0	0	0   0]
             </step1_median_IIR>
             <step1_bf_sigmaR index="1" type="double" size="[1 13]">
-            [10.24	10.24	10.24	12.8	12.8	12.8	17.06	25.6	25.6  25.6	25.6 25.6	25.6]
+                [2.5 2.5 2.5 2.5 2.5 2.5 2.5 2.5 2.5 2.5 2.5 2.5 2.5]
             </step1_bf_sigmaR>
          <step1_bf_uvgain index="1" type="double" size="[1 13]">
             [1.5	1.5	1.5	1.5	1.5	1.5	1.5	1.5	1.0  1.0	1.0	1.0  1.0]
@@ -10026,7 +10148,7 @@
                         [50.0000 ]
                     </iso>
                     <dehaze_en index="1" type="double" size="[1 1]">
-                        [1 ]
+                        [0]
                     </dehaze_en>
                     <dc_en index="1" type="double" size="[1 1]">
 	            [1]
@@ -10151,7 +10273,7 @@
                         [100.0000 ]
                     </iso>
                     <dehaze_en index="1" type="double" size="[1 1]">
-                        [1]
+                        [0]
                     </dehaze_en>
                     <dc_en index="1" type="double" size="[1 1]">
 	            [1]
@@ -10276,7 +10398,7 @@
                         [200.0000 ]
                     </iso>
                     <dehaze_en index="1" type="double" size="[1 1]">
-                        [1 ]
+                        [0 ]
                     </dehaze_en>
                     <dc_en index="1" type="double" size="[1 1]">
 	            [1]
@@ -10401,7 +10523,7 @@
                         [400.0000 ]
                     </iso>
                     <dehaze_en index="1" type="double" size="[1 1]">
-                        [1 ]
+                        [0 ]
                     </dehaze_en>
                     <dc_en index="1" type="double" size="[1 1]">
 	            [1]
@@ -10526,7 +10648,7 @@
                         [800.0000 ]
                     </iso>
                     <dehaze_en index="1" type="double" size="[1 1]">
-                        [1]
+                        [0]
                     </dehaze_en>
                     <dc_en index="1" type="double" size="[1 1]">
 	            [1]
@@ -10651,7 +10773,7 @@
                         [1600.0000 ]
                     </iso>
                     <dehaze_en index="1" type="double" size="[1 1]">
-                        [1 ]
+                        [0 ]
                     </dehaze_en>
                     <dc_en index="1" type="double" size="[1 1]">
 	            [1]
@@ -10776,7 +10898,7 @@
                         [3200.0000 ]
                     </iso>
                     <dehaze_en index="1" type="double" size="[1 1]">
-                        [1 ]
+                        [0 ]
                     </dehaze_en>
                     <dc_en index="1" type="double" size="[1 1]">
                         [1 ]
@@ -10901,7 +11023,7 @@
                         [6400.0000 ]
                     </iso>
                     <dehaze_en index="1" type="double" size="[1 1]">
-                        [1 ]
+                        [0 ]
                     </dehaze_en>
                     <dc_en index="1" type="double" size="[1 1]">
 	            [1]
@@ -11026,7 +11148,7 @@
                         [12800.0000 ]
                     </iso>
                     <dehaze_en index="1" type="double" size="[1 1]">
-                        [1 ]
+                        [0 ]
                     </dehaze_en>
                     <dc_en index="1" type="double" size="[1 1]">
 	            [1]
@@ -11156,22 +11278,22 @@
                 [0.0000 0.0000 1.0000 0.5000 ]
             </TimeFactor>
             <CISTimeRegSumFac index="1" type="double" size="[1 2]">
-                [1.0000 4.0000 ]
+                [1.0000 0.0000 ]
             </CISTimeRegSumFac>
             <CISTimeRegOdevity index="1" type="double" size="[1 2]">
-                [1.0000 0.0000 ]
+                [2.0000 0.0000 ]
             </CISTimeRegOdevity>
             <CISTimeRegUnEqualEn index="1" type="double" size="[1 1]">
-                [1 ]
+                [1]
             </CISTimeRegUnEqualEn>
             <CISTimeRegMin index="1" type="double" size="[1 1]">
-                [3 ]
+                [2]
             </CISTimeRegMin>
             <CISAgainRange index="1" type="double" size="[1 2]">
                 [1.0000 128.0000 ]
             </CISAgainRange>
             <CISExtraAgainRange index="1" type="double" size="[1 2]">
-                [1.0000 128.0000 ]
+                [1.0000 1.0000 ]
             </CISExtraAgainRange>
             <CISDgainRange index="1" type="double" size="[1 2]">
                 [1.0000 1.0000 ]
@@ -11237,7 +11359,7 @@
 	       [0 0 0]
 	    </dcgmode_init>
 	    <dcg_ratio index="1" type="double" size="[1 1]">
-	       [3.5]
+	       [1]
 	    </dcg_ratio>
 	    <sync_switch index="1" type="double" size="[1 1]">
 	       [1]
@@ -11270,7 +11392,7 @@
 	        [2]
 	     </time_delay>
 	     <gain_delay index="1" type="double" size="[1 1]">
-	        [1]
+	        [2]
 	     </gain_delay>
 	     <dcg_delay index="1" type="double" size="[1 1]">
 	        [2]

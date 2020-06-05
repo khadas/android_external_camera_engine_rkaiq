@@ -129,6 +129,7 @@ set (HWI_SRC
         hwi/isp20/Isp20StatsBuffer.cpp
         hwi/isp20/Isp20_module_dbg.cpp
         hwi/SensorHw.cpp
+        hwi/LensHw.cpp
         )
 endif()
 set (IPC_SRC

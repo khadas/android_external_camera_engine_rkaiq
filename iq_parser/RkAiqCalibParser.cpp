@@ -1838,7 +1838,9 @@ bool RkAiqCalibParser::parseEntrySensorAwb
 
     LOGD("%s(%d): (enter)\n", __FUNCTION__, __LINE__);
     autoTabForward();
-    memset(&mCalibDb->awb, 0, sizeof(mCalibDb->awb));
+    if (xmlParseReadWrite == XML_PARSER_READ){
+        memset(&mCalibDb->awb, 0, sizeof(mCalibDb->awb));
+    }
     const XMLNode* pchild = pelement->FirstChild();
     while (pchild) {
         XmlTag tag = XmlTag(pchild->ToElement());
@@ -2174,7 +2176,32 @@ bool RkAiqCalibParser::parseEntrySensorAwbStategyGlobals
 
         XmlTag tag = XmlTag(pchild->ToElement());
         std::string tagname(pchild->ToElement()->Name());
-        if ((tagname == CALIB_SENSOR_AWB_LSFORFIRSTFRAME)
+        if ((tagname == CALIB_SENSOR_AWB_WBGAINADJUSTENABLE)
+                 && (tag.isType(XmlTag::TAG_TYPE_DOUBLE))
+                 && (tag.Size() > 0)) {
+            unsigned char tempVal = mCalibDb->awb.stategy_cfg.wbGainAdjustEn;
+            int no = ParseUcharArray(pchild, &tempVal, 1);
+            DCT_ASSERT((no == tag.Size()));
+            mCalibDb->awb.stategy_cfg.wbGainAdjustEn = (tempVal == 0 ? false : true);
+
+        }
+        else if ((tagname == CALIB_SENSOR_AWB_WBGAINDAYLIGHTCLIPENABLE)
+                 && (tag.isType(XmlTag::TAG_TYPE_DOUBLE))
+                 && (tag.Size() > 0)) {
+            unsigned char tempVal = mCalibDb->awb.stategy_cfg.wbGainDaylightClipEn;
+            int no = ParseUcharArray(pchild, &tempVal, 1);
+            DCT_ASSERT((no == tag.Size()));
+            mCalibDb->awb.stategy_cfg.wbGainDaylightClipEn = (tempVal == 0 ? false : true);
+        }
+        else if ((tagname == CALIB_SENSOR_AWB_WBGAINCLIPEANBLE)
+                 && (tag.isType(XmlTag::TAG_TYPE_DOUBLE))
+                 && (tag.Size() > 0)) {
+            unsigned char tempVal = mCalibDb->awb.stategy_cfg.wbGainClipEn;
+            int no = ParseUcharArray(pchild, &tempVal, 1);
+            DCT_ASSERT((no == tag.Size()));
+            mCalibDb->awb.stategy_cfg.wbGainClipEn = (tempVal == 0 ? false : true);
+        }
+        else if ((tagname == CALIB_SENSOR_AWB_LSFORFIRSTFRAME)
                 && (tag.isType(XmlTag::TAG_TYPE_CHAR))
                 && (tag.Size() > 0)) {
             ParseString(pchild, mCalibDb->awb.stategy_cfg.lsForFirstFrame,
@@ -2200,8 +2227,6 @@ bool RkAiqCalibParser::parseEntrySensorAwbStategyGlobals
                  && (tag.isType(XmlTag::TAG_TYPE_DOUBLE))
                  && (tag.Size() > 0)) {
             int no = ParseFloatArray(pchild, &mCalibDb->awb.stategy_cfg.tolerance, tag.Size());
-
-            LOGE("%s(%d): tolerance %f\n", __FUNCTION__, __LINE__,mCalibDb->awb.stategy_cfg.tolerance);
             DCT_ASSERT((no == tag.Size()));
         }
         else if ((tagname == CALIB_SENSOR_AWB_RUNINTERNAL)
@@ -2431,6 +2456,62 @@ bool RkAiqCalibParser::parseEntrySensorAwbStategyGlobals
             }
             autoTabBackward();
         }
+        else if (tagname == CALIB_SENSOR_AWB_WBGAINADJUST) {
+            if (!parseEntrySensorAwbwbGainAdjust(pchild->ToElement())) {
+                LOGE("parse error in AWB (%s)", tagname);
+                return (false);
+            }
+        }
+        else if (tagname == CALIB_SENSOR_AWB_WBGAINDAYLIGHTCLIP) {
+            const XMLNode* psubchild = pchild->ToElement()->FirstChild();
+            autoTabForward();
+            while (psubchild) {
+                XmlTag subTag = XmlTag(psubchild->ToElement());
+                std::string subTagname(psubchild->ToElement()->Name());
+
+                if (subTagname == CALIB_SENSOR_AWB_OUTDOORCCTMIN) {
+                    int no = ParseFloatArray(psubchild, &mCalibDb->awb.stategy_cfg.cct_clip_cfg.outdoor_cct_min, subTag.Size());
+                    DCT_ASSERT((no == subTag.Size()));
+                }
+                psubchild = psubchild->NextSibling();
+            }
+            autoTabBackward();
+        }
+        else if (tagname == CALIB_SENSOR_AWB_WBGAINCLIP) {
+            const XMLNode* psubchild = pchild->ToElement()->FirstChild();
+            autoTabForward();
+            int cct_num=0;
+            int cri_bound_up_num=0;
+            int cri_bound_low_num=0;
+            while (psubchild) {
+                XmlTag subTag = XmlTag(psubchild->ToElement());
+                std::string subTagname(psubchild->ToElement()->Name());
+
+                if (subTagname == CALIB_SENSOR_AWB_CCT) {
+                    int no = ParseFloatArray(psubchild, mCalibDb->awb.stategy_cfg.cct_clip_cfg.cct, subTag.Size());
+                    DCT_ASSERT((no == subTag.Size()));
+                    cct_num = no;
+                }
+                else if (subTagname == CALIB_SENSOR_AWB_CRIBOUNDUP) {
+                    int no = ParseFloatArray(psubchild, mCalibDb->awb.stategy_cfg.cct_clip_cfg.cri_bound_up, subTag.Size());
+                    DCT_ASSERT((no == subTag.Size()));
+                    cri_bound_up_num = no;
+                }
+                else if (subTagname == CALIB_SENSOR_AWB_CRIBOUNDLOW) {
+                    int no = ParseFloatArray(psubchild, mCalibDb->awb.stategy_cfg.cct_clip_cfg.cri_bound_low, subTag.Size());
+                    DCT_ASSERT((no == subTag.Size()));
+                    cri_bound_low_num = no;
+                }
+                psubchild = psubchild->NextSibling();
+            }
+            if((cct_num !=cri_bound_up_num)||(cct_num !=cri_bound_low_num)){
+                LOGE("para error in AWB section tag:%s  number of cct should be equal to cri_bound_up and cri_bound_low",
+                    tagname.c_str());
+                return ( false );
+            }
+            mCalibDb->awb.stategy_cfg.cct_clip_cfg.grid_num = cct_num;
+            autoTabBackward();
+        }
         else {
             LOGE("parse error in AWB section (unknow tag:%s)", tagname.c_str());
             //return ( false );
@@ -2605,6 +2686,94 @@ bool RkAiqCalibParser::parseEntrySensorAwbWindow
     }
     DCT_ASSERT((index <= CALD_AWB_RRES_NUM_MAX));
     mCalibDb->awb.measure_para_v200.measeureWindow.resNum++;
+    LOGD("%s(%d): (exit)\n", __FUNCTION__, __LINE__);
+    return (true);
+}
+bool RkAiqCalibParser::parseEntrySensorAwbwbGainAdjust
+(
+    const XMLElement*   pelement,
+    void*               param
+) {
+    (void)param;
+
+    LOGD("%s(%d): (enter)\n", __FUNCTION__, __LINE__);
+    autoTabForward();
+
+    const XMLNode* pchild = pelement->FirstChild();
+    while (pchild) {
+        XmlTag tag = XmlTag(pchild->ToElement());
+        std::string tagname(pchild->ToElement()->Name());
+        if ((tagname == CALIB_SENSOR_AWB_CTGRIDNUM)
+                         && (tag.isType(XmlTag::TAG_TYPE_DOUBLE))
+                         && (tag.Size() > 0)) {
+                    int no = ParseIntArray(pchild, &mCalibDb->awb.stategy_cfg.cct_lut_cfg[0].ct_grid_num, tag.Size());
+                    DCT_ASSERT((no == tag.Size()));
+        }else if ((tagname == CALIB_SENSOR_AWB_CTINRANGE)
+                         && (tag.isType(XmlTag::TAG_TYPE_DOUBLE))
+                         && (tag.Size() > 0)) {
+                    int no = ParseFloatArray(pchild, mCalibDb->awb.stategy_cfg.cct_lut_cfg[0].ct_range, tag.Size());
+                    DCT_ASSERT((no == tag.Size()));
+                    DCT_ASSERT((no == 2));
+        }else if ((tagname == CALIB_SENSOR_AWB_CRIGRIDNUM)
+                         && (tag.isType(XmlTag::TAG_TYPE_DOUBLE))
+                         && (tag.Size() > 0)) {
+                    int no = ParseIntArray(pchild, &mCalibDb->awb.stategy_cfg.cct_lut_cfg[0].cri_grid_num, tag.Size());
+                    DCT_ASSERT((no == tag.Size()));
+        }else if ((tagname == CALIB_SENSOR_AWB_CRIINRANGE)
+                         && (tag.isType(XmlTag::TAG_TYPE_DOUBLE))
+                         && (tag.Size() > 0)) {
+                    int no = ParseFloatArray(pchild, mCalibDb->awb.stategy_cfg.cct_lut_cfg[0].cri_range, tag.Size());
+                    DCT_ASSERT((no == tag.Size()));
+                    DCT_ASSERT((no == 2));
+        }
+        else if ((tagname == CALIB_SENSOR_AWB_LUTALL)) {
+
+            mCalibDb->awb.stategy_cfg.cct_lut_cfg_num= tag.Size();
+            DCT_ASSERT((mCalibDb->awb.stategy_cfg.cct_lut_cfg_num <= CALD_AWB_CT_LV_NUM_MAX));
+            if (!parseEntryCell(pchild->ToElement(), tag.Size(), &RkAiqCalibParser::parseEntrySensorAwbCctLutAll)) {
+                LOGE("parse error in AWB wbGainAdjust (%s)", tagname);
+                return (false);
+            }
+        }
+        pchild = pchild->NextSibling();
+    }
+    LOGD("%s(%d): (exit)\n", __FUNCTION__, __LINE__);
+    autoTabBackward();
+    return (true);
+}
+bool RkAiqCalibParser::parseEntrySensorAwbCctLutAll
+(
+    const XMLElement*   pelement,
+    void*                param
+) {
+    LOGD("%s(%d): (enter)\n", __FUNCTION__, __LINE__);
+
+    int index = *((int*)param);
+    const XMLNode* pchild = pelement->FirstChild();
+    while (pchild) {
+        XmlTag tag = XmlTag(pchild->ToElement());
+        const char* value = tag.Value();
+        std::string tagname(pchild->ToElement()->Name());
+        if ((tagname == CALIB_SENSOR_AWB_LVVALUE)
+                && (tag.isType(XmlTag::TAG_TYPE_DOUBLE))
+                && (tag.Size() > 0)) {
+            int no = ParseFloatArray(pchild, &mCalibDb->awb.stategy_cfg.cct_lut_cfg[index].lv, tag.Size());
+            DCT_ASSERT((no == tag.Size()));
+        }
+        else if ((tagname == CALIB_SENSOR_AWB_CTOUT)
+                 && (tag.isType(XmlTag::TAG_TYPE_DOUBLE))
+                 && (tag.Size() > 0)) {
+            int no = ParseFloatArray(pchild, mCalibDb->awb.stategy_cfg.cct_lut_cfg[index].ct_lut_out, tag.Size(), 6);
+            DCT_ASSERT((no == tag.Size()));
+        }
+        else if ((tagname == CALIB_SENSOR_AWB_CRIOUT)
+                 && (tag.isType(XmlTag::TAG_TYPE_DOUBLE))
+                 && (tag.Size() > 0)) {
+            int no = ParseFloatArray(pchild, mCalibDb->awb.stategy_cfg.cct_lut_cfg[index].cri_lut_out, tag.Size(), 6);
+            DCT_ASSERT((no == tag.Size()));
+        }
+        pchild = pchild->NextSibling();
+    }
     LOGD("%s(%d): (exit)\n", __FUNCTION__, __LINE__);
     return (true);
 }
@@ -9753,6 +9922,11 @@ bool RkAiqCalibParser::parseEntrySensorAf
                            && (secsubtag.isType(XmlTag::TAG_TYPE_DOUBLE))
                            && (secsubtag.Size() > 0)) {
                     int no = ParseFloatArray(psecsubchild, &mCalibDb->af.contrast_af.TrigThers, secsubtag.Size());
+                    DCT_ASSERT((no == secsubtag.Size()));
+                } else if (secsubTagname == CALIB_SENSOR_AF_STABLE_THERS
+                           && (secsubtag.isType(XmlTag::TAG_TYPE_DOUBLE))
+                           && (secsubtag.Size() > 0)) {
+                    int no = ParseFloatArray(psecsubchild, &mCalibDb->af.contrast_af.StableThers, secsubtag.Size());
                     DCT_ASSERT((no == secsubtag.Size()));
                 } else if (secsubTagname == CALIB_SENSOR_AF_STABLE_FRAMES
                            && (secsubtag.isType(XmlTag::TAG_TYPE_DOUBLE))

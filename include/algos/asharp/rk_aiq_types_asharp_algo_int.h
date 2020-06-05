@@ -71,7 +71,9 @@ RKAIQ_BEGIN_DECLARE
 
 typedef struct RKAsharp_Sharp_HW_Params_s
 {
-
+	#ifndef RK_SIMULATOR_HW
+	float iso[MAX_ISO_STEP];
+	#endif
 	float lratio		[MAX_ISO_STEP];
 	float hratio		[MAX_ISO_STEP];
 	float M_ratio		[MAX_ISO_STEP];
@@ -222,6 +224,10 @@ typedef struct RKAsharp_Sharp_Params_Select_s
 
 typedef struct RKAsharp_EdgeFilter_Params_s
 {
+	#ifndef RK_SIMULATOR_HW
+	float iso[MAX_ISO_STEP];
+	#endif
+	
 	short edge_thed				[MAX_ISO_STEP];
 	float dir_min				[MAX_ISO_STEP];
 	float smoth4				[MAX_ISO_STEP];

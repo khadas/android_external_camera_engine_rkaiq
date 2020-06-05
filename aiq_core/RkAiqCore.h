@@ -177,6 +177,7 @@ public:
     bool getAxlibStatus(int algoType, int id);
     const RkAiqAlgoContext* getEnabledAxlibCtx(const int algo_type);
     const RkAiqHandle* getAiqAlgoHandle(const int algo_type);
+    XCamReturn get3AStatsFromCachedList(rk_aiq_isp_stats_t &stats);
 public:
     // following vars shared by all algo handlers
     typedef struct RkAiqAlgosShared_s {
@@ -248,6 +249,7 @@ private:
     XCamReturn genIspAorbResult(RkAiqFullParams* params);
     XCamReturn genIspAr2yResult(RkAiqFullParams* params);
     XCamReturn genIspAwdrResult(RkAiqFullParams* params);
+    void cacheIspStatsToList();
 private:
     enum rk_aiq_core_state_e {
         RK_AIQ_CORE_STATE_INVALID,
@@ -315,6 +317,8 @@ private:
     SmartPtr<RkAiqIsppParamsPool> mAiqIsppParamsPool;
     SmartPtr<RkAiqFocusParamsPool> mAiqFocusParamsPool;
     static uint16_t DEFAULT_POOL_SIZE;
+    std::list<rk_aiq_isp_stats_t>  ispStatsCachedList;
+    Mutex ispStatsListMutex;
 };
 
 };
