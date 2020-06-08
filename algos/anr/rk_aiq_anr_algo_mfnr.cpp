@@ -230,8 +230,8 @@ ANRresult_t select_mfnr_params_by_ISO(RKAnr_Mfnr_Params_t *stmfnrParams, 	RKAnr_
 	
     int i, j;
 	int iso_low = iso, iso_high = iso;
-	int gain_high, gain_low;
-	double ratio;
+	int gain_high = 0, gain_low = 0;
+	double ratio = 0.0f;
 	int iso_div 			= 50;
 	int dir_num 			= MFNR_DIR_NUM;
 	int polyorder 			= MFNR_POLYORDER;
@@ -247,12 +247,31 @@ ANRresult_t select_mfnr_params_by_ISO(RKAnr_Mfnr_Params_t *stmfnrParams, 	RKAnr_
 	double noise_sigma_tmp[(1 << Y_CALIBRATION_BITS) + 1];
 
 	#ifndef RK_SIMULATOR_HW
-	for (i =0; i < MAX_ISO_STEP -1; i++)
-	{
+	for (i =0; i < MAX_ISO_STEP - 1; i++){
 		if(iso >= stmfnrParams->iso[i] && iso_low <= stmfnrParams->iso[i + 1]){
 			iso_low = stmfnrParams->iso[i];
 			iso_high = stmfnrParams->iso[i + 1];
+			gain_low = i;
+			gain_high = i + 1;
+			ratio = (double)(iso - iso_low)/(iso_high-iso_low);
+			break;
 		}
+	}
+
+	if(iso < stmfnrParams->iso[0]){
+		iso_low = stmfnrParams->iso[0];
+		iso_high = stmfnrParams->iso[1];
+		gain_low = 0;
+		gain_high = 1;
+		ratio = 0;
+	}
+
+	if(iso > stmfnrParams->iso[MAX_ISO_STEP - 1]){
+		iso_low = stmfnrParams->iso[MAX_ISO_STEP - 2];
+		iso_high = stmfnrParams->iso[MAX_ISO_STEP - 1];
+		gain_low = MAX_ISO_STEP - 2;
+		gain_high = MAX_ISO_STEP - 1;
+		ratio = 1;
 	}
 	#else
 	for (i = MAX_ISO_STEP - 1; i >= 0; i--)
@@ -262,9 +281,7 @@ ANRresult_t select_mfnr_params_by_ISO(RKAnr_Mfnr_Params_t *stmfnrParams, 	RKAnr_
 			iso_low = iso_div * (2 << (i)) / 2;
 			iso_high = iso_div * (2 << i);
 		}
-	}
-	#endif
-	
+	}	
 	ratio = (double)(iso - iso_low)/(iso_high-iso_low);
 	if (iso_low == iso)
 	{
@@ -277,8 +294,14 @@ ANRresult_t select_mfnr_params_by_ISO(RKAnr_Mfnr_Params_t *stmfnrParams, 	RKAnr_
 	    	ratio = 1;
 	}
 	gain_high 		= (int)(log((double)iso_high / 50) /log((double)2));
-
 	gain_low 		= (int)(log((double)iso_low / 50) / log((double)2));
+	#endif
+
+
+	LOGD_ANR("%s:%d iso:%d high:%d low:%d ratio:%f \n", 
+		__FUNCTION__, __LINE__,
+		iso, iso_high, iso_low, ratio);
+	
 
 	stmfnrParamsSelected->back_ref_num 				= stmfnrParams->back_ref_num;
 	for(int lvl = 0; lvl < max_lvl; lvl++)

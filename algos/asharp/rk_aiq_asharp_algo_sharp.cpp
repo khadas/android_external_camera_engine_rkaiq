@@ -188,7 +188,7 @@ AsharpResult_t select_rk_sharpen_hw_params_by_ISO(
 )
 {
     int i;
-	int gain_high, gain_low;
+	int gain_high=0, gain_low=0;
 	float ratio = 0.0f;
 	int iso_div 			= 50;
     int max_iso_step        = MAX_ISO_STEP;
@@ -214,13 +214,31 @@ AsharpResult_t select_rk_sharpen_hw_params_by_ISO(
 	iso = pExpInfo->arIso[pExpInfo->hdr_mode];
 	
 	#ifndef RK_SIMULATOR_HW
-	for (i = 0; i < max_iso_step-1; i++)
-	{
-		if (iso>= strksharpenParams->iso[i] && iso<= strksharpenParams->iso[i+1] )
-		{
+	for (i = 0; i < max_iso_step-1; i++){
+		if (iso >=  strksharpenParams->iso[i]  &&  iso <=  strksharpenParams->iso[i + 1] ){
 			iso_low = strksharpenParams->iso[i] ;
 			iso_high = strksharpenParams->iso[i+1];
+			gain_low = i;
+			gain_high = i+1;
+			ratio = (float)(iso - iso_low)/(iso_high-iso_low);
+			break;
 		}
+	}
+
+	if(iso < strksharpenParams->iso[0] ){
+		iso_low = strksharpenParams->iso[0] ;
+		iso_high = strksharpenParams->iso[1];
+		gain_low = 0;
+		gain_high = 1;
+		ratio = 0;
+	}
+
+	if(iso < strksharpenParams->iso[max_iso_step - 1] ){
+		iso_low = strksharpenParams->iso[max_iso_step - 2] ;
+		iso_high = strksharpenParams->iso[max_iso_step - 1];
+		gain_low = max_iso_step - 2;
+		gain_high = max_iso_step - 1;
+		ratio = 1;
 	}
 	#else
 	for (i = max_iso_step - 1; i >= 0; i--)
@@ -231,7 +249,6 @@ AsharpResult_t select_rk_sharpen_hw_params_by_ISO(
 			iso_high = iso_div * (2 << i);
 		}
 	}
-	#endif
 	
 	ratio = (float)(iso - iso_low)/(iso_high-iso_low);
 	if (iso_low == iso)
@@ -250,7 +267,7 @@ AsharpResult_t select_rk_sharpen_hw_params_by_ISO(
 
 	gain_low		= MIN(MAX(gain_low, 0), max_iso_step - 1);
 	gain_high		= MIN(MAX(gain_high, 0), max_iso_step - 1);
-
+	#endif
 
 
     strksharpenParamsSelected->lratio               = INTERP1(strksharpenParams->lratio     [gain_low],     strksharpenParams->lratio       [gain_high],    ratio);

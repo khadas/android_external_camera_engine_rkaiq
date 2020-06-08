@@ -148,33 +148,46 @@ ANRresult_t select_uvnr_params_by_ISO(RKAnr_Uvnr_Params_t *stRKUVNrParams, RKAnr
 	//rkuvnriso@50 100 200 400 800 1600 3200  6400 12800
 	//		isogain: 1  2   4   8   16  32   64    128  256
 	//	   isoindex: 0  1   2   3   4   5    6     7    8
-	
-	int isoGainStd[MAX_ISO_STEP] ;
-	int ISO = iso / 50;
 
-	#ifndef RK_SIMULATOR_HW
-	for(int i=0; i<MAX_ISO_STEP; i++){
-		isoGainStd[i] = stRKUVNrParams->iso[i] / 50;
-	}
-	#else
-	for(int i=0; i<MAX_ISO_STEP; i++){
-		isoGainStd[i] = 1 * (1 << i);
-	}
-	#endif
-		
-	if (ISO<1)
-	{
-		ISO = 1;
-	}
-	int isoIndex = int(log(float(ISO)) / log(2.0f));
+	int isoIndex = 0;
 	int isoGainLow = 0;
 	int isoGainHigh = 0;
 	int isoIndexLow = 0;
-	int isoIndexHigh = 0;
-	
-		
+	int isoIndexHigh = 0;	
 	int iso_div 		= 50;
-    int max_iso_step	= MAX_ISO_STEP;
+      int max_iso_step	= MAX_ISO_STEP;
+	  
+	#ifndef RK_SIMULATOR_HW
+	for (int i = 0; i < max_iso_step -1 ; i++)
+	{
+		if (iso >=  stRKUVNrParams->iso[i]  &&  iso <= stRKUVNrParams->iso[i + 1])
+		{
+			isoGainLow =  stRKUVNrParams->iso[i] ;
+			isoGainHigh = stRKUVNrParams->iso[i+1];
+			isoIndexLow = i;
+			isoIndexHigh = i +1;
+			isoIndex = isoIndexLow;
+		}
+	}
+
+	if(iso < stRKUVNrParams->iso[0] ){
+		isoGainLow =  stRKUVNrParams->iso[0];
+		isoGainHigh = stRKUVNrParams->iso[1];
+		isoIndexLow = 0;
+		isoIndexHigh = 1;	
+		isoIndex = 0;
+	}
+
+	if(iso >  stRKUVNrParams->iso[max_iso_step - 1] ){
+		isoGainLow =  stRKUVNrParams->iso[max_iso_step - 2] ;
+		isoGainHigh = stRKUVNrParams->iso[max_iso_step - 1];
+		isoIndexLow = max_iso_step - 2;
+		isoIndexHigh = max_iso_step - 1;	
+		isoIndex = max_iso_step - 1;
+	}
+	#else
+	isoIndex = int(log(float(iso/iso_div)) / log(2.0f));
+	
 	for (int i = max_iso_step - 1; i >= 0; i--)
 	{
 		if (iso < iso_div * (2 << i))
@@ -183,6 +196,7 @@ ANRresult_t select_uvnr_params_by_ISO(RKAnr_Uvnr_Params_t *stRKUVNrParams, RKAnr
 			isoGainHigh = iso_div * (2 << i);
 		}
 	}
+	
 	isoGainLow      = MIN(isoGainLow, iso_div * (2 << max_iso_step));
 	isoGainHigh     = MIN(isoGainHigh, iso_div * (2 << max_iso_step));
 
@@ -191,6 +205,11 @@ ANRresult_t select_uvnr_params_by_ISO(RKAnr_Uvnr_Params_t *stRKUVNrParams, RKAnr
 
 	isoIndexLow		= MIN(MAX(isoIndexLow, 0), max_iso_step - 1);
 	isoIndexHigh	= MIN(MAX(isoIndexHigh, 0), max_iso_step - 1);
+	#endif
+
+	LOGD_ANR("%s:%d iso:%d high:%d low:%d \n", 
+		__FUNCTION__, __LINE__,
+		iso, isoGainHigh, isoGainLow);
 
 	//È¡Êý
 	memcpy(stRKUVNrParamsSelected->select_iso, stRKUVNrParams->rkuvnrISO, sizeof(char) * 256);

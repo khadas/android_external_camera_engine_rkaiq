@@ -119,7 +119,7 @@ ANRresult_t selsec_hdr_parmas_by_ISO(RKAnr_Bayernr_Params_t *stBayerNrParams, RK
     	//共有7个iso等级：50 100 200 400 800 1600 3200  6400 12800
     	//		 isogain: 1   2   4   8   16   32  64  128  256
     	//	 	isolevel: 0   1   2   3   4    5   6   7    8
-    	int isoGainStd[MAX_ISO_STEP]={1,2,4,8,16,32,64,128,256,512,1024,2048,4096};
+    	int isoGainStd[MAX_ISO_STEP];
     	int isoGain=int(frameiso[j]);
     	int isoGainLow=0;//向下一个isoGain,用做参数插值：y=float(isoGainHig-isoGain)/float(isoGainHig-isoGainLow)*y[isoLevelLow]
     	//									+float(isoGain-isoGainLow)/float(isoGainHig-isoGainLow)*y[isoLevelHig];
@@ -129,6 +129,16 @@ ANRresult_t selsec_hdr_parmas_by_ISO(RKAnr_Bayernr_Params_t *stBayerNrParams, RK
     	int isoLevelLow=0;
     	int isoLevelHig=0;
     	int isoLevelCorrect=0;
+		
+	#ifndef RK_SIMULATOR_HW
+	for(int i=0; i<MAX_ISO_STEP; i++){
+		isoGainStd[i] = stBayerNrParams->iso[i] / 50;
+	}
+	#else
+	for(int i=0; i<MAX_ISO_STEP; i++){
+		isoGainStd[i] = 1 * (1 << i);
+	}
+	#endif
 
     	for (i=0; i<MAX_ISO_STEP-1; i++)
     	{
@@ -258,7 +268,10 @@ ANRresult_t select_bayernr_params_by_ISO(RKAnr_Bayernr_Params_t *stBayerNrParams
             		isoLevelCorrect = ((isoGain-isoGainStd[i])<=(isoGainStd[i+1]-isoGain)) ? i : (i+1);
 		}
 	}
-	
+
+	LOGD_ANR("%s:%d iso:%d high:%d low:%d\n", 
+		__FUNCTION__, __LINE__,
+		isoGain, isoGainHig, isoGainLow);
 
 	//VST变换参数, bilinear
 	stBayerNrParamsSelected->a[0] = float(isoGainHig-isoGain)/float(isoGainHig-isoGainLow)*stBayerNrParams->a[isoLevelLow]
