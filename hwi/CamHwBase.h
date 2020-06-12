@@ -60,6 +60,7 @@ public:
     // from PollCallback
     virtual XCamReturn poll_buffer_ready (SmartPtr<VideoBuffer> &buf, int type);
     virtual XCamReturn poll_buffer_failed (int64_t timestamp, const char *msg);
+    virtual XCamReturn setIrcutParams(bool on);
 
 protected:
     SmartPtr<V4l2Device> mIsppStatsDev;
@@ -70,6 +71,7 @@ protected:
     SmartPtr<V4l2SubDevice> mIspCoreDev;
     SmartPtr<V4l2SubDevice> mSensorDev;
     SmartPtr<V4l2SubDevice> mLensDev;
+    SmartPtr<V4l2SubDevice> mIrcutDev;
     SmartPtr<PollThread> mPollthread;
     SmartPtr<PollThread> mPollLumathread;
     SmartPtr<PollThread> mPollIsppthread;

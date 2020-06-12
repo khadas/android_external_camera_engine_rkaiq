@@ -216,6 +216,7 @@ typedef struct _RkAiqAlgoComInt {
             RkAiqProcResComb* proc_res_comb;
             RkAiqPostResComb* post_res_comb;
             int iso;
+            bool ircut_on;
         } proc;
     } u;
 } RkAiqAlgoComInt;

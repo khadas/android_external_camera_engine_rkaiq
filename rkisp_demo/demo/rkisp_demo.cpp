@@ -23,12 +23,13 @@
 #include "drmDsp.h"
 #include "rk_aiq_user_api_sysctl.h"
 #include "rk_aiq_user_api_imgproc.h"
+#include "rk_aiq_user_api_debug.h"
 #include <termios.h>
 
 #define CLEAR(x) memset(&(x), 0, sizeof(x))
 #define FMT_NUM_PLANES 1
 
-#define BUFFER_COUNT 4
+#define BUFFER_COUNT 8
 #define CAPTURE_RAW_PATH "/tmp"
 #define CAPTURE_CNT_FILENAME "capture_cnt"
 //#define ENABLE_UAPI_TEST
@@ -305,15 +306,25 @@ static int xioctl(int fh, int request, void *arg)
         return r;
 }
 
-bool get_value_from_file(const char* path, int* value)
+bool get_value_from_file(const char* path, int* value, int* frameId)
 {
-    char buffer[8] = {0};
+    const char *delim = " ";
+    char buffer[16] = {0};
     int fp;
 
     fp = open(path, O_RDONLY | O_SYNC);
     if (fp) {
-	if (read(fp, buffer, sizeof(buffer)) > 0)
-	    *value = atoi(buffer);
+	if (read(fp, buffer, sizeof(buffer)) > 0) {
+            char *p = nullptr;
+
+	    p = strtok(buffer, delim);
+	    if (p != nullptr) {
+	        *value = atoi(p);
+		p = strtok(nullptr, delim);
+		if (p != nullptr)
+	            *frameId = atoi(p);
+	    }
+	}
 	close(fp);
 	return true;
     }
@@ -395,16 +406,21 @@ static void process_image(const void *p, int sequence,int size)
 		int ret = 0;
 		if (!_is_capture_yuv) {
 		    char file_name[32] = {0};
+		    int rawFrameId = 0;
 
 		    snprintf(file_name, sizeof(file_name), "%s/%s",
 			     CAPTURE_RAW_PATH, CAPTURE_CNT_FILENAME);
-		    get_value_from_file(file_name, &g_capture_yuv_num);
+		    get_value_from_file(file_name, &g_capture_yuv_num, &rawFrameId);
 
-		    if (g_capture_yuv_num > 0)
+		    /*
+		     * printf("%s: rawFrameId: %d, sequence: %d\n", __FUNCTION__,
+		     *        rawFrameId, sequence);
+		     */
+
+		    sequence += 1;
+		    if (g_capture_yuv_num > 0 && \
+			((sequence >= rawFrameId && rawFrameId > 0) || sequence < 2))
 			_is_capture_yuv = true;
-
-		    if (sequence != 0)
-			return;
 		}
 
 		if (_is_capture_yuv) {
@@ -414,9 +430,10 @@ static void process_image(const void *p, int sequence,int size)
 
 		    if (_is_yuv_dir_exist) {
 			write_yuv_to_file(p, size, sequence);
+			rk_aiq_uapi_debug_captureRawNotify(aiq_ctx);
 		    }
 
-		    if (--g_capture_yuv_num == 0) {
+		    if (g_capture_yuv_num-- == 0) {
 			_is_capture_yuv = false;
 			_is_yuv_dir_exist = false;
 		    }
@@ -451,7 +468,19 @@ static int read_frame()
             bytesused = buf.bytesused;
 
 	if (vop) {
-	    drmDspFrame(width, height, buffers[i].start, DRM_FORMAT_NV12);
+	    int dispWidth, dispHeight;
+
+	    if (width > 1920)
+		dispWidth = 1920;
+	    else
+		dispWidth = width;
+
+	    if (height > 1088)
+		dispHeight = 1088;
+	    else
+		dispHeight = height;
+
+	    drmDspFrame(width, height, dispWidth, dispHeight, buffers[i].start, DRM_FORMAT_NV12);
 	}
 
 	process_image(buffers[i].start,  buf.sequence, bytesused);
@@ -1119,47 +1148,50 @@ int main(int argc, char **argv)
         }
     }
 
-	if (rkaiq) {
-		aiq_ctx = rk_aiq_uapi_sysctl_init(sns_entity_name, "/oem/etc/iqfiles", NULL, NULL);
+    if (rkaiq) {
+	aiq_ctx = rk_aiq_uapi_sysctl_init(sns_entity_name, "/oem/etc/iqfiles", NULL, NULL);
 
-		if (aiq_ctx) {
-            printf("-------- init mipi tx/rx -------------\n");
-			XCamReturn ret = rk_aiq_uapi_sysctl_prepare(aiq_ctx, width, height, work_mode);
-			if (ret != XCAM_RETURN_NO_ERROR)
-				ERR("rk_aiq_uapi_sysctl_prepare failed: %d\n", ret);
-			else {
-                /* printf("-------- stream on mipi tx/rx -------------\n"); */
-				/* ret = rk_aiq_uapi_sysctl_start(aiq_ctx ); */
-				start_capturing();
-                if (pponeframe)
-                    start_capturing_pp_oneframe();
-                printf("-------- stream on mipi tx/rx -------------\n");
-				ret = rk_aiq_uapi_sysctl_start(aiq_ctx );
-			}
+	if (aiq_ctx) {
+	    printf("-------- init mipi tx/rx -------------\n");
+	    if (writeFileSync)
+		rk_aiq_uapi_debug_captureRawCtl(aiq_ctx, true);
 
-			if (vop) {
-				if (initDrmDsp() < 0) {
-					printf("DRM display init failed\n");
-					exit(0);
-				}
-			}
-
-			usleep(500 * 1000);
-		}
-	} else {
-		if (vop) {
-			if (initDrmDsp() < 0) {
-				printf("DRM display init failed\n");
-				exit(0);
-			}
-		}
-
-		usleep(500 * 1000);
-
+	    XCamReturn ret = rk_aiq_uapi_sysctl_prepare(aiq_ctx, width, height, work_mode);
+	    if (ret != XCAM_RETURN_NO_ERROR)
+		ERR("rk_aiq_uapi_sysctl_prepare failed: %d\n", ret);
+	    else {
+		/* printf("-------- stream on mipi tx/rx -------------\n"); */
+		/* ret = rk_aiq_uapi_sysctl_start(aiq_ctx ); */
 		start_capturing();
-        if (pponeframe)
-            start_capturing_pp_oneframe();
+		if (pponeframe)
+		    start_capturing_pp_oneframe();
+		printf("-------- stream on mipi tx/rx -------------\n");
+		ret = rk_aiq_uapi_sysctl_start(aiq_ctx );
+	    }
+
+	if (vop) {
+	    if (initDrmDsp() < 0) {
+		printf("DRM display init failed\n");
+		exit(0);
+	    }
 	}
+
+	usleep(500 * 1000);
+	}
+    } else {
+	if (vop) {
+	    if (initDrmDsp() < 0) {
+		printf("DRM display init failed\n");
+		exit(0);
+	    }
+	}
+
+	usleep(500 * 1000);
+
+	start_capturing();
+	if (pponeframe)
+	    start_capturing_pp_oneframe();
+    }
 #ifdef ENABLE_UAPI_TEST    
     pthread_t tid;
     pthread_create(&tid, NULL, test_thread, NULL);

@@ -1298,49 +1298,49 @@
                   <wbGain index="1" type="double" size="[1 2]">                      [1.2861    3.0000]                  </wbGain>
                   <matrixUsed  index="1" type="char" size="[1 30]">                      A_90  A_60                  </matrixUsed >
                   <gains  index="1" type="double" size="[1 4]">                      [1  4  8  32]                  </gains >
-                  <sat  index="1" type="double" size="[1 4]">                      [100 100 74 30]                  </sat >
+                  <sat  index="1" type="double" size="[1 4]">                      [100 100 100 100]                  </sat >
               </cell>
               <cell index="2" type="struct" size="[1 1]">
                   <name index="1" type="char" size="[1 9]">                      D50                  </name>
                   <wbGain index="1" type="double" size="[1 2]">                      [1.7617    1.7998]                  </wbGain>
                   <matrixUsed  index="1" type="char" size="[1 30]">                      D50_90  D50_60                  </matrixUsed >
                   <gains  index="1" type="double" size="[1 4]">                      [1 4 6 32]                  </gains >
-                  <sat  index="1" type="double" size="[1 4]">                      [100 100 90 50]                  </sat >
+                  <sat  index="1" type="double" size="[1 4]">                      [100 100 100 100]                  </sat >
               </cell>
               <cell index="3" type="struct" size="[1 1]">
                   <name index="1" type="char" size="[1 9]">                      D65                  </name>
                   <wbGain index="1" type="double" size="[1 2]">                      [2.0586    1.5098]                  </wbGain>
                   <matrixUsed  index="1" type="char" size="[1 30]">                      D65_90  D65_60                  </matrixUsed >
                   <gains  index="1" type="double" size="[1 4]">                      [1 4 6 32]                  </gains >
-                  <sat  index="1" type="double" size="[1 4]">                      [100 100 90 50]                  </sat >
+                  <sat  index="1" type="double" size="[1 4]">                      [100 100 100 100]                  </sat >
               </cell>
               <cell index="4" type="struct" size="[1 1]">
                   <name index="1" type="char" size="[1 9]">                      D75                  </name>
                   <wbGain index="1" type="double" size="[1 2]">                      [2.1602    1.4092]                  </wbGain>
                   <matrixUsed  index="1" type="char" size="[1 30]">                      D75_90  D75_60                  </matrixUsed >
                   <gains  index="1" type="double" size="[1 4]">                      [1 4 6 32]                  </gains >
-                  <sat  index="1" type="double" size="[1 4]">                      [100 100 90 50]                  </sat >
+                  <sat  index="1" type="double" size="[1 4]">                      [100 100 100 100]                  </sat >
               </cell>
               <cell index="5" type="struct" size="[1 1]">
                   <name index="1" type="char" size="[1 9]">                      CWF                  </name>
                   <wbGain index="1" type="double" size="[1 2]">                      [1.7529    2.5752]                  </wbGain>
                   <matrixUsed  index="1" type="char" size="[1 30]">                      CWF_90  CWF_60                  </matrixUsed >
                   <gains  index="1" type="double" size="[1 4]">                      [1 4 6 32]                  </gains >
-                  <sat  index="1" type="double" size="[1 4]">                      [100 100 90 74]                  </sat >
+                  <sat  index="1" type="double" size="[1 4]">                      [100 100 100 100]                  </sat >
               </cell>
               <cell index="6" type="struct" size="[1 1]">
                   <name index="1" type="char" size="[1 9]">                      TL84                  </name>
                   <wbGain index="1" type="double" size="[1 2]">                      [1.4163    2.4326]                  </wbGain>
                   <matrixUsed  index="1" type="char" size="[1 30]">                     TL84_90  TL84_60                  </matrixUsed >
                   <gains  index="1" type="double" size="[1 4]">                      [1 4 6 32]                  </gains >
-                  <sat  index="1" type="double" size="[1 4]">                      [100 100 90 50]                  </sat >
+                  <sat  index="1" type="double" size="[1 4]">                      [100 100 100 100]                  </sat >
               </cell>
               <cell index="4" type="struct" size="[1 1]">
                   <name index="1" type="char" size="[1 9]">                      HZ                  </name>
                   <wbGain index="1" type="double" size="[1 2]">                      [1.0664    3.6504]                  </wbGain>
                   <matrixUsed  index="1" type="char" size="[1 30]">                      HZ_90  HZ_60                  </matrixUsed >
                   <gains  index="1" type="double" size="[1 4]">                      [1 4 6 32]                  </gains >
-                  <sat  index="1" type="double" size="[1 4]">                      [100 100 90 50]                  </sat >
+                  <sat  index="1" type="double" size="[1 4]">                      [100 100 100 100]                  </sat >
               </cell>
           </illAll>
 	         </aCcmCof>

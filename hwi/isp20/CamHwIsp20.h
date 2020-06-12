@@ -97,6 +97,7 @@ typedef struct {
     std::string parent_media_dev;
     int csi_port;
     std::string module_lens_dev_name; // matched using mPhyModuleIndex
+    std::string module_ircut_dev_name;
     int flash_num;
     std::string module_flash_dev_name[SENSOR_ATTACHED_FLASH_MAX_NUM]; // matched using mPhyModuleIndex
     std::string module_real_sensor_name; //parsed frome sensor entity name
@@ -137,6 +138,9 @@ public:
     XCamReturn getEffectiveIspParams(SmartPtr<RkAiqIspParamsProxy>& ispParams, int frame_id);
     XCamReturn setModuleCtl(rk_aiq_module_id_t moduleId, bool en);
     XCamReturn getModuleCtl(rk_aiq_module_id_t moduleId, bool& en);
+    XCamReturn notify_capture_raw();
+    XCamReturn capture_raw_ctl(bool sync);
+    XCamReturn setIrcutParams(bool on);
 private:
     XCAM_DEAD_COPY(CamHwIsp20);
     enum cam_hw_state_e {
@@ -145,6 +149,12 @@ private:
         CAM_HW_STATE_PREPARED,
         CAM_HW_STATE_STARTED,
         CAM_HW_STATE_STOPED,
+    };
+    enum ircut_state_e {
+        IRCUT_STATE_CLOSED,
+        IRCUT_STATE_CLOSING,
+        IRCUT_STATE_OPENING,
+        IRCUT_STATE_OPENED,
     };
     int _hdr_mode;
     Mutex _mutex;

@@ -130,6 +130,7 @@ XCamReturn RkAiqHandleIntCom::configInparamsCom(RkAiqAlgoCom* com, int type)
         rk_com->u.proc.proc_res_comb = &shared->procResComb;
         rk_com->u.proc.post_res_comb = &shared->postResComb;
         rk_com->u.proc.iso = shared->iso;
+        rk_com->u.proc.ircut_on = shared->ircut_on;
     }
 
     EXIT_ANALYZER_FUNCTION();

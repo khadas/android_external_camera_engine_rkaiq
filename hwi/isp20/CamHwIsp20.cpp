@@ -501,6 +501,29 @@ CamHwIsp20::clearStaticCamHwInfo()
     return XCAM_RETURN_NO_ERROR;
 }
 
+static void
+findAttachedSubdevs(struct media_device *device, uint32_t count, rk_sensor_full_info_t *s_info)
+{
+    const struct media_entity_desc *entity_info = NULL;
+    struct media_entity *entity = NULL;
+    uint32_t k;
+
+    for (k = 0; k < count; ++k) {
+        entity = media_get_entity (device, k);
+        entity_info = media_entity_get_info(entity);
+        if ((NULL != entity_info) && (entity_info->type == MEDIA_ENT_T_V4L2_SUBDEV_LENS)) {
+            if ((entity_info->name[0] == 'm') &&
+                (strncmp(entity_info->name, s_info->module_index_str.c_str(), 3) == 0)){
+                 if (entity_info->flags == 1)
+                    s_info->module_ircut_dev_name = std::string(media_entity_get_devname(entity));
+                 else//vcm
+                    s_info->module_lens_dev_name = std::string(media_entity_get_devname(entity));
+            }
+        }
+    }
+
+}
+
 XCamReturn
 CamHwIsp20::initCamHwInfos()
 {
@@ -551,6 +574,7 @@ CamHwIsp20::initCamHwInfos()
                 parse_module_info(s_full_info);
                 get_sensor_caps(s_full_info);
                 s_full_info->isp_info = isp_info;
+                findAttachedSubdevs(device, nents, s_full_info);
                 SensorInfoCopy(s_full_info, &info->sensor_info);
                 CamHwIsp20::mSensorHwInfos[s_full_info->sensor_name] = s_full_info;
                 CamHwIsp20::mCamHwInfos[s_full_info->sensor_name] = info;
@@ -627,6 +651,10 @@ CamHwIsp20::init(const char* sns_ent_name)
         mLensDev->open();
     }
 
+    if(!s_info->module_ircut_dev_name.empty()) {
+        mIrcutDev = new V4l2SubDevice(s_info->module_ircut_dev_name.c_str());
+        mIrcutDev->open();
+    }
     //short frame
     mipi_tx_devs[0] = new V4l2Device (s_info->isp_info->rawwr2_path);//rkisp_rawwr2
     mipi_tx_devs[0]->open();
@@ -2437,6 +2465,50 @@ CamHwIsp20::getModuleCtl(rk_aiq_module_id_t moduleId, bool &en)
 {
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
     getModuleStatus(moduleId, en);
+    return ret;
+}
+
+XCamReturn CamHwIsp20::notify_capture_raw()
+{
+    SmartPtr<Isp20PollThread> isp20Pollthread = mPollthread.dynamic_cast_ptr<Isp20PollThread>();
+    if (isp20Pollthread.ptr())
+        return isp20Pollthread->notify_capture_raw();
+
+    return XCAM_RETURN_ERROR_FAILED;
+}
+
+XCamReturn CamHwIsp20::capture_raw_ctl(bool sync)
+{
+    SmartPtr<Isp20PollThread> isp20Pollthread = mPollthread.dynamic_cast_ptr<Isp20PollThread>();
+    if (isp20Pollthread.ptr())
+        return isp20Pollthread->capture_raw_ctl(sync);
+
+    return XCAM_RETURN_ERROR_FAILED;
+}
+
+XCamReturn
+CamHwIsp20::setIrcutParams(bool on)
+{
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    ENTER_CAMHW_FUNCTION();
+
+    struct v4l2_control control;
+
+    xcam_mem_clear (control);
+    control.id = V4L2_CID_BAND_STOP_FILTER;
+    if(on)
+        control.value = IRCUT_STATE_OPENED;
+    else
+        control.value = IRCUT_STATE_CLOSED;
+    if (mIrcutDev.ptr()) {
+        LOGD_CAMHW ("set ircut value: %d", control.value);
+        if (mIrcutDev->io_control (VIDIOC_S_CTRL, &control) < 0) {
+            LOGE_CAMHW ("set ircut value failed to device!");
+            ret = XCAM_RETURN_ERROR_IOCTL;
+        }
+    }
+
+    EXIT_CAMHW_FUNCTION();
     return ret;
 }
 

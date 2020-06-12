@@ -161,4 +161,9 @@ CamHwBase::poll_buffer_failed (int64_t timestamp, const char *msg)
     return XCAM_RETURN_ERROR_FAILED;
 }
 
+XCamReturn CamHwBase::setIrcutParams(bool on)
+{
+    return XCAM_RETURN_NO_ERROR;
+}
+
 }; //namspace RkCam

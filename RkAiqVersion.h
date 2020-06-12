@@ -77,8 +77,18 @@
  * - NR & sharp: support free iso level on machine
  * - move paras of wbgain clip and wbgain adjustment to xml
  * - add awb chromatic adatptation gain adjust funciton
- * - add rk_aiq_uapi_sysctl_get3AStats interface */
+ * - add rk_aiq_uapi_sysctl_get3AStats interface
+ * v0.1.7
+ * - gc4c33 IQ v1.0.8
+ * - sharp: fix bug of select iso level
+ * - rkisp_parser_demo: parse xml and generate bin
+ * - support IR-CUT&Infrared-light control
+ * - add synchronization mechanism for capturing RAW and YUV images
+ * - NR & sharp: fix bug for free iso level
+ * - fix wrong expression in caga part
+ * - modify calibdb load logic
+ */
 
-#define RK_AIQ_VERSION "v0.1.6"
-#define RK_AIQ_RELEASE_DATE "2020-06-05"
+#define RK_AIQ_VERSION "v0.1.7"
+#define RK_AIQ_RELEASE_DATE "2020-06-12"
 #endif

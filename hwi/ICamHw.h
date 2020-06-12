@@ -93,6 +93,9 @@ public:
     virtual XCamReturn setEvtsListener(IspEvtsListener* evtListener) = 0;
     virtual XCamReturn setModuleCtl(rk_aiq_module_id_t mId, bool mod_en) = 0;
     virtual XCamReturn getModuleCtl(rk_aiq_module_id_t mId, bool& mod_en) = 0;
+    virtual XCamReturn notify_capture_raw() = 0;
+    virtual XCamReturn capture_raw_ctl(bool sync) = 0;
+    virtual XCamReturn setIrcutParams(bool on) = 0;
 private:
     XCAM_DEAD_COPY (ICamHw);
 };
