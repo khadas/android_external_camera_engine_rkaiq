@@ -13,6 +13,8 @@
 #include "./include/xf86drm.h"
 #include "./include/xf86drmMode.h"
 #include "drmDsp.h"
+#include "rkRgaApi.h"
+#include "rga.h"
 
 struct drmDsp {
   struct fb_var_screeninfo vinfo;
@@ -59,6 +61,8 @@ int initDrmDsp() {
   }
   if (!pDrmDsp->test_plane)
     return -1;
+
+  rkRgaInit();
 }
 
 void deInitDrmDsp() {
@@ -206,22 +210,16 @@ static int arm_camera_yuv420_scale_arm(char *srcbuf, char *dstbuf,int src_w, int
 	return 0;
 }	
 
-int drmDspFrame(int width, int height, void* dmaFd, int fmt) {
+int drmDspFrame(int srcWidth, int srcHeight, int dispWidth, int dispHeight,
+		void* dmaFd, int fmt)
+{
   int ret;
   struct drm_mode_create_dumb cd;
   struct sp_bo* bo;
   struct drmDsp* pDrmDsp = &gDrmDsp;
 
-  int ori_width = width;
-  int ori_height = height;
-
-  if (width > 1920) {
-	  width = 1920;
-      height = 1080;
-  }
-
-  int wAlign16 = ((width + 15) & (~15));
-  int hAlign16 = ((height + 15) & (~15));
+  int wAlign16 = ((dispWidth+ 15) & (~15));
+  int hAlign16 = ((dispHeight+ 15) & (~15));
   int frameSize = wAlign16 * hAlign16 * 3 / 2;
   uint32_t handles[4], pitches[4], offsets[4];
 
@@ -262,12 +260,30 @@ int drmDspFrame(int width, int height, void* dmaFd, int fmt) {
   offsets[0] = 0;
   handles[1] = bo->handle;
   pitches[1] = wAlign16;
-  offsets[1] = width * height; //wAlign16 * hAlign16;
+  offsets[1] = wAlign16 * hAlign16;
+
+#if 1
+  struct rkRgaCfg src_cfg, dst_cfg;
+
+  src_cfg.addr = dmaFd;
+  src_cfg.fmt = RK_FORMAT_YCrCb_420_SP;
+  src_cfg.width = srcWidth;
+  src_cfg.height = srcHeight;
+
+  dst_cfg.addr = bo->map_addr;
+  dst_cfg.fmt = RK_FORMAT_YCrCb_420_SP;
+  dst_cfg.width = dispWidth;
+  dst_cfg.height = dispHeight;
+
+  rkRgaBlit(&src_cfg, &dst_cfg);
+#else
   //copy src data to bo
   if (ori_width == width)
 	  memcpy(bo->map_addr, dmaFd, wAlign16 * hAlign16 * 3 / 2);
   else
 	  arm_camera_yuv420_scale_arm(dmaFd, bo->map_addr, ori_width, ori_height, width, height);
+#endif
+
   ret = drmModeAddFB2(bo->dev->fd, bo->width, bo->height,
                       bo->format, handles, pitches, offsets,
                       &bo->fb_id, bo->flags);
@@ -285,7 +301,7 @@ int drmDspFrame(int width, int height, void* dmaFd, int fmt) {
                         //pDrmDsp->test_crtc->crtc->mode.hdisplay,
 			wAlign16, hAlign16,
                         //pDrmDsp->test_crtc->crtc->mode.vdisplay,
-                        0, 0, width << 16, height << 16);
+                        0, 0, wAlign16 << 16,  hAlign16 << 16);
   if (ret) {
     printf("failed to set plane to crtc ret=%d\n", ret);
     return ret;

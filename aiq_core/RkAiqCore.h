@@ -189,6 +189,7 @@ public:
         rk_aiq_exposure_sensor_descriptor snsDes;
         uint32_t frameId;
         int working_mode;
+        bool ircut_on;
         bool init;
         bool reConfig;
         uint32_t hardware_version;
@@ -206,6 +207,7 @@ public:
             reConfig = false;
             hardware_version = 0;
             iso = 0;
+            ircut_on = true;
         }
     } RkAiqAlgosShared_t;
     RkAiqAlgosShared_t mAlogsSharedParams;

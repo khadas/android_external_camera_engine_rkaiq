@@ -73,6 +73,7 @@ endif()
 SET(RK_DRM_LIB_DIR ${PROJECT_SOURCE_DIR}/demo/libs/arm32/)
 
 SET(RK_DRM_LIB drm)
+SET(RK_RGA_LIB rga)
 
 #head file path
 include_directories(
@@ -109,4 +110,4 @@ add_definitions(-D_CRT_SECURE_NO_WARNINGS)
 link_directories("${LIBRARY_OUTPUT_PATH}" "${RK_AIQ_LIB_DIR}" "${RK_DRM_LIB_DIR}")
 #add executable file
 ADD_EXECUTABLE(rkisp_demo ${DIR_SRCS})
-target_link_libraries(rkisp_demo ${RK_AIQ_LIB} ${RK_DRM_LIB} ${LINK_ASAN} pthread)
+target_link_libraries(rkisp_demo ${RK_AIQ_LIB} ${RK_DRM_LIB} ${RK_RGA_LIB} ${LINK_ASAN} pthread)

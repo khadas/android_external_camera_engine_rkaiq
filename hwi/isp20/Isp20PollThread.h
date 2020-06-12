@@ -59,8 +59,10 @@ public:
     void set_hdr_frame_readback_infos(int frame_id, int times);
     XCamReturn hdr_mipi_start(SmartPtr<SensorHw> sensor);
     XCamReturn hdr_mipi_stop();
+    XCamReturn notify_capture_raw();
     // should be called befor start
     void set_working_mode(int mode);
+    XCamReturn capture_raw_ctl(bool sync);
     virtual XCamReturn start();
     virtual XCamReturn stop ();
     enum {
@@ -119,6 +121,9 @@ private:
     sint32_t _capture_raw_num;
     sint32_t _capture_metadata_num;
     static const struct capture_fmt csirx_fmts[];
+    Mutex _capture_image_mutex;
+    Cond _capture_image_cond;
+    bool _is_raw_sync_yuv;
 
     int calculate_stride_per_line(const struct capture_fmt& fmt,
 				  uint32_t& bytesPerLine);
@@ -133,8 +138,9 @@ private:
     void write_metadata_to_file(const char* dir_path, int frame_id,
 		    SmartPtr<RkAiqIspParamsProxy>& ispParams,
 		    SmartPtr<RkAiqExpParamsProxy>& expParams);
-    bool get_value_from_file(const char* path, int* value);
-    bool set_value_to_file(const char* path, int value);
+    bool get_value_from_file(const char* path, int& value, uint32_t& frameId);
+    bool set_value_to_file(const char* path, int value, uint32_t sequence = 0);
 };
+
 }
 #endif

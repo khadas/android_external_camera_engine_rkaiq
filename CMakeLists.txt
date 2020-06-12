@@ -142,6 +142,7 @@ set (IQ_PARSER_SRC
 	)
 set (UAPI_SRC
 	uAPI/rk_aiq_user_api_sysctl.cpp
+	uAPI/rk_aiq_user_api_debug.cpp
 	)
 set (XCORE_SRC
 	xcore/xcam_common.cpp

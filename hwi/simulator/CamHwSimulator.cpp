@@ -416,4 +416,9 @@ CamHwSimulator::setEvtsListener(IspEvtsListener* evtListener)
     return CamHwBase::setEvtsListener(evtListener);
 }
 
+XCamReturn CamHwSimulator::setIrcutParams(bool on)
+{
+    return XCAM_RETURN_NO_ERROR;
+}
+
 };

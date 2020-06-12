@@ -130,7 +130,22 @@ CamCalibDbContext_t* RkAiqCalibDb::createCalibDb(char* iqFile)
     } else {
         CamCalibDbContext_t *pCalibDb = new CamCalibDbContext_t();
         if (pCalibDb) {
-            if(isDataBinExist(iqFile)){
+            if (0==access(iqFile, F_OK)){
+                RkAiqCalibParser  parser(pCalibDb);
+                if (parser.doParse(iqFile)) {
+                    mCalibDbsMap[str] = pCalibDb;
+                    LOGD("create calibdb from %s success.", iqFile);
+                    /*
+                    if (calibSaveToFile(iqFile, pCalibDb))
+                        LOGD("save to bin success.");
+                    else
+                        LOGE("save to bin failed.");
+                    */
+                    return pCalibDb;
+                } else {
+                    LOGE("parse %s failed.", iqFile);
+                }
+            } else if(isDataBinExist(iqFile)){
                 if (calibReadFromFile(iqFile, pCalibDb)) {
                     mCalibDbsMap[str] = pCalibDb;
                     LOGD("get calibdb from bin success.");
@@ -139,19 +154,7 @@ CamCalibDbContext_t* RkAiqCalibDb::createCalibDb(char* iqFile)
                     LOGE("get calibdb from bin failed.");
                 }
             } else{
-                LOGD("calibdb bin is not exist");
-                RkAiqCalibParser  parser(pCalibDb);
-                if (parser.doParse(iqFile)) {
-                    mCalibDbsMap[str] = pCalibDb;
-                    LOGD("create calibdb from %s success.", iqFile);
-                    if (calibSaveToFile(iqFile, pCalibDb))
-                        LOGD("save to bin success.");
-                    else
-                        LOGE("save to bin failed.");
-                    return pCalibDb;
-                } else {
-                    LOGE("parse %s failed.", iqFile);
-                }
+                LOGE("calibdb xml and bin are all not exist!");
             }
         } else {
             LOGE("alloc calibdb memory failed.");

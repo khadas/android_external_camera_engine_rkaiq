@@ -233,7 +233,7 @@ AsharpResult_t select_rk_sharpen_hw_params_by_ISO(
 		ratio = 0;
 	}
 
-	if(iso < strksharpenParams->iso[max_iso_step - 1] ){
+	if(iso > strksharpenParams->iso[max_iso_step - 1] ){
 		iso_low = strksharpenParams->iso[max_iso_step - 2] ;
 		iso_high = strksharpenParams->iso[max_iso_step - 1];
 		gain_low = max_iso_step - 2;
