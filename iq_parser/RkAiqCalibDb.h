@@ -35,9 +35,8 @@ public:
 	static bool generateCalibDb(char* iqFileRef, char* iqFileOutput, CamCalibDbContext_t* pCalibDb);
     static void releaseCalibDb();
     static CamCalibDbContext_t* getCalibDb(char* iqFile);
-
+	static void createCalibDbBinFromXml(char* iqFile);
 private:
-	void InitCalibDatabase(CamCalibDbContext_t *pCalibDb, RkAiqCalibParser *pCalibDbParser);
     static map<string, CamCalibDbContext_t*> mCalibDbsMap;
 };
 
