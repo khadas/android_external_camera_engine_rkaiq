@@ -80,9 +80,10 @@ static bool calibSaveToFile(char* iqFile, CamCalibDbContext_t* calib)
     char path[CALIBDB_PATH_LEN];
 
     getFilePathName(iqFile, path);
-    fd = open(path, O_CREAT | O_RDWR | O_SYNC, S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH|S_IWOTH);
+    fd = open(path, O_CREAT | O_TRUNC | O_RDWR | O_SYNC, S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH|S_IWOTH);
     if (fd < 0) {
         ret = false;
+        LOGE("open %s failed!", path);
     } else{
         lseek(fd, 0, SEEK_SET);
         if (write(fd, calib, sizeof(CamCalibDbContext_t)) <= 0) {
@@ -215,9 +216,26 @@ CamCalibDbContext_t* RkAiqCalibDb::getCalibDb(char* iqFile)
     }
 }
 
-void RkAiqCalibDb::InitCalibDatabase(CamCalibDbContext_t *pCalibDb, RkAiqCalibParser *pCalibDbParser)
+void RkAiqCalibDb::createCalibDbBinFromXml(char* iqFile)
 {
-
+        CamCalibDbContext_t *pCalibDb = new CamCalibDbContext_t();
+        if (pCalibDb) {
+            if (0 == access(iqFile, F_OK)){
+                RkAiqCalibParser  parser(pCalibDb);
+                if (parser.doParse(iqFile)) {
+                    LOGD("create calibdb from %s success.", iqFile);
+                    if (calibSaveToFile(iqFile, pCalibDb))
+                        LOGD("save to bin success.");
+                    else
+                        LOGE("save to bin failed.");
+                } else {
+                    LOGE("parse %s failed.", iqFile);
+                }
+            }else {
+                LOGE("%s is not found!", iqFile);
+            }
+            delete pCalibDb;
+        }
 }
 
 }; //namespace RkCam
