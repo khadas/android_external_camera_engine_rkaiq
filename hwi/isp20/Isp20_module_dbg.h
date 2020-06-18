@@ -16,7 +16,7 @@
  */
 
 #ifndef _ISP20_MODULE_DBG_H_
-#define _ISP20_MODULE_DBG_H_ 
+#define _ISP20_MODULE_DBG_H_
 
 #define RUNTIME_MODULE_DEBUG
 #ifdef RUNTIME_MODULE_DEBUG

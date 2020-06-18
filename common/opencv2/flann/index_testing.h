@@ -50,9 +50,9 @@ namespace cvflann
 inline int countCorrectMatches(int* neighbors, int* groundTruth, int n)
 {
     int count = 0;
-    for (int i=0; i<n; ++i) {
-        for (int k=0; k<n; ++k) {
-            if (neighbors[i]==groundTruth[k]) {
+    for (int i = 0; i < n; ++i) {
+        for (int k = 0; k < n; ++k) {
+            if (neighbors[i] == groundTruth[k]) {
                 count++;
                 break;
             }
@@ -64,20 +64,20 @@ inline int countCorrectMatches(int* neighbors, int* groundTruth, int n)
 
 template <typename Distance>
 typename Distance::ResultType computeDistanceRaport(const Matrix<typename Distance::ElementType>& inputData, typename Distance::ElementType* target,
-                                                    int* neighbors, int* groundTruth, int veclen, int n, const Distance& distance)
+        int* neighbors, int* groundTruth, int veclen, int n, const Distance& distance)
 {
     typedef typename Distance::ResultType DistanceType;
 
     DistanceType ret = 0;
-    for (int i=0; i<n; ++i) {
+    for (int i = 0; i < n; ++i) {
         DistanceType den = distance(inputData[groundTruth[i]], target, veclen);
         DistanceType num = distance(inputData[neighbors[i]], target, veclen);
 
-        if ((den==0)&&(num==0)) {
+        if ((den == 0) && (num == 0)) {
             ret += 1;
         }
         else {
-            ret += num/den;
+            ret += num / den;
         }
     }
 
@@ -91,24 +91,24 @@ float search_with_ground_truth(NNIndex<Distance>& index, const Matrix<typename D
 {
     typedef typename Distance::ResultType DistanceType;
 
-    if (matches.cols<size_t(nn)) {
-        Logger::info("matches.cols=%d, nn=%d\n",matches.cols,nn);
+    if (matches.cols < size_t(nn)) {
+        Logger::info("matches.cols=%d, nn=%d\n", matches.cols, nn);
 
         throw FLANNException("Ground truth is not computed for as many neighbors as requested");
     }
 
-    KNNResultSet<DistanceType> resultSet(nn+skipMatches);
+    KNNResultSet<DistanceType> resultSet(nn + skipMatches);
     SearchParams searchParams(checks);
 
-    std::vector<int> indices(nn+skipMatches);
-    std::vector<DistanceType> dists(nn+skipMatches);
+    std::vector<int> indices(nn + skipMatches);
+    std::vector<DistanceType> dists(nn + skipMatches);
     int* neighbors = &indices[skipMatches];
 
     int correct = 0;
     DistanceType distR = 0;
     StartStopTimer t;
     int repeats = 0;
-    while (t.value<0.2) {
+    while (t.value < 0.2) {
         repeats++;
         t.start();
         correct = 0;
@@ -117,16 +117,16 @@ float search_with_ground_truth(NNIndex<Distance>& index, const Matrix<typename D
             resultSet.init(&indices[0], &dists[0]);
             index.findNeighbors(resultSet, testData[i], searchParams);
 
-            correct += countCorrectMatches(neighbors,matches[i], nn);
+            correct += countCorrectMatches(neighbors, matches[i], nn);
             distR += computeDistanceRaport<Distance>(inputData, testData[i], neighbors, matches[i], (int)testData.cols, nn, distance);
         }
         t.stop();
     }
-    time = float(t.value/repeats);
+    time = float(t.value / repeats);
 
-    float precicion = (float)correct/(nn*testData.rows);
+    float precicion = (float)correct / (nn * testData.rows);
 
-    dist = distR/(testData.rows*nn);
+    dist = distR / (testData.rows * nn);
 
     Logger::info("%8d %10.4g %10.5g %10.5g %10.5g\n",
                  checks, precicion, time, 1000.0 * time / testData.rows, dist);
@@ -172,38 +172,38 @@ float test_index_precision(NNIndex<Distance>& index, const Matrix<typename Dista
 
     p2 = search_with_ground_truth(index, inputData, testData, matches, nn, c2, time, dist, distance, skipMatches);
 
-    if (p2>precision) {
+    if (p2 > precision) {
         Logger::info("Got as close as I can\n");
         checks = c2;
         return time;
     }
 
-    while (p2<precision) {
+    while (p2 < precision) {
         c1 = c2;
         //p1 = p2;
-        c2 *=2;
+        c2 *= 2;
         p2 = search_with_ground_truth(index, inputData, testData, matches, nn, c2, time, dist, distance, skipMatches);
     }
 
     int cx;
     float realPrecision;
-    if (fabs(p2-precision)>SEARCH_EPS) {
+    if (fabs(p2 - precision) > SEARCH_EPS) {
         Logger::info("Start linear estimation\n");
         // after we got to values in the vecinity of the desired precision
         // use linear approximation get a better estimation
 
-        cx = (c1+c2)/2;
+        cx = (c1 + c2) / 2;
         realPrecision = search_with_ground_truth(index, inputData, testData, matches, nn, cx, time, dist, distance, skipMatches);
-        while (fabs(realPrecision-precision)>SEARCH_EPS) {
+        while (fabs(realPrecision - precision) > SEARCH_EPS) {
 
-            if (realPrecision<precision) {
+            if (realPrecision < precision) {
                 c1 = cx;
             }
             else {
                 c2 = cx;
             }
-            cx = (c1+c2)/2;
-            if (cx==c1) {
+            cx = (c1 + c2) / 2;
+            if (cx == c1) {
                 Logger::info("Got as close as I can\n");
                 break;
             }
@@ -235,7 +235,7 @@ void test_index_precisions(NNIndex<Distance>& index, const Matrix<typename Dista
     const float SEARCH_EPS = 0.001;
 
     // make sure precisions array is sorted
-    std::sort(precisions, precisions+precisions_length);
+    std::sort(precisions, precisions + precisions_length);
 
     int pindex = 0;
     float precision = precisions[pindex];
@@ -257,45 +257,45 @@ void test_index_precisions(NNIndex<Distance>& index, const Matrix<typename Dista
     // if precision for 1 run down the tree is already
     // better then some of the requested precisions, then
     // skip those
-    while (precisions[pindex]<p2 && pindex<precisions_length) {
+    while (precisions[pindex] < p2 && pindex < precisions_length) {
         pindex++;
     }
 
-    if (pindex==precisions_length) {
+    if (pindex == precisions_length) {
         Logger::info("Got as close as I can\n");
         return;
     }
 
-    for (int i=pindex; i<precisions_length; ++i) {
+    for (int i = pindex; i < precisions_length; ++i) {
 
         precision = precisions[i];
-        while (p2<precision) {
+        while (p2 < precision) {
             c1 = c2;
             p1 = p2;
-            c2 *=2;
+            c2 *= 2;
             p2 = search_with_ground_truth(index, inputData, testData, matches, nn, c2, time, dist, distance, skipMatches);
-            if ((maxTime> 0)&&(time > maxTime)&&(p2<precision)) return;
+            if ((maxTime > 0) && (time > maxTime) && (p2 < precision)) return;
         }
 
         int cx;
         float realPrecision;
-        if (fabs(p2-precision)>SEARCH_EPS) {
+        if (fabs(p2 - precision) > SEARCH_EPS) {
             Logger::info("Start linear estimation\n");
             // after we got to values in the vecinity of the desired precision
             // use linear approximation get a better estimation
 
-            cx = (c1+c2)/2;
+            cx = (c1 + c2) / 2;
             realPrecision = search_with_ground_truth(index, inputData, testData, matches, nn, cx, time, dist, distance, skipMatches);
-            while (fabs(realPrecision-precision)>SEARCH_EPS) {
+            while (fabs(realPrecision - precision) > SEARCH_EPS) {
 
-                if (realPrecision<precision) {
+                if (realPrecision < precision) {
                     c1 = cx;
                 }
                 else {
                     c2 = cx;
                 }
-                cx = (c1+c2)/2;
-                if (cx==c1) {
+                cx = (c1 + c2) / 2;
+                if (cx == c1) {
                     Logger::info("Got as close as I can\n");
                     break;
                 }

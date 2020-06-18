@@ -80,10 +80,10 @@ public:
     AutotunedIndex(const Matrix<ElementType>& inputData, const IndexParams& params = AutotunedIndexParams(), Distance d = Distance()) :
         dataset_(inputData), distance_(d)
     {
-        target_precision_ = get_param(params, "target_precision",0.8f);
-        build_weight_ =  get_param(params,"build_weight", 0.01f);
+        target_precision_ = get_param(params, "target_precision", 0.8f);
+        build_weight_ =  get_param(params, "build_weight", 0.01f);
         memory_weight_ = get_param(params, "memory_weight", 0.0f);
-        sample_fraction_ = get_param(params,"sample_fraction", 0.1f);
+        sample_fraction_ = get_param(params, "sample_fraction", 0.1f);
         bestIndex_ = NULL;
         speedup_ = 0;
     }
@@ -155,7 +155,7 @@ public:
      */
     virtual void findNeighbors(ResultSet<DistanceType>& result, const ElementType* vec, const SearchParams& searchParams) CV_OVERRIDE
     {
-        int checks = get_param<int>(searchParams,"checks",FLANN_CHECKS_AUTOTUNED);
+        int checks = get_param<int>(searchParams, "checks", FLANN_CHECKS_AUTOTUNED);
         if (checks == FLANN_CHECKS_AUTOTUNED) {
             bestIndex_->findNeighbors(result, vec, bestSearchParams_);
         }
@@ -231,8 +231,8 @@ private:
         const int nn = 1;
 
         Logger::info("KMeansTree using params: max_iterations=%d, branching=%d\n",
-                     get_param<int>(cost.params,"iterations"),
-                     get_param<int>(cost.params,"branching"));
+                     get_param<int>(cost.params, "iterations"),
+                     get_param<int>(cost.params, "branching"));
         KMeansIndex<Distance> kmeans(sampledDataset_, cost.params, distance_);
         // measure index build time
         t.start();
@@ -257,7 +257,7 @@ private:
         int checks;
         const int nn = 1;
 
-        Logger::info("KDTree using params: trees=%d\n", get_param<int>(cost.params,"trees"));
+        Logger::info("KDTree using params: trees=%d\n", get_param<int>(cost.params, "trees"));
         KDTreeIndex<Distance> kdtree(sampledDataset_, cost.params, distance_);
 
         t.start();

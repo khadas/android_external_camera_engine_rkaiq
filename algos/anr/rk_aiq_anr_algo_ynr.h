@@ -14,7 +14,7 @@
 
 RKAIQ_BEGIN_DECLARE
 
-ANRresult_t init_ynr_params(RKAnr_Ynr_Params_s *pYnrParams, CalibDb_YNR_t* pYnrCalib);
+ANRresult_t init_ynr_params(RKAnr_Ynr_Params_s *pYnrParams, CalibDb_YNR_t* pYnrCalib, int setting_idx);
 
 ANRresult_t select_ynr_params_by_ISO(RKAnr_Ynr_Params_t *stYnrParam, RKAnr_Ynr_Params_Select_t *stYnrParamSelected, ANRExpInfo_t *pExpInfo, short bitValue);
 
@@ -22,7 +22,9 @@ ANRresult_t ynr_fix_transfer(RKAnr_Ynr_Params_Select_t* ynr, RKAnr_Ynr_Fix_t *pN
 
 ANRresult_t ynr_fix_printf(RKAnr_Ynr_Fix_t * pNrCfg);
 
+ANRresult_t ynr_get_setting_idx_by_name(CalibDb_YNR_t *pCalibdb, char *name, int *setting_idx);
 
+ANRresult_t ynr_config_setting_param(RKAnr_Ynr_Params_s *pParams, CalibDb_YNR_t *pCalibdb, char* snr_name);
 RKAIQ_END_DECLARE
 
 

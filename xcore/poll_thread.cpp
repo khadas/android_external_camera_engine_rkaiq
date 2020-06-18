@@ -112,8 +112,8 @@ PollThread::PollThread ()
     _isp_pparams_loop = isp_pparams_loop;
 
     SmartPtr<IspPollThread> ispp_stats_loop = new IspPollThread(this, ISPP_POLL_STATS);
-        XCAM_ASSERT (ispp_stats_loop.ptr ());
-        _ispp_stats_loop = ispp_stats_loop;
+    XCAM_ASSERT (ispp_stats_loop.ptr ());
+    _ispp_stats_loop = ispp_stats_loop;
 
     _ispp_poll_stop_fd[0] =  -1;
     _ispp_poll_stop_fd[1] =  -1;
@@ -584,7 +584,7 @@ PollThread::poll_buffer_loop (int type)
     }
 
     if (poll_ret <= 0) {
-	XCAM_LOG_DEBUG ("poll %s buffer event got error(0x%x) but continue\n", isp_poll_type_to_str[type], poll_ret);
+        XCAM_LOG_DEBUG ("poll %s buffer event got error(0x%x) but continue\n", isp_poll_type_to_str[type], poll_ret);
         ::usleep (100000); // 100ms
         return XCAM_RETURN_ERROR_TIMEOUT;
     }
@@ -599,7 +599,7 @@ PollThread::poll_buffer_loop (int type)
     XCAM_ASSERT (_poll_callback);
 
     if (_poll_callback &&
-        (type == ISP_POLL_3A_STATS || type == ISP_POLL_LUMA || type == ISPP_POLL_STATS)) {
+            (type == ISP_POLL_3A_STATS || type == ISP_POLL_LUMA || type == ISPP_POLL_STATS)) {
         SmartPtr<VideoBuffer> video_buf = new_video_buffer(buf, dev, type);
 
         return _poll_callback->poll_buffer_ready (video_buf, type);

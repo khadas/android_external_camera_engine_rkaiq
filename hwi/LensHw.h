@@ -32,7 +32,7 @@ struct rk_cam_vcm_tim {
 #define RK_VIDIOC_VCM_TIMEINFO \
     _IOR('V', BASE_VIDIOC_PRIVATE + 0, struct rk_cam_vcm_tim)
 
-#define LENSHW_RECORD_SOF_NUM	8
+#define LENSHW_RECORD_SOF_NUM   8
 
 using namespace XCam;
 
@@ -47,17 +47,17 @@ public:
     XCamReturn stop();
     XCamReturn setFocusParams(int position);
     XCamReturn handle_sof(int64_t time, int frameid);
-	XCamReturn getAfInfoParams(SmartPtr<RkAiqAfInfoProxy>& afInfo, int frame_id);
+    XCamReturn getAfInfoParams(SmartPtr<RkAiqAfInfoProxy>& afInfo, int frame_id);
 
 private:
     XCAM_DEAD_COPY (LensHw);
     Mutex _mutex;
     SmartPtr<RkAiqAfInfoPool> _afInfoPool;
-	static uint16_t DEFAULT_POOL_SIZE;
+    static uint16_t DEFAULT_POOL_SIZE;
     struct rk_cam_vcm_tim _vcm_tim;
-	int64_t _frame_time[LENSHW_RECORD_SOF_NUM];
-	int _frame_sequence[LENSHW_RECORD_SOF_NUM];
-	int _rec_sof_idx;
+    int64_t _frame_time[LENSHW_RECORD_SOF_NUM];
+    int _frame_sequence[LENSHW_RECORD_SOF_NUM];
+    int _rec_sof_idx;
 };
 
 }; //namespace RkCam

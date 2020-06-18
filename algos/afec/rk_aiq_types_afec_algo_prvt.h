@@ -25,10 +25,10 @@
 RKAIQ_BEGIN_DECLARE
 
 typedef enum {
-    FEC_CORRECT_LEVEL0, 	     // 100%
-    FEC_CORRECT_LEVEL1,		     // 75%
-    FEC_CORRECT_LEVEL2,		     // 50%
-    FEC_CORRECT_LEVEL3,		     // 25%
+    FEC_CORRECT_LEVEL0,          // 100%
+    FEC_CORRECT_LEVEL1,          // 75%
+    FEC_CORRECT_LEVEL2,          // 50%
+    FEC_CORRECT_LEVEL3,          // 25%
     FEC_BYPASS
 } FECCorrectLevel;
 

@@ -44,9 +44,10 @@ private:
 typedef struct RKAiqAecExpInfoWrapper_s {
     RKAiqAecExpInfo_t aecExpInfo;
     RkAiqExpParam_t exp_tbl[MAX_AEC_EFFECT_FNUM];
+    Sensor_dpcc_res_t SensorDpccInfo;
     int exp_tbl_size;
     int algo_id;
-}RKAiqAecExpInfoWrapper_t;
+} RKAiqAecExpInfoWrapper_t;
 
 typedef struct RKAiqAfInfoWrapper_s {
     struct timeval focusStartTim;

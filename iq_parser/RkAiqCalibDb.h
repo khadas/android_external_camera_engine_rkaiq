@@ -32,10 +32,10 @@ class RkAiqCalibDb
 {
 public:
     static CamCalibDbContext_t* createCalibDb(char* iqFile);
-	static bool generateCalibDb(char* iqFileRef, char* iqFileOutput, CamCalibDbContext_t* pCalibDb);
+    static bool generateCalibDb(char* iqFileRef, char* iqFileOutput, CamCalibDbContext_t* pCalibDb);
     static void releaseCalibDb();
     static CamCalibDbContext_t* getCalibDb(char* iqFile);
-	static void createCalibDbBinFromXml(char* iqFile);
+    static void createCalibDbBinFromXml(char* iqFile);
 private:
     static map<string, CamCalibDbContext_t*> mCalibDbsMap;
 };

@@ -86,7 +86,7 @@ public:
         for (size_t i = 0; i < queries.rows; i++) {
             resultSet.clear();
             findNeighbors(resultSet, queries[i], params);
-            if (get_param(params,"sorted",true)) resultSet.sortAndCopy(indices[i], dists[i], knn);
+            if (get_param(params, "sorted", true)) resultSet.sortAndCopy(indices[i], dists[i], knn);
             else resultSet.copy(indices[i], dists[i], knn);
         }
 #endif
@@ -122,8 +122,8 @@ public:
         RadiusUniqueResultSet<DistanceType> resultSet((DistanceType)radius);
         resultSet.clear();
         findNeighbors(resultSet, query[0], params);
-        if (n>0) {
-            if (get_param(params,"sorted",true)) resultSet.sortAndCopy(indices_ptr, dists_ptr, n);
+        if (n > 0) {
+            if (get_param(params, "sorted", true)) resultSet.sortAndCopy(indices_ptr, dists_ptr, n);
             else resultSet.copy(indices_ptr, dists_ptr, n);
         }
 

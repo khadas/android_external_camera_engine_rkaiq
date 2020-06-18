@@ -35,10 +35,10 @@ typedef struct AgammaHandle_s {
 
 typedef struct agamma_context_s {
     const CalibDb_Gamma_t *calibgamma;//profile para
- 
-  
+
+
     agamma_sw_info_t agammaSwInfo;
-   
+
     unsigned int count;
     //ctrl & api
     rk_aiq_gamma_attrib_t mCurAtt;

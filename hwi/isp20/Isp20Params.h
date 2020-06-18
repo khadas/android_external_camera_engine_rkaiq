@@ -22,17 +22,15 @@
 #include "rkisp2-config.h"
 #include "rkispp-config.h"
 
-#define LIMIT_PARA(a,b,c,d,e)      (c+(a-e)*(b-c)/(d -e))
-
 namespace RkCam {
 
 
 class Isp20Params {
 public:
     explicit Isp20Params() : _last_pp_module_init_ens(0)
-                               ,_force_isp_module_ens(0)
-                               ,_force_ispp_module_ens(0)
-                               ,_force_module_flags(0) {};
+        , _force_isp_module_ens(0)
+        , _force_ispp_module_ens(0)
+        , _force_module_flags(0) {};
     virtual ~Isp20Params() {};
 
     virtual XCamReturn checkIsp20Params(struct isp2x_isp_params_cfg& isp_cfg);
@@ -80,31 +78,31 @@ private:
     void convertAiqA3dlutToIsp20Params(struct isp2x_isp_params_cfg& isp_cfg,
                                        const rk_aiq_lut3d_cfg_t& lut3d_cfg);
     void convertAiqCpToIsp20Params(struct isp2x_isp_params_cfg& isp_cfg,
-                                       const rk_aiq_acp_params_t& lut3d_cfg);
+                                   const rk_aiq_acp_params_t& lut3d_cfg);
     void convertAiqIeToIsp20Params(struct isp2x_isp_params_cfg& isp_cfg,
-                                       const rk_aiq_isp_ie_t& ie_cfg);
-	void convertAiqRawnrToIsp20Params(struct isp2x_isp_params_cfg& isp_cfg,
-        	rk_aiq_isp_rawnr_t& rawnr);
-	void convertAiqTnrToIsp20Params(struct rkispp_params_cfg& pp_cfg,
-        rk_aiq_isp_tnr_t& tnr);
-	void convertAiqUvnrToIsp20Params(struct rkispp_params_cfg& pp_cfg,
-        rk_aiq_isp_uvnr_t& uvnr);
-	void convertAiqYnrToIsp20Params(struct rkispp_params_cfg& pp_cfg,
-        rk_aiq_isp_ynr_t& ynr);
-	void convertAiqSharpenToIsp20Params(struct rkispp_params_cfg& pp_cfg,
-        rk_aiq_isp_sharpen_t& sharp, rk_aiq_isp_edgeflt_t& edgeflt);
+                                   const rk_aiq_isp_ie_t& ie_cfg);
+    void convertAiqRawnrToIsp20Params(struct isp2x_isp_params_cfg& isp_cfg,
+                                      rk_aiq_isp_rawnr_t& rawnr);
+    void convertAiqTnrToIsp20Params(struct rkispp_params_cfg& pp_cfg,
+                                    rk_aiq_isp_tnr_t& tnr);
+    void convertAiqUvnrToIsp20Params(struct rkispp_params_cfg& pp_cfg,
+                                     rk_aiq_isp_uvnr_t& uvnr);
+    void convertAiqYnrToIsp20Params(struct rkispp_params_cfg& pp_cfg,
+                                    rk_aiq_isp_ynr_t& ynr);
+    void convertAiqSharpenToIsp20Params(struct rkispp_params_cfg& pp_cfg,
+                                        rk_aiq_isp_sharpen_t& sharp, rk_aiq_isp_edgeflt_t& edgeflt);
     void convertAiqAfToIsp20Params(struct isp2x_isp_params_cfg& isp_cfg,
                                    const rk_aiq_isp_af_meas_t& af_data);
-	void convertAiqGainToIsp20Params(struct isp2x_isp_params_cfg& isp_cfg,
-        rk_aiq_isp_gain_t& gain);
+    void convertAiqGainToIsp20Params(struct isp2x_isp_params_cfg& isp_cfg,
+                                     rk_aiq_isp_gain_t& gain);
     void convertAiqAldchToIsp20Params(struct isp2x_isp_params_cfg& isp_cfg,
                                       const rk_aiq_isp_ldch_t& ldch_cfg);
     void convertAiqFecToIsp20Params(struct rkispp_params_cfg& pp_cfg,
-                                   rk_aiq_isp_fec_t& fec);
+                                    rk_aiq_isp_fec_t& fec);
     void convertAiqGicToIsp20Params(struct isp2x_isp_params_cfg& isp_cfg,
-                                          const rk_aiq_isp_gic_t& gic_cfg);
+                                    const rk_aiq_isp_gic_t& gic_cfg);
     void convertAiqOrbToIsp20Params(struct rkispp_params_cfg& pp_cfg,
-        rk_aiq_isp_orb_t& orb);
+                                    rk_aiq_isp_orb_t& orb);
     bool getModuleForceFlag(int module_id);
     void setModuleForceFlagInverse(int module_id);
     bool getModuleForceEn(int module_id);

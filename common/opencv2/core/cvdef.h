@@ -59,7 +59,9 @@
 // https://github.com/opencv/opencv/pull/9161
 #define CV__DEBUG_NS_BEGIN namespace debug_build_guard {
 #define CV__DEBUG_NS_END }
-namespace cv { namespace debug_build_guard { } using namespace debug_build_guard; }
+namespace cv {
+namespace debug_build_guard { } using namespace debug_build_guard;
+}
 #endif
 #endif
 
@@ -123,9 +125,11 @@ namespace cv { namespace debug_build_guard { } using namespace debug_build_guard
 #    define CV_StaticAssert(condition, reason) ({ extern int __attribute__((error("CV_StaticAssert: " reason " " #condition))) CV_StaticAssert(); ((condition) ? 0 : CV_StaticAssert()); })
 #  else
 namespace cv {
-     template <bool x> struct CV_StaticAssert_failed;
-     template <> struct CV_StaticAssert_failed<true> { enum { val = 1 }; };
-     template<int x> struct CV_StaticAssert_test {};
+template <bool x> struct CV_StaticAssert_failed;
+template <> struct CV_StaticAssert_failed<true> {
+    enum { val = 1 };
+};
+template<int x> struct CV_StaticAssert_test {};
 }
 #    define CV_StaticAssert(condition, reason)\
        typedef cv::CV_StaticAssert_test< sizeof(cv::CV_StaticAssert_failed< static_cast<bool>(condition) >) > CVAUX_CONCAT(CV_StaticAssert_failed_at_, __LINE__)
@@ -134,11 +138,11 @@ namespace cv {
 
 // Suppress warning "-Wdeprecated-declarations" / C4996
 #if defined(_MSC_VER)
-    #define CV_DO_PRAGMA(x) __pragma(x)
+#define CV_DO_PRAGMA(x) __pragma(x)
 #elif defined(__GNUC__)
-    #define CV_DO_PRAGMA(x) _Pragma (#x)
+#define CV_DO_PRAGMA(x) _Pragma (#x)
 #else
-    #define CV_DO_PRAGMA(x)
+#define CV_DO_PRAGMA(x)
 #endif
 
 #ifdef _MSC_VER
@@ -296,7 +300,7 @@ enum CpuFeatures {
     CPU_AVX_512VBMI2    = 22,
     CPU_AVX_512VNNI     = 23,
     CPU_AVX_512BITALG   = 24,
-    CPU_AVX_512VPOPCNTDQ= 25,
+    CPU_AVX_512VPOPCNTDQ = 25,
     CPU_AVX_5124VNNIW   = 26,
     CPU_AVX_5124FMAPS   = 27,
 
@@ -627,7 +631,7 @@ __CV_ENUM_FLAGS_BITWISE_XOR_EQ   (EnumType, EnumType)                           
 \****************************************************************************************/
 
 #ifdef CV_XADD
-  // allow to use user-defined macro
+// allow to use user-defined macro
 #elif defined __GNUC__ || defined __clang__
 #  if defined __clang__ && __clang_major__ >= 3 && !defined __ANDROID__ && !defined __EMSCRIPTEN__ && !defined(__CUDACC__)  && !defined __INTEL_COMPILER
 #    ifdef __ATOMIC_ACQ_REL
@@ -637,7 +641,7 @@ __CV_ENUM_FLAGS_BITWISE_XOR_EQ   (EnumType, EnumType)                           
 #    endif
 #  else
 #    if defined __ATOMIC_ACQ_REL && !defined __clang__
-       // version for gcc >= 4.7
+// version for gcc >= 4.7
 #      define CV_XADD(addr, delta) (int)__atomic_fetch_add((unsigned*)(addr), (unsigned)(delta), __ATOMIC_ACQ_REL)
 #    else
 #      define CV_XADD(addr, delta) (int)__sync_fetch_and_add((unsigned*)(addr), (unsigned)(delta))
@@ -647,11 +651,15 @@ __CV_ENUM_FLAGS_BITWISE_XOR_EQ   (EnumType, EnumType)                           
 #  include <intrin.h>
 #  define CV_XADD(addr, delta) (int)_InterlockedExchangeAdd((long volatile*)addr, delta)
 #else
-  #ifdef OPENCV_FORCE_UNSAFE_XADD
-    CV_INLINE CV_XADD(int* addr, int delta) { int tmp = *addr; *addr += delta; return tmp; }
-  #else
-    #error "OpenCV: can't define safe CV_XADD macro for current platform (unsupported). Define CV_XADD macro through custom port header (see OPENCV_INCLUDE_PORT_FILE)"
-  #endif
+#ifdef OPENCV_FORCE_UNSAFE_XADD
+CV_INLINE CV_XADD(int* addr, int delta) {
+    int tmp = *addr;
+    *addr += delta;
+    return tmp;
+}
+#else
+#error "OpenCV: can't define safe CV_XADD macro for current platform (unsupported). Define CV_XADD macro through custom port header (see OPENCV_INCLUDE_PORT_FILE)"
+#endif
 #endif
 
 
@@ -787,8 +795,12 @@ public:
 #if CV_FP16_TYPE
 
     float16_t() : h(0) {}
-    explicit float16_t(float x) { h = (__fp16)x; }
-    operator float() const { return (float)h; }
+    explicit float16_t(float x) {
+        h = (__fp16)x;
+    }
+    operator float() const {
+        return (float)h;
+    }
     static float16_t fromBits(ushort w)
     {
         Cv16suf u;
@@ -816,10 +828,10 @@ protected:
     float16_t() : w(0) {}
     explicit float16_t(float x)
     {
-    #if CV_AVX2
+#if CV_AVX2
         __m128 v = _mm_load_ss(&x);
         w = (ushort)_mm_cvtsi128_si32(_mm_cvtps_ph(v, 0));
-    #else
+#else
         Cv32suf in;
         in.f = x;
         unsigned sign = in.u & 0x80000000;
@@ -842,16 +854,16 @@ protected:
         }
 
         w = (ushort)(w | (sign >> 16));
-    #endif
+#endif
     }
 
     operator float() const
     {
-    #if CV_AVX2
+#if CV_AVX2
         float f;
         _mm_store_ss(&f, _mm_cvtph_ps(_mm_cvtsi32_si128(w)));
         return f;
-    #else
+#else
         Cv32suf out;
 
         unsigned t = ((w & 0x7fff) << 13) + 0x38000000;
@@ -862,7 +874,7 @@ protected:
         out.u = (e >= 0x7c00 ? t + 0x38000000 :
                  e == 0 ? (static_cast<void>(out.f -= 6.103515625e-05f), out.u) : t) | sign;
         return out.f;
-    #endif
+#endif
     }
 
     static float16_t fromBits(ushort b)
@@ -877,7 +889,9 @@ protected:
         result.w = (ushort)0;
         return result;
     }
-    ushort bits() const { return w; }
+    ushort bits() const {
+        return w;
+    }
 protected:
     ushort w;
 

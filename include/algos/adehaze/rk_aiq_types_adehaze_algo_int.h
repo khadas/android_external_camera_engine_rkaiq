@@ -75,16 +75,16 @@ typedef struct RKAiqAdhazConfig_s
 typedef struct rk_aiq_dehaze_M_attrib_s {
     //rk_aiq_wb_mwb_mode_t mode;
 
-	int sw_dhaz_en ; //1
-	int cfg_alpha ;   //1
-	int enhance_en;//0
+    int sw_dhaz_en ; //1
+    int cfg_alpha ;   //1
+    int enhance_en;//0
 
-	
-	float sw_dhaz_cfg_wt ;//0.1~1.0
-	int sw_dhaz_cfg_air;//0~255
-	float sw_dhaz_cfg_tmax;//0.1~1.0
-	int sw_dhaz_cfg_gratio;//0~10
-    
+
+    float sw_dhaz_cfg_wt ;//0.1~1.0
+    int sw_dhaz_cfg_air;//0~255
+    float sw_dhaz_cfg_tmax;//0.1~1.0
+    int sw_dhaz_cfg_gratio;//0~10
+
 } rk_aiq_dehaze_M_attrib_t;
 
 
@@ -94,47 +94,47 @@ typedef struct rk_aiq_dehaze_M_attrib_s {
 typedef struct rk_aiq_dehaze_A_attrib_s {
     //rk_aiq_wb_awb_alg_method_t algMethod;
     int sw_dhaz_en ;//1
-	int cfg_alpha ; //0
-	int enhance_en ;//0
-	
+    int cfg_alpha ; //0
+    int enhance_en ;//0
 
-	
+
+
 } rk_aiq_dehaze_A_attrib_t;
 
 typedef struct rk_aiq_dehaze_enhance_s {
     //rk_aiq_wb_awb_alg_method_t algMethod;
     int sw_dhaz_en ;//1
-	int cfg_alpha ; //1
-	int enhance_en ;//1
-	float level;//0~10
+    int cfg_alpha ; //1
+    int enhance_en ;//1
+    float level;//0~10
 } rk_aiq_dehaze_enhance_t;
 
 
 
-typedef enum rk_aiq_dehaze_op_mode_s{
+typedef enum rk_aiq_dehaze_op_mode_s {
     RK_AIQ_DEHAZE_MODE_INVALID                     = 0,        /**< initialization value */
     RK_AIQ_DEHAZE_MODE_MANUAL                      = 1,        /**< run manual dehaze */
     RK_AIQ_DEHAZE_MODE_AUTO                        = 2,        /**< run auto dehaze */
-  
+
 } rk_aiq_dehaze_op_mode_t;
 
 
 typedef struct adehaze_sw_s {
-   bool byPass;
+    bool byPass;
     rk_aiq_dehaze_op_mode_t mode;
     rk_aiq_dehaze_M_attrib_t stManual;
     rk_aiq_dehaze_A_attrib_t stAuto;
-	rk_aiq_dehaze_enhance_t stEnhance;
+    rk_aiq_dehaze_enhance_t stEnhance;
 } adehaze_sw_t;
 
 
-typedef struct AdehazeExpInfo_s{
-	int hdr_mode;
-	float arTime[3];
-	float arAGain[3];
-	float arDGain[3];
-	int   arIso[3];
-}AdehazeExpInfo_t;
+typedef struct AdehazeExpInfo_s {
+    int hdr_mode;
+    float arTime[3];
+    float arAGain[3];
+    float arDGain[3];
+    int   arIso[3];
+} AdehazeExpInfo_t;
 
 
 

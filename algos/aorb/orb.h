@@ -5,7 +5,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
-    
+
 #define MAX_POINTS 40000
 
 #define FAST_CANDIDATE 16 // fast9 use surrounding 16 points
@@ -23,28 +23,28 @@
 class rkisp_orb
 {
 public:
-	unsigned char fast9_limit;
-	unsigned char cur_limit;
-	int feature_size;
-	int feature_capacity;
-	int non_max_sup_radius;
+    unsigned char fast9_limit;
+    unsigned char cur_limit;
+    int feature_size;
+    int feature_capacity;
+    int non_max_sup_radius;
 
-	unsigned char* imgSrc;
-	int width;
-	int height;
-	int data_bits;
-	unsigned short* pXs;
-	unsigned short* pYs;
-	unsigned char*  pDescriptors;
-	unsigned char* pScores;
+    unsigned char* imgSrc;
+    int width;
+    int height;
+    int data_bits;
+    unsigned short* pXs;
+    unsigned short* pYs;
+    unsigned char*  pDescriptors;
+    unsigned char* pScores;
 public:
-	int process();
-	int fast9_detect();
-	int compare_pixel(unsigned char center, unsigned char* compare, unsigned char* candidate);
-	int find_9consecutive_pixel(unsigned char* compare);
-	int non_max_suppress();
-	int orb_feature();
-	int get_rotation_value(unsigned char* center_ptr, int* cur_point_pattern, int idx, int cos_value, int sin_value);
+    int process();
+    int fast9_detect();
+    int compare_pixel(unsigned char center, unsigned char* compare, unsigned char* candidate);
+    int find_9consecutive_pixel(unsigned char* compare);
+    int non_max_suppress();
+    int orb_feature();
+    int get_rotation_value(unsigned char* center_ptr, int* cur_point_pattern, int idx, int cos_value, int sin_value);
 };
 
 

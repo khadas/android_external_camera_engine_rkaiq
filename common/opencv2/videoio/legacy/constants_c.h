@@ -7,44 +7,44 @@
 
 enum
 {
-    CV_CAP_ANY      =0,     // autodetect
+    CV_CAP_ANY      = 0,    // autodetect
 
-    CV_CAP_MIL      =100,   // MIL proprietary drivers
+    CV_CAP_MIL      = 100,  // MIL proprietary drivers
 
-    CV_CAP_VFW      =200,   // platform native
-    CV_CAP_V4L      =200,
-    CV_CAP_V4L2     =200,
+    CV_CAP_VFW      = 200,  // platform native
+    CV_CAP_V4L      = 200,
+    CV_CAP_V4L2     = 200,
 
-    CV_CAP_FIREWARE =300,   // IEEE 1394 drivers
-    CV_CAP_FIREWIRE =300,
-    CV_CAP_IEEE1394 =300,
-    CV_CAP_DC1394   =300,
-    CV_CAP_CMU1394  =300,
+    CV_CAP_FIREWARE = 300,  // IEEE 1394 drivers
+    CV_CAP_FIREWIRE = 300,
+    CV_CAP_IEEE1394 = 300,
+    CV_CAP_DC1394   = 300,
+    CV_CAP_CMU1394  = 300,
 
-    CV_CAP_STEREO   =400,   // TYZX proprietary drivers
-    CV_CAP_TYZX     =400,
-    CV_TYZX_LEFT    =400,
-    CV_TYZX_RIGHT   =401,
-    CV_TYZX_COLOR   =402,
-    CV_TYZX_Z       =403,
+    CV_CAP_STEREO   = 400,  // TYZX proprietary drivers
+    CV_CAP_TYZX     = 400,
+    CV_TYZX_LEFT    = 400,
+    CV_TYZX_RIGHT   = 401,
+    CV_TYZX_COLOR   = 402,
+    CV_TYZX_Z       = 403,
 
-    CV_CAP_QT       =500,   // QuickTime
+    CV_CAP_QT       = 500,  // QuickTime
 
-    CV_CAP_UNICAP   =600,   // Unicap drivers
+    CV_CAP_UNICAP   = 600,  // Unicap drivers
 
-    CV_CAP_DSHOW    =700,   // DirectShow (via videoInput)
-    CV_CAP_MSMF     =1400,  // Microsoft Media Foundation (via videoInput)
+    CV_CAP_DSHOW    = 700,  // DirectShow (via videoInput)
+    CV_CAP_MSMF     = 1400, // Microsoft Media Foundation (via videoInput)
 
-    CV_CAP_PVAPI    =800,   // PvAPI, Prosilica GigE SDK
+    CV_CAP_PVAPI    = 800,  // PvAPI, Prosilica GigE SDK
 
-    CV_CAP_OPENNI   =900,   // OpenNI (for Kinect)
-    CV_CAP_OPENNI_ASUS =910,   // OpenNI (for Asus Xtion)
+    CV_CAP_OPENNI   = 900,  // OpenNI (for Kinect)
+    CV_CAP_OPENNI_ASUS = 910,  // OpenNI (for Asus Xtion)
 
-    CV_CAP_ANDROID  =1000,  // Android - not used
-    CV_CAP_ANDROID_BACK =CV_CAP_ANDROID+99, // Android back camera - not used
-    CV_CAP_ANDROID_FRONT =CV_CAP_ANDROID+98, // Android front camera - not used
+    CV_CAP_ANDROID  = 1000, // Android - not used
+    CV_CAP_ANDROID_BACK = CV_CAP_ANDROID + 99, // Android back camera - not used
+    CV_CAP_ANDROID_FRONT = CV_CAP_ANDROID + 98, // Android front camera - not used
 
-    CV_CAP_XIAPI    =1100,   // XIMEA Camera API
+    CV_CAP_XIAPI    = 1100,  // XIMEA Camera API
 
     CV_CAP_AVFOUNDATION = 1200,  // AVFoundation framework for iOS (OS X Lion will have the same API)
 
@@ -69,54 +69,54 @@ enum
     CV_CAP_PROP_DC1394_MODE_MANUAL = -3, //set automatically when a value of the feature is set by the user
     CV_CAP_PROP_DC1394_MODE_AUTO = -2,
     CV_CAP_PROP_DC1394_MODE_ONE_PUSH_AUTO = -1,
-    CV_CAP_PROP_POS_MSEC       =0,
-    CV_CAP_PROP_POS_FRAMES     =1,
-    CV_CAP_PROP_POS_AVI_RATIO  =2,
-    CV_CAP_PROP_FRAME_WIDTH    =3,
-    CV_CAP_PROP_FRAME_HEIGHT   =4,
-    CV_CAP_PROP_FPS            =5,
-    CV_CAP_PROP_FOURCC         =6,
-    CV_CAP_PROP_FRAME_COUNT    =7,
-    CV_CAP_PROP_FORMAT         =8,
-    CV_CAP_PROP_MODE           =9,
-    CV_CAP_PROP_BRIGHTNESS    =10,
-    CV_CAP_PROP_CONTRAST      =11,
-    CV_CAP_PROP_SATURATION    =12,
-    CV_CAP_PROP_HUE           =13,
-    CV_CAP_PROP_GAIN          =14,
-    CV_CAP_PROP_EXPOSURE      =15,
-    CV_CAP_PROP_CONVERT_RGB   =16,
-    CV_CAP_PROP_WHITE_BALANCE_BLUE_U =17,
-    CV_CAP_PROP_RECTIFICATION =18,
-    CV_CAP_PROP_MONOCHROME    =19,
-    CV_CAP_PROP_SHARPNESS     =20,
-    CV_CAP_PROP_AUTO_EXPOSURE =21, // exposure control done by camera,
-                                   // user can adjust reference level
-                                   // using this feature
-    CV_CAP_PROP_GAMMA         =22,
-    CV_CAP_PROP_TEMPERATURE   =23,
-    CV_CAP_PROP_TRIGGER       =24,
-    CV_CAP_PROP_TRIGGER_DELAY =25,
-    CV_CAP_PROP_WHITE_BALANCE_RED_V =26,
-    CV_CAP_PROP_ZOOM          =27,
-    CV_CAP_PROP_FOCUS         =28,
-    CV_CAP_PROP_GUID          =29,
-    CV_CAP_PROP_ISO_SPEED     =30,
-    CV_CAP_PROP_MAX_DC1394    =31,
-    CV_CAP_PROP_BACKLIGHT     =32,
-    CV_CAP_PROP_PAN           =33,
-    CV_CAP_PROP_TILT          =34,
-    CV_CAP_PROP_ROLL          =35,
-    CV_CAP_PROP_IRIS          =36,
-    CV_CAP_PROP_SETTINGS      =37,
-    CV_CAP_PROP_BUFFERSIZE    =38,
-    CV_CAP_PROP_AUTOFOCUS     =39,
-    CV_CAP_PROP_SAR_NUM       =40,
-    CV_CAP_PROP_SAR_DEN       =41,
+    CV_CAP_PROP_POS_MSEC       = 0,
+    CV_CAP_PROP_POS_FRAMES     = 1,
+    CV_CAP_PROP_POS_AVI_RATIO  = 2,
+    CV_CAP_PROP_FRAME_WIDTH    = 3,
+    CV_CAP_PROP_FRAME_HEIGHT   = 4,
+    CV_CAP_PROP_FPS            = 5,
+    CV_CAP_PROP_FOURCC         = 6,
+    CV_CAP_PROP_FRAME_COUNT    = 7,
+    CV_CAP_PROP_FORMAT         = 8,
+    CV_CAP_PROP_MODE           = 9,
+    CV_CAP_PROP_BRIGHTNESS    = 10,
+    CV_CAP_PROP_CONTRAST      = 11,
+    CV_CAP_PROP_SATURATION    = 12,
+    CV_CAP_PROP_HUE           = 13,
+    CV_CAP_PROP_GAIN          = 14,
+    CV_CAP_PROP_EXPOSURE      = 15,
+    CV_CAP_PROP_CONVERT_RGB   = 16,
+    CV_CAP_PROP_WHITE_BALANCE_BLUE_U = 17,
+    CV_CAP_PROP_RECTIFICATION = 18,
+    CV_CAP_PROP_MONOCHROME    = 19,
+    CV_CAP_PROP_SHARPNESS     = 20,
+    CV_CAP_PROP_AUTO_EXPOSURE = 21, // exposure control done by camera,
+    // user can adjust reference level
+    // using this feature
+    CV_CAP_PROP_GAMMA         = 22,
+    CV_CAP_PROP_TEMPERATURE   = 23,
+    CV_CAP_PROP_TRIGGER       = 24,
+    CV_CAP_PROP_TRIGGER_DELAY = 25,
+    CV_CAP_PROP_WHITE_BALANCE_RED_V = 26,
+    CV_CAP_PROP_ZOOM          = 27,
+    CV_CAP_PROP_FOCUS         = 28,
+    CV_CAP_PROP_GUID          = 29,
+    CV_CAP_PROP_ISO_SPEED     = 30,
+    CV_CAP_PROP_MAX_DC1394    = 31,
+    CV_CAP_PROP_BACKLIGHT     = 32,
+    CV_CAP_PROP_PAN           = 33,
+    CV_CAP_PROP_TILT          = 34,
+    CV_CAP_PROP_ROLL          = 35,
+    CV_CAP_PROP_IRIS          = 36,
+    CV_CAP_PROP_SETTINGS      = 37,
+    CV_CAP_PROP_BUFFERSIZE    = 38,
+    CV_CAP_PROP_AUTOFOCUS     = 39,
+    CV_CAP_PROP_SAR_NUM       = 40,
+    CV_CAP_PROP_SAR_DEN       = 41,
 
-    CV_CAP_PROP_AUTOGRAB      =1024, // property for videoio class CvCapture_Android only
-    CV_CAP_PROP_SUPPORTED_PREVIEW_SIZES_STRING=1025, // readonly, tricky property, returns cpnst char* indeed
-    CV_CAP_PROP_PREVIEW_FORMAT=1026, // readonly, tricky property, returns cpnst char* indeed
+    CV_CAP_PROP_AUTOGRAB      = 1024, // property for videoio class CvCapture_Android only
+    CV_CAP_PROP_SUPPORTED_PREVIEW_SIZES_STRING = 1025, // readonly, tricky property, returns cpnst char* indeed
+    CV_CAP_PROP_PREVIEW_FORMAT = 1026, // readonly, tricky property, returns cpnst char* indeed
 
     // OpenNI map generators
     CV_CAP_OPENNI_DEPTH_GENERATOR = 1 << 31,
@@ -131,8 +131,8 @@ enum
     CV_CAP_PROP_OPENNI_FOCAL_LENGTH    = 103, // in pixels
     CV_CAP_PROP_OPENNI_REGISTRATION    = 104, // flag
     CV_CAP_PROP_OPENNI_REGISTRATION_ON = CV_CAP_PROP_OPENNI_REGISTRATION, // flag that synchronizes the remapping depth map to image map
-                                                                          // by changing depth generator's view point (if the flag is "on") or
-                                                                          // sets this view point to its normal one (if the flag is "off").
+    // by changing depth generator's view point (if the flag is "on") or
+    // sets this view point to its normal one (if the flag is "off").
     CV_CAP_PROP_OPENNI_APPROX_FRAME_SYNC = 105,
     CV_CAP_PROP_OPENNI_MAX_BUFFER_SIZE   = 106,
     CV_CAP_PROP_OPENNI_CIRCLE_BUFFER     = 107,

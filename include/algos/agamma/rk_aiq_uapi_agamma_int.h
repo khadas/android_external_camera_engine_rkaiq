@@ -14,11 +14,11 @@
 
 XCamReturn
 rk_aiq_uapi_agamma_SetAttrib(RkAiqAlgoContext *ctx,
-                          rk_aiq_gamma_attrib_t attr,
-                          bool need_sync);
+                             rk_aiq_gamma_attrib_t attr,
+                             bool need_sync);
 XCamReturn
 rk_aiq_uapi_agamma_GetAttrib(const RkAiqAlgoContext *ctx,
-                          rk_aiq_gamma_attrib_t *attr);
+                             rk_aiq_gamma_attrib_t *attr);
 
 
 #endif

@@ -413,6 +413,7 @@ RkAiqAeHandleInt::prepare()
     /*****************AecConfig pic-info params*****************/
     ae_config_int->RawWidth = shared->snsDes.isp_acq_width;
     ae_config_int->RawHeight = shared->snsDes.isp_acq_height;
+    ae_config_int->nr_switch = shared->snsDes.nr_switch;
 
     RkAiqAlgoDescription* des = (RkAiqAlgoDescription*)mDes;
     ret = des->prepare(mConfig);
@@ -1601,7 +1602,7 @@ RkAiqAhdrHandleInt::updateConfig()
     if (updateAtt) {
         mCurAtt = mNewAtt;
         updateAtt = false;
-        rk_aiq_uapi_ahdr_SetAttrib(mAlgoCtx, mCurAtt, false);
+        rk_aiq_uapi_ahdr_SetAttrib(mAlgoCtx, mCurAtt, true);
     }
     mCfgMutex.unlock();
 
@@ -1636,13 +1637,13 @@ RkAiqAhdrHandleInt::setAttrib(ahdr_attrib_t att)
     return ret;
 }
 XCamReturn
-RkAiqAhdrHandleInt::getAttrib(ahdr_attrib_t att)
+RkAiqAhdrHandleInt::getAttrib(ahdr_attrib_t* att)
 {
     ENTER_ANALYZER_FUNCTION();
 
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
 
-    rk_aiq_uapi_ahdr_GetAttrib(mAlgoCtx, &att);
+    rk_aiq_uapi_ahdr_GetAttrib(mAlgoCtx, att);
 
     EXIT_ANALYZER_FUNCTION();
     return ret;

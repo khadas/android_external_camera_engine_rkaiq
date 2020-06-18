@@ -13,7 +13,7 @@ typedef struct {
 
 typedef struct {
     unsigned int num_points;
-	rk_aiq_orb_featue_point points[MAX_POINTS];
+    rk_aiq_orb_featue_point points[MAX_POINTS];
 } rk_aiq_orb_algo_stat_t;
 
 typedef struct {
@@ -37,7 +37,7 @@ typedef struct {
     unsigned int score;
 } orb_matched_point_t;
 
-typedef struct{
+typedef struct {
     unsigned int left;
     unsigned int top;
     unsigned int right;

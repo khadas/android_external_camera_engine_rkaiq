@@ -18,7 +18,7 @@
  */
 
 #ifndef _RK_AIQ_TYPES_AIE_ALGO_H_
-#define _RK_AIQ_TYPES_AIE_ALGO_H_ 
+#define _RK_AIQ_TYPES_AIE_ALGO_H_
 
 typedef enum rk_aiq_ie_effect_e {
     RK_AIQ_IE_EFFECT_NONE,
@@ -31,7 +31,7 @@ typedef enum rk_aiq_ie_effect_e {
 } rk_aiq_ie_effect_t;
 
 typedef struct rk_aiq_aie_params_s {
-  rk_aiq_ie_effect_t mode;
+    rk_aiq_ie_effect_t mode;
 } rk_aiq_aie_params_t;
 
 #endif

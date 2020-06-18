@@ -59,25 +59,25 @@ extern "C" {
 @see cv::accumulate
 */
 CVAPI(void)  cvAcc( const CvArr* image, CvArr* sum,
-                   const CvArr* mask CV_DEFAULT(NULL) );
+                    const CvArr* mask CV_DEFAULT(NULL) );
 
 /** @brief Adds squared image to accumulator
 @see cv::accumulateSquare
 */
 CVAPI(void)  cvSquareAcc( const CvArr* image, CvArr* sqsum,
-                         const CvArr* mask CV_DEFAULT(NULL) );
+                          const CvArr* mask CV_DEFAULT(NULL) );
 
 /** @brief Adds a product of two images to accumulator
 @see cv::accumulateProduct
 */
 CVAPI(void)  cvMultiplyAcc( const CvArr* image1, const CvArr* image2, CvArr* acc,
-                           const CvArr* mask CV_DEFAULT(NULL) );
+                            const CvArr* mask CV_DEFAULT(NULL) );
 
 /** @brief Adds image to accumulator with weights: acc = acc*(1-alpha) + image*alpha
 @see cv::accumulateWeighted
 */
 CVAPI(void)  cvRunningAvg( const CvArr* image, CvArr* acc, double alpha,
-                          const CvArr* mask CV_DEFAULT(NULL) );
+                           const CvArr* mask CV_DEFAULT(NULL) );
 
 /****************************************************************************************\
 *                                    Image Processing                                    *
@@ -129,14 +129,14 @@ is at the kernel center.
 @see cv::filter2D
  */
 CVAPI(void) cvFilter2D( const CvArr* src, CvArr* dst, const CvMat* kernel,
-                        CvPoint anchor CV_DEFAULT(cvPoint(-1,-1)));
+                        CvPoint anchor CV_DEFAULT(cvPoint(-1, -1)));
 
 /** @brief Finds integral image: SUM(X,Y) = sum(x<X,y<Y)I(x,y)
 @see cv::integral
 */
 CVAPI(void) cvIntegral( const CvArr* image, CvArr* sum,
-                       CvArr* sqsum CV_DEFAULT(NULL),
-                       CvArr* tilted_sum CV_DEFAULT(NULL));
+                        CvArr* sqsum CV_DEFAULT(NULL),
+                        CvArr* tilted_sum CV_DEFAULT(NULL));
 
 /** @brief Smoothes the input image with gaussian kernel and then down-samples it.
 
@@ -173,8 +173,8 @@ CVAPI(void)  cvReleasePyramid( CvMat*** pyramid, int extra_layers );
 @see cv::pyrMeanShiftFiltering
 */
 CVAPI(void) cvPyrMeanShiftFiltering( const CvArr* src, CvArr* dst,
-    double sp, double sr, int max_level CV_DEFAULT(1),
-    CvTermCriteria termcrit CV_DEFAULT(cvTermCriteria(CV_TERMCRIT_ITER+CV_TERMCRIT_EPS,5,1)));
+                                     double sp, double sr, int max_level CV_DEFAULT(1),
+                                     CvTermCriteria termcrit CV_DEFAULT(cvTermCriteria(CV_TERMCRIT_ITER + CV_TERMCRIT_EPS, 5, 1)));
 
 /** @brief Segments image using seed "markers"
 @see cv::watershed
@@ -188,14 +188,14 @@ CVAPI(void) cvWatershed( const CvArr* image, CvArr* markers );
 @see cv::Sobel
 */
 CVAPI(void) cvSobel( const CvArr* src, CvArr* dst,
-                    int xorder, int yorder,
-                    int aperture_size CV_DEFAULT(3));
+                     int xorder, int yorder,
+                     int aperture_size CV_DEFAULT(3));
 
 /** @brief Calculates the image Laplacian: (d2/dx + d2/dy)I
 @see cv::Laplacian
 */
 CVAPI(void) cvLaplace( const CvArr* src, CvArr* dst,
-                      int aperture_size CV_DEFAULT(3) );
+                       int aperture_size CV_DEFAULT(3) );
 
 /** @brief Converts input array pixels from one color space to another
 @see cv::cvtColor
@@ -215,7 +215,7 @@ replication border mode.
 @see cv::warpAffine
 */
 CVAPI(void)  cvWarpAffine( const CvArr* src, CvArr* dst, const CvMat* map_matrix,
-                           int flags CV_DEFAULT(CV_INTER_LINEAR+CV_WARP_FILL_OUTLIERS),
+                           int flags CV_DEFAULT(CV_INTER_LINEAR + CV_WARP_FILL_OUTLIERS),
                            CvScalar fillval CV_DEFAULT(cvScalarAll(0)) );
 
 /** @brief Computes affine transform matrix for mapping src[i] to dst[i] (i=0,1,2)
@@ -235,22 +235,22 @@ CVAPI(CvMat*)  cv2DRotationMatrix( CvPoint2D32f center, double angle,
 @see cv::warpPerspective
 */
 CVAPI(void)  cvWarpPerspective( const CvArr* src, CvArr* dst, const CvMat* map_matrix,
-                                int flags CV_DEFAULT(CV_INTER_LINEAR+CV_WARP_FILL_OUTLIERS),
+                                int flags CV_DEFAULT(CV_INTER_LINEAR + CV_WARP_FILL_OUTLIERS),
                                 CvScalar fillval CV_DEFAULT(cvScalarAll(0)) );
 
 /** @brief Computes perspective transform matrix for mapping src[i] to dst[i] (i=0,1,2,3)
 @see cv::getPerspectiveTransform
 */
 CVAPI(CvMat*) cvGetPerspectiveTransform( const CvPoint2D32f* src,
-                                         const CvPoint2D32f* dst,
-                                         CvMat* map_matrix );
+        const CvPoint2D32f* dst,
+        CvMat* map_matrix );
 
 /** @brief Performs generic geometric transformation using the specified coordinate maps
 @see cv::remap
 */
 CVAPI(void)  cvRemap( const CvArr* src, CvArr* dst,
                       const CvArr* mapx, const CvArr* mapy,
-                      int flags CV_DEFAULT(CV_INTER_LINEAR+CV_WARP_FILL_OUTLIERS),
+                      int flags CV_DEFAULT(CV_INTER_LINEAR + CV_WARP_FILL_OUTLIERS),
                       CvScalar fillval CV_DEFAULT(cvScalarAll(0)) );
 
 /** @brief Converts mapx & mapy from floating-point to integer formats for cvRemap
@@ -264,14 +264,14 @@ CVAPI(void)  cvConvertMaps( const CvArr* mapx, const CvArr* mapy,
 */
 CVAPI(void)  cvLogPolar( const CvArr* src, CvArr* dst,
                          CvPoint2D32f center, double M,
-                         int flags CV_DEFAULT(CV_INTER_LINEAR+CV_WARP_FILL_OUTLIERS));
+                         int flags CV_DEFAULT(CV_INTER_LINEAR + CV_WARP_FILL_OUTLIERS));
 
 /** Performs forward or inverse linear-polar image transform
 @see cv::warpPolar
 */
 CVAPI(void)  cvLinearPolar( const CvArr* src, CvArr* dst,
-                         CvPoint2D32f center, double maxRadius,
-                         int flags CV_DEFAULT(CV_INTER_LINEAR+CV_WARP_FILL_OUTLIERS));
+                            CvPoint2D32f center, double maxRadius,
+                            int flags CV_DEFAULT(CV_INTER_LINEAR + CV_WARP_FILL_OUTLIERS));
 
 /** @brief Returns a structuring element of the specified size and shape for morphological operations.
 
@@ -288,9 +288,9 @@ structuring element, when shape=CV_SHAPE_CUSTOM.
 
 @see cv::getStructuringElement
  */
- CVAPI(IplConvKernel*)  cvCreateStructuringElementEx(
-            int cols, int  rows, int  anchor_x, int  anchor_y,
-            int shape, int* values CV_DEFAULT(NULL) );
+CVAPI(IplConvKernel*)  cvCreateStructuringElementEx(
+    int cols, int  rows, int  anchor_x, int  anchor_y,
+    int shape, int* values CV_DEFAULT(NULL) );
 
 /** @brief releases structuring element
 @see cvCreateStructuringElementEx
@@ -332,7 +332,7 @@ CVAPI(double)  cvGetSpatialMoment( CvMoments* moments, int x_order, int y_order 
 CVAPI(double)  cvGetCentralMoment( CvMoments* moments, int x_order, int y_order );
 /** @brief Retrieve normalized central moments */
 CVAPI(double)  cvGetNormalizedCentralMoment( CvMoments* moments,
-                                             int x_order, int y_order );
+        int x_order, int y_order );
 
 /** @brief Calculates 7 Hu's invariants from precalculated spatial and central moments
 @see cv::HuMoments
@@ -400,7 +400,7 @@ CVAPI(int)  cvFindContours( CvArr* image, CvMemStorage* storage, CvSeq** first_c
                             int header_size CV_DEFAULT(sizeof(CvContour)),
                             int mode CV_DEFAULT(CV_RETR_LIST),
                             int method CV_DEFAULT(CV_CHAIN_APPROX_SIMPLE),
-                            CvPoint offset CV_DEFAULT(cvPoint(0,0)));
+                            CvPoint offset CV_DEFAULT(cvPoint(0, 0)));
 
 /** @brief Initializes contour retrieving process.
 
@@ -411,10 +411,10 @@ CVAPI(int)  cvFindContours( CvArr* image, CvMemStorage* storage, CvSeq** first_c
 @see cvFindContours
 */
 CVAPI(CvContourScanner)  cvStartFindContours( CvArr* image, CvMemStorage* storage,
-                            int header_size CV_DEFAULT(sizeof(CvContour)),
-                            int mode CV_DEFAULT(CV_RETR_LIST),
-                            int method CV_DEFAULT(CV_CHAIN_APPROX_SIMPLE),
-                            CvPoint offset CV_DEFAULT(cvPoint(0,0)));
+        int header_size CV_DEFAULT(sizeof(CvContour)),
+        int mode CV_DEFAULT(CV_RETR_LIST),
+        int method CV_DEFAULT(CV_CHAIN_APPROX_SIMPLE),
+        CvPoint offset CV_DEFAULT(cvPoint(0, 0)));
 
 /** @brief Retrieves next contour
 @see cvFindContours
@@ -453,10 +453,10 @@ approximated.
 @see cvStartReadChainPoints, cvReadChainPoint
  */
 CVAPI(CvSeq*) cvApproxChains( CvSeq* src_seq, CvMemStorage* storage,
-                            int method CV_DEFAULT(CV_CHAIN_APPROX_SIMPLE),
-                            double parameter CV_DEFAULT(0),
-                            int  minimal_perimeter CV_DEFAULT(0),
-                            int  recursive CV_DEFAULT(0));
+                              int method CV_DEFAULT(CV_CHAIN_APPROX_SIMPLE),
+                              double parameter CV_DEFAULT(0),
+                              int  minimal_perimeter CV_DEFAULT(0),
+                              int  recursive CV_DEFAULT(0));
 
 /** @brief Initializes Freeman chain reader.
 
@@ -626,7 +626,7 @@ the backproject of the histogram is calculated.
 @param uniform Uniformity flag. See :ocvCreateHist for details.
  */
 CVAPI(void)  cvSetHistBinRanges( CvHistogram* hist, float** ranges,
-                                int uniform CV_DEFAULT(1));
+                                 int uniform CV_DEFAULT(1));
 
 /** @brief Makes a histogram out of an array.
 
@@ -642,9 +642,9 @@ way. The function returns hist.
 @param uniform Uniformity flag. See cvCreateHist for details.
  */
 CVAPI(CvHistogram*)  cvMakeHistHeaderForArray(
-                            int  dims, int* sizes, CvHistogram* hist,
-                            float* data, float** ranges CV_DEFAULT(NULL),
-                            int uniform CV_DEFAULT(1));
+    int  dims, int* sizes, CvHistogram* hist,
+    float* data, float** ranges CV_DEFAULT(NULL),
+    int uniform CV_DEFAULT(1));
 
 /** @brief Releases the histogram.
 
@@ -725,7 +725,7 @@ CVAPI(void)  cvCopyHist( const CvHistogram* src, CvHistogram** dst );
 /** @brief Calculates bayesian probabilistic histograms
    (each or src and dst is an array of _number_ histograms */
 CVAPI(void)  cvCalcBayesianProb( CvHistogram** src, int number,
-                                CvHistogram** dst);
+                                 CvHistogram** dst);
 
 /** @brief Calculates array histogram
 @see cv::calcHist
@@ -1004,9 +1004,9 @@ CV_INLINE  void  cvEllipseBox( CvArr* img, CvBox2D box, CvScalar color,
                                int line_type CV_DEFAULT(8), int shift CV_DEFAULT(0) )
 {
     CvSize axes = cvSize(
-        cvRound(box.size.width*0.5),
-        cvRound(box.size.height*0.5)
-    );
+                      cvRound(box.size.width * 0.5),
+                      cvRound(box.size.height * 0.5)
+                  );
 
     cvEllipse( img, cvPointFrom32f( box.center ), axes, box.angle,
                0, 360, color, thickness, line_type, shift );
@@ -1084,8 +1084,8 @@ CVAPI(int)  cvInitLineIterator( const CvArr* image, CvPoint pt1, CvPoint pt2,
 /** Font structure */
 typedef struct CvFont
 {
-  const char* nameFont;   //Qt:nameFont
-  CvScalar color;       //Qt:ColorFont -> cvScalar(blue_component, green_component, red_component[, alpha_component])
+    const char* nameFont;   //Qt:nameFont
+    CvScalar color;       //Qt:ColorFont -> cvScalar(blue_component, green_component, red_component[, alpha_component])
     int         font_face;    //Qt: bool italic         /** =CV_FONT_* */
     const int*  ascii;      //!< font data and metrics
     const int*  greek;
@@ -1157,7 +1157,7 @@ number of points stored into 'pts' is returned by this function.
 @see cv::ellipse2Poly
 */
 CVAPI(int) cvEllipse2Poly( CvPoint center, CvSize axes,
-                 int angle, int arc_start, int arc_end, CvPoint * pts, int delta );
+                           int angle, int arc_start, int arc_end, CvPoint * pts, int delta );
 
 /** @brief Draws contour outlines or filled interiors on the image
 @see cv::drawContours
@@ -1166,7 +1166,7 @@ CVAPI(void)  cvDrawContours( CvArr *img, CvSeq* contour,
                              CvScalar external_color, CvScalar hole_color,
                              int max_level, int thickness CV_DEFAULT(1),
                              int line_type CV_DEFAULT(8),
-                             CvPoint offset CV_DEFAULT(cvPoint(0,0)));
+                             CvPoint offset CV_DEFAULT(cvPoint(0, 0)));
 
 /** @} */
 

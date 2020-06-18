@@ -106,7 +106,7 @@ typedef struct _RkAiqAlgoCom {
     uint32_t frame_id;
     union {
         struct {
-            int working_mode; // real type is rk_aiq_working_mode_t or rk_aiq_isp_hdr_mode_t 
+            int working_mode; // real type is rk_aiq_working_mode_t or rk_aiq_isp_hdr_mode_t
             int sns_op_width;
             int sns_op_height;
         } prepare; //for prepare function

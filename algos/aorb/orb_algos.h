@@ -5,14 +5,14 @@
 typedef  unsigned char  U8 ;
 typedef  unsigned short U16 ;
 typedef  unsigned int   U32 ;
-typedef enum Byte{ Uchar = 1,Float = 4,Rgb = 3}Byte;
+typedef enum Byte { Uchar = 1, Float = 4, Rgb = 3} Byte;
 
-typedef struct point_s{
+typedef struct point_s {
     float row;
     float col;
 } point_t;
 
-typedef struct Mat{
+typedef struct Mat {
     void* buffer; //buffer to save the image
     U16 height;
     U16 width;
@@ -20,12 +20,12 @@ typedef struct Mat{
     Byte bytes;
 } Mat;
 
-typedef struct Node{
+typedef struct Node {
     struct Node* next;
     void* data;
 } Node;
 
-typedef struct ORBList{
+typedef struct ORBList {
     struct Node* start;
     struct Node* end;
     U16 length;
@@ -38,7 +38,7 @@ void freeList(ORBList* list);
 #if 0
 int push(ORBList* list, void* data);
 orb_point_t* init_orbpoint(U16 row, U16 col, bool descriptor[ORB_FEATURE_DESCRIPTOR_BITS]);
-orb_matched_point_t* init_matchpoints(U16 row1, U16 col1,U16 row2, U16 col2);
+orb_matched_point_t* init_matchpoints(U16 row1, U16 col1, U16 row2, U16 col2);
 #endif
 void freeList(ORBList* list);
 

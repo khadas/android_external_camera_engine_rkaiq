@@ -16,7 +16,7 @@ void interpolation(const float *x, const float *y, int Num, float x0, float*y0)
     }
     else
     {
-        for (i = 0; i<Num; i++)
+        for (i = 0; i < Num; i++)
         {
             if (x0 < x[i])
                 break;
@@ -27,8 +27,8 @@ void interpolation(const float *x, const float *y, int Num, float x0, float*y0)
             k = (float)y[index];
         else
             k = ((float)x0 - (float)x[index]) / ((float)x[index + 1] - (float)x[index])
-            *((float)y[index + 1] - (float)y[index])
-            + (float)y[index];
+                * ((float)y[index + 1] - (float)y[index])
+                + (float)y[index];
     }
 
     *y0 = k;
@@ -48,18 +48,18 @@ int interpolation(unsigned char *x, bool *y, int xNum, unsigned char x0, bool *y
         k = y[xNum - 2];
         index = xNum - 2;
     }
-    else{
-        for (i = 0; i<xNum; i++)
+    else {
+        for (i = 0; i < xNum; i++)
         {
             if (x0 < x[i])
                 break;
         }
 
         index = i - 1;
-        if (abs(x[index + 1] - x0)>abs(x0 - x[index])){
+        if (abs(x[index + 1] - x0) > abs(x0 - x[index])) {
             k = y[index - 1];
         }
-        else{
+        else {
             k = y[index];
         }
     }

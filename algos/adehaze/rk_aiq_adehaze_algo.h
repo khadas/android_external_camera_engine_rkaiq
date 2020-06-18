@@ -27,12 +27,12 @@
 
 RKAIQ_BEGIN_DECLARE
 
-   XCamReturn AdehazeInitV200(AdehazeHandle_t** para);
-	XCamReturn AdehazeReleaseV200(AdehazeHandle_t* para);
-	XCamReturn AdehazeConfigV200(const CalibDb_Dehaze_t * adhaz_html_para, AdehazeHandle_t* para,int iso);
-	XCamReturn AdehazePreProcV200(AdehazeHandle_t* para);
-	XCamReturn AdehazeProcessingV200(AdehazeHandle_t* para);
-	XCamReturn  AdehazeReConfigV200(AdehazeHandle_t *para,const CalibDb_Dehaze_t *calib_dehaze,int iso);
+XCamReturn AdehazeInitV200(AdehazeHandle_t** para);
+XCamReturn AdehazeReleaseV200(AdehazeHandle_t* para);
+XCamReturn AdehazeConfigV200(const CalibDb_Dehaze_t * adhaz_html_para, AdehazeHandle_t* para, int iso);
+XCamReturn AdehazePreProcV200(AdehazeHandle_t* para);
+XCamReturn AdehazeProcessingV200(AdehazeHandle_t* para);
+XCamReturn  AdehazeReConfigV200(AdehazeHandle_t *para, const CalibDb_Dehaze_t *calib_dehaze, int iso);
 
 RKAIQ_END_DECLARE
 

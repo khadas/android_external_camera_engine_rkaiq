@@ -4,39 +4,94 @@
 
 RKAIQ_BEGIN_DECLARE
 
-
-ANRresult_t init_bayernr_params(RKAnr_Bayernr_Params_t *pParams, CalibDb_BayerNr_t *pCalibdb)
+ANRresult_t bayernr_get_setting_idx_by_name(CalibDb_BayerNr_t *pCalibdb, char *name, int *setting_idx)
 {
-	ANRresult_t res = ANR_RET_SUCCESS;
 	int i = 0;
-	int j = 0;
-
-	LOGI_ANR("%s:(%d) oyyf bayerner xml config start\n", __FUNCTION__, __LINE__);
-	if(pParams == NULL){
-		LOGE_ANR("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
-		return ANR_RET_NULL_POINTER;
-	}
+	ANRresult_t res = ANR_RET_SUCCESS;
 
 	if(pCalibdb == NULL){
 		LOGE_ANR("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
 		return ANR_RET_NULL_POINTER;
 	}
 
-	//RKAnr_Bayernr_Params_t *pParams = &pANRCtx->stAuto.stBayernrParams;
-	//CalibDb_BayerNr_t *pCalibdb = &pANRConfig->stBayernrCalib;
+	if(name == NULL){
+		LOGE_ANR("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
+		return ANR_RET_NULL_POINTER;
+	}
+
+	if(setting_idx == NULL){
+		LOGE_ANR("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
+		return ANR_RET_NULL_POINTER;
+	}
+
+	for(i=0; i<CALIBDB_NR_SHARP_SETTING_LEVEL; i++){
+		if(strncmp(name, pCalibdb->setting[i].name, sizeof(pCalibdb->setting[i].name)) == 0){
+			break;
+		}
+	}
+
+	if(i<CALIBDB_NR_SHARP_SETTING_LEVEL){
+		*setting_idx = i;
+		res = ANR_RET_SUCCESS;
+	}else{
+		*setting_idx = 0;
+		res = ANR_RET_FAILURE;
+	}
+
+	LOGD_ANR("%s:%d snr_name:%s  snr_idx:%d i:%d \n", __FUNCTION__, __LINE__,name, *setting_idx, i);
+	return res;
+
+}
+
+ANRresult_t bayernr_config_setting_param(RKAnr_Bayernr_Params_t *pParams, CalibDb_BayerNr_t *pCalibdb, char * snr_name)
+{
+	ANRresult_t res = ANR_RET_SUCCESS;
+	int setting_idx = 0;
+
+	res = bayernr_get_setting_idx_by_name(pCalibdb, snr_name, &setting_idx);
+	if(res != ANR_RET_SUCCESS){
+		LOGW_ANR("%s(%d): error!!!  can't find setting in iq files, use 0 instead\n", __FUNCTION__, __LINE__);
+	}
+
+	res = init_bayernr_params(pParams, pCalibdb, setting_idx);
+
+	return res;
+
+}
+ANRresult_t init_bayernr_params(RKAnr_Bayernr_Params_t *pParams, CalibDb_BayerNr_t *pCalibdb, int setting_idx)
+{
+    ANRresult_t res = ANR_RET_SUCCESS;
+    int i = 0;
+    int j = 0;
+
+    LOGI_ANR("%s:(%d) oyyf bayerner xml config start\n", __FUNCTION__, __LINE__);
+    if(pParams == NULL) {
+        LOGE_ANR("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
+        return ANR_RET_NULL_POINTER;
+    }
+
+    if(pCalibdb == NULL) {
+        LOGE_ANR("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
+        return ANR_RET_NULL_POINTER;
+    }
+
+    //RKAnr_Bayernr_Params_t *pParams = &pANRCtx->stAuto.stBayernrParams;
+    //CalibDb_BayerNr_t *pCalibdb = &pANRConfig->stBayernrCalib;
+
+	CalibDb_BayerNR_Params_t *pSetting = &pCalibdb->setting[setting_idx];
 
 	for(i=0; i<MAX_ISO_STEP; i++){
 		#ifndef RK_SIMULATOR_HW
-		pParams->iso[i] = pCalibdb->iso[i];
+		pParams->iso[i] = pSetting->iso[i];
 		#endif
-		pParams->a[i] = pCalibdb->iso[i];
-		pParams->b[i] = pCalibdb->iso[i];
-		pParams->filtpar[i] = pCalibdb->filtPara[i];
+		pParams->a[i] = pSetting->iso[i];
+		pParams->b[i] = pSetting->iso[i];
+		pParams->filtpar[i] = pSetting->filtPara[i];
 		LOGI_ANR("a[%d]:%f filtpar[%d]:%f\n",
 			i, pParams->a[i],
 			i, pParams->filtpar[i]);
 	}
-	
+
 	pParams->halfpatch = 1;
 	pParams->halfblock = 1;
 
@@ -45,356 +100,356 @@ ANRresult_t init_bayernr_params(RKAnr_Bayernr_Params_t *pParams, CalibDb_BayerNr
 	}
 
 	for(i=0; i<8; i++){
-		pParams->luLevel[i] = pCalibdb->luLevelVal[i];
+		pParams->luLevel[i] = pSetting->luLevelVal[i];
 		LOGI_ANR("luLevel[%d]:%f \n",
 			i, pParams->luLevel[i]);
 	}
 
 	for(i = 0; i<MAX_ISO_STEP; i++){
 		for(j=0; j<8; j++){
-			pParams->luRatio[i][j] = pCalibdb->luRatio[j][i];
+			pParams->luRatio[i][j] = pSetting->luRatio[j][i];
 		}
 	}
 
 	for(i = 0; i<MAX_ISO_STEP; i++){
 		for(j=0; j<4; j++){
-			pParams->w[i][j] = pCalibdb->fixW[j][i];
+			pParams->w[i][j] = pSetting->fixW[j][i];
 		}
 	}
 
-	pParams->peaknoisesigma = pCalibdb->lamda;
-	pParams->sw_rawnr_gauss_en = pCalibdb->gauss_en;
-	pParams->rgain_offs = pCalibdb->RGainOff;
-	pParams->rgain_filp = pCalibdb->RGainFilp;
-	pParams->bgain_offs = pCalibdb->BGainOff;
-	pParams->bgain_filp = pCalibdb->BGainFilp;
-	pParams->bayernr_edgesoftness = pCalibdb->edgeSoftness;
-	pParams->bayernr_gauss_weight0 = pCalibdb->gaussWeight0;
-	pParams->bayernr_gauss_weight1 = pCalibdb->gaussWeight1;	
+	pParams->peaknoisesigma = pSetting->lamda;
+	pParams->sw_rawnr_gauss_en = pSetting->gauss_en;
+	pParams->rgain_offs = pSetting->RGainOff;
+	pParams->rgain_filp = pSetting->RGainFilp;
+	pParams->bgain_offs = pSetting->BGainOff;
+	pParams->bgain_filp = pSetting->BGainFilp;
+	pParams->bayernr_edgesoftness = pSetting->edgeSoftness;
+	pParams->bayernr_gauss_weight0 = pSetting->gaussWeight0;
+	pParams->bayernr_gauss_weight1 = pSetting->gaussWeight1;
 
 	memcpy(pParams->bayernr_ver_char,  pCalibdb->version, sizeof(pParams->bayernr_ver_char));
-	
+
 	LOGI_ANR("%s:(%d) oyyf bayerner xml config end!  ver:%s \n", __FUNCTION__, __LINE__, pParams->bayernr_ver_char);
 
 	return res;
 }
 
-
 ANRresult_t selsec_hdr_parmas_by_ISO(RKAnr_Bayernr_Params_t *stBayerNrParams, RKAnr_Bayernr_Params_Select_t *stBayerNrParamsSelected, ANRExpInfo_t *pExpInfo)
 {
-	float frameiso[3];
-	float frameEt[3];
-	float fdgain[3];
-	int i = 0;
+    float frameiso[3];
+    float frameEt[3];
+    float fdgain[3];
+    int i = 0;
 
-	if(stBayerNrParams == NULL){
-		LOGE_ANR("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
-		return ANR_RET_NULL_POINTER;
-	}
+    if(stBayerNrParams == NULL) {
+        LOGE_ANR("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
+        return ANR_RET_NULL_POINTER;
+    }
 
-	if(stBayerNrParamsSelected == NULL){
-		LOGE_ANR("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
-		return ANR_RET_NULL_POINTER;
-	}
+    if(stBayerNrParamsSelected == NULL) {
+        LOGE_ANR("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
+        return ANR_RET_NULL_POINTER;
+    }
 
-	if(pExpInfo == NULL){
-		LOGE_ANR("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
-		return ANR_RET_NULL_POINTER;
-	}
+    if(pExpInfo == NULL) {
+        LOGE_ANR("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
+        return ANR_RET_NULL_POINTER;
+    }
 
-	int framenum = pExpInfo->hdr_mode + 1;
-	
-	frameiso[0] = pExpInfo->arAGain[0] * pExpInfo->arDGain[0];
-	frameiso[1] = pExpInfo->arAGain[1] * pExpInfo->arDGain[1];
-	frameiso[2] = pExpInfo->arAGain[2] * pExpInfo->arDGain[2];
-	
-	frameEt[0] = pExpInfo->arTime[0];
-	frameEt[1] = pExpInfo->arTime[1];
-	frameEt[2] = pExpInfo->arTime[2];
-	
-	for(int j=0; j<framenum; j++)
+    int framenum = pExpInfo->hdr_mode + 1;
+
+    frameiso[0] = pExpInfo->arAGain[0] * pExpInfo->arDGain[0];
+    frameiso[1] = pExpInfo->arAGain[1] * pExpInfo->arDGain[1];
+    frameiso[2] = pExpInfo->arAGain[2] * pExpInfo->arDGain[2];
+
+    frameEt[0] = pExpInfo->arTime[0];
+    frameEt[1] = pExpInfo->arTime[1];
+    frameEt[2] = pExpInfo->arTime[2];
+
+    for(int j = 0; j < framenum; j++)
     {
-    	////降噪参数获取
-    	//确定iso等级
-    	//共有7个iso等级：50 100 200 400 800 1600 3200  6400 12800
-    	//		 isogain: 1   2   4   8   16   32  64  128  256
-    	//	 	isolevel: 0   1   2   3   4    5   6   7    8
-    	int isoGainStd[MAX_ISO_STEP];
-    	int isoGain=int(frameiso[j]);
-    	int isoGainLow=0;//向下一个isoGain,用做参数插值：y=float(isoGainHig-isoGain)/float(isoGainHig-isoGainLow)*y[isoLevelLow]
-    	//									+float(isoGain-isoGainLow)/float(isoGainHig-isoGainLow)*y[isoLevelHig];
-    	int isoGainHig=0;//向上一个isoGain
-    	int isoGainCorrect=1;//选择最近的一档iso的配置
+        ////降噪参数获取
+        //确定iso等级
+        //共有7个iso等级：50 100 200 400 800 1600 3200  6400 12800
+        //       isogain: 1   2   4   8   16   32  64  128  256
+        //      isolevel: 0   1   2   3   4    5   6   7    8
+        int isoGainStd[MAX_ISO_STEP];
+        int isoGain = int(frameiso[j]);
+        int isoGainLow = 0; //向下一个isoGain,用做参数插值：y=float(isoGainHig-isoGain)/float(isoGainHig-isoGainLow)*y[isoLevelLow]
+        //                                  +float(isoGain-isoGainLow)/float(isoGainHig-isoGainLow)*y[isoLevelHig];
+        int isoGainHig = 0; //向上一个isoGain
+        int isoGainCorrect = 1; //选择最近的一档iso的配置
 
-    	int isoLevelLow=0;
-    	int isoLevelHig=0;
-    	int isoLevelCorrect=0;
-		
-	#ifndef RK_SIMULATOR_HW
-	for(int i=0; i<MAX_ISO_STEP; i++){
-		isoGainStd[i] = stBayerNrParams->iso[i] / 50;
-	}
-	#else
-	for(int i=0; i<MAX_ISO_STEP; i++){
-		isoGainStd[i] = 1 * (1 << i);
-	}
-	#endif
+        int isoLevelLow = 0;
+        int isoLevelHig = 0;
+        int isoLevelCorrect = 0;
 
-    	for (i=0; i<MAX_ISO_STEP-1; i++)
-    	{
-    		if (isoGain>=isoGainStd[i] && isoGain<=isoGainStd[i+1])
-    		{
-    			isoGainLow = isoGainStd[i];
-    			isoGainHig = isoGainStd[i+1];
-    			isoLevelLow = i;
-    			isoLevelHig = i+1;
-    			isoGainCorrect = ((isoGain-isoGainStd[i])<=(isoGainStd[i+1]-isoGain)) ? isoGainStd[i] : isoGainStd[i+1];
-                isoLevelCorrect = ((isoGain-isoGainStd[i])<=(isoGainStd[i+1]-isoGain)) ? i : (i+1);
-    		}
-    	}
+#ifndef RK_SIMULATOR_HW
+        for(int i = 0; i < MAX_ISO_STEP; i++) {
+            isoGainStd[i] = stBayerNrParams->iso[i] / 50;
+        }
+#else
+        for(int i = 0; i < MAX_ISO_STEP; i++) {
+            isoGainStd[i] = 1 * (1 << i);
+        }
+#endif
 
-    	//VST变换参数, bilinear
-    	stBayerNrParamsSelected->a[j] = float(isoGainHig-isoGain)/float(isoGainHig-isoGainLow)*stBayerNrParams->a[isoLevelLow]
-    	+ float(isoGain-isoGainLow)/float(isoGainHig-isoGainLow)*stBayerNrParams->a[isoLevelHig];
+        for (i = 0; i < MAX_ISO_STEP - 1; i++)
+        {
+            if (isoGain >= isoGainStd[i] && isoGain <= isoGainStd[i + 1])
+            {
+                isoGainLow = isoGainStd[i];
+                isoGainHig = isoGainStd[i + 1];
+                isoLevelLow = i;
+                isoLevelHig = i + 1;
+                isoGainCorrect = ((isoGain - isoGainStd[i]) <= (isoGainStd[i + 1] - isoGain)) ? isoGainStd[i] : isoGainStd[i + 1];
+                isoLevelCorrect = ((isoGain - isoGainStd[i]) <= (isoGainStd[i + 1] - isoGain)) ? i : (i + 1);
+            }
+        }
 
-    	stBayerNrParamsSelected->b[j] = float(isoGainHig-isoGain)/float(isoGainHig-isoGainLow)*stBayerNrParams->b[isoLevelLow]
-    	+float(isoGain-isoGainLow)/float(isoGainHig-isoGainLow)*stBayerNrParams->b[isoLevelHig];
+        //VST变换参数, bilinear
+        stBayerNrParamsSelected->a[j] = float(isoGainHig - isoGain) / float(isoGainHig - isoGainLow) * stBayerNrParams->a[isoLevelLow]
+                                        + float(isoGain - isoGainLow) / float(isoGainHig - isoGainLow) * stBayerNrParams->a[isoLevelHig];
 
-    	stBayerNrParamsSelected->b[j] = 0;
-    	stBayerNrParamsSelected->t0[j] = 0;
+        stBayerNrParamsSelected->b[j] = float(isoGainHig - isoGain) / float(isoGainHig - isoGainLow) * stBayerNrParams->b[isoLevelLow]
+                                        + float(isoGain - isoGainLow) / float(isoGainHig - isoGainLow) * stBayerNrParams->b[isoLevelHig];
 
-    	stBayerNrParamsSelected->filtPar[j] = float(isoGainHig-isoGain)/float(isoGainHig-isoGainLow)*stBayerNrParams->filtpar[isoLevelLow]
-    	+float(isoGain-isoGainLow)/float(isoGainHig-isoGainLow)*stBayerNrParams->filtpar[isoLevelHig];
+        stBayerNrParamsSelected->b[j] = 0;
+        stBayerNrParamsSelected->t0[j] = 0;
+
+        stBayerNrParamsSelected->filtPar[j] = float(isoGainHig - isoGain) / float(isoGainHig - isoGainLow) * stBayerNrParams->filtpar[isoLevelLow]
+                                              + float(isoGain - isoGainLow) / float(isoGainHig - isoGainLow) * stBayerNrParams->filtpar[isoLevelHig];
 
     }
 
-	for (i=0;i<framenum;i++){
-		frameiso[i] = frameiso[i] * 50;
-		fdgain[i] = frameiso[i] * frameEt[i];
-	}
+    for (i = 0; i < framenum; i++) {
+        frameiso[i] = frameiso[i] * 50;
+        fdgain[i] = frameiso[i] * frameEt[i];
+    }
 
-	for (i=0;i<framenum;i++){
-		fdgain[i] = fdgain[framenum-1]/fdgain[i];
-		#if 0
-		stBayerNrParamsSelected->sw_dgain[i] = fdgain[i];
-		#else
-		stBayerNrParamsSelected->sw_dgain[i] = sqrt(fdgain[i]);
-		#endif
-	}
+    for (i = 0; i < framenum; i++) {
+        fdgain[i] = fdgain[framenum - 1] / fdgain[i];
+#if 0
+        stBayerNrParamsSelected->sw_dgain[i] = fdgain[i];
+#else
+        stBayerNrParamsSelected->sw_dgain[i] = sqrt(fdgain[i]);
+#endif
+    }
 
-	float filtParDiscount = (float)0.1;
-	for (i=0; i<framenum; i++)
-	{
-		float gainsqrt = sqrt(fdgain[i]);
-		#if 0
-		float par = (stBayerNrParamsSelected->filtPar[i] * filtParDiscount);
+    float filtParDiscount = (float)0.1;
+    for (i = 0; i < framenum; i++)
+    {
+        float gainsqrt = sqrt(fdgain[i]);
+#if 0
+        float par = (stBayerNrParamsSelected->filtPar[i] * filtParDiscount);
 
-		LOGD_ANR("gainsqrt:%f filtpar:%f, total:%f\n", 
-			gainsqrt, stBayerNrParamsSelected->filtPar[i], par*gainsqrt);
-		stBayerNrParamsSelected->filtPar[i] = par * gainsqrt;
-		#else
-		stBayerNrParamsSelected->filtPar[i] = stBayerNrParamsSelected->filtPar[i] * gainsqrt;
-		#endif
-	}
+        LOGD_ANR("gainsqrt:%f filtpar:%f, total:%f\n",
+                 gainsqrt, stBayerNrParamsSelected->filtPar[i], par * gainsqrt);
+        stBayerNrParamsSelected->filtPar[i] = par * gainsqrt;
+#else
+        stBayerNrParamsSelected->filtPar[i] = stBayerNrParamsSelected->filtPar[i] * gainsqrt;
+#endif
+    }
 
-	if(framenum <= 1 ){
-		stBayerNrParamsSelected->gausskparsq = int((1*1)*float(1<<(FIXNLMCALC)))*(1 << 7);
-	}else{
-		stBayerNrParamsSelected->gausskparsq = int((1*1)*float(1<<(FIXNLMCALC)));
-	}
-	stBayerNrParamsSelected->sigmaPar = 0*(1<<FIXNLMCALC);
-	stBayerNrParamsSelected->thld_diff = (int(LUTMAXM1_FIX*LUTPRECISION_FIX));
-	stBayerNrParamsSelected->thld_chanelw = int(0.1*float(1<<FIXNLMCALC));
-	stBayerNrParamsSelected->pix_diff = FIXDIFMAX - 1;
-	stBayerNrParamsSelected->log_bypass = 0;	//0 is none, 1 is G and RB all en,  2 only en G, 3 only RB;
+    if(framenum <= 1 ) {
+        stBayerNrParamsSelected->gausskparsq = int((1 * 1) * float(1 << (FIXNLMCALC))) * (1 << 7);
+    } else {
+        stBayerNrParamsSelected->gausskparsq = int((1 * 1) * float(1 << (FIXNLMCALC)));
+    }
+    stBayerNrParamsSelected->sigmaPar = 0 * (1 << FIXNLMCALC);
+    stBayerNrParamsSelected->thld_diff = (int(LUTMAXM1_FIX * LUTPRECISION_FIX));
+    stBayerNrParamsSelected->thld_chanelw = int(0.1 * float(1 << FIXNLMCALC));
+    stBayerNrParamsSelected->pix_diff = FIXDIFMAX - 1;
+    stBayerNrParamsSelected->log_bypass = 0;    //0 is none, 1 is G and RB all en,  2 only en G, 3 only RB;
 
-	return ANR_RET_SUCCESS;
+    return ANR_RET_SUCCESS;
 }
 
 ANRresult_t select_bayernr_params_by_ISO(RKAnr_Bayernr_Params_t *stBayerNrParams, RKAnr_Bayernr_Params_Select_t *stBayerNrParamsSelected, ANRExpInfo_t *pExpInfo)
 {
-	ANRresult_t res = ANR_RET_SUCCESS;
-	int iso = 50;
-	
-	if(stBayerNrParams == NULL){
-		LOGE_ANR("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
-		return ANR_RET_NULL_POINTER;
-	}
+    ANRresult_t res = ANR_RET_SUCCESS;
+    int iso = 50;
 
-	if(stBayerNrParamsSelected == NULL){
-		LOGE_ANR("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
-		return ANR_RET_NULL_POINTER;
-	}
+    if(stBayerNrParams == NULL) {
+        LOGE_ANR("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
+        return ANR_RET_NULL_POINTER;
+    }
 
-	if(pExpInfo == NULL){
-		LOGE_ANR("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
-		return ANR_RET_NULL_POINTER;
-	}
+    if(stBayerNrParamsSelected == NULL) {
+        LOGE_ANR("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
+        return ANR_RET_NULL_POINTER;
+    }
 
-	iso = pExpInfo->arIso[pExpInfo->hdr_mode];
+    if(pExpInfo == NULL) {
+        LOGE_ANR("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
+        return ANR_RET_NULL_POINTER;
+    }
 
-	LOGD_ANR("%s:%d iso:%d \n", __FUNCTION__, __LINE__, iso);
+    iso = pExpInfo->arIso[pExpInfo->hdr_mode];
 
-	int isoGainStd[MAX_ISO_STEP];
-	int isoGain=MAX(int(iso/50),1);
-	int isoGainLow=0;
-	int isoGainHig=0;
-	int isoGainCorrect=1;
-	int isoLevelLow=0;
-	int isoLevelHig=0;
-	int isoLevelCorrect=0;
-	int i, j;
+    LOGD_ANR("%s:%d iso:%d \n", __FUNCTION__, __LINE__, iso);
 
-	#ifndef RK_SIMULATOR_HW
-	for(int i=0; i<MAX_ISO_STEP; i++){
-		isoGainStd[i] = stBayerNrParams->iso[i] / 50;
-	}
-	#else
-	for(int i=0; i<MAX_ISO_STEP; i++){
-		isoGainStd[i] = 1 * (1 << i);
-	}
-	#endif
-	
-	
-	for (i=0; i< MAX_ISO_STEP - 1; i++)
-	{
-		if (isoGain>=isoGainStd[i] && isoGain<=isoGainStd[i+1])
-		{
-			isoGainLow=isoGainStd[i];
-			isoGainHig=isoGainStd[i+1];
-			isoLevelLow=i;
-			isoLevelHig=i+1;
-			isoGainCorrect = ((isoGain-isoGainStd[i])<=(isoGainStd[i+1]-isoGain)) ? isoGainStd[i] : isoGainStd[i+1];
-            		isoLevelCorrect = ((isoGain-isoGainStd[i])<=(isoGainStd[i+1]-isoGain)) ? i : (i+1);
-		}
-	}
+    int isoGainStd[MAX_ISO_STEP];
+    int isoGain = MAX(int(iso / 50), 1);
+    int isoGainLow = 0;
+    int isoGainHig = 0;
+    int isoGainCorrect = 1;
+    int isoLevelLow = 0;
+    int isoLevelHig = 0;
+    int isoLevelCorrect = 0;
+    int i, j;
 
-	LOGD_ANR("%s:%d iso:%d high:%d low:%d\n", 
-		__FUNCTION__, __LINE__,
-		isoGain, isoGainHig, isoGainLow);
-
-	//VST变换参数, bilinear
-	stBayerNrParamsSelected->a[0] = float(isoGainHig-isoGain)/float(isoGainHig-isoGainLow)*stBayerNrParams->a[isoLevelLow]
-	+ float(isoGain-isoGainLow)/float(isoGainHig-isoGainLow)*stBayerNrParams->a[isoLevelHig];
-
-	stBayerNrParamsSelected->b[0]=float(isoGainHig-isoGain)/float(isoGainHig-isoGainLow)*stBayerNrParams->b[isoLevelLow]
-	+float(isoGain-isoGainLow)/float(isoGainHig-isoGainLow)*stBayerNrParams->b[isoLevelHig];
-
-	stBayerNrParamsSelected->b[0]=0;
-	stBayerNrParamsSelected->t0[0]=0;
-
-	//领域halfBlock、搜索halfBlock、降噪系数filtPar,其中halfPatch和halfBlock都是对单通道而言
-	stBayerNrParamsSelected->halfPatch=stBayerNrParams->halfpatch;
-	stBayerNrParamsSelected->halfBlock=stBayerNrParams->halfblock;
-
-	stBayerNrParamsSelected->filtPar[0]=float(isoGainHig-isoGain)/float(isoGainHig-isoGainLow)*stBayerNrParams->filtpar[isoLevelLow]
-	+float(isoGain-isoGainLow)/float(isoGainHig-isoGainLow)*stBayerNrParams->filtpar[isoLevelHig];
-
-#ifdef BAYER_NR_DEBUG
-	LOGD_ANR("Patch=%d*%d\n",stBayerNrParamsSelected->halfPatch*2+1,stBayerNrParamsSelected->halfPatch*2+1);
-	LOGD_ANR("Block=%d*%d\n",stBayerNrParamsSelected->halfBlock*2+1,stBayerNrParamsSelected->halfBlock*2+1);
-	LOGD_ANR("filPar=%f\n",stBayerNrParamsSelected->filtPar);
+#ifndef RK_SIMULATOR_HW
+    for(int i = 0; i < MAX_ISO_STEP; i++) {
+        isoGainStd[i] = stBayerNrParams->iso[i] / 50;
+    }
+#else
+    for(int i = 0; i < MAX_ISO_STEP; i++) {
+        isoGainStd[i] = 1 * (1 << i);
+    }
 #endif
 
-	for (i=0;i<7;i++)
-	{
-		stBayerNrParamsSelected->ctrPit[i]=stBayerNrParams->ctrPit[i];
-	}
 
-	for (i=0;i<8;i++)
-	{
-		stBayerNrParamsSelected->luLevel[i]=stBayerNrParams->luLevel[i];
-		stBayerNrParamsSelected->luRatio[i]=float(isoGainHig-isoGain)/float(isoGainHig-isoGainLow)*stBayerNrParams->luRatio[isoLevelLow][i]
-		+float(isoGain-isoGainLow)/float(isoGainHig-isoGainLow)*stBayerNrParams->luRatio[isoLevelHig][i];
-	}
+    for (i = 0; i < MAX_ISO_STEP - 1; i++)
+    {
+        if (isoGain >= isoGainStd[i] && isoGain <= isoGainStd[i + 1])
+        {
+            isoGainLow = isoGainStd[i];
+            isoGainHig = isoGainStd[i + 1];
+            isoLevelLow = i;
+            isoLevelHig = i + 1;
+            isoGainCorrect = ((isoGain - isoGainStd[i]) <= (isoGainStd[i + 1] - isoGain)) ? isoGainStd[i] : isoGainStd[i + 1];
+            isoLevelCorrect = ((isoGain - isoGainStd[i]) <= (isoGainStd[i + 1] - isoGain)) ? i : (i + 1);
+        }
+    }
 
-	stBayerNrParamsSelected->peaknoisesigma=stBayerNrParams->peaknoisesigma;
-	stBayerNrParamsSelected->sw_rawnr_gauss_en=stBayerNrParams->sw_rawnr_gauss_en;
-	for (i=0;i<4;i++)
-	{
-		stBayerNrParamsSelected->w[i]=float(isoGainHig-isoGain)/float(isoGainHig-isoGainLow)*stBayerNrParams->w[isoLevelLow][i]
-		+float(isoGain-isoGainLow)/float(isoGainHig-isoGainLow)*stBayerNrParams->w[isoLevelHig][i];
-	}
-	stBayerNrParamsSelected->bayernr_edgesoftness = stBayerNrParams->bayernr_edgesoftness;
-	
-	stBayerNrParamsSelected->sw_bayernr_edge_filter_en = stBayerNrParams->sw_bayernr_edge_filter_en;
-	for (i=0;i<8;i++)
-	{
-		stBayerNrParamsSelected->sw_bayernr_edge_filter_lumapoint[i] = stBayerNrParams->sw_bayernr_edge_filter_lumapoint[i];
-		stBayerNrParamsSelected->sw_bayernr_edge_filter_wgt[i] = float(isoGainHig-isoGain)/float(isoGainHig-isoGainLow)*stBayerNrParams->sw_bayernr_edge_filter_wgt[isoLevelLow][i]
-		+float(isoGain-isoGainLow)/float(isoGainHig-isoGainLow)*stBayerNrParams->sw_bayernr_edge_filter_wgt[isoLevelHig][i];
-	}
-	stBayerNrParamsSelected->sw_bayernr_filter_strength = float(isoGainHig-isoGain)/float(isoGainHig-isoGainLow)*stBayerNrParams->sw_bayernr_filter_strength[isoLevelLow]
-	+float(isoGain-isoGainLow)/float(isoGainHig-isoGainLow)*stBayerNrParams->sw_bayernr_filter_strength[isoLevelHig];
-	for (i=0;i<16;i++)
-	{
-		stBayerNrParamsSelected->sw_bayernr_filter_lumapoint[i] = stBayerNrParams->sw_bayernr_filter_lumapoint[i];
-		stBayerNrParamsSelected->sw_bayernr_filter_sigma[i] = float(isoGainHig-isoGain)/float(isoGainHig-isoGainLow)*stBayerNrParams->sw_bayernr_filter_sigma[isoLevelLow][i]
-		+float(isoGain-isoGainLow)/float(isoGainHig-isoGainLow)*stBayerNrParams->sw_bayernr_filter_sigma[isoLevelHig][i];
-	}
-	stBayerNrParamsSelected->sw_bayernr_filter_edgesofts = float(isoGainHig-isoGain)/float(isoGainHig-isoGainLow)*stBayerNrParams->sw_bayernr_filter_edgesofts[isoLevelLow]
-	+float(isoGain-isoGainLow)/float(isoGainHig-isoGainLow)*stBayerNrParams->sw_bayernr_filter_edgesofts[isoLevelHig];
-	stBayerNrParamsSelected->sw_bayernr_filter_soft_threshold_ratio = float(isoGainHig-isoGain)/float(isoGainHig-isoGainLow)*stBayerNrParams->sw_bayernr_filter_soft_threshold_ratio[isoLevelLow]
-	+float(isoGain-isoGainLow)/float(isoGainHig-isoGainLow)*stBayerNrParams->sw_bayernr_filter_soft_threshold_ratio[isoLevelHig];
-	stBayerNrParamsSelected->sw_bayernr_filter_out_wgt = float(isoGainHig-isoGain)/float(isoGainHig-isoGainLow)*stBayerNrParams->sw_bayernr_filter_out_wgt[isoLevelLow]
-	+float(isoGain-isoGainLow)/float(isoGainHig-isoGainLow)*stBayerNrParams->sw_bayernr_filter_out_wgt[isoLevelHig];
+    LOGD_ANR("%s:%d iso:%d high:%d low:%d\n",
+             __FUNCTION__, __LINE__,
+             isoGain, isoGainHig, isoGainLow);
 
-	//oyyf: add some fix params select 
-	memcpy(stBayerNrParamsSelected->bayernr_ver_char, stBayerNrParams->bayernr_ver_char, sizeof(stBayerNrParams->bayernr_ver_char));
-	stBayerNrParamsSelected->rgain_offs = stBayerNrParams->rgain_offs;
+    //VST变换参数, bilinear
+    stBayerNrParamsSelected->a[0] = float(isoGainHig - isoGain) / float(isoGainHig - isoGainLow) * stBayerNrParams->a[isoLevelLow]
+                                    + float(isoGain - isoGainLow) / float(isoGainHig - isoGainLow) * stBayerNrParams->a[isoLevelHig];
+
+    stBayerNrParamsSelected->b[0] = float(isoGainHig - isoGain) / float(isoGainHig - isoGainLow) * stBayerNrParams->b[isoLevelLow]
+                                    + float(isoGain - isoGainLow) / float(isoGainHig - isoGainLow) * stBayerNrParams->b[isoLevelHig];
+
+    stBayerNrParamsSelected->b[0] = 0;
+    stBayerNrParamsSelected->t0[0] = 0;
+
+    //领域halfBlock、搜索halfBlock、降噪系数filtPar,其中halfPatch和halfBlock都是对单通道而言
+    stBayerNrParamsSelected->halfPatch = stBayerNrParams->halfpatch;
+    stBayerNrParamsSelected->halfBlock = stBayerNrParams->halfblock;
+
+    stBayerNrParamsSelected->filtPar[0] = float(isoGainHig - isoGain) / float(isoGainHig - isoGainLow) * stBayerNrParams->filtpar[isoLevelLow]
+                                          + float(isoGain - isoGainLow) / float(isoGainHig - isoGainLow) * stBayerNrParams->filtpar[isoLevelHig];
+
+#ifdef BAYER_NR_DEBUG
+    LOGD_ANR("Patch=%d*%d\n", stBayerNrParamsSelected->halfPatch * 2 + 1, stBayerNrParamsSelected->halfPatch * 2 + 1);
+    LOGD_ANR("Block=%d*%d\n", stBayerNrParamsSelected->halfBlock * 2 + 1, stBayerNrParamsSelected->halfBlock * 2 + 1);
+    LOGD_ANR("filPar=%f\n", stBayerNrParamsSelected->filtPar);
+#endif
+
+    for (i = 0; i < 7; i++)
+    {
+        stBayerNrParamsSelected->ctrPit[i] = stBayerNrParams->ctrPit[i];
+    }
+
+    for (i = 0; i < 8; i++)
+    {
+        stBayerNrParamsSelected->luLevel[i] = stBayerNrParams->luLevel[i];
+        stBayerNrParamsSelected->luRatio[i] = float(isoGainHig - isoGain) / float(isoGainHig - isoGainLow) * stBayerNrParams->luRatio[isoLevelLow][i]
+                                              + float(isoGain - isoGainLow) / float(isoGainHig - isoGainLow) * stBayerNrParams->luRatio[isoLevelHig][i];
+    }
+
+    stBayerNrParamsSelected->peaknoisesigma = stBayerNrParams->peaknoisesigma;
+    stBayerNrParamsSelected->sw_rawnr_gauss_en = stBayerNrParams->sw_rawnr_gauss_en;
+    for (i = 0; i < 4; i++)
+    {
+        stBayerNrParamsSelected->w[i] = float(isoGainHig - isoGain) / float(isoGainHig - isoGainLow) * stBayerNrParams->w[isoLevelLow][i]
+                                        + float(isoGain - isoGainLow) / float(isoGainHig - isoGainLow) * stBayerNrParams->w[isoLevelHig][i];
+    }
+    stBayerNrParamsSelected->bayernr_edgesoftness = stBayerNrParams->bayernr_edgesoftness;
+
+    stBayerNrParamsSelected->sw_bayernr_edge_filter_en = stBayerNrParams->sw_bayernr_edge_filter_en;
+    for (i = 0; i < 8; i++)
+    {
+        stBayerNrParamsSelected->sw_bayernr_edge_filter_lumapoint[i] = stBayerNrParams->sw_bayernr_edge_filter_lumapoint[i];
+        stBayerNrParamsSelected->sw_bayernr_edge_filter_wgt[i] = float(isoGainHig - isoGain) / float(isoGainHig - isoGainLow) * stBayerNrParams->sw_bayernr_edge_filter_wgt[isoLevelLow][i]
+                + float(isoGain - isoGainLow) / float(isoGainHig - isoGainLow) * stBayerNrParams->sw_bayernr_edge_filter_wgt[isoLevelHig][i];
+    }
+    stBayerNrParamsSelected->sw_bayernr_filter_strength = float(isoGainHig - isoGain) / float(isoGainHig - isoGainLow) * stBayerNrParams->sw_bayernr_filter_strength[isoLevelLow]
+            + float(isoGain - isoGainLow) / float(isoGainHig - isoGainLow) * stBayerNrParams->sw_bayernr_filter_strength[isoLevelHig];
+    for (i = 0; i < 16; i++)
+    {
+        stBayerNrParamsSelected->sw_bayernr_filter_lumapoint[i] = stBayerNrParams->sw_bayernr_filter_lumapoint[i];
+        stBayerNrParamsSelected->sw_bayernr_filter_sigma[i] = float(isoGainHig - isoGain) / float(isoGainHig - isoGainLow) * stBayerNrParams->sw_bayernr_filter_sigma[isoLevelLow][i]
+                + float(isoGain - isoGainLow) / float(isoGainHig - isoGainLow) * stBayerNrParams->sw_bayernr_filter_sigma[isoLevelHig][i];
+    }
+    stBayerNrParamsSelected->sw_bayernr_filter_edgesofts = float(isoGainHig - isoGain) / float(isoGainHig - isoGainLow) * stBayerNrParams->sw_bayernr_filter_edgesofts[isoLevelLow]
+            + float(isoGain - isoGainLow) / float(isoGainHig - isoGainLow) * stBayerNrParams->sw_bayernr_filter_edgesofts[isoLevelHig];
+    stBayerNrParamsSelected->sw_bayernr_filter_soft_threshold_ratio = float(isoGainHig - isoGain) / float(isoGainHig - isoGainLow) * stBayerNrParams->sw_bayernr_filter_soft_threshold_ratio[isoLevelLow]
+            + float(isoGain - isoGainLow) / float(isoGainHig - isoGainLow) * stBayerNrParams->sw_bayernr_filter_soft_threshold_ratio[isoLevelHig];
+    stBayerNrParamsSelected->sw_bayernr_filter_out_wgt = float(isoGainHig - isoGain) / float(isoGainHig - isoGainLow) * stBayerNrParams->sw_bayernr_filter_out_wgt[isoLevelLow]
+            + float(isoGain - isoGainLow) / float(isoGainHig - isoGainLow) * stBayerNrParams->sw_bayernr_filter_out_wgt[isoLevelHig];
+
+    //oyyf: add some fix params select
+    memcpy(stBayerNrParamsSelected->bayernr_ver_char, stBayerNrParams->bayernr_ver_char, sizeof(stBayerNrParams->bayernr_ver_char));
+    stBayerNrParamsSelected->rgain_offs = stBayerNrParams->rgain_offs;
     stBayerNrParamsSelected->rgain_filp = stBayerNrParams->rgain_filp;
     stBayerNrParamsSelected->bgain_offs = stBayerNrParams->bgain_offs;
     stBayerNrParamsSelected->bgain_filp = stBayerNrParams->bgain_filp;
 
-	stBayerNrParamsSelected->bayernr_gauss_weight0 = stBayerNrParams->bayernr_gauss_weight0;
-	stBayerNrParamsSelected->bayernr_gauss_weight1 = stBayerNrParams->bayernr_gauss_weight1;
+    stBayerNrParamsSelected->bayernr_gauss_weight0 = stBayerNrParams->bayernr_gauss_weight0;
+    stBayerNrParamsSelected->bayernr_gauss_weight1 = stBayerNrParams->bayernr_gauss_weight1;
 
-	stBayerNrParamsSelected->gausskparsq = int((1.15*1.15)*float(1<<(FIXNLMCALC)));
-	stBayerNrParamsSelected->sigmaPar = 0*(1<<FIXNLMCALC);
-	stBayerNrParamsSelected->thld_diff = (int(LUTMAXM1_FIX*LUTPRECISION_FIX));
-	stBayerNrParamsSelected->thld_chanelw = int(0.1*float(1<<FIXNLMCALC));
-	stBayerNrParamsSelected->pix_diff = FIXDIFMAX - 1;
-	stBayerNrParamsSelected->log_bypass = 0;	//0 is none, 1 is G and RB all en,  2 only en G, 3 only RB;
+    stBayerNrParamsSelected->gausskparsq = int((1.15 * 1.15) * float(1 << (FIXNLMCALC)));
+    stBayerNrParamsSelected->sigmaPar = 0 * (1 << FIXNLMCALC);
+    stBayerNrParamsSelected->thld_diff = (int(LUTMAXM1_FIX * LUTPRECISION_FIX));
+    stBayerNrParamsSelected->thld_chanelw = int(0.1 * float(1 << FIXNLMCALC));
+    stBayerNrParamsSelected->pix_diff = FIXDIFMAX - 1;
+    stBayerNrParamsSelected->log_bypass = 0;    //0 is none, 1 is G and RB all en,  2 only en G, 3 only RB;
 
-	//oyyf: if hdr open
-	selsec_hdr_parmas_by_ISO(stBayerNrParams, stBayerNrParamsSelected, pExpInfo);
+    //oyyf: if hdr open
+    selsec_hdr_parmas_by_ISO(stBayerNrParams, stBayerNrParamsSelected, pExpInfo);
 
-	return res;
+    return res;
 }
 
 
 unsigned short bayernr_get_trans(int tmpfix)
 {
-	int logtablef[65] = {0,1465,2909,4331,5731,7112,8472,9813,11136,12440,
-		13726,14995,16248,17484,18704,19908,21097,22272,23432,24578,25710,
-		26829,27935,29028,30109,31177,32234,33278,34312,35334,36345,37346,
-		38336,39315,40285,41245,42195,43136,44068,44990,45904,46808,47704,
-		48592,49472,50343,51207,52062,52910,53751,54584,55410,56228,57040,
-		57844,58642,59433,60218,60996,61768,62534,63293,64047,64794,65536};
-	int logprecision = 6;
+    int logtablef[65] = {0, 1465, 2909, 4331, 5731, 7112, 8472, 9813, 11136, 12440,
+                         13726, 14995, 16248, 17484, 18704, 19908, 21097, 22272, 23432, 24578, 25710,
+                         26829, 27935, 29028, 30109, 31177, 32234, 33278, 34312, 35334, 36345, 37346,
+                         38336, 39315, 40285, 41245, 42195, 43136, 44068, 44990, 45904, 46808, 47704,
+                         48592, 49472, 50343, 51207, 52062, 52910, 53751, 54584, 55410, 56228, 57040,
+                         57844, 58642, 59433, 60218, 60996, 61768, 62534, 63293, 64047, 64794, 65536
+                        };
+    int logprecision = 6;
     int logfixbit = 16;
     int logtblbit = 16;
     int logscalebit = 12;
-	int logfixmul = (1<<logfixbit);
-	long long x8, one = 1;
-	long long gx, n = 0, ix1, ix2, dp;
-	long long lt1, lt2, dx, fx;
-	int i, j = 1;
-	
-    x8 = tmpfix + (1<<8);
-    // find highest bit
-	for (i = 0; i<32; i++)
-	{
-		if (x8&j)
-		{
-			n = i;
-		}
-		j = j << 1;
-	}
+    int logfixmul = (1 << logfixbit);
+    long long x8, one = 1;
+    long long gx, n = 0, ix1, ix2, dp;
+    long long lt1, lt2, dx, fx;
+    int i, j = 1;
 
-    gx = x8 - (one<<n);
-    gx = gx * (one<<logprecision) * logfixmul;
-    gx = gx/(one<<n);
+    x8 = tmpfix + (1 << 8);
+    // find highest bit
+    for (i = 0; i < 32; i++)
+    {
+        if (x8 & j)
+        {
+            n = i;
+        }
+        j = j << 1;
+    }
+
+    gx = x8 - (one << n);
+    gx = gx * (one << logprecision) * logfixmul;
+    gx = gx / (one << n);
 
     ix1 = gx >> logfixbit;
     dp = gx - ix1 * logfixmul;
@@ -404,214 +459,214 @@ unsigned short bayernr_get_trans(int tmpfix)
     lt1 = logtablef[ix1];
     lt2 = logtablef[ix2];
 
-    dx = lt1*(logfixmul-dp) + lt2*dp;
+    dx = lt1 * (logfixmul - dp) + lt2 * dp;
 
-    fx = dx + (n-8)*(one<<(logfixbit+logtblbit));
-    fx = fx + (one<<(logfixbit+logtblbit-logscalebit-1));
-    fx = fx >> (logfixbit+logtblbit-logscalebit);
+    fx = dx + (n - 8) * (one << (logfixbit + logtblbit));
+    fx = fx + (one << (logfixbit + logtblbit - logscalebit - 1));
+    fx = fx >> (logfixbit + logtblbit - logscalebit);
 
-	return fx;
+    return fx;
 }
 
 ANRresult_t bayernr_fix_tranfer(RKAnr_Bayernr_Params_Select_t* rawnr, RKAnr_Bayernr_Fix_t *pRawnrCfg)
 {
-	ANRresult_t res = ANR_RET_SUCCESS;
-	int rawbit = 12;//rawBit;
-	float tmp;
+    ANRresult_t res = ANR_RET_SUCCESS;
+    int rawbit = 12;//rawBit;
+    float tmp;
 
-	LOGI_ANR("%s:(%d) enter \n", __FUNCTION__, __LINE__);
-	
-	if(rawnr == NULL){
-		LOGE_ANR("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
-		return ANR_RET_NULL_POINTER;
-	}
+    LOGI_ANR("%s:(%d) enter \n", __FUNCTION__, __LINE__);
 
-	if(pRawnrCfg == NULL){
-		LOGE_ANR("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
-		return ANR_RET_NULL_POINTER;
-	}	
-	
-	//(0x0004)
-	pRawnrCfg->gauss_en = rawnr->sw_rawnr_gauss_en;
-	pRawnrCfg->log_bypass = rawnr->log_bypass;
+    if(rawnr == NULL) {
+        LOGE_ANR("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
+        return ANR_RET_NULL_POINTER;
+    }
 
-	//(0x0008 - 0x00010)
-	pRawnrCfg->filtpar0 = (unsigned short)(rawnr->filtPar[0] * (1<<FIXNLMCALC));
-	pRawnrCfg->filtpar1 = (unsigned short)(rawnr->filtPar[1] * (1<<FIXNLMCALC));
-	pRawnrCfg->filtpar2 = (unsigned short)(rawnr->filtPar[2] * (1<<FIXNLMCALC));
-	if(pRawnrCfg->filtpar0 > 0x3fff){
-		pRawnrCfg->filtpar0 =  0x3fff;
-	}
-	if(pRawnrCfg->filtpar1 > 0x3fff){
-		pRawnrCfg->filtpar1 =  0x3fff;
-	}
-	if(pRawnrCfg->filtpar2 > 0x3fff){
-		pRawnrCfg->filtpar2 =  0x3fff;
-	}
+    if(pRawnrCfg == NULL) {
+        LOGE_ANR("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
+        return ANR_RET_NULL_POINTER;
+    }
 
-	//(0x0014 - 0x0001c)
-	pRawnrCfg->dgain0 = (unsigned int)(rawnr->sw_dgain[0] * (1<<FIXNLMCALC));
-	pRawnrCfg->dgain1 = (unsigned int)(rawnr->sw_dgain[1] * (1<<FIXNLMCALC));
-	pRawnrCfg->dgain2 = (unsigned int)(rawnr->sw_dgain[2] * (1<<FIXNLMCALC));
-	if(pRawnrCfg->dgain0 > 0x3ffff){
-		pRawnrCfg->dgain0 =  0x3ffff;
-	}
-	if(pRawnrCfg->dgain1 > 0x3ffff){
-		pRawnrCfg->dgain1 =  0x3ffff;
-	}
-	if(pRawnrCfg->dgain2 > 0x3ffff){
-		pRawnrCfg->dgain2 =  0x3ffff;
-	}
-	
+    //(0x0004)
+    pRawnrCfg->gauss_en = rawnr->sw_rawnr_gauss_en;
+    pRawnrCfg->log_bypass = rawnr->log_bypass;
 
-	//(0x0020 - 0x0002c)
-	for(int i=0; i<8; i++){
-		pRawnrCfg->luration[i] = (unsigned short)(rawnr->luRatio[i] * (1<<FIXNLMCALC));
-	}
+    //(0x0008 - 0x00010)
+    pRawnrCfg->filtpar0 = (unsigned short)(rawnr->filtPar[0] * (1 << FIXNLMCALC));
+    pRawnrCfg->filtpar1 = (unsigned short)(rawnr->filtPar[1] * (1 << FIXNLMCALC));
+    pRawnrCfg->filtpar2 = (unsigned short)(rawnr->filtPar[2] * (1 << FIXNLMCALC));
+    if(pRawnrCfg->filtpar0 > 0x3fff) {
+        pRawnrCfg->filtpar0 =  0x3fff;
+    }
+    if(pRawnrCfg->filtpar1 > 0x3fff) {
+        pRawnrCfg->filtpar1 =  0x3fff;
+    }
+    if(pRawnrCfg->filtpar2 > 0x3fff) {
+        pRawnrCfg->filtpar2 =  0x3fff;
+    }
 
-	//(0x0030 - 0x0003c)
-	for(int i=0; i<8; i++){		
-		tmp = rawnr->luLevel[i] * ( 1<<(rawbit - 8) );
-		pRawnrCfg->lulevel[i] = bayernr_get_trans((int)tmp);
-	}
-	tmp = (float)((1<<rawbit) - 1);
-    pRawnrCfg->lulevel[8 - 1] = bayernr_get_trans((int)tmp); 
+    //(0x0014 - 0x0001c)
+    pRawnrCfg->dgain0 = (unsigned int)(rawnr->sw_dgain[0] * (1 << FIXNLMCALC));
+    pRawnrCfg->dgain1 = (unsigned int)(rawnr->sw_dgain[1] * (1 << FIXNLMCALC));
+    pRawnrCfg->dgain2 = (unsigned int)(rawnr->sw_dgain[2] * (1 << FIXNLMCALC));
+    if(pRawnrCfg->dgain0 > 0x3ffff) {
+        pRawnrCfg->dgain0 =  0x3ffff;
+    }
+    if(pRawnrCfg->dgain1 > 0x3ffff) {
+        pRawnrCfg->dgain1 =  0x3ffff;
+    }
+    if(pRawnrCfg->dgain2 > 0x3ffff) {
+        pRawnrCfg->dgain2 =  0x3ffff;
+    }
 
-	//(0x0040)
-	pRawnrCfg->gauss = rawnr->gausskparsq;
-	
-	//(0x0044)
-	pRawnrCfg->sigma = rawnr->sigmaPar;
-	
 
-	//(0x0048)
-	pRawnrCfg->pix_diff = rawnr->pix_diff;
-	
+    //(0x0020 - 0x0002c)
+    for(int i = 0; i < 8; i++) {
+        pRawnrCfg->luration[i] = (unsigned short)(rawnr->luRatio[i] * (1 << FIXNLMCALC));
+    }
 
-	//(0x004c)
-	pRawnrCfg->thld_diff = rawnr->thld_diff;
-	
+    //(0x0030 - 0x0003c)
+    for(int i = 0; i < 8; i++) {
+        tmp = rawnr->luLevel[i] * ( 1 << (rawbit - 8) );
+        pRawnrCfg->lulevel[i] = bayernr_get_trans((int)tmp);
+    }
+    tmp = (float)((1 << rawbit) - 1);
+    pRawnrCfg->lulevel[8 - 1] = bayernr_get_trans((int)tmp);
 
-	//(0x0050)
-	pRawnrCfg->gas_weig_scl1 = rawnr->bayernr_gauss_weight0 * (1<<8);
-	pRawnrCfg->gas_weig_scl2 = rawnr->bayernr_gauss_weight1 * (1<<8);
-	pRawnrCfg->thld_chanelw = rawnr->thld_chanelw;
-	
-	
+    //(0x0040)
+    pRawnrCfg->gauss = rawnr->gausskparsq;
 
-	//(0x0054)
-	pRawnrCfg->lamda = rawnr->peaknoisesigma;
-	
+    //(0x0044)
+    pRawnrCfg->sigma = rawnr->sigmaPar;
 
-	//(0x0058 - 0x0005c)
-	pRawnrCfg->fixw0 = (unsigned short)(rawnr->w[0] * (1<<FIXNLMCALC));
-	pRawnrCfg->fixw1 = (unsigned short)(rawnr->w[1] * (1<<FIXNLMCALC));
-	pRawnrCfg->fixw2 = (unsigned short)(rawnr->w[2] * (1<<FIXNLMCALC));
-	pRawnrCfg->fixw3 = (unsigned short)(rawnr->w[3] * (1<<FIXNLMCALC));
-	
 
-	//(0x0060 - 0x00068)
-	pRawnrCfg->wlamda0 = (pRawnrCfg->fixw0 * pRawnrCfg->lamda)>>FIXNLMCALC;
-	pRawnrCfg->wlamda1 = (pRawnrCfg->fixw1 * pRawnrCfg->lamda)>>FIXNLMCALC;
-	pRawnrCfg->wlamda2 = (pRawnrCfg->fixw2 * pRawnrCfg->lamda)>>FIXNLMCALC;
-	
+    //(0x0048)
+    pRawnrCfg->pix_diff = rawnr->pix_diff;
 
-	//(0x006c)
-	pRawnrCfg->rgain_filp = rawnr->rgain_filp;
-	pRawnrCfg->bgain_filp = rawnr->bgain_filp;
 
-	#if BAYERNR_FIX_VALUE_PRINTF
-	bayernr_fix_printf(pRawnrCfg);
-	#endif
+    //(0x004c)
+    pRawnrCfg->thld_diff = rawnr->thld_diff;
 
-	LOGI_ANR("%s:(%d) exit \n", __FUNCTION__, __LINE__);
 
-	return res;
-		
+    //(0x0050)
+    pRawnrCfg->gas_weig_scl1 = rawnr->bayernr_gauss_weight0 * (1 << 8);
+    pRawnrCfg->gas_weig_scl2 = rawnr->bayernr_gauss_weight1 * (1 << 8);
+    pRawnrCfg->thld_chanelw = rawnr->thld_chanelw;
+
+
+
+    //(0x0054)
+    pRawnrCfg->lamda = rawnr->peaknoisesigma;
+
+
+    //(0x0058 - 0x0005c)
+    pRawnrCfg->fixw0 = (unsigned short)(rawnr->w[0] * (1 << FIXNLMCALC));
+    pRawnrCfg->fixw1 = (unsigned short)(rawnr->w[1] * (1 << FIXNLMCALC));
+    pRawnrCfg->fixw2 = (unsigned short)(rawnr->w[2] * (1 << FIXNLMCALC));
+    pRawnrCfg->fixw3 = (unsigned short)(rawnr->w[3] * (1 << FIXNLMCALC));
+
+
+    //(0x0060 - 0x00068)
+    pRawnrCfg->wlamda0 = (pRawnrCfg->fixw0 * pRawnrCfg->lamda) >> FIXNLMCALC;
+    pRawnrCfg->wlamda1 = (pRawnrCfg->fixw1 * pRawnrCfg->lamda) >> FIXNLMCALC;
+    pRawnrCfg->wlamda2 = (pRawnrCfg->fixw2 * pRawnrCfg->lamda) >> FIXNLMCALC;
+
+
+    //(0x006c)
+    pRawnrCfg->rgain_filp = rawnr->rgain_filp;
+    pRawnrCfg->bgain_filp = rawnr->bgain_filp;
+
+#if BAYERNR_FIX_VALUE_PRINTF
+    bayernr_fix_printf(pRawnrCfg);
+#endif
+
+    LOGI_ANR("%s:(%d) exit \n", __FUNCTION__, __LINE__);
+
+    return res;
+
 }
 
 ANRresult_t bayernr_fix_printf(RKAnr_Bayernr_Fix_t * pRawnrCfg)
 {
-	//FILE *fp = fopen("bayernr_regsiter.dat", "wb+");
-	ANRresult_t res = ANR_RET_SUCCESS;
+    //FILE *fp = fopen("bayernr_regsiter.dat", "wb+");
+    ANRresult_t res = ANR_RET_SUCCESS;
 
-	if(pRawnrCfg == NULL){
-		LOGE_ANR("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
-		return ANR_RET_NULL_POINTER;
-	}
-	
-	LOGD_ANR("%s:(%d) ############# rawnr enter######################## \n", __FUNCTION__, __LINE__);
+    if(pRawnrCfg == NULL) {
+        LOGE_ANR("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
+        return ANR_RET_NULL_POINTER;
+    }
 
-	//(0x0004)
-	LOGD_ANR("gauss_en:%d log_bypass:%d \n", 
-		pRawnrCfg->gauss_en, 
-		pRawnrCfg->log_bypass);
+    LOGD_ANR("%s:(%d) ############# rawnr enter######################## \n", __FUNCTION__, __LINE__);
 
-	//(0x0008 - 0x00010)
-	LOGD_ANR("filtpar0-2:%d %d %d \n", 
-		pRawnrCfg->filtpar0, 
-		pRawnrCfg->filtpar1, 
-		pRawnrCfg->filtpar2);
+    //(0x0004)
+    LOGD_ANR("gauss_en:%d log_bypass:%d \n",
+             pRawnrCfg->gauss_en,
+             pRawnrCfg->log_bypass);
 
-	//(0x0014 - 0x0001c)
-	LOGD_ANR("dgain0-2:%d %d %d \n", 
-		pRawnrCfg->dgain0, 
-		pRawnrCfg->dgain1, 
-		pRawnrCfg->dgain2);
+    //(0x0008 - 0x00010)
+    LOGD_ANR("filtpar0-2:%d %d %d \n",
+             pRawnrCfg->filtpar0,
+             pRawnrCfg->filtpar1,
+             pRawnrCfg->filtpar2);
 
-	//(0x0020 - 0x0002c)
-	for(int i=0; i<8; i++){
-		LOGD_ANR("luration[%d]:%d \n", i, pRawnrCfg->luration[i]);
-	}
+    //(0x0014 - 0x0001c)
+    LOGD_ANR("dgain0-2:%d %d %d \n",
+             pRawnrCfg->dgain0,
+             pRawnrCfg->dgain1,
+             pRawnrCfg->dgain2);
 
-	//(0x0030 - 0x0003c)
-	for(int i=0; i<8; i++){		
-		LOGD_ANR("lulevel[%d]:%d \n", i, pRawnrCfg->lulevel[i]);
-	}
+    //(0x0020 - 0x0002c)
+    for(int i = 0; i < 8; i++) {
+        LOGD_ANR("luration[%d]:%d \n", i, pRawnrCfg->luration[i]);
+    }
 
-	//(0x0040)
-	LOGD_ANR("gauss:%d \n", pRawnrCfg->gauss);
+    //(0x0030 - 0x0003c)
+    for(int i = 0; i < 8; i++) {
+        LOGD_ANR("lulevel[%d]:%d \n", i, pRawnrCfg->lulevel[i]);
+    }
 
-	//(0x0044)
-	LOGD_ANR("sigma:%d \n", pRawnrCfg->sigma);
+    //(0x0040)
+    LOGD_ANR("gauss:%d \n", pRawnrCfg->gauss);
 
-	//(0x0048)
-	LOGD_ANR("pix_diff:%d \n", pRawnrCfg->pix_diff);
+    //(0x0044)
+    LOGD_ANR("sigma:%d \n", pRawnrCfg->sigma);
 
-	//(0x004c)
-	LOGD_ANR("thld_diff:%d \n", pRawnrCfg->thld_diff);
+    //(0x0048)
+    LOGD_ANR("pix_diff:%d \n", pRawnrCfg->pix_diff);
 
-	//(0x0050)
-	LOGD_ANR("gas_weig_scl1:%d gas_weig_scl2:%d thld_chanelw:%d \n", 
-		pRawnrCfg->gas_weig_scl1, 
-		pRawnrCfg->gas_weig_scl2, 
-		pRawnrCfg->thld_chanelw);
+    //(0x004c)
+    LOGD_ANR("thld_diff:%d \n", pRawnrCfg->thld_diff);
 
-	//(0x0054)
-	LOGD_ANR("lamda:%d \n", pRawnrCfg->lamda);
+    //(0x0050)
+    LOGD_ANR("gas_weig_scl1:%d gas_weig_scl2:%d thld_chanelw:%d \n",
+             pRawnrCfg->gas_weig_scl1,
+             pRawnrCfg->gas_weig_scl2,
+             pRawnrCfg->thld_chanelw);
 
-	//(0x0058 - 0x0005c)
-	LOGD_ANR("fixw0-3:%d %d %d %d\n", 
-		pRawnrCfg->fixw0, 
-		pRawnrCfg->fixw1, 
-		pRawnrCfg->fixw2,
-		pRawnrCfg->fixw3);
+    //(0x0054)
+    LOGD_ANR("lamda:%d \n", pRawnrCfg->lamda);
 
-	//(0x0060 - 0x00068)
-	LOGD_ANR("wlamda0-2:%d %d %d \n", 
-		pRawnrCfg->wlamda0, 
-		pRawnrCfg->wlamda1, 
-		pRawnrCfg->wlamda2);
+    //(0x0058 - 0x0005c)
+    LOGD_ANR("fixw0-3:%d %d %d %d\n",
+             pRawnrCfg->fixw0,
+             pRawnrCfg->fixw1,
+             pRawnrCfg->fixw2,
+             pRawnrCfg->fixw3);
 
-	//(0x006c)
-	LOGD_ANR("rgain_filp:%d bgain_filp:%d \n", 
-		pRawnrCfg->rgain_filp, 
-		pRawnrCfg->bgain_filp);
+    //(0x0060 - 0x00068)
+    LOGD_ANR("wlamda0-2:%d %d %d \n",
+             pRawnrCfg->wlamda0,
+             pRawnrCfg->wlamda1,
+             pRawnrCfg->wlamda2);
 
-	LOGD_ANR("%s:(%d) ############# rawnr exit ######################## \n", __FUNCTION__, __LINE__);
-	LOGD_ANR("%s:(%d) exit \n", __FUNCTION__, __LINE__);
+    //(0x006c)
+    LOGD_ANR("rgain_filp:%d bgain_filp:%d \n",
+             pRawnrCfg->rgain_filp,
+             pRawnrCfg->bgain_filp);
 
-	return res;
+    LOGD_ANR("%s:(%d) ############# rawnr exit ######################## \n", __FUNCTION__, __LINE__);
+    LOGD_ANR("%s:(%d) exit \n", __FUNCTION__, __LINE__);
+
+    return res;
 }
 
 RKAIQ_END_DECLARE

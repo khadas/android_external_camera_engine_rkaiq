@@ -37,53 +37,53 @@ XmlTag::XmlTag( const XMLElement* e )
  *****************************************************************************/
 int XmlTag::Size()
 {
-	const XMLAttribute* pattr = m_Element->FindAttribute(CALIB_ATTRIBUTE_SIZE);
-	const char* c_string = pattr->Value();
+    const XMLAttribute* pattr = m_Element->FindAttribute(CALIB_ATTRIBUTE_SIZE);
+    const char* c_string = pattr->Value();
 
-	int col;
-	int row;
+    int col;
+    int row;
 
-	int res = sscanf(c_string, CALIB_ATTRIBUTE_SIZE_FORMAT, &row, &col);
-	if (res != CALIB_ATTRIBUTE_SIZE_NO_ELEMENTS)
-	{
-		return (0);
-	}
+    int res = sscanf(c_string, CALIB_ATTRIBUTE_SIZE_FORMAT, &row, &col);
+    if (res != CALIB_ATTRIBUTE_SIZE_NO_ELEMENTS)
+    {
+        return (0);
+    }
 
-	return ((col * row));
+    return ((col * row));
 }
 
 int XmlTag::SizeRow()
 {
-	const XMLAttribute* pattr = m_Element->FindAttribute(CALIB_ATTRIBUTE_SIZE);
-	const char* c_string = pattr->Value();
+    const XMLAttribute* pattr = m_Element->FindAttribute(CALIB_ATTRIBUTE_SIZE);
+    const char* c_string = pattr->Value();
 
-	int col;
-	int row;
+    int col;
+    int row;
 
-	int res = sscanf(c_string, CALIB_ATTRIBUTE_SIZE_FORMAT, &row, &col);
-	if (res != CALIB_ATTRIBUTE_SIZE_NO_ELEMENTS)
-	{
-		return (0);
-	}
+    int res = sscanf(c_string, CALIB_ATTRIBUTE_SIZE_FORMAT, &row, &col);
+    if (res != CALIB_ATTRIBUTE_SIZE_NO_ELEMENTS)
+    {
+        return (0);
+    }
 
-	return (row);
+    return (row);
 }
 
 int XmlTag::SizeCol()
 {
-	const XMLAttribute* pattr = m_Element->FindAttribute(CALIB_ATTRIBUTE_SIZE);
-	const char* c_string = pattr->Value();
+    const XMLAttribute* pattr = m_Element->FindAttribute(CALIB_ATTRIBUTE_SIZE);
+    const char* c_string = pattr->Value();
 
-	int col;
-	int row;
+    int col;
+    int row;
 
-	int res = sscanf(c_string, CALIB_ATTRIBUTE_SIZE_FORMAT, &row, &col);
-	if (res != CALIB_ATTRIBUTE_SIZE_NO_ELEMENTS)
-	{
-		return (0);
-	}
+    int res = sscanf(c_string, CALIB_ATTRIBUTE_SIZE_FORMAT, &row, &col);
+    if (res != CALIB_ATTRIBUTE_SIZE_NO_ELEMENTS)
+    {
+        return (0);
+    }
 
-	return (col);
+    return (col);
 }
 
 
@@ -97,43 +97,43 @@ const char* XmlTag::Value()
     char* pstr_start = (char*)text;
     int len = 0;
     char* pstr_last = pstr_start;
-    
+
 #if 0
-	if (pstr_start) {
-		len = strlen(pstr_start);
-		pstr_last = (char*)text + len - 1;
+    if (pstr_start) {
+        len = strlen(pstr_start);
+        pstr_last = (char*)text + len - 1;
 
-		while ((*pstr_start == '\n' || *pstr_start == '\r' || *pstr_start == 0x20 || *pstr_start == 0x09) && (pstr_start != pstr_last)) {
-			pstr_start++;
-		}
+        while ((*pstr_start == '\n' || *pstr_start == '\r' || *pstr_start == 0x20 || *pstr_start == 0x09) && (pstr_start != pstr_last)) {
+            pstr_start++;
+        }
 
-		while ((*pstr_last == '\n' || *pstr_last == '\r' || *pstr_last == 0x20 || *pstr_last == 0x09) && (pstr_start != pstr_last)) {
-			pstr_last--;
-		}
+        while ((*pstr_last == '\n' || *pstr_last == '\r' || *pstr_last == 0x20 || *pstr_last == 0x09) && (pstr_start != pstr_last)) {
+            pstr_last--;
+        }
 
-		len = pstr_last - pstr_start;
-	}
+        len = pstr_last - pstr_start;
+    }
 
-	if (len) {
-		*(pstr_last + 1) = '\0';
-	}
+    if (len) {
+        *(pstr_last + 1) = '\0';
+    }
 #else
-	/* above code cannot process the case: there is only one valide charactor,such as "A  \n\r" */
-	if (pstr_start) {
-		len = strlen(pstr_start);
-		pstr_last = (char*)text + len - 1;
+    /* above code cannot process the case: there is only one valide charactor,such as "A  \n\r" */
+    if (pstr_start) {
+        len = strlen(pstr_start);
+        pstr_last = (char*)text + len - 1;
 
-		while ((*pstr_start == '\n' || *pstr_start == '\r' || *pstr_start == 0x20 || *pstr_start == 0x09) && (pstr_start != pstr_last)) {
-			pstr_start++;
-		}
+        while ((*pstr_start == '\n' || *pstr_start == '\r' || *pstr_start == 0x20 || *pstr_start == 0x09) && (pstr_start != pstr_last)) {
+            pstr_start++;
+        }
 
-		while ((*pstr_last == '\n' || *pstr_last == '\r' || *pstr_last == 0x20 || *pstr_last == 0x09) && (pstr_start != pstr_last)) {
-			*pstr_last = '\0';
-			pstr_last--;
-		}
-	}
+        while ((*pstr_last == '\n' || *pstr_last == '\r' || *pstr_last == 0x20 || *pstr_last == 0x09) && (pstr_start != pstr_last)) {
+            *pstr_last = '\0';
+            pstr_last--;
+        }
+    }
 #endif
-    
+
     return pstr_start ;
 }
 

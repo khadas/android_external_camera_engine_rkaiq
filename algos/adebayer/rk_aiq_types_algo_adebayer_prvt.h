@@ -15,7 +15,7 @@ typedef enum AdebayerState_e {
     ADEBAYER_STATE_MAX
 } AdebayerState_t;
 
-typedef struct AdebayerFullParam_s{
+typedef struct AdebayerFullParam_s {
     int iso[9];
     signed char filter1[5];
     signed char filter2[5];
@@ -31,14 +31,14 @@ typedef struct AdebayerFullParam_s{
     unsigned char dist_scale;
     unsigned char cnr_strength;
     unsigned char shift_num;
-}AdebayerFullParam_t;
+} AdebayerFullParam_t;
 
-typedef struct AdebayerContext_s{
+typedef struct AdebayerContext_s {
     AdebayerConfig_t config;
     AdebayerState_t state;
     CamCalibDbContext_t* pCalibDb;
     AdebayerFullParam_t full_param;
-}AdebayerContext_t;
+} AdebayerContext_t;
 
 typedef struct _RkAiqAlgoContext {
     AdebayerContext_t adebayerCtx;

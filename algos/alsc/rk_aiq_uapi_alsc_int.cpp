@@ -2,8 +2,8 @@
 #include "alsc/rk_aiq_types_alsc_algo_prvt.h"
 XCamReturn
 rk_aiq_uapi_alsc_SetAttrib(RkAiqAlgoContext *ctx,
-                          rk_aiq_lsc_attrib_t attr,
-                          bool need_sync)
+                           rk_aiq_lsc_attrib_t attr,
+                           bool need_sync)
 {
 
     alsc_context_t* lsc_contex = (alsc_context_t*)ctx->alsc_para;
@@ -15,19 +15,19 @@ rk_aiq_uapi_alsc_SetAttrib(RkAiqAlgoContext *ctx,
 
 XCamReturn
 rk_aiq_uapi_alsc_GetAttrib(const RkAiqAlgoContext *ctx,
-                          rk_aiq_lsc_attrib_t *attr)
+                           rk_aiq_lsc_attrib_t *attr)
 {
 
     alsc_context_t* lsc_contex = (alsc_context_t*)ctx->alsc_para;;
 
-    memcpy(attr,&lsc_contex->mCurAtt,sizeof(rk_aiq_lsc_attrib_t));
+    memcpy(attr, &lsc_contex->mCurAtt, sizeof(rk_aiq_lsc_attrib_t));
 
     return XCAM_RETURN_NO_ERROR;
 }
 
 XCamReturn
 rk_aiq_uapi_alsc_QueryLscInfo(const RkAiqAlgoContext *ctx,
-                          rk_aiq_lsc_querry_info_t *lsc_querry_info )
+                              rk_aiq_lsc_querry_info_t *lsc_querry_info )
 {
 
     alsc_context_t* lsc_contex = (alsc_context_t*)ctx->alsc_para;;

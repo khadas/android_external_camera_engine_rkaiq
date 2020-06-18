@@ -97,63 +97,63 @@ const struct capture_fmt Isp20PollThread::csirx_fmts[] =
 {
     /* raw */
     {
-	.fourcc = V4L2_PIX_FMT_SRGGB8,
-	.bayer_fmt = 3,
-	.pcpp = 1,
-	.bpp = { 8 },
+        .fourcc = V4L2_PIX_FMT_SRGGB8,
+        .bayer_fmt = 3,
+        .pcpp = 1,
+        .bpp = { 8 },
     }, {
-	.fourcc = V4L2_PIX_FMT_SGRBG8,
-	.bayer_fmt = 2,
-	.pcpp = 1,
-	.bpp = { 8 },
+        .fourcc = V4L2_PIX_FMT_SGRBG8,
+        .bayer_fmt = 2,
+        .pcpp = 1,
+        .bpp = { 8 },
     }, {
-	.fourcc = V4L2_PIX_FMT_SGBRG8,
-	.bayer_fmt = 1,
-	.pcpp = 1,
-	.bpp = { 8 },
+        .fourcc = V4L2_PIX_FMT_SGBRG8,
+        .bayer_fmt = 1,
+        .pcpp = 1,
+        .bpp = { 8 },
     }, {
-	.fourcc = V4L2_PIX_FMT_SBGGR8,
-	.bayer_fmt = 0,
-	.pcpp = 1,
-	.bpp = { 8 },
+        .fourcc = V4L2_PIX_FMT_SBGGR8,
+        .bayer_fmt = 0,
+        .pcpp = 1,
+        .bpp = { 8 },
     }, {
-	.fourcc = V4L2_PIX_FMT_SRGGB10,
-	.bayer_fmt = 3,
-	.pcpp = 4,
-	.bpp = { 10 },
+        .fourcc = V4L2_PIX_FMT_SRGGB10,
+        .bayer_fmt = 3,
+        .pcpp = 4,
+        .bpp = { 10 },
     }, {
-	.fourcc = V4L2_PIX_FMT_SGRBG10,
-	.bayer_fmt = 2,
-	.pcpp = 4,
-	.bpp = { 10 },
+        .fourcc = V4L2_PIX_FMT_SGRBG10,
+        .bayer_fmt = 2,
+        .pcpp = 4,
+        .bpp = { 10 },
     }, {
-	.fourcc = V4L2_PIX_FMT_SGBRG10,
-	.bayer_fmt = 1,
-	.pcpp = 4,
-	.bpp = { 10 },
+        .fourcc = V4L2_PIX_FMT_SGBRG10,
+        .bayer_fmt = 1,
+        .pcpp = 4,
+        .bpp = { 10 },
     }, {
-	.fourcc = V4L2_PIX_FMT_SBGGR10,
-	.bayer_fmt = 0,
-	.pcpp = 4,
-	.bpp = { 10 },
+        .fourcc = V4L2_PIX_FMT_SBGGR10,
+        .bayer_fmt = 0,
+        .pcpp = 4,
+        .bpp = { 10 },
     }, {
-	.fourcc = V4L2_PIX_FMT_SRGGB12,
-	.pcpp = 2,
-	.bpp = { 12 },
+        .fourcc = V4L2_PIX_FMT_SRGGB12,
+        .pcpp = 2,
+        .bpp = { 12 },
     }, {
-	.fourcc = V4L2_PIX_FMT_SGRBG12,
-	.pcpp = 2,
-	.bpp = { 12 },
+        .fourcc = V4L2_PIX_FMT_SGRBG12,
+        .pcpp = 2,
+        .bpp = { 12 },
     }, {
-	.fourcc = V4L2_PIX_FMT_SGBRG12,
-	.bayer_fmt = 1,
-	.pcpp = 2,
-	.bpp = { 12 },
+        .fourcc = V4L2_PIX_FMT_SGBRG12,
+        .bayer_fmt = 1,
+        .pcpp = 2,
+        .bpp = { 12 },
     }, {
-	.fourcc = V4L2_PIX_FMT_SBGGR12,
-	.bayer_fmt = 0,
-	.pcpp = 2,
-	.bpp = { 12 },
+        .fourcc = V4L2_PIX_FMT_SBGGR12,
+        .bayer_fmt = 0,
+        .pcpp = 2,
+        .bpp = { 12 },
     },
 };
 
@@ -177,7 +177,11 @@ public:
 
 protected:
     virtual bool loop () {
-        XCamReturn ret = _poll->mipi_poll_buffer_loop (_type, _dev_index);
+        XCamReturn ret;
+        if(_poll->_loop_vain)
+            ret = XCAM_RETURN_NO_ERROR;
+        else
+            ret = _poll->mipi_poll_buffer_loop (_type, _dev_index);
 
         if (ret == XCAM_RETURN_NO_ERROR || ret == XCAM_RETURN_ERROR_TIMEOUT ||
                 XCAM_RETURN_BYPASS)
@@ -200,22 +204,22 @@ Isp20PollThread::get_value_from_file(const char* path, int& value, uint32_t& fra
 
     fp = open(path, O_RDONLY | O_SYNC);
     if (fp) {
-	if (read(fp, buffer, sizeof(buffer)) <= 0) {
-	    LOGW_CAMHW("%s read %s failed!\n", __func__, path);
-	} else {
+        if (read(fp, buffer, sizeof(buffer)) <= 0) {
+            LOGW_CAMHW("%s read %s failed!\n", __func__, path);
+        } else {
             char *p = nullptr;
 
-	    p = strtok(buffer, delim);
-	    if (p != nullptr) {
-	        value = atoi(p);
-		p = strtok(nullptr, delim);
-		if (p != nullptr)
-	            frameId = atoi(p);
-	    }
-	}
-	close(fp);
-	LOGV_CAMHW("value: %d, frameId: %d\n", value, frameId);
-	return true;
+            p = strtok(buffer, delim);
+            if (p != nullptr) {
+                value = atoi(p);
+                p = strtok(nullptr, delim);
+                if (p != nullptr)
+                    frameId = atoi(p);
+            }
+        }
+        close(fp);
+        LOGV_CAMHW("value: %d, frameId: %d\n", value, frameId);
+        return true;
     }
 
     return false;
@@ -230,13 +234,13 @@ Isp20PollThread::set_value_to_file(const char* path, int value, uint32_t sequenc
 
     fp = open(path, O_CREAT | O_RDWR | O_SYNC);
     if (fp) {
-	ftruncate(fp,0);
-	lseek(fp, 0, SEEK_SET);
-	snprintf(buffer, sizeof(buffer), "%3d %8d\n", _capture_raw_num, sequence);
-	if (write(fp, buffer, sizeof(buffer)) <= 0)
-		LOGW_CAMHW("%s write %s failed!\n", __func__, path);
-	close(fp);
-	return true;
+        ftruncate(fp, 0);
+        lseek(fp, 0, SEEK_SET);
+        snprintf(buffer, sizeof(buffer), "%3d %8d\n", _capture_raw_num, sequence);
+        if (write(fp, buffer, sizeof(buffer)) <= 0)
+            LOGW_CAMHW("%s write %s failed!\n", __func__, path);
+        close(fp);
+        return true;
     }
 
     return false;
@@ -259,39 +263,39 @@ Isp20PollThread::new_video_buffer(SmartPtr<V4l2Buffer> buf,
         if (_focus_handle_dev.ptr())
             _focus_handle_dev->getAfInfoParams(afParams, buf->get_buf().sequence);
 
-	if (_rx_handle_dev)
-		_rx_handle_dev->getEffectiveIspParams(ispParams, buf->get_buf().sequence);
+        if (_rx_handle_dev)
+            _rx_handle_dev->getEffectiveIspParams(ispParams, buf->get_buf().sequence);
 
-	if (_capture_metadata_num > 0) {
-	    char file_name[32] = {0};
-	    int capture_cnt = 0;
-	    uint32_t rawFrmId = 0;
+        if (_capture_metadata_num > 0) {
+            char file_name[32] = {0};
+            int capture_cnt = 0;
+            uint32_t rawFrmId = 0;
 
-	    snprintf(file_name, sizeof(file_name), "%s/%s",
-		     CAPTURE_RAW_PATH, CAPTURE_CNT_FILENAME);
-	    get_value_from_file(file_name, capture_cnt, rawFrmId);
+            snprintf(file_name, sizeof(file_name), "%s/%s",
+                     CAPTURE_RAW_PATH, CAPTURE_CNT_FILENAME);
+            get_value_from_file(file_name, capture_cnt, rawFrmId);
 
-	    LOGD_CAMHW("rawFrmId: %d, sequence: %d, _capture_metadata_num: %d\n",
-		       rawFrmId, buf->get_buf().sequence,
-		       _capture_metadata_num);
+            LOGD_CAMHW("rawFrmId: %d, sequence: %d, _capture_metadata_num: %d\n",
+                       rawFrmId, buf->get_buf().sequence,
+                       _capture_metadata_num);
 
-	    if (_is_raw_dir_exist && buf->get_buf().sequence >= rawFrmId && \
-		ispParams.ptr() && expParams.ptr())
+            if (_is_raw_dir_exist && buf->get_buf().sequence >= rawFrmId && \
+                    ispParams.ptr() && expParams.ptr())
 #ifdef WRITE_ISP_REG
-		write_reg_to_file(ISP_REGS_BASE, 0x0, 0x6000, buf->get_buf().sequence);
+                write_reg_to_file(ISP_REGS_BASE, 0x0, 0x6000, buf->get_buf().sequence);
 #endif
 #ifdef WRITE_ISPP_REG
-		write_reg_to_file(ISPP_REGS_BASE, 0x0, 0xc94, buf->get_buf().sequence);
+            write_reg_to_file(ISPP_REGS_BASE, 0x0, 0xc94, buf->get_buf().sequence);
 #endif
-		write_metadata_to_file(raw_dir_path,
-				       buf->get_buf().sequence,
-				       ispParams, expParams);
-	    _capture_metadata_num--;
-	    if (!_capture_metadata_num) {
-		_is_raw_dir_exist = false;
-		LOGD_CAMHW("stop capturing raw!\n");
-	    }
-	}
+            write_metadata_to_file(raw_dir_path,
+                                   buf->get_buf().sequence,
+                                   ispParams, expParams);
+            _capture_metadata_num--;
+            if (!_capture_metadata_num) {
+                _is_raw_dir_exist = false;
+                LOGD_CAMHW("stop capturing raw!\n");
+            }
+        }
 
         // TODO: get ispParams from isp dev;
 
@@ -363,6 +367,7 @@ Isp20PollThread::Isp20PollThread()
     , _capture_image_mutex(false)
     , _capture_image_cond(false)
     , _is_raw_sync_yuv(false)
+    ,_loop_vain(false)
 
 {
     for (int i = 0; i < 3; i++) {
@@ -446,20 +451,26 @@ Isp20PollThread::stop ()
 void
 Isp20PollThread::set_working_mode(int mode)
 {
-   _working_mode = mode;
+    _working_mode = mode;
 
     switch (_working_mode) {
-        case RK_AIQ_ISP_HDR_MODE_3_FRAME_HDR:
-        case RK_AIQ_ISP_HDR_MODE_3_LINE_HDR:
-            _mipi_dev_max = 3;
-            break;
-        case RK_AIQ_ISP_HDR_MODE_2_FRAME_HDR:
-        case RK_AIQ_ISP_HDR_MODE_2_LINE_HDR:
-            _mipi_dev_max = 2;
-            break;
-        default:
-            _mipi_dev_max = 1;
+    case RK_AIQ_ISP_HDR_MODE_3_FRAME_HDR:
+    case RK_AIQ_ISP_HDR_MODE_3_LINE_HDR:
+        _mipi_dev_max = 3;
+        break;
+    case RK_AIQ_ISP_HDR_MODE_2_FRAME_HDR:
+    case RK_AIQ_ISP_HDR_MODE_2_LINE_HDR:
+        _mipi_dev_max = 2;
+        break;
+    default:
+        _mipi_dev_max = 1;
     }
+}
+
+void
+Isp20PollThread::set_loop_status(bool stat)
+{
+    _loop_vain = stat;
 }
 
 void
@@ -485,8 +496,8 @@ Isp20PollThread::hdr_mipi_start(SmartPtr<SensorHw> sensor)
     } else {
         rk_aiq_exposure_sensor_descriptor sns_des;
         sensor->get_format(&sns_des);
-	sns_width = sns_des.sensor_output_width;
-	sns_height = sns_des.sensor_output_height;
+        sns_width = sns_des.sensor_output_width;
+        sns_height = sns_des.sensor_output_height;
         pixelformat = sns_des.sensor_pixelformat;
     }
 
@@ -546,28 +557,28 @@ Isp20PollThread::create_stop_fds_mipi () {
         status = pipe(_isp_mipi_tx_infos[i].stop_fds);
         if (status < 0) {
             LOGE_CAMHW("Failed to create mipi tx:%d poll stop pipe: %s",
-                            i, strerror(errno));
+                       i, strerror(errno));
             ret = XCAM_RETURN_ERROR_UNKNOWN;
             goto exit_error;
         }
         status = fcntl(_isp_mipi_tx_infos[0].stop_fds[0], F_SETFL, O_NONBLOCK);
         if (status < 0) {
             LOGE_CAMHW("Fail to set event mipi tx:%d stop pipe flag: %s",
-                            i, strerror(errno));
+                       i, strerror(errno));
             goto exit_error;
         }
 
         status = pipe(_isp_mipi_rx_infos[i].stop_fds);
         if (status < 0) {
             LOGE_CAMHW("Failed to create mipi rx:%d poll stop pipe: %s",
-                            i, strerror(errno));
+                       i, strerror(errno));
             ret = XCAM_RETURN_ERROR_UNKNOWN;
             goto exit_error;
         }
         status = fcntl(_isp_mipi_rx_infos[0].stop_fds[0], F_SETFL, O_NONBLOCK);
         if (status < 0) {
             LOGE_CAMHW("Fail to set event mipi rx:%d stop pipe flag: %s",
-                            i, strerror(errno));
+                       i, strerror(errno));
             goto exit_error;
         }
     }
@@ -581,7 +592,7 @@ exit_error:
 void Isp20PollThread::destroy_stop_fds_mipi () {
     for (int i = 0; i < 3; i++) {
         if (_isp_mipi_tx_infos[i].stop_fds[0] != -1 ||
-            _isp_mipi_tx_infos[i].stop_fds[1] != -1) {
+                _isp_mipi_tx_infos[i].stop_fds[1] != -1) {
             close(_isp_mipi_tx_infos[i].stop_fds[0]);
             close(_isp_mipi_tx_infos[i].stop_fds[1]);
             _isp_mipi_tx_infos[i].stop_fds[0] = -1;
@@ -589,7 +600,7 @@ void Isp20PollThread::destroy_stop_fds_mipi () {
         }
 
         if (_isp_mipi_rx_infos[i].stop_fds[0] != -1 ||
-            _isp_mipi_rx_infos[i].stop_fds[1] != -1) {
+                _isp_mipi_rx_infos[i].stop_fds[1] != -1) {
             close(_isp_mipi_rx_infos[i].stop_fds[0]);
             close(_isp_mipi_rx_infos[i].stop_fds[1]);
             _isp_mipi_rx_infos[i].stop_fds[0] = -1;
@@ -627,7 +638,7 @@ Isp20PollThread::mipi_poll_buffer_loop (int type, int dev_index)
 
     if (poll_ret <= 0) {
         LOGW_CAMHW("mipi_dev_index %d poll %s buffer event got error(0x%x) but continue\n",
-                        dev_index, mipi_poll_type_to_str[type], poll_ret);
+                   dev_index, mipi_poll_type_to_str[type], poll_ret);
         ::usleep (10000); // 10ms
         return XCAM_RETURN_ERROR_TIMEOUT;
     }
@@ -654,7 +665,7 @@ Isp20PollThread::handle_rx_buf(SmartPtr<V4l2BufferProxy> &rx_buf, int dev_index)
 
     SmartPtr<V4l2BufferProxy> buf = _isp_mipi_rx_infos[dev_index].buf_list.pop(-1);
     LOGD_CAMHW("%s dev_index:%d index:%d fd:%d\n",
-        __func__, dev_index, buf->get_v4l2_buf_index(), buf->get_expbuf_fd());
+               __func__, dev_index, buf->get_v4l2_buf_index(), buf->get_expbuf_fd());
 }
 
 void Isp20PollThread::sync_tx_buf()
@@ -683,9 +694,9 @@ void Isp20PollThread::sync_tx_buf()
     if (buf_s.ptr()) {
         sequence_s = buf_s->get_sequence();
         if ((_working_mode == RK_AIQ_ISP_HDR_MODE_3_FRAME_HDR ||
-             _working_mode == RK_AIQ_ISP_HDR_MODE_3_LINE_HDR) &&
-            buf_m.ptr() && buf_l.ptr() && buf_s.ptr() &&
-            sequence_l == sequence_s && sequence_m == sequence_s) {
+                _working_mode == RK_AIQ_ISP_HDR_MODE_3_LINE_HDR) &&
+                buf_m.ptr() && buf_l.ptr() && buf_s.ptr() &&
+                sequence_l == sequence_s && sequence_m == sequence_s) {
             _isp_mipi_rx_infos[ISP_MIPI_HDR_S].cache_list.push(buf_s);
             _isp_mipi_rx_infos[ISP_MIPI_HDR_M].cache_list.push(buf_m);
             _isp_mipi_rx_infos[ISP_MIPI_HDR_L].cache_list.push(buf_l);
@@ -721,7 +732,7 @@ void Isp20PollThread::sync_tx_buf()
             trigger_readback();
         } else {
             LOGW_CAMHW("do nothing, sequence not match l: %d, s: %d, m: %d !!!",
-                           sequence_l, sequence_s, sequence_m);
+                       sequence_l, sequence_s, sequence_m);
         }
     }
     _mipi_buf_mutex.unlock();
@@ -731,7 +742,7 @@ void
 Isp20PollThread::handle_tx_buf(SmartPtr<V4l2BufferProxy> &tx_buf, int dev_index)
 {
     LOGD_CAMHW("%s dev_index:%d sequence:%d\n",
-        __func__, dev_index, tx_buf->get_sequence());
+               __func__, dev_index, tx_buf->get_sequence());
     _isp_mipi_tx_infos[dev_index].buf_list.push(tx_buf);
     sync_tx_buf();
 }
@@ -758,7 +769,7 @@ Isp20PollThread::trigger_readback()
 
     std::map<uint32_t, int>::iterator it_times_del;
     for (std::map<uint32_t, int>::iterator iter = _isp_hdr_fid2times_map.begin();
-         iter != _isp_hdr_fid2times_map.end();) {
+            iter != _isp_hdr_fid2times_map.end();) {
         if (iter->first < sequence) {
             it_times_del = iter++;
             LOGD_CAMHW("del seq %d", it_times_del->first);
@@ -771,7 +782,7 @@ Isp20PollThread::trigger_readback()
             break;
         } else {
             LOGW_CAMHW("%s missing rdtimes for buf_seq %d, min rdtimes_seq %d !",
-                           __func__, sequence, iter->first);
+                       __func__, sequence, iter->first);
             times = 0;
             break;
         }
@@ -800,12 +811,12 @@ Isp20PollThread::trigger_readback()
     else
         tg.times = 2;
     LOGW_CAMHW("%s fix the trigger to %d time for ahdr temporarily\n",
-	       __func__,
-	       tg.times);
+               __func__,
+               tg.times);
 
     if (_rx_handle_dev) {
         if (_rx_handle_dev->setIspParamsSync(sequence) ||
-            _rx_handle_dev->setIsppParamsSync(sequence)) {
+                _rx_handle_dev->setIsppParamsSync(sequence)) {
             LOGE_CAMHW("%s frame[%d] set isp params failed, don't read back!\n",
                        __func__, sequence);
             // drop frame, return buf to tx
@@ -814,101 +825,102 @@ Isp20PollThread::trigger_readback()
             }
         } else {
             char file_name[32] = {0};
-	    int ret = XCAM_RETURN_NO_ERROR;
+            int ret = XCAM_RETURN_NO_ERROR;
 
-	    snprintf(file_name, sizeof(file_name), "%s/%s",
-		     CAPTURE_RAW_PATH, CAPTURE_CNT_FILENAME);
-	    if (!_is_capture_raw) {
-		uint32_t rawFrmId = 0;
-		get_value_from_file(file_name, _capture_raw_num, rawFrmId);
+            snprintf(file_name, sizeof(file_name), "%s/%s",
+                     CAPTURE_RAW_PATH, CAPTURE_CNT_FILENAME);
+            if (!_is_capture_raw) {
+                uint32_t rawFrmId = 0;
+                get_value_from_file(file_name, _capture_raw_num, rawFrmId);
 
-		if (_capture_raw_num > 0) {
-		    set_value_to_file(file_name, _capture_raw_num, sequence);
-		    _is_capture_raw = true;
-		    _capture_metadata_num = _capture_raw_num;
-		    if (_first_trigger)
-			++_capture_metadata_num;
-		}
-	    }
+                if (_capture_raw_num > 0) {
+                    set_value_to_file(file_name, _capture_raw_num, sequence);
+                    _is_capture_raw = true;
+                    _capture_metadata_num = _capture_raw_num;
+                    if (_first_trigger)
+                        ++_capture_metadata_num;
+                }
+            }
 
             for (int i = 0; i < _mipi_dev_max; i++) {
-		ret = _isp_mipi_rx_infos[i].dev->get_buffer(v4l2buf[i]);
-		if (ret != XCAM_RETURN_NO_ERROR) {
-			LOGE_CAMHW("Rx[%d] can not get buffer\n", i);
-			break;
-		} else {
-		    buf_proxy = _isp_mipi_rx_infos[i].cache_list.pop(-1);
-		    _isp_mipi_rx_infos[i].buf_list.push(buf_proxy);
-		    v4l2buf[i]->set_expbuf_fd(buf_proxy->get_expbuf_fd());
+                ret = _isp_mipi_rx_infos[i].dev->get_buffer(v4l2buf[i]);
+                if (ret != XCAM_RETURN_NO_ERROR) {
+                    LOGE_CAMHW("Rx[%d] can not get buffer\n", i);
+                    break;
+                } else {
+                    buf_proxy = _isp_mipi_rx_infos[i].cache_list.pop(-1);
+                    _isp_mipi_rx_infos[i].buf_list.push(buf_proxy);
+                    //v4l2buf[i]->set_expbuf_fd(buf_proxy->get_expbuf_fd());
+                    v4l2buf[i]->set_expbuf_usrptr(buf_proxy->get_v4l2_userptr());
 
                     if (_is_capture_raw && _capture_raw_num > 0) {
                         if (!_is_raw_dir_exist) {
                             creat_raw_dir(CAPTURE_RAW_PATH);
-			}
+                        }
 
                         if (_is_raw_dir_exist) {
-			    char raw_name[128] = {0};
-			    FILE *fp = nullptr;
+                            char raw_name[128] = {0};
+                            FILE *fp = nullptr;
 
-			    XCAM_STATIC_PROFILING_START(write_raw);
-			    memset(raw_name, 0, sizeof(raw_name));
-			    snprintf(raw_name, sizeof(raw_name),
-				     "%s/frame%d_%dx%d_%s.raw",
-				     raw_dir_path,
-				     sequence,
-				     sns_width,
-				     sns_height,
-				     i == 0 ? "short" : "long");
+                            XCAM_STATIC_PROFILING_START(write_raw);
+                            memset(raw_name, 0, sizeof(raw_name));
+                            snprintf(raw_name, sizeof(raw_name),
+                                     "%s/frame%d_%dx%d_%s.raw",
+                                     raw_dir_path,
+                                     sequence,
+                                     sns_width,
+                                     sns_height,
+                                     i == 0 ? "short" : "long");
 
-			    fp = fopen(raw_name, "wb+");
-			    if (fp != nullptr) {
+                            fp = fopen(raw_name, "wb+");
+                            if (fp != nullptr) {
 #ifdef WRITE_RAW_FILE_HEADER
-			        write_frame_header_to_raw(fp, i, sequence);
+                                write_frame_header_to_raw(fp, i, sequence);
 #endif
-				write_raw_to_file(fp, i, sequence,
-						  (void *)(buf_proxy->get_v4l2_userptr()),
-						  v4l2buf[i]->get_buf().m.planes[0].bytesused);
-				fclose(fp);
-			    }
-			    XCAM_STATIC_PROFILING_END(write_raw, 0);
-			}
-		    }
-		}
-	    }
+                                write_raw_to_file(fp, i, sequence,
+                                                  (void *)(buf_proxy->get_v4l2_userptr()),
+                                                  v4l2buf[i]->get_buf().m.planes[0].bytesused);
+                                fclose(fp);
+                            }
+                            XCAM_STATIC_PROFILING_END(write_raw, 0);
+                        }
+                    }
+                }
+            }
 
             for (int i = 0; i < _mipi_dev_max; i++) {
-		    ret = _isp_mipi_rx_infos[i].dev->queue_buffer(v4l2buf[i]);
-		    if (ret != XCAM_RETURN_NO_ERROR) {
-			_isp_mipi_rx_infos[i].buf_list.pop(-1);
-			LOGE_CAMHW("Rx[%d] queue buffer failed\n", i);
-			break;
-		    }
-	    }
+                ret = _isp_mipi_rx_infos[i].dev->queue_buffer(v4l2buf[i]);
+                if (ret != XCAM_RETURN_NO_ERROR) {
+                    _isp_mipi_rx_infos[i].buf_list.pop(-1);
+                    LOGE_CAMHW("Rx[%d] queue buffer failed\n", i);
+                    break;
+                }
+            }
 
-        tg.frame_timestamp = buf_proxy->get_timestamp () * 1000;
+            tg.frame_timestamp = buf_proxy->get_timestamp () * 1000;
 
-        LOGD_CAMHW("%s set frame[%d]:ts %" PRId64 "ms \n",
-                   __func__, sequence, tg.frame_timestamp / 1000/1000);
+            LOGD_CAMHW("%s set frame[%d]:ts %" PRId64 "ms \n",
+                       __func__, sequence, tg.frame_timestamp / 1000 / 1000);
 
-	    if (ret == XCAM_RETURN_NO_ERROR)
+            if (ret == XCAM_RETURN_NO_ERROR)
                 _isp_core_dev->io_control(RKISP_CMD_TRIGGER_READ_BACK, &tg);
-	    else
-		LOGE_CAMHW("%s frame[%d] queue  failed, don't read back!\n",
-			   __func__, sequence);
+            else
+                LOGE_CAMHW("%s frame[%d] queue  failed, don't read back!\n",
+                           __func__, sequence);
 
-	    if (_is_capture_raw && !_first_trigger) {
-		if (_is_raw_sync_yuv) {
-		    _capture_image_mutex.lock();
-		    _capture_image_cond.timedwait(_capture_image_mutex, 3000000);
-		    _capture_image_mutex.unlock();
-		}
+            if (_is_capture_raw && !_first_trigger) {
+                if (_is_raw_sync_yuv) {
+                    _capture_image_mutex.lock();
+                    _capture_image_cond.timedwait(_capture_image_mutex, 3000000);
+                    _capture_image_mutex.unlock();
+                }
 
-		// _capture_raw_num--;
-		if (!--_capture_raw_num) {
-		    set_value_to_file(file_name, _capture_raw_num);
-		    _is_capture_raw = false;
-		}
-	    }
+                // _capture_raw_num--;
+                if (!--_capture_raw_num) {
+                    set_value_to_file(file_name, _capture_raw_num);
+                    _is_capture_raw = false;
+                }
+            }
         }
     }
 
@@ -918,9 +930,9 @@ Isp20PollThread::trigger_readback()
 
 void
 Isp20PollThread::write_metadata_to_file(const char* dir_path,
-		int frame_id,
-		SmartPtr<RkAiqIspParamsProxy>& ispParams,
-		SmartPtr<RkAiqExpParamsProxy>& expParams)
+                                        int frame_id,
+                                        SmartPtr<RkAiqIspParamsProxy>& ispParams,
+                                        SmartPtr<RkAiqExpParamsProxy>& expParams)
 {
     FILE *fp = nullptr;
     char file_name[64] = {0};
@@ -931,57 +943,57 @@ Isp20PollThread::write_metadata_to_file(const char* dir_path,
     fp = fopen(file_name, "ab+");
     if (fp != nullptr) {
         if (_working_mode == RK_AIQ_ISP_HDR_MODE_3_FRAME_HDR || \
-	    _working_mode == RK_AIQ_ISP_HDR_MODE_3_LINE_HDR) {
-	    snprintf(buffer,
-		     sizeof(buffer),
-		     "frame%08d-l_m_s-gain[%08.5f_%08.5f_%08.5f]-time[%08.5f_%08.5f_%08.5f]-"
-		     "awbGain[%08.4f_%08.4f_%08.4f_%08.4f]-dgain[%08d]\n",
-		     frame_id,
-		     expParams->data()->aecExpInfo.HdrExp[2].exp_real_params.analog_gain,
-		     expParams->data()->aecExpInfo.HdrExp[1].exp_real_params.analog_gain,
-		     expParams->data()->aecExpInfo.HdrExp[0].exp_real_params.analog_gain,
-		     expParams->data()->aecExpInfo.HdrExp[2].exp_real_params.integration_time,
-		     expParams->data()->aecExpInfo.HdrExp[1].exp_real_params.integration_time,
-		     expParams->data()->aecExpInfo.HdrExp[0].exp_real_params.integration_time,
-		     ispParams->data()->awb_gain.rgain,
-		     ispParams->data()->awb_gain.grgain,
-		     ispParams->data()->awb_gain.gbgain,
-		     ispParams->data()->awb_gain.bgain,
-		     1);
+                _working_mode == RK_AIQ_ISP_HDR_MODE_3_LINE_HDR) {
+            snprintf(buffer,
+                     sizeof(buffer),
+                     "frame%08d-l_m_s-gain[%08.5f_%08.5f_%08.5f]-time[%08.5f_%08.5f_%08.5f]-"
+                     "awbGain[%08.4f_%08.4f_%08.4f_%08.4f]-dgain[%08d]\n",
+                     frame_id,
+                     expParams->data()->aecExpInfo.HdrExp[2].exp_real_params.analog_gain,
+                     expParams->data()->aecExpInfo.HdrExp[1].exp_real_params.analog_gain,
+                     expParams->data()->aecExpInfo.HdrExp[0].exp_real_params.analog_gain,
+                     expParams->data()->aecExpInfo.HdrExp[2].exp_real_params.integration_time,
+                     expParams->data()->aecExpInfo.HdrExp[1].exp_real_params.integration_time,
+                     expParams->data()->aecExpInfo.HdrExp[0].exp_real_params.integration_time,
+                     ispParams->data()->awb_gain.rgain,
+                     ispParams->data()->awb_gain.grgain,
+                     ispParams->data()->awb_gain.gbgain,
+                     ispParams->data()->awb_gain.bgain,
+                     1);
         } else if (_working_mode == RK_AIQ_ISP_HDR_MODE_2_FRAME_HDR || \
-		   _working_mode == RK_AIQ_ISP_HDR_MODE_2_LINE_HDR) {
-	    snprintf(buffer,
-		     sizeof(buffer),
-		     "frame%08d-l_s-gain[%08.5f_%08.5f]-time[%08.5f_%08.5f]-"
-		     "awbGain[%08.4f_%08.4f_%08.4f_%08.4f]-dgain[%08d]\n",
-		     frame_id,
-		     expParams->data()->aecExpInfo.HdrExp[2].exp_real_params.analog_gain,
-		     expParams->data()->aecExpInfo.HdrExp[0].exp_real_params.analog_gain,
-		     expParams->data()->aecExpInfo.HdrExp[2].exp_real_params.integration_time,
-		     expParams->data()->aecExpInfo.HdrExp[0].exp_real_params.integration_time,
-		     ispParams->data()->awb_gain.rgain,
-		     ispParams->data()->awb_gain.grgain,
-		     ispParams->data()->awb_gain.gbgain,
-		     ispParams->data()->awb_gain.bgain,
-		     1);
-	} else {
-	    snprintf(buffer,
-		     sizeof(buffer),
-		     "frame%08d-gain[%08.5f]-time[%08.5f]-"
-		     "awbGain[%08.4f_%08.4f_%08.4f_%08.4f]-dgain[%08d]\n",
-		     frame_id,
-		     expParams->data()->aecExpInfo.LinearExp.exp_real_params.analog_gain,
-		     expParams->data()->aecExpInfo.LinearExp.exp_real_params.integration_time,
-		     ispParams->data()->awb_gain.rgain,
-		     ispParams->data()->awb_gain.grgain,
-		     ispParams->data()->awb_gain.gbgain,
-		     ispParams->data()->awb_gain.bgain,
-		     1);
-	}
+                   _working_mode == RK_AIQ_ISP_HDR_MODE_2_LINE_HDR) {
+            snprintf(buffer,
+                     sizeof(buffer),
+                     "frame%08d-l_s-gain[%08.5f_%08.5f]-time[%08.5f_%08.5f]-"
+                     "awbGain[%08.4f_%08.4f_%08.4f_%08.4f]-dgain[%08d]\n",
+                     frame_id,
+                     expParams->data()->aecExpInfo.HdrExp[2].exp_real_params.analog_gain,
+                     expParams->data()->aecExpInfo.HdrExp[0].exp_real_params.analog_gain,
+                     expParams->data()->aecExpInfo.HdrExp[2].exp_real_params.integration_time,
+                     expParams->data()->aecExpInfo.HdrExp[0].exp_real_params.integration_time,
+                     ispParams->data()->awb_gain.rgain,
+                     ispParams->data()->awb_gain.grgain,
+                     ispParams->data()->awb_gain.gbgain,
+                     ispParams->data()->awb_gain.bgain,
+                     1);
+        } else {
+            snprintf(buffer,
+                     sizeof(buffer),
+                     "frame%08d-gain[%08.5f]-time[%08.5f]-"
+                     "awbGain[%08.4f_%08.4f_%08.4f_%08.4f]-dgain[%08d]\n",
+                     frame_id,
+                     expParams->data()->aecExpInfo.LinearExp.exp_real_params.analog_gain,
+                     expParams->data()->aecExpInfo.LinearExp.exp_real_params.integration_time,
+                     ispParams->data()->awb_gain.rgain,
+                     ispParams->data()->awb_gain.grgain,
+                     ispParams->data()->awb_gain.gbgain,
+                     ispParams->data()->awb_gain.bgain,
+                     1);
+        }
 
-	fwrite((void *)buffer, strlen(buffer), 1, fp);
-	fflush(fp);
-	fclose(fp);
+        fwrite((void *)buffer, strlen(buffer), 1, fp);
+        fflush(fp);
+        fclose(fp);
     }
 }
 
@@ -991,16 +1003,16 @@ const struct capture_fmt* Isp20PollThread::find_fmt(const uint32_t pixelformat)
     unsigned int i;
 
     for (i = 0; i < sizeof(csirx_fmts); i++) {
-	fmt = &csirx_fmts[i];
-	if (fmt->fourcc == pixelformat)
-	    return fmt;
+        fmt = &csirx_fmts[i];
+        if (fmt->fourcc == pixelformat)
+            return fmt;
     }
 
     return NULL;
 }
 
 int Isp20PollThread::calculate_stride_per_line(const struct capture_fmt& fmt,
-					   uint32_t& bytesPerLine)
+        uint32_t& bytesPerLine)
 {
     uint32_t pixelsPerLine = 0, stridePerLine = 0;
     /* The actual size stored in the memory */
@@ -1015,10 +1027,10 @@ int Isp20PollThread::calculate_stride_per_line(const struct capture_fmt& fmt,
     stridePerLine = 4 * DIV_ROUND_UP(actualBytesPerLine, 4);
 
     LOGD_CAMHW("sns_width: %d, pixelsPerLine: %d, bytesPerLine: %d, stridePerLine: %d\n",
-	   sns_width,
-	   pixelsPerLine,
-	   bytesPerLine,
-	   stridePerLine);
+               sns_width,
+               pixelsPerLine,
+               bytesPerLine,
+               stridePerLine);
 
     return stridePerLine;
 }
@@ -1028,7 +1040,7 @@ int Isp20PollThread::calculate_stride_per_line(const struct capture_fmt& fmt,
  */
 XCamReturn
 Isp20PollThread::write_frame_header_to_raw(FILE *fp, int dev_index,
-					   int sequence)
+        int sequence)
 {
     uint8_t buffer[128] = {0};
     uint32_t stridePerLine = 0, bytesPerLine = 0;
@@ -1037,34 +1049,34 @@ Isp20PollThread::write_frame_header_to_raw(FILE *fp, int dev_index,
     uint8_t frame_type = 0, storage_type = 0;
 
     if (fp == nullptr)
-	return XCAM_RETURN_ERROR_PARAM;
+        return XCAM_RETURN_ERROR_PARAM;
 
     if ((fmt = find_fmt(pixelformat)))
         stridePerLine = calculate_stride_per_line(*fmt, bytesPerLine);
 
     if (_working_mode == RK_AIQ_ISP_HDR_MODE_3_FRAME_HDR || \
-	 _working_mode == RK_AIQ_ISP_HDR_MODE_3_LINE_HDR) {
-	mode = 3;
-	frame_type = dev_index == 0 ? 1: dev_index == 1 ? 2 : 3;
+            _working_mode == RK_AIQ_ISP_HDR_MODE_3_LINE_HDR) {
+        mode = 3;
+        frame_type = dev_index == 0 ? 1 : dev_index == 1 ? 2 : 3;
     } else if (_working_mode == RK_AIQ_ISP_HDR_MODE_2_FRAME_HDR || \
-	     _working_mode == RK_AIQ_ISP_HDR_MODE_2_LINE_HDR) {
-	mode = 2;
-	frame_type = dev_index == 0 ? 1: 3;
+               _working_mode == RK_AIQ_ISP_HDR_MODE_2_LINE_HDR) {
+        mode = 2;
+        frame_type = dev_index == 0 ? 1 : 3;
     } else {
-	mode = 1;
+        mode = 1;
     }
 
 
-    *((uint16_t* )buffer) = RAW_FILE_IDENT;	  // Identifier
-    *((uint16_t* )(buffer + 2)) = HEADER_LEN;	  // Header length
-    *((uint32_t* )(buffer + 4)) = sequence;	  // Frame number
-    *((uint16_t* )(buffer + 8)) = sns_width;	  // Image width
+    *((uint16_t* )buffer) = RAW_FILE_IDENT;   // Identifier
+    *((uint16_t* )(buffer + 2)) = HEADER_LEN;     // Header length
+    *((uint32_t* )(buffer + 4)) = sequence;   // Frame number
+    *((uint16_t* )(buffer + 8)) = sns_width;      // Image width
     *((uint16_t* )(buffer + 10)) = sns_height;    // Image height
-    *(buffer + 12) = fmt->bpp[0];		  // Bit depth
-    *(buffer + 13) = fmt->bayer_fmt;		  // Bayer format
-    *(buffer + 14) = mode;			  // Number of HDR frame
-    *(buffer + 15) = frame_type;		  // Current frame type
-    *(buffer + 16) = storage_type;		  // Storage type
+    *(buffer + 12) = fmt->bpp[0];         // Bit depth
+    *(buffer + 13) = fmt->bayer_fmt;          // Bayer format
+    *(buffer + 14) = mode;            // Number of HDR frame
+    *(buffer + 15) = frame_type;          // Current frame type
+    *(buffer + 16) = storage_type;        // Storage type
     *((uint16_t* )(buffer + 17)) = stridePerLine; // Line stride
     *((uint16_t* )(buffer + 19)) = bytesPerLine;  // Effective line stride
 
@@ -1072,22 +1084,22 @@ Isp20PollThread::write_frame_header_to_raw(FILE *fp, int dev_index,
     fflush(fp);
 
     LOGV_CAMHW("frame%d: image rect: %dx%d, %d bit depth, Bayer fmt: %d, "
-	   "hdr frame number: %d, frame type: %d, Storage type: %d, "
-	   "line stride: %d, Effective line stride: %d\n",
-	   sequence, sns_width, sns_height,
-	   fmt->bpp[0], fmt->bayer_fmt, mode,
-	   frame_type, storage_type, stridePerLine,
-	   bytesPerLine);
+               "hdr frame number: %d, frame type: %d, Storage type: %d, "
+               "line stride: %d, Effective line stride: %d\n",
+               sequence, sns_width, sns_height,
+               fmt->bpp[0], fmt->bayer_fmt, mode,
+               frame_type, storage_type, stridePerLine,
+               bytesPerLine);
 
     return XCAM_RETURN_NO_ERROR;
 }
 
 XCamReturn
 Isp20PollThread::write_raw_to_file(FILE* fp, int dev_index,
-				   int sequence, void* userptr, int size)
+                                   int sequence, void* userptr, int size)
 {
     if (fp == nullptr)
-	return XCAM_RETURN_ERROR_PARAM;
+        return XCAM_RETURN_ERROR_PARAM;
 
     fwrite(userptr, size, 1, fp);
     fflush(fp);
@@ -1095,9 +1107,9 @@ Isp20PollThread::write_raw_to_file(FILE* fp, int dev_index,
     if (!dev_index) {
         for (int i = 0; i < _capture_raw_num; i++)
             printf(">");
-	printf("\n");
+        printf("\n");
 
-	LOGV_CAMHW("write frame%d raw\n", sequence);
+        LOGV_CAMHW("write frame%d raw\n", sequence);
     }
 
     return XCAM_RETURN_NO_ERROR;
@@ -1105,41 +1117,41 @@ Isp20PollThread::write_raw_to_file(FILE* fp, int dev_index,
 
 void
 Isp20PollThread::write_reg_to_file(uint32_t base_addr, uint32_t offset_addr,
-				   int len, int sequence)
+                                   int len, int sequence)
 {
     char cmd_buffer[128] = {0};
 
     if (base_addr == ISP_REGS_BASE) {
 #if 1
         snprintf(cmd_buffer, sizeof(cmd_buffer),
-		 "io -4 -l 0x%x 0x%x > %s/frame%d_isp_reg",
-		 len,
-		 base_addr + offset_addr,
-		 raw_dir_path,
-		 sequence);
+                 "io -4 -l 0x%x 0x%x > %s/frame%d_isp_reg",
+                 len,
+                 base_addr + offset_addr,
+                 raw_dir_path,
+                 sequence);
 #else
-	snprintf(cmd_buffer, sizeof(cmd_buffer),
-		 "io -4 -r -f %s/frame%d_isp_reg -l 0x%x 0x%x",
-		 raw_dir_path,
-		 sequence,
-		 len,
-		 base_addr + offset_addr);
+        snprintf(cmd_buffer, sizeof(cmd_buffer),
+                 "io -4 -r -f %s/frame%d_isp_reg -l 0x%x 0x%x",
+                 raw_dir_path,
+                 sequence,
+                 len,
+                 base_addr + offset_addr);
 #endif
     } else {
 #if 1
         snprintf(cmd_buffer, sizeof(cmd_buffer),
-		 "io -4 -l 0x%x 0x%x > %s/frame%d_ispp_reg",
-		 len,
-		 base_addr + offset_addr,
-		 raw_dir_path,
-		 sequence);
+                 "io -4 -l 0x%x 0x%x > %s/frame%d_ispp_reg",
+                 len,
+                 base_addr + offset_addr,
+                 raw_dir_path,
+                 sequence);
 #else
-	snprintf(cmd_buffer, sizeof(cmd_buffer),
-		 "io -4 -r -f %s/frame%d_isppp_reg -l 0x%x 0x%x",
-		 raw_dir_path,
-		 sequence,
-		 len,
-		 base_addr + offset_addr);
+        snprintf(cmd_buffer, sizeof(cmd_buffer),
+                 "io -4 -r -f %s/frame%d_isppp_reg -l 0x%x 0x%x",
+                 raw_dir_path,
+                 sequence,
+                 len,
+                 base_addr + offset_addr);
 #endif
     }
 
@@ -1153,25 +1165,25 @@ Isp20PollThread::creat_raw_dir(const char* path)
     struct tm* timenow;
 
     if (!path)
-	return XCAM_RETURN_ERROR_FAILED;
+        return XCAM_RETURN_ERROR_FAILED;
 
     time(&now);
     timenow = localtime(&now);
     snprintf(raw_dir_path, sizeof(raw_dir_path), "%s/raw_%04d-%02d-%02d_%02d-%02d-%02d",
-	     path,
-	     timenow->tm_year + 1900,
-	     timenow->tm_mon + 1,
-	     timenow->tm_mday,
-	     timenow->tm_hour,
-	     timenow->tm_min,
-	     timenow->tm_sec);
+             path,
+             timenow->tm_year + 1900,
+             timenow->tm_mon + 1,
+             timenow->tm_mday,
+             timenow->tm_hour,
+             timenow->tm_min,
+             timenow->tm_sec);
 
     LOGV_CAMHW("mkdir %s for capturing %d frames raw!\n",
-	       raw_dir_path, _capture_raw_num);
+               raw_dir_path, _capture_raw_num);
 
     if(mkdir(raw_dir_path, 0755) < 0) {
         LOGE_CAMHW("mkdir %s error!!!\n", raw_dir_path);
-	return XCAM_RETURN_ERROR_PARAM;
+        return XCAM_RETURN_ERROR_PARAM;
     }
 
     _is_raw_dir_exist = true;

@@ -238,14 +238,14 @@ public:
         , updateAtt(false) {};
     virtual ~RkAiqAhdrHandleInt() {
         RkAiqAhdrHandle::deInit();
-	};
+    };
     virtual XCamReturn updateConfig();
     virtual XCamReturn prepare();
     virtual XCamReturn preProcess();
     virtual XCamReturn processing();
     virtual XCamReturn postProcess();
     XCamReturn setAttrib(ahdr_attrib_t att);
-    XCamReturn getAttrib(ahdr_attrib_t att);
+    XCamReturn getAttrib(ahdr_attrib_t* att);
 protected:
     virtual void init();
     virtual void deInit() {
@@ -269,7 +269,7 @@ public:
         , RkAiqHandleIntCom(des, aiqCore) {};
     virtual ~RkAiqAgicHandleInt() {
         RkAiqAgicHandle::deInit();
-	};
+    };
     virtual XCamReturn updateConfig();
     virtual XCamReturn prepare();
     virtual XCamReturn preProcess();
@@ -479,9 +479,9 @@ public:
         : RkAiqHandle(des, aiqCore)
         , RkAiqAblcHandle(des, aiqCore)
         , RkAiqHandleIntCom(des, aiqCore) {
-            memset(&mCurAtt, 0, sizeof(rk_aiq_blc_attrib_t));
-            memset(&mNewAtt, 0, sizeof(rk_aiq_blc_attrib_t));
-        };
+        memset(&mCurAtt, 0, sizeof(rk_aiq_blc_attrib_t));
+        memset(&mNewAtt, 0, sizeof(rk_aiq_blc_attrib_t));
+    };
     virtual ~RkAiqAblcHandleInt() {
         RkAiqAblcHandle::deInit();
     };
@@ -497,7 +497,7 @@ public:
 protected:
     virtual void init();
     virtual void deInit() {
-    RkAiqAblcHandle::deInit();
+        RkAiqAblcHandle::deInit();
     };
 private:
     // TODO
@@ -517,9 +517,9 @@ public:
         : RkAiqHandle(des, aiqCore)
         , RkAiqAdpccHandle(des, aiqCore)
         , RkAiqHandleIntCom(des, aiqCore) {
-            memset(&mCurAtt, 0, sizeof(rk_aiq_dpcc_attrib_t));
-            memset(&mNewAtt, 0, sizeof(rk_aiq_dpcc_attrib_t));
-        };
+        memset(&mCurAtt, 0, sizeof(rk_aiq_dpcc_attrib_t));
+        memset(&mNewAtt, 0, sizeof(rk_aiq_dpcc_attrib_t));
+    };
     virtual ~RkAiqAdpccHandleInt() {
         RkAiqAdpccHandle::deInit();
     };
@@ -535,7 +535,7 @@ public:
 protected:
     virtual void init();
     virtual void deInit() {
-    RkAiqAdpccHandle::deInit();
+        RkAiqAdpccHandle::deInit();
     };
 private:
     // TODO
@@ -553,9 +553,9 @@ public:
         : RkAiqHandle(des, aiqCore)
         , RkAiqAnrHandle(des, aiqCore)
         , RkAiqHandleIntCom(des, aiqCore) {
-            memset(&mCurAtt, 0, sizeof(rk_aiq_nr_attrib_t));
-            memset(&mNewAtt, 0, sizeof(rk_aiq_nr_attrib_t));
-        };
+        memset(&mCurAtt, 0, sizeof(rk_aiq_nr_attrib_t));
+        memset(&mNewAtt, 0, sizeof(rk_aiq_nr_attrib_t));
+    };
     virtual ~RkAiqAnrHandleInt() {
         RkAiqAnrHandle::deInit();
     };
@@ -571,7 +571,7 @@ public:
 protected:
     virtual void init();
     virtual void deInit() {
-    RkAiqAnrHandle::deInit();
+        RkAiqAnrHandle::deInit();
     };
 private:
     // TODO
@@ -589,9 +589,9 @@ public:
         : RkAiqHandle(des, aiqCore)
         , RkAiqAsharpHandle(des, aiqCore)
         , RkAiqHandleIntCom(des, aiqCore) {
-            memset(&mCurAtt, 0, sizeof(rk_aiq_sharp_attrib_t));
-            memset(&mNewAtt, 0, sizeof(rk_aiq_sharp_attrib_t));
-        };
+        memset(&mCurAtt, 0, sizeof(rk_aiq_sharp_attrib_t));
+        memset(&mNewAtt, 0, sizeof(rk_aiq_sharp_attrib_t));
+    };
     virtual ~RkAiqAsharpHandleInt() {
         RkAiqAsharpHandle::deInit();
     };
@@ -607,7 +607,7 @@ public:
 protected:
     virtual void init();
     virtual void deInit() {
-    RkAiqAsharpHandle::deInit();
+        RkAiqAsharpHandle::deInit();
     };
 private:
     // TODO

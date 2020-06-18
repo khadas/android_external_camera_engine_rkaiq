@@ -1,12 +1,12 @@
 #ifndef __RK_AIQ_TYPES_AF_ALGO_H__
 #define __RK_AIQ_TYPES_AF_ALGO_H__
 
-#define RKAIQ_RAWAF_WIN_NUM		2
-#define RKAIQ_RAWAF_LINE_NUM		5
-#define RKAIQ_RAWAF_GAMMA_NUM		17
-#define RKAIQ_RAWAF_SUMDATA_ROW		15
-#define RKAIQ_RAWAF_SUMDATA_COLUMN	15
-#define RKAIQ_RAWAF_SUMDATA_NUM		225
+#define RKAIQ_RAWAF_WIN_NUM     2
+#define RKAIQ_RAWAF_LINE_NUM        5
+#define RKAIQ_RAWAF_GAMMA_NUM       17
+#define RKAIQ_RAWAF_SUMDATA_ROW     15
+#define RKAIQ_RAWAF_SUMDATA_COLUMN  15
+#define RKAIQ_RAWAF_SUMDATA_NUM     225
 
 typedef struct {
     unsigned int roia_sharpness;

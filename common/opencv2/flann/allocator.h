@@ -50,7 +50,7 @@ namespace cvflann
 template <typename T>
 T* allocate(size_t count = 1)
 {
-    T* mem = (T*) ::malloc(sizeof(T)*count);
+    T* mem = (T*) ::malloc(sizeof(T) * count);
     return mem;
 }
 
@@ -70,15 +70,15 @@ T* allocate(size_t count = 1)
  *
  */
 
-const size_t     WORDSIZE=16;
-const  size_t     BLOCKSIZE=8192;
+const size_t     WORDSIZE = 16;
+const  size_t     BLOCKSIZE = 8192;
 
 class PooledAllocator
 {
     /* We maintain memory alignment to word boundaries by requiring that all
         allocations be in multiples of the machine wordsize.  */
     /* Size of machine word in bytes.  Must be power of 2. */
-    /* Minimum number of bytes requested at a time from	the system.  Must be multiple of WORDSIZE. */
+    /* Minimum number of bytes requested at a time from the system.  Must be multiple of WORDSIZE. */
 
 
     int     remaining;  /* Number of bytes left in current block of storage. */
@@ -141,13 +141,13 @@ public:
             wastedMemory += remaining;
 
             /* Allocate new storage. */
-            blockSize = (size + sizeof(void*) + (WORDSIZE-1) > BLOCKSIZE) ?
-                        size + sizeof(void*) + (WORDSIZE-1) : BLOCKSIZE;
+            blockSize = (size + sizeof(void*) + (WORDSIZE - 1) > BLOCKSIZE) ?
+                        size + sizeof(void*) + (WORDSIZE - 1) : BLOCKSIZE;
 
             // use the standard C malloc to allocate memory
             void* m = ::malloc(blockSize);
             if (!m) {
-                fprintf(stderr,"Failed to allocate memory.\n");
+                fprintf(stderr, "Failed to allocate memory.\n");
                 return NULL;
             }
 
@@ -180,7 +180,7 @@ public:
     template <typename T>
     T* allocate(size_t count = 1)
     {
-        T* mem = (T*) this->allocateMemory((int)(sizeof(T)*count));
+        T* mem = (T*) this->allocateMemory((int)(sizeof(T) * count));
         return mem;
     }
 

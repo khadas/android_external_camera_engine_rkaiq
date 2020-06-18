@@ -94,9 +94,9 @@ public:
     {
         // cv::flann::IndexParams sets integer params as 'int', so it is used with get_param
         // in place of 'unsigned int'
-        table_number_ = (unsigned int)get_param<int>(index_params_,"table_number",12);
-        key_size_ = (unsigned int)get_param<int>(index_params_,"key_size",20);
-        multi_probe_level_ = (unsigned int)get_param<int>(index_params_,"multi_probe_level",2);
+        table_number_ = (unsigned int)get_param<int>(index_params_, "table_number", 12);
+        key_size_ = (unsigned int)get_param<int>(index_params_, "key_size", 20);
+        multi_probe_level_ = (unsigned int)get_param<int>(index_params_, "multi_probe_level", 2);
 
         feature_size_ = (unsigned)dataset_.cols;
         fill_xor_mask(0, key_size_, multi_probe_level_, xor_masks_);
@@ -129,9 +129,9 @@ public:
 
     void saveIndex(FILE* stream) CV_OVERRIDE
     {
-        save_value(stream,table_number_);
-        save_value(stream,key_size_);
-        save_value(stream,multi_probe_level_);
+        save_value(stream, table_number_);
+        save_value(stream, key_size_);
+        save_value(stream, multi_probe_level_);
         save_value(stream, dataset_);
     }
 
@@ -204,7 +204,7 @@ public:
             std::fill_n(indices[i], knn, -1);
             std::fill_n(dists[i], knn, std::numeric_limits<DistanceType>::max());
             findNeighbors(resultSet, queries[i], params);
-            if (get_param(params,"sorted",true)) resultSet.sortAndCopy(indices[i], dists[i], knn);
+            if (get_param(params, "sorted", true)) resultSet.sortAndCopy(indices[i], dists[i], knn);
             else resultSet.copy(indices[i], dists[i], knn);
         }
     }

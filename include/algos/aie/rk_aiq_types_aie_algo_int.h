@@ -18,21 +18,21 @@
  */
 
 #ifndef _RK_AIQ_TYPES_AIE_ALGO_INT_H_
-#define _RK_AIQ_TYPES_AIE_ALGO_INT_H_ 
+#define _RK_AIQ_TYPES_AIE_ALGO_INT_H_
 
-#include "rk_aiq_types_aie_algo.h" 
+#include "rk_aiq_types_aie_algo.h"
 
-typedef struct rk_aiq_aie_params_int_s { 
-  unsigned char mode_coeffs[9];
-  /* range: 0 to 15.75*/
-  float sharp_factor; /*!< only used by SHARPEN mode */
-  /*
-  Threshold for coring function. This value is used to avoid amplifying noise too much by suppressing sharpening
-  for small gradients. Higher value means less sharpening for smooth edges. Threshold zero means no coring,
-  so all gradients are treated the same. Threshold 255 means nearly no sharpening. An absolute value for the
-  highpass signal is defined here. The highpass signal is truncated at the defined level.
-  */
-  unsigned char sharp_thres; /*!< only used by SHARPEN mode */
+typedef struct rk_aiq_aie_params_int_s {
+    unsigned char mode_coeffs[9];
+    /* range: 0 to 15.75*/
+    float sharp_factor; /*!< only used by SHARPEN mode */
+    /*
+    Threshold for coring function. This value is used to avoid amplifying noise too much by suppressing sharpening
+    for small gradients. Higher value means less sharpening for smooth edges. Threshold zero means no coring,
+    so all gradients are treated the same. Threshold 255 means nearly no sharpening. An absolute value for the
+    highpass signal is defined here. The highpass signal is truncated at the defined level.
+    */
+    unsigned char sharp_thres; /*!< only used by SHARPEN mode */
 } rk_aiq_aie_params_int_t;
 
 #endif

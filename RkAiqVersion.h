@@ -31,7 +31,7 @@
  *  - fix circular flicker of image luma
  *  - add fec and ldch, default disabled
  * v0.1.1
- *  - fix some bugs of bayer nr, ynr, uvnr 
+ *  - fix some bugs of bayer nr, ynr, uvnr
  *  - optimize imx347 hdr mode image quality
  *  - workaround for imx347 ae flicker when the
  *    luma changed dramatically
@@ -70,7 +70,7 @@
  * - imx347 IQ xml v1.0.9
  * - update ahdr algo
  * - modify awb & aec runinterval para & mfnr para for gc4c33
- * - use VS as unified timestamp 
+ * - use VS as unified timestamp
  * v0.1.6
  * - gc4c33 IQ v1.0.7
  * - imx347 IQ v1.0.a
@@ -87,8 +87,17 @@
  * - NR & sharp: fix bug for free iso level
  * - fix wrong expression in caga part
  * - modify calibdb load logic
+ * v0.1.8
+ * - gc4c33 iq v1.0.b
+ * - demo support full/limit range
+ * - fix rkisp_parse_demo can't generate bin error
+ * - Add sensor dpcc setting to IQ
+ * - change sensor_dpcc.enable from bool to int
+ * - update DPCC setting in GC4C33 IQ
+ * - format the source codes
+ * - add hsnr & lsnr control from AE pre results
  */
 
-#define RK_AIQ_VERSION "v0.1.7"
-#define RK_AIQ_RELEASE_DATE "2020-06-12"
+#define RK_AIQ_VERSION "v0.1.8"
+#define RK_AIQ_RELEASE_DATE "2020-06-18"
 #endif

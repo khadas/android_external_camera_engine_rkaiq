@@ -62,7 +62,7 @@ public:
     Matrix(T* data_, size_t rows_, size_t cols_, size_t stride_ = 0) :
         rows(rows_), cols(cols_),  stride(stride_), data(data_)
     {
-        if (stride==0) stride = cols;
+        if (stride == 0) stride = cols;
     }
 
     /**
@@ -81,7 +81,7 @@ public:
      */
     T* operator[](size_t index) const
     {
-        return data+index*stride;
+        return data + index * stride;
     }
 };
 

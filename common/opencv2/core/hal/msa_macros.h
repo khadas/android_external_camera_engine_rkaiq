@@ -1088,48 +1088,48 @@ __extension__ extern __inline v4i32
 __attribute__ ((__always_inline__, __gnu_inline__, __artificial__))
 msa_mlaq_s32(v4i32 __a, v4i32 __b, v4i32 __c)
 {
-  __asm__ volatile("maddv.w %w[__a], %w[__b], %w[__c]\n"
-               // Outputs
-               : [__a] "+f"(__a)
-               // Inputs
-               : [__b] "f"(__b), [__c] "f"(__c));
-  return __a;
+    __asm__ volatile("maddv.w %w[__a], %w[__b], %w[__c]\n"
+                     // Outputs
+                     : [__a] "+f"(__a)
+                     // Inputs
+                     : [__b] "f"(__b), [__c] "f"(__c));
+    return __a;
 }
 
 __extension__ extern __inline v2i64
 __attribute__ ((__always_inline__, __gnu_inline__, __artificial__))
 msa_mlaq_s64(v2i64 __a, v2i64 __b, v2i64 __c)
 {
-  __asm__ volatile("maddv.d %w[__a], %w[__b], %w[__c]\n"
-               // Outputs
-               : [__a] "+f"(__a)
-               // Inputs
-               : [__b] "f"(__b), [__c] "f"(__c));
-  return __a;
+    __asm__ volatile("maddv.d %w[__a], %w[__b], %w[__c]\n"
+                     // Outputs
+                     : [__a] "+f"(__a)
+                     // Inputs
+                     : [__b] "f"(__b), [__c] "f"(__c));
+    return __a;
 }
 
 __extension__ extern __inline v4f32
 __attribute__ ((__always_inline__, __gnu_inline__, __artificial__))
 msa_mlaq_f32(v4f32 __a, v4f32 __b, v4f32 __c)
 {
-  __asm__ volatile("fmadd.w %w[__a], %w[__b], %w[__c]\n"
-               // Outputs
-               : [__a] "+f"(__a)
-               // Inputs
-               : [__b] "f"(__b), [__c] "f"(__c));
-  return __a;
+    __asm__ volatile("fmadd.w %w[__a], %w[__b], %w[__c]\n"
+                     // Outputs
+                     : [__a] "+f"(__a)
+                     // Inputs
+                     : [__b] "f"(__b), [__c] "f"(__c));
+    return __a;
 }
 
 __extension__ extern __inline v2f64
 __attribute__ ((__always_inline__, __gnu_inline__, __artificial__))
 msa_mlaq_f64(v2f64 __a, v2f64 __b, v2f64 __c)
 {
-  __asm__ volatile("fmadd.d %w[__a], %w[__b], %w[__c]\n"
-               // Outputs
-               : [__a] "+f"(__a)
-               // Inputs
-               : [__b] "f"(__b), [__c] "f"(__c));
-  return __a;
+    __asm__ volatile("fmadd.d %w[__a], %w[__b], %w[__c]\n"
+                     // Outputs
+                     : [__a] "+f"(__a)
+                     // Inputs
+                     : [__b] "f"(__b), [__c] "f"(__c));
+    return __a;
 }
 
 /* cntq */
@@ -1544,10 +1544,10 @@ __extension__ extern __inline v8i16
 __attribute__ ((__always_inline__, __gnu_inline__, __artificial__))
 msa_qdmulhq_n_s16(v8i16 a, int16_t b)
 {
-  v8i16 a_lo, a_hi;
-  ILVRL_H2_SH(a, msa_dupq_n_s16(0), a_lo, a_hi);
-  return msa_packr_s32(msa_shlq_n_s32(msa_mulq_s32(msa_paddlq_s16(a_lo), msa_dupq_n_s32(b)), 1),
-                       msa_shlq_n_s32(msa_mulq_s32(msa_paddlq_s16(a_hi), msa_dupq_n_s32(b)), 1), 16);
+    v8i16 a_lo, a_hi;
+    ILVRL_H2_SH(a, msa_dupq_n_s16(0), a_lo, a_hi);
+    return msa_packr_s32(msa_shlq_n_s32(msa_mulq_s32(msa_paddlq_s16(a_lo), msa_dupq_n_s32(b)), 1),
+                         msa_shlq_n_s32(msa_mulq_s32(msa_paddlq_s16(a_hi), msa_dupq_n_s32(b)), 1), 16);
 }
 
 #ifdef __cplusplus

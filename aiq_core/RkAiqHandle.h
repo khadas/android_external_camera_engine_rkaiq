@@ -30,23 +30,33 @@ class RkAiqHandle {
 public:
     explicit RkAiqHandle(RkAiqAlgoDesComm* des, RkAiqCore* aiqCore);
     virtual ~RkAiqHandle();
-    void setEnable(bool enable) { mEnable = enable; };
-    bool getEnable() { return mEnable; };
+    void setEnable(bool enable) {
+        mEnable = enable;
+    };
+    bool getEnable() {
+        return mEnable;
+    };
     virtual XCamReturn prepare();
     virtual XCamReturn preProcess();
     virtual XCamReturn processing();
     virtual XCamReturn postProcess();
-    RkAiqAlgoContext* getAlgoCtx() { return mAlgoCtx; }
-    int getAlgoId() { return mDes->id; }
-    virtual XCamReturn updateConfig() { return XCAM_RETURN_NO_ERROR; };
+    RkAiqAlgoContext* getAlgoCtx() {
+        return mAlgoCtx;
+    }
+    int getAlgoId() {
+        return mDes->id;
+    }
+    virtual XCamReturn updateConfig() {
+        return XCAM_RETURN_NO_ERROR;
+    };
 protected:
     virtual void init() = 0;
     virtual void deInit();
     enum {
-       RKAIQ_CONFIG_COM_PREPARE, 
-       RKAIQ_CONFIG_COM_PRE, 
-       RKAIQ_CONFIG_COM_PROC, 
-       RKAIQ_CONFIG_COM_POST, 
+        RKAIQ_CONFIG_COM_PREPARE,
+        RKAIQ_CONFIG_COM_PRE,
+        RKAIQ_CONFIG_COM_PROC,
+        RKAIQ_CONFIG_COM_POST,
     };
     virtual XCamReturn configInparamsCom(RkAiqAlgoCom* com, int type);
     RkAiqAlgoCom*     mConfig;

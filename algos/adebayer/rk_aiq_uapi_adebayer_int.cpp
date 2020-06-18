@@ -36,8 +36,8 @@ rk_aiq_uapi_adebayer_GetAttrib
 )
 {
     if(ctx == NULL || attr == NULL) {
-      LOGE_ADEBAYER("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
-      return XCAM_RETURN_ERROR_PARAM;
+        LOGE_ADEBAYER("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
+        return XCAM_RETURN_ERROR_PARAM;
     }
 
     AdebayerContext_t* pAdebayerCtx = (AdebayerContext_t*)&ctx->adebayerCtx;

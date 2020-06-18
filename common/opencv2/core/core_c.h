@@ -107,8 +107,8 @@ The returned IplImage\* points to the initialized header.
 @param align Alignment for image rows, typically 4 or 8 bytes
  */
 CVAPI(IplImage*) cvInitImageHeader( IplImage* image, CvSize size, int depth,
-                                   int channels, int origin CV_DEFAULT(0),
-                                   int align CV_DEFAULT(4));
+                                    int channels, int origin CV_DEFAULT(0),
+                                    int align CV_DEFAULT(4));
 
 /** @brief Creates an image header and allocates the image data.
 
@@ -252,8 +252,8 @@ following code computes the matrix product of two matrices, stored as ordinary a
 possible step is used which assumes there are no gaps between subsequent rows of the matrix.
  */
 CVAPI(CvMat*) cvInitMatHeader( CvMat* mat, int rows, int cols,
-                              int type, void* data CV_DEFAULT(NULL),
-                              int step CV_DEFAULT(CV_AUTOSTEP) );
+                               int type, void* data CV_DEFAULT(NULL),
+                               int step CV_DEFAULT(CV_AUTOSTEP) );
 
 /** @brief Creates a matrix header and allocates the matrix data.
 
@@ -369,8 +369,8 @@ cvGetRow(arr, submat, row) is a shortcut for cvGetRows(arr, submat, row, row+1).
 row from start_row and up to (but not including) end_row .
  */
 CVAPI(CvMat*) cvGetRows( const CvArr* arr, CvMat* submat,
-                        int start_row, int end_row,
-                        int delta_row CV_DEFAULT(1));
+                         int start_row, int end_row,
+                         int delta_row CV_DEFAULT(1));
 
 /** @overload
 @param arr Input array
@@ -396,7 +396,7 @@ cvGetCols(arr, submat, col, col+1).
 @param end_col Zero-based index of the ending column (exclusive) of the span
  */
 CVAPI(CvMat*) cvGetCols( const CvArr* arr, CvMat* submat,
-                        int start_col, int end_col );
+                         int start_col, int end_col );
 
 /** @overload
 @param arr Input array
@@ -418,11 +418,11 @@ corresponds to the diagonal above the main, 1 corresponds to the diagonal below 
 forth.
  */
 CVAPI(CvMat*) cvGetDiag( const CvArr* arr, CvMat* submat,
-                            int diag CV_DEFAULT(0));
+                         int diag CV_DEFAULT(0));
 
 /** low-level scalar <-> raw data conversion functions */
 CVAPI(void) cvScalarToRawData( const CvScalar* scalar, void* data, int type,
-                              int extend_to_12 CV_DEFAULT(0) );
+                               int extend_to_12 CV_DEFAULT(0) );
 
 CVAPI(void) cvRawDataToScalar( const void* data, int type, CvScalar* scalar );
 
@@ -509,7 +509,7 @@ or NULL if the array is empty.
 @param mat_iterator Initialized iterator
  */
 CVAPI(CvSparseNode*) cvInitSparseMatIterator( const CvSparseMat* mat,
-                                              CvSparseMatIterator* mat_iterator );
+        CvSparseMatIterator* mat_iterator );
 
 /** @brief Returns the next sparse matrix element
 
@@ -651,7 +651,7 @@ CVAPI(uchar*) cvPtr1D( const CvArr* arr, int idx0, int* type CV_DEFAULT(NULL));
 CVAPI(uchar*) cvPtr2D( const CvArr* arr, int idx0, int idx1, int* type CV_DEFAULT(NULL) );
 /** @overload */
 CVAPI(uchar*) cvPtr3D( const CvArr* arr, int idx0, int idx1, int idx2,
-                      int* type CV_DEFAULT(NULL));
+                       int* type CV_DEFAULT(NULL));
 /** @overload
 @param arr Input array
 @param idx Array of the element indices
@@ -663,8 +663,8 @@ the function does not recalculate the node hash value, but takes it from the spe
 It is useful for speeding up pair-wise operations (TODO: provide an example)
 */
 CVAPI(uchar*) cvPtrND( const CvArr* arr, const int* idx, int* type CV_DEFAULT(NULL),
-                      int create_node CV_DEFAULT(1),
-                      unsigned* precalc_hashval CV_DEFAULT(NULL));
+                       int create_node CV_DEFAULT(1),
+                       unsigned* precalc_hashval CV_DEFAULT(NULL));
 
 /** @brief Return a specific array element.
 
@@ -742,7 +742,7 @@ CVAPI(void) cvSetReal1D( CvArr* arr, int idx0, double value );
 CVAPI(void) cvSetReal2D( CvArr* arr, int idx0, int idx1, double value );
 /** @overload */
 CVAPI(void) cvSetReal3D( CvArr* arr, int idx0,
-                        int idx1, int idx2, double value );
+                         int idx1, int idx2, double value );
 /** @overload
 @param arr Input array
 @param idx Array of the element indices
@@ -777,8 +777,8 @@ more than 2 dimensions). The CvMatND array must be continuous.
 @sa cvGetImage, cvarrToMat.
  */
 CVAPI(CvMat*) cvGetMat( const CvArr* arr, CvMat* header,
-                       int* coi CV_DEFAULT(NULL),
-                       int allowND CV_DEFAULT(0));
+                        int* coi CV_DEFAULT(NULL),
+                        int allowND CV_DEFAULT(0));
 
 /** @brief Returns image header for arbitrary array.
 
@@ -830,8 +830,8 @@ total number of elements must remain the same. Thus, if new_dims = 1, new_sizes 
 used.
  */
 CVAPI(CvArr*) cvReshapeMatND( const CvArr* arr,
-                             int sizeof_header, CvArr* header,
-                             int new_cn, int new_dims, int* new_sizes );
+                              int sizeof_header, CvArr* header,
+                              int new_cn, int new_dims, int* new_sizes );
 
 #define cvReshapeND( arr, header, new_cn, new_dims, new_sizes )   \
       cvReshapeMatND( (arr), sizeof(*(header)), (header),         \
@@ -865,7 +865,7 @@ unchanged.
 unchanged unless it needs to be changed according to new_cn value.
 */
 CVAPI(CvMat*) cvReshape( const CvArr* arr, CvMat* header,
-                        int new_cn, int new_rows CV_DEFAULT(0) );
+                         int new_cn, int new_rows CV_DEFAULT(0) );
 
 /** Repeats source 2d array several times in both horizontal and
    vertical direction to fill destination array */
@@ -928,8 +928,8 @@ array elements :
 @param roi_size Output ROI size
  */
 CVAPI(void) cvGetRawData( const CvArr* arr, uchar** data,
-                         int* step CV_DEFAULT(NULL),
-                         CvSize* roi_size CV_DEFAULT(NULL));
+                          int* step CV_DEFAULT(NULL),
+                          CvSize* roi_size CV_DEFAULT(NULL));
 
 /** @brief Returns size of matrix or image ROI.
 
@@ -1039,8 +1039,8 @@ CVAPI(void)  cvConvertScaleAbs( const CvArr* src, CvArr* dst,
    max_iter to default_max_iters (if it is not set)
 */
 CVAPI(CvTermCriteria) cvCheckTermCriteria( CvTermCriteria criteria,
-                                           double default_eps,
-                                           int default_max_iters );
+        double default_eps,
+        int default_max_iters );
 
 /****************************************************************************************\
 *                   Arithmetic, logic and comparison operations                          *
@@ -1107,38 +1107,38 @@ CVAPI(double)  cvDotProduct( const CvArr* src1, const CvArr* src2 );
 
 /** dst(idx) = src1(idx) & src2(idx) */
 CVAPI(void) cvAnd( const CvArr* src1, const CvArr* src2,
-                  CvArr* dst, const CvArr* mask CV_DEFAULT(NULL));
+                   CvArr* dst, const CvArr* mask CV_DEFAULT(NULL));
 
 /** dst(idx) = src(idx) & value */
 CVAPI(void) cvAndS( const CvArr* src, CvScalar value,
-                   CvArr* dst, const CvArr* mask CV_DEFAULT(NULL));
+                    CvArr* dst, const CvArr* mask CV_DEFAULT(NULL));
 
 /** dst(idx) = src1(idx) | src2(idx) */
 CVAPI(void) cvOr( const CvArr* src1, const CvArr* src2,
-                 CvArr* dst, const CvArr* mask CV_DEFAULT(NULL));
+                  CvArr* dst, const CvArr* mask CV_DEFAULT(NULL));
 
 /** dst(idx) = src(idx) | value */
 CVAPI(void) cvOrS( const CvArr* src, CvScalar value,
-                  CvArr* dst, const CvArr* mask CV_DEFAULT(NULL));
+                   CvArr* dst, const CvArr* mask CV_DEFAULT(NULL));
 
 /** dst(idx) = src1(idx) ^ src2(idx) */
 CVAPI(void) cvXor( const CvArr* src1, const CvArr* src2,
-                  CvArr* dst, const CvArr* mask CV_DEFAULT(NULL));
+                   CvArr* dst, const CvArr* mask CV_DEFAULT(NULL));
 
 /** dst(idx) = src(idx) ^ value */
 CVAPI(void) cvXorS( const CvArr* src, CvScalar value,
-                   CvArr* dst, const CvArr* mask CV_DEFAULT(NULL));
+                    CvArr* dst, const CvArr* mask CV_DEFAULT(NULL));
 
 /** dst(idx) = ~src(idx) */
 CVAPI(void) cvNot( const CvArr* src, CvArr* dst );
 
 /** dst(idx) = lower(idx) <= src(idx) < upper(idx) */
 CVAPI(void) cvInRange( const CvArr* src, const CvArr* lower,
-                      const CvArr* upper, CvArr* dst );
+                       const CvArr* upper, CvArr* dst );
 
 /** dst(idx) = lower <= src(idx) < upper */
 CVAPI(void) cvInRangeS( const CvArr* src, CvScalar lower,
-                       CvScalar upper, CvArr* dst );
+                        CvScalar upper, CvArr* dst );
 
 #define CV_CMP_EQ   0
 #define CV_CMP_GT   1
@@ -1242,7 +1242,7 @@ it is the standard deviation of the random numbers.
 @sa randu, randn, RNG::fill.
  */
 CVAPI(void) cvRandArr( CvRNG* rng, CvArr* arr, int dist_type,
-                      CvScalar param1, CvScalar param2 );
+                       CvScalar param1, CvScalar param2 );
 
 CVAPI(void) cvRandShuffle( CvArr* mat, CvRNG* rng,
                            double iter_factor CV_DEFAULT(1.));
@@ -1261,7 +1261,7 @@ CVAPI(int) cvSolveCubic( const CvMat* coeffs, CvMat* roots );
 
 /** Finds all real and complex roots of a polynomial equation */
 CVAPI(void) cvSolvePoly(const CvMat* coeffs, CvMat *roots2,
-      int maxiter CV_DEFAULT(20), int fig CV_DEFAULT(100));
+                        int maxiter CV_DEFAULT(20), int fig CV_DEFAULT(100));
 
 /****************************************************************************************\
 *                                Matrix operations                                       *
@@ -1637,7 +1637,7 @@ CVAPI(schar*)  cvGetSeqElem( const CvSeq* seq, int index );
 /** Calculates index of the specified sequence element.
    Returns -1 if element does not belong to the sequence */
 CVAPI(int)  cvSeqElemIdx( const CvSeq* seq, const void* element,
-                         CvSeqBlock** block CV_DEFAULT(NULL) );
+                          CvSeqBlock** block CV_DEFAULT(NULL) );
 
 /** Initializes sequence writer. The new elements will be added to the end of sequence */
 CVAPI(void)  cvStartAppendToSeq( CvSeq* seq, CvSeqWriter* writer );
@@ -1663,7 +1663,7 @@ CVAPI(void)   cvFlushSeqWriter( CvSeqWriter* writer );
 /** Initializes sequence reader.
    The sequence can be read in forward or backward direction */
 CVAPI(void) cvStartReadSeq( const CvSeq* seq, CvSeqReader* reader,
-                           int reverse CV_DEFAULT(0) );
+                            int reverse CV_DEFAULT(0) );
 
 
 /** Returns current sequence reader position (currently observed sequence element) */
@@ -1688,8 +1688,8 @@ CVAPI(CvSeq*) cvMakeSeqHeaderForArray( int seq_type, int header_size,
 
 /** Extracts sequence slice (with or without copying sequence elements) */
 CVAPI(CvSeq*) cvSeqSlice( const CvSeq* seq, CvSlice slice,
-                         CvMemStorage* storage CV_DEFAULT(NULL),
-                         int copy_data CV_DEFAULT(0));
+                          CvMemStorage* storage CV_DEFAULT(NULL),
+                          int copy_data CV_DEFAULT(0));
 
 CV_INLINE CvSeq* cvCloneSeq( const CvSeq* seq, CvMemStorage* storage CV_DEFAULT(NULL))
 {
@@ -1798,9 +1798,9 @@ CVAPI(int)  cvGraphAddEdge( CvGraph* graph,
                             CvGraphEdge** inserted_edge CV_DEFAULT(NULL) );
 
 CVAPI(int)  cvGraphAddEdgeByPtr( CvGraph* graph,
-                               CvGraphVtx* start_vtx, CvGraphVtx* end_vtx,
-                               const CvGraphEdge* edge CV_DEFAULT(NULL),
-                               CvGraphEdge** inserted_edge CV_DEFAULT(NULL) );
+                                 CvGraphVtx* start_vtx, CvGraphVtx* end_vtx,
+                                 const CvGraphEdge* edge CV_DEFAULT(NULL),
+                                 CvGraphEdge** inserted_edge CV_DEFAULT(NULL) );
 
 /** Remove edge connecting two vertices */
 CVAPI(void)  cvGraphRemoveEdge( CvGraph* graph, int start_idx, int end_idx );
@@ -1810,8 +1810,8 @@ CVAPI(void)  cvGraphRemoveEdgeByPtr( CvGraph* graph, CvGraphVtx* start_vtx,
 /** Find edge connecting two vertices */
 CVAPI(CvGraphEdge*)  cvFindGraphEdge( const CvGraph* graph, int start_idx, int end_idx );
 CVAPI(CvGraphEdge*)  cvFindGraphEdgeByPtr( const CvGraph* graph,
-                                           const CvGraphVtx* start_vtx,
-                                           const CvGraphVtx* end_vtx );
+        const CvGraphVtx* start_vtx,
+        const CvGraphVtx* end_vtx );
 #define cvGraphFindEdge cvFindGraphEdge
 #define cvGraphFindEdgeByPtr cvFindGraphEdgeByPtr
 
@@ -1872,8 +1872,8 @@ CvGraphScanner;
 
 /** Creates new graph scanner. */
 CVAPI(CvGraphScanner*)  cvCreateGraphScanner( CvGraph* graph,
-                                             CvGraphVtx* vtx CV_DEFAULT(NULL),
-                                             int mask CV_DEFAULT(CV_GRAPH_ALL_ITEMS));
+        CvGraphVtx* vtx CV_DEFAULT(NULL),
+        int mask CV_DEFAULT(CV_GRAPH_ALL_ITEMS));
 
 /** Releases graph scanner. */
 CVAPI(void) cvReleaseGraphScanner( CvGraphScanner** scanner );
@@ -1900,7 +1900,7 @@ typedef struct CvTreeNodeIterator
 CvTreeNodeIterator;
 
 CVAPI(void) cvInitTreeNodeIterator( CvTreeNodeIterator* tree_iterator,
-                                   const void* first, int max_level );
+                                    const void* first, int max_level );
 CVAPI(void*) cvNextTreeNode( CvTreeNodeIterator* tree_iterator );
 CVAPI(void*) cvPrevTreeNode( CvTreeNodeIterator* tree_iterator );
 
@@ -1915,7 +1915,7 @@ CVAPI(void) cvRemoveNodeFromTree( void* node, void* frame );
 /** Gathers pointers to all the sequences,
    accessible from the `first`, to the single sequence */
 CVAPI(CvSeq*) cvTreeToNodeSeq( const void* first, int header_size,
-                              CvMemStorage* storage );
+                               CvMemStorage* storage );
 
 /** The function implements the K-means algorithm for clustering an array of sample
    vectors in a specified number of classes */
@@ -1933,11 +1933,11 @@ CVAPI(int) cvKMeans2( const CvArr* samples, int cluster_count, CvArr* labels,
 CVAPI(int)  cvUseOptimized( int on_off );
 
 typedef IplImage* (CV_STDCALL* Cv_iplCreateImageHeader)
-                            (int,int,int,char*,char*,int,int,int,int,int,
-                            IplROI*,IplImage*,void*,IplTileInfo*);
-typedef void (CV_STDCALL* Cv_iplAllocateImageData)(IplImage*,int,int);
-typedef void (CV_STDCALL* Cv_iplDeallocate)(IplImage*,int);
-typedef IplROI* (CV_STDCALL* Cv_iplCreateROI)(int,int,int,int,int);
+(int, int, int, char*, char*, int, int, int, int, int,
+ IplROI*, IplImage*, void*, IplTileInfo*);
+typedef void (CV_STDCALL* Cv_iplAllocateImageData)(IplImage*, int, int);
+typedef void (CV_STDCALL* Cv_iplDeallocate)(IplImage*, int);
+typedef IplROI* (CV_STDCALL* Cv_iplCreateROI)(int, int, int, int, int);
 typedef IplImage* (CV_STDCALL* Cv_iplCloneImage)(const IplImage*);
 
 /** @brief Makes OpenCV use IPL functions for allocating IplImage and IplROI structures.
@@ -1957,10 +1957,10 @@ to IPL allocation functions. :
 @param clone_image pointer to a function, cloning an IPL image.
  */
 CVAPI(void) cvSetIPLAllocators( Cv_iplCreateImageHeader create_header,
-                               Cv_iplAllocateImageData allocate_data,
-                               Cv_iplDeallocate deallocate,
-                               Cv_iplCreateROI create_roi,
-                               Cv_iplCloneImage clone_image );
+                                Cv_iplAllocateImageData allocate_data,
+                                Cv_iplDeallocate deallocate,
+                                Cv_iplCreateROI create_roi,
+                                Cv_iplCloneImage clone_image );
 
 #define CV_TURN_ON_IPL_COMPATIBILITY()                                  \
     cvSetIPLAllocators( iplCreateImageHeader, iplAllocateImage,         \
@@ -1994,7 +1994,7 @@ If the file cannot be opened then the function returns NULL.
 @param encoding
  */
 CVAPI(CvFileStorage*)  cvOpenFileStorage( const char* filename, CvMemStorage* memstorage,
-                                          int flags, const char* encoding CV_DEFAULT(NULL) );
+        int flags, const char* encoding CV_DEFAULT(NULL) );
 
 /** @brief Releases file storage.
 
@@ -2152,7 +2152,7 @@ sequence.
 the discussion below).
  */
 CVAPI(void) cvWrite( CvFileStorage* fs, const char* name, const void* ptr,
-                         CvAttrList attributes CV_DEFAULT(cvAttrList()));
+                     CvAttrList attributes CV_DEFAULT(cvAttrList()));
 
 /** @brief Starts the next stream.
 
@@ -2192,7 +2192,7 @@ to a sequence rather than a map.
 @param dt Specification of each array element, see @ref format_spec "format specification"
  */
 CVAPI(void) cvWriteRawData( CvFileStorage* fs, const void* src,
-                                int len, const char* dt );
+                            int len, const char* dt );
 
 /** @brief Writes multiple numbers in Base64.
 
@@ -2209,7 +2209,7 @@ This function can only be used to write a sequence with a type "binary".
 @param dt Specification of each array element, see @ref format_spec "format specification"
 */
 CVAPI(void) cvWriteRawDataBase64( CvFileStorage* fs, const void* src,
-                                 int len, const char* dt );
+                                  int len, const char* dt );
 
 /** @brief Returns a unique pointer for a given name.
 
@@ -2280,8 +2280,8 @@ as pairs of integers in a single numeric sequence.
 @param create_missing Flag that specifies, whether an absent key should be added into the hash table
 */
 CVAPI(CvStringHashNode*) cvGetHashedKey( CvFileStorage* fs, const char* name,
-                                        int len CV_DEFAULT(-1),
-                                        int create_missing CV_DEFAULT(0));
+        int len CV_DEFAULT(-1),
+        int create_missing CV_DEFAULT(0));
 
 /** @brief Retrieves one of the top-level nodes of the file storage.
 
@@ -2295,7 +2295,7 @@ This function can be used as a base for recursive traversal of the file storage.
 there is only one stream in the file; however, there can be several.
  */
 CVAPI(CvFileNode*) cvGetRootFileNode( const CvFileStorage* fs,
-                                     int stream_index CV_DEFAULT(0) );
+                                      int stream_index CV_DEFAULT(0) );
 
 /** @brief Finds a node in a map or file storage.
 
@@ -2308,8 +2308,8 @@ key are NULLs, the function returns the root file node - a map that contains top
 @param create_missing Flag that specifies whether an absent node should be added to the map
  */
 CVAPI(CvFileNode*) cvGetFileNode( CvFileStorage* fs, CvFileNode* map,
-                                 const CvStringHashNode* key,
-                                 int create_missing CV_DEFAULT(0) );
+                                  const CvStringHashNode* key,
+                                  int create_missing CV_DEFAULT(0) );
 
 /** @brief Finds a node in a map or file storage.
 
@@ -2324,8 +2324,8 @@ combination of cvGetHashedKey and cvGetFileNode.
 @param name The file node name
  */
 CVAPI(CvFileNode*) cvGetFileNodeByName( const CvFileStorage* fs,
-                                       const CvFileNode* map,
-                                       const char* name );
+                                        const CvFileNode* map,
+                                        const char* name );
 
 /** @brief Retrieves an integer value from a file node.
 
@@ -2340,8 +2340,8 @@ and returned. Otherwise the error is reported.
 CV_INLINE int cvReadInt( const CvFileNode* node, int default_value CV_DEFAULT(0) )
 {
     return !node ? default_value :
-        CV_NODE_IS_INT(node->tag) ? node->data.i :
-        CV_NODE_IS_REAL(node->tag) ? cvRound(node->data.f) : 0x7fffffff;
+           CV_NODE_IS_INT(node->tag) ? node->data.i :
+           CV_NODE_IS_REAL(node->tag) ? cvRound(node->data.f) : 0x7fffffff;
 }
 
 /** @brief Finds a file node and returns its value.
@@ -2353,7 +2353,7 @@ The function is a simple superposition of cvGetFileNodeByName and cvReadInt.
 @param default_value The value that is returned if the file node is not found
  */
 CV_INLINE int cvReadIntByName( const CvFileStorage* fs, const CvFileNode* map,
-                         const char* name, int default_value CV_DEFAULT(0) )
+                               const char* name, int default_value CV_DEFAULT(0) )
 {
     return cvReadInt( cvGetFileNodeByName( fs, map, name ), default_value );
 }
@@ -2371,8 +2371,8 @@ is converted to floating-point and returned. Otherwise the result is not determi
 CV_INLINE double cvReadReal( const CvFileNode* node, double default_value CV_DEFAULT(0.) )
 {
     return !node ? default_value :
-        CV_NODE_IS_INT(node->tag) ? (double)node->data.i :
-        CV_NODE_IS_REAL(node->tag) ? node->data.f : 1e300;
+           CV_NODE_IS_INT(node->tag) ? (double)node->data.i :
+           CV_NODE_IS_REAL(node->tag) ? node->data.f : 1e300;
 }
 
 /** @brief Finds a file node and returns its value.
@@ -2384,7 +2384,7 @@ The function is a simple superposition of cvGetFileNodeByName and cvReadReal .
 @param default_value The value that is returned if the file node is not found
  */
 CV_INLINE double cvReadRealByName( const CvFileStorage* fs, const CvFileNode* map,
-                        const char* name, double default_value CV_DEFAULT(0.) )
+                                   const char* name, double default_value CV_DEFAULT(0.) )
 {
     return cvReadReal( cvGetFileNodeByName( fs, map, name ), default_value );
 }
@@ -2399,7 +2399,7 @@ node-:math:\>data.str.ptr is returned. Otherwise the result is not determined.
 @param default_value The value that is returned if node is NULL
  */
 CV_INLINE const char* cvReadString( const CvFileNode* node,
-                        const char* default_value CV_DEFAULT(NULL) )
+                                    const char* default_value CV_DEFAULT(NULL) )
 {
     return !node ? default_value : CV_NODE_IS_STRING(node->tag) ? node->data.str.ptr : 0;
 }
@@ -2413,7 +2413,7 @@ The function is a simple superposition of cvGetFileNodeByName and cvReadString .
 @param default_value The value that is returned if the file node is not found
  */
 CV_INLINE const char* cvReadStringByName( const CvFileStorage* fs, const CvFileNode* map,
-                        const char* name, const char* default_value CV_DEFAULT(NULL) )
+        const char* name, const char* default_value CV_DEFAULT(NULL) )
 {
     return cvReadString( cvGetFileNodeByName( fs, map, name ), default_value );
 }
@@ -2434,7 +2434,7 @@ or by using the generic cvRelease.
 @param attributes Unused parameter
  */
 CVAPI(void*) cvRead( CvFileStorage* fs, CvFileNode* node,
-                        CvAttrList* attributes CV_DEFAULT(NULL));
+                     CvAttrList* attributes CV_DEFAULT(NULL));
 
 /** @brief Finds an object by name and decodes it.
 
@@ -2460,7 +2460,7 @@ can be then passed to cvReadRawDataSlice.
 @param reader Pointer to the sequence reader
  */
 CVAPI(void) cvStartReadRawData( const CvFileStorage* fs, const CvFileNode* src,
-                               CvSeqReader* reader );
+                                CvSeqReader* reader );
 
 /** @brief Initializes file node sequence reader.
 
@@ -2476,7 +2476,7 @@ repeatedly by repositioning the reader using cvSetSeqReaderPos.
 @param dt Specification of each array element. It has the same format as in cvWriteRawData .
  */
 CVAPI(void) cvReadRawDataSlice( const CvFileStorage* fs, CvSeqReader* reader,
-                               int count, void* dst, const char* dt );
+                                int count, void* dst, const char* dt );
 
 /** @brief Reads multiple numbers.
 
@@ -2487,7 +2487,7 @@ The function reads elements from a file node that represents a sequence of scala
 @param dt Specification of each array element. It has the same format as in cvWriteRawData .
  */
 CVAPI(void) cvReadRawData( const CvFileStorage* fs, const CvFileNode* src,
-                          void* dst, const char* dt );
+                           void* dst, const char* dt );
 
 /** @brief Writes a file node to another file storage.
 
@@ -2503,7 +2503,7 @@ structure. Of course, map elements can only be embedded into another map, and se
 can only be embedded into another sequence.
  */
 CVAPI(void) cvWriteFileNode( CvFileStorage* fs, const char* new_node_name,
-                            const CvFileNode* node, int embed );
+                             const CvFileNode* node, int embed );
 
 /** @brief Returns the name of a file node.
 
@@ -2617,37 +2617,37 @@ CVAPI(int) cvSetErrMode( int mode );
  writing message to stderr, terminating application etc.)
  depending on the current error mode */
 CVAPI(void) cvError( int status, const char* func_name,
-                    const char* err_msg, const char* file_name, int line );
+                     const char* err_msg, const char* file_name, int line );
 
 /** Retrieves textual description of the error given its code */
 CVAPI(const char*) cvErrorStr( int status );
 
 /** Retrieves detailed information about the last error occurred */
 CVAPI(int) cvGetErrInfo( const char** errcode_desc, const char** description,
-                        const char** filename, int* line );
+                         const char** filename, int* line );
 
 /** Maps IPP error codes to the counterparts from OpenCV */
 CVAPI(int) cvErrorFromIppStatus( int ipp_status );
 
 typedef int (CV_CDECL *CvErrorCallback)( int status, const char* func_name,
-                                        const char* err_msg, const char* file_name, int line, void* userdata );
+        const char* err_msg, const char* file_name, int line, void* userdata );
 
 /** Assigns a new error-handling function */
 CVAPI(CvErrorCallback) cvRedirectError( CvErrorCallback error_handler,
-                                       void* userdata CV_DEFAULT(NULL),
-                                       void** prev_userdata CV_DEFAULT(NULL) );
+                                        void* userdata CV_DEFAULT(NULL),
+                                        void** prev_userdata CV_DEFAULT(NULL) );
 
 /** Output nothing */
 CVAPI(int) cvNulDevReport( int status, const char* func_name, const char* err_msg,
-                          const char* file_name, int line, void* userdata );
+                           const char* file_name, int line, void* userdata );
 
 /** Output to console(fprintf(stderr,...)) */
 CVAPI(int) cvStdErrReport( int status, const char* func_name, const char* err_msg,
-                          const char* file_name, int line, void* userdata );
+                           const char* file_name, int line, void* userdata );
 
 /** Output to MessageBox(WIN32) */
 CVAPI(int) cvGuiBoxReport( int status, const char* func_name, const char* err_msg,
-                          const char* file_name, int line, void* userdata );
+                           const char* file_name, int line, void* userdata );
 
 #define OPENCV_ERROR(status,func,context)                           \
 cvError((status),(func),(context),__FILE__,__LINE__)
@@ -2736,30 +2736,40 @@ namespace cv
 /////////////////////////////////////////// glue ///////////////////////////////////////////
 
 //! converts array (CvMat or IplImage) to cv::Mat
-CV_EXPORTS Mat cvarrToMat(const CvArr* arr, bool copyData=false,
-                          bool allowND=true, int coiMode=0,
-                          AutoBuffer<double>* buf=0);
+CV_EXPORTS Mat cvarrToMat(const CvArr* arr, bool copyData = false,
+                          bool allowND = true, int coiMode = 0,
+                          AutoBuffer<double>* buf = 0);
 
-static inline Mat cvarrToMatND(const CvArr* arr, bool copyData=false, int coiMode=0)
+static inline Mat cvarrToMatND(const CvArr* arr, bool copyData = false, int coiMode = 0)
 {
     return cvarrToMat(arr, copyData, true, coiMode);
 }
 
 
 //! extracts Channel of Interest from CvMat or IplImage and makes cv::Mat out of it.
-CV_EXPORTS void extractImageCOI(const CvArr* arr, OutputArray coiimg, int coi=-1);
+CV_EXPORTS void extractImageCOI(const CvArr* arr, OutputArray coiimg, int coi = -1);
 //! inserts single-channel cv::Mat into a multi-channel CvMat or IplImage
-CV_EXPORTS void insertImageCOI(InputArray coiimg, CvArr* arr, int coi=-1);
+CV_EXPORTS void insertImageCOI(InputArray coiimg, CvArr* arr, int coi = -1);
 
 
 
 ////// specialized implementations of DefaultDeleter::operator() for classic OpenCV types //////
 
-template<> struct DefaultDeleter<CvMat>{ CV_EXPORTS void operator ()(CvMat* obj) const; };
-template<> struct DefaultDeleter<IplImage>{ CV_EXPORTS void operator ()(IplImage* obj) const; };
-template<> struct DefaultDeleter<CvMatND>{ CV_EXPORTS void operator ()(CvMatND* obj) const; };
-template<> struct DefaultDeleter<CvSparseMat>{ CV_EXPORTS void operator ()(CvSparseMat* obj) const; };
-template<> struct DefaultDeleter<CvMemStorage>{ CV_EXPORTS void operator ()(CvMemStorage* obj) const; };
+template<> struct DefaultDeleter<CvMat> {
+    CV_EXPORTS void operator ()(CvMat* obj) const;
+};
+template<> struct DefaultDeleter<IplImage> {
+    CV_EXPORTS void operator ()(IplImage* obj) const;
+};
+template<> struct DefaultDeleter<CvMatND> {
+    CV_EXPORTS void operator ()(CvMatND* obj) const;
+};
+template<> struct DefaultDeleter<CvSparseMat> {
+    CV_EXPORTS void operator ()(CvSparseMat* obj) const;
+};
+template<> struct DefaultDeleter<CvMemStorage> {
+    CV_EXPORTS void operator ()(CvMemStorage* obj) const;
+};
 
 ////////////// convenient wrappers for operating old-style dynamic structures //////////////
 
@@ -2849,7 +2859,7 @@ public:
     void pop_back(_Tp* elems, size_t count);
 
     //! copies the whole sequence or the sequence slice to the specified vector
-    void copyTo(std::vector<_Tp>& vec, const Range& range=Range::all()) const;
+    void copyTo(std::vector<_Tp>& vec, const Range& range = Range::all()) const;
     //! returns the vector containing all the sequence elements
     operator std::vector<_Tp>() const;
 
@@ -2866,7 +2876,7 @@ public:
     //! the default constructor
     SeqIterator();
     //! the constructor setting the iterator to the beginning or to the end of the sequence
-    SeqIterator(const Seq<_Tp>& seq, bool seekEnd=false);
+    SeqIterator(const Seq<_Tp>& seq, bool seekEnd = false);
     //! positions the iterator within the sequence
     void seek(size_t pos);
     //! reports the current iterator position
@@ -2897,12 +2907,12 @@ public:
 
 
 // bridge C++ => C Seq API
-CV_EXPORTS schar*  seqPush( CvSeq* seq, const void* element=0);
-CV_EXPORTS schar*  seqPushFront( CvSeq* seq, const void* element=0);
-CV_EXPORTS void  seqPop( CvSeq* seq, void* element=0);
-CV_EXPORTS void  seqPopFront( CvSeq* seq, void* element=0);
+CV_EXPORTS schar*  seqPush( CvSeq* seq, const void* element = 0);
+CV_EXPORTS schar*  seqPushFront( CvSeq* seq, const void* element = 0);
+CV_EXPORTS void  seqPop( CvSeq* seq, void* element = 0);
+CV_EXPORTS void  seqPopFront( CvSeq* seq, void* element = 0);
 CV_EXPORTS void  seqPopMulti( CvSeq* seq, void* elements,
-                              int count, int in_front=0 );
+                              int count, int in_front = 0 );
 CV_EXPORTS void  seqRemove( CvSeq* seq, int index );
 CV_EXPORTS void  clearSeq( CvSeq* seq );
 CV_EXPORTS schar*  getSeqElem( const CvSeq* seq, int index );
@@ -2916,86 +2926,136 @@ template<typename _Tp> inline Seq<_Tp>::Seq( const CvSeq* _seq ) : seq((CvSeq*)_
 }
 
 template<typename _Tp> inline Seq<_Tp>::Seq( MemStorage& storage,
-                                             int headerSize )
+        int headerSize )
 {
     CV_Assert(headerSize >= (int)sizeof(CvSeq));
     seq = cvCreateSeq(DataType<_Tp>::type, headerSize, sizeof(_Tp), storage);
 }
 
 template<typename _Tp> inline _Tp& Seq<_Tp>::operator [](int idx)
-{ return *(_Tp*)getSeqElem(seq, idx); }
+{
+    return *(_Tp*)getSeqElem(seq, idx);
+}
 
 template<typename _Tp> inline const _Tp& Seq<_Tp>::operator [](int idx) const
-{ return *(_Tp*)getSeqElem(seq, idx); }
+{
+    return *(_Tp*)getSeqElem(seq, idx);
+}
 
 template<typename _Tp> inline SeqIterator<_Tp> Seq<_Tp>::begin() const
-{ return SeqIterator<_Tp>(*this); }
+{
+    return SeqIterator<_Tp>(*this);
+}
 
 template<typename _Tp> inline SeqIterator<_Tp> Seq<_Tp>::end() const
-{ return SeqIterator<_Tp>(*this, true); }
+{
+    return SeqIterator<_Tp>(*this, true);
+}
 
 template<typename _Tp> inline size_t Seq<_Tp>::size() const
-{ return seq ? seq->total : 0; }
+{
+    return seq ? seq->total : 0;
+}
 
 template<typename _Tp> inline int Seq<_Tp>::type() const
-{ return seq ? CV_MAT_TYPE(seq->flags) : 0; }
+{
+    return seq ? CV_MAT_TYPE(seq->flags) : 0;
+}
 
 template<typename _Tp> inline int Seq<_Tp>::depth() const
-{ return seq ? CV_MAT_DEPTH(seq->flags) : 0; }
+{
+    return seq ? CV_MAT_DEPTH(seq->flags) : 0;
+}
 
 template<typename _Tp> inline int Seq<_Tp>::channels() const
-{ return seq ? CV_MAT_CN(seq->flags) : 0; }
+{
+    return seq ? CV_MAT_CN(seq->flags) : 0;
+}
 
 template<typename _Tp> inline size_t Seq<_Tp>::elemSize() const
-{ return seq ? seq->elem_size : 0; }
+{
+    return seq ? seq->elem_size : 0;
+}
 
 template<typename _Tp> inline size_t Seq<_Tp>::index(const _Tp& elem) const
-{ return cvSeqElemIdx(seq, &elem); }
+{
+    return cvSeqElemIdx(seq, &elem);
+}
 
 template<typename _Tp> inline void Seq<_Tp>::push_back(const _Tp& elem)
-{ cvSeqPush(seq, &elem); }
+{
+    cvSeqPush(seq, &elem);
+}
 
 template<typename _Tp> inline void Seq<_Tp>::push_front(const _Tp& elem)
-{ cvSeqPushFront(seq, &elem); }
+{
+    cvSeqPushFront(seq, &elem);
+}
 
 template<typename _Tp> inline void Seq<_Tp>::push_back(const _Tp* elem, size_t count)
-{ cvSeqPushMulti(seq, elem, (int)count, 0); }
+{
+    cvSeqPushMulti(seq, elem, (int)count, 0);
+}
 
 template<typename _Tp> inline void Seq<_Tp>::push_front(const _Tp* elem, size_t count)
-{ cvSeqPushMulti(seq, elem, (int)count, 1); }
+{
+    cvSeqPushMulti(seq, elem, (int)count, 1);
+}
 
 template<typename _Tp> inline _Tp& Seq<_Tp>::back()
-{ return *(_Tp*)getSeqElem(seq, -1); }
+{
+    return *(_Tp*)getSeqElem(seq, -1);
+}
 
 template<typename _Tp> inline const _Tp& Seq<_Tp>::back() const
-{ return *(const _Tp*)getSeqElem(seq, -1); }
+{
+    return *(const _Tp*)getSeqElem(seq, -1);
+}
 
 template<typename _Tp> inline _Tp& Seq<_Tp>::front()
-{ return *(_Tp*)getSeqElem(seq, 0); }
+{
+    return *(_Tp*)getSeqElem(seq, 0);
+}
 
 template<typename _Tp> inline const _Tp& Seq<_Tp>::front() const
-{ return *(const _Tp*)getSeqElem(seq, 0); }
+{
+    return *(const _Tp*)getSeqElem(seq, 0);
+}
 
 template<typename _Tp> inline bool Seq<_Tp>::empty() const
-{ return !seq || seq->total == 0; }
+{
+    return !seq || seq->total == 0;
+}
 
 template<typename _Tp> inline void Seq<_Tp>::clear()
-{ if(seq) clearSeq(seq); }
+{
+    if(seq) clearSeq(seq);
+}
 
 template<typename _Tp> inline void Seq<_Tp>::pop_back()
-{ seqPop(seq); }
+{
+    seqPop(seq);
+}
 
 template<typename _Tp> inline void Seq<_Tp>::pop_front()
-{ seqPopFront(seq); }
+{
+    seqPopFront(seq);
+}
 
 template<typename _Tp> inline void Seq<_Tp>::pop_back(_Tp* elem, size_t count)
-{ seqPopMulti(seq, elem, (int)count, 0); }
+{
+    seqPopMulti(seq, elem, (int)count, 0);
+}
 
 template<typename _Tp> inline void Seq<_Tp>::pop_front(_Tp* elem, size_t count)
-{ seqPopMulti(seq, elem, (int)count, 1); }
+{
+    seqPopMulti(seq, elem, (int)count, 1);
+}
 
 template<typename _Tp> inline void Seq<_Tp>::insert(int idx, const _Tp& elem)
-{ seqInsert(seq, idx, &elem); }
+{
+    seqInsert(seq, idx, &elem);
+}
 
 template<typename _Tp> inline void Seq<_Tp>::insert(int idx, const _Tp* elems, size_t count)
 {
@@ -3004,10 +3064,14 @@ template<typename _Tp> inline void Seq<_Tp>::insert(int idx, const _Tp* elems, s
 }
 
 template<typename _Tp> inline void Seq<_Tp>::remove(int idx)
-{ seqRemove(seq, idx); }
+{
+    seqRemove(seq, idx);
+}
 
 template<typename _Tp> inline void Seq<_Tp>::remove(const Range& r)
-{ seqRemoveSlice(seq, cvSlice(r.start, r.end)); }
+{
+    seqRemoveSlice(seq, cvSlice(r.start, r.end));
+}
 
 template<typename _Tp> inline void Seq<_Tp>::copyTo(std::vector<_Tp>& vec, const Range& range) const
 {
@@ -3025,7 +3089,9 @@ template<typename _Tp> inline Seq<_Tp>::operator std::vector<_Tp>() const
 }
 
 template<typename _Tp> inline SeqIterator<_Tp>::SeqIterator()
-{ memset(this, 0, sizeof(*this)); }
+{
+    memset(this, 0, sizeof(*this));
+}
 
 template<typename _Tp> inline SeqIterator<_Tp>::SeqIterator(const Seq<_Tp>& _seq, bool seekEnd)
 {
@@ -3040,18 +3106,24 @@ template<typename _Tp> inline void SeqIterator<_Tp>::seek(size_t pos)
 }
 
 template<typename _Tp> inline size_t SeqIterator<_Tp>::tell() const
-{ return index; }
+{
+    return index;
+}
 
 template<typename _Tp> inline _Tp& SeqIterator<_Tp>::operator *()
-{ return *(_Tp*)ptr; }
+{
+    return *(_Tp*)ptr;
+}
 
 template<typename _Tp> inline const _Tp& SeqIterator<_Tp>::operator *() const
-{ return *(const _Tp*)ptr; }
+{
+    return *(const _Tp*)ptr;
+}
 
 template<typename _Tp> inline SeqIterator<_Tp>& SeqIterator<_Tp>::operator ++()
 {
     CV_NEXT_SEQ_ELEM(sizeof(_Tp), *this);
-    if( ++index >= seq->total*2 )
+    if( ++index >= seq->total * 2 )
         index = 0;
     return *this;
 }
@@ -3067,7 +3139,7 @@ template<typename _Tp> inline SeqIterator<_Tp>& SeqIterator<_Tp>::operator --()
 {
     CV_PREV_SEQ_ELEM(sizeof(_Tp), *this);
     if( --index < 0 )
-        index = seq->total*2-1;
+        index = seq->total * 2 - 1;
     return *this;
 }
 
@@ -3082,7 +3154,7 @@ template<typename _Tp> inline SeqIterator<_Tp>& SeqIterator<_Tp>::operator +=(in
 {
     cvSetSeqReaderPos(this, delta, 1);
     index += delta;
-    int n = seq->total*2;
+    int n = seq->total * 2;
     if( index < 0 )
         index += n;
     if( index >= n )
@@ -3096,7 +3168,7 @@ template<typename _Tp> inline SeqIterator<_Tp>& SeqIterator<_Tp>::operator -=(in
 }
 
 template<typename _Tp> inline ptrdiff_t operator - (const SeqIterator<_Tp>& a,
-                                                    const SeqIterator<_Tp>& b)
+        const SeqIterator<_Tp>& b)
 {
     ptrdiff_t delta = a.index - b.index, n = a.seq->total;
     if( delta > n || delta < -n )
@@ -3105,13 +3177,13 @@ template<typename _Tp> inline ptrdiff_t operator - (const SeqIterator<_Tp>& a,
 }
 
 template<typename _Tp> inline bool operator == (const SeqIterator<_Tp>& a,
-                                                const SeqIterator<_Tp>& b)
+        const SeqIterator<_Tp>& b)
 {
     return a.seq == b.seq && a.index == b.index;
 }
 
 template<typename _Tp> inline bool operator != (const SeqIterator<_Tp>& a,
-                                                const SeqIterator<_Tp>& b)
+        const SeqIterator<_Tp>& b)
 {
     return !(a == b);
 }

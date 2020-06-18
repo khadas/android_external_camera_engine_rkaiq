@@ -90,15 +90,15 @@ processing(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outparams)
         if(pAgicProcParams->hdr_mode == RK_AIQ_WORKING_MODE_NORMAL) {
             iso = pAEPreRes->ae_pre_res_rk.LinearExp.exp_real_params.analog_gain * 50;
             LOGD_AGIC("%s:NORMAL:iso=%d,again=%f\n", __FUNCTION__, iso,
-                          pAEPreRes->ae_pre_res_rk.LinearExp.exp_real_params.analog_gain);
+                      pAEPreRes->ae_pre_res_rk.LinearExp.exp_real_params.analog_gain);
         } else if(RK_AIQ_HDR_GET_WORKING_MODE(pAgicProcParams->hdr_mode) == RK_AIQ_WORKING_MODE_ISP_HDR2) {
             iso = pAEPreRes->ae_pre_res_rk.HdrExp[1].exp_real_params.analog_gain * 50;
             LOGD_AGIC("%s:HDR2:iso=%d,again=%f\n", __FUNCTION__, iso,
-                          pAEPreRes->ae_pre_res_rk.HdrExp[1].exp_real_params.analog_gain);
+                      pAEPreRes->ae_pre_res_rk.HdrExp[1].exp_real_params.analog_gain);
         } else if(RK_AIQ_HDR_GET_WORKING_MODE(pAgicProcParams->hdr_mode) == RK_AIQ_WORKING_MODE_ISP_HDR3) {
             iso = pAEPreRes->ae_pre_res_rk.HdrExp[2].exp_real_params.analog_gain * 50;
             LOGD_AGIC("%s:HDR3:iso=%d,again=%f\n", __FUNCTION__, iso,
-                          pAEPreRes->ae_pre_res_rk.HdrExp[2].exp_real_params.analog_gain);
+                      pAEPreRes->ae_pre_res_rk.HdrExp[2].exp_real_params.analog_gain);
         }
     } else {
         LOGE_AGIC("%s: pAEPreRes is NULL, so use default instead \n", __FUNCTION__);

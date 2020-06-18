@@ -232,6 +232,7 @@ typedef struct _RkAiqAlgoConfigAeInt {
     RkAiqAlgoComInt          rk_com;
     int                      RawWidth;
     int                      RawHeight;
+    rk_aiq_sensor_nr_switch_t nr_switch;
 } RkAiqAlgoConfigAeInt;
 
 typedef struct _RkAiqAlgoPreAeInt {

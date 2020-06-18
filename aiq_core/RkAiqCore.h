@@ -96,7 +96,7 @@ public:
     bool af_stats_valid;
     rk_aiq_isp_orb_stats_t orb_stats;
     bool orb_stats_valid;
-	rkisp_ahdr_stats_t ahdr_stats;
+    rkisp_ahdr_stats_t ahdr_stats;
     bool ahdr_stats_valid;
     uint32_t frame_id;
 private:

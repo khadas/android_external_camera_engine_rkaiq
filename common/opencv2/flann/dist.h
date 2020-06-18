@@ -57,31 +57,53 @@ namespace cvflann
 {
 
 template<typename T>
-inline T abs(T x) { return (x<0) ? -x : x; }
+inline T abs(T x) {
+    return (x < 0) ? -x : x;
+}
 
 template<>
-inline int abs<int>(int x) { return ::abs(x); }
+inline int abs<int>(int x) {
+    return ::abs(x);
+}
 
 template<>
-inline float abs<float>(float x) { return fabsf(x); }
+inline float abs<float>(float x) {
+    return fabsf(x);
+}
 
 template<>
-inline double abs<double>(double x) { return fabs(x); }
+inline double abs<double>(double x) {
+    return fabs(x);
+}
 
 template<typename T>
-struct Accumulator { typedef T Type; };
+struct Accumulator {
+    typedef T Type;
+};
 template<>
-struct Accumulator<unsigned char>  { typedef float Type; };
+struct Accumulator<unsigned char>  {
+    typedef float Type;
+};
 template<>
-struct Accumulator<unsigned short> { typedef float Type; };
+struct Accumulator<unsigned short> {
+    typedef float Type;
+};
 template<>
-struct Accumulator<unsigned int> { typedef float Type; };
+struct Accumulator<unsigned int> {
+    typedef float Type;
+};
 template<>
-struct Accumulator<char>   { typedef float Type; };
+struct Accumulator<char>   {
+    typedef float Type;
+};
 template<>
-struct Accumulator<short>  { typedef float Type; };
+struct Accumulator<short>  {
+    typedef float Type;
+};
 template<>
-struct Accumulator<int> { typedef float Type; };
+struct Accumulator<int> {
+    typedef float Type;
+};
 
 #undef True
 #undef False
@@ -117,7 +139,7 @@ struct L2_Simple
         ResultType diff;
         for(size_t i = 0; i < size; ++i ) {
             diff = (ResultType)(*a++ - *b++);
-            result += diff*diff;
+            result += diff * diff;
         }
         return result;
     }
@@ -125,7 +147,7 @@ struct L2_Simple
     template <typename U, typename V>
     inline ResultType accum_dist(const U& a, const V& b, int) const
     {
-        return (a-b)*(a-b);
+        return (a - b) * (a - b);
     }
 };
 
@@ -146,11 +168,11 @@ struct L2
     /**
      *  Compute the squared Euclidean distance between two vectors.
      *
-     *	This is highly optimised, with loop unrolling, as it is one
-     *	of the most expensive inner loops.
+     *  This is highly optimised, with loop unrolling, as it is one
+     *  of the most expensive inner loops.
      *
-     *	The computation of squared root at the end is omitted for
-     *	efficiency.
+     *  The computation of squared root at the end is omitted for
+     *  efficiency.
      */
     template <typename Iterator1, typename Iterator2>
     ResultType operator()(Iterator1 a, Iterator2 b, size_t size, ResultType worst_dist = -1) const
@@ -170,7 +192,7 @@ struct L2
             a += 4;
             b += 4;
 
-            if ((worst_dist>0)&&(result>worst_dist)) {
+            if ((worst_dist > 0) && (result > worst_dist)) {
                 return result;
             }
         }
@@ -183,15 +205,15 @@ struct L2
     }
 
     /**
-     *	Partial euclidean distance, using just one dimension. This is used by the
-     *	kd-tree when computing partial distances while traversing the tree.
+     *  Partial euclidean distance, using just one dimension. This is used by the
+     *  kd-tree when computing partial distances while traversing the tree.
      *
-     *	Squared root is omitted for efficiency.
+     *  Squared root is omitted for efficiency.
      */
     template <typename U, typename V>
     inline ResultType accum_dist(const U& a, const V& b, int) const
     {
-        return (a-b)*(a-b);
+        return (a - b) * (a - b);
     }
 };
 
@@ -211,8 +233,8 @@ struct L1
     /**
      *  Compute the Manhattan (L_1) distance between two vectors.
      *
-     *	This is highly optimised, with loop unrolling, as it is one
-     *	of the most expensive inner loops.
+     *  This is highly optimised, with loop unrolling, as it is one
+     *  of the most expensive inner loops.
      */
     template <typename Iterator1, typename Iterator2>
     ResultType operator()(Iterator1 a, Iterator2 b, size_t size, ResultType worst_dist = -1) const
@@ -232,7 +254,7 @@ struct L1
             a += 4;
             b += 4;
 
-            if ((worst_dist>0)&&(result>worst_dist)) {
+            if ((worst_dist > 0) && (result > worst_dist)) {
                 return result;
             }
         }
@@ -250,7 +272,7 @@ struct L1
     template <typename U, typename V>
     inline ResultType accum_dist(const U& a, const V& b, int) const
     {
-        return abs(a-b);
+        return abs(a - b);
     }
 };
 
@@ -272,11 +294,11 @@ struct MinkowskiDistance
     /**
      *  Compute the Minkowsky (L_p) distance between two vectors.
      *
-     *	This is highly optimised, with loop unrolling, as it is one
-     *	of the most expensive inner loops.
+     *  This is highly optimised, with loop unrolling, as it is one
+     *  of the most expensive inner loops.
      *
-     *	The computation of squared root at the end is omitted for
-     *	efficiency.
+     *  The computation of squared root at the end is omitted for
+     *  efficiency.
      */
     template <typename Iterator1, typename Iterator2>
     ResultType operator()(Iterator1 a, Iterator2 b, size_t size, ResultType worst_dist = -1) const
@@ -292,18 +314,18 @@ struct MinkowskiDistance
             diff1 = (ResultType)abs(a[1] - b[1]);
             diff2 = (ResultType)abs(a[2] - b[2]);
             diff3 = (ResultType)abs(a[3] - b[3]);
-            result += pow(diff0,order) + pow(diff1,order) + pow(diff2,order) + pow(diff3,order);
+            result += pow(diff0, order) + pow(diff1, order) + pow(diff2, order) + pow(diff3, order);
             a += 4;
             b += 4;
 
-            if ((worst_dist>0)&&(result>worst_dist)) {
+            if ((worst_dist > 0) && (result > worst_dist)) {
                 return result;
             }
         }
         /* Process last 0-3 pixels.  Not needed for standard vector lengths. */
         while (a < last) {
             diff0 = (ResultType)abs(*a++ - *b++);
-            result += pow(diff0,order);
+            result += pow(diff0, order);
         }
         return result;
     }
@@ -314,7 +336,7 @@ struct MinkowskiDistance
     template <typename U, typename V>
     inline ResultType accum_dist(const U& a, const V& b, int) const
     {
-        return pow(static_cast<ResultType>(abs(a-b)),order);
+        return pow(static_cast<ResultType>(abs(a - b)), order);
     }
 };
 
@@ -348,21 +370,29 @@ struct MaxDistance
             diff1 = abs(a[1] - b[1]);
             diff2 = abs(a[2] - b[2]);
             diff3 = abs(a[3] - b[3]);
-            if (diff0>result) {result = diff0; }
-            if (diff1>result) {result = diff1; }
-            if (diff2>result) {result = diff2; }
-            if (diff3>result) {result = diff3; }
+            if (diff0 > result) {
+                result = diff0;
+            }
+            if (diff1 > result) {
+                result = diff1;
+            }
+            if (diff2 > result) {
+                result = diff2;
+            }
+            if (diff3 > result) {
+                result = diff3;
+            }
             a += 4;
             b += 4;
 
-            if ((worst_dist>0)&&(result>worst_dist)) {
+            if ((worst_dist > 0) && (result > worst_dist)) {
                 return result;
             }
         }
         /* Process last 0-3 pixels.  Not needed for standard vector lengths. */
         while (a < last) {
             diff0 = abs(*a++ - *b++);
-            result = (diff0>result) ? diff0 : result;
+            result = (diff0 > result) ? diff0 : result;
         }
         return result;
     }
@@ -440,8 +470,8 @@ struct Hamming
                 bits = vaddq_u32(bits, bitSet4);
             }
             uint64x2_t bitSet2 = vpaddlq_u32 (bits);
-            result = vgetq_lane_s32 (vreinterpretq_s32_u64(bitSet2),0);
-            result += vgetq_lane_s32 (vreinterpretq_s32_u64(bitSet2),2);
+            result = vgetq_lane_s32 (vreinterpretq_s32_u64(bitSet2), 0);
+            result += vgetq_lane_s32 (vreinterpretq_s32_u64(bitSet2), 2);
         }
 #elif defined(__GNUC__)
         {
@@ -487,7 +517,7 @@ struct Hamming2
     {
         n -= ((n >> 1) & 0x55555555);
         n = (n & 0x33333333) + ((n >> 2) & 0x33333333);
-        return (((n + (n >> 4))& 0xF0F0F0F)* 0x1010101) >> 24;
+        return (((n + (n >> 4)) & 0xF0F0F0F) * 0x1010101) >> 24;
     }
 
 #ifdef FLANN_PLATFORM_64_BIT
@@ -495,7 +525,7 @@ struct Hamming2
     {
         n -= ((n >> 1) & 0x5555555555555555);
         n = (n & 0x3333333333333333) + ((n >> 2) & 0x3333333333333333);
-        return (((n + (n >> 4))& 0x0f0f0f0f0f0f0f0f)* 0x0101010101010101) >> 56;
+        return (((n + (n >> 4)) & 0x0f0f0f0f0f0f0f0f) * 0x0101010101010101) >> 56;
     }
 #endif
 
@@ -506,7 +536,7 @@ struct Hamming2
         const uint64_t* pa = reinterpret_cast<const uint64_t*>(a);
         const uint64_t* pb = reinterpret_cast<const uint64_t*>(b);
         ResultType result = 0;
-        size /= (sizeof(uint64_t)/sizeof(unsigned char));
+        size /= (sizeof(uint64_t) / sizeof(unsigned char));
         for(size_t i = 0; i < size; ++i ) {
             result += popcnt64(*pa ^ *pb);
             ++pa;
@@ -516,7 +546,7 @@ struct Hamming2
         const uint32_t* pa = reinterpret_cast<const uint32_t*>(a);
         const uint32_t* pb = reinterpret_cast<const uint32_t*>(b);
         ResultType result = 0;
-        size /= (sizeof(uint32_t)/sizeof(unsigned char));
+        size /= (sizeof(uint32_t) / sizeof(unsigned char));
         for(size_t i = 0; i < size; ++i ) {
             result += popcnt32(*pa ^ *pb);
             ++pa;
@@ -560,7 +590,7 @@ struct HistIntersectionDistance
             result += min0 + min1 + min2 + min3;
             a += 4;
             b += 4;
-            if ((worst_dist>0)&&(result>worst_dist)) {
+            if ((worst_dist > 0) && (result > worst_dist)) {
                 return result;
             }
         }
@@ -580,7 +610,7 @@ struct HistIntersectionDistance
     template <typename U, typename V>
     inline ResultType accum_dist(const U& a, const V& b, int) const
     {
-        return a<b ? a : b;
+        return a < b ? a : b;
     }
 };
 
@@ -656,14 +686,14 @@ struct ChiSquareDistance
 
         while (a < last) {
             sum = (ResultType)(*a + *b);
-            if (sum>0) {
+            if (sum > 0) {
                 diff = (ResultType)(*a - *b);
-                result += diff*diff/sum;
+                result += diff * diff / sum;
             }
             ++a;
             ++b;
 
-            if ((worst_dist>0)&&(result>worst_dist)) {
+            if ((worst_dist > 0) && (result > worst_dist)) {
                 return result;
             }
         }
@@ -679,10 +709,10 @@ struct ChiSquareDistance
         ResultType result = ResultType();
         ResultType sum, diff;
 
-        sum = (ResultType)(a+b);
-        if (sum>0) {
-            diff = (ResultType)(a-b);
-            result = diff*diff/sum;
+        sum = (ResultType)(a + b);
+        if (sum > 0) {
+            diff = (ResultType)(a - b);
+            result = diff * diff / sum;
         }
         return result;
     }
@@ -710,14 +740,14 @@ struct KL_Divergence
         while (a < last) {
             if (* b != 0) {
                 ResultType ratio = (ResultType)(*a / *b);
-                if (ratio>0) {
+                if (ratio > 0) {
                     result += *a * log(ratio);
                 }
             }
             ++a;
             ++b;
 
-            if ((worst_dist>0)&&(result>worst_dist)) {
+            if ((worst_dist > 0) && (result > worst_dist)) {
                 return result;
             }
         }
@@ -733,7 +763,7 @@ struct KL_Divergence
         ResultType result = ResultType();
         if( *b != 0 ) {
             ResultType ratio = (ResultType)(a / b);
-            if (ratio>0) {
+            if (ratio > 0) {
                 result = a * log(ratio);
             }
         }
@@ -791,7 +821,9 @@ template <typename Distance, typename ElementType>
 struct squareDistance
 {
     typedef typename Distance::ResultType ResultType;
-    ResultType operator()( ResultType dist ) { return dist*dist; }
+    ResultType operator()( ResultType dist ) {
+        return dist * dist;
+    }
 };
 
 
@@ -799,14 +831,18 @@ template <typename ElementType>
 struct squareDistance<L2_Simple<ElementType>, ElementType>
 {
     typedef typename L2_Simple<ElementType>::ResultType ResultType;
-    ResultType operator()( ResultType dist ) { return dist; }
+    ResultType operator()( ResultType dist ) {
+        return dist;
+    }
 };
 
 template <typename ElementType>
 struct squareDistance<L2<ElementType>, ElementType>
 {
     typedef typename L2<ElementType>::ResultType ResultType;
-    ResultType operator()( ResultType dist ) { return dist; }
+    ResultType operator()( ResultType dist ) {
+        return dist;
+    }
 };
 
 
@@ -814,21 +850,27 @@ template <typename ElementType>
 struct squareDistance<MinkowskiDistance<ElementType>, ElementType>
 {
     typedef typename MinkowskiDistance<ElementType>::ResultType ResultType;
-    ResultType operator()( ResultType dist ) { return dist; }
+    ResultType operator()( ResultType dist ) {
+        return dist;
+    }
 };
 
 template <typename ElementType>
 struct squareDistance<HellingerDistance<ElementType>, ElementType>
 {
     typedef typename HellingerDistance<ElementType>::ResultType ResultType;
-    ResultType operator()( ResultType dist ) { return dist; }
+    ResultType operator()( ResultType dist ) {
+        return dist;
+    }
 };
 
 template <typename ElementType>
 struct squareDistance<ChiSquareDistance<ElementType>, ElementType>
 {
     typedef typename ChiSquareDistance<ElementType>::ResultType ResultType;
-    ResultType operator()( ResultType dist ) { return dist; }
+    ResultType operator()( ResultType dist ) {
+        return dist;
+    }
 };
 
 
@@ -851,7 +893,9 @@ template <typename Distance, typename ElementType>
 struct simpleDistance
 {
     typedef typename Distance::ResultType ResultType;
-    ResultType operator()( ResultType dist ) { return dist; }
+    ResultType operator()( ResultType dist ) {
+        return dist;
+    }
 };
 
 
@@ -859,14 +903,18 @@ template <typename ElementType>
 struct simpleDistance<L2_Simple<ElementType>, ElementType>
 {
     typedef typename L2_Simple<ElementType>::ResultType ResultType;
-    ResultType operator()( ResultType dist ) { return sqrt(dist); }
+    ResultType operator()( ResultType dist ) {
+        return sqrt(dist);
+    }
 };
 
 template <typename ElementType>
 struct simpleDistance<L2<ElementType>, ElementType>
 {
     typedef typename L2<ElementType>::ResultType ResultType;
-    ResultType operator()( ResultType dist ) { return sqrt(dist); }
+    ResultType operator()( ResultType dist ) {
+        return sqrt(dist);
+    }
 };
 
 
@@ -874,21 +922,27 @@ template <typename ElementType>
 struct simpleDistance<MinkowskiDistance<ElementType>, ElementType>
 {
     typedef typename MinkowskiDistance<ElementType>::ResultType ResultType;
-    ResultType operator()( ResultType dist ) { return sqrt(dist); }
+    ResultType operator()( ResultType dist ) {
+        return sqrt(dist);
+    }
 };
 
 template <typename ElementType>
 struct simpleDistance<HellingerDistance<ElementType>, ElementType>
 {
     typedef typename HellingerDistance<ElementType>::ResultType ResultType;
-    ResultType operator()( ResultType dist ) { return sqrt(dist); }
+    ResultType operator()( ResultType dist ) {
+        return sqrt(dist);
+    }
 };
 
 template <typename ElementType>
 struct simpleDistance<ChiSquareDistance<ElementType>, ElementType>
 {
     typedef typename ChiSquareDistance<ElementType>::ResultType ResultType;
-    ResultType operator()( ResultType dist ) { return sqrt(dist); }
+    ResultType operator()( ResultType dist ) {
+        return sqrt(dist);
+    }
 };
 
 

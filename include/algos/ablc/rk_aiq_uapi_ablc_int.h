@@ -15,10 +15,10 @@
 
 XCamReturn
 rk_aiq_uapi_ablc_SetAttrib(RkAiqAlgoContext *ctx,
-                          rk_aiq_blc_attrib_t *attr,
-                          bool need_sync);
+                           rk_aiq_blc_attrib_t *attr,
+                           bool need_sync);
 XCamReturn
 rk_aiq_uapi_ablc_GetAttrib(const RkAiqAlgoContext *ctx,
-                          rk_aiq_blc_attrib_t *attr);
+                           rk_aiq_blc_attrib_t *attr);
 
 #endif

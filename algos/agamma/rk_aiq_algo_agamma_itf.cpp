@@ -41,7 +41,7 @@ create_context(RkAiqAlgoContext **context, const AlgoCtxInstanceCfg* cfg)
 static XCamReturn
 destroy_context(RkAiqAlgoContext *context)
 {
-      AgammaHandle_t*AgammaHandle = (AgammaHandle_t*)context;
+    AgammaHandle_t*AgammaHandle = (AgammaHandle_t*)context;
     XCamReturn ret;
 
     ret = AgammaReleaseV200(AgammaHandle);
@@ -53,16 +53,16 @@ static XCamReturn
 prepare(RkAiqAlgoCom* params)
 {
 
-	    XCamReturn ret;
-		RkAiqAlgoConfigAgammaInt* config = (RkAiqAlgoConfigAgammaInt*)params;
+    XCamReturn ret;
+    RkAiqAlgoConfigAgammaInt* config = (RkAiqAlgoConfigAgammaInt*)params;
 
-		int work_mode;
-		AgammaHandle_t * AgammaHandle = (AgammaHandle_t *)params->ctx;
-        CamCalibDbContext_t* calib = config->rk_com.u.prepare.calib;
-	    const CalibDb_Gamma_t *calib_gamma = &calib->gamma;
+    int work_mode;
+    AgammaHandle_t * AgammaHandle = (AgammaHandle_t *)params->ctx;
+    CamCalibDbContext_t* calib = config->rk_com.u.prepare.calib;
+    const CalibDb_Gamma_t *calib_gamma = &calib->gamma;
 
-		ret = AgammaConfigV200(calib_gamma,AgammaHandle);
-		return XCAM_RETURN_NO_ERROR;
+    ret = AgammaConfigV200(calib_gamma, AgammaHandle);
+    return XCAM_RETURN_NO_ERROR;
 }
 
 static XCamReturn
@@ -75,16 +75,16 @@ static XCamReturn
 processing(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outparams)
 {
 
-	XCamReturn ret;
+    XCamReturn ret;
     AgammaHandle_t * AgammaHandle = (AgammaHandle_t *)inparams->ctx;
     RkAiqAlgoProcAgammaInt* procPara = (RkAiqAlgoProcAgammaInt*)inparams;
     RkAiqAlgoProcResAgamma* procResPara = (RkAiqAlgoProcResAgamma*)outparams;
     rk_aiq_gamma_cfg_t* agamma_config;
     agamma_config = (rk_aiq_gamma_cfg_t*)&procResPara->agamma_config;
-	const CalibDb_Gamma_t *calib_gamma = AgammaHandle->calib_gamma;
+    const CalibDb_Gamma_t *calib_gamma = AgammaHandle->calib_gamma;
 
     if(inparams->u.proc.init == false) {
-        ret = AgammaReConfigV200(AgammaHandle,calib_gamma);
+        ret = AgammaReConfigV200(AgammaHandle, calib_gamma);
     }
     memcpy(agamma_config, &AgammaHandle->agamma_config, sizeof(rk_aiq_gamma_cfg_t));
     return XCAM_RETURN_NO_ERROR;

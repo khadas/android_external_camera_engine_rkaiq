@@ -150,6 +150,6 @@ typedef struct rk_aiq_awb_stat_res_v201_s {
     rk_aiq_awb_stat_wp_res_v201_t excWpRangeResult[RK_AIQ_AWB_STAT_WP_RANGE_NUM_V201];
     //wpno histogram
     unsigned int WpNoHist[RK_AIQ_AWB_WP_HIST_BIN_NUM];
-} rk_aiq_awb_stat_res_v201_t,rk_aiq_awb_stat_res_v201_t;
+} rk_aiq_awb_stat_res_v201_t, rk_aiq_awb_stat_res_v201_t;
 
 #endif

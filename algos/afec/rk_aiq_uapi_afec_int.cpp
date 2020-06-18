@@ -27,7 +27,7 @@ rk_aiq_uapi_afec_enable(RkAiqAlgoContext *ctx)
     if (fec_contex->fec_en)
         fec_contex->user_en = true;
     else
-	return XCAM_RETURN_ERROR_FAILED;
+        return XCAM_RETURN_ERROR_FAILED;
 
     return XCAM_RETURN_NO_ERROR;
 }
@@ -37,9 +37,9 @@ rk_aiq_uapi_afec_disable(RkAiqAlgoContext *ctx)
 {
     FECHandle_t fec_contex = (FECHandle_t)ctx->hFEC;;
     if (fec_contex->fec_en)
-	fec_contex->user_en = false;
+        fec_contex->user_en = false;
     else
-	return XCAM_RETURN_ERROR_FAILED;
+        return XCAM_RETURN_ERROR_FAILED;
 
     return XCAM_RETURN_NO_ERROR;
 }

@@ -40,7 +40,7 @@
 
 typedef enum dayNightScene_e {
     DAYNIGHT_SCENE_DAY = 0,
-    DAYNIGHT_SCENE_NIGHT= 1,
+    DAYNIGHT_SCENE_NIGHT = 1,
     DAYNIGHT_SCENE_INVAL
 } dayNightScene_t;
 
@@ -78,7 +78,7 @@ typedef enum aeMode_e {
 *   |       (0,0)     |
 *   |                 |
 *   |                 |
-*   ------------------- 
+*   -------------------
 *                     (1000, 1000)
 *****************
 */
@@ -90,9 +90,9 @@ typedef struct paRect_s {
 } paRect_t;
 
 typedef enum expPwrLineFreq_e {
-       EXP_PWR_LINE_FREQ_DIS   = 0,
-       EXP_PWR_LINE_FREQ_50HZ  = 1,
-       EXP_PWR_LINE_FREQ_60HZ  = 2,
+    EXP_PWR_LINE_FREQ_DIS   = 0,
+    EXP_PWR_LINE_FREQ_50HZ  = 1,
+    EXP_PWR_LINE_FREQ_60HZ  = 2,
 } expPwrLineFreq_t;
 
 typedef enum antiFlickerMode_e {

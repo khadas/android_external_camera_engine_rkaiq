@@ -48,7 +48,7 @@ class Logger
 
     ~Logger()
     {
-        if ((stream!=NULL)&&(stream!=stdout)) {
+        if ((stream != NULL) && (stream != stdout)) {
             fclose(stream);
         }
     }
@@ -61,7 +61,7 @@ class Logger
 
     void _setDestination(const char* name)
     {
-        if (name==NULL) {
+        if (name == NULL) {
             stream = stdout;
         }
         else {
@@ -69,7 +69,7 @@ class Logger
             if (fopen_s(&stream, name, "w") != 0)
                 stream = NULL;
 #else
-            stream = fopen(name,"w");
+            stream = fopen(name, "w");
 #endif
             if (stream == NULL) {
                 stream = stdout;
@@ -89,13 +89,17 @@ public:
      * Sets the logging level. All messages with lower priority will be ignored.
      * @param level Logging level
      */
-    static void setLevel(int level) { instance().logLevel = level; }
+    static void setLevel(int level) {
+        instance().logLevel = level;
+    }
 
     /**
      * Sets the logging destination
      * @param name Filename or NULL for console
      */
-    static void setDestination(const char* name) { instance()._setDestination(name); }
+    static void setDestination(const char* name) {
+        instance()._setDestination(name);
+    }
 
     /**
      * Print log message
@@ -107,7 +111,7 @@ public:
     {
         va_list arglist;
         va_start(arglist, fmt);
-        int ret = instance()._log(level,fmt,arglist);
+        int ret = instance()._log(level, fmt, arglist);
         va_end(arglist);
         return ret;
     }

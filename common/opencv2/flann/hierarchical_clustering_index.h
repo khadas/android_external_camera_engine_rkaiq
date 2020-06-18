@@ -112,22 +112,22 @@ private:
         UniqueRandom r(indices_length);
 
         int index;
-        for (index=0; index<k; ++index) {
+        for (index = 0; index < k; ++index) {
             bool duplicate = true;
             int rnd;
             while (duplicate) {
                 duplicate = false;
                 rnd = r.next();
-                if (rnd<0) {
+                if (rnd < 0) {
                     centers_length = index;
                     return;
                 }
 
                 centers[index] = dsindices[rnd];
 
-                for (int j=0; j<index; ++j) {
+                for (int j = 0; j < index; ++j) {
                     DistanceType sq = distance(dataset[centers[index]], dataset[centers[j]], dataset.cols);
-                    if (sq<1e-16) {
+                    if (sq < 1e-16) {
                         duplicate = true;
                     }
                 }
@@ -153,29 +153,29 @@ private:
         int n = indices_length;
 
         int rnd = rand_int(n);
-        assert(rnd >=0 && rnd < n);
+        assert(rnd >= 0 && rnd < n);
 
         centers[0] = dsindices[rnd];
 
         int index;
-        for (index=1; index<k; ++index) {
+        for (index = 1; index < k; ++index) {
 
             int best_index = -1;
             DistanceType best_val = 0;
-            for (int j=0; j<n; ++j) {
-                DistanceType dist = distance(dataset[centers[0]],dataset[dsindices[j]],dataset.cols);
-                for (int i=1; i<index; ++i) {
-                    DistanceType tmp_dist = distance(dataset[centers[i]],dataset[dsindices[j]],dataset.cols);
-                    if (tmp_dist<dist) {
+            for (int j = 0; j < n; ++j) {
+                DistanceType dist = distance(dataset[centers[0]], dataset[dsindices[j]], dataset.cols);
+                for (int i = 1; i < index; ++i) {
+                    DistanceType tmp_dist = distance(dataset[centers[i]], dataset[dsindices[j]], dataset.cols);
+                    if (tmp_dist < dist) {
                         dist = tmp_dist;
                     }
                 }
-                if (dist>best_val) {
+                if (dist > best_val) {
                     best_val = dist;
                     best_index = j;
                 }
             }
-            if (best_index!=-1) {
+            if (best_index != -1) {
                 centers[index] = dsindices[best_index];
             }
             else {
@@ -208,7 +208,7 @@ private:
 
         // Choose one random center and set the closestDistSq values
         int index = rand_int(n);
-        assert(index >=0 && index < n);
+        assert(index >= 0 && index < n);
         centers[0] = dsindices[index];
 
         // Computing distance^2 will have the advantage of even higher probability further to pick new centers
@@ -234,7 +234,7 @@ private:
                 // Choose our center - have to be slightly careful to return a valid answer even accounting
                 // for possible rounding errors
                 double randVal = rand_double(currentPot);
-                for (index = 0; index < n-1; index++) {
+                for (index = 0; index < n - 1; index++) {
                     if (randVal <= closestDistSq[index]) break;
                     else randVal -= closestDistSq[index];
                 }
@@ -247,7 +247,7 @@ private:
                 }
 
                 // Store the best result
-                if ((bestNewPot < 0)||(newPot < bestNewPot)) {
+                if ((bestNewPot < 0) || (newPot < bestNewPot)) {
                     bestNewPot = newPot;
                     bestNewIndex = index;
                 }
@@ -295,7 +295,7 @@ private:
 
         // Choose one random center and set the closestDistSq values
         int index = rand_int(n);
-        assert(index >=0 && index < n);
+        assert(index >= 0 && index < n);
         centers[0] = dsindices[index];
 
         for (int i = 0; i < n; i++) {
@@ -324,7 +324,7 @@ private:
                     }
 
                     // Store the best result
-                    if ((bestNewPot < 0)||(newPot <= bestNewPot)) {
+                    if ((bestNewPot < 0) || (newPot <= bestNewPot)) {
                         bestNewPot = newPot;
                         bestNewIndex = index;
                         furthest = closestDistSq[index];
@@ -365,32 +365,32 @@ public:
         size_ = dataset.rows;
         veclen_ = dataset.cols;
 
-        branching_ = get_param(params,"branching",32);
-        centers_init_ = get_param(params,"centers_init", FLANN_CENTERS_RANDOM);
-        trees_ = get_param(params,"trees",4);
-        leaf_size_ = get_param(params,"leaf_size",100);
+        branching_ = get_param(params, "branching", 32);
+        centers_init_ = get_param(params, "centers_init", FLANN_CENTERS_RANDOM);
+        trees_ = get_param(params, "trees", 4);
+        leaf_size_ = get_param(params, "leaf_size", 100);
 
-        if (centers_init_==FLANN_CENTERS_RANDOM) {
+        if (centers_init_ == FLANN_CENTERS_RANDOM) {
             chooseCenters = &HierarchicalClusteringIndex::chooseCentersRandom;
         }
-        else if (centers_init_==FLANN_CENTERS_GONZALES) {
+        else if (centers_init_ == FLANN_CENTERS_GONZALES) {
             chooseCenters = &HierarchicalClusteringIndex::chooseCentersGonzales;
         }
-        else if (centers_init_==FLANN_CENTERS_KMEANSPP) {
+        else if (centers_init_ == FLANN_CENTERS_KMEANSPP) {
             chooseCenters = &HierarchicalClusteringIndex::chooseCentersKMeanspp;
         }
-        else if (centers_init_==FLANN_CENTERS_GROUPWISE) {
+        else if (centers_init_ == FLANN_CENTERS_GROUPWISE) {
             chooseCenters = &HierarchicalClusteringIndex::GroupWiseCenterChooser;
         }
         else {
             throw FLANNException("Unknown algorithm for choosing initial centers.");
         }
 
-        trees_ = get_param(params,"trees",4);
+        trees_ = get_param(params, "trees", 4);
         root = new NodePtr[trees_];
         indices = new int*[trees_];
 
-        for (int i=0; i<trees_; ++i) {
+        for (int i = 0; i < trees_; ++i) {
             root[i] = NULL;
             indices[i] = NULL;
         }
@@ -408,11 +408,11 @@ public:
     {
         free_elements();
 
-        if (root!=NULL) {
+        if (root != NULL) {
             delete[] root;
         }
 
-        if (indices!=NULL) {
+        if (indices != NULL) {
             delete[] indices;
         }
     }
@@ -423,9 +423,9 @@ public:
      */
     void free_elements()
     {
-        if (indices!=NULL) {
-            for(int i=0; i<trees_; ++i) {
-                if (indices[i]!=NULL) {
+        if (indices != NULL) {
+            for(int i = 0; i < trees_; ++i) {
+                if (indices[i] != NULL) {
                     delete[] indices[i];
                     indices[i] = NULL;
                 }
@@ -457,7 +457,7 @@ public:
      */
     int usedMemory() const CV_OVERRIDE
     {
-        return pool.usedMemory+pool.wastedMemory+memoryCounter;
+        return pool.usedMemory + pool.wastedMemory + memoryCounter;
     }
 
     /**
@@ -465,19 +465,19 @@ public:
      */
     void buildIndex() CV_OVERRIDE
     {
-        if (branching_<2) {
+        if (branching_ < 2) {
             throw FLANNException("Branching factor must be at least 2");
         }
 
         free_elements();
 
-        for (int i=0; i<trees_; ++i) {
+        for (int i = 0; i < trees_; ++i) {
             indices[i] = new int[size_];
-            for (size_t j=0; j<size_; ++j) {
+            for (size_t j = 0; j < size_; ++j) {
                 indices[i][j] = (int)j;
             }
             root[i] = pool.allocate<Node>();
-            computeClustering(root[i], indices[i], (int)size_, branching_,0);
+            computeClustering(root[i], indices[i], (int)size_, branching_, 0);
         }
     }
 
@@ -495,7 +495,7 @@ public:
         save_value(stream, centers_init_);
         save_value(stream, leaf_size_);
         save_value(stream, memoryCounter);
-        for (int i=0; i<trees_; ++i) {
+        for (int i = 0; i < trees_; ++i) {
             save_value(stream, *indices[i], size_);
             save_tree(stream, root[i], i);
         }
@@ -507,11 +507,11 @@ public:
     {
         free_elements();
 
-        if (root!=NULL) {
+        if (root != NULL) {
             delete[] root;
         }
 
-        if (indices!=NULL) {
+        if (indices != NULL) {
             delete[] indices;
         }
 
@@ -523,7 +523,7 @@ public:
 
         indices = new int*[trees_];
         root = new NodePtr[trees_];
-        for (int i=0; i<trees_; ++i) {
+        for (int i = 0; i < trees_; ++i) {
             indices[i] = new int[size_];
             load_value(stream, *indices[i], size_);
             load_tree(stream, root[i], i);
@@ -549,19 +549,19 @@ public:
     void findNeighbors(ResultSet<DistanceType>& result, const ElementType* vec, const SearchParams& searchParams) CV_OVERRIDE
     {
 
-        int maxChecks = get_param(searchParams,"checks",32);
+        int maxChecks = get_param(searchParams, "checks", 32);
 
         // Priority queue storing intermediate branches in the best-bin-first search
         Heap<BranchSt>* heap = new Heap<BranchSt>((int)size_);
 
-        std::vector<bool> checked(size_,false);
+        std::vector<bool> checked(size_, false);
         int checks = 0;
-        for (int i=0; i<trees_; ++i) {
+        for (int i = 0; i < trees_; ++i) {
             findNN(root[i], result, vec, checks, maxChecks, heap, checked);
         }
 
         BranchSt branch;
-        while (heap->popMin(branch) && (checks<maxChecks || !result.full())) {
+        while (heap->popMin(branch) && (checks < maxChecks || !result.full())) {
             NodePtr node = branch.node;
             findNN(node, result, vec, checks, maxChecks, heap, checked);
         }
@@ -619,12 +619,12 @@ private:
     void save_tree(FILE* stream, NodePtr node, int num)
     {
         save_value(stream, *node);
-        if (node->childs==NULL) {
+        if (node->childs == NULL) {
             int indices_offset = (int)(node->indices - indices[num]);
             save_value(stream, indices_offset);
         }
         else {
-            for(int i=0; i<branching_; ++i) {
+            for(int i = 0; i < branching_; ++i) {
                 save_tree(stream, node->childs[i], num);
             }
         }
@@ -635,14 +635,14 @@ private:
     {
         node = pool.allocate<Node>();
         load_value(stream, *node);
-        if (node->childs==NULL) {
+        if (node->childs == NULL) {
             int indices_offset;
             load_value(stream, indices_offset);
             node->indices = indices[num] + indices_offset;
         }
         else {
             node->childs = pool.allocate<NodePtr>(branching_);
-            for(int i=0; i<branching_; ++i) {
+            for(int i = 0; i < branching_; ++i) {
                 load_tree(stream, node->childs[i], num);
             }
         }
@@ -654,13 +654,13 @@ private:
     void computeLabels(int* dsindices, int indices_length,  int* centers, int centers_length, int* labels, DistanceType& cost)
     {
         cost = 0;
-        for (int i=0; i<indices_length; ++i) {
+        for (int i = 0; i < indices_length; ++i) {
             ElementType* point = dataset[dsindices[i]];
             DistanceType dist = distance(point, dataset[centers[0]], veclen_);
             labels[i] = 0;
-            for (int j=1; j<centers_length; ++j) {
+            for (int j = 1; j < centers_length; ++j) {
                 DistanceType new_dist = distance(point, dataset[centers[j]], veclen_);
-                if (dist>new_dist) {
+                if (dist > new_dist) {
                     labels[i] = j;
                     dist = new_dist;
                 }
@@ -687,7 +687,7 @@ private:
 
         if (indices_length < leaf_size_) { // leaf node
             node->indices = dsindices;
-            std::sort(node->indices,node->indices+indices_length);
+            std::sort(node->indices, node->indices + indices_length);
             node->childs = NULL;
             return;
         }
@@ -698,26 +698,26 @@ private:
         int centers_length;
         (this->*chooseCenters)(branching, dsindices, indices_length, &centers[0], centers_length);
 
-        if (centers_length<branching) {
+        if (centers_length < branching) {
             node->indices = dsindices;
-            std::sort(node->indices,node->indices+indices_length);
+            std::sort(node->indices, node->indices + indices_length);
             node->childs = NULL;
             return;
         }
 
 
-        //	assign points to clusters
+        //  assign points to clusters
         DistanceType cost;
         computeLabels(dsindices, indices_length, &centers[0], centers_length, &labels[0], cost);
 
         node->childs = pool.allocate<NodePtr>(branching);
         int start = 0;
         int end = start;
-        for (int i=0; i<branching; ++i) {
-            for (int j=0; j<indices_length; ++j) {
-                if (labels[j]==i) {
-                    std::swap(dsindices[j],dsindices[end]);
-                    std::swap(labels[j],labels[end]);
+        for (int i = 0; i < branching; ++i) {
+            for (int j = 0; j < indices_length; ++j) {
+                if (labels[j] == i) {
+                    std::swap(dsindices[j], dsindices[end]);
+                    std::swap(labels[j], labels[end]);
                     end++;
                 }
             }
@@ -725,8 +725,8 @@ private:
             node->childs[i] = pool.allocate<Node>();
             node->childs[i]->pivot = centers[i];
             node->childs[i]->indices = NULL;
-            computeClustering(node->childs[i],dsindices+start, end-start, branching, level+1);
-            start=end;
+            computeClustering(node->childs[i], dsindices + start, end - start, branching, level + 1);
+            start = end;
         }
     }
 
@@ -748,11 +748,11 @@ private:
     void findNN(NodePtr node, ResultSet<DistanceType>& result, const ElementType* vec, int& checks, int maxChecks,
                 Heap<BranchSt>* heap, std::vector<bool>& checked)
     {
-        if (node->childs==NULL) {
-            if (checks>=maxChecks) {
+        if (node->childs == NULL) {
+            if (checks >= maxChecks) {
                 if (result.full()) return;
             }
-            for (int i=0; i<node->size; ++i) {
+            for (int i = 0; i < node->size; ++i) {
                 int index = node->indices[i];
                 if (!checked[index]) {
                     DistanceType dist = distance(dataset[index], vec, veclen_);
@@ -766,19 +766,19 @@ private:
             DistanceType* domain_distances = new DistanceType[branching_];
             int best_index = 0;
             domain_distances[best_index] = distance(vec, dataset[node->childs[best_index]->pivot], veclen_);
-            for (int i=1; i<branching_; ++i) {
+            for (int i = 1; i < branching_; ++i) {
                 domain_distances[i] = distance(vec, dataset[node->childs[i]->pivot], veclen_);
-                if (domain_distances[i]<domain_distances[best_index]) {
+                if (domain_distances[i] < domain_distances[best_index]) {
                     best_index = i;
                 }
             }
-            for (int i=0; i<branching_; ++i) {
-                if (i!=best_index) {
-                    heap->insert(BranchSt(node->childs[i],domain_distances[i]));
+            for (int i = 0; i < branching_; ++i) {
+                if (i != best_index) {
+                    heap->insert(BranchSt(node->childs[i], domain_distances[i]));
                 }
             }
             delete[] domain_distances;
-            findNN(node->childs[best_index],result,vec, checks, maxChecks, heap, checked);
+            findNN(node->childs[best_index], result, vec, checks, maxChecks, heap, checked);
         }
     }
 

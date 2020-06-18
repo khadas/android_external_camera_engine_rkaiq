@@ -27,20 +27,25 @@
 
 RKAIQ_BEGIN_DECLARE
 
-typedef struct AdpccContext_s{
-	AdpccOPMode_t eMode;
-	AdpccState_t eState;
-	
-	AdpccExpInfo_t stExpInfo;
-	
-	Adpcc_Auto_Attr_t stAuto;
-	Adpcc_Manual_Attr_t stManual;
 
-	//xml param
-	CalibDb_Dpcc_t stDpccCalib;
-	//html param
-	Adpcc_html_param_t stParams;	
-}AdpccContext_t;
+
+typedef struct AdpccContext_s {
+    AdpccOPMode_t eMode;
+    AdpccState_t eState;
+
+    AdpccExpInfo_t stExpInfo;
+
+    Adpcc_Auto_Attr_t stAuto;
+    Adpcc_Manual_Attr_t stManual;
+
+    //xml param
+    CalibDb_Dpcc_t stDpccCalib;
+    //html param
+    Adpcc_html_param_t stParams;
+
+    //sensor dpcc proc result
+    Sensor_dpcc_res_t SenDpccRes;
+} AdpccContext_t;
 
 
 RKAIQ_END_DECLARE

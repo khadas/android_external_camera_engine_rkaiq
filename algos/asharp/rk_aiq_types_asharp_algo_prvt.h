@@ -27,46 +27,46 @@
 
 RKAIQ_BEGIN_DECLARE
 
-//sharp fix 
-#define reg_sharpenHW_lratio_fix_bits				8
-#define reg_sharpenHW_hratio_fix_bits				8
-#define reg_sharpenHW_M_ratio_fix_bits				2
-#define reg_sharpenHW_H_ratio_fix_bits				2
-#define reg_sharpenHW_pbf_ratio_fix_bits			7
-#define reg_sharpenHW_lum_min_m_fix_bits			4
-#define reg_sharpenHW_hbf_ratio_fix_bits			8
-#define reg_sharpenHW_pPBfCoeff_fix_bits			6
-#define reg_sharpenHW_pMRfCoeff_fix_bits			7
-#define reg_sharpenHW_pMBfCoeff_fix_bits			6
-#define reg_sharpenHW_pHRfCoeff_fix_bits			7
-#define reg_sharpenHW_pHBfCoeff_fix_bits			6
+//sharp fix
+#define reg_sharpenHW_lratio_fix_bits               8
+#define reg_sharpenHW_hratio_fix_bits               8
+#define reg_sharpenHW_M_ratio_fix_bits              2
+#define reg_sharpenHW_H_ratio_fix_bits              2
+#define reg_sharpenHW_pbf_ratio_fix_bits            7
+#define reg_sharpenHW_lum_min_m_fix_bits            4
+#define reg_sharpenHW_hbf_ratio_fix_bits            8
+#define reg_sharpenHW_pPBfCoeff_fix_bits            6
+#define reg_sharpenHW_pMRfCoeff_fix_bits            7
+#define reg_sharpenHW_pMBfCoeff_fix_bits            6
+#define reg_sharpenHW_pHRfCoeff_fix_bits            7
+#define reg_sharpenHW_pHBfCoeff_fix_bits            6
 
 //edgefilter fix
-#define RK_EDGEFILTER_COEF_BIT      			(6)       
-#define	reg_dir_min_fix_bits             		RK_EDGEFILTER_COEF_BIT
-#define	reg_l_alpha_fix_bits             		8
-#define	reg_g_alpha_fix_bits             		8 
-#define	reg_detail_alpha_dog_fix_bits    		6
-#define	reg_h0_h_coef_5x5_fix_bits       		6
-#define	reg_h_coef_5x5_fix_bits          		6
-#define	reg_gf_coef_3x3_fix_bits         		4
-#define	reg_dog_kernel_fix_bits          		6
-#define	reg_smoth4_fix_bits						8	
+#define RK_EDGEFILTER_COEF_BIT                  (6)
+#define reg_dir_min_fix_bits                    RK_EDGEFILTER_COEF_BIT
+#define reg_l_alpha_fix_bits                    8
+#define reg_g_alpha_fix_bits                    8
+#define reg_detail_alpha_dog_fix_bits           6
+#define reg_h0_h_coef_5x5_fix_bits              6
+#define reg_h_coef_5x5_fix_bits                 6
+#define reg_gf_coef_3x3_fix_bits                4
+#define reg_dog_kernel_fix_bits                 6
+#define reg_smoth4_fix_bits                     8
 
-typedef struct AsharpContext_s{
-	AsharpExpInfo_t stExpInfo;
-	float fEnvLight;
-	AsharpState_t eState;
-	AsharpOPMode_t eMode;
+typedef struct AsharpContext_s {
+    AsharpExpInfo_t stExpInfo;
+    float fEnvLight;
+    AsharpState_t eState;
+    AsharpOPMode_t eMode;
 
-	Asharp_Auto_Attr_t stAuto;
-	Asharp_Manual_Attr_t stManual;
+    Asharp_Auto_Attr_t stAuto;
+    Asharp_Manual_Attr_t stManual;
 
-	//xml
-	CalibDb_Sharp_t stSharpCalib;
-	CalibDb_EdgeFilter_t stEdgeFltCalib;
+    //xml
+    CalibDb_Sharp_t stSharpCalib;
+    CalibDb_EdgeFilter_t stEdgeFltCalib;
 
-}AsharpContext_t;
+} AsharpContext_t;
 
 
 RKAIQ_END_DECLARE

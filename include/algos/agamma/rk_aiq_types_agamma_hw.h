@@ -32,8 +32,8 @@ typedef struct rk_aiq_gamma_cfg_s {
     int gamma_en;
     int gamma_out_mode; //0:log segment ; 1:equal segment ;
     int gamma_out_segnum ;
-	int gamma_out_offset;
-	int gamma_table[45];
+    int gamma_out_offset;
+    int gamma_table[45];
 }  rk_aiq_gamma_cfg_t;
 
 

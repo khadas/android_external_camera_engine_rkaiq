@@ -163,7 +163,7 @@ private:
     volatile bool _is_exit;
     SmartPtr<RkAiqIspParamsProxy> _last_aiq_results;
     struct isp2x_isp_params_cfg _full_active_isp_params;
-	uint32_t _ispp_module_init_ens;
+    uint32_t _ispp_module_init_ens;
     std::list<SmartPtr<RkAiqIspParamsProxy>> _pending_ispparams_queue;
     std::list<SmartPtr<RkAiqIsppParamsProxy>> _pending_isppParams_queue;
     std::map<int, SmartPtr<RkAiqIspParamsProxy>> _effecting_ispparm_map;
@@ -173,8 +173,8 @@ private:
     void gen_full_isp_params(const struct isp2x_isp_params_cfg* update_params,
                              struct isp2x_isp_params_cfg* full_params);
     XCamReturn overrideExpRatioToAiqResults(const sint32_t frameId,
-					   int module_id,
-					   SmartPtr<RkAiqIspParamsProxy>& aiq_results);
+                                            int module_id,
+                                            SmartPtr<RkAiqIspParamsProxy>& aiq_results);
     void dump_isp_config(struct isp2x_isp_params_cfg* isp_params,
                          SmartPtr<RkAiqIspParamsProxy> aiq_results);
     void dumpRawnrFixValue(struct isp2x_rawnr_cfg * pRawnrCfg );

@@ -47,7 +47,7 @@ template<typename BaseClass,
          typename ObjectCreator = BaseClass* (*)()>
 class ObjectFactory
 {
-    typedef ObjectFactory<BaseClass,UniqueIdType,ObjectCreator> ThisClass;
+    typedef ObjectFactory<BaseClass, UniqueIdType, ObjectCreator> ThisClass;
     typedef std::map<UniqueIdType, ObjectCreator> ObjectRegistry;
 
     // singleton class, private constructor

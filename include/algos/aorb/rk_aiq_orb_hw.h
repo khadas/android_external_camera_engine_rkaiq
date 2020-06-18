@@ -5,10 +5,10 @@
 
 typedef struct {
     unsigned int num_points;
-	unsigned short pXs[MAX_POINTS];
-	unsigned short pYs[MAX_POINTS];
-	unsigned char pDescriptors[MAX_POINTS * DESCRIPTOR_SIZE];
-	unsigned char pScores;
+    unsigned short pXs[MAX_POINTS];
+    unsigned short pYs[MAX_POINTS];
+    unsigned char pDescriptors[MAX_POINTS * DESCRIPTOR_SIZE];
+    unsigned char pScores;
 } sim_orb_stat_t;
 
 typedef struct {

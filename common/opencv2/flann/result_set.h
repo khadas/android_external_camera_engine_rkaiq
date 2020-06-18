@@ -59,7 +59,7 @@ struct BranchStruct
 
     bool operator<(const BranchStruct<T, DistanceType>& rhs) const
     {
-        return mindist<rhs.mindist;
+        return mindist < rhs.mindist;
     }
 };
 
@@ -103,7 +103,7 @@ public:
         dists = dists_;
         count = 0;
         worst_distance_ = (std::numeric_limits<DistanceType>::max)();
-        dists[capacity-1] = worst_distance_;
+        dists[capacity - 1] = worst_distance_;
     }
 
     size_t size() const
@@ -121,16 +121,16 @@ public:
     {
         if (dist >= worst_distance_) return;
         int i;
-        for (i=count; i>0; --i) {
+        for (i = count; i > 0; --i) {
 #ifdef FLANN_FIRST_MATCH
-            if ( (dists[i-1]>dist) || ((dist==dists[i-1])&&(indices[i-1]>index)) )
+            if ( (dists[i - 1] > dist) || ((dist == dists[i - 1]) && (indices[i - 1] > index)) )
 #else
-            if (dists[i-1]>dist)
+            if (dists[i - 1] > dist)
 #endif
             {
-                if (i<capacity) {
-                    dists[i] = dists[i-1];
-                    indices[i] = indices[i-1];
+                if (i < capacity) {
+                    dists[i] = dists[i - 1];
+                    indices[i] = indices[i - 1];
                 }
             }
             else break;
@@ -138,7 +138,7 @@ public:
         if (count < capacity) ++count;
         dists[i] = dist;
         indices[i] = index;
-        worst_distance_ = dists[capacity-1];
+        worst_distance_ = dists[capacity - 1];
     }
 
     DistanceType worstDist() const CV_OVERRIDE
@@ -170,7 +170,7 @@ public:
         dists = dists_;
         count = 0;
         worst_distance_ = (std::numeric_limits<DistanceType>::max)();
-        dists[capacity-1] = worst_distance_;
+        dists[capacity - 1] = worst_distance_;
     }
 
     size_t size() const
@@ -190,9 +190,9 @@ public:
         int i;
         for (i = count; i > 0; --i) {
 #ifdef FLANN_FIRST_MATCH
-            if ( (dists[i-1]<=dist) && ((dist!=dists[i-1])||(indices[i-1]<=index)) )
+            if ( (dists[i - 1] <= dist) && ((dist != dists[i - 1]) || (indices[i - 1] <= index)) )
 #else
-            if (dists[i-1]<=dist)
+            if (dists[i - 1] <= dist)
 #endif
             {
                 // Check for duplicate indices
@@ -208,13 +208,13 @@ public:
         }
 
         if (count < capacity) ++count;
-        for (int j = count-1; j > i; --j) {
-            dists[j] = dists[j-1];
-            indices[j] = indices[j-1];
+        for (int j = count - 1; j > i; --j) {
+            dists[j] = dists[j - 1];
+            indices[j] = indices[j - 1];
         }
         dists[i] = dist;
         indices[i] = index;
-        worst_distance_ = dists[capacity-1];
+        worst_distance_ = dists[capacity - 1];
     }
 
     DistanceType worstDist() const CV_OVERRIDE
@@ -264,8 +264,8 @@ public:
 
     void addPoint(DistanceType dist, int index)
     {
-        if (dist<radius) {
-            if ((capacity>0)&&(count < capacity)) {
+        if (dist < radius) {
+            if ((capacity > 0) && (count < capacity)) {
                 dists[count] = dist;
                 indices[count] = index;
             }
@@ -330,7 +330,7 @@ public:
     {
         if (n_neighbors < 0) {
             for (typename std::set<DistIndex>::const_iterator dist_index = dist_indices_.begin(), dist_index_end =
-                     dist_indices_.end(); dist_index != dist_index_end; ++dist_index, ++indices, ++dist) {
+                        dist_indices_.end(); dist_index != dist_index_end; ++dist_index, ++indices, ++dist) {
                 *indices = dist_index->index_;
                 *dist = dist_index->dist_;
             }
@@ -338,7 +338,7 @@ public:
         else {
             int i = 0;
             for (typename std::set<DistIndex>::const_iterator dist_index = dist_indices_.begin(), dist_index_end =
-                     dist_indices_.end(); (dist_index != dist_index_end) && (i < n_neighbors); ++dist_index, ++indices, ++dist, ++i) {
+                        dist_indices_.end(); (dist_index != dist_index_end) && (i < n_neighbors); ++dist_index, ++indices, ++dist, ++i) {
                 *indices = dist_index->index_;
                 *dist = dist_index->dist_;
             }

@@ -306,7 +306,7 @@ typedef struct _RkAiqAlgoProcAdhaz {
 
 typedef struct _RkAiqAlgoProcResAdhaz {
     RkAiqAlgoResCom proc_res_com;
-	 rk_aiq_dehaze_cfg_t adhaz_config;
+    rk_aiq_dehaze_cfg_t adhaz_config;
 } RkAiqAlgoProcResAdhaz;
 
 typedef struct _RkAiqAlgoPostAdhaz {
@@ -336,7 +336,7 @@ typedef struct _RkAiqAlgoProcA3dlut {
 
 typedef struct _RkAiqAlgoProcResA3dlut {
     RkAiqAlgoResCom proc_res_com;
-     rk_aiq_lut3d_cfg_t lut3d_hw_conf;
+    rk_aiq_lut3d_cfg_t lut3d_hw_conf;
 } RkAiqAlgoProcResA3dlut;
 
 typedef struct _RkAiqAlgoPostA3dlut {
@@ -484,6 +484,7 @@ typedef struct _RkAiqAlgoProcAdpcc {
 
 typedef struct _RkAiqAlgoProcResAdpcc {
     RkAiqAlgoResCom proc_res_com;
+    Sensor_dpcc_res_t SenDpccRes;
 } RkAiqAlgoProcResAdpcc;
 
 typedef struct _RkAiqAlgoPostAdpcc {
@@ -542,7 +543,7 @@ typedef struct _RkAiqAlgoProcAgamma {
 
 typedef struct _RkAiqAlgoProcResAgamma {
     RkAiqAlgoResCom proc_res_com;
-	rk_aiq_gamma_cfg_t agamma_config;
+    rk_aiq_gamma_cfg_t agamma_config;
 } RkAiqAlgoProcResAgamma;
 
 typedef struct _RkAiqAlgoPostAgamma {

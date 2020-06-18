@@ -29,7 +29,7 @@ typedef struct rk_aiq_lut3d_mlut3d_attrib_s {
     unsigned short look_up_table_b[729];//10bit
 } rk_aiq_lut3d_mlut3d_attrib_t;
 
-typedef enum rk_aiq_lut3d_op_mode_s{
+typedef enum rk_aiq_lut3d_op_mode_s {
     RK_AIQ_LUT3D_MODE_INVALID                     = 0,        /**< initialization value */
     RK_AIQ_LUT3D_MODE_MANUAL                      = 1,        /**< run manual lens shading correction */
     RK_AIQ_LUT3D_MODE_AUTO                        = 2,        /**< run auto lens shading correction */
@@ -37,12 +37,12 @@ typedef enum rk_aiq_lut3d_op_mode_s{
 } rk_aiq_lut3d_op_mode_t;
 
 
-typedef struct rk_aiq_lut3d_attrib_s{
+typedef struct rk_aiq_lut3d_attrib_s {
     bool byPass;
     rk_aiq_lut3d_op_mode_t mode;
     rk_aiq_lut3d_mlut3d_attrib_t stManual;
 
-}rk_aiq_lut3d_attrib_t;
+} rk_aiq_lut3d_attrib_t;
 
 typedef struct rk_aiq_lut3d_querry_info_s {
     bool lut3d_en;

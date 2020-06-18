@@ -29,47 +29,47 @@ void select_RkGamma_params(const CalibDb_Gamma_t * stRKGammaParam, RKAiqAgammaHt
 {
     int i;
 
-     stRKgammaParamSelected->gamma_en = stRKGammaParam->gamma_en;
-	 stRKgammaParamSelected->gamma_out_mode = stRKGammaParam->gamma_out_mode;
-	 stRKgammaParamSelected->gamma_out_offset = stRKGammaParam->gamma_out_offset;
-	 stRKgammaParamSelected->gamma_out_segnum = stRKGammaParam->gamma_out_segnum;
+    stRKgammaParamSelected->gamma_en = stRKGammaParam->gamma_en;
+    stRKgammaParamSelected->gamma_out_mode = stRKGammaParam->gamma_out_mode;
+    stRKgammaParamSelected->gamma_out_offset = stRKGammaParam->gamma_out_offset;
+    stRKgammaParamSelected->gamma_out_segnum = stRKGammaParam->gamma_out_segnum;
 
-	 if(workMode == GAMMA_OUT_NORMAL)
-	 	{
-	 	    for (i = 0; i < 45; i++)
-		    {
-		        stRKgammaParamSelected->gamma_table[i] = stRKGammaParam->curve_normal[i];
-		    }
-	 	}
-	 else if(workMode == GAMMA_OUT_HDR)
-	 	{
-	 	    for (i = 0; i < 45; i++)
-		    {
-		        stRKgammaParamSelected->gamma_table[i] = stRKGammaParam->curve_hdr[i];
-		    }
-	 	}
-	 else if(workMode == GAMMA_OUT_NIGHT)
-	 	{
-	 	    for (i = 0; i < 45; i++)
-		    {
-		        stRKgammaParamSelected->gamma_table[i] = stRKGammaParam->curve_night[i];
-		    }
-	 	}
-	 else if(workMode == GAMMA_OUT_USR1)
-	 	{
-	 	    for (i = 0; i < 45; i++)
-		    {
-		        stRKgammaParamSelected->gamma_table[i] = stRKGammaParam->curve_user1[i];
-		    }
-	 	}
-	 else if(workMode == GAMMA_OUT_USR2)
-	 	{
-	 	    for (i = 0; i < 45; i++)
-		    {
-		        stRKgammaParamSelected->gamma_table[i] = stRKGammaParam->curve_user2[i];
-		    }
-	 	}
-	 else return;
+    if(workMode == GAMMA_OUT_NORMAL)
+    {
+        for (i = 0; i < 45; i++)
+        {
+            stRKgammaParamSelected->gamma_table[i] = stRKGammaParam->curve_normal[i];
+        }
+    }
+    else if(workMode == GAMMA_OUT_HDR)
+    {
+        for (i = 0; i < 45; i++)
+        {
+            stRKgammaParamSelected->gamma_table[i] = stRKGammaParam->curve_hdr[i];
+        }
+    }
+    else if(workMode == GAMMA_OUT_NIGHT)
+    {
+        for (i = 0; i < 45; i++)
+        {
+            stRKgammaParamSelected->gamma_table[i] = stRKGammaParam->curve_night[i];
+        }
+    }
+    else if(workMode == GAMMA_OUT_USR1)
+    {
+        for (i = 0; i < 45; i++)
+        {
+            stRKgammaParamSelected->gamma_table[i] = stRKGammaParam->curve_user1[i];
+        }
+    }
+    else if(workMode == GAMMA_OUT_USR2)
+    {
+        for (i = 0; i < 45; i++)
+        {
+            stRKgammaParamSelected->gamma_table[i] = stRKGammaParam->curve_user2[i];
+        }
+    }
+    else return;
 
 
 
@@ -107,7 +107,7 @@ XCamReturn AgammaConfigV200(const CalibDb_Gamma_t * AgammaHtmlPara, AgammaHandle
     int workmode = AgammaHtmlPara->gamma_out_mode;
 
 
-	select_RkGamma_params(AgammaHtmlPara, (RKAiqAgammaHtmlConfig_Select_t*)&para->agamma_config,  workmode);
+    select_RkGamma_params(AgammaHtmlPara, (RKAiqAgammaHtmlConfig_Select_t*)&para->agamma_config,  workmode);
     para->calib_gamma = (CalibDb_Gamma_t *)AgammaHtmlPara;
 
     return ret;
@@ -133,15 +133,15 @@ XCamReturn AgammaProcessingV200(AgammaHandle_t* para)
 }
 */
 
-XCamReturn  AgammaReConfigV200(AgammaHandle_t *para,const CalibDb_Gamma_t * gamma_calib)
+XCamReturn  AgammaReConfigV200(AgammaHandle_t *para, const CalibDb_Gamma_t * gamma_calib)
 {
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
     LOGD_AGAMMA("ENTER: %s \n", __func__);
 
-	int workmode = gamma_calib->gamma_out_mode;
+    int workmode = gamma_calib->gamma_out_mode;
 
 
-    select_RkGamma_params(gamma_calib, (RKAiqAgammaHtmlConfig_Select_t*)&para->agamma_config,	workmode);
+    select_RkGamma_params(gamma_calib, (RKAiqAgammaHtmlConfig_Select_t*)&para->agamma_config,   workmode);
 
 
     return(ret);

@@ -64,12 +64,12 @@ enum {  CV_FONT_LIGHT           = 25,//QFont::Light,
         CV_FONT_DEMIBOLD        = 63,//QFont::DemiBold,
         CV_FONT_BOLD            = 75,//QFont::Bold,
         CV_FONT_BLACK           = 87 //QFont::Black
-};
+     };
 
 enum {  CV_STYLE_NORMAL         = 0,//QFont::StyleNormal,
         CV_STYLE_ITALIC         = 1,//QFont::StyleItalic,
         CV_STYLE_OBLIQUE        = 2 //QFont::StyleOblique
-};
+     };
 /* ---------*/
 
 //for color cvScalar(blue_component, green_component, red_component[, alpha_component])
@@ -88,7 +88,7 @@ CVAPI(void) cvStopLoop( void );
 
 typedef void (CV_CDECL *CvButtonCallback)(int state, void* userdata);
 enum {CV_PUSH_BUTTON = 0, CV_CHECKBOX = 1, CV_RADIOBOX = 2};
-CVAPI(int) cvCreateButton( const char* button_name CV_DEFAULT(NULL),CvButtonCallback on_change CV_DEFAULT(NULL), void* userdata CV_DEFAULT(NULL) , int button_type CV_DEFAULT(CV_PUSH_BUTTON), int initial_button_state CV_DEFAULT(0));
+CVAPI(int) cvCreateButton( const char* button_name CV_DEFAULT(NULL), CvButtonCallback on_change CV_DEFAULT(NULL), void* userdata CV_DEFAULT(NULL), int button_type CV_DEFAULT(CV_PUSH_BUTTON), int initial_button_state CV_DEFAULT(0));
 //----------------------
 
 
@@ -103,7 +103,7 @@ enum
     //These 3 flags are used by cvSet/GetWindowProperty
     CV_WND_PROP_FULLSCREEN = 0, //to change/get window's fullscreen property
     CV_WND_PROP_AUTOSIZE   = 1, //to change/get window's autosize property
-    CV_WND_PROP_ASPECTRATIO= 2, //to change/get window's aspectratio property
+    CV_WND_PROP_ASPECTRATIO = 2, //to change/get window's aspectratio property
     CV_WND_PROP_OPENGL     = 3, //to change/get window's opengl support
     CV_WND_PROP_VISIBLE    = 4,
 
@@ -174,28 +174,28 @@ CVAPI(void) cvSetTrackbarMin(const char* trackbar_name, const char* window_name,
 
 enum
 {
-    CV_EVENT_MOUSEMOVE      =0,
-    CV_EVENT_LBUTTONDOWN    =1,
-    CV_EVENT_RBUTTONDOWN    =2,
-    CV_EVENT_MBUTTONDOWN    =3,
-    CV_EVENT_LBUTTONUP      =4,
-    CV_EVENT_RBUTTONUP      =5,
-    CV_EVENT_MBUTTONUP      =6,
-    CV_EVENT_LBUTTONDBLCLK  =7,
-    CV_EVENT_RBUTTONDBLCLK  =8,
-    CV_EVENT_MBUTTONDBLCLK  =9,
-    CV_EVENT_MOUSEWHEEL     =10,
-    CV_EVENT_MOUSEHWHEEL    =11
+    CV_EVENT_MOUSEMOVE      = 0,
+    CV_EVENT_LBUTTONDOWN    = 1,
+    CV_EVENT_RBUTTONDOWN    = 2,
+    CV_EVENT_MBUTTONDOWN    = 3,
+    CV_EVENT_LBUTTONUP      = 4,
+    CV_EVENT_RBUTTONUP      = 5,
+    CV_EVENT_MBUTTONUP      = 6,
+    CV_EVENT_LBUTTONDBLCLK  = 7,
+    CV_EVENT_RBUTTONDBLCLK  = 8,
+    CV_EVENT_MBUTTONDBLCLK  = 9,
+    CV_EVENT_MOUSEWHEEL     = 10,
+    CV_EVENT_MOUSEHWHEEL    = 11
 };
 
 enum
 {
-    CV_EVENT_FLAG_LBUTTON   =1,
-    CV_EVENT_FLAG_RBUTTON   =2,
-    CV_EVENT_FLAG_MBUTTON   =4,
-    CV_EVENT_FLAG_CTRLKEY   =8,
-    CV_EVENT_FLAG_SHIFTKEY  =16,
-    CV_EVENT_FLAG_ALTKEY    =32
+    CV_EVENT_FLAG_LBUTTON   = 1,
+    CV_EVENT_FLAG_RBUTTON   = 2,
+    CV_EVENT_FLAG_MBUTTON   = 4,
+    CV_EVENT_FLAG_CTRLKEY   = 8,
+    CV_EVENT_FLAG_SHIFTKEY  = 16,
+    CV_EVENT_FLAG_ALTKEY    = 32
 };
 
 

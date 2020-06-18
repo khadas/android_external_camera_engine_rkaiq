@@ -23,7 +23,7 @@
 #include "adehaze/rk_aiq_types_adehaze_hw.h"
 
 RKAIQ_BEGIN_DECLARE
-	
+
 
 RKAIQ_END_DECLARE
 

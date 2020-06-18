@@ -90,7 +90,7 @@ struct index_creator
 };
 
 template<typename VectorSpace, typename Distance>
-struct index_creator<False,VectorSpace,Distance>
+struct index_creator<False, VectorSpace, Distance>
 {
     static NNIndex<Distance>* create(const Matrix<typename Distance::ElementType>& dataset, const IndexParams& params, const Distance& distance)
     {
@@ -119,7 +119,7 @@ struct index_creator<False,VectorSpace,Distance>
 };
 
 template<typename Distance>
-struct index_creator<False,False,Distance>
+struct index_creator<False, False, Distance>
 {
     static NNIndex<Distance>* create(const Matrix<typename Distance::ElementType>& dataset, const IndexParams& params, const Distance& distance)
     {
@@ -148,8 +148,8 @@ template<typename Distance>
 NNIndex<Distance>* create_index_by_type(const Matrix<typename Distance::ElementType>& dataset, const IndexParams& params, const Distance& distance)
 {
     return index_creator<typename Distance::is_kdtree_distance,
-                         typename Distance::is_vector_space_distance,
-                         Distance>::create(dataset, params,distance);
+           typename Distance::is_vector_space_distance,
+           Distance>::create(dataset, params, distance);
 }
 
 }

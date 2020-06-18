@@ -22,7 +22,8 @@
 #include "ae/rk_aiq_types_ae_algo_int.h"
 #include "af/rk_aiq_af_hw_v200.h"
 #include "rk_aiq_types_ahdr_stat_v200.h"
-#include "rk_aiq_uapi_ahdr_int.h"
+//#include "rk_aiq_types_ahdr_algo_int.h"
+
 
 
 #define LIMIT_VALUE(value,max_value,min_value)      (value > max_value? max_value : value < min_value ? min_value : value)
@@ -31,6 +32,9 @@
 #define SHIFT10BIT(A)         (A*1024)
 #define SHIFT11BIT(A)         (A*2048)
 #define SHIFT12BIT(A)         (A*4096)
+
+#define LIMIT_PARA(a,b,c,d,e)      (c+(a-e)*(b-c)/(d -e))
+
 
 #define AHDR_RET_SUCCESS             0   //!< this has to be 0, if clauses rely on it
 #define AHDR_RET_FAILURE             1   //!< general failure
@@ -264,7 +268,7 @@ typedef struct AhdrContext_s
     int hdr_mode;
 } AhdrContext_t;
 
-typedef struct AhdrContext_s* AhdrHandle_t;
+typedef AhdrContext_t* AhdrHandle_t;
 
 typedef struct AhdrInstanceConfig_s {
     AhdrHandle_t              hAhdr;
