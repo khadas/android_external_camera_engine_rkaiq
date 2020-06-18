@@ -26,10 +26,10 @@ LensHw::LensHw(const char* name)
     : V4l2SubDevice (name)
 {
     ENTER_CAMHW_FUNCTION();
-	_rec_sof_idx = 0;
-	memset(_frame_time, 0, sizeof(_frame_time));
-	memset(_frame_sequence, 0, sizeof(_frame_sequence));
-	_afInfoPool = new RkAiqAfInfoPool("LensLocalAfInfoParams", LensHw::DEFAULT_POOL_SIZE);
+    _rec_sof_idx = 0;
+    memset(_frame_time, 0, sizeof(_frame_time));
+    memset(_frame_sequence, 0, sizeof(_frame_sequence));
+    _afInfoPool = new RkAiqAfInfoPool("LensLocalAfInfoParams", LensHw::DEFAULT_POOL_SIZE);
     EXIT_CAMHW_FUNCTION();
 }
 
@@ -43,9 +43,9 @@ XCamReturn
 LensHw::start()
 {
     ENTER_CAMHW_FUNCTION();
-	_rec_sof_idx = 0;
-	memset(_frame_time, 0, sizeof(_frame_time));
-	memset(_frame_sequence, 0, sizeof(_frame_sequence));
+    _rec_sof_idx = 0;
+    memset(_frame_time, 0, sizeof(_frame_time));
+    memset(_frame_sequence, 0, sizeof(_frame_sequence));
     EXIT_CAMHW_FUNCTION();
     return XCAM_RETURN_NO_ERROR;
 }
@@ -94,14 +94,14 @@ LensHw::handle_sof(int64_t time, int frameid)
     SmartLock locker (_mutex);
 
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
-	int idx;
+    int idx;
 
     idx = (_rec_sof_idx + 1) % LENSHW_RECORD_SOF_NUM;
     _frame_sequence[idx] = frameid;
-	_frame_time[idx] = time;
-	_rec_sof_idx = idx;
+    _frame_time[idx] = time;
+    _rec_sof_idx = idx;
 
-	LOGD_CAMHW("%s: frm_id %d, time %lld\n", __func__, frameid, time);
+    LOGD_CAMHW("%s: frm_id %d, time %lld\n", __func__, frameid, time);
 
     EXIT_CAMHW_FUNCTION();
     return ret;
@@ -113,7 +113,7 @@ LensHw::getAfInfoParams(SmartPtr<RkAiqAfInfoProxy>& afInfo, int frame_id)
     ENTER_CAMHW_FUNCTION();
     SmartLock locker (_mutex);
 
-	int i;
+    int i;
 
     afInfo = NULL;
     if (_afInfoPool->has_free_items()) {
@@ -123,21 +123,21 @@ LensHw::getAfInfoParams(SmartPtr<RkAiqAfInfoProxy>& afInfo, int frame_id)
         return XCAM_RETURN_ERROR_MEM;
     }
 
-	for (i = 0; i < LENSHW_RECORD_SOF_NUM; i++) {
+    for (i = 0; i < LENSHW_RECORD_SOF_NUM; i++) {
         if (frame_id == _frame_sequence[i])
-			break;
-	}
+            break;
+    }
 
     afInfo->data()->focusStartTim = _vcm_tim.vcm_start_t;
     afInfo->data()->focusEndTim = _vcm_tim.vcm_end_t;
     if (i < LENSHW_RECORD_SOF_NUM) {
-	    afInfo->data()->sofTime = _frame_time[i];
+        afInfo->data()->sofTime = _frame_time[i];
     } else {
         LOGE_CAMHW("%s: frame_id %d, can not find sof time!\n", __FUNCTION__, frame_id);
         return  XCAM_RETURN_ERROR_PARAM;
-	}
+    }
 
-	LOGD_CAMHW("%s: frm_id %d, time %lld\n", __func__, frame_id, afInfo->data()->sofTime);
+    LOGD_CAMHW("%s: frm_id %d, time %lld\n", __func__, frame_id, afInfo->data()->sofTime);
 
     EXIT_CAMHW_FUNCTION();
 

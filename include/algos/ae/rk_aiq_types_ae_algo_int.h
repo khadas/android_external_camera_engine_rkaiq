@@ -219,6 +219,16 @@ typedef enum {
     AEC_DCG_MODE_HCG         = 1,       /* HCG, use higher conversion gain*/
 } AecDcgMode_t;
 
+typedef enum {
+    LOW_TO_HIGH   = 0,        /* gain > up_thres: LSNR to HSNR*/
+    HIGH_TO_LOW   = 1,       /* gain > up_thres: HSNR to LSNR*/
+} NrSwitchMode_t;
+
+typedef enum {
+    CIS_FEATURE_LEVEL_LOW    = 0,        /* Low level*/
+    CIS_FEATURE_LEVEL_HIGH   = 1,       /* High level*/
+} AecCISFeatureLevel_t;
+
 /*****************************************************************************/
 /**
  *          AecFrameMode_t
@@ -307,6 +317,15 @@ typedef RKAiqAecExpInfo_t ExpInfo_t;
  * @brief   AEC Module configuration structure isp2; used for re-configuration as well
  *
  *****************************************************************************/
+
+typedef struct Aec_Sensor_nr_switch_s {
+    bool valid;
+    uint32_t direct;
+    uint32_t up_thres;
+    uint32_t down_thres;
+    uint32_t div_coeff;
+} Aec_Sensor_nr_switch_t;
+
 typedef struct AecConfig_s {
 
     /*Aec Ctrl Configuration from calibdb, support User Api input Ctrl configuration*/
@@ -324,6 +343,7 @@ typedef struct AecConfig_s {
     float                         LinePeriodsPerField;
     float                         PixelClockFreqMHZ;
     float                         PixelPeriodsPerLine;
+    Aec_Sensor_nr_switch_t        nr_switch;
 
     /*continue to use some old params to keep the same with AecConfig_t*/
     AecDampingMode_t              DampingMode;              /**< damping mode */
@@ -355,6 +375,14 @@ typedef struct AeInstanceConfig_s {
  * @brief   ISP2.0 AEC Algo Result Params
  */
 /*****************************************************************************/
+
+typedef struct CISFeature_s {
+    uint8_t SNR;
+    uint8_t DR;
+    uint8_t Sat;
+    uint8_t SEN;
+} CISFeature_t;
+
 typedef struct AecPreResult_s {
     float MeanLuma[MAX_HDR_FRAMENUM];
     float LowLightLuma[MAX_HDR_FRAMENUM];
@@ -375,6 +403,8 @@ typedef struct AecPreResult_s {
     RkAiqExpParamComb_t HdrExp[MAX_HDR_FRAMENUM];
 
     CamerIcHistBins_t AeHistBin[3];
+    CISFeature_t CISFeature;
+
 } AecPreResult_t;
 
 /*****************************************************************************/

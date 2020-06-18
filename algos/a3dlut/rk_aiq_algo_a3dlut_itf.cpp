@@ -32,7 +32,7 @@ create_context(RkAiqAlgoContext **context, const AlgoCtxInstanceCfg* cfg)
 {
     LOGI_A3DLUT( "%s: (enter)\n", __FUNCTION__);
     AlgoCtxInstanceCfgInt *cfgInt = (AlgoCtxInstanceCfgInt*)cfg;
-    Alut3dInit(&ctx.a3dlut_para,cfgInt->calib);
+    Alut3dInit(&ctx.a3dlut_para, cfgInt->calib);
     *context = &ctx;
 
     LOGI_A3DLUT( "%s: (exit)\n", __FUNCTION__);

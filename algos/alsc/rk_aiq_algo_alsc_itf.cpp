@@ -33,7 +33,7 @@ create_context(RkAiqAlgoContext **context, const AlgoCtxInstanceCfg* cfg)
     LOGI_ALSC( "%s: (enter)\n", __FUNCTION__);
     AlgoCtxInstanceCfgInt *cfgInt = (AlgoCtxInstanceCfgInt*)cfg;
 
-    AlscInit(&ctx.alsc_para,cfgInt->calib);
+    AlscInit(&ctx.alsc_para, cfgInt->calib);
     *context = &ctx;
     LOGI_ALSC( "%s: (exit)\n", __FUNCTION__);
     return XCAM_RETURN_NO_ERROR;
@@ -58,8 +58,8 @@ prepare(RkAiqAlgoCom* params)
 
     RkAiqAlgoConfigAlscInt *para = (RkAiqAlgoConfigAlscInt *)params;
 
-    sprintf(hAlsc->curResName,"%dx%d",para->alsc_config_com.com.u.prepare.sns_op_width,
-       para->alsc_config_com.com.u.prepare.sns_op_height );
+    sprintf(hAlsc->curResName, "%dx%d", para->alsc_config_com.com.u.prepare.sns_op_width,
+            para->alsc_config_com.com.u.prepare.sns_op_height );
 
     AlscPrepare((alsc_handle_t)(params->ctx->alsc_para));
 
@@ -89,9 +89,9 @@ processing(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outparams)
     hAlsc->alscSwInfo = procAlsc->alsc_sw_info;
     LOGI_ALSC( "%s alsc_proc_com.u.init:%d \n", __FUNCTION__, inparams->u.proc.init);
     LOGD_ALSC( "%s: sensorGain:%f, awbGain:%f,%f, resName:%s, awbIIRDampCoef:%f\n", __FUNCTION__,
-        hAlsc->alscSwInfo.sensorGain,
-        hAlsc->alscSwInfo.awbGain[0], hAlsc->alscSwInfo.awbGain[1],
-        hAlsc->curResName, hAlsc->alscSwInfo.awbIIRDampCoef);
+               hAlsc->alscSwInfo.sensorGain,
+               hAlsc->alscSwInfo.awbGain[0], hAlsc->alscSwInfo.awbGain[1],
+               hAlsc->curResName, hAlsc->alscSwInfo.awbIIRDampCoef);
 
     AlscConfig(hAlsc);
     memcpy(&proResAlsc->alsc_proc_res_com.alsc_hw_conf, &hAlsc->lscHwConf, sizeof(rk_aiq_lsc_cfg_t));

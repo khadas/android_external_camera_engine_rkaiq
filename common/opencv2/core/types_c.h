@@ -142,61 +142,61 @@ typedef int CVStatus;
 
 /** @see cv::Error::Code */
 enum {
- CV_StsOk=                       0,  /**< everything is ok                */
- CV_StsBackTrace=               -1,  /**< pseudo error for back trace     */
- CV_StsError=                   -2,  /**< unknown /unspecified error      */
- CV_StsInternal=                -3,  /**< internal error (bad state)      */
- CV_StsNoMem=                   -4,  /**< insufficient memory             */
- CV_StsBadArg=                  -5,  /**< function arg/param is bad       */
- CV_StsBadFunc=                 -6,  /**< unsupported function            */
- CV_StsNoConv=                  -7,  /**< iter. didn't converge           */
- CV_StsAutoTrace=               -8,  /**< tracing                         */
- CV_HeaderIsNull=               -9,  /**< image header is NULL            */
- CV_BadImageSize=              -10,  /**< image size is invalid           */
- CV_BadOffset=                 -11,  /**< offset is invalid               */
- CV_BadDataPtr=                -12,  /**/
- CV_BadStep=                   -13,  /**< image step is wrong, this may happen for a non-continuous matrix */
- CV_BadModelOrChSeq=           -14,  /**/
- CV_BadNumChannels=            -15,  /**< bad number of channels, for example, some functions accept only single channel matrices */
- CV_BadNumChannel1U=           -16,  /**/
- CV_BadDepth=                  -17,  /**< input image depth is not supported by the function */
- CV_BadAlphaChannel=           -18,  /**/
- CV_BadOrder=                  -19,  /**< number of dimensions is out of range */
- CV_BadOrigin=                 -20,  /**< incorrect input origin               */
- CV_BadAlign=                  -21,  /**< incorrect input align                */
- CV_BadCallBack=               -22,  /**/
- CV_BadTileSize=               -23,  /**/
- CV_BadCOI=                    -24,  /**< input COI is not supported           */
- CV_BadROISize=                -25,  /**< incorrect input roi                  */
- CV_MaskIsTiled=               -26,  /**/
- CV_StsNullPtr=                -27,  /**< null pointer */
- CV_StsVecLengthErr=           -28,  /**< incorrect vector length */
- CV_StsFilterStructContentErr= -29,  /**< incorrect filter structure content */
- CV_StsKernelStructContentErr= -30,  /**< incorrect transform kernel content */
- CV_StsFilterOffsetErr=        -31,  /**< incorrect filter offset value */
- CV_StsBadSize=                -201, /**< the input/output structure size is incorrect  */
- CV_StsDivByZero=              -202, /**< division by zero */
- CV_StsInplaceNotSupported=    -203, /**< in-place operation is not supported */
- CV_StsObjectNotFound=         -204, /**< request can't be completed */
- CV_StsUnmatchedFormats=       -205, /**< formats of input/output arrays differ */
- CV_StsBadFlag=                -206, /**< flag is wrong or not supported */
- CV_StsBadPoint=               -207, /**< bad CvPoint */
- CV_StsBadMask=                -208, /**< bad format of mask (neither 8uC1 nor 8sC1)*/
- CV_StsUnmatchedSizes=         -209, /**< sizes of input/output structures do not match */
- CV_StsUnsupportedFormat=      -210, /**< the data format/type is not supported by the function*/
- CV_StsOutOfRange=             -211, /**< some of parameters are out of range */
- CV_StsParseError=             -212, /**< invalid syntax/structure of the parsed file */
- CV_StsNotImplemented=         -213, /**< the requested function/feature is not implemented */
- CV_StsBadMemBlock=            -214, /**< an allocated block has been corrupted */
- CV_StsAssert=                 -215, /**< assertion failed   */
- CV_GpuNotSupported=           -216, /**< no CUDA support    */
- CV_GpuApiCallError=           -217, /**< GPU API call error */
- CV_OpenGlNotSupported=        -218, /**< no OpenGL support  */
- CV_OpenGlApiCallError=        -219, /**< OpenGL API call error */
- CV_OpenCLApiCallError=        -220, /**< OpenCL API call error */
- CV_OpenCLDoubleNotSupported=  -221,
- CV_OpenCLInitError=           -222, /**< OpenCL initialization error */
- CV_OpenCLNoAMDBlasFft=        -223
+    CV_StsOk =                       0, /**< everything is ok                */
+    CV_StsBackTrace =               -1, /**< pseudo error for back trace     */
+    CV_StsError =                   -2, /**< unknown /unspecified error      */
+    CV_StsInternal =                -3, /**< internal error (bad state)      */
+    CV_StsNoMem =                   -4, /**< insufficient memory             */
+    CV_StsBadArg =                  -5, /**< function arg/param is bad       */
+    CV_StsBadFunc =                 -6, /**< unsupported function            */
+    CV_StsNoConv =                  -7, /**< iter. didn't converge           */
+    CV_StsAutoTrace =               -8, /**< tracing                         */
+    CV_HeaderIsNull =               -9, /**< image header is NULL            */
+    CV_BadImageSize =              -10, /**< image size is invalid           */
+    CV_BadOffset =                 -11, /**< offset is invalid               */
+    CV_BadDataPtr =                -12, /**/
+    CV_BadStep =                   -13, /**< image step is wrong, this may happen for a non-continuous matrix */
+    CV_BadModelOrChSeq =           -14, /**/
+    CV_BadNumChannels =            -15, /**< bad number of channels, for example, some functions accept only single channel matrices */
+    CV_BadNumChannel1U =           -16, /**/
+    CV_BadDepth =                  -17, /**< input image depth is not supported by the function */
+    CV_BadAlphaChannel =           -18, /**/
+    CV_BadOrder =                  -19, /**< number of dimensions is out of range */
+    CV_BadOrigin =                 -20, /**< incorrect input origin               */
+    CV_BadAlign =                  -21, /**< incorrect input align                */
+    CV_BadCallBack =               -22, /**/
+    CV_BadTileSize =               -23, /**/
+    CV_BadCOI =                    -24, /**< input COI is not supported           */
+    CV_BadROISize =                -25, /**< incorrect input roi                  */
+    CV_MaskIsTiled =               -26, /**/
+    CV_StsNullPtr =                -27, /**< null pointer */
+    CV_StsVecLengthErr =           -28, /**< incorrect vector length */
+    CV_StsFilterStructContentErr = -29, /**< incorrect filter structure content */
+    CV_StsKernelStructContentErr = -30, /**< incorrect transform kernel content */
+    CV_StsFilterOffsetErr =        -31, /**< incorrect filter offset value */
+    CV_StsBadSize =                -201, /**< the input/output structure size is incorrect  */
+    CV_StsDivByZero =              -202, /**< division by zero */
+    CV_StsInplaceNotSupported =    -203, /**< in-place operation is not supported */
+    CV_StsObjectNotFound =         -204, /**< request can't be completed */
+    CV_StsUnmatchedFormats =       -205, /**< formats of input/output arrays differ */
+    CV_StsBadFlag =                -206, /**< flag is wrong or not supported */
+    CV_StsBadPoint =               -207, /**< bad CvPoint */
+    CV_StsBadMask =                -208, /**< bad format of mask (neither 8uC1 nor 8sC1)*/
+    CV_StsUnmatchedSizes =         -209, /**< sizes of input/output structures do not match */
+    CV_StsUnsupportedFormat =      -210, /**< the data format/type is not supported by the function*/
+    CV_StsOutOfRange =             -211, /**< some of parameters are out of range */
+    CV_StsParseError =             -212, /**< invalid syntax/structure of the parsed file */
+    CV_StsNotImplemented =         -213, /**< the requested function/feature is not implemented */
+    CV_StsBadMemBlock =            -214, /**< an allocated block has been corrupted */
+    CV_StsAssert =                 -215, /**< assertion failed   */
+    CV_GpuNotSupported =           -216, /**< no CUDA support    */
+    CV_GpuApiCallError =           -217, /**< GPU API call error */
+    CV_OpenGlNotSupported =        -218, /**< no OpenGL support  */
+    CV_OpenGlApiCallError =        -219, /**< OpenGL API call error */
+    CV_OpenCLApiCallError =        -220, /**< OpenCL API call error */
+    CV_OpenCLDoubleNotSupported =  -221,
+    CV_OpenCLInitError =           -222, /**< OpenCL initialization error */
+    CV_OpenCLNoAMDBlasFft =        -223
 };
 
 /****************************************************************************************\
@@ -239,7 +239,7 @@ implementation a multiply-with-carry generator is used.
  */
 CV_INLINE CvRNG cvRNG( int64 seed CV_DEFAULT(-1))
 {
-    CvRNG rng = seed ? (uint64)seed : (uint64)(int64)-1;
+    CvRNG rng = seed ? (uint64)seed : (uint64)(int64) - 1;
     return rng;
 }
 
@@ -253,7 +253,7 @@ always generates a 32-bit random number, regardless of the platform.
 CV_INLINE unsigned cvRandInt( CvRNG* rng )
 {
     uint64 temp = *rng;
-    temp = (uint64)(unsigned)temp*CV_RNG_COEFF + (temp >> 32);
+    temp = (uint64)(unsigned)temp * CV_RNG_COEFF + (temp >> 32);
     *rng = temp;
     return (unsigned)temp;
 }
@@ -266,7 +266,7 @@ included).
  */
 CV_INLINE double cvRandReal( CvRNG* rng )
 {
-    return cvRandInt(rng)*2.3283064365386962890625e-10 /* 2^-32 */;
+    return cvRandInt(rng) * 2.3283064365386962890625e-10 /* 2^-32 */;
 }
 
 /****************************************************************************************\
@@ -324,7 +324,7 @@ hand, the Intel Image Processing Library processes the area of intersection betw
 destination images (or ROIs), allowing them to vary independently.
 */
 typedef struct
-_IplImage
+    _IplImage
 {
     int  nSize;             /**< sizeof(IplImage) */
     int  ID;                /**< version (=0)*/
@@ -359,7 +359,9 @@ _IplImage
 
 #if defined(CV__ENABLE_C_API_CTORS) && defined(__cplusplus)
     _IplImage() {}
-    _IplImage(const cv::Mat& m) { *this = cvIplImage(m); }
+    _IplImage(const cv::Mat& m) {
+        *this = cvIplImage(m);
+    }
 #endif
 }
 IplImage;
@@ -367,7 +369,9 @@ IplImage;
 CV_INLINE IplImage cvIplImage()
 {
 #if !(defined(CV__ENABLE_C_API_CTORS) && defined(__cplusplus))
-    IplImage self = CV_STRUCT_INITIALIZER; self.nSize = sizeof(IplImage); return self;
+    IplImage self = CV_STRUCT_INITIALIZER;
+    self.nSize = sizeof(IplImage);
+    return self;
 #else
     return _IplImage();
 #endif
@@ -498,7 +502,9 @@ typedef struct CvMat
 
 #if defined(CV__ENABLE_C_API_CTORS) && defined(__cplusplus)
     CvMat() {}
-    CvMat(const cv::Mat& m) { *this = cvMat(m); }
+    CvMat(const cv::Mat& m) {
+        *this = cvMat(m);
+    }
 #endif
 }
 CvMat;
@@ -553,7 +559,7 @@ CV_INLINE CvMat cvMat( int rows, int cols, int type, void* data CV_DEFAULT(NULL)
     m.type = CV_MAT_MAGIC_VAL | CV_MAT_CONT_FLAG | type;
     m.cols = cols;
     m.rows = rows;
-    m.step = m.cols*CV_ELEM_SIZE(type);
+    m.step = m.cols * CV_ELEM_SIZE(type);
     m.data.ptr = (uchar*)data;
     m.refcount = NULL;
     m.hdr_refcount = 0;
@@ -575,7 +581,8 @@ CV_INLINE CvMat cvMat(const cv::Mat& m)
 CV_INLINE CvMat cvMat()
 {
 #if !defined(CV__ENABLE_C_API_CTORS)
-    CvMat self = CV_STRUCT_INITIALIZER; return self;
+    CvMat self = CV_STRUCT_INITIALIZER;
+    return self;
 #else
     return CvMat();
 #endif
@@ -583,7 +590,9 @@ CV_INLINE CvMat cvMat()
 CV_INLINE CvMat cvMat(const CvMat& m)
 {
 #if !defined(CV__ENABLE_C_API_CTORS)
-    CvMat self = CV_STRUCT_INITIALIZER; memcpy(&self, &m, sizeof(self)); return self;
+    CvMat self = CV_STRUCT_INITIALIZER;
+    memcpy(&self, &m, sizeof(self));
+    return self;
 #else
     return CvMat(m);
 #endif
@@ -621,11 +630,11 @@ CV_INLINE  double  cvmGet( const CvMat* mat, int row, int col )
             (unsigned)col < (unsigned)mat->cols );
 
     if( type == CV_32FC1 )
-        return ((float*)(void*)(mat->data.ptr + (size_t)mat->step*row))[col];
+        return ((float*)(void*)(mat->data.ptr + (size_t)mat->step * row))[col];
     else
     {
         assert( type == CV_64FC1 );
-        return ((double*)(void*)(mat->data.ptr + (size_t)mat->step*row))[col];
+        return ((double*)(void*)(mat->data.ptr + (size_t)mat->step * row))[col];
     }
 }
 
@@ -647,11 +656,11 @@ CV_INLINE  void  cvmSet( CvMat* mat, int row, int col, double value )
             (unsigned)col < (unsigned)mat->cols );
 
     if( type == CV_32FC1 )
-        ((float*)(void*)(mat->data.ptr + (size_t)mat->step*row))[col] = (float)value;
+        ((float*)(void*)(mat->data.ptr + (size_t)mat->step * row))[col] = (float)value;
     else
     {
         assert( type == CV_64FC1 );
-        ((double*)(void*)(mat->data.ptr + (size_t)mat->step*row))[col] = value;
+        ((double*)(void*)(mat->data.ptr + (size_t)mat->step * row))[col] = value;
     }
 }
 
@@ -659,8 +668,8 @@ CV_INLINE  void  cvmSet( CvMat* mat, int row, int col, double value )
 CV_INLINE int cvIplDepth( int type )
 {
     int depth = CV_MAT_DEPTH(type);
-    return CV_ELEM_SIZE1(depth)*8 | (depth == CV_8S || depth == CV_16S ||
-           depth == CV_32S ? IPL_DEPTH_SIGN : 0);
+    return CV_ELEM_SIZE1(depth) * 8 | (depth == CV_8S || depth == CV_16S ||
+                                       depth == CV_32S ? IPL_DEPTH_SIGN : 0);
 }
 
 
@@ -682,7 +691,7 @@ CV_EXPORTS CvMatND cvMatND(const cv::Mat& m);
   @deprecated consider using cv::Mat instead
   */
 typedef struct
-CvMatND
+    CvMatND
 {
     int type;
     int dims;
@@ -708,7 +717,9 @@ CvMatND
 
 #if defined(CV__ENABLE_C_API_CTORS) && defined(__cplusplus)
     CvMatND() {}
-    CvMatND(const cv::Mat& m) { *this = cvMatND(m); }
+    CvMatND(const cv::Mat& m) {
+        *this = cvMatND(m);
+    }
 #endif
 }
 CvMatND;
@@ -717,7 +728,8 @@ CvMatND;
 CV_INLINE CvMatND cvMatND()
 {
 #if !(defined(CV__ENABLE_C_API_CTORS) && defined(__cplusplus))
-    CvMatND self = CV_STRUCT_INITIALIZER; return self;
+    CvMatND self = CV_STRUCT_INITIALIZER;
+    return self;
 #else
     return CvMatND();
 #endif
@@ -855,7 +867,10 @@ typedef struct CvRect
         x = y = width = height = 0;
         if (list.size() == 4)
         {
-            x = list.begin()[0]; y = list.begin()[1]; width = list.begin()[2]; height = list.begin()[3];
+            x = list.begin()[0];
+            y = list.begin()[1];
+            width = list.begin()[2];
+            height = list.begin()[3];
         }
     };
 #elif defined(CV__ENABLE_C_API_CTORS) && defined(__cplusplus)
@@ -865,7 +880,9 @@ typedef struct CvRect
 #endif
 #ifdef __cplusplus
     template<typename _Tp>
-    operator cv::Rect_<_Tp>() const { return cv::Rect_<_Tp>((_Tp)x, (_Tp)y, (_Tp)width, (_Tp)height); }
+    operator cv::Rect_<_Tp>() const {
+        return cv::Rect_<_Tp>((_Tp)x, (_Tp)y, (_Tp)width, (_Tp)height);
+    }
 #endif
 }
 CvRect;
@@ -876,12 +893,14 @@ CV_INLINE  CvRect  cvRect( int x, int y, int width, int height )
 #if !(defined(CV__ENABLE_C_API_CTORS) && defined(__cplusplus))
     CvRect r = {x, y, width, height};
 #else
-    CvRect r(x, y , width, height);
+    CvRect r(x, y, width, height);
 #endif
     return r;
 }
 #ifdef __cplusplus
-CV_INLINE CvRect cvRect(const cv::Rect& rc) { return cvRect(rc.x, rc.y, rc.width, rc.height); }
+CV_INLINE CvRect cvRect(const cv::Rect& rc) {
+    return cvRect(rc.x, rc.y, rc.width, rc.height);
+}
 #endif
 
 CV_INLINE  IplROI  cvRectToROI( CvRect rect, int coi )
@@ -922,7 +941,9 @@ typedef struct CvTermCriteria
     CvTermCriteria(const cv::TermCriteria& t) : type(t.type), max_iter(t.maxCount), epsilon(t.epsilon)  {}
 #endif
 #ifdef __cplusplus
-    operator cv::TermCriteria() const { return cv::TermCriteria(type, max_iter, epsilon); }
+    operator cv::TermCriteria() const {
+        return cv::TermCriteria(type, max_iter, epsilon);
+    }
 #endif
 }
 CvTermCriteria;
@@ -937,7 +958,9 @@ CV_INLINE  CvTermCriteria  cvTermCriteria( int type, int max_iter, double epsilo
     return t;
 }
 #ifdef __cplusplus
-CV_INLINE CvTermCriteria cvTermCriteria(const cv::TermCriteria& t) { return cvTermCriteria(t.type, t.maxCount, t.epsilon); }
+CV_INLINE CvTermCriteria cvTermCriteria(const cv::TermCriteria& t) {
+    return cvTermCriteria(t.type, t.maxCount, t.epsilon);
+}
 #endif
 
 
@@ -956,7 +979,8 @@ typedef struct CvPoint
         x = y = 0;
         if (list.size() == 2)
         {
-            x = list.begin()[0]; y = list.begin()[1];
+            x = list.begin()[0];
+            y = list.begin()[1];
         }
     };
 #elif defined(CV__ENABLE_C_API_CTORS) && defined(__cplusplus)
@@ -966,7 +990,9 @@ typedef struct CvPoint
 #endif
 #ifdef __cplusplus
     template<typename _Tp>
-    operator cv::Point_<_Tp>() const { return cv::Point_<_Tp>(cv::saturate_cast<_Tp>(x), cv::saturate_cast<_Tp>(y)); }
+    operator cv::Point_<_Tp>() const {
+        return cv::Point_<_Tp>(cv::saturate_cast<_Tp>(x), cv::saturate_cast<_Tp>(y));
+    }
 #endif
 }
 CvPoint;
@@ -982,7 +1008,9 @@ CV_INLINE  CvPoint  cvPoint( int x, int y )
     return p;
 }
 #ifdef __cplusplus
-CV_INLINE CvPoint cvPoint(const cv::Point& pt) { return cvPoint(pt.x, pt.y); }
+CV_INLINE CvPoint cvPoint(const cv::Point& pt) {
+    return cvPoint(pt.x, pt.y);
+}
 #endif
 
 typedef struct CvPoint2D32f
@@ -998,7 +1026,8 @@ typedef struct CvPoint2D32f
         x = y = 0;
         if (list.size() == 2)
         {
-            x = list.begin()[0]; y = list.begin()[1];
+            x = list.begin()[0];
+            y = list.begin()[1];
         }
     };
 #elif defined(CV__ENABLE_C_API_CTORS) && defined(__cplusplus)
@@ -1008,7 +1037,9 @@ typedef struct CvPoint2D32f
 #endif
 #ifdef __cplusplus
     template<typename _Tp>
-    operator cv::Point_<_Tp>() const { return cv::Point_<_Tp>(cv::saturate_cast<_Tp>(x), cv::saturate_cast<_Tp>(y)); }
+    operator cv::Point_<_Tp>() const {
+        return cv::Point_<_Tp>(cv::saturate_cast<_Tp>(x), cv::saturate_cast<_Tp>(y));
+    }
 #endif
 }
 CvPoint2D32f;
@@ -1069,7 +1100,9 @@ typedef struct CvPoint3D32f
         x = y = z = 0;
         if (list.size() == 3)
         {
-            x = list.begin()[0]; y = list.begin()[1]; z = list.begin()[2];
+            x = list.begin()[0];
+            y = list.begin()[1];
+            z = list.begin()[2];
         }
     };
 #elif defined(CV__ENABLE_C_API_CTORS) && defined(__cplusplus)
@@ -1079,7 +1112,9 @@ typedef struct CvPoint3D32f
 #endif
 #ifdef __cplusplus
     template<typename _Tp>
-    operator cv::Point3_<_Tp>() const { return cv::Point3_<_Tp>(cv::saturate_cast<_Tp>(x), cv::saturate_cast<_Tp>(y), cv::saturate_cast<_Tp>(z)); }
+    operator cv::Point3_<_Tp>() const {
+        return cv::Point3_<_Tp>(cv::saturate_cast<_Tp>(x), cv::saturate_cast<_Tp>(y), cv::saturate_cast<_Tp>(z));
+    }
 #endif
 }
 CvPoint3D32f;
@@ -1121,7 +1156,8 @@ typedef struct CvPoint2D64f
         x = y = 0;
         if (list.size() == 2)
         {
-            x = list.begin()[0]; y = list.begin()[1];
+            x = list.begin()[0];
+            y = list.begin()[1];
         }
     };
 #endif
@@ -1149,7 +1185,9 @@ typedef struct CvPoint3D64f
         x = y = z = 0;
         if (list.size() == 3)
         {
-            x = list.begin()[0]; y = list.begin()[1]; z = list.begin()[2];
+            x = list.begin()[0];
+            y = list.begin()[1];
+            z = list.begin()[2];
         }
     };
 #endif
@@ -1176,10 +1214,12 @@ typedef struct CvSize
     template<typename _Tp> CvSize(const std::initializer_list<_Tp> list)
     {
         CV_Assert(list.size() == 0 || list.size() == 2);
-        width = 0; height = 0;
+        width = 0;
+        height = 0;
         if (list.size() == 2)
         {
-            width = list.begin()[0]; height = list.begin()[1];
+            width = list.begin()[0];
+            height = list.begin()[1];
         }
     };
 #elif defined(CV__ENABLE_C_API_CTORS) && defined(__cplusplus)
@@ -1189,7 +1229,9 @@ typedef struct CvSize
 #endif
 #ifdef __cplusplus
     template<typename _Tp>
-    operator cv::Size_<_Tp>() const { return cv::Size_<_Tp>(cv::saturate_cast<_Tp>(width), cv::saturate_cast<_Tp>(height)); }
+    operator cv::Size_<_Tp>() const {
+        return cv::Size_<_Tp>(cv::saturate_cast<_Tp>(width), cv::saturate_cast<_Tp>(height));
+    }
 #endif
 }
 CvSize;
@@ -1227,10 +1269,12 @@ typedef struct CvSize2D32f
     template<typename _Tp> CvSize2D32f(const std::initializer_list<_Tp> list)
     {
         CV_Assert(list.size() == 0 || list.size() == 2);
-        width = 0; height = 0;
+        width = 0;
+        height = 0;
         if (list.size() == 2)
         {
-            width = list.begin()[0]; height = list.begin()[1];
+            width = list.begin()[0];
+            height = list.begin()[1];
         }
     };
 #elif defined(CV__ENABLE_C_API_CTORS) && defined(__cplusplus)
@@ -1240,7 +1284,9 @@ typedef struct CvSize2D32f
 #endif
 #ifdef __cplusplus
     template<typename _Tp>
-    operator cv::Size_<_Tp>() const { return cv::Size_<_Tp>(cv::saturate_cast<_Tp>(width), cv::saturate_cast<_Tp>(height)); }
+    operator cv::Size_<_Tp>() const {
+        return cv::Size_<_Tp>(cv::saturate_cast<_Tp>(width), cv::saturate_cast<_Tp>(height));
+    }
 #endif
 }
 CvSize2D32f;
@@ -1275,14 +1321,16 @@ typedef struct CvBox2D
     CvPoint2D32f center;  /**< Center of the box.                          */
     CvSize2D32f  size;    /**< Box width and length.                       */
     float angle;          /**< Angle between the horizontal axis           */
-                          /**< and the first side (i.e. length) in degrees */
+    /**< and the first side (i.e. length) in degrees */
 
 #if defined(CV__ENABLE_C_API_CTORS) && defined(__cplusplus)
     CvBox2D(CvPoint2D32f c = CvPoint2D32f(), CvSize2D32f s = CvSize2D32f(), float a = 0) : center(c), size(s), angle(a) {}
     CvBox2D(const cv::RotatedRect& rr) : center(rr.center), size(rr.size), angle(rr.angle) {}
 #endif
 #ifdef __cplusplus
-    operator cv::RotatedRect() const { return cv::RotatedRect(center, size, angle); }
+    operator cv::RotatedRect() const {
+        return cv::RotatedRect(center, size, angle);
+    }
 #endif
 }
 CvBox2D;
@@ -1341,14 +1389,19 @@ typedef struct CvSlice
         start_index = end_index = 0;
         if (list.size() == 2)
         {
-            start_index = list.begin()[0]; end_index = list.begin()[1];
+            start_index = list.begin()[0];
+            end_index = list.begin()[1];
         }
     };
 #endif
 #if defined(CV__ENABLE_C_API_CTORS) && defined(__cplusplus) && !defined(__CUDACC__)
     CvSlice(int start = 0, int end = 0) : start_index(start), end_index(end) {}
-    CvSlice(const cv::Range& r) { *this = (r.start != INT_MIN && r.end != INT_MAX) ? CvSlice(r.start, r.end) : CvSlice(0, CV_WHOLE_SEQ_END_INDEX); }
-    operator cv::Range() const { return (start_index == 0 && end_index == CV_WHOLE_SEQ_END_INDEX ) ? cv::Range::all() : cv::Range(start_index, end_index); }
+    CvSlice(const cv::Range& r) {
+        *this = (r.start != INT_MIN && r.end != INT_MAX) ? CvSlice(r.start, r.end) : CvSlice(0, CV_WHOLE_SEQ_END_INDEX);
+    }
+    operator cv::Range() const {
+        return (start_index == 0 && end_index == CV_WHOLE_SEQ_END_INDEX ) ? cv::Range::all() : cv::Range(start_index, end_index);
+    }
 #endif
 }
 CvSlice;
@@ -1387,14 +1440,27 @@ typedef struct CvScalar
         val[0] = val[1] = val[2] = val[3] = 0;
         if (list.size() == 4)
         {
-            val[0] = list.begin()[0]; val[1] = list.begin()[1]; val[2] = list.begin()[2]; val[3] = list.begin()[3];
+            val[0] = list.begin()[0];
+            val[1] = list.begin()[1];
+            val[2] = list.begin()[2];
+            val[3] = list.begin()[3];
         }
     };
 #elif defined(CV__ENABLE_C_API_CTORS) && defined(__cplusplus)
     CvScalar() {}
-    CvScalar(double d0, double d1 = 0, double d2 = 0, double d3 = 0) { val[0] = d0; val[1] = d1; val[2] = d2; val[3] = d3; }
+    CvScalar(double d0, double d1 = 0, double d2 = 0, double d3 = 0) {
+        val[0] = d0;
+        val[1] = d1;
+        val[2] = d2;
+        val[3] = d3;
+    }
     template<typename _Tp>
-    CvScalar(const cv::Scalar_<_Tp>& s) { val[0] = s.val[0]; val[1] = s.val[1]; val[2] = s.val[2]; val[3] = s.val[3]; }
+    CvScalar(const cv::Scalar_<_Tp>& s) {
+        val[0] = s.val[0];
+        val[1] = s.val[1];
+        val[2] = s.val[2];
+        val[3] = s.val[3];
+    }
     template<typename _Tp, int cn>
     CvScalar(const cv::Vec<_Tp, cn>& v)
     {
@@ -1405,7 +1471,9 @@ typedef struct CvScalar
 #endif
 #ifdef __cplusplus
     template<typename _Tp>
-    operator cv::Scalar_<_Tp>() const { return cv::Scalar_<_Tp>(cv::saturate_cast<_Tp>(val[0]), cv::saturate_cast<_Tp>(val[1]), cv::saturate_cast<_Tp>(val[2]), cv::saturate_cast<_Tp>(val[3])); }
+    operator cv::Scalar_<_Tp>() const {
+        return cv::Scalar_<_Tp>(cv::saturate_cast<_Tp>(val[0]), cv::saturate_cast<_Tp>(val[1]), cv::saturate_cast<_Tp>(val[2]), cv::saturate_cast<_Tp>(val[3]));
+    }
 #endif
 }
 CvScalar;
@@ -1418,8 +1486,10 @@ CV_INLINE  CvScalar  cvScalar( double val0, double val1 CV_DEFAULT(0),
 #else
     CvScalar scalar;
 #endif
-    scalar.val[0] = val0; scalar.val[1] = val1;
-    scalar.val[2] = val2; scalar.val[3] = val3;
+    scalar.val[0] = val0;
+    scalar.val[1] = val1;
+    scalar.val[2] = val2;
+    scalar.val[3] = val3;
     return scalar;
 }
 
@@ -1521,7 +1591,7 @@ typedef struct CvSeqBlock
     struct CvSeqBlock*  prev; /**< Previous sequence block.                   */
     struct CvSeqBlock*  next; /**< Next sequence block.                       */
     int    start_index;       /**< Index of the first element in the block +  */
-                              /**< sequence->first->start_index.              */
+    /**< sequence->first->start_index.              */
     int    count;             /**< Number of elements in the block.           */
     schar* data;              /**< Pointer to the first element of the block. */
 }

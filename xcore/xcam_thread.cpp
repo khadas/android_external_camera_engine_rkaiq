@@ -138,7 +138,7 @@ Thread::emit_stop ()
 bool Thread::stop ()
 {
     XCAM_LOG_DEBUG ("stop thread(%s) _started: %d _stopped: %d",
-        XCAM_STR(_name), _started, _stopped);
+                    XCAM_STR(_name), _started, _stopped);
 
     SmartLock locker(_mutex);
     if (_started) {

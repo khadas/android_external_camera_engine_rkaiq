@@ -175,21 +175,21 @@ RkLumaCore::analyze(const SmartPtr<VideoBuffer> &buffer)
     rk_sim_isp_v200_luma_t* luma =
         (rk_sim_isp_v200_luma_t*)(buf->get_v4l2_userptr());
     LOGD_ANALYZER("lumatest rkaiq get luma(%d): %d\n",
-                luma->valid_luma,
-                luma->image_luma_result.mean_luma[0]);
+                  luma->valid_luma,
+                  luma->image_luma_result.mean_luma[0]);
 
     if (!mLumaQueueFIFO.is_empty() && mLumaQueueFIFO.size() == LUMA_FIFO_CNT - 1) {
         SmartPtr<isp_luma_stat_t> luma_frame_pre2 = mLumaQueueFIFO.pop();
         SmartPtr<isp_luma_stat_t> luma_frame_pre1 = mLumaQueueFIFO.pop();
         LOGD_ANALYZER("lumatest now pre1 pre2: %d-%d-%d, datasize: %d\n",
-            luma->image_luma_result.mean_luma[0],
-            luma_frame_pre1->mean_luma[0],
-            luma_frame_pre2->mean_luma[0],
-            mLumaQueueFIFO.size());
+                      luma->image_luma_result.mean_luma[0],
+                      luma_frame_pre1->mean_luma[0],
+                      luma_frame_pre2->mean_luma[0],
+                      mLumaQueueFIFO.size());
         float dluma1 = float(luma_frame_pre1->mean_luma[0] - luma->image_luma_result.mean_luma[0]) /
-                        (luma_frame_pre1->mean_luma[0] + luma->image_luma_result.mean_luma[0]);
+                       (luma_frame_pre1->mean_luma[0] + luma->image_luma_result.mean_luma[0]);
         float dluma2 = float(luma_frame_pre1->mean_luma[0] - luma_frame_pre2->mean_luma[0]) /
-                        (luma_frame_pre1->mean_luma[0] + luma_frame_pre2->mean_luma[0]);
+                       (luma_frame_pre1->mean_luma[0] + luma_frame_pre2->mean_luma[0]);
 
         if ((dluma1 > 0.2 && dluma2 > 0.2) ||
                 (dluma1 < -0.2 && dluma2 < -0.2)) {
@@ -210,25 +210,25 @@ RkLumaCore::analyze(const SmartPtr<VideoBuffer> &buffer)
         mCb->rkLumaCalcDone(0, hdrProcessCnt);
 #else
     rkisp_isp2x_luma_buffer* lumaStat =
-            (rkisp_isp2x_luma_buffer*)(buf->get_v4l2_userptr());
+        (rkisp_isp2x_luma_buffer*)(buf->get_v4l2_userptr());
 
     int raw_channal = 1;
     switch (mWorkingMode)
     {
-        case RK_AIQ_WORKING_MODE_NORMAL:
-            raw_channal = 1;
-            break;
-        case RK_AIQ_ISP_HDR_MODE_2_FRAME_HDR:
-        case RK_AIQ_ISP_HDR_MODE_2_LINE_HDR:
-            raw_channal = 0;
-            break;
-        case RK_AIQ_ISP_HDR_MODE_3_FRAME_HDR:
-        case RK_AIQ_ISP_HDR_MODE_3_LINE_HDR:
-            raw_channal = 1;
-            break;
-        default:
-            raw_channal = 1;
-            break;
+    case RK_AIQ_WORKING_MODE_NORMAL:
+        raw_channal = 1;
+        break;
+    case RK_AIQ_ISP_HDR_MODE_2_FRAME_HDR:
+    case RK_AIQ_ISP_HDR_MODE_2_LINE_HDR:
+        raw_channal = 0;
+        break;
+    case RK_AIQ_ISP_HDR_MODE_3_FRAME_HDR:
+    case RK_AIQ_ISP_HDR_MODE_3_LINE_HDR:
+        raw_channal = 1;
+        break;
+    default:
+        raw_channal = 1;
+        break;
     }
 
     unsigned int mean_luma = 0;
@@ -242,9 +242,9 @@ RkLumaCore::analyze(const SmartPtr<VideoBuffer> &buffer)
         SmartPtr<isp_luma_stat_t> luma_frame_pre1 = mLumaQueueFIFO.pop();
 
         float dluma1 = int(luma_frame_pre1->mean_luma[raw_channal] - mean_luma) /
-                        float(luma_frame_pre1->mean_luma[raw_channal] + mean_luma);
+                       float(luma_frame_pre1->mean_luma[raw_channal] + mean_luma);
         float dluma2 = int(luma_frame_pre1->mean_luma[raw_channal] - luma_frame_pre2->mean_luma[raw_channal]) /
-                        float(luma_frame_pre1->mean_luma[raw_channal] + luma_frame_pre2->mean_luma[raw_channal]);
+                       float(luma_frame_pre1->mean_luma[raw_channal] + luma_frame_pre2->mean_luma[raw_channal]);
         /*
         LOGE_ANALYZER("lumatest(%d) now pre1 pre2: %d-%d-%d, datasize: %d\n",
             mWorkingMode, mean_luma,

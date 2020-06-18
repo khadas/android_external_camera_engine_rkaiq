@@ -17,6 +17,7 @@
 
 #include "CamHwIsp20.h"
 #include "Isp20PollThread.h"
+#include "Isp20OfflineFrmRead.h"
 #include "rk_isp20_hw.h"
 #include "Isp20_module_dbg.h"
 #include "mediactl/mediactl-priv.h"
@@ -513,10 +514,10 @@ findAttachedSubdevs(struct media_device *device, uint32_t count, rk_sensor_full_
         entity_info = media_entity_get_info(entity);
         if ((NULL != entity_info) && (entity_info->type == MEDIA_ENT_T_V4L2_SUBDEV_LENS)) {
             if ((entity_info->name[0] == 'm') &&
-                (strncmp(entity_info->name, s_info->module_index_str.c_str(), 3) == 0)){
-                 if (entity_info->flags == 1)
+                    (strncmp(entity_info->name, s_info->module_index_str.c_str(), 3) == 0)) {
+                if (entity_info->flags == 1)
                     s_info->module_ircut_dev_name = std::string(media_entity_get_devname(entity));
-                 else//vcm
+                else//vcm
                     s_info->module_lens_dev_name = std::string(media_entity_get_devname(entity));
             }
         }
@@ -606,6 +607,7 @@ CamHwIsp20::init(const char* sns_ent_name)
 {
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
     SmartPtr<Isp20PollThread> isp20Pollthread;
+    SmartPtr<OfflineFrmRdThread> isp20OfflineRdthread;
     SmartPtr<PollThread> isp20LumaPollthread;
     SmartPtr<PollThread> isp20IsppPollthread;
     SmartPtr<SensorHw> sensorHw;
@@ -660,20 +662,20 @@ CamHwIsp20::init(const char* sns_ent_name)
     mipi_tx_devs[0]->open();
     mipi_rx_devs[0] = new V4l2Device (s_info->isp_info->rawrd2_s_path);//rkisp_rawrd2_s
     mipi_rx_devs[0]->open();
-    mipi_rx_devs[0]->set_mem_type(V4L2_MEMORY_DMABUF);
+    mipi_rx_devs[0]->set_mem_type(V4L2_MEMORY_USERPTR);
     //mid frame
     mipi_tx_devs[1] = new V4l2Device (s_info->isp_info->rawwr0_path);//rkisp_rawwr0
     mipi_tx_devs[1]->open();
     mipi_rx_devs[1] = new V4l2Device (s_info->isp_info->rawrd0_m_path);//rkisp_rawrd0_m
     mipi_rx_devs[1]->open();
-    mipi_rx_devs[1]->set_mem_type(V4L2_MEMORY_DMABUF);
+    mipi_rx_devs[1]->set_mem_type(V4L2_MEMORY_USERPTR);
     //long frame
     mipi_tx_devs[2] = new V4l2Device (s_info->isp_info->rawwr1_path);//rkisp_rawwr1
     mipi_tx_devs[2]->open();
     mipi_rx_devs[2] = new V4l2Device (s_info->isp_info->rawrd1_l_path);//rkisp_rawrd1_l
     mipi_rx_devs[2]->open();
 
-    mipi_rx_devs[2]->set_mem_type(V4L2_MEMORY_DMABUF);
+    mipi_rx_devs[2]->set_mem_type(V4L2_MEMORY_USERPTR);
     for (int i = 0; i < 3; i++) {
         mipi_tx_devs[i]->set_buffer_count(4);
         mipi_rx_devs[i]->set_buffer_count(4);
@@ -690,6 +692,11 @@ CamHwIsp20::init(const char* sns_ent_name)
     mPollthread->set_isp_stats_device(mIspStatsDev);
     mPollthread->set_isp_params_devices(mIspParamsDev, mIsppParamsDev);
     mPollthread->set_poll_callback (this);
+
+    isp20OfflineRdthread = new OfflineFrmRdThread(isp20Pollthread.ptr());
+    isp20OfflineRdthread->set_mipi_devs(mipi_rx_devs, mIspCoreDev);
+    isp20OfflineRdthread->initialize();
+    mOfflineRdThread = isp20OfflineRdthread;
 
     isp20LumaPollthread = new PollThread();
     mPollLumathread = isp20LumaPollthread;
@@ -848,7 +855,7 @@ CamHwIsp20::prepare(uint32_t width, uint32_t height, int mode, int t_delay, int 
 #ifndef DISABLE_PP_STATS
     ret = mIsppStatsDev->start();
     if (ret < 0) {
-    	LOGE_CAMHW("start ispp stats dev err: %d\n", ret);
+        LOGE_CAMHW("start ispp stats dev err: %d\n", ret);
     }
 #endif
     ret = mIsppParamsDev->start();
@@ -917,6 +924,7 @@ CamHwIsp20::start()
 #endif
     }
 
+    mOfflineRdThread->start();
     mPollthread->start();
     mPollLumathread->start();
 #ifndef DISABLE_PP
@@ -988,7 +996,7 @@ XCamReturn CamHwIsp20::stop()
 #ifndef DISABLE_PP_STATS
     ret = mIsppStatsDev->stop();
     if (ret < 0) {
-	    LOGE_CAMHW("stop ispp stats dev err: %d\n", ret);
+        LOGE_CAMHW("stop ispp stats dev err: %d\n", ret);
     }
 #endif
     ret = mIsppParamsDev->stop();

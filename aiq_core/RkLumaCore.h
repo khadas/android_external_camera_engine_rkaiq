@@ -77,7 +77,7 @@ protected:
     virtual bool loop ();
 private:
     RkLumaCore* mRkLumaCore;
-    SafeList<VideoBuffer> mStatsQueue;    
+    SafeList<VideoBuffer> mStatsQueue;
 };
 
 class RkLumaCore {
@@ -115,7 +115,7 @@ private:
         RK_AIQ_CORE_STATE_STARTED,
         RK_AIQ_CORE_STATE_STOPED,
     };
-    
+
     int mState;
     int mWorkingMode;
     RkLumaAnalyzerCb* mCb;

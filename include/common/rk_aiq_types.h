@@ -259,6 +259,14 @@ typedef struct {
     // other from iq
 } rk_aiq_static_info_t;
 
+typedef struct rk_aiq_sensor_nr_switch_s {
+    bool valid;
+    uint32_t direct;
+    uint32_t up_thres;
+    uint32_t down_thres;
+    uint32_t div_coeff;
+} rk_aiq_sensor_nr_switch_t;
+
 // sensor
 typedef struct {
     unsigned short line_periods_vertical_blanking;
@@ -277,6 +285,7 @@ typedef struct {
     uint32_t sensor_pixelformat;
     uint32_t isp_acq_width;
     uint32_t isp_acq_height;
+    rk_aiq_sensor_nr_switch_t nr_switch;
 } rk_aiq_exposure_sensor_descriptor;
 
 // exposure
@@ -649,7 +658,7 @@ typedef struct {
     rk_aiq_isp_cgc_t        cgc;
     rk_aiq_isp_conv422_t    conv22;
     rk_aiq_isp_yuvconv_t    yuvconv;
-	rk_aiq_isp_gain_t       gain_config;
+    rk_aiq_isp_gain_t       gain_config;
     //anr result
     rkaiq_anr_procRes_t     rkaiq_anr_proc_res;
     rkaiq_asharp_procRes_t  rkaiq_asharp_proc_res;
@@ -681,11 +690,11 @@ typedef struct {
 #endif
 } rk_aiq_isp_params_t;
 
-#define RKAIQ_ISPP_TNR_ID			(1 << 0)
-#define RKAIQ_ISPP_NR_ID			(1 << 1)
-#define RKAIQ_ISPP_SHARP_ID			(1 << 2)
-#define RKAIQ_ISPP_FEC_ID			(1 << 3)
-#define RKAIQ_ISPP_ORB_ID			(1 << 4)
+#define RKAIQ_ISPP_TNR_ID           (1 << 0)
+#define RKAIQ_ISPP_NR_ID            (1 << 1)
+#define RKAIQ_ISPP_SHARP_ID         (1 << 2)
+#define RKAIQ_ISPP_FEC_ID           (1 << 3)
+#define RKAIQ_ISPP_ORB_ID           (1 << 4)
 
 typedef struct {
     uint32_t update_mask;

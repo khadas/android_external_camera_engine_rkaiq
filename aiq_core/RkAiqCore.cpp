@@ -1204,6 +1204,8 @@ RkAiqCore::genIspAdpccResult(RkAiqFullParams* params)
         mAlogsSharedParams.procResComb.adpcc_proc_res;
     SmartPtr<rk_aiq_isp_params_t> isp_param =
         params->mIspParams->data();
+    SmartPtr<rk_aiq_exposure_params_wrapper_t> exp_param =
+        params->mExposureParams->data();
 
     if (!adpcc_com) {
         LOGD_ANALYZER("no adpcc result");
@@ -1216,6 +1218,10 @@ RkAiqCore::genIspAdpccResult(RkAiqFullParams* params)
     int algo_id = (*handle)->getAlgoId();
 
     // gen rk adpcc result
+    exp_param->SensorDpccInfo.enable = adpcc_com->SenDpccRes.enable;
+    exp_param->SensorDpccInfo.cur_dpcc = adpcc_com->SenDpccRes.cur_dpcc;
+    exp_param->SensorDpccInfo.total_dpcc = adpcc_com->SenDpccRes.total_dpcc;
+
     if (algo_id == 0) {
         RkAiqAlgoProcResAdpccInt* adpcc_rk = (RkAiqAlgoProcResAdpccInt*)adpcc_com;
 
@@ -1882,7 +1888,7 @@ RkAiqCore::convertIspstatsToAlgo(const SmartPtr<VideoBuffer> &buffer)
     SmartPtr<RkAiqIspParamsProxy> ispParams = buf->get_isp_params();
     SmartPtr<RkAiqAfInfoProxy> afParams = buf->get_af_params();
     stats = (struct rkisp_isp2x_stat_buffer *)(buf->get_v4l2_userptr());
-    if(stats == NULL){
+    if(stats == NULL) {
         LOGE("fail to get stats ,ignore\n");
         return XCAM_RETURN_BYPASS;
     }
@@ -1891,7 +1897,7 @@ RkAiqCore::convertIspstatsToAlgo(const SmartPtr<VideoBuffer> &buffer)
 
     mAlogsSharedParams.frameId = stats->frame_id;
 
-    if(ispParams.ptr() == NULL){
+    if(ispParams.ptr() == NULL) {
         LOGE("fail to get ispParams ,ignore\n");
         return XCAM_RETURN_BYPASS;
     }
@@ -2235,7 +2241,7 @@ RkAiqCore::analyze(const SmartPtr<VideoBuffer> &buffer)
             mAlogsSharedParams.ispStats.orb_stats.points[i].y =
                 ppstats->data[i].y;
             memcpy(mAlogsSharedParams.ispStats.orb_stats.points[i].brief,
-                ppstats->data[i].brief, 15);
+                   ppstats->data[i].brief, 15);
         }
     } else {
         LOGW_ANALYZER("no orb or 3a stats !", __FUNCTION__, __LINE__);

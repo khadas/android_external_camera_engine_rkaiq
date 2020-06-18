@@ -142,6 +142,23 @@ SensorHw::setHdrSensorExposure(RKAiqAecExpInfo_t* expPar)
 }
 
 XCamReturn
+SensorHw::setSensorDpcc(Sensor_dpcc_res_t* SensorDpccInfo)
+{
+    struct rkmodule_dpcc_cfg dpcc_cfg;
+
+    dpcc_cfg.enable = SensorDpccInfo->enable;
+    dpcc_cfg.cur_dpcc = SensorDpccInfo->cur_dpcc;
+    dpcc_cfg.total_dpcc = SensorDpccInfo->total_dpcc;
+
+    if (io_control(RKMODULE_SET_DPCC_CFG, &dpcc_cfg) < 0) {
+        //LOGE_CAMHW ("failed to set sensor dpcc");
+        return XCAM_RETURN_ERROR_IOCTL;
+    }
+
+    return XCAM_RETURN_NO_ERROR;
+}
+
+XCamReturn
 SensorHw::setLinearSensorExposure(RKAiqAecExpInfo_t* expPar)
 {
     ENTER_CAMHW_FUNCTION();
@@ -324,6 +341,26 @@ SensorHw::get_exposure_range(rk_aiq_exposure_sensor_descriptor* sns_des)
     return 0;
 }
 
+int
+SensorHw::get_nr_switch(rk_aiq_sensor_nr_switch_t* nr_switch)
+{
+    struct rkmodule_nr_switch_threshold nr_switch_drv;
+
+    if (io_control(RKMODULE_GET_NR_SWITCH_THRESHOLD, &nr_switch_drv) < 0) {
+        //LOGE_CAMHW ("failed to get sensor nr switch");
+        nr_switch->valid = false;
+        return XCAM_RETURN_ERROR_IOCTL;
+    }
+
+    nr_switch->valid = true;
+    nr_switch->direct = nr_switch_drv.direct;
+    nr_switch->up_thres = nr_switch_drv.up_thres;
+    nr_switch->down_thres = nr_switch_drv.down_thres;
+    nr_switch->div_coeff = nr_switch_drv.div_coeff;
+
+    return 0;
+}
+
 XCamReturn
 SensorHw::get_sensor_descriptor(rk_aiq_exposure_sensor_descriptor *sns_des)
 {
@@ -350,6 +387,10 @@ SensorHw::get_sensor_descriptor(rk_aiq_exposure_sensor_descriptor *sns_des)
     if (get_exposure_range(sns_des))
         return XCAM_RETURN_ERROR_IOCTL;
 
+    if (get_nr_switch(&sns_des->nr_switch)) {
+        // do nothing;
+    }
+
     return XCAM_RETURN_NO_ERROR;
 }
 
@@ -373,6 +414,8 @@ SensorHw::setExposureParams(SmartPtr<RkAiqExpParamsProxy>& expPar)
             setLinearSensorExposure(&expPar->data()->aecExpInfo);
         else
             setHdrSensorExposure(&expPar->data()->aecExpInfo);
+
+        setSensorDpcc(&expPar->data()->SensorDpccInfo);
 
         _effecting_exp_map[0] = expPar;
         _first = false;
@@ -542,6 +585,9 @@ SensorHw::getSensorModeData(const char* sns_ent_name,
     sns_des.vt_pix_clk_freq_hz = sensor_desc.pixel_clock_freq_mhz/*  * 1000000 */;
     sns_des.pixel_clock_freq_mhz = sensor_desc.pixel_clock_freq_mhz/* * 1000000 */;
 
+	//add nr_switch
+	sns_des.nr_switch = sensor_desc.nr_switch;
+
     sns_des.sensor_output_width = sensor_desc.sensor_output_width;
     sns_des.sensor_output_height = sensor_desc.sensor_output_height;
     sns_des.sensor_pixelformat = sensor_desc.sensor_pixelformat;
@@ -638,6 +684,8 @@ SensorHw::handle_sof(int64_t time, int frameid)
         } else {
             ret = setHdrSensorExposure(ptr_new_exp);
         }
+
+        setSensorDpcc(&exp_time->data()->SensorDpccInfo);
     }
 
     if (ret != XCAM_RETURN_NO_ERROR) {

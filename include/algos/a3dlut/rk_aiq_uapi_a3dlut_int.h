@@ -14,13 +14,13 @@
 
 XCamReturn
 rk_aiq_uapi_a3dlut_SetAttrib(RkAiqAlgoContext *ctx,
-                          rk_aiq_lut3d_attrib_t attr,
-                          bool need_sync);
+                             rk_aiq_lut3d_attrib_t attr,
+                             bool need_sync);
 XCamReturn
 rk_aiq_uapi_a3dlut_GetAttrib(const RkAiqAlgoContext *ctx,
-                          rk_aiq_lut3d_attrib_t *attr);
+                             rk_aiq_lut3d_attrib_t *attr);
 XCamReturn
 rk_aiq_uapi_a3dlut_Query3dlutInfo(const RkAiqAlgoContext *ctx,
-                          rk_aiq_lut3d_querry_info_t *lut3d_querry_info );
+                                  rk_aiq_lut3d_querry_info_t *lut3d_querry_info );
 
 #endif

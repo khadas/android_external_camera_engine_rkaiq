@@ -28,6 +28,7 @@ AsharpResult_t AsharpGetProcResult(AsharpContext_t *pAsharpCtx, AsharpProcResult
 
 AsharpResult_t Asharp_fix_Printf(RKAsharp_Sharp_HW_Fix_t  * pSharpCfg, RKAsharp_Edgefilter_Fix_t *pEdgefltCfg);
 
+AsharpResult_t ASharpConfigSettingParam(AsharpContext_t *pAsharpCtx, int snr_mode);
 RKAIQ_END_DECLARE
 
 #endif

@@ -14,13 +14,13 @@
 
 XCamReturn
 rk_aiq_uapi_alsc_SetAttrib(RkAiqAlgoContext *ctx,
-                          rk_aiq_lsc_attrib_t attr,
-                          bool need_sync);
+                           rk_aiq_lsc_attrib_t attr,
+                           bool need_sync);
 XCamReturn
 rk_aiq_uapi_alsc_GetAttrib(const RkAiqAlgoContext *ctx,
-                          rk_aiq_lsc_attrib_t *attr);
+                           rk_aiq_lsc_attrib_t *attr);
 XCamReturn
 rk_aiq_uapi_alsc_QueryLscInfo(const RkAiqAlgoContext *ctx,
-                          rk_aiq_lsc_querry_info_t *lsc_querry_info );
+                              rk_aiq_lsc_querry_info_t *lsc_querry_info );
 
 #endif

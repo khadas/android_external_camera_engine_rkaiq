@@ -115,8 +115,10 @@ private:
     XCamReturn setLinearSensorExposure(RKAiqAecExpInfo_t* expPar);
     XCamReturn setHdrSensorExposure(RKAiqAecExpInfo_t* expPar);
     XCamReturn setExposure(int frameid);
+    XCamReturn setSensorDpcc(Sensor_dpcc_res_t* SensorDpccInfo);
     uint32_t get_v4l2_pixelformat(uint32_t pixelcode);
     XCamReturn composeExpParam( RKAiqAecExpInfo_t* timeValid, RKAiqAecExpInfo_t* gainValid, RKAiqAecExpInfo_t* dcgGainModeValid, RKAiqAecExpInfo_t* newExp);
+    int get_nr_switch(rk_aiq_sensor_nr_switch_t* nr_switch);
 };
 
 }; //namespace RkCam

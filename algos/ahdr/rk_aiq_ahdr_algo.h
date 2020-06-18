@@ -22,8 +22,11 @@
 
 RESULT AhdrStart(AhdrHandle_t pAhdrCtx);
 RESULT AhdrStop(AhdrHandle_t pAhdrCtx);
+void AhdrApiOffConfig(AhdrHandle_t pAhdrCtx);
 void AhdrConfig(AhdrHandle_t pAhdrCtx);
 void AhdrGetStats(AhdrHandle_t pAhdrCtx, rkisp_ahdr_stats_t* ROData) ;
+void AhdrApiOffUpdate(AhdrHandle_t pAhdrCtx, AecPreResult_t AecHdrPreResult, af_preprocess_result_t AfPreResult);
+void AhdrApiOnUpdate(AhdrHandle_t pAhdrCtx);
 void AhdrGetXmlParas(AhdrHandle_t pAhdrCtx, const CamCalibDbContext_t* pConfig);
 void AhdrUpdateConfig(AhdrHandle_t pAhdrCtx, AecPreResult_t AecHdrPreResult, af_preprocess_result_t AfPreResult);
 RESULT AhdrInit(AhdrInstanceConfig_t* pInstConfig) ;

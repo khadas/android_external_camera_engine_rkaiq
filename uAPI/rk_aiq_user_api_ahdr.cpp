@@ -32,5 +32,17 @@ rk_aiq_user_api_ahdr_SetAttrib(const rk_aiq_sys_ctx_t* sys_ctx, ahdr_attrib_t at
 
     return XCAM_RETURN_NO_ERROR;
 }
+XCamReturn
+rk_aiq_user_api_ahdr_GetAttrib(const rk_aiq_sys_ctx_t* sys_ctx, ahdr_attrib_t* attr)
+{
+    RkAiqAhdrHandleInt* algo_handle =
+        algoHandle<RkAiqAhdrHandleInt>(sys_ctx, RK_AIQ_ALGO_TYPE_AHDR);
+
+    if (algo_handle) {
+        return algo_handle->getAttrib(attr);
+    }
+
+    return XCAM_RETURN_NO_ERROR;
+}
 
 RKAIQ_END_DECLARE

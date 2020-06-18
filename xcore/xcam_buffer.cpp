@@ -85,13 +85,13 @@ xcam_video_buffer_info_reset (
         info->offsets [0] = 0;
         image_size = info->strides [0] * aligned_height;
         break;
-        // memory order RGBA 8-8-8-8
+    // memory order RGBA 8-8-8-8
     case V4L2_PIX_FMT_RGBA32:
-        // memory order: BGRA 8-8-8-8
+    // memory order: BGRA 8-8-8-8
     case V4L2_PIX_FMT_XBGR32:
     case V4L2_PIX_FMT_ABGR32:
     case V4L2_PIX_FMT_BGR32:
-        // memory order: ARGB 8-8-8-8
+    // memory order: ARGB 8-8-8-8
     case V4L2_PIX_FMT_RGB32:
     case V4L2_PIX_FMT_ARGB32:
     case V4L2_PIX_FMT_XRGB32:

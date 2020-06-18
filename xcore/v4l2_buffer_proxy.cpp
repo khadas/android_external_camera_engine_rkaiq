@@ -82,7 +82,7 @@ V4l2BufferProxy::v4l2_format_to_video_info (
     const struct v4l2_format &format, VideoBufferInfo &info)
 {
     if (format.type == V4L2_BUF_TYPE_META_CAPTURE ||
-        format.type == V4L2_BUF_TYPE_META_OUTPUT) {
+            format.type == V4L2_BUF_TYPE_META_OUTPUT) {
         info.format = format.fmt.meta.dataformat;
     } else {
         info.format = format.fmt.pix.pixelformat;

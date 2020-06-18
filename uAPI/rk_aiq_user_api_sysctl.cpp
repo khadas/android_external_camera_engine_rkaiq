@@ -56,7 +56,7 @@ rk_aiq_uapi_sysctl_init(const char* sns_ent_name,
     char config_file[256];
 
     XCAM_ASSERT(sns_ent_name);
-    
+
     bool is_ent_name = true;
     if (sns_ent_name[0] != 'm' || sns_ent_name[3] != '_')
         is_ent_name = false;
@@ -210,7 +210,7 @@ rk_aiq_uapi_sysctl_getStaticMetas(const char* sns_ent_name, rk_aiq_static_info_t
     /* nothing to do now*/
     static_info = NULL;
 #else
-   memcpy(static_info, CamHwIsp20::getStaticCamHwInfo(sns_ent_name), sizeof(rk_aiq_static_info_t));
+    memcpy(static_info, CamHwIsp20::getStaticCamHwInfo(sns_ent_name), sizeof(rk_aiq_static_info_t));
 #endif
     return XCAM_RETURN_NO_ERROR;
 }
@@ -262,7 +262,7 @@ rk_aiq_uapi_sysctl_getEnabledAxlibCtx(const rk_aiq_sys_ctx_t* ctx, const int alg
 
 XCamReturn
 rk_aiq_uapi_sysctl_get3AStats(const rk_aiq_sys_ctx_t* ctx,
-                                      rk_aiq_isp_stats_t *stats)
+                              rk_aiq_isp_stats_t *stats)
 {
     return ctx->_analyzer->get3AStatsFromCachedList(*stats);
 }
@@ -312,7 +312,7 @@ rk_aiq_uapi_sysctl_setModuleCtl(const rk_aiq_sys_ctx_t* ctx, rk_aiq_module_id_t 
 
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
     if (mId > RK_MODULE_INVAL && mId < RK_MODULE_MAX) {
-        if (mId == RK_MODULE_FEC){
+        if (mId == RK_MODULE_FEC) {
             if(mod_en) {
                 if(XCAM_RETURN_NO_ERROR != rk_aiq_user_api_afec_enable(ctx))
                     LOGE("enable fec failed! maybe fec not enable in xml.");
@@ -373,62 +373,62 @@ static void _print_versions()
     extern RkAiqAlgoDescription g_RkIspAlgoDescAwb;
     extern RkAiqAlgoDescription g_RkIspAlgoDescAwdr;
     LOGI("\n"
-        "************************** VERSION INFOS **************************\n"
-        "version release date: %s\n"
-        "         AIQ:       %s\n"
-        "   IQ PARSER:       %s\n"
-        "   RK INTEGRATED ALGO MODULES:\n"
-        "         AWB:       %s\n"
-        "         AEC:       %s\n"
-        "          AF:       %s\n"
-        "        AHDR:       %s\n"
-        "         ANR:       %s\n"
-        "      ASHARP:       %s\n"
-        "     ADEHAZE:       %s\n"
-        "      AGAMMA:       %s\n"
-        "      A3DLUT:       %s\n"
-        "        ABLC:       %s\n"
-        "        ACCM:       %s\n"
-        "        ACGC:       %s\n"
-        "         ACP:       %s\n"
-        "    ADEBAYER:       %s\n"
-        "       ADPCC:       %s\n"
-        "        AGIC:       %s\n"
-        "         AIE:       %s\n"
-        "       ALDCH:       %s\n"
-        "        ALSC:       %s\n"
-        "        AORB:       %s\n"
-        "        AR2Y:       %s\n"
-        "         ASD:       %s\n"
-        "        AWDR:       %s\n"
-        "************************ VERSION INFOS END ************************\n"
-        , RK_AIQ_RELEASE_DATE
-        , RK_AIQ_VERSION 
-        , RK_AIQ_CALIB_VERSION 
-        , g_RkIspAlgoDescAwb.common.version
-        , g_RkIspAlgoDescAe.common.version
-        , g_RkIspAlgoDescAf.common.version
-        , g_RkIspAlgoDescAhdr.common.version
-        , g_RkIspAlgoDescAnr.common.version
-        , g_RkIspAlgoDescAsharp.common.version
-        , g_RkIspAlgoDescAdhaz.common.version
-        , g_RkIspAlgoDescAgamma.common.version
-        , g_RkIspAlgoDescA3dlut.common.version
-        , g_RkIspAlgoDescAblc.common.version
-        , g_RkIspAlgoDescAccm.common.version
-        , g_RkIspAlgoDescAcgc.common.version
-        , g_RkIspAlgoDescAcp.common.version
-        , g_RkIspAlgoDescAdebayer.common.version
-        , g_RkIspAlgoDescAdpcc.common.version
-        , g_RkIspAlgoDescAfec.common.version
-        , g_RkIspAlgoDescAgic.common.version
-        , g_RkIspAlgoDescAie.common.version
-        , g_RkIspAlgoDescAldch.common.version
-        , g_RkIspAlgoDescAlsc.common.version
-        , g_RkIspAlgoDescAorb.common.version
-        , g_RkIspAlgoDescAr2y.common.version
-        , g_RkIspAlgoDescAsd.common.version
-        , g_RkIspAlgoDescAwdr.common.version
+         "************************** VERSION INFOS **************************\n"
+         "version release date: %s\n"
+         "         AIQ:       %s\n"
+         "   IQ PARSER:       %s\n"
+         "   RK INTEGRATED ALGO MODULES:\n"
+         "         AWB:       %s\n"
+         "         AEC:       %s\n"
+         "          AF:       %s\n"
+         "        AHDR:       %s\n"
+         "         ANR:       %s\n"
+         "      ASHARP:       %s\n"
+         "     ADEHAZE:       %s\n"
+         "      AGAMMA:       %s\n"
+         "      A3DLUT:       %s\n"
+         "        ABLC:       %s\n"
+         "        ACCM:       %s\n"
+         "        ACGC:       %s\n"
+         "         ACP:       %s\n"
+         "    ADEBAYER:       %s\n"
+         "       ADPCC:       %s\n"
+         "        AGIC:       %s\n"
+         "         AIE:       %s\n"
+         "       ALDCH:       %s\n"
+         "        ALSC:       %s\n"
+         "        AORB:       %s\n"
+         "        AR2Y:       %s\n"
+         "         ASD:       %s\n"
+         "        AWDR:       %s\n"
+         "************************ VERSION INFOS END ************************\n"
+         , RK_AIQ_RELEASE_DATE
+         , RK_AIQ_VERSION
+         , RK_AIQ_CALIB_VERSION
+         , g_RkIspAlgoDescAwb.common.version
+         , g_RkIspAlgoDescAe.common.version
+         , g_RkIspAlgoDescAf.common.version
+         , g_RkIspAlgoDescAhdr.common.version
+         , g_RkIspAlgoDescAnr.common.version
+         , g_RkIspAlgoDescAsharp.common.version
+         , g_RkIspAlgoDescAdhaz.common.version
+         , g_RkIspAlgoDescAgamma.common.version
+         , g_RkIspAlgoDescA3dlut.common.version
+         , g_RkIspAlgoDescAblc.common.version
+         , g_RkIspAlgoDescAccm.common.version
+         , g_RkIspAlgoDescAcgc.common.version
+         , g_RkIspAlgoDescAcp.common.version
+         , g_RkIspAlgoDescAdebayer.common.version
+         , g_RkIspAlgoDescAdpcc.common.version
+         , g_RkIspAlgoDescAfec.common.version
+         , g_RkIspAlgoDescAgic.common.version
+         , g_RkIspAlgoDescAie.common.version
+         , g_RkIspAlgoDescAldch.common.version
+         , g_RkIspAlgoDescAlsc.common.version
+         , g_RkIspAlgoDescAorb.common.version
+         , g_RkIspAlgoDescAr2y.common.version
+         , g_RkIspAlgoDescAsd.common.version
+         , g_RkIspAlgoDescAwdr.common.version
         );
 }
 
@@ -438,7 +438,7 @@ static void rk_aiq_init_lib(void)
     xcam_get_log_level();
     ENTER_XCORE_FUNCTION();
 #ifdef RK_SIMULATOR_HW
-/* nothing to do now */
+    /* nothing to do now */
 #else
     CamHwIsp20::initCamHwInfos();
 #endif
@@ -451,7 +451,7 @@ static void rk_aiq_deinit_lib(void)
 {
     ENTER_XCORE_FUNCTION();
 #ifdef RK_SIMULATOR_HW
-/* nothing to do now */
+    /* nothing to do now */
 #else
     RkAiqCalibDb::releaseCalibDb();
     CamHwIsp20::clearStaticCamHwInfo();

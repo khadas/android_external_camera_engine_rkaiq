@@ -17,10 +17,10 @@
 
 #ifndef _RK_AIQ_CALIB_VERSION_H_
 /*!
- * ==================== AIQ CALIB VERSION HISTORY ==================== 
- * 
+ * ==================== AIQ CALIB VERSION HISTORY ====================
+ *
  * v1.0.0
- *  - initial version 
+ *  - initial version
  */
 
 #define RK_AIQ_CALIB_VERSION "v1.0.0"

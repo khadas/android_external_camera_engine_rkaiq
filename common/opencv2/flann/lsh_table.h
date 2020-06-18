@@ -104,18 +104,18 @@ inline std::ostream& operator <<(std::ostream& out, const LshStats& stats)
 {
     int w = 20;
     out << "Lsh Table Stats:\n" << std::setw(w) << std::setiosflags(std::ios::right) << "N buckets : "
-    << stats.n_buckets_ << "\n" << std::setw(w) << std::setiosflags(std::ios::right) << "mean size : "
-    << std::setiosflags(std::ios::left) << stats.bucket_size_mean_ << "\n" << std::setw(w)
-    << std::setiosflags(std::ios::right) << "median size : " << stats.bucket_size_median_ << "\n" << std::setw(w)
-    << std::setiosflags(std::ios::right) << "min size : " << std::setiosflags(std::ios::left)
-    << stats.bucket_size_min_ << "\n" << std::setw(w) << std::setiosflags(std::ios::right) << "max size : "
-    << std::setiosflags(std::ios::left) << stats.bucket_size_max_;
+        << stats.n_buckets_ << "\n" << std::setw(w) << std::setiosflags(std::ios::right) << "mean size : "
+        << std::setiosflags(std::ios::left) << stats.bucket_size_mean_ << "\n" << std::setw(w)
+        << std::setiosflags(std::ios::right) << "median size : " << stats.bucket_size_median_ << "\n" << std::setw(w)
+        << std::setiosflags(std::ios::right) << "min size : " << std::setiosflags(std::ios::left)
+        << stats.bucket_size_min_ << "\n" << std::setw(w) << std::setiosflags(std::ios::right) << "max size : "
+        << std::setiosflags(std::ios::left) << stats.bucket_size_max_;
 
     // Display the histogram
     out << std::endl << std::setw(w) << std::setiosflags(std::ios::right) << "histogram : "
-    << std::setiosflags(std::ios::left);
+        << std::setiosflags(std::ios::left);
     for (std::vector<std::vector<unsigned int> >::const_iterator iterator = stats.size_histogram_.begin(), end =
-             stats.size_histogram_.end(); iterator != end; ++iterator) out << (*iterator)[0] << "-" << (*iterator)[1] << ": " << (*iterator)[2] << ",  ";
+                stats.size_histogram_.end(); iterator != end; ++iterator) out << (*iterator)[0] << "-" << (*iterator)[1] << ": " << (*iterator)[2] << ",  ";
 
     return out;
 }
@@ -302,7 +302,7 @@ private:
         // If the bitset is going to use less than 10% of the RAM of the hash map (at least 1 size_t for the key and two
         // for the vector) or less than 512MB (key_size_ <= 30)
         if (((std::max(buckets_space_.size(), buckets_speed_.size()) * CHAR_BIT * 3 * sizeof(BucketKey)) / 10
-             >= (size_t(1) << key_size_)) || (key_size_ <= 32)) {
+                >= (size_t(1) << key_size_)) || (key_size_ <= 32)) {
             speed_level_ = kBitsetHash;
             key_bitset_.resize(size_t(1) << key_size_);
             key_bitset_.reset();
@@ -378,7 +378,7 @@ inline LshTable<unsigned char>::LshTable(unsigned int feature_size, unsigned int
 #if 0
     {
         size_t bcount = 0;
-        BOOST_FOREACH(size_t mask_block, mask_){
+        BOOST_FOREACH(size_t mask_block, mask_) {
             out << std::setw(sizeof(size_t) * CHAR_BIT / 4) << std::setfill('0') << std::hex << mask_block
                 << std::endl;
             bcount += __builtin_popcountll(mask_block);
@@ -486,7 +486,7 @@ inline LshStats LshTable<unsigned char>::getStats() const
     unsigned int bin_end = 20;
     bool is_new_bin = true;
     for (std::vector<unsigned int>::iterator iterator = stats.bucket_sizes_.begin(), end = stats.bucket_sizes_.end(); iterator
-         != end; )
+            != end; )
         if (*iterator < bin_end) {
             if (is_new_bin) {
                 stats.size_histogram_.push_back(std::vector<unsigned int>(3, 0));

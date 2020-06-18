@@ -11,6 +11,8 @@
 #ifndef __RK_AIQ_TYPES_AHDR_ALGO_INT_H__
 #define __RK_AIQ_TYPES_AHDR_ALGO_INT_H__
 
+//#include "rk_aiq_uapi_ahdr_int.h"
+
 typedef struct globalLuma_s
 {
     float globalLumaMode;
@@ -160,16 +162,18 @@ typedef struct mhdrAttr_s
 
 typedef enum OpMode_s {
     OpMode_Auto = 1,
-    OpMode_MANU = 2
+    OpMode_MANU = 2,
+    OpMode_Fast = 3
 } OpMode_t;
 
 
 typedef struct hdrAttr_s
 {
     bool      bEnable;
-    OpMode_t  opMode;
+    OpMode_t    opMode;
     ahdrAttr_t    stAuto;
     mhdrAttr_t stManual;
+    int level;
 } hdrAttr_t;
 
 typedef struct MgeProcRes_s

@@ -10,9 +10,9 @@ rk_aiq_uapi_anr_SetAttrib(RkAiqAlgoContext *ctx,
 
     ANRContext_t* pAnrCtx = (ANRContext_t*)ctx;
 
-	pAnrCtx->eMode = attr->eMode;
+    pAnrCtx->eMode = attr->eMode;
     pAnrCtx->stAuto = attr->stAuto;
-	pAnrCtx->stManual = attr->stManual;
+    pAnrCtx->stManual = attr->stManual;
 
     return XCAM_RETURN_NO_ERROR;
 }
@@ -26,7 +26,7 @@ rk_aiq_uapi_anr_GetAttrib(const RkAiqAlgoContext *ctx,
 
     attr->eMode = pAnrCtx->eMode;
     memcpy(&attr->stAuto, &pAnrCtx->stAuto, sizeof(ANR_Auto_Attr_t));
-	memcpy(&attr->stManual, &pAnrCtx->stManual, sizeof(ANR_Manual_Attr_t));
+    memcpy(&attr->stManual, &pAnrCtx->stManual, sizeof(ANR_Manual_Attr_t));
 
     return XCAM_RETURN_NO_ERROR;
 }

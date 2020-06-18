@@ -339,7 +339,7 @@ CamHwSimulator::deInit()
 XCamReturn
 CamHwSimulator::prepare(uint32_t width, uint32_t height, rk_aiq_working_mode_t mode)
 {
-    return CamHwBase::prepare(width, height, mode,0,0);
+    return CamHwBase::prepare(width, height, mode, 0, 0);
 }
 
 XCamReturn

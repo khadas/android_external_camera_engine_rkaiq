@@ -317,7 +317,7 @@ XCamReturn AccmAutoConfig
     int resIdx;
     //1)
     ret = illuminant_index_estimation_ccm(hAccm->calibCcm->aCcmCof.illuNum, hAccm->calibCcm->aCcmCof.illAll,
-                                      hAccm->accmSwInfo.awbGain, &dominateIlluProfileIdx);
+                                          hAccm->accmSwInfo.awbGain, &dominateIlluProfileIdx);
     RETURN_RESULT_IF_DIFFERENT(ret, XCAM_RETURN_NO_ERROR);
     hAccm->accmRest.dominateIlluProfileIdx = dominateIlluProfileIdx;
 

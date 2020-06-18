@@ -66,10 +66,10 @@ typedef unsigned long long u64;
 #define RK_ISP2X_GAIN_ID        34
 #define RK_ISP2X_DEBAYER_ID     35
 #define RK_ISP2X_MAX_ID         36
-#define RK_ISP2X_PP_TNR_ID	    37	
-#define RK_ISP2X_PP_NR_ID		38
-#define RK_ISP2X_PP_TSHP_ID     39	
-#define RK_ISP2X_PP_TFEC_ID		40
+#define RK_ISP2X_PP_TNR_ID      37
+#define RK_ISP2X_PP_NR_ID       38
+#define RK_ISP2X_PP_TSHP_ID     39
+#define RK_ISP2X_PP_TFEC_ID     40
 #define RK_ISP2X_PP_MAX_ID      41
 
 #endif

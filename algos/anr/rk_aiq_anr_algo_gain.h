@@ -15,5 +15,5 @@ ANRresult_t gain_fix_transfer(RKAnr_Mfnr_Params_Select_t *pMfnrSelect, RKAnr_Gai
 
 
 
-#endif  
+#endif
 

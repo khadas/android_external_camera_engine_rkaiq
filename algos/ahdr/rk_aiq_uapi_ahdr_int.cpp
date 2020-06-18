@@ -17,21 +17,43 @@ rk_aiq_uapi_ahdr_SetAttrib
 
     AhdrContext_t* pAhdrCtx = (AhdrContext_t*)(ctx->AhdrInstConfig.hAhdr);
 
-	//Todo
-	pAhdrCtx->hdrAttr.bEnable = attr.bEnable;
-	pAhdrCtx->hdrAttr.bEnable = false;
+    //Todo
+    pAhdrCtx->hdrAttr.bEnable = need_sync;
+    pAhdrCtx->hdrAttr.opMode = attr.opMode;
+    pAhdrCtx->hdrAttr.level = attr.level;
 
     if (need_sync == true)
     {
-        pAhdrCtx->hdrAttr.stAuto.bUpdateMge = attr.stAuto.bUpdateMge;
-        pAhdrCtx->hdrAttr.stAuto.bUpdateTmo = attr.stAuto.bUpdateTmo;
-        memcpy(&pAhdrCtx->hdrAttr.stAuto.stMgeAuto, &attr.stAuto.stMgeAuto, sizeof(amgeAttr_t));
-        memcpy(&pAhdrCtx->hdrAttr.stAuto.stTmoAuto, &attr.stAuto.stMgeAuto, sizeof(atmoAttr_t));
 
-        pAhdrCtx->hdrAttr.stManual.bUpdateMge = attr.stManual.bUpdateMge;
-        pAhdrCtx->hdrAttr.stManual.bUpdateTmo = attr.stManual.bUpdateTmo;
-        memcpy(&pAhdrCtx->hdrAttr.stManual.stMgeManual, &attr.stManual.stMgeManual, sizeof(mmgeAttr_t));
-        memcpy(&pAhdrCtx->hdrAttr.stManual.stTmoManual, &attr.stManual.stTmoManual, sizeof(mtmoAttr_t));
+        if (0 != memcmp(&pAhdrCtx->hdrAttr.stAuto.stMgeAuto, &attr.stAuto.stMgeAuto, sizeof(amgeAttr_t))) {
+            memcpy(&pAhdrCtx->hdrAttr.stAuto.stMgeAuto, &attr.stAuto.stMgeAuto, sizeof(amgeAttr_t));
+            pAhdrCtx->hdrAttr.stAuto.bUpdateMge = true;
+        }
+        else
+            pAhdrCtx->hdrAttr.stAuto.bUpdateMge = false;
+
+        if (0 != memcmp(&pAhdrCtx->hdrAttr.stAuto.stTmoAuto, &attr.stAuto.stTmoAuto, sizeof(atmoAttr_t))) {
+            memcpy(&pAhdrCtx->hdrAttr.stAuto.stTmoAuto, &attr.stAuto.stTmoAuto, sizeof(atmoAttr_t));
+            pAhdrCtx->hdrAttr.stAuto.bUpdateTmo = true;
+        }
+        else
+            pAhdrCtx->hdrAttr.stAuto.bUpdateTmo = false;
+
+
+        if (0 != memcmp(&pAhdrCtx->hdrAttr.stManual.stMgeManual, &attr.stManual.stMgeManual, sizeof(mmgeAttr_t))) {
+            memcpy(&pAhdrCtx->hdrAttr.stManual.stMgeManual, &attr.stManual.stMgeManual, sizeof(mmgeAttr_t));
+            pAhdrCtx->hdrAttr.stManual.bUpdateMge = true;
+        }
+        else
+            pAhdrCtx->hdrAttr.stManual.bUpdateMge = false;
+
+        if (0 != memcmp(&pAhdrCtx->hdrAttr.stManual.stTmoManual, &attr.stManual.stTmoManual, sizeof(mtmoAttr_t))) {
+            memcpy(&pAhdrCtx->hdrAttr.stManual.stTmoManual, &attr.stManual.stTmoManual, sizeof(mtmoAttr_t));
+            pAhdrCtx->hdrAttr.stManual.bUpdateTmo = true;
+        }
+        else
+            pAhdrCtx->hdrAttr.stManual.bUpdateTmo = false;
+
     }
     else
     {
@@ -60,10 +82,7 @@ rk_aiq_uapi_ahdr_GetAttrib
 
     attr->bEnable = pAhdrCtx->hdrAttr.bEnable;
     attr->opMode = pAhdrCtx->hdrAttr.opMode;
-    attr->stAuto.bUpdateMge = false;
-    attr->stAuto.bUpdateTmo = false;
-    attr->stManual.bUpdateMge = false;
-    attr->stManual.bUpdateTmo = false;
+    attr->level = pAhdrCtx->hdrAttr.level;
 
     memcpy(&attr->stAuto.stMgeAuto, &pAhdrCtx->hdrAttr.stAuto.stMgeAuto, sizeof(amgeAttr_t));
     memcpy(&attr->stAuto.stTmoAuto, &pAhdrCtx->hdrAttr.stAuto.stTmoAuto, sizeof(atmoAttr_t));
@@ -73,4 +92,5 @@ rk_aiq_uapi_ahdr_GetAttrib
 
     return XCAM_RETURN_NO_ERROR;
 }
+
 

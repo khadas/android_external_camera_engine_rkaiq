@@ -71,7 +71,7 @@ CVAPI(CvCapture*) cvCreateFileCapture( const char* filename );
 
 /** @brief start capturing frames from video file. allows specifying a preferred API to use
 */
-CVAPI(CvCapture*) cvCreateFileCaptureWithPreference( const char* filename , int apiPreference);
+CVAPI(CvCapture*) cvCreateFileCaptureWithPreference( const char* filename, int apiPreference);
 
 /** @brief start capturing frames from camera: index = camera_index + domain_offset (CV_CAP_*)
 */
@@ -123,8 +123,8 @@ typedef struct CvVideoWriter CvVideoWriter;
 /** @brief initialize video file writer
 */
 CVAPI(CvVideoWriter*) cvCreateVideoWriter( const char* filename, int fourcc,
-                                           double fps, CvSize frame_size,
-                                           int is_color CV_DEFAULT(1));
+        double fps, CvSize frame_size,
+        int is_color CV_DEFAULT(1));
 
 /** @brief write frame to video file
 */

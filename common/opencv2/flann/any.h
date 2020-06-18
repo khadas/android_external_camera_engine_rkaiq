@@ -177,7 +177,9 @@ typename choose_policy<T>::type SinglePolicy<T>::policy;
 
 /// This function will return a different policy for each type.
 template <typename T>
-inline base_any_policy* SinglePolicy<T>::get_policy() { return &policy; }
+inline base_any_policy* SinglePolicy<T>::get_policy() {
+    return &policy;
+}
 
 } // namespace anyimpl
 
@@ -323,7 +325,7 @@ public:
 
 inline std::ostream& operator <<(std::ostream& out, const any& any_val)
 {
-    any_val.policy->print(out,&any_val.object);
+    any_val.policy->print(out, &any_val.object);
     return out;
 }
 

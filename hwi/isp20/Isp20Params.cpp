@@ -147,13 +147,13 @@ void
 Isp20Params::convertAiqAwbToIsp20Params(struct isp2x_isp_params_cfg& isp_cfg,
                                         const rk_aiq_awb_stat_cfg_v200_t& awb_meas, bool awb_cfg_udpate)
 {
-    if(awb_cfg_udpate){
+    if(awb_cfg_udpate) {
         if(awb_meas.awbEnable) {
             isp_cfg.module_ens |= ISP2X_MODULE_RAWAWB;
             isp_cfg.module_cfg_update |= ISP2X_MODULE_RAWAWB;
             isp_cfg.module_en_update |= ISP2X_MODULE_RAWAWB;
         }
-    }else{
+    } else {
         return;
     }
 
@@ -597,14 +597,14 @@ void Isp20Params::convertAiqAhdrToIsp20Params(struct isp2x_isp_params_cfg& isp_c
         const rk_aiq_isp_hdr_t& ahdr_data)
 {
     if(1) {
-	isp_cfg.module_en_update |= 1LL << RK_ISP2X_HDRMGE_ID;
-	isp_cfg.module_ens |= 1LL << RK_ISP2X_HDRMGE_ID;
-	isp_cfg.module_cfg_update |= 1LL << RK_ISP2X_HDRMGE_ID;
+        isp_cfg.module_en_update |= 1LL << RK_ISP2X_HDRMGE_ID;
+        isp_cfg.module_ens |= 1LL << RK_ISP2X_HDRMGE_ID;
+        isp_cfg.module_cfg_update |= 1LL << RK_ISP2X_HDRMGE_ID;
 
-	isp_cfg.module_en_update |= 1LL << RK_ISP2X_HDRTMO_ID;
-	isp_cfg.module_ens |= 1LL << RK_ISP2X_HDRTMO_ID;
-	isp_cfg.module_cfg_update |= 1LL << RK_ISP2X_HDRTMO_ID;
-    }else{
+        isp_cfg.module_en_update |= 1LL << RK_ISP2X_HDRTMO_ID;
+        isp_cfg.module_ens |= 1LL << RK_ISP2X_HDRTMO_ID;
+        isp_cfg.module_cfg_update |= 1LL << RK_ISP2X_HDRTMO_ID;
+    } else {
         return;
     }
 
@@ -665,137 +665,6 @@ void Isp20Params::convertAiqAhdrToIsp20Params(struct isp2x_isp_params_cfg& isp_c
     isp_cfg.others.hdrtmo_cfg.maxgain       = ahdr_data.TmoProcRes.sw_hdrtmo_maxgain;
     isp_cfg.others.hdrtmo_cfg.maxpalpha     = ahdr_data.TmoProcRes.sw_hdrtmo_maxpalpha;
 
-    //api setting
-    //update merge data in Auto mode
-    if(ahdr_data.hdrAttr.bEnable == true && ahdr_data.hdrAttr.stAuto.bUpdateMge == true )
-    {
-        //get oe cruve
-        float slope = 0;
-        float ofst = 0;
-        slope = LIMIT_PARA(ahdr_data.hdrAttr.stAuto.stMgeAuto.stOECurve.stCoef, ahdr_data.hdrAttr.stAuto.stMgeAuto.stOECurve.stSmthMax,
-                           ahdr_data.hdrAttr.stAuto.stMgeAuto.stOECurve.stSmthMin, ahdr_data.hdrAttr.stAuto.stMgeAuto.stOECurve.stCoefMax,
-                           ahdr_data.hdrAttr.stAuto.stMgeAuto.stOECurve.stCoefMin);
-        ofst = LIMIT_PARA(ahdr_data.hdrAttr.stAuto.stMgeAuto.stOECurve.stCoef, ahdr_data.hdrAttr.stAuto.stMgeAuto.stOECurve.stOfstMax,
-                          ahdr_data.hdrAttr.stAuto.stMgeAuto.stOECurve.stOfstMin, ahdr_data.hdrAttr.stAuto.stMgeAuto.stOECurve.stCoefMax,
-                          ahdr_data.hdrAttr.stAuto.stMgeAuto.stOECurve.stCoefMin);
-        int step = 32 ;
-        float curve = 0;
-        int OECurve[17];
-        float k = 511;
-        for(int i = 0; i < 17; ++i)
-        {
-            curve = 1 + exp(-slope * (k / 1023.0 - ofst / 256.0));
-            curve = 1024.0 / curve ;
-            OECurve[i] = round(curve) ;
-            OECurve[i] = MIN(OECurve[i], 1023);
-            isp_cfg.others.hdrmge_cfg.e_y[i] = OECurve[i];
-            k += step ;
-        }
-
-        //get md cruve ms
-        slope = 0;
-        ofst = 0;
-        slope = LIMIT_PARA(ahdr_data.hdrAttr.stAuto.stMgeAuto.stMDCurveMS.stCoef, ahdr_data.hdrAttr.stAuto.stMgeAuto.stMDCurveMS.stSmthMax,
-                           ahdr_data.hdrAttr.stAuto.stMgeAuto.stMDCurveMS.stSmthMin, ahdr_data.hdrAttr.stAuto.stMgeAuto.stMDCurveMS.stCoefMax,
-                           ahdr_data.hdrAttr.stAuto.stMgeAuto.stMDCurveMS.stCoefMin);
-        ofst = LIMIT_PARA(ahdr_data.hdrAttr.stAuto.stMgeAuto.stMDCurveMS.stCoef, ahdr_data.hdrAttr.stAuto.stMgeAuto.stMDCurveMS.stOfstMax,
-                          ahdr_data.hdrAttr.stAuto.stMgeAuto.stMDCurveMS.stOfstMin, ahdr_data.hdrAttr.stAuto.stMgeAuto.stMDCurveMS.stCoefMax,
-                          ahdr_data.hdrAttr.stAuto.stMgeAuto.stMDCurveMS.stCoefMin);
-        isp_cfg.others.hdrmge_cfg.ms_diff_0p15   = (int)(ofst + 0.5);
-        step = 16;
-        curve = 0;
-        int MDCurveMS[17];
-        k = 0;
-        for (int i = 0; i < 17; ++i)
-        {
-            curve = 1 + exp(-slope * (k / 1023.0 - ofst / 256.0));
-            curve = 1024.0 / curve ;
-            MDCurveMS[i] = round(curve) ;
-            MDCurveMS[i] = MIN(MDCurveMS[i], 1023);
-            isp_cfg.others.hdrmge_cfg.curve.curve_0[i] = MDCurveMS[i];
-            k += step ;
-        }
-
-        //get md cruve lm
-        slope = 0;
-        ofst = 0;
-        slope = LIMIT_PARA(ahdr_data.hdrAttr.stAuto.stMgeAuto.stMDCurveLM.stCoef, ahdr_data.hdrAttr.stAuto.stMgeAuto.stMDCurveLM.stSmthMax,
-                           ahdr_data.hdrAttr.stAuto.stMgeAuto.stMDCurveLM.stSmthMin, ahdr_data.hdrAttr.stAuto.stMgeAuto.stMDCurveLM.stCoefMax,
-                           ahdr_data.hdrAttr.stAuto.stMgeAuto.stMDCurveLM.stCoefMin);
-        ofst = LIMIT_PARA(ahdr_data.hdrAttr.stAuto.stMgeAuto.stMDCurveLM.stCoef, ahdr_data.hdrAttr.stAuto.stMgeAuto.stMDCurveLM.stOfstMax,
-                          ahdr_data.hdrAttr.stAuto.stMgeAuto.stMDCurveLM.stOfstMin, ahdr_data.hdrAttr.stAuto.stMgeAuto.stMDCurveLM.stCoefMax,
-                          ahdr_data.hdrAttr.stAuto.stMgeAuto.stMDCurveLM.stCoefMin);
-        isp_cfg.others.hdrmge_cfg.lm_dif_0p15   = (int)(ofst + 0.5);
-        step = 16;
-        curve = 0;
-        int MDCurveLM[17];
-        k = 0;
-
-        for (int i = 0; i < 17; ++i)
-        {
-            curve = 1 + exp(-slope * (k / 1023.0 - ofst / 256.0));
-            curve = 1024.0 / curve ;
-            MDCurveLM[i] = round(curve) ;
-            MDCurveLM[i] = MIN(MDCurveLM[i], 1023.0);
-            isp_cfg.others.hdrmge_cfg.curve.curve_1[i] = MDCurveLM[i];
-            k += step ;
-        }
-    }
-
-    //update tmo data in Auto mode
-    if(ahdr_data.hdrAttr.bEnable == true && ahdr_data.hdrAttr.stAuto.bUpdateTmo == true )
-    {
-        float value = 0;
-        value = LIMIT_PARA(ahdr_data.hdrAttr.stAuto.stTmoAuto.stDtlsLL.stCoef, ahdr_data.hdrAttr.stAuto.stTmoAuto.stDtlsLL.stMax, ahdr_data.hdrAttr.stAuto.stTmoAuto.stDtlsLL.stMin,
-                           ahdr_data.hdrAttr.stAuto.stTmoAuto.stDtlsLL.stCoefMax, ahdr_data.hdrAttr.stAuto.stTmoAuto.stDtlsLL.stMin);
-        isp_cfg.others.hdrtmo_cfg.palpha_lwscl  = (int)(value + 0.5);
-
-        value = 0;
-        value = LIMIT_PARA(ahdr_data.hdrAttr.stAuto.stTmoAuto.stDtlsHL.stCoef, ahdr_data.hdrAttr.stAuto.stTmoAuto.stDtlsHL.stMax, ahdr_data.hdrAttr.stAuto.stTmoAuto.stDtlsHL.stMin,
-                           ahdr_data.hdrAttr.stAuto.stTmoAuto.stDtlsHL.stCoefMax, ahdr_data.hdrAttr.stAuto.stTmoAuto.stDtlsHL.stMin);
-        isp_cfg.others.hdrtmo_cfg.palpha_lw0p5  = (int)(value + 0.5);
-
-        value = 0;
-        value = LIMIT_PARA(ahdr_data.hdrAttr.stAuto.stTmoAuto.stGlobeLuma.stCoef, ahdr_data.hdrAttr.stAuto.stTmoAuto.stGlobeLuma.stMax, ahdr_data.hdrAttr.stAuto.stTmoAuto.stGlobeLuma.stMin,
-                           ahdr_data.hdrAttr.stAuto.stTmoAuto.stGlobeLuma.stCoefMax, ahdr_data.hdrAttr.stAuto.stTmoAuto.stGlobeLuma.stMin);
-        isp_cfg.others.hdrtmo_cfg.palpha_0p18   = (int)(value + 0.5);
-        isp_cfg.others.hdrtmo_cfg.maxpalpha     = (int)(1.5 * value + 30 + 0.5);
-        isp_cfg.others.hdrtmo_cfg.maxpalpha = isp_cfg.others.hdrtmo_cfg.maxpalpha > 1023 ?
-                                              1023 : isp_cfg.others.hdrtmo_cfg.maxpalpha < 51 ? 51 : isp_cfg.others.hdrtmo_cfg.maxpalpha;
-
-
-        value = 0;
-        value = LIMIT_PARA(ahdr_data.hdrAttr.stAuto.stTmoAuto.stTmoContrast.stCoef, ahdr_data.hdrAttr.stAuto.stTmoAuto.stTmoContrast.stMax, ahdr_data.hdrAttr.stAuto.stTmoAuto.stTmoContrast.stMin,
-                           ahdr_data.hdrAttr.stAuto.stTmoAuto.stTmoContrast.stCoefMax, ahdr_data.hdrAttr.stAuto.stTmoAuto.stTmoContrast.stMin);
-        isp_cfg.others.hdrtmo_cfg.set_weightkey = (int)(value + 0.5);
-
-    }
-
-    //update merge data in manual mode
-    if(ahdr_data.hdrAttr.bEnable == true && ahdr_data.hdrAttr.stManual.bUpdateMge == true )
-    {
-        isp_cfg.others.hdrmge_cfg.mode = ahdr_data.hdrAttr.opMode;
-        for(int i = 0; i < 17; i++)
-        {
-            isp_cfg.others.hdrmge_cfg.curve.curve_0[i] = (int)(ahdr_data.hdrAttr.stManual.stMgeManual.MDCurveMS[i]);
-            isp_cfg.others.hdrmge_cfg.curve.curve_1[i] = (int)(ahdr_data.hdrAttr.stManual.stMgeManual.MDCurveLM[i]);
-            isp_cfg.others.hdrmge_cfg.e_y[i]           = (int)(ahdr_data.hdrAttr.stManual.stMgeManual.OECurve[i]);
-        }
-    }
-
-    //update tmo data in manual mode
-    if(ahdr_data.hdrAttr.bEnable == true && ahdr_data.hdrAttr.stManual.bUpdateTmo == true )
-    {
-        isp_cfg.others.hdrtmo_cfg.palpha_lwscl  = (int)(ahdr_data.hdrAttr.stManual.stTmoManual.stDtlsLL + 0.5);
-        isp_cfg.others.hdrtmo_cfg.palpha_lw0p5  = (int)(ahdr_data.hdrAttr.stManual.stTmoManual.stDtlsHL + 0.5);
-        isp_cfg.others.hdrtmo_cfg.palpha_0p18   = (int)(ahdr_data.hdrAttr.stManual.stTmoManual.stGlobeLuma + 0.5);
-        isp_cfg.others.hdrtmo_cfg.set_weightkey = (int)(ahdr_data.hdrAttr.stManual.stTmoManual.stTmoContrast + 0.5);
-        isp_cfg.others.hdrtmo_cfg.maxpalpha     = (int)(1.5 * ahdr_data.hdrAttr.stManual.stTmoManual.stGlobeLuma + 30 + 0.5);
-        isp_cfg.others.hdrtmo_cfg.maxpalpha = isp_cfg.others.hdrtmo_cfg.maxpalpha > 1023 ?
-                                              1023 : isp_cfg.others.hdrtmo_cfg.maxpalpha < 51 ? 51 : isp_cfg.others.hdrtmo_cfg.maxpalpha;
-
-    }
-
 #if 0
     LOGE("%d: gain0_inv %d", __LINE__, isp_cfg.others.hdrmge_cfg.gain0_inv);
     LOGE("%d: gain0 %d", __LINE__, isp_cfg.others.hdrmge_cfg.gain0);
@@ -850,37 +719,6 @@ void Isp20Params::convertAiqAhdrToIsp20Params(struct isp2x_isp_params_cfg& isp_c
     LOGE("%d: palpha_0p18 %d", __LINE__, isp_cfg.others.hdrtmo_cfg.palpha_0p18);
     LOGE("%d: maxgain %d", __LINE__, isp_cfg.others.hdrtmo_cfg.maxgain);
     LOGE("%d: maxpalpha %d", __LINE__, isp_cfg.others.hdrtmo_cfg.maxpalpha);
-    if(ahdr_data.hdrAttr.bEnable == true)
-    {
-        LOGE("%d:Ahdr API is ON!!!", __LINE__);
-        if(ahdr_data.hdrAttr.opMode == 1)
-        {
-            LOGE("%d:Ahdr API use Atuo Mode!!!", __LINE__);
-            if(ahdr_data.hdrAttr.stAuto.bUpdateMge == true)
-                LOGE("%d:Merge datas are updated!!!", __LINE__);
-            else
-                LOGE("%d:Merge datas stay the same!!!", __LINE__);
-            if(ahdr_data.hdrAttr.stAuto.bUpdateTmo == true)
-                LOGE("%d:TMO datas are updated!!!", __LINE__);
-            else
-                LOGE("%d:TMO datas stay the same!!!", __LINE__);
-        }
-        else if(ahdr_data.hdrAttr.opMode == 2)
-        {
-            LOGE("%d:Ahdr API use Manual Mode!!!", __LINE__);
-            if(ahdr_data.hdrAttr.stManual.bUpdateMge == true)
-                LOGE("%d:Merge datas are updated!!!", __LINE__);
-            else
-                LOGE("%d:Merge datas stay the same!!!", __LINE__);
-            if(ahdr_data.hdrAttr.stManual.bUpdateTmo == true)
-                LOGE("%d:TMO datas are updated!!!", __LINE__);
-            else
-                LOGE("%d:TMO datas stay the same!!!", __LINE__);
-        }
-
-    }
-    else
-        LOGE("%d:Ahdr API is OFF!!!", __LINE__);
 #endif
 }
 
@@ -929,11 +767,11 @@ Isp20Params::convertAiqAwbGainToIsp20Params(struct isp2x_isp_params_cfg& isp_cfg
         const rk_aiq_wb_gain_t& awb_gain, const rk_aiq_isp_blc_t &blc, bool awb_gain_update)
 {
 
-    if(awb_gain_update){
+    if(awb_gain_update) {
         isp_cfg.module_ens |= 1LL << RK_ISP2X_AWB_GAIN_ID;
         isp_cfg.module_cfg_update |= 1LL << RK_ISP2X_AWB_GAIN_ID;
         isp_cfg.module_en_update |= 1LL << RK_ISP2X_AWB_GAIN_ID;
-    }else{
+    } else {
         return;
     }
 
@@ -2078,8 +1916,8 @@ Isp20Params::convertAiqResultsToIsp20Params(struct isp2x_isp_params_cfg& isp_cfg
     if (_working_mode != RK_AIQ_WORKING_MODE_NORMAL)
         convertAiqAhdrToIsp20Params(isp_cfg, aiq_results->data()->ahdr_proc_res);
     convertAiqAwbGainToIsp20Params(isp_cfg, aiq_results->data()->awb_gain, aiq_results->data()->blc,
-        aiq_results->data()->awb_gain_update);
-    convertAiqAwbToIsp20Params(isp_cfg, aiq_results->data()->awb_cfg_v200,aiq_results->data()->awb_cfg_update);
+                                   aiq_results->data()->awb_gain_update);
+    convertAiqAwbToIsp20Params(isp_cfg, aiq_results->data()->awb_cfg_v200, aiq_results->data()->awb_cfg_update);
     convertAiqLscToIsp20Params(isp_cfg, aiq_results->data()->lsc);
     convertAiqCcmToIsp20Params(isp_cfg, aiq_results->data()->ccm);
     convertAiqAgammaToIsp20Params(isp_cfg, aiq_results->data()->agamma_config);
@@ -2342,94 +2180,94 @@ Isp20Params::convertAiqAldchToIsp20Params(struct isp2x_isp_params_cfg& isp_cfg,
 
 void
 Isp20Params::convertAiqGicToIsp20Params(struct isp2x_isp_params_cfg& isp_cfg,
-                                      const rk_aiq_isp_gic_t& gic_cfg)
+                                        const rk_aiq_isp_gic_t& gic_cfg)
 {
-   struct isp2x_gic_cfg *isp_gic_cfg = &isp_cfg.others.gic_cfg;
+    struct isp2x_gic_cfg *isp_gic_cfg = &isp_cfg.others.gic_cfg;
 
-   if (gic_cfg.gic_en) {
-       isp_cfg.module_ens |= ISP2X_MODULE_GIC;
-       isp_cfg.module_en_update |= ISP2X_MODULE_GIC;
-       isp_cfg.module_cfg_update |= ISP2X_MODULE_GIC;
-       isp_gic_cfg->edge_open = gic_cfg.edge_open;
-       isp_gic_cfg->regmingradthrdark2 = gic_cfg.regmingradthrdark2;
-       isp_gic_cfg->regmingradthrdark1 = gic_cfg.regmingradthrdark1;
-       isp_gic_cfg->regminbusythre = gic_cfg.regminbusythre;
-       isp_gic_cfg->regdarkthre = gic_cfg.regdarkthre;
-       isp_gic_cfg->regmaxcorvboth = gic_cfg.regmaxcorvboth;
-       isp_gic_cfg->regdarktthrehi = gic_cfg.regdarktthrehi;
-       //isp_gic_cfg->regkgrad2dark = gic_cfg.regkgrad2dark;
-       //isp_gic_cfg->regkgrad1dark = gic_cfg.regkgrad1dark;
-       isp_gic_cfg->regkgrad2dark = (int)(log(double(gic_cfg.regkgrad2dark)) / log((double)2) + 0.5f);
-       isp_gic_cfg->regkgrad1dark = (int)(log(double(gic_cfg.regkgrad1dark)) / log((double)2) + 0.5f);
+    if (gic_cfg.gic_en) {
+        isp_cfg.module_ens |= ISP2X_MODULE_GIC;
+        isp_cfg.module_en_update |= ISP2X_MODULE_GIC;
+        isp_cfg.module_cfg_update |= ISP2X_MODULE_GIC;
+        isp_gic_cfg->edge_open = gic_cfg.edge_open;
+        isp_gic_cfg->regmingradthrdark2 = gic_cfg.regmingradthrdark2;
+        isp_gic_cfg->regmingradthrdark1 = gic_cfg.regmingradthrdark1;
+        isp_gic_cfg->regminbusythre = gic_cfg.regminbusythre;
+        isp_gic_cfg->regdarkthre = gic_cfg.regdarkthre;
+        isp_gic_cfg->regmaxcorvboth = gic_cfg.regmaxcorvboth;
+        isp_gic_cfg->regdarktthrehi = gic_cfg.regdarktthrehi;
+        //isp_gic_cfg->regkgrad2dark = gic_cfg.regkgrad2dark;
+        //isp_gic_cfg->regkgrad1dark = gic_cfg.regkgrad1dark;
+        isp_gic_cfg->regkgrad2dark = (int)(log(double(gic_cfg.regkgrad2dark)) / log((double)2) + 0.5f);
+        isp_gic_cfg->regkgrad1dark = (int)(log(double(gic_cfg.regkgrad1dark)) / log((double)2) + 0.5f);
 
-       isp_gic_cfg->regstrengthglobal_fix =  (int)(gic_cfg.globalStrength * (1 << 7));
-       if (isp_gic_cfg->regstrengthglobal_fix > (1<<7)-1)
-          isp_gic_cfg->regstrengthglobal_fix = 7+1;
-       else
-          isp_gic_cfg->regstrengthglobal_fix = int(log(double((1 << 7) - isp_gic_cfg->regstrengthglobal_fix)) / log((double)2) + 0.5f);
+        isp_gic_cfg->regstrengthglobal_fix =  (int)(gic_cfg.globalStrength * (1 << 7));
+        if (isp_gic_cfg->regstrengthglobal_fix > (1 << 7) - 1)
+            isp_gic_cfg->regstrengthglobal_fix = 7 + 1;
+        else
+            isp_gic_cfg->regstrengthglobal_fix = int(log(double((1 << 7) - isp_gic_cfg->regstrengthglobal_fix)) / log((double)2) + 0.5f);
 
-       //isp_gic_cfg->regdarkthrestep = gic_cfg.regdarkthrestep;
-       isp_gic_cfg->regdarkthrestep = int(log(double(gic_cfg.regdarktthrehi - gic_cfg.regdarkthre)) / log((double)2) + 0.5f);
-       //isp_gic_cfg->regkgrad2 = gic_cfg.regkgrad2;
-       //isp_gic_cfg->regkgrad1 = gic_cfg.regkgrad1;
-       isp_gic_cfg->regkgrad2 = (int)(log(double(gic_cfg.regkgrad2)) / log((double)2) + 0.5f);
-       isp_gic_cfg->regkgrad1 = (int)(log(double(gic_cfg.regkgrad1)) / log((double)2) + 0.5f);
+        //isp_gic_cfg->regdarkthrestep = gic_cfg.regdarkthrestep;
+        isp_gic_cfg->regdarkthrestep = int(log(double(gic_cfg.regdarktthrehi - gic_cfg.regdarkthre)) / log((double)2) + 0.5f);
+        //isp_gic_cfg->regkgrad2 = gic_cfg.regkgrad2;
+        //isp_gic_cfg->regkgrad1 = gic_cfg.regkgrad1;
+        isp_gic_cfg->regkgrad2 = (int)(log(double(gic_cfg.regkgrad2)) / log((double)2) + 0.5f);
+        isp_gic_cfg->regkgrad1 = (int)(log(double(gic_cfg.regkgrad1)) / log((double)2) + 0.5f);
 
-       //isp_gic_cfg->reggbthre = gic_cfg.regdarkthre;
-       isp_gic_cfg->reggbthre = int(log(double(gic_cfg.reggbthre)) / log((double)2) + 0.5f);
-       isp_gic_cfg->regmaxcorv = gic_cfg.regmaxcorv;
+        //isp_gic_cfg->reggbthre = gic_cfg.regdarkthre;
+        isp_gic_cfg->reggbthre = int(log(double(gic_cfg.reggbthre)) / log((double)2) + 0.5f);
+        isp_gic_cfg->regmaxcorv = gic_cfg.regmaxcorv;
 
-       isp_gic_cfg->regmingradthr1 = gic_cfg.regmingradthr1;
-       //isp_gic_cfg->regmingradthr2 = gic_cfg.regmingradthr2;
-       isp_gic_cfg->regmingradthr2 = isp_gic_cfg->regmingradthr1;
+        isp_gic_cfg->regmingradthr1 = gic_cfg.regmingradthr1;
+        //isp_gic_cfg->regmingradthr2 = gic_cfg.regmingradthr2;
+        isp_gic_cfg->regmingradthr2 = isp_gic_cfg->regmingradthr1;
 
-       isp_gic_cfg->gr_ratio = gic_cfg.gr_ratio;
-       isp_gic_cfg->dnloscale = (int)(gic_cfg.dnloscale * (1 << 7));
-       isp_gic_cfg->dnhiscale = (int)(gic_cfg.dnhiscale * (1 << 7));
-       isp_gic_cfg->reglumapointsstep = gic_cfg.reglumapointsstep;
-       isp_gic_cfg->gvaluelimitlo = (int)gic_cfg.gvaluelimitlo;
-       isp_gic_cfg->gvaluelimithi = (int)gic_cfg.gvaluelimithi;
-       isp_gic_cfg->fusionratiohilimt1 = (int)(gic_cfg.fusionratiohilimt1 * (1 << 7));
-       isp_gic_cfg->regstrength_fix = (int)(gic_cfg.textureStrength * (1 << 7));
+        isp_gic_cfg->gr_ratio = gic_cfg.gr_ratio;
+        isp_gic_cfg->dnloscale = (int)(gic_cfg.dnloscale * (1 << 7));
+        isp_gic_cfg->dnhiscale = (int)(gic_cfg.dnhiscale * (1 << 7));
+        isp_gic_cfg->reglumapointsstep = gic_cfg.reglumapointsstep;
+        isp_gic_cfg->gvaluelimitlo = (int)gic_cfg.gvaluelimitlo;
+        isp_gic_cfg->gvaluelimithi = (int)gic_cfg.gvaluelimithi;
+        isp_gic_cfg->fusionratiohilimt1 = (int)(gic_cfg.fusionratiohilimt1 * (1 << 7));
+        isp_gic_cfg->regstrength_fix = (int)(gic_cfg.textureStrength * (1 << 7));
 
-       for (int i = 0; i < 15; i++)
-       {
-           isp_gic_cfg->sigma_y[i] = (int)(gic_cfg.sigma_y[i] * (1 << 7));
-       }
+        for (int i = 0; i < 15; i++)
+        {
+            isp_gic_cfg->sigma_y[i] = (int)(gic_cfg.sigma_y[i] * (1 << 7));
+        }
 
-       isp_gic_cfg->noise_cut_en = gic_cfg.noise_cut_en;
-       isp_gic_cfg->noise_coe_a = gic_cfg.noise_coe_a;
-       isp_gic_cfg->noise_coe_b = gic_cfg.noise_coe_b;
-       isp_gic_cfg->diff_clip = gic_cfg.diff_clip;
+        isp_gic_cfg->noise_cut_en = gic_cfg.noise_cut_en;
+        isp_gic_cfg->noise_coe_a = gic_cfg.noise_coe_a;
+        isp_gic_cfg->noise_coe_b = gic_cfg.noise_coe_b;
+        isp_gic_cfg->diff_clip = gic_cfg.diff_clip;
 
-       #define GIC_SWAP(_T_,A,B) { _T_ tmp = (A); (A) = (B); (B) = tmp; }
+#define GIC_SWAP(_T_,A,B) { _T_ tmp = (A); (A) = (B); (B) = tmp; }
 
-       if (isp_gic_cfg->regkgrad2dark < isp_gic_cfg->regkgrad2)
-           GIC_SWAP(u8, isp_gic_cfg->regkgrad2dark, isp_gic_cfg->regkgrad2);
+        if (isp_gic_cfg->regkgrad2dark < isp_gic_cfg->regkgrad2)
+            GIC_SWAP(u8, isp_gic_cfg->regkgrad2dark, isp_gic_cfg->regkgrad2);
 
-       if (isp_gic_cfg->regmingradthrdark1 < isp_gic_cfg->regmingradthr1)
-           GIC_SWAP(u16, isp_gic_cfg->regmingradthrdark1, isp_gic_cfg->regmingradthr1);
+        if (isp_gic_cfg->regmingradthrdark1 < isp_gic_cfg->regmingradthr1)
+            GIC_SWAP(u16, isp_gic_cfg->regmingradthrdark1, isp_gic_cfg->regmingradthr1);
 
-       if (isp_gic_cfg->regmingradthrdark2 < isp_gic_cfg->regmingradthr2)
-           GIC_SWAP(u16, isp_gic_cfg->regmingradthrdark2, isp_gic_cfg->regmingradthr2);
+        if (isp_gic_cfg->regmingradthrdark2 < isp_gic_cfg->regmingradthr2)
+            GIC_SWAP(u16, isp_gic_cfg->regmingradthrdark2, isp_gic_cfg->regmingradthr2);
 
-       if (isp_gic_cfg->regdarktthrehi < isp_gic_cfg->regdarkthre)
-           GIC_SWAP(u16, isp_gic_cfg->regdarktthrehi, isp_gic_cfg->regdarkthre);
+        if (isp_gic_cfg->regdarktthrehi < isp_gic_cfg->regdarkthre)
+            GIC_SWAP(u16, isp_gic_cfg->regdarktthrehi, isp_gic_cfg->regdarkthre);
 
-   }
+    }
 }
 
 void
 Isp20Params::set_working_mode(int mode)
 {
-   _working_mode = mode;
+    _working_mode = mode;
 }
 
 void
 Isp20Params::convertAiqOrbToIsp20Params(struct rkispp_params_cfg& pp_cfg,
-        rk_aiq_isp_orb_t& orb)
+                                        rk_aiq_isp_orb_t& orb)
 {
-    if(orb.orb_en){
+    if(orb.orb_en) {
         pp_cfg.module_ens |= ISPP_MODULE_ORB;
         pp_cfg.module_en_update |= ISPP_MODULE_ORB;
         pp_cfg.module_cfg_update |= ISPP_MODULE_ORB;
@@ -2446,7 +2284,7 @@ Isp20Params::convertAiqOrbToIsp20Params(struct rkispp_params_cfg& pp_cfg,
 
 void Isp20Params::setModuleStatus(rk_aiq_module_id_t mId, bool en)
 {
-    #define _ISP_MODULE_CFG_(id)  \
+#define _ISP_MODULE_CFG_(id)  \
     {\
         _force_module_flags |= 1LL << id;\
         if(en)\
@@ -2455,7 +2293,7 @@ void Isp20Params::setModuleStatus(rk_aiq_module_id_t mId, bool en)
             _force_isp_module_ens &= ~(1LL << id);\
     }
 
-    #define _ISPP_MODULE_CFG_(id, mod_en)  \
+#define _ISPP_MODULE_CFG_(id, mod_en)  \
     {\
         _force_module_flags |= 1LL << id;\
         if(en)\
@@ -2465,56 +2303,56 @@ void Isp20Params::setModuleStatus(rk_aiq_module_id_t mId, bool en)
     }
 
     SmartLock locker (_mutex);
-    switch (mId){
-        case RK_MODULE_INVAL:
+    switch (mId) {
+    case RK_MODULE_INVAL:
         break;
-        case RK_MODULE_MAX:
+    case RK_MODULE_MAX:
         break;
-        case RK_MODULE_FEC:
+    case RK_MODULE_FEC:
         break;
-        case RK_MODULE_TNR:
-            _ISPP_MODULE_CFG_(RK_ISP2X_PP_TNR_ID, ISPP_MODULE_TNR);
+    case RK_MODULE_TNR:
+        _ISPP_MODULE_CFG_(RK_ISP2X_PP_TNR_ID, ISPP_MODULE_TNR);
         break;
-        case RK_MODULE_NR:
-            _ISPP_MODULE_CFG_(RK_ISP2X_RAWNR_ID, ISPP_MODULE_NR);
+    case RK_MODULE_NR:
+        _ISPP_MODULE_CFG_(RK_ISP2X_RAWNR_ID, ISPP_MODULE_NR);
         break;
-        case RK_MODULE_DPCC:
-            _ISP_MODULE_CFG_(RK_ISP2X_DPCC_ID);
+    case RK_MODULE_DPCC:
+        _ISP_MODULE_CFG_(RK_ISP2X_DPCC_ID);
         break;
-        case RK_MODULE_BLS:
-            _ISP_MODULE_CFG_(RK_ISP2X_BLS_ID);
+    case RK_MODULE_BLS:
+        _ISP_MODULE_CFG_(RK_ISP2X_BLS_ID);
         break;
-        case RK_MODULE_LSC:
-            _ISP_MODULE_CFG_(RK_ISP2X_LSC_ID);
+    case RK_MODULE_LSC:
+        _ISP_MODULE_CFG_(RK_ISP2X_LSC_ID);
         break;
-        case RK_MODULE_CTK:
-            _ISP_MODULE_CFG_(RK_ISP2X_CTK_ID);
+    case RK_MODULE_CTK:
+        _ISP_MODULE_CFG_(RK_ISP2X_CTK_ID);
         break;
-        case RK_MODULE_AWB:
-            _ISP_MODULE_CFG_(RK_ISP2X_RAWAWB_ID);
+    case RK_MODULE_AWB:
+        _ISP_MODULE_CFG_(RK_ISP2X_RAWAWB_ID);
         break;
-        case RK_MODULE_GOC:
-            _ISP_MODULE_CFG_(RK_ISP2X_GOC_ID);
+    case RK_MODULE_GOC:
+        _ISP_MODULE_CFG_(RK_ISP2X_GOC_ID);
         break;
-        case RK_MODULE_3DLUT:
-            _ISP_MODULE_CFG_(RK_ISP2X_3DLUT_ID);
+    case RK_MODULE_3DLUT:
+        _ISP_MODULE_CFG_(RK_ISP2X_3DLUT_ID);
         break;
-        case RK_MODULE_LDCH:
-            _ISP_MODULE_CFG_(RK_ISP2X_LDCH_ID);
+    case RK_MODULE_LDCH:
+        _ISP_MODULE_CFG_(RK_ISP2X_LDCH_ID);
         break;
-        case RK_MODULE_GIC:
-            _ISP_MODULE_CFG_(RK_ISP2X_GIC_ID);
+    case RK_MODULE_GIC:
+        _ISP_MODULE_CFG_(RK_ISP2X_GIC_ID);
         break;
-        case RK_MODULE_AWB_GAIN:
-            _ISP_MODULE_CFG_(RK_ISP2X_GAIN_ID);
+    case RK_MODULE_AWB_GAIN:
+        _ISP_MODULE_CFG_(RK_ISP2X_GAIN_ID);
         break;
-        case RK_MODULE_SHARP:
-            _ISP_MODULE_CFG_(RK_ISP2X_RK_IESHARP_ID);
+    case RK_MODULE_SHARP:
+        _ISP_MODULE_CFG_(RK_ISP2X_RK_IESHARP_ID);
         break;
-        case RK_MODULE_AE:
+    case RK_MODULE_AE:
         break;
-        case RK_MODULE_DHAZ:
-            _ISP_MODULE_CFG_(RK_ISP2X_DHAZ_ID);
+    case RK_MODULE_DHAZ:
+        _ISP_MODULE_CFG_(RK_ISP2X_DHAZ_ID);
         break;
     }
 }
@@ -2522,58 +2360,58 @@ void Isp20Params::setModuleStatus(rk_aiq_module_id_t mId, bool en)
 void Isp20Params::getModuleStatus(rk_aiq_module_id_t mId, bool& en)
 {
     int mod_id = -1;
-    switch (mId){
-        case RK_MODULE_INVAL:
+    switch (mId) {
+    case RK_MODULE_INVAL:
         break;
-        case RK_MODULE_MAX:
+    case RK_MODULE_MAX:
         break;
-        case RK_MODULE_TNR:
-            mod_id = RK_ISP2X_PP_TNR_ID;
+    case RK_MODULE_TNR:
+        mod_id = RK_ISP2X_PP_TNR_ID;
         break;
-        case RK_MODULE_DPCC:
-            mod_id = RK_ISP2X_DPCC_ID;
+    case RK_MODULE_DPCC:
+        mod_id = RK_ISP2X_DPCC_ID;
         break;
-        case RK_MODULE_BLS:
-            mod_id = RK_ISP2X_BLS_ID;
+    case RK_MODULE_BLS:
+        mod_id = RK_ISP2X_BLS_ID;
         break;
-        case RK_MODULE_LSC:
-            mod_id = RK_ISP2X_LSC_ID;
+    case RK_MODULE_LSC:
+        mod_id = RK_ISP2X_LSC_ID;
         break;
-        case RK_MODULE_CTK:
-            mod_id = RK_ISP2X_CTK_ID;
+    case RK_MODULE_CTK:
+        mod_id = RK_ISP2X_CTK_ID;
         break;
-        case RK_MODULE_AWB:
-            mod_id = RK_ISP2X_RAWAWB_ID;
+    case RK_MODULE_AWB:
+        mod_id = RK_ISP2X_RAWAWB_ID;
         break;
-        case RK_MODULE_GOC:
-            mod_id = RK_ISP2X_GOC_ID;
+    case RK_MODULE_GOC:
+        mod_id = RK_ISP2X_GOC_ID;
         break;
-        case RK_MODULE_NR:
-            mod_id = RK_ISP2X_RAWNR_ID;
+    case RK_MODULE_NR:
+        mod_id = RK_ISP2X_RAWNR_ID;
         break;
-        case RK_MODULE_3DLUT:
-            mod_id = RK_ISP2X_3DLUT_ID;
+    case RK_MODULE_3DLUT:
+        mod_id = RK_ISP2X_3DLUT_ID;
         break;
-        case RK_MODULE_LDCH:
-            mod_id = RK_ISP2X_LDCH_ID;
+    case RK_MODULE_LDCH:
+        mod_id = RK_ISP2X_LDCH_ID;
         break;
-        case RK_MODULE_GIC:
-            mod_id = RK_ISP2X_GIC_ID;
+    case RK_MODULE_GIC:
+        mod_id = RK_ISP2X_GIC_ID;
         break;
-        case RK_MODULE_AWB_GAIN:
-            mod_id = RK_ISP2X_GAIN_ID;
+    case RK_MODULE_AWB_GAIN:
+        mod_id = RK_ISP2X_GAIN_ID;
         break;
-        case RK_MODULE_SHARP:
-            mod_id = RK_ISP2X_RK_IESHARP_ID;
+    case RK_MODULE_SHARP:
+        mod_id = RK_ISP2X_RK_IESHARP_ID;
         break;
-        case RK_MODULE_AE:
-            mod_id = RK_ISP2X_RAWAE_LITE_ID;
+    case RK_MODULE_AE:
+        mod_id = RK_ISP2X_RAWAE_LITE_ID;
         break;
-        case RK_MODULE_FEC:
-            mod_id = RK_ISP2X_PP_TFEC_ID;
+    case RK_MODULE_FEC:
+        mod_id = RK_ISP2X_PP_TFEC_ID;
         break;
-        case RK_MODULE_DHAZ:
-            mod_id = RK_ISP2X_DHAZ_ID;
+    case RK_MODULE_DHAZ:
+        mod_id = RK_ISP2X_DHAZ_ID;
         break;
     }
     if (mod_id < 0)
@@ -2598,13 +2436,13 @@ bool Isp20Params::getModuleForceEn(int module_id)
 {
     SmartLock locker (_mutex);
     if(module_id == RK_ISP2X_PP_TNR_ID)
-        return (_force_ispp_module_ens & ISPP_MODULE_TNR)>>0;
+        return (_force_ispp_module_ens & ISPP_MODULE_TNR) >> 0;
     else if(module_id == RK_ISP2X_PP_NR_ID)
-        return (_force_ispp_module_ens & ISPP_MODULE_NR)>>1;
+        return (_force_ispp_module_ens & ISPP_MODULE_NR) >> 1;
     else if(module_id == RK_ISP2X_PP_TSHP_ID)
-        return (_force_ispp_module_ens & ISPP_MODULE_SHP)>>2;
+        return (_force_ispp_module_ens & ISPP_MODULE_SHP) >> 2;
     else if(module_id == RK_ISP2X_PP_TFEC_ID)
-        return (_force_ispp_module_ens & ISPP_MODULE_FEC)>>3;
+        return (_force_ispp_module_ens & ISPP_MODULE_FEC) >> 3;
     else
         return ((_force_isp_module_ens & (1LL << module_id)) >> module_id);
 }
@@ -2624,57 +2462,57 @@ void Isp20Params::updateIsppModuleForceEns(u32 module_ens)
 void
 Isp20Params::forceOverwriteAiqIsppCfg(struct rkispp_params_cfg& pp_cfg, SmartPtr<RkAiqIsppParamsProxy> aiq_results)
 {
-    for (int i=RK_ISP2X_PP_TNR_ID; i <= RK_ISP2X_PP_MAX_ID; i++){
+    for (int i = RK_ISP2X_PP_TNR_ID; i <= RK_ISP2X_PP_MAX_ID; i++) {
         if (getModuleForceFlag(i)) {
-            switch (i){
-                case RK_ISP2X_PP_TNR_ID:
-                    if (getModuleForceEn(RK_ISP2X_PP_TNR_ID)){
-                        if(aiq_results->data()->tnr.tnr_en){
-                            pp_cfg.module_ens |= ISPP_MODULE_TNR;
-                            pp_cfg.module_en_update |= ISPP_MODULE_TNR;
-                            pp_cfg.module_cfg_update |= ISPP_MODULE_TNR;
-                        }else{
-                            setModuleForceFlagInverse(RK_ISP2X_PP_TNR_ID);
-                            LOGE("algo isn't enabled, so enable module failed!");
-                        }
-                    }else{
-                        pp_cfg.module_ens &= ~ISPP_MODULE_TNR;
+            switch (i) {
+            case RK_ISP2X_PP_TNR_ID:
+                if (getModuleForceEn(RK_ISP2X_PP_TNR_ID)) {
+                    if(aiq_results->data()->tnr.tnr_en) {
+                        pp_cfg.module_ens |= ISPP_MODULE_TNR;
                         pp_cfg.module_en_update |= ISPP_MODULE_TNR;
-                        pp_cfg.module_cfg_update &= ~ISPP_MODULE_TNR;
+                        pp_cfg.module_cfg_update |= ISPP_MODULE_TNR;
+                    } else {
+                        setModuleForceFlagInverse(RK_ISP2X_PP_TNR_ID);
+                        LOGE("algo isn't enabled, so enable module failed!");
                     }
+                } else {
+                    pp_cfg.module_ens &= ~ISPP_MODULE_TNR;
+                    pp_cfg.module_en_update |= ISPP_MODULE_TNR;
+                    pp_cfg.module_cfg_update &= ~ISPP_MODULE_TNR;
+                }
                 break;
-                case RK_ISP2X_PP_NR_ID:
-                    if (getModuleForceEn(RK_ISP2X_PP_NR_ID)){
-                        if(aiq_results->data()->tnr.tnr_en){
-                            pp_cfg.module_ens |= ISPP_MODULE_NR;
-                            pp_cfg.module_en_update |= ISPP_MODULE_NR;
-                            pp_cfg.module_cfg_update |= ISPP_MODULE_NR;
-                        }else{
-                            setModuleForceFlagInverse(RK_ISP2X_PP_NR_ID);
-                            LOGE("algo isn't enabled, so enable module failed!");
-                        }
-                    }else{
-                        pp_cfg.module_ens &= ~ISPP_MODULE_NR;
+            case RK_ISP2X_PP_NR_ID:
+                if (getModuleForceEn(RK_ISP2X_PP_NR_ID)) {
+                    if(aiq_results->data()->tnr.tnr_en) {
+                        pp_cfg.module_ens |= ISPP_MODULE_NR;
                         pp_cfg.module_en_update |= ISPP_MODULE_NR;
-                        pp_cfg.module_cfg_update &= ~ISPP_MODULE_NR;
+                        pp_cfg.module_cfg_update |= ISPP_MODULE_NR;
+                    } else {
+                        setModuleForceFlagInverse(RK_ISP2X_PP_NR_ID);
+                        LOGE("algo isn't enabled, so enable module failed!");
                     }
+                } else {
+                    pp_cfg.module_ens &= ~ISPP_MODULE_NR;
+                    pp_cfg.module_en_update |= ISPP_MODULE_NR;
+                    pp_cfg.module_cfg_update &= ~ISPP_MODULE_NR;
+                }
                 break;
-                case RK_ISP2X_PP_TSHP_ID:
-                    if (getModuleForceEn(RK_ISP2X_RK_IESHARP_ID)){
-                        if(aiq_results->data()->sharpen.stSharpFixV1.sharp_en ||
-                           aiq_results->data()->edgeflt.edgeflt_en){
-                            pp_cfg.module_ens |= ISPP_MODULE_SHP;
-                            pp_cfg.module_en_update |= ISPP_MODULE_SHP;
-                            pp_cfg.module_cfg_update |= ISPP_MODULE_SHP;
-                        }else{
-                            setModuleForceFlagInverse(RK_ISP2X_PP_TSHP_ID);
-                            LOGE("algo isn't enabled, so enable module failed!");
-                        }
-                    }else{
-                        pp_cfg.module_ens &= ~ISPP_MODULE_SHP;
+            case RK_ISP2X_PP_TSHP_ID:
+                if (getModuleForceEn(RK_ISP2X_RK_IESHARP_ID)) {
+                    if(aiq_results->data()->sharpen.stSharpFixV1.sharp_en ||
+                            aiq_results->data()->edgeflt.edgeflt_en) {
+                        pp_cfg.module_ens |= ISPP_MODULE_SHP;
                         pp_cfg.module_en_update |= ISPP_MODULE_SHP;
-                        pp_cfg.module_cfg_update &= ~ISPP_MODULE_SHP;
+                        pp_cfg.module_cfg_update |= ISPP_MODULE_SHP;
+                    } else {
+                        setModuleForceFlagInverse(RK_ISP2X_PP_TSHP_ID);
+                        LOGE("algo isn't enabled, so enable module failed!");
                     }
+                } else {
+                    pp_cfg.module_ens &= ~ISPP_MODULE_SHP;
+                    pp_cfg.module_en_update |= ISPP_MODULE_SHP;
+                    pp_cfg.module_cfg_update &= ~ISPP_MODULE_SHP;
+                }
                 break;
             }
         }
@@ -2684,202 +2522,202 @@ Isp20Params::forceOverwriteAiqIsppCfg(struct rkispp_params_cfg& pp_cfg, SmartPtr
 
 void
 Isp20Params::forceOverwriteAiqIspCfg(struct isp2x_isp_params_cfg& isp_cfg,
-        SmartPtr<RkAiqIspParamsProxy> aiq_results)
+                                     SmartPtr<RkAiqIspParamsProxy> aiq_results)
 {
-    for (int i=0; i <= RK_ISP2X_MAX_ID; i++){
+    for (int i = 0; i <= RK_ISP2X_MAX_ID; i++) {
         if (getModuleForceFlag(i)) {
-            switch (i){
-                case RK_ISP2X_DPCC_ID:
-                    if (getModuleForceEn(RK_ISP2X_PP_TNR_ID)){
-                        if(aiq_results->data()->dpcc.stBasic.enable){
-                            isp_cfg.module_ens |= ISPP_MODULE_TNR;
-                            isp_cfg.module_en_update |= ISPP_MODULE_TNR;
-                            isp_cfg.module_cfg_update |= ISPP_MODULE_TNR;
-                        }else{
-                            setModuleForceFlagInverse(RK_ISP2X_DPCC_ID);
-                            LOGE("algo isn't enabled, so enable module failed!");
-                        }
-                    }else{
-                        isp_cfg.module_ens &= ~ISPP_MODULE_TNR;
+            switch (i) {
+            case RK_ISP2X_DPCC_ID:
+                if (getModuleForceEn(RK_ISP2X_PP_TNR_ID)) {
+                    if(aiq_results->data()->dpcc.stBasic.enable) {
+                        isp_cfg.module_ens |= ISPP_MODULE_TNR;
                         isp_cfg.module_en_update |= ISPP_MODULE_TNR;
-                        isp_cfg.module_cfg_update &= ~ISPP_MODULE_TNR;
+                        isp_cfg.module_cfg_update |= ISPP_MODULE_TNR;
+                    } else {
+                        setModuleForceFlagInverse(RK_ISP2X_DPCC_ID);
+                        LOGE("algo isn't enabled, so enable module failed!");
                     }
+                } else {
+                    isp_cfg.module_ens &= ~ISPP_MODULE_TNR;
+                    isp_cfg.module_en_update |= ISPP_MODULE_TNR;
+                    isp_cfg.module_cfg_update &= ~ISPP_MODULE_TNR;
+                }
                 break;
-                case RK_ISP2X_BLS_ID:
-                    if (getModuleForceEn(RK_ISP2X_BLS_ID)){
-                        if(aiq_results->data()->blc.stResult.enable){
-                            isp_cfg.module_ens |= ISP2X_MODULE_BLS;
-                            isp_cfg.module_en_update |= ISP2X_MODULE_BLS;
-                            isp_cfg.module_cfg_update |= ISP2X_MODULE_BLS;
-                        }else{
-                            setModuleForceFlagInverse(RK_ISP2X_BLS_ID);
-                            LOGE("algo isn't enabled, so enable module failed!");
-                        }
-                    }else{
-                        isp_cfg.module_ens &= ~ISP2X_MODULE_BLS;
+            case RK_ISP2X_BLS_ID:
+                if (getModuleForceEn(RK_ISP2X_BLS_ID)) {
+                    if(aiq_results->data()->blc.stResult.enable) {
+                        isp_cfg.module_ens |= ISP2X_MODULE_BLS;
                         isp_cfg.module_en_update |= ISP2X_MODULE_BLS;
-                        isp_cfg.module_cfg_update &= ~ISP2X_MODULE_BLS;
+                        isp_cfg.module_cfg_update |= ISP2X_MODULE_BLS;
+                    } else {
+                        setModuleForceFlagInverse(RK_ISP2X_BLS_ID);
+                        LOGE("algo isn't enabled, so enable module failed!");
                     }
+                } else {
+                    isp_cfg.module_ens &= ~ISP2X_MODULE_BLS;
+                    isp_cfg.module_en_update |= ISP2X_MODULE_BLS;
+                    isp_cfg.module_cfg_update &= ~ISP2X_MODULE_BLS;
+                }
                 break;
-                case RK_ISP2X_LSC_ID:
-                    if (getModuleForceEn(RK_ISP2X_LSC_ID)){
-                        if(aiq_results->data()->lsc.lsc_en){
-                            isp_cfg.module_ens |= ISP2X_MODULE_LSC;
-                            isp_cfg.module_en_update |= ISP2X_MODULE_LSC;
-                            isp_cfg.module_cfg_update |= ISP2X_MODULE_LSC;
-                        }else{
-                            setModuleForceFlagInverse(RK_ISP2X_LSC_ID);
-                            LOGE("algo isn't enabled, so enable module failed!");
-                        }
-                    }else{
-                        isp_cfg.module_ens &= ~ISP2X_MODULE_LSC;
+            case RK_ISP2X_LSC_ID:
+                if (getModuleForceEn(RK_ISP2X_LSC_ID)) {
+                    if(aiq_results->data()->lsc.lsc_en) {
+                        isp_cfg.module_ens |= ISP2X_MODULE_LSC;
                         isp_cfg.module_en_update |= ISP2X_MODULE_LSC;
-                        isp_cfg.module_cfg_update &= ~ISP2X_MODULE_LSC;
+                        isp_cfg.module_cfg_update |= ISP2X_MODULE_LSC;
+                    } else {
+                        setModuleForceFlagInverse(RK_ISP2X_LSC_ID);
+                        LOGE("algo isn't enabled, so enable module failed!");
                     }
+                } else {
+                    isp_cfg.module_ens &= ~ISP2X_MODULE_LSC;
+                    isp_cfg.module_en_update |= ISP2X_MODULE_LSC;
+                    isp_cfg.module_cfg_update &= ~ISP2X_MODULE_LSC;
+                }
                 break;
-                case RK_ISP2X_CTK_ID:
-                    if (getModuleForceEn(RK_ISP2X_CTK_ID)){
-                        if(aiq_results->data()->lsc.lsc_en){
-                            isp_cfg.module_ens |= ISP2X_MODULE_CCM;
-                            isp_cfg.module_en_update |= ISP2X_MODULE_CCM;
-                            isp_cfg.module_cfg_update |= ISP2X_MODULE_CCM;
-                        }else{
-                            setModuleForceFlagInverse(RK_ISP2X_CTK_ID);
-                            LOGE("algo isn't enabled, so enable module failed!");
-                        }
-                    }else{
-                        isp_cfg.module_ens &= ~ISP2X_MODULE_CCM;
+            case RK_ISP2X_CTK_ID:
+                if (getModuleForceEn(RK_ISP2X_CTK_ID)) {
+                    if(aiq_results->data()->lsc.lsc_en) {
+                        isp_cfg.module_ens |= ISP2X_MODULE_CCM;
                         isp_cfg.module_en_update |= ISP2X_MODULE_CCM;
-                        isp_cfg.module_cfg_update &= ~ISP2X_MODULE_CCM;
+                        isp_cfg.module_cfg_update |= ISP2X_MODULE_CCM;
+                    } else {
+                        setModuleForceFlagInverse(RK_ISP2X_CTK_ID);
+                        LOGE("algo isn't enabled, so enable module failed!");
                     }
+                } else {
+                    isp_cfg.module_ens &= ~ISP2X_MODULE_CCM;
+                    isp_cfg.module_en_update |= ISP2X_MODULE_CCM;
+                    isp_cfg.module_cfg_update &= ~ISP2X_MODULE_CCM;
+                }
                 break;
-                case RK_ISP2X_RAWAWB_ID:
-                    if (getModuleForceEn(RK_ISP2X_RAWAWB_ID)){
-                        if(aiq_results->data()->awb_cfg_v200.awbEnable){
-                            isp_cfg.module_ens |= ISP2X_MODULE_RAWAWB;
-                            isp_cfg.module_en_update |= ISP2X_MODULE_RAWAWB;
-                            isp_cfg.module_cfg_update |= ISP2X_MODULE_RAWAWB;
-                        }else{
-                            setModuleForceFlagInverse(RK_ISP2X_RAWAWB_ID);
-                            LOGE("algo isn't enabled, so enable module failed!");
-                        }
-                    }else{
-                        isp_cfg.module_ens &= ~ISP2X_MODULE_RAWAWB;
+            case RK_ISP2X_RAWAWB_ID:
+                if (getModuleForceEn(RK_ISP2X_RAWAWB_ID)) {
+                    if(aiq_results->data()->awb_cfg_v200.awbEnable) {
+                        isp_cfg.module_ens |= ISP2X_MODULE_RAWAWB;
                         isp_cfg.module_en_update |= ISP2X_MODULE_RAWAWB;
-                        isp_cfg.module_cfg_update &= ~ISP2X_MODULE_RAWAWB;
+                        isp_cfg.module_cfg_update |= ISP2X_MODULE_RAWAWB;
+                    } else {
+                        setModuleForceFlagInverse(RK_ISP2X_RAWAWB_ID);
+                        LOGE("algo isn't enabled, so enable module failed!");
                     }
+                } else {
+                    isp_cfg.module_ens &= ~ISP2X_MODULE_RAWAWB;
+                    isp_cfg.module_en_update |= ISP2X_MODULE_RAWAWB;
+                    isp_cfg.module_cfg_update &= ~ISP2X_MODULE_RAWAWB;
+                }
                 break;
-                case RK_ISP2X_GOC_ID:
-                    if (getModuleForceEn(RK_ISP2X_GOC_ID)){
-                        if(aiq_results->data()->agamma_config.gamma_en){
-                            isp_cfg.module_ens |= ISP2X_MODULE_GOC;
-                            isp_cfg.module_en_update |= ISP2X_MODULE_GOC;
-                            isp_cfg.module_cfg_update |= ISP2X_MODULE_GOC;
-                        }else{
-                            setModuleForceFlagInverse(RK_ISP2X_GOC_ID);
-                            LOGE("algo isn't enabled, so enable module failed!");
-                        }
-                    }else{
-                        isp_cfg.module_ens &= ~ISP2X_MODULE_GOC;
+            case RK_ISP2X_GOC_ID:
+                if (getModuleForceEn(RK_ISP2X_GOC_ID)) {
+                    if(aiq_results->data()->agamma_config.gamma_en) {
+                        isp_cfg.module_ens |= ISP2X_MODULE_GOC;
                         isp_cfg.module_en_update |= ISP2X_MODULE_GOC;
-                        isp_cfg.module_cfg_update &= ~ISP2X_MODULE_GOC;
+                        isp_cfg.module_cfg_update |= ISP2X_MODULE_GOC;
+                    } else {
+                        setModuleForceFlagInverse(RK_ISP2X_GOC_ID);
+                        LOGE("algo isn't enabled, so enable module failed!");
                     }
+                } else {
+                    isp_cfg.module_ens &= ~ISP2X_MODULE_GOC;
+                    isp_cfg.module_en_update |= ISP2X_MODULE_GOC;
+                    isp_cfg.module_cfg_update &= ~ISP2X_MODULE_GOC;
+                }
                 break;
-                case RK_ISP2X_RAWNR_ID:
-                    if (getModuleForceEn(RK_ISP2X_RAWNR_ID)){
-                        if(aiq_results->data()->rawnr.rawnr_en){
-                            isp_cfg.module_ens |= ISP2X_MODULE_RAWNR;
-                            isp_cfg.module_en_update |= ISP2X_MODULE_RAWNR;
-                            isp_cfg.module_cfg_update |= ISP2X_MODULE_RAWNR;
-                        }else{
-                            setModuleForceFlagInverse(RK_ISP2X_RAWNR_ID);
-                            LOGE("algo isn't enabled, so enable module failed!");
-                        }
-                    }else{
-                        isp_cfg.module_ens &= ~ISP2X_MODULE_RAWNR;
+            case RK_ISP2X_RAWNR_ID:
+                if (getModuleForceEn(RK_ISP2X_RAWNR_ID)) {
+                    if(aiq_results->data()->rawnr.rawnr_en) {
+                        isp_cfg.module_ens |= ISP2X_MODULE_RAWNR;
                         isp_cfg.module_en_update |= ISP2X_MODULE_RAWNR;
-                        isp_cfg.module_cfg_update &= ~ISP2X_MODULE_RAWNR;
+                        isp_cfg.module_cfg_update |= ISP2X_MODULE_RAWNR;
+                    } else {
+                        setModuleForceFlagInverse(RK_ISP2X_RAWNR_ID);
+                        LOGE("algo isn't enabled, so enable module failed!");
                     }
+                } else {
+                    isp_cfg.module_ens &= ~ISP2X_MODULE_RAWNR;
+                    isp_cfg.module_en_update |= ISP2X_MODULE_RAWNR;
+                    isp_cfg.module_cfg_update &= ~ISP2X_MODULE_RAWNR;
+                }
                 break;
-                case RK_ISP2X_3DLUT_ID:
-                    if (getModuleForceEn(RK_ISP2X_3DLUT_ID)){
-                        if(aiq_results->data()->rawnr.rawnr_en){
-                            isp_cfg.module_ens |= ISP2X_MODULE_3DLUT;
-                            isp_cfg.module_en_update |= ISP2X_MODULE_3DLUT;
-                            isp_cfg.module_cfg_update |= ISP2X_MODULE_3DLUT;
-                        }else{
-                            setModuleForceFlagInverse(RK_ISP2X_3DLUT_ID);
-                            LOGE("algo isn't enabled, so enable module failed!");
-                        }
-                    }else{
-                        isp_cfg.module_ens &= ~ISP2X_MODULE_3DLUT;
+            case RK_ISP2X_3DLUT_ID:
+                if (getModuleForceEn(RK_ISP2X_3DLUT_ID)) {
+                    if(aiq_results->data()->rawnr.rawnr_en) {
+                        isp_cfg.module_ens |= ISP2X_MODULE_3DLUT;
                         isp_cfg.module_en_update |= ISP2X_MODULE_3DLUT;
-                        isp_cfg.module_cfg_update &= ~ISP2X_MODULE_3DLUT;
+                        isp_cfg.module_cfg_update |= ISP2X_MODULE_3DLUT;
+                    } else {
+                        setModuleForceFlagInverse(RK_ISP2X_3DLUT_ID);
+                        LOGE("algo isn't enabled, so enable module failed!");
                     }
+                } else {
+                    isp_cfg.module_ens &= ~ISP2X_MODULE_3DLUT;
+                    isp_cfg.module_en_update |= ISP2X_MODULE_3DLUT;
+                    isp_cfg.module_cfg_update &= ~ISP2X_MODULE_3DLUT;
+                }
                 break;
-                case RK_ISP2X_LDCH_ID:
-                    if (getModuleForceEn(RK_ISP2X_LDCH_ID)){
-                        if(aiq_results->data()->ldch.ldch_en){
-                            isp_cfg.module_ens |= ISP2X_MODULE_LDCH;
-                            isp_cfg.module_en_update |= ISP2X_MODULE_LDCH;
-                            isp_cfg.module_cfg_update |= ISP2X_MODULE_LDCH;
-                        }else{
-                            setModuleForceFlagInverse(RK_ISP2X_LDCH_ID);
-                            LOGE("algo isn't enabled, so enable module failed!");
-                        }
-                    }else{
-                        isp_cfg.module_ens &= ~ISP2X_MODULE_LDCH;
+            case RK_ISP2X_LDCH_ID:
+                if (getModuleForceEn(RK_ISP2X_LDCH_ID)) {
+                    if(aiq_results->data()->ldch.ldch_en) {
+                        isp_cfg.module_ens |= ISP2X_MODULE_LDCH;
                         isp_cfg.module_en_update |= ISP2X_MODULE_LDCH;
-                        isp_cfg.module_cfg_update &= ~ISP2X_MODULE_LDCH;
+                        isp_cfg.module_cfg_update |= ISP2X_MODULE_LDCH;
+                    } else {
+                        setModuleForceFlagInverse(RK_ISP2X_LDCH_ID);
+                        LOGE("algo isn't enabled, so enable module failed!");
                     }
+                } else {
+                    isp_cfg.module_ens &= ~ISP2X_MODULE_LDCH;
+                    isp_cfg.module_en_update |= ISP2X_MODULE_LDCH;
+                    isp_cfg.module_cfg_update &= ~ISP2X_MODULE_LDCH;
+                }
                 break;
-                case RK_ISP2X_GIC_ID:
-                    if (getModuleForceEn(RK_ISP2X_GIC_ID)){
-                        if(aiq_results->data()->gic.gic_en){
-                            isp_cfg.module_ens |= ISP2X_MODULE_GIC;
-                            isp_cfg.module_en_update |= ISP2X_MODULE_GIC;
-                            isp_cfg.module_cfg_update |= ISP2X_MODULE_GIC;
-                        }else{
-                            setModuleForceFlagInverse(RK_ISP2X_GIC_ID);
-                            LOGE("algo isn't enabled, so enable module failed!");
-                        }
-                    }else{
-                        isp_cfg.module_ens &= ~ISP2X_MODULE_GIC;
+            case RK_ISP2X_GIC_ID:
+                if (getModuleForceEn(RK_ISP2X_GIC_ID)) {
+                    if(aiq_results->data()->gic.gic_en) {
+                        isp_cfg.module_ens |= ISP2X_MODULE_GIC;
                         isp_cfg.module_en_update |= ISP2X_MODULE_GIC;
-                        isp_cfg.module_cfg_update &= ~ISP2X_MODULE_GIC;
+                        isp_cfg.module_cfg_update |= ISP2X_MODULE_GIC;
+                    } else {
+                        setModuleForceFlagInverse(RK_ISP2X_GIC_ID);
+                        LOGE("algo isn't enabled, so enable module failed!");
                     }
+                } else {
+                    isp_cfg.module_ens &= ~ISP2X_MODULE_GIC;
+                    isp_cfg.module_en_update |= ISP2X_MODULE_GIC;
+                    isp_cfg.module_cfg_update &= ~ISP2X_MODULE_GIC;
+                }
                 break;
-                case RK_ISP2X_GAIN_ID:
-                    if (getModuleForceEn(RK_ISP2X_GAIN_ID)){
-                        if(aiq_results->data()->gain_config.gain_table_en){
-                            isp_cfg.module_ens |= ISP2X_MODULE_GAIN;
-                            isp_cfg.module_en_update |= ISP2X_MODULE_GAIN;
-                            isp_cfg.module_cfg_update |= ISP2X_MODULE_GAIN;
-                        }else{
-                            setModuleForceFlagInverse(RK_ISP2X_GAIN_ID);
-                            LOGE("algo isn't enabled, so enable module failed!");
-                        }
-                    }else{
-                        isp_cfg.module_ens &= ~ISP2X_MODULE_GAIN;
+            case RK_ISP2X_GAIN_ID:
+                if (getModuleForceEn(RK_ISP2X_GAIN_ID)) {
+                    if(aiq_results->data()->gain_config.gain_table_en) {
+                        isp_cfg.module_ens |= ISP2X_MODULE_GAIN;
                         isp_cfg.module_en_update |= ISP2X_MODULE_GAIN;
-                        isp_cfg.module_cfg_update &= ~ISP2X_MODULE_GAIN;
+                        isp_cfg.module_cfg_update |= ISP2X_MODULE_GAIN;
+                    } else {
+                        setModuleForceFlagInverse(RK_ISP2X_GAIN_ID);
+                        LOGE("algo isn't enabled, so enable module failed!");
                     }
+                } else {
+                    isp_cfg.module_ens &= ~ISP2X_MODULE_GAIN;
+                    isp_cfg.module_en_update |= ISP2X_MODULE_GAIN;
+                    isp_cfg.module_cfg_update &= ~ISP2X_MODULE_GAIN;
+                }
                 break;
-                case RK_MODULE_DHAZ:
-                    if (getModuleForceEn(RK_ISP2X_DHAZ_ID)){
-                        if(aiq_results->data()->adhaz_config.dehaze_en[0]){
-                            isp_cfg.module_ens |= ISP2X_MODULE_DHAZ;
-                            isp_cfg.module_en_update |= ISP2X_MODULE_DHAZ;
-                            isp_cfg.module_cfg_update |= ISP2X_MODULE_DHAZ;
-                        }else{
-                            setModuleForceFlagInverse(RK_ISP2X_DHAZ_ID);
-                            LOGE("algo isn't enabled, so enable module failed!");
-                        }
-                    }else{
-                        isp_cfg.module_ens &= ~ISP2X_MODULE_DHAZ;
+            case RK_MODULE_DHAZ:
+                if (getModuleForceEn(RK_ISP2X_DHAZ_ID)) {
+                    if(aiq_results->data()->adhaz_config.dehaze_en[0]) {
+                        isp_cfg.module_ens |= ISP2X_MODULE_DHAZ;
                         isp_cfg.module_en_update |= ISP2X_MODULE_DHAZ;
-                        isp_cfg.module_cfg_update &= ~ISP2X_MODULE_DHAZ;
+                        isp_cfg.module_cfg_update |= ISP2X_MODULE_DHAZ;
+                    } else {
+                        setModuleForceFlagInverse(RK_ISP2X_DHAZ_ID);
+                        LOGE("algo isn't enabled, so enable module failed!");
                     }
+                } else {
+                    isp_cfg.module_ens &= ~ISP2X_MODULE_DHAZ;
+                    isp_cfg.module_en_update |= ISP2X_MODULE_DHAZ;
+                    isp_cfg.module_cfg_update &= ~ISP2X_MODULE_DHAZ;
+                }
                 break;
             }
         }

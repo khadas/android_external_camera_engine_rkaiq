@@ -31,114 +31,114 @@ RKAIQ_BEGIN_DECLARE
 
 
 /************bayernr fix***************/
-#define FIXNLMCALC      10	    
-#define FIXDIFMAX       ((long long)1<<(14))   
+#define FIXNLMCALC      10
+#define FIXDIFMAX       ((long long)1<<(14))
 #define LUTMAXM1_FIX    300.0 //29.0
 #define LUTPRECISION_FIX (1<<FIXNLMCALC)
 
 /************mfnr fix***************/
-#define MFNR_MATALAB_FLG					0
-#define FIX_VAL								(1 && !MFNR_MATALAB_FLG)//  1 for rtl_3dnr, 0 for matlab_3dnr
-#define ACCURATE_LOW						0
-#define F_ACCURATE_FLG_SCALE_L				ACCURATE_LOW
+#define MFNR_MATALAB_FLG                    0
+#define FIX_VAL                             (1 && !MFNR_MATALAB_FLG)//  1 for rtl_3dnr, 0 for matlab_3dnr
+#define ACCURATE_LOW                        0
+#define F_ACCURATE_FLG_SCALE_L              ACCURATE_LOW
 #if FIX_VAL
-#define FIX_ENABLE_GAIN_IN					FIX_ENABLE							
-#define FIX_ENABLE_DELTA_SCALE				FIX_ENABLE
-#define FIX_ENABLE_DELTA_CALC				FIX_ENABLE
-#define FIX_ENABLE_DELTA_TO_DELTA_SQR		FIX_ENABLE
-#define FIX_ENABLE_DELTA_CONV				FIX_ENABLE
-#define FIX_ENABLE_PK_CALC					FIX_ENABLE
-#define F_ACCURATE_FLG_SCALE_L				ACCURATE_LOW						
-#define F_ACCURATE_FLG_DELTA_SCALE_L		ACCURATE_LOW
-#define F_ACCURATE_FLG_LUMA_W_IN_CHROMA		ACCURATE_LOW
-#define F_ACCURATE_FLG_CONV_WEIGHT			ACCURATE_LOW
-#define F_ACCURATE_FLG_CONV_OUT				ACCURATE_LOW
-#define F_ACCURATE_FLG_CONV1_OUT			ACCURATE_LOW
-#define F_ACCURATE_FLG_SIGMA				ACCURATE_LOW
-#define F_ACCURATE_FLG_FRQ_DELTA			ACCURATE_LOW
-#define F_ACCURATE_FLG_TXT_THRD_RATIO		ACCURATE_LOW
-#define F_ACCURATE_FLG_TXT_THRD  			ACCURATE_LOW
-#define F_ACCURATE_FLG_TXT_RATIO  			ACCURATE_LOW
-#define F_ACCURATE_FLG_DELTA				ACCURATE_LOW
-#define F_ACCURATE_FLG_EXP_VAL				ACCURATE_LOW						
-#define F_ACCURATE_FLG_PK_MID				ACCURATE_LOW
-#define F_ACCURATE_FLG_EXP_SIGMA			ACCURATE_LOW
-#define F_ACCURATE_FLG_EXP_SIGMA_RATIO		ACCURATE_LOW
-#define F_ACCURATE_FLG_GAIN					ACCURATE_LOW
-#define F_ACCURATE_FLG_PIXEL_RECON  		ACCURATE_LOW
-#define F_ACCURATE_FLG_PIXEL_ORI	  		ACCURATE_LOW
+#define FIX_ENABLE_GAIN_IN                  FIX_ENABLE
+#define FIX_ENABLE_DELTA_SCALE              FIX_ENABLE
+#define FIX_ENABLE_DELTA_CALC               FIX_ENABLE
+#define FIX_ENABLE_DELTA_TO_DELTA_SQR       FIX_ENABLE
+#define FIX_ENABLE_DELTA_CONV               FIX_ENABLE
+#define FIX_ENABLE_PK_CALC                  FIX_ENABLE
+#define F_ACCURATE_FLG_SCALE_L              ACCURATE_LOW
+#define F_ACCURATE_FLG_DELTA_SCALE_L        ACCURATE_LOW
+#define F_ACCURATE_FLG_LUMA_W_IN_CHROMA     ACCURATE_LOW
+#define F_ACCURATE_FLG_CONV_WEIGHT          ACCURATE_LOW
+#define F_ACCURATE_FLG_CONV_OUT             ACCURATE_LOW
+#define F_ACCURATE_FLG_CONV1_OUT            ACCURATE_LOW
+#define F_ACCURATE_FLG_SIGMA                ACCURATE_LOW
+#define F_ACCURATE_FLG_FRQ_DELTA            ACCURATE_LOW
+#define F_ACCURATE_FLG_TXT_THRD_RATIO       ACCURATE_LOW
+#define F_ACCURATE_FLG_TXT_THRD             ACCURATE_LOW
+#define F_ACCURATE_FLG_TXT_RATIO            ACCURATE_LOW
+#define F_ACCURATE_FLG_DELTA                ACCURATE_LOW
+#define F_ACCURATE_FLG_EXP_VAL              ACCURATE_LOW
+#define F_ACCURATE_FLG_PK_MID               ACCURATE_LOW
+#define F_ACCURATE_FLG_EXP_SIGMA            ACCURATE_LOW
+#define F_ACCURATE_FLG_EXP_SIGMA_RATIO      ACCURATE_LOW
+#define F_ACCURATE_FLG_GAIN                 ACCURATE_LOW
+#define F_ACCURATE_FLG_PIXEL_RECON          ACCURATE_LOW
+#define F_ACCURATE_FLG_PIXEL_ORI            ACCURATE_LOW
 #else
-#define FIX_ENABLE_GAIN_IN					FIX_DISABLE
-#define FIX_ENABLE_DELTA_SCALE				FIX_DISABLE
-#define FIX_ENABLE_DELTA_CALC				FIX_DISABLE
-#define FIX_ENABLE_DELTA_TO_DELTA_SQR		FIX_DISABLE
-#define FIX_ENABLE_DELTA_CONV				FIX_DISABLE
-#define FIX_ENABLE_PK_CALC					FIX_DISABLE
-#define F_ACCURATE_FLG_SCALE_L				ACCURATE_HIGH
-#define F_ACCURATE_FLG_DELTA_SCALE_L		ACCURATE_HIGH
-#define F_ACCURATE_FLG_LUMA_W_IN_CHROMA		ACCURATE_HIGH
-#define F_ACCURATE_FLG_CONV_WEIGHT			ACCURATE_HIGH
-#define F_ACCURATE_FLG_CONV_OUT				ACCURATE_HIGH
-#define F_ACCURATE_FLG_CONV1_OUT			ACCURATE_HIGH
-#define F_ACCURATE_FLG_SIGMA				ACCURATE_HIGH
-#define F_ACCURATE_FLG_FRQ_DELTA			ACCURATE_HIGH
-#define F_ACCURATE_FLG_TXT_THRD_RATIO		ACCURATE_HIGH
-#define F_ACCURATE_FLG_TXT_THRD  			ACCURATE_HIGH
-#define F_ACCURATE_FLG_TXT_RATIO  			ACCURATE_HIGH
-#define F_ACCURATE_FLG_DELTA				ACCURATE_HIGH
-#define F_ACCURATE_FLG_EXP_VAL				ACCURATE_HIGH
-#define F_ACCURATE_FLG_PK_MID				ACCURATE_HIGH
-#define F_ACCURATE_FLG_EXP_SIGMA			ACCURATE_HIGH
-#define F_ACCURATE_FLG_EXP_SIGMA_RATIO		ACCURATE_HIGH
-#define F_ACCURATE_FLG_GAIN					ACCURATE_HIGH
-#define F_ACCURATE_FLG_PIXEL_RECON  		ACCURATE_HIGH
-#define F_ACCURATE_FLG_PIXEL_ORI	  		ACCURATE_HIGH
+#define FIX_ENABLE_GAIN_IN                  FIX_DISABLE
+#define FIX_ENABLE_DELTA_SCALE              FIX_DISABLE
+#define FIX_ENABLE_DELTA_CALC               FIX_DISABLE
+#define FIX_ENABLE_DELTA_TO_DELTA_SQR       FIX_DISABLE
+#define FIX_ENABLE_DELTA_CONV               FIX_DISABLE
+#define FIX_ENABLE_PK_CALC                  FIX_DISABLE
+#define F_ACCURATE_FLG_SCALE_L              ACCURATE_HIGH
+#define F_ACCURATE_FLG_DELTA_SCALE_L        ACCURATE_HIGH
+#define F_ACCURATE_FLG_LUMA_W_IN_CHROMA     ACCURATE_HIGH
+#define F_ACCURATE_FLG_CONV_WEIGHT          ACCURATE_HIGH
+#define F_ACCURATE_FLG_CONV_OUT             ACCURATE_HIGH
+#define F_ACCURATE_FLG_CONV1_OUT            ACCURATE_HIGH
+#define F_ACCURATE_FLG_SIGMA                ACCURATE_HIGH
+#define F_ACCURATE_FLG_FRQ_DELTA            ACCURATE_HIGH
+#define F_ACCURATE_FLG_TXT_THRD_RATIO       ACCURATE_HIGH
+#define F_ACCURATE_FLG_TXT_THRD             ACCURATE_HIGH
+#define F_ACCURATE_FLG_TXT_RATIO            ACCURATE_HIGH
+#define F_ACCURATE_FLG_DELTA                ACCURATE_HIGH
+#define F_ACCURATE_FLG_EXP_VAL              ACCURATE_HIGH
+#define F_ACCURATE_FLG_PK_MID               ACCURATE_HIGH
+#define F_ACCURATE_FLG_EXP_SIGMA            ACCURATE_HIGH
+#define F_ACCURATE_FLG_EXP_SIGMA_RATIO      ACCURATE_HIGH
+#define F_ACCURATE_FLG_GAIN                 ACCURATE_HIGH
+#define F_ACCURATE_FLG_PIXEL_RECON          ACCURATE_HIGH
+#define F_ACCURATE_FLG_PIXEL_ORI            ACCURATE_HIGH
 #endif
 
 
-#define F_DECI_CONV_WEIGHT_ACCURATE					13
-#define F_DECI_CONV_WEIGHT_REAL						8
-#define F_DECI_CONV_WEIGHT							(F_ACCURATE_FLG_CONV_WEIGHT ? F_DECI_CONV_WEIGHT_ACCURATE : F_DECI_CONV_WEIGHT_REAL)
+#define F_DECI_CONV_WEIGHT_ACCURATE                 13
+#define F_DECI_CONV_WEIGHT_REAL                     8
+#define F_DECI_CONV_WEIGHT                          (F_ACCURATE_FLG_CONV_WEIGHT ? F_DECI_CONV_WEIGHT_ACCURATE : F_DECI_CONV_WEIGHT_REAL)
 #define F_DECI_PIXEL_SIGMA_CONV_WEIGHT              F_DECI_CONV_WEIGHT
 #define F_DECI_GAIN_ACCURATE                        (16)
 #define F_DECI_GAIN_REAL                            8 //(MAX(F_DECI_GAIN_IN*2, 8))
 #define F_DECI_GAIN                                 (F_ACCURATE_FLG_GAIN ? (F_DECI_GAIN_ACCURATE) : (F_DECI_GAIN_REAL))
 #define F_DECI_GAIN_SQRT                            4// 8 for rtl_sqrt(F_DECI_GAIN / 2)
-#define F_DECI_GAIN_GLB_SQRT                    	F_DECI_GAIN_SQRT
-#define F_DECI_GAIN_GLB_SQRT_INV                    13 // (F_INTE_GAIN_SQRT + F_DECI_GAIN_SQRT)    	// 13   // (F_INTE_GAIN_SQRT + F_DECI_GAIN_SQRT + 4) is better jmj_3dnr
-#define	F_DECI_LUMASCALE						    6		//8 for rtl_3dnr
-#define F_DECI_SCALE_L_ACCURATE               		18
-#define F_DECI_SCALE_L_REAL               			8
-#define F_DECI_SCALE_L                        		(F_ACCURATE_FLG_SCALE_L ? F_DECI_SCALE_L_ACCURATE : F_DECI_SCALE_L_REAL)
-#define F_DECI_SCALE_L_UV_ACCURATE               	18
-#define F_DECI_SCALE_L_UV_REAL               		6
-#define F_DECI_SCALE_L_UV                     		(F_ACCURATE_FLG_SCALE_L ? F_DECI_SCALE_L_UV_ACCURATE : F_DECI_SCALE_L_UV_REAL)
+#define F_DECI_GAIN_GLB_SQRT                        F_DECI_GAIN_SQRT
+#define F_DECI_GAIN_GLB_SQRT_INV                    13 // (F_INTE_GAIN_SQRT + F_DECI_GAIN_SQRT)     // 13   // (F_INTE_GAIN_SQRT + F_DECI_GAIN_SQRT + 4) is better jmj_3dnr
+#define F_DECI_LUMASCALE                            6       //8 for rtl_3dnr
+#define F_DECI_SCALE_L_ACCURATE                     18
+#define F_DECI_SCALE_L_REAL                         8
+#define F_DECI_SCALE_L                              (F_ACCURATE_FLG_SCALE_L ? F_DECI_SCALE_L_ACCURATE : F_DECI_SCALE_L_REAL)
+#define F_DECI_SCALE_L_UV_ACCURATE                  18
+#define F_DECI_SCALE_L_UV_REAL                      6
+#define F_DECI_SCALE_L_UV                           (F_ACCURATE_FLG_SCALE_L ? F_DECI_SCALE_L_UV_ACCURATE : F_DECI_SCALE_L_UV_REAL)
 #define F_DECI_LUMA_W_IN_CHROMA_ACCURATE            16
-#define F_DECI_LUMA_W_IN_CHROMA_REAL               	5
+#define F_DECI_LUMA_W_IN_CHROMA_REAL                5
 #define F_DECI_LUMA_W_IN_CHROMA                     (F_ACCURATE_FLG_LUMA_W_IN_CHROMA ? F_DECI_LUMA_W_IN_CHROMA_ACCURATE : F_DECI_LUMA_W_IN_CHROMA_REAL)
-#define	F_DECI_SIGMA_ACCURATE						(24)
-#define	F_DECI_SIGMA_REAL							(6 )
+#define F_DECI_SIGMA_ACCURATE                       (24)
+#define F_DECI_SIGMA_REAL                           (6 )
 #define F_DECI_SIGMA                                (F_ACCURATE_FLG_SIGMA ? F_DECI_SIGMA_ACCURATE : F_DECI_SIGMA_REAL)
 #define F_DECI_TXT_THRD_RATIO_ACCURATE              (16)
-#define F_DECI_TXT_THRD_RATIO_REAL                  (6)		//(8)	
+#define F_DECI_TXT_THRD_RATIO_REAL                  (6)     //(8)   
 #define F_DECI_TXT_THRD_RATIO                       (F_ACCURATE_FLG_TXT_THRD_RATIO ? F_DECI_TXT_THRD_RATIO_ACCURATE : F_DECI_TXT_THRD_RATIO_REAL)
 #define F_INTE_GAIN_GLB_SQRT_INV                    0
 #define F_DECI_GAIN_GLB_SQRT_INV                    13
-#define GAIN_SIGMA_BITS_ACT		10
-#define MAX_INTEPORATATION_LUMAPOINT 	17
-#define	GAIN_HDR_MERGE_IN_FIX_BITS_DECI		        6
-#define	GAIN_HDR_MERGE_IN2_FIX_BITS_INTE		    12
-#define	GAIN_HDR_MERGE_IN0_FIX_BITS_INTE		    8
+#define GAIN_SIGMA_BITS_ACT     10
+#define MAX_INTEPORATATION_LUMAPOINT    17
+#define GAIN_HDR_MERGE_IN_FIX_BITS_DECI             6
+#define GAIN_HDR_MERGE_IN2_FIX_BITS_INTE            12
+#define GAIN_HDR_MERGE_IN0_FIX_BITS_INTE            8
 
 
 /************uvnr fix***************/
 #define RKUVNR_ratio 0
 #define RKUVNR_offset 4
 #define RKUVNR_kernels 7
-#define RKUVNR_medRatio 4 
-#define RKUVNR_sigmaR 0  
-#define RKUVNR_uvgain 4  
-#define RKUVNR_exp2_lut_y 7 
+#define RKUVNR_medRatio 4
+#define RKUVNR_sigmaR 0
+#define RKUVNR_uvgain 4
+#define RKUVNR_exp2_lut_y 7
 #define RKUVNR_bfRatio RKUVNR_exp2_lut_y
 #define RKUVNR_gainRatio 7
 #define RKUVNR_imgBit_set 8
@@ -170,9 +170,9 @@ RKAIQ_BEGIN_DECLARE
 #define YNR_FILT_MODE1                 1
 #define YNR_DMA_NUM                    4
 
-#define YNR_exp_lut_num 16 
-#define YNR_exp_lut_x 7 
-#define YNR_exp_lut_y 7 
+#define YNR_exp_lut_num 16
+#define YNR_exp_lut_x 7
+#define YNR_exp_lut_y 7
 #define CLIPVALUE
 
 #define WAVELET_LEVEL_1 0
@@ -182,35 +182,35 @@ RKAIQ_BEGIN_DECLARE
 #define YNR_SIGMA_BITS  10
 
 
-typedef struct ANRGainState_s{
-	int gainState;
-	float gain_th0;
-	float gain_th1;
-	float gain_cur;
-	float ratio;
-}ANRGainState_t;
+typedef struct ANRGainState_s {
+    int gainState;
+    float gain_th0;
+    float gain_th1;
+    float gain_cur;
+    float ratio;
+} ANRGainState_t;
 
 //anr context
-typedef struct ANRContext_s{
-	ANRExpInfo_t stExpInfo;
-	
-	float fEnvLight;
-	ANRState_t eState;
-	ANROPMode_t eMode;
-	
-	ANR_Auto_Attr_t stAuto;
-	ANR_Manual_Attr_t stManual;
+typedef struct ANRContext_s {
+    ANRExpInfo_t stExpInfo;
 
-	int refYuvBit;
+    float fEnvLight;
+    ANRState_t eState;
+    ANROPMode_t eMode;
 
-	CalibDb_BayerNr_t stBayernrCalib;
-	CalibDb_MFNR_t stMfnrCalib;
-	CalibDb_UVNR_t stUvnrCalib;
-	CalibDb_YNR_t stYnrCalib;
+    ANR_Auto_Attr_t stAuto;
+    ANR_Manual_Attr_t stManual;
 
-	ANRGainState_t stGainState;
+    int refYuvBit;
 
-}ANRContext_t;
+    CalibDb_BayerNr_t stBayernrCalib;
+    CalibDb_MFNR_t stMfnrCalib;
+    CalibDb_UVNR_t stUvnrCalib;
+    CalibDb_YNR_t stYnrCalib;
+
+    ANRGainState_t stGainState;
+
+} ANRContext_t;
 
 
 

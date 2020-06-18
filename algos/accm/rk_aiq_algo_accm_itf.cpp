@@ -32,7 +32,7 @@ create_context(RkAiqAlgoContext **context, const AlgoCtxInstanceCfg* cfg)
 {
     LOGI_ACCM( "%s: (enter)\n", __FUNCTION__);
     AlgoCtxInstanceCfgInt *cfgInt = (AlgoCtxInstanceCfgInt*)cfg;
-    AccmInit(&ctx.accm_para,cfgInt->calib);
+    AccmInit(&ctx.accm_para, cfgInt->calib);
     *context = &ctx;
 
     LOGI_ACCM( "%s: (exit)\n", __FUNCTION__);

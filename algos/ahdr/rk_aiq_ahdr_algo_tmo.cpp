@@ -253,7 +253,7 @@ void TmoProcessing
     bool enDampDtlslowLgt;
     bool enDampSmoothCtrl;
 
-    if(pAhdrCtx->frameCnt != 0)
+    if(pAhdrCtx->hdrAttr.bEnable == false && pAhdrCtx->frameCnt != 0)
     {
         float diff = ABS(pAhdrCtx->CurrHandleData.CurrEnvLv - pAhdrCtx->AhdrPrevData.PreEnvlv);
         diff = diff / pAhdrCtx->AhdrPrevData.PreEnvlv;

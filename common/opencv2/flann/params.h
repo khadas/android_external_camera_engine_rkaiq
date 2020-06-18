@@ -77,7 +77,7 @@ T get_param(const IndexParams& params, cv::String name)
         return it->second.cast<T>();
     }
     else {
-        throw FLANNException(cv::String("Missing parameter '")+name+cv::String("' in the parameters given"));
+        throw FLANNException(cv::String("Missing parameter '") + name + cv::String("' in the parameters given"));
     }
 }
 
@@ -85,7 +85,7 @@ inline void print_params(const IndexParams& params, std::ostream& stream)
 {
     IndexParams::const_iterator it;
 
-    for(it=params.begin(); it!=params.end(); ++it) {
+    for(it = params.begin(); it != params.end(); ++it) {
         stream << it->first << " : " << it->second << std::endl;
     }
 }

@@ -41,8 +41,12 @@ public:
     virtual XCamReturn setIspLumaListener(IspLumaListener* lumaListener);
     virtual XCamReturn setIspStatsListener(IspStatsListener* statsListener);
     virtual XCamReturn setEvtsListener(IspEvtsListener* evtListener);
-    XCamReturn setModuleCtl(rk_aiq_module_id_t moduleId, bool en){return XCAM_RETURN_NO_ERROR;};
-    XCamReturn getModuleCtl(rk_aiq_module_id_t moduleId, bool& en){return XCAM_RETURN_NO_ERROR;};
+    XCamReturn setModuleCtl(rk_aiq_module_id_t moduleId, bool en) {
+        return XCAM_RETURN_NO_ERROR;
+    };
+    XCamReturn getModuleCtl(rk_aiq_module_id_t moduleId, bool& en) {
+        return XCAM_RETURN_NO_ERROR;
+    };
     virtual XCamReturn setIrcutParams(bool on);
 private:
     XCAM_DEAD_COPY (CamHwSimulator);

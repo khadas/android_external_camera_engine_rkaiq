@@ -83,16 +83,21 @@ RESULT MergeGetCurrIOData
     int OECurve[17];
 
     pAhdrCtx->AhdrProcRes.MgeProcRes.sw_hdrmge_mode = pAhdrCtx->CurrHandleData.MergeMode;
-    CalibrateOECurve(pAhdrCtx->CurrHandleData.CurrMergeHandleData.OECurve_smooth,
-                     pAhdrCtx->CurrHandleData.CurrMergeHandleData.OECurve_offset, pAhdrCtx->AhdrProcRes.MgeProcRes.sw_hdrmge_e_y) ;
-    CalibrateMDCurve(pAhdrCtx->CurrHandleData.CurrMergeHandleData.MDCurveLM_smooth,
-                     pAhdrCtx->CurrHandleData.CurrMergeHandleData.MDCurveLM_offset, pAhdrCtx->AhdrProcRes.MgeProcRes.sw_hdrmge_l1_y);
-    CalibrateMDCurve(pAhdrCtx->CurrHandleData.CurrMergeHandleData.MDCurveMS_smooth,
-                     pAhdrCtx->CurrHandleData.CurrMergeHandleData.MDCurveMS_offset, pAhdrCtx->AhdrProcRes.MgeProcRes.sw_hdrmge_l0_y);
     pAhdrCtx->AhdrProcRes.MgeProcRes.sw_hdrmge_lm_dif_0p9 = 230;
     pAhdrCtx->AhdrProcRes.MgeProcRes.sw_hdrmge_ms_dif_0p8 = 205;
     pAhdrCtx->AhdrProcRes.MgeProcRes.sw_hdrmge_lm_dif_0p15 = (int)pAhdrCtx->CurrHandleData.CurrMergeHandleData.MDCurveLM_offset;
     pAhdrCtx->AhdrProcRes.MgeProcRes.sw_hdrmge_ms_dif_0p15 = (int)pAhdrCtx->CurrHandleData.CurrMergeHandleData.MDCurveMS_offset;
+
+    if(pAhdrCtx->hdrAttr.bEnable == false ||
+            (pAhdrCtx->hdrAttr.bEnable == true && (pAhdrCtx->hdrAttr.opMode == OpMode_Auto || pAhdrCtx->hdrAttr.opMode == OpMode_Fast)))
+    {
+        CalibrateOECurve(pAhdrCtx->CurrHandleData.CurrMergeHandleData.OECurve_smooth,
+                         pAhdrCtx->CurrHandleData.CurrMergeHandleData.OECurve_offset, pAhdrCtx->AhdrProcRes.MgeProcRes.sw_hdrmge_e_y) ;
+        CalibrateMDCurve(pAhdrCtx->CurrHandleData.CurrMergeHandleData.MDCurveLM_smooth,
+                         pAhdrCtx->CurrHandleData.CurrMergeHandleData.MDCurveLM_offset, pAhdrCtx->AhdrProcRes.MgeProcRes.sw_hdrmge_l1_y);
+        CalibrateMDCurve(pAhdrCtx->CurrHandleData.CurrMergeHandleData.MDCurveMS_smooth,
+                         pAhdrCtx->CurrHandleData.CurrMergeHandleData.MDCurveMS_offset, pAhdrCtx->AhdrProcRes.MgeProcRes.sw_hdrmge_l0_y);
+    }
 
     //when gainX = 1, gainX_inv = 1/gainX -1
     pAhdrCtx->AhdrProcRes.MgeProcRes.sw_hdrmge_gain0 = (int)SHIFT6BIT(pAhdrCtx->CurrHandleData.CurrL2S_Ratio);
@@ -147,7 +152,7 @@ RESULT MergeProcessing
     float MDDampMS = pAhdrCtx->CurrHandleData.MergeMDDampMS;
 
     //get finnal current data
-    if (pAhdrCtx->frameCnt != 0)
+    if (pAhdrCtx->hdrAttr.bEnable == false && pAhdrCtx->frameCnt != 0)
     {
         pAhdrCtx->CurrHandleData.CurrMergeHandleData.OECurve_smooth = OEDamp * pAhdrCtx->CurrHandleData.CurrMergeHandleData.OECurve_smooth
                 + (1 - OEDamp) * pAhdrCtx->AhdrPrevData.PrevMergeHandleData.OECurve_smooth;

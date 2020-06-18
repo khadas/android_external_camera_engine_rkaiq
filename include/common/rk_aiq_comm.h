@@ -460,5 +460,5 @@ typedef enum {
     RK_MODULE_TNR,
     RK_MODULE_FEC,
     RK_MODULE_MAX
-}rk_aiq_module_id_t;
+} rk_aiq_module_id_t;
 #endif

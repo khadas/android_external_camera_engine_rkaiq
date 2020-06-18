@@ -60,6 +60,7 @@ static int writeFile = 0;
 static int writeFileSync = 0;
 static int pponeframe = 0;
 static int hdrmode = 0;
+static int limit_range = 0;
 
 static int fd_pp_input = -1;
 static int fd_isp_mp = -1;
@@ -848,17 +849,31 @@ static void init_device(void)
                 exit(EXIT_FAILURE);
         }
 
-        if (cap.capabilities & V4L2_CAP_VIDEO_CAPTURE)
+        if (cap.capabilities & V4L2_CAP_VIDEO_CAPTURE) {
             buf_type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
-        else if (cap.capabilities & V4L2_CAP_VIDEO_CAPTURE_MPLANE)
+            CLEAR(fmt);
+            fmt.type = buf_type;
+            fmt.fmt.pix.width = width;
+            fmt.fmt.pix.height = height;
+            fmt.fmt.pix.pixelformat = format;
+            fmt.fmt.pix.field = V4L2_FIELD_INTERLACED;
+            if (limit_range)
+                fmt.fmt.pix.quantization = V4L2_QUANTIZATION_LIM_RANGE;
+            else
+                fmt.fmt.pix.quantization = V4L2_QUANTIZATION_FULL_RANGE;
+        } else if (cap.capabilities & V4L2_CAP_VIDEO_CAPTURE_MPLANE) {
             buf_type = V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE;
-
-        CLEAR(fmt);
-        fmt.type = buf_type;
-        fmt.fmt.pix.width = width;
-        fmt.fmt.pix.height = height;
-        fmt.fmt.pix.pixelformat = format;
-        fmt.fmt.pix.field = V4L2_FIELD_INTERLACED;
+            CLEAR(fmt);
+            fmt.type = buf_type;
+            fmt.fmt.pix_mp.width = width;
+            fmt.fmt.pix_mp.height = height;
+            fmt.fmt.pix_mp.pixelformat = format;
+            fmt.fmt.pix_mp.field = V4L2_FIELD_INTERLACED;
+            if (limit_range)
+                fmt.fmt.pix_mp.quantization = V4L2_QUANTIZATION_LIM_RANGE;
+            else
+                fmt.fmt.pix_mp.quantization = V4L2_QUANTIZATION_FULL_RANGE;
+        }
 
         if (-1 == xioctl(fd, VIDIOC_S_FMT, &fmt))
                 errno_exit("VIDIOC_S_FMT");
@@ -963,6 +978,7 @@ void parse_args(int argc, char **argv)
            {"pponeframe",   no_argument,       0, 'm' },
            {"hdr",   no_argument,       0, 'a' },
            {"sync-to-raw", no_argument, 0, 'e' },
+           {"limit", no_argument, 0, 'l' },
            {0,          0,                 0,  0  }
        };
 
@@ -1014,7 +1030,10 @@ void parse_args(int argc, char **argv)
            hdrmode = 1;
            break;
        case 'e':
-	   writeFileSync = 1;
+           writeFileSync = 1;
+           break;
+       case 'l':
+           limit_range = 1;
            break;
        case '?':
        case 'p':
@@ -1028,11 +1047,12 @@ void parse_args(int argc, char **argv)
                   "         --stream-count, default 3	       optional, how many frames to write files\n"
                   "         --stream-skip, default 30	       optional, how many frames to skip befor writing file\n"
                   "         --vop,                             optional, drm display\n"
-                  "         --rkaiq,                           optional, auto image quality\n",
-                  "         --silent,                          optional, subpress debug log\n",
-                  "         --pponeframe,                      optional, pp oneframe readback mode\n",
-                  "         --hdr,                             optional, hdr mode\n",
-                  "         --sync-to-raw,		       optional, write yuv files in sync with raw\n",
+                  "         --rkaiq,                           optional, auto image quality\n"
+                  "         --silent,                          optional, subpress debug log\n"
+                  "         --pponeframe,                      optional, pp oneframe readback mode\n"
+                  "         --hdr,                             optional, hdr mode\n"
+                  "         --sync-to-raw,      		       optional, write yuv files in sync with raw\n"
+                  "         --limit,		                   optional, yuv limit range\n",
                   argv[0]);
            exit(-1);
 

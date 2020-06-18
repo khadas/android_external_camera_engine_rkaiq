@@ -27,16 +27,16 @@
 
 RKAIQ_BEGIN_DECLARE
 
-typedef struct AblcContext_s{	
-	AblcExpInfo_t stExpInfo;
-	AblcState_t eState;
-	AblcOPMode_t eMode;
+typedef struct AblcContext_s {
+    AblcExpInfo_t stExpInfo;
+    AblcState_t eState;
+    AblcOPMode_t eMode;
 
-	AblcAutoAttr_t stAuto;
-	AblcManualAttr_t stManual;
+    AblcAutoAttr_t stAuto;
+    AblcManualAttr_t stManual;
 
-	CalibDb_Blc_t stBlcCalib;
-}AblcContext_t;
+    CalibDb_Blc_t stBlcCalib;
+} AblcContext_t;
 
 
 

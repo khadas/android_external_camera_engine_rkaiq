@@ -107,17 +107,17 @@ processing(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outparams)
     rk_aiq_aie_params_int_t* int_params = NULL;
     switch (ctx->params.mode)
     {
-        case RK_AIQ_IE_EFFECT_EMBOSS :
-            int_params = &ctx->emboss_params;
-            break;
-        case RK_AIQ_IE_EFFECT_SKETCH :
-            int_params = &ctx->sketch_params;
-            break;
-        case RK_AIQ_IE_EFFECT_SHARPEN : /*!< deprecated */
-            int_params = &ctx->sharp_params;
-            break;
-        default:
-            break;
+    case RK_AIQ_IE_EFFECT_EMBOSS :
+        int_params = &ctx->emboss_params;
+        break;
+    case RK_AIQ_IE_EFFECT_SKETCH :
+        int_params = &ctx->sketch_params;
+        break;
+    case RK_AIQ_IE_EFFECT_SHARPEN : /*!< deprecated */
+        int_params = &ctx->sharp_params;
+        break;
+    default:
+        break;
     }
 
     if (int_params)

@@ -29,7 +29,7 @@ void work_end(const char* module_name)
     LOGE_AORB("[%s] TIME = %lf ms \n", module_name, end_tick);
 }
 
-ORBList* initList(U32 bytes){
+ORBList* initList(U32 bytes) {
     ORBList* list = (ORBList*)malloc(sizeof(ORBList));
     list->bytes = bytes;
     list->start = NULL;
@@ -40,7 +40,7 @@ ORBList* initList(U32 bytes){
 
 void freeList(ORBList* list) {
     if (list != NULL) {
-        for(Node* item = list->start; item != NULL; item = item->next){
+        for(Node* item = list->start; item != NULL; item = item->next) {
             if (item->data != NULL) {
                 free(item->data);
                 item->data = NULL;
@@ -51,7 +51,7 @@ void freeList(ORBList* list) {
     }
 }
 
-int push(ORBList* list, void* data){
+int push(ORBList* list, void* data) {
 
     Node* node = (Node*)malloc(sizeof(Node));
     node->data = malloc(list->bytes);
@@ -86,7 +86,7 @@ ORBList* get_roi_points_list (rk_aiq_orb_algo_stat_t* keypoints, orb_rect_t roi)
     ORBList* roi_points_list = initList(sizeof(rk_aiq_orb_featue_point));
 
     for (unsigned int i = 0; i < keypoints->num_points; i++) {
-        rk_aiq_orb_featue_point* point = keypoints->points+i;
+        rk_aiq_orb_featue_point* point = keypoints->points + i;
         if (point->x < roi.left ||
                 point->x > roi.right ||
                 point->y < roi.top ||
@@ -100,8 +100,8 @@ ORBList* get_roi_points_list (rk_aiq_orb_algo_stat_t* keypoints, orb_rect_t roi)
 #if 1
     FILE* fp = fopen("/tmp/points0.txt", "wb");
     for (unsigned int i = 0; i < keypoints->num_points; i++) {
-        rk_aiq_orb_featue_point* point = keypoints->points+i;
-        fprintf(fp,"%d, %d\n", point->x, point->y);
+        rk_aiq_orb_featue_point* point = keypoints->points + i;
+        fprintf(fp, "%d, %d\n", point->x, point->y);
     }
     fflush(fp);
     fclose(fp);
@@ -113,12 +113,12 @@ ORBList* matching(ORBList* roi_points_list, rk_aiq_orb_algo_stat_t* keypoints2, 
     orb_matched_point_t keypoint = {0};
     ORBList* matched_list = initList(sizeof(orb_matched_point_t));
 
-    for(Node* point = roi_points_list->start; point != NULL; point = point->next){
+    for(Node* point = roi_points_list->start; point != NULL; point = point->next) {
         rk_aiq_orb_featue_point* descriptor1 = (rk_aiq_orb_featue_point*)point->data;
         keypoint.score = 0;
 
         for (unsigned int j = 0; j < keypoints2->num_points; j++) {
-            rk_aiq_orb_featue_point* descriptor2 = keypoints2->points+j;
+            rk_aiq_orb_featue_point* descriptor2 = keypoints2->points + j;
 
             unsigned int success_num = 120;
             for(int k = 0; k < DESCRIPTOR_SIZE; k++) {
@@ -131,12 +131,12 @@ ORBList* matching(ORBList* roi_points_list, rk_aiq_orb_algo_stat_t* keypoints2, 
                 }
             }
 
-            if(success_num > 110){ //120        
+            if(success_num > 110) { //120
                 if (success_num > keypoint.score) {
                     init_matchpoints(&keypoint,
-                        descriptor1->y, descriptor1->x,
-                        descriptor2->y, descriptor2->x,
-                        success_num);
+                                     descriptor1->y, descriptor1->x,
+                                     descriptor2->y, descriptor2->x,
+                                     success_num);
                 }
 
                 //orb_matched_point_t* f = (orb_matched_point_t*)(matched_list->start);
@@ -144,7 +144,7 @@ ORBList* matching(ORBList* roi_points_list, rk_aiq_orb_algo_stat_t* keypoints2, 
                 //    f->col1, f->row1, f->col2, f->row2);
             }
         }
-        
+
         if (keypoint.score > 0) {
             push(matched_list, &keypoint);
         }
@@ -157,8 +157,8 @@ ORBList* matching(ORBList* roi_points_list, rk_aiq_orb_algo_stat_t* keypoints2, 
 #if 1
     FILE* fp = fopen("/tmp/points1.txt", "wb");
     for (unsigned int i = 0; i < keypoints2->num_points; i++) {
-        rk_aiq_orb_featue_point* point = keypoints2->points+i;
-        fprintf(fp,"%d, %d\n", point->x, point->y);
+        rk_aiq_orb_featue_point* point = keypoints2->points + i;
+        fprintf(fp, "%d, %d\n", point->x, point->y);
     }
     fflush(fp);
     fclose(fp);
@@ -169,64 +169,64 @@ ORBList* matching(ORBList* roi_points_list, rk_aiq_orb_algo_stat_t* keypoints2, 
 
 void gaussian_elimination(double *input, int n)
 {
-	double * A = input;
-	int i = 0;
-	int j = 0;
+    double * A = input;
+    int i = 0;
+    int j = 0;
     //m = 8 rows, n = 9 cols
-	int m = n-1;
-	while (i < m && j < n)
+    int m = n - 1;
+    while (i < m && j < n)
     {
-		// Find pivot in column j, starting in row i:
-		int maxi = i;
-		for(int k = i+1; k < m; k++)
+        // Find pivot in column j, starting in row i:
+        int maxi = i;
+        for(int k = i + 1; k < m; k++)
         {
-			if(fabs(A[k * n + j]) > fabs(A[maxi * n + j]))
+            if(fabs(A[k * n + j]) > fabs(A[maxi * n + j]))
             {
-				maxi = k;
-			}
-		}
-		if (A[maxi * n + j] != 0)
+                maxi = k;
+            }
+        }
+        if (A[maxi * n + j] != 0)
         {
-			//swap rows i and maxi, but do not change the value of i
-			if(i != maxi)
-				for(int k = 0; k < n; k++)
+            //swap rows i and maxi, but do not change the value of i
+            if(i != maxi)
+                for(int k = 0; k < n; k++)
                 {
-					float aux = A[i * n + k];
-					A[i * n + k] = A[maxi * n + k];
-					A[maxi * n + k] = aux;
-				}
-			//Now A[i,j] will contain the old value of A[maxi,j].
-			//divide each entry in row i by A[i,j]
-			float A_ij = A[i * n + j];
-			for(int k = 0; k < n; k++)
+                    float aux = A[i * n + k];
+                    A[i * n + k] = A[maxi * n + k];
+                    A[maxi * n + k] = aux;
+                }
+            //Now A[i,j] will contain the old value of A[maxi,j].
+            //divide each entry in row i by A[i,j]
+            float A_ij = A[i * n + j];
+            for(int k = 0; k < n; k++)
             {
-				A[i * n + k] /= A_ij;
-			}
-			//Now A[i,j] will have the value 1.
-			for(int u = i+1; u< m; u++)
+                A[i * n + k] /= A_ij;
+            }
+            //Now A[i,j] will have the value 1.
+            for(int u = i + 1; u < m; u++)
             {
-				//subtract A[u,j] * row i from row u
-				float A_uj = A[u * n + j];
-				for(int k = 0; k <n; k++)
+                //subtract A[u,j] * row i from row u
+                float A_uj = A[u * n + j];
+                for(int k = 0; k < n; k++)
                 {
-					A[u * n + k] -= A_uj * A[i * n + k];
-				}
-				//Now A[u,j] will be 0, since A[u,j] - A[i,j] * A[u,j] = A[u,j] - 1 * A[u,j] = 0.
-			}
-			i++;
-		}
-		j++;
-	}
+                    A[u * n + k] -= A_uj * A[i * n + k];
+                }
+                //Now A[u,j] will be 0, since A[u,j] - A[i,j] * A[u,j] = A[u,j] - 1 * A[u,j] = 0.
+            }
+            i++;
+        }
+        j++;
+    }
 
-	//back substitution
-	for(int i = m-2; i >= 0; i--)
+    //back substitution
+    for(int i = m - 2; i >= 0; i--)
     {
-		for(int j = i+1; j < n-1; j++)
+        for(int j = i + 1; j < n - 1; j++)
         {
-			A[i * n + m] -= A[i * n + j] * A[j * n + m];
-		}
-	}
-} 
+            A[i * n + m] -= A[i * n + j] * A[j * n + m];
+        }
+    }
+}
 
 int get_trusted_four_points(ORBList* matched_keypoints, point_t src[4], point_t dst[4])
 {
@@ -236,7 +236,7 @@ int get_trusted_four_points(ORBList* matched_keypoints, point_t src[4], point_t 
         return -1;
     }
 
-    for(Node* point = matched_keypoints->start; point != NULL; point = point->next){
+    for(Node* point = matched_keypoints->start; point != NULL; point = point->next) {
         orb_matched_point_t* keypoints = (orb_matched_point_t*)point->data;
         center.col += keypoints->col1;
         center.row += keypoints->row1;
@@ -246,20 +246,20 @@ int get_trusted_four_points(ORBList* matched_keypoints, point_t src[4], point_t 
     center.row = center.row / matched_keypoints->length;
 
     int subx, suby, dist;
-    int max_dist_lt= 0;
-    int max_dist_rt= 0;
-    int max_dist_lb= 0;
-    int max_dist_rb= 0;
+    int max_dist_lt = 0;
+    int max_dist_rt = 0;
+    int max_dist_lb = 0;
+    int max_dist_rb = 0;
     bool found_lt, found_rt, found_lb, found_rb;
 
     found_lt = found_rt = found_lb = found_rb = false;
-    for(Node* point = matched_keypoints->start; point != NULL; point = point->next){
+    for(Node* point = matched_keypoints->start; point != NULL; point = point->next) {
         orb_matched_point_t* keypoints = (orb_matched_point_t*)point->data;
         if (keypoints->col1 < center.col &&
-            keypoints->row1 < center.row) {
+                keypoints->row1 < center.row) {
             subx = keypoints->col1 - center.col;
             suby = keypoints->row1 - center.row;
-            dist = subx*subx + suby*suby;
+            dist = subx * subx + suby * suby;
             if (dist > max_dist_lt) {
                 found_lt = true;
                 max_dist_lt = dist;
@@ -271,10 +271,10 @@ int get_trusted_four_points(ORBList* matched_keypoints, point_t src[4], point_t 
         }
 
         if (keypoints->col1 > center.col &&
-            keypoints->row1 < center.row) {
+                keypoints->row1 < center.row) {
             subx = keypoints->col1 - center.col;
             suby = keypoints->row1 - center.row;
-            dist = subx*subx + suby*suby;
+            dist = subx * subx + suby * suby;
             if (dist > max_dist_rt) {
                 found_rt = true;
                 max_dist_rt = dist;
@@ -286,10 +286,10 @@ int get_trusted_four_points(ORBList* matched_keypoints, point_t src[4], point_t 
         }
 
         if (keypoints->col1 < center.col &&
-            keypoints->row1 > center.row) {
+                keypoints->row1 > center.row) {
             subx = keypoints->col1 - center.col;
             suby = keypoints->row1 - center.row;
-            dist = subx*subx + suby*suby;
+            dist = subx * subx + suby * suby;
             if (dist > max_dist_lb) {
                 found_lb = true;
                 max_dist_lb = dist;
@@ -301,10 +301,10 @@ int get_trusted_four_points(ORBList* matched_keypoints, point_t src[4], point_t 
         }
 
         if (keypoints->col1 > center.col &&
-            keypoints->row1 > center.row) {
+                keypoints->row1 > center.row) {
             subx = keypoints->col1 - center.col;
             suby = keypoints->row1 - center.row;
-            dist = subx*subx + suby*suby;
+            dist = subx * subx + suby * suby;
             if (dist > max_dist_rb) {
                 found_rb = true;
                 max_dist_rb = dist;
@@ -334,50 +334,51 @@ int find_homography_by_four_points(ORBList* matched_keypoints, double homography
         return -1;
     }
 
-	// create the equation system to be solved
-	// src and dst must implement [] operator for point access
-	//
-	// from: Multiple View Geometry in Computer Vision 2ed
-	//       Hartley R. and Zisserman A.
-	//
-	// x' = xH
-	// where H is the homography: a 3 by 3 matrix
-	// that transformed to inhomogeneous coordinates for each point
-	// gives the following equations for each point:
-	//
-	// x' * (h31*x + h32*y + h33) = h11*x + h12*y + h13
-	// y' * (h31*x + h32*y + h33) = h21*x + h22*y + h23
-	//
-	// as the homography is scale independent we can let h33 be 1 (indeed any of the terms)
-	// so for 4 points we have 8 equations for 8 terms to solve: h11 - h32
-	// after ordering the terms it gives the following matrix
-	// that can be solved with gaussian elimination:
+    // create the equation system to be solved
+    // src and dst must implement [] operator for point access
+    //
+    // from: Multiple View Geometry in Computer Vision 2ed
+    //       Hartley R. and Zisserman A.
+    //
+    // x' = xH
+    // where H is the homography: a 3 by 3 matrix
+    // that transformed to inhomogeneous coordinates for each point
+    // gives the following equations for each point:
+    //
+    // x' * (h31*x + h32*y + h33) = h11*x + h12*y + h13
+    // y' * (h31*x + h32*y + h33) = h21*x + h22*y + h23
+    //
+    // as the homography is scale independent we can let h33 be 1 (indeed any of the terms)
+    // so for 4 points we have 8 equations for 8 terms to solve: h11 - h32
+    // after ordering the terms it gives the following matrix
+    // that can be solved with gaussian elimination:
 
-	double P[8][9]=
+    double P[8][9] =
     {
-		{-src[0].col, -src[0].row, -1,   0,   0,  0, src[0].col * dst[0].col, src[0].row * dst[0].col, -dst[0].col }, // h11
-		{  0,   0,  0, -src[0].col, -src[0].row, -1, src[0].col * dst[0].row, src[0].row * dst[0].row, -dst[0].row }, // h12
+        {-src[0].col, -src[0].row, -1,   0,   0,  0, src[0].col * dst[0].col, src[0].row * dst[0].col, -dst[0].col }, // h11
+        {  0,   0,  0, -src[0].col, -src[0].row, -1, src[0].col * dst[0].row, src[0].row * dst[0].row, -dst[0].row }, // h12
 
-		{-src[1].col, -src[1].row, -1,   0,   0,  0, src[1].col * dst[1].col, src[1].row * dst[1].col, -dst[1].col }, // h13
-		{  0,   0,  0, -src[1].col, -src[1].row, -1, src[1].col * dst[1].row, src[1].row * dst[1].row, -dst[1].row }, // h21
+        {-src[1].col, -src[1].row, -1,   0,   0,  0, src[1].col * dst[1].col, src[1].row * dst[1].col, -dst[1].col }, // h13
+        {  0,   0,  0, -src[1].col, -src[1].row, -1, src[1].col * dst[1].row, src[1].row * dst[1].row, -dst[1].row }, // h21
 
-		{-src[2].col, -src[2].row, -1,   0,   0,  0, src[2].col * dst[2].col, src[2].row * dst[2].col, -dst[2].col }, // h22
-		{  0,   0,  0, -src[2].col, -src[2].row, -1, src[2].col * dst[2].row, src[2].row * dst[2].row, -dst[2].row }, // h23
+        {-src[2].col, -src[2].row, -1,   0,   0,  0, src[2].col * dst[2].col, src[2].row * dst[2].col, -dst[2].col }, // h22
+        {  0,   0,  0, -src[2].col, -src[2].row, -1, src[2].col * dst[2].row, src[2].row * dst[2].row, -dst[2].row }, // h23
 
-		{-src[3].col, -src[3].row, -1,   0,   0,  0, src[3].col * dst[3].col, src[3].row * dst[3].col, -dst[3].col }, // h31
-		{  0,   0,  0, -src[3].col, -src[3].row, -1, src[3].col * dst[3].row, src[3].row * dst[3].row, -dst[3].row }, // h32
-	};
+        {-src[3].col, -src[3].row, -1,   0,   0,  0, src[3].col * dst[3].col, src[3].row * dst[3].col, -dst[3].col }, // h31
+        {  0,   0,  0, -src[3].col, -src[3].row, -1, src[3].col * dst[3].row, src[3].row * dst[3].row, -dst[3].row }, // h32
+    };
 
-	gaussian_elimination((&P[0][0]), 9);
+    gaussian_elimination((&P[0][0]), 9);
 
-	// gaussian elimination gives the results of the equation system
-	// in the last column of the original matrix.
-	// opengl needs the transposed 4x4 matrix:
-    double aux_H[]={ P[0][8], P[1][8], P[2][8],	// h11  h21 0 h31
-                    P[3][8], P[4][8], P[5][8],	// h12  h22 0 h32
-                    P[6][8], P[7][8], 1};		// h13  h23 0 h33
+    // gaussian elimination gives the results of the equation system
+    // in the last column of the original matrix.
+    // opengl needs the transposed 4x4 matrix:
+    double aux_H[] = { P[0][8], P[1][8], P[2][8], // h11  h21 0 h31
+                       P[3][8], P[4][8], P[5][8],  // h12  h22 0 h32
+                       P[6][8], P[7][8], 1
+                     };       // h13  h23 0 h33
 
-	for(int i = 0; i < 3; i++)
+    for(int i = 0; i < 3; i++)
     {
         for(int j = 0; j < 3; j++)
         {
@@ -399,17 +400,17 @@ void get_affine_matrix(double m[3][5], int dim, double affineM[9]) {
         strcat(res, str1);
         for(int i = 0; i < dim; i++) {
             char str2[128];
-            sprintf(str2, "x%d * %f + ", i, m[i][j+dim+1]);
+            sprintf(str2, "x%d * %f + ", i, m[i][j + dim + 1]);
             strcat(res, str2);
 
-            affineM[index] = m[i][j+dim+1];
+            affineM[index] = m[i][j + dim + 1];
             index++;
         }
         char str3[128];
-        sprintf(str3, "%f\n",m[dim][j+dim+1]);
+        sprintf(str3, "%f\n", m[dim][j + dim + 1]);
         strcat(res, str3);
 
-        affineM[index] = m[dim][j+dim+1];
+        affineM[index] = m[dim][j + dim + 1];
         index++;
     }
 
@@ -422,12 +423,12 @@ void get_affine_matrix(double m[3][5], int dim, double affineM[9]) {
 bool gauss_jordan(double m[3][5], int length, int dim) {
     int h = length;
     int w = dim;
-/*
-    LOGV_ORB("gauss1: \n[[%f, %f, %f, %f, %f]\n[%f, %f, %f, %f, %f]\n[%f, %f, %f, %f, %f]]\n",
-        m[0][0], m[0][1], m[0][2], m[0][3], m[0][4],
-        m[1][0], m[1][1], m[1][2], m[1][3], m[1][4],
-        m[2][0], m[2][1], m[2][2], m[2][3], m[2][4]);
-*/
+    /*
+        LOGV_ORB("gauss1: \n[[%f, %f, %f, %f, %f]\n[%f, %f, %f, %f, %f]\n[%f, %f, %f, %f, %f]]\n",
+            m[0][0], m[0][1], m[0][2], m[0][3], m[0][4],
+            m[1][0], m[1][1], m[1][2], m[1][3], m[1][4],
+            m[2][0], m[2][1], m[2][2], m[2][3], m[2][4]);
+    */
     for(int y = 0; y < h; y++) {
         int maxrow = y;
         for(int y2 = y + 1; y2 < h; y2++) {
@@ -441,7 +442,7 @@ bool gauss_jordan(double m[3][5], int length, int dim) {
             for(int i = 0; i < w; i++) {
                 double temp = m[y][i];
                 m[y][i] = m[maxrow][i];
-                 m[maxrow][i] = temp;
+                m[maxrow][i] = temp;
             }
         }
 
@@ -457,10 +458,10 @@ bool gauss_jordan(double m[3][5], int length, int dim) {
         }
     }
 
-    for(int y = h-1; y > -1; y--) {
+    for(int y = h - 1; y > -1; y--) {
         double c = m[y][y];
         for(int y2 = 0; y2 < y; y2++) {
-            for(int x = w-1; x > y-1; x--) {
+            for(int x = w - 1; x > y - 1; x--) {
                 m[y2][x] -= m[y][x] * m[y2][y] / c;
             }
         }
@@ -490,12 +491,12 @@ int affine_fit(double fpt[][2], double tpt[][2], int length, int dim, double aff
         }
     }
 
-	// dim+1 x dim+1
+    // dim+1 x dim+1
     double Q[3][3] = {0};
     for(int k = 0; k < length; k++) {
         double qt[3] = {fpt[k][0], fpt[k][1], 1};
-        for(int i = 0; i < (dim+1); i++) {
-            for(int j = 0; j < (dim+1); j++) {
+        for(int i = 0; i < (dim + 1); i++) {
+            for(int j = 0; j < (dim + 1); j++) {
                 Q[i][j] += qt[i] * qt[j];
             }
         }
@@ -510,7 +511,7 @@ int affine_fit(double fpt[][2], double tpt[][2], int length, int dim, double aff
 
     for(int i = 0; i < 3; i++) {
         for(int j = 3; j < 5; j++) {
-            M[i][j] = c[i][j-3];
+            M[i][j] = c[i][j - 3];
         }
     }
 
@@ -522,21 +523,21 @@ int affine_fit(double fpt[][2], double tpt[][2], int length, int dim, double aff
 
 int elimate_affine_transform(ORBList* matched_keypoints, double homography[9])
 {
-	int ret = 0;
-	int i = 0, j = 0, k = 0;
+    int ret = 0;
+    int i = 0, j = 0, k = 0;
 
-	if (matched_keypoints->length < 3) {
-		LOGE_ORB("matched keypoints num(%d) not enough", matched_keypoints->length);
+    if (matched_keypoints->length < 3) {
+        LOGE_ORB("matched keypoints num(%d) not enough", matched_keypoints->length);
         k = 0;
         for(Node* point = matched_keypoints->start; point != NULL; point = point->next) {
             orb_matched_point_t* keypoint = (orb_matched_point_t*)point->data;
             LOGE_AORB("<%d>-[%d - %d]-[%d - %d]",
-                keypoint->score,
-                keypoint->col1, keypoint->row1,
-                keypoint->col2, keypoint->row2);
+                      keypoint->score,
+                      keypoint->col1, keypoint->row1,
+                      keypoint->col2, keypoint->row2);
             k++;
         }
-		return -1;
+        return -1;
     }
 
     int max, M0, count = 0;
@@ -553,7 +554,7 @@ int elimate_affine_transform(ORBList* matched_keypoints, double homography[9])
     }
 
     double (*from_pts)[2];
-	from_pts = (double (*)[2])malloc(sizeof(double) * length * 2);
+    from_pts = (double (*)[2])malloc(sizeof(double) * length * 2);
 
     double (*to_pts)[2];
     to_pts = (double (*)[2])malloc(sizeof(double) * length * 2);
@@ -561,12 +562,12 @@ int elimate_affine_transform(ORBList* matched_keypoints, double homography[9])
 
     LOGD_ORB("matched points:");
     //work_begin();
-	for(Node* point = matched_keypoints->start; point != NULL; point = point->next) {
+    for(Node* point = matched_keypoints->start; point != NULL; point = point->next) {
         orb_matched_point_t* keypoint = (orb_matched_point_t*)point->data;
 
         subX = (keypoint->col1 - keypoint->col2);
         subY = (keypoint->row1 - keypoint->row2);
-        distanceArray[i] = subX*subX + subY*subY;
+        distanceArray[i] = subX * subX + subY * subY;
         distanceSortedArray[i] = distanceArray[i];
         distanceAvg += distanceArray[i];
         i++;
@@ -587,7 +588,7 @@ int elimate_affine_transform(ORBList* matched_keypoints, double homography[9])
 
     //find mode
     for (k = 0, j = 0; k < matched_keypoints->length - 1; k++) {
-        if (distanceSortedArray[k] == distanceSortedArray[k+1]) {
+        if (distanceSortedArray[k] == distanceSortedArray[k + 1]) {
             M0_stats[0][j] = distanceSortedArray[k];
             if (M0_stats[1][j] == -1) {
                 M0_stats[1][j] = 2;
@@ -602,7 +603,7 @@ int elimate_affine_transform(ORBList* matched_keypoints, double homography[9])
             j++;
 
             if (k == matched_keypoints->length - 2) {
-                M0_stats[0][j] = distanceSortedArray[k+1];
+                M0_stats[0][j] = distanceSortedArray[k + 1];
                 M0_stats[1][j] = 1;
             }
         }
@@ -630,7 +631,7 @@ int elimate_affine_transform(ORBList* matched_keypoints, double homography[9])
     LOGE_AORB("mesured distance: %d, count: %d", distance, max);
 
     for (k = 0; k < matched_keypoints->length; k++) {
-        if (abs(distanceArray[k] - distance) > distance*10) {
+        if (abs(distanceArray[k] - distance) > distance * 10) {
             distanceArray[k] = -1;
         }
     }
@@ -640,7 +641,7 @@ int elimate_affine_transform(ORBList* matched_keypoints, double homography[9])
 
     i = 0;
     k = 0;
-	for(Node* point = matched_keypoints->start; point != NULL && i < maxLength; point = point->next) {
+    for(Node* point = matched_keypoints->start; point != NULL && i < maxLength; point = point->next) {
         orb_matched_point_t* keypoint = (orb_matched_point_t*)point->data;
 
         if (distanceArray[k] == -1) {
@@ -648,34 +649,34 @@ int elimate_affine_transform(ORBList* matched_keypoints, double homography[9])
             continue;
         }
 
-		from_pts[i][0] = keypoint->col1;
-		from_pts[i][1] = keypoint->row1;
-		to_pts[i][0] = keypoint->col2;
-		to_pts[i][1] = keypoint->row2;
+        from_pts[i][0] = keypoint->col1;
+        from_pts[i][1] = keypoint->row1;
+        to_pts[i][0] = keypoint->col2;
+        to_pts[i][1] = keypoint->row2;
         i++;
         k++;
     }
 
-	if (i < 3) {
+    if (i < 3) {
         k = 0;
         for(Node* point = matched_keypoints->start; point != NULL; point = point->next) {
             orb_matched_point_t* keypoint = (orb_matched_point_t*)point->data;
             LOGE_AORB("<%d>-[%d - %d]-[%d - %d]-<%d>",
-                keypoint->score,
-                keypoint->col1, keypoint->row1,
-                keypoint->col2, keypoint->row2,
-                distanceArray[k]);
+                      keypoint->score,
+                      keypoint->col1, keypoint->row1,
+                      keypoint->col2, keypoint->row2,
+                      distanceArray[k]);
             k++;
         }
-		LOGE_ORB("valid matched keypoints %d less than 6", i);
-		return -2;
+        LOGE_ORB("valid matched keypoints %d less than 6", i);
+        return -2;
     }
 
     ret = affine_fit(from_pts, to_pts, i, 2, homography);
     //work_end("calc-affine");
 
-	free(from_pts);
-	free(to_pts);
+    free(from_pts);
+    free(to_pts);
     free(distanceArray);
     free(distanceSortedArray);
     free(M0_stats);
@@ -688,9 +689,9 @@ void map_point(double mat[9], point_t* point_src, point_t* point_dst)
     // P[0], P[1], P[2],
     // P[3], P[4], P[5],
     // P[6], P[7], P[8]
-    double D = point_src->col*mat[6] + point_src->row*mat[7] + mat[8];
-    point_dst->col = (point_src->col*mat[0] + point_src->row*mat[1] + mat[2]) / D;
-    point_dst->row = (point_src->col*mat[3] + point_src->row*mat[4] + mat[5]) / D;
+    double D = point_src->col * mat[6] + point_src->row * mat[7] + mat[8];
+    point_dst->col = (point_src->col * mat[0] + point_src->row * mat[1] + mat[2]) / D;
+    point_dst->row = (point_src->col * mat[3] + point_src->row * mat[4] + mat[5]) / D;
 
 }
 

@@ -14,13 +14,13 @@
 
 XCamReturn
 rk_aiq_uapi_accm_SetAttrib(RkAiqAlgoContext *ctx,
-                          rk_aiq_ccm_attrib_t attr,
-                          bool need_sync);
+                           rk_aiq_ccm_attrib_t attr,
+                           bool need_sync);
 XCamReturn
 rk_aiq_uapi_accm_GetAttrib(const RkAiqAlgoContext *ctx,
-                          rk_aiq_ccm_attrib_t *attr);
+                           rk_aiq_ccm_attrib_t *attr);
 XCamReturn
 rk_aiq_uapi_accm_QueryCcmInfo(const RkAiqAlgoContext *ctx,
-                          rk_aiq_ccm_querry_info_t *ccm_querry_info );
+                              rk_aiq_ccm_querry_info_t *ccm_querry_info );
 
 #endif

@@ -31,18 +31,18 @@ RKAIQ_BEGIN_DECLARE
 
 typedef struct RKAiqAgammaHtmlConfig_s
 {
-   
+
     int gamma_en;
-	int gamma_out_mode; //0:log segment ; 1:equal segment ;
+    int gamma_out_mode; //0:log segment ; 1:equal segment ;
     int gamma_out_segnum ;
 
-	int gamma_out_offset;
+    int gamma_out_offset;
 
-	int gamma_nomal[45];
-	int gamma_hdr[45];
-	int gamma_night[45];
-	int gamma_user1[45];
-	int gamma_user2[45];
+    int gamma_nomal[45];
+    int gamma_hdr[45];
+    int gamma_night[45];
+    int gamma_user1[45];
+    int gamma_user2[45];
 
 
 
@@ -52,13 +52,13 @@ typedef struct RKAiqAgammaHtmlConfig_s
 
 typedef struct RKAiqAgammaHtmlConfig_Select_s {
 
-	int gamma_en;
-	int gamma_out_mode; //0:log segment ; 1:equal segment ;
+    int gamma_en;
+    int gamma_out_mode; //0:log segment ; 1:equal segment ;
     int gamma_out_segnum ;
 
-	int gamma_out_offset;
+    int gamma_out_offset;
 
-	int gamma_table[45];
+    int gamma_table[45];
 }  RKAiqAgammaHtmlConfig_Select_t;
 
 enum {
@@ -70,30 +70,30 @@ enum {
     GAMMA_OUT_NORMAL = 0,
     GAMMA_OUT_HDR = 1,
     GAMMA_OUT_NIGHT = 2,
-   GAMMA_OUT_USR1 = 3,
+    GAMMA_OUT_USR1 = 3,
     GAMMA_OUT_USR2 = 4
 };
 
 typedef struct agamma_sw_info_s {
     float wokemode;
-    
+
 } agamma_sw_info_t;
 
 
 
 typedef struct rk_aiq_lsc_mgamma_attrib_s {
     int gamma_en;
-	int gamma_out_mode; //0:log segment ; 1:equal segment ;
+    int gamma_out_mode; //0:log segment ; 1:equal segment ;
     int gamma_out_segnum ;
 
-	int gamma_out_offset;
+    int gamma_out_offset;
 
-	int gamma_table[45];
-    
+    int gamma_table[45];
+
 
 } rk_aiq_gamma_mgamma_attrib_t;
 
-typedef enum rk_aiq_gamma_op_mode_s{
+typedef enum rk_aiq_gamma_op_mode_s {
     RK_AIQ_GAMMA_MODE_INVALID                     = 0,        /**< initialization value */
     RK_AIQ_GAMMA_MODE_MANUAL                      = 1,        /**< run manual lens shading correction */
     RK_AIQ_GAMMA_MODE_AUTO                        = 2,        /**< run auto lens shading correction */
@@ -101,12 +101,12 @@ typedef enum rk_aiq_gamma_op_mode_s{
 } rk_aiq_gamma_op_mode_t;
 
 
-typedef struct rk_aiq_gamma_attrib_s{
+typedef struct rk_aiq_gamma_attrib_s {
     bool byPass;
     rk_aiq_gamma_op_mode_t mode;
     rk_aiq_gamma_mgamma_attrib_t stManual;
 
-}rk_aiq_gamma_attrib_t;
+} rk_aiq_gamma_attrib_t;
 
 RKAIQ_END_DECLARE
 

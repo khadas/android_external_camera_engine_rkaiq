@@ -50,25 +50,45 @@ hid_t get_hdf5_type()
 }
 
 template<>
-hid_t get_hdf5_type<char>() { return H5T_NATIVE_CHAR; }
+hid_t get_hdf5_type<char>() {
+    return H5T_NATIVE_CHAR;
+}
 template<>
-hid_t get_hdf5_type<unsigned char>() { return H5T_NATIVE_UCHAR; }
+hid_t get_hdf5_type<unsigned char>() {
+    return H5T_NATIVE_UCHAR;
+}
 template<>
-hid_t get_hdf5_type<short int>() { return H5T_NATIVE_SHORT; }
+hid_t get_hdf5_type<short int>() {
+    return H5T_NATIVE_SHORT;
+}
 template<>
-hid_t get_hdf5_type<unsigned short int>() { return H5T_NATIVE_USHORT; }
+hid_t get_hdf5_type<unsigned short int>() {
+    return H5T_NATIVE_USHORT;
+}
 template<>
-hid_t get_hdf5_type<int>() { return H5T_NATIVE_INT; }
+hid_t get_hdf5_type<int>() {
+    return H5T_NATIVE_INT;
+}
 template<>
-hid_t get_hdf5_type<unsigned int>() { return H5T_NATIVE_UINT; }
+hid_t get_hdf5_type<unsigned int>() {
+    return H5T_NATIVE_UINT;
+}
 template<>
-hid_t get_hdf5_type<long>() { return H5T_NATIVE_LONG; }
+hid_t get_hdf5_type<long>() {
+    return H5T_NATIVE_LONG;
+}
 template<>
-hid_t get_hdf5_type<unsigned long>() { return H5T_NATIVE_ULONG; }
+hid_t get_hdf5_type<unsigned long>() {
+    return H5T_NATIVE_ULONG;
+}
 template<>
-hid_t get_hdf5_type<float>() { return H5T_NATIVE_FLOAT; }
+hid_t get_hdf5_type<float>() {
+    return H5T_NATIVE_FLOAT;
+}
 template<>
-hid_t get_hdf5_type<double>() { return H5T_NATIVE_DOUBLE; }
+hid_t get_hdf5_type<double>() {
+    return H5T_NATIVE_DOUBLE;
+}
 }
 
 
@@ -90,7 +110,7 @@ void save_to_file(const cvflann::Matrix<T>& dataset, const String& filename, con
     if (file_id < 0) {
         file_id = H5Fcreate(filename.c_str(), H5F_ACC_EXCL, H5P_DEFAULT, H5P_DEFAULT);
     }
-    CHECK_ERROR(file_id,"Error creating hdf5 file.");
+    CHECK_ERROR(file_id, "Error creating hdf5 file.");
 
     hsize_t     dimsf[2];              // dataset dimensions
     dimsf[0] = dataset.rows;
@@ -106,14 +126,14 @@ void save_to_file(const cvflann::Matrix<T>& dataset, const String& filename, con
     dataset_id = H5Dcreate(file_id, name.c_str(), get_hdf5_type<T>(), space_id, H5P_DEFAULT);
 #endif
 
-    if (dataset_id<0) {
+    if (dataset_id < 0) {
 #if H5Dopen_vers == 2
         dataset_id = H5Dopen2(file_id, name.c_str(), H5P_DEFAULT);
 #else
         dataset_id = H5Dopen(file_id, name.c_str());
 #endif
     }
-    CHECK_ERROR(dataset_id,"Error creating or opening dataset in file.");
+    CHECK_ERROR(dataset_id, "Error creating or opening dataset in file.");
 
     status = H5Dwrite(dataset_id, get_hdf5_type<T>(), memspace_id, space_id, H5P_DEFAULT, dataset.data );
     CHECK_ERROR(status, "Error writing to dataset");
@@ -131,7 +151,7 @@ void load_from_file(cvflann::Matrix<T>& dataset, const String& filename, const S
 {
     herr_t status;
     hid_t file_id = H5Fopen(filename.c_str(), H5F_ACC_RDWR, H5P_DEFAULT);
-    CHECK_ERROR(file_id,"Error opening hdf5 file.");
+    CHECK_ERROR(file_id, "Error opening hdf5 file.");
 
     hid_t dataset_id;
 #if H5Dopen_vers == 2
@@ -139,7 +159,7 @@ void load_from_file(cvflann::Matrix<T>& dataset, const String& filename, const S
 #else
     dataset_id = H5Dopen(file_id, name.c_str());
 #endif
-    CHECK_ERROR(dataset_id,"Error opening dataset in file.");
+    CHECK_ERROR(dataset_id, "Error opening dataset in file.");
 
     hid_t space_id = H5Dget_space(dataset_id);
 
@@ -182,7 +202,7 @@ void load_from_file(cvflann::Matrix<T>& dataset, const String& filename, const S
     hid_t plist_id = H5Pcreate(H5P_FILE_ACCESS);
     H5Pset_fapl_mpio(plist_id, comm, info);
     hid_t file_id = H5Fopen(filename.c_str(), H5F_ACC_RDWR, plist_id);
-    CHECK_ERROR(file_id,"Error opening hdf5 file.");
+    CHECK_ERROR(file_id, "Error opening hdf5 file.");
     H5Pclose(plist_id);
     hid_t dataset_id;
 #if H5Dopen_vers == 2
@@ -190,7 +210,7 @@ void load_from_file(cvflann::Matrix<T>& dataset, const String& filename, const S
 #else
     dataset_id = H5Dopen(file_id, name.c_str());
 #endif
-    CHECK_ERROR(dataset_id,"Error opening dataset in file.");
+    CHECK_ERROR(dataset_id, "Error opening dataset in file.");
 
     hid_t space_id = H5Dget_space(dataset_id);
     hsize_t dims[2];
@@ -199,21 +219,21 @@ void load_from_file(cvflann::Matrix<T>& dataset, const String& filename, const S
     hsize_t count[2];
     hsize_t offset[2];
 
-    hsize_t item_cnt = dims[0]/mpi_size+(dims[0]%mpi_size==0 ? 0 : 1);
-    hsize_t cnt = (mpi_rank<mpi_size-1 ? item_cnt : dims[0]-item_cnt*(mpi_size-1));
+    hsize_t item_cnt = dims[0] / mpi_size + (dims[0] % mpi_size == 0 ? 0 : 1);
+    hsize_t cnt = (mpi_rank < mpi_size - 1 ? item_cnt : dims[0] - item_cnt * (mpi_size - 1));
 
     count[0] = cnt;
     count[1] = dims[1];
-    offset[0] = mpi_rank*item_cnt;
+    offset[0] = mpi_rank * item_cnt;
     offset[1] = 0;
 
-    hid_t memspace_id = H5Screate_simple(2,count,NULL);
+    hid_t memspace_id = H5Screate_simple(2, count, NULL);
 
     H5Sselect_hyperslab(space_id, H5S_SELECT_SET, offset, NULL, count, NULL);
 
     dataset.rows = count[0];
     dataset.cols = count[1];
-    dataset.data = new T[dataset.rows*dataset.cols];
+    dataset.data = new T[dataset.rows * dataset.cols];
 
     plist_id = H5Pcreate(H5P_DATASET_XFER);
     H5Pset_dxpl_mpio(plist_id, H5FD_MPIO_COLLECTIVE);

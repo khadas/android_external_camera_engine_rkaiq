@@ -32,176 +32,177 @@ static RkAiqAlgoContext ctx;
 static XCamReturn
 create_context(RkAiqAlgoContext **context, const AlgoCtxInstanceCfg* cfg)
 {
-	 
-	XCamReturn result = XCAM_RETURN_NO_ERROR;
-	AlgoCtxInstanceCfgInt *cfgInt = (AlgoCtxInstanceCfgInt*)cfg;
-	LOGI_ASHARP("%s: (enter)\n", __FUNCTION__ );
-	 
+
+    XCamReturn result = XCAM_RETURN_NO_ERROR;
+    AlgoCtxInstanceCfgInt *cfgInt = (AlgoCtxInstanceCfgInt*)cfg;
+    LOGI_ASHARP("%s: (enter)\n", __FUNCTION__ );
+
 #if 1
-	AsharpContext_t* pAsharpCtx = NULL;
+    AsharpContext_t* pAsharpCtx = NULL;
     AsharpResult_t ret = AsharpInit(&pAsharpCtx, cfgInt->calib);
-	if(ret != ASHARP_RET_SUCCESS){
-		result = XCAM_RETURN_ERROR_FAILED;
-		LOGE_ASHARP("%s: Initializaion Asharp failed (%d)\n", __FUNCTION__, ret);
-	}else{
-		*context = (RkAiqAlgoContext *)(pAsharpCtx);
-	}
+    if(ret != ASHARP_RET_SUCCESS) {
+        result = XCAM_RETURN_ERROR_FAILED;
+        LOGE_ASHARP("%s: Initializaion Asharp failed (%d)\n", __FUNCTION__, ret);
+    } else {
+        *context = (RkAiqAlgoContext *)(pAsharpCtx);
+    }
 #endif
 
-	LOGI_ASHARP("%s: (exit)\n", __FUNCTION__ );
-	return result;
+    LOGI_ASHARP("%s: (exit)\n", __FUNCTION__ );
+    return result;
 }
 
 static XCamReturn
 destroy_context(RkAiqAlgoContext *context)
-{	
-	XCamReturn result = XCAM_RETURN_NO_ERROR;
-	
-	LOGI_ASHARP("%s: (enter)\n", __FUNCTION__ );
-	
+{
+    XCamReturn result = XCAM_RETURN_NO_ERROR;
+
+    LOGI_ASHARP("%s: (enter)\n", __FUNCTION__ );
+
 #if 1
-	AsharpContext_t* pAsharpCtx = (AsharpContext_t*)context;
+    AsharpContext_t* pAsharpCtx = (AsharpContext_t*)context;
     AsharpResult_t ret = AsharpRelease(pAsharpCtx);
-	if(ret != ASHARP_RET_SUCCESS){
-		result = XCAM_RETURN_ERROR_FAILED;
-		LOGE_ASHARP("%s: release Asharp failed (%d)\n", __FUNCTION__, ret);
-	}
+    if(ret != ASHARP_RET_SUCCESS) {
+        result = XCAM_RETURN_ERROR_FAILED;
+        LOGE_ASHARP("%s: release Asharp failed (%d)\n", __FUNCTION__, ret);
+    }
 #endif
 
-	LOGI_ASHARP("%s: (exit)\n", __FUNCTION__ );
+    LOGI_ASHARP("%s: (exit)\n", __FUNCTION__ );
     return result;
 }
 
 static XCamReturn
 prepare(RkAiqAlgoCom* params)
 {
-	XCamReturn result = XCAM_RETURN_NO_ERROR;
+    XCamReturn result = XCAM_RETURN_NO_ERROR;
 
-	LOGI_ASHARP("%s: (enter)\n", __FUNCTION__ );
-	
+    LOGI_ASHARP("%s: (enter)\n", __FUNCTION__ );
+
 #if 1
     AsharpContext_t* pAsharpCtx = (AsharpContext_t *)params->ctx;
     RkAiqAlgoConfigAsharpInt* pCfgParam = (RkAiqAlgoConfigAsharpInt*)params;
-	
-	AsharpResult_t ret = AsharpPrepare(pAsharpCtx, &pCfgParam->stAsharpConfig);
-	if(ret != ASHARP_RET_SUCCESS){
-		result = XCAM_RETURN_ERROR_FAILED;
-		LOGE_ASHARP("%s: config Asharp failed (%d)\n", __FUNCTION__, ret);
-	}
-	
+
+    AsharpResult_t ret = AsharpPrepare(pAsharpCtx, &pCfgParam->stAsharpConfig);
+    if(ret != ASHARP_RET_SUCCESS) {
+        result = XCAM_RETURN_ERROR_FAILED;
+        LOGE_ASHARP("%s: config Asharp failed (%d)\n", __FUNCTION__, ret);
+    }
+
 #endif
 
-	LOGI_ASHARP("%s: (exit)\n", __FUNCTION__ );
+    LOGI_ASHARP("%s: (exit)\n", __FUNCTION__ );
     return result;
 }
 
 static XCamReturn
 pre_process(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outparams)
 {
-	XCamReturn result = XCAM_RETURN_NO_ERROR;
-	static int framecnt = 0;
+    XCamReturn result = XCAM_RETURN_NO_ERROR;
+    static int framecnt = 0;
 
-	LOGI_ASHARP("%s: (enter)\n", __FUNCTION__ );
-	
-	//nothing todo now
+    LOGI_ASHARP("%s: (enter)\n", __FUNCTION__ );
 
-	LOGI_ASHARP("%s: (exit)\n", __FUNCTION__ );
+    //nothing todo now
+
+    LOGI_ASHARP("%s: (exit)\n", __FUNCTION__ );
     return result;
 }
 
 static XCamReturn
 processing(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outparams)
 {
-	XCamReturn result = XCAM_RETURN_NO_ERROR;
+    XCamReturn result = XCAM_RETURN_NO_ERROR;
 
-	LOGI_ASHARP("%s: (enter)\n", __FUNCTION__ );
-	
+    LOGI_ASHARP("%s: (enter)\n", __FUNCTION__ );
+
 #if 1
-	RkAiqAlgoProcAsharpInt* pAsharpProcParams = (RkAiqAlgoProcAsharpInt*)inparams;
-	RkAiqAlgoProcResAsharpInt* pAsharpProcResParams = (RkAiqAlgoProcResAsharpInt*)outparams;
-	AsharpContext_t* pAsharpCtx = (AsharpContext_t *)inparams->ctx;
-	AsharpExpInfo_t stExpInfo;
-	memset(&stExpInfo, 0x00, sizeof(AsharpExpInfo_t));
+    RkAiqAlgoProcAsharpInt* pAsharpProcParams = (RkAiqAlgoProcAsharpInt*)inparams;
+    RkAiqAlgoProcResAsharpInt* pAsharpProcResParams = (RkAiqAlgoProcResAsharpInt*)outparams;
+    AsharpContext_t* pAsharpCtx = (AsharpContext_t *)inparams->ctx;
+    AsharpExpInfo_t stExpInfo;
+    memset(&stExpInfo, 0x00, sizeof(AsharpExpInfo_t));
 
-	LOGD_ASHARP("%s:%d init:%d hdr mode:%d  \n", 
-		__FUNCTION__, __LINE__, 
-		inparams->u.proc.init, 
-		pAsharpProcParams->hdr_mode);
+    LOGD_ASHARP("%s:%d init:%d hdr mode:%d  \n",
+                __FUNCTION__, __LINE__,
+                inparams->u.proc.init,
+                pAsharpProcParams->hdr_mode);
 
-	stExpInfo.hdr_mode = 0; //pAnrProcParams->hdr_mode;
-	for(int i=0; i<3; i++){
-		stExpInfo.arIso[i] = 50;
-		stExpInfo.arAGain[i] = 1.0;
-		stExpInfo.arDGain[i] = 1.0;
-		stExpInfo.arTime[i] = 0.01;
-	}	
+    stExpInfo.hdr_mode = 0; //pAnrProcParams->hdr_mode;
+    for(int i = 0; i < 3; i++) {
+        stExpInfo.arIso[i] = 50;
+        stExpInfo.arAGain[i] = 1.0;
+        stExpInfo.arDGain[i] = 1.0;
+        stExpInfo.arTime[i] = 0.01;
+    }
 
-	if(pAsharpProcParams->hdr_mode == RK_AIQ_WORKING_MODE_NORMAL){
-			stExpInfo.hdr_mode = 0;
-	}else if(pAsharpProcParams->hdr_mode == RK_AIQ_ISP_HDR_MODE_2_FRAME_HDR 
-		|| pAsharpProcParams->hdr_mode == RK_AIQ_ISP_HDR_MODE_2_LINE_HDR ){
-		stExpInfo.hdr_mode = 1; 
-	}else if(pAsharpProcParams->hdr_mode == RK_AIQ_ISP_HDR_MODE_3_FRAME_HDR 
-		|| pAsharpProcParams->hdr_mode == RK_AIQ_ISP_HDR_MODE_3_LINE_HDR ){
-		stExpInfo.hdr_mode = 2;
-	}
-			
-	
-	#if 1
-	RkAiqAlgoPreResAeInt* pAEPreRes =
-    	(RkAiqAlgoPreResAeInt*)(pAsharpProcParams->rk_com.u.proc.pre_res_comb->ae_pre_res);
+    if(pAsharpProcParams->hdr_mode == RK_AIQ_WORKING_MODE_NORMAL) {
+        stExpInfo.hdr_mode = 0;
+    } else if(pAsharpProcParams->hdr_mode == RK_AIQ_ISP_HDR_MODE_2_FRAME_HDR
+              || pAsharpProcParams->hdr_mode == RK_AIQ_ISP_HDR_MODE_2_LINE_HDR ) {
+        stExpInfo.hdr_mode = 1;
+    } else if(pAsharpProcParams->hdr_mode == RK_AIQ_ISP_HDR_MODE_3_FRAME_HDR
+              || pAsharpProcParams->hdr_mode == RK_AIQ_ISP_HDR_MODE_3_LINE_HDR ) {
+        stExpInfo.hdr_mode = 2;
+    }
+	stExpInfo.snr_mode = 0;		
 
-	if(pAEPreRes != NULL){
-		if(pAsharpProcParams->hdr_mode == RK_AIQ_WORKING_MODE_NORMAL){
-			stExpInfo.hdr_mode = 0;
-			stExpInfo.arAGain[0] = pAEPreRes->ae_pre_res_rk.LinearExp.exp_real_params.analog_gain;
-			stExpInfo.arDGain[0] = pAEPreRes->ae_pre_res_rk.LinearExp.exp_real_params.digital_gain;
-			stExpInfo.arTime[0] = pAEPreRes->ae_pre_res_rk.LinearExp.exp_real_params.integration_time;
-			stExpInfo.arIso[0] = stExpInfo.arAGain[0]* 50;
-		}else{
-			for(int i=0; i<3; i++){				
-				stExpInfo.arAGain[i] = pAEPreRes->ae_pre_res_rk.HdrExp[i].exp_real_params.analog_gain;
-				stExpInfo.arDGain[i] = pAEPreRes->ae_pre_res_rk.HdrExp[i].exp_real_params.digital_gain;
-				stExpInfo.arTime[i] = pAEPreRes->ae_pre_res_rk.HdrExp[i].exp_real_params.integration_time;
-				stExpInfo.arIso[i] = stExpInfo.arAGain[i] * stExpInfo.arDGain[i] * 50;
+#if 1
+    RkAiqAlgoPreResAeInt* pAEPreRes =
+        (RkAiqAlgoPreResAeInt*)(pAsharpProcParams->rk_com.u.proc.pre_res_comb->ae_pre_res);
 
-				LOGD_ASHARP("%s:%d index:%d again:%f dgain:%f time:%f iso:%d hdr_mode:%d\n",
-					__FUNCTION__, __LINE__,
-					i,
-					stExpInfo.arAGain[i],
-					stExpInfo.arDGain[i],
-					stExpInfo.arTime[i],
-					stExpInfo.arIso[i],
-					stExpInfo.hdr_mode);
-			}				
-		}
-	}else{
-		LOGE_ASHARP("%s:%d pAEPreRes is NULL, so use default instead \n", __FUNCTION__, __LINE__);
-	}		
-	#endif
-	
-	AsharpResult_t ret = AsharpProcess(pAsharpCtx, &stExpInfo);
-	if(ret != ASHARP_RET_SUCCESS){
-		result = XCAM_RETURN_ERROR_FAILED;
-		LOGE_ASHARP("%s: processing Asharp failed (%d)\n", __FUNCTION__, ret);
-	}
+    if(pAEPreRes != NULL) {
+	stExpInfo.snr_mode = pAEPreRes->ae_pre_res_rk.CISFeature.SNR;
+        if(pAsharpProcParams->hdr_mode == RK_AIQ_WORKING_MODE_NORMAL) {
+            stExpInfo.hdr_mode = 0;
+            stExpInfo.arAGain[0] = pAEPreRes->ae_pre_res_rk.LinearExp.exp_real_params.analog_gain;
+            stExpInfo.arDGain[0] = pAEPreRes->ae_pre_res_rk.LinearExp.exp_real_params.digital_gain;
+            stExpInfo.arTime[0] = pAEPreRes->ae_pre_res_rk.LinearExp.exp_real_params.integration_time;
+            stExpInfo.arIso[0] = stExpInfo.arAGain[0] * 50;
+        } else {
+            for(int i = 0; i < 3; i++) {
+                stExpInfo.arAGain[i] = pAEPreRes->ae_pre_res_rk.HdrExp[i].exp_real_params.analog_gain;
+                stExpInfo.arDGain[i] = pAEPreRes->ae_pre_res_rk.HdrExp[i].exp_real_params.digital_gain;
+                stExpInfo.arTime[i] = pAEPreRes->ae_pre_res_rk.HdrExp[i].exp_real_params.integration_time;
+                stExpInfo.arIso[i] = stExpInfo.arAGain[i] * stExpInfo.arDGain[i] * 50;
 
-	AsharpGetProcResult(pAsharpCtx, &pAsharpProcResParams->stAsharpProcResult);	
+                LOGD_ASHARP("%s:%d index:%d again:%f dgain:%f time:%f iso:%d hdr_mode:%d\n",
+                            __FUNCTION__, __LINE__,
+                            i,
+                            stExpInfo.arAGain[i],
+                            stExpInfo.arDGain[i],
+                            stExpInfo.arTime[i],
+                            stExpInfo.arIso[i],
+                            stExpInfo.hdr_mode);
+            }
+        }
+    } else {
+        LOGE_ASHARP("%s:%d pAEPreRes is NULL, so use default instead \n", __FUNCTION__, __LINE__);
+    }
 #endif
 
-	LOGI_ASHARP("%s: (exit)\n", __FUNCTION__ );
+    AsharpResult_t ret = AsharpProcess(pAsharpCtx, &stExpInfo);
+    if(ret != ASHARP_RET_SUCCESS) {
+        result = XCAM_RETURN_ERROR_FAILED;
+        LOGE_ASHARP("%s: processing Asharp failed (%d)\n", __FUNCTION__, ret);
+    }
+
+    AsharpGetProcResult(pAsharpCtx, &pAsharpProcResParams->stAsharpProcResult);
+#endif
+
+    LOGI_ASHARP("%s: (exit)\n", __FUNCTION__ );
     return XCAM_RETURN_NO_ERROR;
 }
 
 static XCamReturn
 post_process(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outparams)
 {
-	LOGI_ASHARP("%s: (enter)\n", __FUNCTION__ );
-	
-	//nothing todo now
+    LOGI_ASHARP("%s: (enter)\n", __FUNCTION__ );
 
-	LOGI_ASHARP("%s: (exit)\n", __FUNCTION__ );
-    return XCAM_RETURN_NO_ERROR;	
+    //nothing todo now
+
+    LOGI_ASHARP("%s: (exit)\n", __FUNCTION__ );
+    return XCAM_RETURN_NO_ERROR;
 }
 
 RkAiqAlgoDescription g_RkIspAlgoDescAsharp = {

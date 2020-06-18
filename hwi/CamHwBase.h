@@ -61,6 +61,8 @@ public:
     virtual XCamReturn poll_buffer_ready (SmartPtr<VideoBuffer> &buf, int type);
     virtual XCamReturn poll_buffer_failed (int64_t timestamp, const char *msg);
     virtual XCamReturn setIrcutParams(bool on);
+    virtual XCamReturn notify_capture_raw() { return  XCAM_RETURN_ERROR_FAILED;}
+    virtual XCamReturn capture_raw_ctl(bool sync) { return  XCAM_RETURN_ERROR_FAILED;}
 
 protected:
     SmartPtr<V4l2Device> mIsppStatsDev;
@@ -75,6 +77,7 @@ protected:
     SmartPtr<PollThread> mPollthread;
     SmartPtr<PollThread> mPollLumathread;
     SmartPtr<PollThread> mPollIsppthread;
+    SmartPtr<Thread> mOfflineRdThread;
     IsppStatsListener* mIsppStatsListener;
     IspLumaListener* mIspLumaListener;
     IspStatsListener* mIspStatsLintener;

@@ -128,6 +128,7 @@ set (HWI_SRC
         hwi/isp20/Isp20PollThread.cpp
         hwi/isp20/Isp20StatsBuffer.cpp
         hwi/isp20/Isp20_module_dbg.cpp
+        hwi/isp20/Isp20OfflineFrmRead.cpp
         hwi/SensorHw.cpp
         hwi/LensHw.cpp
         )

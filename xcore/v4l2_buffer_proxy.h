@@ -79,6 +79,14 @@ public:
         return _expbuf_fd;
     }
 
+    void set_expbuf_usrptr(uintptr_t ptr) {
+        _expbuf_usrptr = ptr;
+    }
+
+    uintptr_t get_expbuf_usrptr () {
+        return _expbuf_usrptr;
+    }
+
     void reset () {
         xcam_mem_clear (_buf.timestamp);
         xcam_mem_clear (_buf.timecode);
@@ -103,6 +111,7 @@ private:
     struct v4l2_format  _format;
     int _length;
     int _expbuf_fd;
+    uintptr_t _expbuf_usrptr;
     std::atomic<char> _queued;
 };
 
@@ -134,7 +143,7 @@ public:
 
     uintptr_t get_v4l2_userptr () {
         if (V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE == get_v4l2_buf().type ||
-            V4L2_BUF_TYPE_VIDEO_OUTPUT_MPLANE == get_v4l2_buf().type)
+                V4L2_BUF_TYPE_VIDEO_OUTPUT_MPLANE == get_v4l2_buf().type)
             return get_v4l2_buf().m.planes[0].m.userptr;
         else
             return get_v4l2_buf().m.userptr;

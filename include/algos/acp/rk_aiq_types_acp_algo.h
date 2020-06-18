@@ -18,7 +18,7 @@
  */
 
 #ifndef _RK_AIQ_TYPES_ACP_ALGO_H_
-#define _RK_AIQ_TYPES_ACP_ALGO_H_ 
+#define _RK_AIQ_TYPES_ACP_ALGO_H_
 
 typedef struct rk_aiq_ranges_s {
     float min;

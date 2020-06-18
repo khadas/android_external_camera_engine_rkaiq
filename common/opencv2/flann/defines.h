@@ -39,16 +39,16 @@
 #endif
 #ifdef _WIN32
 /* win32 dll export/import directives */
- #ifdef FLANN_EXPORTS
-  #define FLANN_EXPORT __declspec(dllexport)
- #elif defined(FLANN_STATIC)
-  #define FLANN_EXPORT
- #else
-  #define FLANN_EXPORT __declspec(dllimport)
- #endif
+#ifdef FLANN_EXPORTS
+#define FLANN_EXPORT __declspec(dllexport)
+#elif defined(FLANN_STATIC)
+#define FLANN_EXPORT
+#else
+#define FLANN_EXPORT __declspec(dllimport)
+#endif
 #else
 /* unix needs nothing */
- #define FLANN_EXPORT
+#define FLANN_EXPORT
 #endif
 
 

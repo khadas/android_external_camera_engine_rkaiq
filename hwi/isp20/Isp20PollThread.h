@@ -37,10 +37,10 @@ namespace RkCam {
  * @bpp: bits per pixel
  */
 struct capture_fmt {
-        u32 fourcc;
-        u8 bayer_fmt;
-        u8 pcpp;
-        u8 bpp[VIDEO_MAX_PLANES];
+    u32 fourcc;
+    u8 bayer_fmt;
+    u8 pcpp;
+    u8 bpp[VIDEO_MAX_PLANES];
 };
 
 class Isp20PollThread
@@ -62,6 +62,7 @@ public:
     XCamReturn notify_capture_raw();
     // should be called befor start
     void set_working_mode(int mode);
+    void set_loop_status(bool stat);
     XCamReturn capture_raw_ctl(bool sync);
     virtual XCamReturn start();
     virtual XCamReturn stop ();
@@ -107,6 +108,7 @@ private:
     Mutex _mipi_buf_mutex;
     Mutex _mipi_trigger_mutex;
     bool _first_trigger;
+    bool _loop_vain;
 private:
     XCAM_DEAD_COPY(Isp20PollThread);
     SmartPtr<SensorHw> _event_handle_dev;
@@ -126,18 +128,18 @@ private:
     bool _is_raw_sync_yuv;
 
     int calculate_stride_per_line(const struct capture_fmt& fmt,
-				  uint32_t& bytesPerLine);
+                                  uint32_t& bytesPerLine);
     const struct capture_fmt* find_fmt(const uint32_t pixelformat);
     XCamReturn creat_raw_dir(const char* path);
     XCamReturn write_frame_header_to_raw(FILE* fp,
-		    int dev_index, int sequence);
+                                         int dev_index, int sequence);
     XCamReturn write_raw_to_file(FILE* fp, int dev_index,
-		    int sequence, void* userptr, int size);
+                                 int sequence, void* userptr, int size);
     void write_reg_to_file(uint32_t base_addr, uint32_t offset_addr,
-		    int len, int sequence);
+                           int len, int sequence);
     void write_metadata_to_file(const char* dir_path, int frame_id,
-		    SmartPtr<RkAiqIspParamsProxy>& ispParams,
-		    SmartPtr<RkAiqExpParamsProxy>& expParams);
+                                SmartPtr<RkAiqIspParamsProxy>& ispParams,
+                                SmartPtr<RkAiqExpParamsProxy>& expParams);
     bool get_value_from_file(const char* path, int& value, uint32_t& frameId);
     bool set_value_to_file(const char* path, int value, uint32_t sequence = 0);
 };

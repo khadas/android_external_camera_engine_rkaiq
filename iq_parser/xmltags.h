@@ -5,17 +5,17 @@
  * transcribed, or translated into any language or computer format, in any form
  * or by any means without written permission of:
  * Fuzhou Rockchip Electronics Co.Ltd .
- * 
+ *
  *
  *****************************************************************************/
 /**
  * @file xmltags.h
  *
  *****************************************************************************/
- #ifndef __XMLTAGS_H__
- #define __XMLTAGS_H__
+#ifndef __XMLTAGS_H__
+#define __XMLTAGS_H__
 
- #include "tinyxml2.h"
+#include "tinyxml2.h"
 
 using namespace tinyxml2;
 /******************************************************************************
@@ -37,9 +37,9 @@ public:
 
     XmlTag( const XMLElement *e );
 
-	int Size();
-	int SizeRow();
-	int SizeCol();
+    int Size();
+    int SizeRow();
+    int SizeCol();
     const char* Value();
     unsigned int ValueToUInt( bool *ok );
 
