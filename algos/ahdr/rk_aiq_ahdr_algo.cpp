@@ -451,12 +451,77 @@ void AhdrApiOffUpdate
         pAhdrCtx->CurrHandleData.CurrDynamicRange = LIMIT_VALUE(pAhdrCtx->CurrHandleData.CurrDynamicRange, DYNAMICRANGEMAX, DYNAMICRANGEMIN);
         pAhdrCtx->CurrHandleData.CurrTmoHandleData.TmoContrast = GetCurrPara(pAhdrCtx->CurrHandleData.CurrDynamicRange,
                 pAhdrCtx->AhdrConfig.tmo_para.Contrast.DynamicRange,
-                pAhdrCtx->AhdrConfig.tmo_para.Contrast.TmoContrast);}
+                pAhdrCtx->AhdrConfig.tmo_para.Contrast.TmoContrast);
 
-    
-   
-   
-   
+    }
+    else if(TmoContrast_mode == 1)
+    {
+        pAhdrCtx->CurrHandleData.CurrTmoHandleData.TmoContrast = GetCurrPara(pAhdrCtx->CurrHandleData.CurrEnvLv,
+                pAhdrCtx->AhdrConfig.tmo_para.Contrast.EnvLv,
+                pAhdrCtx->AhdrConfig.tmo_para.Contrast.TmoContrast);
+    }
+
+    //get Current tmo DetailsHighLight
+    int DetailsHighLight_mode = (int)pAhdrCtx->AhdrConfig.tmo_para.DtsHiLit.DetailsHighLightMode;
+    if(DetailsHighLight_mode == 0)
+    {
+        pAhdrCtx->CurrHandleData.CurrOEPdf = pAhdrCtx->CurrAeResult.OEPdf;
+        pAhdrCtx->CurrHandleData.CurrOEPdf = LIMIT_VALUE(pAhdrCtx->CurrHandleData.CurrOEPdf, OEPDFMAX, OEPDFMIN);
+        pAhdrCtx->CurrHandleData.CurrTmoHandleData.DetailsHighLight = GetCurrPara(pAhdrCtx->CurrHandleData.CurrOEPdf,
+                pAhdrCtx->AhdrConfig.tmo_para.DtsHiLit.OEPdf,
+                pAhdrCtx->AhdrConfig.tmo_para.DtsHiLit.DetailsHighLight);
+    }
+    else if(DetailsHighLight_mode == 1)
+    {
+        pAhdrCtx->CurrHandleData.CurrTmoHandleData.DetailsHighLight = GetCurrPara(pAhdrCtx->CurrHandleData.CurrEnvLv,
+                pAhdrCtx->AhdrConfig.tmo_para.DtsHiLit.EnvLv,
+                pAhdrCtx->AhdrConfig.tmo_para.DtsHiLit.DetailsHighLight);
+    }
+
+    //get Current tmo DetailsLowLight
+    int DetailsLowLight_mode = (int)pAhdrCtx->AhdrConfig.tmo_para.DtsLoLit.DetailsLowLightMode;
+    if (DetailsLowLight_mode == 0)
+    {
+#if 0
+        int focs = pAhdrCtx->CurrAfResult.CurrAfTargetPos;
+        int focs_width = pAhdrCtx->CurrAfResult.CurrAfTargetWidth / (pAhdrCtx->width / 15);
+        int focs_height = pAhdrCtx->CurrAfResult.CurrAfTargetHeight / (pAhdrCtx->height / 15);
+        float focs_luma = 0;
+        for(int i = 0; i < focs_height; i++)
+            for(int j = 0; j < focs_width; j++)
+                focs_luma += pAhdrCtx->CurrAeResult.BlockLumaL[focs + i + 15 * j];
+        focs_luma = focs_luma / (focs_width * focs_height);
+        pAhdrCtx->CurrHandleData.CurrTotalFocusLuma = focs_luma / 15;
+        pAhdrCtx->CurrHandleData.CurrTotalFocusLuma = LIMIT_VALUE(pAhdrCtx->CurrHandleData.CurrTotalFocusLuma, FOCUSLUMAMAX, FOCUSLUMAMIN);
+        pAhdrCtx->CurrHandleData.CurrTmoHandleData.DetailsLowLight = GetCurrPara(pAhdrCtx->CurrHandleData.CurrTotalFocusLuma,
+                pAhdrCtx->AhdrConfig.tmo_para.DtsLoLit.FocusLuma,
+                pAhdrCtx->AhdrConfig.tmo_para.DtsLoLit.DetailsLowLight);
+
+#endif
+        pAhdrCtx->CurrHandleData.CurrTmoHandleData.DetailsLowLight = pAhdrCtx->AhdrConfig.tmo_para.DtsLoLit.DetailsLowLight[0];
+
+    }
+    else if (DetailsLowLight_mode == 1)
+    {
+        pAhdrCtx->CurrHandleData.CurrDarkPdf = pAhdrCtx->CurrAeResult.DarkPdf;
+        pAhdrCtx->CurrHandleData.CurrDarkPdf = LIMIT_VALUE(pAhdrCtx->CurrHandleData.CurrDarkPdf, 0.5, 0);
+        pAhdrCtx->CurrHandleData.CurrTmoHandleData.DetailsLowLight = GetCurrPara(pAhdrCtx->CurrHandleData.CurrDarkPdf,
+                pAhdrCtx->AhdrConfig.tmo_para.DtsLoLit.DarkPdf,
+                pAhdrCtx->AhdrConfig.tmo_para.DtsLoLit.DetailsLowLight);
+    }
+    else if (DetailsLowLight_mode == 2)
+    {
+        pAhdrCtx->CurrHandleData.CurrISO = pAhdrCtx->CurrAeResult.ISO;
+        pAhdrCtx->CurrHandleData.CurrISO = LIMIT_VALUE(pAhdrCtx->CurrHandleData.CurrISO, ISOMAX, ISOMIN);
+        pAhdrCtx->CurrHandleData.CurrTmoHandleData.DetailsLowLight = GetCurrPara(pAhdrCtx->CurrHandleData.CurrISO,
+                pAhdrCtx->AhdrConfig.tmo_para.DtsLoLit.ISO,
+                pAhdrCtx->AhdrConfig.tmo_para.DtsLoLit.DetailsLowLight);
+    }
+
+    pAhdrCtx->CurrHandleData.CurrTmoHandleData.clipgap0 = pAhdrCtx->AhdrConfig.tmo_para.More.clipgap0;
+    pAhdrCtx->CurrHandleData.CurrTmoHandleData.clipgap1 = pAhdrCtx->AhdrConfig.tmo_para.More.clipgap1;
+    pAhdrCtx->CurrHandleData.CurrTmoHandleData.clipratio0 = pAhdrCtx->AhdrConfig.tmo_para.More.clipratio0;
+    pAhdrCtx->CurrHandleData.CurrTmoHandleData.clipratio1 = pAhdrCtx->AhdrConfig.tmo_para.More.clipratio1;
 
     //get Current tmo TmoDamp
     pAhdrCtx->CurrHandleData.TmoDamp = pAhdrCtx->AhdrConfig.tmo_para.More.damp;
