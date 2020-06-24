@@ -34,7 +34,13 @@ CamHwIsp20::CamHwIsp20()
     , _state(CAM_HW_STATE_INVALID)
     , _hdr_mode(0)
     , _ispp_module_init_ens(0)
-{}
+{
+    mNormalNoReadBack = false;
+    char* valueStr = getenv("normal_no_read_back");
+    if (valueStr) {
+        mNormalNoReadBack = atoi(valueStr) > 0 ? true : false;
+    }
+}
 
 CamHwIsp20::~CamHwIsp20()
 {}
@@ -815,8 +821,14 @@ CamHwIsp20::prepare(uint32_t width, uint32_t height, int mode, int t_delay, int 
 
     _hdr_mode = mode;
 
-    /* if (_hdr_mode != RK_AIQ_WORKING_MODE_NORMAL) */
-    setupHdrLink(_hdr_mode, 0, true);
+    if (_hdr_mode != RK_AIQ_WORKING_MODE_NORMAL) {
+        setupHdrLink(_hdr_mode, 0, true);
+    } else {
+        if (mNormalNoReadBack)
+            setupHdrLink(_hdr_mode, 0, false);
+        else
+            setupHdrLink(_hdr_mode, 0, true);
+    }
 
     Isp20Params::set_working_mode(_hdr_mode);
 
@@ -826,9 +838,12 @@ CamHwIsp20::prepare(uint32_t width, uint32_t height, int mode, int t_delay, int 
     isp20Pollthread = mPollthread.dynamic_cast_ptr<Isp20PollThread>();
     isp20Pollthread->set_working_mode(mode);
     // TODO: may start devices in start() ?
-    ret = isp20Pollthread->hdr_mipi_start(sensorHw);
-    if (ret < 0) {
-        LOGE_CAMHW("hdr mipi start err: %d\n", ret);
+    if ((_hdr_mode != RK_AIQ_WORKING_MODE_NORMAL) ||
+        (_hdr_mode == RK_AIQ_WORKING_MODE_NORMAL && !mNormalNoReadBack)) {
+        ret = isp20Pollthread->hdr_mipi_start(sensorHw);
+        if (ret < 0) {
+            LOGE_CAMHW("hdr mipi start err: %d\n", ret);
+        }
     }
 
     ret = mIspLumaDev->start();
@@ -885,9 +900,12 @@ CamHwIsp20::start()
 
     // restart if in stop state
     if (_state == CAM_HW_STATE_STOPED) {
-        ret = isp20Pollthread->hdr_mipi_start(sensorHw);
-        if (ret < 0) {
-            LOGE_CAMHW("hdr mipi start err: %d\n", ret);
+        if ((_hdr_mode != RK_AIQ_WORKING_MODE_NORMAL) ||
+            (_hdr_mode == RK_AIQ_WORKING_MODE_NORMAL && !mNormalNoReadBack)) {
+            ret = isp20Pollthread->hdr_mipi_start(sensorHw);
+            if (ret < 0) {
+                LOGE_CAMHW("hdr mipi start err: %d\n", ret);
+            }
         }
 
         ret = mIspLumaDev->start();
@@ -987,9 +1005,12 @@ XCamReturn CamHwIsp20::stop()
         LOGE_CAMHW("stop isp params dev err: %d\n", ret);
     }
 
-    ret = isp20Pollthread->hdr_mipi_stop();
-    if (ret < 0) {
-        LOGE_CAMHW("hdr mipi stop err: %d\n", ret);
+    if ((_hdr_mode != RK_AIQ_WORKING_MODE_NORMAL) ||
+        (_hdr_mode == RK_AIQ_WORKING_MODE_NORMAL && !mNormalNoReadBack)) {
+        ret = isp20Pollthread->hdr_mipi_stop();
+        if (ret < 0) {
+            LOGE_CAMHW("hdr mipi stop err: %d\n", ret);
+        }
     }
 
 #ifndef DISABLE_PP
@@ -1004,7 +1025,7 @@ XCamReturn CamHwIsp20::stop()
         LOGE_CAMHW("stop ispp params dev err: %d\n", ret);
     }
 #endif
-    /* if (_hdr_mode != RK_AIQ_WORKING_MODE_NORMAL) */
+
     setupHdrLink(_hdr_mode, 0, false);
 
     _state = CAM_HW_STATE_STOPED;
@@ -1102,12 +1123,25 @@ CamHwIsp20::overrideExpRatioToAiqResults(const sint32_t frameId,
         float curLgmax = 12 + log(curRatioLS) / log(2);
         float lgmin = 0;
 
+        if( aiq_results->data()->ahdr_proc_res.LongFrameMode == true)
+        {
+            nextRatioLS = 1;
+            nextRatioLM = 1;
+            curRatioLS = 1;
+            nextLgmax = 12 + log(nextRatioLS) / log(2);
+            curLgmax = 12 + log(curRatioLS) / log(2);
+            lgmin = 0;
+        }
+
         //tmo
         // shadow resgister,needs to set a frame before, for ctrl_cfg/lg_scl reg
         aiq_results->data()->ahdr_proc_res.TmoProcRes.sw_hdrtmo_expl_lgratio = \
                 (int)(2048 * (log(curLExpo / nextLExpo) / log(2)));
-        aiq_results->data()->ahdr_proc_res.TmoProcRes.sw_hdrtmo_lgscl_ratio = \
-                (int)(128 * (log(nextRatioLS) / log(curRatioLS)));
+        if( aiq_results->data()->ahdr_proc_res.LongFrameMode == true)
+            aiq_results->data()->ahdr_proc_res.TmoProcRes.sw_hdrtmo_lgscl_ratio = 128;
+        else
+            aiq_results->data()->ahdr_proc_res.TmoProcRes.sw_hdrtmo_lgscl_ratio = \
+                    (int)(128 * (log(nextRatioLS) / log(curRatioLS)));
         aiq_results->data()->ahdr_proc_res.TmoProcRes.sw_hdrtmo_lgscl = (int)(4096 * 16 / nextLgmax);
         aiq_results->data()->ahdr_proc_res.TmoProcRes.sw_hdrtmo_lgscl_inv = (int)(4096 * nextLgmax / 16);
 
@@ -1542,8 +1576,9 @@ CamHwIsp20::setIspParams(SmartPtr<RkAiqIspParamsProxy>& ispParams)
         _first = false;
     }
 
-    /* if (RK_AIQ_HDR_GET_WORKING_MODE(_hdr_mode) == RK_AIQ_WORKING_MODE_NORMAL) */
-    /*     setIspParamsSync(ispParams->data()->frame_id); */
+    if (RK_AIQ_HDR_GET_WORKING_MODE(_hdr_mode) == RK_AIQ_WORKING_MODE_NORMAL &&
+        mNormalNoReadBack)
+        setIspParamsSync(ispParams->data()->frame_id);
 
     EXIT_CAMHW_FUNCTION();
     return ret;
@@ -1574,8 +1609,9 @@ CamHwIsp20::setIsppParams(SmartPtr<RkAiqIsppParamsProxy>& isppParams)
         setIsppParamsSync(isppParams->data()->frame_id);
     }
 
-    /* if (RK_AIQ_HDR_GET_WORKING_MODE(_hdr_mode) == RK_AIQ_WORKING_MODE_NORMAL) */
-    /*     setIspParamsSync(ispParams->data()->frame_id); */
+    if (RK_AIQ_HDR_GET_WORKING_MODE(_hdr_mode) == RK_AIQ_WORKING_MODE_NORMAL &&
+        mNormalNoReadBack)
+        setIsppParamsSync(isppParams->data()->frame_id);
 
     EXIT_CAMHW_FUNCTION();
     return ret;

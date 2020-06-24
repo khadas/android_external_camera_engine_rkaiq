@@ -96,8 +96,14 @@
  * - update DPCC setting in GC4C33 IQ
  * - format the source codes
  * - add hsnr & lsnr control from AE pre results
+ * v0.1.9
+ * - tnr disable/enable controlled by iq xml
+ * - GC4C33 iq v1.0.c 
+ * - ae v0.1.3
+ * - add env variable normal_no_read_back
+ * - fix ahdr bug in v0.1.8
  */
 
-#define RK_AIQ_VERSION "v0.1.8"
-#define RK_AIQ_RELEASE_DATE "2020-06-18"
+#define RK_AIQ_VERSION "v0.1.9"
+#define RK_AIQ_RELEASE_DATE "2020-06-24"
 #endif

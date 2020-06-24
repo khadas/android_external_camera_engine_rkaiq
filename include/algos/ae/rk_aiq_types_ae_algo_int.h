@@ -69,7 +69,6 @@
 /*****************************************************************************/
 #define ECM_TFLICKER_50HZ (1.0/100.0)                                  //!< predefined flicker period value for ECM module
 #define ECM_TFLICKER_60HZ (1.0/120.0)                                  //!< predefined flicker period value for ECM module
-#define ECM_TFLICKER_OFF   ((ECM_TFLICKER_50HZ+ECM_TFLICKER_60HZ)/2)  //!< predefined flicker period value for ECM module
 #define ECM_DOT_NO         (6)
 
 /*****************************************************************************/
@@ -433,10 +432,12 @@ typedef struct AecProcResult_s {
     uint8_t                       FillLightMode;
 
     /*AE interpolation results to make ae more smooth*/
-    RkAiqExpParamComb_t           InterpLinAe[MAX_AEC_EFFECT_FNUM];
-    RkAiqExpParamComb_t           InterpHdrAe[MAX_AEC_EFFECT_FNUM][MAX_HDR_FRAMENUM];
+    //RkAiqExpParamComb_t           InterpLinAe[MAX_AEC_EFFECT_FNUM];
+    //RkAiqExpParamComb_t           InterpHdrAe[MAX_AEC_EFFECT_FNUM][MAX_HDR_FRAMENUM];
 
-    RkAiqExpParam_t               exp_set_tbl[MAX_AEC_EFFECT_FNUM];
+    RKAiqAecExpInfo_t             InterpExp[MAX_AEC_EFFECT_FNUM];
+
+    RKAiqAecExpInfo_t             exp_set_tbl[MAX_AEC_EFFECT_FNUM];
     int                           exp_set_cnt;
 
     /***LinearAe results****/
@@ -458,6 +459,7 @@ typedef struct AecProcResult_s {
     float                         overHistPercent;
 
     /***Hdr results****/
+    bool                          LongFrmMode;
     float                         HdrMeanLuma[3];
     float                         HdrLumaDeviation[MAX_HDR_FRAMENUM];
 

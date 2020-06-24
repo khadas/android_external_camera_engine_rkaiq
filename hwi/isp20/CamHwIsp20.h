@@ -183,6 +183,7 @@ private:
     void dumpYnrFixValue(struct rkispp_nr_config  * pNrCfg);
     void dumpSharpFixValue(struct rkispp_sharp_config  * pSharpCfg);
     uint32_t _isp_module_ens;
+    bool mNormalNoReadBack;
 };
 
 };

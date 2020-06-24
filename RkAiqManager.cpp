@@ -349,7 +349,7 @@ RkAiqManager::applyAnalyzerResult(SmartPtr<RkAiqFullParamsProxy>& results)
         int cnt = aiqParams->mIspParams->data()->frame_id ;
         if (aiqParams->mExposureParams->data()->algo_id == 0) {
             aiqParams->mExposureParams->data()->exp_tbl_size = 1;
-            RkAiqExpParam_t* exp_tbl = &aiqParams->mExposureParams->data()->exp_tbl[0];
+            RKAiqAecExpInfo_t* exp_tbl = &aiqParams->mExposureParams->data()->exp_tbl[0];
             if(cnt % 40 <= 19) {
                 exp_tbl->HdrExp[2].exp_sensor_params.coarse_integration_time = 984;
                 exp_tbl->HdrExp[2].exp_sensor_params.analog_gain_code_global = 48;

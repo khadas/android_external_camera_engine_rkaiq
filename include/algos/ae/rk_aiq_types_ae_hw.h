@@ -138,6 +138,8 @@ struct sihst_cfg {
    RawAE3 = RawAE big1, addr=0x4400, extra aebig <=> RawHIST3
 */
 typedef struct rk_aiq_ae_meas_params_s {
+    bool   ae_meas_en;
+    bool   ae_meas_update;
     struct rawaelite_meas_cfg rawae0;
     struct rawaebig_meas_cfg rawae1;
     struct rawaebig_meas_cfg rawae2;
@@ -146,6 +148,8 @@ typedef struct rk_aiq_ae_meas_params_s {
 } rk_aiq_ae_meas_params_t;
 
 typedef struct rk_aiq_hist_meas_params_s {
+    bool   hist_meas_en;
+    bool   hist_meas_update;
     struct rawhistlite_cfg rawhist0;
     struct rawhistbig_cfg rawhist1;
     struct rawhistbig_cfg rawhist2;
@@ -236,11 +240,6 @@ typedef struct {
     RkAiqExpRealParam_t exp_real_params; //real value
     RkAiqExpSensorParam_t exp_sensor_params;//reg value
 } RkAiqExpParamComb_t;
-
-typedef struct {
-    RkAiqExpParamComb_t LinearExp;
-    RkAiqExpParamComb_t HdrExp[3];
-} RkAiqExpParam_t;
 
 typedef struct RKAiqAecExpInfo_s {
     RkAiqExpParamComb_t LinearExp;

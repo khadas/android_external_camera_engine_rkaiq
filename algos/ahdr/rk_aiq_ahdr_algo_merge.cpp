@@ -98,6 +98,10 @@ RESULT MergeGetCurrIOData
         CalibrateMDCurve(pAhdrCtx->CurrHandleData.CurrMergeHandleData.MDCurveMS_smooth,
                          pAhdrCtx->CurrHandleData.CurrMergeHandleData.MDCurveMS_offset, pAhdrCtx->AhdrProcRes.MgeProcRes.sw_hdrmge_l0_y);
     }
+	if(pAhdrCtx->SensorInfo.LongFrmMode == true) {
+        for(int i = 0; i < 17; i++)
+            pAhdrCtx->AhdrProcRes.MgeProcRes.sw_hdrmge_e_y[i] = 0;
+    }
 
     //when gainX = 1, gainX_inv = 1/gainX -1
     pAhdrCtx->AhdrProcRes.MgeProcRes.sw_hdrmge_gain0 = (int)SHIFT6BIT(pAhdrCtx->CurrHandleData.CurrL2S_Ratio);

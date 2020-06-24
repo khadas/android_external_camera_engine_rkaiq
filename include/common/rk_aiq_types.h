@@ -289,7 +289,7 @@ typedef struct {
 } rk_aiq_exposure_sensor_descriptor;
 
 // exposure
-typedef RkAiqExpParam_t rk_aiq_exposure_real_params;
+typedef RkAiqExpRealParam_t rk_aiq_exposure_real_params;
 typedef RkAiqExpSensorParam_t rk_aiq_exposure_sensor_params;
 typedef RkAiqExpParamComb_t rk_aiq_exposure_params_comb_t;
 typedef RKAiqAecExpInfo_t rk_aiq_exposure_params_t;
@@ -630,13 +630,13 @@ typedef struct {
     uint32_t module_enable_mask;
     sint32_t frame_id;
     rk_aiq_isp_aec_meas_t   aec_meas;
+    rk_aiq_isp_hist_meas_t  hist_meas;
     bool awb_cfg_update;
     rk_aiq_awb_stat_cfg_v200_t   awb_cfg_v200;
     rk_aiq_awb_stat_cfg_v201_t   awb_cfg_v201;
     bool awb_gain_update;
     rk_aiq_wb_gain_t       awb_gain;
     rk_aiq_isp_af_meas_t    af_meas;
-    rk_aiq_isp_hist_meas_t  hist_meas;
     rk_aiq_isp_blc_t        blc;
     rk_aiq_isp_dpcc_t       dpcc;
     RkAiqAhdrProcResult_t   ahdr_proc_res;//porc data for hw/simulator

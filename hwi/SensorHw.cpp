@@ -408,6 +408,7 @@ SensorHw::setExposureParams(SmartPtr<RkAiqExpParamsProxy>& expPar)
                 expPar->data()->aecExpInfo.HdrExp[0] = expPar->data()->exp_tbl[lastIdx].HdrExp[0];
                 expPar->data()->aecExpInfo.HdrExp[1] = expPar->data()->exp_tbl[lastIdx].HdrExp[1];
                 expPar->data()->aecExpInfo.HdrExp[2] = expPar->data()->exp_tbl[lastIdx].HdrExp[2];
+                expPar->data()->aecExpInfo.frame_length_lines = expPar->data()->exp_tbl[lastIdx].frame_length_lines;
             }
         }
         if (_working_mode == RK_AIQ_WORKING_MODE_NORMAL)
@@ -450,6 +451,8 @@ SensorHw::setExposureParams(SmartPtr<RkAiqExpParamsProxy>& expPar)
                     expParamsProxy->data()->aecExpInfo.HdrExp[0] = expParamsProxy->data()->exp_tbl[i].HdrExp[0];
                     expParamsProxy->data()->aecExpInfo.HdrExp[1] = expParamsProxy->data()->exp_tbl[i].HdrExp[1];
                     expParamsProxy->data()->aecExpInfo.HdrExp[2] = expParamsProxy->data()->exp_tbl[i].HdrExp[2];
+                    expParamsProxy->data()->aecExpInfo.frame_length_lines = expParamsProxy->data()->exp_tbl[i].frame_length_lines;
+
                     /* set a flag when it's fisrt elem of exp-table*/
                     _exp_list.push_back(std::make_pair(expParamsProxy, (i == 0 ? true : false)));
 
@@ -585,8 +588,8 @@ SensorHw::getSensorModeData(const char* sns_ent_name,
     sns_des.vt_pix_clk_freq_hz = sensor_desc.pixel_clock_freq_mhz/*  * 1000000 */;
     sns_des.pixel_clock_freq_mhz = sensor_desc.pixel_clock_freq_mhz/* * 1000000 */;
 
-	//add nr_switch
-	sns_des.nr_switch = sensor_desc.nr_switch;
+    //add nr_switch
+    sns_des.nr_switch = sensor_desc.nr_switch;
 
     sns_des.sensor_output_width = sensor_desc.sensor_output_width;
     sns_des.sensor_output_height = sensor_desc.sensor_output_height;
