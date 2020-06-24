@@ -239,6 +239,7 @@ typedef struct RkAiqAhdrProcResult_s
     TmoProcRes_t TmoProcRes;
     MgeProcRes_t MgeProcRes;
     hdrAttr_t hdrAttr;
+    bool LongFrameMode;
 } RkAiqAhdrProcResult_t;
 
 

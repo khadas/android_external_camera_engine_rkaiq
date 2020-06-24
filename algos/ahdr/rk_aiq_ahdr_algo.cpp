@@ -326,6 +326,46 @@ void AhdrGetStats
 
     LOG1_AHDR( "%s:exit!\n", __FUNCTION__);
 }
+void AhdrGetSensorInfo
+(
+    AhdrHandle_t     pAhdrCtx,
+    AecProcResult_t  AecHdrProcResult
+) {
+    LOGI_AHDR( "%s:enter!\n", __FUNCTION__);
+
+    pAhdrCtx->SensorInfo.LongFrmMode = AecHdrProcResult.LongFrmMode;
+
+    for(int i = 0; i < 3; i++)
+    {
+        pAhdrCtx->SensorInfo.HdrMinGain[i] = AecHdrProcResult.HdrMinGain[i];
+        pAhdrCtx->SensorInfo.HdrMaxGain[i] = AecHdrProcResult.HdrMaxGain[i];
+        pAhdrCtx->SensorInfo.HdrMinIntegrationTime[i] = AecHdrProcResult.HdrMinIntegrationTime[i];
+        pAhdrCtx->SensorInfo.HdrMaxIntegrationTime[i] = AecHdrProcResult.HdrMaxIntegrationTime[i];
+    }
+
+    if(pAhdrCtx->hdr_mode == 2)
+    {
+        pAhdrCtx->SensorInfo.MaxExpoL = pAhdrCtx->SensorInfo.HdrMaxGain[1] * pAhdrCtx->SensorInfo.HdrMaxIntegrationTime[1];
+        pAhdrCtx->SensorInfo.MinExpoL = pAhdrCtx->SensorInfo.HdrMinGain[1] * pAhdrCtx->SensorInfo.HdrMinIntegrationTime[1];
+        pAhdrCtx->SensorInfo.MaxExpoM = 0;
+        pAhdrCtx->SensorInfo.MinExpoM = 0;
+
+    }
+    else if(pAhdrCtx->hdr_mode == 3)
+    {
+        pAhdrCtx->SensorInfo.MaxExpoL = pAhdrCtx->SensorInfo.HdrMaxGain[2] * pAhdrCtx->SensorInfo.HdrMaxIntegrationTime[2];
+        pAhdrCtx->SensorInfo.MinExpoL = pAhdrCtx->SensorInfo.HdrMinGain[2] * pAhdrCtx->SensorInfo.HdrMinIntegrationTime[2];
+        pAhdrCtx->SensorInfo.MaxExpoM = pAhdrCtx->SensorInfo.HdrMaxGain[1] * pAhdrCtx->SensorInfo.HdrMaxIntegrationTime[1];
+        pAhdrCtx->SensorInfo.MinExpoM = pAhdrCtx->SensorInfo.HdrMinGain[1] * pAhdrCtx->SensorInfo.HdrMinIntegrationTime[1];
+    }
+
+
+    pAhdrCtx->SensorInfo.MaxExpoS = pAhdrCtx->SensorInfo.HdrMaxGain[0] * pAhdrCtx->SensorInfo.HdrMaxIntegrationTime[0];
+    pAhdrCtx->SensorInfo.MinExpoS = pAhdrCtx->SensorInfo.HdrMinGain[0] * pAhdrCtx->SensorInfo.HdrMinIntegrationTime[0];
+
+
+    LOGI_AHDR( "%s:exit!\n", __FUNCTION__);
+}
 
 /******************************************************************************
  * AhdrApiOffUpdate()

@@ -500,11 +500,6 @@ RkAiqCore::genIspAeResult(RkAiqFullParams* params)
     isp_param->aec_meas = ae_com->ae_meas;
     isp_param->hist_meas = ae_com->hist_meas;
 
-    LOGD_ANALYZER("%s:genIspAeResult test,rawae1.wnd_num=%d,rawae2.win,h_size=%d,rawhist2.weight0=%d", __FUNCTION__,
-                  isp_param->aec_meas.rawae1.wnd_num, isp_param->aec_meas.rawae2.win.h_size,
-                  isp_param->hist_meas.rawhist1.weight[0]);
-
-
     // gen rk ae result
     if (algo_id == 0) {
         RkAiqAlgoProcResAeInt* ae_rk = (RkAiqAlgoProcResAeInt*)ae_com;
@@ -1993,7 +1988,6 @@ RkAiqCore::convertIspstatsToAlgo(const SmartPtr<VideoBuffer> &buffer)
     for(int i = 0; i < 32; i++)
         mAlogsSharedParams.ispStats.ahdr_stats.tmo_stats.ro_array_min_max[i] = stats->params.hdrtmo.min_max[i];
 
-    // TODO: for AEC FPGA test, default setting is hdr-3frame. You can modify working_mode in IQ xml !!
     for(int i = 0; i < ISP2X_YUVAE_MEAN_NUM; i++) {
         mAlogsSharedParams.ispStats.aec_stats.ae_data.yuv.mean[i] = stats->params.yuvae.mean[i];
         if(i < ISP2X_YUVAE_SUBWIN_NUM)
@@ -2125,9 +2119,8 @@ RkAiqCore::convertIspstatsToAlgo(const SmartPtr<VideoBuffer> &buffer)
     }
 
     if (expParams.ptr()) {
-        mAlogsSharedParams.ispStats.aec_stats.ae_exp.LinearExp = expParams->data()->aecExpInfo.LinearExp;
-        memcpy(mAlogsSharedParams.ispStats.aec_stats.ae_exp.HdrExp,
-               expParams->data()->aecExpInfo.HdrExp, sizeof(expParams->data()->aecExpInfo.HdrExp));
+
+        mAlogsSharedParams.ispStats.aec_stats.ae_exp = expParams->data()->aecExpInfo;
         /*
          * printf("%s: L: [0x%x-0x%x], M: [0x%x-0x%x], S: [0x%x-0x%x]\n",
          *        __func__,

@@ -46,9 +46,6 @@ public:
     void forceOverwriteAiqIspCfg(struct isp2x_isp_params_cfg& isp_cfg, SmartPtr<RkAiqIspParamsProxy> aiq_results);
 private:
     XCAM_DEAD_COPY(Isp20Params);
-    void convertAiqLiteHstWndSize(struct isp2x_rawhistlite_cfg & hst_lite);
-    void convertAiqBigHstWndSize(struct isp2x_rawhistbig_cfg & hst_big);
-    void convertAiqSiHstWndSize(struct isp2x_sihst_cfg & sihst);
     void convertAiqAeToIsp20Params(struct isp2x_isp_params_cfg& isp_cfg,
                                    const rk_aiq_isp_aec_meas_t& aec_meas);
     void convertAiqHistToIsp20Params(struct isp2x_isp_params_cfg& isp_cfg,

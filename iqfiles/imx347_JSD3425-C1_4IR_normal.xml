@@ -825,18 +825,21 @@
       </StrategyPara>            <RemosaicPara index="1" type="struct" size="[1 1]">                        <enable index="1" type="double" size="[1 1]">                            [0]                        </enable>                        <sensorWbGain index="1" type="double" size="[1 4]">                            [1    1    1    1 ]                        </sensorWbGain>            </RemosaicPara>
       </AWB>
       <AEC index="1" type="struct" size="[1 1]">
+         <Enable index="1" type="double" size="[1 1]">
+            [1]
+         </Enable>
          <AecRunInterval index="1" type="double" size="[1 1]">            [0]         </AecRunInterval>         <AecOpType index="1" type="char" size="[1 6]">            AUTO         </AecOpType>
          <HistStatsMode index="1" type="char" size="[1 3]">            Y         </HistStatsMode>         <RawStatsMode index="1" type="char" size="[1 3]">            Y         </RawStatsMode>
          <YRangeMode index="1" type="char" size="[1 10]">            FULL         </YRangeMode>
          <AecSpeed index="1" type="struct" size="[1 1]">
            <DampOver index="1" type="double" size="[1 1]">
-              [0.45]
+              [0.25]
            </DampOver>
            <DampUnder index="1" type="double" size="[1 1]">
               [0.45]
            </DampUnder>
            <DampDark2Bright index="1" type="double" size="[1 1]">
-              [0.45]
+              [0.15]
            </DampDark2Bright>
            <DampBright2Dark index="1" type="double" size="[1 1]">
               [0.45]
@@ -852,7 +855,7 @@
          </AecDelayFrmNum>
          <AecFrameRateMode index="1" type="struct" size="[1 1]">
             <isFpsFix index="1" type="double" size="[1 1]">
-               [0]
+               [1]
             </isFpsFix>
             <FpsValue index="1" type="double" size="[1 1]">
                [0]
@@ -903,7 +906,7 @@
 		<IspDGainDot index="1" type="double" size="[1 6]">		    [1 1 1 1 1 1]		</IspDGainDot>
 		<PIrisDot index="1" type="double" size="[1 6]">		    [2.4 2.2 2.0 1.8 1.6 1.4]		</PIrisDot>                                 </cell>            </LinearAE>            <HdrAE index="1" type="cell" size="[1 2]">
 	      <cell index="1" type="struct" size="[1 1]">
-	      <name index="1" type="char" size="[1 8]">                  day               </name>	      <LTimeDot index="1" type="double" size="[1 6]">                  [0 0.03 0.03 0.03 0.03 0.04]               </LTimeDot>               <MTimeDot index="1" type="double" size="[1 6]">                  [0 0.01 0.01 0.02 0.03 0.03]               </MTimeDot>               <STimeDot index="1" type="double" size="[1 6]">                  [0 0.003 0.003 0.005 0.01 0.01]               </STimeDot>               <LGainDot index="1" type="double" size="[1 6]">                  [1 1 4 8 16 230]               </LGainDot>               <MGainDot index="1" type="double" size="[1 6]">                  [1 1 4 8 16 230]               </MGainDot>               <SGainDot index="1" type="double" size="[1 6]">                  [1 1 4 8 16 32]               </SGainDot>
+	      <name index="1" type="char" size="[1 8]">                  day               </name>	      <LTimeDot index="1" type="double" size="[1 6]">                  [0 0.03 0.03 0.03 0.03 0.04]               </LTimeDot>               <MTimeDot index="1" type="double" size="[1 6]">                  [0 0.03 0.03 0.03 0.03 0.03]               </MTimeDot>               <STimeDot index="1" type="double" size="[1 6]">                  [0 0.003 0.003 0.005 0.009 0.009]               </STimeDot>               <LGainDot index="1" type="double" size="[1 6]">                  [1 1 4 8 16 230]               </LGainDot>               <MGainDot index="1" type="double" size="[1 6]">                  [1 1 4 8 16 230]               </MGainDot>               <SGainDot index="1" type="double" size="[1 6]">                  [1 1 4 8 16 32]               </SGainDot>
 	      <LIspDGainDot index="1" type="double" size="[1 6]">                  [1 1 1 1 1 1]               </LIspDGainDot>
 	      <MIspDGainDot index="1" type="double" size="[1 6]">                  [1 1 1 1 1 1]               </MIspDGainDot>
 	      <SIspDGainDot index="1" type="double" size="[1 6]">                  [1 1 1 1 1 1]               </SIspDGainDot>	      
@@ -1013,6 +1016,9 @@
                  <LumaDistTh index="1" type="double" size="[1 1]">                    [10]                 </LumaDistTh>                 <ExpLevel index="1" type="double" size="[1 6]">                    [0 0.02 0.06 0.1 0.5 1]                 </ExpLevel>                 <NonOEPdfTh index="1" type="double" size="[1 6]">                    [0.05 0.1 0.2 0.5 0.7 1]                 </NonOEPdfTh>                 <LowLightPdfTh index="1" type="double" size="[1 6]">                    [0.20 0.20 0.22 0.25 0.3 0.35]                 </LowLightPdfTh>                 <TargetLLLuma index="1" type="double" size="[1 6]">                    [45 42 40 35 28 20]                 </TargetLLLuma>              </DarkROIMethod>           </BackLight>           <IntervalAdjustStrategy index="1" type="struct" size="[1 1]">              <Enable index="1" type="double" size="[1 1]">                 [0]              </Enable>              <dLuma_high_th index="1" type="double" size="[1 1]">                 [0.5]              </dLuma_high_th>              <dLuma_low_th index="1" type="double" size="[1 1]">                 [0.03]              </dLuma_low_th>              <adjust_trigger_frame index="1" type="double" size="[1 1]">                 [100]              </adjust_trigger_frame>           </IntervalAdjustStrategy>
            <Hist2hal index="1" type="struct" size="[1 1]">              <Enable index="1" type="double" size="[1 1]">                 [0]              </Enable>              <LowHistBinTh index="1" type="double" size="[1 1]">                 [13]              </LowHistBinTh>           </Hist2hal>	</LinearAECtrl>         <HdrAECtrl index="1" type="struct" size="[1 1]">
             <Evbias index="1" type="double" size="[1 1]">               [0]            </Evbias>            <Tolerance index="1" type="double" size="[1 1]">               [10]            </Tolerance>
+      	   <LongFrmMode index="1" type="struct" size="[1 1]">	      <mode index="1" type="char" size="[1 20]">	         NORMAL	      </mode>
+	      <SfrmMinLine index="1" type="double" size="[1 1]">	         [160]	      </SfrmMinLine>
+               <LfrmModeExpTh index="1" type="double" size="[1 1]">               	[0.62]               </LfrmModeExpTh>            </LongFrmMode>
       	   <StrategyMode index="1" type="char" size="[1 20]">                LOWLIGHT_PRIOR            </StrategyMode>
 	   <ExpRatioCtrl index="1" type="struct" size="[1 1]">
               <ExpRatioType index="1" type="char" size="[1 8]">                 AUTO              </ExpRatioType>
@@ -4552,9 +4558,9 @@
       </DEHAZE>
       <SENSORINFO index="1" type="struct" size="[1 1]">
          <GainRange index="1" type="double" size="[10 7]">            [1 2 20 20 1 0 20 2 4 10 0 1 20 40 4 8 5 -20 1 40 60 8 16 2.5 -40 1 60 80 16 32 1.25 -60 1 80 100 32 64  0.625 -80 1 100 120 64 128 0.3125 -100 1 120 140 128 256 0.15625 -120 1 140 160 256 512 0.078125 -140 1 160 180 512 1024 0.0390625 -160 1 180 200]         </GainRange>         <TimeFactor index="1" type="double" size="[1 4]">            [0 0 1 0.5]         </TimeFactor>
-         <CISTimeRegSumFac index="1" type="double" size="[1 2]">           [2 4]         </CISTimeRegSumFac>         <CISTimeRegOdevity index="1" type="double" size="[1 2]">           [2 0]         </CISTimeRegOdevity>
+         <CISTimeRegSumFac index="1" type="double" size="[1 2]">           [2 10]         </CISTimeRegSumFac>         <CISTimeRegOdevity index="1" type="double" size="[1 2]">           [2 0]         </CISTimeRegOdevity>
          <CISTimeRegUnEqualEn index="1" type="double" size="[1 1]">            [0]         </CISTimeRegUnEqualEn>
-         <CISTimeRegMin index="1" type="double" size="[1 1]">            [2]         </CISTimeRegMin>         <CISAgainRange index="1" type="double" size="[1 2]">            [1 29.5]         </CISAgainRange>
+         <CISMinFps index="1" type="double" size="[1 1]">            [10]         </CISMinFps>         <CISTimeRegMin index="1" type="double" size="[1 1]">            [2]         </CISTimeRegMin>         <CISAgainRange index="1" type="double" size="[1 2]">            [1 29.5]         </CISAgainRange>
          <CISExtraAgainRange index="1" type="double" size="[1 2]">            [2.6 76.7]         </CISExtraAgainRange>         <CISDgainRange index="1" type="double" size="[1 2]">            [1 256]         </CISDgainRange>         <CISIspDgainRange index="1" type="double" size="[1 2]">            [1 1]         </CISIspDgainRange>     </SENSORINFO>      <LUT3D  index="1" type="struct" size="[1 1]">
          <enable index="1" type="double" size="[1 1]">            [0]         </enable>
          <look_up_table_r index="1" type="double" size="[1 729]">            [  0   20  205  415  626  829 1023 1023 1023

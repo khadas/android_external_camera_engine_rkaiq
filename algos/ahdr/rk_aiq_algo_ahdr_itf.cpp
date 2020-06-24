@@ -127,6 +127,17 @@ static XCamReturn AhdrProcess(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* out
     // pAhdrCtx->frameCnt = inparams->frame_id;
     AhdrGetStats(pAhdrCtx, &AhdrParams->ispAhdrStats);
 
+    RkAiqAlgoProcResAeInt* ae_proc_res_int =
+        (RkAiqAlgoProcResAeInt*)(AhdrParams->rk_com.u.proc.proc_res_comb->ae_proc_res);
+
+    if (ae_proc_res_int)
+        AhdrGetSensorInfo(pAhdrCtx, ae_proc_res_int->ae_proc_res_rk);
+    else {
+        AecProcResult_t AeProcResult;
+        LOGW_AHDR("%s: Ae Proc result is null!!!\n", __FUNCTION__);
+        AhdrGetSensorInfo(pAhdrCtx, AeProcResult);
+    }
+
     RkAiqAlgoPreResAeInt* ae_pre_res_int =
         (RkAiqAlgoPreResAeInt*)(AhdrParams->rk_com.u.proc.pre_res_comb->ae_pre_res);
     RkAiqAlgoPreResAfInt* af_pre_res_int =
@@ -152,7 +163,7 @@ static XCamReturn AhdrProcess(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* out
     }
     AhdrProcessing(pAhdrCtx);
 
-
+    pAhdrCtx->AhdrProcRes.LongFrameMode = pAhdrCtx->SensorInfo.LongFrmMode;
     memcpy(&AhdrProcResParams->AhdrProcRes.MgeProcRes, &pAhdrCtx->AhdrProcRes.MgeProcRes, sizeof(MgeProcRes_t));
     memcpy(&AhdrProcResParams->AhdrProcRes.TmoProcRes, &pAhdrCtx->AhdrProcRes.TmoProcRes, sizeof(TmoProcRes_t));
 

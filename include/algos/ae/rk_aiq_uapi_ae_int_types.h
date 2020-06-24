@@ -42,7 +42,6 @@ typedef CalibDb_HdrMeAttr_t Uapi_HdrMeAttr_t;
 typedef CalibDb_MeAttr_t Uapi_MeAttr_t;
 
 typedef struct Uapi_ExpSwAttr_s {
-    bool                     Bypass;
     int                      RawStatsMode;
     int                      HistStatsMode;
     int                      YRangeMode;
@@ -78,6 +77,7 @@ typedef struct Uapi_LinExpAttr_s {
     int                     StrategyMode;
     bool                    DySetPointEn;
     Uapi_AeDySetpoint_t     DySetpoint[AEC_DNMODE_MAX];
+    uint8_t                 BacklitEn;
 } Uapi_LinExpAttr_t;
 
 typedef struct Uapi_HdrExpAttr_s {
