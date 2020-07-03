@@ -17,6 +17,9 @@
 
 #include "RkAiqManager.h"
 #include "isp20/Isp20_module_dbg.h"
+#include "isp20/CamHwIsp20.h"
+#include <fcntl.h>
+#include <unistd.h>
 
 using namespace XCam;
 namespace RkCam {
@@ -131,11 +134,23 @@ RkAiqManager::init()
     XCAM_ASSERT (mCalibDb);
 
     mRkAiqAnalyzer->setAnalyzeResultCb(this);
+    // set hw infos
+    struct RkAiqHwInfo hw_info;
+    xcam_mem_clear(hw_info);
+
+#ifndef RK_SIMULATOR_HW
+    rk_aiq_static_info_t* s_info = CamHwIsp20::getStaticCamHwInfo(mSnsEntName);
+    hw_info.fl_supported = s_info->has_fl;
+    hw_info.irc_supported = s_info->has_irc;
+    hw_info.lens_supported = s_info->has_lens_vcm;
+#endif
+    mRkAiqAnalyzer->setHwInfos(hw_info);
+
     ret = mRkAiqAnalyzer->init(mSnsEntName, mCalibDb);
     RKAIQMNG_CHECK_RET(ret, "analyzer init error %d !", ret);
 
     mRkLumaAnalyzer->setAnalyzeResultCb(this);
-    ret = mRkLumaAnalyzer->init();
+    ret = mRkLumaAnalyzer->init(&mCalibDb->lumaDetect);
     RKAIQMNG_CHECK_RET(ret, "luma analyzer init error %d !", ret);
 
     mCamHw->setIspLumaListener(this);
@@ -342,6 +357,35 @@ RkAiqManager::applyAnalyzerResult(SmartPtr<RkAiqFullParamsProxy>& results)
         goto set_exp_end;
 #endif
 #endif
+
+    /* #define FLASH_CTL_DEBUG */
+#ifdef FLASH_CTL_DEBUG
+    {
+        // for test
+        int fd = open("/tmp/flash_ctl", O_RDWR);
+        if (fd != -1) {
+            char c;
+            read(fd, &c, 1);
+            int enable = atoi(&c);
+            SmartPtr<rk_aiq_flash_setting_t> fl = new rk_aiq_flash_setting_t();
+            fl->flash_mode = enable ? RK_AIQ_FLASH_MODE_TORCH : RK_AIQ_FLASH_MODE_OFF;
+            fl->power[0] = 10000;
+            fl->strobe = enable ? true : false;
+            aiqParams->mFlParams = new SharedItemProxy<rk_aiq_flash_setting_t>(fl);;
+            ret = mCamHw->setFlParams(aiqParams->mFlParams);
+            if (ret)
+                LOGE_ANALYZER("setFlParams error %d", ret);
+            close(fd);
+        }
+    }
+#else
+    if (aiqParams->mCpslParams.ptr()) {
+        ret = mCamHw->setCpslParams(aiqParams->mCpslParams);
+        if (ret)
+            LOGE_ANALYZER("setFlParams error %d", ret);
+    }
+#endif
+
     if (aiqParams->mExposureParams.ptr()) {
 //#define DEBUG_FIXED_EXPOSURE
 #ifdef DEBUG_FIXED_EXPOSURE
@@ -486,6 +530,36 @@ RkAiqManager::getModuleCtl(rk_aiq_module_id_t mId, bool& mod_en)
     ENTER_XCORE_FUNCTION();
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
     ret = mCamHw->getModuleCtl(mId, mod_en);
+    EXIT_XCORE_FUNCTION();
+    return ret;
+}
+
+XCamReturn
+RkAiqManager::enqueueBuffer(struct rk_aiq_vbuf *vbuf)
+{
+    ENTER_XCORE_FUNCTION();
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    ret = mCamHw->enqueueBuffer(vbuf);
+    EXIT_XCORE_FUNCTION();
+    return ret;
+}
+
+XCamReturn RkAiqManager::offlineRdJobPrepare()
+{
+    ENTER_XCORE_FUNCTION();
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+ 
+    ret = mCamHw->offlineRdJobPrepare();
+    EXIT_XCORE_FUNCTION();
+    return ret;
+}
+
+XCamReturn RkAiqManager::offlineRdJobDone()
+{
+    ENTER_XCORE_FUNCTION();
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+
+    ret = mCamHw->offlineRdJobDone();
     EXIT_XCORE_FUNCTION();
     return ret;
 }

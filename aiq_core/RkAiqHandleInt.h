@@ -38,7 +38,7 @@
 #include "asharp/rk_aiq_uapi_asharp_int.h"
 #include "agic/rk_aiq_uapi_agic_int.h"
 #include "afec/rk_aiq_uapi_afec_int.h"
-
+#include "af/rk_aiq_uapi_af_int.h"
 
 
 namespace RkCam {
@@ -80,7 +80,7 @@ protected:
 // define
 //RKAIQHANDLEINT(Ae);
 //RKAIQHANDLEINT(Awb);
-RKAIQHANDLEINT(Af);
+//RKAIQHANDLEINT(Af);
 //RKAIQHANDLEINT(Ahdr);
 //RKAIQHANDLEINT(Anr);
 //RKAIQHANDLEINT(Alsc);
@@ -192,6 +192,43 @@ private:
     // TODO
     rk_aiq_wb_attrib_t mCurAtt;
     rk_aiq_wb_attrib_t mNewAtt;
+};
+
+// af
+class RkAiqAfHandleInt:
+    virtual public RkAiqAfHandle,
+    virtual public RkAiqHandleIntCom {
+public:
+    explicit RkAiqAfHandleInt(RkAiqAlgoDesComm* des, RkAiqCore* aiqCore)
+        : RkAiqHandle(des, aiqCore)
+        , RkAiqAfHandle(des, aiqCore)
+        , RkAiqHandleIntCom(des, aiqCore) {
+        memset(&mCurAtt, 0, sizeof(rk_aiq_af_attrib_t));
+        memset(&mNewAtt, 0, sizeof(rk_aiq_af_attrib_t));
+    };
+    virtual ~RkAiqAfHandleInt() {
+        RkAiqAfHandle::deInit();
+    };
+    virtual XCamReturn updateConfig();
+    virtual XCamReturn prepare();
+    virtual XCamReturn preProcess();
+    virtual XCamReturn processing();
+    virtual XCamReturn postProcess();
+    // TODO add algo specific methords, this is a sample
+    XCamReturn setAttrib(rk_aiq_af_attrib_t att);
+    XCamReturn getAttrib(rk_aiq_af_attrib_t *att);
+    XCamReturn lock();
+    XCamReturn unlock();
+
+protected:
+    virtual void init();
+    virtual void deInit() {
+        RkAiqAfHandle::deInit();
+    };
+private:
+    // TODO
+    rk_aiq_af_attrib_t mCurAtt;
+    rk_aiq_af_attrib_t mNewAtt;
 };
 
 class RkAiqAdebayerHandleInt:
@@ -567,7 +604,16 @@ public:
     // TODO add algo specific methords, this is a sample
     XCamReturn setAttrib(rk_aiq_nr_attrib_t *att);
     XCamReturn getAttrib(rk_aiq_nr_attrib_t *att);
-
+    XCamReturn setLumaSFStrength(float fPercent);
+    XCamReturn setLumaTFStrength(float fPercent);
+    XCamReturn getLumaSFStrength(float *pPercent);
+    XCamReturn getLumaTFStrength(float *pPercent);
+    XCamReturn setChromaSFStrength(float fPercent);
+    XCamReturn setChromaTFStrength(float fPercent);
+    XCamReturn getChromaSFStrength(float *pPercent);
+    XCamReturn getChromaTFStrength(float *pPercent);
+	XCamReturn setRawnrSFStrength(float fPercent);
+    XCamReturn getRawnrSFStrength(float *pPercent);
 protected:
     virtual void init();
     virtual void deInit() {
@@ -603,6 +649,8 @@ public:
     // TODO add algo specific methords, this is a sample
     XCamReturn setAttrib(rk_aiq_sharp_attrib_t *att);
     XCamReturn getAttrib(rk_aiq_sharp_attrib_t *att);
+    XCamReturn setStrength(float fPercent);
+    XCamReturn getStrength(float *pPercent);
 
 protected:
     virtual void init();

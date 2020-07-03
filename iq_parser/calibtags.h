@@ -528,8 +528,8 @@
 #define CALIB_SENSOR_DPCC_SENSOR                                   "sensor_dpcc"
 #define CALIB_SENSOR_DPCC_SENSOR_AUTO_ENABLE                     "sensor_dpcc_auto_en"
 #define CALIB_SENSOR_DPCC_SENSOR_MAX_LEVEL                       "max_level"
-#define CALIB_SENSOR_DPCC_SENSOR_LEVEL                            "level"
-
+#define CALIB_SENSOR_DPCC_SENSOR_LEVEL_SINGLE                    "level_single"
+#define CALIB_SENSOR_DPCC_SENSOR_LEVEL_MULTIPLE                  "level_multiple"
 
 
 /******************************************************************************
@@ -571,6 +571,7 @@
 #define CALIB_SENSOR_LSC_ALSCCOF_RESALL                  "resolutionAlll"
 #define CALIB_SENSOR_LSC_ALSCCOF_RESALL_NAME             "name"
 #define CALIB_SENSOR_LSC_ALSCCOF_IllALL                  "illAll"
+#define CALIB_SENSOR_LSC_ALSCCOF_CASE                    "usedForCase"
 #define CALIB_SENSOR_LSC_ALSCCOF_NAME                    "name"
 #define CALIB_SENSOR_LSC_ALSCCOF_WBGAIN                  "wbGain"
 #define CALIB_SENSOR_LSC_ALSCCOF_TABLEUSED               "tableUsed"
@@ -596,6 +597,7 @@
  * XML RKDM section
  *****************************************************************************/
 #define CALIB_SENSOR_RKDM                                         "RKDM"
+#define CALIB_SENSOR_RKDM_ENABLE                                  "enable"
 #define CALIB_SENSOR_RKDM_DEBAYER_FILTER1                         "debayer_filter1"
 #define CALIB_SENSOR_RKDM_DEBAYER_FILTER2                         "debayer_filter2"
 #define CALIB_SENSOR_RKDM_DEBAYER_GAIN_OFFSET                     "debayer_gain_offset"
@@ -1039,10 +1041,32 @@
 #define    CALIB_SENSOR_FEC_CORRECT_LEVEL               "correct_level"
 
 /******************************************************************************
+ * XML LUMA DETECT section
+ *****************************************************************************/
+#define    CALIB_SENSOR_LUMA_DETECT                     "LUMADETECT"
+#define    CALIB_SENSOR_LUMA_DETECT_ENABLE		"enable"
+#define    CALIB_SENSOR_LUMA_DETECT_THRESHOLD           "threshold"
+
+/******************************************************************************
 * XML ORB section
 *****************************************************************************/
 #define    CALIB_SENSOR_ORB                            "ORB"
 #define    CALIB_SENSOR_ORB_ENABLE                     "enable"
+
+/******************************************************************************
+* XML CPSL section
+*****************************************************************************/
+#define    CALIB_SENSOR_CPSL                              "CPSL"
+#define    CALIB_SENSOR_CPSL_ENABLE                       "enable"
+#define    CALIB_SENSOR_CPSL_MODE                         "mode"
+#define    CALIB_SENSOR_CPSL_FORCE_GRAY                   "force_gray"
+#define    CALIB_SENSOR_CPSL_LGHT_SRC                     "light_src"
+#define    CALIB_SENSOR_CPSL_AUTO_ADJUST_SENS             "auto_adjust_sens"
+#define    CALIB_SENSOR_CPSL_AUTO_ON2OFF_TH               "auto_on2off_th"
+#define    CALIB_SENSOR_CPSL_AUTO_OFF2ON_TH               "auto_off2on_th"
+#define    CALIB_SENSOR_CPSL_AUTO_SW_INTERVAL             "auto_sw_interval"
+#define    CALIB_SENSOR_CPSL_MANUAL_ON                    "manual_on"
+#define    CALIB_SENSOR_CPSL_MANUAL_STRENGTH              "manual_sthength"
 
 /******************************************************************************
  * XML system section

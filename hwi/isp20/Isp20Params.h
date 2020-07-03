@@ -89,7 +89,7 @@ private:
     void convertAiqSharpenToIsp20Params(struct rkispp_params_cfg& pp_cfg,
                                         rk_aiq_isp_sharpen_t& sharp, rk_aiq_isp_edgeflt_t& edgeflt);
     void convertAiqAfToIsp20Params(struct isp2x_isp_params_cfg& isp_cfg,
-                                   const rk_aiq_isp_af_meas_t& af_data);
+                                   const rk_aiq_isp_af_meas_t& af_data, bool af_cfg_udpate);
     void convertAiqGainToIsp20Params(struct isp2x_isp_params_cfg& isp_cfg,
                                      rk_aiq_isp_gain_t& gain);
     void convertAiqAldchToIsp20Params(struct isp2x_isp_params_cfg& isp_cfg,

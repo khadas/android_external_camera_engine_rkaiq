@@ -21,5 +21,46 @@ XCamReturn
 rk_aiq_uapi_anr_GetAttrib(const RkAiqAlgoContext *ctx,
                           rk_aiq_nr_attrib_t *attr);
 
+XCamReturn
+rk_aiq_uapi_anr_SetLumaSFStrength(const RkAiqAlgoContext *ctx,
+                          float fPercnt);
+
+XCamReturn
+rk_aiq_uapi_anr_SetLumaTFStrength(const RkAiqAlgoContext *ctx,
+                          float fPercnt);
+
+XCamReturn
+rk_aiq_uapi_anr_GetLumaSFStrength(const RkAiqAlgoContext *ctx,
+                          float *pPercent);
+
+XCamReturn
+rk_aiq_uapi_anr_GetLumaTFStrength(const RkAiqAlgoContext *ctx,
+                          float *pPercent);
+
+
+XCamReturn
+rk_aiq_uapi_anr_SetChromaSFStrength(const RkAiqAlgoContext *ctx,
+                          float fPercnt);
+
+XCamReturn
+rk_aiq_uapi_anr_SetChromaTFStrength(const RkAiqAlgoContext *ctx,
+                          float fPercnt);
+
+XCamReturn
+rk_aiq_uapi_anr_GetChromaSFStrength(const RkAiqAlgoContext *ctx,
+                          float *pPercent);
+
+XCamReturn
+rk_aiq_uapi_anr_GetChromaTFStrength(const RkAiqAlgoContext *ctx,
+                          float *pPercent);
+
+XCamReturn
+rk_aiq_uapi_anr_SetRawnrSFStrength(const RkAiqAlgoContext *ctx,
+                          float fPercent);
+
+XCamReturn
+rk_aiq_uapi_anr_GetRawnrSFStrength(const RkAiqAlgoContext *ctx,
+                          float *pPercent);
+
 
 #endif

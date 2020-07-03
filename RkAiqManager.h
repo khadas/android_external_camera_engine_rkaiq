@@ -93,6 +93,9 @@ public:
     void rkLumaCalcFailed(const char* msg);
     XCamReturn setModuleCtl(rk_aiq_module_id_t mId, bool mod_en);
     XCamReturn getModuleCtl(rk_aiq_module_id_t mId, bool& mod_en);
+    XCamReturn enqueueBuffer(struct rk_aiq_vbuf *vbuf);
+    XCamReturn offlineRdJobPrepare();
+    XCamReturn offlineRdJobDone();
 protected:
     XCamReturn applyAnalyzerResult(SmartPtr<RkAiqFullParamsProxy>& results);
 private:

@@ -51,6 +51,8 @@
 #include "isp20/rkisp2-config.h"
 #include "isp20/rkispp-config.h"
 #endif
+#include <fcntl.h>
+#include <unistd.h>
 
 namespace RkCam {
 
@@ -121,6 +123,7 @@ RkAiqCore::RkAiqCore()
     , mAiqIspParamsPool(new RkAiqIspParamsPool("RkAiqIspParams", RkAiqCore::DEFAULT_POOL_SIZE))
     , mAiqIsppParamsPool(new RkAiqIsppParamsPool("RkAiqIspParams", RkAiqCore::DEFAULT_POOL_SIZE))
     , mAiqFocusParamsPool(new RkAiqFocusParamsPool("RkAiqFocusParams", RkAiqCore::DEFAULT_POOL_SIZE))
+    , mAiqCpslParamsPool(new RkAiqCpslParamsPool("RkAiqCpslParamsPool", RkAiqCore::DEFAULT_POOL_SIZE))
 {
     ENTER_ANALYZER_FUNCTION();
     mAlogsSharedParams.reset();
@@ -148,6 +151,8 @@ RkAiqCore::RkAiqCore()
     mCurAeAlgoHdl = NULL;
     mCurAwbAlgoHdl = NULL;
     mCurAfAlgoHdl = NULL;
+    xcam_mem_clear(mHwInfo);
+    mCurCpslOn = false;
 
     SmartPtr<RkAiqFullParams> fullParam = new RkAiqFullParams();
     mAiqCurParams = new RkAiqFullParamsProxy(fullParam );
@@ -159,6 +164,48 @@ RkAiqCore::~RkAiqCore()
 {
     ENTER_ANALYZER_FUNCTION();
     EXIT_ANALYZER_FUNCTION();
+}
+
+void RkAiqCore::initCpsl()
+{
+    queryCpsLtCap(mCpslCap);
+
+    rk_aiq_cpsl_cfg_t* cfg = &mAlogsSharedParams.cpslCfg;
+    const CamCalibDbContext_t* aiqCalib = mAlogsSharedParams.calib;
+    // TODO: something from calib
+    if (mCpslCap.modes_num > 0 && aiqCalib->cpsl.support_en) {
+        if (aiqCalib->cpsl.mode == 0) {
+            cfg->mode = RK_AIQ_OP_MODE_AUTO;
+        } else if (aiqCalib->cpsl.mode == 1) {
+            cfg->mode = RK_AIQ_OP_MODE_MANUAL;
+        } else {
+            cfg->mode = RK_AIQ_OP_MODE_INVALID;
+        }
+
+        if (aiqCalib->cpsl.lght_src == 0) {
+            cfg->lght_src = RK_AIQ_CPSLS_LED;
+        } else if (aiqCalib->cpsl.lght_src == 1) {
+            cfg->lght_src = RK_AIQ_CPSLS_IR;
+        } else if (aiqCalib->cpsl.lght_src == 2) {
+            cfg->lght_src = RK_AIQ_CPSLS_MAX;
+        } else {
+            cfg->lght_src = RK_AIQ_CPSLS_INVALID;
+        }
+        cfg->gray_on = aiqCalib->cpsl.gray;
+        if (cfg->mode == RK_AIQ_OP_MODE_AUTO) {
+            cfg->u.a.sensitivity = aiqCalib->cpsl.ajust_sens;
+            cfg->u.a.sw_interval = aiqCalib->cpsl.sw_interval;
+            LOGI_ANALYZER("mode sensitivity %f, interval time %d s\n",
+                          cfg->u.a.sensitivity, cfg->u.a.sw_interval);
+        } else {
+            cfg->u.m.on = aiqCalib->cpsl.cpsl_on;
+            cfg->u.m.strength = aiqCalib->cpsl.strength;
+            LOGI_ANALYZER("on %d, strength %f\n", cfg->u.m.on, cfg->u.m.strength);
+        }
+    } else {
+        cfg->mode = RK_AIQ_OP_MODE_INVALID;
+        LOGI_ANALYZER("not support light compensation \n");
+    }
 }
 
 XCamReturn
@@ -174,6 +221,7 @@ RkAiqCore::init(const char* sns_ent_name, const CamCalibDbContext_t* aiqCalib)
     mAlogsSharedParams.calib = aiqCalib;
 
     addDefaultAlgos();
+    initCpsl();
 
     mState = RK_AIQ_CORE_STATE_INITED;
     return XCAM_RETURN_NO_ERROR;
@@ -255,6 +303,14 @@ RkAiqCore::prepare(const rk_aiq_exposure_sensor_descriptor* sensor_des,
 
     mAlogsSharedParams.snsDes = *sensor_des;
     mAlogsSharedParams.working_mode = mode;
+
+    if ((mAlogsSharedParams.snsDes.sensor_pixelformat == V4L2_PIX_FMT_GREY) ||
+        (mAlogsSharedParams.snsDes.sensor_pixelformat == V4L2_PIX_FMT_Y10) ||
+        (mAlogsSharedParams.snsDes.sensor_pixelformat == V4L2_PIX_FMT_Y12)) {
+         mAlogsSharedParams.is_bw_sensor = true;
+     } else {
+        mAlogsSharedParams.is_bw_sensor = false;
+     }
 
     // for not hdr mode
     if (mAlogsSharedParams.working_mode < RK_AIQ_WORKING_MODE_ISP_HDR2)
@@ -362,9 +418,37 @@ RkAiqCore::analyzeInternal()
         LOGE_ANALYZER("no free ispp params buffer!");
         return NULL;
     }
+#if 0
+    // for test
+    int fd = open("/tmp/cpsl", O_RDWR);
+    if (fd != -1) {
+        char c;
+        read(fd, &c, 1);
+        int enable = atoi(&c);
 
+        rk_aiq_cpsl_cfg_t cfg;
+
+        cfg.mode = (RKAiqOPMode_t)enable;
+        cfg.lght_src = RK_AIQ_CPSLS_LED;
+        if (cfg.mode == RK_AIQ_OP_MODE_AUTO) {
+            cfg.u.a.sensitivity = 100;
+            cfg.u.a.sw_interval = 60;
+            cfg.gray_on = false;
+            LOGI_ANALYZER("mode sensitivity %f, interval time %d s\n",
+                          cfg.u.a.sensitivity, cfg.u.a.sw_interval);
+        } else {
+            cfg.gray_on = true;
+            cfg.u.m.on = true;
+            cfg.u.m.strength = 100;
+            LOGI_ANALYZER("on %d, strength %f\n", cfg.u.m.on, cfg.u.m.strength);
+        }
+        close(fd);
+        setCpsLtCfg(cfg);
+    }
+#endif
     ret = preProcess();
     RKAIQCORE_CHECK_RET_NULL(ret, "preprocess failed");
+    genCpslResult(aiqParams);
 
     ret = processing();
     RKAIQCORE_CHECK_RET_NULL(ret, "processing failed");
@@ -396,11 +480,20 @@ RkAiqCore::analyzeInternal()
     genIspAlscResult(aiqParams);
     genIspAr2yResult(aiqParams);
     genIspAwdrResult(aiqParams);
-
+    //TODO:
+#if 0
+    rk_aiq_cpsl_cfg_t cfg;
+    cfg.mode = RK_AIQ_OP_MODE_MANUAL;
+    cfg.lght_src = RK_AIQ_CPSLS_LED;
+    cfg.u.m.on = true;
+    cfg.u.m.strength = 100;
+    setCpsLtCfg(cfg);
+#endif
     mAiqCurParams->data()->mIspParams = aiqParams->mIspParams;
     mAiqCurParams->data()->mExposureParams = aiqParams->mExposureParams;
     mAiqCurParams->data()->mFocusParams = aiqParams->mFocusParams;
     mAiqCurParams->data()->mIsppParams = aiqParams->mIsppParams;
+    mAiqCurParams->data()->mCpslParams = aiqParams->mCpslParams;
 
     EXIT_ANALYZER_FUNCTION();
 
@@ -563,6 +656,7 @@ RkAiqCore::genIspAfResult(RkAiqFullParams* params)
     SmartPtr<rk_aiq_focus_params_t> focus_param =
         params->mFocusParams->data();
 
+    isp_param->af_cfg_update = false;
     focus_param->lens_pos_valid = false;
     if (!af_com) {
         LOGD_ANALYZER("no af result");
@@ -579,6 +673,7 @@ RkAiqCore::genIspAfResult(RkAiqFullParams* params)
         RkAiqAlgoProcResAfInt* af_rk = (RkAiqAlgoProcResAfInt*)af_com;
 
         isp_param->af_meas = af_rk->af_proc_res_com.af_isp_param;
+        isp_param->af_cfg_update = af_rk->af_proc_res_com.af_cfg_update;
 
         focus_param->next_lens_pos = af_rk->af_proc_res_com.af_focus_param.next_lens_pos;
         focus_param->lens_pos_valid = true;
@@ -866,8 +961,17 @@ RkAiqCore::genIspAsdResult(RkAiqFullParams* params)
     if (algo_id == 0) {
         RkAiqAlgoProcResAsdInt* asd_rk = (RkAiqAlgoProcResAsdInt*)asd_com;
 
-#ifdef RK_SIMULATOR_HW
-#else
+#if 0 // flash test
+        RkAiqAlgoPreResAsdInt* asd_pre_rk = (RkAiqAlgoPreResAsdInt*)mAlogsSharedParams.preResComb.asd_pre_res;
+        if (asd_pre_rk->asd_result.fl_on) {
+            fl_param->flash_mode = RK_AIQ_FLASH_MODE_TORCH;
+            fl_param->power[0] = 1000;
+            fl_param->strobe = true;
+        } else {
+            fl_param->flash_mode = RK_AIQ_FLASH_MODE_OFF;
+            fl_param->power[0] = 0;
+            fl_param->strobe = false;
+        }
 #endif
     }
 
@@ -1214,7 +1318,8 @@ RkAiqCore::genIspAdpccResult(RkAiqFullParams* params)
 
     // gen rk adpcc result
     exp_param->SensorDpccInfo.enable = adpcc_com->SenDpccRes.enable;
-    exp_param->SensorDpccInfo.cur_dpcc = adpcc_com->SenDpccRes.cur_dpcc;
+    exp_param->SensorDpccInfo.cur_single_dpcc = adpcc_com->SenDpccRes.cur_single_dpcc;
+    exp_param->SensorDpccInfo.cur_multiple_dpcc = adpcc_com->SenDpccRes.cur_multiple_dpcc;
     exp_param->SensorDpccInfo.total_dpcc = adpcc_com->SenDpccRes.total_dpcc;
 
     if (algo_id == 0) {
@@ -1683,6 +1788,8 @@ RkAiqCore::addDefaultAlgos()
     enableAlgo(RK_AIQ_ALGO_TYPE_AGIC, 0, true);
     enableAlgo(RK_AIQ_ALGO_TYPE_ADEBAYER, 0, true);
     enableAlgo(RK_AIQ_ALGO_TYPE_AORB, 0, true);
+    enableAlgo(RK_AIQ_ALGO_TYPE_ASD, 0, true);
+    enableAlgo(RK_AIQ_ALGO_TYPE_AIE, 0, true);
 #endif
 #endif
 }
@@ -2432,6 +2539,206 @@ RkAiqCore::postProcess()
     POSTPROCESS_ALGO(Asd);
     // TODO: may adjust the postProcess order
     EXIT_ANALYZER_FUNCTION();
+
+    return XCAM_RETURN_NO_ERROR;
+}
+
+XCamReturn
+RkAiqCore::setHwInfos(struct RkAiqHwInfo &hw_info)
+{
+    ENTER_ANALYZER_FUNCTION();
+    mHwInfo = hw_info;
+    EXIT_ANALYZER_FUNCTION();
+
+    return XCAM_RETURN_NO_ERROR;
+}
+
+XCamReturn
+RkAiqCore::setCpsLtCfg(rk_aiq_cpsl_cfg_t &cfg)
+{
+    ENTER_ANALYZER_FUNCTION();
+    if (mState < RK_AIQ_CORE_STATE_INITED) {
+        LOGE_ANALYZER("should call afer init");
+        return XCAM_RETURN_ERROR_FAILED;
+    }
+
+    if (mCpslCap.modes_num == 0)
+        return XCAM_RETURN_ERROR_PARAM;
+
+    int i = 0;
+    for (; i < mCpslCap.modes_num; i++) {
+        if (mCpslCap.supported_modes[i] == cfg.mode)
+            break;
+    }
+
+    if (i == mCpslCap.modes_num) {
+        return XCAM_RETURN_ERROR_PARAM;
+    }
+
+    if (cfg.mode == RK_AIQ_OP_MODE_AUTO) {
+        mAlogsSharedParams.cpslCfg.u.a = cfg.u.a;
+    } else if (cfg.mode == RK_AIQ_OP_MODE_MANUAL) {
+        mAlogsSharedParams.cpslCfg.u.m = cfg.u.m;
+    } else {
+        return XCAM_RETURN_ERROR_PARAM;
+    }
+
+    mAlogsSharedParams.cpslCfg.mode = cfg.mode;
+
+    for (i = 0; i < mCpslCap.lght_src_num; i++) {
+        if (mCpslCap.supported_lght_src[i] == cfg.lght_src)
+            break;
+    }
+
+    if (i == mCpslCap.lght_src_num) {
+        return XCAM_RETURN_ERROR_PARAM;
+    }
+
+    mAlogsSharedParams.cpslCfg = cfg;
+    LOGD("set cpsl: mode %d", cfg.mode);
+    EXIT_ANALYZER_FUNCTION();
+
+    return XCAM_RETURN_NO_ERROR;
+}
+
+XCamReturn
+RkAiqCore::getCpsLtInfo(rk_aiq_cpsl_info_t &info)
+{
+    ENTER_ANALYZER_FUNCTION();
+    if (mState < RK_AIQ_CORE_STATE_INITED) {
+        LOGE_ANALYZER("should call afer init");
+        return XCAM_RETURN_ERROR_FAILED;
+    }
+
+    info.mode = mAlogsSharedParams.cpslCfg.mode;
+    if (info.mode == RK_AIQ_OP_MODE_MANUAL) {
+        info.on = mAlogsSharedParams.cpslCfg.u.m.on;
+        info.strength = mAlogsSharedParams.cpslCfg.u.m.strength;
+    } else {
+        info.on = mCurCpslOn;
+        info.gray = mAlogsSharedParams.gray_mode;
+    }
+
+    info.lght_src = mAlogsSharedParams.cpslCfg.lght_src;
+    EXIT_ANALYZER_FUNCTION();
+
+    return XCAM_RETURN_NO_ERROR;
+}
+
+XCamReturn
+RkAiqCore::queryCpsLtCap(rk_aiq_cpsl_cap_t &cap)
+{
+    ENTER_ANALYZER_FUNCTION();
+    if (mHwInfo.fl_supported || mHwInfo.irc_supported) {
+        cap.supported_modes[0] = RK_AIQ_OP_MODE_AUTO;
+        cap.supported_modes[1] = RK_AIQ_OP_MODE_MANUAL;
+        cap.modes_num = 2;
+    } else {
+        cap.modes_num = 0;
+    }
+
+    cap.lght_src_num = 0;
+    if (mHwInfo.fl_supported) {
+        cap.supported_lght_src[0] = RK_AIQ_CPSLS_LED;
+        cap.lght_src_num++;
+    }
+
+    if (mHwInfo.irc_supported) {
+        cap.supported_lght_src[cap.lght_src_num] = RK_AIQ_CPSLS_IR;
+        cap.lght_src_num++;
+    }
+
+    if (cap.lght_src_num > 1) {
+        cap.supported_lght_src[cap.lght_src_num] = RK_AIQ_CPSLS_MIX;
+        cap.lght_src_num++;
+    }
+
+    // TODO: something from calib
+    cap.strength.min = 0;
+    cap.strength.max = 100;
+    cap.strength.step = 100;
+    cap.sensitivity.min = 0;
+    cap.sensitivity.max = 1;
+    cap.sensitivity.step = 100;
+    EXIT_ANALYZER_FUNCTION();
+
+    return XCAM_RETURN_NO_ERROR;
+}
+
+XCamReturn
+RkAiqCore::genCpslResult(RkAiqFullParams* params)
+{
+    rk_aiq_cpsl_cfg_t* cpsl_cfg = &mAlogsSharedParams.cpslCfg;
+
+    if (cpsl_cfg->mode == RK_AIQ_OP_MODE_INVALID)
+        return XCAM_RETURN_NO_ERROR;
+
+    if (mAiqCpslParamsPool->has_free_items()) {
+        params->mCpslParams = mAiqCpslParamsPool->get_item();
+    } else {
+        LOGW_ANALYZER("no free cpsl params buffer!");
+        return XCAM_RETURN_NO_ERROR;
+    }
+
+    RKAiqCpslInfoWrapper_t* cpsl_param = params->mCpslParams->data().ptr();
+    xcam_mem_clear(*cpsl_param);
+
+    LOGD_ANALYZER("mode %d, light src %d", cpsl_cfg->mode, cpsl_cfg->lght_src);
+    bool cpsl_on = false;
+    if (cpsl_cfg->mode == RK_AIQ_OP_MODE_MANUAL) {
+        cpsl_on = cpsl_cfg->u.m.on;
+        cpsl_param->fl.power[0] = cpsl_cfg->u.m.strength;
+
+    } else {
+        RkAiqAlgoPreResAsdInt* asd_pre_rk = (RkAiqAlgoPreResAsdInt*)mAlogsSharedParams.preResComb.asd_pre_res;
+        if (asd_pre_rk) {
+            asd_preprocess_result_t* asd_result = &asd_pre_rk->asd_result;
+
+            cpsl_on = asd_result->cpsl_on;
+        }
+    }
+
+    // need update ?
+    if (mCurCpslOn != cpsl_on ) {
+        if (cpsl_cfg->lght_src & RK_AIQ_CPSLS_LED) {
+            cpsl_param->update_fl = true;
+            if (cpsl_on)
+                cpsl_param->fl.flash_mode = RK_AIQ_FLASH_MODE_TORCH;
+            else
+                cpsl_param->fl.flash_mode = RK_AIQ_FLASH_MODE_OFF;
+            if (cpsl_on ) {
+                cpsl_param->fl.strobe = true;
+                mAlogsSharedParams.fill_light_on = true;
+            } else {
+                cpsl_param->fl.strobe = false;
+                mAlogsSharedParams.fill_light_on = false;
+            }
+            LOGD_ANALYZER("fl mode %d, strength %d, strobe %d",
+                          cpsl_param->fl.flash_mode, cpsl_param->fl.power[0],
+                          cpsl_param->fl.strobe);
+        }
+
+        if (cpsl_cfg->lght_src & RK_AIQ_CPSLS_IR) {
+            cpsl_param->update_ir = true;
+            if (cpsl_on) {
+                cpsl_param->ir.irc_on = true;
+                mAlogsSharedParams.fill_light_on = true;
+            } else {
+                cpsl_param->ir.irc_on = false;
+                mAlogsSharedParams.fill_light_on = false;
+                mAlogsSharedParams.gray_mode = false;
+            }
+            LOGD_ANALYZER("irc on %d", cpsl_param->ir.irc_on);
+        }
+        if (mAlogsSharedParams.fill_light_on && cpsl_cfg->gray_on) {
+            mAlogsSharedParams.gray_mode = true;
+        } else
+            mAlogsSharedParams.gray_mode = false;
+        mCurCpslOn = cpsl_on;
+    } else {
+        cpsl_param->update_ir = false;
+        cpsl_param->update_fl = false;
+    }
 
     return XCAM_RETURN_NO_ERROR;
 }

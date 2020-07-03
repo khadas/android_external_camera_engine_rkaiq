@@ -86,6 +86,7 @@ public:
     virtual XCamReturn setHdrProcessCount(int frame_id, int count) = 0;
     virtual XCamReturn setExposureParams(SmartPtr<RkAiqExpParamsProxy>& expPar) = 0;
     virtual XCamReturn setFocusParams(SmartPtr<RkAiqFocusParamsProxy>& focus_params) = 0;
+    virtual XCamReturn setCpslParams(SmartPtr<RkAiqCpslParamsProxy>& cpsl_params) = 0;
     virtual XCamReturn setIsppParams(SmartPtr<RkAiqIsppParamsProxy>& isppParams) = 0;
     virtual XCamReturn setIsppStatsListener(IsppStatsListener* isppStatsListener) = 0;
     virtual XCamReturn setIspLumaListener(IspLumaListener* lumaListener) = 0;
@@ -95,7 +96,9 @@ public:
     virtual XCamReturn getModuleCtl(rk_aiq_module_id_t mId, bool& mod_en) = 0;
     virtual XCamReturn notify_capture_raw() = 0;
     virtual XCamReturn capture_raw_ctl(bool sync) = 0;
-    virtual XCamReturn setIrcutParams(bool on) = 0;
+    virtual XCamReturn enqueueBuffer(struct rk_aiq_vbuf *vbuf) = 0;
+    virtual XCamReturn offlineRdJobPrepare() = 0;
+    virtual XCamReturn offlineRdJobDone() = 0;
 private:
     XCAM_DEAD_COPY (ICamHw);
 };

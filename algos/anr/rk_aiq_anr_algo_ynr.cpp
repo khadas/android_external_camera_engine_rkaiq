@@ -537,7 +537,7 @@ int  find_top_one_pos(int data)
     return pos;
 }
 
-ANRresult_t ynr_fix_transfer(RKAnr_Ynr_Params_Select_t* ynr, RKAnr_Ynr_Fix_t *pNrCfg)
+ANRresult_t ynr_fix_transfer(RKAnr_Ynr_Params_Select_t* ynr, RKAnr_Ynr_Fix_t *pNrCfg, float fStrength)
 {
     LOGI_ANR("%s:(%d) enter \n", __FUNCTION__, __LINE__);
 
@@ -556,6 +556,7 @@ ANRresult_t ynr_fix_transfer(RKAnr_Ynr_Params_Select_t* ynr, RKAnr_Ynr_Fix_t *pN
     int i = 0;
     int j = 0;
     int tmp = 0;
+	int strength_i = 2;
 
     //0x0104 - 0x0108
     for(i = 0; i < 16; i++) {
@@ -588,12 +589,30 @@ ANRresult_t ynr_fix_transfer(RKAnr_Ynr_Params_Select_t* ynr, RKAnr_Ynr_Fix_t *pN
 
     //0x0130
     for(i = 0; i < 4; i++) {
-        pNrCfg->ynr_lci[i] = (unsigned char)(ynr->loFreqNoiseCi[i] * (1 << FIX_BIT_CI));
+		if(i>strength_i){
+			tmp = (ynr->loFreqNoiseCi[i] *(1 << FIX_BIT_CI));
+		}else{
+          tmp = (ynr->loFreqNoiseCi[i] * fStrength *(1 << FIX_BIT_CI));
+		}
+		//printf("ynr ci[%d]: ci:%f  reg:0x%x  fstrength: %f \n", i, ynr->loFreqNoiseCi[i], tmp, fStrength);
+		
+		if(tmp > 0xff){
+			tmp = 0xff;
+		}
+		pNrCfg->ynr_lci[i] = tmp;
     }
 
     //0x0134
     for(i = 0; i < 4; i++) {
-        pNrCfg->ynr_lgain_min[i] = (unsigned char)(ynr->loFreqBfScale[i] * (1 << FIX_BIT_BF_SCALE));
+		if(i>strength_i){
+			tmp = (ynr->loFreqBfScale[i] * (1 << FIX_BIT_BF_SCALE));
+		}else{
+          tmp = (ynr->loFreqBfScale[i] * fStrength * (1 << FIX_BIT_BF_SCALE));
+		}
+		if(tmp > 0xff){
+			tmp = 0xff;
+		}
+		pNrCfg->ynr_lgain_min[i] = tmp;
     }
 
     //0x0138
@@ -601,12 +620,19 @@ ANRresult_t ynr_fix_transfer(RKAnr_Ynr_Params_Select_t* ynr, RKAnr_Ynr_Fix_t *pN
 
 
     //0x013c
-    pNrCfg->ynr_lmerge_bound = (unsigned char)((ynr->loFreqDenoiseStrength[1]) * (1 << FIX_BIT_DENOISE_STRENGTH));
+    pNrCfg->ynr_lmerge_bound = (unsigned char)((ynr->loFreqDenoiseStrength[1]) * (1 << FIX_BIT_DENOISE_STRENGTH) );
     pNrCfg->ynr_lmerge_ratio = (unsigned char)((ynr->loFreqDenoiseStrength[0]) * (1 << FIX_BIT_DENOISE_STRENGTH));
 
     //0x0140
     for(i = 0; i < 4; i++) {
-        pNrCfg->ynr_lweit_flt[i] = (unsigned char)(ynr->loFreqDenoiseWeight[i] * (1 << FIX_BIT_DENOISE_WEIGHT));
+		if(i>strength_i){
+        	pNrCfg->ynr_lweit_flt[i] = (unsigned char)(ynr->loFreqDenoiseWeight[i] *  (1 << FIX_BIT_DENOISE_WEIGHT));
+		}else{
+			pNrCfg->ynr_lweit_flt[i] = (unsigned char)(ynr->loFreqDenoiseWeight[i] * fStrength * (1 << FIX_BIT_DENOISE_WEIGHT));
+		}
+		if(pNrCfg->ynr_lweit_flt[i] > 0x80){
+			pNrCfg->ynr_lweit_flt[i] = 0x80;
+		}
     }
 
     //0x0144 - 0x0164
@@ -635,22 +661,54 @@ ANRresult_t ynr_fix_transfer(RKAnr_Ynr_Params_Select_t* ynr, RKAnr_Ynr_Fix_t *pN
 
     //0x0168
     for(i = 0; i < 4; i++) {
-        pNrCfg->ynr_hlci[i] = (unsigned char)(ynr->ciISO[i * 3 + 1] * (1 << FIX_BIT_CI));
+		if(i>strength_i){
+			tmp = (ynr->ciISO[i * 3 + 1] * (1 << FIX_BIT_CI));
+		}else{
+          tmp = (ynr->ciISO[i * 3 + 1] *  (1 << FIX_BIT_CI));
+		}
+		if(tmp > 0xff){
+			tmp = 0xff;
+		}
+		pNrCfg->ynr_hlci[i] = tmp;
     }
 
     //0x016c
     for(i = 0; i < 4; i++) {
-        pNrCfg->ynr_lhci[i] = (unsigned char)(ynr->ciISO[i * 3 + 0] * (1 << FIX_BIT_CI));
+		if(i>strength_i){
+			tmp = (ynr->ciISO[i * 3 + 0] *  (1 << FIX_BIT_CI));
+		}else{
+          tmp = (ynr->ciISO[i * 3 + 0] * (1 << FIX_BIT_CI));
+		}
+		if(tmp > 0xff){
+			tmp = 0xff;
+		}
+		pNrCfg->ynr_lhci[i] = tmp;
     }
 
     //0x0170
     for(i = 0; i < 4; i++) {
-        pNrCfg->ynr_hhci[i] = (unsigned char)(ynr->ciISO[i * 3 + 2] * (1 << FIX_BIT_CI));
+		if(i>strength_i){
+			tmp = (ynr->ciISO[i * 3 + 2] * (1 << FIX_BIT_CI));
+		}else{
+          tmp = (ynr->ciISO[i * 3 + 2] *  (1 << FIX_BIT_CI));
+		}
+		if(tmp > 0xff){
+			tmp = 0xff;
+		}
+		pNrCfg->ynr_hhci[i] = tmp;
     }
 
     //0x0174
     for(i = 0; i < 4; i++) {
-        pNrCfg->ynr_hgain_sgm[i] = (unsigned char)(ynr->hiFreqBfScale[i] * (1 << FIX_BIT_BF_SCALE));
+		if(i>strength_i){
+			tmp = (ynr->hiFreqBfScale[i] * (1 << FIX_BIT_BF_SCALE));
+		}else{
+          tmp = (ynr->hiFreqBfScale[i] *   (1 << FIX_BIT_BF_SCALE));
+		}
+		if(tmp > 0xff){
+			tmp = 0xff;
+		}
+		pNrCfg->ynr_hgain_sgm[i] = tmp;
     }
 
     //0x0178 - 0x0188
@@ -687,14 +745,26 @@ ANRresult_t ynr_fix_transfer(RKAnr_Ynr_Params_Select_t* ynr, RKAnr_Ynr_Fix_t *pN
 
     //0x01a4 -0x01a8
     for(i = 0; i < 4; i++) {
-        pNrCfg->ynr_hweit[i] = (unsigned short)(ynr->hiFreqDenoiseWeight[i] * (1 << FIX_BIT_DENOISE_WEIGHT));
+		if(i>strength_i){
+			pNrCfg->ynr_hweit[i] = (unsigned short)(ynr->hiFreqDenoiseWeight[i] *(1 << FIX_BIT_DENOISE_WEIGHT));
+		}else{
+          pNrCfg->ynr_hweit[i] = (unsigned short)(ynr->hiFreqDenoiseWeight[i] * fStrength *  (1 << FIX_BIT_DENOISE_WEIGHT));
+		}
+        
+		if(pNrCfg->ynr_hweit[i] > 0x1ff){
+			pNrCfg->ynr_hweit[i] = 0x1ff;
+		}
     }
 
     //0x01b0
     pNrCfg->ynr_hmax_adjust = (unsigned char)(ynr->detailMinAdjDnW * (1 << FIX_BIT_GRAD_ADJUST_CURVE));
 
     //0x01b4
-    pNrCfg->ynr_hstrength = (unsigned char)(ynr->hiFreqDenoiseStrength * (1 << FIX_BIT_DENOISE_STRENGTH));
+    tmp = (ynr->hiFreqDenoiseStrength * fStrength * (1 << FIX_BIT_DENOISE_STRENGTH));
+	if(tmp > 0xff){
+		tmp = 0xff;
+	}
+	pNrCfg->ynr_hstrength = tmp;
 
     //0x01b8
     pNrCfg->ynr_lweit_cmp[0] = (int)(0.1f * (1 << YNR_exp_lut_y) + 0.5f);//13

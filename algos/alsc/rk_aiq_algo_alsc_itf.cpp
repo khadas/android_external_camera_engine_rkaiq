@@ -86,6 +86,8 @@ processing(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outparams)
     RkAiqAlgoProcAlscInt *procAlsc = (RkAiqAlgoProcAlscInt*)inparams;
     RkAiqAlgoProcResAlscInt *proResAlsc = (RkAiqAlgoProcResAlscInt*)outparams;
     alsc_handle_t hAlsc = (alsc_handle_t)(inparams->ctx->alsc_para);
+    RkAiqAlgoProcAlscInt* procPara = (RkAiqAlgoProcAlscInt*)inparams;
+    procAlsc->alsc_sw_info.grayMode = procPara->rk_com.u.proc.gray_mode;
     hAlsc->alscSwInfo = procAlsc->alsc_sw_info;
     LOGI_ALSC( "%s alsc_proc_com.u.init:%d \n", __FUNCTION__, inparams->u.proc.init);
     LOGD_ALSC( "%s: sensorGain:%f, awbGain:%f,%f, resName:%s, awbIIRDampCoef:%f\n", __FUNCTION__,

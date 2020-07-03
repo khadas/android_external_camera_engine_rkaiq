@@ -15,16 +15,17 @@
  *
  */
 
-#include "rk_aiq_user_api_asharp.h"
+#include "rk_aiq_user_api_af.h"
 #include "RkAiqHandleInt.h"
+#include "rk_aiq_user_api_sysctl.h"
 
 RKAIQ_BEGIN_DECLARE
 
 XCamReturn
-rk_aiq_user_api_asharp_SetAttrib(const rk_aiq_sys_ctx_t* sys_ctx, rk_aiq_sharp_attrib_t *attr)
+rk_aiq_user_api_af_SetAttrib(const rk_aiq_sys_ctx_t* sys_ctx, rk_aiq_af_attrib_t attr)
 {
-    RkAiqAsharpHandleInt* algo_handle =
-        algoHandle<RkAiqAsharpHandleInt>(sys_ctx, RK_AIQ_ALGO_TYPE_ASHARP);
+    RkAiqAfHandleInt* algo_handle =
+        algoHandle<RkAiqAfHandleInt>(sys_ctx, RK_AIQ_ALGO_TYPE_AF);
 
     if (algo_handle) {
         return algo_handle->setAttrib(attr);
@@ -34,10 +35,10 @@ rk_aiq_user_api_asharp_SetAttrib(const rk_aiq_sys_ctx_t* sys_ctx, rk_aiq_sharp_a
 }
 
 XCamReturn
-rk_aiq_user_api_asharp_GetAttrib(const rk_aiq_sys_ctx_t* sys_ctx, rk_aiq_sharp_attrib_t *attr)
+rk_aiq_user_api_af_GetAttrib(const rk_aiq_sys_ctx_t* sys_ctx, rk_aiq_af_attrib_t *attr)
 {
-    RkAiqAsharpHandleInt* algo_handle =
-        algoHandle<RkAiqAsharpHandleInt>(sys_ctx, RK_AIQ_ALGO_TYPE_ASHARP);
+    RkAiqAfHandleInt* algo_handle =
+        algoHandle<RkAiqAfHandleInt>(sys_ctx, RK_AIQ_ALGO_TYPE_AF);
 
     if (algo_handle) {
         return algo_handle->getAttrib(attr);
@@ -47,26 +48,26 @@ rk_aiq_user_api_asharp_GetAttrib(const rk_aiq_sys_ctx_t* sys_ctx, rk_aiq_sharp_a
 }
 
 XCamReturn
-rk_aiq_user_api_asharp_SetStrength(const rk_aiq_sys_ctx_t* sys_ctx, float fPercent)
+rk_aiq_user_api_af_Lock(const rk_aiq_sys_ctx_t* sys_ctx)
 {
-    RkAiqAsharpHandleInt* algo_handle =
-        algoHandle<RkAiqAsharpHandleInt>(sys_ctx, RK_AIQ_ALGO_TYPE_ASHARP);
+    RkAiqAfHandleInt* algo_handle =
+        algoHandle<RkAiqAfHandleInt>(sys_ctx, RK_AIQ_ALGO_TYPE_AF);
 
     if (algo_handle) {
-        return algo_handle->setStrength(fPercent);
+        return algo_handle->lock();
     }
 
     return XCAM_RETURN_NO_ERROR;
 }
 
 XCamReturn
-rk_aiq_user_api_asharp_GetStrength(const rk_aiq_sys_ctx_t* sys_ctx, float *pPercent)
+rk_aiq_user_api_af_Unlock(const rk_aiq_sys_ctx_t* sys_ctx)
 {
-    RkAiqAsharpHandleInt* algo_handle =
-        algoHandle<RkAiqAsharpHandleInt>(sys_ctx, RK_AIQ_ALGO_TYPE_ASHARP);
+    RkAiqAfHandleInt* algo_handle =
+        algoHandle<RkAiqAfHandleInt>(sys_ctx, RK_AIQ_ALGO_TYPE_AF);
 
     if (algo_handle) {
-        return algo_handle->getStrength(pPercent);
+        return algo_handle->unlock();
     }
 
     return XCAM_RETURN_NO_ERROR;

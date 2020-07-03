@@ -209,7 +209,12 @@ typedef struct ANRContext_s {
     CalibDb_YNR_t stYnrCalib;
 
     ANRGainState_t stGainState;
-
+	
+	float fLuma_TF_Strength;
+	float fLuma_SF_Strength;
+	float fChroma_TF_Strength;
+	float fChroma_SF_Strength;
+	float fRawnr_SF_Strength;
 } ANRContext_t;
 
 

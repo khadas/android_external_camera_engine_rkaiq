@@ -143,6 +143,12 @@ private:
     SafeList<VideoBuffer> mStatsQueue;
 };
 
+struct RkAiqHwInfo {
+    bool fl_supported;
+    bool irc_supported;
+    bool lens_supported;
+};
+
 class RkAiqCore {
     friend class RkAiqCoreThread;
 public:
@@ -178,6 +184,10 @@ public:
     const RkAiqAlgoContext* getEnabledAxlibCtx(const int algo_type);
     const RkAiqHandle* getAiqAlgoHandle(const int algo_type);
     XCamReturn get3AStatsFromCachedList(rk_aiq_isp_stats_t &stats);
+    XCamReturn setCpsLtCfg(rk_aiq_cpsl_cfg_t &cfg);
+    XCamReturn getCpsLtInfo(rk_aiq_cpsl_info_t &info);
+    XCamReturn queryCpsLtCap(rk_aiq_cpsl_cap_t &cap);
+    XCamReturn setHwInfos(struct RkAiqHwInfo &hw_info);
 public:
     // following vars shared by all algo handlers
     typedef struct RkAiqAlgosShared_s {
@@ -189,17 +199,21 @@ public:
         rk_aiq_exposure_sensor_descriptor snsDes;
         uint32_t frameId;
         int working_mode;
-        bool ircut_on;
+        bool fill_light_on;
+        bool gray_mode;
         bool init;
         bool reConfig;
+        bool is_bw_sensor;
         uint32_t hardware_version;
         int iso;
         AlgoCtxInstanceCfgInt ctxCfigs[RK_AIQ_ALGO_TYPE_MAX];
+        rk_aiq_cpsl_cfg_t cpslCfg;
         void reset() {
             xcam_mem_clear(preResComb);
             xcam_mem_clear(procResComb);
             xcam_mem_clear(postResComb);
             xcam_mem_clear(ctxCfigs);
+            xcam_mem_clear(cpslCfg);
             calib = NULL;
             frameId = -1;
             working_mode = 0;
@@ -207,7 +221,9 @@ public:
             reConfig = false;
             hardware_version = 0;
             iso = 0;
-            ircut_on = true;
+            fill_light_on = false;
+            gray_mode = false;
+            is_bw_sensor = false;
         }
     } RkAiqAlgosShared_t;
     RkAiqAlgosShared_t mAlogsSharedParams;
@@ -251,7 +267,9 @@ private:
     XCamReturn genIspAorbResult(RkAiqFullParams* params);
     XCamReturn genIspAr2yResult(RkAiqFullParams* params);
     XCamReturn genIspAwdrResult(RkAiqFullParams* params);
+    XCamReturn genCpslResult(RkAiqFullParams* params);
     void cacheIspStatsToList();
+    void initCpsl();
 private:
     enum rk_aiq_core_state_e {
         RK_AIQ_CORE_STATE_INVALID,
@@ -318,9 +336,13 @@ private:
     SmartPtr<RkAiqIspParamsPool> mAiqIspParamsPool;
     SmartPtr<RkAiqIsppParamsPool> mAiqIsppParamsPool;
     SmartPtr<RkAiqFocusParamsPool> mAiqFocusParamsPool;
+    SmartPtr<RkAiqCpslParamsPool> mAiqCpslParamsPool;
     static uint16_t DEFAULT_POOL_SIZE;
     std::list<rk_aiq_isp_stats_t>  ispStatsCachedList;
     Mutex ispStatsListMutex;
+    struct RkAiqHwInfo mHwInfo;
+    rk_aiq_cpsl_cap_t mCpslCap;
+    bool mCurCpslOn;
 };
 
 };

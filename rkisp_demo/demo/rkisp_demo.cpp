@@ -31,8 +31,8 @@
 
 #define BUFFER_COUNT 8
 #define CAPTURE_RAW_PATH "/tmp"
-#define CAPTURE_CNT_FILENAME "capture_cnt"
-//#define ENABLE_UAPI_TEST
+#define CAPTURE_CNT_FILENAME ".capture_cnt"
+#define ENABLE_UAPI_TEST
 
 struct buffer {
         void *start;
@@ -73,6 +73,7 @@ static bool _is_yuv_dir_exist = false;
 static int g_capture_yuv_num = 0x0;
 static bool _is_capture_yuv;
 static struct termios oldt;
+static int gAfFixedModeCode = 0;
 //TODO: get active sensor from driver
 
 #define DBG(...) do { if(!silent) printf(__VA_ARGS__); } while(0)
@@ -207,14 +208,8 @@ void test_imgproc(const rk_aiq_sys_ctx_t* ctx) {
         printf("getMWBGain=[%f %f %f %f]\n",gain.rgain,gain.grgain,gain.gbgain,gain.bgain);
         break;
     case 'g':
-        ct.CCT = 0.5f;
-        ct.CCRI = 0.5f;
-        rk_aiq_uapi_setMWBCT(ctx,ct);
-        printf("setMWBCT\n");
         break;
     case 'h':
-        rk_aiq_uapi_getMWBCT(ctx,&ct);
-        printf("getMWBCT=[%f %f]\n",ct.CCT,ct.CCRI);
         break;
     case 'i':
         rk_aiq_uapi_setAntiFlickerMode(ctx,ANTIFLICKER_NORMAL_MODE);
@@ -229,16 +224,16 @@ void test_imgproc(const rk_aiq_sys_ctx_t* ctx) {
         printf("getAntiFlickerMode=%d\n",flicker);
         break;
     case 'l':
-        rk_aiq_uapi_setSaturation(ctx, 50.0);
+        rk_aiq_uapi_setSaturation(ctx, 50);
         printf("setSaturation\n");
         break;
     case 'm':
-        float level1;
+        unsigned int level1;
         rk_aiq_uapi_getSaturation(ctx, &level1);
-        printf("getSaturation=%f\n",level1);
+        printf("getSaturation=%d\n",level1);
         break;
     case 'n':
-        rk_aiq_uapi_setCrSuppsn(ctx, 50.0);
+        rk_aiq_uapi_setCrSuppsn(ctx, 50);
         printf("setCrSuppsn\n");
         break;
     case 'o':
@@ -259,12 +254,13 @@ void test_imgproc(const rk_aiq_sys_ctx_t* ctx) {
         printf("getHDRMode=%d\n",mode);
         break;
     case 's':
-        rk_aiq_uapi_setNRMode(ctx, OP_MANUALl);
-        printf("setNRMode\n");
+        rk_aiq_uapi_setANRStrth(ctx, 0.9);
+        printf("setANRStrth\n");
         break;
     case 't':
-        rk_aiq_uapi_getNRMode(ctx, &mode);
-        printf("getNRMode=%d\n",mode);
+        rk_aiq_uapi_setMSpaNRStrth(ctx, true, 0.4);
+        rk_aiq_uapi_setMTNRStrth(ctx, true, 0.4);
+        printf("setMSpaNRStrth and setMTNRStrth\n");
         break;
      case 'u':
         rk_aiq_uapi_setDhzMode(ctx, OP_MANUALl);
@@ -275,17 +271,69 @@ void test_imgproc(const rk_aiq_sys_ctx_t* ctx) {
         printf("getDhzMode=%d\n",mode);
         break;
     case 'w':
-        rk_aiq_uapi_sysctl_setModuleCtl(ctx, RK_MODULE_TNR, false);
-        printf("setModuleCtl false\n");
+    {
+        bool stat = false;
+        unsigned int level4 = 0;
+        rk_aiq_uapi_getMHDRStrth(ctx, &stat, &level4);
+        printf("getMHDRStrth: status:%d, level=%d\n",stat, level4);
+     }
         break;
     case 'x':
-        rk_aiq_uapi_sysctl_setModuleCtl(ctx, RK_MODULE_TNR, true);
-        printf("setModuleCtl true\n");
+        rk_aiq_uapi_setMHDRStrth(ctx, true, 8);
+        printf("setMHDRStrth true\n");
         break;
     case 'y':
         bool mod_en;
         rk_aiq_uapi_sysctl_getModuleCtl(ctx, RK_MODULE_TNR, &mod_en);
         printf("getModuleCtl=%d\n",mod_en);
+        break;
+    case 'A':
+        rk_aiq_uapi_setFocusMode(ctx, OP_AUTO);
+        printf("setFocusMode OP_AUTO\n");
+        break;
+    case 'B':
+        rk_aiq_uapi_setFocusMode(ctx, OP_MANUALl);
+        printf("setFocusMode OP_MANUALl\n");
+        break;
+    case 'C':
+        paRect_t rect;
+        rect.x = -1000;
+        rect.y = -1000;
+        rect.w = 1000;
+        rect.h = 1000;
+        rk_aiq_uapi_setFocusWin(ctx, &rect);
+        printf("setFocusWin 0\n");
+        break;
+    case 'D':
+        rect.x = 0;
+        rect.y = 0;
+        rect.w = 1000;
+        rect.h = 1000;
+        rk_aiq_uapi_setFocusWin(ctx, &rect);
+        printf("setFocusWin 1\n");
+        break;
+    case 'E':
+        rect.x = 0;
+        rect.y = -1000;
+        rect.w = 1000;
+        rect.h = 1000;
+        rk_aiq_uapi_setFocusWin(ctx, &rect);
+        printf("setFocusWin 2\n");
+        break;
+    case 'F':
+        gAfFixedModeCode = 0;
+        rk_aiq_uapi_setFixedModeCode(ctx, gAfFixedModeCode);
+        printf("setFixedModeCode, gAfFixedModeCode %d\n", gAfFixedModeCode);
+        break;
+    case 'G':
+        gAfFixedModeCode = (gAfFixedModeCode + 1 + 65) % 65;
+        rk_aiq_uapi_setFixedModeCode(ctx, gAfFixedModeCode);
+        printf("setFixedModeCode++, gAfFixedModeCode %d\n", gAfFixedModeCode);
+        break;
+    case 'H':
+        gAfFixedModeCode = (gAfFixedModeCode - 1 + 65) % 65;
+        rk_aiq_uapi_setFixedModeCode(ctx, gAfFixedModeCode);
+        printf("setFixedModeCode--, gAfFixedModeCode %d\n", gAfFixedModeCode);
         break;
     default:
         break;

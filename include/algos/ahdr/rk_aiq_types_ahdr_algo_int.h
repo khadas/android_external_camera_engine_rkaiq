@@ -160,17 +160,17 @@ typedef struct mhdrAttr_s
     mtmoAttr_t stTmoManual;
 } mhdrAttr_t;
 
-typedef enum OpMode_s {
-    OpMode_Auto = 1,
-    OpMode_MANU = 2,
-    OpMode_Fast = 3
-} OpMode_t;
+typedef enum hdr_OpMode_s {
+    HDR_OpMode_Auto = 1,
+    HDR_OpMode_MANU = 2,
+    HDR_OpMode_Fast = 3,
+} hdr_OpMode_t;
 
 
 typedef struct hdrAttr_s
 {
     bool      bEnable;
-    OpMode_t    opMode;
+    hdr_OpMode_t    opMode;
     ahdrAttr_t    stAuto;
     mhdrAttr_t stManual;
     int level;

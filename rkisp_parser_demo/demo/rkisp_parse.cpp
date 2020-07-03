@@ -10,7 +10,7 @@
 #include "RkAiqCalibDb.h"
 
 using namespace RkCam;
-#define CALIBDB_PATH_LEN      128
+#define CALIBDB_PATH_LEN      256
 
 
 int main(int argc, char **argv)

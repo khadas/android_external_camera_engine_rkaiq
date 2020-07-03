@@ -329,17 +329,31 @@ typedef struct rk_aiq_dpcc_attrib_s {
 
 typedef struct AdpccExpInfo_s {
     int hdr_mode;
-    float arTime[3];
-    float arAGain[3];
-    float arDGain[3];
-    int   arIso[3];
+    float arPreResTime[3];
+    float arPreResAGain[3];
+    float arPreResDGain[3];
+    int   arPreResIso[3];
+
+    float arProcResTime[3];
+    float arProcResAGain[3];
+    float arProcResDGain[3];
+    int   arProcResIso[3];
 } AdpccExpInfo_t;
 
 typedef struct Sensor_dpcc_res_s {
     int enable;
-    int cur_dpcc;
+    int cur_single_dpcc;
+    int cur_multiple_dpcc;
     int total_dpcc;
 } Sensor_dpcc_res_t;
+
+typedef struct Adpcc_pre_ae_res_s {
+    float arProcResTime[3];
+    float arProcResAGain[3];
+    float arProcResDGain[3];
+    int   arProcResIso[3];
+} Adpcc_pre_ae_res_t;
+
 
 RKAIQ_END_DECLARE
 

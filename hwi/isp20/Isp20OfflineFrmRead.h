@@ -30,45 +30,6 @@ using namespace XCam;
 namespace RkCam {
 
 #define ISP2X_FASTBOOT_DELAY_MS         100
-#define ISP2X_FASTBOOT_VIDEO_BUF_NUM    30
-
-#define RKISP_CMD_GET_SHARED_BUF \
-    _IOR('V', BASE_VIDIOC_PRIVATE + 2, struct rkisp_fastboot_resmem)
-
-struct rkisp_fastboot_video_buf {
-    u32 index;
-    u32 frame_id;
-    u32 timestamp;
-    u32 time_reg;
-    u32 gain_reg;
-    u8 *bufaddr;
-    u32 bufsize;
-} __attribute__ ((packed));
-
-/**
- * struct rkisp_fastboot_resmem_head
- */
-struct rkisp_fastboot_resmem_head {
-    u16 enable;
-    u16 complete;
-    u16 frm_total;
-    u16 hdr_mode;
-    u16 width;
-    u16 height;
-    u32 bus_fmt;
-
-    struct rkisp_fastboot_video_buf l_buf[ISP2X_FASTBOOT_VIDEO_BUF_NUM];
-    struct rkisp_fastboot_video_buf m_buf[ISP2X_FASTBOOT_VIDEO_BUF_NUM];
-    struct rkisp_fastboot_video_buf s_buf[ISP2X_FASTBOOT_VIDEO_BUF_NUM];
-} __attribute__ ((packed));
-
-/**
- * struct rkisp_fastboot_resmem - shared buffer for fastboot with risc-v side
- */
-struct rkisp_fastboot_resmem {
-    u32 resmem_padr;
-    u32 resmem_size;
-} __attribute__ ((packed));
 
 class OfflineFrmRdThread
     : public Thread
@@ -77,36 +38,34 @@ public:
     explicit OfflineFrmRdThread (Isp20PollThread *poll)
         : Thread("offlineFrmRead"),
           _poll (poll) {
-        _queued_index = 0;
-        _mfd = -1;
-        _mem_vir_addr = NULL;
         _rx_dev_max = 0;
-        _buffer_size = 0;
         _vbuf_count = 0;
+        _queued_vbuf_count = 0;
         _initialized = false;
+        _last_timestamp = 0;
     }
-    bool initialize();
     void set_mipi_devs(SmartPtr<V4l2Device> mipi_rx_devs[3], SmartPtr<V4l2SubDevice> isp_dev);
+    XCamReturn enqueueBuffer(struct rk_aiq_vbuf *buf);
+    void set_working_mode(int hdr_mode);
+    void offlineRdJobPrepare();
+    void offlineRdJobDone();
 protected:
     virtual bool loop ();
-    void uninitialize();
-    void queue_all_buffer();
-    void dequeue_all_buffer ();
-    unsigned long get_buffer_addr(int index);
-    void triger_readback();
+    XCamReturn queue_all_buffer();
+    XCamReturn dequeue_all_buffer ();
+    void triger_readback(rk_aiq_vbuf *vb);
 private:
     Isp20PollThread *_poll;
-    int _mfd;
-    uint8_t *_mem_vir_addr;
-    struct rkisp_fastboot_resmem _resmem;
-    struct rkisp_fastboot_resmem_head _resmem_head;
     SmartPtr<V4l2SubDevice> _isp_dev;
     SmartPtr<V4l2Device>  _rx_dev[3];
     int _rx_dev_max;
-    int _queued_index;
-    int _buffer_size;
     int _vbuf_count;
+    int _queued_vbuf_count;
     bool _initialized;
+    std::list<struct rk_aiq_vbuf> _vbuf_cached_list;
+    Mutex _mutex;
+    int _work_mode;
+    uint32_t _last_timestamp;
 };
 
 }

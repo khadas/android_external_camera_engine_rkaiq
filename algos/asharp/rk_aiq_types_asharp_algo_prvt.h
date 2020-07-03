@@ -66,6 +66,8 @@ typedef struct AsharpContext_s {
     CalibDb_Sharp_t stSharpCalib;
     CalibDb_EdgeFilter_t stEdgeFltCalib;
 
+    float fStrength;
+
 } AsharpContext_t;
 
 

@@ -468,7 +468,7 @@ unsigned short bayernr_get_trans(int tmpfix)
     return fx;
 }
 
-ANRresult_t bayernr_fix_tranfer(RKAnr_Bayernr_Params_Select_t* rawnr, RKAnr_Bayernr_Fix_t *pRawnrCfg)
+ANRresult_t bayernr_fix_tranfer(RKAnr_Bayernr_Params_Select_t* rawnr, RKAnr_Bayernr_Fix_t *pRawnrCfg, float fStrength)
 {
     ANRresult_t res = ANR_RET_SUCCESS;
     int rawbit = 12;//rawBit;
@@ -491,9 +491,9 @@ ANRresult_t bayernr_fix_tranfer(RKAnr_Bayernr_Params_Select_t* rawnr, RKAnr_Baye
     pRawnrCfg->log_bypass = rawnr->log_bypass;
 
     //(0x0008 - 0x00010)
-    pRawnrCfg->filtpar0 = (unsigned short)(rawnr->filtPar[0] * (1 << FIXNLMCALC));
-    pRawnrCfg->filtpar1 = (unsigned short)(rawnr->filtPar[1] * (1 << FIXNLMCALC));
-    pRawnrCfg->filtpar2 = (unsigned short)(rawnr->filtPar[2] * (1 << FIXNLMCALC));
+    pRawnrCfg->filtpar0 = (unsigned short)(rawnr->filtPar[0] * fStrength * (1 << FIXNLMCALC));
+    pRawnrCfg->filtpar1 = (unsigned short)(rawnr->filtPar[1] * fStrength * (1 << FIXNLMCALC));
+    pRawnrCfg->filtpar2 = (unsigned short)(rawnr->filtPar[2] * fStrength * (1 << FIXNLMCALC));
     if(pRawnrCfg->filtpar0 > 0x3fff) {
         pRawnrCfg->filtpar0 =  0x3fff;
     }

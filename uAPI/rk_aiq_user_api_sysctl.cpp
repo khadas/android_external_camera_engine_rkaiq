@@ -304,6 +304,7 @@ algoHandle(const rk_aiq_sys_ctx_t* ctx, const int algo_type)
 #include "rk_aiq_user_api_asharp.cpp"
 #include "rk_aiq_user_api_imgproc.cpp"
 #include "rk_aiq_user_api_afec.cpp"
+#include "rk_aiq_user_api_af.cpp"
 
 XCamReturn
 rk_aiq_uapi_sysctl_setModuleCtl(const rk_aiq_sys_ctx_t* ctx, rk_aiq_module_id_t mId, bool mod_en)
@@ -344,6 +345,27 @@ rk_aiq_uapi_sysctl_getModuleCtl(const rk_aiq_sys_ctx_t* ctx, rk_aiq_module_id_t 
     EXIT_XCORE_FUNCTION();
 
     return ret;
+}
+
+XCamReturn
+rk_aiq_uapi_sysctl_setCpsLtCfg(const rk_aiq_sys_ctx_t* ctx,
+                               rk_aiq_cpsl_cfg_t* cfg)
+{
+    return ctx->_analyzer->setCpsLtCfg(*cfg);
+}
+
+XCamReturn
+rk_aiq_uapi_sysctl_getCpsLtInfo(const rk_aiq_sys_ctx_t* ctx,
+                                rk_aiq_cpsl_info_t* info)
+{
+    return ctx->_analyzer->getCpsLtInfo(*info);
+}
+
+XCamReturn
+rk_aiq_uapi_sysctl_queryCpsLtCap(const rk_aiq_sys_ctx_t* ctx,
+                                 rk_aiq_cpsl_cap_t* cap)
+{
+    return ctx->_analyzer->queryCpsLtCap(*cap);
 }
 
 static void _print_versions()
@@ -459,3 +481,33 @@ static void rk_aiq_deinit_lib(void)
     EXIT_XCORE_FUNCTION();
 }
 
+int32_t
+rk_aiq_uapi_enqueue_buffer(const rk_aiq_sys_ctx_t* ctx, struct rk_aiq_vbuf *vbuf)
+{
+    ENTER_XCORE_FUNCTION();
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    ret = ctx->_rkAiqManager->enqueueBuffer(vbuf);
+    EXIT_XCORE_FUNCTION();
+
+    return ret;
+}
+
+int32_t
+offlineRdJobPrepare(const rk_aiq_sys_ctx_t* ctx)
+{
+    ENTER_XCORE_FUNCTION();
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    ret = ctx->_rkAiqManager->offlineRdJobPrepare();
+    EXIT_XCORE_FUNCTION();
+    return ret;
+}
+
+int32_t
+offlineRdJobDone(const rk_aiq_sys_ctx_t* ctx)
+{
+    ENTER_XCORE_FUNCTION();
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    ret = ctx->_rkAiqManager->offlineRdJobDone();
+    EXIT_XCORE_FUNCTION();
+    return ret;
+}

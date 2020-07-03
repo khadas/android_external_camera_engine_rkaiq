@@ -61,6 +61,12 @@
     ((uint32_t)(a) | ((uint32_t)(b) << 8) | ((uint32_t)(c) << 16) | ((uint32_t)(d) << 24))
 #define rk_fmt_fourcc_be(a, b, c, d)    (rk_fmt_fourcc(a, b, c, d) | (1 << 31))
 
+typedef struct rk_aiq_range_s {
+    float min;
+    float max;
+    float step;
+} rk_aiq_range_t;
+
 typedef enum {
     /*      Pixel format         FOURCC                          depth  Description  */
 
@@ -235,22 +241,27 @@ typedef struct rk_frame_fmt_s {
     int32_t width;
     int32_t height;
     rk_aiq_format_t format;
+    int32_t fps;
+    int32_t hdr_mode;
 } rk_frame_fmt_t;
 
 #define SUPPORT_FMT_MAX 10
 typedef struct {
     char sensor_name[32];
     rk_frame_fmt_t  support_fmt[SUPPORT_FMT_MAX];
-    int num;
+    int32_t num;
 } rk_aiq_sensor_info_t;
 
 typedef struct {
-    int UNKNOWN;
+    char len_name[32];
 } rk_aiq_lens_info_t;
 
 typedef struct {
     rk_aiq_sensor_info_t    sensor_info;
     rk_aiq_lens_info_t      lens_info;
+    bool has_lens_vcm; /*< has lens vcm */
+    bool has_fl; /*< has flash light */
+    bool has_irc; /*< has ircutter */
     // supported Antibanding modes
     // supported lock modes
     // supported ae compensation range/step
@@ -626,6 +637,108 @@ typedef struct rk_aiq_isp_ie_s {
     rk_aiq_aie_params_int_t extra;
 } rk_aiq_isp_ie_t;
 
+/* Flash modes. Default is off.
+ * Setting a flash to TORCH or INDICATOR mode will automatically
+ * turn it on. Setting it to FLASH mode will not turn on the flash
+ * until the FLASH_STROBE command is sent. */
+enum rk_aiq_flash_mode {
+    RK_AIQ_FLASH_MODE_OFF,
+    RK_AIQ_FLASH_MODE_FLASH,
+    RK_AIQ_FLASH_MODE_FLASH_PRE,
+    RK_AIQ_FLASH_MODE_FLASH_MAIN,
+    RK_AIQ_FLASH_MODE_TORCH,
+    RK_AIQ_FLASH_MODE_INDICATOR,
+};
+
+/* Flash statuses, used by rk_aiq driver to check before starting
+ * flash and after having started flash. */
+enum rk_aiq_flash_status {
+    RK_AIQ_FLASH_STATUS_OK,
+    RK_AIQ_FLASH_STATUS_HW_ERROR,
+    RK_AIQ_FLASH_STATUS_INTERRUPTED,
+    RK_AIQ_FLASH_STATUS_TIMEOUT,
+};
+
+/* Frame status. This is used to detect corrupted frames and cpsl(compensation
+ * light) exposed frames. Usually, the first 2 frames coming out of the sensor
+ * are corrupted. When using flash, the frame before and the frame after
+ * the cpsl exposed frame may be partially exposed by cpsl. The ISP
+ * statistics for these frames should not be used by the 3A library.
+ * The frame status value can be found in the "reserved" field in the
+ * v4l2_buffer struct. */
+enum rk_aiq_frame_status {
+    RK_AIQ_FRAME_STATUS_OK,
+    RK_AIQ_FRAME_STATUS_CORRUPTED,
+    RK_AIQ_FRAME_STATUS_EXPOSED,
+    RK_AIQ_FRAME_STATUS_PARTIAL,
+    RK_AIQ_FRAME_STATUS_FAILED,
+};
+
+#define RK_AIQ_FLASH_NUM_MAX 2
+
+typedef struct rk_aiq_flash_setting_s {
+    enum rk_aiq_flash_mode flash_mode;
+    enum rk_aiq_frame_status frame_status;
+    float power[RK_AIQ_FLASH_NUM_MAX];
+    bool strobe;
+    int timeout_ms;
+    int64_t effect_ts;
+} rk_aiq_flash_setting_t;
+
+typedef struct rk_aiq_ir_setting_s {
+    bool irc_on; /*< true means cut the IR, vice versa */
+} rk_aiq_ir_setting_t;
+
+typedef enum rk_aiq_cpsls_e {
+    RK_AIQ_CPSLS_INVALID = -1,
+    RK_AIQ_CPSLS_LED = 1,
+    RK_AIQ_CPSLS_IR  = 2,
+    RK_AIQ_CPSLS_MIX = 3, /*< led and ir mixture */
+    RK_AIQ_CPSLS_MAX
+} rk_aiq_cpsls_t;
+
+/*!
+ * \brief compensation light configs
+ *
+ * user data types of compensation lights, applied to IR and
+ * full colour light source.
+ */
+
+typedef struct rk_aiq_cpsl_cfg_s {
+    RKAiqOPMode_t mode;
+    rk_aiq_cpsls_t lght_src;
+    bool gray_on; /*!< force to gray if light on */
+    union {
+        struct {
+            float sensitivity; /*!< Range [0-100] */
+            uint32_t sw_interval; /*!< switch interval time, unit seconds */
+        } a; /*< auto mode */
+        struct {
+            uint8_t on; /*!< disable 0, enable 1 */
+            float strength; /*!< Range [0-100] */
+        } m; /*!< manual mode */
+    } u;
+} rk_aiq_cpsl_cfg_t;
+
+typedef struct rk_aiq_cpsl_info_s {
+    int32_t mode;
+    uint8_t on;
+    bool gray;
+    float strength;
+    float sensitivity;
+    uint32_t sw_interval;
+    int32_t lght_src;
+} rk_aiq_cpsl_info_t;
+
+typedef struct rk_aiq_cpsl_cap_s {
+    int32_t supported_modes[RK_AIQ_OP_MODE_MAX];
+    uint8_t modes_num;
+    int32_t supported_lght_src[RK_AIQ_CPSLS_MAX];
+    uint8_t lght_src_num;
+    rk_aiq_range_t strength;
+    rk_aiq_range_t sensitivity;
+} rk_aiq_cpsl_cap_t;
+
 typedef struct {
     uint32_t module_enable_mask;
     sint32_t frame_id;
@@ -637,6 +750,7 @@ typedef struct {
     bool awb_gain_update;
     rk_aiq_wb_gain_t       awb_gain;
     rk_aiq_isp_af_meas_t    af_meas;
+    bool af_cfg_update;
     rk_aiq_isp_blc_t        blc;
     rk_aiq_isp_dpcc_t       dpcc;
     RkAiqAhdrProcResult_t   ahdr_proc_res;//porc data for hw/simulator

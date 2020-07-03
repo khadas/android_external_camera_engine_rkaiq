@@ -19,7 +19,8 @@ AsharpResult_t AsharpInit(AsharpContext_t **ppAsharpCtx, CamCalibDbContext_t *pC
     memset(pAsharpCtx, 0x00, sizeof(AsharpContext_t));
     pAsharpCtx->eState = ASHARP_STATE_INITIALIZED;
     *ppAsharpCtx = pAsharpCtx;
-
+    pAsharpCtx->fStrength = 1.0;
+	
     //init params config
     pAsharpCtx->eMode = ASHARP_OP_MODE_AUTO;
 
@@ -183,9 +184,10 @@ AsharpResult_t AsharpGetProcResult(AsharpContext_t *pAsharpCtx, AsharpProcResult
         pAsharpResult->stSharpParamSelect = pAsharpCtx->stManual.stSharpParamSelect;
         pAsharpResult->edgeFltEn = pAsharpCtx->stManual.edgeFltEn;
         pAsharpResult->stEdgefilterParamSelect = pAsharpCtx->stManual.stEdgefilterParamSelect;
+	  pAsharpCtx->fStrength = 1.0;
     }
 
-    rk_Sharp_fix_transfer(&pAsharpResult->stSharpParamSelect, &pAsharpResult->stSharpFix);
+    rk_Sharp_fix_transfer(&pAsharpResult->stSharpParamSelect, &pAsharpResult->stSharpFix, pAsharpCtx->fStrength);
     edgefilter_fix_transfer(&pAsharpResult->stEdgefilterParamSelect, &pAsharpResult->stEdgefltFix);
     pAsharpResult->stSharpFix.stSharpFixV1.sharp_en = pAsharpResult->sharpEn ;
     pAsharpResult->stEdgefltFix.edgeflt_en = pAsharpResult->edgeFltEn;

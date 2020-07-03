@@ -1,6 +1,7 @@
 #include "rk_aiq_uapi_asharp_int.h"
 #include "asharp/rk_aiq_types_asharp_algo_prvt.h"
 
+#define SHARP_MAX_STRENGTH_PERCENT (5.0)
 
 XCamReturn
 rk_aiq_uapi_asharp_SetAttrib(RkAiqAlgoContext *ctx,
@@ -31,4 +32,44 @@ rk_aiq_uapi_asharp_GetAttrib(const RkAiqAlgoContext *ctx,
     return XCAM_RETURN_NO_ERROR;
 }
 
+XCamReturn
+rk_aiq_uapi_asharp_SetStrength(const RkAiqAlgoContext *ctx,
+                             float fPercent)
+{
+
+    AsharpContext_t* pAsharpCtx = (AsharpContext_t*)ctx;
+	float fMax = SHARP_MAX_STRENGTH_PERCENT;
+	float fStrength = 1.0;
+
+	
+	if(fPercent <= 0.5){
+		fStrength =  fPercent /0.5;
+	}else{
+		fStrength = (fPercent - 0.5)*(fMax - 1) * 2 + 1;
+	}
+	
+	pAsharpCtx->fStrength = fStrength;
+    
+    return XCAM_RETURN_NO_ERROR;
+}
+
+XCamReturn
+rk_aiq_uapi_asharp_GetStrength(const RkAiqAlgoContext *ctx,
+                             float *pPercent)
+{
+
+    AsharpContext_t* pAsharpCtx = (AsharpContext_t*)ctx;
+	float fMax = SHARP_MAX_STRENGTH_PERCENT;
+	float fStrength = 1.0;
+	
+	fStrength = pAsharpCtx->fStrength;
+
+	if(fStrength <= 1){
+		*pPercent = fStrength * 0.5;
+	}else{
+		*pPercent = 2 * (fStrength - 1)/(fMax - 1) + 0.5;
+	}
+    
+    return XCAM_RETURN_NO_ERROR;
+}
 

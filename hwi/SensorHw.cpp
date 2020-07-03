@@ -147,9 +147,11 @@ SensorHw::setSensorDpcc(Sensor_dpcc_res_t* SensorDpccInfo)
     struct rkmodule_dpcc_cfg dpcc_cfg;
 
     dpcc_cfg.enable = SensorDpccInfo->enable;
-    dpcc_cfg.cur_dpcc = SensorDpccInfo->cur_dpcc;
+    dpcc_cfg.cur_single_dpcc = SensorDpccInfo->cur_single_dpcc;
+    dpcc_cfg.cur_multiple_dpcc = SensorDpccInfo->cur_multiple_dpcc;
     dpcc_cfg.total_dpcc = SensorDpccInfo->total_dpcc;
-
+    LOGD_CAMHW("enable:%d,single:%d,multi:%d,total:%d",dpcc_cfg.enable,
+    dpcc_cfg.cur_single_dpcc,dpcc_cfg.cur_multiple_dpcc,dpcc_cfg.total_dpcc);
     if (io_control(RKMODULE_SET_DPCC_CFG, &dpcc_cfg) < 0) {
         //LOGE_CAMHW ("failed to set sensor dpcc");
         return XCAM_RETURN_ERROR_IOCTL;
@@ -774,6 +776,15 @@ SensorHw::get_v4l2_pixelformat(uint32_t pixelcode)
         break;
     case MEDIA_BUS_FMT_SGRBG12_1X12:
         pixelformat = V4L2_PIX_FMT_SGRBG12;
+        break;
+    case MEDIA_BUS_FMT_Y8_1X8:
+        pixelformat = V4L2_PIX_FMT_GREY;
+        break;
+    case MEDIA_BUS_FMT_Y10_1X10:
+        pixelformat = V4L2_PIX_FMT_Y10;
+        break;
+    case MEDIA_BUS_FMT_Y12_1X12:
+        pixelformat = V4L2_PIX_FMT_Y12;
         break;
     default:
         //TODO add other

@@ -912,7 +912,8 @@ typedef struct CalibDb_Dpcc_Sensor_s {
     float en;
     float max_level;
     float iso[CALIBDB_DPCC_MAX_ISO_LEVEL];
-    float level[CALIBDB_DPCC_MAX_ISO_LEVEL];
+    float level_single[CALIBDB_DPCC_MAX_ISO_LEVEL];
+    float level_multiple[CALIBDB_DPCC_MAX_ISO_LEVEL];
 } CalibDb_Dpcc_Sensor_t;
 
 
@@ -977,6 +978,14 @@ typedef struct CalibDb_BayerNr_s {
 #define CIFISP_LSC_SIZE_TBL_SIZE           8
 #define LSC_GRAD_TBL_SIZE                  8
 #define LSC_ILLUMINATION_MAX               7
+typedef enum  CalibDb_Used_For_Case_e{
+    USED_FOR_CASE_NORMAL = 0,
+    USED_FOR_CASE_FLASH,
+    USED_FOR_CASE_GRAY,
+    USED_FOR_CASE_3,
+    USED_FOR_CASE_MAX
+}CalibDb_Used_For_Case_t;
+
 #define LSC_RESOLUTION_NAME         ( 15U )
 typedef char                        CalibDb_ResolutionName_t[LSC_RESOLUTION_NAME];
 #define LSC_PROFILE_NAME            ( 25U )
@@ -1016,8 +1025,8 @@ typedef struct CalibDb_AlscCof_ill_s {
 typedef struct CalibDb_AlscCof_s {
     int   lscResNum;
     CalibDb_ResolutionName_t  lscResName[LSC_RESOLUTIONS_NUM_MAX];// type CalibDb_ResolutionName_t
-    int   illuNum;
-    CalibDb_AlscCof_ill_t illAll[LSC_ILLUMINATION_MAX];
+    int   illuNum[USED_FOR_CASE_MAX];
+    CalibDb_AlscCof_ill_t illAll[USED_FOR_CASE_MAX][LSC_ILLUMINATION_MAX];
 } CalibDb_AlscCof_t;
 
 typedef struct CalibDb_LscTableProfile_s {
@@ -1049,6 +1058,7 @@ typedef struct CalibDb_Lsc_s {
 
 
 typedef struct CalibDb_RKDM_s {
+    unsigned char debayer_en;
     signed char debayer_filter1[5];
     signed char debayer_filter2[5];
     unsigned char debayer_gain_offset;
@@ -1539,6 +1549,11 @@ typedef struct CalibDb_ORB_s {
     unsigned char orb_en;
 } CalibDb_ORB_t;
 
+typedef struct CalibDb_LUMA_DETECT_s {
+    unsigned char luma_detect_en;
+    float mutation_threshold;
+} CalibDb_LUMA_DETECT_t;
+
 typedef struct CalibDb_FEC_s {
     unsigned char fec_en;
     char meshfile[256];
@@ -1572,6 +1587,31 @@ typedef struct {
 } CalibDb_Dcg_t;
 
 typedef struct {
+    uint8_t       support_en;
+    /* default mode
+     * 0: auto
+     * 1: manual
+     */
+    int32_t      mode;
+    /* force gray if cpsl on */
+    uint8_t        gray;
+    /* default cpsl source
+     * 0: led
+     * 1: ir
+     * 2: mix
+     */
+    int32_t      lght_src;
+    /* auto mode default params */
+    float         ajust_sens;
+    uint32_t      sw_interval;
+    uint32_t      on2off_th;
+    uint32_t      off2on_th;
+    /* manual mode default params */
+    uint8_t       cpsl_on;
+    float         strength;
+} CalibDb_Cpsl_t;
+
+typedef struct {
 #define HDR_MODE_2_FRAME_STR        "MODE_2_FRAME"
 #define HDR_MODE_2_LINE_STR         "MODE_2_LINE"
 #define HDR_MODE_3_FRAME_STR        "MODE_3_FRAME"
@@ -1588,7 +1628,17 @@ typedef struct {
     int dcg_delay;
 } CalibDb_System_t;
 
+typedef struct {
+    char parse_version[16];
+    char date[16];
+    char author[32];
+    char sensor_name[32];
+    char sample_name[64];
+    char gen_verion[16];
+}CalibDb_Header_t;
+
 typedef struct CamCalibDbContext_s {
+    CalibDb_Header_t header;
     CalibDb_Awb_Para_t awb;
     CalibDb_Lut3d_t lut3d;
     CalibDb_Aec_Para_t aec;
@@ -1610,8 +1660,10 @@ typedef struct CamCalibDbContext_s {
     CalibDb_Dehaze_t dehaze;
     CalibDb_FEC_t afec;
     CalibDb_LDCH_t aldch;
+    CalibDb_LUMA_DETECT_t lumaDetect;
     CalibDb_ORB_t orb;
     CalibDb_Sensor_Para_t sensor;
+    CalibDb_Cpsl_t cpsl;
     CalibDb_System_t  sysContrl;
 } CamCalibDbContext_t;
 

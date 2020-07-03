@@ -586,7 +586,7 @@ AdpccResult_t select_basic_params_by_ISO(
         return ret;
     }
 
-    iso = pExpInfo->arIso[pExpInfo->hdr_mode];
+    iso = pExpInfo->arPreResIso[pExpInfo->hdr_mode];
 
     for(int i = 0; i < DPCC_MAX_ISO_LEVEL - 1; i++) {
         LOGD_ADPCC("%s:(%d) iso:%d %d %d\n", __FUNCTION__, __LINE__,
@@ -892,17 +892,20 @@ void Sensor_dpcc_process(AdpccContext_t *pAdpccCtx)
     LOGI_ADPCC("%s(%d): enter!\n", __FUNCTION__, __LINE__);
     int iso = 0;
     if(pAdpccCtx->stExpInfo.hdr_mode == 0)
-        iso = pAdpccCtx->stExpInfo.arIso[0];
+        iso = pAdpccCtx->stExpInfo.arProcResIso[0];
     else if(pAdpccCtx->stExpInfo.hdr_mode == 1)
-        iso = pAdpccCtx->stExpInfo.arIso[1];
+        iso = pAdpccCtx->stExpInfo.arProcResIso[1];
     else if(pAdpccCtx->stExpInfo.hdr_mode == 2)
-        iso = pAdpccCtx->stExpInfo.arIso[2];
+        iso = pAdpccCtx->stExpInfo.arProcResIso[2];
 
-    float sensor_dpcc_level = GetCurrDpccValue(iso, pAdpccCtx->stDpccCalib.sensor_dpcc.max_level,
-                              pAdpccCtx->stDpccCalib.sensor_dpcc.iso, pAdpccCtx->stDpccCalib.sensor_dpcc.level);
+    float sensor_dpcc_level_single = GetCurrDpccValue(iso, pAdpccCtx->stDpccCalib.sensor_dpcc.max_level,
+                                     pAdpccCtx->stDpccCalib.sensor_dpcc.iso, pAdpccCtx->stDpccCalib.sensor_dpcc.level_single);
+    float sensor_dpcc_level_multi = GetCurrDpccValue(iso, pAdpccCtx->stDpccCalib.sensor_dpcc.max_level,
+                                    pAdpccCtx->stDpccCalib.sensor_dpcc.iso, pAdpccCtx->stDpccCalib.sensor_dpcc.level_multiple);
 
-    pAdpccCtx->SenDpccRes.enable = pAdpccCtx->stDpccCalib.sensor_dpcc.en != 0 ? 1 : 0;
-    pAdpccCtx->SenDpccRes.cur_dpcc = (int)(sensor_dpcc_level + 0.5);
+    pAdpccCtx->SenDpccRes.enable = pAdpccCtx->stDpccCalib.sensor_dpcc.en;
+    pAdpccCtx->SenDpccRes.cur_single_dpcc = (int)(sensor_dpcc_level_single + 0.5);
+    pAdpccCtx->SenDpccRes.cur_multiple_dpcc = (int)(sensor_dpcc_level_multi + 0.5);
     pAdpccCtx->SenDpccRes.total_dpcc = (int)(pAdpccCtx->stDpccCalib.sensor_dpcc.max_level + 0.5);
 
     if(pAdpccCtx->SenDpccRes.enable == false)
@@ -910,8 +913,8 @@ void Sensor_dpcc_process(AdpccContext_t *pAdpccCtx)
     else
         LOGD_ADPCC("%s(%d):sensor dpcc setting on!!\n", __FUNCTION__, __LINE__);
 
-    LOGD_ADPCC("%s(%d):sensor dpcc cur_dpcc:%d total_dpcc:%d!!\n", __FUNCTION__, __LINE__,
-               pAdpccCtx->SenDpccRes.cur_dpcc, pAdpccCtx->SenDpccRes.total_dpcc);
+    LOGD_ADPCC("%s(%d):ISO:%d sensor dpcc cur_s_dpcc:%d cur_m_dpcc:%d total_dpcc:%d!!\n", __FUNCTION__, __LINE__, iso,
+               pAdpccCtx->SenDpccRes.cur_single_dpcc, pAdpccCtx->SenDpccRes.cur_multiple_dpcc, pAdpccCtx->SenDpccRes.total_dpcc);
 
     LOGI_ADPCC("%s(%d): exit!\n", __FUNCTION__, __LINE__);
 
@@ -951,6 +954,12 @@ AdpccResult_t AdpccInit(AdpccContext_t **ppAdpccCtx, CamCalibDbContext_t *pCalib
     memcpy(&pAdpccCtx->stAuto.stPdafParams, &pAdpccCtx->stParams.stPdaf, sizeof(Adpcc_pdaf_params_t));
 #endif
 
+    for(int i = 0; i < 3; i++) {
+        pAdpccCtx->PreAe.arProcResIso[i] = 50;
+        pAdpccCtx->PreAe.arProcResAGain[i] = 1.0;
+        pAdpccCtx->PreAe.arProcResDGain[i] = 1.0;
+        pAdpccCtx->PreAe.arProcResTime[i] = 0.01;
+    }
 
     LOGI_ADPCC("%s(%d): exit!\n", __FUNCTION__, __LINE__);
     return ADPCC_RET_SUCCESS;

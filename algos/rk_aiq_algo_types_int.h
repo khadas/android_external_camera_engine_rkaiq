@@ -216,7 +216,9 @@ typedef struct _RkAiqAlgoComInt {
             RkAiqProcResComb* proc_res_comb;
             RkAiqPostResComb* post_res_comb;
             int iso;
-            bool ircut_on;
+            bool fill_light_on;
+            bool gray_mode;
+            bool is_bw_sensor;
         } proc;
     } u;
 } RkAiqAlgoComInt;
@@ -339,8 +341,8 @@ typedef struct _RkAiqAlgoConfigAfInt {
 typedef struct _RkAiqAlgoPreAfInt {
     RkAiqAlgoPreAf af_pre_com;
     RkAiqAlgoComInt rk_com;
-    rk_aiq_isp_af_stats_t af_stats;
-    rk_aiq_isp_aec_stats_t aec_stats;
+    rk_aiq_isp_af_stats_t *af_stats;
+    rk_aiq_isp_aec_stats_t *aec_stats;
 } RkAiqAlgoPreAfInt;
 
 typedef struct _RkAiqAlgoPreResAfInt {
@@ -451,6 +453,7 @@ typedef struct _RkAiqAlgoConfigAsdInt {
 typedef struct _RkAiqAlgoPreAsdInt {
     RkAiqAlgoPreAsd asd_pre_com;
     RkAiqAlgoComInt rk_com;
+    asd_preprocess_in_t pre_params;
 } RkAiqAlgoPreAsdInt;
 
 typedef struct _RkAiqAlgoPreResAsdInt {

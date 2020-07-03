@@ -24,6 +24,8 @@
 #include "SensorHw.h"
 #include "LensHw.h"
 
+struct media_device;
+
 namespace RkCam {
 #define MAX_MEDIA_INDEX               16
 #define DEV_PATH_LEN                  64
@@ -94,6 +96,7 @@ typedef struct {
      */
     std::string sensor_name;
     std::string device_name;
+    std::string len_name;
     std::string parent_media_dev;
     int csi_port;
     std::string module_lens_dev_name; // matched using mPhyModuleIndex
@@ -128,9 +131,11 @@ public:
     virtual XCamReturn setExposureParams(SmartPtr<RkAiqExpParamsProxy>& expPar);
     virtual XCamReturn setHdrProcessCount(int frame_id, int count);
     virtual XCamReturn setFocusParams(SmartPtr<RkAiqFocusParamsProxy>& focus_params);
+    virtual XCamReturn setCpslParams(SmartPtr<RkAiqCpslParamsProxy>& cpsl_params);
     virtual XCamReturn setIsppParams(SmartPtr<RkAiqIsppParamsProxy>& isppParams);
     static rk_aiq_static_info_t* getStaticCamHwInfo(const char* sns_ent_name);
     static XCamReturn clearStaticCamHwInfo();
+    static void findAttachedSubdevs(struct media_device *device, uint32_t count, rk_sensor_full_info_t *s_info);
     static XCamReturn initCamHwInfos();
     XCamReturn setupHdrLink(int mode, int isp_index, bool enable);
     static XCamReturn selectIqFile(const char* sns_ent_name, char* iqfile_name);
@@ -140,7 +145,11 @@ public:
     XCamReturn getModuleCtl(rk_aiq_module_id_t moduleId, bool& en);
     XCamReturn notify_capture_raw();
     XCamReturn capture_raw_ctl(bool sync);
-    XCamReturn setIrcutParams(bool on);
+    void setDhazState(float& on);
+    bool getDhazState();
+    XCamReturn enqueueBuffer(struct rk_aiq_vbuf *vbuf);
+    XCamReturn offlineRdJobPrepare();
+    XCamReturn offlineRdJobDone();
 private:
     XCAM_DEAD_COPY(CamHwIsp20);
     enum cam_hw_state_e {
@@ -151,10 +160,10 @@ private:
         CAM_HW_STATE_STOPED,
     };
     enum ircut_state_e {
-        IRCUT_STATE_CLOSED,
+        IRCUT_STATE_CLOSED, /* close ir-cut,meaning that infrared ray can be received */
         IRCUT_STATE_CLOSING,
         IRCUT_STATE_OPENING,
-        IRCUT_STATE_OPENED,
+        IRCUT_STATE_OPENED, /* open ir-cut,meaning that only visible light can be received */
     };
     int _hdr_mode;
     Mutex _mutex;
@@ -182,8 +191,10 @@ private:
     void dumpUvnrFixValue(struct rkispp_nr_config  * pNrCfg);
     void dumpYnrFixValue(struct rkispp_nr_config  * pNrCfg);
     void dumpSharpFixValue(struct rkispp_sharp_config  * pSharpCfg);
+    XCamReturn setIrcutParams(bool on);
     uint32_t _isp_module_ens;
     bool mNormalNoReadBack;
+    bool mIsDhazOn;
 };
 
 };

@@ -47,7 +47,12 @@ public:
     XCamReturn getModuleCtl(rk_aiq_module_id_t moduleId, bool& en) {
         return XCAM_RETURN_NO_ERROR;
     };
-    virtual XCamReturn setIrcutParams(bool on);
+    XCamReturn notify_capture_raw() {
+        return XCAM_RETURN_NO_ERROR;
+    };
+    XCamReturn capture_raw_ctl(bool sync) {
+        return XCAM_RETURN_NO_ERROR;
+    };
 private:
     XCAM_DEAD_COPY (CamHwSimulator);
 };

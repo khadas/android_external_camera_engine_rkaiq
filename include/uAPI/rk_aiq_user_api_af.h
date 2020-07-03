@@ -15,26 +15,19 @@
  *
  */
 
-#ifndef _RK_AIQ_USER_API_ASHARP_H_
-#define _RK_AIQ_USER_API_ASHARP_H_
-#include "asharp/rk_aiq_uapi_asharp_int.h"
+#ifndef _RK_AIQ_USER_API_AF_H_
+#define _RK_AIQ_USER_API_AF_H_
+#include "af/rk_aiq_uapi_af_int.h"
 
 typedef struct rk_aiq_sys_ctx_s rk_aiq_sys_ctx_t;
 
 RKAIQ_BEGIN_DECLARE
 
 XCamReturn
-rk_aiq_user_api_asharp_SetAttrib(const rk_aiq_sys_ctx_t* sys_ctx, rk_aiq_sharp_attrib_t *attr);
+rk_aiq_user_api_af_SetAttrib(const rk_aiq_sys_ctx_t* sys_ctx, rk_aiq_af_attrib_t attr);
 XCamReturn
-rk_aiq_user_api_asharp_GetAttrib(const rk_aiq_sys_ctx_t* sys_ctx, rk_aiq_sharp_attrib_t *attr);
-
-XCamReturn
-rk_aiq_user_api_asharp_SetStrength(const rk_aiq_sys_ctx_t* sys_ctx, float fPercent);
-
-XCamReturn
-rk_aiq_user_api_asharp_GetStrength(const rk_aiq_sys_ctx_t* sys_ctx, float *pPercent);
+rk_aiq_user_api_af_GetAttrib(const rk_aiq_sys_ctx_t* sys_ctx, rk_aiq_af_attrib_t *attr);
 
 RKAIQ_END_DECLARE
 
 #endif
-

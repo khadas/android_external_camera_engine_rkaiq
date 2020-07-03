@@ -246,7 +246,8 @@ struct rkmodule_lvds_cfg {
 
 struct rkmodule_dpcc_cfg {
     __u32 enable;
-    __u32 cur_dpcc;
+    __u32 cur_single_dpcc;
+    __u32 cur_multiple_dpcc;
     __u32 total_dpcc;
 } __attribute__ ((packed));
 

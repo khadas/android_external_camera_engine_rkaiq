@@ -24,6 +24,9 @@
 #include "ICamHw.h"
 #include "v4l2_device.h"
 #include "poll_thread.h"
+#ifndef RK_SIMULATOR_HW
+#include "FlashLight.h"
+#endif
 
 using namespace XCam;
 
@@ -49,6 +52,7 @@ public:
     virtual XCamReturn setIspParams(SmartPtr<RkAiqIspParamsProxy>& ispParams);
     virtual XCamReturn setExposureParams(SmartPtr<RkAiqExpParamsProxy>& expPar);
     virtual XCamReturn setFocusParams(SmartPtr<RkAiqFocusParamsProxy>& focus_params);
+    virtual XCamReturn setCpslParams(SmartPtr<RkAiqCpslParamsProxy>& cpsl_params);
     virtual XCamReturn setIsppParams(SmartPtr<RkAiqIsppParamsProxy>& isppParams);
     virtual XCamReturn setIsppStatsListener(IsppStatsListener* isppStatsListener);
     virtual XCamReturn setIspLumaListener(IspLumaListener* lumaListener);
@@ -60,10 +64,21 @@ public:
     // from PollCallback
     virtual XCamReturn poll_buffer_ready (SmartPtr<VideoBuffer> &buf, int type);
     virtual XCamReturn poll_buffer_failed (int64_t timestamp, const char *msg);
-    virtual XCamReturn setIrcutParams(bool on);
-    virtual XCamReturn notify_capture_raw() { return  XCAM_RETURN_ERROR_FAILED;}
-    virtual XCamReturn capture_raw_ctl(bool sync) { return  XCAM_RETURN_ERROR_FAILED;}
-
+    virtual XCamReturn notify_capture_raw() {
+        return  XCAM_RETURN_ERROR_FAILED;
+    }
+    virtual XCamReturn capture_raw_ctl(bool sync) {
+        return  XCAM_RETURN_ERROR_FAILED;
+    }
+    virtual XCamReturn enqueueBuffer(struct rk_aiq_vbuf *vbuf) {
+        return  XCAM_RETURN_ERROR_FAILED;
+    }
+    virtual XCamReturn offlineRdJobPrepare() {
+        return  XCAM_RETURN_ERROR_FAILED;
+    }
+    virtual XCamReturn offlineRdJobDone() {
+        return  XCAM_RETURN_ERROR_FAILED;
+    }
 protected:
     SmartPtr<V4l2Device> mIsppStatsDev;
     SmartPtr<V4l2Device> mIsppParamsDev;
@@ -74,6 +89,9 @@ protected:
     SmartPtr<V4l2SubDevice> mSensorDev;
     SmartPtr<V4l2SubDevice> mLensDev;
     SmartPtr<V4l2SubDevice> mIrcutDev;
+#ifndef RK_SIMULATOR_HW
+    SmartPtr<FlashLightHw> mFlashLight;
+#endif
     SmartPtr<PollThread> mPollthread;
     SmartPtr<PollThread> mPollLumathread;
     SmartPtr<PollThread> mPollIsppthread;

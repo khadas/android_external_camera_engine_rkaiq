@@ -67,7 +67,6 @@ static XCamReturn
 pre_process(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outparams)
 {
     LOGI_ACCM( "%s: (enter)\n", __FUNCTION__);
-
     AccmPreProc((accm_handle_t)(inparams->ctx->accm_para));
 
     LOGI_ACCM( "%s: (exit)\n", __FUNCTION__);
@@ -82,6 +81,8 @@ processing(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outparams)
     RkAiqAlgoProcAccmInt *procAccm = (RkAiqAlgoProcAccmInt*)inparams;
     RkAiqAlgoProcResAccmInt *proResAccm = (RkAiqAlgoProcResAccmInt*)outparams;
     accm_handle_t hAccm = (accm_handle_t)(inparams->ctx->accm_para);
+    RkAiqAlgoProcAccmInt* procPara = (RkAiqAlgoProcAccmInt*)inparams;
+    procAccm->accm_sw_info.grayMode = procPara->rk_com.u.proc.gray_mode;
     hAccm->accmSwInfo = procAccm->accm_sw_info;
     LOGI_ACCM( "%s accm_proc_com.u.init:%d \n", __FUNCTION__, inparams->u.proc.init);
     LOGD_ACCM( "%s: sensorGain:%f, awbGain:%f,%f,  awbIIRDampCoef:%f\n", __FUNCTION__,

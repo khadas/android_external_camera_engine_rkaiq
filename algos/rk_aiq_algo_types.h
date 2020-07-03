@@ -123,11 +123,12 @@ typedef struct _RkAiqAlgoPreResAf {
 
 typedef struct _RkAiqAlgoProcAf {
     RkAiqAlgoCom com;
-    rk_aiq_isp_af_stats_t af_stats;
-    rk_aiq_isp_aec_stats_t aec_stats;
+    rk_aiq_isp_af_stats_t *af_stats;
+    rk_aiq_isp_aec_stats_t *aec_stats;
 } RkAiqAlgoProcAf;
 
 typedef struct _RkAiqAlgoProcResAf {
+    bool af_cfg_update;
     RkAiqAlgoResCom proc_res_com;
     rk_aiq_isp_af_meas_t af_isp_param;
     rk_aiq_af_focus_pos_meas_t af_focus_param;
