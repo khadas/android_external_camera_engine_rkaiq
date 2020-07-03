@@ -23,6 +23,12 @@ ANRresult_t ANRInit(ANRContext_t **ppANRCtx, CamCalibDbContext_t *pCalibDb)
     pANRCtx->stGainState.gainState = -1;
     pANRCtx->stGainState.gain_th0 = 32.0;
     pANRCtx->stGainState.gain_th1 = 128.0;
+	
+	pANRCtx->fLuma_SF_Strength = 1.0;
+	pANRCtx->fLuma_TF_Strength = 1.0;
+	pANRCtx->fChroma_SF_Strength = 1.0;
+	pANRCtx->fChroma_TF_Strength = 1.0;
+	pANRCtx->fRawnr_SF_Strength = 1.0;
 
     pANRCtx->eState = ANR_STATE_INITIALIZED;
     *ppANRCtx = pANRCtx;
@@ -149,6 +155,8 @@ ANRresult_t ANRProcess(ANRContext_t *pANRCtx, ANRExpInfo_t *pExpInfo)
         return ANR_RET_INVALID_PARM;
     }
 
+    ANRGainRatioProcess(&pANRCtx->stGainState, pExpInfo);
+	
     if(pANRCtx->eMode == ANR_OP_MODE_AUTO) {
 
         LOGD_ANR("%s(%d): refYuvBit:%d\n", __FUNCTION__, __LINE__, pANRCtx->refYuvBit);
@@ -158,9 +166,7 @@ ANRresult_t ANRProcess(ANRContext_t *pANRCtx, ANRExpInfo_t *pExpInfo)
 			ANRConfigSettingParam(pANRCtx, pExpInfo->snr_mode);
 		}
 		#endif
-        memcpy(&pANRCtx->stExpInfo, pExpInfo, sizeof(ANRExpInfo_t));
-
-        ANRGainRatioProcess(&pANRCtx->stGainState, &pANRCtx->stExpInfo);
+        
         //select param
         select_bayernr_params_by_ISO(&pANRCtx->stAuto.stBayernrParams, &pANRCtx->stAuto.stBayernrParamSelect, pExpInfo);
         select_mfnr_params_by_ISO(&pANRCtx->stAuto.stMfnrParams, &pANRCtx->stAuto.stMfnrParamSelect, pExpInfo, pANRCtx->refYuvBit);
@@ -170,6 +176,8 @@ ANRresult_t ANRProcess(ANRContext_t *pANRCtx, ANRExpInfo_t *pExpInfo)
     } else if(pANRCtx->eMode == ANR_OP_MODE_MANUAL) {
         //TODO
     }
+
+    memcpy(&pANRCtx->stExpInfo, pExpInfo, sizeof(ANRExpInfo_t));
 
     LOGI_ANR("%s(%d): exit!\n", __FUNCTION__, __LINE__);
     return ANR_RET_SUCCESS;
@@ -236,13 +244,18 @@ ANRresult_t ANRGetProcResult(ANRContext_t *pANRCtx, ANRProcResult_t* pANRResult)
         pANRResult->stYnrParamSelect = pANRCtx->stManual.stYnrParamSelect;
         pANRResult->uvnrEn = pANRCtx->stManual.uvnrEn;
         pANRResult->stUvnrParamSelect = pANRCtx->stManual.stUvnrParamSelect;
+ 	 pANRCtx->fLuma_TF_Strength = 1.0;
+ 	 pANRCtx->fLuma_SF_Strength = 1.0;
+	 pANRCtx->fChroma_SF_Strength = 1.0;
+	 pANRCtx->fChroma_TF_Strength = 1.0;
+	 pANRCtx->fRawnr_SF_Strength = 1.0;
     }
 
     //transfer to reg value
-    bayernr_fix_tranfer(&pANRResult->stBayernrParamSelect, &pANRResult->stBayernrFix);
-    mfnr_fix_transfer(&pANRResult->stMfnrParamSelect, &pANRResult->stMfnrFix, &pANRCtx->stExpInfo, pANRCtx->stGainState.ratio);
-    ynr_fix_transfer(&pANRResult->stYnrParamSelect, &pANRResult->stYnrFix);
-    uvnr_fix_transfer(&pANRResult->stUvnrParamSelect, &pANRResult->stUvnrFix, &pANRCtx->stExpInfo, pANRCtx->stGainState.ratio);
+    bayernr_fix_tranfer(&pANRResult->stBayernrParamSelect, &pANRResult->stBayernrFix, pANRCtx->fRawnr_SF_Strength);
+    mfnr_fix_transfer(&pANRResult->stMfnrParamSelect, &pANRResult->stMfnrFix, &pANRCtx->stExpInfo, pANRCtx->stGainState.ratio, pANRCtx->fLuma_TF_Strength,  pANRCtx->fChroma_TF_Strength);
+    ynr_fix_transfer(&pANRResult->stYnrParamSelect, &pANRResult->stYnrFix, pANRCtx->fLuma_SF_Strength);
+    uvnr_fix_transfer(&pANRResult->stUvnrParamSelect, &pANRResult->stUvnrFix, &pANRCtx->stExpInfo, pANRCtx->stGainState.ratio, pANRCtx->fChroma_SF_Strength);
     gain_fix_transfer(&pANRResult->stMfnrParamSelect, &pANRResult->stGainFix, &pANRCtx->stExpInfo, pANRCtx->stGainState.ratio);
     pANRResult->stBayernrFix.rawnr_en = pANRResult->bayernrEn;
     pANRResult->stMfnrFix.tnr_en = pANRResult->mfnrEn;

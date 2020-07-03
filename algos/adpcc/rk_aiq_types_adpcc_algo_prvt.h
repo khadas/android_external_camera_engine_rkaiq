@@ -45,6 +45,9 @@ typedef struct AdpccContext_s {
 
     //sensor dpcc proc result
     Sensor_dpcc_res_t SenDpccRes;
+
+    //pre ae result
+    Adpcc_pre_ae_res_t PreAe;
 } AdpccContext_t;
 
 

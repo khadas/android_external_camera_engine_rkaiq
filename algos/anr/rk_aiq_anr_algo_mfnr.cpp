@@ -794,7 +794,7 @@ void mfnr_gfcoef_fix(int rad, double *gfcoef, unsigned char* gfcoef_fix)
 }
 
 
-ANRresult_t mfnr_fix_transfer(RKAnr_Mfnr_Params_Select_t* tnr, RKAnr_Mfnr_Fix_t *pMfnrCfg, ANRExpInfo_t *pExpInfo, float gain_ratio)
+ANRresult_t mfnr_fix_transfer(RKAnr_Mfnr_Params_Select_t* tnr, RKAnr_Mfnr_Fix_t *pMfnrCfg, ANRExpInfo_t *pExpInfo, float gain_ratio, float fLumaStrength, float fChromaStrength)
 {
     LOGI_ANR("%s:(%d) enter \n", __FUNCTION__, __LINE__);
 
@@ -841,12 +841,12 @@ ANRresult_t mfnr_fix_transfer(RKAnr_Mfnr_Params_Select_t* tnr, RKAnr_Mfnr_Fix_t 
 
     for(int dir_idx = 0; dir_idx < dir_num; dir_idx++) {
         for(int lvl = 0; lvl < max_lvl; lvl++)
-            scale_l_y[dir_idx][lvl] = tnr->ci[dir_idx][lvl] * tnr->scale[dir_idx][lvl] / tnr->dnstr[dir_idx];
+            scale_l_y[dir_idx][lvl] = tnr->ci[dir_idx][lvl] * tnr->scale[dir_idx][lvl] / (tnr->dnstr[dir_idx] * fLumaStrength);
     }
     for(int dir_idx = 0; dir_idx < dir_num; dir_idx++) {
         for(int lvl = 0; lvl < max_lvl_uv; lvl++) {
-            scale_l_y_uv[dir_idx][lvl] = tnr->ci[dir_idx][lvl] * tnr->scale_uv[dir_idx][lvl] / tnr->dnstr_uv[dir_idx];
-            scale_l_uv[dir_idx][lvl] = tnr->ci_uv[dir_idx][lvl] * tnr->scale_uv[dir_idx][lvl] / tnr->dnstr_uv[dir_idx];
+            scale_l_y_uv[dir_idx][lvl] = tnr->ci[dir_idx][lvl] * tnr->scale_uv[dir_idx][lvl] / (tnr->dnstr_uv[dir_idx] * fChromaStrength);
+            scale_l_uv[dir_idx][lvl] = tnr->ci_uv[dir_idx][lvl] * tnr->scale_uv[dir_idx][lvl] / (tnr->dnstr_uv[dir_idx] * fChromaStrength);
         }
     }
 

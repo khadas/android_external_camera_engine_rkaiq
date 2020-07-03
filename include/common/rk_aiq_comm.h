@@ -459,6 +459,20 @@ typedef enum {
     RK_MODULE_LDCH,
     RK_MODULE_TNR,
     RK_MODULE_FEC,
+    RK_MODULE_RAWNR,
     RK_MODULE_MAX
 } rk_aiq_module_id_t;
+
+struct rk_aiq_vbuf_info {
+    uint32_t frame_id;
+    uint32_t timestamp;
+    uint32_t exp_time;
+    uint32_t exp_gain;
+    uint8_t *data_addr;
+    uint32_t data_length;
+};
+struct rk_aiq_vbuf {
+    struct rk_aiq_vbuf_info buf_info[3];/*index: 0-short,1-medium,2-long*/
+};
+
 #endif

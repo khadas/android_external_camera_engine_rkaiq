@@ -99,6 +99,7 @@ set (AF_SRC
 	af/af_search.cpp
 	af/af_trigger.cpp
 	af/af_utils.cpp
+	af/rk_aiq_uapi_af_int.cpp
     )
 
 if(EXISTS "${CMAKE_SOURCE_DIR}/algos/af/rk_aiq_algo_af_itf.cpp")

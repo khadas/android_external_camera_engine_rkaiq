@@ -28,6 +28,27 @@ XCamReturn
 rk_aiq_user_api_anr_SetAttrib(const rk_aiq_sys_ctx_t* sys_ctx, rk_aiq_nr_attrib_t *attr);
 XCamReturn
 rk_aiq_user_api_anr_GetAttrib(const rk_aiq_sys_ctx_t* sys_ctx, rk_aiq_nr_attrib_t *attr);
+XCamReturn
+rk_aiq_user_api_anr_SetLumaSFStrength(const rk_aiq_sys_ctx_t* sys_ctx, float fPercnt);
+XCamReturn
+rk_aiq_user_api_anr_SetLumaTFStrength(const rk_aiq_sys_ctx_t* sys_ctx, float fPercnt);
+XCamReturn
+rk_aiq_user_api_anr_GetLumaSFStrength(const rk_aiq_sys_ctx_t* sys_ctx, float *pPercnt);
+XCamReturn
+rk_aiq_user_api_anr_GetLumaTFStrength(const rk_aiq_sys_ctx_t* sys_ctx, float *pPercnt);
+XCamReturn
+rk_aiq_user_api_anr_SetChromaSFStrength(const rk_aiq_sys_ctx_t* sys_ctx, float fPercnt);
+XCamReturn
+rk_aiq_user_api_anr_SetChromaTFStrength(const rk_aiq_sys_ctx_t* sys_ctx, float fPercnt);
+XCamReturn
+rk_aiq_user_api_anr_GetChromaSFStrength(const rk_aiq_sys_ctx_t* sys_ctx, float *pPercnt);
+XCamReturn
+rk_aiq_user_api_anr_GetChromaTFStrength(const rk_aiq_sys_ctx_t* sys_ctx, float *pPercnt);
+XCamReturn
+rk_aiq_user_api_anr_SetRawnrSFStrength(const rk_aiq_sys_ctx_t* sys_ctx, float fPercnt);
+XCamReturn
+rk_aiq_user_api_anr_GetRawnrSFStrength(const rk_aiq_sys_ctx_t* sys_ctx, float *pPercnt);
+
 
 RKAIQ_END_DECLARE
 

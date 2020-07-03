@@ -194,6 +194,47 @@ rk_aiq_uapi_sysctl_getEnabledAxlibCtx(const rk_aiq_sys_ctx_t* ctx, const int alg
 XCamReturn
 rk_aiq_uapi_sysctl_get3AStats(const rk_aiq_sys_ctx_t* ctx,
                               rk_aiq_isp_stats_t *stats);
+
+/*!
+ * \brief set compensation light config
+ *
+ * \param[in] ctx             context
+ * \param[out] cfg            cpsl configs
+ * \return return 0 if success
+ */
+XCamReturn
+rk_aiq_uapi_sysctl_setCpsLtCfg(const rk_aiq_sys_ctx_t* ctx,
+                               rk_aiq_cpsl_cfg_t* cfg);
+/*!
+ * \brief get compensation light info
+ *
+ * \param[in] ctx             context
+ * \param[out] info           current cpsl settings
+ * \return return 0 if success
+ */
+XCamReturn
+rk_aiq_uapi_sysctl_getCpsLtInfo(const rk_aiq_sys_ctx_t* ctx,
+                                rk_aiq_cpsl_info_t* info);
+/*!
+ * \brief query compensation light capability
+ *
+ * \param[in] ctx             context
+ * \param[out] cap            cpsl cap info
+ * \return return 0 if success
+ */
+XCamReturn
+rk_aiq_uapi_sysctl_queryCpsLtCap(const rk_aiq_sys_ctx_t* ctx,
+                                 rk_aiq_cpsl_cap_t* cap);
+
+int32_t
+rk_aiq_uapi_enqueue_buffer(const rk_aiq_sys_ctx_t* ctx, struct rk_aiq_vbuf *vbuf);
+
+int32_t
+offlineRdJobPrepare(const rk_aiq_sys_ctx_t* ctx);
+
+int32_t
+offlineRdJobDone(const rk_aiq_sys_ctx_t* ctx);
+
 RKAIQ_END_DECLARE
 
 #endif

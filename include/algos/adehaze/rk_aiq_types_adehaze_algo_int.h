@@ -115,7 +115,7 @@ typedef enum rk_aiq_dehaze_op_mode_s {
     RK_AIQ_DEHAZE_MODE_INVALID                     = 0,        /**< initialization value */
     RK_AIQ_DEHAZE_MODE_MANUAL                      = 1,        /**< run manual dehaze */
     RK_AIQ_DEHAZE_MODE_AUTO                        = 2,        /**< run auto dehaze */
-
+    RK_AIQ_DEHAZE_MODE_ENHANCE                     = 3,        /**< run dehaze enhance*/
 } rk_aiq_dehaze_op_mode_t;
 
 
@@ -124,9 +124,8 @@ typedef struct adehaze_sw_s {
     rk_aiq_dehaze_op_mode_t mode;
     rk_aiq_dehaze_M_attrib_t stManual;
     rk_aiq_dehaze_A_attrib_t stAuto;
-    rk_aiq_dehaze_enhance_t stEnhance;
+    rk_aiq_dehaze_enhance_t  stEnhance;
 } adehaze_sw_t;
-
 
 typedef struct AdehazeExpInfo_s {
     int hdr_mode;

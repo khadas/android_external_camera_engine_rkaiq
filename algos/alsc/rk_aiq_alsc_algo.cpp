@@ -323,7 +323,7 @@ XCamReturn AlscAutoConfig
 ) {
 
     LOGI_ALSC("%s: (enter) count:%d\n", __FUNCTION__, hAlsc->count);
-
+    int caseIndex = hAlsc->alscRest.caseIndex;
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
     const CalibDb_AlscCof_ill_t* pDomIlluProfile = NULL;
     const CalibDb_LscTableProfile_t* pLscProfile1 = NULL;
@@ -336,7 +336,7 @@ XCamReturn AlscAutoConfig
     int dominateIlluProfileIdx;
     int resIdx;
     //1)
-    ret = illuminant_index_estimation(hAlsc->calibLsc->aLscCof.illuNum, hAlsc->calibLsc->aLscCof.illAll,
+    ret = illuminant_index_estimation(hAlsc->calibLsc->aLscCof.illuNum[caseIndex], hAlsc->calibLsc->aLscCof.illAll[caseIndex],
                                       hAlsc->alscSwInfo.awbGain, &dominateIlluProfileIdx);
     RETURN_RESULT_IF_DIFFERENT(ret, XCAM_RETURN_NO_ERROR);
     hAlsc->alscRest.dominateIlluProfileIdx = dominateIlluProfileIdx;
@@ -348,7 +348,7 @@ XCamReturn AlscAutoConfig
     // 3)
     float sensorGain =  hAlsc->alscSwInfo.sensorGain;
     float fVignetting;
-    pDomIlluProfile = &hAlsc->calibLsc->aLscCof.illAll[dominateIlluProfileIdx];
+    pDomIlluProfile = &hAlsc->calibLsc->aLscCof.illAll[caseIndex][dominateIlluProfileIdx];
 
     interpolation(pDomIlluProfile->vignettingCurve.pSensorGain,
                   pDomIlluProfile->vignettingCurve.pVignetting,
@@ -357,7 +357,7 @@ XCamReturn AlscAutoConfig
     hAlsc->alscRest.fVignetting =  fVignetting;
     //4)
     // CalibDb_LscTableProfile_t* pLscProfiles = hAlsc->pLscTableAll[resIdx][dominateIlluProfileIdx];
-    ret = VignSelectLscProfiles(fVignetting, pDomIlluProfile->tableUsedNO, hAlsc->pLscTableAll[resIdx][dominateIlluProfileIdx],
+    ret = VignSelectLscProfiles(fVignetting, pDomIlluProfile->tableUsedNO, hAlsc->pLscTableAll[caseIndex][resIdx][dominateIlluProfileIdx],
                                 &pLscProfile1, &pLscProfile2);
     if (ret == XCAM_RETURN_NO_ERROR) {
         if (pLscProfile1 && pLscProfile2)
@@ -428,11 +428,16 @@ XCamReturn AlscConfig
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
 
     LOGD_ALSC("%s: updateAtt: %d\n", __FUNCTION__, hAlsc->updateAtt);
+    hAlsc->alscRest.caseIndex = USED_FOR_CASE_NORMAL;
+    if(hAlsc->alscSwInfo.grayMode){
+        hAlsc->alscRest.caseIndex = USED_FOR_CASE_GRAY;
+    }
     if(hAlsc->updateAtt) {
         hAlsc->mCurAtt = hAlsc->mNewAtt;
     }
-    LOGD_ALSC("%s: byPass: %d  mode:%d \n", __FUNCTION__, hAlsc->mCurAtt.byPass, hAlsc->mCurAtt.mode);
-    if(hAlsc->mCurAtt.byPass != true) {
+    LOGD_ALSC("%s: byPass: %d  mode:%d used for case: %d\n", __FUNCTION__,
+        hAlsc->mCurAtt.byPass, hAlsc->mCurAtt.mode,hAlsc->alscRest.caseIndex);
+    if(hAlsc->mCurAtt.byPass != true ) {
         hAlsc->lscHwConf.lsc_en = true;
         if(hAlsc->mCurAtt.mode == RK_AIQ_LSC_MODE_AUTO) {
             AlscAutoConfig(hAlsc);
@@ -494,47 +499,53 @@ XCamReturn AlscInit(alsc_handle_t *hAlsc, const CamCalibDbContext_t* calib)
 
     alsc_context->alscSwInfo.sensorGain = 1.0;
     alsc_context->alscSwInfo.awbIIRDampCoef = 0;
+    alsc_context->alscSwInfo.grayMode = false;
+    int caseIndex = USED_FOR_CASE_NORMAL;
+    alsc_context->alscRest.caseIndex = caseIndex;
     bool lsFound;
-    for(int i = 0; i < calib_lsc->aLscCof.illuNum; i++) {
-        if(strcmp(calib_lsc->aLscCof.illAll[i].illuName, calib->awb.stategy_cfg.lsForFirstFrame) == 0) {
-            memcpy(alsc_context->alscSwInfo.awbGain, calib_lsc->aLscCof.illAll[i].awbGain,
+    for(int i = 0; i < calib_lsc->aLscCof.illuNum[caseIndex]; i++) {
+        if(strcmp(calib_lsc->aLscCof.illAll[caseIndex][i].illuName, calib->awb.stategy_cfg.lsForFirstFrame) == 0) {
+            memcpy(alsc_context->alscSwInfo.awbGain, calib_lsc->aLscCof.illAll[caseIndex][i].awbGain,
                    sizeof(alsc_context->alscSwInfo.awbGain));
             lsFound = true;
-            LOGD_ALSC("%s: alsc lsForFirstFrame:%s", __FUNCTION__, calib_lsc->aLscCof.illAll[i].illuName);
+            LOGD_ALSC("%s: alsc lsForFirstFrame:%s", __FUNCTION__, calib_lsc->aLscCof.illAll[caseIndex][i].illuName);
             break;
         }
     }
     if(calib_lsc->aLscCof.illuNum > 0 && lsFound == false) {
-        memcpy(alsc_context->alscSwInfo.awbGain, calib_lsc->aLscCof.illAll[0].awbGain,
+        memcpy(alsc_context->alscSwInfo.awbGain, calib_lsc->aLscCof.illAll[caseIndex][0].awbGain,
                sizeof(alsc_context->alscSwInfo.awbGain));
-        LOGD_ALSC("%s: alsc lsForFirstFrame:%s", __FUNCTION__, calib_lsc->aLscCof.illAll[0].illuName);
+        LOGD_ALSC("%s: alsc lsForFirstFrame:%s", __FUNCTION__, calib_lsc->aLscCof.illAll[caseIndex][0].illuName);
     }
     LOGI_ALSC("%s: alsc illunum:%d", __FUNCTION__, calib_lsc->aLscCof.illuNum);
+
     // 1) gtet and reorder para
     //const CalibDb_Lsc_t *pAlscProfile = calib->lsc;
-    for(int i = 0; i < calib_lsc->aLscCof.illuNum; i++) {
-        for (int k = 0; k < calib_lsc->aLscCof.lscResNum; k++) {
-            for (int j = 0; j < calib_lsc->aLscCof.illAll[i].tableUsedNO; j++) {
-                char name[LSC_PROFILE_NAME + LSC_RESOLUTION_NAME];
-                sprintf(name, "%s_%s", calib_lsc->aLscCof.lscResName[k],
-                        calib_lsc->aLscCof.illAll[i].tableUsed[j]);
-                const CalibDb_LscTableProfile_t* pLscTableProfile = NULL;
-                // get a lsc-profile from database
-                ret = CamCalibDbGetLscProfileByName(calib_lsc, name, &pLscTableProfile);
-                RETURN_RESULT_IF_DIFFERENT(ret, XCAM_RETURN_NO_ERROR);
-                // store lsc-profile in pointer array
-                alsc_context->pLscTableAll[k][i][j] = pLscTableProfile;
-                LOGD_ALSC("LSC name  %s r[1:2]:%d,%d \n", name,
-                          alsc_context->pLscTableAll[k][i][j]->LscMatrix[0].uCoeff[1],
-                          alsc_context->pLscTableAll[k][i][j]->LscMatrix[0].uCoeff[2]);
+    for(int c=0;c<USED_FOR_CASE_MAX;c++){
+        for(int i = 0; i < calib_lsc->aLscCof.illuNum[c]; i++) {
+            for (int k = 0; k < calib_lsc->aLscCof.lscResNum; k++) {
+                for (int j = 0; j < calib_lsc->aLscCof.illAll[c][i].tableUsedNO; j++) {
+                    char name[LSC_PROFILE_NAME + LSC_RESOLUTION_NAME];
+                    sprintf(name, "%s_%s", calib_lsc->aLscCof.lscResName[k],
+                            calib_lsc->aLscCof.illAll[c][i].tableUsed[j]);
+                    const CalibDb_LscTableProfile_t* pLscTableProfile = NULL;
+                    // get a lsc-profile from database
+                    ret = CamCalibDbGetLscProfileByName(calib_lsc, name, &pLscTableProfile);
+                    RETURN_RESULT_IF_DIFFERENT(ret, XCAM_RETURN_NO_ERROR);
+                    // store lsc-profile in pointer array
+                    alsc_context->pLscTableAll[c][k][i][j] = pLscTableProfile;
+                    LOGD_ALSC("LSC name  %s r[1:2]:%d,%d \n", name,
+                              alsc_context->pLscTableAll[c][k][i][j]->LscMatrix[0].uCoeff[1],
+                              alsc_context->pLscTableAll[c][k][i][j]->LscMatrix[0].uCoeff[2]);
 
+                }
+                // order lsc-profiles by vignetting
+                ret = AwbOrderLscProfilesByVignetting(alsc_context->pLscTableAll[c][k][i],
+                                                      calib_lsc->aLscCof.illAll[c][i].tableUsedNO);
+                //RETURN_RESULT_IF_DIFFERENT(result, XCAM_RETURN_NO_ERROR);
             }
-            // order lsc-profiles by vignetting
-            ret = AwbOrderLscProfilesByVignetting(alsc_context->pLscTableAll[k][i],
-                                                  calib_lsc->aLscCof.illAll[i].tableUsedNO);
-            //RETURN_RESULT_IF_DIFFERENT(result, XCAM_RETURN_NO_ERROR);
-        }
 
+        }
     }
     alsc_context->count = 0;
     alsc_context->mCurAtt.byPass = !(calib_lsc->enable);
@@ -566,7 +577,7 @@ XCamReturn AlscPrepare(alsc_handle_t hAlsc)
     ret = CamCalibDbGetLscResIdxByName( hAlsc->calibLsc, hAlsc->curResName, &resIdx );
     RETURN_RESULT_IF_DIFFERENT(ret, XCAM_RETURN_NO_ERROR);
     hAlsc->alscRest.resIdx = resIdx;
-    const CalibDb_LscTableProfile_t* pLscProfile1 = hAlsc->pLscTableAll[resIdx][0][0];
+    const CalibDb_LscTableProfile_t* pLscProfile1 = hAlsc->pLscTableAll[USED_FOR_CASE_NORMAL][resIdx][0][0];
     memcpy(&hAlsc->lscHwConf.x_grad_tbl[0], &pLscProfile1-> LscXGradTbl[0], sizeof(pLscProfile1-> LscXGradTbl));
     memcpy(&hAlsc->lscHwConf.y_grad_tbl[0], &pLscProfile1-> LscYGradTbl[0], sizeof(pLscProfile1-> LscYGradTbl));
     memcpy(&hAlsc->lscHwConf.x_size_tbl[0], &pLscProfile1-> LscXSizeTbl[0], sizeof(pLscProfile1-> LscXSizeTbl));

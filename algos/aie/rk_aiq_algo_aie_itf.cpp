@@ -92,6 +92,14 @@ prepare(RkAiqAlgoCom* params)
 static XCamReturn
 pre_process(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outparams)
 {
+    RkAiqAlgoContext *ctx = inparams->ctx;
+    RkAiqAlgoPreAieInt* pAiePreParams = (RkAiqAlgoPreAieInt*)inparams;
+    if (pAiePreParams->rk_com.u.proc.gray_mode) {
+        ctx->params.mode = RK_AIQ_IE_EFFECT_BW;
+    }else {
+        ctx->params.mode = RK_AIQ_IE_EFFECT_NONE;
+    }
+
     return XCAM_RETURN_NO_ERROR;
 }
 
@@ -99,6 +107,7 @@ static XCamReturn
 processing(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outparams)
 {
     RkAiqAlgoContext *ctx = inparams->ctx;
+
     RkAiqAlgoProcResAieInt* res_int = (RkAiqAlgoProcResAieInt*)outparams;
     RkAiqAlgoProcResAie* res = (RkAiqAlgoProcResAie*)outparams;
 

@@ -219,7 +219,7 @@ int drmDspFrame(int srcWidth, int srcHeight, int dispWidth, int dispHeight,
   struct drmDsp* pDrmDsp = &gDrmDsp;
 
   int wAlign16 = ((dispWidth+ 15) & (~15));
-  int hAlign16 = ((dispHeight+ 15) & (~15));
+  int hAlign16 = dispHeight;
   int frameSize = wAlign16 * hAlign16 * 3 / 2;
   uint32_t handles[4], pitches[4], offsets[4];
 

@@ -28,6 +28,7 @@
 RKAIQ_BEGIN_DECLARE
 
 typedef struct alsc_rest_s {
+    int caseIndex;
     float fVignetting;
     int dominateIlluProfileIdx;
     int resIdx;
@@ -40,7 +41,7 @@ typedef struct alsc_rest_s {
 
 typedef struct alsc_context_s {
     const CalibDb_Lsc_t *calibLsc;//profile para
-    const CalibDb_LscTableProfile_t *pLscTableAll[LSC_RESOLUTIONS_NUM_MAX][LSC_ILLUMINATION_MAX][LSC_PROFILES_NUM_MAX];// reorder para //to do, change to pointer
+    const CalibDb_LscTableProfile_t *pLscTableAll[USED_FOR_CASE_MAX][LSC_RESOLUTIONS_NUM_MAX][LSC_ILLUMINATION_MAX][LSC_PROFILES_NUM_MAX];// reorder para //to do, change to pointer
     CalibDb_ResolutionName_t  curResName;
     alsc_sw_info_t alscSwInfo;
     alsc_rest_t alscRest;

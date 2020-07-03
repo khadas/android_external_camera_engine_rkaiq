@@ -98,12 +98,28 @@
  * - add hsnr & lsnr control from AE pre results
  * v0.1.9
  * - tnr disable/enable controlled by iq xml
- * - GC4C33 iq v1.0.c 
+ * - GC4C33 iq v1.0.c
  * - ae v0.1.3
  * - add env variable normal_no_read_back
  * - fix ahdr bug in v0.1.8
+ * v1.0.0
+ * - product API implement, include:
+ *   - brightness/contrast/sataration/sharpeness
+ *   - exposure time&gain range
+ *   - white balance scene and R/G gain
+ *   - noise reduction
+ *   - dehaze&fec
+ * - suppport cpsl(compensation light) functionality
+ *   - suppport LED or IR light source
+ *   - support gray mode
+ *   - support auto light compensation control
+ * - rkisp_parser_demo: fixup iqfile path are too long to be complete
+ * - change calib parser version to v1.0.1
+ * - change the name of '/tmp/capture_cnt' to '/tmp/.capture_cnt'
+ * - determine isp read back times according to lumaDetect module
+ * - fix sensor dpcc bug
  */
 
-#define RK_AIQ_VERSION "v0.1.9"
-#define RK_AIQ_RELEASE_DATE "2020-06-24"
+#define RK_AIQ_VERSION "AIQ v1.0.0"
+#define RK_AIQ_RELEASE_DATE "2020-07-03"
 #endif

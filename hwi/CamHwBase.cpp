@@ -161,7 +161,7 @@ CamHwBase::poll_buffer_failed (int64_t timestamp, const char *msg)
     return XCAM_RETURN_ERROR_FAILED;
 }
 
-XCamReturn CamHwBase::setIrcutParams(bool on)
+XCamReturn CamHwBase::setCpslParams(SmartPtr<RkAiqCpslParamsProxy>& cpsl_params)
 {
     return XCAM_RETURN_NO_ERROR;
 }

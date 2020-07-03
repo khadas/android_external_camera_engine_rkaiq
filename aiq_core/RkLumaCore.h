@@ -26,6 +26,7 @@
 #include "xcam_log.h"
 #include "video_buffer.h"
 #include "rk_aiq_luma.h"
+#include "RkAiqCalibDbTypes.h"
 
 using namespace XCam;
 namespace RkCam {
@@ -36,7 +37,7 @@ namespace RkCam {
         return ret; \
     }
 
-#define LUMA_FIFO_CNT 3
+#define LUMA_FIFO_CNT 2
 
 class RkLumaCore;
 
@@ -93,7 +94,7 @@ public:
     }
 
     // called only once
-    XCamReturn init();
+    XCamReturn init(const CalibDb_LUMA_DETECT_t* lumaDetect);
     // called only once
     XCamReturn deInit();
     // start analyze thread
@@ -121,6 +122,7 @@ private:
     RkLumaAnalyzerCb* mCb;
     SmartPtr<RkLumaCoreThread> mRkLumaCoreTh;
     SafeList<isp_luma_stat_t> mLumaQueueFIFO;
+    const CalibDb_LUMA_DETECT_t* calib;
 
     static uint16_t DEFAULT_POOL_SIZE;
 };

@@ -130,7 +130,9 @@ XCamReturn RkAiqHandleIntCom::configInparamsCom(RkAiqAlgoCom* com, int type)
         rk_com->u.proc.proc_res_comb = &shared->procResComb;
         rk_com->u.proc.post_res_comb = &shared->postResComb;
         rk_com->u.proc.iso = shared->iso;
-        rk_com->u.proc.ircut_on = shared->ircut_on;
+        rk_com->u.proc.fill_light_on = shared->fill_light_on;
+        rk_com->u.proc.gray_mode = shared->gray_mode;
+        rk_com->u.proc.is_bw_sensor = shared->is_bw_sensor;
     }
 
     EXIT_ANALYZER_FUNCTION();
@@ -845,6 +847,92 @@ RkAiqAfHandleInt::init()
 }
 
 XCamReturn
+RkAiqAfHandleInt::updateConfig()
+{
+    ENTER_ANALYZER_FUNCTION();
+
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    //TODO
+    mCfgMutex.lock();
+    // if something changed
+    if (updateAtt) {
+        mCurAtt = mNewAtt;
+        updateAtt = false;
+        // TODO
+        rk_aiq_uapi_af_SetAttrib(mAlgoCtx, mCurAtt, false);
+    }
+    mCfgMutex.unlock();
+
+
+    EXIT_ANALYZER_FUNCTION();
+    return ret;
+}
+
+XCamReturn
+RkAiqAfHandleInt::setAttrib(rk_aiq_af_attrib_t att)
+{
+    ENTER_ANALYZER_FUNCTION();
+
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    mCfgMutex.lock();
+    //TODO
+    // check if there is different between att & mCurAtt
+    // if something changed, set att to mNewAtt, and
+    // the new params will be effective later when updateConfig
+    // called by RkAiqCore
+
+    // if something changed
+    if (0 != memcmp(&mCurAtt, &att, sizeof(rk_aiq_af_attrib_t))) {
+        mNewAtt = att;
+        updateAtt = true;
+    }
+
+    mCfgMutex.unlock();
+
+    EXIT_ANALYZER_FUNCTION();
+    return ret;
+}
+
+XCamReturn
+RkAiqAfHandleInt::getAttrib(rk_aiq_af_attrib_t *att)
+{
+    ENTER_ANALYZER_FUNCTION();
+
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+
+    rk_aiq_uapi_af_GetAttrib(mAlgoCtx, att);
+
+    EXIT_ANALYZER_FUNCTION();
+    return ret;
+}
+
+XCamReturn
+RkAiqAfHandleInt::lock()
+{
+    ENTER_ANALYZER_FUNCTION();
+
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+
+    rk_aiq_uapi_af_Lock(mAlgoCtx);
+
+    EXIT_ANALYZER_FUNCTION();
+    return ret;
+}
+
+XCamReturn
+RkAiqAfHandleInt::unlock()
+{
+    ENTER_ANALYZER_FUNCTION();
+
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+
+    rk_aiq_uapi_af_Unlock(mAlgoCtx);
+
+    EXIT_ANALYZER_FUNCTION();
+    return ret;
+}
+
+XCamReturn
 RkAiqAfHandleInt::prepare()
 {
     ENTER_ANALYZER_FUNCTION();
@@ -890,7 +978,8 @@ RkAiqAfHandleInt::preProcess()
     }
 
     comb->af_pre_res = NULL;
-    af_pre_int->af_stats = ispStats->af_stats;
+    af_pre_int->af_stats = &ispStats->af_stats;
+    af_pre_int->aec_stats = &ispStats->aec_stats;
 
     RkAiqAlgoDescription* des = (RkAiqAlgoDescription*)mDes;
     ret = des->pre_process(mPreInParam, mPreOutParam);
@@ -923,8 +1012,8 @@ RkAiqAfHandleInt::processing()
     }
 
     comb->af_proc_res = NULL;
-    af_proc_int->af_proc_com.af_stats = ispStats->af_stats;
-    af_proc_int->af_proc_com.aec_stats = ispStats->aec_stats;
+    af_proc_int->af_proc_com.af_stats = &ispStats->af_stats;
+    af_proc_int->af_proc_com.aec_stats = &ispStats->aec_stats;
     af_proc_int->af_proc_com.com.u.prepare.working_mode = shared->working_mode;
 
     RkAiqAlgoDescription* des = (RkAiqAlgoDescription*)mDes;
@@ -1040,12 +1129,111 @@ RkAiqAnrHandleInt::getAttrib(rk_aiq_nr_attrib_t *att)
 
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
 
-    rk_aiq_uapi_anr_GetAttrib(mAlgoCtx, att);
+    ret = rk_aiq_uapi_anr_GetAttrib(mAlgoCtx, att);
 
     EXIT_ANALYZER_FUNCTION();
     return ret;
 }
 
+XCamReturn
+RkAiqAnrHandleInt::setLumaSFStrength(float fPercent)
+{
+    ENTER_ANALYZER_FUNCTION();
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    ret = rk_aiq_uapi_anr_SetLumaSFStrength(mAlgoCtx, fPercent);
+    EXIT_ANALYZER_FUNCTION();
+    return ret;
+}
+
+XCamReturn
+RkAiqAnrHandleInt::setLumaTFStrength(float fPercent)
+{
+    ENTER_ANALYZER_FUNCTION();
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    ret = rk_aiq_uapi_anr_SetLumaTFStrength(mAlgoCtx, fPercent);
+    EXIT_ANALYZER_FUNCTION();
+    return ret;
+}
+
+XCamReturn
+RkAiqAnrHandleInt::getLumaSFStrength(float *pPercent)
+{
+    ENTER_ANALYZER_FUNCTION();
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    ret = rk_aiq_uapi_anr_GetLumaSFStrength(mAlgoCtx, pPercent);
+    EXIT_ANALYZER_FUNCTION();
+    return ret;
+}
+
+XCamReturn
+RkAiqAnrHandleInt::getLumaTFStrength(float *pPercent)
+{
+    ENTER_ANALYZER_FUNCTION();
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    ret = rk_aiq_uapi_anr_GetLumaTFStrength(mAlgoCtx, pPercent);
+    EXIT_ANALYZER_FUNCTION();
+    return ret;
+}
+
+XCamReturn
+RkAiqAnrHandleInt::setChromaSFStrength(float fPercent)
+{
+    ENTER_ANALYZER_FUNCTION();
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    ret = rk_aiq_uapi_anr_SetChromaSFStrength(mAlgoCtx, fPercent);
+    EXIT_ANALYZER_FUNCTION();
+    return ret;
+}
+
+XCamReturn
+RkAiqAnrHandleInt::setChromaTFStrength(float fPercent)
+{
+    ENTER_ANALYZER_FUNCTION();
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    ret = rk_aiq_uapi_anr_SetChromaTFStrength(mAlgoCtx, fPercent);
+    EXIT_ANALYZER_FUNCTION();
+    return ret;
+}
+
+XCamReturn
+RkAiqAnrHandleInt::getChromaSFStrength(float *pPercent)
+{
+    ENTER_ANALYZER_FUNCTION();
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    ret = rk_aiq_uapi_anr_GetChromaSFStrength(mAlgoCtx, pPercent);
+    EXIT_ANALYZER_FUNCTION();
+    return ret;
+}
+
+XCamReturn
+RkAiqAnrHandleInt::getChromaTFStrength(float *pPercent)
+{
+    ENTER_ANALYZER_FUNCTION();
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    ret = rk_aiq_uapi_anr_GetChromaTFStrength(mAlgoCtx, pPercent);
+    EXIT_ANALYZER_FUNCTION();
+    return ret;
+}
+
+XCamReturn
+RkAiqAnrHandleInt::setRawnrSFStrength(float fPercent)
+{
+    ENTER_ANALYZER_FUNCTION();
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    ret = rk_aiq_uapi_anr_SetRawnrSFStrength(mAlgoCtx, fPercent);
+    EXIT_ANALYZER_FUNCTION();
+    return ret;
+}
+
+XCamReturn
+RkAiqAnrHandleInt::getRawnrSFStrength(float *pPercent)
+{
+    ENTER_ANALYZER_FUNCTION();
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    ret = rk_aiq_uapi_anr_GetRawnrSFStrength(mAlgoCtx, pPercent);
+    EXIT_ANALYZER_FUNCTION();
+    return ret;
+}
 
 XCamReturn
 RkAiqAnrHandleInt::prepare()
@@ -1244,6 +1432,33 @@ RkAiqAsharpHandleInt::getAttrib(rk_aiq_sharp_attrib_t *att)
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
 
     rk_aiq_uapi_asharp_GetAttrib(mAlgoCtx, att);
+
+    EXIT_ANALYZER_FUNCTION();
+    return ret;
+}
+
+XCamReturn
+RkAiqAsharpHandleInt::setStrength(float fPercent)
+{
+    ENTER_ANALYZER_FUNCTION();
+
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+
+    rk_aiq_uapi_asharp_SetStrength(mAlgoCtx, fPercent);
+
+    EXIT_ANALYZER_FUNCTION();
+    return ret;
+}
+
+
+XCamReturn
+RkAiqAsharpHandleInt::getStrength(float *pPercent)
+{
+    ENTER_ANALYZER_FUNCTION();
+
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+
+    rk_aiq_uapi_asharp_GetStrength(mAlgoCtx, pPercent);
 
     EXIT_ANALYZER_FUNCTION();
     return ret;
@@ -1568,7 +1783,7 @@ RkAiqAdhazHandleInt::getSwAttrib(adehaze_sw_s *att)
 
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
 
-    //rk_aiq_uapi_alsc_GetAttrib(mAlgoCtx, att);
+    rk_aiq_uapi_adehaze_GetAttrib(mAlgoCtx, att);
 
     EXIT_ANALYZER_FUNCTION();
     return ret;
@@ -1606,9 +1821,6 @@ RkAiqAhdrHandleInt::updateConfig()
     }
     mCfgMutex.unlock();
 
-    // TODO
-    //rk_aiq_uapi_ahdr_SetAttrib(mAlgoCtx, mCurAtt, false);
-
     EXIT_ANALYZER_FUNCTION();
     return ret;
 }
@@ -1628,7 +1840,7 @@ RkAiqAhdrHandleInt::setAttrib(ahdr_attrib_t att)
 
     // if something changed
     if (0 != memcmp(&mCurAtt, &att, sizeof(ahdr_attrib_t))) {
-        mCurAtt = att;
+        mNewAtt = att;
         updateAtt = true;
     }
     mCfgMutex.unlock();
@@ -1875,7 +2087,10 @@ RkAiqAsdHandleInt::preProcess()
     }
 
     comb->asd_pre_res = NULL;
-
+    asd_pre_int->pre_params.cpsl_mode = shared->cpslCfg.mode;
+    asd_pre_int->pre_params.cpsl_on = shared->cpslCfg.u.m.on;
+    asd_pre_int->pre_params.cpsl_sensitivity = shared->cpslCfg.u.a.sensitivity;
+    asd_pre_int->pre_params.cpsl_sw_interval = shared->cpslCfg.u.a.sw_interval;
     RkAiqAlgoDescription* des = (RkAiqAlgoDescription*)mDes;
     ret = des->pre_process(mPreInParam, mPreOutParam);
     RKAIQCORE_CHECK_RET(ret, "asd algo pre_process failed");

@@ -46,4 +46,134 @@ rk_aiq_user_api_anr_GetAttrib(const rk_aiq_sys_ctx_t* sys_ctx, rk_aiq_nr_attrib_
     return XCAM_RETURN_NO_ERROR;
 }
 
+XCamReturn
+rk_aiq_user_api_anr_SetLumaSFStrength(const rk_aiq_sys_ctx_t* sys_ctx, float fPercnt)
+{
+    RkAiqAnrHandleInt* algo_handle =
+        algoHandle<RkAiqAnrHandleInt>(sys_ctx, RK_AIQ_ALGO_TYPE_ANR);
+
+    if (algo_handle) {
+        return algo_handle->setLumaSFStrength(fPercnt);
+    }
+
+    return XCAM_RETURN_NO_ERROR;
+}
+
+XCamReturn
+rk_aiq_user_api_anr_SetLumaTFStrength(const rk_aiq_sys_ctx_t* sys_ctx, float fPercnt)
+{
+    RkAiqAnrHandleInt* algo_handle =
+        algoHandle<RkAiqAnrHandleInt>(sys_ctx, RK_AIQ_ALGO_TYPE_ANR);
+
+    if (algo_handle) {
+        return algo_handle->setLumaTFStrength(fPercnt);
+    }
+
+    return XCAM_RETURN_NO_ERROR;
+}
+
+XCamReturn
+rk_aiq_user_api_anr_GetLumaSFStrength(const rk_aiq_sys_ctx_t* sys_ctx, float *pPercnt)
+{
+    RkAiqAnrHandleInt* algo_handle =
+        algoHandle<RkAiqAnrHandleInt>(sys_ctx, RK_AIQ_ALGO_TYPE_ANR);
+
+    if (algo_handle) {
+        return algo_handle->getLumaSFStrength(pPercnt);
+    }
+
+    return XCAM_RETURN_NO_ERROR;
+}
+
+XCamReturn
+rk_aiq_user_api_anr_GetLumaTFStrength(const rk_aiq_sys_ctx_t* sys_ctx, float *pPercnt)
+{
+    RkAiqAnrHandleInt* algo_handle =
+        algoHandle<RkAiqAnrHandleInt>(sys_ctx, RK_AIQ_ALGO_TYPE_ANR);
+
+    if (algo_handle) {
+        return algo_handle->getLumaTFStrength(pPercnt);
+    }
+
+    return XCAM_RETURN_NO_ERROR;
+}
+
+XCamReturn
+rk_aiq_user_api_anr_SetChromaSFStrength(const rk_aiq_sys_ctx_t* sys_ctx, float fPercnt)
+{
+    RkAiqAnrHandleInt* algo_handle =
+        algoHandle<RkAiqAnrHandleInt>(sys_ctx, RK_AIQ_ALGO_TYPE_ANR);
+
+    if (algo_handle) {
+        return algo_handle->setChromaSFStrength(fPercnt);
+    }
+
+    return XCAM_RETURN_NO_ERROR;
+}
+
+XCamReturn
+rk_aiq_user_api_anr_SetChromaTFStrength(const rk_aiq_sys_ctx_t* sys_ctx, float fPercnt)
+{
+    RkAiqAnrHandleInt* algo_handle =
+        algoHandle<RkAiqAnrHandleInt>(sys_ctx, RK_AIQ_ALGO_TYPE_ANR);
+
+    if (algo_handle) {
+        return algo_handle->setChromaTFStrength(fPercnt);
+    }
+
+    return XCAM_RETURN_NO_ERROR;
+}
+
+XCamReturn
+rk_aiq_user_api_anr_GetChromaSFStrength(const rk_aiq_sys_ctx_t* sys_ctx, float *pPercnt)
+{
+    RkAiqAnrHandleInt* algo_handle =
+        algoHandle<RkAiqAnrHandleInt>(sys_ctx, RK_AIQ_ALGO_TYPE_ANR);
+
+    if (algo_handle) {
+        return algo_handle->getChromaSFStrength(pPercnt);
+    }
+
+    return XCAM_RETURN_NO_ERROR;
+}
+
+XCamReturn
+rk_aiq_user_api_anr_GetChromaTFStrength(const rk_aiq_sys_ctx_t* sys_ctx, float *pPercnt)
+{
+    RkAiqAnrHandleInt* algo_handle =
+        algoHandle<RkAiqAnrHandleInt>(sys_ctx, RK_AIQ_ALGO_TYPE_ANR);
+
+    if (algo_handle) {
+        return algo_handle->getChromaTFStrength(pPercnt);
+    }
+
+    return XCAM_RETURN_NO_ERROR;
+}
+
+XCamReturn
+rk_aiq_user_api_anr_SetRawnrSFStrength(const rk_aiq_sys_ctx_t* sys_ctx, float fPercnt)
+{
+    RkAiqAnrHandleInt* algo_handle =
+        algoHandle<RkAiqAnrHandleInt>(sys_ctx, RK_AIQ_ALGO_TYPE_ANR);
+
+    if (algo_handle) {
+        return algo_handle->setRawnrSFStrength(fPercnt);
+    }
+
+    return XCAM_RETURN_NO_ERROR;
+}
+
+XCamReturn
+rk_aiq_user_api_anr_GetRawnrSFStrength(const rk_aiq_sys_ctx_t* sys_ctx, float *pPercnt)
+{
+    RkAiqAnrHandleInt* algo_handle =
+        algoHandle<RkAiqAnrHandleInt>(sys_ctx, RK_AIQ_ALGO_TYPE_ANR);
+
+    if (algo_handle) {
+        return algo_handle->getRawnrSFStrength(pPercnt);
+    }
+
+    return XCAM_RETURN_NO_ERROR;
+}
+
 RKAIQ_END_DECLARE

@@ -746,8 +746,11 @@ void Isp20Params::convertAiqAhdrToIsp20Params(struct isp2x_isp_params_cfg& isp_c
 
 void
 Isp20Params::convertAiqAfToIsp20Params(struct isp2x_isp_params_cfg& isp_cfg,
-                                       const rk_aiq_isp_af_meas_t& af_data)
+                                       const rk_aiq_isp_af_meas_t& af_data, bool af_cfg_udpate)
 {
+    if (!af_cfg_udpate)
+        return;
+
     if (af_data.contrast_af_en)
         isp_cfg.module_ens |= ISP2X_MODULE_RAWAF;
     isp_cfg.module_en_update |= ISP2X_MODULE_RAWAF;
@@ -1949,7 +1952,7 @@ Isp20Params::convertAiqResultsToIsp20Params(struct isp2x_isp_params_cfg& isp_cfg
     convertAiqBlcToIsp20Params(isp_cfg, aiq_results);
     convertAiqDpccToIsp20Params(isp_cfg, aiq_results);
     convertAiqRawnrToIsp20Params(isp_cfg, aiq_results->data()->rawnr);
-    convertAiqAfToIsp20Params(isp_cfg, aiq_results->data()->af_meas);
+    convertAiqAfToIsp20Params(isp_cfg, aiq_results->data()->af_meas, aiq_results->data()->af_cfg_update);
     convertAiqAdehazeToIsp20Params(isp_cfg, aiq_results->data()->adhaz_config);
     convertAiqA3dlutToIsp20Params(isp_cfg, aiq_results->data()->lut3d);
     convertAiqAldchToIsp20Params(isp_cfg, aiq_results->data()->ldch);
@@ -1961,13 +1964,12 @@ Isp20Params::convertAiqResultsToIsp20Params(struct isp2x_isp_params_cfg& isp_cfg
      * TODO: enable all modules after validation in isp
      */
 #if 0
-    convertAiqAfToIsp20Params(isp_cfg, aiq_results->data()->af_meas);
     convertAiqCpToIsp20Params(isp_cfg, aiq_results->data()->cp);
     convertAiqIeToIsp20Params(isp_cfg, aiq_results->data()->ie);
 #endif
     convertAiqGicToIsp20Params(isp_cfg, aiq_results->data()->gic);
     convertAiqAdemosaicToIsp20Params(isp_cfg, aiq_results);
-
+    convertAiqIeToIsp20Params(isp_cfg, aiq_results->data()->ie);
     last_aiq_results = aiq_results;
 
     return ret;
@@ -2052,33 +2054,35 @@ void
 Isp20Params::convertAiqAdemosaicToIsp20Params(struct isp2x_isp_params_cfg& isp_cfg,
         SmartPtr<RkAiqIspParamsProxy> aiq_results)
 {
-    isp_cfg.module_ens |= ISP2X_MODULE_DEBAYER;
-    isp_cfg.module_en_update |= ISP2X_MODULE_DEBAYER;
-    isp_cfg.module_cfg_update |= ISP2X_MODULE_DEBAYER;
+    if (aiq_results->data()->demosaic.enable) {
+        isp_cfg.module_ens |= ISP2X_MODULE_DEBAYER;
+        isp_cfg.module_en_update |= ISP2X_MODULE_DEBAYER;
+        isp_cfg.module_cfg_update |= ISP2X_MODULE_DEBAYER;
 
-    isp_cfg.others.debayer_cfg.clip_en = aiq_results->data()->demosaic.clip_en;
-    isp_cfg.others.debayer_cfg.filter_c_en = aiq_results->data()->demosaic.filter_c_en;
-    isp_cfg.others.debayer_cfg.filter_g_en = aiq_results->data()->demosaic.filter_g_en;
-    isp_cfg.others.debayer_cfg.gain_offset = aiq_results->data()->demosaic.gain_offset;
-    isp_cfg.others.debayer_cfg.offset = aiq_results->data()->demosaic.offset;
-    isp_cfg.others.debayer_cfg.hf_offset = aiq_results->data()->demosaic.hf_offset;
-    isp_cfg.others.debayer_cfg.thed0 = aiq_results->data()->demosaic.thed0;
-    isp_cfg.others.debayer_cfg.thed1 = aiq_results->data()->demosaic.thed1;
-    isp_cfg.others.debayer_cfg.dist_scale = aiq_results->data()->demosaic.dist_scale;
-    isp_cfg.others.debayer_cfg.shift_num = aiq_results->data()->demosaic.shift_num;
-    isp_cfg.others.debayer_cfg.filter1_coe1 = aiq_results->data()->demosaic.filter1_coe[0];
-    isp_cfg.others.debayer_cfg.filter1_coe2 = aiq_results->data()->demosaic.filter1_coe[1];
-    isp_cfg.others.debayer_cfg.filter1_coe3 = aiq_results->data()->demosaic.filter1_coe[2];
-    isp_cfg.others.debayer_cfg.filter1_coe4 = aiq_results->data()->demosaic.filter1_coe[3];
-    isp_cfg.others.debayer_cfg.filter1_coe5 = aiq_results->data()->demosaic.filter1_coe[4];
-    isp_cfg.others.debayer_cfg.filter2_coe1 = aiq_results->data()->demosaic.filter2_coe[0];
-    isp_cfg.others.debayer_cfg.filter2_coe2 = aiq_results->data()->demosaic.filter2_coe[1];
-    isp_cfg.others.debayer_cfg.filter2_coe3 = aiq_results->data()->demosaic.filter2_coe[2];
-    isp_cfg.others.debayer_cfg.filter2_coe4 = aiq_results->data()->demosaic.filter2_coe[3];
-    isp_cfg.others.debayer_cfg.filter2_coe5 = aiq_results->data()->demosaic.filter2_coe[4];
-    isp_cfg.others.debayer_cfg.max_ratio = aiq_results->data()->demosaic.max_ratio;
-    isp_cfg.others.debayer_cfg.order_max = aiq_results->data()->demosaic.order_max;
-    isp_cfg.others.debayer_cfg.order_min = aiq_results->data()->demosaic.order_min;
+        isp_cfg.others.debayer_cfg.clip_en = aiq_results->data()->demosaic.clip_en;
+        isp_cfg.others.debayer_cfg.filter_c_en = aiq_results->data()->demosaic.filter_c_en;
+        isp_cfg.others.debayer_cfg.filter_g_en = aiq_results->data()->demosaic.filter_g_en;
+        isp_cfg.others.debayer_cfg.gain_offset = aiq_results->data()->demosaic.gain_offset;
+        isp_cfg.others.debayer_cfg.offset = aiq_results->data()->demosaic.offset;
+        isp_cfg.others.debayer_cfg.hf_offset = aiq_results->data()->demosaic.hf_offset;
+        isp_cfg.others.debayer_cfg.thed0 = aiq_results->data()->demosaic.thed0;
+        isp_cfg.others.debayer_cfg.thed1 = aiq_results->data()->demosaic.thed1;
+        isp_cfg.others.debayer_cfg.dist_scale = aiq_results->data()->demosaic.dist_scale;
+        isp_cfg.others.debayer_cfg.shift_num = aiq_results->data()->demosaic.shift_num;
+        isp_cfg.others.debayer_cfg.filter1_coe1 = aiq_results->data()->demosaic.filter1_coe[0];
+        isp_cfg.others.debayer_cfg.filter1_coe2 = aiq_results->data()->demosaic.filter1_coe[1];
+        isp_cfg.others.debayer_cfg.filter1_coe3 = aiq_results->data()->demosaic.filter1_coe[2];
+        isp_cfg.others.debayer_cfg.filter1_coe4 = aiq_results->data()->demosaic.filter1_coe[3];
+        isp_cfg.others.debayer_cfg.filter1_coe5 = aiq_results->data()->demosaic.filter1_coe[4];
+        isp_cfg.others.debayer_cfg.filter2_coe1 = aiq_results->data()->demosaic.filter2_coe[0];
+        isp_cfg.others.debayer_cfg.filter2_coe2 = aiq_results->data()->demosaic.filter2_coe[1];
+        isp_cfg.others.debayer_cfg.filter2_coe3 = aiq_results->data()->demosaic.filter2_coe[2];
+        isp_cfg.others.debayer_cfg.filter2_coe4 = aiq_results->data()->demosaic.filter2_coe[3];
+        isp_cfg.others.debayer_cfg.filter2_coe5 = aiq_results->data()->demosaic.filter2_coe[4];
+        isp_cfg.others.debayer_cfg.max_ratio = aiq_results->data()->demosaic.max_ratio;
+        isp_cfg.others.debayer_cfg.order_max = aiq_results->data()->demosaic.order_max;
+        isp_cfg.others.debayer_cfg.order_min = aiq_results->data()->demosaic.order_min;
+    }
 }
 
 void
@@ -2108,6 +2112,10 @@ Isp20Params::convertAiqIeToIsp20Params(struct isp2x_isp_params_cfg& isp_cfg,
                                        const rk_aiq_isp_ie_t& ie_cfg)
 {
     struct isp2x_ie_cfg* ie_config = &isp_cfg.others.ie_cfg;
+
+    isp_cfg.module_ens |= ISP2X_MODULE_IE;
+    isp_cfg.module_en_update |= ISP2X_MODULE_IE;
+    isp_cfg.module_cfg_update |= ISP2X_MODULE_IE;
 
     switch (ie_cfg.base.mode) {
     case RK_AIQ_IE_EFFECT_BW:
@@ -2178,6 +2186,13 @@ Isp20Params::convertAiqIeToIsp20Params(struct isp2x_isp_params_cfg& isp_cfg,
         ie_config->eff_mat_5 = 0;
         ie_config->color_sel = 0;
         ie_config->eff_tint = 0;
+    }
+    break;
+    case RK_AIQ_IE_EFFECT_NONE:
+    {
+        isp_cfg.module_ens &= ~ISP2X_MODULE_IE;
+        isp_cfg.module_en_update |= ISP2X_MODULE_IE;
+        isp_cfg.module_cfg_update &= ~ISP2X_MODULE_IE;
     }
     break;
     default:
@@ -2339,8 +2354,10 @@ void Isp20Params::setModuleStatus(rk_aiq_module_id_t mId, bool en)
         _ISPP_MODULE_CFG_(RK_ISP2X_PP_TNR_ID, ISPP_MODULE_TNR);
         break;
     case RK_MODULE_NR:
-        _ISPP_MODULE_CFG_(RK_ISP2X_RAWNR_ID, ISPP_MODULE_NR);
+        _ISPP_MODULE_CFG_(RK_ISP2X_PP_NR_ID, ISPP_MODULE_NR);
         break;
+    case RK_MODULE_RAWNR:
+        _ISP_MODULE_CFG_(RK_ISP2X_RAWNR_ID);
     case RK_MODULE_DPCC:
         _ISP_MODULE_CFG_(RK_ISP2X_DPCC_ID);
         break;
@@ -2372,7 +2389,7 @@ void Isp20Params::setModuleStatus(rk_aiq_module_id_t mId, bool en)
         _ISP_MODULE_CFG_(RK_ISP2X_GAIN_ID);
         break;
     case RK_MODULE_SHARP:
-        _ISP_MODULE_CFG_(RK_ISP2X_RK_IESHARP_ID);
+        _ISPP_MODULE_CFG_(RK_ISP2X_PP_TSHP_ID, ISPP_MODULE_SHP);
         break;
     case RK_MODULE_AE:
         break;
@@ -2393,6 +2410,9 @@ void Isp20Params::getModuleStatus(rk_aiq_module_id_t mId, bool& en)
     case RK_MODULE_TNR:
         mod_id = RK_ISP2X_PP_TNR_ID;
         break;
+    case RK_MODULE_RAWNR:
+        mod_id = RK_ISP2X_RAWNR_ID;
+        break;
     case RK_MODULE_DPCC:
         mod_id = RK_ISP2X_DPCC_ID;
         break;
@@ -2412,7 +2432,7 @@ void Isp20Params::getModuleStatus(rk_aiq_module_id_t mId, bool& en)
         mod_id = RK_ISP2X_GOC_ID;
         break;
     case RK_MODULE_NR:
-        mod_id = RK_ISP2X_RAWNR_ID;
+        mod_id = RK_ISP2X_PP_NR_ID;
         break;
     case RK_MODULE_3DLUT:
         mod_id = RK_ISP2X_3DLUT_ID;
@@ -2427,7 +2447,7 @@ void Isp20Params::getModuleStatus(rk_aiq_module_id_t mId, bool& en)
         mod_id = RK_ISP2X_GAIN_ID;
         break;
     case RK_MODULE_SHARP:
-        mod_id = RK_ISP2X_RK_IESHARP_ID;
+        mod_id = RK_ISP2X_PP_TSHP_ID;
         break;
     case RK_MODULE_AE:
         mod_id = RK_ISP2X_RAWAE_LITE_ID;
@@ -2523,7 +2543,7 @@ Isp20Params::forceOverwriteAiqIsppCfg(struct rkispp_params_cfg& pp_cfg, SmartPtr
                 }
                 break;
             case RK_ISP2X_PP_TSHP_ID:
-                if (getModuleForceEn(RK_ISP2X_RK_IESHARP_ID)) {
+                if (getModuleForceEn(RK_ISP2X_PP_TSHP_ID)) {
                     if(aiq_results->data()->sharpen.stSharpFixV1.sharp_en ||
                             aiq_results->data()->edgeflt.edgeflt_en) {
                         pp_cfg.module_ens |= ISPP_MODULE_SHP;
@@ -2553,19 +2573,19 @@ Isp20Params::forceOverwriteAiqIspCfg(struct isp2x_isp_params_cfg& isp_cfg,
         if (getModuleForceFlag(i)) {
             switch (i) {
             case RK_ISP2X_DPCC_ID:
-                if (getModuleForceEn(RK_ISP2X_PP_TNR_ID)) {
+                if (getModuleForceEn(RK_ISP2X_DPCC_ID)) {
                     if(aiq_results->data()->dpcc.stBasic.enable) {
-                        isp_cfg.module_ens |= ISPP_MODULE_TNR;
-                        isp_cfg.module_en_update |= ISPP_MODULE_TNR;
-                        isp_cfg.module_cfg_update |= ISPP_MODULE_TNR;
+                        isp_cfg.module_ens |= ISP2X_MODULE_DPCC;
+                        isp_cfg.module_en_update |= ISP2X_MODULE_DPCC;
+                        isp_cfg.module_cfg_update |= ISP2X_MODULE_DPCC;
                     } else {
                         setModuleForceFlagInverse(RK_ISP2X_DPCC_ID);
-                        LOGE("algo isn't enabled, so enable module failed!");
+                        LOGE("dpcc algo isn't enabled, so enable module failed!");
                     }
                 } else {
-                    isp_cfg.module_ens &= ~ISPP_MODULE_TNR;
-                    isp_cfg.module_en_update |= ISPP_MODULE_TNR;
-                    isp_cfg.module_cfg_update &= ~ISPP_MODULE_TNR;
+                    isp_cfg.module_ens &= ~ISP2X_MODULE_DPCC;
+                    isp_cfg.module_en_update |= ISP2X_MODULE_DPCC;
+                    isp_cfg.module_cfg_update &= ~ISP2X_MODULE_DPCC;
                 }
                 break;
             case RK_ISP2X_BLS_ID:
@@ -2576,7 +2596,7 @@ Isp20Params::forceOverwriteAiqIspCfg(struct isp2x_isp_params_cfg& isp_cfg,
                         isp_cfg.module_cfg_update |= ISP2X_MODULE_BLS;
                     } else {
                         setModuleForceFlagInverse(RK_ISP2X_BLS_ID);
-                        LOGE("algo isn't enabled, so enable module failed!");
+                        LOGE("bls algo isn't enabled, so enable module failed!");
                     }
                 } else {
                     isp_cfg.module_ens &= ~ISP2X_MODULE_BLS;
@@ -2592,7 +2612,7 @@ Isp20Params::forceOverwriteAiqIspCfg(struct isp2x_isp_params_cfg& isp_cfg,
                         isp_cfg.module_cfg_update |= ISP2X_MODULE_LSC;
                     } else {
                         setModuleForceFlagInverse(RK_ISP2X_LSC_ID);
-                        LOGE("algo isn't enabled, so enable module failed!");
+                        LOGE("lsc algo isn't enabled, so enable module failed!");
                     }
                 } else {
                     isp_cfg.module_ens &= ~ISP2X_MODULE_LSC;
@@ -2608,7 +2628,7 @@ Isp20Params::forceOverwriteAiqIspCfg(struct isp2x_isp_params_cfg& isp_cfg,
                         isp_cfg.module_cfg_update |= ISP2X_MODULE_CCM;
                     } else {
                         setModuleForceFlagInverse(RK_ISP2X_CTK_ID);
-                        LOGE("algo isn't enabled, so enable module failed!");
+                        LOGE("ccm algo isn't enabled, so enable module failed!");
                     }
                 } else {
                     isp_cfg.module_ens &= ~ISP2X_MODULE_CCM;
@@ -2624,7 +2644,7 @@ Isp20Params::forceOverwriteAiqIspCfg(struct isp2x_isp_params_cfg& isp_cfg,
                         isp_cfg.module_cfg_update |= ISP2X_MODULE_RAWAWB;
                     } else {
                         setModuleForceFlagInverse(RK_ISP2X_RAWAWB_ID);
-                        LOGE("algo isn't enabled, so enable module failed!");
+                        LOGE("awb algo isn't enabled, so enable module failed!");
                     }
                 } else {
                     isp_cfg.module_ens &= ~ISP2X_MODULE_RAWAWB;
@@ -2640,7 +2660,7 @@ Isp20Params::forceOverwriteAiqIspCfg(struct isp2x_isp_params_cfg& isp_cfg,
                         isp_cfg.module_cfg_update |= ISP2X_MODULE_GOC;
                     } else {
                         setModuleForceFlagInverse(RK_ISP2X_GOC_ID);
-                        LOGE("algo isn't enabled, so enable module failed!");
+                        LOGE("goc algo isn't enabled, so enable module failed!");
                     }
                 } else {
                     isp_cfg.module_ens &= ~ISP2X_MODULE_GOC;
@@ -2656,7 +2676,7 @@ Isp20Params::forceOverwriteAiqIspCfg(struct isp2x_isp_params_cfg& isp_cfg,
                         isp_cfg.module_cfg_update |= ISP2X_MODULE_RAWNR;
                     } else {
                         setModuleForceFlagInverse(RK_ISP2X_RAWNR_ID);
-                        LOGE("algo isn't enabled, so enable module failed!");
+                        LOGE("rawnr algo isn't enabled, so enable module failed!");
                     }
                 } else {
                     isp_cfg.module_ens &= ~ISP2X_MODULE_RAWNR;
@@ -2672,7 +2692,7 @@ Isp20Params::forceOverwriteAiqIspCfg(struct isp2x_isp_params_cfg& isp_cfg,
                         isp_cfg.module_cfg_update |= ISP2X_MODULE_3DLUT;
                     } else {
                         setModuleForceFlagInverse(RK_ISP2X_3DLUT_ID);
-                        LOGE("algo isn't enabled, so enable module failed!");
+                        LOGE("3dlut algo isn't enabled, so enable module failed!");
                     }
                 } else {
                     isp_cfg.module_ens &= ~ISP2X_MODULE_3DLUT;
@@ -2688,7 +2708,7 @@ Isp20Params::forceOverwriteAiqIspCfg(struct isp2x_isp_params_cfg& isp_cfg,
                         isp_cfg.module_cfg_update |= ISP2X_MODULE_LDCH;
                     } else {
                         setModuleForceFlagInverse(RK_ISP2X_LDCH_ID);
-                        LOGE("algo isn't enabled, so enable module failed!");
+                        LOGE("ldch algo isn't enabled, so enable module failed!");
                     }
                 } else {
                     isp_cfg.module_ens &= ~ISP2X_MODULE_LDCH;
@@ -2704,7 +2724,7 @@ Isp20Params::forceOverwriteAiqIspCfg(struct isp2x_isp_params_cfg& isp_cfg,
                         isp_cfg.module_cfg_update |= ISP2X_MODULE_GIC;
                     } else {
                         setModuleForceFlagInverse(RK_ISP2X_GIC_ID);
-                        LOGE("algo isn't enabled, so enable module failed!");
+                        LOGE("gic algo isn't enabled, so enable module failed!");
                     }
                 } else {
                     isp_cfg.module_ens &= ~ISP2X_MODULE_GIC;
@@ -2720,7 +2740,7 @@ Isp20Params::forceOverwriteAiqIspCfg(struct isp2x_isp_params_cfg& isp_cfg,
                         isp_cfg.module_cfg_update |= ISP2X_MODULE_GAIN;
                     } else {
                         setModuleForceFlagInverse(RK_ISP2X_GAIN_ID);
-                        LOGE("algo isn't enabled, so enable module failed!");
+                        LOGE("gain algo isn't enabled, so enable module failed!");
                     }
                 } else {
                     isp_cfg.module_ens &= ~ISP2X_MODULE_GAIN;
@@ -2728,7 +2748,7 @@ Isp20Params::forceOverwriteAiqIspCfg(struct isp2x_isp_params_cfg& isp_cfg,
                     isp_cfg.module_cfg_update &= ~ISP2X_MODULE_GAIN;
                 }
                 break;
-            case RK_MODULE_DHAZ:
+            case RK_ISP2X_DHAZ_ID:
                 if (getModuleForceEn(RK_ISP2X_DHAZ_ID)) {
                     if(aiq_results->data()->adhaz_config.dehaze_en[0]) {
                         isp_cfg.module_ens |= ISP2X_MODULE_DHAZ;
@@ -2736,7 +2756,7 @@ Isp20Params::forceOverwriteAiqIspCfg(struct isp2x_isp_params_cfg& isp_cfg,
                         isp_cfg.module_cfg_update |= ISP2X_MODULE_DHAZ;
                     } else {
                         setModuleForceFlagInverse(RK_ISP2X_DHAZ_ID);
-                        LOGE("algo isn't enabled, so enable module failed!");
+                        LOGE("dehaze algo isn't enabled, so enable module failed!");
                     }
                 } else {
                     isp_cfg.module_ens &= ~ISP2X_MODULE_DHAZ;
@@ -2747,6 +2767,6 @@ Isp20Params::forceOverwriteAiqIspCfg(struct isp2x_isp_params_cfg& isp_cfg,
             }
         }
     }
-    updateIsppModuleForceEns(isp_cfg.module_ens);
+    updateIspModuleForceEns(isp_cfg.module_ens);
 }
 }; //namspace RkCam

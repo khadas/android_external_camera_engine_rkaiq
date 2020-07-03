@@ -29,10 +29,9 @@ RKAIQ_BEGIN_DECLARE
 
 XCamReturn AgammaInitV200(AgammaHandle_t** para);
 XCamReturn AgammaReleaseV200(AgammaHandle_t* para);
-XCamReturn AgammaConfigV200(const CalibDb_Gamma_t *  AgammaHtmlPara, AgammaHandle_t* para);
+XCamReturn AgammaConfigInit(AgammaHandle_t* para);
 XCamReturn AgammaPreProcV200(AgammaHandle_t* para);
 XCamReturn AgammaProcessingV200(AgammaHandle_t* para);
-XCamReturn  AgammaReConfigV200(AgammaHandle_t *para, const CalibDb_Gamma_t * gamma_calib);
 
 RKAIQ_END_DECLARE
 

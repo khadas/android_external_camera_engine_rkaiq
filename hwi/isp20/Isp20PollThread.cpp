@@ -29,8 +29,8 @@
 #endif
 
 #define CAPTURE_RAW_PATH "/tmp"
-#define CAPTURE_CNT_FILENAME "capture_cnt"
-// #define WRITE_RAW_FILE_HEADER
+#define CAPTURE_CNT_FILENAME ".capture_cnt"
+#define WRITE_RAW_FILE_HEADER
 // #define WRITE_ISP_REG
 // #define WRITE_ISPP_REG
 #define ISP_REGS_BASE 0xffb50000
@@ -177,11 +177,7 @@ public:
 
 protected:
     virtual bool loop () {
-        XCamReturn ret;
-        if(_poll->_loop_vain)
-            ret = XCAM_RETURN_NO_ERROR;
-        else
-            ret = _poll->mipi_poll_buffer_loop (_type, _dev_index);
+        XCamReturn ret = _poll->mipi_poll_buffer_loop (_type, _dev_index);
 
         if (ret == XCAM_RETURN_NO_ERROR || ret == XCAM_RETURN_ERROR_TIMEOUT ||
                 XCAM_RETURN_BYPASS)
@@ -622,6 +618,8 @@ Isp20PollThread::mipi_poll_buffer_loop (int type, int dev_index)
         dev = _isp_mipi_tx_infos[dev_index].dev;
         stop_fd = _isp_mipi_tx_infos[dev_index].stop_fds[0];
     } else if (type == ISP_POLL_MIPI_RX) {
+        if(_loop_vain)
+            return ret;
         dev = _isp_mipi_rx_infos[dev_index].dev;
         stop_fd = _isp_mipi_rx_infos[dev_index].stop_fds[0];
     } else
@@ -651,6 +649,8 @@ Isp20PollThread::mipi_poll_buffer_loop (int type, int dev_index)
 
     SmartPtr<V4l2BufferProxy> buf_proxy = new V4l2BufferProxy(buf, dev);
     if (type == ISP_POLL_MIPI_TX) {
+        if(_loop_vain)
+            return ret;
         handle_tx_buf(buf_proxy, dev_index);
     } else if (type == ISP_POLL_MIPI_RX) {
         handle_rx_buf(buf_proxy, dev_index);
@@ -798,13 +798,10 @@ Isp20PollThread::trigger_readback()
 
     struct isp2x_csi_trigger tg = {
         .frame_id = sequence,
-        .times = times - 1,
+        .times = times,
     };
 
-    if (_first_trigger) {
-        tg.times = 1;
-    }
-
+#if 0
     /* TODO: fix the trigger time for ahdr temporarily */
     if (_mipi_dev_max == 1)
         tg.times = 1;
@@ -813,6 +810,7 @@ Isp20PollThread::trigger_readback()
     LOGW_CAMHW("%s fix the trigger to %d time for ahdr temporarily\n",
                __func__,
                tg.times);
+#endif
 
     if (_rx_handle_dev) {
         if (_rx_handle_dev->setIspParamsSync(sequence) ||
@@ -850,8 +848,10 @@ Isp20PollThread::trigger_readback()
                 } else {
                     buf_proxy = _isp_mipi_rx_infos[i].cache_list.pop(-1);
                     _isp_mipi_rx_infos[i].buf_list.push(buf_proxy);
-                    //v4l2buf[i]->set_expbuf_fd(buf_proxy->get_expbuf_fd());
-                    v4l2buf[i]->set_expbuf_usrptr(buf_proxy->get_v4l2_userptr());
+		    if (_isp_mipi_rx_infos[i].dev->get_mem_type() == V4L2_MEMORY_USERPTR)
+                        v4l2buf[i]->set_expbuf_usrptr(buf_proxy->get_v4l2_userptr());
+		    else if (_isp_mipi_rx_infos[i].dev->get_mem_type() == V4L2_MEMORY_DMABUF)
+		        v4l2buf[i]->set_expbuf_fd(buf_proxy->get_expbuf_fd());
 
                     if (_is_capture_raw && _capture_raw_num > 0) {
                         if (!_is_raw_dir_exist) {
@@ -899,12 +899,25 @@ Isp20PollThread::trigger_readback()
 
             tg.frame_timestamp = buf_proxy->get_timestamp () * 1000;
 
-            LOGD_CAMHW("%s set frame[%d]:ts %" PRId64 "ms \n",
-                       __func__, sequence, tg.frame_timestamp / 1000 / 1000);
+	    if (_first_trigger) {
+		tg.times = 0;
+		if (_working_mode != RK_AIQ_WORKING_MODE_NORMAL)
+		    tg.times++;
+	    }
 
-            if (ret == XCAM_RETURN_NO_ERROR)
+	    if (_rx_handle_dev->getDhazState())
+	        tg.times++;
+
+            LOGD_CAMHW("%s frame[%d]:ts %" PRId64 "ms, readback %dtimes \n",
+                       __func__, sequence,
+		       tg.frame_timestamp / 1000 / 1000,
+		       tg.times);
+
+            if (ret == XCAM_RETURN_NO_ERROR) {
+		if (--tg.times < 0)
+		    tg.times = 0;
                 _isp_core_dev->io_control(RKISP_CMD_TRIGGER_READ_BACK, &tg);
-            else
+	    } else
                 LOGE_CAMHW("%s frame[%d] queue  failed, don't read back!\n",
                            __func__, sequence);
 

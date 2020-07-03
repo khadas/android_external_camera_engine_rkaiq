@@ -558,7 +558,7 @@ void select_sharpen_params_by_ISO   (
 
 
 
-AsharpResult_t rk_Sharp_V1_fix_transfer(RKAsharp_Sharp_HW_Params_Select_t *pSharpV1, RKAsharp_Sharp_HW_Fix_t* pSharpCfg)
+AsharpResult_t rk_Sharp_V1_fix_transfer(RKAsharp_Sharp_HW_Params_Select_t *pSharpV1, RKAsharp_Sharp_HW_Fix_t* pSharpCfg, float fPercent)
 {
     int i = 0;
     int k = 0;
@@ -836,14 +836,20 @@ AsharpResult_t rk_Sharp_V1_fix_transfer(RKAsharp_Sharp_HW_Params_Select_t *pShar
     pSharpCfg->rfh_ratio = (unsigned short)ROUND_F(pSharpV1->hratio * (1 << reg_sharpenHW_hratio_fix_bits));
 
     //0x012C
-    pSharpCfg->m_ratio = (unsigned char)ROUND_F(pSharpV1->M_ratio * (1 << reg_sharpenHW_M_ratio_fix_bits));
-    pSharpCfg->h_ratio = (unsigned char)ROUND_F(pSharpV1->H_ratio * (1 << reg_sharpenHW_H_ratio_fix_bits));
+    pSharpCfg->m_ratio = (unsigned char)ROUND_F(pSharpV1->M_ratio * fPercent * (1 << reg_sharpenHW_M_ratio_fix_bits));
+    if(pSharpCfg->m_ratio > 0x1f){
+	pSharpCfg->m_ratio = 0x1f;
+    }
+    pSharpCfg->h_ratio = (unsigned char)ROUND_F(pSharpV1->H_ratio *  fPercent * (1 << reg_sharpenHW_H_ratio_fix_bits));
+    if(pSharpCfg->h_ratio > 0x1f){
+	pSharpCfg->h_ratio = 0x1f;
+    }
 
 
     return res;
 }
 
-AsharpResult_t rk_Sharp_fix_transfer(RKAsharp_Sharp_Params_Select_t* sharp, RKAsharp_Sharp_Fix_t* pSharpCfg)
+AsharpResult_t rk_Sharp_fix_transfer(RKAsharp_Sharp_Params_Select_t* sharp, RKAsharp_Sharp_Fix_t* pSharpCfg, float fPercent)
 {
     AsharpResult_t res = ASHARP_RET_SUCCESS;
 
@@ -857,7 +863,7 @@ AsharpResult_t rk_Sharp_fix_transfer(RKAsharp_Sharp_Params_Select_t* sharp, RKAs
         return ASHARP_RET_NULL_POINTER;
     }
 
-    rk_Sharp_V1_fix_transfer(&sharp->rk_sharpen_params_selected_V1, &pSharpCfg->stSharpFixV1);
+    rk_Sharp_V1_fix_transfer(&sharp->rk_sharpen_params_selected_V1, &pSharpCfg->stSharpFixV1, fPercent);
 
     return res;
 }

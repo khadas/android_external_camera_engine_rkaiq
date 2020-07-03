@@ -21,8 +21,9 @@
  *
  * v1.0.0
  *  - initial version
+ * v1.0.1
  */
 
-#define RK_AIQ_CALIB_VERSION "v1.0.0"
+#define RK_AIQ_CALIB_VERSION "Calib v1.0.1"
 
 #endif

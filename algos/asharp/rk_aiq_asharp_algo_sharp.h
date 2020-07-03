@@ -23,9 +23,9 @@ AsharpResult_t select_rk_sharpen_hw_v3_params_by_ISO (RKAsharp_Sharp_HW_V3_Param
 
 void select_sharpen_params_by_ISO(RKAsharp_Sharp_Params_t *strksharpenParams, RKAsharp_Sharp_Params_Select_t *strksharpenParamsSelected, AsharpExpInfo_t *pExpInfo);
 
-AsharpResult_t rk_Sharp_V1_fix_transfer(RKAsharp_Sharp_HW_Params_Select_t *pSharpV1, RKAsharp_Sharp_HW_Fix_t* pSharpCfg);
+AsharpResult_t rk_Sharp_V1_fix_transfer(RKAsharp_Sharp_HW_Params_Select_t *pSharpV1, RKAsharp_Sharp_HW_Fix_t* pSharpCfg, float fPercent);
 
-AsharpResult_t rk_Sharp_fix_transfer(RKAsharp_Sharp_Params_Select_t* sharp, RKAsharp_Sharp_Fix_t* pSharpCfg);
+AsharpResult_t rk_Sharp_fix_transfer(RKAsharp_Sharp_Params_Select_t* sharp, RKAsharp_Sharp_Fix_t* pSharpCfg, float fPercent);
 
 AsharpResult_t sharp_get_setting_idx_by_name_v1(CalibDb_Sharp_t *pCalibdb, char *name, int *setting_idx);
 

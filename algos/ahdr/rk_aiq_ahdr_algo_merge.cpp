@@ -89,7 +89,7 @@ RESULT MergeGetCurrIOData
     pAhdrCtx->AhdrProcRes.MgeProcRes.sw_hdrmge_ms_dif_0p15 = (int)pAhdrCtx->CurrHandleData.CurrMergeHandleData.MDCurveMS_offset;
 
     if(pAhdrCtx->hdrAttr.bEnable == false ||
-            (pAhdrCtx->hdrAttr.bEnable == true && (pAhdrCtx->hdrAttr.opMode == OpMode_Auto || pAhdrCtx->hdrAttr.opMode == OpMode_Fast)))
+            (pAhdrCtx->hdrAttr.bEnable == true && (pAhdrCtx->hdrAttr.opMode == HDR_OpMode_Auto || pAhdrCtx->hdrAttr.opMode == HDR_OpMode_Fast)))
     {
         CalibrateOECurve(pAhdrCtx->CurrHandleData.CurrMergeHandleData.OECurve_smooth,
                          pAhdrCtx->CurrHandleData.CurrMergeHandleData.OECurve_offset, pAhdrCtx->AhdrProcRes.MgeProcRes.sw_hdrmge_e_y) ;

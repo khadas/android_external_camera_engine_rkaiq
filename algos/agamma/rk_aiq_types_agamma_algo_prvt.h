@@ -26,32 +26,10 @@
 
 RKAIQ_BEGIN_DECLARE
 
-
 typedef struct AgammaHandle_s {
-    rk_aiq_gamma_cfg_t    agamma_config;
-    CalibDb_Gamma_t *calib_gamma;
+    rk_aiq_gamma_cfg_t  agamma_config;
+    CamCalibDbContext_t *pCalibDb;
 } AgammaHandle_t;
-
-
-typedef struct agamma_context_s {
-    const CalibDb_Gamma_t *calibgamma;//profile para
-
-
-    agamma_sw_info_t agammaSwInfo;
-
-    unsigned int count;
-    //ctrl & api
-    rk_aiq_gamma_attrib_t mCurAtt;
-    rk_aiq_gamma_attrib_t mNewAtt;
-    bool updateAtt;
-} agamma_context_t ;
-
-typedef agamma_context_t* agamma_handle_t ;
-/*
-typedef struct _RkAiqAlgoContext {
-    agamma_handle_t agamma_para;
-} RkAiqAlgoContext;
-*/
 
 RKAIQ_END_DECLARE
 

@@ -17,67 +17,10 @@
  *
  */
 #include <string.h>
-#include "../../xcore/base/xcam_common.h"
+#include "xcam_common.h"
 #include "rk_aiq_agamma_algo.h"
 
 RKAIQ_BEGIN_DECLARE
-
-
-
-
-void select_RkGamma_params(const CalibDb_Gamma_t * stRKGammaParam, RKAiqAgammaHtmlConfig_Select_t *stRKgammaParamSelected, int workMode)
-{
-    int i;
-
-    stRKgammaParamSelected->gamma_en = stRKGammaParam->gamma_en;
-    stRKgammaParamSelected->gamma_out_mode = stRKGammaParam->gamma_out_mode;
-    stRKgammaParamSelected->gamma_out_offset = stRKGammaParam->gamma_out_offset;
-    stRKgammaParamSelected->gamma_out_segnum = stRKGammaParam->gamma_out_segnum;
-
-    if(workMode == GAMMA_OUT_NORMAL)
-    {
-        for (i = 0; i < 45; i++)
-        {
-            stRKgammaParamSelected->gamma_table[i] = stRKGammaParam->curve_normal[i];
-        }
-    }
-    else if(workMode == GAMMA_OUT_HDR)
-    {
-        for (i = 0; i < 45; i++)
-        {
-            stRKgammaParamSelected->gamma_table[i] = stRKGammaParam->curve_hdr[i];
-        }
-    }
-    else if(workMode == GAMMA_OUT_NIGHT)
-    {
-        for (i = 0; i < 45; i++)
-        {
-            stRKgammaParamSelected->gamma_table[i] = stRKGammaParam->curve_night[i];
-        }
-    }
-    else if(workMode == GAMMA_OUT_USR1)
-    {
-        for (i = 0; i < 45; i++)
-        {
-            stRKgammaParamSelected->gamma_table[i] = stRKGammaParam->curve_user1[i];
-        }
-    }
-    else if(workMode == GAMMA_OUT_USR2)
-    {
-        for (i = 0; i < 45; i++)
-        {
-            stRKgammaParamSelected->gamma_table[i] = stRKGammaParam->curve_user2[i];
-        }
-    }
-    else return;
-
-
-
-
-}
-
-
-
 
 XCamReturn AgammaInitV200(AgammaHandle_t** para)
 {
@@ -99,19 +42,62 @@ XCamReturn AgammaReleaseV200(AgammaHandle_t* para)
     return(ret);
 
 }
-XCamReturn AgammaConfigV200(const CalibDb_Gamma_t * AgammaHtmlPara, AgammaHandle_t* para)
+
+XCamReturn AgammaConfigInit(AgammaHandle_t* para)
 {
 
     LOGD_AGAMMA("ENTER: %s \n", __func__);
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
-    int workmode = AgammaHtmlPara->gamma_out_mode;
+    int i;
 
+    CalibDb_Gamma_t *gamma_calib = &para->pCalibDb->gamma;
+    para->agamma_config.gamma_en = gamma_calib->gamma_en;
+    para->agamma_config.gamma_out_mode = gamma_calib->gamma_out_mode;
+    para->agamma_config.gamma_out_offset = gamma_calib->gamma_out_offset;
+    para->agamma_config.gamma_out_segnum = gamma_calib->gamma_out_segnum;
 
-    select_RkGamma_params(AgammaHtmlPara, (RKAiqAgammaHtmlConfig_Select_t*)&para->agamma_config,  workmode);
-    para->calib_gamma = (CalibDb_Gamma_t *)AgammaHtmlPara;
-
+    if(gamma_calib->gamma_out_mode == GAMMA_OUT_NORMAL)
+    {
+        for (i = 0; i < 45; i++)
+        {
+            para->agamma_config.gamma_table[i] = gamma_calib->curve_normal[i];
+        }
+    }
+    else if(gamma_calib->gamma_out_mode == GAMMA_OUT_HDR)
+    {
+        for (i = 0; i < 45; i++)
+        {
+            para->agamma_config.gamma_table[i] = gamma_calib->curve_hdr[i];
+        }
+    }
+    else if(gamma_calib->gamma_out_mode == GAMMA_OUT_NIGHT)
+    {
+        for (i = 0; i < 45; i++)
+        {
+            para->agamma_config.gamma_table[i] = gamma_calib->curve_night[i];
+        }
+    }
+    else if(gamma_calib->gamma_out_mode == GAMMA_OUT_USR1)
+    {
+        for (i = 0; i < 45; i++)
+        {
+            para->agamma_config.gamma_table[i] = gamma_calib->curve_user1[i];
+        }
+    }
+    else if(gamma_calib->gamma_out_mode == GAMMA_OUT_USR2)
+    {
+        for (i = 0; i < 45; i++)
+        {
+            para->agamma_config.gamma_table[i] = gamma_calib->curve_user2[i];
+        }
+    }
+    else {
+        LOGE_AGAMMA("%s: gamma out mode is not support!\n", __func__);
+        ret = XCAM_RETURN_ERROR_PARAM;
+    }
     return ret;
 }
+
 XCamReturn AgammaPreProcV200(AgammaHandle_t* para)
 {
     LOGD_AGAMMA("ENTER: %s \n", __func__);
@@ -121,32 +107,6 @@ XCamReturn AgammaPreProcV200(AgammaHandle_t* para)
     return(ret);
 
 }
-/*
-XCamReturn AgammaProcessingV200(AgammaHandle_t* para)
-{
-    XCamReturn ret = XCAM_RETURN_NO_ERROR;
-    LOGD_AGAMMA("ENTER: %s \n", __func__);
-
-    ret = AgammaReConfigV200(para);
-
-    return(ret);
-}
-*/
-
-XCamReturn  AgammaReConfigV200(AgammaHandle_t *para, const CalibDb_Gamma_t * gamma_calib)
-{
-    XCamReturn ret = XCAM_RETURN_NO_ERROR;
-    LOGD_AGAMMA("ENTER: %s \n", __func__);
-
-    int workmode = gamma_calib->gamma_out_mode;
-
-
-    select_RkGamma_params(gamma_calib, (RKAiqAgammaHtmlConfig_Select_t*)&para->agamma_config,   workmode);
-
-
-    return(ret);
-}
-
 
 RKAIQ_END_DECLARE
 

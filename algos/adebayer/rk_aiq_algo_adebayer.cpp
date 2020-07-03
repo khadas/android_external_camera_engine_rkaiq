@@ -107,6 +107,7 @@ AdebayerFullParamsInit
     AdebayerContext_t *pAdebayerCtx
 )
 {
+    pAdebayerCtx->full_param.enable = pAdebayerCtx->pCalibDb->dm.debayer_en;
     for (int i = 0; i < 9; i++) {
         pAdebayerCtx->full_param.iso[i] = pAdebayerCtx->pCalibDb->dm.ISO[i];
         pAdebayerCtx->full_param.hf_offset[i] = pAdebayerCtx->pCalibDb->dm.debayer_hf_offset[i];
@@ -267,6 +268,7 @@ AdebayerProcess
         return XCAM_RETURN_ERROR_PARAM;
     }
 
+    pAdebayerCtx->config.enable = pAdebayerCtx->full_param.enable;
     for (int i = 0; i < 5; i++)
     {
         pAdebayerCtx->config.filter1_coe[i] = pAdebayerCtx->full_param.filter1[i];

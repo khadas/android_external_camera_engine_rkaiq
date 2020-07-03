@@ -23,4 +23,35 @@ typedef struct {
     unsigned int global_sharpness_compensated[RKAIQ_RAWAF_SUMDATA_NUM];
 } af_preprocess_result_t;
 
+typedef enum _RKAIQ_AF_MODE
+{
+    RKAIQ_AF_MODE_NOT_SET = -1,
+    RKAIQ_AF_MODE_AUTO,
+    RKAIQ_AF_MODE_MACRO,
+    RKAIQ_AF_MODE_INFINITY,
+    RKAIQ_AF_MODE_FIXED,
+    RKAIQ_AF_MODE_EDOF,
+    RKAIQ_AF_MODE_CONTINUOUS_VIDEO,
+    RKAIQ_AF_MODE_CONTINUOUS_PICTURE,
+} RKAIQ_AF_MODE;
+
+typedef struct rk_aiq_af_attrib_s {
+    RKAIQ_AF_MODE AfMode;
+
+    bool contrast_af;
+    bool laser_af;
+    bool pdaf;
+    bool GammaEnable;
+    bool GausEnable;
+
+    int h_offs;
+    int v_offs;
+    unsigned int h_size;
+    unsigned int v_size;
+
+    unsigned short fixedModeDefCode;
+    unsigned short macroModeDefCode;
+    unsigned short infinityModeDefCode;
+} rk_aiq_af_attrib_t;
+
 #endif

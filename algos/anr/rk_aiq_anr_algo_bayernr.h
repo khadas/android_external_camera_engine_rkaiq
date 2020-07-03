@@ -19,7 +19,7 @@ ANRresult_t select_bayernr_params_by_ISO(RKAnr_Bayernr_Params_t *stBayerNrParams
 
 unsigned short bayernr_get_trans(int tmpfix);
 
-ANRresult_t bayernr_fix_tranfer(RKAnr_Bayernr_Params_Select_t* rawnr, RKAnr_Bayernr_Fix_t *pRawnrCfg);
+ANRresult_t bayernr_fix_tranfer(RKAnr_Bayernr_Params_Select_t* rawnr, RKAnr_Bayernr_Fix_t *pRawnrCfg, float fStrength);
 
 ANRresult_t bayernr_fix_printf(RKAnr_Bayernr_Fix_t * pRawnrCfg);
 

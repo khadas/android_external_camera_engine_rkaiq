@@ -1,8 +1,8 @@
-
 #ifndef __RKAIQ_TYPES_ALGO_ADEBAYER_H__
 #define __RKAIQ_TYPES_ALGO_ADEBAYER_H__
 
-typedef struct AdebayerConfig_s {
+typedef struct AdebayerConfig_s{
+    unsigned char enable;
     unsigned char filter_c_en;
     unsigned char filter_g_en;
     unsigned char gain_offset;
@@ -18,10 +18,10 @@ typedef struct AdebayerConfig_s {
     unsigned char shift_num;
     unsigned char order_max;
     unsigned char order_min;
-} AdebayerConfig_t;
+}AdebayerConfig_t;
 
-typedef struct AdebayerProcResult_s {
+typedef struct AdebayerProcResult_s{
     AdebayerConfig_t config;
-} AdebayerProcResult_t;
+}AdebayerProcResult_t;
 
 #endif//__RKAIQ_TYPES_ALGO_ADEBAYER_H__

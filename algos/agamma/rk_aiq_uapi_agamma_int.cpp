@@ -1,15 +1,14 @@
 #include "rk_aiq_uapi_agamma_int.h"
 #include "agamma/rk_aiq_types_agamma_algo_prvt.h"
+
 XCamReturn
 rk_aiq_uapi_agamma_SetAttrib(RkAiqAlgoContext *ctx,
                              rk_aiq_gamma_attrib_t attr,
                              bool need_sync)
 {
+    AgammaHandle_t *gamma_handle = (AgammaHandle_t *)ctx;
 
-    agamma_context_t* gamma_contex = (agamma_context_t*)ctx;
-    gamma_contex->mNewAtt = attr;
-    gamma_contex->updateAtt = true;
-
+    memcpy(&gamma_handle->agamma_config, &attr, sizeof(rk_aiq_gamma_attrib_t));
     return XCAM_RETURN_NO_ERROR;
 }
 
@@ -18,9 +17,9 @@ rk_aiq_uapi_agamma_GetAttrib(const RkAiqAlgoContext *ctx,
                              rk_aiq_gamma_attrib_t *attr)
 {
 
-    agamma_context_t* gamma_contex = (agamma_context_t*)ctx;
+    AgammaHandle_t* gamma_handle = (AgammaHandle_t*)ctx;
 
-    memcpy(attr, &gamma_contex->mCurAtt, sizeof(rk_aiq_gamma_attrib_t));
+    memcpy(attr, &gamma_handle->agamma_config, sizeof(rk_aiq_gamma_attrib_t));
 
     return XCAM_RETURN_NO_ERROR;
 }

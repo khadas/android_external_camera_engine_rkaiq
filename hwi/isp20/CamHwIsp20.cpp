@@ -104,6 +104,9 @@ static XCamReturn get_sensor_caps(rk_sensor_full_info_t *sensor_info) {
         LOGE_CAMHW("@%s %s: Get sensor module info failed", __FUNCTION__, sensor_info->device_name.c_str());
         return XCAM_RETURN_ERROR_FAILED;
     }
+    sensor_info->len_name = std::string(minfo->base.lens);
+
+#if 0
     memset(&code_enum, 0, sizeof(code_enum));
     while (vdev.io_control(VIDIOC_SUBDEV_ENUM_MBUS_CODE, &code_enum) == 0) {
         formats.push_back(code_enum.code);
@@ -111,7 +114,6 @@ static XCamReturn get_sensor_caps(rk_sensor_full_info_t *sensor_info) {
     };
 
     //TODO: sensor driver not supported now
-#if 0
     for (auto it = formats.begin(); it != formats.end(); ++it) {
         fsize_enum.pad = 0;
         fsize_enum.index = 0;
@@ -129,6 +131,20 @@ static XCamReturn get_sensor_caps(rk_sensor_full_info_t *sensor_info) {
         ret = XCAM_RETURN_ERROR_FAILED;
     }
 #endif
+
+    struct v4l2_subdev_frame_interval_enum fie;
+    memset(&fie, 0, sizeof(fie));
+    while(vdev.io_control(VIDIOC_SUBDEV_ENUM_FRAME_INTERVAL, &fie) == 0) {
+        frameSize.format = (rk_aiq_format_t)fie.code;
+        frameSize.width = fie.width;
+        frameSize.height = fie.height;
+        frameSize.fps = fie.interval.denominator/fie.interval.numerator;
+        frameSize.hdr_mode = fie.reserved[0];
+        sensor_info->frame_size.push_back(frameSize);
+        fie.index++;
+    }
+    if (fie.index == 0)
+        LOGE_CAMHW("@%s %s: Enum sensor frame interval failed", __FUNCTION__, sensor_info->device_name.c_str());
     vdev.close();
 
     return ret;
@@ -420,19 +436,21 @@ get_isp_subdevs(struct media_device *device, const char *devpath, rk_aiq_isp_t* 
 
 static
 XCamReturn
-SensorInfoCopy(rk_sensor_full_info_t *finfo, rk_aiq_sensor_info_t *sinfo) {
+SensorInfoCopy(rk_sensor_full_info_t *finfo, rk_aiq_static_info_t *info) {
     int fs_num, i = 0;
+    rk_aiq_sensor_info_t *sinfo = NULL;
 
+    strncpy(info->lens_info.len_name, finfo->len_name.c_str(), sizeof(info->lens_info.len_name));
+    sinfo = &info->sensor_info;
     strncpy(sinfo->sensor_name, finfo->sensor_name.c_str(), sizeof(sinfo->sensor_name));
     fs_num = finfo->frame_size.size();
     if (fs_num) {
-        //sinfo->support_fmt = new rk_frame_fmt_t[fs_num]();
-        //sinfo->num = fs_num;
         for (auto iter = finfo->frame_size.begin(); iter != finfo->frame_size.end() && i < 10; ++iter, i++) {
             sinfo->support_fmt[i].width = (*iter).width;
             sinfo->support_fmt[i].height = (*iter).height;
             sinfo->support_fmt[i].format = (*iter).format;
-            //sinfo->support_fmt++;
+            sinfo->support_fmt[i].fps = (*iter).fps;
+            sinfo->support_fmt[i].hdr_mode = (*iter).hdr_mode;
         }
         sinfo->num = i;
     }
@@ -481,7 +499,7 @@ CamHwIsp20::getStaticCamHwInfo(const char* sns_ent_name)
     it = mCamHwInfos.find(str);
     if (it != mCamHwInfos.end()) {
         LOGD_CAMHW("find camerainfo of %s!", sns_ent_name);
-        it->second.ptr();
+        return it->second.ptr();
     } else {
         LOGE_CAMHW("camerainfo of %s not fount!", sns_ent_name);
     }
@@ -508,8 +526,8 @@ CamHwIsp20::clearStaticCamHwInfo()
     return XCAM_RETURN_NO_ERROR;
 }
 
-static void
-findAttachedSubdevs(struct media_device *device, uint32_t count, rk_sensor_full_info_t *s_info)
+void
+CamHwIsp20::findAttachedSubdevs(struct media_device *device, uint32_t count, rk_sensor_full_info_t *s_info)
 {
     const struct media_entity_desc *entity_info = NULL;
     struct media_entity *entity = NULL;
@@ -526,19 +544,19 @@ findAttachedSubdevs(struct media_device *device, uint32_t count, rk_sensor_full_
                 else//vcm
                     s_info->module_lens_dev_name = std::string(media_entity_get_devname(entity));
             }
+        } else if ((NULL != entity_info) && (entity_info->type == MEDIA_ENT_T_V4L2_SUBDEV_FLASH)) {
+            if ((entity_info->name[0] == 'm') &&
+                    (strncmp(entity_info->name, s_info->module_index_str.c_str(), 3) == 0)) {
+                s_info->module_flash_dev_name[s_info->flash_num++] =
+                    std::string(media_entity_get_devname(entity));
+            }
         }
     }
-
 }
 
 XCamReturn
 CamHwIsp20::initCamHwInfos()
 {
-    // TODO
-    // (1) all sensor info
-    // (2) all pipeline entity infos belonged to
-    //     the sensor
-
     char sys_path[64], devpath[32];
     FILE *fp = NULL;
     struct media_device *device = NULL;
@@ -582,25 +600,15 @@ CamHwIsp20::initCamHwInfos()
                 get_sensor_caps(s_full_info);
                 s_full_info->isp_info = isp_info;
                 findAttachedSubdevs(device, nents, s_full_info);
-                SensorInfoCopy(s_full_info, &info->sensor_info);
+                SensorInfoCopy(s_full_info, info);
+                info->has_lens_vcm = s_full_info->module_lens_dev_name.empty() ? false : true;
+                info->has_fl = s_full_info->flash_num > 0 ? true : false;
+                info->has_irc = s_full_info->module_ircut_dev_name.empty() ? false : true;
                 CamHwIsp20::mSensorHwInfos[s_full_info->sensor_name] = s_full_info;
                 CamHwIsp20::mCamHwInfos[s_full_info->sensor_name] = info;
             }
         }
 
-        for (j = 0; j < nents; ++j) {
-            entity = media_get_entity (device, j);
-            entity_info = media_entity_get_info(entity);
-            if ((NULL != entity_info) && (entity_info->type == MEDIA_ENT_T_V4L2_SUBDEV_LENS) && (entity_info->flags == 0)) {
-                strncpy(devpath, media_entity_get_devname(entity), sizeof(devpath));
-                std::map<std::string, SmartPtr<rk_sensor_full_info_t>>::iterator it2;
-                for (it2 = mSensorHwInfos.begin(); it2 != mSensorHwInfos.end(); it2++) {
-                    rk_sensor_full_info_t *s_full_info = it2->second.ptr();
-                    if (0 == strncmp(s_full_info->sensor_name.c_str(), entity_info->name, strlen("m01_b")))
-                        s_full_info->module_lens_dev_name = std::string(devpath);
-                }
-            }
-        }
 media_unref:
         media_device_unref (device);
     }
@@ -701,7 +709,6 @@ CamHwIsp20::init(const char* sns_ent_name)
 
     isp20OfflineRdthread = new OfflineFrmRdThread(isp20Pollthread.ptr());
     isp20OfflineRdthread->set_mipi_devs(mipi_rx_devs, mIspCoreDev);
-    isp20OfflineRdthread->initialize();
     mOfflineRdThread = isp20OfflineRdthread;
 
     isp20LumaPollthread = new PollThread();
@@ -717,6 +724,10 @@ CamHwIsp20::init(const char* sns_ent_name)
     mPollIsppthread->set_poll_callback (this);
 #endif
 #endif
+
+    mFlashLight = new FlashLightHw(s_info->module_flash_dev_name, s_info->flash_num);
+    // TODO: active num from iq ?
+    mFlashLight->init(s_info->flash_num);
     _state = CAM_HW_STATE_INITED;
     EXIT_CAMHW_FUNCTION();
 
@@ -726,6 +737,7 @@ CamHwIsp20::init(const char* sns_ent_name)
 XCamReturn
 CamHwIsp20::deInit()
 {
+    mFlashLight->deinit();
     _state = CAM_HW_STATE_INVALID;
     return XCAM_RETURN_NO_ERROR;
 }
@@ -814,6 +826,7 @@ CamHwIsp20::prepare(uint32_t width, uint32_t height, int mode, int t_delay, int 
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
     SmartPtr<Isp20PollThread> isp20Pollthread;
     SmartPtr<SensorHw> sensorHw;
+    SmartPtr<OfflineFrmRdThread> offlineRdthread;
 
     ENTER_CAMHW_FUNCTION();
 
@@ -837,6 +850,8 @@ CamHwIsp20::prepare(uint32_t width, uint32_t height, int mode, int t_delay, int 
     sensorHw->set_exp_delay_info(t_delay, g_delay, mCalibDb->sysContrl.dcg_delay);
     isp20Pollthread = mPollthread.dynamic_cast_ptr<Isp20PollThread>();
     isp20Pollthread->set_working_mode(mode);
+    offlineRdthread = mOfflineRdThread.dynamic_cast_ptr<OfflineFrmRdThread>();
+    offlineRdthread->set_working_mode(mode);
     // TODO: may start devices in start() ?
     if ((_hdr_mode != RK_AIQ_WORKING_MODE_NORMAL) ||
         (_hdr_mode == RK_AIQ_WORKING_MODE_NORMAL && !mNormalNoReadBack)) {
@@ -878,6 +893,10 @@ CamHwIsp20::prepare(uint32_t width, uint32_t height, int mode, int t_delay, int 
         LOGE_CAMHW("start ispp params dev err: %d\n", ret);
     }
 #endif
+    ret = mFlashLight->start();
+    if (ret < 0) {
+        LOGE_CAMHW("start flashlight err: %d\n", ret);
+    }
     _ispp_module_init_ens = 0;
     _state = CAM_HW_STATE_PREPARED;
     EXIT_CAMHW_FUNCTION();
@@ -1025,6 +1044,12 @@ XCamReturn CamHwIsp20::stop()
         LOGE_CAMHW("stop ispp params dev err: %d\n", ret);
     }
 #endif
+    ret = mFlashLight->stop();
+    if (ret < 0) {
+        LOGE_CAMHW("stop flashlight err: %d\n", ret);
+    }
+
+    setIrcutParams(false);
 
     setupHdrLink(_hdr_mode, 0, false);
 
@@ -1503,7 +1528,7 @@ CamHwIsp20::setIspParamsSync(int frameId)
     if (ret != XCAM_RETURN_NO_ERROR) {
         LOGE_CAMHW("rkisp1_convert_results error\n");
     }
-
+    forceOverwriteAiqIspCfg(update_params, aiq_results);
     gen_full_isp_params(&update_params, &_full_active_isp_params);
 
 #ifdef RUNTIME_MODULE_DEBUG
@@ -1535,6 +1560,7 @@ CamHwIsp20::setIspParamsSync(int frameId)
 
             _effecting_ispparm_map[frameId] = aiq_results;
 
+	    setDhazState(aiq_results->data()->adhaz_config.dehaze_en[0]);
             LOGD_CAMHW ("device(%s) queue buffer index %d, queue cnt %d, check exit status again[exit: %d]",
                         XCAM_STR (mIspParamsDev->get_device_name()),
                         buf_index, mIspParamsDev->get_queued_bufcnt(), _is_exit);
@@ -1577,7 +1603,7 @@ CamHwIsp20::setIspParams(SmartPtr<RkAiqIspParamsProxy>& ispParams)
     }
 
     if (RK_AIQ_HDR_GET_WORKING_MODE(_hdr_mode) == RK_AIQ_WORKING_MODE_NORMAL &&
-        mNormalNoReadBack)
+            mNormalNoReadBack)
         setIspParamsSync(ispParams->data()->frame_id);
 
     EXIT_CAMHW_FUNCTION();
@@ -1610,7 +1636,7 @@ CamHwIsp20::setIsppParams(SmartPtr<RkAiqIsppParamsProxy>& isppParams)
     }
 
     if (RK_AIQ_HDR_GET_WORKING_MODE(_hdr_mode) == RK_AIQ_WORKING_MODE_NORMAL &&
-        mNormalNoReadBack)
+            mNormalNoReadBack)
         setIsppParamsSync(isppParams->data()->frame_id);
 
     EXIT_CAMHW_FUNCTION();
@@ -1760,6 +1786,37 @@ CamHwIsp20::setFocusParams(SmartPtr<RkAiqFocusParamsProxy>& focus_params)
         if (mLensSubdev->setFocusParams(position) < 0) {
             LOGE_CAMHW("set focus result failed to device");
             return XCAM_RETURN_ERROR_IOCTL;
+        }
+    }
+
+    EXIT_CAMHW_FUNCTION();
+    return ret;
+}
+
+XCamReturn
+CamHwIsp20::setCpslParams(SmartPtr<RkAiqCpslParamsProxy>& cpsl_params)
+{
+    ENTER_CAMHW_FUNCTION();
+
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+
+    RKAiqCpslInfoWrapper_t* cpsl_setting = cpsl_params->data().ptr();
+
+    if (cpsl_setting->update_fl) {
+        rk_aiq_flash_setting_t* fl_setting = &cpsl_setting->fl;
+
+        ret = mFlashLight->set_params(*fl_setting);
+        if (ret < 0) {
+            LOGE_CAMHW("set flashlight params err: %d\n", ret);
+        }
+    }
+
+    if (cpsl_setting->update_ir) {
+        rk_aiq_ir_setting_t* ir_setting = &cpsl_setting->ir;
+
+        ret = setIrcutParams(ir_setting->irc_on);
+        if (ret < 0) {
+            LOGE_CAMHW("set ir params err: %d\n", ret);
         }
     }
 
@@ -2512,6 +2569,38 @@ CamHwIsp20::getModuleCtl(rk_aiq_module_id_t moduleId, bool &en)
     return ret;
 }
 
+XCamReturn
+CamHwIsp20::enqueueBuffer(struct rk_aiq_vbuf *vbuf)
+{
+    ENTER_XCORE_FUNCTION();
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    SmartPtr<OfflineFrmRdThread> OfflineThread = mOfflineRdThread.dynamic_cast_ptr<OfflineFrmRdThread>();
+    ret = OfflineThread->enqueueBuffer(vbuf);
+    EXIT_XCORE_FUNCTION();
+    return ret;
+}
+
+XCamReturn CamHwIsp20::offlineRdJobPrepare()
+{
+    ENTER_XCORE_FUNCTION();
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    SmartPtr<OfflineFrmRdThread> OfflineThread = mOfflineRdThread.dynamic_cast_ptr<OfflineFrmRdThread>();
+    OfflineThread->offlineRdJobPrepare();
+    EXIT_XCORE_FUNCTION();
+    return ret;
+}
+
+XCamReturn CamHwIsp20::offlineRdJobDone()
+{
+    ENTER_XCORE_FUNCTION();
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    SmartPtr<OfflineFrmRdThread> OfflineThread = mOfflineRdThread.dynamic_cast_ptr<OfflineFrmRdThread>();
+    OfflineThread->offlineRdJobDone();
+    mOfflineRdThread->stop();
+    EXIT_XCORE_FUNCTION();
+    return ret;
+}
+
 XCamReturn CamHwIsp20::notify_capture_raw()
 {
     SmartPtr<Isp20PollThread> isp20Pollthread = mPollthread.dynamic_cast_ptr<Isp20PollThread>();
@@ -2541,9 +2630,9 @@ CamHwIsp20::setIrcutParams(bool on)
     xcam_mem_clear (control);
     control.id = V4L2_CID_BAND_STOP_FILTER;
     if(on)
-        control.value = IRCUT_STATE_OPENED;
-    else
         control.value = IRCUT_STATE_CLOSED;
+    else
+        control.value = IRCUT_STATE_OPENED;
     if (mIrcutDev.ptr()) {
         LOGD_CAMHW ("set ircut value: %d", control.value);
         if (mIrcutDev->io_control (VIDIOC_S_CTRL, &control) < 0) {
@@ -2554,6 +2643,19 @@ CamHwIsp20::setIrcutParams(bool on)
 
     EXIT_CAMHW_FUNCTION();
     return ret;
+}
+
+void CamHwIsp20::setDhazState(float& on)
+{
+    if (on)
+	mIsDhazOn = true;
+    else
+	mIsDhazOn = false;
+}
+
+bool CamHwIsp20::getDhazState()
+{
+    return mIsDhazOn;
 }
 
 }; //namspace RkCam

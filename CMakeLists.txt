@@ -131,6 +131,7 @@ set (HWI_SRC
         hwi/isp20/Isp20OfflineFrmRead.cpp
         hwi/SensorHw.cpp
         hwi/LensHw.cpp
+        hwi/FlashLight.cpp
         )
 endif()
 set (IPC_SRC

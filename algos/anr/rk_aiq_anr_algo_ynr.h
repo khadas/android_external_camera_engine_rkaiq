@@ -18,7 +18,7 @@ ANRresult_t init_ynr_params(RKAnr_Ynr_Params_s *pYnrParams, CalibDb_YNR_t* pYnrC
 
 ANRresult_t select_ynr_params_by_ISO(RKAnr_Ynr_Params_t *stYnrParam, RKAnr_Ynr_Params_Select_t *stYnrParamSelected, ANRExpInfo_t *pExpInfo, short bitValue);
 
-ANRresult_t ynr_fix_transfer(RKAnr_Ynr_Params_Select_t* ynr, RKAnr_Ynr_Fix_t *pNrCfg);
+ANRresult_t ynr_fix_transfer(RKAnr_Ynr_Params_Select_t* ynr, RKAnr_Ynr_Fix_t *pNrCfg, float fStrength);
 
 ANRresult_t ynr_fix_printf(RKAnr_Ynr_Fix_t * pNrCfg);
 

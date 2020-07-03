@@ -55,6 +55,13 @@ typedef struct RKAiqAfInfoWrapper_s {
     int64_t sofTime;
 } RKAiqAfInfoWrapper_t;
 
+typedef struct RKAiqCpslInfoWrapper_s {
+    rk_aiq_flash_setting_t fl;
+    bool update_fl;
+    rk_aiq_ir_setting_t ir;
+    bool update_ir;
+} RKAiqCpslInfoWrapper_t;
+
 typedef RKAiqAecExpInfoWrapper_t rk_aiq_exposure_params_wrapper_t;
 typedef RKAiqAfInfoWrapper_t rk_aiq_af_info_wrapper_t;
 
@@ -68,6 +75,8 @@ typedef SharedItemPool<rk_aiq_focus_params_t> RkAiqFocusParamsPool;
 typedef SharedItemProxy<rk_aiq_focus_params_t> RkAiqFocusParamsProxy;
 typedef SharedItemPool<rk_aiq_ispp_params_t> RkAiqIsppParamsPool;
 typedef SharedItemProxy<rk_aiq_ispp_params_t> RkAiqIsppParamsProxy;
+typedef SharedItemPool<RKAiqCpslInfoWrapper_t> RkAiqCpslParamsPool;
+typedef SharedItemProxy<RKAiqCpslInfoWrapper_t> RkAiqCpslParamsProxy;
 
 class RkAiqFullParams {
 public:
@@ -75,7 +84,8 @@ public:
         : mExposureParams(NULL)
         , mIspParams(NULL)
         , mIsppParams(NULL)
-        , mFocusParams(NULL) {
+        , mFocusParams(NULL)
+        , mCpslParams(NULL) {
     };
     ~RkAiqFullParams() {};
 
@@ -84,11 +94,13 @@ public:
         mIspParams.release();
         mIsppParams.release();
         mFocusParams.release();
+        mCpslParams.release();
     };
     SmartPtr<RkAiqExpParamsProxy> mExposureParams;
     SmartPtr<RkAiqIspParamsProxy> mIspParams;
     SmartPtr<RkAiqIsppParamsProxy> mIsppParams;
     SmartPtr<RkAiqFocusParamsProxy> mFocusParams;
+    SmartPtr<RkAiqCpslParamsProxy> mCpslParams;
 
 private:
     XCAM_DEAD_COPY (RkAiqFullParams);

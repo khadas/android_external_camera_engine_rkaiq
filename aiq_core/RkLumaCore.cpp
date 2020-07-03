@@ -73,7 +73,7 @@ RkLumaCore::~RkLumaCore()
 }
 
 XCamReturn
-RkLumaCore::init()
+RkLumaCore::init(const CalibDb_LUMA_DETECT_t* lumaCalib)
 {
     ENTER_ANALYZER_FUNCTION();
 
@@ -81,6 +81,11 @@ RkLumaCore::init()
         LOGE_ANALYZER("wrong state %d\n", mState);
         return XCAM_RETURN_ERROR_ANALYZER;
     }
+
+    calib = lumaCalib;
+    LOGD_ANALYZER("en: %d, threshold: %f\n",
+		  lumaCalib->luma_detect_en,
+		  lumaCalib->mutation_threshold);
 
     mState = RK_AIQ_CORE_STATE_INITED;
     return XCAM_RETURN_NO_ERROR;
@@ -178,26 +183,18 @@ RkLumaCore::analyze(const SmartPtr<VideoBuffer> &buffer)
                   luma->valid_luma,
                   luma->image_luma_result.mean_luma[0]);
 
-    if (!mLumaQueueFIFO.is_empty() && mLumaQueueFIFO.size() == LUMA_FIFO_CNT - 1) {
-        SmartPtr<isp_luma_stat_t> luma_frame_pre2 = mLumaQueueFIFO.pop();
-        SmartPtr<isp_luma_stat_t> luma_frame_pre1 = mLumaQueueFIFO.pop();
-        LOGD_ANALYZER("lumatest now pre1 pre2: %d-%d-%d, datasize: %d\n",
+    if (!mLumaQueueFIFO.is_empty()) {
+        SmartPtr<isp_luma_stat_t> luma_frame_pre = mLumaQueueFIFO.pop();
+        LOGD_ANALYZER("lumatest now pre: %d-%d-%d, datasize: %d\n",
                       luma->image_luma_result.mean_luma[0],
-                      luma_frame_pre1->mean_luma[0],
-                      luma_frame_pre2->mean_luma[0],
+                      luma_frame_pre->mean_luma[0],
                       mLumaQueueFIFO.size());
-        float dluma1 = float(luma_frame_pre1->mean_luma[0] - luma->image_luma_result.mean_luma[0]) /
-                       (luma_frame_pre1->mean_luma[0] + luma->image_luma_result.mean_luma[0]);
-        float dluma2 = float(luma_frame_pre1->mean_luma[0] - luma_frame_pre2->mean_luma[0]) /
-                       (luma_frame_pre1->mean_luma[0] + luma_frame_pre2->mean_luma[0]);
+        float dluma = float(luma_frame_pre->mean_luma[0] - luma->image_luma_result.mean_luma[0]) /
+                       (luma_frame_pre->mean_luma[0] + luma->image_luma_result.mean_luma[0]);
 
-        if ((dluma1 > 0.2 && dluma2 > 0.2) ||
-                (dluma1 < -0.2 && dluma2 < -0.2)) {
+        if (dluma > lumaCalib->mutation_threshold || dluma < -lumaCalib->mutation_threshold) {
             hdrProcessCnt = 2;
         }
-
-        //write back pre1 result to fifo
-        mLumaQueueFIFO.push(luma_frame_pre1);
     }
 
     SmartPtr<isp_luma_stat_t> luma_result = new isp_luma_stat_t();
@@ -237,28 +234,26 @@ RkLumaCore::analyze(const SmartPtr<VideoBuffer> &buffer)
     }
     mean_luma = mean_luma / ISP2X_MIPI_LUMA_MEAN_MAX;
 
-    if (!mLumaQueueFIFO.is_empty() && mLumaQueueFIFO.size() == LUMA_FIFO_CNT - 1) {
-        SmartPtr<isp_luma_stat_t> luma_frame_pre2 = mLumaQueueFIFO.pop();
-        SmartPtr<isp_luma_stat_t> luma_frame_pre1 = mLumaQueueFIFO.pop();
+    if (!mLumaQueueFIFO.is_empty()) {
+        SmartPtr<isp_luma_stat_t> luma_frame_pre = mLumaQueueFIFO.pop();
 
-        float dluma1 = int(luma_frame_pre1->mean_luma[raw_channal] - mean_luma) /
-                       float(luma_frame_pre1->mean_luma[raw_channal] + mean_luma);
-        float dluma2 = int(luma_frame_pre1->mean_luma[raw_channal] - luma_frame_pre2->mean_luma[raw_channal]) /
-                       float(luma_frame_pre1->mean_luma[raw_channal] + luma_frame_pre2->mean_luma[raw_channal]);
-        /*
-        LOGE_ANALYZER("lumatest(%d) now pre1 pre2: %d-%d-%d, datasize: %d\n",
-            mWorkingMode, mean_luma,
-            luma_frame_pre1->mean_luma[raw_channal],
-            luma_frame_pre2->mean_luma[raw_channal],
-            mLumaQueueFIFO.size());
-        */
-        if ((dluma1 > 0.2 && dluma2 > 0.2) ||
-                (dluma1 < -0.2 && dluma2 < -0.2)) {
-            hdrProcessCnt = 2;
+        float dluma = int(luma_frame_pre->mean_luma[raw_channal] - mean_luma) /
+                       float(luma_frame_pre->mean_luma[raw_channal] + mean_luma);
+
+	LOGV_ANALYZER("lumatest(%d) now pre: %d-%d, threshold: %f, dluma: %f, datasize: %d\n",
+		      mWorkingMode,
+		      mean_luma,
+		      luma_frame_pre->mean_luma[raw_channal],
+		      calib->mutation_threshold,
+		      dluma,
+		      mLumaQueueFIFO.size());
+
+        if (dluma > calib->mutation_threshold || dluma < -calib->mutation_threshold ) {
+	    if (mWorkingMode != RK_AIQ_WORKING_MODE_NORMAL)
+                hdrProcessCnt = 1;
+	    else
+                hdrProcessCnt = 0;
         }
-
-        //write back pre1 result to fifo
-        mLumaQueueFIFO.push(luma_frame_pre1);
     }
 
     SmartPtr<isp_luma_stat_t> luma_result = new isp_luma_stat_t();
