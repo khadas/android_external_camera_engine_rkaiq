@@ -2,7 +2,7 @@
 <matfile>
     <header type="struct" size="[1 1]">
         <code_xml_parse_version index="1" type="char" size="[1 6]">
-            v1.0.4
+         v1.1.1
         </code_xml_parse_version>
         <creation_date index="1" type="char" size="[1 10]">
             2020-06-19
@@ -17,8 +17,11 @@
             PCORW0009A
         </sample_name>
         <generator_version index="1" type="char" size="[1 6]">
-            v1.0.e
+            v1.0.f
         </generator_version>
+        <magic_code_version  index="1" type="int" size="[1 1]">
+       [996625]
+        </magic_code_version>
     </header>
     <sensor type="struct" size="[1 1]">
         <AWB index="1" type="struct" size="[1 1]">
@@ -98,7 +101,7 @@
                             [0 ]
                         </mode>
                         <resAll index="1" type="cell" size="[1 1]">
-                            <cell index="6" type="struct" size="[1 1]">
+                            <cell index="1" type="struct" size="[1 1]">
                                 <resolution index="1" type="char" size="[1 9]">
                                     2560x1440
                                 </resolution>
@@ -283,7 +286,7 @@
                   <lightVRegion index="1" type="double" size="[1 5]">
                      [148.5 112 124 127.5 148.5]
                   </lightVRegion>
-                  <lightXYRegion index="1" type="double" size="[1 1]">
+                  <lightXYRegion index="1" type="struct" size="[1 1]">
                      <normal index="1" type="double" size="[1 4]">
                         [-0.84385201341081 -0.506688146846318 -0.0461215933445084 -0.16575821104123]
                      </normal>
@@ -334,7 +337,7 @@
                   <lightVRegion index="1" type="double" size="[1 5]">
                      [122 107 128.5 142 122]
                   </lightVRegion>
-                  <lightXYRegion index="1" type="double" size="[1 1]">
+                  <lightXYRegion index="1" type="struct" size="[1 1]">
                      <normal index="1" type="double" size="[1 4]">
                         [-0.489583333333332 -0.133714118336262 0.171837708830549 -0.19706498951782]
                      </normal>
@@ -385,7 +388,7 @@
                   <lightVRegion index="1" type="double" size="[1 5]">
                      [95 123 134 126.5 95]
                   </lightVRegion>
-                  <lightXYRegion index="1" type="double" size="[1 1]">
+                  <lightXYRegion index="1" type="struct" size="[1 1]">
                      <normal index="1" type="double" size="[1 4]">
                         [-0.127083333333332 0.0830404217926195 0.164200477326969 -0.181411600279525]
                      </normal>
@@ -436,7 +439,7 @@
                   <lightVRegion index="1" type="double" size="[1 5]">
                      [134 123.5 85.5 116.5 134]
                   </lightVRegion>
-                  <lightXYRegion index="1" type="double" size="[1 1]">
+                  <lightXYRegion index="1" type="struct" size="[1 1]">
                      <normal index="1" type="double" size="[1 4]">
                         [0.0895833333333336 0.39596193415638 0.175656324582339 -0.119697103627096]
                      </normal>
@@ -487,7 +490,7 @@
                   <lightVRegion index="1" type="double" size="[1 5]">
                      [140.5 192 188 132.5 140.5]
                   </lightVRegion>
-                  <lightXYRegion index="1" type="double" size="[1 1]">
+                  <lightXYRegion index="1" type="struct" size="[1 1]">
                      <normal index="1" type="double" size="[1 4]">
                         [-1.99447016460905 -1.49200102880658 0.0234302719585139 -0.0682165060844455]
                      </normal>
@@ -538,7 +541,7 @@
                   <lightVRegion index="1" type="double" size="[1 5]">
                      [131.5 179.5 149.5 127 131.5]
                   </lightVRegion>
-                  <lightXYRegion index="1" type="double" size="[1 1]">
+                  <lightXYRegion index="1" type="struct" size="[1 1]">
                      <normal index="1" type="double" size="[1 4]">
                         [-0.873803944542081 -0.506755891260113 0.0556254367575124 -0.0451277273611246]
                      </normal>
@@ -673,9 +676,6 @@
                     <multiWindowEnable index="1" type="double" size="[1 1]">
                         [1 ]
                     </multiWindowEnable>
-                    <wpDiffLumaWeiEnable index="1" type="double" size="[1 1]">
-                        [1 ]
-                    </wpDiffLumaWeiEnable>
                     <limitRange index="1" type="struct" size="[1 1]">
                         <Y index="1" type="double" size="[1 2]">
                         [9 210 ]
@@ -881,7 +881,7 @@
                                 [-1.2548 -1.0370 0.1368 -0.0296 ]
                             </small>
                         </lightXYRegion>
-                        <rtYuvRegion>
+                        <rtYuvRegion index="1" type="struct" size="[1 1]">
                             <thcurve_u_set index="1" type="double" size="[1 6]">
                                 [50.0000 54.0000 70.0000 78.0000 110.0000 142.0000 ]
                             </thcurve_u_set>
@@ -909,7 +909,7 @@
                         <smallVRegion index="1" type="double" size="[1 5]">
                             [92.0000 79.5000 124.0000 125.5000 92.0000 ]
                         </smallVRegion>
-                        <lightXYRegion index="1" type="double" size="[1 1]">
+                        <lightXYRegion index="1" type="struct" size="[1 1]">
                             <normal index="1" type="double" size="[1 4]">
                                 [-0.8597 -0.5894 -0.0223 -0.1544 ]
                             </normal>
@@ -920,7 +920,7 @@
                                 [-0.8111 -0.5877 -0.0218 -0.1544 ]
                             </small>
                         </lightXYRegion>
-                        <rtYuvRegion>
+                        <rtYuvRegion index="1" type="struct" size="[1 1]">
                             <thcurve_u_set index="1" type="double" size="[1 6]">
                                 [50.0000 54.0000 70.0000 78.0000 110.0000 142.0000 ]
                             </thcurve_u_set>
@@ -948,7 +948,7 @@
                         <smallVRegion index="1" type="double" size="[1 5]">
                             [79.5000 65.0000 123.0000 126.5000 79.5000 ]
                         </smallVRegion>
-                        <lightXYRegion index="1" type="double" size="[1 1]">
+                        <lightXYRegion index="1" type="struct" size="[1 1]">
                             <normal index="1" type="double" size="[1 4]">
                                 [-0.5700 -0.1369 0.1500 -0.0356 ]
                             </normal>
@@ -959,7 +959,7 @@
                                 [-0.4210 -0.1444 0.1510 -0.0399 ]
                             </small>
                         </lightXYRegion>
-                        <rtYuvRegion>
+                        <rtYuvRegion index="1" type="struct" size="[1 1]">
                             <thcurve_u_set index="1" type="double" size="[1 6]">
                                 [50.0000 54.0000 70.0000 78.0000 110.0000 142.0000 ]
                             </thcurve_u_set>
@@ -987,7 +987,7 @@
                         <smallVRegion index="1" type="double" size="[1 5]">
                             [65.0000 47.5000 117.5000 123.0000 65.0000 ]
                         </smallVRegion>
-                        <lightXYRegion index="1" type="double" size="[1 1]">
+                        <lightXYRegion index="1" type="struct" size="[1 1]">
                             <normal index="1" type="double" size="[1 4]">
                                 [-0.1333 0.0850 0.0798 -0.1095 ]
                             </normal>
@@ -998,7 +998,7 @@
                                 [-0.1322 0.0267 0.0787 -0.0978 ]
                             </small>
                         </lightXYRegion>
-                        <rtYuvRegion>
+                        <rtYuvRegion index="1" type="struct" size="[1 1]">
                             <thcurve_u_set index="1" type="double" size="[1 6]">
                                 [50.0000 54.0000 70.0000 78.0000 110.0000 142.0000 ]
                             </thcurve_u_set>
@@ -1026,7 +1026,7 @@
                         <smallVRegion index="1" type="double" size="[1 5]">
                             [114.0000 116.5000 47.0000 54.0000 114.0000 ]
                         </smallVRegion>
-                        <lightXYRegion index="1" type="double" size="[1 1]">
+                        <lightXYRegion index="1" type="struct" size="[1 1]">
                             <normal index="1" type="double" size="[1 4]">
                                 [0.0921 0.1997 0.0768 -0.1204 ]
                             </normal>
@@ -1037,7 +1037,7 @@
                                 [0.0898 0.2000 0.0703 -0.0865 ]
                             </small>
                         </lightXYRegion>
-                        <rtYuvRegion>
+                        <rtYuvRegion index="1" type="struct" size="[1 1]">
                             <thcurve_u_set index="1" type="double" size="[1 6]">
                                 [50.0000 54.0000 70.0000 78.0000 110.0000 142.0000 ]
                             </thcurve_u_set>
@@ -1065,7 +1065,7 @@
                         <smallVRegion index="1" type="double" size="[1 5]">
                             [132.0000 150.5000 136.5000 129.0000 132.0000 ]
                         </smallVRegion>
-                        <lightXYRegion index="1" type="double" size="[1 1]">
+                        <lightXYRegion index="1" type="struct" size="[1 1]">
                             <normal index="1" type="double" size="[1 4]">
                                 [-1.7415 -1.3448 0.0802 -0.0816 ]
                             </normal>
@@ -1076,7 +1076,7 @@
                                 [-1.6326 -1.3459 0.0802 -0.0805 ]
                             </small>
                         </lightXYRegion>
-                        <rtYuvRegion>
+                        <rtYuvRegion index="1" type="struct" size="[1 1]">
                             <thcurve_u_set index="1" type="double" size="[1 6]">
                                 [50.0000 54.0000 70.0000 78.0000 110.0000 142.0000 ]
                             </thcurve_u_set>
@@ -1104,7 +1104,7 @@
                         <smallVRegion index="1" type="double" size="[1 5]">
                             [127.0000 117.5000 92.0000 125.5000 127.0000 ]
                         </smallVRegion>
-                        <lightXYRegion index="1" type="double" size="[1 1]">
+                        <lightXYRegion index="1" type="struct" size="[1 1]">
                             <normal index="1" type="double" size="[1 4]">
                                 [-1.0324 -0.5794 0.1213 -0.0527 ]
                             </normal>
@@ -1115,7 +1115,7 @@
                                 [-0.9015 -0.5650 0.1198 -0.0591 ]
                             </small>
                         </lightXYRegion>
-                        <rtYuvRegion>
+                        <rtYuvRegion index="1" type="struct" size="[1 1]">
                             <thcurve_u_set index="1" type="double" size="[1 6]">
                                 [50.0000 54.0000 70.0000 78.0000 110.0000 142.0000 ]
                             </thcurve_u_set>
@@ -1149,12 +1149,22 @@
                     <ca_Enable index="1" type="double" size="[1 1]">
                         [0 ]
                     </ca_Enable>                    
-                    <tolerance index="1" type="double" size="[1 1]">
-                        [0 ]
-                    </tolerance>
-                    <runInterval index="1" type="double" size="[1 1]">
-                        [20 ]
-                    </runInterval>
+            <tolerance index="1" type="struct" size="[1 1]">
+              <LV  index="1" type="double" size="[1 4]">
+                   [256  512  32768 131072]
+              </LV >
+              <value  index="1" type="double" size="[1 4]">
+                  [0 0 0 0]
+              </value >
+            </tolerance>
+            <runInterval index="1" type="struct" size="[1 1]">
+              <LV  index="1" type="double" size="[1 4]">
+                   [256  512  32768 131072]
+              </LV >
+              <value  index="1" type="double" size="[1 4]">
+                  [20 15 10 5]
+              </value >
+            </runInterval>    
                     <multiwindowMode index="1" type="double" size="[1 1]">
                         [0 ]
                     </multiwindowMode>
@@ -2903,6 +2913,9 @@
                 </resolutionAlll>
                 <illAll index="1" type="cell" size="[1 7]">
                     <cell index="1" type="struct" size="[1 1]">
+                 <usedForCase index="1" type="double" size="[1 1]">
+                     [0]
+                 </usedForCase>	
                         <name index="1" type="char" size="[1 1]">
                             A
                         </name>
@@ -2920,6 +2933,9 @@
                         </vig>
                     </cell>
                     <cell index="5" type="struct" size="[1 1]">
+                  <usedForCase index="1" type="double" size="[1 1]">
+                     [0]
+                 </usedForCase>	             
                         <name index="1" type="char" size="[1 3]">
                             CWF
                         </name>
@@ -2937,6 +2953,9 @@
                         </vig>
                     </cell>
                     <cell index="2" type="struct" size="[1 1]">
+                 <usedForCase index="1" type="double" size="[1 1]">
+                     [0]
+                 </usedForCase>	             
                         <name index="1" type="char" size="[1 3]">
                             D50
                         </name>
@@ -2954,6 +2973,9 @@
                         </vig>
                     </cell>
                     <cell index="3" type="struct" size="[1 1]">
+                 <usedForCase index="1" type="double" size="[1 1]">
+                     [0]
+                 </usedForCase>	             
                         <name index="1" type="char" size="[1 3]">
                             D65
                         </name>
@@ -2971,6 +2993,9 @@
                         </vig>
                     </cell>
                     <cell index="4" type="struct" size="[1 1]">
+                  <usedForCase index="1" type="double" size="[1 1]">
+                     [0]
+                 </usedForCase>	             
                         <name index="1" type="char" size="[1 3]">
                             D75
                         </name>
@@ -2988,6 +3013,9 @@
                         </vig>
                     </cell>
                     <cell index="4" type="struct" size="[1 1]">
+                  <usedForCase index="1" type="double" size="[1 1]">
+                     [0]
+                  </usedForCase>	             
                         <name index="1" type="char" size="[1 2]">
                             HZ
                         </name>
@@ -3005,6 +3033,9 @@
                         </vig>
                     </cell>
                     <cell index="6" type="struct" size="[1 1]">
+                  <usedForCase index="1" type="double" size="[1 1]">
+                     [0]
+                 </usedForCase>                       
                         <name index="1" type="char" size="[1 4]">
                             TL84
                         </name>
@@ -16177,14 +16208,54 @@
                [0]
           </enable>
       </ORB>      
+      <CPSL index="1" type="struct" size="[1 1]">
+          <enable index="1" type="char" size="[1 1]">
+               [0]
+          </enable>
+          <mode index="1" type="int" size="[1 1]">
+               [0]
+          </mode>
+          <force_gray index="1" type="char" size="[1 1]">
+               [1]
+          </force_gray>
+          <light_src index="1" type="int" size="[1 1]">
+               [0]
+          </light_src>
+          <auto_adjust_sens index="1" type="double" size="[1 1]">
+               [50]
+          </auto_adjust_sens>
+          <auto_on2off_th index="1" type="int" size="[1 1]">
+               [3000]
+          </auto_on2off_th>
+          <auto_off2on_th index="1" type="int" size="[1 1]">
+               [100]
+          </auto_off2on_th>
+          <auto_sw_interval index="1" type="int" size="[1 1]">
+               [60]
+          </auto_sw_interval>
+          <manual_on index="1" type="char" size="[1 1]">
+               [0]
+          </manual_on>
+          <manual_strength index="1" type="double" size="[1 1]">
+               [100]
+          </manual_strength>
+      </CPSL>
+      <LUMADETECT index="1" type="struct" size="[1 1]">
+          <enable index="1" type="double" size="[1 1]">
+               [1]
+          </enable>
+          <threshold index="1" type="double" size="[1 1]">
+               [0.2]
+          </threshold>
+       </LUMADETECT>
     </sensor>
     <system type="struct" size="[1 1]">
         <HDR index="1" type="struct" size="[1 1]">
             <enable index="1" type="double" size="[1 1]">
             [1 ]
         </enable>
-            <support_mode index="1" type="char" size="[1 5]">MODE_2_LINE</support_mode>
-            <line_mode index="1" type="char" size="[1 0]">STAGGER</line_mode>
+            <support_mode index="1" type="char" size="[1 16]">MODE_2_LINE</support_mode>
+            <line_mode index="1" type="char" size="[1 16]">STAGGER</line_mode>
         </HDR>
 	<DCG_SETTING index="1" type="struct" size="[1 1]">
 	    <support_en index="1" type="double" size="[1 1]">
@@ -16225,34 +16296,6 @@
 	       </hcg2lcg_th>
 	    </env_ctrl>
 	</DCG_SETTING>
-	<REMOSIAC_BINING_SETTING index="1" type="struct" size="[1 1]">
-	    <support_en index="1" type="double" size="[1 1]">
-	       [0]
-	    </support_en>
-	    <bining_optype index="1" type="char" size="[1 8]">
-	       AUTO
-	    </bining_optype>
-	    <biningMode_init index="1" type="double" size="[1 3]">
-	       [0 0 0]
-	    </biningMode_init>
-	    <bining_ratio index="1" type="double" size="[1 1]">
-	       [1]
-	    </bining_ratio>
-	    <sync_switch index="1" type="double" size="[1 1]">
-	       [1]
-	    </sync_switch>
-	    <gain_ctrl index="1" type="struct" size="[1 1]">
-	       <enable index="1" type="double" size="[1 1]">
-	          [1]
-	       </enable>
-	       <lcg2hcg_th index="1" type="double" size="[1 1]">
-	          [30.1]
-	       </lcg2hcg_th>
-	       <hcg2lcg_th index="1" type="double" size="[1 1]">
-	          [25]
-	       </hcg2lcg_th>
-	    </gain_ctrl>    
-	</REMOSIAC_BINING_SETTING>
          <EXP_DELAY index="1" type="struct" size="[1 1]">
 	     <time_delay index="1" type="double" size="[1 1]">
 	        [2]

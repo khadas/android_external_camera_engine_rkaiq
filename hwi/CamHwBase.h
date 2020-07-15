@@ -91,6 +91,7 @@ protected:
     SmartPtr<V4l2SubDevice> mIrcutDev;
 #ifndef RK_SIMULATOR_HW
     SmartPtr<FlashLightHw> mFlashLight;
+    SmartPtr<FlashLightHw> mFlashLightIr;
 #endif
     SmartPtr<PollThread> mPollthread;
     SmartPtr<PollThread> mPollLumathread;

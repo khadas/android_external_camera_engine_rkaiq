@@ -465,7 +465,7 @@ typedef struct CalibDb_Aec_Para_s {
     CalibDb_HdrAE_Attr_t          HdrAeCtrl;
 } CalibDb_Aec_Para_t;
 
-#define CALD_AEC_GAIN_RANGE_MAX_LEN  70
+#define CALD_AEC_GAIN_RANGE_MAX_LEN  350
 typedef struct CalibDb_AecGainRange_s {
     int array_size;
     float pGainRange[CALD_AEC_GAIN_RANGE_MAX_LEN];
@@ -503,6 +503,8 @@ typedef struct CalibDb_Sensor_Para_s {
 #define CALD_AWB_CRI_GRID_NUM_MAX 10
 #define CALD_AWB_CT_LV_NUM_MAX 3
 #define CALD_AWB_CT_CLIP_GRID_NUM_MAX 7
+#define CALD_AWB_LV_NUM_FOR_TOLERANCE 4
+#define CALD_AWB_LV_NUM_FOR_RUNINTERVAL 4
 
 typedef struct _CalibDb_ExcRange_s {
     unsigned char domain;/*0uv domain,1 xy domain*/
@@ -707,6 +709,18 @@ typedef struct cct_clip_cfg_s {
     float cri_bound_low[CALD_AWB_CT_CLIP_GRID_NUM_MAX];
 } cct_clip_cfg_t, CalibDb_Awb_Cct_Clip_Cfg_t;
 
+typedef struct rk_aiq_wb_awb_runinterval_s {
+    int num;
+    float LV[CALD_AWB_LV_NUM_FOR_RUNINTERVAL];
+    float value[CALD_AWB_LV_NUM_FOR_RUNINTERVAL];
+}rk_aiq_wb_awb_runinterval_t,CalibDb_Awb_runinterval_t;
+
+typedef struct rk_aiq_wb_awb_tolerance_s {
+    int num;
+    float LV[CALD_AWB_LV_NUM_FOR_RUNINTERVAL];
+    float value[CALD_AWB_LV_NUM_FOR_RUNINTERVAL];
+}rk_aiq_wb_awb_tolerance_t,CalibDb_Awb_tolerance_t;
+
 typedef struct CalibDb_Awb_Stategy_Para_s {
     unsigned char lightNum;
     bool ca_enable;
@@ -717,8 +731,8 @@ typedef struct CalibDb_Awb_Stategy_Para_s {
     //multiwindow
     unsigned char multiwindowMode;
     bool uvRange_small_enable;
-    float tolerance;//wb gain diff th for awb gain update, set 0 to disable this function
-    unsigned int runInterval;
+    CalibDb_Awb_tolerance_t tolerance;//wb gain diff th for awb gain update, set 0 to disable this function
+    CalibDb_Awb_runinterval_t runInterval;
     //wbgain damp
     float dFStep;
     float dFMin;
@@ -1027,6 +1041,7 @@ typedef struct CalibDb_AlscCof_s {
     CalibDb_ResolutionName_t  lscResName[LSC_RESOLUTIONS_NUM_MAX];// type CalibDb_ResolutionName_t
     int   illuNum[USED_FOR_CASE_MAX];
     CalibDb_AlscCof_ill_t illAll[USED_FOR_CASE_MAX][LSC_ILLUMINATION_MAX];
+    int usedForCaseAll[USED_FOR_CASE_MAX*LSC_ILLUMINATION_MAX];//for write xml
 } CalibDb_AlscCof_t;
 
 typedef struct CalibDb_LscTableProfile_s {
@@ -1635,6 +1650,7 @@ typedef struct {
     char sensor_name[32];
     char sample_name[64];
     char gen_verion[16];
+    uint32_t magic_code;
 }CalibDb_Header_t;
 
 typedef struct CamCalibDbContext_s {

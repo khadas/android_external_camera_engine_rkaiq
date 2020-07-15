@@ -512,12 +512,12 @@ XCamReturn AlscInit(alsc_handle_t *hAlsc, const CamCalibDbContext_t* calib)
             break;
         }
     }
-    if(calib_lsc->aLscCof.illuNum > 0 && lsFound == false) {
+    if(calib_lsc->aLscCof.illuNum[caseIndex] > 0 && lsFound == false) {
         memcpy(alsc_context->alscSwInfo.awbGain, calib_lsc->aLscCof.illAll[caseIndex][0].awbGain,
                sizeof(alsc_context->alscSwInfo.awbGain));
         LOGD_ALSC("%s: alsc lsForFirstFrame:%s", __FUNCTION__, calib_lsc->aLscCof.illAll[caseIndex][0].illuName);
     }
-    LOGI_ALSC("%s: alsc illunum:%d", __FUNCTION__, calib_lsc->aLscCof.illuNum);
+    LOGI_ALSC("%s: alsc illunum:%d", __FUNCTION__, calib_lsc->aLscCof.illuNum[caseIndex]);
 
     // 1) gtet and reorder para
     //const CalibDb_Lsc_t *pAlscProfile = calib->lsc;

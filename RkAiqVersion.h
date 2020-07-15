@@ -118,8 +118,30 @@
  * - change the name of '/tmp/capture_cnt' to '/tmp/.capture_cnt'
  * - determine isp read back times according to lumaDetect module
  * - fix sensor dpcc bug
+ * v1.0.1
+ * - iq parser support tag check
+ *   - Calib v1.1.1 magic code 996625
+ * - add following uApi
+ *   - rk_aiq_uapi_getGrayMode 
+ *   - rk_aiq_uapi_setGrayMode
+ *   - rk_aiq_uapi_setFrameRate 
+ *   - rk_aiq_uapi_getFrameRate 
+ *   - rk_aiq_uapi_sysctl_enumStaticMetas
+ *   - rk_aiq_uapi_get_version_info 
+ * - cpsl support sensitivity and strength control
+ * - add iq for OV02K10 
+ * - add iq for imx334 
+ * - fix accm-saturation bug 
  */
 
-#define RK_AIQ_VERSION "AIQ v1.0.0"
-#define RK_AIQ_RELEASE_DATE "2020-07-03"
+#define RK_AIQ_VERSION_REAL_V "v1.0.1"
+#define RK_AIQ_RELEASE_DATE "2020-07-15"
+
+/******* DO NOT EDIT THE FOLLOWINGS ***********/
+
+#define RK_AIQ_VERSION_HEAD "AIQ "
+#define RK_AIQ_VERSION \
+    RK_AIQ_VERSION_HEAD\
+    RK_AIQ_VERSION_REAL_V
+
 #endif

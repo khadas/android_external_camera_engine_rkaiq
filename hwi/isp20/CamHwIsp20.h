@@ -103,6 +103,10 @@ typedef struct {
     std::string module_ircut_dev_name;
     int flash_num;
     std::string module_flash_dev_name[SENSOR_ATTACHED_FLASH_MAX_NUM]; // matched using mPhyModuleIndex
+    bool fl_strth_adj_sup;
+    int flash_ir_num;
+    std::string module_flash_ir_dev_name[SENSOR_ATTACHED_FLASH_MAX_NUM];
+    bool fl_ir_strth_adj_sup;
     std::string module_real_sensor_name; //parsed frome sensor entity name
     std::string module_index_str; // parsed from sensor entity name
     char phy_module_orient; // parsed from sensor entity name
@@ -133,7 +137,7 @@ public:
     virtual XCamReturn setFocusParams(SmartPtr<RkAiqFocusParamsProxy>& focus_params);
     virtual XCamReturn setCpslParams(SmartPtr<RkAiqCpslParamsProxy>& cpsl_params);
     virtual XCamReturn setIsppParams(SmartPtr<RkAiqIsppParamsProxy>& isppParams);
-    static rk_aiq_static_info_t* getStaticCamHwInfo(const char* sns_ent_name);
+    static rk_aiq_static_info_t* getStaticCamHwInfo(const char* sns_ent_name, uint16_t index = 0);
     static XCamReturn clearStaticCamHwInfo();
     static void findAttachedSubdevs(struct media_device *device, uint32_t count, rk_sensor_full_info_t *s_info);
     static XCamReturn initCamHwInfos();

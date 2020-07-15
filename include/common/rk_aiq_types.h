@@ -261,7 +261,9 @@ typedef struct {
     rk_aiq_lens_info_t      lens_info;
     bool has_lens_vcm; /*< has lens vcm */
     bool has_fl; /*< has flash light */
+    bool fl_strth_adj_sup;
     bool has_irc; /*< has ircutter */
+    bool fl_ir_strth_adj_sup;
     // supported Antibanding modes
     // supported lock modes
     // supported ae compensation range/step
@@ -637,6 +639,12 @@ typedef struct rk_aiq_isp_ie_s {
     rk_aiq_aie_params_int_t extra;
 } rk_aiq_isp_ie_t;
 
+typedef enum rk_aiq_gray_mode_e {
+    RK_AIQ_GRAY_MODE_CPSL, /*!< controlled by cpsl*/
+    RK_AIQ_GRAY_MODE_OFF,
+    RK_AIQ_GRAY_MODE_ON,
+} rk_aiq_gray_mode_t;
+
 /* Flash modes. Default is off.
  * Setting a flash to TORCH or INDICATOR mode will automatically
  * turn it on. Setting it to FLASH mode will not turn on the flash
@@ -715,7 +723,8 @@ typedef struct rk_aiq_cpsl_cfg_s {
         } a; /*< auto mode */
         struct {
             uint8_t on; /*!< disable 0, enable 1 */
-            float strength; /*!< Range [0-100] */
+            float strength_led; /*!< Range [0-100] */
+            float strength_ir; /*!< Range [0-100] */
         } m; /*!< manual mode */
     } u;
 } rk_aiq_cpsl_cfg_t;
@@ -724,7 +733,8 @@ typedef struct rk_aiq_cpsl_info_s {
     int32_t mode;
     uint8_t on;
     bool gray;
-    float strength;
+    float strength_led;
+    float strength_ir;
     float sensitivity;
     uint32_t sw_interval;
     int32_t lght_src;
@@ -735,8 +745,9 @@ typedef struct rk_aiq_cpsl_cap_s {
     uint8_t modes_num;
     int32_t supported_lght_src[RK_AIQ_CPSLS_MAX];
     uint8_t lght_src_num;
-    rk_aiq_range_t strength;
+    rk_aiq_range_t strength_led;
     rk_aiq_range_t sensitivity;
+    rk_aiq_range_t strength_ir;
 } rk_aiq_cpsl_cap_t;
 
 typedef struct {

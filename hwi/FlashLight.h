@@ -37,7 +37,8 @@ public:
     XCamReturn deinit();
     XCamReturn start();
     XCamReturn stop();
-
+    bool isStrengthAdj() {
+        return  _v4l_flash_info[0].fl_strth_adj_enable || _v4l_flash_info[0].tc_strth_adj_enable;}
     XCamReturn set_params(rk_aiq_flash_setting_t& flash_settings);
     XCamReturn get_status (rk_aiq_flash_setting_t& flash_settings, int frame_id = -1);
 private:
@@ -62,6 +63,8 @@ private:
       // [min, max, default, step]
       int torch_power_info[RK_AIQ_V4L_FLASH_QUERY_TYPE_E_LAST];
       int flash_power_info[RK_AIQ_V4L_FLASH_QUERY_TYPE_E_LAST];
+      bool fl_strth_adj_enable;
+      bool tc_strth_adj_enable;
     };
 
     struct rk_aiq_v4l_flash_info_s _v4l_flash_info[FLASH_MAX_NUM];

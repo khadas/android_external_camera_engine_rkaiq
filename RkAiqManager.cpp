@@ -143,6 +143,8 @@ RkAiqManager::init()
     hw_info.fl_supported = s_info->has_fl;
     hw_info.irc_supported = s_info->has_irc;
     hw_info.lens_supported = s_info->has_lens_vcm;
+    hw_info.fl_strth_adj = s_info->fl_strth_adj_sup;
+    hw_info.fl_ir_strth_adj = s_info->fl_ir_strth_adj_sup;
 #endif
     mRkAiqAnalyzer->setHwInfos(hw_info);
 

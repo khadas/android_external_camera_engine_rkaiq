@@ -216,6 +216,24 @@ rk_aiq_uapi_sysctl_getStaticMetas(const char* sns_ent_name, rk_aiq_static_info_t
 }
 
 XCamReturn
+rk_aiq_uapi_sysctl_enumStaticMetas(int index, rk_aiq_static_info_t* static_info)
+{
+    if (!static_info)
+        return XCAM_RETURN_ERROR_FAILED;
+#ifdef RK_SIMULATOR_HW
+    /* nothing to do now*/
+    static_info = NULL;
+#else
+    rk_aiq_static_info_t* tmp =  CamHwIsp20::getStaticCamHwInfo(NULL, index);
+    if (tmp)
+        memcpy(static_info, tmp, sizeof(rk_aiq_static_info_t));
+    else
+        return XCAM_RETURN_ERROR_OUTOFRANGE;
+#endif
+    return XCAM_RETURN_NO_ERROR;
+}
+
+XCamReturn
 rk_aiq_uapi_sysctl_getMetaData(const rk_aiq_sys_ctx_t* ctx, uint32_t frame_id, rk_aiq_metas_t* metas)
 {
     // TODO
@@ -368,32 +386,33 @@ rk_aiq_uapi_sysctl_queryCpsLtCap(const rk_aiq_sys_ctx_t* ctx,
     return ctx->_analyzer->queryCpsLtCap(*cap);
 }
 
+extern RkAiqAlgoDescription g_RkIspAlgoDescA3dlut;
+extern RkAiqAlgoDescription g_RkIspAlgoDescAblc;
+extern RkAiqAlgoDescription g_RkIspAlgoDescAccm;
+extern RkAiqAlgoDescription g_RkIspAlgoDescAcgc;
+extern RkAiqAlgoDescription g_RkIspAlgoDescAcp;
+extern RkAiqAlgoDescription g_RkIspAlgoDescAdebayer;
+extern RkAiqAlgoDescription g_RkIspAlgoDescAdhaz;
+extern RkAiqAlgoDescription g_RkIspAlgoDescAdpcc;
+extern RkAiqAlgoDescription g_RkIspAlgoDescAe;
+extern RkAiqAlgoDescription g_RkIspAlgoDescAf;
+extern RkAiqAlgoDescription g_RkIspAlgoDescAfec;
+extern RkAiqAlgoDescription g_RkIspAlgoDescAgamma;
+extern RkAiqAlgoDescription g_RkIspAlgoDescAgic;
+extern RkAiqAlgoDescription g_RkIspAlgoDescAhdr;
+extern RkAiqAlgoDescription g_RkIspAlgoDescAie;
+extern RkAiqAlgoDescription g_RkIspAlgoDescAldch;
+extern RkAiqAlgoDescription g_RkIspAlgoDescAlsc;
+extern RkAiqAlgoDescription g_RkIspAlgoDescAnr;
+extern RkAiqAlgoDescription g_RkIspAlgoDescAorb;
+extern RkAiqAlgoDescription g_RkIspAlgoDescAr2y;
+extern RkAiqAlgoDescription g_RkIspAlgoDescAsd;
+extern RkAiqAlgoDescription g_RkIspAlgoDescAsharp;
+extern RkAiqAlgoDescription g_RkIspAlgoDescAwb;
+extern RkAiqAlgoDescription g_RkIspAlgoDescAwdr;
+
 static void _print_versions()
 {
-    extern RkAiqAlgoDescription g_RkIspAlgoDescA3dlut;
-    extern RkAiqAlgoDescription g_RkIspAlgoDescAblc;
-    extern RkAiqAlgoDescription g_RkIspAlgoDescAccm;
-    extern RkAiqAlgoDescription g_RkIspAlgoDescAcgc;
-    extern RkAiqAlgoDescription g_RkIspAlgoDescAcp;
-    extern RkAiqAlgoDescription g_RkIspAlgoDescAdebayer;
-    extern RkAiqAlgoDescription g_RkIspAlgoDescAdhaz;
-    extern RkAiqAlgoDescription g_RkIspAlgoDescAdpcc;
-    extern RkAiqAlgoDescription g_RkIspAlgoDescAe;
-    extern RkAiqAlgoDescription g_RkIspAlgoDescAf;
-    extern RkAiqAlgoDescription g_RkIspAlgoDescAfec;
-    extern RkAiqAlgoDescription g_RkIspAlgoDescAgamma;
-    extern RkAiqAlgoDescription g_RkIspAlgoDescAgic;
-    extern RkAiqAlgoDescription g_RkIspAlgoDescAhdr;
-    extern RkAiqAlgoDescription g_RkIspAlgoDescAie;
-    extern RkAiqAlgoDescription g_RkIspAlgoDescAldch;
-    extern RkAiqAlgoDescription g_RkIspAlgoDescAlsc;
-    extern RkAiqAlgoDescription g_RkIspAlgoDescAnr;
-    extern RkAiqAlgoDescription g_RkIspAlgoDescAorb;
-    extern RkAiqAlgoDescription g_RkIspAlgoDescAr2y;
-    extern RkAiqAlgoDescription g_RkIspAlgoDescAsd;
-    extern RkAiqAlgoDescription g_RkIspAlgoDescAsharp;
-    extern RkAiqAlgoDescription g_RkIspAlgoDescAwb;
-    extern RkAiqAlgoDescription g_RkIspAlgoDescAwdr;
     LOGI("\n"
          "************************** VERSION INFOS **************************\n"
          "version release date: %s\n"
@@ -452,6 +471,39 @@ static void _print_versions()
          , g_RkIspAlgoDescAsd.common.version
          , g_RkIspAlgoDescAwdr.common.version
         );
+}
+
+void rk_aiq_uapi_get_version_info(rk_aiq_ver_info_t* vers)
+{
+    uint32_t iq_parser_magic_code;
+
+    xcam_mem_clear (*vers);
+    const char* ver_str = RK_AIQ_CALIB_VERSION;
+    const char* start = ver_str +  strlen(RK_AIQ_CALIB_VERSION_HEAD);
+    const char* stop = strstr(ver_str, RK_AIQ_CALIB_VERSION_MAGIC_JOINT);
+
+    // TODO: use strncpy instead of memcpy, but has compile warning now
+    memcpy(vers->iq_parser_ver, start, stop - start);
+
+    start = strstr(ver_str, RK_AIQ_CALIB_VERSION_MAGIC_CODE_HEAD) +
+        strlen(RK_AIQ_CALIB_VERSION_MAGIC_CODE_HEAD);
+
+    vers->iq_parser_magic_code = atoi(start);
+
+    ver_str = RK_AIQ_VERSION;
+    start = ver_str +  strlen(RK_AIQ_VERSION_HEAD);
+    strcpy(vers->aiq_ver, start);
+
+    strcpy(vers->awb_algo_ver, g_RkIspAlgoDescAwb.common.version);
+    strcpy(vers->ae_algo_ver, g_RkIspAlgoDescAe.common.version);
+    strcpy(vers->af_algo_ver, g_RkIspAlgoDescAf.common.version);
+    strcpy(vers->ahdr_algo_ver, g_RkIspAlgoDescAhdr.common.version);
+
+    LOGD("aiq ver %s, parser ver %s, magic code %d, awb ver %s\n"
+         "ae ver %s, af ver %s, ahdr ver %s", vers->aiq_ver,
+         vers->iq_parser_ver, vers->iq_parser_magic_code,
+         vers->awb_algo_ver, vers->ae_algo_ver,
+         vers->af_algo_ver, vers->ahdr_algo_ver);
 }
 
 static void rk_aiq_init_lib(void) __attribute__((constructor));

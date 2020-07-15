@@ -59,6 +59,7 @@ typedef struct RKAiqCpslInfoWrapper_s {
     rk_aiq_flash_setting_t fl;
     bool update_fl;
     rk_aiq_ir_setting_t ir;
+    rk_aiq_flash_setting_t fl_ir;
     bool update_ir;
 } RKAiqCpslInfoWrapper_t;
 

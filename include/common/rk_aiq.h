@@ -38,6 +38,16 @@ typedef struct rk_aiq_err_msg_s {
     int err_code;
 } rk_aiq_err_msg_t;
 
+typedef struct rk_aiq_ver_info_s{
+    char aiq_ver[16];
+    char iq_parser_ver[16];
+    uint32_t iq_parser_magic_code;
+    char awb_algo_ver[16];
+    char ae_algo_ver[16];
+    char af_algo_ver[16];
+    char ahdr_algo_ver[16];
+} rk_aiq_ver_info_t;
+
 typedef XCamReturn (*rk_aiq_error_cb)(rk_aiq_err_msg_t* err_msg);
 typedef XCamReturn (*rk_aiq_metas_cb)(rk_aiq_metas_t* metas);
 

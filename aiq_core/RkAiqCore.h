@@ -144,8 +144,10 @@ private:
 };
 
 struct RkAiqHwInfo {
-    bool fl_supported;
-    bool irc_supported;
+    bool fl_supported;   // led flash
+    bool fl_strth_adj;   // led streng_adjust
+    bool irc_supported;  // ir flash & ir cutter
+    bool fl_ir_strth_adj;   // ir streng_adjust
     bool lens_supported;
 };
 
@@ -188,6 +190,8 @@ public:
     XCamReturn getCpsLtInfo(rk_aiq_cpsl_info_t &info);
     XCamReturn queryCpsLtCap(rk_aiq_cpsl_cap_t &cap);
     XCamReturn setHwInfos(struct RkAiqHwInfo &hw_info);
+    XCamReturn setGrayMode(rk_aiq_gray_mode_t mode);
+    rk_aiq_gray_mode_t getGrayMode();
 public:
     // following vars shared by all algo handlers
     typedef struct RkAiqAlgosShared_s {
@@ -343,6 +347,7 @@ private:
     struct RkAiqHwInfo mHwInfo;
     rk_aiq_cpsl_cap_t mCpslCap;
     bool mCurCpslOn;
+    rk_aiq_gray_mode_t mGrayMode;
 };
 
 };

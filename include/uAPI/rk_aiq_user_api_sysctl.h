@@ -93,6 +93,16 @@ rk_aiq_uapi_sysctl_stop(const rk_aiq_sys_ctx_t* ctx);
 XCamReturn
 rk_aiq_uapi_sysctl_getStaticMetas(const char* sns_ent_name, rk_aiq_static_info_t* static_info);
 
+/*!
+ * \brief enum static camera infos 
+ *
+ * \param[in] index           which camera info will be enum 
+ * \param[out] static_info    returned camera infos  
+ * \return return 0 if success
+ */
+XCamReturn
+rk_aiq_uapi_sysctl_enumStaticMetas(int index, rk_aiq_static_info_t* static_info);
+
 XCamReturn
 rk_aiq_uapi_sysctl_getMetaData(const rk_aiq_sys_ctx_t* ctx, uint32_t frame_id, rk_aiq_metas_t* metas);
 
@@ -234,6 +244,14 @@ offlineRdJobPrepare(const rk_aiq_sys_ctx_t* ctx);
 
 int32_t
 offlineRdJobDone(const rk_aiq_sys_ctx_t* ctx);
+
+/*!
+ * \brief get aiq version infos
+ *
+ * \param[in,out] vers         version infos
+ * \return return 0 if success
+ */
+void rk_aiq_uapi_get_version_info(rk_aiq_ver_info_t* vers);
 
 RKAIQ_END_DECLARE
 

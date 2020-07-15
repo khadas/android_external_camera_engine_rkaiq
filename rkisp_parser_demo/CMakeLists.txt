@@ -59,6 +59,7 @@ set (DIR_SRCS
 	demo/rkisp_parse.cpp
 	${RK_AIQ_SOURCE_DIR}/iq_parser/RkAiqCalibDb.cpp
 	${RK_AIQ_SOURCE_DIR}/iq_parser/RkAiqCalibParser.cpp
+	${RK_AIQ_SOURCE_DIR}/iq_parser/RkAiqCalibTag.cpp
 	${RK_AIQ_SOURCE_DIR}/iq_parser/tinyxml2.cpp
 	${RK_AIQ_SOURCE_DIR}/iq_parser/xmltags.cpp
 	${RK_AIQ_SOURCE_DIR}/xcore/xcam_log.cpp

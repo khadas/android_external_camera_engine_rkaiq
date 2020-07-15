@@ -205,11 +205,7 @@ FlashLightHw::v4l_set_params(int fl_mode, float fl_intensity[], int fl_timeout, 
             fl_device = _fl_device[i];
             set_fl_contol_to_dev(fl_device, V4L2_CID_FLASH_LED_MODE, V4L2_FLASH_LED_MODE_FLASH);
             set_fl_contol_to_dev(fl_device, V4L2_CID_FLASH_TIMEOUT, fl_timeout * 1000);
-            if (_v4l_flash_info[i].flash_power_info[RK_AIQ_V4L_FLASH_QUERY_TYPE_E_STEP] ==
-                    _v4l_flash_info[i].flash_power_info[RK_AIQ_V4L_FLASH_QUERY_TYPE_E_MAX]) {
-                set_fl_contol_to_dev(fl_device, V4L2_CID_FLASH_INTENSITY,
-                                     _v4l_flash_info[i].flash_power_info[RK_AIQ_V4L_FLASH_QUERY_TYPE_E_MAX]);
-            } else {
+            if (_v4l_flash_info[i].fl_strth_adj_enable) {
                 int flash_power =
                     fl_intensity[i] * (_v4l_flash_info[i].flash_power_info[RK_AIQ_V4L_FLASH_QUERY_TYPE_E_MAX]);
                 set_fl_contol_to_dev(fl_device, V4L2_CID_FLASH_INTENSITY, flash_power);
@@ -228,11 +224,7 @@ FlashLightHw::v4l_set_params(int fl_mode, float fl_intensity[], int fl_timeout, 
     } else if (fl_v4l_mode == V4L2_FLASH_LED_MODE_TORCH) {
         for (i = 0; i < _active_fl_num; i++) {
             fl_device = _fl_device[i];
-            if (_v4l_flash_info[i].torch_power_info[RK_AIQ_V4L_FLASH_QUERY_TYPE_E_STEP] ==
-                    _v4l_flash_info[i].torch_power_info[RK_AIQ_V4L_FLASH_QUERY_TYPE_E_MAX]) {
-                set_fl_contol_to_dev(fl_device, V4L2_CID_FLASH_INTENSITY,
-                                     _v4l_flash_info[i].torch_power_info[RK_AIQ_V4L_FLASH_QUERY_TYPE_E_MAX]);
-            } else {
+            if (_v4l_flash_info[i].tc_strth_adj_enable) {
                 int torch_power =
                     fl_intensity[i] * (_v4l_flash_info[i].torch_power_info[RK_AIQ_V4L_FLASH_QUERY_TYPE_E_MAX]);
                 set_fl_contol_to_dev(fl_device, V4L2_CID_FLASH_TORCH_INTENSITY, torch_power);
@@ -277,9 +269,10 @@ FlashLightHw::get_flash_info ()
             ctrl.default_value;
         _v4l_flash_info[i].flash_power_info[RK_AIQ_V4L_FLASH_QUERY_TYPE_E_STEP] =
             ctrl.step;
+        _v4l_flash_info[i].fl_strth_adj_enable = !(ctrl.flags & V4L2_CTRL_FLAG_READ_ONLY);
 
-        LOGD_CAMHW_SUBM(FL_SUBM, "fl_dev[%d], flash power range:[%d,%d]",
-                        i, ctrl.minimum, ctrl.maximum);
+        LOGD_CAMHW_SUBM(FL_SUBM, "fl_dev[%d], flash power range:[%d,%d], adjust enable %d",
+                        i, ctrl.minimum, ctrl.maximum, _v4l_flash_info[i].fl_strth_adj_enable);
 
         memset(&ctrl, 0, sizeof(ctrl));
         ctrl.id = V4L2_CID_FLASH_TORCH_INTENSITY;
@@ -298,8 +291,11 @@ FlashLightHw::get_flash_info ()
         _v4l_flash_info[i].torch_power_info[RK_AIQ_V4L_FLASH_QUERY_TYPE_E_STEP] =
             ctrl.step;
 
-        LOGD_CAMHW_SUBM(FL_SUBM, "fl_dev[%d], torch power range:[%d,%d]",
-                        i, ctrl.minimum, ctrl.maximum);
+        _v4l_flash_info[i].tc_strth_adj_enable = !(ctrl.flags & V4L2_CTRL_FLAG_READ_ONLY);
+
+
+        LOGD_CAMHW_SUBM(FL_SUBM, "fl_dev[%d], torch power range:[%d,%d], adjust enable %d",
+                        i, ctrl.minimum, ctrl.maximum, _v4l_flash_info[i].tc_strth_adj_enable);
     }
 
     return XCAM_RETURN_NO_ERROR;
