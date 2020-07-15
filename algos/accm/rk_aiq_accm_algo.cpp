@@ -389,6 +389,8 @@ XCamReturn AccmAutoConfig
                   pDomIlluProfile->saturationCurve.arraySize,
                   sensorGain, &fSaturation);
 
+    hAccm->accmRest.fSaturation =  fSaturation;
+
     //3)
     ret = SatSelectCcmProfiles( hAccm->accmRest.fSaturation, pDomIlluProfile->matrixUsedNO, hAccm->pCcmMatrixAll[dominateIlluProfileIdx],
                                 &pCcmProfile1, &pCcmProfile2);

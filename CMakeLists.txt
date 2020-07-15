@@ -139,6 +139,7 @@ set (IPC_SRC
 set (IQ_PARSER_SRC
 	iq_parser/RkAiqCalibParser.cpp
 	iq_parser/RkAiqCalibDb.cpp
+	iq_parser/RkAiqCalibTag.cpp
 	iq_parser/tinyxml2.cpp
 	iq_parser/xmltags.cpp
 	)

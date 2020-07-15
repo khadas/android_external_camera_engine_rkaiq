@@ -192,7 +192,7 @@ RkLumaCore::analyze(const SmartPtr<VideoBuffer> &buffer)
         float dluma = float(luma_frame_pre->mean_luma[0] - luma->image_luma_result.mean_luma[0]) /
                        (luma_frame_pre->mean_luma[0] + luma->image_luma_result.mean_luma[0]);
 
-        if (dluma > lumaCalib->mutation_threshold || dluma < -lumaCalib->mutation_threshold) {
+        if (dluma > 0.2 || dluma < -0.2) {
             hdrProcessCnt = 2;
         }
     }

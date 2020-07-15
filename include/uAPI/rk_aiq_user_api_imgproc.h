@@ -46,7 +46,7 @@ typedef enum dayNightScene_e {
 
 typedef enum opMode_e {
     OP_AUTO = 0,
-    OP_MANUALl = 1,
+    OP_MANUAL = 1,
     OP_SEMI_AUTO = 2,
     OP_INVAL
 } opMode_t;
@@ -99,6 +99,11 @@ typedef enum antiFlickerMode_e {
     ANTIFLICKER_NORMAL_MODE = 0,
     ANTIFLICKER_AUTO_MODE = 1,
 } antiFlickerMode_t;
+
+typedef struct frameRateInfo_s {
+    opMode_t         mode;
+    unsigned int     fps; /* valid when manual mode*/
+} frameRateInfo_t;
 
 RKAIQ_BEGIN_DECLARE
 
@@ -645,6 +650,33 @@ XCamReturn rk_aiq_uapi_setSharpness(const rk_aiq_sys_ctx_t* ctx, unsigned int le
 XCamReturn rk_aiq_uapi_getSharpness(const rk_aiq_sys_ctx_t* ctx, unsigned int *level);
 
 XCamReturn rk_aiq_uapi_setGammaCoef(const rk_aiq_sys_ctx_t* ctx, unsigned int level);
+
+/*
+*****************************
+*
+* Desc: set gray mode
+* Argument:
+*    mode : RK_AIQ_GRAY_MODE_CPSL
+*           RK_AIQ_GRAY_MODE_OFF
+*           RK_AIQ_GRAY_MODE_ON
+* related: rk_aiq_uapi_sysctl_setCpsLtCfg
+*****************************
+*/
+XCamReturn rk_aiq_uapi_setGrayMode(const rk_aiq_sys_ctx_t* ctx, rk_aiq_gray_mode_t mode);
+rk_aiq_gray_mode_t rk_aiq_uapi_getGrayMode(const rk_aiq_sys_ctx_t* ctx);
+
+/*
+*****************************
+*
+* Desc: set frame rate
+* Argument:
+*    frameRateInfo_t :
+*           auto mode: vary fps
+*         manual mode: fixed fps
+*****************************
+*/
+XCamReturn rk_aiq_uapi_setFrameRate(const rk_aiq_sys_ctx_t* ctx, frameRateInfo_t info);
+XCamReturn rk_aiq_uapi_getFrameRate(const rk_aiq_sys_ctx_t* ctx, frameRateInfo_t *info);
 
 RKAIQ_END_DECLARE
 

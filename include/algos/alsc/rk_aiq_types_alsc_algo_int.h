@@ -29,7 +29,7 @@ typedef struct alsc_sw_info_s {
     float sensorGain;
     float awbGain[2];
     float awbIIRDampCoef;
-    int grayMode;
+    bool grayMode;
 } alsc_sw_info_t;
 
 typedef struct rk_aiq_lsc_mlsc_attrib_s {

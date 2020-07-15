@@ -181,6 +181,8 @@
 #define CALIB_SENSOR_AWB_REMOSAICPARA_WBGAIN                    "sensorWbGain"
 #define CALIB_SENSOR_AWB_RUNINTERNAL                            "runInterval"
 #define CALIB_SENSOR_AWB_TOLERANCE                              "tolerance"
+#define CALIB_SENSOR_AWB_LV                                     "LV"
+#define CALIB_SENSOR_AWB_VALUE                                  "value"
 #define CALIB_SENSOR_AWB_XYREGIONSTABLESELECTION                "xyRegionStableSelection"
 #define CALIB_SENSOR_AWB_XYREGIONSIZE                           "xyRegionSize"
 #define CALIB_SENSOR_AWB_WBGAINADJUST                           "wbGainAdjust"
@@ -1066,7 +1068,7 @@
 #define    CALIB_SENSOR_CPSL_AUTO_OFF2ON_TH               "auto_off2on_th"
 #define    CALIB_SENSOR_CPSL_AUTO_SW_INTERVAL             "auto_sw_interval"
 #define    CALIB_SENSOR_CPSL_MANUAL_ON                    "manual_on"
-#define    CALIB_SENSOR_CPSL_MANUAL_STRENGTH              "manual_sthength"
+#define    CALIB_SENSOR_CPSL_MANUAL_STRENGTH              "manual_strength"
 
 /******************************************************************************
  * XML system section

@@ -153,6 +153,7 @@ RkAiqCore::RkAiqCore()
     mCurAfAlgoHdl = NULL;
     xcam_mem_clear(mHwInfo);
     mCurCpslOn = false;
+    mGrayMode = RK_AIQ_GRAY_MODE_CPSL;
 
     SmartPtr<RkAiqFullParams> fullParam = new RkAiqFullParams();
     mAiqCurParams = new RkAiqFullParamsProxy(fullParam );
@@ -199,8 +200,10 @@ void RkAiqCore::initCpsl()
                           cfg->u.a.sensitivity, cfg->u.a.sw_interval);
         } else {
             cfg->u.m.on = aiqCalib->cpsl.cpsl_on;
-            cfg->u.m.strength = aiqCalib->cpsl.strength;
-            LOGI_ANALYZER("on %d, strength %f\n", cfg->u.m.on, cfg->u.m.strength);
+            cfg->u.m.strength_ir = aiqCalib->cpsl.strength;
+            cfg->u.m.strength_led = aiqCalib->cpsl.strength;
+            LOGI_ANALYZER("on %d, strength_led %f, strength_ir %f \n",
+                          cfg->u.m.on, cfg->u.m.strength_led, cfg->u.m.strength_ir);
         }
     } else {
         cfg->mode = RK_AIQ_OP_MODE_INVALID;
@@ -439,8 +442,10 @@ RkAiqCore::analyzeInternal()
         } else {
             cfg.gray_on = true;
             cfg.u.m.on = true;
-            cfg.u.m.strength = 100;
-            LOGI_ANALYZER("on %d, strength %f\n", cfg.u.m.on, cfg.u.m.strength);
+            cfg.u.m.strength_ir = 100;
+            cfg.u.m.strength_led = 100;
+            LOGI_ANALYZER("on %d, strength_led %f, strength_ir %f\n",
+                          cfg.u.m.on, cfg.u.m.strength_led, cfg.u.m.strength_ir);
         }
         close(fd);
         setCpsLtCfg(cfg);
@@ -480,15 +485,6 @@ RkAiqCore::analyzeInternal()
     genIspAlscResult(aiqParams);
     genIspAr2yResult(aiqParams);
     genIspAwdrResult(aiqParams);
-    //TODO:
-#if 0
-    rk_aiq_cpsl_cfg_t cfg;
-    cfg.mode = RK_AIQ_OP_MODE_MANUAL;
-    cfg.lght_src = RK_AIQ_CPSLS_LED;
-    cfg.u.m.on = true;
-    cfg.u.m.strength = 100;
-    setCpsLtCfg(cfg);
-#endif
     mAiqCurParams->data()->mIspParams = aiqParams->mIspParams;
     mAiqCurParams->data()->mExposureParams = aiqParams->mExposureParams;
     mAiqCurParams->data()->mFocusParams = aiqParams->mFocusParams;
@@ -2613,7 +2609,8 @@ RkAiqCore::getCpsLtInfo(rk_aiq_cpsl_info_t &info)
     info.mode = mAlogsSharedParams.cpslCfg.mode;
     if (info.mode == RK_AIQ_OP_MODE_MANUAL) {
         info.on = mAlogsSharedParams.cpslCfg.u.m.on;
-        info.strength = mAlogsSharedParams.cpslCfg.u.m.strength;
+        info.strength_led = mAlogsSharedParams.cpslCfg.u.m.strength_led;
+        info.strength_ir = mAlogsSharedParams.cpslCfg.u.m.strength_ir;
     } else {
         info.on = mCurCpslOn;
         info.gray = mAlogsSharedParams.gray_mode;
@@ -2653,13 +2650,27 @@ RkAiqCore::queryCpsLtCap(rk_aiq_cpsl_cap_t &cap)
         cap.lght_src_num++;
     }
 
-    // TODO: something from calib
-    cap.strength.min = 0;
-    cap.strength.max = 100;
-    cap.strength.step = 100;
+    cap.strength_led.min = 0;
+    cap.strength_led.max = 100;
+    if (!mHwInfo.fl_strth_adj)
+        cap.strength_led.step = 100;
+    else
+        cap.strength_led.step = 1;
+
+    cap.strength_ir.min = 0;
+    cap.strength_ir.max = 100;
+    if (!mHwInfo.fl_ir_strth_adj)
+        cap.strength_ir.step = 100;
+    else
+        cap.strength_ir.step = 1;
+
     cap.sensitivity.min = 0;
-    cap.sensitivity.max = 1;
-    cap.sensitivity.step = 100;
+    cap.sensitivity.max = 100;
+    cap.sensitivity.step = 1;
+
+    LOGI("cpsl cap: light_src_num %d, led_step %f, ir_step %f",
+         cap.lght_src_num, cap.strength_led.step, cap.strength_ir.step);
+
     EXIT_ANALYZER_FUNCTION();
 
     return XCAM_RETURN_NO_ERROR;
@@ -2683,11 +2694,12 @@ RkAiqCore::genCpslResult(RkAiqFullParams* params)
     RKAiqCpslInfoWrapper_t* cpsl_param = params->mCpslParams->data().ptr();
     xcam_mem_clear(*cpsl_param);
 
-    LOGD_ANALYZER("mode %d, light src %d", cpsl_cfg->mode, cpsl_cfg->lght_src);
+    LOGD_ANALYZER("cpsl mode %d, light src %d", cpsl_cfg->mode, cpsl_cfg->lght_src);
     bool cpsl_on = false;
     if (cpsl_cfg->mode == RK_AIQ_OP_MODE_MANUAL) {
         cpsl_on = cpsl_cfg->u.m.on;
-        cpsl_param->fl.power[0] = cpsl_cfg->u.m.strength;
+        cpsl_param->fl.power[0] = cpsl_cfg->u.m.strength_led / 100.0f;
+        cpsl_param->fl_ir.power[0] = cpsl_cfg->u.m.strength_ir / 100.0f;
 
     } else {
         RkAiqAlgoPreResAsdInt* asd_pre_rk = (RkAiqAlgoPreResAsdInt*)mAlogsSharedParams.preResComb.asd_pre_res;
@@ -2696,6 +2708,8 @@ RkAiqCore::genCpslResult(RkAiqFullParams* params)
 
             cpsl_on = asd_result->cpsl_on;
         }
+        cpsl_param->fl.power[0] = 1.0f;
+        cpsl_param->fl_ir.power[0] = 1.0f;
     }
 
     // need update ?
@@ -2713,7 +2727,7 @@ RkAiqCore::genCpslResult(RkAiqFullParams* params)
                 cpsl_param->fl.strobe = false;
                 mAlogsSharedParams.fill_light_on = false;
             }
-            LOGD_ANALYZER("fl mode %d, strength %d, strobe %d",
+            LOGD_ANALYZER("cpsl fl mode %d, strength %f, strobe %d",
                           cpsl_param->fl.flash_mode, cpsl_param->fl.power[0],
                           cpsl_param->fl.strobe);
         }
@@ -2722,18 +2736,35 @@ RkAiqCore::genCpslResult(RkAiqFullParams* params)
             cpsl_param->update_ir = true;
             if (cpsl_on) {
                 cpsl_param->ir.irc_on = true;
+                cpsl_param->fl_ir.flash_mode = RK_AIQ_FLASH_MODE_TORCH;
+                cpsl_param->fl_ir.strobe = true;
                 mAlogsSharedParams.fill_light_on = true;
             } else {
                 cpsl_param->ir.irc_on = false;
+                cpsl_param->fl_ir.flash_mode = RK_AIQ_FLASH_MODE_OFF;
+                cpsl_param->fl_ir.strobe = false;
                 mAlogsSharedParams.fill_light_on = false;
-                mAlogsSharedParams.gray_mode = false;
             }
-            LOGD_ANALYZER("irc on %d", cpsl_param->ir.irc_on);
+            LOGD_ANALYZER("cpsl irc on %d, fl_ir: mode %d, strength %f, strobe %d",
+                          cpsl_param->ir.irc_on, cpsl_param->fl_ir.flash_mode, cpsl_param->fl_ir.power[0],
+                          cpsl_param->fl_ir.strobe);
         }
-        if (mAlogsSharedParams.fill_light_on && cpsl_cfg->gray_on) {
-            mAlogsSharedParams.gray_mode = true;
-        } else
-            mAlogsSharedParams.gray_mode = false;
+
+        if (mGrayMode == RK_AIQ_GRAY_MODE_CPSL) {
+            if (mAlogsSharedParams.fill_light_on && cpsl_cfg->gray_on) {
+                mAlogsSharedParams.gray_mode = true;
+            } else
+                mAlogsSharedParams.gray_mode = false;
+
+        } else {
+            /* no mutex lock protection for gray_mode with setGrayMode,
+             * so need set again here
+             */
+            if (mGrayMode == RK_AIQ_GRAY_MODE_OFF)
+                mAlogsSharedParams.gray_mode = false;
+            else if (mGrayMode == RK_AIQ_GRAY_MODE_ON)
+                mAlogsSharedParams.gray_mode = true;
+        }
         mCurCpslOn = cpsl_on;
     } else {
         cpsl_param->update_ir = false;
@@ -2741,6 +2772,31 @@ RkAiqCore::genCpslResult(RkAiqFullParams* params)
     }
 
     return XCAM_RETURN_NO_ERROR;
+}
+
+XCamReturn
+RkAiqCore::setGrayMode(rk_aiq_gray_mode_t mode)
+{
+    LOGD_ANALYZER("%s: gray mode %d", __FUNCTION__, mode);
+
+    mGrayMode = mode;
+    if (mode == RK_AIQ_GRAY_MODE_OFF)
+        mAlogsSharedParams.gray_mode = false;
+    else if (mode == RK_AIQ_GRAY_MODE_ON)
+        mAlogsSharedParams.gray_mode = true;
+    else if (mode == RK_AIQ_GRAY_MODE_CPSL)
+        ; // do nothing
+    else
+        LOGE_ANALYZER("%s: gray mode %d error", __FUNCTION__, mode);
+
+    return XCAM_RETURN_NO_ERROR;
+}
+
+rk_aiq_gray_mode_t
+RkAiqCore::getGrayMode()
+{
+    LOGD_ANALYZER("%s: gray mode %d", __FUNCTION__, mGrayMode);
+    return mGrayMode;
 }
 
 } //namespace RkCam

@@ -134,23 +134,33 @@ CamCalibDbContext_t* RkAiqCalibDb::createCalibDb(char* iqFile)
             if (0 == access(iqFile, F_OK)) {
                 RkAiqCalibParser  parser(pCalibDb);
                 if (parser.doParse(iqFile)) {
-                    mCalibDbsMap[str] = pCalibDb;
-                    LOGD("create calibdb from %s success.", iqFile);
-                    /*
-                    if (calibSaveToFile(iqFile, pCalibDb))
-                        LOGD("save to bin success.");
-                    else
-                        LOGE("save to bin failed.");
-                    */
-                    return pCalibDb;
+                    uint32_t magicCode = calib_check_calc_checksum();
+                    if (magicCode != pCalibDb->header.magic_code) {
+                        LOGE("magic code is not matched! calculated:%u, readed:%u", magicCode, pCalibDb->header.magic_code);
+                    }else {
+                        mCalibDbsMap[str] = pCalibDb;
+                        LOGD("create calibdb from %s success.", iqFile);
+                        /*
+                        if (calibSaveToFile(iqFile, pCalibDb))
+                            LOGD("save to bin success.");
+                        else
+                            LOGE("save to bin failed.");
+                        */
+                        return pCalibDb;
+                    }
                 } else {
                     LOGE("parse %s failed.", iqFile);
                 }
             } else if(isDataBinExist(iqFile)) {
                 if (calibReadFromFile(iqFile, pCalibDb)) {
-                    mCalibDbsMap[str] = pCalibDb;
-                    LOGD("get calibdb from bin success.");
-                    return pCalibDb;
+                    uint32_t magicCode = calib_check_calc_checksum();
+                    if (magicCode != pCalibDb->header.magic_code) {
+                        LOGE("magic code is not matched! calculated:%u, readed:%u", magicCode, pCalibDb->header.magic_code);
+                    }else {
+                        mCalibDbsMap[str] = pCalibDb;
+                        LOGD("get calibdb from bin success.");
+                        return pCalibDb;
+                    }
                 } else {
                     LOGE("get calibdb from bin failed.");
                 }

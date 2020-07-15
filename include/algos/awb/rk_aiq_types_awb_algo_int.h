@@ -24,7 +24,7 @@
 #define __RK_AIQ_TYPE_AWB_ALGO_INT_H__
 
 #include "awb/rk_aiq_types_awb_algo.h"
-
+#include "RkAiqCalibDbTypes.h"
 
 typedef enum rk_aiq_wb_scene_e {
     RK_AIQ_WBCT_INCANDESCENT = 0,
@@ -76,11 +76,10 @@ typedef enum rk_aiq_wb_awb_alg_method_s {
     //add more
 } rk_aiq_wb_awb_alg_method_t;
 
-
 typedef struct rk_aiq_wb_awb_attrib_s {
     rk_aiq_wb_awb_alg_method_t algMethod;
-    float tolerance;//wb gain diff th for awb gain update, set 0 to disable this function
-    unsigned int runInterval;
+    rk_aiq_wb_awb_tolerance_t tolerance;//wb gain diff th for awb gain update, set 0 to disable this function
+    rk_aiq_wb_awb_runinterval_t runInterval;
     bool sceneAdjustEn;//to do
     bool colorBalanceEn;//to do
     bool cagaEn;

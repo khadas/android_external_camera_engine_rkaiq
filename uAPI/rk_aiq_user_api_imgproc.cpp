@@ -24,8 +24,8 @@
         return ret; \
     }
 
-#define IMGPROC_FUNC_ENTER LOGE("%s: enter", __FUNCTION__);
-#define IMGPROC_FUNC_EXIT LOGE("%s: exit", __FUNCTION__);
+#define IMGPROC_FUNC_ENTER LOGD("%s: enter", __FUNCTION__);
+#define IMGPROC_FUNC_EXIT LOGD("%s: exit", __FUNCTION__);
 
 RKAIQ_BEGIN_DECLARE
 
@@ -84,7 +84,7 @@ XCamReturn rk_aiq_uapi_setExpMode(const rk_aiq_sys_ctx_t* ctx, opMode_t mode)
     RKAIQ_IMGPROC_CHECK_RET(ret, "get exp attr failed!\nset exp mode failed!");
     if (mode == OP_AUTO) {
         expSwAttr.AecOpType = RK_AIQ_OP_MODE_AUTO;
-    } else if (mode == OP_MANUALl) {
+    } else if (mode == OP_MANUAL) {
         expSwAttr.AecOpType = RK_AIQ_OP_MODE_MANUAL;
     } else {
         ret = XCAM_RETURN_ERROR_PARAM;
@@ -111,7 +111,7 @@ XCamReturn rk_aiq_uapi_getExpMode(const rk_aiq_sys_ctx_t* ctx, opMode_t *mode)
     if (expSwAttr.AecOpType == RK_AIQ_OP_MODE_AUTO) {
         *mode = OP_AUTO;
     } else if (expSwAttr.AecOpType == RK_AIQ_OP_MODE_MANUAL) {
-        *mode = OP_MANUALl;
+        *mode = OP_MANUAL;
     }
     IMGPROC_FUNC_EXIT
     return (ret);
@@ -375,7 +375,7 @@ XCamReturn rk_aiq_uapi_setLExpMode(const rk_aiq_sys_ctx_t* ctx, opMode_t mode)
     Uapi_LinExpAttr_t linExpAttr;
     ret = rk_aiq_user_api_ae_getLinExpAttr(ctx, &linExpAttr);
     RKAIQ_IMGPROC_CHECK_RET(ret, "setLExpMode failed!");
-    if (mode == OP_MANUALl) {
+    if (mode == OP_MANUAL) {
         linExpAttr.StrategyMode = RKAIQ_AEC_STRATEGY_MODE_LOWLIGHT_PRIOR;
     } else if (mode == OP_AUTO) {
         linExpAttr.StrategyMode = RKAIQ_AEC_STRATEGY_MODE_AUTO;
@@ -401,7 +401,7 @@ XCamReturn rk_aiq_uapi_getLExpMode(const rk_aiq_sys_ctx_t* ctx, opMode_t *mode)
     ret = rk_aiq_user_api_ae_getLinExpAttr(ctx, &linExpAttr);
     RKAIQ_IMGPROC_CHECK_RET(ret, "getLExpMode failed!");
     if (linExpAttr.StrategyMode == RKAIQ_AEC_STRATEGY_MODE_LOWLIGHT_PRIOR)
-        *mode = OP_MANUALl;
+        *mode = OP_MANUAL;
     else if (linExpAttr.StrategyMode == RKAIQ_AEC_STRATEGY_MODE_AUTO)
         *mode = OP_AUTO;
     IMGPROC_FUNC_EXIT
@@ -566,7 +566,7 @@ XCamReturn rk_aiq_uapi_setDayNSwMode(const rk_aiq_sys_ctx_t* ctx, opMode_t mode)
     if (mode == OP_AUTO) {
         expSwAttr.DNTrigger = 1;
         rk_aiq_user_api_ae_setExpSwAttr(ctx, expSwAttr);
-    } else if (mode == OP_MANUALl) {
+    } else if (mode == OP_MANUAL) {
         expSwAttr.DNTrigger = 0;
         expSwAttr.DNMode = AEC_DNMODE_DAY;
         rk_aiq_user_api_ae_setExpSwAttr(ctx, expSwAttr);
@@ -588,7 +588,7 @@ XCamReturn rk_aiq_uapi_getDayNSwMode(const rk_aiq_sys_ctx_t* ctx, opMode_t *mode
 
     ret = rk_aiq_user_api_ae_getExpSwAttr(ctx, &expSwAttr);
     if (expSwAttr.DNTrigger == 0)
-        *mode = OP_MANUALl;
+        *mode = OP_MANUAL;
     else if (expSwAttr.DNTrigger == 1 || expSwAttr.DNTrigger == 2)
         *mode = OP_AUTO;
     IMGPROC_FUNC_EXIT
@@ -740,7 +740,7 @@ XCamReturn rk_aiq_uapi_setWBMode(const rk_aiq_sys_ctx_t* ctx, opMode_t mode)
     RKAIQ_IMGPROC_CHECK_RET(ret, "setWBMode failed!");
     if (mode == OP_AUTO) {
         attr.mode = RK_AIQ_WB_MODE_AUTO;
-    } else if (mode == OP_MANUALl) {
+    } else if (mode == OP_MANUAL) {
         attr.mode = RK_AIQ_WB_MODE_MANUAL;
         attr.stManual.mode = RK_AIQ_MWB_MODE_SCENE;
         attr.stManual.para.scene =  RK_AIQ_WBCT_DAYLIGHT;
@@ -764,7 +764,7 @@ XCamReturn rk_aiq_uapi_getWBMode(const rk_aiq_sys_ctx_t* ctx, opMode_t *mode)
     if (attr.mode == RK_AIQ_WB_MODE_AUTO) {
         *mode = OP_AUTO;
     } else if (attr.mode == RK_AIQ_WB_MODE_MANUAL) {
-        *mode = OP_MANUALl;
+        *mode = OP_MANUAL;
     } else {
         *mode = OP_INVAL;
     }
@@ -1041,7 +1041,7 @@ XCamReturn rk_aiq_uapi_setFocusMode(const rk_aiq_sys_ctx_t* ctx, opMode_t mode)
     RKAIQ_IMGPROC_CHECK_RET(ret, "setFocusMode failed!");
     if (mode == OP_AUTO) {
         attr.AfMode = RKAIQ_AF_MODE_CONTINUOUS_PICTURE;
-    } else if (mode == OP_MANUALl) {
+    } else if (mode == OP_MANUAL) {
         attr.AfMode = RKAIQ_AF_MODE_FIXED;
     } else {
         ret = XCAM_RETURN_ERROR_PARAM;
@@ -1061,7 +1061,7 @@ XCamReturn rk_aiq_uapi_getFocusMode(const rk_aiq_sys_ctx_t* ctx, opMode_t *mode)
     ret = rk_aiq_user_api_af_GetAttrib(ctx, &attr);
     RKAIQ_IMGPROC_CHECK_RET(ret, "getFocusMode failed!");
     if (attr.AfMode == RKAIQ_AF_MODE_FIXED) {
-        *mode = OP_MANUALl;
+        *mode = OP_MANUAL;
     } else if (attr.AfMode == RKAIQ_AF_MODE_NOT_SET) {
         *mode = OP_INVAL;
     } else {
@@ -1248,7 +1248,7 @@ XCamReturn rk_aiq_uapi_setHDRMode(const rk_aiq_sys_ctx_t* ctx, opMode_t mode)
     attr.bEnable = true;
     if (mode == OP_AUTO) {
         attr.opMode = HDR_OpMode_Auto;
-    } else if (mode == OP_MANUALl) {
+    } else if (mode == OP_MANUAL) {
         attr.opMode = HDR_OpMode_MANU;
     } else {
         ret = XCAM_RETURN_ERROR_PARAM;
@@ -1277,7 +1277,7 @@ XCamReturn rk_aiq_uapi_getHDRMode(const rk_aiq_sys_ctx_t* ctx, opMode_t *mode)
     if (attr.opMode == HDR_OpMode_Auto)
        *mode =  OP_AUTO;
     else if (attr.opMode == HDR_OpMode_MANU)
-        *mode = OP_MANUALl;
+        *mode = OP_MANUAL;
     IMGPROC_FUNC_EXIT
     return ret;
 }
@@ -1373,7 +1373,7 @@ XCamReturn rk_aiq_uapi_setNRMode(const rk_aiq_sys_ctx_t* ctx, opMode_t mode)
     RKAIQ_IMGPROC_CHECK_RET(ret, "get anr attrib failed!,ret=%d", ret);
     if (mode == OP_AUTO) {
         attr.eMode = ANR_OP_MODE_AUTO;
-    } else if (mode == OP_MANUALl) {
+    } else if (mode == OP_MANUAL) {
         attr.eMode = ANR_OP_MODE_MANUAL;
     } else {
         ret = XCAM_RETURN_ERROR_PARAM;
@@ -1394,7 +1394,7 @@ XCamReturn rk_aiq_uapi_getNRMode(const rk_aiq_sys_ctx_t* ctx, opMode_t *mode)
     if (attr.eMode == ANR_OP_MODE_AUTO) {
         *mode = OP_AUTO;
     } else if (attr.eMode == ANR_OP_MODE_MANUAL) {
-        *mode = OP_MANUALl;
+        *mode = OP_MANUAL;
     } else if (attr.eMode == ANR_OP_MODE_INVALID) {
         *mode = OP_INVAL;
     }
@@ -1540,7 +1540,7 @@ XCamReturn rk_aiq_uapi_setDhzMode(const rk_aiq_sys_ctx_t* ctx, opMode_t mode)
         attr.stAuto.sw_dhaz_en = 1;
         attr.stAuto.enhance_en = 0;
         attr.stAuto.cfg_alpha = 0;
-    }else if (mode == OP_MANUALl) {
+    }else if (mode == OP_MANUAL) {
         attr.mode = RK_AIQ_DEHAZE_MODE_MANUAL;
         attr.stManual.sw_dhaz_en = 1;
         attr.stManual.enhance_en = 0;
@@ -1906,5 +1906,59 @@ XCamReturn rk_aiq_uapi_setGammaCoef(const rk_aiq_sys_ctx_t* ctx, unsigned int le
     return ret;
 }
 
+XCamReturn rk_aiq_uapi_setGrayMode(const rk_aiq_sys_ctx_t* ctx, rk_aiq_gray_mode_t mode)
+{
+    return ctx->_analyzer->setGrayMode(mode);
+}
+
+rk_aiq_gray_mode_t rk_aiq_uapi_getGrayMode(const rk_aiq_sys_ctx_t* ctx)
+{
+    return ctx->_analyzer->getGrayMode();
+}
+
+XCamReturn rk_aiq_uapi_setFrameRate(const rk_aiq_sys_ctx_t* ctx, frameRateInfo_t info)
+{
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    Uapi_ExpSwAttr_t expSwAttr;
+    IMGPROC_FUNC_ENTER
+    if ((ctx == NULL) || (info.mode < OP_AUTO || info.mode >= OP_INVAL)) {
+        ret = XCAM_RETURN_ERROR_PARAM;
+        RKAIQ_IMGPROC_CHECK_RET(ret, "param error!");
+    }
+    ret = rk_aiq_user_api_ae_getExpSwAttr(ctx, &expSwAttr);
+    RKAIQ_IMGPROC_CHECK_RET(ret, "get exp attr failed!\n setFrameRate failed!");
+    if(info.mode == OP_AUTO) {
+        expSwAttr.stAuto.stFrmRate.isFpsFix = false;
+    }else if (info.mode == OP_MANUAL) {
+        expSwAttr.stAuto.stFrmRate.isFpsFix = true;
+        expSwAttr.stAuto.stFrmRate.FpsValue = info.fps;
+    }
+    ret = rk_aiq_user_api_ae_setExpSwAttr(ctx, expSwAttr);
+    RKAIQ_IMGPROC_CHECK_RET(ret, "set exp attr failed!\n setFrameRate failed!");
+    IMGPROC_FUNC_EXIT
+    return ret;
+}
+
+XCamReturn rk_aiq_uapi_getFrameRate(const rk_aiq_sys_ctx_t* ctx, frameRateInfo_t *info)
+{
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    Uapi_ExpSwAttr_t expSwAttr;
+    IMGPROC_FUNC_ENTER
+    if ((ctx == NULL) || (info == NULL)) {
+        ret = XCAM_RETURN_ERROR_PARAM;
+        RKAIQ_IMGPROC_CHECK_RET(ret, "param error!");
+    }
+    ret = rk_aiq_user_api_ae_getExpSwAttr(ctx, &expSwAttr);
+    RKAIQ_IMGPROC_CHECK_RET(ret, "get exp attr failed!\n getFrameRate failed!");
+    if(expSwAttr.stAuto.stFrmRate.isFpsFix) {
+        info->mode = OP_MANUAL;
+        info->fps = expSwAttr.stAuto.stFrmRate.FpsValue;
+    }else {
+        info->mode = OP_AUTO;
+        info->fps = expSwAttr.stAuto.stFrmRate.FpsValue;
+    }
+    IMGPROC_FUNC_EXIT
+    return ret;
+}
 
 RKAIQ_END_DECLARE

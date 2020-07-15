@@ -490,19 +490,30 @@ CamHwIsp20::selectIqFile(const char* sns_ent_name, char* iqfile_name)
 }
 
 rk_aiq_static_info_t*
-CamHwIsp20::getStaticCamHwInfo(const char* sns_ent_name)
+CamHwIsp20::getStaticCamHwInfo(const char* sns_ent_name, uint16_t index)
 {
     std::map<std::string, SmartPtr<rk_aiq_static_info_t>>::iterator it;
 
-    std::string str(sns_ent_name);
+    if (sns_ent_name) {
+        std::string str(sns_ent_name);
 
-    it = mCamHwInfos.find(str);
-    if (it != mCamHwInfos.end()) {
-        LOGD_CAMHW("find camerainfo of %s!", sns_ent_name);
-        return it->second.ptr();
+        it = mCamHwInfos.find(str);
+        if (it != mCamHwInfos.end()) {
+            LOGD_CAMHW("find camerainfo of %s!", sns_ent_name);
+            return it->second.ptr();
+        } else {
+            LOGE_CAMHW("camerainfo of %s not fount!", sns_ent_name);
+        }
     } else {
-        LOGE_CAMHW("camerainfo of %s not fount!", sns_ent_name);
+        if (index >= 0 && index < mCamHwInfos.size() - 1) {
+            int i = 0;
+            for (it = mCamHwInfos.begin(); it != mCamHwInfos.end(); it++, i++) {
+                if (i == index)        
+                    return it->second.ptr();
+            }
+        }
     }
+
     return NULL;
 }
 
@@ -547,10 +558,29 @@ CamHwIsp20::findAttachedSubdevs(struct media_device *device, uint32_t count, rk_
         } else if ((NULL != entity_info) && (entity_info->type == MEDIA_ENT_T_V4L2_SUBDEV_FLASH)) {
             if ((entity_info->name[0] == 'm') &&
                     (strncmp(entity_info->name, s_info->module_index_str.c_str(), 3) == 0)) {
-                s_info->module_flash_dev_name[s_info->flash_num++] =
-                    std::string(media_entity_get_devname(entity));
+
+                /* check if entity name has the format string mxx_x_ir- */
+                if (strncmp(&entity_info->name[6], "ir-", 3) == 0)
+                    s_info->module_flash_ir_dev_name[s_info->flash_ir_num++] =
+                        std::string(media_entity_get_devname(entity));
+                else
+                    s_info->module_flash_dev_name[s_info->flash_num++] =
+                        std::string(media_entity_get_devname(entity));
             }
         }
+    }
+    // query flash infos
+    if (s_info->flash_num) {
+        SmartPtr<FlashLightHw> fl = new FlashLightHw(s_info->module_flash_dev_name, s_info->flash_num);
+        fl->init(1);
+        s_info->fl_strth_adj_sup = fl->isStrengthAdj();
+        fl->deinit();
+    }
+    if (s_info->flash_ir_num) {
+        SmartPtr<FlashLightHw> fl_ir = new FlashLightHw(s_info->module_flash_ir_dev_name, s_info->flash_ir_num);
+        fl_ir->init(1);
+        s_info->fl_ir_strth_adj_sup = fl_ir->isStrengthAdj();
+        fl_ir->deinit();
     }
 }
 
@@ -604,6 +634,8 @@ CamHwIsp20::initCamHwInfos()
                 info->has_lens_vcm = s_full_info->module_lens_dev_name.empty() ? false : true;
                 info->has_fl = s_full_info->flash_num > 0 ? true : false;
                 info->has_irc = s_full_info->module_ircut_dev_name.empty() ? false : true;
+                info->fl_strth_adj_sup = s_full_info->fl_ir_strth_adj_sup;
+                info->fl_ir_strth_adj_sup = s_full_info->fl_ir_strth_adj_sup;
                 CamHwIsp20::mSensorHwInfos[s_full_info->sensor_name] = s_full_info;
                 CamHwIsp20::mCamHwInfos[s_full_info->sensor_name] = info;
             }
@@ -725,9 +757,15 @@ CamHwIsp20::init(const char* sns_ent_name)
 #endif
 #endif
 
-    mFlashLight = new FlashLightHw(s_info->module_flash_dev_name, s_info->flash_num);
-    // TODO: active num from iq ?
-    mFlashLight->init(s_info->flash_num);
+    if (s_info->flash_num) {
+        mFlashLight = new FlashLightHw(s_info->module_flash_dev_name, s_info->flash_num);
+        mFlashLight->init(s_info->flash_num);
+    }
+    if (s_info->flash_ir_num) {
+
+        mFlashLightIr = new FlashLightHw(s_info->module_flash_ir_dev_name, s_info->flash_ir_num);
+        mFlashLightIr->init(s_info->flash_ir_num);
+    }
     _state = CAM_HW_STATE_INITED;
     EXIT_CAMHW_FUNCTION();
 
@@ -737,7 +775,10 @@ CamHwIsp20::init(const char* sns_ent_name)
 XCamReturn
 CamHwIsp20::deInit()
 {
-    mFlashLight->deinit();
+    if (mFlashLight.ptr())
+        mFlashLight->deinit();
+    if (mFlashLightIr.ptr())
+        mFlashLightIr->deinit();
     _state = CAM_HW_STATE_INVALID;
     return XCAM_RETURN_NO_ERROR;
 }
@@ -893,9 +934,17 @@ CamHwIsp20::prepare(uint32_t width, uint32_t height, int mode, int t_delay, int 
         LOGE_CAMHW("start ispp params dev err: %d\n", ret);
     }
 #endif
-    ret = mFlashLight->start();
-    if (ret < 0) {
-        LOGE_CAMHW("start flashlight err: %d\n", ret);
+    if (mFlashLight.ptr()) {
+        ret = mFlashLight->start();
+        if (ret < 0) {
+            LOGE_CAMHW("start flashlight err: %d\n", ret);
+        }
+    }
+    if (mFlashLightIr.ptr()) {
+        ret = mFlashLightIr->start();
+        if (ret < 0) {
+            LOGE_CAMHW("start flashlight ir err: %d\n", ret);
+        }
     }
     _ispp_module_init_ens = 0;
     _state = CAM_HW_STATE_PREPARED;
@@ -1044,9 +1093,17 @@ XCamReturn CamHwIsp20::stop()
         LOGE_CAMHW("stop ispp params dev err: %d\n", ret);
     }
 #endif
-    ret = mFlashLight->stop();
-    if (ret < 0) {
-        LOGE_CAMHW("stop flashlight err: %d\n", ret);
+    if (mFlashLight.ptr()) {
+        ret = mFlashLight->stop();
+        if (ret < 0) {
+            LOGE_CAMHW("stop flashlight err: %d\n", ret);
+        }
+    }
+    if (mFlashLightIr.ptr()) {
+        ret = mFlashLightIr->stop();
+        if (ret < 0) {
+            LOGE_CAMHW("stop flashlight ir err: %d\n", ret);
+        }
     }
 
     setIrcutParams(false);
@@ -1805,9 +1862,11 @@ CamHwIsp20::setCpslParams(SmartPtr<RkAiqCpslParamsProxy>& cpsl_params)
     if (cpsl_setting->update_fl) {
         rk_aiq_flash_setting_t* fl_setting = &cpsl_setting->fl;
 
-        ret = mFlashLight->set_params(*fl_setting);
-        if (ret < 0) {
-            LOGE_CAMHW("set flashlight params err: %d\n", ret);
+        if (mFlashLight.ptr()) {
+            ret = mFlashLight->set_params(*fl_setting);
+            if (ret < 0) {
+                LOGE_CAMHW("set flashlight params err: %d\n", ret);
+            }
         }
     }
 
@@ -1817,6 +1876,15 @@ CamHwIsp20::setCpslParams(SmartPtr<RkAiqCpslParamsProxy>& cpsl_params)
         ret = setIrcutParams(ir_setting->irc_on);
         if (ret < 0) {
             LOGE_CAMHW("set ir params err: %d\n", ret);
+        }
+
+        rk_aiq_flash_setting_t* fl_ir_setting = &cpsl_setting->fl_ir;
+
+        if (mFlashLightIr.ptr()) {
+            ret = mFlashLightIr->set_params(*fl_ir_setting);
+            if (ret < 0) {
+                LOGE_CAMHW("set flashlight ir params err: %d\n", ret);
+            }
         }
     }
 
