@@ -27,11 +27,19 @@
  * v1.1.1
  *  - magic code:996625
  *  - awb
-  **** difference tolerance and run interval in difference luma value
+ *  - difference tolerance and run interval in difference luma value
+ * v1.1.2
+ *  - magic code:998276
+ *  - add COLOR_AS_GREY tag
+ * v1.1.3
+ *  - magic code:1003001
+ *  - Aec: add sensor-AEC-LinearAECtrl-RawStatsEn, ae stats can use rawae/yuvae
+ *  - Aec: add system-dcg_setting divide into 2 parts -normal /Hdr
+ *  - Aec: add system-Gainrange-Linear/NonLinear, support db_mode
  */
 
-#define RK_AIQ_CALIB_VERSION_REAL_V          "v1.1.1"
-#define RK_AIQ_CALIB_VERSION_MAGIC_V         "996625"
+#define RK_AIQ_CALIB_VERSION_REAL_V          "v1.1.3"
+#define RK_AIQ_CALIB_VERSION_MAGIC_V         "1003001"
 
 /******* DO NOT EDIT THE FOLLOWINGS ***********/
 

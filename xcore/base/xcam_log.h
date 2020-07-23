@@ -356,6 +356,13 @@ void xcam_get_awb_log_level(unsigned char *log_level, unsigned char *sub_modules
 #define LOGI_CAMHW(...) XCAM_MODULE_LOG_INFO(XCORE_LOG_MODULE_CAMHW, 0xff, ##__VA_ARGS__)
 #define LOG1_CAMHW(...) XCAM_MODULE_LOG_LOW1(XCORE_LOG_MODULE_CAMHW, 0xff, ##__VA_ARGS__)
 
+#define LOGD_CAMHW_SUBM(sub_modules, ...) XCAM_MODULE_LOG_DEBUG(XCORE_LOG_MODULE_CAMHW, sub_modules, ##__VA_ARGS__)
+#define LOGE_CAMHW_SUBM(sub_modules, ...) XCAM_MODULE_LOG_ERROR(XCORE_LOG_MODULE_CAMHW, sub_modules, ##__VA_ARGS__)
+#define LOGW_CAMHW_SUBM(sub_modules, ...) XCAM_MODULE_LOG_WARNING(XCORE_LOG_MODULE_CAMHW, sub_modules, ##__VA_ARGS__)
+#define LOGV_CAMHW_SUBM(sub_modules, ...) XCAM_MODULE_LOG_VERBOSE(XCORE_LOG_MODULE_CAMHW, sub_modules, ##__VA_ARGS__)
+#define LOGI_CAMHW_SUBM(sub_modules, ...) XCAM_MODULE_LOG_INFO(XCORE_LOG_MODULE_CAMHW, sub_modules, ##__VA_ARGS__)
+#define LOG1_CAMHW_SUBM(sub_modules, ...) XCAM_MODULE_LOG_LOW1(XCORE_LOG_MODULE_CAMHW, sub_modules, ##__VA_ARGS__)
+
 #define XCAM_LOG_MODULE_ENTER(module) XCAM_MODULE_LOG_LOW1(module, 0xff, "ENTER %s", __func__)
 #define XCAM_LOG_MODULE_EXIT(module) XCAM_MODULE_LOG_LOW1(module, 0xff, "EXIT %s", __func__)
 

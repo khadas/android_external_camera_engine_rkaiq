@@ -28,5 +28,8 @@ XCamReturn rk_aiq_uapi_ae_getLinExpAttr(RkAiqAlgoContext* ctx, Uapi_LinExpAttr_t
 XCamReturn rk_aiq_uapi_ae_setHdrExpAttr(RkAiqAlgoContext* ctx, const Uapi_HdrExpAttr_t* pHdrExpAttr, bool need_sync);
 XCamReturn rk_aiq_uapi_ae_getHdrExpAttr(RkAiqAlgoContext* ctx, Uapi_HdrExpAttr_t* pHdrExpAttr);
 
+XCamReturn rk_aiq_uapi_ae_setExpWinAttr(RkAiqAlgoContext* ctx, const Aec_Win_t* pExpWinAttr, bool need_sync);
+XCamReturn rk_aiq_uapi_ae_getExpWinAttr(RkAiqAlgoContext* ctx, Aec_Win_t* pExpWinAttr);
+
 
 #endif /*__RK_AIQ_UAPI_AE_INT_H__*/

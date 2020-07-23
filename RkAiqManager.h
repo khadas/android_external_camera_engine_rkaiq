@@ -39,6 +39,10 @@ public:
         mAiqRstQueue.pause_pop ();
     };
 
+    void triger_start() {
+        mAiqRstQueue.resume_pop ();
+    };
+
     bool push_results (SmartPtr<RkAiqFullParamsProxy> aiqRst) {
         return mAiqRstQueue.push(aiqRst);
     };
@@ -96,9 +100,17 @@ public:
     XCamReturn enqueueBuffer(struct rk_aiq_vbuf *vbuf);
     XCamReturn offlineRdJobPrepare();
     XCamReturn offlineRdJobDone();
+    XCamReturn setSharpFbcRotation(rk_aiq_rotation_t rot);
 protected:
     XCamReturn applyAnalyzerResult(SmartPtr<RkAiqFullParamsProxy>& results);
 private:
+    enum aiq_state_e {
+        AIQ_STATE_INVALID,
+        AIQ_STATE_INITED,
+        AIQ_STATE_PREPARED,
+        AIQ_STATE_STARTED,
+        AIQ_STATE_STOPED,
+    };
     XCAM_DEAD_COPY (RkAiqManager);
 private:
     SmartPtr<ICamHw> mCamHw;
@@ -110,7 +122,9 @@ private:
     const char* mSnsEntName;
     const CamCalibDbContext_t* mCalibDb;
     rk_aiq_working_mode_t mWorkingMode;
-
+    uint32_t mWidth;
+    uint32_t mHeight;
+    int _state;
 };
 
 }; //namespace RkCam

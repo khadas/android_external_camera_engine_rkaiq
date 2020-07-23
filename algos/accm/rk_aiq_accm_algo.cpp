@@ -114,7 +114,9 @@ static XCamReturn SatSelectCcmProfiles
             while ((fSaturation <= pCcmProfiles[n]->saturation) && (n <= nLast)) {
                 n++;
             }
-            n--;
+
+            if (n > 0)
+                n--;
 
             *pCcmProfile1 = pCcmProfiles[n];
             *pCcmProfile2 = pCcmProfiles[n + 1];
@@ -288,9 +290,22 @@ void Saturationadjust(float fScale, accm_handle_t hAccm )
         LOGD_ACCM("Satura: %f \n", flevel1);
         pccMatrixA = &hAccm->accmRest.undampedCcmMatrix;
         memcpy(&Matrix_tmp, &pccMatrixA->fCoeff, sizeof(Cam3x3FloatMatrix_t));
-               pccMatrixB = &Matrix_tmp;
+        pccMatrixB = &Matrix_tmp;
+        /* M =  (M0 - E) * fscale + E
+           M' = ycbcr2rgb[ sat_matrix * rgb2ycbcr(M) ]
+           M1 = (M' - E) / fscale + E
+        */
         if ( (pccMatrixA != NULL) && (pccMatrixB != NULL) )
         {
+            for(int i =0; i < 9; i++)
+            {
+                if (i == 0 || i == 4 || i == 8){
+                  pccMatrixA->fCoeff[i] = (pccMatrixA->fCoeff[i] - 1)*fScale+1;
+                }
+                else{
+                  pccMatrixA->fCoeff[i] = pccMatrixA->fCoeff[i]*fScale;
+                }
+            }
             pccMatrixB->fCoeff[0] = 0.299 * pccMatrixA->fCoeff[0] + 0.587 * pccMatrixA->fCoeff[3] + 0.114 * pccMatrixA->fCoeff[6];
             pccMatrixB->fCoeff[1] = 0.299 * pccMatrixA->fCoeff[1] + 0.587 * pccMatrixA->fCoeff[4] + 0.114 * pccMatrixA->fCoeff[7];
             pccMatrixB->fCoeff[2] = 0.299 * pccMatrixA->fCoeff[2] + 0.587 * pccMatrixA->fCoeff[5] + 0.114 * pccMatrixA->fCoeff[8];
@@ -316,17 +331,14 @@ void Saturationadjust(float fScale, accm_handle_t hAccm )
             pccMatrixA->fCoeff[8] = 1 * pccMatrixB->fCoeff[2]  + 1.772 * pccMatrixB->fCoeff[5] + 0 * pccMatrixB->fCoeff[8];
 
 
-            for(int i =0; i < 9; i+= 4)
-            {
-                pccMatrixA->fCoeff[i] = pccMatrixA->fCoeff[i] - 1;
-            }
             for(int i =0; i < 9; i++)
             {
-                 pccMatrixA->fCoeff[i] = pccMatrixA->fCoeff[i]/fScale;
-             }
-            for(int i =0; i < 9; i+= 4)
-            {
-                pccMatrixA->fCoeff[i] = pccMatrixA->fCoeff[i] + 1;
+                if (i == 0 || i == 4 || i == 8){
+                  pccMatrixA->fCoeff[i] = (pccMatrixA->fCoeff[i] - 1)/fScale+1;
+                }
+                else{
+                  pccMatrixA->fCoeff[i] = pccMatrixA->fCoeff[i]/fScale;
+                }
             }
         }
 

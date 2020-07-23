@@ -102,8 +102,14 @@ pre_process(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outparams)
     static int framecnt = 0;
 
     LOGI_ASHARP("%s: (enter)\n", __FUNCTION__ );
-
+	AsharpContext_t* pAsharpCtx = (AsharpContext_t *)inparams->ctx;
+	
     //nothing todo now
+    AsharpResult_t ret = AsharpPreProcess(pAsharpCtx);
+	if(ret != ASHARP_RET_SUCCESS) {
+		result = XCAM_RETURN_ERROR_FAILED;
+		LOGE_ASHARP("%s: AsharpPreProcess failed (%d)\n", __FUNCTION__, ret);
+	}
 
     LOGI_ASHARP("%s: (exit)\n", __FUNCTION__ );
     return result;

@@ -126,12 +126,12 @@ typedef enum _CalibDb_CamRawStatsMode_e {
 
 typedef enum _CalibDb_CamHistStatsMode_e {
     CAM_HIST_MODE_INVALID       = 0,    /**< lower border (only for an internal evaluation) */
-    CAM_HIST_MODE_RGB_COMBINED  = 1,    /**< RGB combined histogram */
+    CAM_HIST_MODE_RGB_COMBINED  = 1,    /**< RGB combined histogram, only available for SiHist */
     CAM_HIST_MODE_R             = 2,    /**< R histogram */
     CAM_HIST_MODE_G             = 3,    /**< G histogram */
     CAM_HIST_MODE_B             = 4,    /**< B histogram */
-    CAM_HIST_MODE_Y             = 5,    /**< luminance histogram */
-    CAM_HIST_MODE_MAX,                                  /**< upper border (only for an internal evaluation) */
+    CAM_HIST_MODE_Y             = 5,    /**< Y luminance histogram */
+    CAM_HIST_MODE_MAX,                  /**< upper border (only for an internal evaluation) */
 } CalibDb_CamHistStatsMode_t;
 
 typedef struct CalibDb_Aec_Win_s {
@@ -381,6 +381,7 @@ typedef struct CalibDb_AecHist2Hal_s {
 } CalibDb_AecHist2Hal_t;
 
 typedef struct CalibDb_LinearAE_Attr_s {
+    uint8_t                 RawStatsEn;
     float                   SetPoint;                   /**< set point to hit by the ae control system */
     float                   NightSetPoint;
     float                   Tolerance;
@@ -466,9 +467,17 @@ typedef struct CalibDb_Aec_Para_s {
 } CalibDb_Aec_Para_t;
 
 #define CALD_AEC_GAIN_RANGE_MAX_LEN  350
+typedef enum _CalibDb_ExpGainMode_e {
+    RKAIQ_EXPGAIN_MODE_LINEAR         = 0,
+    RKAIQ_EXPGAIN_MODE_NONLINEAR_DB   = 1,
+    RKAIQ_EXPGAIN_MODE_MAX            = 2
+} CalibDb_ExpGainMode_t;
+
 typedef struct CalibDb_AecGainRange_s {
-    int array_size;
-    float pGainRange[CALD_AEC_GAIN_RANGE_MAX_LEN];
+    bool    IsLinear;
+    int     array_size;
+    float   pGainRange[CALD_AEC_GAIN_RANGE_MAX_LEN];
+    CalibDb_ExpGainMode_t     GainMode;
 } CalibDb_AecGainRange_t;
 
 typedef struct CalibDb_Sensor_Para_s {
@@ -713,13 +722,13 @@ typedef struct rk_aiq_wb_awb_runinterval_s {
     int num;
     float LV[CALD_AWB_LV_NUM_FOR_RUNINTERVAL];
     float value[CALD_AWB_LV_NUM_FOR_RUNINTERVAL];
-}rk_aiq_wb_awb_runinterval_t,CalibDb_Awb_runinterval_t;
+} rk_aiq_wb_awb_runinterval_t, CalibDb_Awb_runinterval_t;
 
 typedef struct rk_aiq_wb_awb_tolerance_s {
     int num;
     float LV[CALD_AWB_LV_NUM_FOR_RUNINTERVAL];
     float value[CALD_AWB_LV_NUM_FOR_RUNINTERVAL];
-}rk_aiq_wb_awb_tolerance_t,CalibDb_Awb_tolerance_t;
+} rk_aiq_wb_awb_tolerance_t, CalibDb_Awb_tolerance_t;
 
 typedef struct CalibDb_Awb_Stategy_Para_s {
     unsigned char lightNum;
@@ -992,13 +1001,13 @@ typedef struct CalibDb_BayerNr_s {
 #define CIFISP_LSC_SIZE_TBL_SIZE           8
 #define LSC_GRAD_TBL_SIZE                  8
 #define LSC_ILLUMINATION_MAX               7
-typedef enum  CalibDb_Used_For_Case_e{
+typedef enum  CalibDb_Used_For_Case_e {
     USED_FOR_CASE_NORMAL = 0,
     USED_FOR_CASE_FLASH,
     USED_FOR_CASE_GRAY,
     USED_FOR_CASE_3,
     USED_FOR_CASE_MAX
-}CalibDb_Used_For_Case_t;
+} CalibDb_Used_For_Case_t;
 
 #define LSC_RESOLUTION_NAME         ( 15U )
 typedef char                        CalibDb_ResolutionName_t[LSC_RESOLUTION_NAME];
@@ -1041,7 +1050,7 @@ typedef struct CalibDb_AlscCof_s {
     CalibDb_ResolutionName_t  lscResName[LSC_RESOLUTIONS_NUM_MAX];// type CalibDb_ResolutionName_t
     int   illuNum[USED_FOR_CASE_MAX];
     CalibDb_AlscCof_ill_t illAll[USED_FOR_CASE_MAX][LSC_ILLUMINATION_MAX];
-    int usedForCaseAll[USED_FOR_CASE_MAX*LSC_ILLUMINATION_MAX];//for write xml
+    int usedForCaseAll[USED_FOR_CASE_MAX * LSC_ILLUMINATION_MAX]; //for write xml
 } CalibDb_AlscCof_t;
 
 typedef struct CalibDb_LscTableProfile_s {
@@ -1599,6 +1608,11 @@ typedef struct {
     float         lcg2hcg_env_th;
     float         hcg2lcg_gain_th;
     float         hcg2lcg_env_th;
+} CalibDb_Dcg_Params_t;
+
+typedef struct {
+    CalibDb_Dcg_Params_t Hdr;
+    CalibDb_Dcg_Params_t Normal;
 } CalibDb_Dcg_t;
 
 typedef struct {
@@ -1651,7 +1665,11 @@ typedef struct {
     char sample_name[64];
     char gen_verion[16];
     uint32_t magic_code;
-}CalibDb_Header_t;
+} CalibDb_Header_t;
+
+typedef struct CalibDb_ColorAsGrey_s {
+    int enable;
+} CalibDb_ColorAsGrey_t;
 
 typedef struct CamCalibDbContext_s {
     CalibDb_Header_t header;
@@ -1680,6 +1698,7 @@ typedef struct CamCalibDbContext_s {
     CalibDb_ORB_t orb;
     CalibDb_Sensor_Para_t sensor;
     CalibDb_Cpsl_t cpsl;
+    CalibDb_ColorAsGrey_t colorAsGrey;
     CalibDb_System_t  sysContrl;
 } CamCalibDbContext_t;
 

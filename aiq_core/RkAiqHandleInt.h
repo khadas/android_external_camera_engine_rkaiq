@@ -120,17 +120,19 @@ public:
     virtual XCamReturn processing();
     virtual XCamReturn postProcess();
     // TODO add algo specific methods, this is a sample
-    XCamReturn setExpSwAttr(Uapi_ExpSwAttr_t pExpSwAttr);
+    XCamReturn setExpSwAttr(Uapi_ExpSwAttr_t ExpSwAttr);
     XCamReturn getExpSwAttr(Uapi_ExpSwAttr_t* pExpSwAttr);
-    XCamReturn setLinExpAttr(Uapi_LinExpAttr_t pLinExpAttr);
+    XCamReturn setLinExpAttr(Uapi_LinExpAttr_t LinExpAttr);
     XCamReturn getLinExpAttr(Uapi_LinExpAttr_t* pLinExpAttr);
-    XCamReturn setHdrExpAttr(Uapi_HdrExpAttr_t pHdrExpAttr);
+    XCamReturn setHdrExpAttr(Uapi_HdrExpAttr_t HdrExpAttr);
     XCamReturn getHdrExpAttr (Uapi_HdrExpAttr_t* pHdrExpAttr);
-    XCamReturn setLinAeRouteAttr(Uapi_LinAeRouteAttr_t pLinAeRouteAttr);
+    XCamReturn setLinAeRouteAttr(Uapi_LinAeRouteAttr_t LinAeRouteAttr);
     XCamReturn getLinAeRouteAttr(Uapi_LinAeRouteAttr_t* pLinAeRouteAttr);
-    XCamReturn setHdrAeRouteAttr(Uapi_HdrAeRouteAttr_t pHdrAeRouteAttr);
+    XCamReturn setHdrAeRouteAttr(Uapi_HdrAeRouteAttr_t HdrAeRouteAttr);
     XCamReturn getHdrAeRouteAttr(Uapi_HdrAeRouteAttr_t* pHdrAeRouteAttr);
     XCamReturn queryExpInfo(Uapi_ExpQueryInfo_t* pExpQueryInfo);
+    XCamReturn setExpWinAttr(Aec_Win_t ExpWinAttr);
+    XCamReturn getExpWinAttr(Aec_Win_t* pExpWinAttr);
 
 protected:
     virtual void init();
@@ -150,12 +152,15 @@ private:
     Uapi_LinAeRouteAttr_t mNewLinAeRouteAttr;
     Uapi_HdrAeRouteAttr_t mCurHdrAeRouteAttr;
     Uapi_HdrAeRouteAttr_t mNewHdrAeRouteAttr;
+    Aec_Win_t         mCurExpWinAttr;
+    Aec_Win_t         mNewExpWinAttr;
     bool updateExpSwAttr = false;
     bool updateExpHwAttr = false;
     bool updateLinExpAttr = false;
     bool updateHdrExpAttr = false;
     bool updateLinAeRouteAttr = false;
     bool updateHdrAeRouteAttr = false;
+    bool updateExpWinAttr = false;
 };
 
 // awb
@@ -260,7 +265,6 @@ private:
     XCam::Mutex mCfgMutex;
     adebayer_attrib_t mCurAtt;
     adebayer_attrib_t mNewAtt;
-    bool updateAtt;
 };
 
 // ahdr
@@ -271,8 +275,7 @@ public:
     explicit RkAiqAhdrHandleInt(RkAiqAlgoDesComm* des, RkAiqCore* aiqCore)
         : RkAiqHandle(des, aiqCore)
         , RkAiqAhdrHandle(des, aiqCore)
-        , RkAiqHandleIntCom(des, aiqCore)
-        , updateAtt(false) {};
+        , RkAiqHandleIntCom(des, aiqCore) {}
     virtual ~RkAiqAhdrHandleInt() {
         RkAiqAhdrHandle::deInit();
     };
@@ -293,7 +296,6 @@ private:
     XCam::Mutex mCfgMutex;
     ahdr_attrib_t mCurAtt;
     ahdr_attrib_t mNewAtt;
-    bool updateAtt;
 };
 
 class RkAiqAgicHandleInt:
@@ -324,7 +326,6 @@ private:
     XCam::Mutex mCfgMutex;
     agic_attrib_t mCurAtt;
     agic_attrib_t mNewAtt;
-    bool updateAtt;
 };
 
 // adehaze
@@ -612,8 +613,10 @@ public:
     XCamReturn setChromaTFStrength(float fPercent);
     XCamReturn getChromaSFStrength(float *pPercent);
     XCamReturn getChromaTFStrength(float *pPercent);
-	XCamReturn setRawnrSFStrength(float fPercent);
+    XCamReturn setRawnrSFStrength(float fPercent);
     XCamReturn getRawnrSFStrength(float *pPercent);
+	XCamReturn setIQPara(rk_aiq_nr_IQPara_t *pPara);
+    XCamReturn getIQPara(rk_aiq_nr_IQPara_t *pPara);
 protected:
     virtual void init();
     virtual void deInit() {
@@ -623,6 +626,9 @@ private:
     // TODO
     rk_aiq_nr_attrib_t mCurAtt;
     rk_aiq_nr_attrib_t mNewAtt;
+	rk_aiq_nr_IQPara_t mCurIQpara;
+	rk_aiq_nr_IQPara_t mNewIQpara;
+	bool UpdateIQpara = false;
 };
 
 
@@ -651,6 +657,8 @@ public:
     XCamReturn getAttrib(rk_aiq_sharp_attrib_t *att);
     XCamReturn setStrength(float fPercent);
     XCamReturn getStrength(float *pPercent);
+	XCamReturn setIQPara(rk_aiq_sharp_IQpara_t *para);
+    XCamReturn getIQPara(rk_aiq_sharp_IQpara_t *para);
 
 protected:
     virtual void init();
@@ -661,6 +669,10 @@ private:
     // TODO
     rk_aiq_sharp_attrib_t mCurAtt;
     rk_aiq_sharp_attrib_t mNewAtt;
+	rk_aiq_sharp_IQpara_t mCurIQPara;
+    rk_aiq_sharp_IQpara_t mNewIQPara;
+	bool updateIQpara = false;
+	
 };
 
 // afec

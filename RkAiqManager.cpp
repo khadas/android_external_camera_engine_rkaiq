@@ -74,6 +74,7 @@ RkAiqManager::RkAiqManager(const char* sns_ent_name,
     , mSnsEntName(sns_ent_name)
     , mWorkingMode(RK_AIQ_WORKING_MODE_NORMAL)
     , mCalibDb(NULL)
+    , _state(AIQ_STATE_INVALID)
 {
     ENTER_XCORE_FUNCTION();
     EXIT_XCORE_FUNCTION();
@@ -160,6 +161,7 @@ RkAiqManager::init()
     mCamHw->setEvtsListener(NULL);
     ret = mCamHw->init(mSnsEntName);
     RKAIQMNG_CHECK_RET(ret, "camHw init error %d !", ret);
+    _state = AIQ_STATE_INITED;
 
     EXIT_XCORE_FUNCTION();
 
@@ -209,6 +211,11 @@ RkAiqManager::prepare(uint32_t width, uint32_t height, rk_aiq_working_mode_t mod
     ret = applyAnalyzerResult(initParams);
     RKAIQMNG_CHECK_RET(ret, "set initial params error %d", ret);
 
+    mWorkingMode = mode;
+    mWidth = width;
+    mHeight = height;
+    _state = AIQ_STATE_PREPARED;
+
     EXIT_XCORE_FUNCTION();
 
     return ret;
@@ -220,6 +227,22 @@ RkAiqManager::start()
     ENTER_XCORE_FUNCTION();
 
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
+
+    // restart
+    if (_state == AIQ_STATE_STOPED) {
+        SmartPtr<RkAiqFullParamsProxy> initParams = mRkAiqAnalyzer->getAiqFullParams();
+
+        if (initParams->data()->mIspParams.ptr()) {
+            initParams->data()->mIspParams->data()->frame_id = 0;
+        }
+
+        if (initParams->data()->mIsppParams.ptr()) {
+            initParams->data()->mIsppParams->data()->frame_id = 0;
+        }
+        applyAnalyzerResult(initParams);
+    }
+
+    mAiqRstAppTh->triger_start();
 
     bool bret = mAiqRstAppTh->start();
     ret = bret ? XCAM_RETURN_NO_ERROR : XCAM_RETURN_ERROR_FAILED;
@@ -234,6 +257,8 @@ RkAiqManager::start()
     ret = mCamHw->start();
     RKAIQMNG_CHECK_RET(ret, "camhw start error %d", ret);
 
+    _state = AIQ_STATE_STARTED;
+
     EXIT_XCORE_FUNCTION();
 
     return ret;
@@ -245,6 +270,10 @@ RkAiqManager::stop()
     ENTER_XCORE_FUNCTION();
 
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
+
+    if (_state  == AIQ_STATE_STOPED) {
+        return ret;
+    }
 
     mAiqRstAppTh->triger_stop();
     bool bret = mAiqRstAppTh->stop();
@@ -259,6 +288,8 @@ RkAiqManager::stop()
 
     ret = mCamHw->stop();
     RKAIQMNG_CHECK_RET(ret, "camhw stop error %d", ret);
+
+    _state = AIQ_STATE_STOPED;
 
     EXIT_XCORE_FUNCTION();
 
@@ -280,6 +311,8 @@ RkAiqManager::deInit()
 
     ret = mCamHw->deInit();
     RKAIQMNG_CHECK_RET(ret, "camhw deinit error %d", ret);
+
+    _state = AIQ_STATE_INVALID;
 
     EXIT_XCORE_FUNCTION();
 
@@ -345,7 +378,6 @@ RkAiqManager::applyAnalyzerResult(SmartPtr<RkAiqFullParamsProxy>& results)
         LOGW_ANALYZER("empty aiq params results!");
         return ret;
     }
-
     // TODO: couldn't get dynamic debug env now
 #if 0//def RUNTIME_MODULE_DEBUG
     get_dbg_force_disable_mods_env();
@@ -565,4 +597,15 @@ XCamReturn RkAiqManager::offlineRdJobDone()
     EXIT_XCORE_FUNCTION();
     return ret;
 }
+
+XCamReturn RkAiqManager::setSharpFbcRotation(rk_aiq_rotation_t rot)
+{
+    SmartPtr<CamHwIsp20> camHwIsp20 = mCamHw.dynamic_cast_ptr<CamHwIsp20>();
+
+    if (camHwIsp20.ptr())
+        return camHwIsp20->setSharpFbcRotation(rot);
+    else
+        return XCAM_RETURN_ERROR_FAILED;
+}
+
 }; //namespace RkCam

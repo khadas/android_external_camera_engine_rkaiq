@@ -96,11 +96,16 @@ static XCamReturn
 pre_process(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outparams)
 {
     XCamReturn result = XCAM_RETURN_NO_ERROR;
-    static int framecnt = 0;
 
     LOGI_ANR("%s: (enter)\n", __FUNCTION__ );
-
+    ANRContext_t* pAnrCtx = (ANRContext_t *)inparams->ctx;
+	
     //nothing todo now
+    ANRresult_t ret = ANRPreProcess(pAnrCtx);
+    if(ret != ANR_RET_SUCCESS) {
+        result = XCAM_RETURN_ERROR_FAILED;
+        LOGE_ANR("%s: ANRPreProcess failed (%d)\n", __FUNCTION__, ret);
+    }
 
     LOGI_ANR("%s: (exit)\n", __FUNCTION__ );
     return result;

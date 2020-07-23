@@ -65,6 +65,10 @@ public:
         mStatsQueue.pause_pop ();
     };
 
+    void triger_start() {
+        mStatsQueue.resume_pop ();
+    };
+
     bool push_stats (const SmartPtr<VideoBuffer> &buffer) {
         mStatsQueue.push (buffer);
         return true;

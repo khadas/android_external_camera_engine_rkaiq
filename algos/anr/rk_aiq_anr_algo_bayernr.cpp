@@ -124,8 +124,8 @@ ANRresult_t init_bayernr_params(RKAnr_Bayernr_Params_t *pParams, CalibDb_BayerNr
 	pParams->bgain_offs = pSetting->BGainOff;
 	pParams->bgain_filp = pSetting->BGainFilp;
 	pParams->bayernr_edgesoftness = pSetting->edgeSoftness;
-	pParams->bayernr_gauss_weight0 = pSetting->gaussWeight0;
-	pParams->bayernr_gauss_weight1 = pSetting->gaussWeight1;
+	pParams->bayernr_gauss_weight0 = 0;
+	pParams->bayernr_gauss_weight1 = 0;
 
 	memcpy(pParams->bayernr_ver_char,  pCalibdb->version, sizeof(pParams->bayernr_ver_char));
 

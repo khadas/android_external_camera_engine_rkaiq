@@ -142,6 +142,11 @@ prepare(RkAiqAlgoCom* params)
         ldchCtx->lut_h_size = hsize;
         ldchCtx->lut_v_size = vsize;
         ldchCtx->lut_mapxy_size = ldchCtx->lut_h_size * ldchCtx->lut_v_size * sizeof(unsigned short);
+        // need re-alloc ?
+        if (ldchCtx->lut_mapxy) {
+            free(ldchCtx->lut_mapxy);
+            ldchCtx->lut_mapxy = NULL;
+        }
         ldchCtx->lut_mapxy = (unsigned short*)malloc(ldchCtx->lut_mapxy_size);
         ldchCtx->lut_h_size = hsize / 2; //word unit
 
@@ -152,7 +157,7 @@ prepare(RkAiqAlgoCom* params)
             ldchCtx->ldch_en = 0;
             LOGE_ALDCH("mismatched lut calib file");
         }
-        LOGE_ALDCH("check calib file, size: %d, num: %d", ldchCtx->lut_mapxy_size, num);
+        LOGD_ALDCH("check calib file, size: %d, num: %d", ldchCtx->lut_mapxy_size, num);
     } else {
         LOGW_ALDCH("lut calib file not exist");
         ldchCtx->ldch_en = 0;

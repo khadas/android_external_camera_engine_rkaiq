@@ -70,6 +70,7 @@ uint32_t calib_sensor_sub_tags[] = {
     CALIB_SENSOR_FEC_TAG_ID,
     CALIB_SENSOR_LUMA_DETECT_TAG_ID,
     CALIB_SENSOR_ORB_TAG_ID,
+    CALIB_SENSOR_COLOR_AS_GREY_TAG_ID,
 };
 
 uint32_t calib_sensor_awb_sub_tags[] = {
@@ -536,6 +537,7 @@ uint32_t calib_sensor_aec_AecManualCtrl_HdrAE_sub_tags[] = {
 
 uint32_t calib_sensor_aec_LinearAECtrl_sub_tags[] = {
     CALIB_SENSOR_AEC_SETPOINT_TAG_ID,
+    CALIB_SENSOR_AEC_RAWSTATS_EN_TAG_ID,
     CALIB_SENSOR_AEC_NIGHTSETPOINT_TAG_ID,
     CALIB_SENSOR_AEC_DYSETPOINTEN_TAG_ID,
     CALIB_SENSOR_AEC_DYNAMICSETPOINT_TAG_ID,
@@ -1326,6 +1328,12 @@ uint32_t calib_sensor_sensorinfo_sub_tags[] = {
     CALIB_SENSOR_SENSORINFO_CISISPDGAIN_RANGE_TAG_ID,
 };
 
+uint32_t calib_sensor_sensorinfo_gainrange_sub_tags[] = {
+    CALIB_SENSOR_SENSORINFO_GAINRANGE_ISLINEAR_TAG_ID,
+    CALIB_SENSOR_SENSORINFO_GAINRANGE_LINEAR_TAG_ID,
+    CALIB_SENSOR_SENSORINFO_GAINRANGE_NONLINEAR_TAG_ID,
+};
+
 uint32_t calib_sensor_cpsl_sub_tags[] = {
     CALIB_SENSOR_CPSL_ENABLE_TAG_ID,
     CALIB_SENSOR_CPSL_MODE_TAG_ID,
@@ -1367,6 +1375,10 @@ uint32_t calib_sensor_orb_sub_tags[] = {
     CALIB_SENSOR_ORB_ENABLE_TAG_ID,
 };
 
+uint32_t calib_sensor_color_as_grey_sub_tags[] = {
+    CALIB_SENSOR_COLOR_AS_GREY_ENABLE_TAG_ID,
+};
+
 uint32_t calib_system_sub_tags[] = {
     CALIB_SYSTEM_HDR_TAG_ID,
     CALIB_SYSTEM_DCG_SETTING_TAG_ID,
@@ -1380,6 +1392,20 @@ uint32_t calib_system_hdr_sub_tags[] = {
 };
 
 uint32_t calib_system_DCG_SETTING_sub_tags[] = {
+    CALIB_SYSTEM_DCG_SETTING_NORMAL_TAG_ID,
+    CALIB_SYSTEM_DCG_SETTING_HDR_TAG_ID,
+};
+
+uint32_t calib_system_DCG_SETTING_Normal_sub_tags[] = {
+    CALIB_SYSTEM_DCG_SUPPORT_EN_TAG_ID,
+    CALIB_SYSTEM_DCG_OPTYPE_TAG_ID,
+    CALIB_SYSTEM_DCG_MODE_INIT_TAG_ID,
+    CALIB_SYSTEM_DCG_RATIO_TAG_ID,
+    CALIB_SYSTEM_DCG_GAINCTRL_TAG_ID,
+    CALIB_SYSTEM_DCG_ENVCTRL_TAG_ID,
+};
+
+uint32_t calib_system_DCG_SETTING_Hdr_sub_tags[] = {
     CALIB_SYSTEM_DCG_SUPPORT_EN_TAG_ID,
     CALIB_SYSTEM_DCG_OPTYPE_TAG_ID,
     CALIB_SYSTEM_DCG_MODE_INIT_TAG_ID,
@@ -2616,6 +2642,10 @@ calib_tag_info_t g_calib_tag_infos[CALIB_IQ_TAG_END] = {
     [CALIB_SENSOR_AEC_LINEARAE_CTRL_TAG_ID]         =
     {   "LinearAECtrl", CALIB_TAG_TYPE_STRUCT, {-1, -1},
         check_tags_array_info(calib_sensor_aec_LinearAECtrl_sub_tags), NULL
+    },
+    [CALIB_SENSOR_AEC_RAWSTATS_EN_TAG_ID]         =
+    {   "RawStatsEn", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
+        check_tags_array_ignore, NULL
     },
     [CALIB_SENSOR_AEC_SETPOINT_TAG_ID]         =
     {   "SetPoint", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
@@ -5047,7 +5077,23 @@ calib_tag_info_t g_calib_tag_infos[CALIB_IQ_TAG_END] = {
         check_tags_array_info(calib_sensor_sensorinfo_sub_tags), NULL
     },
     [CALIB_SENSOR_SENSORINFO_GAINRANGE_TAG_ID]         =
-    {   "GainRange", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
+    {   "GainRange", CALIB_TAG_TYPE_STRUCT, {-1, -1},
+        check_tags_array_info(calib_sensor_sensorinfo_gainrange_sub_tags), NULL
+    },
+    [CALIB_SENSOR_SENSORINFO_GAINRANGE_ISLINEAR_TAG_ID]         =
+    {   "IsLinear", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
+        check_tags_array_ignore, NULL
+    },
+    [CALIB_SENSOR_SENSORINFO_GAINRANGE_LINEAR_TAG_ID]         =
+    {   "Linear", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
+        check_tags_array_ignore, NULL
+    },
+    [CALIB_SENSOR_SENSORINFO_GAINRANGE_NONLINEAR_TAG_ID]         =
+    {   "NonLinear", CALIB_TAG_TYPE_CHAR, {-1, -1},
+        check_tags_array_ignore, NULL
+    },
+    [CALIB_SENSOR_SENSORINFO_GAINRANGE_NONLINEAR_DB_TAG_ID]         =
+    {   "DB_MODE", CALIB_TAG_TYPE_UNKNOWN, {-1, -1},
         check_tags_array_ignore, NULL
     },
     [CALIB_SENSOR_SENSORINFO_TIMEFACTOR_TAG_ID]         =
@@ -5223,6 +5269,16 @@ calib_tag_info_t g_calib_tag_infos[CALIB_IQ_TAG_END] = {
         check_tags_array_ignore, NULL
     },
 
+    // Sensor COLOR_AS_GREY
+    [CALIB_SENSOR_COLOR_AS_GREY_TAG_ID]         =
+    {   "COLOR_AS_GREY", CALIB_TAG_TYPE_STRUCT, {-1, -1},
+        check_tags_array_info(calib_sensor_color_as_grey_sub_tags), NULL
+    },
+    [CALIB_SENSOR_COLOR_AS_GREY_ENABLE_TAG_ID]         =
+    {   "enable", CALIB_TAG_TYPE_INT, {-1, -1},
+        check_tags_array_ignore, NULL
+    },
+
     // System
     [CALIB_SYSTEM_TAG_ID]         =
     {   "system", CALIB_TAG_TYPE_STRUCT, {-1, -1},
@@ -5249,6 +5305,14 @@ calib_tag_info_t g_calib_tag_infos[CALIB_IQ_TAG_END] = {
     [CALIB_SYSTEM_DCG_SETTING_TAG_ID]         =
     {   "DCG_SETTING", CALIB_TAG_TYPE_STRUCT, {-1, -1},
         check_tags_array_info(calib_system_DCG_SETTING_sub_tags), NULL
+    },
+    [CALIB_SYSTEM_DCG_SETTING_NORMAL_TAG_ID]         =
+    {   "Normal", CALIB_TAG_TYPE_STRUCT, {-1, -1},
+        check_tags_array_info(calib_system_DCG_SETTING_Normal_sub_tags), NULL
+    },
+    [CALIB_SYSTEM_DCG_SETTING_HDR_TAG_ID]         =
+    {   "Hdr", CALIB_TAG_TYPE_STRUCT, {-1, -1},
+        check_tags_array_info(calib_system_DCG_SETTING_Hdr_sub_tags), NULL
     },
     [CALIB_SYSTEM_DCG_SUPPORT_EN_TAG_ID]         =
     {   "support_en", CALIB_TAG_TYPE_DOUBLE, {-1, -1},

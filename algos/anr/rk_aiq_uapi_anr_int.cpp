@@ -38,6 +38,54 @@ rk_aiq_uapi_anr_GetAttrib(const RkAiqAlgoContext *ctx,
 }
 
 XCamReturn
+rk_aiq_uapi_anr_SetIQPara(RkAiqAlgoContext *ctx,
+                          rk_aiq_nr_IQPara_t *pPara,
+                          bool need_sync)
+{
+
+    ANRContext_t* pAnrCtx = (ANRContext_t*)ctx;
+
+	if(pPara->module_bits & (1 << ANR_MODULE_BAYERNR)){
+		pAnrCtx->stBayernrCalib = pPara->stBayernrPara;
+		pAnrCtx->isIQParaUpdate = true;
+	}
+
+	if(pPara->module_bits & (1 << ANR_MODULE_MFNR)){
+		pAnrCtx->stMfnrCalib = pPara->stMfnrPara;
+		pAnrCtx->isIQParaUpdate = true;
+	}
+
+	if(pPara->module_bits & (1 << ANR_MODULE_UVNR)){
+		pAnrCtx->stUvnrCalib = pPara->stUvnrPara;
+		pAnrCtx->isIQParaUpdate = true;
+	}
+
+	if(pPara->module_bits & (1 << ANR_MODULE_YNR)){
+		pAnrCtx->stYnrCalib = pPara->stYnrPara;
+		pAnrCtx->isIQParaUpdate = true;
+	}
+
+    return XCAM_RETURN_NO_ERROR;
+}
+
+
+XCamReturn
+rk_aiq_uapi_anr_GetIQPara(RkAiqAlgoContext *ctx,
+                          rk_aiq_nr_IQPara_t *pPara)
+{
+
+	ANRContext_t* pAnrCtx = (ANRContext_t*)ctx;
+
+	pPara->stBayernrPara = pAnrCtx->stBayernrCalib;
+	pPara->stMfnrPara = pAnrCtx->stMfnrCalib;
+	pPara->stUvnrPara = pAnrCtx->stUvnrCalib;
+	pPara->stYnrPara = pAnrCtx->stYnrCalib;
+	
+    return XCAM_RETURN_NO_ERROR;
+}
+
+
+XCamReturn
 rk_aiq_uapi_anr_SetLumaSFStrength(const RkAiqAlgoContext *ctx,
                           float fPercent)
 {

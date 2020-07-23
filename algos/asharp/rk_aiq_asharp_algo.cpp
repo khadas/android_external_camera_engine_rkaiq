@@ -4,6 +4,46 @@
 
 RKAIQ_BEGIN_DECLARE
 
+AsharpResult_t AsharpStart(AsharpContext_t *pAsharpCtx) 
+{
+    LOGI_ANR( "%s:enter!\n", __FUNCTION__);
+
+    // initial checks
+    if (pAsharpCtx == NULL) {
+        return (ASHARP_RET_NULL_POINTER);
+    }
+
+    if ((ASHARP_STATE_RUNNING == pAsharpCtx->eState)
+            || (ASHARP_STATE_LOCKED == pAsharpCtx->eState)) {
+        return (ASHARP_RET_FAILURE);
+    }
+
+    pAsharpCtx->eState = ASHARP_STATE_RUNNING;
+
+    LOGI_ANR( "%s:exit!\n", __FUNCTION__);
+    return (ASHARP_RET_SUCCESS);
+}
+
+
+AsharpResult_t AsharpStop(AsharpContext_t *pAsharpCtx) 
+{
+    LOGI_ANR( "%s:enter!\n", __FUNCTION__);
+
+    // initial checks
+    if (pAsharpCtx == NULL) {
+        return (ASHARP_RET_NULL_POINTER);
+    }
+
+    if (ASHARP_STATE_LOCKED == pAsharpCtx->eState) {
+        return (ASHARP_RET_FAILURE);
+    }
+
+    pAsharpCtx->eState = ASHARP_STATE_STOPPED;
+
+    LOGI_ANR( "%s:exit!\n", __FUNCTION__);
+    return (ASHARP_RET_SUCCESS);
+}
+
 AsharpResult_t AsharpInit(AsharpContext_t **ppAsharpCtx, CamCalibDbContext_t *pCalibDb)
 {
     AsharpContext_t * pAsharpCtx;
@@ -68,11 +108,25 @@ AsharpResult_t AsharpInit(AsharpContext_t **ppAsharpCtx, CamCalibDbContext_t *pC
 AsharpResult_t AsharpRelease(AsharpContext_t *pAsharpCtx)
 {
     LOGI_ASHARP("%s(%d): enter!\n", __FUNCTION__, __LINE__);
+	AsharpResult_t result = ASHARP_RET_SUCCESS;
+	
     if(pAsharpCtx == NULL) {
         LOGE_ASHARP("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
         return ASHARP_RET_NULL_POINTER;
     }
 
+	result = AsharpStop(pAsharpCtx);
+    if (result != ASHARP_RET_SUCCESS) {
+        LOGE_ASHARP( "%s: AsharpStop() failed!\n", __FUNCTION__);
+        return (result);
+    }
+
+    // check state
+    if ((ASHARP_STATE_RUNNING == pAsharpCtx->eState)
+            || (ASHARP_STATE_LOCKED == pAsharpCtx->eState)) {
+        return (ASHARP_RET_BUSY);
+    }
+	
     memset(pAsharpCtx, 0x00, sizeof(AsharpContext_t));
     free(pAsharpCtx);
 
@@ -98,6 +152,8 @@ AsharpResult_t AsharpPrepare(AsharpContext_t *pAsharpCtx, AsharpConfig_t* pAshar
     //pAsharpCtx->eMode = pAsharpConfig->eMode;
     //pAsharpCtx->eState = pAsharpConfig->eState;
 
+	AsharpStart(pAsharpCtx);
+	
     LOGI_ASHARP("%s(%d): exit!\n", __FUNCTION__, __LINE__);
     return ASHARP_RET_SUCCESS;
 }
@@ -112,12 +168,31 @@ AsharpResult_t AsharpReConfig(AsharpContext_t *pAsharpCtx, AsharpConfig_t* pAsha
     return ASHARP_RET_SUCCESS;
 }
 
+//anr reconfig
+AsharpResult_t AsharpIQParaUpdate(AsharpContext_t *pAsharpCtx)
+{
+    LOGI_ASHARP("%s(%d): enter!\n", __FUNCTION__, __LINE__);
+    //need todo what?
+	
+	if(pAsharpCtx->isIQParaUpdate){	
+		LOGD_ASHARP(" update iq para\n");
+		ASharpConfigSettingParam(pAsharpCtx, pAsharpCtx->stExpInfo.snr_mode);
+		pAsharpCtx->isIQParaUpdate = false;
+	}
+	
+    LOGI_ASHARP("%s(%d): exit!\n", __FUNCTION__, __LINE__);
+    return ASHARP_RET_SUCCESS;
+}
+
+
 //anr preprocess
 AsharpResult_t AsharpPreProcess(AsharpContext_t *pAsharpCtx)
 {
     LOGI_ASHARP("%s(%d): enter!\n", __FUNCTION__, __LINE__);
     //need todo what?
 
+	AsharpIQParaUpdate(pAsharpCtx);
+	
     LOGI_ASHARP("%s(%d): exit!\n", __FUNCTION__, __LINE__);
     return ASHARP_RET_SUCCESS;
 }
@@ -137,6 +212,10 @@ AsharpResult_t AsharpProcess(AsharpContext_t *pAsharpCtx, AsharpExpInfo_t *pExpI
         return ASHARP_RET_INVALID_PARM;
     }
 
+	if(pAsharpCtx->eState != ASHARP_STATE_RUNNING){
+        return ASHARP_RET_SUCCESS;
+	}
+		
 	#if ASHARP_USE_XML_FILE
 	if(pExpInfo->snr_mode != pAsharpCtx->stExpInfo.snr_mode){
 		ASharpConfigSettingParam(pAsharpCtx, pExpInfo->snr_mode);

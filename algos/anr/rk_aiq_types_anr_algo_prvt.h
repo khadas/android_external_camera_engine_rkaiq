@@ -215,6 +215,8 @@ typedef struct ANRContext_s {
 	float fChroma_TF_Strength;
 	float fChroma_SF_Strength;
 	float fRawnr_SF_Strength;
+
+	bool isIQParaUpdate;
 } ANRContext_t;
 
 

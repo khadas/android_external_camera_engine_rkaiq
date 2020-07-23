@@ -486,7 +486,7 @@ V4l2Device::get_format (struct v4l2_format &format)
 }
 
 XCamReturn
-V4l2Device::start ()
+V4l2Device::prepare ()
 {
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
     // request buffer first
@@ -514,6 +514,119 @@ V4l2Device::start ()
                     XCAM_STR (_name), i);
                 stop ();
                 return ret;
+            }
+        }
+    }
+    return ret;
+}
+
+XCamReturn
+V4l2SubDevice::set_selection (struct v4l2_subdev_selection &aSelection)
+{
+    int ret = 0;
+    XCAM_ASSERT (is_opened());
+
+    XCAM_LOG_DEBUG ("VIDIOC_SUBDEV_S_SELECTION: which: %d, pad: %d, target: 0x%x, "
+         "flags: 0x%x, rect left: %d, rect top: %d, width: %d, height: %d",
+        aSelection.which,
+        aSelection.pad,
+        aSelection.target,
+        aSelection.flags,
+        aSelection.r.left,
+        aSelection.r.top,
+        aSelection.r.width,
+        aSelection.r.height);
+
+    ret = this->io_control (VIDIOC_SUBDEV_S_SELECTION, &aSelection);
+    if (ret < 0) {
+        XCAM_LOG_ERROR("subdev(%s) VIDIOC_SUBDEV_S_SELECTION failed", XCAM_STR(_name));
+        return XCAM_RETURN_ERROR_IOCTL;
+    }
+
+    return XCAM_RETURN_NO_ERROR;
+}
+
+XCamReturn
+V4l2SubDevice::getFormat(struct v4l2_subdev_format &aFormat)
+{
+    int ret = 0;
+    XCAM_ASSERT (is_opened());
+
+    ret = this->io_control(VIDIOC_SUBDEV_G_FMT, &aFormat);
+    if (ret < 0) {
+        XCAM_LOG_ERROR("subdev(%s) VIDIOC_SUBDEV_G_FMT failed: %s", XCAM_STR(_name));
+        return XCAM_RETURN_ERROR_IOCTL;
+    }
+
+    XCAM_LOG_DEBUG ("VIDIOC_SUBDEV_G_FMT: pad: %d, which: %d, width: %d, "
+         "height: %d, format: 0x%x, field: %d, color space: %d",
+         aFormat.pad,
+         aFormat.which,
+         aFormat.format.width,
+         aFormat.format.height,
+         aFormat.format.code,
+         aFormat.format.field,
+         aFormat.format.colorspace);
+
+    return XCAM_RETURN_NO_ERROR;
+}
+
+XCamReturn
+V4l2SubDevice::setFormat(struct v4l2_subdev_format &aFormat)
+{
+    int ret = 0;
+    XCAM_ASSERT (is_opened());
+
+    XCAM_LOG_DEBUG ("VIDIOC_SUBDEV_S_FMT: pad: %d, which: %d, width: %d, "
+         "height: %d, format: 0x%x, field: %d, color space: %d",
+         aFormat.pad,
+         aFormat.which,
+         aFormat.format.width,
+         aFormat.format.height,
+         aFormat.format.code,
+         aFormat.format.field,
+         aFormat.format.colorspace);
+
+    ret = this->io_control(VIDIOC_SUBDEV_S_FMT, &aFormat);
+    if (ret < 0) {
+        XCAM_LOG_ERROR("subdev(%s) VIDIOC_SUBDEV_S_FMT failed: %s", XCAM_STR(_name));
+        return XCAM_RETURN_ERROR_IOCTL;
+    }
+
+    return XCAM_RETURN_NO_ERROR;
+}
+
+XCamReturn
+V4l2Device::start (bool prepared)
+{
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    if (!prepared) {
+        // request buffer first
+        ret = request_buffer ();
+        XCAM_FAIL_RETURN (
+            ERROR, ret == XCAM_RETURN_NO_ERROR, ret,
+            "device(%s) start failed", XCAM_STR (_name));
+        _queued_bufcnt = 0;
+        //alloc buffers
+        ret = init_buffer_pool ();
+        XCAM_FAIL_RETURN (
+            ERROR, ret == XCAM_RETURN_NO_ERROR, ret,
+            "device(%s) start failed", XCAM_STR (_name));
+        if (!V4L2_TYPE_IS_OUTPUT(_buf_type) &&
+                (_buf_type != V4L2_BUF_TYPE_META_OUTPUT)) {
+            //queue all buffers
+            for (uint32_t i = 0; i < _buf_count; ++i) {
+                SmartPtr<V4l2Buffer> &buf = _buf_pool [i];
+                XCAM_ASSERT (buf.ptr());
+                XCAM_ASSERT (buf->get_buf().index == i);
+                ret = queue_buffer (buf);
+                if (ret != XCAM_RETURN_NO_ERROR) {
+                    XCAM_LOG_ERROR (
+                        "device(%s) start failed on queue index:%d",
+                        XCAM_STR (_name), i);
+                    stop ();
+                    return ret;
+                }
             }
         }
     }
@@ -783,12 +896,17 @@ V4l2Device::fini_buffer_pool()
     }
 
     _buf_pool.clear ();
+    if (_planes) {
+        xcam_free (_planes);
+        _planes = NULL;
+    }
 
     return XCAM_RETURN_NO_ERROR;
 }
 
 SmartPtr<V4l2Buffer>
 V4l2Device::get_buffer_by_index (int index) {
+    SmartLock auto_lock(_buf_mutex);
     SmartPtr<V4l2Buffer> &buf = _buf_pool [index];
 
     return buf;
@@ -843,6 +961,8 @@ V4l2Device::dequeue_buffer(SmartPtr<V4l2Buffer> &buf)
         return XCAM_RETURN_ERROR_ISP;
     }
 
+    SmartLock auto_lock(_buf_mutex);
+
     buf = _buf_pool [v4l2_buf.index];
     buf->set_timestamp (v4l2_buf.timestamp);
     buf->set_timecode (v4l2_buf.timecode);
@@ -863,6 +983,8 @@ V4l2Device::dequeue_buffer(SmartPtr<V4l2Buffer> &buf)
 XCamReturn
 V4l2Device::get_buffer (SmartPtr<V4l2Buffer> &buf) const
 {
+    SmartLock auto_lock(_buf_mutex);
+
     uint32_t i;
 
     for (i = 0; i < _buf_count; i++) {
@@ -881,18 +1003,23 @@ V4l2Device::get_buffer (SmartPtr<V4l2Buffer> &buf) const
 XCamReturn
 V4l2Device::return_buffer (SmartPtr<V4l2Buffer> &buf)
 {
-    if (V4L2_TYPE_IS_OUTPUT(buf->get_buf ().type) ||
+    SmartLock auto_lock(_buf_mutex);
+
+   if (V4L2_TYPE_IS_OUTPUT(buf->get_buf ().type) ||
             (buf->get_buf ().type == V4L2_BUF_TYPE_META_OUTPUT)) {
         XCAM_ASSERT (buf.ptr());
         buf->reset ();
         return XCAM_RETURN_NO_ERROR;
     } else
-        return queue_buffer (buf);
+        return queue_buffer (buf, true);
 }
 
 XCamReturn
-V4l2Device::queue_buffer (SmartPtr<V4l2Buffer> &buf)
+V4l2Device::queue_buffer (SmartPtr<V4l2Buffer> &buf, bool locked)
 {
+    if (!locked)
+        _buf_mutex.lock();
+
     XCAM_ASSERT (buf.ptr());
     buf->reset ();
 
@@ -925,12 +1052,22 @@ V4l2Device::queue_buffer (SmartPtr<V4l2Buffer> &buf)
             v4l2_buf.m.planes[0].m.userptr = buf->get_expbuf_usrptr();
     }
 
-    if (io_control (VIDIOC_QBUF, &v4l2_buf) < 0) {
-        XCAM_LOG_ERROR("fail to enqueue buffer index:%d.", v4l2_buf.index);
-        return XCAM_RETURN_ERROR_IOCTL;
-    }
     _queued_bufcnt++;
     buf->set_queued(true);
+    if (!locked)
+        _buf_mutex.unlock();
+
+    if (io_control (VIDIOC_QBUF, &v4l2_buf) < 0) {
+        XCAM_LOG_ERROR("fail to enqueue buffer index:%d.", v4l2_buf.index);
+        // restore buf status
+        {
+            SmartLock auto_lock(_buf_mutex);
+            buf->set_queued(false);
+            _queued_bufcnt--;
+        }
+
+        return XCAM_RETURN_ERROR_IOCTL;
+    }
 
     return XCAM_RETURN_NO_ERROR;
 }
@@ -1001,7 +1138,7 @@ V4l2SubDevice::get_selection (int pad, struct v4l2_subdev_selection &select)
 
     select.pad = pad;
     select.which = V4L2_SUBDEV_FORMAT_ACTIVE;
-    select.target = V4L2_SEL_TGT_CROP;
+    select.target = V4L2_SEL_TGT_CROP_BOUNDS;
 
     ret = this->io_control (VIDIOC_SUBDEV_G_SELECTION, &select);
     if (ret < 0) {
@@ -1012,7 +1149,7 @@ V4l2SubDevice::get_selection (int pad, struct v4l2_subdev_selection &select)
     return XCAM_RETURN_NO_ERROR;
 }
 
-XCamReturn V4l2SubDevice::start ()
+XCamReturn V4l2SubDevice::start (bool prepared)
 {
     if (!is_opened())
         return XCAM_RETURN_ERROR_PARAM;

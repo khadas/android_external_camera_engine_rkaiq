@@ -33,6 +33,9 @@ public:
     void setEnable(bool enable) {
         mEnable = enable;
     };
+    void setReConfig(bool reconfig) {
+        mReConfig = reconfig;
+    };
     bool getEnable() {
         return mEnable;
     };
@@ -70,6 +73,7 @@ protected:
     RkAiqAlgoContext* mAlgoCtx;
     RkAiqCore*        mAiqCore;
     bool              mEnable;
+    bool              mReConfig;
 };
 
 #define RKAIQHANDLE(algo) \

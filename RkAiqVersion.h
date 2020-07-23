@@ -122,20 +122,33 @@
  * - iq parser support tag check
  *   - Calib v1.1.1 magic code 996625
  * - add following uApi
- *   - rk_aiq_uapi_getGrayMode 
+ *   - rk_aiq_uapi_getGrayMode
  *   - rk_aiq_uapi_setGrayMode
- *   - rk_aiq_uapi_setFrameRate 
- *   - rk_aiq_uapi_getFrameRate 
+ *   - rk_aiq_uapi_setFrameRate
+ *   - rk_aiq_uapi_getFrameRate
  *   - rk_aiq_uapi_sysctl_enumStaticMetas
- *   - rk_aiq_uapi_get_version_info 
+ *   - rk_aiq_uapi_get_version_info
  * - cpsl support sensitivity and strength control
- * - add iq for OV02K10 
- * - add iq for imx334 
- * - fix accm-saturation bug 
+ * - add iq for OV02K10
+ * - add iq for imx334
+ * - fix accm-saturation bug
+ * v1.0.2
+ * - Calib : v1.1.3  magic code: 1003001
+ * - iq_parser: fix make error for host
+ * - add imx307/ov2718 xml
+ * - fix Saturation_adjust_API bug
+ * - support re-start and re-prepare procedure
+ * - support sharp fbc rotation
+ * - support VICAP MIPI + ISP, LVDS + ISP
+ *   - tested on imx307, imx415, os04a10
+ * - nr,sharp: add IQ para set & get interface
+ * - ae: v0.1.4-20200722
+ * - Fix the bug of getStaticCamHwInfo function
+ * - xcore: add mutex for dq/que buffer, fix can_not_get_buffer error
  */
 
-#define RK_AIQ_VERSION_REAL_V "v1.0.1"
-#define RK_AIQ_RELEASE_DATE "2020-07-15"
+#define RK_AIQ_VERSION_REAL_V "v1.0.2"
+#define RK_AIQ_RELEASE_DATE "2020-07-24"
 
 /******* DO NOT EDIT THE FOLLOWINGS ***********/
 

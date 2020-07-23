@@ -4,6 +4,47 @@
 
 RKAIQ_BEGIN_DECLARE
 
+ANRresult_t ANRStart(ANRContext_t *pANRCtx) 
+{
+    LOGI_ANR( "%s:enter!\n", __FUNCTION__);
+
+    // initial checks
+    if (pANRCtx == NULL) {
+        return (ANR_RET_NULL_POINTER);
+    }
+
+    if ((ANR_STATE_RUNNING == pANRCtx->eState)
+            || (ANR_STATE_LOCKED == pANRCtx->eState)) {
+        return (ANR_RET_FAILURE);
+    }
+
+    pANRCtx->eState = ANR_STATE_RUNNING;
+
+    LOGI_ANR( "%s:exit!\n", __FUNCTION__);
+    return (ANR_RET_SUCCESS);
+}
+
+
+ANRresult_t ANRStop(ANRContext_t *pANRCtx) 
+{
+    LOGI_ANR( "%s:enter!\n", __FUNCTION__);
+
+    // initial checks
+    if (pANRCtx == NULL) {
+        return (ANR_RET_NULL_POINTER);
+    }
+
+    if (ANR_STATE_LOCKED == pANRCtx->eState) {
+        return (ANR_RET_FAILURE);
+    }
+
+    pANRCtx->eState = ANR_STATE_STOPPED;
+
+    LOGI_ANR( "%s:exit!\n", __FUNCTION__);
+    return (ANR_RET_SUCCESS);
+}
+
+
 //anr inint
 ANRresult_t ANRInit(ANRContext_t **ppANRCtx, CamCalibDbContext_t *pCalibDb)
 {
@@ -35,6 +76,7 @@ ANRresult_t ANRInit(ANRContext_t **ppANRCtx, CamCalibDbContext_t *pCalibDb)
 
     pANRCtx->refYuvBit = 8;
     pANRCtx->eMode = ANR_OP_MODE_AUTO;
+	pANRCtx->isIQParaUpdate = false;
 
 #if ANR_USE_XML_FILE
     //read v1 params from xml
@@ -84,12 +126,25 @@ ANRresult_t ANRInit(ANRContext_t **ppANRCtx, CamCalibDbContext_t *pCalibDb)
 //anr release
 ANRresult_t ANRRelease(ANRContext_t *pANRCtx)
 {
+	ANRresult_t result = ANR_RET_SUCCESS;
     LOGI_ANR("%s(%d): enter!\n", __FUNCTION__, __LINE__);
     if(pANRCtx == NULL) {
         LOGE_ANR("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
         return ANR_RET_NULL_POINTER;
     }
 
+	result = ANRStop(pANRCtx);
+    if (result != ANR_RET_SUCCESS) {
+        LOGE_ANR( "%s: ANRStop() failed!\n", __FUNCTION__);
+        return (result);
+    }
+
+    // check state
+    if ((ANR_STATE_RUNNING == pANRCtx->eState)
+            || (ANR_STATE_LOCKED == pANRCtx->eState)) {
+        return (ANR_RET_BUSY);
+    }
+	
     memset(pANRCtx, 0x00, sizeof(ANRContext_t));
     free(pANRCtx);
 
@@ -115,6 +170,7 @@ ANRresult_t ANRPrepare(ANRContext_t *pANRCtx, ANRConfig_t* pANRConfig)
     //pANRCtx->eMode = pANRConfig->eMode;
     //pANRCtx->eState = pANRConfig->eState;
     //pANRCtx->refYuvBit = pANRConfig->refYuvBit;
+    ANRStart(pANRCtx);
 
     LOGI_ANR("%s(%d): exit!\n", __FUNCTION__, __LINE__);
     return ANR_RET_SUCCESS;
@@ -130,12 +186,31 @@ ANRresult_t ANRReConfig(ANRContext_t *pANRCtx, ANRConfig_t* pANRConfig)
     return ANR_RET_SUCCESS;
 }
 
+//anr reconfig
+ANRresult_t ANRIQParaUpdate(ANRContext_t *pANRCtx)
+{
+    LOGI_ANR("%s(%d): enter!\n", __FUNCTION__, __LINE__);
+    //need todo what?
+
+	if(pANRCtx->isIQParaUpdate){
+		LOGD_ANR("IQ data reconfig\n");
+		ANRConfigSettingParam(pANRCtx, pANRCtx->stExpInfo.snr_mode);
+		pANRCtx->isIQParaUpdate = false;
+	}
+
+    LOGI_ANR("%s(%d): exit!\n", __FUNCTION__, __LINE__);
+    return ANR_RET_SUCCESS;
+}
+
+
 //anr preprocess
 ANRresult_t ANRPreProcess(ANRContext_t *pANRCtx)
 {
     LOGI_ANR("%s(%d): enter!\n", __FUNCTION__, __LINE__);
     //need todo what?
 
+	ANRIQParaUpdate(pANRCtx);
+	
     LOGI_ANR("%s(%d): exit!\n", __FUNCTION__, __LINE__);
     return ANR_RET_SUCCESS;
 }
@@ -155,6 +230,10 @@ ANRresult_t ANRProcess(ANRContext_t *pANRCtx, ANRExpInfo_t *pExpInfo)
         return ANR_RET_INVALID_PARM;
     }
 
+	if(pANRCtx->eState != ANR_STATE_RUNNING){
+		return ANR_RET_SUCCESS;
+	}
+	
     ANRGainRatioProcess(&pANRCtx->stGainState, pExpInfo);
 	
     if(pANRCtx->eMode == ANR_OP_MODE_AUTO) {

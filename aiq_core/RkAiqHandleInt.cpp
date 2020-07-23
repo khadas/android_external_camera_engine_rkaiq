@@ -197,6 +197,13 @@ RkAiqAeHandleInt::updateConfig()
         updateAtt = true;
         rk_aiq_uapi_ae_setHdrAeRouteAttr(mAlgoCtx, &mCurHdrAeRouteAttr, false);
     }
+    if (updateExpWinAttr) {
+        mCurExpWinAttr = mNewExpWinAttr;
+        updateExpWinAttr = false;
+        updateAtt = true;
+        rk_aiq_uapi_ae_setExpWinAttr(mAlgoCtx, &mCurExpWinAttr, false);
+    }
+
     // once any params are changed, run reconfig to convert aecCfg to paectx
     AeInstanceConfig_t* pAeInstConfig = (AeInstanceConfig_t*)mAlgoCtx;
     AeConfig_t pAecCfg = pAeInstConfig->aecCfg;
@@ -382,6 +389,42 @@ RkAiqAeHandleInt::getHdrAeRouteAttr(Uapi_HdrAeRouteAttr_t* pHdrAeRouteAttr)
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
 
     rk_aiq_uapi_ae_getHdrAeRouteAttr(mAlgoCtx, pHdrAeRouteAttr);
+
+    EXIT_ANALYZER_FUNCTION();
+    return ret;
+
+}
+XCamReturn
+RkAiqAeHandleInt::setExpWinAttr(Aec_Win_t ExpWinAttr)
+{
+    ENTER_ANALYZER_FUNCTION();
+
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    mCfgMutex.lock();
+    //TODO
+    // check if there is different between att & mCurAtt
+    // if something changed, set att to mNewAtt, and
+    // the new params will be effective later when updateConfig
+    // called by RkAiqCore
+
+    // if something changed
+    if (0 != memcmp(&mCurExpWinAttr, &ExpWinAttr, sizeof(Aec_Win_t))) {
+        mCurExpWinAttr = ExpWinAttr;
+        updateExpWinAttr = true;
+    }
+    mCfgMutex.unlock();
+
+    EXIT_ANALYZER_FUNCTION();
+    return ret;
+}
+XCamReturn
+RkAiqAeHandleInt::getExpWinAttr(Aec_Win_t * pExpWinAttr)
+{
+    ENTER_ANALYZER_FUNCTION();
+
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+
+    rk_aiq_uapi_ae_getExpWinAttr(mAlgoCtx, pExpWinAttr);
 
     EXIT_ANALYZER_FUNCTION();
     return ret;
@@ -1090,6 +1133,12 @@ RkAiqAnrHandleInt::updateConfig()
         rk_aiq_uapi_anr_SetAttrib(mAlgoCtx, &mCurAtt, false);
     }
 
+	if(UpdateIQpara){
+		mCurIQpara = mNewIQpara;
+		UpdateIQpara = false;
+		rk_aiq_uapi_anr_SetIQPara(mAlgoCtx, &mCurIQpara, false);
+	}
+
     mCfgMutex.unlock();
 
 
@@ -1134,6 +1183,45 @@ RkAiqAnrHandleInt::getAttrib(rk_aiq_nr_attrib_t *att)
     EXIT_ANALYZER_FUNCTION();
     return ret;
 }
+
+XCamReturn
+RkAiqAnrHandleInt::setIQPara(rk_aiq_nr_IQPara_t *para)
+{
+    ENTER_ANALYZER_FUNCTION();
+
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    mCfgMutex.lock();
+    //TODO
+    // check if there is different between att & mCurAtt
+    // if something changed, set att to mNewAtt, and
+    // the new params will be effective later when updateConfig
+    // called by RkAiqCore
+
+    // if something changed
+    if (0 != memcmp(&mCurIQpara, para, sizeof(rk_aiq_nr_IQPara_t))) {
+        mNewIQpara = *para;
+        UpdateIQpara = true;
+    }
+
+    mCfgMutex.unlock();
+
+    EXIT_ANALYZER_FUNCTION();
+    return ret;
+}
+
+XCamReturn
+RkAiqAnrHandleInt::getIQPara(rk_aiq_nr_IQPara_t *para)
+{
+    ENTER_ANALYZER_FUNCTION();
+
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+
+    ret = rk_aiq_uapi_anr_GetIQPara(mAlgoCtx, para);
+
+    EXIT_ANALYZER_FUNCTION();
+    return ret;
+}
+
 
 XCamReturn
 RkAiqAnrHandleInt::setLumaSFStrength(float fPercent)
@@ -1392,6 +1480,13 @@ RkAiqAsharpHandleInt::updateConfig()
         rk_aiq_uapi_asharp_SetAttrib(mAlgoCtx, &mCurAtt, false);
     }
 
+	if(updateIQpara){
+		mCurIQPara = mNewIQPara;
+        updateIQpara = false;
+        // TODO
+        rk_aiq_uapi_asharp_SetIQpara(mAlgoCtx, &mCurIQPara, false);
+	}
+	
     mCfgMutex.unlock();
 
 
@@ -1436,6 +1531,45 @@ RkAiqAsharpHandleInt::getAttrib(rk_aiq_sharp_attrib_t *att)
     EXIT_ANALYZER_FUNCTION();
     return ret;
 }
+
+XCamReturn
+RkAiqAsharpHandleInt::setIQPara(rk_aiq_sharp_IQpara_t *para)
+{
+    ENTER_ANALYZER_FUNCTION();
+
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    mCfgMutex.lock();
+    //TODO
+    // check if there is different between att & mCurAtt
+    // if something changed, set att to mNewAtt, and
+    // the new params will be effective later when updateConfig
+    // called by RkAiqCore
+
+    // if something changed
+    if (0 != memcmp(&mCurIQPara, para, sizeof(rk_aiq_sharp_IQpara_t))) {
+        mNewIQPara = *para;
+        updateIQpara = true;
+    }
+
+    mCfgMutex.unlock();
+
+    EXIT_ANALYZER_FUNCTION();
+    return ret;
+}
+
+XCamReturn
+RkAiqAsharpHandleInt::getIQPara(rk_aiq_sharp_IQpara_t *para)
+{
+    ENTER_ANALYZER_FUNCTION();
+
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+
+    rk_aiq_uapi_asharp_GetIQpara(mAlgoCtx, para);
+
+    EXIT_ANALYZER_FUNCTION();
+    return ret;
+}
+
 
 XCamReturn
 RkAiqAsharpHandleInt::setStrength(float fPercent)

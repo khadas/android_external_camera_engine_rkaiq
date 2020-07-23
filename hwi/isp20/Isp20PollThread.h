@@ -30,6 +30,8 @@ using namespace XCam;
 namespace RkCam {
 
 
+#define ISP20POLL_SUBM (0x2)
+
 /*
  * @fourcc: pixel format
  * @bayer_fmt: custom bayer format value
