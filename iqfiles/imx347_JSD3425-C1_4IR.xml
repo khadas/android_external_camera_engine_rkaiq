@@ -1,6 +1,6 @@
-<?xml version="1.0" encoding="utf-8"?><matfile>   <header type="struct" size="[1 1]">      <code_xml_parse_version index="1" type="char" size="[1 6]">         v1.1.1      </code_xml_parse_version>      <creation_date index="1" type="char" size="[1 11]">         2020-04-24      </creation_date>      <creator index="1" type="char" size="[1 2]">         sandy      </creator>      <sensor_name index="1" type="char" size="[1 7]">         IMX347      </sensor_name>      <sample_name index="1" type="char" size="[1 9]">         JSD3425-C1      </sample_name>      <generator_version index="1" type="char" size="[1 4]">         v1.0.e      </generator_version>
+<?xml version="1.0" encoding="utf-8"?><matfile>   <header type="struct" size="[1 1]">      <code_xml_parse_version index="1" type="char" size="[1 6]">         v1.1.3      </code_xml_parse_version>      <creation_date index="1" type="char" size="[1 11]">         2020-04-24      </creation_date>      <creator index="1" type="char" size="[1 2]">         sandy      </creator>      <sensor_name index="1" type="char" size="[1 7]">         IMX347      </sensor_name>      <sample_name index="1" type="char" size="[1 9]">         JSD3425-C1      </sample_name>      <generator_version index="1" type="char" size="[1 4]">         v1.0.f      </generator_version>
       <magic_code_version  index="1" type="int" size="[1 1]">
-       [996625]
+       [1003001]
       </magic_code_version>   </header>   <sensor type="struct" size="[1 1]">
       <AWB index="1" type="struct" size="[1 1]">
 	 <wbBypass index="1" type="double" size="[1 1]">	   [0]	 </wbBypass>
@@ -979,7 +979,7 @@
             </HdrAE>
          </AecManualCtrl>
 	<LinearAECtrl index="1" type="struct" size="[1 1]">
-           <SetPoint index="1" type="double" size="[1 1]">
+           <RawStatsEn index="1" type="double" size="[1 1]">              [1]           </RawStatsEn>           <SetPoint index="1" type="double" size="[1 1]">
               [55]
            </SetPoint>
            <NightSetpoint index="1" type="double" size="[1 1]">
@@ -1178,7 +1178,7 @@
 	<Bayernr_Setting index="1" type="cell" size="[1 2]">
 	     <cell index="1" type="struct" size="[1 1]">
                 <name index="1" type="char" size="[1 8]">
-                     HSNR
+                     LSNR
                 </name>
 	       <mode index="1" type="char" size="[1 8]">
                      lcg
@@ -1215,7 +1215,7 @@
               </cell>
 	     <cell index="2" type="struct" size="[1 1]">
                 <name index="1" type="char" size="[1 8]">
-                     LSNR
+                     HSNR
                 </name>
 	       <mode index="1" type="char" size="[1 8]">
                      hcg
@@ -1623,7 +1623,7 @@
 	<UVNR_Setting index="1" type="cell" size="[1 2]">
 	  <cell index="1" type="struct" size="[1 1]">
 	       <name index="1" type="char" size="[1 8]">
-                     HSNR
+                     LSNR
                 </name>
 	       <mode index="1" type="char" size="[1 8]">
                      lcg
@@ -1681,7 +1681,7 @@
 	  </cell>
 	  <cell index="2" type="struct" size="[1 1]">
 	       <name index="1" type="char" size="[1 8]">
-                     LSNR
+                     HSNR
                 </name>
 	       <mode index="1" type="char" size="[1 8]">
                      hcg
@@ -1761,7 +1761,7 @@
 	    <YNR_Setting index="1" type="cell" size="[1 2]">
 	     <cell index="1" type="struct" size="[1 1]">
 	       <name index="1" type="char" size="[1 8]">
-                     HSNR
+                     LSNR
                 </name>
 	       <mode index="1" type="char" size="[1 8]">
                      lcg
@@ -2518,7 +2518,7 @@
 	  </cell>
 	     <cell index="2" type="struct" size="[1 1]">
 	       <name index="1" type="char" size="[1 8]">
-                     LSNR
+                     HSNR
                 </name>
 	       <mode index="1" type="char" size="[1 8]">
                      hcg
@@ -3602,7 +3602,7 @@
 	<MFNR_Setting index="1" type="cell" size="[1 2]">
 	    <cell index="1" type="struct" size="[1 1]">
 	       <name index="1" type="char" size="[1 8]">
-                     HSNR
+                     LSNR
                 </name>
 	       <mode index="1" type="char" size="[1 8]">
                      lcg
@@ -4003,7 +4003,7 @@
 	 </cell>
            <cell index="2" type="struct" size="[1 1]">
 	       <name index="1" type="char" size="[1 8]">
-                     LSNR
+                     HSNR
                 </name>
 	       <mode index="1" type="char" size="[1 8]">
                      hcg
@@ -4409,7 +4409,7 @@
          <SHARP_Setting index="1" type="cell" size="[1 2]">
 	    <cell index="1" type="struct" size="[1 1]">
 	       <name index="1" type="char" size="[1 8]">
-                     HSNR
+                     LSNR
                 </name>
 	       <mode index="1" type="char" size="[1 8]">
                      lcg
@@ -4598,7 +4598,7 @@
 	  </cell>
             <cell index="2" type="struct" size="[1 1]">
 	       <name index="1" type="char" size="[1 8]">
-                     LSNR
+                     HSNR
                 </name>
 	       <mode index="1" type="char" size="[1 8]">
                      hcg
@@ -4792,7 +4792,7 @@
          <EDGEFILTER_Setting index="1" type="cell" size="[1 2]">
 	    <cell index="1" type="struct" size="[1 1]">
 	      <name index="1" type="char" size="[1 8]">
-                     HSNR
+                     LSNR
                </name>
 	      <sensor_mode index="1" type="char" size="[1 8]">
                      lcg
@@ -4963,7 +4963,7 @@
 	  </cell>
            <cell index="1" type="struct" size="[1 1]">
 	      <name index="1" type="char" size="[1 8]">
-                     LSNR
+                     HSNR
                </name>
 	      <sensor_mode index="1" type="char" size="[1 8]">
                      hcg
@@ -5542,8 +5542,11 @@
          </DEHAZE_ISO>
       </DEHAZE>
       <SENSORINFO index="1" type="struct" size="[1 1]">
-         <GainRange index="1" type="double" size="[10 7]">            [1 2 20 20 1 0 20 2 4 10 0 1 20 40 4 8 5 -20 1 40 60 8 16 2.5 -40 1 60 80 16 32 1.25 -60 1 80 100 32 64  0.625 -80 1 100 120 64 128 0.3125 -100 1 120 140 128 256 0.15625 -120 1 140 160 256 512 0.078125 -140 1 160 180 512 1024 0.0390625 -160 1 180 200]         </GainRange>         <TimeFactor index="1" type="double" size="[1 4]">            [0 0 1 0.5]         </TimeFactor>
-         <CISTimeRegSumFac index="1" type="double" size="[1 2]">           [2 10]         </CISTimeRegSumFac>         <CISTimeRegOdevity index="1" type="double" size="[1 2]">           [2 0]         </CISTimeRegOdevity>
+         <GainRange index="1" type="struct" size="[1 1]">
+            <IsLinear index="1" type="double" size="[1 1]">	       [0]            </IsLinear>            <Linear index="1" type="double" size="[10 7]">                [1 2 20 20 1 0 20 2 4 10 0 1 20 40 4 8 5 -20 1 40 60 8 16 2.5 -40 1 60 80 16 32 1.25 -60 1 80 100 32 64  0.625 -80 1 100 120 64 128 0.3125 -100 1 120 140 128 256 0.15625 -120 1 140 160 256 512 0.078125 -140 1 160 180 512 1024 0.0390625 -160 1 180 200]            </Linear>
+            <NonLinear index="1" type="char" size="[1 10]">	       DB_MODE            </NonLinear>
+	</GainRange>         <TimeFactor index="1" type="double" size="[1 4]">            [0 0 1 0.5]         </TimeFactor>
+         <CISTimeRegSumFac index="1" type="double" size="[1 2]">           [2 20]         </CISTimeRegSumFac>         <CISTimeRegOdevity index="1" type="double" size="[1 2]">           [2 0]         </CISTimeRegOdevity>
          <CISTimeRegUnEqualEn index="1" type="double" size="[1 1]">            [0]         </CISTimeRegUnEqualEn>
          <CISMinFps index="1" type="double" size="[1 1]">            [10]         </CISMinFps>         <CISTimeRegMin index="1" type="double" size="[1 1]">            [2]         </CISTimeRegMin>         <CISAgainRange index="1" type="double" size="[1 2]">            [1 29.5]         </CISAgainRange>
          <CISExtraAgainRange index="1" type="double" size="[1 2]">            [2.6 76.7]         </CISExtraAgainRange>         <CISDgainRange index="1" type="double" size="[1 2]">            [1 256]         </CISDgainRange>         <CISIspDgainRange index="1" type="double" size="[1 2]">            [1 1]         </CISIspDgainRange>     </SENSORINFO>      <LUT3D  index="1" type="struct" size="[1 1]">
@@ -5816,7 +5819,9 @@
                [0.2]
           </threshold>
        </LUMADETECT>
+      <COLOR_AS_GREY index="1" type="struct" size="[1 1]">          <enable index="1" type="int" size="[1 1]">               [0]          </enable>
+       </COLOR_AS_GREY>
    </sensor>   <system type="struct" size="[1 1]">
          <HDR index="1" type="struct" size="[1 1]">
 	     <enable index="1" type="double" size="[1 1]">	        [1]	     </enable>	     <support_mode index="1" type="char" size="[1 1]">	        MODE_2_LINE	     </support_mode>
-	     <line_mode index="1" type="char" size="[1 1]">	        STAGGER	     </line_mode>         </HDR>	<DCG_SETTING index="1" type="struct" size="[1 1]">	    <support_en index="1" type="double" size="[1 1]">	       [1]	    </support_en>	    <dcg_optype index="1" type="char" size="[1 8]">	       AUTO	    </dcg_optype>	    <dcgmode_init index="1" type="double" size="[1 3]">	       [0 0 0]	    </dcgmode_init>	    <dcg_ratio index="1" type="double" size="[1 1]">	       [2.6]	    </dcg_ratio>	    <sync_switch index="1" type="double" size="[1 1]">	       [1]	    </sync_switch>	    <gain_ctrl index="1" type="struct" size="[1 1]">	       <enable index="1" type="double" size="[1 1]">	          [1]	       </enable>	       <lcg2hcg_th index="1" type="double" size="[1 1]">	          [32]	       </lcg2hcg_th>	       <hcg2lcg_th index="1" type="double" size="[1 1]">	          [16]	       </hcg2lcg_th>	    </gain_ctrl>	    <env_ctrl index="1" type="struct" size="[1 1]">	       <enable index="1" type="double" size="[1 1]">	          [0]	       </enable>	       <lcg2hcg_th index="1" type="double" size="[1 1]">	          [0.3125]	       </lcg2hcg_th>	       <hcg2lcg_th index="1" type="double" size="[1 1]">	          [0.6]	       </hcg2lcg_th>	    </env_ctrl>	</DCG_SETTING>         <EXP_DELAY index="1" type="struct" size="[1 1]">	     <time_delay index="1" type="double" size="[1 1]">	        [2]	     </time_delay>	     <gain_delay index="1" type="double" size="[1 1]">	        [1]	     </gain_delay>	     <dcg_delay index="1" type="double" size="[1 1]">	        [2]	     </dcg_delay>         </EXP_DELAY>   </system></matfile>
+	     <line_mode index="1" type="char" size="[1 1]">	        STAGGER	     </line_mode>         </HDR>	<DCG_SETTING index="1" type="struct" size="[1 1]">	  <Normal index="1" type="struct" size="[1 1]">			    <support_en index="1" type="double" size="[1 1]">	       [1]	    </support_en>	    <dcg_optype index="1" type="char" size="[1 8]">	       AUTO	    </dcg_optype>	    <dcgmode_init index="1" type="double" size="[1 1]">	       [0]	    </dcgmode_init>	    <dcg_ratio index="1" type="double" size="[1 1]">	       [2.6]	    </dcg_ratio>	    <gain_ctrl index="1" type="struct" size="[1 1]">	       <enable index="1" type="double" size="[1 1]">	          [1]	       </enable>	       <lcg2hcg_th index="1" type="double" size="[1 1]">	          [32]	       </lcg2hcg_th>	       <hcg2lcg_th index="1" type="double" size="[1 1]">	          [16]	       </hcg2lcg_th>	    </gain_ctrl>	    <env_ctrl index="1" type="struct" size="[1 1]">	       <enable index="1" type="double" size="[1 1]">	          [0]	       </enable>	       <lcg2hcg_th index="1" type="double" size="[1 1]">	          [0.3125]	       </lcg2hcg_th>	       <hcg2lcg_th index="1" type="double" size="[1 1]">	          [0.6]	       </hcg2lcg_th>	    </env_ctrl>	  </Normal>	  <Hdr index="1" type="struct" size="[1 1]">			    <support_en index="1" type="double" size="[1 1]">	       [1]	    </support_en>	    <dcg_optype index="1" type="char" size="[1 8]">	       AUTO	    </dcg_optype>	    <dcgmode_init index="1" type="double" size="[1 3]">	       [0 0 0]	    </dcgmode_init>	    <dcg_ratio index="1" type="double" size="[1 1]">	       [2.6]	    </dcg_ratio>	    <sync_switch index="1" type="double" size="[1 1]">	       [1]	    </sync_switch>	    <gain_ctrl index="1" type="struct" size="[1 1]">	       <enable index="1" type="double" size="[1 1]">	          [1]	       </enable>	       <lcg2hcg_th index="1" type="double" size="[1 1]">	          [32]	       </lcg2hcg_th>	       <hcg2lcg_th index="1" type="double" size="[1 1]">	          [16]	       </hcg2lcg_th>	    </gain_ctrl>	    <env_ctrl index="1" type="struct" size="[1 1]">	       <enable index="1" type="double" size="[1 1]">	          [0]	       </enable>	       <lcg2hcg_th index="1" type="double" size="[1 1]">	          [0.3125]	       </lcg2hcg_th>	       <hcg2lcg_th index="1" type="double" size="[1 1]">	          [0.6]	       </hcg2lcg_th>	    </env_ctrl>	  </Hdr>	</DCG_SETTING>         <EXP_DELAY index="1" type="struct" size="[1 1]">	     <time_delay index="1" type="double" size="[1 1]">	        [2]	     </time_delay>	     <gain_delay index="1" type="double" size="[1 1]">	        [1]	     </gain_delay>	     <dcg_delay index="1" type="double" size="[1 1]">	        [2]	     </dcg_delay>         </EXP_DELAY>   </system></matfile>

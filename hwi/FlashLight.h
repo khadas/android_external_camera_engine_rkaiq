@@ -27,6 +27,7 @@ using namespace XCam;
 namespace RkCam {
 
 #define FLASH_MAX_NUM 2
+#define FL_SUBM (0x8)
 
 class FlashLightHw {
 public:

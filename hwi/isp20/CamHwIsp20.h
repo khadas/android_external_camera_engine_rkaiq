@@ -27,9 +27,15 @@
 struct media_device;
 
 namespace RkCam {
+
+#define ISP20HW_SUBM (0x1)
+
 #define MAX_MEDIA_INDEX               16
 #define DEV_PATH_LEN                  64
 #define SENSOR_ATTACHED_FLASH_MAX_NUM 2
+
+#define ISP_TX_BUF_NUM 4
+#define VIPCAP_TX_BUF_NUM 6
 
 typedef struct {
     char media_dev_path[DEV_PATH_LEN];
@@ -89,6 +95,18 @@ typedef struct {
 } rk_aiq_isp_hw_info_t;
 
 typedef struct {
+    char media_dev_path[DEV_PATH_LEN];
+    char mipi_id0[DEV_PATH_LEN];
+    char mipi_id1[DEV_PATH_LEN];
+    char mipi_id2[DEV_PATH_LEN];
+    char mipi_id3[DEV_PATH_LEN];
+    char mipi_dphy_rx_path[DEV_PATH_LEN];
+    char mipi_csi2_sd_path[DEV_PATH_LEN];
+    char lvds_sd_path[DEV_PATH_LEN];
+    char mipi_luma_path[DEV_PATH_LEN];
+} rk_aiq_cif_info_t;
+
+typedef struct {
     /* sensor entity name format:
      * m01_b_ov13850 1-0010, where 'm01' means module index number
      * 'b' meansback or front, 'ov13850' is real sensor name
@@ -112,6 +130,8 @@ typedef struct {
     char phy_module_orient; // parsed from sensor entity name
     std::vector<rk_frame_fmt_t>  frame_size;
     rk_aiq_isp_t *isp_info;
+    rk_aiq_cif_info_t *cif_info;
+    bool linked_to_isp;
     struct rkmodule_inf mod_info;
 } rk_sensor_full_info_t;
 
@@ -154,6 +174,10 @@ public:
     XCamReturn enqueueBuffer(struct rk_aiq_vbuf *vbuf);
     XCamReturn offlineRdJobPrepare();
     XCamReturn offlineRdJobDone();
+    XCamReturn setSharpFbcRotation(rk_aiq_rotation_t rot) {
+        _sharp_fbc_rotation = rot;
+        return XCAM_RETURN_NO_ERROR;
+    }
 private:
     XCAM_DEAD_COPY(CamHwIsp20);
     enum cam_hw_state_e {
@@ -161,7 +185,7 @@ private:
         CAM_HW_STATE_INITED,
         CAM_HW_STATE_PREPARED,
         CAM_HW_STATE_STARTED,
-        CAM_HW_STATE_STOPED,
+        CAM_HW_STATE_STOPPED,
     };
     enum ircut_state_e {
         IRCUT_STATE_CLOSED, /* close ir-cut,meaning that infrared ray can be received */
@@ -174,17 +198,26 @@ private:
     int _state;
     bool _first;
     volatile bool _is_exit;
+    bool _linked_to_isp;
     SmartPtr<RkAiqIspParamsProxy> _last_aiq_results;
     struct isp2x_isp_params_cfg _full_active_isp_params;
+    struct rkispp_params_cfg _full_active_ispp_params;
     uint32_t _ispp_module_init_ens;
+    SmartPtr<V4l2Device> _mipi_tx_devs[3];
+    SmartPtr<V4l2Device> _mipi_rx_devs[3];
+    SmartPtr<V4l2SubDevice> _ispp_sd;
+    SmartPtr<V4l2SubDevice> _cif_csi2_sd;
     std::list<SmartPtr<RkAiqIspParamsProxy>> _pending_ispparams_queue;
     std::list<SmartPtr<RkAiqIsppParamsProxy>> _pending_isppParams_queue;
     std::map<int, SmartPtr<RkAiqIspParamsProxy>> _effecting_ispparm_map;
     static std::map<std::string, SmartPtr<rk_aiq_static_info_t>> mCamHwInfos;
     static rk_aiq_isp_hw_info_t mIspHwInfos;
+    static rk_aiq_cif_info_t mCifHwInfos;
     static std::map<std::string, SmartPtr<rk_sensor_full_info_t>> mSensorHwInfos;
     void gen_full_isp_params(const struct isp2x_isp_params_cfg* update_params,
                              struct isp2x_isp_params_cfg* full_params);
+    void gen_full_ispp_params(const struct rkispp_params_cfg* update_params,
+                              struct rkispp_params_cfg* full_params);
     XCamReturn overrideExpRatioToAiqResults(const sint32_t frameId,
                                             int module_id,
                                             SmartPtr<RkAiqIspParamsProxy>& aiq_results);
@@ -196,9 +229,19 @@ private:
     void dumpYnrFixValue(struct rkispp_nr_config  * pNrCfg);
     void dumpSharpFixValue(struct rkispp_sharp_config  * pSharpCfg);
     XCamReturn setIrcutParams(bool on);
+    XCamReturn setIsppSharpFbcRot(struct rkispp_sharp_config* shp_cfg);
+    XCamReturn setupPipelineFmt();
+    XCamReturn setupPipelineFmtIsp(struct v4l2_subdev_selection& sns_sd_sel,
+                                   struct v4l2_subdev_format& sns_sd_fmt,
+                                   __u32 sns_v4l_pix_fmt);
+    XCamReturn setupPipelineFmtCif(struct v4l2_subdev_selection& sns_sd_sel,
+                                   struct v4l2_subdev_format& sns_sd_fmt,
+                                   __u32 sns_v4l_pix_fmt);
+    XCamReturn setupHdrLink_vidcap(int hdr_mode, bool enable);
     uint32_t _isp_module_ens;
     bool mNormalNoReadBack;
     bool mIsDhazOn;
+    rk_aiq_rotation_t _sharp_fbc_rotation;
 };
 
 };

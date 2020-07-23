@@ -11,6 +11,9 @@
 
 
 RKAIQ_BEGIN_DECLARE
+AsharpResult_t AsharpStart(AsharpContext_t *pAsharpCtx);
+
+AsharpResult_t AsharpStop(AsharpContext_t *pAsharpCtx);
 
 AsharpResult_t AsharpInit(AsharpContext_t **ppAsharpCtx, CamCalibDbContext_t *pCalibDb);
 

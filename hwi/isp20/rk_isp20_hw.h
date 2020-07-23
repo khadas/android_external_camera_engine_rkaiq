@@ -70,6 +70,7 @@ typedef unsigned long long u64;
 #define RK_ISP2X_PP_NR_ID       38
 #define RK_ISP2X_PP_TSHP_ID     39
 #define RK_ISP2X_PP_TFEC_ID     40
-#define RK_ISP2X_PP_MAX_ID      41
+#define RK_ISP2X_PP_ORB_ID      41
+#define RK_ISP2X_PP_MAX_ID      42
 
 #endif

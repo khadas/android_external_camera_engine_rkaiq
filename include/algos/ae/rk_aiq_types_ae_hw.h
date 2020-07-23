@@ -2,23 +2,19 @@
 #ifndef __RK_AIQ_TYPES_AE_HW_H__
 #define __RK_AIQ_TYPES_AE_HW_H__
 
-#define RAWAE_BIG_GRIDNUM (15*15)
-#define RAWAE_LITE_GRIDNUM (5*5)
-#define RAWAE_BIG_WINXNUM_MAX (4)
-#define RAWHIST_BINNUM (1<<8)
-
 #define RAWAEBIG_SUBWIN_NUM 4
-#define RAWAEBIG_MEAN_NUM       225
-#define RAWAELITE_MEAN_NUM  25
-#define YUVAE_SUBWIN_NUM        4
-#define YUVAE_MEAN_NUM      225
+#define RAWAEBIG_WIN_NUM    225
+#define RAWAELITE_WIN_NUM   25
+#define YUVAE_SUBWIN_NUM    4
+#define YUVAE_WIN_NUM       225
 
-#define RAWHISTBIG_SUBWIN_NUM 225
-#define RAWHISTLITE_SUBWIN_NUM 25
-#define SIHIST_WIN_NUM      1
-#define SIHIST_WEIGHT_NUM   225
-#define HIST_WEIGHT_NUM     225
-#define HIST_BIN_N_MAX      256
+#define RAWHISTBIG_WIN_NUM  225
+#define RAWHISTLITE_WIN_NUM 25
+#define SIHIST_WINCFG_NUM   1
+#define SIHIST_WIN_NUM      225
+
+#define RAWHIST_BIN_N_MAX   256
+#define SIHIST_BIN_N_MAX    32
 
 #define MAX_AEC_EFFECT_FNUM 5
 
@@ -99,7 +95,7 @@ struct rawhistbig_cfg {
     unsigned char gcc;
     unsigned char rcc;
     struct window win;
-    unsigned char weight[RAWHISTBIG_SUBWIN_NUM];
+    unsigned char weight[RAWHISTBIG_WIN_NUM];
 } __attribute__ ((packed));
 
 struct rawhistlite_cfg {
@@ -112,7 +108,7 @@ struct rawhistlite_cfg {
     unsigned char gcc;
     unsigned char rcc;
     struct window win;
-    unsigned char weight[RAWHISTLITE_SUBWIN_NUM];
+    unsigned char weight[RAWHISTLITE_WIN_NUM];
 } __attribute__ ((packed));
 
 struct sihst_win_cfg {
@@ -127,8 +123,8 @@ struct sihst_win_cfg {
 
 struct sihst_cfg {
     unsigned char wnd_num;
-    struct sihst_win_cfg win_cfg[SIHIST_WIN_NUM];
-    unsigned char hist_weight[SIHIST_WEIGHT_NUM];
+    struct sihst_win_cfg win_cfg[SIHIST_WINCFG_NUM];
+    unsigned char hist_weight[SIHIST_WIN_NUM];
 } __attribute__ ((packed));
 
 /*NOTE: name of rawae/rawhist channel has been renamed!
@@ -163,14 +159,17 @@ typedef struct rk_aiq_hist_meas_params_s {
 /*****************************************************************************/
 
 struct rawhist_stat {
-    unsigned int bins[HIST_BIN_N_MAX];
+    unsigned int bins[RAWHIST_BIN_N_MAX];
+};
+struct sihist_stat {
+    unsigned int bins[SIHIST_BIN_N_MAX];
 };
 
 struct rawaebig_stat {
-    unsigned short channelr_xy[RAWAEBIG_MEAN_NUM];
-    unsigned short channelg_xy[RAWAEBIG_MEAN_NUM];
-    unsigned short channelb_xy[RAWAEBIG_MEAN_NUM];
-    unsigned char  channely_xy[RAWAEBIG_MEAN_NUM]; //not HW!
+    unsigned short channelr_xy[RAWAEBIG_WIN_NUM];
+    unsigned short channelg_xy[RAWAEBIG_WIN_NUM];
+    unsigned short channelb_xy[RAWAEBIG_WIN_NUM];
+    unsigned char  channely_xy[RAWAEBIG_WIN_NUM]; //not HW!
     unsigned long int wndx_sumr[RAWAEBIG_SUBWIN_NUM];
     unsigned long int wndx_sumg[RAWAEBIG_SUBWIN_NUM];
     unsigned long int wndx_sumb[RAWAEBIG_SUBWIN_NUM];
@@ -180,15 +179,15 @@ struct rawaebig_stat {
     unsigned char wndx_channely[RAWAEBIG_SUBWIN_NUM]; //not HW!
 };
 struct rawaelite_stat {
-    unsigned short channelr_xy[RAWAELITE_MEAN_NUM];
-    unsigned short channelg_xy[RAWAELITE_MEAN_NUM];
-    unsigned short channelb_xy[RAWAELITE_MEAN_NUM];
-    unsigned char  channely_xy[RAWAELITE_MEAN_NUM]; //not HW!
+    unsigned short channelr_xy[RAWAELITE_WIN_NUM];
+    unsigned short channelg_xy[RAWAELITE_WIN_NUM];
+    unsigned short channelb_xy[RAWAELITE_WIN_NUM];
+    unsigned char  channely_xy[RAWAELITE_WIN_NUM]; //not HW!
 };
 
 struct yuvae_stat {
     unsigned long int ro_yuvae_sumy[YUVAE_SUBWIN_NUM];
-    unsigned char mean[YUVAE_MEAN_NUM];
+    unsigned char mean[YUVAE_WIN_NUM];
 };
 
 typedef struct Aec_Stat_Res_s {
@@ -209,7 +208,8 @@ typedef struct RkAiqAecHwConfig_s {
 typedef struct RkAiqAecHwStatsRes_s {
     Aec_Stat_Res_t chn[3];
     Aec_Stat_Res_t extra;
-    struct yuvae_stat yuv;
+    struct yuvae_stat yuvae;
+    struct sihist_stat sihist;
 } RkAiqAecHwStatsRes_t;
 
 

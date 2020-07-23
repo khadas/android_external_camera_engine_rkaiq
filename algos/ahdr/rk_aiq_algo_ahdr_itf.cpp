@@ -96,6 +96,7 @@ static XCamReturn AhdrPrepare(RkAiqAlgoCom* params)
     }
 
     if(/* !params->u.prepare.reconfig*/true) {
+        AhdrStop(pAhdrCtx); // stop firstly for re-preapre
         ret = AhdrStart(pAhdrCtx);
         if (ret != AHDR_RET_SUCCESS) {
             LOGE_AHDR("%s AHDRStart failed: %d", __FUNCTION__, ret);

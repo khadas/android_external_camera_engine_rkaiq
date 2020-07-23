@@ -113,7 +113,9 @@ static XCamReturn VignSelectLscProfiles
             while ((fVignetting <= pLscProfiles[n]->vignetting) && (n <= nLast)) {
                 n++;
             }
-            n--;
+
+            if (n > 0)
+                n--;
 
             *pLscProfile1 = pLscProfiles[n];
             *pLscProfile2 = pLscProfiles[n + 1];

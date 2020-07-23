@@ -570,6 +570,10 @@ XCamReturn rk_aiq_uapi_getMSpaNRStrth(const rk_aiq_sys_ctx_t* ctx, bool *on, uns
 XCamReturn rk_aiq_uapi_setMTNRStrth(const rk_aiq_sys_ctx_t* ctx, bool on, unsigned int level);
 XCamReturn rk_aiq_uapi_getMTNRStrth(const rk_aiq_sys_ctx_t* ctx, bool *on, unsigned int *level);
 
+
+XCamReturn rk_aiq_uapi_setNRIQPara(const rk_aiq_sys_ctx_t* ctx, rk_aiq_nr_IQPara_t *para);
+XCamReturn rk_aiq_uapi_getNRIQPara(const rk_aiq_sys_ctx_t* ctx, rk_aiq_nr_IQPara_t *para);
+
 /*
 **********************************************************
 * Dehazer
@@ -648,6 +652,10 @@ XCamReturn rk_aiq_uapi_getSaturation(const rk_aiq_sys_ctx_t* ctx, unsigned int* 
 */
 XCamReturn rk_aiq_uapi_setSharpness(const rk_aiq_sys_ctx_t* ctx, unsigned int level);
 XCamReturn rk_aiq_uapi_getSharpness(const rk_aiq_sys_ctx_t* ctx, unsigned int *level);
+
+XCamReturn rk_aiq_uapi_setSharpIQPara(const rk_aiq_sys_ctx_t* ctx, rk_aiq_sharp_IQpara_t *para);
+XCamReturn rk_aiq_uapi_getSharpIQPara(const rk_aiq_sys_ctx_t* ctx, rk_aiq_sharp_IQpara_t *para);
+
 
 XCamReturn rk_aiq_uapi_setGammaCoef(const rk_aiq_sys_ctx_t* ctx, unsigned int level);
 

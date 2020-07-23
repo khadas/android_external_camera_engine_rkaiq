@@ -373,6 +373,19 @@ typedef struct AsharpExpInfo_s {
 	int   snr_mode;
 } AsharpExpInfo_t;
 
+typedef enum rk_aiq_sharp_module_e{
+    ASHARP_MODULE_SHARP     	= 0,          /**< instance is created, but not initialized */
+    ASHARP_MODULE_EDGEFILTER    = 1,          /**< instance is confiured (ready to start) or stopped */
+} rk_aiq_sharp_module_t;
+
+
+typedef struct rk_aiq_sharp_IQpara_s{
+	int module_bits;
+	
+	CalibDb_Sharp_t stSharpPara;
+    CalibDb_EdgeFilter_t stEdgeFltPara;
+}rk_aiq_sharp_IQpara_t;
+
 RKAIQ_END_DECLARE
 
 #endif

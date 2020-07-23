@@ -38,6 +38,8 @@ using namespace XCam;
 
 namespace RkCam {
 
+#define LENS_SUBM (0x10)
+
 class LensHw : public V4l2SubDevice {
 public:
     explicit LensHw(const char* name);

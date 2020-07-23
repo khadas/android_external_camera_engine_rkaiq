@@ -563,3 +563,13 @@ offlineRdJobDone(const rk_aiq_sys_ctx_t* ctx)
     EXIT_XCORE_FUNCTION();
     return ret;
 }
+
+XCamReturn
+rk_aiq_uapi_sysctl_setSharpFbcRotation(const rk_aiq_sys_ctx_t* ctx, rk_aiq_rotation_t rot)
+{
+    ENTER_XCORE_FUNCTION();
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    ret = ctx->_rkAiqManager->setSharpFbcRotation(rot);
+    EXIT_XCORE_FUNCTION();
+    return ret;
+}

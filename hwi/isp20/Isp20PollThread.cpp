@@ -201,7 +201,7 @@ Isp20PollThread::get_value_from_file(const char* path, int& value, uint32_t& fra
     fp = open(path, O_RDONLY | O_SYNC);
     if (fp) {
         if (read(fp, buffer, sizeof(buffer)) <= 0) {
-            LOGW_CAMHW("%s read %s failed!\n", __func__, path);
+            LOGW_CAMHW_SUBM(ISP20POLL_SUBM,"%s read %s failed!\n", __func__, path);
         } else {
             char *p = nullptr;
 
@@ -214,7 +214,7 @@ Isp20PollThread::get_value_from_file(const char* path, int& value, uint32_t& fra
             }
         }
         close(fp);
-        LOGV_CAMHW("value: %d, frameId: %d\n", value, frameId);
+        LOGV_CAMHW_SUBM(ISP20POLL_SUBM,"value: %d, frameId: %d\n", value, frameId);
         return true;
     }
 
@@ -234,7 +234,7 @@ Isp20PollThread::set_value_to_file(const char* path, int value, uint32_t sequenc
         lseek(fp, 0, SEEK_SET);
         snprintf(buffer, sizeof(buffer), "%3d %8d\n", _capture_raw_num, sequence);
         if (write(fp, buffer, sizeof(buffer)) <= 0)
-            LOGW_CAMHW("%s write %s failed!\n", __func__, path);
+            LOGW_CAMHW_SUBM(ISP20POLL_SUBM,"%s write %s failed!\n", __func__, path);
         close(fp);
         return true;
     }
@@ -271,7 +271,7 @@ Isp20PollThread::new_video_buffer(SmartPtr<V4l2Buffer> buf,
                      CAPTURE_RAW_PATH, CAPTURE_CNT_FILENAME);
             get_value_from_file(file_name, capture_cnt, rawFrmId);
 
-            LOGD_CAMHW("rawFrmId: %d, sequence: %d, _capture_metadata_num: %d\n",
+            LOGD_CAMHW_SUBM(ISP20POLL_SUBM,"rawFrmId: %d, sequence: %d, _capture_metadata_num: %d\n",
                        rawFrmId, buf->get_buf().sequence,
                        _capture_metadata_num);
 
@@ -289,7 +289,7 @@ Isp20PollThread::new_video_buffer(SmartPtr<V4l2Buffer> buf,
             _capture_metadata_num--;
             if (!_capture_metadata_num) {
                 _is_raw_dir_exist = false;
-                LOGD_CAMHW("stop capturing raw!\n");
+                LOGD_CAMHW_SUBM(ISP20POLL_SUBM,"stop capturing raw!\n");
             }
         }
 
@@ -382,14 +382,14 @@ Isp20PollThread::Isp20PollThread()
 
     }
 
-    LOGD_CAMHW("Isp20PollThread constructed");
+    LOGD_CAMHW_SUBM(ISP20POLL_SUBM,"Isp20PollThread constructed");
 }
 
 Isp20PollThread::~Isp20PollThread()
 {
     stop();
 
-    LOGD_CAMHW("~Isp20PollThread destructed");
+    LOGD_CAMHW_SUBM(ISP20POLL_SUBM,"~Isp20PollThread destructed");
 }
 
 
@@ -397,7 +397,7 @@ XCamReturn
 Isp20PollThread::start ()
 {
     if (create_stop_fds_mipi()) {
-        LOGE_CAMHW("create mipi stop fds failed !");
+        LOGE_CAMHW_SUBM(ISP20POLL_SUBM,"create mipi stop fds failed !");
         return XCAM_RETURN_ERROR_UNKNOWN;
     }
 
@@ -417,7 +417,7 @@ Isp20PollThread::stop ()
                 char buf = 0xf;  // random value to write to flush fd.
                 unsigned int size = write(_isp_mipi_tx_infos[i].stop_fds[1], &buf, sizeof(char));
                 if (size != sizeof(char))
-                    LOGW_CAMHW("Flush write not completed");
+                    LOGW_CAMHW_SUBM(ISP20POLL_SUBM,"Flush write not completed");
             }
             _isp_mipi_tx_infos[i].loop->stop ();
             _isp_mipi_tx_infos[i].buf_list.clear ();
@@ -429,7 +429,7 @@ Isp20PollThread::stop ()
                 char buf = 0xf;  // random value to write to flush fd.
                 unsigned int size = write(_isp_mipi_rx_infos[i].stop_fds[1], &buf, sizeof(char));
                 if (size != sizeof(char))
-                    LOGW_CAMHW("Flush write not completed");
+                    LOGW_CAMHW_SUBM(ISP20POLL_SUBM,"Flush write not completed");
             }
             _isp_mipi_rx_infos[i].loop->stop ();
             _isp_mipi_rx_infos[i].buf_list.clear ();
@@ -499,17 +499,12 @@ Isp20PollThread::hdr_mipi_start(SmartPtr<SensorHw> sensor)
 
     // mipi rx/tx format should match to sensor.
     for (int i = 0; i < _mipi_dev_max; i++) {
-        _isp_mipi_tx_infos[i].dev->set_format(sns_width, sns_height, pixelformat,
-                                              V4L2_FIELD_NONE, 0);
         ret = _isp_mipi_tx_infos[i].dev->start();
         if (ret < 0)
-            LOGE_CAMHW("mipi tx:%d start err: %d\n", ret);
-
-        _isp_mipi_rx_infos[i].dev->set_format(sns_width, sns_height, pixelformat,
-                                              V4L2_FIELD_NONE, 0);
+            LOGE_CAMHW_SUBM(ISP20POLL_SUBM,"mipi tx:%d start err: %d\n", ret);
         ret = _isp_mipi_rx_infos[i].dev->start();
         if (ret < 0)
-            LOGE_CAMHW("mipi rx:%d start err: %d\n", ret);
+            LOGE_CAMHW_SUBM(ISP20POLL_SUBM,"mipi rx:%d start err: %d\n", ret);
     }
 
     return ret;
@@ -523,10 +518,10 @@ Isp20PollThread::hdr_mipi_stop()
     for (int i = 0; i < _mipi_dev_max; i++) {
         ret = _isp_mipi_tx_infos[i].dev->stop();
         if (ret < 0)
-            LOGE_CAMHW("mipi tx:%d stop err: %d\n", ret);
+            LOGE_CAMHW_SUBM(ISP20POLL_SUBM,"mipi tx:%d stop err: %d\n", ret);
         ret = _isp_mipi_rx_infos[i].dev->stop();
         if (ret < 0)
-            LOGE_CAMHW("mipi rx:%d stop err: %d\n", ret);
+            LOGE_CAMHW_SUBM(ISP20POLL_SUBM,"mipi rx:%d stop err: %d\n", ret);
     }
 
     return ret;
@@ -537,7 +532,7 @@ Isp20PollThread::set_hdr_frame_readback_infos(int frame_id, int times)
 {
     _mipi_trigger_mutex.lock();
     _isp_hdr_fid2times_map[frame_id] = times;
-    LOGD_CAMHW("rdtimes seq %d \n", frame_id);
+    LOGD_CAMHW_SUBM(ISP20POLL_SUBM,"rdtimes seq %d \n", frame_id);
     _mipi_trigger_mutex.unlock();
     trigger_readback();
 }
@@ -552,28 +547,28 @@ Isp20PollThread::create_stop_fds_mipi () {
     for (i = 0; i < _mipi_dev_max; i++) {
         status = pipe(_isp_mipi_tx_infos[i].stop_fds);
         if (status < 0) {
-            LOGE_CAMHW("Failed to create mipi tx:%d poll stop pipe: %s",
+            LOGE_CAMHW_SUBM(ISP20POLL_SUBM,"Failed to create mipi tx:%d poll stop pipe: %s",
                        i, strerror(errno));
             ret = XCAM_RETURN_ERROR_UNKNOWN;
             goto exit_error;
         }
         status = fcntl(_isp_mipi_tx_infos[0].stop_fds[0], F_SETFL, O_NONBLOCK);
         if (status < 0) {
-            LOGE_CAMHW("Fail to set event mipi tx:%d stop pipe flag: %s",
+            LOGE_CAMHW_SUBM(ISP20POLL_SUBM,"Fail to set event mipi tx:%d stop pipe flag: %s",
                        i, strerror(errno));
             goto exit_error;
         }
 
         status = pipe(_isp_mipi_rx_infos[i].stop_fds);
         if (status < 0) {
-            LOGE_CAMHW("Failed to create mipi rx:%d poll stop pipe: %s",
+            LOGE_CAMHW_SUBM(ISP20POLL_SUBM,"Failed to create mipi rx:%d poll stop pipe: %s",
                        i, strerror(errno));
             ret = XCAM_RETURN_ERROR_UNKNOWN;
             goto exit_error;
         }
         status = fcntl(_isp_mipi_rx_infos[0].stop_fds[0], F_SETFL, O_NONBLOCK);
         if (status < 0) {
-            LOGE_CAMHW("Fail to set event mipi rx:%d stop pipe flag: %s",
+            LOGE_CAMHW_SUBM(ISP20POLL_SUBM,"Fail to set event mipi rx:%d stop pipe flag: %s",
                        i, strerror(errno));
             goto exit_error;
         }
@@ -629,13 +624,13 @@ Isp20PollThread::mipi_poll_buffer_loop (int type, int dev_index)
                                 stop_fd);
 
     if (poll_ret == POLL_STOP_RET) {
-        LOGW_CAMHW("poll %s buffer stop success !", mipi_poll_type_to_str[type]);
+        LOGW_CAMHW_SUBM(ISP20POLL_SUBM,"poll %s buffer stop success !", mipi_poll_type_to_str[type]);
         // stop success, return error to stop the poll thread
         return XCAM_RETURN_ERROR_UNKNOWN;
     }
 
     if (poll_ret <= 0) {
-        LOGW_CAMHW("mipi_dev_index %d poll %s buffer event got error(0x%x) but continue\n",
+        LOGW_CAMHW_SUBM(ISP20POLL_SUBM,"mipi_dev_index %d poll %s buffer event got error(0x%x) but continue\n",
                    dev_index, mipi_poll_type_to_str[type], poll_ret);
         ::usleep (10000); // 10ms
         return XCAM_RETURN_ERROR_TIMEOUT;
@@ -643,7 +638,7 @@ Isp20PollThread::mipi_poll_buffer_loop (int type, int dev_index)
 
     ret = dev->dequeue_buffer (buf);
     if (ret != XCAM_RETURN_NO_ERROR) {
-        LOGW_CAMHW("dequeue %s buffer failed", mipi_poll_type_to_str[type]);
+        LOGW_CAMHW_SUBM(ISP20POLL_SUBM,"dequeue %s buffer failed", mipi_poll_type_to_str[type]);
         return ret;
     }
 
@@ -664,7 +659,7 @@ Isp20PollThread::handle_rx_buf(SmartPtr<V4l2BufferProxy> &rx_buf, int dev_index)
 {
 
     SmartPtr<V4l2BufferProxy> buf = _isp_mipi_rx_infos[dev_index].buf_list.pop(-1);
-    LOGD_CAMHW("%s dev_index:%d index:%d fd:%d\n",
+    LOGD_CAMHW_SUBM(ISP20POLL_SUBM,"%s dev_index:%d index:%d fd:%d\n",
                __func__, dev_index, buf->get_v4l2_buf_index(), buf->get_expbuf_fd());
 }
 
@@ -707,7 +702,7 @@ void Isp20PollThread::sync_tx_buf()
             _mipi_trigger_mutex.lock();
             _isp_hdr_fid2ready_map[sequence_s] = true;
             _mipi_trigger_mutex.unlock();
-            LOGD_CAMHW("trigger readback %d", sequence_s);
+            LOGD_CAMHW_SUBM(ISP20POLL_SUBM,"trigger readback %d", sequence_s);
             trigger_readback();
         } else if ((_working_mode == RK_AIQ_ISP_HDR_MODE_2_FRAME_HDR ||
                     _working_mode == RK_AIQ_ISP_HDR_MODE_2_LINE_HDR) &&
@@ -720,7 +715,7 @@ void Isp20PollThread::sync_tx_buf()
             _mipi_trigger_mutex.lock();
             _isp_hdr_fid2ready_map[sequence_s] = true;
             _mipi_trigger_mutex.unlock();
-            LOGD_CAMHW("trigger readback %d", sequence_s);
+            LOGD_CAMHW_SUBM(ISP20POLL_SUBM,"trigger readback %d", sequence_s);
             trigger_readback();
         } else if (_working_mode == RK_AIQ_WORKING_MODE_NORMAL) {
             _isp_mipi_rx_infos[ISP_MIPI_HDR_S].cache_list.push(buf_s);
@@ -728,10 +723,10 @@ void Isp20PollThread::sync_tx_buf()
             _mipi_trigger_mutex.lock();
             _isp_hdr_fid2ready_map[sequence_s] = true;
             _mipi_trigger_mutex.unlock();
-            LOGD_CAMHW("trigger readback %d", sequence_s);
+            LOGD_CAMHW_SUBM(ISP20POLL_SUBM,"trigger readback %d", sequence_s);
             trigger_readback();
         } else {
-            LOGW_CAMHW("do nothing, sequence not match l: %d, s: %d, m: %d !!!",
+            LOGW_CAMHW_SUBM(ISP20POLL_SUBM,"do nothing, sequence not match l: %d, s: %d, m: %d !!!",
                        sequence_l, sequence_s, sequence_m);
         }
     }
@@ -741,7 +736,7 @@ void Isp20PollThread::sync_tx_buf()
 void
 Isp20PollThread::handle_tx_buf(SmartPtr<V4l2BufferProxy> &tx_buf, int dev_index)
 {
-    LOGD_CAMHW("%s dev_index:%d sequence:%d\n",
+    LOGD_CAMHW_SUBM(ISP20POLL_SUBM,"%s dev_index:%d sequence:%d\n",
                __func__, dev_index, tx_buf->get_sequence());
     _isp_mipi_tx_infos[dev_index].buf_list.push(tx_buf);
     sync_tx_buf();
@@ -759,7 +754,7 @@ Isp20PollThread::trigger_readback()
     _mipi_trigger_mutex.lock();
     _isp_hdr_fid2ready_map.size();
     if (_isp_hdr_fid2ready_map.size() == 0) {
-        LOGD_CAMHW("%s buf not ready !", __func__);
+        LOGD_CAMHW_SUBM(ISP20POLL_SUBM,"%s buf not ready !", __func__);
         _mipi_trigger_mutex.unlock();
         return;
     }
@@ -767,31 +762,35 @@ Isp20PollThread::trigger_readback()
     it_ready = _isp_hdr_fid2ready_map.begin();
     sequence = it_ready->first;
 
-    std::map<uint32_t, int>::iterator it_times_del;
-    for (std::map<uint32_t, int>::iterator iter = _isp_hdr_fid2times_map.begin();
-            iter != _isp_hdr_fid2times_map.end();) {
-        if (iter->first < sequence) {
-            it_times_del = iter++;
-            LOGD_CAMHW("del seq %d", it_times_del->first);
-            _isp_hdr_fid2times_map.erase(it_times_del);
-        } else if (iter->first == sequence) {
-            times = iter->second;
-            it_times_del = iter++;
-            LOGD_CAMHW("del seq %d", it_times_del->first);
-            _isp_hdr_fid2times_map.erase(it_times_del);
-            break;
-        } else {
-            LOGW_CAMHW("%s missing rdtimes for buf_seq %d, min rdtimes_seq %d !",
-                       __func__, sequence, iter->first);
-            times = 0;
-            break;
-        }
+    if (_working_mode != RK_AIQ_WORKING_MODE_NORMAL) {
+	std::map<uint32_t, int>::iterator it_times_del;
+	for (std::map<uint32_t, int>::iterator iter = _isp_hdr_fid2times_map.begin();
+	     iter != _isp_hdr_fid2times_map.end();) {
+	    if (iter->first < sequence) {
+		it_times_del = iter++;
+		LOGD_CAMHW_SUBM(ISP20POLL_SUBM,"del seq %d", it_times_del->first);
+		_isp_hdr_fid2times_map.erase(it_times_del);
+	    } else if (iter->first == sequence) {
+		times = iter->second;
+		it_times_del = iter++;
+		LOGD_CAMHW_SUBM(ISP20POLL_SUBM,"del seq %d", it_times_del->first);
+		_isp_hdr_fid2times_map.erase(it_times_del);
+		break;
+	    } else {
+		LOGW_CAMHW_SUBM(ISP20POLL_SUBM,"%s missing rdtimes for buf_seq %d, min rdtimes_seq %d !",
+				__func__, sequence, iter->first);
+		times = 0;
+		break;
+	    }
+	}
+    } else {
+        times = 0;
     }
 
     if (times == -1) {
-        LOGD_CAMHW("%s rdtimes not ready for seq %d !", __func__, sequence);
-        _mipi_trigger_mutex.unlock();
-        return;
+	LOGD_CAMHW_SUBM(ISP20POLL_SUBM,"%s rdtimes not ready for seq %d !", __func__, sequence);
+	_mipi_trigger_mutex.unlock();
+	return;
     }
 
     _isp_hdr_fid2ready_map.erase(it_ready);
@@ -807,7 +806,7 @@ Isp20PollThread::trigger_readback()
         tg.times = 1;
     else
         tg.times = 2;
-    LOGW_CAMHW("%s fix the trigger to %d time for ahdr temporarily\n",
+    LOGW_CAMHW_SUBM(ISP20POLL_SUBM,"%s fix the trigger to %d time for ahdr temporarily\n",
                __func__,
                tg.times);
 #endif
@@ -815,7 +814,7 @@ Isp20PollThread::trigger_readback()
     if (_rx_handle_dev) {
         if (_rx_handle_dev->setIspParamsSync(sequence) ||
                 _rx_handle_dev->setIsppParamsSync(sequence)) {
-            LOGE_CAMHW("%s frame[%d] set isp params failed, don't read back!\n",
+            LOGE_CAMHW_SUBM(ISP20POLL_SUBM,"%s frame[%d] set isp params failed, don't read back!\n",
                        __func__, sequence);
             // drop frame, return buf to tx
             for (int i = 0; i < _mipi_dev_max; i++) {
@@ -843,7 +842,7 @@ Isp20PollThread::trigger_readback()
             for (int i = 0; i < _mipi_dev_max; i++) {
                 ret = _isp_mipi_rx_infos[i].dev->get_buffer(v4l2buf[i]);
                 if (ret != XCAM_RETURN_NO_ERROR) {
-                    LOGE_CAMHW("Rx[%d] can not get buffer\n", i);
+                    LOGE_CAMHW_SUBM(ISP20POLL_SUBM,"Rx[%d] can not get buffer\n", i);
                     break;
                 } else {
                     buf_proxy = _isp_mipi_rx_infos[i].cache_list.pop(-1);
@@ -892,7 +891,7 @@ Isp20PollThread::trigger_readback()
                 ret = _isp_mipi_rx_infos[i].dev->queue_buffer(v4l2buf[i]);
                 if (ret != XCAM_RETURN_NO_ERROR) {
                     _isp_mipi_rx_infos[i].buf_list.pop(-1);
-                    LOGE_CAMHW("Rx[%d] queue buffer failed\n", i);
+                    LOGE_CAMHW_SUBM(ISP20POLL_SUBM,"Rx[%d] queue buffer failed\n", i);
                     break;
                 }
             }
@@ -908,7 +907,7 @@ Isp20PollThread::trigger_readback()
 	    if (_rx_handle_dev->getDhazState())
 	        tg.times++;
 
-            LOGD_CAMHW("%s frame[%d]:ts %" PRId64 "ms, readback %dtimes \n",
+            LOGD_CAMHW_SUBM(ISP20POLL_SUBM,"%s frame[%d]:ts %" PRId64 "ms, readback %dtimes \n",
                        __func__, sequence,
 		       tg.frame_timestamp / 1000 / 1000,
 		       tg.times);
@@ -918,7 +917,7 @@ Isp20PollThread::trigger_readback()
 		    tg.times = 0;
                 _isp_core_dev->io_control(RKISP_CMD_TRIGGER_READ_BACK, &tg);
 	    } else
-                LOGE_CAMHW("%s frame[%d] queue  failed, don't read back!\n",
+                LOGE_CAMHW_SUBM(ISP20POLL_SUBM,"%s frame[%d] queue  failed, don't read back!\n",
                            __func__, sequence);
 
             if (_is_capture_raw && !_first_trigger) {
@@ -1039,7 +1038,7 @@ int Isp20PollThread::calculate_stride_per_line(const struct capture_fmt& fmt,
     /* mipi wc(Word count) must be 4 byte aligned */
     stridePerLine = 4 * DIV_ROUND_UP(actualBytesPerLine, 4);
 
-    LOGD_CAMHW("sns_width: %d, pixelsPerLine: %d, bytesPerLine: %d, stridePerLine: %d\n",
+    LOGD_CAMHW_SUBM(ISP20POLL_SUBM,"sns_width: %d, pixelsPerLine: %d, bytesPerLine: %d, stridePerLine: %d\n",
                sns_width,
                pixelsPerLine,
                bytesPerLine,
@@ -1096,7 +1095,7 @@ Isp20PollThread::write_frame_header_to_raw(FILE *fp, int dev_index,
     fwrite(buffer, sizeof(buffer), 1, fp);
     fflush(fp);
 
-    LOGV_CAMHW("frame%d: image rect: %dx%d, %d bit depth, Bayer fmt: %d, "
+    LOGV_CAMHW_SUBM(ISP20POLL_SUBM,"frame%d: image rect: %dx%d, %d bit depth, Bayer fmt: %d, "
                "hdr frame number: %d, frame type: %d, Storage type: %d, "
                "line stride: %d, Effective line stride: %d\n",
                sequence, sns_width, sns_height,
@@ -1122,7 +1121,7 @@ Isp20PollThread::write_raw_to_file(FILE* fp, int dev_index,
             printf(">");
         printf("\n");
 
-        LOGV_CAMHW("write frame%d raw\n", sequence);
+        LOGV_CAMHW_SUBM(ISP20POLL_SUBM,"write frame%d raw\n", sequence);
     }
 
     return XCAM_RETURN_NO_ERROR;
@@ -1191,11 +1190,11 @@ Isp20PollThread::creat_raw_dir(const char* path)
              timenow->tm_min,
              timenow->tm_sec);
 
-    LOGV_CAMHW("mkdir %s for capturing %d frames raw!\n",
+    LOGV_CAMHW_SUBM(ISP20POLL_SUBM,"mkdir %s for capturing %d frames raw!\n",
                raw_dir_path, _capture_raw_num);
 
     if(mkdir(raw_dir_path, 0755) < 0) {
-        LOGE_CAMHW("mkdir %s error!!!\n", raw_dir_path);
+        LOGE_CAMHW_SUBM(ISP20POLL_SUBM,"mkdir %s error!!!\n", raw_dir_path);
         return XCAM_RETURN_ERROR_PARAM;
     }
 
@@ -1217,7 +1216,7 @@ XCamReturn
 Isp20PollThread::capture_raw_ctl(bool sync)
 {
     _is_raw_sync_yuv = sync;
-    LOGD("capture raw and yuv images simultaneously!");
+    LOGD_CAMHW_SUBM(ISP20POLL_SUBM,"capture raw and yuv images simultaneously!");
 
     return XCAM_RETURN_NO_ERROR;
 }

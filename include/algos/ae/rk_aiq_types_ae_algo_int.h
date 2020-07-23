@@ -53,14 +53,8 @@
  * @brief   The number of mean and hist.
  */
 /*****************************************************************************/
-/*zlj add*/
-#define ISP2_RAWAE_LOGHISTBIN_NUM 100
-#define ISP2_RAWAE_LITE_GRIDNUM 25
-#define ISP2_RAWAE_BIG_GRIDNUM (15*15)
-#define ISP2_RAWAE_BIG_WINX_NUM 4
-
-#define ISP2_RAWHIST_BINNUM_MAX  (1<<8)
-#define ISP2_RAWAE_GRIDNUM_MAX  ((ISP2_RAWAE_LITE_GRIDNUM > ISP2_RAWAE_BIG_GRIDNUM) ? ISP2_RAWAE_LITE_GRIDNUM : ISP2_RAWAE_BIG_GRIDNUM)
+#define ISP2_RAWAE_WINNUM_MAX  ((RAWAELITE_WIN_NUM > RAWAEBIG_WIN_NUM) ? RAWAELITE_WIN_NUM : RAWAEBIG_WIN_NUM)
+#define ISP2_HIST_BINNUM_MAX  ((RAWHIST_BIN_N_MAX > SIHIST_BIN_N_MAX) ? RAWHIST_BIN_N_MAX : SIHIST_BIN_N_MAX)
 
 /*****************************************************************************/
 /**
@@ -77,7 +71,7 @@
  *          CamerIC ISP histogram module.
  *
  *****************************************************************************/
-typedef uint32_t CamerIcHistBins_t[ISP2_RAWHIST_BINNUM_MAX];//the same with BIG/LITE
+typedef uint32_t CamerIcHistBins_t[ISP2_HIST_BINNUM_MAX];
 
 /*****************************************************************************/
 /**
@@ -85,8 +79,8 @@ typedef uint32_t CamerIcHistBins_t[ISP2_RAWHIST_BINNUM_MAX];//the same with BIG/
  *          CamerIC ISP RawAe grid-luma module.
  *
  *****************************************************************************/
-typedef uint8_t CamerIcLiteMeanLuma_t[ISP2_RAWAE_LITE_GRIDNUM];
-typedef uint8_t CamerIcBigMeanLuma_t[ISP2_RAWAE_BIG_GRIDNUM];
+typedef uint8_t CamerIcLiteMeanLuma_t[RAWAELITE_WIN_NUM];
+typedef uint8_t CamerIcBigMeanLuma_t[RAWAEBIG_WIN_NUM];
 
 /*****************************************************************************/
 /**
@@ -224,9 +218,9 @@ typedef enum {
 } NrSwitchMode_t;
 
 typedef enum {
-    CIS_FEATURE_LEVEL_LOW    = 0,        /* Low level*/
-    CIS_FEATURE_LEVEL_HIGH   = 1,       /* High level*/
-} AecCISFeatureLevel_t;
+    NR_FEATURE_LEVEL_LOW    = 0,        /* Low level, LSNR*/
+    NR_FEATURE_LEVEL_HIGH   = 1,       /* High level, HSNR*/
+} AecNRFeatureLevel_t;
 
 /*****************************************************************************/
 /**
@@ -393,7 +387,7 @@ typedef struct AecPreResult_s {
     float M2S_ExpRatio;
 
     float GlobalEnvLv[MAX_HDR_FRAMENUM];
-    float BlockEnvLv[ISP2_RAWAE_BIG_GRIDNUM];
+    float BlockEnvLv[ISP2_RAWAE_WINNUM_MAX];
     float DynamicRange;
 
     unsigned char NormalIndex;
@@ -401,7 +395,7 @@ typedef struct AecPreResult_s {
     RkAiqExpParamComb_t LinearExp;
     RkAiqExpParamComb_t HdrExp[MAX_HDR_FRAMENUM];
 
-    CamerIcHistBins_t AeHistBin[3];
+    CamerIcHistBins_t AeRawHistBin[3];
     CISFeature_t CISFeature;
 
 } AecPreResult_t;
@@ -450,7 +444,7 @@ typedef struct AecProcResult_s {
     float                         MinIntegrationTime;
     float                         MaxIntegrationTime;
 
-    uint8_t                       GridWeights[ISP2_RAWAE_GRIDNUM_MAX];//used for histogram calculation
+    uint8_t                       GridWeights[ISP2_RAWAE_WINNUM_MAX];//used for histogram calculation
 
     float                         MeanLuma;
     float                         LumaDeviation;
@@ -470,7 +464,7 @@ typedef struct AecProcResult_s {
     float                         HdrMinIntegrationTime[MAX_HDR_FRAMENUM];
     float                         HdrMaxIntegrationTime[MAX_HDR_FRAMENUM];
 
-    uint8_t                       HdrGridWeights[3][ISP2_RAWAE_GRIDNUM_MAX];//used for histogram calculation
+    uint8_t                       HdrGridWeights[3][ISP2_RAWAE_WINNUM_MAX];//used for histogram calculation
 } AecProcResult_t;
 
 /* @} AEC */

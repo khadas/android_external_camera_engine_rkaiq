@@ -335,6 +335,196 @@ void test_imgproc(const rk_aiq_sys_ctx_t* ctx) {
         rk_aiq_uapi_setFixedModeCode(ctx, gAfFixedModeCode);
         printf("setFixedModeCode--, gAfFixedModeCode %d\n", gAfFixedModeCode);
         break;
+	case 'I':
+		rk_aiq_nr_IQPara_t stNRIQPara;
+		rk_aiq_nr_IQPara_t stGetNRIQPara;	
+	   stNRIQPara.module_bits = (1<<ANR_MODULE_BAYERNR) | (1<< ANR_MODULE_MFNR) | (1<< ANR_MODULE_UVNR) | (1<< ANR_MODULE_YNR);
+	   stGetNRIQPara.module_bits = (1<<ANR_MODULE_BAYERNR) | (1<< ANR_MODULE_MFNR) | (1<< ANR_MODULE_UVNR) | (1<< ANR_MODULE_YNR);
+       rk_aiq_uapi_getNRIQPara(ctx, &stNRIQPara);  
+	   for(int k=0; k<2; k++){
+		   for(int i=0; i<CALIBDB_NR_SHARP_MAX_ISO_LEVEL; i++ ){
+					//bayernr
+					stNRIQPara.stBayernrPara.setting[k].filtPara[i] = 0.1;
+					stNRIQPara.stBayernrPara.setting[k].lamda = 500;
+					stNRIQPara.stBayernrPara.setting[k].fixW[0][i] = 0.1;
+					stNRIQPara.stBayernrPara.setting[k].fixW[1][i] = 0.1;
+					stNRIQPara.stBayernrPara.setting[k].fixW[2][i] = 0.1;
+					stNRIQPara.stBayernrPara.setting[k].fixW[3][i] = 0.1;
+
+					//mfnr
+					stNRIQPara.stMfnrPara.setting[k].mfnr_iso[i].weight_limit_y[0] = 2;
+					stNRIQPara.stMfnrPara.setting[k].mfnr_iso[i].weight_limit_y[1] = 2;
+					stNRIQPara.stMfnrPara.setting[k].mfnr_iso[i].weight_limit_y[2] = 2;
+					stNRIQPara.stMfnrPara.setting[k].mfnr_iso[i].weight_limit_y[3] = 2;
+
+					stNRIQPara.stMfnrPara.setting[k].mfnr_iso[i].weight_limit_uv[0] = 2;
+					stNRIQPara.stMfnrPara.setting[k].mfnr_iso[i].weight_limit_uv[1] = 2;
+					stNRIQPara.stMfnrPara.setting[k].mfnr_iso[i].weight_limit_uv[2] = 2;
+					
+					stNRIQPara.stMfnrPara.setting[k].mfnr_iso[i].y_lo_bfscale[0] = 0.4;
+					stNRIQPara.stMfnrPara.setting[k].mfnr_iso[i].y_lo_bfscale[1] = 0.6;
+					stNRIQPara.stMfnrPara.setting[k].mfnr_iso[i].y_lo_bfscale[2] = 0.8;
+					stNRIQPara.stMfnrPara.setting[k].mfnr_iso[i].y_lo_bfscale[3] = 1.0;
+
+					stNRIQPara.stMfnrPara.setting[k].mfnr_iso[i].y_hi_bfscale[0] = 0.4;
+					stNRIQPara.stMfnrPara.setting[k].mfnr_iso[i].y_hi_bfscale[1] = 0.6;
+					stNRIQPara.stMfnrPara.setting[k].mfnr_iso[i].y_hi_bfscale[2] = 0.8;
+					stNRIQPara.stMfnrPara.setting[k].mfnr_iso[i].y_hi_bfscale[3] = 1.0;
+
+					stNRIQPara.stMfnrPara.setting[k].mfnr_iso[i].uv_lo_bfscale[0] = 0.1;
+					stNRIQPara.stMfnrPara.setting[k].mfnr_iso[i].uv_lo_bfscale[1] = 0.2;
+					stNRIQPara.stMfnrPara.setting[k].mfnr_iso[i].uv_lo_bfscale[2] = 0.3;
+					
+					stNRIQPara.stMfnrPara.setting[k].mfnr_iso[i].uv_hi_bfscale[0] = 0.1;
+					stNRIQPara.stMfnrPara.setting[k].mfnr_iso[i].uv_hi_bfscale[1] = 0.2;
+					stNRIQPara.stMfnrPara.setting[k].mfnr_iso[i].uv_hi_bfscale[2] = 0.3;
+
+					//ynr
+					stNRIQPara.stYnrPara.setting[k].ynr_iso[i].lo_bfScale[0] = 0.4;
+					stNRIQPara.stYnrPara.setting[k].ynr_iso[i].lo_bfScale[1] = 0.6;
+					stNRIQPara.stYnrPara.setting[k].ynr_iso[i].lo_bfScale[2] = 0.8;
+					stNRIQPara.stYnrPara.setting[k].ynr_iso[i].lo_bfScale[3] = 1.0;
+
+					stNRIQPara.stYnrPara.setting[k].ynr_iso[i].hi_bfScale[0] = 0.4;
+					stNRIQPara.stYnrPara.setting[k].ynr_iso[i].hi_bfScale[1] = 0.6;
+					stNRIQPara.stYnrPara.setting[k].ynr_iso[i].hi_bfScale[2] = 0.8;
+					stNRIQPara.stYnrPara.setting[k].ynr_iso[i].hi_bfScale[3] = 1.0;
+
+					stNRIQPara.stYnrPara.setting[k].ynr_iso[i].hi_denoiseStrength = 1.0;
+					
+					stNRIQPara.stYnrPara.setting[k].ynr_iso[i].hi_denoiseWeight[0] = 1.0;
+					stNRIQPara.stYnrPara.setting[k].ynr_iso[i].hi_denoiseWeight[1] = 1.0;
+					stNRIQPara.stYnrPara.setting[k].ynr_iso[i].hi_denoiseWeight[2] = 1.0;
+					stNRIQPara.stYnrPara.setting[k].ynr_iso[i].hi_denoiseWeight[3] = 1.0;
+
+					stNRIQPara.stYnrPara.setting[k].ynr_iso[i].denoise_weight[0] = 1.0;
+					stNRIQPara.stYnrPara.setting[k].ynr_iso[i].denoise_weight[1] = 1.0;
+					stNRIQPara.stYnrPara.setting[k].ynr_iso[i].denoise_weight[2] = 1.0;
+					stNRIQPara.stYnrPara.setting[k].ynr_iso[i].denoise_weight[3] = 1.0;
+
+					//uvnr
+					stNRIQPara.stUvnrPara.setting[k].step0_uvgrad_ratio[i] = 100;
+					stNRIQPara.stUvnrPara.setting[k].step1_median_ratio[i] = 0.5;
+					stNRIQPara.stUvnrPara.setting[k].step2_median_ratio[i] = 0.5;
+					stNRIQPara.stUvnrPara.setting[k].step1_bf_sigmaR[i] = 20;
+					stNRIQPara.stUvnrPara.setting[k].step2_bf_sigmaR[i] = 16;
+					stNRIQPara.stUvnrPara.setting[k].step3_bf_sigmaR[i] = 8;
+
+		   	}
+    	}
+
+		rk_aiq_uapi_setNRIQPara(ctx, &stNRIQPara); 
+
+		sleep(5);
+		 //printf all the para
+		 rk_aiq_uapi_getNRIQPara(ctx, &stGetNRIQPara);  
+
+		for(int k=0; k<1; k++){
+		   for(int i=0; i<CALIBDB_NR_SHARP_MAX_ISO_LEVEL; i++ ){
+			 printf("\n\n!!!!!!!!!!set:%d cell:%d !!!!!!!!!!\n", k, i);
+			 printf("oyyf222 bayernr: fiter:%f lamda:%f fixw:%f %f %f %f\n",
+			 	stGetNRIQPara.stBayernrPara.setting[k].filtPara[i],
+			 	stGetNRIQPara.stBayernrPara.setting[k].lamda,
+			 	stGetNRIQPara.stBayernrPara.setting[k].fixW[0][i],
+			 	stGetNRIQPara.stBayernrPara.setting[k].fixW[1][i],
+			 	stGetNRIQPara.stBayernrPara.setting[k].fixW[2][i],
+			 	stGetNRIQPara.stBayernrPara.setting[k].fixW[3][i]);
+
+			 printf("oyyf222 mfnr: limiy:%f %f %f %f uv: %f %f %f, y_lo:%f %f %f %f y_hi:%f %f %f %f uv_lo:%f %f %f uv_hi:%f %f %f\n",
+			 	stGetNRIQPara.stMfnrPara.setting[k].mfnr_iso[i].weight_limit_y[0],
+			 	stGetNRIQPara.stMfnrPara.setting[k].mfnr_iso[i].weight_limit_y[1],
+			 	stGetNRIQPara.stMfnrPara.setting[k].mfnr_iso[i].weight_limit_y[2],
+			 	stGetNRIQPara.stMfnrPara.setting[k].mfnr_iso[i].weight_limit_y[3],
+			 	stGetNRIQPara.stMfnrPara.setting[k].mfnr_iso[i].weight_limit_uv[0],
+			 	stGetNRIQPara.stMfnrPara.setting[k].mfnr_iso[i].weight_limit_uv[1],
+			 	stGetNRIQPara.stMfnrPara.setting[k].mfnr_iso[i].weight_limit_uv[2],
+			 	stGetNRIQPara.stMfnrPara.setting[k].mfnr_iso[i].y_lo_bfscale[0],
+			 	stGetNRIQPara.stMfnrPara.setting[k].mfnr_iso[i].y_lo_bfscale[1],
+			 	stGetNRIQPara.stMfnrPara.setting[k].mfnr_iso[i].y_lo_bfscale[2],
+			 	stGetNRIQPara.stMfnrPara.setting[k].mfnr_iso[i].y_lo_bfscale[3],
+			 	stGetNRIQPara.stMfnrPara.setting[k].mfnr_iso[i].y_hi_bfscale[0],
+			 	stGetNRIQPara.stMfnrPara.setting[k].mfnr_iso[i].y_hi_bfscale[1],
+			 	stGetNRIQPara.stMfnrPara.setting[k].mfnr_iso[i].y_hi_bfscale[2],
+			 	stGetNRIQPara.stMfnrPara.setting[k].mfnr_iso[i].y_hi_bfscale[3],
+			 	stGetNRIQPara.stMfnrPara.setting[k].mfnr_iso[i].uv_lo_bfscale[0],
+			 	stGetNRIQPara.stMfnrPara.setting[k].mfnr_iso[i].uv_lo_bfscale[1],
+			 	stGetNRIQPara.stMfnrPara.setting[k].mfnr_iso[i].uv_lo_bfscale[2],
+			 	stGetNRIQPara.stMfnrPara.setting[k].mfnr_iso[i].uv_hi_bfscale[0],
+			 	stGetNRIQPara.stMfnrPara.setting[k].mfnr_iso[i].uv_hi_bfscale[1],
+			 	stGetNRIQPara.stMfnrPara.setting[k].mfnr_iso[i].uv_hi_bfscale[2]);
+
+			  printf("oyyf222 ynr: lo_bf:%f %f %f %f  lo_do:%f %f %f %f  hi_bf:%f %f %f %f stre:%f hi_do:%f %f %f %f\n",
+			 	stGetNRIQPara.stYnrPara.setting[k].ynr_iso[i].lo_bfScale[0],
+			 	stGetNRIQPara.stYnrPara.setting[k].ynr_iso[i].lo_bfScale[1],
+			 	stGetNRIQPara.stYnrPara.setting[k].ynr_iso[i].lo_bfScale[2],
+			 	stGetNRIQPara.stYnrPara.setting[k].ynr_iso[i].lo_bfScale[3],
+			  	stGetNRIQPara.stYnrPara.setting[k].ynr_iso[i].denoise_weight[0],
+			 	stGetNRIQPara.stYnrPara.setting[k].ynr_iso[i].denoise_weight[1],
+			 	stGetNRIQPara.stYnrPara.setting[k].ynr_iso[i].denoise_weight[2],
+			 	stGetNRIQPara.stYnrPara.setting[k].ynr_iso[i].denoise_weight[3],
+			 	stGetNRIQPara.stYnrPara.setting[k].ynr_iso[i].hi_bfScale[0],
+			 	stGetNRIQPara.stYnrPara.setting[k].ynr_iso[i].hi_bfScale[1],
+			 	stGetNRIQPara.stYnrPara.setting[k].ynr_iso[i].hi_bfScale[2],
+			 	stGetNRIQPara.stYnrPara.setting[k].ynr_iso[i].hi_bfScale[3],
+			 	stGetNRIQPara.stYnrPara.setting[k].ynr_iso[i].hi_denoiseStrength,
+			 	stGetNRIQPara.stYnrPara.setting[k].ynr_iso[i].hi_denoiseWeight[0],
+			 	stGetNRIQPara.stYnrPara.setting[k].ynr_iso[i].hi_denoiseWeight[1],
+			 	stGetNRIQPara.stYnrPara.setting[k].ynr_iso[i].hi_denoiseWeight[2],
+			 	stGetNRIQPara.stYnrPara.setting[k].ynr_iso[i].hi_denoiseWeight[3]
+			 	);
+
+			  printf("oyyf222 uvnr: uv:%f  med:%f %f sigmaR:%f %f %f\n",
+			 	stGetNRIQPara.stUvnrPara.setting[k].step0_uvgrad_ratio[i],
+				stGetNRIQPara.stUvnrPara.setting[k].step1_median_ratio[i],
+				stGetNRIQPara.stUvnrPara.setting[k].step2_median_ratio[i],
+				stGetNRIQPara.stUvnrPara.setting[k].step1_bf_sigmaR[i],
+				stGetNRIQPara.stUvnrPara.setting[k].step2_bf_sigmaR[i],
+				stGetNRIQPara.stUvnrPara.setting[k].step3_bf_sigmaR[i]);
+
+			  printf("!!!!!!!!!!set:%d cell:%d  end !!!!!!!!!!\n\n", k, i);
+		   	}
+		}	 	
+		break;
+	 case 'J':
+        rk_aiq_sharp_IQpara_t stSharpIQpara;
+		rk_aiq_sharp_IQpara_t stGetSharpIQpara;
+		stSharpIQpara.module_bits= (1<<ASHARP_MODULE_SHARP) | (1<< ASHARP_MODULE_EDGEFILTER) ;
+		rk_aiq_uapi_getSharpIQPara(ctx, &stSharpIQpara);
+
+		for(int k=0; k<2; k++){
+			for(int i=0; i<CALIBDB_NR_SHARP_MAX_ISO_LEVEL; i++ ){
+				stSharpIQpara.stSharpPara.setting[k].sharp_iso[i].hratio = 1.9;
+				stSharpIQpara.stSharpPara.setting[k].sharp_iso[i].lratio = 0.4;
+				stSharpIQpara.stSharpPara.setting[k].sharp_iso[i].mf_sharp_ratio = 5.0;
+				stSharpIQpara.stSharpPara.setting[k].sharp_iso[i].hf_sharp_ratio = 6.0;
+
+				stSharpIQpara.stEdgeFltPara.setting[k].edgeFilter_iso[i].edge_thed = 33.0;
+				stSharpIQpara.stEdgeFltPara.setting[k].edgeFilter_iso[i].local_alpha = 0.5;
+			}
+		}
+
+		rk_aiq_uapi_setSharpIQPara(ctx, &stSharpIQpara);
+
+		sleep(5);
+		rk_aiq_uapi_getSharpIQPara(ctx, &stGetSharpIQpara);
+
+		for(int k=0; k<1; k++){
+		   for(int i=0; i<CALIBDB_NR_SHARP_MAX_ISO_LEVEL; i++ ){
+		   	 	printf("\n\n!!!!!!!!!!set:%d cell:%d !!!!!!!!!!\n", k, i);
+				printf("oyyf222 sharp:%f %f ratio:%f %f\n",
+					stGetSharpIQpara.stSharpPara.setting[k].sharp_iso[i].lratio,
+					stGetSharpIQpara.stSharpPara.setting[k].sharp_iso[i].hratio,
+					stGetSharpIQpara.stSharpPara.setting[k].sharp_iso[i].mf_sharp_ratio,
+					stGetSharpIQpara.stSharpPara.setting[k].sharp_iso[i].hf_sharp_ratio);
+
+				printf("oyyf222 edgefilter:%f %f\n",
+					stGetSharpIQpara.stEdgeFltPara.setting[k].edgeFilter_iso[i].edge_thed,
+					stGetSharpIQpara.stEdgeFltPara.setting[k].edgeFilter_iso[i].local_alpha);
+
+				printf("!!!!!!!!!!set:%d cell:%d  end !!!!!!!!!!\n", k, i);
+		   	}
+		}   
+       break;
     default:
         break;
     }
@@ -1170,9 +1360,7 @@ int main(int argc, char **argv)
     open_device();
     if (pponeframe)
         open_device_pp_oneframe();
-    init_device();
-    if (pponeframe)
-        init_device_pp_oneframe();
+
     if (writeFile) {
 	fp = fopen(out_file, "w+");
 	if (fp == NULL) {
@@ -1183,23 +1371,34 @@ int main(int argc, char **argv)
 
     char sns_entity_name[64];
     rk_aiq_working_mode_t work_mode = RK_AIQ_WORKING_MODE_NORMAL;
-    const char *cmd = "media-ctl -p | grep sensor -i -B 1 | cut -d ' ' -f 4,5 | grep -e \"^.*[0-9]\" > /tmp/sensor_entity";
-    system(cmd);
-    FILE* tmp = fopen("/tmp/sensor_entity", "r");
-    if (tmp) {
-        size_t n = 64;
-        char *lineptr = sns_entity_name;
-        if (getline(&lineptr, &n, tmp) > 0) {
-            printf("sensor entity name :%s", lineptr);
-            int len = strlen(lineptr);
-            if (lineptr[len - 1] == '\r' || lineptr[len - 1] == '\n')
-                lineptr[len - 1] = '\0';
+    char cmd[128] = {0};
+    for (int i = 0; i < 3; ++i) {
+        memset(cmd, 0, sizeof(cmd));
+            snprintf(cmd, sizeof(cmd),
+             "media-ctl -d /dev/media%d -p | grep sensor -i -B 1 | cut -d ' ' -f 4,5 | grep -e \"^.*[0-9]\" > /tmp/sensor_entity",
+             i);
+        system(cmd);
+        FILE* tmp = fopen("/tmp/sensor_entity", "r");
+        if (tmp) {
+            size_t n = 64;
+            char *lineptr = sns_entity_name;
+            bool find_sns = false;
+            if (getline(&lineptr, &n, tmp) > 0) {
+                printf("sensor entity name :%s", lineptr);
+                int len = strlen(lineptr);
+                if (lineptr[len - 1] == '\r' || lineptr[len - 1] == '\n')
+                    lineptr[len - 1] = '\0';
+                find_sns = true;
+            }
+
+            fclose(tmp);
+            remove("/tmp/sensor_entity");
+            if (find_sns)
+                break;
+        } else {
+            if (i == 2)
+            errno_exit("can't find snesor entity!");
         }
-         
-        fclose(tmp);
-        remove("/tmp/sensor_entity");
-    } else {
-        errno_exit("can't find snesor entity!");
     }
     
     printf("sns_entity_name %s\n", sns_entity_name);
@@ -1213,6 +1412,10 @@ int main(int argc, char **argv)
             work_mode = RK_AIQ_WORKING_MODE_ISP_HDR2;
         } else if (strstr(sns_entity_name, "imx347")) {
             work_mode = RK_AIQ_WORKING_MODE_ISP_HDR2;
+        } else if (strstr(sns_entity_name, "imx307")) {
+            work_mode = RK_AIQ_WORKING_MODE_ISP_HDR2;
+        } else if (strstr(sns_entity_name, "imx415")) {
+            work_mode = RK_AIQ_WORKING_MODE_ISP_HDR2;
         }
     }
 
@@ -1225,16 +1428,21 @@ int main(int argc, char **argv)
 		rk_aiq_uapi_debug_captureRawCtl(aiq_ctx, true);
 
 	    XCamReturn ret = rk_aiq_uapi_sysctl_prepare(aiq_ctx, width, height, work_mode);
+
 	    if (ret != XCAM_RETURN_NO_ERROR)
 		ERR("rk_aiq_uapi_sysctl_prepare failed: %d\n", ret);
 	    else {
 		/* printf("-------- stream on mipi tx/rx -------------\n"); */
-		/* ret = rk_aiq_uapi_sysctl_start(aiq_ctx ); */
+		ret = rk_aiq_uapi_sysctl_start(aiq_ctx );
+
+		init_device();
+		if (pponeframe)
+			init_device_pp_oneframe();
 		start_capturing();
 		if (pponeframe)
 		    start_capturing_pp_oneframe();
 		printf("-------- stream on mipi tx/rx -------------\n");
-		ret = rk_aiq_uapi_sysctl_start(aiq_ctx );
+		/* ret = rk_aiq_uapi_sysctl_start(aiq_ctx ); */
 	    }
 
 	if (vop) {
@@ -1256,6 +1464,9 @@ int main(int argc, char **argv)
 
 	usleep(500 * 1000);
 
+	init_device();
+	if (pponeframe)
+	    init_device_pp_oneframe();
 	start_capturing();
 	if (pponeframe)
 	    start_capturing_pp_oneframe();

@@ -333,6 +333,7 @@
 
 
 #define CALIB_SENSOR_AEC_LINEARAE_CTRL                           "LinearAECtrl"
+#define CALIB_SENSOR_AEC_RAWSTATSEN                              "RawStatsEn"
 #define CALIB_SENSOR_AEC_SETPOINT                                "SetPoint"
 #define CALIB_SENSOR_AEC_NIGHTSETPOINT                           "NightSetpoint"
 #define CALIB_SENSOR_AEC_DYSETPOINTEN                            "DySetPointEn"
@@ -972,6 +973,11 @@
  *****************************************************************************/
 #define CALIB_SENSOR_SENSORINFO                             "SENSORINFO"
 #define CALIB_SENSOR_SENSORINFO_GAINRANGE                   "GainRange"
+#define CALIB_SENSOR_SENSORINFO_GAINRANGE_ISLINEAR          "IsLinear"
+#define CALIB_SENSOR_SENSORINFO_GAINRANGE_LINEAR            "Linear"
+#define CALIB_SENSOR_SENSORINFO_GAINRANGE_NONLINEAR         "NonLinear"
+#define CALIB_SENSOR_SENSORINFO_GAINRANGE_NONLINEAR_DB      "DB_MODE"
+
 #define CALIB_SENSOR_SENSORINFO_TIMEFACTOR                  "TimeFactor"
 #define CALIB_SENSOR_SENSORINFO_CISTIMEREG_SUMFAC           "CISTimeRegSumFac"
 #define CALIB_SENSOR_SENSORINFO_CISTIMEREG_ODEVITY          "CISTimeRegOdevity"
@@ -1046,7 +1052,7 @@
  * XML LUMA DETECT section
  *****************************************************************************/
 #define    CALIB_SENSOR_LUMA_DETECT                     "LUMADETECT"
-#define    CALIB_SENSOR_LUMA_DETECT_ENABLE		"enable"
+#define    CALIB_SENSOR_LUMA_DETECT_ENABLE      "enable"
 #define    CALIB_SENSOR_LUMA_DETECT_THRESHOLD           "threshold"
 
 /******************************************************************************
@@ -1071,6 +1077,12 @@
 #define    CALIB_SENSOR_CPSL_MANUAL_STRENGTH              "manual_strength"
 
 /******************************************************************************
+* XML COLOR_AS_GREY section
+*****************************************************************************/
+#define    CALIB_SENSOR_COLOR_AS_GREY                     "COLOR_AS_GREY"
+#define    CALIB_SENSOR_COLOR_AS_GREY_ENABLE              "enable"
+
+/******************************************************************************
  * XML system section
  *****************************************************************************/
 #define CALIB_SYSTEM_TAG                                    "system"
@@ -1081,6 +1093,8 @@
 #define CALIB_SYSTEM_HDR_LINE_MODE                          "line_mode"
 
 #define CALIB_SYSTEM_DCG_SETTING                            "DCG_SETTING"
+#define CALIB_SYSTEM_DCG_SETTING_HDR                        "Hdr"
+#define CALIB_SYSTEM_DCG_SETTING_NORMAL                     "Normal"
 #define CALIB_SYSTEM_DCG_SUPPORT_EN                         "support_en"
 #define CALIB_SYSTEM_DCG_OPTYPE                             "dcg_optype"
 #define CALIB_SYSTEM_DCG_OPTYPE_AUTO                        "AUTO"

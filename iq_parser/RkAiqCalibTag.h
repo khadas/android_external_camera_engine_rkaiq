@@ -49,37 +49,37 @@
 // should expand non leaf node's tags
 typedef enum CALIB_IQ_TAG_ID_E
 {
-	/******************************************************************************
-	* XML main section
-	*****************************************************************************/
-	CALIB_FILESTART_TAG_ID,
+    /******************************************************************************
+    * XML main section
+    *****************************************************************************/
+    CALIB_FILESTART_TAG_ID,
 
-	/******************************************************************************
-	* XML cell section
-	*****************************************************************************/
-	CALIB_CELL_TAG_ID,
+    /******************************************************************************
+    * XML cell section
+    *****************************************************************************/
+    CALIB_CELL_TAG_ID,
 
-	/******************************************************************************
-	* XML header section
-	*****************************************************************************/
-	CALIB_HEADER_TAG_ID,
-	CALIB_HEADER_CODE_XML_PARSE_VERSION_TAG_ID,
-	CALIB_HEADER_CREATION_DATE_TAG_ID,
-	CALIB_HEADER_CREATOR_TAG_ID,
-	CALIB_HEADER_SENSOR_NAME_TAG_ID,
-	CALIB_HEADER_SAMPLE_NAME_TAG_ID,
-	CALIB_HEADER_GENERATOR_VERSION_TAG_ID,
-	CALIB_HEADER_MAGIC_CODE_TAG_ID,
+    /******************************************************************************
+    * XML header section
+    *****************************************************************************/
+    CALIB_HEADER_TAG_ID,
+    CALIB_HEADER_CODE_XML_PARSE_VERSION_TAG_ID,
+    CALIB_HEADER_CREATION_DATE_TAG_ID,
+    CALIB_HEADER_CREATOR_TAG_ID,
+    CALIB_HEADER_SENSOR_NAME_TAG_ID,
+    CALIB_HEADER_SAMPLE_NAME_TAG_ID,
+    CALIB_HEADER_GENERATOR_VERSION_TAG_ID,
+    CALIB_HEADER_MAGIC_CODE_TAG_ID,
 
-	/******************************************************************************
-	* XML sensor section
-	*****************************************************************************/
-	CALIB_SENSOR_TAG_ID,
+    /******************************************************************************
+    * XML sensor section
+    *****************************************************************************/
+    CALIB_SENSOR_TAG_ID,
 
-	/******************************************************************************
-	* XML sensor AWB tag
-	*****************************************************************************/
-	CALIB_SENSOR_AWB_TAG_ID,
+    /******************************************************************************
+    * XML sensor AWB tag
+    *****************************************************************************/
+    CALIB_SENSOR_AWB_TAG_ID,
     CALIB_SENSOR_AWB_V200_TAG_ID,
     CALIB_SENSOR_AWB_V201_TAG_ID,
     CALIB_SENSOR_AWB_STATEGYPARA_TAG_ID,
@@ -376,6 +376,7 @@ typedef enum CALIB_IQ_TAG_ID_E
 
 
     CALIB_SENSOR_AEC_LINEARAE_CTRL_TAG_ID,
+    CALIB_SENSOR_AEC_RAWSTATS_EN_TAG_ID,
     CALIB_SENSOR_AEC_SETPOINT_TAG_ID,
     CALIB_SENSOR_AEC_NIGHTSETPOINT_TAG_ID,
     CALIB_SENSOR_AEC_DYSETPOINTEN_TAG_ID,
@@ -1057,6 +1058,10 @@ typedef enum CALIB_IQ_TAG_ID_E
     *****************************************************************************/
     CALIB_SENSOR_SENSORINFO_TAG_ID,
     CALIB_SENSOR_SENSORINFO_GAINRANGE_TAG_ID,
+    CALIB_SENSOR_SENSORINFO_GAINRANGE_ISLINEAR_TAG_ID,
+    CALIB_SENSOR_SENSORINFO_GAINRANGE_LINEAR_TAG_ID,
+    CALIB_SENSOR_SENSORINFO_GAINRANGE_NONLINEAR_TAG_ID,
+    CALIB_SENSOR_SENSORINFO_GAINRANGE_NONLINEAR_DB_TAG_ID,
     CALIB_SENSOR_SENSORINFO_TIMEFACTOR_TAG_ID,
     CALIB_SENSOR_SENSORINFO_CISTIMEREG_SUMFAC_TAG_ID,
     CALIB_SENSOR_SENSORINFO_CISTIMEREG_ODEVITY_TAG_ID,
@@ -1120,6 +1125,12 @@ typedef enum CALIB_IQ_TAG_ID_E
     CALIB_SENSOR_ORB_ENABLE_TAG_ID,
 
     /******************************************************************************
+    * XML COLOR_AS_GREY section
+    *****************************************************************************/
+    CALIB_SENSOR_COLOR_AS_GREY_TAG_ID,
+    CALIB_SENSOR_COLOR_AS_GREY_ENABLE_TAG_ID,
+
+    /******************************************************************************
     * XML system section
     *****************************************************************************/
     CALIB_SYSTEM_TAG_ID,
@@ -1130,6 +1141,8 @@ typedef enum CALIB_IQ_TAG_ID_E
     CALIB_SYSTEM_HDR_LINE_MODE_TAG_ID,
 
     CALIB_SYSTEM_DCG_SETTING_TAG_ID,
+    CALIB_SYSTEM_DCG_SETTING_NORMAL_TAG_ID,
+    CALIB_SYSTEM_DCG_SETTING_HDR_TAG_ID,
     CALIB_SYSTEM_DCG_SUPPORT_EN_TAG_ID,
     CALIB_SYSTEM_DCG_OPTYPE_TAG_ID,
     CALIB_SYSTEM_DCG_OPTYPE_AUTO_TAG_ID,
@@ -1148,7 +1161,7 @@ typedef enum CALIB_IQ_TAG_ID_E
     CALIB_SYSTEM_EXP_DELAY_GAIN_TAG_ID,
     CALIB_SYSTEM_EXP_DELAY_DCG_TAG_ID,
 
-	CALIB_IQ_TAG_END,
+    CALIB_IQ_TAG_END,
 } CALIB_IQ_TAG_ID_T;
 
 typedef enum CALIB_TAG_TYPE_E {
@@ -1184,18 +1197,18 @@ extern calib_tag_info_t g_calib_tag_infos[CALIB_IQ_TAG_END];
 
 uint32_t calib_check_calc_checksum();
 int calib_check_getID_by_name(char* tag_name,
-									CALIB_IQ_TAG_ID_T parent_tag_id,
-									CALIB_IQ_TAG_ID_T *tag_id );
+                              CALIB_IQ_TAG_ID_T parent_tag_id,
+                              CALIB_IQ_TAG_ID_T *tag_id );
 
 int calib_check_cell_set_size(CALIB_IQ_TAG_ID_T tag_id,
-									CALIB_IQ_TAG_ID_T parent_tag_id,
-									int size);
+                              CALIB_IQ_TAG_ID_T parent_tag_id,
+                              int size);
 int calib_check_tag_attrs(CALIB_IQ_TAG_ID_T tag_id,
                           uint32_t type,
                           int size,
                           CALIB_IQ_TAG_ID_T parent_tag_id);
 int calib_check_nonleaf_tag_start(CALIB_IQ_TAG_ID_T tag_id,
-										CALIB_IQ_TAG_ID_T parent_tag_id);
+                                  CALIB_IQ_TAG_ID_T parent_tag_id);
 int calib_check_tag_mark(CALIB_IQ_TAG_ID_T tag_id,
                          CALIB_IQ_TAG_ID_T parent_tag_id);
 int calib_check_nonleaf_tag_end(CALIB_IQ_TAG_ID_T tag_id);
@@ -1210,40 +1223,40 @@ int calib_check_nonleaf_tag_end(CALIB_IQ_TAG_ID_T tag_id);
 *****************************************************************************/
 
 #define XML_CHECK_SET_CUR_ID(cur_id) \
-	cur_tag_id = cur_id;
+    cur_tag_id = cur_id;
 
 #define XML_CHECK_START(parent_id, p_parent_id) \
-	CALIB_IQ_TAG_ID_T cur_tag_id = CALIB_IQ_TAG_END; \
-  	CALIB_IQ_TAG_ID_T parent_tag_id = parent_id; \
-	calib_check_nonleaf_tag_start(parent_tag_id, p_parent_id);
+    CALIB_IQ_TAG_ID_T cur_tag_id = CALIB_IQ_TAG_END; \
+    CALIB_IQ_TAG_ID_T parent_tag_id = parent_id; \
+    calib_check_nonleaf_tag_start(parent_tag_id, p_parent_id);
 
 #define XML_CHECK_MARK_IF_NEED(type, size) \
-	calib_tag_info_t *tag_info = &(g_calib_tag_infos[cur_tag_id]); \
-	calib_check_tag_attrs(cur_tag_id, type, size, parent_tag_id); \
-	if(tag_info->sub_tags_array == NULL) { \
-		calib_check_tag_mark(cur_tag_id, parent_tag_id); \
-	}
+    calib_tag_info_t *tag_info = &(g_calib_tag_infos[cur_tag_id]); \
+    calib_check_tag_attrs(cur_tag_id, type, size, parent_tag_id); \
+    if(tag_info->sub_tags_array == NULL) { \
+        calib_check_tag_mark(cur_tag_id, parent_tag_id); \
+    }
 
 #define XML_CHECK_END() \
-	calib_check_nonleaf_tag_end(parent_tag_id);
+    calib_check_nonleaf_tag_end(parent_tag_id);
 
 #define XML_CHECK_CELL_SET_SIZE(size) \
-	calib_check_cell_set_size(cur_tag_id, parent_tag_id, cell_size);
+    calib_check_cell_set_size(cur_tag_id, parent_tag_id, cell_size);
 
 #define XML_CHECK_GET_TAG_ID(tag_name) \
-	calib_check_getID_by_name(tag_name, parent_tag_id, &cur_tag_id);
+    calib_check_getID_by_name(tag_name, parent_tag_id, &cur_tag_id);
 
 #define XML_CHECK_TAGID_COMPARE(tag_id) \
-		cur_tag_id == tag_id
+        cur_tag_id == tag_id
 
 #define XML_CHECK_WHILE_SUBTAG_MARK(tag_name, type, size) \
-		XML_CHECK_SET_CUR_ID(CALIB_IQ_TAG_END); \
-		XML_CHECK_GET_TAG_ID(tag_name); \
-		XML_CHECK_MARK_IF_NEED(type, size);
+        XML_CHECK_SET_CUR_ID(CALIB_IQ_TAG_END); \
+        XML_CHECK_GET_TAG_ID(tag_name); \
+        XML_CHECK_MARK_IF_NEED(type, size);
 
 #define XML_CHECK_TOPTAG_MARK(tag_id, type, size) \
-	XML_CHECK_SET_CUR_ID(tag_id); \
-	XML_CHECK_MARK_IF_NEED(type, size);
+    XML_CHECK_SET_CUR_ID(tag_id); \
+    XML_CHECK_MARK_IF_NEED(type, size);
 
 #endif
 

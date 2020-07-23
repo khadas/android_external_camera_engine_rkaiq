@@ -70,15 +70,15 @@ LensHw::setFocusParams(int position)
     control.id = V4L2_CID_FOCUS_ABSOLUTE;
     control.value = position;
 
-    LOGD_CAMHW("|||set focus result: %d", position);
+    LOGD_CAMHW_SUBM(LENS_SUBM,"|||set focus result: %d", position);
     if (io_control (VIDIOC_S_CTRL, &control) < 0) {
-        LOGE_CAMHW("set focus result failed to device");
+        LOGE_CAMHW_SUBM(LENS_SUBM,"set focus result failed to device");
         return XCAM_RETURN_ERROR_IOCTL;
     }
 
     struct rk_cam_vcm_tim tim;
     if (io_control (RK_VIDIOC_VCM_TIMEINFO, &tim) < 0) {
-        LOGE_CAMHW("set focus result failed to device");
+        LOGE_CAMHW_SUBM(LENS_SUBM,"set focus result failed to device");
         return XCAM_RETURN_ERROR_IOCTL;
     }
     _vcm_tim = tim;
@@ -101,7 +101,7 @@ LensHw::handle_sof(int64_t time, int frameid)
     _frame_time[idx] = time;
     _rec_sof_idx = idx;
 
-    LOGD_CAMHW("%s: frm_id %d, time %lld\n", __func__, frameid, time);
+    LOGD_CAMHW_SUBM(LENS_SUBM,"%s: frm_id %d, time %lld\n", __func__, frameid, time);
 
     EXIT_CAMHW_FUNCTION();
     return ret;
@@ -119,7 +119,7 @@ LensHw::getAfInfoParams(SmartPtr<RkAiqAfInfoProxy>& afInfo, int frame_id)
     if (_afInfoPool->has_free_items()) {
         afInfo = (SmartPtr<RkAiqAfInfoProxy>)_afInfoPool->get_item();
     } else {
-        LOGE_CAMHW("%s: no free params buffer!\n", __FUNCTION__);
+        LOGE_CAMHW_SUBM(LENS_SUBM,"%s: no free params buffer!\n", __FUNCTION__);
         return XCAM_RETURN_ERROR_MEM;
     }
 
@@ -133,11 +133,11 @@ LensHw::getAfInfoParams(SmartPtr<RkAiqAfInfoProxy>& afInfo, int frame_id)
     if (i < LENSHW_RECORD_SOF_NUM) {
         afInfo->data()->sofTime = _frame_time[i];
     } else {
-        LOGE_CAMHW("%s: frame_id %d, can not find sof time!\n", __FUNCTION__, frame_id);
+        LOGE_CAMHW_SUBM(LENS_SUBM,"%s: frame_id %d, can not find sof time!\n", __FUNCTION__, frame_id);
         return  XCAM_RETURN_ERROR_PARAM;
     }
 
-    LOGD_CAMHW("%s: frm_id %d, time %lld\n", __func__, frame_id, afInfo->data()->sofTime);
+    LOGD_CAMHW_SUBM(LENS_SUBM,"%s: frm_id %d, time %lld\n", __func__, frame_id, afInfo->data()->sofTime);
 
     EXIT_CAMHW_FUNCTION();
 

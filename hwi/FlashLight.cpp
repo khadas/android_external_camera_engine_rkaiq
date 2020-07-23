@@ -19,15 +19,6 @@
 #include "xcam_log.h"
 #include "rk-led-flash.h"
 
-#define LOGD_CAMHW_SUBM(sub_modules, ...) XCAM_MODULE_LOG_DEBUG(XCORE_LOG_MODULE_CAMHW, sub_modules, ##__VA_ARGS__)
-#define LOGE_CAMHW_SUBM(sub_modules, ...) XCAM_MODULE_LOG_ERROR(XCORE_LOG_MODULE_CAMHW, sub_modules, ##__VA_ARGS__)
-#define LOGW_CAMHW_SUBM(sub_modules, ...) XCAM_MODULE_LOG_WARNING(XCORE_LOG_MODULE_CAMHW, sub_modules, ##__VA_ARGS__)
-#define LOGV_CAMHW_SUBM(sub_modules, ...) XCAM_MODULE_LOG_VERBOSE(XCORE_LOG_MODULE_CAMHW, sub_modules, ##__VA_ARGS__)
-#define LOGI_CAMHW_SUBM(sub_modules, ...) XCAM_MODULE_LOG_INFO(XCORE_LOG_MODULE_CAMHW, sub_modules, ##__VA_ARGS__)
-#define LOG1_CAMHW_SUBM(sub_modules, ...) XCAM_MODULE_LOG_LOW1(XCORE_LOG_MODULE_CAMHW, sub_modules, ##__VA_ARGS__)
-
-#define FL_SUBM (0x1)
-
 namespace RkCam {
 
 FlashLightHw::FlashLightHw(std::string name[], int num)

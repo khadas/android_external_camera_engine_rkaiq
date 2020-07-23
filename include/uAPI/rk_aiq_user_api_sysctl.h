@@ -246,6 +246,16 @@ int32_t
 offlineRdJobDone(const rk_aiq_sys_ctx_t* ctx);
 
 /*!
+ * \brief set the bypass stream rotation
+ *
+ * \param[in] ctx             context
+ * \param[in] rot             rotation val
+ * \return return 0 if success
+ */
+XCamReturn
+rk_aiq_uapi_sysctl_setSharpFbcRotation(const rk_aiq_sys_ctx_t* ctx, rk_aiq_rotation_t rot);
+
+/*!
  * \brief get aiq version infos
  *
  * \param[in,out] vers         version infos

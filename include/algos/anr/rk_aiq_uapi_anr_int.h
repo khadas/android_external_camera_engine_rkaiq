@@ -22,6 +22,15 @@ rk_aiq_uapi_anr_GetAttrib(const RkAiqAlgoContext *ctx,
                           rk_aiq_nr_attrib_t *attr);
 
 XCamReturn
+rk_aiq_uapi_anr_SetIQPara(RkAiqAlgoContext *ctx,
+                          rk_aiq_nr_IQPara_t *pPara,
+                          bool need_sync);
+
+XCamReturn
+rk_aiq_uapi_anr_GetIQPara(RkAiqAlgoContext *ctx,
+                          rk_aiq_nr_IQPara_t *pPara);
+
+XCamReturn
 rk_aiq_uapi_anr_SetLumaSFStrength(const RkAiqAlgoContext *ctx,
                           float fPercnt);
 

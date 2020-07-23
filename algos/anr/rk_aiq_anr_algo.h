@@ -15,6 +15,10 @@
 
 RKAIQ_BEGIN_DECLARE
 
+ANRresult_t ANRStart(ANRContext_t *pANRCtx);
+
+ANRresult_t ANRStop(ANRContext_t *pANRCtx); 
+
 //anr inint
 ANRresult_t ANRInit(ANRContext_t **ppANRCtx, CamCalibDbContext_t *pCalibDb);
 
@@ -26,6 +30,8 @@ ANRresult_t ANRPrepare(ANRContext_t *pANRCtx, ANRConfig_t* pANRConfig);
 
 //anr reconfig
 ANRresult_t ANRReConfig(ANRContext_t *pANRCtx, ANRConfig_t* pANRConfig);
+
+ANRresult_t ANRIQParaUpdate(ANRContext_t *pANRCtx);
 
 //anr preprocess
 ANRresult_t ANRPreProcess(ANRContext_t *pANRCtx);

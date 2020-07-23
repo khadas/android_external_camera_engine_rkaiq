@@ -67,6 +67,12 @@ typedef struct rk_aiq_range_s {
     float step;
 } rk_aiq_range_t;
 
+typedef enum rk_aiq_rotation_e {
+   RK_AIQ_ROTATION_0,
+   RK_AIQ_ROTATION_90,
+   RK_AIQ_ROTATION_270
+} rk_aiq_rotation_t;
+
 typedef enum {
     /*      Pixel format         FOURCC                          depth  Description  */
 

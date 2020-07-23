@@ -26,6 +26,7 @@ RkAiqHandle::RkAiqHandle(RkAiqAlgoDesComm* des, RkAiqCore* aiqCore)
     : mDes(des)
     , mAiqCore(aiqCore)
     , mEnable(true)
+    , mReConfig(false)
 {
     RkAiqCore::RkAiqAlgosShared_t* shared = &mAiqCore->mAlogsSharedParams;
     mDes->create_context(&mAlgoCtx,
@@ -76,7 +77,8 @@ RkAiqHandle::prepare()
 
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
 
-    init();
+    if (mConfig == NULL)
+        init();
     // build common configs
     RkAiqAlgoCom* cfgParam = mConfig;
     configInparamsCom(cfgParam, RKAIQ_CONFIG_COM_PREPARE);

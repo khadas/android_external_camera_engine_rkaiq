@@ -260,7 +260,9 @@ RkAiqCore::start()
         return XCAM_RETURN_ERROR_ANALYZER;
     }
 
+    mRkAiqCoreTh->triger_start();
     mRkAiqCoreTh->start();
+    mRkAiqCorePpTh->triger_start();
     mRkAiqCorePpTh->start();
     mState = RK_AIQ_CORE_STATE_STARTED;
 
@@ -308,23 +310,31 @@ RkAiqCore::prepare(const rk_aiq_exposure_sensor_descriptor* sensor_des,
     mAlogsSharedParams.working_mode = mode;
 
     if ((mAlogsSharedParams.snsDes.sensor_pixelformat == V4L2_PIX_FMT_GREY) ||
-        (mAlogsSharedParams.snsDes.sensor_pixelformat == V4L2_PIX_FMT_Y10) ||
-        (mAlogsSharedParams.snsDes.sensor_pixelformat == V4L2_PIX_FMT_Y12)) {
-         mAlogsSharedParams.is_bw_sensor = true;
-     } else {
+            (mAlogsSharedParams.snsDes.sensor_pixelformat == V4L2_PIX_FMT_Y10) ||
+            (mAlogsSharedParams.snsDes.sensor_pixelformat == V4L2_PIX_FMT_Y12)) {
+        mAlogsSharedParams.is_bw_sensor = true;
+        mGrayMode = RK_AIQ_GRAY_MODE_ON;
+        mAlogsSharedParams.gray_mode = true;
+    } else {
         mAlogsSharedParams.is_bw_sensor = false;
-     }
+        if (mAlogsSharedParams.calib->colorAsGrey.enable) {
+            mAlogsSharedParams.gray_mode = true;
+            mGrayMode = RK_AIQ_GRAY_MODE_ON;
+        }
+    }
 
     // for not hdr mode
     if (mAlogsSharedParams.working_mode < RK_AIQ_WORKING_MODE_ISP_HDR2)
         enableAlgo(RK_AIQ_ALGO_TYPE_AHDR, 0, false);
-
+    else
+        enableAlgo(RK_AIQ_ALGO_TYPE_AHDR, 0, true);
 #define PREPARE_ALGO(at) \
     LOGD_ANALYZER("%s handle prepare start ....", #at); \
     if (mCur##at##AlgoHdl.ptr() && mCur##at##AlgoHdl->getEnable()) { \
         /* update user initial params */ \
         ret = mCur##at##AlgoHdl->updateConfig(); \
         RKAIQCORE_CHECK_BYPASS(ret, "%s update initial user params failed", #at); \
+        mCur##at##AlgoHdl->setReConfig(mState == RK_AIQ_CORE_STATE_STOPED); \
         ret = mCur##at##AlgoHdl->prepare(); \
         RKAIQCORE_CHECK_BYPASS(ret, "%s prepare failed", #at); \
     } \
@@ -358,6 +368,14 @@ RkAiqCore::prepare(const rk_aiq_exposure_sensor_descriptor* sensor_des,
     mAlogsSharedParams.init = true;
     analyzeInternal();
     analyzeInternalPp();
+
+    if (mAiqCurParams->data()->mIspParams.ptr()) {
+        mAiqCurParams->data()->mIspParams->data()->frame_id = 0;
+    }
+
+    if (mAiqCurParams->data()->mIsppParams.ptr()) {
+        mAiqCurParams->data()->mIsppParams->data()->frame_id = 0;
+    }
 
     mState = RK_AIQ_CORE_STATE_PREPARED;
 
@@ -2092,9 +2110,9 @@ RkAiqCore::convertIspstatsToAlgo(const SmartPtr<VideoBuffer> &buffer)
         mAlogsSharedParams.ispStats.ahdr_stats.tmo_stats.ro_array_min_max[i] = stats->params.hdrtmo.min_max[i];
 
     for(int i = 0; i < ISP2X_YUVAE_MEAN_NUM; i++) {
-        mAlogsSharedParams.ispStats.aec_stats.ae_data.yuv.mean[i] = stats->params.yuvae.mean[i];
+        mAlogsSharedParams.ispStats.aec_stats.ae_data.yuvae.mean[i] = stats->params.yuvae.mean[i];
         if(i < ISP2X_YUVAE_SUBWIN_NUM)
-            mAlogsSharedParams.ispStats.aec_stats.ae_data.yuv.ro_yuvae_sumy[i] = stats->params.yuvae.ro_yuvae_sumy[i];
+            mAlogsSharedParams.ispStats.aec_stats.ae_data.yuvae.ro_yuvae_sumy[i] = stats->params.yuvae.ro_yuvae_sumy[i];
     }
 
     int FrameNum;
@@ -2219,6 +2237,7 @@ RkAiqCore::convertIspstatsToAlgo(const SmartPtr<VideoBuffer> &buffer)
         memcpy(mAlogsSharedParams.ispStats.aec_stats.ae_data.chn[1].rawhist_big.bins, stats->params.rawhist1.hist_bin, ISP2X_HIST_BIN_N_MAX * sizeof(u32));
         memcpy(mAlogsSharedParams.ispStats.aec_stats.ae_data.chn[2].rawhist_lite.bins, stats->params.rawhist0.hist_bin, ISP2X_HIST_BIN_N_MAX * sizeof(u32));
         memcpy(mAlogsSharedParams.ispStats.aec_stats.ae_data.extra.rawhist_big.bins, stats->params.rawhist3.hist_bin, ISP2X_HIST_BIN_N_MAX * sizeof(u32));
+        memcpy(mAlogsSharedParams.ispStats.aec_stats.ae_data.sihist.bins, stats->params.sihst.win_stat[0].hist_bins, ISP2X_SIHIST_BIN_N_MAX * sizeof(u32));
     }
 
     if (expParams.ptr()) {
@@ -2778,6 +2797,15 @@ XCamReturn
 RkAiqCore::setGrayMode(rk_aiq_gray_mode_t mode)
 {
     LOGD_ANALYZER("%s: gray mode %d", __FUNCTION__, mode);
+
+    if (mAlogsSharedParams.is_bw_sensor) {
+        LOGE_ANALYZER("%s: not support for black&white sensor", __FUNCTION__);
+        return XCAM_RETURN_ERROR_PARAM;
+    }
+    if (mAlogsSharedParams.calib->colorAsGrey.enable) {
+        LOGE_ANALYZER("%s: not support,since color_as_grey is enabled in xml", __FUNCTION__);
+        return XCAM_RETURN_ERROR_PARAM;
+    }
 
     mGrayMode = mode;
     if (mode == RK_AIQ_GRAY_MODE_OFF)

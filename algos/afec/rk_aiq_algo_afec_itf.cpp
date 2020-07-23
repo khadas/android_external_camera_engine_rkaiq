@@ -225,6 +225,23 @@ prepare(RkAiqAlgoCom* params)
               fecCtx->fec_mesh_h_size, fecCtx->fec_mesh_v_size,
               fecCtx->fec_mesh_size);
 
+    // need realloc ?
+    if (fecCtx->meshxi) {
+        free(fecCtx->meshxi);
+        fecCtx->meshxi = NULL;
+    }
+    if (fecCtx->meshxf) {
+        free(fecCtx->meshxf);
+        fecCtx->meshxf = NULL;
+    }
+    if (fecCtx->meshyi) {
+        free(fecCtx->meshyi);
+        fecCtx->meshyi = NULL;
+    }
+    if (fecCtx->meshyf) {
+        free(fecCtx->meshyf);
+        fecCtx->meshyf = NULL;
+    }
     fecCtx->meshxi = (unsigned short*)malloc(fecCtx->fec_mesh_size * sizeof(unsigned short));
     fecCtx->meshxf = (unsigned char*)malloc(fecCtx->fec_mesh_size * sizeof(unsigned char));
     fecCtx->meshyi = (unsigned short*)malloc(fecCtx->fec_mesh_size * sizeof(unsigned short));

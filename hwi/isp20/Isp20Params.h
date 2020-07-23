@@ -24,6 +24,7 @@
 
 namespace RkCam {
 
+#define ISP20PARAM_SUBM (0x2)
 
 class Isp20Params {
 public:

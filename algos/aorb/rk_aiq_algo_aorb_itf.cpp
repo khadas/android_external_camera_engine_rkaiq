@@ -145,6 +145,7 @@ XCamReturn ORBPreProcess(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outparam
         rkaiqAorbPreOut->orb_pre_result.valid = 0;
         ORBctx->initialized = 1;
         ORBctx->orb_stats = rkaiqAorbPreParam->orb_stats;
+        ORBctx->orb_stats.num_points = 0;
     } else {
         if (ORBctx->orb_stats.num_points > 0 &&
                 rkaiqAorbPreParam->orb_stats.num_points > 0) {

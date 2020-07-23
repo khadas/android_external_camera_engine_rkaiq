@@ -99,23 +99,6 @@ typedef struct Uapi_HdrExpAttr_s {
  */
 /*****************************************************************************/
 typedef struct window Aec_Win_t;
-typedef struct Uapi_ExpHwAttr_s {
-#if 0
-    Aec_Win_t AeBig1;
-    Aec_Win_t AeBig2;
-    Aec_Win_t AeBig3;
-    Aec_Win_t AeLite;
-    Aec_Win_t YuvAe;
-    Aec_Win_t HistBig1;
-    Aec_Win_t HistBig2;
-    Aec_Win_t HistBig3;
-    Aec_Win_t HistLite;
-#else
-    Aec_Win_t Chn_wnd[3];
-    Aec_Win_t Extra_wnd;
-    Aec_Win_t YuvAe_wnd;
-#endif
-} Uapi_ExpHwAttr_t;
 
 /*****************************************************************************/
 /**

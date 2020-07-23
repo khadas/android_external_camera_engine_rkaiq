@@ -33,6 +33,41 @@ rk_aiq_uapi_asharp_GetAttrib(const RkAiqAlgoContext *ctx,
 }
 
 XCamReturn
+rk_aiq_uapi_asharp_SetIQpara(RkAiqAlgoContext *ctx,
+                             rk_aiq_sharp_IQpara_t *para,
+                             bool need_sync)
+{
+
+    AsharpContext_t* pAsharpCtx = (AsharpContext_t*)ctx;
+
+    if(para->module_bits & (1 << ASHARP_MODULE_SHARP)){
+		pAsharpCtx->stSharpCalib = para->stSharpPara;
+		pAsharpCtx->isIQParaUpdate = true;
+    }	
+
+	if(para->module_bits & (1 << ASHARP_MODULE_EDGEFILTER)){
+		pAsharpCtx->stEdgeFltCalib = para->stEdgeFltPara;
+		pAsharpCtx->isIQParaUpdate = true;
+    }
+	
+    return XCAM_RETURN_NO_ERROR;
+}
+
+XCamReturn
+rk_aiq_uapi_asharp_GetIQpara(const RkAiqAlgoContext *ctx,
+                             rk_aiq_sharp_IQpara_t *para)
+{
+
+ 	AsharpContext_t* pAsharpCtx = (AsharpContext_t*)ctx;
+
+	para->stSharpPara = pAsharpCtx->stSharpCalib;
+	para->stEdgeFltPara = pAsharpCtx->stEdgeFltCalib;
+	
+    return XCAM_RETURN_NO_ERROR;
+}
+
+
+XCamReturn
 rk_aiq_uapi_asharp_SetStrength(const RkAiqAlgoContext *ctx,
                              float fPercent)
 {

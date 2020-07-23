@@ -64,6 +64,8 @@ using namespace XCam;
 
 namespace RkCam {
 
+#define SENSOR_SUBM (0x4)
+
 class SensorHw : public V4l2SubDevice {
 public:
     explicit SensorHw(const char* name);

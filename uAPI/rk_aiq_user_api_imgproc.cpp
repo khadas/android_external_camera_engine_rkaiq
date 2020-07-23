@@ -1509,6 +1509,32 @@ XCamReturn rk_aiq_uapi_getMTNRStrth(const rk_aiq_sys_ctx_t* ctx, bool *on, unsig
     return ret;
 }
 
+XCamReturn rk_aiq_uapi_setNRIQPara(const rk_aiq_sys_ctx_t* ctx, rk_aiq_nr_IQPara_t *para)
+{
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    IMGPROC_FUNC_ENTER
+    if (ctx == NULL) {
+        ret = XCAM_RETURN_ERROR_PARAM;
+        RKAIQ_IMGPROC_CHECK_RET(ret, "ctx is null, setMTNRStrth failed!");
+    }
+    ret = rk_aiq_user_api_anr_SetIQPara(ctx, para);
+    IMGPROC_FUNC_EXIT
+    return ret;
+}
+
+XCamReturn rk_aiq_uapi_getNRIQPara(const rk_aiq_sys_ctx_t* ctx, rk_aiq_nr_IQPara_t *para)
+{
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    IMGPROC_FUNC_ENTER
+    if (ctx == NULL) {
+        ret = XCAM_RETURN_ERROR_PARAM;
+        RKAIQ_IMGPROC_CHECK_RET(ret, "ctx is null, getMTNRStrth failed!");
+    }
+    ret = rk_aiq_user_api_anr_GetIQPara(ctx, para);
+    IMGPROC_FUNC_EXIT
+    return ret;
+}
+
 /*
 **********************************************************
 * Dehazer
@@ -1877,6 +1903,37 @@ XCamReturn rk_aiq_uapi_getSharpness(const rk_aiq_sys_ctx_t* ctx, unsigned int *l
     IMGPROC_FUNC_EXIT
     return ret;
 }
+
+XCamReturn rk_aiq_uapi_setSharpIQPara(const rk_aiq_sys_ctx_t* ctx, rk_aiq_sharp_IQpara_t *para)
+{
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+	
+    IMGPROC_FUNC_ENTER
+    if (ctx == NULL) {
+        ret = XCAM_RETURN_ERROR_PARAM;
+        RKAIQ_IMGPROC_CHECK_RET(ret, "ctx is null, setSharpIQPara failed!");
+    }
+    ret = rk_aiq_user_api_asharp_SetIQPara(ctx, para);
+    IMGPROC_FUNC_EXIT
+
+    return ret;
+}
+
+XCamReturn rk_aiq_uapi_getSharpIQPara(const rk_aiq_sys_ctx_t* ctx, rk_aiq_sharp_IQpara_t *para)
+{
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+
+    IMGPROC_FUNC_ENTER
+    if (ctx == NULL) {
+        ret = XCAM_RETURN_ERROR_PARAM;
+        RKAIQ_IMGPROC_CHECK_RET(ret, "ctx is null, getSharpIQPara failed!");
+    }
+    ret = rk_aiq_user_api_asharp_GetIQPara(ctx, para);
+    IMGPROC_FUNC_EXIT
+		
+    return ret;
+}
+
 
 XCamReturn rk_aiq_uapi_setGammaCoef(const rk_aiq_sys_ctx_t* ctx, unsigned int level)
 {

@@ -22,6 +22,7 @@
 #define XCAM_V4L2_DEVICE_H
 
 #include <xcam_std.h>
+#include <xcam_mutex.h>
 #include <linux/videodev2.h>
 #include <linux/v4l2-subdev.h>
 #include <list>
@@ -108,14 +109,15 @@ public:
 
     std::list<struct v4l2_fmtdesc> enum_formats ();
 
-    virtual XCamReturn start ();
+    virtual XCamReturn start (bool prepared = false);
     virtual XCamReturn stop ();
+    XCamReturn prepare ();
 
     int poll_event (int timeout_msec, int stop_fd);
 
     SmartPtr<V4l2Buffer> get_buffer_by_index (int index);
     virtual XCamReturn dequeue_buffer (SmartPtr<V4l2Buffer> &buf);
-    virtual XCamReturn queue_buffer (SmartPtr<V4l2Buffer> &buf);
+    virtual XCamReturn queue_buffer (SmartPtr<V4l2Buffer> &buf, bool locked = false);
     XCamReturn return_buffer (SmartPtr<V4l2Buffer> &buf);
     // get free buf for type V4L2_BUF_TYPE_xxx_OUTPUT
     XCamReturn get_buffer (SmartPtr<V4l2Buffer> &buf) const;
@@ -159,6 +161,7 @@ protected:
     BufferPool          _buf_pool;
     uint32_t            _buf_count;
     uint32_t            _queued_bufcnt;
+    mutable Mutex      _buf_mutex;
     XCamReturn buffer_new();
     XCamReturn buffer_del();
 };
@@ -173,8 +176,11 @@ public:
     XCamReturn unsubscribe_event (int event);
     XCamReturn dequeue_event (struct v4l2_event &event);
     XCamReturn get_selection (int pad, struct v4l2_subdev_selection &select);
+    XCamReturn setFormat(struct v4l2_subdev_format &aFormat);
+    XCamReturn getFormat(struct v4l2_subdev_format &aFormat);
+    XCamReturn set_selection (struct v4l2_subdev_selection &aSelection);
 
-    virtual XCamReturn start ();
+    virtual XCamReturn start (bool prepared = false);
     virtual XCamReturn stop ();
 
 private:

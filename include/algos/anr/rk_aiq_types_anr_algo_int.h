@@ -577,6 +577,25 @@ typedef struct ANRExpInfo_s {
 } ANRExpInfo_t;
 
 
+typedef enum rk_aiq_nr_module_e{
+    ANR_MODULE_BAYERNR      = 0,                   /**< instance is created, but not initialized */
+    ANR_MODULE_MFNR         = 1,                   /**< instance is confiured (ready to start) or stopped */
+    ANR_MODULE_UVNR         = 2,                   /**< instance is running (processes frames) */
+    ANR_MODULE_YNR          = 3,                   /**< instance is locked (for taking snapshots) */               /**< max */
+} rk_aiq_nr_module_t;
+
+
+typedef struct rk_aiq_nr_IQPara_s {
+    int module_bits;//judge by bits
+	
+	CalibDb_BayerNr_t stBayernrPara;
+	CalibDb_MFNR_t stMfnrPara;
+	CalibDb_UVNR_t stUvnrPara;
+	CalibDb_YNR_t stYnrPara;
+    
+} rk_aiq_nr_IQPara_t;
+
+
 RKAIQ_END_DECLARE
 
 #endif

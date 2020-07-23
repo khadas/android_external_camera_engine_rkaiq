@@ -47,6 +47,33 @@ rk_aiq_user_api_asharp_GetAttrib(const rk_aiq_sys_ctx_t* sys_ctx, rk_aiq_sharp_a
 }
 
 XCamReturn
+rk_aiq_user_api_asharp_SetIQPara(const rk_aiq_sys_ctx_t* sys_ctx, rk_aiq_sharp_IQpara_t *para)
+{
+    RkAiqAsharpHandleInt* algo_handle =
+        algoHandle<RkAiqAsharpHandleInt>(sys_ctx, RK_AIQ_ALGO_TYPE_ASHARP);
+
+    if (algo_handle) {
+        return algo_handle->setIQPara(para);
+    }
+
+    return XCAM_RETURN_NO_ERROR;
+}
+
+XCamReturn
+rk_aiq_user_api_asharp_GetIQPara(const rk_aiq_sys_ctx_t* sys_ctx, rk_aiq_sharp_IQpara_t *para)
+{
+    RkAiqAsharpHandleInt* algo_handle =
+        algoHandle<RkAiqAsharpHandleInt>(sys_ctx, RK_AIQ_ALGO_TYPE_ASHARP);
+
+    if (algo_handle) {
+        return algo_handle->getIQPara(para);
+    }
+
+    return XCAM_RETURN_NO_ERROR;
+}
+
+
+XCamReturn
 rk_aiq_user_api_asharp_SetStrength(const rk_aiq_sys_ctx_t* sys_ctx, float fPercent)
 {
     RkAiqAsharpHandleInt* algo_handle =

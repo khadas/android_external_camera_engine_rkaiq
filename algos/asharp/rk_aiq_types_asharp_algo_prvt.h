@@ -68,6 +68,7 @@ typedef struct AsharpContext_s {
 
     float fStrength;
 
+	bool isIQParaUpdate;
 } AsharpContext_t;
 
 

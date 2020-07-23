@@ -122,6 +122,7 @@ RkLumaCore::start()
         return XCAM_RETURN_ERROR_ANALYZER;
     }
 
+    mRkLumaCoreTh->triger_start();
     mRkLumaCoreTh->start();
     mState = RK_AIQ_CORE_STATE_STARTED;
 
@@ -173,7 +174,7 @@ RkLumaCore::prepare(int mode)
 XCamReturn
 RkLumaCore::analyze(const SmartPtr<VideoBuffer> &buffer)
 {
-    uint16_t hdrProcessCnt = 1;
+    uint16_t hdrProcessCnt = 0;
     const SmartPtr<V4l2BufferProxy> buf =
         buffer.dynamic_cast_ptr<V4l2BufferProxy>();
 #ifdef RK_SIMULATOR_HW
