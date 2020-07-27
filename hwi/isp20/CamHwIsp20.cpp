@@ -958,21 +958,25 @@ CamHwIsp20::setupPipelineFmtCif(struct v4l2_subdev_selection& sns_sd_sel,
 
     for (int i = 0; i < 3; i++) {
         _mipi_tx_devs[i]->get_format (format);
-        if (format.fmt.pix.width == sns_sd_sel.r.width &&
-            format.fmt.pix.height == sns_sd_sel.r.height &&
-            format.fmt.pix.pixelformat == sns_v4l_pix_fmt)
-            continue;
-
-        _mipi_tx_devs[i]->set_format(sns_sd_sel.r.width,
-                                     sns_sd_sel.r.height,
-                                     sns_v4l_pix_fmt,
-                                     V4L2_FIELD_NONE,
-                                     0);
-        _mipi_rx_devs[i]->set_format(sns_sd_sel.r.width,
-                                     sns_sd_sel.r.height,
-                                     sns_v4l_pix_fmt,
-                                     V4L2_FIELD_NONE,
-                                     0);
+        if (format.fmt.pix.width != sns_sd_sel.r.width ||
+            format.fmt.pix.height != sns_sd_sel.r.height ||
+            format.fmt.pix.pixelformat != sns_v4l_pix_fmt) {
+            _mipi_tx_devs[i]->set_format(sns_sd_sel.r.width,
+                                         sns_sd_sel.r.height,
+                                         sns_v4l_pix_fmt,
+                                         V4L2_FIELD_NONE,
+                                         0);
+        }
+        _mipi_rx_devs[i]->get_format (format);
+        if (format.fmt.pix.width != sns_sd_sel.r.width ||
+            format.fmt.pix.height != sns_sd_sel.r.height ||
+            format.fmt.pix.pixelformat != sns_v4l_pix_fmt) {
+            _mipi_rx_devs[i]->set_format(sns_sd_sel.r.width,
+                                         sns_sd_sel.r.height,
+                                         sns_v4l_pix_fmt,
+                                         V4L2_FIELD_NONE,
+                                         0);
+        }
     }
 
     LOGD_CAMHW_SUBM(ISP20HW_SUBM, "mipi tx/rx fmt info: fmt 0x%x, %dx%d !",
@@ -1026,7 +1030,7 @@ CamHwIsp20::setupPipelineFmtCif(struct v4l2_subdev_selection& sns_sd_sel,
 
     // set isp rkisp-isp-subdev src crop
     aSelection.pad = 2;
-#if 0 // isp src has no crop
+#if 1 // isp src has no crop
     ret = mIspCoreDev->set_selection (aSelection);
     if (ret) {
         LOGE_CAMHW_SUBM(ISP20HW_SUBM, "set mIspCoreDev source crop failed !\n");
@@ -1078,21 +1082,25 @@ CamHwIsp20::setupPipelineFmtIsp(struct v4l2_subdev_selection& sns_sd_sel,
 
     for (int i = 0; i < 3; i++) {
         _mipi_tx_devs[i]->get_format (format);
-        if (format.fmt.pix.width == sns_sd_fmt.format.width &&
-            format.fmt.pix.height == sns_sd_fmt.format.height &&
-            format.fmt.pix.pixelformat == sns_v4l_pix_fmt)
-            continue;
-
-        _mipi_tx_devs[i]->set_format(sns_sd_fmt.format.width,
-                                     sns_sd_fmt.format.height,
-                                     sns_v4l_pix_fmt,
-                                     V4L2_FIELD_NONE,
-                                     0);
-        _mipi_rx_devs[i]->set_format(sns_sd_fmt.format.width,
-                                     sns_sd_fmt.format.height,
-                                     sns_v4l_pix_fmt,
-                                     V4L2_FIELD_NONE,
-                                     0);
+        if (format.fmt.pix.width != sns_sd_fmt.format.width ||
+            format.fmt.pix.height != sns_sd_fmt.format.height ||
+            format.fmt.pix.pixelformat != sns_v4l_pix_fmt) {
+            _mipi_tx_devs[i]->set_format(sns_sd_fmt.format.width,
+                                         sns_sd_fmt.format.height,
+                                         sns_v4l_pix_fmt,
+                                         V4L2_FIELD_NONE,
+                                         0);
+        }
+        _mipi_rx_devs[i]->get_format (format);
+        if (format.fmt.pix.width != sns_sd_fmt.format.width ||
+            format.fmt.pix.height != sns_sd_fmt.format.height ||
+            format.fmt.pix.pixelformat != sns_v4l_pix_fmt) {
+            _mipi_rx_devs[i]->set_format(sns_sd_fmt.format.width,
+                                         sns_sd_fmt.format.height,
+                                         sns_v4l_pix_fmt,
+                                         V4L2_FIELD_NONE,
+                                         0);
+        }
     }
 
     LOGD_CAMHW_SUBM(ISP20HW_SUBM, "mipi tx/rx fmt info: fmt 0x%x, %dx%d !",
@@ -1152,7 +1160,7 @@ CamHwIsp20::setupPipelineFmtIsp(struct v4l2_subdev_selection& sns_sd_sel,
     aSelection.r.top = 0;
     aSelection.r.width = sns_sd_sel.r.width;
     aSelection.r.height = sns_sd_sel.r.height;
-#if 0 // isp src has no crop
+#if 1 // isp src has no crop
     ret = mIspCoreDev->set_selection (aSelection);
     if (ret) {
         LOGE_CAMHW_SUBM(ISP20HW_SUBM, "set mIspCoreDev source crop failed !\n");
