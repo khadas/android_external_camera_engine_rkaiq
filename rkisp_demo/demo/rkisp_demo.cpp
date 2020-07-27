@@ -1308,7 +1308,7 @@ void parse_args(int argc, char **argv)
 
 static void deinit() 
 {
-    stop_capturing();
+    // stop_capturing();
     if (pponeframe)
         stop_capturing_pp_oneframe();
 	if (aiq_ctx) {
@@ -1319,7 +1319,7 @@ static void deinit()
         printf("-------- deinit aiq end -------------\n");
 	}
 
-    //stop_capturing();
+    stop_capturing();
     uninit_device();
     if (pponeframe)
         uninit_device_pp_oneframe();
