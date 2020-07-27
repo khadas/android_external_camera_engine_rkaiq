@@ -1225,7 +1225,7 @@ CamHwIsp20::setupPipelineFmt()
     struct v4l2_subdev_selection sns_sd_sel;
     memset(&sns_sd_sel, 0, sizeof(sns_sd_sel));
 
-    ret = mSensorDev->get_selection(0, sns_sd_sel);
+    ret = mSensorDev->get_selection(0, V4L2_SEL_TGT_CROP_BOUNDS, sns_sd_sel);
     if (ret) {
         LOGW_CAMHW_SUBM(ISP20HW_SUBM, "get_selection failed !\n");
         // TODO, some sensor driver has not implemented this
@@ -2544,7 +2544,7 @@ CamHwIsp20::getSensorModeData(const char* sns_ent_name,
     }
 
     xcam_mem_clear (select);
-    ret = mIspCoreDev->get_selection(0, select);
+    ret = mIspCoreDev->get_selection(0, V4L2_SEL_TGT_CROP, select);
     if (ret == XCAM_RETURN_NO_ERROR) {
         sns_des.isp_acq_width = select.r.width;
         sns_des.isp_acq_height = select.r.height;
