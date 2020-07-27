@@ -1131,14 +1131,14 @@ V4l2SubDevice::dequeue_event (struct v4l2_event &event)
 }
 
 XCamReturn
-V4l2SubDevice::get_selection (int pad, struct v4l2_subdev_selection &select)
+V4l2SubDevice::get_selection (int pad, uint32_t target, struct v4l2_subdev_selection &select)
 {
     int ret = 0;
     XCAM_ASSERT (is_opened());
 
     select.pad = pad;
     select.which = V4L2_SUBDEV_FORMAT_ACTIVE;
-    select.target = V4L2_SEL_TGT_CROP_BOUNDS;
+    select.target = target;
 
     ret = this->io_control (VIDIOC_SUBDEV_G_SELECTION, &select);
     if (ret < 0) {

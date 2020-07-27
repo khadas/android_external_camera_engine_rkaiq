@@ -175,7 +175,7 @@ public:
     XCamReturn subscribe_event (int event);
     XCamReturn unsubscribe_event (int event);
     XCamReturn dequeue_event (struct v4l2_event &event);
-    XCamReturn get_selection (int pad, struct v4l2_subdev_selection &select);
+    XCamReturn get_selection (int pad, uint32_t target, struct v4l2_subdev_selection &select);
     XCamReturn setFormat(struct v4l2_subdev_format &aFormat);
     XCamReturn getFormat(struct v4l2_subdev_format &aFormat);
     XCamReturn set_selection (struct v4l2_subdev_selection &aSelection);
