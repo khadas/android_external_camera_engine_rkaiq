@@ -530,6 +530,9 @@ Isp20PollThread::hdr_mipi_stop()
 void
 Isp20PollThread::set_hdr_frame_readback_infos(int frame_id, int times)
 {
+    if (_working_mode == RK_AIQ_WORKING_MODE_NORMAL)
+        return;
+
     _mipi_trigger_mutex.lock();
     _isp_hdr_fid2times_map[frame_id] = times;
     LOGD_CAMHW_SUBM(ISP20POLL_SUBM,"rdtimes seq %d \n", frame_id);
@@ -749,7 +752,7 @@ Isp20PollThread::trigger_readback()
     SmartPtr<V4l2Buffer> v4l2buf[3];
     SmartPtr<V4l2BufferProxy> buf_proxy;
     uint32_t sequence = -1;
-    int times = -1;
+    sint32_t additional_times = -1;
 
     _mipi_trigger_mutex.lock();
     _isp_hdr_fid2ready_map.size();
@@ -763,53 +766,37 @@ Isp20PollThread::trigger_readback()
     sequence = it_ready->first;
 
     if (_working_mode != RK_AIQ_WORKING_MODE_NORMAL) {
-	std::map<uint32_t, int>::iterator it_times_del;
-	for (std::map<uint32_t, int>::iterator iter = _isp_hdr_fid2times_map.begin();
-	     iter != _isp_hdr_fid2times_map.end();) {
-	    if (iter->first < sequence) {
-		it_times_del = iter++;
-		LOGD_CAMHW_SUBM(ISP20POLL_SUBM,"del seq %d", it_times_del->first);
-		_isp_hdr_fid2times_map.erase(it_times_del);
-	    } else if (iter->first == sequence) {
-		times = iter->second;
-		it_times_del = iter++;
-		LOGD_CAMHW_SUBM(ISP20POLL_SUBM,"del seq %d", it_times_del->first);
-		_isp_hdr_fid2times_map.erase(it_times_del);
-		break;
-	    } else {
-		LOGW_CAMHW_SUBM(ISP20POLL_SUBM,"%s missing rdtimes for buf_seq %d, min rdtimes_seq %d !",
-				__func__, sequence, iter->first);
-		times = 0;
-		break;
-	    }
-	}
+        std::map<uint32_t, int>::iterator it_times_del;
+        for (std::map<uint32_t, int>::iterator iter = _isp_hdr_fid2times_map.begin();
+             iter != _isp_hdr_fid2times_map.end();) {
+            if (iter->first < sequence) {
+                it_times_del = iter++;
+                LOGD_CAMHW_SUBM(ISP20POLL_SUBM,"del seq %d", it_times_del->first);
+                _isp_hdr_fid2times_map.erase(it_times_del);
+            } else if (iter->first == sequence) {
+                additional_times = iter->second;
+                it_times_del = iter++;
+                LOGD_CAMHW_SUBM(ISP20POLL_SUBM,"del seq %d", it_times_del->first);
+                _isp_hdr_fid2times_map.erase(it_times_del);
+                break;
+            } else {
+                LOGW_CAMHW_SUBM(ISP20POLL_SUBM,"%s missing rdtimes for buf_seq %d, min rdtimes_seq %d !",
+                        __func__, sequence, iter->first);
+                additional_times = 0;
+                break;
+            }
+        }
     } else {
-        times = 0;
+        additional_times = 0;
     }
 
-    if (times == -1) {
-	LOGD_CAMHW_SUBM(ISP20POLL_SUBM,"%s rdtimes not ready for seq %d !", __func__, sequence);
-	_mipi_trigger_mutex.unlock();
-	return;
+    if (additional_times == -1) {
+        LOGD_CAMHW_SUBM(ISP20POLL_SUBM,"%s rdtimes not ready for seq %d !", __func__, sequence);
+        _mipi_trigger_mutex.unlock();
+        return;
     }
 
     _isp_hdr_fid2ready_map.erase(it_ready);
-
-    struct isp2x_csi_trigger tg = {
-        .frame_id = sequence,
-        .times = times,
-    };
-
-#if 0
-    /* TODO: fix the trigger time for ahdr temporarily */
-    if (_mipi_dev_max == 1)
-        tg.times = 1;
-    else
-        tg.times = 2;
-    LOGW_CAMHW_SUBM(ISP20POLL_SUBM,"%s fix the trigger to %d time for ahdr temporarily\n",
-               __func__,
-               tg.times);
-#endif
 
     if (_rx_handle_dev) {
         if (_rx_handle_dev->setIspParamsSync(sequence) ||
@@ -847,10 +834,10 @@ Isp20PollThread::trigger_readback()
                 } else {
                     buf_proxy = _isp_mipi_rx_infos[i].cache_list.pop(-1);
                     _isp_mipi_rx_infos[i].buf_list.push(buf_proxy);
-		    if (_isp_mipi_rx_infos[i].dev->get_mem_type() == V4L2_MEMORY_USERPTR)
+                    if (_isp_mipi_rx_infos[i].dev->get_mem_type() == V4L2_MEMORY_USERPTR)
                         v4l2buf[i]->set_expbuf_usrptr(buf_proxy->get_v4l2_userptr());
-		    else if (_isp_mipi_rx_infos[i].dev->get_mem_type() == V4L2_MEMORY_DMABUF)
-		        v4l2buf[i]->set_expbuf_fd(buf_proxy->get_expbuf_fd());
+                    else if (_isp_mipi_rx_infos[i].dev->get_mem_type() == V4L2_MEMORY_DMABUF)
+                        v4l2buf[i]->set_expbuf_fd(buf_proxy->get_expbuf_fd());
 
                     if (_is_capture_raw && _capture_raw_num > 0) {
                         if (!_is_raw_dir_exist) {
@@ -896,29 +883,32 @@ Isp20PollThread::trigger_readback()
                 }
             }
 
+            struct isp2x_csi_trigger tg = {
+                .frame_id = sequence,
+                .times = 0,
+            };
+
+            if (_first_trigger)
+                tg.times = 1;
+            else
+                tg.times += additional_times;
+
+            if (_rx_handle_dev->getDhazState())
+                tg.times++;
+            if (tg.times > 2)
+                tg.times = 2;
             tg.frame_timestamp = buf_proxy->get_timestamp () * 1000;
 
-	    if (_first_trigger) {
-		tg.times = 0;
-		if (_working_mode != RK_AIQ_WORKING_MODE_NORMAL)
-		    tg.times++;
-	    }
-
-	    if (_rx_handle_dev->getDhazState())
-	        tg.times++;
-
             LOGD_CAMHW_SUBM(ISP20POLL_SUBM,"%s frame[%d]:ts %" PRId64 "ms, readback %dtimes \n",
-                       __func__, sequence,
-		       tg.frame_timestamp / 1000 / 1000,
-		       tg.times);
+                    __func__, sequence,
+                    tg.frame_timestamp / 1000 / 1000,
+                    tg.times);
 
-            if (ret == XCAM_RETURN_NO_ERROR) {
-		if (--tg.times < 0)
-		    tg.times = 0;
+            if (ret == XCAM_RETURN_NO_ERROR)
                 _isp_core_dev->io_control(RKISP_CMD_TRIGGER_READ_BACK, &tg);
-	    } else
+            else
                 LOGE_CAMHW_SUBM(ISP20POLL_SUBM,"%s frame[%d] queue  failed, don't read back!\n",
-                           __func__, sequence);
+                        __func__, sequence);
 
             if (_is_capture_raw && !_first_trigger) {
                 if (_is_raw_sync_yuv) {
