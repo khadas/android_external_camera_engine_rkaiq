@@ -2271,8 +2271,6 @@ CamHwIsp20::setIspParamsSync(int frameId)
 #endif
     dump_isp_config(&_full_active_isp_params, aiq_results);
 
-    _mutex.unlock();
-
     if (mIspParamsDev.ptr()) {
         struct isp2x_isp_params_cfg* isp_params;
         SmartPtr<V4l2Buffer> v4l2buf;
