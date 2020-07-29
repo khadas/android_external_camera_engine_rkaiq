@@ -164,6 +164,10 @@ RkAiqCore::RkAiqCore()
 RkAiqCore::~RkAiqCore()
 {
     ENTER_ANALYZER_FUNCTION();
+    if (mAlogsSharedParams.resourcePath) {
+        xcam_free((void*)(mAlogsSharedParams.resourcePath));
+        mAlogsSharedParams.resourcePath = NULL;
+    }
     EXIT_ANALYZER_FUNCTION();
 }
 

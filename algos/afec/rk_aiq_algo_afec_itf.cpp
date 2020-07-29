@@ -110,7 +110,8 @@ read_mesh_table(FECContext_t* fecCtx, unsigned int correct_level)
 #else
     FILE* ofp;
     char filename[512];
-    sprintf(filename, "/oem/etc/iqfiles/%s/meshxi_level%d.bin",
+    sprintf(filename, "%s/%s/meshxi_level%d.bin",
+            fecCtx->resource_path,
             fecCtx->meshfile,
             correct_level);
     ofp = fopen(filename, "rb");
@@ -123,11 +124,12 @@ read_mesh_table(FECContext_t* fecCtx, unsigned int correct_level)
             LOGE_AFEC("mismatched mesh XI file");
         }
     } else {
-        LOGE_AFEC("mesh XI file not exist");
+        LOGE_AFEC("mesh XI file %s not exist", filename);
         fecCtx->fec_en = 0;
     }
 
-    sprintf(filename, "/oem/etc/iqfiles/%s/meshxf_level%d.bin",
+    sprintf(filename, "%s/%s/meshxf_level%d.bin",
+            fecCtx->resource_path,
             fecCtx->meshfile,
             correct_level);
     ofp = fopen(filename, "rb");
@@ -139,11 +141,12 @@ read_mesh_table(FECContext_t* fecCtx, unsigned int correct_level)
             LOGE_AFEC("mismatched mesh XF file");
         }
     } else {
-        LOGE_AFEC("mesh XF file not exist");
+        LOGE_AFEC("mesh XF file %s not exist", filename);
         fecCtx->fec_en = 0;
     }
 
-    sprintf(filename, "/oem/etc/iqfiles/%s/meshyi_level%d.bin",
+    sprintf(filename, "%s/%s/meshyi_level%d.bin",
+            fecCtx->resource_path,
             fecCtx->meshfile,
             correct_level);
     ofp = fopen(filename, "rb");
@@ -155,11 +158,12 @@ read_mesh_table(FECContext_t* fecCtx, unsigned int correct_level)
             LOGE_AFEC("mismatched mesh YI file");
         }
     } else {
-        LOGE_AFEC("mesh YI file not exist");
+        LOGE_AFEC("mesh YI file %s not exist", filename);
         fecCtx->fec_en = 0;
     }
 
-    sprintf(filename, "/oem/etc/iqfiles/%s/meshyf_level%d.bin",
+    sprintf(filename, "%s/%s/meshyf_level%d.bin",
+            fecCtx->resource_path,
             fecCtx->meshfile,
             correct_level);
     ofp = fopen(filename, "rb");
@@ -171,7 +175,7 @@ read_mesh_table(FECContext_t* fecCtx, unsigned int correct_level)
             LOGE_AFEC("mismatched mesh YF file");
         }
     } else {
-        LOGE_AFEC("mesh YF file not exist");
+        LOGE_AFEC("mesh YF file %s not exist", filename);
         fecCtx->fec_en = 0;
     }
 #endif
@@ -192,6 +196,7 @@ prepare(RkAiqAlgoCom* params)
     memcpy(fecCtx->meshfile, rkaiqAfecConfig->afec_calib_cfg.meshfile, sizeof(fecCtx->meshfile));
     fecCtx->pic_width = params->u.prepare.sns_op_width;
     fecCtx->pic_height = params->u.prepare.sns_op_height;
+    fecCtx->resource_path = rkaiqAfecConfig->resource_path;
 
     if (fecCtx->pic_width <= 1920) {
         fecCtx->mesh_density = 0;
@@ -224,7 +229,8 @@ prepare(RkAiqAlgoCom* params)
               fecCtx->pic_width, fecCtx->pic_height,
               fecCtx->fec_mesh_h_size, fecCtx->fec_mesh_v_size,
               fecCtx->fec_mesh_size);
-
+    if (!fecCtx->fec_en)
+        return XCAM_RETURN_NO_ERROR;
     // need realloc ?
     if (fecCtx->meshxi) {
         free(fecCtx->meshxi);
@@ -275,6 +281,9 @@ processing(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outparams)
     // TODO: should check the fec mode,
     // if mode == RK_AIQ_ISPP_STATIC_FEC_WORKING_MODE_STABLIZATION
     // params may be changed
+    if (!fecCtx->fec_en)
+        return XCAM_RETURN_NO_ERROR;
+
     if (inparams->u.proc.init) {
         fecPreOut->afec_result.update = 1;
     } else {

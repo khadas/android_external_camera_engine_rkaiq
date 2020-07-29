@@ -809,6 +809,7 @@ typedef struct _RkAiqAlgoConfigAfecInt {
     RkAiqAlgoConfigAfec afec_config_com;
     RkAiqAlgoComInt rk_com;
     CalibDb_FEC_t afec_calib_cfg;
+    const char* resource_path;
 } RkAiqAlgoConfigAfecInt;
 
 typedef struct _RkAiqAlgoPreAfecInt {
@@ -951,6 +952,7 @@ typedef struct _RkAiqAlgoConfigAldchInt {
     RkAiqAlgoConfigAldch aldch_config_com;
     RkAiqAlgoComInt rk_com;
     CalibDb_LDCH_t aldch_calib_cfg;
+    const char* resource_path;
 } RkAiqAlgoConfigAldchInt;
 
 typedef struct _RkAiqAlgoPreAldchInt {
