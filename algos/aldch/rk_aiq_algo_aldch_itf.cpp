@@ -44,6 +44,7 @@ typedef struct LDCHContext_s {
     unsigned short* lut_mapxy;
     char meshfile[256];
     unsigned char correct_level;
+    const char* resource_path;
 } LDCHContext_t;
 
 typedef struct LDCHContext_s* LDCHHandle_t;
@@ -96,6 +97,7 @@ prepare(RkAiqAlgoCom* params)
 
     ldchCtx->ldch_en = rkaiqAldchConfig->aldch_calib_cfg.ldch_en;
     memcpy(ldchCtx->meshfile, rkaiqAldchConfig->aldch_calib_cfg.meshfile, sizeof(ldchCtx->meshfile));
+    ldchCtx->resource_path = rkaiqAldchConfig->resource_path;
 
     double correct_level = rkaiqAldchConfig->aldch_calib_cfg.correct_level;
     if (fabs(correct_level) <= fabs(EPSINON)) {
@@ -121,9 +123,13 @@ prepare(RkAiqAlgoCom* params)
     ldchCtx->pic_width = params->u.prepare.sns_op_width;
     ldchCtx->pic_height = params->u.prepare.sns_op_height;
 
+    if (!ldchCtx->ldch_en)
+        return XCAM_RETURN_NO_ERROR;
+
     FILE* ofp;
     char filename[512];
-    sprintf(filename, "/oem/etc/iqfiles/%s/mesh_level%d.bin",
+    sprintf(filename, "%s/%s/mesh_level%d.bin",
+            ldchCtx->resource_path,
             ldchCtx->meshfile,
             ldchCtx->correct_level);
     ofp = fopen(filename, "rb");
@@ -189,7 +195,6 @@ processing(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outparams)
             memcpy(ldchPreOut->ldch_result.lut_mapxy, ldchCtx->lut_mapxy,
                    ldchCtx->lut_mapxy_size);
         }
-        ldchCtx->ldch_en = 0;
     }
 
     return XCAM_RETURN_NO_ERROR;

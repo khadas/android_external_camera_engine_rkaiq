@@ -53,6 +53,7 @@ typedef struct FECContext_s {
     unsigned char correct_level;
     unsigned int user_en;
     bool bypass;
+    const char* resource_path;
 } FECContext_t;
 
 typedef struct FECContext_s* FECHandle_t;

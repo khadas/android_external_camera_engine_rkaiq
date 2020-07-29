@@ -116,6 +116,10 @@ rk_aiq_uapi_sysctl_init(const char* sns_ent_name,
 #endif
     ctx->_rkAiqManager->setCamHw(ctx->_camHw);
     ctx->_analyzer = new RkAiqCore();
+    if (is_ent_name && config_file_dir) {
+        ctx->_analyzer->setResrcPath(config_file_dir);
+    } else
+        ctx->_analyzer->setResrcPath(RKAIQ_DEFAULT_IQ_PATH);
     ctx->_rkAiqManager->setAnalyzer(ctx->_analyzer);
     ctx->_lumaAnalyzer = new RkLumaCore();
     ctx->_rkAiqManager->setLumaAnalyzer(ctx->_lumaAnalyzer);

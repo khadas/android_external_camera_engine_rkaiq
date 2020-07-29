@@ -196,6 +196,14 @@ public:
     XCamReturn setHwInfos(struct RkAiqHwInfo &hw_info);
     XCamReturn setGrayMode(rk_aiq_gray_mode_t mode);
     rk_aiq_gray_mode_t getGrayMode();
+    void setResrcPath(const char* rp) {
+        if (mAlogsSharedParams.resourcePath) {
+            xcam_free((void*)(mAlogsSharedParams.resourcePath));
+            mAlogsSharedParams.resourcePath = NULL;
+        }
+        if (rp)
+            mAlogsSharedParams.resourcePath = strdup(rp);
+    };
 public:
     // following vars shared by all algo handlers
     typedef struct RkAiqAlgosShared_s {
@@ -216,6 +224,7 @@ public:
         int iso;
         AlgoCtxInstanceCfgInt ctxCfigs[RK_AIQ_ALGO_TYPE_MAX];
         rk_aiq_cpsl_cfg_t cpslCfg;
+        const char* resourcePath;
         void reset() {
             xcam_mem_clear(preResComb);
             xcam_mem_clear(procResComb);
@@ -232,6 +241,7 @@ public:
             fill_light_on = false;
             gray_mode = false;
             is_bw_sensor = false;
+            resourcePath = NULL;
         }
     } RkAiqAlgosShared_t;
     RkAiqAlgosShared_t mAlogsSharedParams;
