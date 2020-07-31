@@ -126,13 +126,17 @@ public:
     XCamReturn getLinExpAttr(Uapi_LinExpAttr_t* pLinExpAttr);
     XCamReturn setHdrExpAttr(Uapi_HdrExpAttr_t HdrExpAttr);
     XCamReturn getHdrExpAttr (Uapi_HdrExpAttr_t* pHdrExpAttr);
-    XCamReturn setLinAeRouteAttr(Uapi_LinAeRouteAttr_t LinAeRouteAttr);
-    XCamReturn getLinAeRouteAttr(Uapi_LinAeRouteAttr_t* pLinAeRouteAttr);
-    XCamReturn setHdrAeRouteAttr(Uapi_HdrAeRouteAttr_t HdrAeRouteAttr);
-    XCamReturn getHdrAeRouteAttr(Uapi_HdrAeRouteAttr_t* pHdrAeRouteAttr);
+    XCamReturn setLinAeDayRouteAttr(Uapi_LinAeRouteAttr_t LinAeRouteAttr);
+    XCamReturn getLinAeDayRouteAttr(Uapi_LinAeRouteAttr_t* pLinAeRouteAttr);
+    XCamReturn setHdrAeDayRouteAttr(Uapi_HdrAeRouteAttr_t HdrAeRouteAttr);
+    XCamReturn getHdrAeDayRouteAttr(Uapi_HdrAeRouteAttr_t* pHdrAeRouteAttr);
+    XCamReturn setLinAeNightRouteAttr(Uapi_LinAeRouteAttr_t LinAeRouteAttr);
+    XCamReturn getLinAeNightRouteAttr(Uapi_LinAeRouteAttr_t* pLinAeRouteAttr);
+    XCamReturn setHdrAeNightRouteAttr(Uapi_HdrAeRouteAttr_t HdrAeRouteAttr);
+    XCamReturn getHdrAeNightRouteAttr(Uapi_HdrAeRouteAttr_t* pHdrAeRouteAttr);
     XCamReturn queryExpInfo(Uapi_ExpQueryInfo_t* pExpQueryInfo);
-    XCamReturn setExpWinAttr(Aec_Win_t ExpWinAttr);
-    XCamReturn getExpWinAttr(Aec_Win_t* pExpWinAttr);
+    XCamReturn setExpWinAttr(Uapi_ExpWin_t ExpWinAttr);
+    XCamReturn getExpWinAttr(Uapi_ExpWin_t* pExpWinAttr);
 
 protected:
     virtual void init();
@@ -148,18 +152,24 @@ private:
     Uapi_LinExpAttr_t mNewLinExpAttr;
     Uapi_HdrExpAttr_t mCurHdrExpAttr;
     Uapi_HdrExpAttr_t mNewHdrExpAttr;
-    Uapi_LinAeRouteAttr_t mCurLinAeRouteAttr;
-    Uapi_LinAeRouteAttr_t mNewLinAeRouteAttr;
-    Uapi_HdrAeRouteAttr_t mCurHdrAeRouteAttr;
-    Uapi_HdrAeRouteAttr_t mNewHdrAeRouteAttr;
-    Aec_Win_t         mCurExpWinAttr;
-    Aec_Win_t         mNewExpWinAttr;
+    Uapi_LinAeRouteAttr_t mCurLinAeDayRouteAttr;
+    Uapi_LinAeRouteAttr_t mNewLinAeDayRouteAttr;
+    Uapi_HdrAeRouteAttr_t mCurHdrAeDayRouteAttr;
+    Uapi_HdrAeRouteAttr_t mNewHdrAeDayRouteAttr;
+    Uapi_LinAeRouteAttr_t mCurLinAeNightRouteAttr;
+    Uapi_LinAeRouteAttr_t mNewLinAeNightRouteAttr;
+    Uapi_HdrAeRouteAttr_t mCurHdrAeNightRouteAttr;
+    Uapi_HdrAeRouteAttr_t mNewHdrAeNightRouteAttr;
+    Uapi_ExpWin_t         mCurExpWinAttr;
+    Uapi_ExpWin_t         mNewExpWinAttr;
     bool updateExpSwAttr = false;
     bool updateExpHwAttr = false;
     bool updateLinExpAttr = false;
     bool updateHdrExpAttr = false;
-    bool updateLinAeRouteAttr = false;
-    bool updateHdrAeRouteAttr = false;
+    bool updateLinAeDayRouteAttr = false;
+    bool updateHdrAeDayRouteAttr = false;
+    bool updateLinAeNightRouteAttr = false;
+    bool updateHdrAeNightRouteAttr = false;
     bool updateExpWinAttr = false;
 };
 
@@ -615,7 +625,7 @@ public:
     XCamReturn getChromaTFStrength(float *pPercent);
     XCamReturn setRawnrSFStrength(float fPercent);
     XCamReturn getRawnrSFStrength(float *pPercent);
-	XCamReturn setIQPara(rk_aiq_nr_IQPara_t *pPara);
+    XCamReturn setIQPara(rk_aiq_nr_IQPara_t *pPara);
     XCamReturn getIQPara(rk_aiq_nr_IQPara_t *pPara);
 protected:
     virtual void init();
@@ -626,9 +636,9 @@ private:
     // TODO
     rk_aiq_nr_attrib_t mCurAtt;
     rk_aiq_nr_attrib_t mNewAtt;
-	rk_aiq_nr_IQPara_t mCurIQpara;
-	rk_aiq_nr_IQPara_t mNewIQpara;
-	bool UpdateIQpara = false;
+    rk_aiq_nr_IQPara_t mCurIQpara;
+    rk_aiq_nr_IQPara_t mNewIQpara;
+    bool UpdateIQpara = false;
 };
 
 
@@ -657,7 +667,7 @@ public:
     XCamReturn getAttrib(rk_aiq_sharp_attrib_t *att);
     XCamReturn setStrength(float fPercent);
     XCamReturn getStrength(float *pPercent);
-	XCamReturn setIQPara(rk_aiq_sharp_IQpara_t *para);
+    XCamReturn setIQPara(rk_aiq_sharp_IQpara_t *para);
     XCamReturn getIQPara(rk_aiq_sharp_IQpara_t *para);
 
 protected:
@@ -669,10 +679,10 @@ private:
     // TODO
     rk_aiq_sharp_attrib_t mCurAtt;
     rk_aiq_sharp_attrib_t mNewAtt;
-	rk_aiq_sharp_IQpara_t mCurIQPara;
+    rk_aiq_sharp_IQpara_t mCurIQPara;
     rk_aiq_sharp_IQpara_t mNewIQPara;
-	bool updateIQpara = false;
-	
+    bool updateIQpara = false;
+
 };
 
 // afec

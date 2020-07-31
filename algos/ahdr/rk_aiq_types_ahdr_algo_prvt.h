@@ -104,7 +104,7 @@
 #define DETAILSLOWLIGHTMIN     (16)
 #define DYNAMICRANGEMAX     (84)
 #define DYNAMICRANGEMIN     (1)
-#define TMOCONTRASTMAX     (153)
+#define TMOCONTRASTMAX     (255)
 #define TMOCONTRASTMIN     (0)
 #define IQPARAMAX     (1)
 #define IQPARAMIN     (0)
@@ -231,6 +231,7 @@ typedef struct AhdrProcResData_s
     TmoProcRes_t TmoProcRes;
     MgeProcRes_t MgeProcRes;
     bool LongFrameMode;
+    bool isHdrGlobalTmo;
 } AhdrProcResData_t;
 
 typedef struct SensorInfo_s

@@ -135,6 +135,8 @@ processing(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outparams)
         stExpInfo.arProcResTime[i] = 0.01;
     }
 
+    pAdpccCtx->isBlackSensor = pAdpccProcParams->rk_com.u.proc.is_bw_sensor;
+
     if(pAdpccProcParams->hdr_mode == RK_AIQ_WORKING_MODE_NORMAL) {
         stExpInfo.hdr_mode = 0;
     } else if(pAdpccProcParams->hdr_mode == RK_AIQ_ISP_HDR_MODE_2_FRAME_HDR

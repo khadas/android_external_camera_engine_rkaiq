@@ -87,6 +87,8 @@ public:
     XCamReturn getEffectiveExpParams(SmartPtr<RkAiqExpParamsProxy>& ExpParams, int frame_id);
     XCamReturn set_working_mode(int mode);
     XCamReturn set_exp_delay_info(int time_delay, int gain_delay, int hcg_lcg_mode_delay);
+    XCamReturn set_mirror_flip(bool mirror, bool flip);
+    XCamReturn get_mirror_flip(bool& mirror, bool& flip);
     XCamReturn start();
     XCamReturn stop();
 

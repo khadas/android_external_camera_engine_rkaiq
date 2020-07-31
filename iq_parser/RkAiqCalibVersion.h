@@ -36,10 +36,24 @@
  *  - Aec: add sensor-AEC-LinearAECtrl-RawStatsEn, ae stats can use rawae/yuvae
  *  - Aec: add system-dcg_setting divide into 2 parts -normal /Hdr
  *  - Aec: add system-Gainrange-Linear/NonLinear, support db_mode
+ * v1.1.4
+ *  - magic code:1003993
+ *  - Ahdr: add Band prior mode 
+ * v1.1.5
+ *  - magic code: 1005025
+ *  - sensor_para: add default sensor flip setting
+ * v1.1.6
+ *  - magic code:1011737
+ *  - Aec: add AecEnvLvCalib
+ *  - add ModuleInfo
+ * v1.1.7
+ *  - magic code:1023357
+ *  - Adpcc: Redefine DPCC in IQ files, add Expert Mode
+ *  - Adpcc: Add fast mode in DPCC
  */
 
-#define RK_AIQ_CALIB_VERSION_REAL_V          "v1.1.3"
-#define RK_AIQ_CALIB_VERSION_MAGIC_V         "1003001"
+#define RK_AIQ_CALIB_VERSION_REAL_V          "v1.1.7"
+#define RK_AIQ_CALIB_VERSION_MAGIC_V         "1023357" 
 
 /******* DO NOT EDIT THE FOLLOWINGS ***********/
 

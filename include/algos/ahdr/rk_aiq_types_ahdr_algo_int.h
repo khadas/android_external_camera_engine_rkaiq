@@ -11,7 +11,7 @@
 #ifndef __RK_AIQ_TYPES_AHDR_ALGO_INT_H__
 #define __RK_AIQ_TYPES_AHDR_ALGO_INT_H__
 
-//#include "rk_aiq_uapi_ahdr_int.h"
+//#include "rk_aiq_types.h"
 
 typedef struct globalLuma_s
 {
@@ -56,6 +56,7 @@ typedef struct tmoContrast_s
 
 typedef struct moreSetting_s
 {
+    bool isHdrGlobalTmo;
     float clipgap0;
     float clipgap1;
     float clipratio0;
@@ -240,6 +241,7 @@ typedef struct RkAiqAhdrProcResult_s
     MgeProcRes_t MgeProcRes;
     hdrAttr_t hdrAttr;
     bool LongFrameMode;
+    bool isHdrGlobalTmo;
 } RkAiqAhdrProcResult_t;
 
 

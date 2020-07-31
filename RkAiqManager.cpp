@@ -75,6 +75,8 @@ RkAiqManager::RkAiqManager(const char* sns_ent_name,
     , mWorkingMode(RK_AIQ_WORKING_MODE_NORMAL)
     , mCalibDb(NULL)
     , _state(AIQ_STATE_INVALID)
+    , mCurMirror(false)
+    , mCurFlip(false)
 {
     ENTER_XCORE_FUNCTION();
     EXIT_XCORE_FUNCTION();
@@ -148,7 +150,6 @@ RkAiqManager::init()
     hw_info.fl_ir_strth_adj = s_info->fl_ir_strth_adj_sup;
 #endif
     mRkAiqAnalyzer->setHwInfos(hw_info);
-
     ret = mRkAiqAnalyzer->init(mSnsEntName, mCalibDb);
     RKAIQMNG_CHECK_RET(ret, "analyzer init error %d !", ret);
 
@@ -162,6 +163,8 @@ RkAiqManager::init()
     ret = mCamHw->init(mSnsEntName);
     RKAIQMNG_CHECK_RET(ret, "camHw init error %d !", ret);
     _state = AIQ_STATE_INITED;
+    // set default mirror & flip
+    setDefMirrorFlip();
 
     EXIT_XCORE_FUNCTION();
 
@@ -215,7 +218,6 @@ RkAiqManager::prepare(uint32_t width, uint32_t height, rk_aiq_working_mode_t mod
     mWidth = width;
     mHeight = height;
     _state = AIQ_STATE_PREPARED;
-
     EXIT_XCORE_FUNCTION();
 
     return ret;
@@ -582,7 +584,7 @@ XCamReturn RkAiqManager::offlineRdJobPrepare()
 {
     ENTER_XCORE_FUNCTION();
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
- 
+
     ret = mCamHw->offlineRdJobPrepare();
     EXIT_XCORE_FUNCTION();
     return ret;
@@ -606,6 +608,50 @@ XCamReturn RkAiqManager::setSharpFbcRotation(rk_aiq_rotation_t rot)
         return camHwIsp20->setSharpFbcRotation(rot);
     else
         return XCAM_RETURN_ERROR_FAILED;
+}
+
+XCamReturn RkAiqManager::setMirrorFlip(bool mirror, bool flip)
+{
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    ENTER_XCORE_FUNCTION();
+    if (_state == AIQ_STATE_INVALID) {
+        LOGE_ANALYZER("wrong aiq state !");
+        return XCAM_RETURN_ERROR_FAILED;
+    }
+    ret = mCamHw->setSensorFlip(mirror, flip);
+    if (ret == XCAM_RETURN_NO_ERROR) {
+        // notify aiq sensor flip is changed
+        mRkAiqAnalyzer->setSensorFlip(mirror, flip);
+        mCurMirror = mirror;
+        mCurFlip = flip;
+    } else {
+        LOGW_ANALYZER("set mirror %d, flip %d error", mirror, flip);
+    }
+    return ret;
+    EXIT_XCORE_FUNCTION();
+}
+
+XCamReturn RkAiqManager::getMirrorFlip(bool& mirror, bool& flip)
+{
+    ENTER_XCORE_FUNCTION();
+    if (_state == AIQ_STATE_INVALID) {
+        LOGE_ANALYZER("wrong aiq state !");
+        return XCAM_RETURN_ERROR_FAILED;
+    }
+
+    mirror = mCurMirror;
+    flip = mCurFlip;
+
+    EXIT_XCORE_FUNCTION();
+    return XCAM_RETURN_NO_ERROR;
+}
+
+void RkAiqManager::setDefMirrorFlip()
+{
+    /* set defalut mirror & flip from iq*/
+    bool def_mirr = mCalibDb->sensor.flip & 0x1 ? true : false;
+    bool def_flip = mCalibDb->sensor.flip & 0x2 ? true : false;
+    setMirrorFlip(def_mirr, def_flip);
 }
 
 }; //namespace RkCam

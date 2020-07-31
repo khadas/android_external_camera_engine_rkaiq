@@ -99,6 +99,8 @@ public:
     virtual XCamReturn enqueueBuffer(struct rk_aiq_vbuf *vbuf) = 0;
     virtual XCamReturn offlineRdJobPrepare() = 0;
     virtual XCamReturn offlineRdJobDone() = 0;
+    virtual XCamReturn setSensorFlip(bool mirror, bool flip) = 0;
+    virtual XCamReturn getSensorFlip(bool& mirror, bool& flip) = 0;
 private:
     XCAM_DEAD_COPY (ICamHw);
 };

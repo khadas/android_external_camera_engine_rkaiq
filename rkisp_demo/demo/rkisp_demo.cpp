@@ -525,6 +525,18 @@ void test_imgproc(const rk_aiq_sys_ctx_t* ctx) {
 		   	}
 		}   
        break;
+    case 'K':
+        printf("test mirro, flip\n");
+        bool mirror, flip;
+        rk_aiq_uapi_getMirrorFlip(ctx, &mirror, &flip);
+        printf("oringinal mir %d, flip %d \n", mirror, flip);
+        mirror = true;
+        flip = true;
+        printf("set mir %d, flip %d \n", mirror, flip);
+        rk_aiq_uapi_setMirroFlip(ctx, true,true);
+        rk_aiq_uapi_getMirrorFlip(ctx, &mirror, &flip);
+        printf("after set mir %d, flip %d \n", mirror, flip);
+       break;
     default:
         break;
     }

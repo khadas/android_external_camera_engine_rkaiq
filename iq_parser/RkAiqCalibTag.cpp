@@ -64,6 +64,7 @@ uint32_t calib_sensor_sub_tags[] = {
     CALIB_SENSOR_EDGEFILTER_TAG_ID,
     CALIB_SENSOR_DEHAZE_TAG_ID,
     CALIB_SENSOR_SENSORINFO_TAG_ID,
+    CALIB_SENSOR_MODULEINFO_TAG_ID,
     CALIB_SENSOR_CPSL_TAG_ID,
     CALIB_SENSOR_LUT3D_TAG_ID,
     CALIB_SENSOR_LDCH_TAG_ID,
@@ -380,6 +381,7 @@ uint32_t calib_sensor_aec_sub_tags[] = {
     CALIB_SENSOR_AEC_AECROUTE_TAG_ID,
     CALIB_SENSOR_AEC_AECDNSWITCH_TAG_ID,
     CALIB_SENSOR_AEC_MANUALCTRL_TAG_ID,
+    CALIB_SENSOR_AEC_ENVLVCALIB_TAG_ID,
     CALIB_SENSOR_AEC_LINEARAE_CTRL_TAG_ID,
     CALIB_SENSOR_AEC_HDRAECTRL_TAG_ID,
 };
@@ -534,6 +536,12 @@ uint32_t calib_sensor_aec_AecManualCtrl_HdrAE_sub_tags[] = {
     CALIB_SENSOR_AEC_MANUALCTRL_PIRISVALUE_TAG_ID,
 
 };
+
+uint32_t calib_sensor_aec_AecEnvLvCalib_sub_tags[] = {
+    CALIB_SENSOR_AEC_ENVLVCALIB_CALIBFNUMBER_TAG_ID,
+    CALIB_SENSOR_AEC_ENVLVCALIB_CURVECOEFF_TAG_ID,
+};
+
 
 uint32_t calib_sensor_aec_LinearAECtrl_sub_tags[] = {
     CALIB_SENSOR_AEC_SETPOINT_TAG_ID,
@@ -772,6 +780,7 @@ uint32_t calib_sensor_ahdr_TmoContrast_sub_tags[] = {
 };
 
 uint32_t calib_sensor_ahdr_MoreSetting_sub_tags[] = {
+    CALIB_SENSOR_AHDR_TMO_BAND_PRIOR_TAG_ID,
     CALIB_SENSOR_AHDR_TMO_CLIPGAP0_TAG_ID,
     CALIB_SENSOR_AHDR_TMO_CLIPGAP1_TAG_ID,
     CALIB_SENSOR_AHDR_TMO_CLIPRATIO0_TAG_ID,
@@ -788,6 +797,24 @@ uint32_t calib_sensor_blc_sub_tags[] = {
 uint32_t calib_sensor_dpcc_sub_tags[] = {
     CALIB_SENSOR_DPCC_ENABLE_TAG_ID,
     CALIB_SENSOR_DPCC_VERSION_TAG_ID,
+    CALIB_SENSOR_DPCC_FAST_MODE_TAG_ID,
+    CALIB_SENSOR_DPCC_EXPERT_MODE_TAG_ID,
+    CALIB_SENSOR_DPCC_PDAF_TAG_ID,
+    CALIB_SENSOR_DPCC_SENSOR_TAG_ID,
+};
+
+uint32_t calib_sensor_dpcc_fast_mode_sub_tags[] = {
+    CALIB_SENSOR_DPCC_FAST_MODE_ENABLE_TAG_ID,
+    CALIB_SENSOR_DPCC_FAST_MODE_ISO_TAG_ID,
+    CALIB_SENSOR_DPCC_FAST_MODE_SINGLE_ENABLE_TAG_ID,
+    CALIB_SENSOR_DPCC_FAST_MODE_SINGLE_LEVEL_TAG_ID,
+    CALIB_SENSOR_DPCC_FAST_MODE_DOUBLE_ENABLE_TAG_ID,
+    CALIB_SENSOR_DPCC_FAST_MODE_DOUBLE_LEVEL_TAG_ID,
+    CALIB_SENSOR_DPCC_FAST_MODE_TRIPLE_ENABLE_TAG_ID,
+    CALIB_SENSOR_DPCC_FAST_MODE_TRIPLE_LEVEL_TAG_ID,
+};
+
+uint32_t calib_sensor_dpcc_expert_mode_sub_tags[] = {
     CALIB_SENSOR_DPCC_ISO_TAG_ID,
     CALIB_SENSOR_DPCC_STAGE1_ENABLE_TAG_ID,
     CALIB_SENSOR_DPCC_GRAYSCALE_MODE_TAG_ID,
@@ -802,8 +829,6 @@ uint32_t calib_sensor_dpcc_sub_tags[] = {
     CALIB_SENSOR_DPCC_STAGE1_USE_SET2_TAG_ID,
     CALIB_SENSOR_DPCC_STAGE1_USE_SET3_TAG_ID,
     CALIB_SENSOR_DPCC_SET_CELL_TAG_ID,
-    CALIB_SENSOR_DPCC_PDAF_TAG_ID,
-    CALIB_SENSOR_DPCC_SENSOR_TAG_ID,
 };
 
 uint32_t calib_sensor_set_cell_sub_tags[] = {
@@ -1326,12 +1351,20 @@ uint32_t calib_sensor_sensorinfo_sub_tags[] = {
     CALIB_SENSOR_SENSORINFO_CISEXTRAAGAIN_RANGE_TAG_ID,
     CALIB_SENSOR_SENSORINFO_CISDGAIN_RANGE_TAG_ID,
     CALIB_SENSOR_SENSORINFO_CISISPDGAIN_RANGE_TAG_ID,
+    CALIB_SENSOR_SENSORSETTING_FLIP_ID,
 };
 
 uint32_t calib_sensor_sensorinfo_gainrange_sub_tags[] = {
     CALIB_SENSOR_SENSORINFO_GAINRANGE_ISLINEAR_TAG_ID,
     CALIB_SENSOR_SENSORINFO_GAINRANGE_LINEAR_TAG_ID,
     CALIB_SENSOR_SENSORINFO_GAINRANGE_NONLINEAR_TAG_ID,
+};
+
+uint32_t calib_sensor_moduleinfo_sub_tags[] = {
+    CALIB_SENSOR_MODULEINFO_FNUMBER_TAG_ID,
+    CALIB_SENSOR_MODULEINFO_EFL_TAG_ID,
+    CALIB_SENSOR_MODULEINFO_LENS_TRANSMITTANCE_TAG_ID,
+    CALIB_SENSOR_MODULEINFO_IRCUT_TRANSMITTANCE_TAG_ID,
 };
 
 uint32_t calib_sensor_cpsl_sub_tags[] = {
@@ -2639,6 +2672,19 @@ calib_tag_info_t g_calib_tag_infos[CALIB_IQ_TAG_END] = {
         check_tags_array_ignore, NULL
     },
 
+    [CALIB_SENSOR_AEC_ENVLVCALIB_TAG_ID]      =
+    {   "AecEnvLvCalib", CALIB_TAG_TYPE_STRUCT, {-1, -1},
+        check_tags_array_info(calib_sensor_aec_AecEnvLvCalib_sub_tags), NULL
+    },
+    [CALIB_SENSOR_AEC_ENVLVCALIB_CALIBFNUMBER_TAG_ID]         =
+    {   "CalibFNumber", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
+        check_tags_array_ignore, NULL
+    },
+    [CALIB_SENSOR_AEC_ENVLVCALIB_CURVECOEFF_TAG_ID]      =
+    {   "CurveCoeff", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
+        check_tags_array_ignore, NULL
+    },
+
     [CALIB_SENSOR_AEC_LINEARAE_CTRL_TAG_ID]         =
     {   "LinearAECtrl", CALIB_TAG_TYPE_STRUCT, {-1, -1},
         check_tags_array_info(calib_sensor_aec_LinearAECtrl_sub_tags), NULL
@@ -3278,6 +3324,10 @@ calib_tag_info_t g_calib_tag_infos[CALIB_IQ_TAG_END] = {
     {   "Damp", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
         check_tags_array_ignore, NULL
     },
+    [CALIB_SENSOR_AHDR_TMO_BAND_PRIOR_TAG_ID]         =
+    {   "Band_Prior", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
+        check_tags_array_ignore, NULL
+    },
     [CALIB_SENSOR_AHDR_TMO_CLIPGAP0_TAG_ID]         =
     {   "clipgap0", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
         check_tags_array_ignore, NULL
@@ -3326,6 +3376,47 @@ calib_tag_info_t g_calib_tag_infos[CALIB_IQ_TAG_END] = {
         check_tags_array_ignore, NULL
     },
 
+    [CALIB_SENSOR_DPCC_FAST_MODE_TAG_ID]         =
+    {   "Fast_mode", CALIB_TAG_TYPE_STRUCT, {-1, -1},
+        check_tags_array_info(calib_sensor_dpcc_fast_mode_sub_tags), NULL
+    },
+    [CALIB_SENSOR_DPCC_FAST_MODE_ENABLE_TAG_ID]         =
+    {   "Fast_mode_enable", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
+        check_tags_array_ignore, NULL
+    },
+    [CALIB_SENSOR_DPCC_FAST_MODE_ISO_TAG_ID]        =
+    {   "ISO", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
+        check_tags_array_ignore, NULL
+    },
+    [CALIB_SENSOR_DPCC_FAST_MODE_SINGLE_ENABLE_TAG_ID]         =
+    {   "Single_enable", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
+        check_tags_array_ignore, NULL
+    },
+    [CALIB_SENSOR_DPCC_FAST_MODE_SINGLE_LEVEL_TAG_ID]         =
+    {   "Single_level", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
+        check_tags_array_ignore, NULL
+    },
+    [CALIB_SENSOR_DPCC_FAST_MODE_DOUBLE_ENABLE_TAG_ID]         =
+    {   "Double_enable", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
+        check_tags_array_ignore, NULL
+    },
+    [CALIB_SENSOR_DPCC_FAST_MODE_DOUBLE_LEVEL_TAG_ID]         =
+    {   "Double_level", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
+        check_tags_array_ignore, NULL
+    },
+    [CALIB_SENSOR_DPCC_FAST_MODE_TRIPLE_ENABLE_TAG_ID]         =
+    {   "Triple_enable", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
+        check_tags_array_ignore, NULL
+    },
+    [CALIB_SENSOR_DPCC_FAST_MODE_TRIPLE_LEVEL_TAG_ID]         =
+    {   "Triple_level", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
+        check_tags_array_ignore, NULL
+    },
+
+    [CALIB_SENSOR_DPCC_EXPERT_MODE_TAG_ID]         =
+    {   "Expert_mode", CALIB_TAG_TYPE_STRUCT, {-1, -1},
+        check_tags_array_info(calib_sensor_dpcc_expert_mode_sub_tags), NULL
+    },
     [CALIB_SENSOR_DPCC_ISO_TAG_ID]         =
     {   "ISO", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
         check_tags_array_ignore, NULL
@@ -5140,6 +5231,33 @@ calib_tag_info_t g_calib_tag_infos[CALIB_IQ_TAG_END] = {
     {   "CISIspDgainRange", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
         check_tags_array_ignore, NULL
     },
+    [CALIB_SENSOR_SENSORSETTING_FLIP_ID]         =
+    {   "SensorFlip", CALIB_TAG_TYPE_CHAR, {1, 1},
+        check_tags_array_ignore, NULL
+    },
+
+    //Module Info
+    [CALIB_SENSOR_MODULEINFO_TAG_ID]         =
+    {   "MODULEINFO", CALIB_TAG_TYPE_STRUCT, {-1, -1},
+        check_tags_array_info(calib_sensor_moduleinfo_sub_tags), NULL
+    },
+    [CALIB_SENSOR_MODULEINFO_FNUMBER_TAG_ID]         =
+    {   "FNumber", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
+        check_tags_array_ignore, NULL
+    },
+    [CALIB_SENSOR_MODULEINFO_EFL_TAG_ID]         =
+    {   "EFL", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
+        check_tags_array_ignore, NULL
+    },
+    [CALIB_SENSOR_MODULEINFO_LENS_TRANSMITTANCE_TAG_ID]         =
+    {   "LensTavg", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
+        check_tags_array_ignore, NULL
+    },
+    [CALIB_SENSOR_MODULEINFO_IRCUT_TRANSMITTANCE_TAG_ID]         =
+    {   "IRCutTavg", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
+        check_tags_array_ignore, NULL
+    },
+
 
     // Sensor CPSL
     [CALIB_SENSOR_CPSL_TAG_ID]         =
@@ -5444,7 +5562,7 @@ uint32_t calib_check_calc_checksum() {
  *          calib_tag_info_t from g_calib_tag_infos.
  *
  ***************************************************************/
-int calib_check_getID_by_name(char* tag_name, CALIB_IQ_TAG_ID_T parent_tag_id, CALIB_IQ_TAG_ID_T *tag_id ) {
+int calib_check_getID_by_name(char* tag_name, CALIB_IQ_TAG_ID_T parent_tag_id, CALIB_IQ_TAG_ID_T * tag_id ) {
 
     uint32_t i = 0;
     calib_tag_check_info_t* parent_check_info =

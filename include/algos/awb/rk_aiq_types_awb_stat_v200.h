@@ -83,6 +83,11 @@ typedef struct rk_aiq_awb_stat_cfg_v200_s {
     unsigned short multiwindow[RK_AIQ_AWB_MULTIWINDOW_NUM][4];//8  windows in pixel domain ,hOffset,vOffser,hSize,vSize;
     //several winow in uv or xy domain
     rk_aiq_awb_exc_range_t excludeWpRange[RK_AIQ_AWB_EXCLUDE_WP_RANGE_NUM];
+
+    int  groupIllIndxCurrent;//for time share
+    int  IllIndxSetCurrent[RK_AIQ_AWB_MAX_WHITEREGIONS_NUM];//for time share
+    char timeSign[64];
+
 } rk_aiq_awb_stat_cfg_v200_t;
 
 typedef struct rk_aiq_awb_stat_wp_res_v200_s {

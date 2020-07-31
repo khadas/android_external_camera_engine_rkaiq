@@ -828,6 +828,56 @@ SensorHw::set_working_mode(int mode)
 }
 
 XCamReturn
+SensorHw::set_mirror_flip(bool mirror, bool flip)
+{
+    struct v4l2_control ctrl;
+
+    memset(&ctrl, 0, sizeof(ctrl));
+    ctrl.id = V4L2_CID_HFLIP;
+    ctrl.value = mirror ? 1 : 0;
+    if (io_control(VIDIOC_S_CTRL, &ctrl) < 0) {
+        LOGW_CAMHW_SUBM(SENSOR_SUBM,"failed to set hflip (val: %d)", ctrl.value);
+        return XCAM_RETURN_ERROR_IOCTL;
+    }
+
+    ctrl.id = V4L2_CID_VFLIP;
+    ctrl.value = flip ? 1 : 0;
+    if (io_control(VIDIOC_S_CTRL, &ctrl) < 0) {
+        LOGW_CAMHW_SUBM(SENSOR_SUBM,"failed to set vflip (val: %d)", ctrl.value);
+        return XCAM_RETURN_ERROR_IOCTL;
+    }
+
+    LOGD_CAMHW_SUBM(SENSOR_SUBM,"set mirror %d, flip %d", mirror, flip);
+
+    return XCAM_RETURN_NO_ERROR;
+}
+
+XCamReturn
+SensorHw::get_mirror_flip(bool& mirror, bool& flip)
+{
+    struct v4l2_control ctrl;
+
+    memset(&ctrl, 0, sizeof(ctrl));
+    ctrl.id = V4L2_CID_HFLIP;
+    if (io_control(VIDIOC_G_CTRL, &ctrl) < 0) {
+        LOGW_CAMHW_SUBM(SENSOR_SUBM,"failed to set hflip (val: %d)", ctrl.value);
+        return XCAM_RETURN_ERROR_IOCTL;
+    }
+
+    mirror = ctrl.value ? true : false;
+
+    ctrl.id = V4L2_CID_VFLIP;
+    if (io_control(VIDIOC_S_CTRL, &ctrl) < 0) {
+        LOGW_CAMHW_SUBM(SENSOR_SUBM,"failed to set vflip (val: %d)", ctrl.value);
+        return XCAM_RETURN_ERROR_IOCTL;
+    }
+
+    flip = ctrl.value ? true : false;
+
+    return XCAM_RETURN_NO_ERROR;
+}
+
+XCamReturn
 SensorHw::set_exp_delay_info(int time_delay, int gain_delay, int hcg_lcg_mode_delay)
 {
     _time_delay = time_delay;

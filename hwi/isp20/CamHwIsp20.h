@@ -178,6 +178,8 @@ public:
         _sharp_fbc_rotation = rot;
         return XCAM_RETURN_NO_ERROR;
     }
+    XCamReturn setSensorFlip(bool mirror, bool flip);
+    XCamReturn getSensorFlip(bool& mirror, bool& flip);
 private:
     XCAM_DEAD_COPY(CamHwIsp20);
     enum cam_hw_state_e {

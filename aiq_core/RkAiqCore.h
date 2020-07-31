@@ -196,6 +196,7 @@ public:
     XCamReturn setHwInfos(struct RkAiqHwInfo &hw_info);
     XCamReturn setGrayMode(rk_aiq_gray_mode_t mode);
     rk_aiq_gray_mode_t getGrayMode();
+    void setSensorFlip(bool mirror, bool flip);
     void setResrcPath(const char* rp) {
         if (mAlogsSharedParams.resourcePath) {
             xcam_free((void*)(mAlogsSharedParams.resourcePath));
@@ -225,6 +226,8 @@ public:
         AlgoCtxInstanceCfgInt ctxCfigs[RK_AIQ_ALGO_TYPE_MAX];
         rk_aiq_cpsl_cfg_t cpslCfg;
         const char* resourcePath;
+        bool sns_mirror;
+        bool sns_flip;
         void reset() {
             xcam_mem_clear(preResComb);
             xcam_mem_clear(procResComb);
@@ -242,6 +245,8 @@ public:
             gray_mode = false;
             is_bw_sensor = false;
             resourcePath = NULL;
+            sns_mirror = false;
+            sns_flip = false;
         }
     } RkAiqAlgosShared_t;
     RkAiqAlgosShared_t mAlogsSharedParams;

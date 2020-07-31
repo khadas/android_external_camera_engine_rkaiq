@@ -327,6 +327,7 @@ typedef struct AecConfig_s {
     CalibDb_HdrAE_Attr_t          HdrAeCtrl;
     RkAiqAecHwConfig_t            HwCtrl;
     CalibDb_Sensor_Para_t         SensorInfo;
+    CalibDb_Module_Info_t         ModuleInfo;
     CalibDb_System_t              SystemCtrl;
 
     int                           Workingmode;
@@ -388,6 +389,8 @@ typedef struct AecPreResult_s {
 
     float GlobalEnvLv[MAX_HDR_FRAMENUM];
     float BlockEnvLv[ISP2_RAWAE_WINNUM_MAX];
+    float GlobalEnvLux;
+    float BlockEnvLux[ISP2_RAWAE_WINNUM_MAX];
     float DynamicRange;
 
     unsigned char NormalIndex;

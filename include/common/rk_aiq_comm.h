@@ -74,6 +74,7 @@ typedef enum RKAiqOPMode_e {
 #define FLOOR_INT64(a) (long)( ((double)(a) < (long)(a)) ? (long)((a)-1) : (long)(a) )
 #define INTERP1(x0, x1, ratio)  ((ratio) * ((x1) - (x0)) + x0)
 #define CLIPBIT(a,b) ((a)>((1<<(b))-1)?((1<<(b))-1):(a))
+#define SWAP(_T_,A,B)                   { _T_ tmp = (A); (A) = (B); (B) = tmp; }
 
 
 #define RETURN_RESULT_IF_DIFFERENT( cur_res, exp_res ) if ( exp_res != cur_res ) { return ( cur_res ); }

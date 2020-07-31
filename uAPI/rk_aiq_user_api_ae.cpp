@@ -48,10 +48,10 @@ XCamReturn rk_aiq_user_api_ae_getExpSwAttr
 
     return (ret);
 }
-XCamReturn rk_aiq_user_api_ae_setLinAeRouteAttr
+XCamReturn rk_aiq_user_api_ae_setLinAeDayRouteAttr
 (
     const rk_aiq_sys_ctx_t* sys_ctx,
-    const Uapi_LinAeRouteAttr_t linAeRouteAttr
+    const Uapi_LinAeRouteAttr_t linAeDayRouteAttr
 ) {
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
 
@@ -59,15 +59,15 @@ XCamReturn rk_aiq_user_api_ae_setLinAeRouteAttr
         algoHandle<RkAiqAeHandleInt>(sys_ctx, RK_AIQ_ALGO_TYPE_AE);
 
     if (algo_handle) {
-        return algo_handle->setLinAeRouteAttr(linAeRouteAttr);
+        return algo_handle->setLinAeDayRouteAttr(linAeDayRouteAttr);
     }
 
     return(ret);
 }
-XCamReturn rk_aiq_user_api_ae_getLinAeRouteAttr
+XCamReturn rk_aiq_user_api_ae_getLinAeDayRouteAttr
 (
     const rk_aiq_sys_ctx_t* sys_ctx,
-    Uapi_LinAeRouteAttr_t* pLinAeRouteAttr
+    Uapi_LinAeRouteAttr_t* pLinAeDayRouteAttr
 ) {
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
 
@@ -75,16 +75,16 @@ XCamReturn rk_aiq_user_api_ae_getLinAeRouteAttr
         algoHandle<RkAiqAeHandleInt>(sys_ctx, RK_AIQ_ALGO_TYPE_AE);
 
     if (algo_handle) {
-        return algo_handle->getLinAeRouteAttr(pLinAeRouteAttr);
+        return algo_handle->getLinAeDayRouteAttr(pLinAeDayRouteAttr);
     }
 
     return(ret);
 
 }
-XCamReturn rk_aiq_user_api_ae_setHdrAeRouteAttr
+XCamReturn rk_aiq_user_api_ae_setHdrAeDayRouteAttr
 (
     const rk_aiq_sys_ctx_t* sys_ctx,
-    const Uapi_HdrAeRouteAttr_t hdrAeRouteAttr
+    const Uapi_HdrAeRouteAttr_t hdrAeDayRouteAttr
 ) {
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
 
@@ -92,16 +92,16 @@ XCamReturn rk_aiq_user_api_ae_setHdrAeRouteAttr
         algoHandle<RkAiqAeHandleInt>(sys_ctx, RK_AIQ_ALGO_TYPE_AE);
 
     if (algo_handle) {
-        return algo_handle->setHdrAeRouteAttr(hdrAeRouteAttr);
+        return algo_handle->setHdrAeDayRouteAttr(hdrAeDayRouteAttr);
     }
 
     return(ret);
 
 }
-XCamReturn rk_aiq_user_api_ae_getHdrAeRouteAttr
+XCamReturn rk_aiq_user_api_ae_getHdrAeDayRouteAttr
 (
     const rk_aiq_sys_ctx_t* sys_ctx,
-    Uapi_HdrAeRouteAttr_t* pHdrAeRouteAttr
+    Uapi_HdrAeRouteAttr_t* pHdrAeDayRouteAttr
 ) {
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
 
@@ -109,12 +109,80 @@ XCamReturn rk_aiq_user_api_ae_getHdrAeRouteAttr
         algoHandle<RkAiqAeHandleInt>(sys_ctx, RK_AIQ_ALGO_TYPE_AE);
 
     if (algo_handle) {
-        return algo_handle->getHdrAeRouteAttr(pHdrAeRouteAttr);
+        return algo_handle->getHdrAeDayRouteAttr(pHdrAeDayRouteAttr);
     }
 
     return(ret);
 
 }
+XCamReturn rk_aiq_user_api_ae_setLinAeNightRouteAttr
+(
+    const rk_aiq_sys_ctx_t* sys_ctx,
+    const Uapi_LinAeRouteAttr_t linAeNightRouteAttr
+) {
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+
+    RkAiqAeHandleInt* algo_handle =
+        algoHandle<RkAiqAeHandleInt>(sys_ctx, RK_AIQ_ALGO_TYPE_AE);
+
+    if (algo_handle) {
+        return algo_handle->setLinAeNightRouteAttr(linAeNightRouteAttr);
+    }
+
+    return(ret);
+}
+XCamReturn rk_aiq_user_api_ae_getLinAeNightRouteAttr
+(
+    const rk_aiq_sys_ctx_t* sys_ctx,
+    Uapi_LinAeRouteAttr_t* pLinAeNightRouteAttr
+) {
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+
+    RkAiqAeHandleInt* algo_handle =
+        algoHandle<RkAiqAeHandleInt>(sys_ctx, RK_AIQ_ALGO_TYPE_AE);
+
+    if (algo_handle) {
+        return algo_handle->getLinAeNightRouteAttr(pLinAeNightRouteAttr);
+    }
+
+    return(ret);
+
+}
+XCamReturn rk_aiq_user_api_ae_setHdrAeNightRouteAttr
+(
+    const rk_aiq_sys_ctx_t* sys_ctx,
+    const Uapi_HdrAeRouteAttr_t hdrAeNightRouteAttr
+) {
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+
+    RkAiqAeHandleInt* algo_handle =
+        algoHandle<RkAiqAeHandleInt>(sys_ctx, RK_AIQ_ALGO_TYPE_AE);
+
+    if (algo_handle) {
+        return algo_handle->setHdrAeNightRouteAttr(hdrAeNightRouteAttr);
+    }
+
+    return(ret);
+
+}
+XCamReturn rk_aiq_user_api_ae_getHdrAeNightRouteAttr
+(
+    const rk_aiq_sys_ctx_t* sys_ctx,
+    Uapi_HdrAeRouteAttr_t* pHdrAeNightRouteAttr
+) {
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+
+    RkAiqAeHandleInt* algo_handle =
+        algoHandle<RkAiqAeHandleInt>(sys_ctx, RK_AIQ_ALGO_TYPE_AE);
+
+    if (algo_handle) {
+        return algo_handle->getHdrAeNightRouteAttr(pHdrAeNightRouteAttr);
+    }
+
+    return(ret);
+
+}
+
 XCamReturn rk_aiq_user_api_ae_queryExpResInfo
 (
     const rk_aiq_sys_ctx_t* sys_ctx,
@@ -196,6 +264,41 @@ XCamReturn rk_aiq_user_api_ae_getHdrExpAttr
 
     if (algo_handle) {
         return algo_handle->getHdrExpAttr(pHdrExpAttr);
+    }
+
+    return(ret);
+
+}
+
+XCamReturn rk_aiq_user_api_ae_setExpWinAttr
+(
+    const rk_aiq_sys_ctx_t* sys_ctx,
+    const Uapi_ExpWin_t ExpWin
+) {
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+
+    RkAiqAeHandleInt* algo_handle =
+        algoHandle<RkAiqAeHandleInt>(sys_ctx, RK_AIQ_ALGO_TYPE_AE);
+
+    if (algo_handle) {
+        return algo_handle->setExpWinAttr(ExpWin);
+    }
+
+    return(ret);
+
+}
+XCamReturn rk_aiq_user_api_ae_getExpWinAttr
+(
+    const rk_aiq_sys_ctx_t* sys_ctx,
+    Uapi_ExpWin_t* pExpWin
+) {
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+
+    RkAiqAeHandleInt* algo_handle =
+        algoHandle<RkAiqAeHandleInt>(sys_ctx, RK_AIQ_ALGO_TYPE_AE);
+
+    if (algo_handle) {
+        return algo_handle->getExpWinAttr(pExpWin);
     }
 
     return(ret);

@@ -67,38 +67,16 @@ typedef struct Uapi_ExpSwAttr_s {
  * @brief   ISP2.0 AEC API LinExpAttr/HdrExpAttr Params
  */
 /*****************************************************************************/
-typedef CalibDb_AecDynamicSetpoint_t Uapi_AeDySetpoint_t;
+typedef CalibDb_LinearAE_Attr_t Uapi_LinExpAttr_t;
 
-typedef struct Uapi_LinExpAttr_s {
-    float                   SetPoint;                   /**< set point to hit by the ae control system */
-    float                   NightSetPoint;
-    float                   EvBias;
-    float                   Tolerance;
-    int                     StrategyMode;
-    bool                    DySetPointEn;
-    Uapi_AeDySetpoint_t     DySetpoint[AEC_DNMODE_MAX];
-    uint8_t                 BacklitEn;
-} Uapi_LinExpAttr_t;
-
-typedef struct Uapi_HdrExpAttr_s {
-    float                   Tolerance;
-    int                     StrategyMode;
-    float                   Evbias;
-    //ExpRatioCtrl
-    int                     ExpRatioType;
-    Cam1x6FloatMatrix_t     RatioExpDot;
-    Cam1x6FloatMatrix_t     M2SRatioFix;
-    Cam1x6FloatMatrix_t     L2MRatioFix;
-    Cam1x6FloatMatrix_t     M2SRatioMax;
-    Cam1x6FloatMatrix_t     L2MRatioMax;
-} Uapi_HdrExpAttr_t;
+typedef CalibDb_HdrAE_Attr_t Uapi_HdrExpAttr_t;
 
 /*****************************************************************************/
 /**
  * @brief   ISP2.0 AEC API ExpHwAttr Params
  */
 /*****************************************************************************/
-typedef struct window Aec_Win_t;
+typedef struct window Uapi_ExpWin_t;
 
 /*****************************************************************************/
 /**

@@ -20,6 +20,8 @@
 #ifndef _RK_AIQ_TYPE_ALSC_HW_H_
 #define _RK_AIQ_TYPE_ALSC_HW_H_
 #include "rk_aiq_comm.h"
+#define LSC_DATA_TBL_V_SIZE         17
+#define LSC_DATA_TBL_H_SIZE         17
 #define LSC_DATA_TBL_SIZE           289
 #define LSC_GRAD_TBL_SIZE           8
 #define LSC_SIZE_TBL_SIZE           8

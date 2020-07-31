@@ -2,7 +2,7 @@
 <matfile>
     <header type="struct" size="[1 1]">
         <code_xml_parse_version index="1" type="char" size="[1 6]">
-            v1.1.3
+            v1.1.7
         </code_xml_parse_version>
         <creation_date index="1" type="char" size="[1 10]">
             2020-04-24
@@ -19,7 +19,9 @@
         <generator_version index="1" type="char" size="[1 6]">
             v1.0.9
         </generator_version>
-        <magic_code_version  index="1" type="int" size="[1 1]">          [1003001]        </magic_code_version>
+        <magic_code_version  index="1" type="int" size="[1 1]">
+            [1023357]
+        </magic_code_version>
     </header>
     <sensor type="struct" size="[1 1]">
         <AWB index="1" type="struct" size="[1 1]">
@@ -1970,7 +1972,9 @@
                     </VBPercent>
                 </IRNightMode>
             </AecDNSwitch>
-            <AecManualCtrl index="1" type="struct" size="[1 1]">
+	<AecEnvLvCalib index="1" type="struct" size="[1 1]">
+               <CalibFNumber index="1" type="double" size="[1 1]">                  [2.0]               </CalibFNumber>
+               <CurveCoeff index="1" type="double" size="[1 2]">                  [0.2433 -3.492]               </CurveCoeff>         </AecEnvLvCalib>            <AecManualCtrl index="1" type="struct" size="[1 1]">
                 <LinearAE index="1" type="struct" size="[1 1]">
                     <ManualTimeEn index="1" type="double" size="[1 1]">
                         [1 ]
@@ -2251,7 +2255,7 @@
                         [12.0000 ]
                     </HLLumaTolerance>
                     <HLROIExpandEn index="1" type="double" size="[1 1]">
-                        [0 ]
+                        [1]
                     </HLROIExpandEn>
                 </SframeCtrl>
             </HdrAECtrl>
@@ -2453,6 +2457,7 @@
                     </TmoContrast>
                 </TmoContrast>
                 <MoreSetting index="1" type="struct" size="[1 1]">
+                 <Band_Prior index="1" type="double" size="[1 1]">                     [0]                 </Band_Prior>
                     <clipgap0 index="1" type="double" size="[1 1]">
                         [12.0000 ]
                     </clipgap0>
@@ -2492,6 +2497,8 @@
             <Version index="1" type="char" size="[1 2]">
                 V1
             </Version>
+	<Fast_mode index="1" type="struct" size="[1 1]">
+	<Fast_mode_enable index="1" type="double" size="[1 1]">            [0]         </Fast_mode_enable>         <ISO index="1" type="double" size="[1 13]">            [50 100 200 400 800 1600 3200 6400 12800 25600 51200 102400  204800]         </ISO>         <Single_enable index="1" type="double" size="[1 1]">            [0]         </Single_enable>	<Single_level index="1" type="double" size="[1 13]">            [0 0 0 0 0 0 0 0 0 0 0 0 0]         </Single_level>	<Double_enable index="1" type="double" size="[1 1]">            [0]         </Double_enable>	<Double_level index="1" type="double" size="[1 13]">            [0 0 0 0 0 0 0 0 0 0 0 0 0]         </Double_level>	<Triple_enable index="1" type="double" size="[1 1]">            [0]         </Triple_enable>	<Triple_level index="1" type="double" size="[1 13]">            [0 0 0 0 0 0 0 0 0 0 0 0 0]         </Triple_level>	</Fast_mode>	<Expert_mode index="1" type="struct" size="[1 1]">
             <ISO index="1" type="double" size="[1 13]">
                 [50.0000 100.0000 200.0000 400.0000 800.0000 1600.0000 3200.0000 6400.0000 12800.0000 25600.0000 51200.0000 102400.0000 204800.0000 ]
             </ISO>
@@ -2683,6 +2690,7 @@
                     </rnd_offs>
                 </cell>
             </set_cell>
+	</Expert_mode >
             <dpcc_pdaf index="1" type="struct" size="[1 1]">
                 <pdaf_en index="1" type="double" size="[1 1]">
               [0]
@@ -17539,15 +17547,9 @@
         </DEHAZE>
         <SENSORINFO index="1" type="struct" size="[1 1]">
             <GainRange index="1" type="struct" size="[1 1]">
-                <IsLinear index="1" type="double" size="[1 1]">
-	          [1]
-                </IsLinear>
-                <Linear index="1" type="double" size="[1 7]">
-                   [2.0000 512.0000 256.0000 0.0000 1.0000 512.0000 131072.0000]
-                </Linear>
-                <NonLinear index="1" type="char" size="[1 10]">
-	          DB_MODE
-                </NonLinear>
+                <IsLinear index="1" type="double" size="[1 1]">	          [1]                </IsLinear>                <Linear index="1" type="double" size="[1 7]">
+                   [2.0000 512.0000 256.0000 0.0000 1.0000 512.0000 131072.0000]                </Linear>
+                <NonLinear index="1" type="char" size="[1 10]">	          DB_MODE                </NonLinear>
 	   </GainRange>
             <TimeFactor index="1" type="double" size="[1 4]">
                 [0.0000 0.0000 1.0000 0.5000 ]
@@ -17579,8 +17581,16 @@
             <CISIspDgainRange index="1" type="double" size="[1 2]">
                 [1.0000 1.0000 ]
             </CISIspDgainRange>
+			<SensorFlip index="1" type="char" size="[1 1]">
+				[0]
+			</SensorFlip>
         </SENSORINFO>
-        <LUT3D index="1" type="struct" size="[1 1]">
+      <MODULEINFO  index="1" type="struct" size="[1 1]">
+         <FNumber index="1" type="double" size="[1 1]">            [2.0]         </FNumber>
+         <EFL index="1" type="double" size="[1 1]">            [3.6]         </EFL>
+         <LensTavg index="1" type="double" size="[1 1]">            [90]         </LensTavg>
+         <IRCutTavg index="1" type="double" size="[1 1]">            [90]         </IRCutTavg>
+      </MODULEINFO>        <LUT3D index="1" type="struct" size="[1 1]">
             <enable index="1" type="double" size="[1 1]">
                 [0 ]
             </enable>
@@ -17661,16 +17671,13 @@
                 [0.2000 ]
             </threshold>
         </LUMADETECT>
-      <COLOR_AS_GREY index="1" type="struct" size="[1 1]">
-          <enable index="1" type="int" size="[1 1]">
-               [0]
-          </enable>
+      <COLOR_AS_GREY index="1" type="struct" size="[1 1]">          <enable index="1" type="int" size="[1 1]">               [0]          </enable>
        </COLOR_AS_GREY>
     </sensor>
     <system type="struct" size="[1 1]">
         <HDR index="1" type="struct" size="[1 1]">
             <enable index="1" type="double" size="[1 1]">
-            [0 ]
+            [1 ]
         </enable>
             <support_mode index="1" type="char" size="[1 1]">MODE_2_LINE</support_mode>
             <line_mode index="1" type="char" size="[1 10]">DCG</line_mode>

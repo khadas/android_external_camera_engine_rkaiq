@@ -169,7 +169,7 @@ struct rawaebig_stat {
     unsigned short channelr_xy[RAWAEBIG_WIN_NUM];
     unsigned short channelg_xy[RAWAEBIG_WIN_NUM];
     unsigned short channelb_xy[RAWAEBIG_WIN_NUM];
-    unsigned char  channely_xy[RAWAEBIG_WIN_NUM]; //not HW!
+    unsigned int   channely_xy[RAWAEBIG_WIN_NUM]; //not HW!
     unsigned long int wndx_sumr[RAWAEBIG_SUBWIN_NUM];
     unsigned long int wndx_sumg[RAWAEBIG_SUBWIN_NUM];
     unsigned long int wndx_sumb[RAWAEBIG_SUBWIN_NUM];
@@ -182,7 +182,7 @@ struct rawaelite_stat {
     unsigned short channelr_xy[RAWAELITE_WIN_NUM];
     unsigned short channelg_xy[RAWAELITE_WIN_NUM];
     unsigned short channelb_xy[RAWAELITE_WIN_NUM];
-    unsigned char  channely_xy[RAWAELITE_WIN_NUM]; //not HW!
+    unsigned int   channely_xy[RAWAELITE_WIN_NUM]; //not HW!
 };
 
 struct yuvae_stat {

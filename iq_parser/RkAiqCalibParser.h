@@ -151,6 +151,7 @@ private:
     bool parseEntrySensorAecManualCtrlLinearAE(const XMLElement*, void* param = NULL);
     bool parseEntrySensorAecManualCtrlHdrAE(const XMLElement*, void* param = NULL);
     bool parseEntrySensorAecManualCtrl(const XMLElement*, void* param = NULL);
+    bool parseEntrySensorAecEnvLvCalib(const XMLElement*, void* param = NULL);
     bool parseEntrySensorAecRoute(const XMLElement*, void* param = NULL);
     bool parseEntrySensorLinearAECtrlAoe(const XMLElement*, void* param = NULL);
     bool parseEntrySensorLinearAECtrl(const XMLElement*, void* param = NULL);
@@ -180,6 +181,8 @@ private:
     bool parseEntrySensorBlc(const XMLElement* pelement, void* param = NULL);
     bool parseEntrySensorLut3d(const XMLElement* pelement, void* param = NULL);
     bool parseEntrySensorDpcc(const XMLElement* pelement, void* param = NULL);
+    bool parseEntrySensorDpccFastMode(const XMLElement* pelement, void* param = NULL);
+    bool parseEntrySensorDpccExpertMode(const XMLElement* pelement, void* param = NULL);
     bool parseEntrySensorDpccSetCell(const XMLElement* pelement, void* param = NULL);
     bool parseEntrySensorDpccPdaf(const XMLElement* pelement, void* param = NULL);
     bool parseEntrySensorDpccSensor(const XMLElement* pelement, void* param = NULL);
@@ -231,6 +234,7 @@ private:
     bool parseEntrySensorOrb(const XMLElement* pelement, void* param = NULL);
     bool parseEntrySensorInfoGainRange(const XMLElement* pelement, void* param = NULL);
     bool parseEntrySensorInfo(const XMLElement* pelement, void* param = NULL);
+    bool parseEntrySensorModuleInfo(const XMLElement* pelement, void* param = NULL);
     bool parseEntrySensorCpsl(const XMLElement* pelement, void* param = NULL);
     bool parseEntrySensorColorAsGrey(const XMLElement* pelement, void* param = NULL);
     bool parseEntrySystemHDR(const XMLElement* pelement, void* param = NULL);
