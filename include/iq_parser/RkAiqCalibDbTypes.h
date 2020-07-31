@@ -170,6 +170,13 @@ typedef struct CalibDb_AeRoute_Attr_s {
     CalibDb_HdrAeRoute_Attr_t HdrAeSeperate[AEC_DNMODE_MAX];
 } CalibDb_AeRoute_Attr_t;
 
+typedef struct CalibDb_AeEnvLvCalib_s {
+    float CalibFN;
+    float RealFN;
+    Cam2x1FloatMatrix_t Curve;
+} CalibDb_AeEnvLvCalib_t;
+
+
 //2). Auto exposure
 typedef struct CalibDb_AeSpeed_s {
     float                   DampOver;
@@ -309,6 +316,8 @@ typedef struct CalibDb_AecCommon_Attr_s {
     //GridWeight
     Cam5x5UCharMatrix_t              DayGridWeights;
     Cam5x5UCharMatrix_t              NightGridWeights;
+    //envlv calibration
+    CalibDb_AeEnvLvCalib_t           stEnvLvCalib;
     //antiflicker
     CalibDb_AntiFlickerAttr_t        stAntiFlicker;
     //initial exp
@@ -494,8 +503,17 @@ typedef struct CalibDb_Sensor_Para_s {
     CalibDb_AeRange_t       CISExtraAgainRange; //add for HDR-DCG MODE, HCG range
     CalibDb_AeRange_t       CISDgainRange; //sensor Dgain
     CalibDb_AeRange_t       CISIspDgainRange; //Isp Dgain
+    // bit 0 : mirror
+    // bit 1 : flip
+    uint8_t                 flip; // this will change the sensor output image orientation
 } CalibDb_Sensor_Para_t;
 
+typedef struct CalibDb_Module_Info_s {
+    float FNumber;
+    float EFL;
+    float LensT;
+    float IRCutT;
+} CalibDb_Module_Info_t;
 
 #define CALD_AWB_LS_NUM_MAX 7
 #define CALD_AWB_WINDOW_NUM_MAX 8
@@ -877,6 +895,7 @@ typedef struct TmoContrast_s
 
 typedef struct TmoMoreSetting_s
 {
+    float Band_Prior;
     float clipgap0;
     float clipgap1;
     float clipratio0;
@@ -913,9 +932,21 @@ typedef struct CalibDb_Dpcc_set_s {
     unsigned char pg_fac[2][CALIBDB_DPCC_MAX_ISO_LEVEL];
     unsigned char rnd_thresh[2][CALIBDB_DPCC_MAX_ISO_LEVEL];
     unsigned char rg_fac[2][CALIBDB_DPCC_MAX_ISO_LEVEL];
-    unsigned char rg_lim[2][CALIBDB_DPCC_MAX_ISO_LEVEL];
+    unsigned char ro_lim[2][CALIBDB_DPCC_MAX_ISO_LEVEL];
     unsigned char rnd_offs[2][CALIBDB_DPCC_MAX_ISO_LEVEL];
 } CalibDb_Dpcc_set_t;
+
+typedef struct CalibDb_Dpcc_Fast_Mode_s {
+    int fast_mode_en;
+    int ISO[CALIBDB_DPCC_MAX_ISO_LEVEL];
+    int fast_mode_single_en;
+    int fast_mode_single_level[CALIBDB_DPCC_MAX_ISO_LEVEL];
+    int fast_mode_double_en;
+    int fast_mode_double_level[CALIBDB_DPCC_MAX_ISO_LEVEL];
+    int fast_mode_triple_en;
+    int fast_mode_triple_level[CALIBDB_DPCC_MAX_ISO_LEVEL];
+
+} CalibDb_Dpcc_Fast_Mode_t;
 
 typedef struct CalibDb_Dpcc_Pdaf_s {
     unsigned char en;
@@ -931,18 +962,7 @@ typedef struct CalibDb_Dpcc_Pdaf_s {
     unsigned char forward_med;
 } CalibDb_Dpcc_Pdaf_t;
 
-typedef struct CalibDb_Dpcc_Sensor_s {
-    float en;
-    float max_level;
-    float iso[CALIBDB_DPCC_MAX_ISO_LEVEL];
-    float level_single[CALIBDB_DPCC_MAX_ISO_LEVEL];
-    float level_multiple[CALIBDB_DPCC_MAX_ISO_LEVEL];
-} CalibDb_Dpcc_Sensor_t;
-
-
-typedef struct CalibDb_Dpcc_s {
-    int enable;
-    char version[64];
+typedef struct CalibDb_Dpcc_Expert_Mode_s {
     float iso[CALIBDB_DPCC_MAX_ISO_LEVEL];
     unsigned char stage1_Enable[CALIBDB_DPCC_MAX_ISO_LEVEL];
     unsigned char grayscale_mode[CALIBDB_DPCC_MAX_ISO_LEVEL];
@@ -957,6 +977,22 @@ typedef struct CalibDb_Dpcc_s {
     unsigned char stage1_use_set2[CALIBDB_DPCC_MAX_ISO_LEVEL];
     unsigned char stage1_use_set1[CALIBDB_DPCC_MAX_ISO_LEVEL];
     CalibDb_Dpcc_set_t set[3];
+} CalibDb_Dpcc_Expert_Mode_t;
+
+typedef struct CalibDb_Dpcc_Sensor_s {
+    float en;
+    float max_level;
+    float iso[CALIBDB_DPCC_MAX_ISO_LEVEL];
+    float level_single[CALIBDB_DPCC_MAX_ISO_LEVEL];
+    float level_multiple[CALIBDB_DPCC_MAX_ISO_LEVEL];
+} CalibDb_Dpcc_Sensor_t;
+
+
+typedef struct CalibDb_Dpcc_s {
+    int enable;
+    char version[64];
+    CalibDb_Dpcc_Fast_Mode_t fast;
+    CalibDb_Dpcc_Expert_Mode_t expert;
     CalibDb_Dpcc_Pdaf_t pdaf;
     CalibDb_Dpcc_Sensor_t sensor_dpcc;
 } CalibDb_Dpcc_t;
@@ -1697,6 +1733,7 @@ typedef struct CamCalibDbContext_s {
     CalibDb_LUMA_DETECT_t lumaDetect;
     CalibDb_ORB_t orb;
     CalibDb_Sensor_Para_t sensor;
+    CalibDb_Module_Info_t module;
     CalibDb_Cpsl_t cpsl;
     CalibDb_ColorAsGrey_t colorAsGrey;
     CalibDb_System_t  sysContrl;

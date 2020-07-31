@@ -79,6 +79,12 @@ public:
     virtual XCamReturn offlineRdJobDone() {
         return  XCAM_RETURN_ERROR_FAILED;
     }
+    virtual XCamReturn setSensorFlip(bool mirror, bool flip) {
+        return  XCAM_RETURN_ERROR_FAILED;
+    }
+    virtual XCamReturn getSensorFlip(bool& mirror, bool& flip) {
+        return  XCAM_RETURN_ERROR_FAILED;
+    }
 protected:
     SmartPtr<V4l2Device> mIsppStatsDev;
     SmartPtr<V4l2Device> mIsppParamsDev;

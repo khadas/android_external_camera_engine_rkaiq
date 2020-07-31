@@ -30,6 +30,7 @@ void AhdrApiOnUpdate(AhdrHandle_t pAhdrCtx);
 void AhdrGetSensorInfo( AhdrHandle_t pAhdrCtx, AecProcResult_t AecHdrProcResult);
 void AhdrGetXmlParas(AhdrHandle_t pAhdrCtx, const CamCalibDbContext_t* pConfig);
 void AhdrUpdateConfig(AhdrHandle_t pAhdrCtx, AecPreResult_t AecHdrPreResult, af_preprocess_result_t AfPreResult);
+bool BandPrior(AhdrHandle_t pAhdrCtx);
 RESULT AhdrInit(AhdrInstanceConfig_t* pInstConfig) ;
 RESULT AhdrRelease(AhdrHandle_t pAhdrCtx) ;
 void AhdrProcessing(AhdrHandle_t pAhdrCtx);

@@ -2,7 +2,7 @@
 <matfile>
     <header type="struct" size="[1 1]">
         <code_xml_parse_version index="1" type="char" size="[1 6]">
-         v1.1.3
+         v1.1.7
         </code_xml_parse_version>
         <creation_date index="1" type="char" size="[1 10]">
             2020-06-19
@@ -20,7 +20,7 @@
             v1.1.1
         </generator_version>
         <magic_code_version  index="1" type="int" size="[1 1]">
-       [1003001]
+	  [1023357]
         </magic_code_version>
     </header>
     <sensor type="struct" size="[1 1]">
@@ -1991,6 +1991,9 @@
                     </VBPercent>
                 </IRNightMode>
             </AecDNSwitch>
+	<AecEnvLvCalib index="1" type="struct" size="[1 1]">
+               <CalibFNumber index="1" type="double" size="[1 1]">                  [1.6]               </CalibFNumber>
+               <CurveCoeff index="1" type="double" size="[1 2]">                  [0.02859 0.5972]               </CurveCoeff>         </AecEnvLvCalib>
             <AecManualCtrl index="1" type="struct" size="[1 1]">
                 <LinearAE index="1" type="struct" size="[1 1]">
                     <ManualTimeEn index="1" type="double" size="[1 1]">
@@ -2460,10 +2463,11 @@
                     [0]
                  </Tolerance>
                  <TmoContrast index="1" type="double" size="[1 6]">
-                    [0.8 0.8 0.8 0.8 0.8 0.8]
+                    [0.3 0.3 0.3 0.3 0.3 0.3]
                  </TmoContrast>
          </TmoContrast>
          <MoreSetting index="1" type="struct" size="[1 1]">
+                 <Band_Prior index="1" type="double" size="[1 1]">                     [0]                 </Band_Prior>
                  <clipgap0 index="1" type="double" size="[1 1]">
                      [12]
                  </clipgap0>
@@ -2495,6 +2499,8 @@
             <Version index="1" type="char" size="[1 2]">
                 V1
             </Version>
+	<Fast_mode index="1" type="struct" size="[1 1]">
+	<Fast_mode_enable index="1" type="double" size="[1 1]">            [0]         </Fast_mode_enable>         <ISO index="1" type="double" size="[1 13]">            [50 100 200 400 800 1600 3200 6400 12800 25600 51200 102400  204800]         </ISO>         <Single_enable index="1" type="double" size="[1 1]">            [0]         </Single_enable>	<Single_level index="1" type="double" size="[1 13]">            [0 0 0 0 0 0 0 0 0 0 0 0 0]         </Single_level>	<Double_enable index="1" type="double" size="[1 1]">            [0]         </Double_enable>	<Double_level index="1" type="double" size="[1 13]">            [0 0 0 0 0 0 0 0 0 0 0 0 0]         </Double_level>	<Triple_enable index="1" type="double" size="[1 1]">            [0]         </Triple_enable>	<Triple_level index="1" type="double" size="[1 13]">            [0 0 0 0 0 0 0 0 0 0 0 0 0]         </Triple_level>	</Fast_mode>	<Expert_mode index="1" type="struct" size="[1 1]">
          <ISO index="1" type="double" size="[1 13]">
             [50 100 200 400 800 1500 1507 1510 3200 6400 12800 102400  204800]
             </ISO>
@@ -2686,6 +2692,7 @@
          	</rnd_offs>
                 </cell>
             </set_cell>
+	</Expert_mode >
             <dpcc_pdaf index="1" type="struct" size="[1 1]">
                 <pdaf_en index="1" type="double" size="[1 1]">
               [0]
@@ -15935,8 +15942,16 @@
             <CISIspDgainRange index="1" type="double" size="[1 2]">
                 [1.0000 1.0000 ]
             </CISIspDgainRange>
+			<SensorFlip index="1" type="char" size="[1 1]">
+				[0]
+			</SensorFlip>
         </SENSORINFO>
-        <LUT3D index="1" type="struct" size="[1 1]">
+      <MODULEINFO  index="1" type="struct" size="[1 1]">
+         <FNumber index="1" type="double" size="[1 1]">            [1.8]         </FNumber>
+         <EFL index="1" type="double" size="[1 1]">            [3.95]         </EFL>
+         <LensTavg index="1" type="double" size="[1 1]">            [90]         </LensTavg>
+         <IRCutTavg index="1" type="double" size="[1 1]">            [90]         </IRCutTavg>
+      </MODULEINFO>        <LUT3D index="1" type="struct" size="[1 1]">
             <enable index="1" type="double" size="[1 1]">
                 [0]
             </enable>

@@ -269,6 +269,18 @@ typedef struct Adpcc_pdaf_params_select_s {
     unsigned char pdaf_forward_med;
 } Adpcc_pdaf_params_select_t;
 
+typedef struct Adpcc_fast_mode_params_s {
+    int fast_mode_en;
+    int ISO[CALIBDB_DPCC_MAX_ISO_LEVEL];
+    int fast_mode_single_en;
+    int fast_mode_single_level[CALIBDB_DPCC_MAX_ISO_LEVEL];
+    int fast_mode_double_en;
+    int fast_mode_double_level[CALIBDB_DPCC_MAX_ISO_LEVEL];
+    int fast_mode_triple_en;
+    int fast_mode_triple_level[CALIBDB_DPCC_MAX_ISO_LEVEL];
+} Adpcc_fast_mode_params_t;
+
+
 typedef struct Adpcc_sensor_dpcc_s {
     bool en;
     int max_level;

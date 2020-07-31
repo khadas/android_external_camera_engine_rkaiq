@@ -686,6 +686,24 @@ rk_aiq_gray_mode_t rk_aiq_uapi_getGrayMode(const rk_aiq_sys_ctx_t* ctx);
 XCamReturn rk_aiq_uapi_setFrameRate(const rk_aiq_sys_ctx_t* ctx, frameRateInfo_t info);
 XCamReturn rk_aiq_uapi_getFrameRate(const rk_aiq_sys_ctx_t* ctx, frameRateInfo_t *info);
 
+/*
+*****************************
+*
+* Desc: set mirro & flip
+* Argument:
+*****************************
+*/
+XCamReturn rk_aiq_uapi_setMirroFlip(const rk_aiq_sys_ctx_t* ctx, bool mirror, bool flip);
+
+/*
+*****************************
+*
+* Desc: get mirro & flip
+* Argument:
+*****************************
+*/
+XCamReturn rk_aiq_uapi_getMirrorFlip(const rk_aiq_sys_ctx_t* ctx, bool* mirror, bool* flip);
+
 RKAIQ_END_DECLARE
 
 #endif

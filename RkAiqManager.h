@@ -101,6 +101,9 @@ public:
     XCamReturn offlineRdJobPrepare();
     XCamReturn offlineRdJobDone();
     XCamReturn setSharpFbcRotation(rk_aiq_rotation_t rot);
+    XCamReturn setMirrorFlip(bool mirror, bool flip);
+    XCamReturn getMirrorFlip(bool& mirror, bool& flip);
+    void setDefMirrorFlip();
 protected:
     XCamReturn applyAnalyzerResult(SmartPtr<RkAiqFullParamsProxy>& results);
 private:
@@ -125,6 +128,8 @@ private:
     uint32_t mWidth;
     uint32_t mHeight;
     int _state;
+    bool mCurMirror;
+    bool mCurFlip;
 };
 
 }; //namespace RkCam

@@ -832,6 +832,9 @@ RkAiqCore::genIspAhdrResult(RkAiqFullParams* params)
         isp_param->ahdr_proc_res.TmoProcRes.sw_hdrtmo_lgscl_ratio =
             ahdr_rk->AhdrProcRes.TmoProcRes.sw_hdrtmo_lgscl_ratio;
 
+        isp_param->ahdr_proc_res.isHdrGlobalTmo =
+            ahdr_rk->AhdrProcRes.isHdrGlobalTmo;
+
     }
 
     EXIT_ANALYZER_FUNCTION();
@@ -1522,11 +1525,29 @@ RkAiqCore::genIspAlscResult(RkAiqFullParams* params)
         LOGD_ANALYZER("no alsc result");
         return XCAM_RETURN_NO_ERROR;
     }
-
     // TODO: gen alsc common result
     RkAiqAlgoProcResAlsc* alsc_rk = (RkAiqAlgoProcResAlsc*)alsc_com;
     isp_param->lsc = alsc_rk->alsc_hw_conf;
-
+    if(mAlogsSharedParams.sns_mirror){
+        for(int i = 0; i < LSC_DATA_TBL_V_SIZE; i++){
+            for(int j = 0; j < LSC_DATA_TBL_H_SIZE; j++){
+                SWAP(unsigned short,isp_param->lsc.r_data_tbl[i*LSC_DATA_TBL_H_SIZE+j],isp_param->lsc.r_data_tbl[i*LSC_DATA_TBL_H_SIZE+(LSC_DATA_TBL_H_SIZE-1-j)]);
+                SWAP(unsigned short,isp_param->lsc.gr_data_tbl[i*LSC_DATA_TBL_H_SIZE+j],isp_param->lsc.gr_data_tbl[i*LSC_DATA_TBL_H_SIZE+(LSC_DATA_TBL_H_SIZE-1-j)]);
+                SWAP(unsigned short,isp_param->lsc.gb_data_tbl[i*LSC_DATA_TBL_H_SIZE+j],isp_param->lsc.gb_data_tbl[i*LSC_DATA_TBL_H_SIZE+(LSC_DATA_TBL_H_SIZE-1-j)]);
+                SWAP(unsigned short,isp_param->lsc.b_data_tbl[i*LSC_DATA_TBL_H_SIZE+j],isp_param->lsc.b_data_tbl[i*LSC_DATA_TBL_H_SIZE+(LSC_DATA_TBL_H_SIZE-1-j)]);
+            }
+        }
+    }
+    if(mAlogsSharedParams.sns_flip){
+        for(int i = 0; i < LSC_DATA_TBL_V_SIZE; i++){
+            for(int j = 0; j < LSC_DATA_TBL_H_SIZE; j++){
+                SWAP(unsigned short,isp_param->lsc.r_data_tbl[i*LSC_DATA_TBL_H_SIZE+j],isp_param->lsc.r_data_tbl[(LSC_DATA_TBL_V_SIZE-1-i)*LSC_DATA_TBL_H_SIZE+j]);
+                SWAP(unsigned short,isp_param->lsc.gr_data_tbl[i*LSC_DATA_TBL_H_SIZE+j],isp_param->lsc.gr_data_tbl[(LSC_DATA_TBL_V_SIZE-1-i)*LSC_DATA_TBL_H_SIZE+j]);
+                SWAP(unsigned short,isp_param->lsc.gb_data_tbl[i*LSC_DATA_TBL_H_SIZE+j],isp_param->lsc.gb_data_tbl[(LSC_DATA_TBL_V_SIZE-1-i)*LSC_DATA_TBL_H_SIZE+j]);
+                SWAP(unsigned short,isp_param->lsc.b_data_tbl[i*LSC_DATA_TBL_H_SIZE+j],isp_param->lsc.b_data_tbl[(LSC_DATA_TBL_V_SIZE-1-i)*LSC_DATA_TBL_H_SIZE+j]);
+            }
+        }
+    }
     SmartPtr<RkAiqHandle>* handle = getCurAlgoTypeHandle(RK_AIQ_ALGO_TYPE_ALSC);
     int algo_id = (*handle)->getAlgoId();
 
@@ -2027,7 +2048,7 @@ RkAiqCore::convertIspstatsToAlgo(const SmartPtr<VideoBuffer> &buffer)
     mAlogsSharedParams.ispStats.awb_cfg_effect_v200 = ispParams->data()->awb_cfg_v200;
     mAlogsSharedParams.ispStats.awb_cfg_effect_valid = true;
 
-    for(int i = 0; i < RK_AIQ_AWB_MAX_WHITEREGIONS_NUM; i++) {
+    for(int i = 0; i < mAlogsSharedParams.ispStats.awb_cfg_effect_v200.lightNum; i++) {
         mAlogsSharedParams.ispStats.awb_stats.light[i].xYType[RK_AIQ_AWB_XY_TYPE_NORMAL_V200].Rvalue =
             stats->params.rawawb.ro_rawawb_sum_r_nor[i];
         mAlogsSharedParams.ispStats.awb_stats.light[i].xYType[RK_AIQ_AWB_XY_TYPE_NORMAL_V200].Gvalue =
@@ -2053,7 +2074,7 @@ RkAiqCore::convertIspstatsToAlgo(const SmartPtr<VideoBuffer> &buffer)
         mAlogsSharedParams.ispStats.awb_stats.light[i].xYType[RK_AIQ_AWB_XY_TYPE_SMALL_V200].WpNo =
             stats->params.rawawb.ro_rawawb_wp_num_sma[i];
     }
-    for(int i = 0; i < RK_AIQ_AWB_MAX_WHITEREGIONS_NUM; i++) {
+    for(int i = 0; i < mAlogsSharedParams.ispStats.awb_cfg_effect_v200.lightNum; i++) {
         mAlogsSharedParams.ispStats.awb_stats.multiwindowLightResult[i].xYType[RK_AIQ_AWB_XY_TYPE_NORMAL_V200].Rvalue =
             stats->params.rawawb.ro_sum_r_nor_multiwindow[i];
         mAlogsSharedParams.ispStats.awb_stats.multiwindowLightResult[i].xYType[RK_AIQ_AWB_XY_TYPE_NORMAL_V200].Gvalue =
@@ -2829,6 +2850,13 @@ RkAiqCore::getGrayMode()
 {
     LOGD_ANALYZER("%s: gray mode %d", __FUNCTION__, mGrayMode);
     return mGrayMode;
+}
+
+void
+RkAiqCore::setSensorFlip(bool mirror, bool flip)
+{
+    mAlogsSharedParams.sns_mirror = mirror;
+    mAlogsSharedParams.sns_flip = flip;
 }
 
 } //namespace RkCam

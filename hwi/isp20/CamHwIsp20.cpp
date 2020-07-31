@@ -3468,4 +3468,18 @@ bool CamHwIsp20::getDhazState()
     return mIsDhazOn;
 }
 
+XCamReturn CamHwIsp20::setSensorFlip(bool mirror, bool flip)
+{
+    SmartPtr<SensorHw> mSensorSubdev = mSensorDev.dynamic_cast_ptr<SensorHw>();
+
+    return mSensorSubdev->set_mirror_flip(mirror, flip);
+}
+
+XCamReturn CamHwIsp20::getSensorFlip(bool& mirror, bool& flip)
+{
+    SmartPtr<SensorHw> mSensorSubdev = mSensorDev.dynamic_cast_ptr<SensorHw>();
+
+    return mSensorSubdev->get_mirror_flip(mirror, flip);
+}
+
 }; //namspace RkCam

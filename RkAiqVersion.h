@@ -145,10 +145,27 @@
  * - ae: v0.1.4-20200722
  * - Fix the bug of getStaticCamHwInfo function
  * - xcore: add mutex for dq/que buffer, fix can_not_get_buffer error
+ * v1.0.3
+ * - Calib : v1.1.7  magic code: 1023357
+ * - iqfiles:
+ *   - rename all iqfiles
+ *   - add imx378, imx415,s5kgm1sp,gc2035
+ * - support sensor mirror and flip
+ * - ae:
+ *   - fix some ae uApi bugs
+ *   - add EnvCalibration in AE
+ * - FEC/LDCH: use resource path of user config
+ * - CamHwIsp20: fix wrong mutex unlock
+ * - DPCC:
+ *   - Redefine DPCC in algo, add Expert Mode
+ *   - Add Fast mode in DPCC
+ * - fix some compatible issues of vicap and isp
+ * - rkisp_demo: streaming stop after aiq
+ * - fix the bug calculating the times of readback is error in lumadetect
  */
 
-#define RK_AIQ_VERSION_REAL_V "v1.0.2"
-#define RK_AIQ_RELEASE_DATE "2020-07-24"
+#define RK_AIQ_VERSION_REAL_V "v1.0.3"
+#define RK_AIQ_RELEASE_DATE "2020-07-31"
 
 /******* DO NOT EDIT THE FOLLOWINGS ***********/
 

@@ -336,8 +336,42 @@ AdpccResult_t html_params_init(Adpcc_html_param_t *pParams)
 
 }
 
+AdpccResult_t dpcc_fast_mode_basic_params_init(Adpcc_fast_mode_params_t *pFasic, CalibDb_Dpcc_t *pCalib)
+{
+    AdpccResult_t ret = ADPCC_RET_SUCCESS;
+    LOGI_ADPCC("%s(%d): enter!\n", __FUNCTION__, __LINE__);
 
-AdpccResult_t dpcc_basic_params_init(Adpcc_basic_params_t *pBasic, CalibDb_Dpcc_t *pCalib)
+    if(pFasic == NULL) {
+        ret = ADPCC_RET_NULL_POINTER;
+        LOGE_ADPCC("%s(%d): invalid input params\n", __FUNCTION__, __LINE__);
+        return ret;
+    }
+
+    if(pCalib == NULL) {
+        ret = ADPCC_RET_NULL_POINTER;
+        LOGE_ADPCC("%s(%d): invalid input params\n", __FUNCTION__, __LINE__);
+        return ret;
+    }
+
+    pFasic->fast_mode_en = pCalib->fast.fast_mode_en;
+    pFasic->fast_mode_single_en = pCalib->fast.fast_mode_single_en;
+    pFasic->fast_mode_double_en = pCalib->fast.fast_mode_double_en;
+    pFasic->fast_mode_triple_en = pCalib->fast.fast_mode_triple_en;
+
+    for(int i = 0; i < DPCC_MAX_ISO_LEVEL; i++) {
+        pFasic->ISO[i] = pCalib->fast.ISO[i];
+        pFasic->fast_mode_single_level[i] = pCalib->fast.fast_mode_single_level[i];
+        pFasic->fast_mode_double_level[i] = pCalib->fast.fast_mode_double_level[i];
+        pFasic->fast_mode_triple_level[i] = pCalib->fast.fast_mode_triple_level[i];
+    }
+
+    LOGI_ADPCC("%s(%d): exit!\n", __FUNCTION__, __LINE__);
+    return ret;
+
+}
+
+
+AdpccResult_t dpcc_expert_mode_basic_params_init(Adpcc_basic_params_t *pBasic, CalibDb_Dpcc_t *pCalib)
 {
     AdpccResult_t ret = ADPCC_RET_SUCCESS;
     LOGI_ADPCC("%s(%d): enter!\n", __FUNCTION__, __LINE__);
@@ -355,158 +389,158 @@ AdpccResult_t dpcc_basic_params_init(Adpcc_basic_params_t *pBasic, CalibDb_Dpcc_
     }
 
     for(int i = 0; i < DPCC_MAX_ISO_LEVEL; i++) {
-        pBasic->arBasic[i].iso = pCalib->iso[i];
+        pBasic->arBasic[i].iso = pCalib->expert.iso[i];
 
         //mode 0x0000
-        pBasic->arBasic[i].stage1_enable = pCalib->stage1_Enable[i];
-        pBasic->arBasic[i].grayscale_mode = pCalib->grayscale_mode[i];
+        pBasic->arBasic[i].stage1_enable = pCalib->expert.stage1_Enable[i];
+        pBasic->arBasic[i].grayscale_mode = pCalib->expert.grayscale_mode[i];
         pBasic->arBasic[i].enable = pCalib->enable;
 
         //output_mode 0x0004
-        pBasic->arBasic[i].sw_rk_out_sel = pCalib->rk_out_sel[i];
-        pBasic->arBasic[i].sw_dpcc_output_sel = pCalib->dpcc_out_sel[i];
-        pBasic->arBasic[i].stage1_rb_3x3 = pCalib->stage1_rb_3x3[i];
-        pBasic->arBasic[i].stage1_g_3x3 = pCalib->stage1_g_3x3[i];
-        pBasic->arBasic[i].stage1_incl_rb_center = pCalib->stage1_inc_rb_center[i];
-        pBasic->arBasic[i].stage1_incl_green_center = pCalib->stage1_inc_g_center[i];
+        pBasic->arBasic[i].sw_rk_out_sel = pCalib->expert.rk_out_sel[i];
+        pBasic->arBasic[i].sw_dpcc_output_sel = pCalib->expert.dpcc_out_sel[i];
+        pBasic->arBasic[i].stage1_rb_3x3 = pCalib->expert.stage1_rb_3x3[i];
+        pBasic->arBasic[i].stage1_g_3x3 = pCalib->expert.stage1_g_3x3[i];
+        pBasic->arBasic[i].stage1_incl_rb_center = pCalib->expert.stage1_inc_rb_center[i];
+        pBasic->arBasic[i].stage1_incl_green_center = pCalib->expert.stage1_inc_g_center[i];
 
         //set_use 0x0008
-        pBasic->arBasic[i].stage1_use_fix_set = pCalib->stage1_use_fix_set[i];
-        pBasic->arBasic[i].stage1_use_set_3 = pCalib->stage1_use_set3[i];
-        pBasic->arBasic[i].stage1_use_set_2 = pCalib->stage1_use_set2[i];
-        pBasic->arBasic[i].stage1_use_set_1 = pCalib->stage1_use_set1[i];
+        pBasic->arBasic[i].stage1_use_fix_set = pCalib->expert.stage1_use_fix_set[i];
+        pBasic->arBasic[i].stage1_use_set_3 = pCalib->expert.stage1_use_set3[i];
+        pBasic->arBasic[i].stage1_use_set_2 = pCalib->expert.stage1_use_set2[i];
+        pBasic->arBasic[i].stage1_use_set_1 = pCalib->expert.stage1_use_set1[i];
 
         //methods_set_1 0x000c
-        pBasic->arBasic[i].sw_rk_red_blue1_en = pCalib->set[0].red_blue_enable[0][i];
-        pBasic->arBasic[i].rg_red_blue1_enable = pCalib->set[0].red_blue_enable[1][i];
-        pBasic->arBasic[i].rnd_red_blue1_enable = pCalib->set[0].red_blue_enable[2][i];
-        pBasic->arBasic[i].ro_red_blue1_enable = pCalib->set[0].red_blue_enable[3][i];
-        pBasic->arBasic[i].lc_red_blue1_enable = pCalib->set[0].red_blue_enable[4][i];
-        pBasic->arBasic[i].pg_red_blue1_enable = pCalib->set[0].red_blue_enable[5][i];
-        pBasic->arBasic[i].sw_rk_green1_en = pCalib->set[0].green_enable[0][i];
-        pBasic->arBasic[i].rg_green1_enable = pCalib->set[0].green_enable[1][i];
-        pBasic->arBasic[i].rnd_green1_enable = pCalib->set[0].green_enable[2][i];
-        pBasic->arBasic[i].ro_green1_enable = pCalib->set[0].green_enable[3][i];
-        pBasic->arBasic[i].lc_green1_enable = pCalib->set[0].green_enable[4][i];
-        pBasic->arBasic[i].pg_green1_enable = pCalib->set[0].green_enable[5][i];
+        pBasic->arBasic[i].sw_rk_red_blue1_en = pCalib->expert.set[0].red_blue_enable[0][i];
+        pBasic->arBasic[i].rg_red_blue1_enable = pCalib->expert.set[0].red_blue_enable[1][i];
+        pBasic->arBasic[i].rnd_red_blue1_enable = pCalib->expert.set[0].red_blue_enable[2][i];
+        pBasic->arBasic[i].ro_red_blue1_enable = pCalib->expert.set[0].red_blue_enable[3][i];
+        pBasic->arBasic[i].lc_red_blue1_enable = pCalib->expert.set[0].red_blue_enable[4][i];
+        pBasic->arBasic[i].pg_red_blue1_enable = pCalib->expert.set[0].red_blue_enable[5][i];
+        pBasic->arBasic[i].sw_rk_green1_en = pCalib->expert.set[0].green_enable[0][i];
+        pBasic->arBasic[i].rg_green1_enable = pCalib->expert.set[0].green_enable[1][i];
+        pBasic->arBasic[i].rnd_green1_enable = pCalib->expert.set[0].green_enable[2][i];
+        pBasic->arBasic[i].ro_green1_enable = pCalib->expert.set[0].green_enable[3][i];
+        pBasic->arBasic[i].lc_green1_enable = pCalib->expert.set[0].green_enable[4][i];
+        pBasic->arBasic[i].pg_green1_enable = pCalib->expert.set[0].green_enable[5][i];
 
         //methods_set_2 0x0010
-        pBasic->arBasic[i].sw_rk_red_blue2_en = pCalib->set[1].red_blue_enable[0][i];
-        pBasic->arBasic[i].rg_red_blue2_enable = pCalib->set[1].red_blue_enable[1][i];
-        pBasic->arBasic[i].rnd_red_blue2_enable = pCalib->set[1].red_blue_enable[2][i];
-        pBasic->arBasic[i].ro_red_blue2_enable = pCalib->set[1].red_blue_enable[3][i];
-        pBasic->arBasic[i].lc_red_blue2_enable = pCalib->set[1].red_blue_enable[4][i];
-        pBasic->arBasic[i].pg_red_blue2_enable = pCalib->set[1].red_blue_enable[5][i];
-        pBasic->arBasic[i].sw_rk_green2_en = pCalib->set[1].green_enable[0][i];
-        pBasic->arBasic[i].rg_green2_enable = pCalib->set[1].green_enable[1][i];
-        pBasic->arBasic[i].rnd_green2_enable = pCalib->set[1].green_enable[2][i];
-        pBasic->arBasic[i].ro_green2_enable = pCalib->set[1].green_enable[3][i];
-        pBasic->arBasic[i].lc_green2_enable = pCalib->set[1].green_enable[4][i];
-        pBasic->arBasic[i].pg_green2_enable = pCalib->set[1].green_enable[5][i];
+        pBasic->arBasic[i].sw_rk_red_blue2_en = pCalib->expert.set[1].red_blue_enable[0][i];
+        pBasic->arBasic[i].rg_red_blue2_enable = pCalib->expert.set[1].red_blue_enable[1][i];
+        pBasic->arBasic[i].rnd_red_blue2_enable = pCalib->expert.set[1].red_blue_enable[2][i];
+        pBasic->arBasic[i].ro_red_blue2_enable = pCalib->expert.set[1].red_blue_enable[3][i];
+        pBasic->arBasic[i].lc_red_blue2_enable = pCalib->expert.set[1].red_blue_enable[4][i];
+        pBasic->arBasic[i].pg_red_blue2_enable = pCalib->expert.set[1].red_blue_enable[5][i];
+        pBasic->arBasic[i].sw_rk_green2_en = pCalib->expert.set[1].green_enable[0][i];
+        pBasic->arBasic[i].rg_green2_enable = pCalib->expert.set[1].green_enable[1][i];
+        pBasic->arBasic[i].rnd_green2_enable = pCalib->expert.set[1].green_enable[2][i];
+        pBasic->arBasic[i].ro_green2_enable = pCalib->expert.set[1].green_enable[3][i];
+        pBasic->arBasic[i].lc_green2_enable = pCalib->expert.set[1].green_enable[4][i];
+        pBasic->arBasic[i].pg_green2_enable = pCalib->expert.set[1].green_enable[5][i];
 
         //methods_set_3 0x0014
-        pBasic->arBasic[i].sw_rk_red_blue3_en = pCalib->set[2].red_blue_enable[0][i];
-        pBasic->arBasic[i].rg_red_blue3_enable = pCalib->set[2].red_blue_enable[1][i];
-        pBasic->arBasic[i].rnd_red_blue3_enable = pCalib->set[2].red_blue_enable[2][i];
-        pBasic->arBasic[i].ro_red_blue3_enable = pCalib->set[2].red_blue_enable[3][i];
-        pBasic->arBasic[i].lc_red_blue3_enable = pCalib->set[2].red_blue_enable[4][i];
-        pBasic->arBasic[i].pg_red_blue3_enable = pCalib->set[2].red_blue_enable[5][i];
-        pBasic->arBasic[i].sw_rk_green3_en = pCalib->set[2].green_enable[0][i];
-        pBasic->arBasic[i].rg_green3_enable = pCalib->set[2].green_enable[1][i];
-        pBasic->arBasic[i].rnd_green3_enable = pCalib->set[2].green_enable[2][i];
-        pBasic->arBasic[i].ro_green3_enable = pCalib->set[2].green_enable[3][i];
-        pBasic->arBasic[i].lc_green3_enable = pCalib->set[2].green_enable[4][i];
-        pBasic->arBasic[i].pg_green3_enable = pCalib->set[2].green_enable[5][i];
+        pBasic->arBasic[i].sw_rk_red_blue3_en = pCalib->expert.set[2].red_blue_enable[0][i];
+        pBasic->arBasic[i].rg_red_blue3_enable = pCalib->expert.set[2].red_blue_enable[1][i];
+        pBasic->arBasic[i].rnd_red_blue3_enable = pCalib->expert.set[2].red_blue_enable[2][i];
+        pBasic->arBasic[i].ro_red_blue3_enable = pCalib->expert.set[2].red_blue_enable[3][i];
+        pBasic->arBasic[i].lc_red_blue3_enable = pCalib->expert.set[2].red_blue_enable[4][i];
+        pBasic->arBasic[i].pg_red_blue3_enable = pCalib->expert.set[2].red_blue_enable[5][i];
+        pBasic->arBasic[i].sw_rk_green3_en = pCalib->expert.set[2].green_enable[0][i];
+        pBasic->arBasic[i].rg_green3_enable = pCalib->expert.set[2].green_enable[1][i];
+        pBasic->arBasic[i].rnd_green3_enable = pCalib->expert.set[2].green_enable[2][i];
+        pBasic->arBasic[i].ro_green3_enable = pCalib->expert.set[2].green_enable[3][i];
+        pBasic->arBasic[i].lc_green3_enable = pCalib->expert.set[2].green_enable[4][i];
+        pBasic->arBasic[i].pg_green3_enable = pCalib->expert.set[2].green_enable[5][i];
 
         //line_thresh_1 0x0018
-        pBasic->arBasic[i].sw_mindis1_rb = pCalib->set[0].line_thresh[0][i];
-        pBasic->arBasic[i].sw_mindis1_g = pCalib->set[0].line_thresh[1][i];
-        pBasic->arBasic[i].line_thr_1_rb = pCalib->set[0].line_thresh[2][i];
-        pBasic->arBasic[i].line_thr_1_g = pCalib->set[0].line_thresh[3][i];
+        pBasic->arBasic[i].sw_mindis1_rb = pCalib->expert.set[0].line_thresh[0][i];
+        pBasic->arBasic[i].sw_mindis1_g = pCalib->expert.set[0].line_thresh[1][i];
+        pBasic->arBasic[i].line_thr_1_rb = pCalib->expert.set[0].line_thresh[2][i];
+        pBasic->arBasic[i].line_thr_1_g = pCalib->expert.set[0].line_thresh[3][i];
 
         //line_mad_fac_1 0x001c
-        pBasic->arBasic[i].sw_dis_scale_min1 = pCalib->set[0].line_mad_fac[0][i];
-        pBasic->arBasic[i].sw_dis_scale_max1 = pCalib->set[0].line_mad_fac[1][i];
-        pBasic->arBasic[i].line_mad_fac_1_rb = pCalib->set[0].line_mad_fac[2][i];
-        pBasic->arBasic[i].line_mad_fac_1_g = pCalib->set[0].line_mad_fac[3][i];
+        pBasic->arBasic[i].sw_dis_scale_min1 = pCalib->expert.set[0].line_mad_fac[0][i];
+        pBasic->arBasic[i].sw_dis_scale_max1 = pCalib->expert.set[0].line_mad_fac[1][i];
+        pBasic->arBasic[i].line_mad_fac_1_rb = pCalib->expert.set[0].line_mad_fac[2][i];
+        pBasic->arBasic[i].line_mad_fac_1_g = pCalib->expert.set[0].line_mad_fac[3][i];
 
         //pg_fac_1 0x0020
-        pBasic->arBasic[i].pg_fac_1_rb = pCalib->set[0].pg_fac[0][i];
-        pBasic->arBasic[i].pg_fac_1_g = pCalib->set[0].pg_fac[1][i];
+        pBasic->arBasic[i].pg_fac_1_rb = pCalib->expert.set[0].pg_fac[0][i];
+        pBasic->arBasic[i].pg_fac_1_g = pCalib->expert.set[0].pg_fac[1][i];
 
         //rnd_thresh_1 0x0024
-        pBasic->arBasic[i].rnd_thr_1_rb = pCalib->set[0].rnd_thresh[0][i];
-        pBasic->arBasic[i].rnd_thr_1_g = pCalib->set[0].rnd_thresh[1][i];
+        pBasic->arBasic[i].rnd_thr_1_rb = pCalib->expert.set[0].rnd_thresh[0][i];
+        pBasic->arBasic[i].rnd_thr_1_g = pCalib->expert.set[0].rnd_thresh[1][i];
 
         //rg_fac_1 0x0028
-        pBasic->arBasic[i].rg_fac_1_rb = pCalib->set[0].rg_fac[0][i];
-        pBasic->arBasic[i].rg_fac_1_g = pCalib->set[0].rg_fac[1][i];
+        pBasic->arBasic[i].rg_fac_1_rb = pCalib->expert.set[0].rg_fac[0][i];
+        pBasic->arBasic[i].rg_fac_1_g = pCalib->expert.set[0].rg_fac[1][i];
 
 
         //line_thresh_2 0x002c
-        pBasic->arBasic[i].sw_mindis2_rb = pCalib->set[1].line_thresh[0][i];
-        pBasic->arBasic[i].sw_mindis2_g = pCalib->set[1].line_thresh[1][i];
-        pBasic->arBasic[i].line_thr_2_rb = pCalib->set[1].line_thresh[2][i];
-        pBasic->arBasic[i].line_thr_2_g = pCalib->set[1].line_thresh[3][i];
+        pBasic->arBasic[i].sw_mindis2_rb = pCalib->expert.set[1].line_thresh[0][i];
+        pBasic->arBasic[i].sw_mindis2_g = pCalib->expert.set[1].line_thresh[1][i];
+        pBasic->arBasic[i].line_thr_2_rb = pCalib->expert.set[1].line_thresh[2][i];
+        pBasic->arBasic[i].line_thr_2_g = pCalib->expert.set[1].line_thresh[3][i];
 
         //line_mad_fac_2 0x0030
-        pBasic->arBasic[i].sw_dis_scale_min2 = pCalib->set[1].line_mad_fac[0][i];
-        pBasic->arBasic[i].sw_dis_scale_max2 = pCalib->set[1].line_mad_fac[1][i];
-        pBasic->arBasic[i].line_mad_fac_2_rb = pCalib->set[1].line_mad_fac[2][i];
-        pBasic->arBasic[i].line_mad_fac_2_g = pCalib->set[1].line_mad_fac[3][i];
+        pBasic->arBasic[i].sw_dis_scale_min2 = pCalib->expert.set[1].line_mad_fac[0][i];
+        pBasic->arBasic[i].sw_dis_scale_max2 = pCalib->expert.set[1].line_mad_fac[1][i];
+        pBasic->arBasic[i].line_mad_fac_2_rb = pCalib->expert.set[1].line_mad_fac[2][i];
+        pBasic->arBasic[i].line_mad_fac_2_g = pCalib->expert.set[1].line_mad_fac[3][i];
 
         //pg_fac_2 0x0034
-        pBasic->arBasic[i].pg_fac_2_rb = pCalib->set[1].pg_fac[0][i];
-        pBasic->arBasic[i].pg_fac_2_g = pCalib->set[1].pg_fac[1][i];
+        pBasic->arBasic[i].pg_fac_2_rb = pCalib->expert.set[1].pg_fac[0][i];
+        pBasic->arBasic[i].pg_fac_2_g = pCalib->expert.set[1].pg_fac[1][i];
 
         //rnd_thresh_2 0x0038
-        pBasic->arBasic[i].rnd_thr_2_rb = pCalib->set[1].rnd_thresh[0][i];
-        pBasic->arBasic[i].rnd_thr_2_g = pCalib->set[1].rnd_thresh[1][i];
+        pBasic->arBasic[i].rnd_thr_2_rb = pCalib->expert.set[1].rnd_thresh[0][i];
+        pBasic->arBasic[i].rnd_thr_2_g = pCalib->expert.set[1].rnd_thresh[1][i];
 
         //rg_fac_2 0x003c
-        pBasic->arBasic[i].rg_fac_2_rb = pCalib->set[1].rg_fac[0][i];
-        pBasic->arBasic[i].rg_fac_2_g = pCalib->set[1].rg_fac[1][i];
+        pBasic->arBasic[i].rg_fac_2_rb = pCalib->expert.set[1].rg_fac[0][i];
+        pBasic->arBasic[i].rg_fac_2_g = pCalib->expert.set[1].rg_fac[1][i];
 
 
         //line_thresh_3 0x0040
-        pBasic->arBasic[i].sw_mindis3_rb = pCalib->set[2].line_thresh[0][i];
-        pBasic->arBasic[i].sw_mindis3_g = pCalib->set[2].line_thresh[1][i];
-        pBasic->arBasic[i].line_thr_3_rb = pCalib->set[2].line_thresh[2][i];
-        pBasic->arBasic[i].line_thr_3_g = pCalib->set[2].line_thresh[3][i];
+        pBasic->arBasic[i].sw_mindis3_rb = pCalib->expert.set[2].line_thresh[0][i];
+        pBasic->arBasic[i].sw_mindis3_g = pCalib->expert.set[2].line_thresh[1][i];
+        pBasic->arBasic[i].line_thr_3_rb = pCalib->expert.set[2].line_thresh[2][i];
+        pBasic->arBasic[i].line_thr_3_g = pCalib->expert.set[2].line_thresh[3][i];
 
         //line_mad_fac_3 0x0044
-        pBasic->arBasic[i].sw_dis_scale_min3 = pCalib->set[2].line_mad_fac[0][i];
-        pBasic->arBasic[i].sw_dis_scale_max3 = pCalib->set[2].line_mad_fac[1][i];
-        pBasic->arBasic[i].line_mad_fac_3_rb = pCalib->set[2].line_mad_fac[2][i];
-        pBasic->arBasic[i].line_mad_fac_3_g = pCalib->set[2].line_mad_fac[3][i];
+        pBasic->arBasic[i].sw_dis_scale_min3 = pCalib->expert.set[2].line_mad_fac[0][i];
+        pBasic->arBasic[i].sw_dis_scale_max3 = pCalib->expert.set[2].line_mad_fac[1][i];
+        pBasic->arBasic[i].line_mad_fac_3_rb = pCalib->expert.set[2].line_mad_fac[2][i];
+        pBasic->arBasic[i].line_mad_fac_3_g = pCalib->expert.set[2].line_mad_fac[3][i];
 
         //pg_fac_3 0x0048
-        pBasic->arBasic[i].pg_fac_3_rb = pCalib->set[2].pg_fac[0][i];
-        pBasic->arBasic[i].pg_fac_3_g = pCalib->set[2].pg_fac[1][i];
+        pBasic->arBasic[i].pg_fac_3_rb = pCalib->expert.set[2].pg_fac[0][i];
+        pBasic->arBasic[i].pg_fac_3_g = pCalib->expert.set[2].pg_fac[1][i];
 
         //rnd_thresh_3 0x004c
-        pBasic->arBasic[i].rnd_thr_3_rb = pCalib->set[2].rnd_thresh[0][i];
-        pBasic->arBasic[i].rnd_thr_3_g = pCalib->set[2].rnd_thresh[1][i];
+        pBasic->arBasic[i].rnd_thr_3_rb = pCalib->expert.set[2].rnd_thresh[0][i];
+        pBasic->arBasic[i].rnd_thr_3_g = pCalib->expert.set[2].rnd_thresh[1][i];
 
         //rg_fac_3 0x0050
-        pBasic->arBasic[i].rg_fac_3_rb = pCalib->set[2].rg_fac[0][i];
-        pBasic->arBasic[i].rg_fac_3_g = pCalib->set[2].rg_fac[1][i];
+        pBasic->arBasic[i].rg_fac_3_rb = pCalib->expert.set[2].rg_fac[0][i];
+        pBasic->arBasic[i].rg_fac_3_g = pCalib->expert.set[2].rg_fac[1][i];
 
         //ro_limits 0x0054
-        pBasic->arBasic[i].ro_lim_3_rb = pCalib->set[2].rg_lim[0][i];
-        pBasic->arBasic[i].ro_lim_3_g = pCalib->set[2].rg_lim[1][i];
-        pBasic->arBasic[i].ro_lim_2_rb = pCalib->set[1].rg_lim[0][i];
-        pBasic->arBasic[i].ro_lim_2_g = pCalib->set[1].rg_lim[1][i];
-        pBasic->arBasic[i].ro_lim_1_rb = pCalib->set[0].rg_lim[0][i];
-        pBasic->arBasic[i].ro_lim_1_g = pCalib->set[0].rg_lim[1][i];
+        pBasic->arBasic[i].ro_lim_3_rb = pCalib->expert.set[2].ro_lim[0][i];
+        pBasic->arBasic[i].ro_lim_3_g = pCalib->expert.set[2].ro_lim[1][i];
+        pBasic->arBasic[i].ro_lim_2_rb = pCalib->expert.set[1].ro_lim[0][i];
+        pBasic->arBasic[i].ro_lim_2_g = pCalib->expert.set[1].ro_lim[1][i];
+        pBasic->arBasic[i].ro_lim_1_rb = pCalib->expert.set[0].ro_lim[0][i];
+        pBasic->arBasic[i].ro_lim_1_g = pCalib->expert.set[0].ro_lim[1][i];
 
         //rnd_offs 0x0058
-        pBasic->arBasic[i].rnd_offs_3_rb = pCalib->set[2].rnd_offs[0][i];
-        pBasic->arBasic[i].rnd_offs_3_g = pCalib->set[2].rnd_offs[1][i];
-        pBasic->arBasic[i].rnd_offs_2_rb = pCalib->set[1].rnd_offs[0][i];
-        pBasic->arBasic[i].rnd_offs_2_g = pCalib->set[1].rnd_offs[1][i];
-        pBasic->arBasic[i].rnd_offs_1_rb = pCalib->set[0].rnd_offs[0][i];
-        pBasic->arBasic[i].rnd_offs_1_g = pCalib->set[0].rnd_offs[1][i];
+        pBasic->arBasic[i].rnd_offs_3_rb = pCalib->expert.set[2].rnd_offs[0][i];
+        pBasic->arBasic[i].rnd_offs_3_g = pCalib->expert.set[2].rnd_offs[1][i];
+        pBasic->arBasic[i].rnd_offs_2_rb = pCalib->expert.set[1].rnd_offs[0][i];
+        pBasic->arBasic[i].rnd_offs_2_g = pCalib->expert.set[1].rnd_offs[1][i];
+        pBasic->arBasic[i].rnd_offs_1_rb = pCalib->expert.set[0].rnd_offs[0][i];
+        pBasic->arBasic[i].rnd_offs_1_g = pCalib->expert.set[0].rnd_offs[1][i];
 
     }
 
@@ -552,8 +586,7 @@ AdpccResult_t dpcc_pdaf_params_init(Adpcc_pdaf_params_t *pPdaf, CalibDb_Dpcc_Pda
     return ret;
 }
 
-
-AdpccResult_t select_basic_params_by_ISO(
+AdpccResult_t Expert_mode_select_basic_params_by_ISO(
     Adpcc_basic_params_t *pParams,
     Adpcc_basic_params_select_t *pSelect,
     AdpccExpInfo_t *pExpInfo)
@@ -777,6 +810,1310 @@ AdpccResult_t select_basic_params_by_ISO(
     return ret;
 }
 
+void Fast_mode_Triple_Setting(
+    AdpccContext_t *pParams,
+    Adpcc_basic_params_select_t *pSelect,
+    int iso)
+{
+    LOGI_ADPCC("%s(%d): enter!\n", __FUNCTION__, __LINE__);
+
+    int level = 1;
+    for(int i = 0; i < DPCC_MAX_ISO_LEVEL - 1; i++) {
+        if(iso >= pParams->fast.ISO[i] && iso <= pParams->fast.ISO[i + 1]) {
+            level = (pParams->fast.fast_mode_triple_level[i] - pParams->fast.fast_mode_triple_level[i + 1])
+                    / (pParams->fast.ISO[i] - pParams->fast.ISO[i + 1]);
+            level += pParams->fast.fast_mode_triple_level[i];
+            break;
+        }
+    }
+
+    if(iso < pParams->fast.ISO[0] ) {
+        level = pParams->fast.fast_mode_triple_level[0];
+    }
+
+    if(iso > pParams->fast.ISO[DPCC_MAX_ISO_LEVEL - 1] ) {
+        level = pParams->fast.fast_mode_triple_level[DPCC_MAX_ISO_LEVEL - 1];
+    }
+
+    if(pParams->fast.fast_mode_triple_en != 0)
+        pSelect->stage1_use_set_3 = 0x1;
+    else
+        pSelect->stage1_use_set_3 = 0x0;
+
+    switch (level)
+    {
+    case 1:
+        pSelect->sw_rk_green3_en = 1;
+        pSelect->sw_mindis3_rb = 0x5;
+        pSelect->sw_mindis3_g = 0x5;
+        pSelect->sw_dis_scale_min3 = 0x3;
+        pSelect->sw_dis_scale_max3 = 0x3;
+
+        pSelect->rg_red_blue3_enable = 0;
+        pSelect->rg_green3_enable = 0;
+        pSelect->rg_fac_3_rb = 0;
+        pSelect->rg_fac_3_g = 0;
+
+        pSelect->rnd_red_blue3_enable = 1;
+        pSelect->rnd_green3_enable = 1;
+        pSelect->rnd_thr_3_rb = 4;
+        pSelect->rnd_thr_3_g = 4;
+        pSelect->rnd_offs_3_rb = 2;
+        pSelect->rnd_offs_3_g = 2;
+
+        pSelect->ro_red_blue3_enable = 1;
+        pSelect->ro_green3_enable = 1;
+        pSelect->ro_lim_3_rb = 2;
+        pSelect->ro_lim_3_g = 2;
+
+        pSelect->lc_red_blue3_enable = 1;
+        pSelect->lc_green3_enable = 0;
+        pSelect->line_thr_3_rb = 0x3;
+        pSelect->line_thr_3_g = 0;
+        pSelect->line_mad_fac_3_rb = 0x3;
+        pSelect->line_mad_fac_3_g = 0;
+
+        pSelect->pg_red_blue3_enable = 1;
+        pSelect->pg_green3_enable = 1;
+        pSelect->pg_fac_3_rb = 0x3;
+        pSelect->pg_fac_3_g = 0x3;
+        break;
+    case 2:
+        pSelect->sw_rk_green3_en = 1;
+        pSelect->sw_mindis3_rb = 0x5;
+        pSelect->sw_mindis3_g = 0x5;
+        pSelect->sw_dis_scale_min3 = 0x3;
+        pSelect->sw_dis_scale_max3 = 0x3;
+
+        pSelect->rg_red_blue3_enable = 0;
+        pSelect->rg_green3_enable = 0;
+        pSelect->rg_fac_3_rb = 0;
+        pSelect->rg_fac_3_g = 0;
+
+        pSelect->rnd_red_blue3_enable = 1;
+        pSelect->rnd_green3_enable = 1;
+        pSelect->rnd_thr_3_rb = 4;
+        pSelect->rnd_thr_3_g = 4;
+        pSelect->rnd_offs_3_rb = 2;
+        pSelect->rnd_offs_3_g = 2;
+
+        pSelect->ro_red_blue3_enable = 1;
+        pSelect->ro_green3_enable = 1;
+        pSelect->ro_lim_3_rb = 2;
+        pSelect->ro_lim_3_g = 2;
+
+        pSelect->lc_red_blue3_enable = 1;
+        pSelect->lc_green3_enable = 0;
+        pSelect->line_thr_3_rb = 0x2;
+        pSelect->line_thr_3_g = 0;
+        pSelect->line_mad_fac_3_rb = 0x2;
+        pSelect->line_mad_fac_3_g = 0;
+
+        pSelect->pg_red_blue3_enable = 1;
+        pSelect->pg_green3_enable = 1;
+        pSelect->pg_fac_3_rb = 0x3;
+        pSelect->pg_fac_3_g = 0x3;
+        break;
+    case 3:
+        pSelect->sw_rk_green3_en = 1;
+        pSelect->sw_mindis3_rb = 0x5;
+        pSelect->sw_mindis3_g = 0x5;
+        pSelect->sw_dis_scale_min3 = 0x3;
+        pSelect->sw_dis_scale_max3 = 0x3;
+
+        pSelect->rg_red_blue3_enable = 0;
+        pSelect->rg_green3_enable = 0;
+        pSelect->rg_fac_3_rb = 0;
+        pSelect->rg_fac_3_g = 0;
+
+        pSelect->rnd_red_blue3_enable = 1;
+        pSelect->rnd_green3_enable = 1;
+        pSelect->rnd_thr_3_rb = 4;
+        pSelect->rnd_thr_3_g = 4;
+        pSelect->rnd_offs_3_rb = 2;
+        pSelect->rnd_offs_3_g = 2;
+
+        pSelect->ro_red_blue3_enable = 1;
+        pSelect->ro_green3_enable = 1;
+        pSelect->ro_lim_3_rb = 2;
+        pSelect->ro_lim_3_g = 2;
+
+        pSelect->lc_red_blue3_enable = 0;
+        pSelect->lc_green3_enable = 0;
+        pSelect->line_thr_3_rb = 0;
+        pSelect->line_thr_3_g = 0;
+        pSelect->line_mad_fac_3_rb = 0;
+        pSelect->line_mad_fac_3_g = 0;
+
+        pSelect->pg_red_blue3_enable = 1;
+        pSelect->pg_green3_enable = 1;
+        pSelect->pg_fac_3_rb = 0x3;
+        pSelect->pg_fac_3_g = 0x3;
+        break;
+    case 4:
+        pSelect->sw_rk_green3_en = 1;
+        pSelect->sw_mindis3_rb = 0x5;
+        pSelect->sw_mindis3_g = 0x5;
+        pSelect->sw_dis_scale_min3 = 0x3;
+        pSelect->sw_dis_scale_max3 = 0x3;
+
+        pSelect->rg_red_blue3_enable = 0;
+        pSelect->rg_green3_enable = 0;
+        pSelect->rg_fac_3_rb = 0;
+        pSelect->rg_fac_3_g = 0;
+
+        pSelect->rnd_red_blue3_enable = 1;
+        pSelect->rnd_green3_enable = 1;
+        pSelect->rnd_thr_3_rb = 4;
+        pSelect->rnd_thr_3_g = 4;
+        pSelect->rnd_offs_3_rb = 2;
+        pSelect->rnd_offs_3_g = 2;
+
+        pSelect->ro_red_blue3_enable = 1;
+        pSelect->ro_green3_enable = 1;
+        pSelect->ro_lim_3_rb = 2;
+        pSelect->ro_lim_3_g = 2;
+
+        pSelect->lc_red_blue3_enable = 0;
+        pSelect->lc_green3_enable = 0;
+        pSelect->line_thr_3_rb = 0;
+        pSelect->line_thr_3_g = 0;
+        pSelect->line_mad_fac_3_rb = 0;
+        pSelect->line_mad_fac_3_g = 0;
+
+        pSelect->pg_red_blue3_enable = 1;
+        pSelect->pg_green3_enable = 1;
+        pSelect->pg_fac_3_rb = 0x2;
+        pSelect->pg_fac_3_g = 0x2;
+        break;
+    case 5:
+        pSelect->sw_rk_green3_en = 1;
+        pSelect->sw_mindis3_rb = 0x5;
+        pSelect->sw_mindis3_g = 0x5;
+        pSelect->sw_dis_scale_min3 = 0x3;
+        pSelect->sw_dis_scale_max3 = 0x3;
+
+        pSelect->rg_red_blue3_enable = 0;
+        pSelect->rg_green3_enable = 0;
+        pSelect->rg_fac_3_rb = 0;
+        pSelect->rg_fac_3_g = 0;
+
+        pSelect->rnd_red_blue3_enable = 1;
+        pSelect->rnd_green3_enable = 1;
+        pSelect->rnd_thr_3_rb = 4;
+        pSelect->rnd_thr_3_g = 4;
+        pSelect->rnd_offs_3_rb = 2;
+        pSelect->rnd_offs_3_g = 2;
+
+        pSelect->ro_red_blue3_enable = 1;
+        pSelect->ro_green3_enable = 1;
+        pSelect->ro_lim_3_rb = 2;
+        pSelect->ro_lim_3_g = 2;
+
+        pSelect->lc_red_blue3_enable = 0;
+        pSelect->lc_green3_enable = 0;
+        pSelect->line_thr_3_rb = 0;
+        pSelect->line_thr_3_g = 0;
+        pSelect->line_mad_fac_3_rb = 0;
+        pSelect->line_mad_fac_3_g = 0;
+
+        pSelect->pg_red_blue3_enable = 0;
+        pSelect->pg_green3_enable = 0;
+        pSelect->pg_fac_3_rb = 0;
+        pSelect->pg_fac_3_g = 0;
+        break;
+    case 6:
+        pSelect->stage1_use_fix_set = 0x1;
+        pSelect->sw_rk_red_blue3_en = 1;
+        pSelect->sw_rk_green3_en = 1;
+        pSelect->sw_mindis3_rb = 0x5;
+        pSelect->sw_mindis3_g = 0x5;
+        pSelect->sw_dis_scale_min3 = 0x3;
+        pSelect->sw_dis_scale_max3 = 0x3;
+
+        pSelect->rg_red_blue3_enable = 0;
+        pSelect->rg_green3_enable = 0;
+        pSelect->rg_fac_3_rb = 0;
+        pSelect->rg_fac_3_g = 0;
+
+        pSelect->rnd_red_blue3_enable = 1;
+        pSelect->rnd_green3_enable = 1;
+        pSelect->rnd_thr_3_rb = 4;
+        pSelect->rnd_thr_3_g = 4;
+        pSelect->rnd_offs_3_rb = 2;
+        pSelect->rnd_offs_3_g = 2;
+
+        pSelect->ro_red_blue3_enable = 1;
+        pSelect->ro_green3_enable = 1;
+        pSelect->ro_lim_3_rb = 2;
+        pSelect->ro_lim_3_g = 2;
+
+        pSelect->lc_red_blue3_enable = 0;
+        pSelect->lc_green3_enable = 0;
+        pSelect->line_thr_3_rb = 0;
+        pSelect->line_thr_3_g = 0;
+        pSelect->line_mad_fac_3_rb = 0;
+        pSelect->line_mad_fac_3_g = 0;
+
+        pSelect->pg_red_blue3_enable = 0;
+        pSelect->pg_green3_enable = 0;
+        pSelect->pg_fac_3_rb = 0;
+        pSelect->pg_fac_3_g = 0;
+        break;
+    case 7:
+        pSelect->stage1_use_fix_set = 0x1;
+        pSelect->sw_rk_red_blue3_en = 1;
+        pSelect->sw_rk_green3_en = 1;
+        pSelect->sw_mindis3_rb = 0x5;
+        pSelect->sw_mindis3_g = 0x5;
+        pSelect->sw_dis_scale_min3 = 0x3;
+        pSelect->sw_dis_scale_max3 = 0x3;
+
+        pSelect->rg_red_blue3_enable = 0;
+        pSelect->rg_green3_enable = 0;
+        pSelect->rg_fac_3_rb = 0;
+        pSelect->rg_fac_3_g = 0;
+
+        pSelect->rnd_red_blue3_enable = 1;
+        pSelect->rnd_green3_enable = 1;
+        pSelect->rnd_thr_3_rb = 4;
+        pSelect->rnd_thr_3_g = 4;
+        pSelect->rnd_offs_3_rb = 2;
+        pSelect->rnd_offs_3_g = 2;
+
+        pSelect->ro_red_blue3_enable = 1;
+        pSelect->ro_green3_enable = 1;
+        pSelect->ro_lim_3_rb = 2;
+        pSelect->ro_lim_3_g = 2;
+
+        pSelect->lc_red_blue3_enable = 0;
+        pSelect->lc_green3_enable = 0;
+        pSelect->line_thr_3_rb = 0;
+        pSelect->line_thr_3_g = 0;
+        pSelect->line_mad_fac_3_rb = 0;
+        pSelect->line_mad_fac_3_g = 0;
+
+        pSelect->pg_red_blue3_enable = 0;
+        pSelect->pg_green3_enable = 0;
+        pSelect->pg_fac_3_rb = 0;
+        pSelect->pg_fac_3_g = 0;
+        break;
+    case 8:
+        pSelect->stage1_use_fix_set = 0x1;
+        pSelect->sw_rk_red_blue3_en = 1;
+        pSelect->sw_rk_green3_en = 1;
+        pSelect->sw_mindis3_rb = 0x3;
+        pSelect->sw_mindis3_g = 0x3;
+        pSelect->sw_dis_scale_min3 = 0x2;
+        pSelect->sw_dis_scale_max3 = 0x2;
+
+        pSelect->rg_red_blue3_enable = 0;
+        pSelect->rg_green3_enable = 0;
+        pSelect->rg_fac_3_rb = 0;
+        pSelect->rg_fac_3_g = 0;
+
+        pSelect->rnd_red_blue3_enable = 1;
+        pSelect->rnd_green3_enable = 1;
+        pSelect->rnd_thr_3_rb = 0x4;
+        pSelect->rnd_thr_3_g = 0x4;
+        pSelect->rnd_offs_3_rb = 0x2;
+        pSelect->rnd_offs_3_g = 0x2;
+
+        pSelect->ro_red_blue3_enable = 1;
+        pSelect->ro_green3_enable = 1;
+        pSelect->ro_lim_3_rb = 0x2;
+        pSelect->ro_lim_3_g = 0x2;
+
+        pSelect->lc_red_blue3_enable = 0;
+        pSelect->lc_green3_enable = 0;
+        pSelect->line_thr_3_rb = 0;
+        pSelect->line_thr_3_g = 0;
+        pSelect->line_mad_fac_3_rb = 0;
+        pSelect->line_mad_fac_3_g = 0;
+
+        pSelect->pg_red_blue3_enable = 0;
+        pSelect->pg_green3_enable = 0;
+        pSelect->pg_fac_3_rb = 0;
+        pSelect->pg_fac_3_g = 0;
+        break;
+    case 9:
+        pSelect->stage1_use_fix_set = 0x1;
+        pSelect->sw_rk_red_blue3_en = 0;
+        pSelect->sw_rk_green3_en = 0;
+        pSelect->sw_mindis3_rb = 0;
+        pSelect->sw_mindis3_g = 0;
+        pSelect->sw_dis_scale_min3 = 0;
+        pSelect->sw_dis_scale_max3 = 0;
+
+        pSelect->rg_red_blue3_enable = 0;
+        pSelect->rg_green3_enable = 0;
+        pSelect->rg_fac_3_rb = 0;
+        pSelect->rg_fac_3_g = 0;
+
+        pSelect->rnd_red_blue3_enable = 1;
+        pSelect->rnd_green3_enable = 1;
+        pSelect->rnd_thr_3_rb = 0x4;
+        pSelect->rnd_thr_3_g = 0x4;
+        pSelect->rnd_offs_3_rb = 0x2;
+        pSelect->rnd_offs_3_g = 0x2;
+
+        pSelect->ro_red_blue3_enable = 1;
+        pSelect->ro_green3_enable = 1;
+        pSelect->ro_lim_3_rb = 0x2;
+        pSelect->ro_lim_3_g = 0x2;
+
+        pSelect->lc_red_blue3_enable = 0;
+        pSelect->lc_green3_enable = 0;
+        pSelect->line_thr_3_rb = 0;
+        pSelect->line_thr_3_g = 0;
+        pSelect->line_mad_fac_3_rb = 0;
+        pSelect->line_mad_fac_3_g = 0;
+
+        pSelect->pg_red_blue3_enable = 0;
+        pSelect->pg_green3_enable = 0;
+        pSelect->pg_fac_3_rb = 0;
+        pSelect->pg_fac_3_g = 0;
+        break;
+    case 10:
+        pSelect->stage1_use_fix_set = 0x1;
+        pSelect->sw_rk_red_blue3_en = 0;
+        pSelect->sw_rk_green3_en = 0;
+        pSelect->sw_mindis3_rb = 0;
+        pSelect->sw_mindis3_g = 0;
+        pSelect->sw_dis_scale_min3 = 0;
+        pSelect->sw_dis_scale_max3 = 0;
+
+        pSelect->rg_red_blue3_enable = 0;
+        pSelect->rg_green3_enable = 0;
+        pSelect->rg_fac_3_rb = 0;
+        pSelect->rg_fac_3_g = 0;
+
+        pSelect->rnd_red_blue3_enable = 1;
+        pSelect->rnd_green3_enable = 1;
+        pSelect->rnd_thr_3_rb = 0x3;
+        pSelect->rnd_thr_3_g = 0x3;
+        pSelect->rnd_offs_3_rb = 0x1;
+        pSelect->rnd_offs_3_g = 0x1;
+
+        pSelect->ro_red_blue3_enable = 1;
+        pSelect->ro_green3_enable = 1;
+        pSelect->ro_lim_3_rb = 0x2;
+        pSelect->ro_lim_3_g = 0x1;
+
+        pSelect->lc_red_blue3_enable = 0;
+        pSelect->lc_green3_enable = 0;
+        pSelect->line_thr_3_rb = 0;
+        pSelect->line_thr_3_g = 0;
+        pSelect->line_mad_fac_3_rb = 0;
+        pSelect->line_mad_fac_3_g = 0;
+
+        pSelect->pg_red_blue3_enable = 0;
+        pSelect->pg_green3_enable = 0;
+        pSelect->pg_fac_3_rb = 0;
+        pSelect->pg_fac_3_g = 0;
+        break;
+    default:
+        LOGE_ADPCC("%s(%d): Wrong fast mode level!!!\n", __FUNCTION__, __LINE__);
+        break;
+    }
+
+    LOGI_ADPCC("%s(%d): exit!\n", __FUNCTION__, __LINE__);
+
+}
+
+void Fast_mode_Double_Setting(
+    AdpccContext_t *pParams,
+    Adpcc_basic_params_select_t *pSelect,
+    int iso)
+{
+    LOGI_ADPCC("%s(%d): enter!\n", __FUNCTION__, __LINE__);
+
+    int level = 1;
+    for(int i = 0; i < DPCC_MAX_ISO_LEVEL - 1; i++) {
+        if(iso >= pParams->fast.ISO[i] && iso <= pParams->fast.ISO[i + 1]) {
+            level = (pParams->fast.fast_mode_double_level[i] - pParams->fast.fast_mode_double_level[i + 1])
+                    / (pParams->fast.ISO[i] - pParams->fast.ISO[i + 1]);
+            level += pParams->fast.fast_mode_double_level[i];
+            break;
+        }
+    }
+
+    if(iso < pParams->fast.ISO[0] ) {
+        level = pParams->fast.fast_mode_double_level[0];
+    }
+
+    if(iso > pParams->fast.ISO[DPCC_MAX_ISO_LEVEL - 1] ) {
+        level = pParams->fast.fast_mode_double_level[DPCC_MAX_ISO_LEVEL - 1];
+    }
+
+    if(pParams->fast.fast_mode_double_en != 0)
+        pSelect->stage1_use_set_2 = 0x1;
+    else
+        pSelect->stage1_use_set_2 = 0x0;
+
+    switch (level)
+    {
+    case 1:
+        pSelect->sw_rk_red_blue2_en = 1;
+        pSelect->sw_rk_green2_en = 1;
+        pSelect->sw_mindis2_rb = 0x15;
+        pSelect->sw_mindis2_g = 0x20;
+        pSelect->sw_dis_scale_min2 = 0x10;
+        pSelect->sw_dis_scale_max2 = 0x12;
+
+        pSelect->rg_red_blue2_enable = 1;
+        pSelect->rg_green2_enable = 1;
+        pSelect->rg_fac_2_rb = 0x15;
+        pSelect->rg_fac_2_g = 0x20;
+
+        pSelect->rnd_red_blue2_enable = 1;
+        pSelect->rnd_green2_enable = 1;
+        pSelect->rnd_thr_2_rb = 0x9;
+        pSelect->rnd_thr_2_g = 0xa;
+        pSelect->rnd_offs_2_rb = 0x1;
+        pSelect->rnd_offs_2_g = 0x1;
+
+        pSelect->ro_red_blue2_enable = 1;
+        pSelect->ro_green2_enable = 1;
+        pSelect->ro_lim_2_rb = 0x1;
+        pSelect->ro_lim_2_g = 0x2;
+
+        pSelect->lc_red_blue2_enable = 1;
+        pSelect->lc_green2_enable = 1;
+        pSelect->line_thr_2_rb = 0x6;
+        pSelect->line_thr_2_g = 0x8;
+        pSelect->line_mad_fac_2_rb = 0x3;
+        pSelect->line_mad_fac_2_g = 0x4;
+
+        pSelect->pg_red_blue2_enable = 1;
+        pSelect->pg_green1_enable = 1;
+        pSelect->pg_fac_2_rb = 0x6;
+        pSelect->pg_fac_2_g = 0x8;
+        break;
+    case 2:
+        pSelect->sw_rk_red_blue2_en = 1;
+        pSelect->sw_rk_green2_en = 1;
+        pSelect->sw_mindis2_rb = 0x12;
+        pSelect->sw_mindis2_g = 0x16;
+        pSelect->sw_dis_scale_min2 = 0x6;
+        pSelect->sw_dis_scale_max2 = 0x8;
+
+        pSelect->rg_red_blue2_enable = 1;
+        pSelect->rg_green2_enable = 1;
+        pSelect->rg_fac_2_rb = 0x7;
+        pSelect->rg_fac_2_g = 0x10;
+
+        pSelect->rnd_red_blue2_enable = 1;
+        pSelect->rnd_green2_enable = 1;
+        pSelect->rnd_thr_2_rb = 0x5;
+        pSelect->rnd_thr_2_g = 0x6;
+        pSelect->rnd_offs_2_rb = 0x1;
+        pSelect->rnd_offs_2_g = 0x1;
+
+        pSelect->ro_red_blue2_enable = 1;
+        pSelect->ro_green2_enable = 1;
+        pSelect->ro_lim_2_rb = 0x3;
+        pSelect->ro_lim_2_g = 0x2;
+
+        pSelect->lc_red_blue2_enable = 1;
+        pSelect->lc_green2_enable = 1;
+        pSelect->line_thr_2_rb = 0x12;
+        pSelect->line_thr_2_g = 0x16;
+        pSelect->line_mad_fac_2_rb = 0x8;
+        pSelect->line_mad_fac_2_g = 0x10;
+
+        pSelect->pg_red_blue2_enable = 1;
+        pSelect->pg_green2_enable = 1;
+        pSelect->pg_fac_2_rb = 0x5;
+        pSelect->pg_fac_2_g = 0x6;
+        break;
+    case 3:
+        pSelect->sw_rk_red_blue2_en = 1;
+        pSelect->sw_rk_green2_en = 1;
+        pSelect->sw_mindis2_rb = 0x12;
+        pSelect->sw_mindis2_g = 0x16;
+        pSelect->sw_dis_scale_min2 = 0x6;
+        pSelect->sw_dis_scale_max2 = 0x8;
+
+        pSelect->rg_red_blue2_enable = 0;
+        pSelect->rg_green2_enable = 0;
+        pSelect->rg_fac_2_rb = 0;
+        pSelect->rg_fac_2_g = 0;
+
+        pSelect->rnd_red_blue2_enable = 1;
+        pSelect->rnd_green2_enable = 1;
+        pSelect->rnd_thr_2_rb = 0x5;
+        pSelect->rnd_thr_2_g = 0x6;
+        pSelect->rnd_offs_2_rb = 0x1;
+        pSelect->rnd_offs_2_g = 0x1;
+
+        pSelect->ro_red_blue2_enable = 1;
+        pSelect->ro_green2_enable = 1;
+        pSelect->ro_lim_2_rb = 0x3;
+        pSelect->ro_lim_2_g = 0x2;
+
+        pSelect->lc_red_blue2_enable = 1;
+        pSelect->lc_green2_enable = 1;
+        pSelect->line_thr_2_rb = 0x12;
+        pSelect->line_thr_2_g = 0x16;
+        pSelect->line_mad_fac_2_rb = 0x8;
+        pSelect->line_mad_fac_2_g = 0x10;
+
+        pSelect->pg_red_blue2_enable = 1;
+        pSelect->pg_green2_enable = 1;
+        pSelect->pg_fac_2_rb = 0x5;
+        pSelect->pg_fac_2_g = 0x6;
+        break;
+    case 4:
+        pSelect->sw_rk_red_blue2_en = 1;
+        pSelect->sw_rk_green2_en = 1;
+        pSelect->sw_mindis2_rb = 0x12;
+        pSelect->sw_mindis2_g = 0x16;
+        pSelect->sw_dis_scale_min2 = 0x6;
+        pSelect->sw_dis_scale_max2 = 0x8;
+
+        pSelect->rg_red_blue2_enable = 0;
+        pSelect->rg_green2_enable = 0;
+        pSelect->rg_fac_2_rb = 0;
+        pSelect->rg_fac_2_g = 0;
+
+        pSelect->rnd_red_blue2_enable = 0;
+        pSelect->rnd_green2_enable = 0;
+        pSelect->rnd_thr_2_rb = 0;
+        pSelect->rnd_thr_2_g = 0;
+        pSelect->rnd_offs_2_rb = 0;
+        pSelect->rnd_offs_2_g = 0;
+
+        pSelect->ro_red_blue2_enable = 1;
+        pSelect->ro_green2_enable = 1;
+        pSelect->ro_lim_2_rb = 0x3;
+        pSelect->ro_lim_2_g = 0x2;
+
+        pSelect->lc_red_blue2_enable = 1;
+        pSelect->lc_green2_enable = 1;
+        pSelect->line_thr_2_rb = 0x12;
+        pSelect->line_thr_2_g = 0x16;
+        pSelect->line_mad_fac_2_rb = 0x8;
+        pSelect->line_mad_fac_2_g = 0x10;
+
+        pSelect->pg_red_blue2_enable = 1;
+        pSelect->pg_green2_enable = 1;
+        pSelect->pg_fac_2_rb = 0x5;
+        pSelect->pg_fac_2_g = 0x6;
+        break;
+    case 5:
+        pSelect->sw_rk_red_blue2_en = 1;
+        pSelect->sw_rk_green2_en = 1;
+        pSelect->sw_mindis2_rb = 0x10;
+        pSelect->sw_mindis2_g = 0x14;
+        pSelect->sw_dis_scale_min2 = 0x6;
+        pSelect->sw_dis_scale_max2 = 0xc;
+
+        pSelect->rg_red_blue2_enable = 0;
+        pSelect->rg_green2_enable = 0;
+        pSelect->rg_fac_2_rb = 0;
+        pSelect->rg_fac_2_g = 0;
+
+        pSelect->rnd_red_blue2_enable = 0;
+        pSelect->rnd_green2_enable = 0;
+        pSelect->rnd_thr_2_rb = 0;
+        pSelect->rnd_thr_2_g = 0;
+        pSelect->rnd_offs_2_rb = 0;
+        pSelect->rnd_offs_2_g = 0;
+
+        pSelect->ro_red_blue2_enable = 1;
+        pSelect->ro_green2_enable = 1;
+        pSelect->ro_lim_2_rb = 0x3;
+        pSelect->ro_lim_2_g = 0x3;
+
+        pSelect->lc_red_blue2_enable = 1;
+        pSelect->lc_green2_enable = 1;
+        pSelect->line_thr_2_rb = 0x7;
+        pSelect->line_thr_2_g = 0xc;
+        pSelect->line_mad_fac_2_rb = 0x7;
+        pSelect->line_mad_fac_2_g = 0x9;
+
+        pSelect->pg_red_blue2_enable = 1;
+        pSelect->pg_green2_enable = 1;
+        pSelect->pg_fac_2_rb = 0x3;
+        pSelect->pg_fac_2_g = 0x4;
+        break;
+    case 6:
+        pSelect->sw_rk_red_blue2_en = 1;
+        pSelect->sw_rk_green2_en = 1;
+        pSelect->sw_mindis2_rb = 0x7;
+        pSelect->sw_mindis2_g = 0x10;
+        pSelect->sw_dis_scale_min2 = 0x6;
+        pSelect->sw_dis_scale_max2 = 0x8;
+
+        pSelect->rg_red_blue2_enable = 0;
+        pSelect->rg_green2_enable = 0;
+        pSelect->rg_fac_2_rb = 0;
+        pSelect->rg_fac_2_g = 0;
+
+        pSelect->rnd_red_blue2_enable = 0;
+        pSelect->rnd_green2_enable = 0;
+        pSelect->rnd_thr_2_rb = 0;
+        pSelect->rnd_thr_2_g = 0;
+        pSelect->rnd_offs_2_rb = 0;
+        pSelect->rnd_offs_2_g = 0;
+
+        pSelect->ro_red_blue2_enable = 1;
+        pSelect->ro_green2_enable = 1;
+        pSelect->ro_lim_2_rb = 0x3;
+        pSelect->ro_lim_2_g = 0x3;
+
+        pSelect->lc_red_blue2_enable = 1;
+        pSelect->lc_green2_enable = 1;
+        pSelect->line_thr_2_rb = 0x7;
+        pSelect->line_thr_2_g = 0x9;
+        pSelect->line_mad_fac_2_rb = 0x5;
+        pSelect->line_mad_fac_2_g = 0x7;
+
+        pSelect->pg_red_blue2_enable = 1;
+        pSelect->pg_green2_enable = 1;
+        pSelect->pg_fac_2_rb = 0x3;
+        pSelect->pg_fac_2_g = 0x4;
+        break;
+    case 7:
+        pSelect->sw_rk_red_blue2_en = 1;
+        pSelect->sw_rk_green2_en = 1;
+        pSelect->sw_mindis2_rb = 0x5;
+        pSelect->sw_mindis2_g = 0x8;
+        pSelect->sw_dis_scale_min2 = 0x3;
+        pSelect->sw_dis_scale_max2 = 0x6;
+
+        pSelect->rg_red_blue2_enable = 0;
+        pSelect->rg_green2_enable = 0;
+        pSelect->rg_fac_2_rb = 0;
+        pSelect->rg_fac_2_g = 0;
+
+        pSelect->rnd_red_blue2_enable = 0;
+        pSelect->rnd_green2_enable = 0;
+        pSelect->rnd_thr_2_rb = 0;
+        pSelect->rnd_thr_2_g = 0;
+        pSelect->rnd_offs_2_rb = 0;
+        pSelect->rnd_offs_2_g = 0;
+
+        pSelect->ro_red_blue2_enable = 1;
+        pSelect->ro_green2_enable = 1;
+        pSelect->ro_lim_2_rb = 0x4;
+        pSelect->ro_lim_2_g = 0x3;
+
+        pSelect->lc_red_blue2_enable = 1;
+        pSelect->lc_green2_enable = 1;
+        pSelect->line_thr_2_rb = 0x5;
+        pSelect->line_thr_2_g = 0x7;
+        pSelect->line_mad_fac_2_rb = 0x3;
+        pSelect->line_mad_fac_2_g = 0x5;
+
+        pSelect->pg_red_blue2_enable = 1;
+        pSelect->pg_green2_enable = 1;
+        pSelect->pg_fac_2_rb = 0x2;
+        pSelect->pg_fac_2_g = 0x1;
+        break;
+    case 8:
+        pSelect->sw_rk_red_blue2_en = 1;
+        pSelect->sw_rk_green2_en = 1;
+        pSelect->sw_mindis2_rb = 0x5;
+        pSelect->sw_mindis2_g = 0x8;
+        pSelect->sw_dis_scale_min2 = 0x3;
+        pSelect->sw_dis_scale_max2 = 0x6;
+
+        pSelect->rg_red_blue2_enable = 0;
+        pSelect->rg_green2_enable = 0;
+        pSelect->rg_fac_2_rb = 0;
+        pSelect->rg_fac_2_g = 0;
+
+        pSelect->rnd_red_blue2_enable = 0;
+        pSelect->rnd_green2_enable = 0;
+        pSelect->rnd_thr_2_rb = 0;
+        pSelect->rnd_thr_2_g = 0;
+        pSelect->rnd_offs_2_rb = 0;
+        pSelect->rnd_offs_2_g = 0;
+
+        pSelect->ro_red_blue2_enable = 1;
+        pSelect->ro_green2_enable = 1;
+        pSelect->ro_lim_2_rb = 0x1;
+        pSelect->ro_lim_2_g = 0x3;
+
+        pSelect->lc_red_blue2_enable = 1;
+        pSelect->lc_green2_enable = 1;
+        pSelect->line_thr_2_rb = 0x5;
+        pSelect->line_thr_2_g = 0x7;
+        pSelect->line_mad_fac_2_rb = 0x3;
+        pSelect->line_mad_fac_2_g = 0x5;
+
+        pSelect->pg_red_blue2_enable = 0;
+        pSelect->pg_green2_enable = 0;
+        pSelect->pg_fac_2_rb = 0;
+        pSelect->pg_fac_2_g = 0;
+        break;
+    case 9:
+        pSelect->sw_rk_red_blue2_en = 1;
+        pSelect->sw_rk_green2_en = 1;
+        pSelect->sw_mindis2_rb = 0x4;
+        pSelect->sw_mindis2_g = 0x8;
+        pSelect->sw_dis_scale_min2 = 0x2;
+        pSelect->sw_dis_scale_max2 = 0x6;
+
+        pSelect->rg_red_blue2_enable = 0;
+        pSelect->rg_green2_enable = 0;
+        pSelect->rg_fac_2_rb = 0;
+        pSelect->rg_fac_2_g = 0;
+
+        pSelect->rnd_red_blue2_enable = 0;
+        pSelect->rnd_green2_enable = 0;
+        pSelect->rnd_thr_2_rb = 0;
+        pSelect->rnd_thr_2_g = 0;
+        pSelect->rnd_offs_2_rb = 0;
+        pSelect->rnd_offs_2_g = 0;
+
+        pSelect->ro_red_blue2_enable = 1;
+        pSelect->ro_green2_enable = 1;
+        pSelect->ro_lim_2_rb = 0x4;
+        pSelect->ro_lim_2_g = 0x3;
+
+        pSelect->lc_red_blue2_enable = 1;
+        pSelect->lc_green2_enable = 1;
+        pSelect->line_thr_2_rb = 0x1;
+        pSelect->line_thr_2_g = 0x3;
+        pSelect->line_mad_fac_2_rb = 0x2;
+        pSelect->line_mad_fac_2_g = 0x2;
+
+        pSelect->pg_red_blue2_enable = 0;
+        pSelect->pg_green2_enable = 0;
+        pSelect->pg_fac_2_rb = 0;
+        pSelect->pg_fac_2_g = 0;
+        break;
+    case 10:
+        pSelect->sw_rk_red_blue2_en = 1;
+        pSelect->sw_rk_green2_en = 1;
+        pSelect->sw_mindis2_rb = 0x4;
+        pSelect->sw_mindis2_g = 0x8;
+        pSelect->sw_dis_scale_min2 = 0x3;
+        pSelect->sw_dis_scale_max2 = 0x6;
+
+        pSelect->rg_red_blue2_enable = 0;
+        pSelect->rg_green2_enable = 0;
+        pSelect->rg_fac_2_rb = 0;
+        pSelect->rg_fac_2_g = 0;
+
+        pSelect->rnd_red_blue2_enable = 0;
+        pSelect->rnd_green2_enable = 0;
+        pSelect->rnd_thr_2_rb = 0;
+        pSelect->rnd_thr_2_g = 0;
+        pSelect->rnd_offs_2_rb = 0;
+        pSelect->rnd_offs_2_g = 0;
+
+        pSelect->ro_red_blue2_enable = 1;
+        pSelect->ro_green2_enable = 1;
+        pSelect->ro_lim_2_rb = 0x4;
+        pSelect->ro_lim_2_g = 0x3;
+
+        pSelect->lc_red_blue2_enable = 0;
+        pSelect->lc_green2_enable = 0;
+        pSelect->line_thr_2_rb = 0;
+        pSelect->line_thr_2_g = 0;
+        pSelect->line_mad_fac_2_rb = 0;
+        pSelect->line_mad_fac_2_g = 0;
+
+        pSelect->pg_red_blue2_enable = 0;
+        pSelect->pg_green2_enable = 0;
+        pSelect->pg_fac_2_rb = 0;
+        pSelect->pg_fac_2_g = 0;
+        break;
+    default:
+        LOGE_ADPCC("%s(%d): Wrong fast mode level!!!\n", __FUNCTION__, __LINE__);
+        break;
+    }
+
+
+    LOGI_ADPCC("%s(%d): exit!\n", __FUNCTION__, __LINE__);
+
+}
+
+void Fast_mode_Single_Setting(
+    AdpccContext_t *pParams,
+    Adpcc_basic_params_select_t *pSelect,
+    int iso)
+{
+    LOG1_ADPCC("%s(%d): enter!\n", __FUNCTION__, __LINE__);
+
+    int level = 1;
+    for(int i = 0; i < DPCC_MAX_ISO_LEVEL - 1; i++) {
+        if(iso >= pParams->fast.ISO[i] && iso <= pParams->fast.ISO[i + 1]) {
+            level = (pParams->fast.fast_mode_single_level[i] - pParams->fast.fast_mode_single_level[i + 1])
+                    / (pParams->fast.ISO[i] - pParams->fast.ISO[i + 1]);
+            level += pParams->fast.fast_mode_single_level[i];
+            break;
+        }
+    }
+
+    if(iso < pParams->fast.ISO[0] ) {
+        level = pParams->fast.fast_mode_single_level[0];
+    }
+
+    if(iso > pParams->fast.ISO[DPCC_MAX_ISO_LEVEL - 1] ) {
+        level = pParams->fast.fast_mode_single_level[DPCC_MAX_ISO_LEVEL - 1];
+    }
+
+    if(pParams->fast.fast_mode_single_en != 0)
+        pSelect->stage1_use_set_1 = 0x1;
+    else
+        pSelect->stage1_use_set_1 = 0x0;
+
+
+    switch (level)
+    {
+    case 1:
+        pSelect->sw_rk_red_blue1_en = 1;
+        pSelect->sw_rk_green1_en = 1;
+        pSelect->sw_mindis1_rb = 0x20;
+        pSelect->sw_mindis1_g = 0x20;
+        pSelect->sw_dis_scale_min1 = 0x12;
+        pSelect->sw_dis_scale_max1 = 0x12;
+
+        pSelect->rg_red_blue1_enable = 1;
+        pSelect->rg_green1_enable = 1;
+        pSelect->rg_fac_1_rb = 0x20;
+        pSelect->rg_fac_1_g = 0x20;
+
+        pSelect->rnd_red_blue1_enable = 1;
+        pSelect->rnd_green1_enable = 1;
+        pSelect->rnd_thr_1_rb = 0xa;
+        pSelect->rnd_thr_1_g = 0xa;
+        pSelect->rnd_offs_1_rb = 0x1;
+        pSelect->rnd_offs_1_g = 0x1;
+
+        pSelect->ro_red_blue1_enable = 1;
+        pSelect->ro_green1_enable = 1;
+        pSelect->ro_lim_1_rb = 0x2;
+        pSelect->ro_lim_1_g = 0x2;
+
+        pSelect->lc_red_blue1_enable = 1;
+        pSelect->lc_green1_enable = 1;
+        pSelect->line_thr_1_rb = 0x8;
+        pSelect->line_thr_1_g = 0x8;
+        pSelect->line_mad_fac_1_rb = 0x4;
+        pSelect->line_mad_fac_1_g = 0x4;
+
+        pSelect->pg_red_blue1_enable = 1;
+        pSelect->pg_green1_enable = 1;
+        pSelect->pg_fac_1_rb = 0x8;
+        pSelect->pg_fac_1_g = 0x8;
+        break;
+    case 2:
+        pSelect->sw_rk_red_blue1_en = 1;
+        pSelect->sw_rk_green1_en = 1;
+        pSelect->sw_mindis1_rb = 0x16;
+        pSelect->sw_mindis1_g = 0x16;
+        pSelect->sw_dis_scale_min1 = 0x8;
+        pSelect->sw_dis_scale_max1 = 0x8;
+
+        pSelect->rg_red_blue1_enable = 1;
+        pSelect->rg_green1_enable = 1;
+        pSelect->rg_fac_1_rb = 0x10;
+        pSelect->rg_fac_1_g = 0x10;
+
+        pSelect->rnd_red_blue1_enable = 1;
+        pSelect->rnd_green1_enable = 1;
+        pSelect->rnd_thr_1_rb = 0x6;
+        pSelect->rnd_thr_1_g = 0x6;
+        pSelect->rnd_offs_1_rb = 0x1;
+        pSelect->rnd_offs_1_g = 0x1;
+
+        pSelect->ro_red_blue1_enable = 1;
+        pSelect->ro_green1_enable = 1;
+        pSelect->ro_lim_1_rb = 0x2;
+        pSelect->ro_lim_1_g = 0x2;
+
+        pSelect->lc_red_blue1_enable = 1;
+        pSelect->lc_green1_enable = 1;
+        pSelect->line_thr_1_rb = 0x16;
+        pSelect->line_thr_1_g = 0x16;
+        pSelect->line_mad_fac_1_rb = 0x10;
+        pSelect->line_mad_fac_1_g = 0x10;
+
+        pSelect->pg_red_blue1_enable = 1;
+        pSelect->pg_green1_enable = 1;
+        pSelect->pg_fac_1_rb = 0x6;
+        pSelect->pg_fac_1_g = 0x6;
+        break;
+    case 3:
+        pSelect->sw_rk_red_blue1_en = 1;
+        pSelect->sw_rk_green1_en = 1;
+        pSelect->sw_mindis1_rb = 0x16;
+        pSelect->sw_mindis1_g = 0x16;
+        pSelect->sw_dis_scale_min1 = 0x8;
+        pSelect->sw_dis_scale_max1 = 0x8;
+
+        pSelect->rg_red_blue1_enable = 0;
+        pSelect->rg_green1_enable = 0;
+        pSelect->rg_fac_1_rb = 0;
+        pSelect->rg_fac_1_g = 0;
+
+        pSelect->rnd_red_blue1_enable = 1;
+        pSelect->rnd_green1_enable = 1;
+        pSelect->rnd_thr_1_rb = 0x6;
+        pSelect->rnd_thr_1_g = 0x6;
+        pSelect->rnd_offs_1_rb = 0x1;
+        pSelect->rnd_offs_1_g = 0x1;
+
+        pSelect->ro_red_blue1_enable = 1;
+        pSelect->ro_green1_enable = 1;
+        pSelect->ro_lim_1_rb = 0x2;
+        pSelect->ro_lim_1_g = 0x2;
+
+        pSelect->lc_red_blue1_enable = 1;
+        pSelect->lc_green1_enable = 1;
+        pSelect->line_thr_1_rb = 0x16;
+        pSelect->line_thr_1_g = 0x16;
+        pSelect->line_mad_fac_1_rb = 0x10;
+        pSelect->line_mad_fac_1_g = 0x10;
+
+        pSelect->pg_red_blue1_enable = 1;
+        pSelect->pg_green1_enable = 1;
+        pSelect->pg_fac_1_rb = 0x6;
+        pSelect->pg_fac_1_g = 0x6;
+        break;
+    case 4:
+        pSelect->sw_rk_red_blue1_en = 1;
+        pSelect->sw_rk_green1_en = 1;
+        pSelect->sw_mindis1_rb = 0x16;
+        pSelect->sw_mindis1_g = 0x16;
+        pSelect->sw_dis_scale_min1 = 0x8;
+        pSelect->sw_dis_scale_max1 = 0x8;
+
+        pSelect->rg_red_blue1_enable = 0;
+        pSelect->rg_green1_enable = 0;
+        pSelect->rg_fac_1_rb = 0;
+        pSelect->rg_fac_1_g = 0;
+
+        pSelect->rnd_red_blue1_enable = 0;
+        pSelect->rnd_green1_enable = 0;
+        pSelect->rnd_thr_1_rb = 0;
+        pSelect->rnd_thr_1_g = 0;
+        pSelect->rnd_offs_1_rb = 0;
+        pSelect->rnd_offs_1_g = 0;
+
+        pSelect->ro_red_blue1_enable = 1;
+        pSelect->ro_green1_enable = 1;
+        pSelect->ro_lim_1_rb = 0x2;
+        pSelect->ro_lim_1_g = 0x2;
+
+        pSelect->lc_red_blue1_enable = 1;
+        pSelect->lc_green1_enable = 1;
+        pSelect->line_thr_1_rb = 0x16;
+        pSelect->line_thr_1_g = 0x16;
+        pSelect->line_mad_fac_1_rb = 0x10;
+        pSelect->line_mad_fac_1_g = 0x10;
+
+        pSelect->pg_red_blue1_enable = 1;
+        pSelect->pg_green1_enable = 1;
+        pSelect->pg_fac_1_rb = 0x6;
+        pSelect->pg_fac_1_g = 0x6;
+        break;
+    case 5:
+        pSelect->sw_rk_red_blue1_en = 1;
+        pSelect->sw_rk_green1_en = 1;
+        pSelect->sw_mindis1_rb = 0x14;
+        pSelect->sw_mindis1_g = 0x14;
+        pSelect->sw_dis_scale_min1 = 0xc;
+        pSelect->sw_dis_scale_max1 = 0xc;
+
+        pSelect->rg_red_blue1_enable = 0;
+        pSelect->rg_green1_enable = 0;
+        pSelect->rg_fac_1_rb = 0;
+        pSelect->rg_fac_1_g = 0;
+
+        pSelect->rnd_red_blue1_enable = 0;
+        pSelect->rnd_green1_enable = 0;
+        pSelect->rnd_thr_1_rb = 0;
+        pSelect->rnd_thr_1_g = 0;
+        pSelect->rnd_offs_1_rb = 0;
+        pSelect->rnd_offs_1_g = 0;
+
+        pSelect->ro_red_blue1_enable = 1;
+        pSelect->ro_green1_enable = 1;
+        pSelect->ro_lim_1_rb = 0x3;
+        pSelect->ro_lim_1_g = 0x3;
+
+        pSelect->lc_red_blue1_enable = 1;
+        pSelect->lc_green1_enable = 1;
+        pSelect->line_thr_1_rb = 0xc;
+        pSelect->line_thr_1_g = 0xc;
+        pSelect->line_mad_fac_1_rb = 0x9;
+        pSelect->line_mad_fac_1_g = 0x9;
+
+        pSelect->pg_red_blue1_enable = 1;
+        pSelect->pg_green1_enable = 1;
+        pSelect->pg_fac_1_rb = 0x5;
+        pSelect->pg_fac_1_g = 0x4;
+        break;
+    case 6:
+        pSelect->sw_rk_red_blue1_en = 1;
+        pSelect->sw_rk_green1_en = 1;
+        pSelect->sw_mindis1_rb = 0x10;
+        pSelect->sw_mindis1_g = 0x10;
+        pSelect->sw_dis_scale_min1 = 0x8;
+        pSelect->sw_dis_scale_max1 = 0x8;
+
+        pSelect->rg_red_blue1_enable = 0;
+        pSelect->rg_green1_enable = 0;
+        pSelect->rg_fac_1_rb = 0;
+        pSelect->rg_fac_1_g = 0;
+
+        pSelect->rnd_red_blue1_enable = 0;
+        pSelect->rnd_green1_enable = 0;
+        pSelect->rnd_thr_1_rb = 0;
+        pSelect->rnd_thr_1_g = 0;
+        pSelect->rnd_offs_1_rb = 0;
+        pSelect->rnd_offs_1_g = 0;
+
+        pSelect->ro_red_blue1_enable = 1;
+        pSelect->ro_green1_enable = 1;
+        pSelect->ro_lim_1_rb = 0x3;
+        pSelect->ro_lim_1_g = 0x3;
+
+        pSelect->lc_red_blue1_enable = 1;
+        pSelect->lc_green1_enable = 1;
+        pSelect->line_thr_1_rb = 0x9;
+        pSelect->line_thr_1_g = 0x9;
+        pSelect->line_mad_fac_1_rb = 0x7;
+        pSelect->line_mad_fac_1_g = 0x7;
+
+        pSelect->pg_red_blue1_enable = 1;
+        pSelect->pg_green1_enable = 1;
+        pSelect->pg_fac_1_rb = 0x5;
+        pSelect->pg_fac_1_g = 0x4;
+        break;
+    case 7:
+        pSelect->sw_rk_red_blue1_en = 1;
+        pSelect->sw_rk_green1_en = 1;
+        pSelect->sw_mindis1_rb = 0x8;
+        pSelect->sw_mindis1_g = 0x8;
+        pSelect->sw_dis_scale_min1 = 0x6;
+        pSelect->sw_dis_scale_max1 = 0x6;
+
+        pSelect->rg_red_blue1_enable = 0;
+        pSelect->rg_green1_enable = 0;
+        pSelect->rg_fac_1_rb = 0;
+        pSelect->rg_fac_1_g = 0;
+
+        pSelect->rnd_red_blue1_enable = 0;
+        pSelect->rnd_green1_enable = 0;
+        pSelect->rnd_thr_1_rb = 0;
+        pSelect->rnd_thr_1_g = 0;
+        pSelect->rnd_offs_1_rb = 0;
+        pSelect->rnd_offs_1_g = 0;
+
+        pSelect->ro_red_blue1_enable = 1;
+        pSelect->ro_green1_enable = 1;
+        pSelect->ro_lim_1_rb = 0x3;
+        pSelect->ro_lim_1_g = 0x3;
+
+        pSelect->lc_red_blue1_enable = 1;
+        pSelect->lc_green1_enable = 1;
+        pSelect->line_thr_1_rb = 0x7;
+        pSelect->line_thr_1_g = 0x7;
+        pSelect->line_mad_fac_1_rb = 0x5;
+        pSelect->line_mad_fac_1_g = 0x5;
+
+        pSelect->pg_red_blue1_enable = 1;
+        pSelect->pg_green1_enable = 1;
+        pSelect->pg_fac_1_rb = 0x3;
+        pSelect->pg_fac_1_g = 0x1;
+        break;
+    case 8:
+        pSelect->sw_rk_red_blue1_en = 1;
+        pSelect->sw_rk_green1_en = 1;
+        pSelect->sw_mindis1_rb = 0x8;
+        pSelect->sw_mindis1_g = 0x8;
+        pSelect->sw_dis_scale_min1 = 0x6;
+        pSelect->sw_dis_scale_max1 = 0x6;
+
+        pSelect->rg_red_blue1_enable = 0;
+        pSelect->rg_green1_enable = 0;
+        pSelect->rg_fac_1_rb = 0;
+        pSelect->rg_fac_1_g = 0;
+
+        pSelect->rnd_red_blue1_enable = 0;
+        pSelect->rnd_green1_enable = 0;
+        pSelect->rnd_thr_1_rb = 0;
+        pSelect->rnd_thr_1_g = 0;
+        pSelect->rnd_offs_1_rb = 0;
+        pSelect->rnd_offs_1_g = 0;
+
+        pSelect->ro_red_blue1_enable = 1;
+        pSelect->ro_green1_enable = 1;
+        pSelect->ro_lim_1_rb = 0x3;
+        pSelect->ro_lim_1_g = 0x3;
+
+        pSelect->lc_red_blue1_enable = 1;
+        pSelect->lc_green1_enable = 1;
+        pSelect->line_thr_1_rb = 0x7;
+        pSelect->line_thr_1_g = 0x7;
+        pSelect->line_mad_fac_1_rb = 0x5;
+        pSelect->line_mad_fac_1_g = 0x5;
+
+        pSelect->pg_red_blue1_enable = 0;
+        pSelect->pg_green1_enable = 0;
+        pSelect->pg_fac_1_rb = 0;
+        pSelect->pg_fac_1_g = 0;
+        break;
+    case 9:
+        pSelect->sw_rk_red_blue1_en = 1;
+        pSelect->sw_rk_green1_en = 1;
+        pSelect->sw_mindis1_rb = 0x8;
+        pSelect->sw_mindis1_g = 0x8;
+        pSelect->sw_dis_scale_min1 = 0x6;
+        pSelect->sw_dis_scale_max1 = 0x6;
+
+        pSelect->rg_red_blue1_enable = 0;
+        pSelect->rg_green1_enable = 0;
+        pSelect->rg_fac_1_rb = 0;
+        pSelect->rg_fac_1_g = 0;
+
+        pSelect->rnd_red_blue1_enable = 0;
+        pSelect->rnd_green1_enable = 0;
+        pSelect->rnd_thr_1_rb = 0;
+        pSelect->rnd_thr_1_g = 0;
+        pSelect->rnd_offs_1_rb = 0;
+        pSelect->rnd_offs_1_g = 0;
+
+        pSelect->ro_red_blue1_enable = 1;
+        pSelect->ro_green1_enable = 1;
+        pSelect->ro_lim_1_rb = 0x3;
+        pSelect->ro_lim_1_g = 0x3;
+
+        pSelect->lc_red_blue1_enable = 1;
+        pSelect->lc_green1_enable = 1;
+        pSelect->line_thr_1_rb = 0x3;
+        pSelect->line_thr_1_g = 0x3;
+        pSelect->line_mad_fac_1_rb = 0x2;
+        pSelect->line_mad_fac_1_g = 0x2;
+
+        pSelect->pg_red_blue1_enable = 0;
+        pSelect->pg_green1_enable = 0;
+        pSelect->pg_fac_1_rb = 0;
+        pSelect->pg_fac_1_g = 0;
+        break;
+    case 10:
+        pSelect->sw_rk_red_blue1_en = 1;
+        pSelect->sw_rk_green1_en = 1;
+        pSelect->sw_mindis1_rb = 0x8;
+        pSelect->sw_mindis1_g = 0x8;
+        pSelect->sw_dis_scale_min1 = 0x6;
+        pSelect->sw_dis_scale_max1 = 0x6;
+
+        pSelect->rg_red_blue1_enable = 0;
+        pSelect->rg_green1_enable = 0;
+        pSelect->rg_fac_1_rb = 0;
+        pSelect->rg_fac_1_g = 0;
+
+        pSelect->rnd_red_blue1_enable = 0;
+        pSelect->rnd_green1_enable = 0;
+        pSelect->rnd_thr_1_rb = 0;
+        pSelect->rnd_thr_1_g = 0;
+        pSelect->rnd_offs_1_rb = 0;
+        pSelect->rnd_offs_1_g = 0;
+
+        pSelect->ro_red_blue1_enable = 1;
+        pSelect->ro_green1_enable = 1;
+        pSelect->ro_lim_1_rb = 0x3;
+        pSelect->ro_lim_1_g = 0x3;
+
+        pSelect->lc_red_blue1_enable = 0;
+        pSelect->lc_green1_enable = 0;
+        pSelect->line_thr_1_rb = 0;
+        pSelect->line_thr_1_g = 0;
+        pSelect->line_mad_fac_1_rb = 0;
+        pSelect->line_mad_fac_1_g = 0;
+
+        pSelect->pg_red_blue1_enable = 0;
+        pSelect->pg_green1_enable = 0;
+        pSelect->pg_fac_1_rb = 0;
+        pSelect->pg_fac_1_g = 0;
+        break;
+    default:
+        LOGE_ADPCC("%s(%d): Wrong fast mode level!!!\n", __FUNCTION__, __LINE__);
+        break;
+    }
+
+    LOGD_ADPCC("%s(%d): Dpcc fast mode level:%\n", __FUNCTION__, __LINE__, level);
+    LOGV_ADPCC("%s(%d): Dpcc fast mode level:%\n", __FUNCTION__, __LINE__, level);
+
+    LOG1_ADPCC("%s(%d): exit!\n", __FUNCTION__, __LINE__);
+
+}
+
+AdpccResult_t Fast_mode_select_basic_params_by_ISO(
+    AdpccContext_t *pParams,
+    Adpcc_basic_params_select_t *pSelect,
+    AdpccExpInfo_t *pExpInfo)
+{
+    AdpccResult_t ret = ADPCC_RET_SUCCESS;
+    int iso = 50;
+
+    LOGI_ADPCC("%s(%d): enter!\n", __FUNCTION__, __LINE__);
+
+    if(pParams == NULL) {
+        ret = ADPCC_RET_NULL_POINTER;
+        LOGE_ADPCC("%s(%d): invalid inputparams\n", __FUNCTION__, __LINE__);
+        return ret;
+    }
+
+    if(pSelect == NULL) {
+        ret = ADPCC_RET_NULL_POINTER;
+        LOGE_ADPCC("%s(%d): invalid inputparams\n", __FUNCTION__, __LINE__);
+        return ret;
+    }
+
+    if(pExpInfo == NULL) {
+        ret = ADPCC_RET_NULL_POINTER;
+        LOGE_ADPCC("%s(%d): invalid inputparams\n", __FUNCTION__, __LINE__);
+        return ret;
+    }
+
+    iso = pExpInfo->arPreResIso[pExpInfo->hdr_mode];
+
+    //set dpcc ctrl params
+    //mode 0x0000
+    pSelect->stage1_enable = 1;
+
+    if(pParams->isBlackSensor)
+        pSelect->grayscale_mode = 0x1;
+    else
+        pSelect->grayscale_mode = 0x0;
+
+    pSelect->enable = 0x1;
+
+    //output_mode 0x0004
+    pSelect->sw_rk_out_sel = 1;
+    pSelect->sw_dpcc_output_sel = 1;
+    pSelect->stage1_rb_3x3 = 0;
+    pSelect->stage1_g_3x3 = 0;
+    pSelect->stage1_incl_rb_center = 1;
+    pSelect->stage1_incl_green_center = 1;
+
+    //set_use 0x0008
+    pSelect->stage1_use_fix_set = 0x0;
+
+    //get current fast mode single level
+    Fast_mode_Single_Setting(pParams, pSelect, iso);
+
+    //get current fast mode double level
+    Fast_mode_Double_Setting(pParams, pSelect, iso);
+
+    //get current fast mode triple level
+    Fast_mode_Triple_Setting(pParams, pSelect, iso);
+
+
+    LOGI_ADPCC("%s(%d): exit!\n", __FUNCTION__, __LINE__);
+    return ret;
+}
+
 AdpccResult_t select_bpt_params_by_ISO(
     Adpcc_bpt_params_t *pParams,
     Adpcc_bpt_params_select_t *pSelect,
@@ -842,6 +2179,40 @@ AdpccResult_t select_pdaf_params_by_ISO(
     LOGI_ADPCC("%s(%d): exit!\n", __FUNCTION__, __LINE__);
     return ret;
 }
+
+AdpccResult_t DpccExpertMode(
+    Adpcc_pdaf_params_t *pParams,
+    Adpcc_pdaf_params_select_t *pSelect,
+    AdpccExpInfo_t *pExpInfo)
+{
+    AdpccResult_t ret = ADPCC_RET_SUCCESS;
+
+    LOGI_ADPCC("%s(%d): enter!\n", __FUNCTION__, __LINE__);
+
+    if(pParams == NULL) {
+        ret = ADPCC_RET_NULL_POINTER;
+        LOGE_ADPCC("%s(%d): invalid inputparams\n", __FUNCTION__, __LINE__);
+        return ret;
+    }
+
+    if(pSelect == NULL) {
+        ret = ADPCC_RET_NULL_POINTER;
+        LOGE_ADPCC("%s(%d): invalid inputparams\n", __FUNCTION__, __LINE__);
+        return ret;
+    }
+
+    if(pExpInfo == NULL) {
+        ret = ADPCC_RET_NULL_POINTER;
+        LOGE_ADPCC("%s(%d): invalid inputparams\n", __FUNCTION__, __LINE__);
+        return ret;
+    }
+
+    memcpy(pSelect, pParams, sizeof(Adpcc_pdaf_params_select_t));
+
+    LOGI_ADPCC("%s(%d): exit!\n", __FUNCTION__, __LINE__);
+    return ret;
+}
+
 int GetCurrDpccValue
 (
     int           inPara,
@@ -943,7 +2314,8 @@ AdpccResult_t AdpccInit(AdpccContext_t **ppAdpccCtx, CamCalibDbContext_t *pCalib
 #if 1
     //init fix param for algo
     pAdpccCtx->stDpccCalib = pCalibDb->dpcc;
-    dpcc_basic_params_init(&pAdpccCtx->stAuto.stBasicParams, &pAdpccCtx->stDpccCalib);
+    dpcc_expert_mode_basic_params_init(&pAdpccCtx->stAuto.stBasicParams, &pAdpccCtx->stDpccCalib);
+    dpcc_fast_mode_basic_params_init(&pAdpccCtx->fast, &pAdpccCtx->stDpccCalib);
     dpcc_pdaf_params_init(&pAdpccCtx->stAuto.stPdafParams, &pAdpccCtx->stDpccCalib.pdaf);
     memset(&pAdpccCtx->stAuto.stPdafParams, 0x00, sizeof(pAdpccCtx->stAuto.stPdafParams));
 #else
@@ -1037,15 +2409,21 @@ AdpccResult_t AdpccProcess(AdpccContext_t *pAdpccCtx, AdpccExpInfo_t *pExpInfo)
 
     memcpy(&pAdpccCtx->stExpInfo, pExpInfo, sizeof(AdpccExpInfo_t));
 
+    bool fast_enable = pAdpccCtx->stDpccCalib.fast.fast_mode_en == 0 ? false : true;
+
     if(pAdpccCtx->eMode == ADPCC_OP_MODE_AUTO) {
-        ret = select_basic_params_by_ISO(&pAdpccCtx->stAuto.stBasicParams, &pAdpccCtx->stAuto.stBasicSelect, pExpInfo);
+        if(fast_enable == false)
+            ret = Expert_mode_select_basic_params_by_ISO(&pAdpccCtx->stAuto.stBasicParams, &pAdpccCtx->stAuto.stBasicSelect, pExpInfo);
+        else
+            ret = Fast_mode_select_basic_params_by_ISO(pAdpccCtx, &pAdpccCtx->stAuto.stBasicSelect, pExpInfo);
+
         ret = select_bpt_params_by_ISO(&pAdpccCtx->stAuto.stBptParams, &pAdpccCtx->stAuto.stBptSelect, pExpInfo);
         ret = select_pdaf_params_by_ISO(&pAdpccCtx->stAuto.stPdafParams, &pAdpccCtx->stAuto.stPdafSelect, pExpInfo);
-
     } else if(pAdpccCtx->eMode == ADPCC_OP_MODE_MANUAL) {
         //TODO
 
     }
+
 
     //sensor dpcc
     if(pAdpccCtx->stDpccCalib.sensor_dpcc.en != 0 )

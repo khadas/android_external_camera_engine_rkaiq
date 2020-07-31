@@ -867,6 +867,10 @@ void AhdrGetXmlParas
         pAhdrCtx->AhdrConfig.tmo_para.Contrast.TmoContrast[i] = LIMIT_VALUE(pCalibDb->ahdr.tmo.Contrast.TmoContrast[i], IQPARAMAX, IQPARAMIN) ;
     }
 
+    //band prior
+    pAhdrCtx->AhdrConfig.tmo_para.More.isHdrGlobalTmo =
+        pCalibDb->ahdr.tmo.MoreSetting.Band_Prior == 0 ? false : true;
+
     LOG1_AHDR("%s:  Ahdr comfig data from xml:\n", __FUNCTION__);
     LOG1_AHDR("%s:  Merge MergeMode:%d:\n", __FUNCTION__, pAhdrCtx->AhdrConfig.merge_para.MergeMode);
     LOG1_AHDR("%s:  Merge EnvLv:%f %f %f %f %f %f:\n", __FUNCTION__, pAhdrCtx->AhdrConfig.merge_para.EnvLv[0], pAhdrCtx->AhdrConfig.merge_para.EnvLv[1], pAhdrCtx->AhdrConfig.merge_para.EnvLv[2],
@@ -923,6 +927,7 @@ void AhdrGetXmlParas
     LOG1_AHDR("%s:  Tmo TmoContrast:%f %f %f %f %f %f:\n", __FUNCTION__, pAhdrCtx->AhdrConfig.tmo_para.Contrast.TmoContrast[0], pAhdrCtx->AhdrConfig.tmo_para.Contrast.TmoContrast[1], pAhdrCtx->AhdrConfig.tmo_para.Contrast.TmoContrast[2]
               , pAhdrCtx->AhdrConfig.tmo_para.Contrast.TmoContrast[3], pAhdrCtx->AhdrConfig.tmo_para.Contrast.TmoContrast[4], pAhdrCtx->AhdrConfig.tmo_para.Contrast.TmoContrast[5]);
     LOG1_AHDR("%s:  Tmo Damp:%f:\n", __FUNCTION__, pAhdrCtx->AhdrConfig.tmo_para.More.damp);
+    LOG1_AHDR("%s:  Tmo DaBandPrior:%d:\n", __FUNCTION__, pAhdrCtx->AhdrConfig.tmo_para.More.isHdrGlobalTmo);
 
     //turn the IQ paras into algo paras
     for(int i = 0; i < 6; i++)
@@ -1038,8 +1043,33 @@ void AhdrUpdateConfig
     middle_mean = middle_mean / 25;
     middle_mean = middle_mean / 16;
 
-    LOGD_AHDR("%s:  preFrame lgMergeLuma:%f ergeLuma(8bit):%f TmoLuma(8bit):%d\n", __FUNCTION__, lgmean, MergeLuma, tmo_mean);
+    LOGD_AHDR("%s:  preFrame lgMergeLuma:%f MergeLuma(8bit):%f TmoLuma(8bit):%d\n", __FUNCTION__, lgmean, MergeLuma, tmo_mean);
     LOGD_AHDR("%s:  preFrame SLuma(8bit):%d MLuma(8bit):%d LLuma(8bit):%d\n", __FUNCTION__, short_mean, middle_mean, long_mean);
+
+    LOG1_AHDR( "%s:exit!\n", __FUNCTION__);
+}
+/******************************************************************************
+ * AhdrRelease()
+ *****************************************************************************/
+bool BandPrior
+(
+    AhdrHandle_t pAhdrCtx
+) {
+
+    LOG1_AHDR( "%s:enter!\n", __FUNCTION__);
+
+    bool returnValue = false;
+
+    if(pAhdrCtx->AhdrConfig.tmo_para.More.isHdrGlobalTmo == true)
+        bool returnValue =
+            pAhdrCtx->AhdrProcRes.TmoProcRes.sw_hdrtmo_set_weightkey == 0 ? true : false;
+
+    else
+        returnValue = false;
+
+    return returnValue;
+
+    LOGD_AHDR("%s: BandPrior:%d\n", __FUNCTION__, returnValue);
 
     LOG1_AHDR( "%s:exit!\n", __FUNCTION__);
 }
@@ -1138,6 +1168,9 @@ void AhdrProcessing
 
     MergeProcessing(pAhdrCtx);
     TmoProcessing(pAhdrCtx);
+
+    //Band prior
+    pAhdrCtx->AhdrProcRes.isHdrGlobalTmo = BandPrior(pAhdrCtx);
 
     // store current handle data to pre data for next loop
     pAhdrCtx->AhdrPrevData.ro_hdrtmo_lgmean = pAhdrCtx->AhdrProcRes.TmoProcRes.sw_hdrtmo_set_lgmean;

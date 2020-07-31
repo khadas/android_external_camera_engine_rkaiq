@@ -185,17 +185,29 @@ RkAiqAeHandleInt::updateConfig()
         updateAtt = true;
         rk_aiq_uapi_ae_setHdrExpAttr(mAlgoCtx, &mCurHdrExpAttr, false);
     }
-    if (updateLinAeRouteAttr) {
-        mCurLinAeRouteAttr = mNewLinAeRouteAttr;
-        updateLinAeRouteAttr = false;
+    if (updateLinAeDayRouteAttr) {
+        mCurLinAeDayRouteAttr = mNewLinAeDayRouteAttr;
+        updateLinAeDayRouteAttr = false;
         updateAtt = true;
-        rk_aiq_uapi_ae_setLinAeRouteAttr(mAlgoCtx, &mCurLinAeRouteAttr, false);
+        rk_aiq_uapi_ae_setLinAeDayRouteAttr(mAlgoCtx, &mCurLinAeDayRouteAttr, false);
     }
-    if (updateHdrAeRouteAttr) {
-        mCurHdrAeRouteAttr = mNewHdrAeRouteAttr;
-        updateHdrAeRouteAttr = false;
+    if (updateHdrAeDayRouteAttr) {
+        mCurHdrAeDayRouteAttr = mNewHdrAeDayRouteAttr;
+        updateHdrAeDayRouteAttr = false;
         updateAtt = true;
-        rk_aiq_uapi_ae_setHdrAeRouteAttr(mAlgoCtx, &mCurHdrAeRouteAttr, false);
+        rk_aiq_uapi_ae_setHdrAeDayRouteAttr(mAlgoCtx, &mCurHdrAeDayRouteAttr, false);
+    }
+    if (updateLinAeNightRouteAttr) {
+        mCurLinAeNightRouteAttr = mNewLinAeNightRouteAttr;
+        updateLinAeNightRouteAttr = false;
+        updateAtt = true;
+        rk_aiq_uapi_ae_setLinAeNightRouteAttr(mAlgoCtx, &mCurLinAeNightRouteAttr, false);
+    }
+    if (updateHdrAeNightRouteAttr) {
+        mCurHdrAeNightRouteAttr = mNewHdrAeNightRouteAttr;
+        updateHdrAeNightRouteAttr = false;
+        updateAtt = true;
+        rk_aiq_uapi_ae_setHdrAeNightRouteAttr(mAlgoCtx, &mCurHdrAeNightRouteAttr, false);
     }
     if (updateExpWinAttr) {
         mCurExpWinAttr = mNewExpWinAttr;
@@ -324,7 +336,7 @@ RkAiqAeHandleInt::getHdrExpAttr (Uapi_HdrExpAttr_t* pHdrExpAttr)
     return ret;
 }
 XCamReturn
-RkAiqAeHandleInt::setLinAeRouteAttr(Uapi_LinAeRouteAttr_t LinAeRouteAttr)
+RkAiqAeHandleInt::setLinAeDayRouteAttr(Uapi_LinAeRouteAttr_t LinAeDayRouteAttr)
 {
     ENTER_ANALYZER_FUNCTION();
 
@@ -337,9 +349,10 @@ RkAiqAeHandleInt::setLinAeRouteAttr(Uapi_LinAeRouteAttr_t LinAeRouteAttr)
     // called by RkAiqCore
 
     // if something changed
-    if (0 != memcmp(&mCurLinAeRouteAttr, &LinAeRouteAttr, sizeof(Uapi_LinAeRouteAttr_t))) {
-        mNewLinAeRouteAttr = LinAeRouteAttr;
-        updateLinAeRouteAttr = true;
+
+    if (0 != memcmp(&mCurLinAeDayRouteAttr, &LinAeDayRouteAttr, sizeof(Uapi_LinAeRouteAttr_t))) {
+        mNewLinAeDayRouteAttr = LinAeDayRouteAttr;
+        updateLinAeDayRouteAttr = true;
     }
     mCfgMutex.unlock();
 
@@ -347,19 +360,19 @@ RkAiqAeHandleInt::setLinAeRouteAttr(Uapi_LinAeRouteAttr_t LinAeRouteAttr)
     return ret;
 }
 XCamReturn
-RkAiqAeHandleInt::getLinAeRouteAttr(Uapi_LinAeRouteAttr_t* pLinAeRouteAttr)
+RkAiqAeHandleInt::getLinAeDayRouteAttr(Uapi_LinAeRouteAttr_t* pLinAeDayRouteAttr)
 {
     ENTER_ANALYZER_FUNCTION();
 
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
 
-    rk_aiq_uapi_ae_getLinAeRouteAttr(mAlgoCtx, pLinAeRouteAttr);
+    rk_aiq_uapi_ae_getLinAeDayRouteAttr(mAlgoCtx, pLinAeDayRouteAttr);
 
     EXIT_ANALYZER_FUNCTION();
     return ret;
 }
 XCamReturn
-RkAiqAeHandleInt::setHdrAeRouteAttr(Uapi_HdrAeRouteAttr_t HdrAeRouteAttr)
+RkAiqAeHandleInt::setHdrAeDayRouteAttr(Uapi_HdrAeRouteAttr_t HdrAeDayRouteAttr)
 {
     ENTER_ANALYZER_FUNCTION();
 
@@ -372,9 +385,9 @@ RkAiqAeHandleInt::setHdrAeRouteAttr(Uapi_HdrAeRouteAttr_t HdrAeRouteAttr)
     // called by RkAiqCore
 
     // if something changed
-    if (0 != memcmp(&mCurHdrAeRouteAttr, &HdrAeRouteAttr, sizeof(Uapi_HdrAeRouteAttr_t))) {
-        mNewHdrAeRouteAttr = HdrAeRouteAttr;
-        updateHdrAeRouteAttr = true;
+    if (0 != memcmp(&mCurHdrAeDayRouteAttr, &HdrAeDayRouteAttr, sizeof(Uapi_HdrAeRouteAttr_t))) {
+        mNewHdrAeDayRouteAttr = HdrAeDayRouteAttr;
+        updateHdrAeDayRouteAttr = true;
     }
     mCfgMutex.unlock();
 
@@ -382,20 +395,21 @@ RkAiqAeHandleInt::setHdrAeRouteAttr(Uapi_HdrAeRouteAttr_t HdrAeRouteAttr)
     return ret;
 }
 XCamReturn
-RkAiqAeHandleInt::getHdrAeRouteAttr(Uapi_HdrAeRouteAttr_t* pHdrAeRouteAttr)
+RkAiqAeHandleInt::getHdrAeDayRouteAttr(Uapi_HdrAeRouteAttr_t* pHdrAeDayRouteAttr)
 {
     ENTER_ANALYZER_FUNCTION();
 
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
 
-    rk_aiq_uapi_ae_getHdrAeRouteAttr(mAlgoCtx, pHdrAeRouteAttr);
+    rk_aiq_uapi_ae_getHdrAeDayRouteAttr(mAlgoCtx, pHdrAeDayRouteAttr);
 
     EXIT_ANALYZER_FUNCTION();
     return ret;
 
 }
+
 XCamReturn
-RkAiqAeHandleInt::setExpWinAttr(Aec_Win_t ExpWinAttr)
+RkAiqAeHandleInt::setLinAeNightRouteAttr(Uapi_LinAeRouteAttr_t LinAeNightRouteAttr)
 {
     ENTER_ANALYZER_FUNCTION();
 
@@ -408,17 +422,92 @@ RkAiqAeHandleInt::setExpWinAttr(Aec_Win_t ExpWinAttr)
     // called by RkAiqCore
 
     // if something changed
-    if (0 != memcmp(&mCurExpWinAttr, &ExpWinAttr, sizeof(Aec_Win_t))) {
-        mCurExpWinAttr = ExpWinAttr;
+
+    if (0 != memcmp(&mCurLinAeNightRouteAttr, &LinAeNightRouteAttr, sizeof(Uapi_LinAeRouteAttr_t))) {
+        mNewLinAeNightRouteAttr = LinAeNightRouteAttr;
+        updateLinAeNightRouteAttr = true;
+    }
+    mCfgMutex.unlock();
+
+    EXIT_ANALYZER_FUNCTION();
+    return ret;
+}
+XCamReturn
+RkAiqAeHandleInt::getLinAeNightRouteAttr(Uapi_LinAeRouteAttr_t* pLinAeNightRouteAttr)
+{
+    ENTER_ANALYZER_FUNCTION();
+
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+
+    rk_aiq_uapi_ae_getLinAeNightRouteAttr(mAlgoCtx, pLinAeNightRouteAttr);
+
+    EXIT_ANALYZER_FUNCTION();
+    return ret;
+}
+XCamReturn
+RkAiqAeHandleInt::setHdrAeNightRouteAttr(Uapi_HdrAeRouteAttr_t HdrAeNightRouteAttr)
+{
+    ENTER_ANALYZER_FUNCTION();
+
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    mCfgMutex.lock();
+    //TODO
+    // check if there is different between att & mCurAtt
+    // if something changed, set att to mNewAtt, and
+    // the new params will be effective later when updateConfig
+    // called by RkAiqCore
+
+    // if something changed
+    if (0 != memcmp(&mCurHdrAeNightRouteAttr, &HdrAeNightRouteAttr, sizeof(Uapi_HdrAeRouteAttr_t))) {
+        mNewHdrAeNightRouteAttr = HdrAeNightRouteAttr;
+        updateHdrAeNightRouteAttr = true;
+    }
+    mCfgMutex.unlock();
+
+    EXIT_ANALYZER_FUNCTION();
+    return ret;
+}
+XCamReturn
+RkAiqAeHandleInt::getHdrAeNightRouteAttr(Uapi_HdrAeRouteAttr_t* pHdrAeNightRouteAttr)
+{
+    ENTER_ANALYZER_FUNCTION();
+
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+
+    rk_aiq_uapi_ae_getHdrAeNightRouteAttr(mAlgoCtx, pHdrAeNightRouteAttr);
+
+    EXIT_ANALYZER_FUNCTION();
+    return ret;
+
+}
+
+XCamReturn
+RkAiqAeHandleInt::setExpWinAttr(Uapi_ExpWin_t ExpWinAttr)
+{
+    ENTER_ANALYZER_FUNCTION();
+
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    mCfgMutex.lock();
+    //TODO
+    // check if there is different between att & mCurAtt
+    // if something changed, set att to mNewAtt, and
+    // the new params will be effective later when updateConfig
+    // called by RkAiqCore
+
+    // if something changed
+
+    if (0 != memcmp(&mCurExpWinAttr, &ExpWinAttr, sizeof(Uapi_ExpWin_t))) {
+        mNewExpWinAttr = ExpWinAttr;
         updateExpWinAttr = true;
     }
+
     mCfgMutex.unlock();
 
     EXIT_ANALYZER_FUNCTION();
     return ret;
 }
 XCamReturn
-RkAiqAeHandleInt::getExpWinAttr(Aec_Win_t * pExpWinAttr)
+RkAiqAeHandleInt::getExpWinAttr(Uapi_ExpWin_t * pExpWinAttr)
 {
     ENTER_ANALYZER_FUNCTION();
 
@@ -747,7 +836,7 @@ RkAiqAwbHandleInt::preProcess()
     if(shared->hardware_version == 0) {
         awb_pre_int->awb_cfg_effect_v200 = ispStats->awb_cfg_effect_v200;
 
-        for(int i = 0; i < RK_AIQ_AWB_MAX_WHITEREGIONS_NUM; i++) {
+        for(int i = 0; i < awb_pre_int->awb_cfg_effect_v200.lightNum; i++) {
             //mAwbPreParam.awb_hw0_statis.light,
             for(int j = 0; j < RK_AIQ_AWB_XY_TYPE_MAX_V200; j++) {
                 awb_pre_int->awb_hw0_statis.light[i].xYType[j].WpNo
@@ -1133,11 +1222,11 @@ RkAiqAnrHandleInt::updateConfig()
         rk_aiq_uapi_anr_SetAttrib(mAlgoCtx, &mCurAtt, false);
     }
 
-	if(UpdateIQpara){
-		mCurIQpara = mNewIQpara;
-		UpdateIQpara = false;
-		rk_aiq_uapi_anr_SetIQPara(mAlgoCtx, &mCurIQpara, false);
-	}
+    if(UpdateIQpara) {
+        mCurIQpara = mNewIQpara;
+        UpdateIQpara = false;
+        rk_aiq_uapi_anr_SetIQPara(mAlgoCtx, &mCurIQpara, false);
+    }
 
     mCfgMutex.unlock();
 
@@ -1480,13 +1569,13 @@ RkAiqAsharpHandleInt::updateConfig()
         rk_aiq_uapi_asharp_SetAttrib(mAlgoCtx, &mCurAtt, false);
     }
 
-	if(updateIQpara){
-		mCurIQPara = mNewIQPara;
+    if(updateIQpara) {
+        mCurIQPara = mNewIQPara;
         updateIQpara = false;
         // TODO
         rk_aiq_uapi_asharp_SetIQpara(mAlgoCtx, &mCurIQPara, false);
-	}
-	
+    }
+
     mCfgMutex.unlock();
 
 
