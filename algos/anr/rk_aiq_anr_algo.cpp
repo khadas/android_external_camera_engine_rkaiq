@@ -77,6 +77,7 @@ ANRresult_t ANRInit(ANRContext_t **ppANRCtx, CamCalibDbContext_t *pCalibDb)
     pANRCtx->refYuvBit = 8;
     pANRCtx->eMode = ANR_OP_MODE_AUTO;
 	pANRCtx->isIQParaUpdate = false;
+	pANRCtx->isGrayMode = false;
 
 #if ANR_USE_XML_FILE
     //read v1 params from xml
@@ -330,6 +331,14 @@ ANRresult_t ANRGetProcResult(ANRContext_t *pANRCtx, ANRProcResult_t* pANRResult)
 	 pANRCtx->fRawnr_SF_Strength = 1.0;
     }
 
+	//for bw setting
+	if(pANRCtx->isGrayMode){
+		LOGD_ANR("anr: set gray mode!\n");
+		for(int i=0; i<MFNR_MAX_LVL_UV; i++){
+			pANRResult->stMfnrParamSelect.weight_limit_uv[i] = MFNR_MAX_WEIGHT_LIMIT_UV;
+		}
+	}
+		
     //transfer to reg value
     bayernr_fix_tranfer(&pANRResult->stBayernrParamSelect, &pANRResult->stBayernrFix, pANRCtx->fRawnr_SF_Strength);
     mfnr_fix_transfer(&pANRResult->stMfnrParamSelect, &pANRResult->stMfnrFix, &pANRCtx->stExpInfo, pANRCtx->stGainState.ratio, pANRCtx->fLuma_TF_Strength,  pANRCtx->fChroma_TF_Strength);
@@ -343,6 +352,13 @@ ANRresult_t ANRGetProcResult(ANRContext_t *pANRCtx, ANRProcResult_t* pANRResult)
     pANRResult->stUvnrFix.uvnr_en = pANRResult->uvnrEn;
     pANRResult->stGainFix.gain_table_en = pANRCtx->stMfnrCalib.local_gain_en;
     ANRSetGainMode(pANRResult);
+
+	//for bw setting
+	if(pANRCtx->isGrayMode){
+		//uvnr disable
+		pANRResult->stUvnrFix.uvnr_step1_en = 0;
+		pANRResult->stUvnrFix.uvnr_step2_en = 0;
+	}
 
     LOGD_ANR("%s:%d xml:local:%d mode:%d  reg: local gain:%d  mfnr gain:%d mode:%d\n",
              __FUNCTION__, __LINE__,

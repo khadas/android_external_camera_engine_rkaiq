@@ -111,19 +111,21 @@ RkAiqCoreThread::loop()
     return false;
 }
 
-uint16_t RkAiqCore::DEFAULT_POOL_SIZE = 20;
+// notice that some pool shared items may be cached by other
+// modules(e.g. CamHwIsp20), so here should consider the cached number
+uint16_t RkAiqCore::DEFAULT_POOL_SIZE = 8;
 
 RkAiqCore::RkAiqCore()
     : mRkAiqCoreTh(new RkAiqCoreThread(this))
     , mRkAiqCorePpTh(new RkAiqCoreThread(this))
     , mState(RK_AIQ_CORE_STATE_INVALID)
     , mCb(NULL)
-    , mAiqParamsPool(new RkAiqFullParamsPool("RkAiqFullParams", RkAiqCore::DEFAULT_POOL_SIZE))
-    , mAiqExpParamsPool(new RkAiqExpParamsPool("RkAiqExpParams", RkAiqCore::DEFAULT_POOL_SIZE))
+    , mAiqParamsPool(new RkAiqFullParamsPool("RkAiqFullParams", 4))
+    , mAiqExpParamsPool(new RkAiqExpParamsPool("RkAiqExpParams", 4))
     , mAiqIspParamsPool(new RkAiqIspParamsPool("RkAiqIspParams", RkAiqCore::DEFAULT_POOL_SIZE))
-    , mAiqIsppParamsPool(new RkAiqIsppParamsPool("RkAiqIspParams", RkAiqCore::DEFAULT_POOL_SIZE))
-    , mAiqFocusParamsPool(new RkAiqFocusParamsPool("RkAiqFocusParams", RkAiqCore::DEFAULT_POOL_SIZE))
-    , mAiqCpslParamsPool(new RkAiqCpslParamsPool("RkAiqCpslParamsPool", RkAiqCore::DEFAULT_POOL_SIZE))
+    , mAiqIsppParamsPool(new RkAiqIsppParamsPool("RkAiqIsppParams", 4))
+    , mAiqFocusParamsPool(new RkAiqFocusParamsPool("RkAiqFocusParams", 4))
+    , mAiqCpslParamsPool(new RkAiqCpslParamsPool("RkAiqCpslParamsPool", 4))
 {
     ENTER_ANALYZER_FUNCTION();
     mAlogsSharedParams.reset();

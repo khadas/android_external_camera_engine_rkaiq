@@ -602,12 +602,16 @@ XCamReturn RkAiqManager::offlineRdJobDone()
 
 XCamReturn RkAiqManager::setSharpFbcRotation(rk_aiq_rotation_t rot)
 {
+#ifndef RK_SIMULATOR_HW
     SmartPtr<CamHwIsp20> camHwIsp20 = mCamHw.dynamic_cast_ptr<CamHwIsp20>();
 
     if (camHwIsp20.ptr())
         return camHwIsp20->setSharpFbcRotation(rot);
     else
         return XCAM_RETURN_ERROR_FAILED;
+#else
+    return XCAM_RETURN_ERROR_FAILED;
+#endif
 }
 
 XCamReturn RkAiqManager::setMirrorFlip(bool mirror, bool flip)

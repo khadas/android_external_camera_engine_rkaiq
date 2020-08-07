@@ -99,6 +99,13 @@ pre_process(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outparams)
 
     LOGI_ANR("%s: (enter)\n", __FUNCTION__ );
     ANRContext_t* pAnrCtx = (ANRContext_t *)inparams->ctx;
+    RkAiqAlgoPreAnrInt* pAnrPreParams = (RkAiqAlgoPreAnrInt*)inparams;
+	
+    if (pAnrPreParams->rk_com.u.proc.gray_mode) {
+        pAnrCtx->isGrayMode = true;
+    }else {
+        pAnrCtx->isGrayMode = false;
+    }
 	
     //nothing todo now
     ANRresult_t ret = ANRPreProcess(pAnrCtx);

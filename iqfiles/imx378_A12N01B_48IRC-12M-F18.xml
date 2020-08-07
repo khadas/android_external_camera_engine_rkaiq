@@ -2753,7 +2753,7 @@
             <Bayernr_Setting index="1" type="cell" size="[1 2]">
                 <cell index="1" type="struct" size="[1 1]">
                     <name index="1" type="char" size="[1 4]">
-                        HSNR
+                        LSNR
                     </name>
                     <mode index="1" type="char" size="[1 3]">
                         lcg
@@ -2831,7 +2831,7 @@
                 </cell>
                 <cell index="2" type="struct" size="[1 1]">
                     <name index="1" type="char" size="[1 4]">
-                        LSNR
+                        HSNR
                     </name>
                     <mode index="1" type="char" size="[1 3]">
                         hcg
@@ -8459,7 +8459,7 @@
             <YNR_Setting index="1" type="cell" size="[1 2]">
                 <cell index="1" type="struct" size="[1 1]">
                     <name index="1" type="char" size="[1 4]">
-                    HSNR
+                    LSNR
                 </name>
                     <mode index="1" type="char" size="[1 3]">
                     lcg
@@ -9509,7 +9509,7 @@
                 </cell>
                 <cell index="2" type="struct" size="[1 1]">
                     <name index="1" type="char" size="[1 4]">
-                    LSNR
+                    HSNR
                 </name>
                     <mode index="1" type="char" size="[1 3]">
                     hcg
@@ -11435,7 +11435,7 @@
             <MFNR_Setting index="1" type="cell" size="[1 2]">
                 <cell index="1" type="struct" size="[1 1]">
                     <name index="1" type="char" size="[1 4]">
-                        HSNR
+                        LSNR
                     </name>
                     <mode index="1" type="char" size="[1 3]">
                         lcg
@@ -13148,7 +13148,7 @@
                 </cell>
                 <cell index="2" type="struct" size="[1 1]">
                     <name index="1" type="char" size="[1 4]">
-                        LSNR
+                        HSNR
                     </name>
                     <mode index="1" type="char" size="[1 3]">
                         hcg
@@ -14874,7 +14874,7 @@
             <SHARP_Setting index="1" type="cell" size="[1 2]">
                 <cell index="1" type="struct" size="[1 1]">
                     <name index="1" type="char" size="[1 4]">
-                        HSNR
+                        LSNR
                     </name>
                     <mode index="1" type="char" size="[1 3]">
                         lcg
@@ -15612,7 +15612,7 @@
                 </cell>
                 <cell index="2" type="struct" size="[1 1]">
                     <name index="1" type="char" size="[1 4]">
-                        LSNR
+                        HSNR
                     </name>
                     <mode index="1" type="char" size="[1 3]">
                         hcg
@@ -16363,7 +16363,7 @@
             <EDGEFILTER_Setting index="1" type="cell" size="[1 2]">
                 <cell index="1" type="struct" size="[1 1]">
                     <name index="1" type="char" size="[1 4]">
-                        HSNR
+                        LSNR
                     </name>
                     <sensor_mode index="1" type="char" size="[1 3]">
                         lcg
@@ -17023,7 +17023,7 @@
                 </cell>
                 <cell index="2" type="struct" size="[1 1]">
                     <name index="1" type="char" size="[1 4]">
-                        LSNR
+                        HSNR
                     </name>
                     <sensor_mode index="1" type="char" size="[1 3]">
                         hcg
@@ -18844,7 +18844,7 @@
         <SENSORINFO index="1" type="struct" size="[1 1]">
          <GainRange index="1" type="struct" size="[1 1]">
             <IsLinear index="1" type="double" size="[1 1]">
-	       [0]
+	       [1]
             </IsLinear>
             <Linear index="1" type="double" size="[2 7]">
                 [1.0000 22.2600 -1024.0000 -1024.0000 -1.0000 0.0000 978.0000 
