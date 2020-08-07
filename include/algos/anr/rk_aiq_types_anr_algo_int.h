@@ -31,6 +31,7 @@ RKAIQ_BEGIN_DECLARE
 
 
 #define MAX_ISO_STEP CALIBDB_NR_SHARP_MAX_ISO_LEVEL
+#define MFNR_MAX_WEIGHT_LIMIT_UV (255)
 
 
 /************mfnr***************/

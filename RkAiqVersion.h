@@ -162,10 +162,19 @@
  * - fix some compatible issues of vicap and isp
  * - rkisp_demo: streaming stop after aiq
  * - fix the bug calculating the times of readback is error in lumadetect
+ * v1.0.4
+ * - iqfiles:
+ *   - imx378/imx415/gc2053/gc4c33,HSNR<=>LSNR
+ *   - imx378/s5kgm1sp, GainRange:use Linear Mode
+ *   - gc2053:v0.0.2  imx415:v0.0.2  ov2718:v0.0.2
+ * - ANR: add gray mode control for mfnr & uvnr param
+ * - decrease AIQ heap memory usage, save 50M
+ * - CamHwIsp20: move isp/ispp/mipitx,rx streaming on to prepare stage
+ * - fix bugs in GainRange-dBmode
  */
 
-#define RK_AIQ_VERSION_REAL_V "v1.0.3"
-#define RK_AIQ_RELEASE_DATE "2020-07-31"
+#define RK_AIQ_VERSION_REAL_V "v1.0.4"
+#define RK_AIQ_RELEASE_DATE "2020-08-07"
 
 /******* DO NOT EDIT THE FOLLOWINGS ***********/
 

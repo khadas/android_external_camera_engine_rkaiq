@@ -2750,7 +2750,7 @@
 	  <Bayernr_Setting index="1" type="cell" size="[1 2]">
 	     <cell index="1" type="struct" size="[1 1]">
                 <name index="1" type="char" size="[1 8]">
-                     HSNR
+                     LSNR
                 </name>
 	       <mode index="1" type="char" size="[1 8]">
                      remosaic
@@ -2828,7 +2828,7 @@
 	      </cell>
 	      <cell index="1" type="struct" size="[1 1]">
                   <name index="1" type="char" size="[1 8]">
-                     LSNR
+                     HSNR
                 </name>
 	       <mode index="1" type="char" size="[1 8]">
                      bining
@@ -5169,7 +5169,7 @@
          <UVNR_Setting index="1" type="cell" size="[1 2]">
 	  <cell index="1" type="struct" size="[1 1]">
 	       <name index="1" type="char" size="[1 8]">
-                     HSNR
+                     LSNR
                 </name>
 	       <mode index="1" type="char" size="[1 8]">
                      remosaic
@@ -5327,7 +5327,7 @@
            </cell>
 	  <cell index="2" type="struct" size="[1 1]">
 	       <name index="1" type="char" size="[1 8]">
-                     LSNR
+                     HSNR
                 </name>
 	       <mode index="1" type="char" size="[1 8]">
                      bining
@@ -5524,7 +5524,7 @@
              <YNR_Setting index="1" type="cell" size="[1 2]">
 	     <cell index="1" type="struct" size="[1 1]">
 	       <name index="1" type="char" size="[1 8]">
-                     HSNR
+                     LSNR
                 </name>
 	       <mode index="1" type="char" size="[1 8]">
                      remosaic
@@ -6574,7 +6574,7 @@
 	     </cell>
 	     <cell index="2" type="struct" size="[1 1]">
 	       <name index="1" type="char" size="[1 8]">
-                     LSNR
+                     HSNR
                 </name>
 	       <mode index="1" type="char" size="[1 8]">
                      bining
@@ -8500,7 +8500,7 @@
            <MFNR_Setting index="1" type="cell" size="[1 2]">
 	    <cell index="1" type="struct" size="[1 1]">
 	       <name index="1" type="char" size="[1 8]">
-                     HSNR
+                     LSNR
                 </name>
 	       <mode index="1" type="char" size="[1 8]">
                      remosaic
@@ -10213,7 +10213,7 @@
 	     </cell>
 	     <cell index="2" type="struct" size="[1 1]">
 	       <name index="1" type="char" size="[1 8]">
-                     LSNR
+                     HSNR
                 </name>
 	       <mode index="1" type="char" size="[1 8]">
                      bining
@@ -11939,7 +11939,7 @@
            <SHARP_Setting index="1" type="cell" size="[1 2]">
 	    <cell index="1" type="struct" size="[1 1]">
 	       <name index="1" type="char" size="[1 8]">
-                     HSNR
+                     LSNR
                 </name>
 	       <mode index="1" type="char" size="[1 8]">
                      remosaic
@@ -12677,7 +12677,7 @@
                </cell>
                <cell index="2" type="struct" size="[1 1]">
 	       <name index="1" type="char" size="[1 8]">
-                     LSNR
+                     HSNR
                 </name>
 	       <mode index="1" type="char" size="[1 8]">
                      bining
@@ -13428,7 +13428,7 @@
             <EDGEFILTER_Setting index="1" type="cell" size="[1 2]">
 	    <cell index="1" type="struct" size="[1 1]">
 	      <name index="1" type="char" size="[1 8]">
-                     HSNR
+                     LSNR
                </name>
 	      <sensor_mode index="1" type="char" size="[1 8]">
                      remosaic
@@ -14088,7 +14088,7 @@
               </cell>
 	     <cell index="2" type="struct" size="[1 1]">
 	      <name index="1" type="char" size="[1 8]">
-                     LSNR
+                     HSNR
                </name>
 	      <sensor_mode index="1" type="char" size="[1 8]">
                      bining

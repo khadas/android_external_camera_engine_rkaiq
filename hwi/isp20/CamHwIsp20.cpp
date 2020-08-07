@@ -1513,42 +1513,6 @@ CamHwIsp20::prepare(uint32_t width, uint32_t height, int mode, int t_delay, int 
         LOGE_CAMHW_SUBM(ISP20HW_SUBM, "setupPipelineFmt err: %d\n", ret);
     }
 
-    ret = mIspParamsDev->prepare();
-    if (ret < 0) {
-        LOGE_CAMHW_SUBM(ISP20HW_SUBM, "prepare isp params dev err: %d\n", ret);
-    }
-
-#ifndef DISABLE_PP
-    ret = mIsppParamsDev->prepare();
-    if (ret < 0) {
-        LOGE_CAMHW_SUBM(ISP20HW_SUBM, "prepare ispp params dev err: %d\n", ret);
-    }
-#endif
-    _state = CAM_HW_STATE_PREPARED;
-    EXIT_CAMHW_FUNCTION();
-    return ret;
-}
-
-XCamReturn
-CamHwIsp20::start()
-{
-    XCamReturn ret = XCAM_RETURN_NO_ERROR;
-    SmartPtr<SensorHw> sensorHw;
-    SmartPtr<LensHw> lensHw;
-    SmartPtr<Isp20PollThread> isp20Pollthread;
-
-    ENTER_CAMHW_FUNCTION();
-
-    isp20Pollthread = mPollthread.dynamic_cast_ptr<Isp20PollThread>();
-    sensorHw = mSensorDev.dynamic_cast_ptr<SensorHw>();
-    lensHw = mLensDev.dynamic_cast_ptr<LensHw>();
-
-    if (_state != CAM_HW_STATE_PREPARED &&
-            _state != CAM_HW_STATE_STOPPED) {
-        LOGE_CAMHW_SUBM(ISP20HW_SUBM, "camhw state err: %d\n", ret);
-        return XCAM_RETURN_ERROR_FAILED;
-    }
-
     if (!_linked_to_isp) {
         // _mipi_tx_devs
         if (_hdr_mode == RK_AIQ_WORKING_MODE_NORMAL) {
@@ -1586,6 +1550,32 @@ CamHwIsp20::start()
         LOGD_CAMHW_SUBM(ISP20HW_SUBM, "CIF mipi tx: %d\n", _hdr_mode);
     }
 
+    _state = CAM_HW_STATE_PREPARED;
+    EXIT_CAMHW_FUNCTION();
+    return ret;
+}
+
+XCamReturn
+CamHwIsp20::start()
+{
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    SmartPtr<SensorHw> sensorHw;
+    SmartPtr<LensHw> lensHw;
+    SmartPtr<Isp20PollThread> isp20Pollthread;
+
+    ENTER_CAMHW_FUNCTION();
+
+    isp20Pollthread = mPollthread.dynamic_cast_ptr<Isp20PollThread>();
+    sensorHw = mSensorDev.dynamic_cast_ptr<SensorHw>();
+    lensHw = mLensDev.dynamic_cast_ptr<LensHw>();
+
+    if (_state != CAM_HW_STATE_PREPARED &&
+            _state != CAM_HW_STATE_STOPPED) {
+        LOGE_CAMHW_SUBM(ISP20HW_SUBM, "camhw state err: %d\n", ret);
+        return XCAM_RETURN_ERROR_FAILED;
+    }
+
+#if 0 // moved to set first isp params
     if ((_hdr_mode != RK_AIQ_WORKING_MODE_NORMAL) ||
             (_hdr_mode == RK_AIQ_WORKING_MODE_NORMAL && !mNormalNoReadBack)) {
         ret = isp20Pollthread->hdr_mipi_start(sensorHw);
@@ -1593,7 +1583,7 @@ CamHwIsp20::start()
             LOGE_CAMHW_SUBM(ISP20HW_SUBM, "hdr mipi start err: %d\n", ret);
         }
     }
-
+#endif
     ret = mIspLumaDev->start();
     if (ret < 0) {
         LOGE_CAMHW_SUBM(ISP20HW_SUBM, "start isp luma dev err: %d\n", ret);
@@ -1608,10 +1598,6 @@ CamHwIsp20::start()
     if (ret < 0) {
         LOGE_CAMHW_SUBM(ISP20HW_SUBM, "start isp stats dev err: %d\n", ret);
     }
-    ret = mIspParamsDev->start(true);
-    if (ret < 0) {
-        LOGE_CAMHW_SUBM(ISP20HW_SUBM, "start isp params dev err: %d\n", ret);
-    }
 
 #ifndef DISABLE_PP
 #ifndef DISABLE_PP_STATS
@@ -1620,10 +1606,6 @@ CamHwIsp20::start()
         LOGE_CAMHW_SUBM(ISP20HW_SUBM, "start ispp stats dev err: %d\n", ret);
     }
 #endif
-    ret = mIsppParamsDev->start(true);
-    if (ret < 0) {
-        LOGE_CAMHW_SUBM(ISP20HW_SUBM, "start ispp params dev err: %d\n", ret);
-    }
 #endif
 
     if (mFlashLight.ptr()) {
@@ -2209,7 +2191,7 @@ CamHwIsp20::setIspParamsSync(int frameId)
 
     ENTER_CAMHW_FUNCTION();
     _mutex.lock();
-    while (_effecting_ispparm_map.size() > 10)
+    while (_effecting_ispparm_map.size() > 2)
         _effecting_ispparm_map.erase(_effecting_ispparm_map.begin());
 
     if (_pending_ispparams_queue.empty()) {
@@ -2333,13 +2315,22 @@ CamHwIsp20::setIspParams(SmartPtr<RkAiqIspParamsProxy>& ispParams)
     if (_state == CAM_HW_STATE_PREPARED || _state == CAM_HW_STATE_STOPPED) {
         LOGD_CAMHW_SUBM(ISP20HW_SUBM, "hdr-debug: %s: first set ispparams id[%d]\n",
                         __func__, ispParams->data()->frame_id);
-        if (_state != CAM_HW_STATE_PREPARED) {
-            ret = mIspParamsDev->prepare();
+        ret = mIspParamsDev->start();
+        if (ret < 0) {
+            LOGE_CAMHW_SUBM(ISP20HW_SUBM, "prepare isp params dev err: %d\n", ret);
+        }
+
+        setIspParamsSync(ispParams->data()->frame_id);
+
+        SmartPtr<Isp20PollThread> isp20Pollthread = mPollthread.dynamic_cast_ptr<Isp20PollThread>();
+        SmartPtr<SensorHw> sensorHw = mSensorDev.dynamic_cast_ptr<SensorHw>();
+        if ((_hdr_mode != RK_AIQ_WORKING_MODE_NORMAL) ||
+                (_hdr_mode == RK_AIQ_WORKING_MODE_NORMAL && !mNormalNoReadBack)) {
+            ret = isp20Pollthread->hdr_mipi_start(sensorHw);
             if (ret < 0) {
-                LOGE_CAMHW_SUBM(ISP20HW_SUBM, "prepare isp params dev err: %d\n", ret);
+                LOGE_CAMHW_SUBM(ISP20HW_SUBM, "hdr mipi start err: %d\n", ret);
             }
         }
-        setIspParamsSync(ispParams->data()->frame_id);
         _first = false;
     }
 
@@ -2373,11 +2364,9 @@ CamHwIsp20::setIsppParams(SmartPtr<RkAiqIsppParamsProxy>& isppParams)
     if (_state == CAM_HW_STATE_PREPARED || _state == CAM_HW_STATE_STOPPED) {
         LOGD_CAMHW_SUBM(ISP20HW_SUBM, "hdr-debug: %s: first set isppParams id[%d]\n",
                         __func__, isppParams->data()->frame_id);
-        if (_state != CAM_HW_STATE_PREPARED) {
-            ret = mIsppParamsDev->prepare();
-            if (ret < 0) {
-                LOGE_CAMHW_SUBM(ISP20HW_SUBM, "prepare ispp params dev err: %d\n", ret);
-            }
+        ret = mIsppParamsDev->start();
+        if (ret < 0) {
+            LOGE_CAMHW_SUBM(ISP20HW_SUBM, "prepare ispp params dev err: %d\n", ret);
         }
         setIsppParamsSync(isppParams->data()->frame_id);
     }
@@ -2486,7 +2475,7 @@ CamHwIsp20::setIsppParamsSync(int frameId)
             ispp_params->module_ens = _full_active_ispp_params.module_ens;
             ispp_params->module_cfg_update = _full_active_ispp_params.module_cfg_update;
 
-            LOGD("module_init_ens frome drv 0x%x\n", ispp_params->module_init_ens);
+            LOGD_CAMHW_SUBM(ISP20HW_SUBM, "module_init_ens frome drv 0x%x\n", ispp_params->module_init_ens);
 
 #ifdef RUNTIME_MODULE_DEBUG
             ispp_params->module_en_update &= ~g_disable_ispp_modules_en;
@@ -2690,6 +2679,10 @@ CamHwIsp20::getEffectiveIspParams(SmartPtr<RkAiqIspParamsProxy>& ispParams, int 
     } else {
         ispParams = it->second;
     }
+
+    while (_effecting_ispparm_map.size() > 2)
+        _effecting_ispparm_map.erase(_effecting_ispparm_map.begin());
+
     EXIT_CAMHW_FUNCTION();
 
     return XCAM_RETURN_NO_ERROR;

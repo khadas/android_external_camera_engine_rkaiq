@@ -182,6 +182,7 @@ RKAIQ_BEGIN_DECLARE
 #define YNR_SIGMA_BITS  10
 
 
+
 typedef struct ANRGainState_s {
     int gainState;
     float gain_th0;
@@ -217,6 +218,7 @@ typedef struct ANRContext_s {
 	float fRawnr_SF_Strength;
 
 	bool isIQParaUpdate;
+	bool isGrayMode;
 } ANRContext_t;
 
 
