@@ -28,23 +28,26 @@
 RKAIQ_BEGIN_DECLARE
 
 
-static RkAiqAlgoContext ctx;
 
 static XCamReturn AhdrCreateCtx(RkAiqAlgoContext **context, const AlgoCtxInstanceCfg* cfg)
 {
 
     LOG1_AHDR("%s:Enter!\n", __FUNCTION__);
     RESULT ret = AHDR_RET_SUCCESS;
-
-    memset(&ctx.AhdrInstConfig, 0x00, sizeof(AhdrInstanceConfig_t));
-    ret = AhdrInit(&ctx.AhdrInstConfig);
+    RkAiqAlgoContext *ctx = new RkAiqAlgoContext();
+    if (ctx == NULL) {
+        LOGE_AHDR( "%s: create ahdr context fail!\n", __FUNCTION__);
+        return XCAM_RETURN_ERROR_MEM;
+    }
+    memset(&ctx->AhdrInstConfig, 0x00, sizeof(AhdrInstanceConfig_t));
+    ret = AhdrInit(&ctx->AhdrInstConfig);
 
     if (ret != AHDR_RET_SUCCESS) {
         LOGE_AHDR("%s AHDRInit failed: %d", __FUNCTION__, ret);
         return(XCAM_RETURN_ERROR_FAILED);
     }
 
-    *context = &ctx;
+    *context = ctx;
 
     LOG1_AHDR("%s:Exit!\n", __FUNCTION__);
     return(XCAM_RETURN_NO_ERROR);
@@ -64,6 +67,7 @@ static XCamReturn AhdrDestroyCtx(RkAiqAlgoContext *context)
             LOGE_AHDR("%s AecRelease failed: %d", __FUNCTION__, ret);
             return(XCAM_RETURN_ERROR_FAILED);
         }
+        delete context;
         context = NULL;
     }
 

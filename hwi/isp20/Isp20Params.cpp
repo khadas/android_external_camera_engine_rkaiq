@@ -2074,31 +2074,34 @@ Isp20Params::convertAiqAdemosaicToIsp20Params(struct isp2x_isp_params_cfg& isp_c
         isp_cfg.module_ens |= ISP2X_MODULE_DEBAYER;
         isp_cfg.module_en_update |= ISP2X_MODULE_DEBAYER;
         isp_cfg.module_cfg_update |= ISP2X_MODULE_DEBAYER;
+     }else {
+        isp_cfg.module_ens &= ~ISP2X_MODULE_DEBAYER;
+        isp_cfg.module_en_update |= ISP2X_MODULE_DEBAYER;
+     }
 
-        isp_cfg.others.debayer_cfg.clip_en = aiq_results->data()->demosaic.clip_en;
-        isp_cfg.others.debayer_cfg.filter_c_en = aiq_results->data()->demosaic.filter_c_en;
-        isp_cfg.others.debayer_cfg.filter_g_en = aiq_results->data()->demosaic.filter_g_en;
-        isp_cfg.others.debayer_cfg.gain_offset = aiq_results->data()->demosaic.gain_offset;
-        isp_cfg.others.debayer_cfg.offset = aiq_results->data()->demosaic.offset;
-        isp_cfg.others.debayer_cfg.hf_offset = aiq_results->data()->demosaic.hf_offset;
-        isp_cfg.others.debayer_cfg.thed0 = aiq_results->data()->demosaic.thed0;
-        isp_cfg.others.debayer_cfg.thed1 = aiq_results->data()->demosaic.thed1;
-        isp_cfg.others.debayer_cfg.dist_scale = aiq_results->data()->demosaic.dist_scale;
-        isp_cfg.others.debayer_cfg.shift_num = aiq_results->data()->demosaic.shift_num;
-        isp_cfg.others.debayer_cfg.filter1_coe1 = aiq_results->data()->demosaic.filter1_coe[0];
-        isp_cfg.others.debayer_cfg.filter1_coe2 = aiq_results->data()->demosaic.filter1_coe[1];
-        isp_cfg.others.debayer_cfg.filter1_coe3 = aiq_results->data()->demosaic.filter1_coe[2];
-        isp_cfg.others.debayer_cfg.filter1_coe4 = aiq_results->data()->demosaic.filter1_coe[3];
-        isp_cfg.others.debayer_cfg.filter1_coe5 = aiq_results->data()->demosaic.filter1_coe[4];
-        isp_cfg.others.debayer_cfg.filter2_coe1 = aiq_results->data()->demosaic.filter2_coe[0];
-        isp_cfg.others.debayer_cfg.filter2_coe2 = aiq_results->data()->demosaic.filter2_coe[1];
-        isp_cfg.others.debayer_cfg.filter2_coe3 = aiq_results->data()->demosaic.filter2_coe[2];
-        isp_cfg.others.debayer_cfg.filter2_coe4 = aiq_results->data()->demosaic.filter2_coe[3];
-        isp_cfg.others.debayer_cfg.filter2_coe5 = aiq_results->data()->demosaic.filter2_coe[4];
-        isp_cfg.others.debayer_cfg.max_ratio = aiq_results->data()->demosaic.max_ratio;
-        isp_cfg.others.debayer_cfg.order_max = aiq_results->data()->demosaic.order_max;
-        isp_cfg.others.debayer_cfg.order_min = aiq_results->data()->demosaic.order_min;
-    }
+    isp_cfg.others.debayer_cfg.clip_en = aiq_results->data()->demosaic.clip_en;
+    isp_cfg.others.debayer_cfg.filter_c_en = aiq_results->data()->demosaic.filter_c_en;
+    isp_cfg.others.debayer_cfg.filter_g_en = aiq_results->data()->demosaic.filter_g_en;
+    isp_cfg.others.debayer_cfg.gain_offset = aiq_results->data()->demosaic.gain_offset;
+    isp_cfg.others.debayer_cfg.offset = aiq_results->data()->demosaic.offset;
+    isp_cfg.others.debayer_cfg.hf_offset = aiq_results->data()->demosaic.hf_offset;
+    isp_cfg.others.debayer_cfg.thed0 = aiq_results->data()->demosaic.thed0;
+    isp_cfg.others.debayer_cfg.thed1 = aiq_results->data()->demosaic.thed1;
+    isp_cfg.others.debayer_cfg.dist_scale = aiq_results->data()->demosaic.dist_scale;
+    isp_cfg.others.debayer_cfg.shift_num = aiq_results->data()->demosaic.shift_num;
+    isp_cfg.others.debayer_cfg.filter1_coe1 = aiq_results->data()->demosaic.filter1_coe[0];
+    isp_cfg.others.debayer_cfg.filter1_coe2 = aiq_results->data()->demosaic.filter1_coe[1];
+    isp_cfg.others.debayer_cfg.filter1_coe3 = aiq_results->data()->demosaic.filter1_coe[2];
+    isp_cfg.others.debayer_cfg.filter1_coe4 = aiq_results->data()->demosaic.filter1_coe[3];
+    isp_cfg.others.debayer_cfg.filter1_coe5 = aiq_results->data()->demosaic.filter1_coe[4];
+    isp_cfg.others.debayer_cfg.filter2_coe1 = aiq_results->data()->demosaic.filter2_coe[0];
+    isp_cfg.others.debayer_cfg.filter2_coe2 = aiq_results->data()->demosaic.filter2_coe[1];
+    isp_cfg.others.debayer_cfg.filter2_coe3 = aiq_results->data()->demosaic.filter2_coe[2];
+    isp_cfg.others.debayer_cfg.filter2_coe4 = aiq_results->data()->demosaic.filter2_coe[3];
+    isp_cfg.others.debayer_cfg.filter2_coe5 = aiq_results->data()->demosaic.filter2_coe[4];
+    isp_cfg.others.debayer_cfg.max_ratio = aiq_results->data()->demosaic.max_ratio;
+    isp_cfg.others.debayer_cfg.order_max = aiq_results->data()->demosaic.order_max;
+    isp_cfg.others.debayer_cfg.order_min = aiq_results->data()->demosaic.order_min;
 }
 
 void
@@ -2231,6 +2234,9 @@ Isp20Params::convertAiqAldchToIsp20Params(struct isp2x_isp_params_cfg& isp_cfg,
         pLdchCfg->hsize = ldch_cfg.lut_h_size;
         pLdchCfg->vsize = ldch_cfg.lut_v_size;
         memcpy(pLdchCfg->data, ldch_cfg.lut_mapxy, ldch_cfg.lut_size);
+    } else {
+        isp_cfg.module_ens &= ~ISP2X_MODULE_LDCH;
+        isp_cfg.module_en_update |= ISP2X_MODULE_LDCH;
     }
 }
 
@@ -2244,6 +2250,10 @@ Isp20Params::convertAiqGicToIsp20Params(struct isp2x_isp_params_cfg& isp_cfg,
         isp_cfg.module_ens |= ISP2X_MODULE_GIC;
         isp_cfg.module_en_update |= ISP2X_MODULE_GIC;
         isp_cfg.module_cfg_update |= ISP2X_MODULE_GIC;
+     } else {
+        isp_cfg.module_ens &= ~ISP2X_MODULE_GIC;
+        isp_cfg.module_en_update |= ISP2X_MODULE_GIC;
+     }
         isp_gic_cfg->edge_open = gic_cfg.edge_open;
         isp_gic_cfg->regmingradthrdark2 = gic_cfg.regmingradthrdark2;
         isp_gic_cfg->regmingradthrdark1 = gic_cfg.regmingradthrdark1;
@@ -2309,8 +2319,6 @@ Isp20Params::convertAiqGicToIsp20Params(struct isp2x_isp_params_cfg& isp_cfg,
 
         if (isp_gic_cfg->regdarktthrehi < isp_gic_cfg->regdarkthre)
             GIC_SWAP(u16, isp_gic_cfg->regdarktthrehi, isp_gic_cfg->regdarkthre);
-
-    }
 }
 
 void

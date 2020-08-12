@@ -54,9 +54,18 @@ typedef struct tmoContrast_s
 
 } tmoContrast_t ;
 
-typedef struct moreSetting_s
+typedef struct Band_Prior_s
 {
     bool isHdrGlobalTmo;
+    float mode;
+    float DynamicRange[6];
+    float EnvLv[6];
+    float Tolerance;
+    float Strength[6];
+} Band_Prior_t;
+
+typedef struct moreSetting_s
+{
     float clipgap0;
     float clipgap1;
     float clipratio0;
@@ -71,6 +80,7 @@ typedef struct tmo_config_s
     detailsHighLight_t DtsHiLit;
     detailsLowLight_t DtsLoLit;
     tmoContrast_t Contrast;
+    Band_Prior_t Band;
     moreSetting_t More;
 
 } tmo_config_t ;

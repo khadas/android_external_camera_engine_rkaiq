@@ -1326,12 +1326,14 @@ static void deinit()
 	if (aiq_ctx) {
         printf("-------- stop aiq -------------\n");
 		rk_aiq_uapi_sysctl_stop(aiq_ctx);
-        printf("-------- deinit aiq -------------\n");
-		rk_aiq_uapi_sysctl_deinit(aiq_ctx);
-        printf("-------- deinit aiq end -------------\n");
 	}
 
     stop_capturing();
+    if (aiq_ctx) {
+        printf("-------- deinit aiq -------------\n");
+		rk_aiq_uapi_sysctl_deinit(aiq_ctx);
+        printf("-------- deinit aiq end -------------\n");
+    }
     uninit_device();
     if (pponeframe)
         uninit_device_pp_oneframe();
@@ -1383,6 +1385,7 @@ int main(int argc, char **argv)
 
     char sns_entity_name[64];
     rk_aiq_working_mode_t work_mode = RK_AIQ_WORKING_MODE_NORMAL;
+#if 0
     char cmd[128] = {0};
     for (int i = 0; i < 3; ++i) {
         memset(cmd, 0, sizeof(cmd));
@@ -1412,7 +1415,8 @@ int main(int argc, char **argv)
             errno_exit("can't find snesor entity!");
         }
     }
-    
+#endif
+    strcpy(sns_entity_name, rk_aiq_uapi_sysctl_getBindedSnsEntNmByVd(dev_name));
     printf("sns_entity_name %s\n", sns_entity_name);
 
     if (hdrmode) {

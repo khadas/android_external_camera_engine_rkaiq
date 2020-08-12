@@ -20,7 +20,7 @@
 
 #include "RkAiqCalibParser.h"
 #include "RkAiqCalibDbTypes.h"
-
+#include "xcam_mutex.h"
 #include <map>
 #include <string>
 
@@ -38,6 +38,7 @@ public:
     static void createCalibDbBinFromXml(char* iqFile);
 private:
     static map<string, CamCalibDbContext_t*> mCalibDbsMap;
+    static XCam::Mutex mMutex;
 };
 
 }; //namespace RkCam

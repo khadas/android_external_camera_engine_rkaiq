@@ -33,10 +33,14 @@ create_context
 )
 {
     XCamReturn result = XCAM_RETURN_NO_ERROR;
-
+    RkAiqAlgoContext *ctx = new RkAiqAlgoContext();
+    if (ctx == NULL) {
+        LOGE_ADEBAYER( "%s: create adebayer context fail!\n", __FUNCTION__);
+        return XCAM_RETURN_ERROR_MEM;
+    }
     LOGI_ADEBAYER("%s: (enter)\n", __FUNCTION__ );
-    AdebayerInit(&ctx.adebayerCtx);
-    *context = &ctx;
+    AdebayerInit(&ctx->adebayerCtx);
+    *context = ctx;
     LOGI_ADEBAYER("%s: (exit)\n", __FUNCTION__ );
     return result;
 }
@@ -52,6 +56,7 @@ destroy_context
     LOGI_ADEBAYER("%s: (enter)\n", __FUNCTION__ );
     AdebayerContext_t* pAdebayerCtx = (AdebayerContext_t*)&context->adebayerCtx;
     AdebayerRelease(pAdebayerCtx);
+    delete context;
     LOGI_ADEBAYER("%s: (exit)\n", __FUNCTION__ );
     return result;
 }

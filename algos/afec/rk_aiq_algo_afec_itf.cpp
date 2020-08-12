@@ -26,8 +26,7 @@
 
 RKAIQ_BEGIN_DECLARE
 
-static FECContext_t gFECCtx;
-static RkAiqAlgoContext ctx;
+
 
 static XCamReturn
 gen_mesh_table(
@@ -42,9 +41,18 @@ gen_mesh_table(
 static XCamReturn
 create_context(RkAiqAlgoContext **context, const AlgoCtxInstanceCfg* cfg)
 {
-    memset(&gFECCtx, 0, sizeof(FECContext_t));
-    ctx.hFEC = &gFECCtx;
-    *context = &ctx;
+    RkAiqAlgoContext *ctx = new RkAiqAlgoContext();
+    if (ctx == NULL) {
+        LOGE_AFEC( "%s: create afec context fail!\n", __FUNCTION__);
+        return XCAM_RETURN_ERROR_MEM;
+    }
+    ctx->hFEC = new FECContext_t;
+    if (ctx->hFEC == NULL) {
+        LOGE_AFEC( "%s: create afec handle fail!\n", __FUNCTION__);
+        return XCAM_RETURN_ERROR_MEM;
+    }
+    memset(ctx->hFEC, 0, sizeof(FECContext_t));
+    *context = ctx;
     return XCAM_RETURN_NO_ERROR;
 }
 
@@ -73,6 +81,10 @@ destroy_context(RkAiqAlgoContext *context)
         free(fecCtx->meshyf);
         fecCtx->meshyf = NULL;
     }
+    delete context->hFEC;
+    context->hFEC = NULL;
+    delete context;
+    context = NULL;
     return XCAM_RETURN_NO_ERROR;
 }
 

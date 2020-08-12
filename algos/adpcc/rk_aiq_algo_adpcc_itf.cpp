@@ -27,7 +27,6 @@ typedef struct _RkAiqAlgoContext {
     void* place_holder[0];
 } RkAiqAlgoContext;
 
-static RkAiqAlgoContext ctx;
 
 static XCamReturn
 create_context(RkAiqAlgoContext **context, const AlgoCtxInstanceCfg* cfg)

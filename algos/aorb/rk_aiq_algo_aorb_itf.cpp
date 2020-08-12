@@ -46,7 +46,6 @@ typedef struct ORBContext_s {
 
 } ORBContext_t;
 
-ORBContext_t gORBCtx;
 
 typedef struct ORBContext_s* ORBHandle_t;
 
@@ -55,7 +54,6 @@ typedef struct _RkAiqAlgoContext {
     void* place_holder[0];
 } RkAiqAlgoContext;
 
-static RkAiqAlgoContext ctx;
 
 #define ORB_LIMIT_VALUE_DEF 15
 #define ORB_MAX_FEATURE_DEF 1000
@@ -70,14 +68,21 @@ XCamReturn ORBCreateContext(RkAiqAlgoContext **context, const AlgoCtxInstanceCfg
     XCamReturn result = XCAM_RETURN_NO_ERROR;
 
     LOGI_ORB("%s: (enter)\n", __FUNCTION__ );
-
+    RkAiqAlgoContext *ctx = new RkAiqAlgoContext();
+    if (ctx == NULL) {
+        LOGE_AORB( "%s: create aorb context fail!\n", __FUNCTION__);
+        return XCAM_RETURN_ERROR_MEM;
+    }
+    ctx->hORB = new ORBContext_t;
+    if (ctx->hORB == NULL) {
+        LOGE_AORB( "%s: create aorb handle fail!\n", __FUNCTION__);
+        return XCAM_RETURN_ERROR_MEM;
+    }
     /* setup config */
-    memset( &gORBCtx, 0, sizeof(gORBCtx) );
-
-    ctx.hORB = &gORBCtx;
+    memset( ctx->hORB, 0, sizeof(ORBContext_t) );
 
     /* return handle */
-    *context = &ctx;
+    *context = ctx;
 
     return XCAM_RETURN_NO_ERROR;
 }
@@ -91,6 +96,9 @@ XCamReturn ORBDestroyContext(RkAiqAlgoContext *context)
 
     if ( NULL != context )
     {
+        delete context->hORB;
+        context->hORB = NULL;
+        delete context;
         context = NULL;
     }
 

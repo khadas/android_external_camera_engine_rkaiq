@@ -893,9 +893,18 @@ typedef struct TmoContrast_s
     float TmoContrast[6];
 } TmoContrast_t;
 
+typedef struct BandPrior_s
+{
+    float en;
+    float mode;
+    float DynamicRange[6];
+    float EnvLv[6];
+    float Tolerance;
+    float Strength[6];
+} BandPrior_t;
+
 typedef struct TmoMoreSetting_s
 {
-    float Band_Prior;
     float clipgap0;
     float clipgap1;
     float clipratio0;
@@ -910,6 +919,7 @@ typedef struct CalibDb_HdrTmo_s
     DetailsHighLight_t HighLight;
     DetailsLowLight_t LowLight;
     TmoContrast_t Contrast;
+    BandPrior_t BandPrior;
     TmoMoreSetting_t MoreSetting;
 } CalibDb_HdrTmo_t;
 

@@ -38,6 +38,8 @@ namespace RkCam {
 #define VIPCAP_TX_BUF_NUM 6
 
 typedef struct {
+    int  model_idx:3;
+    int  linked_sensor:3;
     char media_dev_path[DEV_PATH_LEN];
     char isp_dev_path[DEV_PATH_LEN];
     char csi_dev_path[DEV_PATH_LEN];
@@ -59,6 +61,7 @@ typedef struct {
 } rk_aiq_isp_t;
 
 typedef struct {
+    int  model_idx;
     char media_dev_path[DEV_PATH_LEN];
     char pp_input_image_path[DEV_PATH_LEN];
     char pp_m_bypass_path[DEV_PATH_LEN];
@@ -90,7 +93,7 @@ typedef struct {
 
 typedef struct {
     rk_aiq_isp_t isp_info[2];
-    rk_aiq_ispp_t ispp_info;
+    rk_aiq_ispp_t ispp_info[2];
     rk_aiq_hw_ver_t hw_ver_info;
 } rk_aiq_isp_hw_info_t;
 
@@ -116,6 +119,7 @@ typedef struct {
     std::string device_name;
     std::string len_name;
     std::string parent_media_dev;
+    int media_node_index;
     int csi_port;
     std::string module_lens_dev_name; // matched using mPhyModuleIndex
     std::string module_ircut_dev_name;
@@ -131,6 +135,7 @@ typedef struct {
     std::vector<rk_frame_fmt_t>  frame_size;
     rk_aiq_isp_t *isp_info;
     rk_aiq_cif_info_t *cif_info;
+    rk_aiq_ispp_t *ispp_info;
     bool linked_to_isp;
     struct rkmodule_inf mod_info;
 } rk_sensor_full_info_t;
@@ -163,6 +168,7 @@ public:
     static XCamReturn initCamHwInfos();
     XCamReturn setupHdrLink(int mode, int isp_index, bool enable);
     static XCamReturn selectIqFile(const char* sns_ent_name, char* iqfile_name);
+    static const char* getBindedSnsEntNmByVd(const char* vd);
     XCamReturn setExpDelayInfo(int time_delay, int gain_delay);
     XCamReturn getEffectiveIspParams(SmartPtr<RkAiqIspParamsProxy>& ispParams, int frame_id);
     XCamReturn setModuleCtl(rk_aiq_module_id_t moduleId, bool en);
@@ -209,6 +215,7 @@ private:
     SmartPtr<V4l2Device> _mipi_rx_devs[3];
     SmartPtr<V4l2SubDevice> _ispp_sd;
     SmartPtr<V4l2SubDevice> _cif_csi2_sd;
+    char sns_name[32];
     std::list<SmartPtr<RkAiqIspParamsProxy>> _pending_ispparams_queue;
     std::list<SmartPtr<RkAiqIsppParamsProxy>> _pending_isppParams_queue;
     std::map<int, SmartPtr<RkAiqIspParamsProxy>> _effecting_ispparm_map;

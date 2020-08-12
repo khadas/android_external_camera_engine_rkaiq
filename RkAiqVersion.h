@@ -171,10 +171,12 @@
  * - decrease AIQ heap memory usage, save 50M
  * - CamHwIsp20: move isp/ispp/mipitx,rx streaming on to prepare stage
  * - fix bugs in GainRange-dBmode
+ * v1.0.5
+ * - support dual cameras streaming concurrently 
  */
 
-#define RK_AIQ_VERSION_REAL_V "v1.0.4"
-#define RK_AIQ_RELEASE_DATE "2020-08-07"
+#define RK_AIQ_VERSION_REAL_V "v1.0.5"
+#define RK_AIQ_RELEASE_DATE "2020-08-12"
 
 /******* DO NOT EDIT THE FOLLOWINGS ***********/
 

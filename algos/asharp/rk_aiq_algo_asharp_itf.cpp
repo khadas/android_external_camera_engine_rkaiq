@@ -27,7 +27,6 @@ typedef struct _RkAiqAlgoContext {
     void* place_holder[0];
 } RkAiqAlgoContext;
 
-static RkAiqAlgoContext ctx;
 
 static XCamReturn
 create_context(RkAiqAlgoContext **context, const AlgoCtxInstanceCfg* cfg)
@@ -99,7 +98,6 @@ static XCamReturn
 pre_process(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outparams)
 {
     XCamReturn result = XCAM_RETURN_NO_ERROR;
-    static int framecnt = 0;
 
     LOGI_ASHARP("%s: (enter)\n", __FUNCTION__ );
 	AsharpContext_t* pAsharpCtx = (AsharpContext_t *)inparams->ctx;

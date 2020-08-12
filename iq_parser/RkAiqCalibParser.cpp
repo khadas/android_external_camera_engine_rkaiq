@@ -7264,6 +7264,13 @@ bool RkAiqCalibParser::parseEntrySensorAhdrTmo
             }
 
         }
+        else if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_AHDR_TMO_BANDPRIOR_TAG_ID)) {
+            if (!parseEntrySensorAhdrBandPrior(pchild->ToElement())) {
+                LOGE("parse error in AHDR Tmo BandPrior(%s)", tagname.c_str());
+                return (false);
+            }
+
+        }
         else if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_AHDR_TMO_MORESETTING_TAG_ID)) {
             if (!parseEntrySensorAhdrTmoMoreSetting(pchild->ToElement())) {
                 LOGE("parse error in AHDR Tmo MoreSetting(%s)", tagname.c_str());
@@ -7470,6 +7477,56 @@ bool RkAiqCalibParser::parseEntrySensorAhdrTmoContrast
     return (true);
 }
 
+bool RkAiqCalibParser::parseEntrySensorAhdrBandPrior
+(
+    const XMLElement*   pelement,
+    void*                param
+) {
+    LOGD("%s(%d): (enter)\n", __FUNCTION__, __LINE__);
+    autoTabForward();
+
+    XML_CHECK_START(CALIB_SENSOR_AHDR_TMO_BANDPRIOR_TAG_ID, CALIB_SENSOR_AHDR_TMO_TAG_ID);
+
+    const XMLNode* pchild = pelement->FirstChild();
+    while (pchild) {
+        XmlTag tag = XmlTag(pchild->ToElement());
+        std::string Tagname(pchild->ToElement()->Name());
+        XML_CHECK_WHILE_SUBTAG_MARK((char *)(Tagname.c_str()), tag.Type(), tag.Size());
+
+        if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_AHDR_TMO_BANDPRIOR_EN_TAG_ID)) {
+            int no = ParseFloatArray(pchild, &mCalibDb->ahdr.tmo.BandPrior.en, tag.Size());
+            DCT_ASSERT((no == tag.Size()));
+        }
+        else if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_AHDR_TMO_BANDPRIOR_MODE_TAG_ID)) {
+            int no = ParseFloatArray(pchild, &mCalibDb->ahdr.tmo.BandPrior.mode, tag.Size());
+            DCT_ASSERT((no == tag.Size()));
+        }
+        else if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_AHDR_TMO_BANDPRIOR_DYNAMICRANGE_TAG_ID)) {
+            int no = ParseFloatArray(pchild, mCalibDb->ahdr.tmo.BandPrior.DynamicRange, tag.Size());
+            DCT_ASSERT((no == tag.Size()));
+        }
+        else if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_AHDR_TMO_BANDPRIOR_ENVLV_TAG_ID)) {
+            int no = ParseFloatArray(pchild, mCalibDb->ahdr.tmo.BandPrior.EnvLv, tag.Size());
+            DCT_ASSERT((no == tag.Size()));
+        }
+        else if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_AHDR_TMO_BANDPRIOR_TOLERANCE_TAG_ID)) {
+            int no = ParseFloatArray(pchild, &mCalibDb->ahdr.tmo.BandPrior.Tolerance, tag.Size());
+            DCT_ASSERT((no == tag.Size()));
+        }
+        else if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_AHDR_TMO_BANDPRIOR_STRENGTH_TAG_ID)) {
+            int no = ParseFloatArray(pchild, mCalibDb->ahdr.tmo.BandPrior.Strength, tag.Size());
+            DCT_ASSERT((no == tag.Size()));
+        }
+        pchild = pchild->NextSibling();
+    }
+
+    XML_CHECK_END();
+
+    LOGD("%s(%d): (exit)\n", __FUNCTION__, __LINE__);
+    autoTabBackward();
+    return (true);
+}
+
 bool RkAiqCalibParser::parseEntrySensorAhdrTmoMoreSetting
 (
     const XMLElement*   pelement,
@@ -7486,11 +7543,7 @@ bool RkAiqCalibParser::parseEntrySensorAhdrTmoMoreSetting
         std::string Tagname(pchild->ToElement()->Name());
         XML_CHECK_WHILE_SUBTAG_MARK((char *)(Tagname.c_str()), tag.Type(), tag.Size());
 
-        if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_AHDR_TMO_BAND_PRIOR_TAG_ID)) {
-            int no = ParseFloatArray(pchild, &mCalibDb->ahdr.tmo.MoreSetting.Band_Prior, tag.Size());
-            DCT_ASSERT((no == tag.Size()));
-        }
-        else if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_AHDR_TMO_CLIPGAP0_TAG_ID)) {
+        if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_AHDR_TMO_CLIPGAP0_TAG_ID)) {
             int no = ParseFloatArray(pchild, &mCalibDb->ahdr.tmo.MoreSetting.clipgap0, tag.Size());
             DCT_ASSERT((no == tag.Size()));
         }
@@ -7626,7 +7679,7 @@ bool RkAiqCalibParser::parseEntrySensorDpcc
         } else if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_DPCC_VERSION_TAG_ID)) {
             ParseString(pchild, mCalibDb->dpcc.version,  sizeof(mCalibDb->dpcc.version));
         }
-		else if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_DPCC_FAST_MODE_TAG_ID)) {
+        else if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_DPCC_FAST_MODE_TAG_ID)) {
             if (!parseEntrySensorDpccFastMode(pchild->ToElement())) {
                 LOGE("parse error in dpcc Fast Mode (%s)", tagname.c_str());
                 return (false);
