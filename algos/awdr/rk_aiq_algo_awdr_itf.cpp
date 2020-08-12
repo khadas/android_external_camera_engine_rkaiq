@@ -19,25 +19,31 @@
 
 #include "rk_aiq_algo_types_int.h"
 #include "awdr/rk_aiq_algo_awdr_itf.h"
-
+#include "xcam_log.h"
 RKAIQ_BEGIN_DECLARE
 
 typedef struct _RkAiqAlgoContext {
     void* place_holder[0];
 } RkAiqAlgoContext;
 
-static RkAiqAlgoContext ctx;
 
 static XCamReturn
 create_context(RkAiqAlgoContext **context, const AlgoCtxInstanceCfg* cfg)
 {
-    *context = &ctx;
+    RkAiqAlgoContext *ctx = new RkAiqAlgoContext();
+    if (ctx == NULL) {
+        LOGE_AWDR( "%s: create awdr context fail!\n", __FUNCTION__);
+        return XCAM_RETURN_ERROR_MEM;
+    }
+    *context = ctx;
     return XCAM_RETURN_NO_ERROR;
 }
 
 static XCamReturn
 destroy_context(RkAiqAlgoContext *context)
 {
+    delete context;
+    context = NULL;
     return XCAM_RETURN_NO_ERROR;
 }
 

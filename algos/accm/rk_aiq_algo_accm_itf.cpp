@@ -25,15 +25,19 @@
 RKAIQ_BEGIN_DECLARE
 
 
-static RkAiqAlgoContext ctx;
 
 static XCamReturn
 create_context(RkAiqAlgoContext **context, const AlgoCtxInstanceCfg* cfg)
 {
     LOGI_ACCM( "%s: (enter)\n", __FUNCTION__);
     AlgoCtxInstanceCfgInt *cfgInt = (AlgoCtxInstanceCfgInt*)cfg;
-    AccmInit(&ctx.accm_para, cfgInt->calib);
-    *context = &ctx;
+    RkAiqAlgoContext *ctx = new RkAiqAlgoContext();
+    if (ctx == NULL) {
+        LOGE_ACCM( "%s: create ccm context fail!\n", __FUNCTION__);
+        return XCAM_RETURN_ERROR_MEM;
+    }
+    AccmInit(&ctx->accm_para, cfgInt->calib);
+    *context = ctx;
 
     LOGI_ACCM( "%s: (exit)\n", __FUNCTION__);
     return XCAM_RETURN_NO_ERROR;
@@ -45,7 +49,7 @@ destroy_context(RkAiqAlgoContext *context)
     LOGI_ACCM( "%s: (enter)\n", __FUNCTION__);
 
     AccmRelease((accm_handle_t)context->accm_para);
-
+    delete context;
     LOGI_ACCM( "%s: (exit)\n", __FUNCTION__);
     return XCAM_RETURN_NO_ERROR;
 }

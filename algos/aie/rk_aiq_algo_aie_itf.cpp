@@ -19,7 +19,7 @@
 
 #include "rk_aiq_algo_types_int.h"
 #include "aie/rk_aiq_algo_aie_itf.h"
-
+#include "xcam_log.h"
 RKAIQ_BEGIN_DECLARE
 
 typedef struct _RkAiqAlgoContext {
@@ -30,47 +30,51 @@ typedef struct _RkAiqAlgoContext {
     rk_aiq_aie_params_int_t sketch_params;
 } RkAiqAlgoContext;
 
-static RkAiqAlgoContext ctx;
 
 static XCamReturn
 create_context(RkAiqAlgoContext **context, const AlgoCtxInstanceCfg* cfg)
 {
-    ctx.params.mode = RK_AIQ_IE_EFFECT_NONE;
+    RkAiqAlgoContext *ctx = new RkAiqAlgoContext();
+    if (ctx == NULL) {
+        LOGE_AIE( "%s: create aie context fail!\n", __FUNCTION__);
+        return XCAM_RETURN_ERROR_MEM;
+    }
+    ctx->params.mode = RK_AIQ_IE_EFFECT_NONE;
 
     // default value
-    ctx.emboss_params.mode_coeffs[0] = 0x9;//  2
-    ctx.emboss_params.mode_coeffs[1] = 0x0;// 0
-    ctx.emboss_params.mode_coeffs[2] = 0x0;// 0
-    ctx.emboss_params.mode_coeffs[3] = 0x8;// 1
-    ctx.emboss_params.mode_coeffs[4] = 0x0;// 0
-    ctx.emboss_params.mode_coeffs[5] = 0xc;// -1
-    ctx.emboss_params.mode_coeffs[6] = 0x0;// 0x0
-    ctx.emboss_params.mode_coeffs[7] = 0xc;// -1
-    ctx.emboss_params.mode_coeffs[8] = 0x9;// 2
+    ctx->emboss_params.mode_coeffs[0] = 0x9;//  2
+    ctx->emboss_params.mode_coeffs[1] = 0x0;// 0
+    ctx->emboss_params.mode_coeffs[2] = 0x0;// 0
+    ctx->emboss_params.mode_coeffs[3] = 0x8;// 1
+    ctx->emboss_params.mode_coeffs[4] = 0x0;// 0
+    ctx->emboss_params.mode_coeffs[5] = 0xc;// -1
+    ctx->emboss_params.mode_coeffs[6] = 0x0;// 0x0
+    ctx->emboss_params.mode_coeffs[7] = 0xc;// -1
+    ctx->emboss_params.mode_coeffs[8] = 0x9;// 2
 
-    ctx.sketch_params.mode_coeffs[0] = 0xc;//-1
-    ctx.sketch_params.mode_coeffs[1] = 0xc;//-1
-    ctx.sketch_params.mode_coeffs[2] = 0xc;//-1
-    ctx.sketch_params.mode_coeffs[3] = 0xc;//-1
-    ctx.sketch_params.mode_coeffs[4] = 0xb;// 0x8
-    ctx.sketch_params.mode_coeffs[5] = 0xc;//-1
-    ctx.sketch_params.mode_coeffs[6] = 0xc;//-1
-    ctx.sketch_params.mode_coeffs[7] = 0xc;//-1
-    ctx.sketch_params.mode_coeffs[8] = 0xc;//-1
+    ctx->sketch_params.mode_coeffs[0] = 0xc;//-1
+    ctx->sketch_params.mode_coeffs[1] = 0xc;//-1
+    ctx->sketch_params.mode_coeffs[2] = 0xc;//-1
+    ctx->sketch_params.mode_coeffs[3] = 0xc;//-1
+    ctx->sketch_params.mode_coeffs[4] = 0xb;// 0x8
+    ctx->sketch_params.mode_coeffs[5] = 0xc;//-1
+    ctx->sketch_params.mode_coeffs[6] = 0xc;//-1
+    ctx->sketch_params.mode_coeffs[7] = 0xc;//-1
+    ctx->sketch_params.mode_coeffs[8] = 0xc;//-1
 
-    ctx.sharp_params.mode_coeffs[0] = 0xc;//-1
-    ctx.sharp_params.mode_coeffs[1] = 0xc;//-1
-    ctx.sharp_params.mode_coeffs[2] = 0xc;//-1
-    ctx.sharp_params.mode_coeffs[3] = 0xc;//-1
-    ctx.sharp_params.mode_coeffs[4] = 0xb;// 0x8
-    ctx.sharp_params.mode_coeffs[5] = 0xc;//-1
-    ctx.sharp_params.mode_coeffs[6] = 0xc;//-1
-    ctx.sharp_params.mode_coeffs[7] = 0xc;//-1
-    ctx.sharp_params.mode_coeffs[8] = 0xc;//-1
-    ctx.sharp_params.sharp_factor = 8.0;
-    ctx.sharp_params.sharp_thres = 128;
+    ctx->sharp_params.mode_coeffs[0] = 0xc;//-1
+    ctx->sharp_params.mode_coeffs[1] = 0xc;//-1
+    ctx->sharp_params.mode_coeffs[2] = 0xc;//-1
+    ctx->sharp_params.mode_coeffs[3] = 0xc;//-1
+    ctx->sharp_params.mode_coeffs[4] = 0xb;// 0x8
+    ctx->sharp_params.mode_coeffs[5] = 0xc;//-1
+    ctx->sharp_params.mode_coeffs[6] = 0xc;//-1
+    ctx->sharp_params.mode_coeffs[7] = 0xc;//-1
+    ctx->sharp_params.mode_coeffs[8] = 0xc;//-1
+    ctx->sharp_params.sharp_factor = 8.0;
+    ctx->sharp_params.sharp_thres = 128;
 
-    *context = &ctx;
+    *context = ctx;
 
     return XCAM_RETURN_NO_ERROR;
 }
@@ -78,6 +82,8 @@ create_context(RkAiqAlgoContext **context, const AlgoCtxInstanceCfg* cfg)
 static XCamReturn
 destroy_context(RkAiqAlgoContext *context)
 {
+    delete context;
+    context = NULL;
     return XCAM_RETURN_NO_ERROR;
 }
 

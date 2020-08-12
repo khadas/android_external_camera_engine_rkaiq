@@ -31,6 +31,7 @@
 namespace RkCam {
 
 map<string, CamCalibDbContext_t*> RkAiqCalibDb::mCalibDbsMap;
+XCam::Mutex RkAiqCalibDb::mMutex{false};
 static bool calibGetEnviromentPath(const char* variable, char* value)
 {
     if (!variable || !value) {
@@ -133,19 +134,16 @@ CamCalibDbContext_t* RkAiqCalibDb::createCalibDb(char* iqFile)
         if (pCalibDb) {
             if (0 == access(iqFile, F_OK)) {
                 RkAiqCalibParser  parser(pCalibDb);
-                if (parser.doParse(iqFile)) {
+                mMutex.lock();
+                bool ret = parser.doParse(iqFile);
+                mMutex.unlock();
+                if (ret) {
                     uint32_t magicCode = calib_check_calc_checksum();
                     if (magicCode != pCalibDb->header.magic_code) {
                         LOGE("magic code is not matched! calculated:%u, readed:%u", magicCode, pCalibDb->header.magic_code);
                     }else {
                         mCalibDbsMap[str] = pCalibDb;
                         LOGD("create calibdb from %s success.", iqFile);
-                        /*
-                        if (calibSaveToFile(iqFile, pCalibDb))
-                            LOGD("save to bin success.");
-                        else
-                            LOGE("save to bin failed.");
-                        */
                         return pCalibDb;
                     }
                 } else {

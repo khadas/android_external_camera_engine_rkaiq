@@ -25,15 +25,19 @@
 RKAIQ_BEGIN_DECLARE
 
 
-static RkAiqAlgoContext ctx;
 
 static XCamReturn
 create_context(RkAiqAlgoContext **context, const AlgoCtxInstanceCfg* cfg)
 {
     LOGI_A3DLUT( "%s: (enter)\n", __FUNCTION__);
+    RkAiqAlgoContext *ctx = new RkAiqAlgoContext();
+    if (ctx == NULL) {
+        LOGE_A3DLUT( "%s: create 3dlut context fail!\n", __FUNCTION__);
+        return XCAM_RETURN_ERROR_MEM;
+    }
     AlgoCtxInstanceCfgInt *cfgInt = (AlgoCtxInstanceCfgInt*)cfg;
-    Alut3dInit(&ctx.a3dlut_para, cfgInt->calib);
-    *context = &ctx;
+    Alut3dInit(&ctx->a3dlut_para, cfgInt->calib);
+    *context = ctx;
 
     LOGI_A3DLUT( "%s: (exit)\n", __FUNCTION__);
     return XCAM_RETURN_NO_ERROR;
@@ -45,7 +49,7 @@ destroy_context(RkAiqAlgoContext *context)
     LOGI_A3DLUT( "%s: (enter)\n", __FUNCTION__);
 
     Alut3dRelease((alut3d_handle_t)context->a3dlut_para);
-
+    delete context;
     LOGI_A3DLUT( "%s: (exit)\n", __FUNCTION__);
     return XCAM_RETURN_NO_ERROR;
 }

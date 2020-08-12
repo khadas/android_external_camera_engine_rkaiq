@@ -237,6 +237,15 @@ rk_aiq_uapi_sysctl_enumStaticMetas(int index, rk_aiq_static_info_t* static_info)
     return XCAM_RETURN_NO_ERROR;
 }
 
+const char*
+rk_aiq_uapi_sysctl_getBindedSnsEntNmByVd(const char* vd)
+{
+#ifndef RK_SIMULATOR_HW
+    return CamHwIsp20::getBindedSnsEntNmByVd(vd);
+#endif
+    return NULL;
+}
+
 XCamReturn
 rk_aiq_uapi_sysctl_getMetaData(const rk_aiq_sys_ctx_t* ctx, uint32_t frame_id, rk_aiq_metas_t* metas)
 {

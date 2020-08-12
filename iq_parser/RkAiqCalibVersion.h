@@ -38,7 +38,7 @@
  *  - Aec: add system-Gainrange-Linear/NonLinear, support db_mode
  * v1.1.4
  *  - magic code:1003993
- *  - Ahdr: add Band prior mode 
+ *  - Ahdr: add Band prior mode
  * v1.1.5
  *  - magic code: 1005025
  *  - sensor_para: add default sensor flip setting
@@ -50,10 +50,14 @@
  *  - magic code:1023357
  *  - Adpcc: Redefine DPCC in IQ files, add Expert Mode
  *  - Adpcc: Add fast mode in DPCC
+  * v1.1.8
+ *  - magic code:1027323
+ *  - Ahdr: remove Band_Prior from moresetting in IQ files
+ *  - Ahdr: Add Band_Prior module in IQ files
  */
 
-#define RK_AIQ_CALIB_VERSION_REAL_V          "v1.1.7"
-#define RK_AIQ_CALIB_VERSION_MAGIC_V         "1023357" 
+#define RK_AIQ_CALIB_VERSION_REAL_V          "v1.1.8"
+#define RK_AIQ_CALIB_VERSION_MAGIC_V         "1027323"
 
 /******* DO NOT EDIT THE FOLLOWINGS ***********/
 

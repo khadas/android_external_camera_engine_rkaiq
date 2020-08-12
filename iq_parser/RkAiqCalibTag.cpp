@@ -743,6 +743,7 @@ uint32_t calib_sensor_ahdr_Tmo_sub_tags[] = {
     CALIB_SENSOR_AHDR_TMO_DETAILSHIGHLIGHT_TAG_ID,
     CALIB_SENSOR_AHDR_TMO_DETAILSLOWLIGHT_TAG_ID,
     CALIB_SENSOR_AHDR_TMO_TMOCONTRAST_TAG_ID,
+    CALIB_SENSOR_AHDR_TMO_BANDPRIOR_TAG_ID,
     CALIB_SENSOR_AHDR_TMO_MORESETTING_TAG_ID,
 };
 
@@ -779,8 +780,16 @@ uint32_t calib_sensor_ahdr_TmoContrast_sub_tags[] = {
     CALIB_SENSOR_AHDR_TMO_TMOCONTRAST_TMOCONTRAST_TAG_ID,
 };
 
+uint32_t calib_sensor_ahdr_BandPrior_sub_tags[] = {
+    CALIB_SENSOR_AHDR_TMO_BANDPRIOR_EN_TAG_ID,
+    CALIB_SENSOR_AHDR_TMO_BANDPRIOR_MODE_TAG_ID,
+    CALIB_SENSOR_AHDR_TMO_BANDPRIOR_DYNAMICRANGE_TAG_ID,
+    CALIB_SENSOR_AHDR_TMO_BANDPRIOR_ENVLV_TAG_ID,
+    CALIB_SENSOR_AHDR_TMO_BANDPRIOR_TOLERANCE_TAG_ID,
+    CALIB_SENSOR_AHDR_TMO_BANDPRIOR_STRENGTH_TAG_ID,
+};
+
 uint32_t calib_sensor_ahdr_MoreSetting_sub_tags[] = {
-    CALIB_SENSOR_AHDR_TMO_BAND_PRIOR_TAG_ID,
     CALIB_SENSOR_AHDR_TMO_CLIPGAP0_TAG_ID,
     CALIB_SENSOR_AHDR_TMO_CLIPGAP1_TAG_ID,
     CALIB_SENSOR_AHDR_TMO_CLIPRATIO0_TAG_ID,
@@ -3263,10 +3272,39 @@ calib_tag_info_t g_calib_tag_infos[CALIB_IQ_TAG_END] = {
     {   "TmoContrastMode", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
         check_tags_array_ignore, NULL
     },
+    [CALIB_SENSOR_AHDR_TMO_BANDPRIOR_TAG_ID]         =
+    {   "Band_Prior", CALIB_TAG_TYPE_STRUCT, {-1, -1},
+        check_tags_array_info(calib_sensor_ahdr_BandPrior_sub_tags), NULL
+    },
+    [CALIB_SENSOR_AHDR_TMO_BANDPRIOR_EN_TAG_ID]         =
+    {   "Enable", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
+        check_tags_array_ignore, NULL
+    },
+    [CALIB_SENSOR_AHDR_TMO_BANDPRIOR_MODE_TAG_ID]         =
+    {   "Mode", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
+        check_tags_array_ignore, NULL
+    },
+    [CALIB_SENSOR_AHDR_TMO_BANDPRIOR_DYNAMICRANGE_TAG_ID]         =
+    {   "DynamicRange", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
+        check_tags_array_ignore, NULL
+    },
+    [CALIB_SENSOR_AHDR_TMO_BANDPRIOR_ENVLV_TAG_ID]         =
+    {   "EnvLv", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
+        check_tags_array_ignore, NULL
+    },
+    [CALIB_SENSOR_AHDR_TMO_BANDPRIOR_TOLERANCE_TAG_ID]         =
+    {   "Tolerance", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
+        check_tags_array_ignore, NULL
+    },
+    [CALIB_SENSOR_AHDR_TMO_BANDPRIOR_STRENGTH_TAG_ID]         =
+    {   "Strength", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
+        check_tags_array_ignore, NULL
+    },
     [CALIB_SENSOR_AHDR_TMO_MORESETTING_TAG_ID]         =
     {   "MoreSetting", CALIB_TAG_TYPE_STRUCT, {-1, -1},
         check_tags_array_info(calib_sensor_ahdr_MoreSetting_sub_tags), NULL
     },
+
     [CALIB_SENSOR_AHDR_TMO_DETAILSHIGHLIGHTMODE_TAG_ID]         =
     {   "DetailsHighLightMode", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
         check_tags_array_ignore, NULL
@@ -3316,16 +3354,8 @@ calib_tag_info_t g_calib_tag_infos[CALIB_IQ_TAG_END] = {
     {   "DynamicRange", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
         check_tags_array_ignore, NULL
     },
-    [CALIB_SENSOR_AHDR_TMO_DAYTH_TAG_ID]         =
-    {   "DayTh", CALIB_TAG_TYPE_UNKNOWN, {-1, -1},
-        check_tags_array_ignore, NULL
-    },
     [CALIB_SENSOR_AHDR_TMO_DAMP_TAG_ID]         =
     {   "Damp", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
-        check_tags_array_ignore, NULL
-    },
-    [CALIB_SENSOR_AHDR_TMO_BAND_PRIOR_TAG_ID]         =
-    {   "Band_Prior", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
         check_tags_array_ignore, NULL
     },
     [CALIB_SENSOR_AHDR_TMO_CLIPGAP0_TAG_ID]         =

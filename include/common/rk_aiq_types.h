@@ -256,6 +256,8 @@ typedef struct {
     char sensor_name[32];
     rk_frame_fmt_t  support_fmt[SUPPORT_FMT_MAX];
     int32_t num;
+    /* binded pp stream media index */
+    int8_t binded_strm_media_idx;
 } rk_aiq_sensor_info_t;
 
 typedef struct {

@@ -48,14 +48,12 @@ typedef struct LDCHContext_s {
 } LDCHContext_t;
 
 typedef struct LDCHContext_s* LDCHHandle_t;
-LDCHContext_t gLDCHCtx;
 
 typedef struct _RkAiqAlgoContext {
     LDCHHandle_t hLDCH;
     void* place_holder[0];
 } RkAiqAlgoContext;
 
-static RkAiqAlgoContext ctx;
 
 static XCamReturn
 create_context(RkAiqAlgoContext **context, const AlgoCtxInstanceCfg* cfg)
@@ -63,13 +61,21 @@ create_context(RkAiqAlgoContext **context, const AlgoCtxInstanceCfg* cfg)
     XCamReturn result = XCAM_RETURN_NO_ERROR;
 
     LOG1_AHDR("%s: (enter)\n", __FUNCTION__ );
-
+    RkAiqAlgoContext *ctx = new RkAiqAlgoContext();
+    if (ctx == NULL) {
+        LOGE_ALDCH( "%s: create aldch context fail!\n", __FUNCTION__);
+        return XCAM_RETURN_ERROR_MEM;
+    }
+    ctx->hLDCH = new LDCHContext_t;
+    if (ctx->hLDCH == NULL) {
+        LOGE_ALDCH( "%s: create aldch handle fail!\n", __FUNCTION__);
+        return XCAM_RETURN_ERROR_MEM;
+    }
     /* setup config */
-    memset( &gLDCHCtx, 0, sizeof(gLDCHCtx) );
-    ctx.hLDCH = &gLDCHCtx;
+    memset( ctx->hLDCH, 0, sizeof(LDCHContext_t) );
 
     /* return handle */
-    *context = &ctx;
+    *context = ctx;
 
     return XCAM_RETURN_NO_ERROR;
 }
@@ -84,6 +90,9 @@ destroy_context(RkAiqAlgoContext *context)
         free(ldchCtx->lut_mapxy);
         ldchCtx->lut_mapxy = NULL;
     }
+    delete context->hLDCH;
+    context->hLDCH = NULL;
+    delete context;
     context = NULL;
     return XCAM_RETURN_NO_ERROR;
 }

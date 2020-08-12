@@ -27,7 +27,6 @@ typedef struct _RkAiqAlgoContext {
     void* place_holder[0];
 } RkAiqAlgoContext;
 
-static RkAiqAlgoContext ctx;
 
 static XCamReturn
 create_context(RkAiqAlgoContext **context, const AlgoCtxInstanceCfg* cfg)
@@ -99,15 +98,15 @@ pre_process(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outparams)
 
     LOGI_ANR("%s: (enter)\n", __FUNCTION__ );
     ANRContext_t* pAnrCtx = (ANRContext_t *)inparams->ctx;
-    RkAiqAlgoPreAnrInt* pAnrPreParams = (RkAiqAlgoPreAnrInt*)inparams;
 	
+    RkAiqAlgoPreAnrInt* pAnrPreParams = (RkAiqAlgoPreAnrInt*)inparams;
+
     if (pAnrPreParams->rk_com.u.proc.gray_mode) {
         pAnrCtx->isGrayMode = true;
     }else {
         pAnrCtx->isGrayMode = false;
     }
-	
-    //nothing todo now
+
     ANRresult_t ret = ANRPreProcess(pAnrCtx);
     if(ret != ANR_RET_SUCCESS) {
         result = XCAM_RETURN_ERROR_FAILED;

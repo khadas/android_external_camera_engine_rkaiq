@@ -23,16 +23,19 @@
 
 RKAIQ_BEGIN_DECLARE
 
-static RkAiqAlgoContext ctx;
 
 static XCamReturn
 create_context(RkAiqAlgoContext **context, const AlgoCtxInstanceCfg* cfg)
 {
     XCamReturn result = XCAM_RETURN_NO_ERROR;
-
+    RkAiqAlgoContext *ctx = new RkAiqAlgoContext();
+    if (ctx == NULL) {
+        LOGE_AGIC( "%s: create agic context fail!\n", __FUNCTION__);
+        return XCAM_RETURN_ERROR_MEM;
+    }
     LOGI_AGIC("%s: (enter)\n", __FUNCTION__ );
-    AgicInit(&ctx.agicCtx);
-    *context = &ctx;
+    AgicInit(&ctx->agicCtx);
+    *context = ctx;
     LOGI_AGIC("%s: (exit)\n", __FUNCTION__ );
     return result;
 
@@ -46,6 +49,7 @@ destroy_context(RkAiqAlgoContext *context)
     LOGI_AGIC("%s: (enter)\n", __FUNCTION__ );
     AgicContext_t* pAgicCtx = (AgicContext_t*)&context->agicCtx;
     AgicRelease(pAgicCtx);
+    delete context;
     LOGI_AGIC("%s: (exit)\n", __FUNCTION__ );
     return result;
 

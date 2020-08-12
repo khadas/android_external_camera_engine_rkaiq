@@ -19,7 +19,7 @@
 
 #include "rk_aiq_algo_types_int.h"
 #include "acp/rk_aiq_algo_acp_itf.h"
-
+#include "xcam_log.h"
 RKAIQ_BEGIN_DECLARE
 
 typedef struct _RkAiqAlgoContext {
@@ -27,22 +27,25 @@ typedef struct _RkAiqAlgoContext {
     rk_aiq_acp_params_t params;
 } RkAiqAlgoContext;
 
-static RkAiqAlgoContext ctx;
 
 static XCamReturn
 create_context(RkAiqAlgoContext **context, const AlgoCtxInstanceCfg* cfg)
 {
     const AlgoCtxInstanceCfgInt* cfg_int = (const AlgoCtxInstanceCfgInt*)cfg;
-
-    ctx.calib = cfg_int->calib;
+    RkAiqAlgoContext *ctx = new RkAiqAlgoContext();
+    if (ctx == NULL) {
+        LOGE_ACP( "%s: create acp context fail!\n", __FUNCTION__);
+        return XCAM_RETURN_ERROR_MEM;
+    }
+    ctx->calib = cfg_int->calib;
     // TODO: get initial params from calib
-    rk_aiq_acp_params_t* params = &ctx.params;
+    rk_aiq_acp_params_t* params = &ctx->params;
     params->brightness = 0;
     params->hue = 0.0f;
     params->saturation = 0.0f;
     params->contrast = 0.0f;
 
-    *context = &ctx;
+    *context = ctx;
 
     return XCAM_RETURN_NO_ERROR;
 }
@@ -50,6 +53,7 @@ create_context(RkAiqAlgoContext **context, const AlgoCtxInstanceCfg* cfg)
 static XCamReturn
 destroy_context(RkAiqAlgoContext *context)
 {
+    delete context;
     return XCAM_RETURN_NO_ERROR;
 }
 

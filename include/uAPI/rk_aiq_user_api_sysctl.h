@@ -94,14 +94,22 @@ XCamReturn
 rk_aiq_uapi_sysctl_getStaticMetas(const char* sns_ent_name, rk_aiq_static_info_t* static_info);
 
 /*!
- * \brief enum static camera infos 
+ * \brief enum static camera infos
  *
- * \param[in] index           which camera info will be enum 
- * \param[out] static_info    returned camera infos  
+ * \param[in] index           which camera info will be enum
+ * \param[out] static_info    returned camera infos
  * \return return 0 if success
  */
 XCamReturn
 rk_aiq_uapi_sysctl_enumStaticMetas(int index, rk_aiq_static_info_t* static_info);
+
+/*!
+ * \brief get sensor entity name from video node
+ * \param[in] vd             pp stream video node full path
+ * \return return the binded sensor name
+ */
+const char*
+rk_aiq_uapi_sysctl_getBindedSnsEntNmByVd(const char* vd);
 
 XCamReturn
 rk_aiq_uapi_sysctl_getMetaData(const rk_aiq_sys_ctx_t* ctx, uint32_t frame_id, rk_aiq_metas_t* metas);

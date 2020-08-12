@@ -2,7 +2,7 @@
 <matfile>
     <header type="struct" size="[1 1]">
         <code_xml_parse_version index="1" type="char" size="[1 6]">
-            v1.1.7
+            v1.1.8
         </code_xml_parse_version>
         <creation_date index="1" type="char" size="[1 10]">
             2020-04-24
@@ -20,7 +20,7 @@
             v0.0.3
         </generator_version>
       <magic_code_version  index="1" type="int" size="[1 1]">
-		   [1023357]
+          [1027323]
       </magic_code_version>
     </header>
     <sensor type="struct" size="[1 1]">
@@ -2277,8 +2277,8 @@
                         [0.3000 0.3000 0.3000 0.3000 0.3000 0.3000 ]
                     </TmoContrast>
                 </TmoContrast>
-                <MoreSetting index="1" type="struct" size="[1 1]">
-                 <Band_Prior index="1" type="double" size="[1 1]">                     [0]                 </Band_Prior>
+         <Band_Prior index="1" type="struct" size="[1 1]">
+		<Enable index="1" type="double" size="[1 1]">           	   [0]                 </Enable>                <Mode index="1" type="double" size="[1 1]">                    [0]                 </Mode>                 <DynamicRange index="1" type="double" size="[1 6]">                    [1 44 66 72 78 84]                 </DynamicRange>               <EnvLv index="1" type="double" size="[1 6]">                  [0 0.2 0.4 0.6 0.8 1.0]               </EnvLv> 		<Tolerance index="1" type="double" size="[1 1]">                    [0]                 </Tolerance>                 <Strength index="1" type="double" size="[1 6]">                    [0.5 0.5 0.5 0.5 0.5 0.5]                 </Strength>         </Band_Prior>                <MoreSetting index="1" type="struct" size="[1 1]">
                     <clipgap0 index="1" type="double" size="[1 1]">
                         [12.0000 ]
                     </clipgap0>
