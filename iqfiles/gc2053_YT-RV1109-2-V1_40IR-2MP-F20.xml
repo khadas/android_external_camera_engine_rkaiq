@@ -17,7 +17,7 @@
             UNKNOWN
         </sample_name>
         <generator_version index="1" type="char" size="[1 6]">
-            v0.0.2
+            v0.0.3
         </generator_version>
         <magic_code_version  index="1" type="int" size="[1 1]">
 	  [1027323]
@@ -17818,7 +17818,7 @@
                 [1.0000 1.0000 ]
             </CISIspDgainRange>
 			<SensorFlip index="1" type="char" size="[1 1]">
-				[0]
+				[2]
 			</SensorFlip>
         </SENSORINFO>
       <MODULEINFO  index="1" type="struct" size="[1 1]">
