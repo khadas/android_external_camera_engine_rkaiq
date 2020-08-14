@@ -77,12 +77,14 @@ typedef enum _CalibDb_AecSemMode_e {
  *
  */
 /*****************************************************************************/
-typedef enum _CalibDb_AecBackLitMode_e {
-    AEC_BACKLIT_MODE_INVALID    = 0,        /* invalid (only used for initialization) */
-    AEC_BACKLIT_MODE_WEIGHT_METHOD = 1,        /* Backlit based on Weight-Method MODE (only one integration time value) */
-    AEC_BACKLIT_MODE_DARKROI_METHOD    = 2,        /* Backlit based on DarkROI-Method MODE (independent integration time value) */
-    AEC_BACKLIT_MODE_MAX
-} CalibDb_AecBackLitMode_t;
+typedef enum _CalibDb_AecMeasAreaMode_e {
+    AEC_MEASURE_AREA_AUTO    = 0,
+    AEC_MEASURE_AREA_UP,
+    AEC_MEASURE_AREA_BOTTOM,
+    AEC_MEASURE_AREA_LEFT,
+    AEC_MEASURE_AREA_RIGHT,
+    AEC_MEASURE_AREA_CENTER,
+} CalibDb_AecMeasAreaMode_t;
 
 /*****************************************************************************/
 typedef enum _CalibDb_AecECMMode_e {
@@ -336,26 +338,6 @@ typedef struct CalibDb_AecCommon_Attr_s {
  * @brief   ISP2.0 AEC API algo Config Params(private)
  */
 /*****************************************************************************/
-typedef struct CalibDb_AecInterAdjust_s {
-    uint8_t     enable;
-    float       dluma_high_th;
-    float       dluma_low_th;
-    uint8_t     trigger_frame;
-} CalibDb_AecInterAdjust_t;
-#define CALID_AEC_GAIN_LEVEL_MAX_LEN  10
-#define CALID_AEC_MAX_LUMA_MAX_LEN  10
-typedef struct CalibDb_AecOverExpControl_s {
-    AecDynamicSetpointName_t      name;                       /**name */
-    float K1;
-    float K2;
-    float K3;
-    float OEC_Pdf_max;
-    float OEC_Pdf_th;
-    float OEC_Tolerance_max;
-    float pGainLevel[CALID_AEC_GAIN_LEVEL_MAX_LEN];
-    float pDyMaxLuma[CALID_AEC_MAX_LUMA_MAX_LEN];
-    int   array_size;
-} CalibDb_AecOverExpControl_t;
 
 #define AEC_SETPOINT_MAX_NODES 10
 typedef struct CalibDb_AecDynamicSetpoint_s {
@@ -365,29 +347,33 @@ typedef struct CalibDb_AecDynamicSetpoint_s {
     int   array_size;
 } CalibDb_AecDynamicSetpoint_t;
 
-typedef struct CalibDb_AecBacklight_s {
-    uint8_t             enable;
-    uint8_t             Mode;
-    float               lumaHighTh;
-    float               lumaLowTh;
-    float               LvTh;
-    float               weightMinTh;
-    float               weightMaxTh;
 
-    float               OEROILowTh;
-    float               LvLowTh;
-    float               LvHightTh;
-    Cam1x6FloatMatrix_t NonOEPdfTh;
-    Cam1x6FloatMatrix_t LowLightPdfTh;
-    Cam1x6FloatMatrix_t ExpLevel;
-    Cam1x6FloatMatrix_t TargetLLLuma;
-    float               LumaDistTh;
+typedef struct CalibDb_AecBacklight_s {
+    uint8_t                     enable;
+    float                       StrBias;
+    CalibDb_AecMeasAreaMode_t   MeasArea;
+    float                       OEROILowTh;
+    float                       LumaDistTh;
+    float                       LvLowTh;
+    float                       LvHightTh;
+    Cam1x6FloatMatrix_t         ExpLevel;
+    Cam1x6FloatMatrix_t         NonOEPdfTh;
+    Cam1x6FloatMatrix_t         LowLightPdfTh;
+    Cam1x6FloatMatrix_t         TargetLLLuma;
 } CalibDb_AecBacklight_t;
 
-typedef struct CalibDb_AecHist2Hal_s {
-    uint8_t             enable;
-    uint8_t             lowHistBinTh;
-} CalibDb_AecHist2Hal_t;
+typedef struct CalibDb_AecOverExpCtrl_s {
+    uint8_t                     enable;
+    float                       StrBias;
+    float                       MaxWeight;
+    float                       HighLightTh;
+    float                       LowLightTh;
+    Cam1x6FloatMatrix_t         OEpdf;
+    Cam1x6FloatMatrix_t         LowLightWeight;
+    Cam1x6FloatMatrix_t         HighLightWeight;
+
+} CalibDb_AecOverExpCtrl_t;
+
 
 typedef struct CalibDb_LinearAE_Attr_s {
     uint8_t                 RawStatsEn;
@@ -398,18 +384,9 @@ typedef struct CalibDb_LinearAE_Attr_s {
     CalibDb_AeStrategyMode_t        StrategyMode;
     bool                    DySetPointEn;
     CalibDb_AecDynamicSetpoint_t DySetpoint[AEC_DNMODE_MAX];
-    //AOE
-    bool                    AOE_Enable;
-    float                   AOE_Max_point;
-    float                   AOE_Min_point;
-    float                   AOE_Y_Max_th;
-    float                   AOE_Y_Min_th;
-    float                   AOE_Step_Inc;
-    float                   AOE_Step_Dec;
 
     CalibDb_AecBacklight_t  BackLightConf;
-    CalibDb_AecHist2Hal_t   Hist2Hal; //TODO
-    CalibDb_AecInterAdjust_t InterAdjustStrategy;//TODO
+    CalibDb_AecOverExpCtrl_t OverExpCtrl;
 } CalibDb_LinearAE_Attr_t;
 
 typedef struct CalibDb_LFrameCtrl_s

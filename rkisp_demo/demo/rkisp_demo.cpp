@@ -340,7 +340,7 @@ void test_imgproc(const rk_aiq_sys_ctx_t* ctx) {
 		rk_aiq_nr_IQPara_t stGetNRIQPara;	
 	   stNRIQPara.module_bits = (1<<ANR_MODULE_BAYERNR) | (1<< ANR_MODULE_MFNR) | (1<< ANR_MODULE_UVNR) | (1<< ANR_MODULE_YNR);
 	   stGetNRIQPara.module_bits = (1<<ANR_MODULE_BAYERNR) | (1<< ANR_MODULE_MFNR) | (1<< ANR_MODULE_UVNR) | (1<< ANR_MODULE_YNR);
-       rk_aiq_uapi_getNRIQPara(ctx, &stNRIQPara);  
+       rk_aiq_user_api_anr_GetIQPara(ctx, &stNRIQPara);  
 	   for(int k=0; k<2; k++){
 		   for(int i=0; i<CALIBDB_NR_SHARP_MAX_ISO_LEVEL; i++ ){
 					//bayernr
@@ -413,11 +413,11 @@ void test_imgproc(const rk_aiq_sys_ctx_t* ctx) {
 		   	}
     	}
 
-		rk_aiq_uapi_setNRIQPara(ctx, &stNRIQPara); 
+		rk_aiq_user_api_anr_SetIQPara(ctx, &stNRIQPara); 
 
 		sleep(5);
 		 //printf all the para
-		 rk_aiq_uapi_getNRIQPara(ctx, &stGetNRIQPara);  
+		 rk_aiq_user_api_anr_GetIQPara(ctx, &stGetNRIQPara);  
 
 		for(int k=0; k<1; k++){
 		   for(int i=0; i<CALIBDB_NR_SHARP_MAX_ISO_LEVEL; i++ ){
@@ -489,7 +489,7 @@ void test_imgproc(const rk_aiq_sys_ctx_t* ctx) {
         rk_aiq_sharp_IQpara_t stSharpIQpara;
 		rk_aiq_sharp_IQpara_t stGetSharpIQpara;
 		stSharpIQpara.module_bits= (1<<ASHARP_MODULE_SHARP) | (1<< ASHARP_MODULE_EDGEFILTER) ;
-		rk_aiq_uapi_getSharpIQPara(ctx, &stSharpIQpara);
+		rk_aiq_user_api_asharp_GetIQPara(ctx, &stSharpIQpara);
 
 		for(int k=0; k<2; k++){
 			for(int i=0; i<CALIBDB_NR_SHARP_MAX_ISO_LEVEL; i++ ){
@@ -503,10 +503,10 @@ void test_imgproc(const rk_aiq_sys_ctx_t* ctx) {
 			}
 		}
 
-		rk_aiq_uapi_setSharpIQPara(ctx, &stSharpIQpara);
+		rk_aiq_user_api_asharp_SetIQPara(ctx, &stSharpIQpara);
 
 		sleep(5);
-		rk_aiq_uapi_getSharpIQPara(ctx, &stGetSharpIQpara);
+		rk_aiq_user_api_asharp_GetIQPara(ctx, &stGetSharpIQpara);
 
 		for(int k=0; k<1; k++){
 		   for(int i=0; i<CALIBDB_NR_SHARP_MAX_ISO_LEVEL; i++ ){

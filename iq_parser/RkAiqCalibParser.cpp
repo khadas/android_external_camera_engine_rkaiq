@@ -4640,201 +4640,6 @@ bool RkAiqCalibParser::parseEntrySensorAecFrameRateMode
     return (true);
 }
 
-bool RkAiqCalibParser::parseEntrySensorAecRangeLinearAE
-(
-    const XMLElement*   pelement,
-    void*                param
-) {
-    LOGD("%s(%d): (enter)\n", __FUNCTION__, __LINE__);
-    autoTabForward();
-    XML_CHECK_START(CALIB_SENSOR_AEC_AECRANGE_LINEARAE_TAG_ID, CALIB_SENSOR_AEC_AECRANGE_TAG_ID);
-
-    const XMLNode* psubsubchild = pelement->FirstChild();
-    while (psubsubchild) {
-        XmlTag subsubTag = XmlTag(psubsubchild->ToElement());
-        std::string subsubTagname(psubsubchild->ToElement()->Name());
-        XML_CHECK_WHILE_SUBTAG_MARK((char *)(subsubTagname.c_str()), subsubTag.Type(), subsubTag.Size());
-#ifdef DEBUG_LOG
-        LOGE("%s(%d): subsubTagname = %s\n", __FUNCTION__, __LINE__, subsubTagname.c_str());
-#endif
-        if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_AEC_TIMERANGE_TAG_ID)) {
-            float tempVal[2] = { mCalibDb->aec.CommCtrl.stAuto.stLinAeRange.stExpTimeRange.Min, mCalibDb->aec.CommCtrl.stAuto.stLinAeRange.stExpTimeRange.Max };
-            int no = ParseFloatArray(psubsubchild, tempVal, subsubTag.Size());
-            DCT_ASSERT((no == subsubTag.Size()));
-            mCalibDb->aec.CommCtrl.stAuto.stLinAeRange.stExpTimeRange.Min = tempVal[0];
-            mCalibDb->aec.CommCtrl.stAuto.stLinAeRange.stExpTimeRange.Max = tempVal[1];
-        }
-        else if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_AEC_GAINRANGE_TAG_ID)) {
-            float tempVal[2] = { mCalibDb->aec.CommCtrl.stAuto.stLinAeRange.stGainRange.Min, mCalibDb->aec.CommCtrl.stAuto.stLinAeRange.stGainRange.Max };
-            int no = ParseFloatArray(psubsubchild, tempVal, subsubTag.Size());
-            DCT_ASSERT((no == subsubTag.Size()));
-            mCalibDb->aec.CommCtrl.stAuto.stLinAeRange.stGainRange.Min = tempVal[0];
-            mCalibDb->aec.CommCtrl.stAuto.stLinAeRange.stGainRange.Max = tempVal[1];
-        }
-        else if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_AEC_ISPDGAINRANGE_TAG_ID)) {
-            float tempVal[2] = { mCalibDb->aec.CommCtrl.stAuto.stLinAeRange.stIspDGainRange.Min, mCalibDb->aec.CommCtrl.stAuto.stLinAeRange.stIspDGainRange.Max };
-            int no = ParseFloatArray(psubsubchild, tempVal, subsubTag.Size());
-            DCT_ASSERT((no == subsubTag.Size()));
-            mCalibDb->aec.CommCtrl.stAuto.stLinAeRange.stIspDGainRange.Min = tempVal[0];
-            mCalibDb->aec.CommCtrl.stAuto.stLinAeRange.stIspDGainRange.Max = tempVal[1];
-        }
-        else if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_AEC_PIRISRANGE_TAG_ID)) {
-            float tempVal[2] = { mCalibDb->aec.CommCtrl.stAuto.stLinAeRange.stPIrisRange.Min, mCalibDb->aec.CommCtrl.stAuto.stLinAeRange.stPIrisRange.Max };
-            int no = ParseFloatArray(psubsubchild, tempVal, subsubTag.Size());
-            DCT_ASSERT((no == subsubTag.Size()));
-            mCalibDb->aec.CommCtrl.stAuto.stLinAeRange.stPIrisRange.Min = tempVal[0];
-            mCalibDb->aec.CommCtrl.stAuto.stLinAeRange.stPIrisRange.Max = tempVal[1];
-        }
-        else {
-            LOGE("%s(%d): parse error in  stLinAeRange (unknow tag: %s )\n", __FUNCTION__, __LINE__, subsubTagname.c_str());
-        }
-        psubsubchild = psubsubchild->NextSibling();
-    }
-
-    const XMLNode* psubchild = pelement->FirstChild();
-    XML_CHECK_END();
-    autoTabBackward();
-    LOGD("%s(%d): (exit)\n", __FUNCTION__, __LINE__);
-    return (true);
-}
-
-bool RkAiqCalibParser::parseEntrySensorAecRangeHdrAE
-(
-    const XMLElement*   pelement,
-    void*                param
-) {
-    LOGD("%s(%d): (enter)\n", __FUNCTION__, __LINE__);
-    autoTabForward();
-    XML_CHECK_START(CALIB_SENSOR_AEC_AECRANGE_HDRAE_TAG_ID, CALIB_SENSOR_AEC_AECRANGE_TAG_ID);
-
-    const XMLNode* psubsubchild = pelement->FirstChild();
-    while (psubsubchild) {
-        XmlTag subsubTag = XmlTag(psubsubchild->ToElement());
-        std::string subsubTagname(psubsubchild->ToElement()->Name());
-        XML_CHECK_WHILE_SUBTAG_MARK((char *)(subsubTagname.c_str()), subsubTag.Type(), subsubTag.Size());
-#ifdef DEBUG_LOG
-        LOGE("%s(%d): subsubTagname = %s\n", __FUNCTION__, __LINE__, subsubTagname.c_str());
-#endif
-        if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_AEC_HDR_TIMERANGE_MIN_TAG_ID)) {
-            float tempVal[3];
-            for (int i = 0; i < 3; i++)
-                tempVal[i] = mCalibDb->aec.CommCtrl.stAuto.stHdrAeRange.stExpTimeRange[i].Min;
-            int no = ParseFloatArray(psubsubchild, tempVal, subsubTag.Size());
-            DCT_ASSERT((no == subsubTag.Size()));
-            for (int i = 0; i < 3; i++)
-                mCalibDb->aec.CommCtrl.stAuto.stHdrAeRange.stExpTimeRange[i].Min = tempVal[i];
-        }
-        else if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_AEC_HDR_TIMERANGE_MAX_TAG_ID)) {
-            float tempVal[3];
-            for (int i = 0; i < 3; i++)
-                tempVal[i] = mCalibDb->aec.CommCtrl.stAuto.stHdrAeRange.stExpTimeRange[i].Max;
-            int no = ParseFloatArray(psubsubchild, tempVal, subsubTag.Size());
-            DCT_ASSERT((no == subsubTag.Size()));
-            for (int i = 0; i < 3; i++)
-                mCalibDb->aec.CommCtrl.stAuto.stHdrAeRange.stExpTimeRange[i].Max = tempVal[i];
-        }
-        else if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_AEC_HDR_GAINRANGE_MIN_TAG_ID)) {
-            float tempVal[3];
-            for (int i = 0; i < 3; i++)
-                tempVal[i] = mCalibDb->aec.CommCtrl.stAuto.stHdrAeRange.stGainRange[i].Min;
-            int no = ParseFloatArray(psubsubchild, tempVal, subsubTag.Size());
-            DCT_ASSERT((no == subsubTag.Size()));
-            for (int i = 0; i < 3; i++)
-                mCalibDb->aec.CommCtrl.stAuto.stHdrAeRange.stGainRange[i].Min = tempVal[i];
-        }
-        else if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_AEC_HDR_GAINRANGE_MAX_TAG_ID)) {
-            float tempVal[3];
-            for (int i = 0; i < 3; i++)
-                tempVal[i] = mCalibDb->aec.CommCtrl.stAuto.stHdrAeRange.stGainRange[i].Max;
-            int no = ParseFloatArray(psubsubchild, tempVal, subsubTag.Size());
-            DCT_ASSERT((no == subsubTag.Size()));
-            for (int i = 0; i < 3; i++)
-                mCalibDb->aec.CommCtrl.stAuto.stHdrAeRange.stGainRange[i].Max = tempVal[i];
-        }
-        else if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_AEC_HDR_ISPDGAINRANGE_MIN_TAG_ID)) {
-            float tempVal[3];
-            for (int i = 0; i < 3; i++)
-                tempVal[i] = mCalibDb->aec.CommCtrl.stAuto.stHdrAeRange.stIspDGainRange[i].Min;
-            int no = ParseFloatArray(psubsubchild, tempVal, subsubTag.Size());
-            DCT_ASSERT((no == subsubTag.Size()));
-            for (int i = 0; i < 3; i++)
-                mCalibDb->aec.CommCtrl.stAuto.stHdrAeRange.stIspDGainRange[i].Min = tempVal[i];
-        }
-        else if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_AEC_HDR_ISPDGAINRANGE_MAX_TAG_ID)) {
-            float tempVal[3];
-            for (int i = 0; i < 3; i++)
-                tempVal[i] = mCalibDb->aec.CommCtrl.stAuto.stHdrAeRange.stIspDGainRange[i].Max;
-            int no = ParseFloatArray(psubsubchild, tempVal, subsubTag.Size());
-            DCT_ASSERT((no == subsubTag.Size()));
-            for (int i = 0; i < 3; i++)
-                mCalibDb->aec.CommCtrl.stAuto.stHdrAeRange.stIspDGainRange[i].Max = tempVal[i];
-        }
-        else if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_AEC_HDR_PIRISRANGE_TAG_ID)) {
-            float tempVal[2] = { mCalibDb->aec.CommCtrl.stAuto.stHdrAeRange.stPIrisRange.Min, mCalibDb->aec.CommCtrl.stAuto.stHdrAeRange.stPIrisRange.Max };
-            int no = ParseFloatArray(psubsubchild, tempVal, subsubTag.Size());
-            DCT_ASSERT((no == subsubTag.Size()));
-            mCalibDb->aec.CommCtrl.stAuto.stHdrAeRange.stPIrisRange.Min = tempVal[0];
-            mCalibDb->aec.CommCtrl.stAuto.stHdrAeRange.stPIrisRange.Max = tempVal[1];
-        }
-        psubsubchild = psubsubchild->NextSibling();
-    }
-    XML_CHECK_END();
-    autoTabBackward();
-    LOGD("%s(%d): (exit)\n", __FUNCTION__, __LINE__);
-    return (true);
-}
-
-bool RkAiqCalibParser::parseEntrySensorAecRange
-(
-    const XMLElement*   pelement,
-    void*                param
-) {
-    LOGD("%s(%d): (enter)\n", __FUNCTION__, __LINE__);
-    autoTabForward();
-
-    XML_CHECK_START(CALIB_SENSOR_AEC_AECRANGE_TAG_ID, CALIB_SENSOR_AEC_TAG_ID);
-
-    const XMLNode* psubchild = pelement->FirstChild();
-#ifdef DEBUG_LOG
-    LOGE("%s(%d): Tagname = %s\n", __FUNCTION__, __LINE__, pelement->Name());
-#endif
-    while (psubchild) {
-        XmlTag subTag = XmlTag(psubchild->ToElement());
-        std::string subTagname(psubchild->ToElement()->Name());
-        XML_CHECK_WHILE_SUBTAG_MARK((char *)(subTagname.c_str()), subTag.Type(), subTag.Size());
-#ifdef DEBUG_LOG
-        LOGE("%s(%d): subTagname = %s\n", __FUNCTION__, __LINE__, subTagname.c_str());
-#endif
-        if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_AEC_AECRANGE_ENABLE_TAG_ID)) {
-            uint8_t temp = mCalibDb->aec.CommCtrl.stAuto.SetAeRangeEn;
-            int no = ParseUcharArray(psubchild, &temp, subTag.Size());
-            mCalibDb->aec.CommCtrl.stAuto.SetAeRangeEn = (temp == 0) ? false : true;
-            DCT_ASSERT((no == subTag.Size()));
-        }
-        else if(XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_AEC_AECRANGE_LINEARAE_TAG_ID)) {
-            if (!parseEntrySensorAecRangeLinearAE(psubchild->ToElement(), param)) {
-                LOGE("parse error in Aec (%s)", subTagname.c_str());
-                return (false);
-            }
-        }
-        else if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_AEC_AECRANGE_HDRAE_TAG_ID)) {
-            if (!parseEntrySensorAecRangeHdrAE(psubchild->ToElement(), param)) {
-                LOGE("parse error in Aec (%s)", subTagname.c_str());
-                return (false);
-            }
-        }
-        else {
-            LOGE("%s(%d): parse error in  AeRange (unknow tag: %s )\n", __FUNCTION__, __LINE__, subTagname.c_str());
-        }
-        psubchild = psubchild->NextSibling();
-    }
-
-    XML_CHECK_END();
-    autoTabBackward();
-    LOGD("%s(%d): (exit)\n", __FUNCTION__, __LINE__);
-    return (true);
-}
-
 bool RkAiqCalibParser::parseEntrySensorAecInitValueLinearAE
 (
     const XMLElement*   pelement,
@@ -5284,192 +5089,6 @@ bool RkAiqCalibParser::parseEntrySensorAecRoute
     return (true);
 }
 
-bool RkAiqCalibParser::parseEntrySensorLinearAECtrlAoe
-(
-    const XMLElement*   pelement,
-    void*                param
-) {
-    LOGD("%s(%d): (enter)\n", __FUNCTION__, __LINE__);
-    autoTabForward();
-
-    XML_CHECK_START(CALIB_SENSOR_AEC_AOE_TAG_ID, CALIB_SENSOR_AEC_LINEARAE_CTRL_TAG_ID);
-
-    const XMLNode* psubsubchild = pelement->FirstChild();
-    while (psubsubchild) {
-        XmlTag subsubTag = XmlTag(psubsubchild->ToElement());
-        std::string subsubTagname(psubsubchild->ToElement()->Name());
-        XML_CHECK_WHILE_SUBTAG_MARK((char *)(subsubTagname.c_str()), subsubTag.Type(), subsubTag.Size());
-#ifdef DEBUG_LOG
-        LOGE("%s(%d): subsubTagname = %s\n", __FUNCTION__, __LINE__, subsubTagname.c_str());
-#endif
-        if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_AEC_AOE_ENABLE_TAG_ID)) {
-            uint8_t temp = mCalibDb->aec.LinearAeCtrl.AOE_Enable;
-            int no = ParseUcharArray(psubsubchild, &temp, subsubTag.Size());
-            mCalibDb->aec.LinearAeCtrl.AOE_Enable = (temp == 0) ? false : true;
-            DCT_ASSERT((no == subsubTag.Size()));
-        }
-        else if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_AEC_AOE_MAX_POINT_TAG_ID)) {
-            int no = ParseFloatArray(psubsubchild, &mCalibDb->aec.LinearAeCtrl.AOE_Max_point, subsubTag.Size());
-            DCT_ASSERT((no == subsubTag.Size()));
-        }
-        else if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_AEC_AOE_MIN_POINT_TAG_ID)) {
-            int no = ParseFloatArray(psubsubchild, &mCalibDb->aec.LinearAeCtrl.AOE_Min_point, subsubTag.Size());
-            DCT_ASSERT((no == subsubTag.Size()));
-        }
-        else if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_AEC_AOE_Y_MAX_TH_TAG_ID)) {
-            int no = ParseFloatArray(psubsubchild, &mCalibDb->aec.LinearAeCtrl.AOE_Y_Max_th, subsubTag.Size());
-            DCT_ASSERT((no == subsubTag.Size()));
-        }
-        else if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_AEC_AOE_Y_MIN_TH_TAG_ID)) {
-            int no = ParseFloatArray(psubsubchild, &mCalibDb->aec.LinearAeCtrl.AOE_Y_Min_th, subsubTag.Size());
-            DCT_ASSERT((no == subsubTag.Size()));
-        }
-        else if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_AEC_AOE_STEP_INC_TAG_ID)) {
-            int no = ParseFloatArray(psubsubchild, &mCalibDb->aec.LinearAeCtrl.AOE_Step_Inc, subsubTag.Size());
-            DCT_ASSERT((no == subsubTag.Size()));
-        }
-        else if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_AEC_AOE_STEP_DEC_TAG_ID)) {
-            int no = ParseFloatArray(psubsubchild, &mCalibDb->aec.LinearAeCtrl.AOE_Step_Dec, subsubTag.Size());
-            DCT_ASSERT((no == subsubTag.Size()));
-        }
-        else {
-            LOGE("%s(%d): parse error in AEC-LiearAE AOE section (unknow subsubTagname: %s )\n", __FUNCTION__, __LINE__, subsubTagname.c_str());
-        }
-        psubsubchild = psubsubchild->NextSibling();
-    }
-
-    XML_CHECK_END();
-    autoTabBackward();
-    LOGD("%s(%d): (exit)\n", __FUNCTION__, __LINE__);
-    return (true);
-}
-
-bool RkAiqCalibParser::parseEntrySensorLinearAECtrlWeightMethod
-(
-    const XMLElement*   pelement,
-    void*                param
-) {
-    LOGD("%s(%d): (enter)\n", __FUNCTION__, __LINE__);
-    autoTabForward();
-
-    XML_CHECK_START(CALIB_SENSOR_LINAECTRL_BACKLIGHT_WEIGHT_METHOD_TAG_ID,
-                    CALIB_SENSOR_LINAECTRL_BACKLIGHT_CONFIG_TAG_ID);
-
-    const XMLNode* pthdsubchild = pelement->FirstChild();
-    while (pthdsubchild) {
-        XmlTag thdsubtag = XmlTag(pthdsubchild->ToElement());
-        std::string thdsubTagname(pthdsubchild->ToElement()->Name());
-        XML_CHECK_WHILE_SUBTAG_MARK((char *)(thdsubTagname.c_str()), thdsubtag.Type(), thdsubtag.Size());
-#ifdef DEBUG_LOG
-        redirectOut << "thdsubTagname: " << thdsubTagname << std::endl;
-#endif
-        if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_LINAECTRL_BACKLIGHT_LUMALOWTH_TAG_ID)) {
-            int no = ParseFloatArray(pthdsubchild, &mCalibDb->aec.LinearAeCtrl.BackLightConf.lumaLowTh, thdsubtag.Size());
-            DCT_ASSERT((no == thdsubtag.Size()));
-        }
-        else if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_LINAECTRL_BACKLIGHT_LUMAHIGHTH_TAG_ID)) {
-            int no = ParseFloatArray(pthdsubchild, &mCalibDb->aec.LinearAeCtrl.BackLightConf.lumaHighTh, thdsubtag.Size());
-            DCT_ASSERT((no == thdsubtag.Size()));
-        }
-        else if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_LINAECTRL_BACKLIGHT_LVTH_TAG_ID)) {
-            int no = ParseFloatArray(pthdsubchild, &mCalibDb->aec.LinearAeCtrl.BackLightConf.LvTh, thdsubtag.Size());
-            DCT_ASSERT((no == thdsubtag.Size()));
-        }
-        else if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_LINAECTRL_BACKLIGHT_WEIGHTMINTH_TAG_ID)) {
-            int no = ParseFloatArray(pthdsubchild, &mCalibDb->aec.LinearAeCtrl.BackLightConf.weightMinTh, thdsubtag.Size());
-            DCT_ASSERT((no == thdsubtag.Size()));
-        }
-        else if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_LINAECTRL_BACKLIGHT_WEIGHTMAXTH_TAG_ID)) {
-            int no = ParseFloatArray(pthdsubchild, &mCalibDb->aec.LinearAeCtrl.BackLightConf.weightMaxTh, thdsubtag.Size());
-            DCT_ASSERT((no == thdsubtag.Size()));
-        }
-        else {
-            redirectOut
-                    << "parse error in LinearAeCtrl BackLight WeightMethod (unknow tag: "
-                    << thdsubTagname
-                    << ")"
-                    << std::endl;
-        }
-        pthdsubchild = pthdsubchild->NextSibling();
-    }
-
-    XML_CHECK_END();
-    autoTabBackward();
-    LOGD("%s(%d): (exit)\n", __FUNCTION__, __LINE__);
-    return (true);
-}
-
-bool RkAiqCalibParser::parseEntrySensorLinearAECtrlDarkROIMethod
-(
-    const XMLElement*   pelement,
-    void*                param
-) {
-    LOGD("%s(%d): (enter)\n", __FUNCTION__, __LINE__);
-    autoTabForward();
-
-    XML_CHECK_START(CALIB_SENSOR_LINAECTRL_BACKLIGHT_DARKROI_METHOD_TAG_ID,
-                    CALIB_SENSOR_LINAECTRL_BACKLIGHT_CONFIG_TAG_ID);
-
-    const XMLNode* pthdsubchild = pelement->FirstChild();
-
-    while (pthdsubchild) {
-        XmlTag thdsubtag = XmlTag(pthdsubchild->ToElement());
-        std::string thdsubTagname(pthdsubchild->ToElement()->Name());
-        XML_CHECK_WHILE_SUBTAG_MARK((char *)(thdsubTagname.c_str()), thdsubtag.Type(), thdsubtag.Size());
-#ifdef DEBUG_LOG
-        redirectOut << "thdsubTagname: " << thdsubTagname << std::endl;
-#endif
-        if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_LINAECTRL_BACKLIGHT_OEROI_LOWTH_TAG_ID)) {
-            int no = ParseFloatArray(pthdsubchild, &mCalibDb->aec.LinearAeCtrl.BackLightConf.OEROILowTh, thdsubtag.Size());
-            DCT_ASSERT((no == thdsubtag.Size()));
-        }
-        else if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_LINAECTRL_BACKLIGHT_LV_HIGHTH_TAG_ID)) {
-            int no = ParseFloatArray(pthdsubchild, &mCalibDb->aec.LinearAeCtrl.BackLightConf.LvHightTh, thdsubtag.Size());
-            DCT_ASSERT((no == thdsubtag.Size()));
-        }
-        else if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_LINAECTRL_BACKLIGHT_LV_LOWTH_TAG_ID)) {
-            int no = ParseFloatArray(pthdsubchild, &mCalibDb->aec.LinearAeCtrl.BackLightConf.LvLowTh, thdsubtag.Size());
-            DCT_ASSERT((no == thdsubtag.Size()));
-        }
-        else if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_LINAECTRL_BACKLIGHT_LUMADISTTH_TAG_ID)) {
-            int no = ParseFloatArray(pthdsubchild, &mCalibDb->aec.LinearAeCtrl.BackLightConf.LumaDistTh, thdsubtag.Size());
-            DCT_ASSERT((no == thdsubtag.Size()));
-        }
-        else if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_LINAECTRL_BACKLIGHT_LOWLIGHTPDFTH_TAG_ID)) {
-            int i = (sizeof(mCalibDb->aec.LinearAeCtrl.BackLightConf.LowLightPdfTh) / sizeof(mCalibDb->aec.LinearAeCtrl.BackLightConf.LowLightPdfTh.fCoeff[0]));
-            int no = ParseFloatArray(pthdsubchild, mCalibDb->aec.LinearAeCtrl.BackLightConf.LowLightPdfTh.fCoeff, i);
-            DCT_ASSERT((no == thdsubtag.Size()));
-        }
-        else if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_LINAECTRL_BACKLIGHT_NONOEPDFTH_TAG_ID)) {
-            int i = (sizeof(mCalibDb->aec.LinearAeCtrl.BackLightConf.NonOEPdfTh) / sizeof(mCalibDb->aec.LinearAeCtrl.BackLightConf.NonOEPdfTh.fCoeff[0]));
-            int no = ParseFloatArray(pthdsubchild, mCalibDb->aec.LinearAeCtrl.BackLightConf.NonOEPdfTh.fCoeff, i);
-            DCT_ASSERT((no == thdsubtag.Size()));
-        }
-        else if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_LINAECTRL_BACKLIGHT_EXPLEVEL_TAG_ID)) {
-            int i = (sizeof(mCalibDb->aec.LinearAeCtrl.BackLightConf.ExpLevel) / sizeof(mCalibDb->aec.LinearAeCtrl.BackLightConf.ExpLevel.fCoeff[0]));
-            int no = ParseFloatArray(pthdsubchild, mCalibDb->aec.LinearAeCtrl.BackLightConf.ExpLevel.fCoeff, i);
-            DCT_ASSERT((no == thdsubtag.Size()));
-        }
-        else if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_LINAECTRL_BACKLIGHT_TARGETLLLUMA_TAG_ID)) {
-            int i = (sizeof(mCalibDb->aec.LinearAeCtrl.BackLightConf.TargetLLLuma) / sizeof(mCalibDb->aec.LinearAeCtrl.BackLightConf.TargetLLLuma.fCoeff[0]));
-            int no = ParseFloatArray(pthdsubchild, mCalibDb->aec.LinearAeCtrl.BackLightConf.TargetLLLuma.fCoeff, i);
-            DCT_ASSERT((no == thdsubtag.Size()));
-        }
-        else {
-            redirectOut
-                    << "parse error in LinearAeCtrl BackLight DarkROI section (unknow thdsubtag: "
-                    << thdsubTagname
-                    << ")"
-                    << std::endl;
-        }
-        pthdsubchild = pthdsubchild->NextSibling();
-    }
-    XML_CHECK_END();
-    autoTabBackward();
-    LOGD("%s(%d): (exit)\n", __FUNCTION__, __LINE__);
-    return (true);
-}
-
 bool RkAiqCalibParser::parseEntrySensorLinearAECtrlBackLight
 (
     const XMLElement*   pelement,
@@ -5492,7 +5111,7 @@ bool RkAiqCalibParser::parseEntrySensorLinearAECtrlBackLight
             int no = ParseUcharArray(psecsubchild, &mCalibDb->aec.LinearAeCtrl.BackLightConf.enable, secsubtag.Size());
             DCT_ASSERT((no == secsubtag.Size()));
         }
-        else  if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_LINAECTRL_BACKLIGHT_MODE_TAG_ID)) {
+        else  if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_LINAECTRL_BACKLIGHT_MEASAREA_TAG_ID)) {
             char* value = Toupper(secsubtag.Value());
             std::string s_value(value);
 #ifdef DEBUG_LOG
@@ -5501,42 +5120,85 @@ bool RkAiqCalibParser::parseEntrySensorLinearAECtrlBackLight
 #endif
             if (xmlParseReadWrite == XML_PARSER_READ)
             {
-                if (s_value == CALIB_SENSOR_LINAECTRL_BACKLIGHT_MODE_WEIGHT) {
-                    mCalibDb->aec.LinearAeCtrl.BackLightConf.Mode = AEC_BACKLIT_MODE_WEIGHT_METHOD;
+                if (s_value == CALIB_SENSOR_AEC_MEASAREA_AUTO) {
+                    mCalibDb->aec.LinearAeCtrl.BackLightConf.MeasArea = AEC_MEASURE_AREA_AUTO;
                 }
-                else if (s_value == CALIB_SENSOR_LINAECTRL_BACKLIGHT_MODE_DARKROI) {
-                    mCalibDb->aec.LinearAeCtrl.BackLightConf.Mode = AEC_BACKLIT_MODE_DARKROI_METHOD;
+                else if (s_value == CALIB_SENSOR_AEC_MEASAREA_CENTER) {
+                    mCalibDb->aec.LinearAeCtrl.BackLightConf.MeasArea = AEC_MEASURE_AREA_CENTER;
+                }
+                else if (s_value == CALIB_SENSOR_AEC_MEASAREA_UP) {
+                    mCalibDb->aec.LinearAeCtrl.BackLightConf.MeasArea = AEC_MEASURE_AREA_UP;
+                }
+                else if (s_value == CALIB_SENSOR_AEC_MEASAREA_BOTTOM) {
+                    mCalibDb->aec.LinearAeCtrl.BackLightConf.MeasArea = AEC_MEASURE_AREA_BOTTOM;
+                }
+                else if (s_value == CALIB_SENSOR_AEC_MEASAREA_LEFT) {
+                    mCalibDb->aec.LinearAeCtrl.BackLightConf.MeasArea = AEC_MEASURE_AREA_LEFT;
+                }
+                else if (s_value == CALIB_SENSOR_AEC_MEASAREA_RIGHT) {
+                    mCalibDb->aec.LinearAeCtrl.BackLightConf.MeasArea = AEC_MEASURE_AREA_RIGHT;
                 }
                 else {
-                    mCalibDb->aec.LinearAeCtrl.BackLightConf.Mode = AEC_BACKLIT_MODE_INVALID;
-                    redirectOut << "invalid LINAECTRL BackLitMode (" << s_value << ")" << std::endl;
+                    mCalibDb->aec.LinearAeCtrl.BackLightConf.MeasArea = AEC_MEASURE_AREA_AUTO;
+                    redirectOut << "invalid BackLit MeasArea (" << s_value << ")" << std::endl;
                 }
             }
             else if (xmlParseReadWrite == XML_PARSER_WRITE)
             {
                 XMLNode* pNode = (XMLNode *)psecsubchild;
-                if (mCalibDb->aec.LinearAeCtrl.BackLightConf.Mode == AEC_BACKLIT_MODE_WEIGHT_METHOD)
-                    pNode->FirstChild()->SetValue(CALIB_SENSOR_LINAECTRL_BACKLIGHT_MODE_WEIGHT);
-                else if (mCalibDb->aec.LinearAeCtrl.BackLightConf.Mode == AEC_BACKLIT_MODE_DARKROI_METHOD)
-                    pNode->FirstChild()->SetValue(CALIB_SENSOR_LINAECTRL_BACKLIGHT_MODE_DARKROI);
+                if (mCalibDb->aec.LinearAeCtrl.BackLightConf.MeasArea == AEC_MEASURE_AREA_AUTO)
+                    pNode->FirstChild()->SetValue(CALIB_SENSOR_AEC_MEASAREA_AUTO);
+                else if (mCalibDb->aec.LinearAeCtrl.BackLightConf.MeasArea == AEC_MEASURE_AREA_CENTER)
+                    pNode->FirstChild()->SetValue(CALIB_SENSOR_AEC_MEASAREA_CENTER);
+                else if (mCalibDb->aec.LinearAeCtrl.BackLightConf.MeasArea == AEC_MEASURE_AREA_UP)
+                    pNode->FirstChild()->SetValue(CALIB_SENSOR_AEC_MEASAREA_UP);
+                else if (mCalibDb->aec.LinearAeCtrl.BackLightConf.MeasArea == AEC_MEASURE_AREA_BOTTOM)
+                    pNode->FirstChild()->SetValue(CALIB_SENSOR_AEC_MEASAREA_BOTTOM);
+                else if (mCalibDb->aec.LinearAeCtrl.BackLightConf.MeasArea == AEC_MEASURE_AREA_LEFT)
+                    pNode->FirstChild()->SetValue(CALIB_SENSOR_AEC_MEASAREA_LEFT);
+                else if (mCalibDb->aec.LinearAeCtrl.BackLightConf.MeasArea == AEC_MEASURE_AREA_RIGHT)
+                    pNode->FirstChild()->SetValue(CALIB_SENSOR_AEC_MEASAREA_RIGHT);
                 else {
                     pNode->FirstChild()->SetValue("INVALID");
-                    redirectOut << "(XML Write)invalid LINAECTRL BackLitMode (" << mCalibDb->aec.LinearAeCtrl.BackLightConf.Mode << ")" << std::endl;
+                    redirectOut << "(XML Write)invalid BackLit MeasArea  (" << mCalibDb->aec.LinearAeCtrl.BackLightConf.MeasArea << ")" << std::endl;
                 }
             }
-
         }
-        else if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_LINAECTRL_BACKLIGHT_WEIGHT_METHOD_TAG_ID)) {
-            if (!parseEntrySensorLinearAECtrlWeightMethod(psecsubchild->ToElement(), param)) {
-                LOGE("parse error in Aec (%s)", secsubTagname.c_str());
-                return (false);
-            }
+        else if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_LINAECTRL_BACKLIGHT_OEROI_LOWTH_TAG_ID)) {
+            int no = ParseFloatArray(psecsubchild, &mCalibDb->aec.LinearAeCtrl.BackLightConf.OEROILowTh, secsubtag.Size());
+            DCT_ASSERT((no == secsubtag.Size()));
         }
-        else if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_LINAECTRL_BACKLIGHT_DARKROI_METHOD_TAG_ID)) {
-            if (!parseEntrySensorLinearAECtrlDarkROIMethod(psecsubchild->ToElement(), param)) {
-                LOGE("parse error in Aec (%s)", secsubTagname.c_str());
-                return (false);
-            }
+        else if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_LINAECTRL_BACKLIGHT_LV_HIGHTH_TAG_ID)) {
+            int no = ParseFloatArray(psecsubchild, &mCalibDb->aec.LinearAeCtrl.BackLightConf.LvHightTh, secsubtag.Size());
+            DCT_ASSERT((no == secsubtag.Size()));
+        }
+        else if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_LINAECTRL_BACKLIGHT_LV_LOWTH_TAG_ID)) {
+            int no = ParseFloatArray(psecsubchild, &mCalibDb->aec.LinearAeCtrl.BackLightConf.LvLowTh, secsubtag.Size());
+            DCT_ASSERT((no == secsubtag.Size()));
+        }
+        else if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_LINAECTRL_BACKLIGHT_LUMADISTTH_TAG_ID)) {
+            int no = ParseFloatArray(psecsubchild, &mCalibDb->aec.LinearAeCtrl.BackLightConf.LumaDistTh, secsubtag.Size());
+            DCT_ASSERT((no == secsubtag.Size()));
+        }
+        else if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_LINAECTRL_BACKLIGHT_LOWLIGHTPDFTH_TAG_ID)) {
+            int i = (sizeof(mCalibDb->aec.LinearAeCtrl.BackLightConf.LowLightPdfTh) / sizeof(mCalibDb->aec.LinearAeCtrl.BackLightConf.LowLightPdfTh.fCoeff[0]));
+            int no = ParseFloatArray(psecsubchild, mCalibDb->aec.LinearAeCtrl.BackLightConf.LowLightPdfTh.fCoeff, i);
+            DCT_ASSERT((no == secsubtag.Size()));
+        }
+        else if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_LINAECTRL_BACKLIGHT_NONOEPDFTH_TAG_ID)) {
+            int i = (sizeof(mCalibDb->aec.LinearAeCtrl.BackLightConf.NonOEPdfTh) / sizeof(mCalibDb->aec.LinearAeCtrl.BackLightConf.NonOEPdfTh.fCoeff[0]));
+            int no = ParseFloatArray(psecsubchild, mCalibDb->aec.LinearAeCtrl.BackLightConf.NonOEPdfTh.fCoeff, i);
+            DCT_ASSERT((no == secsubtag.Size()));
+        }
+        else if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_LINAECTRL_BACKLIGHT_EXPLEVEL_TAG_ID)) {
+            int i = (sizeof(mCalibDb->aec.LinearAeCtrl.BackLightConf.ExpLevel) / sizeof(mCalibDb->aec.LinearAeCtrl.BackLightConf.ExpLevel.fCoeff[0]));
+            int no = ParseFloatArray(psecsubchild, mCalibDb->aec.LinearAeCtrl.BackLightConf.ExpLevel.fCoeff, i);
+            DCT_ASSERT((no == secsubtag.Size()));
+        }
+        else if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_LINAECTRL_BACKLIGHT_TARGETLLLUMA_TAG_ID)) {
+            int i = (sizeof(mCalibDb->aec.LinearAeCtrl.BackLightConf.TargetLLLuma) / sizeof(mCalibDb->aec.LinearAeCtrl.BackLightConf.TargetLLLuma.fCoeff[0]));
+            int no = ParseFloatArray(psecsubchild, mCalibDb->aec.LinearAeCtrl.BackLightConf.TargetLLLuma.fCoeff, i);
+            DCT_ASSERT((no == secsubtag.Size()));
         }
         else {
             redirectOut
@@ -5554,7 +5216,7 @@ bool RkAiqCalibParser::parseEntrySensorLinearAECtrlBackLight
     return (true);
 }
 
-bool RkAiqCalibParser::parseEntrySensorIntervalAdjustStrategy
+bool RkAiqCalibParser::parseEntrySensorLinearAECtrlOverExp
 (
     const XMLElement*   pelement,
     void*                param
@@ -5562,82 +5224,55 @@ bool RkAiqCalibParser::parseEntrySensorIntervalAdjustStrategy
     LOGD("%s(%d): (enter)\n", __FUNCTION__, __LINE__);
     autoTabForward();
 
-    XML_CHECK_START(CALIB_SENSOR_AEC_AEC_INTERVAL_ADJUST_STRATEGY_TAG_ID, CALIB_SENSOR_AEC_LINEARAE_CTRL_TAG_ID);
+    XML_CHECK_START(CALIB_SENSOR_LINAECTRL_OVEREXP_CONTROL_TAG_ID, CALIB_SENSOR_AEC_LINEARAE_CTRL_TAG_ID);
 
-    const XMLNode* psubsubchild = pelement->FirstChild();
-    while (psubsubchild) {
-        XmlTag subTag = XmlTag(psubsubchild->ToElement());
-        std::string subsubTagname(psubsubchild->ToElement()->Name());
-        XML_CHECK_WHILE_SUBTAG_MARK((char *)(subsubTagname.c_str()), subTag.Type(), subTag.Size());
+    const XMLNode* psecsubchild = pelement->FirstChild();
+    while (psecsubchild) {
+        XmlTag secsubtag = XmlTag(psecsubchild->ToElement());
+        std::string secsubTagname(psecsubchild->ToElement()->Name());
+        XML_CHECK_WHILE_SUBTAG_MARK((char *)(secsubTagname.c_str()), secsubtag.Type(), secsubtag.Size());
 #ifdef DEBUG_LOG
-        LOGE("%s(%d): subsubTagname = %s\n", __FUNCTION__, __LINE__, subsubTagname.c_str());
+        redirectOut << "secsubTagname: " << secsubTagname << std::endl;
 #endif
-        if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_AEC_ENABLE_TAG_ID)) {
-            int no = ParseUcharArray(psubsubchild, &mCalibDb->aec.LinearAeCtrl.InterAdjustStrategy.enable, subTag.Size());
-            DCT_ASSERT((no == subTag.Size()));
+        if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_LINAECTRL_OVEREXP_ENABLE_TAG_ID)) {
+            int no = ParseUcharArray(psecsubchild, &mCalibDb->aec.LinearAeCtrl.OverExpCtrl.enable, secsubtag.Size());
+            DCT_ASSERT((no == secsubtag.Size()));
         }
-        else if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_AEC_DLUMA_HIGH_TH_TAG_ID)) {
-            int no = ParseFloatArray(psubsubchild, &mCalibDb->aec.LinearAeCtrl.InterAdjustStrategy.dluma_high_th, subTag.Size());
-            DCT_ASSERT((no == subTag.Size()));
+        else if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_LINAECTRL_OVEREXP_LOWLIGHT_TH_TAG_ID)) {
+            int no = ParseFloatArray(psecsubchild, &mCalibDb->aec.LinearAeCtrl.OverExpCtrl.LowLightTh, secsubtag.Size());
+            DCT_ASSERT((no == secsubtag.Size()));
         }
-        else if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_AEC_DLUMA_LOW_TH_TAG_ID)) {
-            int no = ParseFloatArray(psubsubchild, &mCalibDb->aec.LinearAeCtrl.InterAdjustStrategy.dluma_low_th, subTag.Size());
-            DCT_ASSERT((no == subTag.Size()));
+        else if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_LINAECTRL_OVEREXP_HIGHLIGHT_TH_TAG_ID)) {
+            int no = ParseFloatArray(psecsubchild, &mCalibDb->aec.LinearAeCtrl.OverExpCtrl.HighLightTh, secsubtag.Size());
+            DCT_ASSERT((no == secsubtag.Size()));
         }
-        else if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_AEC_ADJUST_TRIGGER_FRAME_TAG_ID)) {
-            int no = ParseUcharArray(psubsubchild, &mCalibDb->aec.LinearAeCtrl.InterAdjustStrategy.trigger_frame, subTag.Size());
-            DCT_ASSERT((no == subTag.Size()));
+        else if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_LINAECTRL_OVEREXP_MAXWEIGHT_TAG_ID)) {
+            int no = ParseFloatArray(psecsubchild, &mCalibDb->aec.LinearAeCtrl.OverExpCtrl.MaxWeight, secsubtag.Size());
+            DCT_ASSERT((no == secsubtag.Size()));
+        }
+        else if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_LINAECTRL_OVEREXP_OEPDF_TAG_ID)) {
+            int i = (sizeof(mCalibDb->aec.LinearAeCtrl.OverExpCtrl.OEpdf) / sizeof(mCalibDb->aec.LinearAeCtrl.OverExpCtrl.OEpdf.fCoeff[0]));
+            int no = ParseFloatArray(psecsubchild, mCalibDb->aec.LinearAeCtrl.OverExpCtrl.OEpdf.fCoeff, i);
+            DCT_ASSERT((no == secsubtag.Size()));
+        }
+        else if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_LINAECTRL_OVEREXP_HIGHLIGHT_WEIGHT_TAG_ID)) {
+            int i = (sizeof(mCalibDb->aec.LinearAeCtrl.OverExpCtrl.HighLightWeight) / sizeof(mCalibDb->aec.LinearAeCtrl.OverExpCtrl.HighLightWeight.fCoeff[0]));
+            int no = ParseFloatArray(psecsubchild, mCalibDb->aec.LinearAeCtrl.OverExpCtrl.HighLightWeight.fCoeff, i);
+            DCT_ASSERT((no == secsubtag.Size()));
+        }
+        else if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_LINAECTRL_OVEREXP_LOWLIGHT_WEIGHT_TAG_ID)) {
+            int i = (sizeof(mCalibDb->aec.LinearAeCtrl.OverExpCtrl.LowLightWeight) / sizeof(mCalibDb->aec.LinearAeCtrl.OverExpCtrl.LowLightWeight.fCoeff[0]));
+            int no = ParseFloatArray(psecsubchild, mCalibDb->aec.LinearAeCtrl.OverExpCtrl.LowLightWeight.fCoeff, i);
+            DCT_ASSERT((no == secsubtag.Size()));
         }
         else {
             redirectOut
-                    << "parse error in AEC LINAECTRL InterAdjustStrategy (unknow tag: "
-                    << subsubTagname
+                    << "parse error in LINAECTRL OverExpCtrl section (unknow tag: "
+                    << secsubTagname
                     << ")"
                     << std::endl;
         }
-        psubsubchild = psubsubchild->NextSibling();
-    }
-
-    XML_CHECK_END();
-    autoTabBackward();
-    LOGD("%s(%d): (exit)\n", __FUNCTION__, __LINE__);
-    return (true);
-}
-
-bool RkAiqCalibParser::parseEntrySensorLinearAECtrlHist2hal
-(
-    const XMLElement*   pelement,
-    void*                param
-) {
-    LOGD("%s(%d): (enter)\n", __FUNCTION__, __LINE__);
-    autoTabForward();
-
-    XML_CHECK_START(CALIB_SENSOR_AEC_HIST2HAL_TAG_ID, CALIB_SENSOR_AEC_LINEARAE_CTRL_TAG_ID);
-
-    const XMLNode* psubsubchild = pelement->FirstChild();
-    while (psubsubchild) {
-        XmlTag subTag = XmlTag(psubsubchild->ToElement());
-        std::string subsubTagname(psubsubchild->ToElement()->Name());
-        XML_CHECK_WHILE_SUBTAG_MARK((char *)(subsubTagname.c_str()), subTag.Type(), subTag.Size());
-#ifdef DEBUG_LOG
-        LOGE("%s(%d): subsubTagname = %s\n", __FUNCTION__, __LINE__, subsubTagname.c_str());
-#endif
-        if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_AEC_ENABLE_TAG_ID)) {
-            int no = ParseUcharArray(psubsubchild, &mCalibDb->aec.LinearAeCtrl.Hist2Hal.enable, subTag.Size());
-            DCT_ASSERT((no == subTag.Size()));
-        }
-        else if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_AEC_LOWHISTBINTH_TAG_ID)) {
-            int no = ParseUcharArray(psubsubchild, &mCalibDb->aec.LinearAeCtrl.Hist2Hal.lowHistBinTh, subTag.Size());
-            DCT_ASSERT((no == subTag.Size()));
-        }
-        else {
-            redirectOut
-                    << "parse error in AEC LinearAeCtrl Hist2Hal (unknow tag: "
-                    << subsubTagname
-                    << ")"
-                    << std::endl;
-        }
-        psubsubchild = psubsubchild->NextSibling();
+        psecsubchild = psecsubchild->NextSibling();
     }
 
     XML_CHECK_END();
@@ -5735,30 +5370,19 @@ bool RkAiqCalibParser::parseEntrySensorLinearAECtrl
             }
 
         }
-        else if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_AEC_AOE_TAG_ID)) {
-            if (!parseEntrySensorLinearAECtrlAoe(psubchild->ToElement(), param)) {
-                LOGE("parse error in Aec (%s)", subTagname.c_str());
-                return (false);
-            }
-        }
         else if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_LINAECTRL_BACKLIGHT_CONFIG_TAG_ID)) {
             if (!parseEntrySensorLinearAECtrlBackLight(psubchild->ToElement(), param)) {
                 LOGE("parse error in Aec (%s)", subTagname.c_str());
                 return (false);
             }
         }
-        else if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_AEC_AEC_INTERVAL_ADJUST_STRATEGY_TAG_ID)) {
-            if (!parseEntrySensorIntervalAdjustStrategy(psubchild->ToElement(), param)) {
+        else if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_LINAECTRL_OVEREXP_CONTROL_TAG_ID)) {
+            if (!parseEntrySensorLinearAECtrlOverExp(psubchild->ToElement(), param)) {
                 LOGE("parse error in Aec (%s)", subTagname.c_str());
                 return (false);
             }
         }
-        else if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_AEC_HIST2HAL_TAG_ID)) {
-            if (!parseEntrySensorLinearAECtrlHist2hal(psubchild->ToElement(), param)) {
-                LOGE("parse error in Aec (%s)", subTagname.c_str());
-                return (false);
-            }
-        }
+
         psubchild = psubchild->NextSibling();
     }
 
@@ -6521,12 +6145,6 @@ bool RkAiqCalibParser::parseEntrySensorAec
         }
         else if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_AEC_AECFRAMERATEMODE_TAG_ID)) {
             if (!parseEntrySensorAecFrameRateMode(pchild->ToElement(), param)) {
-                LOGE("parse error in Aec (%s)", tagname.c_str());
-                return (false);
-            }
-        }
-        else if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_AEC_AECRANGE_TAG_ID)) {
-            if (!parseEntrySensorAecRange(pchild->ToElement(), param)) {
                 LOGE("parse error in Aec (%s)", tagname.c_str());
                 return (false);
             }

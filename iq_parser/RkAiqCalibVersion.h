@@ -50,14 +50,19 @@
  *  - magic code:1023357
  *  - Adpcc: Redefine DPCC in IQ files, add Expert Mode
  *  - Adpcc: Add fast mode in DPCC
-  * v1.1.8
+ * v1.1.8
  *  - magic code:1027323
  *  - Ahdr: remove Band_Prior from moresetting in IQ files
  *  - Ahdr: Add Band_Prior module in IQ files
+ * v1.1.9
+ *  - simplify params in Backlight, add MeasArea
+ *  - add OverExpCtrl in AEC
+ *  - delete useless iq params in AEC
+ *  - including:AOE,Hist2Hal,AecRange,InternalAdjust
  */
 
-#define RK_AIQ_CALIB_VERSION_REAL_V          "v1.1.8"
-#define RK_AIQ_CALIB_VERSION_MAGIC_V         "1027323"
+#define RK_AIQ_CALIB_VERSION_REAL_V          "v1.1.9"
+#define RK_AIQ_CALIB_VERSION_MAGIC_V         "996490"
 
 /******* DO NOT EDIT THE FOLLOWINGS ***********/
 

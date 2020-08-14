@@ -163,7 +163,7 @@ CamCalibDbContext_t* RkAiqCalibDb::createCalibDb(char* iqFile)
                     LOGE("get calibdb from bin failed.");
                 }
             } else {
-                LOGE("calibdb xml and bin are all not exist!");
+                LOGE("calibdb %s and bin are all not exist!", iqFile);
             }
         } else {
             LOGE("alloc calibdb memory failed.");
@@ -231,11 +231,16 @@ void RkAiqCalibDb::createCalibDbBinFromXml(char* iqFile)
         if (0 == access(iqFile, F_OK)) {
             RkAiqCalibParser  parser(pCalibDb);
             if (parser.doParse(iqFile)) {
-                LOGD("create calibdb from %s success.", iqFile);
-                if (calibSaveToFile(iqFile, pCalibDb))
-                    LOGD("save to bin success.");
-                else
-                    LOGE("save to bin failed.");
+                uint32_t magicCode = calib_check_calc_checksum();
+                if (magicCode != pCalibDb->header.magic_code) {
+                    LOGE("magic code is not matched! calculated:%u, readed:%u", magicCode, pCalibDb->header.magic_code);
+                }else {
+                    LOGD("create calibdb from %s success.", iqFile);
+                    if (calibSaveToFile(iqFile, pCalibDb))
+                        LOGD("save to bin success.");
+                    else
+                        LOGE("save to bin failed.");
+                }
             } else {
                 LOGE("parse %s failed.", iqFile);
             }

@@ -455,7 +455,6 @@ typedef enum {
     RK_MODULE_AWB,
     RK_MODULE_NR,
     RK_MODULE_GIC,
-    RK_MODULE_DHAZ,
     RK_MODULE_3DLUT,
     RK_MODULE_LDCH,
     RK_MODULE_TNR,

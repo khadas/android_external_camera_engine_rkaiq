@@ -158,6 +158,7 @@ private:
     bool parseEntrySensorLinearAECtrlWeightMethod(const XMLElement*, void* param = NULL);
     bool parseEntrySensorLinearAECtrlDarkROIMethod(const XMLElement*, void* param = NULL);
     bool parseEntrySensorLinearAECtrlBackLight(const XMLElement*, void* param = NULL);
+    bool parseEntrySensorLinearAECtrlOverExp(const XMLElement*, void* param = NULL);
     bool parseEntrySensorIntervalAdjustStrategy(const XMLElement*, void* param = NULL);
     bool parseEntrySensorLinearAECtrlHist2hal(const XMLElement*, void* param = NULL);
     bool parseEntrySensorHdrAECtrlExpRatioCtrl(const XMLElement*, void* param = NULL);

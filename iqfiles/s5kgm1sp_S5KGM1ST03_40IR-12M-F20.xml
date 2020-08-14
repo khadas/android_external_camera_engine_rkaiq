@@ -1,6 +1,6 @@
-<?xml version="1.0" encoding="utf-8"?><matfile>   <header type="struct" size="[1 1]">      <code_xml_parse_version index="1" type="char" size="[1 6]">            v1.1.8      </code_xml_parse_version>      <creation_date index="1" type="char" size="[1 11]">         2020-04-24      </creation_date>      <creator index="1" type="char" size="[1 2]">         sandy      </creator>      <sensor_name index="1" type="char" size="[1 7]">            s5kgm1sp      </sensor_name>      <sample_name index="1" type="char" size="[1 9]">            S5KGM1ST03      </sample_name>      <generator_version index="1" type="char" size="[1 4]">         v0.0.1      </generator_version>
+<?xml version="1.0" encoding="utf-8"?><matfile>   <header type="struct" size="[1 1]">      <code_xml_parse_version index="1" type="char" size="[1 6]">            v1.1.9      </code_xml_parse_version>      <creation_date index="1" type="char" size="[1 11]">         2020-04-24      </creation_date>      <creator index="1" type="char" size="[1 2]">         sandy      </creator>      <sensor_name index="1" type="char" size="[1 7]">            s5kgm1sp      </sensor_name>      <sample_name index="1" type="char" size="[1 9]">            S5KGM1ST03      </sample_name>      <generator_version index="1" type="char" size="[1 4]">         v0.0.1      </generator_version>
       <magic_code_version  index="1" type="int" size="[1 1]">
-       [1027323]
+       [996490]
       </magic_code_version>   </header>   <sensor type="struct" size="[1 1]">
       <AWB index="1" type="struct" size="[1 1]">
 	 <wbBypass index="1" type="double" size="[1 1]">	   [0]	 </wbBypass>
@@ -863,27 +863,7 @@
                [0]
             </FpsValue>
          </AecFrameRateMode>
-         <AecAntiFlicker index="1" type="struct" size="[1 1]">            <enable index="1" type="double" size="[1 1]">               [1]            </enable>            <Frequency index="1" type="char" size="[1 15]">               FLICKER_50HZ            </Frequency>            <Mode index="1" type="char" size="[1 10]">               AUTO            </Mode>         </AecAntiFlicker>           <AecRange index="1" type="struct" size="[1 1]">
-	     <Enable index="1" type="double" size="[1 1]">
-	         [0]
-	     </Enable>
-              <LinearAE index="1" type="struct" size="[1 1]">
-                 <TimeRange index="1" type="double" size="[1 2]">                       [0  0]                  </TimeRange>
-	         <GainRange index="1" type="double" size="[1 2]">                       [0  0]                  </GainRange>
-	         <IspDgainRange index="1" type="double" size="[1 2]">                       [0  0]                    </IspDgainRange>
-	         <PIrisRange index="1" type="double" size="[1 2]">                       [0  0]                  </PIrisRange>
-              </LinearAE>
-              <HdrAE index="1" type="struct" size="[1 1]">
-                 <TimeRangeMin index="1" type="double" size="[1 3]">                       [0 0 0]                  </TimeRangeMin>
-                 <TimeRangeMax index="1" type="double" size="[1 3]">                       [0 0 0]                  </TimeRangeMax>
-	         <GainRangeMin index="1" type="double" size="[1 3]">                       [0 0 0]                  </GainRangeMin>
-	         <GainRangeMax index="1" type="double" size="[1 3]">                       [0 0 0]                  </GainRangeMax>
-	         <IspDgainRangeMin index="1" type="double" size="[1 3]">                       [0 0 0]                  </IspDgainRangeMin>
-	         <IspDgainRangeMax index="1" type="double" size="[1 3]">                       [0 0 0]                  </IspDgainRangeMax>
-	         <PIrisRange index="1" type="double" size="[1 2]">                       [0  0]                  </PIrisRange>
-              </HdrAE>
-           </AecRange>
-	<AecInitValue index="1" type="struct" size="[1 1]">            <LinearAE index="1" type="struct" size="[1 1]">                  <InitTimeValue index="1" type="double" size="[1 1]">                     [0.003]                  </InitTimeValue>
+         <AecAntiFlicker index="1" type="struct" size="[1 1]">            <enable index="1" type="double" size="[1 1]">               [1]            </enable>            <Frequency index="1" type="char" size="[1 15]">               FLICKER_50HZ            </Frequency>            <Mode index="1" type="char" size="[1 10]">               AUTO            </Mode>         </AecAntiFlicker>	<AecInitValue index="1" type="struct" size="[1 1]">            <LinearAE index="1" type="struct" size="[1 1]">                  <InitTimeValue index="1" type="double" size="[1 1]">                     [0.003]                  </InitTimeValue>
 	         <InitGainValue index="1" type="double" size="[1 1]">                     [1]                  </InitGainValue>
 	         <InitIspDgainValue index="1" type="double" size="[1 1]">                     [1]                  </InitIspDgainValue>
 	         <InitPIrisValue index="1" type="double" size="[1 1]">                     [1.4]                  </InitPIrisValue>            </LinearAE>            <HdrAE index="1" type="struct" size="[1 1]">                  <InitTimeValue index="1" type="double" size="[1 3]">                     [0.003 0.003 0.003]                  </InitTimeValue>
@@ -1014,11 +994,62 @@
                  </DySetpoint>
               </cell>
            </DynamicSetpoint>
-           <Evbias index="1" type="double" size="[1 1]">              [0]           </Evbias>           <Tolerance index="1" type="double" size="[1 1]">              [10]           </Tolerance>      	  <StrategyMode index="1" type="char" size="[1 20]">              LOWLIGHT_PRIOR           </StrategyMode>           <AOE index="1" type="struct" size="[1 1]">              <AOE_Enable index="1" type="double" size="[1 1]">                 [0]              </AOE_Enable>              <AOE_Max_point index="1" type="double" size="[1 1]">                 [70]              </AOE_Max_point>              <AOE_Min_point index="1" type="double" size="[1 1]">                 [50]              </AOE_Min_point>              <AOE_Y_Max_th index="1" type="double" size="[1 1]">                 [0.2]              </AOE_Y_Max_th>              <AOE_Y_Min_th index="1" type="double" size="[1 1]">                 [0.1]              </AOE_Y_Min_th>              <AOE_Step_Inc index="1" type="double" size="[1 1]">                 [2]              </AOE_Step_Inc>              <AOE_Step_Dec index="1" type="double" size="[1 1]">                 [2]              </AOE_Step_Dec>
-           </AOE>
-           <BackLight index="1" type="struct" size="[1 1]">              <Enable index="1" type="double" size="[1 1]">                 [0]              </Enable>              <Mode index="1" type="char" size="[1 8]">                 DARKROI              </Mode>              <WeightMethod index="1" type="struct" size="[1 1]">                 <LumaLowTh index="1" type="double" size="[1 1]">                    [100]                 </LumaLowTh>                 <LumaHighTh index="1" type="double" size="[1 1]">                    [180]                 </LumaHighTh>                 <LvTh index="1" type="double" size="[1 1]">                    [0]                 </LvTh>                 <WeightMinTh index="1" type="double" size="[1 1]">                    [0.3]                 </WeightMinTh>                 <WeightMaxTh index="1" type="double" size="[1 1]">                    [0.7]                 </WeightMaxTh>              </WeightMethod>              <DarkROIMethod index="1" type="struct" size="[1 1]">                 <OEROILowTh index="1" type="double" size="[1 1]">                    [150]                 </OEROILowTh>                 <LvHighTh index="1" type="double" size="[1 1]">                    [3]                 </LvHighTh>                 <LvLowTh index="1" type="double" size="[1 1]">                    [0.25]                 </LvLowTh>
-                 <LumaDistTh index="1" type="double" size="[1 1]">                    [10]                 </LumaDistTh>                 <ExpLevel index="1" type="double" size="[1 6]">                    [0 0.02 0.06 0.1 0.5 1]                 </ExpLevel>                 <NonOEPdfTh index="1" type="double" size="[1 6]">                    [0.05 0.1 0.2 0.5 0.7 1]                 </NonOEPdfTh>                 <LowLightPdfTh index="1" type="double" size="[1 6]">                    [0.20 0.20 0.22 0.25 0.3 0.35]                 </LowLightPdfTh>                 <TargetLLLuma index="1" type="double" size="[1 6]">                    [45 42 40 35 28 20]                 </TargetLLLuma>              </DarkROIMethod>           </BackLight>           <IntervalAdjustStrategy index="1" type="struct" size="[1 1]">              <Enable index="1" type="double" size="[1 1]">                 [0]              </Enable>              <dLuma_high_th index="1" type="double" size="[1 1]">                 [0.5]              </dLuma_high_th>              <dLuma_low_th index="1" type="double" size="[1 1]">                 [0.03]              </dLuma_low_th>              <adjust_trigger_frame index="1" type="double" size="[1 1]">                 [100]              </adjust_trigger_frame>           </IntervalAdjustStrategy>
-           <Hist2hal index="1" type="struct" size="[1 1]">              <Enable index="1" type="double" size="[1 1]">                 [0]              </Enable>              <LowHistBinTh index="1" type="double" size="[1 1]">                 [13]              </LowHistBinTh>           </Hist2hal>	</LinearAECtrl>         <HdrAECtrl index="1" type="struct" size="[1 1]">
+           <Evbias index="1" type="double" size="[1 1]">              [0]           </Evbias>           <Tolerance index="1" type="double" size="[1 1]">              [10]           </Tolerance>      	  <StrategyMode index="1" type="char" size="[1 20]">              LOWLIGHT_PRIOR           </StrategyMode>           <BackLightCtrl index="1" type="struct" size="[1 1]">
+              <Enable index="1" type="double" size="[1 1]">
+                 [0]
+              </Enable>
+              <MeasArea index="1" type="char" size="[1 8]">
+                 AUTO
+              </MeasArea>
+             <LumaDistTh index="1" type="double" size="[1 1]">
+                [10]
+             </LumaDistTh>              
+             <OEROILowTh index="1" type="double" size="[1 1]">
+                [150]
+             </OEROILowTh>
+             <LvHighTh index="1" type="double" size="[1 1]">
+                [7.5]
+             </LvHighTh>
+             <LvLowTh index="1" type="double" size="[1 1]">
+                [0.3125]
+             </LvLowTh>
+             <ExpLevel index="1" type="double" size="[1 6]">
+                [0.05 0.1 0.2 0.3 0.5 0.7]
+             </ExpLevel>
+             <NonOEPdfTh index="1" type="double" size="[1 6]">
+                [0.4 0.45 0.55 0.65 0.75 1]
+             </NonOEPdfTh>
+             <LowLightPdfTh index="1" type="double" size="[1 6]">
+                [0.20 0.20 0.22 0.25 0.3 0.35]
+             </LowLightPdfTh>
+             <TargetLLLuma index="1" type="double" size="[1 6]">
+                [25 22 20 18 15 12]
+             </TargetLLLuma>
+           </BackLightCtrl>
+           <OverExpCtrl index="1" type="struct" size="[1 1]">
+              <Enable index="1" type="double" size="[1 1]">
+                 [0]
+              </Enable>
+             <HighLightTh index="1" type="double" size="[1 1]">
+                [150]
+             </HighLightTh>              
+             <LowLightTh index="1" type="double" size="[1 1]">
+                [30]
+             </LowLightTh>
+             <MaxWeight index="1" type="double" size="[1 1]">
+                [8]
+             </MaxWeight>
+             <OEpdf index="1" type="double" size="[1 6]">
+                [0.01 0.02 0.03 0.04 0.05 0.07]
+             </OEpdf>
+             <HighLightWeight index="1" type="double" size="[1 6]">
+                [4 3 3 3 2 2]
+             </HighLightWeight>
+             <LowLightWeight index="1" type="double" size="[1 6]">
+                [1 1 1 1 1 1]
+             </LowLightWeight>
+           </OverExpCtrl>
+	</LinearAECtrl>         <HdrAECtrl index="1" type="struct" size="[1 1]">
             <Evbias index="1" type="double" size="[1 1]">               [0]            </Evbias>            <Tolerance index="1" type="double" size="[1 1]">               [10]            </Tolerance>
       	   <LongFrmMode index="1" type="struct" size="[1 1]">	      <mode index="1" type="char" size="[1 20]">	         NORMAL	      </mode>
 	      <SfrmMinLine index="1" type="double" size="[1 1]">	         [160]	      </SfrmMinLine>
