@@ -39,7 +39,7 @@
 #include "agic/rk_aiq_uapi_agic_int.h"
 #include "afec/rk_aiq_uapi_afec_int.h"
 #include "af/rk_aiq_uapi_af_int.h"
-
+#include "asd/rk_aiq_uapi_asd_int.h"
 
 namespace RkCam {
 
@@ -86,7 +86,7 @@ protected:
 //RKAIQHANDLEINT(Alsc);
 //RKAIQHANDLEINT(Asharp);
 //RKAIQHANDLEINT(Adhaz);
-RKAIQHANDLEINT(Asd);
+//RKAIQHANDLEINT(Asd);
 RKAIQHANDLEINT(Acp);
 //RKAIQHANDLEINT(A3dlut);
 //RKAIQHANDLEINT(Ablc);
@@ -714,6 +714,36 @@ private:
     // TODO
 };
 
+class RkAiqAsdHandleInt:
+    virtual public RkAiqAsdHandle,
+    virtual public RkAiqHandleIntCom {
+public:
+    explicit RkAiqAsdHandleInt(RkAiqAlgoDesComm* des, RkAiqCore* aiqCore)
+        : RkAiqHandle(des, aiqCore)
+        , RkAiqAsdHandle(des, aiqCore)
+        , RkAiqHandleIntCom(des, aiqCore) {};
+    virtual ~RkAiqAsdHandleInt() {
+        RkAiqAsdHandle::deInit();
+    };
+    virtual XCamReturn updateConfig();
+    virtual XCamReturn prepare();
+    virtual XCamReturn preProcess();
+    virtual XCamReturn processing();
+    virtual XCamReturn postProcess();
+    // TODO add algo specific methords, this is a sample
+    XCamReturn setAttrib(asd_attrib_t att);
+    XCamReturn getAttrib(asd_attrib_t *att);
+protected:
+    virtual void init();
+    virtual void deInit() {
+        RkAiqAsdHandle::deInit();
+    };
+private:
+    // TODO
+    XCam::Mutex mCfgMutex;
+    asd_attrib_t mCurAtt;
+    asd_attrib_t mNewAtt;
+};
 }; //namespace RkCam
 
 #endif

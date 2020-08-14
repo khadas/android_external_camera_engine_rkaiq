@@ -452,9 +452,6 @@ typedef struct AecProcResult_s {
     float                         MeanLuma;
     float                         LumaDeviation;
 
-    bool_t                        aoe_enable;
-    float                         overHistPercent;
-
     /***Hdr results****/
     bool                          LongFrmMode;
     float                         HdrMeanLuma[3];

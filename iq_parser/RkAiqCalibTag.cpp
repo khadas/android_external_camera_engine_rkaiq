@@ -375,7 +375,6 @@ uint32_t calib_sensor_aec_sub_tags[] = {
     CALIB_SENSOR_AEC_AECDELAYFRMNUM_TAG_ID,
     CALIB_SENSOR_AEC_AECFRAMERATEMODE_TAG_ID,
     CALIB_SENSOR_AEC_ANTIFLICKER_TAG_ID,
-    CALIB_SENSOR_AEC_AECRANGE_TAG_ID,
     CALIB_SENSOR_AEC_AECINITVALUE_TAG_ID,
     CALIB_SENSOR_AEC_AECGRIDWEIGHT_TAG_ID,
     CALIB_SENSOR_AEC_AECROUTE_TAG_ID,
@@ -407,29 +406,6 @@ uint32_t calib_sensor_aec_AecAntiFlicker_sub_tags[] = {
     CALIB_SENSOR_AEC_ANTIFLICKER_ENABLE_TAG_ID,
     CALIB_SENSOR_AEC_ANTIFLICKER_FREQ_TAG_ID,
     CALIB_SENSOR_AEC_ANTIFLICKER_MODE_TAG_ID,
-};
-
-uint32_t calib_sensor_aec_AecRange_sub_tags[] = {
-    CALIB_SENSOR_AEC_AECRANGE_ENABLE_TAG_ID,
-    CALIB_SENSOR_AEC_AECRANGE_LINEARAE_TAG_ID,
-    CALIB_SENSOR_AEC_AECRANGE_HDRAE_TAG_ID,
-};
-
-uint32_t calib_sensor_aec_AecRange_LinearAE_sub_tags[] = {
-    CALIB_SENSOR_AEC_TIMERANGE_TAG_ID,
-    CALIB_SENSOR_AEC_GAINRANGE_TAG_ID,
-    CALIB_SENSOR_AEC_ISPDGAINRANGE_TAG_ID,
-    CALIB_SENSOR_AEC_PIRISRANGE_TAG_ID,
-};
-
-uint32_t calib_sensor_aec_AecRange_HdrAE_sub_tags[] = {
-    CALIB_SENSOR_AEC_HDR_TIMERANGE_MIN_TAG_ID,
-    CALIB_SENSOR_AEC_HDR_TIMERANGE_MAX_TAG_ID,
-    CALIB_SENSOR_AEC_HDR_GAINRANGE_MIN_TAG_ID,
-    CALIB_SENSOR_AEC_HDR_GAINRANGE_MAX_TAG_ID,
-    CALIB_SENSOR_AEC_HDR_ISPDGAINRANGE_MIN_TAG_ID,
-    CALIB_SENSOR_AEC_HDR_ISPDGAINRANGE_MAX_TAG_ID,
-    CALIB_SENSOR_AEC_HDR_PIRISRANGE_TAG_ID,
 };
 
 uint32_t calib_sensor_aec_AecInitValue_sub_tags[] = {
@@ -552,10 +528,8 @@ uint32_t calib_sensor_aec_LinearAECtrl_sub_tags[] = {
     CALIB_SENSOR_AEC_EVBIAS_TAG_ID,
     CALIB_SENSOR_AEC_TOLERANCE_TAG_ID,
     CALIB_SENSOR_AEC_STRATEGYMODE_TAG_ID,
-    CALIB_SENSOR_AEC_AOE_TAG_ID,
     CALIB_SENSOR_LINAECTRL_BACKLIGHT_CONFIG_TAG_ID,
-    CALIB_SENSOR_AEC_AEC_INTERVAL_ADJUST_STRATEGY_TAG_ID,
-    CALIB_SENSOR_AEC_HIST2HAL_TAG_ID,
+    CALIB_SENSOR_LINAECTRL_OVEREXP_CONTROL_TAG_ID,
 };
 
 uint32_t calib_sensor_aec_DySetPointEn_sub_tags[] = {
@@ -564,32 +538,10 @@ uint32_t calib_sensor_aec_DySetPointEn_sub_tags[] = {
     CALIB_SENSOR_AEC_DYSETPOINT_TAG_ID,
 };
 
-uint32_t calib_sensor_aec_AOE_sub_tags[] = {
-    CALIB_SENSOR_AEC_AOE_ENABLE_TAG_ID,
-    CALIB_SENSOR_AEC_AOE_MAX_POINT_TAG_ID,
-    CALIB_SENSOR_AEC_AOE_MIN_POINT_TAG_ID,
-    CALIB_SENSOR_AEC_AOE_Y_MAX_TH_TAG_ID,
-    CALIB_SENSOR_AEC_AOE_Y_MIN_TH_TAG_ID,
-    CALIB_SENSOR_AEC_AOE_STEP_INC_TAG_ID,
-    CALIB_SENSOR_AEC_AOE_STEP_DEC_TAG_ID,
-};
 
 uint32_t calib_sensor_aec_BackLight_sub_tags[] = {
     CALIB_SENSOR_LINAECTRL_BACKLIGHT_ENABLE_TAG_ID,
-    CALIB_SENSOR_LINAECTRL_BACKLIGHT_MODE_TAG_ID,
-    CALIB_SENSOR_LINAECTRL_BACKLIGHT_WEIGHT_METHOD_TAG_ID,
-    CALIB_SENSOR_LINAECTRL_BACKLIGHT_DARKROI_METHOD_TAG_ID,
-};
-
-uint32_t calib_sensor_aec_WeightMethod_sub_tags[] = {
-    CALIB_SENSOR_LINAECTRL_BACKLIGHT_LUMALOWTH_TAG_ID,
-    CALIB_SENSOR_LINAECTRL_BACKLIGHT_LUMAHIGHTH_TAG_ID,
-    CALIB_SENSOR_LINAECTRL_BACKLIGHT_LVTH_TAG_ID,
-    CALIB_SENSOR_LINAECTRL_BACKLIGHT_WEIGHTMINTH_TAG_ID,
-    CALIB_SENSOR_LINAECTRL_BACKLIGHT_WEIGHTMAXTH_TAG_ID,
-};
-
-uint32_t calib_sensor_aec_DarkROIMethod_sub_tags[] = {
+    CALIB_SENSOR_LINAECTRL_BACKLIGHT_MEASAREA_TAG_ID,
     CALIB_SENSOR_LINAECTRL_BACKLIGHT_OEROI_LOWTH_TAG_ID,
     CALIB_SENSOR_LINAECTRL_BACKLIGHT_LV_LOWTH_TAG_ID,
     CALIB_SENSOR_LINAECTRL_BACKLIGHT_LV_HIGHTH_TAG_ID,
@@ -600,16 +552,14 @@ uint32_t calib_sensor_aec_DarkROIMethod_sub_tags[] = {
     CALIB_SENSOR_LINAECTRL_BACKLIGHT_LUMADISTTH_TAG_ID,
 };
 
-uint32_t calib_sensor_aec_IntervalAdjustStrategy_sub_tags[] = {
-    CALIB_SENSOR_AEC_ENABLE_TAG_ID,
-    CALIB_SENSOR_AEC_DLUMA_HIGH_TH_TAG_ID,
-    CALIB_SENSOR_AEC_DLUMA_LOW_TH_TAG_ID,
-    CALIB_SENSOR_AEC_ADJUST_TRIGGER_FRAME_TAG_ID,
-};
-
-uint32_t calib_sensor_aec_Hist2hal_sub_tags[] = {
-    CALIB_SENSOR_AEC_ENABLE_TAG_ID,
-    CALIB_SENSOR_AEC_LOWHISTBINTH_TAG_ID,
+uint32_t calib_sensor_aec_OverExp_sub_tags[] = {
+    CALIB_SENSOR_LINAECTRL_OVEREXP_ENABLE_TAG_ID,
+    CALIB_SENSOR_LINAECTRL_OVEREXP_HIGHLIGHT_TH_TAG_ID,
+    CALIB_SENSOR_LINAECTRL_OVEREXP_LOWLIGHT_TH_TAG_ID,
+    CALIB_SENSOR_LINAECTRL_OVEREXP_MAXWEIGHT_TAG_ID,
+    CALIB_SENSOR_LINAECTRL_OVEREXP_OEPDF_TAG_ID,
+    CALIB_SENSOR_LINAECTRL_OVEREXP_HIGHLIGHT_WEIGHT_TAG_ID,
+    CALIB_SENSOR_LINAECTRL_OVEREXP_LOWLIGHT_WEIGHT_TAG_ID,
 };
 
 uint32_t calib_sensor_aec_HdrAECtrl_sub_tags[] = {
@@ -2454,77 +2404,6 @@ calib_tag_info_t g_calib_tag_infos[CALIB_IQ_TAG_END] = {
         check_tags_array_ignore, NULL
     },
 
-    [CALIB_SENSOR_AEC_AECRANGE_TAG_ID]         =
-    {   "AecRange", CALIB_TAG_TYPE_STRUCT, {-1, -1},
-        check_tags_array_info(calib_sensor_aec_AecRange_sub_tags), NULL
-    },
-    [CALIB_SENSOR_AEC_AECRANGE_ENABLE_TAG_ID]         =
-    {   "Enable", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
-        check_tags_array_ignore, NULL
-    },
-
-    [CALIB_SENSOR_AEC_AECRANGE_LINEARAE_TAG_ID]         =
-    {   "LinearAE", CALIB_TAG_TYPE_STRUCT, {-1, -1},
-        check_tags_array_info(calib_sensor_aec_AecRange_LinearAE_sub_tags), NULL
-    },
-    [CALIB_SENSOR_AEC_TIMERANGE_TAG_ID]         =
-    {   "TimeRange", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
-        check_tags_array_ignore, NULL
-    },
-    [CALIB_SENSOR_AEC_MAXVALUE_TAG_ID]         =
-    {   "MaxValue", CALIB_TAG_TYPE_UNKNOWN, {-1, -1},
-        check_tags_array_ignore, NULL
-    },
-    [CALIB_SENSOR_AEC_MINVALUE_TAG_ID]         =
-    {   "MinValue", CALIB_TAG_TYPE_UNKNOWN, {-1, -1},
-        check_tags_array_ignore, NULL
-    },
-    [CALIB_SENSOR_AEC_GAINRANGE_TAG_ID]         =
-    {   "GainRange", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
-        check_tags_array_ignore, NULL
-    },
-    [CALIB_SENSOR_AEC_ISPDGAINRANGE_TAG_ID]         =
-    {   "IspDgainRange", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
-        check_tags_array_ignore, NULL
-    },
-    [CALIB_SENSOR_AEC_PIRISRANGE_TAG_ID]         =
-    {   "PIrisRange", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
-        check_tags_array_ignore, NULL
-    },
-
-    [CALIB_SENSOR_AEC_AECRANGE_HDRAE_TAG_ID]         =
-    {   "HdrAE", CALIB_TAG_TYPE_STRUCT, {-1, -1},
-        check_tags_array_info(calib_sensor_aec_AecRange_HdrAE_sub_tags), NULL
-    },
-    [CALIB_SENSOR_AEC_HDR_TIMERANGE_MIN_TAG_ID]         =
-    {   "TimeRangeMin", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
-        check_tags_array_ignore, NULL
-    },
-    [CALIB_SENSOR_AEC_HDR_TIMERANGE_MAX_TAG_ID]         =
-    {   "TimeRangeMax", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
-        check_tags_array_ignore, NULL
-    },
-    [CALIB_SENSOR_AEC_HDR_GAINRANGE_MIN_TAG_ID]         =
-    {   "GainRangeMin", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
-        check_tags_array_ignore, NULL
-    },
-    [CALIB_SENSOR_AEC_HDR_GAINRANGE_MAX_TAG_ID]         =
-    {   "GainRangeMax", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
-        check_tags_array_ignore, NULL
-    },
-    [CALIB_SENSOR_AEC_HDR_ISPDGAINRANGE_MIN_TAG_ID]         =
-    {   "IspDgainRangeMin", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
-        check_tags_array_ignore, NULL
-    },
-    [CALIB_SENSOR_AEC_HDR_ISPDGAINRANGE_MAX_TAG_ID]         =
-    {   "IspDgainRangeMax", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
-        check_tags_array_ignore, NULL
-    },
-    [CALIB_SENSOR_AEC_HDR_PIRISRANGE_TAG_ID]         =
-    {   "PIrisRange", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
-        check_tags_array_ignore, NULL
-    },
-
     [CALIB_SENSOR_AEC_AECINITVALUE_TAG_ID]         =
     {   "AecInitValue", CALIB_TAG_TYPE_STRUCT, {-1, -1},
         check_tags_array_info(calib_sensor_aec_AecInitValue_sub_tags), NULL
@@ -2747,88 +2626,41 @@ calib_tag_info_t g_calib_tag_infos[CALIB_IQ_TAG_END] = {
         check_tags_array_ignore, NULL
     },
 
-    [CALIB_SENSOR_AEC_AOE_TAG_ID]         =
-    {   "AOE", CALIB_TAG_TYPE_STRUCT, {-1, -1},
-        check_tags_array_info(calib_sensor_aec_AOE_sub_tags), NULL
-    },
-    [CALIB_SENSOR_AEC_AOE_ENABLE_TAG_ID]         =
-    {   "AOE_Enable", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
-        check_tags_array_ignore, NULL
-    },
-    [CALIB_SENSOR_AEC_AOE_MAX_POINT_TAG_ID]         =
-    {   "AOE_Max_point", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
-        check_tags_array_ignore, NULL
-    },
-    [CALIB_SENSOR_AEC_AOE_MIN_POINT_TAG_ID]         =
-    {   "AOE_Min_point", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
-        check_tags_array_ignore, NULL
-    },
-    [CALIB_SENSOR_AEC_AOE_Y_MAX_TH_TAG_ID]         =
-    {   "AOE_Y_Max_th", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
-        check_tags_array_ignore, NULL
-    },
-    [CALIB_SENSOR_AEC_AOE_Y_MIN_TH_TAG_ID]         =
-    {   "AOE_Y_Min_th", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
-        check_tags_array_ignore, NULL
-    },
-    [CALIB_SENSOR_AEC_AOE_STEP_INC_TAG_ID]         =
-    {   "AOE_Step_Inc", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
-        check_tags_array_ignore, NULL
-    },
-    [CALIB_SENSOR_AEC_AOE_STEP_DEC_TAG_ID]         =
-    {   "AOE_Step_Dec", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
-        check_tags_array_ignore, NULL
-    },
-
     [CALIB_SENSOR_LINAECTRL_BACKLIGHT_CONFIG_TAG_ID]         =
-    {   "BackLight", CALIB_TAG_TYPE_STRUCT, {-1, -1},
+    {   "BackLightCtrl", CALIB_TAG_TYPE_STRUCT, {-1, -1},
         check_tags_array_info(calib_sensor_aec_BackLight_sub_tags), NULL
     },
     [CALIB_SENSOR_LINAECTRL_BACKLIGHT_ENABLE_TAG_ID]         =
     {   "Enable", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
         check_tags_array_ignore, NULL
     },
-    [CALIB_SENSOR_LINAECTRL_BACKLIGHT_MODE_TAG_ID]         =
-    {   "Mode", CALIB_TAG_TYPE_CHAR, {-1, -1},
+    [CALIB_SENSOR_LINAECTRL_BACKLIGHT_MEASAREA_TAG_ID]       =
+    {   "MeasArea", CALIB_TAG_TYPE_CHAR, {-1, -1},
         check_tags_array_ignore, NULL
     },
-    [CALIB_SENSOR_LINAECTRL_BACKLIGHT_MODE_WEIGHT_TAG_ID]         =
-    {   "WEIGHT", CALIB_TAG_TYPE_UNKNOWN, {-1, -1},
+    [CALIB_SENSOR_LINAECTRL_BACKLIGHT_MEASAREA_AUTO_TAG_ID]      =
+    {   "AUTO", CALIB_TAG_TYPE_UNKNOWN, {-1, -1},
         check_tags_array_ignore, NULL
     },
-    [CALIB_SENSOR_LINAECTRL_BACKLIGHT_MODE_DARKROI_TAG_ID]         =
-    {   "DARKROI", CALIB_TAG_TYPE_UNKNOWN, {-1, -1},
+    [CALIB_SENSOR_LINAECTRL_BACKLIGHT_MEASAREA_CENTER_TAG_ID]        =
+    {   "CENTER", CALIB_TAG_TYPE_UNKNOWN, {-1, -1},
         check_tags_array_ignore, NULL
     },
-
-    [CALIB_SENSOR_LINAECTRL_BACKLIGHT_WEIGHT_METHOD_TAG_ID]         =
-    {   "WeightMethod", CALIB_TAG_TYPE_STRUCT, {-1, -1},
-        check_tags_array_info(calib_sensor_aec_WeightMethod_sub_tags), NULL
-    },
-    [CALIB_SENSOR_LINAECTRL_BACKLIGHT_LUMALOWTH_TAG_ID]         =
-    {   "LumaLowTh", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
+    [CALIB_SENSOR_LINAECTRL_BACKLIGHT_MEASAREA_LEFT_TAG_ID]      =
+    {   "LEFT", CALIB_TAG_TYPE_UNKNOWN, {-1, -1},
         check_tags_array_ignore, NULL
     },
-    [CALIB_SENSOR_LINAECTRL_BACKLIGHT_LUMAHIGHTH_TAG_ID]         =
-    {   "LumaHighTh", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
+    [CALIB_SENSOR_LINAECTRL_BACKLIGHT_MEASAREA_RIGHT_TAG_ID]         =
+    {   "RIGHT", CALIB_TAG_TYPE_UNKNOWN, {-1, -1},
         check_tags_array_ignore, NULL
     },
-    [CALIB_SENSOR_LINAECTRL_BACKLIGHT_LVTH_TAG_ID]         =
-    {   "LvTh", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
+    [CALIB_SENSOR_LINAECTRL_BACKLIGHT_MEASAREA_UP_TAG_ID]        =
+    {   "UP", CALIB_TAG_TYPE_UNKNOWN, {-1, -1},
         check_tags_array_ignore, NULL
     },
-    [CALIB_SENSOR_LINAECTRL_BACKLIGHT_WEIGHTMINTH_TAG_ID]         =
-    {   "WeightMinTh", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
+    [CALIB_SENSOR_LINAECTRL_BACKLIGHT_MEASAREA_BOTTOM_TAG_ID]        =
+    {   "BOTTOM", CALIB_TAG_TYPE_UNKNOWN, {-1, -1},
         check_tags_array_ignore, NULL
-    },
-    [CALIB_SENSOR_LINAECTRL_BACKLIGHT_WEIGHTMAXTH_TAG_ID]         =
-    {   "WeightMaxTh", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
-        check_tags_array_ignore, NULL
-    },
-
-    [CALIB_SENSOR_LINAECTRL_BACKLIGHT_DARKROI_METHOD_TAG_ID]         =
-    {   "DarkROIMethod", CALIB_TAG_TYPE_STRUCT, {-1, -1},
-        check_tags_array_info(calib_sensor_aec_DarkROIMethod_sub_tags), NULL
     },
     [CALIB_SENSOR_LINAECTRL_BACKLIGHT_OEROI_LOWTH_TAG_ID]         =
     {   "OEROILowTh", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
@@ -2863,29 +2695,36 @@ calib_tag_info_t g_calib_tag_infos[CALIB_IQ_TAG_END] = {
         check_tags_array_ignore, NULL
     },
 
-    [CALIB_SENSOR_AEC_AEC_INTERVAL_ADJUST_STRATEGY_TAG_ID]         =
-    {   "IntervalAdjustStrategy", CALIB_TAG_TYPE_STRUCT, {-1, -1},
-        check_tags_array_info(calib_sensor_aec_IntervalAdjustStrategy_sub_tags), NULL
+    [CALIB_SENSOR_LINAECTRL_OVEREXP_CONTROL_TAG_ID]         =
+    {   "OverExpCtrl", CALIB_TAG_TYPE_STRUCT, {-1, -1},
+        check_tags_array_info(calib_sensor_aec_OverExp_sub_tags), NULL
     },
-    [CALIB_SENSOR_AEC_DLUMA_HIGH_TH_TAG_ID]         =
-    {   "dLuma_high_th", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
+    [CALIB_SENSOR_LINAECTRL_OVEREXP_ENABLE_TAG_ID]         =
+    {   "Enable", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
         check_tags_array_ignore, NULL
     },
-    [CALIB_SENSOR_AEC_DLUMA_LOW_TH_TAG_ID]         =
-    {   "dLuma_low_th", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
+    [CALIB_SENSOR_LINAECTRL_OVEREXP_HIGHLIGHT_TH_TAG_ID]         =
+    {   "HighLightTh", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
         check_tags_array_ignore, NULL
     },
-    [CALIB_SENSOR_AEC_ADJUST_TRIGGER_FRAME_TAG_ID]         =
-    {   "adjust_trigger_frame", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
+    [CALIB_SENSOR_LINAECTRL_OVEREXP_LOWLIGHT_TH_TAG_ID]      =
+    {   "LowLightTh", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
         check_tags_array_ignore, NULL
     },
-
-    [CALIB_SENSOR_AEC_HIST2HAL_TAG_ID]         =
-    {   "Hist2hal", CALIB_TAG_TYPE_STRUCT, {-1, -1},
-        check_tags_array_info(calib_sensor_aec_Hist2hal_sub_tags), NULL
+    [CALIB_SENSOR_LINAECTRL_OVEREXP_MAXWEIGHT_TAG_ID]        =
+    {   "MaxWeight", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
+        check_tags_array_ignore, NULL
     },
-    [CALIB_SENSOR_AEC_LOWHISTBINTH_TAG_ID]         =
-    {   "LowHistBinTh", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
+    [CALIB_SENSOR_LINAECTRL_OVEREXP_OEPDF_TAG_ID]        =
+    {   "OEpdf", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
+        check_tags_array_ignore, NULL
+    },
+    [CALIB_SENSOR_LINAECTRL_OVEREXP_HIGHLIGHT_WEIGHT_TAG_ID]         =
+    {   "HighLightWeight", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
+        check_tags_array_ignore, NULL
+    },
+    [CALIB_SENSOR_LINAECTRL_OVEREXP_LOWLIGHT_WEIGHT_TAG_ID]      =
+    {   "LowLightWeight", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
         check_tags_array_ignore, NULL
     },
 

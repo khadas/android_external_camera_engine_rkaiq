@@ -173,10 +173,15 @@
  * - fix bugs in GainRange-dBmode
  * v1.0.5
  * - support dual cameras streaming concurrently 
+ * v1.0.6
+ * - add backlight compasation and highlight depresion interface
+ * - add enable and disable dehaze interface
+ * - add asd interface to get calculated environmental luma
+ * - ov2718: v0.0.4 gc2053: v0.0.3 ov02k10: v0.0.2
  */
 
-#define RK_AIQ_VERSION_REAL_V "v1.0.5"
-#define RK_AIQ_RELEASE_DATE "2020-08-12"
+#define RK_AIQ_VERSION_REAL_V "v1.0.6"
+#define RK_AIQ_RELEASE_DATE "2020-08-14"
 
 /******* DO NOT EDIT THE FOLLOWINGS ***********/
 

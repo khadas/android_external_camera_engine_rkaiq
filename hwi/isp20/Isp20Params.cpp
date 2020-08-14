@@ -2417,8 +2417,8 @@ void Isp20Params::setModuleStatus(rk_aiq_module_id_t mId, bool en)
         break;
     case RK_MODULE_AE:
         break;
-    case RK_MODULE_DHAZ:
-        _ISP_MODULE_CFG_(RK_ISP2X_DHAZ_ID);
+    //case RK_MODULE_DHAZ:
+    //    _ISP_MODULE_CFG_(RK_ISP2X_DHAZ_ID);
         break;
     }
 }
@@ -2479,8 +2479,8 @@ void Isp20Params::getModuleStatus(rk_aiq_module_id_t mId, bool& en)
     case RK_MODULE_FEC:
         mod_id = RK_ISP2X_PP_TFEC_ID;
         break;
-    case RK_MODULE_DHAZ:
-        mod_id = RK_ISP2X_DHAZ_ID;
+    //case RK_MODULE_DHAZ:
+    //    mod_id = RK_ISP2X_DHAZ_ID;
         break;
     }
     if (mod_id < 0)
