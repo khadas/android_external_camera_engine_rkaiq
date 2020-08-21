@@ -16,6 +16,7 @@ using namespace RkCam;
 int main(int argc, char **argv)
 {
     char config_file[CALIBDB_PATH_LEN];
+    xcam_get_log_level();
     strcpy(config_file, argv[1]);
     RkAiqCalibDb::createCalibDbBinFromXml(config_file);
 

@@ -44,7 +44,10 @@ ANRresult_t ANRGetProcResult(ANRContext_t *pANRCtx, ANRProcResult_t* pANRResult)
 
 ANRresult_t ANRGainRatioProcess(ANRGainState_t *pGainState, ANRExpInfo_t *pExpInfo);
 
-ANRresult_t ANRConfigSettingParam(ANRContext_t *pANRCtx, int snr_mode);
+ANRresult_t ANRConfigSettingParam(ANRContext_t *pANRCtx, ANRParamMode_t eParamMode, int snr_mode);
+
+ANRresult_t ANRParamModeProcess(ANRContext_t *pANRCtx, ANRExpInfo_t *pExpInfo, ANRParamMode_t *mode);
+
 
 RKAIQ_END_DECLARE
 

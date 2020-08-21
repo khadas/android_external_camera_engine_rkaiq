@@ -242,7 +242,7 @@ get_ispp_subdevs(struct media_device *device, const char *devpath, rk_aiq_ispp_t
         return NULL;
 
     if (strcmp(device->info.model, "rkispp0") == 0 ||
-        strcmp(device->info.model, "rkispp") == 0)
+            strcmp(device->info.model, "rkispp") == 0)
         ispp_info[index].model_idx = 0;
     else if (strcmp(device->info.model, "rkispp1") == 0)
         ispp_info[index].model_idx = 1;
@@ -309,8 +309,8 @@ get_ispp_subdevs(struct media_device *device, const char *devpath, rk_aiq_ispp_t
     }
 
     LOGI_CAMHW_SUBM(ISP20HW_SUBM, "model(%s): ispp_info(%d): ispp-subdev entity name: %s\n",
-           device->info.model, index,
-           ispp_info[index].pp_dev_path);
+                    device->info.model, index,
+                    ispp_info[index].pp_dev_path);
 
     return &ispp_info[index];
 }
@@ -336,7 +336,7 @@ get_isp_subdevs(struct media_device *device, const char *devpath, rk_aiq_isp_t* 
         return NULL;
 
     if (strcmp(device->info.model, "rkisp0") == 0 ||
-        strcmp(device->info.model, "rkisp") == 0)
+            strcmp(device->info.model, "rkisp") == 0)
         isp_info[index].model_idx = 0;
     else if (strcmp(device->info.model, "rkisp1") == 0)
         isp_info[index].model_idx = 1;
@@ -468,8 +468,8 @@ get_isp_subdevs(struct media_device *device, const char *devpath, rk_aiq_isp_t* 
 
 
     LOGI_CAMHW_SUBM(ISP20HW_SUBM, "model(%s): isp_info(%d): ispp-subdev entity name: %s\n",
-           device->info.model, index,
-           isp_info[index].isp_dev_path);
+                    device->info.model, index,
+                    isp_info[index].isp_dev_path);
 
     return &isp_info[index];
 }
@@ -727,15 +727,16 @@ CamHwIsp20::initCamHwInfos()
         rk_aiq_isp_t* isp_info = NULL;
         rk_aiq_cif_info_t* cif_info = NULL;
         if (strcmp(device->info.model, "rkispp0") == 0 ||
-            strcmp(device->info.model, "rkispp1") == 0 ||
-            strcmp(device->info.model, "rkispp") == 0) {
+                strcmp(device->info.model, "rkispp1") == 0 ||
+                strcmp(device->info.model, "rkispp") == 0) {
             get_ispp_subdevs(device, sys_path, CamHwIsp20::mIspHwInfos.ispp_info);
             goto media_unref;
         } else if (strcmp(device->info.model, "rkisp0") == 0 ||
                    strcmp(device->info.model, "rkisp1") == 0 ||
                    strcmp(device->info.model, "rkisp") == 0) {
             isp_info = get_isp_subdevs(device, sys_path, CamHwIsp20::mIspHwInfos.isp_info);
-        } else if (strcmp(device->info.model, "rkcif") == 0) {
+        } else if (strcmp(device->info.model, "rkcif") == 0 ||
+                   strcmp(device->info.model, "rkcif_mipi_lvds") == 0) {
             cif_info = &CamHwIsp20::mCifHwInfos;
             get_cif_subdevs(device, sys_path, cif_info);
         } else {
@@ -761,7 +762,7 @@ CamHwIsp20::initCamHwInfos()
                     s_full_info->linked_to_isp = false;
                     s_full_info->cif_info = cif_info;
                     s_full_info->isp_info = NULL;
-                } else if (isp_info){
+                } else if (isp_info) {
                     s_full_info->linked_to_isp = true;
                     isp_info->linked_sensor = true;
                     s_full_info->isp_info = isp_info;
@@ -787,27 +788,27 @@ media_unref:
 
     std::map<std::string, SmartPtr<rk_sensor_full_info_t>>::iterator iter;
     for(iter = CamHwIsp20::mSensorHwInfos.begin(); \
-        iter != CamHwIsp20::mSensorHwInfos.end(); iter++) {
+            iter != CamHwIsp20::mSensorHwInfos.end(); iter++) {
         LOGI_CAMHW_SUBM(ISP20HW_SUBM, "match the sensor_name(%s) media link\n", (iter->first).c_str());
         SmartPtr<rk_sensor_full_info_t> s_full_info = iter->second;
 
         /*
          * The ISP and ISPP match links through the media device model
          */
-         if (s_full_info->linked_to_isp) {
+        if (s_full_info->linked_to_isp) {
             for (i = 0; i < 2; i++) {
                 LOGI_CAMHW_SUBM(ISP20HW_SUBM, "isp model_idx: %d, ispp(%d) model_idx: %d\n",
-                        s_full_info->isp_info->model_idx,
-                        i,
-                        CamHwIsp20::mIspHwInfos.ispp_info[i].model_idx);
-                        
+                                s_full_info->isp_info->model_idx,
+                                i,
+                                CamHwIsp20::mIspHwInfos.ispp_info[i].model_idx);
+
                 if (s_full_info->isp_info->model_idx == CamHwIsp20::mIspHwInfos.ispp_info[i].model_idx) {
                     s_full_info->ispp_info = &CamHwIsp20::mIspHwInfos.ispp_info[i];
                     LOGI_CAMHW_SUBM(ISP20HW_SUBM, "isp(%d) link to ispp(%d)\n",
-                            s_full_info->isp_info->model_idx,
-                            CamHwIsp20::mIspHwInfos.ispp_info[i].model_idx);
+                                    s_full_info->isp_info->model_idx,
+                                    CamHwIsp20::mIspHwInfos.ispp_info[i].model_idx);
                     CamHwIsp20::mCamHwInfos[s_full_info->sensor_name]->sensor_info.binded_strm_media_idx =
-                        atoi(s_full_info->ispp_info->media_dev_path+strlen("/dev/media"));
+                        atoi(s_full_info->ispp_info->media_dev_path + strlen("/dev/media"));
                     LOGI_CAMHW_SUBM(ISP20HW_SUBM, "sensor %s adapted to pp media %d:%s\n",
                                     s_full_info->sensor_name.c_str(),
                                     CamHwIsp20::mCamHwInfos[s_full_info->sensor_name]->sensor_info.binded_strm_media_idx,
@@ -815,19 +816,19 @@ media_unref:
                     break;
                 }
             }
-        }else{
-        /*
-         * Determine which isp that vipCap is linked
-         */
-            for (i = 0; i < 2; i++) { 
+        } else {
+            /*
+             * Determine which isp that vipCap is linked
+             */
+            for (i = 0; i < 2; i++) {
                 if (!CamHwIsp20::mIspHwInfos.isp_info[i].linked_sensor) {
                     s_full_info->isp_info = &CamHwIsp20::mIspHwInfos.isp_info[i];
                     s_full_info->ispp_info = &CamHwIsp20::mIspHwInfos.ispp_info[i];
                     LOGI_CAMHW_SUBM(ISP20HW_SUBM, "vicap link to isp(%d) to ispp(%d)\n",
-                            s_full_info->isp_info->model_idx,
-                            s_full_info->ispp_info->model_idx);
+                                    s_full_info->isp_info->model_idx,
+                                    s_full_info->ispp_info->model_idx);
                     CamHwIsp20::mCamHwInfos[s_full_info->sensor_name]->sensor_info.binded_strm_media_idx =
-                        atoi(s_full_info->ispp_info->media_dev_path+strlen("/dev/media"));
+                        atoi(s_full_info->ispp_info->media_dev_path + strlen("/dev/media"));
                     LOGI_CAMHW_SUBM(ISP20HW_SUBM, "sensor %s adapted to pp media %d:%s\n",
                                     s_full_info->sensor_name.c_str(),
                                     CamHwIsp20::mCamHwInfos[s_full_info->sensor_name]->sensor_info.binded_strm_media_idx,
@@ -857,12 +858,12 @@ CamHwIsp20::getBindedSnsEntNmByVd(const char* vd)
 
     std::map<std::string, SmartPtr<rk_sensor_full_info_t>>::iterator iter;
     for(iter = CamHwIsp20::mSensorHwInfos.begin(); \
-        iter != CamHwIsp20::mSensorHwInfos.end(); iter++) {
+            iter != CamHwIsp20::mSensorHwInfos.end(); iter++) {
         SmartPtr<rk_sensor_full_info_t> s_full_info = iter->second;
         if (strstr(s_full_info->ispp_info->pp_m_bypass_path, vd) ||
-            strstr(s_full_info->ispp_info->pp_scale0_path, vd) ||
-            strstr(s_full_info->ispp_info->pp_scale1_path, vd) ||
-            strstr(s_full_info->ispp_info->pp_scale2_path, vd))
+                strstr(s_full_info->ispp_info->pp_scale0_path, vd) ||
+                strstr(s_full_info->ispp_info->pp_scale1_path, vd) ||
+                strstr(s_full_info->ispp_info->pp_scale2_path, vd))
             return  s_full_info->sensor_name.c_str();
     }
 
@@ -1070,9 +1071,9 @@ CamHwIsp20::deInit()
     rk_sensor_full_info_t *s_info = it->second.ptr();
     int isp_index = s_info->isp_info->model_idx;
     LOGD_CAMHW_SUBM(ISP20HW_SUBM, "sensor_name(%s) is linked to isp_index(%d)",
-            sns_name, isp_index);
+                    sns_name, isp_index);
     if (_hdr_mode != RK_AIQ_WORKING_MODE_NORMAL && \
-                    !mNormalNoReadBack) {
+            !mNormalNoReadBack) {
         setupHdrLink(_hdr_mode, isp_index, false);
     } else {
         setupHdrLink(_hdr_mode, isp_index, false);
@@ -1100,8 +1101,8 @@ CamHwIsp20::setupPipelineFmtCif(struct v4l2_subdev_selection& sns_sd_sel,
     for (int i = 0; i < 3; i++) {
         _mipi_tx_devs[i]->get_format (format);
         if (format.fmt.pix.width != sns_sd_sel.r.width ||
-            format.fmt.pix.height != sns_sd_sel.r.height ||
-            format.fmt.pix.pixelformat != sns_v4l_pix_fmt) {
+                format.fmt.pix.height != sns_sd_sel.r.height ||
+                format.fmt.pix.pixelformat != sns_v4l_pix_fmt) {
             _mipi_tx_devs[i]->set_format(sns_sd_sel.r.width,
                                          sns_sd_sel.r.height,
                                          sns_v4l_pix_fmt,
@@ -1110,8 +1111,8 @@ CamHwIsp20::setupPipelineFmtCif(struct v4l2_subdev_selection& sns_sd_sel,
         }
         _mipi_rx_devs[i]->get_format (format);
         if (format.fmt.pix.width != sns_sd_sel.r.width ||
-            format.fmt.pix.height != sns_sd_sel.r.height ||
-            format.fmt.pix.pixelformat != sns_v4l_pix_fmt) {
+                format.fmt.pix.height != sns_sd_sel.r.height ||
+                format.fmt.pix.pixelformat != sns_v4l_pix_fmt) {
             _mipi_rx_devs[i]->set_format(sns_sd_sel.r.width,
                                          sns_sd_sel.r.height,
                                          sns_v4l_pix_fmt,
@@ -1121,7 +1122,7 @@ CamHwIsp20::setupPipelineFmtCif(struct v4l2_subdev_selection& sns_sd_sel,
     }
 
     LOGD_CAMHW_SUBM(ISP20HW_SUBM, "mipi tx/rx fmt info: fmt 0x%x, %dx%d !",
-               sns_v4l_pix_fmt, sns_sd_sel.r.width, sns_sd_sel.r.height);
+                    sns_v4l_pix_fmt, sns_sd_sel.r.width, sns_sd_sel.r.height);
 
     // set isp sink fmt, same as sensor bounds - crop
     struct v4l2_subdev_format isp_sink_fmt;
@@ -1145,7 +1146,7 @@ CamHwIsp20::setupPipelineFmtCif(struct v4l2_subdev_selection& sns_sd_sel,
     }
 
     LOGD_CAMHW_SUBM(ISP20HW_SUBM, "isp sink fmt info: fmt 0x%x, %dx%d !",
-               isp_sink_fmt.format.code, isp_sink_fmt.format.width, isp_sink_fmt.format.height);
+                    isp_sink_fmt.format.code, isp_sink_fmt.format.width, isp_sink_fmt.format.height);
 
     // set selection, isp needn't do the crop
     struct v4l2_subdev_selection aSelection;
@@ -1166,8 +1167,8 @@ CamHwIsp20::setupPipelineFmtCif(struct v4l2_subdev_selection& sns_sd_sel,
     }
 
     LOGD_CAMHW_SUBM(ISP20HW_SUBM, "isp sink crop info: %dx%d@%d,%d !",
-               aSelection.r.width, aSelection.r.height,
-               aSelection.r.left, aSelection.r.top);
+                    aSelection.r.width, aSelection.r.height,
+                    aSelection.r.left, aSelection.r.top);
 
     // set isp rkisp-isp-subdev src crop
     aSelection.pad = 2;
@@ -1179,8 +1180,8 @@ CamHwIsp20::setupPipelineFmtCif(struct v4l2_subdev_selection& sns_sd_sel,
     }
 #endif
     LOGD_CAMHW_SUBM(ISP20HW_SUBM, "isp src crop info: %dx%d@%d,%d !",
-               aSelection.r.width, aSelection.r.height,
-               aSelection.r.left, aSelection.r.top);
+                    aSelection.r.width, aSelection.r.height,
+                    aSelection.r.left, aSelection.r.top);
 
     // set isp rkisp-isp-subdev src pad fmt
     struct v4l2_subdev_format isp_src_fmt;
@@ -1202,7 +1203,7 @@ CamHwIsp20::setupPipelineFmtCif(struct v4l2_subdev_selection& sns_sd_sel,
     }
 
     LOGD_CAMHW_SUBM(ISP20HW_SUBM, "isp src fmt info: fmt 0x%x, %dx%d !",
-               isp_src_fmt.format.code, isp_src_fmt.format.width, isp_src_fmt.format.height);
+                    isp_src_fmt.format.code, isp_src_fmt.format.width, isp_src_fmt.format.height);
 
     return ret;
 
@@ -1224,8 +1225,8 @@ CamHwIsp20::setupPipelineFmtIsp(struct v4l2_subdev_selection& sns_sd_sel,
     for (int i = 0; i < 3; i++) {
         _mipi_tx_devs[i]->get_format (format);
         if (format.fmt.pix.width != sns_sd_fmt.format.width ||
-            format.fmt.pix.height != sns_sd_fmt.format.height ||
-            format.fmt.pix.pixelformat != sns_v4l_pix_fmt) {
+                format.fmt.pix.height != sns_sd_fmt.format.height ||
+                format.fmt.pix.pixelformat != sns_v4l_pix_fmt) {
             _mipi_tx_devs[i]->set_format(sns_sd_fmt.format.width,
                                          sns_sd_fmt.format.height,
                                          sns_v4l_pix_fmt,
@@ -1234,8 +1235,8 @@ CamHwIsp20::setupPipelineFmtIsp(struct v4l2_subdev_selection& sns_sd_sel,
         }
         _mipi_rx_devs[i]->get_format (format);
         if (format.fmt.pix.width != sns_sd_fmt.format.width ||
-            format.fmt.pix.height != sns_sd_fmt.format.height ||
-            format.fmt.pix.pixelformat != sns_v4l_pix_fmt) {
+                format.fmt.pix.height != sns_sd_fmt.format.height ||
+                format.fmt.pix.pixelformat != sns_v4l_pix_fmt) {
             _mipi_rx_devs[i]->set_format(sns_sd_fmt.format.width,
                                          sns_sd_fmt.format.height,
                                          sns_v4l_pix_fmt,
@@ -1245,7 +1246,7 @@ CamHwIsp20::setupPipelineFmtIsp(struct v4l2_subdev_selection& sns_sd_sel,
     }
 
     LOGD_CAMHW_SUBM(ISP20HW_SUBM, "mipi tx/rx fmt info: fmt 0x%x, %dx%d !",
-               sns_v4l_pix_fmt, sns_sd_fmt.format.width, sns_sd_fmt.format.height);
+                    sns_v4l_pix_fmt, sns_sd_fmt.format.width, sns_sd_fmt.format.height);
 
     // set isp sink fmt, same as sensor fmt
     struct v4l2_subdev_format isp_sink_fmt;
@@ -1270,7 +1271,7 @@ CamHwIsp20::setupPipelineFmtIsp(struct v4l2_subdev_selection& sns_sd_sel,
     }
 
     LOGD_CAMHW_SUBM(ISP20HW_SUBM, "isp sink fmt info: fmt 0x%x, %dx%d !",
-               isp_sink_fmt.format.code, isp_sink_fmt.format.width, isp_sink_fmt.format.height);
+                    isp_sink_fmt.format.code, isp_sink_fmt.format.width, isp_sink_fmt.format.height);
 
     // set selection, isp do the crop
     struct v4l2_subdev_selection aSelection;
@@ -1291,8 +1292,8 @@ CamHwIsp20::setupPipelineFmtIsp(struct v4l2_subdev_selection& sns_sd_sel,
     }
 
     LOGD_CAMHW_SUBM(ISP20HW_SUBM, "isp sink crop info: %dx%d@%d,%d !",
-               aSelection.r.width, aSelection.r.height,
-               aSelection.r.left, aSelection.r.top);
+                    aSelection.r.width, aSelection.r.height,
+                    aSelection.r.left, aSelection.r.top);
 
     // set isp rkisp-isp-subdev src crop
     aSelection.pad = 2;
@@ -1309,8 +1310,8 @@ CamHwIsp20::setupPipelineFmtIsp(struct v4l2_subdev_selection& sns_sd_sel,
     }
 #endif
     LOGD_CAMHW_SUBM(ISP20HW_SUBM, "isp src crop info: %dx%d@%d,%d !",
-               aSelection.r.width, aSelection.r.height,
-               aSelection.r.left, aSelection.r.top);
+                    aSelection.r.width, aSelection.r.height,
+                    aSelection.r.left, aSelection.r.top);
 
     // set isp rkisp-isp-subdev src pad fmt
     struct v4l2_subdev_format isp_src_fmt;
@@ -1332,7 +1333,7 @@ CamHwIsp20::setupPipelineFmtIsp(struct v4l2_subdev_selection& sns_sd_sel,
     }
 
     LOGD_CAMHW_SUBM(ISP20HW_SUBM, "isp src fmt info: fmt 0x%x, %dx%d !",
-               isp_src_fmt.format.code, isp_src_fmt.format.width, isp_src_fmt.format.height);
+                    isp_src_fmt.format.code, isp_src_fmt.format.width, isp_src_fmt.format.height);
 
     return ret;
 }
@@ -1377,9 +1378,9 @@ CamHwIsp20::setupPipelineFmt()
     }
 
     LOGD_CAMHW_SUBM(ISP20HW_SUBM, "sensor fmt info: bounds %dx%d, crop %dx%d@%d,%d !",
-               sns_sd_sel.r.width, sns_sd_sel.r.height,
-               sns_sd_fmt.format.width, sns_sd_fmt.format.height,
-               sns_sd_sel.r.left, sns_sd_sel.r.top);
+                    sns_sd_sel.r.width, sns_sd_sel.r.height,
+                    sns_sd_fmt.format.width, sns_sd_fmt.format.height,
+                    sns_sd_sel.r.left, sns_sd_sel.r.top);
 
     if (_linked_to_isp)
         ret = setupPipelineFmtIsp(sns_sd_sel, sns_sd_fmt, sns_v4l_pix_fmt);
@@ -1431,7 +1432,7 @@ CamHwIsp20::setupPipelineFmt()
     }
 
     LOGD_CAMHW_SUBM(ISP20HW_SUBM, "ispp sd fmt info: %dx%d",
-               isp_src_fmt.format.width, isp_src_fmt.format.height);
+                    isp_src_fmt.format.width, isp_src_fmt.format.height);
 
     return ret;
 }
@@ -1605,7 +1606,10 @@ CamHwIsp20::setExpDelayInfo(int time_delay, int gain_delay)
     ENTER_CAMHW_FUNCTION();
     SmartPtr<SensorHw> sensorHw;
     sensorHw = mSensorDev.dynamic_cast_ptr<SensorHw>();
-    sensorHw->set_exp_delay_info(time_delay, gain_delay, mCalibDb->sysContrl.dcg_delay);
+    if(_hdr_mode != RK_AIQ_WORKING_MODE_NORMAL)
+        sensorHw->set_exp_delay_info(time_delay, gain_delay, mCalibDb->sysContrl.exp_delay.Hdr.dcg_delay);
+    else
+        sensorHw->set_exp_delay_info(time_delay, gain_delay, mCalibDb->sysContrl.exp_delay.Normal.dcg_delay);
     EXIT_CAMHW_FUNCTION();
     return XCAM_RETURN_NO_ERROR;
 }
@@ -1635,7 +1639,7 @@ CamHwIsp20::prepare(uint32_t width, uint32_t height, int mode, int t_delay, int 
     rk_sensor_full_info_t *s_info = it->second.ptr();
     int isp_index = s_info->isp_info->model_idx;
     LOGI_CAMHW_SUBM(ISP20HW_SUBM, "sensor_name(%s) is linked to isp_index(%d)",
-            sns_name, isp_index);
+                    sns_name, isp_index);
     if (_linked_to_isp) {
         if (_hdr_mode != RK_AIQ_WORKING_MODE_NORMAL) {
             setupHdrLink(_hdr_mode, isp_index, true);
@@ -1651,8 +1655,17 @@ CamHwIsp20::prepare(uint32_t width, uint32_t height, int mode, int t_delay, int 
     }
 
     sensorHw = mSensorDev.dynamic_cast_ptr<SensorHw>();
-    sensorHw->set_working_mode(mode);
-    sensorHw->set_exp_delay_info(t_delay, g_delay, mCalibDb->sysContrl.dcg_delay);
+    ret = sensorHw->set_working_mode(mode);
+    if (ret) {
+       LOGW_CAMHW_SUBM(ISP20HW_SUBM, "set sensor mode error !");
+       return ret;
+    }
+
+    if(_hdr_mode != RK_AIQ_WORKING_MODE_NORMAL)
+        sensorHw->set_exp_delay_info(t_delay, g_delay, mCalibDb->sysContrl.exp_delay.Hdr.dcg_delay);
+    else
+        sensorHw->set_exp_delay_info(t_delay, g_delay, mCalibDb->sysContrl.exp_delay.Normal.dcg_delay);
+
     isp20Pollthread = mPollthread.dynamic_cast_ptr<Isp20PollThread>();
     isp20Pollthread->set_working_mode(mode);
     offlineRdthread = mOfflineRdThread.dynamic_cast_ptr<OfflineFrmRdThread>();
@@ -1727,10 +1740,10 @@ CamHwIsp20::start()
     }
 
     // move hdr_mipi_start of isp to set first isp params stage,
-    // and do hdr_mipi_start of cif at start stage 
+    // and do hdr_mipi_start of cif at start stage
     if ((_hdr_mode != RK_AIQ_WORKING_MODE_NORMAL ||
-        (_hdr_mode == RK_AIQ_WORKING_MODE_NORMAL && !mNormalNoReadBack)) &&
-        !_linked_to_isp) {
+            (_hdr_mode == RK_AIQ_WORKING_MODE_NORMAL && !mNormalNoReadBack)) &&
+            !_linked_to_isp) {
         ret = isp20Pollthread->hdr_mipi_start(sensorHw);
         if (ret < 0) {
             LOGE_CAMHW_SUBM(ISP20HW_SUBM, "hdr mipi start err: %d\n", ret);
@@ -2478,8 +2491,8 @@ CamHwIsp20::setIspParams(SmartPtr<RkAiqIspParamsProxy>& ispParams)
         SmartPtr<Isp20PollThread> isp20Pollthread = mPollthread.dynamic_cast_ptr<Isp20PollThread>();
         SmartPtr<SensorHw> sensorHw = mSensorDev.dynamic_cast_ptr<SensorHw>();
         if ((_hdr_mode != RK_AIQ_WORKING_MODE_NORMAL ||
-            (_hdr_mode == RK_AIQ_WORKING_MODE_NORMAL && !mNormalNoReadBack)) &&
-            _linked_to_isp) {
+                (_hdr_mode == RK_AIQ_WORKING_MODE_NORMAL && !mNormalNoReadBack)) &&
+                _linked_to_isp) {
             ret = isp20Pollthread->hdr_mipi_start(sensorHw);
             if (ret < 0) {
                 LOGE_CAMHW_SUBM(ISP20HW_SUBM, "hdr mipi start err: %d\n", ret);

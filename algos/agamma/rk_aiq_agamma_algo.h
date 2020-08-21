@@ -27,11 +27,11 @@
 
 RKAIQ_BEGIN_DECLARE
 
-XCamReturn AgammaInitV200(AgammaHandle_t** para);
-XCamReturn AgammaReleaseV200(AgammaHandle_t* para);
+XCamReturn AgammaInit(AgammaHandle_t** para, CamCalibDbContext_t* calib);
+XCamReturn AgammaRelease(AgammaHandle_t* para);
 XCamReturn AgammaConfigInit(AgammaHandle_t* para);
-XCamReturn AgammaPreProcV200(AgammaHandle_t* para);
-XCamReturn AgammaProcessingV200(AgammaHandle_t* para);
+XCamReturn AgammaPreProc(AgammaHandle_t* para);
+XCamReturn AgammaProcessing(AgammaHandle_t* para);
 
 RKAIQ_END_DECLARE
 

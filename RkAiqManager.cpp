@@ -185,19 +185,30 @@ RkAiqManager::prepare(uint32_t width, uint32_t height, rk_aiq_working_mode_t mod
     get_dbg_force_disable_mods_env();
 #endif
 #endif
-    int working_mode_hw;
+    int working_mode_hw = RK_AIQ_WORKING_MODE_NORMAL;
     if (mode == RK_AIQ_WORKING_MODE_NORMAL) {
         working_mode_hw = mode;
     } else {
-        if (mode != RK_AIQ_HDR_GET_WORKING_MODE(mCalibDb->sysContrl.hdr_mode)) {
-            ret = XCAM_RETURN_ERROR_PARAM;
-            RKAIQMNG_CHECK_RET(ret, "Not supported HDR mode!");
-        } else {
-            working_mode_hw = mCalibDb->sysContrl.hdr_mode;
-        }
+        // depreate mCalibDb->sysContrl.hdr_mode
+        /* if (mode != RK_AIQ_HDR_GET_WORKING_MODE(mCalibDb->sysContrl.hdr_mode)) { */
+        /*     ret = XCAM_RETURN_ERROR_PARAM; */
+        /*     RKAIQMNG_CHECK_RET(ret, "Not supported HDR mode!"); */
+        /* } else { */
+        /*     working_mode_hw = mCalibDb->sysContrl.hdr_mode; */
+        /* } */
+        if (mode == RK_AIQ_WORKING_MODE_ISP_HDR2)
+            working_mode_hw = RK_AIQ_ISP_HDR_MODE_2_FRAME_HDR;
+        else if (mode == RK_AIQ_WORKING_MODE_ISP_HDR3)
+            working_mode_hw = RK_AIQ_ISP_HDR_MODE_3_FRAME_HDR;
+        else
+            LOGE_ANALYZER("Not supported HDR mode !");
     }
     mCamHw->setCalib(mCalibDb);
-    ret = mCamHw->prepare(width, height, working_mode_hw, mCalibDb->sysContrl.time_delay, mCalibDb->sysContrl.gain_delay);
+    if(mode != RK_AIQ_WORKING_MODE_NORMAL)
+        ret = mCamHw->prepare(width, height, working_mode_hw, mCalibDb->sysContrl.exp_delay.Hdr.time_delay, mCalibDb->sysContrl.exp_delay.Hdr.gain_delay);
+    else
+        ret = mCamHw->prepare(width, height, working_mode_hw, mCalibDb->sysContrl.exp_delay.Normal.time_delay, mCalibDb->sysContrl.exp_delay.Normal.gain_delay);
+
     RKAIQMNG_CHECK_RET(ret, "camhw prepare error %d", ret);
 
     xcam_mem_clear(sensor_des);

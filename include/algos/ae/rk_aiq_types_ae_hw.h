@@ -16,7 +16,7 @@
 #define RAWHIST_BIN_N_MAX   256
 #define SIHIST_BIN_N_MAX    32
 
-#define MAX_AEC_EFFECT_FNUM 5
+#define MAX_AEC_EFFECT_FNUM 10
 
 typedef enum _RAWAE_WND_NUM {
     RAWAE_WND_1X1 = 0,
@@ -229,11 +229,11 @@ typedef struct RkAiqExpRealParam_s {
 } RkAiqExpRealParam_t;
 
 typedef struct RkAiqExpSensorParam_s {
-    unsigned short fine_integration_time;
-    unsigned short coarse_integration_time;
-    unsigned short analog_gain_code_global;
-    unsigned short digital_gain_global;
-    unsigned short isp_digital_gain;
+    unsigned int fine_integration_time;
+    unsigned int coarse_integration_time;
+    unsigned int analog_gain_code_global;
+    unsigned int digital_gain_global;
+    unsigned int isp_digital_gain;
 } RkAiqExpSensorParam_t;
 
 typedef struct {

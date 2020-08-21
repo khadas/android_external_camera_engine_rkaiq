@@ -481,6 +481,14 @@ typedef enum ANROPMode_e {
     ANR_OP_MODE_MAX                                      /**< max */
 } ANROPMode_t;
 
+typedef enum ANRParamMode_e {
+	ANR_PARAM_MODE_INVALID           = 0, 
+    ANR_PARAM_MODE_NORMAL          = 1,                   /**< initialization value */
+    ANR_PARAM_MODE_HDR              = 2,                   /**< instance is created, but not initialized */
+    ANR_PARAM_MODE_GRAY            = 3,                   /**< instance is confiured (ready to start) or stopped */
+    ANR_PARAM_MODE_MAX                                      /**< max */
+} ANRParamMode_t;
+
 
 typedef struct ANR_Manual_Attr_s
 {

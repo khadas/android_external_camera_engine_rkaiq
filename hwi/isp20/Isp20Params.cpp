@@ -833,13 +833,17 @@ void Isp20Params::convertAiqAgammaToIsp20Params(struct isp2x_isp_params_cfg& isp
         isp_cfg.module_ens |= ISP2X_MODULE_GOC;
         isp_cfg.module_en_update |= ISP2X_MODULE_GOC;
         isp_cfg.module_cfg_update |= ISP2X_MODULE_GOC;
-    }
+    }else {
+        isp_cfg.module_ens &= ~ISP2X_MODULE_GOC;
+        isp_cfg.module_en_update |= ISP2X_MODULE_GOC;
+        return;
+     }
 
 
     struct isp2x_gammaout_cfg* cfg = &isp_cfg.others.gammaout_cfg;
     cfg->offset = gamma_out_cfg.gamma_out_offset;
     cfg->equ_segm = gamma_out_cfg.gamma_out_segnum;
-    for (int i = 0; i < 45 + 1; i++)
+    for (int i = 0; i < 45; i++)
     {
         cfg->gamma_y[i] = gamma_out_cfg.gamma_table[i];
     }

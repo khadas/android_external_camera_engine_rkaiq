@@ -35,11 +35,8 @@ unsigned short GetSetLgmean(AhdrHandle_t pAhdrCtx)
     float PrevLgMean = pAhdrCtx->AhdrPrevData.ro_hdrtmo_lgmean / 2048.0;
     float CurrLgMean = pAhdrCtx->CurrHandleData.CurrLgMean;
 
-    if(pAhdrCtx->AhdrConfig.tmo_para.Band.isHdrGlobalTmo)
-    {
-        CurrLgMean *= 1 + 0.5 - pAhdrCtx->CurrHandleData.CurrTmoHandleData.BandPriorStrength;
-        value_default *= 1 + 0.5 - pAhdrCtx->CurrHandleData.CurrTmoHandleData.BandPriorStrength;
-    }
+    CurrLgMean *= 1 + 0.5 - pAhdrCtx->CurrHandleData.CurrTmoHandleData.BandPriorStrength;
+    value_default *= 1 + 0.5 - pAhdrCtx->CurrHandleData.CurrTmoHandleData.BandPriorStrength;
 
     value = pAhdrCtx->frameCnt == 0 ? value_default :
             (iir_frame_real - 1) * PrevLgMean / iir_frame_real + CurrLgMean / iir_frame_real;

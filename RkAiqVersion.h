@@ -172,16 +172,30 @@
  * - CamHwIsp20: move isp/ispp/mipitx,rx streaming on to prepare stage
  * - fix bugs in GainRange-dBmode
  * v1.0.5
- * - support dual cameras streaming concurrently 
+ * - calib db: v1.1.8 magic code 1027323
+ * - support dual cameras streaming concurrently
  * v1.0.6
+ * - calib db: v1.1.9 magic code: 996490
  * - add backlight compasation and highlight depresion interface
  * - add enable and disable dehaze interface
  * - add asd interface to get calculated environmental luma
  * - ov2718: v0.0.4 gc2053: v0.0.3 ov02k10: v0.0.2
+ * v1.0.7
+ * - calib db: v1.2.0 magic code: 1006650
+ * - support dependant iq for hdr/normal/gray
+ * - rkisp_demo
+ *   - support dual camera
+ *   - add hdr x2 and x3 arg option
+ * - Isp20PollThread
+ *   - correct error handle in trigger_readback
+ *   - fix the bug of stopping blocked by tx thread stop process
+ * - ae support hdr3, add imx415 hdr3 xml
+ * - imx415 anti-flicker
+ * - readback two times to avoid luma detect bug
  */
 
-#define RK_AIQ_VERSION_REAL_V "v1.0.6"
-#define RK_AIQ_RELEASE_DATE "2020-08-14"
+#define RK_AIQ_VERSION_REAL_V "v1.0.7"
+#define RK_AIQ_RELEASE_DATE "2020-08-21"
 
 /******* DO NOT EDIT THE FOLLOWINGS ***********/
 

@@ -58,6 +58,14 @@ typedef enum AblcOPMode_e {
     ABLC_OP_MODE_MAX                                      /**< max */
 } AblcOPMode_t;
 
+typedef enum AblcParamMode_e {
+    ABLC_PARAM_MODE_INVALID          = 0,                    /**< initialization value */
+    ABLC_PARAM_MODE_NORMAL             = 1,                   /**< instance is created, but not initialized */
+    ABLC_PARAM_MODE_HDR           = 2,                   /**< instance is confiured (ready to start) or stopped */                               
+    ABLC_PARAM_MODE_MAX                                        /**< max */
+} AblcParamMode_t;
+
+
 typedef struct AblcParams_s {
     int enable;
     int iso[BLC_MAX_ISO_LEVEL];

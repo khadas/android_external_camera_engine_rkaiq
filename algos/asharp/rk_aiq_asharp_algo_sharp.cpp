@@ -3,7 +3,46 @@
 
 RKAIQ_BEGIN_DECLARE
 
-AsharpResult_t sharp_get_setting_idx_by_name_v1(CalibDb_Sharp_t *pCalibdb, char *name, int *setting_idx)
+AsharpResult_t sharp_get_mode_cell_idx_by_name_v1(CalibDb_Sharp_t *pCalibdb, char *name, int *mode_idx)
+{
+	int i = 0;
+	AsharpResult_t res = ASHARP_RET_SUCCESS;
+
+	if(pCalibdb == NULL){
+		LOGE_ASHARP("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
+		return ASHARP_RET_NULL_POINTER;
+	}
+
+	if(name == NULL){
+		LOGE_ASHARP("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
+		return ASHARP_RET_NULL_POINTER;
+	}
+
+	if(mode_idx == NULL){
+		LOGE_ASHARP("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
+		return ASHARP_RET_NULL_POINTER;
+	}
+
+	for(i=0; i<CALIBDB_NR_SHARP_SETTING_LEVEL; i++){
+		if(strncmp(name, pCalibdb->mode_cell[i].name, sizeof(pCalibdb->mode_cell[i].name)) == 0){
+			break;
+		}
+	}
+
+	if(i<CALIBDB_MAX_MODE_NUM){
+		*mode_idx = i;
+		res = ASHARP_RET_SUCCESS;
+	}else{
+		*mode_idx = 0;
+		res = ASHARP_RET_FAILURE;
+	}
+
+	LOGD_ASHARP("%s:%d mode_name:%s  mode_idx:%d i:%d \n",__FUNCTION__, __LINE__, name,* mode_idx, i);
+	return res;
+
+}
+
+AsharpResult_t sharp_get_setting_idx_by_name_v1(CalibDb_Sharp_t *pCalibdb, char *name, int mode_idx, int *setting_idx)
 {
 	int i = 0;
 	AsharpResult_t res = ASHARP_RET_SUCCESS;
@@ -24,7 +63,7 @@ AsharpResult_t sharp_get_setting_idx_by_name_v1(CalibDb_Sharp_t *pCalibdb, char 
 	}
 
 	for(i=0; i<CALIBDB_NR_SHARP_SETTING_LEVEL; i++){
-		if(strncmp(name, pCalibdb->setting[i].name, sizeof(pCalibdb->setting[i].name)) == 0){
+		if(strncmp(name, pCalibdb->mode_cell[mode_idx].setting[i].snr_mode, sizeof(pCalibdb->mode_cell[mode_idx].setting[i].snr_mode)) == 0){
 			break;
 		}
 	}
@@ -42,9 +81,10 @@ AsharpResult_t sharp_get_setting_idx_by_name_v1(CalibDb_Sharp_t *pCalibdb, char 
 
 }
 
-AsharpResult_t sharp_config_setting_param_v1(RKAsharp_Sharp_HW_Params_t *pParams, CalibDb_Sharp_t *pCalibdb, char* snr_name)
+AsharpResult_t sharp_config_setting_param_v1(RKAsharp_Sharp_HW_Params_t *pParams, CalibDb_Sharp_t *pCalibdb, char *param_mode, char* snr_name)
 {
 	AsharpResult_t res = ASHARP_RET_SUCCESS;
+	int mode_idx = 0;
 	int setting_idx = 0;
 
 	if(pParams == NULL){
@@ -57,17 +97,24 @@ AsharpResult_t sharp_config_setting_param_v1(RKAsharp_Sharp_HW_Params_t *pParams
 		return ASHARP_RET_NULL_POINTER;
 	}
 
-	res = sharp_get_setting_idx_by_name_v1(pCalibdb, snr_name, &setting_idx);
+	
+	res = sharp_get_mode_cell_idx_by_name_v1(pCalibdb, param_mode, &mode_idx);
 	if(res != ASHARP_RET_SUCCESS){
-		LOGW_ASHARP("%s(%d): error!!!  can't find setting in iq files, use 0 instead\n", __FUNCTION__, __LINE__);
+		LOGE_ASHARP("%s(%d): error!!!  can't find mode name in iq files, use 0 instead\n", __FUNCTION__, __LINE__);
 	}
 
-	res = init_sharp_params_v1(pParams, pCalibdb, setting_idx);
+	res = sharp_get_setting_idx_by_name_v1(pCalibdb, snr_name, mode_idx, &setting_idx);
+	if(res != ASHARP_RET_SUCCESS){
+		LOGE_ASHARP("%s(%d): error!!!  can't find setting in iq files, use 0 instead\n", __FUNCTION__, __LINE__);
+	}
 
+	res = init_sharp_params_v1(pParams, pCalibdb, mode_idx, setting_idx);
+
+	LOGD_ASHARP("%s(%d): finnal mode:%d snr_mode:%d \n", __FUNCTION__, __LINE__, mode_idx, setting_idx);
 	return res;
 
 }
-AsharpResult_t init_sharp_params_v1(RKAsharp_Sharp_HW_Params_t *pParams, CalibDb_Sharp_t *pCalibdb, int setting_idx)
+AsharpResult_t init_sharp_params_v1(RKAsharp_Sharp_HW_Params_t *pParams, CalibDb_Sharp_t *pCalibdb, int mode_idx, int setting_idx)
 {
     AsharpResult_t res = ASHARP_RET_SUCCESS;
     int i = 0;
@@ -84,7 +131,7 @@ AsharpResult_t init_sharp_params_v1(RKAsharp_Sharp_HW_Params_t *pParams, CalibDb
         return ASHARP_RET_NULL_POINTER;
     }
 
-	CalibDb_Sharp_Setting_t *pSetting = &pCalibdb->setting[setting_idx];
+	CalibDb_Sharp_Setting_t *pSetting = &pCalibdb->mode_cell[mode_idx].setting[setting_idx];
     for (i = 0; i < max_iso_step; i++) {
 #ifndef RK_SIMULATOR_HW
 		pParams->iso[i] = pSetting->sharp_iso[i].iso;

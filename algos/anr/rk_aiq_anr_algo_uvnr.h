@@ -12,7 +12,13 @@
 
 RKAIQ_BEGIN_DECLARE
 
-ANRresult_t init_uvnr_params(RKAnr_Uvnr_Params_t *pParams, CalibDb_UVNR_t *pCalibdb, int setting_idx);
+ANRresult_t uvnr_get_mode_cell_idx_by_name(CalibDb_UVNR_t *pCalibdb, char *name, int *mode_idx);
+
+ANRresult_t uvnr_get_setting_idx_by_name(CalibDb_UVNR_t *pCalibdb, char *name, int mode_idx, int *setting_idx);
+
+ANRresult_t uvnr_config_setting_param(RKAnr_Uvnr_Params_t *pParams, CalibDb_UVNR_t *pCalibdb, char* param_mode, char * snr_name);
+
+ANRresult_t init_uvnr_params(RKAnr_Uvnr_Params_t *pParams, CalibDb_UVNR_t *pCalibdb, int mode_idx, int setting_idx);
 
 ANRresult_t select_uvnr_params_by_ISO(RKAnr_Uvnr_Params_t *stRKUVNrParams, RKAnr_Uvnr_Params_Select_t *stRKUVNrParamsSelected, ANRExpInfo_t *pExpInfo);
 
@@ -20,8 +26,6 @@ ANRresult_t uvnr_fix_transfer(RKAnr_Uvnr_Params_Select_t *uvnr, RKAnr_Uvnr_Fix_t
 
 ANRresult_t uvnr_fix_Printf(RKAnr_Uvnr_Fix_t  * pNrCfg);
 
-ANRresult_t uvnr_get_setting_idx_by_name(CalibDb_UVNR_t *pCalibdb, char *name, int *setting_idx);
-ANRresult_t uvnr_config_setting_param(RKAnr_Uvnr_Params_t *pParams, CalibDb_UVNR_t *pCalibdb, char* snr_name);
 RKAIQ_END_DECLARE
 
 #endif

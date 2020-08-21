@@ -2,7 +2,7 @@
 <matfile>
     <header type="struct" size="[1 1]">
         <code_xml_parse_version index="1" type="char" size="[1 6]">
-            v1.1.9
+            v1.1.a
         </code_xml_parse_version>
         <creation_date index="1" type="char" size="[1 10]">
             2020-04-24
@@ -20,7 +20,7 @@
             v0.0.3
         </generator_version>
         <magic_code_version  index="1" type="int" size="[1 1]">
-            [996490]
+            [998815]
         </magic_code_version>
     </header>
     <sensor type="struct" size="[1 1]">
@@ -2047,9 +2047,12 @@
                 <Evbias index="1" type="double" size="[1 1]">
                     [0.0000 ]
                 </Evbias>
-                <Tolerance index="1" type="double" size="[1 1]">
+                <ToleranceIn index="1" type="double" size="[1 1]">
                     [10.0000 ]
-                </Tolerance>
+                </ToleranceIn>
+                <ToleranceOut index="1" type="double" size="[1 1]">
+                    [15.0000 ]
+                </ToleranceOut>
                 <StrategyMode index="1" type="char" size="[1 20]">LOWLIGHT_PRIOR</StrategyMode>
            <BackLightCtrl index="1" type="struct" size="[1 1]">
               <Enable index="1" type="double" size="[1 1]">
@@ -2111,9 +2114,12 @@
                 <Evbias index="1" type="double" size="[1 1]">
                     [0.0000 ]
                 </Evbias>
-                <Tolerance index="1" type="double" size="[1 1]">
+                <ToleranceIn index="1" type="double" size="[1 1]">
                     [10.0000 ]
-                </Tolerance>
+                </ToleranceIn>
+                <ToleranceOut index="1" type="double" size="[1 1]">
+                    [15.0000 ]
+                </ToleranceOut>
       	       <LongFrmMode index="1" type="struct" size="[1 1]">
 		  <mode index="1" type="char" size="[1 20]">
 		     NORMAL
@@ -17741,15 +17747,28 @@
 	  </Hdr>
         </DCG_SETTING>
         <EXP_DELAY index="1" type="struct" size="[1 1]">
-            <time_delay index="1" type="double" size="[1 1]">
-            [2 ]
-        </time_delay>
-            <gain_delay index="1" type="double" size="[1 1]">
-            [2 ]
-        </gain_delay>
-            <dcg_delay index="1" type="double" size="[1 1]">
-            [1]
-        </dcg_delay>
+	  <Normal index="1" type="struct" size="[1 1]">	
+	     <time_delay index="1" type="double" size="[1 1]">
+	        [2]
+	     </time_delay>
+	     <gain_delay index="1" type="double" size="[1 1]">
+	        [2]
+	     </gain_delay>
+	     <dcg_delay index="1" type="double" size="[1 1]">
+	        [0]
+	     </dcg_delay>
+	  </Normal>
+	  <Hdr index="1" type="struct" size="[1 1]">	
+	     <time_delay index="1" type="double" size="[1 1]">
+	        [2]
+	     </time_delay>
+	     <gain_delay index="1" type="double" size="[1 1]">
+	        [2]
+	     </gain_delay>
+	     <dcg_delay index="1" type="double" size="[1 1]">
+	        [0]
+	     </dcg_delay>
+	  </Hdr>
         </EXP_DELAY>
     </system>
 </matfile>

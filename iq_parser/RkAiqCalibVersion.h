@@ -59,10 +59,15 @@
  *  - add OverExpCtrl in AEC
  *  - delete useless iq params in AEC
  *  - including:AOE,Hist2Hal,AecRange,InternalAdjust
+ * v1.1.a
+ *  - ExpDelay support Hdr/Normal mode
+ *  - Tolerance divide into ToleranceIn/ToleranceOut
  */
 
-#define RK_AIQ_CALIB_VERSION_REAL_V          "v1.1.9"
-#define RK_AIQ_CALIB_VERSION_MAGIC_V         "996490"
+
+#define RK_AIQ_CALIB_VERSION_REAL_V          "v1.2.0"
+#define RK_AIQ_CALIB_VERSION_MAGIC_V         "1006650"
+
 
 /******* DO NOT EDIT THE FOLLOWINGS ***********/
 
