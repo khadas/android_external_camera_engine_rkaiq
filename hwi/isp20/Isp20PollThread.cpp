@@ -228,7 +228,7 @@ Isp20PollThread::set_value_to_file(const char* path, int value, uint32_t sequenc
     char buffer[16] = {0};
     int fp;
 
-    fp = open(path, O_CREAT | O_RDWR | O_SYNC);
+    fp = open(path, O_CREAT | O_RDWR | O_SYNC, S_IRWXU|S_IRUSR|S_IXUSR|S_IROTH|S_IXOTH);
     if (fp) {
         ftruncate(fp, 0);
         lseek(fp, 0, SEEK_SET);

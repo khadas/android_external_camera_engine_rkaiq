@@ -4435,7 +4435,7 @@ bool RkAiqCalibParser::parseEntrySensorAecDNSwitch
                 }
                 else {
                     mCalibDb->aec.CommCtrl.stDNSwitch.DNMode = AEC_DNMODE_MIN;
-                    LOGE("%s(%d): invalid AEC DNSwitch-DNMode = %s\n", __FUNCTION__, __LINE__, s_value);
+                    LOGE("%s(%d): invalid AEC DNSwitch-DNMode = %s\n", __FUNCTION__, __LINE__, s_value.c_str());
                 }
             }
             else if (xmlParseReadWrite == XML_PARSER_WRITE)
@@ -4528,7 +4528,7 @@ bool RkAiqCalibParser::parseEntrySensorAecAntiFlicker
                 }
                 else {
                     mCalibDb->aec.CommCtrl.stAntiFlicker.Frequency = AEC_FLICKER_FREQUENCY_OFF;
-                    LOGE("%s(%d): invalid stAntiFlicker.Frequency = %s\n", __FUNCTION__, __LINE__, s_value);
+                    LOGE("%s(%d): invalid stAntiFlicker.Frequency = %s\n", __FUNCTION__, __LINE__, s_value.c_str());
                 }
             }
             else if (xmlParseReadWrite == XML_PARSER_WRITE)
@@ -4560,7 +4560,7 @@ bool RkAiqCalibParser::parseEntrySensorAecAntiFlicker
                 }
                 else {
                     mCalibDb->aec.CommCtrl.stAntiFlicker.Mode = AEC_ANTIFLICKER_AUTO_MODE;
-                    LOGE("%s(%d): invalid stAntiFlicker.Mode = %s\n", __FUNCTION__, __LINE__, s_value);
+                    LOGE("%s(%d): invalid stAntiFlicker.Mode = %s\n", __FUNCTION__, __LINE__, s_value.c_str());
                 }
             }
             else if (xmlParseReadWrite == XML_PARSER_WRITE)
@@ -5950,7 +5950,7 @@ bool RkAiqCalibParser::parseEntrySensorAec
                 }
                 else {
                     mCalibDb->aec.CommCtrl.HistStatsMode = CAM_HIST_MODE_INVALID;
-                    LOGE("%s(%d): invalid AEC HistStatsMode = %s end\n", __FUNCTION__, __LINE__, s_value);
+                    LOGE("%s(%d): invalid AEC HistStatsMode = %s end\n", __FUNCTION__, __LINE__, s_value.c_str());
                 }
             }
             else if (xmlParseReadWrite == XML_PARSER_WRITE)
@@ -6026,7 +6026,7 @@ bool RkAiqCalibParser::parseEntrySensorAec
                 }
                 else {
                     mCalibDb->aec.CommCtrl.RawStatsMode = CAM_RAWSTATS_MODE_INVALID;
-                    LOGE("%s(%d): invalid AEC RawStatsMode = %s\n", __FUNCTION__, __LINE__, s_value);
+                    LOGE("%s(%d): invalid AEC RawStatsMode = %s\n", __FUNCTION__, __LINE__, s_value.c_str());
                 }
             }
             else if (xmlParseReadWrite == XML_PARSER_WRITE)
@@ -6066,7 +6066,7 @@ bool RkAiqCalibParser::parseEntrySensorAec
                 }
                 else {
                     mCalibDb->aec.CommCtrl.YRangeMode = CAM_YRANGE_MODE_INVALID;
-                    LOGE("%s(%d): invalid AEC YRangeMode = %s\n", __FUNCTION__, __LINE__, s_value);
+                    LOGE("%s(%d): invalid AEC YRangeMode = %s\n", __FUNCTION__, __LINE__, s_value.c_str());
                 }
             }
             else if (xmlParseReadWrite == XML_PARSER_WRITE)
@@ -6100,7 +6100,7 @@ bool RkAiqCalibParser::parseEntrySensorAec
                 }
                 else {
                     mCalibDb->aec.CommCtrl.AecOpType = RK_AIQ_OP_MODE_INVALID;
-                    LOGE("%s(%d): invalid AEC AecOpType = %s\n", __FUNCTION__, __LINE__, s_value);
+                    LOGE("%s(%d): invalid AEC AecOpType = %s\n", __FUNCTION__, __LINE__, s_value.c_str());
                 }
             }
             else if (xmlParseReadWrite == XML_PARSER_WRITE)
@@ -6127,7 +6127,7 @@ bool RkAiqCalibParser::parseEntrySensorAec
         }
         else if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_AEC_AECDELAYFRMNUM_TAG_ID)) {
             if (!parseEntrySensorAecDelayFrmNum(pchild->ToElement())) {
-                LOGE("parse error in Aec (%s)", tagname, param);
+                LOGE("parse error in Aec (%s)", tagname.c_str(), param);
                 return (false);
             }
         }
@@ -6550,7 +6550,7 @@ bool RkAiqCalibParser::parseEntrySensorInfoGainRange
                 }
                 else {
                     mCalibDb->sensor.GainRange.GainMode = RKAIQ_EXPGAIN_MODE_NONLINEAR_DB;
-                    LOGE("%s(%d): invalid GainRange Mode = %s\n", __FUNCTION__, __LINE__, s_value);
+                    LOGE("%s(%d): invalid GainRange Mode = %s\n", __FUNCTION__, __LINE__, s_value.c_str());
                 }
             }
             else if (xmlParseReadWrite == XML_PARSER_WRITE)
@@ -11084,7 +11084,7 @@ bool RkAiqCalibParser::parseEntrySystemDcgHdrSetting
                 }
                 else {
                     mCalibDb->sysContrl.dcg.Hdr.dcg_optype = RK_AIQ_OP_MODE_INVALID;
-                    LOGE("%s(%d): invalid dcg Hdr.OpType = %s\n", __FUNCTION__, __LINE__, s_value);
+                    LOGE("%s(%d): invalid dcg Hdr.OpType = %s\n", __FUNCTION__, __LINE__, s_value.c_str());
                 }
             }
             else if (xmlParseReadWrite == XML_PARSER_WRITE)
@@ -11170,7 +11170,7 @@ bool RkAiqCalibParser::parseEntrySystemDcgNormalSetting
                 }
                 else {
                     mCalibDb->sysContrl.dcg.Normal.dcg_optype = RK_AIQ_OP_MODE_INVALID;
-                    LOGE("%s(%d): invalid dcg OpType = %s\n", __FUNCTION__, __LINE__, s_value);
+                    LOGE("%s(%d): invalid dcg OpType = %s\n", __FUNCTION__, __LINE__, s_value.c_str());
                 }
             }
             else if (xmlParseReadWrite == XML_PARSER_WRITE)
@@ -11237,12 +11237,12 @@ bool RkAiqCalibParser::parseEntrySystemDcgSetting
         XML_CHECK_WHILE_SUBTAG_MARK((char *)(subTagname.c_str()), subTag.Type(), subTag.Size());
         if (XML_CHECK_TAGID_COMPARE(CALIB_SYSTEM_DCG_SETTING_NORMAL_TAG_ID)) {
             if (!parseEntrySystemDcgNormalSetting(psecsubchild->ToElement())) {
-                LOGE("parse error in Dcg NormalSetting (%s)", subTagname);
+                LOGE("parse error in Dcg NormalSetting (%s)", subTagname.c_str());
                 return (false);
             }
         } else if(XML_CHECK_TAGID_COMPARE(CALIB_SYSTEM_DCG_SETTING_HDR_TAG_ID)) {
             if (!parseEntrySystemDcgHdrSetting(psecsubchild->ToElement())) {
-                LOGE("parse error in Dcg HdrSetting (%s)", subTagname);
+                LOGE("parse error in Dcg HdrSetting (%s)", subTagname.c_str());
                 return (false);
             }
         }

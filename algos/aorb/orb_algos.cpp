@@ -547,8 +547,9 @@ int elimate_affine_transform(ORBList* matched_keypoints, double homography[9])
     int distance = -1, distanceAvg = 0;
     int* distanceArray = (int*)malloc(sizeof(int) * matched_keypoints->length);
     int* distanceSortedArray = (int*)malloc(sizeof(int) * matched_keypoints->length);
-    int (*M0_stats)[matched_keypoints->length] =
-        (int (*)[matched_keypoints->length])malloc(sizeof(int) * matched_keypoints->length * 2);
+    int* M0_stats[2];
+    for (int i = 0; i < 2 ;i++)
+        M0_stats[i] = (int*)malloc(sizeof(int) * matched_keypoints->length);
     for (k = 0; k < matched_keypoints->length; k++) {
         M0_stats[0][k] = M0_stats[1][k] = -1;
     }
