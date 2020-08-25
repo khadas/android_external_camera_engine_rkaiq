@@ -17,7 +17,7 @@
             CMK-OT1607
         </sample_name>
         <generator_version index="1" type="char" size="[1 6]">
-            v0.0.4
+            v0.0.6
         </generator_version>
         <magic_code_version  index="1" type="int" size="[1 1]">
             [1006650]
@@ -1743,10 +1743,10 @@
             <AecInitValue index="1" type="struct" size="[1 1]">
                 <LinearAE index="1" type="struct" size="[1 1]">
                     <InitTimeValue index="1" type="double" size="[1 1]">
-                        [0.003 ]
+                        [0.001 ]
                     </InitTimeValue>
                     <InitGainValue index="1" type="double" size="[1 1]">
-                        [3.0000 ]
+                        [1.0000 ]
                     </InitGainValue>
                     <InitIspDgainValue index="1" type="double" size="[1 1]">
                         [1.0000 ]
@@ -1757,10 +1757,10 @@
                 </LinearAE>
                 <HdrAE index="1" type="struct" size="[1 1]">
                     <InitTimeValue index="1" type="double" size="[1 3]">
-                        [0.003 0.003 0.003 ]
+                        [0.001 0.001 0.001 ]
                     </InitTimeValue>
                     <InitGainValue index="1" type="double" size="[1 3]">
-                        [3 22 22 ]
+                        [1 1 1 ]
                     </InitGainValue>
                     <InitIspDgainValue index="1" type="double" size="[1 3]">
                         [1.0000 1.0000 1.0000 ]
@@ -1879,7 +1879,7 @@
                             [22.0000 22.0000 44.0000 88.0000 352.0000 1408.000 ]
                         </MGainDot>
                         <SGainDot index="1" type="double" size="[1 6]">
-                            [3.0000 8.0000 8.0000 16.0000 32.0000 64.000 ]
+                            [3.0000 3.0000 8.0000 16.0000 32.0000 64.000 ]
                         </SGainDot>
                         <LIspDGainDot index="1" type="double" size="[1 6]">
                             [1.0000 1.0000 1.0000 1.0000 1.0000 1.0000 ]
@@ -2144,10 +2144,10 @@
                         [4.0000 4.0000 4.0000 4.0000 4.0000 4.0000 ]
                     </L2MRatioFix>
                     <M2SRatioMax index="1" type="double" size="[1 6]">
-                        [64.0000 64.0000 64.0000 64.0000 64.0000 64.0000 ]
+                        [16.0000 16.0000 16.0000 16.0000 16.0000 16.0000 ]
                     </M2SRatioMax>
                     <L2MRatioMax index="1" type="double" size="[1 6]">
-                        [64.0000 64.0000 64.0000 64.0000 64.0000 64.0000 ]
+                        [16.0000 16.0000 16.0000 16.0000 16.0000 16.0000 ]
                     </L2MRatioMax>
                 </ExpRatioCtrl>
                 <LumaDistTh index="1" type="double" size="[1 1]">
@@ -2158,19 +2158,19 @@
                         [150.0000 ]
                     </OEROILowTh>
                     <LvHighTh index="1" type="double" size="[1 1]">
-               	[0.182]
+               	      [0.182]
                     </LvHighTh>
                     <LvLowTh index="1" type="double" size="[1 1]">
-               	[0.02]
+               	      [0.02]
                     </LvLowTh>
                     <LExpLevel index="1" type="double" size="[1 6]">
                         [0.0000 0.0100 0.0300 0.0500 0.1000 0.2000 ]
                     </LExpLevel>
                     <LSetPoint index="1" type="double" size="[1 6]">
-                        [75.0000 75.0000 75.0000 75.0000 75.0000 75.0000 ]
+                        [55 50 45 40 35 30]
                     </LSetPoint>
                     <TargetLLLuma index="1" type="double" size="[1 6]">
-                  [35 32 30 28 25 20]
+                        [35 32 30 28 25 20]
                     </TargetLLLuma>
                     <NonOEPdfTh index="1" type="double" size="[1 6]">
                         [0.4000 0.4500 0.5500 0.6500 0.7500 1.0000 ]
@@ -2192,7 +2192,7 @@
                         [0.0000 0.0500 0.1500 0.2500 0.4000 0.6000 ]
                     </SExpLevel>
                     <TargetHLLuma index="1" type="double" size="[1 6]">
-                        [100.0000 100.0000 100.0000 90.0000 80.0000 70.0000 ]
+                        [90.0000 90.0000 90.0000 90.0000 80.0000 70.0000 ]
                     </TargetHLLuma>
                     <SSetPoint index="1" type="double" size="[1 6]">
                         [18.0000 18.0000 15.0000 12.0000 12.0000 12.0000 ]
@@ -2382,7 +2382,7 @@
                         [0.0000 ]
                     </Tolerance>
                     <DetailsLowLight index="1" type="double" size="[1 6]">
-                    [1.0 1.0 1.0 1.0 1.0 1.0]
+                    [2.0 2.0 2.0 2.0 2.0 2.0]
                     </DetailsLowLight>
                 </DetailsLowLight>
                 <TmoContrast index="1" type="struct" size="[1 1]">
@@ -34148,7 +34148,7 @@
                         [50.0000 ]
                     </iso>
                     <dehaze_en index="1" type="double" size="[1 1]">
-                        [0 ]
+                        [1 ]
                     </dehaze_en>
                     <dc_en index="1" type="double" size="[1 1]">
                         [1 ]
@@ -34273,7 +34273,7 @@
                         [100.0000 ]
                     </iso>
                     <dehaze_en index="1" type="double" size="[1 1]">
-                        [0]
+                        [1]
                     </dehaze_en>
                     <dc_en index="1" type="double" size="[1 1]">
                         [1 ]
@@ -34398,7 +34398,7 @@
                         [200.0000 ]
                     </iso>
                     <dehaze_en index="1" type="double" size="[1 1]">
-                        [0 ]
+                        [1 ]
                     </dehaze_en>
                     <dc_en index="1" type="double" size="[1 1]">
                         [1 ]
@@ -34523,7 +34523,7 @@
                         [400.0000 ]
                     </iso>
                     <dehaze_en index="1" type="double" size="[1 1]">
-                        [0]
+                        [1]
                     </dehaze_en>
                     <dc_en index="1" type="double" size="[1 1]">
                         [1 ]
@@ -34648,7 +34648,7 @@
                         [800.0000 ]
                     </iso>
                     <dehaze_en index="1" type="double" size="[1 1]">
-                        [0]
+                        [1]
                     </dehaze_en>
                     <dc_en index="1" type="double" size="[1 1]">
                         [1 ]
@@ -34717,7 +34717,7 @@
                         [1 ]
                     </enhance_en>
                     <enhance_value index="1" type="double" size="[1 1]">
-                        [1.5000 ]
+                        [1.3000 ]
                     </enhance_value>
                     <hist_para_en index="1" type="double" size="[1 1]">
                         [1 ]
@@ -34773,7 +34773,7 @@
                         [1600.0000 ]
                     </iso>
                     <dehaze_en index="1" type="double" size="[1 1]">
-                        [0 ]
+                        [1 ]
                     </dehaze_en>
                     <dc_en index="1" type="double" size="[1 1]">
                         [1 ]
@@ -34898,7 +34898,7 @@
                         [3200.0000 ]
                     </iso>
                     <dehaze_en index="1" type="double" size="[1 1]">
-                        [0 ]
+                        [1 ]
                     </dehaze_en>
                     <dc_en index="1" type="double" size="[1 1]">
                         [1 ]
@@ -35023,7 +35023,7 @@
                         [6400.0000 ]
                     </iso>
                     <dehaze_en index="1" type="double" size="[1 1]">
-                        [0 ]
+                        [1 ]
                     </dehaze_en>
                     <dc_en index="1" type="double" size="[1 1]">
                         [1 ]
@@ -35148,7 +35148,7 @@
                         [12800.0000 ]
                     </iso>
                     <dehaze_en index="1" type="double" size="[1 1]">
-                        [0 ]
+                        [1 ]
                     </dehaze_en>
                     <dc_en index="1" type="double" size="[1 1]">
                         [1 ]
@@ -35408,7 +35408,7 @@
                 [1 ]
             </enable>
             <threshold index="1" type="double" size="[1 1]">
-                [0.2000 ]
+                [0.0000 ]
             </threshold>
         </LUMADETECT>
       <COLOR_AS_GREY index="1" type="struct" size="[1 1]">
