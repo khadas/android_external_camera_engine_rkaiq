@@ -113,7 +113,7 @@ RkAiqCoreThread::loop()
 
 // notice that some pool shared items may be cached by other
 // modules(e.g. CamHwIsp20), so here should consider the cached number
-uint16_t RkAiqCore::DEFAULT_POOL_SIZE = 8;
+uint16_t RkAiqCore::DEFAULT_POOL_SIZE = 15;
 
 RkAiqCore::RkAiqCore()
     : mRkAiqCoreTh(new RkAiqCoreThread(this))

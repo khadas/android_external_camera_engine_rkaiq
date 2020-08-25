@@ -2357,7 +2357,7 @@ CamHwIsp20::setIspParamsSync(int frameId)
 
     ENTER_CAMHW_FUNCTION();
     _mutex.lock();
-    while (_effecting_ispparm_map.size() > 2)
+    while (_effecting_ispparm_map.size() > 4)
         _effecting_ispparm_map.erase(_effecting_ispparm_map.begin());
 
     if (_pending_ispparams_queue.empty()) {
@@ -2847,7 +2847,7 @@ CamHwIsp20::getEffectiveIspParams(SmartPtr<RkAiqIspParamsProxy>& ispParams, int 
         ispParams = it->second;
     }
 
-    while (_effecting_ispparm_map.size() > 2)
+    while (_effecting_ispparm_map.size() > 4)
         _effecting_ispparm_map.erase(_effecting_ispparm_map.begin());
 
     EXIT_CAMHW_FUNCTION();
