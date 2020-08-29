@@ -241,20 +241,24 @@ RkLumaCore::analyze(const SmartPtr<VideoBuffer> &buffer)
         float dluma = int(luma_frame_pre->mean_luma[raw_channal] - mean_luma) /
                        float(luma_frame_pre->mean_luma[raw_channal] + mean_luma);
 
-        if (dluma > calib->mutation_threshold || dluma < -calib->mutation_threshold ) {
-	    if (mWorkingMode != RK_AIQ_WORKING_MODE_NORMAL)
-                hdrProcessCnt++;
+        if (mWorkingMode != RK_AIQ_WORKING_MODE_NORMAL) {
+            if (dluma > calib->mutation_threshold_level2 || dluma < -calib->mutation_threshold_level2) {
+                hdrProcessCnt = 2;
+            } else if (dluma > calib->mutation_threshold || dluma < -calib->mutation_threshold ) {
+                hdrProcessCnt = 1;
+            }
         }
 
-	LOGD_ANALYZER("id(%d) lumatest(%d) now pre: %d-%d, threshold: %f, dluma: %f, hdrProcessCnt: %d, datasize: %d\n",
-		      lumaStat->frame_id,
-		      mWorkingMode,
-		      mean_luma,
-		      luma_frame_pre->mean_luma[raw_channal],
-		      calib->mutation_threshold,
-		      dluma,
-		      hdrProcessCnt,
-		      mLumaQueueFIFO.size());
+        LOGV_ANALYZER("id(%d) lumatest(%d) now pre: %d-%d, threshold: %f, threshold_level2: %f, dluma: %f, hdrProcessCnt: %d, datasize: %d\n",
+                lumaStat->frame_id,
+                mWorkingMode,
+                mean_luma,
+                luma_frame_pre->mean_luma[raw_channal],
+                calib->mutation_threshold,
+                calib->mutation_threshold_level2,
+                dluma,
+                hdrProcessCnt,
+                mLumaQueueFIFO.size());
     }
 
     SmartPtr<isp_luma_stat_t> luma_result = new isp_luma_stat_t();

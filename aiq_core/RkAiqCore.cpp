@@ -329,11 +329,6 @@ RkAiqCore::prepare(const rk_aiq_exposure_sensor_descriptor* sensor_des,
         }
     }
 
-    // for not hdr mode
-    if (mAlogsSharedParams.working_mode < RK_AIQ_WORKING_MODE_ISP_HDR2)
-        enableAlgo(RK_AIQ_ALGO_TYPE_AHDR, 0, false);
-    else
-        enableAlgo(RK_AIQ_ALGO_TYPE_AHDR, 0, true);
 #define PREPARE_ALGO(at) \
     LOGD_ANALYZER("%s handle prepare start ....", #at); \
     if (mCur##at##AlgoHdl.ptr() && mCur##at##AlgoHdl->getEnable()) { \
@@ -836,6 +831,9 @@ RkAiqCore::genIspAhdrResult(RkAiqFullParams* params)
 
         isp_param->ahdr_proc_res.isHdrGlobalTmo =
             ahdr_rk->AhdrProcRes.isHdrGlobalTmo;
+
+        isp_param->ahdr_proc_res.isLinearTmoOn =
+            ahdr_rk->AhdrProcRes.isLinearTmoOn;
 
     }
 
@@ -1530,23 +1528,23 @@ RkAiqCore::genIspAlscResult(RkAiqFullParams* params)
     // TODO: gen alsc common result
     RkAiqAlgoProcResAlsc* alsc_rk = (RkAiqAlgoProcResAlsc*)alsc_com;
     isp_param->lsc = alsc_rk->alsc_hw_conf;
-    if(mAlogsSharedParams.sns_mirror){
-        for(int i = 0; i < LSC_DATA_TBL_V_SIZE; i++){
-            for(int j = 0; j < LSC_DATA_TBL_H_SIZE; j++){
-                SWAP(unsigned short,isp_param->lsc.r_data_tbl[i*LSC_DATA_TBL_H_SIZE+j],isp_param->lsc.r_data_tbl[i*LSC_DATA_TBL_H_SIZE+(LSC_DATA_TBL_H_SIZE-1-j)]);
-                SWAP(unsigned short,isp_param->lsc.gr_data_tbl[i*LSC_DATA_TBL_H_SIZE+j],isp_param->lsc.gr_data_tbl[i*LSC_DATA_TBL_H_SIZE+(LSC_DATA_TBL_H_SIZE-1-j)]);
-                SWAP(unsigned short,isp_param->lsc.gb_data_tbl[i*LSC_DATA_TBL_H_SIZE+j],isp_param->lsc.gb_data_tbl[i*LSC_DATA_TBL_H_SIZE+(LSC_DATA_TBL_H_SIZE-1-j)]);
-                SWAP(unsigned short,isp_param->lsc.b_data_tbl[i*LSC_DATA_TBL_H_SIZE+j],isp_param->lsc.b_data_tbl[i*LSC_DATA_TBL_H_SIZE+(LSC_DATA_TBL_H_SIZE-1-j)]);
+    if(mAlogsSharedParams.sns_mirror) {
+        for(int i = 0; i < LSC_DATA_TBL_V_SIZE; i++) {
+            for(int j = 0; j < LSC_DATA_TBL_H_SIZE; j++) {
+                SWAP(unsigned short, isp_param->lsc.r_data_tbl[i * LSC_DATA_TBL_H_SIZE + j], isp_param->lsc.r_data_tbl[i * LSC_DATA_TBL_H_SIZE + (LSC_DATA_TBL_H_SIZE - 1 - j)]);
+                SWAP(unsigned short, isp_param->lsc.gr_data_tbl[i * LSC_DATA_TBL_H_SIZE + j], isp_param->lsc.gr_data_tbl[i * LSC_DATA_TBL_H_SIZE + (LSC_DATA_TBL_H_SIZE - 1 - j)]);
+                SWAP(unsigned short, isp_param->lsc.gb_data_tbl[i * LSC_DATA_TBL_H_SIZE + j], isp_param->lsc.gb_data_tbl[i * LSC_DATA_TBL_H_SIZE + (LSC_DATA_TBL_H_SIZE - 1 - j)]);
+                SWAP(unsigned short, isp_param->lsc.b_data_tbl[i * LSC_DATA_TBL_H_SIZE + j], isp_param->lsc.b_data_tbl[i * LSC_DATA_TBL_H_SIZE + (LSC_DATA_TBL_H_SIZE - 1 - j)]);
             }
         }
     }
-    if(mAlogsSharedParams.sns_flip){
-        for(int i = 0; i < LSC_DATA_TBL_V_SIZE; i++){
-            for(int j = 0; j < LSC_DATA_TBL_H_SIZE; j++){
-                SWAP(unsigned short,isp_param->lsc.r_data_tbl[i*LSC_DATA_TBL_H_SIZE+j],isp_param->lsc.r_data_tbl[(LSC_DATA_TBL_V_SIZE-1-i)*LSC_DATA_TBL_H_SIZE+j]);
-                SWAP(unsigned short,isp_param->lsc.gr_data_tbl[i*LSC_DATA_TBL_H_SIZE+j],isp_param->lsc.gr_data_tbl[(LSC_DATA_TBL_V_SIZE-1-i)*LSC_DATA_TBL_H_SIZE+j]);
-                SWAP(unsigned short,isp_param->lsc.gb_data_tbl[i*LSC_DATA_TBL_H_SIZE+j],isp_param->lsc.gb_data_tbl[(LSC_DATA_TBL_V_SIZE-1-i)*LSC_DATA_TBL_H_SIZE+j]);
-                SWAP(unsigned short,isp_param->lsc.b_data_tbl[i*LSC_DATA_TBL_H_SIZE+j],isp_param->lsc.b_data_tbl[(LSC_DATA_TBL_V_SIZE-1-i)*LSC_DATA_TBL_H_SIZE+j]);
+    if(mAlogsSharedParams.sns_flip) {
+        for(int i = 0; i < LSC_DATA_TBL_V_SIZE; i++) {
+            for(int j = 0; j < LSC_DATA_TBL_H_SIZE; j++) {
+                SWAP(unsigned short, isp_param->lsc.r_data_tbl[i * LSC_DATA_TBL_H_SIZE + j], isp_param->lsc.r_data_tbl[(LSC_DATA_TBL_V_SIZE - 1 - i)*LSC_DATA_TBL_H_SIZE + j]);
+                SWAP(unsigned short, isp_param->lsc.gr_data_tbl[i * LSC_DATA_TBL_H_SIZE + j], isp_param->lsc.gr_data_tbl[(LSC_DATA_TBL_V_SIZE - 1 - i)*LSC_DATA_TBL_H_SIZE + j]);
+                SWAP(unsigned short, isp_param->lsc.gb_data_tbl[i * LSC_DATA_TBL_H_SIZE + j], isp_param->lsc.gb_data_tbl[(LSC_DATA_TBL_V_SIZE - 1 - i)*LSC_DATA_TBL_H_SIZE + j]);
+                SWAP(unsigned short, isp_param->lsc.b_data_tbl[i * LSC_DATA_TBL_H_SIZE + j], isp_param->lsc.b_data_tbl[(LSC_DATA_TBL_V_SIZE - 1 - i)*LSC_DATA_TBL_H_SIZE + j]);
             }
         }
     }

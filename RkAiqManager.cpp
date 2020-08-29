@@ -669,4 +669,91 @@ void RkAiqManager::setDefMirrorFlip()
     setMirrorFlip(def_mirr, def_flip);
 }
 
+XCamReturn RkAiqManager::swWorkingModeDyn(rk_aiq_working_mode_t mode)
+{
+    ENTER_XCORE_FUNCTION();
+
+    SmartPtr<RkAiqFullParamsProxy> initParams;
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    if (mode == mWorkingMode)
+        return ret;
+
+    if (_state != AIQ_STATE_STARTED) {
+        LOGW_ANALYZER("should be called at STARTED state");
+        return ret;
+    }
+    // 1. stop analyzer, re-preapre with the new mode
+    // 2. stop luma analyzer, re-preapre with the new mode
+    LOGI_ANALYZER("stop analyzer ...");
+    mAiqRstAppTh->triger_stop();
+    bool bret = mAiqRstAppTh->stop();
+    ret = bret ? XCAM_RETURN_NO_ERROR : XCAM_RETURN_ERROR_FAILED;
+    RKAIQMNG_CHECK_RET(ret, "apply result thread stop error");
+
+    ret = mRkAiqAnalyzer->stop();
+    RKAIQMNG_CHECK_RET(ret, "analyzer stop error %d", ret);
+
+    ret = mRkLumaAnalyzer->stop();
+    RKAIQMNG_CHECK_RET(ret, "luma analyzer stop error %d", ret);
+
+    // 3. pause hwi
+    LOGI_ANALYZER("pause hwi ...");
+    ret = mCamHw->pause();
+    RKAIQMNG_CHECK_RET(ret, "pause hwi error %d", ret);
+
+    int working_mode_hw = RK_AIQ_WORKING_MODE_NORMAL;
+    if (mode == RK_AIQ_WORKING_MODE_ISP_HDR2)
+        working_mode_hw = RK_AIQ_ISP_HDR_MODE_2_FRAME_HDR;
+    else if (mode == RK_AIQ_WORKING_MODE_ISP_HDR3)
+        working_mode_hw = RK_AIQ_ISP_HDR_MODE_3_FRAME_HDR;
+
+    // 4. set new mode to hwi
+    ret = mCamHw->swWorkingModeDyn(working_mode_hw);
+    if (ret) {
+        LOGE_ANALYZER("hwi swWorkingModeDyn error ...");
+        goto restart;
+    }
+
+    // 5. re-prepare analyzer
+    LOGI_ANALYZER("reprepare analyzer ...");
+    rk_aiq_exposure_sensor_descriptor sensor_des;
+    ret = mCamHw->getSensorModeData(mSnsEntName, sensor_des);
+    ret = mRkAiqAnalyzer->prepare(&sensor_des, working_mode_hw);
+    RKAIQMNG_CHECK_RET(ret, "analyzer prepare error %d", ret);
+
+    initParams = mRkAiqAnalyzer->getAiqFullParams();
+
+    ret = applyAnalyzerResult(initParams);
+    RKAIQMNG_CHECK_RET(ret, "set initial params error %d", ret);
+
+restart:
+    // 6. resume hwi
+    LOGI_ANALYZER("resume hwi");
+    ret = mCamHw->resume();
+    RKAIQMNG_CHECK_RET(ret, "pause hwi error %d", ret);
+
+    // 7. restart analyzer
+    LOGI_ANALYZER("restart analyzer");
+    mAiqRstAppTh->triger_start();
+    bret = mAiqRstAppTh->start();
+    ret = bret ? XCAM_RETURN_NO_ERROR : XCAM_RETURN_ERROR_FAILED;
+    RKAIQMNG_CHECK_RET(ret, "apply result thread start error");
+
+    ret = mRkAiqAnalyzer->start();
+    RKAIQMNG_CHECK_RET(ret, "analyzer start error %d", ret);
+
+    ret = mRkLumaAnalyzer->start();
+    RKAIQMNG_CHECK_RET(ret, "luma analyzer start error %d", ret);
+
+    /* // 7. resume hwi */
+    /* LOGI_ANALYZER("resume hwi"); */
+    /* ret = mCamHw->resume(); */
+    /* RKAIQMNG_CHECK_RET(ret, "pause hwi error %d", ret); */
+
+    mWorkingMode = mode;
+
+    EXIT_XCORE_FUNCTION();
+    return XCAM_RETURN_NO_ERROR;
+}
+
 }; //namespace RkCam

@@ -89,8 +89,8 @@ rk_aiq_uapi_sysctl_init(const char* sns_ent_name,
         int start = strlen(iq_file) - strlen(".xml");
         if (hdr_mode) {
             iq_file[start] = '\0';
-            if (*hdr_mode == '1')
-                strcat(iq_file, "_hdr.xml");
+            if (*hdr_mode == '3')
+                strcat(iq_file, "-hdr3.xml");
             else
                 strcat(iq_file, "_normal.xml");
         }
@@ -104,8 +104,8 @@ rk_aiq_uapi_sysctl_init(const char* sns_ent_name,
         // use default iq file
         if (hdr_mode && access(config_file, F_OK)) {
             LOGW("%s not exist, will use the default !", config_file);
-            if (*hdr_mode == '1')
-                start = strlen(config_file) - strlen("_hdr.xml");
+            if (*hdr_mode == '3')
+                start = strlen(config_file) - strlen("-hdr3.xml");
             else
                 start = strlen(config_file) - strlen("_normal.xml");
             config_file[start] = '\0';
@@ -346,13 +346,11 @@ rk_aiq_uapi_sysctl_setModuleCtl(const rk_aiq_sys_ctx_t* ctx, rk_aiq_module_id_t 
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
     if (mId > RK_MODULE_INVAL && mId < RK_MODULE_MAX) {
         if (mId == RK_MODULE_FEC) {
-            if(mod_en) {
-                if(XCAM_RETURN_NO_ERROR != rk_aiq_user_api_afec_enable(ctx))
-                    LOGE("enable fec failed! maybe fec not enable in xml.");
-            } else {
-                if(XCAM_RETURN_NO_ERROR != rk_aiq_user_api_afec_disable(ctx))
-                    LOGE("disable fec failed! maybe fec not enable in xml.");
-            }
+            rk_aiq_fec_attrib_t fecAttr;
+            rk_aiq_user_api_afec_GetAttrib(ctx, &fecAttr);
+            fecAttr.en = mod_en;
+            if(XCAM_RETURN_NO_ERROR != rk_aiq_user_api_afec_SetAttrib(ctx, fecAttr))
+                LOGE("enable fec failed! maybe fec not enable in xml.");
         } else {
             ret = ctx->_rkAiqManager->setModuleCtl(mId, mod_en);
         }
@@ -584,6 +582,22 @@ rk_aiq_uapi_sysctl_setSharpFbcRotation(const rk_aiq_sys_ctx_t* ctx, rk_aiq_rotat
     ENTER_XCORE_FUNCTION();
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
     ret = ctx->_rkAiqManager->setSharpFbcRotation(rot);
+    EXIT_XCORE_FUNCTION();
+    return ret;
+}
+
+/*!
+ * \brief switch working mode dynamically
+ * this aims to switch the isp pipeline working mode fast, and can be called on
+ * streaming status. On non streaming status, should call rk_aiq_uapi_sysctl_prepare
+ * instead of this to set working mode.
+ */
+XCamReturn
+rk_aiq_uapi_sysctl_swWorkingModeDyn(const rk_aiq_sys_ctx_t* ctx, rk_aiq_working_mode_t mode)
+{
+    ENTER_XCORE_FUNCTION();
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    ret = ctx->_rkAiqManager->swWorkingModeDyn(mode);
     EXIT_XCORE_FUNCTION();
     return ret;
 }

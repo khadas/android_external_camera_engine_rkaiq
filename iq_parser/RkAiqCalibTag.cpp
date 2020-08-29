@@ -48,7 +48,8 @@ uint32_t calib_sensor_sub_tags[] = {
     CALIB_SENSOR_AWB_TAG_ID,
     CALIB_SENSOR_AEC_TAG_ID,
     CALIB_SENSOR_AF_TAG_ID,
-    CALIB_SENSOR_AHDR_TAG_ID,
+    CALIB_SENSOR_AHDR_MERGE_TAG_ID,
+    CALIB_SENSOR_AHDR_TMO_TAG_ID,
     CALIB_SENSOR_BLC_TAG_ID,
     CALIB_SENSOR_DPCC_TAG_ID,
     CALIB_SENSOR_BAYERNR_TAG_ID,
@@ -671,11 +672,6 @@ uint32_t calib_sensor_af_pdaf_sub_tags[] = {
     CALIB_SENSOR_AF_PDAF_ENABLE_TAG_ID,
 };
 
-uint32_t calib_sensor_ahdr_sub_tags[] = {
-    CALIB_SENSOR_AHDR_MERGE_TAG_ID,
-    CALIB_SENSOR_AHDR_TMO_TAG_ID,
-};
-
 uint32_t calib_sensor_ahdr_Merge_sub_tags[] = {
     CALIB_SENSOR_AHDR_ENVLV_TAG_ID,
     CALIB_SENSOR_AHDR_MERGE_OECURVE_SMOOTH_TAG_ID,
@@ -691,6 +687,7 @@ uint32_t calib_sensor_ahdr_Merge_sub_tags[] = {
 };
 
 uint32_t calib_sensor_ahdr_Tmo_sub_tags[] = {
+    CALIB_SENSOR_AHDR_TMO_LINEAR_TMO_EN_TAG_ID,
     CALIB_SENSOR_AHDR_TMO_GLOBALLUMA_TAG_ID,
     CALIB_SENSOR_AHDR_TMO_DETAILSHIGHLIGHT_TAG_ID,
     CALIB_SENSOR_AHDR_TMO_DETAILSLOWLIGHT_TAG_ID,
@@ -751,11 +748,11 @@ uint32_t calib_sensor_ahdr_MoreSetting_sub_tags[] = {
 
 uint32_t calib_sensor_blc_sub_tags[] = {
     CALIB_SENSOR_BLC_ENABLE_TAG_ID,
-	CALIB_SENSOR_BLC_MODE_CELL_TAG_ID,
+    CALIB_SENSOR_BLC_MODE_CELL_TAG_ID,
 };
 
 uint32_t calib_sensor_blc_mode_cell_sub_tags[] = {
-	CALIB_SENSOR_BLC_MODE_NAME_TAG_ID,
+    CALIB_SENSOR_BLC_MODE_NAME_TAG_ID,
     CALIB_SENSOR_BLC_ISO_TAG_ID,
     CALIB_SENSOR_BLC_BLACK_LEVEL_TAG_ID,
 };
@@ -1397,11 +1394,14 @@ uint32_t calib_sensor_fec_sub_tags[] = {
     CALIB_SENSOR_FEC_ENABLE_TAG_ID,
     CALIB_SENSOR_FEC_MESH_FILE_TAG_ID,
     CALIB_SENSOR_FEC_CORRECT_LEVEL_TAG_ID,
+    CALIB_SENSOR_FEC_LIGHT_CENTER_TAG_ID,
+    CALIB_SENSOR_FEC_DISTORTION_COEFF_ID,
 };
 
 uint32_t calib_sensor_lumadetect_sub_tags[] = {
     CALIB_SENSOR_LUMA_DETECT_ENABLE_TAG_ID,
     CALIB_SENSOR_LUMA_DETECT_THRESHOLD_TAG_ID,
+    CALIB_SENSOR_LUMA_DETECT_THRESHOLD_LEVEL2_TAG_ID,
 };
 
 uint32_t calib_sensor_orb_sub_tags[] = {
@@ -3084,16 +3084,12 @@ calib_tag_info_t g_calib_tag_infos[CALIB_IQ_TAG_END] = {
 
 
     // Sensor AHDR
-    [CALIB_SENSOR_AHDR_TAG_ID]         =
-    {   "AHDR", CALIB_TAG_TYPE_STRUCT, {-1, -1},
-        check_tags_array_info(calib_sensor_ahdr_sub_tags), NULL
-    },
     [CALIB_SENSOR_AHDR_MERGE_TAG_ID]         =
-    {   "Merge", CALIB_TAG_TYPE_STRUCT, {-1, -1},
+    {   "MERGE", CALIB_TAG_TYPE_STRUCT, {-1, -1},
         check_tags_array_info(calib_sensor_ahdr_Merge_sub_tags), NULL
     },
     [CALIB_SENSOR_AHDR_TMO_TAG_ID]         =
-    {   "Tmo", CALIB_TAG_TYPE_STRUCT, {-1, -1},
+    {   "TMO", CALIB_TAG_TYPE_STRUCT, {-1, -1},
         check_tags_array_info(calib_sensor_ahdr_Tmo_sub_tags), NULL
     },
     [CALIB_SENSOR_AHDR_ENVLV_TAG_ID]         =
@@ -3139,6 +3135,10 @@ calib_tag_info_t g_calib_tag_infos[CALIB_IQ_TAG_END] = {
     [CALIB_SENSOR_AHDR_MERGE_MDCURVEMS_DAMP_TAG_ID]         =
     {   "MDCurveMS_damp", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
         check_tags_array_ignore, NULL
+    },
+
+    [CALIB_SENSOR_AHDR_TMO_LINEAR_TMO_EN_TAG_ID]         =
+    {   "LinearTmoEn", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
     },
 
     [CALIB_SENSOR_AHDR_TMO_GLOBALLUMA_TAG_ID]         =
@@ -4498,12 +4498,12 @@ calib_tag_info_t g_calib_tag_infos[CALIB_IQ_TAG_END] = {
     {   "local_gain_en", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
         check_tags_array_ignore, NULL
     },
-    
+
     [CALIB_SENSOR_MFNR_MODE_3TO1_TAG_ID]         =
     {   "mode_3to1", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
         check_tags_array_ignore, NULL
     },
-    
+
     [CALIB_SENSOR_MFNR_MAX_LEVEL_TAG_ID]         =
     {   "max_level", CALIB_TAG_TYPE_CHAR, {-1, -1},
         check_tags_array_ignore, NULL
@@ -4528,7 +4528,7 @@ calib_tag_info_t g_calib_tag_infos[CALIB_IQ_TAG_END] = {
     {   "ratio", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
         check_tags_array_ignore, NULL
     },
-    	
+
     [CALIB_SENSOR_MFNR_MODE_CELL_TAG_ID]         =
     {   "Mode", CALIB_TAG_TYPE_CELL, {-1, -1},
         check_tags_array_info(calib_sensor_mfnr_mode_cell_sub_tags), NULL
@@ -5351,6 +5351,14 @@ calib_tag_info_t g_calib_tag_infos[CALIB_IQ_TAG_END] = {
     {   "correct_level", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
         check_tags_array_ignore, NULL
     },
+    [CALIB_SENSOR_FEC_LIGHT_CENTER_TAG_ID]         =
+    {   "light_center",  CALIB_TAG_TYPE_DOUBLE, {-1, -1},
+        check_tags_array_ignore, NULL
+    },
+    [CALIB_SENSOR_FEC_DISTORTION_COEFF_ID]         =
+    {   "distortion_coeff", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
+        check_tags_array_ignore, NULL
+    },
 
     // Sensor LUMADETECT
     [CALIB_SENSOR_LUMA_DETECT_TAG_ID]         =
@@ -5363,6 +5371,10 @@ calib_tag_info_t g_calib_tag_infos[CALIB_IQ_TAG_END] = {
     },
     [CALIB_SENSOR_LUMA_DETECT_THRESHOLD_TAG_ID]         =
     {   "threshold", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
+        check_tags_array_ignore, NULL
+    },
+    [CALIB_SENSOR_LUMA_DETECT_THRESHOLD_LEVEL2_TAG_ID]         =
+    {   "threshold_level2", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
         check_tags_array_ignore, NULL
     },
 
@@ -5494,7 +5506,7 @@ calib_tag_info_t g_calib_tag_infos[CALIB_IQ_TAG_END] = {
     {   "dcg_delay", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
         check_tags_array_ignore, NULL
     },
-    
+
 };
 
 typedef struct calib_tag_check_info_s {

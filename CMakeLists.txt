@@ -205,6 +205,15 @@ set (OPENCV_LIBS_DIR
 add_compile_options(-DOPENCV_SUPPORT)
 endif()
 
+set(FEC_GENMESH true)
+if(FEC_GENMESH)
+    set (FEC_GENMESH_LIBS genMesh_arm32)
+    set (FEC_GENMESH_LIBS_DIR
+        ${PROJECT_SOURCE_DIR}/algos/afec/
+        )
+add_compile_options(-DFEC_GENMESH)
+endif()
+
 # set output binary path
 if(WIN32)
     SET(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/exe)
@@ -247,7 +256,7 @@ add_subdirectory(algos)
 cmake_policy(SET CMP0015 NEW)
 
 #
-link_directories("${LIBRARY_OUTPUT_PATH}" "${OPENCV_LIBS_DIR}")
+link_directories("${LIBRARY_OUTPUT_PATH}" "${OPENCV_LIBS_DIR}" "${FEC_GENMESH_LIBS_DIR}")
 
 add_library(rkaiq SHARED ${RK_AIQ_SRC})
 set_target_properties(rkaiq PROPERTIES FOLDER "rk_aiq")
@@ -262,4 +271,4 @@ target_link_libraries(rkaiq rkaiq_ae rkaiq_awb rkaiq_af rkaiq_anr rkaiq_asd rkai
 	rkaiq_acp rkaiq_asharp rkaiq_adhaz rkaiq_a3dlut rkaiq_ablc rkaiq_accm rkaiq_acgc
 	rkaiq_adebayer rkaiq_adpcc rkaiq_afec rkaiq_agamma rkaiq_agic rkaiq_aie rkaiq_aldch
 	rkaiq_alsc rkaiq_aorb rkaiq_ar2y rkaiq_awdr ${OPENCV_LIBS}
-	${OPENCV_3RDPARTY_LIBS} ${LINK_ASAN} pthread)
+	${OPENCV_3RDPARTY_LIBS} ${FEC_GENMESH_LIBS} ${LINK_ASAN} pthread)

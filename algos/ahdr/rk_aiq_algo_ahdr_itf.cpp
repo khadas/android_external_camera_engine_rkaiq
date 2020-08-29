@@ -86,7 +86,10 @@ static XCamReturn AhdrPrepare(RkAiqAlgoCom* params)
     pAhdrCtx->width = AhdrCfgParam->rawWidth;
     pAhdrCtx->height = AhdrCfgParam->rawHeight;
 
-    if (AhdrCfgParam->working_mode < RK_AIQ_WORKING_MODE_ISP_HDR3)
+    if (AhdrCfgParam->working_mode < RK_AIQ_WORKING_MODE_ISP_HDR2)
+        pAhdrCtx->hdr_mode = 1;
+    else if (AhdrCfgParam->working_mode < RK_AIQ_WORKING_MODE_ISP_HDR3 &&
+             AhdrCfgParam->working_mode >= RK_AIQ_WORKING_MODE_ISP_HDR2)
         pAhdrCtx->hdr_mode = 2;
     else
         pAhdrCtx->hdr_mode = 3;
@@ -170,6 +173,7 @@ static XCamReturn AhdrProcess(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* out
 
     pAhdrCtx->AhdrProcRes.LongFrameMode = pAhdrCtx->SensorInfo.LongFrmMode;
     AhdrProcResParams->AhdrProcRes.isHdrGlobalTmo = pAhdrCtx->AhdrProcRes.isHdrGlobalTmo;
+    AhdrProcResParams->AhdrProcRes.isLinearTmoOn = pAhdrCtx->AhdrProcRes.isLinearTmoOn;
     memcpy(&AhdrProcResParams->AhdrProcRes.MgeProcRes, &pAhdrCtx->AhdrProcRes.MgeProcRes, sizeof(MgeProcRes_t));
     memcpy(&AhdrProcResParams->AhdrProcRes.TmoProcRes, &pAhdrCtx->AhdrProcRes.TmoProcRes, sizeof(TmoProcRes_t));
 

@@ -62,11 +62,19 @@
  * v1.1.a
  *  - ExpDelay support Hdr/Normal mode
  *  - Tolerance divide into ToleranceIn/ToleranceOut
+ * v1.2.1
+ *  - magic code:1007256
+ *  - Ahdr:divide Ahdr into two parts,merge and tmo
+ *  - Tmo: add linear tmo function
+ * v1.2.2
+ *  - Afec: add light_center and distortion_coeff
+ * v1.2.3
+ *  - LumaDetect: add the level2 of mutation threshold
  */
 
 
-#define RK_AIQ_CALIB_VERSION_REAL_V          "v1.2.0"
-#define RK_AIQ_CALIB_VERSION_MAGIC_V         "1006650"
+#define RK_AIQ_CALIB_VERSION_REAL_V          "v1.2.3"
+#define RK_AIQ_CALIB_VERSION_MAGIC_V         "1011895"
 
 
 /******* DO NOT EDIT THE FOLLOWINGS ***********/

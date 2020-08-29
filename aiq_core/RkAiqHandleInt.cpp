@@ -3890,19 +3890,64 @@ RkAiqAfecHandleInt::postProcess()
 }
 
 XCamReturn
-RkAiqAfecHandleInt::enable()
+RkAiqAfecHandleInt::updateConfig()
 {
     ENTER_ANALYZER_FUNCTION();
 
-    return rk_aiq_uapi_afec_enable(mAlgoCtx);
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    //TODO
+    mCfgMutex.lock();
+    // if something changed
+    if (updateAtt) {
+        mCurAtt = mNewAtt;
+        updateAtt = false;
+        // TODO
+        rk_aiq_uapi_afec_SetAttrib(mAlgoCtx, mCurAtt, false);
+    }
+
+    mCfgMutex.unlock();
+
+
+    EXIT_ANALYZER_FUNCTION();
+    return ret;
 }
 
 XCamReturn
-RkAiqAfecHandleInt::disable()
+RkAiqAfecHandleInt::setAttrib(rk_aiq_fec_attrib_t att)
 {
     ENTER_ANALYZER_FUNCTION();
 
-    return rk_aiq_uapi_afec_disable(mAlgoCtx);
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    mCfgMutex.lock();
+    //TODO
+    // check if there is different between att & mCurAtt
+    // if something changed, set att to mNewAtt, and
+    // the new params will be effective later when updateConfig
+    // called by RkAiqCore
+
+    // if something changed
+    if (0 != memcmp(&mCurAtt, &att, sizeof(rk_aiq_fec_attrib_t))) {
+        mNewAtt = att;
+        updateAtt = true;
+    }
+
+    mCfgMutex.unlock();
+
+    EXIT_ANALYZER_FUNCTION();
+    return ret;
+}
+
+XCamReturn
+RkAiqAfecHandleInt::getAttrib(rk_aiq_fec_attrib_t *att)
+{
+    ENTER_ANALYZER_FUNCTION();
+
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+
+    rk_aiq_uapi_afec_GetAttrib(mAlgoCtx, att);
+
+    EXIT_ANALYZER_FUNCTION();
+    return ret;
 }
 
 void

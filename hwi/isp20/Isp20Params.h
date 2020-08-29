@@ -57,8 +57,10 @@ private:
     void convertAiqAwbGainToIsp20Params(struct isp2x_isp_params_cfg& isp_cfg,
                                         const rk_aiq_wb_gain_t& awb_gain, const rk_aiq_isp_blc_t &blc,
                                         bool awb_gain_update);
-    void convertAiqAhdrToIsp20Params(struct isp2x_isp_params_cfg& isp_cfg,
-                                     const rk_aiq_isp_hdr_t& ahdr_data);
+    void convertAiqMergeToIsp20Params(struct isp2x_isp_params_cfg& isp_cfg,
+                                      const rk_aiq_isp_hdr_t& ahdr_data);
+    void convertAiqTmoToIsp20Params(struct isp2x_isp_params_cfg& isp_cfg,
+                                    const rk_aiq_isp_hdr_t& ahdr_data);
     void convertAiqAdehazeToIsp20Params(struct isp2x_isp_params_cfg& isp_cfg,
                                         const rk_aiq_dehaze_cfg_t& dhaze                     );
     void convertAiqAgammaToIsp20Params(struct isp2x_isp_params_cfg& isp_cfg,

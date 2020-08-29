@@ -192,10 +192,17 @@
  * - ae support hdr3, add imx415 hdr3 xml
  * - imx415 anti-flicker
  * - readback two times to avoid luma detect bug
+ * v1.0.8
+ * - calib db: v1.2.3 magic code: 1011895
+ * - add uApi
+ *  - setDarkAreaBoostStrth/getDarkAreaBoostStrth
+ *  - rk_aiq_uapi_sysctl_swWorkingModeDyn
+ *  - rk_aiq_uapi_setFecEn/rk_aiq_uapi_setFecCorrectLevel
+ * - match up with isp driver v0.1.4
  */
 
-#define RK_AIQ_VERSION_REAL_V "v1.0.7"
-#define RK_AIQ_RELEASE_DATE "2020-08-21"
+#define RK_AIQ_VERSION_REAL_V "v1.0.8"
+#define RK_AIQ_RELEASE_DATE "2020-08-29"
 
 /******* DO NOT EDIT THE FOLLOWINGS ***********/
 

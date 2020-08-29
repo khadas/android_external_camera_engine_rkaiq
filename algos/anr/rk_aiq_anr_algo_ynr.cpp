@@ -98,7 +98,7 @@ ANRresult_t ynr_config_setting_param(RKAnr_Ynr_Params_s *pParams, CalibDb_YNR_t 
 		return ANR_RET_NULL_POINTER;
 	}
 
-	res = ynr_get_mode_cell_idx_by_name(pCalibdb, snr_name, &mode_idx);
+	res = ynr_get_mode_cell_idx_by_name(pCalibdb, param_mode, &mode_idx);
 	if(res != ANR_RET_SUCCESS){
 		LOGW_ANR("%s(%d): error!!!  can't find mode name in iq files, use 0 instead\n", __FUNCTION__, __LINE__);
 	}

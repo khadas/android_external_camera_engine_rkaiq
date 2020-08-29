@@ -35,7 +35,7 @@
 #define BUFFER_COUNT 8
 #define CAPTURE_RAW_PATH "/tmp"
 #define CAPTURE_CNT_FILENAME ".capture_cnt"
-//#define ENABLE_UAPI_TEST
+#define ENABLE_UAPI_TEST
 
 struct buffer {
     void *start;
@@ -130,11 +130,13 @@ char* get_sensor_name(demo_context_t* ctx)
       return ctx->sns_name;
 }
 
-void test_imgproc(const rk_aiq_sys_ctx_t* ctx) {
+void test_imgproc(const demo_context_t* demo_ctx) {
     
-   if (ctx == NULL) {
+   if (demo_ctx == NULL) {
       return;
    }
+
+   const rk_aiq_sys_ctx_t* ctx = (const rk_aiq_sys_ctx_t*)(demo_ctx->aiq_ctx);
 
    int key =getchar();
    printf("press key=[%c]\n",key);
@@ -561,6 +563,35 @@ void test_imgproc(const rk_aiq_sys_ctx_t* ctx) {
         rk_aiq_uapi_setMirroFlip(ctx, true,true);
         rk_aiq_uapi_getMirrorFlip(ctx, &mirror, &flip);
         printf("after set mir %d, flip %d \n", mirror, flip);
+       break;
+    case 'L':
+       printf("test fec correct level100\n");
+       rk_aiq_uapi_setFecCorrectLevel(ctx, 100);
+       break;
+    case 'M':
+       printf("test fec correct level255\n");
+       rk_aiq_uapi_setFecCorrectLevel(ctx, 255);
+       break;
+    case 'N':
+       printf("test en fec\n");
+       rk_aiq_uapi_setFecEn(ctx, true);
+       break;
+    case 'O':
+       printf("test disable fec\n");
+       rk_aiq_uapi_setFecEn(ctx, false);
+       break;
+    case 'P':
+       {
+            int work_mode = demo_ctx->hdrmode;
+            rk_aiq_working_mode_t new_mode;
+            if (work_mode == RK_AIQ_WORKING_MODE_NORMAL)
+                new_mode = RK_AIQ_WORKING_MODE_ISP_HDR3;
+            else
+                new_mode = RK_AIQ_WORKING_MODE_NORMAL;
+            printf("switch work mode from %d to %d\n", work_mode, new_mode);
+            *const_cast<int*>(&demo_ctx->hdrmode) = work_mode = new_mode;
+            rk_aiq_uapi_sysctl_swWorkingModeDyn(ctx, new_mode);
+       }
        break;
     default:
         break;
@@ -1401,7 +1432,7 @@ static void* test_thread(void* args) {
     disable_terminal_return();
     printf("begin test imgproc\n");
     while(1) {
-        test_imgproc((rk_aiq_sys_ctx_t*) args);
+        test_imgproc((demo_context_t*) args);
     }
     printf("end test imgproc\n");
     restore_terminal_settings();
@@ -1566,7 +1597,7 @@ int main(int argc, char **argv)
 
 #ifdef ENABLE_UAPI_TEST
     pthread_t tid;
-    pthread_create(&tid, NULL, test_thread, &main_ctx->aiq_ctx);
+    pthread_create(&tid, NULL, test_thread, &main_ctx);
 #endif
 
     mainloop(&main_ctx);

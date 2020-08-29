@@ -327,6 +327,13 @@ Isp20PollThread::set_event_handle_dev(SmartPtr<SensorHw> &dev)
     ENTER_CAMHW_FUNCTION();
     XCAM_ASSERT (dev.ptr());
     _event_handle_dev = dev;
+
+    rk_aiq_exposure_sensor_descriptor sns_des;
+    dev->get_format(&sns_des);
+    sns_width = sns_des.sensor_output_width;
+    sns_height = sns_des.sensor_output_height;
+    pixelformat = sns_des.sensor_pixelformat;
+
     EXIT_CAMHW_FUNCTION();
     return true;
 }
@@ -492,52 +499,6 @@ Isp20PollThread::set_mipi_devs(SmartPtr<V4l2Device> mipi_tx_devs[3],
     }
 }
 
-XCamReturn
-Isp20PollThread::hdr_mipi_start(SmartPtr<SensorHw> sensor)
-{
-    XCamReturn ret = XCAM_RETURN_NO_ERROR;
-
-    if (!sensor.ptr()) {
-        //TODO no sensor case
-        return XCAM_RETURN_ERROR_SENSOR;
-    } else {
-        rk_aiq_exposure_sensor_descriptor sns_des;
-        sensor->get_format(&sns_des);
-        sns_width = sns_des.sensor_output_width;
-        sns_height = sns_des.sensor_output_height;
-        pixelformat = sns_des.sensor_pixelformat;
-    }
-
-    // mipi rx/tx format should match to sensor.
-    for (int i = 0; i < _mipi_dev_max; i++) {
-        ret = _isp_mipi_tx_infos[i].dev->start();
-        if (ret < 0)
-            LOGE_CAMHW_SUBM(ISP20POLL_SUBM, "mipi tx:%d start err: %d\n", ret);
-        ret = _isp_mipi_rx_infos[i].dev->start();
-        if (ret < 0)
-            LOGE_CAMHW_SUBM(ISP20POLL_SUBM, "mipi rx:%d start err: %d\n", ret);
-    }
-
-    return ret;
-}
-
-XCamReturn
-Isp20PollThread::hdr_mipi_stop()
-{
-    XCamReturn ret = XCAM_RETURN_NO_ERROR;
-
-    for (int i = 0; i < _mipi_dev_max; i++) {
-        ret = _isp_mipi_tx_infos[i].dev->stop();
-        if (ret < 0)
-            LOGE_CAMHW_SUBM(ISP20POLL_SUBM, "mipi tx:%d stop err: %d\n", ret);
-        ret = _isp_mipi_rx_infos[i].dev->stop();
-        if (ret < 0)
-            LOGE_CAMHW_SUBM(ISP20POLL_SUBM, "mipi rx:%d stop err: %d\n", ret);
-    }
-
-    return ret;
-}
-
 void
 Isp20PollThread::set_hdr_frame_readback_infos(int frame_id, int times)
 {
@@ -671,10 +632,11 @@ Isp20PollThread::mipi_poll_buffer_loop (int type, int dev_index)
 void
 Isp20PollThread::handle_rx_buf(SmartPtr<V4l2BufferProxy> &rx_buf, int dev_index)
 {
-
-    SmartPtr<V4l2BufferProxy> buf = _isp_mipi_rx_infos[dev_index].buf_list.pop(-1);
-    LOGD_CAMHW_SUBM(ISP20POLL_SUBM, "%s dev_index:%d index:%d fd:%d\n",
-                    __func__, dev_index, buf->get_v4l2_buf_index(), buf->get_expbuf_fd());
+    if (!_isp_mipi_rx_infos[dev_index].buf_list.is_empty()) {
+        SmartPtr<V4l2BufferProxy> buf = _isp_mipi_rx_infos[dev_index].buf_list.pop(-1);
+        LOGD_CAMHW_SUBM(ISP20POLL_SUBM,"%s dev_index:%d index:%d fd:%d\n",
+                   __func__, dev_index, buf->get_v4l2_buf_index(), buf->get_expbuf_fd());
+    }
 }
 
 void Isp20PollThread::sync_tx_buf()
@@ -915,6 +877,9 @@ Isp20PollThread::trigger_readback()
             struct isp2x_csi_trigger tg = {
                 .frame_id = sequence,
                 .times = 0,
+                .mode = _mipi_dev_max == 1 ? T_START_X1 :
+                    _mipi_dev_max == 2 ? T_START_X2 : T_START_X3,
+                /* .mode = T_START_X2, */
             };
 
             if (_first_trigger)
@@ -922,12 +887,10 @@ Isp20PollThread::trigger_readback()
             else
                 tg.times += additional_times;
 
-            if (_rx_handle_dev->getDhazState())
-                tg.times++;
             if (tg.times > 2)
                 tg.times = 2;
             tg.frame_timestamp = buf_proxy->get_timestamp () * 1000;
-            tg.times = 1;//fixed to three times readback
+            // tg.times = 1;//fixed to three times readback
             LOGD_CAMHW_SUBM(ISP20POLL_SUBM, "%s frame[%d]:ts %" PRId64 "ms, readback %dtimes \n",
                             __func__, sequence,
                             tg.frame_timestamp / 1000 / 1000,

@@ -74,6 +74,15 @@ CamHwBase::stop()
     return XCAM_RETURN_NO_ERROR;
 }
 
+XCamReturn CamHwBase::pause()
+{
+    return XCAM_RETURN_NO_ERROR;
+}
+XCamReturn CamHwBase::resume()
+{
+    return XCAM_RETURN_NO_ERROR;
+}
+
 XCamReturn
 CamHwBase::getSensorModeData(const char* sns_ent_name,
                              rk_aiq_exposure_sensor_descriptor& sns_des)

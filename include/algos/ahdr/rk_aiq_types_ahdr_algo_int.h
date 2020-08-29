@@ -76,6 +76,7 @@ typedef struct moreSetting_s
 
 typedef struct tmo_config_s
 {
+    bool isLinearTmoOn;
     globalLuma_t Luma;
     detailsHighLight_t DtsHiLit;
     detailsLowLight_t DtsLoLit;
@@ -175,6 +176,7 @@ typedef enum hdr_OpMode_s {
     HDR_OpMode_Auto = 1,
     HDR_OpMode_MANU = 2,
     HDR_OpMode_Fast = 3,
+    HDR_OpMode_LINEAR = 4,
 } hdr_OpMode_t;
 
 
@@ -185,6 +187,7 @@ typedef struct hdrAttr_s
     ahdrAttr_t    stAuto;
     mhdrAttr_t stManual;
     int level;
+    int level_Linear_Dark;
 } hdrAttr_t;
 
 typedef struct MgeProcRes_s
@@ -252,6 +255,7 @@ typedef struct RkAiqAhdrProcResult_s
     hdrAttr_t hdrAttr;
     bool LongFrameMode;
     bool isHdrGlobalTmo;
+    bool isLinearTmoOn;
 } RkAiqAhdrProcResult_t;
 
 

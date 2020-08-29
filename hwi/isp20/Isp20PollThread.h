@@ -59,8 +59,6 @@ public:
                        SmartPtr<V4l2Device> mipi_rx_devs[3],
                        SmartPtr<V4l2SubDevice> isp_dev);
     void set_hdr_frame_readback_infos(int frame_id, int times);
-    XCamReturn hdr_mipi_start(SmartPtr<SensorHw> sensor);
-    XCamReturn hdr_mipi_stop();
     XCamReturn notify_capture_raw();
     // should be called befor start
     void set_working_mode(int mode);

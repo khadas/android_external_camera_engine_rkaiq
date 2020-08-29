@@ -2,7 +2,7 @@
 <matfile>
     <header type="struct" size="[1 1]">
         <code_xml_parse_version index="1" type="char" size="[1 6]">
-            v1.2.0
+            v1.2.3
         </code_xml_parse_version>
         <creation_date index="1" type="char" size="[1 10]">
             2020-04-24
@@ -20,7 +20,7 @@
             v0.0.3
         </generator_version>
       <magic_code_version  index="1" type="int" size="[1 1]">
-          [1006650]
+          [1011895]
       </magic_code_version>
     </header>
     <sensor type="struct" size="[1 1]">
@@ -2114,8 +2114,7 @@
             </enable>
             </pdaf>
         </AF>
-        <AHDR index="1" type="struct" size="[1 1]">
-            <Merge index="1" type="struct" size="[1 1]">
+            <MERGE index="1" type="struct" size="[1 1]">
                 <EnvLv index="1" type="double" size="[1 6]">
                     [0.0000 0.1000 0.2000 0.3000 0.7000 1.0000 ]
                 </EnvLv>
@@ -2149,8 +2148,11 @@
                 <MDCurveMS_damp index="1" type="double" size="[1 1]">
                     [0.3000 ]
                 </MDCurveMS_damp>
-            </Merge>
-            <Tmo index="1" type="struct" size="[1 1]">
+            </MERGE>
+            <TMO index="1" type="struct" size="[1 1]">
+		<LinearTmoEn index="1" type="double" size="[1 1]">
+                    [1]
+                 </LinearTmoEn>
                 <GlobalLuma index="1" type="struct" size="[1 1]">
                     <GlobalLumaMode index="1" type="double" size="[1 1]">
                         [1.0000 ]
@@ -2240,8 +2242,7 @@
                         [0.3000 ]
                     </Damp>
                 </MoreSetting>
-            </Tmo>
-        </AHDR>
+            </TMO>
         <BLC index="1" type="struct" size="[1 1]">
             <Enable index="1" type="double" size="[1 1]">
                 [1 ]
@@ -35901,6 +35902,12 @@
             <correct_level index="1" type="double" size="[1 1]">
                 [1.00000000000000e+000 ]
             </correct_level>
+	 <light_center index="1" type="double" size="[1 2]">
+	      [1333.2695039999998698 728.1043200000000297]
+	 </light_center>
+	 <distortion_coeff index="1" type="double" size="[1 4]">
+	      [-2653.9299617503911576 0.0001171174803799 -0.0000000150166870 0.0000000000087465]
+	 </distortion_coeff>
         </FEC>
         <ORB index="1" type="struct" size="[1 1]">
             <enable index="1" type="double" size="[1 1]">
@@ -35943,9 +35950,10 @@
             <enable index="1" type="double" size="[1 1]">
                 [1 ]
             </enable>
-            <threshold index="1" type="double" size="[1 1]">
-                [0.2000 ]
-            </threshold>
+          <threshold index="1" type="double" size="[1 1]">               [0.01]
+          </threshold>
+          <threshold_level2 index="1" type="double" size="[1 1]">               [1000]
+          </threshold_level2>
         </LUMADETECT>
       <COLOR_AS_GREY index="1" type="struct" size="[1 1]">          <enable index="1" type="int" size="[1 1]">               [0]          </enable>
        </COLOR_AS_GREY>

@@ -1423,6 +1423,76 @@ XCamReturn rk_aiq_uapi_getMHDRStrth(const rk_aiq_sys_ctx_t* ctx, bool *on, unsig
 }
 
 /*
+*****************************
+*
+* Desc: set dark area boost strength
+*    this function is active for normal mode
+* Argument:
+*   level: [1, 10]
+*
+*****************************
+*/
+XCamReturn rk_aiq_uapi_getDarkAreaBoostStrth(const rk_aiq_sys_ctx_t* ctx, unsigned int *level)
+{
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    ahdr_attrib_t attr;
+    IMGPROC_FUNC_ENTER
+    if (ctx == NULL) {
+        ret = XCAM_RETURN_ERROR_PARAM;
+        RKAIQ_IMGPROC_CHECK_RET(ret, "ctx is null, getMHDRStrth failed!");
+    }
+    if (isHDRmode(ctx)) {
+        ret = XCAM_RETURN_ERROR_FAILED;
+        RKAIQ_IMGPROC_CHECK_RET(ret, "Not valid in HDR mode!");
+    }
+    ret = rk_aiq_user_api_ahdr_GetAttrib(ctx, &attr);
+    RKAIQ_IMGPROC_CHECK_RET(ret, "get hdr attr failed!");
+    if (attr.opMode == HDR_OpMode_LINEAR)
+        *level = attr.level_Linear_Dark;
+    else
+        *level = 0;
+    IMGPROC_FUNC_EXIT
+    return ret;
+}
+
+/*
+*****************************
+*
+* Desc: get dark area boost strength
+*    this function is active for normal mode
+* Argument:
+*   level: [1, 10]
+*
+*****************************
+*/
+XCamReturn rk_aiq_uapi_setDarkAreaBoostStrth(const rk_aiq_sys_ctx_t* ctx, unsigned int level)
+{
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    ahdr_attrib_t attr;
+    IMGPROC_FUNC_ENTER
+    if (ctx == NULL) {
+        ret = XCAM_RETURN_ERROR_PARAM;
+        RKAIQ_IMGPROC_CHECK_RET(ret, "ctx is null, setMHDRStrth failed!");
+    }
+
+    if (isHDRmode(ctx)) {
+        ret = XCAM_RETURN_ERROR_FAILED;
+        RKAIQ_IMGPROC_CHECK_RET(ret, "Not valid in HDR mode!");
+    }
+    if (level > 10) {
+        ret = XCAM_RETURN_ERROR_OUTOFRANGE;
+        RKAIQ_IMGPROC_CHECK_RET(ret, "level(%d) is out of range, setDarkAreaBoostStrth failed!");
+    }
+    attr.bEnable = true;
+    attr.level_Linear_Dark = level;
+    attr.opMode = HDR_OpMode_LINEAR;
+    ret = rk_aiq_user_api_ahdr_SetAttrib(ctx, attr);
+    RKAIQ_IMGPROC_CHECK_RET(ret, "setDarkAreaBoostStrth failed!");
+    IMGPROC_FUNC_EXIT
+    return ret;
+}
+
+/*
 **********************************************************
 * Noise reduction
 **********************************************************
@@ -2090,6 +2160,40 @@ XCamReturn rk_aiq_uapi_getMirrorFlip(const rk_aiq_sys_ctx_t* ctx, bool* mirror, 
         RKAIQ_IMGPROC_CHECK_RET(ret, "param error!");
     }
     return ctx->_rkAiqManager->getMirrorFlip(*mirror, *flip);
+}
+
+XCamReturn rk_aiq_uapi_setFecEn(const rk_aiq_sys_ctx_t* ctx, bool en)
+{
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    IMGPROC_FUNC_ENTER
+    if (ctx == NULL) {
+        ret = XCAM_RETURN_ERROR_PARAM;
+        RKAIQ_IMGPROC_CHECK_RET(ret, "param error!");
+    }
+    rk_aiq_fec_attrib_t fecAttr;
+    ret = rk_aiq_user_api_afec_GetAttrib(ctx, &fecAttr);
+    RKAIQ_IMGPROC_CHECK_RET(ret, "get fec attrib failed!");
+    fecAttr.en = en;
+    ret = rk_aiq_user_api_afec_SetAttrib(ctx, fecAttr);
+    IMGPROC_FUNC_EXIT
+    return ret;
+}
+
+XCamReturn rk_aiq_uapi_setFecCorrectLevel(const rk_aiq_sys_ctx_t* ctx, int correctLevel)
+{
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    IMGPROC_FUNC_ENTER
+    if (ctx == NULL) {
+        ret = XCAM_RETURN_ERROR_PARAM;
+        RKAIQ_IMGPROC_CHECK_RET(ret, "param error!");
+    }
+    rk_aiq_fec_attrib_t fecAttr;
+    ret = rk_aiq_user_api_afec_GetAttrib(ctx, &fecAttr);
+    RKAIQ_IMGPROC_CHECK_RET(ret, "get fec attrib failed!");
+    fecAttr.correct_level = correctLevel;
+    ret = rk_aiq_user_api_afec_SetAttrib(ctx, fecAttr);
+    IMGPROC_FUNC_EXIT
+    return ret;
 }
 
 RKAIQ_END_DECLARE

@@ -369,6 +369,14 @@ void AhdrGetAeResult
     //transfer CurrAeResult data into AhdrHandle
     switch (pAhdrCtx->CurrHandleData.MergeMode)
     {
+    case 0:
+        pAhdrCtx->CurrHandleData.CurrLExpo = AecHdrPreResult.LinearExp.exp_real_params.analog_gain * AecHdrPreResult.LinearExp.exp_real_params.integration_time;
+        pAhdrCtx->CurrHandleData.CurrL2S_Ratio = 1;
+        pAhdrCtx->CurrAeResult.ISO = AecHdrPreResult.LinearExp.exp_real_params.analog_gain * 50.0;
+        pAhdrCtx->CurrAeResult.GlobalEnvLv = AecHdrPreResult.GlobalEnvLv[0];
+        pAhdrCtx->CurrAeResult.OEPdf = AecHdrPreResult.OverExpROIPdf[0];
+        pAhdrCtx->CurrAeResult.DarkPdf = AecHdrPreResult.LowLightROIPdf[0];
+        break;
     case 1:
         pAhdrCtx->CurrAeResult.L2M_Ratio = 1;
         pAhdrCtx->CurrHandleData.CurrL2S_Ratio = pAhdrCtx->CurrAeResult.M2S_Ratio;
@@ -677,6 +685,17 @@ void AhdrApiOffUpdate
     if(pAhdrCtx->hdrAttr.opMode == HDR_OpMode_Fast)
         AhdrApiFastMode(pAhdrCtx);
 
+    //add linear tmo UI control
+    if(pAhdrCtx->hdrAttr.opMode == HDR_OpMode_LINEAR)
+    {
+        pAhdrCtx->CurrHandleData.CurrTmoHandleData.DetailsLowLight *= 1 + (float)(pAhdrCtx->hdrAttr.level_Linear_Dark) * 0.4;
+        pAhdrCtx->CurrHandleData.CurrTmoHandleData.DetailsLowLight =
+            LIMIT_VALUE(pAhdrCtx->CurrHandleData.CurrTmoHandleData.DetailsLowLight, DETAILSLOWLIGHTMAX, DETAILSLOWLIGHTMIN);
+        LOGD_AHDR("%s:  Linear Tmo On\n", __FUNCTION__);
+        LOGD_AHDR("%s:  DetailsLowLightMode:%f CurrTotalFocusLuma:%f CurrDarkPdf:%f CurrISO:%f DetailsLowLight:%f\n", __FUNCTION__, pAhdrCtx->AhdrConfig.tmo_para.DtsLoLit.DetailsLowLightMode,
+                  pAhdrCtx->CurrHandleData.CurrTotalFocusLuma, pAhdrCtx->CurrHandleData.CurrDarkPdf, pAhdrCtx->CurrHandleData.CurrISO, pAhdrCtx->CurrHandleData.CurrTmoHandleData.DetailsLowLight);
+    }
+
     //get Current tmo TmoDamp
     pAhdrCtx->CurrHandleData.TmoDamp = pAhdrCtx->AhdrConfig.tmo_para.More.damp;
 
@@ -922,6 +941,11 @@ void AhdrGetXmlParas
         pAhdrCtx->AhdrConfig.tmo_para.Band.Strength[i] = LIMIT_VALUE(pCalibDb->ahdr.tmo.BandPrior.Strength[i], IQPARAMAX, IQPARAMIN) ;
     }
 
+    //linear tmo
+    pAhdrCtx->AhdrConfig.tmo_para.isLinearTmoOn =
+        (pCalibDb->ahdr.tmo.isLinearTmoOn == 0 && pAhdrCtx->hdr_mode == 1) ? false : true;
+    pAhdrCtx->AhdrProcRes.isLinearTmoOn = pAhdrCtx->AhdrConfig.tmo_para.isLinearTmoOn;
+
     LOG1_AHDR("%s:  Ahdr comfig data from xml:\n", __FUNCTION__);
     LOG1_AHDR("%s:  Merge MergeMode:%d:\n", __FUNCTION__, pAhdrCtx->AhdrConfig.merge_para.MergeMode);
     LOG1_AHDR("%s:  Merge EnvLv:%f %f %f %f %f %f:\n", __FUNCTION__, pAhdrCtx->AhdrConfig.merge_para.EnvLv[0], pAhdrCtx->AhdrConfig.merge_para.EnvLv[1], pAhdrCtx->AhdrConfig.merge_para.EnvLv[2],
@@ -944,6 +968,7 @@ void AhdrGetXmlParas
     LOG1_AHDR("%s:  Merge MDCurveLM_damp:%f:\n", __FUNCTION__, pAhdrCtx->AhdrConfig.merge_para.MDCurveLM_damp);
     LOG1_AHDR("%s:  Merge MDCurveMS_damp:%f:\n", __FUNCTION__, pAhdrCtx->AhdrConfig.merge_para.MDCurveMS_damp);
 
+    LOG1_AHDR("%s:  Tmo Linear Tmo en%d:\n", __FUNCTION__, pAhdrCtx->AhdrConfig.tmo_para.isLinearTmoOn);
     LOG1_AHDR("%s:  Tmo GlobalLuma EnvLv:%f %f %f %f %f %f:\n", __FUNCTION__, pAhdrCtx->AhdrConfig.tmo_para.Luma.EnvLv[0], pAhdrCtx->AhdrConfig.tmo_para.Luma.EnvLv[1], pAhdrCtx->AhdrConfig.tmo_para.Luma.EnvLv[2]
               , pAhdrCtx->AhdrConfig.tmo_para.Luma.EnvLv[3], pAhdrCtx->AhdrConfig.tmo_para.Luma.EnvLv[4], pAhdrCtx->AhdrConfig.tmo_para.Luma.EnvLv[5]);
     LOG1_AHDR("%s:  Tmo GlobalLuma ISO:%f %f %f %f %f %f:\n", __FUNCTION__, pAhdrCtx->AhdrConfig.tmo_para.Luma.ISO[0], pAhdrCtx->AhdrConfig.tmo_para.Luma.ISO[1], pAhdrCtx->AhdrConfig.tmo_para.Luma.ISO[2]
@@ -977,7 +1002,7 @@ void AhdrGetXmlParas
     LOG1_AHDR("%s:  Tmo TmoContrast Tolerance:%f:\n", __FUNCTION__, pAhdrCtx->AhdrConfig.tmo_para.Contrast.Tolerance);
     LOG1_AHDR("%s:  Tmo TmoContrast:%f %f %f %f %f %f:\n", __FUNCTION__, pAhdrCtx->AhdrConfig.tmo_para.Contrast.TmoContrast[0], pAhdrCtx->AhdrConfig.tmo_para.Contrast.TmoContrast[1], pAhdrCtx->AhdrConfig.tmo_para.Contrast.TmoContrast[2]
               , pAhdrCtx->AhdrConfig.tmo_para.Contrast.TmoContrast[3], pAhdrCtx->AhdrConfig.tmo_para.Contrast.TmoContrast[4], pAhdrCtx->AhdrConfig.tmo_para.Contrast.TmoContrast[5]);
-    LOG1_AHDR("%s:  Tmo BandPrior en%d:\n", __FUNCTION__, pAhdrCtx->AhdrConfig.tmo_para.Band.isHdrGlobalTmo);
+    LOG1_AHDR("%s:  Tmo BandPrior en%d\n", __FUNCTION__, pAhdrCtx->AhdrConfig.tmo_para.Band.isHdrGlobalTmo);
     LOG1_AHDR("%s:  Tmo BandPrior mode:%f:\n", __FUNCTION__, pAhdrCtx->AhdrConfig.tmo_para.Band.mode);
     LOG1_AHDR("%s:  Tmo BandPrior DynamicRange:%f %f %f %f %f %f:\n", __FUNCTION__, pAhdrCtx->AhdrConfig.tmo_para.Band.DynamicRange[0], pAhdrCtx->AhdrConfig.tmo_para.Band.DynamicRange[1], pAhdrCtx->AhdrConfig.tmo_para.Band.DynamicRange[2]
               , pAhdrCtx->AhdrConfig.tmo_para.Band.DynamicRange[3], pAhdrCtx->AhdrConfig.tmo_para.Band.DynamicRange[4], pAhdrCtx->AhdrConfig.tmo_para.Band.DynamicRange[5]);
@@ -1062,7 +1087,8 @@ void AhdrUpdateConfig
     //get current ae data from AecPreRes
     AhdrGetAeResult(pAhdrCtx, AecHdrPreResult);
 
-    if(pAhdrCtx->hdrAttr.bEnable == false || pAhdrCtx->hdrAttr.opMode == HDR_OpMode_Fast) //api close
+    if(pAhdrCtx->hdrAttr.bEnable == false || pAhdrCtx->hdrAttr.opMode == HDR_OpMode_Fast
+            || pAhdrCtx->hdrAttr.opMode == HDR_OpMode_LINEAR) //api close
         AhdrApiOffUpdate(pAhdrCtx, AecHdrPreResult, AfPreResult);
     else //api on
         AhdrApiOnUpdate(pAhdrCtx);

@@ -209,6 +209,7 @@ endif()
 set (ASD_SRC
 	asd/rk_aiq_algo_asd_itf.cpp
     asd/scene_detector.cpp
+	asd/rk_aiq_uapi_asd_int.cpp
     )
 
 if(EXISTS "${CMAKE_SOURCE_DIR}/algos/asd/rk_aiq_algo_asd_itf.cpp")
@@ -433,6 +434,7 @@ endif()
 set (AFEC_SRC
 	afec/rk_aiq_algo_afec_itf.cpp
 	afec/rk_aiq_uapi_afec_int.cpp
+	afec/rk_aiq_algo_afec_genMesh.cpp
     )
 
 if(EXISTS "${CMAKE_SOURCE_DIR}/algos/afec/rk_aiq_algo_afec_itf.cpp")

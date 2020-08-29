@@ -80,6 +80,9 @@ public:
     virtual XCamReturn prepare(uint32_t width, uint32_t height, int mode, int t_delay, int g_delay) = 0;
     virtual XCamReturn start() = 0;
     virtual XCamReturn stop() = 0;
+    virtual XCamReturn pause() = 0;
+    virtual XCamReturn resume() = 0;
+    virtual XCamReturn swWorkingModeDyn(int mode) = 0;
     virtual XCamReturn getSensorModeData(const char* sns_ent_name,
                                          rk_aiq_exposure_sensor_descriptor& sns_des) = 0;
     virtual XCamReturn setIspParams(SmartPtr<RkAiqIspParamsProxy>& ispParams) = 0;

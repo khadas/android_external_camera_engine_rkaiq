@@ -895,6 +895,7 @@ typedef struct TmoMoreSetting_s
 
 typedef struct CalibDb_HdrTmo_s
 {
+    float isLinearTmoOn;
     GlobalLuma_t luma;
     DetailsHighLight_t HighLight;
     DetailsLowLight_t LowLight;
@@ -909,14 +910,14 @@ typedef struct CalibDb_Ahdr_Para_s {
 } CalibDb_Ahdr_Para_t;
 
 typedef struct CalibDb_Blc_ModeCell_s {
-	char name[CALIBDB_MAX_MODE_NAME_LENGTH];
-	float iso[CALIBDB_BLC_MAX_ISO_LEVEL];
+    char name[CALIBDB_MAX_MODE_NAME_LENGTH];
+    float iso[CALIBDB_BLC_MAX_ISO_LEVEL];
     float level[4][CALIBDB_BLC_MAX_ISO_LEVEL];
-}CalibDb_Blc_ModeCell_t;
+} CalibDb_Blc_ModeCell_t;
 
 typedef struct CalibDb_Blc_s {
     int enable;
-	CalibDb_Blc_ModeCell_t mode_cell[CALIBDB_MAX_MODE_NUM];   
+    CalibDb_Blc_ModeCell_t mode_cell[CALIBDB_MAX_MODE_NUM];
 } CalibDb_Blc_t;
 
 typedef struct CalibDb_Dpcc_set_s {
@@ -1020,10 +1021,10 @@ typedef struct CalibDb_BayerNR_Params_s {
     float bilRegWgt;
 } CalibDb_BayerNR_Params_t;
 
-typedef struct CalibDb_BayerNr_ModeCell_s{
-	char name[CALIBDB_MAX_MODE_NAME_LENGTH];
-	CalibDb_BayerNR_Params_t setting[CALIBDB_NR_SHARP_SETTING_LEVEL];
-}CalibDb_BayerNr_ModeCell_t;
+typedef struct CalibDb_BayerNr_ModeCell_s {
+    char name[CALIBDB_MAX_MODE_NAME_LENGTH];
+    CalibDb_BayerNR_Params_t setting[CALIBDB_NR_SHARP_SETTING_LEVEL];
+} CalibDb_BayerNr_ModeCell_t;
 
 typedef struct CalibDb_BayerNr_s {
     int enable;
@@ -1254,9 +1255,9 @@ typedef struct CalibDb_UVNR_Params_s {
 } CalibDb_UVNR_Params_t;
 
 typedef struct CalibDb_UVNR_ModeCell_s {
-	char name[CALIBDB_MAX_MODE_NAME_LENGTH];
-	CalibDb_UVNR_Params_t setting[CALIBDB_NR_SHARP_SETTING_LEVEL];
-}CalibDb_UVNR_ModeCell_t;
+    char name[CALIBDB_MAX_MODE_NAME_LENGTH];
+    CalibDb_UVNR_Params_t setting[CALIBDB_NR_SHARP_SETTING_LEVEL];
+} CalibDb_UVNR_ModeCell_t;
 
 typedef struct CalibDb_UVNR_s {
     int enable;
@@ -1312,9 +1313,9 @@ typedef struct CalibDb_YNR_Setting_s {
 } CalibDb_YNR_Setting_t;
 
 typedef struct CalibDb_YNR_ModeCell_s {
-	char name[CALIBDB_MAX_MODE_NAME_LENGTH];
-	CalibDb_YNR_Setting_t setting[CALIBDB_NR_SHARP_SETTING_LEVEL];
-}CalibDb_YNR_ModeCell_t;
+    char name[CALIBDB_MAX_MODE_NAME_LENGTH];
+    CalibDb_YNR_Setting_t setting[CALIBDB_NR_SHARP_SETTING_LEVEL];
+} CalibDb_YNR_ModeCell_t;
 
 typedef struct CalibDb_YNR_s {
     int enable;
@@ -1419,10 +1420,10 @@ typedef struct CalibDb_MFNR_Setting_s {
     struct CalibDb_MFNR_ISO_s mfnr_iso[CALIBDB_NR_SHARP_MAX_ISO_LEVEL];
 } CalibDb_MFNR_Setting_t;
 
-typedef struct CalibDb_MFNR_ModeCell_s{
-	char name[CALIBDB_MAX_MODE_NAME_LENGTH];
-	CalibDb_MFNR_Setting_t setting[CALIBDB_NR_SHARP_SETTING_LEVEL];
-}CalibDb_MFNR_ModeCell_t;
+typedef struct CalibDb_MFNR_ModeCell_s {
+    char name[CALIBDB_MAX_MODE_NAME_LENGTH];
+    CalibDb_MFNR_Setting_t setting[CALIBDB_NR_SHARP_SETTING_LEVEL];
+} CalibDb_MFNR_ModeCell_t;
 
 typedef struct CalibDb_MFNR_s {
     int enable;
@@ -1464,9 +1465,9 @@ typedef struct CalibDb_Sharp_Setting_s {
 } CalibDb_Sharp_Setting_t;
 
 typedef struct CalibDb_Sharp_ModeCell_s {
-	char name[CALIBDB_MAX_MODE_NAME_LENGTH];
-	CalibDb_Sharp_Setting_t setting[CALIBDB_NR_SHARP_SETTING_LEVEL];
-}CalibDb_Sharp_ModeCell_t;
+    char name[CALIBDB_MAX_MODE_NAME_LENGTH];
+    CalibDb_Sharp_Setting_t setting[CALIBDB_NR_SHARP_SETTING_LEVEL];
+} CalibDb_Sharp_ModeCell_t;
 
 typedef struct CalibDb_Sharp_s {
     int enable;
@@ -1501,9 +1502,9 @@ typedef struct CalibDb_EdgeFilter_Setting_s {
 } CalibDb_EdgeFilter_Setting_t;
 
 typedef struct CalibDb_EdgeFilter_ModeCell_s {
-	char name[CALIBDB_MAX_MODE_NAME_LENGTH];
-	CalibDb_EdgeFilter_Setting_t setting[CALIBDB_NR_SHARP_SETTING_LEVEL];
-}CalibDb_EdgeFilter_ModeCell_t;
+    char name[CALIBDB_MAX_MODE_NAME_LENGTH];
+    CalibDb_EdgeFilter_Setting_t setting[CALIBDB_NR_SHARP_SETTING_LEVEL];
+} CalibDb_EdgeFilter_ModeCell_t;
 
 typedef struct CalibDb_EdgeFilter_s {
     int enable;
@@ -1637,12 +1638,15 @@ typedef struct CalibDb_ORB_s {
 typedef struct CalibDb_LUMA_DETECT_s {
     unsigned char luma_detect_en;
     float mutation_threshold;
+    float mutation_threshold_level2;
 } CalibDb_LUMA_DETECT_t;
 
 typedef struct CalibDb_FEC_s {
     unsigned char fec_en;
     char meshfile[256];
     double correct_level;
+    double light_center[2]; // light center
+    double coefficient[4]; // the distortion coefficient of the fisheye lens
 } CalibDb_FEC_t;
 
 typedef struct CalibDb_LDCH_s {

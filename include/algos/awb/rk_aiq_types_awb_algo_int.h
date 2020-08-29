@@ -92,9 +92,8 @@ typedef struct rk_aiq_wb_awb_attrib_s {
 } rk_aiq_wb_awb_attrib_t;
 
 typedef enum rk_aiq_wb_op_mode_s {
-    RK_AIQ_WB_MODE_INVALID                     = 0,        /**< initialization value */
-    RK_AIQ_WB_MODE_MANUAL                      = 1,        /**< run manual white balance */
-    RK_AIQ_WB_MODE_AUTO                        = 2,        /**< run auto white balance */
+    RK_AIQ_WB_MODE_MANUAL                      = 0,        /**< run manual white balance */
+    RK_AIQ_WB_MODE_AUTO                        = 1,        /**< run auto white balance */
     RK_AIQ_WB_MODE_MAX
 } rk_aiq_wb_op_mode_t;
 

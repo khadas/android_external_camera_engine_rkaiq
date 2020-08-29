@@ -693,17 +693,21 @@ public:
     explicit RkAiqAfecHandleInt(RkAiqAlgoDesComm* des, RkAiqCore* aiqCore)
         : RkAiqHandle(des, aiqCore)
         , RkAiqAfecHandle(des, aiqCore)
-        , RkAiqHandleIntCom(des, aiqCore) {};
+        , RkAiqHandleIntCom(des, aiqCore) {
+            memset(&mCurAtt, 0, sizeof(rk_aiq_fec_attrib_t));
+            memset(&mNewAtt, 0, sizeof(rk_aiq_fec_attrib_t));
+        };
     virtual ~RkAiqAfecHandleInt() {
         RkAiqAfecHandle::deInit();
     };
+    virtual XCamReturn updateConfig();
     virtual XCamReturn prepare();
     virtual XCamReturn preProcess();
     virtual XCamReturn processing();
     virtual XCamReturn postProcess();
 
-    XCamReturn enable();
-    XCamReturn disable();
+    XCamReturn setAttrib(rk_aiq_fec_attrib_t att);
+    XCamReturn getAttrib(rk_aiq_fec_attrib_t *att);
 
 protected:
     virtual void init();
@@ -712,6 +716,9 @@ protected:
     };
 private:
     // TODO
+    // XCam::Mutex mCfgMutex;
+    rk_aiq_fec_attrib_t mCurAtt;
+    rk_aiq_fec_attrib_t mNewAtt;
 };
 
 class RkAiqAsdHandleInt:

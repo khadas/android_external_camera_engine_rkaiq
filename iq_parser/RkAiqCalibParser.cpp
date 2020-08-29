@@ -1739,8 +1739,13 @@ bool RkAiqCalibParser::parseEntrySensor
                 return (false);
             }
         }
-        else if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_AHDR_TAG_ID)) {
-            if (!parseEntrySensorAhdr(pchild->ToElement())) {
+        else if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_AHDR_MERGE_TAG_ID)) {
+            if (!parseEntrySensorAhdrMerge(pchild->ToElement())) {
+                return (false);
+            }
+        }
+        else if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_AHDR_TMO_TAG_ID)) {
+            if (!parseEntrySensorAhdrTmo(pchild->ToElement())) {
                 return (false);
             }
         }
@@ -4435,7 +4440,7 @@ bool RkAiqCalibParser::parseEntrySensorAecDNSwitch
                 }
                 else {
                     mCalibDb->aec.CommCtrl.stDNSwitch.DNMode = AEC_DNMODE_MIN;
-                    LOGE("%s(%d): invalid AEC DNSwitch-DNMode = %s\n", __FUNCTION__, __LINE__, s_value);
+                    LOGE("%s(%d): invalid AEC DNSwitch-DNMode = %s\n", __FUNCTION__, __LINE__, s_value.c_str());
                 }
             }
             else if (xmlParseReadWrite == XML_PARSER_WRITE)
@@ -4528,7 +4533,7 @@ bool RkAiqCalibParser::parseEntrySensorAecAntiFlicker
                 }
                 else {
                     mCalibDb->aec.CommCtrl.stAntiFlicker.Frequency = AEC_FLICKER_FREQUENCY_OFF;
-                    LOGE("%s(%d): invalid stAntiFlicker.Frequency = %s\n", __FUNCTION__, __LINE__, s_value);
+                    LOGE("%s(%d): invalid stAntiFlicker.Frequency = %s\n", __FUNCTION__, __LINE__, s_value.c_str());
                 }
             }
             else if (xmlParseReadWrite == XML_PARSER_WRITE)
@@ -4560,7 +4565,7 @@ bool RkAiqCalibParser::parseEntrySensorAecAntiFlicker
                 }
                 else {
                     mCalibDb->aec.CommCtrl.stAntiFlicker.Mode = AEC_ANTIFLICKER_AUTO_MODE;
-                    LOGE("%s(%d): invalid stAntiFlicker.Mode = %s\n", __FUNCTION__, __LINE__, s_value);
+                    LOGE("%s(%d): invalid stAntiFlicker.Mode = %s\n", __FUNCTION__, __LINE__, s_value.c_str());
                 }
             }
             else if (xmlParseReadWrite == XML_PARSER_WRITE)
@@ -5937,7 +5942,7 @@ bool RkAiqCalibParser::parseEntrySensorAec
             *value2 = '\0';
             std::string s_value(value3);
 #ifdef DEBUG_LOG
-            LOGE("%s(%d): value: %s\n", __FUNCTION__, __LINE__, s_value);
+            LOGE("%s(%d): value: %s\n", __FUNCTION__, __LINE__, s_value.c_str());
 #endif
             if (xmlParseReadWrite == XML_PARSER_READ)
             {
@@ -5958,7 +5963,7 @@ bool RkAiqCalibParser::parseEntrySensorAec
                 }
                 else {
                     mCalibDb->aec.CommCtrl.HistStatsMode = CAM_HIST_MODE_INVALID;
-                    LOGE("%s(%d): invalid AEC HistStatsMode = %s end\n", __FUNCTION__, __LINE__, s_value);
+                    LOGE("%s(%d): invalid AEC HistStatsMode = %s end\n", __FUNCTION__, __LINE__, s_value.c_str());
                 }
             }
             else if (xmlParseReadWrite == XML_PARSER_WRITE)
@@ -6016,7 +6021,7 @@ bool RkAiqCalibParser::parseEntrySensorAec
             *value2 = '\0';
             std::string s_value(value3);
 #ifdef DEBUG_LOG
-            LOGE("%s(%d): value = %s\n", __FUNCTION__, __LINE__, s_value);
+            LOGE("%s(%d): value = %s\n", __FUNCTION__, __LINE__, s_value.c_str());
 #endif
             if (xmlParseReadWrite == XML_PARSER_READ)
             {
@@ -6034,7 +6039,7 @@ bool RkAiqCalibParser::parseEntrySensorAec
                 }
                 else {
                     mCalibDb->aec.CommCtrl.RawStatsMode = CAM_RAWSTATS_MODE_INVALID;
-                    LOGE("%s(%d): invalid AEC RawStatsMode = %s\n", __FUNCTION__, __LINE__, s_value);
+                    LOGE("%s(%d): invalid AEC RawStatsMode = %s\n", __FUNCTION__, __LINE__, s_value.c_str());
                 }
             }
             else if (xmlParseReadWrite == XML_PARSER_WRITE)
@@ -6074,7 +6079,7 @@ bool RkAiqCalibParser::parseEntrySensorAec
                 }
                 else {
                     mCalibDb->aec.CommCtrl.YRangeMode = CAM_YRANGE_MODE_INVALID;
-                    LOGE("%s(%d): invalid AEC YRangeMode = %s\n", __FUNCTION__, __LINE__, s_value);
+                    LOGE("%s(%d): invalid AEC YRangeMode = %s\n", __FUNCTION__, __LINE__, s_value.c_str());
                 }
             }
             else if (xmlParseReadWrite == XML_PARSER_WRITE)
@@ -6108,7 +6113,7 @@ bool RkAiqCalibParser::parseEntrySensorAec
                 }
                 else {
                     mCalibDb->aec.CommCtrl.AecOpType = RK_AIQ_OP_MODE_INVALID;
-                    LOGE("%s(%d): invalid AEC AecOpType = %s\n", __FUNCTION__, __LINE__, s_value);
+                    LOGE("%s(%d): invalid AEC AecOpType = %s\n", __FUNCTION__, __LINE__, s_value.c_str());
                 }
             }
             else if (xmlParseReadWrite == XML_PARSER_WRITE)
@@ -6135,7 +6140,7 @@ bool RkAiqCalibParser::parseEntrySensorAec
         }
         else if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_AEC_AECDELAYFRMNUM_TAG_ID)) {
             if (!parseEntrySensorAecDelayFrmNum(pchild->ToElement())) {
-                LOGE("parse error in Aec (%s)", tagname, param);
+                LOGE("parse error in Aec (%s)", tagname.c_str(), param);
                 return (false);
             }
         }
@@ -6558,7 +6563,7 @@ bool RkAiqCalibParser::parseEntrySensorInfoGainRange
                 }
                 else {
                     mCalibDb->sensor.GainRange.GainMode = RKAIQ_EXPGAIN_MODE_NONLINEAR_DB;
-                    LOGE("%s(%d): invalid GainRange Mode = %s\n", __FUNCTION__, __LINE__, s_value);
+                    LOGE("%s(%d): invalid GainRange Mode = %s\n", __FUNCTION__, __LINE__, s_value.c_str());
                 }
             }
             else if (xmlParseReadWrite == XML_PARSER_WRITE)
@@ -6740,44 +6745,6 @@ bool RkAiqCalibParser::parseEntrySensorModuleInfo
     return (true);
 }
 
-bool RkAiqCalibParser::parseEntrySensorAhdr
-(
-    const XMLElement*   pelement,
-    void*               param
-) {
-    (void)param;
-
-    LOGD("%s(%d): (enter)\n", __FUNCTION__, __LINE__);
-    autoTabForward();
-
-    XML_CHECK_START(CALIB_SENSOR_AHDR_TAG_ID, CALIB_SENSOR_TAG_ID);
-
-    const XMLNode* pchild = pelement->FirstChild();
-    while (pchild) {
-        XmlTag tag = XmlTag(pchild->ToElement());
-        std::string tagname(pchild->ToElement()->Name());
-        XML_CHECK_WHILE_SUBTAG_MARK((char *)(tagname.c_str()), tag.Type(), tag.Size());
-
-        if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_AHDR_MERGE_TAG_ID)) {
-            if (!parseEntrySensorAhdrMerge(pchild->ToElement())) {
-                LOGE("parse error in AHDR Merge (%s)", tagname.c_str());
-                return (false);
-            }
-        }
-        else if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_AHDR_TMO_TAG_ID)) {
-            if (!parseEntrySensorAhdrTmo(pchild->ToElement())) {
-                LOGE("parse error in AHDR Tmo (%s)", tagname.c_str());
-                return (false);
-            }
-        }
-        pchild = pchild->NextSibling();
-    }
-    XML_CHECK_END();
-    LOGD("%s(%d): (exit)\n", __FUNCTION__, __LINE__);
-    autoTabBackward();
-    return (true);
-}
-
 bool RkAiqCalibParser::parseEntrySensorAhdrMerge
 (
     const XMLElement*   pelement,
@@ -6786,7 +6753,7 @@ bool RkAiqCalibParser::parseEntrySensorAhdrMerge
     LOGD("%s(%d): (enter)\n", __FUNCTION__, __LINE__);
     autoTabForward();
 
-    XML_CHECK_START(CALIB_SENSOR_AHDR_MERGE_TAG_ID, CALIB_SENSOR_AHDR_TAG_ID);
+    XML_CHECK_START(CALIB_SENSOR_AHDR_MERGE_TAG_ID, CALIB_SENSOR_TAG_ID);
 
     const XMLNode* pchild = pelement->FirstChild();
     while (pchild) {
@@ -6855,7 +6822,7 @@ bool RkAiqCalibParser::parseEntrySensorAhdrTmo
     LOGD("%s(%d): (enter)\n", __FUNCTION__, __LINE__);
     autoTabForward();
 
-    XML_CHECK_START(CALIB_SENSOR_AHDR_TMO_TAG_ID, CALIB_SENSOR_AHDR_TAG_ID);
+    XML_CHECK_START(CALIB_SENSOR_AHDR_TMO_TAG_ID, CALIB_SENSOR_TAG_ID);
 
     const XMLNode* pchild = pelement->FirstChild();
     while (pchild) {
@@ -6863,7 +6830,11 @@ bool RkAiqCalibParser::parseEntrySensorAhdrTmo
         std::string tagname(pchild->ToElement()->Name());
         XML_CHECK_WHILE_SUBTAG_MARK((char *)(tagname.c_str()), tag.Type(), tag.Size());
 
-        if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_AHDR_TMO_GLOBALLUMA_TAG_ID)) {
+        if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_AHDR_TMO_LINEAR_TMO_EN_TAG_ID)) {
+            int no = ParseFloatArray(pchild, &mCalibDb->ahdr.tmo.isLinearTmoOn, tag.Size());
+            DCT_ASSERT((no == tag.Size()));
+        }
+        else if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_AHDR_TMO_GLOBALLUMA_TAG_ID)) {
             if (!parseEntrySensorAhdrTmoGlobalLuma(pchild->ToElement())) {
                 LOGE("parse error in AHDR Tmo GlobalLuma (%s)", tagname.c_str());
                 return (false);
@@ -7228,10 +7199,10 @@ bool RkAiqCalibParser::parseEntrySensorBlcModeCell
             DCT_ASSERT((no == tag.Size()));
         }
         pchild = pchild->NextSibling();
-		
+
     }
 
-	XML_CHECK_END();
+    XML_CHECK_END();
     LOGD( "%s(%d): (exit)\n", __FUNCTION__, __LINE__);
     return (true);
 }
@@ -7680,14 +7651,14 @@ bool RkAiqCalibParser::parseEntrySensorBayerNrSetting
 (
     const XMLElement*   pelement,
     void*               param,
-    int					index
+    int                 index
 ) {
     (void)param;
 
     LOGD("%s(%d): (enter)\n", __FUNCTION__, __LINE__);
 
     CalibDb_BayerNr_ModeCell_t *pModeCell = (CalibDb_BayerNr_ModeCell_t *)param;
-	
+
     XML_CHECK_START(CALIB_SENSOR_BAYERNR_SETTING_TAG_ID, CALIB_SENSOR_BAYERNR_MODE_CELL_TAG_ID);
 
     const XMLNode* pchild = pelement->FirstChild();
@@ -7823,23 +7794,23 @@ bool RkAiqCalibParser::parseEntrySensorBayerNrModeCell
         std::string tagname(pchild->ToElement()->Name());
         XML_CHECK_WHILE_SUBTAG_MARK((char *)(tagname.c_str()), tag.Type(), tag.Size());
 
-		if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_BAYERNR_MODE_NAME_TAG_ID)) {
+        if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_BAYERNR_MODE_NAME_TAG_ID)) {
             ParseString(pchild,  mCalibDb->bayerNr.mode_cell[index].name, sizeof(mCalibDb->bayerNr.mode_cell[index].name));
         } else if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_BAYERNR_SETTING_TAG_ID)) {
             if (!parseEntryCell2(pchild->ToElement(), tag.Size(),
-                                &RkAiqCalibParser::parseEntrySensorBayerNrSetting,
-                                &mCalibDb->bayerNr.mode_cell[index],
-                                (uint32_t)CALIB_SENSOR_BAYERNR_SETTING_TAG_ID,
-                                (uint32_t)CALIB_SENSOR_BAYERNR_MODE_CELL_TAG_ID)) {
+                                 &RkAiqCalibParser::parseEntrySensorBayerNrSetting,
+                                 &mCalibDb->bayerNr.mode_cell[index],
+                                 (uint32_t)CALIB_SENSOR_BAYERNR_SETTING_TAG_ID,
+                                 (uint32_t)CALIB_SENSOR_BAYERNR_MODE_CELL_TAG_ID)) {
                 LOGE("parse error in BayerNR setting (%s)\n", tagname.c_str());
                 return (false);
             }
         }
-		
-		pchild = pchild->NextSibling();
-	}
 
-	XML_CHECK_END();
+        pchild = pchild->NextSibling();
+    }
+
+    XML_CHECK_END();
     LOGD("%s(%d): (exit)\n", __FUNCTION__, __LINE__);
     return (true);
 }
@@ -8635,7 +8606,7 @@ bool RkAiqCalibParser::parseEntrySensorUVNRSetting
 (
     const XMLElement*   pelement,
     void*               param,
-    int					index
+    int                 index
 ) {
     (void)param;
 
@@ -8879,22 +8850,22 @@ bool RkAiqCalibParser::parseEntrySensorUVNRModeCell
         std::string tagname(pchild->ToElement()->Name());
         XML_CHECK_WHILE_SUBTAG_MARK((char *)(tagname.c_str()), tag.Type(), tag.Size());
 
-		if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_UVNR_MODE_NAME_TAG_ID)) {
+        if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_UVNR_MODE_NAME_TAG_ID)) {
             ParseString(pchild, mCalibDb->uvnr.mode_cell[index].name, sizeof(mCalibDb->uvnr.mode_cell[index].name));
         } else if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_UVNR_SETTING_TAG_ID)) {
             if (!parseEntryCell2(pchild->ToElement(), tag.Size(),
-                                &RkAiqCalibParser::parseEntrySensorUVNRSetting,
-                                &mCalibDb->uvnr.mode_cell[index],
-                                (uint32_t)CALIB_SENSOR_UVNR_SETTING_TAG_ID,
-                                (uint32_t)CALIB_SENSOR_UVNR_MODE_CELL_TAG_ID)) {
+                                 &RkAiqCalibParser::parseEntrySensorUVNRSetting,
+                                 &mCalibDb->uvnr.mode_cell[index],
+                                 (uint32_t)CALIB_SENSOR_UVNR_SETTING_TAG_ID,
+                                 (uint32_t)CALIB_SENSOR_UVNR_MODE_CELL_TAG_ID)) {
                 LOGE("parse error in BayerNR setting (%s)\n", tagname.c_str());
                 return (false);
             }
         }
-		
-		pchild = pchild->NextSibling();
-	}
-	XML_CHECK_END();
+
+        pchild = pchild->NextSibling();
+    }
+    XML_CHECK_END();
     LOGD("%s(%d): (exit)\n", __FUNCTION__, __LINE__);
     return (true);
 }
@@ -9067,17 +9038,17 @@ bool RkAiqCalibParser::parseEntrySensorYnrModeCell
         if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_YNR_MODE_NAME_TAG_ID)) {
             ParseString(pchild, mCalibDb->ynr.mode_cell[index].name, sizeof(mCalibDb->ynr.mode_cell[index].name));
         }
-		else if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_YNR_SETTING_CELL_TAG_ID)) {
-					if (!parseEntryCell2(pchild->ToElement(), tag.Size(),
-										&RkAiqCalibParser::parseEntrySensorYnrSetting,
-										(void *)&mCalibDb->ynr.mode_cell[index],
-										(uint32_t)CALIB_SENSOR_YNR_SETTING_CELL_TAG_ID,
-										(uint32_t)CALIB_SENSOR_YNR_MODE_CELL_TAG_ID)) {
-						LOGE("parse error in YNR setting (%s)", tagname.c_str());
-						return (false);
-					}
-				}
-        
+        else if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_YNR_SETTING_CELL_TAG_ID)) {
+            if (!parseEntryCell2(pchild->ToElement(), tag.Size(),
+                                 &RkAiqCalibParser::parseEntrySensorYnrSetting,
+                                 (void *)&mCalibDb->ynr.mode_cell[index],
+                                 (uint32_t)CALIB_SENSOR_YNR_SETTING_CELL_TAG_ID,
+                                 (uint32_t)CALIB_SENSOR_YNR_MODE_CELL_TAG_ID)) {
+                LOGE("parse error in YNR setting (%s)", tagname.c_str());
+                return (false);
+            }
+        }
+
 
         pchild = pchild->NextSibling();
     }
@@ -9091,7 +9062,7 @@ bool RkAiqCalibParser::parseEntrySensorYnrSetting
 (
     const XMLElement*   pelement,
     void*                param,
-    int             	 index
+    int                  index
 )
 {
     (void)param;
@@ -9581,20 +9552,20 @@ bool RkAiqCalibParser::parseEntrySensorMFNRModeCell
         std::string tagname(pchild->ToElement()->Name());
         XML_CHECK_WHILE_SUBTAG_MARK((char *)(tagname.c_str()), tag.Type(), tag.Size());
 
-    	if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_MFNR_MODE_NAME_TAG_ID)) {
+        if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_MFNR_MODE_NAME_TAG_ID)) {
             ParseString(pchild, mCalibDb->mfnr.mode_cell[index].name, sizeof(mCalibDb->mfnr.mode_cell[index].name));
         }
-		else if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_MFNR_SETTING_TAG_ID)) {
-			if (!parseEntryCell2(pchild->ToElement(), tag.Size(),
-								&RkAiqCalibParser::parseEntrySensorMFNRSetting,
-								(void *)&mCalibDb->mfnr.mode_cell[index],
-								(uint32_t)CALIB_SENSOR_MFNR_SETTING_TAG_ID,
-								(uint32_t)CALIB_SENSOR_MFNR_MODE_CELL_TAG_ID)) {
-				LOGE("parse error in MFNR MFNR_ISO (%s)\n", tagname.c_str());
-				return (false);
-			}
-		}
-        
+        else if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_MFNR_SETTING_TAG_ID)) {
+            if (!parseEntryCell2(pchild->ToElement(), tag.Size(),
+                                 &RkAiqCalibParser::parseEntrySensorMFNRSetting,
+                                 (void *)&mCalibDb->mfnr.mode_cell[index],
+                                 (uint32_t)CALIB_SENSOR_MFNR_SETTING_TAG_ID,
+                                 (uint32_t)CALIB_SENSOR_MFNR_MODE_CELL_TAG_ID)) {
+                LOGE("parse error in MFNR MFNR_ISO (%s)\n", tagname.c_str());
+                return (false);
+            }
+        }
+
         pchild = pchild->NextSibling();
     }
     XML_CHECK_END();
@@ -9608,7 +9579,7 @@ bool RkAiqCalibParser::parseEntrySensorMFNRSetting
 (
     const XMLElement*   pelement,
     void*               param,
-    int					index
+    int                 index
 ) {
     (void)param;
 
@@ -9911,12 +9882,12 @@ bool RkAiqCalibParser::parseEntrySensorSharpModeCell
 
         if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_SHARP_MODE_NAME_TAG_ID)) {
             ParseString(pchild, mCalibDb->sharp.mode_cell[index].name, sizeof(mCalibDb->sharp.mode_cell[index].name));
-        }else if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_SHARP_SETTING_TAG_ID)) {
+        } else if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_SHARP_SETTING_TAG_ID)) {
             if (!parseEntryCell2(pchild->ToElement(), tag.Size(),
-                                &RkAiqCalibParser::parseEntrySensorSharpSetting,
-                                (void *)&mCalibDb->sharp.mode_cell[index],
-                                (uint32_t)CALIB_SENSOR_SHARP_SETTING_TAG_ID,
-                                (uint32_t)CALIB_SENSOR_SHARP_MODE_CELL_TAG_ID)) {
+                                 &RkAiqCalibParser::parseEntrySensorSharpSetting,
+                                 (void *)&mCalibDb->sharp.mode_cell[index],
+                                 (uint32_t)CALIB_SENSOR_SHARP_SETTING_TAG_ID,
+                                 (uint32_t)CALIB_SENSOR_SHARP_MODE_CELL_TAG_ID)) {
                 LOGE("parse error in SHARP SHARP_Setting (%s)", tagname.c_str());
                 return (false);
             }
@@ -9934,14 +9905,14 @@ bool RkAiqCalibParser::parseEntrySensorSharpSetting
 (
     const XMLElement*   pelement,
     void*               param,
-    int					index
+    int                 index
 ) {
     (void)param;
 
     LOGD("%s(%d): (enter)\n", __FUNCTION__, __LINE__);
 
     CalibDb_Sharp_ModeCell_t *pModeCell = (CalibDb_Sharp_ModeCell_t *)param;
-   
+
     XML_CHECK_START(CALIB_SENSOR_SHARP_SETTING_TAG_ID, CALIB_SENSOR_SHARP_MODE_CELL_TAG_ID);
     const XMLNode* pchild = pelement->FirstChild();
     while (pchild) {
@@ -10143,10 +10114,10 @@ bool RkAiqCalibParser::parseEntrySensorEdgeFilterModeCell
         }
         else if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_EDGEFILTER_SETTING_TAG_ID)) {
             if (!parseEntryCell2(pchild->ToElement(), tag.Size(),
-                                &RkAiqCalibParser::parseEntrySensorEdgeFilterSetting,
-                                (void *)&mCalibDb->edgeFilter.mode_cell[index],
-                                (uint32_t)CALIB_SENSOR_EDGEFILTER_SETTING_TAG_ID,
-                                (uint32_t)CALIB_SENSOR_EDGEFILTER_MODE_CELL_TAG_ID)) {
+                                 &RkAiqCalibParser::parseEntrySensorEdgeFilterSetting,
+                                 (void *)&mCalibDb->edgeFilter.mode_cell[index],
+                                 (uint32_t)CALIB_SENSOR_EDGEFILTER_SETTING_TAG_ID,
+                                 (uint32_t)CALIB_SENSOR_EDGEFILTER_MODE_CELL_TAG_ID)) {
                 LOGE("parse error in EDGEFILTER setting (%s)", tagname.c_str());
                 return (false);
             }
@@ -10163,7 +10134,7 @@ bool RkAiqCalibParser::parseEntrySensorEdgeFilterSetting
 (
     const XMLElement*   pelement,
     void*               param,
-    int					index
+    int                 index
 ) {
     (void)param;
 
@@ -10944,6 +10915,9 @@ bool RkAiqCalibParser::parseEntrySensorLumaDetect
         } else if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_LUMA_DETECT_THRESHOLD_TAG_ID)) {
             int no =  ParseFloatArray(pchild, &mCalibDb->lumaDetect.mutation_threshold, tag.Size());
             DCT_ASSERT((no == tag.Size()));
+        } else if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_LUMA_DETECT_THRESHOLD_LEVEL2_TAG_ID)) {
+            int no =  ParseFloatArray(pchild, &mCalibDb->lumaDetect.mutation_threshold_level2, tag.Size());
+            DCT_ASSERT((no == tag.Size()));
         }
         pchild = pchild->NextSibling();
     }
@@ -10979,6 +10953,12 @@ bool RkAiqCalibParser::parseEntrySensorFec
             ParseString(pchild, mCalibDb->afec.meshfile, sizeof(mesh_filename));
         } else if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_FEC_CORRECT_LEVEL_TAG_ID)) {
             int no =  ParseDoubleArray(pchild, &mCalibDb->afec.correct_level, tag.Size());
+            DCT_ASSERT((no == tag.Size()));
+        } else if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_FEC_LIGHT_CENTER_TAG_ID)) {
+            int no = ParseDoubleArray(pchild, mCalibDb->afec.light_center, tag.Size());
+            DCT_ASSERT((no == tag.Size()));
+        } else if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_FEC_DISTORTION_COEFF_ID)) {
+            int no = ParseDoubleArray(pchild, mCalibDb->afec.coefficient, tag.Size());
             DCT_ASSERT((no == tag.Size()));
         }
         pchild = pchild->NextSibling();
@@ -11375,7 +11355,7 @@ bool RkAiqCalibParser::parseEntrySystemDcgHdrSetting
                 }
                 else {
                     mCalibDb->sysContrl.dcg.Hdr.dcg_optype = RK_AIQ_OP_MODE_INVALID;
-                    LOGE("%s(%d): invalid dcg Hdr.OpType = %s\n", __FUNCTION__, __LINE__, s_value);
+                    LOGE("%s(%d): invalid dcg Hdr.OpType = %s\n", __FUNCTION__, __LINE__, s_value.c_str());
                 }
             }
             else if (xmlParseReadWrite == XML_PARSER_WRITE)
@@ -11461,7 +11441,7 @@ bool RkAiqCalibParser::parseEntrySystemDcgNormalSetting
                 }
                 else {
                     mCalibDb->sysContrl.dcg.Normal.dcg_optype = RK_AIQ_OP_MODE_INVALID;
-                    LOGE("%s(%d): invalid dcg OpType = %s\n", __FUNCTION__, __LINE__, s_value);
+                    LOGE("%s(%d): invalid dcg OpType = %s\n", __FUNCTION__, __LINE__, s_value.c_str());
                 }
             }
             else if (xmlParseReadWrite == XML_PARSER_WRITE)

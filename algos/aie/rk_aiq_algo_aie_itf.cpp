@@ -23,6 +23,7 @@
 RKAIQ_BEGIN_DECLARE
 
 typedef struct _RkAiqAlgoContext {
+    int skip_frame;
     CamCalibDbContext_t* calib;
     rk_aiq_aie_params_t params;
     rk_aiq_aie_params_int_t sharp_params;
@@ -39,6 +40,7 @@ create_context(RkAiqAlgoContext **context, const AlgoCtxInstanceCfg* cfg)
         LOGE_AIE( "%s: create aie context fail!\n", __FUNCTION__);
         return XCAM_RETURN_ERROR_MEM;
     }
+    memset(ctx, 0, sizeof(RkAiqAlgoContext));
     ctx->params.mode = RK_AIQ_IE_EFFECT_NONE;
 
     // default value
@@ -102,8 +104,10 @@ pre_process(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outparams)
     RkAiqAlgoPreAieInt* pAiePreParams = (RkAiqAlgoPreAieInt*)inparams;
     if (pAiePreParams->rk_com.u.proc.gray_mode) {
         ctx->params.mode = RK_AIQ_IE_EFFECT_BW;
+        ctx->skip_frame = 10;
     }else {
-        ctx->params.mode = RK_AIQ_IE_EFFECT_NONE;
+        if (ctx->skip_frame && --ctx->skip_frame == 0)
+            ctx->params.mode = RK_AIQ_IE_EFFECT_NONE;
     }
 
     return XCAM_RETURN_NO_ERROR;

@@ -152,6 +152,9 @@ public:
     virtual XCamReturn prepare(uint32_t width, uint32_t height, int mode, int t_delay, int g_delay);
     virtual XCamReturn start();
     virtual XCamReturn stop();
+    virtual XCamReturn pause();
+    virtual XCamReturn resume();
+    virtual XCamReturn swWorkingModeDyn(int mode);
     virtual XCamReturn getSensorModeData(const char* sns_ent_name,
                                          rk_aiq_exposure_sensor_descriptor& sns_des);
     XCamReturn setIspParamsSync(int frameId);
@@ -193,6 +196,7 @@ private:
         CAM_HW_STATE_INITED,
         CAM_HW_STATE_PREPARED,
         CAM_HW_STATE_STARTED,
+        CAM_HW_STATE_PAUSED,
         CAM_HW_STATE_STOPPED,
     };
     enum ircut_state_e {
@@ -204,7 +208,6 @@ private:
     int _hdr_mode;
     Mutex _mutex;
     int _state;
-    bool _first;
     volatile bool _is_exit;
     bool _linked_to_isp;
     SmartPtr<RkAiqIspParamsProxy> _last_aiq_results;
@@ -247,6 +250,16 @@ private:
                                    struct v4l2_subdev_format& sns_sd_fmt,
                                    __u32 sns_v4l_pix_fmt);
     XCamReturn setupHdrLink_vidcap(int hdr_mode, bool enable);
+    enum mipi_stream_idx {
+        MIPI_STREAM_IDX_0   = 1,
+        MIPI_STREAM_IDX_1   = 2,
+        MIPI_STREAM_IDX_2   = 4,
+        MIPI_STREAM_IDX_ALL = 7,
+    };
+    XCamReturn hdr_mipi_start(int idx = MIPI_STREAM_IDX_ALL);
+    XCamReturn hdr_mipi_start_mode(int mode);
+    XCamReturn hdr_mipi_stop(int idx = MIPI_STREAM_IDX_ALL);
+    void prepare_cif_mipi();
     uint32_t _isp_module_ens;
     bool mNormalNoReadBack;
     bool mIsDhazOn;

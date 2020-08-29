@@ -236,6 +236,7 @@ typedef struct AhdrProcResData_s
     MgeProcRes_t MgeProcRes;
     bool LongFrameMode;
     bool isHdrGlobalTmo;
+    bool isLinearTmoOn;
 } AhdrProcResData_t;
 
 typedef struct SensorInfo_s

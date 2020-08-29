@@ -31,6 +31,7 @@
 #include "rk_aiq_user_api_a3dlut.h"
 #include "rk_aiq_user_api_asharp.h"
 #include "rk_aiq_user_api_agamma.h"
+#include "rk_aiq_user_api_afec.h"
 
 /*
 *****************************
@@ -504,6 +505,20 @@ XCamReturn rk_aiq_uapi_getDhzMode(const rk_aiq_sys_ctx_t* ctx, opMode_t *mode);
 */
 XCamReturn rk_aiq_uapi_setMDhzStrth(const rk_aiq_sys_ctx_t* ctx, bool on, unsigned int level);
 XCamReturn rk_aiq_uapi_getMDhzStrth(const rk_aiq_sys_ctx_t* ctx, bool* on, unsigned int* level);
+
+/*
+*****************************
+*
+* Desc: set/get dark area boost strength
+*    this function is active for normal mode
+* Argument:
+*   level: [1, 10]
+*
+*****************************
+*/
+XCamReturn rk_aiq_uapi_setDarkAreaBoostStrth(const rk_aiq_sys_ctx_t* ctx, unsigned int level);
+XCamReturn rk_aiq_uapi_getDarkAreaBoostStrth(const rk_aiq_sys_ctx_t* ctx, unsigned int *level);
+
 /*
 *****************************
 *
@@ -615,6 +630,10 @@ XCamReturn rk_aiq_uapi_setMirroFlip(const rk_aiq_sys_ctx_t* ctx, bool mirror, bo
 *****************************
 */
 XCamReturn rk_aiq_uapi_getMirrorFlip(const rk_aiq_sys_ctx_t* ctx, bool* mirror, bool* flip);
+
+XCamReturn rk_aiq_uapi_setFecEn(const rk_aiq_sys_ctx_t* ctx, bool en);
+
+XCamReturn rk_aiq_uapi_setFecCorrectLevel(const rk_aiq_sys_ctx_t* ctx, int correctLevel);
 
 RKAIQ_END_DECLARE
 

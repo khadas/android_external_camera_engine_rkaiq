@@ -104,6 +104,7 @@ public:
     XCamReturn setMirrorFlip(bool mirror, bool flip);
     XCamReturn getMirrorFlip(bool& mirror, bool& flip);
     void setDefMirrorFlip();
+    XCamReturn swWorkingModeDyn(rk_aiq_working_mode_t mode);
 protected:
     XCamReturn applyAnalyzerResult(SmartPtr<RkAiqFullParamsProxy>& results);
 private:
