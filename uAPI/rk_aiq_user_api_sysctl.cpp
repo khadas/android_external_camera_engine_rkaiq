@@ -89,7 +89,7 @@ rk_aiq_uapi_sysctl_init(const char* sns_ent_name,
         int start = strlen(iq_file) - strlen(".xml");
         if (hdr_mode) {
             iq_file[start] = '\0';
-            if (*hdr_mode == '3')
+            if (strstr(hdr_mode, "32"))
                 strcat(iq_file, "-hdr3.xml");
             else
                 strcat(iq_file, "_normal.xml");
@@ -104,7 +104,7 @@ rk_aiq_uapi_sysctl_init(const char* sns_ent_name,
         // use default iq file
         if (hdr_mode && access(config_file, F_OK)) {
             LOGW("%s not exist, will use the default !", config_file);
-            if (*hdr_mode == '3')
+            if (strstr(hdr_mode, "32"))
                 start = strlen(config_file) - strlen("-hdr3.xml");
             else
                 start = strlen(config_file) - strlen("_normal.xml");
