@@ -676,11 +676,11 @@ CamHwIsp20::findAttachedSubdevs(struct media_device *device, uint32_t count, rk_
             if ((entity_info->name[0] == 'm') &&
                     (strncmp(entity_info->name, s_info->module_index_str.c_str(), 3) == 0)) {
 
-                /* check if entity name has the format string mxx_x_ir- */
-                if (strncmp(&entity_info->name[6], "ir-", 3) == 0)
+                /* check if entity name has the format string mxx_x_xxx-irxxx */
+                if (strstr(entity_info->name, "-ir") != NULL) {
                     s_info->module_flash_ir_dev_name[s_info->flash_ir_num++] =
                         std::string(media_entity_get_devname(entity));
-                else
+                }else
                     s_info->module_flash_dev_name[s_info->flash_num++] =
                         std::string(media_entity_get_devname(entity));
             }
@@ -1038,7 +1038,6 @@ CamHwIsp20::init(const char* sns_ent_name)
         mFlashLight->init(s_info->flash_num);
     }
     if (s_info->flash_ir_num) {
-
         mFlashLightIr = new FlashLightHw(s_info->module_flash_ir_dev_name, s_info->flash_ir_num);
         mFlashLightIr->init(s_info->flash_ir_num);
     }
@@ -3005,7 +3004,6 @@ CamHwIsp20::setCpslParams(SmartPtr<RkAiqCpslParamsProxy>& cpsl_params)
 
     if (cpsl_setting->update_fl) {
         rk_aiq_flash_setting_t* fl_setting = &cpsl_setting->fl;
-
         if (mFlashLight.ptr()) {
             ret = mFlashLight->set_params(*fl_setting);
             if (ret < 0) {
@@ -3016,7 +3014,6 @@ CamHwIsp20::setCpslParams(SmartPtr<RkAiqCpslParamsProxy>& cpsl_params)
 
     if (cpsl_setting->update_ir) {
         rk_aiq_ir_setting_t* ir_setting = &cpsl_setting->ir;
-
         ret = setIrcutParams(ir_setting->irc_on);
         if (ret < 0) {
             LOGE_CAMHW_SUBM(ISP20HW_SUBM, "set ir params err: %d\n", ret);

@@ -102,6 +102,9 @@ FlashLightHw::set_params(rk_aiq_flash_setting_t& flash_settings)
             (old_flash_settings->power[0] != flash_settings.power[0]) ||
             (old_flash_settings->power[1] != flash_settings.power[1])
        ) {
+       LOGD_CAMHW_SUBM(FL_SUBM, "flash_settings: mode:%d,power:%f,timeout_ms:%d,strobe:%d",
+                             flash_settings.flash_mode, flash_settings.power[0],
+                             flash_settings.timeout_ms, flash_settings.strobe);
         ret = v4l_set_params(flash_settings.flash_mode, flash_settings.power,
                              flash_settings.timeout_ms, flash_settings.strobe);
     }

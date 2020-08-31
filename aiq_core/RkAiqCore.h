@@ -367,6 +367,8 @@ private:
     struct RkAiqHwInfo mHwInfo;
     rk_aiq_cpsl_cap_t mCpslCap;
     bool mCurCpslOn;
+    float mStrthLed;
+    float mStrthIr;
     rk_aiq_gray_mode_t mGrayMode;
 };
 

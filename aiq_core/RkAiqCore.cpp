@@ -55,6 +55,7 @@
 #include <unistd.h>
 
 namespace RkCam {
+#define EPSINON 0.0000001
 
 /*
  * notice that the order should be the same as enum RkAiqAlgoType_t
@@ -155,6 +156,8 @@ RkAiqCore::RkAiqCore()
     mCurAfAlgoHdl = NULL;
     xcam_mem_clear(mHwInfo);
     mCurCpslOn = false;
+    mStrthLed = 0.0f;
+    mStrthIr = 0.0f;
     mGrayMode = RK_AIQ_GRAY_MODE_CPSL;
 
     SmartPtr<RkAiqFullParams> fullParam = new RkAiqFullParams();
@@ -2740,24 +2743,31 @@ RkAiqCore::genCpslResult(RkAiqFullParams* params)
 
     LOGD_ANALYZER("cpsl mode %d, light src %d", cpsl_cfg->mode, cpsl_cfg->lght_src);
     bool cpsl_on = false;
-    if (cpsl_cfg->mode == RK_AIQ_OP_MODE_MANUAL) {
-        cpsl_on = cpsl_cfg->u.m.on;
-        cpsl_param->fl.power[0] = cpsl_cfg->u.m.strength_led / 100.0f;
-        cpsl_param->fl_ir.power[0] = cpsl_cfg->u.m.strength_ir / 100.0f;
+    bool need_update = false;
 
+    if (cpsl_cfg->mode == RK_AIQ_OP_MODE_MANUAL) {
+        if ((mCurCpslOn != cpsl_cfg->u.m.on) ||
+            (fabs(mStrthLed - cpsl_cfg->u.m.strength_led) > EPSINON) ||
+            (fabs(mStrthIr - cpsl_cfg->u.m.strength_ir) > EPSINON)) {
+            need_update = true;
+            cpsl_on = cpsl_cfg->u.m.on;
+            cpsl_param->fl.power[0] = cpsl_cfg->u.m.strength_led / 100.0f;
+            cpsl_param->fl_ir.power[0] = cpsl_cfg->u.m.strength_ir / 100.0f;
+        }
     } else {
         RkAiqAlgoPreResAsdInt* asd_pre_rk = (RkAiqAlgoPreResAsdInt*)mAlogsSharedParams.preResComb.asd_pre_res;
         if (asd_pre_rk) {
             asd_preprocess_result_t* asd_result = &asd_pre_rk->asd_result;
-
-            cpsl_on = asd_result->cpsl_on;
+            if (mCurCpslOn != asd_result->cpsl_on) {
+                need_update = true;
+                cpsl_on = asd_result->cpsl_on;
+            }
         }
         cpsl_param->fl.power[0] = 1.0f;
         cpsl_param->fl_ir.power[0] = 1.0f;
     }
 
-    // need update ?
-    if (mCurCpslOn != cpsl_on ) {
+    if (need_update) {
         if (cpsl_cfg->lght_src & RK_AIQ_CPSLS_LED) {
             cpsl_param->update_fl = true;
             if (cpsl_on)
@@ -2810,6 +2820,8 @@ RkAiqCore::genCpslResult(RkAiqFullParams* params)
                 mAlogsSharedParams.gray_mode = true;
         }
         mCurCpslOn = cpsl_on;
+        mStrthLed = cpsl_cfg->u.m.strength_led;
+        mStrthIr = cpsl_cfg->u.m.strength_ir;
     } else {
         cpsl_param->update_ir = false;
         cpsl_param->update_fl = false;
