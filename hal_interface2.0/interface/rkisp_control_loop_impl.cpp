@@ -25,7 +25,7 @@
 #include <v4l2_device.h>
 #include <base/xcam_log.h>
 #include <linux/rk-camera-module.h>
-//#include <RkAiqManager.h>
+#include <RkAiqManager.h>
 #include <RkAiqCalibDb.h>
 #include <sys/ioctl.h>
 #include <linux/videodev2.h>
@@ -39,6 +39,8 @@
 //test
 #include "rk_aiq_user_api_imgproc.h"
 
+#include "rkaiq.h"
+#include "AiqCameraHalAdapter.h"
 
 #define RK_3A_TUNING_FILE_PATH  "/vendor/etc/camera/rkisp1"
 
@@ -51,6 +53,17 @@ using namespace XCam;
 using namespace android;
 
 static rkisp_metadata_info_t gDefMetadata[MAX_SENSOR_NUM];
+
+typedef struct rk_aiq_sys_ctx_s {
+    const char* _sensor_entity_name;
+    SmartPtr<RkAiqManager> _rkAiqManager;
+    SmartPtr<ICamHw> _camHw;
+    SmartPtr<RkAiqCore> _analyzer;
+    SmartPtr<RkLumaCore> _lumaAnalyzer;
+    CamCalibDbContext_t *_calibDb;
+} rk_aiq_sys_ctx_t;
+
+static AiqCameraHalAdapter *gAiqCameraHalAdapter;
 
 static int __rkisp_get_sensor_fmt_infos(SmartPtr<V4l2SubDevice> subDev, rkisp_metadata_info_t *metadata_info)
 {
@@ -301,10 +314,11 @@ EXIT:
 	return -1;
 }
 
+
+
 int rkisp_cl_init(void** cl_ctx, const char* tuning_file_path,
                   const cl_result_callback_ops_t *callback_ops) {
     char* sns_entity_name = "m01_f_os04a10 1-0036-1";
-
     xcam_get_log_level();
     LOGD("--------------------------rk_aiq_uapi_sysctl_init");
     rk_aiq_sys_ctx_t* aiq_ctx = NULL;
@@ -312,26 +326,30 @@ int rkisp_cl_init(void** cl_ctx, const char* tuning_file_path,
     aiq_ctx = rk_aiq_uapi_sysctl_init(sns_entity_name, RK_3A_TUNING_FILE_PATH, NULL, NULL);
 
     *cl_ctx = (void*)aiq_ctx;
+
     return 0;
 }
 
 int rkisp_cl_rkaiq_init(void** cl_ctx, const char* tuning_file_path,
-                  const cl_result_callback_ops_t *callback_ops,
+                  const cl_result_callbacks_ops_t *callbacks_ops,
                   const char* sns_entity_name) {
     xcam_get_log_level();
     LOGD("--------------------------rk_aiq_uapi_sysctl_init");
-    rk_aiq_sys_ctx_t* aiq_ctx = NULL;
-
+    rk_aiq_sys_ctx_s* aiq_ctx = NULL;
     aiq_ctx = rk_aiq_uapi_sysctl_init(sns_entity_name, RK_3A_TUNING_FILE_PATH, NULL, NULL);
 
     *cl_ctx = (void*)aiq_ctx;
     LOGD("@%s(%d)aiq_ctx pointer(%p)",__FUNCTION__, __LINE__, aiq_ctx);
+    if(cl_ctx){
+        gAiqCameraHalAdapter = new AiqCameraHalAdapter(aiq_ctx->_rkAiqManager,aiq_ctx->_analyzer,aiq_ctx->_camHw);
+        gAiqCameraHalAdapter->init(callbacks_ops);
+    }
     return 0;
 }
 
 int rkisp_cl_prepare(void* cl_ctx,
                      const struct rkisp_cl_prepare_params_s* prepare_params) {
-	ALOGD("--------------------------rkisp_cl_prepare");
+	LOGD("--------------------------rkisp_cl_prepare");
 
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
     LOGD("@%s(%d)cl_ctx pointer(%p)",__FUNCTION__, __LINE__, cl_ctx);
@@ -339,7 +357,7 @@ int rkisp_cl_prepare(void* cl_ctx,
     rk_aiq_working_mode_t work_mode = RK_AIQ_WORKING_MODE_ISP_HDR2; //work_mode = RK_AIQ_WORKING_MODE_NORMAL;
     ret = rk_aiq_uapi_sysctl_prepare(aiq_ctx, prepare_params->width, prepare_params->height, work_mode);
 
-    ALOGD("--------------------------rkisp_cl_prepare done");
+    LOGD("--------------------------rkisp_cl_prepare done");
 
     return 0;
 }
@@ -347,30 +365,18 @@ int rkisp_cl_prepare(void* cl_ctx,
 int rkisp_cl_start(void* cl_ctx) {
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
     LOGD("--------------------------rkisp_cl_start");
+
     rk_aiq_sys_ctx_t *aiq_ctx = AIQ_CONTEXT_CAST (cl_ctx);
     ret = rk_aiq_uapi_sysctl_start(aiq_ctx);
-    LOGD("--------------------------rkisp_cl_start done");
 
+    LOGD("--------------------------rkisp_cl_start done");
     return ret;
 }
 
-int rkisp_cl_set_frame_params(const void* cl_ctx,
-                              const struct rkisp_cl_frame_metadata_s* frame_params) {
-    XCamReturn ret = XCAM_RETURN_NO_ERROR;
-    unsigned int level;
-
-    ALOGD("--------------------------rkisp_cl_set_frame_params");
-    rk_aiq_sys_ctx_t *aiq_ctx = AIQ_CONTEXT_CAST (cl_ctx);
-    //TODO 需要封装一层，将aiq_ctx加到控制里面
-    //ret = aiq_ctx->set_control_params(frame_params->id, frame_params->metas);
-    if (ret != XCAM_RETURN_NO_ERROR) {
-        LOGE("@%s %d: set_control_params failed ", __FUNCTION__, __LINE__);
-    }
-    ret = rk_aiq_uapi_setBrightness(aiq_ctx, 20);
-    sleep(2);
-    ret = rk_aiq_uapi_getBrightness(aiq_ctx, &level);
-    ALOGD("%s(%d) level(%u)", __FUNCTION__, __LINE__, level);
-    return 0;
+int rkisp_cl_rkaiq_set_frame_params(const void* cl_ctx,
+                              const struct rkisp_cl_frame_rkaiq_s* frame_params) {
+    gAiqCameraHalAdapter->setFrameParams(frame_params);
+    return XCAM_RETURN_NO_ERROR;
 }
 
 // implement interface stop as pause so we could keep all the 3a status,
@@ -379,14 +385,18 @@ int rkisp_cl_stop(void* cl_ctx) {
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
     rk_aiq_sys_ctx_t *aiq_ctx = AIQ_CONTEXT_CAST (cl_ctx);
     LOGD("--------------------------rkisp_cl_stop");
+
     ret = rk_aiq_uapi_sysctl_stop(aiq_ctx);
+
     LOGD("--------------------------rkisp_cl_stop done");
     return 0;
 }
 
 void rkisp_cl_deinit(void* cl_ctx) {
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
-
+    if(gAiqCameraHalAdapter){
+        delete gAiqCameraHalAdapter;
+    }
     LOGD("--------------------------rkisp_cl_deinit");
     rk_aiq_sys_ctx_t *aiq_ctx = AIQ_CONTEXT_CAST (cl_ctx);\
     rk_aiq_uapi_sysctl_deinit(aiq_ctx);

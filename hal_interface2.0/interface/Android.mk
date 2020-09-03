@@ -4,7 +4,9 @@ include $(CLEAR_VARS)
 
 LOCAL_SRC_FILES +=\
 	rkisp_control_loop_impl.cpp \
-	rkcamera_vendor_tags.cpp
+	rkcamera_vendor_tags.cpp \
+	rkaiq.cpp \
+	AiqCameraHalAdapter.cpp
 
 #LOCAL_CFLAGS += -DLINUX  -D_FILE_OFFSET_BITS=64 -DHAS_STDINT_H -DENABLE_ASSERT
 LOCAL_CPPFLAGS += -std=c++11 -Wno-error -frtti
