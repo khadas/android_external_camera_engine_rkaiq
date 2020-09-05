@@ -199,10 +199,24 @@
  *  - rk_aiq_uapi_sysctl_swWorkingModeDyn
  *  - rk_aiq_uapi_setFecEn/rk_aiq_uapi_setFecCorrectLevel
  * - match up with isp driver v0.1.4
+ * v1.0.9
+ * - calib db: v1.2.4 magic code: 1014880
+ * - uApi changes:
+ *   - rk_aiq_user_api_ae_queryExpResInfo
+ *     modify data-type & add EnvLux in Ae-api
+ *   - rk_aiq_uapi_setLdchEn
+ *   - rk_aiq_uapi_setLdchCorrectLevel
+ *   - rk_aiq_uapi_setFecBypass
+ *   - rk_aiq_uapi_setFecEn
+ * - support aiq version checking with tuning tool version
+ * - fix the buf plane info changed of vb2
+ * - Isp20Poll: modify the resolution of the input ISP to crop resolution
+ * - awb: fix the bug in cct_lut_cfg initinalize
+ * - fix flash-ir bugs
  */
 
-#define RK_AIQ_VERSION_REAL_V "v1.0.8"
-#define RK_AIQ_RELEASE_DATE "2020-08-29"
+#define RK_AIQ_VERSION_REAL_V "v1.0.9"
+#define RK_AIQ_RELEASE_DATE "2020-09-07"
 
 /******* DO NOT EDIT THE FOLLOWINGS ***********/
 

@@ -1993,7 +1993,8 @@ Isp20Params::convertAiqResultsToIsp20Params(struct isp2x_isp_params_cfg& isp_cfg
     convertAiqAfToIsp20Params(isp_cfg, aiq_results->data()->af_meas, aiq_results->data()->af_cfg_update);
     convertAiqAdehazeToIsp20Params(isp_cfg, aiq_results->data()->adhaz_config);
     convertAiqA3dlutToIsp20Params(isp_cfg, aiq_results->data()->lut3d);
-    convertAiqAldchToIsp20Params(isp_cfg, aiq_results->data()->ldch);
+    if(aiq_results->data()->update_mask & RKAIQ_ISP_LDCH_ID)
+        convertAiqAldchToIsp20Params(isp_cfg, aiq_results->data()->ldch);
 
     //must be at the end of isp module
     convertAiqGainToIsp20Params(isp_cfg, aiq_results->data()->gain_config);

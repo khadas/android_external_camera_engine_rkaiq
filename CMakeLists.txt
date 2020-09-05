@@ -26,6 +26,7 @@ set(BUILROOT_BUILD_PROJECT true)
 #set RK_SIMULATOR_HW
 #set(RK_SIMULATOR_HW true)
 
+set(GENMESH_ONLINE true)
 # ----------------------------------------------------------------------------
 # SET THE COMPILER PATH
 # ----------------------------------------------------------------------------
@@ -100,6 +101,7 @@ include/algos/asd
 include/algos/asharp
 include/algos/awb
 include/algos/awdr
+include/common/gen_mesh
 )
 #source directory
 #AUX_SOURCE_DIRECTORY(demo/src DIR_SRCS)
@@ -112,9 +114,16 @@ set (AIQ_CORE_SRC
 set (ALGO_COMMON_SRC
 	algos/interpolation.cpp
 	)
+if(GENMESH_ONLINE)
+set (COMMON_SRC
+    common/mediactl/mediactl.c
+    common/gen_mesh/genMesh.cpp
+    )
+else()
 set (COMMON_SRC
 	common/mediactl/mediactl.c
 	)
+endif()
 if(RK_SIMULATOR_HW)
 set (HWI_SRC
         hwi/CamHwBase.cpp
@@ -205,13 +214,12 @@ set (OPENCV_LIBS_DIR
 add_compile_options(-DOPENCV_SUPPORT)
 endif()
 
-set(FEC_GENMESH true)
-if(FEC_GENMESH)
-    set (FEC_GENMESH_LIBS genMesh_arm32)
-    set (FEC_GENMESH_LIBS_DIR
-        ${PROJECT_SOURCE_DIR}/algos/afec/
+if(GENMESH_ONLINE)
+    set (GENMESH_LIBS genMeshLib)
+    set (GENMESH_LIBS_DIR
+        ${PROJECT_SOURCE_DIR}/common/gen_mesh/genMesh_static_32bit/
         )
-add_compile_options(-DFEC_GENMESH)
+    add_compile_options(-DGENMESH_ONLINE)
 endif()
 
 # set output binary path
@@ -256,7 +264,7 @@ add_subdirectory(algos)
 cmake_policy(SET CMP0015 NEW)
 
 #
-link_directories("${LIBRARY_OUTPUT_PATH}" "${OPENCV_LIBS_DIR}" "${FEC_GENMESH_LIBS_DIR}")
+link_directories("${LIBRARY_OUTPUT_PATH}" "${OPENCV_LIBS_DIR}" "${GENMESH_LIBS_DIR}")
 
 add_library(rkaiq SHARED ${RK_AIQ_SRC})
 set_target_properties(rkaiq PROPERTIES FOLDER "rk_aiq")
@@ -271,4 +279,9 @@ target_link_libraries(rkaiq rkaiq_ae rkaiq_awb rkaiq_af rkaiq_anr rkaiq_asd rkai
 	rkaiq_acp rkaiq_asharp rkaiq_adhaz rkaiq_a3dlut rkaiq_ablc rkaiq_accm rkaiq_acgc
 	rkaiq_adebayer rkaiq_adpcc rkaiq_afec rkaiq_agamma rkaiq_agic rkaiq_aie rkaiq_aldch
 	rkaiq_alsc rkaiq_aorb rkaiq_ar2y rkaiq_awdr ${OPENCV_LIBS}
-	${OPENCV_3RDPARTY_LIBS} ${FEC_GENMESH_LIBS} ${LINK_ASAN} pthread)
+	${OPENCV_3RDPARTY_LIBS} ${GENMESH_LIBS} ${LINK_ASAN} pthread)
+
+set (VERSIONFILEPATH ${PROJECT_SOURCE_DIR}/)
+execute_process(COMMAND sh
+	${PROJECT_SOURCE_DIR}/tools/check-version-with-tuningtools.sh
+	${VERSIONFILEPATH})

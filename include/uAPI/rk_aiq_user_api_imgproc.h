@@ -32,6 +32,7 @@
 #include "rk_aiq_user_api_asharp.h"
 #include "rk_aiq_user_api_agamma.h"
 #include "rk_aiq_user_api_afec.h"
+#include "rk_aiq_user_api_aldch.h"
 
 /*
 *****************************
@@ -631,9 +632,49 @@ XCamReturn rk_aiq_uapi_setMirroFlip(const rk_aiq_sys_ctx_t* ctx, bool mirror, bo
 */
 XCamReturn rk_aiq_uapi_getMirrorFlip(const rk_aiq_sys_ctx_t* ctx, bool* mirror, bool* flip);
 
+/*
+*****************************
+*
+* Desc: fec dynamic switch, valid only if aiq hasn't executed the 'prepare' action
+* Argument:
+*****************************
+*/
 XCamReturn rk_aiq_uapi_setFecEn(const rk_aiq_sys_ctx_t* ctx, bool en);
 
+/*
+*****************************
+*
+* Desc: The FEC module is still working in bypass state
+* Argument:
+*****************************
+*/
+XCamReturn rk_aiq_uapi_setFecBypass(const rk_aiq_sys_ctx_t* ctx, bool en);
+
+/*
+*****************************
+*
+* Desc: the adjustment range of distortion intensity is 0~255
+* Argument:
+*****************************
+*/
 XCamReturn rk_aiq_uapi_setFecCorrectLevel(const rk_aiq_sys_ctx_t* ctx, int correctLevel);
+
+/*
+*****************************
+*
+* Desc:
+* Argument:
+*****************************
+*/
+XCamReturn rk_aiq_uapi_setLdchEn(const rk_aiq_sys_ctx_t* ctx, bool en);
+/*
+*****************************
+*
+* Desc: the adjustment range of distortion intensity is 0~255
+* Argument:
+*****************************
+*/
+XCamReturn rk_aiq_uapi_setLdchCorrectLevel(const rk_aiq_sys_ctx_t* ctx, int correctLevel);
 
 RKAIQ_END_DECLARE
 

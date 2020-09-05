@@ -4,6 +4,7 @@
 #define LDCH_MESH_XY_NUM_ALGO 524288 // ((4096/16) * (4096/8))*4
 
 typedef struct {
+    unsigned char update;
     unsigned int sw_ldch_en;
     unsigned int lut_h_size;
     unsigned int lut_v_size;

@@ -40,6 +40,7 @@
 #include "afec/rk_aiq_uapi_afec_int.h"
 #include "af/rk_aiq_uapi_af_int.h"
 #include "asd/rk_aiq_uapi_asd_int.h"
+#include "aldch/rk_aiq_uapi_aldch_int.h"
 
 namespace RkCam {
 
@@ -98,7 +99,7 @@ RKAIQHANDLEINT(Acgc);
 //RKAIQHANDLEINT(Agamma);
 //RKAIQHANDLEINT(Agic);
 RKAIQHANDLEINT(Aie);
-RKAIQHANDLEINT(Aldch);
+// RKAIQHANDLEINT(Aldch);
 RKAIQHANDLEINT(Ar2y);
 RKAIQHANDLEINT(Awdr);
 RKAIQHANDLEINT(Aorb);
@@ -696,6 +697,7 @@ public:
         , RkAiqHandleIntCom(des, aiqCore) {
             memset(&mCurAtt, 0, sizeof(rk_aiq_fec_attrib_t));
             memset(&mNewAtt, 0, sizeof(rk_aiq_fec_attrib_t));
+            mCurAtt.en = 0xff;
         };
     virtual ~RkAiqAfecHandleInt() {
         RkAiqAfecHandle::deInit();
@@ -751,6 +753,43 @@ private:
     asd_attrib_t mCurAtt;
     asd_attrib_t mNewAtt;
 };
+
+// aldch
+class RkAiqAldchHandleInt:
+    virtual public RkAiqAldchHandle,
+    virtual public RkAiqHandleIntCom {
+public:
+    explicit RkAiqAldchHandleInt(RkAiqAlgoDesComm* des, RkAiqCore* aiqCore)
+        : RkAiqHandle(des, aiqCore)
+        , RkAiqAldchHandle(des, aiqCore)
+        , RkAiqHandleIntCom(des, aiqCore) {
+            memset(&mCurAtt, 0, sizeof(rk_aiq_ldch_attrib_t));
+            memset(&mNewAtt, 0, sizeof(rk_aiq_ldch_attrib_t));
+        };
+    virtual ~RkAiqAldchHandleInt() {
+        RkAiqAldchHandle::deInit();
+    };
+    virtual XCamReturn updateConfig();
+    virtual XCamReturn prepare();
+    virtual XCamReturn preProcess();
+    virtual XCamReturn processing();
+    virtual XCamReturn postProcess();
+
+    XCamReturn setAttrib(rk_aiq_ldch_attrib_t att);
+    XCamReturn getAttrib(rk_aiq_ldch_attrib_t *att);
+
+protected:
+    virtual void init();
+    virtual void deInit() {
+        RkAiqAldchHandle::deInit();
+    };
+private:
+    // TODO
+    // XCam::Mutex mCfgMutex;
+    rk_aiq_ldch_attrib_t mCurAtt;
+    rk_aiq_ldch_attrib_t mNewAtt;
+};
+
 }; //namespace RkCam
 
 #endif

@@ -573,12 +573,12 @@ void test_imgproc(const demo_context_t* demo_ctx) {
        rk_aiq_uapi_setFecCorrectLevel(ctx, 255);
        break;
     case 'N':
-       printf("test en fec\n");
-       rk_aiq_uapi_setFecEn(ctx, true);
+       printf("test bypass fec\n");
+       rk_aiq_uapi_setFecBypass(ctx, true);
        break;
     case 'O':
-       printf("test disable fec\n");
-       rk_aiq_uapi_setFecEn(ctx, false);
+       printf("test not bypass fec\n");
+       rk_aiq_uapi_setFecBypass(ctx, false);
        break;
     case 'P':
        {
@@ -592,6 +592,22 @@ void test_imgproc(const demo_context_t* demo_ctx) {
             *const_cast<int*>(&demo_ctx->hdrmode) = work_mode = new_mode;
             rk_aiq_uapi_sysctl_swWorkingModeDyn(ctx, new_mode);
        }
+       break;
+    case 'Q':
+       printf("test enable ldch\n");
+       rk_aiq_uapi_setLdchEn(ctx, true);
+       break;
+    case 'R':
+       printf("test disalbe ldch\n");
+       rk_aiq_uapi_setLdchEn(ctx, false);
+       break;
+    case 'S':
+       printf("test fec correct level100\n");
+       rk_aiq_uapi_setLdchCorrectLevel(ctx, 100);
+       break;
+    case 'T':
+       printf("test fec correct level255\n");
+       rk_aiq_uapi_setLdchCorrectLevel(ctx, 255);
        break;
     default:
         break;
@@ -1501,6 +1517,7 @@ static void rkisp_routine(demo_context_t *ctx)
     	    if (ctx->writeFileSync)
         		rk_aiq_uapi_debug_captureRawCtl(ctx->aiq_ctx, true);
 
+            // rk_aiq_uapi_setFecEn(ctx->aiq_ctx, true);
     	    XCamReturn ret = rk_aiq_uapi_sysctl_prepare(ctx->aiq_ctx, ctx->width, ctx->height, work_mode);
 
     	    if (ret != XCAM_RETURN_NO_ERROR)

@@ -26,7 +26,7 @@
 #include "smartptr.h"
 #include "safe_list.h"
 #include "xcam_log.h"
-#include "afec/rk_aiq_algo_afec_genMesh.h"
+#include "gen_mesh/genMesh.h"
 #include "afec/rk_aiq_types_afec_algo_int.h"
 
 RKAIQ_BEGIN_DECLARE
@@ -40,6 +40,14 @@ typedef enum {
     FEC_CORRECT_LEVEL3,          // 25%
     FEC_BYPASS
 } FECCorrectLevel;
+
+typedef enum FECState_e {
+    FEC_STATE_INVALID           = 0,                   /**< initialization value */
+    FEC_STATE_INITIALIZED       = 1,                   /**< instance is created, but not initialized */
+    FEC_STATE_STOPPED           = 2,                   /**< instance is confiured (ready to start) or stopped */
+    FEC_STATE_RUNNING           = 3,                   /**< instance is running (processes frames) */
+    FEC_STATE_MAX                                      /**< max */
+} FECState_t;
 
 class RKAiqAfecThread;
 
@@ -69,6 +77,8 @@ typedef struct FECContext_s {
     int meshStepW;
     int meshStepH;
     struct CameraCoeff camCoeff;
+    FecParams fecParams;
+    FECState_t eState;
 
     std::atomic<bool> isAttribUpdated;
     rk_aiq_fec_cfg_t user_config;

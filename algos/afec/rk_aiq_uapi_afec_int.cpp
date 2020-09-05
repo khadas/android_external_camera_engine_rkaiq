@@ -28,22 +28,27 @@ rk_aiq_uapi_afec_SetAttrib(RkAiqAlgoContext *ctx,
 {
     FECHandle_t fec_contex = (FECHandle_t)ctx->hFEC;;
 
-    if (!fec_contex->fec_en) {
-        LOGE_AFEC("failed, fec not enable in xml!\n");
+    if (fec_contex->fec_en != attr.en && \
+        (fec_contex->eState == FEC_STATE_INITIALIZED || \
+         fec_contex->eState == FEC_STATE_RUNNING)) {
+        LOGE_AFEC("failed, Fec en(%d-%d) don't support switch at running time!\n",
+                  fec_contex->fec_en, attr.en);
         return XCAM_RETURN_ERROR_FAILED;
     }
 
-    if (!fec_contex->user_config.en && !attr.en) {
-        LOGE_AFEC("failed, fec is disabled by user!\n");
+    if (fec_contex->user_config.bypass && attr.bypass) {
+        LOGE_AFEC("failed, bypass fec!\n");
         return XCAM_RETURN_ERROR_FAILED;
     }
 
-    if (0 != memcmp(&fec_contex->user_config, &attr, sizeof(rk_aiq_fec_attrib_t))) {
+    if (0 != memcmp(&fec_contex->user_config, &attr, sizeof(rk_aiq_fec_attrib_t)) ||\
+        fec_contex->eState == FEC_STATE_INVALID) {
         memcpy(&fec_contex->user_config, &attr, sizeof(rk_aiq_fec_attrib_t));
 
         SmartPtr<rk_aiq_fec_attrib_t> attrPtr = new rk_aiq_fec_attrib_t;
 
         attrPtr->en = fec_contex->user_config.en;
+        attrPtr->bypass = fec_contex->user_config.bypass;
         attrPtr->correct_level = fec_contex->user_config.correct_level;
         fec_contex->afecReadMeshThread->clear_attr();
         fec_contex->afecReadMeshThread->push_attr(attrPtr);

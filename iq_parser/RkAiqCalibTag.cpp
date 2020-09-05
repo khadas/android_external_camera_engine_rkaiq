@@ -1388,6 +1388,8 @@ uint32_t calib_sensor_ldch_sub_tags[] = {
     CALIB_SENSOR_LDCH_ENABLE_TAG_ID,
     CALIB_SENSOR_LDCH_MESH_FILE_TAG_ID,
     CALIB_SENSOR_LDCH_CORRECT_LEVEL_TAG_ID,
+    CALIB_SENSOR_LDCH_LIGHT_CENTER_TAG_ID,
+    CALIB_SENSOR_LDCH_DISTORTION_COEFF_ID,
 };
 
 uint32_t calib_sensor_fec_sub_tags[] = {
@@ -3139,6 +3141,7 @@ calib_tag_info_t g_calib_tag_infos[CALIB_IQ_TAG_END] = {
 
     [CALIB_SENSOR_AHDR_TMO_LINEAR_TMO_EN_TAG_ID]         =
     {   "LinearTmoEn", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
+        check_tags_array_ignore, NULL
     },
 
     [CALIB_SENSOR_AHDR_TMO_GLOBALLUMA_TAG_ID]         =
@@ -5331,6 +5334,14 @@ calib_tag_info_t g_calib_tag_infos[CALIB_IQ_TAG_END] = {
     },
     [CALIB_SENSOR_LDCH_CORRECT_LEVEL_TAG_ID]         =
     {   "correct_level", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
+        check_tags_array_ignore, NULL
+    },
+    [CALIB_SENSOR_LDCH_LIGHT_CENTER_TAG_ID]         =
+    {   "light_center",  CALIB_TAG_TYPE_DOUBLE, {-1, -1},
+        check_tags_array_ignore, NULL
+    },
+    [CALIB_SENSOR_LDCH_DISTORTION_COEFF_ID]         =
+    {   "distortion_coeff", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
         check_tags_array_ignore, NULL
     },
 

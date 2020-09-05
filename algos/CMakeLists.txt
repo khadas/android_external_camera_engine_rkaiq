@@ -434,7 +434,6 @@ endif()
 set (AFEC_SRC
 	afec/rk_aiq_algo_afec_itf.cpp
 	afec/rk_aiq_uapi_afec_int.cpp
-	afec/rk_aiq_algo_afec_genMesh.cpp
     )
 
 if(EXISTS "${CMAKE_SOURCE_DIR}/algos/afec/rk_aiq_algo_afec_itf.cpp")
@@ -533,6 +532,7 @@ endif()
 # ----------------------------------------------------------------------------
 set (ALDCH_SRC
 	aldch/rk_aiq_algo_aldch_itf.cpp
+	aldch/rk_aiq_uapi_aldch_int.cpp
     )
 
 if(EXISTS "${CMAKE_SOURCE_DIR}/algos/aldch/rk_aiq_algo_aldch_itf.cpp")

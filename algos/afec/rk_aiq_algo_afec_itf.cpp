@@ -51,11 +51,12 @@ create_context(RkAiqAlgoContext **context, const AlgoCtxInstanceCfg* cfg)
     }
     memset((void *)(ctx->hFEC), 0, sizeof(FECContext_t));
     *context = ctx;
-#if FEC_GENMESH
+#if GENMESH_ONLINE
     ctx->hFEC->afecReadMeshThread = new RKAiqAfecThread(ctx->hFEC);
     ctx->hFEC->afecReadMeshThread->triger_start();
     ctx->hFEC->afecReadMeshThread->start();
 #endif
+    ctx->hFEC->eState = FEC_STATE_INVALID;
     return XCAM_RETURN_NO_ERROR;
 }
 
@@ -64,13 +65,14 @@ destroy_context(RkAiqAlgoContext *context)
 {
     FECHandle_t hFEC = (FECHandle_t)context->hFEC;
     FECContext_t* fecCtx = (FECContext_t*)hFEC;
-#if FEC_GENMESH
+#if GENMESH_ONLINE
     fecCtx->afecReadMeshThread->triger_stop();
     fecCtx->afecReadMeshThread->stop();
     if (fecCtx->meshxi != NULL || fecCtx->meshyi != NULL || \
         fecCtx->meshxf != NULL || fecCtx->meshyf != NULL)
         freeFecMesh(fecCtx->meshxi, fecCtx->meshxf,
                 fecCtx->meshyi, fecCtx->meshyf);
+    genFecMeshDeInit(fecCtx->fecParams);
 #else
     if (fecCtx->meshxi != NULL) {
         free(fecCtx->meshxi);
@@ -127,13 +129,17 @@ uint32_t cal_fec_mesh(uint32_t width, uint32_t height, uint32_t mode, uint32_t &
 static XCamReturn
 read_mesh_table(FECContext_t* fecCtx, unsigned int correct_level)
 {
+    bool ret;
 #if OPENCV_SUPPORT
     gen_default_mesh_table(fecCtx->src_width, fecCtx->src_height, fecCtx->mesh_density,
                            fecCtx->meshxi, fecCtx->meshyi, fecCtx->meshxf, fecCtx->meshyf);
-#elif FEC_GENMESH
-    genFECMeshNLevel(fecCtx->src_width, fecCtx->src_height, fecCtx->camCoeff, correct_level,
-                     fecCtx->meshxi, fecCtx->meshxf,
-                     fecCtx->meshyi, fecCtx->meshyf);
+#elif GENMESH_ONLINE
+    ret = genFECMeshNLevel(fecCtx->fecParams, fecCtx->camCoeff, correct_level, fecCtx->meshxi,
+                           fecCtx->meshxf, fecCtx->meshyi, fecCtx->meshyf);
+    if (!ret) {
+        LOGE_AFEC("afec gen mesh false!");
+        return XCAM_RETURN_ERROR_FAILED;
+    }
 #else
     FILE* ofp;
     char filename[512];
@@ -238,7 +244,6 @@ prepare(RkAiqAlgoCom* params)
     fecCtx->resource_path = rkaiqAfecConfig->resource_path;
     fecCtx->dst_width = params->u.prepare.sns_op_width;
     fecCtx->dst_height = params->u.prepare.sns_op_height;
-    fecCtx->user_config.en = true;
 
     if (fecCtx->src_width <= 1920) {
         fecCtx->mesh_density = 0;
@@ -248,24 +253,25 @@ prepare(RkAiqAlgoCom* params)
 
     double correct_level = rkaiqAfecConfig->afec_calib_cfg.correct_level;
     if (fecCtx->isAttribUpdated) {
-        if (!fecCtx->user_config.en) {
+        if (fecCtx->user_config.bypass)
             correct_level = 0;
-        } else {
-            correct_level = fecCtx->user_config.correct_level;
-        }
+        fecCtx->fec_en = fecCtx->user_config.en;
         fecCtx->isAttribUpdated = false;
+    } else {
+        fecCtx->user_config.en = fecCtx->fec_en;
     }
-#if FEC_GENMESH
+    fecCtx->user_config.correct_level = correct_level ;
+
+#if GENMESH_ONLINE
     fecCtx->user_config.correct_level = correct_level;
-	calcFecMeshParams(fecCtx->src_width, fecCtx->src_height, fecCtx->dst_width, fecCtx->dst_height,
-                      &fecCtx->meshSizeW, &fecCtx->meshSizeH, &fecCtx->meshStepW, &fecCtx->meshStepH);
-    fecCtx->fec_mesh_size = mallocFecMesh(fecCtx->src_width, fecCtx->src_height,
-            fecCtx->meshStepW, fecCtx->meshStepH,
-            &fecCtx->meshxi, &fecCtx->meshxf,
-            &fecCtx->meshyi, &fecCtx->meshyf);
-    LOGI_AFEC("(%s) en: %d, user_en: %d, correct_level: %d, dimen: %d-%d, mesh dimen: %d-%d, size: %d",
+    genFecMeshInit(fecCtx->src_width, fecCtx->src_height, fecCtx->dst_width,
+            fecCtx->dst_height, fecCtx->fecParams, fecCtx->camCoeff);
+    mallocFecMesh(fecCtx->fecParams.meshSize4bin, &fecCtx->meshxi,
+            &fecCtx->meshxf, &fecCtx->meshyi, &fecCtx->meshyf);
+    fecCtx->fec_mesh_size = fecCtx->fecParams.meshSize4bin;
+    LOGI_AFEC("(%s) en: %d, bypass(%d), correct_level(%d), dimen(%d-%d), mesh dimen(%d-%d), size(%d)",
               rkaiqAfecConfig->afec_calib_cfg.meshfile, fecCtx->fec_en,
-              fecCtx->user_config.en, fecCtx->user_config.correct_level,
+              fecCtx->user_config.bypass, fecCtx->user_config.correct_level,
               fecCtx->src_width, fecCtx->src_height,
               fecCtx->fec_mesh_h_size, fecCtx->fec_mesh_v_size,
               fecCtx->fec_mesh_size);
@@ -320,6 +326,7 @@ prepare(RkAiqAlgoCom* params)
 #endif
 
     read_mesh_table(fecCtx, fecCtx->user_config.correct_level);
+    fecCtx->eState = FEC_STATE_INITIALIZED;
 
     return XCAM_RETURN_NO_ERROR;
 }
@@ -349,20 +356,23 @@ processing(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outparams)
     // params may be changed
     if (!fecCtx->fec_en)
         return XCAM_RETURN_NO_ERROR;
+    fecCtx->eState = FEC_STATE_RUNNING;
 
     if (inparams->u.proc.init) {
         fecPreOut->afec_result.update = 1;
     } else {
-        fecPreOut->afec_result.update = 0;
 
         if (fecCtx->isAttribUpdated) {
             fecCtx->isAttribUpdated = false;
             fecPreOut->afec_result.update = 1;
+        } else {
+            fecPreOut->afec_result.update = 0;
         }
 
-        LOGV_AFEC("(%s)user en(%d), level(%d), result update(%d)\n",
-                __FUNCTION__,
+        LOGV_AFEC("en(%d), user en(%d), bypass(%d), level(%d), result update(%d)\n",
+                fecCtx->fec_en,
                 fecCtx->user_config.en,
+                fecCtx->user_config.bypass,
                 fecCtx->user_config.correct_level,
                 fecPreOut->afec_result.update);
     }
@@ -418,10 +428,16 @@ bool RKAiqAfecThread::loop()
         return false;
     }
 
-    if (!hFEC->user_config.en)
+    if (hFEC->eState != FEC_STATE_RUNNING) {
+        hFEC->isAttribUpdated = true;
+        return true;
+    }
+
+    if (hFEC->user_config.bypass) {
         ret = read_mesh_table(hFEC, 0);
-    else
+    } else {
         ret = read_mesh_table(hFEC, attrib->correct_level);
+    }
 
     if (ret == XCAM_RETURN_NO_ERROR) {
         hFEC->isAttribUpdated = true;

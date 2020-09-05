@@ -70,11 +70,13 @@
  *  - Afec: add light_center and distortion_coeff
  * v1.2.3
  *  - LumaDetect: add the level2 of mutation threshold
+ * v1.2.4
+ *  - Aldch: add light_center and distortion_coeff
  */
 
 
-#define RK_AIQ_CALIB_VERSION_REAL_V          "v1.2.3"
-#define RK_AIQ_CALIB_VERSION_MAGIC_V         "1011895"
+#define RK_AIQ_CALIB_VERSION_REAL_V          "v1.2.4"
+#define RK_AIQ_CALIB_VERSION_MAGIC_V         "1014880"
 
 
 /******* DO NOT EDIT THE FOLLOWINGS ***********/

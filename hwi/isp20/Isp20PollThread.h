@@ -61,7 +61,7 @@ public:
     void set_hdr_frame_readback_infos(int frame_id, int times);
     XCamReturn notify_capture_raw();
     // should be called befor start
-    void set_working_mode(int mode);
+    void set_working_mode(int mode, bool linked_to_isp);
     void set_loop_status(bool stat);
     XCamReturn capture_raw_ctl(bool sync);
     virtual XCamReturn start();
@@ -104,6 +104,7 @@ private:
     std::map<uint32_t, int> _isp_hdr_fid2times_map;
     std::map<uint32_t, bool> _isp_hdr_fid2ready_map;
     int _working_mode;
+    bool _linked_to_isp;
     int _mipi_dev_max;
     Mutex _mipi_buf_mutex;
     Mutex _mipi_trigger_mutex;

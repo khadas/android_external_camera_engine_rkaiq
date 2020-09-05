@@ -1123,6 +1123,8 @@ typedef enum CALIB_IQ_TAG_ID_E
     CALIB_SENSOR_LDCH_ENABLE_TAG_ID,
     CALIB_SENSOR_LDCH_MESH_FILE_TAG_ID,
     CALIB_SENSOR_LDCH_CORRECT_LEVEL_TAG_ID,
+    CALIB_SENSOR_LDCH_LIGHT_CENTER_TAG_ID,
+    CALIB_SENSOR_LDCH_DISTORTION_COEFF_ID,
 
     /******************************************************************************
     * XML FEC section

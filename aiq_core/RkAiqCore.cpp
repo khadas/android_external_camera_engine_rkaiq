@@ -1490,14 +1490,18 @@ RkAiqCore::genIspAldchResult(RkAiqFullParams* params)
         return XCAM_RETURN_NO_ERROR;
     }
 
-    // TODO: add update flag for ldch
     RkAiqAlgoProcResAldchInt* aldch_rk = (RkAiqAlgoProcResAldchInt*)aldch_com;
-    isp_param->ldch.ldch_en = aldch_rk->ldch_result.sw_ldch_en;
-    if (isp_param->ldch.ldch_en) {
-        isp_param->ldch.lut_h_size = aldch_rk->ldch_result.lut_h_size;
-        isp_param->ldch.lut_v_size = aldch_rk->ldch_result.lut_v_size;
-        isp_param->ldch.lut_size = aldch_rk->ldch_result.lut_map_size;
-        memcpy(isp_param->ldch.lut_mapxy, aldch_rk->ldch_result.lut_mapxy, aldch_rk->ldch_result.lut_map_size);
+    if (aldch_rk->ldch_result.update) {
+        isp_param->update_mask |= RKAIQ_ISP_LDCH_ID;
+        isp_param->ldch.ldch_en = aldch_rk->ldch_result.sw_ldch_en;
+        if (isp_param->ldch.ldch_en) {
+            isp_param->ldch.lut_h_size = aldch_rk->ldch_result.lut_h_size;
+            isp_param->ldch.lut_v_size = aldch_rk->ldch_result.lut_v_size;
+            isp_param->ldch.lut_size = aldch_rk->ldch_result.lut_map_size;
+            memcpy(isp_param->ldch.lut_mapxy, aldch_rk->ldch_result.lut_mapxy, aldch_rk->ldch_result.lut_map_size);
+        }
+    } else {
+        isp_param->update_mask &= ~RKAIQ_ISP_LDCH_ID;
     }
 
     SmartPtr<RkAiqHandle>* handle = getCurAlgoTypeHandle(RK_AIQ_ALGO_TYPE_ALDCH);

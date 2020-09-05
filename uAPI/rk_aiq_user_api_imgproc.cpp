@@ -2179,6 +2179,23 @@ XCamReturn rk_aiq_uapi_setFecEn(const rk_aiq_sys_ctx_t* ctx, bool en)
     return ret;
 }
 
+XCamReturn rk_aiq_uapi_setFecBypass(const rk_aiq_sys_ctx_t* ctx, bool bypass)
+{
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    IMGPROC_FUNC_ENTER
+    if (ctx == NULL) {
+        ret = XCAM_RETURN_ERROR_PARAM;
+        RKAIQ_IMGPROC_CHECK_RET(ret, "param error!");
+    }
+    rk_aiq_fec_attrib_t fecAttr;
+    ret = rk_aiq_user_api_afec_GetAttrib(ctx, &fecAttr);
+    RKAIQ_IMGPROC_CHECK_RET(ret, "get fec attrib failed!");
+    fecAttr.bypass = bypass;
+    ret = rk_aiq_user_api_afec_SetAttrib(ctx, fecAttr);
+    IMGPROC_FUNC_EXIT
+    return ret;
+}
+
 XCamReturn rk_aiq_uapi_setFecCorrectLevel(const rk_aiq_sys_ctx_t* ctx, int correctLevel)
 {
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
@@ -2192,6 +2209,40 @@ XCamReturn rk_aiq_uapi_setFecCorrectLevel(const rk_aiq_sys_ctx_t* ctx, int corre
     RKAIQ_IMGPROC_CHECK_RET(ret, "get fec attrib failed!");
     fecAttr.correct_level = correctLevel;
     ret = rk_aiq_user_api_afec_SetAttrib(ctx, fecAttr);
+    IMGPROC_FUNC_EXIT
+    return ret;
+}
+
+XCamReturn rk_aiq_uapi_setLdchEn(const rk_aiq_sys_ctx_t* ctx, bool en)
+{
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    IMGPROC_FUNC_ENTER
+    if (ctx == NULL) {
+        ret = XCAM_RETURN_ERROR_PARAM;
+        RKAIQ_IMGPROC_CHECK_RET(ret, "param error!");
+    }
+    rk_aiq_ldch_attrib_t ldchAttr;
+    ret = rk_aiq_user_api_aldch_GetAttrib(ctx, &ldchAttr);
+    RKAIQ_IMGPROC_CHECK_RET(ret, "get ldch attrib failed!");
+    ldchAttr.en = en;
+    ret = rk_aiq_user_api_aldch_SetAttrib(ctx, ldchAttr);
+    IMGPROC_FUNC_EXIT
+    return ret;
+}
+
+XCamReturn rk_aiq_uapi_setLdchCorrectLevel(const rk_aiq_sys_ctx_t* ctx, int correctLevel)
+{
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    IMGPROC_FUNC_ENTER
+    if (ctx == NULL) {
+        ret = XCAM_RETURN_ERROR_PARAM;
+        RKAIQ_IMGPROC_CHECK_RET(ret, "param error!");
+    }
+    rk_aiq_ldch_attrib_t ldchAttr;
+    ret = rk_aiq_user_api_aldch_GetAttrib(ctx, &ldchAttr);
+    RKAIQ_IMGPROC_CHECK_RET(ret, "get ldch attrib failed!");
+    ldchAttr.correct_level = correctLevel;
+    ret = rk_aiq_user_api_aldch_SetAttrib(ctx, ldchAttr);
     IMGPROC_FUNC_EXIT
     return ret;
 }

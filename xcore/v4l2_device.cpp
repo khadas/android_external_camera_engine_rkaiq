@@ -996,9 +996,14 @@ V4l2Device::dequeue_buffer(SmartPtr<V4l2Buffer> &buf)
 }
 
 XCamReturn
-V4l2Device::get_buffer (SmartPtr<V4l2Buffer> &buf) const
+V4l2Device::get_buffer (SmartPtr<V4l2Buffer> &buf, int index) const
 {
     SmartLock auto_lock(_buf_mutex);
+
+    if (index != -1 && !(_buf_pool[index]->get_queued())) {
+        buf = _buf_pool[index];
+        return XCAM_RETURN_NO_ERROR;
+    }
 
     uint32_t i;
 

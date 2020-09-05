@@ -120,7 +120,7 @@ public:
     virtual XCamReturn queue_buffer (SmartPtr<V4l2Buffer> &buf, bool locked = false);
     XCamReturn return_buffer (SmartPtr<V4l2Buffer> &buf);
     // get free buf for type V4L2_BUF_TYPE_xxx_OUTPUT
-    XCamReturn get_buffer (SmartPtr<V4l2Buffer> &buf) const;
+    XCamReturn get_buffer (SmartPtr<V4l2Buffer> &buf, int index = -1) const;
     // use as less as possible
     virtual int io_control (int cmd, void *arg);
 

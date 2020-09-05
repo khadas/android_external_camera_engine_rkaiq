@@ -758,7 +758,10 @@ typedef struct rk_aiq_cpsl_cap_s {
     rk_aiq_range_t strength_ir;
 } rk_aiq_cpsl_cap_t;
 
+#define RKAIQ_ISP_LDCH_ID           (1 << 0)
+
 typedef struct {
+    uint32_t update_mask;
     uint32_t module_enable_mask;
     sint32_t frame_id;
     rk_aiq_isp_aec_meas_t   aec_meas;

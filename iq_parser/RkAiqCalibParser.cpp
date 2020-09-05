@@ -10883,6 +10883,12 @@ bool RkAiqCalibParser::parseEntrySensorLdch
         } else if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_LDCH_CORRECT_LEVEL_TAG_ID)) {
             int no =  ParseDoubleArray(pchild, &mCalibDb->aldch.correct_level, tag.Size());
             DCT_ASSERT((no == tag.Size()));
+        } else if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_LDCH_LIGHT_CENTER_TAG_ID)) {
+            int no = ParseDoubleArray(pchild, mCalibDb->aldch.light_center, tag.Size());
+            DCT_ASSERT((no == tag.Size()));
+        } else if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_LDCH_DISTORTION_COEFF_ID)) {
+            int no = ParseDoubleArray(pchild, mCalibDb->aldch.coefficient, tag.Size());
+            DCT_ASSERT((no == tag.Size()));
         }
         pchild = pchild->NextSibling();
     }

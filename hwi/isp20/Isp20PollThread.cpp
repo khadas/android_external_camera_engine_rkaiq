@@ -334,6 +334,26 @@ Isp20PollThread::set_event_handle_dev(SmartPtr<SensorHw> &dev)
     sns_height = sns_des.sensor_output_height;
     pixelformat = sns_des.sensor_pixelformat;
 
+
+    if (!_linked_to_isp) {
+        XCamReturn ret = XCAM_RETURN_NO_ERROR;
+
+        // get sensor crop bounds
+        struct v4l2_subdev_selection sns_sd_sel;
+        memset(&sns_sd_sel, 0, sizeof(sns_sd_sel));
+
+        ret = dev->get_selection(0, V4L2_SEL_TGT_CROP_BOUNDS, sns_sd_sel);
+        if (ret) {
+            LOGW_CAMHW_SUBM(ISP20POLL_SUBM, "get_selection failed !\n");
+        } else {
+            if (sns_width != sns_sd_sel.r.width ||
+                sns_height != sns_sd_sel.r.height) {
+                sns_width = sns_sd_sel.r.width;
+                sns_height = sns_sd_sel.r.height;
+            }
+        }
+    }
+
     EXIT_CAMHW_FUNCTION();
     return true;
 }
@@ -463,9 +483,10 @@ Isp20PollThread::stop ()
 }
 
 void
-Isp20PollThread::set_working_mode(int mode)
+Isp20PollThread::set_working_mode(int mode, bool linked_to_isp)
 {
     _working_mode = mode;
+    _linked_to_isp = linked_to_isp;
 
     switch (_working_mode) {
     case RK_AIQ_ISP_HDR_MODE_3_FRAME_HDR:
@@ -772,8 +793,7 @@ Isp20PollThread::trigger_readback()
     _isp_hdr_fid2ready_map.erase(it_ready);
 
     if (_rx_handle_dev) {
-        if (_rx_handle_dev->setIspParamsSync(sequence) ||
-                _rx_handle_dev->setIsppParamsSync(sequence)) {
+        if (_rx_handle_dev->setIspParamsSync(sequence)) {
             LOGE_CAMHW_SUBM(ISP20POLL_SUBM, "%s frame[%d] set isp params failed, don't read back!\n",
                             __func__, sequence);
             // drop frame, return buf to tx
@@ -782,6 +802,8 @@ Isp20PollThread::trigger_readback()
             }
             goto out;
         } else {
+            _rx_handle_dev->setIsppParamsSync(sequence);
+
             char file_name[32] = {0};
             int ret = XCAM_RETURN_NO_ERROR;
 
@@ -801,7 +823,8 @@ Isp20PollThread::trigger_readback()
             }
 
             for (int i = 0; i < _mipi_dev_max; i++) {
-                ret = _isp_mipi_rx_infos[i].dev->get_buffer(v4l2buf[i]);
+                ret = _isp_mipi_rx_infos[i].dev->get_buffer(v4l2buf[i],
+                                                            _isp_mipi_rx_infos[i].cache_list.front()->get_v4l2_buf_index());
                 if (ret != XCAM_RETURN_NO_ERROR) {
                     LOGE_CAMHW_SUBM(ISP20POLL_SUBM, "Rx[%d] can not get buffer\n", i);
                     goto out;

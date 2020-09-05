@@ -1711,7 +1711,7 @@ CamHwIsp20::prepare(uint32_t width, uint32_t height, int mode, int t_delay, int 
         sensorHw->set_exp_delay_info(t_delay, g_delay, mCalibDb->sysContrl.exp_delay.Normal.dcg_delay);
 
     isp20Pollthread = mPollthread.dynamic_cast_ptr<Isp20PollThread>();
-    isp20Pollthread->set_working_mode(mode);
+    isp20Pollthread->set_working_mode(mode, _linked_to_isp);
     offlineRdthread = mOfflineRdThread.dynamic_cast_ptr<OfflineFrmRdThread>();
     offlineRdthread->set_working_mode(mode);
     _ispp_module_init_ens = 0;
@@ -2043,7 +2043,7 @@ XCamReturn CamHwIsp20::swWorkingModeDyn(int mode)
 
     Isp20Params::set_working_mode(mode);
     isp20Pollthread = mPollthread.dynamic_cast_ptr<Isp20PollThread>();
-    isp20Pollthread->set_working_mode(mode);
+    isp20Pollthread->set_working_mode(mode, _linked_to_isp);
 
 #if 0 // for quick switch, not used now
     int old_mode = RK_AIQ_HDR_GET_WORKING_MODE(_hdr_mode);
