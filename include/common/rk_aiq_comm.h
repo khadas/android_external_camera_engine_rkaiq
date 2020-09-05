@@ -453,13 +453,13 @@ typedef enum {
     RK_MODULE_SHARP,
     RK_MODULE_AE,
     RK_MODULE_AWB,
-    RK_MODULE_NR,
+    RK_MODULE_NR,//10
     RK_MODULE_GIC,
     RK_MODULE_3DLUT,
     RK_MODULE_LDCH,
-    RK_MODULE_TNR,
+    RK_MODULE_TNR,//14
     RK_MODULE_FEC,
-    RK_MODULE_RAWNR,
+    RK_MODULE_RAWNR,//16
     RK_MODULE_MAX
 } rk_aiq_module_id_t;
 

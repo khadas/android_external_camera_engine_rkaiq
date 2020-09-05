@@ -20,13 +20,8 @@
 #include "rk_aiq_algo_types_int.h"
 #include "acp/rk_aiq_algo_acp_itf.h"
 #include "xcam_log.h"
+#include "acp/rk_aiq_types_algo_acp_prvt.h"
 RKAIQ_BEGIN_DECLARE
-
-typedef struct _RkAiqAlgoContext {
-    CamCalibDbContext_t* calib;
-    rk_aiq_acp_params_t params;
-} RkAiqAlgoContext;
-
 
 static XCamReturn
 create_context(RkAiqAlgoContext **context, const AlgoCtxInstanceCfg* cfg)
@@ -37,13 +32,12 @@ create_context(RkAiqAlgoContext **context, const AlgoCtxInstanceCfg* cfg)
         LOGE_ACP( "%s: create acp context fail!\n", __FUNCTION__);
         return XCAM_RETURN_ERROR_MEM;
     }
-    ctx->calib = cfg_int->calib;
-    // TODO: get initial params from calib
-    rk_aiq_acp_params_t* params = &ctx->params;
-    params->brightness = 0;
-    params->hue = 0.0f;
-    params->saturation = 0.0f;
-    params->contrast = 0.0f;
+    ctx->acpCtx.calib = cfg_int->calib;
+    rk_aiq_acp_params_t* params = &ctx->acpCtx.params;
+    params->brightness = 128;
+    params->hue = 128;
+    params->saturation = 128;
+    params->contrast = 128;
 
     *context = ctx;
 
@@ -76,7 +70,7 @@ processing(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outparams)
     RkAiqAlgoProcResAcpInt* res_int = (RkAiqAlgoProcResAcpInt*)outparams;
     RkAiqAlgoContext* ctx = inparams->ctx;
 
-    res_com->acp_res = ctx->params;
+    res_com->acp_res = ctx->acpCtx.params;
 
     return XCAM_RETURN_NO_ERROR;
 }

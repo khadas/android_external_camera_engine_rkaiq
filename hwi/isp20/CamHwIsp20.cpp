@@ -2476,6 +2476,9 @@ CamHwIsp20::gen_full_isp_params(const struct isp2x_isp_params_cfg* update_params
             case RK_ISP2X_GIC_ID:
                 full_params->others.gic_cfg = update_params->others.gic_cfg;
                 break;
+            case RK_ISP2X_CPROC_ID:
+                full_params->others.cproc_cfg = update_params->others.cproc_cfg;
+                break;
             default:
                 break;
             }

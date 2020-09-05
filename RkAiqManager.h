@@ -27,6 +27,54 @@
 namespace RkCam {
 
 class RkAiqManager;
+
+class RkAiqMngCmdThread
+    : public Thread {
+public:
+    RkAiqMngCmdThread(RkAiqManager* aiqMng)
+        : Thread("RkAiqMngCmdThread")
+        , mAiqMng(aiqMng) {};
+    ~RkAiqMngCmdThread() {};
+
+    void triger_stop() {
+        mAiqCmdQueue.pause_pop ();
+    };
+
+    void triger_start() {
+        mAiqCmdQueue.resume_pop ();
+    };
+
+    enum MSG_CMD {
+        MSG_CMD_SW_WORKING_MODE
+    };
+
+    typedef struct message_s {
+        int cmd;
+        union {
+            struct {
+                rk_aiq_working_mode_t mode;
+            } sw_wk_mode;
+        } data;
+    } msg_t;
+
+    bool send_cmd(SmartPtr<msg_t> msg) {
+        bool ret = true;
+        ret = mAiqCmdQueue.push(msg);
+        return ret;
+    };
+
+protected:
+    virtual void stopped () {
+        mAiqCmdQueue.clear ();
+    };
+
+    virtual bool loop ();
+
+private:
+    RkAiqManager* mAiqMng;
+    SafeList<msg_t>  mAiqCmdQueue;
+};
+
 class RkAiqRstApplyThread
     : public Thread {
 public:
@@ -67,6 +115,7 @@ class RkAiqManager
     , public RkAiqAnalyzerCb
     , public RkLumaAnalyzerCb {
     friend RkAiqRstApplyThread;
+    friend RkAiqMngCmdThread;
 public:
     explicit RkAiqManager(const char* sns_ent_name,
                           rk_aiq_error_cb err_cb,
@@ -120,12 +169,15 @@ private:
     SmartPtr<ICamHw> mCamHw;
     SmartPtr<RkAiqCore> mRkAiqAnalyzer;
     SmartPtr<RkAiqRstApplyThread> mAiqRstAppTh;
+    SmartPtr<RkAiqMngCmdThread> mAiqMngCmdTh;
     SmartPtr<RkLumaCore> mRkLumaAnalyzer;
     rk_aiq_error_cb mErrCb;
     rk_aiq_metas_cb mMetasCb;
     const char* mSnsEntName;
     const CamCalibDbContext_t* mCalibDb;
     rk_aiq_working_mode_t mWorkingMode;
+    rk_aiq_working_mode_t mOldWkModeForGray;
+    bool mWkSwitching;
     uint32_t mWidth;
     uint32_t mHeight;
     int _state;

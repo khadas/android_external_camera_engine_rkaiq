@@ -64,6 +64,10 @@ destroy_context(RkAiqAlgoContext *context)
     LDCHHandle_t hLDCH = (LDCHHandle_t)context->hLDCH;
     LDCHContext_t* ldchCtx = (LDCHContext_t*)hLDCH;
 
+#if GENMESH_ONLINE
+    ldchCtx->aldchReadMeshThread->triger_stop();
+    ldchCtx->aldchReadMeshThread->stop();
+#endif
     if (ldchCtx->lut_mapxy != NULL) {
         free(ldchCtx->lut_mapxy);
         ldchCtx->lut_mapxy = NULL;

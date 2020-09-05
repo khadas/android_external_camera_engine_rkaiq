@@ -41,6 +41,7 @@
 #include "af/rk_aiq_uapi_af_int.h"
 #include "asd/rk_aiq_uapi_asd_int.h"
 #include "aldch/rk_aiq_uapi_aldch_int.h"
+#include "acp/rk_aiq_uapi_acp_int.h"
 
 namespace RkCam {
 
@@ -51,12 +52,14 @@ class RkAiqHandleIntCom : virtual public RkAiqHandle
 public:
     explicit RkAiqHandleIntCom(RkAiqAlgoDesComm* des, RkAiqCore* aiqCore)
         : RkAiqHandle(des, aiqCore)
-        , updateAtt(false) {};
+        , updateAtt(false)
+        , mUpdateCond(false) {};
     virtual ~RkAiqHandleIntCom() {};
 protected:
     XCamReturn configInparamsCom(RkAiqAlgoCom* com, int type);
     XCam::Mutex mCfgMutex;
     bool updateAtt;
+    XCam::Cond mUpdateCond;
 };
 
 #define RKAIQHANDLEINT(algo) \
@@ -88,7 +91,7 @@ protected:
 //RKAIQHANDLEINT(Asharp);
 //RKAIQHANDLEINT(Adhaz);
 //RKAIQHANDLEINT(Asd);
-RKAIQHANDLEINT(Acp);
+//RKAIQHANDLEINT(Acp);
 //RKAIQHANDLEINT(A3dlut);
 //RKAIQHANDLEINT(Ablc);
 //RKAIQHANDLEINT(Accm);
@@ -145,8 +148,6 @@ protected:
         RkAiqAeHandle::deInit();
     };
 private:
-    // TODO
-    XCam::Mutex mCfgMutex;
     Uapi_ExpSwAttr_t  mCurExpSwAttr;
     Uapi_ExpSwAttr_t  mNewExpSwAttr;
     Uapi_LinExpAttr_t mCurLinExpAttr;
@@ -272,8 +273,6 @@ protected:
         RkAiqAdebayerHandle::deInit();
     };
 private:
-    // TODO
-    XCam::Mutex mCfgMutex;
     adebayer_attrib_t mCurAtt;
     adebayer_attrib_t mNewAtt;
 };
@@ -303,8 +302,6 @@ protected:
         RkAiqAhdrHandle::deInit();
     };
 private:
-    // TODO
-    XCam::Mutex mCfgMutex;
     ahdr_attrib_t mCurAtt;
     ahdr_attrib_t mNewAtt;
 };
@@ -333,8 +330,6 @@ protected:
         RkAiqAgicHandle::deInit();
     };
 private:
-    // TODO
-    XCam::Mutex mCfgMutex;
     agic_attrib_t mCurAtt;
     agic_attrib_t mNewAtt;
 };
@@ -717,8 +712,6 @@ protected:
         RkAiqAfecHandle::deInit();
     };
 private:
-    // TODO
-    // XCam::Mutex mCfgMutex;
     rk_aiq_fec_attrib_t mCurAtt;
     rk_aiq_fec_attrib_t mNewAtt;
 };
@@ -748,8 +741,6 @@ protected:
         RkAiqAsdHandle::deInit();
     };
 private:
-    // TODO
-    XCam::Mutex mCfgMutex;
     asd_attrib_t mCurAtt;
     asd_attrib_t mNewAtt;
 };
@@ -784,10 +775,36 @@ protected:
         RkAiqAldchHandle::deInit();
     };
 private:
-    // TODO
-    // XCam::Mutex mCfgMutex;
     rk_aiq_ldch_attrib_t mCurAtt;
     rk_aiq_ldch_attrib_t mNewAtt;
+};
+
+class RkAiqAcpHandleInt:
+    virtual public RkAiqAcpHandle,
+    virtual public RkAiqHandleIntCom {
+public:
+    explicit RkAiqAcpHandleInt(RkAiqAlgoDesComm* des, RkAiqCore* aiqCore)
+        : RkAiqHandle(des, aiqCore)
+        , RkAiqAcpHandle(des, aiqCore)
+        , RkAiqHandleIntCom(des, aiqCore) {};
+    virtual ~RkAiqAcpHandleInt() {
+        RkAiqAcpHandle::deInit();
+    };
+    virtual XCamReturn updateConfig();
+    virtual XCamReturn prepare();
+    virtual XCamReturn preProcess();
+    virtual XCamReturn processing();
+    virtual XCamReturn postProcess();
+    XCamReturn setAttrib(acp_attrib_t att);
+    XCamReturn getAttrib(acp_attrib_t *att);
+protected:
+    virtual void init();
+    virtual void deInit() {
+        RkAiqAcpHandle::deInit();
+    };
+private:
+    acp_attrib_t mCurAtt;
+    acp_attrib_t mNewAtt;
 };
 
 }; //namespace RkCam

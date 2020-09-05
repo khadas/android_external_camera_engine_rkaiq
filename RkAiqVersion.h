@@ -213,6 +213,9 @@
  * - Isp20Poll: modify the resolution of the input ISP to crop resolution
  * - awb: fix the bug in cct_lut_cfg initinalize
  * - fix flash-ir bugs
+ * - switch to normal if gray mode is on
+ * - add acp user interfaces
+ * - fix gamma mode switching bug
  */
 
 #define RK_AIQ_VERSION_REAL_V "v1.0.9"

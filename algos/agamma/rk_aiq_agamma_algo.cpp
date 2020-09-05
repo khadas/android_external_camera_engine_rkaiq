@@ -59,7 +59,6 @@ XCamReturn AgammaConfigInit(AgammaHandle_t* para)
     CalibDb_Gamma_t *gamma_calib = &para->pCalibDb->gamma;
     para->agamma_config.gamma_en = gamma_calib->gamma_en;
     para->agamma_config.gamma_out_mode = gamma_calib->gamma_out_mode;
-    para->last_mode = gamma_calib->gamma_out_mode;
     para->agamma_config.gamma_out_offset = gamma_calib->gamma_out_offset;
     para->agamma_config.gamma_out_segnum = gamma_calib->gamma_out_segnum;
 

@@ -338,6 +338,7 @@ algoHandle(const rk_aiq_sys_ctx_t* ctx, const int algo_type)
 #include "rk_aiq_user_api_af.cpp"
 #include "rk_aiq_user_api_asd.cpp"
 #include "rk_aiq_user_api_aldch.cpp"
+#include "rk_aiq_user_api_acp.cpp"
 
 XCamReturn
 rk_aiq_uapi_sysctl_setModuleCtl(const rk_aiq_sys_ctx_t* ctx, rk_aiq_module_id_t mId, bool mod_en)

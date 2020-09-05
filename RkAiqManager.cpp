@@ -31,6 +31,34 @@ namespace RkCam {
     }
 
 bool
+RkAiqMngCmdThread::loop ()
+{
+    ENTER_XCORE_FUNCTION();
+
+    const static int32_t timeout = -1;
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    SmartPtr<msg_t> msg = mAiqCmdQueue.pop (timeout);
+
+    if (!msg.ptr()) {
+        XCAM_LOG_WARNING("RkAiqMngCmdThread got empty result, stop thread");
+        return false;
+    }
+
+    XCAM_ASSERT (mAiqMng);
+
+    switch (msg->cmd) {
+    case MSG_CMD_SW_WORKING_MODE:
+        mAiqMng->swWorkingModeDyn(msg->data.sw_wk_mode.mode);
+        mAiqMng->mWkSwitching = false;
+        break;
+    default:
+        break;
+    }
+    // always true
+    return true;
+}
+
+bool
 RkAiqRstApplyThread::loop ()
 {
     ENTER_XCORE_FUNCTION();
@@ -69,10 +97,13 @@ RkAiqManager::RkAiqManager(const char* sns_ent_name,
     , mRkAiqAnalyzer(NULL)
     , mRkLumaAnalyzer(NULL)
     , mAiqRstAppTh(new RkAiqRstApplyThread(this))
+    , mAiqMngCmdTh(new RkAiqMngCmdThread(this))
     , mErrCb(err_cb)
     , mMetasCb(metas_cb)
     , mSnsEntName(sns_ent_name)
     , mWorkingMode(RK_AIQ_WORKING_MODE_NORMAL)
+    , mOldWkModeForGray(RK_AIQ_WORKING_MODE_NORMAL)
+    , mWkSwitching(false)
     , mCalibDb(NULL)
     , _state(AIQ_STATE_INVALID)
     , mCurMirror(false)
@@ -165,6 +196,10 @@ RkAiqManager::init()
     _state = AIQ_STATE_INITED;
     // set default mirror & flip
     setDefMirrorFlip();
+    mAiqMngCmdTh->triger_start();
+    bool bret = mAiqMngCmdTh->start();
+    ret = bret ? XCAM_RETURN_NO_ERROR : XCAM_RETURN_ERROR_FAILED;
+    RKAIQMNG_CHECK_RET(ret, "cmd thread start error");
 
     EXIT_XCORE_FUNCTION();
 
@@ -226,6 +261,7 @@ RkAiqManager::prepare(uint32_t width, uint32_t height, rk_aiq_working_mode_t mod
     RKAIQMNG_CHECK_RET(ret, "set initial params error %d", ret);
 
     mWorkingMode = mode;
+    mOldWkModeForGray = RK_AIQ_WORKING_MODE_NORMAL;
     mWidth = width;
     mHeight = height;
     _state = AIQ_STATE_PREPARED;
@@ -315,6 +351,12 @@ RkAiqManager::deInit()
     ENTER_XCORE_FUNCTION();
 
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
+
+    mAiqMngCmdTh->triger_stop();
+
+    bool bret = mAiqMngCmdTh->stop();
+    ret = bret ? XCAM_RETURN_NO_ERROR : XCAM_RETURN_ERROR_FAILED;
+    RKAIQMNG_CHECK_RET(ret, "cmd thread stop error");
 
     ret = mRkAiqAnalyzer->deInit();
     RKAIQMNG_CHECK_RET(ret, "analyzer deinit error %d", ret);
@@ -516,6 +558,31 @@ set_ispp_end:
         ret = mCamHw->setFocusParams(aiqParams->mFocusParams);
         if (ret)
             LOGE_ANALYZER("setFocusParams error %d", ret);
+    }
+    // switch working mode by gray_mode ?
+    if (aiqParams->mIspParams.ptr()) {
+        SmartPtr<rk_aiq_isp_params_t> isp_params = aiqParams->mIspParams->data();
+        LOGD_ANALYZER("ie mode %d, mWkSwitching %d, mWorkingMode %d, mOldWkModeForGray %d",
+             isp_params->ie.base.mode, mWkSwitching, mWorkingMode, mOldWkModeForGray);
+        if (isp_params->ie.base.mode == RK_AIQ_IE_EFFECT_BW &&
+            mWorkingMode != RK_AIQ_WORKING_MODE_NORMAL && !mWkSwitching) {
+            mOldWkModeForGray = mWorkingMode;
+            mWkSwitching = true;
+            LOGD_ANALYZER("switch to BW, old mode %d", mOldWkModeForGray);
+            SmartPtr<RkAiqMngCmdThread::msg_t> msg = new RkAiqMngCmdThread::msg_t();
+            msg->cmd = RkAiqMngCmdThread::MSG_CMD_SW_WORKING_MODE;
+            msg->data.sw_wk_mode.mode = RK_AIQ_WORKING_MODE_NORMAL;
+            mAiqMngCmdTh->send_cmd(msg);
+        } else if (isp_params->ie.base.mode != RK_AIQ_IE_EFFECT_BW &&
+                   mOldWkModeForGray != RK_AIQ_WORKING_MODE_NORMAL && !mWkSwitching) {
+            LOGD_ANALYZER("switch to color, old mode %d", mOldWkModeForGray);
+            mWkSwitching = true;
+            SmartPtr<RkAiqMngCmdThread::msg_t> msg = new RkAiqMngCmdThread::msg_t();
+            msg->cmd = RkAiqMngCmdThread::MSG_CMD_SW_WORKING_MODE;
+            msg->data.sw_wk_mode.mode = mOldWkModeForGray;
+            mAiqMngCmdTh->send_cmd(msg);
+            mOldWkModeForGray = RK_AIQ_WORKING_MODE_NORMAL;
+        }
     }
 
     EXIT_XCORE_FUNCTION();

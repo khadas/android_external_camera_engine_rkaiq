@@ -234,6 +234,7 @@ endif()
 # ----------------------------------------------------------------------------
 set (ACP_SRC
 	acp/rk_aiq_algo_acp_itf.cpp
+	acp/rk_aiq_uapi_acp_int.cpp
     )
 
 if(EXISTS "${CMAKE_SOURCE_DIR}/algos/acp/rk_aiq_algo_acp_itf.cpp")

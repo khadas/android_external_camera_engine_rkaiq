@@ -33,6 +33,7 @@
 #include "rk_aiq_user_api_agamma.h"
 #include "rk_aiq_user_api_afec.h"
 #include "rk_aiq_user_api_aldch.h"
+#include "rk_aiq_user_api_acp.h"
 
 /*
 *****************************
@@ -139,15 +140,25 @@ XCamReturn rk_aiq_uapi_getExpMode(const rk_aiq_sys_ctx_t* ctx, opMode_t *mode);
 /*
 *****************************
 *
-* Desc: set auto exposure mode
+* Desc: set exposure mode
 * Argument:
-*   mode:
+*   mode: if mode is set to manual, gain&time initial value will be used
 *
 *****************************
 */
 XCamReturn rk_aiq_uapi_setAeMode(const rk_aiq_sys_ctx_t* ctx, aeMode_t mode);
 XCamReturn rk_aiq_uapi_getAeMode(const rk_aiq_sys_ctx_t* ctx, aeMode_t *mode);
-
+/*
+*****************************
+*
+* Desc: set manual exposure
+* Argument:
+*   gain:
+*   time:
+*
+*****************************
+*/
+XCamReturn rk_aiq_uapi_setManualExp(const rk_aiq_sys_ctx_t* ctx, float gain, float time);
 /*
 *****************************
 *
@@ -541,7 +552,7 @@ XCamReturn rk_aiq_uapi_disableDhz(const rk_aiq_sys_ctx_t* ctx);
 *
 * Desc: Adjust image contrast level
 * Argument:
-*    level: contrast level, [0, 100]
+*    level: contrast level, [0, 255]
 *****************************
 */
 XCamReturn rk_aiq_uapi_setContrast(const rk_aiq_sys_ctx_t* ctx, unsigned int level);
@@ -551,7 +562,7 @@ XCamReturn rk_aiq_uapi_setContrast(const rk_aiq_sys_ctx_t* ctx, unsigned int lev
 *
 * Desc: Adjust image brightness level
 * Argument:
-*    level: brightness level, [0, 100]
+*    level: brightness level, [0, 255]
 *****************************
 */
 XCamReturn rk_aiq_uapi_setBrightness(const rk_aiq_sys_ctx_t* ctx, unsigned int level);
@@ -561,11 +572,21 @@ XCamReturn rk_aiq_uapi_getBrightness(const rk_aiq_sys_ctx_t* ctx, unsigned int *
 *
 * Desc: Adjust image saturation level
 * Argument:
-*    level: saturation level, [0, 100]
+*    level: saturation level, [0, 255]
 *****************************
 */
 XCamReturn rk_aiq_uapi_setSaturation(const rk_aiq_sys_ctx_t* ctx, unsigned int level);
 XCamReturn rk_aiq_uapi_getSaturation(const rk_aiq_sys_ctx_t* ctx, unsigned int* level);
+/*
+*****************************
+*
+* Desc: Adjust image hue level
+* Argument:
+*    level: hue level, [0, 255]
+*****************************
+*/
+XCamReturn rk_aiq_uapi_setHue(const rk_aiq_sys_ctx_t* ctx, unsigned int level);
+XCamReturn rk_aiq_uapi_getHue(const rk_aiq_sys_ctx_t* ctx, unsigned int *level);
 /*
 *****************************
 *

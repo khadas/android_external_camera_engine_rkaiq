@@ -59,11 +59,10 @@ prepare(RkAiqAlgoCom* params)
     RkAiqAlgoConfigAgammaInt* pCfgParam = (RkAiqAlgoConfigAgammaInt*)params;
     rk_aiq_gamma_cfg_t *agamma_config = &AgammaHandle->agamma_config;
 
-    if (RK_AIQ_WORKING_MODE_NORMAL == pCfgParam->agamma_config_com.com.u.prepare.working_mode){
-        AgammaHandle->last_mode = agamma_config->gamma_out_mode = GAMMA_OUT_NORMAL;
+    AgammaHandle->working_mode = pCfgParam->agamma_config_com.com.u.prepare.working_mode;
+    if (RK_AIQ_WORKING_MODE_NORMAL == AgammaHandle->working_mode){
         memcpy(agamma_config->gamma_table, AgammaHandle->normal_table, sizeof(AgammaHandle->normal_table));
     }else{
-        AgammaHandle->last_mode = agamma_config->gamma_out_mode = GAMMA_OUT_HDR;
         memcpy(agamma_config->gamma_table, AgammaHandle->hdr_table, sizeof(AgammaHandle->hdr_table));
     }
     return ret;
@@ -77,10 +76,9 @@ pre_process(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outparams)
     rk_aiq_gamma_cfg_t *agamma_config = &AgammaHandle->agamma_config;
 
     if (pAgammaPreParams->rk_com.u.proc.gray_mode) {
-        AgammaHandle->last_mode = agamma_config->gamma_out_mode;
         agamma_config->gamma_out_mode = GAMMA_OUT_NIGHT;
         memcpy(agamma_config->gamma_table, AgammaHandle->night_table, sizeof(AgammaHandle->night_table));
-    }else if (GAMMA_OUT_NORMAL == AgammaHandle->last_mode){
+    }else if (GAMMA_OUT_NORMAL == AgammaHandle->working_mode){
         agamma_config->gamma_out_mode = GAMMA_OUT_NORMAL;
         memcpy(agamma_config->gamma_table, AgammaHandle->normal_table, sizeof(AgammaHandle->normal_table));
     }else{

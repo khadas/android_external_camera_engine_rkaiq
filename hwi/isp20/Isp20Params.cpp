@@ -2009,6 +2009,7 @@ Isp20Params::convertAiqResultsToIsp20Params(struct isp2x_isp_params_cfg& isp_cfg
     convertAiqGicToIsp20Params(isp_cfg, aiq_results->data()->gic);
     convertAiqAdemosaicToIsp20Params(isp_cfg, aiq_results);
     convertAiqIeToIsp20Params(isp_cfg, aiq_results->data()->ie);
+    convertAiqCpToIsp20Params(isp_cfg, aiq_results->data()->cp);
     last_aiq_results = aiq_results;
 
     return ret;
@@ -2134,19 +2135,18 @@ Isp20Params::convertAiqCpToIsp20Params(struct isp2x_isp_params_cfg& isp_cfg,
     struct isp2x_cproc_cfg* cproc_cfg = &isp_cfg.others.cproc_cfg;
 
     // TODO: set range
-    /* cproc_cfg->y_in_range = ; */
-    /* cproc_cfg->y_out_range =; */
-    /* cproc_cfg->c_out_range = ; */
+    /* cproc_cfg->y_in_range = 1; */
+    /* cproc_cfg->y_out_range = 1; */
+    /* cproc_cfg->c_out_range = 1; */
 
-    // do float to fix
-    cproc_cfg->contrast = (uint8_t)(cp_cfg.contrast * (1 << 7) + 0.5);
-    cproc_cfg->sat = (uint8_t)(cp_cfg.saturation * (1 << 7) + 0.5);
-    cproc_cfg->brightness = cp_cfg.brightness > 0.0f ? \
-                            (uint8_t)(cp_cfg.brightness + 0.5) :
-                            (uint8_t)(-cp_cfg.brightness + 0.5);
-    cproc_cfg->hue = cp_cfg.hue < 0.0f ? \
-                     (uint8_t)(cp_cfg.hue * -128.0f / 90.0f) :
-                     (uint8_t)(cp_cfg.hue * 128.0f / 90.0f);
+    isp_cfg.module_ens |= ISP2X_MODULE_CPROC;
+    isp_cfg.module_en_update |= ISP2X_MODULE_CPROC;
+    isp_cfg.module_cfg_update |= ISP2X_MODULE_CPROC;
+
+    cproc_cfg->contrast = (uint8_t)(cp_cfg.contrast);
+    cproc_cfg->sat = (uint8_t)(cp_cfg.saturation);
+    cproc_cfg->brightness = (uint8_t)(cp_cfg.brightness - 128);
+    cproc_cfg->hue = (uint8_t)(cp_cfg.hue - 128);
 }
 
 void
@@ -2442,7 +2442,7 @@ void Isp20Params::setModuleStatus(rk_aiq_module_id_t mId, bool en)
         break;
         //case RK_MODULE_DHAZ:
         //    _ISP_MODULE_CFG_(RK_ISP2X_DHAZ_ID);
-        break;
+        //break;
     }
 }
 

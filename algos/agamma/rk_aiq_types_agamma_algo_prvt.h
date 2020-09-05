@@ -29,7 +29,7 @@ RKAIQ_BEGIN_DECLARE
 typedef struct AgammaHandle_s {
     rk_aiq_gamma_cfg_t  agamma_config;
     CamCalibDbContext_t *pCalibDb;
-    int last_mode;
+    int working_mode;
     int normal_table[45];
     int night_table[45];
     int hdr_table[45];

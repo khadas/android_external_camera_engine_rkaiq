@@ -23,8 +23,6 @@
 
 RKAIQ_BEGIN_DECLARE
 
-static RkAiqAlgoContext ctx;
-
 static XCamReturn
 create_context
 (

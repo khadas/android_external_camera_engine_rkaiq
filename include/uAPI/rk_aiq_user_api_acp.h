@@ -1,6 +1,4 @@
 /*
- * rk_aiq_types_acp_algo.h
- *
  *  Copyright (c) 2019 Rockchip Corporation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,14 +15,19 @@
  *
  */
 
-#ifndef _RK_AIQ_TYPES_ACP_ALGO_H_
-#define _RK_AIQ_TYPES_ACP_ALGO_H_
+#ifndef _RK_AIQ_USER_API_ACP_H_
+#define _RK_AIQ_USER_API_ACP_H_
 
-typedef struct rk_aiq_acp_params_s {
-    uint8_t brightness;
-    uint8_t contrast;
-    uint8_t saturation;
-    uint8_t hue;
-} rk_aiq_acp_params_t;
+#include "acp/rk_aiq_uapi_acp_int.h"
+
+typedef struct rk_aiq_sys_ctx_s rk_aiq_sys_ctx_t;
+
+RKAIQ_BEGIN_DECLARE
+
+XCamReturn
+rk_aiq_user_api_acp_SetAttrib(const rk_aiq_sys_ctx_t* sys_ctx, acp_attrib_t attr);
+XCamReturn
+rk_aiq_user_api_acp_GetAttrib(const rk_aiq_sys_ctx_t* sys_ctx, acp_attrib_t *attr);
+RKAIQ_END_DECLARE
 
 #endif

@@ -172,48 +172,56 @@ RkAiqAeHandleInt::updateConfig()
         updateExpSwAttr = false;
         updateAtt = true;
         rk_aiq_uapi_ae_setExpSwAttr(mAlgoCtx, &mCurExpSwAttr, false);
+        mUpdateCond.signal();
     }
     if (updateLinExpAttr) {
         mCurLinExpAttr = mNewLinExpAttr;
         updateLinExpAttr = false;
         updateAtt = true;
         rk_aiq_uapi_ae_setLinExpAttr(mAlgoCtx, &mCurLinExpAttr, false);
+        mUpdateCond.signal();
     }
     if (updateHdrExpAttr) {
         mCurHdrExpAttr = mNewHdrExpAttr;
         updateHdrExpAttr = false;
         updateAtt = true;
         rk_aiq_uapi_ae_setHdrExpAttr(mAlgoCtx, &mCurHdrExpAttr, false);
+        mUpdateCond.signal();
     }
     if (updateLinAeDayRouteAttr) {
         mCurLinAeDayRouteAttr = mNewLinAeDayRouteAttr;
         updateLinAeDayRouteAttr = false;
         updateAtt = true;
         rk_aiq_uapi_ae_setLinAeDayRouteAttr(mAlgoCtx, &mCurLinAeDayRouteAttr, false);
+        mUpdateCond.signal();
     }
     if (updateHdrAeDayRouteAttr) {
         mCurHdrAeDayRouteAttr = mNewHdrAeDayRouteAttr;
         updateHdrAeDayRouteAttr = false;
         updateAtt = true;
         rk_aiq_uapi_ae_setHdrAeDayRouteAttr(mAlgoCtx, &mCurHdrAeDayRouteAttr, false);
+        mUpdateCond.signal();
     }
     if (updateLinAeNightRouteAttr) {
         mCurLinAeNightRouteAttr = mNewLinAeNightRouteAttr;
         updateLinAeNightRouteAttr = false;
         updateAtt = true;
         rk_aiq_uapi_ae_setLinAeNightRouteAttr(mAlgoCtx, &mCurLinAeNightRouteAttr, false);
+        mUpdateCond.signal();
     }
     if (updateHdrAeNightRouteAttr) {
         mCurHdrAeNightRouteAttr = mNewHdrAeNightRouteAttr;
         updateHdrAeNightRouteAttr = false;
         updateAtt = true;
         rk_aiq_uapi_ae_setHdrAeNightRouteAttr(mAlgoCtx, &mCurHdrAeNightRouteAttr, false);
+        mUpdateCond.signal();
     }
     if (updateExpWinAttr) {
         mCurExpWinAttr = mNewExpWinAttr;
         updateExpWinAttr = false;
         updateAtt = true;
         rk_aiq_uapi_ae_setExpWinAttr(mAlgoCtx, &mCurExpWinAttr, false);
+        mUpdateCond.signal();
     }
 
     // once any params are changed, run reconfig to convert aecCfg to paectx
@@ -245,6 +253,7 @@ RkAiqAeHandleInt::setExpSwAttr(Uapi_ExpSwAttr_t ExpSwAttr)
     if (0 != memcmp(&mCurExpSwAttr, &ExpSwAttr, sizeof(Uapi_ExpSwAttr_t))) {
         mNewExpSwAttr = ExpSwAttr;
         updateExpSwAttr = true;
+        mUpdateCond.wait(mCfgMutex);
     }
     mCfgMutex.unlock();
 
@@ -281,6 +290,7 @@ RkAiqAeHandleInt::setLinExpAttr(Uapi_LinExpAttr_t LinExpAttr)
     if (0 != memcmp(&mCurLinExpAttr, &LinExpAttr, sizeof(Uapi_LinExpAttr_t))) {
         mNewLinExpAttr = LinExpAttr;
         updateLinExpAttr = true;
+        mUpdateCond.wait(mCfgMutex);
     }
     mCfgMutex.unlock();
 
@@ -317,6 +327,7 @@ RkAiqAeHandleInt::setHdrExpAttr(Uapi_HdrExpAttr_t HdrExpAttr)
     if (0 != memcmp(&mCurHdrExpAttr, &HdrExpAttr, sizeof(Uapi_HdrExpAttr_t))) {
         mNewHdrExpAttr = HdrExpAttr;
         updateHdrExpAttr = true;
+        mUpdateCond.wait(mCfgMutex);
     }
     mCfgMutex.unlock();
 
@@ -353,6 +364,7 @@ RkAiqAeHandleInt::setLinAeDayRouteAttr(Uapi_LinAeRouteAttr_t LinAeDayRouteAttr)
     if (0 != memcmp(&mCurLinAeDayRouteAttr, &LinAeDayRouteAttr, sizeof(Uapi_LinAeRouteAttr_t))) {
         mNewLinAeDayRouteAttr = LinAeDayRouteAttr;
         updateLinAeDayRouteAttr = true;
+        mUpdateCond.wait(mCfgMutex);
     }
     mCfgMutex.unlock();
 
@@ -388,6 +400,7 @@ RkAiqAeHandleInt::setHdrAeDayRouteAttr(Uapi_HdrAeRouteAttr_t HdrAeDayRouteAttr)
     if (0 != memcmp(&mCurHdrAeDayRouteAttr, &HdrAeDayRouteAttr, sizeof(Uapi_HdrAeRouteAttr_t))) {
         mNewHdrAeDayRouteAttr = HdrAeDayRouteAttr;
         updateHdrAeDayRouteAttr = true;
+        mUpdateCond.wait(mCfgMutex);
     }
     mCfgMutex.unlock();
 
@@ -426,6 +439,7 @@ RkAiqAeHandleInt::setLinAeNightRouteAttr(Uapi_LinAeRouteAttr_t LinAeNightRouteAt
     if (0 != memcmp(&mCurLinAeNightRouteAttr, &LinAeNightRouteAttr, sizeof(Uapi_LinAeRouteAttr_t))) {
         mNewLinAeNightRouteAttr = LinAeNightRouteAttr;
         updateLinAeNightRouteAttr = true;
+        mUpdateCond.wait(mCfgMutex);
     }
     mCfgMutex.unlock();
 
@@ -461,6 +475,7 @@ RkAiqAeHandleInt::setHdrAeNightRouteAttr(Uapi_HdrAeRouteAttr_t HdrAeNightRouteAt
     if (0 != memcmp(&mCurHdrAeNightRouteAttr, &HdrAeNightRouteAttr, sizeof(Uapi_HdrAeRouteAttr_t))) {
         mNewHdrAeNightRouteAttr = HdrAeNightRouteAttr;
         updateHdrAeNightRouteAttr = true;
+        mUpdateCond.wait(mCfgMutex);
     }
     mCfgMutex.unlock();
 
@@ -499,6 +514,7 @@ RkAiqAeHandleInt::setExpWinAttr(Uapi_ExpWin_t ExpWinAttr)
     if (0 != memcmp(&mCurExpWinAttr, &ExpWinAttr, sizeof(Uapi_ExpWin_t))) {
         mNewExpWinAttr = ExpWinAttr;
         updateExpWinAttr = true;
+        mUpdateCond.wait(mCfgMutex);
     }
 
     mCfgMutex.unlock();
@@ -682,8 +698,8 @@ RkAiqAwbHandleInt::updateConfig()
     if (updateAtt) {
         mCurAtt = mNewAtt;
         updateAtt = false;
-        // TODO
         rk_aiq_uapi_awb_SetAttrib(mAlgoCtx, mCurAtt, false);
+        mUpdateCond.signal();
     }
     mCfgMutex.unlock();
 
@@ -709,6 +725,7 @@ RkAiqAwbHandleInt::setAttrib(rk_aiq_wb_attrib_t att)
     if (0 != memcmp(&mCurAtt, &att, sizeof(rk_aiq_wb_attrib_t))) {
         mNewAtt = att;
         updateAtt = true;
+        mUpdateCond.wait(mCfgMutex);
     }
 
     mCfgMutex.unlock();
@@ -992,6 +1009,7 @@ RkAiqAfHandleInt::updateConfig()
         updateAtt = false;
         // TODO
         rk_aiq_uapi_af_SetAttrib(mAlgoCtx, mCurAtt, false);
+        mUpdateCond.signal();
     }
     mCfgMutex.unlock();
 
@@ -1017,6 +1035,7 @@ RkAiqAfHandleInt::setAttrib(rk_aiq_af_attrib_t att)
     if (0 != memcmp(&mCurAtt, &att, sizeof(rk_aiq_af_attrib_t))) {
         mNewAtt = att;
         updateAtt = true;
+        mUpdateCond.wait(mCfgMutex);
     }
 
     mCfgMutex.unlock();
@@ -1220,12 +1239,14 @@ RkAiqAnrHandleInt::updateConfig()
         updateAtt = false;
         // TODO
         rk_aiq_uapi_anr_SetAttrib(mAlgoCtx, &mCurAtt, false);
+        mUpdateCond.signal();
     }
 
     if(UpdateIQpara) {
         mCurIQpara = mNewIQpara;
         UpdateIQpara = false;
         rk_aiq_uapi_anr_SetIQPara(mAlgoCtx, &mCurIQpara, false);
+        mUpdateCond.signal();
     }
 
     mCfgMutex.unlock();
@@ -1252,6 +1273,7 @@ RkAiqAnrHandleInt::setAttrib(rk_aiq_nr_attrib_t *att)
     if (0 != memcmp(&mCurAtt, att, sizeof(rk_aiq_nr_attrib_t))) {
         mNewAtt = *att;
         updateAtt = true;
+        mUpdateCond.wait(mCfgMutex);
     }
 
     mCfgMutex.unlock();
@@ -1290,6 +1312,7 @@ RkAiqAnrHandleInt::setIQPara(rk_aiq_nr_IQPara_t *para)
     if (0 != memcmp(&mCurIQpara, para, sizeof(rk_aiq_nr_IQPara_t))) {
         mNewIQpara = *para;
         UpdateIQpara = true;
+        mUpdateCond.wait(mCfgMutex);
     }
 
     mCfgMutex.unlock();
@@ -1567,6 +1590,7 @@ RkAiqAsharpHandleInt::updateConfig()
         updateAtt = false;
         // TODO
         rk_aiq_uapi_asharp_SetAttrib(mAlgoCtx, &mCurAtt, false);
+        mUpdateCond.signal();
     }
 
     if(updateIQpara) {
@@ -1574,6 +1598,7 @@ RkAiqAsharpHandleInt::updateConfig()
         updateIQpara = false;
         // TODO
         rk_aiq_uapi_asharp_SetIQpara(mAlgoCtx, &mCurIQPara, false);
+        mUpdateCond.signal();
     }
 
     mCfgMutex.unlock();
@@ -1600,6 +1625,7 @@ RkAiqAsharpHandleInt::setAttrib(rk_aiq_sharp_attrib_t *att)
     if (0 != memcmp(&mCurAtt, att, sizeof(rk_aiq_sharp_attrib_t))) {
         mNewAtt = *att;
         updateAtt = true;
+        mUpdateCond.wait(mCfgMutex);
     }
 
     mCfgMutex.unlock();
@@ -1638,6 +1664,7 @@ RkAiqAsharpHandleInt::setIQPara(rk_aiq_sharp_IQpara_t *para)
     if (0 != memcmp(&mCurIQPara, para, sizeof(rk_aiq_sharp_IQpara_t))) {
         mNewIQPara = *para;
         updateIQpara = true;
+        mUpdateCond.wait(mCfgMutex);
     }
 
     mCfgMutex.unlock();
@@ -1965,6 +1992,7 @@ RkAiqAdhazHandleInt::updateConfig()
         updateAtt = false;
         // TODO
         rk_aiq_uapi_adehaze_SetAttrib(mAlgoCtx, mCurAtt, false);
+        mUpdateCond.signal();
     }
 
     mCfgMutex.unlock();
@@ -1991,6 +2019,7 @@ RkAiqAdhazHandleInt::setSwAttrib(adehaze_sw_s att)
     if (0 != memcmp(&mCurAtt, &att, sizeof(adehaze_sw_s))) {
         mNewAtt = att;
         updateAtt = true;
+        mUpdateCond.wait(mCfgMutex);
     }
 
     mCfgMutex.unlock();
@@ -2041,6 +2070,7 @@ RkAiqAhdrHandleInt::updateConfig()
         mCurAtt = mNewAtt;
         updateAtt = false;
         rk_aiq_uapi_ahdr_SetAttrib(mAlgoCtx, mCurAtt, true);
+        mUpdateCond.signal();
     }
     mCfgMutex.unlock();
 
@@ -2065,6 +2095,7 @@ RkAiqAhdrHandleInt::setAttrib(ahdr_attrib_t att)
     if (0 != memcmp(&mCurAtt, &att, sizeof(ahdr_attrib_t))) {
         mNewAtt = att;
         updateAtt = true;
+        mUpdateCond.wait(mCfgMutex);
     }
     mCfgMutex.unlock();
 
@@ -2282,6 +2313,7 @@ RkAiqAsdHandleInt::updateConfig()
         mCurAtt = mNewAtt;
         updateAtt = false;
         rk_aiq_uapi_asd_SetAttrib(mAlgoCtx, mCurAtt, false);
+        mUpdateCond.signal();
     }
 
     mCfgMutex.unlock();
@@ -2308,6 +2340,7 @@ RkAiqAsdHandleInt::setAttrib(asd_attrib_t att)
     if (0 != memcmp(&mCurAtt, &att, sizeof(asd_attrib_t))) {
         mNewAtt = att;
         updateAtt = true;
+        mUpdateCond.wait(mCfgMutex);
     }
 
     mCfgMutex.unlock();
@@ -2465,6 +2498,63 @@ RkAiqAcpHandleInt::init()
 }
 
 XCamReturn
+RkAiqAcpHandleInt::updateConfig()
+{
+    ENTER_ANALYZER_FUNCTION();
+
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    //TODO
+    mCfgMutex.lock();
+    // if something changed
+    if (updateAtt) {
+        mCurAtt = mNewAtt;
+        updateAtt = false;
+        rk_aiq_uapi_acp_SetAttrib(mAlgoCtx, mCurAtt, false);
+        mUpdateCond.signal();
+    }
+    mCfgMutex.unlock();
+
+    EXIT_ANALYZER_FUNCTION();
+    return ret;
+}
+
+XCamReturn
+RkAiqAcpHandleInt::setAttrib(acp_attrib_t att)
+{
+    ENTER_ANALYZER_FUNCTION();
+
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    mCfgMutex.lock();
+    // check if there is different between att & mCurAtt
+    // if something changed, set att to mNewAtt, and
+    // the new params will be effective later when updateConfig
+    // called by RkAiqCore
+    if (0 != memcmp(&mCurAtt, &att, sizeof(acp_attrib_t))) {
+        mNewAtt = att;
+        updateAtt = true;
+        mUpdateCond.wait(mCfgMutex);
+    }
+
+    mCfgMutex.unlock();
+
+    EXIT_ANALYZER_FUNCTION();
+    return ret;
+}
+
+XCamReturn
+RkAiqAcpHandleInt::getAttrib(acp_attrib_t *att)
+{
+    ENTER_ANALYZER_FUNCTION();
+
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+
+    rk_aiq_uapi_acp_GetAttrib(mAlgoCtx, att);
+
+    EXIT_ANALYZER_FUNCTION();
+    return ret;
+}
+
+XCamReturn
 RkAiqAcpHandleInt::prepare()
 {
     ENTER_ANALYZER_FUNCTION();
@@ -2610,6 +2700,7 @@ RkAiqA3dlutHandleInt::updateConfig()
         updateAtt = false;
         // TODO
         rk_aiq_uapi_a3dlut_SetAttrib(mAlgoCtx, mCurAtt, false);
+        mUpdateCond.signal();
     }
 
     mCfgMutex.unlock();
@@ -2636,6 +2727,7 @@ RkAiqA3dlutHandleInt::setAttrib(rk_aiq_lut3d_attrib_t att)
     if (0 != memcmp(&mCurAtt, &att, sizeof(rk_aiq_lut3d_attrib_t))) {
         mNewAtt = att;
         updateAtt = true;
+        mUpdateCond.wait(mCfgMutex);
     }
 
     mCfgMutex.unlock();
@@ -2817,6 +2909,7 @@ RkAiqAblcHandleInt::updateConfig()
         updateAtt = false;
         // TODO
         rk_aiq_uapi_ablc_SetAttrib(mAlgoCtx, &mCurAtt, false);
+        mUpdateCond.signal();
     }
 
     mCfgMutex.unlock();
@@ -2843,6 +2936,7 @@ RkAiqAblcHandleInt::setAttrib(rk_aiq_blc_attrib_t *att)
     if (0 != memcmp(&mCurAtt, att, sizeof(rk_aiq_blc_attrib_t))) {
         mNewAtt = *att;
         updateAtt = true;
+        mUpdateCond.wait(mCfgMutex);
     }
 
     mCfgMutex.unlock();
@@ -3013,6 +3107,7 @@ RkAiqAccmHandleInt::updateConfig()
         updateAtt = false;
         // TODO
         rk_aiq_uapi_accm_SetAttrib(mAlgoCtx, mCurAtt, false);
+        mUpdateCond.signal();
     }
 
     mCfgMutex.unlock();
@@ -3039,6 +3134,7 @@ RkAiqAccmHandleInt::setAttrib(rk_aiq_ccm_attrib_t att)
     if (0 != memcmp(&mCurAtt, &att, sizeof(rk_aiq_ccm_attrib_t))) {
         mNewAtt = att;
         updateAtt = true;
+        mUpdateCond.wait(mCfgMutex);
     }
 
     mCfgMutex.unlock();
@@ -3396,6 +3492,7 @@ RkAiqAdebayerHandleInt::updateConfig()
         mCurAtt = mNewAtt;
         updateAtt = false;
         rk_aiq_uapi_adebayer_SetAttrib(mAlgoCtx, mCurAtt, false);
+        mUpdateCond.signal();
     }
     mCfgMutex.unlock();
 
@@ -3418,6 +3515,7 @@ RkAiqAdebayerHandleInt::setAttrib(adebayer_attrib_t att)
     if (0 != memcmp(&mCurAtt, &att, sizeof(adebayer_attrib_t))) {
         mNewAtt = att;
         updateAtt = true;
+        mUpdateCond.wait(mCfgMutex);
     }
 
     mCfgMutex.unlock();
@@ -3587,6 +3685,7 @@ RkAiqAdpccHandleInt::updateConfig()
         updateAtt = false;
         // TODO
         rk_aiq_uapi_adpcc_SetAttrib(mAlgoCtx, &mCurAtt, false);
+        mUpdateCond.signal();
     }
 
     mCfgMutex.unlock();
@@ -3613,6 +3712,7 @@ RkAiqAdpccHandleInt::setAttrib(rk_aiq_dpcc_attrib_t *att)
     if (0 != memcmp(&mCurAtt, att, sizeof(rk_aiq_dpcc_attrib_t))) {
         mNewAtt = *att;
         updateAtt = true;
+        mUpdateCond.wait(mCfgMutex);
     }
 
     mCfgMutex.unlock();
@@ -3903,6 +4003,7 @@ RkAiqAfecHandleInt::updateConfig()
         updateAtt = false;
         // TODO
         rk_aiq_uapi_afec_SetAttrib(mAlgoCtx, mCurAtt, false);
+        mUpdateCond.signal();
     }
 
     mCfgMutex.unlock();
@@ -3929,6 +4030,7 @@ RkAiqAfecHandleInt::setAttrib(rk_aiq_fec_attrib_t att)
     if (0 != memcmp(&mCurAtt, &att, sizeof(rk_aiq_fec_attrib_t))) {
         mNewAtt = att;
         updateAtt = true;
+        mUpdateCond.wait(mCfgMutex);
     }
 
     mCfgMutex.unlock();
@@ -3981,6 +4083,7 @@ RkAiqAgammaHandleInt::updateConfig()
         updateAtt = false;
         // TODO
         rk_aiq_uapi_agamma_SetAttrib(mAlgoCtx, mCurAtt, false);
+        mUpdateCond.wait(mCfgMutex);
     }
 
     mCfgMutex.unlock();
@@ -4007,6 +4110,7 @@ RkAiqAgammaHandleInt::setAttrib(rk_aiq_gamma_attrib_t att)
     if (0 != memcmp(&mCurAtt, &att, sizeof(rk_aiq_gamma_attrib_t))) {
         mNewAtt = att;
         updateAtt = true;
+        mUpdateCond.signal();
     }
 
     mCfgMutex.unlock();
@@ -4177,6 +4281,7 @@ RkAiqAgicHandleInt::updateConfig()
         mCurAtt = mNewAtt;
         updateAtt = false;
         rk_aiq_uapi_agic_SetAttrib(mAlgoCtx, mCurAtt, false);
+        mUpdateCond.signal();
     }
     mCfgMutex.unlock();
 
@@ -4199,6 +4304,7 @@ RkAiqAgicHandleInt::setAttrib(agic_attrib_t att)
     if (0 != memcmp(&mCurAtt, &att, sizeof(agic_attrib_t))) {
         mNewAtt = att;
         updateAtt = true;
+        mUpdateCond.wait(mCfgMutex);
     }
 
     mCfgMutex.unlock();
@@ -4617,6 +4723,7 @@ RkAiqAldchHandleInt::updateConfig()
         updateAtt = false;
         // TODO
         rk_aiq_uapi_aldch_SetAttrib(mAlgoCtx, mCurAtt, false);
+        mUpdateCond.signal();
     }
 
     mCfgMutex.unlock();
@@ -4643,6 +4750,7 @@ RkAiqAldchHandleInt::setAttrib(rk_aiq_ldch_attrib_t att)
     if (0 != memcmp(&mCurAtt, &att, sizeof(rk_aiq_ldch_attrib_t))) {
         mNewAtt = att;
         updateAtt = true;
+        mUpdateCond.wait(mCfgMutex);
     }
 
     mCfgMutex.unlock();
@@ -4695,6 +4803,7 @@ RkAiqAlscHandleInt::updateConfig()
         updateAtt = false;
         // TODO
         rk_aiq_uapi_alsc_SetAttrib(mAlgoCtx, mCurAtt, false);
+        mUpdateCond.signal();
     }
 
     mCfgMutex.unlock();
@@ -4721,6 +4830,7 @@ RkAiqAlscHandleInt::setAttrib(rk_aiq_lsc_attrib_t att)
     if (0 != memcmp(&mCurAtt, &att, sizeof(rk_aiq_lsc_attrib_t))) {
         mNewAtt = att;
         updateAtt = true;
+        mUpdateCond.wait(mCfgMutex);
     }
 
     mCfgMutex.unlock();
