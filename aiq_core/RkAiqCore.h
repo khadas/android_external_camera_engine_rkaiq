@@ -206,6 +206,9 @@ public:
         if (rp)
             mAlogsSharedParams.resourcePath = strdup(rp);
     };
+    bool isRunningState() {
+        return mState == RK_AIQ_CORE_STATE_RUNNING;
+    }
 public:
     // following vars shared by all algo handlers
     typedef struct RkAiqAlgosShared_s {
@@ -300,6 +303,7 @@ private:
         RK_AIQ_CORE_STATE_INITED,
         RK_AIQ_CORE_STATE_PREPARED,
         RK_AIQ_CORE_STATE_STARTED,
+        RK_AIQ_CORE_STATE_RUNNING,
         RK_AIQ_CORE_STATE_STOPED,
     };
     SmartPtr<RkAiqCoreThread> mRkAiqCoreTh;
@@ -370,6 +374,7 @@ private:
     float mStrthLed;
     float mStrthIr;
     rk_aiq_gray_mode_t mGrayMode;
+    bool firstStatsReceived;
 };
 
 };

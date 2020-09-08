@@ -141,6 +141,23 @@ out:
 }
 
 void
+RkAiqHandleIntCom::waitSignal()
+{
+    if (mAiqCore->isRunningState()) {
+        mUpdateCond.timedwait(mCfgMutex,100000);
+    }else{
+        updateConfig(false);
+    }
+}
+
+void
+RkAiqHandleIntCom::sendSignal()
+{
+    if (mAiqCore->isRunningState())
+        mUpdateCond.signal();
+}
+
+void
 RkAiqAeHandleInt::init()
 {
     ENTER_ANALYZER_FUNCTION();
@@ -158,70 +175,70 @@ RkAiqAeHandleInt::init()
 }
 
 XCamReturn
-RkAiqAeHandleInt::updateConfig()
+RkAiqAeHandleInt::updateConfig(bool needSync)
 {
     ENTER_ANALYZER_FUNCTION();
 
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
-    //TODO
 
-    mCfgMutex.lock();
+    if (needSync)
+        mCfgMutex.lock();
     // if something changed, api will modify aecCfg in mAlgoCtx
     if (updateExpSwAttr) {
         mCurExpSwAttr = mNewExpSwAttr;
         updateExpSwAttr = false;
         updateAtt = true;
         rk_aiq_uapi_ae_setExpSwAttr(mAlgoCtx, &mCurExpSwAttr, false);
-        mUpdateCond.signal();
+        sendSignal();
     }
     if (updateLinExpAttr) {
         mCurLinExpAttr = mNewLinExpAttr;
         updateLinExpAttr = false;
         updateAtt = true;
         rk_aiq_uapi_ae_setLinExpAttr(mAlgoCtx, &mCurLinExpAttr, false);
-        mUpdateCond.signal();
+        sendSignal();
     }
     if (updateHdrExpAttr) {
         mCurHdrExpAttr = mNewHdrExpAttr;
         updateHdrExpAttr = false;
         updateAtt = true;
         rk_aiq_uapi_ae_setHdrExpAttr(mAlgoCtx, &mCurHdrExpAttr, false);
-        mUpdateCond.signal();
+        sendSignal();
     }
     if (updateLinAeDayRouteAttr) {
         mCurLinAeDayRouteAttr = mNewLinAeDayRouteAttr;
         updateLinAeDayRouteAttr = false;
         updateAtt = true;
         rk_aiq_uapi_ae_setLinAeDayRouteAttr(mAlgoCtx, &mCurLinAeDayRouteAttr, false);
-        mUpdateCond.signal();
+        sendSignal();
     }
     if (updateHdrAeDayRouteAttr) {
         mCurHdrAeDayRouteAttr = mNewHdrAeDayRouteAttr;
         updateHdrAeDayRouteAttr = false;
         updateAtt = true;
         rk_aiq_uapi_ae_setHdrAeDayRouteAttr(mAlgoCtx, &mCurHdrAeDayRouteAttr, false);
-        mUpdateCond.signal();
+        sendSignal();
     }
     if (updateLinAeNightRouteAttr) {
         mCurLinAeNightRouteAttr = mNewLinAeNightRouteAttr;
         updateLinAeNightRouteAttr = false;
         updateAtt = true;
         rk_aiq_uapi_ae_setLinAeNightRouteAttr(mAlgoCtx, &mCurLinAeNightRouteAttr, false);
-        mUpdateCond.signal();
+        sendSignal();
     }
     if (updateHdrAeNightRouteAttr) {
         mCurHdrAeNightRouteAttr = mNewHdrAeNightRouteAttr;
         updateHdrAeNightRouteAttr = false;
         updateAtt = true;
         rk_aiq_uapi_ae_setHdrAeNightRouteAttr(mAlgoCtx, &mCurHdrAeNightRouteAttr, false);
-        mUpdateCond.signal();
+        sendSignal();
     }
     if (updateExpWinAttr) {
         mCurExpWinAttr = mNewExpWinAttr;
         updateExpWinAttr = false;
         updateAtt = true;
         rk_aiq_uapi_ae_setExpWinAttr(mAlgoCtx, &mCurExpWinAttr, false);
-        mUpdateCond.signal();
+        sendSignal();
     }
 
     // once any params are changed, run reconfig to convert aecCfg to paectx
@@ -229,9 +246,8 @@ RkAiqAeHandleInt::updateConfig()
     AeConfig_t pAecCfg = pAeInstConfig->aecCfg;
     pAecCfg->IsReconfig |= updateAtt;
     updateAtt = false;
-
-    mCfgMutex.unlock();
-    // TODO
+    if (needSync)
+        mCfgMutex.unlock();
 
     EXIT_ANALYZER_FUNCTION();
     return ret;
@@ -253,7 +269,7 @@ RkAiqAeHandleInt::setExpSwAttr(Uapi_ExpSwAttr_t ExpSwAttr)
     if (0 != memcmp(&mCurExpSwAttr, &ExpSwAttr, sizeof(Uapi_ExpSwAttr_t))) {
         mNewExpSwAttr = ExpSwAttr;
         updateExpSwAttr = true;
-        mUpdateCond.wait(mCfgMutex);
+        waitSignal();
     }
     mCfgMutex.unlock();
 
@@ -290,7 +306,7 @@ RkAiqAeHandleInt::setLinExpAttr(Uapi_LinExpAttr_t LinExpAttr)
     if (0 != memcmp(&mCurLinExpAttr, &LinExpAttr, sizeof(Uapi_LinExpAttr_t))) {
         mNewLinExpAttr = LinExpAttr;
         updateLinExpAttr = true;
-        mUpdateCond.wait(mCfgMutex);
+        waitSignal();
     }
     mCfgMutex.unlock();
 
@@ -327,7 +343,7 @@ RkAiqAeHandleInt::setHdrExpAttr(Uapi_HdrExpAttr_t HdrExpAttr)
     if (0 != memcmp(&mCurHdrExpAttr, &HdrExpAttr, sizeof(Uapi_HdrExpAttr_t))) {
         mNewHdrExpAttr = HdrExpAttr;
         updateHdrExpAttr = true;
-        mUpdateCond.wait(mCfgMutex);
+        waitSignal();
     }
     mCfgMutex.unlock();
 
@@ -364,7 +380,7 @@ RkAiqAeHandleInt::setLinAeDayRouteAttr(Uapi_LinAeRouteAttr_t LinAeDayRouteAttr)
     if (0 != memcmp(&mCurLinAeDayRouteAttr, &LinAeDayRouteAttr, sizeof(Uapi_LinAeRouteAttr_t))) {
         mNewLinAeDayRouteAttr = LinAeDayRouteAttr;
         updateLinAeDayRouteAttr = true;
-        mUpdateCond.wait(mCfgMutex);
+        waitSignal();
     }
     mCfgMutex.unlock();
 
@@ -400,7 +416,7 @@ RkAiqAeHandleInt::setHdrAeDayRouteAttr(Uapi_HdrAeRouteAttr_t HdrAeDayRouteAttr)
     if (0 != memcmp(&mCurHdrAeDayRouteAttr, &HdrAeDayRouteAttr, sizeof(Uapi_HdrAeRouteAttr_t))) {
         mNewHdrAeDayRouteAttr = HdrAeDayRouteAttr;
         updateHdrAeDayRouteAttr = true;
-        mUpdateCond.wait(mCfgMutex);
+        waitSignal();
     }
     mCfgMutex.unlock();
 
@@ -439,7 +455,7 @@ RkAiqAeHandleInt::setLinAeNightRouteAttr(Uapi_LinAeRouteAttr_t LinAeNightRouteAt
     if (0 != memcmp(&mCurLinAeNightRouteAttr, &LinAeNightRouteAttr, sizeof(Uapi_LinAeRouteAttr_t))) {
         mNewLinAeNightRouteAttr = LinAeNightRouteAttr;
         updateLinAeNightRouteAttr = true;
-        mUpdateCond.wait(mCfgMutex);
+        waitSignal();
     }
     mCfgMutex.unlock();
 
@@ -475,7 +491,7 @@ RkAiqAeHandleInt::setHdrAeNightRouteAttr(Uapi_HdrAeRouteAttr_t HdrAeNightRouteAt
     if (0 != memcmp(&mCurHdrAeNightRouteAttr, &HdrAeNightRouteAttr, sizeof(Uapi_HdrAeRouteAttr_t))) {
         mNewHdrAeNightRouteAttr = HdrAeNightRouteAttr;
         updateHdrAeNightRouteAttr = true;
-        mUpdateCond.wait(mCfgMutex);
+        waitSignal();
     }
     mCfgMutex.unlock();
 
@@ -514,7 +530,7 @@ RkAiqAeHandleInt::setExpWinAttr(Uapi_ExpWin_t ExpWinAttr)
     if (0 != memcmp(&mCurExpWinAttr, &ExpWinAttr, sizeof(Uapi_ExpWin_t))) {
         mNewExpWinAttr = ExpWinAttr;
         updateExpWinAttr = true;
-        mUpdateCond.wait(mCfgMutex);
+        waitSignal();
     }
 
     mCfgMutex.unlock();
@@ -687,21 +703,22 @@ RkAiqAwbHandleInt::init()
 }
 
 XCamReturn
-RkAiqAwbHandleInt::updateConfig()
+RkAiqAwbHandleInt::updateConfig(bool needSync)
 {
     ENTER_ANALYZER_FUNCTION();
 
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
-    //TODO
-    mCfgMutex.lock();
+    if (needSync)
+        mCfgMutex.lock();
     // if something changed
     if (updateAtt) {
         mCurAtt = mNewAtt;
         updateAtt = false;
         rk_aiq_uapi_awb_SetAttrib(mAlgoCtx, mCurAtt, false);
-        mUpdateCond.signal();
+        sendSignal();
     }
-    mCfgMutex.unlock();
+    if (needSync)
+        mCfgMutex.unlock();
 
 
     EXIT_ANALYZER_FUNCTION();
@@ -725,7 +742,7 @@ RkAiqAwbHandleInt::setAttrib(rk_aiq_wb_attrib_t att)
     if (0 != memcmp(&mCurAtt, &att, sizeof(rk_aiq_wb_attrib_t))) {
         mNewAtt = att;
         updateAtt = true;
-        mUpdateCond.wait(mCfgMutex);
+        waitSignal();
     }
 
     mCfgMutex.unlock();
@@ -996,22 +1013,23 @@ RkAiqAfHandleInt::init()
 }
 
 XCamReturn
-RkAiqAfHandleInt::updateConfig()
+RkAiqAfHandleInt::updateConfig(bool needSync)
 {
     ENTER_ANALYZER_FUNCTION();
 
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
-    //TODO
-    mCfgMutex.lock();
+    if (needSync)
+        mCfgMutex.lock();
     // if something changed
     if (updateAtt) {
         mCurAtt = mNewAtt;
         updateAtt = false;
         // TODO
         rk_aiq_uapi_af_SetAttrib(mAlgoCtx, mCurAtt, false);
-        mUpdateCond.signal();
+        sendSignal();
     }
-    mCfgMutex.unlock();
+    if (needSync)
+        mCfgMutex.unlock();
 
 
     EXIT_ANALYZER_FUNCTION();
@@ -1035,7 +1053,7 @@ RkAiqAfHandleInt::setAttrib(rk_aiq_af_attrib_t att)
     if (0 != memcmp(&mCurAtt, &att, sizeof(rk_aiq_af_attrib_t))) {
         mNewAtt = att;
         updateAtt = true;
-        mUpdateCond.wait(mCfgMutex);
+        waitSignal();
     }
 
     mCfgMutex.unlock();
@@ -1226,30 +1244,31 @@ RkAiqAnrHandleInt::init()
 }
 
 XCamReturn
-RkAiqAnrHandleInt::updateConfig()
+RkAiqAnrHandleInt::updateConfig(bool needSync)
 {
     ENTER_ANALYZER_FUNCTION();
 
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
-    //TODO
-    mCfgMutex.lock();
+    if (needSync)
+        mCfgMutex.lock();
     // if something changed
     if (updateAtt) {
         mCurAtt = mNewAtt;
         updateAtt = false;
         // TODO
         rk_aiq_uapi_anr_SetAttrib(mAlgoCtx, &mCurAtt, false);
-        mUpdateCond.signal();
+        sendSignal();
     }
 
     if(UpdateIQpara) {
         mCurIQpara = mNewIQpara;
         UpdateIQpara = false;
         rk_aiq_uapi_anr_SetIQPara(mAlgoCtx, &mCurIQpara, false);
-        mUpdateCond.signal();
+        sendSignal();
     }
 
-    mCfgMutex.unlock();
+    if (needSync)
+        mCfgMutex.unlock();
 
 
     EXIT_ANALYZER_FUNCTION();
@@ -1273,7 +1292,7 @@ RkAiqAnrHandleInt::setAttrib(rk_aiq_nr_attrib_t *att)
     if (0 != memcmp(&mCurAtt, att, sizeof(rk_aiq_nr_attrib_t))) {
         mNewAtt = *att;
         updateAtt = true;
-        mUpdateCond.wait(mCfgMutex);
+        waitSignal();
     }
 
     mCfgMutex.unlock();
@@ -1312,7 +1331,7 @@ RkAiqAnrHandleInt::setIQPara(rk_aiq_nr_IQPara_t *para)
     if (0 != memcmp(&mCurIQpara, para, sizeof(rk_aiq_nr_IQPara_t))) {
         mNewIQpara = *para;
         UpdateIQpara = true;
-        mUpdateCond.wait(mCfgMutex);
+        waitSignal();
     }
 
     mCfgMutex.unlock();
@@ -1577,20 +1596,20 @@ RkAiqAsharpHandleInt::init()
 
 
 XCamReturn
-RkAiqAsharpHandleInt::updateConfig()
+RkAiqAsharpHandleInt::updateConfig(bool needSync)
 {
     ENTER_ANALYZER_FUNCTION();
 
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
-    //TODO
-    mCfgMutex.lock();
+    if (needSync)
+        mCfgMutex.lock();
     // if something changed
     if (updateAtt) {
         mCurAtt = mNewAtt;
         updateAtt = false;
         // TODO
         rk_aiq_uapi_asharp_SetAttrib(mAlgoCtx, &mCurAtt, false);
-        mUpdateCond.signal();
+        sendSignal();
     }
 
     if(updateIQpara) {
@@ -1598,10 +1617,11 @@ RkAiqAsharpHandleInt::updateConfig()
         updateIQpara = false;
         // TODO
         rk_aiq_uapi_asharp_SetIQpara(mAlgoCtx, &mCurIQPara, false);
-        mUpdateCond.signal();
+        sendSignal();
     }
 
-    mCfgMutex.unlock();
+    if (needSync)
+        mCfgMutex.unlock();
 
 
     EXIT_ANALYZER_FUNCTION();
@@ -1625,7 +1645,7 @@ RkAiqAsharpHandleInt::setAttrib(rk_aiq_sharp_attrib_t *att)
     if (0 != memcmp(&mCurAtt, att, sizeof(rk_aiq_sharp_attrib_t))) {
         mNewAtt = *att;
         updateAtt = true;
-        mUpdateCond.wait(mCfgMutex);
+        waitSignal();
     }
 
     mCfgMutex.unlock();
@@ -1664,7 +1684,7 @@ RkAiqAsharpHandleInt::setIQPara(rk_aiq_sharp_IQpara_t *para)
     if (0 != memcmp(&mCurIQPara, para, sizeof(rk_aiq_sharp_IQpara_t))) {
         mNewIQPara = *para;
         updateIQpara = true;
-        mUpdateCond.wait(mCfgMutex);
+        waitSignal();
     }
 
     mCfgMutex.unlock();
@@ -1979,23 +1999,24 @@ RkAiqAdhazHandleInt::postProcess()
 }
 
 XCamReturn
-RkAiqAdhazHandleInt::updateConfig()
+RkAiqAdhazHandleInt::updateConfig(bool needSync)
 {
     ENTER_ANALYZER_FUNCTION();
 
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
-    //TODO
-    mCfgMutex.lock();
+    if (needSync)
+        mCfgMutex.lock();
     // if something changed
     if (updateAtt) {
         mCurAtt = mNewAtt;
         updateAtt = false;
         // TODO
         rk_aiq_uapi_adehaze_SetAttrib(mAlgoCtx, mCurAtt, false);
-        mUpdateCond.signal();
+        sendSignal();
     }
 
-    mCfgMutex.unlock();
+    if (needSync)
+        mCfgMutex.unlock();
 
 
     EXIT_ANALYZER_FUNCTION();
@@ -2019,7 +2040,7 @@ RkAiqAdhazHandleInt::setSwAttrib(adehaze_sw_s att)
     if (0 != memcmp(&mCurAtt, &att, sizeof(adehaze_sw_s))) {
         mNewAtt = att;
         updateAtt = true;
-        mUpdateCond.wait(mCfgMutex);
+        waitSignal();
     }
 
     mCfgMutex.unlock();
@@ -2058,21 +2079,22 @@ RkAiqAhdrHandleInt::init()
     EXIT_ANALYZER_FUNCTION();
 }
 XCamReturn
-RkAiqAhdrHandleInt::updateConfig()
+RkAiqAhdrHandleInt::updateConfig(bool needSync)
 {
     ENTER_ANALYZER_FUNCTION();
 
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
-    //TODO
-    mCfgMutex.lock();
+    if (needSync)
+        mCfgMutex.lock();
     // if something changed
     if (updateAtt) {
         mCurAtt = mNewAtt;
         updateAtt = false;
         rk_aiq_uapi_ahdr_SetAttrib(mAlgoCtx, mCurAtt, true);
-        mUpdateCond.signal();
+        sendSignal();
     }
-    mCfgMutex.unlock();
+    if (needSync)
+        mCfgMutex.unlock();
 
     EXIT_ANALYZER_FUNCTION();
     return ret;
@@ -2095,7 +2117,7 @@ RkAiqAhdrHandleInt::setAttrib(ahdr_attrib_t att)
     if (0 != memcmp(&mCurAtt, &att, sizeof(ahdr_attrib_t))) {
         mNewAtt = att;
         updateAtt = true;
-        mUpdateCond.wait(mCfgMutex);
+        waitSignal();
     }
     mCfgMutex.unlock();
 
@@ -2301,22 +2323,24 @@ RkAiqAsdHandleInt::init()
 }
 
 XCamReturn
-RkAiqAsdHandleInt::updateConfig()
+RkAiqAsdHandleInt::updateConfig(bool needSync)
 {
     ENTER_ANALYZER_FUNCTION();
 
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
 
-    mCfgMutex.lock();
+    if (needSync)
+        mCfgMutex.lock();
     // if something changed
     if (updateAtt) {
         mCurAtt = mNewAtt;
         updateAtt = false;
         rk_aiq_uapi_asd_SetAttrib(mAlgoCtx, mCurAtt, false);
-        mUpdateCond.signal();
+        sendSignal();
     }
 
-    mCfgMutex.unlock();
+    if (needSync)
+        mCfgMutex.unlock();
 
 
     EXIT_ANALYZER_FUNCTION();
@@ -2340,7 +2364,7 @@ RkAiqAsdHandleInt::setAttrib(asd_attrib_t att)
     if (0 != memcmp(&mCurAtt, &att, sizeof(asd_attrib_t))) {
         mNewAtt = att;
         updateAtt = true;
-        mUpdateCond.wait(mCfgMutex);
+        waitSignal();
     }
 
     mCfgMutex.unlock();
@@ -2498,21 +2522,22 @@ RkAiqAcpHandleInt::init()
 }
 
 XCamReturn
-RkAiqAcpHandleInt::updateConfig()
+RkAiqAcpHandleInt::updateConfig(bool needSync)
 {
     ENTER_ANALYZER_FUNCTION();
 
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
-    //TODO
-    mCfgMutex.lock();
+    if (needSync)
+        mCfgMutex.lock();
     // if something changed
     if (updateAtt) {
         mCurAtt = mNewAtt;
         updateAtt = false;
         rk_aiq_uapi_acp_SetAttrib(mAlgoCtx, mCurAtt, false);
-        mUpdateCond.signal();
+        sendSignal();
     }
-    mCfgMutex.unlock();
+    if (needSync)
+        mCfgMutex.unlock();
 
     EXIT_ANALYZER_FUNCTION();
     return ret;
@@ -2532,7 +2557,7 @@ RkAiqAcpHandleInt::setAttrib(acp_attrib_t att)
     if (0 != memcmp(&mCurAtt, &att, sizeof(acp_attrib_t))) {
         mNewAtt = att;
         updateAtt = true;
-        mUpdateCond.wait(mCfgMutex);
+        waitSignal();
     }
 
     mCfgMutex.unlock();
@@ -2687,23 +2712,24 @@ RkAiqA3dlutHandleInt::init()
 }
 
 XCamReturn
-RkAiqA3dlutHandleInt::updateConfig()
+RkAiqA3dlutHandleInt::updateConfig(bool needSync)
 {
     ENTER_ANALYZER_FUNCTION();
 
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
-    //TODO
-    mCfgMutex.lock();
+    if (needSync)
+        mCfgMutex.lock();
     // if something changed
     if (updateAtt) {
         mCurAtt = mNewAtt;
         updateAtt = false;
         // TODO
         rk_aiq_uapi_a3dlut_SetAttrib(mAlgoCtx, mCurAtt, false);
-        mUpdateCond.signal();
+        sendSignal();
     }
 
-    mCfgMutex.unlock();
+    if (needSync)
+        mCfgMutex.unlock();
 
 
     EXIT_ANALYZER_FUNCTION();
@@ -2727,7 +2753,7 @@ RkAiqA3dlutHandleInt::setAttrib(rk_aiq_lut3d_attrib_t att)
     if (0 != memcmp(&mCurAtt, &att, sizeof(rk_aiq_lut3d_attrib_t))) {
         mNewAtt = att;
         updateAtt = true;
-        mUpdateCond.wait(mCfgMutex);
+        waitSignal();
     }
 
     mCfgMutex.unlock();
@@ -2896,23 +2922,24 @@ RkAiqAblcHandleInt::init()
 }
 
 XCamReturn
-RkAiqAblcHandleInt::updateConfig()
+RkAiqAblcHandleInt::updateConfig(bool needSync)
 {
     ENTER_ANALYZER_FUNCTION();
 
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
-    //TODO
-    mCfgMutex.lock();
+    if (needSync)
+        mCfgMutex.lock();
     // if something changed
     if (updateAtt) {
         mCurAtt = mNewAtt;
         updateAtt = false;
         // TODO
         rk_aiq_uapi_ablc_SetAttrib(mAlgoCtx, &mCurAtt, false);
-        mUpdateCond.signal();
+        sendSignal();
     }
 
-    mCfgMutex.unlock();
+    if (needSync)
+        mCfgMutex.unlock();
 
 
     EXIT_ANALYZER_FUNCTION();
@@ -2936,7 +2963,7 @@ RkAiqAblcHandleInt::setAttrib(rk_aiq_blc_attrib_t *att)
     if (0 != memcmp(&mCurAtt, att, sizeof(rk_aiq_blc_attrib_t))) {
         mNewAtt = *att;
         updateAtt = true;
-        mUpdateCond.wait(mCfgMutex);
+        waitSignal();
     }
 
     mCfgMutex.unlock();
@@ -3094,23 +3121,24 @@ RkAiqAccmHandleInt::init()
 }
 
 XCamReturn
-RkAiqAccmHandleInt::updateConfig()
+RkAiqAccmHandleInt::updateConfig(bool needSync)
 {
     ENTER_ANALYZER_FUNCTION();
 
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
-    //TODO
-    mCfgMutex.lock();
+    if (needSync)
+        mCfgMutex.lock();
     // if something changed
     if (updateAtt) {
         mCurAtt = mNewAtt;
         updateAtt = false;
         // TODO
         rk_aiq_uapi_accm_SetAttrib(mAlgoCtx, mCurAtt, false);
-        mUpdateCond.signal();
+        sendSignal();
     }
 
-    mCfgMutex.unlock();
+    if (needSync)
+        mCfgMutex.unlock();
 
 
     EXIT_ANALYZER_FUNCTION();
@@ -3134,7 +3162,7 @@ RkAiqAccmHandleInt::setAttrib(rk_aiq_ccm_attrib_t att)
     if (0 != memcmp(&mCurAtt, &att, sizeof(rk_aiq_ccm_attrib_t))) {
         mNewAtt = att;
         updateAtt = true;
-        mUpdateCond.wait(mCfgMutex);
+        waitSignal();
     }
 
     mCfgMutex.unlock();
@@ -3480,21 +3508,22 @@ RkAiqAdebayerHandleInt::init()
 }
 
 XCamReturn
-RkAiqAdebayerHandleInt::updateConfig()
+RkAiqAdebayerHandleInt::updateConfig(bool needSync)
 {
     ENTER_ANALYZER_FUNCTION();
 
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
-    //TODO
-    mCfgMutex.lock();
+    if (needSync)
+        mCfgMutex.lock();
     // if something changed
     if (updateAtt) {
         mCurAtt = mNewAtt;
         updateAtt = false;
         rk_aiq_uapi_adebayer_SetAttrib(mAlgoCtx, mCurAtt, false);
-        mUpdateCond.signal();
+        sendSignal();
     }
-    mCfgMutex.unlock();
+    if (needSync)
+        mCfgMutex.unlock();
 
     EXIT_ANALYZER_FUNCTION();
     return ret;
@@ -3515,7 +3544,7 @@ RkAiqAdebayerHandleInt::setAttrib(adebayer_attrib_t att)
     if (0 != memcmp(&mCurAtt, &att, sizeof(adebayer_attrib_t))) {
         mNewAtt = att;
         updateAtt = true;
-        mUpdateCond.wait(mCfgMutex);
+        waitSignal();
     }
 
     mCfgMutex.unlock();
@@ -3672,23 +3701,24 @@ RkAiqAdpccHandleInt::init()
 }
 
 XCamReturn
-RkAiqAdpccHandleInt::updateConfig()
+RkAiqAdpccHandleInt::updateConfig(bool needSync)
 {
     ENTER_ANALYZER_FUNCTION();
 
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
-    //TODO
-    mCfgMutex.lock();
+    if (needSync)
+        mCfgMutex.lock();
     // if something changed
     if (updateAtt) {
         mCurAtt = mNewAtt;
         updateAtt = false;
         // TODO
         rk_aiq_uapi_adpcc_SetAttrib(mAlgoCtx, &mCurAtt, false);
-        mUpdateCond.signal();
+        sendSignal();
     }
 
-    mCfgMutex.unlock();
+    if (needSync)
+        mCfgMutex.unlock();
 
 
     EXIT_ANALYZER_FUNCTION();
@@ -3712,7 +3742,7 @@ RkAiqAdpccHandleInt::setAttrib(rk_aiq_dpcc_attrib_t *att)
     if (0 != memcmp(&mCurAtt, att, sizeof(rk_aiq_dpcc_attrib_t))) {
         mNewAtt = *att;
         updateAtt = true;
-        mUpdateCond.wait(mCfgMutex);
+        waitSignal();
     }
 
     mCfgMutex.unlock();
@@ -3990,23 +4020,24 @@ RkAiqAfecHandleInt::postProcess()
 }
 
 XCamReturn
-RkAiqAfecHandleInt::updateConfig()
+RkAiqAfecHandleInt::updateConfig(bool needSync)
 {
     ENTER_ANALYZER_FUNCTION();
 
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
-    //TODO
-    mCfgMutex.lock();
+    if (needSync)
+        mCfgMutex.lock();
     // if something changed
     if (updateAtt) {
         mCurAtt = mNewAtt;
         updateAtt = false;
         // TODO
         rk_aiq_uapi_afec_SetAttrib(mAlgoCtx, mCurAtt, false);
-        mUpdateCond.signal();
+        sendSignal();
     }
 
-    mCfgMutex.unlock();
+    if (needSync)
+        mCfgMutex.unlock();
 
 
     EXIT_ANALYZER_FUNCTION();
@@ -4030,7 +4061,7 @@ RkAiqAfecHandleInt::setAttrib(rk_aiq_fec_attrib_t att)
     if (0 != memcmp(&mCurAtt, &att, sizeof(rk_aiq_fec_attrib_t))) {
         mNewAtt = att;
         updateAtt = true;
-        mUpdateCond.wait(mCfgMutex);
+        waitSignal();
     }
 
     mCfgMutex.unlock();
@@ -4070,23 +4101,24 @@ RkAiqAgammaHandleInt::init()
 }
 
 XCamReturn
-RkAiqAgammaHandleInt::updateConfig()
+RkAiqAgammaHandleInt::updateConfig(bool needSync)
 {
     ENTER_ANALYZER_FUNCTION();
 
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
-    //TODO
-    mCfgMutex.lock();
+    if (needSync)
+        mCfgMutex.lock();
     // if something changed
     if (updateAtt) {
         mCurAtt = mNewAtt;
         updateAtt = false;
         // TODO
         rk_aiq_uapi_agamma_SetAttrib(mAlgoCtx, mCurAtt, false);
-        mUpdateCond.wait(mCfgMutex);
+        waitSignal();
     }
 
-    mCfgMutex.unlock();
+    if (needSync)
+        mCfgMutex.unlock();
 
 
     EXIT_ANALYZER_FUNCTION();
@@ -4110,7 +4142,7 @@ RkAiqAgammaHandleInt::setAttrib(rk_aiq_gamma_attrib_t att)
     if (0 != memcmp(&mCurAtt, &att, sizeof(rk_aiq_gamma_attrib_t))) {
         mNewAtt = att;
         updateAtt = true;
-        mUpdateCond.signal();
+        sendSignal();
     }
 
     mCfgMutex.unlock();
@@ -4269,21 +4301,22 @@ RkAiqAgicHandleInt::init()
 }
 
 XCamReturn
-RkAiqAgicHandleInt::updateConfig()
+RkAiqAgicHandleInt::updateConfig(bool needSync)
 {
     ENTER_ANALYZER_FUNCTION();
 
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
-    //TODO
-    mCfgMutex.lock();
+    if (needSync)
+        mCfgMutex.lock();
     // if something changed
     if (updateAtt) {
         mCurAtt = mNewAtt;
         updateAtt = false;
         rk_aiq_uapi_agic_SetAttrib(mAlgoCtx, mCurAtt, false);
-        mUpdateCond.signal();
+        sendSignal();
     }
-    mCfgMutex.unlock();
+    if (needSync)
+        mCfgMutex.unlock();
 
     EXIT_ANALYZER_FUNCTION();
     return ret;
@@ -4304,7 +4337,7 @@ RkAiqAgicHandleInt::setAttrib(agic_attrib_t att)
     if (0 != memcmp(&mCurAtt, &att, sizeof(agic_attrib_t))) {
         mNewAtt = att;
         updateAtt = true;
-        mUpdateCond.wait(mCfgMutex);
+        waitSignal();
     }
 
     mCfgMutex.unlock();
@@ -4710,23 +4743,24 @@ RkAiqAldchHandleInt::postProcess()
 }
 
 XCamReturn
-RkAiqAldchHandleInt::updateConfig()
+RkAiqAldchHandleInt::updateConfig(bool needSync)
 {
     ENTER_ANALYZER_FUNCTION();
 
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
-    //TODO
-    mCfgMutex.lock();
+    if (needSync)
+        mCfgMutex.lock();
     // if something changed
     if (updateAtt) {
         mCurAtt = mNewAtt;
         updateAtt = false;
         // TODO
         rk_aiq_uapi_aldch_SetAttrib(mAlgoCtx, mCurAtt, false);
-        mUpdateCond.signal();
+        sendSignal();
     }
 
-    mCfgMutex.unlock();
+    if (needSync)
+        mCfgMutex.unlock();
 
 
     EXIT_ANALYZER_FUNCTION();
@@ -4750,7 +4784,7 @@ RkAiqAldchHandleInt::setAttrib(rk_aiq_ldch_attrib_t att)
     if (0 != memcmp(&mCurAtt, &att, sizeof(rk_aiq_ldch_attrib_t))) {
         mNewAtt = att;
         updateAtt = true;
-        mUpdateCond.wait(mCfgMutex);
+        waitSignal();
     }
 
     mCfgMutex.unlock();
@@ -4790,23 +4824,24 @@ RkAiqAlscHandleInt::init()
 }
 
 XCamReturn
-RkAiqAlscHandleInt::updateConfig()
+RkAiqAlscHandleInt::updateConfig(bool needSync)
 {
     ENTER_ANALYZER_FUNCTION();
 
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
-    //TODO
-    mCfgMutex.lock();
+    if (needSync)
+        mCfgMutex.lock();
     // if something changed
     if (updateAtt) {
         mCurAtt = mNewAtt;
         updateAtt = false;
         // TODO
         rk_aiq_uapi_alsc_SetAttrib(mAlgoCtx, mCurAtt, false);
-        mUpdateCond.signal();
+        sendSignal();
     }
 
-    mCfgMutex.unlock();
+    if (needSync)
+        mCfgMutex.unlock();
 
 
     EXIT_ANALYZER_FUNCTION();
@@ -4830,7 +4865,7 @@ RkAiqAlscHandleInt::setAttrib(rk_aiq_lsc_attrib_t att)
     if (0 != memcmp(&mCurAtt, &att, sizeof(rk_aiq_lsc_attrib_t))) {
         mNewAtt = att;
         updateAtt = true;
-        mUpdateCond.wait(mCfgMutex);
+        waitSignal();
     }
 
     mCfgMutex.unlock();

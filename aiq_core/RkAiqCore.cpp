@@ -159,6 +159,7 @@ RkAiqCore::RkAiqCore()
     mStrthLed = 0.0f;
     mStrthIr = 0.0f;
     mGrayMode = RK_AIQ_GRAY_MODE_CPSL;
+    firstStatsReceived = false;
 
     SmartPtr<RkAiqFullParams> fullParam = new RkAiqFullParams();
     mAiqCurParams = new RkAiqFullParamsProxy(fullParam );
@@ -246,7 +247,7 @@ RkAiqCore::deInit()
 {
     ENTER_ANALYZER_FUNCTION();
 
-    if (mState == RK_AIQ_CORE_STATE_STARTED) {
+    if (mState == RK_AIQ_CORE_STATE_STARTED || mState == RK_AIQ_CORE_STATE_RUNNING) {
         LOGE_ANALYZER("wrong state %d\n", mState);
         return XCAM_RETURN_ERROR_ANALYZER;
     }
@@ -285,7 +286,7 @@ RkAiqCore::stop()
 {
     ENTER_ANALYZER_FUNCTION();
 
-    if (mState != RK_AIQ_CORE_STATE_STARTED) {
+    if (mState != RK_AIQ_CORE_STATE_STARTED && mState != RK_AIQ_CORE_STATE_RUNNING) {
         LOGW_ANALYZER("in state %d\n", mState);
         return XCAM_RETURN_NO_ERROR;
     }
@@ -296,7 +297,7 @@ RkAiqCore::stop()
     mRkAiqCorePpTh->stop();
     ispStatsCachedList.clear();
     mState = RK_AIQ_CORE_STATE_STOPED;
-
+    firstStatsReceived = false;
     EXIT_ANALYZER_FUNCTION();
 
     return XCAM_RETURN_NO_ERROR;
@@ -310,7 +311,8 @@ RkAiqCore::prepare(const rk_aiq_exposure_sensor_descriptor* sensor_des,
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
     // check state
     if ((mState == RK_AIQ_CORE_STATE_STARTED) ||
-            (mState == RK_AIQ_CORE_STATE_INVALID)) {
+        (mState == RK_AIQ_CORE_STATE_INVALID) ||
+        (mState == RK_AIQ_CORE_STATE_RUNNING)) {
         LOGW_ANALYZER("in state %d\n", mState);
         return XCAM_RETURN_NO_ERROR;
     }
@@ -336,7 +338,7 @@ RkAiqCore::prepare(const rk_aiq_exposure_sensor_descriptor* sensor_des,
     LOGD_ANALYZER("%s handle prepare start ....", #at); \
     if (mCur##at##AlgoHdl.ptr() && mCur##at##AlgoHdl->getEnable()) { \
         /* update user initial params */ \
-        ret = mCur##at##AlgoHdl->updateConfig(); \
+        ret = mCur##at##AlgoHdl->updateConfig(true); \
         RKAIQCORE_CHECK_BYPASS(ret, "%s update initial user params failed", #at); \
         mCur##at##AlgoHdl->setReConfig(mState == RK_AIQ_CORE_STATE_STOPED); \
         ret = mCur##at##AlgoHdl->prepare(); \
@@ -2322,6 +2324,11 @@ RkAiqCore::analyze(const SmartPtr<VideoBuffer> &buffer)
     bool has_orb_stats = false;
     bool has_3a_stats = false;
 
+    if (!firstStatsReceived) {
+        firstStatsReceived = true;
+        mState = RK_AIQ_CORE_STATE_RUNNING;
+    }
+
     mAlogsSharedParams.init = false;
 
 #ifdef RK_SIMULATOR_HW
@@ -2422,7 +2429,7 @@ RkAiqCore::analyze(const SmartPtr<VideoBuffer> &buffer)
 #define PREPROCESS_ALGO(at) \
     if (mCur##at##AlgoHdl.ptr() && mCur##at##AlgoHdl->getEnable()) { \
         /* TODO, should be called before all algos preProcess ? */ \
-        ret = mCur##at##AlgoHdl->updateConfig(); \
+        ret = mCur##at##AlgoHdl->updateConfig(true); \
         RKAIQCORE_CHECK_BYPASS(ret, "%s updateConfig failed", #at); \
         ret = mCur##at##AlgoHdl->preProcess(); \
         RKAIQCORE_CHECK_BYPASS(ret, "%s preProcess failed", #at); \

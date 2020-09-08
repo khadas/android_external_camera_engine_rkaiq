@@ -57,6 +57,8 @@ public:
     virtual ~RkAiqHandleIntCom() {};
 protected:
     XCamReturn configInparamsCom(RkAiqAlgoCom* com, int type);
+    void waitSignal();
+    void sendSignal();
     XCam::Mutex mCfgMutex;
     bool updateAtt;
     XCam::Cond mUpdateCond;
@@ -118,7 +120,7 @@ public:
     virtual ~RkAiqAeHandleInt() {
         RkAiqAeHandle::deInit();
     };
-    virtual XCamReturn updateConfig();
+    virtual XCamReturn updateConfig(bool needSync);
     virtual XCamReturn prepare();
     virtual XCamReturn preProcess();
     virtual XCamReturn processing();
@@ -187,7 +189,7 @@ public:
     virtual ~RkAiqAwbHandleInt() {
         RkAiqAwbHandle::deInit();
     };
-    virtual XCamReturn updateConfig();
+    virtual XCamReturn updateConfig(bool needSync);
     virtual XCamReturn prepare();
     virtual XCamReturn preProcess();
     virtual XCamReturn processing();
@@ -226,7 +228,7 @@ public:
     virtual ~RkAiqAfHandleInt() {
         RkAiqAfHandle::deInit();
     };
-    virtual XCamReturn updateConfig();
+    virtual XCamReturn updateConfig(bool needSync);
     virtual XCamReturn prepare();
     virtual XCamReturn preProcess();
     virtual XCamReturn processing();
@@ -259,7 +261,7 @@ public:
     virtual ~RkAiqAdebayerHandleInt() {
         RkAiqAdebayerHandle::deInit();
     };
-    virtual XCamReturn updateConfig();
+    virtual XCamReturn updateConfig(bool needSync);
     virtual XCamReturn prepare();
     virtual XCamReturn preProcess();
     virtual XCamReturn processing();
@@ -289,7 +291,7 @@ public:
     virtual ~RkAiqAhdrHandleInt() {
         RkAiqAhdrHandle::deInit();
     };
-    virtual XCamReturn updateConfig();
+    virtual XCamReturn updateConfig(bool needSync);
     virtual XCamReturn prepare();
     virtual XCamReturn preProcess();
     virtual XCamReturn processing();
@@ -317,7 +319,7 @@ public:
     virtual ~RkAiqAgicHandleInt() {
         RkAiqAgicHandle::deInit();
     };
-    virtual XCamReturn updateConfig();
+    virtual XCamReturn updateConfig(bool needSync);
     virtual XCamReturn prepare();
     virtual XCamReturn preProcess();
     virtual XCamReturn processing();
@@ -346,7 +348,7 @@ public:
     virtual ~RkAiqAdhazHandleInt() {
         RkAiqAdhazHandle::deInit();
     };
-    virtual XCamReturn updateConfig();
+    virtual XCamReturn updateConfig(bool needSync);
     virtual XCamReturn prepare();
     virtual XCamReturn preProcess();
     virtual XCamReturn processing();
@@ -382,7 +384,7 @@ public:
     virtual ~RkAiqAgammaHandleInt() {
         RkAiqAgammaHandle::deInit();
     };
-    virtual XCamReturn updateConfig();
+    virtual XCamReturn updateConfig(bool needSync);
     virtual XCamReturn prepare();
     virtual XCamReturn preProcess();
     virtual XCamReturn processing();
@@ -419,7 +421,7 @@ public:
     virtual ~RkAiqAlscHandleInt() {
         RkAiqAlscHandle::deInit();
     };
-    virtual XCamReturn updateConfig();
+    virtual XCamReturn updateConfig(bool needSync);
     virtual XCamReturn prepare();
     virtual XCamReturn preProcess();
     virtual XCamReturn processing();
@@ -455,7 +457,7 @@ public:
     virtual ~RkAiqAccmHandleInt() {
         RkAiqAccmHandle::deInit();
     };
-    virtual XCamReturn updateConfig();
+    virtual XCamReturn updateConfig(bool needSync);
     virtual XCamReturn prepare();
     virtual XCamReturn preProcess();
     virtual XCamReturn processing();
@@ -491,7 +493,7 @@ public:
     virtual ~RkAiqA3dlutHandleInt() {
         RkAiqA3dlutHandle::deInit();
     };
-    virtual XCamReturn updateConfig();
+    virtual XCamReturn updateConfig(bool needSync);
     virtual XCamReturn prepare();
     virtual XCamReturn preProcess();
     virtual XCamReturn processing();
@@ -529,7 +531,7 @@ public:
     virtual ~RkAiqAblcHandleInt() {
         RkAiqAblcHandle::deInit();
     };
-    virtual XCamReturn updateConfig();
+    virtual XCamReturn updateConfig(bool needSync);
     virtual XCamReturn prepare();
     virtual XCamReturn preProcess();
     virtual XCamReturn processing();
@@ -567,7 +569,7 @@ public:
     virtual ~RkAiqAdpccHandleInt() {
         RkAiqAdpccHandle::deInit();
     };
-    virtual XCamReturn updateConfig();
+    virtual XCamReturn updateConfig(bool needSync);
     virtual XCamReturn prepare();
     virtual XCamReturn preProcess();
     virtual XCamReturn processing();
@@ -603,7 +605,7 @@ public:
     virtual ~RkAiqAnrHandleInt() {
         RkAiqAnrHandle::deInit();
     };
-    virtual XCamReturn updateConfig();
+    virtual XCamReturn updateConfig(bool needSync);
     virtual XCamReturn prepare();
     virtual XCamReturn preProcess();
     virtual XCamReturn processing();
@@ -653,7 +655,7 @@ public:
     virtual ~RkAiqAsharpHandleInt() {
         RkAiqAsharpHandle::deInit();
     };
-    virtual XCamReturn updateConfig();
+    virtual XCamReturn updateConfig(bool needSync);
     virtual XCamReturn prepare();
     virtual XCamReturn preProcess();
     virtual XCamReturn processing();
@@ -697,7 +699,7 @@ public:
     virtual ~RkAiqAfecHandleInt() {
         RkAiqAfecHandle::deInit();
     };
-    virtual XCamReturn updateConfig();
+    virtual XCamReturn updateConfig(bool needSync);
     virtual XCamReturn prepare();
     virtual XCamReturn preProcess();
     virtual XCamReturn processing();
@@ -727,7 +729,7 @@ public:
     virtual ~RkAiqAsdHandleInt() {
         RkAiqAsdHandle::deInit();
     };
-    virtual XCamReturn updateConfig();
+    virtual XCamReturn updateConfig(bool needSync);
     virtual XCamReturn prepare();
     virtual XCamReturn preProcess();
     virtual XCamReturn processing();
@@ -760,7 +762,7 @@ public:
     virtual ~RkAiqAldchHandleInt() {
         RkAiqAldchHandle::deInit();
     };
-    virtual XCamReturn updateConfig();
+    virtual XCamReturn updateConfig(bool needSync);
     virtual XCamReturn prepare();
     virtual XCamReturn preProcess();
     virtual XCamReturn processing();
@@ -790,7 +792,7 @@ public:
     virtual ~RkAiqAcpHandleInt() {
         RkAiqAcpHandle::deInit();
     };
-    virtual XCamReturn updateConfig();
+    virtual XCamReturn updateConfig(bool needSync);
     virtual XCamReturn prepare();
     virtual XCamReturn preProcess();
     virtual XCamReturn processing();
