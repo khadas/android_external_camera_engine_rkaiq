@@ -22,35 +22,16 @@
 #include "adehaze/rk_aiq_types_adehaze_algo.h"
 
 
-
-
 RKAIQ_BEGIN_DECLARE
 
-//add more here  api
 
 #define RK_DEHAZE_ISO_NUM 9
 
-
-
-typedef struct RKAiqAdhazHtmlConfig_s
-{
-    float iso_idx              [RK_DEHAZE_ISO_NUM];
-    float dehaze_en         [5][RK_DEHAZE_ISO_NUM];
-    float dehaze_self_adp   [7][RK_DEHAZE_ISO_NUM]; //-
-    float dehaze_range_adj  [6][RK_DEHAZE_ISO_NUM];
-    float dehaze_hist_para  [4][RK_DEHAZE_ISO_NUM];
-    float dehaze_enhance    [4][RK_DEHAZE_ISO_NUM];
-    float dehaze_iir_control[5][RK_DEHAZE_ISO_NUM];
-    float dehaze_user_config[5][RK_DEHAZE_ISO_NUM];
-    float dehaze_bi_para    [4][RK_DEHAZE_ISO_NUM]; //-
-    float dehaze_dc_bf_h   [25];
-    float dehaze_air_bf_h   [9];
-    float dehaze_gaus_h     [9];
-    float dehaze_hist_t0    [6]; //-
-    float dehaze_hist_t1    [6]; //-
-    float dehaze_hist_t2    [6]; //-
-
-} RKAiqAdhazHtmlConfig_t;
+enum {
+    DEHAZE_NORMAL = 0,
+    DEHAZE_HDR = 1,
+    DEHAZE_NIGHT = 2
+};
 
 typedef struct RKAiqAdhazConfig_s
 {
@@ -70,35 +51,23 @@ typedef struct RKAiqAdhazConfig_s
     float dehaze_hist_t2    [6]; //-
 } RKAiqAdhazConfig_t;
 
-
-
 typedef struct rk_aiq_dehaze_M_attrib_s {
-    //rk_aiq_wb_mwb_mode_t mode;
-
+    int strength;
     int sw_dhaz_en ; //1
     int cfg_alpha ;   //1
     int enhance_en;//0
-
-
+    int dc_en;
     float sw_dhaz_cfg_wt ;//0.1~1.0
     int sw_dhaz_cfg_air;//0~255
     float sw_dhaz_cfg_tmax;//0.1~1.0
     int sw_dhaz_cfg_gratio;//0~10
-
 } rk_aiq_dehaze_M_attrib_t;
-
-
-
-
 
 typedef struct rk_aiq_dehaze_A_attrib_s {
     //rk_aiq_wb_awb_alg_method_t algMethod;
     int sw_dhaz_en ;//1
     int cfg_alpha ; //0
     int enhance_en ;//0
-
-
-
 } rk_aiq_dehaze_A_attrib_t;
 
 typedef struct rk_aiq_dehaze_enhance_s {
@@ -109,15 +78,13 @@ typedef struct rk_aiq_dehaze_enhance_s {
     float level;//0~10
 } rk_aiq_dehaze_enhance_t;
 
-
-
 typedef enum rk_aiq_dehaze_op_mode_s {
-    RK_AIQ_DEHAZE_MODE_INVALID                     = 0,        /**< initialization value */
+    RK_AIQ_DEHAZE_MODE_INVALID                     = 0,        /**< invalid mode */
     RK_AIQ_DEHAZE_MODE_MANUAL                      = 1,        /**< run manual dehaze */
     RK_AIQ_DEHAZE_MODE_AUTO                        = 2,        /**< run auto dehaze */
     RK_AIQ_DEHAZE_MODE_ENHANCE                     = 3,        /**< run dehaze enhance*/
+    RK_AIQ_DEHAZE_MODE_DEFAULT                     = 4,        /**< initialization value */
 } rk_aiq_dehaze_op_mode_t;
-
 
 typedef struct adehaze_sw_s {
     bool byPass;
@@ -134,10 +101,6 @@ typedef struct AdehazeExpInfo_s {
     float arDGain[3];
     int   arIso[3];
 } AdehazeExpInfo_t;
-
-
-
-
 
 RKAIQ_END_DECLARE
 

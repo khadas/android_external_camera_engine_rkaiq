@@ -198,7 +198,7 @@ void RkAiqCore::initCpsl()
         } else if (aiqCalib->cpsl.lght_src == 1) {
             cfg->lght_src = RK_AIQ_CPSLS_IR;
         } else if (aiqCalib->cpsl.lght_src == 2) {
-            cfg->lght_src = RK_AIQ_CPSLS_MAX;
+            cfg->lght_src = RK_AIQ_CPSLS_MIX;
         } else {
             cfg->lght_src = RK_AIQ_CPSLS_INVALID;
         }

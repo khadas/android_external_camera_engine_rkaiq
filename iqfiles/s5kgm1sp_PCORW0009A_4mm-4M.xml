@@ -2,7 +2,7 @@
 <matfile>
     <header type="struct" size="[1 1]">
         <code_xml_parse_version index="1" type="char" size="[1 6]">
-            v1.2.3
+            v1.2.6
         </code_xml_parse_version>
         <creation_date index="1" type="char" size="[1 10]">
             2020-09-07
@@ -20,7 +20,7 @@
             v1.0.8
         </generator_version>
         <magic_code_version index="1" type="int" size="[1 1]">
-            [1014880 ]
+            [1019694 ]
         </magic_code_version>
     </header>
     <sensor type="struct" size="[1 1]">
@@ -35422,7 +35422,7 @@
                 [1.0000 -2.0000 1.0000 
                 2.0000 -4.0000 2.0000 ]
             </hist_conv_t2>
-            <DEHAZE_ISO index="1" type="cell" size="[1 9]">
+         <Normal_DEHAZE_ISO index="1" type="cell" size="[1 9]">
                 <cell index="1" type="struct" size="[1 1]">
                     <iso index="1" type="double" size="[1 1]">
                         [50.0000 ]
@@ -36548,7 +36548,2261 @@
                         [0.1400 ]
                     </air_weitcur>
                 </cell>
-            </DEHAZE_ISO>
+         </Normal_DEHAZE_ISO>
+         <HDR_DEHAZE_ISO index="1" type="cell" size="[1 9]">
+                <cell index="1" type="struct" size="[1 1]">
+                    <iso index="1" type="double" size="[1 1]">
+                        [50.0000 ]
+                    </iso>
+                    <dehaze_en index="1" type="double" size="[1 1]">
+                        [0 ]
+                    </dehaze_en>
+                    <dc_en index="1" type="double" size="[1 1]">
+                        [1 ]
+                    </dc_en>
+                    <hist_en index="1" type="double" size="[1 1]">
+                        [0 ]
+                    </hist_en>
+                    <hist_channel index="1" type="double" size="[1 1]">
+                        [0 ]
+                    </hist_channel>
+                    <gain_en index="1" type="double" size="[1 1]">
+                        [1 ]
+                    </gain_en>
+                    <dc_min_th index="1" type="double" size="[1 1]">
+                        [64.0000 ]
+                    </dc_min_th>
+                    <dc_max_th index="1" type="double" size="[1 1]">
+                        [192.0000 ]
+                    </dc_max_th>
+                    <yhist_th index="1" type="double" size="[1 1]">
+                        [249.0000 ]
+                    </yhist_th>
+                    <yblk_th index="1" type="double" size="[1 1]">
+                        [0.0020 ]
+                    </yblk_th>
+                    <dark_th index="1" type="double" size="[1 1]">
+                        [250.0000 ]
+                    </dark_th>
+                    <bright_min index="1" type="double" size="[1 1]">
+                        [180.0000 ]
+                    </bright_min>
+                    <bright_max index="1" type="double" size="[1 1]">
+                        [240.0000 ]
+                    </bright_max>
+                    <wt_max index="1" type="double" size="[1 1]">
+                        [0.9000 ]
+                    </wt_max>
+                    <air_min index="1" type="double" size="[1 1]">
+                        [200.0000 ]
+                    </air_min>
+                    <air_max index="1" type="double" size="[1 1]">
+                        [250.0000 ]
+                    </air_max>
+                    <tmax_base index="1" type="double" size="[1 1]">
+                        [125.0000 ]
+                    </tmax_base>
+                    <tmax_off index="1" type="double" size="[1 1]">
+                        [0.1000 ]
+                    </tmax_off>
+                    <tmax_max index="1" type="double" size="[1 1]">
+                        [0.5000 ]
+                    </tmax_max>
+                    <hist_gratio index="1" type="double" size="[1 1]">
+                        [2.0000 ]
+                    </hist_gratio>
+                    <hist_th_off index="1" type="double" size="[1 1]">
+                        [64.0000 ]
+                    </hist_th_off>
+                    <hist_k index="1" type="double" size="[1 1]">
+                        [2.0000 ]
+                    </hist_k>
+                    <hist_min index="1" type="double" size="[1 1]">
+                        [0.0150 ]
+                    </hist_min>
+                    <enhance_en index="1" type="double" size="[1 1]">
+                        [1 ]
+                    </enhance_en>
+                    <enhance_value index="1" type="double" size="[1 1]">
+                        [1.5000 ]
+                    </enhance_value>
+                    <hist_para_en index="1" type="double" size="[1 1]">
+                        [1 ]
+                    </hist_para_en>
+                    <hist_scale index="1" type="double" size="[1 1]">
+                        [0.9000 ]
+                    </hist_scale>
+                    <stab_fnum index="1" type="double" size="[1 1]">
+                        [8.0000 ]
+                    </stab_fnum>
+                    <sigma index="1" type="double" size="[1 1]">
+                        [6.0000 ]
+                    </sigma>
+                    <wt_sigma index="1" type="double" size="[1 1]">
+                        [8.0000 ]
+                    </wt_sigma>
+                    <air_sigma index="1" type="double" size="[1 1]">
+                        [120.0000 ]
+                    </air_sigma>
+                    <tmax_sigma index="1" type="double" size="[1 1]">
+                        [0.0100 ]
+                    </tmax_sigma>
+                    <cfg_alpha index="1" type="double" size="[1 1]">
+                        [0.0000 ]
+                    </cfg_alpha>
+                    <cfg_wt index="1" type="double" size="[1 1]">
+                        [0.8000 ]
+                    </cfg_wt>
+                    <cfg_air index="1" type="double" size="[1 1]">
+                        [210.0000 ]
+                    </cfg_air>
+                    <cfg_tmax index="1" type="double" size="[1 1]">
+                        [0.2000 ]
+                    </cfg_tmax>
+                    <cfg_gratio index="1" type="double" size="[1 1]">
+                        [2.0000 ]
+                    </cfg_gratio>
+                    <dc_thed index="1" type="double" size="[1 1]">
+                        [2.0000 ]
+                    </dc_thed>
+                    <dc_weitcur index="1" type="double" size="[1 1]">
+                        [1.0000 ]
+                    </dc_weitcur>
+                    <air_thed index="1" type="double" size="[1 1]">
+                        [2.0000 ]
+                    </air_thed>
+                    <air_weitcur index="1" type="double" size="[1 1]">
+                        [0.1400 ]
+                    </air_weitcur>
+                </cell>
+                <cell index="2" type="struct" size="[1 1]">
+                    <iso index="1" type="double" size="[1 1]">
+                        [100.0000 ]
+                    </iso>
+                    <dehaze_en index="1" type="double" size="[1 1]">
+                        [0 ]
+                    </dehaze_en>
+                    <dc_en index="1" type="double" size="[1 1]">
+                        [1 ]
+                    </dc_en>
+                    <hist_en index="1" type="double" size="[1 1]">
+                        [0 ]
+                    </hist_en>
+                    <hist_channel index="1" type="double" size="[1 1]">
+                        [0 ]
+                    </hist_channel>
+                    <gain_en index="1" type="double" size="[1 1]">
+                        [1 ]
+                    </gain_en>
+                    <dc_min_th index="1" type="double" size="[1 1]">
+                        [64.0000 ]
+                    </dc_min_th>
+                    <dc_max_th index="1" type="double" size="[1 1]">
+                        [192.0000 ]
+                    </dc_max_th>
+                    <yhist_th index="1" type="double" size="[1 1]">
+                        [249.0000 ]
+                    </yhist_th>
+                    <yblk_th index="1" type="double" size="[1 1]">
+                        [0.0020 ]
+                    </yblk_th>
+                    <dark_th index="1" type="double" size="[1 1]">
+                        [250.0000 ]
+                    </dark_th>
+                    <bright_min index="1" type="double" size="[1 1]">
+                        [180.0000 ]
+                    </bright_min>
+                    <bright_max index="1" type="double" size="[1 1]">
+                        [240.0000 ]
+                    </bright_max>
+                    <wt_max index="1" type="double" size="[1 1]">
+                        [0.9000 ]
+                    </wt_max>
+                    <air_min index="1" type="double" size="[1 1]">
+                        [200.0000 ]
+                    </air_min>
+                    <air_max index="1" type="double" size="[1 1]">
+                        [250.0000 ]
+                    </air_max>
+                    <tmax_base index="1" type="double" size="[1 1]">
+                        [125.0000 ]
+                    </tmax_base>
+                    <tmax_off index="1" type="double" size="[1 1]">
+                        [0.1000 ]
+                    </tmax_off>
+                    <tmax_max index="1" type="double" size="[1 1]">
+                        [0.5000 ]
+                    </tmax_max>
+                    <hist_gratio index="1" type="double" size="[1 1]">
+                        [2.0000 ]
+                    </hist_gratio>
+                    <hist_th_off index="1" type="double" size="[1 1]">
+                        [64.0000 ]
+                    </hist_th_off>
+                    <hist_k index="1" type="double" size="[1 1]">
+                        [2.0000 ]
+                    </hist_k>
+                    <hist_min index="1" type="double" size="[1 1]">
+                        [0.0150 ]
+                    </hist_min>
+                    <enhance_en index="1" type="double" size="[1 1]">
+                        [1 ]
+                    </enhance_en>
+                    <enhance_value index="1" type="double" size="[1 1]">
+                        [1.5000 ]
+                    </enhance_value>
+                    <hist_para_en index="1" type="double" size="[1 1]">
+                        [1 ]
+                    </hist_para_en>
+                    <hist_scale index="1" type="double" size="[1 1]">
+                        [0.9000 ]
+                    </hist_scale>
+                    <stab_fnum index="1" type="double" size="[1 1]">
+                        [8.0000 ]
+                    </stab_fnum>
+                    <sigma index="1" type="double" size="[1 1]">
+                        [6.0000 ]
+                    </sigma>
+                    <wt_sigma index="1" type="double" size="[1 1]">
+                        [8.0000 ]
+                    </wt_sigma>
+                    <air_sigma index="1" type="double" size="[1 1]">
+                        [120.0000 ]
+                    </air_sigma>
+                    <tmax_sigma index="1" type="double" size="[1 1]">
+                        [0.0100 ]
+                    </tmax_sigma>
+                    <cfg_alpha index="1" type="double" size="[1 1]">
+                        [0.0000 ]
+                    </cfg_alpha>
+                    <cfg_wt index="1" type="double" size="[1 1]">
+                        [0.8000 ]
+                    </cfg_wt>
+                    <cfg_air index="1" type="double" size="[1 1]">
+                        [210.0000 ]
+                    </cfg_air>
+                    <cfg_tmax index="1" type="double" size="[1 1]">
+                        [0.2000 ]
+                    </cfg_tmax>
+                    <cfg_gratio index="1" type="double" size="[1 1]">
+                        [2.0000 ]
+                    </cfg_gratio>
+                    <dc_thed index="1" type="double" size="[1 1]">
+                        [2.0000 ]
+                    </dc_thed>
+                    <dc_weitcur index="1" type="double" size="[1 1]">
+                        [1.0000 ]
+                    </dc_weitcur>
+                    <air_thed index="1" type="double" size="[1 1]">
+                        [2.0000 ]
+                    </air_thed>
+                    <air_weitcur index="1" type="double" size="[1 1]">
+                        [0.1400 ]
+                    </air_weitcur>
+                </cell>
+                <cell index="3" type="struct" size="[1 1]">
+                    <iso index="1" type="double" size="[1 1]">
+                        [200.0000 ]
+                    </iso>
+                    <dehaze_en index="1" type="double" size="[1 1]">
+                        [0 ]
+                    </dehaze_en>
+                    <dc_en index="1" type="double" size="[1 1]">
+                        [1 ]
+                    </dc_en>
+                    <hist_en index="1" type="double" size="[1 1]">
+                        [0 ]
+                    </hist_en>
+                    <hist_channel index="1" type="double" size="[1 1]">
+                        [0 ]
+                    </hist_channel>
+                    <gain_en index="1" type="double" size="[1 1]">
+                        [1 ]
+                    </gain_en>
+                    <dc_min_th index="1" type="double" size="[1 1]">
+                        [64.0000 ]
+                    </dc_min_th>
+                    <dc_max_th index="1" type="double" size="[1 1]">
+                        [192.0000 ]
+                    </dc_max_th>
+                    <yhist_th index="1" type="double" size="[1 1]">
+                        [249.0000 ]
+                    </yhist_th>
+                    <yblk_th index="1" type="double" size="[1 1]">
+                        [0.0020 ]
+                    </yblk_th>
+                    <dark_th index="1" type="double" size="[1 1]">
+                        [250.0000 ]
+                    </dark_th>
+                    <bright_min index="1" type="double" size="[1 1]">
+                        [180.0000 ]
+                    </bright_min>
+                    <bright_max index="1" type="double" size="[1 1]">
+                        [240.0000 ]
+                    </bright_max>
+                    <wt_max index="1" type="double" size="[1 1]">
+                        [0.9000 ]
+                    </wt_max>
+                    <air_min index="1" type="double" size="[1 1]">
+                        [200.0000 ]
+                    </air_min>
+                    <air_max index="1" type="double" size="[1 1]">
+                        [250.0000 ]
+                    </air_max>
+                    <tmax_base index="1" type="double" size="[1 1]">
+                        [125.0000 ]
+                    </tmax_base>
+                    <tmax_off index="1" type="double" size="[1 1]">
+                        [0.1000 ]
+                    </tmax_off>
+                    <tmax_max index="1" type="double" size="[1 1]">
+                        [0.5000 ]
+                    </tmax_max>
+                    <hist_gratio index="1" type="double" size="[1 1]">
+                        [2.0000 ]
+                    </hist_gratio>
+                    <hist_th_off index="1" type="double" size="[1 1]">
+                        [64.0000 ]
+                    </hist_th_off>
+                    <hist_k index="1" type="double" size="[1 1]">
+                        [2.0000 ]
+                    </hist_k>
+                    <hist_min index="1" type="double" size="[1 1]">
+                        [0.0150 ]
+                    </hist_min>
+                    <enhance_en index="1" type="double" size="[1 1]">
+                        [1 ]
+                    </enhance_en>
+                    <enhance_value index="1" type="double" size="[1 1]">
+                        [1.4000 ]
+                    </enhance_value>
+                    <hist_para_en index="1" type="double" size="[1 1]">
+                        [1 ]
+                    </hist_para_en>
+                    <hist_scale index="1" type="double" size="[1 1]">
+                        [0.9000 ]
+                    </hist_scale>
+                    <stab_fnum index="1" type="double" size="[1 1]">
+                        [8.0000 ]
+                    </stab_fnum>
+                    <sigma index="1" type="double" size="[1 1]">
+                        [6.0000 ]
+                    </sigma>
+                    <wt_sigma index="1" type="double" size="[1 1]">
+                        [8.0000 ]
+                    </wt_sigma>
+                    <air_sigma index="1" type="double" size="[1 1]">
+                        [120.0000 ]
+                    </air_sigma>
+                    <tmax_sigma index="1" type="double" size="[1 1]">
+                        [0.0100 ]
+                    </tmax_sigma>
+                    <cfg_alpha index="1" type="double" size="[1 1]">
+                        [0.0000 ]
+                    </cfg_alpha>
+                    <cfg_wt index="1" type="double" size="[1 1]">
+                        [0.8000 ]
+                    </cfg_wt>
+                    <cfg_air index="1" type="double" size="[1 1]">
+                        [210.0000 ]
+                    </cfg_air>
+                    <cfg_tmax index="1" type="double" size="[1 1]">
+                        [0.2000 ]
+                    </cfg_tmax>
+                    <cfg_gratio index="1" type="double" size="[1 1]">
+                        [2.0000 ]
+                    </cfg_gratio>
+                    <dc_thed index="1" type="double" size="[1 1]">
+                        [2.0000 ]
+                    </dc_thed>
+                    <dc_weitcur index="1" type="double" size="[1 1]">
+                        [1.0000 ]
+                    </dc_weitcur>
+                    <air_thed index="1" type="double" size="[1 1]">
+                        [2.0000 ]
+                    </air_thed>
+                    <air_weitcur index="1" type="double" size="[1 1]">
+                        [0.1400 ]
+                    </air_weitcur>
+                </cell>
+                <cell index="4" type="struct" size="[1 1]">
+                    <iso index="1" type="double" size="[1 1]">
+                        [400.0000 ]
+                    </iso>
+                    <dehaze_en index="1" type="double" size="[1 1]">
+                        [0 ]
+                    </dehaze_en>
+                    <dc_en index="1" type="double" size="[1 1]">
+                        [1 ]
+                    </dc_en>
+                    <hist_en index="1" type="double" size="[1 1]">
+                        [0 ]
+                    </hist_en>
+                    <hist_channel index="1" type="double" size="[1 1]">
+                        [0 ]
+                    </hist_channel>
+                    <gain_en index="1" type="double" size="[1 1]">
+                        [1 ]
+                    </gain_en>
+                    <dc_min_th index="1" type="double" size="[1 1]">
+                        [64.0000 ]
+                    </dc_min_th>
+                    <dc_max_th index="1" type="double" size="[1 1]">
+                        [192.0000 ]
+                    </dc_max_th>
+                    <yhist_th index="1" type="double" size="[1 1]">
+                        [249.0000 ]
+                    </yhist_th>
+                    <yblk_th index="1" type="double" size="[1 1]">
+                        [0.0020 ]
+                    </yblk_th>
+                    <dark_th index="1" type="double" size="[1 1]">
+                        [250.0000 ]
+                    </dark_th>
+                    <bright_min index="1" type="double" size="[1 1]">
+                        [180.0000 ]
+                    </bright_min>
+                    <bright_max index="1" type="double" size="[1 1]">
+                        [240.0000 ]
+                    </bright_max>
+                    <wt_max index="1" type="double" size="[1 1]">
+                        [0.9000 ]
+                    </wt_max>
+                    <air_min index="1" type="double" size="[1 1]">
+                        [200.0000 ]
+                    </air_min>
+                    <air_max index="1" type="double" size="[1 1]">
+                        [250.0000 ]
+                    </air_max>
+                    <tmax_base index="1" type="double" size="[1 1]">
+                        [125.0000 ]
+                    </tmax_base>
+                    <tmax_off index="1" type="double" size="[1 1]">
+                        [0.1000 ]
+                    </tmax_off>
+                    <tmax_max index="1" type="double" size="[1 1]">
+                        [0.5000 ]
+                    </tmax_max>
+                    <hist_gratio index="1" type="double" size="[1 1]">
+                        [2.0000 ]
+                    </hist_gratio>
+                    <hist_th_off index="1" type="double" size="[1 1]">
+                        [64.0000 ]
+                    </hist_th_off>
+                    <hist_k index="1" type="double" size="[1 1]">
+                        [2.0000 ]
+                    </hist_k>
+                    <hist_min index="1" type="double" size="[1 1]">
+                        [0.0150 ]
+                    </hist_min>
+                    <enhance_en index="1" type="double" size="[1 1]">
+                        [1 ]
+                    </enhance_en>
+                    <enhance_value index="1" type="double" size="[1 1]">
+                        [1.3000 ]
+                    </enhance_value>
+                    <hist_para_en index="1" type="double" size="[1 1]">
+                        [1 ]
+                    </hist_para_en>
+                    <hist_scale index="1" type="double" size="[1 1]">
+                        [0.9000 ]
+                    </hist_scale>
+                    <stab_fnum index="1" type="double" size="[1 1]">
+                        [8.0000 ]
+                    </stab_fnum>
+                    <sigma index="1" type="double" size="[1 1]">
+                        [6.0000 ]
+                    </sigma>
+                    <wt_sigma index="1" type="double" size="[1 1]">
+                        [8.0000 ]
+                    </wt_sigma>
+                    <air_sigma index="1" type="double" size="[1 1]">
+                        [120.0000 ]
+                    </air_sigma>
+                    <tmax_sigma index="1" type="double" size="[1 1]">
+                        [0.0100 ]
+                    </tmax_sigma>
+                    <cfg_alpha index="1" type="double" size="[1 1]">
+                        [0.0000 ]
+                    </cfg_alpha>
+                    <cfg_wt index="1" type="double" size="[1 1]">
+                        [0.8000 ]
+                    </cfg_wt>
+                    <cfg_air index="1" type="double" size="[1 1]">
+                        [210.0000 ]
+                    </cfg_air>
+                    <cfg_tmax index="1" type="double" size="[1 1]">
+                        [0.2000 ]
+                    </cfg_tmax>
+                    <cfg_gratio index="1" type="double" size="[1 1]">
+                        [2.0000 ]
+                    </cfg_gratio>
+                    <dc_thed index="1" type="double" size="[1 1]">
+                        [2.0000 ]
+                    </dc_thed>
+                    <dc_weitcur index="1" type="double" size="[1 1]">
+                        [1.0000 ]
+                    </dc_weitcur>
+                    <air_thed index="1" type="double" size="[1 1]">
+                        [2.0000 ]
+                    </air_thed>
+                    <air_weitcur index="1" type="double" size="[1 1]">
+                        [0.1400 ]
+                    </air_weitcur>
+                </cell>
+                <cell index="5" type="struct" size="[1 1]">
+                    <iso index="1" type="double" size="[1 1]">
+                        [800.0000 ]
+                    </iso>
+                    <dehaze_en index="1" type="double" size="[1 1]">
+                        [0 ]
+                    </dehaze_en>
+                    <dc_en index="1" type="double" size="[1 1]">
+                        [1 ]
+                    </dc_en>
+                    <hist_en index="1" type="double" size="[1 1]">
+                        [0 ]
+                    </hist_en>
+                    <hist_channel index="1" type="double" size="[1 1]">
+                        [0 ]
+                    </hist_channel>
+                    <gain_en index="1" type="double" size="[1 1]">
+                        [1 ]
+                    </gain_en>
+                    <dc_min_th index="1" type="double" size="[1 1]">
+                        [64.0000 ]
+                    </dc_min_th>
+                    <dc_max_th index="1" type="double" size="[1 1]">
+                        [192.0000 ]
+                    </dc_max_th>
+                    <yhist_th index="1" type="double" size="[1 1]">
+                        [249.0000 ]
+                    </yhist_th>
+                    <yblk_th index="1" type="double" size="[1 1]">
+                        [0.0020 ]
+                    </yblk_th>
+                    <dark_th index="1" type="double" size="[1 1]">
+                        [250.0000 ]
+                    </dark_th>
+                    <bright_min index="1" type="double" size="[1 1]">
+                        [180.0000 ]
+                    </bright_min>
+                    <bright_max index="1" type="double" size="[1 1]">
+                        [240.0000 ]
+                    </bright_max>
+                    <wt_max index="1" type="double" size="[1 1]">
+                        [0.9000 ]
+                    </wt_max>
+                    <air_min index="1" type="double" size="[1 1]">
+                        [200.0000 ]
+                    </air_min>
+                    <air_max index="1" type="double" size="[1 1]">
+                        [250.0000 ]
+                    </air_max>
+                    <tmax_base index="1" type="double" size="[1 1]">
+                        [125.0000 ]
+                    </tmax_base>
+                    <tmax_off index="1" type="double" size="[1 1]">
+                        [0.1000 ]
+                    </tmax_off>
+                    <tmax_max index="1" type="double" size="[1 1]">
+                        [0.5000 ]
+                    </tmax_max>
+                    <hist_gratio index="1" type="double" size="[1 1]">
+                        [2.0000 ]
+                    </hist_gratio>
+                    <hist_th_off index="1" type="double" size="[1 1]">
+                        [64.0000 ]
+                    </hist_th_off>
+                    <hist_k index="1" type="double" size="[1 1]">
+                        [2.0000 ]
+                    </hist_k>
+                    <hist_min index="1" type="double" size="[1 1]">
+                        [0.0150 ]
+                    </hist_min>
+                    <enhance_en index="1" type="double" size="[1 1]">
+                        [1 ]
+                    </enhance_en>
+                    <enhance_value index="1" type="double" size="[1 1]">
+                        [1.3000 ]
+                    </enhance_value>
+                    <hist_para_en index="1" type="double" size="[1 1]">
+                        [1 ]
+                    </hist_para_en>
+                    <hist_scale index="1" type="double" size="[1 1]">
+                        [0.9000 ]
+                    </hist_scale>
+                    <stab_fnum index="1" type="double" size="[1 1]">
+                        [8.0000 ]
+                    </stab_fnum>
+                    <sigma index="1" type="double" size="[1 1]">
+                        [6.0000 ]
+                    </sigma>
+                    <wt_sigma index="1" type="double" size="[1 1]">
+                        [8.0000 ]
+                    </wt_sigma>
+                    <air_sigma index="1" type="double" size="[1 1]">
+                        [120.0000 ]
+                    </air_sigma>
+                    <tmax_sigma index="1" type="double" size="[1 1]">
+                        [0.0100 ]
+                    </tmax_sigma>
+                    <cfg_alpha index="1" type="double" size="[1 1]">
+                        [0.0000 ]
+                    </cfg_alpha>
+                    <cfg_wt index="1" type="double" size="[1 1]">
+                        [0.8000 ]
+                    </cfg_wt>
+                    <cfg_air index="1" type="double" size="[1 1]">
+                        [210.0000 ]
+                    </cfg_air>
+                    <cfg_tmax index="1" type="double" size="[1 1]">
+                        [0.2000 ]
+                    </cfg_tmax>
+                    <cfg_gratio index="1" type="double" size="[1 1]">
+                        [2.0000 ]
+                    </cfg_gratio>
+                    <dc_thed index="1" type="double" size="[1 1]">
+                        [2.0000 ]
+                    </dc_thed>
+                    <dc_weitcur index="1" type="double" size="[1 1]">
+                        [1.0000 ]
+                    </dc_weitcur>
+                    <air_thed index="1" type="double" size="[1 1]">
+                        [2.0000 ]
+                    </air_thed>
+                    <air_weitcur index="1" type="double" size="[1 1]">
+                        [0.1400 ]
+                    </air_weitcur>
+                </cell>
+                <cell index="6" type="struct" size="[1 1]">
+                    <iso index="1" type="double" size="[1 1]">
+                        [1600.0000 ]
+                    </iso>
+                    <dehaze_en index="1" type="double" size="[1 1]">
+                        [0 ]
+                    </dehaze_en>
+                    <dc_en index="1" type="double" size="[1 1]">
+                        [1 ]
+                    </dc_en>
+                    <hist_en index="1" type="double" size="[1 1]">
+                        [0 ]
+                    </hist_en>
+                    <hist_channel index="1" type="double" size="[1 1]">
+                        [0 ]
+                    </hist_channel>
+                    <gain_en index="1" type="double" size="[1 1]">
+                        [1 ]
+                    </gain_en>
+                    <dc_min_th index="1" type="double" size="[1 1]">
+                        [64.0000 ]
+                    </dc_min_th>
+                    <dc_max_th index="1" type="double" size="[1 1]">
+                        [192.0000 ]
+                    </dc_max_th>
+                    <yhist_th index="1" type="double" size="[1 1]">
+                        [249.0000 ]
+                    </yhist_th>
+                    <yblk_th index="1" type="double" size="[1 1]">
+                        [0.0020 ]
+                    </yblk_th>
+                    <dark_th index="1" type="double" size="[1 1]">
+                        [250.0000 ]
+                    </dark_th>
+                    <bright_min index="1" type="double" size="[1 1]">
+                        [180.0000 ]
+                    </bright_min>
+                    <bright_max index="1" type="double" size="[1 1]">
+                        [240.0000 ]
+                    </bright_max>
+                    <wt_max index="1" type="double" size="[1 1]">
+                        [0.9000 ]
+                    </wt_max>
+                    <air_min index="1" type="double" size="[1 1]">
+                        [200.0000 ]
+                    </air_min>
+                    <air_max index="1" type="double" size="[1 1]">
+                        [250.0000 ]
+                    </air_max>
+                    <tmax_base index="1" type="double" size="[1 1]">
+                        [125.0000 ]
+                    </tmax_base>
+                    <tmax_off index="1" type="double" size="[1 1]">
+                        [0.1000 ]
+                    </tmax_off>
+                    <tmax_max index="1" type="double" size="[1 1]">
+                        [0.5000 ]
+                    </tmax_max>
+                    <hist_gratio index="1" type="double" size="[1 1]">
+                        [2.0000 ]
+                    </hist_gratio>
+                    <hist_th_off index="1" type="double" size="[1 1]">
+                        [64.0000 ]
+                    </hist_th_off>
+                    <hist_k index="1" type="double" size="[1 1]">
+                        [2.0000 ]
+                    </hist_k>
+                    <hist_min index="1" type="double" size="[1 1]">
+                        [0.0150 ]
+                    </hist_min>
+                    <enhance_en index="1" type="double" size="[1 1]">
+                        [1 ]
+                    </enhance_en>
+                    <enhance_value index="1" type="double" size="[1 1]">
+                        [1.0000 ]
+                    </enhance_value>
+                    <hist_para_en index="1" type="double" size="[1 1]">
+                        [1 ]
+                    </hist_para_en>
+                    <hist_scale index="1" type="double" size="[1 1]">
+                        [0.9000 ]
+                    </hist_scale>
+                    <stab_fnum index="1" type="double" size="[1 1]">
+                        [8.0000 ]
+                    </stab_fnum>
+                    <sigma index="1" type="double" size="[1 1]">
+                        [6.0000 ]
+                    </sigma>
+                    <wt_sigma index="1" type="double" size="[1 1]">
+                        [8.0000 ]
+                    </wt_sigma>
+                    <air_sigma index="1" type="double" size="[1 1]">
+                        [120.0000 ]
+                    </air_sigma>
+                    <tmax_sigma index="1" type="double" size="[1 1]">
+                        [0.0100 ]
+                    </tmax_sigma>
+                    <cfg_alpha index="1" type="double" size="[1 1]">
+                        [0.0000 ]
+                    </cfg_alpha>
+                    <cfg_wt index="1" type="double" size="[1 1]">
+                        [0.8000 ]
+                    </cfg_wt>
+                    <cfg_air index="1" type="double" size="[1 1]">
+                        [210.0000 ]
+                    </cfg_air>
+                    <cfg_tmax index="1" type="double" size="[1 1]">
+                        [0.2000 ]
+                    </cfg_tmax>
+                    <cfg_gratio index="1" type="double" size="[1 1]">
+                        [2.0000 ]
+                    </cfg_gratio>
+                    <dc_thed index="1" type="double" size="[1 1]">
+                        [2.0000 ]
+                    </dc_thed>
+                    <dc_weitcur index="1" type="double" size="[1 1]">
+                        [1.0000 ]
+                    </dc_weitcur>
+                    <air_thed index="1" type="double" size="[1 1]">
+                        [2.0000 ]
+                    </air_thed>
+                    <air_weitcur index="1" type="double" size="[1 1]">
+                        [0.1400 ]
+                    </air_weitcur>
+                </cell>
+                <cell index="7" type="struct" size="[1 1]">
+                    <iso index="1" type="double" size="[1 1]">
+                        [3200.0000 ]
+                    </iso>
+                    <dehaze_en index="1" type="double" size="[1 1]">
+                        [0 ]
+                    </dehaze_en>
+                    <dc_en index="1" type="double" size="[1 1]">
+                        [1 ]
+                    </dc_en>
+                    <hist_en index="1" type="double" size="[1 1]">
+                        [0 ]
+                    </hist_en>
+                    <hist_channel index="1" type="double" size="[1 1]">
+                        [0 ]
+                    </hist_channel>
+                    <gain_en index="1" type="double" size="[1 1]">
+                        [1 ]
+                    </gain_en>
+                    <dc_min_th index="1" type="double" size="[1 1]">
+                        [64.0000 ]
+                    </dc_min_th>
+                    <dc_max_th index="1" type="double" size="[1 1]">
+                        [192.0000 ]
+                    </dc_max_th>
+                    <yhist_th index="1" type="double" size="[1 1]">
+                        [249.0000 ]
+                    </yhist_th>
+                    <yblk_th index="1" type="double" size="[1 1]">
+                        [0.0020 ]
+                    </yblk_th>
+                    <dark_th index="1" type="double" size="[1 1]">
+                        [250.0000 ]
+                    </dark_th>
+                    <bright_min index="1" type="double" size="[1 1]">
+                        [180.0000 ]
+                    </bright_min>
+                    <bright_max index="1" type="double" size="[1 1]">
+                        [240.0000 ]
+                    </bright_max>
+                    <wt_max index="1" type="double" size="[1 1]">
+                        [0.9000 ]
+                    </wt_max>
+                    <air_min index="1" type="double" size="[1 1]">
+                        [200.0000 ]
+                    </air_min>
+                    <air_max index="1" type="double" size="[1 1]">
+                        [250.0000 ]
+                    </air_max>
+                    <tmax_base index="1" type="double" size="[1 1]">
+                        [125.0000 ]
+                    </tmax_base>
+                    <tmax_off index="1" type="double" size="[1 1]">
+                        [0.1000 ]
+                    </tmax_off>
+                    <tmax_max index="1" type="double" size="[1 1]">
+                        [0.5000 ]
+                    </tmax_max>
+                    <hist_gratio index="1" type="double" size="[1 1]">
+                        [2.0000 ]
+                    </hist_gratio>
+                    <hist_th_off index="1" type="double" size="[1 1]">
+                        [64.0000 ]
+                    </hist_th_off>
+                    <hist_k index="1" type="double" size="[1 1]">
+                        [2.0000 ]
+                    </hist_k>
+                    <hist_min index="1" type="double" size="[1 1]">
+                        [0.0150 ]
+                    </hist_min>
+                    <enhance_en index="1" type="double" size="[1 1]">
+                        [1 ]
+                    </enhance_en>
+                    <enhance_value index="1" type="double" size="[1 1]">
+                        [1.0000 ]
+                    </enhance_value>
+                    <hist_para_en index="1" type="double" size="[1 1]">
+                        [1 ]
+                    </hist_para_en>
+                    <hist_scale index="1" type="double" size="[1 1]">
+                        [0.9000 ]
+                    </hist_scale>
+                    <stab_fnum index="1" type="double" size="[1 1]">
+                        [8.0000 ]
+                    </stab_fnum>
+                    <sigma index="1" type="double" size="[1 1]">
+                        [6.0000 ]
+                    </sigma>
+                    <wt_sigma index="1" type="double" size="[1 1]">
+                        [8.0000 ]
+                    </wt_sigma>
+                    <air_sigma index="1" type="double" size="[1 1]">
+                        [120.0000 ]
+                    </air_sigma>
+                    <tmax_sigma index="1" type="double" size="[1 1]">
+                        [0.0100 ]
+                    </tmax_sigma>
+                    <cfg_alpha index="1" type="double" size="[1 1]">
+                        [0.0000 ]
+                    </cfg_alpha>
+                    <cfg_wt index="1" type="double" size="[1 1]">
+                        [0.8000 ]
+                    </cfg_wt>
+                    <cfg_air index="1" type="double" size="[1 1]">
+                        [210.0000 ]
+                    </cfg_air>
+                    <cfg_tmax index="1" type="double" size="[1 1]">
+                        [0.2000 ]
+                    </cfg_tmax>
+                    <cfg_gratio index="1" type="double" size="[1 1]">
+                        [2.0000 ]
+                    </cfg_gratio>
+                    <dc_thed index="1" type="double" size="[1 1]">
+                        [2.0000 ]
+                    </dc_thed>
+                    <dc_weitcur index="1" type="double" size="[1 1]">
+                        [1.0000 ]
+                    </dc_weitcur>
+                    <air_thed index="1" type="double" size="[1 1]">
+                        [2.0000 ]
+                    </air_thed>
+                    <air_weitcur index="1" type="double" size="[1 1]">
+                        [0.1400 ]
+                    </air_weitcur>
+                </cell>
+                <cell index="8" type="struct" size="[1 1]">
+                    <iso index="1" type="double" size="[1 1]">
+                        [6400.0000 ]
+                    </iso>
+                    <dehaze_en index="1" type="double" size="[1 1]">
+                        [0 ]
+                    </dehaze_en>
+                    <dc_en index="1" type="double" size="[1 1]">
+                        [1 ]
+                    </dc_en>
+                    <hist_en index="1" type="double" size="[1 1]">
+                        [0 ]
+                    </hist_en>
+                    <hist_channel index="1" type="double" size="[1 1]">
+                        [0 ]
+                    </hist_channel>
+                    <gain_en index="1" type="double" size="[1 1]">
+                        [1 ]
+                    </gain_en>
+                    <dc_min_th index="1" type="double" size="[1 1]">
+                        [64.0000 ]
+                    </dc_min_th>
+                    <dc_max_th index="1" type="double" size="[1 1]">
+                        [192.0000 ]
+                    </dc_max_th>
+                    <yhist_th index="1" type="double" size="[1 1]">
+                        [249.0000 ]
+                    </yhist_th>
+                    <yblk_th index="1" type="double" size="[1 1]">
+                        [0.0020 ]
+                    </yblk_th>
+                    <dark_th index="1" type="double" size="[1 1]">
+                        [250.0000 ]
+                    </dark_th>
+                    <bright_min index="1" type="double" size="[1 1]">
+                        [180.0000 ]
+                    </bright_min>
+                    <bright_max index="1" type="double" size="[1 1]">
+                        [240.0000 ]
+                    </bright_max>
+                    <wt_max index="1" type="double" size="[1 1]">
+                        [0.9000 ]
+                    </wt_max>
+                    <air_min index="1" type="double" size="[1 1]">
+                        [200.0000 ]
+                    </air_min>
+                    <air_max index="1" type="double" size="[1 1]">
+                        [250.0000 ]
+                    </air_max>
+                    <tmax_base index="1" type="double" size="[1 1]">
+                        [125.0000 ]
+                    </tmax_base>
+                    <tmax_off index="1" type="double" size="[1 1]">
+                        [0.1000 ]
+                    </tmax_off>
+                    <tmax_max index="1" type="double" size="[1 1]">
+                        [0.5000 ]
+                    </tmax_max>
+                    <hist_gratio index="1" type="double" size="[1 1]">
+                        [2.0000 ]
+                    </hist_gratio>
+                    <hist_th_off index="1" type="double" size="[1 1]">
+                        [64.0000 ]
+                    </hist_th_off>
+                    <hist_k index="1" type="double" size="[1 1]">
+                        [2.0000 ]
+                    </hist_k>
+                    <hist_min index="1" type="double" size="[1 1]">
+                        [0.0150 ]
+                    </hist_min>
+                    <enhance_en index="1" type="double" size="[1 1]">
+                        [1 ]
+                    </enhance_en>
+                    <enhance_value index="1" type="double" size="[1 1]">
+                        [1.0000 ]
+                    </enhance_value>
+                    <hist_para_en index="1" type="double" size="[1 1]">
+                        [1 ]
+                    </hist_para_en>
+                    <hist_scale index="1" type="double" size="[1 1]">
+                        [0.9000 ]
+                    </hist_scale>
+                    <stab_fnum index="1" type="double" size="[1 1]">
+                        [8.0000 ]
+                    </stab_fnum>
+                    <sigma index="1" type="double" size="[1 1]">
+                        [6.0000 ]
+                    </sigma>
+                    <wt_sigma index="1" type="double" size="[1 1]">
+                        [8.0000 ]
+                    </wt_sigma>
+                    <air_sigma index="1" type="double" size="[1 1]">
+                        [120.0000 ]
+                    </air_sigma>
+                    <tmax_sigma index="1" type="double" size="[1 1]">
+                        [0.0100 ]
+                    </tmax_sigma>
+                    <cfg_alpha index="1" type="double" size="[1 1]">
+                        [0.0000 ]
+                    </cfg_alpha>
+                    <cfg_wt index="1" type="double" size="[1 1]">
+                        [0.8000 ]
+                    </cfg_wt>
+                    <cfg_air index="1" type="double" size="[1 1]">
+                        [210.0000 ]
+                    </cfg_air>
+                    <cfg_tmax index="1" type="double" size="[1 1]">
+                        [0.2000 ]
+                    </cfg_tmax>
+                    <cfg_gratio index="1" type="double" size="[1 1]">
+                        [2.0000 ]
+                    </cfg_gratio>
+                    <dc_thed index="1" type="double" size="[1 1]">
+                        [2.0000 ]
+                    </dc_thed>
+                    <dc_weitcur index="1" type="double" size="[1 1]">
+                        [1.0000 ]
+                    </dc_weitcur>
+                    <air_thed index="1" type="double" size="[1 1]">
+                        [2.0000 ]
+                    </air_thed>
+                    <air_weitcur index="1" type="double" size="[1 1]">
+                        [0.1400 ]
+                    </air_weitcur>
+                </cell>
+                <cell index="9" type="struct" size="[1 1]">
+                    <iso index="1" type="double" size="[1 1]">
+                        [12800.0000 ]
+                    </iso>
+                    <dehaze_en index="1" type="double" size="[1 1]">
+                        [0 ]
+                    </dehaze_en>
+                    <dc_en index="1" type="double" size="[1 1]">
+                        [1 ]
+                    </dc_en>
+                    <hist_en index="1" type="double" size="[1 1]">
+                        [0 ]
+                    </hist_en>
+                    <hist_channel index="1" type="double" size="[1 1]">
+                        [0 ]
+                    </hist_channel>
+                    <gain_en index="1" type="double" size="[1 1]">
+                        [1 ]
+                    </gain_en>
+                    <dc_min_th index="1" type="double" size="[1 1]">
+                        [64.0000 ]
+                    </dc_min_th>
+                    <dc_max_th index="1" type="double" size="[1 1]">
+                        [192.0000 ]
+                    </dc_max_th>
+                    <yhist_th index="1" type="double" size="[1 1]">
+                        [249.0000 ]
+                    </yhist_th>
+                    <yblk_th index="1" type="double" size="[1 1]">
+                        [0.0020 ]
+                    </yblk_th>
+                    <dark_th index="1" type="double" size="[1 1]">
+                        [250.0000 ]
+                    </dark_th>
+                    <bright_min index="1" type="double" size="[1 1]">
+                        [180.0000 ]
+                    </bright_min>
+                    <bright_max index="1" type="double" size="[1 1]">
+                        [240.0000 ]
+                    </bright_max>
+                    <wt_max index="1" type="double" size="[1 1]">
+                        [0.9000 ]
+                    </wt_max>
+                    <air_min index="1" type="double" size="[1 1]">
+                        [200.0000 ]
+                    </air_min>
+                    <air_max index="1" type="double" size="[1 1]">
+                        [250.0000 ]
+                    </air_max>
+                    <tmax_base index="1" type="double" size="[1 1]">
+                        [125.0000 ]
+                    </tmax_base>
+                    <tmax_off index="1" type="double" size="[1 1]">
+                        [0.1000 ]
+                    </tmax_off>
+                    <tmax_max index="1" type="double" size="[1 1]">
+                        [0.5000 ]
+                    </tmax_max>
+                    <hist_gratio index="1" type="double" size="[1 1]">
+                        [2.0000 ]
+                    </hist_gratio>
+                    <hist_th_off index="1" type="double" size="[1 1]">
+                        [64.0000 ]
+                    </hist_th_off>
+                    <hist_k index="1" type="double" size="[1 1]">
+                        [2.0000 ]
+                    </hist_k>
+                    <hist_min index="1" type="double" size="[1 1]">
+                        [0.0150 ]
+                    </hist_min>
+                    <enhance_en index="1" type="double" size="[1 1]">
+                        [1 ]
+                    </enhance_en>
+                    <enhance_value index="1" type="double" size="[1 1]">
+                        [1.0000 ]
+                    </enhance_value>
+                    <hist_para_en index="1" type="double" size="[1 1]">
+                        [1 ]
+                    </hist_para_en>
+                    <hist_scale index="1" type="double" size="[1 1]">
+                        [0.9000 ]
+                    </hist_scale>
+                    <stab_fnum index="1" type="double" size="[1 1]">
+                        [8.0000 ]
+                    </stab_fnum>
+                    <sigma index="1" type="double" size="[1 1]">
+                        [6.0000 ]
+                    </sigma>
+                    <wt_sigma index="1" type="double" size="[1 1]">
+                        [8.0000 ]
+                    </wt_sigma>
+                    <air_sigma index="1" type="double" size="[1 1]">
+                        [120.0000 ]
+                    </air_sigma>
+                    <tmax_sigma index="1" type="double" size="[1 1]">
+                        [0.0100 ]
+                    </tmax_sigma>
+                    <cfg_alpha index="1" type="double" size="[1 1]">
+                        [0.0000 ]
+                    </cfg_alpha>
+                    <cfg_wt index="1" type="double" size="[1 1]">
+                        [0.8000 ]
+                    </cfg_wt>
+                    <cfg_air index="1" type="double" size="[1 1]">
+                        [210.0000 ]
+                    </cfg_air>
+                    <cfg_tmax index="1" type="double" size="[1 1]">
+                        [0.2000 ]
+                    </cfg_tmax>
+                    <cfg_gratio index="1" type="double" size="[1 1]">
+                        [2.0000 ]
+                    </cfg_gratio>
+                    <dc_thed index="1" type="double" size="[1 1]">
+                        [2.0000 ]
+                    </dc_thed>
+                    <dc_weitcur index="1" type="double" size="[1 1]">
+                        [1.0000 ]
+                    </dc_weitcur>
+                    <air_thed index="1" type="double" size="[1 1]">
+                        [2.0000 ]
+                    </air_thed>
+                    <air_weitcur index="1" type="double" size="[1 1]">
+                        [0.1400 ]
+                    </air_weitcur>
+                </cell>
+         </HDR_DEHAZE_ISO>
+         <Night_DEHAZE_ISO index="1" type="cell" size="[1 9]">
+                <cell index="1" type="struct" size="[1 1]">
+                    <iso index="1" type="double" size="[1 1]">
+                        [50.0000 ]
+                    </iso>
+                    <dehaze_en index="1" type="double" size="[1 1]">
+                        [0 ]
+                    </dehaze_en>
+                    <dc_en index="1" type="double" size="[1 1]">
+                        [1 ]
+                    </dc_en>
+                    <hist_en index="1" type="double" size="[1 1]">
+                        [0 ]
+                    </hist_en>
+                    <hist_channel index="1" type="double" size="[1 1]">
+                        [0 ]
+                    </hist_channel>
+                    <gain_en index="1" type="double" size="[1 1]">
+                        [1 ]
+                    </gain_en>
+                    <dc_min_th index="1" type="double" size="[1 1]">
+                        [64.0000 ]
+                    </dc_min_th>
+                    <dc_max_th index="1" type="double" size="[1 1]">
+                        [192.0000 ]
+                    </dc_max_th>
+                    <yhist_th index="1" type="double" size="[1 1]">
+                        [249.0000 ]
+                    </yhist_th>
+                    <yblk_th index="1" type="double" size="[1 1]">
+                        [0.0020 ]
+                    </yblk_th>
+                    <dark_th index="1" type="double" size="[1 1]">
+                        [250.0000 ]
+                    </dark_th>
+                    <bright_min index="1" type="double" size="[1 1]">
+                        [180.0000 ]
+                    </bright_min>
+                    <bright_max index="1" type="double" size="[1 1]">
+                        [240.0000 ]
+                    </bright_max>
+                    <wt_max index="1" type="double" size="[1 1]">
+                        [0.9000 ]
+                    </wt_max>
+                    <air_min index="1" type="double" size="[1 1]">
+                        [200.0000 ]
+                    </air_min>
+                    <air_max index="1" type="double" size="[1 1]">
+                        [250.0000 ]
+                    </air_max>
+                    <tmax_base index="1" type="double" size="[1 1]">
+                        [125.0000 ]
+                    </tmax_base>
+                    <tmax_off index="1" type="double" size="[1 1]">
+                        [0.1000 ]
+                    </tmax_off>
+                    <tmax_max index="1" type="double" size="[1 1]">
+                        [0.5000 ]
+                    </tmax_max>
+                    <hist_gratio index="1" type="double" size="[1 1]">
+                        [2.0000 ]
+                    </hist_gratio>
+                    <hist_th_off index="1" type="double" size="[1 1]">
+                        [64.0000 ]
+                    </hist_th_off>
+                    <hist_k index="1" type="double" size="[1 1]">
+                        [2.0000 ]
+                    </hist_k>
+                    <hist_min index="1" type="double" size="[1 1]">
+                        [0.0150 ]
+                    </hist_min>
+                    <enhance_en index="1" type="double" size="[1 1]">
+                        [1 ]
+                    </enhance_en>
+                    <enhance_value index="1" type="double" size="[1 1]">
+                        [1.5000 ]
+                    </enhance_value>
+                    <hist_para_en index="1" type="double" size="[1 1]">
+                        [1 ]
+                    </hist_para_en>
+                    <hist_scale index="1" type="double" size="[1 1]">
+                        [0.9000 ]
+                    </hist_scale>
+                    <stab_fnum index="1" type="double" size="[1 1]">
+                        [8.0000 ]
+                    </stab_fnum>
+                    <sigma index="1" type="double" size="[1 1]">
+                        [6.0000 ]
+                    </sigma>
+                    <wt_sigma index="1" type="double" size="[1 1]">
+                        [8.0000 ]
+                    </wt_sigma>
+                    <air_sigma index="1" type="double" size="[1 1]">
+                        [120.0000 ]
+                    </air_sigma>
+                    <tmax_sigma index="1" type="double" size="[1 1]">
+                        [0.0100 ]
+                    </tmax_sigma>
+                    <cfg_alpha index="1" type="double" size="[1 1]">
+                        [0.0000 ]
+                    </cfg_alpha>
+                    <cfg_wt index="1" type="double" size="[1 1]">
+                        [0.8000 ]
+                    </cfg_wt>
+                    <cfg_air index="1" type="double" size="[1 1]">
+                        [210.0000 ]
+                    </cfg_air>
+                    <cfg_tmax index="1" type="double" size="[1 1]">
+                        [0.2000 ]
+                    </cfg_tmax>
+                    <cfg_gratio index="1" type="double" size="[1 1]">
+                        [2.0000 ]
+                    </cfg_gratio>
+                    <dc_thed index="1" type="double" size="[1 1]">
+                        [2.0000 ]
+                    </dc_thed>
+                    <dc_weitcur index="1" type="double" size="[1 1]">
+                        [1.0000 ]
+                    </dc_weitcur>
+                    <air_thed index="1" type="double" size="[1 1]">
+                        [2.0000 ]
+                    </air_thed>
+                    <air_weitcur index="1" type="double" size="[1 1]">
+                        [0.1400 ]
+                    </air_weitcur>
+                </cell>
+                <cell index="2" type="struct" size="[1 1]">
+                    <iso index="1" type="double" size="[1 1]">
+                        [100.0000 ]
+                    </iso>
+                    <dehaze_en index="1" type="double" size="[1 1]">
+                        [0 ]
+                    </dehaze_en>
+                    <dc_en index="1" type="double" size="[1 1]">
+                        [1 ]
+                    </dc_en>
+                    <hist_en index="1" type="double" size="[1 1]">
+                        [0 ]
+                    </hist_en>
+                    <hist_channel index="1" type="double" size="[1 1]">
+                        [0 ]
+                    </hist_channel>
+                    <gain_en index="1" type="double" size="[1 1]">
+                        [1 ]
+                    </gain_en>
+                    <dc_min_th index="1" type="double" size="[1 1]">
+                        [64.0000 ]
+                    </dc_min_th>
+                    <dc_max_th index="1" type="double" size="[1 1]">
+                        [192.0000 ]
+                    </dc_max_th>
+                    <yhist_th index="1" type="double" size="[1 1]">
+                        [249.0000 ]
+                    </yhist_th>
+                    <yblk_th index="1" type="double" size="[1 1]">
+                        [0.0020 ]
+                    </yblk_th>
+                    <dark_th index="1" type="double" size="[1 1]">
+                        [250.0000 ]
+                    </dark_th>
+                    <bright_min index="1" type="double" size="[1 1]">
+                        [180.0000 ]
+                    </bright_min>
+                    <bright_max index="1" type="double" size="[1 1]">
+                        [240.0000 ]
+                    </bright_max>
+                    <wt_max index="1" type="double" size="[1 1]">
+                        [0.9000 ]
+                    </wt_max>
+                    <air_min index="1" type="double" size="[1 1]">
+                        [200.0000 ]
+                    </air_min>
+                    <air_max index="1" type="double" size="[1 1]">
+                        [250.0000 ]
+                    </air_max>
+                    <tmax_base index="1" type="double" size="[1 1]">
+                        [125.0000 ]
+                    </tmax_base>
+                    <tmax_off index="1" type="double" size="[1 1]">
+                        [0.1000 ]
+                    </tmax_off>
+                    <tmax_max index="1" type="double" size="[1 1]">
+                        [0.5000 ]
+                    </tmax_max>
+                    <hist_gratio index="1" type="double" size="[1 1]">
+                        [2.0000 ]
+                    </hist_gratio>
+                    <hist_th_off index="1" type="double" size="[1 1]">
+                        [64.0000 ]
+                    </hist_th_off>
+                    <hist_k index="1" type="double" size="[1 1]">
+                        [2.0000 ]
+                    </hist_k>
+                    <hist_min index="1" type="double" size="[1 1]">
+                        [0.0150 ]
+                    </hist_min>
+                    <enhance_en index="1" type="double" size="[1 1]">
+                        [1 ]
+                    </enhance_en>
+                    <enhance_value index="1" type="double" size="[1 1]">
+                        [1.5000 ]
+                    </enhance_value>
+                    <hist_para_en index="1" type="double" size="[1 1]">
+                        [1 ]
+                    </hist_para_en>
+                    <hist_scale index="1" type="double" size="[1 1]">
+                        [0.9000 ]
+                    </hist_scale>
+                    <stab_fnum index="1" type="double" size="[1 1]">
+                        [8.0000 ]
+                    </stab_fnum>
+                    <sigma index="1" type="double" size="[1 1]">
+                        [6.0000 ]
+                    </sigma>
+                    <wt_sigma index="1" type="double" size="[1 1]">
+                        [8.0000 ]
+                    </wt_sigma>
+                    <air_sigma index="1" type="double" size="[1 1]">
+                        [120.0000 ]
+                    </air_sigma>
+                    <tmax_sigma index="1" type="double" size="[1 1]">
+                        [0.0100 ]
+                    </tmax_sigma>
+                    <cfg_alpha index="1" type="double" size="[1 1]">
+                        [0.0000 ]
+                    </cfg_alpha>
+                    <cfg_wt index="1" type="double" size="[1 1]">
+                        [0.8000 ]
+                    </cfg_wt>
+                    <cfg_air index="1" type="double" size="[1 1]">
+                        [210.0000 ]
+                    </cfg_air>
+                    <cfg_tmax index="1" type="double" size="[1 1]">
+                        [0.2000 ]
+                    </cfg_tmax>
+                    <cfg_gratio index="1" type="double" size="[1 1]">
+                        [2.0000 ]
+                    </cfg_gratio>
+                    <dc_thed index="1" type="double" size="[1 1]">
+                        [2.0000 ]
+                    </dc_thed>
+                    <dc_weitcur index="1" type="double" size="[1 1]">
+                        [1.0000 ]
+                    </dc_weitcur>
+                    <air_thed index="1" type="double" size="[1 1]">
+                        [2.0000 ]
+                    </air_thed>
+                    <air_weitcur index="1" type="double" size="[1 1]">
+                        [0.1400 ]
+                    </air_weitcur>
+                </cell>
+                <cell index="3" type="struct" size="[1 1]">
+                    <iso index="1" type="double" size="[1 1]">
+                        [200.0000 ]
+                    </iso>
+                    <dehaze_en index="1" type="double" size="[1 1]">
+                        [0 ]
+                    </dehaze_en>
+                    <dc_en index="1" type="double" size="[1 1]">
+                        [1 ]
+                    </dc_en>
+                    <hist_en index="1" type="double" size="[1 1]">
+                        [0 ]
+                    </hist_en>
+                    <hist_channel index="1" type="double" size="[1 1]">
+                        [0 ]
+                    </hist_channel>
+                    <gain_en index="1" type="double" size="[1 1]">
+                        [1 ]
+                    </gain_en>
+                    <dc_min_th index="1" type="double" size="[1 1]">
+                        [64.0000 ]
+                    </dc_min_th>
+                    <dc_max_th index="1" type="double" size="[1 1]">
+                        [192.0000 ]
+                    </dc_max_th>
+                    <yhist_th index="1" type="double" size="[1 1]">
+                        [249.0000 ]
+                    </yhist_th>
+                    <yblk_th index="1" type="double" size="[1 1]">
+                        [0.0020 ]
+                    </yblk_th>
+                    <dark_th index="1" type="double" size="[1 1]">
+                        [250.0000 ]
+                    </dark_th>
+                    <bright_min index="1" type="double" size="[1 1]">
+                        [180.0000 ]
+                    </bright_min>
+                    <bright_max index="1" type="double" size="[1 1]">
+                        [240.0000 ]
+                    </bright_max>
+                    <wt_max index="1" type="double" size="[1 1]">
+                        [0.9000 ]
+                    </wt_max>
+                    <air_min index="1" type="double" size="[1 1]">
+                        [200.0000 ]
+                    </air_min>
+                    <air_max index="1" type="double" size="[1 1]">
+                        [250.0000 ]
+                    </air_max>
+                    <tmax_base index="1" type="double" size="[1 1]">
+                        [125.0000 ]
+                    </tmax_base>
+                    <tmax_off index="1" type="double" size="[1 1]">
+                        [0.1000 ]
+                    </tmax_off>
+                    <tmax_max index="1" type="double" size="[1 1]">
+                        [0.5000 ]
+                    </tmax_max>
+                    <hist_gratio index="1" type="double" size="[1 1]">
+                        [2.0000 ]
+                    </hist_gratio>
+                    <hist_th_off index="1" type="double" size="[1 1]">
+                        [64.0000 ]
+                    </hist_th_off>
+                    <hist_k index="1" type="double" size="[1 1]">
+                        [2.0000 ]
+                    </hist_k>
+                    <hist_min index="1" type="double" size="[1 1]">
+                        [0.0150 ]
+                    </hist_min>
+                    <enhance_en index="1" type="double" size="[1 1]">
+                        [1 ]
+                    </enhance_en>
+                    <enhance_value index="1" type="double" size="[1 1]">
+                        [1.4000 ]
+                    </enhance_value>
+                    <hist_para_en index="1" type="double" size="[1 1]">
+                        [1 ]
+                    </hist_para_en>
+                    <hist_scale index="1" type="double" size="[1 1]">
+                        [0.9000 ]
+                    </hist_scale>
+                    <stab_fnum index="1" type="double" size="[1 1]">
+                        [8.0000 ]
+                    </stab_fnum>
+                    <sigma index="1" type="double" size="[1 1]">
+                        [6.0000 ]
+                    </sigma>
+                    <wt_sigma index="1" type="double" size="[1 1]">
+                        [8.0000 ]
+                    </wt_sigma>
+                    <air_sigma index="1" type="double" size="[1 1]">
+                        [120.0000 ]
+                    </air_sigma>
+                    <tmax_sigma index="1" type="double" size="[1 1]">
+                        [0.0100 ]
+                    </tmax_sigma>
+                    <cfg_alpha index="1" type="double" size="[1 1]">
+                        [0.0000 ]
+                    </cfg_alpha>
+                    <cfg_wt index="1" type="double" size="[1 1]">
+                        [0.8000 ]
+                    </cfg_wt>
+                    <cfg_air index="1" type="double" size="[1 1]">
+                        [210.0000 ]
+                    </cfg_air>
+                    <cfg_tmax index="1" type="double" size="[1 1]">
+                        [0.2000 ]
+                    </cfg_tmax>
+                    <cfg_gratio index="1" type="double" size="[1 1]">
+                        [2.0000 ]
+                    </cfg_gratio>
+                    <dc_thed index="1" type="double" size="[1 1]">
+                        [2.0000 ]
+                    </dc_thed>
+                    <dc_weitcur index="1" type="double" size="[1 1]">
+                        [1.0000 ]
+                    </dc_weitcur>
+                    <air_thed index="1" type="double" size="[1 1]">
+                        [2.0000 ]
+                    </air_thed>
+                    <air_weitcur index="1" type="double" size="[1 1]">
+                        [0.1400 ]
+                    </air_weitcur>
+                </cell>
+                <cell index="4" type="struct" size="[1 1]">
+                    <iso index="1" type="double" size="[1 1]">
+                        [400.0000 ]
+                    </iso>
+                    <dehaze_en index="1" type="double" size="[1 1]">
+                        [0 ]
+                    </dehaze_en>
+                    <dc_en index="1" type="double" size="[1 1]">
+                        [1 ]
+                    </dc_en>
+                    <hist_en index="1" type="double" size="[1 1]">
+                        [0 ]
+                    </hist_en>
+                    <hist_channel index="1" type="double" size="[1 1]">
+                        [0 ]
+                    </hist_channel>
+                    <gain_en index="1" type="double" size="[1 1]">
+                        [1 ]
+                    </gain_en>
+                    <dc_min_th index="1" type="double" size="[1 1]">
+                        [64.0000 ]
+                    </dc_min_th>
+                    <dc_max_th index="1" type="double" size="[1 1]">
+                        [192.0000 ]
+                    </dc_max_th>
+                    <yhist_th index="1" type="double" size="[1 1]">
+                        [249.0000 ]
+                    </yhist_th>
+                    <yblk_th index="1" type="double" size="[1 1]">
+                        [0.0020 ]
+                    </yblk_th>
+                    <dark_th index="1" type="double" size="[1 1]">
+                        [250.0000 ]
+                    </dark_th>
+                    <bright_min index="1" type="double" size="[1 1]">
+                        [180.0000 ]
+                    </bright_min>
+                    <bright_max index="1" type="double" size="[1 1]">
+                        [240.0000 ]
+                    </bright_max>
+                    <wt_max index="1" type="double" size="[1 1]">
+                        [0.9000 ]
+                    </wt_max>
+                    <air_min index="1" type="double" size="[1 1]">
+                        [200.0000 ]
+                    </air_min>
+                    <air_max index="1" type="double" size="[1 1]">
+                        [250.0000 ]
+                    </air_max>
+                    <tmax_base index="1" type="double" size="[1 1]">
+                        [125.0000 ]
+                    </tmax_base>
+                    <tmax_off index="1" type="double" size="[1 1]">
+                        [0.1000 ]
+                    </tmax_off>
+                    <tmax_max index="1" type="double" size="[1 1]">
+                        [0.5000 ]
+                    </tmax_max>
+                    <hist_gratio index="1" type="double" size="[1 1]">
+                        [2.0000 ]
+                    </hist_gratio>
+                    <hist_th_off index="1" type="double" size="[1 1]">
+                        [64.0000 ]
+                    </hist_th_off>
+                    <hist_k index="1" type="double" size="[1 1]">
+                        [2.0000 ]
+                    </hist_k>
+                    <hist_min index="1" type="double" size="[1 1]">
+                        [0.0150 ]
+                    </hist_min>
+                    <enhance_en index="1" type="double" size="[1 1]">
+                        [1 ]
+                    </enhance_en>
+                    <enhance_value index="1" type="double" size="[1 1]">
+                        [1.3000 ]
+                    </enhance_value>
+                    <hist_para_en index="1" type="double" size="[1 1]">
+                        [1 ]
+                    </hist_para_en>
+                    <hist_scale index="1" type="double" size="[1 1]">
+                        [0.9000 ]
+                    </hist_scale>
+                    <stab_fnum index="1" type="double" size="[1 1]">
+                        [8.0000 ]
+                    </stab_fnum>
+                    <sigma index="1" type="double" size="[1 1]">
+                        [6.0000 ]
+                    </sigma>
+                    <wt_sigma index="1" type="double" size="[1 1]">
+                        [8.0000 ]
+                    </wt_sigma>
+                    <air_sigma index="1" type="double" size="[1 1]">
+                        [120.0000 ]
+                    </air_sigma>
+                    <tmax_sigma index="1" type="double" size="[1 1]">
+                        [0.0100 ]
+                    </tmax_sigma>
+                    <cfg_alpha index="1" type="double" size="[1 1]">
+                        [0.0000 ]
+                    </cfg_alpha>
+                    <cfg_wt index="1" type="double" size="[1 1]">
+                        [0.8000 ]
+                    </cfg_wt>
+                    <cfg_air index="1" type="double" size="[1 1]">
+                        [210.0000 ]
+                    </cfg_air>
+                    <cfg_tmax index="1" type="double" size="[1 1]">
+                        [0.2000 ]
+                    </cfg_tmax>
+                    <cfg_gratio index="1" type="double" size="[1 1]">
+                        [2.0000 ]
+                    </cfg_gratio>
+                    <dc_thed index="1" type="double" size="[1 1]">
+                        [2.0000 ]
+                    </dc_thed>
+                    <dc_weitcur index="1" type="double" size="[1 1]">
+                        [1.0000 ]
+                    </dc_weitcur>
+                    <air_thed index="1" type="double" size="[1 1]">
+                        [2.0000 ]
+                    </air_thed>
+                    <air_weitcur index="1" type="double" size="[1 1]">
+                        [0.1400 ]
+                    </air_weitcur>
+                </cell>
+                <cell index="5" type="struct" size="[1 1]">
+                    <iso index="1" type="double" size="[1 1]">
+                        [800.0000 ]
+                    </iso>
+                    <dehaze_en index="1" type="double" size="[1 1]">
+                        [0 ]
+                    </dehaze_en>
+                    <dc_en index="1" type="double" size="[1 1]">
+                        [1 ]
+                    </dc_en>
+                    <hist_en index="1" type="double" size="[1 1]">
+                        [0 ]
+                    </hist_en>
+                    <hist_channel index="1" type="double" size="[1 1]">
+                        [0 ]
+                    </hist_channel>
+                    <gain_en index="1" type="double" size="[1 1]">
+                        [1 ]
+                    </gain_en>
+                    <dc_min_th index="1" type="double" size="[1 1]">
+                        [64.0000 ]
+                    </dc_min_th>
+                    <dc_max_th index="1" type="double" size="[1 1]">
+                        [192.0000 ]
+                    </dc_max_th>
+                    <yhist_th index="1" type="double" size="[1 1]">
+                        [249.0000 ]
+                    </yhist_th>
+                    <yblk_th index="1" type="double" size="[1 1]">
+                        [0.0020 ]
+                    </yblk_th>
+                    <dark_th index="1" type="double" size="[1 1]">
+                        [250.0000 ]
+                    </dark_th>
+                    <bright_min index="1" type="double" size="[1 1]">
+                        [180.0000 ]
+                    </bright_min>
+                    <bright_max index="1" type="double" size="[1 1]">
+                        [240.0000 ]
+                    </bright_max>
+                    <wt_max index="1" type="double" size="[1 1]">
+                        [0.9000 ]
+                    </wt_max>
+                    <air_min index="1" type="double" size="[1 1]">
+                        [200.0000 ]
+                    </air_min>
+                    <air_max index="1" type="double" size="[1 1]">
+                        [250.0000 ]
+                    </air_max>
+                    <tmax_base index="1" type="double" size="[1 1]">
+                        [125.0000 ]
+                    </tmax_base>
+                    <tmax_off index="1" type="double" size="[1 1]">
+                        [0.1000 ]
+                    </tmax_off>
+                    <tmax_max index="1" type="double" size="[1 1]">
+                        [0.5000 ]
+                    </tmax_max>
+                    <hist_gratio index="1" type="double" size="[1 1]">
+                        [2.0000 ]
+                    </hist_gratio>
+                    <hist_th_off index="1" type="double" size="[1 1]">
+                        [64.0000 ]
+                    </hist_th_off>
+                    <hist_k index="1" type="double" size="[1 1]">
+                        [2.0000 ]
+                    </hist_k>
+                    <hist_min index="1" type="double" size="[1 1]">
+                        [0.0150 ]
+                    </hist_min>
+                    <enhance_en index="1" type="double" size="[1 1]">
+                        [1 ]
+                    </enhance_en>
+                    <enhance_value index="1" type="double" size="[1 1]">
+                        [1.3000 ]
+                    </enhance_value>
+                    <hist_para_en index="1" type="double" size="[1 1]">
+                        [1 ]
+                    </hist_para_en>
+                    <hist_scale index="1" type="double" size="[1 1]">
+                        [0.9000 ]
+                    </hist_scale>
+                    <stab_fnum index="1" type="double" size="[1 1]">
+                        [8.0000 ]
+                    </stab_fnum>
+                    <sigma index="1" type="double" size="[1 1]">
+                        [6.0000 ]
+                    </sigma>
+                    <wt_sigma index="1" type="double" size="[1 1]">
+                        [8.0000 ]
+                    </wt_sigma>
+                    <air_sigma index="1" type="double" size="[1 1]">
+                        [120.0000 ]
+                    </air_sigma>
+                    <tmax_sigma index="1" type="double" size="[1 1]">
+                        [0.0100 ]
+                    </tmax_sigma>
+                    <cfg_alpha index="1" type="double" size="[1 1]">
+                        [0.0000 ]
+                    </cfg_alpha>
+                    <cfg_wt index="1" type="double" size="[1 1]">
+                        [0.8000 ]
+                    </cfg_wt>
+                    <cfg_air index="1" type="double" size="[1 1]">
+                        [210.0000 ]
+                    </cfg_air>
+                    <cfg_tmax index="1" type="double" size="[1 1]">
+                        [0.2000 ]
+                    </cfg_tmax>
+                    <cfg_gratio index="1" type="double" size="[1 1]">
+                        [2.0000 ]
+                    </cfg_gratio>
+                    <dc_thed index="1" type="double" size="[1 1]">
+                        [2.0000 ]
+                    </dc_thed>
+                    <dc_weitcur index="1" type="double" size="[1 1]">
+                        [1.0000 ]
+                    </dc_weitcur>
+                    <air_thed index="1" type="double" size="[1 1]">
+                        [2.0000 ]
+                    </air_thed>
+                    <air_weitcur index="1" type="double" size="[1 1]">
+                        [0.1400 ]
+                    </air_weitcur>
+                </cell>
+                <cell index="6" type="struct" size="[1 1]">
+                    <iso index="1" type="double" size="[1 1]">
+                        [1600.0000 ]
+                    </iso>
+                    <dehaze_en index="1" type="double" size="[1 1]">
+                        [0 ]
+                    </dehaze_en>
+                    <dc_en index="1" type="double" size="[1 1]">
+                        [1 ]
+                    </dc_en>
+                    <hist_en index="1" type="double" size="[1 1]">
+                        [0 ]
+                    </hist_en>
+                    <hist_channel index="1" type="double" size="[1 1]">
+                        [0 ]
+                    </hist_channel>
+                    <gain_en index="1" type="double" size="[1 1]">
+                        [1 ]
+                    </gain_en>
+                    <dc_min_th index="1" type="double" size="[1 1]">
+                        [64.0000 ]
+                    </dc_min_th>
+                    <dc_max_th index="1" type="double" size="[1 1]">
+                        [192.0000 ]
+                    </dc_max_th>
+                    <yhist_th index="1" type="double" size="[1 1]">
+                        [249.0000 ]
+                    </yhist_th>
+                    <yblk_th index="1" type="double" size="[1 1]">
+                        [0.0020 ]
+                    </yblk_th>
+                    <dark_th index="1" type="double" size="[1 1]">
+                        [250.0000 ]
+                    </dark_th>
+                    <bright_min index="1" type="double" size="[1 1]">
+                        [180.0000 ]
+                    </bright_min>
+                    <bright_max index="1" type="double" size="[1 1]">
+                        [240.0000 ]
+                    </bright_max>
+                    <wt_max index="1" type="double" size="[1 1]">
+                        [0.9000 ]
+                    </wt_max>
+                    <air_min index="1" type="double" size="[1 1]">
+                        [200.0000 ]
+                    </air_min>
+                    <air_max index="1" type="double" size="[1 1]">
+                        [250.0000 ]
+                    </air_max>
+                    <tmax_base index="1" type="double" size="[1 1]">
+                        [125.0000 ]
+                    </tmax_base>
+                    <tmax_off index="1" type="double" size="[1 1]">
+                        [0.1000 ]
+                    </tmax_off>
+                    <tmax_max index="1" type="double" size="[1 1]">
+                        [0.5000 ]
+                    </tmax_max>
+                    <hist_gratio index="1" type="double" size="[1 1]">
+                        [2.0000 ]
+                    </hist_gratio>
+                    <hist_th_off index="1" type="double" size="[1 1]">
+                        [64.0000 ]
+                    </hist_th_off>
+                    <hist_k index="1" type="double" size="[1 1]">
+                        [2.0000 ]
+                    </hist_k>
+                    <hist_min index="1" type="double" size="[1 1]">
+                        [0.0150 ]
+                    </hist_min>
+                    <enhance_en index="1" type="double" size="[1 1]">
+                        [1 ]
+                    </enhance_en>
+                    <enhance_value index="1" type="double" size="[1 1]">
+                        [1.0000 ]
+                    </enhance_value>
+                    <hist_para_en index="1" type="double" size="[1 1]">
+                        [1 ]
+                    </hist_para_en>
+                    <hist_scale index="1" type="double" size="[1 1]">
+                        [0.9000 ]
+                    </hist_scale>
+                    <stab_fnum index="1" type="double" size="[1 1]">
+                        [8.0000 ]
+                    </stab_fnum>
+                    <sigma index="1" type="double" size="[1 1]">
+                        [6.0000 ]
+                    </sigma>
+                    <wt_sigma index="1" type="double" size="[1 1]">
+                        [8.0000 ]
+                    </wt_sigma>
+                    <air_sigma index="1" type="double" size="[1 1]">
+                        [120.0000 ]
+                    </air_sigma>
+                    <tmax_sigma index="1" type="double" size="[1 1]">
+                        [0.0100 ]
+                    </tmax_sigma>
+                    <cfg_alpha index="1" type="double" size="[1 1]">
+                        [0.0000 ]
+                    </cfg_alpha>
+                    <cfg_wt index="1" type="double" size="[1 1]">
+                        [0.8000 ]
+                    </cfg_wt>
+                    <cfg_air index="1" type="double" size="[1 1]">
+                        [210.0000 ]
+                    </cfg_air>
+                    <cfg_tmax index="1" type="double" size="[1 1]">
+                        [0.2000 ]
+                    </cfg_tmax>
+                    <cfg_gratio index="1" type="double" size="[1 1]">
+                        [2.0000 ]
+                    </cfg_gratio>
+                    <dc_thed index="1" type="double" size="[1 1]">
+                        [2.0000 ]
+                    </dc_thed>
+                    <dc_weitcur index="1" type="double" size="[1 1]">
+                        [1.0000 ]
+                    </dc_weitcur>
+                    <air_thed index="1" type="double" size="[1 1]">
+                        [2.0000 ]
+                    </air_thed>
+                    <air_weitcur index="1" type="double" size="[1 1]">
+                        [0.1400 ]
+                    </air_weitcur>
+                </cell>
+                <cell index="7" type="struct" size="[1 1]">
+                    <iso index="1" type="double" size="[1 1]">
+                        [3200.0000 ]
+                    </iso>
+                    <dehaze_en index="1" type="double" size="[1 1]">
+                        [0 ]
+                    </dehaze_en>
+                    <dc_en index="1" type="double" size="[1 1]">
+                        [1 ]
+                    </dc_en>
+                    <hist_en index="1" type="double" size="[1 1]">
+                        [0 ]
+                    </hist_en>
+                    <hist_channel index="1" type="double" size="[1 1]">
+                        [0 ]
+                    </hist_channel>
+                    <gain_en index="1" type="double" size="[1 1]">
+                        [1 ]
+                    </gain_en>
+                    <dc_min_th index="1" type="double" size="[1 1]">
+                        [64.0000 ]
+                    </dc_min_th>
+                    <dc_max_th index="1" type="double" size="[1 1]">
+                        [192.0000 ]
+                    </dc_max_th>
+                    <yhist_th index="1" type="double" size="[1 1]">
+                        [249.0000 ]
+                    </yhist_th>
+                    <yblk_th index="1" type="double" size="[1 1]">
+                        [0.0020 ]
+                    </yblk_th>
+                    <dark_th index="1" type="double" size="[1 1]">
+                        [250.0000 ]
+                    </dark_th>
+                    <bright_min index="1" type="double" size="[1 1]">
+                        [180.0000 ]
+                    </bright_min>
+                    <bright_max index="1" type="double" size="[1 1]">
+                        [240.0000 ]
+                    </bright_max>
+                    <wt_max index="1" type="double" size="[1 1]">
+                        [0.9000 ]
+                    </wt_max>
+                    <air_min index="1" type="double" size="[1 1]">
+                        [200.0000 ]
+                    </air_min>
+                    <air_max index="1" type="double" size="[1 1]">
+                        [250.0000 ]
+                    </air_max>
+                    <tmax_base index="1" type="double" size="[1 1]">
+                        [125.0000 ]
+                    </tmax_base>
+                    <tmax_off index="1" type="double" size="[1 1]">
+                        [0.1000 ]
+                    </tmax_off>
+                    <tmax_max index="1" type="double" size="[1 1]">
+                        [0.5000 ]
+                    </tmax_max>
+                    <hist_gratio index="1" type="double" size="[1 1]">
+                        [2.0000 ]
+                    </hist_gratio>
+                    <hist_th_off index="1" type="double" size="[1 1]">
+                        [64.0000 ]
+                    </hist_th_off>
+                    <hist_k index="1" type="double" size="[1 1]">
+                        [2.0000 ]
+                    </hist_k>
+                    <hist_min index="1" type="double" size="[1 1]">
+                        [0.0150 ]
+                    </hist_min>
+                    <enhance_en index="1" type="double" size="[1 1]">
+                        [1 ]
+                    </enhance_en>
+                    <enhance_value index="1" type="double" size="[1 1]">
+                        [1.0000 ]
+                    </enhance_value>
+                    <hist_para_en index="1" type="double" size="[1 1]">
+                        [1 ]
+                    </hist_para_en>
+                    <hist_scale index="1" type="double" size="[1 1]">
+                        [0.9000 ]
+                    </hist_scale>
+                    <stab_fnum index="1" type="double" size="[1 1]">
+                        [8.0000 ]
+                    </stab_fnum>
+                    <sigma index="1" type="double" size="[1 1]">
+                        [6.0000 ]
+                    </sigma>
+                    <wt_sigma index="1" type="double" size="[1 1]">
+                        [8.0000 ]
+                    </wt_sigma>
+                    <air_sigma index="1" type="double" size="[1 1]">
+                        [120.0000 ]
+                    </air_sigma>
+                    <tmax_sigma index="1" type="double" size="[1 1]">
+                        [0.0100 ]
+                    </tmax_sigma>
+                    <cfg_alpha index="1" type="double" size="[1 1]">
+                        [0.0000 ]
+                    </cfg_alpha>
+                    <cfg_wt index="1" type="double" size="[1 1]">
+                        [0.8000 ]
+                    </cfg_wt>
+                    <cfg_air index="1" type="double" size="[1 1]">
+                        [210.0000 ]
+                    </cfg_air>
+                    <cfg_tmax index="1" type="double" size="[1 1]">
+                        [0.2000 ]
+                    </cfg_tmax>
+                    <cfg_gratio index="1" type="double" size="[1 1]">
+                        [2.0000 ]
+                    </cfg_gratio>
+                    <dc_thed index="1" type="double" size="[1 1]">
+                        [2.0000 ]
+                    </dc_thed>
+                    <dc_weitcur index="1" type="double" size="[1 1]">
+                        [1.0000 ]
+                    </dc_weitcur>
+                    <air_thed index="1" type="double" size="[1 1]">
+                        [2.0000 ]
+                    </air_thed>
+                    <air_weitcur index="1" type="double" size="[1 1]">
+                        [0.1400 ]
+                    </air_weitcur>
+                </cell>
+                <cell index="8" type="struct" size="[1 1]">
+                    <iso index="1" type="double" size="[1 1]">
+                        [6400.0000 ]
+                    </iso>
+                    <dehaze_en index="1" type="double" size="[1 1]">
+                        [0 ]
+                    </dehaze_en>
+                    <dc_en index="1" type="double" size="[1 1]">
+                        [1 ]
+                    </dc_en>
+                    <hist_en index="1" type="double" size="[1 1]">
+                        [0 ]
+                    </hist_en>
+                    <hist_channel index="1" type="double" size="[1 1]">
+                        [0 ]
+                    </hist_channel>
+                    <gain_en index="1" type="double" size="[1 1]">
+                        [1 ]
+                    </gain_en>
+                    <dc_min_th index="1" type="double" size="[1 1]">
+                        [64.0000 ]
+                    </dc_min_th>
+                    <dc_max_th index="1" type="double" size="[1 1]">
+                        [192.0000 ]
+                    </dc_max_th>
+                    <yhist_th index="1" type="double" size="[1 1]">
+                        [249.0000 ]
+                    </yhist_th>
+                    <yblk_th index="1" type="double" size="[1 1]">
+                        [0.0020 ]
+                    </yblk_th>
+                    <dark_th index="1" type="double" size="[1 1]">
+                        [250.0000 ]
+                    </dark_th>
+                    <bright_min index="1" type="double" size="[1 1]">
+                        [180.0000 ]
+                    </bright_min>
+                    <bright_max index="1" type="double" size="[1 1]">
+                        [240.0000 ]
+                    </bright_max>
+                    <wt_max index="1" type="double" size="[1 1]">
+                        [0.9000 ]
+                    </wt_max>
+                    <air_min index="1" type="double" size="[1 1]">
+                        [200.0000 ]
+                    </air_min>
+                    <air_max index="1" type="double" size="[1 1]">
+                        [250.0000 ]
+                    </air_max>
+                    <tmax_base index="1" type="double" size="[1 1]">
+                        [125.0000 ]
+                    </tmax_base>
+                    <tmax_off index="1" type="double" size="[1 1]">
+                        [0.1000 ]
+                    </tmax_off>
+                    <tmax_max index="1" type="double" size="[1 1]">
+                        [0.5000 ]
+                    </tmax_max>
+                    <hist_gratio index="1" type="double" size="[1 1]">
+                        [2.0000 ]
+                    </hist_gratio>
+                    <hist_th_off index="1" type="double" size="[1 1]">
+                        [64.0000 ]
+                    </hist_th_off>
+                    <hist_k index="1" type="double" size="[1 1]">
+                        [2.0000 ]
+                    </hist_k>
+                    <hist_min index="1" type="double" size="[1 1]">
+                        [0.0150 ]
+                    </hist_min>
+                    <enhance_en index="1" type="double" size="[1 1]">
+                        [1 ]
+                    </enhance_en>
+                    <enhance_value index="1" type="double" size="[1 1]">
+                        [1.0000 ]
+                    </enhance_value>
+                    <hist_para_en index="1" type="double" size="[1 1]">
+                        [1 ]
+                    </hist_para_en>
+                    <hist_scale index="1" type="double" size="[1 1]">
+                        [0.9000 ]
+                    </hist_scale>
+                    <stab_fnum index="1" type="double" size="[1 1]">
+                        [8.0000 ]
+                    </stab_fnum>
+                    <sigma index="1" type="double" size="[1 1]">
+                        [6.0000 ]
+                    </sigma>
+                    <wt_sigma index="1" type="double" size="[1 1]">
+                        [8.0000 ]
+                    </wt_sigma>
+                    <air_sigma index="1" type="double" size="[1 1]">
+                        [120.0000 ]
+                    </air_sigma>
+                    <tmax_sigma index="1" type="double" size="[1 1]">
+                        [0.0100 ]
+                    </tmax_sigma>
+                    <cfg_alpha index="1" type="double" size="[1 1]">
+                        [0.0000 ]
+                    </cfg_alpha>
+                    <cfg_wt index="1" type="double" size="[1 1]">
+                        [0.8000 ]
+                    </cfg_wt>
+                    <cfg_air index="1" type="double" size="[1 1]">
+                        [210.0000 ]
+                    </cfg_air>
+                    <cfg_tmax index="1" type="double" size="[1 1]">
+                        [0.2000 ]
+                    </cfg_tmax>
+                    <cfg_gratio index="1" type="double" size="[1 1]">
+                        [2.0000 ]
+                    </cfg_gratio>
+                    <dc_thed index="1" type="double" size="[1 1]">
+                        [2.0000 ]
+                    </dc_thed>
+                    <dc_weitcur index="1" type="double" size="[1 1]">
+                        [1.0000 ]
+                    </dc_weitcur>
+                    <air_thed index="1" type="double" size="[1 1]">
+                        [2.0000 ]
+                    </air_thed>
+                    <air_weitcur index="1" type="double" size="[1 1]">
+                        [0.1400 ]
+                    </air_weitcur>
+                </cell>
+                <cell index="9" type="struct" size="[1 1]">
+                    <iso index="1" type="double" size="[1 1]">
+                        [12800.0000 ]
+                    </iso>
+                    <dehaze_en index="1" type="double" size="[1 1]">
+                        [0 ]
+                    </dehaze_en>
+                    <dc_en index="1" type="double" size="[1 1]">
+                        [1 ]
+                    </dc_en>
+                    <hist_en index="1" type="double" size="[1 1]">
+                        [0 ]
+                    </hist_en>
+                    <hist_channel index="1" type="double" size="[1 1]">
+                        [0 ]
+                    </hist_channel>
+                    <gain_en index="1" type="double" size="[1 1]">
+                        [1 ]
+                    </gain_en>
+                    <dc_min_th index="1" type="double" size="[1 1]">
+                        [64.0000 ]
+                    </dc_min_th>
+                    <dc_max_th index="1" type="double" size="[1 1]">
+                        [192.0000 ]
+                    </dc_max_th>
+                    <yhist_th index="1" type="double" size="[1 1]">
+                        [249.0000 ]
+                    </yhist_th>
+                    <yblk_th index="1" type="double" size="[1 1]">
+                        [0.0020 ]
+                    </yblk_th>
+                    <dark_th index="1" type="double" size="[1 1]">
+                        [250.0000 ]
+                    </dark_th>
+                    <bright_min index="1" type="double" size="[1 1]">
+                        [180.0000 ]
+                    </bright_min>
+                    <bright_max index="1" type="double" size="[1 1]">
+                        [240.0000 ]
+                    </bright_max>
+                    <wt_max index="1" type="double" size="[1 1]">
+                        [0.9000 ]
+                    </wt_max>
+                    <air_min index="1" type="double" size="[1 1]">
+                        [200.0000 ]
+                    </air_min>
+                    <air_max index="1" type="double" size="[1 1]">
+                        [250.0000 ]
+                    </air_max>
+                    <tmax_base index="1" type="double" size="[1 1]">
+                        [125.0000 ]
+                    </tmax_base>
+                    <tmax_off index="1" type="double" size="[1 1]">
+                        [0.1000 ]
+                    </tmax_off>
+                    <tmax_max index="1" type="double" size="[1 1]">
+                        [0.5000 ]
+                    </tmax_max>
+                    <hist_gratio index="1" type="double" size="[1 1]">
+                        [2.0000 ]
+                    </hist_gratio>
+                    <hist_th_off index="1" type="double" size="[1 1]">
+                        [64.0000 ]
+                    </hist_th_off>
+                    <hist_k index="1" type="double" size="[1 1]">
+                        [2.0000 ]
+                    </hist_k>
+                    <hist_min index="1" type="double" size="[1 1]">
+                        [0.0150 ]
+                    </hist_min>
+                    <enhance_en index="1" type="double" size="[1 1]">
+                        [1 ]
+                    </enhance_en>
+                    <enhance_value index="1" type="double" size="[1 1]">
+                        [1.0000 ]
+                    </enhance_value>
+                    <hist_para_en index="1" type="double" size="[1 1]">
+                        [1 ]
+                    </hist_para_en>
+                    <hist_scale index="1" type="double" size="[1 1]">
+                        [0.9000 ]
+                    </hist_scale>
+                    <stab_fnum index="1" type="double" size="[1 1]">
+                        [8.0000 ]
+                    </stab_fnum>
+                    <sigma index="1" type="double" size="[1 1]">
+                        [6.0000 ]
+                    </sigma>
+                    <wt_sigma index="1" type="double" size="[1 1]">
+                        [8.0000 ]
+                    </wt_sigma>
+                    <air_sigma index="1" type="double" size="[1 1]">
+                        [120.0000 ]
+                    </air_sigma>
+                    <tmax_sigma index="1" type="double" size="[1 1]">
+                        [0.0100 ]
+                    </tmax_sigma>
+                    <cfg_alpha index="1" type="double" size="[1 1]">
+                        [0.0000 ]
+                    </cfg_alpha>
+                    <cfg_wt index="1" type="double" size="[1 1]">
+                        [0.8000 ]
+                    </cfg_wt>
+                    <cfg_air index="1" type="double" size="[1 1]">
+                        [210.0000 ]
+                    </cfg_air>
+                    <cfg_tmax index="1" type="double" size="[1 1]">
+                        [0.2000 ]
+                    </cfg_tmax>
+                    <cfg_gratio index="1" type="double" size="[1 1]">
+                        [2.0000 ]
+                    </cfg_gratio>
+                    <dc_thed index="1" type="double" size="[1 1]">
+                        [2.0000 ]
+                    </dc_thed>
+                    <dc_weitcur index="1" type="double" size="[1 1]">
+                        [1.0000 ]
+                    </dc_weitcur>
+                    <air_thed index="1" type="double" size="[1 1]">
+                        [2.0000 ]
+                    </air_thed>
+                    <air_weitcur index="1" type="double" size="[1 1]">
+                        [0.1400 ]
+                    </air_weitcur>
+                </cell>
+         </Night_DEHAZE_ISO>
         </DEHAZE>
         <SENSORINFO index="1" type="struct" size="[1 1]">
             <GainRange index="1" type="struct" size="[1 1]">
@@ -36591,6 +38845,7 @@
             <CISIspDgainRange index="1" type="double" size="[1 2]">
                 [1.0000 1.0000 ]
             </CISIspDgainRange>
+ 	<CISHdrGainIndSetEn index="1" type="double" size="[1 1]">            [1]         </CISHdrGainIndSetEn>
             <SensorFlip index="1" type="char" size="[1 1]">
                 [0 ]
             </SensorFlip>

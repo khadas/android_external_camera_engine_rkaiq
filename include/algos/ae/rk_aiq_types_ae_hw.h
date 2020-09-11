@@ -50,40 +50,46 @@ typedef enum _HIST_MODE {
  * @brief   ISP2.0 AEC HW-Meas Config Params
  */
 /*****************************************************************************/
-
+#pragma pack(1)
 struct window {
     unsigned short h_offs;
     unsigned short v_offs;
     unsigned short h_size;
     unsigned short v_size;
-} __attribute__ ((packed));
+};
+#pragma pack()
 
 
+#pragma pack(1)
 struct rawaebig_meas_cfg {
     unsigned char rawae_sel;
     unsigned char wnd_num;
     unsigned char subwin_en[RAWAEBIG_SUBWIN_NUM];
     struct window win;
     struct window subwin[RAWAEBIG_SUBWIN_NUM];
-} __attribute__ ((packed));
+};
+#pragma pack()
 
-
+#pragma pack(1)
 struct rawaelite_meas_cfg {
     unsigned char rawae_sel;
     unsigned char wnd_num;
     struct window win;
-} __attribute__ ((packed));
+};
+#pragma pack()
 
-
+#pragma pack(1)
 struct yuvae_meas_cfg {
     unsigned char ysel;
     unsigned char wnd_num;
     unsigned char subwin_en[YUVAE_SUBWIN_NUM];
     struct window win;
     struct window subwin[YUVAE_SUBWIN_NUM];
-} __attribute__ ((packed));
+};
+#pragma pack()
 
 
+#pragma pack(1)
 struct rawhistbig_cfg {
     unsigned char wnd_num;
     unsigned char data_sel;
@@ -96,8 +102,10 @@ struct rawhistbig_cfg {
     unsigned char rcc;
     struct window win;
     unsigned char weight[RAWHISTBIG_WIN_NUM];
-} __attribute__ ((packed));
+};
+#pragma pack()
 
+#pragma pack(1)
 struct rawhistlite_cfg {
     unsigned char data_sel;
     unsigned char waterline;
@@ -109,8 +117,10 @@ struct rawhistlite_cfg {
     unsigned char rcc;
     struct window win;
     unsigned char weight[RAWHISTLITE_WIN_NUM];
-} __attribute__ ((packed));
+};
+#pragma pack()
 
+#pragma pack(1)
 struct sihst_win_cfg {
     unsigned char  data_sel;
     unsigned char  waterline;
@@ -118,14 +128,16 @@ struct sihst_win_cfg {
     unsigned char  mode;
     unsigned char  stepsize;
     struct window win;
-} __attribute__ ((packed));
+};
+#pragma pack()
 
-
+#pragma pack(1)
 struct sihst_cfg {
     unsigned char wnd_num;
     struct sihst_win_cfg win_cfg[SIHIST_WINCFG_NUM];
     unsigned char hist_weight[SIHIST_WIN_NUM];
-} __attribute__ ((packed));
+};
+#pragma pack()
 
 /*NOTE: name of rawae/rawhist channel has been renamed!
    RawAE0 = RawAE lite,  addr=0x4500  <=> RawHIST0

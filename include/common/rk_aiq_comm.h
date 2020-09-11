@@ -66,8 +66,12 @@ typedef enum RKAiqOPMode_e {
 } RKAiqOPMode_t;
 
 #define ABS(a) (((a) > 0) ? (a) : (-(a)))
-#define MAX(a,b)  ((a) >= (b) ? (a):(b))
-#define MIN(a,b)  ((a) <= (b) ? (a):(b))
+#ifndef MIN
+#define MIN(a,b)  ((a) > (b) ? (b) : (a))
+#endif
+#ifndef MAX
+#define MAX(a,b)  ((a) < (b) ? (b) : (a))
+#endif
 #define ROUND_D(x) (long)(((double)x)+(((x) > 0) ? 0.5 : (-0.5)))
 #define ROUND_F(x) (int)(((float)x)+(((x) > 0) ? 0.5 : (-0.5)))
 #define FLOOR(a)   (int)( ((double)(a) < (int)(a)) ? (int)((a)-1) : (int)(a) )

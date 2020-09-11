@@ -48,8 +48,14 @@ RkAiqMngCmdThread::loop ()
 
     switch (msg->cmd) {
     case MSG_CMD_SW_WORKING_MODE:
+        if (msg->sync)
+            msg->mutex->lock();
         mAiqMng->swWorkingModeDyn(msg->data.sw_wk_mode.mode);
         mAiqMng->mWkSwitching = false;
+        if (msg->sync) {
+            msg->cond->broadcast ();
+            msg->mutex->unlock();
+        }
         break;
     default:
         break;
@@ -559,6 +565,9 @@ set_ispp_end:
         if (ret)
             LOGE_ANALYZER("setFocusParams error %d", ret);
     }
+
+// disable this feature now, this require the hdr mode set to auto
+#if 0
     // switch working mode by gray_mode ?
     if (aiqParams->mIspParams.ptr()) {
         SmartPtr<rk_aiq_isp_params_t> isp_params = aiqParams->mIspParams->data();
@@ -571,6 +580,7 @@ set_ispp_end:
             LOGD_ANALYZER("switch to BW, old mode %d", mOldWkModeForGray);
             SmartPtr<RkAiqMngCmdThread::msg_t> msg = new RkAiqMngCmdThread::msg_t();
             msg->cmd = RkAiqMngCmdThread::MSG_CMD_SW_WORKING_MODE;
+            msg->sync = false;
             msg->data.sw_wk_mode.mode = RK_AIQ_WORKING_MODE_NORMAL;
             mAiqMngCmdTh->send_cmd(msg);
         } else if (isp_params->ie.base.mode != RK_AIQ_IE_EFFECT_BW &&
@@ -579,12 +589,14 @@ set_ispp_end:
             mWkSwitching = true;
             SmartPtr<RkAiqMngCmdThread::msg_t> msg = new RkAiqMngCmdThread::msg_t();
             msg->cmd = RkAiqMngCmdThread::MSG_CMD_SW_WORKING_MODE;
+            msg->sync = false;
             msg->data.sw_wk_mode.mode = mOldWkModeForGray;
             mAiqMngCmdTh->send_cmd(msg);
             mOldWkModeForGray = RK_AIQ_WORKING_MODE_NORMAL;
+            LOGD_ANALYZER("done switch to color, old mode %d", mOldWkModeForGray);
         }
     }
-
+#endif
     EXIT_XCORE_FUNCTION();
 out:
     return ret;
@@ -736,6 +748,16 @@ void RkAiqManager::setDefMirrorFlip()
     setMirrorFlip(def_mirr, def_flip);
 }
 
+XCamReturn RkAiqManager::swWorkingModeDyn_msg(rk_aiq_working_mode_t mode) {
+    SmartPtr<RkAiqMngCmdThread::msg_t> msg = new RkAiqMngCmdThread::msg_t();
+    msg->cmd = RkAiqMngCmdThread::MSG_CMD_SW_WORKING_MODE;
+    msg->sync = true;
+    msg->data.sw_wk_mode.mode = mode;
+    mAiqMngCmdTh->send_cmd(msg);
+
+    return XCAM_RETURN_NO_ERROR;
+}
+
 XCamReturn RkAiqManager::swWorkingModeDyn(rk_aiq_working_mode_t mode)
 {
     ENTER_XCORE_FUNCTION();
@@ -818,7 +840,6 @@ restart:
     /* RKAIQMNG_CHECK_RET(ret, "pause hwi error %d", ret); */
 
     mWorkingMode = mode;
-
     EXIT_XCORE_FUNCTION();
     return XCAM_RETURN_NO_ERROR;
 }

@@ -55,11 +55,23 @@ public:
                 rk_aiq_working_mode_t mode;
             } sw_wk_mode;
         } data;
+        bool sync;
+        SmartPtr<Mutex>             mutex;
+        SmartPtr<XCam::Cond>        cond;
     } msg_t;
 
     bool send_cmd(SmartPtr<msg_t> msg) {
         bool ret = true;
-        ret = mAiqCmdQueue.push(msg);
+        if (msg->sync) {
+            msg->mutex = new Mutex();
+            msg->cond = new XCam::Cond();
+            SmartLock lock (*msg->mutex.ptr());
+            ret = mAiqCmdQueue.push(msg);
+            msg->cond->wait(*msg->mutex.ptr());
+        } else {
+            ret = mAiqCmdQueue.push(msg);
+        }
+
         return ret;
     };
 
@@ -153,9 +165,10 @@ public:
     XCamReturn setMirrorFlip(bool mirror, bool flip);
     XCamReturn getMirrorFlip(bool& mirror, bool& flip);
     void setDefMirrorFlip();
-    XCamReturn swWorkingModeDyn(rk_aiq_working_mode_t mode);
+    XCamReturn swWorkingModeDyn_msg(rk_aiq_working_mode_t mode);
 protected:
     XCamReturn applyAnalyzerResult(SmartPtr<RkAiqFullParamsProxy>& results);
+    XCamReturn swWorkingModeDyn(rk_aiq_working_mode_t mode);
 private:
     enum aiq_state_e {
         AIQ_STATE_INVALID,

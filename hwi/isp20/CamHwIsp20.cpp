@@ -27,7 +27,7 @@ namespace RkCam {
 std::map<std::string, SmartPtr<rk_aiq_static_info_t>> CamHwIsp20::mCamHwInfos;
 std::map<std::string, SmartPtr<rk_sensor_full_info_t>> CamHwIsp20::mSensorHwInfos;
 rk_aiq_isp_hw_info_t CamHwIsp20::mIspHwInfos;
-rk_aiq_cif_info_t CamHwIsp20::mCifHwInfos;
+rk_aiq_cif_hw_info_t CamHwIsp20::mCifHwInfos;
 
 CamHwIsp20::CamHwIsp20()
     : _is_exit(false)
@@ -473,22 +473,35 @@ get_isp_subdevs(struct media_device *device, const char *devpath, rk_aiq_isp_t* 
     return &isp_info[index];
 }
 
-static void
+static rk_aiq_cif_info_t*
 get_cif_subdevs(struct media_device *device, const char *devpath, rk_aiq_cif_info_t* cif_info)
 {
     media_entity *entity = NULL;
     const char *entity_name = NULL;
     int index = 0;
     if(!device || !devpath || !cif_info)
-        return ;
+        return NULL;
 
-    strncpy(cif_info->media_dev_path, devpath, sizeof(cif_info->media_dev_path));
+    for(index = 0; index < MAX_CIF_NUM; index++) {
+        if (0 == strlen(cif_info[index].media_dev_path))
+            break;
+        if (0 == strncmp(cif_info[index].media_dev_path, devpath, sizeof(cif_info[index].media_dev_path))) {
+            LOGD_CAMHW_SUBM(ISP20HW_SUBM, "isp info of path %s exists!", devpath);
+            return &cif_info[index];
+        }
+    }
+    if (index >= 2)
+        return NULL;
+
+    cif_info[index].model_idx = index;
+
+    strncpy(cif_info[index].media_dev_path, devpath, sizeof(cif_info[index].media_dev_path));
 
     entity = media_get_entity_by_name(device, "stream_cif_mipi_id0", strlen("stream_cif_mipi_id0"));
     if(entity) {
         entity_name = media_entity_get_devname (entity);
         if(entity_name) {
-            strncpy(cif_info->mipi_id0, entity_name, sizeof(cif_info->mipi_id0));
+            strncpy(cif_info[index].mipi_id0, entity_name, sizeof(cif_info[index].mipi_id0));
         }
     }
 
@@ -496,7 +509,7 @@ get_cif_subdevs(struct media_device *device, const char *devpath, rk_aiq_cif_inf
     if(entity) {
         entity_name = media_entity_get_devname (entity);
         if(entity_name) {
-            strncpy(cif_info->mipi_id1, entity_name, sizeof(cif_info->mipi_id1));
+            strncpy(cif_info[index].mipi_id1, entity_name, sizeof(cif_info[index].mipi_id1));
         }
     }
 
@@ -504,7 +517,7 @@ get_cif_subdevs(struct media_device *device, const char *devpath, rk_aiq_cif_inf
     if(entity) {
         entity_name = media_entity_get_devname (entity);
         if(entity_name) {
-            strncpy(cif_info->mipi_id2, entity_name, sizeof(cif_info->mipi_id2));
+            strncpy(cif_info[index].mipi_id2, entity_name, sizeof(cif_info[index].mipi_id2));
         }
     }
 
@@ -512,7 +525,7 @@ get_cif_subdevs(struct media_device *device, const char *devpath, rk_aiq_cif_inf
     if(entity) {
         entity_name = media_entity_get_devname (entity);
         if(entity_name) {
-            strncpy(cif_info->mipi_id3, entity_name, sizeof(cif_info->mipi_id3));
+            strncpy(cif_info[index].mipi_id3, entity_name, sizeof(cif_info[index].mipi_id3));
         }
     }
 
@@ -520,7 +533,7 @@ get_cif_subdevs(struct media_device *device, const char *devpath, rk_aiq_cif_inf
     if(entity) {
         entity_name = media_entity_get_devname (entity);
         if(entity_name) {
-            strncpy(cif_info->mipi_luma_path, entity_name, sizeof(cif_info->mipi_luma_path));
+            strncpy(cif_info[index].mipi_luma_path, entity_name, sizeof(cif_info[index].mipi_luma_path));
         }
     }
 
@@ -528,7 +541,7 @@ get_cif_subdevs(struct media_device *device, const char *devpath, rk_aiq_cif_inf
     if(entity) {
         entity_name = media_entity_get_devname (entity);
         if(entity_name) {
-            strncpy(cif_info->mipi_csi2_sd_path, entity_name, sizeof(cif_info->mipi_csi2_sd_path));
+            strncpy(cif_info[index].mipi_csi2_sd_path, entity_name, sizeof(cif_info[index].mipi_csi2_sd_path));
         }
     }
 
@@ -536,7 +549,15 @@ get_cif_subdevs(struct media_device *device, const char *devpath, rk_aiq_cif_inf
     if(entity) {
         entity_name = media_entity_get_devname (entity);
         if(entity_name) {
-            strncpy(cif_info->lvds_sd_path, entity_name, sizeof(cif_info->lvds_sd_path));
+            strncpy(cif_info[index].lvds_sd_path, entity_name, sizeof(cif_info[index].lvds_sd_path));
+        }
+    }
+
+    entity = media_get_entity_by_name(device, "rkcif-lite-lvds-subdev", strlen("rkcif-lite-lvds-subdev"));
+    if(entity) {
+        entity_name = media_entity_get_devname (entity);
+        if(entity_name) {
+            strncpy(cif_info[index].lvds_sd_path, entity_name, sizeof(cif_info[index].lvds_sd_path));
         }
     }
 
@@ -544,9 +565,11 @@ get_cif_subdevs(struct media_device *device, const char *devpath, rk_aiq_cif_inf
     if(entity) {
         entity_name = media_entity_get_devname (entity);
         if(entity_name) {
-            strncpy(cif_info->mipi_dphy_rx_path, entity_name, sizeof(cif_info->mipi_csi2_sd_path));
+            strncpy(cif_info[index].mipi_dphy_rx_path, entity_name, sizeof(cif_info[index].mipi_csi2_sd_path));
         }
     }
+
+    return &cif_info[index];
 }
 
 
@@ -735,9 +758,9 @@ CamHwIsp20::initCamHwInfos()
                    strcmp(device->info.model, "rkisp") == 0) {
             isp_info = get_isp_subdevs(device, sys_path, CamHwIsp20::mIspHwInfos.isp_info);
         } else if (strcmp(device->info.model, "rkcif") == 0 ||
-                   strcmp(device->info.model, "rkcif_mipi_lvds") == 0) {
-            cif_info = &CamHwIsp20::mCifHwInfos;
-            get_cif_subdevs(device, sys_path, cif_info);
+                   strcmp(device->info.model, "rkcif_mipi_lvds") == 0 ||
+                   strcmp(device->info.model, "rkcif_lite_mipi_lvds") == 0) {
+            cif_info = get_cif_subdevs(device, sys_path, CamHwIsp20::mCifHwInfos.cif_info);
         } else {
             goto media_unref;
         }
@@ -832,6 +855,7 @@ media_unref:
                                     s_full_info->sensor_name.c_str(),
                                     CamHwIsp20::mCamHwInfos[s_full_info->sensor_name]->sensor_info.binded_strm_media_idx,
                                     s_full_info->ispp_info->media_dev_path);
+                    CamHwIsp20::mIspHwInfos.isp_info[i].linked_sensor = true;
                     break;
                 }
             }
@@ -1074,8 +1098,10 @@ CamHwIsp20::deInit()
         !mNormalNoReadBack) {
         setupHdrLink(RK_AIQ_WORKING_MODE_ISP_HDR3, isp_index, false);
     } else {
-        setupHdrLink(RK_AIQ_WORKING_MODE_ISP_HDR3, isp_index, false);
-        setupHdrLink_vidcap(_hdr_mode, false);
+        if (!_linked_to_isp) {
+            setupHdrLink(RK_AIQ_WORKING_MODE_ISP_HDR3, isp_index, false);
+            setupHdrLink_vidcap(_hdr_mode, isp_index, false);
+        }
     }
 
     _state = CAM_HW_STATE_INVALID;
@@ -1436,7 +1462,7 @@ CamHwIsp20::setupPipelineFmt()
 }
 
 XCamReturn
-CamHwIsp20::setupHdrLink_vidcap(int hdr_mode, bool enable)
+CamHwIsp20::setupHdrLink_vidcap(int hdr_mode, int cif_index, bool enable)
 {
     media_device *device = NULL;
     media_entity *entity = NULL;
@@ -1449,7 +1475,7 @@ CamHwIsp20::setupHdrLink_vidcap(int hdr_mode, bool enable)
         return XCAM_RETURN_NO_ERROR;
 
     // TODO: normal mode
-    device = media_device_new (mCifHwInfos.media_dev_path);
+    device = media_device_new (mCifHwInfos.cif_info[cif_index].media_dev_path);
 
     /* Enumerate entities, pads and links. */
     media_device_enumerate (device);
@@ -1459,6 +1485,24 @@ CamHwIsp20::setupHdrLink_vidcap(int hdr_mode, bool enable)
         if (!src_pad_s) {
             LOGE_CAMHW_SUBM(ISP20HW_SUBM, "get rockchip-mipi-csi2 source pad0 failed !\n");
             goto FAIL;
+        }
+    } else {
+        entity = media_get_entity_by_name(device, "rkcif-lvds-subdev", strlen("rkcif-lvds-subdev"));
+        if(entity) {
+            src_pad_s = (media_pad *)media_entity_get_pad(entity, 1);
+            if (!src_pad_s) {
+                LOGE_CAMHW_SUBM(ISP20HW_SUBM, "get rkcif-lvds-subdev source pad0 failed !\n");
+                goto FAIL;
+            }
+        } else {
+            entity = media_get_entity_by_name(device, "rkcif-lite-lvds-subdev", strlen("rkcif-lite-lvds-subdev"));
+            if(entity) {
+                src_pad_s = (media_pad *)media_entity_get_pad(entity, 1);
+                if (!src_pad_s) {
+                    LOGE_CAMHW_SUBM(ISP20HW_SUBM, "get rkcif-lite-lvds-subdev source pad0 failed !\n");
+                    goto FAIL;
+                }
+            }
         }
     }
 
@@ -1481,6 +1525,24 @@ CamHwIsp20::setupHdrLink_vidcap(int hdr_mode, bool enable)
         if (!src_pad_m) {
             LOGE_CAMHW_SUBM(ISP20HW_SUBM, "get rockchip-mipi-csi2 source pad0 failed !\n");
             goto FAIL;
+        }
+    } else {
+        entity = media_get_entity_by_name(device, "rkcif-lvds-subdev", strlen("rkcif-lvds-subdev"));
+        if(entity) {
+            src_pad_m = (media_pad *)media_entity_get_pad(entity, 2);
+            if (!src_pad_m) {
+                LOGE_CAMHW_SUBM(ISP20HW_SUBM, "get rkcif-lvds-subdev source pad0 failed !\n");
+                goto FAIL;
+            }
+        } else {
+            entity = media_get_entity_by_name(device, "rkcif-lite-lvds-subdev", strlen("rkcif-lite-lvds-subdev"));
+            if(entity) {
+                src_pad_m = (media_pad *)media_entity_get_pad(entity, 2);
+                if (!src_pad_m) {
+                    LOGE_CAMHW_SUBM(ISP20HW_SUBM, "get rkcif-lite-lvds-subdev source pad0 failed !\n");
+                    goto FAIL;
+                }
+            }
         }
     }
 
@@ -1695,7 +1757,8 @@ CamHwIsp20::prepare(uint32_t width, uint32_t height, int mode, int t_delay, int 
         }
     } else {
         setupHdrLink(RK_AIQ_WORKING_MODE_ISP_HDR3, isp_index, true);
-        setupHdrLink_vidcap(_hdr_mode, true);
+        int cif_index = s_info->cif_info->model_idx;
+        setupHdrLink_vidcap(_hdr_mode, cif_index, true);
     }
 
     sensorHw = mSensorDev.dynamic_cast_ptr<SensorHw>();
@@ -2862,12 +2925,14 @@ CamHwIsp20::setIsppParamsSync(int frameId)
 
             ispp_params = (struct rkispp_params_cfg*)v4l2buf->get_buf().m.userptr;
 
+            bool update_full = false;
             // restore params for re-start and re-prepare
             if (_state == CAM_HW_STATE_STOPPED || _state == CAM_HW_STATE_PREPARED || _state == CAM_HW_STATE_PAUSED) {
                 // TODO: don't know why updating all ens will lead to no frame output
                 _full_active_ispp_params.module_en_update = _full_active_ispp_params.module_ens;
                 // just re-config the enabled moddules
                 _full_active_ispp_params.module_cfg_update = _full_active_ispp_params.module_ens;
+                update_full = true;
             } else {
                 _full_active_ispp_params.module_en_update = 0;
                 _full_active_ispp_params.module_cfg_update = 0;
@@ -2884,11 +2949,35 @@ CamHwIsp20::setIsppParamsSync(int frameId)
 
             _mutex.unlock();
 
+            u64 last_module_ens = _full_active_ispp_params.module_ens;
             gen_full_ispp_params(ispp_params, &_full_active_ispp_params);
-            // replace ens,update with _full_active_ispp_params
-            ispp_params->module_en_update = _full_active_ispp_params.module_en_update;
-            ispp_params->module_ens = _full_active_ispp_params.module_ens;
-            ispp_params->module_cfg_update = _full_active_ispp_params.module_cfg_update;
+
+            LOGD_CAMHW_SUBM(ISP20HW_SUBM, "ispp full en update 0x%x, ens 0x%x, cfg update 0x%x",
+                             _full_active_ispp_params.module_en_update,
+                             _full_active_ispp_params.module_ens,
+                             _full_active_ispp_params.module_cfg_update);
+
+            if (update_full) {
+                // replace ens,update with _full_active_ispp_params
+                ispp_params->module_en_update = _full_active_ispp_params.module_en_update;
+                ispp_params->module_ens = _full_active_ispp_params.module_ens;
+                ispp_params->module_cfg_update = _full_active_ispp_params.module_cfg_update;
+            } else {
+                int end = RK_ISP2X_PP_MAX_ID - RK_ISP2X_PP_TNR_ID;
+                u64 new_module_ens_update = 0;
+
+                for (int i = 0; i < end; i++)
+                    if ((last_module_ens & (1 << i)) != (_full_active_ispp_params.module_ens & (1 << i))) {
+                        new_module_ens_update |= 1 << i;
+                    }
+
+                ispp_params->module_en_update = new_module_ens_update;
+                ispp_params->module_ens = _full_active_ispp_params.module_ens;
+                ispp_params->module_cfg_update = _full_active_ispp_params.module_cfg_update;
+                LOGD_CAMHW_SUBM(ISP20HW_SUBM, "ispp new en update 0x%x, ens 0x%x, cfg update 0x%x",
+                                 ispp_params->module_en_update, ispp_params->module_ens,
+                                 ispp_params->module_cfg_update);
+            }
 
             LOGD_CAMHW_SUBM(ISP20HW_SUBM, "module_init_ens frome drv 0x%x\n", ispp_params->module_init_ens);
 

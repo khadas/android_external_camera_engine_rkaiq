@@ -33,6 +33,7 @@ namespace RkCam {
 #define MAX_MEDIA_INDEX               16
 #define DEV_PATH_LEN                  64
 #define SENSOR_ATTACHED_FLASH_MAX_NUM 2
+#define MAX_CIF_NUM               2
 
 #define ISP_TX_BUF_NUM 4
 #define VIPCAP_TX_BUF_NUM 6
@@ -98,6 +99,7 @@ typedef struct {
 } rk_aiq_isp_hw_info_t;
 
 typedef struct {
+    int  model_idx:3;
     char media_dev_path[DEV_PATH_LEN];
     char mipi_id0[DEV_PATH_LEN];
     char mipi_id1[DEV_PATH_LEN];
@@ -108,6 +110,11 @@ typedef struct {
     char lvds_sd_path[DEV_PATH_LEN];
     char mipi_luma_path[DEV_PATH_LEN];
 } rk_aiq_cif_info_t;
+
+typedef struct {
+    rk_aiq_cif_info_t cif_info[MAX_CIF_NUM];
+    rk_aiq_hw_ver_t hw_ver_info;
+} rk_aiq_cif_hw_info_t;
 
 typedef struct {
     /* sensor entity name format:
@@ -224,7 +231,7 @@ private:
     std::map<int, SmartPtr<RkAiqIspParamsProxy>> _effecting_ispparm_map;
     static std::map<std::string, SmartPtr<rk_aiq_static_info_t>> mCamHwInfos;
     static rk_aiq_isp_hw_info_t mIspHwInfos;
-    static rk_aiq_cif_info_t mCifHwInfos;
+    static rk_aiq_cif_hw_info_t mCifHwInfos;
     static std::map<std::string, SmartPtr<rk_sensor_full_info_t>> mSensorHwInfos;
     void gen_full_isp_params(const struct isp2x_isp_params_cfg* update_params,
                              struct isp2x_isp_params_cfg* full_params);
@@ -249,7 +256,7 @@ private:
     XCamReturn setupPipelineFmtCif(struct v4l2_subdev_selection& sns_sd_sel,
                                    struct v4l2_subdev_format& sns_sd_fmt,
                                    __u32 sns_v4l_pix_fmt);
-    XCamReturn setupHdrLink_vidcap(int hdr_mode, bool enable);
+    XCamReturn setupHdrLink_vidcap(int hdr_mode, int cif_index, bool enable);
     enum mipi_stream_idx {
         MIPI_STREAM_IDX_0   = 1,
         MIPI_STREAM_IDX_1   = 2,

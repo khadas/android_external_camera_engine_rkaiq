@@ -20,7 +20,8 @@ struct CameraCoeff
 /* 生成FEC映射表相关的参数 */
 struct FecParams
 {
-	int srcW, srcH, dstW, dstH;
+	int srcW, srcH, dstW, dstH;							/* 输入输出图像的分辨率 */
+	int srcW_ex, srcH_ex, dstW_ex, dstH_ex;				/* 扩展后的输入输出分辨率 */
 	int meshSizeW, meshSizeH, meshStepW, meshStepH;
 	int meshSize1bin;
 	int meshSize4bin;
@@ -78,10 +79,10 @@ bool genFECMeshNLevel(FecParams &fecParams, CameraCoeff &camCoeff, int level, un
 
 /* =============================================================================================================================================================================== */
 
-/*  LDCH: 初始化，根据图像输出分辨率，计算LDCH映射表的相关参数，申请需要的buffer */
+/* LDCH: 初始化，根据图像输出分辨率，计算LDCH映射表的相关参数，申请需要的buffer */
 void genLdchMeshInit(int srcW, int srcH, int dstW, int dstH, LdchParams &ldchParams, CameraCoeff &camCoeff);
 
-/*  LDCH: 反初始化 */
+/* LDCH: 反初始化 */
 void genLdchMeshDeInit(LdchParams &ldchParams);
 
 /* LDCH: 预先计算的部分: 浮点未校正的小表和level=0,level=255的多项式参数 */

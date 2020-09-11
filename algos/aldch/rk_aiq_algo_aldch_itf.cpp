@@ -134,7 +134,7 @@ prepare(RkAiqAlgoCom* params)
                     ldchCtx->dst_width, ldchCtx->dst_height,
                     ldchCtx->ldchParams, ldchCtx->camCoeff);
 
-    ldchCtx->lut_h_size = ldchCtx->ldchParams.meshSizeW / 2; //word unit
+    ldchCtx->lut_h_size = (ldchCtx->ldchParams.meshSizeW + 1) / 2; //word unit
     ldchCtx->lut_v_size = ldchCtx->ldchParams.meshSizeH;
     ldchCtx->lut_mapxy_size = ldchCtx->ldchParams.meshSize * sizeof(unsigned short);
 

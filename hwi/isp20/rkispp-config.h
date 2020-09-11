@@ -9,7 +9,7 @@
 #include <linux/types.h>
 #include <linux/v4l2-controls.h>
 
-#define ISPP_API_VERSION		KERNEL_VERSION(0, 1, 0x4)
+#define ISPP_API_VERSION		KERNEL_VERSION(0, 1, 0x6)
 
 #ifndef BIT
 #define BIT(x) (~0 & (1 << x))

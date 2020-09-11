@@ -72,11 +72,15 @@
  *  - LumaDetect: add the level2 of mutation threshold
  * v1.2.4
  *  - Aldch: add light_center and distortion_coeff
+ * v1.2.5
+ *  - dehaze: add normal, HDR and night mode
+ * v1.2.6
+ *  -sensorinfo: add CISHdrGainIndSetEn for Stagger+same gain
  */
 
 
-#define RK_AIQ_CALIB_VERSION_REAL_V          "v1.2.4"
-#define RK_AIQ_CALIB_VERSION_MAGIC_V         "1014880"
+#define RK_AIQ_CALIB_VERSION_REAL_V          "v1.2.6"
+#define RK_AIQ_CALIB_VERSION_MAGIC_V         "1019694"
 
 
 /******* DO NOT EDIT THE FOLLOWINGS ***********/

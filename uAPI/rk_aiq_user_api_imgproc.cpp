@@ -872,14 +872,22 @@ XCamReturn rk_aiq_uapi_setWBMode(const rk_aiq_sys_ctx_t* ctx, opMode_t mode)
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
     rk_aiq_wb_attrib_t attr;
     IMGPROC_FUNC_ENTER
+    if (mode >= OP_INVAL || mode < OP_AUTO) {
+        ret = XCAM_RETURN_ERROR_PARAM;
+        RKAIQ_IMGPROC_CHECK_RET(ret, "mode is invalid!");
+    }
     ret = rk_aiq_user_api_awb_GetAttrib(ctx, &attr);
-    RKAIQ_IMGPROC_CHECK_RET(ret, "setWBMode failed!");
+    RKAIQ_IMGPROC_CHECK_RET(ret, "setWBMode failed in getting awb attrib!");
+
     if (mode == OP_AUTO) {
         attr.mode = RK_AIQ_WB_MODE_AUTO;
     } else if (mode == OP_MANUAL) {
+        rk_aiq_wb_querry_info_t wb_querry_info;
+        ret = rk_aiq_user_api_awb_QueryWBInfo(ctx, &wb_querry_info);
+        RKAIQ_IMGPROC_CHECK_RET(ret, "setWBMode failed in query info!");
         attr.mode = RK_AIQ_WB_MODE_MANUAL;
-        attr.stManual.mode = RK_AIQ_MWB_MODE_SCENE;
-        attr.stManual.para.scene =  RK_AIQ_WBCT_DAYLIGHT;
+        attr.stManual.mode = RK_AIQ_MWB_MODE_WBGAIN;
+        attr.stManual.para.gain = wb_querry_info.gain;
     } else {
         ret = XCAM_RETURN_ERROR_PARAM;
         RKAIQ_IMGPROC_CHECK_RET(ret, "Not supported mode!");
@@ -1798,11 +1806,22 @@ XCamReturn rk_aiq_uapi_setDhzMode(const rk_aiq_sys_ctx_t* ctx, opMode_t mode)
 XCamReturn rk_aiq_uapi_getDhzMode(const rk_aiq_sys_ctx_t* ctx, opMode_t *mode)
 {
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    adehaze_sw_t attr;
+    IMGPROC_FUNC_ENTER
     if (ctx == NULL) {
         ret = XCAM_RETURN_ERROR_PARAM;
         RKAIQ_IMGPROC_CHECK_RET(ret, "param error, getDhzMode failed!");
     }
-
+    ret = rk_aiq_user_api_adehaze_getSwAttrib(ctx, &attr);
+    RKAIQ_IMGPROC_CHECK_RET(ret, "getMDhzStrth failed in get attrib!");
+    if (attr.mode == RK_AIQ_DEHAZE_MODE_AUTO || attr.mode == RK_AIQ_DEHAZE_MODE_DEFAULT) {
+        *mode = OP_AUTO;
+    }else if (attr.mode == RK_AIQ_DEHAZE_MODE_MANUAL) {
+        *mode = OP_MANUAL;
+    }else {
+        *mode = OP_INVAL;
+    }
+    IMGPROC_FUNC_EXIT
     return ret;
 }
 
@@ -1821,9 +1840,14 @@ XCamReturn rk_aiq_uapi_setMDhzStrth(const rk_aiq_sys_ctx_t* ctx, bool on, unsign
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
     adehaze_sw_t attr;
     IMGPROC_FUNC_ENTER
+
     if (ctx == NULL) {
         ret = XCAM_RETURN_ERROR_PARAM;
         RKAIQ_IMGPROC_CHECK_RET(ret, "param error, ctx is NULL!");
+    }
+    if (!on) {
+        ret = XCAM_RETURN_ERROR_PARAM;
+        RKAIQ_IMGPROC_CHECK_RET(ret, "Error use, param 'on' should be 'true'!");
     }
     if (level < 1 || level > 10) {
         ret = XCAM_RETURN_ERROR_PARAM;
@@ -1831,68 +1855,69 @@ XCamReturn rk_aiq_uapi_setMDhzStrth(const rk_aiq_sys_ctx_t* ctx, bool on, unsign
     }
     attr.mode = RK_AIQ_DEHAZE_MODE_MANUAL;
     attr.stManual.sw_dhaz_en = 1;
+    attr.stManual.dc_en = 1;
     attr.stManual.enhance_en = 0;
     attr.stManual.cfg_alpha = 1;
-
+    attr.stManual.strength = level;
     switch (level) {
     case 1:
-        attr.stManual.sw_dhaz_cfg_wt = 0.2f;
-        attr.stManual.sw_dhaz_cfg_air = 220;
+        attr.stManual.sw_dhaz_cfg_wt = 0.1f;
+        attr.stManual.sw_dhaz_cfg_air = 160;
         attr.stManual.sw_dhaz_cfg_tmax = 0.2f;
         attr.stManual.sw_dhaz_cfg_gratio = 2;
         break;
     case 2:
-        attr.stManual.sw_dhaz_cfg_wt = 0.3f;
-        attr.stManual.sw_dhaz_cfg_air = 230;
+        attr.stManual.sw_dhaz_cfg_wt = 0.2f;
+        attr.stManual.sw_dhaz_cfg_air = 170;
         attr.stManual.sw_dhaz_cfg_tmax = 0.2f;
         attr.stManual.sw_dhaz_cfg_gratio = 2;
         break;
     case 3:
-        attr.stManual.sw_dhaz_cfg_wt = 0.4f;
-        attr.stManual.sw_dhaz_cfg_air = 240;
+        attr.stManual.sw_dhaz_cfg_wt = 0.3f;
+        attr.stManual.sw_dhaz_cfg_air = 180;
         attr.stManual.sw_dhaz_cfg_tmax = 0.2f;
         attr.stManual.sw_dhaz_cfg_gratio = 2;
         break;
     case 4:
-        attr.stManual.sw_dhaz_cfg_wt = 0.5f;
-        attr.stManual.sw_dhaz_cfg_air = 250;
+        attr.stManual.sw_dhaz_cfg_wt = 0.4f;
+        attr.stManual.sw_dhaz_cfg_air = 190;
         attr.stManual.sw_dhaz_cfg_tmax = 0.2f;
         attr.stManual.sw_dhaz_cfg_gratio = 2;
         break;
     case 5:
-        attr.stManual.sw_dhaz_cfg_wt = 0.6f;
-        attr.stManual.sw_dhaz_cfg_air = 260;
+        attr.stManual.sw_dhaz_cfg_wt = 0.5f;
+        attr.stManual.sw_dhaz_cfg_air = 200;
         attr.stManual.sw_dhaz_cfg_tmax = 0.2f;
         attr.stManual.sw_dhaz_cfg_gratio = 2;
         break;
     case 6:
-        attr.stManual.sw_dhaz_cfg_wt = 0.7f;
-        attr.stManual.sw_dhaz_cfg_air = 270;
+        attr.stManual.sw_dhaz_cfg_wt = 0.6f;
+        attr.stManual.sw_dhaz_cfg_air = 210;
         attr.stManual.sw_dhaz_cfg_tmax = 0.2f;
         attr.stManual.sw_dhaz_cfg_gratio = 2;
         break;
     case 7:
-        attr.stManual.sw_dhaz_cfg_wt = 0.75f;
-        attr.stManual.sw_dhaz_cfg_air = 275;
+        attr.stManual.sw_dhaz_cfg_wt = 0.7f;
+        attr.stManual.sw_dhaz_cfg_air = 220;
         attr.stManual.sw_dhaz_cfg_tmax = 0.2f;
         attr.stManual.sw_dhaz_cfg_gratio = 2;
         break;
     case 8:
         attr.stManual.sw_dhaz_cfg_wt = 0.8f;
-        attr.stManual.sw_dhaz_cfg_air = 280;
+        attr.stManual.sw_dhaz_cfg_air = 230;
         attr.stManual.sw_dhaz_cfg_tmax = 0.2f;
         attr.stManual.sw_dhaz_cfg_gratio = 2;
         break;
     case 9:
         attr.stManual.sw_dhaz_cfg_wt = 0.9f;
-        attr.stManual.sw_dhaz_cfg_air = 290;
+        attr.stManual.sw_dhaz_cfg_air = 240;
         attr.stManual.sw_dhaz_cfg_tmax = 0.2f;
         attr.stManual.sw_dhaz_cfg_gratio = 2;
         break;
     case 10:
-        attr.stManual.sw_dhaz_cfg_wt = 0.95f;
-        attr.stManual.sw_dhaz_cfg_air = 295;
-        attr.stManual.sw_dhaz_cfg_tmax = 0.2f;
+        attr.stManual.sw_dhaz_cfg_wt = 1.0f;
+        attr.stManual.sw_dhaz_cfg_air = 250;
+        attr.stManual.sw_dhaz_cfg_tmax = 1.0f;
         attr.stManual.sw_dhaz_cfg_gratio = 2;
         break;
     }
@@ -1905,7 +1930,23 @@ XCamReturn rk_aiq_uapi_setMDhzStrth(const rk_aiq_sys_ctx_t* ctx, bool on, unsign
 XCamReturn rk_aiq_uapi_getMDhzStrth(const rk_aiq_sys_ctx_t* ctx, bool *on, unsigned int *level)
 {
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
-
+    adehaze_sw_t attr;
+    IMGPROC_FUNC_ENTER
+    if (ctx == NULL) {
+        ret = XCAM_RETURN_ERROR_PARAM;
+        RKAIQ_IMGPROC_CHECK_RET(ret, "param error, ctx is NULL!");
+    }
+    ret = rk_aiq_user_api_adehaze_getSwAttrib(ctx, &attr);
+    RKAIQ_IMGPROC_CHECK_RET(ret, "getMDhzStrth failed in get attrib!");
+    if (attr.mode != RK_AIQ_DEHAZE_MODE_MANUAL) {
+        LOGE("Not in manual mode!");
+        *level = 0;
+        *on = false;
+    }else {
+        *level = attr.stManual.strength;
+        *on = true;
+    }
+    IMGPROC_FUNC_EXIT
     return ret;
 }
 
@@ -1919,14 +1960,9 @@ XCamReturn rk_aiq_uapi_enableDhz(const rk_aiq_sys_ctx_t* ctx)
         ret = XCAM_RETURN_ERROR_PARAM;
         RKAIQ_IMGPROC_CHECK_RET(ret, "param error, ctx is NULL!");
     }
-    attr.mode = RK_AIQ_DEHAZE_MODE_MANUAL;
-    attr.stManual.sw_dhaz_en = 1;
+    attr.mode = RK_AIQ_DEHAZE_MODE_DEFAULT;
+    attr.stManual.dc_en = 1;
     attr.stManual.enhance_en = 0;
-    attr.stManual.cfg_alpha = 1;
-    attr.stManual.sw_dhaz_cfg_wt = 0.2f;
-    attr.stManual.sw_dhaz_cfg_air = 220;
-    attr.stManual.sw_dhaz_cfg_tmax = 0.2f;
-    attr.stManual.sw_dhaz_cfg_gratio = 2;
     ret = rk_aiq_user_api_adehaze_setSwAttrib(ctx, attr);
     RKAIQ_IMGPROC_CHECK_RET(ret, "enable dehaze failed!");
     IMGPROC_FUNC_EXIT
@@ -1943,14 +1979,9 @@ XCamReturn rk_aiq_uapi_disableDhz(const rk_aiq_sys_ctx_t* ctx)
         ret = XCAM_RETURN_ERROR_PARAM;
         RKAIQ_IMGPROC_CHECK_RET(ret, "param error, ctx is NULL!");
     }
-    attr.mode = RK_AIQ_DEHAZE_MODE_MANUAL;
-    attr.stManual.sw_dhaz_en = 1;
+    attr.mode = RK_AIQ_DEHAZE_MODE_DEFAULT;
+    attr.stManual.dc_en = 0;
     attr.stManual.enhance_en = 0;
-    attr.stManual.cfg_alpha = 0;
-    attr.stManual.sw_dhaz_cfg_wt = 0.1f;
-    attr.stManual.sw_dhaz_cfg_air = 200;
-    attr.stManual.sw_dhaz_cfg_tmax = 0.2f;
-    attr.stManual.sw_dhaz_cfg_gratio = 2;
     ret = rk_aiq_user_api_adehaze_setSwAttrib(ctx, attr);
     RKAIQ_IMGPROC_CHECK_RET(ret, "disable dehaze failed!");
     IMGPROC_FUNC_EXIT

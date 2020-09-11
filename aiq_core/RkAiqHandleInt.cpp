@@ -1183,7 +1183,6 @@ RkAiqAfHandleInt::processing()
     comb->af_proc_res = NULL;
     af_proc_int->af_proc_com.af_stats = &ispStats->af_stats;
     af_proc_int->af_proc_com.aec_stats = &ispStats->aec_stats;
-    af_proc_int->af_proc_com.com.u.prepare.working_mode = shared->working_mode;
 
     RkAiqAlgoDescription* des = (RkAiqAlgoDescription*)mDes;
     ret = des->processing(mProcInParam, mProcOutParam);
@@ -3914,7 +3913,7 @@ RkAiqAfecHandleInt::prepare()
     RkAiqAlgoConfigAfecInt* afec_config_int = (RkAiqAlgoConfigAfecInt*)mConfig;
     RkAiqCore::RkAiqAlgosShared_t* shared = &mAiqCore->mAlogsSharedParams;
 
-    memcpy(&afec_config_int->afec_calib_cfg, &shared->calib->afec, sizeof(CalibDb_FEC_t));
+    /* memcpy(&afec_config_int->afec_calib_cfg, &shared->calib->afec, sizeof(CalibDb_FEC_t)); */
     afec_config_int->resource_path = shared->resourcePath;
 
     RkAiqAlgoDescription* des = (RkAiqAlgoDescription*)mDes;

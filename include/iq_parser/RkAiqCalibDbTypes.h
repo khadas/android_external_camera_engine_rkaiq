@@ -483,6 +483,10 @@ typedef struct CalibDb_Sensor_Para_s {
     CalibDb_AeRange_t       CISExtraAgainRange; //add for HDR-DCG MODE, HCG range
     CalibDb_AeRange_t       CISDgainRange; //sensor Dgain
     CalibDb_AeRange_t       CISIspDgainRange; //Isp Dgain
+
+    //bit 0: for hdr gain should use the same value;
+    //bit 1: support use different gain value
+    uint8_t                 CISHdrGainIndSetEn; //only used for hdr-stagger mode
     // bit 0 : mirror
     // bit 1 : flip
     uint8_t                 flip; // this will change the sensor output image orientation
@@ -1564,7 +1568,9 @@ typedef struct CalibDb_Dehaze_s {
     float hist_conv_t0[6];
     float hist_conv_t1[6];
     float hist_conv_t2[6];
-    struct CalibDb_Dehaze_ISO_s dehaze_iso;
+    struct CalibDb_Dehaze_ISO_s normal;
+    struct CalibDb_Dehaze_ISO_s hdr;
+    struct CalibDb_Dehaze_ISO_s night;
 } CalibDb_Dehaze_t;
 
 typedef enum CalibDb_Af_SearchDir_s {

@@ -216,10 +216,25 @@
  * - switch to normal if gray mode is on
  * - add acp user interfaces
  * - fix gamma mode switching bug
+ * v1.2.0
+ * - calib db: v1.2.6 magic code: 1019694
+ * - uApi changes:
+ *    - rk_aiq_user_api_ahdr_SetAttrib
+ *    - rk_aiq_user_api_adehaze_setSwAttrib
+ *    - rk_aiq_user_api_adpcc_SetAttrib
+ * - modify FpsSet bug in Ae
+ * - user api called before sysctl prepared would cause stuck, fix it
+ * - fix fec params error when switching hdr/normal
+ * - disable switching working mode to normal on gray mode
+ * - sharp: make more sharp strength for api
+ * - add dehaze normal,HDR and night mode in algo
+ * - update rkisp2x_tuner v0.2.0
+ * - isp driver v0.1.6
+ * - imx415 xml enable dc_en and set cfg_alpha
  */
 
-#define RK_AIQ_VERSION_REAL_V "v1.0.9"
-#define RK_AIQ_RELEASE_DATE "2020-09-07"
+#define RK_AIQ_VERSION_REAL_V "v1.2.0"
+#define RK_AIQ_RELEASE_DATE "2020-09-11"
 
 /******* DO NOT EDIT THE FOLLOWINGS ***********/
 

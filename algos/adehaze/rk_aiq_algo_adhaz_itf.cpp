@@ -32,42 +32,54 @@ RKAIQ_BEGIN_DECLARE
 static XCamReturn
 create_context(RkAiqAlgoContext **context, const AlgoCtxInstanceCfg* cfg)
 {
-    AdehazeHandle_t*AdehazeHandle = NULL;
-    XCamReturn ret;
-    ret = AdehazeInitV200(&AdehazeHandle);
-    *context = (RkAiqAlgoContext *)(AdehazeHandle);
-    return XCAM_RETURN_NO_ERROR;
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    AdehazeHandle_t *AdehazeHandle = NULL;
+    AlgoCtxInstanceCfgInt* instanc_int = (AlgoCtxInstanceCfgInt*)cfg;
+    CamCalibDbContext_t* calib = instanc_int->calib;
 
+    ret = AdehazeInit(&AdehazeHandle, calib);
+    *context = (RkAiqAlgoContext *)(AdehazeHandle);
+    return ret;
 }
 
 static XCamReturn
 destroy_context(RkAiqAlgoContext *context)
 {
-    AdehazeHandle_t*AdehazeHandle = (AdehazeHandle_t*)context;
-    XCamReturn ret;
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    AdehazeHandle_t *AdehazeHandle = (AdehazeHandle_t *)context;
 
-    ret = AdehazeReleaseV200(AdehazeHandle);
+    ret = AdehazeRelease(AdehazeHandle);
 
-    return XCAM_RETURN_NO_ERROR;
+    return ret;
 }
 
 static XCamReturn
 prepare(RkAiqAlgoCom* params)
 {
 
-    XCamReturn ret;
-    int iso;
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    //int iso;
 
     RkAiqAlgoConfigAdhazInt* config = (RkAiqAlgoConfigAdhazInt*)params;
     AdehazeHandle_t * AdehazeHandle = (AdehazeHandle_t *)params->ctx;
-    RKAiqAdhazHtmlConfig_t adhaz_html_para;
-    CamCalibDbContext_t* calib = config->rk_com.u.prepare.calib;
-    const CalibDb_Dehaze_t *calib_dehaze = &calib->dehaze;
-    //TO DO
-    iso = 50;
-    ret = AdehazeConfigV200(calib_dehaze, AdehazeHandle, iso);
 
-    return XCAM_RETURN_NO_ERROR;
+    //CamCalibDbContext_t* calib = config->rk_com.u.prepare.calib;
+    //const CalibDb_Dehaze_t *calib_dehaze = &calib->dehaze;
+
+    AdehazeHandle->working_mode = config->adhaz_config_com.com.u.prepare.working_mode;
+
+    if (config->rk_com.u.proc.gray_mode)
+        AdehazeHandle->Dehaze_ISO_mode = DEHAZE_NIGHT;
+    else if (DEHAZE_NORMAL == AdehazeHandle->working_mode)
+        AdehazeHandle->Dehaze_ISO_mode = DEHAZE_NORMAL;
+    else
+        AdehazeHandle->Dehaze_ISO_mode = DEHAZE_HDR;
+
+    //TO DO
+//    iso = 50;
+//    ret = AdehazeConfig(calib_dehaze, AdehazeHandle, iso, AdehazeHandle->Dehaze_ISO_mode);
+
+    return ret;
 
 }
 
@@ -80,31 +92,15 @@ pre_process(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outparams)
 static XCamReturn
 processing(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outparams)
 {
-
-    XCamReturn ret;
-    int iso;
-
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    int iso = 50;
     AdehazeHandle_t * AdehazeHandle = (AdehazeHandle_t *)inparams->ctx;
     RkAiqAlgoProcAdhazInt* procPara = (RkAiqAlgoProcAdhazInt*)inparams;
     RkAiqAlgoProcResAdhaz* procResPara = (RkAiqAlgoProcResAdhaz*)outparams;
-    rk_aiq_dehaze_cfg_t* adhaz_config;
-    const CalibDb_Dehaze_t *calib_dehaze = AdehazeHandle->calib_dehaz;
-    adhaz_config = (rk_aiq_dehaze_cfg_t*)&procResPara->adhaz_config;
-
-
-
-
-#if 1
-
     AdehazeExpInfo_t stExpInfo;
     memset(&stExpInfo, 0x00, sizeof(AdehazeExpInfo_t));
 
-    LOGD_ADEHAZE("%s:%d init:%d hdr mode:%d  \n",
-                 __FUNCTION__, __LINE__,
-                 inparams->u.proc.init,
-                 procPara->hdr_mode);
-
-    stExpInfo.hdr_mode = 0; //pAnrProcParams->hdr_mode;
+    stExpInfo.hdr_mode = 0;
     for(int i = 0; i < 3; i++) {
         stExpInfo.arIso[i] = 50;
         stExpInfo.arAGain[i] = 1.0;
@@ -112,74 +108,49 @@ processing(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outparams)
         stExpInfo.arTime[i] = 0.01;
     }
 
-    if(procPara->hdr_mode == RK_AIQ_WORKING_MODE_NORMAL) {
+    if(AdehazeHandle->working_mode == RK_AIQ_WORKING_MODE_NORMAL) {
         stExpInfo.hdr_mode = 0;
-    } else if(procPara->hdr_mode == RK_AIQ_ISP_HDR_MODE_2_FRAME_HDR
-              || procPara->hdr_mode == RK_AIQ_ISP_HDR_MODE_2_LINE_HDR ) {
+    } else if(RK_AIQ_HDR_GET_WORKING_MODE(AdehazeHandle->working_mode) == RK_AIQ_WORKING_MODE_ISP_HDR2) {
         stExpInfo.hdr_mode = 1;
-    } else if(procPara->hdr_mode == RK_AIQ_ISP_HDR_MODE_3_FRAME_HDR
-              || procPara->hdr_mode == RK_AIQ_ISP_HDR_MODE_3_LINE_HDR ) {
+    } else if(RK_AIQ_HDR_GET_WORKING_MODE(AdehazeHandle->working_mode) == RK_AIQ_WORKING_MODE_ISP_HDR3) {
         stExpInfo.hdr_mode = 2;
     }
 
-#if 1
-    if(!inparams->u.proc.init) {
-        RkAiqAlgoPreResAeInt* pAEPreRes =
-            (RkAiqAlgoPreResAeInt*)(procPara->rk_com.u.proc.pre_res_comb->ae_pre_res);
+    RkAiqAlgoPreResAeInt* pAEPreRes =
+        (RkAiqAlgoPreResAeInt*)(procPara->rk_com.u.proc.pre_res_comb->ae_pre_res);
 
-        if(pAEPreRes != NULL) {
-            if(procPara->hdr_mode == RK_AIQ_WORKING_MODE_NORMAL) {
-                stExpInfo.arAGain[0] = pAEPreRes->ae_pre_res_rk.LinearExp.exp_real_params.analog_gain;
-                stExpInfo.arDGain[0] = pAEPreRes->ae_pre_res_rk.LinearExp.exp_real_params.digital_gain;
-                stExpInfo.arTime[0] = pAEPreRes->ae_pre_res_rk.LinearExp.exp_real_params.integration_time;
-                stExpInfo.arIso[0] = stExpInfo.arAGain[0] * 50;
-            } else {
-                for(int i = 0; i < 3; i++) {
-                    stExpInfo.arAGain[i] = pAEPreRes->ae_pre_res_rk.HdrExp[i].exp_real_params.analog_gain;
-                    stExpInfo.arDGain[i] = pAEPreRes->ae_pre_res_rk.HdrExp[i].exp_real_params.digital_gain;
-                    stExpInfo.arTime[i] = pAEPreRes->ae_pre_res_rk.HdrExp[i].exp_real_params.integration_time;
-                    stExpInfo.arIso[i] = stExpInfo.arAGain[i] * 50;
-
-                    LOGD_ADEHAZE("%s:%d index:%d again:%f dgain:%f time:%f iso:%d hdr_mode:%d\n",
-                                 __FUNCTION__, __LINE__,
-                                 i,
-                                 stExpInfo.arAGain[i],
-                                 stExpInfo.arDGain[i],
-                                 stExpInfo.arTime[i],
-                                 stExpInfo.arIso[i],
-                                 stExpInfo.hdr_mode);
-                }
-            }
+    if(pAEPreRes != NULL) {
+        if(AdehazeHandle->working_mode) {
+            stExpInfo.arAGain[0] = pAEPreRes->ae_pre_res_rk.LinearExp.exp_real_params.analog_gain;
+            stExpInfo.arDGain[0] = pAEPreRes->ae_pre_res_rk.LinearExp.exp_real_params.digital_gain;
+            stExpInfo.arTime[0] = pAEPreRes->ae_pre_res_rk.LinearExp.exp_real_params.integration_time;
+            stExpInfo.arIso[0] = stExpInfo.arAGain[0] * stExpInfo.arDGain[0] * 50;
         } else {
-            //LOGE_ADEHAZE("%s:%d pAEPreRes is NULL, so use default instead \n", __FUNCTION__, __LINE__);
+            for(int i = 0; i < 3; i++) {
+                stExpInfo.arAGain[i] = pAEPreRes->ae_pre_res_rk.HdrExp[i].exp_real_params.analog_gain;
+                stExpInfo.arDGain[i] = pAEPreRes->ae_pre_res_rk.HdrExp[i].exp_real_params.digital_gain;
+                stExpInfo.arTime[i] = pAEPreRes->ae_pre_res_rk.HdrExp[i].exp_real_params.integration_time;
+                stExpInfo.arIso[i] = stExpInfo.arAGain[i] * stExpInfo.arDGain[i] * 50;
+
+                LOGD_ADEHAZE("index:%d again:%f dgain:%f time:%f iso:%d hdr_mode:%d\n",
+                             i,
+                             stExpInfo.arAGain[i],
+                             stExpInfo.arDGain[i],
+                             stExpInfo.arTime[i],
+                             stExpInfo.arIso[i],
+                             stExpInfo.hdr_mode);
+            }
         }
+    } else {
+        LOGE_ADEHAZE("%s:%d pAEPreRes is NULL, so use default instead \n", __FUNCTION__, __LINE__);
     }
-#endif
 
-
-
-
-
-
-    //if(inparams->u.proc.init == false) {
     iso = stExpInfo.arIso[stExpInfo.hdr_mode];
-    //todo
-    LOGD_ADEHAZE("============hdr_mode=%d,iso=%d========\n", stExpInfo.hdr_mode, iso);
-    ret = AdehazeReConfigV200(AdehazeHandle, calib_dehaze, iso);
-    //}
-
-    memcpy(adhaz_config, &AdehazeHandle->adhaz_config, sizeof(rk_aiq_dehaze_cfg_t));
-    return XCAM_RETURN_NO_ERROR;
-
-
-
-
-
-#endif
-
-
-
-
+ 
+    LOGD_ADEHAZE("hdr_mode=%d,iso=%d\n", stExpInfo.hdr_mode, iso);
+    ret = AdehazeProcess(AdehazeHandle, iso, AdehazeHandle->Dehaze_ISO_mode);
+    memcpy(&procResPara->adhaz_config, &AdehazeHandle->adhaz_config, sizeof(rk_aiq_dehaze_cfg_t));
+    return ret;
 }
 
 static XCamReturn

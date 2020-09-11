@@ -44,7 +44,7 @@ create_context(RkAiqAlgoContext **context, const AlgoCtxInstanceCfg* cfg)
         LOGE_AFEC( "%s: create afec context fail!\n", __FUNCTION__);
         return XCAM_RETURN_ERROR_MEM;
     }
-    ctx->hFEC = new FECContext_t;
+    ctx->hFEC = new FECContext_t();
     if (ctx->hFEC == NULL) {
         LOGE_AFEC( "%s: create afec handle fail!\n", __FUNCTION__);
         return XCAM_RETURN_ERROR_MEM;
@@ -56,7 +56,22 @@ create_context(RkAiqAlgoContext **context, const AlgoCtxInstanceCfg* cfg)
     ctx->hFEC->afecReadMeshThread->triger_start();
     ctx->hFEC->afecReadMeshThread->start();
 #endif
+
+    const AlgoCtxInstanceCfgInt* cfg_int = (const AlgoCtxInstanceCfgInt*)cfg;
+    FECHandle_t fecCtx = ctx->hFEC;
+    CalibDb_FEC_t* calib_fec = &cfg_int->calib->afec;
+
+    fecCtx->fec_en = calib_fec->fec_en;
+    memcpy(fecCtx->meshfile, calib_fec->meshfile, sizeof(fecCtx->meshfile));
+    fecCtx->camCoeff.cx = calib_fec->light_center[0];
+    fecCtx->camCoeff.cy = calib_fec->light_center[1];
+    fecCtx->camCoeff.a0 = calib_fec->coefficient[0];
+    fecCtx->camCoeff.a2 = calib_fec->coefficient[1];
+    fecCtx->camCoeff.a3 = calib_fec->coefficient[2];
+    fecCtx->camCoeff.a4 = calib_fec->coefficient[3];
+    fecCtx->correct_level = calib_fec->correct_level;
     ctx->hFEC->eState = FEC_STATE_INVALID;
+
     return XCAM_RETURN_NO_ERROR;
 }
 
@@ -222,7 +237,7 @@ prepare(RkAiqAlgoCom* params)
     FECHandle_t hFEC = (FECHandle_t)params->ctx->hFEC;
     FECContext_t* fecCtx = (FECContext_t*)hFEC;
     RkAiqAlgoConfigAfecInt* rkaiqAfecConfig = (RkAiqAlgoConfigAfecInt*)params;
-
+#if 0 //moved to create_ctx
     fecCtx->fec_en = rkaiqAfecConfig->afec_calib_cfg.fec_en;
     memcpy(fecCtx->meshfile, rkaiqAfecConfig->afec_calib_cfg.meshfile, sizeof(fecCtx->meshfile));
     fecCtx->camCoeff.cx = rkaiqAfecConfig->afec_calib_cfg.light_center[0];
@@ -231,6 +246,7 @@ prepare(RkAiqAlgoCom* params)
     fecCtx->camCoeff.a2 = rkaiqAfecConfig->afec_calib_cfg.coefficient[1];
     fecCtx->camCoeff.a3 = rkaiqAfecConfig->afec_calib_cfg.coefficient[2];
     fecCtx->camCoeff.a4 = rkaiqAfecConfig->afec_calib_cfg.coefficient[3];
+#endif
     LOGI_AFEC("(%s) len light center(%.16f, %.16f)\n",
             __FUNCTION__,
             fecCtx->camCoeff.cx, fecCtx->camCoeff.cy);
@@ -251,7 +267,7 @@ prepare(RkAiqAlgoCom* params)
         fecCtx->mesh_density = 1;
     }
 
-    double correct_level = rkaiqAfecConfig->afec_calib_cfg.correct_level;
+    double correct_level = fecCtx->correct_level;
     if (fecCtx->isAttribUpdated) {
         if (fecCtx->user_config.bypass)
             correct_level = 0;
@@ -270,7 +286,7 @@ prepare(RkAiqAlgoCom* params)
             &fecCtx->meshxf, &fecCtx->meshyi, &fecCtx->meshyf);
     fecCtx->fec_mesh_size = fecCtx->fecParams.meshSize4bin;
     LOGI_AFEC("(%s) en: %d, bypass(%d), correct_level(%d), dimen(%d-%d), mesh dimen(%d-%d), size(%d)",
-              rkaiqAfecConfig->afec_calib_cfg.meshfile, fecCtx->fec_en,
+              fecCtx->meshfile, fecCtx->fec_en,
               fecCtx->user_config.bypass, fecCtx->user_config.correct_level,
               fecCtx->src_width, fecCtx->src_height,
               fecCtx->fec_mesh_h_size, fecCtx->fec_mesh_v_size,
@@ -295,7 +311,7 @@ prepare(RkAiqAlgoCom* params)
                      fecCtx->fec_mesh_h_size, fecCtx->fec_mesh_v_size);
 
     LOGI_AFEC("(%s) en: %d, user_en: %d, correct_level: %d, dimen: %d-%d, mesh dimen: %d-%d, size: %d",
-              rkaiqAfecConfig->afec_calib_cfg.meshfile, fecCtx->fec_en,
+              fecCtx->meshfile, fecCtx->fec_en,
               fecCtx->user_config.en, fecCtx->user_config.correct_level,
               fecCtx->src_width, fecCtx->src_height,
               fecCtx->fec_mesh_h_size, fecCtx->fec_mesh_v_size,
@@ -324,7 +340,6 @@ prepare(RkAiqAlgoCom* params)
     fecCtx->meshyi = (unsigned short*)malloc(fecCtx->fec_mesh_size * sizeof(unsigned short));
     fecCtx->meshyf = (unsigned char*)malloc(fecCtx->fec_mesh_size * sizeof(unsigned char));
 #endif
-
     read_mesh_table(fecCtx, fecCtx->user_config.correct_level);
     fecCtx->eState = FEC_STATE_INITIALIZED;
 

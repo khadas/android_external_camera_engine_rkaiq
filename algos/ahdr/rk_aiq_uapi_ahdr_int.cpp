@@ -91,6 +91,8 @@ rk_aiq_uapi_ahdr_GetAttrib
 
     memcpy(&attr->stManual.stMgeManual, &pAhdrCtx->hdrAttr.stManual.stMgeManual, sizeof(mmgeAttr_t));
     memcpy(&attr->stManual.stTmoManual, &pAhdrCtx->hdrAttr.stManual.stTmoManual, sizeof(mtmoAttr_t));
+    memcpy(&attr->CtlInfo, &pAhdrCtx->hdrAttr.CtlInfo, sizeof(CurrCtlData_t));
+    memcpy(&attr->RegInfo, &pAhdrCtx->hdrAttr.RegInfo, sizeof(CurrRegData_t));
 
     return XCAM_RETURN_NO_ERROR;
 }

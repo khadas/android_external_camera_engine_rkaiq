@@ -1572,9 +1572,9 @@ int XMLDocument::SaveFile( const char* filename )
 #pragma warning ( push )
 #pragma warning ( disable : 4996 )        // Fail to see a compelling reason why this should be deprecated.
 #endif
-    int fd = open(filename, O_RDWR | O_CREAT, 0644);
-    FILE* fp = fdopen(fd, "w");
-    //FILE* fp = fopen( filename, "w" );
+    //int fd = open(filename, O_RDWR | O_CREAT, 0644);
+    //FILE* fp = fdopen(fd, "w");
+    FILE* fp = fopen( filename, "w+" );
 #if defined(_MSC_VER)
 #pragma warning ( pop )
 #endif

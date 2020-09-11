@@ -25,6 +25,13 @@
 #include "xmltags.h"
 using namespace tinyxml2;
 
+#if defined(_MSC_VER)
+#define strcasecmp _stricmp
+#define snprintf(buf,len, format,...) _snprintf_s(buf, len, len-1, format, __VA_ARGS__)
+#endif
+
+
+
 #if defined(__linux__)
 #include "smartptr.h"
 #include <xcam_common.h>
@@ -227,7 +234,9 @@ private:
     bool parseEntrySensorEdgeFilterSetting(const XMLElement* pelement, void* param = NULL, int index = 0);
     bool parseEntrySensorEdgeFilterISO(const XMLElement* pelement, void* param = NULL, int index = 0);
     bool parseEntrySensorDehaze(const XMLElement* pelement, void* param = NULL);
-    bool parseEntrySensorDehazeISO(const XMLElement* pelement, void* param = NULL);
+    bool parseEntrySensorNormalDehazeISO(const XMLElement* pelement, void* param = NULL);
+    bool parseEntrySensorHDRDehazeISO(const XMLElement* pelement, void* param = NULL);
+    bool parseEntrySensorNightDehazeISO(const XMLElement* pelement, void* param = NULL);
     bool parseEntrySensorAfWindow(const XMLElement* pelement, void* param = NULL);
     bool parseEntrySensorAfFixedMode(const XMLElement* pelement, void* param = NULL);
     bool parseEntrySensorAfMacroMode(const XMLElement* pelement, void* param = NULL);

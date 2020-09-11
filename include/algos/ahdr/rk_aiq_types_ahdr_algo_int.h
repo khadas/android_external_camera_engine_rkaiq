@@ -115,6 +115,16 @@ typedef struct tmoCtrlData_s
     int   stMin;
 } tmoCtrlData_t;
 
+typedef struct AtmoBandPriorData_s
+{
+    bool en;
+    float stCoef;
+    float stCoefMax;
+    float stCoefMin;
+    int   stMax;
+    int   stMin;
+} AtmoBandPriorData_t;
+
 typedef struct mgeCtrlData_S
 {
     float stCoef;
@@ -139,6 +149,7 @@ typedef struct atmoAttr_S
     tmoCtrlData_t stDtlsLL;
     tmoCtrlData_t stDtlsHL;
     tmoCtrlData_t stTmoContrast;
+    AtmoBandPriorData_t stTmoBandPrior;
 } atmoAttr_t;
 
 typedef struct mmgeAttr_S
@@ -154,6 +165,7 @@ typedef struct mtmoAttr_S
     float stDtlsHL;
     float stDtlsLL;
     float stTmoContrast;
+    float stBandPriorStrength;
 } mtmoAttr_t;
 
 typedef struct ahdrAttr_S
@@ -179,6 +191,25 @@ typedef enum hdr_OpMode_s {
     HDR_OpMode_LINEAR = 4,
 } hdr_OpMode_t;
 
+typedef struct CurrCtlData_s
+{
+    float Envlv;
+    float MoveCoef;
+    float ISO;
+    float OEPdf;
+    float FocusLuma;
+    float DarkPdf;
+    float DynamicRange;
+} CurrCtlData_t;
+
+typedef struct CurrRegData_s
+{
+    float GlobalLuma;
+    float DetailsLowlight;
+    float DetailsHighlight;
+    float TmoContrast;
+    float BandPriorStrength;
+} CurrRegData_t;
 
 typedef struct hdrAttr_s
 {
@@ -188,6 +219,8 @@ typedef struct hdrAttr_s
     mhdrAttr_t stManual;
     int level;
     int level_Linear_Dark;
+    CurrCtlData_t CtlInfo;
+    CurrRegData_t RegInfo;
 } hdrAttr_t;
 
 typedef struct MgeProcRes_s

@@ -324,12 +324,14 @@ typedef struct
 
 // isp
 
+#pragma pack(1)
 struct rk_aiq_isp_window {
     uint16_t h_offs;
     uint16_t v_offs;
     uint16_t h_size;
     uint16_t v_size;
-} __attribute__ ((packed));
+};
+#pragma pack()
 
 
 typedef RKAiqAecStats_t rk_aiq_isp_aec_stats_t;

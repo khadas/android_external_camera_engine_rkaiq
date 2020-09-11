@@ -20,7 +20,9 @@
 
 #ifndef XCAM_DEFS_H
 #define XCAM_DEFS_H
+#if defined(__linux__)
 #include "unistd.h"
+#endif
 //#include "xcam_log.h"
 
 #define XCAM_ASSERT(exp)  assert(exp)

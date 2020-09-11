@@ -27,8 +27,12 @@ RKAIQ_BEGIN_DECLARE
 
 typedef struct AdehazeHandle_s {
     rk_aiq_dehaze_cfg_t adhaz_config;
-    RKAiqAdhazHtmlConfig_t adhaz_html_para;
-    CalibDb_Dehaze_t* calib_dehaz;
+    CalibDb_Dehaze_t calib_dehaz;
+    CamCalibDbContext_t* pCalibDb;
+    rk_aiq_dehaze_op_mode_t mode;
+    int strength;
+    int working_mode;
+    int Dehaze_ISO_mode;
 } AdehazeHandle_t;
 
 

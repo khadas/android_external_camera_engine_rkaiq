@@ -1289,7 +1289,10 @@ uint32_t calib_sensor_dehaze_sub_tags[] = {
     CALIB_SENSOR_DEHAZE_HIST_CONV_T0_TAG_ID,
     CALIB_SENSOR_DEHAZE_HIST_CONV_T1_TAG_ID,
     CALIB_SENSOR_DEHAZE_HIST_CONV_T2_TAG_ID,
-    CALIB_SENSOR_DEHAZE_ISO_TAG_ID,
+    CALIB_SENSOR_NORMAL_DEHAZE_ISO_TAG_ID,
+    CALIB_SENSOR_HDR_DEHAZE_ISO_TAG_ID,
+    CALIB_SENSOR_NIGHT_DEHAZE_ISO_TAG_ID,
+
 };
 
 uint32_t calib_sensor_DEHAZE_ISO_sub_tags[] = {
@@ -1348,6 +1351,7 @@ uint32_t calib_sensor_sensorinfo_sub_tags[] = {
     CALIB_SENSOR_SENSORINFO_CISEXTRAAGAIN_RANGE_TAG_ID,
     CALIB_SENSOR_SENSORINFO_CISDGAIN_RANGE_TAG_ID,
     CALIB_SENSOR_SENSORINFO_CISISPDGAIN_RANGE_TAG_ID,
+    CALIB_SENSOR_SENSORINFO_CISHDRGAININDSETEN_TAG_ID,
     CALIB_SENSOR_SENSORSETTING_FLIP_ID,
 };
 
@@ -4985,8 +4989,16 @@ calib_tag_info_t g_calib_tag_infos[CALIB_IQ_TAG_END] = {
     {   "hist_conv_t2", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
         check_tags_array_ignore, NULL
     },
-    [CALIB_SENSOR_DEHAZE_ISO_TAG_ID]         =
-    {   "DEHAZE_ISO", CALIB_TAG_TYPE_CELL, {-1, -1},
+    [CALIB_SENSOR_NORMAL_DEHAZE_ISO_TAG_ID]         =
+    {   "Normal_DEHAZE_ISO", CALIB_TAG_TYPE_CELL, {-1, -1},
+        check_tags_array_info(calib_sensor_DEHAZE_ISO_sub_tags), NULL
+    },
+    [CALIB_SENSOR_HDR_DEHAZE_ISO_TAG_ID]         =
+    {   "HDR_DEHAZE_ISO", CALIB_TAG_TYPE_CELL, {-1, -1},
+        check_tags_array_info(calib_sensor_DEHAZE_ISO_sub_tags), NULL
+    },
+    [CALIB_SENSOR_NIGHT_DEHAZE_ISO_TAG_ID]         =
+    {   "Night_DEHAZE_ISO", CALIB_TAG_TYPE_CELL, {-1, -1},
         check_tags_array_info(calib_sensor_DEHAZE_ISO_sub_tags), NULL
     },
     [CALIB_SENSOR_DEHAZE_ISO_ISO_TAG_ID]         =
@@ -5221,6 +5233,10 @@ calib_tag_info_t g_calib_tag_infos[CALIB_IQ_TAG_END] = {
     },
     [CALIB_SENSOR_SENSORINFO_CISISPDGAIN_RANGE_TAG_ID]         =
     {   "CISIspDgainRange", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
+        check_tags_array_ignore, NULL
+    },
+    [CALIB_SENSOR_SENSORINFO_CISHDRGAININDSETEN_TAG_ID]         =
+    {   "CISHdrGainIndSetEn", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
         check_tags_array_ignore, NULL
     },
     [CALIB_SENSOR_SENSORSETTING_FLIP_ID]         =
@@ -5623,7 +5639,7 @@ int calib_check_getID_by_name(char* tag_name, CALIB_IQ_TAG_ID_T parent_tag_id, C
     if(i < parent_check_info->count) {
         return 0;
     } else {
-        LOGE("%s(%d): can't find subtag:%s from parent tag:%s, assert!!!\n",
+        LOGE("%s(%d): subtag: %s from parent tag: %s is unknown, assert!!!\n",
              __FUNCTION__, __LINE__, tag_name, TAG_NAME(parent_tag_id));
         DCT_ASSERT(false);
         return -1;

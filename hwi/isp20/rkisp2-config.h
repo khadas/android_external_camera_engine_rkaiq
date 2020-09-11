@@ -11,7 +11,7 @@
 #include <linux/v4l2-controls.h>
 #include "rk_isp20_hw.h"
 
-#define RKISP_API_VERSION		KERNEL_VERSION(0, 1, 0x4)
+#define RKISP_API_VERSION		KERNEL_VERSION(0, 1, 0x6)
 
 #ifndef BIT
 #define BIT(x) (~0 & (1 << x))
