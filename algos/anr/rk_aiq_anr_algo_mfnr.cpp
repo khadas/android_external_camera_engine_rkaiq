@@ -862,6 +862,11 @@ ANRresult_t mfnr_fix_transfer(RKAnr_Mfnr_Params_Select_t* tnr, RKAnr_Mfnr_Fix_t 
         return ANR_RET_NULL_POINTER;
     }
 
+	LOGD_ANR("%s:%d iso:%d strength:%f\n", __FUNCTION__, __LINE__, pExpInfo->arIso[pExpInfo->hdr_mode], fLumaStrength);
+	if(fLumaStrength <= 0.0){
+		fLumaStrength = 0.000001;
+	}
+	
     int i = 0;
     unsigned long tmp = 0;
     int mIso_last = pExpInfo->arIso[pExpInfo->hdr_mode];
@@ -903,11 +908,28 @@ ANRresult_t mfnr_fix_transfer(RKAnr_Mfnr_Params_Select_t* tnr, RKAnr_Mfnr_Fix_t 
     pMfnrCfg->optc_en = 1;
     pMfnrCfg->gain_en = 1;
 
-    //0x0088
-    pMfnrCfg->pk0_y = tnr->weight_limit_y[0];
-    pMfnrCfg->pk1_y = tnr->weight_limit_y[max_lvl - 1];
-    pMfnrCfg->pk0_c = tnr->weight_limit_uv[0];
-    pMfnrCfg->pk1_c = tnr->weight_limit_uv[max_lvl_uv - 1];
+    //0x0088   
+    tmp = (tnr->weight_limit_y[0] / fLumaStrength);
+	if(tmp > 0xff){
+		tmp = 0xff;
+	}
+	pMfnrCfg->pk0_y = (unsigned char)tmp;
+
+	tmp = (tnr->weight_limit_y[max_lvl - 1] / fLumaStrength);
+	if(tmp > 0xff){
+		tmp = 0xff;
+	}
+    pMfnrCfg->pk1_y = (unsigned char)tmp;
+	tmp = (tnr->weight_limit_uv[0] / fChromaStrength );
+	if(tmp > 0xff){
+		tmp = 0xff;
+	}
+    pMfnrCfg->pk0_c = (unsigned char)tmp;
+	tmp = (tnr->weight_limit_uv[max_lvl_uv - 1] / fChromaStrength);
+	if(tmp > 0xff){
+		tmp = 0xff;
+	}
+    pMfnrCfg->pk1_c = (unsigned char)tmp;
 
     //0x008c
     FIX_FLOAT(gain_glb_filt, F_DECI_GAIN, tmp, 0);

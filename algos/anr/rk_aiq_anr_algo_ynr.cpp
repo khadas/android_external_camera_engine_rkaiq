@@ -599,6 +599,11 @@ ANRresult_t ynr_fix_transfer(RKAnr_Ynr_Params_Select_t* ynr, RKAnr_Ynr_Fix_t *pN
         return ANR_RET_NULL_POINTER;
     }
 
+	LOGD_ANR("%s:%d strength:%f\n", __FUNCTION__, __LINE__, fStrength);
+	if(fStrength <= 0.0){
+		fStrength = 0.000001;
+	}
+	
     int i = 0;
     int j = 0;
     int tmp = 0;
@@ -749,7 +754,7 @@ ANRresult_t ynr_fix_transfer(RKAnr_Ynr_Params_Select_t* ynr, RKAnr_Ynr_Fix_t *pN
 		if(i>strength_i){
 			tmp = (ynr->hiFreqBfScale[i] * (1 << FIX_BIT_BF_SCALE));
 		}else{
-          tmp = (ynr->hiFreqBfScale[i] *   (1 << FIX_BIT_BF_SCALE));
+          tmp = (ynr->hiFreqBfScale[i] * fStrength *  (1 << FIX_BIT_BF_SCALE));
 		}
 		if(tmp > 0xff){
 			tmp = 0xff;

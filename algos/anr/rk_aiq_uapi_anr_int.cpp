@@ -1,12 +1,12 @@
 #include "rk_aiq_uapi_anr_int.h"
 #include "anr/rk_aiq_types_anr_algo_prvt.h"
 
-#define NR_STRENGTH_MAX_PERCENT (2.0)
+#define NR_STRENGTH_MAX_PERCENT (50.0)
 #define NR_LUMA_TF_STRENGTH_MAX_PERCENT NR_STRENGTH_MAX_PERCENT
-#define NR_LUMA_SF_STRENGTH_MAX_PERCENT 4.0
+#define NR_LUMA_SF_STRENGTH_MAX_PERCENT (80.0)
 #define NR_CHROMA_TF_STRENGTH_MAX_PERCENT NR_STRENGTH_MAX_PERCENT
 #define NR_CHROMA_SF_STRENGTH_MAX_PERCENT NR_STRENGTH_MAX_PERCENT
-#define NR_RAWNR_SF_STRENGTH_MAX_PERCENT 10.0
+#define NR_RAWNR_SF_STRENGTH_MAX_PERCENT (80.0)
 
 XCamReturn
 rk_aiq_uapi_anr_SetAttrib(RkAiqAlgoContext *ctx,
@@ -101,7 +101,13 @@ rk_aiq_uapi_anr_SetLumaSFStrength(const RkAiqAlgoContext *ctx,
 		fStrength = (fPercent - 0.5)*(fMax - 1)*2 + 1;
 	}
 
-	pAnrCtx->fLuma_SF_Strength = fStrength;
+	if(fStrength > 1){
+		pAnrCtx->fRawnr_SF_Strength = fStrength / 2.0;
+		pAnrCtx->fLuma_SF_Strength = 1;
+	}else{
+		pAnrCtx->fRawnr_SF_Strength = fStrength;
+		pAnrCtx->fLuma_SF_Strength = fStrength;
+	}
 
 	return XCAM_RETURN_NO_ERROR;
 }

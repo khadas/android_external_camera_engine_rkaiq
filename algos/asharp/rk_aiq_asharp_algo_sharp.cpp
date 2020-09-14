@@ -628,6 +628,10 @@ AsharpResult_t rk_Sharp_V1_fix_transfer(RKAsharp_Sharp_HW_Params_Select_t *pShar
         return ASHARP_RET_NULL_POINTER;
     }
 
+	if(fPercent <= 0.0){
+		fPercent = 0.000001;
+	}
+
 	if(fPercent > (MAX_SHARP_LUMA_CLIP_VALUE / pSharpV1->M_ratio )){
 		mClipStrength = fPercent / (MAX_SHARP_LUMA_CLIP_VALUE / pSharpV1->M_ratio ) ;
 	}
