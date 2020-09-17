@@ -17,8 +17,6 @@
 #ifndef _RKISP_CONTROL_LOOP_H_
 #define _RKISP_CONTROL_LOOP_H_
 
-#include "rk_aiq_types.h"
-
 #ifdef ANDROID_VERSION_ABOVE_8_X
 #include <CameraMetadata.h>
 using ::android::hardware::camera::common::V1_0::helper::CameraMetadata;
@@ -78,8 +76,8 @@ struct rkisp_cl_prepare_params_s {
   const char* lens_sd_node_path;
   // flashlight subdev node path
   const char* flashlight_sd_node_path[RKISP_SENSOR_ATTACHED_FLASH_MAX_NUM];
-  // rkaiq input parameters
-  const void *rkaiq;
+  // static metadata
+  const camera_metadata_t *staticMeta;
   // TODO: sensor mode descriptor and others
   /**
    * The width in pixels of the buffers in this stream
@@ -101,21 +99,6 @@ struct rkisp_cl_frame_metadata_s {
     int id;
     // TODO: use camera_metadata from Android directly ?
     const camera_metadata_t *metas;
-};
-
-struct rkisp_cl_frame_rkaiq_s {
-    //frame id
-    int id;
-    // rkaiq input parameters
-    const void *rkaiq;
-};
-
-struct rkisp_cl_frame_rkaiq_result_s {
-    //frame id
-    int id;
-    rk_aiq_ae_results  *ae_results;
-    rk_aiq_awb_results *awb_results;
-    rk_aiq_af_results  *af_results;
 };
 
 typedef struct frame_interval_s {
@@ -158,15 +141,6 @@ typedef struct cl_result_callback_ops {
                                      struct rkisp_cl_frame_metadata_s *result);
 } cl_result_callback_ops_t;
 
-typedef struct cl_result_callbacks_ops {
-
-    void (*rkaiq_result_callback)(const struct cl_result_callbacks_ops *ops,
-                                     struct rkisp_cl_frame_rkaiq_result_s *result);
-    int (*getAeStatus)(const struct cl_result_callbacks_ops *ops);
-    int (*getAfStatus)(const struct cl_result_callbacks_ops *ops);
-    int (*getAwbStatus)(const struct cl_result_callbacks_ops *ops);
-} cl_result_callbacks_ops_t;
-
 /*
  * Get the control loop context
  * Args:
@@ -190,7 +164,7 @@ int rkisp_cl_init(void** cl_ctx, const char* tuning_file_path,
  *    0      : success
  */
 int rkisp_cl_rkaiq_init(void** cl_ctx, const char* tuning_file_path,
-                  const cl_result_callbacks_ops_t *callbacks_ops,
+                  const cl_result_callback_ops_t *callback_ops,
                   const char* sns_entity_name);
 
 /*
@@ -234,8 +208,8 @@ int rkisp_cl_start(void* cl_ctx);
  *    -EINVAL: failed
  *    0      : success
  */
-int rkisp_cl_rkaiq_set_frame_params(const void* cl_ctx,
-                              const struct rkisp_cl_frame_rkaiq_s* frame_params);
+int rkisp_cl_set_frame_params(const void* cl_ctx,
+                              const struct rkisp_cl_frame_metadata_s* frame_params);
 
 /*
  * Stop the current control loop.

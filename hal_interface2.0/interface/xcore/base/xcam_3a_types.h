@@ -28,18 +28,7 @@
 #include <stddef.h>
 #include <stdio.h>
 #include <stdint.h>
-//#include <xcam_defs.h>
-
-#ifdef  __cplusplus
-#define XCAM_BEGIN_DECLARE  extern "C" {
-#define XCAM_END_DECLARE    }
-#else
-#define XCAM_BEGIN_DECLARE
-#define XCAM_END_DECLARE
-#endif
-
-#define XCAM_GAMMA_TABLE_SIZE 256
-
+#include <base/xcam_defs.h>
 
 XCAM_BEGIN_DECLARE
 
@@ -225,8 +214,6 @@ typedef enum {
     XCAM_DENOISE_TYPE_RETINEX   = (1UL << 6), // retinex on yuv
     XCAM_DENOISE_TYPE_WAVELET   = (1UL << 7), // wavelet on yuv
 } XCamDenoiseType;
-
-
 
 XCAM_END_DECLARE
 

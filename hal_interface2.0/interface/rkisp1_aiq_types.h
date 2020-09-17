@@ -19,12 +19,12 @@
  */
 
 /*!
- * \file rk_aiq_types.h
+ * \file rkisp1_aiq_types.h
  * \brief Definitions of input/output structures of the Rockchip 3A library.
  */
 
-#ifndef __RK_AIQ_TYPES_H__
-#define __RK_AIQ_TYPES_H__
+#ifndef __RKISP1_AIQ_TYPES_H__
+#define __RKISP1_AIQ_TYPES_H__
 
 #include <stdint.h>
 
@@ -310,14 +310,14 @@ typedef struct
     unsigned short isp_input_height;
     unsigned short isp_output_width;
     unsigned short isp_output_height;
-} rk_aiq_exposure_sensor_descriptor_struct;
+} rkisp1_aiq_exposure_sensor_descriptor;
 
 typedef enum
 {
     rk_aiq_flash_mode_auto,
     rk_aiq_flash_mode_on,
     rk_aiq_flash_mode_off,
-} rk_aiq_flash_mode_enum;
+} rkisp1_aiq_flash_mode;
 
 /*!
  * \brief Flash status.
@@ -329,7 +329,7 @@ typedef enum
     rk_aiq_flash_status_pre,               /*!< Pre-flash use. */
     rk_aiq_flash_status_main,              /*!< Main flash use. */
     rk_aiq_flash_status_red_eye_reduction, /*!< Red Eye Reduction flash use. */
-} rk_aiq_flash_status_enum;
+} rkisp1_aiq_flash_status;
 
 /*!
  * \brief Manual focus parameters.

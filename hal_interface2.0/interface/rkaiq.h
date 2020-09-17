@@ -18,14 +18,14 @@
 #ifndef __RKAIQ_H
 #define __RKAIQ_H
 
-//#include <xcam_std.h>
+#include <xcam_std.h>
 #ifdef ANDROID_VERSION_ABOVE_8_X
 #include <CameraMetadata.h>
 using ::android::hardware::camera::common::V1_0::helper::CameraMetadata;
 #else
-#include <CameraMetadata.h>
+#include <camera/CameraMetadata.h>
 #endif
-#include "xcam_params.h"
+#include <base/xcam_params.h>
 
 using namespace android;
 namespace XCam {
@@ -339,8 +339,8 @@ typedef struct _AiqInputParams {
     // for tuning tool END
     AfInputParams   afInputParams;
     AAAControls     aaaControls;
-    // CameraMetadata  settings;
-    // CameraMetadata* staticMeta;
+    CameraMetadata  settings;
+    CameraMetadata* staticMeta;
     int sensorOutputWidth;
     int sensorOutputHeight;
     AiqFrameUseCase frameUseCase;

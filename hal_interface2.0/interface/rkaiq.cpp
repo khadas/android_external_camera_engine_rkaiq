@@ -74,7 +74,7 @@ _AiqInputParams &_AiqInputParams::operator=(const _AiqInputParams &other)
     this->aeInputParams.aiqParams = this;
     this->awbInputParams.aiqParams = this;
     this->afInputParams.aiqParams = this;
-    //this->settings = other.settings;
+    this->settings = other.settings;
 
     return *this;
 }

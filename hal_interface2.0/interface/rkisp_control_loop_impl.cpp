@@ -19,6 +19,8 @@
 #include <assert.h>
 #include <unistd.h>
 #include <fcntl.h> /* low-level i/o */
+#include <system/camera_metadata.h> //vendor Metadata
+#include <camera_metadata_hidden.h>
 
 //rkaiq head files
 #include <mediactl.h>
@@ -42,7 +44,10 @@
 #include "rkaiq.h"
 #include "AiqCameraHalAdapter.h"
 
+#include "isp20/CamHwIsp20.h"
+
 #define RK_3A_TUNING_FILE_PATH  "/vendor/etc/camera/rkisp1"
+#define RK_3A_TUNING_FILE_PATH2 "/vendor/etc/camera/rkisp1/"
 
 #define MAX_MEDIA_INDEX 16
 #define MAX_SENSOR_NUM  16
@@ -52,16 +57,17 @@ using namespace RkCam;
 using namespace XCam;
 using namespace android;
 
+CameraMetadata AiqCameraHalAdapter::staticMeta;
 static rkisp_metadata_info_t gDefMetadata[MAX_SENSOR_NUM];
+static vendor_tag_ops_t rkcamera_vendor_tag_ops_instance;
 
-typedef struct rk_aiq_sys_ctx_s {
-    const char* _sensor_entity_name;
-    SmartPtr<RkAiqManager> _rkAiqManager;
-    SmartPtr<ICamHw> _camHw;
-    SmartPtr<RkAiqCore> _analyzer;
-    SmartPtr<RkLumaCore> _lumaAnalyzer;
-    CamCalibDbContext_t *_calibDb;
-} rk_aiq_sys_ctx_t;
+typedef enum RKISP_CL_STATE_enum {
+    RKISP_CL_STATE_INVALID  = -1,
+    RKISP_CL_STATE_INITED   =  0,
+    RKISP_CL_STATE_PREPARED     ,
+    RKISP_CL_STATE_STARTED      ,
+    RKISP_CL_STATE_PAUSED       ,
+} RKISP_CL_STATE_e;
 
 static AiqCameraHalAdapter *gAiqCameraHalAdapter;
 
@@ -191,6 +197,7 @@ static int __rkisp_get_iq_exp_infos(SmartPtr<V4l2SubDevice> subDev, rkisp_metada
 	char iq_file_name[128];
 	CamCalibDbContext_t * calibdb_p = NULL;
 	int ret = 0;
+    int array_size;
 
 	ret = subDev->open ();
 	if(ret < 0){
@@ -204,17 +211,20 @@ static int __rkisp_get_iq_exp_infos(SmartPtr<V4l2SubDevice> subDev, rkisp_metada
 	}
 	xcam_mem_clear (iq_file_full_name);
 	xcam_mem_clear (iq_file_name);
-	strcpy(iq_file_full_name, RK_3A_TUNING_FILE_PATH);
+	strcpy(iq_file_full_name, RK_3A_TUNING_FILE_PATH2);
 	__rkisp_auto_select_iqfile(&camera_mod_info, metadata_info->entity_name, iq_file_name);
 	strcat(iq_file_full_name, iq_file_name);
 	if (access(iq_file_full_name, F_OK) == 0) {
 		calibdb_p = RkAiqCalibDb::createCalibDb(iq_file_full_name);
 		if (calibdb_p) {
 			CalibDb_AecGainRange_t* GainRange;
+			GainRange = &(calibdb_p->sensor.GainRange);
+			array_size = calibdb_p->sensor.GainRange.array_size;
 			metadata_info->gain_range[0] = calibdb_p->sensor.GainRange.pGainRange[0];
-			metadata_info->gain_range[1] = calibdb_p->sensor.GainRange.pGainRange[1];
+			metadata_info->gain_range[1] = calibdb_p->sensor.GainRange.pGainRange[array_size];
+			array_size = calibdb_p->aec.CommCtrl.stAeRoute.LinAeSeperate[0].array_size;
 			metadata_info->time_range[0] = calibdb_p->aec.CommCtrl.stAeRoute.LinAeSeperate[0].TimeDot[0];
-			metadata_info->time_range[1] = calibdb_p->aec.CommCtrl.stAeRoute.LinAeSeperate[0].TimeDot[9];
+			metadata_info->time_range[1] = calibdb_p->aec.CommCtrl.stAeRoute.LinAeSeperate[0].TimeDot[array_size];
 		}
 	}else {
 		LOGW("calib file %s not found! Ignore it if not raw sensor.", iq_file_full_name);
@@ -331,18 +341,21 @@ int rkisp_cl_init(void** cl_ctx, const char* tuning_file_path,
 }
 
 int rkisp_cl_rkaiq_init(void** cl_ctx, const char* tuning_file_path,
-                  const cl_result_callbacks_ops_t *callbacks_ops,
+                  const cl_result_callback_ops_t *callbacks_ops,
                   const char* sns_entity_name) {
     xcam_get_log_level();
     LOGD("--------------------------rk_aiq_uapi_sysctl_init");
-    rk_aiq_sys_ctx_s* aiq_ctx = NULL;
+    rk_aiq_sys_ctx_t* aiq_ctx = NULL;
     aiq_ctx = rk_aiq_uapi_sysctl_init(sns_entity_name, RK_3A_TUNING_FILE_PATH, NULL, NULL);
+    RkCamera3VendorTags::get_vendor_tag_ops(&rkcamera_vendor_tag_ops_instance);
+    set_camera_metadata_vendor_ops(&rkcamera_vendor_tag_ops_instance);
 
     *cl_ctx = (void*)aiq_ctx;
     LOGD("@%s(%d)aiq_ctx pointer(%p)",__FUNCTION__, __LINE__, aiq_ctx);
     if(cl_ctx){
         gAiqCameraHalAdapter = new AiqCameraHalAdapter(aiq_ctx->_rkAiqManager,aiq_ctx->_analyzer,aiq_ctx->_camHw);
         gAiqCameraHalAdapter->init(callbacks_ops);
+        gAiqCameraHalAdapter->set_aiq_ctx(aiq_ctx);
     }
     return 0;
 }
@@ -350,13 +363,18 @@ int rkisp_cl_rkaiq_init(void** cl_ctx, const char* tuning_file_path,
 int rkisp_cl_prepare(void* cl_ctx,
                      const struct rkisp_cl_prepare_params_s* prepare_params) {
 	LOGD("--------------------------rkisp_cl_prepare");
+    char iq_file_full_name[128] = {'\0'};
 
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
     LOGD("@%s(%d)cl_ctx pointer(%p)",__FUNCTION__, __LINE__, cl_ctx);
     rk_aiq_sys_ctx_t *aiq_ctx = AIQ_CONTEXT_CAST (cl_ctx);
     rk_aiq_working_mode_t work_mode = RK_AIQ_WORKING_MODE_ISP_HDR2; //work_mode = RK_AIQ_WORKING_MODE_NORMAL;
     ret = rk_aiq_uapi_sysctl_prepare(aiq_ctx, prepare_params->width, prepare_params->height, work_mode);
+    gAiqCameraHalAdapter->set_static_metadata (prepare_params->staticMeta);
+    gAiqCameraHalAdapter->set_working_mode(work_mode);
 
+    CamHwIsp20::selectIqFile(aiq_ctx->_sensor_entity_name, iq_file_full_name);
+    property_set(CAM_IQ_PROPERTY_KEY,iq_file_full_name);
     LOGD("--------------------------rkisp_cl_prepare done");
 
     return 0;
@@ -373,10 +391,19 @@ int rkisp_cl_start(void* cl_ctx) {
     return ret;
 }
 
-int rkisp_cl_rkaiq_set_frame_params(const void* cl_ctx,
-                              const struct rkisp_cl_frame_rkaiq_s* frame_params) {
-    gAiqCameraHalAdapter->setFrameParams(frame_params);
-    return XCAM_RETURN_NO_ERROR;
+int rkisp_cl_set_frame_params(const void* cl_ctx,
+                              const struct rkisp_cl_frame_metadata_s* frame_params) {
+    int ret = 0;
+
+    LOGD("--------------------------rkisp_cl_set_frame_params");
+    rk_aiq_sys_ctx_t *aiq_ctx = AIQ_CONTEXT_CAST (cl_ctx);
+
+    ret = gAiqCameraHalAdapter->set_control_params(frame_params->id, frame_params->metas);
+    if (ret != XCAM_RETURN_NO_ERROR) {
+        LOGE("@%s %d: set_control_params failed ", __FUNCTION__, __LINE__);
+    }
+
+    return 0;
 }
 
 // implement interface stop as pause so we could keep all the 3a status,
