@@ -362,7 +362,7 @@ AsharpResult_t select_edgefilter_params_by_ISO(RKAsharp_EdgeFilter_Params_t *str
 
 
 
-AsharpResult_t edgefilter_fix_transfer(RKAsharp_EdgeFilter_Params_Select_t* edgeflt, RKAsharp_Edgefilter_Fix_t* pEdgefilterCfg)
+AsharpResult_t edgefilter_fix_transfer(RKAsharp_EdgeFilter_Params_Select_t* edgeflt, RKAsharp_Edgefilter_Fix_t* pEdgefilterCfg , float fPercent)
 {
     int i = 0;
     int k = 0;
@@ -381,19 +381,41 @@ AsharpResult_t edgefilter_fix_transfer(RKAsharp_EdgeFilter_Params_Select_t* edge
         return ASHARP_RET_NULL_POINTER;
     }
 
+	if(fPercent <= 0.0f){
+		fPercent = 0.000001;
+	}
+	LOGD_ASHARP("%s(%d): fPercent:%f \n", __FUNCTION__, __LINE__, fPercent);
+
     //0x0080
     pEdgefilterCfg->alpha_adp_en = edgeflt->alpha_adp_en;
 
     //0x0084
 
     //0x0088
-    pEdgefilterCfg->edge_thed = edgeflt->edge_thed;
-    pEdgefilterCfg->dir_min = (unsigned char)ROUND_F(edgeflt->dir_min * (1 << reg_dir_min_fix_bits));
-    pEdgefilterCfg->smoth_th4 = (unsigned short)ROUND_F(edgeflt->smoth4 * (1 << reg_smoth4_fix_bits));
+    tmp = ROUND_F(edgeflt->edge_thed / fPercent );
+	if(tmp > 0xff){
+		tmp = 0xff;
+	}
+	pEdgefilterCfg->edge_thed  = tmp;
+	pEdgefilterCfg->dir_min = ROUND_F((edgeflt->dir_min ) * (1 << reg_dir_min_fix_bits));
+     tmp = ROUND_F((edgeflt->smoth4 + (fPercent -1.0)/(SHARP_MAX_STRENGTH_PERCENT)*1.0 )* (1 << reg_smoth4_fix_bits));
+	 if(tmp > 0xff){
+		tmp = 0xff;
+	 }
+	 pEdgefilterCfg->smoth_th4 = (unsigned short)tmp;
 
     //0x008c
-    pEdgefilterCfg->l_alpha = (unsigned short)ROUND_F(edgeflt->l_alpha * (1 << reg_l_alpha_fix_bits));
-    pEdgefilterCfg->g_alpha = (unsigned short)ROUND_F(edgeflt->g_alpha * (1 << reg_g_alpha_fix_bits));
+    tmp = ROUND_F(edgeflt->l_alpha / fPercent * (1 << reg_l_alpha_fix_bits));
+	if(tmp > 0x1ff){
+		tmp = 0x1ff;
+	}
+	pEdgefilterCfg->l_alpha = (unsigned short)tmp;
+	
+    tmp = ROUND_F(edgeflt->g_alpha / fPercent * (1 << reg_g_alpha_fix_bits));
+	if(tmp > 0x1ff){
+		tmp = 0x1ff;
+	}
+	pEdgefilterCfg->g_alpha = (unsigned short)tmp;
 
     //0x0090 - 0x00b0
 
@@ -453,7 +475,7 @@ AsharpResult_t edgefilter_fix_transfer(RKAsharp_EdgeFilter_Params_Select_t* edge
     sum_coeff_float = 0;
     for(int k = 0; k < RKEDGEFILTER_DOG_DIAM * RKEDGEFILTER_DOG_DIAM; k ++)
     {
-        sum_coeff += ROUND_F(edgeflt->dog_kernel[k] * (1 << reg_dog_kernel_fix_bits));
+        sum_coeff += ROUND_F(edgeflt->dog_kernel[k] * (fPercent -1.0)/SHARP_MAX_STRENGTH_PERCENT * 2 * (1 << reg_dog_kernel_fix_bits));
         sum_coeff_float += edgeflt->dog_kernel[k];
     }
     offset = int(sum_coeff_float * (1 << reg_dog_kernel_fix_bits)) - sum_coeff;
@@ -463,22 +485,42 @@ AsharpResult_t edgefilter_fix_transfer(RKAsharp_EdgeFilter_Params_Select_t* edge
 
     //0x0108 - 0x010c
     for(i = 0; i < 8; i++) {
-        pEdgefilterCfg->edge_lum_thed[i] = (unsigned char)edgeflt->edge_thed_1[i];
+		 tmp = ROUND_F(edgeflt->edge_thed_1[i] * fPercent);
+		 if(tmp > 0xff){
+			tmp = 0xff;
+		 }
+        pEdgefilterCfg->edge_lum_thed[i] = (unsigned char)tmp;
     }
 
     //0x0110 - 0x0114
     for(i = 0; i < 8; i++) {
-        pEdgefilterCfg->clamp_pos[i] = (unsigned char)edgeflt->clamp_pos_dog[i];
+         tmp = ROUND_F(edgeflt->clamp_pos_dog[i] * fPercent);
+		 if(tmp > 0xff){
+			tmp = 0xff;
+		 }
+		 pEdgefilterCfg->clamp_pos[i] = (unsigned char)tmp;
     }
 
     //0x0118 - 0x011c
     for(i = 0; i < 8; i++) {
-        pEdgefilterCfg->clamp_neg[i] = (unsigned char)edgeflt->clamp_neg_dog[i];
+		tmp = ROUND_F(edgeflt->clamp_neg_dog[i] * fPercent);
+		 if(tmp > 0xff){
+			tmp = 0xff;
+		 }
+        pEdgefilterCfg->clamp_neg[i] = (unsigned char)tmp;
     }
 
     //0x0120 - 0x0124
     for(i = 0; i < 8; i++) {
-        pEdgefilterCfg->detail_alpha[i] = (unsigned char)ROUND_F(edgeflt->detail_alpha_dog[i] * (1 << reg_detail_alpha_dog_fix_bits));
+		 if(fPercent > 1.0){
+         	tmp = ROUND_F((edgeflt->detail_alpha_dog[i] + (fPercent - 1.0)/SHARP_MAX_STRENGTH_PERCENT * 3 ) * (1 << reg_detail_alpha_dog_fix_bits));
+		 }else{
+			tmp = ROUND_F((edgeflt->detail_alpha_dog[i] ) * (1 << reg_detail_alpha_dog_fix_bits));
+		 }
+		 if(tmp > 0xff){
+			tmp = 0xff;
+		 }
+		 pEdgefilterCfg->detail_alpha[i] = (unsigned char)tmp;
     }
 
     return res;

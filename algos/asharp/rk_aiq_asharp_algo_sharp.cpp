@@ -640,9 +640,34 @@ AsharpResult_t rk_Sharp_V1_fix_transfer(RKAsharp_Sharp_HW_Params_Select_t *pShar
 		hClipStrength = fPercent / (MAX_SHARP_LUMA_CLIP_VALUE / pSharpV1->H_ratio ) ;
 	}
 
-	 LOGD_ASHARP("%s:%d percent:%f strength:%f %f\n", 
+	LOGD_ASHARP("%s:%d percent:%f m&h_strength:%f %f\n", 
 	 	__FUNCTION__, __LINE__, fPercent,
 		mClipStrength, hClipStrength);
+
+	pSharpV1->pbf_gain  = pSharpV1->pbf_gain/ fPercent;
+	if(pSharpV1->pbf_gain > 2.0)
+		pSharpV1->pbf_gain  = 2.0;
+
+	pSharpV1->pbf_add = pSharpV1->pbf_add/ fPercent;
+	if(pSharpV1->pbf_add > 255)
+		pSharpV1->pbf_add = 255;
+	
+	pSharpV1->mbf_gain  = pSharpV1->mbf_gain / fPercent;
+	if(pSharpV1->mbf_gain > 2.0)
+		pSharpV1->mbf_gain  = 2.0;
+
+	pSharpV1->mbf_add = pSharpV1->mbf_add / fPercent;
+	if(pSharpV1->mbf_add > 255)
+		pSharpV1->mbf_add = 255;	
+
+	pSharpV1->hbf_gain  = pSharpV1->hbf_gain / fPercent;
+	if(pSharpV1->hbf_gain > 2.0)
+		pSharpV1->hbf_gain  = 2.0;
+
+	pSharpV1->hbf_add = pSharpV1->hbf_add / fPercent;
+	if(pSharpV1->hbf_add > 255)
+		pSharpV1->hbf_add = 255;
+
 	
     //0x0080
     pSharpCfg->yin_flt_en = 1;
@@ -650,14 +675,18 @@ AsharpResult_t rk_Sharp_V1_fix_transfer(RKAsharp_Sharp_HW_Params_Select_t *pShar
 
     //0x0084
     tmp = ROUND_F(pSharpV1->hbf_ratio / fPercent * (1 << reg_sharpenHW_hbf_ratio_fix_bits));
+	if(tmp > 0x100){
+		tmp = 0x100;
+	}
+    pSharpCfg->hbf_ratio = (unsigned short)tmp;
+    tmp = ROUND_F(pSharpV1->ehf_th * fPercent);
 	if(tmp > 0xff){
 		tmp = 0xff;
 	}
-    pSharpCfg->hbf_ratio = (unsigned short)tmp;
-    pSharpCfg->ehf_th = (unsigned short)ROUND_F(pSharpV1->ehf_th);
+	pSharpCfg->ehf_th =(unsigned char) tmp;
 	tmp = ROUND_F(pSharpV1->pbf_ratio / fPercent * (1 << reg_sharpenHW_pbf_ratio_fix_bits));
-	if(tmp > 0x7f){
-		tmp = 0x7f;
+	if(tmp > 0x80){
+		tmp = 0x80;
 	}
 	pSharpCfg->pbf_ratio = (unsigned short)tmp;
 
@@ -847,8 +876,8 @@ AsharpResult_t rk_Sharp_V1_fix_transfer(RKAsharp_Sharp_HW_Params_Select_t *pShar
     //0x00e0 - 0x00e4
     for(i = 0; i < 8; i++) {
 		tmp = ((pSharpV1->lum_clp_m[i]) * mClipStrength);
-		if(tmp > 255){
-			tmp = 255;
+		if(tmp > 0xff){
+			tmp = 0xff;
 		}
 		pSharpCfg->lum_clp_m[i] = (unsigned char)tmp;
     }
@@ -863,6 +892,8 @@ AsharpResult_t rk_Sharp_V1_fix_transfer(RKAsharp_Sharp_HW_Params_Select_t *pShar
     }
 
     //0x00f0 - 0x00f4
+    
+	
     // mf bf sigma inv
     max_val = 0;
     min_val = 65536;
@@ -888,14 +919,15 @@ AsharpResult_t rk_Sharp_V1_fix_transfer(RKAsharp_Sharp_HW_Params_Select_t *pShar
     //0x00f8 - 0x00fc
     for(i = 0; i < 8; i++) {
         tmp = (pSharpV1->lum_clp_h[i] * hClipStrength);
-		if(tmp > 255){
-			tmp = 255;
+		if(tmp > 0xff){
+			tmp = 0xff;
 		}
 		pSharpCfg->lum_clp_h[i] = (unsigned char)tmp;
     }
 
     //0x0100 - 0x0104
     //hbf
+    
     max_val = 0;
     min_val = 65536;
     shf_bits = 0;
@@ -918,8 +950,20 @@ AsharpResult_t rk_Sharp_V1_fix_transfer(RKAsharp_Sharp_HW_Params_Select_t *pShar
     }
 
     //0x0128
-    pSharpCfg->rfl_ratio = (unsigned short)ROUND_F(pSharpV1->lratio * (1 << reg_sharpenHW_lratio_fix_bits));
-    pSharpCfg->rfh_ratio = (unsigned short)ROUND_F(pSharpV1->hratio * (1 << reg_sharpenHW_hratio_fix_bits));
+    tmp = ROUND_F(pSharpV1->lratio /  fPercent * (1 << reg_sharpenHW_lratio_fix_bits));
+	if(tmp > 0x100){
+		tmp = 0x100;
+	}
+	pSharpCfg->rfl_ratio = (unsigned short) tmp;
+	
+    tmp = ROUND_F(pSharpV1->hratio * fPercent * (1 << reg_sharpenHW_hratio_fix_bits));
+	if(tmp > 0x3ff){
+		tmp = 0x3ff;
+	}
+	if(tmp < 0x100){
+		tmp = 0x100;
+	}
+	pSharpCfg->rfh_ratio = (unsigned short) tmp;
 
     //0x012C
     pSharpCfg->m_ratio = (unsigned char)ROUND_F(pSharpV1->M_ratio * fPercent * (1 << reg_sharpenHW_M_ratio_fix_bits));

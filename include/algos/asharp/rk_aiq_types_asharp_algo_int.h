@@ -25,6 +25,9 @@
 
 
 RKAIQ_BEGIN_DECLARE
+
+#define SHARP_MAX_STRENGTH_PERCENT (100.0)
+
 #define MAX_ISO_STEP                CALIBDB_NR_SHARP_MAX_ISO_LEVEL
 //sharp
 #define IDX_SIGN                            0

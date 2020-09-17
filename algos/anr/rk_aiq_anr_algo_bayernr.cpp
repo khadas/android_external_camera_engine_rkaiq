@@ -531,6 +531,12 @@ ANRresult_t bayernr_fix_tranfer(RKAnr_Bayernr_Params_Select_t* rawnr, RKAnr_Baye
         return ANR_RET_NULL_POINTER;
     }
 
+	if(fStrength <= 0.0f){
+		fStrength = 0.000001;
+	}
+
+	LOGD_ANR("%s(%d): strength:%f \n", __FUNCTION__, __LINE__, fStrength);
+
     //(0x0004)
     pRawnrCfg->gauss_en = rawnr->sw_rawnr_gauss_en;
     pRawnrCfg->log_bypass = rawnr->log_bypass;
@@ -604,10 +610,26 @@ ANRresult_t bayernr_fix_tranfer(RKAnr_Bayernr_Params_Select_t* rawnr, RKAnr_Baye
 
 
     //(0x0058 - 0x0005c)
-    pRawnrCfg->fixw0 = (unsigned short)(rawnr->w[0] * (1 << FIXNLMCALC));
-    pRawnrCfg->fixw1 = (unsigned short)(rawnr->w[1] * (1 << FIXNLMCALC));
-    pRawnrCfg->fixw2 = (unsigned short)(rawnr->w[2] * (1 << FIXNLMCALC));
-    pRawnrCfg->fixw3 = (unsigned short)(rawnr->w[3] * (1 << FIXNLMCALC));
+    tmp = (rawnr->w[0] / fStrength * (1 << FIXNLMCALC));
+	if(tmp > 0x3ff){
+		tmp = 0x3ff;
+	}
+	pRawnrCfg->fixw0 = (unsigned short)tmp;
+	tmp = (rawnr->w[1] / fStrength * (1 << FIXNLMCALC));
+	if(tmp > 0x3ff){
+		tmp = 0x3ff;
+	}
+    pRawnrCfg->fixw1 = (unsigned short)tmp;;
+	tmp = (rawnr->w[2] / fStrength * (1 << FIXNLMCALC));
+	if(tmp > 0x3ff){
+		tmp = 0x3ff;
+	}
+    pRawnrCfg->fixw2 = (unsigned short)tmp;
+	tmp = (rawnr->w[3] / fStrength * (1 << FIXNLMCALC));
+	if(tmp > 0x3ff){
+		tmp = 0x3ff;
+	}
+    pRawnrCfg->fixw3 = (unsigned short)tmp;
 
 
     //(0x0060 - 0x00068)

@@ -1,7 +1,7 @@
 #include "rk_aiq_uapi_asharp_int.h"
 #include "asharp/rk_aiq_types_asharp_algo_prvt.h"
 
-#define SHARP_MAX_STRENGTH_PERCENT (5.0)
+
 
 XCamReturn
 rk_aiq_uapi_asharp_SetAttrib(RkAiqAlgoContext *ctx,

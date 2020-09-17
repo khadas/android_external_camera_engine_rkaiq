@@ -273,7 +273,7 @@ AsharpResult_t AsharpGetProcResult(AsharpContext_t *pAsharpCtx, AsharpProcResult
     }
 
     rk_Sharp_fix_transfer(&pAsharpResult->stSharpParamSelect, &pAsharpResult->stSharpFix, pAsharpCtx->fStrength);
-    edgefilter_fix_transfer(&pAsharpResult->stEdgefilterParamSelect, &pAsharpResult->stEdgefltFix);
+    edgefilter_fix_transfer(&pAsharpResult->stEdgefilterParamSelect, &pAsharpResult->stEdgefltFix,  pAsharpCtx->fStrength);
     pAsharpResult->stSharpFix.stSharpFixV1.sharp_en = pAsharpResult->sharpEn ;
     pAsharpResult->stEdgefltFix.edgeflt_en = pAsharpResult->edgeFltEn;
 #if ASHARP_FIX_VALUE_PRINTF

@@ -231,10 +231,19 @@
  * - update rkisp2x_tuner v0.2.0
  * - isp driver v0.1.6
  * - imx415 xml enable dc_en and set cfg_alpha
+ * v1.2.1
+ * - calib db: v1.2.7 magic code: 1021509
+ * - uApi changes:
+ *   - fix mwb params error after sysctl re-init
+ *   - fix dehaze bugs
+ * - optimize cpu usage
+ *   - support buf no sync
+ *   - disable Asharp_fix_Printf log
+ * - isp driver v0.1.7
  */
 
-#define RK_AIQ_VERSION_REAL_V "v1.2.0"
-#define RK_AIQ_RELEASE_DATE "2020-09-11"
+#define RK_AIQ_VERSION_REAL_V "v1.2.1"
+#define RK_AIQ_RELEASE_DATE "2020-09-17"
 
 /******* DO NOT EDIT THE FOLLOWINGS ***********/
 
