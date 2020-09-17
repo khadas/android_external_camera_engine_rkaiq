@@ -21,6 +21,7 @@
 #include "simulator/CamHwSimulator.h"
 #else
 #include "isp20/CamHwIsp20.h"
+#include "isp20/Isp20_module_dbg.h"
 #endif
 
 using namespace RkCam;
@@ -340,10 +341,13 @@ algoHandle(const rk_aiq_sys_ctx_t* ctx, const int algo_type)
 #include "rk_aiq_user_api_aldch.cpp"
 #include "rk_aiq_user_api_acp.cpp"
 
+#define RK_AIQ_ALGO_TYPE_MODULES (RK_AIQ_ALGO_TYPE_MAX + 1)
+
 XCamReturn
 rk_aiq_uapi_sysctl_setModuleCtl(const rk_aiq_sys_ctx_t* ctx, rk_aiq_module_id_t mId, bool mod_en)
 {
     ENTER_XCORE_FUNCTION();
+    CHECK_USER_API_ENABLE(RK_AIQ_ALGO_TYPE_MODULES);
 
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
     if (mId > RK_MODULE_INVAL && mId < RK_MODULE_MAX) {

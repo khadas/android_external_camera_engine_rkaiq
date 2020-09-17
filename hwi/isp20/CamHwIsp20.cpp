@@ -920,7 +920,7 @@ CamHwIsp20::init(const char* sns_ent_name)
     mSensorDev = sensorHw;
     mSensorDev->open();
 
-    memcpy(sns_name, sns_ent_name, sizeof(sns_name));
+    strncpy(sns_name, sns_ent_name, sizeof(sns_name));
 
     if (s_info->linked_to_isp)
         _linked_to_isp = true;
@@ -1010,6 +1010,8 @@ CamHwIsp20::init(const char* sns_ent_name)
             _mipi_tx_devs[i]->set_buffer_count(VIPCAP_TX_BUF_NUM);
             _mipi_rx_devs[i]->set_buffer_count(VIPCAP_TX_BUF_NUM);
         }
+        _mipi_tx_devs[i]->set_buf_sync (true);
+        _mipi_rx_devs[i]->set_buf_sync (true);
     }
 
     if (!_linked_to_isp) {
@@ -3975,6 +3977,17 @@ XCamReturn CamHwIsp20::getSensorFlip(bool& mirror, bool& flip)
     SmartPtr<SensorHw> mSensorSubdev = mSensorDev.dynamic_cast_ptr<SensorHw>();
 
     return mSensorSubdev->get_mirror_flip(mirror, flip);
+}
+
+void CamHwIsp20::setHdrGlobalTmoMode(int frame_id, bool mode)
+{
+    if (mNormalNoReadBack)
+        return;
+
+    SmartPtr<Isp20PollThread> isp20Pollthread = mPollthread.dynamic_cast_ptr<Isp20PollThread>();
+
+    if (isp20Pollthread.ptr())
+        isp20Pollthread->set_hdr_global_tmo_mode(frame_id, mode);
 }
 
 }; //namspace RkCam

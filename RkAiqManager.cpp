@@ -446,6 +446,13 @@ RkAiqManager::applyAnalyzerResult(SmartPtr<RkAiqFullParamsProxy>& results)
 
     aiqParams = results->data().ptr();
 
+    if (mWorkingMode != RK_AIQ_WORKING_MODE_NORMAL) {
+        SmartPtr<CamHwIsp20> mCamHwIsp20 = mCamHw.dynamic_cast_ptr<CamHwIsp20>();
+        bool isHdrGlobalTmo = aiqParams->mIspParams->data()->ahdr_proc_res.isHdrGlobalTmo;
+
+        mCamHwIsp20->setHdrGlobalTmoMode(aiqParams->mIspParams->data()->frame_id, isHdrGlobalTmo);
+    }
+
 #ifdef RUNTIME_MODULE_DEBUG
 #ifndef RK_SIMULATOR_HW
     if (g_bypass_exp_params)

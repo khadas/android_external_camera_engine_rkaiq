@@ -1,6 +1,22 @@
+/*
+ *  Copyright (c) 2020 Rockchip Corporation
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
+
 #ifndef __GENMESH_H__
 #define __GENMESH_H__
-
 
 /* 相机参数 */
 struct CameraCoeff
@@ -20,9 +36,14 @@ struct CameraCoeff
 /* 生成FEC映射表相关的参数 */
 struct FecParams
 {
+	int correctX;										/* 水平x方向校正：1代表校正，0代表不校正 */
+	int correctY;										/* 垂直y方向校正：1代表校正，0代表不校正 */
+	int saveMesh4bin;									/* 是否保存meshxi,xf,yi,yf4个bin文件：1代表保存，0代表不保存 */
+	char mesh4binPath[256];								/* 保存meshxi,xf,yi,yf4个bin文件的路径 */
 	int srcW, srcH, dstW, dstH;							/* 输入输出图像的分辨率 */
 	int srcW_ex, srcH_ex, dstW_ex, dstH_ex;				/* 扩展后的输入输出分辨率 */
-	int meshSizeW, meshSizeH, meshStepW, meshStepH;
+	int meshSizeW, meshSizeH;
+	double meshStepW, meshStepH;
 	int meshSize1bin;
 	int meshSize4bin;
 	unsigned short	SpbNum;
@@ -39,11 +60,14 @@ struct FecParams
 /* 生成LDCH映射表相关的参数 */
 struct LdchParams
 {
-	int srcW, srcH, dstW, dstH;
+	int saveMeshX;									/* 是否保存MeshX.bin文件：1代表保存，0代表不保存 */
+	char meshPath[256];								/* 保存MeshX.bin文件的路径 */
+	int srcW, srcH, dstW, dstH;						/* 输入输出图像的分辨率 */
 	int meshSizeW, meshSizeH;
 	double meshStepW, meshStepH;
+	int mapxFixBit;									/* 定点化左移位数 */
 	int meshSize;
-
+	int maxLevel;
 	double *mapx;
 	double *mapy;
 };
@@ -87,6 +111,9 @@ void genLdchMeshDeInit(LdchParams &ldchParams);
 
 /* LDCH: 预先计算的部分: 浮点未校正的小表和level=0,level=255的多项式参数 */
 void genLdchPreCalcPart(LdchParams &ldchParams, CameraCoeff &camCoeff);
+
+/* LDCH: 计算LDCH能够校正的最大程度 */
+void calcLdchMaxLevel(LdchParams &ldchParams, CameraCoeff &camCoeff);
 
 /*
 函数功能: 生成不同校正程度的mesh映射表，用于ISP的LDCH模块

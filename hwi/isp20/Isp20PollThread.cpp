@@ -391,7 +391,6 @@ Isp20PollThread::Isp20PollThread()
     , _capture_image_cond(false)
     , _is_raw_sync_yuv(false)
     , _loop_vain(false)
-
 {
     for (int i = 0; i < 3; i++) {
         SmartPtr<MipiPollThread> mipi_poll = new MipiPollThread(this, ISP_POLL_MIPI_TX, i);
@@ -477,6 +476,7 @@ Isp20PollThread::stop ()
 
     _isp_hdr_fid2times_map.clear();
     _isp_hdr_fid2ready_map.clear();
+    _hdr_global_tmo_state_map.clear();
     destroy_stop_fds_mipi ();
 
     return PollThread::stop ();
@@ -747,6 +747,7 @@ Isp20PollThread::trigger_readback()
     SmartPtr<V4l2BufferProxy> buf_proxy;
     uint32_t sequence = -1;
     sint32_t additional_times = -1;
+    bool isHdrGlobalTmo = false;
 
     _mipi_trigger_mutex.lock();
     _isp_hdr_fid2ready_map.size();
@@ -760,24 +761,48 @@ Isp20PollThread::trigger_readback()
     sequence = it_ready->first;
 
     if (_working_mode != RK_AIQ_WORKING_MODE_NORMAL) {
-        std::map<uint32_t, int>::iterator it_times_del;
-        for (std::map<uint32_t, int>::iterator iter = _isp_hdr_fid2times_map.begin();
-                iter != _isp_hdr_fid2times_map.end();) {
+        std::map<uint32_t, bool>::iterator it_del;
+        for (std::map<uint32_t, bool>::iterator iter = _hdr_global_tmo_state_map.begin();
+                iter !=  _hdr_global_tmo_state_map.end();) {
             if (iter->first < sequence) {
-                it_times_del = iter++;
-                LOGD_CAMHW_SUBM(ISP20POLL_SUBM, "del seq %d", it_times_del->first);
-                _isp_hdr_fid2times_map.erase(it_times_del);
+                it_del = iter++;
+                LOGD_CAMHW_SUBM(ISP20POLL_SUBM, "del seq %d", it_del->first);
+                _hdr_global_tmo_state_map.erase(it_del);
             } else if (iter->first == sequence) {
-                additional_times = iter->second;
-                it_times_del = iter++;
-                LOGD_CAMHW_SUBM(ISP20POLL_SUBM, "del seq %d", it_times_del->first);
-                _isp_hdr_fid2times_map.erase(it_times_del);
+                isHdrGlobalTmo = iter->second;
+                it_del = iter++;
+                LOGD_CAMHW_SUBM(ISP20POLL_SUBM, "del seq %d", it_del->first);
+                _hdr_global_tmo_state_map.erase(it_del);
                 break;
             } else {
-                LOGW_CAMHW_SUBM(ISP20POLL_SUBM, "%s missing rdtimes for buf_seq %d, min rdtimes_seq %d !",
+                LOGW_CAMHW_SUBM(ISP20POLL_SUBM, "%s missing tmo state for buf_seq %d, min rdtimes_seq %d !",
                                 __func__, sequence, iter->first);
-                additional_times = 0;
                 break;
+            }
+        }
+
+        if (isHdrGlobalTmo) {
+            additional_times = 0;
+        } else {
+            std::map<uint32_t, int>::iterator it_times_del;
+            for (std::map<uint32_t, int>::iterator iter = _isp_hdr_fid2times_map.begin();
+                    iter != _isp_hdr_fid2times_map.end();) {
+                if (iter->first < sequence) {
+                    it_times_del = iter++;
+                    LOGD_CAMHW_SUBM(ISP20POLL_SUBM, "del seq %d", it_times_del->first);
+                    _isp_hdr_fid2times_map.erase(it_times_del);
+                } else if (iter->first == sequence) {
+                    additional_times = iter->second;
+                    it_times_del = iter++;
+                    LOGD_CAMHW_SUBM(ISP20POLL_SUBM, "del seq %d", it_times_del->first);
+                    _isp_hdr_fid2times_map.erase(it_times_del);
+                    break;
+                } else {
+                    LOGW_CAMHW_SUBM(ISP20POLL_SUBM, "%s missing rdtimes for buf_seq %d, min rdtimes_seq %d !",
+                            __func__, sequence, iter->first);
+                    additional_times = 0;
+                    break;
+                }
             }
         }
     } else {
@@ -914,9 +939,10 @@ Isp20PollThread::trigger_readback()
                 tg.times = 2;
             tg.frame_timestamp = buf_proxy->get_timestamp () * 1000;
             // tg.times = 1;//fixed to three times readback
-            LOGD_CAMHW_SUBM(ISP20POLL_SUBM, "%s frame[%d]:ts %" PRId64 "ms, readback %dtimes \n",
+            LOGD_CAMHW_SUBM(ISP20POLL_SUBM, "%s frame[%d]:ts %" PRId64 "ms, isHdrGlobalTmo(%d), readback %dtimes \n",
                             __func__, sequence,
                             tg.frame_timestamp / 1000 / 1000,
+                            isHdrGlobalTmo,
                             tg.times);
 
             if (ret == XCAM_RETURN_NO_ERROR)
@@ -1041,8 +1067,16 @@ int Isp20PollThread::calculate_stride_per_line(const struct capture_fmt& fmt,
     pixelsPerLine = fmt.pcpp * DIV_ROUND_UP(sns_width, fmt.pcpp);
     actualBytesPerLine = pixelsPerLine * fmt.bpp[0] / 8;
 
+#if 0
     /* mipi wc(Word count) must be 4 byte aligned */
-    stridePerLine = 4 * DIV_ROUND_UP(actualBytesPerLine, 4);
+    stridePerLine = 256 * DIV_ROUND_UP(actualBytesPerLine, 256);
+#else
+    struct v4l2_format format;
+    memset(&format, 0, sizeof(format));
+
+    _isp_mipi_tx_infos[0].dev->get_format(format);
+    stridePerLine = format.fmt.pix_mp.plane_fmt[0].bytesperline;
+#endif
 
     LOGD_CAMHW_SUBM(ISP20POLL_SUBM, "sns_width: %d, pixelsPerLine: %d, bytesPerLine: %d, stridePerLine: %d\n",
                     sns_width,
@@ -1225,6 +1259,14 @@ Isp20PollThread::capture_raw_ctl(bool sync)
     LOGD_CAMHW_SUBM(ISP20POLL_SUBM, "capture raw and yuv images simultaneously!");
 
     return XCAM_RETURN_NO_ERROR;
+}
+
+void
+Isp20PollThread::set_hdr_global_tmo_mode(int frame_id, bool mode)
+{
+    _mipi_trigger_mutex.lock();
+    _hdr_global_tmo_state_map[frame_id] = mode;
+    _mipi_trigger_mutex.unlock();
 }
 
 }; //namspace RkCam

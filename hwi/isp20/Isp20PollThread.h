@@ -64,6 +64,7 @@ public:
     void set_working_mode(int mode, bool linked_to_isp);
     void set_loop_status(bool stat);
     XCamReturn capture_raw_ctl(bool sync);
+    void set_hdr_global_tmo_mode(int frame_id, bool mode);
     virtual XCamReturn start();
     virtual XCamReturn stop ();
     enum {
@@ -127,6 +128,7 @@ private:
     Mutex _capture_image_mutex;
     Cond _capture_image_cond;
     bool _is_raw_sync_yuv;
+    std::map<uint32_t, bool> _hdr_global_tmo_state_map;
 
     int calculate_stride_per_line(const struct capture_fmt& fmt,
                                   uint32_t& bytesPerLine);

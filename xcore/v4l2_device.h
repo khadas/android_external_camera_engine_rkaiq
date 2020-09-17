@@ -73,6 +73,7 @@ public:
         return _memory_type;
     }
     bool set_buf_type (enum v4l2_buf_type type);
+    bool set_buf_sync (bool sync);
     enum v4l2_buf_type get_buf_type () const {
         return _buf_type;
     }
@@ -148,6 +149,7 @@ protected:
     int32_t             _sensor_id;
     uint32_t            _capture_mode;
     enum v4l2_buf_type  _buf_type;
+    bool                _buf_sync;
     enum v4l2_memory    _memory_type;
     struct v4l2_plane  *_planes;
 

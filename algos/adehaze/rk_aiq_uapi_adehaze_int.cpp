@@ -8,6 +8,7 @@ rk_aiq_uapi_adehaze_SetAttrib(RkAiqAlgoContext *ctx,
                               bool need_sync)
 {
     AdehazeHandle_t * AdehazeHandle = (AdehazeHandle_t *)ctx;
+    LOGD_ADEHAZE("%s: setMode:%d", __func__, attr.mode);
     if(attr.mode == RK_AIQ_DEHAZE_MODE_AUTO) {
         if (attr.mode != AdehazeHandle->mode) {
             AdehazeHandle->calib_dehaz = AdehazeHandle->pCalibDb->dehaze;
@@ -78,7 +79,7 @@ rk_aiq_uapi_adehaze_SetAttrib(RkAiqAlgoContext *ctx,
             //AdehazeHandle->calib_dehaz.hdr.cfg_alpha[i] = attr.stEnhance.cfg_alpha;
             AdehazeHandle->calib_dehaz.hdr.enhance_value[i] = attr.stEnhance.level;
         }
-    }else if(attr.mode == RK_AIQ_DEHAZE_MODE_DEFAULT) {
+    } else if(attr.mode == RK_AIQ_DEHAZE_MODE_DEFAULT) {
         for(int i = 0; i < 9; i++) {
             AdehazeHandle->calib_dehaz.night.dc_en[i] = attr.stManual.dc_en;
             AdehazeHandle->calib_dehaz.night.enhance_en[i] = attr.stManual.enhance_en;
@@ -100,21 +101,21 @@ rk_aiq_uapi_adehaze_GetAttrib(RkAiqAlgoContext *ctx, adehaze_sw_t *attr)
     attr->mode = AdehazeHandle->mode;
     if (AdehazeHandle->mode == RK_AIQ_DEHAZE_MODE_AUTO) {
         if (AdehazeHandle->Dehaze_ISO_mode == 0) {
-        }else if (AdehazeHandle->Dehaze_ISO_mode == 1) {
-        }else if (AdehazeHandle->Dehaze_ISO_mode == 2) {
+        } else if (AdehazeHandle->Dehaze_ISO_mode == 1) {
+        } else if (AdehazeHandle->Dehaze_ISO_mode == 2) {
         }
-    }else if (AdehazeHandle->mode == RK_AIQ_DEHAZE_MODE_MANUAL) {
+    } else if (AdehazeHandle->mode == RK_AIQ_DEHAZE_MODE_MANUAL) {
         attr->stManual.strength = AdehazeHandle->strength;
         if (AdehazeHandle->Dehaze_ISO_mode == 0) {
-        }else if (AdehazeHandle->Dehaze_ISO_mode == 1) {
-        }else if (AdehazeHandle->Dehaze_ISO_mode == 2) {
+        } else if (AdehazeHandle->Dehaze_ISO_mode == 1) {
+        } else if (AdehazeHandle->Dehaze_ISO_mode == 2) {
         }
-    }else if (AdehazeHandle->mode == RK_AIQ_DEHAZE_MODE_ENHANCE) {
+    } else if (AdehazeHandle->mode == RK_AIQ_DEHAZE_MODE_ENHANCE) {
         if (AdehazeHandle->Dehaze_ISO_mode == 0) {
-        }else if (AdehazeHandle->Dehaze_ISO_mode == 1) {
-        }else if (AdehazeHandle->Dehaze_ISO_mode == 2) {
+        } else if (AdehazeHandle->Dehaze_ISO_mode == 1) {
+        } else if (AdehazeHandle->Dehaze_ISO_mode == 2) {
         }
-    }else if (AdehazeHandle->mode == RK_AIQ_DEHAZE_MODE_DEFAULT) {
+    } else if (AdehazeHandle->mode == RK_AIQ_DEHAZE_MODE_DEFAULT) {
     }
     return XCAM_RETURN_NO_ERROR;
 }

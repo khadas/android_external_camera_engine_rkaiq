@@ -190,6 +190,7 @@ public:
     XCamReturn enqueueBuffer(struct rk_aiq_vbuf *vbuf);
     XCamReturn offlineRdJobPrepare();
     XCamReturn offlineRdJobDone();
+    void setHdrGlobalTmoMode(int frame_id, bool mode);
     XCamReturn setSharpFbcRotation(rk_aiq_rotation_t rot) {
         _sharp_fbc_rotation = rot;
         return XCAM_RETURN_NO_ERROR;

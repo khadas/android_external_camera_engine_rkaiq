@@ -185,7 +185,10 @@ public:
     explicit RkAiqAwbHandleInt(RkAiqAlgoDesComm* des, RkAiqCore* aiqCore)
         : RkAiqHandle(des, aiqCore)
         , RkAiqAwbHandle(des, aiqCore)
-        , RkAiqHandleIntCom(des, aiqCore) {};
+        , RkAiqHandleIntCom(des, aiqCore) {
+        memset(&mCurAtt, 0, sizeof(rk_aiq_wb_attrib_t));
+        memset(&mNewAtt, 0, sizeof(rk_aiq_wb_attrib_t));
+      };
     virtual ~RkAiqAwbHandleInt() {
         RkAiqAwbHandle::deInit();
     };

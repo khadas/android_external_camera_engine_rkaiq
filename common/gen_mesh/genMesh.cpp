@@ -16,17 +16,23 @@ void genFecMeshInit(int srcW, int srcH, int dstW, int dstH, FecParams &fecParams
 	fecParams.dstW_ex = 32 * ((dstW + 31) / 32);
 	fecParams.dstH_ex = 32 * ((dstH + 31) / 32);
 	/* 映射表的步长 */
+	int meshStepW, meshStepH;
 	if (dstW > 1920) { //32x16
-		fecParams.meshStepW = 32;
-		fecParams.meshStepH = 16;
+		meshStepW = 32;
+		meshStepH = 16;
 	}
 	else { //16x8
-		fecParams.meshStepW = 16;
-		fecParams.meshStepH = 8;
+		meshStepW = 16;
+		meshStepH = 8;
 	}
 	/* 映射表的宽高 */
-	fecParams.meshSizeW = (fecParams.dstW_ex + fecParams.meshStepW - 1) / fecParams.meshStepW + 1;//modify to mesh alligned to 32x32
-	fecParams.meshSizeH = (fecParams.dstH_ex + fecParams.meshStepH - 1) / fecParams.meshStepH + 1;//modify to mesh alligned to 32x32
+	fecParams.meshSizeW = (fecParams.dstW_ex + meshStepW - 1) / meshStepW + 1;//modify to mesh alligned to 32x32
+	fecParams.meshSizeH = (fecParams.dstH_ex + meshStepH - 1) / meshStepH + 1;//modify to mesh alligned to 32x32
+
+	/* mesh表降采样的步长 */
+	fecParams.meshStepW = meshStepW;
+	fecParams.meshStepH = meshStepH;
+
 	/* MeshXY的大小 */
 	fecParams.meshSize1bin = fecParams.meshSizeW * fecParams.meshSizeH;
 	/* 浮点的mesh网格 */
@@ -36,15 +42,15 @@ void genFecMeshInit(int srcW, int srcH, int dstW, int dstH, FecParams &fecParams
 	fecParams.pMeshXY = new unsigned short[fecParams.meshSize1bin * 2 * 2];
 
 	/* 计算4个mesh的相关参数 */
-	unsigned short SpbMeshPNum = 128 / fecParams.meshStepH * fecParams.meshSizeW;
+	unsigned short SpbMeshPNum = 128 / meshStepH * fecParams.meshSizeW;
 	unsigned long MeshNumW;
 	int LastSpbH;
 	fecParams.SpbNum = (dstH + 128 - 1) / 128;
-	MeshNumW = fecParams.dstW_ex / fecParams.meshStepW;
+	MeshNumW = fecParams.dstW_ex / meshStepW;
 	fecParams.MeshPointNumW = MeshNumW + 1;
-	fecParams.SpbMeshPNumH = 128 / fecParams.meshStepH + 1;//16x8 -> 17, 32x16 -> 9
+	fecParams.SpbMeshPNumH = 128 / meshStepH + 1;//16x8 -> 17, 32x16 -> 9
 	LastSpbH = (fecParams.dstH_ex % 128 == 0) ? 128 : (fecParams.dstH_ex % 128);//modify to mesh alligned to 32x32
-	fecParams.LastSpbMeshPNumH = LastSpbH / fecParams.meshStepH + 1;
+	fecParams.LastSpbMeshPNumH = LastSpbH / meshStepH + 1;
 	/* 4个mesh的大小 */
 	fecParams.meshSize4bin = (fecParams.SpbNum - 1) * fecParams.MeshPointNumW * fecParams.SpbMeshPNumH + fecParams.MeshPointNumW * fecParams.LastSpbMeshPNumH;
 
@@ -92,10 +98,11 @@ void genLdchMeshInit(int srcW, int srcH, int dstW, int dstH, LdchParams &ldchPar
 
 	int map_scale_bit_X = 4;
 	int map_scale_bit_Y = 3;
-	int mapx_fix_bit = 4;
+	/* 定点化左移位数 */
+	ldchParams.mapxFixBit = 4;
 	if (dstW > 4096)
 	{
-		mapx_fix_bit = 3;
+		ldchParams.mapxFixBit = 3;
 	}
 	// mesh表的宽，如2688->169
 	ldchParams.meshSizeW = ((dstW + (1 << map_scale_bit_X) - 1) >> map_scale_bit_X) + 1;
@@ -105,6 +112,8 @@ void genLdchMeshInit(int srcW, int srcH, int dstW, int dstH, LdchParams &ldchPar
 	/* mesh表降采样的步长 */
 	ldchParams.meshStepW = double(dstW) / double(ldchParams.meshSizeW);
 	ldchParams.meshStepH = double(dstH) / double(ldchParams.meshSizeH);
+	//ldchParams.meshStepW = 16;
+	//ldchParams.meshStepH = 8;
 
 	/* 对齐后的宽 */
 	int mapWidAlign = ((ldchParams.meshSizeW + 1) >> 1) << 1;//例如，分辨率2688*1520，169->170
@@ -118,6 +127,9 @@ void genLdchMeshInit(int srcW, int srcH, int dstW, int dstH, LdchParams &ldchPar
 
 	/* LDCH: 预先计算的部分: 浮点未校正的小表和level=0,level=255的多项式参数 */
 	genLdchPreCalcPart(ldchParams, camCoeff);
+
+	/* LDCH: 计算LDCH能够校正的最大程度 */
+	calcLdchMaxLevel(ldchParams, camCoeff);
 }
 
 /* LDCH: 反初始化 */

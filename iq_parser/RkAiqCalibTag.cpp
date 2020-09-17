@@ -1392,6 +1392,7 @@ uint32_t calib_sensor_ldch_sub_tags[] = {
     CALIB_SENSOR_LDCH_ENABLE_TAG_ID,
     CALIB_SENSOR_LDCH_MESH_FILE_TAG_ID,
     CALIB_SENSOR_LDCH_CORRECT_LEVEL_TAG_ID,
+    CALIB_SENSOR_LDCH_CORRECT_LEVEL_MAX_TAG_ID,
     CALIB_SENSOR_LDCH_LIGHT_CENTER_TAG_ID,
     CALIB_SENSOR_LDCH_DISTORTION_COEFF_ID,
 };
@@ -5349,7 +5350,11 @@ calib_tag_info_t g_calib_tag_infos[CALIB_IQ_TAG_END] = {
         check_tags_array_ignore, NULL
     },
     [CALIB_SENSOR_LDCH_CORRECT_LEVEL_TAG_ID]         =
-    {   "correct_level", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
+    {   "correct_level", CALIB_TAG_TYPE_INT, {-1, -1},
+        check_tags_array_ignore, NULL
+    },
+    [CALIB_SENSOR_LDCH_CORRECT_LEVEL_MAX_TAG_ID]         =
+    {   "correct_level_max",  CALIB_TAG_TYPE_INT, {-1, -1},
         check_tags_array_ignore, NULL
     },
     [CALIB_SENSOR_LDCH_LIGHT_CENTER_TAG_ID]         =
@@ -5375,7 +5380,7 @@ calib_tag_info_t g_calib_tag_infos[CALIB_IQ_TAG_END] = {
         check_tags_array_ignore, NULL
     },
     [CALIB_SENSOR_FEC_CORRECT_LEVEL_TAG_ID]         =
-    {   "correct_level", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
+    {   "correct_level", CALIB_TAG_TYPE_INT, {-1, -1},
         check_tags_array_ignore, NULL
     },
     [CALIB_SENSOR_FEC_LIGHT_CENTER_TAG_ID]         =

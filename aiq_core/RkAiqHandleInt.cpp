@@ -4636,7 +4636,7 @@ RkAiqAldchHandleInt::prepare()
     RkAiqAlgoConfigAldchInt* aldch_config_int = (RkAiqAlgoConfigAldchInt*)mConfig;
     RkAiqCore::RkAiqAlgosShared_t* shared = &mAiqCore->mAlogsSharedParams;
 
-    memcpy(&aldch_config_int->aldch_calib_cfg, &shared->calib->aldch, sizeof(CalibDb_LDCH_t));
+    // memcpy(&aldch_config_int->aldch_calib_cfg, &shared->calib->aldch, sizeof(CalibDb_LDCH_t));
     aldch_config_int->resource_path = shared->resourcePath;
 
     RkAiqAlgoDescription* des = (RkAiqAlgoDescription*)mDes;

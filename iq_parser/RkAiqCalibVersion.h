@@ -76,11 +76,13 @@
  *  - dehaze: add normal, HDR and night mode
  * v1.2.6
  *  -sensorinfo: add CISHdrGainIndSetEn for Stagger+same gain
+ * v1.2.7
+ *  -aldch: add correct_level_max filed
  */
 
 
-#define RK_AIQ_CALIB_VERSION_REAL_V          "v1.2.6"
-#define RK_AIQ_CALIB_VERSION_MAGIC_V         "1019694"
+#define RK_AIQ_CALIB_VERSION_REAL_V          "v1.2.7"
+#define RK_AIQ_CALIB_VERSION_MAGIC_V         "1021509"
 
 
 /******* DO NOT EDIT THE FOLLOWINGS ***********/

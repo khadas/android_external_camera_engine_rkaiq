@@ -18,12 +18,12 @@
 #include "rk_aiq_user_api_a3dlut.h"
 #include "RkAiqHandleInt.h"
 #include "rk_aiq_user_api_sysctl.h"
-
 RKAIQ_BEGIN_DECLARE
 
 XCamReturn
 rk_aiq_user_api_a3dlut_SetAttrib(const rk_aiq_sys_ctx_t* sys_ctx, rk_aiq_lut3d_attrib_t attr)
 {
+    CHECK_USER_API_ENABLE(RK_AIQ_ALGO_TYPE_A3DLUT);
     RkAiqA3dlutHandleInt* algo_handle =
         algoHandle<RkAiqA3dlutHandleInt>(sys_ctx, RK_AIQ_ALGO_TYPE_A3DLUT);
 

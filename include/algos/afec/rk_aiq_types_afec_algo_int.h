@@ -6,7 +6,7 @@
 typedef struct rk_aiq_fec_cfg_s {
     unsigned int en;
     int bypass;
-    unsigned char correct_level;
+    int correct_level;
 } rk_aiq_fec_cfg_t;
 
 #endif

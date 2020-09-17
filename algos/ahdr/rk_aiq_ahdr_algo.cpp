@@ -1162,16 +1162,17 @@ bool BandPrior
 
     bool returnValue = false;
 
-    if(pAhdrCtx->AhdrConfig.tmo_para.Band.isHdrGlobalTmo == true)
-        bool returnValue =
-            pAhdrCtx->AhdrProcRes.TmoProcRes.sw_hdrtmo_set_weightkey == 0 ? true : false;
+    if(pAhdrCtx->AhdrConfig.tmo_para.Band.isHdrGlobalTmo == true) {
+        returnValue = true;
+        pAhdrCtx->AhdrProcRes.TmoProcRes.sw_hdrtmo_set_weightkey = 0;
+    }
 
     else
         returnValue = false;
 
-    return returnValue;
-
     LOGD_AHDR("%s: BandPrior:%d\n", __FUNCTION__, returnValue);
+
+    return returnValue;
 
     LOG1_AHDR( "%s:exit!\n", __FUNCTION__);
 }

@@ -1,4 +1,4 @@
-
+#include "RkGenMeshVersion.h"
 #include "genMesh.h"
 #include "genMeshUtils.h"
 #include "Utils.h"
@@ -22,7 +22,6 @@ extern "C" {
 #endif
 
 
-
 /* 测试FEC分级校正效果 */
 void test1()
 {
@@ -44,6 +43,18 @@ void test1()
 	//camCoeff.cx = 2035.6544000000001233274815604090690612792968750000000000000000000000000000000000000000000000000000000000;
 	//camCoeff.cy = 1515.2591999999999643478076905012130737304687500000000000000000000000000000000000000000000000000000000000;
 
+	/* 3840x2160_imx415_2.88mm_ISP */
+	srcWidth = 3840;
+	srcHeight = 2160;
+	dstWidth = 3840;
+	dstHeight = 2160;
+	camCoeff.a0 = -2297.284245574242504517;
+	camCoeff.a2 = 0.0001183387160889;
+	camCoeff.a3 = 0.00000000621559354720;
+	camCoeff.a4 = 0.00000000001194583141;
+	camCoeff.cx = 1950.09945599999991827644;
+	camCoeff.cy = 1124.36467200000015509431;
+
 	/* 3840x2160_imx415_2.8mm */
 	//srcWidth = 3584;
 	//srcHeight = 2016;
@@ -57,16 +68,16 @@ void test1()
 	//camCoeff.cy = 1123.5352222944213735900120809674263000488281250000000000000000000000000000000000000000000000000000000000;
 
 	/* 3840x2160_imx415_3.6mm_ISP */
-	srcWidth = 3584;
-	srcHeight = 2016;
-	dstWidth = 3584;
-	dstHeight = 2016;
-	camCoeff.a0 = -2819.4072493821618081;
-	camCoeff.a2 = 0.0000316126581792;
-	camCoeff.a3 = 0.0000000688410142;
-	camCoeff.a4 = -0.0000000000130686;
-	camCoeff.cx = 1956.3909119999998438;
-	camCoeff.cy = 1140.6355200000000422;
+	//srcWidth = 3584;
+	//srcHeight = 2016;
+	//dstWidth = 3584;
+	//dstHeight = 2016;
+	//camCoeff.a0 = -2819.4072493821618081;
+	//camCoeff.a2 = 0.0000316126581792;
+	//camCoeff.a3 = 0.0000000688410142;
+	//camCoeff.a4 = -0.0000000000130686;
+	//camCoeff.cx = 1956.3909119999998438;
+	//camCoeff.cy = 1140.6355200000000422;
 
 	/* 3840x2160_imx415_3.6mm */
 	//srcWidth = 3840;
@@ -108,18 +119,35 @@ void test1()
 	//camCoeff.cx = 1333.2695039999998698476701974868774414062500000000000000000000000000000000000000000000000000000000000000;
 	//camCoeff.cy = 728.1043200000000297222868539392948150634765625000000000000000000000000000000000000000000000000000000000;
 
+	/* s5kgm1sp_2mm_3840x2160 */
+	//srcWidth = 3840;
+	//srcHeight = 2160;
+	//dstWidth = 3840;
+	//dstHeight = 2160;
+	//camCoeff.a0 = -2218.1261186871761310612782835960388183593750000000000000000000000000000000000000000000000000000000000000;
+	//camCoeff.a2 = 0.0001041174419821471223372016945418749855889473110437393188476562500000000000000000000000000000000000;
+	//camCoeff.a3 = 0.0000000126660789198655226725038293366168429265883332845987752079963684082031250000000000000000000000;
+	//camCoeff.a4 = -0.0000000000042910636667388937011160122430028583239564055062942315998952835798263549804687500000000000;
+	//camCoeff.cx = 1941.4969974473960974137298762798309326171875000000000000000000000000000000000000000000000000000000000000;
+	//camCoeff.cy = 1119.2980280068773026869166642427444458007812500000000000000000000000000000000000000000000000000000000000;
+
 	int srcSize = (srcWidth * srcHeight) > (dstWidth * dstHeight) ? (srcWidth * srcHeight) : (dstWidth * dstHeight);
 	unsigned char *pImgY = new unsigned char[srcSize];
 	unsigned char *pImgUV = new unsigned char[srcSize];
 	unsigned char *pImgOut = new unsigned char[srcSize * 2];
 	/* 读yuv文件 */
 	char srcYuvPath[256];
-	//sprintf(srcYuvPath, "../data_in/imx415_2.8mm_3840x2160/imx415_2.8mm_3840x2160_001.nv12");
-	sprintf(srcYuvPath, "../data_in/imx415_3584x2016_fec_off.nv12");
+	sprintf(srcYuvPath, "../data_in/imx415_2.8mm_3840x2160/imx415_2.8mm_3840x2160_001.nv12");	/* 3840x2160_imx415_2.8mm */
+	//sprintf(srcYuvPath, "../data_in/s5kgm1sp_2mm_3840x2160/s5kgm1sp_2mm_3840x2160_001.nv12");
+	//sprintf(srcYuvPath, "../data_in/imx415_2.88mm_3584x2016/imx415_2.88mm_3584x2016_001.nv12");
 	readNV12(srcYuvPath, srcWidth, srcHeight, pImgY, pImgUV);
 
 	/* 生成FEC映射表相关的参数 */
 	FecParams fecParams;
+	fecParams.correctX = 1;								/* 水平x方向校正：1代表校正，0代表不校正 */
+	fecParams.correctY = 1;								/* 垂直y方向校正：1代表校正，0代表不校正 */
+	fecParams.saveMesh4bin = 0;							/* 是否保存meshxi,xf,yi,yf4个bin文件：1代表保存，0代表不保存 */
+	sprintf(fecParams.mesh4binPath, "../data_out/");	/* 保存meshxi,xf,yi,yf4个bin文件的路径 */
 	/* 初始化：根据图像输出分辨率，计算FEC映射表的相关参数，申请需要的buffer */
 	genFecMeshInit(srcWidth, srcHeight, dstWidth, dstHeight, fecParams, camCoeff);
 
@@ -134,6 +162,7 @@ void test1()
 	bool success;
 	int level = 0;// level范围: 0-255
 	char dstYuvPath[256];
+	char dstBmpPath[256];
 	for (level = 0; level <= 255; level++)
 	{
 		printf("level = %d\n", level);
@@ -147,8 +176,28 @@ void test1()
 		FEC_Cmodel_4bin(srcWidth, srcHeight, dstWidth, dstHeight, pImgY, pImgUV, pMeshXI, pMeshXF, pMeshYI, pMeshYF, pImgOut);
 
 		/* 保存 */
-		sprintf(dstYuvPath, "../data_out/fec_out_%dx%d_%03d.nv12", dstWidth, dstHeight, level);
-		saveNV12(dstYuvPath, dstWidth, dstHeight, pImgOut);
+		if (fecParams.correctX == 1 && fecParams.correctY == 1)
+		{
+			sprintf(dstYuvPath, "../data_out/fec_out_both_correct_%dx%d_%03d.nv12", dstWidth, dstHeight, level);
+			sprintf(dstBmpPath, "../data_out/fec_out_both_correct_%dx%d_%03d.bmp", dstWidth, dstHeight, level);
+		}
+		else if (fecParams.correctX == 1 && fecParams.correctY == 0)
+		{
+			sprintf(dstYuvPath, "../data_out/fec_out_x_correct_%dx%d_%03d.nv12", dstWidth, dstHeight, level);
+			sprintf(dstBmpPath, "../data_out/fec_out_x_correct_%dx%d_%03d.bmp", dstWidth, dstHeight, level);
+		}
+		else if (fecParams.correctX == 0 && fecParams.correctY == 1)
+		{
+			sprintf(dstYuvPath, "../data_out/fec_out_y_correct_%dx%d_%03d.nv12", dstWidth, dstHeight, level);
+			sprintf(dstBmpPath, "../data_out/fec_out_y_correct_%dx%d_%03d.bmp", dstWidth, dstHeight, level);
+		}
+		else if (fecParams.correctX == 0 && fecParams.correctY == 0)
+		{
+			sprintf(dstYuvPath, "../data_out/fec_out_no_correct_%dx%d_%03d.nv12", dstWidth, dstHeight, level);
+			sprintf(dstBmpPath, "../data_out/fec_out_no_correct_%dx%d_%03d.bmp", dstWidth, dstHeight, level);
+		}
+		//saveNV12(dstYuvPath, dstWidth, dstHeight, pImgOut);
+		yuv2bmp(dstBmpPath, 0, pImgOut, &pImgOut[dstWidth * dstHeight], dstWidth, dstHeight);
 	}
 	delete[] pImgY;
 	delete[] pImgUV;
@@ -229,6 +278,18 @@ void test2()
 	//camCoeff.cx = 1363.0740479999999479332473129034042358398437500000000000000000000000000000000000000000000000000000000000;
 	//camCoeff.cy = 787.0316799999999375359038822352886199951171875000000000000000000000000000000000000000000000000000000000;
 
+	/* s5kgm1sp_2mm_3840x2160 */
+	//srcWidth = 3840;
+	//srcHeight = 2160;
+	//dstWidth = 3840;
+	//dstHeight = 2160;
+	//camCoeff.a0 = -2218.1261186871761310612782835960388183593750000000000000000000000000000000000000000000000000000000000000;
+	//camCoeff.a2 = 0.0001041174419821471223372016945418749855889473110437393188476562500000000000000000000000000000000000;
+	//camCoeff.a3 = 0.0000000126660789198655226725038293366168429265883332845987752079963684082031250000000000000000000000;
+	//camCoeff.a4 = -0.0000000000042910636667388937011160122430028583239564055062942315998952835798263549804687500000000000;
+	//camCoeff.cx = 1941.4969974473960974137298762798309326171875000000000000000000000000000000000000000000000000000000000000;
+	//camCoeff.cy = 1119.2980280068773026869166642427444458007812500000000000000000000000000000000000000000000000000000000000;
+
 	int srcSize = (srcWidth * srcHeight) > (dstWidth * dstHeight) ? (srcWidth * srcHeight) : (dstWidth * dstHeight);
 	unsigned short *pImgIn = new unsigned short[srcSize * 3];
 	unsigned short *pImgOut = new unsigned short[srcSize * 3];
@@ -238,6 +299,8 @@ void test2()
 	sprintf(srcBGRPath, "../data_in/imx415_2.8mm_3840x2160/imx415_2.8mm_3840x2160_001.jpeg");	/* 3840x2160_imx415_2.8mm */
 	//sprintf(srcBGRPath, "../data_in/imx415_3.6mm_3840x2160/imx415_3.6mm_3840x2160_001.jpeg");	/* 3840x2160_imx415_3.6mm */
 	//sprintf(srcBGRPath, "../data_in/imx347_4mm_2688x1520/imx347_4mm_2688x1520_006.bmp");		/* 2688x1520_imx347_4mm */
+	//sprintf(srcBGRPath, "../data_in/s5kgm1sp_2mm_3840x2160/s5kgm1sp_2mm_3840x2160_001.png");	/* s5kgm1sp_2mm_3840x2160 */
+
 #ifdef WIN32
 	cv::Mat imgBGR = cv::imread(srcBGRPath);
 	unsigned char *pIn = imgBGR.data;
@@ -254,35 +317,40 @@ void test2()
 		}
 	}
 #endif
+	Rkclock rkclock;
 
 	/* 生成LDCH映射表相关的参数 */
 	LdchParams ldchParams;
-	/* 初始化：根据图像输出分辨率，计算LDCH映射表的相关参数，申请需要的buffer */
-	genLdchMeshInit(srcWidth, srcHeight, dstWidth, dstHeight, ldchParams, camCoeff);
-	unsigned short *pMeshX = new unsigned short[ldchParams.meshSize];
+	ldchParams.saveMeshX = 1;						/* 是否保存MeshX.bin文件：1代表保存，0代表不保存 */
+	sprintf(ldchParams.meshPath, "../data_out/");	/* 保存MeshX.bin文件的路径 */
 
-	Rkclock rkclock;
+	rkclock.clockStart();
+	genLdchMeshInit(srcWidth, srcHeight, dstWidth, dstHeight, ldchParams, camCoeff);	/* 初始化：根据图像输出分辨率，计算LDCH映射表的相关参数，申请需要的buffer */
+	rkclock.clockEnd("genLdchMeshInit");
+
+	unsigned short *pMeshX = new unsigned short[ldchParams.meshSize];
 	bool success;
-	int level = 0;// level范围: 0-255
+	int level = 0;				/* level范围: 0-255 */
 	char dstYuvPath[256];
-	for (level = 160; level <= 160; level++)
+	for (level = 255; level <= 255; level++)
 	{
 		printf("level = %d\n", level);
 
 		rkclock.clockStart();
-		success = genLDCMeshNLevel(ldchParams, camCoeff, level, pMeshX);
+		success = genLDCMeshNLevel(ldchParams, camCoeff, level, pMeshX);	/* 生成对应校正level的LDCH映射表 */
 		rkclock.clockEnd("genLDCMeshNLevel");
 
-		/* 调用LDCH_Cmodel */
-		LDCH_Cmodel(dstWidth, dstHeight, pImgIn, pImgOut, pMeshX);
+		LDCH_Cmodel(dstWidth, dstHeight, pImgIn, pImgOut, pMeshX);			/* 调用LDCH_Cmodel */
 
+#ifdef WIN32
 		/* 保存 */
-		sprintf(dstYuvPath, "../data_out/ldch_out_%dx%d_%03d.jpg", dstWidth, dstHeight, level);
 		int imgBit = 8;
-		SaveBmpFile2(dstYuvPath, dstWidth, dstHeight, imgBit, pImgOut);
-
+		//sprintf(dstYuvPath, "../data_out/ldch_out_%dx%d_%03d.bmp", dstWidth, dstHeight, level);
+		//SaveBmpFile2(dstYuvPath, dstWidth, dstHeight, imgBit, pImgOut);
+		sprintf(dstYuvPath, "../data_out/ldch_out_%dx%d_%03d.nv12", dstWidth, dstHeight, level);
+		saveLdchNV12(dstYuvPath, dstWidth, dstHeight, imgBit, pImgOut);
+#endif
 	}
-
 	delete[] pImgIn;
 	delete[] pImgOut;
 	delete[] pMeshX;

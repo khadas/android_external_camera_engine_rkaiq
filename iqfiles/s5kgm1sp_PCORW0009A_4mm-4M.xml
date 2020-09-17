@@ -20,7 +20,7 @@
             v1.0.8
         </generator_version>
         <magic_code_version index="1" type="int" size="[1 1]">
-            [1019694 ]
+            [1021509]
         </magic_code_version>
     </header>
     <sensor type="struct" size="[1 1]">
@@ -38885,9 +38885,8 @@
             <mesh_file index="1" type="char" size="[1 33]">
                 LDCH_mesh_s5kgm1sp_16mm_3840_2160
             </mesh_file>
-            <correct_level index="1" type="double" size="[1 1]">
-                [1.00000000000000e+00 ]
-            </correct_level>
+            <correct_level index="1" type="int" size="[1 1]">               [255]            </correct_level>
+            <correct_level_max index="1" type="int" size="[1 1]">               [255]            </correct_level_max>
             <light_center index="1" type="double" size="[1 2]">	      [1956.3909119999998438 1140.6355200000000422]	 </light_center>	 <distortion_coeff index="1" type="double" size="[1 4]">	      [-2819.4072493821618081 0.0000316126581792 0.0000000688410142 -0.0000000000130686]	 </distortion_coeff>
         </LDCH>
         <FEC index="1" type="struct" size="[1 1]">
@@ -38897,8 +38896,8 @@
             <mesh_file index="1" type="char" size="[1 32]">
                 FEC_mesh_s5kgm1sp_16mm_3840_2160
             </mesh_file>
-            <correct_level index="1" type="double" size="[1 1]">
-                [255.0 ]
+            <correct_level index="1" type="int" size="[1 1]">
+                [255]
             </correct_level>
             <light_center index="1" type="double" size="[1 2]">
                 [1.33326950400000e+03 7.28104320000000e+02 ]

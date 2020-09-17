@@ -23,6 +23,7 @@ RKAIQ_BEGIN_DECLARE
 XCamReturn
 rk_aiq_user_api_ahdr_SetAttrib(const rk_aiq_sys_ctx_t* sys_ctx, ahdr_attrib_t attr)
 {
+    CHECK_USER_API_ENABLE(RK_AIQ_ALGO_TYPE_AHDR);
     RkAiqAhdrHandleInt* algo_handle =
         algoHandle<RkAiqAhdrHandleInt>(sys_ctx, RK_AIQ_ALGO_TYPE_AHDR);
 

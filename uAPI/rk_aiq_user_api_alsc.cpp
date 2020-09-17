@@ -23,6 +23,7 @@ RKAIQ_BEGIN_DECLARE
 XCamReturn
 rk_aiq_user_api_alsc_SetAttrib(const rk_aiq_sys_ctx_t* sys_ctx, rk_aiq_lsc_attrib_t attr)
 {
+    CHECK_USER_API_ENABLE(RK_AIQ_ALGO_TYPE_ALSC);
     /*  RkAiqAlscHandleInt* algo_handle =
           algoHandle<RkAiqAlscHandleInt>(sys_ctx, RK_AIQ_ALGO_TYPE_ALSC);
 

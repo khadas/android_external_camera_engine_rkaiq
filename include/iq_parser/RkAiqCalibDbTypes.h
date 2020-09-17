@@ -1650,7 +1650,7 @@ typedef struct CalibDb_LUMA_DETECT_s {
 typedef struct CalibDb_FEC_s {
     unsigned char fec_en;
     char meshfile[256];
-    double correct_level;
+    int correct_level;
     double light_center[2]; // light center
     double coefficient[4]; // the distortion coefficient of the fisheye lens
 } CalibDb_FEC_t;
@@ -1658,7 +1658,8 @@ typedef struct CalibDb_FEC_s {
 typedef struct CalibDb_LDCH_s {
     unsigned char ldch_en;
     char meshfile[256];
-    double correct_level;
+    int correct_level;
+    int correct_level_max;
     double light_center[2]; // light center
     double coefficient[4]; // the distortion coefficient of the fisheye lens
 } CalibDb_LDCH_t;

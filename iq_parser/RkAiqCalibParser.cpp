@@ -295,7 +295,7 @@ int RkAiqCalibParser::ParseDoubleArray
         for (int i = 0; i < rows; i++)
         {
             for (int k = 0; k < cols; k++) {
-                snprintf(tmp_val_str, sizeof(tmp_val_str), "%.14e ", values[i * cols + k]);
+                snprintf(tmp_val_str, sizeof(tmp_val_str), "%.16e ", values[i * cols + k]);
                 strcat(str, tmp_val_str);
             }
             if (i < rows - 1) {
@@ -11265,7 +11265,10 @@ bool RkAiqCalibParser::parseEntrySensorLdch
             char mesh_filename[256];
             ParseString(pchild, mCalibDb->aldch.meshfile, sizeof(mesh_filename));
         } else if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_LDCH_CORRECT_LEVEL_TAG_ID)) {
-            int no =  ParseDoubleArray(pchild, &mCalibDb->aldch.correct_level, tag.Size());
+            int no = ParseIntArray(pchild, &mCalibDb->aldch.correct_level, tag.Size());
+            DCT_ASSERT((no == tag.Size()));
+        } else if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_LDCH_CORRECT_LEVEL_MAX_TAG_ID)) {
+            int no = ParseIntArray(pchild, &mCalibDb->aldch.correct_level_max, tag.Size());
             DCT_ASSERT((no == tag.Size()));
         } else if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_LDCH_LIGHT_CENTER_TAG_ID)) {
             int no = ParseDoubleArray(pchild, mCalibDb->aldch.light_center, tag.Size());
@@ -11342,7 +11345,7 @@ bool RkAiqCalibParser::parseEntrySensorFec
             char mesh_filename[256];
             ParseString(pchild, mCalibDb->afec.meshfile, sizeof(mesh_filename));
         } else if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_FEC_CORRECT_LEVEL_TAG_ID)) {
-            int no =  ParseDoubleArray(pchild, &mCalibDb->afec.correct_level, tag.Size());
+            int no = ParseIntArray(pchild, &mCalibDb->afec.correct_level, tag.Size());
             DCT_ASSERT((no == tag.Size()));
         } else if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_FEC_LIGHT_CENTER_TAG_ID)) {
             int no = ParseDoubleArray(pchild, mCalibDb->afec.light_center, tag.Size());

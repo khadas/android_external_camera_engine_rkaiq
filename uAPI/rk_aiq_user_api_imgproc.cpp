@@ -90,25 +90,25 @@ XCamReturn rk_aiq_uapi_setExpMode(const rk_aiq_sys_ctx_t* ctx, opMode_t mode)
             expSwAttr.stManual.stHdrMe.ManualGainEn = true;
             expSwAttr.stManual.stHdrMe.ManualTimeEn = true;
             expSwAttr.stManual.stHdrMe.GainValue.fCoeff[0] =
-            ctx->_calibDb->aec.CommCtrl.stInitExp.stHdrExpInitExp.InitGainValue.fCoeff[0];
+                ctx->_calibDb->aec.CommCtrl.stInitExp.stHdrExpInitExp.InitGainValue.fCoeff[0];
             expSwAttr.stManual.stHdrMe.GainValue.fCoeff[1] =
-            ctx->_calibDb->aec.CommCtrl.stInitExp.stHdrExpInitExp.InitGainValue.fCoeff[1];
+                ctx->_calibDb->aec.CommCtrl.stInitExp.stHdrExpInitExp.InitGainValue.fCoeff[1];
             expSwAttr.stManual.stHdrMe.GainValue.fCoeff[2] =
-            ctx->_calibDb->aec.CommCtrl.stInitExp.stHdrExpInitExp.InitGainValue.fCoeff[2];
+                ctx->_calibDb->aec.CommCtrl.stInitExp.stHdrExpInitExp.InitGainValue.fCoeff[2];
             expSwAttr.stManual.stHdrMe.TimeValue.fCoeff[0] =
-            ctx->_calibDb->aec.CommCtrl.stInitExp.stHdrExpInitExp.InitTimeValue.fCoeff[0];
+                ctx->_calibDb->aec.CommCtrl.stInitExp.stHdrExpInitExp.InitTimeValue.fCoeff[0];
             expSwAttr.stManual.stHdrMe.TimeValue.fCoeff[1] =
-            ctx->_calibDb->aec.CommCtrl.stInitExp.stHdrExpInitExp.InitTimeValue.fCoeff[1];
+                ctx->_calibDb->aec.CommCtrl.stInitExp.stHdrExpInitExp.InitTimeValue.fCoeff[1];
             expSwAttr.stManual.stHdrMe.TimeValue.fCoeff[2] =
-            ctx->_calibDb->aec.CommCtrl.stInitExp.stHdrExpInitExp.InitTimeValue.fCoeff[2];
-        }else{
+                ctx->_calibDb->aec.CommCtrl.stInitExp.stHdrExpInitExp.InitTimeValue.fCoeff[2];
+        } else {
             expSwAttr.AecOpType = RK_AIQ_OP_MODE_MANUAL;
             expSwAttr.stManual.stLinMe.ManualGainEn = true;
             expSwAttr.stManual.stLinMe.ManualTimeEn = true;
             expSwAttr.stManual.stLinMe.GainValue =
-            ctx->_calibDb->aec.CommCtrl.stInitExp.stLinExpInitExp.InitGainValue;
+                ctx->_calibDb->aec.CommCtrl.stInitExp.stLinExpInitExp.InitGainValue;
             expSwAttr.stManual.stLinMe.TimeValue =
-            ctx->_calibDb->aec.CommCtrl.stInitExp.stLinExpInitExp.InitTimeValue;
+                ctx->_calibDb->aec.CommCtrl.stInitExp.stLinExpInitExp.InitTimeValue;
         }
     } else {
         ret = XCAM_RETURN_ERROR_PARAM;
@@ -145,7 +145,7 @@ XCamReturn rk_aiq_uapi_setManualExp(const rk_aiq_sys_ctx_t* ctx, float gain, flo
         expSwAttr.stManual.stHdrMe.TimeValue.fCoeff[0] = time;
         expSwAttr.stManual.stHdrMe.TimeValue.fCoeff[1] = time;
         expSwAttr.stManual.stHdrMe.TimeValue.fCoeff[2] = time;
-    }else{
+    } else {
         expSwAttr.AecOpType = RK_AIQ_OP_MODE_MANUAL;
         expSwAttr.stManual.stLinMe.ManualGainEn = true;
         expSwAttr.stManual.stLinMe.ManualTimeEn = true;
@@ -407,7 +407,7 @@ XCamReturn rk_aiq_uapi_setBLCStrength(const rk_aiq_sys_ctx_t* ctx, int strength)
     if (isHDRmode(ctx)) {
         ret = XCAM_RETURN_ERROR_FAILED;
         RKAIQ_IMGPROC_CHECK_RET(ret, "Not support in HDR mode!");
-    }else {
+    } else {
         ret = rk_aiq_user_api_ae_getLinExpAttr(ctx, &lineExpAttr);
         RKAIQ_IMGPROC_CHECK_RET(ret, "getLinExpAttr error!");
         if(0 == lineExpAttr.BackLightConf.enable)
@@ -443,7 +443,7 @@ XCamReturn rk_aiq_uapi_setHLCMode(const rk_aiq_sys_ctx_t* ctx, bool on)
     if (isHDRmode(ctx)) {
         ret = XCAM_RETURN_ERROR_FAILED;
         RKAIQ_IMGPROC_CHECK_RET(ret, "Not support in HDR mode!");
-    }else {
+    } else {
         ret = rk_aiq_user_api_ae_getLinExpAttr(ctx, &linExpAttr);
         RKAIQ_IMGPROC_CHECK_RET(ret, "get exp attr failed!\n setHLCMode failed!");
         linExpAttr.OverExpCtrl.enable = on ? 1 : 0;
@@ -476,7 +476,7 @@ XCamReturn rk_aiq_uapi_setHLCStrength(const rk_aiq_sys_ctx_t* ctx, int strength)
     if (isHDRmode(ctx)) {
         ret = XCAM_RETURN_ERROR_FAILED;
         RKAIQ_IMGPROC_CHECK_RET(ret, "Not support in HDR mode!");
-    }else {
+    } else {
         ret = rk_aiq_user_api_ae_getLinExpAttr(ctx, &lineExpAttr);
         RKAIQ_IMGPROC_CHECK_RET(ret, "getLinExpAttr error!");
         if(0 == lineExpAttr.OverExpCtrl.enable)
@@ -1816,9 +1816,9 @@ XCamReturn rk_aiq_uapi_getDhzMode(const rk_aiq_sys_ctx_t* ctx, opMode_t *mode)
     RKAIQ_IMGPROC_CHECK_RET(ret, "getMDhzStrth failed in get attrib!");
     if (attr.mode == RK_AIQ_DEHAZE_MODE_AUTO || attr.mode == RK_AIQ_DEHAZE_MODE_DEFAULT) {
         *mode = OP_AUTO;
-    }else if (attr.mode == RK_AIQ_DEHAZE_MODE_MANUAL) {
+    } else if (attr.mode == RK_AIQ_DEHAZE_MODE_MANUAL) {
         *mode = OP_MANUAL;
-    }else {
+    } else {
         *mode = OP_INVAL;
     }
     IMGPROC_FUNC_EXIT
@@ -1942,7 +1942,7 @@ XCamReturn rk_aiq_uapi_getMDhzStrth(const rk_aiq_sys_ctx_t* ctx, bool *on, unsig
         LOGE("Not in manual mode!");
         *level = 0;
         *on = false;
-    }else {
+    } else {
         *level = attr.stManual.strength;
         *on = true;
     }
@@ -1980,8 +1980,8 @@ XCamReturn rk_aiq_uapi_disableDhz(const rk_aiq_sys_ctx_t* ctx)
         RKAIQ_IMGPROC_CHECK_RET(ret, "param error, ctx is NULL!");
     }
     attr.mode = RK_AIQ_DEHAZE_MODE_DEFAULT;
-    attr.stManual.dc_en = 0;
-    attr.stManual.enhance_en = 0;
+    attr.stManual.dc_en = 1;
+    attr.stManual.enhance_en = 1;
     ret = rk_aiq_user_api_adehaze_setSwAttrib(ctx, attr);
     RKAIQ_IMGPROC_CHECK_RET(ret, "disable dehaze failed!");
     IMGPROC_FUNC_EXIT

@@ -40,6 +40,7 @@ V4l2Device::V4l2Device (const char *name)
     , _sensor_id (0)
     , _capture_mode (0)
     , _buf_type (V4L2_BUF_TYPE_VIDEO_CAPTURE)
+    , _buf_sync (false)
     , _memory_type (V4L2_MEMORY_MMAP)
     , _planes (NULL)
     , _fps_n (0)
@@ -137,6 +138,16 @@ V4l2Device::set_buf_type (enum v4l2_buf_type type) {
         return false;
     }
     _buf_type = type;
+    return true;
+}
+
+bool
+V4l2Device::set_buf_sync (bool sync) {
+    if (is_activated ()) {
+        XCAM_LOG_WARNING ("device(%s) set buf sync failed", XCAM_STR (_name));
+        return false;
+    }
+    _buf_sync = sync;
     return true;
 }
 
@@ -735,6 +746,10 @@ V4l2Device::allocate_buffer (
     v4l2_buf.index = index;
     v4l2_buf.type = _buf_type;
     v4l2_buf.memory = _memory_type;
+    if (_buf_sync) {
+        v4l2_buf.flags = V4L2_BUF_FLAG_NO_CACHE_INVALIDATE |
+            V4L2_BUF_FLAG_NO_CACHE_CLEAN;
+    }
 
     if (V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE == _buf_type ||
             V4L2_BUF_TYPE_VIDEO_OUTPUT_MPLANE == _buf_type) {

@@ -33,6 +33,9 @@ RKAIQ_BEGIN_DECLARE
 
 using namespace XCam;
 
+#define MAP_TO_255LEVEL(level, level_max) \
+    ((float)(level) / 255 * (level_max));
+
 typedef enum {
     LDCH_CORRECT_LEVEL0,        // 100%
     LDCH_CORRECT_LEVEL1,        // 75%
@@ -63,8 +66,10 @@ typedef struct LDCHContext_s {
     unsigned int lut_mapxy_size;
     unsigned short* lut_mapxy;
     char meshfile[256];
-    unsigned char correct_level;
+    int correct_level;
+    int correct_level_max;
     const char* resource_path;
+    std::atomic<bool> genLdchMeshInit;
 
     struct CameraCoeff camCoeff;
     LdchParams ldchParams;

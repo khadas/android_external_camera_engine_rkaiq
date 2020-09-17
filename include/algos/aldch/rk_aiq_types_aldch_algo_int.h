@@ -5,7 +5,7 @@
 
 typedef struct rk_aiq_ldch_cfg_s {
     unsigned int en;
-    unsigned char correct_level;
+    int correct_level;
 } rk_aiq_ldch_cfg_t;
 
 #endif

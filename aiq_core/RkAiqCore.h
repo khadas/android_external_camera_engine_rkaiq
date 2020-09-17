@@ -75,6 +75,8 @@ public:
         xcam_mem_clear(aec_stats);
         xcam_mem_clear(awb_stats);
         xcam_mem_clear(awb_stats_v201);
+        xcam_mem_clear(awb_cfg_effect_v200);
+        xcam_mem_clear(awb_cfg_effect_v201);
         xcam_mem_clear(af_stats);
         aec_stats_valid = false;
         awb_stats_valid = false;

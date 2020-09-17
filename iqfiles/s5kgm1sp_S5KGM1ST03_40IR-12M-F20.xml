@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?><matfile>   <header type="struct" size="[1 1]">      <code_xml_parse_version index="1" type="char" size="[1 6]">            v1.2.6      </code_xml_parse_version>      <creation_date index="1" type="char" size="[1 11]">         2020-04-24      </creation_date>      <creator index="1" type="char" size="[1 2]">         sandy      </creator>      <sensor_name index="1" type="char" size="[1 7]">            s5kgm1sp      </sensor_name>      <sample_name index="1" type="char" size="[1 9]">            S5KGM1ST03      </sample_name>      <generator_version index="1" type="char" size="[1 4]">         v0.0.1      </generator_version>
       <magic_code_version  index="1" type="int" size="[1 1]">
-       [1019694]
+       [1021509]
       </magic_code_version>   </header>   <sensor type="struct" size="[1 1]">
       <AWB index="1" type="struct" size="[1 1]">
 	 <wbBypass index="1" type="double" size="[1 1]">	   [0]	 </wbBypass>
@@ -10919,13 +10919,14 @@
                [0]
           </enable>
           <mesh_file index="1" type="char" size="[1 1]">               LDCH_mesh_2688_1520_imx347_4IR          </mesh_file>
-          <correct_level index="1" type="double" size="[1 1]">               [1.00]          </correct_level>
+          <correct_level index="1" type="int" size="[1 1]">               [255]          </correct_level>
+          <correct_level_max index="1" type="int" size="[1 1]">               [255]          </correct_level_max>
 	 <light_center index="1" type="double" size="[1 2]">	      [1333.2695039999998698 728.1043200000000297]	 </light_center>	 <distortion_coeff index="1" type="double" size="[1 4]">	      [-2653.9299617503911576 0.0001171174803799 -0.0000000150166870 0.0000000000087465]	 </distortion_coeff>
       </LDCH>
       <FEC index="1" type="struct" size="[1 1]">
           <enable index="1" type="double" size="[1 1]">               [0]          </enable>
           <mesh_file index="1" type="char" size="[1 1]">               FEC_mesh_2688_1520_imx347_4IR          </mesh_file>
-          <correct_level index="1" type="double" size="[1 1]">               [1.00]          </correct_level>
+          <correct_level index="1" type="int" size="[1 1]">               [255]          </correct_level>
 	 <light_center index="1" type="double" size="[1 2]">	      [1333.2695039999998698 728.1043200000000297]	 </light_center>	 <distortion_coeff index="1" type="double" size="[1 4]">	      [-2653.9299617503911576 0.0001171174803799 -0.0000000150166870 0.0000000000087465]	 </distortion_coeff>      </FEC>
       <ORB index="1" type="struct" size="[1 1]">
           <enable index="1" type="double" size="[1 1]">

@@ -63,13 +63,23 @@ create_context(RkAiqAlgoContext **context, const AlgoCtxInstanceCfg* cfg)
 
     fecCtx->fec_en = calib_fec->fec_en;
     memcpy(fecCtx->meshfile, calib_fec->meshfile, sizeof(fecCtx->meshfile));
+#if GENMESH_ONLINE
     fecCtx->camCoeff.cx = calib_fec->light_center[0];
     fecCtx->camCoeff.cy = calib_fec->light_center[1];
     fecCtx->camCoeff.a0 = calib_fec->coefficient[0];
     fecCtx->camCoeff.a2 = calib_fec->coefficient[1];
     fecCtx->camCoeff.a3 = calib_fec->coefficient[2];
     fecCtx->camCoeff.a4 = calib_fec->coefficient[3];
+    LOGI_AFEC("(%s) len light center(%.16f, %.16f)\n",
+            __FUNCTION__,
+            fecCtx->camCoeff.cx, fecCtx->camCoeff.cy);
+    LOGI_AFEC("(%s) len coefficient(%.16f, %.16f, %.16f, %.16f)\n",
+            __FUNCTION__,
+            fecCtx->camCoeff.a0, fecCtx->camCoeff.a2,
+            fecCtx->camCoeff.a3, fecCtx->camCoeff.a4);
+#endif
     fecCtx->correct_level = calib_fec->correct_level;
+
     ctx->hFEC->eState = FEC_STATE_INVALID;
 
     return XCAM_RETURN_NO_ERROR;
@@ -246,7 +256,6 @@ prepare(RkAiqAlgoCom* params)
     fecCtx->camCoeff.a2 = rkaiqAfecConfig->afec_calib_cfg.coefficient[1];
     fecCtx->camCoeff.a3 = rkaiqAfecConfig->afec_calib_cfg.coefficient[2];
     fecCtx->camCoeff.a4 = rkaiqAfecConfig->afec_calib_cfg.coefficient[3];
-#endif
     LOGI_AFEC("(%s) len light center(%.16f, %.16f)\n",
             __FUNCTION__,
             fecCtx->camCoeff.cx, fecCtx->camCoeff.cy);
@@ -254,6 +263,7 @@ prepare(RkAiqAlgoCom* params)
             __FUNCTION__,
             fecCtx->camCoeff.a0, fecCtx->camCoeff.a2,
             fecCtx->camCoeff.a3, fecCtx->camCoeff.a4);
+#endif
 
     fecCtx->src_width = params->u.prepare.sns_op_width;
     fecCtx->src_height = params->u.prepare.sns_op_height;
@@ -280,6 +290,10 @@ prepare(RkAiqAlgoCom* params)
 
 #if GENMESH_ONLINE
     fecCtx->user_config.correct_level = correct_level;
+	fecCtx->fecParams.correctX = 1;
+	fecCtx->fecParams.correctY = 1;
+	fecCtx->fecParams.saveMesh4bin = 0;
+	sprintf(fecCtx->fecParams.mesh4binPath, "/tmp/");
     genFecMeshInit(fecCtx->src_width, fecCtx->src_height, fecCtx->dst_width,
             fecCtx->dst_height, fecCtx->fecParams, fecCtx->camCoeff);
     mallocFecMesh(fecCtx->fecParams.meshSize4bin, &fecCtx->meshxi,
@@ -291,21 +305,9 @@ prepare(RkAiqAlgoCom* params)
               fecCtx->src_width, fecCtx->src_height,
               fecCtx->fec_mesh_h_size, fecCtx->fec_mesh_v_size,
               fecCtx->fec_mesh_size);
+    if (!fecCtx->fec_en)
+        return XCAM_RETURN_NO_ERROR;
 #else
-    if (fabs(correct_level) <= fabs(EPSINON)) {
-        fecCtx->user_config.correct_level = FEC_BYPASS;
-    } else if (correct_level >= 1.0) {
-        fecCtx->user_config.correct_level = FEC_CORRECT_LEVEL0;
-    } else if (1 - correct_level <= 0.25) {
-        fecCtx->user_config.correct_level = FEC_CORRECT_LEVEL1;
-    } else if (1 - correct_level <= 0.50) {
-        fecCtx->user_config.correct_level = FEC_CORRECT_LEVEL2;
-    } else if (1 - correct_level <= 0.75) {
-        fecCtx->user_config.correct_level = FEC_CORRECT_LEVEL3;
-    } else {
-        fecCtx->user_config.correct_level = FEC_BYPASS;
-    }
-
     fecCtx->fec_mesh_size =
         cal_fec_mesh(fecCtx->src_width, fecCtx->src_height, fecCtx->mesh_density,
                      fecCtx->fec_mesh_h_size, fecCtx->fec_mesh_v_size);
@@ -452,6 +454,7 @@ bool RKAiqAfecThread::loop()
         ret = read_mesh_table(hFEC, 0);
     } else {
         ret = read_mesh_table(hFEC, attrib->correct_level);
+        hFEC->correct_level = attrib->correct_level;
     }
 
     if (ret == XCAM_RETURN_NO_ERROR) {

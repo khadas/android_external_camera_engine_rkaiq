@@ -19,7 +19,7 @@
         <generator_version index="1" type="char" size="[1 6]">
             v1.0.3
         </generator_version>
-        <magic_code_version  index="1" type="int" size="[1 1]">       	    [1019694]        </magic_code_version>
+        <magic_code_version  index="1" type="int" size="[1 1]">       	    [1021509]        </magic_code_version>
     </header>
     <sensor type="struct" size="[1 1]">
         <AWB index="1" type="struct" size="[1 1]">
@@ -37298,9 +37298,8 @@
             <mesh_file index="1" type="char" size="[1 31]">
                 LDCH_mesh_2688_1520_os04a10_4IR
             </mesh_file>
-            <correct_level index="1" type="double" size="[1 1]">
-                [1.0000 ]
-            </correct_level>
+            <correct_level index="1" type="int" size="[1 1]">               [255]            </correct_level>
+            <correct_level_max index="1" type="int" size="[1 1]">               [255]            </correct_level_max>
 	   <light_center index="1" type="double" size="[1 2]">
 	      [1333.2695039999998698 728.1043200000000297]
 	   </light_center>
@@ -37315,8 +37314,8 @@
             <mesh_file index="1" type="char" size="[1 30]">
                 FEC_mesh_2688_1520_os04a10_4IR
             </mesh_file>
-            <correct_level index="1" type="double" size="[1 1]">
-                [1.0000 ]
+            <correct_level index="1" type="int" size="[1 1]">
+                [255 ]
             </correct_level>
 	 <light_center index="1" type="double" size="[1 2]">
 	      [1333.2695039999998698 728.1043200000000297]

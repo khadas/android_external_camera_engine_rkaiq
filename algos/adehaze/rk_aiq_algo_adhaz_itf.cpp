@@ -120,7 +120,7 @@ processing(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outparams)
         (RkAiqAlgoPreResAeInt*)(procPara->rk_com.u.proc.pre_res_comb->ae_pre_res);
 
     if(pAEPreRes != NULL) {
-        if(AdehazeHandle->working_mode) {
+        if(AdehazeHandle->working_mode == RK_AIQ_WORKING_MODE_NORMAL) {
             stExpInfo.arAGain[0] = pAEPreRes->ae_pre_res_rk.LinearExp.exp_real_params.analog_gain;
             stExpInfo.arDGain[0] = pAEPreRes->ae_pre_res_rk.LinearExp.exp_real_params.digital_gain;
             stExpInfo.arTime[0] = pAEPreRes->ae_pre_res_rk.LinearExp.exp_real_params.integration_time;
@@ -146,7 +146,7 @@ processing(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outparams)
     }
 
     iso = stExpInfo.arIso[stExpInfo.hdr_mode];
- 
+
     LOGD_ADEHAZE("hdr_mode=%d,iso=%d\n", stExpInfo.hdr_mode, iso);
     ret = AdehazeProcess(AdehazeHandle, iso, AdehazeHandle->Dehaze_ISO_mode);
     memcpy(&procResPara->adhaz_config, &AdehazeHandle->adhaz_config, sizeof(rk_aiq_dehaze_cfg_t));
