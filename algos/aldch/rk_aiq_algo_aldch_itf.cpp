@@ -84,8 +84,8 @@ create_context(RkAiqAlgoContext **context, const AlgoCtxInstanceCfg* cfg)
 #if GENMESH_ONLINE
     ctx->hLDCH->isAttribUpdated = false;
     ctx->hLDCH->aldchReadMeshThread = new RKAiqAldchThread(ctx->hLDCH);
-    ctx->hLDCH->aldchReadMeshThread->triger_start();
-    ctx->hLDCH->aldchReadMeshThread->start();
+    /* ctx->hLDCH->aldchReadMeshThread->triger_start(); */
+    /* ctx->hLDCH->aldchReadMeshThread->start(); */
 #endif
 
     const AlgoCtxInstanceCfgInt* cfg_int = (const AlgoCtxInstanceCfgInt*)cfg;
@@ -181,6 +181,14 @@ prepare(RkAiqAlgoCom* params)
     ldchCtx->dst_height = params->u.prepare.sns_op_height;
     ldchCtx->resource_path = rkaiqAldchConfig->resource_path;
 #if GENMESH_ONLINE
+    // process the new attrib set before prepare
+    hLDCH->aldchReadMeshThread->triger_stop();
+    hLDCH->aldchReadMeshThread->stop();
+    if (!hLDCH->aldchReadMeshThread->is_empty()) {
+        hLDCH->aldchReadMeshThread->clear_attr();
+        ldchCtx->isAttribUpdated = true;
+    }
+
     if (ldchCtx->isAttribUpdated) {
         ldchCtx->ldch_en = ldchCtx->user_config.en;
         ldchCtx->correct_level = ldchCtx->user_config.correct_level;
@@ -213,6 +221,8 @@ prepare(RkAiqAlgoCom* params)
     ldchCtx->lut_mapxy = (unsigned short*)malloc(ldchCtx->lut_mapxy_size);
 #endif
 
+    hLDCH->aldchReadMeshThread->triger_start();
+    hLDCH->aldchReadMeshThread->start();
     if (!ldchCtx->ldch_en)
         return XCAM_RETURN_NO_ERROR;
 
@@ -358,7 +368,6 @@ bool RKAiqAldchThread::loop()
         LOGW_ANALYZER("RKAiqAldchThread got empty attrib, stop thread");
         return false;
     }
-
 #if GENMESH_ONLINE
     if (attrib->en && (hLDCH->ldch_en != attrib->en || \
 	    attrib->correct_level != hLDCH->correct_level)) {

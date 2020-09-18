@@ -111,6 +111,10 @@ public:
         return true;
     };
 
+    bool is_empty () {
+        return mAttrQueue.is_empty();
+    };
+
     void clear_attr () {
         mAttrQueue.clear ();
     };
