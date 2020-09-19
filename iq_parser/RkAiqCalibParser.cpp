@@ -291,7 +291,7 @@ int RkAiqCalibParser::ParseDoubleArray
         int rows = XmlTag(pNode->ToElement()).SizeRow();
         char str[8192];
         snprintf(str, sizeof(str), "\n%s[", autoTabStr);
-        char tmp_val_str[25];
+        char tmp_val_str[64];
         for (int i = 0; i < rows; i++)
         {
             for (int k = 0; k < cols; k++) {

@@ -1,4 +1,4 @@
-Current Version: v0.2.0
+Current Version: v0.2.1
 
 ==================== RKISP2X TUNER VERSION HISTORY ====================
 v0.1.0 - 2020.07.15
@@ -11,5 +11,9 @@ v0.2.0 - 2020.09.11
   - update AIQ to v1.2.0
   - new function
         - tuner(online): AEC, BNR, MFNR, UVNR, YNR, SHARP
+
+v0.2.1 - 2020.09.19
+  - update AIQ to v1.2.1
+  - fix some bugs
 
 ==================== RKISP2X TUNER VERSION HISTORY ====================
