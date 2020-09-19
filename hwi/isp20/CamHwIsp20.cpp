@@ -1663,15 +1663,25 @@ FAIL:
 }
 
 XCamReturn
-CamHwIsp20::setExpDelayInfo(int time_delay, int gain_delay)
+CamHwIsp20::setExpDelayInfo(int mode)
 {
     ENTER_CAMHW_FUNCTION();
     SmartPtr<SensorHw> sensorHw;
     sensorHw = mSensorDev.dynamic_cast_ptr<SensorHw>();
-    if(_hdr_mode != RK_AIQ_WORKING_MODE_NORMAL)
-        sensorHw->set_exp_delay_info(time_delay, gain_delay, mCalibDb->sysContrl.exp_delay.Hdr.dcg_delay);
-    else
-        sensorHw->set_exp_delay_info(time_delay, gain_delay, mCalibDb->sysContrl.exp_delay.Normal.dcg_delay);
+
+    if(mode != RK_AIQ_WORKING_MODE_NORMAL) {
+        sensorHw->set_exp_delay_info(mCalibDb->sysContrl.exp_delay.Hdr.time_delay,
+                                     mCalibDb->sysContrl.exp_delay.Hdr.gain_delay,
+                                     mCalibDb->sysContrl.dcg.Hdr.support_en ? \
+                                     mCalibDb->sysContrl.exp_delay.Hdr.dcg_delay : -1);
+
+    } else {
+        sensorHw->set_exp_delay_info(mCalibDb->sysContrl.exp_delay.Normal.time_delay,
+                                     mCalibDb->sysContrl.exp_delay.Normal.gain_delay,
+                                     mCalibDb->sysContrl.dcg.Normal.support_en ? \
+                                     mCalibDb->sysContrl.exp_delay.Normal.dcg_delay : -1);
+    }
+
     EXIT_CAMHW_FUNCTION();
     return XCAM_RETURN_NO_ERROR;
 }
@@ -1770,10 +1780,7 @@ CamHwIsp20::prepare(uint32_t width, uint32_t height, int mode, int t_delay, int 
        return ret;
     }
 
-    if(_hdr_mode != RK_AIQ_WORKING_MODE_NORMAL)
-        sensorHw->set_exp_delay_info(t_delay, g_delay, mCalibDb->sysContrl.exp_delay.Hdr.dcg_delay);
-    else
-        sensorHw->set_exp_delay_info(t_delay, g_delay, mCalibDb->sysContrl.exp_delay.Normal.dcg_delay);
+    setExpDelayInfo(mode);
 
     isp20Pollthread = mPollthread.dynamic_cast_ptr<Isp20PollThread>();
     isp20Pollthread->set_working_mode(mode, _linked_to_isp);
@@ -2097,14 +2104,7 @@ XCamReturn CamHwIsp20::swWorkingModeDyn(int mode)
        return ret;
     }
 
-    if(_hdr_mode != RK_AIQ_WORKING_MODE_NORMAL)
-        sensorHw->set_exp_delay_info(mCalibDb->sysContrl.exp_delay.Hdr.time_delay,
-                                     mCalibDb->sysContrl.exp_delay.Hdr.gain_delay,
-                                     mCalibDb->sysContrl.exp_delay.Hdr.dcg_delay);
-    else
-        sensorHw->set_exp_delay_info(mCalibDb->sysContrl.exp_delay.Normal.time_delay,
-                                     mCalibDb->sysContrl.exp_delay.Normal.gain_delay,
-                                     mCalibDb->sysContrl.exp_delay.Normal.dcg_delay);
+    setExpDelayInfo(mode);
 
     Isp20Params::set_working_mode(mode);
     isp20Pollthread = mPollthread.dynamic_cast_ptr<Isp20PollThread>();

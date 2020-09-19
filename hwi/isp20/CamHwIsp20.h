@@ -179,7 +179,7 @@ public:
     XCamReturn setupHdrLink(int mode, int isp_index, bool enable);
     static XCamReturn selectIqFile(const char* sns_ent_name, char* iqfile_name);
     static const char* getBindedSnsEntNmByVd(const char* vd);
-    XCamReturn setExpDelayInfo(int time_delay, int gain_delay);
+    XCamReturn setExpDelayInfo(int mode);
     XCamReturn getEffectiveIspParams(SmartPtr<RkAiqIspParamsProxy>& ispParams, int frame_id);
     XCamReturn setModuleCtl(rk_aiq_module_id_t moduleId, bool en);
     XCamReturn getModuleCtl(rk_aiq_module_id_t moduleId, bool& en);

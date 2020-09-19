@@ -901,8 +901,9 @@ SensorHw::set_exp_delay_info(int time_delay, int gain_delay, int hcg_lcg_mode_de
         return XCAM_RETURN_ERROR_PARAM;
     }
 
-    if (_dcg_gain_mode_delay != time_delay &&
-            _dcg_gain_mode_delay != _gain_delay) {
+    if (_dcg_gain_mode_delay > 0 &&
+        _dcg_gain_mode_delay != time_delay &&
+        _dcg_gain_mode_delay != _gain_delay) {
         _dcg_gain_mode_delayed = true;
     }  else {
         if (_dcg_gain_mode_delay == time_delay)
