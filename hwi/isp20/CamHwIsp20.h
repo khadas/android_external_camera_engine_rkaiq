@@ -197,6 +197,7 @@ public:
     }
     XCamReturn setSensorFlip(bool mirror, bool flip);
     XCamReturn getSensorFlip(bool& mirror, bool& flip);
+    void setMulCamConc(bool cc);
 private:
     XCAM_DEAD_COPY(CamHwIsp20);
     enum cam_hw_state_e {

@@ -391,6 +391,7 @@ Isp20PollThread::Isp20PollThread()
     , _capture_image_cond(false)
     , _is_raw_sync_yuv(false)
     , _loop_vain(false)
+    , _is_multi_cam_conc(false)
 {
     for (int i = 0; i < 3; i++) {
         SmartPtr<MipiPollThread> mipi_poll = new MipiPollThread(this, ISP_POLL_MIPI_TX, i);
@@ -937,6 +938,8 @@ Isp20PollThread::trigger_readback()
 
             if (tg.times > 2)
                 tg.times = 2;
+            if (_is_multi_cam_conc && (tg.times < 1))
+                tg.times = 1;
             tg.frame_timestamp = buf_proxy->get_timestamp () * 1000;
             // tg.times = 1;//fixed to three times readback
             LOGD_CAMHW_SUBM(ISP20POLL_SUBM, "%s frame[%d]:ts %" PRId64 "ms, isHdrGlobalTmo(%d), readback %dtimes \n",

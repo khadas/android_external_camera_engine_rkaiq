@@ -851,4 +851,14 @@ restart:
     return XCAM_RETURN_NO_ERROR;
 }
 
+void RkAiqManager::setMulCamConc(bool cc)
+{
+#ifndef RK_SIMULATOR_HW
+    SmartPtr<CamHwIsp20> camHwIsp20 = mCamHw.dynamic_cast_ptr<CamHwIsp20>();
+
+    if (camHwIsp20.ptr())
+        camHwIsp20->setMulCamConc(cc);
+#endif
+}
+
 }; //namespace RkCam

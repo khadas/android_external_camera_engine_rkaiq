@@ -3990,4 +3990,12 @@ void CamHwIsp20::setHdrGlobalTmoMode(int frame_id, bool mode)
         isp20Pollthread->set_hdr_global_tmo_mode(frame_id, mode);
 }
 
+void CamHwIsp20::setMulCamConc(bool cc)
+{
+    SmartPtr<Isp20PollThread> isp20Pollthread = mPollthread.dynamic_cast_ptr<Isp20PollThread>();
+
+    if (isp20Pollthread.ptr())
+        isp20Pollthread->setMulCamConc(cc);
+}
+
 }; //namspace RkCam

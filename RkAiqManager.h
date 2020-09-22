@@ -166,6 +166,7 @@ public:
     XCamReturn getMirrorFlip(bool& mirror, bool& flip);
     void setDefMirrorFlip();
     XCamReturn swWorkingModeDyn_msg(rk_aiq_working_mode_t mode);
+    void setMulCamConc(bool cc);
 protected:
     XCamReturn applyAnalyzerResult(SmartPtr<RkAiqFullParamsProxy>& results);
     XCamReturn swWorkingModeDyn(rk_aiq_working_mode_t mode);

@@ -280,6 +280,16 @@ void rk_aiq_uapi_get_version_info(rk_aiq_ver_info_t* vers);
 XCamReturn
 rk_aiq_uapi_sysctl_swWorkingModeDyn(const rk_aiq_sys_ctx_t* ctx, rk_aiq_working_mode_t mode);
 
+/*!
+ * \brief set multiple cameras working concurrently
+ * Notify this AIQ ctx will run with other sensor's AIQ ctx.
+
+ * \param[in] cc        set cams concurrently used or not
+ * \note should be called before rk_aiq_uapi_sysctl_start
+ */
+void
+rk_aiq_uapi_sysctl_setMulCamConc(const rk_aiq_sys_ctx_t* ctx, bool cc);
+
 RKAIQ_END_DECLARE
 
 #endif

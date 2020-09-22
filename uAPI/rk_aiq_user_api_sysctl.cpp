@@ -608,3 +608,11 @@ rk_aiq_uapi_sysctl_swWorkingModeDyn(const rk_aiq_sys_ctx_t* ctx, rk_aiq_working_
     EXIT_XCORE_FUNCTION();
     return ret;
 }
+
+void
+rk_aiq_uapi_sysctl_setMulCamConc(const rk_aiq_sys_ctx_t* ctx, bool cc)
+{
+    ENTER_XCORE_FUNCTION();
+    ctx->_rkAiqManager->setMulCamConc(cc);
+    EXIT_XCORE_FUNCTION();
+}

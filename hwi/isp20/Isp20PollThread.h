@@ -67,6 +67,7 @@ public:
     void set_hdr_global_tmo_mode(int frame_id, bool mode);
     virtual XCamReturn start();
     virtual XCamReturn stop ();
+    void setMulCamConc(bool cc) { _is_multi_cam_conc = cc; }
     enum {
         ISP_POLL_MIPI_TX,
         ISP_POLL_MIPI_RX,
@@ -129,7 +130,7 @@ private:
     Cond _capture_image_cond;
     bool _is_raw_sync_yuv;
     std::map<uint32_t, bool> _hdr_global_tmo_state_map;
-
+    bool _is_multi_cam_conc;
     int calculate_stride_per_line(const struct capture_fmt& fmt,
                                   uint32_t& bytesPerLine);
     const struct capture_fmt* find_fmt(const uint32_t pixelformat);
