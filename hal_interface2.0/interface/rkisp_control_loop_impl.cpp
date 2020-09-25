@@ -368,7 +368,17 @@ int rkisp_cl_prepare(void* cl_ctx,
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
     LOGD("@%s(%d)cl_ctx pointer(%p)",__FUNCTION__, __LINE__, cl_ctx);
     rk_aiq_sys_ctx_t *aiq_ctx = AIQ_CONTEXT_CAST (cl_ctx);
-    rk_aiq_working_mode_t work_mode = RK_AIQ_WORKING_MODE_ISP_HDR2; //work_mode = RK_AIQ_WORKING_MODE_NORMAL;
+    rk_aiq_working_mode_t work_mode = RK_AIQ_WORKING_MODE_NORMAL;
+    if (strcmp(prepare_params->work_mode, "NORMAL") == 0) {
+        work_mode = RK_AIQ_WORKING_MODE_NORMAL;
+    } else if (strcmp(prepare_params->work_mode, "HDR2") == 0) {
+        work_mode = RK_AIQ_WORKING_MODE_ISP_HDR2;
+    } else if (strcmp(prepare_params->work_mode, "HDR3") == 0) {
+        work_mode = RK_AIQ_WORKING_MODE_ISP_HDR3;
+    } else {
+        //default
+        work_mode = RK_AIQ_WORKING_MODE_NORMAL;
+    }
     ret = rk_aiq_uapi_sysctl_prepare(aiq_ctx, prepare_params->width, prepare_params->height, work_mode);
     gAiqCameraHalAdapter->set_static_metadata (prepare_params->staticMeta);
     gAiqCameraHalAdapter->set_working_mode(work_mode);

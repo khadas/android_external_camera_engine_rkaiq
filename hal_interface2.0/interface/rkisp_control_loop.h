@@ -88,7 +88,8 @@ struct rkisp_cl_prepare_params_s {
    * The height in pixels of the buffers in this stream
    */
   uint32_t height;
-
+  //RK AIQ working mode
+  const char* work_mode;
 };
 
 /* A struct used to represent the new parameters set to CL
