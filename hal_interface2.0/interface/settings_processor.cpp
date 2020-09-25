@@ -489,6 +489,7 @@ SettingsProcessor::fillAwbInputParams(const CameraMetadata *settings,
         awbCtrl->colorCorrectionMode = ANDROID_COLOR_CORRECTION_MODE_FAST;
     }
 
+    awbCfg->is_ccm_valid = false;
     if (awbCtrl->awbMode == ANDROID_CONTROL_AWB_MODE_OFF) {
         //# METADATA_Control colorCorrection.transform done
         entry = settings->find(ANDROID_COLOR_CORRECTION_TRANSFORM);
@@ -497,7 +498,8 @@ SettingsProcessor::fillAwbInputParams(const CameraMetadata *settings,
                 int32_t numerator = entry.data.r[i].numerator;
                 int32_t denominator = entry.data.r[i].denominator;
                 /* TODO no struct to contain the colortransform,  need add */
-                /* awbInputParams->aiqInputParams->manualColorTransform[i] = (float) numerator / denominator; */
+                awbCfg->ccm_matrix[i] = (float) numerator / denominator;
+                awbCfg->is_ccm_valid = true;
             }
         }
 

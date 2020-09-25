@@ -71,7 +71,7 @@ extern "C" {
 
 typedef struct
 {
-  unsigned int coeff[9U];
+  float coeff[9U];
 } rk_aiq_3x3Matrix;
 
 typedef struct

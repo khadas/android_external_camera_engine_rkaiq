@@ -13,6 +13,7 @@
 #include "rk_aiq_user_api_ae.h"
 #include "rk_aiq_user_api_af.h"
 #include "rk_aiq_user_api_awb.h"
+#include "rk_aiq_user_api_accm.h"
 
 #include "rkcamera_vendor_tags.h"
 #include "settings_processor.h"
@@ -494,10 +495,7 @@ AiqCameraHalAdapter::updateAeMetaParams(XCamAeParam *aeParams){
 
     /* AE region */
     //stExpSwAttr.metering_mode =  aeParams->metering_mode
-
-    //const CameraMetadata &settings  = _inputParams->settings;
-    camera_metadata_entry entry = _inputParams->settings.find(ANDROID_CONTROL_AE_REGIONS);
-    if (entry.count == 5) {
+    if (aeParams->window.x_end - aeParams->window.x_start > 0) {
         stExpWin.h_offs = aeParams->window.x_start;
         stExpWin.v_offs = aeParams->window.y_start;
         stExpWin.h_size = aeParams->window.x_end - aeParams->window.x_start;
@@ -588,9 +586,7 @@ AiqCameraHalAdapter::updateAfMetaParams(XCamAfParam *afParams){
     //TODO
 
     /* AF region */
-    //const CameraMetadata &settings  = _inputParams->settings;
-    camera_metadata_entry entry = _inputParams->settings.find(ANDROID_CONTROL_AF_REGIONS);
-    if (entry.count == 5) {
+    if (afParams->focus_rect[0].right_width > 0 && afParams->focus_rect[0].bottom_height > 0) {
         stAfttr.h_offs = afParams->focus_rect[0].left_hoff;
         stAfttr.v_offs = afParams->focus_rect[0].top_voff;
         stAfttr.h_size= afParams->focus_rect[0].right_width;
@@ -627,10 +623,16 @@ AiqCameraHalAdapter::updateAwbMetaParams(XCamAwbParam *awbParams){
 
     LOGI("@%s %d: enter", __FUNCTION__, __LINE__);
     rk_aiq_wb_attrib_t stAwbttr;
+    rk_aiq_ccm_attrib_t setCcm;
 
     if (_aiq_ctx == NULL){
         LOGE("@%s %d: _aiq_ctx is NULL!\n", __FUNCTION__, __LINE__);
         return;
+    }
+
+    ret = rk_aiq_user_api_accm_GetAttrib(_aiq_ctx, &setCcm);
+    if (ret) {
+        LOGE("%s(%d) Awb GetAttrib failed!\n", __FUNCTION__, __LINE__);
     }
 
     ret = rk_aiq_user_api_awb_GetAttrib(_aiq_ctx, &stAwbttr);
@@ -680,12 +682,8 @@ AiqCameraHalAdapter::updateAwbMetaParams(XCamAwbParam *awbParams){
     }
 
     /* AWB region */
-    CameraWindow awbRegion;
-
-    const CameraMetadata &settings  = _inputParams->settings;
-    camera_metadata_ro_entry entry = settings.find(ANDROID_CONTROL_AWB_REGIONS);
-    if (entry.count == 5) {
-    //TODO
+    /* TODO no struct contain the awb region,  need add */
+    if (awbParams->window.x_end - awbParams->window.x_start > 0) {
 //        stAwbttr.region.x_start = awbParams->window.x_start;
 //        stAwbttr.region.y_start = awbParams->window.y_start;
 //        stAwbttr.region.x_end = awbParams->window.x_end;
@@ -695,8 +693,7 @@ AiqCameraHalAdapter::updateAwbMetaParams(XCamAwbParam *awbParams){
 
     /* colorCorrection.gains */
     if (awbParams->mode == XCAM_AWB_MODE_MANUAL) {
-        entry = settings.find(ANDROID_COLOR_CORRECTION_GAINS);
-        if (entry.count == 4) {
+        if (awbParams->r_gain) {
             stAwbttr.mode = RK_AIQ_WB_MODE_MANUAL;
             stAwbttr.stManual.mode = RK_AIQ_MWB_MODE_WBGAIN;
             stAwbttr.stManual.para.gain.rgain = awbParams->r_gain;
@@ -706,17 +703,13 @@ AiqCameraHalAdapter::updateAwbMetaParams(XCamAwbParam *awbParams){
         }
 
         /* MANUAL COLOR CORRECTION */
-        entry = settings.find(ANDROID_COLOR_CORRECTION_TRANSFORM);
-        if (entry.count == 9) {
-            for (size_t i = 0; i < entry.count; i++) {
-                int32_t numerator = entry.data.r[i].numerator;
-                int32_t denominator = entry.data.r[i].denominator;
-                stAwbttr.mode = RK_AIQ_WB_MODE_MANUAL;
-                stAwbttr.stManual.mode = RK_AIQ_MWB_MODE_CCT;
-                /* TODO colortransform,  need zyc add */
-                //stAwbttr.stManual.para.cct.CCT = numerator;
-               //stAwbttr.stManual.para.cct.CCRI = denominator;
-            }
+        /* normal auto according color Temperature */
+        if (awbParams->is_ccm_valid) {
+            setCcm.mode = RK_AIQ_CCM_MODE_MANUAL;
+            setCcm.byPass = false;
+            memcpy(setCcm.stManual.matrix,  awbParams->ccm_matrix, sizeof(float)*9);
+        } else {
+            setCcm.mode = RK_AIQ_CCM_MODE_AUTO;
         }
     }
 
@@ -728,10 +721,15 @@ AiqCameraHalAdapter::updateAwbMetaParams(XCamAwbParam *awbParams){
             LOGE("%s(%d) Awb Set unlock failed!\n", __FUNCTION__, __LINE__);
         }
 
+        ret = rk_aiq_user_api_accm_SetAttrib(_aiq_ctx, setCcm);
+        if (ret) {
+            LOGE("%s(%d) accm SetAttrib failed!\n", __FUNCTION__, __LINE__);
+        }
         ret = rk_aiq_user_api_awb_SetAttrib(_aiq_ctx, stAwbttr);
         if (ret) {
             LOGE("%s(%d) Awb SetAttrib failed!\n", __FUNCTION__, __LINE__);
         }
+
     } else {
         ret = rk_aiq_uapi_lockAWB(_aiq_ctx);
         if (ret) {
@@ -1072,6 +1070,7 @@ AiqCameraHalAdapter::getAwbResults(rk_aiq_awb_results &awb_results)
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
     LOGD("@%s %d: enter", __FUNCTION__, __LINE__);
     rk_aiq_wb_querry_info_t query_info;
+    rk_aiq_ccm_querry_info_t ccm_querry_info;
 
     ret = rk_aiq_user_api_awb_QueryWBInfo(_aiq_ctx, &query_info);
     if (ret) {
@@ -1085,11 +1084,17 @@ AiqCameraHalAdapter::getAwbResults(rk_aiq_awb_results &awb_results)
     awb_results.awb_gain_cfg.awb_gains.green_b_gain= query_info.gain.gbgain == 0 ? 256 : query_info.gain.gbgain ;
     awb_results.awb_gain_cfg.awb_gains.green_r_gain= query_info.gain.grgain  == 0 ? 256 : query_info.gain.grgain;
     awb_results.awb_gain_cfg.awb_gains.blue_gain= query_info.gain.bgain == 0 ? 296 : query_info.gain.bgain;
-    //need zyc TODO get interface CCT?
-    //memcpy(awb_results.ctk_config.ctk_matrix.coeff, isp_param->ccm.matrix, sizeof(unsigned int)*9);
-
     awb_results.converged = query_info.awbConverged;
     LOGD("@%s awb_results.converged:%d", __FUNCTION__, awb_results.converged);
+
+    ret = rk_aiq_user_api_accm_QueryCcmInfo(_aiq_ctx, &ccm_querry_info);
+    if (ret) {
+        LOGE("%s(%d) QueryCcmInfo failed!\n", __FUNCTION__, __LINE__);
+        return ret;
+    }
+    memcpy(awb_results.ctk_config.ctk_matrix.coeff, ccm_querry_info.matrix, sizeof(float)*9);
+    LOGD("@%s ccm_en:%s", __FUNCTION__, ccm_querry_info.ccm_en ? "true":"false");
+
     return ret;
 }
 

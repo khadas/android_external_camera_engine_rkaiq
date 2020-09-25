@@ -63,6 +63,8 @@ typedef struct _XCamAwbParam {
     double                  r_gain;
     double                  b_gain;
     double                  gb_gain;
+    float                   ccm_matrix[9];
+    bool                    is_ccm_valid;
 } XCamAwbParam;
 
 typedef struct _XCamAfParam {
