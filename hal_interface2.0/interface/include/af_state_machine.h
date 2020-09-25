@@ -142,6 +142,7 @@ public:
                                     const XCamAfParam &afInputParams,
                                     CameraMetadata &result,
                                     bool fixedFocus = false) const;
+    uint8_t getState() const { return mCurrentAfMode->getState(); }
 
 private:
     // prevent copy constructor and assignment operator

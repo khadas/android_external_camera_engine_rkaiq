@@ -90,6 +90,7 @@ private:
     SmartPtr<RkAEStateMachine>     mAeState;      /**< AE state machine */
     SmartPtr<RkAFStateMachine>      mAfState;     /**< AF state machine */
     SmartPtr<RkAWBStateMachine>    mAwbState;     /**< AWB state machine */
+    rk_aiq_exposure_sensor_descriptor _sns_des;
 
     /* MetaData*/
     CameraMetadata *_metadata;
@@ -107,9 +108,12 @@ public:
     ~AiqCameraHalAdapter();
     void init(const cl_result_callback_ops_t* callbacks);
     void processResults(SmartPtr<RkAiqFullParamsProxy> &results);
-    void getAeResults(rk_aiq_ae_results &ae_results, SmartPtr<rk_aiq_exposure_params_wrapper_t> exp_param);
-    void getAfResults(rk_aiq_af_results &af_results, SmartPtr<rk_aiq_focus_params_t> focus_param);
-    void getAwbResults(rk_aiq_awb_results &awb_results, SmartPtr<rk_aiq_isp_params_t> isp_param);
+    XCamReturn getAeResults(rk_aiq_ae_results &ae_results);
+    void getAeResultsDebug(rk_aiq_ae_results &ae_results, SmartPtr<rk_aiq_exposure_params_wrapper_t> exp_param);
+    XCamReturn getAfResults(rk_aiq_af_results &af_results, SmartPtr<rk_aiq_focus_params_t> focus_param);
+    void getAfResultsDebug(rk_aiq_af_results &af_results, SmartPtr<rk_aiq_focus_params_t> focus_param);
+    XCamReturn getAwbResults(rk_aiq_awb_results &awb_results);
+    void getAwbResultsDebug(rk_aiq_awb_results &awb_results, SmartPtr<rk_aiq_isp_params_t> isp_param);
     void updateParams(SmartPtr<VideoBuffer>& ispStats);
     void updateAeParams(XCamAeParam *aeParams);
     void updateAwbParams(XCamAwbParam *awbParams);
@@ -137,7 +141,7 @@ public:
     void updateAwbMetaParams(XCamAwbParam *awbParams);
     void updateOtherMetaParams();
 
-    void pre_process_3A_states(int requestId, SmartPtr<AiqInputParams> inputParams);
+    void pre_process_3A_states(SmartPtr<AiqInputParams> inputParams);
     bool set_sensor_mode_data (rk_aiq_exposure_sensor_descriptor *sensor_mode,
                                bool first);
     XCamReturn processAeMetaResults(rk_aiq_ae_results &ae_result, CameraMetadata *metadata);
