@@ -63,7 +63,7 @@ public:
     // should be called befor start
     void set_working_mode(int mode, bool linked_to_isp);
     void set_loop_status(bool stat);
-    XCamReturn capture_raw_ctl(bool sync);
+    XCamReturn capture_raw_ctl(capture_raw_t type, int count = 0, const char* capture_dir = nullptr, char* output_dir = nullptr);
     void set_hdr_global_tmo_mode(int frame_id, bool mode);
     virtual XCamReturn start();
     virtual XCamReturn stop ();
@@ -121,6 +121,7 @@ private:
     uint32_t sns_height;
     uint32_t pixelformat;
     char raw_dir_path[64];
+    char user_set_raw_dir[64];
     bool _is_raw_dir_exist;
     bool _is_capture_raw;
     sint32_t _capture_raw_num;
@@ -128,9 +129,10 @@ private:
     static const struct capture_fmt csirx_fmts[];
     Mutex _capture_image_mutex;
     Cond _capture_image_cond;
-    bool _is_raw_sync_yuv;
+    capture_raw_t _capture_raw_type;
     std::map<uint32_t, bool> _hdr_global_tmo_state_map;
     bool _is_multi_cam_conc;
+
     int calculate_stride_per_line(const struct capture_fmt& fmt,
                                   uint32_t& bytesPerLine);
     const struct capture_fmt* find_fmt(const uint32_t pixelformat);
@@ -146,6 +148,13 @@ private:
                                 SmartPtr<RkAiqExpParamsProxy>& expParams);
     bool get_value_from_file(const char* path, int& value, uint32_t& frameId);
     bool set_value_to_file(const char* path, int value, uint32_t sequence = 0);
+    int detect_capture_raw_status(const char* file_name, uint32_t sequence);
+    int update_capture_raw_status(const char* file_name);
+    int dynamic_capture_raw(int i, uint32_t sequence,
+                            SmartPtr<V4l2BufferProxy> buf_proxy,
+                            SmartPtr<V4l2Buffer> &v4l2buf);
+    void match_lumadetect_map(uint32_t sequence, sint32_t &additional_times);
+    void match_globaltmostate_map(uint32_t sequence, bool &isHdrGlobalTmo);
 };
 
 }

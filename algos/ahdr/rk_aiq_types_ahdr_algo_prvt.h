@@ -85,6 +85,8 @@
 #define TMOCONTRASTMODEMIN     (0.0)
 #define FASTMODELEVELMAX     (100.0)
 #define FASTMODELEVELMIN     (1.0)
+#define IIRMAX     (1000)
+#define IIRMIN     (0)
 
 
 #define DAYTHMAX     (1.0)
@@ -131,13 +133,9 @@ typedef struct TmoHandleData_s
     float GlobeLuma;
     float DetailsHighLight;
     float DetailsLowLight;
-    float TmoContrast;
-    float BandPriorStrength;
+    float LocalTmoStrength;
+    float GlobalTmoStrength;
 
-    float clipgap0;
-    float clipgap1;
-    float clipratio0;
-    float clipratio1;
 } TmoHandleData_t;
 
 typedef struct MergeHandleData_s

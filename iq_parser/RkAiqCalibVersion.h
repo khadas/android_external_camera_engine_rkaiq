@@ -78,11 +78,19 @@
  *  -sensorinfo: add CISHdrGainIndSetEn for Stagger+same gain
  * v1.2.7
  *  -aldch: add correct_level_max filed
+ * v1.2.8
+ *  - magic code:1017263
+ *  -Tmo: rename BandPror as GlobalTMO
+ *  -Tmo:add IIR control in GlobalTMO
+ *  -Tmo: rename TmoContrast as LocalTMO
+ *  -Tmo: delete moresetting
+ * v1.2.9
+ *  -LumaDetect: add fixed times of readback
  */
 
 
-#define RK_AIQ_CALIB_VERSION_REAL_V          "v1.2.7"
-#define RK_AIQ_CALIB_VERSION_MAGIC_V         "1021509"
+#define RK_AIQ_CALIB_VERSION_REAL_V          "v1.2.9"
+#define RK_AIQ_CALIB_VERSION_MAGIC_V         "1018435"
 
 
 /******* DO NOT EDIT THE FOLLOWINGS ***********/

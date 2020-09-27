@@ -846,4 +846,9 @@ typedef struct {
     rk_aiq_isp_fec_t        fec;
 } rk_aiq_ispp_params_t;
 
+typedef enum capture_raw_e {
+    CAPTURE_RAW_ASYNC,
+    CAPTURE_RAW_SYNC,
+    CAPTURE_RAW_AND_YUV_SYNC,
+} capture_raw_t;
 #endif

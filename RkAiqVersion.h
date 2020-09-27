@@ -240,10 +240,20 @@
  *   - support buf no sync
  *   - disable Asharp_fix_Printf log
  * - isp driver v0.1.7
+ * v1.2.2
+ * - calib db: v1.2.9 magic code: 1018435
+ *   - change imx415 hdr3 time/gain delay from 3 to 2
+ *   - add gc2093/gc2053 iqfiles
+ * - uApi: add rk_aiq_uapi_sysctl_setMulCamConc
+ * - awb: v1.0.a
+ * - update rkisp2x_tuner v0.2.1
+ * - ALDCH: fix attrib has no effect setting before prepare
+ * - SensorHw.cpp: fix exposure error caused by wrong dcg info
+ * -
  */
 
-#define RK_AIQ_VERSION_REAL_V "v1.2.1"
-#define RK_AIQ_RELEASE_DATE "2020-09-17"
+#define RK_AIQ_VERSION_REAL_V "v1.2.2"
+#define RK_AIQ_RELEASE_DATE "2020-09-27"
 
 /******* DO NOT EDIT THE FOLLOWINGS ***********/
 

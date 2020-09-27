@@ -184,7 +184,7 @@ public:
     XCamReturn setModuleCtl(rk_aiq_module_id_t moduleId, bool en);
     XCamReturn getModuleCtl(rk_aiq_module_id_t moduleId, bool& en);
     XCamReturn notify_capture_raw();
-    XCamReturn capture_raw_ctl(bool sync);
+    XCamReturn capture_raw_ctl(capture_raw_t type, int count = 0, const char* capture_dir = nullptr, char* output_dir = nullptr);
     void setDhazState(float& on);
     bool getDhazState();
     XCamReturn enqueueBuffer(struct rk_aiq_vbuf *vbuf);

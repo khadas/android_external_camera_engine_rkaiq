@@ -317,7 +317,65 @@ static XCamReturn CamCalibDbGetLscResIdxByName(const CalibDb_Lsc_t *calibLsc, ch
     return ret;
 }
 
+void UpdateDominateIlluList(List *l, int illu, int listMaxSize)
+{
+    illu_node_t *pCurNode;
+    illu_node_t *pDelNode;
+    int sizeList;
+    if(listMaxSize == 0) {
+        return;
+    }
+    pCurNode = (illu_node_t*)malloc(sizeof(illu_node_t));
+    pCurNode->value = illu;
+    ListPrepareItem(pCurNode);
+    ListAddTail(l, pCurNode);
+    sizeList = ListNoItems(l);
+    if (sizeList > listMaxSize)
+    {
+        pDelNode = (illu_node_t *)ListRemoveHead(l);
+        free(pDelNode);
+    }
+}
 
+void StableIlluEstimation(List l, int listSize, int illuNum, float varianceLuma, float varianceLumaTh, bool awbConverged, int preIllu, int *newIllu)
+{
+    int sizeList = ListNoItems(&l);
+    if(sizeList < listSize || listSize == 0) {
+        return;
+    }
+    /*if( awbConverged) {
+        *newIllu = preIllu;
+        LOGD_ALSC("awb is converged , reserve the last illumination(%d) \n", preIllu );
+        return;
+    }*/
+    /*if( varianceLuma <= varianceLumaTh) {
+        *newIllu = preIllu;
+        LOGD_ALSC("varianceLuma %f < varianceLumaTh %f , reserve the last illumination(%d) \n", varianceLuma,varianceLumaTh,preIllu );
+        return;
+    }*/
+    List *pNextNode = ListHead(&l);
+    illu_node_t *pL;
+    int *illuSet = (int*)malloc(illuNum*sizeof(int));
+    memset(illuSet, 0, illuNum*sizeof(int));
+    while (NULL != pNextNode)
+    {
+        pL = (illu_node_t*)pNextNode;
+        illuSet[pL->value]++;
+        pNextNode = pNextNode->p_next;
+    }
+    int count2 = 0;
+    int max_count = 0;
+    for(int i=0; i<illuNum; i++){
+        LOGV_ALSC("illu(%d), count(%d)\n", i,illuSet[i]);
+        if(illuSet[i] > max_count){
+            max_count = illuSet[i];
+            *newIllu = i;
+        }
+    }
+    free(illuSet);
+    LOGD_ALSC("varianceLuma %f, varianceLumaTh %f final estmination illu is %d\n", varianceLuma,varianceLumaTh,*newIllu );
+
+}
 
 XCamReturn AlscAutoConfig
 (
@@ -338,9 +396,15 @@ XCamReturn AlscAutoConfig
     int dominateIlluProfileIdx;
     int resIdx;
     //1)
+    int dominateIlluListSize = 15;//to do from xml;
+    float varianceLumaTh = 0.006;//to do from xml;
     ret = illuminant_index_estimation(hAlsc->calibLsc->aLscCof.illuNum[caseIndex], hAlsc->calibLsc->aLscCof.illAll[caseIndex],
                                       hAlsc->alscSwInfo.awbGain, &dominateIlluProfileIdx);
     RETURN_RESULT_IF_DIFFERENT(ret, XCAM_RETURN_NO_ERROR);
+    UpdateDominateIlluList(&hAlsc->alscRest.dominateIlluList, dominateIlluProfileIdx, dominateIlluListSize);
+    StableIlluEstimation(hAlsc->alscRest.dominateIlluList, dominateIlluListSize, hAlsc->calibLsc->aLscCof.illuNum[caseIndex],
+        hAlsc->alscSwInfo.varianceLuma ,varianceLumaTh, hAlsc->alscSwInfo.awbConverged,
+        hAlsc->alscRest.dominateIlluProfileIdx, &dominateIlluProfileIdx);
     hAlsc->alscRest.dominateIlluProfileIdx = dominateIlluProfileIdx;
 
     // 2) cal resIdx
@@ -502,6 +566,8 @@ XCamReturn AlscInit(alsc_handle_t *hAlsc, const CamCalibDbContext_t* calib)
     alsc_context->alscSwInfo.sensorGain = 1.0;
     alsc_context->alscSwInfo.awbIIRDampCoef = 0;
     alsc_context->alscSwInfo.grayMode = false;
+    alsc_context->alscSwInfo.varianceLuma = 255;
+    alsc_context->alscSwInfo.awbConverged = false;
     int caseIndex = USED_FOR_CASE_NORMAL;
     alsc_context->alscRest.caseIndex = caseIndex;
     bool lsFound;
@@ -561,6 +627,7 @@ XCamReturn AlscRelease(alsc_handle_t hAlsc)
     LOGI_ALSC("%s: (enter)\n", __FUNCTION__);
 
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    ClearList(&hAlsc->alscRest.dominateIlluList);
     free(hAlsc);
 
     LOGI_ALSC("%s: (exit)\n", __FUNCTION__);

@@ -120,10 +120,10 @@ void test1()
 	//camCoeff.cy = 728.1043200000000297222868539392948150634765625000000000000000000000000000000000000000000000000000000000;
 
 	/* s5kgm1sp_2mm_3840x2160 */
-	//srcWidth = 3840;
-	//srcHeight = 2160;
-	//dstWidth = 3840;
-	//dstHeight = 2160;
+	//srcWidth = 3584;
+	//srcHeight = 2016;
+	//dstWidth = 3584;
+	//dstHeight = 2016;
 	//camCoeff.a0 = -2218.1261186871761310612782835960388183593750000000000000000000000000000000000000000000000000000000000000;
 	//camCoeff.a2 = 0.0001041174419821471223372016945418749855889473110437393188476562500000000000000000000000000000000000;
 	//camCoeff.a3 = 0.0000000126660789198655226725038293366168429265883332845987752079963684082031250000000000000000000000;
@@ -140,16 +140,20 @@ void test1()
 	sprintf(srcYuvPath, "../data_in/imx415_2.8mm_3840x2160/imx415_2.8mm_3840x2160_001.nv12");	/* 3840x2160_imx415_2.8mm */
 	//sprintf(srcYuvPath, "../data_in/s5kgm1sp_2mm_3840x2160/s5kgm1sp_2mm_3840x2160_001.nv12");
 	//sprintf(srcYuvPath, "../data_in/imx415_2.88mm_3584x2016/imx415_2.88mm_3584x2016_001.nv12");
+	//sprintf(srcYuvPath, "../data_in/s5kgm1sp_2mm_3584x2016/s5kgm1sp_2mm_3584x2016_001.nv12");
 	readNV12(srcYuvPath, srcWidth, srcHeight, pImgY, pImgUV);
 
+	Rkclock rkclock;
 	/* 生成FEC映射表相关的参数 */
 	FecParams fecParams;
 	fecParams.correctX = 1;								/* 水平x方向校正：1代表校正，0代表不校正 */
 	fecParams.correctY = 1;								/* 垂直y方向校正：1代表校正，0代表不校正 */
 	fecParams.saveMesh4bin = 0;							/* 是否保存meshxi,xf,yi,yf4个bin文件：1代表保存，0代表不保存 */
 	sprintf(fecParams.mesh4binPath, "../data_out/");	/* 保存meshxi,xf,yi,yf4个bin文件的路径 */
-	/* 初始化：根据图像输出分辨率，计算FEC映射表的相关参数，申请需要的buffer */
-	genFecMeshInit(srcWidth, srcHeight, dstWidth, dstHeight, fecParams, camCoeff);
+
+	rkclock.clockStart();
+	genFecMeshInit(srcWidth, srcHeight, dstWidth, dstHeight, fecParams, camCoeff);	/* 初始化：根据图像输出分辨率，计算FEC映射表的相关参数，申请需要的buffer */
+	rkclock.clockEnd("genFecMeshInit");
 
 	unsigned short	*pMeshXI;		/* X整数部分 */
 	unsigned char	*pMeshXF;		/* X小数部分 */
@@ -158,9 +162,8 @@ void test1()
 	/* FEC 4个mesh 内存申请 */
 	mallocFecMesh(fecParams.meshSize4bin, &pMeshXI, &pMeshXF, &pMeshYI, &pMeshYF);
 
-	Rkclock rkclock;
 	bool success;
-	int level = 0;// level范围: 0-255
+	int level = 0;					/* level范围: 0-255 */
 	char dstYuvPath[256];
 	char dstBmpPath[256];
 	for (level = 0; level <= 255; level++)
@@ -196,8 +199,8 @@ void test1()
 			sprintf(dstYuvPath, "../data_out/fec_out_no_correct_%dx%d_%03d.nv12", dstWidth, dstHeight, level);
 			sprintf(dstBmpPath, "../data_out/fec_out_no_correct_%dx%d_%03d.bmp", dstWidth, dstHeight, level);
 		}
-		//saveNV12(dstYuvPath, dstWidth, dstHeight, pImgOut);
-		yuv2bmp(dstBmpPath, 0, pImgOut, &pImgOut[dstWidth * dstHeight], dstWidth, dstHeight);
+		saveNV12(dstYuvPath, dstWidth, dstHeight, pImgOut);
+		//yuv2bmp(dstBmpPath, 0, pImgOut, &pImgOut[dstWidth * dstHeight], dstWidth, dstHeight);
 	}
 	delete[] pImgY;
 	delete[] pImgUV;
@@ -231,16 +234,16 @@ void test2()
 	//camCoeff.cy = 1123.5352222944213735900120809674263000488281250000000000000000000000000000000000000000000000000000000000;
 
 	/* 3840x2160_imx415_2.88mm_ISP */
-	srcWidth = 3840;
-	srcHeight = 2160;
-	dstWidth = 3840;
-	dstHeight = 2160;
-	camCoeff.a0 = -2297.284245574242504517;
-	camCoeff.a2 = 0.0001183387160889;
-	camCoeff.a3 = 0.00000000621559354720;
-	camCoeff.a4 = 0.00000000001194583141;
-	camCoeff.cx = 1950.09945599999991827644;
-	camCoeff.cy = 1124.36467200000015509431;
+	//srcWidth = 3840;
+	//srcHeight = 2160;
+	//dstWidth = 3840;
+	//dstHeight = 2160;
+	//camCoeff.a0 = -2297.284245574242504517;
+	//camCoeff.a2 = 0.0001183387160889;
+	//camCoeff.a3 = 0.00000000621559354720;
+	//camCoeff.a4 = 0.00000000001194583141;
+	//camCoeff.cx = 1950.09945599999991827644;
+	//camCoeff.cy = 1124.36467200000015509431;
 
 	/* 3840x2160_imx415_3.6mm_ISP */
 	//srcWidth = 3840;
@@ -267,16 +270,16 @@ void test2()
 	//camCoeff.cy = 1135.7418239999999514111550524830818176269531250000000000000000000000000000000000000000000000000000000000;
 
 	/* 2688x1520_imx347_4mm */
-	//srcWidth = 2688;
-	//srcHeight = 1520;
-	//dstWidth = 2688;
-	//dstHeight = 1520;
-	//camCoeff.a0 = -1863.7984212819360436697024852037429809570312500000000000000000000000000000000000000000000000000000000000;
-	//camCoeff.a2 = 0.0004710038222292998403434305387804670317564159631729125976562500000000000000000000000000000000000000;
-	//camCoeff.a3 = -0.0000002932338849422447377658846635883893583240933367051184177398681640625000000000000000000000000000;
-	//camCoeff.a4 = 0.0000000001512588833120702854166806930133210712385860574613616336137056350708007812500000000000000000;
-	//camCoeff.cx = 1363.0740479999999479332473129034042358398437500000000000000000000000000000000000000000000000000000000000;
-	//camCoeff.cy = 787.0316799999999375359038822352886199951171875000000000000000000000000000000000000000000000000000000000;
+	srcWidth = 2688;
+	srcHeight = 1520;
+	dstWidth = 2688;
+	dstHeight = 1520;
+	camCoeff.a0 = -1863.7984212819360436697024852037429809570312500000000000000000000000000000000000000000000000000000000000;
+	camCoeff.a2 = 0.0004710038222292998403434305387804670317564159631729125976562500000000000000000000000000000000000000;
+	camCoeff.a3 = -0.0000002932338849422447377658846635883893583240933367051184177398681640625000000000000000000000000000;
+	camCoeff.a4 = 0.0000000001512588833120702854166806930133210712385860574613616336137056350708007812500000000000000000;
+	camCoeff.cx = 1363.0740479999999479332473129034042358398437500000000000000000000000000000000000000000000000000000000000;
+	camCoeff.cy = 787.0316799999999375359038822352886199951171875000000000000000000000000000000000000000000000000000000000;
 
 	/* s5kgm1sp_2mm_3840x2160 */
 	//srcWidth = 3840;
@@ -296,9 +299,9 @@ void test2()
 
 	/* 读BGR图像 */
 	char srcBGRPath[256];
-	sprintf(srcBGRPath, "../data_in/imx415_2.8mm_3840x2160/imx415_2.8mm_3840x2160_001.jpeg");	/* 3840x2160_imx415_2.8mm */
+	//sprintf(srcBGRPath, "../data_in/imx415_2.8mm_3840x2160/imx415_2.8mm_3840x2160_001.jpeg");	/* 3840x2160_imx415_2.8mm */
 	//sprintf(srcBGRPath, "../data_in/imx415_3.6mm_3840x2160/imx415_3.6mm_3840x2160_001.jpeg");	/* 3840x2160_imx415_3.6mm */
-	//sprintf(srcBGRPath, "../data_in/imx347_4mm_2688x1520/imx347_4mm_2688x1520_006.bmp");		/* 2688x1520_imx347_4mm */
+	sprintf(srcBGRPath, "../data_in/imx347_4mm_2688x1520/imx347_4mm_2688x1520_006.bmp");		/* 2688x1520_imx347_4mm */
 	//sprintf(srcBGRPath, "../data_in/s5kgm1sp_2mm_3840x2160/s5kgm1sp_2mm_3840x2160_001.png");	/* s5kgm1sp_2mm_3840x2160 */
 
 #ifdef WIN32
@@ -317,11 +320,11 @@ void test2()
 		}
 	}
 #endif
-	Rkclock rkclock;
 
+	Rkclock rkclock;
 	/* 生成LDCH映射表相关的参数 */
 	LdchParams ldchParams;
-	ldchParams.saveMeshX = 1;						/* 是否保存MeshX.bin文件：1代表保存，0代表不保存 */
+	ldchParams.saveMeshX = 0;						/* 是否保存MeshX.bin文件：1代表保存，0代表不保存 */
 	sprintf(ldchParams.meshPath, "../data_out/");	/* 保存MeshX.bin文件的路径 */
 
 	rkclock.clockStart();
@@ -332,7 +335,7 @@ void test2()
 	bool success;
 	int level = 0;				/* level范围: 0-255 */
 	char dstYuvPath[256];
-	for (level = 255; level <= 255; level++)
+	for (level = 0; level <= 255; level++)
 	{
 		printf("level = %d\n", level);
 
@@ -359,7 +362,7 @@ void test2()
 
 int main()
 {
-	test2();
+	test1();
 
 #ifdef WIN32
 	system("pause");

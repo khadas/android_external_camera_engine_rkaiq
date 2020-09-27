@@ -3917,11 +3917,15 @@ XCamReturn CamHwIsp20::notify_capture_raw()
     return XCAM_RETURN_ERROR_FAILED;
 }
 
-XCamReturn CamHwIsp20::capture_raw_ctl(bool sync)
+XCamReturn CamHwIsp20::capture_raw_ctl(capture_raw_t type, int count, const char* capture_dir, char* output_dir)
 {
     SmartPtr<Isp20PollThread> isp20Pollthread = mPollthread.dynamic_cast_ptr<Isp20PollThread>();
-    if (isp20Pollthread.ptr())
-        return isp20Pollthread->capture_raw_ctl(sync);
+    if (isp20Pollthread.ptr()) {
+        if (type == CAPTURE_RAW_AND_YUV_SYNC)
+            return isp20Pollthread->capture_raw_ctl(type);
+        else if (type == CAPTURE_RAW_SYNC)
+            return isp20Pollthread->capture_raw_ctl(type, count, capture_dir, output_dir);
+    }
 
     return XCAM_RETURN_ERROR_FAILED;
 }

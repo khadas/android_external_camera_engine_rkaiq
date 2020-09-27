@@ -210,6 +210,19 @@ RkLumaCore::analyze(const SmartPtr<VideoBuffer> &buffer)
     rkisp_isp2x_luma_buffer* lumaStat =
         (rkisp_isp2x_luma_buffer*)(buf->get_v4l2_userptr());
 
+    if (calib->fixed_times > 0) {
+        hdrProcessCnt = calib->fixed_times - 1;
+        if (hdrProcessCnt > 2)
+            hdrProcessCnt = 2;
+
+        hdrProcessCnt = calib->fixed_times;
+        if (mCb)
+            mCb->rkLumaCalcDone(lumaStat->frame_id, hdrProcessCnt);
+
+        return XCAM_RETURN_NO_ERROR;
+    }
+
+
     int raw_channal = 1;
     switch (mWorkingMode)
     {

@@ -292,6 +292,7 @@ typedef struct _RkAiqAlgoPreResAwbInt {
     color_tempture_info_t cctGloabl;
     color_tempture_info_t cctFirst[4];
     float awb_smooth_factor;
+    float varianceLuma;
     rk_aiq_wb_gain_t awb_gain_algo;
     bool awbConverged;
     //blk
@@ -313,6 +314,7 @@ typedef struct _RkAiqAlgoProcResAwbInt {
     color_tempture_info_t cctFirst[4];
     color_tempture_info_t cctBlk[RK_AIQ_AWB_GRID_NUM_TOTAL];
     float awb_smooth_factor;
+    float varianceLuma;
     bool awbConverged;
     //blk
     bool blkWpFlagVaLid[RK_AIQ_AWB_GRID_NUM_TOTAL];

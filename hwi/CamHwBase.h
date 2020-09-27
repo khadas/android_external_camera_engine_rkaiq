@@ -72,7 +72,9 @@ public:
     virtual XCamReturn notify_capture_raw() {
         return  XCAM_RETURN_ERROR_FAILED;
     }
-    virtual XCamReturn capture_raw_ctl(bool sync) {
+    virtual XCamReturn capture_raw_ctl(capture_raw_t type, int count = 0,
+                                       const char* capture_dir = nullptr,\
+                                       char* output_dir = nullptr) {
         return  XCAM_RETURN_ERROR_FAILED;
     }
     virtual XCamReturn enqueueBuffer(struct rk_aiq_vbuf *vbuf) {

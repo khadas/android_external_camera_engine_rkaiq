@@ -868,34 +868,25 @@ typedef struct DetailsLowLight_s
     float detailsLowLight[6];
 } DetailsLowLight_t;
 
-typedef struct TmoContrast_s
+typedef struct LocalTMO_s
 {
-    float TmoContrastMode;
+    float LocalTMOMode;
     float DynamicRange[6];
     float EnvLv[6];
     float Tolerance;
-    float TmoContrast[6];
-} TmoContrast_t;
+    float Strength[6];
+} LocalTMO_t;
 
-typedef struct BandPrior_s
+typedef struct GlobaTMO_s
 {
     float en;
+    float iir;
     float mode;
     float DynamicRange[6];
     float EnvLv[6];
     float Tolerance;
     float Strength[6];
-} BandPrior_t;
-
-typedef struct TmoMoreSetting_s
-{
-    float clipgap0;
-    float clipgap1;
-    float clipratio0;
-    float clipratio1;
-    float damp;
-} TmoMoreSetting_t;
-
+} GlobaTMO_t;
 
 typedef struct CalibDb_HdrTmo_s
 {
@@ -903,9 +894,9 @@ typedef struct CalibDb_HdrTmo_s
     GlobalLuma_t luma;
     DetailsHighLight_t HighLight;
     DetailsLowLight_t LowLight;
-    TmoContrast_t Contrast;
-    BandPrior_t BandPrior;
-    TmoMoreSetting_t MoreSetting;
+    LocalTMO_t LocalTMO;
+    GlobaTMO_t GlobaTMO;
+    float damp;
 } CalibDb_HdrTmo_t;
 
 typedef struct CalibDb_Ahdr_Para_s {
@@ -1643,6 +1634,7 @@ typedef struct CalibDb_ORB_s {
 
 typedef struct CalibDb_LUMA_DETECT_s {
     unsigned char luma_detect_en;
+    int fixed_times;
     float mutation_threshold;
     float mutation_threshold_level2;
 } CalibDb_LUMA_DETECT_t;

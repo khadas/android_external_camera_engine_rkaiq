@@ -30,7 +30,9 @@ typedef struct accm_sw_info_s {
     float sensorGain;
     float awbGain[2];
     float awbIIRDampCoef;
+    float varianceLuma;
     bool grayMode;
+    bool awbConverged;
 } accm_sw_info_t;
 
 typedef struct rk_aiq_ccm_mccm_attrib_s {

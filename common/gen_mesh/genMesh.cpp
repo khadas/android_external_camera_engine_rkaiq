@@ -130,6 +130,7 @@ void genLdchMeshInit(int srcW, int srcH, int dstW, int dstH, LdchParams &ldchPar
 
 	/* LDCH: 计算LDCH能够校正的最大程度 */
 	calcLdchMaxLevel(ldchParams, camCoeff);
+	//ldchParams.maxLevel = 251;
 }
 
 /* LDCH: 反初始化 */

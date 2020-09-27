@@ -6840,45 +6840,43 @@ bool RkAiqCalibParser::parseEntrySensorAhdrTmo
         }
         else if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_AHDR_TMO_GLOBALLUMA_TAG_ID)) {
             if (!parseEntrySensorAhdrTmoGlobalLuma(pchild->ToElement())) {
-                LOGE("parse error in AHDR Tmo GlobalLuma (%s)", tagname.c_str());
+                LOGE("parse error in Tmo GlobalLuma (%s)", tagname.c_str());
                 return (false);
             }
         }
         else if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_AHDR_TMO_DETAILSHIGHLIGHT_TAG_ID)) {
             if (!parseEntrySensorAhdrTmoDetailsHighLight(pchild->ToElement())) {
-                LOGE("parse error in AHDR Tmo DetailsHighLight(%s)", tagname.c_str());
+                LOGE("parse error in Tmo DetailsHighLight(%s)", tagname.c_str());
                 return (false);
             }
 
         }
         else if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_AHDR_TMO_DETAILSLOWLIGHT_TAG_ID)) {
             if (!parseEntrySensorAhdrTmoDetailsLowLight(pchild->ToElement())) {
-                LOGE("parse error in AHDR Tmo DetailsLowLight(%s)", tagname.c_str());
+                LOGE("parse error in Tmo DetailsLowLight(%s)", tagname.c_str());
                 return (false);
             }
 
         }
-        else if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_AHDR_TMO_TMOCONTRAST_TAG_ID)) {
-            if (!parseEntrySensorAhdrTmoContrast(pchild->ToElement())) {
-                LOGE("parse error in AHDR Tmo TmoContrast(%s)", tagname.c_str());
+        else if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_AHDR_TMO_GLOBALTMO_TAG_ID)) {
+            if (!parseEntrySensorAhdrGlobalTMO(pchild->ToElement())) {
+                LOGE("parse error in Tmo GlobalTMO(%s)", tagname.c_str());
                 return (false);
             }
 
         }
-        else if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_AHDR_TMO_BANDPRIOR_TAG_ID)) {
-            if (!parseEntrySensorAhdrBandPrior(pchild->ToElement())) {
-                LOGE("parse error in AHDR Tmo BandPrior(%s)", tagname.c_str());
+        else if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_AHDR_TMO_LOCALTMO_TAG_ID)) {
+            if (!parseEntrySensorAhdrLocalTMO(pchild->ToElement())) {
+                LOGE("parse error in Tmo LocalTMO(%s)", tagname.c_str());
                 return (false);
             }
 
         }
-        else if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_AHDR_TMO_MORESETTING_TAG_ID)) {
-            if (!parseEntrySensorAhdrTmoMoreSetting(pchild->ToElement())) {
-                LOGE("parse error in AHDR Tmo MoreSetting(%s)", tagname.c_str());
-                return (false);
-            }
-
+        else if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_AHDR_TMO_DAMP_TAG_ID)) {
+            int no = ParseFloatArray(pchild, &mCalibDb->ahdr.tmo.damp, tag.Size());
+            DCT_ASSERT((no == tag.Size()));
         }
+
         pchild = pchild->NextSibling();
     }
 
@@ -7032,7 +7030,7 @@ bool RkAiqCalibParser::parseEntrySensorAhdrTmoDetailsLowLight
     return (true);
 }
 
-bool RkAiqCalibParser::parseEntrySensorAhdrTmoContrast
+bool RkAiqCalibParser::parseEntrySensorAhdrLocalTMO
 (
     const XMLElement*   pelement,
     void*                param
@@ -7040,7 +7038,7 @@ bool RkAiqCalibParser::parseEntrySensorAhdrTmoContrast
     LOGD("%s(%d): (enter)\n", __FUNCTION__, __LINE__);
     autoTabForward();
 
-    XML_CHECK_START(CALIB_SENSOR_AHDR_TMO_TMOCONTRAST_TAG_ID, CALIB_SENSOR_AHDR_TMO_TAG_ID);
+    XML_CHECK_START(CALIB_SENSOR_AHDR_TMO_LOCALTMO_TAG_ID, CALIB_SENSOR_AHDR_TMO_TAG_ID);
 
     const XMLNode* pchild = pelement->FirstChild();
     while (pchild) {
@@ -7048,24 +7046,24 @@ bool RkAiqCalibParser::parseEntrySensorAhdrTmoContrast
         std::string Tagname(pchild->ToElement()->Name());
         XML_CHECK_WHILE_SUBTAG_MARK((char *)(Tagname.c_str()), tag.Type(), tag.Size());
 
-        if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_AHDR_TMO_TMOCONTRASTMODE_TAG_ID)) {
-            int no = ParseFloatArray(pchild, &mCalibDb->ahdr.tmo.Contrast.TmoContrastMode, tag.Size());
+        if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_AHDR_TMO_LOCALTMOMODE_TAG_ID)) {
+            int no = ParseFloatArray(pchild, &mCalibDb->ahdr.tmo.LocalTMO.LocalTMOMode, tag.Size());
             DCT_ASSERT((no == tag.Size()));
         }
         else if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_AHDR_TMO_DYNAMICRANGE_TAG_ID)) {
-            int no = ParseFloatArray(pchild, mCalibDb->ahdr.tmo.Contrast.DynamicRange, tag.Size());
+            int no = ParseFloatArray(pchild, mCalibDb->ahdr.tmo.LocalTMO.DynamicRange, tag.Size());
             DCT_ASSERT((no == tag.Size()));
         }
         else if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_AHDR_ENVLV_TAG_ID)) {
-            int no = ParseFloatArray(pchild, mCalibDb->ahdr.tmo.Contrast.EnvLv, tag.Size());
+            int no = ParseFloatArray(pchild, mCalibDb->ahdr.tmo.LocalTMO.EnvLv, tag.Size());
             DCT_ASSERT((no == tag.Size()));
         }
         else if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_AHDR_TOLERANCE_TAG_ID)) {
-            int no = ParseFloatArray(pchild, &mCalibDb->ahdr.tmo.Contrast.Tolerance, tag.Size());
+            int no = ParseFloatArray(pchild, &mCalibDb->ahdr.tmo.LocalTMO.Tolerance, tag.Size());
             DCT_ASSERT((no == tag.Size()));
         }
-        else if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_AHDR_TMO_TMOCONTRAST_TMOCONTRAST_TAG_ID)) {
-            int no = ParseFloatArray(pchild, mCalibDb->ahdr.tmo.Contrast.TmoContrast, tag.Size());
+        else if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_AHDR_TMO_LOCALTMO_STRENGTH_TAG_ID)) {
+            int no = ParseFloatArray(pchild, mCalibDb->ahdr.tmo.LocalTMO.Strength, tag.Size());
             DCT_ASSERT((no == tag.Size()));
         }
         pchild = pchild->NextSibling();
@@ -7078,7 +7076,7 @@ bool RkAiqCalibParser::parseEntrySensorAhdrTmoContrast
     return (true);
 }
 
-bool RkAiqCalibParser::parseEntrySensorAhdrBandPrior
+bool RkAiqCalibParser::parseEntrySensorAhdrGlobalTMO
 (
     const XMLElement*   pelement,
     void*                param
@@ -7086,7 +7084,7 @@ bool RkAiqCalibParser::parseEntrySensorAhdrBandPrior
     LOGD("%s(%d): (enter)\n", __FUNCTION__, __LINE__);
     autoTabForward();
 
-    XML_CHECK_START(CALIB_SENSOR_AHDR_TMO_BANDPRIOR_TAG_ID, CALIB_SENSOR_AHDR_TMO_TAG_ID);
+    XML_CHECK_START(CALIB_SENSOR_AHDR_TMO_GLOBALTMO_TAG_ID, CALIB_SENSOR_AHDR_TMO_TAG_ID);
 
     const XMLNode* pchild = pelement->FirstChild();
     while (pchild) {
@@ -7094,28 +7092,32 @@ bool RkAiqCalibParser::parseEntrySensorAhdrBandPrior
         std::string Tagname(pchild->ToElement()->Name());
         XML_CHECK_WHILE_SUBTAG_MARK((char *)(Tagname.c_str()), tag.Type(), tag.Size());
 
-        if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_AHDR_TMO_BANDPRIOR_EN_TAG_ID)) {
-            int no = ParseFloatArray(pchild, &mCalibDb->ahdr.tmo.BandPrior.en, tag.Size());
+        if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_AHDR_TMO_GLOBALTMO_EN_TAG_ID)) {
+            int no = ParseFloatArray(pchild, &mCalibDb->ahdr.tmo.GlobaTMO.en, tag.Size());
             DCT_ASSERT((no == tag.Size()));
         }
-        else if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_AHDR_TMO_BANDPRIOR_MODE_TAG_ID)) {
-            int no = ParseFloatArray(pchild, &mCalibDb->ahdr.tmo.BandPrior.mode, tag.Size());
+        else if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_AHDR_TMO_GLOBALTMO_IIR_TAG_ID)) {
+            int no = ParseFloatArray(pchild, &mCalibDb->ahdr.tmo.GlobaTMO.iir, tag.Size());
             DCT_ASSERT((no == tag.Size()));
         }
-        else if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_AHDR_TMO_BANDPRIOR_DYNAMICRANGE_TAG_ID)) {
-            int no = ParseFloatArray(pchild, mCalibDb->ahdr.tmo.BandPrior.DynamicRange, tag.Size());
+        else if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_AHDR_TMO_GLOBALTMO_MODE_TAG_ID)) {
+            int no = ParseFloatArray(pchild, &mCalibDb->ahdr.tmo.GlobaTMO.mode, tag.Size());
             DCT_ASSERT((no == tag.Size()));
         }
-        else if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_AHDR_TMO_BANDPRIOR_ENVLV_TAG_ID)) {
-            int no = ParseFloatArray(pchild, mCalibDb->ahdr.tmo.BandPrior.EnvLv, tag.Size());
+        else if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_AHDR_TMO_GLOBALTMO_DYNAMICRANGE_TAG_ID)) {
+            int no = ParseFloatArray(pchild, mCalibDb->ahdr.tmo.GlobaTMO.DynamicRange, tag.Size());
             DCT_ASSERT((no == tag.Size()));
         }
-        else if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_AHDR_TMO_BANDPRIOR_TOLERANCE_TAG_ID)) {
-            int no = ParseFloatArray(pchild, &mCalibDb->ahdr.tmo.BandPrior.Tolerance, tag.Size());
+        else if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_AHDR_TMO_GLOBALTMO_ENVLV_TAG_ID)) {
+            int no = ParseFloatArray(pchild, mCalibDb->ahdr.tmo.GlobaTMO.EnvLv, tag.Size());
             DCT_ASSERT((no == tag.Size()));
         }
-        else if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_AHDR_TMO_BANDPRIOR_STRENGTH_TAG_ID)) {
-            int no = ParseFloatArray(pchild, mCalibDb->ahdr.tmo.BandPrior.Strength, tag.Size());
+        else if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_AHDR_TMO_GLOBALTMO_TOLERANCE_TAG_ID)) {
+            int no = ParseFloatArray(pchild, &mCalibDb->ahdr.tmo.GlobaTMO.Tolerance, tag.Size());
+            DCT_ASSERT((no == tag.Size()));
+        }
+        else if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_AHDR_TMO_GLOBALTMO_STRENGTH_TAG_ID)) {
+            int no = ParseFloatArray(pchild, mCalibDb->ahdr.tmo.GlobaTMO.Strength, tag.Size());
             DCT_ASSERT((no == tag.Size()));
         }
         pchild = pchild->NextSibling();
@@ -7127,53 +7129,6 @@ bool RkAiqCalibParser::parseEntrySensorAhdrBandPrior
     autoTabBackward();
     return (true);
 }
-
-bool RkAiqCalibParser::parseEntrySensorAhdrTmoMoreSetting
-(
-    const XMLElement*   pelement,
-    void*                param
-) {
-    LOGD("%s(%d): (enter)\n", __FUNCTION__, __LINE__);
-    autoTabForward();
-
-    XML_CHECK_START(CALIB_SENSOR_AHDR_TMO_MORESETTING_TAG_ID, CALIB_SENSOR_AHDR_TMO_TAG_ID);
-
-    const XMLNode* pchild = pelement->FirstChild();
-    while (pchild) {
-        XmlTag tag = XmlTag(pchild->ToElement());
-        std::string Tagname(pchild->ToElement()->Name());
-        XML_CHECK_WHILE_SUBTAG_MARK((char *)(Tagname.c_str()), tag.Type(), tag.Size());
-
-        if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_AHDR_TMO_CLIPGAP0_TAG_ID)) {
-            int no = ParseFloatArray(pchild, &mCalibDb->ahdr.tmo.MoreSetting.clipgap0, tag.Size());
-            DCT_ASSERT((no == tag.Size()));
-        }
-        else if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_AHDR_TMO_CLIPGAP1_TAG_ID)) {
-            int no = ParseFloatArray(pchild, &mCalibDb->ahdr.tmo.MoreSetting.clipgap1, tag.Size());
-            DCT_ASSERT((no == tag.Size()));
-        }
-        else if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_AHDR_TMO_CLIPRATIO0_TAG_ID)) {
-            int no = ParseFloatArray(pchild, &mCalibDb->ahdr.tmo.MoreSetting.clipratio0, tag.Size());
-            DCT_ASSERT((no == tag.Size()));
-        }
-        else if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_AHDR_TMO_CLIPRATIO1_TAG_ID)) {
-            int no = ParseFloatArray(pchild, &mCalibDb->ahdr.tmo.MoreSetting.clipratio1, tag.Size());
-            DCT_ASSERT((no == tag.Size()));
-        }
-        else if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_AHDR_TMO_DAMP_TAG_ID)) {
-            int no = ParseFloatArray(pchild, &mCalibDb->ahdr.tmo.MoreSetting.damp, tag.Size());
-            DCT_ASSERT((no == tag.Size()));
-        }
-        pchild = pchild->NextSibling();
-    }
-
-    XML_CHECK_END();
-
-    LOGD("%s(%d): (exit)\n", __FUNCTION__, __LINE__);
-    autoTabBackward();
-    return (true);
-}
-
 
 bool RkAiqCalibParser::parseEntrySensorBlcModeCell
 (
@@ -11304,6 +11259,9 @@ bool RkAiqCalibParser::parseEntrySensorLumaDetect
         XML_CHECK_WHILE_SUBTAG_MARK((char *)(tagname.c_str()), tag.Type(), tag.Size());
         if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_LUMA_DETECT_ENABLE_TAG_ID)) {
             int no = ParseUcharArray(pchild, &mCalibDb->lumaDetect.luma_detect_en, tag.Size());
+            DCT_ASSERT((no == tag.Size()));
+        } else if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_LUMA_DETECT_FIXED_TIMES_TAG_ID)) {
+            int no =  ParseIntArray(pchild, &mCalibDb->lumaDetect.fixed_times, tag.Size());
             DCT_ASSERT((no == tag.Size()));
         } else if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_LUMA_DETECT_THRESHOLD_TAG_ID)) {
             int no =  ParseFloatArray(pchild, &mCalibDb->lumaDetect.mutation_threshold, tag.Size());

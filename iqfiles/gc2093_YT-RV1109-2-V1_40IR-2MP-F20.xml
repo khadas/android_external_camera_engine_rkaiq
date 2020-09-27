@@ -2,7 +2,7 @@
 <matfile>
     <header type="struct" size="[1 1]">
         <code_xml_parse_version index="1" type="char" size="[1 6]">
-         v1.2.6
+         v1.2.8
         </code_xml_parse_version>
         <creation_date index="1" type="char" size="[1 10]">
             2020-09-11
@@ -20,7 +20,7 @@
             v0.0.1
         </generator_version>
         <magic_code_version  index="1" type="int" size="[1 1]">
-	  [1021509]
+	  [1018435]
         </magic_code_version>
     </header>
     <sensor type="struct" size="[1 1]">
@@ -2380,10 +2380,11 @@
                         [1.0000 1.0000 1.0000 1.0000 1.0000 1.0000 ]
                     </DetailsLowLight>
                 </DetailsLowLight>
-                <TmoContrast index="1" type="struct" size="[1 1]">
-                    <TmoContrastMode index="1" type="double" size="[1 1]">
+         <GlobalTMO index="1" type="struct" size="[1 1]">
+		<Enable index="1" type="double" size="[1 1]">           	   [0]                 </Enable>		<IIR index="1" type="double" size="[1 1]">           	   [64]                 </IIR>                <Mode index="1" type="double" size="[1 1]">                    [0]                 </Mode>                 <DynamicRange index="1" type="double" size="[1 6]">                    [1 44 66 72 78 84]                 </DynamicRange>               <EnvLv index="1" type="double" size="[1 6]">                  [0 0.2 0.4 0.6 0.8 1.0]               </EnvLv> 		<Tolerance index="1" type="double" size="[1 1]">                    [0]                 </Tolerance>                 <GlobalTMOStrength index="1" type="double" size="[1 6]">                    [0.5 0.5 0.5 0.5 0.5 0.5]                 </GlobalTMOStrength>         </GlobalTMO>                <LocalTMO index="1" type="struct" size="[1 1]">
+                    <LocalTMOMode index="1" type="double" size="[1 1]">
                         [0.0000 ]
-                    </TmoContrastMode>
+                    </LocalTMOMode>
                     <DynamicRange index="1" type="double" size="[1 6]">
                         [1.0000 44.0000 66.0000 72.0000 78.0000 84.0000 ]
                     </DynamicRange>
@@ -2393,28 +2394,13 @@
                     <Tolerance index="1" type="double" size="[1 1]">
                         [0.0000 ]
                     </Tolerance>
-                    <TmoContrast index="1" type="double" size="[1 6]">
+                    <LocalTMOStrength index="1" type="double" size="[1 6]">
                         [0.0000 0.0000 0.0000 0.0000 0.0000 0.0000 ]
-                    </TmoContrast>
-                </TmoContrast>
-         <Band_Prior index="1" type="struct" size="[1 1]">
-		<Enable index="1" type="double" size="[1 1]">           	   [0]                 </Enable>                <Mode index="1" type="double" size="[1 1]">                    [0]                 </Mode>                 <DynamicRange index="1" type="double" size="[1 6]">                    [1 44 66 72 78 84]                 </DynamicRange>               <EnvLv index="1" type="double" size="[1 6]">                  [0 0.2 0.4 0.6 0.8 1.0]               </EnvLv> 		<Tolerance index="1" type="double" size="[1 1]">                    [0]                 </Tolerance>                 <Strength index="1" type="double" size="[1 6]">                    [0.5 0.5 0.5 0.5 0.5 0.5]                 </Strength>         </Band_Prior>                <MoreSetting index="1" type="struct" size="[1 1]">
-                    <clipgap0 index="1" type="double" size="[1 1]">
-                        [12.0000 ]
-                    </clipgap0>
-                    <clipgap1 index="1" type="double" size="[1 1]">
-                        [12.0000 ]
-                    </clipgap1>
-                    <clipratio0 index="1" type="double" size="[1 1]">
-                        [64.0000 ]
-                    </clipratio0>
-                    <clipratio1 index="1" type="double" size="[1 1]">
-                        [166.0000 ]
-                    </clipratio1>
-                    <Damp index="1" type="double" size="[1 1]">
-                        [0.3000 ]
-                    </Damp>
-                </MoreSetting>
+                    </LocalTMOStrength>
+                </LocalTMO>
+	<Damp index="1" type="double" size="[1 1]">
+              [0.3]
+	</Damp>
             </TMO>
         <BLC index="1" type="struct" size="[1 1]">
             <Enable index="1" type="double" size="[1 1]">
@@ -37830,6 +37816,7 @@
             <enable index="1" type="double" size="[1 1]">
                 [1 ]
             </enable>
+          <fixed_times index="1" type="int" size="[1 1]">               [0]          </fixed_times>
           <threshold index="1" type="double" size="[1 1]">               [0.01]
           </threshold>
           <threshold_level2 index="1" type="double" size="[1 1]">               [1000]

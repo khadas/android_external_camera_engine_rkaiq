@@ -38,12 +38,26 @@ typedef struct rk_aiq_sys_ctx_s {
 RKAIQ_BEGIN_DECLARE
 
 XCamReturn
-rk_aiq_uapi_debug_captureRawCtl(const rk_aiq_sys_ctx_t* ctx, bool sync)
+rk_aiq_uapi_debug_captureRawYuvSync(const rk_aiq_sys_ctx_t* ctx, capture_raw_t type)
 {
     ENTER_XCORE_FUNCTION();
 
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
-    ret = ctx->_camHw->capture_raw_ctl(sync);
+    ret = ctx->_camHw->capture_raw_ctl(type);
+    EXIT_XCORE_FUNCTION();
+
+    return ret;
+}
+
+XCamReturn
+rk_aiq_uapi_debug_captureRawSync(const rk_aiq_sys_ctx_t* ctx, capture_raw_t type,
+                                 int count, const char* capture_dir,
+                                 char* output_dir)
+{
+    ENTER_XCORE_FUNCTION();
+
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    ret = ctx->_camHw->capture_raw_ctl(type, count, capture_dir, output_dir);
     EXIT_XCORE_FUNCTION();
 
     return ret;

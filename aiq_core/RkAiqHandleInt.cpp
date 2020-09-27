@@ -3287,6 +3287,8 @@ RkAiqAccmHandleInt::processing()
             accm_proc_int->accm_sw_info.awbGain[1] = awb_res->awb_gain_algo.bgain / awb_res->awb_gain_algo.gbgain;
         }
         accm_proc_int->accm_sw_info.awbIIRDampCoef =  awb_res_int->awb_smooth_factor;
+        accm_proc_int->accm_sw_info.varianceLuma = awb_res_int->varianceLuma;
+        accm_proc_int->accm_sw_info.awbConverged = awb_res_int->awbConverged;
     } else {
         LOGE("fail to get awb gain form AWB module,use default value ");
     }
@@ -4990,6 +4992,8 @@ RkAiqAlscHandleInt::processing()
                 awb_res->awb_gain_algo.bgain / awb_res->awb_gain_algo.gbgain;
         }
         alsc_proc_int->alsc_sw_info.awbIIRDampCoef = awb_res_int->awb_smooth_factor;
+        alsc_proc_int->alsc_sw_info.varianceLuma = awb_res_int->varianceLuma;
+        alsc_proc_int->alsc_sw_info.awbConverged = awb_res_int->awbConverged;
     } else {
         LOGE("fail to get awb gain form AWB module,use default value ");
     }

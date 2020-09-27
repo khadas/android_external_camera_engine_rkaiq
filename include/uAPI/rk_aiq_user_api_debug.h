@@ -26,7 +26,21 @@ typedef struct rk_aiq_sys_ctx_s rk_aiq_sys_ctx_t;
 RKAIQ_BEGIN_DECLARE
 
 XCamReturn
-rk_aiq_uapi_debug_captureRawCtl(const rk_aiq_sys_ctx_t* ctx, bool sync);
+rk_aiq_uapi_debug_captureRawYuvSync(const rk_aiq_sys_ctx_t* ctx, capture_raw_t type);
+
+/*!
+ * \brief capture raw Image synchronously
+ *
+ * \param[in] ctx             the context returned by \ref rk_aiq_uapi_sysctl_init
+ * \param[in] type            the type of capturing raw images
+ * \param[in] count           the count of capturing raw images
+ * \param[in] capture_dir     Raw's top-level storage directory
+ * \param[out] output_dir     Raw's storage directory
+ * \return return 0 if success
+ */
+XCamReturn
+rk_aiq_uapi_debug_captureRawSync(const rk_aiq_sys_ctx_t* ctx, capture_raw_t type,
+                                 int count, const char* capture_dir, char* output_dir);
 
 XCamReturn
 rk_aiq_uapi_debug_captureRawNotify(const rk_aiq_sys_ctx_t* ctx);

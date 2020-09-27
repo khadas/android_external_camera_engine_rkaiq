@@ -31,6 +31,20 @@ struct CameraCoeff
 	/* level = 255时的rho-theta多项式拟合 */
 	int invPolyNum255;						// 系数个数
 	double invPolyCoeff255[21];				// 多项式系数，最高次数20次
+
+	/* level = 0时的rho-tanTheta多项式拟合 */
+	int invPolyTanNum0;						// 系数个数
+	double invPolyTanCoeff0[21];			// 多项式系数，最高次数20次
+	/* level = 0时的rho-cotTheta多项式拟合 */
+	int invPolyCotNum0;						// 系数个数
+	double invPolyCotCoeff0[21];			// 多项式系数，最高次数20次
+
+	/* level = 255时的rho-tanTheta多项式拟合 */
+	int invPolyTanNum255;					// 系数个数
+	double invPolyTanCoeff255[21];			// 多项式系数，最高次数20次
+	/* level = 255时的rho-cotTheta多项式拟合 */
+	int invPolyCotNum255;					// 系数个数
+	double invPolyCotCoeff255[21];			// 多项式系数，最高次数20次
 };
 
 /* 生成FEC映射表相关的参数 */
@@ -71,7 +85,6 @@ struct LdchParams
 	double *mapx;
 	double *mapy;
 };
-
 
 /* FEC: 初始化，根据图像输出分辨率，计算FEC映射表的相关参数，申请需要的buffer */
 void genFecMeshInit(int srcW, int srcH, int dstW, int dstH, FecParams &fecParams, CameraCoeff &camCoeff);

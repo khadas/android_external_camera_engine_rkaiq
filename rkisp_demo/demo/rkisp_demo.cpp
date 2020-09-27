@@ -609,6 +609,14 @@ void test_imgproc(const demo_context_t* demo_ctx) {
        printf("test fec correct level255\n");
        rk_aiq_uapi_setLdchCorrectLevel(ctx, 255);
        break;
+    case 'U':
+       {
+           char output_dir[64] = {0};
+           printf("test to capture raw sync\n");
+           rk_aiq_uapi_debug_captureRawSync(ctx, CAPTURE_RAW_SYNC, 5, "/tmp", output_dir);
+           printf("Raw's storage directory is (%s)\n", output_dir);
+       }
+       break;
     default:
         break;
     }
@@ -1515,7 +1523,7 @@ static void rkisp_routine(demo_context_t *ctx)
     	if (ctx->aiq_ctx) {
     	    printf("%s:-------- init mipi tx/rx -------------\n",get_sensor_name(ctx));
     	    if (ctx->writeFileSync)
-        		rk_aiq_uapi_debug_captureRawCtl(ctx->aiq_ctx, true);
+                rk_aiq_uapi_debug_captureRawYuvSync(ctx->aiq_ctx, CAPTURE_RAW_AND_YUV_SYNC);
 
             // rk_aiq_uapi_setFecEn(ctx->aiq_ctx, true);
     	    XCamReturn ret = rk_aiq_uapi_sysctl_prepare(ctx->aiq_ctx, ctx->width, ctx->height, work_mode);

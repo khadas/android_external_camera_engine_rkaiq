@@ -98,7 +98,9 @@ public:
     virtual XCamReturn setModuleCtl(rk_aiq_module_id_t mId, bool mod_en) = 0;
     virtual XCamReturn getModuleCtl(rk_aiq_module_id_t mId, bool& mod_en) = 0;
     virtual XCamReturn notify_capture_raw() = 0;
-    virtual XCamReturn capture_raw_ctl(bool sync) = 0;
+    virtual XCamReturn capture_raw_ctl(capture_raw_t type, int count = 0,
+                                       const char* capture_dir = nullptr,
+                                       char* output_dir = nullptr) = 0;
     virtual XCamReturn enqueueBuffer(struct rk_aiq_vbuf *vbuf) = 0;
     virtual XCamReturn offlineRdJobPrepare() = 0;
     virtual XCamReturn offlineRdJobDone() = 0;
