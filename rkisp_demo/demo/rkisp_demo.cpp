@@ -560,7 +560,7 @@ void test_imgproc(const demo_context_t* demo_ctx) {
         mirror = true;
         flip = true;
         printf("set mir %d, flip %d \n", mirror, flip);
-        rk_aiq_uapi_setMirroFlip(ctx, true,true);
+        rk_aiq_uapi_setMirroFlip(ctx, true,true, 3);
         rk_aiq_uapi_getMirrorFlip(ctx, &mirror, &flip);
         printf("after set mir %d, flip %d \n", mirror, flip);
        break;
@@ -1415,7 +1415,7 @@ static void deinit(demo_context_t *ctx)
         stop_capturing_pp_oneframe(ctx);
 	if (ctx->aiq_ctx) {
         printf("%s:-------- stop aiq -------------\n",get_sensor_name(ctx));
-		rk_aiq_uapi_sysctl_stop(ctx->aiq_ctx);
+		rk_aiq_uapi_sysctl_stop(ctx->aiq_ctx, false);
 	}
 
     stop_capturing(ctx);
