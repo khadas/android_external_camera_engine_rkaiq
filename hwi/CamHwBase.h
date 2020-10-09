@@ -52,6 +52,9 @@ public:
     virtual XCamReturn swWorkingModeDyn(int mode) {
         return XCAM_RETURN_NO_ERROR;
     };
+    virtual void keepHwStAtStop(bool ks) {
+        mKpHwSt = ks;
+    };
     virtual XCamReturn getSensorModeData(const char* sns_ent_name,
                                          rk_aiq_exposure_sensor_descriptor& sns_des);
     virtual XCamReturn setIspParams(SmartPtr<RkAiqIspParamsProxy>& ispParams);
@@ -86,10 +89,19 @@ public:
     virtual XCamReturn offlineRdJobDone() {
         return  XCAM_RETURN_ERROR_FAILED;
     }
-    virtual XCamReturn setSensorFlip(bool mirror, bool flip) {
+    virtual XCamReturn setSensorFlip(bool mirror, bool flip, int skip_frm_cnt) {
         return  XCAM_RETURN_ERROR_FAILED;
     }
     virtual XCamReturn getSensorFlip(bool& mirror, bool& flip) {
+        return  XCAM_RETURN_ERROR_FAILED;
+    }
+    virtual XCamReturn getZoomPosition(int& position) {
+        return  XCAM_RETURN_ERROR_FAILED;
+    }
+    virtual XCamReturn setLensVcmCfg(rk_aiq_lens_vcmcfg& lens_cfg) {
+        return  XCAM_RETURN_ERROR_FAILED;
+    }
+    virtual XCamReturn getLensVcmCfg(rk_aiq_lens_vcmcfg& lens_cfg) {
         return  XCAM_RETURN_ERROR_FAILED;
     }
 protected:
@@ -116,7 +128,7 @@ protected:
     IspEvtsListener* mIspEvtsListener;
     int mWorkingMode;
     const CamCalibDbContext_t* mCalibDb;
-
+    bool mKpHwSt;
 private:
     XCAM_DEAD_COPY (CamHwBase);
 };

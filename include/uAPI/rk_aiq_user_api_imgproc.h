@@ -50,6 +50,7 @@ typedef enum dayNightScene_e {
 typedef enum opMode_e {
     OP_AUTO   = 0,
     OP_MANUAL = 1,
+    OP_SEMI_AUTO = 2,
     OP_INVAL
 } opMode_t;
 
@@ -389,6 +390,17 @@ XCamReturn rk_aiq_uapi_getFocusWin(const rk_aiq_sys_ctx_t* ctx, paRect_t *rect);
 /*
 *****************************
 *
+* Desc: set focus meas config
+* Argument:
+*
+*****************************
+*/
+XCamReturn rk_aiq_uapi_setFocusMeasCfg(const rk_aiq_sys_ctx_t* ctx, rk_aiq_af_algo_meas_t* meascfg);
+XCamReturn rk_aiq_uapi_getFocusMeasCfg(const rk_aiq_sys_ctx_t* ctx, rk_aiq_af_algo_meas_t* meascfg);
+
+/*
+*****************************
+*
 * Desc: set fix mode code
 * Argument:
 *
@@ -396,6 +408,76 @@ XCamReturn rk_aiq_uapi_getFocusWin(const rk_aiq_sys_ctx_t* ctx, paRect_t *rect);
 */
 XCamReturn rk_aiq_uapi_setFixedModeCode(const rk_aiq_sys_ctx_t* ctx, unsigned short code);
 XCamReturn rk_aiq_uapi_getFixedModeCode(const rk_aiq_sys_ctx_t* ctx, unsigned short *code);
+
+/*
+*****************************
+*
+* Desc: lock/unlock auto focus
+* Argument:
+*
+*
+*****************************
+*/
+XCamReturn rk_aiq_uapi_lockFocus(const rk_aiq_sys_ctx_t* ctx);
+XCamReturn rk_aiq_uapi_unlockFocus(const rk_aiq_sys_ctx_t* ctx);
+
+/*
+*****************************
+*
+* Desc: oneshot focus
+* Argument:
+*
+*
+*****************************
+*/
+XCamReturn rk_aiq_uapi_oneshotFocus(const rk_aiq_sys_ctx_t* ctx);
+XCamReturn rk_aiq_uapi_trackingFocus(const rk_aiq_sys_ctx_t* ctx);
+
+/*
+*****************************
+*
+* Desc: ManualTriger focus
+* Argument:
+*
+*
+*****************************
+*/
+XCamReturn rk_aiq_uapi_manualTrigerFocus(const rk_aiq_sys_ctx_t* ctx);
+
+/*
+*****************************
+*
+* Desc: vcm config
+* Argument:
+*
+*
+*****************************
+*/
+XCamReturn rk_aiq_uapi_setVcmCfg(const rk_aiq_sys_ctx_t* ctx, rk_aiq_lens_vcmcfg* cfg);
+XCamReturn rk_aiq_uapi_getVcmCfg(const rk_aiq_sys_ctx_t* ctx, rk_aiq_lens_vcmcfg* cfg);
+
+/*
+*****************************
+*
+* Desc: af serach path record
+* Argument:
+*
+*
+*****************************
+*/
+XCamReturn rk_aiq_uapi_getSearchPath(const rk_aiq_sys_ctx_t* ctx, rk_aiq_af_sec_path_t* path);
+
+/*
+*****************************
+*
+* Desc: set optical zoom position
+* Argument:
+*   pos:  [1, 2000]
+*
+*****************************
+*/
+XCamReturn rk_aiq_uapi_setOpZoomPosition(const rk_aiq_sys_ctx_t* ctx, int pos);
+XCamReturn rk_aiq_uapi_getOpZoomPosition(const rk_aiq_sys_ctx_t* ctx, int *pos);
 
 /*
 **********************************************************
@@ -642,7 +724,10 @@ XCamReturn rk_aiq_uapi_getFrameRate(const rk_aiq_sys_ctx_t* ctx, frameRateInfo_t
 * Argument:
 *****************************
 */
-XCamReturn rk_aiq_uapi_setMirroFlip(const rk_aiq_sys_ctx_t* ctx, bool mirror, bool flip);
+XCamReturn rk_aiq_uapi_setMirroFlip(const rk_aiq_sys_ctx_t* ctx,
+                                    bool mirror,
+                                    bool flip,
+                                    int skip_frm_cnt);
 
 /*
 *****************************

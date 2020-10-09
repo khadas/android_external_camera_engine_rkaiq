@@ -22,6 +22,7 @@
 namespace RkCam {
 
 CamHwBase::CamHwBase()
+    : mKpHwSt (false)
 {}
 
 CamHwBase::~CamHwBase()

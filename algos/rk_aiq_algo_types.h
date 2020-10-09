@@ -111,6 +111,7 @@ typedef struct _RkAiqAlgoConfigAf {
     unsigned short win_v_offs;
     unsigned short win_h_size;
     unsigned short win_v_size;
+    rk_aiq_lens_descriptor lens_des;
 } RkAiqAlgoConfigAf;
 
 typedef struct _RkAiqAlgoPreAf {

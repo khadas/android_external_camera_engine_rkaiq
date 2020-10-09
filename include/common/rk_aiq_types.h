@@ -73,6 +73,13 @@ typedef enum rk_aiq_rotation_e {
     RK_AIQ_ROTATION_270
 } rk_aiq_rotation_t;
 
+typedef enum rk_aiq_af_sec_stat_e
+{
+    RK_AIQ_AF_SEARCH_INVAL   = 0,
+    RK_AIQ_AF_SEARCH_RUNNING = 1,
+    RK_AIQ_AF_SEARCH_END     = 2
+} rk_aiq_af_sec_stat_t;
+
 typedef enum {
     /*      Pixel format         FOURCC                          depth  Description  */
 
@@ -288,6 +295,25 @@ typedef struct rk_aiq_sensor_nr_switch_s {
     uint32_t div_coeff;
 } rk_aiq_sensor_nr_switch_t;
 
+typedef struct {
+    bool focus_support;
+    bool iris_support;
+    bool zoom_support;
+} rk_aiq_lens_descriptor;
+
+typedef struct {
+    int start_ma;
+    int rated_ma;
+    int step_mode;
+} rk_aiq_lens_vcmcfg;
+
+typedef struct {
+    rk_aiq_af_sec_stat_t stat;
+    int32_t search_num;
+    int32_t pos[64];
+    float sharpness[64];
+} rk_aiq_af_sec_path_t;
+
 // sensor
 typedef struct {
     unsigned short line_periods_vertical_blanking;
@@ -307,6 +333,7 @@ typedef struct {
     uint32_t isp_acq_width;
     uint32_t isp_acq_height;
     rk_aiq_sensor_nr_switch_t nr_switch;
+    rk_aiq_lens_descriptor lens_des;
 } rk_aiq_exposure_sensor_descriptor;
 
 // exposure
@@ -319,7 +346,9 @@ typedef RKAiqAecExpInfo_t rk_aiq_exposure_params_t;
 typedef struct
 {
     bool lens_pos_valid;
+    bool zoom_pos_valid;
     unsigned int next_lens_pos;
+    unsigned int next_zoom_pos;
 } rk_aiq_focus_params_t;
 
 // isp

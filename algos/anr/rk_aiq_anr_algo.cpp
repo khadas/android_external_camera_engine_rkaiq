@@ -239,7 +239,7 @@ ANRresult_t ANRProcess(ANRContext_t *pANRCtx, ANRExpInfo_t *pExpInfo)
 	
     ANRGainRatioProcess(&pANRCtx->stGainState, pExpInfo);
 
-	ANRParamModeProcess(pANRCtx, pExpInfo, &mode);
+    ANRParamModeProcess(pANRCtx, pExpInfo, &mode);   
 	
     if(pANRCtx->eMode == ANR_OP_MODE_AUTO) {
 
@@ -258,6 +258,7 @@ ANRresult_t ANRProcess(ANRContext_t *pANRCtx, ANRExpInfo_t *pExpInfo)
         select_mfnr_params_by_ISO(&pANRCtx->stAuto.stMfnrParams, &pANRCtx->stAuto.stMfnrParamSelect, pExpInfo, pANRCtx->refYuvBit);
         select_ynr_params_by_ISO(&pANRCtx->stAuto.stYnrParams, &pANRCtx->stAuto.stYnrParamSelect, pExpInfo, pANRCtx->refYuvBit);
         select_uvnr_params_by_ISO(&pANRCtx->stAuto.stUvnrParams, &pANRCtx->stAuto.stUvnrParamSelect, pExpInfo);
+	 mfnr_dynamic_calc(&pANRCtx->stAuto.stMfnr_dynamic, pExpInfo);
 
     } else if(pANRCtx->eMode == ANR_OP_MODE_MANUAL) {
         //TODO
@@ -319,6 +320,9 @@ ANRresult_t ANRGetProcResult(ANRContext_t *pANRCtx, ANRProcResult_t* pANRResult)
         pANRResult->ynrEN = pANRCtx->stAuto.ynrEn;
         pANRResult->uvnrEn = pANRCtx->stAuto.uvnrEn;
 
+	 if(pANRCtx->stAuto.bayernrEn && pANRCtx->stAuto.stMfnr_dynamic.enable){
+		pANRResult->mfnrEn = pANRCtx->stAuto.stMfnr_dynamic.mfnr_enable_state;
+	 }
 
     } else if(pANRCtx->eMode == ANR_OP_MODE_MANUAL) {
         //TODO
@@ -488,7 +492,7 @@ ANRresult_t ANRConfigSettingParam(ANRContext_t *pANRCtx, ANRParamMode_t eParamMo
 	
 	pANRCtx->stAuto.mfnrEn = pANRCtx->stMfnrCalib.enable;
 	mfnr_config_setting_param(&pANRCtx->stAuto.stMfnrParams, &pANRCtx->stMfnrCalib, param_mode_name, snr_name);
-
+	mfnr_config_dynamic_param(&pANRCtx->stAuto.stMfnr_dynamic, &pANRCtx->stMfnrCalib, param_mode_name);
 	return ANR_RET_SUCCESS; 
 }
 

@@ -1357,8 +1357,11 @@ Isp20Params::convertAiqTnrToIsp20Params(struct rkispp_params_cfg& pp_cfg,
         pp_cfg.module_en_update |= ISPP_MODULE_TNR;
         pp_cfg.module_cfg_update |= ISPP_MODULE_TNR;
     } else {
-        pp_cfg.module_init_ens &= ~ISPP_MODULE_TNR_3TO1;
-        return ;
+        //pp_cfg.module_init_ens &= ~ISPP_MODULE_TNR_3TO1;
+		pp_cfg.module_ens &= ~ISPP_MODULE_TNR;
+        pp_cfg.module_en_update |= ISPP_MODULE_TNR;
+		//pp_cfg.module_cfg_update &= ~ISPP_MODULE_TNR;
+        //return ;
     }
 
     struct rkispp_tnr_config  * pTnrCfg = &pp_cfg.tnr_cfg;

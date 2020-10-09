@@ -37,6 +37,9 @@ SensorHw::SensorHw(const char* name)
     _dcg_gain_mode_delay = 0;
     _dcg_gain_mode_delayed = false;
     _expParamsPool = new RkAiqExpParamsPool("SensorLocalExpParams", SensorHw::DEFAULT_POOL_SIZE);
+    _flip = false;
+    _mirror = false;
+    _update_mirror_flip = false;
     EXIT_CAMHW_FUNCTION();
 }
 
@@ -654,6 +657,11 @@ SensorHw::handle_sof(int64_t time, int frameid)
     } else {
         dcg_gain_mode = _last_dcg_gain_mode;
     }
+    // update flip, skip _frame_sequence
+    if (_update_mirror_flip) {
+        _set_mirror_flip();
+        _update_mirror_flip = false;
+    }
 
     _mutex.unlock();
     LOGD_CAMHW_SUBM(SENSOR_SUBM, "%s: working_mode=%d,frameid=%d, status: set_time=%d,set_gain=%d\n",
@@ -828,26 +836,55 @@ SensorHw::set_working_mode(int mode)
 }
 
 XCamReturn
-SensorHw::set_mirror_flip(bool mirror, bool flip)
-{
+SensorHw::_set_mirror_flip() {
     struct v4l2_control ctrl;
 
     memset(&ctrl, 0, sizeof(ctrl));
     ctrl.id = V4L2_CID_HFLIP;
-    ctrl.value = mirror ? 1 : 0;
+    ctrl.value = _mirror ? 1 : 0;
     if (io_control(VIDIOC_S_CTRL, &ctrl) < 0) {
-        LOGW_CAMHW_SUBM(SENSOR_SUBM, "failed to set hflip (val: %d)", ctrl.value);
+        LOGE_CAMHW_SUBM(SENSOR_SUBM, "failed to set hflip (val: %d)", ctrl.value);
         return XCAM_RETURN_ERROR_IOCTL;
     }
 
     ctrl.id = V4L2_CID_VFLIP;
-    ctrl.value = flip ? 1 : 0;
+    ctrl.value = _flip ? 1 : 0;
     if (io_control(VIDIOC_S_CTRL, &ctrl) < 0) {
-        LOGW_CAMHW_SUBM(SENSOR_SUBM, "failed to set vflip (val: %d)", ctrl.value);
-        return XCAM_RETURN_ERROR_IOCTL;
+        LOGE_CAMHW_SUBM(SENSOR_SUBM, "failed to set vflip (val: %d)", ctrl.value);
     }
 
-    LOGD_CAMHW_SUBM(SENSOR_SUBM, "set mirror %d, flip %d", mirror, flip);
+    LOGD_CAMHW_SUBM(SENSOR_SUBM, "set mirror %d, flip %d", _mirror, _flip);
+
+    return XCAM_RETURN_NO_ERROR;
+
+}
+
+XCamReturn
+SensorHw::set_mirror_flip(bool mirror, bool flip, int32_t& skip_frame_sequence)
+{
+    _mutex.lock();
+
+    if (!is_activated()) {
+        _flip = flip;
+        _mirror = mirror;
+        _set_mirror_flip();
+        goto end;
+    }
+
+    if (_mirror != mirror || _flip != flip) {
+        _flip = flip;
+        _mirror = mirror;
+        // will be set at _frame_sequence + 1
+        _update_mirror_flip = true;
+        // skip pre and current frame
+        skip_frame_sequence = _frame_sequence;
+        if (skip_frame_sequence < 0)
+            skip_frame_sequence = 0;
+    } else
+        skip_frame_sequence = -1;
+
+end:
+    _mutex.unlock();
 
     return XCAM_RETURN_NO_ERROR;
 }
@@ -919,6 +956,7 @@ XCamReturn
 SensorHw::start()
 {
     ENTER_CAMHW_FUNCTION();
+    V4l2SubDevice::start();
     EXIT_CAMHW_FUNCTION();
     return XCAM_RETURN_NO_ERROR;
 }
@@ -933,6 +971,7 @@ SensorHw::stop()
     _delayed_dcg_gain_mode_list.clear();
     _frame_sequence = 0;
     _first = true;
+    V4l2SubDevice::stop();
     EXIT_CAMHW_FUNCTION();
     return XCAM_RETURN_NO_ERROR;
 }

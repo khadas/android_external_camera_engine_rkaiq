@@ -68,6 +68,7 @@ public:
     virtual XCamReturn start();
     virtual XCamReturn stop ();
     void setMulCamConc(bool cc) { _is_multi_cam_conc = cc; }
+    void skip_frames(int skip_num, int32_t skip_seq);
     enum {
         ISP_POLL_MIPI_TX,
         ISP_POLL_MIPI_RX,
@@ -132,7 +133,8 @@ private:
     capture_raw_t _capture_raw_type;
     std::map<uint32_t, bool> _hdr_global_tmo_state_map;
     bool _is_multi_cam_conc;
-
+    int _skip_num;
+    int64_t _skip_to_seq;
     int calculate_stride_per_line(const struct capture_fmt& fmt,
                                   uint32_t& bytesPerLine);
     const struct capture_fmt* find_fmt(const uint32_t pixelformat);
@@ -155,6 +157,7 @@ private:
                             SmartPtr<V4l2Buffer> &v4l2buf);
     void match_lumadetect_map(uint32_t sequence, sint32_t &additional_times);
     void match_globaltmostate_map(uint32_t sequence, bool &isHdrGlobalTmo);
+    bool check_skip_frame(int32_t skip_seq);
 };
 
 }

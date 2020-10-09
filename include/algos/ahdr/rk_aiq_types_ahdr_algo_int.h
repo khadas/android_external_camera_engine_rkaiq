@@ -13,6 +13,12 @@
 
 //#include "rk_aiq_types.h"
 
+enum {
+    AHDR_NORMAL = 0,
+    AHDR_HDR = 1,
+    AHDR_NIGHT = 2
+};
+
 typedef struct globalLuma_s
 {
     float globalLumaMode;

@@ -1189,6 +1189,8 @@ XCamReturn rk_aiq_uapi_setFocusMode(const rk_aiq_sys_ctx_t* ctx, opMode_t mode)
         attr.AfMode = RKAIQ_AF_MODE_CONTINUOUS_PICTURE;
     } else if (mode == OP_MANUAL) {
         attr.AfMode = RKAIQ_AF_MODE_FIXED;
+    } else if (mode == OP_SEMI_AUTO) {
+        attr.AfMode = RKAIQ_AF_MODE_ONESHOT_AFTER_ZOOM;
     } else {
         ret = XCAM_RETURN_ERROR_PARAM;
         RKAIQ_IMGPROC_CHECK_RET(ret, "Not supported mode!");
@@ -1298,6 +1300,115 @@ XCamReturn rk_aiq_uapi_getFocusWin(const rk_aiq_sys_ctx_t* ctx, paRect_t *rect)
 /*
 *****************************
 *
+* Desc: set focus meas config
+* Argument:
+*
+*****************************
+*/
+XCamReturn rk_aiq_uapi_setFocusMeasCfg(const rk_aiq_sys_ctx_t* ctx, rk_aiq_af_algo_meas_t* meascfg)
+{
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+
+    rk_aiq_af_attrib_t attr;
+    ret = rk_aiq_user_api_af_GetAttrib(ctx, &attr);
+    RKAIQ_IMGPROC_CHECK_RET(ret, "setFocusMeasCfg failed!");
+    attr.manual_meascfg = *meascfg;
+
+    ret = rk_aiq_user_api_af_SetAttrib(ctx, attr);
+    RKAIQ_IMGPROC_CHECK_RET(ret, "setFocusMeasCfg failed!");
+    return ret;
+}
+
+XCamReturn rk_aiq_uapi_getFocusMeasCfg(const rk_aiq_sys_ctx_t* ctx, rk_aiq_af_algo_meas_t* meascfg)
+{
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+
+    rk_aiq_af_attrib_t attr;
+    ret = rk_aiq_user_api_af_GetAttrib(ctx, &attr);
+    RKAIQ_IMGPROC_CHECK_RET(ret, "getFocusMeasCfg failed!");
+    *meascfg = attr.manual_meascfg;
+
+    return ret;
+}
+
+XCamReturn rk_aiq_uapi_lockFocus(const rk_aiq_sys_ctx_t* ctx)
+{
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    IMGPROC_FUNC_ENTER
+    ret = rk_aiq_user_api_af_Lock(ctx);
+    IMGPROC_FUNC_EXIT
+    return ret;
+}
+
+XCamReturn rk_aiq_uapi_unlockFocus(const rk_aiq_sys_ctx_t* ctx)
+{
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    IMGPROC_FUNC_ENTER
+    ret = rk_aiq_user_api_af_Unlock(ctx);
+    IMGPROC_FUNC_EXIT
+    return ret;
+}
+
+XCamReturn rk_aiq_uapi_oneshotFocus(const rk_aiq_sys_ctx_t* ctx)
+{
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    IMGPROC_FUNC_ENTER
+    ret = rk_aiq_user_api_af_Oneshot(ctx);
+    IMGPROC_FUNC_EXIT
+    return ret;
+}
+
+XCamReturn rk_aiq_uapi_manualTrigerFocus(const rk_aiq_sys_ctx_t* ctx)
+{
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    IMGPROC_FUNC_ENTER
+    ret = rk_aiq_user_api_af_ManualTriger(ctx);
+    IMGPROC_FUNC_EXIT
+    return ret;
+}
+
+XCamReturn rk_aiq_uapi_trackingFocus(const rk_aiq_sys_ctx_t* ctx)
+{
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    IMGPROC_FUNC_ENTER
+    ret = rk_aiq_user_api_af_Tracking(ctx);
+    IMGPROC_FUNC_EXIT
+    return ret;
+}
+
+XCamReturn rk_aiq_uapi_setVcmCfg(const rk_aiq_sys_ctx_t* ctx, rk_aiq_lens_vcmcfg* cfg)
+{
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    IMGPROC_FUNC_ENTER
+    ret = rk_aiq_user_api_af_SetVcmCfg(ctx, cfg);
+    IMGPROC_FUNC_EXIT
+
+    return ret;
+}
+
+XCamReturn rk_aiq_uapi_getVcmCfg(const rk_aiq_sys_ctx_t* ctx, rk_aiq_lens_vcmcfg* cfg)
+{
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    IMGPROC_FUNC_ENTER
+    ret = rk_aiq_user_api_af_GetVcmCfg(ctx, cfg);
+    IMGPROC_FUNC_EXIT
+
+    return ret;
+}
+
+XCamReturn rk_aiq_uapi_getSearchPath(const rk_aiq_sys_ctx_t* ctx, rk_aiq_af_sec_path_t* path)
+{
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    IMGPROC_FUNC_ENTER
+    ret = rk_aiq_user_api_af_GetSearchPath(ctx, path);
+    IMGPROC_FUNC_EXIT
+
+    return ret;
+}
+
+/*
+*****************************
+*
 * Desc: set minimum focus distance
 * Argument:
 *   disrance:  unint is cm
@@ -1359,6 +1470,35 @@ XCamReturn rk_aiq_uapi_setOpZoomSpeed(const rk_aiq_sys_ctx_t* ctx, unsigned int 
 XCamReturn rk_aiq_uapi_getOpZoomSpeed(const rk_aiq_sys_ctx_t* ctx, unsigned int *level)
 {
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
+
+    return ret;
+}
+
+/*
+*****************************
+*
+* Desc: set optical zoom position
+* Argument:
+*   pos:  [1, 2000]
+*
+*****************************
+*/
+XCamReturn rk_aiq_uapi_setOpZoomPosition(const rk_aiq_sys_ctx_t* ctx, int pos)
+{
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    IMGPROC_FUNC_ENTER
+    ret = rk_aiq_user_api_af_SetZoomPos(ctx, pos);
+    IMGPROC_FUNC_EXIT
+
+    return ret;
+}
+
+XCamReturn rk_aiq_uapi_getOpZoomPosition(const rk_aiq_sys_ctx_t* ctx, int *pos)
+{
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    IMGPROC_FUNC_ENTER
+    ret = rk_aiq_user_api_af_GetZoomPos(ctx, pos);
+    IMGPROC_FUNC_EXIT
 
     return ret;
 }
@@ -2327,7 +2467,7 @@ XCamReturn rk_aiq_uapi_getFrameRate(const rk_aiq_sys_ctx_t* ctx, frameRateInfo_t
     return ret;
 }
 
-XCamReturn rk_aiq_uapi_setMirroFlip(const rk_aiq_sys_ctx_t* ctx, bool mirror, bool flip)
+XCamReturn rk_aiq_uapi_setMirroFlip(const rk_aiq_sys_ctx_t* ctx, bool mirror, bool flip, int skip_frm_cnt)
 {
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
     IMGPROC_FUNC_ENTER
@@ -2335,7 +2475,7 @@ XCamReturn rk_aiq_uapi_setMirroFlip(const rk_aiq_sys_ctx_t* ctx, bool mirror, bo
         ret = XCAM_RETURN_ERROR_PARAM;
         RKAIQ_IMGPROC_CHECK_RET(ret, "param error!");
     }
-    return ctx->_rkAiqManager->setMirrorFlip(mirror, flip);
+    return ctx->_rkAiqManager->setMirrorFlip(mirror, flip, skip_frm_cnt);
 }
 
 XCamReturn rk_aiq_uapi_getMirrorFlip(const rk_aiq_sys_ctx_t* ctx, bool* mirror, bool* flip)

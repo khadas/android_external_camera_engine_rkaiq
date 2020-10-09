@@ -489,6 +489,14 @@ typedef enum ANRParamMode_e {
     ANR_PARAM_MODE_MAX                                      /**< max */
 } ANRParamMode_t;
 
+typedef struct RKAnr_Mfnr_Dynamic_s {
+	int enable;
+	float lowth_iso;
+	float lowth_time;
+	float highth_iso;
+	float highth_time;
+	int mfnr_enable_state;
+}RKAnr_Mfnr_Dynamic_t;
 
 typedef struct ANR_Manual_Attr_s
 {
@@ -530,6 +538,7 @@ typedef struct ANR_Auto_Attr_s
     RKAnr_Uvnr_Params_t stUvnrParams;
     RKAnr_Uvnr_Params_Select_t stUvnrParamSelect;
 
+    RKAnr_Mfnr_Dynamic_t stMfnr_dynamic;
 
 } ANR_Auto_Attr_t;
 

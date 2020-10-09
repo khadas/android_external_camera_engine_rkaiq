@@ -29,8 +29,23 @@ struct rk_cam_vcm_tim {
     struct timeval vcm_end_t;
 };
 
+struct rk_cam_vcm_cfg {
+    int start_ma;
+    int rated_ma;
+    int step_mode;
+};
+
 #define RK_VIDIOC_VCM_TIMEINFO \
     _IOR('V', BASE_VIDIOC_PRIVATE + 0, struct rk_cam_vcm_tim)
+#define RK_VIDIOC_IRIS_TIMEINFO \
+    _IOR('V', BASE_VIDIOC_PRIVATE + 1, struct rk_cam_vcm_tim)
+#define RK_VIDIOC_ZOOM_TIMEINFO \
+    _IOR('V', BASE_VIDIOC_PRIVATE + 2, struct rk_cam_vcm_tim)
+
+#define RK_VIDIOC_GET_VCM_CFG \
+    _IOR('V', BASE_VIDIOC_PRIVATE + 3, struct rk_cam_vcm_cfg)
+#define RK_VIDIOC_SET_VCM_CFG \
+    _IOW('V', BASE_VIDIOC_PRIVATE + 4, struct rk_cam_vcm_cfg)
 
 #define LENSHW_RECORD_SOF_NUM   8
 
@@ -47,16 +62,37 @@ public:
 
     XCamReturn start();
     XCamReturn stop();
+    XCamReturn getLensModeData(rk_aiq_lens_descriptor& lens_des);
+    XCamReturn getLensVcmCfg(rk_aiq_lens_vcmcfg& lens_cfg);
+    XCamReturn setLensVcmCfg(rk_aiq_lens_vcmcfg& lens_cfg);
+    XCamReturn setIrisParams(int position);
     XCamReturn setFocusParams(int position);
+    XCamReturn setZoomParams(int position);
+    XCamReturn getIrisParams(int* position);
+    XCamReturn getFocusParams(int* position);
+    XCamReturn getZoomParams(int* position);
     XCamReturn handle_sof(int64_t time, int frameid);
     XCamReturn getAfInfoParams(SmartPtr<RkAiqAfInfoProxy>& afInfo, int frame_id);
 
 private:
+    XCamReturn queryLensSupport();
+
     XCAM_DEAD_COPY (LensHw);
     Mutex _mutex;
     SmartPtr<RkAiqAfInfoPool> _afInfoPool;
     static uint16_t DEFAULT_POOL_SIZE;
-    struct rk_cam_vcm_tim _vcm_tim;
+    struct v4l2_queryctrl _iris_query;
+    struct v4l2_queryctrl _focus_query;
+    struct v4l2_queryctrl _zoom_query;
+    struct rk_cam_vcm_tim _iris_tim;
+    struct rk_cam_vcm_tim _focus_tim;
+    struct rk_cam_vcm_tim _zoom_tim;
+    bool _iris_enable;
+    bool _focus_enable;
+    bool _zoom_enable;
+    int _iris_pos;
+    int _focus_pos;
+    int _zoom_pos;
     int64_t _frame_time[LENSHW_RECORD_SOF_NUM];
     int _frame_sequence[LENSHW_RECORD_SOF_NUM];
     int _rec_sof_idx;

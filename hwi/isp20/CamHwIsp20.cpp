@@ -1686,6 +1686,34 @@ CamHwIsp20::setExpDelayInfo(int mode)
     return XCAM_RETURN_NO_ERROR;
 }
 
+XCamReturn
+CamHwIsp20::setLensVcmCfg()
+{
+    ENTER_CAMHW_FUNCTION();
+    SmartPtr<LensHw> lensHw = mLensDev.dynamic_cast_ptr<LensHw>();
+    rk_aiq_lens_vcmcfg old_cfg, new_cfg;
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+
+    if (lensHw.ptr()) {
+        ret = lensHw->getLensVcmCfg(old_cfg);
+        if (ret != XCAM_RETURN_NO_ERROR)
+            return ret;
+
+        new_cfg = old_cfg;
+        if (mCalibDb->af.vcmcfg.start_current != -1)
+            new_cfg.start_ma = mCalibDb->af.vcmcfg.start_current;
+        if (mCalibDb->af.vcmcfg.rated_current != -1)
+            new_cfg.rated_ma = mCalibDb->af.vcmcfg.rated_current;
+        if (mCalibDb->af.vcmcfg.step_mode != -1)
+            new_cfg.step_mode = mCalibDb->af.vcmcfg.step_mode;
+
+        if (memcmp(&new_cfg, &old_cfg, sizeof(new_cfg)) != 0)
+            ret = lensHw->setLensVcmCfg(new_cfg);
+    }
+    EXIT_CAMHW_FUNCTION();
+    return ret;
+}
+
 void
 CamHwIsp20::prepare_cif_mipi()
 {
@@ -1781,6 +1809,7 @@ CamHwIsp20::prepare(uint32_t width, uint32_t height, int mode, int t_delay, int 
     }
 
     setExpDelayInfo(mode);
+    setLensVcmCfg();
 
     isp20Pollthread = mPollthread.dynamic_cast_ptr<Isp20PollThread>();
     isp20Pollthread->set_working_mode(mode, _linked_to_isp);
@@ -1823,13 +1852,9 @@ CamHwIsp20::start()
         return XCAM_RETURN_ERROR_FAILED;
     }
 
-    // move hdr_mipi_start of isp to set first isp params stage,
-    // and do hdr_mipi_start of cif at start stage
-    if (!_linked_to_isp) {
-        ret = hdr_mipi_start_mode(_hdr_mode);
-        if (ret < 0) {
-            LOGE_CAMHW_SUBM(ISP20HW_SUBM, "hdr mipi start err: %d\n", ret);
-        }
+    ret = hdr_mipi_start_mode(_hdr_mode);
+    if (ret < 0) {
+        LOGE_CAMHW_SUBM(ISP20HW_SUBM, "hdr mipi start err: %d\n", ret);
     }
 
     ret = mIspLumaDev->start();
@@ -1888,6 +1913,45 @@ CamHwIsp20::start()
 }
 
 XCamReturn
+CamHwIsp20::hdr_mipi_prepare(int idx)
+{
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    // mipi rx/tx format should match to sensor.
+    for (int i = 0; i < 3; i++) {
+        if (!(idx & (1 << i)))
+            continue;
+        ret = _mipi_tx_devs[i]->prepare();
+        if (ret < 0)
+            LOGE_CAMHW_SUBM(ISP20HW_SUBM,"mipi tx:%d prepare err: %d\n", ret);
+        ret = _mipi_rx_devs[i]->prepare();
+        if (ret < 0)
+            LOGE_CAMHW_SUBM(ISP20HW_SUBM,"mipi rx:%d prepare err: %d\n", ret);
+    }
+    return ret;
+}
+
+XCamReturn
+CamHwIsp20::hdr_mipi_prepare_mode(int mode)
+{
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    int new_mode = RK_AIQ_HDR_GET_WORKING_MODE(mode);
+
+    if (!mNormalNoReadBack) {
+        if (new_mode == RK_AIQ_WORKING_MODE_NORMAL)
+            ret = hdr_mipi_prepare(MIPI_STREAM_IDX_0);
+        else if (new_mode == RK_AIQ_WORKING_MODE_ISP_HDR2)
+            ret = hdr_mipi_prepare(MIPI_STREAM_IDX_0 | MIPI_STREAM_IDX_1);
+        else
+            ret = hdr_mipi_prepare(MIPI_STREAM_IDX_ALL);
+        if (ret < 0) {
+            LOGE_CAMHW_SUBM(ISP20HW_SUBM, "hdr mipi start err: %d\n", ret);
+        }
+    }
+
+    return ret;
+}
+
+XCamReturn
 CamHwIsp20::hdr_mipi_start(int idx)
 {
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
@@ -1896,10 +1960,21 @@ CamHwIsp20::hdr_mipi_start(int idx)
     for (int i = 0; i < 3; i++) {
         if (!(idx & (1 << i)))
             continue;
-        ret = _mipi_tx_devs[i]->start();
+        ret = _mipi_tx_devs[i]->start(true);
         if (ret < 0)
             LOGE_CAMHW_SUBM(ISP20HW_SUBM,"mipi tx:%d start err: %d\n", ret);
-        ret = _mipi_rx_devs[i]->start();
+        /* ret = _mipi_rx_devs[i]->start(true); */
+        /* if (ret < 0) */
+        /*     LOGE_CAMHW_SUBM(ISP20HW_SUBM,"mipi rx:%d start err: %d\n", ret); */
+    }
+
+    for (int i = 0; i < 3; i++) {
+        if (!(idx & (1 << i)))
+            continue;
+        /* ret = _mipi_tx_devs[i]->start(true); */
+        /* if (ret < 0) */
+        /*     LOGE_CAMHW_SUBM(ISP20HW_SUBM,"mipi tx:%d start err: %d\n", ret); */
+        ret = _mipi_rx_devs[i]->start(true);
         if (ret < 0)
             LOGE_CAMHW_SUBM(ISP20HW_SUBM,"mipi rx:%d start err: %d\n", ret);
     }
@@ -1955,6 +2030,7 @@ XCamReturn CamHwIsp20::stop()
     SmartPtr<LensHw> lensHw;
 
     ENTER_CAMHW_FUNCTION();
+    mOfflineRdThread->stop();
     isp20Pollthread = mPollthread.dynamic_cast_ptr<Isp20PollThread>();
     mPollthread->stop();
     mPollLumathread->stop();
@@ -2019,13 +2095,15 @@ XCamReturn CamHwIsp20::stop()
         }
     }
     if (mFlashLightIr.ptr()) {
+        mFlashLightIr->keep_status(mKpHwSt);
         ret = mFlashLightIr->stop();
         if (ret < 0) {
             LOGE_CAMHW_SUBM(ISP20HW_SUBM, "stop flashlight ir err: %d\n", ret);
         }
     }
 
-    setIrcutParams(false);
+    if (!mKpHwSt)
+        setIrcutParams(false);
     _pending_ispparams_queue.clear();
     _pending_isppParams_queue.clear();
     _effecting_ispparm_map.clear();
@@ -2170,11 +2248,9 @@ XCamReturn CamHwIsp20::resume()
 
     isp20Pollthread = mPollthread.dynamic_cast_ptr<Isp20PollThread>();
 
-    if (!_linked_to_isp) {
-        ret = hdr_mipi_start_mode(_hdr_mode);
-        if (ret < 0) {
-            LOGE_CAMHW_SUBM(ISP20HW_SUBM, "hdr mipi start err: %d\n", ret);
-        }
+    ret = hdr_mipi_start_mode(_hdr_mode);
+    if (ret < 0) {
+        LOGE_CAMHW_SUBM(ISP20HW_SUBM, "hdr mipi start err: %d\n", ret);
     }
 
     sensorHw->start();
@@ -2805,11 +2881,9 @@ CamHwIsp20::setIspParams(SmartPtr<RkAiqIspParamsProxy>& ispParams)
 
         SmartPtr<Isp20PollThread> isp20Pollthread = mPollthread.dynamic_cast_ptr<Isp20PollThread>();
         SmartPtr<SensorHw> sensorHw = mSensorDev.dynamic_cast_ptr<SensorHw>();
-        if (_linked_to_isp) {
-            ret = hdr_mipi_start_mode(_hdr_mode);
-            if (ret < 0) {
-                LOGE_CAMHW_SUBM(ISP20HW_SUBM, "hdr mipi start err: %d\n", ret);
-            }
+        ret = hdr_mipi_prepare_mode(_hdr_mode);
+        if (ret < 0) {
+            LOGE_CAMHW_SUBM(ISP20HW_SUBM, "hdr mipi start err: %d\n", ret);
         }
     }
 
@@ -3028,6 +3102,7 @@ CamHwIsp20::getSensorModeData(const char* sns_ent_name,
 {
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
     const SmartPtr<SensorHw> mSensorSubdev = mSensorDev.dynamic_cast_ptr<SensorHw>();
+    const SmartPtr<LensHw> mLensSubdev = mLensDev.dynamic_cast_ptr<LensHw>();
     struct v4l2_subdev_selection select;
 
     ret = mSensorSubdev->getSensorModeData(sns_ent_name, sns_des);
@@ -3050,6 +3125,10 @@ CamHwIsp20::getSensorModeData(const char* sns_ent_name,
         sns_des.isp_acq_height = sns_des.sensor_output_height;
         ret = XCAM_RETURN_NO_ERROR;
     }
+
+    xcam_mem_clear (sns_des.lens_des);
+    if (mLensSubdev.ptr())
+        mLensSubdev->getLensModeData(sns_des.lens_des);
 
     return ret;
 }
@@ -3079,6 +3158,71 @@ CamHwIsp20::setFocusParams(SmartPtr<RkAiqFocusParamsProxy>& focus_params)
         LOGD_CAMHW_SUBM(ISP20HW_SUBM, "|||set focus result: %d", position);
         if (mLensSubdev->setFocusParams(position) < 0) {
             LOGE_CAMHW_SUBM(ISP20HW_SUBM, "set focus result failed to device");
+            return XCAM_RETURN_ERROR_IOCTL;
+        }
+    }
+
+    position = focus_params->data()->next_zoom_pos;
+    valid = focus_params->data()->zoom_pos_valid;
+    if (mLensSubdev.ptr() && valid) {
+        LOGD_CAMHW_SUBM(ISP20HW_SUBM, "|||set zoom result: %d", position);
+        if (mLensSubdev->setZoomParams(position) < 0) {
+            LOGE_CAMHW_SUBM(ISP20HW_SUBM, "set zoom result failed to device");
+            return XCAM_RETURN_ERROR_IOCTL;
+        }
+    }
+
+    EXIT_CAMHW_FUNCTION();
+    return ret;
+}
+
+XCamReturn
+CamHwIsp20::getZoomPosition(int& position)
+{
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    ENTER_CAMHW_FUNCTION();
+    SmartPtr<LensHw> mLensSubdev = mLensDev.dynamic_cast_ptr<LensHw>();
+
+    if (mLensSubdev.ptr()) {
+        LOGD_CAMHW_SUBM(ISP20HW_SUBM, "|||get zoom result: %d", position);
+        if (mLensSubdev->getZoomParams(&position) < 0) {
+            LOGE_CAMHW_SUBM(ISP20HW_SUBM, "get zoom result failed to device");
+            return XCAM_RETURN_ERROR_IOCTL;
+        }
+    }
+
+    EXIT_CAMHW_FUNCTION();
+    return ret;
+}
+
+XCamReturn
+CamHwIsp20::setLensVcmCfg(rk_aiq_lens_vcmcfg& lens_cfg)
+{
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    ENTER_CAMHW_FUNCTION();
+    SmartPtr<LensHw> mLensSubdev = mLensDev.dynamic_cast_ptr<LensHw>();
+
+    if (mLensSubdev.ptr()) {
+        if (mLensSubdev->setLensVcmCfg(lens_cfg) < 0) {
+            LOGE_CAMHW_SUBM(ISP20HW_SUBM, "set vcm config failed");
+            return XCAM_RETURN_ERROR_IOCTL;
+        }
+    }
+
+    EXIT_CAMHW_FUNCTION();
+    return ret;
+}
+
+XCamReturn
+CamHwIsp20::getLensVcmCfg(rk_aiq_lens_vcmcfg& lens_cfg)
+{
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    ENTER_CAMHW_FUNCTION();
+    SmartPtr<LensHw> mLensSubdev = mLensDev.dynamic_cast_ptr<LensHw>();
+
+    if (mLensSubdev.ptr()) {
+        if (mLensSubdev->getLensVcmCfg(lens_cfg) < 0) {
+            LOGE_CAMHW_SUBM(ISP20HW_SUBM, "get vcm config failed");
             return XCAM_RETURN_ERROR_IOCTL;
         }
     }
@@ -3969,11 +4113,23 @@ bool CamHwIsp20::getDhazState()
     return mIsDhazOn;
 }
 
-XCamReturn CamHwIsp20::setSensorFlip(bool mirror, bool flip)
+XCamReturn CamHwIsp20::setSensorFlip(bool mirror, bool flip, int skip_frm_cnt)
 {
     SmartPtr<SensorHw> mSensorSubdev = mSensorDev.dynamic_cast_ptr<SensorHw>();
+    SmartPtr<Isp20PollThread> isp20Pollthread = mPollthread.dynamic_cast_ptr<Isp20PollThread>();
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
 
-    return mSensorSubdev->set_mirror_flip(mirror, flip);
+    int32_t skip_frame_sequence = 0;
+    ret = mSensorSubdev->set_mirror_flip(mirror, flip, skip_frame_sequence);
+
+    /* struct timespec tp; */
+    /* clock_gettime(CLOCK_MONOTONIC, &tp); */
+    /* int64_t skip_ts = (int64_t)(tp.tv_sec) * 1000 * 1000 * 1000 + (int64_t)(tp.tv_nsec); */
+
+    if (_state == CAM_HW_STATE_STARTED && skip_frame_sequence != -1)
+        isp20Pollthread->skip_frames(skip_frm_cnt, skip_frame_sequence);
+
+    return ret;
 }
 
 XCamReturn CamHwIsp20::getSensorFlip(bool& mirror, bool& flip)

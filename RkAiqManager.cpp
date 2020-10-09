@@ -320,7 +320,7 @@ RkAiqManager::start()
 }
 
 XCamReturn
-RkAiqManager::stop()
+RkAiqManager::stop(bool keep_ext_hw_st)
 {
     ENTER_XCORE_FUNCTION();
 
@@ -341,6 +341,7 @@ RkAiqManager::stop()
     ret = mRkLumaAnalyzer->stop();
     RKAIQMNG_CHECK_RET(ret, "luma analyzer stop error %d", ret);
 
+    mCamHw->keepHwStAtStop(keep_ext_hw_st);
     ret = mCamHw->stop();
     RKAIQMNG_CHECK_RET(ret, "camhw stop error %d", ret);
 
@@ -711,7 +712,7 @@ XCamReturn RkAiqManager::setSharpFbcRotation(rk_aiq_rotation_t rot)
 #endif
 }
 
-XCamReturn RkAiqManager::setMirrorFlip(bool mirror, bool flip)
+XCamReturn RkAiqManager::setMirrorFlip(bool mirror, bool flip, int skip_frm_cnt)
 {
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
     ENTER_XCORE_FUNCTION();
@@ -719,7 +720,7 @@ XCamReturn RkAiqManager::setMirrorFlip(bool mirror, bool flip)
         LOGE_ANALYZER("wrong aiq state !");
         return XCAM_RETURN_ERROR_FAILED;
     }
-    ret = mCamHw->setSensorFlip(mirror, flip);
+    ret = mCamHw->setSensorFlip(mirror, flip, skip_frm_cnt);
     if (ret == XCAM_RETURN_NO_ERROR) {
         // notify aiq sensor flip is changed
         mRkAiqAnalyzer->setSensorFlip(mirror, flip);
@@ -752,7 +753,7 @@ void RkAiqManager::setDefMirrorFlip()
     /* set defalut mirror & flip from iq*/
     bool def_mirr = mCalibDb->sensor.flip & 0x1 ? true : false;
     bool def_flip = mCalibDb->sensor.flip & 0x2 ? true : false;
-    setMirrorFlip(def_mirr, def_flip);
+    setMirrorFlip(def_mirr, def_flip, 0);
 }
 
 XCamReturn RkAiqManager::swWorkingModeDyn_msg(rk_aiq_working_mode_t mode) {

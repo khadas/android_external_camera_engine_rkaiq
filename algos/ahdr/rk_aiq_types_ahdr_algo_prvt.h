@@ -271,6 +271,7 @@ typedef struct AhdrContext_s
     uint32_t height;
     int frameCnt;
     int hdr_mode;
+    int sence_mode;
 } AhdrContext_t;
 
 typedef AhdrContext_t* AhdrHandle_t;

@@ -79,6 +79,67 @@ ANRresult_t mfnr_get_setting_idx_by_name(CalibDb_MFNR_t *pCalibdb, char *name, i
 
 }
 
+ANRresult_t init_mfnr_dynamic_params(RKAnr_Mfnr_Dynamic_t *pDynamic, CalibDb_MFNR_t *pCalibdb, int mode_idx)
+{
+    ANRresult_t res = ANR_RET_SUCCESS;
+    int i = 0;
+    int j = 0;
+
+    if(pDynamic == NULL) {
+        LOGE_ANR("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
+        return ANR_RET_NULL_POINTER;
+    }
+
+    if(pCalibdb == NULL) {
+        LOGE_ANR("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
+        return ANR_RET_NULL_POINTER;
+    }
+
+   pDynamic->enable = pCalibdb->mode_cell[mode_idx].dynamic.enable;
+   pDynamic->lowth_iso = pCalibdb->mode_cell[mode_idx].dynamic.lowth_iso;
+   pDynamic->lowth_time = pCalibdb->mode_cell[mode_idx].dynamic.lowth_time;
+   pDynamic->highth_iso = pCalibdb->mode_cell[mode_idx].dynamic.highth_iso;
+   pDynamic->highth_time = pCalibdb->mode_cell[mode_idx].dynamic.highth_time;
+
+   LOGD_ANR("dynamic final param mode:%d \n", mode_idx);
+   return res;
+
+}
+
+ANRresult_t mfnr_config_dynamic_param(RKAnr_Mfnr_Dynamic_t *pDynamic,  CalibDb_MFNR_t *pCalibdb, char* param_mode)
+{
+	
+	ANRresult_t res = ANR_RET_SUCCESS;
+	int mode_idx = 0;
+	int setting_idx = 0;
+
+	if(pDynamic == NULL){
+		LOGE_ANR("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
+		return ANR_RET_NULL_POINTER;
+	}
+
+	if(pCalibdb == NULL){
+		LOGE_ANR("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
+		return ANR_RET_NULL_POINTER;
+	}
+
+	if(param_mode == NULL){
+		LOGE_ANR("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
+		return ANR_RET_NULL_POINTER;
+	}
+	
+	res = mfnr_get_mode_cell_idx_by_name(pCalibdb, param_mode, &mode_idx);
+	if(res != ANR_RET_SUCCESS){
+		LOGW_ANR("%s(%d): error!!!	can't find mode name in iq files, use 0 instead\n", __FUNCTION__, __LINE__);
+	}
+
+	res = init_mfnr_dynamic_params(pDynamic, pCalibdb, mode_idx);
+
+	LOGD_ANR("final param mode:%d snr_mode:%d\n", mode_idx);
+	return res;
+	
+}
+
 ANRresult_t mfnr_config_setting_param(RKAnr_Mfnr_Params_t *pParams, CalibDb_MFNR_t *pCalibdb, char* param_mode, char* snr_name)
 {
 	ANRresult_t res = ANR_RET_SUCCESS;
@@ -91,6 +152,16 @@ ANRresult_t mfnr_config_setting_param(RKAnr_Mfnr_Params_t *pParams, CalibDb_MFNR
 	}
 
 	if(pCalibdb == NULL){
+		LOGE_ANR("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
+		return ANR_RET_NULL_POINTER;
+	}
+
+	if(param_mode == NULL){
+		LOGE_ANR("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
+		return ANR_RET_NULL_POINTER;
+	}
+
+	if(snr_name == NULL){
 		LOGE_ANR("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
 		return ANR_RET_NULL_POINTER;
 	}
@@ -1270,6 +1341,43 @@ ANRresult_t mfnr_fix_Printf(RKAnr_Mfnr_Fix_t  * pMfnrCfg)
 
     LOGD_ANR("%s:(%d) exit \n", __FUNCTION__, __LINE__);
 
+    return res;
+}
+
+
+ANRresult_t mfnr_dynamic_calc(RKAnr_Mfnr_Dynamic_t  * pDynamic, ANRExpInfo_t *pExpInfo)
+{
+    LOGI_ANR("%s:(%d) enter \n", __FUNCTION__, __LINE__);
+
+    ANRresult_t res = ANR_RET_SUCCESS;
+    float time = pExpInfo->arTime[pExpInfo->hdr_mode];
+    float iso = pExpInfo->arIso[pExpInfo->hdr_mode];
+    float exp = time * iso;
+	
+    if(pDynamic == NULL) {
+        LOGE_ANR("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
+        return ANR_RET_NULL_POINTER;
+    }
+
+    if(pExpInfo == NULL) {
+        LOGE_ANR("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
+        return ANR_RET_NULL_POINTER;
+    }
+
+	
+    if(iso >= pDynamic->highth_iso && time >= pDynamic->highth_time){
+	 pDynamic->mfnr_enable_state = 1;
+    }else if(iso <= pDynamic->lowth_iso && time <= pDynamic->lowth_time){
+	 pDynamic->mfnr_enable_state = 0;
+    }
+
+	LOGD_ANR("%s:%d mfnr: cur:%f %f  highth:%f %f  lowth:%f %f  finnal:%d\n", 
+		__FUNCTION__, __LINE__, 
+		iso, time, 
+		pDynamic->highth_iso, pDynamic->highth_time,
+		pDynamic->lowth_iso, pDynamic->lowth_time,
+		pDynamic->mfnr_enable_state);
+	
     return res;
 }
 

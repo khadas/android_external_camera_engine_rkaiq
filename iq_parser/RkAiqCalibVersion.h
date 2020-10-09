@@ -86,11 +86,20 @@
  *  -Tmo: delete moresetting
  * v1.2.9
  *  -LumaDetect: add fixed times of readback
+ * v1.2.a
+ *  -AF: add vcmconfig
+ * v1.3.0
+ *  -dynamic mfnr enable in iqfiles
+ * v1.3.1
+ *  - magic code:1034424
+ *  - Redifine dehaze para in IQ files
+ * v1.3.2
+ *  - magic code:1034813
+ *  - TMO: add normal HDR night mode
  */
 
-
-#define RK_AIQ_CALIB_VERSION_REAL_V          "v1.2.9"
-#define RK_AIQ_CALIB_VERSION_MAGIC_V         "1018435"
+#define RK_AIQ_CALIB_VERSION_REAL_V          "v1.3.2"
+#define RK_AIQ_CALIB_VERSION_MAGIC_V         "1034813"
 
 
 /******* DO NOT EDIT THE FOLLOWINGS ***********/

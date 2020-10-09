@@ -14,79 +14,59 @@ rk_aiq_uapi_adehaze_SetAttrib(RkAiqAlgoContext *ctx,
             AdehazeHandle->calib_dehaz = AdehazeHandle->pCalibDb->dehaze;
             AdehazeHandle->mode = attr.mode;
         }
-        for(int i = 0; i < 9; i++) {
-            AdehazeHandle->calib_dehaz.night.dehaze_en[i] = attr.stAuto.sw_dhaz_en;
-            AdehazeHandle->calib_dehaz.night.enhance_en[i] = attr.stAuto.enhance_en;
-            AdehazeHandle->calib_dehaz.night.cfg_alpha[i] = attr.stAuto.cfg_alpha;
 
-            AdehazeHandle->calib_dehaz.normal.dehaze_en[i] = attr.stAuto.sw_dhaz_en;
-            AdehazeHandle->calib_dehaz.normal.enhance_en[i] = attr.stAuto.enhance_en;
-            AdehazeHandle->calib_dehaz.normal.cfg_alpha[i] = attr.stAuto.cfg_alpha;
+        AdehazeHandle->calib_dehaz.en = attr.stAuto.sw_dhaz_en;
+        AdehazeHandle->calib_dehaz.cfg_alpha_normal = attr.stAuto.cfg_alpha;
+        AdehazeHandle->calib_dehaz.cfg_alpha_hdr = attr.stAuto.cfg_alpha;
+        AdehazeHandle->calib_dehaz.cfg_alpha_night = attr.stAuto.cfg_alpha;
 
-            AdehazeHandle->calib_dehaz.hdr.dehaze_en[i] = attr.stAuto.sw_dhaz_en;
-            AdehazeHandle->calib_dehaz.hdr.enhance_en[i] = attr.stAuto.enhance_en;
-            AdehazeHandle->calib_dehaz.hdr.cfg_alpha[i] = attr.stAuto.cfg_alpha;
-        }
+
+        for(int i = 0; i < 3; i++)
+            AdehazeHandle->calib_dehaz.enhance_setting[i].en = attr.stAuto.enhance_en;
+
+
     } else if(attr.mode == RK_AIQ_DEHAZE_MODE_MANUAL) {
         if (attr.mode != AdehazeHandle->mode) {
             AdehazeHandle->calib_dehaz = AdehazeHandle->pCalibDb->dehaze;
             AdehazeHandle->mode = attr.mode;
         }
         AdehazeHandle->strength = attr.stManual.strength;
-        for(int i = 0; i < 9; i++) {
-            AdehazeHandle->calib_dehaz.night.dehaze_en[i] = attr.stManual.sw_dhaz_en;
-            AdehazeHandle->calib_dehaz.night.enhance_en[i] = attr.stManual.enhance_en;
-            //AdehazeHandle->calib_dehaz.night.cfg_alpha[i] = attr.stManual.cfg_alpha;
-            AdehazeHandle->calib_dehaz.night.cfg_wt[i] = attr.stManual.sw_dhaz_cfg_wt;
-            AdehazeHandle->calib_dehaz.night.cfg_air[i] = attr.stManual.sw_dhaz_cfg_air;
-            AdehazeHandle->calib_dehaz.night.cfg_tmax[i] = attr.stManual.sw_dhaz_cfg_tmax;
-            AdehazeHandle->calib_dehaz.night.cfg_gratio[i] = attr.stManual.sw_dhaz_cfg_gratio;
 
-            AdehazeHandle->calib_dehaz.normal.dehaze_en[i] = attr.stManual.sw_dhaz_en;
-            AdehazeHandle->calib_dehaz.normal.enhance_en[i] = attr.stManual.enhance_en;
-            //AdehazeHandle->calib_dehaz.normal.cfg_alpha[i] = attr.stManual.cfg_alpha;
-            AdehazeHandle->calib_dehaz.normal.cfg_wt[i] = attr.stManual.sw_dhaz_cfg_wt;
-            AdehazeHandle->calib_dehaz.normal.cfg_air[i] = attr.stManual.sw_dhaz_cfg_air;
-            AdehazeHandle->calib_dehaz.normal.cfg_tmax[i] = attr.stManual.sw_dhaz_cfg_tmax;
-            AdehazeHandle->calib_dehaz.normal.cfg_gratio[i] = attr.stManual.sw_dhaz_cfg_gratio;
+        AdehazeHandle->calib_dehaz.en = attr.stManual.sw_dhaz_en;
+        //AdehazeHandle->calib_dehaz.cfg_alpha_normal = attr.stManual.cfg_alpha;
+        //AdehazeHandle->calib_dehaz.cfg_alpha_hdr = attr.stManual.cfg_alpha;
+        //AdehazeHandle->calib_dehaz.cfg_alpha_night = attr.stManual.cfg_alpha;
 
-            AdehazeHandle->calib_dehaz.hdr.dehaze_en[i] = attr.stManual.sw_dhaz_en;
-            AdehazeHandle->calib_dehaz.hdr.enhance_en[i] = attr.stManual.enhance_en;
-            //AdehazeHandle->calib_dehaz.hdr.cfg_alpha[i] = attr.stManual.cfg_alpha;
-            AdehazeHandle->calib_dehaz.hdr.cfg_wt[i] = attr.stManual.sw_dhaz_cfg_wt;
-            AdehazeHandle->calib_dehaz.hdr.cfg_air[i] = attr.stManual.sw_dhaz_cfg_air;
-            AdehazeHandle->calib_dehaz.hdr.cfg_tmax[i] = attr.stManual.sw_dhaz_cfg_tmax;
-            AdehazeHandle->calib_dehaz.hdr.cfg_gratio[i] = attr.stManual.sw_dhaz_cfg_gratio;
+        for(int i = 0; i < 3; i++)
+        {
+            AdehazeHandle->calib_dehaz.enhance_setting[i].en = attr.stManual.enhance_en;
+            for(int j = 0; j < 9; i++) {
+                AdehazeHandle->calib_dehaz.dehaze_setting[i].cfg_wt[j] = attr.stManual.sw_dhaz_cfg_wt;
+                AdehazeHandle->calib_dehaz.dehaze_setting[i].cfg_air[j] = attr.stManual.sw_dhaz_cfg_air;
+                AdehazeHandle->calib_dehaz.dehaze_setting[i].cfg_tmax[j] = attr.stManual.sw_dhaz_cfg_tmax;
+            }
         }
     } else if(attr.mode == RK_AIQ_DEHAZE_MODE_ENHANCE) {
         if (attr.mode != AdehazeHandle->mode) {
             AdehazeHandle->calib_dehaz = AdehazeHandle->pCalibDb->dehaze;
             AdehazeHandle->mode = attr.mode;
         }
-        for(int i = 0; i < 9; i++) {
-            AdehazeHandle->calib_dehaz.night.dehaze_en[i] = attr.stEnhance.sw_dhaz_en;
-            AdehazeHandle->calib_dehaz.night.enhance_en[i] = attr.stEnhance.enhance_en;
-            //AdehazeHandle->calib_dehaz->night.cfg_alpha[i] = attr.stEnhance.cfg_alpha;
-            AdehazeHandle->calib_dehaz.night.enhance_value[i] = attr.stEnhance.level;
 
-            AdehazeHandle->calib_dehaz.normal.dehaze_en[i] = attr.stEnhance.sw_dhaz_en;
-            AdehazeHandle->calib_dehaz.normal.enhance_en[i] = attr.stEnhance.enhance_en;
-            //AdehazeHandle->calib_dehaz.normal.cfg_alpha[i] = attr.stEnhance.cfg_alpha;
-            AdehazeHandle->calib_dehaz.normal.enhance_value[i] = attr.stEnhance.level;
-
-            AdehazeHandle->calib_dehaz.hdr.dehaze_en[i] = attr.stEnhance.sw_dhaz_en;
-            AdehazeHandle->calib_dehaz.hdr.enhance_en[i] = attr.stEnhance.enhance_en;
-            //AdehazeHandle->calib_dehaz.hdr.cfg_alpha[i] = attr.stEnhance.cfg_alpha;
-            AdehazeHandle->calib_dehaz.hdr.enhance_value[i] = attr.stEnhance.level;
+        AdehazeHandle->calib_dehaz.en = attr.stEnhance.sw_dhaz_en;
+        //AdehazeHandle->calib_dehaz.cfg_alpha_normal = attr.stManual.cfg_alpha;
+        //AdehazeHandle->calib_dehaz.cfg_alpha_hdr = attr.stManual.cfg_alpha;
+        //AdehazeHandle->calib_dehaz.cfg_alpha_night = attr.stManual.cfg_alpha;
+        for(int i = 0; i < 3; i++)
+        {
+            AdehazeHandle->calib_dehaz.enhance_setting[i].en = attr.stEnhance.enhance_en;
+            for(int j = 0; j < 9; i++)
+                AdehazeHandle->calib_dehaz.enhance_setting[i].enhance_value[j] = attr.stEnhance.level;
         }
     } else if(attr.mode == RK_AIQ_DEHAZE_MODE_DEFAULT) {
-        for(int i = 0; i < 9; i++) {
-            AdehazeHandle->calib_dehaz.night.dc_en[i] = attr.stManual.dc_en;
-            AdehazeHandle->calib_dehaz.night.enhance_en[i] = attr.stManual.enhance_en;
-            AdehazeHandle->calib_dehaz.normal.dc_en[i] = attr.stManual.dc_en;
-            AdehazeHandle->calib_dehaz.normal.enhance_en[i] = attr.stManual.enhance_en;
-            AdehazeHandle->calib_dehaz.hdr.dc_en[i] = attr.stManual.dc_en;
-            AdehazeHandle->calib_dehaz.hdr.enhance_en[i] = attr.stManual.enhance_en;
+        for(int i = 0; i < 3; i++)
+        {
+            //todo//AdehazeHandle->calib_dehaz.dehaze_setting[i].dc_en = attr.stManual.dc_en;
+            //todo//AdehazeHandle->calib_dehaz.enhance_setting[i].enhance_en = attr.stManual.enhance_en;
         }
     } else {
         LOGE_ADEHAZE("invalid mode!");

@@ -195,9 +195,14 @@ public:
         _sharp_fbc_rotation = rot;
         return XCAM_RETURN_NO_ERROR;
     }
-    XCamReturn setSensorFlip(bool mirror, bool flip);
+    XCamReturn setSensorFlip(bool mirror, bool flip, int skip_frm_cnt);
     XCamReturn getSensorFlip(bool& mirror, bool& flip);
     void setMulCamConc(bool cc);
+    XCamReturn getZoomPosition(int& position);
+    XCamReturn getLensVcmCfg(rk_aiq_lens_vcmcfg& lens_cfg);
+    XCamReturn setLensVcmCfg(rk_aiq_lens_vcmcfg& lens_cfg);
+    XCamReturn setLensVcmCfg();
+
 private:
     XCAM_DEAD_COPY(CamHwIsp20);
     enum cam_hw_state_e {
@@ -268,6 +273,8 @@ private:
     XCamReturn hdr_mipi_start(int idx = MIPI_STREAM_IDX_ALL);
     XCamReturn hdr_mipi_start_mode(int mode);
     XCamReturn hdr_mipi_stop(int idx = MIPI_STREAM_IDX_ALL);
+    XCamReturn hdr_mipi_prepare_mode(int mode);
+    XCamReturn hdr_mipi_prepare(int idx);
     void prepare_cif_mipi();
     uint32_t _isp_module_ens;
     bool mNormalNoReadBack;

@@ -409,6 +409,133 @@ void AhdrGetAeResult
     LOG1_AHDR( "%s:exit!\n", __FUNCTION__);
 }
 
+void AhdrGetCurrMergeData
+(
+    AhdrHandle_t           pAhdrCtx
+) {
+    LOG1_AHDR( "%s:enter!\n", __FUNCTION__);
+
+    //get Current merge OECurve
+    pAhdrCtx->CurrHandleData.CurrMergeHandleData.OECurve_smooth = GetCurrPara(pAhdrCtx->CurrHandleData.CurrEnvLv,
+            pAhdrCtx->AhdrConfig.merge_para.EnvLv,
+            pAhdrCtx->AhdrConfig.merge_para.OECurve_smooth);
+    pAhdrCtx->CurrHandleData.CurrMergeHandleData.OECurve_offset = GetCurrPara(pAhdrCtx->CurrHandleData.CurrEnvLv,
+            pAhdrCtx->AhdrConfig.merge_para.EnvLv,
+            pAhdrCtx->AhdrConfig.merge_para.OECurve_offset);
+
+    //get Current merge MDCurve
+    pAhdrCtx->CurrHandleData.CurrMergeHandleData.MDCurveLM_smooth = GetCurrPara(pAhdrCtx->CurrHandleData.CurrMoveCoef,
+            pAhdrCtx->AhdrConfig.merge_para.MoveCoef,
+            pAhdrCtx->AhdrConfig.merge_para.MDCurveLM_smooth);
+    pAhdrCtx->CurrHandleData.CurrMergeHandleData.MDCurveLM_offset = GetCurrPara(pAhdrCtx->CurrHandleData.CurrMoveCoef,
+            pAhdrCtx->AhdrConfig.merge_para.MoveCoef,
+            pAhdrCtx->AhdrConfig.merge_para.MDCurveLM_offset);
+    pAhdrCtx->CurrHandleData.CurrMergeHandleData.MDCurveMS_smooth = GetCurrPara(pAhdrCtx->CurrHandleData.CurrMoveCoef,
+            pAhdrCtx->AhdrConfig.merge_para.MoveCoef,
+            pAhdrCtx->AhdrConfig.merge_para.MDCurveMS_smooth);
+    pAhdrCtx->CurrHandleData.CurrMergeHandleData.MDCurveMS_offset = GetCurrPara(pAhdrCtx->CurrHandleData.CurrMoveCoef,
+            pAhdrCtx->AhdrConfig.merge_para.MoveCoef,
+            pAhdrCtx->AhdrConfig.merge_para.MDCurveMS_offset);
+
+    pAhdrCtx->CurrHandleData.MergeOEDamp = pAhdrCtx->AhdrConfig.merge_para.OECurve_damp;
+    pAhdrCtx->CurrHandleData.MergeMDDampLM = pAhdrCtx->AhdrConfig.merge_para.MDCurveLM_damp;
+    pAhdrCtx->CurrHandleData.MergeMDDampMS = pAhdrCtx->AhdrConfig.merge_para.MDCurveMS_damp;
+
+    LOG1_AHDR( "%s:exit!\n", __FUNCTION__);
+}
+
+void AhdrGetCurrTmoData
+(
+    AhdrHandle_t           pAhdrCtx
+) {
+    LOG1_AHDR( "%s:enter!\n", __FUNCTION__);
+
+    //get Current tmo GlobeLuma GlobeMaxLuma
+    int GlobalLuma_mode = (int)pAhdrCtx->AhdrConfig.tmo_para.Luma.globalLumaMode;
+    if(GlobalLuma_mode == 0)
+        pAhdrCtx->CurrHandleData.CurrTmoHandleData.GlobeLuma = GetCurrPara(pAhdrCtx->CurrHandleData.CurrEnvLv,
+                pAhdrCtx->AhdrConfig.tmo_para.Luma.EnvLv,
+                pAhdrCtx->AhdrConfig.tmo_para.Luma.GlobeLuma);
+    else if(GlobalLuma_mode == 1)
+        pAhdrCtx->CurrHandleData.CurrTmoHandleData.GlobeLuma = GetCurrPara(pAhdrCtx->CurrHandleData.CurrISO,
+                pAhdrCtx->AhdrConfig.tmo_para.Luma.ISO,
+                pAhdrCtx->AhdrConfig.tmo_para.Luma.GlobeLuma);
+
+    float GlobeLuma = pAhdrCtx->CurrHandleData.CurrTmoHandleData.GlobeLuma;
+    pAhdrCtx->CurrHandleData.CurrTmoHandleData.GlobeMaxLuma = MAXLUMAK * GlobeLuma + MAXLUMAB;
+    pAhdrCtx->CurrHandleData.CurrTmoHandleData.GlobeMaxLuma = LIMIT_VALUE(pAhdrCtx->CurrHandleData.CurrTmoHandleData.GlobeMaxLuma, GLOBEMAXLUMAMAX, GLOBEMAXLUMAMIN);
+
+    //get Current tmo strength
+    int LocalMode = (int)pAhdrCtx->AhdrConfig.tmo_para.local.localtmoMode;
+    if(LocalMode == 0)
+        pAhdrCtx->CurrHandleData.CurrTmoHandleData.LocalTmoStrength = GetCurrPara(pAhdrCtx->CurrHandleData.CurrDynamicRange,
+                pAhdrCtx->AhdrConfig.tmo_para.local.DynamicRange,
+                pAhdrCtx->AhdrConfig.tmo_para.local.LocalTmoStrength);
+    else if(LocalMode == 1)
+        pAhdrCtx->CurrHandleData.CurrTmoHandleData.LocalTmoStrength = GetCurrPara(pAhdrCtx->CurrHandleData.CurrEnvLv,
+                pAhdrCtx->AhdrConfig.tmo_para.local.EnvLv,
+                pAhdrCtx->AhdrConfig.tmo_para.local.LocalTmoStrength);
+
+    if(pAhdrCtx->AhdrConfig.tmo_para.global.isHdrGlobalTmo)
+        pAhdrCtx->CurrHandleData.CurrTmoHandleData.LocalTmoStrength = 0;
+
+    //get Current tmo BabdPrior
+    int GlobalMode = (int)pAhdrCtx->AhdrConfig.tmo_para.global.mode;
+    if(GlobalMode == 0)
+        pAhdrCtx->CurrHandleData.CurrTmoHandleData.GlobalTmoStrength = GetCurrPara(pAhdrCtx->CurrHandleData.CurrDynamicRange,
+                pAhdrCtx->AhdrConfig.tmo_para.global.DynamicRange,
+                pAhdrCtx->AhdrConfig.tmo_para.global.GlobalTmoStrength);
+    else if(GlobalMode == 1)
+        pAhdrCtx->CurrHandleData.CurrTmoHandleData.GlobalTmoStrength = GetCurrPara(pAhdrCtx->CurrHandleData.CurrEnvLv,
+                pAhdrCtx->AhdrConfig.tmo_para.global.EnvLv,
+                pAhdrCtx->AhdrConfig.tmo_para.global.GlobalTmoStrength);
+
+    //get Current tmo DetailsHighLight
+    int DetailsHighLight_mode = (int)pAhdrCtx->AhdrConfig.tmo_para.DtsHiLit.DetailsHighLightMode;
+    if(DetailsHighLight_mode == 0)
+        pAhdrCtx->CurrHandleData.CurrTmoHandleData.DetailsHighLight = GetCurrPara(pAhdrCtx->CurrHandleData.CurrOEPdf,
+                pAhdrCtx->AhdrConfig.tmo_para.DtsHiLit.OEPdf,
+                pAhdrCtx->AhdrConfig.tmo_para.DtsHiLit.DetailsHighLight);
+    else if(DetailsHighLight_mode == 1)
+        pAhdrCtx->CurrHandleData.CurrTmoHandleData.DetailsHighLight = GetCurrPara(pAhdrCtx->CurrHandleData.CurrEnvLv,
+                pAhdrCtx->AhdrConfig.tmo_para.DtsHiLit.EnvLv,
+                pAhdrCtx->AhdrConfig.tmo_para.DtsHiLit.DetailsHighLight);
+
+    //get Current tmo DetailsLowLight
+    int DetailsLowLight_mode = (int)pAhdrCtx->AhdrConfig.tmo_para.DtsLoLit.DetailsLowLightMode;
+    if (DetailsLowLight_mode == 0)
+    {
+#if 0
+        int focs = pAhdrCtx->CurrAfResult.CurrAfTargetPos;
+        int focs_width = pAhdrCtx->CurrAfResult.CurrAfTargetWidth / (pAhdrCtx->width / 15);
+        int focs_height = pAhdrCtx->CurrAfResult.CurrAfTargetHeight / (pAhdrCtx->height / 15);
+        float focs_luma = 0;
+        for(int i = 0; i < focs_height; i++)
+            for(int j = 0; j < focs_width; j++)
+                focs_luma += pAhdrCtx->CurrAeResult.BlockLumaL[focs + i + 15 * j];
+        focs_luma = focs_luma / (focs_width * focs_height);
+        pAhdrCtx->CurrHandleData.CurrTotalFocusLuma = focs_luma / 15;
+        pAhdrCtx->CurrHandleData.CurrTotalFocusLuma = LIMIT_VALUE(pAhdrCtx->CurrHandleData.CurrTotalFocusLuma, FOCUSLUMAMAX, FOCUSLUMAMIN);
+        pAhdrCtx->CurrHandleData.CurrTmoHandleData.DetailsLowLight = GetCurrPara(pAhdrCtx->CurrHandleData.CurrTotalFocusLuma,
+                pAhdrCtx->AhdrConfig.tmo_para.DtsLoLit.FocusLuma,
+                pAhdrCtx->AhdrConfig.tmo_para.DtsLoLit.DetailsLowLight);
+
+#endif
+        pAhdrCtx->CurrHandleData.CurrTmoHandleData.DetailsLowLight = pAhdrCtx->AhdrConfig.tmo_para.DtsLoLit.DetailsLowLight[0];
+
+    }
+    else if (DetailsLowLight_mode == 1)
+        pAhdrCtx->CurrHandleData.CurrTmoHandleData.DetailsLowLight = GetCurrPara(pAhdrCtx->CurrHandleData.CurrDarkPdf,
+                pAhdrCtx->AhdrConfig.tmo_para.DtsLoLit.DarkPdf,
+                pAhdrCtx->AhdrConfig.tmo_para.DtsLoLit.DetailsLowLight);
+    else if (DetailsLowLight_mode == 2)
+        pAhdrCtx->CurrHandleData.CurrTmoHandleData.DetailsLowLight = GetCurrPara(pAhdrCtx->CurrHandleData.CurrISO,
+                pAhdrCtx->AhdrConfig.tmo_para.DtsLoLit.ISO,
+                pAhdrCtx->AhdrConfig.tmo_para.DtsLoLit.DetailsLowLight);
+
+    LOG1_AHDR( "%s:exit!\n", __FUNCTION__);
+}
+
 void AhdrGetSensorInfo
 (
     AhdrHandle_t     pAhdrCtx,
@@ -513,121 +640,19 @@ void AhdrApiOffUpdate
     LOG1_AHDR("%s:enter!\n", __FUNCTION__);
     LOGD_AHDR("%s:  Ahdr api off!! Current Handle data:\n", __FUNCTION__);
 
-    //get Current merge OECurve
-    pAhdrCtx->CurrHandleData.CurrMergeHandleData.OECurve_smooth = GetCurrPara(pAhdrCtx->CurrHandleData.CurrEnvLv,
-            pAhdrCtx->AhdrConfig.merge_para.EnvLv,
-            pAhdrCtx->AhdrConfig.merge_para.OECurve_smooth);
-    pAhdrCtx->CurrHandleData.CurrMergeHandleData.OECurve_offset = GetCurrPara(pAhdrCtx->CurrHandleData.CurrEnvLv,
-            pAhdrCtx->AhdrConfig.merge_para.EnvLv,
-            pAhdrCtx->AhdrConfig.merge_para.OECurve_offset);
+    //get current merge data
+    AhdrGetCurrMergeData(pAhdrCtx);
 
-    //get Current merge MDCurve
-    pAhdrCtx->CurrHandleData.CurrMergeHandleData.MDCurveLM_smooth = GetCurrPara(pAhdrCtx->CurrHandleData.CurrMoveCoef,
-            pAhdrCtx->AhdrConfig.merge_para.MoveCoef,
-            pAhdrCtx->AhdrConfig.merge_para.MDCurveLM_smooth);
-    pAhdrCtx->CurrHandleData.CurrMergeHandleData.MDCurveLM_offset = GetCurrPara(pAhdrCtx->CurrHandleData.CurrMoveCoef,
-            pAhdrCtx->AhdrConfig.merge_para.MoveCoef,
-            pAhdrCtx->AhdrConfig.merge_para.MDCurveLM_offset);
-    pAhdrCtx->CurrHandleData.CurrMergeHandleData.MDCurveMS_smooth = GetCurrPara(pAhdrCtx->CurrHandleData.CurrMoveCoef,
-            pAhdrCtx->AhdrConfig.merge_para.MoveCoef,
-            pAhdrCtx->AhdrConfig.merge_para.MDCurveMS_smooth);
-    pAhdrCtx->CurrHandleData.CurrMergeHandleData.MDCurveMS_offset = GetCurrPara(pAhdrCtx->CurrHandleData.CurrMoveCoef,
-            pAhdrCtx->AhdrConfig.merge_para.MoveCoef,
-            pAhdrCtx->AhdrConfig.merge_para.MDCurveMS_offset);
+    //get cuurrent tmo data
+    AhdrGetCurrTmoData(pAhdrCtx);
 
-    pAhdrCtx->CurrHandleData.MergeOEDamp = pAhdrCtx->AhdrConfig.merge_para.OECurve_damp;
-    pAhdrCtx->CurrHandleData.MergeMDDampLM = pAhdrCtx->AhdrConfig.merge_para.MDCurveLM_damp;
-    pAhdrCtx->CurrHandleData.MergeMDDampMS = pAhdrCtx->AhdrConfig.merge_para.MDCurveMS_damp;
+    //log after updating
 
-    //get Current tmo GlobeLuma GlobeMaxLuma
-    int GlobalLuma_mode = (int)pAhdrCtx->AhdrConfig.tmo_para.Luma.globalLumaMode;
-    if(GlobalLuma_mode == 0)
-        pAhdrCtx->CurrHandleData.CurrTmoHandleData.GlobeLuma = GetCurrPara(pAhdrCtx->CurrHandleData.CurrEnvLv,
-                pAhdrCtx->AhdrConfig.tmo_para.Luma.EnvLv,
-                pAhdrCtx->AhdrConfig.tmo_para.Luma.GlobeLuma);
-    else if(GlobalLuma_mode == 1)
-        pAhdrCtx->CurrHandleData.CurrTmoHandleData.GlobeLuma = GetCurrPara(pAhdrCtx->CurrHandleData.CurrISO,
-                pAhdrCtx->AhdrConfig.tmo_para.Luma.ISO,
-                pAhdrCtx->AhdrConfig.tmo_para.Luma.GlobeLuma);
-
-    float GlobeLuma = pAhdrCtx->CurrHandleData.CurrTmoHandleData.GlobeLuma;
-    pAhdrCtx->CurrHandleData.CurrTmoHandleData.GlobeMaxLuma = MAXLUMAK * GlobeLuma + MAXLUMAB;
-    pAhdrCtx->CurrHandleData.CurrTmoHandleData.GlobeMaxLuma = LIMIT_VALUE(pAhdrCtx->CurrHandleData.CurrTmoHandleData.GlobeMaxLuma, GLOBEMAXLUMAMAX, GLOBEMAXLUMAMIN);
-
-    //get Current tmo strength
-    int LocalMode = (int)pAhdrCtx->AhdrConfig.tmo_para.local.localtmoMode;
-    if(LocalMode == 0)
-        pAhdrCtx->CurrHandleData.CurrTmoHandleData.LocalTmoStrength = GetCurrPara(pAhdrCtx->CurrHandleData.CurrDynamicRange,
-                pAhdrCtx->AhdrConfig.tmo_para.local.DynamicRange,
-                pAhdrCtx->AhdrConfig.tmo_para.local.LocalTmoStrength);
-    else if(LocalMode == 1)
-        pAhdrCtx->CurrHandleData.CurrTmoHandleData.LocalTmoStrength = GetCurrPara(pAhdrCtx->CurrHandleData.CurrEnvLv,
-                pAhdrCtx->AhdrConfig.tmo_para.local.EnvLv,
-                pAhdrCtx->AhdrConfig.tmo_para.local.LocalTmoStrength);
-
-    if(pAhdrCtx->AhdrConfig.tmo_para.global.isHdrGlobalTmo)
-        pAhdrCtx->CurrHandleData.CurrTmoHandleData.LocalTmoStrength = 0;
-
-    //get Current tmo BabdPrior
-    int GlobalMode = (int)pAhdrCtx->AhdrConfig.tmo_para.global.mode;
-    if(GlobalMode == 0)
-        pAhdrCtx->CurrHandleData.CurrTmoHandleData.GlobalTmoStrength = GetCurrPara(pAhdrCtx->CurrHandleData.CurrDynamicRange,
-                pAhdrCtx->AhdrConfig.tmo_para.global.DynamicRange,
-                pAhdrCtx->AhdrConfig.tmo_para.global.GlobalTmoStrength);
-    else if(GlobalMode == 1)
-        pAhdrCtx->CurrHandleData.CurrTmoHandleData.GlobalTmoStrength = GetCurrPara(pAhdrCtx->CurrHandleData.CurrEnvLv,
-                pAhdrCtx->AhdrConfig.tmo_para.global.EnvLv,
-                pAhdrCtx->AhdrConfig.tmo_para.global.GlobalTmoStrength);
-
-    //get Current tmo DetailsHighLight
-    int DetailsHighLight_mode = (int)pAhdrCtx->AhdrConfig.tmo_para.DtsHiLit.DetailsHighLightMode;
-    if(DetailsHighLight_mode == 0)
-        pAhdrCtx->CurrHandleData.CurrTmoHandleData.DetailsHighLight = GetCurrPara(pAhdrCtx->CurrHandleData.CurrOEPdf,
-                pAhdrCtx->AhdrConfig.tmo_para.DtsHiLit.OEPdf,
-                pAhdrCtx->AhdrConfig.tmo_para.DtsHiLit.DetailsHighLight);
-    else if(DetailsHighLight_mode == 1)
-        pAhdrCtx->CurrHandleData.CurrTmoHandleData.DetailsHighLight = GetCurrPara(pAhdrCtx->CurrHandleData.CurrEnvLv,
-                pAhdrCtx->AhdrConfig.tmo_para.DtsHiLit.EnvLv,
-                pAhdrCtx->AhdrConfig.tmo_para.DtsHiLit.DetailsHighLight);
-
-    //get Current tmo DetailsLowLight
-    int DetailsLowLight_mode = (int)pAhdrCtx->AhdrConfig.tmo_para.DtsLoLit.DetailsLowLightMode;
-    if (DetailsLowLight_mode == 0)
-    {
-#if 0
-        int focs = pAhdrCtx->CurrAfResult.CurrAfTargetPos;
-        int focs_width = pAhdrCtx->CurrAfResult.CurrAfTargetWidth / (pAhdrCtx->width / 15);
-        int focs_height = pAhdrCtx->CurrAfResult.CurrAfTargetHeight / (pAhdrCtx->height / 15);
-        float focs_luma = 0;
-        for(int i = 0; i < focs_height; i++)
-            for(int j = 0; j < focs_width; j++)
-                focs_luma += pAhdrCtx->CurrAeResult.BlockLumaL[focs + i + 15 * j];
-        focs_luma = focs_luma / (focs_width * focs_height);
-        pAhdrCtx->CurrHandleData.CurrTotalFocusLuma = focs_luma / 15;
-        pAhdrCtx->CurrHandleData.CurrTotalFocusLuma = LIMIT_VALUE(pAhdrCtx->CurrHandleData.CurrTotalFocusLuma, FOCUSLUMAMAX, FOCUSLUMAMIN);
-        pAhdrCtx->CurrHandleData.CurrTmoHandleData.DetailsLowLight = GetCurrPara(pAhdrCtx->CurrHandleData.CurrTotalFocusLuma,
-                pAhdrCtx->AhdrConfig.tmo_para.DtsLoLit.FocusLuma,
-                pAhdrCtx->AhdrConfig.tmo_para.DtsLoLit.DetailsLowLight);
-
-#endif
-        pAhdrCtx->CurrHandleData.CurrTmoHandleData.DetailsLowLight = pAhdrCtx->AhdrConfig.tmo_para.DtsLoLit.DetailsLowLight[0];
-
-    }
-    else if (DetailsLowLight_mode == 1)
-        pAhdrCtx->CurrHandleData.CurrTmoHandleData.DetailsLowLight = GetCurrPara(pAhdrCtx->CurrHandleData.CurrDarkPdf,
-                pAhdrCtx->AhdrConfig.tmo_para.DtsLoLit.DarkPdf,
-                pAhdrCtx->AhdrConfig.tmo_para.DtsLoLit.DetailsLowLight);
-    else if (DetailsLowLight_mode == 2)
-        pAhdrCtx->CurrHandleData.CurrTmoHandleData.DetailsLowLight = GetCurrPara(pAhdrCtx->CurrHandleData.CurrISO,
-                pAhdrCtx->AhdrConfig.tmo_para.DtsLoLit.ISO,
-                pAhdrCtx->AhdrConfig.tmo_para.DtsLoLit.DetailsLowLight);
-
-    //paras after updating
-    LOGD_AHDR("%s:  Current CurrEnvLv:%f OECurve_smooth:%f OECurve_offset:%f \n", __FUNCTION__,  pAhdrCtx->CurrHandleData.CurrEnvLv,
+    LOGD_AHDR("%s:	Current CurrEnvLv:%f OECurve_smooth:%f OECurve_offset:%f \n", __FUNCTION__,  pAhdrCtx->CurrHandleData.CurrEnvLv,
               pAhdrCtx->CurrHandleData.CurrMergeHandleData.OECurve_smooth, pAhdrCtx->CurrHandleData.CurrMergeHandleData.OECurve_offset);
-    LOGD_AHDR("%s:  Current CurrMoveCoef:%f MDCurveLM_smooth:%f MDCurveLM_offset:%f \n", __FUNCTION__, pAhdrCtx->CurrHandleData.CurrMoveCoef,
+    LOGD_AHDR("%s:	Current CurrMoveCoef:%f MDCurveLM_smooth:%f MDCurveLM_offset:%f \n", __FUNCTION__, pAhdrCtx->CurrHandleData.CurrMoveCoef,
               pAhdrCtx->CurrHandleData.CurrMergeHandleData.MDCurveLM_smooth, pAhdrCtx->CurrHandleData.CurrMergeHandleData.MDCurveLM_offset);
-    LOGD_AHDR("%s:  Current CurrMoveCoef:%f MDCurveMS_smooth:%f MDCurveMS_offset:%f \n", __FUNCTION__, pAhdrCtx->CurrHandleData.CurrMoveCoef,
+    LOGD_AHDR("%s:	Current CurrMoveCoef:%f MDCurveMS_smooth:%f MDCurveMS_offset:%f \n", __FUNCTION__, pAhdrCtx->CurrHandleData.CurrMoveCoef,
               pAhdrCtx->CurrHandleData.CurrMergeHandleData.MDCurveMS_smooth, pAhdrCtx->CurrHandleData.CurrMergeHandleData.MDCurveMS_offset);
     LOGD_AHDR("%s:  GlobalLumaMode:%f CurrEnvLv:%f CurrISO:%f GlobeLuma:%f GlobeMaxLuma:%f \n", __FUNCTION__,  pAhdrCtx->AhdrConfig.tmo_para.Luma.globalLumaMode,
               pAhdrCtx->CurrHandleData.CurrEnvLv, pAhdrCtx->CurrHandleData.CurrISO, pAhdrCtx->CurrHandleData.CurrTmoHandleData.GlobeLuma, pAhdrCtx->CurrHandleData.CurrTmoHandleData.GlobeMaxLuma);
@@ -639,6 +664,7 @@ void AhdrApiOffUpdate
               pAhdrCtx->CurrHandleData.CurrEnvLv, pAhdrCtx->CurrHandleData.CurrTmoHandleData.LocalTmoStrength);
     LOGD_AHDR("%s:  GlobalTMO en:%d mode:%f CurrDynamicRange:%f CurrEnvLv:%f Strength:%f\n", __FUNCTION__,  pAhdrCtx->AhdrConfig.tmo_para.global.isHdrGlobalTmo, pAhdrCtx->AhdrConfig.tmo_para.global.mode, pAhdrCtx->CurrHandleData.CurrDynamicRange,
               pAhdrCtx->CurrHandleData.CurrEnvLv, pAhdrCtx->CurrHandleData.CurrTmoHandleData.GlobalTmoStrength);
+
 
     //clip hdr level by fast mode
     if(pAhdrCtx->hdrAttr.opMode == HDR_OpMode_Fast)
@@ -707,6 +733,8 @@ void AhdrApiOnUpdate
                            pAhdrCtx->hdrAttr.stAuto.stMgeAuto.stMDCurveLM.stCoefMin);
 
         }
+        else
+            AhdrGetCurrMergeData(pAhdrCtx);
 
         //update tmo data in Auto mode
         if (pAhdrCtx->hdrAttr.stAuto.bUpdateTmo == true)
@@ -751,6 +779,8 @@ void AhdrApiOnUpdate
                 pAhdrCtx->CurrHandleData.CurrTmoHandleData.GlobalTmoStrength = 0.5;
 
         }
+        else
+            AhdrGetCurrTmoData(pAhdrCtx);
 
         //paras after updating
         LOGD_AHDR("%s:	Ahdr api on!! Current Handle data:\n", __FUNCTION__);
@@ -796,6 +826,8 @@ void AhdrApiOnUpdate
             pAhdrCtx->CurrHandleData.MergeMDDampMS = pAhdrCtx->hdrAttr.stManual.stMgeManual.dampMDMS;
 
         }
+        else
+            AhdrGetCurrMergeData(pAhdrCtx);
 
         //update tmo data in manual mode
         if (pAhdrCtx->hdrAttr.stManual.bUpdateTmo == true)
@@ -826,19 +858,23 @@ void AhdrApiOnUpdate
 
             pAhdrCtx->CurrHandleData.TmoDamp = pAhdrCtx->hdrAttr.stManual.stTmoManual.damp;
 
-            //paras after updating
-            LOGD_AHDR("%s:  Ahdr api on!! Current Handle data:\n", __FUNCTION__);
-            LOGD_AHDR("%s:  API mode is HDR_OpMode_MANU\n", __FUNCTION__);
-            LOGD_AHDR("%s:	Current MDCurveMS_smooth:%f MDCurveMS_offset:%f MDCurveLM_smooth:%f MDCurveLM_offset:%f OECurve_smooth:%f OECurve_offset:%f\n", __FUNCTION__,
-                      pAhdrCtx->CurrHandleData.CurrMergeHandleData.MDCurveMS_smooth, pAhdrCtx->CurrHandleData.CurrMergeHandleData.MDCurveMS_offset,
-                      pAhdrCtx->CurrHandleData.CurrMergeHandleData.MDCurveLM_smooth, pAhdrCtx->CurrHandleData.CurrMergeHandleData.MDCurveLM_offset,
-                      pAhdrCtx->CurrHandleData.CurrMergeHandleData.OECurve_smooth, pAhdrCtx->CurrHandleData.CurrMergeHandleData.OECurve_offset);
-            LOGD_AHDR("%s:  Current GlobeLuma:%f GlobeMaxLuma:%f DetailsHighLight:%f DetailsLowLight:%f TmoContrast:%f BandPriorStrength:%f\n", __FUNCTION__,
-                      pAhdrCtx->CurrHandleData.CurrTmoHandleData.GlobeLuma, pAhdrCtx->CurrHandleData.CurrTmoHandleData.GlobeMaxLuma,
-                      pAhdrCtx->CurrHandleData.CurrTmoHandleData.DetailsHighLight, pAhdrCtx->CurrHandleData.CurrTmoHandleData.DetailsLowLight,
-                      pAhdrCtx->CurrHandleData.CurrTmoHandleData.LocalTmoStrength, pAhdrCtx->CurrHandleData.CurrTmoHandleData.GlobalTmoStrength);
+
 
         }
+        else
+            AhdrGetCurrTmoData(pAhdrCtx);
+
+        //paras after updating
+        LOGD_AHDR("%s:  Ahdr api on!! Current Handle data:\n", __FUNCTION__);
+        LOGD_AHDR("%s:  API mode is HDR_OpMode_MANU\n", __FUNCTION__);
+        LOGD_AHDR("%s:	Current MDCurveMS_smooth:%f MDCurveMS_offset:%f MDCurveLM_smooth:%f MDCurveLM_offset:%f OECurve_smooth:%f OECurve_offset:%f\n", __FUNCTION__,
+                  pAhdrCtx->CurrHandleData.CurrMergeHandleData.MDCurveMS_smooth, pAhdrCtx->CurrHandleData.CurrMergeHandleData.MDCurveMS_offset,
+                  pAhdrCtx->CurrHandleData.CurrMergeHandleData.MDCurveLM_smooth, pAhdrCtx->CurrHandleData.CurrMergeHandleData.MDCurveLM_offset,
+                  pAhdrCtx->CurrHandleData.CurrMergeHandleData.OECurve_smooth, pAhdrCtx->CurrHandleData.CurrMergeHandleData.OECurve_offset);
+        LOGD_AHDR("%s:  Current GlobeLuma:%f GlobeMaxLuma:%f DetailsHighLight:%f DetailsLowLight:%f TmoContrast:%f BandPriorStrength:%f\n", __FUNCTION__,
+                  pAhdrCtx->CurrHandleData.CurrTmoHandleData.GlobeLuma, pAhdrCtx->CurrHandleData.CurrTmoHandleData.GlobeMaxLuma,
+                  pAhdrCtx->CurrHandleData.CurrTmoHandleData.DetailsHighLight, pAhdrCtx->CurrHandleData.CurrTmoHandleData.DetailsLowLight,
+                  pAhdrCtx->CurrHandleData.CurrTmoHandleData.LocalTmoStrength, pAhdrCtx->CurrHandleData.CurrTmoHandleData.GlobalTmoStrength);
 
     }
 
@@ -875,7 +911,8 @@ void AhdrApiOnUpdate
 void AhdrGetXmlParas
 (
     AhdrHandle_t           pAhdrCtx,
-    const CamCalibDbContext_t*         pCalibDb
+    const CamCalibDbContext_t*         pCalibDb,
+    int mode
 ) {
     LOG1_AHDR( "%s:enter!\n", __FUNCTION__);
 
@@ -900,47 +937,47 @@ void AhdrGetXmlParas
     }
 
     //TMO
-    pAhdrCtx->AhdrConfig.tmo_para.Luma.globalLumaMode = LIMIT_VALUE(pCalibDb->ahdr.tmo.luma.GlobalLumaMode, GLOBALLUMAMODEMAX, GLOBALLUMAMODEMIN);
-    pAhdrCtx->AhdrConfig.tmo_para.DtsLoLit.DetailsLowLightMode = LIMIT_VALUE(pCalibDb->ahdr.tmo.LowLight.DetailsLowLightMode, DETAILSLOWLIGHTMODEMAX, DETAILSLOWLIGHTMODEMIN);
-    pAhdrCtx->AhdrConfig.tmo_para.DtsHiLit.DetailsHighLightMode = LIMIT_VALUE(pCalibDb->ahdr.tmo.HighLight.DetailsHighLightMode, DETAILSHIGHLIGHTMODEMAX, DETAILSHIGHLIGHTMODEMIN);
-    pAhdrCtx->AhdrConfig.tmo_para.local.localtmoMode = LIMIT_VALUE(pCalibDb->ahdr.tmo.LocalTMO.LocalTMOMode, TMOCONTRASTMODEMAX, TMOCONTRASTMODEMIN);
+    pAhdrCtx->AhdrConfig.tmo_para.Luma.globalLumaMode = LIMIT_VALUE(pCalibDb->ahdr.tmo.luma[mode].GlobalLumaMode, GLOBALLUMAMODEMAX, GLOBALLUMAMODEMIN);
+    pAhdrCtx->AhdrConfig.tmo_para.DtsLoLit.DetailsLowLightMode = LIMIT_VALUE(pCalibDb->ahdr.tmo.LowLight[mode].DetailsLowLightMode, DETAILSLOWLIGHTMODEMAX, DETAILSLOWLIGHTMODEMIN);
+    pAhdrCtx->AhdrConfig.tmo_para.DtsHiLit.DetailsHighLightMode = LIMIT_VALUE(pCalibDb->ahdr.tmo.HighLight[mode].DetailsHighLightMode, DETAILSHIGHLIGHTMODEMAX, DETAILSHIGHLIGHTMODEMIN);
+    pAhdrCtx->AhdrConfig.tmo_para.local.localtmoMode = LIMIT_VALUE(pCalibDb->ahdr.tmo.LocalTMO[mode].LocalTMOMode, TMOCONTRASTMODEMAX, TMOCONTRASTMODEMIN);
     pAhdrCtx->AhdrConfig.tmo_para.damp = LIMIT_VALUE(pCalibDb->ahdr.tmo.damp, DAMPMAX, DAMPMIN);
-    pAhdrCtx->AhdrConfig.tmo_para.Luma.Tolerance = LIMIT_VALUE(pCalibDb->ahdr.tmo.luma.Tolerance, TOLERANCEMAX, TOLERANCEMIN);
-    pAhdrCtx->AhdrConfig.tmo_para.DtsHiLit.Tolerance = LIMIT_VALUE(pCalibDb->ahdr.tmo.HighLight.Tolerance, TOLERANCEMAX, TOLERANCEMIN);
-    pAhdrCtx->AhdrConfig.tmo_para.DtsLoLit.Tolerance = LIMIT_VALUE(pCalibDb->ahdr.tmo.LowLight.Tolerance, TOLERANCEMAX, TOLERANCEMIN);
-    pAhdrCtx->AhdrConfig.tmo_para.local.Tolerance = LIMIT_VALUE(pCalibDb->ahdr.tmo.LocalTMO.Tolerance, TOLERANCEMAX, TOLERANCEMIN);
+    pAhdrCtx->AhdrConfig.tmo_para.Luma.Tolerance = LIMIT_VALUE(pCalibDb->ahdr.tmo.luma[mode].Tolerance, TOLERANCEMAX, TOLERANCEMIN);
+    pAhdrCtx->AhdrConfig.tmo_para.DtsHiLit.Tolerance = LIMIT_VALUE(pCalibDb->ahdr.tmo.HighLight[mode].Tolerance, TOLERANCEMAX, TOLERANCEMIN);
+    pAhdrCtx->AhdrConfig.tmo_para.DtsLoLit.Tolerance = LIMIT_VALUE(pCalibDb->ahdr.tmo.LowLight[mode].Tolerance, TOLERANCEMAX, TOLERANCEMIN);
+    pAhdrCtx->AhdrConfig.tmo_para.local.Tolerance = LIMIT_VALUE(pCalibDb->ahdr.tmo.LocalTMO[mode].Tolerance, TOLERANCEMAX, TOLERANCEMIN);
     for(int i = 0; i < 6; i++)
     {
-        pAhdrCtx->AhdrConfig.tmo_para.Luma.EnvLv[i] = LIMIT_VALUE(pCalibDb->ahdr.tmo.luma.envLevel[i], ENVLVMAX, ENVLVMIN);
-        pAhdrCtx->AhdrConfig.tmo_para.Luma.ISO[i] = LIMIT_VALUE(pCalibDb->ahdr.tmo.luma.ISO[i], ISOMAX, ISOMIN);
-        pAhdrCtx->AhdrConfig.tmo_para.Luma.GlobeLuma[i] = LIMIT_VALUE(pCalibDb->ahdr.tmo.luma.globalLuma[i], IQPARAMAX, IQPARAMIN) ;
+        pAhdrCtx->AhdrConfig.tmo_para.Luma.EnvLv[i] = LIMIT_VALUE(pCalibDb->ahdr.tmo.luma[mode].envLevel[i], ENVLVMAX, ENVLVMIN);
+        pAhdrCtx->AhdrConfig.tmo_para.Luma.ISO[i] = LIMIT_VALUE(pCalibDb->ahdr.tmo.luma[mode].ISO[i], ISOMAX, ISOMIN);
+        pAhdrCtx->AhdrConfig.tmo_para.Luma.GlobeLuma[i] = LIMIT_VALUE(pCalibDb->ahdr.tmo.luma[mode].globalLuma[i], IQPARAMAX, IQPARAMIN) ;
 
-        pAhdrCtx->AhdrConfig.tmo_para.DtsHiLit.OEPdf[i] = LIMIT_VALUE(pCalibDb->ahdr.tmo.HighLight.OEPdf[i], OEPDFMAX, OEPDFMIN) ;
-        pAhdrCtx->AhdrConfig.tmo_para.DtsHiLit.EnvLv[i] = LIMIT_VALUE(pCalibDb->ahdr.tmo.HighLight.EnvLv[i], ENVLVMAX, ENVLVMIN);
-        pAhdrCtx->AhdrConfig.tmo_para.DtsHiLit.DetailsHighLight[i] = LIMIT_VALUE(pCalibDb->ahdr.tmo.HighLight.detailsHighLight[i], IQPARAMAX, IQPARAMIN) ;
+        pAhdrCtx->AhdrConfig.tmo_para.DtsHiLit.OEPdf[i] = LIMIT_VALUE(pCalibDb->ahdr.tmo.HighLight[mode].OEPdf[i], OEPDFMAX, OEPDFMIN) ;
+        pAhdrCtx->AhdrConfig.tmo_para.DtsHiLit.EnvLv[i] = LIMIT_VALUE(pCalibDb->ahdr.tmo.HighLight[mode].EnvLv[i], ENVLVMAX, ENVLVMIN);
+        pAhdrCtx->AhdrConfig.tmo_para.DtsHiLit.DetailsHighLight[i] = LIMIT_VALUE(pCalibDb->ahdr.tmo.HighLight[mode].detailsHighLight[i], IQPARAMAX, IQPARAMIN) ;
 
-        pAhdrCtx->AhdrConfig.tmo_para.DtsLoLit.FocusLuma[i] = LIMIT_VALUE(pCalibDb->ahdr.tmo.LowLight.FocusLuma[i], FOCUSLUMAMAX, FOCUSLUMAMIN) ;
-        pAhdrCtx->AhdrConfig.tmo_para.DtsLoLit.DarkPdf[i] = LIMIT_VALUE(pCalibDb->ahdr.tmo.LowLight.DarkPdf[i], DARKPDFMAX, DARKPDFMIN) ;
-        pAhdrCtx->AhdrConfig.tmo_para.DtsLoLit.ISO[i] = LIMIT_VALUE(pCalibDb->ahdr.tmo.LowLight.ISO[i], ISOMAX, ISOMIN) ;
-        pAhdrCtx->AhdrConfig.tmo_para.DtsLoLit.DetailsLowLight[i] = LIMIT_VALUE(pCalibDb->ahdr.tmo.LowLight.detailsLowLight[i], IQDETAILSLOWLIGHTMAX, IQDETAILSLOWLIGHTMIN) ;
+        pAhdrCtx->AhdrConfig.tmo_para.DtsLoLit.FocusLuma[i] = LIMIT_VALUE(pCalibDb->ahdr.tmo.LowLight[mode].FocusLuma[i], FOCUSLUMAMAX, FOCUSLUMAMIN) ;
+        pAhdrCtx->AhdrConfig.tmo_para.DtsLoLit.DarkPdf[i] = LIMIT_VALUE(pCalibDb->ahdr.tmo.LowLight[mode].DarkPdf[i], DARKPDFMAX, DARKPDFMIN) ;
+        pAhdrCtx->AhdrConfig.tmo_para.DtsLoLit.ISO[i] = LIMIT_VALUE(pCalibDb->ahdr.tmo.LowLight[mode].ISO[i], ISOMAX, ISOMIN) ;
+        pAhdrCtx->AhdrConfig.tmo_para.DtsLoLit.DetailsLowLight[i] = LIMIT_VALUE(pCalibDb->ahdr.tmo.LowLight[mode].detailsLowLight[i], IQDETAILSLOWLIGHTMAX, IQDETAILSLOWLIGHTMIN) ;
 
-        pAhdrCtx->AhdrConfig.tmo_para.local.DynamicRange[i] = LIMIT_VALUE(pCalibDb->ahdr.tmo.LocalTMO.DynamicRange[i], DYNAMICRANGEMAX, DYNAMICRANGEMIN) ;
-        pAhdrCtx->AhdrConfig.tmo_para.local.EnvLv[i] = LIMIT_VALUE(pCalibDb->ahdr.tmo.LocalTMO.EnvLv[i], ENVLVMAX, ENVLVMIN) ;
-        pAhdrCtx->AhdrConfig.tmo_para.local.LocalTmoStrength[i] = LIMIT_VALUE(pCalibDb->ahdr.tmo.LocalTMO.Strength[i], IQPARAMAX, IQPARAMIN) ;
+        pAhdrCtx->AhdrConfig.tmo_para.local.DynamicRange[i] = LIMIT_VALUE(pCalibDb->ahdr.tmo.LocalTMO[mode].DynamicRange[i], DYNAMICRANGEMAX, DYNAMICRANGEMIN) ;
+        pAhdrCtx->AhdrConfig.tmo_para.local.EnvLv[i] = LIMIT_VALUE(pCalibDb->ahdr.tmo.LocalTMO[mode].EnvLv[i], ENVLVMAX, ENVLVMIN) ;
+        pAhdrCtx->AhdrConfig.tmo_para.local.LocalTmoStrength[i] = LIMIT_VALUE(pCalibDb->ahdr.tmo.LocalTMO[mode].Strength[i], IQPARAMAX, IQPARAMIN) ;
     }
 
     //band prior
     pAhdrCtx->AhdrConfig.tmo_para.global.isHdrGlobalTmo =
-        pCalibDb->ahdr.tmo.GlobaTMO.en == 0 ? false : true;
-    pAhdrCtx->AhdrConfig.tmo_para.global.mode = LIMIT_VALUE(pCalibDb->ahdr.tmo.GlobaTMO.mode, TMOCONTRASTMODEMAX, TMOCONTRASTMODEMIN);
-    pAhdrCtx->AhdrConfig.tmo_para.global.Tolerance = LIMIT_VALUE(pCalibDb->ahdr.tmo.GlobaTMO.Tolerance, TOLERANCEMAX, TOLERANCEMIN);
+        pCalibDb->ahdr.tmo.GlobaTMO[mode].en == 0 ? false : true;
+    pAhdrCtx->AhdrConfig.tmo_para.global.mode = LIMIT_VALUE(pCalibDb->ahdr.tmo.GlobaTMO[mode].mode, TMOCONTRASTMODEMAX, TMOCONTRASTMODEMIN);
+    pAhdrCtx->AhdrConfig.tmo_para.global.Tolerance = LIMIT_VALUE(pCalibDb->ahdr.tmo.GlobaTMO[mode].Tolerance, TOLERANCEMAX, TOLERANCEMIN);
     for(int i = 0; i < 6; i++)
     {
-        pAhdrCtx->AhdrConfig.tmo_para.global.DynamicRange[i] = LIMIT_VALUE(pCalibDb->ahdr.tmo.GlobaTMO.DynamicRange[i], DYNAMICRANGEMAX, DYNAMICRANGEMIN) ;
-        pAhdrCtx->AhdrConfig.tmo_para.global.EnvLv[i] = LIMIT_VALUE(pCalibDb->ahdr.tmo.GlobaTMO.EnvLv[i], ENVLVMAX, ENVLVMIN) ;
-        pAhdrCtx->AhdrConfig.tmo_para.global.GlobalTmoStrength[i] = LIMIT_VALUE(pCalibDb->ahdr.tmo.GlobaTMO.Strength[i], IQPARAMAX, IQPARAMIN) ;
+        pAhdrCtx->AhdrConfig.tmo_para.global.DynamicRange[i] = LIMIT_VALUE(pCalibDb->ahdr.tmo.GlobaTMO[mode].DynamicRange[i], DYNAMICRANGEMAX, DYNAMICRANGEMIN) ;
+        pAhdrCtx->AhdrConfig.tmo_para.global.EnvLv[i] = LIMIT_VALUE(pCalibDb->ahdr.tmo.GlobaTMO[mode].EnvLv[i], ENVLVMAX, ENVLVMIN) ;
+        pAhdrCtx->AhdrConfig.tmo_para.global.GlobalTmoStrength[i] = LIMIT_VALUE(pCalibDb->ahdr.tmo.GlobaTMO[mode].Strength[i], IQPARAMAX, IQPARAMIN) ;
     }
-    pAhdrCtx->AhdrConfig.tmo_para.global.iir = LIMIT_VALUE(pCalibDb->ahdr.tmo.GlobaTMO.iir, IIRMAX, IIRMIN);
+    pAhdrCtx->AhdrConfig.tmo_para.global.iir = LIMIT_VALUE(pCalibDb->ahdr.tmo.GlobaTMO[mode].iir, IIRMAX, IIRMIN);
 
     //linear tmo
     pAhdrCtx->AhdrConfig.tmo_para.isLinearTmoOn =

@@ -23,5 +23,15 @@ XCamReturn
 rk_aiq_uapi_af_Lock(RkAiqAlgoContext *ctx);
 XCamReturn
 rk_aiq_uapi_af_Unlock(const RkAiqAlgoContext *ctx);
+XCamReturn
+rk_aiq_uapi_af_Oneshot(const RkAiqAlgoContext *ctx);
+XCamReturn
+rk_aiq_uapi_af_ManualTriger(const RkAiqAlgoContext *ctx);
+XCamReturn
+rk_aiq_uapi_af_Tracking(const RkAiqAlgoContext *ctx);
+XCamReturn
+rk_aiq_uapi_af_setZoomPos(const RkAiqAlgoContext *ctx, int zoom_pos);
+XCamReturn
+rk_aiq_uapi_af_getSearchPath(const RkAiqAlgoContext *ctx, rk_aiq_af_sec_path_t* path);
 
 #endif

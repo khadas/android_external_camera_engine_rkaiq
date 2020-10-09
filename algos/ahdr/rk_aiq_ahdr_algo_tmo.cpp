@@ -320,7 +320,7 @@ void TmoProcessing
         else
             enDampDtlslowLgt = true;
 
-        int LocalMode = (int)pAhdrCtx->AhdrConfig.tmo_para.local.LocalTmoStrength;
+        int LocalMode = (int)pAhdrCtx->AhdrConfig.tmo_para.local.localtmoMode;
         if(LocalMode == 0) {
             diff = ABS(pAhdrCtx->CurrHandleData.CurrDynamicRange - pAhdrCtx->AhdrPrevData.PreDynamicRange);
             diff = diff / pAhdrCtx->AhdrPrevData.PreDynamicRange;

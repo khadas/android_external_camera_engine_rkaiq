@@ -1102,6 +1102,71 @@ RkAiqAfHandleInt::unlock()
 }
 
 XCamReturn
+RkAiqAfHandleInt::Oneshot()
+{
+    ENTER_ANALYZER_FUNCTION();
+
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+
+    rk_aiq_uapi_af_Oneshot(mAlgoCtx);
+
+    EXIT_ANALYZER_FUNCTION();
+    return ret;
+}
+
+XCamReturn
+RkAiqAfHandleInt::ManualTriger()
+{
+    ENTER_ANALYZER_FUNCTION();
+
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+
+    rk_aiq_uapi_af_ManualTriger(mAlgoCtx);
+
+    EXIT_ANALYZER_FUNCTION();
+    return ret;
+}
+
+XCamReturn
+RkAiqAfHandleInt::Tracking()
+{
+    ENTER_ANALYZER_FUNCTION();
+
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+
+    rk_aiq_uapi_af_Tracking(mAlgoCtx);
+
+    EXIT_ANALYZER_FUNCTION();
+    return ret;
+}
+
+XCamReturn
+RkAiqAfHandleInt::setZoomPos(int zoom_pos)
+{
+    ENTER_ANALYZER_FUNCTION();
+
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+
+    rk_aiq_uapi_af_setZoomPos(mAlgoCtx, zoom_pos);
+
+    EXIT_ANALYZER_FUNCTION();
+    return ret;
+}
+
+XCamReturn
+RkAiqAfHandleInt::GetSearchPath(rk_aiq_af_sec_path_t* path)
+{
+    ENTER_ANALYZER_FUNCTION();
+
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+
+    rk_aiq_uapi_af_getSearchPath(mAlgoCtx, path);
+
+    EXIT_ANALYZER_FUNCTION();
+    return ret;
+}
+
+XCamReturn
 RkAiqAfHandleInt::prepare()
 {
     ENTER_ANALYZER_FUNCTION();
@@ -1112,12 +1177,14 @@ RkAiqAfHandleInt::prepare()
     RKAIQCORE_CHECK_RET(ret, "af handle prepare failed");
 
     RkAiqAlgoConfigAfInt* af_config_int = (RkAiqAlgoConfigAfInt*)mConfig;
+    RkAiqCore::RkAiqAlgosShared_t* shared = &mAiqCore->mAlogsSharedParams;
 
     af_config_int->af_config_com.af_mode = 6;
     af_config_int->af_config_com.win_h_offs = 0;
     af_config_int->af_config_com.win_v_offs = 0;
     af_config_int->af_config_com.win_h_size = 0;
     af_config_int->af_config_com.win_v_size = 0;
+    af_config_int->af_config_com.lens_des = shared->snsDes.lens_des;
 
     RkAiqAlgoDescription* des = (RkAiqAlgoDescription*)mDes;
     ret = des->prepare(mConfig);

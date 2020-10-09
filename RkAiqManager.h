@@ -140,7 +140,7 @@ public:
     XCamReturn init();
     XCamReturn prepare(uint32_t width, uint32_t height, rk_aiq_working_mode_t mode);
     XCamReturn start();
-    XCamReturn stop();
+    XCamReturn stop(bool keep_ext_hw_st = false);
     XCamReturn deInit();
     // from IsppStatsListener
     XCamReturn isppStatsCb(SmartPtr<VideoBuffer>& isppStats);
@@ -162,7 +162,7 @@ public:
     XCamReturn offlineRdJobPrepare();
     XCamReturn offlineRdJobDone();
     XCamReturn setSharpFbcRotation(rk_aiq_rotation_t rot);
-    XCamReturn setMirrorFlip(bool mirror, bool flip);
+    XCamReturn setMirrorFlip(bool mirror, bool flip, int skip_frm_cnt);
     XCamReturn getMirrorFlip(bool& mirror, bool& flip);
     void setDefMirrorFlip();
     XCamReturn swWorkingModeDyn_msg(rk_aiq_working_mode_t mode);

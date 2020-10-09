@@ -686,9 +686,11 @@ V4l2Device::stop ()
         /*     } */
         /*     _queued_bufcnt--; */
         /* } */
-        fini_buffer_pool ();
+        /* fini_buffer_pool (); */
     }
 
+    if (_buf_pool.size() > 0)
+        fini_buffer_pool ();
     return XCAM_RETURN_NO_ERROR;
 }
 
@@ -746,10 +748,10 @@ V4l2Device::allocate_buffer (
     v4l2_buf.index = index;
     v4l2_buf.type = _buf_type;
     v4l2_buf.memory = _memory_type;
-    if (_buf_sync) {
-        v4l2_buf.flags = V4L2_BUF_FLAG_NO_CACHE_INVALIDATE |
-            V4L2_BUF_FLAG_NO_CACHE_CLEAN;
-    }
+    /* if (_buf_sync) { */
+    /*     v4l2_buf.flags = V4L2_BUF_FLAG_NO_CACHE_INVALIDATE | */
+    /*         V4L2_BUF_FLAG_NO_CACHE_CLEAN; */
+    /* } */
 
     if (V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE == _buf_type ||
             V4L2_BUF_TYPE_VIDEO_OUTPUT_MPLANE == _buf_type) {

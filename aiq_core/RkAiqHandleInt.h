@@ -241,6 +241,11 @@ public:
     XCamReturn getAttrib(rk_aiq_af_attrib_t *att);
     XCamReturn lock();
     XCamReturn unlock();
+    XCamReturn Oneshot();
+    XCamReturn ManualTriger();
+    XCamReturn Tracking();
+    XCamReturn setZoomPos(int zoom_pos);
+    XCamReturn GetSearchPath(rk_aiq_af_sec_path_t* path);
 
 protected:
     virtual void init();

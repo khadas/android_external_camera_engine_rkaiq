@@ -37,6 +37,9 @@ public:
     XCamReturn init(int active_num);
     XCamReturn deinit();
     XCamReturn start();
+    void keep_status(bool ks) {
+        _keep_status = ks;
+    };
     XCamReturn stop();
     bool isStrengthAdj() {
         return  _v4l_flash_info[0].fl_strth_adj_enable || _v4l_flash_info[0].tc_strth_adj_enable;}
@@ -69,6 +72,7 @@ private:
     };
 
     struct rk_aiq_v4l_flash_info_s _v4l_flash_info[FLASH_MAX_NUM];
+    bool _keep_status;
 };
 
 }; //namespace RkCam

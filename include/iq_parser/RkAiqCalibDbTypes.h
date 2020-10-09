@@ -842,6 +842,7 @@ typedef struct CalibDb_HdrMerge_s
 
 typedef struct GlobalLuma_s
 {
+    char name[CALIBDB_MAX_MODE_NAME_LENGTH];
     float GlobalLumaMode;
     float envLevel[6];
     float ISO[6];
@@ -851,6 +852,7 @@ typedef struct GlobalLuma_s
 
 typedef struct GDetailsHighLight_s
 {
+    char name[CALIBDB_MAX_MODE_NAME_LENGTH];
     float DetailsHighLightMode;
     float OEPdf[6];
     float EnvLv[6];
@@ -860,6 +862,7 @@ typedef struct GDetailsHighLight_s
 
 typedef struct DetailsLowLight_s
 {
+    char name[CALIBDB_MAX_MODE_NAME_LENGTH];
     float DetailsLowLightMode;
     float FocusLuma[6];
     float DarkPdf[6];
@@ -870,6 +873,7 @@ typedef struct DetailsLowLight_s
 
 typedef struct LocalTMO_s
 {
+    char name[CALIBDB_MAX_MODE_NAME_LENGTH];
     float LocalTMOMode;
     float DynamicRange[6];
     float EnvLv[6];
@@ -879,6 +883,7 @@ typedef struct LocalTMO_s
 
 typedef struct GlobaTMO_s
 {
+    char name[CALIBDB_MAX_MODE_NAME_LENGTH];
     float en;
     float iir;
     float mode;
@@ -891,11 +896,11 @@ typedef struct GlobaTMO_s
 typedef struct CalibDb_HdrTmo_s
 {
     float isLinearTmoOn;
-    GlobalLuma_t luma;
-    DetailsHighLight_t HighLight;
-    DetailsLowLight_t LowLight;
-    LocalTMO_t LocalTMO;
-    GlobaTMO_t GlobaTMO;
+    GlobalLuma_t luma[CALIBDB_MAX_MODE_NUM];
+    DetailsHighLight_t HighLight[CALIBDB_MAX_MODE_NUM];
+    DetailsLowLight_t LowLight[CALIBDB_MAX_MODE_NUM];
+    LocalTMO_t LocalTMO[CALIBDB_MAX_MODE_NUM];
+    GlobaTMO_t GlobaTMO[CALIBDB_MAX_MODE_NUM];
     float damp;
 } CalibDb_HdrTmo_t;
 
@@ -1415,9 +1420,18 @@ typedef struct CalibDb_MFNR_Setting_s {
     struct CalibDb_MFNR_ISO_s mfnr_iso[CALIBDB_NR_SHARP_MAX_ISO_LEVEL];
 } CalibDb_MFNR_Setting_t;
 
+typedef struct CalibDb_MFNR_Dynamic_s {
+    int enable;
+    float lowth_iso;
+    float lowth_time;
+    float highth_iso;
+    float highth_time;
+} CalibDb_MFNR_Dynamic_t;
+
 typedef struct CalibDb_MFNR_ModeCell_s {
     char name[CALIBDB_MAX_MODE_NAME_LENGTH];
     CalibDb_MFNR_Setting_t setting[CALIBDB_NR_SHARP_SETTING_LEVEL];
+    CalibDb_MFNR_Dynamic_t dynamic;
 } CalibDb_MFNR_ModeCell_t;
 
 typedef struct CalibDb_MFNR_s {
@@ -1508,13 +1522,18 @@ typedef struct CalibDb_EdgeFilter_s {
     CalibDb_EdgeFilter_ModeCell_t mode_cell[CALIBDB_MAX_MODE_NUM];
 } CalibDb_EdgeFilter_t;
 
-struct CalibDb_Dehaze_ISO_s {
+struct CalibDb_IIR_setting_s {
+    float stab_fnum;
+    float sigma;
+    float wt_sigma;
+    float air_sigma;
+    float tmax_sigma;
+};
+
+struct CalibDb_Dehaze_Setting_s {
+    char name[CALIBDB_MAX_MODE_NAME_LENGTH];
+    float en;
     float iso[9];
-    unsigned char dehaze_en[9];
-    unsigned char  dc_en[9];
-    unsigned char  hist_en[9];
-    unsigned char  hist_channel[9];
-    unsigned char  gain_en[9];
     float dc_min_th[9];
     float dc_max_th[9];
     float yhist_th[9];
@@ -1528,40 +1547,52 @@ struct CalibDb_Dehaze_ISO_s {
     float tmax_base[9];
     float tmax_off[9];
     float tmax_max[9];
+    float cfg_wt[9];
+    float cfg_air[9];
+    float cfg_tmax[9];
+    float dc_thed[9];
+    float dc_weitcur[9];
+    float dc_bf_h[25];
+    float air_thed[9];
+    float air_weitcur[9];
+    float air_bf_h[9];
+    float gaus_h[9];
+    struct CalibDb_IIR_setting_s IIR_setting;
+};
+
+struct CalibDb_Enhance_Setting_s {
+    char name[CALIBDB_MAX_MODE_NAME_LENGTH];
+    float en;
+    float iso[9];
+    float enhance_value[9];
+};
+
+struct CalibDb_Hist_setting_s {
+    char name[CALIBDB_MAX_MODE_NAME_LENGTH];
+    float en;
+    float iso[9];
+    unsigned char  hist_channel[9];
+    unsigned char  hist_para_en[9];
     float hist_gratio[9];
     float hist_th_off[9];
     float hist_k[9];
     float hist_min[9];
-    unsigned char  enhance_en[9];
-    float enhance_value[9];
-    unsigned char  hist_para_en[9];
     float hist_scale[9];
-    float stab_fnum[9];
-    float sigma[9];
-    float wt_sigma[9];
-    float air_sigma[9];
-    float tmax_sigma[9];
-    float cfg_alpha[9];
-    float cfg_wt[9];
-    float cfg_air[9];
-    float cfg_tmax[9];
     float cfg_gratio[9];
-    float dc_thed[9];
-    float dc_weitcur[9];
-    float air_thed[9];
-    float air_weitcur[9];
-};
-
-typedef struct CalibDb_Dehaze_s {
-    float dc_bf_h[25];
-    float air_bf_h[9];
-    float gaus_h[9];
     float hist_conv_t0[6];
     float hist_conv_t1[6];
     float hist_conv_t2[6];
-    struct CalibDb_Dehaze_ISO_s normal;
-    struct CalibDb_Dehaze_ISO_s hdr;
-    struct CalibDb_Dehaze_ISO_s night;
+};
+
+typedef struct CalibDb_Dehaze_s {
+    float en;
+    float gain_en; //big en
+    float cfg_alpha_normal;
+    float cfg_alpha_hdr;
+    float cfg_alpha_night;
+    struct CalibDb_Dehaze_Setting_s dehaze_setting[CALIBDB_MAX_MODE_NUM];
+    struct CalibDb_Enhance_Setting_s enhance_setting[CALIBDB_MAX_MODE_NUM];
+    struct CalibDb_Hist_setting_s hist_setting[CALIBDB_MAX_MODE_NUM];
 } CalibDb_Dehaze_t;
 
 typedef enum CalibDb_Af_SearchDir_s {
@@ -1611,6 +1642,13 @@ typedef struct CalibDb_Af_Pdaf_s {
     unsigned char enable;
 } CalibDb_Af_Pdaf_t;
 
+typedef struct CalibDb_Af_VcmCfg_s {
+    int start_current;
+    int rated_current;
+    int step_mode;
+    int extra_delay;
+} CalibDb_Af_VcmCfg_t;
+
 typedef struct CalibDb_Af_DefCode_s {
     unsigned char code;
 } CalibDb_Af_DefCode_t;
@@ -1626,6 +1664,7 @@ typedef struct CalibDb_AF_s {
     CalibDb_Af_Contrast_t contrast_af;
     CalibDb_Af_Laser_t laser_af;
     CalibDb_Af_Pdaf_t pdaf;
+    CalibDb_Af_VcmCfg_t vcmcfg;
 } CalibDb_AF_t;
 
 typedef struct CalibDb_ORB_s {

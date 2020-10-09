@@ -193,13 +193,13 @@ rk_aiq_uapi_sysctl_start(const rk_aiq_sys_ctx_t* ctx)
 }
 
 XCamReturn
-rk_aiq_uapi_sysctl_stop(const rk_aiq_sys_ctx_t* ctx)
+rk_aiq_uapi_sysctl_stop(const rk_aiq_sys_ctx_t* ctx, bool keep_ext_hw_st)
 {
     ENTER_XCORE_FUNCTION();
 
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
 
-    ret = ctx->_rkAiqManager->stop();
+    ret = ctx->_rkAiqManager->stop(keep_ext_hw_st);
 
     EXIT_XCORE_FUNCTION();
 

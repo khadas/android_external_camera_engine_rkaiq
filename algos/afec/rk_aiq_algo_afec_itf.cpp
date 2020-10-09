@@ -294,6 +294,16 @@ prepare(RkAiqAlgoCom* params)
 	fecCtx->fecParams.correctY = 1;
 	fecCtx->fecParams.saveMesh4bin = 0;
 	sprintf(fecCtx->fecParams.mesh4binPath, "/tmp/");
+
+    // deinit firtly
+    if (fecCtx->fecParams.mapx)
+        genFecMeshDeInit(fecCtx->fecParams);
+
+    if (fecCtx->meshxi != NULL || fecCtx->meshyi != NULL || \
+        fecCtx->meshxf != NULL || fecCtx->meshyf != NULL)
+        freeFecMesh(fecCtx->meshxi, fecCtx->meshxf,
+                fecCtx->meshyi, fecCtx->meshyf);
+
     genFecMeshInit(fecCtx->src_width, fecCtx->src_height, fecCtx->dst_width,
             fecCtx->dst_height, fecCtx->fecParams, fecCtx->camCoeff);
     mallocFecMesh(fecCtx->fecParams.meshSize4bin, &fecCtx->meshxi,

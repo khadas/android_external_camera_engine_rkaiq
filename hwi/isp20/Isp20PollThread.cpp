@@ -199,7 +199,7 @@ Isp20PollThread::get_value_from_file(const char* path, int& value, uint32_t& fra
     int fp;
 
     fp = open(path, O_RDONLY | O_SYNC);
-    if (fp) {
+    if (fp != -1) {
         if (read(fp, buffer, sizeof(buffer)) <= 0) {
             LOGV_CAMHW_SUBM(ISP20POLL_SUBM, "%s read %s failed!\n", __func__, path);
         } else {
@@ -229,7 +229,7 @@ Isp20PollThread::set_value_to_file(const char* path, int value, uint32_t sequenc
     int fp;
 
     fp = open(path, O_CREAT | O_RDWR | O_SYNC);
-    if (fp) {
+    if (fp != -1) {
         ftruncate(fp, 0);
         lseek(fp, 0, SEEK_SET);
         snprintf(buffer, sizeof(buffer), "%3d %8d\n", _capture_raw_num, sequence);
@@ -394,6 +394,8 @@ Isp20PollThread::Isp20PollThread()
     ,  _capture_raw_type(CAPTURE_RAW_ASYNC)
     , _loop_vain(false)
     , _is_multi_cam_conc(false)
+    , _skip_num(0)
+    , _skip_to_seq(0)
 {
     for (int i = 0; i < 3; i++) {
         SmartPtr<MipiPollThread> mipi_poll = new MipiPollThread(this, ISP_POLL_MIPI_TX, i);
@@ -481,6 +483,7 @@ Isp20PollThread::stop ()
     _isp_hdr_fid2ready_map.clear();
     _hdr_global_tmo_state_map.clear();
     destroy_stop_fds_mipi ();
+    _skip_num = 0;
 
     return PollThread::stop ();
 }
@@ -692,13 +695,17 @@ void Isp20PollThread::sync_tx_buf()
                 _working_mode == RK_AIQ_ISP_HDR_MODE_3_LINE_HDR) &&
                 buf_m.ptr() && buf_l.ptr() && buf_s.ptr() &&
                 sequence_l == sequence_s && sequence_m == sequence_s) {
-            _isp_mipi_rx_infos[ISP_MIPI_HDR_S].cache_list.push(buf_s);
-            _isp_mipi_rx_infos[ISP_MIPI_HDR_M].cache_list.push(buf_m);
-            _isp_mipi_rx_infos[ISP_MIPI_HDR_L].cache_list.push(buf_l);
 
             _isp_mipi_tx_infos[ISP_MIPI_HDR_S].buf_list.erase(buf_s);
             _isp_mipi_tx_infos[ISP_MIPI_HDR_M].buf_list.erase(buf_m);
             _isp_mipi_tx_infos[ISP_MIPI_HDR_L].buf_list.erase(buf_l);
+            if (check_skip_frame(sequence_s)) {
+                LOGW_CAMHW_SUBM(ISP20POLL_SUBM,"skip frame %d", sequence_s);
+                goto end;
+            }
+            _isp_mipi_rx_infos[ISP_MIPI_HDR_S].cache_list.push(buf_s);
+            _isp_mipi_rx_infos[ISP_MIPI_HDR_M].cache_list.push(buf_m);
+            _isp_mipi_rx_infos[ISP_MIPI_HDR_L].cache_list.push(buf_l);
             _mipi_trigger_mutex.lock();
             _isp_hdr_fid2ready_map[sequence_s] = true;
             _mipi_trigger_mutex.unlock();
@@ -707,19 +714,26 @@ void Isp20PollThread::sync_tx_buf()
         } else if ((_working_mode == RK_AIQ_ISP_HDR_MODE_2_FRAME_HDR ||
                     _working_mode == RK_AIQ_ISP_HDR_MODE_2_LINE_HDR) &&
                    buf_m.ptr() && buf_s.ptr() && sequence_m == sequence_s) {
-            _isp_mipi_rx_infos[ISP_MIPI_HDR_S].cache_list.push(buf_s);
-            _isp_mipi_rx_infos[ISP_MIPI_HDR_M].cache_list.push(buf_m);
-
             _isp_mipi_tx_infos[ISP_MIPI_HDR_S].buf_list.erase(buf_s);
             _isp_mipi_tx_infos[ISP_MIPI_HDR_M].buf_list.erase(buf_m);
+            if (check_skip_frame(sequence_s)) {
+                LOGW_CAMHW_SUBM(ISP20POLL_SUBM,"skip frame %d", sequence_s);
+                goto end;
+            }
+            _isp_mipi_rx_infos[ISP_MIPI_HDR_S].cache_list.push(buf_s);
+            _isp_mipi_rx_infos[ISP_MIPI_HDR_M].cache_list.push(buf_m);
             _mipi_trigger_mutex.lock();
             _isp_hdr_fid2ready_map[sequence_s] = true;
             _mipi_trigger_mutex.unlock();
             LOGD_CAMHW_SUBM(ISP20POLL_SUBM, "trigger readback %d", sequence_s);
             trigger_readback();
         } else if (_working_mode == RK_AIQ_WORKING_MODE_NORMAL) {
-            _isp_mipi_rx_infos[ISP_MIPI_HDR_S].cache_list.push(buf_s);
             _isp_mipi_tx_infos[ISP_MIPI_HDR_S].buf_list.erase(buf_s);
+            if (check_skip_frame(sequence_s)) {
+                LOGW_CAMHW_SUBM(ISP20POLL_SUBM,"skip frame %d", sequence_s);
+                goto end;
+            }
+            _isp_mipi_rx_infos[ISP_MIPI_HDR_S].cache_list.push(buf_s);
             _mipi_trigger_mutex.lock();
             _isp_hdr_fid2ready_map[sequence_s] = true;
             _mipi_trigger_mutex.unlock();
@@ -730,6 +744,7 @@ void Isp20PollThread::sync_tx_buf()
                             sequence_l, sequence_s, sequence_m);
         }
     }
+end:
     _mipi_buf_mutex.unlock();
 }
 
@@ -1336,4 +1351,44 @@ Isp20PollThread::set_hdr_global_tmo_mode(int frame_id, bool mode)
     _hdr_global_tmo_state_map[frame_id] = mode;
     _mipi_trigger_mutex.unlock();
 }
+
+void Isp20PollThread::skip_frames(int skip_num, int32_t skip_seq)
+{
+    _mipi_trigger_mutex.lock();
+    _skip_num = skip_num;
+    _skip_to_seq = skip_seq + _skip_num;
+    _mipi_trigger_mutex.unlock();
+}
+
+bool Isp20PollThread::check_skip_frame(int32_t buf_seq)
+{
+    _mipi_trigger_mutex.lock();
+#if 0 // ts
+    if (_skip_num > 0) {
+        int64_t skip_ts_ms = _skip_start_ts / 1000 / 1000;
+        int64_t buf_ts_ms = buf_ts / 1000;
+        LOGD_CAMHW_SUBM(ISP20POLL_SUBM, "skip num  %d, start from %" PRId64 " ms,  buf ts %" PRId64 " ms",
+             _skip_num,
+             skip_ts_ms,
+             buf_ts_ms);
+        if (buf_ts_ms  > skip_ts_ms) {
+            _skip_num--;
+            _mipi_trigger_mutex.unlock();
+            return true;
+        }
+    }
+#else
+
+    if ((_skip_num > 0) && (buf_seq < _skip_to_seq)) {
+        LOGD_CAMHW_SUBM(ISP20POLL_SUBM, "skip num  %d, skip seq %d, dest seq %d",
+             _skip_num, buf_seq, _skip_to_seq);
+        _skip_num--;
+        _mipi_trigger_mutex.unlock();
+        return true;
+    }
+#endif
+    _mipi_trigger_mutex.unlock();
+    return false;
+}
+
 }; //namspace RkCam

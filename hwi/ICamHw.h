@@ -82,6 +82,7 @@ public:
     virtual XCamReturn stop() = 0;
     virtual XCamReturn pause() = 0;
     virtual XCamReturn resume() = 0;
+    virtual void keepHwStAtStop(bool ks) = 0;
     virtual XCamReturn swWorkingModeDyn(int mode) = 0;
     virtual XCamReturn getSensorModeData(const char* sns_ent_name,
                                          rk_aiq_exposure_sensor_descriptor& sns_des) = 0;
@@ -104,8 +105,11 @@ public:
     virtual XCamReturn enqueueBuffer(struct rk_aiq_vbuf *vbuf) = 0;
     virtual XCamReturn offlineRdJobPrepare() = 0;
     virtual XCamReturn offlineRdJobDone() = 0;
-    virtual XCamReturn setSensorFlip(bool mirror, bool flip) = 0;
+    virtual XCamReturn setSensorFlip(bool mirror, bool flip, int skip_frm_cnt) = 0;
     virtual XCamReturn getSensorFlip(bool& mirror, bool& flip) = 0;
+    virtual XCamReturn getZoomPosition(int& position) = 0;
+    virtual XCamReturn getLensVcmCfg(rk_aiq_lens_vcmcfg& lens_cfg) = 0;
+    virtual XCamReturn setLensVcmCfg(rk_aiq_lens_vcmcfg& lens_cfg) = 0;
 private:
     XCAM_DEAD_COPY (ICamHw);
 };

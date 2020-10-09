@@ -678,6 +678,7 @@ RkAiqCore::genIspAfResult(RkAiqFullParams* params)
 
     isp_param->af_cfg_update = false;
     focus_param->lens_pos_valid = false;
+    focus_param->zoom_pos_valid = false;
     if (!af_com) {
         LOGD_ANALYZER("no af result");
         return XCAM_RETURN_NO_ERROR;
@@ -696,7 +697,9 @@ RkAiqCore::genIspAfResult(RkAiqFullParams* params)
         isp_param->af_cfg_update = af_rk->af_proc_res_com.af_cfg_update;
 
         focus_param->next_lens_pos = af_rk->af_proc_res_com.af_focus_param.next_lens_pos;
-        focus_param->lens_pos_valid = true;
+        focus_param->next_zoom_pos = af_rk->af_proc_res_com.af_focus_param.next_zoom_pos;
+        focus_param->lens_pos_valid = af_rk->af_proc_res_com.af_focus_param.lens_pos_valid;
+        focus_param->zoom_pos_valid = af_rk->af_proc_res_com.af_focus_param.zoom_pos_valid;
     }
 
     EXIT_ANALYZER_FUNCTION();
@@ -2308,6 +2311,8 @@ RkAiqCore::convertIspstatsToAlgo(const SmartPtr<VideoBuffer> &buffer)
         if(afParams.ptr()) {
             mAlogsSharedParams.ispStats.af_stats.focus_endtim = afParams->data()->focusEndTim;
             mAlogsSharedParams.ispStats.af_stats.focus_starttim = afParams->data()->focusStartTim;
+            mAlogsSharedParams.ispStats.af_stats.zoom_endtim = afParams->data()->zoomEndTim;
+            mAlogsSharedParams.ispStats.af_stats.zoom_starttim = afParams->data()->zoomStartTim;
             mAlogsSharedParams.ispStats.af_stats.sof_tim = afParams->data()->sofTime;
         }
     }

@@ -495,6 +495,10 @@ XCamReturn AlscConfig
 
     LOGD_ALSC("%s: updateAtt: %d\n", __FUNCTION__, hAlsc->updateAtt);
     hAlsc->alscRest.caseIndex = USED_FOR_CASE_NORMAL;
+    if((hAlsc->alscSwInfo.grayMode == true && hAlsc->alscRest.caseIndex != USED_FOR_CASE_GRAY)||
+        (hAlsc->alscSwInfo.grayMode == false && hAlsc->alscRest.caseIndex == USED_FOR_CASE_GRAY)){
+        ClearList(&hAlsc->alscRest.dominateIlluList);
+    }
     if(hAlsc->alscSwInfo.grayMode){
         hAlsc->alscRest.caseIndex = USED_FOR_CASE_GRAY;
     }

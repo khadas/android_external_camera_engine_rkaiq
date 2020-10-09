@@ -85,10 +85,11 @@ rk_aiq_uapi_sysctl_start(const rk_aiq_sys_ctx_t* ctx);
  * \brief stop aiq control system
  *
  * \param[in] ctx             the context returned by \ref rk_aiq_uapi_sysctl_init
+ * \param[in] keep_ext_hw_st  do not change external devices status, like ircut/cpsl
  * \return return 0 if success
  */
 XCamReturn
-rk_aiq_uapi_sysctl_stop(const rk_aiq_sys_ctx_t* ctx);
+rk_aiq_uapi_sysctl_stop(const rk_aiq_sys_ctx_t* ctx, bool keep_ext_hw_st);
 
 XCamReturn
 rk_aiq_uapi_sysctl_getStaticMetas(const char* sns_ent_name, rk_aiq_static_info_t* static_info);
