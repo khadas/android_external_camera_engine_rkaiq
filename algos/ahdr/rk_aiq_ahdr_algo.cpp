@@ -840,7 +840,7 @@ void AhdrApiOnUpdate
             pAhdrCtx->CurrHandleData.CurrTmoHandleData.DetailsHighLight = LIMIT_VALUE(pAhdrCtx->CurrHandleData.CurrTmoHandleData.DetailsHighLight
                     , DETAILSHIGHLIGHTMAX, DETAILSHIGHLIGHTMIN);
 
-            pAhdrCtx->CurrHandleData.CurrTmoHandleData.LocalTmoStrength = pAhdrCtx->hdrAttr.stManual.stTmoManual.stTmoContrast;
+            pAhdrCtx->CurrHandleData.CurrTmoHandleData.LocalTmoStrength = pAhdrCtx->hdrAttr.stManual.stTmoManual.stLocalTMOStrength;
             pAhdrCtx->CurrHandleData.CurrTmoHandleData.LocalTmoStrength = LIMIT_VALUE(pAhdrCtx->CurrHandleData.CurrTmoHandleData.LocalTmoStrength
                     , TMOCONTRASTMAX, TMOCONTRASTMIN);
 
@@ -853,7 +853,7 @@ void AhdrApiOnUpdate
             pAhdrCtx->CurrHandleData.CurrTmoHandleData.GlobeMaxLuma = LIMIT_VALUE(pAhdrCtx->CurrHandleData.CurrTmoHandleData.GlobeMaxLuma,
                     GLOBEMAXLUMAMAX, GLOBEMAXLUMAMIN);
 
-            pAhdrCtx->CurrHandleData.CurrTmoHandleData.GlobalTmoStrength = LIMIT_VALUE(pAhdrCtx->hdrAttr.stManual.stTmoManual.stBandPriorStrength,
+            pAhdrCtx->CurrHandleData.CurrTmoHandleData.GlobalTmoStrength = LIMIT_VALUE(pAhdrCtx->hdrAttr.stManual.stTmoManual.stGlobalTMOStrength,
                     1, 0);
 
             pAhdrCtx->CurrHandleData.TmoDamp = pAhdrCtx->hdrAttr.stManual.stTmoManual.damp;

@@ -57,6 +57,20 @@ typedef struct RKAiqAfInfoWrapper_s {
     int64_t sofTime;
 } RKAiqAfInfoWrapper_t;
 
+typedef struct RkAiqPirisInfoWrapper_s {
+    int             step;
+    int             laststep;
+    bool            update;
+    struct timeval  StartTim;
+    struct timeval  EndTim;
+} RkAiqPirisInfoWrapper_t;
+
+typedef struct RkAiqIrisInfoWrapper_s {
+    RkAiqPirisInfoWrapper_t   PIris;
+    RkAiqDCIrisParam_t        DCIris;
+    uint64_t                  sofTime;
+} RkAiqIrisInfoWrapper_t;
+
 typedef struct RKAiqCpslInfoWrapper_s {
     rk_aiq_flash_setting_t fl;
     bool update_fl;
@@ -67,9 +81,12 @@ typedef struct RKAiqCpslInfoWrapper_s {
 
 typedef RKAiqAecExpInfoWrapper_t rk_aiq_exposure_params_wrapper_t;
 typedef RKAiqAfInfoWrapper_t rk_aiq_af_info_wrapper_t;
+typedef RkAiqIrisInfoWrapper_t rk_aiq_iris_params_wrapper_t;
 
 typedef SharedItemPool<rk_aiq_exposure_params_wrapper_t> RkAiqExpParamsPool;
 typedef SharedItemProxy<rk_aiq_exposure_params_wrapper_t> RkAiqExpParamsProxy;
+typedef SharedItemPool<rk_aiq_iris_params_wrapper_t> RkAiqIrisParamsPool;
+typedef SharedItemProxy<rk_aiq_iris_params_wrapper_t> RkAiqIrisParamsProxy;
 typedef SharedItemPool<rk_aiq_af_info_wrapper_t> RkAiqAfInfoPool;
 typedef SharedItemProxy<rk_aiq_af_info_wrapper_t> RkAiqAfInfoProxy;
 typedef SharedItemPool<rk_aiq_isp_params_t> RkAiqIspParamsPool;
@@ -88,6 +105,7 @@ public:
         , mIspParams(NULL)
         , mIsppParams(NULL)
         , mFocusParams(NULL)
+        , mIrisParams(NULL)
         , mCpslParams(NULL) {
     };
     ~RkAiqFullParams() {};
@@ -97,12 +115,14 @@ public:
         mIspParams.release();
         mIsppParams.release();
         mFocusParams.release();
+        mIrisParams.release();
         mCpslParams.release();
     };
     SmartPtr<RkAiqExpParamsProxy> mExposureParams;
     SmartPtr<RkAiqIspParamsProxy> mIspParams;
     SmartPtr<RkAiqIsppParamsProxy> mIsppParams;
     SmartPtr<RkAiqFocusParamsProxy> mFocusParams;
+    SmartPtr<RkAiqIrisParamsProxy> mIrisParams;
     SmartPtr<RkAiqCpslParamsProxy> mCpslParams;
 
 private:

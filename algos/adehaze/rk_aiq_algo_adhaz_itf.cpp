@@ -68,13 +68,6 @@ prepare(RkAiqAlgoCom* params)
 
     AdehazeHandle->working_mode = config->adhaz_config_com.com.u.prepare.working_mode;
 
-    if (config->rk_com.u.proc.gray_mode)
-        AdehazeHandle->Dehaze_ISO_mode = DEHAZE_NIGHT;
-    else if (DEHAZE_NORMAL == AdehazeHandle->working_mode)
-        AdehazeHandle->Dehaze_ISO_mode = DEHAZE_NORMAL;
-    else
-        AdehazeHandle->Dehaze_ISO_mode = DEHAZE_HDR;
-
     //TO DO
 //    iso = 50;
 //    ret = AdehazeConfig(calib_dehaze, AdehazeHandle, iso, AdehazeHandle->Dehaze_ISO_mode);
@@ -86,6 +79,17 @@ prepare(RkAiqAlgoCom* params)
 static XCamReturn
 pre_process(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outparams)
 {
+    RkAiqAlgoConfigAdhazInt* config = (RkAiqAlgoConfigAdhazInt*)inparams;
+    AdehazeHandle_t * AdehazeHandle = (AdehazeHandle_t *)inparams->ctx;
+
+    LOGE_ADEHAZE("gray_mode=%d\n", config->rk_com.u.proc.gray_mode);
+    if (config->rk_com.u.proc.gray_mode)
+        AdehazeHandle->Dehaze_ISO_mode = DEHAZE_NIGHT;
+    else if (DEHAZE_NORMAL == AdehazeHandle->working_mode)
+        AdehazeHandle->Dehaze_ISO_mode = DEHAZE_NORMAL;
+    else
+        AdehazeHandle->Dehaze_ISO_mode = DEHAZE_HDR;
+
     return XCAM_RETURN_NO_ERROR;
 }
 
@@ -147,7 +151,7 @@ processing(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outparams)
 
     iso = stExpInfo.arIso[stExpInfo.hdr_mode];
 
-    LOGD_ADEHAZE("hdr_mode=%d,iso=%d\n", stExpInfo.hdr_mode, iso);
+    LOGD_ADEHAZE("hdr_mode=%d,iso=%d Scene mode =%d\n", stExpInfo.hdr_mode, iso, AdehazeHandle->Dehaze_ISO_mode);
     ret = AdehazeProcess(AdehazeHandle, iso, AdehazeHandle->Dehaze_ISO_mode);
     memcpy(&procResPara->adhaz_config, &AdehazeHandle->adhaz_config, sizeof(rk_aiq_dehaze_cfg_t));
     return ret;

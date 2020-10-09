@@ -363,6 +363,7 @@ private:
     SmartPtr<RkAiqFullParamsPool> mAiqParamsPool;
     SmartPtr<RkAiqFullParamsProxy> mAiqCurParams;
     SmartPtr<RkAiqExpParamsPool> mAiqExpParamsPool;
+    SmartPtr<RkAiqIrisParamsPool> mAiqIrisParamsPool;
     SmartPtr<RkAiqIspParamsPool> mAiqIspParamsPool;
     SmartPtr<RkAiqIsppParamsPool> mAiqIsppParamsPool;
     SmartPtr<RkAiqFocusParamsPool> mAiqFocusParamsPool;

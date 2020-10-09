@@ -107,6 +107,12 @@ CamHwBase::setExposureParams(SmartPtr<RkAiqExpParamsProxy>& expPar)
 }
 
 XCamReturn
+CamHwBase::setIrisParams(SmartPtr<RkAiqIrisParamsProxy>& irisPar, CalibDb_IrisType_t irisType)
+{
+    return XCAM_RETURN_NO_ERROR;
+}
+
+XCamReturn
 CamHwBase::setFocusParams(SmartPtr<RkAiqFocusParamsProxy>& focus_params)
 {
     return XCAM_RETURN_NO_ERROR;

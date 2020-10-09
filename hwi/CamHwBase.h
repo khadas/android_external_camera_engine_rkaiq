@@ -59,6 +59,7 @@ public:
                                          rk_aiq_exposure_sensor_descriptor& sns_des);
     virtual XCamReturn setIspParams(SmartPtr<RkAiqIspParamsProxy>& ispParams);
     virtual XCamReturn setExposureParams(SmartPtr<RkAiqExpParamsProxy>& expPar);
+    virtual XCamReturn setIrisParams(SmartPtr<RkAiqIrisParamsProxy>& irisPar, CalibDb_IrisType_t irisType);
     virtual XCamReturn setFocusParams(SmartPtr<RkAiqFocusParamsProxy>& focus_params);
     virtual XCamReturn setCpslParams(SmartPtr<RkAiqCpslParamsProxy>& cpsl_params);
     virtual XCamReturn setIsppParams(SmartPtr<RkAiqIsppParamsProxy>& isppParams);
@@ -76,7 +77,7 @@ public:
         return  XCAM_RETURN_ERROR_FAILED;
     }
     virtual XCamReturn capture_raw_ctl(capture_raw_t type, int count = 0,
-                                       const char* capture_dir = nullptr,\
+                                       const char* capture_dir = nullptr, \
                                        char* output_dir = nullptr) {
         return  XCAM_RETURN_ERROR_FAILED;
     }

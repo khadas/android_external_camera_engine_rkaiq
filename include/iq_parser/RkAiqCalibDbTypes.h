@@ -106,6 +106,13 @@ typedef enum _CalibDb_AntiFlickerMode_e {
     AEC_ANTIFLICKER_AUTO_MODE = 1,
 } CalibDb_AntiFlickerMode_t;
 
+typedef enum _CalibDb_IrisType_e {
+    IRIS_DC_TYPE = 0,
+    IRIS_P_TYPE = 1,
+    IRIS_INVALID_TYPE,
+} CalibDb_IrisType_t;
+
+
 /*****************************************************************************/
 /**
  * @brief   Enumeration type to configure CamerIC ISP exposure measuring mode.
@@ -155,7 +162,7 @@ typedef struct CalibDb_LinAeRoute_Attr_s {
     float                    TimeDot[AEC_ROUTE_MAX_NODES];
     float                    GainDot[AEC_ROUTE_MAX_NODES];
     float                    IspgainDot[AEC_ROUTE_MAX_NODES];
-    float                    PIrisDot[AEC_ROUTE_MAX_NODES];
+    int                      PIrisGainDot[AEC_ROUTE_MAX_NODES];
     int                      array_size;
 } CalibDb_LinAeRoute_Attr_t;
 
@@ -164,7 +171,7 @@ typedef struct CalibDb_HdrAeRoute_Attr_s {
     float                    HdrTimeDot[3][AEC_ROUTE_MAX_NODES];
     float                    HdrGainDot[3][AEC_ROUTE_MAX_NODES];
     float                    HdrIspDGainDot[3][AEC_ROUTE_MAX_NODES];
-    float                    PIrisDot[AEC_ROUTE_MAX_NODES];
+    int                      PIrisGainDot[AEC_ROUTE_MAX_NODES];
     int                      array_size;
 } CalibDb_HdrAeRoute_Attr_t;
 
@@ -223,7 +230,8 @@ typedef struct CalibDb_LinExpInitExp_s {
     float                   InitTimeValue;
     float                   InitGainValue;
     float                   InitIspDGainValue;
-    float                   InitPIrisValue;
+    int                     InitPIrisGainValue;
+    int                     InitDCIrisDutyValue;
     int                     array_size;
 } CalibDb_LinExpInitExp_t;
 
@@ -231,7 +239,8 @@ typedef struct CalibDb_HdrExpInitExp_s {
     Cam3x1FloatMatrix_t     InitTimeValue;
     Cam3x1FloatMatrix_t     InitGainValue;
     Cam3x1FloatMatrix_t     InitIspDGainValue;
-    float                   InitPIrisValue;
+    int                     InitPIrisGainValue;
+    int                     InitDCIrisDutyValue;
     int                     array_size;
 } CalibDb_HdrExpInitExp_t;
 
@@ -259,22 +268,24 @@ typedef struct CalibDb_LinMeAttr_s {
     bool                 ManualTimeEn;
     bool                 ManualGainEn;
     bool                 ManualIspDgainEn;
-    bool                 ManualPIrisEn;
+    bool                 ManualIrisEn;
     float                TimeValue;
     float                GainValue;
     float                IspDGainValue;
-    float                PIrisValue;
+    int                  PIrisGainValue;
+    int                  DCIrisValue;
 } CalibDb_LinMeAttr_t;
 
 typedef struct CalibDb_HdrMeAttr_s {
     bool                    ManualTimeEn;
     bool                    ManualGainEn;
     bool                    ManualIspDgainEn;
-    bool                    ManualPIrisEn;
+    bool                    ManualIrisEn;
     Cam3x1FloatMatrix_t     TimeValue;
     Cam3x1FloatMatrix_t     GainValue;
     Cam3x1FloatMatrix_t     IspDGainValue;
-    float                   PIrisValue;
+    int                     PIrisGainValue;
+    int                     DCIrisValue;
 } CalibDb_HdrMeAttr_t;
 
 typedef struct CalibDb_MeAttr_s {
@@ -309,6 +320,60 @@ typedef struct CalibDb_DNSwitch_Attr_s {
     CalibDb_IRNightMode_t       stIRNightMode;
 } CalibDb_DNSwitch_Attr_t;
 
+//Aec-Sync-Test used for debug
+#define AEC_ALTER_EXP_MAX_NUM (10)
+
+typedef struct CalibDb_LinAlterExp_s {
+    float                    TimeValue[AEC_ALTER_EXP_MAX_NUM];
+    float                    GainValue[AEC_ALTER_EXP_MAX_NUM];
+    float                    IspgainValue[AEC_ALTER_EXP_MAX_NUM];
+    int                      PIrisGainValue[AEC_ALTER_EXP_MAX_NUM];
+    int                      DcgMode[AEC_ALTER_EXP_MAX_NUM];
+    int                      array_size;
+} CalibDb_LinAlterExp_t;
+
+typedef struct CalibDb_HdrAlterExp_s {
+    float                    TimeValue[AEC_ALTER_EXP_MAX_NUM][3];
+    float                    GainValue[AEC_ALTER_EXP_MAX_NUM][3];
+    float                    IspDGainValue[AEC_ALTER_EXP_MAX_NUM][3];
+    int                      PIrisGainValue[AEC_ALTER_EXP_MAX_NUM];
+    int                      DcgMode[AEC_ALTER_EXP_MAX_NUM][3];
+    int                      array_size;
+} CalibDb_HdrAlterExp_t;
+
+typedef struct CalibDb_AeSyncTest_s {
+    uint8_t                     enable;
+    int                         IntervalFrm;
+    CalibDb_LinAlterExp_t       LinAlterExp;
+    CalibDb_HdrAlterExp_t       HdrAlterExp;
+} CalibDb_AeSyncTest_t;
+
+//AecIrisCtrl
+#define AEC_PIRIS_STAP_TABLE_MAX (1024)
+typedef struct CalibDb_PIris_Attr_s {
+    uint16_t              TotalStep;
+    uint16_t              EffcStep;
+    bool                  ZeroIsMax;
+    uint16_t              StepTable[AEC_PIRIS_STAP_TABLE_MAX];
+} CalibDb_PIris_Attr_t;
+
+typedef struct CalibDb_DCIris_Attr_s {
+    float       Kp;
+    float       Ki;
+    float       Kd;
+    int         MinPwmDuty;
+    int         MaxPwmDuty;
+    int         OpenPwmDuty;
+    int         ClosePwmDuty;
+} CalibDb_DCIris_Attr_t;
+
+typedef struct CalibDb_AecIrisCtrl_s {
+    uint8_t                     enable;
+    CalibDb_IrisType_t          IrisType;
+    CalibDb_PIris_Attr_t        PIrisAttr;
+    CalibDb_DCIris_Attr_t       DCIrisAttr;
+} CalibDb_AecIrisCtrl_t;
+
 typedef struct CalibDb_AecCommon_Attr_s {
     uint8_t                          enable;
     uint8_t                          AecRunInterval;
@@ -319,6 +384,10 @@ typedef struct CalibDb_AecCommon_Attr_s {
     //GridWeight
     Cam5x5UCharMatrix_t              DayGridWeights;
     Cam5x5UCharMatrix_t              NightGridWeights;
+
+    CalibDb_AecIrisCtrl_t            stIris;
+
+    CalibDb_AeSyncTest_t             stSyncTest;
     //envlv calibration
     CalibDb_AeEnvLvCalib_t           stEnvLvCalib;
     //antiflicker

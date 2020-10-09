@@ -265,6 +265,7 @@ typedef struct _RkAiqAlgoPostAeInt {
 
 typedef struct _RkAiqAlgoPostResAeInt {
     RkAiqAlgoPostResAe ae_post_res_com;
+    AecPostResult_t    ae_post_res_rk;
 } RkAiqAlgoPostResAeInt;
 
 //Awb

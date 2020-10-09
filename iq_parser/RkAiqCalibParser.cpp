@@ -4210,6 +4210,218 @@ bool RkAiqCalibParser::parseEntrySensorAwbRemosaicPara
     return (true);
 }
 
+bool RkAiqCalibParser::parseEntrySensorAecLinAlterExp
+(
+    const XMLElement*   pelement,
+    void*                param
+) {
+    LOGD("%s(%d): (enter)\n", __FUNCTION__, __LINE__);
+
+    XML_CHECK_START(CALIB_SENSOR_AEC_SYNCTEST_LINALTEREXP_TAG_ID, CALIB_SENSOR_AEC_SYNCTEST_ALTEREXP_TAG_ID);
+
+    int index = *((int*)param);
+    const XMLNode* pchild = pelement->FirstChild();
+
+    while (pchild) {
+        XmlTag tag = XmlTag(pchild->ToElement());
+        std::string Tagname(pchild->ToElement()->Name());
+        XML_CHECK_WHILE_SUBTAG_MARK((char *)(Tagname.c_str()), tag.Type(), tag.Size());
+#ifdef DEBUG_LOG
+        redirectOut << "Tagname: " << Tagname << ",index:" << index << std::endl;
+#endif
+        DCT_ASSERT((index < AEC_ALTER_EXP_MAX_NUM));
+
+        if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_AEC_SYNCTEST_TIMEVALUE_TAG_ID)) {
+            int no = ParseFloatArray(pchild, &mCalibDb->aec.CommCtrl.stSyncTest.LinAlterExp.TimeValue[index], tag.Size());
+            DCT_ASSERT((no == tag.Size()));
+        }
+        else if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_AEC_SYNCTEST_GAINVALUE_TAG_ID)) {
+            int no = ParseFloatArray(pchild, &mCalibDb->aec.CommCtrl.stSyncTest.LinAlterExp.GainValue[index], tag.Size());
+            DCT_ASSERT((no == tag.Size()));
+        }
+        else if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_AEC_SYNCTEST_ISPGAINVALUE_TAG_ID)) {
+            int no = ParseFloatArray(pchild, &mCalibDb->aec.CommCtrl.stSyncTest.LinAlterExp.IspgainValue[index], tag.Size());
+            DCT_ASSERT((no == tag.Size()));
+        }
+        else if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_AEC_SYNCTEST_DCGMODE_TAG_ID)) {
+            int no = ParseIntArray(pchild, &mCalibDb->aec.CommCtrl.stSyncTest.LinAlterExp.DcgMode[index], tag.Size());
+            DCT_ASSERT((no == tag.Size()));
+        }
+        else if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_AEC_SYNCTEST_PIRISVALUE_TAG_ID)) {
+            int no = ParseIntArray(pchild, &mCalibDb->aec.CommCtrl.stSyncTest.LinAlterExp.PIrisGainValue[index], tag.Size());
+            DCT_ASSERT((no == tag.Size()));
+        }
+        else {
+            redirectOut
+                    << "parse error in LinAlterExp (unknow tag: "
+                    << Tagname
+                    << ")"
+                    << std::endl;
+        }
+        pchild = pchild->NextSibling();
+    }
+    XML_CHECK_END();
+    mCalibDb->aec.CommCtrl.stSyncTest.LinAlterExp.array_size = index + 1;
+    LOGD("%s(%d): (exit)\n", __FUNCTION__, __LINE__);
+    return (true);
+}
+
+
+bool RkAiqCalibParser::parseEntrySensorAecHdrAlterExp
+(
+    const XMLElement*   pelement,
+    void*                param
+) {
+    LOGD("%s(%d): (enter)\n", __FUNCTION__, __LINE__);
+
+    XML_CHECK_START(CALIB_SENSOR_AEC_SYNCTEST_HDRALTEREXP_TAG_ID, CALIB_SENSOR_AEC_SYNCTEST_ALTEREXP_TAG_ID);
+
+    int index = *((int*)param);
+    const XMLNode* pchild = pelement->FirstChild();
+
+    while (pchild) {
+        XmlTag tag = XmlTag(pchild->ToElement());
+        std::string Tagname(pchild->ToElement()->Name());
+        XML_CHECK_WHILE_SUBTAG_MARK((char *)(Tagname.c_str()), tag.Type(), tag.Size());
+#ifdef DEBUG_LOG
+        redirectOut << "Tagname: " << Tagname << ",index:" << index << std::endl;
+#endif
+        DCT_ASSERT((index < AEC_ALTER_EXP_MAX_NUM));
+
+        if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_AEC_SYNCTEST_TIMEVALUE_TAG_ID)) {
+            int no = ParseFloatArray(pchild, mCalibDb->aec.CommCtrl.stSyncTest.HdrAlterExp.TimeValue[index], tag.Size());
+            DCT_ASSERT((no == tag.Size()));
+        }
+        else if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_AEC_SYNCTEST_GAINVALUE_TAG_ID)) {
+            int no = ParseFloatArray(pchild, mCalibDb->aec.CommCtrl.stSyncTest.HdrAlterExp.GainValue[index], tag.Size());
+            DCT_ASSERT((no == tag.Size()));
+        }
+        else if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_AEC_SYNCTEST_ISPGAINVALUE_TAG_ID)) {
+            int no = ParseFloatArray(pchild, mCalibDb->aec.CommCtrl.stSyncTest.HdrAlterExp.IspDGainValue[index], tag.Size());
+            DCT_ASSERT((no == tag.Size()));
+        }
+        else if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_AEC_SYNCTEST_DCGMODE_TAG_ID)) {
+            int no = ParseIntArray(pchild, mCalibDb->aec.CommCtrl.stSyncTest.HdrAlterExp.DcgMode[index], tag.Size());
+            DCT_ASSERT((no == tag.Size()));
+        }
+        else if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_AEC_SYNCTEST_PIRISVALUE_TAG_ID)) {
+            int no = ParseIntArray(pchild, &mCalibDb->aec.CommCtrl.stSyncTest.HdrAlterExp.PIrisGainValue[index], tag.Size());
+            DCT_ASSERT((no == tag.Size()));
+        }
+        else {
+            redirectOut
+                    << "parse error in HdrAlterExp (unknow tag: "
+                    << Tagname
+                    << ")"
+                    << std::endl;
+        }
+        pchild = pchild->NextSibling();
+    }
+    XML_CHECK_END();
+    mCalibDb->aec.CommCtrl.stSyncTest.HdrAlterExp.array_size = index + 1;
+    LOGD("%s(%d): (exit)\n", __FUNCTION__, __LINE__);
+    return (true);
+}
+
+bool RkAiqCalibParser::parseEntrySensorAecAlterExp
+(
+    const XMLElement*   pelement,
+    void*                param
+) {
+    LOGD("%s(%d): (enter)\n", __FUNCTION__, __LINE__);
+    autoTabForward();
+
+    XML_CHECK_START(CALIB_SENSOR_AEC_SYNCTEST_ALTEREXP_TAG_ID, CALIB_SENSOR_AEC_SYNCTEST_TAG_ID);
+
+#ifdef DEBUG_LOG
+    LOGE("%s(%d): Tagname = %s\n", __FUNCTION__, __LINE__, pelement->Name());
+#endif
+    const XMLNode* psubchild = pelement->FirstChild();
+    while (psubchild) {
+        XmlTag subTag = XmlTag(psubchild->ToElement());
+        std::string subTagname(psubchild->ToElement()->Name());
+        XML_CHECK_WHILE_SUBTAG_MARK((char *)(subTagname.c_str()), subTag.Type(), subTag.Size());
+#ifdef DEBUG_LOG
+        LOGE("%s(%d): subTagname = %s\n", __FUNCTION__, __LINE__, subTagname.c_str());
+#endif
+        if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_AEC_SYNCTEST_LINALTEREXP_TAG_ID)) {
+            if (!parseEntryCell(psubchild->ToElement(), subTag.Size(),
+                                &RkAiqCalibParser::parseEntrySensorAecLinAlterExp,
+                                param,
+                                (uint32_t)CALIB_SENSOR_AEC_SYNCTEST_LINALTEREXP_TAG_ID,
+                                (uint32_t)CALIB_SENSOR_AEC_SYNCTEST_ALTEREXP_TAG_ID)) {
+                LOGE("parse error in AEC-SyncTest LinAlterExp(%s)", subTagname.c_str());
+                return (false);
+            }
+        }
+        else if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_AEC_SYNCTEST_HDRALTEREXP_TAG_ID)) {
+            if (!parseEntryCell(psubchild->ToElement(), subTag.Size(),
+                                &RkAiqCalibParser::parseEntrySensorAecHdrAlterExp,
+                                param,
+                                (uint32_t)CALIB_SENSOR_AEC_SYNCTEST_HDRALTEREXP_TAG_ID,
+                                (uint32_t)CALIB_SENSOR_AEC_SYNCTEST_ALTEREXP_TAG_ID)) {
+                LOGE("parse error in AEC-SyncTest HdrAlterExp(%s)", subTagname.c_str());
+                return (false);
+            }
+        }
+        else {
+            LOGE("%s(%d): parse error in AEC-SyncTest AlterExp (unknow tag: %s )\n", __FUNCTION__, __LINE__, subTagname.c_str());
+        }
+        psubchild = psubchild->NextSibling();
+    }
+
+    XML_CHECK_END();
+    autoTabBackward();
+    LOGD("%s(%d): (exit)\n", __FUNCTION__, __LINE__);
+    return (true);
+}
+
+bool RkAiqCalibParser::parseEntrySensorAecSyncTest
+(
+    const XMLElement*   pelement,
+    void*                param
+) {
+    LOGD("%s(%d): (enter)\n", __FUNCTION__, __LINE__);
+    autoTabForward();
+
+    XML_CHECK_START(CALIB_SENSOR_AEC_SYNCTEST_TAG_ID, CALIB_SENSOR_AEC_TAG_ID);
+
+    const XMLNode* psubchild = pelement->FirstChild();
+#ifdef DEBUG_LOG
+    LOGE("%s(%d): Tagname = [%s]\n", __FUNCTION__, __LINE__, pelement->Name());
+#endif
+    while (psubchild) {
+        XmlTag subTag = XmlTag(psubchild->ToElement());
+        std::string subTagname(psubchild->ToElement()->Name());
+        XML_CHECK_WHILE_SUBTAG_MARK((char *)(subTagname.c_str()), subTag.Type(), subTag.Size());
+#ifdef DEBUG_LOG
+        LOGE("%s(%d): subTagname = %s\n", __FUNCTION__, __LINE__, subTagname.c_str());
+#endif
+        if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_AEC_SYNCTEST_ENABLE_TAG_ID)) {
+            int no = ParseUcharArray(psubchild, &mCalibDb->aec.CommCtrl.stSyncTest.enable, subTag.Size());
+            DCT_ASSERT((no == subTag.Size()));
+        }
+        else if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_AEC_SYNCTEST_INTERVALFRM_TAG_ID)) {
+            int no = ParseIntArray(psubchild, &mCalibDb->aec.CommCtrl.stSyncTest.IntervalFrm, subTag.Size());
+            DCT_ASSERT((no == subTag.Size()));
+        }
+        else if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_AEC_SYNCTEST_ALTEREXP_TAG_ID)) {
+            if (!parseEntrySensorAecAlterExp(psubchild->ToElement(), param)) {
+                LOGE("parse error in Aec-SyncTest AlterExp(%s)", subTagname.c_str());
+                return (false);
+            }
+        }
+        else {
+            LOGE("%s(%d): parse error in Aec-SyncTest (unknow tag: %s )\n", __FUNCTION__, __LINE__, subTagname.c_str());
+        }
+        psubchild = psubchild->NextSibling();
+    }
+    XML_CHECK_END();
+    autoTabBackward();
+    LOGD("%s(%d): (exit)\n", __FUNCTION__, __LINE__);
+    return (true);
+}
+
 
 bool RkAiqCalibParser::parseEntrySensorAecSpeed
 (
@@ -4676,7 +4888,11 @@ bool RkAiqCalibParser::parseEntrySensorAecInitValueLinearAE
             DCT_ASSERT((no == subsubTag.Size()));
         }
         else if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_AEC_INITPIRISVALUE_TAG_ID)) {
-            int no = ParseFloatArray(psubsubchild, &mCalibDb->aec.CommCtrl.stInitExp.stLinExpInitExp.InitPIrisValue, subsubTag.Size());
+            int no = ParseIntArray(psubsubchild, &mCalibDb->aec.CommCtrl.stInitExp.stLinExpInitExp.InitPIrisGainValue, subsubTag.Size());
+            DCT_ASSERT((no == subsubTag.Size()));
+        }
+        else if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_AEC_INITDCIRISVALUE_TAG_ID)) {
+            int no = ParseIntArray(psubsubchild, &mCalibDb->aec.CommCtrl.stInitExp.stLinExpInitExp.InitDCIrisDutyValue, subsubTag.Size());
             DCT_ASSERT((no == subsubTag.Size()));
         }
         else {
@@ -4737,7 +4953,12 @@ bool RkAiqCalibParser::parseEntrySensorAecInitValueHdrAE
                 mCalibDb->aec.CommCtrl.stInitExp.stHdrExpInitExp.InitIspDGainValue.fCoeff[i] = tempVal[i];
         }
         else if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_AEC_INITPIRISVALUE_TAG_ID)) {
-            int no = ParseFloatArray(psubsubchild, &mCalibDb->aec.CommCtrl.stInitExp.stHdrExpInitExp.InitPIrisValue, subsubTag.Size());
+            int no = ParseIntArray(psubsubchild, &mCalibDb->aec.CommCtrl.stInitExp.stHdrExpInitExp.InitPIrisGainValue, subsubTag.Size());
+            DCT_ASSERT((no == subsubTag.Size()));
+        }
+        else if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_AEC_INITDCIRISVALUE_TAG_ID)) {
+            int no = ParseIntArray(psubsubchild, &mCalibDb->aec.CommCtrl.stInitExp.stHdrExpInitExp.InitDCIrisDutyValue, subsubTag.Size());
+            DCT_ASSERT((no == subsubTag.Size()));
         }
         else {
             LOGE("%s(%d): parse error in  stHdrExpInitExp (unknow tag: %s )\n", __FUNCTION__, __LINE__, subsubTagname.c_str());
@@ -4844,6 +5065,195 @@ bool RkAiqCalibParser::parseEntrySensorAecGridWeight
     return (true);
 }
 
+bool RkAiqCalibParser::parseEntrySensorAecIrisCtrlPAttr
+(
+    const XMLElement*   pelement,
+    void*                param
+) {
+    LOGD("%s(%d): (enter)\n", __FUNCTION__, __LINE__);
+    autoTabForward();
+
+    XML_CHECK_START(CALIB_SENSOR_AEC_IRISCTRL_P_ATTR_TAG_ID, CALIB_SENSOR_AEC_IRISCTRL_TAG_ID);
+
+    const XMLNode* psubsubchild = pelement->FirstChild();
+    while (psubsubchild) {
+        XmlTag subsubTag = XmlTag(psubsubchild->ToElement());
+        std::string subsubTagname(psubsubchild->ToElement()->Name());
+        XML_CHECK_WHILE_SUBTAG_MARK((char *)(subsubTagname.c_str()), subsubTag.Type(), subsubTag.Size());
+#ifdef DEBUG_LOG
+        LOGE("%s(%d): subsubTagname = %s\n", __FUNCTION__, __LINE__, subsubTagname.c_str());
+#endif
+        if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_AEC_IRISCTRL_P_ATTR_TOTALSTEP_TAG_ID)) {
+            int no = ParseUshortArray(psubsubchild, &mCalibDb->aec.CommCtrl.stIris.PIrisAttr.TotalStep, subsubTag.Size());
+            DCT_ASSERT((no == subsubTag.Size()));
+            DCT_ASSERT((no <= AEC_PIRIS_STAP_TABLE_MAX));
+        }
+        else if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_AEC_IRISCTRL_P_ATTR_EFFCSTEP_TAG_ID)) {
+            int no = ParseUshortArray(psubsubchild, &mCalibDb->aec.CommCtrl.stIris.PIrisAttr.EffcStep, subsubTag.Size());
+            DCT_ASSERT((no == subsubTag.Size()));
+            DCT_ASSERT((no <= AEC_PIRIS_STAP_TABLE_MAX));
+        }
+        else if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_AEC_IRISCTRL_P_ATTR_ZEROISMAX_TAG_ID)) {
+            uint8_t temp = mCalibDb->aec.CommCtrl.stIris.PIrisAttr.ZeroIsMax;
+            int no = ParseUcharArray(psubsubchild, &temp, subsubTag.Size());
+            mCalibDb->aec.CommCtrl.stIris.PIrisAttr.ZeroIsMax = (temp == 0) ? false : true;
+            DCT_ASSERT((no == subsubTag.Size()));
+        }
+        else if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_AEC_IRISCTRL_P_ATTR_STEPTABLE_TAG_ID)) {
+            int no = ParseUshortArray(psubsubchild, mCalibDb->aec.CommCtrl.stIris.PIrisAttr.StepTable, subsubTag.Size());
+            DCT_ASSERT((no == subsubTag.Size()));
+            DCT_ASSERT((no <= AEC_PIRIS_STAP_TABLE_MAX));
+        }
+        else {
+            LOGE("%s(%d): parse error in AecIrisCtrl PAttr (unknow tag: %s )\n", __FUNCTION__, __LINE__, subsubTagname.c_str());
+        }
+        psubsubchild = psubsubchild->NextSibling();
+    }
+
+    XML_CHECK_END();
+    autoTabBackward();
+    LOGD("%s(%d): (exit)\n", __FUNCTION__, __LINE__);
+    return (true);
+}
+
+bool RkAiqCalibParser::parseEntrySensorAecIrisCtrlDCAttr
+(
+    const XMLElement*   pelement,
+    void*                param
+) {
+    LOGD("%s(%d): (enter)\n", __FUNCTION__, __LINE__);
+    autoTabForward();
+
+    XML_CHECK_START(CALIB_SENSOR_AEC_IRISCTRL_DC_ATTR_TAG_ID, CALIB_SENSOR_AEC_IRISCTRL_TAG_ID);
+
+    const XMLNode* psubsubchild = pelement->FirstChild();
+    while (psubsubchild) {
+        XmlTag subsubTag = XmlTag(psubsubchild->ToElement());
+        std::string subsubTagname(psubsubchild->ToElement()->Name());
+        XML_CHECK_WHILE_SUBTAG_MARK((char *)(subsubTagname.c_str()), subsubTag.Type(), subsubTag.Size());
+#ifdef DEBUG_LOG
+        LOGE("%s(%d): subsubTagname = %s\n", __FUNCTION__, __LINE__, subsubTagname.c_str());
+#endif
+        if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_AEC_IRISCTRL_DC_ATTR_KP_TAG_ID)) {
+            int no = ParseFloatArray(psubsubchild, &mCalibDb->aec.CommCtrl.stIris.DCIrisAttr.Kp, subsubTag.Size());
+            DCT_ASSERT((no == subsubTag.Size()));
+        }
+        else if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_AEC_IRISCTRL_DC_ATTR_KI_TAG_ID)) {
+            int no = ParseFloatArray(psubsubchild, &mCalibDb->aec.CommCtrl.stIris.DCIrisAttr.Ki, subsubTag.Size());
+            DCT_ASSERT((no == subsubTag.Size()));
+        }
+        else if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_AEC_IRISCTRL_DC_ATTR_KD_TAG_ID)) {
+            int no = ParseFloatArray(psubsubchild, &mCalibDb->aec.CommCtrl.stIris.DCIrisAttr.Kd, subsubTag.Size());
+            DCT_ASSERT((no == subsubTag.Size()));
+        }
+        else if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_AEC_IRISCTRL_DC_ATTR_MIN_PWMDUTY_TAG_ID)) {
+            int no = ParseIntArray(psubsubchild, &mCalibDb->aec.CommCtrl.stIris.DCIrisAttr.MinPwmDuty, subsubTag.Size());
+            DCT_ASSERT((no == subsubTag.Size()));
+        }
+        else if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_AEC_IRISCTRL_DC_ATTR_MAX_PWMDUTY_TAG_ID)) {
+            int no = ParseIntArray(psubsubchild, &mCalibDb->aec.CommCtrl.stIris.DCIrisAttr.MaxPwmDuty, subsubTag.Size());
+            DCT_ASSERT((no == subsubTag.Size()));
+        }
+        else if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_AEC_IRISCTRL_DC_ATTR_OPEN_PWMDUTY_TAG_ID)) {
+            int no = ParseIntArray(psubsubchild, &mCalibDb->aec.CommCtrl.stIris.DCIrisAttr.OpenPwmDuty, subsubTag.Size());
+            DCT_ASSERT((no == subsubTag.Size()));
+        }
+        else if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_AEC_IRISCTRL_DC_ATTR_CLOSE_PWMDUTY_TAG_ID)) {
+            int no = ParseIntArray(psubsubchild, &mCalibDb->aec.CommCtrl.stIris.DCIrisAttr.ClosePwmDuty, subsubTag.Size());
+            DCT_ASSERT((no == subsubTag.Size()));
+        }
+        else {
+            LOGE("%s(%d): parse error in AecIrisCtrl DCAttr (unknow tag: %s )\n", __FUNCTION__, __LINE__, subsubTagname.c_str());
+        }
+        psubsubchild = psubsubchild->NextSibling();
+    }
+
+    XML_CHECK_END();
+    autoTabBackward();
+    LOGD("%s(%d): (exit)\n", __FUNCTION__, __LINE__);
+    return (true);
+}
+
+bool RkAiqCalibParser::parseEntrySensorAecIrisCtrl
+(
+    const XMLElement*   pelement,
+    void*                param
+) {
+    LOGD("%s(%d): (enter)\n", __FUNCTION__, __LINE__);
+    autoTabForward();
+
+    XML_CHECK_START(CALIB_SENSOR_AEC_IRISCTRL_TAG_ID, CALIB_SENSOR_AEC_TAG_ID);
+
+    const XMLNode* psubchild = pelement->FirstChild();
+#ifdef DEBUG_LOG
+    LOGE("%s(%d): Tagname = %s\n", __FUNCTION__, __LINE__, pelement->Name());
+#endif
+    while (psubchild) {
+        XmlTag subTag = XmlTag(psubchild->ToElement());
+        std::string subTagname(psubchild->ToElement()->Name());
+        XML_CHECK_WHILE_SUBTAG_MARK((char *)(subTagname.c_str()), subTag.Type(), subTag.Size());
+#ifdef DEBUG_LOG
+        LOGE("%s(%d): subTagname = %s\n", __FUNCTION__, __LINE__, subTagname.c_str());
+#endif
+        if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_AEC_IRISCTRL_ENABLE_TAG_ID)) {
+            int no = ParseUcharArray(psubchild, &mCalibDb->aec.CommCtrl.stIris.enable, subTag.Size());
+            DCT_ASSERT((no == subTag.Size()));
+        }
+        else if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_AEC_IRISCTRL_TYPE_TAG_ID)) {
+            char* value = Toupper(subTag.Value());
+            std::string s_value(value);
+            if (xmlParseReadWrite == XML_PARSER_READ)
+            {
+                if (s_value == CALIB_SENSOR_AEC_IRISCTRL_TYPE_P) {
+                    mCalibDb->aec.CommCtrl.stIris.IrisType = IRIS_P_TYPE;
+                }
+                else if (s_value == CALIB_SENSOR_AEC_IRISCTRL_TYPE_DC) {
+                    mCalibDb->aec.CommCtrl.stIris.IrisType = IRIS_DC_TYPE;
+                }
+                else {
+                    mCalibDb->aec.CommCtrl.stIris.IrisType = IRIS_INVALID_TYPE;
+                    LOGE("%s(%d): invalid stIris.IrisType = %s\n", __FUNCTION__, __LINE__, s_value.c_str());
+                }
+            }
+            else if (xmlParseReadWrite == XML_PARSER_WRITE)
+            {
+                XMLNode *pNode = (XMLNode*)psubchild;
+                if (mCalibDb->aec.CommCtrl.stIris.IrisType == IRIS_P_TYPE) {
+                    pNode->FirstChild()->SetValue(CALIB_SENSOR_AEC_IRISCTRL_TYPE_P);
+                }
+                else if (mCalibDb->aec.CommCtrl.stIris.IrisType == IRIS_DC_TYPE) {
+                    pNode->FirstChild()->SetValue(CALIB_SENSOR_AEC_IRISCTRL_TYPE_DC);
+                }
+                else {
+                    pNode->FirstChild()->SetValue("Invalid");
+                    LOGE("%s(%d): (XML Write)invalid AEC stAntiFlicker.Frequency = %d\n", __FUNCTION__, __LINE__, mCalibDb->aec.CommCtrl.stAntiFlicker.Frequency);
+                }
+
+            }
+        }
+        else if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_AEC_IRISCTRL_P_ATTR_TAG_ID)) {
+            if (!parseEntrySensorAecIrisCtrlPAttr(psubchild->ToElement(), param)) {
+                LOGE("parse error in Aec IrisCtrl (%s)", subTagname.c_str());
+                return (false);
+            }
+        }
+        else if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_AEC_IRISCTRL_DC_ATTR_TAG_ID)) {
+            if (!parseEntrySensorAecIrisCtrlDCAttr(psubchild->ToElement(), param)) {
+                LOGE("parse error in Aec IrisCtrl (%s)", subTagname.c_str());
+                return (false);
+            }
+        }
+        else {
+            LOGE("%s(%d): parse error in Aec IrisCtrl (unknow tag: %s )\n", __FUNCTION__, __LINE__, subTagname.c_str());
+        }
+        psubchild = psubchild->NextSibling();
+    }
+    XML_CHECK_END();
+    autoTabBackward();
+    LOGD("%s(%d): (exit)\n", __FUNCTION__, __LINE__);
+    return (true);
+}
+
 bool RkAiqCalibParser::parseEntrySensorAecManualCtrlLinearAE
 (
     const XMLElement*   pelement,
@@ -4880,10 +5290,10 @@ bool RkAiqCalibParser::parseEntrySensorAecManualCtrlLinearAE
             mCalibDb->aec.CommCtrl.stManual.stLinMe.ManualIspDgainEn = (temp == 0) ? false : true;
             DCT_ASSERT((no == subsubTag.Size()));
         }
-        else if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_AEC_MANUALCTRL_PIRISEN_TAG_ID)) {
-            uint8_t temp = mCalibDb->aec.CommCtrl.stManual.stLinMe.ManualPIrisEn;
+        else if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_AEC_MANUALCTRL_IRISEN_TAG_ID)) {
+            uint8_t temp = mCalibDb->aec.CommCtrl.stManual.stLinMe.ManualIrisEn;
             int no = ParseUcharArray(psubsubchild, &temp, subsubTag.Size());
-            mCalibDb->aec.CommCtrl.stManual.stLinMe.ManualPIrisEn = (temp == 0) ? false : true;
+            mCalibDb->aec.CommCtrl.stManual.stLinMe.ManualIrisEn = (temp == 0) ? false : true;
             DCT_ASSERT((no == subsubTag.Size()));
         }
         else if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_AEC_MANUALCTRL_TIMEVALUE_TAG_ID)) {
@@ -4897,8 +5307,13 @@ bool RkAiqCalibParser::parseEntrySensorAecManualCtrlLinearAE
         else if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_AEC_MANUALCTRL_ISPDGAINVALUE_TAG_ID)) {
             int no = ParseFloatArray(psubsubchild, &mCalibDb->aec.CommCtrl.stManual.stLinMe.IspDGainValue, subsubTag.Size());
             DCT_ASSERT((no == subsubTag.Size()));
-        } else if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_AEC_MANUALCTRL_PIRISVALUE_TAG_ID)) {
-            int no = ParseFloatArray(psubsubchild, &mCalibDb->aec.CommCtrl.stManual.stLinMe.PIrisValue, subsubTag.Size());
+        }
+        else if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_AEC_MANUALCTRL_PIRISVALUE_TAG_ID)) {
+            int no = ParseIntArray(psubsubchild, &mCalibDb->aec.CommCtrl.stManual.stLinMe.PIrisGainValue, subsubTag.Size());
+            DCT_ASSERT((no == subsubTag.Size()));
+        }
+        else if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_AEC_MANUALCTRL_DCIRISVALUE_TAG_ID)) {
+            int no = ParseIntArray(psubsubchild, &mCalibDb->aec.CommCtrl.stManual.stLinMe.DCIrisValue, subsubTag.Size());
             DCT_ASSERT((no == subsubTag.Size()));
         }
         else {
@@ -4949,10 +5364,10 @@ bool RkAiqCalibParser::parseEntrySensorAecManualCtrlHdrAE
             mCalibDb->aec.CommCtrl.stManual.stHdrMe.ManualIspDgainEn = (temp == 0) ? false : true;
             DCT_ASSERT((no == subsubTag.Size()));
         }
-        else if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_AEC_MANUALCTRL_PIRISEN_TAG_ID)) {
-            uint8_t temp = mCalibDb->aec.CommCtrl.stManual.stHdrMe.ManualPIrisEn;
+        else if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_AEC_MANUALCTRL_IRISEN_TAG_ID)) {
+            uint8_t temp = mCalibDb->aec.CommCtrl.stManual.stHdrMe.ManualIrisEn;
             int no = ParseUcharArray(psubsubchild, &temp, subsubTag.Size());
-            mCalibDb->aec.CommCtrl.stManual.stHdrMe.ManualPIrisEn = (temp == 0) ? false : true;
+            mCalibDb->aec.CommCtrl.stManual.stHdrMe.ManualIrisEn = (temp == 0) ? false : true;
             DCT_ASSERT((no == subsubTag.Size()));
         }
         else if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_AEC_MANUALCTRL_TIMEVALUE_TAG_ID)) {
@@ -4983,7 +5398,10 @@ bool RkAiqCalibParser::parseEntrySensorAecManualCtrlHdrAE
                 mCalibDb->aec.CommCtrl.stManual.stHdrMe.IspDGainValue.fCoeff[i] = tempVal[i];
         }
         else if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_AEC_MANUALCTRL_PIRISVALUE_TAG_ID)) {
-            int no = ParseFloatArray(psubsubchild, &mCalibDb->aec.CommCtrl.stManual.stHdrMe.PIrisValue, subsubTag.Size());
+            int no = ParseIntArray(psubsubchild, &mCalibDb->aec.CommCtrl.stManual.stHdrMe.PIrisGainValue, subsubTag.Size());
+        }
+        else if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_AEC_MANUALCTRL_DCIRISVALUE_TAG_ID)) {
+            int no = ParseIntArray(psubsubchild, &mCalibDb->aec.CommCtrl.stManual.stHdrMe.DCIrisValue, subsubTag.Size());
         }
         else {
             LOGE("%s(%d): parse error in  stManual.stHdrMe (unknow tag: %s )\n", __FUNCTION__, __LINE__, subsubTagname.c_str());
@@ -6132,6 +6550,12 @@ bool RkAiqCalibParser::parseEntrySensorAec
 
             }
         }
+        else if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_AEC_SYNCTEST_TAG_ID)) {
+            if (!parseEntrySensorAecSyncTest(pchild->ToElement()), param) {
+                LOGE("parse error in Aec (%s)", tagname.c_str());
+                return (false);
+            }
+        }
         else if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_AEC_AECSPEED_TAG_ID)) {
             if (!parseEntrySensorAecSpeed(pchild->ToElement()), param) {
                 LOGE("parse error in Aec (%s)", tagname.c_str());
@@ -6170,6 +6594,12 @@ bool RkAiqCalibParser::parseEntrySensorAec
         }
         else if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_AEC_AECGRIDWEIGHT_TAG_ID)) {
             if (!parseEntrySensorAecGridWeight(pchild->ToElement(), param)) {
+                LOGE("parse error in Aec (%s)", tagname.c_str());
+                return (false);
+            }
+        }
+        else if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_AEC_IRISCTRL_TAG_ID)) {
+            if (!parseEntrySensorAecIrisCtrl(pchild->ToElement(), param)) {
                 LOGE("parse error in Aec (%s)", tagname.c_str());
                 return (false);
             }
@@ -6283,7 +6713,7 @@ bool RkAiqCalibParser::parseEntrySensorAecLinearAeRoute
             nIspDGainDot = no;
         }
         else if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_AEC_PIRISDOT_TAG_ID)) {
-            int no = ParseFloatArray(pchild, mCalibDb->aec.CommCtrl.stAeRoute.LinAeSeperate[index].PIrisDot, tag.Size());
+            int no = ParseIntArray(pchild, mCalibDb->aec.CommCtrl.stAeRoute.LinAeSeperate[index].PIrisGainDot, tag.Size());
             DCT_ASSERT((no == tag.Size()));
             if(tag.Size() > AEC_ROUTE_MAX_NODES) {
                 LOGE("array size: %d out of Maximum range(%d)", tag.Size(), AEC_ROUTE_MAX_NODES);
@@ -6422,7 +6852,7 @@ bool RkAiqCalibParser::parseEntrySensorAecHdrAeRoute
             DCT_ASSERT((nIspDGainDot == no));
         }
         else if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_AEC_PIRISDOT_TAG_ID)) {
-            int no = ParseFloatArray(pchild, mCalibDb->aec.CommCtrl.stAeRoute.HdrAeSeperate[index].PIrisDot, tag.Size());
+            int no = ParseIntArray(pchild, mCalibDb->aec.CommCtrl.stAeRoute.HdrAeSeperate[index].PIrisGainDot, tag.Size());
             DCT_ASSERT((no == tag.Size()));
             if(tag.Size() > AEC_ROUTE_MAX_NODES) {
                 LOGE("array size: %d out of Maximum range(%d)", tag.Size(), AEC_ROUTE_MAX_NODES);

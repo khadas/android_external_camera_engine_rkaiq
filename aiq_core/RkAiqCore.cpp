@@ -123,6 +123,7 @@ RkAiqCore::RkAiqCore()
     , mCb(NULL)
     , mAiqParamsPool(new RkAiqFullParamsPool("RkAiqFullParams", 4))
     , mAiqExpParamsPool(new RkAiqExpParamsPool("RkAiqExpParams", 4))
+    , mAiqIrisParamsPool(new RkAiqIrisParamsPool("RkAiqIrisParams", 4))
     , mAiqIspParamsPool(new RkAiqIspParamsPool("RkAiqIspParams", RkAiqCore::DEFAULT_POOL_SIZE))
     , mAiqIsppParamsPool(new RkAiqIsppParamsPool("RkAiqIsppParams", 4))
     , mAiqFocusParamsPool(new RkAiqFocusParamsPool("RkAiqFocusParams", 4))
@@ -311,8 +312,8 @@ RkAiqCore::prepare(const rk_aiq_exposure_sensor_descriptor* sensor_des,
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
     // check state
     if ((mState == RK_AIQ_CORE_STATE_STARTED) ||
-        (mState == RK_AIQ_CORE_STATE_INVALID) ||
-        (mState == RK_AIQ_CORE_STATE_RUNNING)) {
+            (mState == RK_AIQ_CORE_STATE_INVALID) ||
+            (mState == RK_AIQ_CORE_STATE_RUNNING)) {
         LOGW_ANALYZER("in state %d\n", mState);
         return XCAM_RETURN_NO_ERROR;
     }
@@ -431,6 +432,13 @@ RkAiqCore::analyzeInternal()
         return NULL;
     }
 
+    if (mAiqIrisParamsPool->has_free_items()) {
+        aiqParams->mIrisParams = mAiqIrisParamsPool->get_item();
+    } else {
+        LOGE_ANALYZER("no free iris params buffer!");
+        return NULL;
+    }
+
     if (mAiqFocusParamsPool->has_free_items()) {
         aiqParams->mFocusParams = mAiqFocusParamsPool->get_item();
     } else {
@@ -511,6 +519,7 @@ RkAiqCore::analyzeInternal()
     genIspAwdrResult(aiqParams);
     mAiqCurParams->data()->mIspParams = aiqParams->mIspParams;
     mAiqCurParams->data()->mExposureParams = aiqParams->mExposureParams;
+    mAiqCurParams->data()->mIrisParams = aiqParams->mIrisParams;
     mAiqCurParams->data()->mFocusParams = aiqParams->mFocusParams;
     mAiqCurParams->data()->mIsppParams = aiqParams->mIsppParams;
     mAiqCurParams->data()->mCpslParams = aiqParams->mCpslParams;
@@ -587,15 +596,25 @@ RkAiqCore::genIspAeResult(RkAiqFullParams* params)
     ENTER_ANALYZER_FUNCTION();
 
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
-    RkAiqAlgoProcResAe* ae_com =
+    RkAiqAlgoProcResAe* ae_proc =
         mAlogsSharedParams.procResComb.ae_proc_res;
+    RkAiqAlgoPostResAe* ae_post =
+        mAlogsSharedParams.postResComb.ae_post_res;
+
     SmartPtr<rk_aiq_isp_params_t> isp_param =
         params->mIspParams->data();
     SmartPtr<rk_aiq_exposure_params_wrapper_t> exp_param =
         params->mExposureParams->data();
+    SmartPtr<rk_aiq_iris_params_wrapper_t> iris_param =
+        params->mIrisParams->data();
 
-    if (!ae_com) {
-        LOGD_ANALYZER("no ae result");
+    if (!ae_proc) {
+        LOGD_ANALYZER("no ae_proc result");
+        return XCAM_RETURN_NO_ERROR;
+    }
+
+    if (!ae_post) {
+        LOGD_ANALYZER("no ae_post result");
         return XCAM_RETURN_NO_ERROR;
     }
 
@@ -604,21 +623,29 @@ RkAiqCore::genIspAeResult(RkAiqFullParams* params)
     int algo_id = (*handle)->getAlgoId();
     // gen common result
 
-    exp_param->aecExpInfo.LinearExp = ae_com->new_ae_exp.LinearExp;
-    memcpy(exp_param->aecExpInfo.HdrExp, ae_com->new_ae_exp.HdrExp, sizeof(ae_com->new_ae_exp.HdrExp));
-    exp_param->aecExpInfo.frame_length_lines = ae_com->new_ae_exp.frame_length_lines;
-    exp_param->aecExpInfo.line_length_pixels = ae_com->new_ae_exp.line_length_pixels;
-    exp_param->aecExpInfo.pixel_clock_freq_mhz = ae_com->new_ae_exp.pixel_clock_freq_mhz;
+    exp_param->aecExpInfo.LinearExp = ae_proc->new_ae_exp.LinearExp;
+    memcpy(exp_param->aecExpInfo.HdrExp, ae_proc->new_ae_exp.HdrExp, sizeof(ae_proc->new_ae_exp.HdrExp));
+    exp_param->aecExpInfo.frame_length_lines = ae_proc->new_ae_exp.frame_length_lines;
+    exp_param->aecExpInfo.line_length_pixels = ae_proc->new_ae_exp.line_length_pixels;
+    exp_param->aecExpInfo.pixel_clock_freq_mhz = ae_proc->new_ae_exp.pixel_clock_freq_mhz;
+    exp_param->aecExpInfo.Iris.PIris = ae_proc->new_ae_exp.Iris.PIris;
 
-    isp_param->aec_meas = ae_com->ae_meas;
-    isp_param->hist_meas = ae_com->hist_meas;
+    iris_param->PIris.step = ae_proc->new_ae_exp.Iris.PIris.step;
+    iris_param->PIris.update = ae_proc->new_ae_exp.Iris.PIris.update;
+
+    isp_param->aec_meas = ae_proc->ae_meas;
+    isp_param->hist_meas = ae_proc->hist_meas;
 
     // gen rk ae result
     if (algo_id == 0) {
-        RkAiqAlgoProcResAeInt* ae_rk = (RkAiqAlgoProcResAeInt*)ae_com;
+        RkAiqAlgoProcResAeInt* ae_rk = (RkAiqAlgoProcResAeInt*)ae_proc;
         memcpy(exp_param->exp_tbl, ae_rk->ae_proc_res_rk.exp_set_tbl, sizeof(exp_param->exp_tbl));
         exp_param->exp_tbl_size = ae_rk->ae_proc_res_rk.exp_set_cnt;
         exp_param->algo_id = algo_id;
+
+        RkAiqAlgoPostResAeInt* ae_post_rk = (RkAiqAlgoPostResAeInt*)ae_post;
+        iris_param->DCIris.update = ae_post_rk->ae_post_res_rk.DCIris.update;
+        iris_param->DCIris.pwmDuty = ae_post_rk->ae_post_res_rk.DCIris.pwmDuty;
     }
 
     EXIT_ANALYZER_FUNCTION();
@@ -2041,6 +2068,8 @@ RkAiqCore::convertIspstatsToAlgo(const SmartPtr<VideoBuffer> &buffer)
     SmartPtr<RkAiqExpParamsProxy> expParams = buf->get_exp_params();
     SmartPtr<RkAiqIspParamsProxy> ispParams = buf->get_isp_params();
     SmartPtr<RkAiqAfInfoProxy> afParams = buf->get_af_params();
+    SmartPtr<RkAiqIrisParamsProxy> irisParams = buf->get_iris_params();
+
     stats = (struct rkisp_isp2x_stat_buffer *)(buf->get_v4l2_userptr());
     if(stats == NULL) {
         LOGE("fail to get stats ,ignore\n");
@@ -2291,6 +2320,29 @@ RkAiqCore::convertIspstatsToAlgo(const SmartPtr<VideoBuffer> &buffer)
          *        expParams->data()->aecExpInfo.HdrExp[0].exp_sensor_params.coarse_integration_time,
          *        expParams->data()->aecExpInfo.HdrExp[0].exp_sensor_params.analog_gain_code_global);
          */
+    }
+
+    if (irisParams.ptr()) {
+
+        float sof_time = (float)irisParams->data()->sofTime / 1000000000.0f;
+        float start_time = (float)irisParams->data()->PIris.StartTim.tv_sec + (float)irisParams->data()->PIris.StartTim.tv_usec / 1000000.0f;
+        float end_time = (float)irisParams->data()->PIris.EndTim.tv_sec + (float)irisParams->data()->PIris.EndTim.tv_usec / 1000000.0f;
+        float frm_intval = 1 / (mAlogsSharedParams.ispStats.aec_stats.ae_exp.pixel_clock_freq_mhz * 1000000.0f /
+                                (float)mAlogsSharedParams.ispStats.aec_stats.ae_exp.line_length_pixels / (float)mAlogsSharedParams.ispStats.aec_stats.ae_exp.frame_length_lines);
+
+        /*printf("%s: step=%d,last-step=%d,start-tim=%f,end-tim=%f,sof_tim=%f\n",
+            __func__,
+            mAlogsSharedParams.ispStats.aec_stats.ae_exp.Iris.PIris.step,
+            irisParams->data()->PIris.laststep,start_time,end_time,sof_time);
+        */
+
+        if(sof_time < end_time + frm_intval)
+            mAlogsSharedParams.ispStats.aec_stats.ae_exp.Iris.PIris.step = irisParams->data()->PIris.laststep;
+        else
+            mAlogsSharedParams.ispStats.aec_stats.ae_exp.Iris.PIris.step = irisParams->data()->PIris.step;
+
+
+        // TODO: DC-Iris params remained to be added
     }
 
     //af
@@ -2764,8 +2816,8 @@ RkAiqCore::genCpslResult(RkAiqFullParams* params)
 
     if (cpsl_cfg->mode == RK_AIQ_OP_MODE_MANUAL) {
         if ((mCurCpslOn != cpsl_cfg->u.m.on) ||
-            (fabs(mStrthLed - cpsl_cfg->u.m.strength_led) > EPSINON) ||
-            (fabs(mStrthIr - cpsl_cfg->u.m.strength_ir) > EPSINON)) {
+                (fabs(mStrthLed - cpsl_cfg->u.m.strength_led) > EPSINON) ||
+                (fabs(mStrthIr - cpsl_cfg->u.m.strength_ir) > EPSINON)) {
             need_update = true;
             cpsl_on = cpsl_cfg->u.m.on;
             cpsl_param->fl.power[0] = cpsl_cfg->u.m.strength_led / 100.0f;

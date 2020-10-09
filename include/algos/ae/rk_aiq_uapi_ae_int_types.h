@@ -35,6 +35,8 @@ typedef CalibDb_AntiFlickerAttr_t Uapi_AntiFlicker_t;
 
 typedef CalibDb_AeAttr_t Uapi_AeAttr_t;
 
+typedef CalibDb_AecIrisCtrl_t Uapi_IrisAttr_t;
+
 typedef CalibDb_LinMeAttr_t Uapi_LinMeAttr_t;
 
 typedef CalibDb_HdrMeAttr_t Uapi_HdrMeAttr_t;
@@ -56,6 +58,7 @@ typedef struct Uapi_ExpSwAttr_s {
     CalibDb_AecDayNightMode_t   DNMode;
     uint8_t                  FillLightMode;
 
+    Uapi_IrisAttr_t          stIris;
     Uapi_AntiFlicker_t       stAntiFlicker;
     Uapi_AeAttr_t            stAuto;
     Uapi_MeAttr_t            stManual;

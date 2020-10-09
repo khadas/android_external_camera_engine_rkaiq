@@ -94,17 +94,7 @@ static XCamReturn AhdrPrepare(RkAiqAlgoCom* params)
     else
         pAhdrCtx->hdr_mode = 3;
 
-    AhdrConfig(pAhdrCtx); //set default paras
-
-    // sence mode
-    if (AhdrCfgParam->rk_com.u.proc.gray_mode)
-        pAhdrCtx->sence_mode = AHDR_NIGHT;
-    else if (pAhdrCtx->hdr_mode == 1)
-        pAhdrCtx->sence_mode = AHDR_NORMAL;
-    else
-        pAhdrCtx->sence_mode = AHDR_HDR;
-
-    AhdrGetXmlParas(pAhdrCtx, pCalibDb, pAhdrCtx->sence_mode); //convert AeCfg params into AeHandle
+    AhdrConfig(pAhdrCtx); //set default para
 
     if (ret != AHDR_RET_SUCCESS) {
         LOGE_AHDR("%s AHDRUpdateConfig failed: %d", __FUNCTION__, ret);
@@ -128,6 +118,20 @@ static XCamReturn AhdrPreProcess(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* 
 {
     LOG1_AHDR("%s:Enter!\n", __FUNCTION__);
     RESULT ret = AHDR_RET_SUCCESS;
+
+    AhdrHandle_t pAhdrCtx = inparams->ctx->AhdrInstConfig.hAhdr;
+    RkAiqAlgoConfigAhdrInt* AhdrCfgParam = (RkAiqAlgoConfigAhdrInt*)inparams;
+    const CamCalibDbContext_t* pCalibDb = AhdrCfgParam->rk_com.u.prepare.calib;
+
+    // sence mode
+    if (AhdrCfgParam->rk_com.u.proc.gray_mode)
+        pAhdrCtx->sence_mode = AHDR_NIGHT;
+    else if (pAhdrCtx->hdr_mode == 1)
+        pAhdrCtx->sence_mode = AHDR_NORMAL;
+    else
+        pAhdrCtx->sence_mode = AHDR_HDR;
+
+    AhdrGetXmlParas(pAhdrCtx, pCalibDb, pAhdrCtx->sence_mode); //convert AeCfg params into AeHandle
 
     LOG1_AHDR("%s:Exit!\n", __FUNCTION__);
     return(XCAM_RETURN_NO_ERROR);

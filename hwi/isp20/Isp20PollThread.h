@@ -53,6 +53,7 @@ public:
     virtual ~Isp20PollThread();
 
     bool set_event_handle_dev(SmartPtr<SensorHw> &dev);
+    bool set_iris_handle_dev(SmartPtr<LensHw> &dev);
     bool set_focus_handle_dev(SmartPtr<LensHw> &dev);
     bool set_rx_handle_dev(CamHwIsp20* dev);
     void set_mipi_devs(SmartPtr<V4l2Device> mipi_tx_devs[3],
@@ -67,7 +68,9 @@ public:
     void set_hdr_global_tmo_mode(int frame_id, bool mode);
     virtual XCamReturn start();
     virtual XCamReturn stop ();
-    void setMulCamConc(bool cc) { _is_multi_cam_conc = cc; }
+    void setMulCamConc(bool cc) {
+        _is_multi_cam_conc = cc;
+    }
     void skip_frames(int skip_num, int32_t skip_seq);
     enum {
         ISP_POLL_MIPI_TX,
@@ -116,6 +119,7 @@ private:
 private:
     XCAM_DEAD_COPY(Isp20PollThread);
     SmartPtr<SensorHw> _event_handle_dev;
+    SmartPtr<LensHw> _iris_handle_dev;
     SmartPtr<LensHw> _focus_handle_dev;
     CamHwIsp20* _rx_handle_dev;
     uint32_t sns_width;

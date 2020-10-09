@@ -96,10 +96,16 @@
  * v1.3.2
  *  - magic code:1034813
  *  - TMO: add normal HDR night mode
+ * v1.3.3
+ *  - magic code:1044335
+ *  - AE: add SyncTest to debug
+ * v1.3.4
+ *  - magic code:1061311
+ *  - AE: add IrisCtrl, and also modify some params in manualCtrl & initialExp
  */
 
-#define RK_AIQ_CALIB_VERSION_REAL_V          "v1.3.2"
-#define RK_AIQ_CALIB_VERSION_MAGIC_V         "1034813"
+#define RK_AIQ_CALIB_VERSION_REAL_V          "v1.3.4"
+#define RK_AIQ_CALIB_VERSION_MAGIC_V         "1061311"
 
 
 /******* DO NOT EDIT THE FOLLOWINGS ***********/

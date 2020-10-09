@@ -168,8 +168,8 @@ typedef struct mtmoAttr_S
     float stGlobeLuma;
     float stDtlsHL;
     float stDtlsLL;
-    float stTmoContrast;
-    float stBandPriorStrength;
+    float stLocalTMOStrength;
+    float stGlobalTMOStrength;
 
     float damp;
 } mtmoAttr_t;

@@ -253,16 +253,22 @@ Isp20PollThread::new_video_buffer(SmartPtr<V4l2Buffer> buf,
     if (type == ISP_POLL_3A_STATS) {
         SmartPtr<RkAiqIspParamsProxy> ispParams = nullptr;
         SmartPtr<RkAiqExpParamsProxy> expParams = nullptr;
+        SmartPtr<RkAiqIrisParamsProxy> irisParams = nullptr;
         SmartPtr<RkAiqAfInfoProxy> afParams = nullptr;
 
+        //get exp params
         _event_handle_dev->getEffectiveExpParams(expParams, buf->get_buf().sequence);
-        if (_focus_handle_dev.ptr())
+
+        if (_focus_handle_dev.ptr()) {
             _focus_handle_dev->getAfInfoParams(afParams, buf->get_buf().sequence);
+            _focus_handle_dev->getIrisInfoParams(irisParams, buf->get_buf().sequence);
+
+        }
 
         if (_rx_handle_dev)
             _rx_handle_dev->getEffectiveIspParams(ispParams, buf->get_buf().sequence);
 
-        video_buf = new Isp20StatsBuffer(buf, dev, ispParams, expParams, afParams);
+        video_buf = new Isp20StatsBuffer(buf, dev, ispParams, expParams, afParams, irisParams);
 
         // write metadata && isp/ispp reg for debug
         if (_capture_metadata_num > 0) {
@@ -284,8 +290,8 @@ Isp20PollThread::new_video_buffer(SmartPtr<V4l2Buffer> buf,
             write_reg_to_file(ISPP_REGS_BASE, 0x0, 0xc94, buf->get_buf().sequence);
 #endif
             write_metadata_to_file(raw_dir_path,
-                    buf->get_buf().sequence,
-                    ispParams, expParams);
+                                   buf->get_buf().sequence,
+                                   ispParams, expParams);
             _capture_metadata_num--;
             if (!_capture_metadata_num) {
                 _is_raw_dir_exist = false;
@@ -349,7 +355,7 @@ Isp20PollThread::set_event_handle_dev(SmartPtr<SensorHw> &dev)
             LOGW_CAMHW_SUBM(ISP20POLL_SUBM, "get_selection failed !\n");
         } else {
             if (sns_width != sns_sd_sel.r.width ||
-                sns_height != sns_sd_sel.r.height) {
+                    sns_height != sns_sd_sel.r.height) {
                 sns_width = sns_sd_sel.r.width;
                 sns_height = sns_sd_sel.r.height;
             }
@@ -661,8 +667,8 @@ Isp20PollThread::handle_rx_buf(SmartPtr<V4l2BufferProxy> &rx_buf, int dev_index)
 {
     if (!_isp_mipi_rx_infos[dev_index].buf_list.is_empty()) {
         SmartPtr<V4l2BufferProxy> buf = _isp_mipi_rx_infos[dev_index].buf_list.pop(-1);
-        LOGD_CAMHW_SUBM(ISP20POLL_SUBM,"%s dev_index:%d index:%d fd:%d\n",
-                   __func__, dev_index, buf->get_v4l2_buf_index(), buf->get_expbuf_fd());
+        LOGD_CAMHW_SUBM(ISP20POLL_SUBM, "%s dev_index:%d index:%d fd:%d\n",
+                        __func__, dev_index, buf->get_v4l2_buf_index(), buf->get_expbuf_fd());
     }
 }
 
@@ -700,7 +706,7 @@ void Isp20PollThread::sync_tx_buf()
             _isp_mipi_tx_infos[ISP_MIPI_HDR_M].buf_list.erase(buf_m);
             _isp_mipi_tx_infos[ISP_MIPI_HDR_L].buf_list.erase(buf_l);
             if (check_skip_frame(sequence_s)) {
-                LOGW_CAMHW_SUBM(ISP20POLL_SUBM,"skip frame %d", sequence_s);
+                LOGW_CAMHW_SUBM(ISP20POLL_SUBM, "skip frame %d", sequence_s);
                 goto end;
             }
             _isp_mipi_rx_infos[ISP_MIPI_HDR_S].cache_list.push(buf_s);
@@ -717,7 +723,7 @@ void Isp20PollThread::sync_tx_buf()
             _isp_mipi_tx_infos[ISP_MIPI_HDR_S].buf_list.erase(buf_s);
             _isp_mipi_tx_infos[ISP_MIPI_HDR_M].buf_list.erase(buf_m);
             if (check_skip_frame(sequence_s)) {
-                LOGW_CAMHW_SUBM(ISP20POLL_SUBM,"skip frame %d", sequence_s);
+                LOGW_CAMHW_SUBM(ISP20POLL_SUBM, "skip frame %d", sequence_s);
                 goto end;
             }
             _isp_mipi_rx_infos[ISP_MIPI_HDR_S].cache_list.push(buf_s);
@@ -730,7 +736,7 @@ void Isp20PollThread::sync_tx_buf()
         } else if (_working_mode == RK_AIQ_WORKING_MODE_NORMAL) {
             _isp_mipi_tx_infos[ISP_MIPI_HDR_S].buf_list.erase(buf_s);
             if (check_skip_frame(sequence_s)) {
-                LOGW_CAMHW_SUBM(ISP20POLL_SUBM,"skip frame %d", sequence_s);
+                LOGW_CAMHW_SUBM(ISP20POLL_SUBM, "skip frame %d", sequence_s);
                 goto end;
             }
             _isp_mipi_rx_infos[ISP_MIPI_HDR_S].cache_list.push(buf_s);
@@ -813,7 +819,7 @@ Isp20PollThread::trigger_readback()
             _rx_handle_dev->setIsppParamsSync(sequence);
             for (int i = 0; i < _mipi_dev_max; i++) {
                 ret = _isp_mipi_rx_infos[i].dev->get_buffer(v4l2buf[i],
-                                                            _isp_mipi_rx_infos[i].cache_list.front()->get_v4l2_buf_index());
+                        _isp_mipi_rx_infos[i].cache_list.front()->get_v4l2_buf_index());
                 if (ret != XCAM_RETURN_NO_ERROR) {
                     LOGE_CAMHW_SUBM(ISP20POLL_SUBM, "Rx[%d] can not get buffer\n", i);
                     goto out;
@@ -842,7 +848,7 @@ Isp20PollThread::trigger_readback()
                 .frame_id = sequence,
                 .times = 0,
                 .mode = _mipi_dev_max == 1 ? T_START_X1 :
-                    _mipi_dev_max == 2 ? T_START_X2 : T_START_X3,
+                _mipi_dev_max == 2 ? T_START_X2 : T_START_X3,
                 /* .mode = T_START_X2, */
             };
 
@@ -881,50 +887,50 @@ out:
 void
 Isp20PollThread::match_lumadetect_map(uint32_t sequence, sint32_t &additional_times)
 {
-        std::map<uint32_t, int>::iterator it_times_del;
-        for (std::map<uint32_t, int>::iterator iter = _isp_hdr_fid2times_map.begin();
-                iter != _isp_hdr_fid2times_map.end();) {
-            if (iter->first < sequence) {
-                it_times_del = iter++;
-                LOGD_CAMHW_SUBM(ISP20POLL_SUBM, "del seq %d", it_times_del->first);
-                _isp_hdr_fid2times_map.erase(it_times_del);
-            } else if (iter->first == sequence) {
-                additional_times = iter->second;
-                it_times_del = iter++;
-                LOGD_CAMHW_SUBM(ISP20POLL_SUBM, "del seq %d", it_times_del->first);
-                _isp_hdr_fid2times_map.erase(it_times_del);
-                break;
-            } else {
-                LOGW_CAMHW_SUBM(ISP20POLL_SUBM, "%s missing rdtimes for buf_seq %d, min rdtimes_seq %d !",
-                        __func__, sequence, iter->first);
-                additional_times = 0;
-                break;
-            }
+    std::map<uint32_t, int>::iterator it_times_del;
+    for (std::map<uint32_t, int>::iterator iter = _isp_hdr_fid2times_map.begin();
+            iter != _isp_hdr_fid2times_map.end();) {
+        if (iter->first < sequence) {
+            it_times_del = iter++;
+            LOGD_CAMHW_SUBM(ISP20POLL_SUBM, "del seq %d", it_times_del->first);
+            _isp_hdr_fid2times_map.erase(it_times_del);
+        } else if (iter->first == sequence) {
+            additional_times = iter->second;
+            it_times_del = iter++;
+            LOGD_CAMHW_SUBM(ISP20POLL_SUBM, "del seq %d", it_times_del->first);
+            _isp_hdr_fid2times_map.erase(it_times_del);
+            break;
+        } else {
+            LOGW_CAMHW_SUBM(ISP20POLL_SUBM, "%s missing rdtimes for buf_seq %d, min rdtimes_seq %d !",
+                            __func__, sequence, iter->first);
+            additional_times = 0;
+            break;
         }
+    }
 }
 
 void
 Isp20PollThread::match_globaltmostate_map(uint32_t sequence, bool &isHdrGlobalTmo)
 {
-        std::map<uint32_t, bool>::iterator it_del;
-        for (std::map<uint32_t, bool>::iterator iter = _hdr_global_tmo_state_map.begin();
-                iter !=  _hdr_global_tmo_state_map.end();) {
-            if (iter->first < sequence) {
-                it_del = iter++;
-                LOGD_CAMHW_SUBM(ISP20POLL_SUBM, "del seq %d", it_del->first);
-                _hdr_global_tmo_state_map.erase(it_del);
-            } else if (iter->first == sequence) {
-                isHdrGlobalTmo = iter->second;
-                it_del = iter++;
-                LOGD_CAMHW_SUBM(ISP20POLL_SUBM, "del seq %d", it_del->first);
-                _hdr_global_tmo_state_map.erase(it_del);
-                break;
-            } else {
-                LOGW_CAMHW_SUBM(ISP20POLL_SUBM, "%s missing tmo state for buf_seq %d, min rdtimes_seq %d !",
-                                __func__, sequence, iter->first);
-                break;
-            }
+    std::map<uint32_t, bool>::iterator it_del;
+    for (std::map<uint32_t, bool>::iterator iter = _hdr_global_tmo_state_map.begin();
+            iter !=  _hdr_global_tmo_state_map.end();) {
+        if (iter->first < sequence) {
+            it_del = iter++;
+            LOGD_CAMHW_SUBM(ISP20POLL_SUBM, "del seq %d", it_del->first);
+            _hdr_global_tmo_state_map.erase(it_del);
+        } else if (iter->first == sequence) {
+            isHdrGlobalTmo = iter->second;
+            it_del = iter++;
+            LOGD_CAMHW_SUBM(ISP20POLL_SUBM, "del seq %d", it_del->first);
+            _hdr_global_tmo_state_map.erase(it_del);
+            break;
+        } else {
+            LOGW_CAMHW_SUBM(ISP20POLL_SUBM, "%s missing tmo state for buf_seq %d, min rdtimes_seq %d !",
+                            __func__, sequence, iter->first);
+            break;
         }
+    }
 }
 
 void
@@ -1047,8 +1053,8 @@ int Isp20PollThread::update_capture_raw_status(const char* file_name)
 }
 
 int Isp20PollThread::dynamic_capture_raw(int i, uint32_t sequence,
-                                         SmartPtr<V4l2BufferProxy> buf_proxy,
-                                         SmartPtr<V4l2Buffer> &v4l2buf)
+        SmartPtr<V4l2BufferProxy> buf_proxy,
+        SmartPtr<V4l2Buffer> &v4l2buf)
 {
     if (_is_capture_raw && _capture_raw_num > 0) {
         if (!_is_raw_dir_exist) {
@@ -1066,28 +1072,28 @@ int Isp20PollThread::dynamic_capture_raw(int i, uint32_t sequence,
             memset(raw_name, 0, sizeof(raw_name));
             if (_mipi_dev_max == 1)
                 snprintf(raw_name, sizeof(raw_name),
-                        "%s/frame%d_%dx%d_%s.raw",
-                        raw_dir_path,
-                        sequence,
-                        sns_width,
-                        sns_height,
-                        "normal");
+                         "%s/frame%d_%dx%d_%s.raw",
+                         raw_dir_path,
+                         sequence,
+                         sns_width,
+                         sns_height,
+                         "normal");
             else if (_mipi_dev_max == 2)
                 snprintf(raw_name, sizeof(raw_name),
-                        "%s/frame%d_%dx%d_%s.raw",
-                        raw_dir_path,
-                        sequence,
-                        sns_width,
-                        sns_height,
-                        i == 0 ? "short" : "long");
+                         "%s/frame%d_%dx%d_%s.raw",
+                         raw_dir_path,
+                         sequence,
+                         sns_width,
+                         sns_height,
+                         i == 0 ? "short" : "long");
             else
                 snprintf(raw_name, sizeof(raw_name),
-                        "%s/frame%d_%dx%d_%s.raw",
-                        raw_dir_path,
-                        sequence,
-                        sns_width,
-                        sns_height,
-                        i == 0 ? "short" : i == 1 ? "middle" : "long");
+                         "%s/frame%d_%dx%d_%s.raw",
+                         raw_dir_path,
+                         sequence,
+                         sns_width,
+                         sns_height,
+                         i == 0 ? "short" : i == 1 ? "middle" : "long");
 
             fp = fopen(raw_name, "wb+");
             if (fp != nullptr) {
@@ -1095,8 +1101,8 @@ int Isp20PollThread::dynamic_capture_raw(int i, uint32_t sequence,
                 write_frame_header_to_raw(fp, i, sequence);
 #endif
                 write_raw_to_file(fp, i, sequence,
-                        (void *)(buf_proxy->get_v4l2_userptr()),
-                        v4l2buf->get_buf().m.planes[0].bytesused);
+                                  (void *)(buf_proxy->get_v4l2_userptr()),
+                                  v4l2buf->get_buf().m.planes[0].bytesused);
                 fclose(fp);
             }
             XCAM_STATIC_PROFILING_END(write_raw, 0);
@@ -1276,7 +1282,7 @@ Isp20PollThread::creat_raw_dir(const char* path)
     if (access(path, W_OK) == -1) {
         if (mkdir(path, 0755) < 0)
             LOGE_CAMHW_SUBM(ISP20POLL_SUBM, "mkdir %s error(%s)!\n",
-                    path, strerror(errno));
+                            path, strerror(errno));
         return XCAM_RETURN_ERROR_PARAM;
     }
 
@@ -1294,7 +1300,7 @@ Isp20PollThread::creat_raw_dir(const char* path)
 
     if(mkdir(raw_dir_path, 0755) < 0) {
         LOGE_CAMHW_SUBM(ISP20POLL_SUBM, "mkdir %s error(%s)!!!\n",
-                raw_dir_path, strerror(errno));
+                        raw_dir_path, strerror(errno));
         return XCAM_RETURN_ERROR_PARAM;
     }
 
@@ -1321,14 +1327,14 @@ Isp20PollThread::capture_raw_ctl(capture_raw_t type, int count, const char* capt
     if (_capture_raw_type == CAPTURE_RAW_SYNC) {
         if (capture_dir != nullptr)
             snprintf(user_set_raw_dir, sizeof( user_set_raw_dir),
-                    "%s/capture_image", capture_dir);
+                     "%s/capture_image", capture_dir);
         else
             strcpy(user_set_raw_dir, DEFAULT_CAPTURE_RAW_PATH);
 
         char cmd_buffer[32] = {0};
         snprintf(cmd_buffer, sizeof(cmd_buffer),
-                "echo %d > %s",
-                count, CAPTURE_CNT_FILENAME);
+                 "echo %d > %s",
+                 count, CAPTURE_CNT_FILENAME);
         system(cmd_buffer);
 
         _capture_image_mutex.lock();
@@ -1368,9 +1374,9 @@ bool Isp20PollThread::check_skip_frame(int32_t buf_seq)
         int64_t skip_ts_ms = _skip_start_ts / 1000 / 1000;
         int64_t buf_ts_ms = buf_ts / 1000;
         LOGD_CAMHW_SUBM(ISP20POLL_SUBM, "skip num  %d, start from %" PRId64 " ms,  buf ts %" PRId64 " ms",
-             _skip_num,
-             skip_ts_ms,
-             buf_ts_ms);
+                        _skip_num,
+                        skip_ts_ms,
+                        buf_ts_ms);
         if (buf_ts_ms  > skip_ts_ms) {
             _skip_num--;
             _mipi_trigger_mutex.unlock();
@@ -1381,7 +1387,7 @@ bool Isp20PollThread::check_skip_frame(int32_t buf_seq)
 
     if ((_skip_num > 0) && (buf_seq < _skip_to_seq)) {
         LOGD_CAMHW_SUBM(ISP20POLL_SUBM, "skip num  %d, skip seq %d, dest seq %d",
-             _skip_num, buf_seq, _skip_to_seq);
+                        _skip_num, buf_seq, _skip_to_seq);
         _skip_num--;
         _mipi_trigger_mutex.unlock();
         return true;

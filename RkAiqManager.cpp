@@ -538,6 +538,13 @@ RkAiqManager::applyAnalyzerResult(SmartPtr<RkAiqFullParamsProxy>& results)
     }
 set_exp_end:
 
+    if (aiqParams->mIrisParams.ptr()) {
+        ret = mCamHw->setIrisParams(aiqParams->mIrisParams, mCalibDb->aec.CommCtrl.stIris.IrisType);
+        if (ret)
+            LOGE_ANALYZER("setIrisParams error %d", ret);
+    }
+
+
 #ifdef RUNTIME_MODULE_DEBUG
 #ifndef RK_SIMULATOR_HW
     if (g_bypass_isp_params)
@@ -580,9 +587,9 @@ set_ispp_end:
     if (aiqParams->mIspParams.ptr()) {
         SmartPtr<rk_aiq_isp_params_t> isp_params = aiqParams->mIspParams->data();
         LOGD_ANALYZER("ie mode %d, mWkSwitching %d, mWorkingMode %d, mOldWkModeForGray %d",
-             isp_params->ie.base.mode, mWkSwitching, mWorkingMode, mOldWkModeForGray);
+                      isp_params->ie.base.mode, mWkSwitching, mWorkingMode, mOldWkModeForGray);
         if (isp_params->ie.base.mode == RK_AIQ_IE_EFFECT_BW &&
-            mWorkingMode != RK_AIQ_WORKING_MODE_NORMAL && !mWkSwitching) {
+                mWorkingMode != RK_AIQ_WORKING_MODE_NORMAL && !mWkSwitching) {
             mOldWkModeForGray = mWorkingMode;
             mWkSwitching = true;
             LOGD_ANALYZER("switch to BW, old mode %d", mOldWkModeForGray);

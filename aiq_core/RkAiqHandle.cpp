@@ -267,7 +267,7 @@ RkAiqAeHandle::postProcess()
     ENTER_ANALYZER_FUNCTION();
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
     RkAiqAlgoDescription* des = (RkAiqAlgoDescription*)mDes;
-    RkAiqAlgoPostAe* ae_pre = (RkAiqAlgoPostAe*)mPostInParam;
+    RkAiqAlgoPostAe* ae_post = (RkAiqAlgoPostAe*)mPostInParam;
     RkAiqCore::RkAiqAlgosShared_t* shared = &mAiqCore->mAlogsSharedParams;
     RkAiqIspStats* ispStats = &shared->ispStats;
 

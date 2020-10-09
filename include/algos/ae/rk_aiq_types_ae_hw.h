@@ -253,9 +253,26 @@ typedef struct {
     RkAiqExpSensorParam_t exp_sensor_params;//reg value
 } RkAiqExpParamComb_t;
 
+typedef struct {
+    int            step;
+    int            gain;
+    bool           update;
+} RkAiqPIrisParam_t;
+
+typedef struct {
+    int        pwmDuty; //percent value,range = 0-100
+    bool       update;
+} RkAiqDCIrisParam_t;
+
+typedef struct {
+    RkAiqPIrisParam_t   PIris;
+    RkAiqDCIrisParam_t  DCIris;
+} RkAiqIrisParamComb_t;
+
 typedef struct RKAiqAecExpInfo_s {
     RkAiqExpParamComb_t LinearExp;
     RkAiqExpParamComb_t HdrExp[3];
+    RkAiqIrisParamComb_t Iris;
     unsigned short line_length_pixels;
     unsigned short frame_length_lines;
     float pixel_clock_freq_mhz;

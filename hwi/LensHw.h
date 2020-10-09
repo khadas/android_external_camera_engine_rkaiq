@@ -35,6 +35,11 @@ struct rk_cam_vcm_cfg {
     int step_mode;
 };
 
+struct rk_cam_motor_tim {
+    struct timeval motor_start_t;
+    struct timeval motor_end_t;
+};
+
 #define RK_VIDIOC_VCM_TIMEINFO \
     _IOR('V', BASE_VIDIOC_PRIVATE + 0, struct rk_cam_vcm_tim)
 #define RK_VIDIOC_IRIS_TIMEINFO \
@@ -65,13 +70,15 @@ public:
     XCamReturn getLensModeData(rk_aiq_lens_descriptor& lens_des);
     XCamReturn getLensVcmCfg(rk_aiq_lens_vcmcfg& lens_cfg);
     XCamReturn setLensVcmCfg(rk_aiq_lens_vcmcfg& lens_cfg);
-    XCamReturn setIrisParams(int position);
+    XCamReturn setPIrisParams(int step);
+    XCamReturn setDCIrisParams(int pwmDuty);
     XCamReturn setFocusParams(int position);
     XCamReturn setZoomParams(int position);
-    XCamReturn getIrisParams(int* position);
+    XCamReturn getPIrisParams(int* step);
     XCamReturn getFocusParams(int* position);
     XCamReturn getZoomParams(int* position);
     XCamReturn handle_sof(int64_t time, int frameid);
+    XCamReturn getIrisInfoParams(SmartPtr<RkAiqIrisParamsProxy>& irisParams, int frame_id);
     XCamReturn getAfInfoParams(SmartPtr<RkAiqAfInfoProxy>& afInfo, int frame_id);
 
 private:
@@ -80,17 +87,22 @@ private:
     XCAM_DEAD_COPY (LensHw);
     Mutex _mutex;
     SmartPtr<RkAiqAfInfoPool> _afInfoPool;
+    SmartPtr<RkAiqIrisParamsPool> _irisInfoPool;
     static uint16_t DEFAULT_POOL_SIZE;
     struct v4l2_queryctrl _iris_query;
     struct v4l2_queryctrl _focus_query;
     struct v4l2_queryctrl _zoom_query;
-    struct rk_cam_vcm_tim _iris_tim;
+    struct rk_cam_motor_tim _dciris_tim;
+    struct rk_cam_motor_tim _piris_tim;
     struct rk_cam_vcm_tim _focus_tim;
     struct rk_cam_vcm_tim _zoom_tim;
     bool _iris_enable;
     bool _focus_enable;
     bool _zoom_enable;
-    int _iris_pos;
+    int _piris_step;
+    int _last_piris_step;
+    int _dciris_pwmduty;
+    int _last_dciris_pwmduty;
     int _focus_pos;
     int _zoom_pos;
     int64_t _frame_time[LENSHW_RECORD_SOF_NUM];

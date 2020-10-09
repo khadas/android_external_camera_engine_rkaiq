@@ -40,7 +40,7 @@ rk_aiq_uapi_adehaze_SetAttrib(RkAiqAlgoContext *ctx,
         for(int i = 0; i < 3; i++)
         {
             AdehazeHandle->calib_dehaz.enhance_setting[i].en = attr.stManual.enhance_en;
-            for(int j = 0; j < 9; i++) {
+            for(int j = 0; j < 9; j++) {
                 AdehazeHandle->calib_dehaz.dehaze_setting[i].cfg_wt[j] = attr.stManual.sw_dhaz_cfg_wt;
                 AdehazeHandle->calib_dehaz.dehaze_setting[i].cfg_air[j] = attr.stManual.sw_dhaz_cfg_air;
                 AdehazeHandle->calib_dehaz.dehaze_setting[i].cfg_tmax[j] = attr.stManual.sw_dhaz_cfg_tmax;

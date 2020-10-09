@@ -91,10 +91,11 @@ typedef enum {
     PREPARE = 0x01,
     PREPROC = 0x02,
     PROC = 0x04,
-    LDM = 0x08,
-    CLM = 0x10,
-    ECM = 0x20,
-    HDRECM = 0x40,
+    POST = 0x08,
+    LDM = 0x10,
+    CLM = 0x20,
+    ECM = 0x40,
+    HDRECM = 0x80,
 } AecLogLevel_t;
 /*****************************************************************************/
 /**
@@ -405,7 +406,7 @@ typedef struct AecPreResult_s {
 
 /*****************************************************************************/
 /**
-*     AecResult_t
+*     AecProcResult_t
 * @brief   Aec_Result.
 *
 */
@@ -466,6 +467,11 @@ typedef struct AecProcResult_s {
 
     uint8_t                       HdrGridWeights[3][ISP2_RAWAE_WINNUM_MAX];//used for histogram calculation
 } AecProcResult_t;
+
+typedef struct AecPostResult_s {
+    RkAiqDCIrisParam_t      DCIris;
+
+} AecPostResult_t;
 
 /* @} AEC */
 

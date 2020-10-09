@@ -39,8 +39,8 @@ namespace RkCam {
 #define VIPCAP_TX_BUF_NUM 6
 
 typedef struct {
-    int  model_idx:3;
-    int  linked_sensor:3;
+    int  model_idx: 3;
+    int  linked_sensor: 3;
     char media_dev_path[DEV_PATH_LEN];
     char isp_dev_path[DEV_PATH_LEN];
     char csi_dev_path[DEV_PATH_LEN];
@@ -99,7 +99,7 @@ typedef struct {
 } rk_aiq_isp_hw_info_t;
 
 typedef struct {
-    int  model_idx:3;
+    int  model_idx: 3;
     char media_dev_path[DEV_PATH_LEN];
     char mipi_id0[DEV_PATH_LEN];
     char mipi_id1[DEV_PATH_LEN];
@@ -168,6 +168,7 @@ public:
     XCamReturn setIsppParamsSync(int frameId);
     virtual XCamReturn setIspParams(SmartPtr<RkAiqIspParamsProxy>& ispParams);
     virtual XCamReturn setExposureParams(SmartPtr<RkAiqExpParamsProxy>& expPar);
+    virtual XCamReturn setIrisParams(SmartPtr<RkAiqIrisParamsProxy>& irisPar, CalibDb_IrisType_t irisType);
     virtual XCamReturn setHdrProcessCount(int frame_id, int count);
     virtual XCamReturn setFocusParams(SmartPtr<RkAiqFocusParamsProxy>& focus_params);
     virtual XCamReturn setCpslParams(SmartPtr<RkAiqCpslParamsProxy>& cpsl_params);

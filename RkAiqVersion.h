@@ -249,11 +249,17 @@
  * - update rkisp2x_tuner v0.2.1
  * - ALDCH: fix attrib has no effect setting before prepare
  * - SensorHw.cpp: fix exposure error caused by wrong dcg info
- * -
+ * v1.2.3
+ * - calib db: v1.3.4 magic code: 1061311
+ * - fix some memory leak
+ * - support Iris control
+ * - support AF funtionality
+ * - TMO/Dehaze: lots of modifications
+ * - isp driver v0.1.8
  */
 
-#define RK_AIQ_VERSION_REAL_V "v1.2.2"
-#define RK_AIQ_RELEASE_DATE "2020-09-27"
+#define RK_AIQ_VERSION_REAL_V "v1.2.3"
+#define RK_AIQ_RELEASE_DATE "2020-10-09"
 
 /******* DO NOT EDIT THE FOLLOWINGS ***********/
 

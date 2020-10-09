@@ -144,8 +144,8 @@ void
 RkAiqHandleIntCom::waitSignal()
 {
     if (mAiqCore->isRunningState()) {
-        mUpdateCond.timedwait(mCfgMutex,100000);
-    }else{
+        mUpdateCond.timedwait(mCfgMutex, 100000);
+    } else {
         updateConfig(false);
     }
 }
@@ -2736,25 +2736,25 @@ RkAiqAcpHandleInt::postProcess()
 
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
 
-    RkAiqAlgoPostAeInt* ae_post_int = (RkAiqAlgoPostAeInt*)mPostInParam;
-    RkAiqAlgoPostResAeInt* ae_post_res_int = (RkAiqAlgoPostResAeInt*)mPostOutParam;
+    RkAiqAlgoPostAcpInt* acp_post_int = (RkAiqAlgoPostAcpInt*)mPostInParam;
+    RkAiqAlgoPostResAcpInt* acp_post_res_int = (RkAiqAlgoPostResAcpInt*)mPostOutParam;
     RkAiqCore::RkAiqAlgosShared_t* shared = &mAiqCore->mAlogsSharedParams;
     RkAiqPostResComb* comb = &shared->postResComb;
     RkAiqIspStats* ispStats = &shared->ispStats;
 
     ret = RkAiqAcpHandle::postProcess();
     if (ret) {
-        comb->ae_post_res = NULL;
-        RKAIQCORE_CHECK_RET(ret, "ae handle postProcess failed");
+        comb->acp_post_res = NULL;
+        RKAIQCORE_CHECK_RET(ret, "acp handle postProcess failed");
         return ret;
     }
 
-    comb->ae_post_res = NULL;
+    comb->acp_post_res = NULL;
     RkAiqAlgoDescription* des = (RkAiqAlgoDescription*)mDes;
     ret = des->post_process(mPostInParam, mPostOutParam);
-    RKAIQCORE_CHECK_RET(ret, "ae algo post_process failed");
+    RKAIQCORE_CHECK_RET(ret, "acp algo post_process failed");
     // set result to mAiqCore
-    comb->ae_post_res = (RkAiqAlgoPostResAe*)ae_post_res_int ;
+    comb->acp_post_res = (RkAiqAlgoPostResAcp*)acp_post_res_int ;
 
     EXIT_ANALYZER_FUNCTION();
     return ret;

@@ -2,7 +2,7 @@
 <matfile>
 	<header type="struct" size="[1 1]">
 		<code_xml_parse_version index="1" type="char" size="[1 6]">
-         	v1.3.2
+         	v1.3.4
 		</code_xml_parse_version>
 		<creation_date index="1" type="char" size="[1 10]">
 		2020-04-24
@@ -20,7 +20,7 @@
             	v0.0.3
 		</generator_version>
 		<magic_code_version index="1" type="int" size="[1 1]">
-	          [1034813]
+	          [1061311]
 		</magic_code_version>
 	</header>
 	<sensor type="struct" size="[1 1]">
@@ -1711,7 +1711,16 @@ Y
 			<YRangeMode index="1" type="char" size="[1 10]">
 FULL
 </YRangeMode>
-			<AecSpeed index="1" type="struct" size="[1 1]">
+	<AecSyncTest index="1" type="struct" size="[1 1]">	   <Enable index="1" type="double" size="[1 1]">	         [0]	   </Enable>	   <IntervalFrm index="1" type="double" size="[1 1]">	         [60]	   </IntervalFrm>	   <AlterExp index="1" type="struct" size="[1 1]">	            <LinearAE index="1" type="cell" size="[1 2]">			<cell index="1" type="struct" size="[1 1]">	                  <TimeValue index="1" type="double" size="[1 1]">	                     [0.02]	                  </TimeValue>		         <GainValue index="1" type="double" size="[1 1]">	                     [1]	                  </GainValue>		         <IspDgainValue index="1" type="double" size="[1 1]">	                     [1]	                  </IspDgainValue>
+		         <DcgMode index="1" type="double" size="[1 1]">	                     [0]	                  </DcgMode>		         <PIrisGainValue index="1" type="double" size="[1 1]">	                     [1]	                  </PIrisGainValue>
+			</cell>			<cell index="1" type="struct" size="[1 1]">	                  <TimeValue index="1" type="double" size="[1 1]">	                     [0.020]	                  </TimeValue>		         <GainValue index="1" type="double" size="[1 1]">	                     [6]	                  </GainValue>		         <IspDgainValue index="1" type="double" size="[1 1]">	                     [1]	                  </IspDgainValue>
+		         <DcgMode index="1" type="double" size="[1 1]">	                     [0]	                  </DcgMode>		         <PIrisGainValue index="1" type="double" size="[1 1]">	                     [29]	                  </PIrisGainValue>
+			</cell>	            </LinearAE>	            <HdrAE index="1" type="cell" size="[1 2]">			<cell index="1" type="struct" size="[1 1]">	                  <TimeValue index="1" type="double" size="[1 3]">	                     [0.01 0.02 0.03]	                  </TimeValue>		         <GainValue index="1" type="double" size="[1 3]">	                     [1 1 1]	                  </GainValue>		         <IspDgainValue index="1" type="double" size="[1 3]">	                     [1 1 1]	                  </IspDgainValue>
+		         <DcgMode index="1" type="double" size="[1 3]">	                     [0 0 0]	                  </DcgMode>		         <PIrisGainValue index="1" type="double" size="[1 1]">	                     [1]	                  </PIrisGainValue>
+			</cell>
+			<cell index="1" type="struct" size="[1 1]">	                  <TimeValue index="1" type="double" size="[1 3]">	                     [0.01 0.02 0.03]	                  </TimeValue>		         <GainValue index="1" type="double" size="[1 3]">	                     [6 6 1]	                  </GainValue>		         <IspDgainValue index="1" type="double" size="[1 3]">	                     [1 1 1]	                  </IspDgainValue>
+		         <DcgMode index="1" type="double" size="[1 3]">	                     [0 0 0]	                  </DcgMode>		         <PIrisGainValue index="1" type="double" size="[1 1]">	                     [29]	                  </PIrisGainValue>
+			</cell>	            </HdrAE>             </AlterExp>         </AecSyncTest>			<AecSpeed index="1" type="struct" size="[1 1]">
 				<DampOver index="1" type="double" size="[1 1]">
 [0.1500 ]
 </DampOver>
@@ -1763,9 +1772,12 @@ AUTO
 					<InitIspDgainValue index="1" type="double" size="[1 1]">
 [1.0000 ]
 </InitIspDgainValue>
-					<InitPIrisValue index="1" type="double" size="[1 1]">
+					<InitPIrisGainValue index="1" type="double" size="[1 1]">
 [1.4000 ]
-</InitPIrisValue>
+</InitPIrisGainValue>
+	         <InitDCIrisDutyValue index="1" type="double" size="[1 1]">
+                     [30]
+                  </InitDCIrisDutyValue>
 				</LinearAE>
 				<HdrAE index="1" type="struct" size="[1 1]">
 					<InitTimeValue index="1" type="double" size="[1 3]">
@@ -1777,9 +1789,12 @@ AUTO
 					<InitIspDgainValue index="1" type="double" size="[1 3]">
 [1.0000 1.0000 1.0000 ]
 </InitIspDgainValue>
-					<InitPIrisValue index="1" type="double" size="[1 1]">
+					<InitPIrisGainValue index="1" type="double" size="[1 1]">
 [1.4000 ]
-</InitPIrisValue>
+</InitPIrisGainValue>
+	         <InitDCIrisDutyValue index="1" type="double" size="[1 1]">
+                     [30]
+                  </InitDCIrisDutyValue>
 				</HdrAE>
 			</AecInitValue>
 			<AecGridWeight index="1" type="struct" size="[1 1]">
@@ -1967,7 +1982,29 @@ DAY
 [0.0286 0.5972 ]
 </CurveCoeff>
 			</AecEnvLvCalib>
-			<AecManualCtrl index="1" type="struct" size="[1 1]">
+	<AecIrisCtrl index="1" type="struct" size="[1 1]">
+               <Enable index="1" type="double" size="[1 1]">                  [0]               </Enable>
+               <IrisType index="1" type="char" size="[1 3]">                  DC               </IrisType>
+	      <PIrisAttr index="1" type="struct" size="[1 1]">
+               	 <TotalStep index="1" type="double" size="[1 1]">                       [81]                   </TotalStep>
+                   <EffcStep index="1" type="double" size="[1 1]">                       [44]                   </EffcStep>
+                   <ZeroIsMax index="1" type="double" size="[1 1]">                       [1]                   </ZeroIsMax>
+                   <StepTable index="1" type="double" size="[1 81]">                       [512 511 506	499 491 483 474 465 456
+                        446 437 427 417 408 398 388 378 368
+                        359 349 339 329 319 309 300 290 280
+                        271 261 252 242 233 224 214 205 196
+                        187 178 170 161 153 144 136 128 120
+                        112 105 98 90 83 77 70 64 58
+                        52 46 41 36 31 27 23 19 16
+                        13 10 8 6 4 3 1 1 0
+                        0 0 0 0 0 0 0 0 0]                   </StepTable>	       </PIrisAttr>	      <DCIrisAttr index="1" type="struct" size="[1 1]">
+               	 <Kp index="1" type="double" size="[1 1]">                       [1]                   </Kp>
+                   <Ki index="1" type="double" size="[1 1]">                       [0.2]                   </Ki>
+                   <Kd index="1" type="double" size="[1 1]">                       [0.5]                   </Kd>
+                   <MinPwmDuty index="1" type="double" size="[1 1]">                       [0]                   </MinPwmDuty>
+                   <MaxPwmDuty index="1" type="double" size="[1 1]">                       [100]                   </MaxPwmDuty>
+                   <OpenPwmDuty index="1" type="double" size="[1 1]">                       [40]                   </OpenPwmDuty>
+                   <ClosePwmDuty index="1" type="double" size="[1 1]">                       [22]                   </ClosePwmDuty>	       </DCIrisAttr>         </AecIrisCtrl>			<AecManualCtrl index="1" type="struct" size="[1 1]">
 				<LinearAE index="1" type="struct" size="[1 1]">
 					<ManualTimeEn index="1" type="double" size="[1 1]">
 [1 ]
@@ -1978,9 +2015,9 @@ DAY
 					<ManualIspDgainEn index="1" type="double" size="[1 1]">
 [1 ]
 </ManualIspDgainEn>
-					<ManualPirisEn index="1" type="double" size="[1 1]">
+					<ManualIrisEn index="1" type="double" size="[1 1]">
 [1 ]
-</ManualPirisEn>
+</ManualIrisEn>
 					<TimeValue index="1" type="double" size="[1 1]">
 [0.0100 ]
 </TimeValue>
@@ -1990,9 +2027,12 @@ DAY
 					<IspDGainValue index="1" type="double" size="[1 1]">
 [1.0000 ]
 </IspDGainValue>
-					<PIrisValue index="1" type="double" size="[1 1]">
+					<PIrisGainValue index="1" type="double" size="[1 1]">
 [1.4000 ]
-</PIrisValue>
+</PIrisGainValue>
+	         <DCIrisValue index="1" type="double" size="[1 1]">
+                     [30]
+                  </DCIrisValue>
 				</LinearAE>
 				<HdrAE index="1" type="struct" size="[1 1]">
 					<ManualTimeEn index="1" type="double" size="[1 1]">
@@ -2004,9 +2044,9 @@ DAY
 					<ManualIspDgainEn index="1" type="double" size="[1 1]">
 [1 ]
 </ManualIspDgainEn>
-					<ManualPirisEn index="1" type="double" size="[1 1]">
+					<ManualIrisEn index="1" type="double" size="[1 1]">
 [1 ]
-</ManualPirisEn>
+</ManualIrisEn>
 					<TimeValue index="1" type="double" size="[1 3]">
 [0.0100 0.0200 0.0300 ]
 </TimeValue>
@@ -2016,9 +2056,12 @@ DAY
 					<IspDGainValue index="1" type="double" size="[1 3]">
 [1.0000 1.0000 1.0000 ]
 </IspDGainValue>
-					<PIrisValue index="1" type="double" size="[1 1]">
+					<PIrisGainValue index="1" type="double" size="[1 1]">
 [1.4000 ]
-</PIrisValue>
+</PIrisGainValue>
+	         <DCIrisValue index="1" type="double" size="[1 1]">
+                     [30]
+                  </DCIrisValue>
 				</HdrAE>
 			</AecManualCtrl>
 			<LinearAECtrl index="1" type="struct" size="[1 1]">
