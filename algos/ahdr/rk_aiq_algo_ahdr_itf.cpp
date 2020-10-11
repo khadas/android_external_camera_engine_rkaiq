@@ -95,6 +95,7 @@ static XCamReturn AhdrPrepare(RkAiqAlgoCom* params)
         pAhdrCtx->hdr_mode = 3;
 
     AhdrConfig(pAhdrCtx); //set default para
+    memcpy(&pAhdrCtx->pCalibDB, &pCalibDb->ahdr, sizeof(CalibDb_Ahdr_Para_t));//load iq paras
 
     if (ret != AHDR_RET_SUCCESS) {
         LOGE_AHDR("%s AHDRUpdateConfig failed: %d", __FUNCTION__, ret);
@@ -131,7 +132,7 @@ static XCamReturn AhdrPreProcess(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* 
     else
         pAhdrCtx->sence_mode = AHDR_HDR;
 
-    AhdrGetXmlParas(pAhdrCtx, pCalibDb, pAhdrCtx->sence_mode); //convert AeCfg params into AeHandle
+    AhdrSelectMode(pAhdrCtx, &pAhdrCtx->pCalibDB, pAhdrCtx->sence_mode);
 
     LOG1_AHDR("%s:Exit!\n", __FUNCTION__);
     return(XCAM_RETURN_NO_ERROR);

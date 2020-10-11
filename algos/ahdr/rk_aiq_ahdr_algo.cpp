@@ -905,13 +905,13 @@ void AhdrApiOnUpdate
 }
 
 /******************************************************************************
- * AhdrGetXmlParas()
+ * AhdrSelectMode()
  *transfer html parameter into handle
  ***************************************************************************/
-void AhdrGetXmlParas
+void AhdrSelectMode
 (
     AhdrHandle_t           pAhdrCtx,
-    const CamCalibDbContext_t*         pCalibDb,
+    CalibDb_Ahdr_Para_t*         pCalibDb,
     int mode
 ) {
     LOG1_AHDR( "%s:enter!\n", __FUNCTION__);
@@ -921,67 +921,67 @@ void AhdrGetXmlParas
     DCT_ASSERT(pCalibDb != NULL);
 
     //merge
-    pAhdrCtx->AhdrConfig.merge_para.OECurve_damp = LIMIT_VALUE(pCalibDb->ahdr.merge.oeCurve_damp, DAMPMAX, DAMPMIN);
-    pAhdrCtx->AhdrConfig.merge_para.MDCurveLM_damp = LIMIT_VALUE(pCalibDb->ahdr.merge.mdCurveLm_damp, DAMPMAX, DAMPMIN);
-    pAhdrCtx->AhdrConfig.merge_para.MDCurveMS_damp = LIMIT_VALUE(pCalibDb->ahdr.merge.mdCurveMs_damp, DAMPMAX, DAMPMIN);
+    pAhdrCtx->AhdrConfig.merge_para.OECurve_damp = LIMIT_VALUE(pCalibDb->merge.oeCurve_damp, DAMPMAX, DAMPMIN);
+    pAhdrCtx->AhdrConfig.merge_para.MDCurveLM_damp = LIMIT_VALUE(pCalibDb->merge.mdCurveLm_damp, DAMPMAX, DAMPMIN);
+    pAhdrCtx->AhdrConfig.merge_para.MDCurveMS_damp = LIMIT_VALUE(pCalibDb->merge.mdCurveMs_damp, DAMPMAX, DAMPMIN);
     for (int i = 0; i < 6; i++ )
     {
-        pAhdrCtx->AhdrConfig.merge_para.EnvLv[i] = LIMIT_VALUE(pCalibDb->ahdr.merge.envLevel[i], ENVLVMAX, ENVLVMIN);
-        pAhdrCtx->AhdrConfig.merge_para.MoveCoef[i] = LIMIT_VALUE(pCalibDb->ahdr.merge.moveCoef[i], MOVECOEFMAX, MOVECOEFMIN);
-        pAhdrCtx->AhdrConfig.merge_para.OECurve_smooth[i] = LIMIT_VALUE(pCalibDb->ahdr.merge.oeCurve_smooth[i], IQPARAMAX, IQPARAMIN);
-        pAhdrCtx->AhdrConfig.merge_para.OECurve_offset[i] = LIMIT_VALUE(pCalibDb->ahdr.merge.oeCurve_offset[i], OECURVEOFFSETMAX, OECURVEOFFSETMIN);
-        pAhdrCtx->AhdrConfig.merge_para.MDCurveLM_smooth[i] = LIMIT_VALUE(pCalibDb->ahdr.merge.mdCurveLm_smooth[i], IQPARAMAX, IQPARAMIN);
-        pAhdrCtx->AhdrConfig.merge_para.MDCurveLM_offset[i] = LIMIT_VALUE(pCalibDb->ahdr.merge.mdCurveLm_offset[i], IQPARAMAX, IQPARAMIN);
-        pAhdrCtx->AhdrConfig.merge_para.MDCurveMS_smooth[i] = LIMIT_VALUE(pCalibDb->ahdr.merge.mdCurveMs_smooth[i], IQPARAMAX, IQPARAMIN);
-        pAhdrCtx->AhdrConfig.merge_para.MDCurveMS_offset[i] = LIMIT_VALUE(pCalibDb->ahdr.merge.mdCurveMs_offset[i], IQPARAMAX, IQPARAMIN);
+        pAhdrCtx->AhdrConfig.merge_para.EnvLv[i] = LIMIT_VALUE(pCalibDb->merge.envLevel[i], ENVLVMAX, ENVLVMIN);
+        pAhdrCtx->AhdrConfig.merge_para.MoveCoef[i] = LIMIT_VALUE(pCalibDb->merge.moveCoef[i], MOVECOEFMAX, MOVECOEFMIN);
+        pAhdrCtx->AhdrConfig.merge_para.OECurve_smooth[i] = LIMIT_VALUE(pCalibDb->merge.oeCurve_smooth[i], IQPARAMAX, IQPARAMIN);
+        pAhdrCtx->AhdrConfig.merge_para.OECurve_offset[i] = LIMIT_VALUE(pCalibDb->merge.oeCurve_offset[i], OECURVEOFFSETMAX, OECURVEOFFSETMIN);
+        pAhdrCtx->AhdrConfig.merge_para.MDCurveLM_smooth[i] = LIMIT_VALUE(pCalibDb->merge.mdCurveLm_smooth[i], IQPARAMAX, IQPARAMIN);
+        pAhdrCtx->AhdrConfig.merge_para.MDCurveLM_offset[i] = LIMIT_VALUE(pCalibDb->merge.mdCurveLm_offset[i], IQPARAMAX, IQPARAMIN);
+        pAhdrCtx->AhdrConfig.merge_para.MDCurveMS_smooth[i] = LIMIT_VALUE(pCalibDb->merge.mdCurveMs_smooth[i], IQPARAMAX, IQPARAMIN);
+        pAhdrCtx->AhdrConfig.merge_para.MDCurveMS_offset[i] = LIMIT_VALUE(pCalibDb->merge.mdCurveMs_offset[i], IQPARAMAX, IQPARAMIN);
     }
 
     //TMO
-    pAhdrCtx->AhdrConfig.tmo_para.Luma.globalLumaMode = LIMIT_VALUE(pCalibDb->ahdr.tmo.luma[mode].GlobalLumaMode, GLOBALLUMAMODEMAX, GLOBALLUMAMODEMIN);
-    pAhdrCtx->AhdrConfig.tmo_para.DtsLoLit.DetailsLowLightMode = LIMIT_VALUE(pCalibDb->ahdr.tmo.LowLight[mode].DetailsLowLightMode, DETAILSLOWLIGHTMODEMAX, DETAILSLOWLIGHTMODEMIN);
-    pAhdrCtx->AhdrConfig.tmo_para.DtsHiLit.DetailsHighLightMode = LIMIT_VALUE(pCalibDb->ahdr.tmo.HighLight[mode].DetailsHighLightMode, DETAILSHIGHLIGHTMODEMAX, DETAILSHIGHLIGHTMODEMIN);
-    pAhdrCtx->AhdrConfig.tmo_para.local.localtmoMode = LIMIT_VALUE(pCalibDb->ahdr.tmo.LocalTMO[mode].LocalTMOMode, TMOCONTRASTMODEMAX, TMOCONTRASTMODEMIN);
-    pAhdrCtx->AhdrConfig.tmo_para.damp = LIMIT_VALUE(pCalibDb->ahdr.tmo.damp, DAMPMAX, DAMPMIN);
-    pAhdrCtx->AhdrConfig.tmo_para.Luma.Tolerance = LIMIT_VALUE(pCalibDb->ahdr.tmo.luma[mode].Tolerance, TOLERANCEMAX, TOLERANCEMIN);
-    pAhdrCtx->AhdrConfig.tmo_para.DtsHiLit.Tolerance = LIMIT_VALUE(pCalibDb->ahdr.tmo.HighLight[mode].Tolerance, TOLERANCEMAX, TOLERANCEMIN);
-    pAhdrCtx->AhdrConfig.tmo_para.DtsLoLit.Tolerance = LIMIT_VALUE(pCalibDb->ahdr.tmo.LowLight[mode].Tolerance, TOLERANCEMAX, TOLERANCEMIN);
-    pAhdrCtx->AhdrConfig.tmo_para.local.Tolerance = LIMIT_VALUE(pCalibDb->ahdr.tmo.LocalTMO[mode].Tolerance, TOLERANCEMAX, TOLERANCEMIN);
+    pAhdrCtx->AhdrConfig.tmo_para.Luma.globalLumaMode = LIMIT_VALUE(pCalibDb->tmo.luma[mode].GlobalLumaMode, GLOBALLUMAMODEMAX, GLOBALLUMAMODEMIN);
+    pAhdrCtx->AhdrConfig.tmo_para.DtsLoLit.DetailsLowLightMode = LIMIT_VALUE(pCalibDb->tmo.LowLight[mode].DetailsLowLightMode, DETAILSLOWLIGHTMODEMAX, DETAILSLOWLIGHTMODEMIN);
+    pAhdrCtx->AhdrConfig.tmo_para.DtsHiLit.DetailsHighLightMode = LIMIT_VALUE(pCalibDb->tmo.HighLight[mode].DetailsHighLightMode, DETAILSHIGHLIGHTMODEMAX, DETAILSHIGHLIGHTMODEMIN);
+    pAhdrCtx->AhdrConfig.tmo_para.local.localtmoMode = LIMIT_VALUE(pCalibDb->tmo.LocalTMO[mode].LocalTMOMode, TMOCONTRASTMODEMAX, TMOCONTRASTMODEMIN);
+    pAhdrCtx->AhdrConfig.tmo_para.damp = LIMIT_VALUE(pCalibDb->tmo.damp, DAMPMAX, DAMPMIN);
+    pAhdrCtx->AhdrConfig.tmo_para.Luma.Tolerance = LIMIT_VALUE(pCalibDb->tmo.luma[mode].Tolerance, TOLERANCEMAX, TOLERANCEMIN);
+    pAhdrCtx->AhdrConfig.tmo_para.DtsHiLit.Tolerance = LIMIT_VALUE(pCalibDb->tmo.HighLight[mode].Tolerance, TOLERANCEMAX, TOLERANCEMIN);
+    pAhdrCtx->AhdrConfig.tmo_para.DtsLoLit.Tolerance = LIMIT_VALUE(pCalibDb->tmo.LowLight[mode].Tolerance, TOLERANCEMAX, TOLERANCEMIN);
+    pAhdrCtx->AhdrConfig.tmo_para.local.Tolerance = LIMIT_VALUE(pCalibDb->tmo.LocalTMO[mode].Tolerance, TOLERANCEMAX, TOLERANCEMIN);
     for(int i = 0; i < 6; i++)
     {
-        pAhdrCtx->AhdrConfig.tmo_para.Luma.EnvLv[i] = LIMIT_VALUE(pCalibDb->ahdr.tmo.luma[mode].envLevel[i], ENVLVMAX, ENVLVMIN);
-        pAhdrCtx->AhdrConfig.tmo_para.Luma.ISO[i] = LIMIT_VALUE(pCalibDb->ahdr.tmo.luma[mode].ISO[i], ISOMAX, ISOMIN);
-        pAhdrCtx->AhdrConfig.tmo_para.Luma.GlobeLuma[i] = LIMIT_VALUE(pCalibDb->ahdr.tmo.luma[mode].globalLuma[i], IQPARAMAX, IQPARAMIN) ;
+        pAhdrCtx->AhdrConfig.tmo_para.Luma.EnvLv[i] = LIMIT_VALUE(pCalibDb->tmo.luma[mode].envLevel[i], ENVLVMAX, ENVLVMIN);
+        pAhdrCtx->AhdrConfig.tmo_para.Luma.ISO[i] = LIMIT_VALUE(pCalibDb->tmo.luma[mode].ISO[i], ISOMAX, ISOMIN);
+        pAhdrCtx->AhdrConfig.tmo_para.Luma.GlobeLuma[i] = LIMIT_VALUE(pCalibDb->tmo.luma[mode].globalLuma[i], IQPARAMAX, IQPARAMIN) ;
 
-        pAhdrCtx->AhdrConfig.tmo_para.DtsHiLit.OEPdf[i] = LIMIT_VALUE(pCalibDb->ahdr.tmo.HighLight[mode].OEPdf[i], OEPDFMAX, OEPDFMIN) ;
-        pAhdrCtx->AhdrConfig.tmo_para.DtsHiLit.EnvLv[i] = LIMIT_VALUE(pCalibDb->ahdr.tmo.HighLight[mode].EnvLv[i], ENVLVMAX, ENVLVMIN);
-        pAhdrCtx->AhdrConfig.tmo_para.DtsHiLit.DetailsHighLight[i] = LIMIT_VALUE(pCalibDb->ahdr.tmo.HighLight[mode].detailsHighLight[i], IQPARAMAX, IQPARAMIN) ;
+        pAhdrCtx->AhdrConfig.tmo_para.DtsHiLit.OEPdf[i] = LIMIT_VALUE(pCalibDb->tmo.HighLight[mode].OEPdf[i], OEPDFMAX, OEPDFMIN) ;
+        pAhdrCtx->AhdrConfig.tmo_para.DtsHiLit.EnvLv[i] = LIMIT_VALUE(pCalibDb->tmo.HighLight[mode].EnvLv[i], ENVLVMAX, ENVLVMIN);
+        pAhdrCtx->AhdrConfig.tmo_para.DtsHiLit.DetailsHighLight[i] = LIMIT_VALUE(pCalibDb->tmo.HighLight[mode].detailsHighLight[i], IQPARAMAX, IQPARAMIN) ;
 
-        pAhdrCtx->AhdrConfig.tmo_para.DtsLoLit.FocusLuma[i] = LIMIT_VALUE(pCalibDb->ahdr.tmo.LowLight[mode].FocusLuma[i], FOCUSLUMAMAX, FOCUSLUMAMIN) ;
-        pAhdrCtx->AhdrConfig.tmo_para.DtsLoLit.DarkPdf[i] = LIMIT_VALUE(pCalibDb->ahdr.tmo.LowLight[mode].DarkPdf[i], DARKPDFMAX, DARKPDFMIN) ;
-        pAhdrCtx->AhdrConfig.tmo_para.DtsLoLit.ISO[i] = LIMIT_VALUE(pCalibDb->ahdr.tmo.LowLight[mode].ISO[i], ISOMAX, ISOMIN) ;
-        pAhdrCtx->AhdrConfig.tmo_para.DtsLoLit.DetailsLowLight[i] = LIMIT_VALUE(pCalibDb->ahdr.tmo.LowLight[mode].detailsLowLight[i], IQDETAILSLOWLIGHTMAX, IQDETAILSLOWLIGHTMIN) ;
+        pAhdrCtx->AhdrConfig.tmo_para.DtsLoLit.FocusLuma[i] = LIMIT_VALUE(pCalibDb->tmo.LowLight[mode].FocusLuma[i], FOCUSLUMAMAX, FOCUSLUMAMIN) ;
+        pAhdrCtx->AhdrConfig.tmo_para.DtsLoLit.DarkPdf[i] = LIMIT_VALUE(pCalibDb->tmo.LowLight[mode].DarkPdf[i], DARKPDFMAX, DARKPDFMIN) ;
+        pAhdrCtx->AhdrConfig.tmo_para.DtsLoLit.ISO[i] = LIMIT_VALUE(pCalibDb->tmo.LowLight[mode].ISO[i], ISOMAX, ISOMIN) ;
+        pAhdrCtx->AhdrConfig.tmo_para.DtsLoLit.DetailsLowLight[i] = LIMIT_VALUE(pCalibDb->tmo.LowLight[mode].detailsLowLight[i], IQDETAILSLOWLIGHTMAX, IQDETAILSLOWLIGHTMIN) ;
 
-        pAhdrCtx->AhdrConfig.tmo_para.local.DynamicRange[i] = LIMIT_VALUE(pCalibDb->ahdr.tmo.LocalTMO[mode].DynamicRange[i], DYNAMICRANGEMAX, DYNAMICRANGEMIN) ;
-        pAhdrCtx->AhdrConfig.tmo_para.local.EnvLv[i] = LIMIT_VALUE(pCalibDb->ahdr.tmo.LocalTMO[mode].EnvLv[i], ENVLVMAX, ENVLVMIN) ;
-        pAhdrCtx->AhdrConfig.tmo_para.local.LocalTmoStrength[i] = LIMIT_VALUE(pCalibDb->ahdr.tmo.LocalTMO[mode].Strength[i], IQPARAMAX, IQPARAMIN) ;
+        pAhdrCtx->AhdrConfig.tmo_para.local.DynamicRange[i] = LIMIT_VALUE(pCalibDb->tmo.LocalTMO[mode].DynamicRange[i], DYNAMICRANGEMAX, DYNAMICRANGEMIN) ;
+        pAhdrCtx->AhdrConfig.tmo_para.local.EnvLv[i] = LIMIT_VALUE(pCalibDb->tmo.LocalTMO[mode].EnvLv[i], ENVLVMAX, ENVLVMIN) ;
+        pAhdrCtx->AhdrConfig.tmo_para.local.LocalTmoStrength[i] = LIMIT_VALUE(pCalibDb->tmo.LocalTMO[mode].Strength[i], IQPARAMAX, IQPARAMIN) ;
     }
 
     //band prior
     pAhdrCtx->AhdrConfig.tmo_para.global.isHdrGlobalTmo =
-        pCalibDb->ahdr.tmo.GlobaTMO[mode].en == 0 ? false : true;
-    pAhdrCtx->AhdrConfig.tmo_para.global.mode = LIMIT_VALUE(pCalibDb->ahdr.tmo.GlobaTMO[mode].mode, TMOCONTRASTMODEMAX, TMOCONTRASTMODEMIN);
-    pAhdrCtx->AhdrConfig.tmo_para.global.Tolerance = LIMIT_VALUE(pCalibDb->ahdr.tmo.GlobaTMO[mode].Tolerance, TOLERANCEMAX, TOLERANCEMIN);
+        pCalibDb->tmo.GlobaTMO[mode].en == 0 ? false : true;
+    pAhdrCtx->AhdrConfig.tmo_para.global.mode = LIMIT_VALUE(pCalibDb->tmo.GlobaTMO[mode].mode, TMOCONTRASTMODEMAX, TMOCONTRASTMODEMIN);
+    pAhdrCtx->AhdrConfig.tmo_para.global.Tolerance = LIMIT_VALUE(pCalibDb->tmo.GlobaTMO[mode].Tolerance, TOLERANCEMAX, TOLERANCEMIN);
     for(int i = 0; i < 6; i++)
     {
-        pAhdrCtx->AhdrConfig.tmo_para.global.DynamicRange[i] = LIMIT_VALUE(pCalibDb->ahdr.tmo.GlobaTMO[mode].DynamicRange[i], DYNAMICRANGEMAX, DYNAMICRANGEMIN) ;
-        pAhdrCtx->AhdrConfig.tmo_para.global.EnvLv[i] = LIMIT_VALUE(pCalibDb->ahdr.tmo.GlobaTMO[mode].EnvLv[i], ENVLVMAX, ENVLVMIN) ;
-        pAhdrCtx->AhdrConfig.tmo_para.global.GlobalTmoStrength[i] = LIMIT_VALUE(pCalibDb->ahdr.tmo.GlobaTMO[mode].Strength[i], IQPARAMAX, IQPARAMIN) ;
+        pAhdrCtx->AhdrConfig.tmo_para.global.DynamicRange[i] = LIMIT_VALUE(pCalibDb->tmo.GlobaTMO[mode].DynamicRange[i], DYNAMICRANGEMAX, DYNAMICRANGEMIN) ;
+        pAhdrCtx->AhdrConfig.tmo_para.global.EnvLv[i] = LIMIT_VALUE(pCalibDb->tmo.GlobaTMO[mode].EnvLv[i], ENVLVMAX, ENVLVMIN) ;
+        pAhdrCtx->AhdrConfig.tmo_para.global.GlobalTmoStrength[i] = LIMIT_VALUE(pCalibDb->tmo.GlobaTMO[mode].Strength[i], IQPARAMAX, IQPARAMIN) ;
     }
-    pAhdrCtx->AhdrConfig.tmo_para.global.iir = LIMIT_VALUE(pCalibDb->ahdr.tmo.GlobaTMO[mode].iir, IIRMAX, IIRMIN);
+    pAhdrCtx->AhdrConfig.tmo_para.global.iir = LIMIT_VALUE(pCalibDb->tmo.GlobaTMO[mode].iir, IIRMAX, IIRMIN);
 
     //linear tmo
     pAhdrCtx->AhdrConfig.tmo_para.isLinearTmoOn =
-        (pCalibDb->ahdr.tmo.isLinearTmoOn == 0 && pAhdrCtx->hdr_mode == 1) ? false : true;
+        (pCalibDb->tmo.isLinearTmoOn != 0 && pAhdrCtx->hdr_mode == 1) ? true : false;
     pAhdrCtx->AhdrProcRes.isLinearTmoOn = pAhdrCtx->AhdrConfig.tmo_para.isLinearTmoOn;
 
     LOG1_AHDR("%s:  Ahdr comfig data from xml:\n", __FUNCTION__);
@@ -1006,7 +1006,7 @@ void AhdrGetXmlParas
     LOG1_AHDR("%s:  Merge MDCurveLM_damp:%f:\n", __FUNCTION__, pAhdrCtx->AhdrConfig.merge_para.MDCurveLM_damp);
     LOG1_AHDR("%s:  Merge MDCurveMS_damp:%f:\n", __FUNCTION__, pAhdrCtx->AhdrConfig.merge_para.MDCurveMS_damp);
 
-    LOG1_AHDR("%s:  Tmo Linear Tmo en%d:\n", __FUNCTION__, pAhdrCtx->AhdrConfig.tmo_para.isLinearTmoOn);
+    LOGE_AHDR("%s:  Tmo Linear Tmo en:%d\n", __FUNCTION__, pAhdrCtx->AhdrConfig.tmo_para.isLinearTmoOn);
     LOG1_AHDR("%s:  Tmo GlobalLuma EnvLv:%f %f %f %f %f %f:\n", __FUNCTION__, pAhdrCtx->AhdrConfig.tmo_para.Luma.EnvLv[0], pAhdrCtx->AhdrConfig.tmo_para.Luma.EnvLv[1], pAhdrCtx->AhdrConfig.tmo_para.Luma.EnvLv[2]
               , pAhdrCtx->AhdrConfig.tmo_para.Luma.EnvLv[3], pAhdrCtx->AhdrConfig.tmo_para.Luma.EnvLv[4], pAhdrCtx->AhdrConfig.tmo_para.Luma.EnvLv[5]);
     LOG1_AHDR("%s:  Tmo GlobalLuma ISO:%f %f %f %f %f %f:\n", __FUNCTION__, pAhdrCtx->AhdrConfig.tmo_para.Luma.ISO[0], pAhdrCtx->AhdrConfig.tmo_para.Luma.ISO[1], pAhdrCtx->AhdrConfig.tmo_para.Luma.ISO[2]
@@ -1032,7 +1032,7 @@ void AhdrGetXmlParas
     LOG1_AHDR("%s:  Tmo DTPdfTolerance:%f:\n", __FUNCTION__, pAhdrCtx->AhdrConfig.tmo_para.DtsLoLit.Tolerance);
     LOG1_AHDR("%s:  Tmo DetailsLowLight:%f %f %f %f %f %f:\n", __FUNCTION__, pAhdrCtx->AhdrConfig.tmo_para.DtsLoLit.DetailsLowLight[0], pAhdrCtx->AhdrConfig.tmo_para.DtsLoLit.DetailsLowLight[1], pAhdrCtx->AhdrConfig.tmo_para.DtsLoLit.DetailsLowLight[2]
               , pAhdrCtx->AhdrConfig.tmo_para.DtsLoLit.DetailsLowLight[3], pAhdrCtx->AhdrConfig.tmo_para.DtsLoLit.DetailsLowLight[4], pAhdrCtx->AhdrConfig.tmo_para.DtsLoLit.DetailsLowLight[5]);
-    LOG1_AHDR("%s:  Tmo LocalTMOMode:%f:\n", __FUNCTION__, pAhdrCtx->AhdrConfig.tmo_para.local.localtmoMode);
+    LOG1_AHDR("%s:  Tmo LocalTMOMode:%f\n", __FUNCTION__, pAhdrCtx->AhdrConfig.tmo_para.local.localtmoMode);
     LOG1_AHDR("%s:  Tmo LocalTMO DynamicRange:%f %f %f %f %f %f:\n", __FUNCTION__, pAhdrCtx->AhdrConfig.tmo_para.local.DynamicRange[0], pAhdrCtx->AhdrConfig.tmo_para.local.DynamicRange[1], pAhdrCtx->AhdrConfig.tmo_para.local.DynamicRange[2]
               , pAhdrCtx->AhdrConfig.tmo_para.local.DynamicRange[3], pAhdrCtx->AhdrConfig.tmo_para.local.DynamicRange[4], pAhdrCtx->AhdrConfig.tmo_para.local.DynamicRange[5]);
     LOG1_AHDR("%s:  Tmo LocalTMO EnvLv:%f %f %f %f %f %f:\n", __FUNCTION__, pAhdrCtx->AhdrConfig.tmo_para.local.EnvLv[0], pAhdrCtx->AhdrConfig.tmo_para.local.EnvLv[1], pAhdrCtx->AhdrConfig.tmo_para.local.EnvLv[2]

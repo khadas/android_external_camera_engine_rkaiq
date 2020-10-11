@@ -382,7 +382,7 @@ void TmoProcessing
     //get current IO data
     TmoGetCurrIOData(pAhdrCtx);
 
-    LOGD_AHDR("%s:Current damp GlobeLuma:%f GlobeMaxLuma:%f DetailsHighLight:%f DetailsLowLight:%f TmoContrast:%f BandPriorStrength:%f\n", __FUNCTION__, pAhdrCtx->CurrHandleData.CurrTmoHandleData.GlobeLuma
+    LOGD_AHDR("%s:Current damp GlobeLuma:%f GlobeMaxLuma:%f DetailsHighLight:%f DetailsLowLight:%f LocalTmoStrength:%f GlobalTmoStrength:%f\n", __FUNCTION__, pAhdrCtx->CurrHandleData.CurrTmoHandleData.GlobeLuma
               , pAhdrCtx->CurrHandleData.CurrTmoHandleData.GlobeMaxLuma, pAhdrCtx->CurrHandleData.CurrTmoHandleData.DetailsHighLight, pAhdrCtx->CurrHandleData.CurrTmoHandleData.DetailsLowLight
               , pAhdrCtx->CurrHandleData.CurrTmoHandleData.LocalTmoStrength, pAhdrCtx->CurrHandleData.CurrTmoHandleData.GlobalTmoStrength);
 

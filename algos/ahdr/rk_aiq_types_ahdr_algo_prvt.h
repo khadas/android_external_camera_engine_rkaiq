@@ -258,6 +258,7 @@ typedef struct AhdrContext_s
     //api
     hdrAttr_t hdrAttr;
 
+    CalibDb_Ahdr_Para_t pCalibDB;
     AhdrState_t state;
     AhdrConfig_t AhdrConfig;
     AhdrPrevData_t AhdrPrevData ;
