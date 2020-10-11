@@ -2004,61 +2004,51 @@ XCamReturn rk_aiq_uapi_setMDhzStrth(const rk_aiq_sys_ctx_t* ctx, bool on, unsign
         attr.stManual.sw_dhaz_cfg_wt = 0.1f;
         attr.stManual.sw_dhaz_cfg_air = 160;
         attr.stManual.sw_dhaz_cfg_tmax = 0.2f;
-        attr.stManual.sw_dhaz_cfg_gratio = 2;
         break;
     case 2:
         attr.stManual.sw_dhaz_cfg_wt = 0.2f;
         attr.stManual.sw_dhaz_cfg_air = 170;
         attr.stManual.sw_dhaz_cfg_tmax = 0.2f;
-        attr.stManual.sw_dhaz_cfg_gratio = 2;
         break;
     case 3:
         attr.stManual.sw_dhaz_cfg_wt = 0.3f;
         attr.stManual.sw_dhaz_cfg_air = 180;
         attr.stManual.sw_dhaz_cfg_tmax = 0.2f;
-        attr.stManual.sw_dhaz_cfg_gratio = 2;
         break;
     case 4:
         attr.stManual.sw_dhaz_cfg_wt = 0.4f;
         attr.stManual.sw_dhaz_cfg_air = 190;
         attr.stManual.sw_dhaz_cfg_tmax = 0.2f;
-        attr.stManual.sw_dhaz_cfg_gratio = 2;
         break;
     case 5:
         attr.stManual.sw_dhaz_cfg_wt = 0.5f;
         attr.stManual.sw_dhaz_cfg_air = 200;
         attr.stManual.sw_dhaz_cfg_tmax = 0.2f;
-        attr.stManual.sw_dhaz_cfg_gratio = 2;
         break;
     case 6:
         attr.stManual.sw_dhaz_cfg_wt = 0.6f;
         attr.stManual.sw_dhaz_cfg_air = 210;
         attr.stManual.sw_dhaz_cfg_tmax = 0.2f;
-        attr.stManual.sw_dhaz_cfg_gratio = 2;
         break;
     case 7:
         attr.stManual.sw_dhaz_cfg_wt = 0.7f;
         attr.stManual.sw_dhaz_cfg_air = 220;
         attr.stManual.sw_dhaz_cfg_tmax = 0.2f;
-        attr.stManual.sw_dhaz_cfg_gratio = 2;
         break;
     case 8:
         attr.stManual.sw_dhaz_cfg_wt = 0.8f;
         attr.stManual.sw_dhaz_cfg_air = 230;
         attr.stManual.sw_dhaz_cfg_tmax = 0.2f;
-        attr.stManual.sw_dhaz_cfg_gratio = 2;
         break;
     case 9:
         attr.stManual.sw_dhaz_cfg_wt = 0.9f;
         attr.stManual.sw_dhaz_cfg_air = 240;
         attr.stManual.sw_dhaz_cfg_tmax = 0.2f;
-        attr.stManual.sw_dhaz_cfg_gratio = 2;
         break;
     case 10:
-        attr.stManual.sw_dhaz_cfg_wt = 1.0f;
+        attr.stManual.sw_dhaz_cfg_wt = 0.9f;
         attr.stManual.sw_dhaz_cfg_air = 250;
-        attr.stManual.sw_dhaz_cfg_tmax = 1.0f;
-        attr.stManual.sw_dhaz_cfg_gratio = 2;
+        attr.stManual.sw_dhaz_cfg_tmax = 0.5f;
         break;
     }
     ret = rk_aiq_user_api_adehaze_setSwAttrib(ctx, attr);
