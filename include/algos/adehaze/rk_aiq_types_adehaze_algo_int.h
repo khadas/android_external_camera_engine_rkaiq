@@ -26,6 +26,13 @@ RKAIQ_BEGIN_DECLARE
 
 
 #define RK_DEHAZE_ISO_NUM 9
+#define FUNCTION_ENABLE 1
+#define FUNCTION_DISABLE 0
+#define level_default 5
+
+#define LIMIT_VALUE(value,max_value,min_value)      (value > max_value? max_value : value < min_value ? min_value : value)
+
+
 
 enum {
     DEHAZE_NORMAL = 0,
@@ -53,14 +60,6 @@ typedef struct RKAiqAdhazConfig_s
 
 typedef struct rk_aiq_dehaze_M_attrib_s {
     int strength;
-    int sw_dhaz_en ; //1
-    int cfg_alpha ;   //1
-    int enhance_en;//0
-    int dc_en;
-    float sw_dhaz_cfg_wt ;//0.1~1.0
-    int sw_dhaz_cfg_air;//0~255
-    float sw_dhaz_cfg_tmax;//0.1~1.0
-    int sw_dhaz_cfg_gratio;//0~10
 } rk_aiq_dehaze_M_attrib_t;
 
 typedef struct rk_aiq_dehaze_A_attrib_s {
@@ -71,10 +70,6 @@ typedef struct rk_aiq_dehaze_A_attrib_s {
 } rk_aiq_dehaze_A_attrib_t;
 
 typedef struct rk_aiq_dehaze_enhance_s {
-    //rk_aiq_wb_awb_alg_method_t algMethod;
-    int sw_dhaz_en ;//1
-    int cfg_alpha ; //1
-    int enhance_en ;//1
     float level;//0~10
 } rk_aiq_dehaze_enhance_t;
 
@@ -82,8 +77,7 @@ typedef enum rk_aiq_dehaze_op_mode_s {
     RK_AIQ_DEHAZE_MODE_INVALID                     = 0,        /**< invalid mode */
     RK_AIQ_DEHAZE_MODE_MANUAL                      = 1,        /**< run manual dehaze */
     RK_AIQ_DEHAZE_MODE_AUTO                        = 2,        /**< run auto dehaze */
-    RK_AIQ_DEHAZE_MODE_ENHANCE                     = 3,        /**< run dehaze enhance*/
-    RK_AIQ_DEHAZE_MODE_DEFAULT                     = 4,        /**< initialization value */
+    RK_AIQ_DEHAZE_MODE_OFF                         = 3,        /**< dehaze off, enhance follow IQ setting*/
 } rk_aiq_dehaze_op_mode_t;
 
 typedef struct adehaze_sw_s {
