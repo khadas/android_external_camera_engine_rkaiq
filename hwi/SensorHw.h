@@ -20,6 +20,7 @@
 
 #include <map>
 #include <list>
+#include <istream>
 #include "v4l2_device.h"
 #include "rk_aiq_pool.h"
 #include "linux/rk-camera-module.h"

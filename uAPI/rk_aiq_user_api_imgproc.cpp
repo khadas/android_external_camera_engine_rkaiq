@@ -1212,6 +1212,8 @@ XCamReturn rk_aiq_uapi_getFocusMode(const rk_aiq_sys_ctx_t* ctx, opMode_t *mode)
         *mode = OP_MANUAL;
     } else if (attr.AfMode == RKAIQ_AF_MODE_NOT_SET) {
         *mode = OP_INVAL;
+    } else if (attr.AfMode == RKAIQ_AF_MODE_ONESHOT_AFTER_ZOOM) {
+        *mode = OP_SEMI_AUTO;
     } else {
         *mode = OP_AUTO;
     }

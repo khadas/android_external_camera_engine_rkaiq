@@ -59,7 +59,7 @@ rk_aiq_uapi_adehaze_SetAttrib(RkAiqAlgoContext *ctx,
         for(int i = 0; i < 3; i++)
         {
             AdehazeHandle->calib_dehaz.enhance_setting[i].en = attr.stEnhance.enhance_en;
-            for(int j = 0; j < 9; i++)
+            for(int j = 0; j < 9; j++)
                 AdehazeHandle->calib_dehaz.enhance_setting[i].enhance_value[j] = attr.stEnhance.level;
         }
     } else if(attr.mode == RK_AIQ_DEHAZE_MODE_DEFAULT) {

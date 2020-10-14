@@ -332,6 +332,8 @@ typedef struct Adpcc_Auto_Attr_s
     Adpcc_basic_params_t stBasicParams;
     Adpcc_bpt_params_t  stBptParams;
     Adpcc_pdaf_params_t stPdafParams;
+    CalibDb_Dpcc_Fast_Mode_t stFastMode;
+    CalibDb_Dpcc_Sensor_t stSensorDpcc;
 
     Adpcc_basic_params_select_t stBasicSelect;
     Adpcc_bpt_params_select_t stBptSelect;

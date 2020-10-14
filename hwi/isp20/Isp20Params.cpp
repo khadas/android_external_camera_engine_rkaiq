@@ -1271,9 +1271,11 @@ Isp20Params::convertAiqRawnrToIsp20Params(struct isp2x_isp_params_cfg& isp_cfg,
     LOGD_CAMHW_SUBM(ISP20PARAM_SUBM, "%s:(%d) enter \n", __FUNCTION__, __LINE__);
 
     struct isp2x_rawnr_cfg * pRawnrCfg = &isp_cfg.others.rawnr_cfg;
-
-    if(rawnr.rawnr_en) {
+if(rawnr.rawnr_en) {
+    
         isp_cfg.module_ens |= ISP2X_MODULE_RAWNR;
+    }else{
+	 isp_cfg.module_ens &= ~ISP2X_MODULE_RAWNR;
     }
     isp_cfg.module_en_update |= ISP2X_MODULE_RAWNR;
     isp_cfg.module_cfg_update |= ISP2X_MODULE_RAWNR;
@@ -1353,17 +1355,15 @@ Isp20Params::convertAiqTnrToIsp20Params(struct rkispp_params_cfg& pp_cfg,
     LOGD_CAMHW_SUBM(ISP20PARAM_SUBM, "tnr_en %d", tnr.tnr_en);
 
     if(tnr.tnr_en) {
-        pp_cfg.module_ens |= ISPP_MODULE_TNR;
-        pp_cfg.module_en_update |= ISPP_MODULE_TNR;
-        pp_cfg.module_cfg_update |= ISPP_MODULE_TNR;
+        pp_cfg.module_ens |= ISPP_MODULE_TNR;       
     } else {
         //pp_cfg.module_init_ens &= ~ISPP_MODULE_TNR_3TO1;
-		pp_cfg.module_ens &= ~ISPP_MODULE_TNR;
-        pp_cfg.module_en_update |= ISPP_MODULE_TNR;
-		//pp_cfg.module_cfg_update &= ~ISPP_MODULE_TNR;
-        //return ;
+	  pp_cfg.module_ens &= ~ISPP_MODULE_TNR;
     }
 
+    pp_cfg.module_en_update |= ISPP_MODULE_TNR;
+    pp_cfg.module_cfg_update |= ISPP_MODULE_TNR;
+		
     struct rkispp_tnr_config  * pTnrCfg = &pp_cfg.tnr_cfg;
 
     //0x0080
@@ -1524,10 +1524,13 @@ Isp20Params::convertAiqUvnrToIsp20Params(struct rkispp_params_cfg& pp_cfg,
     LOGD_CAMHW_SUBM(ISP20PARAM_SUBM, "uvnr_en %d", uvnr.uvnr_en);
     if(uvnr.uvnr_en) {
         pp_cfg.module_ens |= ISPP_MODULE_NR;
-        pp_cfg.module_en_update |= ISPP_MODULE_NR;
-        pp_cfg.module_cfg_update |= ISPP_MODULE_NR;
         pp_cfg.module_init_ens |= ISPP_MODULE_NR;
+    }else{
+	  pp_cfg.module_ens &=  ~ISPP_MODULE_NR;
     }
+
+    pp_cfg.module_en_update |= ISPP_MODULE_NR;
+    pp_cfg.module_cfg_update |= ISPP_MODULE_NR;
 
     //0x0080
     pNrCfg->uvnr_step1_en = uvnr.uvnr_step1_en;
@@ -1607,10 +1610,13 @@ Isp20Params::convertAiqYnrToIsp20Params(struct rkispp_params_cfg& pp_cfg,
     LOGD_CAMHW_SUBM(ISP20PARAM_SUBM, "ynr_en %d", ynr.ynr_en);
     if(ynr.ynr_en) {
         pp_cfg.module_ens |= ISPP_MODULE_NR;
-        pp_cfg.module_en_update |= ISPP_MODULE_NR;
-        pp_cfg.module_cfg_update |= ISPP_MODULE_NR;
         pp_cfg.module_init_ens |= ISPP_MODULE_NR;
+    }else{
+	 pp_cfg.module_ens &= ~ISPP_MODULE_NR;
     }
+
+    pp_cfg.module_en_update |= ISPP_MODULE_NR;
+    pp_cfg.module_cfg_update |= ISPP_MODULE_NR;
 
     //0x0104 - 0x0108
     for(i = 0; i < NR_YNR_SGM_DX_SIZE; i++) {
@@ -1726,12 +1732,15 @@ Isp20Params::convertAiqSharpenToIsp20Params(struct rkispp_params_cfg& pp_cfg,
 
     LOGD_CAMHW_SUBM(ISP20PARAM_SUBM, "sharp_en %d edgeflt_en %d", pSharpV1->sharp_en, edgeflt.edgeflt_en);
 
-    if(pSharpV1->sharp_en || edgeflt.edgeflt_en) {
+    if(pSharpV1->sharp_en && edgeflt.edgeflt_en) {
         pp_cfg.module_ens |= ISPP_MODULE_SHP;
-        pp_cfg.module_en_update |= ISPP_MODULE_SHP;
-        pp_cfg.module_cfg_update |= ISPP_MODULE_SHP;
         pp_cfg.module_init_ens |= ISPP_MODULE_SHP;
+    }else{
+	  pp_cfg.module_ens &=  ~ISPP_MODULE_SHP;
     }
+
+    pp_cfg.module_en_update |= ISPP_MODULE_SHP;
+    pp_cfg.module_cfg_update |= ISPP_MODULE_SHP;
 #if 1
     //0x0080
     pSharpCfg->alpha_adp_en = edgeflt.alpha_adp_en;

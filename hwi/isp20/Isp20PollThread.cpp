@@ -228,7 +228,7 @@ Isp20PollThread::set_value_to_file(const char* path, int value, uint32_t sequenc
     char buffer[16] = {0};
     int fp;
 
-    fp = open(path, O_CREAT | O_RDWR | O_SYNC);
+    fp = open(path, O_CREAT | O_RDWR | O_SYNC, S_IRWXU|S_IRUSR|S_IXUSR|S_IROTH|S_IXOTH);
     if (fp != -1) {
         ftruncate(fp, 0);
         lseek(fp, 0, SEEK_SET);
@@ -825,6 +825,15 @@ Isp20PollThread::trigger_readback()
                     goto out;
                 } else {
                     buf_proxy = _isp_mipi_rx_infos[i].cache_list.pop(-1);
+                    if (_first_trigger) {
+                        u8 *buf = (u8 *)buf_proxy->get_v4l2_userptr();
+                        struct v4l2_format format = v4l2buf[i]->get_format();
+
+                        if (buf) {
+                            for (u32 j = 0; j < format.fmt.pix.width / 2; j++)
+                                *buf++ += j % 16;
+                        }
+                    }
                     _isp_mipi_rx_infos[i].buf_list.push(buf_proxy);
                     if (_isp_mipi_rx_infos[i].dev->get_mem_type() == V4L2_MEMORY_USERPTR)
                         v4l2buf[i]->set_expbuf_usrptr(buf_proxy->get_v4l2_userptr());

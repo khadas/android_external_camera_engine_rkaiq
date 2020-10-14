@@ -1192,7 +1192,7 @@ int RkAiqCalibParser::ParseString
         autoTabBackward();
         XMLNode* pComment = (XMLNode*)pNode->ToElement()->FirstChild();
         pComment->SetValue((const char *)str);
-        snprintf(str, sizeof(str), "[1 %u]", strlen(values));
+        snprintf(str, sizeof(str), "[1 %u]", (unsigned int)(strlen(values)));
         XMLElement* pElement = (((XMLNode*)pNode)->ToElement());
         pElement->SetAttribute(CALIB_ATTRIBUTE_SIZE, str);
         return 0;
@@ -1300,7 +1300,7 @@ int RkAiqCalibParser::ParseLscProfileArray
         XMLNode* pComment = (XMLNode*)pNode->ToElement()->FirstChild();
         pComment->SetValue((const char *)str);
 
-        snprintf(str, sizeof(str), "[1 %u]", str_len - 1);
+        snprintf(str, sizeof(str), "[1 %u]", (unsigned int)(str_len - 1));
         pComment = (XMLNode *)pNode;
         pComment->ToElement()->SetAttribute(CALIB_ATTRIBUTE_SIZE, str);
         autoTabBackward();

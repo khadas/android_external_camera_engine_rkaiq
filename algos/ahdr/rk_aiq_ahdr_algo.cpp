@@ -685,6 +685,20 @@ void AhdrApiOffUpdate
     pAhdrCtx->CurrHandleData.TmoDamp = pAhdrCtx->AhdrConfig.tmo_para.damp;
 
 
+    pAhdrCtx->hdrAttr.RegInfo.OECurve_smooth = pAhdrCtx->CurrHandleData.CurrMergeHandleData.OECurve_smooth;
+    pAhdrCtx->hdrAttr.RegInfo.OECurve_offset = pAhdrCtx->CurrHandleData.CurrMergeHandleData.OECurve_offset;
+    pAhdrCtx->hdrAttr.RegInfo.MDCurveLM_smooth = pAhdrCtx->CurrHandleData.CurrMergeHandleData.MDCurveLM_smooth;
+    pAhdrCtx->hdrAttr.RegInfo.MDCurveLM_offset = pAhdrCtx->CurrHandleData.CurrMergeHandleData.MDCurveLM_offset;
+    pAhdrCtx->hdrAttr.RegInfo.MDCurveMS_smooth = pAhdrCtx->CurrHandleData.CurrMergeHandleData.MDCurveMS_smooth;
+    pAhdrCtx->hdrAttr.RegInfo.MDCurveMS_offset = pAhdrCtx->CurrHandleData.CurrMergeHandleData.MDCurveMS_offset;
+
+    pAhdrCtx->hdrAttr.RegInfo.GlobalLuma = pAhdrCtx->CurrHandleData.CurrTmoHandleData.GlobeLuma;
+    pAhdrCtx->hdrAttr.RegInfo.DetailsLowlight = pAhdrCtx->CurrHandleData.CurrTmoHandleData.DetailsLowLight;
+    pAhdrCtx->hdrAttr.RegInfo.DetailsHighlight = pAhdrCtx->CurrHandleData.CurrTmoHandleData.DetailsHighLight;
+    pAhdrCtx->hdrAttr.RegInfo.LocalTmoStrength = pAhdrCtx->CurrHandleData.CurrTmoHandleData.LocalTmoStrength;
+    pAhdrCtx->hdrAttr.RegInfo.GlobaltmoStrength = pAhdrCtx->CurrHandleData.CurrTmoHandleData.GlobalTmoStrength;
+
+
     LOG1_AHDR( "%s:exit!\n", __FUNCTION__);
 }
 /******************************************************************************

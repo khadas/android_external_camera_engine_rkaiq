@@ -82,7 +82,6 @@ pre_process(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outparams)
     RkAiqAlgoConfigAdhazInt* config = (RkAiqAlgoConfigAdhazInt*)inparams;
     AdehazeHandle_t * AdehazeHandle = (AdehazeHandle_t *)inparams->ctx;
 
-    LOGE_ADEHAZE("gray_mode=%d\n", config->rk_com.u.proc.gray_mode);
     if (config->rk_com.u.proc.gray_mode)
         AdehazeHandle->Dehaze_ISO_mode = DEHAZE_NIGHT;
     else if (DEHAZE_NORMAL == AdehazeHandle->working_mode)

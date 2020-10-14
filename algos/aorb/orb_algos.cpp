@@ -547,12 +547,20 @@ int elimate_affine_transform(ORBList* matched_keypoints, double homography[9])
     int distance = -1, distanceAvg = 0;
     int* distanceArray = (int*)malloc(sizeof(int) * matched_keypoints->length);
     int* distanceSortedArray = (int*)malloc(sizeof(int) * matched_keypoints->length);
+#if 0 // fix compile error for Android
     int (*M0_stats)[matched_keypoints->length] =
         (int (*)[matched_keypoints->length])malloc(sizeof(int) * matched_keypoints->length * 2);
     for (k = 0; k < matched_keypoints->length; k++) {
         M0_stats[0][k] = M0_stats[1][k] = -1;
     }
-
+#else
+    int* M0_stats[2];
+    for (int i = 0; i < 2 ;i++)
+        M0_stats[i] = (int*)malloc(sizeof(int) * matched_keypoints->length);
+     for (k = 0; k < matched_keypoints->length; k++) {
+         M0_stats[0][k] = M0_stats[1][k] = -1;
+     }
+#endif
     double (*from_pts)[2];
     from_pts = (double (*)[2])malloc(sizeof(double) * length * 2);
 
@@ -679,7 +687,12 @@ int elimate_affine_transform(ORBList* matched_keypoints, double homography[9])
     free(to_pts);
     free(distanceArray);
     free(distanceSortedArray);
+#if 0 // fix compile error for Android
     free(M0_stats);
+#else
+    free(M0_stats[0]);
+    free(M0_stats[1]);
+#endif
     return ret;
 }
 

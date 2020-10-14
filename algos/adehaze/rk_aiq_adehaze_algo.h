@@ -18,7 +18,7 @@
  */
 
 #ifndef __RK_AIQ_ADEHAZE_ALGO_H__
-#define __K_AIQ_ADEHAZE_ALGO_H__
+#define __RK_AIQ_ADEHAZE_ALGO_H__
 
 #include "rk_aiq_comm.h"
 #include "RkAiqCalibDbTypes.h"

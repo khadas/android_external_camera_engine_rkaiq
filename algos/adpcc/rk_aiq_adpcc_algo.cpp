@@ -336,12 +336,12 @@ AdpccResult_t html_params_init(Adpcc_html_param_t *pParams)
 
 }
 
-AdpccResult_t dpcc_fast_mode_basic_params_init(Adpcc_fast_mode_params_t *pFasic, CalibDb_Dpcc_t *pCalib)
+AdpccResult_t dpcc_sensor_params_init(CalibDb_Dpcc_Sensor_t *pSensor, CalibDb_Dpcc_t *pCalib)
 {
     AdpccResult_t ret = ADPCC_RET_SUCCESS;
     LOGI_ADPCC("%s(%d): enter!\n", __FUNCTION__, __LINE__);
 
-    if(pFasic == NULL) {
+    if(pSensor == NULL) {
         ret = ADPCC_RET_NULL_POINTER;
         LOGE_ADPCC("%s(%d): invalid input params\n", __FUNCTION__, __LINE__);
         return ret;
@@ -353,16 +353,47 @@ AdpccResult_t dpcc_fast_mode_basic_params_init(Adpcc_fast_mode_params_t *pFasic,
         return ret;
     }
 
-    pFasic->fast_mode_en = pCalib->fast.fast_mode_en;
-    pFasic->fast_mode_single_en = pCalib->fast.fast_mode_single_en;
-    pFasic->fast_mode_double_en = pCalib->fast.fast_mode_double_en;
-    pFasic->fast_mode_triple_en = pCalib->fast.fast_mode_triple_en;
+    pSensor->en = pCalib->sensor_dpcc.en;
+    pSensor->max_level = pCalib->sensor_dpcc.max_level;
 
     for(int i = 0; i < DPCC_MAX_ISO_LEVEL; i++) {
-        pFasic->ISO[i] = pCalib->fast.ISO[i];
-        pFasic->fast_mode_single_level[i] = pCalib->fast.fast_mode_single_level[i];
-        pFasic->fast_mode_double_level[i] = pCalib->fast.fast_mode_double_level[i];
-        pFasic->fast_mode_triple_level[i] = pCalib->fast.fast_mode_triple_level[i];
+        pSensor->iso[i] = pCalib->sensor_dpcc.iso[i];
+        pSensor->level_single[i] = pCalib->sensor_dpcc.level_single[i];
+        pSensor->level_multiple[i] = pCalib->sensor_dpcc.level_multiple[i];
+    }
+
+    LOGI_ADPCC("%s(%d): exit!\n", __FUNCTION__, __LINE__);
+    return ret;
+
+}
+
+AdpccResult_t dpcc_fast_mode_basic_params_init(CalibDb_Dpcc_Fast_Mode_t *pFast, CalibDb_Dpcc_t *pCalib)
+{
+    AdpccResult_t ret = ADPCC_RET_SUCCESS;
+    LOGI_ADPCC("%s(%d): enter!\n", __FUNCTION__, __LINE__);
+
+    if(pFast == NULL) {
+        ret = ADPCC_RET_NULL_POINTER;
+        LOGE_ADPCC("%s(%d): invalid input params\n", __FUNCTION__, __LINE__);
+        return ret;
+    }
+
+    if(pCalib == NULL) {
+        ret = ADPCC_RET_NULL_POINTER;
+        LOGE_ADPCC("%s(%d): invalid input params\n", __FUNCTION__, __LINE__);
+        return ret;
+    }
+
+    pFast->fast_mode_en = pCalib->fast.fast_mode_en;
+    pFast->fast_mode_single_en = pCalib->fast.fast_mode_single_en;
+    pFast->fast_mode_double_en = pCalib->fast.fast_mode_double_en;
+    pFast->fast_mode_triple_en = pCalib->fast.fast_mode_triple_en;
+
+    for(int i = 0; i < DPCC_MAX_ISO_LEVEL; i++) {
+        pFast->ISO[i] = pCalib->fast.ISO[i];
+        pFast->fast_mode_single_level[i] = pCalib->fast.fast_mode_single_level[i];
+        pFast->fast_mode_double_level[i] = pCalib->fast.fast_mode_double_level[i];
+        pFast->fast_mode_triple_level[i] = pCalib->fast.fast_mode_triple_level[i];
     }
 
     LOGI_ADPCC("%s(%d): exit!\n", __FUNCTION__, __LINE__);
@@ -1386,23 +1417,23 @@ void Fast_mode_Triple_Setting(
 
     int level = 1;
     for(int i = 0; i < DPCC_MAX_ISO_LEVEL - 1; i++) {
-        if(iso >= pParams->fast.ISO[i] && iso <= pParams->fast.ISO[i + 1]) {
-            level = (pParams->fast.fast_mode_triple_level[i] - pParams->fast.fast_mode_triple_level[i + 1])
-                    / (pParams->fast.ISO[i] - pParams->fast.ISO[i + 1]);
-            level += pParams->fast.fast_mode_triple_level[i];
+        if(iso >= pParams->stAuto.stFastMode.ISO[i] && iso <= pParams->stAuto.stFastMode.ISO[i + 1]) {
+            level = (pParams->stAuto.stFastMode.fast_mode_triple_level[i] - pParams->stAuto.stFastMode.fast_mode_triple_level[i + 1])
+                    / (pParams->stAuto.stFastMode.ISO[i] - pParams->stAuto.stFastMode.ISO[i + 1]);
+            level += pParams->stAuto.stFastMode.fast_mode_triple_level[i];
             break;
         }
     }
 
-    if(iso < pParams->fast.ISO[0] ) {
-        level = pParams->fast.fast_mode_triple_level[0];
+    if(iso < pParams->stAuto.stFastMode.ISO[0] ) {
+        level = pParams->stAuto.stFastMode.fast_mode_triple_level[0];
     }
 
-    if(iso > pParams->fast.ISO[DPCC_MAX_ISO_LEVEL - 1] ) {
-        level = pParams->fast.fast_mode_triple_level[DPCC_MAX_ISO_LEVEL - 1];
+    if(iso > pParams->stAuto.stFastMode.ISO[DPCC_MAX_ISO_LEVEL - 1] ) {
+        level = pParams->stAuto.stFastMode.fast_mode_triple_level[DPCC_MAX_ISO_LEVEL - 1];
     }
 
-    if(pParams->fast.fast_mode_triple_en != 0)
+    if(pParams->stAuto.stFastMode.fast_mode_triple_en != 0)
         pSelect->stage1_use_set_3 = 0x1;
     else
         pSelect->stage1_use_set_3 = 0x0;
@@ -1812,23 +1843,23 @@ void Fast_mode_Double_Setting(
 
     int level = 1;
     for(int i = 0; i < DPCC_MAX_ISO_LEVEL - 1; i++) {
-        if(iso >= pParams->fast.ISO[i] && iso <= pParams->fast.ISO[i + 1]) {
-            level = (pParams->fast.fast_mode_double_level[i] - pParams->fast.fast_mode_double_level[i + 1])
-                    / (pParams->fast.ISO[i] - pParams->fast.ISO[i + 1]);
-            level += pParams->fast.fast_mode_double_level[i];
+        if(iso >= pParams->stAuto.stFastMode.ISO[i] && iso <= pParams->stAuto.stFastMode.ISO[i + 1]) {
+            level = (pParams->stAuto.stFastMode.fast_mode_double_level[i] - pParams->stAuto.stFastMode.fast_mode_double_level[i + 1])
+                    / (pParams->stAuto.stFastMode.ISO[i] - pParams->stAuto.stFastMode.ISO[i + 1]);
+            level += pParams->stAuto.stFastMode.fast_mode_double_level[i];
             break;
         }
     }
 
-    if(iso < pParams->fast.ISO[0] ) {
-        level = pParams->fast.fast_mode_double_level[0];
+    if(iso < pParams->stAuto.stFastMode.ISO[0] ) {
+        level = pParams->stAuto.stFastMode.fast_mode_double_level[0];
     }
 
-    if(iso > pParams->fast.ISO[DPCC_MAX_ISO_LEVEL - 1] ) {
-        level = pParams->fast.fast_mode_double_level[DPCC_MAX_ISO_LEVEL - 1];
+    if(iso > pParams->stAuto.stFastMode.ISO[DPCC_MAX_ISO_LEVEL - 1] ) {
+        level = pParams->stAuto.stFastMode.fast_mode_double_level[DPCC_MAX_ISO_LEVEL - 1];
     }
 
-    if(pParams->fast.fast_mode_double_en != 0)
+    if(pParams->stAuto.stFastMode.fast_mode_double_en != 0)
         pSelect->stage1_use_set_2 = 0x1;
     else
         pSelect->stage1_use_set_2 = 0x0;
@@ -2240,23 +2271,23 @@ void Fast_mode_Single_Setting(
 
     int level = 1;
     for(int i = 0; i < DPCC_MAX_ISO_LEVEL - 1; i++) {
-        if(iso >= pParams->fast.ISO[i] && iso <= pParams->fast.ISO[i + 1]) {
-            level = (pParams->fast.fast_mode_single_level[i] - pParams->fast.fast_mode_single_level[i + 1])
-                    / (pParams->fast.ISO[i] - pParams->fast.ISO[i + 1]);
-            level += pParams->fast.fast_mode_single_level[i];
+        if(iso >= pParams->stAuto.stFastMode.ISO[i] && iso <= pParams->stAuto.stFastMode.ISO[i + 1]) {
+            level = (pParams->stAuto.stFastMode.fast_mode_single_level[i] - pParams->stAuto.stFastMode.fast_mode_single_level[i + 1])
+                    / (pParams->stAuto.stFastMode.ISO[i] - pParams->stAuto.stFastMode.ISO[i + 1]);
+            level += pParams->stAuto.stFastMode.fast_mode_single_level[i];
             break;
         }
     }
 
-    if(iso < pParams->fast.ISO[0] ) {
-        level = pParams->fast.fast_mode_single_level[0];
+    if(iso < pParams->stAuto.stFastMode.ISO[0] ) {
+        level = pParams->stAuto.stFastMode.fast_mode_single_level[0];
     }
 
-    if(iso > pParams->fast.ISO[DPCC_MAX_ISO_LEVEL - 1] ) {
-        level = pParams->fast.fast_mode_single_level[DPCC_MAX_ISO_LEVEL - 1];
+    if(iso > pParams->stAuto.stFastMode.ISO[DPCC_MAX_ISO_LEVEL - 1] ) {
+        level = pParams->stAuto.stFastMode.fast_mode_single_level[DPCC_MAX_ISO_LEVEL - 1];
     }
 
-    if(pParams->fast.fast_mode_single_en != 0)
+    if(pParams->stAuto.stFastMode.fast_mode_single_en != 0)
         pSelect->stage1_use_set_1 = 0x1;
     else
         pSelect->stage1_use_set_1 = 0x0;
@@ -2635,15 +2666,15 @@ void Sensor_dpcc_process(AdpccContext_t *pAdpccCtx)
     else if(pAdpccCtx->stExpInfo.hdr_mode == 2)
         iso = pAdpccCtx->stExpInfo.arProcResIso[2];
 
-    float sensor_dpcc_level_single = GetCurrDpccValue(iso, pAdpccCtx->stDpccCalib.sensor_dpcc.max_level,
-                                     pAdpccCtx->stDpccCalib.sensor_dpcc.iso, pAdpccCtx->stDpccCalib.sensor_dpcc.level_single);
-    float sensor_dpcc_level_multi = GetCurrDpccValue(iso, pAdpccCtx->stDpccCalib.sensor_dpcc.max_level,
-                                    pAdpccCtx->stDpccCalib.sensor_dpcc.iso, pAdpccCtx->stDpccCalib.sensor_dpcc.level_multiple);
+    float sensor_dpcc_level_single = GetCurrDpccValue(iso, pAdpccCtx->stAuto.stSensorDpcc.max_level,
+                                     pAdpccCtx->stAuto.stSensorDpcc.iso, pAdpccCtx->stAuto.stSensorDpcc.level_single);
+    float sensor_dpcc_level_multi = GetCurrDpccValue(iso, pAdpccCtx->stAuto.stSensorDpcc.max_level,
+                                    pAdpccCtx->stAuto.stSensorDpcc.iso, pAdpccCtx->stAuto.stSensorDpcc.level_multiple);
 
-    pAdpccCtx->SenDpccRes.enable = pAdpccCtx->stDpccCalib.sensor_dpcc.en;
+    pAdpccCtx->SenDpccRes.enable = pAdpccCtx->stAuto.stSensorDpcc.en;
     pAdpccCtx->SenDpccRes.cur_single_dpcc = (int)(sensor_dpcc_level_single + 0.5);
     pAdpccCtx->SenDpccRes.cur_multiple_dpcc = (int)(sensor_dpcc_level_multi + 0.5);
-    pAdpccCtx->SenDpccRes.total_dpcc = (int)(pAdpccCtx->stDpccCalib.sensor_dpcc.max_level + 0.5);
+    pAdpccCtx->SenDpccRes.total_dpcc = (int)(pAdpccCtx->stAuto.stSensorDpcc.max_level + 0.5);
 
     if(pAdpccCtx->SenDpccRes.enable == false)
         LOGD_ADPCC("%s(%d):sensor dpcc setting off!!\n", __FUNCTION__, __LINE__);
@@ -2681,8 +2712,9 @@ AdpccResult_t AdpccInit(AdpccContext_t **ppAdpccCtx, CamCalibDbContext_t *pCalib
     //init fix param for algo
     pAdpccCtx->stDpccCalib = pCalibDb->dpcc;
     dpcc_expert_mode_basic_params_init(&pAdpccCtx->stAuto.stBasicParams, &pAdpccCtx->stDpccCalib);
-    dpcc_fast_mode_basic_params_init(&pAdpccCtx->fast, &pAdpccCtx->stDpccCalib);
+    dpcc_fast_mode_basic_params_init(&pAdpccCtx->stAuto.stFastMode, &pAdpccCtx->stDpccCalib);
     dpcc_pdaf_params_init(&pAdpccCtx->stAuto.stPdafParams, &pAdpccCtx->stDpccCalib.pdaf);
+    dpcc_sensor_params_init(&pAdpccCtx->stAuto.stSensorDpcc, &pAdpccCtx->stDpccCalib);
     memset(&pAdpccCtx->stAuto.stPdafParams, 0x00, sizeof(pAdpccCtx->stAuto.stPdafParams));
 #else
     //static init
@@ -2776,7 +2808,7 @@ AdpccResult_t AdpccProcess(AdpccContext_t *pAdpccCtx, AdpccExpInfo_t *pExpInfo)
     memcpy(&pAdpccCtx->stExpInfo, pExpInfo, sizeof(AdpccExpInfo_t));
 
     if(pAdpccCtx->eMode == ADPCC_OP_MODE_AUTO) {
-        bool fast_enable = pAdpccCtx->stDpccCalib.fast.fast_mode_en == 0 ? false : true;
+        bool fast_enable = pAdpccCtx->stAuto.stFastMode.fast_mode_en == 0 ? false : true;
         if(fast_enable == false)
             ret = Expert_mode_select_basic_params_by_ISO(&pAdpccCtx->stAuto.stBasicParams, &pAdpccCtx->stAuto.stBasicSelect, pExpInfo);
         else
@@ -2786,7 +2818,7 @@ AdpccResult_t AdpccProcess(AdpccContext_t *pAdpccCtx, AdpccExpInfo_t *pExpInfo)
         ret = select_pdaf_params_by_ISO(&pAdpccCtx->stAuto.stPdafParams, &pAdpccCtx->stAuto.stPdafSelect, pExpInfo);
 
         //sensor dpcc
-        if(pAdpccCtx->stDpccCalib.sensor_dpcc.en != 0 )
+        if(pAdpccCtx->stAuto.stSensorDpcc.en != 0 )
             Sensor_dpcc_process(pAdpccCtx);
 
     } else if(pAdpccCtx->eMode == ADPCC_OP_MODE_MANUAL) {
