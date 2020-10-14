@@ -184,68 +184,229 @@ static void select_Hist_params_algo(const CalibDb_Dehaze_t * stRKDehazeParam, rk
 
 }
 
-void AdehazeApiOnProcess(AdehazeHandle_t* para, int iso, int mode)
+void AdehazeApiToolProcess(AdehazeHandle_t* para, int iso, int mode)
 {
     LOG1_ADEHAZE("ENTER: %s \n", __func__);
+
+    //fuction enable
+    if(para->AdehazeAtrr.stTool.en == 0)
+    {
+        para->adhaz_config.dehaze_en[0] = FUNCTION_DISABLE;
+        LOGD_ADEHAZE(" %s: Dehaze fuction en:%d\n", __func__, FUNCTION_DISABLE);
+    }
+    else
+    {
+        LOGD_ADEHAZE(" %s: Dehaze fuction en:%d,", __func__, FUNCTION_ENABLE);
+        para->adhaz_config.dehaze_en[0] = FUNCTION_ENABLE;
+        if(para->AdehazeAtrr.stTool.dehaze_setting[mode].en != 0 && para->AdehazeAtrr.stTool.enhance_setting[mode].en != 0)
+        {
+            para->adhaz_config.dehaze_en[1] = FUNCTION_ENABLE;
+            para->adhaz_config.dehaze_enhance[0] = FUNCTION_ENABLE;
+            LOGD_ADEHAZE(" Dehaze en:%d, Enhance en:%d,", FUNCTION_DISABLE, FUNCTION_ENABLE );
+        }
+        else if(para->AdehazeAtrr.stTool.dehaze_setting[mode].en != 0 && para->AdehazeAtrr.stTool.enhance_setting[mode].en == 0)
+        {
+            para->adhaz_config.dehaze_en[1] = FUNCTION_ENABLE;
+            para->adhaz_config.dehaze_enhance[0] = FUNCTION_DISABLE;
+            LOGD_ADEHAZE(" Dehaze en:%d, Enhance en:%d,", FUNCTION_ENABLE, FUNCTION_DISABLE );
+        }
+        else if(para->AdehazeAtrr.stTool.dehaze_setting[mode].en == 0 && para->AdehazeAtrr.stTool.enhance_setting[mode].en != 0)
+        {
+            para->adhaz_config.dehaze_en[1] = FUNCTION_ENABLE;
+            para->adhaz_config.dehaze_enhance[0] = FUNCTION_ENABLE;
+            LOGD_ADEHAZE(" Dehaze en:%d, Enhance en:%d,", FUNCTION_DISABLE, FUNCTION_ENABLE );
+        }
+        else
+        {
+            para->adhaz_config.dehaze_en[1] = FUNCTION_DISABLE;
+            para->adhaz_config.dehaze_enhance[0] = FUNCTION_DISABLE;
+            LOGD_ADEHAZE(" Dehaze en:%d, Enhance en:%d,", FUNCTION_DISABLE, FUNCTION_DISABLE );
+        }
+
+        if(para->AdehazeAtrr.stTool.hist_setting[mode].en != 0)
+            para->adhaz_config.dehaze_en[2] = FUNCTION_ENABLE;
+        else
+            para->adhaz_config.dehaze_en[2] = FUNCTION_DISABLE;
+
+        LOGD_ADEHAZE(" Hist en:%d\n", para->adhaz_config.dehaze_en[2] );
+
+    }
+
+
+    //dehaze setting
+    select_Dehaze_params_algo(&para->AdehazeAtrr.stTool, &para->adhaz_config, iso, mode);
+
+    //enhance setting
+    select_Enhance_params_algo(&para->AdehazeAtrr.stTool, &para->adhaz_config, iso, mode);
+
+    //hist setting
+    select_Hist_params_algo(&para->AdehazeAtrr.stTool, &para->adhaz_config, iso, mode);
+
+    LOG1_ADEHAZE("EXIT: %s \n", __func__);
+
+}
+
+void AdehazeEnhanceApiOnProcess(AdehazeHandle_t* para, int iso, int mode)
+{
+    LOG1_ADEHAZE("ENTER: %s \n", __func__);
+    LOGD_ADEHAZE(" %s: Adehaze Api on!!!, api mode:%d \n", __func__, para->AdehazeAtrr.mode);
 
     if(para->AdehazeAtrr.mode == RK_AIQ_DEHAZE_MODE_OFF)
     {
         if(para->calib_dehaz.en == 0)
+        {
             para->adhaz_config.dehaze_en[0] = FUNCTION_DISABLE;
+            LOGD_ADEHAZE(" %s: Dehaze fuction en:%d,", __func__, FUNCTION_DISABLE);
+        }
         else
+        {
             para->adhaz_config.dehaze_en[0] = FUNCTION_ENABLE;
+            LOGD_ADEHAZE(" %s: Dehaze fuction en:%d,", __func__, FUNCTION_ENABLE);
+        }
 
         if(para->calib_dehaz.enhance_setting[mode].en != 0)
         {
             //dc en
             para->adhaz_config.dehaze_en[1] = FUNCTION_ENABLE;
             para->adhaz_config.dehaze_enhance[0] = FUNCTION_ENABLE;
+            LOGD_ADEHAZE(" Dehaze en:%d, Enhance en:%d,", FUNCTION_DISABLE, FUNCTION_ENABLE );
         }
         else
         {
             para->adhaz_config.dehaze_en[1] = FUNCTION_DISABLE;
             para->adhaz_config.dehaze_enhance[0] = FUNCTION_DISABLE;
+            LOGD_ADEHAZE(" Dehaze en:%d, Enhance en:%d,", FUNCTION_DISABLE, FUNCTION_DISABLE );
         }
+
+        //hist en setting
+        if(para->calib_dehaz.hist_setting[mode].en != 0)
+            para->adhaz_config.dehaze_en[2] = FUNCTION_ENABLE;
+        else
+            para->adhaz_config.dehaze_en[2] = FUNCTION_DISABLE;
+        LOGD_ADEHAZE(" Hist en:%d\n", para->adhaz_config.dehaze_en[2] );
 
         //enhance setting
         select_Enhance_params_algo(&para->calib_dehaz, &para->adhaz_config, iso, mode);
 
+        //hist setting
+        select_Hist_params_algo(&para->calib_dehaz, &para->adhaz_config, iso, mode);
+
     }
     else if(para->AdehazeAtrr.mode > RK_AIQ_DEHAZE_MODE_INVALID && para->AdehazeAtrr.mode < RK_AIQ_DEHAZE_MODE_OFF)
     {
+
         para->adhaz_config.dehaze_en[0] = FUNCTION_ENABLE;
         //dc en
         para->adhaz_config.dehaze_en[1] = FUNCTION_ENABLE;
         para->adhaz_config.dehaze_enhance[0] = FUNCTION_DISABLE;
+        LOGD_ADEHAZE(" Dehaze fuction en:%d, Dehaze en:%d, Enhance en:%d,", FUNCTION_ENABLE, FUNCTION_ENABLE, FUNCTION_DISABLE );
+
+        //hist en setting
+        if(para->calib_dehaz.hist_setting[mode].en != 0)
+            para->adhaz_config.dehaze_en[2] = FUNCTION_ENABLE;
+        else
+            para->adhaz_config.dehaze_en[2] = FUNCTION_DISABLE;
+
+        LOGD_ADEHAZE(" Hist en:%d\n", para->adhaz_config.dehaze_en[2] );
 
         select_Dehaze_params_algo(&para->calib_dehaz, &para->adhaz_config, iso, mode);
 
         if(para->AdehazeAtrr.mode == RK_AIQ_DEHAZE_MODE_MANUAL)
         {
-            int level = para->AdehazeAtrr.stManual.strength;
+            float level = (float)(para->AdehazeAtrr.stManual.strength);
+            float level_default = 5;
             float level_diff = (float)(level - level_default);
 
             //sw_dhaz_cfg_wt
-            para->adhaz_config.dehaze_user_config[1] += level_diff * 0.2;
+            para->adhaz_config.dehaze_user_config[1] += level_diff * 0.05;
             para->adhaz_config.dehaze_user_config[1] =
-                LIMIT_VALUE(para->adhaz_config.dehaze_user_config[1], 0, 1);
+                LIMIT_VALUE(para->adhaz_config.dehaze_user_config[1], 0.99, 0);
 
             //sw_dhaz_cfg_air
-            para->adhaz_config.dehaze_user_config[2] += level_diff * 20;
+            para->adhaz_config.dehaze_user_config[2] += level_diff * 5;
             para->adhaz_config.dehaze_user_config[2] =
-                LIMIT_VALUE(para->adhaz_config.dehaze_user_config[2], 0, 255);
+                LIMIT_VALUE(para->adhaz_config.dehaze_user_config[2], 255, 0);
 
             //sw_dhaz_cfg_tmax
-            para->adhaz_config.dehaze_user_config[3] += level_diff * 0.2;
+            para->adhaz_config.dehaze_user_config[3] += level_diff * 0.05;
             para->adhaz_config.dehaze_user_config[3] =
-                LIMIT_VALUE(para->adhaz_config.dehaze_user_config[3], 0, 1);
+                LIMIT_VALUE(para->adhaz_config.dehaze_user_config[3], 0.99, 0);
 
+            LOGD_ADEHAZE(" %s: Adehaze munual level:%f level_diff:%f\n", __func__, level, level_diff);
+            LOGD_ADEHAZE(" %s: After manual api sw_dhaz_cfg_wt:%f sw_dhaz_cfg_air:%f sw_dhaz_cfg_tmax:%f\n", __func__, para->adhaz_config.dehaze_user_config[1],
+                         para->adhaz_config.dehaze_user_config[2], para->adhaz_config.dehaze_user_config[3]);
         }
+        //hist setting
+        select_Hist_params_algo(&para->calib_dehaz, &para->adhaz_config, iso, mode);
 
     }
+    else if(para->AdehazeAtrr.mode == RK_AIQ_DEHAZE_MODE_TOOL)
+        AdehazeApiToolProcess(para, iso, mode);
     else
         LOGE_ADEHAZE("%s:Wrong Adehaze API mode!!! \n", __func__);
 
+
+    LOG1_ADEHAZE("EXIT: %s \n", __func__);
+
+}
+
+void AdehazeEnhanceApiOffProcess(AdehazeHandle_t* para, int iso, int mode)
+{
+    LOG1_ADEHAZE("ENTER: %s \n", __func__);
+    LOGD_ADEHAZE(" %s: Adehaze Api off!!!\n", __func__);
+
+    //fuction enable
+    if(para->calib_dehaz.en == 0)
+    {
+        para->adhaz_config.dehaze_en[0] = FUNCTION_DISABLE;
+        LOGD_ADEHAZE(" %s: Dehaze fuction en:%d\n", __func__, FUNCTION_DISABLE);
+    }
+    else
+    {
+        LOGD_ADEHAZE(" %s: Dehaze fuction en:%d,", __func__, FUNCTION_ENABLE);
+        para->adhaz_config.dehaze_en[0] = FUNCTION_ENABLE;
+        if(para->calib_dehaz.dehaze_setting[mode].en != 0 && para->calib_dehaz.enhance_setting[mode].en != 0)
+        {
+            para->adhaz_config.dehaze_en[1] = FUNCTION_ENABLE;
+            para->adhaz_config.dehaze_enhance[0] = FUNCTION_ENABLE;
+            LOGD_ADEHAZE(" Dehaze en:%d, Enhance en:%d,", FUNCTION_DISABLE, FUNCTION_ENABLE );
+        }
+        else if(para->calib_dehaz.dehaze_setting[mode].en != 0 && para->calib_dehaz.enhance_setting[mode].en == 0)
+        {
+            para->adhaz_config.dehaze_en[1] = FUNCTION_ENABLE;
+            para->adhaz_config.dehaze_enhance[0] = FUNCTION_DISABLE;
+            LOGD_ADEHAZE(" Dehaze en:%d, Enhance en:%d,", FUNCTION_ENABLE, FUNCTION_DISABLE );
+        }
+        else if(para->calib_dehaz.dehaze_setting[mode].en == 0 && para->calib_dehaz.enhance_setting[mode].en != 0)
+        {
+            para->adhaz_config.dehaze_en[1] = FUNCTION_ENABLE;
+            para->adhaz_config.dehaze_enhance[0] = FUNCTION_ENABLE;
+            LOGD_ADEHAZE(" Dehaze en:%d, Enhance en:%d,", FUNCTION_DISABLE, FUNCTION_ENABLE );
+        }
+        else
+        {
+            para->adhaz_config.dehaze_en[1] = FUNCTION_DISABLE;
+            para->adhaz_config.dehaze_enhance[0] = FUNCTION_DISABLE;
+            LOGD_ADEHAZE(" Dehaze en:%d, Enhance en:%d,", FUNCTION_DISABLE, FUNCTION_DISABLE );
+        }
+
+        if(para->calib_dehaz.hist_setting[mode].en != 0)
+            para->adhaz_config.dehaze_en[2] = FUNCTION_ENABLE;
+        else
+            para->adhaz_config.dehaze_en[2] = FUNCTION_DISABLE;
+
+        LOGD_ADEHAZE(" Hist en:%d\n", para->adhaz_config.dehaze_en[2] );
+
+    }
+
+    //dehaze setting
+    select_Dehaze_params_algo(&para->calib_dehaz, &para->adhaz_config, iso, mode);
+
+    //enhance setting
+    select_Enhance_params_algo(&para->calib_dehaz, &para->adhaz_config, iso, mode);
+
+    //hist setting
+    select_Hist_params_algo(&para->calib_dehaz, &para->adhaz_config, iso, mode);
 
     LOG1_ADEHAZE("EXIT: %s \n", __func__);
 
@@ -295,54 +456,9 @@ XCamReturn AdehazeProcess(AdehazeHandle_t* para, int iso, int mode)
     LOGD_ADEHAZE("%s ISO:%d mode:%d\n", __func__, iso, mode);
 
     if(!(para->AdehazeAtrr.byPass))
-        AdehazeApiOnProcess(para, iso, mode);
+        AdehazeEnhanceApiOnProcess(para, iso, mode);
     else
-    {
-        //fuction enable
-        if(para->calib_dehaz.en == 0)
-            para->adhaz_config.dehaze_en[0] = FUNCTION_DISABLE;
-        else
-        {
-            para->adhaz_config.dehaze_en[0] = FUNCTION_ENABLE;
-            if(para->calib_dehaz.dehaze_setting[mode].en != 0 && para->calib_dehaz.enhance_setting[mode].en != 0)
-            {
-                para->adhaz_config.dehaze_en[1] = FUNCTION_ENABLE;
-                para->adhaz_config.dehaze_enhance[0] = FUNCTION_ENABLE;
-            }
-            else if(para->calib_dehaz.dehaze_setting[mode].en != 0 && para->calib_dehaz.enhance_setting[mode].en == 0)
-            {
-                para->adhaz_config.dehaze_en[1] = FUNCTION_ENABLE;
-                para->adhaz_config.dehaze_enhance[0] = FUNCTION_DISABLE;
-            }
-            else if(para->calib_dehaz.dehaze_setting[mode].en == 0 && para->calib_dehaz.enhance_setting[mode].en != 0)
-            {
-                para->adhaz_config.dehaze_en[1] = FUNCTION_ENABLE;
-                para->adhaz_config.dehaze_enhance[0] = FUNCTION_ENABLE;
-            }
-            else
-            {
-                para->adhaz_config.dehaze_en[1] = FUNCTION_DISABLE;
-                para->adhaz_config.dehaze_enhance[0] = FUNCTION_DISABLE;
-                LOGD_ADEHAZE("%s: Dehaze and Enhance do not open!!!\n", __func__);
-            }
-
-            if(para->calib_dehaz.hist_setting[mode].en != 0)
-                para->adhaz_config.dehaze_en[2] = FUNCTION_ENABLE;
-            else
-                para->adhaz_config.dehaze_en[2] = FUNCTION_DISABLE;
-
-        }
-
-
-        //dehaze setting
-        select_Dehaze_params_algo(&para->calib_dehaz, &para->adhaz_config, iso, mode);
-
-        //enhance setting
-        select_Enhance_params_algo(&para->calib_dehaz, &para->adhaz_config, iso, mode);
-    }
-
-    //hist setting
-    select_Hist_params_algo(&para->calib_dehaz, &para->adhaz_config, iso, mode);
+        AdehazeEnhanceApiOffProcess(para, iso, mode);
 
     LOG1_ADEHAZE("EXIT: %s \n", __func__);
     return ret;

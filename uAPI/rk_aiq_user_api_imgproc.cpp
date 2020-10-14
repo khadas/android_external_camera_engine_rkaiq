@@ -1932,7 +1932,6 @@ XCamReturn rk_aiq_uapi_setDhzMode(const rk_aiq_sys_ctx_t* ctx, opMode_t mode)
         RKAIQ_IMGPROC_CHECK_RET(ret, "setDhzMode auto failed!");
     } else if (mode == OP_MANUAL) {
         attr.mode = RK_AIQ_DEHAZE_MODE_MANUAL;
-        ret = rk_aiq_uapi_setMDhzStrth(ctx, true, 1);
         RKAIQ_IMGPROC_CHECK_RET(ret, "setDhzMode manual failed!");
     } else {
         ret = XCAM_RETURN_ERROR_PARAM;

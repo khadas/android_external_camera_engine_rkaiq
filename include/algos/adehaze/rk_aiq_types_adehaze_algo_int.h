@@ -19,6 +19,7 @@
 
 #ifndef _RK_AIQ_TYPE_ADEHAZE_ALGO_INT_H_
 #define _RK_AIQ_TYPE_ADEHAZE_ALGO_INT_H_
+#include "RkAiqCalibDbTypes.h"
 #include "adehaze/rk_aiq_types_adehaze_algo.h"
 
 
@@ -28,7 +29,6 @@ RKAIQ_BEGIN_DECLARE
 #define RK_DEHAZE_ISO_NUM 9
 #define FUNCTION_ENABLE 1
 #define FUNCTION_DISABLE 0
-#define level_default 5
 
 #define LIMIT_VALUE(value,max_value,min_value)      (value > max_value? max_value : value < min_value ? min_value : value)
 
@@ -78,14 +78,16 @@ typedef enum rk_aiq_dehaze_op_mode_s {
     RK_AIQ_DEHAZE_MODE_MANUAL                      = 1,        /**< run manual dehaze */
     RK_AIQ_DEHAZE_MODE_AUTO                        = 2,        /**< run auto dehaze */
     RK_AIQ_DEHAZE_MODE_OFF                         = 3,        /**< dehaze off, enhance follow IQ setting*/
+    RK_AIQ_DEHAZE_MODE_TOOL                        = 4,        /**< dehaze off, enhance follow IQ setting*/
 } rk_aiq_dehaze_op_mode_t;
 
 typedef struct adehaze_sw_s {
     bool byPass;
     rk_aiq_dehaze_op_mode_t mode;
     rk_aiq_dehaze_M_attrib_t stManual;
-    rk_aiq_dehaze_A_attrib_t stAuto;
-    rk_aiq_dehaze_enhance_t  stEnhance;
+    CalibDb_Dehaze_t stAuto;
+    rk_aiq_dehaze_enhance_t stEnhance;
+    CalibDb_Dehaze_t  stTool;
 } adehaze_sw_t;
 
 typedef struct AdehazeExpInfo_s {

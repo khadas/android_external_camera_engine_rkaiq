@@ -12,11 +12,13 @@ rk_aiq_uapi_adehaze_SetAttrib(RkAiqAlgoContext *ctx,
     AdehazeHandle->AdehazeAtrr.byPass = attr.byPass;
     AdehazeHandle->AdehazeAtrr.mode = attr.mode;
     if(attr.mode == RK_AIQ_DEHAZE_MODE_AUTO)
-        memcpy(&AdehazeHandle->AdehazeAtrr.stAuto, &attr.stAuto, sizeof(rk_aiq_dehaze_A_attrib_t));
+        memcpy(&AdehazeHandle->AdehazeAtrr.stAuto, &attr.stAuto, sizeof(CalibDb_Dehaze_t));
     else if(attr.mode == RK_AIQ_DEHAZE_MODE_MANUAL)
         memcpy(&AdehazeHandle->AdehazeAtrr.stManual, &attr.stManual, sizeof(rk_aiq_dehaze_M_attrib_t));
     else if(attr.mode == RK_AIQ_DEHAZE_MODE_OFF)
         memcpy(&AdehazeHandle->AdehazeAtrr.stEnhance, &attr.stEnhance, sizeof(rk_aiq_dehaze_enhance_t));
+    else if(attr.mode == RK_AIQ_DEHAZE_MODE_TOOL)
+        memcpy(&AdehazeHandle->AdehazeAtrr.stTool, &attr.stTool, sizeof(CalibDb_Dehaze_t));
     else {
         LOGE_ADEHAZE("invalid mode!");
     }
@@ -28,23 +30,15 @@ rk_aiq_uapi_adehaze_GetAttrib(RkAiqAlgoContext *ctx, adehaze_sw_t *attr)
 {
     AdehazeHandle_t * AdehazeHandle = (AdehazeHandle_t *)ctx;
     attr->mode = AdehazeHandle->AdehazeAtrr.mode;
-    if (AdehazeHandle->AdehazeAtrr.mode == RK_AIQ_DEHAZE_MODE_AUTO) {
-        if (AdehazeHandle->Dehaze_Scene_mode == 0) {
-        } else if (AdehazeHandle->Dehaze_Scene_mode == 1) {
-        } else if (AdehazeHandle->Dehaze_Scene_mode == 2) {
-        }
-    } else if (AdehazeHandle->AdehazeAtrr.mode == RK_AIQ_DEHAZE_MODE_MANUAL) {
-        attr->stManual.strength = AdehazeHandle->strength;
-        if (AdehazeHandle->Dehaze_Scene_mode == 0) {
-        } else if (AdehazeHandle->Dehaze_Scene_mode == 1) {
-        } else if (AdehazeHandle->Dehaze_Scene_mode == 2) {
-        }
-    } else if (AdehazeHandle->AdehazeAtrr.mode == RK_AIQ_DEHAZE_MODE_OFF) {
-        if (AdehazeHandle->Dehaze_Scene_mode == 0) {
-        } else if (AdehazeHandle->Dehaze_Scene_mode == 1) {
-        } else if (AdehazeHandle->Dehaze_Scene_mode == 2) {
-        }
-    }
+    if (AdehazeHandle->AdehazeAtrr.mode == RK_AIQ_DEHAZE_MODE_AUTO)
+        memcpy(&attr->stAuto, &AdehazeHandle->AdehazeAtrr.stAuto, sizeof(CalibDb_Dehaze_t));
+    else if (AdehazeHandle->AdehazeAtrr.mode == RK_AIQ_DEHAZE_MODE_MANUAL)
+        memcpy(&attr->stManual, &AdehazeHandle->AdehazeAtrr.stManual, sizeof(rk_aiq_dehaze_M_attrib_t));
+    else if (AdehazeHandle->AdehazeAtrr.mode == RK_AIQ_DEHAZE_MODE_OFF)
+        memcpy(&attr->stEnhance, &AdehazeHandle->AdehazeAtrr.stEnhance, sizeof(rk_aiq_dehaze_enhance_t));
+    else if (AdehazeHandle->AdehazeAtrr.mode == RK_AIQ_DEHAZE_MODE_TOOL)
+        memcpy(&attr->stTool, &AdehazeHandle->AdehazeAtrr.stTool, sizeof(CalibDb_Dehaze_t));
+
     return XCAM_RETURN_NO_ERROR;
 }
 
