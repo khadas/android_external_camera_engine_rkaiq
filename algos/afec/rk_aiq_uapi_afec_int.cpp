@@ -63,9 +63,6 @@ rk_aiq_uapi_afec_GetAttrib(const RkAiqAlgoContext *ctx,
 {
     FECHandle_t fec_contex = (FECHandle_t)ctx->hFEC;;
 
-    if (!fec_contex->fec_en)
-        return XCAM_RETURN_ERROR_FAILED;
-
     memcpy(attr, &fec_contex->user_config, sizeof(rk_aiq_fec_attrib_t));
 
     return XCAM_RETURN_NO_ERROR;

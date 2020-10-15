@@ -79,6 +79,7 @@ create_context(RkAiqAlgoContext **context, const AlgoCtxInstanceCfg* cfg)
             fecCtx->camCoeff.a3, fecCtx->camCoeff.a4);
 #endif
     fecCtx->correct_level = calib_fec->correct_level;
+    memset(&fecCtx->user_config, 0, sizeof(fecCtx->user_config));
 
     ctx->hFEC->eState = FEC_STATE_INVALID;
 
@@ -308,6 +309,8 @@ prepare(RkAiqAlgoCom* params)
             fecCtx->dst_height, fecCtx->fecParams, fecCtx->camCoeff);
     mallocFecMesh(fecCtx->fecParams.meshSize4bin, &fecCtx->meshxi,
             &fecCtx->meshxf, &fecCtx->meshyi, &fecCtx->meshyf);
+    fecCtx->fec_mesh_h_size = fecCtx->fecParams.meshSizeW;
+    fecCtx->fec_mesh_v_size = fecCtx->fecParams.meshSizeH;
     fecCtx->fec_mesh_size = fecCtx->fecParams.meshSize4bin;
     LOGI_AFEC("(%s) en: %d, bypass(%d), correct_level(%d), dimen(%d-%d), mesh dimen(%d-%d), size(%d)",
               fecCtx->meshfile, fecCtx->fec_en,
