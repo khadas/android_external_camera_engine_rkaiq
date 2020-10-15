@@ -2836,6 +2836,11 @@ RkAiqCore::genCpslResult(RkAiqFullParams* params)
         cpsl_param->fl_ir.power[0] = 1.0f;
     }
 
+    // need to init cpsl status, cause the cpsl driver state
+    // may be not correct
+    if (mState == RK_AIQ_CORE_STATE_INITED)
+        need_update = true;
+
     if (need_update) {
         if (cpsl_cfg->lght_src & RK_AIQ_CPSLS_LED) {
             cpsl_param->update_fl = true;
