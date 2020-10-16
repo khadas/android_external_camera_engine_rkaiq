@@ -256,10 +256,12 @@
  * - support AF funtionality
  * - TMO/Dehaze: lots of modifications
  * - isp driver v0.1.8
+ * v1.2.4
+ * - temporary version for longsee, fix some bugs of dehaze and cpsl
  */
 
-#define RK_AIQ_VERSION_REAL_V "v1.2.3"
-#define RK_AIQ_RELEASE_DATE "2020-10-09"
+#define RK_AIQ_VERSION_REAL_V "v1.2.4"
+#define RK_AIQ_RELEASE_DATE "2020-10-16"
 
 /******* DO NOT EDIT THE FOLLOWINGS ***********/
 
