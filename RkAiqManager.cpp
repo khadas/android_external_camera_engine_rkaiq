@@ -207,6 +207,8 @@ RkAiqManager::init()
     ret = bret ? XCAM_RETURN_NO_ERROR : XCAM_RETURN_ERROR_FAILED;
     RKAIQMNG_CHECK_RET(ret, "cmd thread start error");
 
+    mDleayCpslParams = NULL;
+
     EXIT_XCORE_FUNCTION();
 
     return ret;
@@ -344,6 +346,8 @@ RkAiqManager::stop(bool keep_ext_hw_st)
     mCamHw->keepHwStAtStop(keep_ext_hw_st);
     ret = mCamHw->stop();
     RKAIQMNG_CHECK_RET(ret, "camhw stop error %d", ret);
+
+    mDleayCpslParams = NULL;
 
     _state = AIQ_STATE_STOPED;
 
@@ -483,9 +487,33 @@ RkAiqManager::applyAnalyzerResult(SmartPtr<RkAiqFullParamsProxy>& results)
     }
 #else
     if (aiqParams->mCpslParams.ptr()) {
-        ret = mCamHw->setCpslParams(aiqParams->mCpslParams);
+        SmartPtr<CamHwIsp20> mCamHwIsp20 = mCamHw.dynamic_cast_ptr<CamHwIsp20>();
+        int gray_mode = aiqParams->mIspParams->data()->ie.base.mode;
+
+        bool cpsl_ir_en = aiqParams->mCpslParams->data()->update_ir &&
+                          aiqParams->mCpslParams->data()->ir.irc_on;
+        bool cpsl_update = aiqParams->mCpslParams->data()->update_ir ||
+                          aiqParams->mCpslParams->data()->update_fl;
+
+        if (cpsl_ir_en) {
+            mDelayCpslApplyFrmNum = 2;
+            mDleayCpslParams = aiqParams->mCpslParams;
+            LOGD_ANALYZER("gray mode on, cpsl ir on delay 2 frames");
+        } else if (cpsl_update) {
+            mDleayCpslParams.release();
+            mDelayCpslApplyFrmNum = 0;
+            ret = mCamHw->setCpslParams(aiqParams->mCpslParams);
+            if (ret)
+                LOGE_ANALYZER("setFlParams error %d", ret);
+        }
+    }
+
+    if (mDleayCpslParams.ptr() && --mDelayCpslApplyFrmNum == 0) {
+        LOGD_ANALYZER("set delyay cpsl ir on");
+        ret = mCamHw->setCpslParams(mDleayCpslParams);
         if (ret)
             LOGE_ANALYZER("setFlParams error %d", ret);
+        mDleayCpslParams.release();
     }
 #endif
 

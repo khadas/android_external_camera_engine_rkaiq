@@ -197,6 +197,8 @@ private:
     int _state;
     bool mCurMirror;
     bool mCurFlip;
+    SmartPtr<RkAiqCpslParamsProxy> mDleayCpslParams;
+    int mDelayCpslApplyFrmNum;
 };
 
 }; //namespace RkCam
