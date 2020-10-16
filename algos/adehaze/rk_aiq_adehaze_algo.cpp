@@ -285,6 +285,9 @@ void AdehazeEnhanceApiOnProcess(AdehazeHandle_t* para, int iso, int mode)
             para->adhaz_config.dehaze_en[2] = FUNCTION_DISABLE;
         LOGD_ADEHAZE(" Hist en:%d\n", para->adhaz_config.dehaze_en[2] );
 
+        //dehaze seting
+        select_Dehaze_params_algo(&para->calib_dehaz, &para->adhaz_config, iso, mode);
+
         //enhance setting
         select_Enhance_params_algo(&para->calib_dehaz, &para->adhaz_config, iso, mode);
 
@@ -320,17 +323,17 @@ void AdehazeEnhanceApiOnProcess(AdehazeHandle_t* para, int iso, int mode)
             //sw_dhaz_cfg_wt
             para->adhaz_config.dehaze_user_config[1] += level_diff * 0.05;
             para->adhaz_config.dehaze_user_config[1] =
-                LIMIT_VALUE(para->adhaz_config.dehaze_user_config[1], 0.99, 0);
+                LIMIT_VALUE(para->adhaz_config.dehaze_user_config[1], 0.99, 0.01);
 
             //sw_dhaz_cfg_air
             para->adhaz_config.dehaze_user_config[2] += level_diff * 5;
             para->adhaz_config.dehaze_user_config[2] =
-                LIMIT_VALUE(para->adhaz_config.dehaze_user_config[2], 255, 0);
+                LIMIT_VALUE(para->adhaz_config.dehaze_user_config[2], 255, 0.01);
 
             //sw_dhaz_cfg_tmax
             para->adhaz_config.dehaze_user_config[3] += level_diff * 0.05;
             para->adhaz_config.dehaze_user_config[3] =
-                LIMIT_VALUE(para->adhaz_config.dehaze_user_config[3], 0.99, 0);
+                LIMIT_VALUE(para->adhaz_config.dehaze_user_config[3], 0.99, 0.01);
 
             LOGD_ADEHAZE(" %s: Adehaze munual level:%f level_diff:%f\n", __func__, level, level_diff);
             LOGD_ADEHAZE(" %s: After manual api sw_dhaz_cfg_wt:%f sw_dhaz_cfg_air:%f sw_dhaz_cfg_tmax:%f\n", __func__, para->adhaz_config.dehaze_user_config[1],
