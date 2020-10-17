@@ -20,6 +20,10 @@
 
 RKAIQ_BEGIN_DECLARE
 
+#ifdef RK_SIMULATOR_HW
+#define CHECK_USER_API_ENABLE
+#endif
+
 XCamReturn
 rk_aiq_user_api_aldch_SetAttrib(const rk_aiq_sys_ctx_t* sys_ctx, rk_aiq_ldch_attrib_t attr)
 {

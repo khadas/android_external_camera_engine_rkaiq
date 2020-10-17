@@ -147,23 +147,23 @@ XCamReturn ORBPreProcess(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outparam
 
     LOGD_AORB("point num: %d - %d",
               ORBctx->orb_stats.num_points,
-              rkaiqAorbPreParam->orb_stats.num_points);
+              rkaiqAorbPreParam->orb_stats->num_points);
 
     if (!ORBctx->initialized) {
         rkaiqAorbPreOut->orb_pre_result.valid = 0;
         ORBctx->initialized = 1;
-        ORBctx->orb_stats = rkaiqAorbPreParam->orb_stats;
+        ORBctx->orb_stats = *rkaiqAorbPreParam->orb_stats;
         ORBctx->orb_stats.num_points = 0;
     } else {
         if (ORBctx->orb_stats.num_points > 0 &&
-                rkaiqAorbPreParam->orb_stats.num_points > 0) {
+                rkaiqAorbPreParam->orb_stats->num_points > 0) {
             rkaiqAorbPreOut->orb_pre_result.valid = 1;
 #if OPENCV_SUPPORT
             vector<Point2f> m_queryPoints, m_trainPoints;
 
             push_orbpoint_cv(
-                rkaiqAorbPreParam->orb_stats.num_points,
-                rkaiqAorbPreParam->orb_stats.points,
+                rkaiqAorbPreParam->orb_stats->num_points,
+                rkaiqAorbPreParam->orb_stats->points,
                 m_queryPoints);
 
             push_orbpoint_cv(
@@ -192,7 +192,7 @@ XCamReturn ORBPreProcess(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outparam
                 LOGD_AORB("reset keypoint_num: %d", ORBctx->roi_points_list->length);
                 freeList(ORBctx->roi_points_list);
                 ORBctx->roi_points_list = NULL;
-                ORBctx->orb_stats = rkaiqAorbPreParam->orb_stats;
+                ORBctx->orb_stats = *rkaiqAorbPreParam->orb_stats;
             } else {
                 ORBList* matched_list =
                     matching(ORBctx->roi_points_list, &rkaiqAorbPreParam->orb_stats, ORBctx->roi_rect);
@@ -242,7 +242,7 @@ XCamReturn ORBPreProcess(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outparam
 #endif
 #endif
         } else {
-            ORBctx->orb_stats = rkaiqAorbPreParam->orb_stats;
+            ORBctx->orb_stats = *rkaiqAorbPreParam->orb_stats;
         }
     }
     LOGI_ORB("%s: (exit)\n", __FUNCTION__ );

@@ -391,11 +391,6 @@ CamHwSimulator::setExposureParams(SmartPtr<RkAiqExpParamsProxy>& expPar)
 {
     return CamHwBase::setExposureParams(expPar);
 }
-XCamReturn
-CamHwSimulator::setIrisParams(SmartPtr<RkAiqIrisParamsProxy>& irisPar)
-{
-    return CamHwBase::setIrisParams(irisPar);
-}
 
 XCamReturn
 CamHwSimulator::setFocusParams(SmartPtr<RkAiqFocusParamsProxy>& focus_params)

@@ -24,10 +24,45 @@
 
 RKAIQ_BEGIN_DECLARE
 
+static XCamReturn alloc_ldch_buf(LDCHContext_t* ldchCtx)
+{
+    rk_aiq_share_mem_config_t share_mem_config;
+    share_mem_config.alloc_param.width =  ldchCtx->dst_width;
+    share_mem_config.alloc_param.height = ldchCtx->dst_height;
+    share_mem_config.mem_type = MEM_TYPE_LDCH;
+    ldchCtx->share_mem_ops->alloc_mem(ldchCtx->share_mem_ops,
+                                      &share_mem_config,
+                                      &ldchCtx->share_mem_ctx);
+    return XCAM_RETURN_NO_ERROR;
+}
+
+static XCamReturn release_ldch_buf(LDCHContext_t* ldchCtx)
+{
+    ldchCtx->share_mem_ops->release_mem(ldchCtx->share_mem_ctx);
+
+    return XCAM_RETURN_NO_ERROR;
+}
+
+static XCamReturn get_ldch_buf(LDCHContext_t* ldchCtx)
+{
+    ldchCtx->ldch_mem_info = (rk_aiq_ldch_share_mem_info_t *)
+            ldchCtx->share_mem_ops->get_free_item(ldchCtx->share_mem_ctx);
+    if (ldchCtx->ldch_mem_info == NULL) {
+        LOGE_ALDCH( "%s(%d): no free ldch buf", __FUNCTION__, __LINE__);
+        return XCAM_RETURN_ERROR_MEM;
+    } else {
+        LOGD_ALDCH( "get ldch buf fd=%d", ldchCtx->ldch_mem_info->fd);
+        ldchCtx->lut_mapxy = (unsigned short*)ldchCtx->ldch_mem_info->addr;
+    }
+
+    return XCAM_RETURN_NO_ERROR;
+}
+
 static XCamReturn aiqGenLdchMeshInit(LDCHContext_t* ldchCtx)
 {
     if (ldchCtx->genLdchMeshInit) {
         LOGW_ALDCH("genLDCHMesh has been initialized!!\n");
+        get_ldch_buf(ldchCtx);
         return XCAM_RETURN_NO_ERROR;
     }
 
@@ -44,20 +79,12 @@ static XCamReturn aiqGenLdchMeshInit(LDCHContext_t* ldchCtx)
                ldchCtx->lut_v_size,
                ldchCtx->lut_mapxy_size ,
                ldchCtx->correct_level);
-
-    // need re-alloc ?
-    if (ldchCtx->lut_mapxy) {
-        free(ldchCtx->lut_mapxy);
-        ldchCtx->lut_mapxy = NULL;
-        return XCAM_RETURN_ERROR_MEM;
-    }
-    ldchCtx->lut_mapxy = (unsigned short*)malloc(ldchCtx->lut_mapxy_size);
+    alloc_ldch_buf(ldchCtx);
+    get_ldch_buf(ldchCtx);
     ldchCtx->genLdchMeshInit = true;
 
     return XCAM_RETURN_NO_ERROR;
 }
-
-
 
 static XCamReturn
 create_context(RkAiqAlgoContext **context, const AlgoCtxInstanceCfg* cfg)
@@ -134,13 +161,11 @@ destroy_context(RkAiqAlgoContext *context)
     ldchCtx->aldchReadMeshThread->triger_stop();
     ldchCtx->aldchReadMeshThread->stop();
 #endif
-    if (ldchCtx->lut_mapxy != NULL) {
-        free(ldchCtx->lut_mapxy);
-        ldchCtx->lut_mapxy = NULL;
-    }
+
 #if GENMESH_ONLINE
 	genLdchMeshDeInit(ldchCtx->ldchParams);
 #endif
+    release_ldch_buf(ldchCtx);
     delete context->hLDCH;
     context->hLDCH = NULL;
     delete context;
@@ -180,6 +205,7 @@ prepare(RkAiqAlgoCom* params)
     ldchCtx->dst_width = params->u.prepare.sns_op_width;
     ldchCtx->dst_height = params->u.prepare.sns_op_height;
     ldchCtx->resource_path = rkaiqAldchConfig->resource_path;
+    ldchCtx->share_mem_ops = rkaiqAldchConfig->mem_ops_ptr;
 #if GENMESH_ONLINE
     // process the new attrib set before prepare
     hLDCH->aldchReadMeshThread->triger_stop();
@@ -259,12 +285,8 @@ prepare(RkAiqAlgoCom* params)
         ldchCtx->lut_h_size = hsize;
         ldchCtx->lut_v_size = vsize;
         ldchCtx->lut_mapxy_size = ldchCtx->lut_h_size * ldchCtx->lut_v_size * sizeof(unsigned short);
-        // need re-alloc ?
-        if (ldchCtx->lut_mapxy) {
-            free(ldchCtx->lut_mapxy);
-            ldchCtx->lut_mapxy = NULL;
-        }
-        ldchCtx->lut_mapxy = (unsigned short*)malloc(ldchCtx->lut_mapxy_size);
+        alloc_ldch_buf(ldchCtx);
+        get_ldch_buf(ldchCtx);
         ldchCtx->lut_h_size = hsize / 2; //word unit
 
         unsigned int num = fread(ldchCtx->lut_mapxy, 1, ldchCtx->lut_mapxy_size, ofp);
@@ -295,7 +317,6 @@ processing(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outparams)
 {
     LDCHHandle_t hLDCH = (LDCHHandle_t)inparams->ctx->hLDCH;
     LDCHContext_t* ldchCtx = (LDCHContext_t*)hLDCH;
-
     RkAiqAlgoProcResAldchInt* ldchPreOut = (RkAiqAlgoProcResAldchInt*)outparams;
 
     if (inparams->u.proc.init) {
@@ -323,8 +344,13 @@ processing(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outparams)
         ldchPreOut->ldch_result.lut_v_size = ldchCtx->lut_v_size;
         ldchPreOut->ldch_result.lut_map_size = ldchCtx->lut_mapxy_size;
         if (ldchCtx->lut_mapxy != NULL && ldchCtx->ldch_en) {
-            memcpy(ldchPreOut->ldch_result.lut_mapxy, ldchCtx->lut_mapxy,
-                   ldchCtx->lut_mapxy_size);
+            if (ldchCtx->ldch_mem_info == NULL) {
+                LOGE_ALDCH("%s: no available ldch buf!", __FUNCTION__);
+                ldchPreOut->ldch_result.update = 0;
+                return XCAM_RETURN_NO_ERROR;
+            }
+            ldchPreOut->ldch_result.lut_mapxy_buf_fd = ldchCtx->ldch_mem_info->fd;
+            ldchCtx->ldch_mem_info->state[0] = 1; //mark that this buf is using.
         }
     }
 

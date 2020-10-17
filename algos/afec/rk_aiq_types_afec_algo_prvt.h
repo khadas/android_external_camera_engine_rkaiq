@@ -28,6 +28,7 @@
 #include "xcam_log.h"
 #include "gen_mesh/genMesh.h"
 #include "afec/rk_aiq_types_afec_algo_int.h"
+#include "rk_aiq_types_priv.h"
 
 RKAIQ_BEGIN_DECLARE
 
@@ -84,6 +85,9 @@ typedef struct FECContext_s {
     std::atomic<bool> isAttribUpdated;
     rk_aiq_fec_cfg_t user_config;
     SmartPtr<RKAiqAfecThread> afecReadMeshThread;
+    isp_drv_share_mem_ops_t *share_mem_ops;
+    rk_aiq_fec_share_mem_info_t *fec_mem_info;
+    void* share_mem_ctx;
 } FECContext_t;
 
 typedef struct FECContext_s* FECHandle_t;

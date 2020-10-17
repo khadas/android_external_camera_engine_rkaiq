@@ -105,6 +105,7 @@ public:
     virtual XCamReturn getLensVcmCfg(rk_aiq_lens_vcmcfg& lens_cfg) {
         return  XCAM_RETURN_ERROR_FAILED;
     }
+    virtual void getShareMemOps(isp_drv_share_mem_ops_t** mem_ops) {};
 protected:
     SmartPtr<V4l2Device> mIsppStatsDev;
     SmartPtr<V4l2Device> mIsppParamsDev;

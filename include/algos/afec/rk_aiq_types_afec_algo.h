@@ -11,10 +11,11 @@ typedef struct {
     unsigned int crop_height;
     unsigned char mesh_density;
     unsigned int mesh_size;
-    unsigned short meshxi[FEC_MESH_XY_NUM_ALGO];
-    unsigned char meshxf[FEC_MESH_XY_NUM_ALGO];
-    unsigned short meshyi[FEC_MESH_XY_NUM_ALGO];
-    unsigned char meshyf[FEC_MESH_XY_NUM_ALGO];
+    unsigned int mesh_buf_fd;
+    //unsigned short meshxi[FEC_MESH_XY_NUM_ALGO];
+    //unsigned char meshxf[FEC_MESH_XY_NUM_ALGO];
+    //unsigned short meshyi[FEC_MESH_XY_NUM_ALGO];
+    //unsigned char meshyf[FEC_MESH_XY_NUM_ALGO];
 } fec_preprocess_result_t;
 
 #endif

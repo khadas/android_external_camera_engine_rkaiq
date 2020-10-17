@@ -20,6 +20,10 @@
 
 RKAIQ_BEGIN_DECLARE
 
+#ifdef RK_SIMULATOR_HW
+#define CHECK_USER_API_ENABLE
+#endif
+
 XCamReturn
 rk_aiq_user_api_adebayer_SetAttrib(const rk_aiq_sys_ctx_t* sys_ctx, adebayer_attrib_t attr)
 {
@@ -29,6 +33,19 @@ rk_aiq_user_api_adebayer_SetAttrib(const rk_aiq_sys_ctx_t* sys_ctx, adebayer_att
 
     if (algo_handle) {
         return algo_handle->setAttrib(attr);
+    }
+
+    return XCAM_RETURN_NO_ERROR;
+}
+
+XCamReturn
+rk_aiq_user_api_adebayer_GetAttrib(const rk_aiq_sys_ctx_t* sys_ctx, adebayer_attrib_t *attr)
+{
+    RkAiqAdebayerHandleInt* algo_handle =
+        algoHandle<RkAiqAdebayerHandleInt>(sys_ctx, RK_AIQ_ALGO_TYPE_ADEBAYER);
+
+    if (algo_handle) {
+        return algo_handle->getAttrib(attr);
     }
 
     return XCAM_RETURN_NO_ERROR;

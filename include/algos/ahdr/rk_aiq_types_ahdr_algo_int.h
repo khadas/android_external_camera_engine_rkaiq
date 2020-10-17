@@ -73,7 +73,7 @@ typedef struct globaltmo_s
 
 typedef struct tmo_config_s
 {
-    bool isLinearTmoOn;
+    bool isTmoOn;
     globalLuma_t Luma;
     detailsHighLight_t DtsHiLit;
     detailsLowLight_t DtsLoLit;
@@ -142,6 +142,7 @@ typedef struct amgeAttr_s
 
 typedef struct atmoAttr_S
 {
+    bool Enable;
     tmoCtrlData_t stGlobeLuma;
     tmoCtrlData_t stDtlsLL;
     tmoCtrlData_t stDtlsHL;
@@ -165,6 +166,7 @@ typedef struct mmgeAttr_S
 
 typedef struct mtmoAttr_S
 {
+    bool Enable;
     float stGlobeLuma;
     float stDtlsHL;
     float stDtlsLL;
@@ -191,14 +193,21 @@ typedef struct mhdrAttr_s
 } mhdrAttr_t;
 
 typedef enum hdr_OpMode_s {
-    HDR_OpMode_Auto = 1,
-    HDR_OpMode_MANU = 2,
-    HDR_OpMode_Fast = 3,
-    HDR_OpMode_LINEAR = 4,
+    HDR_OpMode_Api_OFF = 0, // run IQ ahdr
+    HDR_OpMode_Auto = 1, //run api auto ahdr
+    HDR_OpMode_MANU = 2, //run api manual ahdr
+    HDR_OpMode_SET_LEVEL = 3, // its prevously fast mode, run api set level
+    HDR_OpMode_DarkArea = 4, // for dark area luma inprove, no matter the scene is night, normal, or hdr
 } hdr_OpMode_t;
 
 typedef struct CurrCtlData_s
 {
+    int SceneMode;
+    float GlobalLumaMode;
+    float DetailsHighLightMode;
+    float DetailsLowLightMode;
+    float GlobalTmoMode;
+    float LocalTMOMode;
     float Envlv;
     float MoveCoef;
     float ISO;
@@ -226,7 +235,6 @@ typedef struct CurrRegData_s
 
 typedef struct hdrAttr_s
 {
-    bool      bEnable;
     hdr_OpMode_t    opMode;
     ahdrAttr_t    stAuto;
     mhdrAttr_t stManual;
@@ -301,7 +309,7 @@ typedef struct RkAiqAhdrProcResult_s
     hdrAttr_t hdrAttr;
     bool LongFrameMode;
     bool isHdrGlobalTmo;
-    bool isLinearTmoOn;
+    bool isTmoOn;
 } RkAiqAhdrProcResult_t;
 
 

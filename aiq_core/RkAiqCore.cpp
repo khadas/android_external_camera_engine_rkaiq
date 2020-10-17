@@ -128,6 +128,7 @@ RkAiqCore::RkAiqCore()
     , mAiqIsppParamsPool(new RkAiqIsppParamsPool("RkAiqIsppParams", 4))
     , mAiqFocusParamsPool(new RkAiqFocusParamsPool("RkAiqFocusParams", 4))
     , mAiqCpslParamsPool(new RkAiqCpslParamsPool("RkAiqCpslParamsPool", 4))
+    , mAiqStatsPool(new RkAiqStatsPool("RkAiqStatsPool", 4))
 {
     ENTER_ANALYZER_FUNCTION();
     mAlogsSharedParams.reset();
@@ -296,9 +297,11 @@ RkAiqCore::stop()
     mRkAiqCoreTh->stop();
     mRkAiqCorePpTh->triger_stop();
     mRkAiqCorePpTh->stop();
-    ispStatsCachedList.clear();
+    mAiqStatsCachedList.clear();
+    mAiqStatsOutMap.clear();
     mState = RK_AIQ_CORE_STATE_STOPED;
     firstStatsReceived = false;
+    mIspStatsCond.broadcast ();
     EXIT_ANALYZER_FUNCTION();
 
     return XCAM_RETURN_NO_ERROR;
@@ -453,6 +456,7 @@ RkAiqCore::analyzeInternal()
         LOGE_ANALYZER("no free ispp params buffer!");
         return NULL;
     }
+
 #if 0
     // for test
     int fd = open("/tmp/cpsl", O_RDWR);
@@ -867,8 +871,8 @@ RkAiqCore::genIspAhdrResult(RkAiqFullParams* params)
         isp_param->ahdr_proc_res.isHdrGlobalTmo =
             ahdr_rk->AhdrProcRes.isHdrGlobalTmo;
 
-        isp_param->ahdr_proc_res.isLinearTmoOn =
-            ahdr_rk->AhdrProcRes.isLinearTmoOn;
+        isp_param->ahdr_proc_res.isTmoOn =
+            ahdr_rk->AhdrProcRes.isTmoOn;
 
     }
 
@@ -1426,10 +1430,11 @@ RkAiqCore::genIspAfecResult(RkAiqFullParams* params)
                 ispp_param->fec.crop_height = afec_rk->afec_result.crop_height;
                 ispp_param->fec.mesh_density = afec_rk->afec_result.mesh_density;
                 ispp_param->fec.mesh_size = afec_rk->afec_result.mesh_size;
-                memcpy(ispp_param->fec.sw_mesh_xi, afec_rk->afec_result.meshxi, sizeof(ispp_param->fec.sw_mesh_xi));
-                memcpy(ispp_param->fec.sw_mesh_xf, afec_rk->afec_result.meshxf, sizeof(ispp_param->fec.sw_mesh_xf));
-                memcpy(ispp_param->fec.sw_mesh_yi, afec_rk->afec_result.meshyi, sizeof(ispp_param->fec.sw_mesh_yi));
-                memcpy(ispp_param->fec.sw_mesh_yf, afec_rk->afec_result.meshyf, sizeof(ispp_param->fec.sw_mesh_yf));
+                ispp_param->fec.mesh_buf_fd = afec_rk->afec_result.mesh_buf_fd;
+                //memcpy(ispp_param->fec.sw_mesh_xi, afec_rk->afec_result.meshxi, sizeof(ispp_param->fec.sw_mesh_xi));
+                //memcpy(ispp_param->fec.sw_mesh_xf, afec_rk->afec_result.meshxf, sizeof(ispp_param->fec.sw_mesh_xf));
+                //memcpy(ispp_param->fec.sw_mesh_yi, afec_rk->afec_result.meshyi, sizeof(ispp_param->fec.sw_mesh_yi));
+                //memcpy(ispp_param->fec.sw_mesh_yf, afec_rk->afec_result.meshyf, sizeof(ispp_param->fec.sw_mesh_yf));
             }
         } else
             ispp_param->update_mask &= ~RKAIQ_ISPP_FEC_ID;
@@ -1459,7 +1464,7 @@ RkAiqCore::genIspAgammaResult(RkAiqFullParams* params)
     // TODO: gen agamma common result
     RkAiqAlgoProcResAgamma* agamma_rk = (RkAiqAlgoProcResAgamma*)agamma_com;
 
-    isp_param->agamma_config = agamma_rk->agamma_config;
+    isp_param->agamma = agamma_rk->agamma_proc_res;
 
     SmartPtr<RkAiqHandle>* handle = getCurAlgoTypeHandle(RK_AIQ_ALGO_TYPE_AGAMMA);
     int algo_id = (*handle)->getAlgoId();
@@ -1530,7 +1535,7 @@ RkAiqCore::genIspAldchResult(RkAiqFullParams* params)
             isp_param->ldch.lut_h_size = aldch_rk->ldch_result.lut_h_size;
             isp_param->ldch.lut_v_size = aldch_rk->ldch_result.lut_v_size;
             isp_param->ldch.lut_size = aldch_rk->ldch_result.lut_map_size;
-            memcpy(isp_param->ldch.lut_mapxy, aldch_rk->ldch_result.lut_mapxy, aldch_rk->ldch_result.lut_map_size);
+            isp_param->ldch.lut_mem_fd = aldch_rk->ldch_result.lut_mapxy_buf_fd;
         }
     } else {
         isp_param->update_mask &= ~RKAIQ_ISP_LDCH_ID;
@@ -2035,21 +2040,82 @@ void
 RkAiqCore::cacheIspStatsToList()
 {
     SmartLock locker (ispStatsListMutex);
-    rk_aiq_isp_stats_t stats;
-    stats.aec_stats = mAlogsSharedParams.ispStats.aec_stats;
-    stats.awb_stats_v200 = mAlogsSharedParams.ispStats.awb_stats;
-    stats.af_stats = mAlogsSharedParams.ispStats.af_stats;
-    while (ispStatsCachedList.size() > 10)
-        ispStatsCachedList.pop_front();
-    ispStatsCachedList.push_back(stats);
+    SmartPtr<RkAiqStatsProxy> stats = NULL;
+    if (mAiqStatsPool->has_free_items()) {
+        stats = mAiqStatsPool->get_item();
+    } else {
+        if(mAiqStatsCachedList.empty()) {
+            LOGW_ANALYZER("no free or cached stats, user may hold all stats buf !");
+            return ;
+        }
+        stats = mAiqStatsCachedList.front();
+        mAiqStatsCachedList.pop_front();
+    }
+
+    stats->data()->aec_stats = mAlogsSharedParams.ispStats.aec_stats;
+    stats->data()->awb_stats_v200 = mAlogsSharedParams.ispStats.awb_stats;
+    stats->data()->af_stats = mAlogsSharedParams.ispStats.af_stats;
+    stats->data()->frame_id = mAlogsSharedParams.frameId;
+
+    mAiqStatsCachedList.push_back(stats);
+    mIspStatsCond.broadcast ();
+}
+
+XCamReturn RkAiqCore::get3AStatsFromCachedList(rk_aiq_isp_stats_t **stats, int timeout_ms)
+{
+    SmartLock locker (ispStatsListMutex);
+    int code = 0;
+    while (mState != RK_AIQ_CORE_STATE_STOPED &&
+            mAiqStatsCachedList.empty() &&
+            code == 0) {
+        if (timeout_ms < 0)
+            code = mIspStatsCond.wait(ispStatsListMutex);
+        else
+            code = mIspStatsCond.timedwait(ispStatsListMutex, timeout_ms * 1000);
+    }
+
+    if (mState == RK_AIQ_CORE_STATE_STOPED) {
+        *stats = NULL;
+        return XCAM_RETURN_NO_ERROR;
+    }
+
+    if (mAiqStatsCachedList.empty()) {
+        if (code == ETIMEDOUT) {
+            *stats = NULL;
+            return XCAM_RETURN_ERROR_TIMEOUT;
+        } else {
+            *stats = NULL;
+            return XCAM_RETURN_ERROR_FAILED;
+        }
+    }
+    SmartPtr<RkAiqStatsProxy> stats_proxy = mAiqStatsCachedList.front();
+    mAiqStatsCachedList.pop_front();
+    *stats = stats_proxy->data().ptr();
+    mAiqStatsOutMap[*stats] = stats_proxy;
+    stats_proxy.release();
+
+    return XCAM_RETURN_NO_ERROR;
+}
+
+void RkAiqCore::release3AStatsRef(rk_aiq_isp_stats_t *stats)
+{
+    SmartLock locker (ispStatsListMutex);
+
+    std::map<rk_aiq_isp_stats_t*, SmartPtr<RkAiqStatsProxy>>::iterator it;
+    it = mAiqStatsOutMap.find(stats);
+    if (it != mAiqStatsOutMap.end()) {
+        mAiqStatsOutMap.erase(it);
+    }
 }
 
 XCamReturn RkAiqCore::get3AStatsFromCachedList(rk_aiq_isp_stats_t &stats)
 {
     SmartLock locker (ispStatsListMutex);
-    if(!ispStatsCachedList.empty()) {
-        stats = ispStatsCachedList.front();
-        ispStatsCachedList.pop_front();
+    if(!mAiqStatsCachedList.empty()) {
+        SmartPtr<RkAiqStatsProxy> stats_proxy = mAiqStatsCachedList.front();
+        mAiqStatsCachedList.pop_front();
+        stats = *(stats_proxy->data().ptr());
+        stats_proxy.release();
         return XCAM_RETURN_NO_ERROR;
     } else {
         return XCAM_RETURN_ERROR_FAILED;
@@ -2340,17 +2406,12 @@ RkAiqCore::convertIspstatsToAlgo(const SmartPtr<VideoBuffer> &buffer)
             mAlogsSharedParams.ispStats.aec_stats.ae_exp.Iris.PIris.step = irisParams->data()->PIris.laststep;
         else
             mAlogsSharedParams.ispStats.aec_stats.ae_exp.Iris.PIris.step = irisParams->data()->PIris.step;
-
-
-        // TODO: DC-Iris params remained to be added
     }
 
     //af
     {
         mAlogsSharedParams.ispStats.af_stats_valid =
             (stats->meas_type >> 6) & (0x01) ? true : false;
-        mAlogsSharedParams.ispStats.af_stats.roia_sharpness =
-            stats->params.rawaf.afm_sum[0];
         mAlogsSharedParams.ispStats.af_stats.roia_luminance =
             stats->params.rawaf.afm_lum[0];
         mAlogsSharedParams.ispStats.af_stats.roib_sharpness =
@@ -2359,6 +2420,10 @@ RkAiqCore::convertIspstatsToAlgo(const SmartPtr<VideoBuffer> &buffer)
             stats->params.rawaf.afm_lum[1];
         memcpy(mAlogsSharedParams.ispStats.af_stats.global_sharpness,
                stats->params.rawaf.ramdata, ISP2X_RAWAF_SUMDATA_NUM * sizeof(u32));
+
+        mAlogsSharedParams.ispStats.af_stats.roia_sharpness = 0LL;
+        for (int i = 0; i < ISP2X_RAWAF_SUMDATA_NUM; i++)
+            mAlogsSharedParams.ispStats.af_stats.roia_sharpness += stats->params.rawaf.ramdata[i];
 
         if(afParams.ptr()) {
             mAlogsSharedParams.ispStats.af_stats.focus_endtim = afParams->data()->focusEndTim;
@@ -2944,5 +3009,7 @@ RkAiqCore::setSensorFlip(bool mirror, bool flip)
     mAlogsSharedParams.sns_mirror = mirror;
     mAlogsSharedParams.sns_flip = flip;
 }
+
+
 
 } //namespace RkCam

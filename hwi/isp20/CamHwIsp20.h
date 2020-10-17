@@ -36,7 +36,7 @@ namespace RkCam {
 #define MAX_CIF_NUM               2
 
 #define ISP_TX_BUF_NUM 4
-#define VIPCAP_TX_BUF_NUM 6
+#define VIPCAP_TX_BUF_NUM 4
 
 typedef struct {
     int  model_idx: 3;
@@ -148,7 +148,8 @@ typedef struct {
 } rk_sensor_full_info_t;
 
 class CamHwIsp20
-    : public CamHwBase, public Isp20Params, public V4l2Device {
+    : public CamHwBase, public Isp20Params, public V4l2Device 
+    , public isp_drv_share_mem_ops_t {
 public:
     explicit CamHwIsp20();
     virtual ~CamHwIsp20();
@@ -203,7 +204,7 @@ public:
     XCamReturn getLensVcmCfg(rk_aiq_lens_vcmcfg& lens_cfg);
     XCamReturn setLensVcmCfg(rk_aiq_lens_vcmcfg& lens_cfg);
     XCamReturn setLensVcmCfg();
-
+    virtual void getShareMemOps(isp_drv_share_mem_ops_t** mem_ops);
 private:
     XCAM_DEAD_COPY(CamHwIsp20);
     enum cam_hw_state_e {
@@ -277,10 +278,24 @@ private:
     XCamReturn hdr_mipi_prepare_mode(int mode);
     XCamReturn hdr_mipi_prepare(int idx);
     void prepare_cif_mipi();
+    static void allocMemResource(void *ops_ctx, void *config, void **mem_ctx);
+    static void releaseMemResource(void *mem_ctx);
+    static void* getFreeItem(void *mem_ctx);
     uint32_t _isp_module_ens;
     bool mNormalNoReadBack;
     bool mIsDhazOn;
     rk_aiq_rotation_t _sharp_fbc_rotation;
+
+    rk_aiq_ldch_share_mem_info_t ldch_mem_info_array[ISP2X_LDCH_BUF_NUM];
+    rk_aiq_fec_share_mem_info_t fec_mem_info_array[FEC_MESH_BUF_NUM];
+    typedef struct drv_share_mem_ctx_s {
+        void* ops_ctx;
+        void* mem_info;
+        rk_aiq_drv_share_mem_type_t type;
+    } drv_share_mem_ctx_t;
+    drv_share_mem_ctx_t _ldch_drv_mem_ctx;
+    drv_share_mem_ctx_t _fec_drv_mem_ctx;
+    Mutex _mem_mutex;
 };
 
 };

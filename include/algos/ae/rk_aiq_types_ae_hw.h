@@ -35,16 +35,6 @@ typedef enum _AE_MODE {
     RAWAE_MODE_L_LITE    = 2
 } AE_MODE;
 
-typedef enum _HIST_MODE {
-    DISABLE = 0,
-    RGB_COMB = 1,
-    R = 2,
-    G = 3,
-    B = 4,
-    Y = 5,
-    WDR_IN = 6,
-} HIST_MODE;
-
 /*****************************************************************************/
 /**
  * @brief   ISP2.0 AEC HW-Meas Config Params

@@ -1037,7 +1037,7 @@ RkAiqAfHandleInt::updateConfig(bool needSync)
 }
 
 XCamReturn
-RkAiqAfHandleInt::setAttrib(rk_aiq_af_attrib_t att)
+RkAiqAfHandleInt::setAttrib(rk_aiq_af_attrib_t *att)
 {
     ENTER_ANALYZER_FUNCTION();
 
@@ -1050,8 +1050,8 @@ RkAiqAfHandleInt::setAttrib(rk_aiq_af_attrib_t att)
     // called by RkAiqCore
 
     // if something changed
-    if (0 != memcmp(&mCurAtt, &att, sizeof(rk_aiq_af_attrib_t))) {
-        mNewAtt = att;
+    if (0 != memcmp(&mCurAtt, att, sizeof(rk_aiq_af_attrib_t))) {
+        mNewAtt = *att;
         updateAtt = true;
         waitSignal();
     }
@@ -3984,7 +3984,7 @@ RkAiqAfecHandleInt::prepare()
 
     /* memcpy(&afec_config_int->afec_calib_cfg, &shared->calib->afec, sizeof(CalibDb_FEC_t)); */
     afec_config_int->resource_path = shared->resourcePath;
-
+    afec_config_int->mem_ops_ptr = mAiqCore->mShareMemOps;
     RkAiqAlgoDescription* des = (RkAiqAlgoDescription*)mDes;
     ret = des->prepare(mConfig);
     RKAIQCORE_CHECK_RET(ret, "afec algo prepare failed");
@@ -4707,7 +4707,7 @@ RkAiqAldchHandleInt::prepare()
 
     // memcpy(&aldch_config_int->aldch_calib_cfg, &shared->calib->aldch, sizeof(CalibDb_LDCH_t));
     aldch_config_int->resource_path = shared->resourcePath;
-
+    aldch_config_int->mem_ops_ptr = mAiqCore->mShareMemOps;
     RkAiqAlgoDescription* des = (RkAiqAlgoDescription*)mDes;
     ret = des->prepare(mConfig);
     RKAIQCORE_CHECK_RET(ret, "aldch algo prepare failed");
@@ -5192,7 +5192,7 @@ RkAiqAorbHandleInt::preProcess()
 
     comb->aorb_pre_res = NULL;
 
-    aorb_pre_int->orb_stats = ispStats->orb_stats;
+    aorb_pre_int->orb_stats = &ispStats->orb_stats;
 
     RkAiqAlgoDescription* des = (RkAiqAlgoDescription*)mDes;
     ret = des->pre_process(mPreInParam, mPreOutParam);

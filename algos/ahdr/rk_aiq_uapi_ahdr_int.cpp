@@ -18,7 +18,6 @@ rk_aiq_uapi_ahdr_SetAttrib
     AhdrContext_t* pAhdrCtx = (AhdrContext_t*)(ctx->AhdrInstConfig.hAhdr);
 
     //Todo
-    pAhdrCtx->hdrAttr.bEnable = need_sync;
     pAhdrCtx->hdrAttr.opMode = attr.opMode;
     pAhdrCtx->hdrAttr.level = attr.level;
     pAhdrCtx->hdrAttr.level_Linear_Dark = attr.level_Linear_Dark;
@@ -81,7 +80,6 @@ rk_aiq_uapi_ahdr_GetAttrib
 
     AhdrContext_t* pAhdrCtx = (AhdrContext_t*)ctx->AhdrInstConfig.hAhdr;
 
-    attr->bEnable = pAhdrCtx->hdrAttr.bEnable;
     attr->opMode = pAhdrCtx->hdrAttr.opMode;
     attr->level = pAhdrCtx->hdrAttr.level;
     attr->level_Linear_Dark = pAhdrCtx->hdrAttr.level_Linear_Dark;

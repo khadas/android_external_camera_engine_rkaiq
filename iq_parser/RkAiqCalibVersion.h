@@ -102,10 +102,20 @@
  * v1.3.4
  *  - magic code:1061311
  *  - AE: add IrisCtrl, and also modify some params in manualCtrl & initialExp
+ * v1.3.5
+ *  - magic code:1054757
+ *  - Adehze: remove some para in iq
+ * v1.3.6
+ *  - magic code:1054435
+ *  - Tmo: add normal HDR night mode en
+ * v1.3.7
+ *  - magic code:1056480
+ *  - sensorinfo: rename CISTimeRegSumFac as CISHdrTimeRegSumFac
+ *                add CISLinTimeRegMaxFac
  */
 
-#define RK_AIQ_CALIB_VERSION_REAL_V          "v1.3.4"
-#define RK_AIQ_CALIB_VERSION_MAGIC_V         "1061311"
+#define RK_AIQ_CALIB_VERSION_REAL_V          "v1.3.7"
+#define RK_AIQ_CALIB_VERSION_MAGIC_V         "1056480"
 
 
 /******* DO NOT EDIT THE FOLLOWINGS ***********/

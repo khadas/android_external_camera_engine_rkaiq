@@ -187,6 +187,7 @@ private:
     bool parseEntrySensorAecLinearAeDynamicPoint(const XMLElement*, void* param = NULL);
     bool parseEntrySensorAhdrMerge(const XMLElement* pelement, void* param = NULL);
     bool parseEntrySensorAhdrTmo(const XMLElement* pelement, void* param = NULL);
+    bool parseEntrySensorAhdrTmoEn(const XMLElement* pelement, void* param = NULL);
     bool parseEntrySensorAhdrTmoGlobalLuma(const XMLElement* pelement, void* param = NULL);
     bool parseEntrySensorAhdrTmoDetailsHighLight(const XMLElement* pelement, void* param = NULL);
     bool parseEntrySensorAhdrTmoDetailsLowLight(const XMLElement* pelement, void* param = NULL);

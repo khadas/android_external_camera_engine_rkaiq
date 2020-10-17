@@ -751,7 +751,7 @@ uint32_t calib_sensor_ahdr_Merge_sub_tags[] = {
 };
 
 uint32_t calib_sensor_ahdr_Tmo_sub_tags[] = {
-    CALIB_SENSOR_AHDR_TMO_LINEAR_TMO_EN_TAG_ID,
+    CALIB_SENSOR_AHDR_TMO_TMO_EN_TAG_ID,
     CALIB_SENSOR_AHDR_TMO_GLOBALLUMA_TAG_ID,
     CALIB_SENSOR_AHDR_TMO_DETAILSHIGHLIGHT_TAG_ID,
     CALIB_SENSOR_AHDR_TMO_DETAILSLOWLIGHT_TAG_ID,
@@ -759,6 +759,11 @@ uint32_t calib_sensor_ahdr_Tmo_sub_tags[] = {
     CALIB_SENSOR_AHDR_TMO_LOCALTMO_TAG_ID,
     CALIB_SENSOR_AHDR_TMO_DAMP_TAG_ID,
 
+};
+
+uint32_t calib_sensor_ahdr_Tmo_En_sub_tags[] = {
+    CALIB_SENSOR_AHDR_TMO_NAME_TAG_ID,
+    CALIB_SENSOR_AHDR_TMO_TMO_EN_CELL_EN_TAG_ID,
 };
 
 uint32_t calib_sensor_ahdr_GlobalLuma_sub_tags[] = {
@@ -1355,7 +1360,6 @@ uint32_t calib_sensor_EDGEFILTER_ISO_sub_tags[] = {
 
 uint32_t calib_sensor_dehaze_sub_tags[] = {
     CALIB_SENSOR_DEHAZE_EN_TAG_ID,
-    CALIB_SENSOR_DEHAZE_BIG_EN_TAG_ID,
     CALIB_SENSOR_DEHAZE_CFG_ALPHA_NORMAL_TAG_ID,
     CALIB_SENSOR_DEHAZE_CFG_ALPHA_HDR_TAG_ID,
     CALIB_SENSOR_DEHAZE_CFG_ALPHA_NIGHT_TAG_ID,
@@ -1386,11 +1390,8 @@ uint32_t calib_sensor_Dehaze_Setting_sub_tags[] = {
     CALIB_SENSOR_DEHAZE_SETTING_CFG_TMAX_TAG_ID,
     CALIB_SENSOR_DEHAZE_SETTING_DC_THED_TAG_ID,
     CALIB_SENSOR_DEHAZE_SETTING_DC_WEITCUR_TAG_ID,
-    CALIB_SENSOR_DEHAZE_SETTING_DC_BF_H_TAG_ID,
     CALIB_SENSOR_DEHAZE_SETTING_AIR_THED_TAG_ID,
     CALIB_SENSOR_DEHAZE_SETTING_AIR_WEITCUR_TAG_ID,
-    CALIB_SENSOR_DEHAZE_SETTING_AIR_BF_H_TAG_ID,
-    CALIB_SENSOR_DEHAZE_SETTING_GAUS_H_TAG_ID,
     CALIB_SENSOR_IIR_SETTING_STAB_FNUM_TAG_ID,
     CALIB_SENSOR_IIR_SETTING_SIGMA_TAG_ID,
     CALIB_SENSOR_IIR_SETTING_WT_SIGMA_TAG_ID,
@@ -1417,15 +1418,13 @@ uint32_t calib_sensor_Hist_Setting_sub_tags[] = {
     CALIB_SENSOR_HIST_SETTING_HIST_MIN_TAG_ID,
     CALIB_SENSOR_HIST_SETTING_HIST_SCALE_TAG_ID,
     CALIB_SENSOR_HIST_SETTING_CFG_GRATIO_TAG_ID,
-    CALIB_SENSOR_HIST_SETTING_HIST_CONV_T0_TAG_ID,
-    CALIB_SENSOR_HIST_SETTING_HIST_CONV_T1_TAG_ID,
-    CALIB_SENSOR_HIST_SETTING_HIST_CONV_T2_TAG_ID,
 };
 
 uint32_t calib_sensor_sensorinfo_sub_tags[] = {
     CALIB_SENSOR_SENSORINFO_GAINRANGE_TAG_ID,
     CALIB_SENSOR_SENSORINFO_TIMEFACTOR_TAG_ID,
-    CALIB_SENSOR_SENSORINFO_CISTIMEREG_SUMFAC_TAG_ID,
+    CALIB_SENSOR_SENSORINFO_CISLINTIMEREG_MAXFAC_TAG_ID,
+    CALIB_SENSOR_SENSORINFO_CISHDRTIMEREG_SUMFAC_TAG_ID,
     CALIB_SENSOR_SENSORINFO_CISTIMEREG_ODEVITY_TAG_ID,
     CALIB_SENSOR_SENSORINFO_CISTIMEREG_UNEQUALEN_TAG_ID,
     CALIB_SENSOR_SENSORINFO_CISTIMEREG_MIN_TAG_ID,
@@ -3376,18 +3375,21 @@ calib_tag_info_t g_calib_tag_infos[CALIB_IQ_TAG_END] = {
         check_tags_array_ignore, NULL
     },
 
-    [CALIB_SENSOR_AHDR_TMO_LINEAR_TMO_EN_TAG_ID]         =
-    {   "LinearTmoEn", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
-        check_tags_array_ignore, NULL
-    },
-
-    [CALIB_SENSOR_AHDR_TMO_GLOBALLUMA_TAG_ID]         =
-    {   "GlobalLuma", CALIB_TAG_TYPE_CELL, {-1, -1},
-        check_tags_array_info(calib_sensor_ahdr_GlobalLuma_sub_tags), NULL
+    [CALIB_SENSOR_AHDR_TMO_TMO_EN_TAG_ID]         =
+    {   "Enable", CALIB_TAG_TYPE_CELL, {-1, -1},
+        check_tags_array_info(calib_sensor_ahdr_Tmo_En_sub_tags), NULL
     },
     [CALIB_SENSOR_AHDR_TMO_NAME_TAG_ID]         =
     {   "Name", CALIB_TAG_TYPE_CHAR, {-1, -1},
         check_tags_array_ignore, NULL
+    },
+    [CALIB_SENSOR_AHDR_TMO_TMO_EN_CELL_EN_TAG_ID]         =
+    {   "En", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
+        check_tags_array_ignore, NULL
+    },
+    [CALIB_SENSOR_AHDR_TMO_GLOBALLUMA_TAG_ID]         =
+    {   "GlobalLuma", CALIB_TAG_TYPE_CELL, {-1, -1},
+        check_tags_array_info(calib_sensor_ahdr_GlobalLuma_sub_tags), NULL
     },
     [CALIB_SENSOR_AHDR_TMO_DETAILSHIGHLIGHT_TAG_ID]         =
     {   "DetailsHighLight", CALIB_TAG_TYPE_CELL, {-1, -1},
@@ -5214,10 +5216,6 @@ calib_tag_info_t g_calib_tag_infos[CALIB_IQ_TAG_END] = {
     {   "Enable", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
         check_tags_array_ignore, NULL
     },
-    [CALIB_SENSOR_DEHAZE_BIG_EN_TAG_ID]         =
-    {   "gain_en", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
-        check_tags_array_ignore, NULL
-    },
     [CALIB_SENSOR_DEHAZE_CFG_ALPHA_NORMAL_TAG_ID]         =
     {   "cfg_alpha_normal", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
         check_tags_array_ignore, NULL
@@ -5318,24 +5316,12 @@ calib_tag_info_t g_calib_tag_infos[CALIB_IQ_TAG_END] = {
     {   "dc_weitcur", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
         check_tags_array_ignore, NULL
     },
-    [CALIB_SENSOR_DEHAZE_SETTING_DC_BF_H_TAG_ID]         =
-    {   "dc_bf_h", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
-        check_tags_array_ignore, NULL
-    },
     [CALIB_SENSOR_DEHAZE_SETTING_AIR_THED_TAG_ID]         =
     {   "air_thed", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
         check_tags_array_ignore, NULL
     },
     [CALIB_SENSOR_DEHAZE_SETTING_AIR_WEITCUR_TAG_ID]         =
     {   "air_weitcur", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
-        check_tags_array_ignore, NULL
-    },
-    [CALIB_SENSOR_DEHAZE_SETTING_AIR_BF_H_TAG_ID]         =
-    {   "air_bf_h", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
-        check_tags_array_ignore, NULL
-    },
-    [CALIB_SENSOR_DEHAZE_SETTING_GAUS_H_TAG_ID]         =
-    {   "gaus_h", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
         check_tags_array_ignore, NULL
     },
     [CALIB_SENSOR_IIR_SETTING_STAB_FNUM_TAG_ID]         =
@@ -5426,18 +5412,6 @@ calib_tag_info_t g_calib_tag_infos[CALIB_IQ_TAG_END] = {
     {   "cfg_gratio", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
         check_tags_array_ignore, NULL
     },
-    [CALIB_SENSOR_HIST_SETTING_HIST_CONV_T0_TAG_ID]         =
-    {   "hist_conv_t0", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
-        check_tags_array_ignore, NULL
-    },
-    [CALIB_SENSOR_HIST_SETTING_HIST_CONV_T1_TAG_ID]         =
-    {   "hist_conv_t1", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
-        check_tags_array_ignore, NULL
-    },
-    [CALIB_SENSOR_HIST_SETTING_HIST_CONV_T2_TAG_ID]         =
-    {   "hist_conv_t2", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
-        check_tags_array_ignore, NULL
-    },
 
     // Sensor SENSORINFO
     [CALIB_SENSOR_SENSORINFO_TAG_ID]         =
@@ -5468,8 +5442,12 @@ calib_tag_info_t g_calib_tag_infos[CALIB_IQ_TAG_END] = {
     {   "TimeFactor", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
         check_tags_array_ignore, NULL
     },
-    [CALIB_SENSOR_SENSORINFO_CISTIMEREG_SUMFAC_TAG_ID]         =
-    {   "CISTimeRegSumFac", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
+    [CALIB_SENSOR_SENSORINFO_CISLINTIMEREG_MAXFAC_TAG_ID]         =
+    {   "CISLinTimeRegMaxFac", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
+        check_tags_array_ignore, NULL
+    },
+    [CALIB_SENSOR_SENSORINFO_CISHDRTIMEREG_SUMFAC_TAG_ID]         =
+    {   "CISHdrTimeRegSumFac", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
         check_tags_array_ignore, NULL
     },
     [CALIB_SENSOR_SENSORINFO_CISTIMEREG_ODEVITY_TAG_ID]         =

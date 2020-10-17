@@ -60,11 +60,7 @@ prepare(RkAiqAlgoCom* params)
     rk_aiq_gamma_cfg_t *agamma_config = &AgammaHandle->agamma_config;
 
     AgammaHandle->working_mode = pCfgParam->agamma_config_com.com.u.prepare.working_mode;
-    if (RK_AIQ_WORKING_MODE_NORMAL == AgammaHandle->working_mode){
-        memcpy(agamma_config->gamma_table, AgammaHandle->normal_table, sizeof(AgammaHandle->normal_table));
-    }else{
-        memcpy(agamma_config->gamma_table, AgammaHandle->hdr_table, sizeof(AgammaHandle->hdr_table));
-    }
+
     return ret;
 }
 
@@ -75,16 +71,13 @@ pre_process(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outparams)
     AgammaHandle_t * AgammaHandle = (AgammaHandle_t *)inparams->ctx;
     rk_aiq_gamma_cfg_t *agamma_config = &AgammaHandle->agamma_config;
 
-    if (pAgammaPreParams->rk_com.u.proc.gray_mode) {
-        agamma_config->gamma_out_mode = GAMMA_OUT_NIGHT;
-        memcpy(agamma_config->gamma_table, AgammaHandle->night_table, sizeof(AgammaHandle->night_table));
-    }else if (GAMMA_OUT_NORMAL == AgammaHandle->working_mode){
-        agamma_config->gamma_out_mode = GAMMA_OUT_NORMAL;
-        memcpy(agamma_config->gamma_table, AgammaHandle->normal_table, sizeof(AgammaHandle->normal_table));
-    }else{
-        agamma_config->gamma_out_mode = GAMMA_OUT_HDR;
-        memcpy(agamma_config->gamma_table, AgammaHandle->hdr_table, sizeof(AgammaHandle->hdr_table));
-    }
+    if (pAgammaPreParams->rk_com.u.proc.gray_mode)
+        AgammaHandle->Scene_mode = GAMMA_OUT_NIGHT;
+    else if (GAMMA_OUT_NORMAL == AgammaHandle->working_mode)
+        AgammaHandle->Scene_mode = GAMMA_OUT_NORMAL;
+    else
+        AgammaHandle->Scene_mode = GAMMA_OUT_HDR;
+
     return XCAM_RETURN_NO_ERROR;
 }
 
@@ -94,8 +87,12 @@ processing(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outparams)
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
     AgammaHandle_t * AgammaHandle = (AgammaHandle_t *)inparams->ctx;
     RkAiqAlgoProcResAgamma* procResPara = (RkAiqAlgoProcResAgamma*)outparams;
-    rk_aiq_gamma_cfg_t* agamma_config = (rk_aiq_gamma_cfg_t*)&procResPara->agamma_config;
-    memcpy(agamma_config, &AgammaHandle->agamma_config, sizeof(rk_aiq_gamma_cfg_t));
+    AgammaProcRes_t* AgammaProcRes = (AgammaProcRes_t*)&procResPara->agamma_proc_res;
+
+    AgammaProcessing(AgammaHandle);
+
+    //set proc res
+    AgammaSetProcRes(AgammaProcRes, &AgammaHandle->agamma_config);
     return ret;
 }
 

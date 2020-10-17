@@ -299,6 +299,20 @@ rk_aiq_uapi_sysctl_get3AStats(const rk_aiq_sys_ctx_t* ctx,
     return ctx->_analyzer->get3AStatsFromCachedList(*stats);
 }
 
+XCamReturn
+rk_aiq_uapi_sysctl_get3AStatsBlk(const rk_aiq_sys_ctx_t* ctx,
+                              rk_aiq_isp_stats_t **stats, int timeout_ms)
+{
+    return ctx->_analyzer->get3AStatsFromCachedList(stats, timeout_ms);
+}
+
+void
+rk_aiq_uapi_sysctl_release3AStatsRef(const rk_aiq_sys_ctx_t* ctx,
+                                     rk_aiq_isp_stats_t *stats)
+{
+    ctx->_analyzer->release3AStatsRef(stats);
+}
+
 RKAIQ_END_DECLARE
 
 template<typename T> static T*

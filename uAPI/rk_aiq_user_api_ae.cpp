@@ -15,6 +15,10 @@
 
 RKAIQ_BEGIN_DECLARE
 
+#ifdef RK_SIMULATOR_HW
+#define CHECK_USER_API_ENABLE
+#endif
+
 XCamReturn rk_aiq_user_api_ae_setExpSwAttr
 (
     const rk_aiq_sys_ctx_t* sys_ctx,

@@ -256,12 +256,29 @@
  * - support AF funtionality
  * - TMO/Dehaze: lots of modifications
  * - isp driver v0.1.8
- * v1.2.4
- * - temporary version for longsee, fix some bugs of dehaze and cpsl
+ * v1.3.0
+ * - calib db: v1.3.7 magic code: 1056480
+ *   - modify sections: dehaze, TMO, AE
+ * - update rkisp2x_tuner v0.3.0
+ * - support Android compile
+ * - uAPI changes
+ *   - add blocked 3a stats uapi
+ *     - rk_aiq_uapi_sysctl_get3AStatsBlk
+ *     - rk_aiq_uapi_sysctl_release3AStatsRef
+ *   - modify APIs:
+ *     - rk_aiq_user_api_af_SetAttrib
+ *     - rk_aiq_user_api_adebayer_GetAttrib
+ * - cpsl: delay 2 frames to set ir on for gray mode
+ *         set the cpsl to a certain status when initial
+ * - change vicap tx buf num from 6 to 4
+ * - AFEC: fixed bug fec can't be dynamically switched on and off
+ * - fix TMO,dehaze bugs
+ * - optimize ldch & fec memory usage 
+ * - isp driver v0.1.9
  */
 
-#define RK_AIQ_VERSION_REAL_V "v1.2.4"
-#define RK_AIQ_RELEASE_DATE "2020-10-16"
+#define RK_AIQ_VERSION_REAL_V "v1.3.0"
+#define RK_AIQ_RELEASE_DATE "2020-10-17"
 
 /******* DO NOT EDIT THE FOLLOWINGS ***********/
 

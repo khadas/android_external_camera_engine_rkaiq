@@ -53,6 +53,8 @@ public:
     XCamReturn capture_raw_ctl(bool sync) {
         return XCAM_RETURN_NO_ERROR;
     };
+    virtual void getShareMemOps(isp_drv_share_mem_ops_t** mem_ops) {};
+    
 private:
     XCAM_DEAD_COPY (CamHwSimulator);
 };

@@ -153,8 +153,10 @@ RESULT MergeProcessing
     float MDDampLM = pAhdrCtx->CurrHandleData.MergeMDDampLM;
     float MDDampMS = pAhdrCtx->CurrHandleData.MergeMDDampMS;
 
+    bool ifHDRModeChange = pAhdrCtx->CurrHandleData.MergeMode == pAhdrCtx->AhdrPrevData.MergeMode ? false : true;
+
     //get finnal current data
-    if (pAhdrCtx->hdrAttr.bEnable == false && pAhdrCtx->frameCnt != 0)
+    if (pAhdrCtx->hdrAttr.opMode == HDR_OpMode_Api_OFF && pAhdrCtx->frameCnt != 0 && !ifHDRModeChange)
     {
         pAhdrCtx->CurrHandleData.CurrMergeHandleData.OECurve_smooth = OEDamp * pAhdrCtx->CurrHandleData.CurrMergeHandleData.OECurve_smooth
                 + (1 - OEDamp) * pAhdrCtx->AhdrPrevData.PrevMergeHandleData.OECurve_smooth;

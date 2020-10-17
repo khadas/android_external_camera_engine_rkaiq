@@ -16,7 +16,7 @@
  */
 
 #include "shared_item_pool.h"
-#include "rk_aiq_types.h"
+#include "rk_aiq_types_priv.h"
 
 #ifndef RK_AIQ_POOL_H
 #define RK_AIQ_POOL_H

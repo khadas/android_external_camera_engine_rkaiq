@@ -195,7 +195,7 @@ void TmoGetCurrIOData
     pAhdrCtx->AhdrProcRes.TmoProcRes.sw_hdrtmo_big_en = pAhdrCtx->width > BIGMODE ? 1 : 0;
     pAhdrCtx->AhdrProcRes.TmoProcRes.sw_hdrtmo_nobig_en = (int)(1 - pAhdrCtx->AhdrProcRes.TmoProcRes.sw_hdrtmo_big_en);
     pAhdrCtx->AhdrProcRes.TmoProcRes.sw_hdrtmo_expl_lgratio = (int)SHIFT11BIT(log(pAhdrCtx->AhdrPrevData.PreLExpo / pAhdrCtx->CurrHandleData.CurrLExpo) / log(2));
-    if(pAhdrCtx->AhdrConfig.tmo_para.isLinearTmoOn)
+    if(pAhdrCtx->AhdrConfig.tmo_para.isTmoOn && pAhdrCtx->FrameNumber == 1)
         pAhdrCtx->AhdrProcRes.TmoProcRes.sw_hdrtmo_lgscl_ratio = 128;
     else
         pAhdrCtx->AhdrProcRes.TmoProcRes.sw_hdrtmo_lgscl_ratio = (int)SHIFT7BIT(log(pAhdrCtx->CurrHandleData.CurrL2S_Ratio) / log(pAhdrCtx->AhdrPrevData.PreL2S_ratio));
@@ -273,8 +273,9 @@ void TmoProcessing
     bool enDampDtlslowLgt;
     bool enDampLocal;
     bool enDampGlobal;
+    bool ifHDRModeChange = pAhdrCtx->CurrHandleData.MergeMode == pAhdrCtx->AhdrPrevData.MergeMode ? false : true;
 
-    if(pAhdrCtx->hdrAttr.bEnable == false && pAhdrCtx->frameCnt != 0)
+    if(pAhdrCtx->hdrAttr.opMode == HDR_OpMode_Api_OFF && pAhdrCtx->frameCnt != 0 && !ifHDRModeChange)
     {
         float diff = ABS(pAhdrCtx->CurrHandleData.CurrEnvLv - pAhdrCtx->AhdrPrevData.PreEnvlv);
         diff = diff / pAhdrCtx->AhdrPrevData.PreEnvlv;

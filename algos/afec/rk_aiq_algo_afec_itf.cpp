@@ -26,6 +26,43 @@
 
 RKAIQ_BEGIN_DECLARE
 
+static XCamReturn alloc_fec_buf(FECContext_t* fecCtx)
+{
+    rk_aiq_share_mem_config_t share_mem_config;
+    share_mem_config.alloc_param.width =  fecCtx->dst_width;
+    share_mem_config.alloc_param.height = fecCtx->dst_height;
+    share_mem_config.alloc_param.reserved[0] = fecCtx->mesh_density;
+    share_mem_config.mem_type = MEM_TYPE_FEC;
+    fecCtx->share_mem_ops->alloc_mem(fecCtx->share_mem_ops,
+                                     &share_mem_config,
+                                     &fecCtx->share_mem_ctx);
+    return XCAM_RETURN_NO_ERROR;
+}
+
+static XCamReturn release_fec_buf(FECContext_t* fecCtx)
+{
+    fecCtx->share_mem_ops->release_mem(fecCtx->share_mem_ctx);
+
+    return XCAM_RETURN_NO_ERROR;
+}
+
+static XCamReturn get_fec_buf(FECContext_t* fecCtx)
+{
+    fecCtx->fec_mem_info = (rk_aiq_fec_share_mem_info_t *)
+            fecCtx->share_mem_ops->get_free_item(fecCtx->share_mem_ctx);
+    if (fecCtx->fec_mem_info == NULL) {
+        LOGE_AFEC( "%s(%d): no free fec buf", __FUNCTION__, __LINE__);
+        return XCAM_RETURN_ERROR_MEM;
+    } else {
+        LOGD_AFEC("get buf fd=%d\n",fecCtx->fec_mem_info->fd);
+        fecCtx->meshxi = fecCtx->fec_mem_info->meshxi;
+        fecCtx->meshxf = fecCtx->fec_mem_info->meshxf;
+        fecCtx->meshyi = fecCtx->fec_mem_info->meshyi;
+        fecCtx->meshyf = fecCtx->fec_mem_info->meshyf;
+    }
+    return XCAM_RETURN_NO_ERROR;
+}
+
 static XCamReturn
 gen_mesh_table(
     float k1, float k2, float p1, float p2, float k3,
@@ -94,32 +131,33 @@ destroy_context(RkAiqAlgoContext *context)
 #if GENMESH_ONLINE
     fecCtx->afecReadMeshThread->triger_stop();
     fecCtx->afecReadMeshThread->stop();
-    if (fecCtx->meshxi != NULL || fecCtx->meshyi != NULL || \
-        fecCtx->meshxf != NULL || fecCtx->meshyf != NULL)
-        freeFecMesh(fecCtx->meshxi, fecCtx->meshxf,
-                fecCtx->meshyi, fecCtx->meshyf);
+//    if (fecCtx->meshxi != NULL || fecCtx->meshyi != NULL ||
+//        fecCtx->meshxf != NULL || fecCtx->meshyf != NULL)
+//        freeFecMesh(fecCtx->meshxi, fecCtx->meshxf,
+//                fecCtx->meshyi, fecCtx->meshyf);
     genFecMeshDeInit(fecCtx->fecParams);
 #else
-    if (fecCtx->meshxi != NULL) {
-        free(fecCtx->meshxi);
-        fecCtx->meshxi = NULL;
-    }
+//    if (fecCtx->meshxi != NULL) {
+//        free(fecCtx->meshxi);
+//        fecCtx->meshxi = NULL;
+//    }
+ 
+//    if (fecCtx->meshyi != NULL) {
+//        free(fecCtx->meshyi);
+//        fecCtx->meshyi = NULL;
+//    }
 
-    if (fecCtx->meshyi != NULL) {
-        free(fecCtx->meshyi);
-        fecCtx->meshyi = NULL;
-    }
-
-    if (fecCtx->meshxf != NULL) {
-        free(fecCtx->meshxf);
-        fecCtx->meshxf = NULL;
-    }
-
-    if (fecCtx->meshyf != NULL) {
-        free(fecCtx->meshyf);
-        fecCtx->meshyf = NULL;
-    }
+//    if (fecCtx->meshxf != NULL) {
+//        free(fecCtx->meshxf);
+//        fecCtx->meshxf = NULL;
+//    }
+//
+//    if (fecCtx->meshyf != NULL) {
+//        free(fecCtx->meshyf);
+//        fecCtx->meshyf = NULL;
+//    }
 #endif
+    release_fec_buf(fecCtx);
     delete context->hFEC;
     context->hFEC = NULL;
     delete context;
@@ -265,7 +303,7 @@ prepare(RkAiqAlgoCom* params)
             fecCtx->camCoeff.a0, fecCtx->camCoeff.a2,
             fecCtx->camCoeff.a3, fecCtx->camCoeff.a4);
 #endif
-
+    fecCtx->share_mem_ops = rkaiqAfecConfig->mem_ops_ptr;
     fecCtx->src_width = params->u.prepare.sns_op_width;
     fecCtx->src_height = params->u.prepare.sns_op_height;
     fecCtx->resource_path = rkaiqAfecConfig->resource_path;
@@ -300,17 +338,19 @@ prepare(RkAiqAlgoCom* params)
     if (fecCtx->fecParams.mapx)
         genFecMeshDeInit(fecCtx->fecParams);
 
-    if (fecCtx->meshxi != NULL || fecCtx->meshyi != NULL || \
-        fecCtx->meshxf != NULL || fecCtx->meshyf != NULL)
-        freeFecMesh(fecCtx->meshxi, fecCtx->meshxf,
-                fecCtx->meshyi, fecCtx->meshyf);
+    //if (fecCtx->meshxi != NULL || fecCtx->meshyi != NULL ||
+    //    fecCtx->meshxf != NULL || fecCtx->meshyf != NULL)
+    //    freeFecMesh(fecCtx->meshxi, fecCtx->meshxf,
+    //            fecCtx->meshyi, fecCtx->meshyf);
 
     genFecMeshInit(fecCtx->src_width, fecCtx->src_height, fecCtx->dst_width,
             fecCtx->dst_height, fecCtx->fecParams, fecCtx->camCoeff);
-    mallocFecMesh(fecCtx->fecParams.meshSize4bin, &fecCtx->meshxi,
-            &fecCtx->meshxf, &fecCtx->meshyi, &fecCtx->meshyf);
+    //mallocFecMesh(fecCtx->fecParams.meshSize4bin, &fecCtx->meshxi,
+    //        &fecCtx->meshxf, &fecCtx->meshyi, &fecCtx->meshyf);
     fecCtx->fec_mesh_h_size = fecCtx->fecParams.meshSizeW;
     fecCtx->fec_mesh_v_size = fecCtx->fecParams.meshSizeH;
+    alloc_fec_buf(fecCtx);
+    get_fec_buf(fecCtx);
     fecCtx->fec_mesh_size = fecCtx->fecParams.meshSize4bin;
     LOGI_AFEC("(%s) en: %d, bypass(%d), correct_level(%d), dimen(%d-%d), mesh dimen(%d-%d), size(%d)",
               fecCtx->meshfile, fecCtx->fec_en,
@@ -333,27 +373,30 @@ prepare(RkAiqAlgoCom* params)
               fecCtx->fec_mesh_size);
     if (!fecCtx->fec_en)
         return XCAM_RETURN_NO_ERROR;
+
     // need realloc ?
-    if (fecCtx->meshxi) {
-        free(fecCtx->meshxi);
-        fecCtx->meshxi = NULL;
-    }
-    if (fecCtx->meshxf) {
-        free(fecCtx->meshxf);
-        fecCtx->meshxf = NULL;
-    }
-    if (fecCtx->meshyi) {
-        free(fecCtx->meshyi);
-        fecCtx->meshyi = NULL;
-    }
-    if (fecCtx->meshyf) {
-        free(fecCtx->meshyf);
-        fecCtx->meshyf = NULL;
-    }
-    fecCtx->meshxi = (unsigned short*)malloc(fecCtx->fec_mesh_size * sizeof(unsigned short));
-    fecCtx->meshxf = (unsigned char*)malloc(fecCtx->fec_mesh_size * sizeof(unsigned char));
-    fecCtx->meshyi = (unsigned short*)malloc(fecCtx->fec_mesh_size * sizeof(unsigned short));
-    fecCtx->meshyf = (unsigned char*)malloc(fecCtx->fec_mesh_size * sizeof(unsigned char));
+//    if (fecCtx->meshxi) {
+//        free(fecCtx->meshxi);
+//        fecCtx->meshxi = NULL;
+//    }
+//    if (fecCtx->meshxf) {
+//        free(fecCtx->meshxf);
+//        fecCtx->meshxf = NULL;
+//    }
+//    if (fecCtx->meshyi) {
+//        free(fecCtx->meshyi);
+//        fecCtx->meshyi = NULL;
+//    }
+//    if (fecCtx->meshyf) {
+//        free(fecCtx->meshyf);
+//        fecCtx->meshyf = NULL;
+//    }
+//    fecCtx->meshxi = (unsigned short*)malloc(fecCtx->fec_mesh_size * sizeof(unsigned short));
+//    fecCtx->meshxf = (unsigned char*)malloc(fecCtx->fec_mesh_size * sizeof(unsigned char));
+//    fecCtx->meshyi = (unsigned short*)malloc(fecCtx->fec_mesh_size * sizeof(unsigned short));
+//    fecCtx->meshyf = (unsigned char*)malloc(fecCtx->fec_mesh_size * sizeof(unsigned char));
+
+    get_fec_buf(fecCtx);
 #endif
     read_mesh_table(fecCtx, fecCtx->user_config.correct_level);
     fecCtx->eState = FEC_STATE_INITIALIZED;
@@ -408,14 +451,22 @@ processing(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outparams)
     }
 
     if (fecPreOut->afec_result.update) {
-        memcpy(fecPreOut->afec_result.meshxi, fecCtx->meshxi,
-               fecCtx->fec_mesh_size * sizeof(unsigned short));
-        memcpy(fecPreOut->afec_result.meshxf, fecCtx->meshxf,
-               fecCtx->fec_mesh_size * sizeof(unsigned char));
-        memcpy(fecPreOut->afec_result.meshyi, fecCtx->meshyi,
-               fecCtx->fec_mesh_size * sizeof(unsigned short));
-        memcpy(fecPreOut->afec_result.meshyf, fecCtx->meshyf,
-               fecCtx->fec_mesh_size * sizeof(unsigned char));
+        //memcpy(fecPreOut->afec_result.meshxi, fecCtx->meshxi,
+        //       fecCtx->fec_mesh_size * sizeof(unsigned short));
+        //memcpy(fecPreOut->afec_result.meshxf, fecCtx->meshxf,
+        //       fecCtx->fec_mesh_size * sizeof(unsigned char));
+        //memcpy(fecPreOut->afec_result.meshyi, fecCtx->meshyi,
+        //       fecCtx->fec_mesh_size * sizeof(unsigned short));
+        //memcpy(fecPreOut->afec_result.meshyf, fecCtx->meshyf,
+        //       fecCtx->fec_mesh_size * sizeof(unsigned char));
+
+        if (fecCtx->fec_mem_info == NULL) {
+            LOGE_AFEC("%s: no available fec buf!", __FUNCTION__);
+            fecPreOut->afec_result.update = 0;
+            return XCAM_RETURN_NO_ERROR;
+        }
+        fecPreOut->afec_result.mesh_buf_fd = fecCtx->fec_mem_info->fd;
+        fecCtx->fec_mem_info->state[0] = 1; //mark that this buf is using.
     }
 
     return XCAM_RETURN_NO_ERROR;
@@ -462,7 +513,7 @@ bool RKAiqAfecThread::loop()
         hFEC->isAttribUpdated = true;
         return true;
     }
-
+    get_fec_buf(hFEC);
     if (hFEC->user_config.bypass) {
         ret = read_mesh_table(hFEC, 0);
     } else {

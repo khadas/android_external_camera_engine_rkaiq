@@ -111,6 +111,7 @@ public:
     virtual XCamReturn getZoomPosition(int& position) = 0;
     virtual XCamReturn getLensVcmCfg(rk_aiq_lens_vcmcfg& lens_cfg) = 0;
     virtual XCamReturn setLensVcmCfg(rk_aiq_lens_vcmcfg& lens_cfg) = 0;
+    virtual void getShareMemOps(isp_drv_share_mem_ops_t** mem_ops) = 0;
 private:
     XCAM_DEAD_COPY (ICamHw);
 };

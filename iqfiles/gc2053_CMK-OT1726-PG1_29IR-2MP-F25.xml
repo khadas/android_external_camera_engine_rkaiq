@@ -2,7 +2,7 @@
 <matfile>
 	<header type="struct" size="[1 1]">
 		<code_xml_parse_version index="1" type="char" size="[1 6]">
-         	v1.3.4
+         	v1.3.7
 		</code_xml_parse_version>
 		<creation_date index="1" type="char" size="[1 10]">
 		2020-04-24
@@ -20,7 +20,7 @@
             	v0.0.3
 		</generator_version>
 		<magic_code_version index="1" type="int" size="[1 1]">
-	          [1061311]
+	          [1056480]
 		</magic_code_version>
 	</header>
 	<sensor type="struct" size="[1 1]">
@@ -1773,10 +1773,10 @@ AUTO
 [1.0000 ]
 </InitIspDgainValue>
 					<InitPIrisGainValue index="1" type="double" size="[1 1]">
-[1.4000 ]
+[512]
 </InitPIrisGainValue>
 	         <InitDCIrisDutyValue index="1" type="double" size="[1 1]">
-                     [30]
+                     [100]
                   </InitDCIrisDutyValue>
 				</LinearAE>
 				<HdrAE index="1" type="struct" size="[1 1]">
@@ -1790,10 +1790,10 @@ AUTO
 [1.0000 1.0000 1.0000 ]
 </InitIspDgainValue>
 					<InitPIrisGainValue index="1" type="double" size="[1 1]">
-[1.4000 ]
+[512]
 </InitPIrisGainValue>
 	         <InitDCIrisDutyValue index="1" type="double" size="[1 1]">
-                     [30]
+                     [100]
                   </InitDCIrisDutyValue>
 				</HdrAE>
 			</AecInitValue>
@@ -1829,7 +1829,7 @@ DAY
 [1.0000 1.0000 1.0000 1.0000 1.0000 1.0000 ]
 </IspDGainDot>
 						<PIrisDot index="1" type="double" size="[1 6]">
-[2.4000 2.2000 2.0000 1.8000 1.6000 1.4000 ]
+[512 512 512 512 512 512]
 </PIrisDot>
 					</cell>
 					<cell index="2" type="struct" size="[1 1]">
@@ -1846,7 +1846,7 @@ NIGHT
 [1.0000 1.0000 1.0000 1.0000 1.0000 1.0000 ]
 </IspDGainDot>
 						<PIrisDot index="1" type="double" size="[1 6]">
-[2.4000 2.2000 2.0000 1.8000 1.6000 1.4000 ]
+[512 512 512 512 512 512]
 </PIrisDot>
 					</cell>
 				</LinearAE>
@@ -1883,7 +1883,7 @@ DAY
 [1.0000 1.0000 1.0000 1.0000 1.0000 1.0000 ]
 </SIspDGainDot>
 						<PIrisDot index="1" type="double" size="[1 6]">
-[2.4000 2.2000 2.0000 1.8000 1.6000 1.4000 ]
+[512 512 512 512 512 512]
 </PIrisDot>
 					</cell>
 					<cell index="2" type="struct" size="[1 1]">
@@ -1918,7 +1918,7 @@ NIGHT
 [1.0000 1.0000 1.0000 1.0000 1.0000 1.0000 ]
 </SIspDGainDot>
 						<PIrisDot index="1" type="double" size="[1 6]">
-[2.4000 2.2000 2.0000 1.8000 1.6000 1.4000 ]
+[512 512 512 512 512 512]
 </PIrisDot>
 					</cell>
 				</HdrAE>
@@ -1998,9 +1998,9 @@ DAY
                         52 46 41 36 31 27 23 19 16
                         13 10 8 6 4 3 1 1 0
                         0 0 0 0 0 0 0 0 0]                   </StepTable>	       </PIrisAttr>	      <DCIrisAttr index="1" type="struct" size="[1 1]">
-               	 <Kp index="1" type="double" size="[1 1]">                       [1]                   </Kp>
+               	 <Kp index="1" type="double" size="[1 1]">                       [0.5]                   </Kp>
                    <Ki index="1" type="double" size="[1 1]">                       [0.2]                   </Ki>
-                   <Kd index="1" type="double" size="[1 1]">                       [0.5]                   </Kd>
+                   <Kd index="1" type="double" size="[1 1]">                       [0.3]                   </Kd>
                    <MinPwmDuty index="1" type="double" size="[1 1]">                       [0]                   </MinPwmDuty>
                    <MaxPwmDuty index="1" type="double" size="[1 1]">                       [100]                   </MaxPwmDuty>
                    <OpenPwmDuty index="1" type="double" size="[1 1]">                       [40]                   </OpenPwmDuty>
@@ -2410,9 +2410,32 @@ ADAPTIVE
 </MDCurveMS_damp>
 		</MERGE>
          <TMO index="1" type="struct" size="[1 1]">
-		<LinearTmoEn index="1" type="double" size="[1 1]">
-                    [0]
-                 </LinearTmoEn>
+		<Enable index="1" type="cell" size="[1 3]">
+                   <cell index="1" type="struct" size="[1 1]">
+		<Name index="1" type="char" size="[1 8]">
+                  normal
+                  </Name>
+                    <En index="1" type="double" size="[1 1]">
+                        [1.0000 ]
+                    </En>
+		</cell>
+                   <cell index="2" type="struct" size="[1 1]">
+		<Name index="1" type="char" size="[1 8]">
+                  HDR
+                  </Name>
+                    <En index="1" type="double" size="[1 1]">
+                        [1.0000 ]
+                    </En>
+		</cell>
+                    <cell index="3" type="struct" size="[1 1]">
+		<Name index="1" type="char" size="[1 8]">
+                  night
+                  </Name>
+                    <En index="1" type="double" size="[1 1]">
+                        [0 ]
+                    </En>
+		</cell>
+                 </Enable>
          <GlobalLuma index="1" type="cell" size="[1 3]">
 		<cell index="1" type="struct" size="[1 1]">
 		<Name index="1" type="char" size="[1 8]">
@@ -34656,9 +34679,6 @@ hcg
 	<Enable index="1" type="double" size="[1 1]">
                [1]
            </Enable>  
-                    <gain_en index="1" type="double" size="[1 1]">
-                        [1 ]
-                    </gain_en>
                     <cfg_alpha_normal index="1" type="double" size="[1 1]">
                         [0.0000 ]
                     </cfg_alpha_normal>
@@ -34733,29 +34753,12 @@ hcg
                     <dc_weitcur index="1" type="double" size="[1 9]">
                         [1 1 1 1 1 1 1 1 1 ]
                     </dc_weitcur>
-          <dc_bf_h index="1" type="double" size="[5 5]">
-                [12.0000 17.0000 19.0000 17.0000 12.0000 
-                17.0000 25.0000 28.0000 25.0000 17.0000 
-                19.0000 28.0000 32.0000 28.0000 19.0000 
-                17.0000 25.0000 28.0000 25.0000 17.0000 
-                12.0000 17.0000 19.0000 17.0000 12.0000 ]
-            </dc_bf_h>
                     <air_thed index="1" type="double" size="[1 9]">
 	            [2 2 2 2 2 2 2 2 2]
                     </air_thed>
                     <air_weitcur index="1" type="double" size="[1 9]">
                         [0.1400 0.1400 0.1400 0.1400 0.1400 0.1400 0.1400 0.1400 0.1400]
                     </air_weitcur>
-            <air_bf_h index="1" type="double" size="[3 3]">
-                [25.0000 28.0000 25.0000 
-                28.0000 32.0000 28.0000 
-                25.0000 28.0000 25.0000 ]
-            </air_bf_h>
-            <gaus_h index="1" type="double" size="[3 3]">
-                [2.0000 4.0000 2.0000 
-                4.0000 8.0000 4.0000 
-                2.0000 4.0000 2.0000 ]
-            </gaus_h>
                     <stab_fnum index="1" type="double" size="[1 1]">
 	            [8.0]
                     </stab_fnum>
@@ -34836,29 +34839,12 @@ hcg
                     <dc_weitcur index="1" type="double" size="[1 9]">
                         [1 1 1 1 1 1 1 1 1 ]
                     </dc_weitcur>
-          <dc_bf_h index="1" type="double" size="[5 5]">
-                [12.0000 17.0000 19.0000 17.0000 12.0000 
-                17.0000 25.0000 28.0000 25.0000 17.0000 
-                19.0000 28.0000 32.0000 28.0000 19.0000 
-                17.0000 25.0000 28.0000 25.0000 17.0000 
-                12.0000 17.0000 19.0000 17.0000 12.0000 ]
-            </dc_bf_h>
                     <air_thed index="1" type="double" size="[1 9]">
 	            [2 2 2 2 2 2 2 2 2]
                     </air_thed>
                     <air_weitcur index="1" type="double" size="[1 9]">
                         [0.1400 0.1400 0.1400 0.1400 0.1400 0.1400 0.1400 0.1400 0.1400]
                     </air_weitcur>
-            <air_bf_h index="1" type="double" size="[3 3]">
-                [25.0000 28.0000 25.0000 
-                28.0000 32.0000 28.0000 
-                25.0000 28.0000 25.0000 ]
-            </air_bf_h>
-            <gaus_h index="1" type="double" size="[3 3]">
-                [2.0000 4.0000 2.0000 
-                4.0000 8.0000 4.0000 
-                2.0000 4.0000 2.0000 ]
-            </gaus_h>
                     <stab_fnum index="1" type="double" size="[1 1]">
 	            [8.0]
                     </stab_fnum>
@@ -34939,29 +34925,12 @@ hcg
                     <dc_weitcur index="1" type="double" size="[1 9]">
                         [1 1 1 1 1 1 1 1 1 ]
                     </dc_weitcur>
-          <dc_bf_h index="1" type="double" size="[5 5]">
-                [12.0000 17.0000 19.0000 17.0000 12.0000 
-                17.0000 25.0000 28.0000 25.0000 17.0000 
-                19.0000 28.0000 32.0000 28.0000 19.0000 
-                17.0000 25.0000 28.0000 25.0000 17.0000 
-                12.0000 17.0000 19.0000 17.0000 12.0000 ]
-            </dc_bf_h>
                     <air_thed index="1" type="double" size="[1 9]">
 	            [2 2 2 2 2 2 2 2 2]
                     </air_thed>
                     <air_weitcur index="1" type="double" size="[1 9]">
                         [0.1400 0.1400 0.1400 0.1400 0.1400 0.1400 0.1400 0.1400 0.1400]
                     </air_weitcur>
-            <air_bf_h index="1" type="double" size="[3 3]">
-                [25.0000 28.0000 25.0000 
-                28.0000 32.0000 28.0000 
-                25.0000 28.0000 25.0000 ]
-            </air_bf_h>
-            <gaus_h index="1" type="double" size="[3 3]">
-                [2.0000 4.0000 2.0000 
-                4.0000 8.0000 4.0000 
-                2.0000 4.0000 2.0000 ]
-            </gaus_h>
                     <stab_fnum index="1" type="double" size="[1 1]">
 	            [8.0]
                     </stab_fnum>
@@ -35058,18 +35027,6 @@ hcg
                     <cfg_gratio index="1" type="double" size="[1 9]">
                         [2 2 2 2 2 2 2 2 2 ]
                     </cfg_gratio>
-            <hist_conv_t0 index="1" type="double" size="[2 3]">
-                [1.0000 2.0000 1.0000 
-                -1.0000 -2.0000 -1.0000 ]
-            </hist_conv_t0>
-            <hist_conv_t1 index="1" type="double" size="[2 3]">
-                [1.0000 0.0000 -1.0000 
-                2.0000 0.0000 -2.0000 ]
-            </hist_conv_t1>
-            <hist_conv_t2 index="1" type="double" size="[2 3]">
-                [1.0000 -2.0000 1.0000 
-                2.0000 -4.0000 2.0000 ]
-            </hist_conv_t2>
 		</cell>
 		<cell index="2" type="struct" size="[1 1]">
 		<Name index="1" type="char" size="[1 8]">
@@ -35105,18 +35062,6 @@ hcg
                     <cfg_gratio index="1" type="double" size="[1 9]">
                         [2 2 2 2 2 2 2 2 2 ]
                     </cfg_gratio>
-            <hist_conv_t0 index="1" type="double" size="[2 3]">
-                [1.0000 2.0000 1.0000 
-                -1.0000 -2.0000 -1.0000 ]
-            </hist_conv_t0>
-            <hist_conv_t1 index="1" type="double" size="[2 3]">
-                [1.0000 0.0000 -1.0000 
-                2.0000 0.0000 -2.0000 ]
-            </hist_conv_t1>
-            <hist_conv_t2 index="1" type="double" size="[2 3]">
-                [1.0000 -2.0000 1.0000 
-                2.0000 -4.0000 2.0000 ]
-            </hist_conv_t2>
 		</cell>
 		<cell index="3" type="struct" size="[1 1]">
 		<Name index="1" type="char" size="[1 8]">
@@ -35152,18 +35097,6 @@ hcg
                     <cfg_gratio index="1" type="double" size="[1 9]">
                         [2 2 2 2 2 2 2 2 2 ]
                     </cfg_gratio>
-            <hist_conv_t0 index="1" type="double" size="[2 3]">
-                [1.0000 2.0000 1.0000 
-                -1.0000 -2.0000 -1.0000 ]
-            </hist_conv_t0>
-            <hist_conv_t1 index="1" type="double" size="[2 3]">
-                [1.0000 0.0000 -1.0000 
-                2.0000 0.0000 -2.0000 ]
-            </hist_conv_t1>
-            <hist_conv_t2 index="1" type="double" size="[2 3]">
-                [1.0000 -2.0000 1.0000 
-                2.0000 -4.0000 2.0000 ]
-            </hist_conv_t2>
 		</cell>
                 </Hist_Setting>
         </DEHAZE>
@@ -35182,9 +35115,8 @@ hcg
             <TimeFactor index="1" type="double" size="[1 4]">
                 [0.0000 0.0000 1.0000 0.5000 ]
             </TimeFactor>
-            <CISTimeRegSumFac index="1" type="double" size="[1 2]">
-                [1.0000 0.0000 ]
-            </CISTimeRegSumFac>
+            <CISLinTimeRegMaxFac index="1" type="double" size="[1 2]">                [1.0000 0.0000 ]            </CISLinTimeRegMaxFac>
+            <CISHdrTimeRegSumFac index="1" type="double" size="[1 2]">                [1.0000 0.0000 ]            </CISHdrTimeRegSumFac>
             <CISTimeRegOdevity index="1" type="double" size="[1 2]">
                 [2.0000 0.0000 ]
             </CISTimeRegOdevity>

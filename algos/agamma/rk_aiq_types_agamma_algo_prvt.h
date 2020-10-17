@@ -26,15 +26,16 @@
 
 RKAIQ_BEGIN_DECLARE
 
+#define LIMIT_VALUE(value,max_value,min_value)      (value > max_value? max_value : value < min_value ? min_value : value)
+
+
 typedef struct AgammaHandle_s {
     rk_aiq_gamma_cfg_t  agamma_config;
-    CamCalibDbContext_t *pCalibDb;
+    CalibDb_Gamma_t *pCalibDb;
+    rk_aiq_gamma_attr_t agammaAttr;
+    AgammaProcRes_t ProcRes;
     int working_mode;
-    int normal_table[45];
-    int night_table[45];
-    int hdr_table[45];
-    int user1_table[45];
-    int user2_table[45];
+    int Scene_mode;
 } AgammaHandle_t;
 
 RKAIQ_END_DECLARE

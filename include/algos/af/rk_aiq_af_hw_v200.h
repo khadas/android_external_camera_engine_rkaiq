@@ -54,7 +54,7 @@ typedef struct {
     unsigned char lum_var_shift_a;
     unsigned char lum_var_shift_b;
 
-    unsigned int roia_sharpness;
+    unsigned long long roia_sharpness;
     unsigned int roia_luminance;
     unsigned int roib_sharpness;
     unsigned int roib_luminance;
@@ -114,7 +114,10 @@ typedef struct {
 } rawaf_isp_af_meas_t;
 
 typedef struct {
+    bool lens_pos_valid;
+    bool zoom_pos_valid;
     unsigned int next_lens_pos;
+    unsigned int next_zoom_pos;
 } rawaf_focus_pos_meas_t;
 
 #endif

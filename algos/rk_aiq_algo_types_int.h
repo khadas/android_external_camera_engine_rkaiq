@@ -22,7 +22,7 @@
 
 
 #include "rk_aiq_algo_des.h"
-#include "rk_aiq_types.h"
+#include "rk_aiq_types_priv.h"
 #include "rk_aiq_algo_types.h"
 #include "adehaze/rk_aiq_types_adehaze_algo_int.h"
 #include "anr/rk_aiq_types_anr_algo_int.h"
@@ -813,6 +813,7 @@ typedef struct _RkAiqAlgoConfigAfecInt {
     RkAiqAlgoComInt rk_com;
     CalibDb_FEC_t afec_calib_cfg;
     const char* resource_path;
+    isp_drv_share_mem_ops_t *mem_ops_ptr;
 } RkAiqAlgoConfigAfecInt;
 
 typedef struct _RkAiqAlgoPreAfecInt {
@@ -956,6 +957,7 @@ typedef struct _RkAiqAlgoConfigAldchInt {
     RkAiqAlgoComInt rk_com;
     CalibDb_LDCH_t aldch_calib_cfg;
     const char* resource_path;
+    isp_drv_share_mem_ops_t *mem_ops_ptr;
 } RkAiqAlgoConfigAldchInt;
 
 typedef struct _RkAiqAlgoPreAldchInt {
@@ -1030,7 +1032,7 @@ typedef struct _RkAiqAlgoConfigAorbInt {
 typedef struct _RkAiqAlgoPreAorbInt {
     RkAiqAlgoPreAorb aorb_pre_com;
     RkAiqAlgoComInt rk_com;
-    rk_aiq_isp_orb_stats_t orb_stats;
+    rk_aiq_isp_orb_stats_t* orb_stats;
 } RkAiqAlgoPreAorbInt;
 
 typedef struct _RkAiqAlgoPreResAorbInt {
@@ -1041,7 +1043,6 @@ typedef struct _RkAiqAlgoPreResAorbInt {
 typedef struct _RkAiqAlgoProcAorbInt {
     RkAiqAlgoProcAorb aorb_proc_com;
     RkAiqAlgoComInt rk_com;
-    rk_aiq_isp_orb_stats_t orb_stats;
 } RkAiqAlgoProcAorbInt;
 
 typedef struct _RkAiqAlgoProcResAorbInt {

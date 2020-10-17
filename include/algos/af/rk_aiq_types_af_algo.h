@@ -9,7 +9,7 @@
 #define RKAIQ_RAWAF_SUMDATA_NUM     225
 
 typedef struct {
-    unsigned int roia_sharpness;
+    unsigned long long roia_sharpness;
     unsigned int roia_luminance;
     unsigned int roib_sharpness;
     unsigned int roib_luminance;

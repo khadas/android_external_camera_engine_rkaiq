@@ -237,7 +237,7 @@ public:
     virtual XCamReturn processing();
     virtual XCamReturn postProcess();
     // TODO add algo specific methords, this is a sample
-    XCamReturn setAttrib(rk_aiq_af_attrib_t att);
+    XCamReturn setAttrib(rk_aiq_af_attrib_t *att);
     XCamReturn getAttrib(rk_aiq_af_attrib_t *att);
     XCamReturn lock();
     XCamReturn unlock();

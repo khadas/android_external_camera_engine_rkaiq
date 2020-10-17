@@ -64,7 +64,7 @@ private:
     void convertAiqAdehazeToIsp20Params(struct isp2x_isp_params_cfg& isp_cfg,
                                         const rk_aiq_dehaze_cfg_t& dhaze                     );
     void convertAiqAgammaToIsp20Params(struct isp2x_isp_params_cfg& isp_cfg,
-                                       const rk_aiq_gamma_cfg_t& gamma_out_cfg);
+                                       const AgammaProcRes_t& gamma_out_cfg);
     void convertAiqAdemosaicToIsp20Params(struct isp2x_isp_params_cfg& isp_cfg,
                                           SmartPtr<RkAiqIspParamsProxy> aiq_results);
     void convertAiqLscToIsp20Params(struct isp2x_isp_params_cfg& isp_cfg,

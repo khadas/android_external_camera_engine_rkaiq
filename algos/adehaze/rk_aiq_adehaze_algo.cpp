@@ -127,14 +127,28 @@ static void select_Dehaze_params_algo(const CalibDb_Dehaze_t * stRKDehazeParam, 
                  stRKDehazeParamSelected->dehaze_bi_para[2], stRKDehazeParamSelected->dehaze_bi_para[3]);
 
     // dehaze_dc_bf_h[25]
+    float dc_bf_h[25] = {12.0000, 17.0000, 19.0000, 17.0000, 12.0000,
+                         17.0000, 25.0000, 28.0000, 25.0000, 17.0000,
+                         19.0000, 28.0000, 32.0000, 28.0000, 19.0000,
+                         17.0000, 25.0000, 28.0000, 25.0000, 17.0000,
+                         12.0000, 17.0000, 19.0000, 17.0000, 12.0000
+                        };
     for (int i = 0; i < 25; i++)
-        stRKDehazeParamSelected->dehaze_dc_bf_h[i] = stRKDehazeParam->dehaze_setting[mode].dc_bf_h[i];
+        stRKDehazeParamSelected->dehaze_dc_bf_h[i] = dc_bf_h[i];
 
     // dehaze_air_bf_h[9],dehaze_gaus_h[9]
+    float air_bf_h[9] = {25.0000, 28.0000, 25.0000,
+                         28.0000, 32.0000, 28.0000,
+                         25.0000, 28.0000, 25.0000
+                        };
+    float gaus_h[9] = {2.0000, 4.0000, 2.0000,
+                       4.0000, 8.0000, 4.0000,
+                       2.0000, 4.0000, 2.0000
+                      };
     for (int i = 0; i < 9; i++)
     {
-        stRKDehazeParamSelected->dehaze_air_bf_h[i] = stRKDehazeParam->dehaze_setting[mode].air_bf_h[i];
-        stRKDehazeParamSelected->dehaze_gaus_h[i] = stRKDehazeParam->dehaze_setting[mode].gaus_h[i];
+        stRKDehazeParamSelected->dehaze_air_bf_h[i] = air_bf_h[i];
+        stRKDehazeParamSelected->dehaze_gaus_h[i] = gaus_h[i];
     }
 
     LOG1_ADEHAZE("EIXT: %s \n", __func__);
@@ -166,11 +180,14 @@ static void select_Hist_params_algo(const CalibDb_Dehaze_t * stRKDehazeParam, rk
     LinearInterp(stRKDehazeParam->hist_setting[mode].iso, stRKDehazeParam->hist_setting[mode].cfg_gratio, iso, &stRKDehazeParamSelected->dehaze_user_config[4], RK_DEHAZE_ISO_NUM);
 
     // dehaze_hist_t0[6],dehaze_hist_t1[6],dehaze_hist_t2[6]
+    float hist_conv_t0[6] = {1.0000, 2.0000, 1.0000, -1.0000, -2.0000, -1.0000};
+    float hist_conv_t1[6] = {1.0000, 0.0000, -1.0000, 2.0000, 0.0000, -2.0000};
+    float hist_conv_t2[6] = {1.0000, -2.0000, 1.0000, 2.0000, -4.0000, 2.0000};
     for (int i = 0; i < 6; i++)
     {
-        stRKDehazeParamSelected->dehaze_hist_t0[i] = stRKDehazeParam->hist_setting[mode].hist_conv_t0[i];
-        stRKDehazeParamSelected->dehaze_hist_t1[i] = stRKDehazeParam->hist_setting[mode].hist_conv_t1[i];
-        stRKDehazeParamSelected->dehaze_hist_t2[i] = stRKDehazeParam->hist_setting[mode].hist_conv_t2[i];
+        stRKDehazeParamSelected->dehaze_hist_t0[i] = hist_conv_t0[i];
+        stRKDehazeParamSelected->dehaze_hist_t1[i] = hist_conv_t1[i];
+        stRKDehazeParamSelected->dehaze_hist_t2[i] = hist_conv_t2[i];
     }
 
     LOGD_ADEHAZE("%s dehaze_en:%f hist_en:%f hist_channel:%f hist_para_en:%f\n", __func__, stRKDehazeParamSelected->dehaze_en[0], stRKDehazeParamSelected->dehaze_en[2], stRKDehazeParamSelected->dehaze_en[3],
@@ -425,7 +442,9 @@ XCamReturn AdehazeInit(AdehazeHandle_t** para, CamCalibDbContext_t* calib)
     memset(handle, 0, sizeof(AdehazeHandle_t));
     handle->pCalibDb = calib;
     handle->calib_dehaz = calib->dehaze;
+    handle->AdehazeAtrr.stTool = calib->dehaze;
     handle->AdehazeAtrr.byPass = true;
+    handle->AdehazeAtrr.mode = RK_AIQ_DEHAZE_MODE_AUTO;
     *para = handle;
     LOG1_ADEHAZE("EXIT: %s \n", __func__);
     return(ret);
@@ -446,7 +465,7 @@ XCamReturn AdehazeProcess(AdehazeHandle_t* para, int iso, int mode)
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
     LOG1_ADEHAZE("ENTER: %s \n", __func__);
 
-    para->adhaz_config.dehaze_en[4] = para->calib_dehaz.gain_en;
+    para->adhaz_config.dehaze_en[4] = FUNCTION_ENABLE;
     //cfg setting
     if(mode == 0)
         para->adhaz_config.dehaze_user_config[0] = para->calib_dehaz.cfg_alpha_normal;

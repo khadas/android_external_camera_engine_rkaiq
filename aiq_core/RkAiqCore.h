@@ -193,6 +193,8 @@ public:
     const RkAiqAlgoContext* getEnabledAxlibCtx(const int algo_type);
     const RkAiqHandle* getAiqAlgoHandle(const int algo_type);
     XCamReturn get3AStatsFromCachedList(rk_aiq_isp_stats_t &stats);
+    XCamReturn get3AStatsFromCachedList(rk_aiq_isp_stats_t **stats, int timeout_ms);
+    void release3AStatsRef(rk_aiq_isp_stats_t *stats);
     XCamReturn setCpsLtCfg(rk_aiq_cpsl_cfg_t &cfg);
     XCamReturn getCpsLtInfo(rk_aiq_cpsl_info_t &info);
     XCamReturn queryCpsLtCap(rk_aiq_cpsl_cap_t &cap);
@@ -211,6 +213,10 @@ public:
     bool isRunningState() {
         return mState == RK_AIQ_CORE_STATE_RUNNING;
     }
+    void setShareMemOps(isp_drv_share_mem_ops_t *mem_ops) {
+        mShareMemOps = mem_ops;
+    }
+
 public:
     // following vars shared by all algo handlers
     typedef struct RkAiqAlgosShared_s {
@@ -256,6 +262,7 @@ public:
         }
     } RkAiqAlgosShared_t;
     RkAiqAlgosShared_t mAlogsSharedParams;
+    isp_drv_share_mem_ops_t *mShareMemOps;
 private:
     // in analyzer thread
     XCamReturn analyze(const SmartPtr<VideoBuffer> &buffer);
@@ -299,6 +306,7 @@ private:
     XCamReturn genCpslResult(RkAiqFullParams* params);
     void cacheIspStatsToList();
     void initCpsl();
+
 private:
     enum rk_aiq_core_state_e {
         RK_AIQ_CORE_STATE_INVALID,
@@ -369,7 +377,7 @@ private:
     SmartPtr<RkAiqFocusParamsPool> mAiqFocusParamsPool;
     SmartPtr<RkAiqCpslParamsPool> mAiqCpslParamsPool;
     static uint16_t DEFAULT_POOL_SIZE;
-    std::list<rk_aiq_isp_stats_t>  ispStatsCachedList;
+    XCam::Cond mIspStatsCond;
     Mutex ispStatsListMutex;
     struct RkAiqHwInfo mHwInfo;
     rk_aiq_cpsl_cap_t mCpslCap;
@@ -378,6 +386,11 @@ private:
     float mStrthIr;
     rk_aiq_gray_mode_t mGrayMode;
     bool firstStatsReceived;
+    typedef SharedItemPool<rk_aiq_isp_stats_t> RkAiqStatsPool;
+    typedef SharedItemProxy<rk_aiq_isp_stats_t> RkAiqStatsProxy;
+    SmartPtr<RkAiqStatsPool> mAiqStatsPool;
+    std::list<SmartPtr<RkAiqStatsProxy>> mAiqStatsCachedList;
+    std::map<rk_aiq_isp_stats_t*, SmartPtr<RkAiqStatsProxy>> mAiqStatsOutMap;
 };
 
 };

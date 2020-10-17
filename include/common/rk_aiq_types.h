@@ -30,7 +30,7 @@
 #include "a3dlut/rk_aiq_types_a3dlut_algo.h"
 #include "ahdr/rk_aiq_types_ahdr_algo_int.h"
 #include "ahdr/rk_aiq_types_ahdr_algo.h"
-#include "agamma/rk_aiq_types_agamma_algo.h"
+#include "agamma/rk_aiq_types_agamma_algo_int.h"
 #include "adehaze/rk_aiq_types_adehaze_algo.h"
 #include "acp/rk_aiq_types_acp_algo.h"
 #include "aie/rk_aiq_types_aie_algo_int.h"
@@ -393,148 +393,13 @@ typedef struct {
     unsigned int max_feature;
 } rk_aiq_isp_orb_t;
 
-#if 0
-typedef struct {
-
-} rk_aiq_isp_blc_t;
-#endif
-
-#if 0
-typedef struct {
-
-} rk_aiq_isp_dpcc_t;
-#endif
-
 typedef struct {
     int UNKNOWN;
 } rk_aiq_isp_drc_t;
 
 typedef AgicConfig_t rk_aiq_isp_gic_t;
 
-/*typedef struct {
-
-} rk_aiq_isp_lsc_t;*/
-
-/*
-typedef struct {
-    unsigned char filter_c_en;
-    unsigned char filter_g_en;
-
-    unsigned char gain_offset;
-    unsigned short hf_offset;
-    unsigned char thed1;
-    unsigned char thed0;
-    unsigned char dist_scale;
-    unsigned char max_ratio;
-    unsigned char clip_en;
-
-    signed char filter1_coe[5];
-    signed char filter2_coe[5];
-
-    unsigned char offset;
-    unsigned char shift_num;
-    unsigned char order_max;
-    unsigned char order_min;
-} rk_aiq_isp_demosaic_t;
-*/
 typedef AdebayerConfig_t rk_aiq_isp_demosaic_t;
-
-/*
-typedef struct {
-
-    int enhance_en;
-    int hist_chn;
-    int hpara_en;
-    int hist_en;
-    int dc_en;
-    int big_en;
-    int nobig_en;
-
-    unsigned char yblk_th;
-    unsigned charyhist_th;
-    unsigned char dc_max_th;
-    unsigned char dc_min_th;
-
-    unsigned char wt_max;
-    unsigned char bright_max;
-    unsigned char bright_min;
-
-    unsigned char tmax_base;
-    unsigned char chardark_th;
-    unsigned char air_max;
-    unsigned char air_min;
-
-    unsigned short tmax_max;
-    unsigned short tmax_off;
-
-    unsigned char hist_th_off;
-    unsigned char hist_gratio;
-
-    unsigned short hist_min;
-    unsigned short hist_k;
-
-    unsigned short enhance_value;
-    unsigned short hist_scale;
-
-    unsigned short iir_wt_sigma;
-    unsigned short iir_sigma;
-    unsigned short stab_fnum;
-
-    unsigned short iir_tmax_sigma;
-    unsigned short iir_air_sigma;
-
-    unsigned short cfg_wt;
-    unsigned short cfg_air;
-    unsigned short cfg_alpha;
-
-    unsigned short cfg_gratio;
-    unsigned short cfg_tmax;
-
-    unsigned short dc_weitcur;
-    unsigned short dc_thed;
-
-    unsigned short sw_dhaz_dc_bf_h3;
-    unsigned short sw_dhaz_dc_bf_h2;
-    unsigned short sw_dhaz_dc_bf_h1;
-    unsigned short sw_dhaz_dc_bf_h0;
-
-    unsigned short sw_dhaz_dc_bf_h5;
-    unsigned short sw_dhaz_dc_bf_h4;
-
-    int air_weitcur;
-    int air_thed;
-
-    unsigned short air_bf_h2;
-    unsigned short air_bf_h1;
-    unsigned short air_bf_h0;
-
-    unsigned short gaus_h2;
-    unsigned short gaus_h1;
-    unsigned short gaus_h0;
-
-    unsigned short conv_t0[6];
-    unsigned short conv_t1[6];
-    unsigned short conv_t2[6];
-
-    int dhaz_adp_air_base;
-    int dhaz_adp_wt;
-
-    int dhaz_adp_gratio;
-    int dhaz_adp_tmax;
-
-    int h_r_iir[64];
-    int h_g_iir[64];
-    int h_b_iir[64];
-
-
-} rk_aiq_isp_dehaze_t;*/
-
-
-
-
-
-//typedef rk_aiq_gamma_cfg_t rk_aiq_gamma_cfg_t;
-
 
 typedef struct {
     unsigned char  equ_segm;
@@ -563,7 +428,7 @@ typedef struct {
     int lut_h_size;
     int lut_v_size;
     int lut_size;
-    unsigned short lut_mapxy[LDCH_MESH_XY_NUM_ALGO];
+    unsigned int lut_mem_fd;
 } rk_aiq_isp_ldch_t;
 
 typedef struct {
@@ -573,47 +438,19 @@ typedef struct {
     unsigned int crop_height;
     unsigned char mesh_density;
     unsigned int mesh_size;
-    unsigned short sw_mesh_xi[FEC_MESH_XY_NUM_ALGO];
-    unsigned char sw_mesh_xf[FEC_MESH_XY_NUM_ALGO];
-    unsigned short sw_mesh_yi[FEC_MESH_XY_NUM_ALGO];
-    unsigned char sw_mesh_yf[FEC_MESH_XY_NUM_ALGO];
+    unsigned int mesh_buf_fd;
+    //unsigned short sw_mesh_xi[FEC_MESH_XY_NUM_ALGO];
+    //unsigned char sw_mesh_xf[FEC_MESH_XY_NUM_ALGO];
+    //unsigned short sw_mesh_yi[FEC_MESH_XY_NUM_ALGO];
+    //unsigned char sw_mesh_yf[FEC_MESH_XY_NUM_ALGO];
 } rk_aiq_isp_fec_t;
-
-#if 0
-typedef struct {
-
-} rk_aiq_isp_tnr_t;
-
-typedef struct {
-
-} rk_aiq_isp_ynr_t;
-
-
-typedef struct {
-
-} rk_aiq_isp_uvnr_t;
-
-typedef struct {
-
-} rk_aiq_isp_sharpen_t;
-
-typedef struct {
-
-} rk_aiq_isp_edgeflt_t;
-#endif
 
 typedef struct {
     int UNKNOWN;
 } rk_aiq_isp_cgc_t;
 
-#if 0
 typedef struct {
-
-} rk_aiq_isp_rawnr_t;
-#endif
-
-
-typedef struct {
+    sint32_t frame_id;
     rk_aiq_isp_aec_stats_t aec_stats;
     rk_aiq_awb_stat_res_v200_t awb_stats_v200;
     rk_aiq_isp_af_stats_t  af_stats;
@@ -629,7 +466,6 @@ typedef RKAnr_Uvnr_Fix_t rk_aiq_isp_uvnr_t;
 typedef ANRProcResult_t rkaiq_anr_procRes_t;
 #endif
 
-
 #if 1
 typedef RKAsharp_Sharp_Fix_t rk_aiq_isp_sharpen_t;
 typedef RKAsharp_Edgefilter_Fix_t rk_aiq_isp_edgeflt_t;
@@ -640,38 +476,6 @@ typedef AblcProcResult_t rk_aiq_isp_blc_t;
 typedef AdpccProcResult_t rk_aiq_isp_dpcc_t;
 
 typedef RKAnr_Gain_Fix_t rk_aiq_isp_gain_t;
-
-#if 0
-typedef struct {
-    uint32_t module_enable_mask;
-    rk_aiq_isp_aec_meas_t*   aec_meas;
-    rk_aiq_isp_awb_meas_t*   awb_meas;
-    rk_aiq_isp_af_meas_t*    af_meas;
-    rk_aiq_isp_blc_t*        blc;
-    rk_aiq_isp_dpcc_t*       dpcc;
-    rk_aiq_isp_hdr_t*        hdr;
-    rk_aiq_isp_rawnr_t*      rawnr;
-    rk_aiq_isp_drc_t*        drc;
-    rk_aiq_isp_gic_t*        gic;
-    rk_aiq_isp_lsc_t*        lsc;
-    rk_aiq_isp_demosaic_t*   demosaic;
-    rk_aiq_isp_ldch_t*       ldch;
-    rk_aiq_isp_lut3d_t*      lut3d;
-    rk_aiq_isp_dehaze_t*     dehaze;
-    rk_aiq_isp_ccm_t*        ccm;
-    rk_aiq_isp_goc_t*        goc;
-    rk_aiq_isp_wdr_t*        wdr;
-    rk_aiq_isp_csm_t*        csm;
-    rk_aiq_isp_tnr_t*        tnr;
-    rk_aiq_isp_ynr_t*        ynr;
-    rk_aiq_isp_uvnr_t*       uvnr;
-    rk_aiq_isp_sharpen_t*    sharpen;
-    rk_aiq_isp_edgeflt_t*    edgeflt;
-    rk_aiq_isp_cgc_t*        cgc;
-    rk_aiq_isp_conv422_t*    conv22;
-    rk_aiq_isp_yuvconv_t*    yuvconv;
-} rk_aiq_isp_partial_params_t;
-#endif
 
 typedef struct rk_aiq_isp_ie_s {
     rk_aiq_aie_params_t base;
@@ -789,95 +593,10 @@ typedef struct rk_aiq_cpsl_cap_s {
     rk_aiq_range_t strength_ir;
 } rk_aiq_cpsl_cap_t;
 
-#define RKAIQ_ISP_LDCH_ID           (1 << 0)
-
-typedef struct {
-    uint32_t update_mask;
-    uint32_t module_enable_mask;
-    sint32_t frame_id;
-    rk_aiq_isp_aec_meas_t   aec_meas;
-    rk_aiq_isp_hist_meas_t  hist_meas;
-    bool awb_cfg_update;
-    rk_aiq_awb_stat_cfg_v200_t   awb_cfg_v200;
-    rk_aiq_awb_stat_cfg_v201_t   awb_cfg_v201;
-    bool awb_gain_update;
-    rk_aiq_wb_gain_t       awb_gain;
-    rk_aiq_isp_af_meas_t    af_meas;
-    bool af_cfg_update;
-    rk_aiq_isp_blc_t        blc;
-    rk_aiq_isp_dpcc_t       dpcc;
-    RkAiqAhdrProcResult_t   ahdr_proc_res;//porc data for hw/simulator
-    rk_aiq_isp_rawnr_t      rawnr;
-    rk_aiq_isp_drc_t        drc;
-    rk_aiq_isp_gic_t        gic;
-    rk_aiq_lsc_cfg_t        lsc;
-    rk_aiq_isp_demosaic_t   demosaic;
-    rk_aiq_isp_ldch_t       ldch;
-    //rk_aiq_isp_fec_t        fec;
-    rk_aiq_lut3d_cfg_t      lut3d;
-    //rk_aiq_isp_dehaze_t     dehaze;
-    rk_aiq_dehaze_cfg_t     adhaz_config;
-    rk_aiq_ccm_cfg_t        ccm;
-    //rk_aiq_isp_goc_t        goc;
-    rk_aiq_gamma_cfg_t      agamma_config;
-    rk_aiq_isp_wdr_t        wdr;
-    rk_aiq_isp_csm_t        csm;
-    rk_aiq_isp_cgc_t        cgc;
-    rk_aiq_isp_conv422_t    conv22;
-    rk_aiq_isp_yuvconv_t    yuvconv;
-    rk_aiq_isp_gain_t       gain_config;
-    //anr result
-    rkaiq_anr_procRes_t     rkaiq_anr_proc_res;
-    rkaiq_asharp_procRes_t  rkaiq_asharp_proc_res;
-    rk_aiq_acp_params_t     cp;
-    rk_aiq_isp_ie_t         ie;
-#ifdef RK_SIMULATOR_HW
-    //rk_aiq_awb_stat_cfg_v200_t  awb_hw0_para;
-    // rk_aiq_awb_stat_cfg_v201_t  awb_hw1_para;
-    //rk_aiq_wb_gain_t        awb_gain_algo;
-    // float                   awb_smooth_factor;
-    //adhaz
-
-    //agamma
-    //rk_aiq_gamma_cfg_t  agamma_config;
-
-
-
-    //ahdr
-    //RkAiqAhdrProcResult_t   ahdr_proc_res;
-
-    //adpcc
-    //rkaiq_adpcc_procRes_t rkaiq_adpcc_proc_res;
-
-    //adebayer
-    //AdebayerConfig_t adebayer_config;
-
-    //ablc
-    //rk_aiq_isp_blc_t rkaiq_ablc_proc_res;
-#endif
-} rk_aiq_isp_params_t;
-
-#define RKAIQ_ISPP_TNR_ID           (1 << 0)
-#define RKAIQ_ISPP_NR_ID            (1 << 1)
-#define RKAIQ_ISPP_SHARP_ID         (1 << 2)
-#define RKAIQ_ISPP_FEC_ID           (1 << 3)
-#define RKAIQ_ISPP_ORB_ID           (1 << 4)
-
-typedef struct {
-    uint32_t update_mask;
-    sint32_t frame_id;
-    rk_aiq_isp_tnr_t        tnr;
-    rk_aiq_isp_ynr_t        ynr;
-    rk_aiq_isp_uvnr_t       uvnr;
-    rk_aiq_isp_sharpen_t    sharpen;
-    rk_aiq_isp_edgeflt_t    edgeflt;
-    rk_aiq_isp_orb_t        orb;
-    rk_aiq_isp_fec_t        fec;
-} rk_aiq_ispp_params_t;
-
 typedef enum capture_raw_e {
     CAPTURE_RAW_ASYNC,
     CAPTURE_RAW_SYNC,
     CAPTURE_RAW_AND_YUV_SYNC,
 } capture_raw_t;
+
 #endif

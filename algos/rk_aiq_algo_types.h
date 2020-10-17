@@ -545,7 +545,7 @@ typedef struct _RkAiqAlgoProcAgamma {
 
 typedef struct _RkAiqAlgoProcResAgamma {
     RkAiqAlgoResCom proc_res_com;
-    rk_aiq_gamma_cfg_t agamma_config;
+    AgammaProcRes_t agamma_proc_res;
 } RkAiqAlgoProcResAgamma;
 
 typedef struct _RkAiqAlgoPostAgamma {

@@ -12,7 +12,7 @@
 // sync should be done in inner. now we just need implement
 // the case of need_sync == false; need_sync is for future usage.
 
-typedef rk_aiq_gamma_cfg_t rk_aiq_gamma_attrib_t;
+typedef rk_aiq_gamma_attr_t rk_aiq_gamma_attrib_t;
 
 
 XCamReturn

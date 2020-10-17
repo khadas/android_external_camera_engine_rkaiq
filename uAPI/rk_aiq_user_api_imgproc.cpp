@@ -17,6 +17,9 @@
 
 #include "rk_aiq_user_api_imgproc.h"
 
+#ifdef RK_SIMULATOR_HW
+#define CHECK_USER_API_ENABLE
+#endif
 
 #define RKAIQ_IMGPROC_CHECK_RET(ret, format, ...) \
     if (ret) { \
@@ -1196,7 +1199,7 @@ XCamReturn rk_aiq_uapi_setFocusMode(const rk_aiq_sys_ctx_t* ctx, opMode_t mode)
         RKAIQ_IMGPROC_CHECK_RET(ret, "Not supported mode!");
     }
 
-    ret = rk_aiq_user_api_af_SetAttrib(ctx, attr);
+    ret = rk_aiq_user_api_af_SetAttrib(ctx, &attr);
     RKAIQ_IMGPROC_CHECK_RET(ret, "setFocusMode failed!");
     return ret;
 }
@@ -1238,7 +1241,7 @@ XCamReturn rk_aiq_uapi_setFixedModeCode(const rk_aiq_sys_ctx_t* ctx, unsigned sh
     ret = rk_aiq_user_api_af_GetAttrib(ctx, &attr);
     RKAIQ_IMGPROC_CHECK_RET(ret, "setFixedModeCode failed!");
     attr.fixedModeDefCode = code;
-    ret = rk_aiq_user_api_af_SetAttrib(ctx, attr);
+    ret = rk_aiq_user_api_af_SetAttrib(ctx, &attr);
     RKAIQ_IMGPROC_CHECK_RET(ret, "setFixedModeCode failed!");
     IMGPROC_FUNC_EXIT
     return ret;
@@ -1277,7 +1280,7 @@ XCamReturn rk_aiq_uapi_setFocusWin(const rk_aiq_sys_ctx_t* ctx, paRect_t *rect)
     attr.v_offs = rect->y;
     attr.h_size = rect->w;
     attr.v_size = rect->h;
-    ret = rk_aiq_user_api_af_SetAttrib(ctx, attr);
+    ret = rk_aiq_user_api_af_SetAttrib(ctx, &attr);
     RKAIQ_IMGPROC_CHECK_RET(ret, "setFocusWin failed!");
     IMGPROC_FUNC_EXIT
     return ret;
@@ -1316,7 +1319,7 @@ XCamReturn rk_aiq_uapi_setFocusMeasCfg(const rk_aiq_sys_ctx_t* ctx, rk_aiq_af_al
     RKAIQ_IMGPROC_CHECK_RET(ret, "setFocusMeasCfg failed!");
     attr.manual_meascfg = *meascfg;
 
-    ret = rk_aiq_user_api_af_SetAttrib(ctx, attr);
+    ret = rk_aiq_user_api_af_SetAttrib(ctx, &attr);
     RKAIQ_IMGPROC_CHECK_RET(ret, "setFocusMeasCfg failed!");
     return ret;
 }
@@ -1536,7 +1539,6 @@ XCamReturn rk_aiq_uapi_setHDRMode(const rk_aiq_sys_ctx_t* ctx, opMode_t mode)
     }
     ret = rk_aiq_user_api_ahdr_GetAttrib(ctx, &attr);
     RKAIQ_IMGPROC_CHECK_RET(ret, "get hdr attr failed!");
-    attr.bEnable = true;
     if (mode == OP_AUTO) {
         attr.opMode = HDR_OpMode_Auto;
     } else if (mode == OP_MANUAL) {
@@ -1603,8 +1605,7 @@ XCamReturn rk_aiq_uapi_setMHDRStrth(const rk_aiq_sys_ctx_t* ctx, bool on, unsign
     }
 
     attr.level = level;
-    attr.opMode = HDR_OpMode_Fast;
-    attr.bEnable = true;//enable api set
+    attr.opMode = HDR_OpMode_SET_LEVEL;
     ret = rk_aiq_user_api_ahdr_SetAttrib(ctx, attr);
     RKAIQ_IMGPROC_CHECK_RET(ret, "setMHDRStrth failed!");
     IMGPROC_FUNC_EXIT
@@ -1658,7 +1659,7 @@ XCamReturn rk_aiq_uapi_getDarkAreaBoostStrth(const rk_aiq_sys_ctx_t* ctx, unsign
     }
     ret = rk_aiq_user_api_ahdr_GetAttrib(ctx, &attr);
     RKAIQ_IMGPROC_CHECK_RET(ret, "getDarkAreaBoostStrth failed!");
-    if (attr.opMode == HDR_OpMode_LINEAR)
+    if (attr.opMode == HDR_OpMode_DarkArea)
         *level = attr.level_Linear_Dark;
     else
         *level = 0;
@@ -1694,9 +1695,8 @@ XCamReturn rk_aiq_uapi_setDarkAreaBoostStrth(const rk_aiq_sys_ctx_t* ctx, unsign
         ret = XCAM_RETURN_ERROR_OUTOFRANGE;
         RKAIQ_IMGPROC_CHECK_RET(ret, "level(%d) is out of range, setDarkAreaBoostStrth failed!");
     }
-    attr.bEnable = true;
     attr.level_Linear_Dark = level;
-    attr.opMode = HDR_OpMode_LINEAR;
+    attr.opMode = HDR_OpMode_DarkArea;
     ret = rk_aiq_user_api_ahdr_SetAttrib(ctx, attr);
     RKAIQ_IMGPROC_CHECK_RET(ret, "setDarkAreaBoostStrth failed!");
     IMGPROC_FUNC_EXIT
@@ -2314,29 +2314,16 @@ XCamReturn rk_aiq_uapi_getSharpness(const rk_aiq_sys_ctx_t* ctx, unsigned int *l
 *    level: gamma level, [0, 100]
 *****************************
 */
-XCamReturn rk_aiq_uapi_setGammaCoef(const rk_aiq_sys_ctx_t* ctx, unsigned int level)
+XCamReturn rk_aiq_uapi_setGammaCoef(const rk_aiq_sys_ctx_t* ctx, rk_aiq_gamma_attrib_t gammaAttr)
 {
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
-    rk_aiq_gamma_attrib_t gammaAttr;
-    float flevel = 100.0f / level, maxval = 4096.0f;
-    int tmp_gamma = 0;
     IMGPROC_FUNC_ENTER
     if (ctx == NULL) {
         ret = XCAM_RETURN_ERROR_PARAM;
         RKAIQ_IMGPROC_CHECK_RET(ret, "ctx is null, setGammaCoef failed!");
     }
-    LOGD("%s: flevel:%f", __FUNCTION__, flevel);
     ret = rk_aiq_user_api_agamma_GetAttrib(ctx, &gammaAttr);
     RKAIQ_IMGPROC_CHECK_RET(ret, "get gamma attrib failed!");
-    for(int i = 0; i < 33; i++) {
-        tmp_gamma = (int)((pow((64 * i / maxval), flevel)) * 4096) + gammaAttr.gamma_out_offset;
-        tmp_gamma = (tmp_gamma > 4095) ? 4095 : tmp_gamma;
-        tmp_gamma = (tmp_gamma < 0) ? 0 : tmp_gamma;
-        gammaAttr.gamma_table[i] = (uint16_t)(tmp_gamma);
-        LOGD("gamma_table[%d]:%d", i, gammaAttr.gamma_table[i]);
-    }
-
-    gammaAttr.gamma_out_segnum = GAMMA_OUT_EQ_SEGMENT;
     ret = rk_aiq_user_api_agamma_SetAttrib(ctx, gammaAttr);
     IMGPROC_FUNC_EXIT
     return ret;

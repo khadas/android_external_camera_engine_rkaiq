@@ -5,16 +5,10 @@
 #include "rk_aiq_algo_des.h"
 
 typedef struct adebayer_attrib_s {
-    unsigned char clip_enable;
-    unsigned char main_chan_en;
-    unsigned char chroma_chan_en;
-    unsigned char thed0;
-    unsigned char thed1;
-    unsigned char dist_scale;
-    unsigned char gian_offset;
-    unsigned char offset;
-    unsigned short hf_offset[9];
-    unsigned char sharp_strength[9];
+    unsigned char enable;
+    unsigned char enhance_strength[9];
+    unsigned char low_freq_thresh;
+    unsigned char high_freq_thresh;
 } adebayer_attrib_t;
 
 // need_sync means the implementation should consider

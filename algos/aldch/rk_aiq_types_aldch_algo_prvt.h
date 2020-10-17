@@ -28,7 +28,7 @@
 #include "xcam_log.h"
 #include "gen_mesh/genMesh.h"
 #include "aldch/rk_aiq_types_aldch_algo_int.h"
-
+#include "rk_aiq_types_priv.h"
 RKAIQ_BEGIN_DECLARE
 
 using namespace XCam;
@@ -77,6 +77,9 @@ typedef struct LDCHContext_s {
     std::atomic<bool> isAttribUpdated;
     rk_aiq_ldch_cfg_t user_config;
     SmartPtr<RKAiqAldchThread> aldchReadMeshThread;
+    isp_drv_share_mem_ops_t *share_mem_ops;
+    rk_aiq_ldch_share_mem_info_t *ldch_mem_info;
+    void* share_mem_ctx;
 } LDCHContext_t;
 
 typedef struct LDCHContext_s* LDCHHandle_t;

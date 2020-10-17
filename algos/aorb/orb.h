@@ -18,7 +18,6 @@
 #define SIMILAR   2
 #define BRIGHTER  3
 #define ROUND(x) (int)(((x) >= 0)?((x) + 0.5) : ((x) - 0.5))
-#define MAX(a,b)  ((a) >= (b) ? (a):(b))
 
 class rkisp_orb
 {

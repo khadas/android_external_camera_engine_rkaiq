@@ -200,6 +200,9 @@ RkAiqManager::init()
     ret = mCamHw->init(mSnsEntName);
     RKAIQMNG_CHECK_RET(ret, "camHw init error %d !", ret);
     _state = AIQ_STATE_INITED;
+    isp_drv_share_mem_ops_t *mem_ops = NULL;
+    mCamHw->getShareMemOps(&mem_ops);
+    mRkAiqAnalyzer->setShareMemOps(mem_ops);
     // set default mirror & flip
     setDefMirrorFlip();
     mAiqMngCmdTh->triger_start();

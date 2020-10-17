@@ -543,7 +543,8 @@ typedef struct CalibDb_Sensor_Para_s {
     CalibDb_AecGainRange_t  GainRange;
     float                   TimeFactor[4];
     //ExpSeperateCtrl
-    Cam2x1FloatMatrix_t     CISTimeRegSumFac;
+    Cam2x1FloatMatrix_t     CISHdrTimeRegSumFac;
+    Cam2x1FloatMatrix_t     CISLinTimeRegMaxFac;
     Cam2x1FloatMatrix_t     CISTimeRegOdevity;
     uint8_t                 CISTimeRegUnEqualEn;
     uint16_t                CISTimeRegMin;
@@ -962,9 +963,15 @@ typedef struct GlobaTMO_s
     float Strength[6];
 } GlobaTMO_t;
 
+typedef struct TMO_en_s
+{
+    char name[CALIBDB_MAX_MODE_NAME_LENGTH];
+    float en;
+} TMO_en_t;
+
 typedef struct CalibDb_HdrTmo_s
 {
-    float isLinearTmoOn;
+    TMO_en_t en[CALIBDB_MAX_MODE_NUM];
     GlobalLuma_t luma[CALIBDB_MAX_MODE_NUM];
     DetailsHighLight_t HighLight[CALIBDB_MAX_MODE_NUM];
     DetailsLowLight_t LowLight[CALIBDB_MAX_MODE_NUM];
@@ -1621,11 +1628,8 @@ struct CalibDb_Dehaze_Setting_s {
     float cfg_tmax[9];
     float dc_thed[9];
     float dc_weitcur[9];
-    float dc_bf_h[25];
     float air_thed[9];
     float air_weitcur[9];
-    float air_bf_h[9];
-    float gaus_h[9];
     struct CalibDb_IIR_setting_s IIR_setting;
 };
 
@@ -1648,14 +1652,10 @@ struct CalibDb_Hist_setting_s {
     float hist_min[9];
     float hist_scale[9];
     float cfg_gratio[9];
-    float hist_conv_t0[6];
-    float hist_conv_t1[6];
-    float hist_conv_t2[6];
 };
 
 typedef struct CalibDb_Dehaze_s {
     float en;
-    float gain_en; //big en
     float cfg_alpha_normal;
     float cfg_alpha_hdr;
     float cfg_alpha_night;

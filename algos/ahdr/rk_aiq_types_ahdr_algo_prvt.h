@@ -150,6 +150,7 @@ typedef struct MergeHandleData_s
 
 typedef struct AhdrPrevData_s
 {
+    int MergeMode;
     float PreL2S_ratio;
     float PreLExpo;
     float PreEnvlv;
@@ -234,7 +235,7 @@ typedef struct AhdrProcResData_s
     MgeProcRes_t MgeProcRes;
     bool LongFrameMode;
     bool isHdrGlobalTmo;
-    bool isLinearTmoOn;
+    bool isTmoOn;
 } AhdrProcResData_t;
 
 typedef struct SensorInfo_s
@@ -271,7 +272,7 @@ typedef struct AhdrContext_s
     uint32_t width;
     uint32_t height;
     int frameCnt;
-    int hdr_mode;
+    int FrameNumber;
     int sence_mode;
 } AhdrContext_t;
 

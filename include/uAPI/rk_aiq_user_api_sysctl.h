@@ -209,11 +209,38 @@ rk_aiq_uapi_sysctl_getEnabledAxlibCtx(const rk_aiq_sys_ctx_t* ctx, const int alg
  * \param[in] ctx             context
  * \param[out] stats          stats params
  * \return return 0 if success
+ * \note non-blocked interface, and copy the result to stats.
  */
 XCamReturn
 rk_aiq_uapi_sysctl_get3AStats(const rk_aiq_sys_ctx_t* ctx,
                               rk_aiq_isp_stats_t *stats);
 
+/*!
+ * \brief get 3a stats
+ *
+ * \param[in] ctx             context
+ * \param[out] stats          stats params ref
+ * \param[in] timeout_ms      -1 means wait always until stats is available or
+ *                            stopped
+ * \return return 0 if success
+ * \note blocked interface, and return the stats ref, user should
+ *       call \ref rk_aiq_uapi_sysctl_release3AStatsRef to release.
+ */
+XCamReturn
+rk_aiq_uapi_sysctl_get3AStatsBlk(const rk_aiq_sys_ctx_t* ctx,
+                              rk_aiq_isp_stats_t **stats, int timeout_ms);
+
+/*!
+ * \brief release 3a stats result ref
+ *
+ * \param[in] ctx             context
+ * \param[out] stats          stats ref
+ * \return void
+ * \note called with \ref rk_aiq_uapi_sysctl_get3AStatsBlk
+ */
+void
+rk_aiq_uapi_sysctl_release3AStatsRef(const rk_aiq_sys_ctx_t* ctx,
+                                     rk_aiq_isp_stats_t *stats);
 /*!
  * \brief set compensation light config
  *
