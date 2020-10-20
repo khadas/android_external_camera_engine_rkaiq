@@ -19,40 +19,44 @@
 
 #include "rk_aiq_algo_types_int.h"
 #include "aldch/rk_aiq_algo_aldch_itf.h"
+#include "aldch/rk_aiq_types_aldch_algo_prvt.h"
 #include "xcam_log.h"
-
-#define EPSINON 0.0000001
 
 RKAIQ_BEGIN_DECLARE
 
-typedef enum {
-    LDCH_CORRECT_LEVEL0,        // 100%
-    LDCH_CORRECT_LEVEL1,        // 75%
-    LDCH_CORRECT_LEVEL2,        // 100%
-    LDCH_CORRECT_LEVEL3,        // 75%
-    LDCH_BYPASS
-} LDCHCorrectLevel;
+static XCamReturn aiqGenLdchMeshInit(LDCHContext_t* ldchCtx)
+{
+    if (ldchCtx->genLdchMeshInit) {
+        LOGW_ALDCH("genLDCHMesh has been initialized!!\n");
+        return XCAM_RETURN_NO_ERROR;
+    }
 
-typedef struct LDCHContext_s {
-    unsigned char initialized;
-    unsigned int pic_width;
-    unsigned int pic_height;
-    unsigned int ldch_en;
-    unsigned int lut_h_size;
-    unsigned int lut_v_size;
-    unsigned int lut_mapxy_size;
-    unsigned short* lut_mapxy;
-    char meshfile[256];
-    unsigned char correct_level;
-    const char* resource_path;
-} LDCHContext_t;
+	genLdchMeshInit(ldchCtx->src_width, ldchCtx->src_height,
+                    ldchCtx->dst_width, ldchCtx->dst_height,
+                    ldchCtx->ldchParams, ldchCtx->camCoeff);
 
-typedef struct LDCHContext_s* LDCHHandle_t;
+    ldchCtx->lut_h_size = (ldchCtx->ldchParams.meshSizeW + 1) / 2; //word unit
+    ldchCtx->lut_v_size = ldchCtx->ldchParams.meshSizeH;
+    ldchCtx->lut_mapxy_size = ldchCtx->ldchParams.meshSize * sizeof(unsigned short);
+    LOGI_ALDCH("ldch en %d, h/v size(%dx%d), mapxy size(%d), correct_level: %d",
+               ldchCtx->ldch_en,
+               ldchCtx->lut_h_size,
+               ldchCtx->lut_v_size,
+               ldchCtx->lut_mapxy_size ,
+               ldchCtx->correct_level);
 
-typedef struct _RkAiqAlgoContext {
-    LDCHHandle_t hLDCH;
-    void* place_holder[0];
-} RkAiqAlgoContext;
+    // need re-alloc ?
+    if (ldchCtx->lut_mapxy) {
+        free(ldchCtx->lut_mapxy);
+        ldchCtx->lut_mapxy = NULL;
+        return XCAM_RETURN_ERROR_MEM;
+    }
+    ldchCtx->lut_mapxy = (unsigned short*)malloc(ldchCtx->lut_mapxy_size);
+    ldchCtx->genLdchMeshInit = true;
+
+    return XCAM_RETURN_NO_ERROR;
+}
+
 
 
 static XCamReturn
@@ -72,10 +76,50 @@ create_context(RkAiqAlgoContext **context, const AlgoCtxInstanceCfg* cfg)
         return XCAM_RETURN_ERROR_MEM;
     }
     /* setup config */
-    memset( ctx->hLDCH, 0, sizeof(LDCHContext_t) );
+    memset((void *)(ctx->hLDCH), 0, sizeof(LDCHContext_t) );
 
     /* return handle */
     *context = ctx;
+
+#if GENMESH_ONLINE
+    ctx->hLDCH->isAttribUpdated = false;
+    ctx->hLDCH->aldchReadMeshThread = new RKAiqAldchThread(ctx->hLDCH);
+    /* ctx->hLDCH->aldchReadMeshThread->triger_start(); */
+    /* ctx->hLDCH->aldchReadMeshThread->start(); */
+#endif
+
+    const AlgoCtxInstanceCfgInt* cfg_int = (const AlgoCtxInstanceCfgInt*)cfg;
+    LDCHHandle_t ldchCtx = ctx->hLDCH;
+    CalibDb_LDCH_t* calib_ldch = &cfg_int->calib->aldch;
+
+    ldchCtx->ldch_en = calib_ldch->ldch_en;
+    memcpy(ldchCtx->meshfile, calib_ldch->meshfile, sizeof(ldchCtx->meshfile));
+#if GENMESH_ONLINE
+    ldchCtx->camCoeff.cx = calib_ldch->light_center[0];
+    ldchCtx->camCoeff.cy = calib_ldch->light_center[1];
+    ldchCtx->camCoeff.a0 = calib_ldch->coefficient[0];
+    ldchCtx->camCoeff.a2 = calib_ldch->coefficient[1];
+    ldchCtx->camCoeff.a3 = calib_ldch->coefficient[2];
+    ldchCtx->camCoeff.a4 = calib_ldch->coefficient[3];
+    LOGI_ALDCH("(%s) len light center(%.16f, %.16f)\n",
+            __FUNCTION__,
+            ldchCtx->camCoeff.cx, ldchCtx->camCoeff.cy);
+    LOGI_ALDCH("(%s) len coefficient(%.16f, %.16f, %.16f, %.16f)\n",
+            __FUNCTION__,
+            ldchCtx->camCoeff.a0, ldchCtx->camCoeff.a2,
+            ldchCtx->camCoeff.a3, ldchCtx->camCoeff.a4);
+#endif
+    ldchCtx->correct_level = calib_ldch->correct_level;
+    ldchCtx->correct_level_max = calib_ldch->correct_level_max;
+
+    if (ldchCtx->correct_level_max != 255)
+        ldchCtx->correct_level = MAP_TO_255LEVEL(ldchCtx->correct_level, ldchCtx->correct_level_max);
+
+    LOGI_ALDCH("ldch en %d, meshfile: %s, correct_level-max: %d-%d from xml file",
+               calib_ldch->ldch_en,
+               ldchCtx->meshfile,
+               ldchCtx->correct_level,
+               ldchCtx->correct_level_max);
 
     return XCAM_RETURN_NO_ERROR;
 }
@@ -86,10 +130,17 @@ destroy_context(RkAiqAlgoContext *context)
     LDCHHandle_t hLDCH = (LDCHHandle_t)context->hLDCH;
     LDCHContext_t* ldchCtx = (LDCHContext_t*)hLDCH;
 
+#if GENMESH_ONLINE
+    ldchCtx->aldchReadMeshThread->triger_stop();
+    ldchCtx->aldchReadMeshThread->stop();
+#endif
     if (ldchCtx->lut_mapxy != NULL) {
         free(ldchCtx->lut_mapxy);
         ldchCtx->lut_mapxy = NULL;
     }
+#if GENMESH_ONLINE
+	genLdchMeshDeInit(ldchCtx->ldchParams);
+#endif
     delete context->hLDCH;
     context->hLDCH = NULL;
     delete context;
@@ -104,34 +155,85 @@ prepare(RkAiqAlgoCom* params)
     LDCHContext_t* ldchCtx = (LDCHContext_t*)hLDCH;
     RkAiqAlgoConfigAldchInt* rkaiqAldchConfig = (RkAiqAlgoConfigAldchInt*)params;
 
+#if 0 //moved to create_ctx
     ldchCtx->ldch_en = rkaiqAldchConfig->aldch_calib_cfg.ldch_en;
     memcpy(ldchCtx->meshfile, rkaiqAldchConfig->aldch_calib_cfg.meshfile, sizeof(ldchCtx->meshfile));
-    ldchCtx->resource_path = rkaiqAldchConfig->resource_path;
+#if GENMESH_ONLINE
+    ldchCtx->camCoeff.cx = rkaiqAldchConfig->aldch_calib_cfg.light_center[0];
+    ldchCtx->camCoeff.cy = rkaiqAldchConfig->aldch_calib_cfg.light_center[1];
+    ldchCtx->camCoeff.a0 = rkaiqAldchConfig->aldch_calib_cfg.coefficient[0];
+    ldchCtx->camCoeff.a2 = rkaiqAldchConfig->aldch_calib_cfg.coefficient[1];
+    ldchCtx->camCoeff.a3 = rkaiqAldchConfig->aldch_calib_cfg.coefficient[2];
+    ldchCtx->camCoeff.a4 = rkaiqAldchConfig->aldch_calib_cfg.coefficient[3];
+    LOGI_ALDCH("(%s) len light center(%.16f, %.16f)\n",
+            __FUNCTION__,
+            ldchCtx->camCoeff.cx, ldchCtx->camCoeff.cy);
+    LOGI_ALDCH("(%s) len coefficient(%.16f, %.16f, %.16f, %.16f)\n",
+            __FUNCTION__,
+            ldchCtx->camCoeff.a0, ldchCtx->camCoeff.a2,
+            ldchCtx->camCoeff.a3, ldchCtx->camCoeff.a4);
+#endif
+#endif
 
-    double correct_level = rkaiqAldchConfig->aldch_calib_cfg.correct_level;
-    if (fabs(correct_level) <= fabs(EPSINON)) {
-        ldchCtx->correct_level = LDCH_BYPASS;
-    } else if (correct_level >= 1.0) {
-        ldchCtx->correct_level = LDCH_CORRECT_LEVEL0;
-    } else if (1 - correct_level <= 0.25) {
-        ldchCtx->correct_level = LDCH_CORRECT_LEVEL1;
-    } else if (1 - correct_level <= 0.50) {
-        ldchCtx->correct_level = LDCH_CORRECT_LEVEL2;
-    } else if (1 - correct_level <= 0.75) {
-        ldchCtx->correct_level = LDCH_CORRECT_LEVEL3;
-    } else {
-        ldchCtx->correct_level = LDCH_BYPASS;
+    ldchCtx->src_width = params->u.prepare.sns_op_width;
+    ldchCtx->src_height = params->u.prepare.sns_op_height;
+    ldchCtx->dst_width = params->u.prepare.sns_op_width;
+    ldchCtx->dst_height = params->u.prepare.sns_op_height;
+    ldchCtx->resource_path = rkaiqAldchConfig->resource_path;
+#if GENMESH_ONLINE
+    // process the new attrib set before prepare
+    hLDCH->aldchReadMeshThread->triger_stop();
+    hLDCH->aldchReadMeshThread->stop();
+    if (!hLDCH->aldchReadMeshThread->is_empty()) {
+        hLDCH->aldchReadMeshThread->clear_attr();
+        ldchCtx->isAttribUpdated = true;
     }
 
-    LOGI_ALDCH("ldch en %d, meshfile: %s, correct_level: %d-%f from xml file",
-               rkaiqAldchConfig->aldch_calib_cfg.ldch_en,
-               ldchCtx->meshfile,
-               ldchCtx->correct_level,
-               correct_level);
+    if (ldchCtx->isAttribUpdated) {
+        ldchCtx->ldch_en = ldchCtx->user_config.en;
+        ldchCtx->correct_level = ldchCtx->user_config.correct_level;
+        ldchCtx->isAttribUpdated = false;
+    } else {
+        ldchCtx->user_config.en = ldchCtx->ldch_en;
+        ldchCtx->user_config.correct_level = ldchCtx->correct_level;
+    }
 
-    ldchCtx->pic_width = params->u.prepare.sns_op_width;
-    ldchCtx->pic_height = params->u.prepare.sns_op_height;
+#if 0
+	genLdchMeshInit(ldchCtx->src_width, ldchCtx->src_height,
+                    ldchCtx->dst_width, ldchCtx->dst_height,
+                    ldchCtx->ldchParams, ldchCtx->camCoeff);
 
+    ldchCtx->lut_h_size = (ldchCtx->ldchParams.meshSizeW + 1) / 2; //word unit
+    ldchCtx->lut_v_size = ldchCtx->ldchParams.meshSizeH;
+    ldchCtx->lut_mapxy_size = ldchCtx->ldchParams.meshSize * sizeof(unsigned short);
+    LOGI_ALDCH("ldch en %d, h/v size(%dx%d), mapxy size(%d), correct_level: %d",
+               ldchCtx->ldch_en,
+               ldchCtx->lut_h_size,
+               ldchCtx->lut_v_size,
+               ldchCtx->lut_mapxy_size ,
+               ldchCtx->correct_level);
+
+    // need re-alloc ?
+    if (ldchCtx->lut_mapxy) {
+        free(ldchCtx->lut_mapxy);
+        ldchCtx->lut_mapxy = NULL;
+    }
+    ldchCtx->lut_mapxy = (unsigned short*)malloc(ldchCtx->lut_mapxy_size);
+#endif
+
+    hLDCH->aldchReadMeshThread->triger_start();
+    hLDCH->aldchReadMeshThread->start();
+    if (!ldchCtx->ldch_en)
+        return XCAM_RETURN_NO_ERROR;
+
+    aiqGenLdchMeshInit(ldchCtx);
+    bool success = genLDCMeshNLevel(ldchCtx->ldchParams, ldchCtx->camCoeff,
+                                    ldchCtx->correct_level, ldchCtx->lut_mapxy);
+    if (!success) {
+        LOGW_ALDCH("lut is not exist");
+        ldchCtx->ldch_en = 0;
+    }
+#else
     if (!ldchCtx->ldch_en)
         return XCAM_RETURN_NO_ERROR;
 
@@ -152,7 +254,7 @@ prepare(RkAiqAlgoCom* params)
         fread(&hstep, sizeof(unsigned short), 1, ofp);
         fread(&vstep, sizeof(unsigned short), 1, ofp);
         //fseek(ofp, 0, SEEK_SET);
-        LOGI_ALDCH("lut info: [%d-%d-%d-%d-%d-%d]", hpic, vpic, hsize, vsize, hstep, vstep);
+        LOGE_ALDCH("lut info: [%d-%d-%d-%d-%d-%d]", hpic, vpic, hsize, vsize, hstep, vstep);
 
         ldchCtx->lut_h_size = hsize;
         ldchCtx->lut_v_size = vsize;
@@ -172,11 +274,12 @@ prepare(RkAiqAlgoCom* params)
             ldchCtx->ldch_en = 0;
             LOGE_ALDCH("mismatched lut calib file");
         }
-        LOGD_ALDCH("check calib file, size: %d, num: %d", ldchCtx->lut_mapxy_size, num);
+        LOGE_ALDCH("check calib file, size: %d, num: %d", ldchCtx->lut_mapxy_size, num);
     } else {
         LOGW_ALDCH("lut calib file not exist");
         ldchCtx->ldch_en = 0;
     }
+#endif
 
     return XCAM_RETURN_NO_ERROR;
 }
@@ -194,13 +297,32 @@ processing(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outparams)
     LDCHContext_t* ldchCtx = (LDCHContext_t*)hLDCH;
 
     RkAiqAlgoProcResAldchInt* ldchPreOut = (RkAiqAlgoProcResAldchInt*)outparams;
-    ldchPreOut->ldch_result.sw_ldch_en = ldchCtx->ldch_en;
-    // TODO: add update flag for ldch
-    if (ldchCtx->ldch_en) {
+
+    if (inparams->u.proc.init) {
+        ldchPreOut->ldch_result.update = 1;
+    } else {
+        if (ldchCtx->isAttribUpdated) {
+            ldchCtx->isAttribUpdated = false;
+            ldchPreOut->ldch_result.update = 1;
+        } else {
+            ldchPreOut->ldch_result.update = 0;
+        }
+
+        LOGV_ALDCH("(%s) en(%d), level(%d), user en(%d), level(%d), result update(%d)\n",
+                __FUNCTION__,
+                ldchCtx->ldch_en,
+                ldchCtx->correct_level,
+                ldchCtx->user_config.en,
+                ldchCtx->user_config.correct_level,
+                ldchPreOut->ldch_result.update);
+    }
+
+    if (ldchPreOut->ldch_result.update) {
+        ldchPreOut->ldch_result.sw_ldch_en = ldchCtx->ldch_en;
         ldchPreOut->ldch_result.lut_h_size = ldchCtx->lut_h_size;
         ldchPreOut->ldch_result.lut_v_size = ldchCtx->lut_v_size;
         ldchPreOut->ldch_result.lut_map_size = ldchCtx->lut_mapxy_size;
-        if (ldchCtx->lut_mapxy != NULL) {
+        if (ldchCtx->lut_mapxy != NULL && ldchCtx->ldch_en) {
             memcpy(ldchPreOut->ldch_result.lut_mapxy, ldchCtx->lut_mapxy,
                    ldchCtx->lut_mapxy_size);
         }
@@ -232,3 +354,41 @@ RkAiqAlgoDescription g_RkIspAlgoDescAldch = {
 };
 
 RKAIQ_END_DECLARE
+
+
+bool RKAiqAldchThread::loop()
+{
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    ENTER_ANALYZER_FUNCTION();
+
+    const static int32_t timeout = -1;
+    SmartPtr<rk_aiq_ldch_cfg_t> attrib = mAttrQueue.pop (timeout);
+
+    if (!attrib.ptr()) {
+        LOGW_ANALYZER("RKAiqAldchThread got empty attrib, stop thread");
+        return false;
+    }
+#if GENMESH_ONLINE
+    if (attrib->en && (hLDCH->ldch_en != attrib->en || \
+	    attrib->correct_level != hLDCH->correct_level)) {
+        aiqGenLdchMeshInit(hLDCH);
+        bool success = genLDCMeshNLevel(hLDCH->ldchParams, hLDCH->camCoeff,
+                attrib->correct_level, hLDCH->lut_mapxy);
+        if (!success)
+            LOGW_ALDCH("lut is not exist");
+    }
+    hLDCH->ldch_en = hLDCH->user_config.en;
+    hLDCH->correct_level = hLDCH->user_config.correct_level;
+#endif
+    if (ret == XCAM_RETURN_NO_ERROR) {
+        hLDCH->isAttribUpdated = true;
+        LOGV_ANALYZER("ldch en(%d), level(%d)\n", hLDCH->ldch_en, hLDCH->correct_level);
+        return true;
+    }
+
+    LOGE_ANALYZER("RKAiqAldchThread failed to read mesh table!");
+
+    EXIT_ANALYZER_FUNCTION();
+
+    return false;
+}

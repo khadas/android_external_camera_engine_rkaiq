@@ -3,4 +3,9 @@
 
 #include "rk_aiq_types_aldch_algo.h"
 
+typedef struct rk_aiq_ldch_cfg_s {
+    unsigned int en;
+    int correct_level;
+} rk_aiq_ldch_cfg_t;
+
 #endif

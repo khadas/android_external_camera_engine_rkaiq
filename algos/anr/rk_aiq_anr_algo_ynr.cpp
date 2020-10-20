@@ -3,7 +3,47 @@
 
 RKAIQ_BEGIN_DECLARE
 
-ANRresult_t ynr_get_setting_idx_by_name(CalibDb_YNR_t *pCalibdb, char *name, int *setting_idx)
+ANRresult_t ynr_get_mode_cell_idx_by_name(CalibDb_YNR_t *pCalibdb, char *name, int *mode_idx)
+{
+	int i = 0;
+	ANRresult_t res = ANR_RET_SUCCESS;
+
+	if(pCalibdb == NULL){
+		LOGE_ANR("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
+		return ANR_RET_NULL_POINTER;
+	}
+
+	if(name == NULL){
+		LOGE_ANR("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
+		return ANR_RET_NULL_POINTER;
+	}
+
+	if(mode_idx == NULL){
+		LOGE_ANR("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
+		return ANR_RET_NULL_POINTER;
+	}
+
+	for(i=0; i<CALIBDB_NR_SHARP_SETTING_LEVEL; i++){
+		if(strncmp(name, pCalibdb->mode_cell[i].name, sizeof(pCalibdb->mode_cell[i].name)) == 0){
+			break;
+		}
+	}
+
+	if(i<CALIBDB_MAX_MODE_NUM){
+		*mode_idx = i;
+		res = ANR_RET_SUCCESS;
+	}else{
+		*mode_idx = 0;
+		res = ANR_RET_FAILURE;
+	}
+
+	LOGD_ANR("%s:%d mode_name:%s  mode_idx:%d i:%d \n", __FUNCTION__, __LINE__, name, *mode_idx, i);
+	return res;
+
+}
+
+
+ANRresult_t ynr_get_setting_idx_by_name(CalibDb_YNR_t *pCalibdb, char *name, int mode_idx, int *setting_idx)
 {
 	int i = 0;
 	ANRresult_t res = ANR_RET_SUCCESS;
@@ -24,7 +64,7 @@ ANRresult_t ynr_get_setting_idx_by_name(CalibDb_YNR_t *pCalibdb, char *name, int
 	}
 
 	for(i=0; i<CALIBDB_NR_SHARP_SETTING_LEVEL; i++){
-		if(strncmp(name, pCalibdb->setting[i].name, sizeof(pCalibdb->setting[i].name)) == 0){
+		if(strncmp(name, pCalibdb->mode_cell[mode_idx].setting[i].snr_mode, sizeof(pCalibdb->mode_cell[mode_idx].setting[i].snr_mode)) == 0){
 			break;
 		}
 	}
@@ -42,9 +82,10 @@ ANRresult_t ynr_get_setting_idx_by_name(CalibDb_YNR_t *pCalibdb, char *name, int
 
 }
 
-ANRresult_t ynr_config_setting_param(RKAnr_Ynr_Params_s *pParams, CalibDb_YNR_t *pCalibdb, char* snr_name)
+ANRresult_t ynr_config_setting_param(RKAnr_Ynr_Params_s *pParams, CalibDb_YNR_t *pCalibdb, char* param_mode, char* snr_name)
 {
 	ANRresult_t res = ANR_RET_SUCCESS;
+	int mode_idx = 0;
 	int setting_idx = 0;
 
 	if(pParams == NULL){
@@ -57,17 +98,22 @@ ANRresult_t ynr_config_setting_param(RKAnr_Ynr_Params_s *pParams, CalibDb_YNR_t 
 		return ANR_RET_NULL_POINTER;
 	}
 
-	res = ynr_get_setting_idx_by_name(pCalibdb, snr_name, &setting_idx);
+	res = ynr_get_mode_cell_idx_by_name(pCalibdb, param_mode, &mode_idx);
+	if(res != ANR_RET_SUCCESS){
+		LOGW_ANR("%s(%d): error!!!  can't find mode name in iq files, use 0 instead\n", __FUNCTION__, __LINE__);
+	}
+	
+	res = ynr_get_setting_idx_by_name(pCalibdb, snr_name, mode_idx, &setting_idx);
 	if(res != ANR_RET_SUCCESS){
 		LOGW_ANR("%s(%d): error!!!  can't find setting in iq files, use 0 instead\n", __FUNCTION__, __LINE__);
 	}
 
-	res = init_ynr_params(pParams, pCalibdb, setting_idx);
+	res = init_ynr_params(pParams, pCalibdb, mode_idx, setting_idx);
 
 	return res;
 
 }
-ANRresult_t init_ynr_params(RKAnr_Ynr_Params_s *pYnrParams, CalibDb_YNR_t* pYnrCalib, int setting_idx)
+ANRresult_t init_ynr_params(RKAnr_Ynr_Params_s *pYnrParams, CalibDb_YNR_t* pYnrCalib, int mode_idx, int setting_idx)
 {
     ANRresult_t res = ANR_RET_SUCCESS;
     int i = 0;
@@ -84,7 +130,7 @@ ANRresult_t init_ynr_params(RKAnr_Ynr_Params_s *pYnrParams, CalibDb_YNR_t* pYnrC
     }
 
     RKAnr_Ynr_Params_Select_t *pParams = pYnrParams->aYnrParamsISO;
-	CalibDb_YNR_ISO_t *pCalibdb = pYnrCalib->setting[setting_idx].ynr_iso;
+	CalibDb_YNR_ISO_t *pCalibdb = pYnrCalib->mode_cell[mode_idx].setting[setting_idx].ynr_iso;
 
     short isoCurveSectValue;
     short isoCurveSectValue1;
@@ -553,6 +599,11 @@ ANRresult_t ynr_fix_transfer(RKAnr_Ynr_Params_Select_t* ynr, RKAnr_Ynr_Fix_t *pN
         return ANR_RET_NULL_POINTER;
     }
 
+	LOGD_ANR("%s:%d strength:%f\n", __FUNCTION__, __LINE__, fStrength);
+	if(fStrength <= 0.0){
+		fStrength = 0.000001;
+	}
+	
     int i = 0;
     int j = 0;
     int tmp = 0;
@@ -703,7 +754,7 @@ ANRresult_t ynr_fix_transfer(RKAnr_Ynr_Params_Select_t* ynr, RKAnr_Ynr_Fix_t *pN
 		if(i>strength_i){
 			tmp = (ynr->hiFreqBfScale[i] * (1 << FIX_BIT_BF_SCALE));
 		}else{
-          tmp = (ynr->hiFreqBfScale[i] *   (1 << FIX_BIT_BF_SCALE));
+          tmp = (ynr->hiFreqBfScale[i] * fStrength *  (1 << FIX_BIT_BF_SCALE));
 		}
 		if(tmp > 0xff){
 			tmp = 0xff;

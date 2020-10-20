@@ -33,13 +33,14 @@ namespace RkCam {
 #define MAX_MEDIA_INDEX               16
 #define DEV_PATH_LEN                  64
 #define SENSOR_ATTACHED_FLASH_MAX_NUM 2
+#define MAX_CIF_NUM               2
 
 #define ISP_TX_BUF_NUM 4
 #define VIPCAP_TX_BUF_NUM 6
 
 typedef struct {
-    int  model_idx:3;
-    int  linked_sensor:3;
+    int  model_idx: 3;
+    int  linked_sensor: 3;
     char media_dev_path[DEV_PATH_LEN];
     char isp_dev_path[DEV_PATH_LEN];
     char csi_dev_path[DEV_PATH_LEN];
@@ -98,6 +99,7 @@ typedef struct {
 } rk_aiq_isp_hw_info_t;
 
 typedef struct {
+    int  model_idx: 3;
     char media_dev_path[DEV_PATH_LEN];
     char mipi_id0[DEV_PATH_LEN];
     char mipi_id1[DEV_PATH_LEN];
@@ -108,6 +110,11 @@ typedef struct {
     char lvds_sd_path[DEV_PATH_LEN];
     char mipi_luma_path[DEV_PATH_LEN];
 } rk_aiq_cif_info_t;
+
+typedef struct {
+    rk_aiq_cif_info_t cif_info[MAX_CIF_NUM];
+    rk_aiq_hw_ver_t hw_ver_info;
+} rk_aiq_cif_hw_info_t;
 
 typedef struct {
     /* sensor entity name format:
@@ -152,12 +159,16 @@ public:
     virtual XCamReturn prepare(uint32_t width, uint32_t height, int mode, int t_delay, int g_delay);
     virtual XCamReturn start();
     virtual XCamReturn stop();
+    virtual XCamReturn pause();
+    virtual XCamReturn resume();
+    virtual XCamReturn swWorkingModeDyn(int mode);
     virtual XCamReturn getSensorModeData(const char* sns_ent_name,
                                          rk_aiq_exposure_sensor_descriptor& sns_des);
     XCamReturn setIspParamsSync(int frameId);
     XCamReturn setIsppParamsSync(int frameId);
     virtual XCamReturn setIspParams(SmartPtr<RkAiqIspParamsProxy>& ispParams);
     virtual XCamReturn setExposureParams(SmartPtr<RkAiqExpParamsProxy>& expPar);
+    virtual XCamReturn setIrisParams(SmartPtr<RkAiqIrisParamsProxy>& irisPar, CalibDb_IrisType_t irisType);
     virtual XCamReturn setHdrProcessCount(int frame_id, int count);
     virtual XCamReturn setFocusParams(SmartPtr<RkAiqFocusParamsProxy>& focus_params);
     virtual XCamReturn setCpslParams(SmartPtr<RkAiqCpslParamsProxy>& cpsl_params);
@@ -169,23 +180,30 @@ public:
     XCamReturn setupHdrLink(int mode, int isp_index, bool enable);
     static XCamReturn selectIqFile(const char* sns_ent_name, char* iqfile_name);
     static const char* getBindedSnsEntNmByVd(const char* vd);
-    XCamReturn setExpDelayInfo(int time_delay, int gain_delay);
+    XCamReturn setExpDelayInfo(int mode);
     XCamReturn getEffectiveIspParams(SmartPtr<RkAiqIspParamsProxy>& ispParams, int frame_id);
     XCamReturn setModuleCtl(rk_aiq_module_id_t moduleId, bool en);
     XCamReturn getModuleCtl(rk_aiq_module_id_t moduleId, bool& en);
     XCamReturn notify_capture_raw();
-    XCamReturn capture_raw_ctl(bool sync);
+    XCamReturn capture_raw_ctl(capture_raw_t type, int count = 0, const char* capture_dir = nullptr, char* output_dir = nullptr);
     void setDhazState(float& on);
     bool getDhazState();
     XCamReturn enqueueBuffer(struct rk_aiq_vbuf *vbuf);
     XCamReturn offlineRdJobPrepare();
     XCamReturn offlineRdJobDone();
+    void setHdrGlobalTmoMode(int frame_id, bool mode);
     XCamReturn setSharpFbcRotation(rk_aiq_rotation_t rot) {
         _sharp_fbc_rotation = rot;
         return XCAM_RETURN_NO_ERROR;
     }
-    XCamReturn setSensorFlip(bool mirror, bool flip);
+    XCamReturn setSensorFlip(bool mirror, bool flip, int skip_frm_cnt);
     XCamReturn getSensorFlip(bool& mirror, bool& flip);
+    void setMulCamConc(bool cc);
+    XCamReturn getZoomPosition(int& position);
+    XCamReturn getLensVcmCfg(rk_aiq_lens_vcmcfg& lens_cfg);
+    XCamReturn setLensVcmCfg(rk_aiq_lens_vcmcfg& lens_cfg);
+    XCamReturn setLensVcmCfg();
+
 private:
     XCAM_DEAD_COPY(CamHwIsp20);
     enum cam_hw_state_e {
@@ -193,6 +211,7 @@ private:
         CAM_HW_STATE_INITED,
         CAM_HW_STATE_PREPARED,
         CAM_HW_STATE_STARTED,
+        CAM_HW_STATE_PAUSED,
         CAM_HW_STATE_STOPPED,
     };
     enum ircut_state_e {
@@ -204,7 +223,6 @@ private:
     int _hdr_mode;
     Mutex _mutex;
     int _state;
-    bool _first;
     volatile bool _is_exit;
     bool _linked_to_isp;
     SmartPtr<RkAiqIspParamsProxy> _last_aiq_results;
@@ -221,7 +239,7 @@ private:
     std::map<int, SmartPtr<RkAiqIspParamsProxy>> _effecting_ispparm_map;
     static std::map<std::string, SmartPtr<rk_aiq_static_info_t>> mCamHwInfos;
     static rk_aiq_isp_hw_info_t mIspHwInfos;
-    static rk_aiq_cif_info_t mCifHwInfos;
+    static rk_aiq_cif_hw_info_t mCifHwInfos;
     static std::map<std::string, SmartPtr<rk_sensor_full_info_t>> mSensorHwInfos;
     void gen_full_isp_params(const struct isp2x_isp_params_cfg* update_params,
                              struct isp2x_isp_params_cfg* full_params);
@@ -246,7 +264,19 @@ private:
     XCamReturn setupPipelineFmtCif(struct v4l2_subdev_selection& sns_sd_sel,
                                    struct v4l2_subdev_format& sns_sd_fmt,
                                    __u32 sns_v4l_pix_fmt);
-    XCamReturn setupHdrLink_vidcap(int hdr_mode, bool enable);
+    XCamReturn setupHdrLink_vidcap(int hdr_mode, int cif_index, bool enable);
+    enum mipi_stream_idx {
+        MIPI_STREAM_IDX_0   = 1,
+        MIPI_STREAM_IDX_1   = 2,
+        MIPI_STREAM_IDX_2   = 4,
+        MIPI_STREAM_IDX_ALL = 7,
+    };
+    XCamReturn hdr_mipi_start(int idx = MIPI_STREAM_IDX_ALL);
+    XCamReturn hdr_mipi_start_mode(int mode);
+    XCamReturn hdr_mipi_stop(int idx = MIPI_STREAM_IDX_ALL);
+    XCamReturn hdr_mipi_prepare_mode(int mode);
+    XCamReturn hdr_mipi_prepare(int idx);
+    void prepare_cif_mipi();
     uint32_t _isp_module_ens;
     bool mNormalNoReadBack;
     bool mIsDhazOn;

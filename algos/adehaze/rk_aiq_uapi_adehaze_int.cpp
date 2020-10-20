@@ -8,39 +8,37 @@ rk_aiq_uapi_adehaze_SetAttrib(RkAiqAlgoContext *ctx,
                               bool need_sync)
 {
     AdehazeHandle_t * AdehazeHandle = (AdehazeHandle_t *)ctx;
-    if(attr.mode == RK_AIQ_DEHAZE_MODE_AUTO) {
-        for(int i=0; i<9; i++) {
-            AdehazeHandle->calib_dehaz->dehaze_iso.dehaze_en[i] = attr.stAuto.sw_dhaz_en;
-            AdehazeHandle->calib_dehaz->dehaze_iso.enhance_en[i] = attr.stAuto.enhance_en;
-            AdehazeHandle->calib_dehaz->dehaze_iso.cfg_alpha[i] = attr.stAuto.cfg_alpha;
-        }
-    }else if(attr.mode == RK_AIQ_DEHAZE_MODE_MANUAL) {
-        for(int i=0; i<9; i++) {
-            AdehazeHandle->calib_dehaz->dehaze_iso.dehaze_en[i] = attr.stManual.sw_dhaz_en;
-            AdehazeHandle->calib_dehaz->dehaze_iso.enhance_en[i] = attr.stManual.enhance_en;
-            AdehazeHandle->calib_dehaz->dehaze_iso.cfg_alpha[i] = attr.stManual.cfg_alpha;
-            AdehazeHandle->calib_dehaz->dehaze_iso.cfg_wt[i] = attr.stManual.sw_dhaz_cfg_wt;
-            AdehazeHandle->calib_dehaz->dehaze_iso.cfg_air[i] = attr.stManual.sw_dhaz_cfg_air;
-            AdehazeHandle->calib_dehaz->dehaze_iso.cfg_tmax[i] = attr.stManual.sw_dhaz_cfg_tmax;
-            AdehazeHandle->calib_dehaz->dehaze_iso.cfg_gratio[i] = attr.stManual.sw_dhaz_cfg_gratio;
-        }
-    }else if(attr.mode == RK_AIQ_DEHAZE_MODE_ENHANCE){
-        for(int i=0; i<9; i++) {
-            AdehazeHandle->calib_dehaz->dehaze_iso.dehaze_en[i] = attr.stEnhance.sw_dhaz_en;
-            AdehazeHandle->calib_dehaz->dehaze_iso.enhance_en[i] = attr.stEnhance.enhance_en;
-            AdehazeHandle->calib_dehaz->dehaze_iso.cfg_alpha[i] = attr.stEnhance.cfg_alpha;
-            AdehazeHandle->calib_dehaz->dehaze_iso.enhance_value[i] = attr.stEnhance.level;
-        }
-    }else{
+    LOGD_ADEHAZE("%s: setMode:%d", __func__, attr.mode);
+    AdehazeHandle->AdehazeAtrr.byPass = attr.byPass;
+    AdehazeHandle->AdehazeAtrr.mode = attr.mode;
+    if(attr.mode == RK_AIQ_DEHAZE_MODE_AUTO)
+        memcpy(&AdehazeHandle->AdehazeAtrr.stAuto, &attr.stAuto, sizeof(CalibDb_Dehaze_t));
+    else if(attr.mode == RK_AIQ_DEHAZE_MODE_MANUAL)
+        memcpy(&AdehazeHandle->AdehazeAtrr.stManual, &attr.stManual, sizeof(rk_aiq_dehaze_M_attrib_t));
+    else if(attr.mode == RK_AIQ_DEHAZE_MODE_OFF)
+        memcpy(&AdehazeHandle->AdehazeAtrr.stEnhance, &attr.stEnhance, sizeof(rk_aiq_dehaze_enhance_t));
+    else if(attr.mode == RK_AIQ_DEHAZE_MODE_TOOL)
+        memcpy(&AdehazeHandle->AdehazeAtrr.stTool, &attr.stTool, sizeof(CalibDb_Dehaze_t));
+    else {
         LOGE_ADEHAZE("invalid mode!");
     }
     return XCAM_RETURN_NO_ERROR;
 }
 
 XCamReturn
-rk_aiq_uapi_adehaze_GetAttrib(RkAiqAlgoContext *ctx,
-                              adehaze_sw_t *attr)
+rk_aiq_uapi_adehaze_GetAttrib(RkAiqAlgoContext *ctx, adehaze_sw_t *attr)
 {
+    AdehazeHandle_t * AdehazeHandle = (AdehazeHandle_t *)ctx;
+    attr->mode = AdehazeHandle->AdehazeAtrr.mode;
+    if (AdehazeHandle->AdehazeAtrr.mode == RK_AIQ_DEHAZE_MODE_AUTO)
+        memcpy(&attr->stAuto, &AdehazeHandle->AdehazeAtrr.stAuto, sizeof(CalibDb_Dehaze_t));
+    else if (AdehazeHandle->AdehazeAtrr.mode == RK_AIQ_DEHAZE_MODE_MANUAL)
+        memcpy(&attr->stManual, &AdehazeHandle->AdehazeAtrr.stManual, sizeof(rk_aiq_dehaze_M_attrib_t));
+    else if (AdehazeHandle->AdehazeAtrr.mode == RK_AIQ_DEHAZE_MODE_OFF)
+        memcpy(&attr->stEnhance, &AdehazeHandle->AdehazeAtrr.stEnhance, sizeof(rk_aiq_dehaze_enhance_t));
+    else if (AdehazeHandle->AdehazeAtrr.mode == RK_AIQ_DEHAZE_MODE_TOOL)
+        memcpy(&attr->stTool, &AdehazeHandle->AdehazeAtrr.stTool, sizeof(CalibDb_Dehaze_t));
+
     return XCAM_RETURN_NO_ERROR;
 }
 

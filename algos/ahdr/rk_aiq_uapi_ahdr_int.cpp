@@ -21,6 +21,7 @@ rk_aiq_uapi_ahdr_SetAttrib
     pAhdrCtx->hdrAttr.bEnable = need_sync;
     pAhdrCtx->hdrAttr.opMode = attr.opMode;
     pAhdrCtx->hdrAttr.level = attr.level;
+    pAhdrCtx->hdrAttr.level_Linear_Dark = attr.level_Linear_Dark;
 
     if (need_sync == true)
     {
@@ -83,12 +84,15 @@ rk_aiq_uapi_ahdr_GetAttrib
     attr->bEnable = pAhdrCtx->hdrAttr.bEnable;
     attr->opMode = pAhdrCtx->hdrAttr.opMode;
     attr->level = pAhdrCtx->hdrAttr.level;
+    attr->level_Linear_Dark = pAhdrCtx->hdrAttr.level_Linear_Dark;
 
     memcpy(&attr->stAuto.stMgeAuto, &pAhdrCtx->hdrAttr.stAuto.stMgeAuto, sizeof(amgeAttr_t));
     memcpy(&attr->stAuto.stTmoAuto, &pAhdrCtx->hdrAttr.stAuto.stTmoAuto, sizeof(atmoAttr_t));
 
     memcpy(&attr->stManual.stMgeManual, &pAhdrCtx->hdrAttr.stManual.stMgeManual, sizeof(mmgeAttr_t));
     memcpy(&attr->stManual.stTmoManual, &pAhdrCtx->hdrAttr.stManual.stTmoManual, sizeof(mtmoAttr_t));
+    memcpy(&attr->CtlInfo, &pAhdrCtx->hdrAttr.CtlInfo, sizeof(CurrCtlData_t));
+    memcpy(&attr->RegInfo, &pAhdrCtx->hdrAttr.RegInfo, sizeof(CurrRegData_t));
 
     return XCAM_RETURN_NO_ERROR;
 }

@@ -28,8 +28,15 @@ extern int g_bypass_exp_params;
 extern int g_bypass_isp_params;
 extern int g_bypass_ispp_params;
 extern int g_apply_init_params_only;
+extern int g_disable_algo_user_api_mask;
 extern void get_dbg_force_disable_mods_env();
 extern int get_rkaiq_runtime_dbg();
+#define CHECK_USER_API_ENABLE(mask) \
+    if (g_disable_algo_user_api_mask & (1 << mask)) { \
+        ALOGE("algo module index %d user api disabled !", mask); \
+        return XCAM_RETURN_NO_ERROR; \
+    }
+
 #endif
 
 #endif

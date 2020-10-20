@@ -29,7 +29,46 @@ AblcResult_t Ablc_html_params_init(AblcParams_t *pParams)
     return ret;
 }
 
-AblcResult_t Ablc_xml_params_init(AblcParams_t *pParams, CalibDb_Blc_t* pBlcCalib)
+AblcResult_t Ablc_get_mode_cell_idx_by_name(CalibDb_Blc_t *pCalibdb, char *name, int *mode_idx)
+{
+	int i = 0;
+	AblcResult_t res = ABLC_RET_SUCCESS;
+
+	if(pCalibdb == NULL){
+		LOGE_ABLC("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
+		return ABLC_RET_NULL_POINTER;
+	}
+
+	if(name == NULL){
+		LOGE_ABLC("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
+		return ABLC_RET_NULL_POINTER;
+	}
+
+	if(mode_idx == NULL){
+		LOGE_ABLC("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
+		return ABLC_RET_NULL_POINTER;
+	}
+
+	for(i=0; i<CALIBDB_MAX_MODE_NUM; i++){
+		if(strncmp(name, pCalibdb->mode_cell[i].name, sizeof(pCalibdb->mode_cell[i].name)) == 0){
+			break;
+		}
+	}
+
+	if(i<CALIBDB_MAX_MODE_NUM){
+		*mode_idx = i;
+		res = ABLC_RET_SUCCESS;
+	}else{
+		*mode_idx = 0;
+		res = ABLC_RET_FAILURE;
+	}
+
+	LOGD_ABLC("%s:%d mode_name:%s  mode_idx:%d i:%d \n", __FUNCTION__, __LINE__,name, *mode_idx, i);
+	return res;
+
+}
+
+AblcResult_t Ablc_xml_params_init(AblcParams_t *pParams, CalibDb_Blc_t* pBlcCalib, int mode_idx)
 {
     AblcResult_t ret = ABLC_RET_SUCCESS;
 
@@ -51,28 +90,83 @@ AblcResult_t Ablc_xml_params_init(AblcParams_t *pParams, CalibDb_Blc_t* pBlcCali
 
     pParams->enable = pBlcCalib->enable;
 
-#if 0
+
     for(int i = 0; i < BLC_MAX_ISO_LEVEL; i++) {
-        pParams->iso[i] = isoBase * (1 << i);
-        pParams->blc_r[i] = (short int)(pBlcCalib->level[0]);
-        pParams->blc_gr[i] = (short int)(pBlcCalib->level[1]);
-        pParams->blc_gb[i] = (short int)(pBlcCalib->level[2]);
-        pParams->blc_b[i] = (short int)(pBlcCalib->level[3]);
+        pParams->iso[i] = (int)(pBlcCalib->mode_cell[mode_idx].iso[i]);
+        pParams->blc_r[i] = (short int)(pBlcCalib->mode_cell[mode_idx].level[0][i]);
+        pParams->blc_gr[i] = (short int)(pBlcCalib->mode_cell[mode_idx].level[1][i]);
+        pParams->blc_gb[i] = (short int)(pBlcCalib->mode_cell[mode_idx].level[2][i]);
+        pParams->blc_b[i] = (short int)(pBlcCalib->mode_cell[mode_idx].level[3][i]);
     }
-#else
-    for(int i = 0; i < BLC_MAX_ISO_LEVEL; i++) {
-        pParams->iso[i] = (int)(pBlcCalib->iso[i]);
-        pParams->blc_r[i] = (short int)(pBlcCalib->level[0][i]);
-        pParams->blc_gr[i] = (short int)(pBlcCalib->level[1][i]);
-        pParams->blc_gb[i] = (short int)(pBlcCalib->level[2][i]);
-        pParams->blc_b[i] = (short int)(pBlcCalib->level[3][i]);
-    }
-#endif
+
 
     LOGI_ABLC("%s(%d): exit!\n", __FUNCTION__, __LINE__);
     return ret;
 }
 
+
+AblcResult_t Ablc_config_mode_param(AblcParams_t *pParams, CalibDb_Blc_t* pBlcCalib, AblcParamMode_t eParamMode)
+{
+	AblcResult_t res = ABLC_RET_SUCCESS;
+	int mode_idx = 0;
+	char mode_name[CALIBDB_MAX_MODE_NAME_LENGTH];
+
+	memset(mode_name, 0x00, sizeof(mode_name));
+
+	if(pParams == NULL){
+		LOGE_ASHARP("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
+		return ABLC_RET_NULL_POINTER;
+	}
+
+	if(pBlcCalib == NULL){
+		LOGE_ASHARP("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
+		return ABLC_RET_NULL_POINTER;
+	}
+	
+	 //select param mode first
+	if(eParamMode == ABLC_PARAM_MODE_NORMAL){
+		sprintf(mode_name, "%s", "normal");
+	}else if(eParamMode == ABLC_PARAM_MODE_HDR){
+		sprintf(mode_name, "%s", "hdr");
+	}else{
+		LOGE_ANR("%s(%d): not support param mode!\n", __FUNCTION__, __LINE__);
+		sprintf(mode_name, "%s", "normal");
+	}
+	
+	res = Ablc_get_mode_cell_idx_by_name(pBlcCalib, mode_name, &mode_idx);
+	if(res != ABLC_RET_SUCCESS){
+		LOGE_ASHARP("%s(%d): error!!!  can't find mode name in iq files, use 0 instead\n", __FUNCTION__, __LINE__);
+	}
+
+	Ablc_xml_params_init(pParams, pBlcCalib, mode_idx);
+
+	LOGD_ABLC("%s(%d): finnal: mode:%d \n", __FUNCTION__, __LINE__, mode_idx);
+	return res;
+}
+
+
+
+AblcResult_t AblcParamModeProcess(AblcContext_t *pAblcCtx, AblcExpInfo_t *pExpInfo, AblcParamMode_t *mode)
+{
+	AblcResult_t res  = ABLC_RET_SUCCESS;
+		
+	if(pAblcCtx == NULL) {
+    	LOGE_ABLC("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
+    	return ABLC_RET_NULL_POINTER;
+	}
+
+	*mode = pAblcCtx->eParamMode;
+
+	if(pExpInfo->hdr_mode == 1){
+		*mode = ABLC_PARAM_MODE_NORMAL;
+	}else if(pExpInfo->hdr_mode > 1){
+		*mode = ABLC_PARAM_MODE_HDR;
+	}else{
+		*mode = ABLC_PARAM_MODE_NORMAL;
+	}
+
+	return res;
+}
 
 AblcResult_t Ablc_Select_Params_By_ISO(AblcParams_t *pParams, AblcParamsSelect_t *pSelect, AblcExpInfo_t *pExpInfo)
 {
@@ -177,7 +271,8 @@ AblcResult_t AblcInit(AblcContext_t **ppAblcCtx, CamCalibDbContext_t *pCalibDb)
 #if 1
     //xml param
     pAblcCtx->stBlcCalib = pCalibDb->blc;
-    Ablc_xml_params_init(&pAblcCtx->stAuto.stParams, &pAblcCtx->stBlcCalib);
+	pAblcCtx->eParamMode = ABLC_PARAM_MODE_NORMAL;
+    Ablc_config_mode_param(&pAblcCtx->stAuto.stParams, &pAblcCtx->stBlcCalib, pAblcCtx->eParamMode);
 #else
     //static init params
     Ablc_html_params_init(&pAblcCtx->stAuto.stParams);
@@ -259,7 +354,8 @@ AblcResult_t AblcProcess(AblcContext_t *pAblcCtx, AblcExpInfo_t *pExpInfo)
 {
     LOGI_ABLC("%s(%d): enter!\n", __FUNCTION__, __LINE__);
     AblcResult_t ret = ABLC_RET_SUCCESS;
-
+	AblcParamMode_t mode = ABLC_PARAM_MODE_INVALID;
+	
     if(pAblcCtx == NULL) {
         LOGE_ABLC("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
         return ABLC_RET_NULL_POINTER;
@@ -269,10 +365,17 @@ AblcResult_t AblcProcess(AblcContext_t *pAblcCtx, AblcExpInfo_t *pExpInfo)
         LOGE_ABLC("%s(%d): null pointer \n", __FUNCTION__, __LINE__);
         return ABLC_RET_NULL_POINTER;
     }
+
+	AblcParamModeProcess(pAblcCtx, pExpInfo, &mode);
     memcpy(&pAblcCtx->stExpInfo, pExpInfo, sizeof(AblcExpInfo_t));
 
     if(pAblcCtx->eMode == ABLC_OP_MODE_AUTO) {
+		if(mode != pAblcCtx->eParamMode){
+			pAblcCtx->eParamMode = mode;
+			Ablc_config_mode_param(&pAblcCtx->stAuto.stParams, &pAblcCtx->stBlcCalib, pAblcCtx->eParamMode);
+		}
         ret = Ablc_Select_Params_By_ISO(&pAblcCtx->stAuto.stParams, &pAblcCtx->stAuto.stSelect, pExpInfo);
+		
     }
 
     LOGI_ABLC("%s(%d): exit!\n", __FUNCTION__, __LINE__);

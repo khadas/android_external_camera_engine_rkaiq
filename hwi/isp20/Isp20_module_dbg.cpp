@@ -33,6 +33,7 @@ static const char* rkaiq_runtime_dbg_en = "rkaiq_runtime_dbg_en";
 static const char* force_disable_modules_en = "force_disable_modules_en";
 static const char* force_disable_modules_cfg_update = "force_disable_modules_cfg_update";
 static const char* force_bypass_modules_params = "force_bypass_modules_params";
+static const char* disable_algo_user_api_mask = "disable_algo_user_api_mask";
 static unsigned long long g_disable_modules_en = 0x0;
 static unsigned long long g_disable_modules_cfg_update = 0x0;
 static unsigned long long g_bypass_module_params = 0;
@@ -51,6 +52,8 @@ int g_bypass_isp_params = 0;
 int g_bypass_ispp_params = 0;
 /* just apply the init params, and bypass the latter params */
 int g_apply_init_params_only = 0;
+/* mask bit refer to RkAiqAlgoType_t in rk_aiq_algo_des.h */
+int g_disable_algo_user_api_mask = 0x0;
 
 int get_rkaiq_runtime_dbg()
 {
@@ -63,6 +66,10 @@ int get_rkaiq_runtime_dbg()
 
 void get_dbg_force_disable_mods_env()
 {
+    unsigned long long tmp = 0;
+    xcam_get_enviroment_value(disable_algo_user_api_mask, &tmp);
+    g_disable_algo_user_api_mask = (int)tmp;
+
     xcam_get_enviroment_value(force_bypass_modules_params, &g_bypass_module_params);
 
     if (g_bypass_module_params & (1ULL << SENSOR_EXPOSURE_ID))

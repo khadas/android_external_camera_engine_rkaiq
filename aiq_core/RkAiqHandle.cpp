@@ -267,7 +267,7 @@ RkAiqAeHandle::postProcess()
     ENTER_ANALYZER_FUNCTION();
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
     RkAiqAlgoDescription* des = (RkAiqAlgoDescription*)mDes;
-    RkAiqAlgoPostAe* ae_pre = (RkAiqAlgoPostAe*)mPostInParam;
+    RkAiqAlgoPostAe* ae_post = (RkAiqAlgoPostAe*)mPostInParam;
     RkAiqCore::RkAiqAlgosShared_t* shared = &mAiqCore->mAlogsSharedParams;
     RkAiqIspStats* ispStats = &shared->ispStats;
 
@@ -620,7 +620,7 @@ RkAiqAhdrHandle::preProcess()
     RkAiqIspStats* ispStats = &shared->ispStats;
 
     if(!shared->ispStats.ahdr_stats_valid && !shared->init) {
-        LOGE("no ahdr stats, ignore!");
+        LOGD("no ahdr stats, ignore!");
         // TODO: keep last result ?
         //         comb->ahdr_proc_res = NULL;
         //
@@ -652,7 +652,7 @@ RkAiqAhdrHandle::processing()
     RkAiqIspStats* ispStats = &shared->ispStats;
 
     if(!shared->ispStats.ahdr_stats_valid && !shared->init) {
-        LOGE("no ahdr stats, ignore!");
+        LOGD("no ahdr stats, ignore!");
         // TODO: keep last result ?
         //         comb->ahdr_proc_res = NULL;
         //
@@ -685,7 +685,7 @@ RkAiqAhdrHandle::postProcess()
     RkAiqIspStats* ispStats = &shared->ispStats;
 
     if(!shared->ispStats.ahdr_stats_valid && !shared->init) {
-        LOGE("no ahdr stats, ignore!");
+        LOGD("no ahdr stats, ignore!");
         // TODO: keep last result ?
         //         comb->ahdr_proc_res = NULL;
         //

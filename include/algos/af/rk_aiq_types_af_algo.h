@@ -16,6 +16,8 @@ typedef struct {
     unsigned int global_sharpness[RKAIQ_RAWAF_SUMDATA_NUM];
     struct timeval focus_starttim;
     struct timeval focus_endtim;
+    struct timeval zoom_starttim;
+    struct timeval zoom_endtim;
     int64_t sof_tim;
 } rk_aiq_af_algo_stat_t;
 
@@ -46,14 +48,16 @@ typedef struct {
     unsigned char line_num[RKAIQ_RAWAF_LINE_NUM];
 
     unsigned short afm_thres;
-    unsigned short global_threshold;
 
     unsigned char lum_var_shift[RKAIQ_RAWAF_WIN_NUM];
     unsigned char afm_var_shift[RKAIQ_RAWAF_WIN_NUM];
 } rk_aiq_af_algo_meas_t;
 
 typedef struct {
+    bool lens_pos_valid;
+    bool zoom_pos_valid;
     unsigned int next_lens_pos;
+    unsigned int next_zoom_pos;
 } rk_aiq_af_algo_focus_pos_t;
 
 #endif

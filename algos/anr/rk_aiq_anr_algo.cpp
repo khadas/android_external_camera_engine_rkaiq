@@ -108,7 +108,8 @@ ANRresult_t ANRInit(ANRContext_t **ppANRCtx, CamCalibDbContext_t *pCalibDb)
 
 #if ANR_USE_XML_FILE
 	pANRCtx->stExpInfo.snr_mode = 1;
-	ANRConfigSettingParam(pANRCtx, pANRCtx->stExpInfo.snr_mode);
+	pANRCtx->eParamMode = ANR_PARAM_MODE_NORMAL;
+	ANRConfigSettingParam(pANRCtx, pANRCtx->eParamMode, pANRCtx->stExpInfo.snr_mode);
 #endif
 
     LOGD_ANR("%s(%d): bayernr %f %f %f %d %d %f", __FUNCTION__, __LINE__,
@@ -195,7 +196,7 @@ ANRresult_t ANRIQParaUpdate(ANRContext_t *pANRCtx)
 
 	if(pANRCtx->isIQParaUpdate){
 		LOGD_ANR("IQ data reconfig\n");
-		ANRConfigSettingParam(pANRCtx, pANRCtx->stExpInfo.snr_mode);
+		ANRConfigSettingParam(pANRCtx, pANRCtx->eParamMode, pANRCtx->stExpInfo.snr_mode);
 		pANRCtx->isIQParaUpdate = false;
 	}
 
@@ -220,7 +221,8 @@ ANRresult_t ANRPreProcess(ANRContext_t *pANRCtx)
 ANRresult_t ANRProcess(ANRContext_t *pANRCtx, ANRExpInfo_t *pExpInfo)
 {
     LOGI_ANR("%s(%d): enter!\n", __FUNCTION__, __LINE__);
-
+	ANRParamMode_t mode = ANR_PARAM_MODE_INVALID;
+	
     if(pANRCtx == NULL) {
         LOGE_ANR("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
         return ANR_RET_INVALID_PARM;
@@ -236,14 +238,18 @@ ANRresult_t ANRProcess(ANRContext_t *pANRCtx, ANRExpInfo_t *pExpInfo)
 	}
 	
     ANRGainRatioProcess(&pANRCtx->stGainState, pExpInfo);
+
+    ANRParamModeProcess(pANRCtx, pExpInfo, &mode);   
 	
     if(pANRCtx->eMode == ANR_OP_MODE_AUTO) {
 
         LOGD_ANR("%s(%d): refYuvBit:%d\n", __FUNCTION__, __LINE__, pANRCtx->refYuvBit);
 
 		#if ANR_USE_XML_FILE
-		if(pExpInfo->snr_mode != pANRCtx->stExpInfo.snr_mode){
-			ANRConfigSettingParam(pANRCtx, pExpInfo->snr_mode);
+		if(pExpInfo->snr_mode != pANRCtx->stExpInfo.snr_mode || pANRCtx->eParamMode != mode){
+			LOGD_ANR("param mode:%d snr_mode:%d\n", mode, pExpInfo->snr_mode);
+			pANRCtx->eParamMode = mode;
+			ANRConfigSettingParam(pANRCtx, pANRCtx->eParamMode, pExpInfo->snr_mode);	
 		}
 		#endif
         
@@ -252,6 +258,7 @@ ANRresult_t ANRProcess(ANRContext_t *pANRCtx, ANRExpInfo_t *pExpInfo)
         select_mfnr_params_by_ISO(&pANRCtx->stAuto.stMfnrParams, &pANRCtx->stAuto.stMfnrParamSelect, pExpInfo, pANRCtx->refYuvBit);
         select_ynr_params_by_ISO(&pANRCtx->stAuto.stYnrParams, &pANRCtx->stAuto.stYnrParamSelect, pExpInfo, pANRCtx->refYuvBit);
         select_uvnr_params_by_ISO(&pANRCtx->stAuto.stUvnrParams, &pANRCtx->stAuto.stUvnrParamSelect, pExpInfo);
+	 mfnr_dynamic_calc(&pANRCtx->stAuto.stMfnr_dynamic, pExpInfo);
 
     } else if(pANRCtx->eMode == ANR_OP_MODE_MANUAL) {
         //TODO
@@ -313,6 +320,9 @@ ANRresult_t ANRGetProcResult(ANRContext_t *pANRCtx, ANRProcResult_t* pANRResult)
         pANRResult->ynrEN = pANRCtx->stAuto.ynrEn;
         pANRResult->uvnrEn = pANRCtx->stAuto.uvnrEn;
 
+	 if(pANRCtx->stAuto.bayernrEn && pANRCtx->stAuto.stMfnr_dynamic.enable){
+		pANRResult->mfnrEn = pANRCtx->stAuto.stMfnr_dynamic.mfnr_enable_state;
+	 }
 
     } else if(pANRCtx->eMode == ANR_OP_MODE_MANUAL) {
         //TODO
@@ -347,7 +357,7 @@ ANRresult_t ANRGetProcResult(ANRContext_t *pANRCtx, ANRProcResult_t* pANRResult)
     gain_fix_transfer(&pANRResult->stMfnrParamSelect, &pANRResult->stGainFix, &pANRCtx->stExpInfo, pANRCtx->stGainState.ratio);
     pANRResult->stBayernrFix.rawnr_en = pANRResult->bayernrEn;
     pANRResult->stMfnrFix.tnr_en = pANRResult->mfnrEn;
-    pANRResult->stMfnrFix.mode = pANRCtx->stMfnrCalib.mode;
+    pANRResult->stMfnrFix.mode = pANRCtx->stMfnrCalib.mode_3to1;
     pANRResult->stYnrFix.ynr_en = pANRResult->ynrEN;
     pANRResult->stUvnrFix.uvnr_en = pANRResult->uvnrEn;
     pANRResult->stGainFix.gain_table_en = pANRCtx->stMfnrCalib.local_gain_en;
@@ -363,7 +373,7 @@ ANRresult_t ANRGetProcResult(ANRContext_t *pANRCtx, ANRProcResult_t* pANRResult)
     LOGD_ANR("%s:%d xml:local:%d mode:%d  reg: local gain:%d  mfnr gain:%d mode:%d\n",
              __FUNCTION__, __LINE__,
              pANRCtx->stMfnrCalib.local_gain_en,
-             pANRCtx->stMfnrCalib.mode,
+             pANRCtx->stMfnrCalib.mode_3to1,
              pANRResult->stGainFix.gain_table_en,
              pANRResult->stMfnrFix.gain_en,
              pANRResult->stMfnrFix.mode);
@@ -436,16 +446,32 @@ ANRresult_t ANRGainRatioProcess(ANRGainState_t *pGainState, ANRExpInfo_t *pExpIn
     return ANR_RET_SUCCESS;
 }
 
-ANRresult_t ANRConfigSettingParam(ANRContext_t *pANRCtx, int snr_mode)
+ANRresult_t ANRConfigSettingParam(ANRContext_t *pANRCtx, ANRParamMode_t eParamMode, int snr_mode)
 {
-      char snr_name[CALIBDB_NR_SHARP_NAME_LENGTH];
+	char snr_name[CALIBDB_NR_SHARP_NAME_LENGTH];
+	char param_mode_name[CALIBDB_MAX_MODE_NAME_LENGTH];
+	memset(param_mode_name, 0x00, sizeof(param_mode_name));
 	memset(snr_name, 0x00, sizeof(snr_name));
 	
-	 if(pANRCtx == NULL) {
-        	LOGE_ANR("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
-        	return ANR_RET_INVALID_PARM;
-    	}
-	 
+	if(pANRCtx == NULL) {
+		LOGE_ANR("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
+		return ANR_RET_INVALID_PARM;
+	}
+
+	 //select param mode first
+	if(eParamMode == ANR_PARAM_MODE_NORMAL){
+		sprintf(param_mode_name, "%s", "normal");
+	}else if(eParamMode == ANR_PARAM_MODE_HDR){
+		sprintf(param_mode_name, "%s", "hdr");
+	}else if(eParamMode == ANR_PARAM_MODE_GRAY){
+		sprintf(param_mode_name, "%s", "gray");
+	}else{
+		LOGE_ANR("%s(%d): not support param mode!\n", __FUNCTION__, __LINE__);
+		sprintf(param_mode_name, "%s", "normal");
+	}
+	
+
+	 //then select snr mode next
 	if(snr_mode == 1){
 		sprintf(snr_name, "%s", "HSNR");
 	}else if(snr_mode == 0){
@@ -456,19 +482,43 @@ ANRresult_t ANRConfigSettingParam(ANRContext_t *pANRCtx, int snr_mode)
 	}
 	
 	pANRCtx->stAuto.bayernrEn = pANRCtx->stBayernrCalib.enable;
-	bayernr_config_setting_param(&pANRCtx->stAuto.stBayernrParams, &pANRCtx->stBayernrCalib, snr_name);
+	bayernr_config_setting_param(&pANRCtx->stAuto.stBayernrParams, &pANRCtx->stBayernrCalib, param_mode_name, snr_name);
 
 	pANRCtx->stAuto.uvnrEn = pANRCtx->stUvnrCalib.enable;
-	uvnr_config_setting_param(&pANRCtx->stAuto.stUvnrParams, &pANRCtx->stUvnrCalib, snr_name);
+	uvnr_config_setting_param(&pANRCtx->stAuto.stUvnrParams, &pANRCtx->stUvnrCalib, param_mode_name, snr_name);
 	
 	pANRCtx->stAuto.ynrEn = pANRCtx->stYnrCalib.enable;
-	ynr_config_setting_param(&pANRCtx->stAuto.stYnrParams, &pANRCtx->stYnrCalib, snr_name);
+	ynr_config_setting_param(&pANRCtx->stAuto.stYnrParams, &pANRCtx->stYnrCalib, param_mode_name, snr_name);
 	
 	pANRCtx->stAuto.mfnrEn = pANRCtx->stMfnrCalib.enable;
-	mfnr_config_setting_param(&pANRCtx->stAuto.stMfnrParams, &pANRCtx->stMfnrCalib, snr_name);
-
+	mfnr_config_setting_param(&pANRCtx->stAuto.stMfnrParams, &pANRCtx->stMfnrCalib, param_mode_name, snr_name);
+	mfnr_config_dynamic_param(&pANRCtx->stAuto.stMfnr_dynamic, &pANRCtx->stMfnrCalib, param_mode_name);
 	return ANR_RET_SUCCESS; 
 }
+
+ANRresult_t ANRParamModeProcess(ANRContext_t *pANRCtx, ANRExpInfo_t *pExpInfo, ANRParamMode_t *mode){
+	ANRresult_t res  = ANR_RET_SUCCESS;
+	*mode = pANRCtx->eParamMode;
+		
+	if(pANRCtx == NULL) {
+    	LOGE_ANR("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
+    	return ANR_RET_INVALID_PARM;
+	}
+
+	if(pANRCtx->isGrayMode){
+		*mode = ANR_PARAM_MODE_GRAY;
+	}else if(pExpInfo->hdr_mode == 0){
+		*mode = ANR_PARAM_MODE_NORMAL;
+	}else if(pExpInfo->hdr_mode >= 1){
+		*mode = ANR_PARAM_MODE_HDR;
+	}else{
+		*mode = ANR_PARAM_MODE_NORMAL;
+	}
+
+	return res;
+}
+
+
 RKAIQ_END_DECLARE
 
 

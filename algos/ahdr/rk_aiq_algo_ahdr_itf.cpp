@@ -86,13 +86,16 @@ static XCamReturn AhdrPrepare(RkAiqAlgoCom* params)
     pAhdrCtx->width = AhdrCfgParam->rawWidth;
     pAhdrCtx->height = AhdrCfgParam->rawHeight;
 
-    if (AhdrCfgParam->working_mode < RK_AIQ_WORKING_MODE_ISP_HDR3)
+    if (AhdrCfgParam->working_mode < RK_AIQ_WORKING_MODE_ISP_HDR2)
+        pAhdrCtx->hdr_mode = 1;
+    else if (AhdrCfgParam->working_mode < RK_AIQ_WORKING_MODE_ISP_HDR3 &&
+             AhdrCfgParam->working_mode >= RK_AIQ_WORKING_MODE_ISP_HDR2)
         pAhdrCtx->hdr_mode = 2;
     else
         pAhdrCtx->hdr_mode = 3;
 
-    AhdrConfig(pAhdrCtx); //set default paras
-    AhdrGetXmlParas(pAhdrCtx, pCalibDb); //convert AeCfg params into AeHandle
+    AhdrConfig(pAhdrCtx); //set default para
+    memcpy(&pAhdrCtx->pCalibDB, &pCalibDb->ahdr, sizeof(CalibDb_Ahdr_Para_t));//load iq paras
 
     if (ret != AHDR_RET_SUCCESS) {
         LOGE_AHDR("%s AHDRUpdateConfig failed: %d", __FUNCTION__, ret);
@@ -116,6 +119,20 @@ static XCamReturn AhdrPreProcess(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* 
 {
     LOG1_AHDR("%s:Enter!\n", __FUNCTION__);
     RESULT ret = AHDR_RET_SUCCESS;
+
+    AhdrHandle_t pAhdrCtx = inparams->ctx->AhdrInstConfig.hAhdr;
+    RkAiqAlgoConfigAhdrInt* AhdrCfgParam = (RkAiqAlgoConfigAhdrInt*)inparams;
+    const CamCalibDbContext_t* pCalibDb = AhdrCfgParam->rk_com.u.prepare.calib;
+
+    // sence mode
+    if (AhdrCfgParam->rk_com.u.proc.gray_mode)
+        pAhdrCtx->sence_mode = AHDR_NIGHT;
+    else if (pAhdrCtx->hdr_mode == 1)
+        pAhdrCtx->sence_mode = AHDR_NORMAL;
+    else
+        pAhdrCtx->sence_mode = AHDR_HDR;
+
+    AhdrSelectMode(pAhdrCtx, &pAhdrCtx->pCalibDB, pAhdrCtx->sence_mode);
 
     LOG1_AHDR("%s:Exit!\n", __FUNCTION__);
     return(XCAM_RETURN_NO_ERROR);
@@ -170,6 +187,7 @@ static XCamReturn AhdrProcess(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* out
 
     pAhdrCtx->AhdrProcRes.LongFrameMode = pAhdrCtx->SensorInfo.LongFrmMode;
     AhdrProcResParams->AhdrProcRes.isHdrGlobalTmo = pAhdrCtx->AhdrProcRes.isHdrGlobalTmo;
+    AhdrProcResParams->AhdrProcRes.isLinearTmoOn = pAhdrCtx->AhdrProcRes.isLinearTmoOn;
     memcpy(&AhdrProcResParams->AhdrProcRes.MgeProcRes, &pAhdrCtx->AhdrProcRes.MgeProcRes, sizeof(MgeProcRes_t));
     memcpy(&AhdrProcResParams->AhdrProcRes.TmoProcRes, &pAhdrCtx->AhdrProcRes.TmoProcRes, sizeof(TmoProcRes_t));
 

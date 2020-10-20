@@ -13,6 +13,12 @@
 
 //#include "rk_aiq_types.h"
 
+enum {
+    AHDR_NORMAL = 0,
+    AHDR_HDR = 1,
+    AHDR_NIGHT = 2
+};
+
 typedef struct globalLuma_s
 {
     float globalLumaMode;
@@ -44,44 +50,36 @@ typedef struct detailsLowLight_s
 
 } detailsLowLight_t ;
 
-typedef struct tmoContrast_s
+typedef struct localtmo_s
 {
-    float TmoContrastMode;
+    float localtmoMode;
     float DynamicRange[6];
     float EnvLv[6];
     float Tolerance;
-    float TmoContrast[6];
+    float LocalTmoStrength[6];
 
-} tmoContrast_t ;
+} localtmo_t ;
 
-typedef struct Band_Prior_s
+typedef struct globaltmo_s
 {
     bool isHdrGlobalTmo;
     float mode;
+    float iir;
     float DynamicRange[6];
     float EnvLv[6];
     float Tolerance;
-    float Strength[6];
-} Band_Prior_t;
-
-typedef struct moreSetting_s
-{
-    float clipgap0;
-    float clipgap1;
-    float clipratio0;
-    float clipratio1;
-    float damp;
-
-} moreSetting_t ;
+    float GlobalTmoStrength[6];
+} globaltmo_t;
 
 typedef struct tmo_config_s
 {
+    bool isLinearTmoOn;
     globalLuma_t Luma;
     detailsHighLight_t DtsHiLit;
     detailsLowLight_t DtsLoLit;
-    tmoContrast_t Contrast;
-    Band_Prior_t Band;
-    moreSetting_t More;
+    globaltmo_t global;
+    localtmo_t local;
+    float damp;
 
 } tmo_config_t ;
 
@@ -114,6 +112,16 @@ typedef struct tmoCtrlData_s
     int   stMin;
 } tmoCtrlData_t;
 
+typedef struct AGlobalTmoData_s
+{
+    bool en;
+    float stCoef;
+    float stCoefMax;
+    float stCoefMin;
+    int   stMax;
+    int   stMin;
+} AGlobalTmoData_t;
+
 typedef struct mgeCtrlData_S
 {
     float stCoef;
@@ -137,14 +145,22 @@ typedef struct atmoAttr_S
     tmoCtrlData_t stGlobeLuma;
     tmoCtrlData_t stDtlsLL;
     tmoCtrlData_t stDtlsHL;
-    tmoCtrlData_t stTmoContrast;
+    tmoCtrlData_t stLocalTMO;
+    AGlobalTmoData_t stGlobalTMO;
 } atmoAttr_t;
 
 typedef struct mmgeAttr_S
 {
-    unsigned short OECurve[17];
-    unsigned short MDCurveLM[17];
-    unsigned short MDCurveMS[17];
+    float OECurve_smooth;
+    float OECurve_offset;
+    float MDCurveLM_smooth;
+    float MDCurveLM_offset;
+    float MDCurveMS_smooth;
+    float MDCurveMS_offset;
+
+    float dampOE;
+    float dampMDLM;
+    float dampMDMS;
 } mmgeAttr_t;
 
 typedef struct mtmoAttr_S
@@ -152,7 +168,10 @@ typedef struct mtmoAttr_S
     float stGlobeLuma;
     float stDtlsHL;
     float stDtlsLL;
-    float stTmoContrast;
+    float stLocalTMOStrength;
+    float stGlobalTMOStrength;
+
+    float damp;
 } mtmoAttr_t;
 
 typedef struct ahdrAttr_S
@@ -175,8 +194,35 @@ typedef enum hdr_OpMode_s {
     HDR_OpMode_Auto = 1,
     HDR_OpMode_MANU = 2,
     HDR_OpMode_Fast = 3,
+    HDR_OpMode_LINEAR = 4,
 } hdr_OpMode_t;
 
+typedef struct CurrCtlData_s
+{
+    float Envlv;
+    float MoveCoef;
+    float ISO;
+    float OEPdf;
+    float FocusLuma;
+    float DarkPdf;
+    float DynamicRange;
+} CurrCtlData_t;
+
+typedef struct CurrRegData_s
+{
+    float OECurve_smooth;
+    float OECurve_offset;
+    float MDCurveLM_smooth;
+    float MDCurveLM_offset;
+    float MDCurveMS_smooth;
+    float MDCurveMS_offset;
+
+    float GlobalLuma;
+    float DetailsLowlight;
+    float DetailsHighlight;
+    float LocalTmoStrength;
+    float GlobaltmoStrength;
+} CurrRegData_t;
 
 typedef struct hdrAttr_s
 {
@@ -185,6 +231,9 @@ typedef struct hdrAttr_s
     ahdrAttr_t    stAuto;
     mhdrAttr_t stManual;
     int level;
+    int level_Linear_Dark;
+    CurrCtlData_t CtlInfo;
+    CurrRegData_t RegInfo;
 } hdrAttr_t;
 
 typedef struct MgeProcRes_s
@@ -252,6 +301,7 @@ typedef struct RkAiqAhdrProcResult_s
     hdrAttr_t hdrAttr;
     bool LongFrameMode;
     bool isHdrGlobalTmo;
+    bool isLinearTmoOn;
 } RkAiqAhdrProcResult_t;
 
 

@@ -3,4 +3,10 @@
 
 #include "rk_aiq_types_afec_algo.h"
 
+typedef struct rk_aiq_fec_cfg_s {
+    unsigned int en;
+    int bypass;
+    int correct_level;
+} rk_aiq_fec_cfg_t;
+
 #endif

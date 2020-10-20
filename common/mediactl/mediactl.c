@@ -930,7 +930,7 @@ int media_parse_setup_link(struct media_device *media,
 void media_print_streampos(struct media_device *media, const char *p,
 			   const char *end)
 {
-	int pos;
+	size_t pos;
 
 	pos = end - p + 1;
 

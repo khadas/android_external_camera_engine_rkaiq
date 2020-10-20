@@ -36,6 +36,7 @@ typedef struct AblcContext_s {
     AblcManualAttr_t stManual;
 
     CalibDb_Blc_t stBlcCalib;
+	AblcParamMode_t eParamMode;
 } AblcContext_t;
 
 

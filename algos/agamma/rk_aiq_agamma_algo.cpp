@@ -22,23 +22,29 @@
 
 RKAIQ_BEGIN_DECLARE
 
-XCamReturn AgammaInitV200(AgammaHandle_t** para)
+XCamReturn AgammaInit(AgammaHandle_t** para, CamCalibDbContext_t* calib)
 {
     LOGD_AGAMMA("ENTER: %s \n", __func__);
-
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
-    *para = (AgammaHandle_t*)malloc(sizeof(AgammaHandle_t));
+    AgammaHandle_t* handle = (AgammaHandle_t*)malloc(sizeof(AgammaHandle_t));
+    if (NULL == handle)
+        return XCAM_RETURN_ERROR_MEM;
+    memset(handle, 0, sizeof(AgammaHandle_t));
+    handle->pCalibDb = calib;
+    ret = AgammaConfigInit(handle);
+    *para = handle;
+    LOGD_AGAMMA("EXIT: %s \n", __func__);
     return(ret);
 
 }
 
-XCamReturn AgammaReleaseV200(AgammaHandle_t* para)
+XCamReturn AgammaRelease(AgammaHandle_t* para)
 {
     LOGD_AGAMMA("ENTER: %s \n", __func__);
-
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
-
-    free(para);
+    if (para)
+        free(para);
+    LOGD_AGAMMA("EXIT: %s \n", __func__);
     return(ret);
 
 }
@@ -56,54 +62,50 @@ XCamReturn AgammaConfigInit(AgammaHandle_t* para)
     para->agamma_config.gamma_out_offset = gamma_calib->gamma_out_offset;
     para->agamma_config.gamma_out_segnum = gamma_calib->gamma_out_segnum;
 
+    for (i = 0; i < 45; i++)
+    {
+        para->normal_table[i] = gamma_calib->curve_normal[i];
+        para->hdr_table[i] = gamma_calib->curve_hdr[i];
+        para->night_table[i] = gamma_calib->curve_night[i];
+        para->user1_table[i] = gamma_calib->curve_user1[i];
+        para->user2_table[i] = gamma_calib->curve_user2[i];
+    }
+
     if(gamma_calib->gamma_out_mode == GAMMA_OUT_NORMAL)
     {
-        for (i = 0; i < 45; i++)
-        {
-            para->agamma_config.gamma_table[i] = gamma_calib->curve_normal[i];
-        }
+        memcpy(para->agamma_config.gamma_table, para->normal_table, sizeof(para->normal_table));
     }
     else if(gamma_calib->gamma_out_mode == GAMMA_OUT_HDR)
     {
-        for (i = 0; i < 45; i++)
-        {
-            para->agamma_config.gamma_table[i] = gamma_calib->curve_hdr[i];
-        }
+        memcpy(para->agamma_config.gamma_table, para->hdr_table, sizeof(para->hdr_table));
     }
     else if(gamma_calib->gamma_out_mode == GAMMA_OUT_NIGHT)
     {
-        for (i = 0; i < 45; i++)
-        {
-            para->agamma_config.gamma_table[i] = gamma_calib->curve_night[i];
-        }
+        memcpy(para->agamma_config.gamma_table, para->night_table, sizeof(para->night_table));
     }
     else if(gamma_calib->gamma_out_mode == GAMMA_OUT_USR1)
     {
-        for (i = 0; i < 45; i++)
-        {
-            para->agamma_config.gamma_table[i] = gamma_calib->curve_user1[i];
-        }
+        memcpy(para->agamma_config.gamma_table, para->user1_table, sizeof(para->user1_table));
     }
     else if(gamma_calib->gamma_out_mode == GAMMA_OUT_USR2)
     {
-        for (i = 0; i < 45; i++)
-        {
-            para->agamma_config.gamma_table[i] = gamma_calib->curve_user2[i];
-        }
+        memcpy(para->agamma_config.gamma_table, para->user2_table, sizeof(para->user2_table));
     }
     else {
         LOGE_AGAMMA("%s: gamma out mode is not support!\n", __func__);
         ret = XCAM_RETURN_ERROR_PARAM;
     }
+    LOGD_AGAMMA("EXIT: %s \n", __func__);
     return ret;
 }
 
-XCamReturn AgammaPreProcV200(AgammaHandle_t* para)
+XCamReturn AgammaPreProc(AgammaHandle_t* para)
 {
     LOGD_AGAMMA("ENTER: %s \n", __func__);
 
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
 
+    LOGD_AGAMMA("EXIT: %s \n", __func__);
     return(ret);
 
 }

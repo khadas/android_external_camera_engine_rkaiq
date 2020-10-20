@@ -21,8 +21,17 @@
 #define _RK_AIQ_TYPES_AFEC_ALGO_PRVT_H_
 
 #include "RkAiqCalibDbTypes.h"
+#include <xcam_mutex.h>
+#include "xcam_thread.h"
+#include "smartptr.h"
+#include "safe_list.h"
+#include "xcam_log.h"
+#include "gen_mesh/genMesh.h"
+#include "afec/rk_aiq_types_afec_algo_int.h"
 
 RKAIQ_BEGIN_DECLARE
+
+using namespace XCam;
 
 typedef enum {
     FEC_CORRECT_LEVEL0,          // 100%
@@ -32,6 +41,16 @@ typedef enum {
     FEC_BYPASS
 } FECCorrectLevel;
 
+typedef enum FECState_e {
+    FEC_STATE_INVALID           = 0,                   /**< initialization value */
+    FEC_STATE_INITIALIZED       = 1,                   /**< instance is created, but not initialized */
+    FEC_STATE_STOPPED           = 2,                   /**< instance is confiured (ready to start) or stopped */
+    FEC_STATE_RUNNING           = 3,                   /**< instance is running (processes frames) */
+    FEC_STATE_MAX                                      /**< max */
+} FECState_t;
+
+class RKAiqAfecThread;
+
 typedef struct FECContext_s {
     unsigned char initialized;
     unsigned int fec_en;
@@ -39,8 +58,11 @@ typedef struct FECContext_s {
     unsigned int fec_mesh_h_size;
     unsigned int fec_mesh_v_size;
     unsigned int fec_mesh_size;
-    unsigned int pic_width;
-    unsigned int pic_height;
+    int correct_level;
+    int src_width;
+    int src_height;
+    int dst_width;
+    int dst_height;
     unsigned int sw_rd_vir_stride;
     unsigned int sw_wr_yuv_format; //0:YUV420 1:YUV422
     unsigned int sw_wr_vir_stride;
@@ -50,10 +72,18 @@ typedef struct FECContext_s {
     unsigned short* meshyi;
     unsigned char* meshyf;
     char meshfile[256];
-    unsigned char correct_level;
-    unsigned int user_en;
-    bool bypass;
     const char* resource_path;
+    int meshSizeW;
+    int meshSizeH;
+    int meshStepW;
+    int meshStepH;
+    struct CameraCoeff camCoeff;
+    FecParams fecParams;
+    FECState_t eState;
+
+    std::atomic<bool> isAttribUpdated;
+    rk_aiq_fec_cfg_t user_config;
+    SmartPtr<RKAiqAfecThread> afecReadMeshThread;
 } FECContext_t;
 
 typedef struct FECContext_s* FECHandle_t;
@@ -64,6 +94,44 @@ typedef struct _RkAiqAlgoContext {
 } RkAiqAlgoContext;
 
 RKAIQ_END_DECLARE
+
+class RKAiqAfecThread
+    : public Thread {
+public:
+    RKAiqAfecThread(FECHandle_t fecHandle)
+        : Thread("afecThread")
+          , hFEC(fecHandle) {};
+    ~RKAiqAfecThread() {
+        mAttrQueue.clear ();
+    };
+
+    void triger_stop() {
+        mAttrQueue.pause_pop ();
+    };
+
+    void triger_start() {
+        mAttrQueue.resume_pop ();
+    };
+
+    bool push_attr (const SmartPtr<rk_aiq_fec_cfg_t> buffer) {
+        mAttrQueue.push (buffer);
+        return true;
+    };
+
+    void clear_attr () {
+        mAttrQueue.clear ();
+    };
+
+protected:
+    //virtual bool started ();
+    virtual void stopped () {
+        mAttrQueue.clear ();
+    };
+    virtual bool loop ();
+private:
+    FECHandle_t hFEC;
+    SafeList<rk_aiq_fec_cfg_t> mAttrQueue;
+};
 
 #endif
 

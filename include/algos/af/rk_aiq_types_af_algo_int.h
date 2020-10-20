@@ -33,6 +33,7 @@ typedef enum _RKAIQ_AF_MODE
     RKAIQ_AF_MODE_EDOF,
     RKAIQ_AF_MODE_CONTINUOUS_VIDEO,
     RKAIQ_AF_MODE_CONTINUOUS_PICTURE,
+    RKAIQ_AF_MODE_ONESHOT_AFTER_ZOOM,
 } RKAIQ_AF_MODE;
 
 typedef struct rk_aiq_af_attrib_s {
@@ -52,6 +53,8 @@ typedef struct rk_aiq_af_attrib_s {
     unsigned short fixedModeDefCode;
     unsigned short macroModeDefCode;
     unsigned short infinityModeDefCode;
+
+    rk_aiq_af_algo_meas_t manual_meascfg;
 } rk_aiq_af_attrib_t;
 
 #endif

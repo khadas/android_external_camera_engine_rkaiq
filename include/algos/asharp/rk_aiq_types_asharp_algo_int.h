@@ -25,6 +25,9 @@
 
 
 RKAIQ_BEGIN_DECLARE
+
+#define SHARP_MAX_STRENGTH_PERCENT (100.0)
+
 #define MAX_ISO_STEP                CALIBDB_NR_SHARP_MAX_ISO_LEVEL
 //sharp
 #define IDX_SIGN                            0
@@ -311,6 +314,15 @@ typedef enum AsharpOPMode_e {
     ASHARP_OP_MODE_MANUAL             = 2,                   /**< instance is confiured (ready to start) or stopped */
     ASHARP_OP_MODE_MAX                                      /**< max */
 } AsharpOPMode_t;
+
+typedef enum AsharpParamMode_e {
+    ASHARP_PARAM_MODE_INVALID           = 0,                   /**< initialization value */
+    ASHARP_PARAM_MODE_NORMAL               = 1,                   /**< instance is created, but not initialized */
+    ASHARP_PARAM_MODE_HDR             = 2,                   /**< instance is confiured (ready to start) or stopped */
+    ASHARP_PARAM_MODE_GRAY            =3,                          /**< max */
+    ASHARP_PARAM_MODE_MAX
+} AsharpParamMode_t;
+
 
 
 typedef struct Asharp_Manual_Attr_s

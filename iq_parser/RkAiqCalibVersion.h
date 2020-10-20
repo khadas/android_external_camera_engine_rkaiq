@@ -59,10 +59,54 @@
  *  - add OverExpCtrl in AEC
  *  - delete useless iq params in AEC
  *  - including:AOE,Hist2Hal,AecRange,InternalAdjust
+ * v1.1.a
+ *  - ExpDelay support Hdr/Normal mode
+ *  - Tolerance divide into ToleranceIn/ToleranceOut
+ * v1.2.1
+ *  - magic code:1007256
+ *  - Ahdr:divide Ahdr into two parts,merge and tmo
+ *  - Tmo: add linear tmo function
+ * v1.2.2
+ *  - Afec: add light_center and distortion_coeff
+ * v1.2.3
+ *  - LumaDetect: add the level2 of mutation threshold
+ * v1.2.4
+ *  - Aldch: add light_center and distortion_coeff
+ * v1.2.5
+ *  - dehaze: add normal, HDR and night mode
+ * v1.2.6
+ *  -sensorinfo: add CISHdrGainIndSetEn for Stagger+same gain
+ * v1.2.7
+ *  -aldch: add correct_level_max filed
+ * v1.2.8
+ *  - magic code:1017263
+ *  -Tmo: rename BandPror as GlobalTMO
+ *  -Tmo:add IIR control in GlobalTMO
+ *  -Tmo: rename TmoContrast as LocalTMO
+ *  -Tmo: delete moresetting
+ * v1.2.9
+ *  -LumaDetect: add fixed times of readback
+ * v1.2.a
+ *  -AF: add vcmconfig
+ * v1.3.0
+ *  -dynamic mfnr enable in iqfiles
+ * v1.3.1
+ *  - magic code:1034424
+ *  - Redifine dehaze para in IQ files
+ * v1.3.2
+ *  - magic code:1034813
+ *  - TMO: add normal HDR night mode
+ * v1.3.3
+ *  - magic code:1044335
+ *  - AE: add SyncTest to debug
+ * v1.3.4
+ *  - magic code:1061311
+ *  - AE: add IrisCtrl, and also modify some params in manualCtrl & initialExp
  */
 
-#define RK_AIQ_CALIB_VERSION_REAL_V          "v1.1.9"
-#define RK_AIQ_CALIB_VERSION_MAGIC_V         "996490"
+#define RK_AIQ_CALIB_VERSION_REAL_V          "v1.3.4"
+#define RK_AIQ_CALIB_VERSION_MAGIC_V         "1061311"
+
 
 /******* DO NOT EDIT THE FOLLOWINGS ***********/
 

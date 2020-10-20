@@ -24,12 +24,14 @@
 #include "RkAiqCalibDbTypes.h"
 #include "xcam_log.h"
 #include "xcam_common.h"
+#include "list.h"
 
 RKAIQ_BEGIN_DECLARE
 
 typedef struct alsc_rest_s {
     int caseIndex;
     float fVignetting;
+    List dominateIlluList;//to record domain illuminant
     int dominateIlluProfileIdx;
     int resIdx;
     const CalibDb_LscTableProfile_t *pLscProfile1;
@@ -37,6 +39,11 @@ typedef struct alsc_rest_s {
     CamLscMatrix_t undampedLscMatrixTable;
     CamLscMatrix_t dampedLscMatrixTable;
 } alsc_rest_t;
+
+typedef struct illu_node_s {
+    void*        p_next;       /**< for adding to a list */
+    unsigned int value;
+} illu_node_t;
 
 
 typedef struct alsc_context_s {

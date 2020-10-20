@@ -172,16 +172,96 @@
  * - CamHwIsp20: move isp/ispp/mipitx,rx streaming on to prepare stage
  * - fix bugs in GainRange-dBmode
  * v1.0.5
- * - support dual cameras streaming concurrently 
+ * - calib db: v1.1.8 magic code 1027323
+ * - support dual cameras streaming concurrently
  * v1.0.6
+ * - calib db: v1.1.9 magic code: 996490
  * - add backlight compasation and highlight depresion interface
  * - add enable and disable dehaze interface
  * - add asd interface to get calculated environmental luma
  * - ov2718: v0.0.4 gc2053: v0.0.3 ov02k10: v0.0.2
+ * v1.0.7
+ * - calib db: v1.2.0 magic code: 1006650
+ * - support dependant iq for hdr/normal/gray
+ * - rkisp_demo
+ *   - support dual camera
+ *   - add hdr x2 and x3 arg option
+ * - Isp20PollThread
+ *   - correct error handle in trigger_readback
+ *   - fix the bug of stopping blocked by tx thread stop process
+ * - ae support hdr3, add imx415 hdr3 xml
+ * - imx415 anti-flicker
+ * - readback two times to avoid luma detect bug
+ * v1.0.8
+ * - calib db: v1.2.3 magic code: 1011895
+ * - add uApi
+ *  - setDarkAreaBoostStrth/getDarkAreaBoostStrth
+ *  - rk_aiq_uapi_sysctl_swWorkingModeDyn
+ *  - rk_aiq_uapi_setFecEn/rk_aiq_uapi_setFecCorrectLevel
+ * - match up with isp driver v0.1.4
+ * v1.0.9
+ * - calib db: v1.2.4 magic code: 1014880
+ * - uApi changes:
+ *   - rk_aiq_user_api_ae_queryExpResInfo
+ *     modify data-type & add EnvLux in Ae-api
+ *   - rk_aiq_uapi_setLdchEn
+ *   - rk_aiq_uapi_setLdchCorrectLevel
+ *   - rk_aiq_uapi_setFecBypass
+ *   - rk_aiq_uapi_setFecEn
+ * - support aiq version checking with tuning tool version
+ * - fix the buf plane info changed of vb2
+ * - Isp20Poll: modify the resolution of the input ISP to crop resolution
+ * - awb: fix the bug in cct_lut_cfg initinalize
+ * - fix flash-ir bugs
+ * - switch to normal if gray mode is on
+ * - add acp user interfaces
+ * - fix gamma mode switching bug
+ * v1.2.0
+ * - calib db: v1.2.6 magic code: 1019694
+ * - uApi changes:
+ *    - rk_aiq_user_api_ahdr_SetAttrib
+ *    - rk_aiq_user_api_adehaze_setSwAttrib
+ *    - rk_aiq_user_api_adpcc_SetAttrib
+ * - modify FpsSet bug in Ae
+ * - user api called before sysctl prepared would cause stuck, fix it
+ * - fix fec params error when switching hdr/normal
+ * - disable switching working mode to normal on gray mode
+ * - sharp: make more sharp strength for api
+ * - add dehaze normal,HDR and night mode in algo
+ * - update rkisp2x_tuner v0.2.0
+ * - isp driver v0.1.6
+ * - imx415 xml enable dc_en and set cfg_alpha
+ * v1.2.1
+ * - calib db: v1.2.7 magic code: 1021509
+ * - uApi changes:
+ *   - fix mwb params error after sysctl re-init
+ *   - fix dehaze bugs
+ * - optimize cpu usage
+ *   - support buf no sync
+ *   - disable Asharp_fix_Printf log
+ * - isp driver v0.1.7
+ * v1.2.2
+ * - calib db: v1.2.9 magic code: 1018435
+ *   - change imx415 hdr3 time/gain delay from 3 to 2
+ *   - add gc2093/gc2053 iqfiles
+ * - uApi: add rk_aiq_uapi_sysctl_setMulCamConc
+ * - awb: v1.0.a
+ * - update rkisp2x_tuner v0.2.1
+ * - ALDCH: fix attrib has no effect setting before prepare
+ * - SensorHw.cpp: fix exposure error caused by wrong dcg info
+ * v1.2.3
+ * - calib db: v1.3.4 magic code: 1061311
+ * - fix some memory leak
+ * - support Iris control
+ * - support AF funtionality
+ * - TMO/Dehaze: lots of modifications
+ * - isp driver v0.1.8
+ * v1.2.4
+ * - temporary version for longsee, fix some bugs of dehaze and cpsl
  */
 
-#define RK_AIQ_VERSION_REAL_V "v1.0.6"
-#define RK_AIQ_RELEASE_DATE "2020-08-14"
+#define RK_AIQ_VERSION_REAL_V "v1.2.4"
+#define RK_AIQ_RELEASE_DATE "2020-10-16"
 
 /******* DO NOT EDIT THE FOLLOWINGS ***********/
 

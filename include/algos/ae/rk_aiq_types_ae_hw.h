@@ -16,7 +16,7 @@
 #define RAWHIST_BIN_N_MAX   256
 #define SIHIST_BIN_N_MAX    32
 
-#define MAX_AEC_EFFECT_FNUM 5
+#define MAX_AEC_EFFECT_FNUM 10
 
 typedef enum _RAWAE_WND_NUM {
     RAWAE_WND_1X1 = 0,
@@ -50,40 +50,46 @@ typedef enum _HIST_MODE {
  * @brief   ISP2.0 AEC HW-Meas Config Params
  */
 /*****************************************************************************/
-
+#pragma pack(1)
 struct window {
     unsigned short h_offs;
     unsigned short v_offs;
     unsigned short h_size;
     unsigned short v_size;
-} __attribute__ ((packed));
+};
+#pragma pack()
 
 
+#pragma pack(1)
 struct rawaebig_meas_cfg {
     unsigned char rawae_sel;
     unsigned char wnd_num;
     unsigned char subwin_en[RAWAEBIG_SUBWIN_NUM];
     struct window win;
     struct window subwin[RAWAEBIG_SUBWIN_NUM];
-} __attribute__ ((packed));
+};
+#pragma pack()
 
-
+#pragma pack(1)
 struct rawaelite_meas_cfg {
     unsigned char rawae_sel;
     unsigned char wnd_num;
     struct window win;
-} __attribute__ ((packed));
+};
+#pragma pack()
 
-
+#pragma pack(1)
 struct yuvae_meas_cfg {
     unsigned char ysel;
     unsigned char wnd_num;
     unsigned char subwin_en[YUVAE_SUBWIN_NUM];
     struct window win;
     struct window subwin[YUVAE_SUBWIN_NUM];
-} __attribute__ ((packed));
+};
+#pragma pack()
 
 
+#pragma pack(1)
 struct rawhistbig_cfg {
     unsigned char wnd_num;
     unsigned char data_sel;
@@ -96,8 +102,10 @@ struct rawhistbig_cfg {
     unsigned char rcc;
     struct window win;
     unsigned char weight[RAWHISTBIG_WIN_NUM];
-} __attribute__ ((packed));
+};
+#pragma pack()
 
+#pragma pack(1)
 struct rawhistlite_cfg {
     unsigned char data_sel;
     unsigned char waterline;
@@ -109,8 +117,10 @@ struct rawhistlite_cfg {
     unsigned char rcc;
     struct window win;
     unsigned char weight[RAWHISTLITE_WIN_NUM];
-} __attribute__ ((packed));
+};
+#pragma pack()
 
+#pragma pack(1)
 struct sihst_win_cfg {
     unsigned char  data_sel;
     unsigned char  waterline;
@@ -118,14 +128,16 @@ struct sihst_win_cfg {
     unsigned char  mode;
     unsigned char  stepsize;
     struct window win;
-} __attribute__ ((packed));
+};
+#pragma pack()
 
-
+#pragma pack(1)
 struct sihst_cfg {
     unsigned char wnd_num;
     struct sihst_win_cfg win_cfg[SIHIST_WINCFG_NUM];
     unsigned char hist_weight[SIHIST_WIN_NUM];
-} __attribute__ ((packed));
+};
+#pragma pack()
 
 /*NOTE: name of rawae/rawhist channel has been renamed!
    RawAE0 = RawAE lite,  addr=0x4500  <=> RawHIST0
@@ -229,11 +241,11 @@ typedef struct RkAiqExpRealParam_s {
 } RkAiqExpRealParam_t;
 
 typedef struct RkAiqExpSensorParam_s {
-    unsigned short fine_integration_time;
-    unsigned short coarse_integration_time;
-    unsigned short analog_gain_code_global;
-    unsigned short digital_gain_global;
-    unsigned short isp_digital_gain;
+    unsigned int fine_integration_time;
+    unsigned int coarse_integration_time;
+    unsigned int analog_gain_code_global;
+    unsigned int digital_gain_global;
+    unsigned int isp_digital_gain;
 } RkAiqExpSensorParam_t;
 
 typedef struct {
@@ -241,9 +253,26 @@ typedef struct {
     RkAiqExpSensorParam_t exp_sensor_params;//reg value
 } RkAiqExpParamComb_t;
 
+typedef struct {
+    int            step;
+    int            gain;
+    bool           update;
+} RkAiqPIrisParam_t;
+
+typedef struct {
+    int        pwmDuty; //percent value,range = 0-100
+    bool       update;
+} RkAiqDCIrisParam_t;
+
+typedef struct {
+    RkAiqPIrisParam_t   PIris;
+    RkAiqDCIrisParam_t  DCIris;
+} RkAiqIrisParamComb_t;
+
 typedef struct RKAiqAecExpInfo_s {
     RkAiqExpParamComb_t LinearExp;
     RkAiqExpParamComb_t HdrExp[3];
+    RkAiqIrisParamComb_t Iris;
     unsigned short line_length_pixels;
     unsigned short frame_length_lines;
     float pixel_clock_freq_mhz;

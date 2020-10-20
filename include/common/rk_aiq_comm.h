@@ -66,8 +66,12 @@ typedef enum RKAiqOPMode_e {
 } RKAiqOPMode_t;
 
 #define ABS(a) (((a) > 0) ? (a) : (-(a)))
-#define MAX(a,b)  ((a) >= (b) ? (a):(b))
-#define MIN(a,b)  ((a) <= (b) ? (a):(b))
+#ifndef MIN
+#define MIN(a,b)  ((a) > (b) ? (b) : (a))
+#endif
+#ifndef MAX
+#define MAX(a,b)  ((a) < (b) ? (b) : (a))
+#endif
 #define ROUND_D(x) (long)(((double)x)+(((x) > 0) ? 0.5 : (-0.5)))
 #define ROUND_F(x) (int)(((float)x)+(((x) > 0) ? 0.5 : (-0.5)))
 #define FLOOR(a)   (int)( ((double)(a) < (int)(a)) ? (int)((a)-1) : (int)(a) )
@@ -453,13 +457,13 @@ typedef enum {
     RK_MODULE_SHARP,
     RK_MODULE_AE,
     RK_MODULE_AWB,
-    RK_MODULE_NR,
+    RK_MODULE_NR,//10
     RK_MODULE_GIC,
     RK_MODULE_3DLUT,
     RK_MODULE_LDCH,
-    RK_MODULE_TNR,
+    RK_MODULE_TNR,//14
     RK_MODULE_FEC,
-    RK_MODULE_RAWNR,
+    RK_MODULE_RAWNR,//16
     RK_MODULE_MAX
 } rk_aiq_module_id_t;
 

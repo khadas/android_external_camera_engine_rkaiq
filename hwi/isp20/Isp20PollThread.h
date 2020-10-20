@@ -53,21 +53,25 @@ public:
     virtual ~Isp20PollThread();
 
     bool set_event_handle_dev(SmartPtr<SensorHw> &dev);
+    bool set_iris_handle_dev(SmartPtr<LensHw> &dev);
     bool set_focus_handle_dev(SmartPtr<LensHw> &dev);
     bool set_rx_handle_dev(CamHwIsp20* dev);
     void set_mipi_devs(SmartPtr<V4l2Device> mipi_tx_devs[3],
                        SmartPtr<V4l2Device> mipi_rx_devs[3],
                        SmartPtr<V4l2SubDevice> isp_dev);
     void set_hdr_frame_readback_infos(int frame_id, int times);
-    XCamReturn hdr_mipi_start(SmartPtr<SensorHw> sensor);
-    XCamReturn hdr_mipi_stop();
     XCamReturn notify_capture_raw();
     // should be called befor start
-    void set_working_mode(int mode);
+    void set_working_mode(int mode, bool linked_to_isp);
     void set_loop_status(bool stat);
-    XCamReturn capture_raw_ctl(bool sync);
+    XCamReturn capture_raw_ctl(capture_raw_t type, int count = 0, const char* capture_dir = nullptr, char* output_dir = nullptr);
+    void set_hdr_global_tmo_mode(int frame_id, bool mode);
     virtual XCamReturn start();
     virtual XCamReturn stop ();
+    void setMulCamConc(bool cc) {
+        _is_multi_cam_conc = cc;
+    }
+    void skip_frames(int skip_num, int32_t skip_seq);
     enum {
         ISP_POLL_MIPI_TX,
         ISP_POLL_MIPI_RX,
@@ -106,6 +110,7 @@ private:
     std::map<uint32_t, int> _isp_hdr_fid2times_map;
     std::map<uint32_t, bool> _isp_hdr_fid2ready_map;
     int _working_mode;
+    bool _linked_to_isp;
     int _mipi_dev_max;
     Mutex _mipi_buf_mutex;
     Mutex _mipi_trigger_mutex;
@@ -114,12 +119,14 @@ private:
 private:
     XCAM_DEAD_COPY(Isp20PollThread);
     SmartPtr<SensorHw> _event_handle_dev;
+    SmartPtr<LensHw> _iris_handle_dev;
     SmartPtr<LensHw> _focus_handle_dev;
     CamHwIsp20* _rx_handle_dev;
     uint32_t sns_width;
     uint32_t sns_height;
     uint32_t pixelformat;
     char raw_dir_path[64];
+    char user_set_raw_dir[64];
     bool _is_raw_dir_exist;
     bool _is_capture_raw;
     sint32_t _capture_raw_num;
@@ -127,8 +134,11 @@ private:
     static const struct capture_fmt csirx_fmts[];
     Mutex _capture_image_mutex;
     Cond _capture_image_cond;
-    bool _is_raw_sync_yuv;
-
+    capture_raw_t _capture_raw_type;
+    std::map<uint32_t, bool> _hdr_global_tmo_state_map;
+    bool _is_multi_cam_conc;
+    int _skip_num;
+    int64_t _skip_to_seq;
     int calculate_stride_per_line(const struct capture_fmt& fmt,
                                   uint32_t& bytesPerLine);
     const struct capture_fmt* find_fmt(const uint32_t pixelformat);
@@ -144,6 +154,14 @@ private:
                                 SmartPtr<RkAiqExpParamsProxy>& expParams);
     bool get_value_from_file(const char* path, int& value, uint32_t& frameId);
     bool set_value_to_file(const char* path, int value, uint32_t sequence = 0);
+    int detect_capture_raw_status(const char* file_name, uint32_t sequence);
+    int update_capture_raw_status(const char* file_name);
+    int dynamic_capture_raw(int i, uint32_t sequence,
+                            SmartPtr<V4l2BufferProxy> buf_proxy,
+                            SmartPtr<V4l2Buffer> &v4l2buf);
+    void match_lumadetect_map(uint32_t sequence, sint32_t &additional_times);
+    void match_globaltmostate_map(uint32_t sequence, bool &isHdrGlobalTmo);
+    bool check_skip_frame(int32_t skip_seq);
 };
 
 }

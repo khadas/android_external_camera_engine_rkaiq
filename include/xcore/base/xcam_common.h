@@ -29,9 +29,12 @@
 #include <stdbool.h>
 #include <errno.h>
 #include <assert.h>
-#include <pthread.h>
 #include <math.h>
 #include "xcam_defs.h"
+
+#if defined(__linux__)
+#include <pthread.h>
+#endif
 
 XCAM_BEGIN_DECLARE
 

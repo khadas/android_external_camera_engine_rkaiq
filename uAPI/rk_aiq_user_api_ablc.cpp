@@ -24,6 +24,7 @@ RKAIQ_BEGIN_DECLARE
 XCamReturn
 rk_aiq_user_api_ablc_SetAttrib(const rk_aiq_sys_ctx_t* sys_ctx, rk_aiq_blc_attrib_t *attr)
 {
+    CHECK_USER_API_ENABLE(RK_AIQ_ALGO_TYPE_ABLC);
     /* RkAiqAblcHandleInt* algo_handle =
          algoHandle<RkAiqAblcHandleInt>(sys_ctx, RK_AIQ_ALGO_TYPE_ABLC);
 

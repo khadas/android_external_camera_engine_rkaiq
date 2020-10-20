@@ -22,6 +22,7 @@
 namespace RkCam {
 
 CamHwBase::CamHwBase()
+    : mKpHwSt (false)
 {}
 
 CamHwBase::~CamHwBase()
@@ -74,6 +75,15 @@ CamHwBase::stop()
     return XCAM_RETURN_NO_ERROR;
 }
 
+XCamReturn CamHwBase::pause()
+{
+    return XCAM_RETURN_NO_ERROR;
+}
+XCamReturn CamHwBase::resume()
+{
+    return XCAM_RETURN_NO_ERROR;
+}
+
 XCamReturn
 CamHwBase::getSensorModeData(const char* sns_ent_name,
                              rk_aiq_exposure_sensor_descriptor& sns_des)
@@ -92,6 +102,12 @@ CamHwBase::setIspParams(SmartPtr<RkAiqIspParamsProxy>& ispParams)
 
 XCamReturn
 CamHwBase::setExposureParams(SmartPtr<RkAiqExpParamsProxy>& expPar)
+{
+    return XCAM_RETURN_NO_ERROR;
+}
+
+XCamReturn
+CamHwBase::setIrisParams(SmartPtr<RkAiqIrisParamsProxy>& irisPar, CalibDb_IrisType_t irisType)
 {
     return XCAM_RETURN_NO_ERROR;
 }

@@ -49,7 +49,7 @@ public:
     int getAlgoId() {
         return mDes->id;
     }
-    virtual XCamReturn updateConfig() {
+    virtual XCamReturn updateConfig(bool needSync) {
         return XCAM_RETURN_NO_ERROR;
     };
 protected:

@@ -29,22 +29,24 @@ unsigned short GetSetLgmean(AhdrHandle_t pAhdrCtx)
     float value = 0;
     float value_default = 20000;
     unsigned short returnValue;
-    int iir_frame = 64;
-    int iir_frame_real = MIN(pAhdrCtx->frameCnt + 1, iir_frame);
+    int iir_frame = 0;
 
-    float PrevLgMean = pAhdrCtx->AhdrPrevData.ro_hdrtmo_lgmean / 2048.0;
-    float CurrLgMean = pAhdrCtx->CurrHandleData.CurrLgMean;
+    if(pAhdrCtx->AhdrConfig.tmo_para.global.iir < IIRMAX) {
+        iir_frame = (int)(pAhdrCtx->AhdrConfig.tmo_para.global.iir);
+        int iir_frame_real = MIN(pAhdrCtx->frameCnt + 1, iir_frame);
 
-    if(pAhdrCtx->AhdrConfig.tmo_para.Band.isHdrGlobalTmo)
-    {
-        CurrLgMean *= 1 + 0.5 - pAhdrCtx->CurrHandleData.CurrTmoHandleData.BandPriorStrength;
-        value_default *= 1 + 0.5 - pAhdrCtx->CurrHandleData.CurrTmoHandleData.BandPriorStrength;
+        float PrevLgMean = pAhdrCtx->AhdrPrevData.ro_hdrtmo_lgmean / 2048.0;
+        float CurrLgMean = pAhdrCtx->CurrHandleData.CurrLgMean;
+
+        CurrLgMean *= 1 + 0.5 - pAhdrCtx->CurrHandleData.CurrTmoHandleData.GlobalTmoStrength;
+        value_default *= 1 + 0.5 - pAhdrCtx->CurrHandleData.CurrTmoHandleData.GlobalTmoStrength;
+
+        value = pAhdrCtx->frameCnt == 0 ? value_default :
+                (iir_frame_real - 1) * PrevLgMean / iir_frame_real + CurrLgMean / iir_frame_real;
+        returnValue = (int)SHIFT11BIT(value) ;
     }
-
-    value = pAhdrCtx->frameCnt == 0 ? value_default :
-            (iir_frame_real - 1) * PrevLgMean / iir_frame_real + CurrLgMean / iir_frame_real;
-
-    returnValue = (int)SHIFT11BIT(value) ;
+    else
+        returnValue = value_default;
 
     LOG1_AHDR( "%s: frameCnt:%d iir_frame:%d set_lgmean_float:%f set_lgmean_return:%d\n", __FUNCTION__,
                pAhdrCtx->frameCnt, iir_frame, value, returnValue);
@@ -156,10 +158,10 @@ void TmoGetCurrIOData
     LOG1_AHDR("%s:Enter!\n", __FUNCTION__);
 
     //default IO data
-    pAhdrCtx->AhdrProcRes.TmoProcRes.sw_hdrtmo_clipratio0 = (int)(pAhdrCtx->CurrHandleData.CurrTmoHandleData.clipratio0 + 0.5);
-    pAhdrCtx->AhdrProcRes.TmoProcRes.sw_hdrtmo_clipratio1 = (int)(pAhdrCtx->CurrHandleData.CurrTmoHandleData.clipratio1 + 0.5);
-    pAhdrCtx->AhdrProcRes.TmoProcRes.sw_hdrtmo_clipgap0 = (int)(pAhdrCtx->CurrHandleData.CurrTmoHandleData.clipgap0 + 0.5);
-    pAhdrCtx->AhdrProcRes.TmoProcRes.sw_hdrtmo_clipgap1 = (int)(pAhdrCtx->CurrHandleData.CurrTmoHandleData.clipgap1 + 0.5);
+    pAhdrCtx->AhdrProcRes.TmoProcRes.sw_hdrtmo_clipratio0 = 64;
+    pAhdrCtx->AhdrProcRes.TmoProcRes.sw_hdrtmo_clipratio1 = 166;
+    pAhdrCtx->AhdrProcRes.TmoProcRes.sw_hdrtmo_clipgap0 = 12;
+    pAhdrCtx->AhdrProcRes.TmoProcRes.sw_hdrtmo_clipgap1 = 12;
     pAhdrCtx->AhdrProcRes.TmoProcRes.sw_hdrtmo_ratiol = 32;
     pAhdrCtx->AhdrProcRes.TmoProcRes.sw_hdrtmo_hist_high = (int)(pAhdrCtx->height * pAhdrCtx->width * 0.01 / 16);
     pAhdrCtx->AhdrProcRes.TmoProcRes.sw_hdrtmo_hist_min = 0;
@@ -177,7 +179,7 @@ void TmoGetCurrIOData
     pAhdrCtx->AhdrProcRes.TmoProcRes.sw_hdrtmo_maxpalpha = (int)(pAhdrCtx->CurrHandleData.CurrTmoHandleData.GlobeMaxLuma + 0.5);
     pAhdrCtx->AhdrProcRes.TmoProcRes.sw_hdrtmo_palpha_0p18 =  (int)(pAhdrCtx->CurrHandleData.CurrTmoHandleData.GlobeLuma + 0.5);
     pAhdrCtx->AhdrProcRes.TmoProcRes.sw_hdrtmo_palpha_lw0p5 = (int)(pAhdrCtx->CurrHandleData.CurrTmoHandleData.DetailsHighLight + 0.5);
-    pAhdrCtx->AhdrProcRes.TmoProcRes.sw_hdrtmo_set_weightkey = (int)(pAhdrCtx->CurrHandleData.CurrTmoHandleData.TmoContrast + 0.5);
+    pAhdrCtx->AhdrProcRes.TmoProcRes.sw_hdrtmo_set_weightkey = (int)(pAhdrCtx->CurrHandleData.CurrTmoHandleData.LocalTmoStrength + 0.5);
     if(pAhdrCtx->SensorInfo.LongFrmMode == false) {
         float lwscl = pAhdrCtx->CurrHandleData.CurrTmoHandleData.DetailsLowLight;
         pAhdrCtx->AhdrProcRes.TmoProcRes.sw_hdrtmo_palpha_lwscl = (int)(lwscl + 0.5);
@@ -193,7 +195,10 @@ void TmoGetCurrIOData
     pAhdrCtx->AhdrProcRes.TmoProcRes.sw_hdrtmo_big_en = pAhdrCtx->width > BIGMODE ? 1 : 0;
     pAhdrCtx->AhdrProcRes.TmoProcRes.sw_hdrtmo_nobig_en = (int)(1 - pAhdrCtx->AhdrProcRes.TmoProcRes.sw_hdrtmo_big_en);
     pAhdrCtx->AhdrProcRes.TmoProcRes.sw_hdrtmo_expl_lgratio = (int)SHIFT11BIT(log(pAhdrCtx->AhdrPrevData.PreLExpo / pAhdrCtx->CurrHandleData.CurrLExpo) / log(2));
-    pAhdrCtx->AhdrProcRes.TmoProcRes.sw_hdrtmo_lgscl_ratio = (int)SHIFT7BIT(log(pAhdrCtx->CurrHandleData.CurrL2S_Ratio) / log(pAhdrCtx->AhdrPrevData.PreL2S_ratio));
+    if(pAhdrCtx->AhdrConfig.tmo_para.isLinearTmoOn)
+        pAhdrCtx->AhdrProcRes.TmoProcRes.sw_hdrtmo_lgscl_ratio = 128;
+    else
+        pAhdrCtx->AhdrProcRes.TmoProcRes.sw_hdrtmo_lgscl_ratio = (int)SHIFT7BIT(log(pAhdrCtx->CurrHandleData.CurrL2S_Ratio) / log(pAhdrCtx->AhdrPrevData.PreL2S_ratio));
     float lgmax = 12 + log(pAhdrCtx->CurrHandleData.CurrL2S_Ratio) / log(2);
     pAhdrCtx->AhdrProcRes.TmoProcRes.sw_hdrtmo_lgmax = (int)SHIFT11BIT(lgmax);
     pAhdrCtx->AhdrProcRes.TmoProcRes.sw_hdrtmo_lgscl = (int)SHIFT12BIT(16 / lgmax);
@@ -266,8 +271,8 @@ void TmoProcessing
     bool enDampLuma;
     bool enDampDtlsHighLgt;
     bool enDampDtlslowLgt;
-    bool enDampSmoothCtrl;
-    bool enBandPrior;
+    bool enDampLocal;
+    bool enDampGlobal;
 
     if(pAhdrCtx->hdrAttr.bEnable == false && pAhdrCtx->frameCnt != 0)
     {
@@ -315,35 +320,35 @@ void TmoProcessing
         else
             enDampDtlslowLgt = true;
 
-        int TmoContrast_mode = (int)pAhdrCtx->AhdrConfig.tmo_para.Contrast.TmoContrastMode;
-        if(TmoContrast_mode == 0) {
+        int LocalMode = (int)pAhdrCtx->AhdrConfig.tmo_para.local.localtmoMode;
+        if(LocalMode == 0) {
             diff = ABS(pAhdrCtx->CurrHandleData.CurrDynamicRange - pAhdrCtx->AhdrPrevData.PreDynamicRange);
             diff = diff / pAhdrCtx->AhdrPrevData.PreDynamicRange;
         }
-        else if(TmoContrast_mode == 1)
+        else if(LocalMode == 1)
         {
             diff = ABS(pAhdrCtx->CurrHandleData.CurrEnvLv - pAhdrCtx->AhdrPrevData.PreEnvlv);
             diff = diff / pAhdrCtx->AhdrPrevData.PreEnvlv;
         }
-        if (diff < pAhdrCtx->AhdrConfig.tmo_para.Contrast.Tolerance)
-            enDampSmoothCtrl = false;
+        if (diff < pAhdrCtx->AhdrConfig.tmo_para.local.Tolerance)
+            enDampLocal = false;
         else
-            enDampSmoothCtrl = true;
+            enDampLocal = true;
 
-        int BandPrior_mode = (int)pAhdrCtx->AhdrConfig.tmo_para.Band.mode;
-        if(BandPrior_mode == 0) {
+        int GlobalMode = (int)pAhdrCtx->AhdrConfig.tmo_para.global.mode;
+        if(GlobalMode == 0) {
             diff = ABS(pAhdrCtx->CurrHandleData.CurrDynamicRange - pAhdrCtx->AhdrPrevData.PreDynamicRange);
             diff = diff / pAhdrCtx->AhdrPrevData.PreDynamicRange;
         }
-        else if(BandPrior_mode == 1)
+        else if(GlobalMode == 1)
         {
             diff = ABS(pAhdrCtx->CurrHandleData.CurrEnvLv - pAhdrCtx->AhdrPrevData.PreEnvlv);
             diff = diff / pAhdrCtx->AhdrPrevData.PreEnvlv;
         }
-        if (diff < pAhdrCtx->AhdrConfig.tmo_para.Band.Tolerance)
-            enBandPrior = false;
+        if (diff < pAhdrCtx->AhdrConfig.tmo_para.global.Tolerance)
+            enDampGlobal = false;
         else
-            enBandPrior = true;
+            enDampGlobal = true;
 
 
         //get finnal cfg data by damp
@@ -363,13 +368,13 @@ void TmoProcessing
             pAhdrCtx->CurrHandleData.CurrTmoHandleData.DetailsLowLight = tmo_damp * pAhdrCtx->CurrHandleData.CurrTmoHandleData.DetailsLowLight
                     + (1 - tmo_damp) * pAhdrCtx->AhdrPrevData.PrevTmoHandleData.DetailsLowLight;
 
-        if (enDampSmoothCtrl == true)
-            pAhdrCtx->CurrHandleData.CurrTmoHandleData.TmoContrast = tmo_damp * pAhdrCtx->CurrHandleData.CurrTmoHandleData.TmoContrast
-                    + (1 - tmo_damp) * pAhdrCtx->AhdrPrevData.PrevTmoHandleData.TmoContrast;
+        if (enDampLocal == true)
+            pAhdrCtx->CurrHandleData.CurrTmoHandleData.LocalTmoStrength = tmo_damp * pAhdrCtx->CurrHandleData.CurrTmoHandleData.LocalTmoStrength
+                    + (1 - tmo_damp) * pAhdrCtx->AhdrPrevData.PrevTmoHandleData.LocalTmoStrength;
 
-        if (enBandPrior == true)
-            pAhdrCtx->CurrHandleData.CurrTmoHandleData.BandPriorStrength = tmo_damp * pAhdrCtx->CurrHandleData.CurrTmoHandleData.BandPriorStrength
-                    + (1 - tmo_damp) * pAhdrCtx->AhdrPrevData.PrevTmoHandleData.BandPriorStrength;
+        if (enDampGlobal == true)
+            pAhdrCtx->CurrHandleData.CurrTmoHandleData.GlobalTmoStrength = tmo_damp * pAhdrCtx->CurrHandleData.CurrTmoHandleData.GlobalTmoStrength
+                    + (1 - tmo_damp) * pAhdrCtx->AhdrPrevData.PrevTmoHandleData.GlobalTmoStrength;
 
     }
 
@@ -377,9 +382,9 @@ void TmoProcessing
     //get current IO data
     TmoGetCurrIOData(pAhdrCtx);
 
-    LOGD_AHDR("%s:Current damp GlobeLuma:%f GlobeMaxLuma:%f DetailsHighLight:%f DetailsLowLight:%f TmoContrast:%f BandPriorStrength:%f\n", __FUNCTION__, pAhdrCtx->CurrHandleData.CurrTmoHandleData.GlobeLuma
+    LOGD_AHDR("%s:Current damp GlobeLuma:%f GlobeMaxLuma:%f DetailsHighLight:%f DetailsLowLight:%f LocalTmoStrength:%f GlobalTmoStrength:%f\n", __FUNCTION__, pAhdrCtx->CurrHandleData.CurrTmoHandleData.GlobeLuma
               , pAhdrCtx->CurrHandleData.CurrTmoHandleData.GlobeMaxLuma, pAhdrCtx->CurrHandleData.CurrTmoHandleData.DetailsHighLight, pAhdrCtx->CurrHandleData.CurrTmoHandleData.DetailsLowLight
-              , pAhdrCtx->CurrHandleData.CurrTmoHandleData.TmoContrast, pAhdrCtx->CurrHandleData.CurrTmoHandleData.BandPriorStrength);
+              , pAhdrCtx->CurrHandleData.CurrTmoHandleData.LocalTmoStrength, pAhdrCtx->CurrHandleData.CurrTmoHandleData.GlobalTmoStrength);
 
     LOG1_AHDR("%s:Eixt!\n", __FUNCTION__);
 }

@@ -34,7 +34,8 @@ public:
                               SmartPtr<V4l2Device> &device,
                               SmartPtr<RkAiqIspParamsProxy> IspParams,
                               SmartPtr<RkAiqExpParamsProxy> ExpParams,
-                              SmartPtr<RkAiqAfInfoProxy> AfParams);
+                              SmartPtr<RkAiqAfInfoProxy> AfParams,
+                              SmartPtr<RkAiqIrisParamsProxy> IrisParams);
     virtual ~Isp20StatsBuffer() {};
 
     SmartPtr<RkAiqExpParamsProxy>& get_exp_params () {
@@ -51,11 +52,16 @@ public:
         return _afParams;
     }
 
+    SmartPtr<RkAiqIrisParamsProxy>& get_iris_params () {
+        return _irisParams;
+    }
+
 private:
     XCAM_DEAD_COPY(Isp20StatsBuffer);
     SmartPtr<RkAiqExpParamsProxy> _expParams;
     SmartPtr<RkAiqIspParamsProxy> _ispParams;
     SmartPtr<RkAiqAfInfoProxy> _afParams;
+    SmartPtr<RkAiqIrisParamsProxy> _irisParams;
 };
 }
 

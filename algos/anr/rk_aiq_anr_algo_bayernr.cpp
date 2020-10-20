@@ -4,7 +4,46 @@
 
 RKAIQ_BEGIN_DECLARE
 
-ANRresult_t bayernr_get_setting_idx_by_name(CalibDb_BayerNr_t *pCalibdb, char *name, int *setting_idx)
+ANRresult_t bayernr_get_mode_cell_idx_by_name(CalibDb_BayerNr_t *pCalibdb, char *name, int *mode_idx)
+{
+	int i = 0;
+	ANRresult_t res = ANR_RET_SUCCESS;
+
+	if(pCalibdb == NULL){
+		LOGE_ANR("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
+		return ANR_RET_NULL_POINTER;
+	}
+
+	if(name == NULL){
+		LOGE_ANR("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
+		return ANR_RET_NULL_POINTER;
+	}
+
+	if(mode_idx == NULL){
+		LOGE_ANR("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
+		return ANR_RET_NULL_POINTER;
+	}
+
+	for(i=0; i<CALIBDB_NR_SHARP_SETTING_LEVEL; i++){
+		if(strncmp(name, pCalibdb->mode_cell[i].name, sizeof(pCalibdb->mode_cell[i].name)) == 0){
+			break;
+		}
+	}
+
+	if(i<CALIBDB_MAX_MODE_NUM){
+		*mode_idx = i;
+		res = ANR_RET_SUCCESS;
+	}else{
+		*mode_idx = 0;
+		res = ANR_RET_FAILURE;
+	}
+
+	LOGD_ANR("%s:%d mode_name:%s  mode_idx:%d i:%d \n", __FUNCTION__, __LINE__,name, *mode_idx, i);
+	return res;
+
+}
+
+ANRresult_t bayernr_get_setting_idx_by_name(CalibDb_BayerNr_t *pCalibdb, char *name, int mode_idx, int *setting_idx)
 {
 	int i = 0;
 	ANRresult_t res = ANR_RET_SUCCESS;
@@ -25,7 +64,7 @@ ANRresult_t bayernr_get_setting_idx_by_name(CalibDb_BayerNr_t *pCalibdb, char *n
 	}
 
 	for(i=0; i<CALIBDB_NR_SHARP_SETTING_LEVEL; i++){
-		if(strncmp(name, pCalibdb->setting[i].name, sizeof(pCalibdb->setting[i].name)) == 0){
+		if(strncmp(name, pCalibdb->mode_cell[mode_idx].setting[i].snr_mode, sizeof(pCalibdb->mode_cell[mode_idx].setting[i].snr_mode)) == 0){
 			break;
 		}
 	}
@@ -43,22 +82,28 @@ ANRresult_t bayernr_get_setting_idx_by_name(CalibDb_BayerNr_t *pCalibdb, char *n
 
 }
 
-ANRresult_t bayernr_config_setting_param(RKAnr_Bayernr_Params_t *pParams, CalibDb_BayerNr_t *pCalibdb, char * snr_name)
+ANRresult_t bayernr_config_setting_param(RKAnr_Bayernr_Params_t *pParams, CalibDb_BayerNr_t *pCalibdb, char* param_mode, char * snr_name)
 {
 	ANRresult_t res = ANR_RET_SUCCESS;
+	int mode_idx = 0;
 	int setting_idx = 0;
 
-	res = bayernr_get_setting_idx_by_name(pCalibdb, snr_name, &setting_idx);
+	res = bayernr_get_mode_cell_idx_by_name(pCalibdb, param_mode, &mode_idx);
+	if(res != ANR_RET_SUCCESS){
+		LOGW_ANR("%s(%d): error!!!  can't find mode name in iq files, use 0 instead\n", __FUNCTION__, __LINE__);
+	}
+
+	res = bayernr_get_setting_idx_by_name(pCalibdb, snr_name, mode_idx, &setting_idx);
 	if(res != ANR_RET_SUCCESS){
 		LOGW_ANR("%s(%d): error!!!  can't find setting in iq files, use 0 instead\n", __FUNCTION__, __LINE__);
 	}
 
-	res = init_bayernr_params(pParams, pCalibdb, setting_idx);
+	res = init_bayernr_params(pParams, pCalibdb, mode_idx, setting_idx);
 
 	return res;
 
 }
-ANRresult_t init_bayernr_params(RKAnr_Bayernr_Params_t *pParams, CalibDb_BayerNr_t *pCalibdb, int setting_idx)
+ANRresult_t init_bayernr_params(RKAnr_Bayernr_Params_t *pParams, CalibDb_BayerNr_t *pCalibdb, int mode_idx, int setting_idx)
 {
     ANRresult_t res = ANR_RET_SUCCESS;
     int i = 0;
@@ -78,7 +123,7 @@ ANRresult_t init_bayernr_params(RKAnr_Bayernr_Params_t *pParams, CalibDb_BayerNr
     //RKAnr_Bayernr_Params_t *pParams = &pANRCtx->stAuto.stBayernrParams;
     //CalibDb_BayerNr_t *pCalibdb = &pANRConfig->stBayernrCalib;
 
-	CalibDb_BayerNR_Params_t *pSetting = &pCalibdb->setting[setting_idx];
+	CalibDb_BayerNR_Params_t *pSetting = &pCalibdb->mode_cell[mode_idx].setting[setting_idx];
 
 	for(i=0; i<MAX_ISO_STEP; i++){
 		#ifndef RK_SIMULATOR_HW
@@ -486,6 +531,12 @@ ANRresult_t bayernr_fix_tranfer(RKAnr_Bayernr_Params_Select_t* rawnr, RKAnr_Baye
         return ANR_RET_NULL_POINTER;
     }
 
+	if(fStrength <= 0.0f){
+		fStrength = 0.000001;
+	}
+
+	LOGD_ANR("%s(%d): strength:%f \n", __FUNCTION__, __LINE__, fStrength);
+
     //(0x0004)
     pRawnrCfg->gauss_en = rawnr->sw_rawnr_gauss_en;
     pRawnrCfg->log_bypass = rawnr->log_bypass;
@@ -559,10 +610,26 @@ ANRresult_t bayernr_fix_tranfer(RKAnr_Bayernr_Params_Select_t* rawnr, RKAnr_Baye
 
 
     //(0x0058 - 0x0005c)
-    pRawnrCfg->fixw0 = (unsigned short)(rawnr->w[0] * (1 << FIXNLMCALC));
-    pRawnrCfg->fixw1 = (unsigned short)(rawnr->w[1] * (1 << FIXNLMCALC));
-    pRawnrCfg->fixw2 = (unsigned short)(rawnr->w[2] * (1 << FIXNLMCALC));
-    pRawnrCfg->fixw3 = (unsigned short)(rawnr->w[3] * (1 << FIXNLMCALC));
+    tmp = (rawnr->w[0] / fStrength * (1 << FIXNLMCALC));
+	if(tmp > 0x3ff){
+		tmp = 0x3ff;
+	}
+	pRawnrCfg->fixw0 = (unsigned short)tmp;
+	tmp = (rawnr->w[1] / fStrength * (1 << FIXNLMCALC));
+	if(tmp > 0x3ff){
+		tmp = 0x3ff;
+	}
+    pRawnrCfg->fixw1 = (unsigned short)tmp;;
+	tmp = (rawnr->w[2] / fStrength * (1 << FIXNLMCALC));
+	if(tmp > 0x3ff){
+		tmp = 0x3ff;
+	}
+    pRawnrCfg->fixw2 = (unsigned short)tmp;
+	tmp = (rawnr->w[3] / fStrength * (1 << FIXNLMCALC));
+	if(tmp > 0x3ff){
+		tmp = 0x3ff;
+	}
+    pRawnrCfg->fixw3 = (unsigned short)tmp;
 
 
     //(0x0060 - 0x00068)

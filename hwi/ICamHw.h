@@ -80,11 +80,16 @@ public:
     virtual XCamReturn prepare(uint32_t width, uint32_t height, int mode, int t_delay, int g_delay) = 0;
     virtual XCamReturn start() = 0;
     virtual XCamReturn stop() = 0;
+    virtual XCamReturn pause() = 0;
+    virtual XCamReturn resume() = 0;
+    virtual void keepHwStAtStop(bool ks) = 0;
+    virtual XCamReturn swWorkingModeDyn(int mode) = 0;
     virtual XCamReturn getSensorModeData(const char* sns_ent_name,
                                          rk_aiq_exposure_sensor_descriptor& sns_des) = 0;
     virtual XCamReturn setIspParams(SmartPtr<RkAiqIspParamsProxy>& ispParams) = 0;
     virtual XCamReturn setHdrProcessCount(int frame_id, int count) = 0;
     virtual XCamReturn setExposureParams(SmartPtr<RkAiqExpParamsProxy>& expPar) = 0;
+    virtual XCamReturn setIrisParams(SmartPtr<RkAiqIrisParamsProxy>& irisPar, CalibDb_IrisType_t irisType) = 0;
     virtual XCamReturn setFocusParams(SmartPtr<RkAiqFocusParamsProxy>& focus_params) = 0;
     virtual XCamReturn setCpslParams(SmartPtr<RkAiqCpslParamsProxy>& cpsl_params) = 0;
     virtual XCamReturn setIsppParams(SmartPtr<RkAiqIsppParamsProxy>& isppParams) = 0;
@@ -95,12 +100,17 @@ public:
     virtual XCamReturn setModuleCtl(rk_aiq_module_id_t mId, bool mod_en) = 0;
     virtual XCamReturn getModuleCtl(rk_aiq_module_id_t mId, bool& mod_en) = 0;
     virtual XCamReturn notify_capture_raw() = 0;
-    virtual XCamReturn capture_raw_ctl(bool sync) = 0;
+    virtual XCamReturn capture_raw_ctl(capture_raw_t type, int count = 0,
+                                       const char* capture_dir = nullptr,
+                                       char* output_dir = nullptr) = 0;
     virtual XCamReturn enqueueBuffer(struct rk_aiq_vbuf *vbuf) = 0;
     virtual XCamReturn offlineRdJobPrepare() = 0;
     virtual XCamReturn offlineRdJobDone() = 0;
-    virtual XCamReturn setSensorFlip(bool mirror, bool flip) = 0;
+    virtual XCamReturn setSensorFlip(bool mirror, bool flip, int skip_frm_cnt) = 0;
     virtual XCamReturn getSensorFlip(bool& mirror, bool& flip) = 0;
+    virtual XCamReturn getZoomPosition(int& position) = 0;
+    virtual XCamReturn getLensVcmCfg(rk_aiq_lens_vcmcfg& lens_cfg) = 0;
+    virtual XCamReturn setLensVcmCfg(rk_aiq_lens_vcmcfg& lens_cfg) = 0;
 private:
     XCAM_DEAD_COPY (ICamHw);
 };

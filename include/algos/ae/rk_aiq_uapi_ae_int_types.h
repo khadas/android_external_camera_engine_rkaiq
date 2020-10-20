@@ -35,6 +35,8 @@ typedef CalibDb_AntiFlickerAttr_t Uapi_AntiFlicker_t;
 
 typedef CalibDb_AeAttr_t Uapi_AeAttr_t;
 
+typedef CalibDb_AecIrisCtrl_t Uapi_IrisAttr_t;
+
 typedef CalibDb_LinMeAttr_t Uapi_LinMeAttr_t;
 
 typedef CalibDb_HdrMeAttr_t Uapi_HdrMeAttr_t;
@@ -42,11 +44,11 @@ typedef CalibDb_HdrMeAttr_t Uapi_HdrMeAttr_t;
 typedef CalibDb_MeAttr_t Uapi_MeAttr_t;
 
 typedef struct Uapi_ExpSwAttr_s {
-    int                      RawStatsMode;
-    int                      HistStatsMode;
-    int                      YRangeMode;
+    CalibDb_CamRawStatsMode_t        RawStatsMode;
+    CalibDb_CamHistStatsMode_t       HistStatsMode;
+    CalibDb_CamYRangeMode_t          YRangeMode;
     uint8_t                  AecRunInterval;
-    int                      AecOpType;
+    RKAiqOPMode_t            AecOpType;
     //GridWeight
     Cam5x5UCharMatrix_t      DayGridWeights;
     Cam5x5UCharMatrix_t      NightGridWeights;
@@ -56,6 +58,7 @@ typedef struct Uapi_ExpSwAttr_s {
     CalibDb_AecDayNightMode_t   DNMode;
     uint8_t                  FillLightMode;
 
+    Uapi_IrisAttr_t          stIris;
     Uapi_AntiFlicker_t       stAntiFlicker;
     Uapi_AeAttr_t            stAuto;
     Uapi_MeAttr_t            stManual;
@@ -92,6 +95,9 @@ typedef struct Uapi_ExpQueryInfo_s {
 
     float             MeanLuma;
     float             HdrMeanLuma[3];
+
+    float             GlobalEnvLux;
+    float             BlockEnvLux[ISP2_RAWAE_WINNUM_MAX];
 
     RKAiqAecExpInfo_t CurExpInfo;
     unsigned short    Piris;

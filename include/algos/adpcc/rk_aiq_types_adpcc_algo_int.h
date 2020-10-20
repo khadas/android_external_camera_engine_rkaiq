@@ -280,6 +280,22 @@ typedef struct Adpcc_fast_mode_params_s {
     int fast_mode_triple_level[CALIBDB_DPCC_MAX_ISO_LEVEL];
 } Adpcc_fast_mode_params_t;
 
+typedef struct Adpcc_fast_mode_attr_s {
+    bool fast_mode_en;
+    bool fast_mode_single_en;
+    int fast_mode_single_level;
+    bool fast_mode_double_en;
+    int fast_mode_double_level;
+    bool fast_mode_triple_en;
+    int fast_mode_triple_level;
+} Adpcc_fast_mode_attr_t;
+
+typedef struct Adpcc_sensor_dpcc_attr_s {
+    bool en;
+    int max_level;
+    int single_level;
+    int double_level;
+} Adpcc_sensor_dpcc_attr_t;
 
 typedef struct Adpcc_sensor_dpcc_s {
     bool en;
@@ -307,7 +323,8 @@ typedef struct Adpcc_Manual_Attr_s
     Adpcc_basic_params_select_t stBasic;
     Adpcc_bpt_params_select_t stBpt;
     Adpcc_pdaf_params_select_t stPdaf;
-
+    Adpcc_fast_mode_attr_t stFastMode;
+    Adpcc_sensor_dpcc_attr_t stSensorDpcc;
 } Adpcc_Manual_Attr_t;
 
 typedef struct Adpcc_Auto_Attr_s
@@ -315,6 +332,8 @@ typedef struct Adpcc_Auto_Attr_s
     Adpcc_basic_params_t stBasicParams;
     Adpcc_bpt_params_t  stBptParams;
     Adpcc_pdaf_params_t stPdafParams;
+    CalibDb_Dpcc_Fast_Mode_t stFastMode;
+    CalibDb_Dpcc_Sensor_t stSensorDpcc;
 
     Adpcc_basic_params_select_t stBasicSelect;
     Adpcc_bpt_params_select_t stBptSelect;

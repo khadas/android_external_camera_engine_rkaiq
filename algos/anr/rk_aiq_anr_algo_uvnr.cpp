@@ -2,7 +2,46 @@
 
 RKAIQ_BEGIN_DECLARE
 
-ANRresult_t uvnr_get_setting_idx_by_name(CalibDb_UVNR_t *pCalibdb, char *name, int *setting_idx)
+ANRresult_t uvnr_get_mode_cell_idx_by_name(CalibDb_UVNR_t *pCalibdb, char *name, int *mode_idx)
+{
+	int i = 0;
+	ANRresult_t res = ANR_RET_SUCCESS;
+
+	if(pCalibdb == NULL){
+		LOGE_ANR("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
+		return ANR_RET_NULL_POINTER;
+	}
+
+	if(name == NULL){
+		LOGE_ANR("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
+		return ANR_RET_NULL_POINTER;
+	}
+
+	if(mode_idx == NULL){
+		LOGE_ANR("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
+		return ANR_RET_NULL_POINTER;
+	}
+
+	for(i=0; i<CALIBDB_NR_SHARP_SETTING_LEVEL; i++){
+		if(strncmp(name, pCalibdb->mode_cell[i].name, sizeof(pCalibdb->mode_cell[i].name)) == 0){
+			break;
+		}
+	}
+
+	if(i < CALIBDB_MAX_MODE_NUM){
+		*mode_idx = i;
+		res = ANR_RET_SUCCESS;
+	}else{
+		*mode_idx = 0;
+		res = ANR_RET_FAILURE;
+	}
+
+	LOGD_ANR("%s:%d mode_name:%s  mode_idx:%d i:%d \n", __FUNCTION__, __LINE__, name, *mode_idx, i);
+	return res;
+
+}
+
+ANRresult_t uvnr_get_setting_idx_by_name(CalibDb_UVNR_t *pCalibdb, char *name, int mode_idx, int *setting_idx)
 {
 	int i = 0;
 	ANRresult_t res = ANR_RET_SUCCESS;
@@ -23,7 +62,7 @@ ANRresult_t uvnr_get_setting_idx_by_name(CalibDb_UVNR_t *pCalibdb, char *name, i
 	}
 
 	for(i=0; i<CALIBDB_NR_SHARP_SETTING_LEVEL; i++){
-		if(strncmp(name, pCalibdb->setting[i].name, sizeof(pCalibdb->setting[i].name)) == 0){
+		if(strncmp(name, pCalibdb->mode_cell[mode_idx].setting[i].snr_mode, sizeof(pCalibdb->mode_cell[mode_idx].setting[i].snr_mode)) == 0){
 			break;
 		}
 	}
@@ -41,9 +80,10 @@ ANRresult_t uvnr_get_setting_idx_by_name(CalibDb_UVNR_t *pCalibdb, char *name, i
 
 }
 
-ANRresult_t uvnr_config_setting_param(RKAnr_Uvnr_Params_t *pParams, CalibDb_UVNR_t *pCalibdb, char * snr_name)
+ANRresult_t uvnr_config_setting_param(RKAnr_Uvnr_Params_t *pParams, CalibDb_UVNR_t *pCalibdb, char* param_mode, char * snr_name)
 {
 	ANRresult_t res = ANR_RET_SUCCESS;
+	int mode_idx = 0;
 	int setting_idx = 0;
 
 	if(pParams == NULL){
@@ -56,18 +96,23 @@ ANRresult_t uvnr_config_setting_param(RKAnr_Uvnr_Params_t *pParams, CalibDb_UVNR
 		return ANR_RET_NULL_POINTER;
 	}
 
-	res = uvnr_get_setting_idx_by_name(pCalibdb, snr_name, &setting_idx);
+	res = uvnr_get_mode_cell_idx_by_name(pCalibdb, param_mode, &mode_idx);
+	if(res != ANR_RET_SUCCESS){
+		LOGW_ANR("%s(%d): error!!!  can't find mode cell in iq files, use 0 instead\n", __FUNCTION__, __LINE__);
+	}
+	
+	res = uvnr_get_setting_idx_by_name(pCalibdb, snr_name, mode_idx, &setting_idx);
 	if(res != ANR_RET_SUCCESS){
 		LOGW_ANR("%s(%d): error!!!  can't find setting in iq files, use 0 instead\n", __FUNCTION__, __LINE__);
 	}
 
-	res = init_uvnr_params(pParams, pCalibdb, setting_idx);
+	res = init_uvnr_params(pParams, pCalibdb, mode_idx, setting_idx);
 
 	return res;
 
 }
 
-ANRresult_t init_uvnr_params(RKAnr_Uvnr_Params_t *pParams, CalibDb_UVNR_t *pCalibdb, int setting_idx)
+ANRresult_t init_uvnr_params(RKAnr_Uvnr_Params_t *pParams, CalibDb_UVNR_t *pCalibdb, int mode_idx, int setting_idx)
 {
     ANRresult_t res = ANR_RET_SUCCESS;
     int i = 0;
@@ -83,7 +128,7 @@ ANRresult_t init_uvnr_params(RKAnr_Uvnr_Params_t *pParams, CalibDb_UVNR_t *pCali
         return ANR_RET_NULL_POINTER;
     }
 
-	CalibDb_UVNR_Params_t *pSetting = &pCalibdb->setting[setting_idx];
+	CalibDb_UVNR_Params_t *pSetting = &pCalibdb->mode_cell[mode_idx].setting[setting_idx];
     for(i = 0; i < MAX_ISO_STEP; i++) {
 #ifndef RK_SIMULATOR_HW
 		pParams->iso[i] = pSetting->ISO[i];

@@ -20,20 +20,11 @@
 #ifndef _RK_AIQ_TYPES_ACP_ALGO_H_
 #define _RK_AIQ_TYPES_ACP_ALGO_H_
 
-typedef struct rk_aiq_ranges_s {
-    float min;
-    float max;
-} rk_aiq_ranges_t;
-
 typedef struct rk_aiq_acp_params_s {
-    /*range:  0.0  - 1.992*/
-    float contrast;
-    /* -90 deg - +87.188*/
-    float hue;
-    /*range : -128  - +127 */
-    signed char brightness;
-    /*range:  0.0  - 1.992*/
-    float saturation;
+    uint8_t brightness;
+    uint8_t contrast;
+    uint8_t saturation;
+    uint8_t hue;
 } rk_aiq_acp_params_t;
 
 #endif

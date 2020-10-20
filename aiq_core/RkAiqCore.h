@@ -75,6 +75,8 @@ public:
         xcam_mem_clear(aec_stats);
         xcam_mem_clear(awb_stats);
         xcam_mem_clear(awb_stats_v201);
+        xcam_mem_clear(awb_cfg_effect_v200);
+        xcam_mem_clear(awb_cfg_effect_v201);
         xcam_mem_clear(af_stats);
         aec_stats_valid = false;
         awb_stats_valid = false;
@@ -128,6 +130,7 @@ public:
     };
 
     void triger_start() {
+        mStatsQueue.clear ();
         mStatsQueue.resume_pop ();
     };
 
@@ -205,6 +208,9 @@ public:
         if (rp)
             mAlogsSharedParams.resourcePath = strdup(rp);
     };
+    bool isRunningState() {
+        return mState == RK_AIQ_CORE_STATE_RUNNING;
+    }
 public:
     // following vars shared by all algo handlers
     typedef struct RkAiqAlgosShared_s {
@@ -299,6 +305,7 @@ private:
         RK_AIQ_CORE_STATE_INITED,
         RK_AIQ_CORE_STATE_PREPARED,
         RK_AIQ_CORE_STATE_STARTED,
+        RK_AIQ_CORE_STATE_RUNNING,
         RK_AIQ_CORE_STATE_STOPED,
     };
     SmartPtr<RkAiqCoreThread> mRkAiqCoreTh;
@@ -356,6 +363,7 @@ private:
     SmartPtr<RkAiqFullParamsPool> mAiqParamsPool;
     SmartPtr<RkAiqFullParamsProxy> mAiqCurParams;
     SmartPtr<RkAiqExpParamsPool> mAiqExpParamsPool;
+    SmartPtr<RkAiqIrisParamsPool> mAiqIrisParamsPool;
     SmartPtr<RkAiqIspParamsPool> mAiqIspParamsPool;
     SmartPtr<RkAiqIsppParamsPool> mAiqIsppParamsPool;
     SmartPtr<RkAiqFocusParamsPool> mAiqFocusParamsPool;
@@ -366,7 +374,10 @@ private:
     struct RkAiqHwInfo mHwInfo;
     rk_aiq_cpsl_cap_t mCpslCap;
     bool mCurCpslOn;
+    float mStrthLed;
+    float mStrthIr;
     rk_aiq_gray_mode_t mGrayMode;
+    bool firstStatsReceived;
 };
 
 };

@@ -101,6 +101,14 @@ pre_process(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outparams)
 
     LOGI_ASHARP("%s: (enter)\n", __FUNCTION__ );
 	AsharpContext_t* pAsharpCtx = (AsharpContext_t *)inparams->ctx;
+
+	RkAiqAlgoPreAsharpInt* pAsharpPreParams = (RkAiqAlgoPreAsharpInt*)inparams;
+	
+	if (pAsharpPreParams->rk_com.u.proc.gray_mode) {
+        pAsharpCtx->isGrayMode = true;
+    }else {
+        pAsharpCtx->isGrayMode = false;
+    }
 	
     //nothing todo now
     AsharpResult_t ret = AsharpPreProcess(pAsharpCtx);

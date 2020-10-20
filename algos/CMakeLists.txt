@@ -209,6 +209,7 @@ endif()
 set (ASD_SRC
 	asd/rk_aiq_algo_asd_itf.cpp
     asd/scene_detector.cpp
+	asd/rk_aiq_uapi_asd_int.cpp
     )
 
 if(EXISTS "${CMAKE_SOURCE_DIR}/algos/asd/rk_aiq_algo_asd_itf.cpp")
@@ -233,6 +234,7 @@ endif()
 # ----------------------------------------------------------------------------
 set (ACP_SRC
 	acp/rk_aiq_algo_acp_itf.cpp
+	acp/rk_aiq_uapi_acp_int.cpp
     )
 
 if(EXISTS "${CMAKE_SOURCE_DIR}/algos/acp/rk_aiq_algo_acp_itf.cpp")
@@ -531,6 +533,7 @@ endif()
 # ----------------------------------------------------------------------------
 set (ALDCH_SRC
 	aldch/rk_aiq_algo_aldch_itf.cpp
+	aldch/rk_aiq_uapi_aldch_int.cpp
     )
 
 if(EXISTS "${CMAKE_SOURCE_DIR}/algos/aldch/rk_aiq_algo_aldch_itf.cpp")

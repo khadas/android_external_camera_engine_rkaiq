@@ -40,6 +40,7 @@ V4l2Device::V4l2Device (const char *name)
     , _sensor_id (0)
     , _capture_mode (0)
     , _buf_type (V4L2_BUF_TYPE_VIDEO_CAPTURE)
+    , _buf_sync (false)
     , _memory_type (V4L2_MEMORY_MMAP)
     , _planes (NULL)
     , _fps_n (0)
@@ -137,6 +138,16 @@ V4l2Device::set_buf_type (enum v4l2_buf_type type) {
         return false;
     }
     _buf_type = type;
+    return true;
+}
+
+bool
+V4l2Device::set_buf_sync (bool sync) {
+    if (is_activated ()) {
+        XCAM_LOG_WARNING ("device(%s) set buf sync failed", XCAM_STR (_name));
+        return false;
+    }
+    _buf_sync = sync;
     return true;
 }
 
@@ -646,6 +657,7 @@ V4l2Device::start (bool prepared)
 XCamReturn
 V4l2Device::stop ()
 {
+    SmartLock auto_lock(_buf_mutex);
     XCAM_LOG_INFO ("device(%s) stop, already start: %d", XCAM_STR (_name), _active);
 
     // stream off
@@ -653,10 +665,32 @@ V4l2Device::stop ()
         if (io_control (VIDIOC_STREAMOFF, &_buf_type) < 0) {
             XCAM_LOG_WARNING ("device(%s) steamoff failed", XCAM_STR (_name));
         }
-        fini_buffer_pool ();
         _active = false;
+        /* while (_queued_bufcnt > 0) { */
+        /*     struct v4l2_buffer v4l2_buf; */
+        /*     struct v4l2_plane planes[FMT_NUM_PLANES]; */
+
+        /*     xcam_mem_clear (v4l2_buf); */
+        /*     v4l2_buf.type = _buf_type; */
+        /*     v4l2_buf.memory = _memory_type; */
+
+        /*     if (V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE == _buf_type || */
+        /*             V4L2_BUF_TYPE_VIDEO_OUTPUT_MPLANE == _buf_type) { */
+        /*         memset(planes, 0, sizeof(struct v4l2_plane) * FMT_NUM_PLANES); */
+        /*         v4l2_buf.m.planes = planes; */
+        /*         v4l2_buf.length = FMT_NUM_PLANES; */
+        /*     } */
+
+        /*     if (this->io_control (VIDIOC_DQBUF, &v4l2_buf) < 0) { */
+        /*         XCAM_LOG_WARNING ("device(%s) fail to dequeue buffer.", XCAM_STR (_name)); */
+        /*     } */
+        /*     _queued_bufcnt--; */
+        /* } */
+        /* fini_buffer_pool (); */
     }
 
+    if (_buf_pool.size() > 0)
+        fini_buffer_pool ();
     return XCAM_RETURN_NO_ERROR;
 }
 
@@ -714,6 +748,10 @@ V4l2Device::allocate_buffer (
     v4l2_buf.index = index;
     v4l2_buf.type = _buf_type;
     v4l2_buf.memory = _memory_type;
+    /* if (_buf_sync) { */
+    /*     v4l2_buf.flags = V4L2_BUF_FLAG_NO_CACHE_INVALIDATE | */
+    /*         V4L2_BUF_FLAG_NO_CACHE_CLEAN; */
+    /* } */
 
     if (V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE == _buf_type ||
             V4L2_BUF_TYPE_VIDEO_OUTPUT_MPLANE == _buf_type) {
@@ -975,9 +1013,14 @@ V4l2Device::dequeue_buffer(SmartPtr<V4l2Buffer> &buf)
 }
 
 XCamReturn
-V4l2Device::get_buffer (SmartPtr<V4l2Buffer> &buf) const
+V4l2Device::get_buffer (SmartPtr<V4l2Buffer> &buf, int index) const
 {
     SmartLock auto_lock(_buf_mutex);
+
+    if (index != -1 && !(_buf_pool[index]->get_queued())) {
+        buf = _buf_pool[index];
+        return XCAM_RETURN_NO_ERROR;
+    }
 
     uint32_t i;
 
@@ -1004,8 +1047,14 @@ V4l2Device::return_buffer (SmartPtr<V4l2Buffer> &buf)
         XCAM_ASSERT (buf.ptr());
         buf->reset ();
         return XCAM_RETURN_NO_ERROR;
-    } else
-        return queue_buffer (buf, true);
+   } else {
+        if (!_active)
+            buf->reset();
+        else
+            return queue_buffer (buf, true);
+   }
+
+   return XCAM_RETURN_NO_ERROR;
 }
 
 XCamReturn
@@ -1052,12 +1101,17 @@ V4l2Device::queue_buffer (SmartPtr<V4l2Buffer> &buf, bool locked)
         _buf_mutex.unlock();
 
     if (io_control (VIDIOC_QBUF, &v4l2_buf) < 0) {
-        XCAM_LOG_ERROR("fail to enqueue buffer index:%d.", v4l2_buf.index);
+        XCAM_LOG_ERROR("%s fail to enqueue buffer index:%d.",
+                       XCAM_STR(_name), v4l2_buf.index);
         // restore buf status
         {
-            SmartLock auto_lock(_buf_mutex);
+            if (!locked)
+                _buf_mutex.lock();
+            /* SmartLock auto_lock(_buf_mutex); */
             buf->set_queued(false);
             _queued_bufcnt--;
+            if (!locked)
+                _buf_mutex.unlock();
         }
 
         return XCAM_RETURN_ERROR_IOCTL;

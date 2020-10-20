@@ -331,6 +331,8 @@
 #define CALIB_SENSOR_AEC_MANUALCTRL_ISPDGAINVALUE               "IspDGainValue"
 #define CALIB_SENSOR_AEC_MANUALCTRL_PIRISVALUE                  "PIrisValue"
 
+#define CALIB_SENSOR_AEC_IRISCTRL_TYPE_P                         "P"
+#define CALIB_SENSOR_AEC_IRISCTRL_TYPE_DC                        "DC"
 
 #define CALIB_SENSOR_AEC_LINEARAE_CTRL                           "LinearAECtrl"
 #define CALIB_SENSOR_AEC_RAWSTATSEN                              "RawStatsEn"

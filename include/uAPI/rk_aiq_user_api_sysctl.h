@@ -85,10 +85,11 @@ rk_aiq_uapi_sysctl_start(const rk_aiq_sys_ctx_t* ctx);
  * \brief stop aiq control system
  *
  * \param[in] ctx             the context returned by \ref rk_aiq_uapi_sysctl_init
+ * \param[in] keep_ext_hw_st  do not change external devices status, like ircut/cpsl
  * \return return 0 if success
  */
 XCamReturn
-rk_aiq_uapi_sysctl_stop(const rk_aiq_sys_ctx_t* ctx);
+rk_aiq_uapi_sysctl_stop(const rk_aiq_sys_ctx_t* ctx, bool keep_ext_hw_st);
 
 XCamReturn
 rk_aiq_uapi_sysctl_getStaticMetas(const char* sns_ent_name, rk_aiq_static_info_t* static_info);
@@ -270,6 +271,25 @@ rk_aiq_uapi_sysctl_setSharpFbcRotation(const rk_aiq_sys_ctx_t* ctx, rk_aiq_rotat
  * \return return 0 if success
  */
 void rk_aiq_uapi_get_version_info(rk_aiq_ver_info_t* vers);
+
+/*!
+ * \brief switch working mode dynamically
+ * this aims to switch the isp pipeline working mode fast, and can be called on
+ * streaming status. On non streaming status, should call rk_aiq_uapi_sysctl_prepare
+ * instead of this to set working mode.
+ */
+XCamReturn
+rk_aiq_uapi_sysctl_swWorkingModeDyn(const rk_aiq_sys_ctx_t* ctx, rk_aiq_working_mode_t mode);
+
+/*!
+ * \brief set multiple cameras working concurrently
+ * Notify this AIQ ctx will run with other sensor's AIQ ctx.
+
+ * \param[in] cc        set cams concurrently used or not
+ * \note should be called before rk_aiq_uapi_sysctl_start
+ */
+void
+rk_aiq_uapi_sysctl_setMulCamConc(const rk_aiq_sys_ctx_t* ctx, bool cc);
 
 RKAIQ_END_DECLARE
 

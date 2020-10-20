@@ -40,6 +40,8 @@
 #include "afec/rk_aiq_uapi_afec_int.h"
 #include "af/rk_aiq_uapi_af_int.h"
 #include "asd/rk_aiq_uapi_asd_int.h"
+#include "aldch/rk_aiq_uapi_aldch_int.h"
+#include "acp/rk_aiq_uapi_acp_int.h"
 
 namespace RkCam {
 
@@ -50,12 +52,16 @@ class RkAiqHandleIntCom : virtual public RkAiqHandle
 public:
     explicit RkAiqHandleIntCom(RkAiqAlgoDesComm* des, RkAiqCore* aiqCore)
         : RkAiqHandle(des, aiqCore)
-        , updateAtt(false) {};
+        , updateAtt(false)
+        , mUpdateCond(false) {};
     virtual ~RkAiqHandleIntCom() {};
 protected:
     XCamReturn configInparamsCom(RkAiqAlgoCom* com, int type);
+    void waitSignal();
+    void sendSignal();
     XCam::Mutex mCfgMutex;
     bool updateAtt;
+    XCam::Cond mUpdateCond;
 };
 
 #define RKAIQHANDLEINT(algo) \
@@ -87,7 +93,7 @@ protected:
 //RKAIQHANDLEINT(Asharp);
 //RKAIQHANDLEINT(Adhaz);
 //RKAIQHANDLEINT(Asd);
-RKAIQHANDLEINT(Acp);
+//RKAIQHANDLEINT(Acp);
 //RKAIQHANDLEINT(A3dlut);
 //RKAIQHANDLEINT(Ablc);
 //RKAIQHANDLEINT(Accm);
@@ -98,7 +104,7 @@ RKAIQHANDLEINT(Acgc);
 //RKAIQHANDLEINT(Agamma);
 //RKAIQHANDLEINT(Agic);
 RKAIQHANDLEINT(Aie);
-RKAIQHANDLEINT(Aldch);
+// RKAIQHANDLEINT(Aldch);
 RKAIQHANDLEINT(Ar2y);
 RKAIQHANDLEINT(Awdr);
 RKAIQHANDLEINT(Aorb);
@@ -114,7 +120,7 @@ public:
     virtual ~RkAiqAeHandleInt() {
         RkAiqAeHandle::deInit();
     };
-    virtual XCamReturn updateConfig();
+    virtual XCamReturn updateConfig(bool needSync);
     virtual XCamReturn prepare();
     virtual XCamReturn preProcess();
     virtual XCamReturn processing();
@@ -144,8 +150,6 @@ protected:
         RkAiqAeHandle::deInit();
     };
 private:
-    // TODO
-    XCam::Mutex mCfgMutex;
     Uapi_ExpSwAttr_t  mCurExpSwAttr;
     Uapi_ExpSwAttr_t  mNewExpSwAttr;
     Uapi_LinExpAttr_t mCurLinExpAttr;
@@ -181,11 +185,14 @@ public:
     explicit RkAiqAwbHandleInt(RkAiqAlgoDesComm* des, RkAiqCore* aiqCore)
         : RkAiqHandle(des, aiqCore)
         , RkAiqAwbHandle(des, aiqCore)
-        , RkAiqHandleIntCom(des, aiqCore) {};
+        , RkAiqHandleIntCom(des, aiqCore) {
+        memset(&mCurAtt, 0, sizeof(rk_aiq_wb_attrib_t));
+        memset(&mNewAtt, 0, sizeof(rk_aiq_wb_attrib_t));
+      };
     virtual ~RkAiqAwbHandleInt() {
         RkAiqAwbHandle::deInit();
     };
-    virtual XCamReturn updateConfig();
+    virtual XCamReturn updateConfig(bool needSync);
     virtual XCamReturn prepare();
     virtual XCamReturn preProcess();
     virtual XCamReturn processing();
@@ -224,7 +231,7 @@ public:
     virtual ~RkAiqAfHandleInt() {
         RkAiqAfHandle::deInit();
     };
-    virtual XCamReturn updateConfig();
+    virtual XCamReturn updateConfig(bool needSync);
     virtual XCamReturn prepare();
     virtual XCamReturn preProcess();
     virtual XCamReturn processing();
@@ -234,6 +241,11 @@ public:
     XCamReturn getAttrib(rk_aiq_af_attrib_t *att);
     XCamReturn lock();
     XCamReturn unlock();
+    XCamReturn Oneshot();
+    XCamReturn ManualTriger();
+    XCamReturn Tracking();
+    XCamReturn setZoomPos(int zoom_pos);
+    XCamReturn GetSearchPath(rk_aiq_af_sec_path_t* path);
 
 protected:
     virtual void init();
@@ -257,7 +269,7 @@ public:
     virtual ~RkAiqAdebayerHandleInt() {
         RkAiqAdebayerHandle::deInit();
     };
-    virtual XCamReturn updateConfig();
+    virtual XCamReturn updateConfig(bool needSync);
     virtual XCamReturn prepare();
     virtual XCamReturn preProcess();
     virtual XCamReturn processing();
@@ -271,8 +283,6 @@ protected:
         RkAiqAdebayerHandle::deInit();
     };
 private:
-    // TODO
-    XCam::Mutex mCfgMutex;
     adebayer_attrib_t mCurAtt;
     adebayer_attrib_t mNewAtt;
 };
@@ -289,7 +299,7 @@ public:
     virtual ~RkAiqAhdrHandleInt() {
         RkAiqAhdrHandle::deInit();
     };
-    virtual XCamReturn updateConfig();
+    virtual XCamReturn updateConfig(bool needSync);
     virtual XCamReturn prepare();
     virtual XCamReturn preProcess();
     virtual XCamReturn processing();
@@ -302,8 +312,6 @@ protected:
         RkAiqAhdrHandle::deInit();
     };
 private:
-    // TODO
-    XCam::Mutex mCfgMutex;
     ahdr_attrib_t mCurAtt;
     ahdr_attrib_t mNewAtt;
 };
@@ -319,7 +327,7 @@ public:
     virtual ~RkAiqAgicHandleInt() {
         RkAiqAgicHandle::deInit();
     };
-    virtual XCamReturn updateConfig();
+    virtual XCamReturn updateConfig(bool needSync);
     virtual XCamReturn prepare();
     virtual XCamReturn preProcess();
     virtual XCamReturn processing();
@@ -332,8 +340,6 @@ protected:
         RkAiqAgicHandle::deInit();
     };
 private:
-    // TODO
-    XCam::Mutex mCfgMutex;
     agic_attrib_t mCurAtt;
     agic_attrib_t mNewAtt;
 };
@@ -350,7 +356,7 @@ public:
     virtual ~RkAiqAdhazHandleInt() {
         RkAiqAdhazHandle::deInit();
     };
-    virtual XCamReturn updateConfig();
+    virtual XCamReturn updateConfig(bool needSync);
     virtual XCamReturn prepare();
     virtual XCamReturn preProcess();
     virtual XCamReturn processing();
@@ -386,7 +392,7 @@ public:
     virtual ~RkAiqAgammaHandleInt() {
         RkAiqAgammaHandle::deInit();
     };
-    virtual XCamReturn updateConfig();
+    virtual XCamReturn updateConfig(bool needSync);
     virtual XCamReturn prepare();
     virtual XCamReturn preProcess();
     virtual XCamReturn processing();
@@ -423,7 +429,7 @@ public:
     virtual ~RkAiqAlscHandleInt() {
         RkAiqAlscHandle::deInit();
     };
-    virtual XCamReturn updateConfig();
+    virtual XCamReturn updateConfig(bool needSync);
     virtual XCamReturn prepare();
     virtual XCamReturn preProcess();
     virtual XCamReturn processing();
@@ -459,7 +465,7 @@ public:
     virtual ~RkAiqAccmHandleInt() {
         RkAiqAccmHandle::deInit();
     };
-    virtual XCamReturn updateConfig();
+    virtual XCamReturn updateConfig(bool needSync);
     virtual XCamReturn prepare();
     virtual XCamReturn preProcess();
     virtual XCamReturn processing();
@@ -495,7 +501,7 @@ public:
     virtual ~RkAiqA3dlutHandleInt() {
         RkAiqA3dlutHandle::deInit();
     };
-    virtual XCamReturn updateConfig();
+    virtual XCamReturn updateConfig(bool needSync);
     virtual XCamReturn prepare();
     virtual XCamReturn preProcess();
     virtual XCamReturn processing();
@@ -533,7 +539,7 @@ public:
     virtual ~RkAiqAblcHandleInt() {
         RkAiqAblcHandle::deInit();
     };
-    virtual XCamReturn updateConfig();
+    virtual XCamReturn updateConfig(bool needSync);
     virtual XCamReturn prepare();
     virtual XCamReturn preProcess();
     virtual XCamReturn processing();
@@ -571,7 +577,7 @@ public:
     virtual ~RkAiqAdpccHandleInt() {
         RkAiqAdpccHandle::deInit();
     };
-    virtual XCamReturn updateConfig();
+    virtual XCamReturn updateConfig(bool needSync);
     virtual XCamReturn prepare();
     virtual XCamReturn preProcess();
     virtual XCamReturn processing();
@@ -607,7 +613,7 @@ public:
     virtual ~RkAiqAnrHandleInt() {
         RkAiqAnrHandle::deInit();
     };
-    virtual XCamReturn updateConfig();
+    virtual XCamReturn updateConfig(bool needSync);
     virtual XCamReturn prepare();
     virtual XCamReturn preProcess();
     virtual XCamReturn processing();
@@ -657,7 +663,7 @@ public:
     virtual ~RkAiqAsharpHandleInt() {
         RkAiqAsharpHandle::deInit();
     };
-    virtual XCamReturn updateConfig();
+    virtual XCamReturn updateConfig(bool needSync);
     virtual XCamReturn prepare();
     virtual XCamReturn preProcess();
     virtual XCamReturn processing();
@@ -693,17 +699,22 @@ public:
     explicit RkAiqAfecHandleInt(RkAiqAlgoDesComm* des, RkAiqCore* aiqCore)
         : RkAiqHandle(des, aiqCore)
         , RkAiqAfecHandle(des, aiqCore)
-        , RkAiqHandleIntCom(des, aiqCore) {};
+        , RkAiqHandleIntCom(des, aiqCore) {
+            memset(&mCurAtt, 0, sizeof(rk_aiq_fec_attrib_t));
+            memset(&mNewAtt, 0, sizeof(rk_aiq_fec_attrib_t));
+            mCurAtt.en = 0xff;
+        };
     virtual ~RkAiqAfecHandleInt() {
         RkAiqAfecHandle::deInit();
     };
+    virtual XCamReturn updateConfig(bool needSync);
     virtual XCamReturn prepare();
     virtual XCamReturn preProcess();
     virtual XCamReturn processing();
     virtual XCamReturn postProcess();
 
-    XCamReturn enable();
-    XCamReturn disable();
+    XCamReturn setAttrib(rk_aiq_fec_attrib_t att);
+    XCamReturn getAttrib(rk_aiq_fec_attrib_t *att);
 
 protected:
     virtual void init();
@@ -711,7 +722,8 @@ protected:
         RkAiqAfecHandle::deInit();
     };
 private:
-    // TODO
+    rk_aiq_fec_attrib_t mCurAtt;
+    rk_aiq_fec_attrib_t mNewAtt;
 };
 
 class RkAiqAsdHandleInt:
@@ -725,7 +737,7 @@ public:
     virtual ~RkAiqAsdHandleInt() {
         RkAiqAsdHandle::deInit();
     };
-    virtual XCamReturn updateConfig();
+    virtual XCamReturn updateConfig(bool needSync);
     virtual XCamReturn prepare();
     virtual XCamReturn preProcess();
     virtual XCamReturn processing();
@@ -739,11 +751,72 @@ protected:
         RkAiqAsdHandle::deInit();
     };
 private:
-    // TODO
-    XCam::Mutex mCfgMutex;
     asd_attrib_t mCurAtt;
     asd_attrib_t mNewAtt;
 };
+
+// aldch
+class RkAiqAldchHandleInt:
+    virtual public RkAiqAldchHandle,
+    virtual public RkAiqHandleIntCom {
+public:
+    explicit RkAiqAldchHandleInt(RkAiqAlgoDesComm* des, RkAiqCore* aiqCore)
+        : RkAiqHandle(des, aiqCore)
+        , RkAiqAldchHandle(des, aiqCore)
+        , RkAiqHandleIntCom(des, aiqCore) {
+            memset(&mCurAtt, 0, sizeof(rk_aiq_ldch_attrib_t));
+            memset(&mNewAtt, 0, sizeof(rk_aiq_ldch_attrib_t));
+        };
+    virtual ~RkAiqAldchHandleInt() {
+        RkAiqAldchHandle::deInit();
+    };
+    virtual XCamReturn updateConfig(bool needSync);
+    virtual XCamReturn prepare();
+    virtual XCamReturn preProcess();
+    virtual XCamReturn processing();
+    virtual XCamReturn postProcess();
+
+    XCamReturn setAttrib(rk_aiq_ldch_attrib_t att);
+    XCamReturn getAttrib(rk_aiq_ldch_attrib_t *att);
+
+protected:
+    virtual void init();
+    virtual void deInit() {
+        RkAiqAldchHandle::deInit();
+    };
+private:
+    rk_aiq_ldch_attrib_t mCurAtt;
+    rk_aiq_ldch_attrib_t mNewAtt;
+};
+
+class RkAiqAcpHandleInt:
+    virtual public RkAiqAcpHandle,
+    virtual public RkAiqHandleIntCom {
+public:
+    explicit RkAiqAcpHandleInt(RkAiqAlgoDesComm* des, RkAiqCore* aiqCore)
+        : RkAiqHandle(des, aiqCore)
+        , RkAiqAcpHandle(des, aiqCore)
+        , RkAiqHandleIntCom(des, aiqCore) {};
+    virtual ~RkAiqAcpHandleInt() {
+        RkAiqAcpHandle::deInit();
+    };
+    virtual XCamReturn updateConfig(bool needSync);
+    virtual XCamReturn prepare();
+    virtual XCamReturn preProcess();
+    virtual XCamReturn processing();
+    virtual XCamReturn postProcess();
+    XCamReturn setAttrib(acp_attrib_t att);
+    XCamReturn getAttrib(acp_attrib_t *att);
+protected:
+    virtual void init();
+    virtual void deInit() {
+        RkAiqAcpHandle::deInit();
+    };
+private:
+    acp_attrib_t mCurAtt;
+    acp_attrib_t mNewAtt;
+};
+
 }; //namespace RkCam
 
 #endif

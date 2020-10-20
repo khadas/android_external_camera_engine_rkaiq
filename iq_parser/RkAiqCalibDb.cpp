@@ -235,7 +235,7 @@ void RkAiqCalibDb::createCalibDbBinFromXml(char* iqFile)
                 if (magicCode != pCalibDb->header.magic_code) {
                     LOGE("magic code is not matched! calculated:%u, readed:%u", magicCode, pCalibDb->header.magic_code);
                 }else {
-                    LOGD("create calibdb from %s success.", iqFile);
+                    LOGI("create calibdb from %s success, magic code %u.", iqFile, magicCode);
                     if (calibSaveToFile(iqFile, pCalibDb))
                         LOGD("save to bin success.");
                     else

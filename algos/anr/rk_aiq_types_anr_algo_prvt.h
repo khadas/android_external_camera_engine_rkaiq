@@ -219,6 +219,7 @@ typedef struct ANRContext_s {
 
 	bool isIQParaUpdate;
 	bool isGrayMode;
+	ANRParamMode_t eParamMode;
 } ANRContext_t;
 
 

@@ -88,7 +88,7 @@ public:
     XCamReturn getEffectiveExpParams(SmartPtr<RkAiqExpParamsProxy>& ExpParams, int frame_id);
     XCamReturn set_working_mode(int mode);
     XCamReturn set_exp_delay_info(int time_delay, int gain_delay, int hcg_lcg_mode_delay);
-    XCamReturn set_mirror_flip(bool mirror, bool flip);
+    XCamReturn set_mirror_flip(bool mirror, bool flip, int32_t& skip_frame_sequence);
     XCamReturn get_mirror_flip(bool& mirror, bool& flip);
     XCamReturn start();
     XCamReturn stop();
@@ -116,6 +116,9 @@ private:
     SmartPtr<RkAiqExpParamsPool> _expParamsPool;
     static uint16_t DEFAULT_POOL_SIZE;
     std::string _sns_entity_name;
+    bool _mirror;
+    bool _flip;
+    bool _update_mirror_flip;
     int get_sensor_fps(float& fps);
     XCamReturn setLinearSensorExposure(RKAiqAecExpInfo_t* expPar);
     XCamReturn setHdrSensorExposure(RKAiqAecExpInfo_t* expPar);
@@ -124,6 +127,8 @@ private:
     uint32_t get_v4l2_pixelformat(uint32_t pixelcode);
     XCamReturn composeExpParam( RKAiqAecExpInfo_t* timeValid, RKAiqAecExpInfo_t* gainValid, RKAiqAecExpInfo_t* dcgGainModeValid, RKAiqAecExpInfo_t* newExp);
     int get_nr_switch(rk_aiq_sensor_nr_switch_t* nr_switch);
+    XCamReturn _set_mirror_flip();
+
 };
 
 }; //namespace RkCam

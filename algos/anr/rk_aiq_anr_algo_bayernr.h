@@ -13,7 +13,13 @@
 
 RKAIQ_BEGIN_DECLARE
 
-ANRresult_t init_bayernr_params(RKAnr_Bayernr_Params_t *pParams, CalibDb_BayerNr_t *pCalibdb, int setting_idx);
+ANRresult_t bayernr_get_mode_cell_idx_by_name(CalibDb_BayerNr_t *pCalibdb, char *name, int *mode_idx);
+
+ANRresult_t bayernr_get_setting_idx_by_name(CalibDb_BayerNr_t *pCalibdb, char *name, int mode_idx, int *setting_idx);
+
+ANRresult_t bayernr_config_setting_param(RKAnr_Bayernr_Params_t *pParams, CalibDb_BayerNr_t *pCalibdb, char* param_mode, char * snr_name);
+
+ANRresult_t init_bayernr_params(RKAnr_Bayernr_Params_t *pParams, CalibDb_BayerNr_t *pCalibdb, int mode_idx, int setting_idx);
 
 ANRresult_t select_bayernr_params_by_ISO(RKAnr_Bayernr_Params_t *stBayerNrParams, RKAnr_Bayernr_Params_Select_t *stBayerNrParamsSelected, ANRExpInfo_t *pExpInfo);
 
@@ -23,8 +29,6 @@ ANRresult_t bayernr_fix_tranfer(RKAnr_Bayernr_Params_Select_t* rawnr, RKAnr_Baye
 
 ANRresult_t bayernr_fix_printf(RKAnr_Bayernr_Fix_t * pRawnrCfg);
 
-ANRresult_t bayernr_get_setting_idx_by_name(CalibDb_BayerNr_t *pCalibdb, char *name, int *setting_idx);
-ANRresult_t bayernr_config_setting_param(RKAnr_Bayernr_Params_t *pParams, CalibDb_BayerNr_t *pCalibdb, char* snr_name);
 RKAIQ_END_DECLARE
 
 #endif  // BAYERNR_READ_PARM_H_

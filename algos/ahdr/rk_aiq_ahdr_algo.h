@@ -28,7 +28,7 @@ void AhdrGetStats(AhdrHandle_t pAhdrCtx, rkisp_ahdr_stats_t* ROData) ;
 void AhdrApiOffUpdate(AhdrHandle_t pAhdrCtx, AecPreResult_t AecHdrPreResult, af_preprocess_result_t AfPreResult);
 void AhdrApiOnUpdate(AhdrHandle_t pAhdrCtx);
 void AhdrGetSensorInfo( AhdrHandle_t pAhdrCtx, AecProcResult_t AecHdrProcResult);
-void AhdrGetXmlParas(AhdrHandle_t pAhdrCtx, const CamCalibDbContext_t* pConfig);
+void AhdrSelectMode(AhdrHandle_t pAhdrCtx, CalibDb_Ahdr_Para_t* pConfig, int mode);
 void AhdrUpdateConfig(AhdrHandle_t pAhdrCtx, AecPreResult_t AecHdrPreResult, af_preprocess_result_t AfPreResult);
 bool BandPrior(AhdrHandle_t pAhdrCtx);
 RESULT AhdrInit(AhdrInstanceConfig_t* pInstConfig) ;

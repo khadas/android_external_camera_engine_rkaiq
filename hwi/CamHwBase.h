@@ -47,10 +47,19 @@ public:
     virtual XCamReturn prepare(uint32_t width, uint32_t height, int mode, int t_dealy, int g_delay);
     virtual XCamReturn start();
     virtual XCamReturn stop();
+    virtual XCamReturn pause();
+    virtual XCamReturn resume();
+    virtual XCamReturn swWorkingModeDyn(int mode) {
+        return XCAM_RETURN_NO_ERROR;
+    };
+    virtual void keepHwStAtStop(bool ks) {
+        mKpHwSt = ks;
+    };
     virtual XCamReturn getSensorModeData(const char* sns_ent_name,
                                          rk_aiq_exposure_sensor_descriptor& sns_des);
     virtual XCamReturn setIspParams(SmartPtr<RkAiqIspParamsProxy>& ispParams);
     virtual XCamReturn setExposureParams(SmartPtr<RkAiqExpParamsProxy>& expPar);
+    virtual XCamReturn setIrisParams(SmartPtr<RkAiqIrisParamsProxy>& irisPar, CalibDb_IrisType_t irisType);
     virtual XCamReturn setFocusParams(SmartPtr<RkAiqFocusParamsProxy>& focus_params);
     virtual XCamReturn setCpslParams(SmartPtr<RkAiqCpslParamsProxy>& cpsl_params);
     virtual XCamReturn setIsppParams(SmartPtr<RkAiqIsppParamsProxy>& isppParams);
@@ -67,7 +76,9 @@ public:
     virtual XCamReturn notify_capture_raw() {
         return  XCAM_RETURN_ERROR_FAILED;
     }
-    virtual XCamReturn capture_raw_ctl(bool sync) {
+    virtual XCamReturn capture_raw_ctl(capture_raw_t type, int count = 0,
+                                       const char* capture_dir = nullptr, \
+                                       char* output_dir = nullptr) {
         return  XCAM_RETURN_ERROR_FAILED;
     }
     virtual XCamReturn enqueueBuffer(struct rk_aiq_vbuf *vbuf) {
@@ -79,10 +90,19 @@ public:
     virtual XCamReturn offlineRdJobDone() {
         return  XCAM_RETURN_ERROR_FAILED;
     }
-    virtual XCamReturn setSensorFlip(bool mirror, bool flip) {
+    virtual XCamReturn setSensorFlip(bool mirror, bool flip, int skip_frm_cnt) {
         return  XCAM_RETURN_ERROR_FAILED;
     }
     virtual XCamReturn getSensorFlip(bool& mirror, bool& flip) {
+        return  XCAM_RETURN_ERROR_FAILED;
+    }
+    virtual XCamReturn getZoomPosition(int& position) {
+        return  XCAM_RETURN_ERROR_FAILED;
+    }
+    virtual XCamReturn setLensVcmCfg(rk_aiq_lens_vcmcfg& lens_cfg) {
+        return  XCAM_RETURN_ERROR_FAILED;
+    }
+    virtual XCamReturn getLensVcmCfg(rk_aiq_lens_vcmcfg& lens_cfg) {
         return  XCAM_RETURN_ERROR_FAILED;
     }
 protected:
@@ -109,7 +129,7 @@ protected:
     IspEvtsListener* mIspEvtsListener;
     int mWorkingMode;
     const CamCalibDbContext_t* mCalibDb;
-
+    bool mKpHwSt;
 private:
     XCAM_DEAD_COPY (CamHwBase);
 };

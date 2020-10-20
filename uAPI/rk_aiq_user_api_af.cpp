@@ -24,6 +24,7 @@ RKAIQ_BEGIN_DECLARE
 XCamReturn
 rk_aiq_user_api_af_SetAttrib(const rk_aiq_sys_ctx_t* sys_ctx, rk_aiq_af_attrib_t attr)
 {
+    CHECK_USER_API_ENABLE(RK_AIQ_ALGO_TYPE_AF);
     RkAiqAfHandleInt* algo_handle =
         algoHandle<RkAiqAfHandleInt>(sys_ctx, RK_AIQ_ALGO_TYPE_AF);
 
@@ -68,6 +69,98 @@ rk_aiq_user_api_af_Unlock(const rk_aiq_sys_ctx_t* sys_ctx)
 
     if (algo_handle) {
         return algo_handle->unlock();
+    }
+
+    return XCAM_RETURN_NO_ERROR;
+}
+
+XCamReturn
+rk_aiq_user_api_af_Oneshot(const rk_aiq_sys_ctx_t* sys_ctx)
+{
+    RkAiqAfHandleInt* algo_handle =
+        algoHandle<RkAiqAfHandleInt>(sys_ctx, RK_AIQ_ALGO_TYPE_AF);
+
+    if (algo_handle) {
+        return algo_handle->Oneshot();
+    }
+
+    return XCAM_RETURN_NO_ERROR;
+}
+
+XCamReturn
+rk_aiq_user_api_af_ManualTriger(const rk_aiq_sys_ctx_t* sys_ctx)
+{
+    RkAiqAfHandleInt* algo_handle =
+        algoHandle<RkAiqAfHandleInt>(sys_ctx, RK_AIQ_ALGO_TYPE_AF);
+
+    if (algo_handle) {
+        return algo_handle->ManualTriger();
+    }
+
+    return XCAM_RETURN_NO_ERROR;
+}
+
+XCamReturn
+rk_aiq_user_api_af_Tracking(const rk_aiq_sys_ctx_t* sys_ctx)
+{
+    RkAiqAfHandleInt* algo_handle =
+        algoHandle<RkAiqAfHandleInt>(sys_ctx, RK_AIQ_ALGO_TYPE_AF);
+
+    if (algo_handle) {
+        return algo_handle->Tracking();
+    }
+
+    return XCAM_RETURN_NO_ERROR;
+}
+
+XCamReturn
+rk_aiq_user_api_af_SetZoomPos(const rk_aiq_sys_ctx_t* sys_ctx, int zoom_pos)
+{
+    RkAiqAfHandleInt* algo_handle =
+        algoHandle<RkAiqAfHandleInt>(sys_ctx, RK_AIQ_ALGO_TYPE_AF);
+
+    if (algo_handle) {
+        return algo_handle->setZoomPos(zoom_pos);
+    }
+
+    return XCAM_RETURN_NO_ERROR;
+}
+
+XCamReturn
+rk_aiq_user_api_af_GetZoomPos(const rk_aiq_sys_ctx_t* sys_ctx, int* zoom_pos)
+{
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    ret = sys_ctx->_camHw->getZoomPosition(*zoom_pos);
+
+    return ret;
+}
+
+XCamReturn
+rk_aiq_user_api_af_SetVcmCfg(const rk_aiq_sys_ctx_t* sys_ctx, rk_aiq_lens_vcmcfg* cfg)
+{
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    ret = sys_ctx->_camHw->setLensVcmCfg(*cfg);
+
+    return ret;
+}
+
+XCamReturn
+rk_aiq_user_api_af_GetVcmCfg(const rk_aiq_sys_ctx_t* sys_ctx, rk_aiq_lens_vcmcfg* cfg)
+{
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    ret = sys_ctx->_camHw->getLensVcmCfg(*cfg);
+
+    return ret;
+}
+
+XCamReturn
+rk_aiq_user_api_af_GetSearchPath(const rk_aiq_sys_ctx_t* sys_ctx, rk_aiq_af_sec_path_t* path)
+{
+    RkAiqAfHandleInt* algo_handle =
+        algoHandle<RkAiqAfHandleInt>(sys_ctx, RK_AIQ_ALGO_TYPE_AF);
+
+    if (algo_handle) {
+        return algo_handle->GetSearchPath(path);
     }
 
     return XCAM_RETURN_NO_ERROR;

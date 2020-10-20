@@ -26,12 +26,10 @@
 
 RKAIQ_BEGIN_DECLARE
 
-
-
 static XCamReturn
 gen_mesh_table(
     float k1, float k2, float p1, float p2, float k3,
-    int pic_width, int pic_height,
+    int src_width, int src_height,
     int mesh_h_size, int mesh_v_size,
     int* meshxi, int* meshxf, int* meshyi, int* meshyf) {
     //TODO::implement mesh table generation function
@@ -46,13 +44,45 @@ create_context(RkAiqAlgoContext **context, const AlgoCtxInstanceCfg* cfg)
         LOGE_AFEC( "%s: create afec context fail!\n", __FUNCTION__);
         return XCAM_RETURN_ERROR_MEM;
     }
-    ctx->hFEC = new FECContext_t;
+    ctx->hFEC = new FECContext_t();
     if (ctx->hFEC == NULL) {
         LOGE_AFEC( "%s: create afec handle fail!\n", __FUNCTION__);
         return XCAM_RETURN_ERROR_MEM;
     }
-    memset(ctx->hFEC, 0, sizeof(FECContext_t));
+    memset((void *)(ctx->hFEC), 0, sizeof(FECContext_t));
     *context = ctx;
+#if GENMESH_ONLINE
+    ctx->hFEC->afecReadMeshThread = new RKAiqAfecThread(ctx->hFEC);
+    ctx->hFEC->afecReadMeshThread->triger_start();
+    ctx->hFEC->afecReadMeshThread->start();
+#endif
+
+    const AlgoCtxInstanceCfgInt* cfg_int = (const AlgoCtxInstanceCfgInt*)cfg;
+    FECHandle_t fecCtx = ctx->hFEC;
+    CalibDb_FEC_t* calib_fec = &cfg_int->calib->afec;
+
+    fecCtx->fec_en = calib_fec->fec_en;
+    memcpy(fecCtx->meshfile, calib_fec->meshfile, sizeof(fecCtx->meshfile));
+#if GENMESH_ONLINE
+    fecCtx->camCoeff.cx = calib_fec->light_center[0];
+    fecCtx->camCoeff.cy = calib_fec->light_center[1];
+    fecCtx->camCoeff.a0 = calib_fec->coefficient[0];
+    fecCtx->camCoeff.a2 = calib_fec->coefficient[1];
+    fecCtx->camCoeff.a3 = calib_fec->coefficient[2];
+    fecCtx->camCoeff.a4 = calib_fec->coefficient[3];
+    LOGI_AFEC("(%s) len light center(%.16f, %.16f)\n",
+            __FUNCTION__,
+            fecCtx->camCoeff.cx, fecCtx->camCoeff.cy);
+    LOGI_AFEC("(%s) len coefficient(%.16f, %.16f, %.16f, %.16f)\n",
+            __FUNCTION__,
+            fecCtx->camCoeff.a0, fecCtx->camCoeff.a2,
+            fecCtx->camCoeff.a3, fecCtx->camCoeff.a4);
+#endif
+    fecCtx->correct_level = calib_fec->correct_level;
+    memset(&fecCtx->user_config, 0, sizeof(fecCtx->user_config));
+
+    ctx->hFEC->eState = FEC_STATE_INVALID;
+
     return XCAM_RETURN_NO_ERROR;
 }
 
@@ -61,7 +91,15 @@ destroy_context(RkAiqAlgoContext *context)
 {
     FECHandle_t hFEC = (FECHandle_t)context->hFEC;
     FECContext_t* fecCtx = (FECContext_t*)hFEC;
-
+#if GENMESH_ONLINE
+    fecCtx->afecReadMeshThread->triger_stop();
+    fecCtx->afecReadMeshThread->stop();
+    if (fecCtx->meshxi != NULL || fecCtx->meshyi != NULL || \
+        fecCtx->meshxf != NULL || fecCtx->meshyf != NULL)
+        freeFecMesh(fecCtx->meshxi, fecCtx->meshxf,
+                fecCtx->meshyi, fecCtx->meshyf);
+    genFecMeshDeInit(fecCtx->fecParams);
+#else
     if (fecCtx->meshxi != NULL) {
         free(fecCtx->meshxi);
         fecCtx->meshxi = NULL;
@@ -81,6 +119,7 @@ destroy_context(RkAiqAlgoContext *context)
         free(fecCtx->meshyf);
         fecCtx->meshyf = NULL;
     }
+#endif
     delete context->hFEC;
     context->hFEC = NULL;
     delete context;
@@ -116,9 +155,17 @@ uint32_t cal_fec_mesh(uint32_t width, uint32_t height, uint32_t mode, uint32_t &
 static XCamReturn
 read_mesh_table(FECContext_t* fecCtx, unsigned int correct_level)
 {
+    bool ret;
 #if OPENCV_SUPPORT
-    gen_default_mesh_table(fecCtx->pic_width, fecCtx->pic_height, fecCtx->mesh_density,
+    gen_default_mesh_table(fecCtx->src_width, fecCtx->src_height, fecCtx->mesh_density,
                            fecCtx->meshxi, fecCtx->meshyi, fecCtx->meshxf, fecCtx->meshyf);
+#elif GENMESH_ONLINE
+    ret = genFECMeshNLevel(fecCtx->fecParams, fecCtx->camCoeff, correct_level, fecCtx->meshxi,
+                           fecCtx->meshxf, fecCtx->meshyi, fecCtx->meshyf);
+    if (!ret) {
+        LOGE_AFEC("afec gen mesh false!");
+        return XCAM_RETURN_ERROR_FAILED;
+    }
 #else
     FILE* ofp;
     char filename[512];
@@ -201,44 +248,87 @@ prepare(RkAiqAlgoCom* params)
     FECHandle_t hFEC = (FECHandle_t)params->ctx->hFEC;
     FECContext_t* fecCtx = (FECContext_t*)hFEC;
     RkAiqAlgoConfigAfecInt* rkaiqAfecConfig = (RkAiqAlgoConfigAfecInt*)params;
-
+#if 0 //moved to create_ctx
     fecCtx->fec_en = rkaiqAfecConfig->afec_calib_cfg.fec_en;
-    fecCtx->user_en = -1;
-    fecCtx->bypass = false;
     memcpy(fecCtx->meshfile, rkaiqAfecConfig->afec_calib_cfg.meshfile, sizeof(fecCtx->meshfile));
-    fecCtx->pic_width = params->u.prepare.sns_op_width;
-    fecCtx->pic_height = params->u.prepare.sns_op_height;
-    fecCtx->resource_path = rkaiqAfecConfig->resource_path;
+    fecCtx->camCoeff.cx = rkaiqAfecConfig->afec_calib_cfg.light_center[0];
+    fecCtx->camCoeff.cy = rkaiqAfecConfig->afec_calib_cfg.light_center[1];
+    fecCtx->camCoeff.a0 = rkaiqAfecConfig->afec_calib_cfg.coefficient[0];
+    fecCtx->camCoeff.a2 = rkaiqAfecConfig->afec_calib_cfg.coefficient[1];
+    fecCtx->camCoeff.a3 = rkaiqAfecConfig->afec_calib_cfg.coefficient[2];
+    fecCtx->camCoeff.a4 = rkaiqAfecConfig->afec_calib_cfg.coefficient[3];
+    LOGI_AFEC("(%s) len light center(%.16f, %.16f)\n",
+            __FUNCTION__,
+            fecCtx->camCoeff.cx, fecCtx->camCoeff.cy);
+    LOGI_AFEC("(%s) len coefficient(%.16f, %.16f, %.16f, %.16f)\n",
+            __FUNCTION__,
+            fecCtx->camCoeff.a0, fecCtx->camCoeff.a2,
+            fecCtx->camCoeff.a3, fecCtx->camCoeff.a4);
+#endif
 
-    if (fecCtx->pic_width <= 1920) {
+    fecCtx->src_width = params->u.prepare.sns_op_width;
+    fecCtx->src_height = params->u.prepare.sns_op_height;
+    fecCtx->resource_path = rkaiqAfecConfig->resource_path;
+    fecCtx->dst_width = params->u.prepare.sns_op_width;
+    fecCtx->dst_height = params->u.prepare.sns_op_height;
+
+    if (fecCtx->src_width <= 1920) {
         fecCtx->mesh_density = 0;
     } else {
         fecCtx->mesh_density = 1;
     }
 
-    double correct_level = rkaiqAfecConfig->afec_calib_cfg.correct_level;
-    if (fabs(correct_level) <= fabs(EPSINON)) {
-        fecCtx->correct_level = FEC_BYPASS;
-    } else if (correct_level >= 1.0) {
-        fecCtx->correct_level = FEC_CORRECT_LEVEL0;
-    } else if (1 - correct_level <= 0.25) {
-        fecCtx->correct_level = FEC_CORRECT_LEVEL1;
-    } else if (1 - correct_level <= 0.50) {
-        fecCtx->correct_level = FEC_CORRECT_LEVEL2;
-    } else if (1 - correct_level <= 0.75) {
-        fecCtx->correct_level = FEC_CORRECT_LEVEL3;
+    double correct_level = fecCtx->correct_level;
+    if (fecCtx->isAttribUpdated) {
+        if (fecCtx->user_config.bypass)
+            correct_level = 0;
+        fecCtx->fec_en = fecCtx->user_config.en;
+        fecCtx->isAttribUpdated = false;
     } else {
-        fecCtx->correct_level = FEC_BYPASS;
+        fecCtx->user_config.en = fecCtx->fec_en;
     }
+    fecCtx->user_config.correct_level = correct_level ;
 
+#if GENMESH_ONLINE
+    fecCtx->user_config.correct_level = correct_level;
+	fecCtx->fecParams.correctX = 1;
+	fecCtx->fecParams.correctY = 1;
+	fecCtx->fecParams.saveMesh4bin = 0;
+	sprintf(fecCtx->fecParams.mesh4binPath, "/tmp/");
+
+    // deinit firtly
+    if (fecCtx->fecParams.mapx)
+        genFecMeshDeInit(fecCtx->fecParams);
+
+    if (fecCtx->meshxi != NULL || fecCtx->meshyi != NULL || \
+        fecCtx->meshxf != NULL || fecCtx->meshyf != NULL)
+        freeFecMesh(fecCtx->meshxi, fecCtx->meshxf,
+                fecCtx->meshyi, fecCtx->meshyf);
+
+    genFecMeshInit(fecCtx->src_width, fecCtx->src_height, fecCtx->dst_width,
+            fecCtx->dst_height, fecCtx->fecParams, fecCtx->camCoeff);
+    mallocFecMesh(fecCtx->fecParams.meshSize4bin, &fecCtx->meshxi,
+            &fecCtx->meshxf, &fecCtx->meshyi, &fecCtx->meshyf);
+    fecCtx->fec_mesh_h_size = fecCtx->fecParams.meshSizeW;
+    fecCtx->fec_mesh_v_size = fecCtx->fecParams.meshSizeH;
+    fecCtx->fec_mesh_size = fecCtx->fecParams.meshSize4bin;
+    LOGI_AFEC("(%s) en: %d, bypass(%d), correct_level(%d), dimen(%d-%d), mesh dimen(%d-%d), size(%d)",
+              fecCtx->meshfile, fecCtx->fec_en,
+              fecCtx->user_config.bypass, fecCtx->user_config.correct_level,
+              fecCtx->src_width, fecCtx->src_height,
+              fecCtx->fec_mesh_h_size, fecCtx->fec_mesh_v_size,
+              fecCtx->fec_mesh_size);
+    if (!fecCtx->fec_en)
+        return XCAM_RETURN_NO_ERROR;
+#else
     fecCtx->fec_mesh_size =
-        cal_fec_mesh(fecCtx->pic_width, fecCtx->pic_height, fecCtx->mesh_density,
+        cal_fec_mesh(fecCtx->src_width, fecCtx->src_height, fecCtx->mesh_density,
                      fecCtx->fec_mesh_h_size, fecCtx->fec_mesh_v_size);
 
     LOGI_AFEC("(%s) en: %d, user_en: %d, correct_level: %d, dimen: %d-%d, mesh dimen: %d-%d, size: %d",
-              rkaiqAfecConfig->afec_calib_cfg.meshfile, fecCtx->fec_en,
-              fecCtx->user_en, fecCtx->correct_level,
-              fecCtx->pic_width, fecCtx->pic_height,
+              fecCtx->meshfile, fecCtx->fec_en,
+              fecCtx->user_config.en, fecCtx->user_config.correct_level,
+              fecCtx->src_width, fecCtx->src_height,
               fecCtx->fec_mesh_h_size, fecCtx->fec_mesh_v_size,
               fecCtx->fec_mesh_size);
     if (!fecCtx->fec_en)
@@ -264,8 +354,9 @@ prepare(RkAiqAlgoCom* params)
     fecCtx->meshxf = (unsigned char*)malloc(fecCtx->fec_mesh_size * sizeof(unsigned char));
     fecCtx->meshyi = (unsigned short*)malloc(fecCtx->fec_mesh_size * sizeof(unsigned short));
     fecCtx->meshyf = (unsigned char*)malloc(fecCtx->fec_mesh_size * sizeof(unsigned char));
-
-    read_mesh_table(fecCtx, fecCtx->correct_level);
+#endif
+    read_mesh_table(fecCtx, fecCtx->user_config.correct_level);
+    fecCtx->eState = FEC_STATE_INITIALIZED;
 
     return XCAM_RETURN_NO_ERROR;
 }
@@ -295,21 +386,25 @@ processing(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outparams)
     // params may be changed
     if (!fecCtx->fec_en)
         return XCAM_RETURN_NO_ERROR;
+    fecCtx->eState = FEC_STATE_RUNNING;
 
     if (inparams->u.proc.init) {
         fecPreOut->afec_result.update = 1;
     } else {
-        fecPreOut->afec_result.update = 0;
 
-        if (fecCtx->user_en && fecCtx->bypass) {
-            read_mesh_table(fecCtx, fecCtx->correct_level);
-            fecCtx->bypass = false;
+        if (fecCtx->isAttribUpdated) {
+            fecCtx->isAttribUpdated = false;
             fecPreOut->afec_result.update = 1;
-        } else if(!fecCtx->user_en && !fecCtx->bypass) {
-            read_mesh_table(fecCtx, FEC_BYPASS);
-            fecCtx->bypass = true;
-            fecPreOut->afec_result.update = 1;
+        } else {
+            fecPreOut->afec_result.update = 0;
         }
+
+        LOGV_AFEC("en(%d), user en(%d), bypass(%d), level(%d), result update(%d)\n",
+                fecCtx->fec_en,
+                fecCtx->user_config.en,
+                fecCtx->user_config.bypass,
+                fecCtx->user_config.correct_level,
+                fecPreOut->afec_result.update);
     }
 
     if (fecPreOut->afec_result.update) {
@@ -349,3 +444,40 @@ RkAiqAlgoDescription g_RkIspAlgoDescAfec = {
 };
 
 RKAIQ_END_DECLARE
+
+bool RKAiqAfecThread::loop()
+{
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    ENTER_ANALYZER_FUNCTION();
+
+    const static int32_t timeout = -1;
+    SmartPtr<rk_aiq_fec_cfg_t> attrib = mAttrQueue.pop (timeout);
+
+    if (!attrib.ptr()) {
+        LOGW_ANALYZER("RKAiqAfecThread got empty attrib, stop thread");
+        return false;
+    }
+
+    if (hFEC->eState != FEC_STATE_RUNNING) {
+        hFEC->isAttribUpdated = true;
+        return true;
+    }
+
+    if (hFEC->user_config.bypass) {
+        ret = read_mesh_table(hFEC, 0);
+    } else {
+        ret = read_mesh_table(hFEC, attrib->correct_level);
+        hFEC->correct_level = attrib->correct_level;
+    }
+
+    if (ret == XCAM_RETURN_NO_ERROR) {
+        hFEC->isAttribUpdated = true;
+        return true;
+    }
+
+    LOGE_ANALYZER("RKAiqAfecThread failed to read mesh table!");
+
+    EXIT_ANALYZER_FUNCTION();
+
+    return false;
+}

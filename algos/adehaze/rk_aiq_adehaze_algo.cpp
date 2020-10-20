@@ -21,106 +21,8 @@
 #include "xcam_log.h"
 
 RKAIQ_BEGIN_DECLARE
-/*
-//useless
-void select_dehzae_params_by_ISO(RKAiqAdhazHtmlConfig_t stRKdehazePara, RKAiqAdhazHwConfig_Select_t  *stRKdehazeParamsSelected, int iso)
-{
-    //È·¶¨isoµÈ¼¶
-    //¹²ÓÐ7¸öisoµÈ¼¶£º50 100 200 400 800 1600 3200  6400 12800
-    //       isogain: 1   2   4   8   16   32  64  128  256
-    //      isolevel: 0   1   2   3   4    5   6   7    8
-    int isoGainStd[9] = {1, 2, 4, 8, 16, 32, 64, 128, 256};
-    int isoGain = MAX(int(iso / 50), 1);
-    int isoGainLow = 0; //ÏòÏÂÒ»¸öisoGain,ÓÃ×ö²ÎÊý²åÖµ£ºy=float(isoGainHig-isoGain)/float(isoGainHig-isoGainLow)*y[isoLevelLow]
-    //                                  +float(isoGain-isoGainLow)/float(isoGainHig-isoGainLow)*y[isoLevelHig];
-    int isoGainHig = 0; //ÏòÉÏÒ»¸öisoGain
-    int isoGainCorrect = 1; //Ñ¡Ôñ×î½üµÄÒ»µµisoµÄÅäÖÃ
 
-    int isoLevelLow = 0;
-    int isoLevelHig = 0;
-    int isoLevelCorrect = 0;
-    int i, j;
-
-    for (i = 0; i < 8; i++)
-    {
-        if (isoGain >= isoGainStd[i] && isoGain <= isoGainStd[i + 1])
-        {
-            isoGainLow = isoGainStd[i];
-            isoGainHig = isoGainStd[i + 1];
-            isoLevelLow = i;
-            isoLevelHig = i + 1;
-            isoGainCorrect = ((isoGain - isoGainStd[i]) <= (isoGainStd[i + 1] - isoGain)) ? isoGainStd[i] : isoGainStd[i + 1];
-            isoLevelCorrect = ((isoGain - isoGainStd[i]) <= (isoGainStd[i + 1] - isoGain)) ? i : (i + 1);
-        }
-    }
-//Ê¹ÄÜ²ÎÊý¸³Öµ
-    stRKdehazeParamsSelected->sw_dhaz_en = stRKdehazePara.dehaze_en[0][isoLevelCorrect];
-    stRKdehazeParamsSelected->sw_dhaz_dc_en = stRKdehazePara.dehaze_en[1][isoLevelCorrect];
-    stRKdehazeParamsSelected->sw_dhaz_hist_en = stRKdehazePara.dehaze_en[2][isoLevelCorrect];
-    stRKdehazeParamsSelected->sw_dhaz_hist_chn = stRKdehazePara.dehaze_en[3][isoLevelCorrect];
-    stRKdehazeParamsSelected->sw_dhaz_gain_en = stRKdehazePara.dehaze_en[4][isoLevelCorrect];
-    //ãÐÖµ¸³Öµ
-    stRKdehazeParamsSelected->sw_dhaz_dc_min_th = stRKdehazePara.dehaze_self_adp[0][isoLevelCorrect];
-    stRKdehazeParamsSelected->sw_dhaz_dc_max_th = stRKdehazePara.dehaze_self_adp[1][isoLevelCorrect];
-    stRKdehazeParamsSelected->sw_dhaz_yhist_th = stRKdehazePara.dehaze_self_adp[2][isoLevelCorrect];
-    stRKdehazeParamsSelected->sw_dhaz_yblk_th = stRKdehazePara.dehaze_self_adp[3][isoLevelCorrect];
-    stRKdehazeParamsSelected->sw_dark_th = stRKdehazePara.dehaze_self_adp[4][isoLevelCorrect];
-    stRKdehazeParamsSelected->sw_dhaz_bright_min = stRKdehazePara.dehaze_self_adp[5][isoLevelCorrect];
-    stRKdehazeParamsSelected->sw_dhaz_bright_max = stRKdehazePara.dehaze_self_adp[6][isoLevelCorrect];
-
-
-    stRKdehazeParamsSelected->sw_dhaz_wt_max = stRKdehazePara.dehaze_range_adj[0][isoLevelCorrect];
-    stRKdehazeParamsSelected->sw_dhaz_air_min = stRKdehazePara.dehaze_range_adj[1][isoLevelCorrect];
-    stRKdehazeParamsSelected->sw_dhaz_air_max = stRKdehazePara.dehaze_range_adj[2][isoLevelCorrect];
-    stRKdehazeParamsSelected->sw_dhaz_tmax_base = stRKdehazePara.dehaze_range_adj[3][isoLevelCorrect];
-    stRKdehazeParamsSelected->sw_dhaz_tmax_off = stRKdehazePara.dehaze_range_adj[4][isoLevelCorrect];
-    stRKdehazeParamsSelected->sw_dhaz_tmax_max = stRKdehazePara.dehaze_range_adj[5][isoLevelCorrect];
-
-    //Ö±·½Í¼ãÐÖµ
-    stRKdehazeParamsSelected->sw_dhaz_hist_gratio = stRKdehazePara.dehaze_hist_para[0][isoLevelCorrect];
-    stRKdehazeParamsSelected->sw_dhaz_hist_th_off = stRKdehazePara.dehaze_hist_para[1][isoLevelCorrect];
-    stRKdehazeParamsSelected->sw_dhaz_hist_k = stRKdehazePara.dehaze_hist_para[2][isoLevelCorrect];
-    stRKdehazeParamsSelected->sw_dhaz_hist_min = stRKdehazePara.dehaze_hist_para[3][isoLevelCorrect];
-    //¶Ô±È¶ÈÔöÇ¿Ê¹ÄÜÓëãÐÖµ
-    stRKdehazeParamsSelected->sw_dhaz_enhance_en = stRKdehazePara.dehaze_enhance[0][isoLevelCorrect];
-    stRKdehazeParamsSelected->sw_dhaz_enhance_value = stRKdehazePara.dehaze_enhance[1][isoLevelCorrect];
-    stRKdehazeParamsSelected->sw_dhaz_hpara_en = stRKdehazePara.dehaze_enhance[2][isoLevelCorrect];
-    stRKdehazeParamsSelected->sw_dhaz_hist_scale = stRKdehazePara.dehaze_enhance[3][isoLevelCorrect];
-
-    //iir
-    stRKdehazeParamsSelected->sw_dhaz_hist_stab_fnum = stRKdehazePara.dehaze_iir_control[0][isoLevelCorrect];
-    stRKdehazeParamsSelected->sw_dhaz_iir_sigma = stRKdehazePara.dehaze_iir_control[1][isoLevelCorrect];
-    stRKdehazeParamsSelected->sw_dhaz_iir_wt_sigma = stRKdehazePara.dehaze_iir_control[2][isoLevelCorrect];
-    stRKdehazeParamsSelected->sw_dhaz_iir_air_sigma = stRKdehazePara.dehaze_iir_control[3][isoLevelCorrect];
-    stRKdehazeParamsSelected->sw_dhaz_iir_tmax_sigma = stRKdehazePara.dehaze_iir_control[4][isoLevelCorrect];
-
-    //ÓÃ»§ÅäÖÃ
-    stRKdehazeParamsSelected->sw_dhaz_cfg_alpha = stRKdehazePara.dehaze_user_config[0][isoLevelCorrect];
-    stRKdehazeParamsSelected->sw_dhaz_cfg_wt = stRKdehazePara.dehaze_user_config[1][isoLevelCorrect];
-    stRKdehazeParamsSelected->sw_dhaz_cfg_air = stRKdehazePara.dehaze_user_config[2][isoLevelCorrect];
-    stRKdehazeParamsSelected->sw_dhaz_cfg_tmax = stRKdehazePara.dehaze_user_config[3][isoLevelCorrect];
-    stRKdehazeParamsSelected->sw_dhaz_cfg_gratio = stRKdehazePara.dehaze_user_config[4][isoLevelCorrect];
-
-    stRKdehazeParamsSelected->sw_dhaz_dc_thed = stRKdehazePara.dehaze_bi_para[0][isoLevelCorrect];
-    stRKdehazeParamsSelected->sw_dhaz_dc_weicur = stRKdehazePara.dehaze_bi_para[1][isoLevelCorrect];
-    stRKdehazeParamsSelected->sw_dhaz_air_thed = stRKdehazePara.dehaze_bi_para[2][isoLevelCorrect];
-    stRKdehazeParamsSelected->sw_dhaz_air_weitcur = stRKdehazePara.dehaze_bi_para[3][isoLevelCorrect];
-
-
-    //¾ØÕó¸³Öµ
-    memcpy(stRKdehazeParamsSelected->sw_dhaz_dc_bf_h, stRKdehazePara.dehaze_dc_bf_h, sizeof(stRKdehazePara.dehaze_dc_bf_h));
-    memcpy(stRKdehazeParamsSelected->sw_dhaz_air_bf_h, stRKdehazePara.dehaze_air_bf_h, sizeof(stRKdehazePara.dehaze_air_bf_h));
-    memcpy(stRKdehazeParamsSelected->sw_dhaz_gaus_h, stRKdehazePara.dehaze_gaus_h, sizeof(stRKdehazePara.dehaze_gaus_h));
-    memcpy(stRKdehazeParamsSelected->sw_dhaz_hist_conv_t0, stRKdehazePara.dehaze_hist_t0, sizeof(stRKdehazePara.dehaze_hist_t0));
-    memcpy(stRKdehazeParamsSelected->sw_dhaz_hist_conv_t1, stRKdehazePara.dehaze_hist_t1, sizeof(stRKdehazePara.dehaze_hist_t1));
-    memcpy(stRKdehazeParamsSelected->sw_dhaz_hist_conv_t2, stRKdehazePara.dehaze_hist_t2, sizeof( stRKdehazePara.dehaze_hist_t2));
-
-
-}
-
-*/
-
-void LinearInterp(const float *pX, const float *pY, float posx, float *yOut, int XSize)
+static void LinearInterp(const float *pX, const float *pY, float posx, float *yOut, int XSize)
 {
     int index;
 
@@ -145,7 +47,8 @@ void LinearInterp(const float *pX, const float *pY, float posx, float *yOut, int
     }
 
 }
-void LinearInterpEnable(const float *pX, const unsigned char *pY, float posx, float *yOut, int XSize)
+
+static void LinearInterpEnable(const float *pX, const unsigned char *pY, float posx, float *yOut, int XSize)
 {
     int index;
     float out;
@@ -172,360 +75,397 @@ void LinearInterpEnable(const float *pX, const unsigned char *pY, float posx, fl
 
 }
 
-
-void select_RkDehaze_params(const CalibDb_Dehaze_t * stRKDehazeParam, rk_aiq_dehaze_cfg_t *stRKDehazeParamSelected, int iso)
+static void select_Dehaze_params_algo(const CalibDb_Dehaze_t * stRKDehazeParam, rk_aiq_dehaze_cfg_t *stRKDehazeParamSelected, int iso, int mode)
 {
-    int i;
-
-    LinearInterpEnable(stRKDehazeParam->dehaze_iso.iso, stRKDehazeParam->dehaze_iso.dehaze_en, iso, &stRKDehazeParamSelected->dehaze_en[0], RK_DEHAZE_ISO_NUM);
-    LinearInterpEnable(stRKDehazeParam->dehaze_iso.iso, stRKDehazeParam->dehaze_iso.dc_en, iso, &stRKDehazeParamSelected->dehaze_en[1], RK_DEHAZE_ISO_NUM);
-    LinearInterpEnable(stRKDehazeParam->dehaze_iso.iso, stRKDehazeParam->dehaze_iso.hist_en, iso, &stRKDehazeParamSelected->dehaze_en[2], RK_DEHAZE_ISO_NUM);
-    LinearInterpEnable(stRKDehazeParam->dehaze_iso.iso, stRKDehazeParam->dehaze_iso.hist_channel, iso, &stRKDehazeParamSelected->dehaze_en[3], RK_DEHAZE_ISO_NUM);
-    LinearInterpEnable(stRKDehazeParam->dehaze_iso.iso, stRKDehazeParam->dehaze_iso.gain_en, iso, &stRKDehazeParamSelected->dehaze_en[4], RK_DEHAZE_ISO_NUM);
-
-    /*
-          LinearInterp(stRKDehazeParam->dehaze_iso.iso, stRKDehazeParam->dehaze_iso.dehaze_en, iso, &stRKDehazeParamSelected->dehaze_en[0], RK_DEHAZE_ISO_NUM);
-
-        LinearInterp(stRKDehazeParam.dehaze_iso.iso, stRKDehazeParam.dehaze_iso.dc_en, iso, &stRKDehazeParamSelected->dehaze_en[1], RK_DEHAZE_ISO_NUM);
-        LinearInterp(stRKDehazeParam.dehaze_iso.iso, stRKDehazeParam.dehaze_iso.hist_en, iso, &stRKDehazeParamSelected->dehaze_en[2], RK_DEHAZE_ISO_NUM);
-        LinearInterp(stRKDehazeParam.dehaze_iso.iso, stRKDehazeParam.dehaze_iso.hist_channel, iso, &stRKDehazeParamSelected->dehaze_en[3], RK_DEHAZE_ISO_NUM);
-        LinearInterp(stRKDehazeParam.dehaze_iso.iso, stRKDehazeParam.dehaze_iso.gain_en, iso, &stRKDehazeParamSelected->dehaze_en[4], RK_DEHAZE_ISO_NUM);*/
+    LOG1_ADEHAZE("ENTER: %s \n", __func__);
 
     // dehaze_self_adp[7]
-
-    LinearInterp(stRKDehazeParam->dehaze_iso.iso, stRKDehazeParam->dehaze_iso.dc_min_th, iso, &stRKDehazeParamSelected->dehaze_self_adp[0], RK_DEHAZE_ISO_NUM);
-    LinearInterp(stRKDehazeParam->dehaze_iso.iso, stRKDehazeParam->dehaze_iso.dc_max_th, iso, &stRKDehazeParamSelected->dehaze_self_adp[1], RK_DEHAZE_ISO_NUM);
-    LinearInterp(stRKDehazeParam->dehaze_iso.iso, stRKDehazeParam->dehaze_iso.yhist_th, iso, &stRKDehazeParamSelected->dehaze_self_adp[2], RK_DEHAZE_ISO_NUM);
-    LinearInterp(stRKDehazeParam->dehaze_iso.iso, stRKDehazeParam->dehaze_iso.yblk_th, iso, &stRKDehazeParamSelected->dehaze_self_adp[3], RK_DEHAZE_ISO_NUM);
-    LinearInterp(stRKDehazeParam->dehaze_iso.iso, stRKDehazeParam->dehaze_iso.dark_th, iso, &stRKDehazeParamSelected->dehaze_self_adp[4], RK_DEHAZE_ISO_NUM);
-    LinearInterp(stRKDehazeParam->dehaze_iso.iso, stRKDehazeParam->dehaze_iso.bright_min, iso, &stRKDehazeParamSelected->dehaze_self_adp[5], RK_DEHAZE_ISO_NUM);
-    LinearInterp(stRKDehazeParam->dehaze_iso.iso, stRKDehazeParam->dehaze_iso.bright_max, iso, &stRKDehazeParamSelected->dehaze_self_adp[6], RK_DEHAZE_ISO_NUM);
+    LinearInterp(stRKDehazeParam->dehaze_setting[mode].iso, stRKDehazeParam->dehaze_setting[mode].dc_min_th, iso, &stRKDehazeParamSelected->dehaze_self_adp[0], RK_DEHAZE_ISO_NUM);
+    LinearInterp(stRKDehazeParam->dehaze_setting[mode].iso, stRKDehazeParam->dehaze_setting[mode].dc_max_th, iso, &stRKDehazeParamSelected->dehaze_self_adp[1], RK_DEHAZE_ISO_NUM);
+    LinearInterp(stRKDehazeParam->dehaze_setting[mode].iso, stRKDehazeParam->dehaze_setting[mode].yhist_th, iso, &stRKDehazeParamSelected->dehaze_self_adp[2], RK_DEHAZE_ISO_NUM);
+    LinearInterp(stRKDehazeParam->dehaze_setting[mode].iso, stRKDehazeParam->dehaze_setting[mode].yblk_th, iso, &stRKDehazeParamSelected->dehaze_self_adp[3], RK_DEHAZE_ISO_NUM);
+    LinearInterp(stRKDehazeParam->dehaze_setting[mode].iso, stRKDehazeParam->dehaze_setting[mode].dark_th, iso, &stRKDehazeParamSelected->dehaze_self_adp[4], RK_DEHAZE_ISO_NUM);
+    LinearInterp(stRKDehazeParam->dehaze_setting[mode].iso, stRKDehazeParam->dehaze_setting[mode].bright_min, iso, &stRKDehazeParamSelected->dehaze_self_adp[5], RK_DEHAZE_ISO_NUM);
+    LinearInterp(stRKDehazeParam->dehaze_setting[mode].iso, stRKDehazeParam->dehaze_setting[mode].bright_max, iso, &stRKDehazeParamSelected->dehaze_self_adp[6], RK_DEHAZE_ISO_NUM);
 
     // dehaze_range_adj[6]
-
-    LinearInterp(stRKDehazeParam->dehaze_iso.iso, stRKDehazeParam->dehaze_iso.wt_max, iso, &stRKDehazeParamSelected->dehaze_range_adj[0], RK_DEHAZE_ISO_NUM);
-    LinearInterp(stRKDehazeParam->dehaze_iso.iso, stRKDehazeParam->dehaze_iso.air_max, iso, &stRKDehazeParamSelected->dehaze_range_adj[1], RK_DEHAZE_ISO_NUM);
-    LinearInterp(stRKDehazeParam->dehaze_iso.iso, stRKDehazeParam->dehaze_iso.air_min, iso, &stRKDehazeParamSelected->dehaze_range_adj[2], RK_DEHAZE_ISO_NUM);
-    LinearInterp(stRKDehazeParam->dehaze_iso.iso, stRKDehazeParam->dehaze_iso.tmax_base, iso, &stRKDehazeParamSelected->dehaze_range_adj[3], RK_DEHAZE_ISO_NUM);
-    LinearInterp(stRKDehazeParam->dehaze_iso.iso, stRKDehazeParam->dehaze_iso.tmax_off, iso, &stRKDehazeParamSelected->dehaze_range_adj[4], RK_DEHAZE_ISO_NUM);
-
-    LinearInterp(stRKDehazeParam->dehaze_iso.iso, stRKDehazeParam->dehaze_iso.tmax_max, iso, &stRKDehazeParamSelected->dehaze_range_adj[5], RK_DEHAZE_ISO_NUM);
-
-    // dehaze_hist_para[4]
-
-    LinearInterp(stRKDehazeParam->dehaze_iso.iso, stRKDehazeParam->dehaze_iso.hist_gratio, iso, &stRKDehazeParamSelected->dehaze_hist_para[0], RK_DEHAZE_ISO_NUM);
-    LinearInterp(stRKDehazeParam->dehaze_iso.iso, stRKDehazeParam->dehaze_iso.hist_th_off, iso, &stRKDehazeParamSelected->dehaze_hist_para[1], RK_DEHAZE_ISO_NUM);
-    LinearInterp(stRKDehazeParam->dehaze_iso.iso, stRKDehazeParam->dehaze_iso.hist_k, iso, &stRKDehazeParamSelected->dehaze_hist_para[2], RK_DEHAZE_ISO_NUM);
-    LinearInterp(stRKDehazeParam->dehaze_iso.iso, stRKDehazeParam->dehaze_iso.hist_min, iso, &stRKDehazeParamSelected->dehaze_hist_para[3], RK_DEHAZE_ISO_NUM);
-
-    // dehaze_enhance[4]
-
-    LinearInterpEnable(stRKDehazeParam->dehaze_iso.iso, stRKDehazeParam->dehaze_iso.enhance_en, iso, &stRKDehazeParamSelected->dehaze_enhance[0], RK_DEHAZE_ISO_NUM);
-
-    //stRKDehazeParamSelected->dehaze_enhance[0] = stRKDehazeParam->dehaze_iso.enhance_en;
-    LinearInterp(stRKDehazeParam->dehaze_iso.iso, stRKDehazeParam->dehaze_iso.enhance_value, iso, &stRKDehazeParamSelected->dehaze_enhance[1], RK_DEHAZE_ISO_NUM);
-    LinearInterpEnable(stRKDehazeParam->dehaze_iso.iso, stRKDehazeParam->dehaze_iso.hist_para_en, iso, &stRKDehazeParamSelected->dehaze_enhance[2], RK_DEHAZE_ISO_NUM);
-    //stRKDehazeParamSelected->dehaze_enhance[2] = stRKDehazeParam->dehaze_iso.hist_para_en;
-    LinearInterp(stRKDehazeParam->dehaze_iso.iso, stRKDehazeParam->dehaze_iso.hist_scale, iso, &stRKDehazeParamSelected->dehaze_enhance[3], RK_DEHAZE_ISO_NUM);
+    LinearInterp(stRKDehazeParam->dehaze_setting[mode].iso, stRKDehazeParam->dehaze_setting[mode].wt_max, iso, &stRKDehazeParamSelected->dehaze_range_adj[0], RK_DEHAZE_ISO_NUM);
+    LinearInterp(stRKDehazeParam->dehaze_setting[mode].iso, stRKDehazeParam->dehaze_setting[mode].air_max, iso, &stRKDehazeParamSelected->dehaze_range_adj[1], RK_DEHAZE_ISO_NUM);
+    LinearInterp(stRKDehazeParam->dehaze_setting[mode].iso, stRKDehazeParam->dehaze_setting[mode].air_min, iso, &stRKDehazeParamSelected->dehaze_range_adj[2], RK_DEHAZE_ISO_NUM);
+    LinearInterp(stRKDehazeParam->dehaze_setting[mode].iso, stRKDehazeParam->dehaze_setting[mode].tmax_base, iso, &stRKDehazeParamSelected->dehaze_range_adj[3], RK_DEHAZE_ISO_NUM);
+    LinearInterp(stRKDehazeParam->dehaze_setting[mode].iso, stRKDehazeParam->dehaze_setting[mode].tmax_off, iso, &stRKDehazeParamSelected->dehaze_range_adj[4], RK_DEHAZE_ISO_NUM);
+    LinearInterp(stRKDehazeParam->dehaze_setting[mode].iso, stRKDehazeParam->dehaze_setting[mode].tmax_max, iso, &stRKDehazeParamSelected->dehaze_range_adj[5], RK_DEHAZE_ISO_NUM);
 
     // dehaze_iir_control[5]
+    stRKDehazeParamSelected->dehaze_iir_control[0] = stRKDehazeParam->dehaze_setting[mode].IIR_setting.stab_fnum;
+    stRKDehazeParamSelected->dehaze_iir_control[1] = stRKDehazeParam->dehaze_setting[mode].IIR_setting.sigma;
+    stRKDehazeParamSelected->dehaze_iir_control[2] = stRKDehazeParam->dehaze_setting[mode].IIR_setting.wt_sigma;
+    stRKDehazeParamSelected->dehaze_iir_control[3] = stRKDehazeParam->dehaze_setting[mode].IIR_setting.air_sigma;
+    stRKDehazeParamSelected->dehaze_iir_control[4] = stRKDehazeParam->dehaze_setting[mode].IIR_setting.tmax_sigma;
 
-    LinearInterp(stRKDehazeParam->dehaze_iso.iso, stRKDehazeParam->dehaze_iso.stab_fnum, iso, &stRKDehazeParamSelected->dehaze_iir_control[0], RK_DEHAZE_ISO_NUM);
-    LinearInterp(stRKDehazeParam->dehaze_iso.iso, stRKDehazeParam->dehaze_iso.sigma, iso, &stRKDehazeParamSelected->dehaze_iir_control[1], RK_DEHAZE_ISO_NUM);
-    LinearInterp(stRKDehazeParam->dehaze_iso.iso, stRKDehazeParam->dehaze_iso.wt_sigma, iso, &stRKDehazeParamSelected->dehaze_iir_control[2], RK_DEHAZE_ISO_NUM);
-    LinearInterp(stRKDehazeParam->dehaze_iso.iso, stRKDehazeParam->dehaze_iso.air_sigma, iso, &stRKDehazeParamSelected->dehaze_iir_control[3], RK_DEHAZE_ISO_NUM);
-    LinearInterp(stRKDehazeParam->dehaze_iso.iso, stRKDehazeParam->dehaze_iso.tmax_sigma, iso, &stRKDehazeParamSelected->dehaze_iir_control[4], RK_DEHAZE_ISO_NUM);
-
-    // dehaze_user_config[5]
-
-    LinearInterp(stRKDehazeParam->dehaze_iso.iso, stRKDehazeParam->dehaze_iso.cfg_alpha, iso, &stRKDehazeParamSelected->dehaze_user_config[0], RK_DEHAZE_ISO_NUM);
-    LinearInterp(stRKDehazeParam->dehaze_iso.iso, stRKDehazeParam->dehaze_iso.cfg_wt, iso, &stRKDehazeParamSelected->dehaze_user_config[1], RK_DEHAZE_ISO_NUM);
-    LinearInterp(stRKDehazeParam->dehaze_iso.iso, stRKDehazeParam->dehaze_iso.cfg_air, iso, &stRKDehazeParamSelected->dehaze_user_config[2], RK_DEHAZE_ISO_NUM);
-    LinearInterp(stRKDehazeParam->dehaze_iso.iso, stRKDehazeParam->dehaze_iso.cfg_tmax, iso, &stRKDehazeParamSelected->dehaze_user_config[3], RK_DEHAZE_ISO_NUM);
-    LinearInterp(stRKDehazeParam->dehaze_iso.iso, stRKDehazeParam->dehaze_iso.cfg_gratio, iso, &stRKDehazeParamSelected->dehaze_user_config[4], RK_DEHAZE_ISO_NUM);
+    LinearInterp(stRKDehazeParam->dehaze_setting[mode].iso, stRKDehazeParam->dehaze_setting[mode].cfg_wt, iso, &stRKDehazeParamSelected->dehaze_user_config[1], RK_DEHAZE_ISO_NUM);
+    LinearInterp(stRKDehazeParam->dehaze_setting[mode].iso, stRKDehazeParam->dehaze_setting[mode].cfg_air, iso, &stRKDehazeParamSelected->dehaze_user_config[2], RK_DEHAZE_ISO_NUM);
+    LinearInterp(stRKDehazeParam->dehaze_setting[mode].iso, stRKDehazeParam->dehaze_setting[mode].cfg_tmax, iso, &stRKDehazeParamSelected->dehaze_user_config[3], RK_DEHAZE_ISO_NUM);
 
     // dehaze_bi_para[4]
+    LinearInterp(stRKDehazeParam->dehaze_setting[mode].iso, stRKDehazeParam->dehaze_setting[mode].dc_thed, iso, &stRKDehazeParamSelected->dehaze_bi_para[0], RK_DEHAZE_ISO_NUM);
+    LinearInterp(stRKDehazeParam->dehaze_setting[mode].iso, stRKDehazeParam->dehaze_setting[mode].dc_weitcur, iso, &stRKDehazeParamSelected->dehaze_bi_para[1], RK_DEHAZE_ISO_NUM);
+    LinearInterp(stRKDehazeParam->dehaze_setting[mode].iso, stRKDehazeParam->dehaze_setting[mode].air_thed, iso, &stRKDehazeParamSelected->dehaze_bi_para[2], RK_DEHAZE_ISO_NUM);
+    LinearInterp(stRKDehazeParam->dehaze_setting[mode].iso, stRKDehazeParam->dehaze_setting[mode].air_weitcur, iso, &stRKDehazeParamSelected->dehaze_bi_para[3], RK_DEHAZE_ISO_NUM);
 
-    LinearInterp(stRKDehazeParam->dehaze_iso.iso, stRKDehazeParam->dehaze_iso.dc_thed, iso, &stRKDehazeParamSelected->dehaze_bi_para[0], RK_DEHAZE_ISO_NUM);
-    LinearInterp(stRKDehazeParam->dehaze_iso.iso, stRKDehazeParam->dehaze_iso.dc_weitcur, iso, &stRKDehazeParamSelected->dehaze_bi_para[1], RK_DEHAZE_ISO_NUM);
-    LinearInterp(stRKDehazeParam->dehaze_iso.iso, stRKDehazeParam->dehaze_iso.air_thed, iso, &stRKDehazeParamSelected->dehaze_bi_para[2], RK_DEHAZE_ISO_NUM);
-    LinearInterp(stRKDehazeParam->dehaze_iso.iso, stRKDehazeParam->dehaze_iso.air_weitcur, iso, &stRKDehazeParamSelected->dehaze_bi_para[3], RK_DEHAZE_ISO_NUM);
+    LOGD_ADEHAZE("%s dehaze_en:%f dc_en:%f\n", __func__, stRKDehazeParamSelected->dehaze_en[0], stRKDehazeParamSelected->dehaze_en[1]);
+    LOGD_ADEHAZE("%s dc_min_th:%f dc_max_th:%f yhist_th:%f yblk_th:%f dark_th:%f bright_min:%f bright_max:%f\n", __func__, stRKDehazeParamSelected->dehaze_self_adp[0], stRKDehazeParamSelected->dehaze_self_adp[1],
+                 stRKDehazeParamSelected->dehaze_self_adp[2], stRKDehazeParamSelected->dehaze_self_adp[3], stRKDehazeParamSelected->dehaze_self_adp[4], stRKDehazeParamSelected->dehaze_self_adp[5]
+                 , stRKDehazeParamSelected->dehaze_self_adp[6]);
+    LOGD_ADEHAZE("%s wt_max:%f air_max:%f air_min:%f tmax_base:%f tmax_off:%f tmax_max:%f\n", __func__, stRKDehazeParamSelected->dehaze_range_adj[0], stRKDehazeParamSelected->dehaze_range_adj[1],
+                 stRKDehazeParamSelected->dehaze_range_adj[2], stRKDehazeParamSelected->dehaze_range_adj[3], stRKDehazeParamSelected->dehaze_range_adj[4], stRKDehazeParamSelected->dehaze_range_adj[5]);
+    LOGD_ADEHAZE("%s stab_fnum:%f sigma:%f wt_sigma:%f air_sigma:%f tmax_sigma:%f\n", __func__, stRKDehazeParamSelected->dehaze_iir_control[0], stRKDehazeParamSelected->dehaze_iir_control[1],
+                 stRKDehazeParamSelected->dehaze_iir_control[2], stRKDehazeParamSelected->dehaze_iir_control[3], stRKDehazeParamSelected->dehaze_iir_control[4]);
+    LOGD_ADEHAZE("%s cfg_alpha:%f cfg_wt:%f cfg_air:%f cfg_tmax:%f\n", __func__, stRKDehazeParamSelected->dehaze_user_config[0], stRKDehazeParamSelected->dehaze_user_config[1],
+                 stRKDehazeParamSelected->dehaze_user_config[2], stRKDehazeParamSelected->dehaze_user_config[3]);
+    LOGD_ADEHAZE("%s dc_thed:%f dc_weitcur:%f air_thed:%f air_weitcur:%f\n", __func__, stRKDehazeParamSelected->dehaze_bi_para[0], stRKDehazeParamSelected->dehaze_bi_para[1],
+                 stRKDehazeParamSelected->dehaze_bi_para[2], stRKDehazeParamSelected->dehaze_bi_para[3]);
 
     // dehaze_dc_bf_h[25]
-    for (i = 0; i < 25; i++)
-    {
-        stRKDehazeParamSelected->dehaze_dc_bf_h[i] = stRKDehazeParam->dc_bf_h[i];
-    }
+    for (int i = 0; i < 25; i++)
+        stRKDehazeParamSelected->dehaze_dc_bf_h[i] = stRKDehazeParam->dehaze_setting[mode].dc_bf_h[i];
+
     // dehaze_air_bf_h[9],dehaze_gaus_h[9]
-    for (i = 0; i < 9; i++)
+    for (int i = 0; i < 9; i++)
     {
-        stRKDehazeParamSelected->dehaze_air_bf_h[i] = stRKDehazeParam->air_bf_h[i];
-        stRKDehazeParamSelected->dehaze_gaus_h[i] = stRKDehazeParam->gaus_h[i];
+        stRKDehazeParamSelected->dehaze_air_bf_h[i] = stRKDehazeParam->dehaze_setting[mode].air_bf_h[i];
+        stRKDehazeParamSelected->dehaze_gaus_h[i] = stRKDehazeParam->dehaze_setting[mode].gaus_h[i];
     }
+
+    LOG1_ADEHAZE("EIXT: %s \n", __func__);
+}
+
+static void select_Enhance_params_algo(const CalibDb_Dehaze_t * stRKDehazeParam, rk_aiq_dehaze_cfg_t *stRKDehazeParamSelected, int iso, int mode)
+{
+    LOG1_ADEHAZE("ENTER: %s \n", __func__);
+
+    LinearInterp(stRKDehazeParam->enhance_setting[mode].iso, stRKDehazeParam->enhance_setting[mode].enhance_value, iso, &stRKDehazeParamSelected->dehaze_enhance[1], RK_DEHAZE_ISO_NUM);
+
+
+    LOGD_ADEHAZE("%s enhance_en:%f enhance_value:%f\n", __func__, stRKDehazeParamSelected->dehaze_enhance[0], stRKDehazeParamSelected->dehaze_enhance[1]);
+
+    LOG1_ADEHAZE("EIXT: %s \n", __func__);
+}
+
+static void select_Hist_params_algo(const CalibDb_Dehaze_t * stRKDehazeParam, rk_aiq_dehaze_cfg_t *stRKDehazeParamSelected, int iso, int mode)
+{
+    LOG1_ADEHAZE("ENTER: %s \n", __func__);
+
+    LinearInterpEnable(stRKDehazeParam->hist_setting[mode].iso, stRKDehazeParam->hist_setting[mode].hist_channel, iso, &stRKDehazeParamSelected->dehaze_en[3], RK_DEHAZE_ISO_NUM);
+    LinearInterpEnable(stRKDehazeParam->hist_setting[mode].iso, stRKDehazeParam->hist_setting[mode].hist_para_en, iso, &stRKDehazeParamSelected->dehaze_enhance[2], RK_DEHAZE_ISO_NUM);
+    LinearInterp(stRKDehazeParam->hist_setting[mode].iso, stRKDehazeParam->hist_setting[mode].hist_gratio, iso, &stRKDehazeParamSelected->dehaze_hist_para[0], RK_DEHAZE_ISO_NUM);
+    LinearInterp(stRKDehazeParam->hist_setting[mode].iso, stRKDehazeParam->hist_setting[mode].hist_th_off, iso, &stRKDehazeParamSelected->dehaze_hist_para[1], RK_DEHAZE_ISO_NUM);
+    LinearInterp(stRKDehazeParam->hist_setting[mode].iso, stRKDehazeParam->hist_setting[mode].hist_k, iso, &stRKDehazeParamSelected->dehaze_hist_para[2], RK_DEHAZE_ISO_NUM);
+    LinearInterp(stRKDehazeParam->hist_setting[mode].iso, stRKDehazeParam->hist_setting[mode].hist_min, iso, &stRKDehazeParamSelected->dehaze_hist_para[3], RK_DEHAZE_ISO_NUM);
+    LinearInterp(stRKDehazeParam->hist_setting[mode].iso, stRKDehazeParam->hist_setting[mode].hist_scale, iso, &stRKDehazeParamSelected->dehaze_enhance[3], RK_DEHAZE_ISO_NUM);
+    LinearInterp(stRKDehazeParam->hist_setting[mode].iso, stRKDehazeParam->hist_setting[mode].cfg_gratio, iso, &stRKDehazeParamSelected->dehaze_user_config[4], RK_DEHAZE_ISO_NUM);
+
     // dehaze_hist_t0[6],dehaze_hist_t1[6],dehaze_hist_t2[6]
-    for (i = 0; i < 6; i++)
+    for (int i = 0; i < 6; i++)
     {
-        stRKDehazeParamSelected->dehaze_hist_t0[i] = stRKDehazeParam->hist_conv_t0[i];
-        stRKDehazeParamSelected->dehaze_hist_t1[i] = stRKDehazeParam->hist_conv_t1[i];
-        stRKDehazeParamSelected->dehaze_hist_t2[i] = stRKDehazeParam->hist_conv_t2[i];
+        stRKDehazeParamSelected->dehaze_hist_t0[i] = stRKDehazeParam->hist_setting[mode].hist_conv_t0[i];
+        stRKDehazeParamSelected->dehaze_hist_t1[i] = stRKDehazeParam->hist_setting[mode].hist_conv_t1[i];
+        stRKDehazeParamSelected->dehaze_hist_t2[i] = stRKDehazeParam->hist_setting[mode].hist_conv_t2[i];
     }
 
+    LOGD_ADEHAZE("%s dehaze_en:%f hist_en:%f hist_channel:%f hist_para_en:%f\n", __func__, stRKDehazeParamSelected->dehaze_en[0], stRKDehazeParamSelected->dehaze_en[2], stRKDehazeParamSelected->dehaze_en[3],
+                 stRKDehazeParamSelected->dehaze_en[4], stRKDehazeParamSelected->dehaze_enhance[2]);
+    LOGD_ADEHAZE("%s hist_gratio:%f hist_th_off:%f hist_k:%f hist_min:%f\n", __func__, stRKDehazeParamSelected->dehaze_hist_para[0], stRKDehazeParamSelected->dehaze_hist_para[1],
+                 stRKDehazeParamSelected->dehaze_hist_para[2], stRKDehazeParamSelected->dehaze_hist_para[3]);
+    LOGD_ADEHAZE("%s hist_scale:%f cfg_alpha:%f cfg_gratio:%f\n", __func__, stRKDehazeParamSelected->dehaze_enhance[3], stRKDehazeParamSelected->dehaze_user_config[0],
+                 stRKDehazeParamSelected->dehaze_user_config[4]);
+
+    LOG1_ADEHAZE("EIXT: %s \n", __func__);
+
 }
 
-XCamReturn AdehazeInitV200(AdehazeHandle_t** para)
+void AdehazeApiToolProcess(AdehazeHandle_t* para, int iso, int mode)
 {
-    LOGD_ADEHAZE("ENTER: %s \n", __func__);
+    LOG1_ADEHAZE("ENTER: %s \n", __func__);
 
+    //fuction enable
+    if(para->AdehazeAtrr.stTool.en == 0)
+    {
+        para->adhaz_config.dehaze_en[0] = FUNCTION_DISABLE;
+        LOGD_ADEHAZE(" %s: Dehaze fuction en:%d\n", __func__, FUNCTION_DISABLE);
+    }
+    else
+    {
+        LOGD_ADEHAZE(" %s: Dehaze fuction en:%d,", __func__, FUNCTION_ENABLE);
+        para->adhaz_config.dehaze_en[0] = FUNCTION_ENABLE;
+        if(para->AdehazeAtrr.stTool.dehaze_setting[mode].en != 0 && para->AdehazeAtrr.stTool.enhance_setting[mode].en != 0)
+        {
+            para->adhaz_config.dehaze_en[1] = FUNCTION_ENABLE;
+            para->adhaz_config.dehaze_enhance[0] = FUNCTION_ENABLE;
+            LOGD_ADEHAZE(" Dehaze en:%d, Enhance en:%d,", FUNCTION_DISABLE, FUNCTION_ENABLE );
+        }
+        else if(para->AdehazeAtrr.stTool.dehaze_setting[mode].en != 0 && para->AdehazeAtrr.stTool.enhance_setting[mode].en == 0)
+        {
+            para->adhaz_config.dehaze_en[1] = FUNCTION_ENABLE;
+            para->adhaz_config.dehaze_enhance[0] = FUNCTION_DISABLE;
+            LOGD_ADEHAZE(" Dehaze en:%d, Enhance en:%d,", FUNCTION_ENABLE, FUNCTION_DISABLE );
+        }
+        else if(para->AdehazeAtrr.stTool.dehaze_setting[mode].en == 0 && para->AdehazeAtrr.stTool.enhance_setting[mode].en != 0)
+        {
+            para->adhaz_config.dehaze_en[1] = FUNCTION_ENABLE;
+            para->adhaz_config.dehaze_enhance[0] = FUNCTION_ENABLE;
+            LOGD_ADEHAZE(" Dehaze en:%d, Enhance en:%d,", FUNCTION_DISABLE, FUNCTION_ENABLE );
+        }
+        else
+        {
+            para->adhaz_config.dehaze_en[1] = FUNCTION_DISABLE;
+            para->adhaz_config.dehaze_enhance[0] = FUNCTION_DISABLE;
+            LOGD_ADEHAZE(" Dehaze en:%d, Enhance en:%d,", FUNCTION_DISABLE, FUNCTION_DISABLE );
+        }
+
+        if(para->AdehazeAtrr.stTool.hist_setting[mode].en != 0)
+            para->adhaz_config.dehaze_en[2] = FUNCTION_ENABLE;
+        else
+            para->adhaz_config.dehaze_en[2] = FUNCTION_DISABLE;
+
+        LOGD_ADEHAZE(" Hist en:%d\n", para->adhaz_config.dehaze_en[2] );
+
+    }
+
+
+    //dehaze setting
+    select_Dehaze_params_algo(&para->AdehazeAtrr.stTool, &para->adhaz_config, iso, mode);
+
+    //enhance setting
+    select_Enhance_params_algo(&para->AdehazeAtrr.stTool, &para->adhaz_config, iso, mode);
+
+    //hist setting
+    select_Hist_params_algo(&para->AdehazeAtrr.stTool, &para->adhaz_config, iso, mode);
+
+    LOG1_ADEHAZE("EXIT: %s \n", __func__);
+
+}
+
+void AdehazeEnhanceApiOnProcess(AdehazeHandle_t* para, int iso, int mode)
+{
+    LOG1_ADEHAZE("ENTER: %s \n", __func__);
+    LOGD_ADEHAZE(" %s: Adehaze Api on!!!, api mode:%d \n", __func__, para->AdehazeAtrr.mode);
+
+    if(para->AdehazeAtrr.mode == RK_AIQ_DEHAZE_MODE_OFF)
+    {
+        if(para->calib_dehaz.en == 0)
+        {
+            para->adhaz_config.dehaze_en[0] = FUNCTION_DISABLE;
+            LOGD_ADEHAZE(" %s: Dehaze fuction en:%d,", __func__, FUNCTION_DISABLE);
+        }
+        else
+        {
+            para->adhaz_config.dehaze_en[0] = FUNCTION_ENABLE;
+            LOGD_ADEHAZE(" %s: Dehaze fuction en:%d,", __func__, FUNCTION_ENABLE);
+        }
+
+        if(para->calib_dehaz.enhance_setting[mode].en != 0)
+        {
+            //dc en
+            para->adhaz_config.dehaze_en[1] = FUNCTION_ENABLE;
+            para->adhaz_config.dehaze_enhance[0] = FUNCTION_ENABLE;
+            LOGD_ADEHAZE(" Dehaze en:%d, Enhance en:%d,", FUNCTION_DISABLE, FUNCTION_ENABLE );
+        }
+        else
+        {
+            para->adhaz_config.dehaze_en[1] = FUNCTION_DISABLE;
+            para->adhaz_config.dehaze_enhance[0] = FUNCTION_DISABLE;
+            LOGD_ADEHAZE(" Dehaze en:%d, Enhance en:%d,", FUNCTION_DISABLE, FUNCTION_DISABLE );
+        }
+
+        //hist en setting
+        if(para->calib_dehaz.hist_setting[mode].en != 0)
+            para->adhaz_config.dehaze_en[2] = FUNCTION_ENABLE;
+        else
+            para->adhaz_config.dehaze_en[2] = FUNCTION_DISABLE;
+        LOGD_ADEHAZE(" Hist en:%d\n", para->adhaz_config.dehaze_en[2] );
+
+        //dehaze seting
+        select_Dehaze_params_algo(&para->calib_dehaz, &para->adhaz_config, iso, mode);
+
+        //enhance setting
+        select_Enhance_params_algo(&para->calib_dehaz, &para->adhaz_config, iso, mode);
+
+        //hist setting
+        select_Hist_params_algo(&para->calib_dehaz, &para->adhaz_config, iso, mode);
+
+    }
+    else if(para->AdehazeAtrr.mode > RK_AIQ_DEHAZE_MODE_INVALID && para->AdehazeAtrr.mode < RK_AIQ_DEHAZE_MODE_OFF)
+    {
+
+        para->adhaz_config.dehaze_en[0] = FUNCTION_ENABLE;
+        //dc en
+        para->adhaz_config.dehaze_en[1] = FUNCTION_ENABLE;
+        para->adhaz_config.dehaze_enhance[0] = FUNCTION_DISABLE;
+        LOGD_ADEHAZE(" Dehaze fuction en:%d, Dehaze en:%d, Enhance en:%d,", FUNCTION_ENABLE, FUNCTION_ENABLE, FUNCTION_DISABLE );
+
+        //hist en setting
+        if(para->calib_dehaz.hist_setting[mode].en != 0)
+            para->adhaz_config.dehaze_en[2] = FUNCTION_ENABLE;
+        else
+            para->adhaz_config.dehaze_en[2] = FUNCTION_DISABLE;
+
+        LOGD_ADEHAZE(" Hist en:%d\n", para->adhaz_config.dehaze_en[2] );
+
+        select_Dehaze_params_algo(&para->calib_dehaz, &para->adhaz_config, iso, mode);
+
+        if(para->AdehazeAtrr.mode == RK_AIQ_DEHAZE_MODE_MANUAL)
+        {
+            float level = (float)(para->AdehazeAtrr.stManual.strength);
+            float level_default = 5;
+            float level_diff = (float)(level - level_default);
+
+            //sw_dhaz_cfg_wt
+            para->adhaz_config.dehaze_user_config[1] += level_diff * 0.05;
+            para->adhaz_config.dehaze_user_config[1] =
+                LIMIT_VALUE(para->adhaz_config.dehaze_user_config[1], 0.99, 0.01);
+
+            //sw_dhaz_cfg_air
+            para->adhaz_config.dehaze_user_config[2] += level_diff * 5;
+            para->adhaz_config.dehaze_user_config[2] =
+                LIMIT_VALUE(para->adhaz_config.dehaze_user_config[2], 255, 0.01);
+
+            //sw_dhaz_cfg_tmax
+            para->adhaz_config.dehaze_user_config[3] += level_diff * 0.05;
+            para->adhaz_config.dehaze_user_config[3] =
+                LIMIT_VALUE(para->adhaz_config.dehaze_user_config[3], 0.99, 0.01);
+
+            LOGD_ADEHAZE(" %s: Adehaze munual level:%f level_diff:%f\n", __func__, level, level_diff);
+            LOGD_ADEHAZE(" %s: After manual api sw_dhaz_cfg_wt:%f sw_dhaz_cfg_air:%f sw_dhaz_cfg_tmax:%f\n", __func__, para->adhaz_config.dehaze_user_config[1],
+                         para->adhaz_config.dehaze_user_config[2], para->adhaz_config.dehaze_user_config[3]);
+        }
+        //hist setting
+        select_Hist_params_algo(&para->calib_dehaz, &para->adhaz_config, iso, mode);
+
+    }
+    else if(para->AdehazeAtrr.mode == RK_AIQ_DEHAZE_MODE_TOOL)
+        AdehazeApiToolProcess(para, iso, mode);
+    else
+        LOGE_ADEHAZE("%s:Wrong Adehaze API mode!!! \n", __func__);
+
+
+    LOG1_ADEHAZE("EXIT: %s \n", __func__);
+
+}
+
+void AdehazeEnhanceApiOffProcess(AdehazeHandle_t* para, int iso, int mode)
+{
+    LOG1_ADEHAZE("ENTER: %s \n", __func__);
+    LOGD_ADEHAZE(" %s: Adehaze Api off!!!\n", __func__);
+
+    //fuction enable
+    if(para->calib_dehaz.en == 0)
+    {
+        para->adhaz_config.dehaze_en[0] = FUNCTION_DISABLE;
+        LOGD_ADEHAZE(" %s: Dehaze fuction en:%d\n", __func__, FUNCTION_DISABLE);
+    }
+    else
+    {
+        LOGD_ADEHAZE(" %s: Dehaze fuction en:%d,", __func__, FUNCTION_ENABLE);
+        para->adhaz_config.dehaze_en[0] = FUNCTION_ENABLE;
+        if(para->calib_dehaz.dehaze_setting[mode].en != 0 && para->calib_dehaz.enhance_setting[mode].en != 0)
+        {
+            para->adhaz_config.dehaze_en[1] = FUNCTION_ENABLE;
+            para->adhaz_config.dehaze_enhance[0] = FUNCTION_ENABLE;
+            LOGD_ADEHAZE(" Dehaze en:%d, Enhance en:%d,", FUNCTION_DISABLE, FUNCTION_ENABLE );
+        }
+        else if(para->calib_dehaz.dehaze_setting[mode].en != 0 && para->calib_dehaz.enhance_setting[mode].en == 0)
+        {
+            para->adhaz_config.dehaze_en[1] = FUNCTION_ENABLE;
+            para->adhaz_config.dehaze_enhance[0] = FUNCTION_DISABLE;
+            LOGD_ADEHAZE(" Dehaze en:%d, Enhance en:%d,", FUNCTION_ENABLE, FUNCTION_DISABLE );
+        }
+        else if(para->calib_dehaz.dehaze_setting[mode].en == 0 && para->calib_dehaz.enhance_setting[mode].en != 0)
+        {
+            para->adhaz_config.dehaze_en[1] = FUNCTION_ENABLE;
+            para->adhaz_config.dehaze_enhance[0] = FUNCTION_ENABLE;
+            LOGD_ADEHAZE(" Dehaze en:%d, Enhance en:%d,", FUNCTION_DISABLE, FUNCTION_ENABLE );
+        }
+        else
+        {
+            para->adhaz_config.dehaze_en[1] = FUNCTION_DISABLE;
+            para->adhaz_config.dehaze_enhance[0] = FUNCTION_DISABLE;
+            LOGD_ADEHAZE(" Dehaze en:%d, Enhance en:%d,", FUNCTION_DISABLE, FUNCTION_DISABLE );
+        }
+
+        if(para->calib_dehaz.hist_setting[mode].en != 0)
+            para->adhaz_config.dehaze_en[2] = FUNCTION_ENABLE;
+        else
+            para->adhaz_config.dehaze_en[2] = FUNCTION_DISABLE;
+
+        LOGD_ADEHAZE(" Hist en:%d\n", para->adhaz_config.dehaze_en[2] );
+
+    }
+
+    //dehaze setting
+    select_Dehaze_params_algo(&para->calib_dehaz, &para->adhaz_config, iso, mode);
+
+    //enhance setting
+    select_Enhance_params_algo(&para->calib_dehaz, &para->adhaz_config, iso, mode);
+
+    //hist setting
+    select_Hist_params_algo(&para->calib_dehaz, &para->adhaz_config, iso, mode);
+
+    LOG1_ADEHAZE("EXIT: %s \n", __func__);
+
+}
+
+XCamReturn AdehazeInit(AdehazeHandle_t** para, CamCalibDbContext_t* calib)
+{
+    LOG1_ADEHAZE("ENTER: %s \n", __func__);
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
-    *para = (AdehazeHandle_t*)malloc(sizeof(AdehazeHandle_t));
+    AdehazeHandle_t *handle = (AdehazeHandle_t*)malloc(sizeof(AdehazeHandle_t));
+    if (NULL == handle)
+        return XCAM_RETURN_ERROR_MEM;
+    memset(handle, 0, sizeof(AdehazeHandle_t));
+    handle->pCalibDb = calib;
+    handle->calib_dehaz = calib->dehaze;
+    handle->AdehazeAtrr.byPass = true;
+    *para = handle;
+    LOG1_ADEHAZE("EXIT: %s \n", __func__);
     return(ret);
-
 }
 
-XCamReturn AdehazeReleaseV200(AdehazeHandle_t* para)
+XCamReturn AdehazeRelease(AdehazeHandle_t* para)
 {
-    LOGD_ADEHAZE("ENTER: %s \n", __func__);
-
+    LOG1_ADEHAZE("ENTER: %s \n", __func__);
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
-
-    free(para);
+    if (para)
+        free(para);
+    LOG1_ADEHAZE("EXIT: %s \n", __func__);
     return(ret);
-
 }
-XCamReturn AdehazeConfigV200(const CalibDb_Dehaze_t * adhaz_html_para, AdehazeHandle_t* para, int iso)
+
+XCamReturn AdehazeProcess(AdehazeHandle_t* para, int iso, int mode)
 {
-
-    LOGD_ADEHAZE("ENTER: %s \n", __func__);
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
-#if 0
-    // memset(&adhaz_html_para, 0, sizeof(RKAiqAdhazHtmlConfig_t));
-#include "dhazhtmlpata.h"
-#endif
-    //TO DO
-    //memcpy(&para->adhaz_html_para, &adhaz_html_para, sizeof(adhaz_html_para) );
+    LOG1_ADEHAZE("ENTER: %s \n", __func__);
 
-    //int iso = 50;//TODO
-    //select_RkDehaze_params(para->adhaz_html_para, &para->adhaz_config, iso);
-    select_RkDehaze_params(adhaz_html_para, &para->adhaz_config, iso);
-    para->calib_dehaz = (CalibDb_Dehaze_t *)adhaz_html_para;
+    para->adhaz_config.dehaze_en[4] = para->calib_dehaz.gain_en;
+    //cfg setting
+    if(mode == 0)
+        para->adhaz_config.dehaze_user_config[0] = para->calib_dehaz.cfg_alpha_normal;
+    else if(mode == 1)
+        para->adhaz_config.dehaze_user_config[0] = para->calib_dehaz.cfg_alpha_hdr;
+    else if(mode == 2)
+        para->adhaz_config.dehaze_user_config[0] = para->calib_dehaz.cfg_alpha_night;
+    else
+        LOGE_ADEHAZE("%s Wrong mode in Dehaze!!!\n", __func__);
+    LOGD_ADEHAZE("%s ISO:%d mode:%d\n", __func__, iso, mode);
 
+    if(!(para->AdehazeAtrr.byPass))
+        AdehazeEnhanceApiOnProcess(para, iso, mode);
+    else
+        AdehazeEnhanceApiOffProcess(para, iso, mode);
+
+    LOG1_ADEHAZE("EXIT: %s \n", __func__);
     return ret;
 }
-XCamReturn AdehazePreProcV200(AdehazeHandle_t* para)
-{
-    LOGD_ADEHAZE("ENTER: %s \n", __func__);
-
-    XCamReturn ret = XCAM_RETURN_NO_ERROR;
-
-    return(ret);
-
-}
-/*
-XCamReturn AdehazeProcessingV200(AdehazeHandle_t* para)
-{
-    XCamReturn ret = XCAM_RETURN_NO_ERROR;
-    LOGD_ADEHAZE("ENTER: %s \n", __func__);
-
-    ret = AdehazeReConfigV200(para);
-
-    return(ret);
-}
-*/
-
-
-XCamReturn AdehazeReConfigV200(AdehazeHandle_t* para, const CalibDb_Dehaze_t *calib_dehaze, int iso)
-
-{
-    XCamReturn ret = XCAM_RETURN_NO_ERROR;
-    LOGD_ADEHAZE("ENTER: %s \n", __func__);
-
-
-    //int iso = 50;//TODO
-
-
-
-    select_RkDehaze_params(calib_dehaze, &para->adhaz_config, iso);
-
-    return(ret);
-}
-
-
-
-/*XCamReturn rk_aiq_uapi_setDhzMode(const rk_aiq_sys_ctx_t* ctx, opMode_t mode)
-{
-
-
-    XCamReturn  ret = XCAM_RETURN_NO_ERROR;
-
-    if(mode == 0)//off
-    {
-    }
-    else if(mode == 1)//auto
-    {
-    }
-    else if(mode == 2)//manu
-    {
-    }
-    else return(ret);
-
-    return(ret);
-
-
-}
-
-
-XCamReturn rk_aiq_uapi_getDhzMode(const rk_aiq_sys_ctx_t* ctx, opMode_t *mode)
-{
-    XCamReturn  ret = XCAM_RETURN_NO_ERROR;
-    LOGD_ADEHAZE("ENTER: %s \n", __func__);
-
-    //TO DO
-
-    return(ret);
-}
-
-XCamReturn rk_aiq_uapi_setDehazeManu(const rk_aiq_sys_ctx_t* ctx, float wt, int air, float tmax, float gratio)
-{
-    XCamReturn  ret = XCAM_RETURN_NO_ERROR;
-
-    LOGD_ADEHAZE("ENTER: %s \n", __func__);
-
-    //TO DO
-
-    return(ret);
-}
-
-
-XCamReturn rk_aiq_uapi_getDehazeManu(const rk_aiq_sys_ctx_t* ctx, float *wt, int *air, float *tmax, float *gratio)
-{
-    XCamReturn  ret = XCAM_RETURN_NO_ERROR;
-    LOGD_ADEHAZE("ENTER: %s \n", __func__);
-
-    //TO DO
-
-    return(ret);
-}
-
-
-XCamReturn rk_aiq_uapi_setIircontral(const rk_aiq_sys_ctx_t* ctx, int fnum, int sigma, float wt, float air, float tmax)//(fnum,sigma,wt,air,tmax)
-{
-    XCamReturn  ret = XCAM_RETURN_NO_ERROR;
-    LOGD_ADEHAZE("ENTER: %s \n", __func__);
-
-    //TO DO
-
-    return(ret);
-}
-
-
-XCamReturn rk_aiq_uapi_getIircontral(const rk_aiq_sys_ctx_t* ctx, int *fnum, int *sigma, float *wt, float *air, float *tmax)
-{
-    XCamReturn  ret = XCAM_RETURN_NO_ERROR;
-    LOGD_ADEHAZE("ENTER: %s \n", __func__);
-
-    //TO DO
-
-    return(ret);
-}
-
-
-XCamReturn rk_aiq_uapi_setHisEqMode(const rk_aiq_sys_ctx_t* ctx, opMode_t mode)
-{
-    XCamReturn  ret = XCAM_RETURN_NO_ERROR;
-    LOGD_ADEHAZE("ENTER: %s \n", __func__);
-
-    //TO DO
-
-    return(ret);
-}
-
-
-XCamReturn rk_aiq_uapi_getHisEqMode(const rk_aiq_sys_ctx_t* ctx, opMode_t *mode)
-{
-    XCamReturn  ret = XCAM_RETURN_NO_ERROR;
-    LOGD_ADEHAZE("ENTER: %s \n", __func__);
-
-    //TO DO
-
-    return(ret);
-}
-
-
-XCamReturn rk_aiq_uapi_setHisEqualManu(const rk_aiq_sys_ctx_t* ctx, float strength)//
-{
-    XCamReturn  ret = XCAM_RETURN_NO_ERROR;
-    LOGD_ADEHAZE("ENTER: %s \n", __func__);
-
-    //TO DO
-
-    return(ret);
-}
-
-
-XCamReturn rk_aiq_uapi_getHisEqualManu(const rk_aiq_sys_ctx_t* ctx, float *strength)
-{
-    XCamReturn  ret = XCAM_RETURN_NO_ERROR;
-    LOGD_ADEHAZE("ENTER: %s \n", __func__);
-
-    //TO DO
-
-    return(ret);
-}
-
-
-XCamReturn rk_aiq_uapi_enableEnhanceMode(const rk_aiq_sys_ctx_t* ctx, opMode_t mode)//
-{
-    XCamReturn  ret = XCAM_RETURN_NO_ERROR;
-    LOGD_ADEHAZE("ENTER: %s \n", __func__);
-
-    //TO DO
-
-    return(ret);
-}
-
-
-XCamReturn rk_aiq_uapi_disableEnhanceMode(const rk_aiq_sys_ctx_t* ctx, opMode_t* mode)
-{
-    XCamReturn  ret = XCAM_RETURN_NO_ERROR;
-    LOGD_ADEHAZE("ENTER: %s \n", __func__);
-
-    //TO DO
-
-    return(ret);
-}
-
-
-XCamReturn rk_aiq_uapi_setEnhance(const rk_aiq_sys_ctx_t* ctx, float strength)//
-{
-    XCamReturn  ret = XCAM_RETURN_NO_ERROR;
-    LOGD_ADEHAZE("ENTER: %s \n", __func__);
-
-    //TO DO
-
-    return(ret);
-}
-
-
-XCamReturn rk_aiq_uapi_getEnhance(const rk_aiq_sys_ctx_t* ctx, float *strength)
-{
-    XCamReturn  ret = XCAM_RETURN_NO_ERROR;
-    LOGD_ADEHAZE("ENTER: %s \n", __func__);
-
-    //TO DO
-
-    return(ret);
-}
-
-
-XCamReturn rk_aiq_uapi_getDehazeAdpOut(const rk_aiq_sys_ctx_t* ctx, float *wt, float *air, float *tmax, float *gratio)//(wt,air_base,tmax,gratio)//dehaze
-{
-    XCamReturn  ret = XCAM_RETURN_NO_ERROR;
-    LOGD_ADEHAZE("ENTER: %s \n", __func__);
-
-    //TO DO
-
-    return(ret);
-}*/
 
 RKAIQ_END_DECLARE
 

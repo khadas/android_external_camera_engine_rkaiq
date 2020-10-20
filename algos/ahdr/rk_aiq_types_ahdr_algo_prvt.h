@@ -85,6 +85,8 @@
 #define TMOCONTRASTMODEMIN     (0.0)
 #define FASTMODELEVELMAX     (100.0)
 #define FASTMODELEVELMIN     (1.0)
+#define IIRMAX     (1000)
+#define IIRMIN     (0)
 
 
 #define DAYTHMAX     (1.0)
@@ -131,13 +133,9 @@ typedef struct TmoHandleData_s
     float GlobeLuma;
     float DetailsHighLight;
     float DetailsLowLight;
-    float TmoContrast;
-    float BandPriorStrength;
+    float LocalTmoStrength;
+    float GlobalTmoStrength;
 
-    float clipgap0;
-    float clipgap1;
-    float clipratio0;
-    float clipratio1;
 } TmoHandleData_t;
 
 typedef struct MergeHandleData_s
@@ -236,6 +234,7 @@ typedef struct AhdrProcResData_s
     MgeProcRes_t MgeProcRes;
     bool LongFrameMode;
     bool isHdrGlobalTmo;
+    bool isLinearTmoOn;
 } AhdrProcResData_t;
 
 typedef struct SensorInfo_s
@@ -259,6 +258,7 @@ typedef struct AhdrContext_s
     //api
     hdrAttr_t hdrAttr;
 
+    CalibDb_Ahdr_Para_t pCalibDB;
     AhdrState_t state;
     AhdrConfig_t AhdrConfig;
     AhdrPrevData_t AhdrPrevData ;
@@ -272,6 +272,7 @@ typedef struct AhdrContext_s
     uint32_t height;
     int frameCnt;
     int hdr_mode;
+    int sence_mode;
 } AhdrContext_t;
 
 typedef AhdrContext_t* AhdrHandle_t;

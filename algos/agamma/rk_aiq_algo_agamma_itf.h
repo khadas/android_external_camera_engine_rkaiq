@@ -22,7 +22,7 @@
 
 #include "rk_aiq_algo_des.h"
 
-#define RKISP_ALGO_AGAMMA_VERSION     "v0.0.9"
+#define RKISP_ALGO_AGAMMA_VERSION     "v0.1.0"
 #define RKISP_ALGO_AGAMMA_VENDOR      "Rockchip"
 #define RKISP_ALGO_AGAMMA_DESCRIPTION "Rockchip Agamma algo for ISP2.0"
 

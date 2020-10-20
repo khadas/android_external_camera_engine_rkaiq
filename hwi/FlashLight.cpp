@@ -34,6 +34,8 @@ FlashLightHw::FlashLightHw(std::string name[], int num)
         _dev_num++;
     }
     _active_fl_num = 0;
+    _keep_status = false;
+    xcam_mem_clear (_flash_settings);
 }
 
 FlashLightHw::~FlashLightHw()
@@ -59,7 +61,10 @@ FlashLightHw::init(int active_num)
 XCamReturn
 FlashLightHw::deinit()
 {
-    v4l_set_params(RK_AIQ_FLASH_MODE_OFF, 0, 0, false);
+    if (!_keep_status) {
+        v4l_set_params(RK_AIQ_FLASH_MODE_OFF, 0, 0, false);
+        xcam_mem_clear (_flash_settings);
+    }
     for (int i = 0 ; i < _active_fl_num; i++) {
         _fl_device[i]->close();
     }
@@ -75,15 +80,16 @@ FlashLightHw::start()
         _fl_device[i]->start();
     }
 
-    xcam_mem_clear (_flash_settings);
-
     return XCAM_RETURN_NO_ERROR;
 }
 
 XCamReturn
 FlashLightHw::stop()
 {
-    v4l_set_params(RK_AIQ_FLASH_MODE_OFF, 0, 0, false);
+    if (!_keep_status) {
+        v4l_set_params(RK_AIQ_FLASH_MODE_OFF, 0, 0, false);
+        xcam_mem_clear (_flash_settings);
+    }
     for (int i = 0 ; i < _active_fl_num; i++) {
         _fl_device[i]->stop();
     }
@@ -102,12 +108,14 @@ FlashLightHw::set_params(rk_aiq_flash_setting_t& flash_settings)
             (old_flash_settings->power[0] != flash_settings.power[0]) ||
             (old_flash_settings->power[1] != flash_settings.power[1])
        ) {
+       LOGD_CAMHW_SUBM(FL_SUBM, "flash_settings: mode:%d,power:%f,timeout_ms:%d,strobe:%d",
+                             flash_settings.flash_mode, flash_settings.power[0],
+                             flash_settings.timeout_ms, flash_settings.strobe);
         ret = v4l_set_params(flash_settings.flash_mode, flash_settings.power,
                              flash_settings.timeout_ms, flash_settings.strobe);
+        if (!ret)
+            _flash_settings = flash_settings;
     }
-
-    if (!ret)
-        _flash_settings = flash_settings;
 
     return ret;
 }

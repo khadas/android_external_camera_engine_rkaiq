@@ -21,6 +21,7 @@ XCamReturn rk_aiq_user_api_ae_setExpSwAttr
     const Uapi_ExpSwAttr_t expSwAttr
 ) {
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    CHECK_USER_API_ENABLE(RK_AIQ_ALGO_TYPE_AE);
 
     RkAiqAeHandleInt* algo_handle =
         algoHandle<RkAiqAeHandleInt>(sys_ctx, RK_AIQ_ALGO_TYPE_AE);
@@ -54,6 +55,7 @@ XCamReturn rk_aiq_user_api_ae_setLinAeDayRouteAttr
     const Uapi_LinAeRouteAttr_t linAeDayRouteAttr
 ) {
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    CHECK_USER_API_ENABLE(RK_AIQ_ALGO_TYPE_AE);
 
     RkAiqAeHandleInt* algo_handle =
         algoHandle<RkAiqAeHandleInt>(sys_ctx, RK_AIQ_ALGO_TYPE_AE);
@@ -87,6 +89,7 @@ XCamReturn rk_aiq_user_api_ae_setHdrAeDayRouteAttr
     const Uapi_HdrAeRouteAttr_t hdrAeDayRouteAttr
 ) {
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    CHECK_USER_API_ENABLE(RK_AIQ_ALGO_TYPE_AE);
 
     RkAiqAeHandleInt* algo_handle =
         algoHandle<RkAiqAeHandleInt>(sys_ctx, RK_AIQ_ALGO_TYPE_AE);
@@ -121,6 +124,7 @@ XCamReturn rk_aiq_user_api_ae_setLinAeNightRouteAttr
     const Uapi_LinAeRouteAttr_t linAeNightRouteAttr
 ) {
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    CHECK_USER_API_ENABLE(RK_AIQ_ALGO_TYPE_AE);
 
     RkAiqAeHandleInt* algo_handle =
         algoHandle<RkAiqAeHandleInt>(sys_ctx, RK_AIQ_ALGO_TYPE_AE);
@@ -154,6 +158,7 @@ XCamReturn rk_aiq_user_api_ae_setHdrAeNightRouteAttr
     const Uapi_HdrAeRouteAttr_t hdrAeNightRouteAttr
 ) {
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    CHECK_USER_API_ENABLE(RK_AIQ_ALGO_TYPE_AE);
 
     RkAiqAeHandleInt* algo_handle =
         algoHandle<RkAiqAeHandleInt>(sys_ctx, RK_AIQ_ALGO_TYPE_AE);
@@ -207,6 +212,7 @@ XCamReturn rk_aiq_user_api_ae_setLinExpAttr
     const Uapi_LinExpAttr_t linExpAttr
 ) {
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    CHECK_USER_API_ENABLE(RK_AIQ_ALGO_TYPE_AE);
 
     RkAiqAeHandleInt* algo_handle =
         algoHandle<RkAiqAeHandleInt>(sys_ctx, RK_AIQ_ALGO_TYPE_AE);
@@ -241,6 +247,7 @@ XCamReturn rk_aiq_user_api_ae_setHdrExpAttr
     const Uapi_HdrExpAttr_t hdrExpAttr
 ) {
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    CHECK_USER_API_ENABLE(RK_AIQ_ALGO_TYPE_AE);
 
     RkAiqAeHandleInt* algo_handle =
         algoHandle<RkAiqAeHandleInt>(sys_ctx, RK_AIQ_ALGO_TYPE_AE);
@@ -276,6 +283,7 @@ XCamReturn rk_aiq_user_api_ae_setExpWinAttr
     const Uapi_ExpWin_t ExpWin
 ) {
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    CHECK_USER_API_ENABLE(RK_AIQ_ALGO_TYPE_AE);
 
     RkAiqAeHandleInt* algo_handle =
         algoHandle<RkAiqAeHandleInt>(sys_ctx, RK_AIQ_ALGO_TYPE_AE);

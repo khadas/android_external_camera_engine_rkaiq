@@ -25,6 +25,9 @@
 #include "rk_aiq_user_api_imgproc.h"
 #include "rk_aiq_user_api_debug.h"
 #include <termios.h>
+#include "display.h"
+#include "rga.h"
+
 
 #define CLEAR(x) memset(&(x), 0, sizeof(x))
 #define FMT_NUM_PLANES 1
@@ -35,46 +38,51 @@
 #define ENABLE_UAPI_TEST
 
 struct buffer {
-        void *start;
-        size_t length;
-        int export_fd;
-	int sequence;
+    void *start;
+    size_t length;
+    int export_fd;
+    int sequence;
 };
 
-static char out_file[255];
-static char dev_name[255];
-static int width = 640;
-static int height = 480;
-static int format = V4L2_PIX_FMT_NV12;
-static int fd = -1;
-static enum v4l2_buf_type buf_type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
-struct buffer *buffers;
-static unsigned int n_buffers;
-static int frame_count = -1;
-FILE *fp = NULL;
-static rk_aiq_sys_ctx_t* aiq_ctx = NULL;
-static int silent = 0;
-static int vop = 0;
-static int rkaiq = 0;
-static int writeFile = 0;
-static int writeFileSync = 0;
-static int pponeframe = 0;
-static int hdrmode = 0;
-static int limit_range = 0;
+typedef struct _demo_context {
+     char out_file[255];
+     char dev_name[255];
+     char dev_name2[255];
+     char sns_name[32];
+     int dev_using;
+     int width;
+     int height;
+     int format;
+     int fd;
+     enum v4l2_buf_type buf_type;
+     struct buffer *buffers;
+     unsigned int n_buffers;
+     int frame_count;
+     FILE *fp;
+     rk_aiq_sys_ctx_t* aiq_ctx;
 
-static int fd_pp_input = -1;
-static int fd_isp_mp = -1;
-struct buffer *buffers_mp;
-static int outputCnt = 3;
-static int skipCnt = 30;
+     int vop;
+     int rkaiq;
+     int writeFile;
+     int writeFileSync;
+     int pponeframe;
+     int hdrmode;
+     int limit_range;
+     int fd_pp_input;
+     int fd_isp_mp;
+     struct buffer *buffers_mp;
+     int outputCnt;
+     int skipCnt;
 
-static char yuv_dir_path[64];
-static bool _is_yuv_dir_exist = false;
-static int g_capture_yuv_num = 0x0;
-static bool _is_capture_yuv;
+     char yuv_dir_path[64];
+     bool _is_yuv_dir_exist;
+     int capture_yuv_num;
+     bool is_capture_yuv;
+}demo_context_t;
+
 static struct termios oldt;
-static int gAfFixedModeCode = 0;
-//TODO: get active sensor from driver
+static int silent;
+static demo_context_t *g_main_ctx = NULL, *g_second_ctx = NULL;
 
 #define DBG(...) do { if(!silent) printf(__VA_ARGS__); } while(0)
 #define ERR(...) do { fprintf(stderr, __VA_ARGS__); } while (0)
@@ -105,11 +113,30 @@ void disable_terminal_return(void)
     atexit(restore_terminal_settings);
 }
 
-void test_imgproc(const rk_aiq_sys_ctx_t* ctx) {
+char* get_dev_name(demo_context_t* ctx)
+{
+    if (ctx->dev_using == 1)
+        return ctx->dev_name;
+    else if(ctx->dev_using == 2)
+        return ctx->dev_name2;
+    else {
+        ERR("!!!dev_using is not supported!!!");
+        return NULL;
+    }
+}
+
+char* get_sensor_name(demo_context_t* ctx)
+{
+      return ctx->sns_name;
+}
+
+void test_imgproc(const demo_context_t* demo_ctx) {
     
-   if (ctx == NULL) {
+   if (demo_ctx == NULL) {
       return;
    }
+
+   const rk_aiq_sys_ctx_t* ctx = (const rk_aiq_sys_ctx_t*)(demo_ctx->aiq_ctx);
 
    int key =getchar();
    printf("press key=[%c]\n",key);
@@ -321,19 +348,10 @@ void test_imgproc(const rk_aiq_sys_ctx_t* ctx) {
         printf("setFocusWin 2\n");
         break;
     case 'F':
-        gAfFixedModeCode = 0;
-        rk_aiq_uapi_setFixedModeCode(ctx, gAfFixedModeCode);
-        printf("setFixedModeCode, gAfFixedModeCode %d\n", gAfFixedModeCode);
         break;
     case 'G':
-        gAfFixedModeCode = (gAfFixedModeCode + 1 + 65) % 65;
-        rk_aiq_uapi_setFixedModeCode(ctx, gAfFixedModeCode);
-        printf("setFixedModeCode++, gAfFixedModeCode %d\n", gAfFixedModeCode);
         break;
     case 'H':
-        gAfFixedModeCode = (gAfFixedModeCode - 1 + 65) % 65;
-        rk_aiq_uapi_setFixedModeCode(ctx, gAfFixedModeCode);
-        printf("setFixedModeCode--, gAfFixedModeCode %d\n", gAfFixedModeCode);
         break;
 	case 'I':
 		rk_aiq_nr_IQPara_t stNRIQPara;
@@ -341,77 +359,80 @@ void test_imgproc(const rk_aiq_sys_ctx_t* ctx) {
 	   stNRIQPara.module_bits = (1<<ANR_MODULE_BAYERNR) | (1<< ANR_MODULE_MFNR) | (1<< ANR_MODULE_UVNR) | (1<< ANR_MODULE_YNR);
 	   stGetNRIQPara.module_bits = (1<<ANR_MODULE_BAYERNR) | (1<< ANR_MODULE_MFNR) | (1<< ANR_MODULE_UVNR) | (1<< ANR_MODULE_YNR);
        rk_aiq_user_api_anr_GetIQPara(ctx, &stNRIQPara);  
-	   for(int k=0; k<2; k++){
+
+	   for(int m=0; m<3; m++){
+	   	for(int k=0; k<2; k++){
 		   for(int i=0; i<CALIBDB_NR_SHARP_MAX_ISO_LEVEL; i++ ){
 					//bayernr
-					stNRIQPara.stBayernrPara.setting[k].filtPara[i] = 0.1;
-					stNRIQPara.stBayernrPara.setting[k].lamda = 500;
-					stNRIQPara.stBayernrPara.setting[k].fixW[0][i] = 0.1;
-					stNRIQPara.stBayernrPara.setting[k].fixW[1][i] = 0.1;
-					stNRIQPara.stBayernrPara.setting[k].fixW[2][i] = 0.1;
-					stNRIQPara.stBayernrPara.setting[k].fixW[3][i] = 0.1;
+					stNRIQPara.stBayernrPara.mode_cell[m].setting[k].filtPara[i] = 0.1;
+					stNRIQPara.stBayernrPara.mode_cell[m].setting[k].lamda = 500;
+					stNRIQPara.stBayernrPara.mode_cell[m].setting[k].fixW[0][i] = 0.1;
+					stNRIQPara.stBayernrPara.mode_cell[m].setting[k].fixW[1][i] = 0.1;
+					stNRIQPara.stBayernrPara.mode_cell[m].setting[k].fixW[2][i] = 0.1;
+					stNRIQPara.stBayernrPara.mode_cell[m].setting[k].fixW[3][i] = 0.1;
 
 					//mfnr
-					stNRIQPara.stMfnrPara.setting[k].mfnr_iso[i].weight_limit_y[0] = 2;
-					stNRIQPara.stMfnrPara.setting[k].mfnr_iso[i].weight_limit_y[1] = 2;
-					stNRIQPara.stMfnrPara.setting[k].mfnr_iso[i].weight_limit_y[2] = 2;
-					stNRIQPara.stMfnrPara.setting[k].mfnr_iso[i].weight_limit_y[3] = 2;
+					stNRIQPara.stMfnrPara.mode_cell[m].setting[k].mfnr_iso[i].weight_limit_y[0] = 2;
+					stNRIQPara.stMfnrPara.mode_cell[m].setting[k].mfnr_iso[i].weight_limit_y[1] = 2;
+					stNRIQPara.stMfnrPara.mode_cell[m].setting[k].mfnr_iso[i].weight_limit_y[2] = 2;
+					stNRIQPara.stMfnrPara.mode_cell[m].setting[k].mfnr_iso[i].weight_limit_y[3] = 2;
 
-					stNRIQPara.stMfnrPara.setting[k].mfnr_iso[i].weight_limit_uv[0] = 2;
-					stNRIQPara.stMfnrPara.setting[k].mfnr_iso[i].weight_limit_uv[1] = 2;
-					stNRIQPara.stMfnrPara.setting[k].mfnr_iso[i].weight_limit_uv[2] = 2;
+					stNRIQPara.stMfnrPara.mode_cell[m].setting[k].mfnr_iso[i].weight_limit_uv[0] = 2;
+					stNRIQPara.stMfnrPara.mode_cell[m].setting[k].mfnr_iso[i].weight_limit_uv[1] = 2;
+					stNRIQPara.stMfnrPara.mode_cell[m].setting[k].mfnr_iso[i].weight_limit_uv[2] = 2;
 					
-					stNRIQPara.stMfnrPara.setting[k].mfnr_iso[i].y_lo_bfscale[0] = 0.4;
-					stNRIQPara.stMfnrPara.setting[k].mfnr_iso[i].y_lo_bfscale[1] = 0.6;
-					stNRIQPara.stMfnrPara.setting[k].mfnr_iso[i].y_lo_bfscale[2] = 0.8;
-					stNRIQPara.stMfnrPara.setting[k].mfnr_iso[i].y_lo_bfscale[3] = 1.0;
+					stNRIQPara.stMfnrPara.mode_cell[m].setting[k].mfnr_iso[i].y_lo_bfscale[0] = 0.4;
+					stNRIQPara.stMfnrPara.mode_cell[m].setting[k].mfnr_iso[i].y_lo_bfscale[1] = 0.6;
+					stNRIQPara.stMfnrPara.mode_cell[m].setting[k].mfnr_iso[i].y_lo_bfscale[2] = 0.8;
+					stNRIQPara.stMfnrPara.mode_cell[m].setting[k].mfnr_iso[i].y_lo_bfscale[3] = 1.0;
 
-					stNRIQPara.stMfnrPara.setting[k].mfnr_iso[i].y_hi_bfscale[0] = 0.4;
-					stNRIQPara.stMfnrPara.setting[k].mfnr_iso[i].y_hi_bfscale[1] = 0.6;
-					stNRIQPara.stMfnrPara.setting[k].mfnr_iso[i].y_hi_bfscale[2] = 0.8;
-					stNRIQPara.stMfnrPara.setting[k].mfnr_iso[i].y_hi_bfscale[3] = 1.0;
+					stNRIQPara.stMfnrPara.mode_cell[m].setting[k].mfnr_iso[i].y_hi_bfscale[0] = 0.4;
+					stNRIQPara.stMfnrPara.mode_cell[m].setting[k].mfnr_iso[i].y_hi_bfscale[1] = 0.6;
+					stNRIQPara.stMfnrPara.mode_cell[m].setting[k].mfnr_iso[i].y_hi_bfscale[2] = 0.8;
+					stNRIQPara.stMfnrPara.mode_cell[m].setting[k].mfnr_iso[i].y_hi_bfscale[3] = 1.0;
 
-					stNRIQPara.stMfnrPara.setting[k].mfnr_iso[i].uv_lo_bfscale[0] = 0.1;
-					stNRIQPara.stMfnrPara.setting[k].mfnr_iso[i].uv_lo_bfscale[1] = 0.2;
-					stNRIQPara.stMfnrPara.setting[k].mfnr_iso[i].uv_lo_bfscale[2] = 0.3;
+					stNRIQPara.stMfnrPara.mode_cell[m].setting[k].mfnr_iso[i].uv_lo_bfscale[0] = 0.1;
+					stNRIQPara.stMfnrPara.mode_cell[m].setting[k].mfnr_iso[i].uv_lo_bfscale[1] = 0.2;
+					stNRIQPara.stMfnrPara.mode_cell[m].setting[k].mfnr_iso[i].uv_lo_bfscale[2] = 0.3;
 					
-					stNRIQPara.stMfnrPara.setting[k].mfnr_iso[i].uv_hi_bfscale[0] = 0.1;
-					stNRIQPara.stMfnrPara.setting[k].mfnr_iso[i].uv_hi_bfscale[1] = 0.2;
-					stNRIQPara.stMfnrPara.setting[k].mfnr_iso[i].uv_hi_bfscale[2] = 0.3;
+					stNRIQPara.stMfnrPara.mode_cell[m].setting[k].mfnr_iso[i].uv_hi_bfscale[0] = 0.1;
+					stNRIQPara.stMfnrPara.mode_cell[m].setting[k].mfnr_iso[i].uv_hi_bfscale[1] = 0.2;
+					stNRIQPara.stMfnrPara.mode_cell[m].setting[k].mfnr_iso[i].uv_hi_bfscale[2] = 0.3;
 
 					//ynr
-					stNRIQPara.stYnrPara.setting[k].ynr_iso[i].lo_bfScale[0] = 0.4;
-					stNRIQPara.stYnrPara.setting[k].ynr_iso[i].lo_bfScale[1] = 0.6;
-					stNRIQPara.stYnrPara.setting[k].ynr_iso[i].lo_bfScale[2] = 0.8;
-					stNRIQPara.stYnrPara.setting[k].ynr_iso[i].lo_bfScale[3] = 1.0;
+					stNRIQPara.stYnrPara.mode_cell[m].setting[k].ynr_iso[i].lo_bfScale[0] = 0.4;
+					stNRIQPara.stYnrPara.mode_cell[m].setting[k].ynr_iso[i].lo_bfScale[1] = 0.6;
+					stNRIQPara.stYnrPara.mode_cell[m].setting[k].ynr_iso[i].lo_bfScale[2] = 0.8;
+					stNRIQPara.stYnrPara.mode_cell[m].setting[k].ynr_iso[i].lo_bfScale[3] = 1.0;
 
-					stNRIQPara.stYnrPara.setting[k].ynr_iso[i].hi_bfScale[0] = 0.4;
-					stNRIQPara.stYnrPara.setting[k].ynr_iso[i].hi_bfScale[1] = 0.6;
-					stNRIQPara.stYnrPara.setting[k].ynr_iso[i].hi_bfScale[2] = 0.8;
-					stNRIQPara.stYnrPara.setting[k].ynr_iso[i].hi_bfScale[3] = 1.0;
+					stNRIQPara.stYnrPara.mode_cell[m].setting[k].ynr_iso[i].hi_bfScale[0] = 0.4;
+					stNRIQPara.stYnrPara.mode_cell[m].setting[k].ynr_iso[i].hi_bfScale[1] = 0.6;
+					stNRIQPara.stYnrPara.mode_cell[m].setting[k].ynr_iso[i].hi_bfScale[2] = 0.8;
+					stNRIQPara.stYnrPara.mode_cell[m].setting[k].ynr_iso[i].hi_bfScale[3] = 1.0;
 
-					stNRIQPara.stYnrPara.setting[k].ynr_iso[i].hi_denoiseStrength = 1.0;
+					stNRIQPara.stYnrPara.mode_cell[m].setting[k].ynr_iso[i].hi_denoiseStrength = 1.0;
 					
-					stNRIQPara.stYnrPara.setting[k].ynr_iso[i].hi_denoiseWeight[0] = 1.0;
-					stNRIQPara.stYnrPara.setting[k].ynr_iso[i].hi_denoiseWeight[1] = 1.0;
-					stNRIQPara.stYnrPara.setting[k].ynr_iso[i].hi_denoiseWeight[2] = 1.0;
-					stNRIQPara.stYnrPara.setting[k].ynr_iso[i].hi_denoiseWeight[3] = 1.0;
+					stNRIQPara.stYnrPara.mode_cell[m].setting[k].ynr_iso[i].hi_denoiseWeight[0] = 1.0;
+					stNRIQPara.stYnrPara.mode_cell[m].setting[k].ynr_iso[i].hi_denoiseWeight[1] = 1.0;
+					stNRIQPara.stYnrPara.mode_cell[m].setting[k].ynr_iso[i].hi_denoiseWeight[2] = 1.0;
+					stNRIQPara.stYnrPara.mode_cell[m].setting[k].ynr_iso[i].hi_denoiseWeight[3] = 1.0;
 
-					stNRIQPara.stYnrPara.setting[k].ynr_iso[i].denoise_weight[0] = 1.0;
-					stNRIQPara.stYnrPara.setting[k].ynr_iso[i].denoise_weight[1] = 1.0;
-					stNRIQPara.stYnrPara.setting[k].ynr_iso[i].denoise_weight[2] = 1.0;
-					stNRIQPara.stYnrPara.setting[k].ynr_iso[i].denoise_weight[3] = 1.0;
+					stNRIQPara.stYnrPara.mode_cell[m].setting[k].ynr_iso[i].denoise_weight[0] = 1.0;
+					stNRIQPara.stYnrPara.mode_cell[m].setting[k].ynr_iso[i].denoise_weight[1] = 1.0;
+					stNRIQPara.stYnrPara.mode_cell[m].setting[k].ynr_iso[i].denoise_weight[2] = 1.0;
+					stNRIQPara.stYnrPara.mode_cell[m].setting[k].ynr_iso[i].denoise_weight[3] = 1.0;
 
 					//uvnr
-					stNRIQPara.stUvnrPara.setting[k].step0_uvgrad_ratio[i] = 100;
-					stNRIQPara.stUvnrPara.setting[k].step1_median_ratio[i] = 0.5;
-					stNRIQPara.stUvnrPara.setting[k].step2_median_ratio[i] = 0.5;
-					stNRIQPara.stUvnrPara.setting[k].step1_bf_sigmaR[i] = 20;
-					stNRIQPara.stUvnrPara.setting[k].step2_bf_sigmaR[i] = 16;
-					stNRIQPara.stUvnrPara.setting[k].step3_bf_sigmaR[i] = 8;
+					stNRIQPara.stUvnrPara.mode_cell[m].setting[k].step0_uvgrad_ratio[i] = 100;
+					stNRIQPara.stUvnrPara.mode_cell[m].setting[k].step1_median_ratio[i] = 0.5;
+					stNRIQPara.stUvnrPara.mode_cell[m].setting[k].step2_median_ratio[i] = 0.5;
+					stNRIQPara.stUvnrPara.mode_cell[m].setting[k].step1_bf_sigmaR[i] = 20;
+					stNRIQPara.stUvnrPara.mode_cell[m].setting[k].step2_bf_sigmaR[i] = 16;
+					stNRIQPara.stUvnrPara.mode_cell[m].setting[k].step3_bf_sigmaR[i] = 8;
 
 		   	}
     	}
+	   }
 
 		rk_aiq_user_api_anr_SetIQPara(ctx, &stNRIQPara); 
 
@@ -419,71 +440,73 @@ void test_imgproc(const rk_aiq_sys_ctx_t* ctx) {
 		 //printf all the para
 		 rk_aiq_user_api_anr_GetIQPara(ctx, &stGetNRIQPara);  
 
+		for(int m=0; m<1; m++){
 		for(int k=0; k<1; k++){
 		   for(int i=0; i<CALIBDB_NR_SHARP_MAX_ISO_LEVEL; i++ ){
 			 printf("\n\n!!!!!!!!!!set:%d cell:%d !!!!!!!!!!\n", k, i);
 			 printf("oyyf222 bayernr: fiter:%f lamda:%f fixw:%f %f %f %f\n",
-			 	stGetNRIQPara.stBayernrPara.setting[k].filtPara[i],
-			 	stGetNRIQPara.stBayernrPara.setting[k].lamda,
-			 	stGetNRIQPara.stBayernrPara.setting[k].fixW[0][i],
-			 	stGetNRIQPara.stBayernrPara.setting[k].fixW[1][i],
-			 	stGetNRIQPara.stBayernrPara.setting[k].fixW[2][i],
-			 	stGetNRIQPara.stBayernrPara.setting[k].fixW[3][i]);
+			 	stGetNRIQPara.stBayernrPara.mode_cell[m].setting[k].filtPara[i],
+			 	stGetNRIQPara.stBayernrPara.mode_cell[m].setting[k].lamda,
+			 	stGetNRIQPara.stBayernrPara.mode_cell[m].setting[k].fixW[0][i],
+			 	stGetNRIQPara.stBayernrPara.mode_cell[m].setting[k].fixW[1][i],
+			 	stGetNRIQPara.stBayernrPara.mode_cell[m].setting[k].fixW[2][i],
+			 	stGetNRIQPara.stBayernrPara.mode_cell[m].setting[k].fixW[3][i]);
 
 			 printf("oyyf222 mfnr: limiy:%f %f %f %f uv: %f %f %f, y_lo:%f %f %f %f y_hi:%f %f %f %f uv_lo:%f %f %f uv_hi:%f %f %f\n",
-			 	stGetNRIQPara.stMfnrPara.setting[k].mfnr_iso[i].weight_limit_y[0],
-			 	stGetNRIQPara.stMfnrPara.setting[k].mfnr_iso[i].weight_limit_y[1],
-			 	stGetNRIQPara.stMfnrPara.setting[k].mfnr_iso[i].weight_limit_y[2],
-			 	stGetNRIQPara.stMfnrPara.setting[k].mfnr_iso[i].weight_limit_y[3],
-			 	stGetNRIQPara.stMfnrPara.setting[k].mfnr_iso[i].weight_limit_uv[0],
-			 	stGetNRIQPara.stMfnrPara.setting[k].mfnr_iso[i].weight_limit_uv[1],
-			 	stGetNRIQPara.stMfnrPara.setting[k].mfnr_iso[i].weight_limit_uv[2],
-			 	stGetNRIQPara.stMfnrPara.setting[k].mfnr_iso[i].y_lo_bfscale[0],
-			 	stGetNRIQPara.stMfnrPara.setting[k].mfnr_iso[i].y_lo_bfscale[1],
-			 	stGetNRIQPara.stMfnrPara.setting[k].mfnr_iso[i].y_lo_bfscale[2],
-			 	stGetNRIQPara.stMfnrPara.setting[k].mfnr_iso[i].y_lo_bfscale[3],
-			 	stGetNRIQPara.stMfnrPara.setting[k].mfnr_iso[i].y_hi_bfscale[0],
-			 	stGetNRIQPara.stMfnrPara.setting[k].mfnr_iso[i].y_hi_bfscale[1],
-			 	stGetNRIQPara.stMfnrPara.setting[k].mfnr_iso[i].y_hi_bfscale[2],
-			 	stGetNRIQPara.stMfnrPara.setting[k].mfnr_iso[i].y_hi_bfscale[3],
-			 	stGetNRIQPara.stMfnrPara.setting[k].mfnr_iso[i].uv_lo_bfscale[0],
-			 	stGetNRIQPara.stMfnrPara.setting[k].mfnr_iso[i].uv_lo_bfscale[1],
-			 	stGetNRIQPara.stMfnrPara.setting[k].mfnr_iso[i].uv_lo_bfscale[2],
-			 	stGetNRIQPara.stMfnrPara.setting[k].mfnr_iso[i].uv_hi_bfscale[0],
-			 	stGetNRIQPara.stMfnrPara.setting[k].mfnr_iso[i].uv_hi_bfscale[1],
-			 	stGetNRIQPara.stMfnrPara.setting[k].mfnr_iso[i].uv_hi_bfscale[2]);
+			 	stGetNRIQPara.stMfnrPara.mode_cell[m].setting[k].mfnr_iso[i].weight_limit_y[0],
+			 	stGetNRIQPara.stMfnrPara.mode_cell[m].setting[k].mfnr_iso[i].weight_limit_y[1],
+			 	stGetNRIQPara.stMfnrPara.mode_cell[m].setting[k].mfnr_iso[i].weight_limit_y[2],
+			 	stGetNRIQPara.stMfnrPara.mode_cell[m].setting[k].mfnr_iso[i].weight_limit_y[3],
+			 	stGetNRIQPara.stMfnrPara.mode_cell[m].setting[k].mfnr_iso[i].weight_limit_uv[0],
+			 	stGetNRIQPara.stMfnrPara.mode_cell[m].setting[k].mfnr_iso[i].weight_limit_uv[1],
+			 	stGetNRIQPara.stMfnrPara.mode_cell[m].setting[k].mfnr_iso[i].weight_limit_uv[2],
+			 	stGetNRIQPara.stMfnrPara.mode_cell[m].setting[k].mfnr_iso[i].y_lo_bfscale[0],
+			 	stGetNRIQPara.stMfnrPara.mode_cell[m].setting[k].mfnr_iso[i].y_lo_bfscale[1],
+			 	stGetNRIQPara.stMfnrPara.mode_cell[m].setting[k].mfnr_iso[i].y_lo_bfscale[2],
+			 	stGetNRIQPara.stMfnrPara.mode_cell[m].setting[k].mfnr_iso[i].y_lo_bfscale[3],
+			 	stGetNRIQPara.stMfnrPara.mode_cell[m].setting[k].mfnr_iso[i].y_hi_bfscale[0],
+			 	stGetNRIQPara.stMfnrPara.mode_cell[m].setting[k].mfnr_iso[i].y_hi_bfscale[1],
+			 	stGetNRIQPara.stMfnrPara.mode_cell[m].setting[k].mfnr_iso[i].y_hi_bfscale[2],
+			 	stGetNRIQPara.stMfnrPara.mode_cell[m].setting[k].mfnr_iso[i].y_hi_bfscale[3],
+			 	stGetNRIQPara.stMfnrPara.mode_cell[m].setting[k].mfnr_iso[i].uv_lo_bfscale[0],
+			 	stGetNRIQPara.stMfnrPara.mode_cell[m].setting[k].mfnr_iso[i].uv_lo_bfscale[1],
+			 	stGetNRIQPara.stMfnrPara.mode_cell[m].setting[k].mfnr_iso[i].uv_lo_bfscale[2],
+			 	stGetNRIQPara.stMfnrPara.mode_cell[m].setting[k].mfnr_iso[i].uv_hi_bfscale[0],
+			 	stGetNRIQPara.stMfnrPara.mode_cell[m].setting[k].mfnr_iso[i].uv_hi_bfscale[1],
+			 	stGetNRIQPara.stMfnrPara.mode_cell[m].setting[k].mfnr_iso[i].uv_hi_bfscale[2]);
 
 			  printf("oyyf222 ynr: lo_bf:%f %f %f %f  lo_do:%f %f %f %f  hi_bf:%f %f %f %f stre:%f hi_do:%f %f %f %f\n",
-			 	stGetNRIQPara.stYnrPara.setting[k].ynr_iso[i].lo_bfScale[0],
-			 	stGetNRIQPara.stYnrPara.setting[k].ynr_iso[i].lo_bfScale[1],
-			 	stGetNRIQPara.stYnrPara.setting[k].ynr_iso[i].lo_bfScale[2],
-			 	stGetNRIQPara.stYnrPara.setting[k].ynr_iso[i].lo_bfScale[3],
-			  	stGetNRIQPara.stYnrPara.setting[k].ynr_iso[i].denoise_weight[0],
-			 	stGetNRIQPara.stYnrPara.setting[k].ynr_iso[i].denoise_weight[1],
-			 	stGetNRIQPara.stYnrPara.setting[k].ynr_iso[i].denoise_weight[2],
-			 	stGetNRIQPara.stYnrPara.setting[k].ynr_iso[i].denoise_weight[3],
-			 	stGetNRIQPara.stYnrPara.setting[k].ynr_iso[i].hi_bfScale[0],
-			 	stGetNRIQPara.stYnrPara.setting[k].ynr_iso[i].hi_bfScale[1],
-			 	stGetNRIQPara.stYnrPara.setting[k].ynr_iso[i].hi_bfScale[2],
-			 	stGetNRIQPara.stYnrPara.setting[k].ynr_iso[i].hi_bfScale[3],
-			 	stGetNRIQPara.stYnrPara.setting[k].ynr_iso[i].hi_denoiseStrength,
-			 	stGetNRIQPara.stYnrPara.setting[k].ynr_iso[i].hi_denoiseWeight[0],
-			 	stGetNRIQPara.stYnrPara.setting[k].ynr_iso[i].hi_denoiseWeight[1],
-			 	stGetNRIQPara.stYnrPara.setting[k].ynr_iso[i].hi_denoiseWeight[2],
-			 	stGetNRIQPara.stYnrPara.setting[k].ynr_iso[i].hi_denoiseWeight[3]
+			 	stGetNRIQPara.stYnrPara.mode_cell[m].setting[k].ynr_iso[i].lo_bfScale[0],
+			 	stGetNRIQPara.stYnrPara.mode_cell[m].setting[k].ynr_iso[i].lo_bfScale[1],
+			 	stGetNRIQPara.stYnrPara.mode_cell[m].setting[k].ynr_iso[i].lo_bfScale[2],
+			 	stGetNRIQPara.stYnrPara.mode_cell[m].setting[k].ynr_iso[i].lo_bfScale[3],
+			  	stGetNRIQPara.stYnrPara.mode_cell[m].setting[k].ynr_iso[i].denoise_weight[0],
+			 	stGetNRIQPara.stYnrPara.mode_cell[m].setting[k].ynr_iso[i].denoise_weight[1],
+			 	stGetNRIQPara.stYnrPara.mode_cell[m].setting[k].ynr_iso[i].denoise_weight[2],
+			 	stGetNRIQPara.stYnrPara.mode_cell[m].setting[k].ynr_iso[i].denoise_weight[3],
+			 	stGetNRIQPara.stYnrPara.mode_cell[m].setting[k].ynr_iso[i].hi_bfScale[0],
+			 	stGetNRIQPara.stYnrPara.mode_cell[m].setting[k].ynr_iso[i].hi_bfScale[1],
+			 	stGetNRIQPara.stYnrPara.mode_cell[m].setting[k].ynr_iso[i].hi_bfScale[2],
+			 	stGetNRIQPara.stYnrPara.mode_cell[m].setting[k].ynr_iso[i].hi_bfScale[3],
+			 	stGetNRIQPara.stYnrPara.mode_cell[m].setting[k].ynr_iso[i].hi_denoiseStrength,
+			 	stGetNRIQPara.stYnrPara.mode_cell[m].setting[k].ynr_iso[i].hi_denoiseWeight[0],
+			 	stGetNRIQPara.stYnrPara.mode_cell[m].setting[k].ynr_iso[i].hi_denoiseWeight[1],
+			 	stGetNRIQPara.stYnrPara.mode_cell[m].setting[k].ynr_iso[i].hi_denoiseWeight[2],
+			 	stGetNRIQPara.stYnrPara.mode_cell[m].setting[k].ynr_iso[i].hi_denoiseWeight[3]
 			 	);
 
 			  printf("oyyf222 uvnr: uv:%f  med:%f %f sigmaR:%f %f %f\n",
-			 	stGetNRIQPara.stUvnrPara.setting[k].step0_uvgrad_ratio[i],
-				stGetNRIQPara.stUvnrPara.setting[k].step1_median_ratio[i],
-				stGetNRIQPara.stUvnrPara.setting[k].step2_median_ratio[i],
-				stGetNRIQPara.stUvnrPara.setting[k].step1_bf_sigmaR[i],
-				stGetNRIQPara.stUvnrPara.setting[k].step2_bf_sigmaR[i],
-				stGetNRIQPara.stUvnrPara.setting[k].step3_bf_sigmaR[i]);
+			 	stGetNRIQPara.stUvnrPara.mode_cell[m].setting[k].step0_uvgrad_ratio[i],
+				stGetNRIQPara.stUvnrPara.mode_cell[m].setting[k].step1_median_ratio[i],
+				stGetNRIQPara.stUvnrPara.mode_cell[m].setting[k].step2_median_ratio[i],
+				stGetNRIQPara.stUvnrPara.mode_cell[m].setting[k].step1_bf_sigmaR[i],
+				stGetNRIQPara.stUvnrPara.mode_cell[m].setting[k].step2_bf_sigmaR[i],
+				stGetNRIQPara.stUvnrPara.mode_cell[m].setting[k].step3_bf_sigmaR[i]);
 
 			  printf("!!!!!!!!!!set:%d cell:%d  end !!!!!!!!!!\n\n", k, i);
 		   	}
-		}	 	
+		}	 
+		}
 		break;
 	 case 'J':
         rk_aiq_sharp_IQpara_t stSharpIQpara;
@@ -491,16 +514,18 @@ void test_imgproc(const rk_aiq_sys_ctx_t* ctx) {
 		stSharpIQpara.module_bits= (1<<ASHARP_MODULE_SHARP) | (1<< ASHARP_MODULE_EDGEFILTER) ;
 		rk_aiq_user_api_asharp_GetIQPara(ctx, &stSharpIQpara);
 
-		for(int k=0; k<2; k++){
+		for(int m=0; m<3; m++){
+		  for(int k=0; k<2; k++){
 			for(int i=0; i<CALIBDB_NR_SHARP_MAX_ISO_LEVEL; i++ ){
-				stSharpIQpara.stSharpPara.setting[k].sharp_iso[i].hratio = 1.9;
-				stSharpIQpara.stSharpPara.setting[k].sharp_iso[i].lratio = 0.4;
-				stSharpIQpara.stSharpPara.setting[k].sharp_iso[i].mf_sharp_ratio = 5.0;
-				stSharpIQpara.stSharpPara.setting[k].sharp_iso[i].hf_sharp_ratio = 6.0;
+				stSharpIQpara.stSharpPara.mode_cell[m].setting[k].sharp_iso[i].hratio = 1.9;
+				stSharpIQpara.stSharpPara.mode_cell[m].setting[k].sharp_iso[i].lratio = 0.4;
+				stSharpIQpara.stSharpPara.mode_cell[m].setting[k].sharp_iso[i].mf_sharp_ratio = 5.0;
+				stSharpIQpara.stSharpPara.mode_cell[m].setting[k].sharp_iso[i].hf_sharp_ratio = 6.0;
 
-				stSharpIQpara.stEdgeFltPara.setting[k].edgeFilter_iso[i].edge_thed = 33.0;
-				stSharpIQpara.stEdgeFltPara.setting[k].edgeFilter_iso[i].local_alpha = 0.5;
+				stSharpIQpara.stEdgeFltPara.mode_cell[m].setting[k].edgeFilter_iso[i].edge_thed = 33.0;
+				stSharpIQpara.stEdgeFltPara.mode_cell[m].setting[k].edgeFilter_iso[i].local_alpha = 0.5;
 			}
+		  }
 		}
 
 		rk_aiq_user_api_asharp_SetIQPara(ctx, &stSharpIQpara);
@@ -508,22 +533,24 @@ void test_imgproc(const rk_aiq_sys_ctx_t* ctx) {
 		sleep(5);
 		rk_aiq_user_api_asharp_GetIQPara(ctx, &stGetSharpIQpara);
 
-		for(int k=0; k<1; k++){
+		for(int m=0; m<1; m++){
+		  for(int k=0; k<1; k++){
 		   for(int i=0; i<CALIBDB_NR_SHARP_MAX_ISO_LEVEL; i++ ){
 		   	 	printf("\n\n!!!!!!!!!!set:%d cell:%d !!!!!!!!!!\n", k, i);
 				printf("oyyf222 sharp:%f %f ratio:%f %f\n",
-					stGetSharpIQpara.stSharpPara.setting[k].sharp_iso[i].lratio,
-					stGetSharpIQpara.stSharpPara.setting[k].sharp_iso[i].hratio,
-					stGetSharpIQpara.stSharpPara.setting[k].sharp_iso[i].mf_sharp_ratio,
-					stGetSharpIQpara.stSharpPara.setting[k].sharp_iso[i].hf_sharp_ratio);
+					stGetSharpIQpara.stSharpPara.mode_cell[m].setting[k].sharp_iso[i].lratio,
+					stGetSharpIQpara.stSharpPara.mode_cell[m].setting[k].sharp_iso[i].hratio,
+					stGetSharpIQpara.stSharpPara.mode_cell[m].setting[k].sharp_iso[i].mf_sharp_ratio,
+					stGetSharpIQpara.stSharpPara.mode_cell[m].setting[k].sharp_iso[i].hf_sharp_ratio);
 
 				printf("oyyf222 edgefilter:%f %f\n",
-					stGetSharpIQpara.stEdgeFltPara.setting[k].edgeFilter_iso[i].edge_thed,
-					stGetSharpIQpara.stEdgeFltPara.setting[k].edgeFilter_iso[i].local_alpha);
+					stGetSharpIQpara.stEdgeFltPara.mode_cell[m].setting[k].edgeFilter_iso[i].edge_thed,
+					stGetSharpIQpara.stEdgeFltPara.mode_cell[m].setting[k].edgeFilter_iso[i].local_alpha);
 
 				printf("!!!!!!!!!!set:%d cell:%d  end !!!!!!!!!!\n", k, i);
 		   	}
-		}   
+		  }   
+		}
        break;
     case 'K':
         printf("test mirro, flip\n");
@@ -533,19 +560,72 @@ void test_imgproc(const rk_aiq_sys_ctx_t* ctx) {
         mirror = true;
         flip = true;
         printf("set mir %d, flip %d \n", mirror, flip);
-        rk_aiq_uapi_setMirroFlip(ctx, true,true);
+        rk_aiq_uapi_setMirroFlip(ctx, true,true, 3);
         rk_aiq_uapi_getMirrorFlip(ctx, &mirror, &flip);
         printf("after set mir %d, flip %d \n", mirror, flip);
+       break;
+    case 'L':
+       printf("test fec correct level100\n");
+       rk_aiq_uapi_setFecCorrectLevel(ctx, 100);
+       break;
+    case 'M':
+       printf("test fec correct level255\n");
+       rk_aiq_uapi_setFecCorrectLevel(ctx, 255);
+       break;
+    case 'N':
+       printf("test bypass fec\n");
+       rk_aiq_uapi_setFecBypass(ctx, true);
+       break;
+    case 'O':
+       printf("test not bypass fec\n");
+       rk_aiq_uapi_setFecBypass(ctx, false);
+       break;
+    case 'P':
+       {
+            int work_mode = demo_ctx->hdrmode;
+            rk_aiq_working_mode_t new_mode;
+            if (work_mode == RK_AIQ_WORKING_MODE_NORMAL)
+                new_mode = RK_AIQ_WORKING_MODE_ISP_HDR3;
+            else
+                new_mode = RK_AIQ_WORKING_MODE_NORMAL;
+            printf("switch work mode from %d to %d\n", work_mode, new_mode);
+            *const_cast<int*>(&demo_ctx->hdrmode) = work_mode = new_mode;
+            rk_aiq_uapi_sysctl_swWorkingModeDyn(ctx, new_mode);
+       }
+       break;
+    case 'Q':
+       printf("test enable ldch\n");
+       rk_aiq_uapi_setLdchEn(ctx, true);
+       break;
+    case 'R':
+       printf("test disalbe ldch\n");
+       rk_aiq_uapi_setLdchEn(ctx, false);
+       break;
+    case 'S':
+       printf("test fec correct level100\n");
+       rk_aiq_uapi_setLdchCorrectLevel(ctx, 100);
+       break;
+    case 'T':
+       printf("test fec correct level255\n");
+       rk_aiq_uapi_setLdchCorrectLevel(ctx, 255);
+       break;
+    case 'U':
+       {
+           char output_dir[64] = {0};
+           printf("test to capture raw sync\n");
+           rk_aiq_uapi_debug_captureRawSync(ctx, CAPTURE_RAW_SYNC, 5, "/tmp", output_dir);
+           printf("Raw's storage directory is (%s)\n", output_dir);
+       }
        break;
     default:
         break;
     }
 }
 
-static void errno_exit(const char *s)
+static void errno_exit(demo_context_t *ctx, const char *s)
 {
-        ERR("%s error %d, %s\n", s, errno, strerror(errno));
-        exit(EXIT_FAILURE);
+        ERR("%s: %s error %d, %s\n", get_sensor_name(ctx), s, errno, strerror(errno));
+        //exit(EXIT_FAILURE);
 }
 
 static int xioctl(int fh, int request, void *arg)
@@ -557,7 +637,7 @@ static int xioctl(int fh, int request, void *arg)
         return r;
 }
 
-bool get_value_from_file(const char* path, int* value, int* frameId)
+static bool get_value_from_file(const char* path, int* value, int* frameId)
 {
     const char *delim = " ";
     char buffer[16] = {0};
@@ -584,29 +664,29 @@ bool get_value_from_file(const char* path, int* value, int* frameId)
 }
 
 static int write_yuv_to_file(const void *p,
-			     int size, int sequence)
+			     int size, int sequence, demo_context_t *ctx)
 {
 	char file_name[64] = {0};
 
 	snprintf(file_name, sizeof(file_name),
 			"%s/frame%d.yuv",
-			yuv_dir_path,
+			ctx->yuv_dir_path,
 			sequence);
-	fp = fopen(file_name, "wb+");
-	if (fp == NULL) {
+	ctx->fp = fopen(file_name, "wb+");
+	if (ctx->fp == NULL) {
 		ERR("fopen yuv file %s failed!\n", file_name);
 		return -1;
 	}
 
-	fwrite(p, size, 1, fp);
-	fflush(fp);
+	fwrite(p, size, 1, ctx->fp);
+	fflush(ctx->fp);
 
-	if (fp) {
-		fclose(fp);
-		fp = NULL;
+	if (ctx->fp) {
+		fclose(ctx->fp);
+		ctx->fp = NULL;
 	}
 
-        for (int i = 0; i < g_capture_yuv_num; i++)
+        for (int i = 0; i < ctx->capture_yuv_num; i++)
             printf("<");
 
 	printf("\n");
@@ -615,7 +695,7 @@ static int write_yuv_to_file(const void *p,
 	return 0;
 }
 
-static int creat_yuv_dir(const char* path)
+static int creat_yuv_dir(const char* path, demo_context_t *ctx)
 {
 	time_t now;
 	struct tm* timenow;
@@ -625,7 +705,7 @@ static int creat_yuv_dir(const char* path)
 
 	time(&now);
 	timenow = localtime(&now);
-	snprintf(yuv_dir_path, sizeof(yuv_dir_path),
+	snprintf(ctx->yuv_dir_path, sizeof(ctx->yuv_dir_path),
 			"%s/yuv_%04d-%02d-%02d_%02d-%02d-%02d",
 			path,
 			timenow->tm_year + 1900,
@@ -637,31 +717,31 @@ static int creat_yuv_dir(const char* path)
 
 	// printf("mkdir %s for capturing yuv!\n", yuv_dir_path);
 
-	if(mkdir(yuv_dir_path, 0755) < 0) {
-		printf("mkdir %s error!!!\n", yuv_dir_path);
+	if(mkdir(ctx->yuv_dir_path, 0755) < 0) {
+		printf("mkdir %s error!!!\n", ctx->yuv_dir_path);
 		return -1;
 	}
 
-	_is_yuv_dir_exist = true;
+	ctx->_is_yuv_dir_exist = true;
 
 	return 0;
 }
 
-static void process_image(const void *p, int sequence,int size)
+static void process_image(const void *p, int sequence,int size, demo_context_t *ctx)
 {
-	if (fp && sequence >= skipCnt && outputCnt-- > 0) {
+	if (ctx->fp && sequence >= ctx->skipCnt && ctx->outputCnt-- > 0) {
 		printf(">\n");
-		fwrite(p, size, 1, fp);
-		fflush(fp);
-	} else if (writeFileSync) {
+		fwrite(p, size, 1, ctx->fp);
+		fflush(ctx->fp);
+	} else if (ctx->writeFileSync) {
 		int ret = 0;
-		if (!_is_capture_yuv) {
+		if (!ctx->is_capture_yuv) {
 		    char file_name[32] = {0};
 		    int rawFrameId = 0;
 
 		    snprintf(file_name, sizeof(file_name), "%s/%s",
 			     CAPTURE_RAW_PATH, CAPTURE_CNT_FILENAME);
-		    get_value_from_file(file_name, &g_capture_yuv_num, &rawFrameId);
+		    get_value_from_file(file_name, &ctx->capture_yuv_num, &rawFrameId);
 
 		    /*
 		     * printf("%s: rawFrameId: %d, sequence: %d\n", __FUNCTION__,
@@ -669,80 +749,86 @@ static void process_image(const void *p, int sequence,int size)
 		     */
 
 		    sequence += 1;
-		    if (g_capture_yuv_num > 0 && \
+		    if (ctx->capture_yuv_num > 0 && \
 			((sequence >= rawFrameId && rawFrameId > 0) || sequence < 2))
-			_is_capture_yuv = true;
+    			ctx->is_capture_yuv = true;
 		}
 
-		if (_is_capture_yuv) {
-		    if (!_is_yuv_dir_exist) {
-		        creat_yuv_dir(CAPTURE_RAW_PATH);
+		if (ctx->is_capture_yuv) {
+		    if (!ctx->_is_yuv_dir_exist) {
+		        creat_yuv_dir(CAPTURE_RAW_PATH, ctx);
 		    }
 
-		    if (_is_yuv_dir_exist) {
-			write_yuv_to_file(p, size, sequence);
-			rk_aiq_uapi_debug_captureRawNotify(aiq_ctx);
+		    if (ctx->_is_yuv_dir_exist) {
+    			write_yuv_to_file(p, size, sequence, ctx);
+    			rk_aiq_uapi_debug_captureRawNotify(ctx->aiq_ctx);
 		    }
 
-		    if (g_capture_yuv_num-- == 0) {
-			_is_capture_yuv = false;
-			_is_yuv_dir_exist = false;
+		    if (ctx->capture_yuv_num-- == 0) {
+    			ctx->is_capture_yuv = false;
+    			ctx->_is_yuv_dir_exist = false;
 		    }
 		}
 	}
 }
 
-static int read_frame()
+static int read_frame(demo_context_t *ctx)
 {
         struct v4l2_buffer buf;
         int i, bytesused;
 
         CLEAR(buf);
 
-        buf.type = buf_type;
+        buf.type = ctx->buf_type;
         buf.memory = V4L2_MEMORY_MMAP;
 
         struct v4l2_plane planes[FMT_NUM_PLANES];
-        if (V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE == buf_type) {
+        if (V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE == ctx->buf_type) {
             buf.m.planes = planes;
             buf.length = FMT_NUM_PLANES;
         }
 
-        if (-1 == xioctl(fd, VIDIOC_DQBUF, &buf))
-                errno_exit("VIDIOC_DQBUF");
+        if (-1 == xioctl(ctx->fd, VIDIOC_DQBUF, &buf))
+                errno_exit(ctx, "VIDIOC_DQBUF");
 
         i = buf.index;
 
-        if (V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE == buf_type)
+        if (V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE == ctx->buf_type)
             bytesused = buf.m.planes[0].bytesused;
         else
             bytesused = buf.bytesused;
 
-	if (vop) {
+	if (ctx->vop) {
 	    int dispWidth, dispHeight;
 
-	    if (width > 1920)
-		dispWidth = 1920;
+	    if (ctx->width > 1920)
+		    dispWidth = 1920;
 	    else
-		dispWidth = width;
+		    dispWidth = ctx->width;
 
-	    if (height > 1088)
-		dispHeight = 1088;
+	    if (ctx->height > 1088)
+		    dispHeight = 1088;
 	    else
-		dispHeight = height;
-
-	    drmDspFrame(width, height, dispWidth, dispHeight, buffers[i].start, DRM_FORMAT_NV12);
+		    dispHeight = ctx->height;
+        if (strlen(ctx->dev_name) && strlen(ctx->dev_name2)) {
+    	    if (ctx->dev_using == 1)
+    	        display_win1(ctx->buffers[i].start, ctx->buffers[i].export_fd,  RK_FORMAT_YCbCr_420_SP, dispWidth, dispHeight, 0);
+    	    else
+    	        display_win2(ctx->buffers[i].start, ctx->buffers[i].export_fd,  RK_FORMAT_YCbCr_420_SP, dispWidth, dispHeight, 0);
+	    }else {
+            drmDspFrame(ctx->width, ctx->height, dispWidth, dispHeight, ctx->buffers[i].start, DRM_FORMAT_NV12);
+	    }
 	}
 
-	process_image(buffers[i].start,  buf.sequence, bytesused);
+	process_image(ctx->buffers[i].start,  buf.sequence, bytesused, ctx);
 
-        if (-1 == xioctl(fd, VIDIOC_QBUF, &buf))
-            errno_exit("VIDIOC_QBUF");
+    if (-1 == xioctl(ctx->fd, VIDIOC_QBUF, &buf))
+        errno_exit(ctx, "VIDIOC_QBUF");
 
-        return 1;
+    return 1;
 }
 
-static int read_frame_pp_oneframe()
+static int read_frame_pp_oneframe(demo_context_t *ctx)
 {
         struct v4l2_buffer buf;
         struct v4l2_buffer buf_pp;
@@ -751,36 +837,36 @@ static int read_frame_pp_oneframe()
 
         CLEAR(buf);
         // dq one buf from isp mp
-        printf("------ dq 1 from isp mp --------------\n");
-        buf.type = buf_type;
+        DBG("------ dq 1 from isp mp --------------\n");
+        buf.type = ctx->buf_type;
         buf.memory = V4L2_MEMORY_MMAP;
 
         struct v4l2_plane planes[FMT_NUM_PLANES];
-        if (V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE == buf_type) {
+        if (V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE == ctx->buf_type) {
             buf.m.planes = planes;
             buf.length = FMT_NUM_PLANES;
         }
 
-        if (-1 == xioctl(fd_isp_mp, VIDIOC_DQBUF, &buf))
-                errno_exit("VIDIOC_DQBUF");
+        if (-1 == xioctl(ctx->fd_isp_mp, VIDIOC_DQBUF, &buf))
+                errno_exit(ctx, "VIDIOC_DQBUF");
 
         i = buf.index;
 
         if (first_time ) {
-            printf("------ dq 2 from isp mp --------------\n");
-            if (-1 == xioctl(fd_isp_mp, VIDIOC_DQBUF, &buf))
-                    errno_exit("VIDIOC_DQBUF");
+            DBG("------ dq 2 from isp mp --------------\n");
+            if (-1 == xioctl(ctx->fd_isp_mp, VIDIOC_DQBUF, &buf))
+                    errno_exit(ctx, "VIDIOC_DQBUF");
 
             ii = buf.index;
         }
 
-        if (V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE == buf_type)
+        if (V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE == ctx->buf_type)
             bytesused = buf.m.planes[0].bytesused;
         else
             bytesused = buf.bytesused;
 
         // queue to ispp input 
-        printf("------ queue 1 index %d to ispp input --------------\n", i);
+        DBG("------ queue 1 index %d to ispp input --------------\n", i);
         CLEAR(buf_pp);
         buf_pp.type = V4L2_BUF_TYPE_VIDEO_OUTPUT_MPLANE;
         buf_pp.memory = V4L2_MEMORY_DMABUF;
@@ -790,159 +876,157 @@ static int read_frame_pp_oneframe()
         memset(planes_pp, 0, sizeof(planes_pp));
         buf_pp.m.planes = planes_pp;
         buf_pp.length = FMT_NUM_PLANES;
-        buf_pp.m.planes[0].m.fd = buffers_mp[i].export_fd;
+        buf_pp.m.planes[0].m.fd = ctx->buffers_mp[i].export_fd;
 
-        if (-1 == xioctl(fd_pp_input, VIDIOC_QBUF, &buf_pp))
-                errno_exit("VIDIOC_QBUF");
+        if (-1 == xioctl(ctx->fd_pp_input, VIDIOC_QBUF, &buf_pp))
+                errno_exit(ctx, "VIDIOC_QBUF");
 
         if (first_time ) {
-            printf("------ queue 2 index %d to ispp input --------------\n", ii);
+            DBG("------ queue 2 index %d to ispp input --------------\n", ii);
             buf_pp.index = ii;
-            buf_pp.m.planes[0].m.fd = buffers_mp[ii].export_fd;
-            if (-1 == xioctl(fd_pp_input, VIDIOC_QBUF, &buf_pp))
-                    errno_exit("VIDIOC_QBUF");
+            buf_pp.m.planes[0].m.fd = ctx->buffers_mp[ii].export_fd;
+            if (-1 == xioctl(ctx->fd_pp_input, VIDIOC_QBUF, &buf_pp))
+                    errno_exit(ctx, "VIDIOC_QBUF");
         }
         // read frame from ispp sharp/scale
-        printf("------ readframe from output --------------\n");
-        read_frame();
+        DBG("------ readframe from output --------------\n");
+        read_frame(ctx);
         // dq from pp input
-        printf("------ dq 1 from ispp input--------------\n");
-        if (-1 == xioctl(fd_pp_input, VIDIOC_DQBUF, &buf_pp))
-                errno_exit("VIDIOC_DQBUF");
+        DBG("------ dq 1 from ispp input--------------\n");
+        if (-1 == xioctl(ctx->fd_pp_input, VIDIOC_DQBUF, &buf_pp))
+                errno_exit(ctx, "VIDIOC_DQBUF");
         // queue back to mp
-        printf("------ queue 1 index %d back to isp mp--------------\n", buf_pp.index);
+        DBG("------ queue 1 index %d back to isp mp--------------\n", buf_pp.index);
         buf.index = buf_pp.index;
-        if (-1 == xioctl(fd_isp_mp, VIDIOC_QBUF, &buf))
-            errno_exit("VIDIOC_QBUF");
+        if (-1 == xioctl(ctx->fd_isp_mp, VIDIOC_QBUF, &buf))
+            errno_exit(ctx, "VIDIOC_QBUF");
 
         first_time = 0;
         return 1;
 }
 
-static void mainloop(void)
+static void mainloop(demo_context_t *ctx)
 {
-    bool loop_inf = frame_count == -1 ? true : false;
-
-    while (loop_inf || (frame_count-- > 0)) {
-        if (pponeframe)
-            read_frame_pp_oneframe();
+    while ((ctx->frame_count == -1) || (ctx->frame_count-- > 0)) {
+        if (ctx->pponeframe)
+            read_frame_pp_oneframe(ctx);
         else
-            read_frame();
+            read_frame(ctx);
     }
 }
 
-static void stop_capturing(void)
+static void stop_capturing(demo_context_t *ctx)
 {
         enum v4l2_buf_type type;
 
-        type = buf_type;
-        if (-1 == xioctl(fd, VIDIOC_STREAMOFF, &type))
-            errno_exit("VIDIOC_STREAMOFF");
+        type = ctx->buf_type;
+        if (-1 == xioctl(ctx->fd, VIDIOC_STREAMOFF, &type))
+            errno_exit(ctx, "VIDIOC_STREAMOFF");
 }
 
-static void stop_capturing_pp_oneframe(void)
+static void stop_capturing_pp_oneframe(demo_context_t *ctx)
 {
         enum v4l2_buf_type type;
 
         type = V4L2_BUF_TYPE_VIDEO_OUTPUT_MPLANE;
-        if (-1 == xioctl(fd_pp_input, VIDIOC_STREAMOFF, &type))
-            errno_exit("VIDIOC_STREAMOFF ppinput");
-        type = buf_type;
-        if (-1 == xioctl(fd_isp_mp, VIDIOC_STREAMOFF, &type))
-            errno_exit("VIDIOC_STREAMOFF ispmp");
+        if (-1 == xioctl(ctx->fd_pp_input, VIDIOC_STREAMOFF, &type))
+            errno_exit(ctx, "VIDIOC_STREAMOFF ppinput");
+        type = ctx->buf_type;
+        if (-1 == xioctl(ctx->fd_isp_mp, VIDIOC_STREAMOFF, &type))
+            errno_exit(ctx, "VIDIOC_STREAMOFF ispmp");
 }
 
-static void start_capturing(void)
+static void start_capturing(demo_context_t *ctx)
 {
         unsigned int i;
         enum v4l2_buf_type type;
 
-        for (i = 0; i < n_buffers; ++i) {
+        for (i = 0; i < ctx->n_buffers; ++i) {
                 struct v4l2_buffer buf;
 
                 CLEAR(buf);
-                buf.type = buf_type;
+                buf.type = ctx->buf_type;
                 buf.memory = V4L2_MEMORY_MMAP;
                 buf.index = i;
 
-                if (V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE == buf_type) {
+                if (V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE == ctx->buf_type) {
                     struct v4l2_plane planes[FMT_NUM_PLANES];
 
                     buf.m.planes = planes;
                     buf.length = FMT_NUM_PLANES;
                 }
-                if (-1 == xioctl(fd, VIDIOC_QBUF, &buf))
-                        errno_exit("VIDIOC_QBUF");
+                if (-1 == xioctl(ctx->fd, VIDIOC_QBUF, &buf))
+                        errno_exit(ctx, "VIDIOC_QBUF");
         }
-        type = buf_type;
-        printf("-------- stream on output -------------\n");
-        if (-1 == xioctl(fd, VIDIOC_STREAMON, &type))
-                errno_exit("VIDIOC_STREAMON");
+        type = ctx->buf_type;
+        DBG("%s:-------- stream on output -------------\n",get_sensor_name(ctx));
+        if (-1 == xioctl(ctx->fd, VIDIOC_STREAMON, &type))
+                errno_exit(ctx,"VIDIOC_STREAMON");
 }
 
-static void start_capturing_pp_oneframe(void)
+static void start_capturing_pp_oneframe(demo_context_t *ctx)
 {
         unsigned int i;
         enum v4l2_buf_type type;
 
         type = V4L2_BUF_TYPE_VIDEO_OUTPUT_MPLANE;
-        printf("-------- stream on pp input -------------\n");
-        if (-1 == xioctl(fd_pp_input, VIDIOC_STREAMON, &type))
-                errno_exit("VIDIOC_STREAMON pp input");
+        DBG("%s:-------- stream on pp input -------------\n",get_sensor_name(ctx));
+        if (-1 == xioctl(ctx->fd_pp_input, VIDIOC_STREAMON, &type))
+                errno_exit(ctx, "VIDIOC_STREAMON pp input");
 
-        type = buf_type;
-        for (i = 0; i < n_buffers; ++i) {
+        type = ctx->buf_type;
+        for (i = 0; i < ctx->n_buffers; ++i) {
                 struct v4l2_buffer buf;
 
                 CLEAR(buf);
-                buf.type = buf_type;
+                buf.type = ctx->buf_type;
                 buf.memory = V4L2_MEMORY_MMAP;
                 buf.index = i;
 
-                if (V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE == buf_type) {
+                if (V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE == ctx->buf_type) {
                     struct v4l2_plane planes[FMT_NUM_PLANES];
 
                     buf.m.planes = planes;
                     buf.length = FMT_NUM_PLANES;
                 }
-                if (-1 == xioctl(fd_isp_mp, VIDIOC_QBUF, &buf))
-                        errno_exit("VIDIOC_QBUF");
+                if (-1 == xioctl(ctx->fd_isp_mp, VIDIOC_QBUF, &buf))
+                        errno_exit(ctx, "VIDIOC_QBUF");
         }
-        printf("-------- stream on isp mp -------------\n");
-        if (-1 == xioctl(fd_isp_mp, VIDIOC_STREAMON, &type))
-                errno_exit("VIDIOC_STREAMON ispmp");
+        DBG("%s:-------- stream on isp mp -------------\n",get_sensor_name(ctx));
+        if (-1 == xioctl(ctx->fd_isp_mp, VIDIOC_STREAMON, &type))
+                errno_exit(ctx, "VIDIOC_STREAMON ispmp");
 }
 
 
-static void uninit_device(void)
+static void uninit_device(demo_context_t *ctx)
 {
         unsigned int i;
 
-        for (i = 0; i < n_buffers; ++i) {
-            if (-1 == munmap(buffers[i].start, buffers[i].length))
-                    errno_exit("munmap");
+        for (i = 0; i < ctx->n_buffers; ++i) {
+            if (-1 == munmap(ctx->buffers[i].start, ctx->buffers[i].length))
+                    errno_exit(ctx, "munmap");
 
-            close(buffers[i].export_fd);
+            close(ctx->buffers[i].export_fd);
         }
 
-        free(buffers);
+        free(ctx->buffers);
 }
 
-static void uninit_device_pp_oneframe(void)
+static void uninit_device_pp_oneframe(demo_context_t *ctx)
 {
         unsigned int i;
 
-        for (i = 0; i < n_buffers; ++i) {
-            if (-1 == munmap(buffers_mp[i].start, buffers_mp[i].length))
-                    errno_exit("munmap");
+        for (i = 0; i < ctx->n_buffers; ++i) {
+            if (-1 == munmap(ctx->buffers_mp[i].start, ctx->buffers_mp[i].length))
+                    errno_exit(ctx, "munmap");
 
-            close(buffers_mp[i].export_fd);
+            close(ctx->buffers_mp[i].export_fd);
         }
 
-        free(buffers_mp);
+        free(ctx->buffers_mp);
 }
 
-static void init_mmap(int pp_onframe)
+static void init_mmap(int pp_onframe, demo_context_t *ctx)
 {
         struct v4l2_requestbuffers req;
         int fd_tmp = -1;
@@ -950,73 +1034,73 @@ static void init_mmap(int pp_onframe)
         CLEAR(req);
 
         if (pp_onframe)
-            fd_tmp = fd_isp_mp ;
+            fd_tmp = ctx->fd_isp_mp ;
         else
-            fd_tmp = fd;
+            fd_tmp = ctx->fd;
 
         req.count = BUFFER_COUNT;
-        req.type = buf_type;
+        req.type = ctx->buf_type;
         req.memory = V4L2_MEMORY_MMAP;
 
         struct buffer *tmp_buffers = NULL;
 
         if (-1 == xioctl(fd_tmp, VIDIOC_REQBUFS, &req)) {
                 if (EINVAL == errno) {
-                        ERR("%s does not support "
-                                 "memory mapping\n", dev_name);
-                        exit(EXIT_FAILURE);
+                        ERR("%s: %s does not support "
+                                 "memory mapping\n" ,get_sensor_name(ctx) ,get_dev_name(ctx));
+                        //exit(EXIT_FAILURE);
                 } else {
-                        errno_exit("VIDIOC_REQBUFS");
+                        errno_exit(ctx, "VIDIOC_REQBUFS");
                 }
         }
 
         if (req.count < 2) {
-                ERR("Insufficient buffer memory on %s\n",
-                         dev_name);
-                exit(EXIT_FAILURE);
+                ERR("%s: Insufficient buffer memory on %s\n",get_sensor_name(ctx),
+                         get_dev_name(ctx));
+                //exit(EXIT_FAILURE);
         }
 
         tmp_buffers = (struct buffer*)calloc(req.count, sizeof(struct buffer));
 
         if (!tmp_buffers) {
-                ERR("Out of memory\n");
-                exit(EXIT_FAILURE);
+                ERR("%s: Out of memory\n",get_sensor_name(ctx));
+                //exit(EXIT_FAILURE);
         }
 
         if (pp_onframe)
-            buffers_mp = tmp_buffers;
+            ctx->buffers_mp = tmp_buffers;
         else
-            buffers = tmp_buffers;
+            ctx->buffers = tmp_buffers;
 
-        for (n_buffers = 0; n_buffers < req.count; ++n_buffers) {
+        for (ctx->n_buffers = 0; ctx->n_buffers < req.count; ++ctx->n_buffers) {
                 struct v4l2_buffer buf;
                 struct v4l2_plane planes[FMT_NUM_PLANES];
                 CLEAR(buf);
                 CLEAR(planes);
 
-                buf.type = buf_type;
+                buf.type = ctx->buf_type;
                 buf.memory = V4L2_MEMORY_MMAP;
-                buf.index = n_buffers;
+                buf.index = ctx->n_buffers;
 
-                if (V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE == buf_type) {
+                if (V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE == ctx->buf_type) {
                     buf.m.planes = planes;
                     buf.length = FMT_NUM_PLANES;
                 }
 
                 if (-1 == xioctl(fd_tmp, VIDIOC_QUERYBUF, &buf))
-                        errno_exit("VIDIOC_QUERYBUF");
+                        errno_exit(ctx, "VIDIOC_QUERYBUF");
 
-                if (V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE == buf_type) {
-                    tmp_buffers[n_buffers].length = buf.m.planes[0].length;
-                    tmp_buffers[n_buffers].start =
+                if (V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE == ctx->buf_type) {
+                    tmp_buffers[ctx->n_buffers].length = buf.m.planes[0].length;
+                    tmp_buffers[ctx->n_buffers].start =
                         mmap(NULL /* start anywhere */,
                               buf.m.planes[0].length,
                               PROT_READ | PROT_WRITE /* required */,
                               MAP_SHARED /* recommended */,
                               fd_tmp, buf.m.planes[0].m.mem_offset);
                 } else {
-                    tmp_buffers[n_buffers].length = buf.length;
-                    tmp_buffers[n_buffers].start =
+                    tmp_buffers[ctx->n_buffers].length = buf.length;
+                    tmp_buffers[ctx->n_buffers].start =
                         mmap(NULL /* start anywhere */,
                               buf.length,
                               PROT_READ | PROT_WRITE /* required */,
@@ -1024,191 +1108,191 @@ static void init_mmap(int pp_onframe)
                               fd_tmp, buf.m.offset);
                 }
 
-                if (MAP_FAILED == tmp_buffers[n_buffers].start)
-                        errno_exit("mmap");
+                if (MAP_FAILED == tmp_buffers[ctx->n_buffers].start)
+                        errno_exit(ctx, "mmap");
 
                 // export buf dma fd
                 struct v4l2_exportbuffer expbuf;
                 xcam_mem_clear (expbuf);
-                expbuf.type = buf_type;
-                expbuf.index = n_buffers;
+                expbuf.type = ctx->buf_type;
+                expbuf.index = ctx->n_buffers;
                 expbuf.flags = O_CLOEXEC;
                 if (xioctl(fd_tmp, VIDIOC_EXPBUF, &expbuf) < 0) {
-                    errno_exit("get dma buf failed\n");
+                    errno_exit(ctx, "get dma buf failed\n");
                 } else {
-                    printf("get dma buf(%d)-fd: %d\n", n_buffers, expbuf.fd);
+                    DBG("%s: get dma buf(%d)-fd: %d\n",get_sensor_name(ctx), ctx->n_buffers, expbuf.fd);
                 }
-                tmp_buffers[n_buffers].export_fd = expbuf.fd;
+                tmp_buffers[ctx->n_buffers].export_fd = expbuf.fd;
         }
 }
 
-static void init_input_dmabuf_oneframe(void) {
+static void init_input_dmabuf_oneframe(demo_context_t *ctx) {
         struct v4l2_requestbuffers req;
 
         CLEAR(req);
 
-        printf("-------- request pp input buffer -------------\n");
+        printf("%s:-------- request pp input buffer -------------\n",get_sensor_name(ctx));
         req.count = BUFFER_COUNT;
         req.type = V4L2_BUF_TYPE_VIDEO_OUTPUT_MPLANE;
         req.memory = V4L2_MEMORY_DMABUF;
 
-        if (-1 == xioctl(fd_pp_input, VIDIOC_REQBUFS, &req)) {
+        if (-1 == xioctl(ctx->fd_pp_input, VIDIOC_REQBUFS, &req)) {
                 if (EINVAL == errno) {
                         ERR("does not support "
                                  "DMABUF\n");
                         exit(EXIT_FAILURE);
                 } else {
-                        errno_exit("VIDIOC_REQBUFS");
+                        errno_exit(ctx, "VIDIOC_REQBUFS");
                 }
         }
 
         if (req.count < 2) {
                 ERR("Insufficient buffer memory on %s\n",
-                         dev_name);
+                         get_dev_name(ctx));
                 exit(EXIT_FAILURE);
         }
-    printf("-------- request isp mp buffer -------------\n");
-    init_mmap(true);
+    printf("%s:-------- request isp mp buffer -------------\n",get_sensor_name(ctx));
+    init_mmap(true, ctx);
 }
 
-static void init_device(void)
+static void init_device(demo_context_t *ctx)
 {
         struct v4l2_capability cap;
         struct v4l2_format fmt;
 
-        if (-1 == xioctl(fd, VIDIOC_QUERYCAP, &cap)) {
+        if (-1 == xioctl(ctx->fd, VIDIOC_QUERYCAP, &cap)) {
                 if (EINVAL == errno) {
-                        ERR("%s is no V4L2 device\n",
-                                 dev_name);
-                        exit(EXIT_FAILURE);
+                        ERR("%s: %s is no V4L2 device\n",get_sensor_name(ctx),
+                                 get_dev_name(ctx));
+                        //exit(EXIT_FAILURE);
                 } else {
-                        errno_exit("VIDIOC_QUERYCAP");
+                        errno_exit(ctx,"VIDIOC_QUERYCAP");
                 }
         }
 
         if (!(cap.capabilities & V4L2_CAP_VIDEO_CAPTURE) &&
                 !(cap.capabilities & V4L2_CAP_VIDEO_CAPTURE_MPLANE)) {
-            ERR("%s is not a video capture device, capabilities: %x\n",
-                         dev_name, cap.capabilities);
-                exit(EXIT_FAILURE);
+            ERR("%s: %s is not a video capture device, capabilities: %x\n",
+                         get_sensor_name(ctx), get_dev_name(ctx), cap.capabilities);
+                //exit(EXIT_FAILURE);
         }
 
         if (!(cap.capabilities & V4L2_CAP_STREAMING)) {
-                ERR("%s does not support streaming i/o\n",
-                    dev_name);
-                exit(EXIT_FAILURE);
+                ERR("%s: %s does not support streaming i/o\n",get_sensor_name(ctx),
+                    get_dev_name(ctx));
+                //exit(EXIT_FAILURE);
         }
 
         if (cap.capabilities & V4L2_CAP_VIDEO_CAPTURE) {
-            buf_type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
+            ctx->buf_type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
             CLEAR(fmt);
-            fmt.type = buf_type;
-            fmt.fmt.pix.width = width;
-            fmt.fmt.pix.height = height;
-            fmt.fmt.pix.pixelformat = format;
+            fmt.type = ctx->buf_type;
+            fmt.fmt.pix.width = ctx->width;
+            fmt.fmt.pix.height = ctx->height;
+            fmt.fmt.pix.pixelformat = ctx->format;
             fmt.fmt.pix.field = V4L2_FIELD_INTERLACED;
-            if (limit_range)
+            if (ctx->limit_range)
                 fmt.fmt.pix.quantization = V4L2_QUANTIZATION_LIM_RANGE;
             else
                 fmt.fmt.pix.quantization = V4L2_QUANTIZATION_FULL_RANGE;
         } else if (cap.capabilities & V4L2_CAP_VIDEO_CAPTURE_MPLANE) {
-            buf_type = V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE;
+            ctx->buf_type = V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE;
             CLEAR(fmt);
-            fmt.type = buf_type;
-            fmt.fmt.pix_mp.width = width;
-            fmt.fmt.pix_mp.height = height;
-            fmt.fmt.pix_mp.pixelformat = format;
+            fmt.type = ctx->buf_type;
+            fmt.fmt.pix_mp.width = ctx->width;
+            fmt.fmt.pix_mp.height = ctx->height;
+            fmt.fmt.pix_mp.pixelformat = ctx->format;
             fmt.fmt.pix_mp.field = V4L2_FIELD_INTERLACED;
-            if (limit_range)
+            if (ctx->limit_range)
                 fmt.fmt.pix_mp.quantization = V4L2_QUANTIZATION_LIM_RANGE;
             else
                 fmt.fmt.pix_mp.quantization = V4L2_QUANTIZATION_FULL_RANGE;
         }
 
-        if (-1 == xioctl(fd, VIDIOC_S_FMT, &fmt))
-                errno_exit("VIDIOC_S_FMT");
+        if (-1 == xioctl(ctx->fd, VIDIOC_S_FMT, &fmt))
+                errno_exit(ctx, "VIDIOC_S_FMT");
 
-	init_mmap(false);
+	init_mmap(false, ctx);
 }
 
-static void init_device_pp_oneframe(void)
+static void init_device_pp_oneframe(demo_context_t *ctx)
 {
     // TODO, set format and link, now do with setup_link.sh    
-    init_input_dmabuf_oneframe();
+    init_input_dmabuf_oneframe(ctx);
 }
 
-static void close_device(void)
+static void close_device(demo_context_t *ctx)
 {
-        if (-1 == close(fd))
-                errno_exit("close");
+        if (-1 == close(ctx->fd))
+           errno_exit(ctx, "close");
 
-        fd = -1;
+        ctx->fd = -1;
 }
 
-static void open_device(void)
+static void open_device(demo_context_t *ctx)
 {
-        printf("-------- open output dev_name -------------\n");
-        fd = open(dev_name, O_RDWR /* required */ /*| O_NONBLOCK*/, 0);
+        printf("-------- open output dev_name:%s -------------\n",get_dev_name(ctx));
+        ctx->fd = open(get_dev_name(ctx), O_RDWR /* required */ /*| O_NONBLOCK*/, 0);
 
-        if (-1 == fd) {
+        if (-1 == ctx->fd) {
                 ERR("Cannot open '%s': %d, %s\n",
-                         dev_name, errno, strerror(errno));
+                         get_dev_name(ctx), errno, strerror(errno));
                 exit(EXIT_FAILURE);
         }
 }
 
-static void close_device_pp_oneframe(void)
+static void close_device_pp_oneframe(demo_context_t *ctx)
 {
-        if (-1 == close(fd_pp_input))
-                errno_exit("close");
+        if (-1 == close(ctx->fd_pp_input))
+                errno_exit(ctx, "close");
 
-        fd_pp_input = -1;
+        ctx->fd_pp_input = -1;
 
-        if (-1 == close(fd_isp_mp))
-                errno_exit("close");
+        if (-1 == close(ctx->fd_isp_mp))
+                errno_exit(ctx, "close");
 
-        fd_isp_mp = -1;
+        ctx->fd_isp_mp = -1;
 }
 
-static void open_device_pp_oneframe(void)
+static void open_device_pp_oneframe(demo_context_t *ctx)
 {
         printf("-------- open pp input(video13) -------------\n");
-        fd_pp_input = open("/dev/video13", O_RDWR /* required */ /*| O_NONBLOCK*/, 0);
+        ctx->fd_pp_input = open("/dev/video13", O_RDWR /* required */ /*| O_NONBLOCK*/, 0);
 
-        if (-1 == fd_pp_input) {
+        if (-1 == ctx->fd_pp_input) {
                 ERR("Cannot open '%s': %d, %s\n",
-                         dev_name, errno, strerror(errno));
+                         get_dev_name(ctx), errno, strerror(errno));
                 exit(EXIT_FAILURE);
         }
 
         printf("-------- open isp mp(video0) -------------\n");
-        fd_isp_mp = open("/dev/video0", O_RDWR /* required */ /*| O_NONBLOCK*/, 0);
+        ctx->fd_isp_mp = open("/dev/video0", O_RDWR /* required */ /*| O_NONBLOCK*/, 0);
 
-        if (-1 == fd_isp_mp ) {
+        if (-1 == ctx->fd_isp_mp ) {
                 ERR("Cannot open '%s': %d, %s\n",
-                         dev_name, errno, strerror(errno));
+                         get_dev_name(ctx), errno, strerror(errno));
                 exit(EXIT_FAILURE);
         }
 }
 
-static void uninit_device_pp_onframe(void)
+static void uninit_device_pp_onframe(demo_context_t *ctx)
 {
         unsigned int i;
 
-        for (i = 0; i < n_buffers; ++i) {
-                if (-1 == munmap(buffers_mp[i].start, buffers_mp[i].length))
-                        errno_exit("munmap");
-                close(buffers_mp[i].export_fd);
+        for (i = 0; i < ctx->n_buffers; ++i) {
+                if (-1 == munmap(ctx->buffers_mp[i].start, ctx->buffers_mp[i].length))
+                        errno_exit(ctx,"munmap");
+                close(ctx->buffers_mp[i].export_fd);
         }
 
-        free(buffers_mp);
+        free(ctx->buffers_mp);
 }
 
-void parse_args(int argc, char **argv)
+static void parse_args(int argc, char **argv, demo_context_t *ctx)
 {
    int c;
    int digit_optind = 0;
-
+   optind = 0;
    while (1) {
        int this_option_optind = optind ? optind : 1;
        int option_index = 0;
@@ -1217,6 +1301,7 @@ void parse_args(int argc, char **argv)
            {"height",   required_argument, 0, 'h' },
            {"format",   required_argument, 0, 'f' },
            {"device",   required_argument, 0, 'd' },
+           {"device2",   required_argument, 0, 'i' },
            {"stream-to",   required_argument, 0, 'o' },
            {"stream-count",   required_argument, 0, 'n' },
            {"stream-skip",   required_argument, 0, 'k' },
@@ -1226,65 +1311,69 @@ void parse_args(int argc, char **argv)
            {"vop",   no_argument,       0, 'v' },
            {"rkaiq",   no_argument,       0, 'r' },
            {"pponeframe",   no_argument,       0, 'm' },
-           {"hdr",   no_argument,       0, 'a' },
+           {"hdr",   required_argument,       0, 'a' },
            {"sync-to-raw", no_argument, 0, 'e' },
            {"limit", no_argument, 0, 'l' },
+		   //{"sensor",   required_argument,       0, 'b' },
            {0,          0,                 0,  0  }
        };
 
        //c = getopt_long(argc, argv, "w:h:f:i:d:o:c:ps",
-       c = getopt_long(argc, argv, "w:h:f:i:d:o:c:n:k:m:pse",
+       c = getopt_long(argc, argv, "w:h:f:i:d:o:c:n:k:a:mpsevrl",
            long_options, &option_index);
        if (c == -1)
            break;
 
        switch (c) {
        case 'c':
-           frame_count = atoi(optarg);
+           ctx->frame_count = atoi(optarg);
            break;
        case 'w':
-           width = atoi(optarg);
+           ctx->width = atoi(optarg);
            break;
        case 'h':
-           height = atoi(optarg);
+           ctx->height = atoi(optarg);
            break;
        case 'f':
-           format = v4l2_fourcc(optarg[0], optarg[1], optarg[2], optarg[3]);
+           ctx->format = v4l2_fourcc(optarg[0], optarg[1], optarg[2], optarg[3]);
            break;
        case 'd':
-           strcpy(dev_name, optarg);
+           strcpy(ctx->dev_name, optarg);
            break;
+       case 'i':
+            strcpy(ctx->dev_name2, optarg);
+            break;
        case 'o':
-           strcpy(out_file, optarg);
-           writeFile = 1;
+           strcpy(ctx->out_file, optarg);
+           ctx->writeFile = 1;
 	   break;
        case 'n':
-           outputCnt = atoi(optarg);
+           ctx->outputCnt = atoi(optarg);
 	   break;
        case 'k':
-           skipCnt = atoi(optarg);
+           ctx->skipCnt = atoi(optarg);
 	   break;
        case 's':
            silent = 1;
            break;
        case 'v':
-           vop = 1;
+           ctx->vop = 1;
            break;
        case 'r':
-           rkaiq = 1;
+           ctx->rkaiq = 1;
            break;
        case 'm':
-           pponeframe = 1;
+           ctx->pponeframe = 1;
            break;
        case 'a':
-           hdrmode = 1;
+           ctx->hdrmode = atoi(optarg);
            break;
        case 'e':
-           writeFileSync = 1;
+           ctx->writeFileSync = 1;
            break;
        case 'l':
-           limit_range = 1;
-           break;
+           ctx->limit_range = 1;
+		   break;
        case '?':
        case 'p':
            ERR("Usage: %s to capture rkisp1 frames\n"
@@ -1292,7 +1381,8 @@ void parse_args(int argc, char **argv)
                   "         --height, default 480,             optional, height of image\n"
                   "         --format, default NV12,            optional, fourcc of format\n"
                   "         --count,  default 1000,            optional, how many frames to capture\n"
-                  "         --device,                          required, path of video device\n"
+                  "         --device,                          required, path of video device1\n"
+                  "         --device2,                         required, path of video device2\n"
                   "         --stream-to,                       optional, output file path, if <file> is '-', then the data is written to stdout\n"
                   "         --stream-count, default 3	       optional, how many frames to write files\n"
                   "         --stream-skip, default 30	       optional, how many frames to skip befor writing file\n"
@@ -1300,9 +1390,10 @@ void parse_args(int argc, char **argv)
                   "         --rkaiq,                           optional, auto image quality\n"
                   "         --silent,                          optional, subpress debug log\n"
                   "         --pponeframe,                      optional, pp oneframe readback mode\n"
-                  "         --hdr,                             optional, hdr mode\n"
+                  "         --hdr <val>,                       optional, hdr mode, val 2 means hdrx2, 3 means hdrx3 \n"
                   "         --sync-to-raw,      		       optional, write yuv files in sync with raw\n"
                   "         --limit,		                   optional, yuv limit range\n",
+                  "         --sensor,  default os04a10,        optional, sensor names\n",
                   argv[0]);
            exit(-1);
 
@@ -1311,55 +1402,165 @@ void parse_args(int argc, char **argv)
        }
    }
 
-   if (strlen(dev_name) == 0) {
-        ERR("arguments --output and --device are required\n");
-        exit(-1);
+   if (strlen(ctx->dev_name) == 0) {
+        ERR("%s: arguments --output and --device are required\n",get_sensor_name(ctx));
+        //exit(-1);
    }
 
 }
 
-static void deinit() 
+static void deinit(demo_context_t *ctx) 
 {
-    // stop_capturing();
-    if (pponeframe)
-        stop_capturing_pp_oneframe();
-	if (aiq_ctx) {
-        printf("-------- stop aiq -------------\n");
-		rk_aiq_uapi_sysctl_stop(aiq_ctx);
+    if (ctx->pponeframe)
+        stop_capturing_pp_oneframe(ctx);
+	if (ctx->aiq_ctx) {
+        printf("%s:-------- stop aiq -------------\n",get_sensor_name(ctx));
+		rk_aiq_uapi_sysctl_stop(ctx->aiq_ctx, false);
 	}
 
-    stop_capturing();
-    if (aiq_ctx) {
-        printf("-------- deinit aiq -------------\n");
-		rk_aiq_uapi_sysctl_deinit(aiq_ctx);
-        printf("-------- deinit aiq end -------------\n");
+    stop_capturing(ctx);
+    if (ctx->aiq_ctx) {
+        printf("%s:-------- deinit aiq -------------\n",get_sensor_name(ctx));
+		rk_aiq_uapi_sysctl_deinit(ctx->aiq_ctx);
+        printf("%s:-------- deinit aiq end -------------\n",get_sensor_name(ctx));
     }
-    uninit_device();
-    if (pponeframe)
-        uninit_device_pp_oneframe();
-    close_device();
-    if (pponeframe)
-        close_device_pp_oneframe();
+    uninit_device(ctx);
+    if (ctx->pponeframe)
+        uninit_device_pp_oneframe(ctx);
+    close_device(ctx);
+    if (ctx->pponeframe)
+        close_device_pp_oneframe(ctx);
 
-    if (fp)
-        fclose(fp);
+    if (ctx->fp)
+        fclose(ctx->fp);
 }
 static void signal_handle(int signo)
 {
     printf("force exit signo %d !!!\n",signo);
-    deinit();
+
+    if (g_main_ctx) {
+        g_main_ctx->frame_count = 0;
+        deinit(g_main_ctx);
+        g_main_ctx = NULL;
+    }
+    if (g_second_ctx){
+        g_second_ctx->frame_count = 0;
+        deinit(g_second_ctx);
+        g_second_ctx = NULL;
+    }
     exit(0);
 }
 
-void* test_thread(void* args) {
+static void* test_thread(void* args) {
     pthread_detach (pthread_self());
     disable_terminal_return();
     printf("begin test imgproc\n");
     while(1) {
-        test_imgproc(aiq_ctx);
+        test_imgproc((demo_context_t*) args);
     }
     printf("end test imgproc\n");
     restore_terminal_settings();
+    return 0;
+}
+
+static void rkisp_routine(demo_context_t *ctx)
+{
+    char sns_entity_name[64];
+    rk_aiq_working_mode_t work_mode = RK_AIQ_WORKING_MODE_NORMAL;
+
+    if (ctx->hdrmode == 2)
+        work_mode = RK_AIQ_WORKING_MODE_ISP_HDR2;
+    else if (ctx->hdrmode == 3)
+        work_mode = RK_AIQ_WORKING_MODE_ISP_HDR3;
+
+    printf("work_mode %d\n", work_mode);
+
+    strcpy(sns_entity_name, rk_aiq_uapi_sysctl_getBindedSnsEntNmByVd(get_dev_name(ctx)));
+    printf("sns_entity_name:%s\n", sns_entity_name);
+    sscanf(&sns_entity_name[6], "%s", ctx->sns_name);
+    printf("sns_name:%s\n", ctx->sns_name);
+    rk_aiq_static_info_t s_info;
+    rk_aiq_uapi_sysctl_getStaticMetas(sns_entity_name, &s_info);
+    // check if hdr mode is supported
+    if (work_mode != 0) {
+        bool b_work_mode_supported = false;
+        rk_aiq_sensor_info_t* sns_info = &s_info.sensor_info;
+        for (int i = 0; i < SUPPORT_FMT_MAX; i++)
+            // TODO, should decide the resolution firstly,
+            // then check if the mode is supported on this
+            // resolution
+            if ((sns_info->support_fmt[i].hdr_mode == 5/*HDR_X2*/ &&
+                work_mode == RK_AIQ_WORKING_MODE_ISP_HDR2) ||
+                (sns_info->support_fmt[i].hdr_mode == 6/*HDR_X3*/ &&
+                 work_mode == RK_AIQ_WORKING_MODE_ISP_HDR3)) {
+                b_work_mode_supported = true;
+                break;
+            }
+
+        if (!b_work_mode_supported) {
+            printf("\nWARNING !!!"
+                   "work mode %d is not supported, changed to normal !!!\n\n",
+                   work_mode);
+            work_mode = RK_AIQ_WORKING_MODE_NORMAL;
+        }
+    }
+
+    printf("%s:-------- open output dev -------------\n",get_sensor_name(ctx));
+    open_device(ctx);
+    if (ctx->pponeframe)
+        open_device_pp_oneframe(ctx);
+
+    if (ctx->writeFile) {
+    	ctx->fp = fopen(ctx->out_file, "w+");
+    	if (ctx->fp == NULL) {
+    	    ERR("%s: fopen output file %s failed!\n", get_sensor_name(ctx), ctx->out_file);
+    	}
+    }
+
+    if (ctx->rkaiq) {
+	    ctx->aiq_ctx = rk_aiq_uapi_sysctl_init(sns_entity_name, "/oem/etc/iqfiles", NULL, NULL);
+
+    	if (ctx->aiq_ctx) {
+    	    printf("%s:-------- init mipi tx/rx -------------\n",get_sensor_name(ctx));
+    	    if (ctx->writeFileSync)
+                rk_aiq_uapi_debug_captureRawYuvSync(ctx->aiq_ctx, CAPTURE_RAW_AND_YUV_SYNC);
+
+            // rk_aiq_uapi_setFecEn(ctx->aiq_ctx, true);
+    	    XCamReturn ret = rk_aiq_uapi_sysctl_prepare(ctx->aiq_ctx, ctx->width, ctx->height, work_mode);
+
+    	    if (ret != XCAM_RETURN_NO_ERROR)
+        		ERR("%s:rk_aiq_uapi_sysctl_prepare failed: %d\n",get_sensor_name(ctx), ret);
+    	    else {
+        		ret = rk_aiq_uapi_sysctl_start(ctx->aiq_ctx );
+
+        		init_device(ctx);
+        		if (ctx->pponeframe)
+        			init_device_pp_oneframe(ctx);
+        		start_capturing(ctx);
+        		if (ctx->pponeframe)
+        		    start_capturing_pp_oneframe(ctx);
+        		printf("%s:-------- stream on mipi tx/rx -------------\n",get_sensor_name(ctx));
+    	    }
+
+    	}
+    }
+    else {
+    	init_device(ctx);
+    	if (ctx->pponeframe)
+    	    init_device_pp_oneframe(ctx);
+    	start_capturing(ctx);
+    	if (ctx->pponeframe)
+    	    start_capturing_pp_oneframe(ctx);
+    }
+}
+
+static void* secondary_thread(void* args) {
+    pthread_detach (pthread_self());
+    demo_context_t* ctx = (demo_context_t*) args;
+    rkisp_routine(ctx);
+    mainloop(ctx);
+    deinit(ctx);
+    return 0;
 }
 
 int main(int argc, char **argv)
@@ -1368,132 +1569,67 @@ int main(int argc, char **argv)
     signal(SIGQUIT, signal_handle);
     signal(SIGTERM, signal_handle);
 
-    parse_args(argc, argv);
+    demo_context_t main_ctx = {
+        dev_name: {'\0'},
+        dev_name2: {'\0'},
+        .dev_using = 1,
+        .format = V4L2_PIX_FMT_NV12,
+        .fd = -1,
+        .buf_type = V4L2_BUF_TYPE_VIDEO_CAPTURE,
+        .frame_count = -1,
+        .fp = NULL,
+        .aiq_ctx = NULL,
+        .vop = 0,
+        .rkaiq = 0,
+        .writeFile = 0,
+        .writeFileSync = 0,
+        .pponeframe = 0,
+        .hdrmode = 0,
+        .limit_range = 0,
+        .fd_pp_input = -1,
+        .fd_isp_mp = -1,
+        .outputCnt = 3,
+        .skipCnt = 30,
+        .capture_yuv_num = 0,
+        .is_capture_yuv = false,
+    };
+    demo_context_t second_ctx;
 
-    printf("-------- open output dev -------------\n");
-    open_device();
-    if (pponeframe)
-        open_device_pp_oneframe();
+    parse_args(argc, argv, &main_ctx);
 
-    if (writeFile) {
-	fp = fopen(out_file, "w+");
-	if (fp == NULL) {
-	    ERR("fopen output file %s failed!\n", out_file);
-	    exit(-1);
-	}
-    }
-
-    char sns_entity_name[64];
-    rk_aiq_working_mode_t work_mode = RK_AIQ_WORKING_MODE_NORMAL;
-#if 0
-    char cmd[128] = {0};
-    for (int i = 0; i < 3; ++i) {
-        memset(cmd, 0, sizeof(cmd));
-            snprintf(cmd, sizeof(cmd),
-             "media-ctl -d /dev/media%d -p | grep sensor -i -B 1 | cut -d ' ' -f 4,5 | grep -e \"^.*[0-9]\" > /tmp/sensor_entity",
-             i);
-        system(cmd);
-        FILE* tmp = fopen("/tmp/sensor_entity", "r");
-        if (tmp) {
-            size_t n = 64;
-            char *lineptr = sns_entity_name;
-            bool find_sns = false;
-            if (getline(&lineptr, &n, tmp) > 0) {
-                printf("sensor entity name :%s", lineptr);
-                int len = strlen(lineptr);
-                if (lineptr[len - 1] == '\r' || lineptr[len - 1] == '\n')
-                    lineptr[len - 1] = '\0';
-                find_sns = true;
-            }
-
-            fclose(tmp);
-            remove("/tmp/sensor_entity");
-            if (find_sns)
-                break;
-        } else {
-            if (i == 2)
-            errno_exit("can't find snesor entity!");
-        }
-    }
-#endif
-    strcpy(sns_entity_name, rk_aiq_uapi_sysctl_getBindedSnsEntNmByVd(dev_name));
-    printf("sns_entity_name %s\n", sns_entity_name);
-
-    if (hdrmode) {
-        if (strstr(sns_entity_name, "ov4689")) {
-            work_mode = RK_AIQ_WORKING_MODE_ISP_HDR3;
-        } else if (strstr(sns_entity_name, "os04a10")) {
-            work_mode = RK_AIQ_WORKING_MODE_ISP_HDR2;
-        } else if (strstr(sns_entity_name, "gc4c33")) {
-            work_mode = RK_AIQ_WORKING_MODE_ISP_HDR2;
-        } else if (strstr(sns_entity_name, "imx347")) {
-            work_mode = RK_AIQ_WORKING_MODE_ISP_HDR2;
-        } else if (strstr(sns_entity_name, "imx307")) {
-            work_mode = RK_AIQ_WORKING_MODE_ISP_HDR2;
-        } else if (strstr(sns_entity_name, "imx415")) {
-            work_mode = RK_AIQ_WORKING_MODE_ISP_HDR2;
-        }
-    }
-
-    if (rkaiq) {
-	aiq_ctx = rk_aiq_uapi_sysctl_init(sns_entity_name, "/oem/etc/iqfiles", NULL, NULL);
-
-	if (aiq_ctx) {
-	    printf("-------- init mipi tx/rx -------------\n");
-	    if (writeFileSync)
-		rk_aiq_uapi_debug_captureRawCtl(aiq_ctx, true);
-
-	    XCamReturn ret = rk_aiq_uapi_sysctl_prepare(aiq_ctx, width, height, work_mode);
-
-	    if (ret != XCAM_RETURN_NO_ERROR)
-		ERR("rk_aiq_uapi_sysctl_prepare failed: %d\n", ret);
-	    else {
-		/* printf("-------- stream on mipi tx/rx -------------\n"); */
-		ret = rk_aiq_uapi_sysctl_start(aiq_ctx );
-
-		init_device();
-		if (pponeframe)
-			init_device_pp_oneframe();
-		start_capturing();
-		if (pponeframe)
-		    start_capturing_pp_oneframe();
-		printf("-------- stream on mipi tx/rx -------------\n");
-		/* ret = rk_aiq_uapi_sysctl_start(aiq_ctx ); */
-	    }
-
-	if (vop) {
-	    if (initDrmDsp() < 0) {
-		printf("DRM display init failed\n");
-		exit(0);
+	if (main_ctx.vop) {
+	    if (strlen(main_ctx.dev_name) && strlen(main_ctx.dev_name2)) {
+    	    if (display_init(720, 1280) < 0) {
+    	        printf("display_init failed\n");
+    	    }
+	    } else {
+    	    if (initDrmDsp() < 0) {
+        		printf("initDrmDsp failed\n");
+    	    }
 	    }
 	}
 
-	usleep(500 * 1000);
-	}
-    } else {
-	if (vop) {
-	    if (initDrmDsp() < 0) {
-		printf("DRM display init failed\n");
-		exit(0);
-	    }
-	}
-
-	usleep(500 * 1000);
-
-	init_device();
-	if (pponeframe)
-	    init_device_pp_oneframe();
-	start_capturing();
-	if (pponeframe)
-	    start_capturing_pp_oneframe();
+    if(strlen(main_ctx.dev_name2)) {
+        pthread_t sec_tid;
+        second_ctx = main_ctx;
+        second_ctx.dev_using = 2;
+        g_second_ctx = &second_ctx;
+        pthread_create(&sec_tid, NULL, secondary_thread, &second_ctx);
     }
-#ifdef ENABLE_UAPI_TEST    
+
+    rkisp_routine(&main_ctx);
+    g_main_ctx = &main_ctx;
+
+#ifdef ENABLE_UAPI_TEST
     pthread_t tid;
-    pthread_create(&tid, NULL, test_thread, NULL);
+    pthread_create(&tid, NULL, test_thread, &main_ctx);
 #endif
-    mainloop();
 
-    deinit();
+    mainloop(&main_ctx);
+    deinit(&main_ctx);
+    if (strlen(main_ctx.dev_name) && strlen(main_ctx.dev_name2)) {
+        display_exit();
+    }
 
     return 0;
 }

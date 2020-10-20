@@ -89,7 +89,8 @@ AsharpResult_t AsharpInit(AsharpContext_t **ppAsharpCtx, CamCalibDbContext_t *pC
 
 #if ASHARP_USE_XML_FILE
 	pAsharpCtx->stExpInfo.snr_mode = 1;
-	ASharpConfigSettingParam(pAsharpCtx, pAsharpCtx->stExpInfo.snr_mode);
+	pAsharpCtx->eParamMode = ASHARP_PARAM_MODE_NORMAL;
+	ASharpConfigSettingParam(pAsharpCtx, pAsharpCtx->eParamMode, pAsharpCtx->stExpInfo.snr_mode);
 #endif
 
     LOGD_ASHARP("%s(%d): sharp %f %f %f %f %f %f", __FUNCTION__, __LINE__,
@@ -176,7 +177,7 @@ AsharpResult_t AsharpIQParaUpdate(AsharpContext_t *pAsharpCtx)
 	
 	if(pAsharpCtx->isIQParaUpdate){	
 		LOGD_ASHARP(" update iq para\n");
-		ASharpConfigSettingParam(pAsharpCtx, pAsharpCtx->stExpInfo.snr_mode);
+		ASharpConfigSettingParam(pAsharpCtx, pAsharpCtx->eParamMode, pAsharpCtx->stExpInfo.snr_mode);
 		pAsharpCtx->isIQParaUpdate = false;
 	}
 	
@@ -201,7 +202,8 @@ AsharpResult_t AsharpPreProcess(AsharpContext_t *pAsharpCtx)
 AsharpResult_t AsharpProcess(AsharpContext_t *pAsharpCtx, AsharpExpInfo_t *pExpInfo)
 {
     LOGI_ASHARP("%s(%d): enter!\n", __FUNCTION__, __LINE__);
-
+	AsharpParamMode_t mode = ASHARP_PARAM_MODE_INVALID;
+	
     if(pAsharpCtx == NULL) {
         LOGE_ASHARP("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
         return ASHARP_RET_INVALID_PARM;
@@ -215,10 +217,14 @@ AsharpResult_t AsharpProcess(AsharpContext_t *pAsharpCtx, AsharpExpInfo_t *pExpI
 	if(pAsharpCtx->eState != ASHARP_STATE_RUNNING){
         return ASHARP_RET_SUCCESS;
 	}
+
+	AsharpParamModeProcess(pAsharpCtx, pExpInfo, &mode);
 		
 	#if ASHARP_USE_XML_FILE
-	if(pExpInfo->snr_mode != pAsharpCtx->stExpInfo.snr_mode){
-		ASharpConfigSettingParam(pAsharpCtx, pExpInfo->snr_mode);
+	if(pExpInfo->snr_mode != pAsharpCtx->stExpInfo.snr_mode || pAsharpCtx->eParamMode != mode){
+		LOGD_ASHARP(" sharp mode:%d snr_mode:%d\n", mode, pExpInfo->snr_mode);
+		pAsharpCtx->eParamMode = mode;
+		ASharpConfigSettingParam(pAsharpCtx, pAsharpCtx->eParamMode, pExpInfo->snr_mode);	
 	}
 	#endif
     memcpy(&pAsharpCtx->stExpInfo, pExpInfo, sizeof(AsharpExpInfo_t));
@@ -267,7 +273,7 @@ AsharpResult_t AsharpGetProcResult(AsharpContext_t *pAsharpCtx, AsharpProcResult
     }
 
     rk_Sharp_fix_transfer(&pAsharpResult->stSharpParamSelect, &pAsharpResult->stSharpFix, pAsharpCtx->fStrength);
-    edgefilter_fix_transfer(&pAsharpResult->stEdgefilterParamSelect, &pAsharpResult->stEdgefltFix);
+    edgefilter_fix_transfer(&pAsharpResult->stEdgefilterParamSelect, &pAsharpResult->stEdgefltFix,  pAsharpCtx->fStrength);
     pAsharpResult->stSharpFix.stSharpFixV1.sharp_en = pAsharpResult->sharpEn ;
     pAsharpResult->stEdgefltFix.edgeflt_en = pAsharpResult->edgeFltEn;
 #if ASHARP_FIX_VALUE_PRINTF
@@ -470,15 +476,29 @@ AsharpResult_t Asharp_fix_Printf(RKAsharp_Sharp_HW_Fix_t  * pSharpCfg, RKAsharp_
     return res;
 }
 
-AsharpResult_t ASharpConfigSettingParam(AsharpContext_t *pAsharpCtx, int snr_mode)
+AsharpResult_t ASharpConfigSettingParam(AsharpContext_t *pAsharpCtx, AsharpParamMode_t param_mode, int snr_mode)
 {
+	char mode_name[CALIBDB_MAX_MODE_NAME_LENGTH];
 	char snr_name[CALIBDB_NR_SHARP_NAME_LENGTH];
+	memset(mode_name, 0x00, sizeof(mode_name));
 	memset(snr_name, 0x00, sizeof(snr_name));
 
 	if(pAsharpCtx == NULL) {
         	LOGE_ASHARP("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
         	return ASHARP_RET_NULL_POINTER;
     	}
+
+	
+	if(param_mode == ASHARP_PARAM_MODE_NORMAL){
+		sprintf(mode_name, "%s", "normal");
+	}else if(param_mode == ASHARP_PARAM_MODE_HDR){
+		sprintf(mode_name, "%s", "hdr");
+	}else if(param_mode == ASHARP_PARAM_MODE_GRAY){
+		sprintf(mode_name, "%s", "gray");
+	}else{
+		LOGE_ASHARP("%s(%d): not support mode cell name!\n", __FUNCTION__, __LINE__);
+		sprintf(mode_name, "%s", "normal");
+	}
 
 	if(snr_mode == 1){
 		sprintf(snr_name, "%s", "HSNR");
@@ -490,11 +510,35 @@ AsharpResult_t ASharpConfigSettingParam(AsharpContext_t *pAsharpCtx, int snr_mod
 	}
 
 	pAsharpCtx->stAuto.sharpEn = pAsharpCtx->stSharpCalib.enable;
-	sharp_config_setting_param_v1(&pAsharpCtx->stAuto.stSharpParam.rk_sharpen_params_V1, &pAsharpCtx->stSharpCalib, snr_name);
+	sharp_config_setting_param_v1(&pAsharpCtx->stAuto.stSharpParam.rk_sharpen_params_V1, &pAsharpCtx->stSharpCalib, mode_name,  snr_name);
 	pAsharpCtx->stAuto.edgeFltEn = pAsharpCtx->stEdgeFltCalib.enable;
-	edgefilter_config_setting_param(&pAsharpCtx->stAuto.stEdgefilterParams, &pAsharpCtx->stEdgeFltCalib, snr_name);
+	edgefilter_config_setting_param(&pAsharpCtx->stAuto.stEdgefilterParams, &pAsharpCtx->stEdgeFltCalib, mode_name, snr_name);
 
 	return ASHARP_RET_SUCCESS;
 }
+
+AsharpResult_t AsharpParamModeProcess(AsharpContext_t *pAsharpCtx, AsharpExpInfo_t *pExpInfo, AsharpParamMode_t *mode)
+{
+	AsharpResult_t res  = ASHARP_RET_SUCCESS;
+	*mode = pAsharpCtx->eParamMode;
+		
+	if(pAsharpCtx == NULL) {
+    	LOGE_ASHARP("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
+    	return ASHARP_RET_NULL_POINTER;
+	}
+
+	if(pAsharpCtx->isGrayMode){
+		*mode = ASHARP_PARAM_MODE_GRAY;
+	}else if(pExpInfo->hdr_mode == 0){
+		*mode = ASHARP_PARAM_MODE_NORMAL;
+	}else if(pExpInfo->hdr_mode >= 1){
+		*mode = ASHARP_PARAM_MODE_HDR;
+	}else{
+		*mode = ASHARP_PARAM_MODE_NORMAL;
+	}
+
+	return res;
+}
+
 RKAIQ_END_DECLARE
 

@@ -31,39 +31,60 @@ typedef struct _RkAiqAlgoContext {
 static XCamReturn
 create_context(RkAiqAlgoContext **context, const AlgoCtxInstanceCfg* cfg)
 {
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
     AgammaHandle_t*AgammaHandle = NULL;
-    XCamReturn ret;
-    ret = AgammaInitV200(&AgammaHandle);
+    AlgoCtxInstanceCfgInt* instanc_int = (AlgoCtxInstanceCfgInt*)cfg;
+    CamCalibDbContext_t* calib = instanc_int->calib;
+    ret = AgammaInit(&AgammaHandle, calib);
     *context = (RkAiqAlgoContext *)(AgammaHandle);
-    return XCAM_RETURN_NO_ERROR;
+    return ret;
 }
 
 static XCamReturn
 destroy_context(RkAiqAlgoContext *context)
 {
     AgammaHandle_t*AgammaHandle = (AgammaHandle_t*)context;
-    XCamReturn ret;
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
 
-    ret = AgammaReleaseV200(AgammaHandle);
+    ret = AgammaRelease(AgammaHandle);
 
-    return XCAM_RETURN_NO_ERROR;
+    return ret;
 }
 
 static XCamReturn
 prepare(RkAiqAlgoCom* params)
 {
-
-    XCamReturn ret;
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
     AgammaHandle_t * AgammaHandle = (AgammaHandle_t *)params->ctx;
     RkAiqAlgoConfigAgammaInt* pCfgParam = (RkAiqAlgoConfigAgammaInt*)params;
-    AgammaHandle->pCalibDb = pCfgParam->rk_com.u.prepare.calib;
-    ret = AgammaConfigInit(AgammaHandle);
-    return XCAM_RETURN_NO_ERROR;
+    rk_aiq_gamma_cfg_t *agamma_config = &AgammaHandle->agamma_config;
+
+    AgammaHandle->working_mode = pCfgParam->agamma_config_com.com.u.prepare.working_mode;
+    if (RK_AIQ_WORKING_MODE_NORMAL == AgammaHandle->working_mode){
+        memcpy(agamma_config->gamma_table, AgammaHandle->normal_table, sizeof(AgammaHandle->normal_table));
+    }else{
+        memcpy(agamma_config->gamma_table, AgammaHandle->hdr_table, sizeof(AgammaHandle->hdr_table));
+    }
+    return ret;
 }
 
 static XCamReturn
 pre_process(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outparams)
 {
+    RkAiqAlgoPreAgammaInt* pAgammaPreParams = (RkAiqAlgoPreAgammaInt*)inparams;
+    AgammaHandle_t * AgammaHandle = (AgammaHandle_t *)inparams->ctx;
+    rk_aiq_gamma_cfg_t *agamma_config = &AgammaHandle->agamma_config;
+
+    if (pAgammaPreParams->rk_com.u.proc.gray_mode) {
+        agamma_config->gamma_out_mode = GAMMA_OUT_NIGHT;
+        memcpy(agamma_config->gamma_table, AgammaHandle->night_table, sizeof(AgammaHandle->night_table));
+    }else if (GAMMA_OUT_NORMAL == AgammaHandle->working_mode){
+        agamma_config->gamma_out_mode = GAMMA_OUT_NORMAL;
+        memcpy(agamma_config->gamma_table, AgammaHandle->normal_table, sizeof(AgammaHandle->normal_table));
+    }else{
+        agamma_config->gamma_out_mode = GAMMA_OUT_HDR;
+        memcpy(agamma_config->gamma_table, AgammaHandle->hdr_table, sizeof(AgammaHandle->hdr_table));
+    }
     return XCAM_RETURN_NO_ERROR;
 }
 

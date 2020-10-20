@@ -1,6 +1,46 @@
 #include "rk_aiq_anr_algo_mfnr.h"
 
-ANRresult_t mfnr_get_setting_idx_by_name(CalibDb_MFNR_t *pCalibdb, char *name, int *setting_idx)
+ANRresult_t mfnr_get_mode_cell_idx_by_name(CalibDb_MFNR_t *pCalibdb, char *name, int *mode_idx)
+{
+	int i = 0;
+	ANRresult_t res = ANR_RET_SUCCESS;
+
+	if(pCalibdb == NULL){
+		LOGE_ANR("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
+		return ANR_RET_NULL_POINTER;
+	}
+
+	if(name == NULL){
+		LOGE_ANR("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
+		return ANR_RET_NULL_POINTER;
+	}
+
+	if(mode_idx == NULL){
+		LOGE_ANR("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
+		return ANR_RET_NULL_POINTER;
+	}
+
+	for(i=0; i<CALIBDB_NR_SHARP_SETTING_LEVEL; i++){
+		if(strncmp(name, pCalibdb->mode_cell[i].name, sizeof(pCalibdb->mode_cell[i].name)) == 0){
+			break;
+		}
+	}
+
+	if(i<CALIBDB_MAX_MODE_NUM){
+		*mode_idx = i;
+		res = ANR_RET_SUCCESS;
+	}else{
+		*mode_idx = 0;
+		res = ANR_RET_FAILURE;
+	}
+
+	LOGD_ANR("%s:%d mode_name:%s  mode_idx:%d i:%d \n",__FUNCTION__, __LINE__, name, *mode_idx, i);
+	return res;
+
+}
+
+
+ANRresult_t mfnr_get_setting_idx_by_name(CalibDb_MFNR_t *pCalibdb, char *name, int mode_idx, int *setting_idx)
 {
 	int i = 0;
 	ANRresult_t res = ANR_RET_SUCCESS;
@@ -21,7 +61,7 @@ ANRresult_t mfnr_get_setting_idx_by_name(CalibDb_MFNR_t *pCalibdb, char *name, i
 	}
 
 	for(i=0; i<CALIBDB_NR_SHARP_SETTING_LEVEL; i++){
-		if(strncmp(name, pCalibdb->setting[i].name, sizeof(pCalibdb->setting[i].name)) == 0){
+		if(strncmp(name, pCalibdb->mode_cell[mode_idx].setting[i].snr_mode, sizeof(pCalibdb->mode_cell[mode_idx].setting[i].snr_mode)) == 0){
 			break;
 		}
 	}
@@ -39,9 +79,71 @@ ANRresult_t mfnr_get_setting_idx_by_name(CalibDb_MFNR_t *pCalibdb, char *name, i
 
 }
 
-ANRresult_t mfnr_config_setting_param(RKAnr_Mfnr_Params_t *pParams, CalibDb_MFNR_t *pCalibdb, char* snr_name)
+ANRresult_t init_mfnr_dynamic_params(RKAnr_Mfnr_Dynamic_t *pDynamic, CalibDb_MFNR_t *pCalibdb, int mode_idx)
+{
+    ANRresult_t res = ANR_RET_SUCCESS;
+    int i = 0;
+    int j = 0;
+
+    if(pDynamic == NULL) {
+        LOGE_ANR("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
+        return ANR_RET_NULL_POINTER;
+    }
+
+    if(pCalibdb == NULL) {
+        LOGE_ANR("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
+        return ANR_RET_NULL_POINTER;
+    }
+
+   pDynamic->enable = pCalibdb->mode_cell[mode_idx].dynamic.enable;
+   pDynamic->lowth_iso = pCalibdb->mode_cell[mode_idx].dynamic.lowth_iso;
+   pDynamic->lowth_time = pCalibdb->mode_cell[mode_idx].dynamic.lowth_time;
+   pDynamic->highth_iso = pCalibdb->mode_cell[mode_idx].dynamic.highth_iso;
+   pDynamic->highth_time = pCalibdb->mode_cell[mode_idx].dynamic.highth_time;
+
+   LOGD_ANR("dynamic final param mode:%d \n", mode_idx);
+   return res;
+
+}
+
+ANRresult_t mfnr_config_dynamic_param(RKAnr_Mfnr_Dynamic_t *pDynamic,  CalibDb_MFNR_t *pCalibdb, char* param_mode)
+{
+	
+	ANRresult_t res = ANR_RET_SUCCESS;
+	int mode_idx = 0;
+	int setting_idx = 0;
+
+	if(pDynamic == NULL){
+		LOGE_ANR("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
+		return ANR_RET_NULL_POINTER;
+	}
+
+	if(pCalibdb == NULL){
+		LOGE_ANR("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
+		return ANR_RET_NULL_POINTER;
+	}
+
+	if(param_mode == NULL){
+		LOGE_ANR("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
+		return ANR_RET_NULL_POINTER;
+	}
+	
+	res = mfnr_get_mode_cell_idx_by_name(pCalibdb, param_mode, &mode_idx);
+	if(res != ANR_RET_SUCCESS){
+		LOGW_ANR("%s(%d): error!!!	can't find mode name in iq files, use 0 instead\n", __FUNCTION__, __LINE__);
+	}
+
+	res = init_mfnr_dynamic_params(pDynamic, pCalibdb, mode_idx);
+
+	LOGD_ANR("final param mode:%d snr_mode:%d\n", mode_idx);
+	return res;
+	
+}
+
+ANRresult_t mfnr_config_setting_param(RKAnr_Mfnr_Params_t *pParams, CalibDb_MFNR_t *pCalibdb, char* param_mode, char* snr_name)
 {
 	ANRresult_t res = ANR_RET_SUCCESS;
+	int mode_idx = 0;
 	int setting_idx = 0;
 
 	if(pParams == NULL){
@@ -54,18 +156,34 @@ ANRresult_t mfnr_config_setting_param(RKAnr_Mfnr_Params_t *pParams, CalibDb_MFNR
 		return ANR_RET_NULL_POINTER;
 	}
 
-	res = mfnr_get_setting_idx_by_name(pCalibdb, snr_name, &setting_idx);
+	if(param_mode == NULL){
+		LOGE_ANR("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
+		return ANR_RET_NULL_POINTER;
+	}
+
+	if(snr_name == NULL){
+		LOGE_ANR("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
+		return ANR_RET_NULL_POINTER;
+	}
+	
+	res = mfnr_get_mode_cell_idx_by_name(pCalibdb, param_mode, &mode_idx);
+	if(res != ANR_RET_SUCCESS){
+		LOGW_ANR("%s(%d): error!!!	can't find mode name in iq files, use 0 instead\n", __FUNCTION__, __LINE__);
+	}
+
+	res = mfnr_get_setting_idx_by_name(pCalibdb, snr_name, mode_idx, &setting_idx);
 	if(res != ANR_RET_SUCCESS){
 		LOGW_ANR("%s(%d): error!!!  can't find setting in iq files, use 0 instead\n", __FUNCTION__, __LINE__);
 	}
 
-	res = init_mfnr_params(pParams, pCalibdb, setting_idx);
+	res = init_mfnr_params(pParams, pCalibdb, mode_idx, setting_idx);
 
+	LOGD_ANR("final param mode:%d snr_mode:%d\n", mode_idx, setting_idx);
 	return res;
 
 }
 
-ANRresult_t init_mfnr_params(RKAnr_Mfnr_Params_t *pParams, CalibDb_MFNR_t *pCalibdb, int setting_idx)
+ANRresult_t init_mfnr_params(RKAnr_Mfnr_Params_t *pParams, CalibDb_MFNR_t *pCalibdb, int mode_idx, int setting_idx)
 {
     ANRresult_t res = ANR_RET_SUCCESS;
     int i = 0;
@@ -96,7 +214,7 @@ ANRresult_t init_mfnr_params(RKAnr_Mfnr_Params_t *pParams, CalibDb_MFNR_t *pCali
     max_lvl_uv = pCalibdb->max_level_uv;
     pParams->back_ref_num = pCalibdb->back_ref_num;
 
-	CalibDb_MFNR_Setting_t *pSetting = &pCalibdb->setting[setting_idx];
+	CalibDb_MFNR_Setting_t *pSetting = &pCalibdb->mode_cell[mode_idx].setting[setting_idx];
     for(int lvl = 0; lvl < max_lvl; lvl++) {
         for (i = 0; i < max_iso_step; i++)
             pParams->weight_limit_y[i][lvl] = pSetting->mfnr_iso[i].weight_limit_y[lvl];
@@ -815,6 +933,11 @@ ANRresult_t mfnr_fix_transfer(RKAnr_Mfnr_Params_Select_t* tnr, RKAnr_Mfnr_Fix_t 
         return ANR_RET_NULL_POINTER;
     }
 
+	LOGD_ANR("%s:%d iso:%d strength:%f\n", __FUNCTION__, __LINE__, pExpInfo->arIso[pExpInfo->hdr_mode], fLumaStrength);
+	if(fLumaStrength <= 0.0){
+		fLumaStrength = 0.000001;
+	}
+	
     int i = 0;
     unsigned long tmp = 0;
     int mIso_last = pExpInfo->arIso[pExpInfo->hdr_mode];
@@ -856,11 +979,28 @@ ANRresult_t mfnr_fix_transfer(RKAnr_Mfnr_Params_Select_t* tnr, RKAnr_Mfnr_Fix_t 
     pMfnrCfg->optc_en = 1;
     pMfnrCfg->gain_en = 1;
 
-    //0x0088
-    pMfnrCfg->pk0_y = tnr->weight_limit_y[0];
-    pMfnrCfg->pk1_y = tnr->weight_limit_y[max_lvl - 1];
-    pMfnrCfg->pk0_c = tnr->weight_limit_uv[0];
-    pMfnrCfg->pk1_c = tnr->weight_limit_uv[max_lvl_uv - 1];
+    //0x0088   
+    tmp = (tnr->weight_limit_y[0] / fLumaStrength);
+	if(tmp > 0xff){
+		tmp = 0xff;
+	}
+	pMfnrCfg->pk0_y = (unsigned char)tmp;
+
+	tmp = (tnr->weight_limit_y[max_lvl - 1] / fLumaStrength);
+	if(tmp > 0xff){
+		tmp = 0xff;
+	}
+    pMfnrCfg->pk1_y = (unsigned char)tmp;
+	tmp = (tnr->weight_limit_uv[0] / fChromaStrength );
+	if(tmp > 0xff){
+		tmp = 0xff;
+	}
+    pMfnrCfg->pk0_c = (unsigned char)tmp;
+	tmp = (tnr->weight_limit_uv[max_lvl_uv - 1] / fChromaStrength);
+	if(tmp > 0xff){
+		tmp = 0xff;
+	}
+    pMfnrCfg->pk1_c = (unsigned char)tmp;
 
     //0x008c
     FIX_FLOAT(gain_glb_filt, F_DECI_GAIN, tmp, 0);
@@ -1201,6 +1341,43 @@ ANRresult_t mfnr_fix_Printf(RKAnr_Mfnr_Fix_t  * pMfnrCfg)
 
     LOGD_ANR("%s:(%d) exit \n", __FUNCTION__, __LINE__);
 
+    return res;
+}
+
+
+ANRresult_t mfnr_dynamic_calc(RKAnr_Mfnr_Dynamic_t  * pDynamic, ANRExpInfo_t *pExpInfo)
+{
+    LOGI_ANR("%s:(%d) enter \n", __FUNCTION__, __LINE__);
+
+    ANRresult_t res = ANR_RET_SUCCESS;
+    float time = pExpInfo->arTime[pExpInfo->hdr_mode];
+    float iso = pExpInfo->arIso[pExpInfo->hdr_mode];
+    float exp = time * iso;
+	
+    if(pDynamic == NULL) {
+        LOGE_ANR("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
+        return ANR_RET_NULL_POINTER;
+    }
+
+    if(pExpInfo == NULL) {
+        LOGE_ANR("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
+        return ANR_RET_NULL_POINTER;
+    }
+
+	
+    if(iso >= pDynamic->highth_iso && time >= pDynamic->highth_time){
+	 pDynamic->mfnr_enable_state = 1;
+    }else if(iso <= pDynamic->lowth_iso && time <= pDynamic->lowth_time){
+	 pDynamic->mfnr_enable_state = 0;
+    }
+
+	LOGD_ANR("%s:%d mfnr: cur:%f %f  highth:%f %f  lowth:%f %f  finnal:%d\n", 
+		__FUNCTION__, __LINE__, 
+		iso, time, 
+		pDynamic->highth_iso, pDynamic->highth_time,
+		pDynamic->lowth_iso, pDynamic->lowth_time,
+		pDynamic->mfnr_enable_state);
+	
     return res;
 }
 

@@ -3,7 +3,48 @@
 
 RKAIQ_BEGIN_DECLARE
 
-AsharpResult_t sharp_get_setting_idx_by_name_v1(CalibDb_Sharp_t *pCalibdb, char *name, int *setting_idx)
+#define MAX_SHARP_LUMA_CLIP_VALUE (8.0)
+
+AsharpResult_t sharp_get_mode_cell_idx_by_name_v1(CalibDb_Sharp_t *pCalibdb, char *name, int *mode_idx)
+{
+	int i = 0;
+	AsharpResult_t res = ASHARP_RET_SUCCESS;
+
+	if(pCalibdb == NULL){
+		LOGE_ASHARP("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
+		return ASHARP_RET_NULL_POINTER;
+	}
+
+	if(name == NULL){
+		LOGE_ASHARP("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
+		return ASHARP_RET_NULL_POINTER;
+	}
+
+	if(mode_idx == NULL){
+		LOGE_ASHARP("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
+		return ASHARP_RET_NULL_POINTER;
+	}
+
+	for(i=0; i<CALIBDB_NR_SHARP_SETTING_LEVEL; i++){
+		if(strncmp(name, pCalibdb->mode_cell[i].name, sizeof(pCalibdb->mode_cell[i].name)) == 0){
+			break;
+		}
+	}
+
+	if(i<CALIBDB_MAX_MODE_NUM){
+		*mode_idx = i;
+		res = ASHARP_RET_SUCCESS;
+	}else{
+		*mode_idx = 0;
+		res = ASHARP_RET_FAILURE;
+	}
+
+	LOGD_ASHARP("%s:%d mode_name:%s  mode_idx:%d i:%d \n",__FUNCTION__, __LINE__, name,* mode_idx, i);
+	return res;
+
+}
+
+AsharpResult_t sharp_get_setting_idx_by_name_v1(CalibDb_Sharp_t *pCalibdb, char *name, int mode_idx, int *setting_idx)
 {
 	int i = 0;
 	AsharpResult_t res = ASHARP_RET_SUCCESS;
@@ -24,7 +65,7 @@ AsharpResult_t sharp_get_setting_idx_by_name_v1(CalibDb_Sharp_t *pCalibdb, char 
 	}
 
 	for(i=0; i<CALIBDB_NR_SHARP_SETTING_LEVEL; i++){
-		if(strncmp(name, pCalibdb->setting[i].name, sizeof(pCalibdb->setting[i].name)) == 0){
+		if(strncmp(name, pCalibdb->mode_cell[mode_idx].setting[i].snr_mode, sizeof(pCalibdb->mode_cell[mode_idx].setting[i].snr_mode)) == 0){
 			break;
 		}
 	}
@@ -42,9 +83,10 @@ AsharpResult_t sharp_get_setting_idx_by_name_v1(CalibDb_Sharp_t *pCalibdb, char 
 
 }
 
-AsharpResult_t sharp_config_setting_param_v1(RKAsharp_Sharp_HW_Params_t *pParams, CalibDb_Sharp_t *pCalibdb, char* snr_name)
+AsharpResult_t sharp_config_setting_param_v1(RKAsharp_Sharp_HW_Params_t *pParams, CalibDb_Sharp_t *pCalibdb, char *param_mode, char* snr_name)
 {
 	AsharpResult_t res = ASHARP_RET_SUCCESS;
+	int mode_idx = 0;
 	int setting_idx = 0;
 
 	if(pParams == NULL){
@@ -57,17 +99,24 @@ AsharpResult_t sharp_config_setting_param_v1(RKAsharp_Sharp_HW_Params_t *pParams
 		return ASHARP_RET_NULL_POINTER;
 	}
 
-	res = sharp_get_setting_idx_by_name_v1(pCalibdb, snr_name, &setting_idx);
+	
+	res = sharp_get_mode_cell_idx_by_name_v1(pCalibdb, param_mode, &mode_idx);
 	if(res != ASHARP_RET_SUCCESS){
-		LOGW_ASHARP("%s(%d): error!!!  can't find setting in iq files, use 0 instead\n", __FUNCTION__, __LINE__);
+		LOGE_ASHARP("%s(%d): error!!!  can't find mode name in iq files, use 0 instead\n", __FUNCTION__, __LINE__);
 	}
 
-	res = init_sharp_params_v1(pParams, pCalibdb, setting_idx);
+	res = sharp_get_setting_idx_by_name_v1(pCalibdb, snr_name, mode_idx, &setting_idx);
+	if(res != ASHARP_RET_SUCCESS){
+		LOGE_ASHARP("%s(%d): error!!!  can't find setting in iq files, use 0 instead\n", __FUNCTION__, __LINE__);
+	}
 
+	res = init_sharp_params_v1(pParams, pCalibdb, mode_idx, setting_idx);
+
+	LOGD_ASHARP("%s(%d): finnal mode:%d snr_mode:%d \n", __FUNCTION__, __LINE__, mode_idx, setting_idx);
 	return res;
 
 }
-AsharpResult_t init_sharp_params_v1(RKAsharp_Sharp_HW_Params_t *pParams, CalibDb_Sharp_t *pCalibdb, int setting_idx)
+AsharpResult_t init_sharp_params_v1(RKAsharp_Sharp_HW_Params_t *pParams, CalibDb_Sharp_t *pCalibdb, int mode_idx, int setting_idx)
 {
     AsharpResult_t res = ASHARP_RET_SUCCESS;
     int i = 0;
@@ -84,7 +133,7 @@ AsharpResult_t init_sharp_params_v1(RKAsharp_Sharp_HW_Params_t *pParams, CalibDb
         return ASHARP_RET_NULL_POINTER;
     }
 
-	CalibDb_Sharp_Setting_t *pSetting = &pCalibdb->setting[setting_idx];
+	CalibDb_Sharp_Setting_t *pSetting = &pCalibdb->mode_cell[mode_idx].setting[setting_idx];
     for (i = 0; i < max_iso_step; i++) {
 #ifndef RK_SIMULATOR_HW
 		pParams->iso[i] = pSetting->sharp_iso[i].iso;
@@ -566,6 +615,8 @@ AsharpResult_t rk_Sharp_V1_fix_transfer(RKAsharp_Sharp_HW_Params_Select_t *pShar
     int sum_coeff, offset;
     float sum_coeff_float;
     AsharpResult_t res = ASHARP_RET_SUCCESS;
+	float mClipStrength = 1.0;
+	float hClipStrength = 1.0;
 
     if(pSharpV1 == NULL) {
         LOGE_ASHARP("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
@@ -577,15 +628,67 @@ AsharpResult_t rk_Sharp_V1_fix_transfer(RKAsharp_Sharp_HW_Params_Select_t *pShar
         return ASHARP_RET_NULL_POINTER;
     }
 
+	if(fPercent <= 0.0){
+		fPercent = 0.000001;
+	}
 
+	if(fPercent > (MAX_SHARP_LUMA_CLIP_VALUE / pSharpV1->M_ratio )){
+		mClipStrength = fPercent / (MAX_SHARP_LUMA_CLIP_VALUE / pSharpV1->M_ratio ) ;
+	}
+
+	if(fPercent > (MAX_SHARP_LUMA_CLIP_VALUE / pSharpV1->H_ratio)){
+		hClipStrength = fPercent / (MAX_SHARP_LUMA_CLIP_VALUE / pSharpV1->H_ratio ) ;
+	}
+
+	LOGD_ASHARP("%s:%d percent:%f m&h_strength:%f %f\n", 
+	 	__FUNCTION__, __LINE__, fPercent,
+		mClipStrength, hClipStrength);
+
+	pSharpV1->pbf_gain  = pSharpV1->pbf_gain/ fPercent;
+	if(pSharpV1->pbf_gain > 2.0)
+		pSharpV1->pbf_gain  = 2.0;
+
+	pSharpV1->pbf_add = pSharpV1->pbf_add/ fPercent;
+	if(pSharpV1->pbf_add > 255)
+		pSharpV1->pbf_add = 255;
+	
+	pSharpV1->mbf_gain  = pSharpV1->mbf_gain / fPercent;
+	if(pSharpV1->mbf_gain > 2.0)
+		pSharpV1->mbf_gain  = 2.0;
+
+	pSharpV1->mbf_add = pSharpV1->mbf_add / fPercent;
+	if(pSharpV1->mbf_add > 255)
+		pSharpV1->mbf_add = 255;	
+
+	pSharpV1->hbf_gain  = pSharpV1->hbf_gain / fPercent;
+	if(pSharpV1->hbf_gain > 2.0)
+		pSharpV1->hbf_gain  = 2.0;
+
+	pSharpV1->hbf_add = pSharpV1->hbf_add / fPercent;
+	if(pSharpV1->hbf_add > 255)
+		pSharpV1->hbf_add = 255;
+
+	
     //0x0080
     pSharpCfg->yin_flt_en = 1;
     pSharpCfg->edge_avg_en = 1;
 
     //0x0084
-    pSharpCfg->hbf_ratio = (unsigned short)ROUND_F(pSharpV1->hbf_ratio * (1 << reg_sharpenHW_hbf_ratio_fix_bits));
-    pSharpCfg->ehf_th = (unsigned short)ROUND_F(pSharpV1->ehf_th);
-    pSharpCfg->pbf_ratio = (unsigned short)ROUND_F(pSharpV1->pbf_ratio * (1 << reg_sharpenHW_pbf_ratio_fix_bits));
+    tmp = ROUND_F(pSharpV1->hbf_ratio / fPercent * (1 << reg_sharpenHW_hbf_ratio_fix_bits));
+	if(tmp > 0x100){
+		tmp = 0x100;
+	}
+    pSharpCfg->hbf_ratio = (unsigned short)tmp;
+    tmp = ROUND_F(pSharpV1->ehf_th * fPercent);
+	if(tmp > 0xff){
+		tmp = 0xff;
+	}
+	pSharpCfg->ehf_th =(unsigned char) tmp;
+	tmp = ROUND_F(pSharpV1->pbf_ratio / fPercent * (1 << reg_sharpenHW_pbf_ratio_fix_bits));
+	if(tmp > 0x80){
+		tmp = 0x80;
+	}
+	pSharpCfg->pbf_ratio = (unsigned short)tmp;
 
 
     //0x0090
@@ -772,15 +875,25 @@ AsharpResult_t rk_Sharp_V1_fix_transfer(RKAsharp_Sharp_HW_Params_Select_t *pShar
 
     //0x00e0 - 0x00e4
     for(i = 0; i < 8; i++) {
-        pSharpCfg->lum_clp_m[i] = (unsigned char)(pSharpV1->lum_clp_m[i]);
+		tmp = ((pSharpV1->lum_clp_m[i]) * mClipStrength);
+		if(tmp > 0xff){
+			tmp = 0xff;
+		}
+		pSharpCfg->lum_clp_m[i] = (unsigned char)tmp;
     }
 
     //0x00e8 - 0x00ec
     for(i = 0; i < 8; i++) {
-        pSharpCfg->lum_min_m[i] = (char)ROUND_F(pSharpV1->lum_min_m[i] * (1 << reg_sharpenHW_lum_min_m_fix_bits));
+        tmp = ROUND_F(pSharpV1->lum_min_m[i] * mClipStrength * (1 << reg_sharpenHW_lum_min_m_fix_bits));
+		if(tmp < -32){
+			tmp = -32;
+		}
+	    pSharpCfg->lum_min_m[i] = (char)tmp;
     }
 
     //0x00f0 - 0x00f4
+    
+	
     // mf bf sigma inv
     max_val = 0;
     min_val = 65536;
@@ -805,11 +918,16 @@ AsharpResult_t rk_Sharp_V1_fix_transfer(RKAsharp_Sharp_HW_Params_Select_t *pShar
 
     //0x00f8 - 0x00fc
     for(i = 0; i < 8; i++) {
-        pSharpCfg->lum_clp_h[i] = (unsigned char)(pSharpV1->lum_clp_h[i]);
+        tmp = (pSharpV1->lum_clp_h[i] * hClipStrength);
+		if(tmp > 0xff){
+			tmp = 0xff;
+		}
+		pSharpCfg->lum_clp_h[i] = (unsigned char)tmp;
     }
 
     //0x0100 - 0x0104
     //hbf
+    
     max_val = 0;
     min_val = 65536;
     shf_bits = 0;
@@ -832,8 +950,20 @@ AsharpResult_t rk_Sharp_V1_fix_transfer(RKAsharp_Sharp_HW_Params_Select_t *pShar
     }
 
     //0x0128
-    pSharpCfg->rfl_ratio = (unsigned short)ROUND_F(pSharpV1->lratio * (1 << reg_sharpenHW_lratio_fix_bits));
-    pSharpCfg->rfh_ratio = (unsigned short)ROUND_F(pSharpV1->hratio * (1 << reg_sharpenHW_hratio_fix_bits));
+    tmp = ROUND_F(pSharpV1->lratio /  fPercent * (1 << reg_sharpenHW_lratio_fix_bits));
+	if(tmp > 0x100){
+		tmp = 0x100;
+	}
+	pSharpCfg->rfl_ratio = (unsigned short) tmp;
+	
+    tmp = ROUND_F(pSharpV1->hratio * fPercent * (1 << reg_sharpenHW_hratio_fix_bits));
+	if(tmp > 0x3ff){
+		tmp = 0x3ff;
+	}
+	if(tmp < 0x100){
+		tmp = 0x100;
+	}
+	pSharpCfg->rfh_ratio = (unsigned short) tmp;
 
     //0x012C
     pSharpCfg->m_ratio = (unsigned char)ROUND_F(pSharpV1->M_ratio * fPercent * (1 << reg_sharpenHW_M_ratio_fix_bits));

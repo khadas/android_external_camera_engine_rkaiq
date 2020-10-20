@@ -23,6 +23,7 @@
 #include "accm/rk_aiq_types_accm_algo_int.h"
 #include "xcam_log.h"
 #include "xcam_common.h"
+#include "list.h"
 
 
 RKAIQ_BEGIN_DECLARE
@@ -31,6 +32,7 @@ RKAIQ_BEGIN_DECLARE
 
 typedef struct accm_rest_s {
     float fSaturation;
+    List dominateIlluList;//to record domain illuminant
     int dominateIlluProfileIdx;
     const CalibDb_CcmMatrixProfile_t *pCcmProfile1;
     const CalibDb_CcmMatrixProfile_t *pCcmProfile2;
@@ -41,6 +43,11 @@ typedef struct accm_rest_s {
     float color_inhibition_level;
     float color_saturation_level;
 } accm_rest_t;
+
+typedef struct illu_node_s {
+    void*        p_next;       /**< for adding to a list */
+    unsigned int value;
+} illu_node_t;
 
 typedef struct accm_context_s {
     const CalibDb_Ccm_t *calibCcm;//profile para

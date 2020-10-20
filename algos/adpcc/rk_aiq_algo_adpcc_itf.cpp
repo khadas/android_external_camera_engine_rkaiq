@@ -38,7 +38,7 @@ create_context(RkAiqAlgoContext **context, const AlgoCtxInstanceCfg* cfg)
 
 #if 1
     AdpccContext_t* pAdpccCtx = NULL;
-    AdpccResult_t ret = AdpccInit(&pAdpccCtx, cfgInt->calib);
+    AdpccResult_t ret = AdpccInit(&pAdpccCtx, cfgInt->calib);//load iq paras
     if(ret != ADPCC_RET_SUCCESS) {
         result = XCAM_RETURN_ERROR_FAILED;
         LOGE_ADPCC("%s: Initializaion Adpcc failed (%d)\n", __FUNCTION__, ret);
