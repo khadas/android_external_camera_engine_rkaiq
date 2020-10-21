@@ -423,7 +423,7 @@ int rkisp_cl_stop(void* cl_ctx) {
     rk_aiq_sys_ctx_t *aiq_ctx = AIQ_CONTEXT_CAST (cl_ctx);
     LOGD("--------------------------rkisp_cl_stop");
 
-    ret = rk_aiq_uapi_sysctl_stop(aiq_ctx);
+    ret = rk_aiq_uapi_sysctl_stop(aiq_ctx, false);
 
     LOGD("--------------------------rkisp_cl_stop done");
     return 0;
