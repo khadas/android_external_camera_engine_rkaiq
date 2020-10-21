@@ -21,7 +21,6 @@
 #define DEFAULT_ENTRY_CAP 64
 #define DEFAULT_DATA_CAP 1024
 
-static pthread_mutex_t aiq_ctx_mutex = PTHREAD_MUTEX_INITIALIZER;
 
 AiqCameraHalAdapter::AiqCameraHalAdapter(SmartPtr<RkAiqManager> rkAiqManager,SmartPtr<RkAiqCore> analyzer,SmartPtr<ICamHw> camHw)
 :_rkAiqManager(rkAiqManager),_analyzer(analyzer),_camHw(camHw),_delay_still_capture(false), _aiq_ctx(NULL)
@@ -38,6 +37,7 @@ AiqCameraHalAdapter::AiqCameraHalAdapter(SmartPtr<RkAiqManager> rkAiqManager,Sma
     _meta = allocate_camera_metadata(DEFAULT_ENTRY_CAP, DEFAULT_DATA_CAP);
     XCAM_ASSERT (_meta);
     _metadata = new CameraMetadata(_meta);
+    _aiq_ctx_mutex = PTHREAD_MUTEX_INITIALIZER;
 
 }
 
@@ -502,7 +502,7 @@ AiqCameraHalAdapter::updateAeMetaParams(XCamAeParam *aeParams){
         stExpWin.v_size = aeParams->window.y_end - aeParams->window.y_start;
     }
 
-    pthread_mutex_lock(&aiq_ctx_mutex);
+    pthread_mutex_lock(&_aiq_ctx_mutex);
     //when in Locked state, not run AE Algorithm
     //TODO: Need lock/unlock set api
     if (mAeState->getState() != ANDROID_CONTROL_AE_STATE_LOCKED) {
@@ -516,7 +516,7 @@ AiqCameraHalAdapter::updateAeMetaParams(XCamAeParam *aeParams){
             LOGE("%s(%d) setExpWinAttr failed!\n", __FUNCTION__, __LINE__);
         }
     }
-    pthread_mutex_unlock(&aiq_ctx_mutex);
+    pthread_mutex_unlock(&_aiq_ctx_mutex);
 }
 
 void
@@ -593,7 +593,7 @@ AiqCameraHalAdapter::updateAfMetaParams(XCamAfParam *afParams){
         stAfttr.v_size = afParams->focus_rect[0].bottom_height;
     }
 
-    pthread_mutex_lock(&aiq_ctx_mutex);
+    pthread_mutex_lock(&_aiq_ctx_mutex);
     //when in Locked state, not run AF Algorithm
     //TODO : nedd rk_aiq_user_api_af.h add lock/unlock interface
     if (mAfState->getState() != ANDROID_CONTROL_AF_STATE_FOCUSED_LOCKED) {
@@ -612,7 +612,7 @@ AiqCameraHalAdapter::updateAfMetaParams(XCamAfParam *afParams){
 //            LOGE("%s(%d) Af set lock failed!\n", __FUNCTION__, __LINE__);
 //        }
     }
-    pthread_mutex_unlock(&aiq_ctx_mutex);
+    pthread_mutex_unlock(&_aiq_ctx_mutex);
 
     return;
 }
@@ -713,7 +713,7 @@ AiqCameraHalAdapter::updateAwbMetaParams(XCamAwbParam *awbParams){
         }
     }
 
-    pthread_mutex_lock(&aiq_ctx_mutex);
+    pthread_mutex_lock(&_aiq_ctx_mutex);
     //when in Locked state, not run AWB Algorithm
     if (mAwbState->getState() != ANDROID_CONTROL_AWB_STATE_LOCKED) {
         ret = rk_aiq_uapi_unlockAWB(_aiq_ctx);
@@ -736,7 +736,7 @@ AiqCameraHalAdapter::updateAwbMetaParams(XCamAwbParam *awbParams){
             LOGE("%s(%d) Awb Set lock failed!\n", __FUNCTION__, __LINE__);
         }
     }
-    pthread_mutex_unlock(&aiq_ctx_mutex);
+    pthread_mutex_unlock(&_aiq_ctx_mutex);
     return;
 
 }

@@ -51,7 +51,7 @@
 
 #define MAX_MEDIA_INDEX 16
 #define MAX_SENSOR_NUM  16
-#define AIQ_CONTEXT_CAST(context)  ((rk_aiq_sys_ctx_t*)(context))
+#define AIQ_CONTEXT_CAST(context)  ((AiqCameraHalAdapter*)(context))
 
 using namespace RkCam;
 using namespace XCam;
@@ -68,8 +68,6 @@ typedef enum RKISP_CL_STATE_enum {
     RKISP_CL_STATE_STARTED      ,
     RKISP_CL_STATE_PAUSED       ,
 } RKISP_CL_STATE_e;
-
-static AiqCameraHalAdapter *gAiqCameraHalAdapter;
 
 static int __rkisp_get_sensor_fmt_infos(SmartPtr<V4l2SubDevice> subDev, rkisp_metadata_info_t *metadata_info)
 {
@@ -350,13 +348,15 @@ int rkisp_cl_rkaiq_init(void** cl_ctx, const char* tuning_file_path,
     RkCamera3VendorTags::get_vendor_tag_ops(&rkcamera_vendor_tag_ops_instance);
     set_camera_metadata_vendor_ops(&rkcamera_vendor_tag_ops_instance);
 
-    *cl_ctx = (void*)aiq_ctx;
     LOGD("@%s(%d)aiq_ctx pointer(%p)",__FUNCTION__, __LINE__, aiq_ctx);
-    if(cl_ctx){
+
+    AiqCameraHalAdapter *gAiqCameraHalAdapter;
+    if(aiq_ctx){
         gAiqCameraHalAdapter = new AiqCameraHalAdapter(aiq_ctx->_rkAiqManager,aiq_ctx->_analyzer,aiq_ctx->_camHw);
         gAiqCameraHalAdapter->init(callbacks_ops);
         gAiqCameraHalAdapter->set_aiq_ctx(aiq_ctx);
     }
+    *cl_ctx = (void*)gAiqCameraHalAdapter;
     return 0;
 }
 
@@ -367,7 +367,9 @@ int rkisp_cl_prepare(void* cl_ctx,
 
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
     LOGD("@%s(%d)cl_ctx pointer(%p)",__FUNCTION__, __LINE__, cl_ctx);
-    rk_aiq_sys_ctx_t *aiq_ctx = AIQ_CONTEXT_CAST (cl_ctx);
+
+    AiqCameraHalAdapter * gAiqCameraHalAdapter = AIQ_CONTEXT_CAST (cl_ctx);
+    rk_aiq_sys_ctx_t *aiq_ctx = gAiqCameraHalAdapter->get_aiq_ctx();
     rk_aiq_working_mode_t work_mode = RK_AIQ_WORKING_MODE_NORMAL;
     if (strcmp(prepare_params->work_mode, "NORMAL") == 0) {
         work_mode = RK_AIQ_WORKING_MODE_NORMAL;
@@ -394,7 +396,8 @@ int rkisp_cl_start(void* cl_ctx) {
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
     LOGD("--------------------------rkisp_cl_start");
 
-    rk_aiq_sys_ctx_t *aiq_ctx = AIQ_CONTEXT_CAST (cl_ctx);
+    AiqCameraHalAdapter * gAiqCameraHalAdapter = AIQ_CONTEXT_CAST (cl_ctx);
+    rk_aiq_sys_ctx_t *aiq_ctx = gAiqCameraHalAdapter->get_aiq_ctx();
     ret = rk_aiq_uapi_sysctl_start(aiq_ctx);
 
     LOGD("--------------------------rkisp_cl_start done");
@@ -406,7 +409,8 @@ int rkisp_cl_set_frame_params(const void* cl_ctx,
     int ret = 0;
 
     LOGD("--------------------------rkisp_cl_set_frame_params");
-    rk_aiq_sys_ctx_t *aiq_ctx = AIQ_CONTEXT_CAST (cl_ctx);
+    AiqCameraHalAdapter * gAiqCameraHalAdapter = AIQ_CONTEXT_CAST (cl_ctx);
+    rk_aiq_sys_ctx_t *aiq_ctx = gAiqCameraHalAdapter->get_aiq_ctx();
 
     ret = gAiqCameraHalAdapter->set_control_params(frame_params->id, frame_params->metas);
     if (ret != XCAM_RETURN_NO_ERROR) {
@@ -420,7 +424,8 @@ int rkisp_cl_set_frame_params(const void* cl_ctx,
 // and could speed up 3a converged
 int rkisp_cl_stop(void* cl_ctx) {
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
-    rk_aiq_sys_ctx_t *aiq_ctx = AIQ_CONTEXT_CAST (cl_ctx);
+    AiqCameraHalAdapter * gAiqCameraHalAdapter = AIQ_CONTEXT_CAST (cl_ctx);
+    rk_aiq_sys_ctx_t *aiq_ctx = gAiqCameraHalAdapter->get_aiq_ctx();
     LOGD("--------------------------rkisp_cl_stop");
 
     ret = rk_aiq_uapi_sysctl_stop(aiq_ctx, false);
@@ -431,12 +436,13 @@ int rkisp_cl_stop(void* cl_ctx) {
 
 void rkisp_cl_deinit(void* cl_ctx) {
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
-    if(gAiqCameraHalAdapter){
-        delete gAiqCameraHalAdapter;
-    }
     LOGD("--------------------------rkisp_cl_deinit");
-    rk_aiq_sys_ctx_t *aiq_ctx = AIQ_CONTEXT_CAST (cl_ctx);\
+    AiqCameraHalAdapter * gAiqCameraHalAdapter = AIQ_CONTEXT_CAST (cl_ctx);
+    rk_aiq_sys_ctx_t *aiq_ctx = gAiqCameraHalAdapter->get_aiq_ctx();
     rk_aiq_uapi_sysctl_deinit(aiq_ctx);
     LOGD("--------------------------rkisp_cl_deinit done");
+    if (gAiqCameraHalAdapter){
+        delete gAiqCameraHalAdapter;
+    }
 }
 
