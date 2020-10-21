@@ -35,6 +35,7 @@ set (AE_SRC
     ae/rk_aiq_ae_algo_ecm.cpp
     ae/rk_aiq_ae_algo_clm.cpp
     ae/rk_aiq_ae_algo_ldm.cpp
+    ae/rk_aiq_ae_algo_pid.cpp
     ae/rk_aiq_uapi_ae_int.cpp
 )
 

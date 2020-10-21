@@ -41,7 +41,8 @@ static XCamReturn alloc_fec_buf(FECContext_t* fecCtx)
 
 static XCamReturn release_fec_buf(FECContext_t* fecCtx)
 {
-    fecCtx->share_mem_ops->release_mem(fecCtx->share_mem_ctx);
+    if (fecCtx->share_mem_ctx)
+        fecCtx->share_mem_ops->release_mem(fecCtx->share_mem_ctx);
 
     return XCAM_RETURN_NO_ERROR;
 }
@@ -375,28 +376,27 @@ prepare(RkAiqAlgoCom* params)
         return XCAM_RETURN_NO_ERROR;
 
     // need realloc ?
-//    if (fecCtx->meshxi) {
-//        free(fecCtx->meshxi);
-//        fecCtx->meshxi = NULL;
-//    }
-//    if (fecCtx->meshxf) {
-//        free(fecCtx->meshxf);
-//        fecCtx->meshxf = NULL;
-//    }
-//    if (fecCtx->meshyi) {
-//        free(fecCtx->meshyi);
-//        fecCtx->meshyi = NULL;
-//    }
-//    if (fecCtx->meshyf) {
-//        free(fecCtx->meshyf);
-//        fecCtx->meshyf = NULL;
-//    }
-//    fecCtx->meshxi = (unsigned short*)malloc(fecCtx->fec_mesh_size * sizeof(unsigned short));
-//    fecCtx->meshxf = (unsigned char*)malloc(fecCtx->fec_mesh_size * sizeof(unsigned char));
-//    fecCtx->meshyi = (unsigned short*)malloc(fecCtx->fec_mesh_size * sizeof(unsigned short));
-//    fecCtx->meshyf = (unsigned char*)malloc(fecCtx->fec_mesh_size * sizeof(unsigned char));
+    if (fecCtx->meshxi) {
+        free(fecCtx->meshxi);
+        fecCtx->meshxi = NULL;
+    }
+    if (fecCtx->meshxf) {
+        free(fecCtx->meshxf);
+        fecCtx->meshxf = NULL;
+    }
+    if (fecCtx->meshyi) {
+        free(fecCtx->meshyi);
+        fecCtx->meshyi = NULL;
+    }
+    if (fecCtx->meshyf) {
+        free(fecCtx->meshyf);
+        fecCtx->meshyf = NULL;
+    }
+    fecCtx->meshxi = (unsigned short*)malloc(fecCtx->fec_mesh_size * sizeof(unsigned short));
+    fecCtx->meshxf = (unsigned char*)malloc(fecCtx->fec_mesh_size * sizeof(unsigned char));
+    fecCtx->meshyi = (unsigned short*)malloc(fecCtx->fec_mesh_size * sizeof(unsigned short));
+    fecCtx->meshyf = (unsigned char*)malloc(fecCtx->fec_mesh_size * sizeof(unsigned char));
 
-    get_fec_buf(fecCtx);
 #endif
     read_mesh_table(fecCtx, fecCtx->user_config.correct_level);
     fecCtx->eState = FEC_STATE_INITIALIZED;

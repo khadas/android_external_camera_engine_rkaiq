@@ -26,7 +26,10 @@ set(BUILROOT_BUILD_PROJECT true)
 #set RK_SIMULATOR_HW
 #set(RK_SIMULATOR_HW true)
 
+if(NOT RK_SIMULATOR_HW)
 set(GENMESH_ONLINE true)
+endif()
+
 # ----------------------------------------------------------------------------
 # SET THE COMPILER PATH
 # ----------------------------------------------------------------------------

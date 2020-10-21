@@ -38,7 +38,8 @@ static XCamReturn alloc_ldch_buf(LDCHContext_t* ldchCtx)
 
 static XCamReturn release_ldch_buf(LDCHContext_t* ldchCtx)
 {
-    ldchCtx->share_mem_ops->release_mem(ldchCtx->share_mem_ctx);
+    if (ldchCtx->share_mem_ctx)
+        ldchCtx->share_mem_ops->release_mem(ldchCtx->share_mem_ctx);
 
     return XCAM_RETURN_NO_ERROR;
 }

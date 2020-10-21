@@ -78,6 +78,8 @@ pre_process(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outparams)
     else
         AgammaHandle->Scene_mode = GAMMA_OUT_HDR;
 
+    LOGD_AGAMMA(" %s: Gamma scene is:%d\n", __func__, AgammaHandle->Scene_mode);
+
     return XCAM_RETURN_NO_ERROR;
 }
 
