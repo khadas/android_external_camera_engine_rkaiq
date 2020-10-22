@@ -4362,6 +4362,7 @@ void CamHwIsp20::releaseMemResource(void *mem_ctx)
                     LOGE_CAMHW_SUBM(ISP20HW_SUBM, "munmap ldch buf info!!");
                 mem_info_array[i].map_addr = NULL;
             }
+            ::close(mem_info_array[i].fd);
         }
     } else if (drv_mem_ctx->type == MEM_TYPE_FEC) {
         rk_aiq_fec_share_mem_info_t* mem_info_array =
@@ -4373,6 +4374,7 @@ void CamHwIsp20::releaseMemResource(void *mem_ctx)
                     LOGE_CAMHW_SUBM(ISP20HW_SUBM, "munmap fec buf info!!");
                 mem_info_array[i].map_addr = NULL;
             }
+            ::close(mem_info_array[i].fd);
         }
     }
 }
