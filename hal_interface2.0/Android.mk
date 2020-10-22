@@ -15,7 +15,7 @@
 # (c) modify the Software in whole or part;(d) decompile, reverse-engineer, dissemble,
 # or attempt to derive any source code from the Software;(e) remove or obscure any copyright,
 # patent, or trademark statement or notices contained in the Software.
-#rk1126 use rkisp2.0
-ifeq ($(strip $(TARGET_BOARD_PLATFORM)),rk1126)
+# used for rkisp2.0
+ifneq ($(filter rk1126 rk356x, $(strip $(TARGET_BOARD_PLATFORM))), )
 include $(call all-subdir-makefiles)
 endif
