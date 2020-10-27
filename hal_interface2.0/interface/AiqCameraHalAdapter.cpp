@@ -331,7 +331,7 @@ AiqCameraHalAdapter::updateAfParams(XCamAfParam *afParams){
         att.AfMode = RKAIQ_AF_MODE_AUTO;
     }
 
-    afhandle->setAttrib(att);
+    afhandle->setAttrib(&att);
 }
 
 void
@@ -602,7 +602,7 @@ AiqCameraHalAdapter::updateAfMetaParams(XCamAfParam *afParams){
 //            LOGE("%s(%d) Af set unlock failed!\n", __FUNCTION__, __LINE__);
 //        }
 
-        ret = rk_aiq_user_api_af_SetAttrib(_aiq_ctx, stAfttr);
+        ret = rk_aiq_user_api_af_SetAttrib(_aiq_ctx, &stAfttr);
         if (ret) {
             LOGE("%s(%d) Af SetAttrib failed!\n", __FUNCTION__, __LINE__);
         }
