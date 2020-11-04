@@ -112,7 +112,7 @@ public:
     void processResults(SmartPtr<RkAiqFullParamsProxy> &results);
     XCamReturn getAeResults(rk_aiq_ae_results &ae_results);
     void getAeResultsDebug(rk_aiq_ae_results &ae_results, SmartPtr<rk_aiq_exposure_params_wrapper_t> exp_param);
-    XCamReturn getAfResults(rk_aiq_af_results &af_results, SmartPtr<rk_aiq_focus_params_t> focus_param);
+    XCamReturn getAfResults(rk_aiq_af_results &af_results);
     void getAfResultsDebug(rk_aiq_af_results &af_results, SmartPtr<rk_aiq_focus_params_t> focus_param);
     XCamReturn getAwbResults(rk_aiq_awb_results &awb_results);
     void getAwbResultsDebug(rk_aiq_awb_results &awb_results, SmartPtr<rk_aiq_isp_params_t> isp_param);

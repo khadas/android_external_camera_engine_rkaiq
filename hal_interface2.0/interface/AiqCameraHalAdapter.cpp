@@ -618,22 +618,21 @@ AiqCameraHalAdapter::updateAfMetaParams(XCamAfParam *afParams){
 
     pthread_mutex_lock(&_aiq_ctx_mutex);
     //when in Locked state, not run AF Algorithm
-    //TODO : nedd rk_aiq_user_api_af.h add lock/unlock interface
     if (mAfState->getState() != ANDROID_CONTROL_AF_STATE_FOCUSED_LOCKED) {
-//        ret = rk_aiq_user_api_af_Unlock(_aiq_ctx);
-//        if (ret) {
-//            LOGE("%s(%d) Af set unlock failed!\n", __FUNCTION__, __LINE__);
-//        }
+        ret = rk_aiq_uapi_lockFocus(_aiq_ctx);
+        if (ret) {
+            LOGE("%s(%d) Af set unlock failed!\n", __FUNCTION__, __LINE__);
+        }
 
         ret = rk_aiq_user_api_af_SetAttrib(_aiq_ctx, &stAfttr);
         if (ret) {
             LOGE("%s(%d) Af SetAttrib failed!\n", __FUNCTION__, __LINE__);
         }
     } else {
-//        ret = rk_aiq_user_api_af_Lock(_aiq_ctx);
-//        if (ret) {
-//            LOGE("%s(%d) Af set lock failed!\n", __FUNCTION__, __LINE__);
-//        }
+        ret = rk_aiq_uapi_unlockFocus(_aiq_ctx);
+        if (ret) {
+            LOGE("%s(%d) Af set lock failed!\n", __FUNCTION__, __LINE__);
+        }
     }
     pthread_mutex_unlock(&_aiq_ctx_mutex);
 
@@ -885,7 +884,7 @@ AiqCameraHalAdapter::processResults(SmartPtr<RkAiqFullParamsProxy> &results){
 
         //convert to af_results, need zyc TODO query interface
         rk_aiq_af_results af_results;
-        ret = getAfResults(af_results, focus_param);
+        ret = getAfResults(af_results);
         if (ret) {
             LOGE("%s(%d) getAeResults failed, ae meta is invalid!\n", __FUNCTION__, __LINE__);
         } else {
@@ -1047,22 +1046,39 @@ AiqCameraHalAdapter::getAfResultsDebug(rk_aiq_af_results &af_results,
 }
 
 XCamReturn
-AiqCameraHalAdapter::getAfResults(rk_aiq_af_results &af_results,
-                        SmartPtr<rk_aiq_focus_params_t> focus_param)
+AiqCameraHalAdapter::getAfResults(rk_aiq_af_results &af_results)
 {
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
     LOGD("@%s %d:", __FUNCTION__, __LINE__);
-    RkAiqAlgoProcResAfInt* af_pre_res_int = (RkAiqAlgoProcResAfInt*)_analyzer->mAlogsSharedParams.procResComb.af_proc_res;
-    RkAiqAlgoProcResAf* af_com = _analyzer->mAlogsSharedParams.procResComb.af_proc_res;
+    rk_aiq_af_sec_path_t gtAfPath;
 
-    //need zyc TODO get interface
-    af_results.next_lens_position = focus_param->next_lens_pos;
-    /* // RKAIQ 接口还缺如下参数， TODO
-    af_results.afc_config = focus_param->afc_config;
-    af_results.current_focus_distance = focus_param->current_focus_distance;
-    //主要以下两个
-    af_results.status = focus_param->status;
-    af_results.final_lens_position_reached = focus_param->final_lens_position_reached; */
+    ret = rk_aiq_user_api_af_GetSearchPath(_aiq_ctx, &gtAfPath);
+    if (ret) {
+        LOGE("%s(%d) GetSearchPath failed!\n", __FUNCTION__, __LINE__);
+        return ret;
+    }
+    af_results.next_lens_position = gtAfPath.search_num;
+    switch (gtAfPath.stat) {
+        case RK_AIQ_AF_SEARCH_RUNNING:
+            af_results.status = rk_aiq_af_status_local_search;
+            af_results.final_lens_position_reached = false;
+            break;
+        case RK_AIQ_AF_SEARCH_END:
+            af_results.status = rk_aiq_af_status_success;
+            af_results.final_lens_position_reached = true;
+            break;
+        case RK_AIQ_AF_SEARCH_INVAL:
+            af_results.status = rk_aiq_af_status_success;
+            af_results.final_lens_position_reached = true;
+            break;
+        default:
+            LOGE("ERROR @%s: Unknown af status %d- using idle",
+                    __FUNCTION__, af_results.status);
+             af_results.status = rk_aiq_af_status_idle;
+            break;
+    }
+
+
     return ret;
 }
 
