@@ -23,7 +23,13 @@
 
 
 AiqCameraHalAdapter::AiqCameraHalAdapter(SmartPtr<RkAiqManager> rkAiqManager,SmartPtr<RkAiqCore> analyzer,SmartPtr<ICamHw> camHw)
-:_rkAiqManager(rkAiqManager),_analyzer(analyzer),_camHw(camHw),_delay_still_capture(false), _aiq_ctx(NULL)
+: _rkAiqManager(rkAiqManager)
+, _analyzer(analyzer)
+, _camHw(camHw)
+, _delay_still_capture(false)
+, _aiq_ctx(NULL)
+, _meta (NULL)
+, _metadata (NULL)
 {
     int32_t status = OK;
     LOGD("@%s %d:", __FUNCTION__, __LINE__);
@@ -45,10 +51,17 @@ AiqCameraHalAdapter::~AiqCameraHalAdapter()
 {
     int32_t status = OK;
     LOGD("@%s %d:", __FUNCTION__, __LINE__);
+
+    deInit();
     if(_settingsProcessor)
         delete _settingsProcessor;
     _settings.clear();
     _fly_settings.clear();
+     delete _metadata;
+     _metadata = NULL;
+     /*free_camera_metadata(_meta);*/
+    _meta = NULL;
+    LOGD("@%s deinit done", __FUNCTION__);
 }
 
 void
@@ -61,6 +74,16 @@ AiqCameraHalAdapter::init(const cl_result_callback_ops_t* callbacks){
         this->_camHw->setIspStatsListener(this);
         this->_IspStatsListener = _rkAiqManager;
     }
+}
+
+void
+AiqCameraHalAdapter::deInit(){
+    LOGD("@%s %d:", __FUNCTION__, __LINE__);
+    this->_rkAiqManager = nullptr;
+    this->_analyzer = nullptr;
+    this->_camHw = nullptr;
+    this->_RkAiqAnalyzerCb = nullptr;
+    this->_IspStatsListener = nullptr;
 }
 
 SmartPtr<AiqInputParams> AiqCameraHalAdapter:: getAiqInputParams()

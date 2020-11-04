@@ -350,13 +350,14 @@ int rkisp_cl_rkaiq_init(void** cl_ctx, const char* tuning_file_path,
 
     LOGD("@%s(%d)aiq_ctx pointer(%p)",__FUNCTION__, __LINE__, aiq_ctx);
 
-    AiqCameraHalAdapter *gAiqCameraHalAdapter;
+    AiqCameraHalAdapter *gAiqCameraHalAdapter = NULL;
     if(aiq_ctx){
         gAiqCameraHalAdapter = new AiqCameraHalAdapter(aiq_ctx->_rkAiqManager,aiq_ctx->_analyzer,aiq_ctx->_camHw);
         gAiqCameraHalAdapter->init(callbacks_ops);
         gAiqCameraHalAdapter->set_aiq_ctx(aiq_ctx);
     }
     *cl_ctx = (void*)gAiqCameraHalAdapter;
+    LOGD("@%s(%d)cl_ctx pointer(%p)",__FUNCTION__, __LINE__, cl_ctx);
     return 0;
 }
 
