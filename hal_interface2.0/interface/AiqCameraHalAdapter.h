@@ -109,7 +109,8 @@ public:
     ~AiqCameraHalAdapter();
     void init(const cl_result_callback_ops_t* callbacks);
     void deInit();
-    void processResults(SmartPtr<RkAiqFullParamsProxy> &results);
+    void processResults();
+    void processResultsDebug(SmartPtr<RkAiqFullParamsProxy> &results);
     XCamReturn getAeResults(rk_aiq_ae_results &ae_results);
     void getAeResultsDebug(rk_aiq_ae_results &ae_results, SmartPtr<rk_aiq_exposure_params_wrapper_t> exp_param);
     XCamReturn getAfResults(rk_aiq_af_results &af_results);
