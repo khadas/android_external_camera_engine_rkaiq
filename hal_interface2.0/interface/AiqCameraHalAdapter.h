@@ -47,8 +47,11 @@ using ::android::hardware::camera::common::V1_0::helper::CameraMetadata;
 * v1.0.0 init
 *  - match rkaiq v1.3.0
 *  - add properties to show rkaiq & aiqAdapter lib version
+* v1.0.1
+*  - remove unnecessary code
+
 */
-#define CONFIG_AIQ_ADAPTER_LIB_VERSION "v1.0.0"
+#define CONFIG_AIQ_ADAPTER_LIB_VERSION "v1.0.1"
 
 using namespace RkCam;
 using namespace XCam;
