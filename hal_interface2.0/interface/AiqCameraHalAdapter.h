@@ -1,3 +1,21 @@
+/*
+ * AiqCameraHalAdapter.h - main rkaiq CameraHal Adapter
+ *
+ *  Copyright (c) 2020 Rockchip Corporation
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 
 #ifndef _AIQ_CAMERA_HAL_ADAPTER_H_
 #define _AIQ_CAMERA_HAL_ADAPTER_H_
@@ -27,8 +45,9 @@ using ::android::hardware::camera::common::V1_0::helper::CameraMetadata;
 /*
  ***************** AIQ ADAPTER LIB VERSION NOTE *****************
 * v1.0.0 init
+*  - match rkaiq v1.3.0
+*  - add properties to show rkaiq & aiqAdapter lib version
 */
-
 #define CONFIG_AIQ_ADAPTER_LIB_VERSION "v1.0.0"
 
 using namespace RkCam;

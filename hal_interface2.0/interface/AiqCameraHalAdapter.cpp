@@ -1,3 +1,22 @@
+/*
+ * AiqCameraHalAdapter.cpp - main rkaiq CameraHal Adapter
+ *
+ *  Copyright (c) 2020 Rockchip Corporation
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
+
 #include "AiqCameraHalAdapter.h"
 
 #include <base/xcam_log.h>
@@ -17,10 +36,18 @@
 
 #include "rkcamera_vendor_tags.h"
 #include "settings_processor.h"
+#include "RkAiqVersion.h"
 
 #define DEFAULT_ENTRY_CAP 64
 #define DEFAULT_DATA_CAP 1024
 
+#include <cutils/properties.h>
+#define PROPERTY_VALUE_MAX 32
+#define CAM_RKAIQ_PROPERTY_KEY  "vendor.cam.librkaiq.ver"
+#define CAM_RKAIQ_ADAPTER_APROPERTY_KEY  "vendor.cam.librkaiqAdapter.ver"
+
+static char rkAiqVersion[PROPERTY_VALUE_MAX] = RK_AIQ_VERSION;
+static char rkAiqAdapterVersion[PROPERTY_VALUE_MAX] = CONFIG_AIQ_ADAPTER_LIB_VERSION;
 
 AiqCameraHalAdapter::AiqCameraHalAdapter(SmartPtr<RkAiqManager> rkAiqManager,SmartPtr<RkAiqCore> analyzer,SmartPtr<ICamHw> camHw)
 : _rkAiqManager(rkAiqManager)
@@ -1480,4 +1507,11 @@ void AiqCameraHalAdapter::rkAiqCalcFailed(const char* msg){
         this->_RkAiqAnalyzerCb->rkAiqCalcFailed(msg);
     }
 }
+static void rk_aiqAdapt_init_lib(void) __attribute__((constructor));
+static void rk_aiqAdapt_init_lib(void)
+{
+	property_set(CAM_RKAIQ_PROPERTY_KEY,rkAiqVersion);
+	property_set(CAM_RKAIQ_ADAPTER_APROPERTY_KEY,rkAiqAdapterVersion);
+}
+
 
