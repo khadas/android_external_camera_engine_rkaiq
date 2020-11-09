@@ -41,6 +41,8 @@ using ::android::hardware::camera::common::V1_0::helper::CameraMetadata;
 #include "include/awb_state_machine.h"
 
 #include "settings_processor.h"
+#include "MessageQueue.h"
+#include "MessageThread.h"
 
 /*
  ***************** AIQ ADAPTER LIB VERSION NOTE *****************
@@ -49,12 +51,15 @@ using ::android::hardware::camera::common::V1_0::helper::CameraMetadata;
 *  - add properties to show rkaiq & aiqAdapter lib version
 * v1.0.1
 *  - remove unnecessary code
-
+* v1.0.2
+*  - add Message Thread deal with parameter setting & resultcb
 */
-#define CONFIG_AIQ_ADAPTER_LIB_VERSION "v1.0.1"
+
+#define CONFIG_AIQ_ADAPTER_LIB_VERSION "v1.0.2"
 
 using namespace RkCam;
 using namespace XCam;
+using namespace android::camera2;
 
 typedef struct rk_aiq_sys_ctx_s {
     const char* _sensor_entity_name;
@@ -88,10 +93,43 @@ enum USE_CASE {
   UC_RAW
 };
 
+enum MessageId {
+    MESSAGE_ID_EXIT = 0,            // call requestExitAndWait
+    MESSAGE_ID_ISP_STAT_DONE,
+    MESSAGE_ID_RKAIQ_CAL_DONE,       // partial metadata
+    MESSAGE_ID_FLUSH,
+    // max number of messages
+    MESSAGE_ID_MAX
+};
+
+struct MessageMetadataDone {
+    int resultIndex;    /*!> Index from the partial result array that is
+                             being returned */
+ };
+
+struct MessageShutterDone {
+    int64_t time;
+ };
+
+union MessageData {
+    MessageMetadataDone meta;
+    MessageShutterDone shutter;
+};
+
+/**
+ * \struct
+ * Result processor message structure
+ */
+struct Message {
+    MessageId id;
+    MessageData data;
+};
+
 //namespace RkCam {
 class AiqCameraHalAdapter:
     public RkAiqAnalyzerCb,
-    public IspStatsListener
+    public IspStatsListener,
+    public IMessageHandler
 {
 private:
     SmartPtr<RkAiqManager> _rkAiqManager;
@@ -121,14 +159,31 @@ private:
     bool _delay_still_capture;
     rk_aiq_working_mode_t _work_mode;
 
+private:  /* Members */
+    /**
+     * Thread control members
+     */
+    bool mThreadRunning;
+    MessageQueue<Message, MessageId> mMessageQueue;
+    std::unique_ptr<MessageThread> mMessageThread;
+
+private:  /* Methods */
+    /* IMessageHandler overloads */
+    status_t requestExitAndWait();
+    virtual void messageThreadLoop();
+    status_t handleMessageExit(Message &msg);
+    status_t handleIspStatCb(Message &msg);
+    status_t handleRkAiqCalcDone(Message &msg);
+    status_t handleMessageFlush(Message &msg);
+
 public:
     rk_aiq_sys_ctx_t* _aiq_ctx;
     static CameraMetadata staticMeta;
     pthread_mutex_t _aiq_ctx_mutex;
 
 public:
-    AiqCameraHalAdapter(SmartPtr<RkAiqManager> _rkAiqManager,SmartPtr<RkAiqCore> _analyzer,SmartPtr<ICamHw> _camHw);
-    ~AiqCameraHalAdapter();
+    explicit AiqCameraHalAdapter(SmartPtr<RkAiqManager> _rkAiqManager,SmartPtr<RkAiqCore> _analyzer,SmartPtr<ICamHw> _camHw);
+    virtual ~AiqCameraHalAdapter();
     void init(const cl_result_callback_ops_t* callbacks);
     void deInit();
     void processResults();
@@ -160,7 +215,7 @@ public:
     void setAiqInputParams(SmartPtr<AiqInputParams> inputParams) { _inputParams  = inputParams; };
     SmartPtr<AiqInputParams> getAiqInputParams_simple() { return _inputParams; };
 
-    void updateMetaParams(SmartPtr<VideoBuffer>& ispStats);
+    void updateMetaParams(void);
     void updateAeMetaParams(XCamAeParam *aeParams);
     void updateAfMetaParams(XCamAfParam *afParams);
     void updateAwbMetaParams(XCamAwbParam *awbParams);
@@ -174,7 +229,6 @@ public:
     XCamReturn processAwbMetaResults(rk_aiq_awb_results &awb_result, CameraMetadata *metadata);
     XCamReturn processMiscMetaResults(CameraMetadata *metadata);
     void set_working_mode(rk_aiq_working_mode_t work_mode) { _work_mode = work_mode; };
-
 };
 //}; //namespace RkCam
 

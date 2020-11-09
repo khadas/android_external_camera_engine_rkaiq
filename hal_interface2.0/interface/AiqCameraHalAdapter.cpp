@@ -18,7 +18,7 @@
  */
 
 #include "AiqCameraHalAdapter.h"
-
+#include <utils/Errors.h>
 #include <base/xcam_log.h>
 #include <hwi/isp20/Isp20StatsBuffer.h>
 #include <hwi/isp20/rkisp2-config.h>
@@ -48,15 +48,19 @@
 
 static char rkAiqVersion[PROPERTY_VALUE_MAX] = RK_AIQ_VERSION;
 static char rkAiqAdapterVersion[PROPERTY_VALUE_MAX] = CONFIG_AIQ_ADAPTER_LIB_VERSION;
+using namespace android::camera2;
 
 AiqCameraHalAdapter::AiqCameraHalAdapter(SmartPtr<RkAiqManager> rkAiqManager,SmartPtr<RkAiqCore> analyzer,SmartPtr<ICamHw> camHw)
-: _rkAiqManager(rkAiqManager)
-, _analyzer(analyzer)
-, _camHw(camHw)
-, _delay_still_capture(false)
-, _aiq_ctx(NULL)
-, _meta (NULL)
-, _metadata (NULL)
+: _rkAiqManager(rkAiqManager),
+  _analyzer(analyzer),
+  _camHw(camHw),
+  _delay_still_capture(false),
+  _aiq_ctx(NULL),
+  _meta (NULL),
+  _metadata (NULL),
+  mThreadRunning(false),
+  mMessageQueue("AiqAdatperThread", static_cast<int>(MESSAGE_ID_MAX)),
+  mMessageThread(nullptr)
 {
     int32_t status = OK;
     LOGD("@%s %d:", __FUNCTION__, __LINE__);
@@ -71,12 +75,18 @@ AiqCameraHalAdapter::AiqCameraHalAdapter(SmartPtr<RkAiqManager> rkAiqManager,Sma
     XCAM_ASSERT (_meta);
     _metadata = new CameraMetadata(_meta);
     _aiq_ctx_mutex = PTHREAD_MUTEX_INITIALIZER;
+    mMessageThread = std::unique_ptr<MessageThread>(new MessageThread(this, "AdapterThread"));
+    if (mMessageThread == nullptr) {
+        LOGE("Error creating thread");
+        return;
+    }
+    mMessageThread->run();
 
 }
 
 AiqCameraHalAdapter::~AiqCameraHalAdapter()
 {
-    int32_t status = OK;
+    status_t status = OK;
     LOGD("@%s %d:", __FUNCTION__, __LINE__);
 
     deInit();
@@ -105,12 +115,18 @@ AiqCameraHalAdapter::init(const cl_result_callback_ops_t* callbacks){
 
 void
 AiqCameraHalAdapter::deInit(){
+    status_t status = OK;
     LOGD("@%s %d:", __FUNCTION__, __LINE__);
     this->_rkAiqManager = nullptr;
     this->_analyzer = nullptr;
     this->_camHw = nullptr;
     this->_RkAiqAnalyzerCb = nullptr;
     this->_IspStatsListener = nullptr;
+    requestExitAndWait();
+    if (mMessageThread != nullptr) {
+        mMessageThread.reset();
+        mMessageThread = nullptr;
+    }
 }
 
 SmartPtr<AiqInputParams> AiqCameraHalAdapter:: getAiqInputParams()
@@ -132,14 +148,11 @@ SmartPtr<AiqInputParams> AiqCameraHalAdapter:: getAiqInputParams()
 XCamReturn 
 AiqCameraHalAdapter::ispStatsCb(SmartPtr<VideoBuffer>& ispStats){
     LOGD("@%s %d:", __FUNCTION__, __LINE__);
-    this->processResults();
-    setAiqInputParams(this->getAiqInputParams());
-    LOGD("@%s : reqId %d", __FUNCTION__, _inputParams.ptr() ? _inputParams->reqId : -1);
-    // update 3A states
-    pre_process_3A_states(_inputParams);
-    updateMetaParams(ispStats);
     //TODO
     //set_sensor_mode_data()
+    Message msg;
+    msg.id = MESSAGE_ID_ISP_STAT_DONE;
+    mMessageQueue.send(&msg, MESSAGE_ID_ISP_STAT_DONE);
 
     if(this->_IspStatsListener.ptr()){
         return this->_IspStatsListener->ispStatsCb(ispStats);
@@ -261,7 +274,7 @@ AiqCameraHalAdapter::set_control_params(const int request_frame_id,
 }
 
 void
-AiqCameraHalAdapter::updateMetaParams(SmartPtr<VideoBuffer>& ispStats){
+AiqCameraHalAdapter::updateMetaParams(void){
     LOGI("@%s %d: enter", __FUNCTION__, __LINE__);
     SmartPtr<AiqInputParams> inputParams =  getAiqInputParams_simple();
     XCamAeParam *aeParams = &inputParams->aeInputParams.aeParams;
@@ -1182,6 +1195,99 @@ void AiqCameraHalAdapter::rkAiqCalcFailed(const char* msg){
     if(this->_RkAiqAnalyzerCb.ptr()){
         this->_RkAiqAnalyzerCb->rkAiqCalcFailed(msg);
     }
+}
+void
+AiqCameraHalAdapter::messageThreadLoop()
+{
+    LOGD("@%s - Start", __FUNCTION__);
+
+    mThreadRunning = true;
+    while (mThreadRunning) {
+        status_t status = NO_ERROR;
+        Message msg;
+        mMessageQueue.receive(&msg);
+
+        LOGD("@%s, receive message id:%d", __FUNCTION__, msg.id);
+        switch (msg.id) {
+        case MESSAGE_ID_EXIT:
+            status = handleMessageExit(msg);
+            break;
+        case MESSAGE_ID_ISP_STAT_DONE:
+            status = handleIspStatCb(msg);
+            break;
+        case MESSAGE_ID_RKAIQ_CAL_DONE:
+            status = handleRkAiqCalcDone(msg);
+            break;
+        case MESSAGE_ID_FLUSH:
+            status = handleMessageFlush(msg);
+            break;
+        default:
+            LOGE("ERROR Unknown message %d", msg.id);
+            status = BAD_VALUE;
+            break;
+        }
+        if (status != NO_ERROR)
+            LOGE("error %d in handling message: %d", status,
+                    static_cast<int>(msg.id));
+        LOGD("@%s, finish message id:%d", __FUNCTION__, msg.id);
+        mMessageQueue.reply(msg.id, status);
+    }
+
+    LOGD("%s: Exit", __FUNCTION__);
+}
+
+status_t
+AiqCameraHalAdapter::requestExitAndWait()
+{
+    Message msg;
+    msg.id = MESSAGE_ID_EXIT;
+    status_t status = mMessageQueue.send(&msg, MESSAGE_ID_EXIT);
+    status |= mMessageThread->requestExitAndWait();
+    return status;
+}
+
+status_t
+AiqCameraHalAdapter::handleMessageExit(Message &msg)
+{
+    status_t status = OK;
+
+    LOGD("@%s %d:", __FUNCTION__, __LINE__);
+    mThreadRunning = false;
+    return status;
+}
+
+status_t
+AiqCameraHalAdapter::handleIspStatCb(Message &msg)
+{
+    status_t status = OK;
+
+    this->processResults();
+    setAiqInputParams(this->getAiqInputParams());
+    LOGD("@%s : reqId %d", __FUNCTION__, _inputParams.ptr() ? _inputParams->reqId : -1);
+    // update 3A states
+    pre_process_3A_states(_inputParams);
+    updateMetaParams();
+    return status;
+}
+
+status_t
+AiqCameraHalAdapter::handleRkAiqCalcDone(Message &msg)
+{
+    status_t status = OK;
+
+    LOGD("@%s %d:", __FUNCTION__, __LINE__);
+    return status;
+}
+
+status_t
+AiqCameraHalAdapter::handleMessageFlush(Message &msg)
+{
+    status_t status = OK;
+
+    LOGD("@%s %d:", __FUNCTION__, __LINE__);
+    mMessageQueue.remove(MESSAGE_ID_ISP_STAT_DONE);
+    mMessageQueue.remove(MESSAGE_ID_RKAIQ_CAL_DONE);
+    return status;
 }
 
 static void rk_aiqAdapt_init_lib(void) __attribute__((constructor));
