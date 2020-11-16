@@ -762,4 +762,149 @@ typedef struct _RkAiqAlgoPostResAwdr {
     RkAiqAlgoResCom post_res_com;
 } RkAiqAlgoPostResAwdr;
 
+// arawnr
+typedef struct _RkAiqAlgoConfigArawnr {
+    RkAiqAlgoCom com;
+} RkAiqAlgoConfigArawnr;
+
+typedef struct _RkAiqAlgoPreArawnr {
+    RkAiqAlgoCom com;
+} RkAiqAlgoPreArawnr;
+
+typedef struct _RkAiqAlgoPreResArawnr {
+    RkAiqAlgoResCom pre_res_com;
+} RkAiqAlgoPreResArawnr;
+
+typedef struct _RkAiqAlgoProcArawnr {
+    RkAiqAlgoCom com;
+} RkAiqAlgoProcArawnr;
+
+typedef struct _RkAiqAlgoProcResArawnr {
+    RkAiqAlgoResCom proc_res_com;
+} RkAiqAlgoProcResArawnr;
+
+typedef struct _RkAiqAlgoPostArawnr {
+    RkAiqAlgoCom com;
+} RkAiqAlgoPostArawnr;
+
+typedef struct _RkAiqAlgoPostResArawnr {
+    RkAiqAlgoResCom post_res_com;
+} RkAiqAlgoPostResArawnr;
+
+// amfnr
+typedef struct _RkAiqAlgoConfigAmfnr {
+    RkAiqAlgoCom com;
+} RkAiqAlgoConfigAmfnr;
+
+typedef struct _RkAiqAlgoPreAmfnr {
+    RkAiqAlgoCom com;
+} RkAiqAlgoPreAmfnr;
+
+typedef struct _RkAiqAlgoPreResAmfnr {
+    RkAiqAlgoResCom pre_res_com;
+} RkAiqAlgoPreResAmfnr;
+
+typedef struct _RkAiqAlgoProcAmfnr {
+    RkAiqAlgoCom com;
+} RkAiqAlgoProcAmfnr;
+
+typedef struct _RkAiqAlgoProcResAmfnr {
+    RkAiqAlgoResCom proc_res_com;
+} RkAiqAlgoProcResAmfnr;
+
+typedef struct _RkAiqAlgoPostAmfnr {
+    RkAiqAlgoCom com;
+} RkAiqAlgoPostAmfnr;
+
+typedef struct _RkAiqAlgoPostResAmfnr {
+    RkAiqAlgoResCom post_res_com;
+} RkAiqAlgoPostResAmfnr;
+
+// aynr
+typedef struct _RkAiqAlgoConfigAynr {
+    RkAiqAlgoCom com;
+} RkAiqAlgoConfigAynr;
+
+typedef struct _RkAiqAlgoPreAynr {
+    RkAiqAlgoCom com;
+} RkAiqAlgoPreAynr;
+
+typedef struct _RkAiqAlgoPreResAynr {
+    RkAiqAlgoResCom pre_res_com;
+} RkAiqAlgoPreResAynr;
+
+typedef struct _RkAiqAlgoProcAynr {
+    RkAiqAlgoCom com;
+} RkAiqAlgoProcAynr;
+
+typedef struct _RkAiqAlgoProcResAynr {
+    RkAiqAlgoResCom proc_res_com;
+} RkAiqAlgoProcResAynr;
+
+typedef struct _RkAiqAlgoPostAynr {
+    RkAiqAlgoCom com;
+} RkAiqAlgoPostAynr;
+
+typedef struct _RkAiqAlgoPostResAynr {
+    RkAiqAlgoResCom post_res_com;
+} RkAiqAlgoPostResAynr;
+
+// acnr
+typedef struct _RkAiqAlgoConfigAcnr {
+    RkAiqAlgoCom com;
+} RkAiqAlgoConfigAcnr;
+
+typedef struct _RkAiqAlgoPreAcnr {
+    RkAiqAlgoCom com;
+} RkAiqAlgoPreAcnr;
+
+typedef struct _RkAiqAlgoPreResAcnr {
+    RkAiqAlgoResCom pre_res_com;
+} RkAiqAlgoPreResAcnr;
+
+typedef struct _RkAiqAlgoProcAcnr {
+    RkAiqAlgoCom com;
+} RkAiqAlgoProcAcnr;
+
+typedef struct _RkAiqAlgoProcResAcnr {
+    RkAiqAlgoResCom proc_res_com;
+} RkAiqAlgoProcResAcnr;
+
+typedef struct _RkAiqAlgoPostAcnr {
+    RkAiqAlgoCom com;
+} RkAiqAlgoPostAcnr;
+
+typedef struct _RkAiqAlgoPostResAcnr {
+    RkAiqAlgoResCom post_res_com;
+} RkAiqAlgoPostResAcnr;
+
+// adrc
+typedef struct _RkAiqAlgoConfigAdrc {
+    RkAiqAlgoCom com;
+} RkAiqAlgoConfigAdrc;
+
+typedef struct _RkAiqAlgoPreAdrc {
+    RkAiqAlgoCom com;
+} RkAiqAlgoPreAdrc;
+
+typedef struct _RkAiqAlgoPreResAdrc {
+    RkAiqAlgoResCom pre_res_com;
+} RkAiqAlgoPreResAdrc;
+
+typedef struct _RkAiqAlgoProcAdrc {
+    RkAiqAlgoCom com;
+} RkAiqAlgoProcAdrc;
+
+typedef struct _RkAiqAlgoProcResAdrc {
+    RkAiqAlgoResCom proc_res_com;
+} RkAiqAlgoProcResAdrc;
+
+typedef struct _RkAiqAlgoPostAdrc {
+    RkAiqAlgoCom com;
+} RkAiqAlgoPostAdrc;
+
+typedef struct _RkAiqAlgoPostResAdrc {
+    RkAiqAlgoResCom post_res_com;
+} RkAiqAlgoPostResAdrc;
+
 #endif

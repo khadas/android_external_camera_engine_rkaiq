@@ -40,7 +40,7 @@
 #define RK_AIQ_AWB_YUV2_OUT_FRAC_BIT 4
 #define RK_AIQ_AWB_YUV2_OUT_INTEGER_BIT 8
 #define RK_AIQ_AWB_WP_WEIGHT_BIS_V201 6
-
+#define RK_AIQ_AWB_PRE_WBGAIN_FRAC_BIT 8
 
 typedef enum rk_aiq_awb_xy_type_v201_e {
     RK_AIQ_AWB_XY_TYPE_NORMAL_V201 = 0,
@@ -100,6 +100,9 @@ typedef struct rk_aiq_awb_stat_cfg_v201_s {
     unsigned short minB;
     unsigned short maxY;
     unsigned short minY;
+    uint16_t pre_wbgain_inv_r;//3i+f8;
+    uint16_t pre_wbgain_inv_g;
+    uint16_t pre_wbgain_inv_b;
     short          icrgb2RYuv_matrix[12];//3*3 matrix 9bit fracitional +0bit integer+1s
     //  3*1 off    4bit fractional +8bit integer+1s
     rk_aiq_awb_rt3dyuv_range_para_t     ic3Dyuv2Range_param[RK_AIQ_AWB_YUV_LS_PARA_NUM];
@@ -150,6 +153,6 @@ typedef struct rk_aiq_awb_stat_res_v201_s {
     rk_aiq_awb_stat_wp_res_v201_t excWpRangeResult[RK_AIQ_AWB_STAT_WP_RANGE_NUM_V201];
     //wpno histogram
     unsigned int WpNoHist[RK_AIQ_AWB_WP_HIST_BIN_NUM];
-} rk_aiq_awb_stat_res_v201_t, rk_aiq_awb_stat_res_v201_t;
+} rk_aiq_awb_stat_res_v201_t;
 
 #endif

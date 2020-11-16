@@ -25,12 +25,41 @@ cc_library_shared {
 		"include/algos",
 		"include/common/mediactl",
     ],
-	
+    export_include_dirs: [
+            "xcore",
+            "xcore/base",
+            "aiq_core",
+            "algos",
+            "iq_parser",
+            "uAPI",
+            "common",
+            "include",
+            "include/iq_parser",
+            "include/uAPI",
+            "include/xcore",
+            "include/common",
+            "include/common/mediactl",
+            "include/xcore/base",
+            "include/algos",
+    ],
+
+    header_libs: [
+        "gl_headers",
+    ],
+
+    shared_libs: [
+        "libutils",
+        "libcutils",
+        "liblog",
+    ],
+
 	srcs: [
         // AIQ_CORE_SRC
         "aiq_core/RkAiqHandle.cpp",
         "aiq_core/RkAiqHandleInt.cpp",
+        "aiq_core/RkAiqHandleIntV21.cpp",
         "aiq_core/RkAiqCore.cpp",
+        "aiq_core/RkAiqCoreV21.cpp",
         "aiq_core/RkLumaCore.cpp",
 		
 		//ALGO_COMMON_SRC
@@ -42,6 +71,7 @@ cc_library_shared {
 		//HWI_SRC
         "hwi/CamHwBase.cpp",
         "hwi/isp20/CamHwIsp20.cpp",
+        "hwi/isp21/CamHwIsp21.cpp",
         "hwi/isp20/Isp20Params.cpp",
         "hwi/isp20/Isp20PollThread.cpp",
         "hwi/isp20/Isp20StatsBuffer.cpp",
@@ -57,7 +87,7 @@ cc_library_shared {
         "iq_parser/RkAiqCalibTag.cpp",
         "iq_parser/tinyxml2.cpp",
         "iq_parser/xmltags.cpp",
-		
+        "iq_parser/RkAiqCalibApi.cpp",
 		//UAPI_SRC
         "uAPI/rk_aiq_user_api_sysctl.cpp",
         "uAPI/rk_aiq_user_api_debug.cpp",
@@ -125,6 +155,7 @@ cc_library_shared {
 		"-Wno-extern-c-compat",
 		"-fno-strict-aliasing",
 		"-frtti",
+        "-DANDROID_OS",
     ],
 	
     cppflags: [
@@ -151,6 +182,7 @@ cc_library_shared {
 		"-Wno-missing-field-initializers",
 		"-frtti",
 		"-std=c++11",
+        "-DANDROID_OS",
     ],
 	
 	//min_sdk_version: "29",

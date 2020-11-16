@@ -11,7 +11,7 @@
 #include <linux/v4l2-controls.h>
 #include "rk_isp20_hw.h"
 
-#define RKISP_API_VERSION		KERNEL_VERSION(0, 1, 0x6)
+#define RKISP_API_VERSION       KERNEL_VERSION(0, 1, 0x6)
 
 #ifndef BIT
 #define BIT(x) (~0 & (1 << x))
@@ -24,20 +24,20 @@
     _IOW('V', BASE_VIDIOC_PRIVATE + 1, int)
 
 #define RKISP_CMD_GET_SHARED_BUF \
-	_IOR('V', BASE_VIDIOC_PRIVATE + 2, struct rkisp_thunderboot_resmem)
+    _IOR('V', BASE_VIDIOC_PRIVATE + 2, struct rkisp_thunderboot_resmem)
 
 #define RKISP_CMD_FREE_SHARED_BUF \
-	_IO('V', BASE_VIDIOC_PRIVATE + 3)
+    _IO('V', BASE_VIDIOC_PRIVATE + 3)
 
 #define RKISP_CMD_SW_HDR_MODE_QUICK \
-	_IOW('V', BASE_VIDIOC_PRIVATE + 4, int)
+    _IOW('V', BASE_VIDIOC_PRIVATE + 4, int)
 
 
 #define RKISP_CMD_GET_LDCHBUF_INFO \
-	_IOR('V', BASE_VIDIOC_PRIVATE + 4, struct rkisp_ldchbuf_info)
+    _IOR('V', BASE_VIDIOC_PRIVATE + 4, struct rkisp_ldchbuf_info)
 
 #define RKISP_CMD_SET_LDCHBUF_SIZE \
-	_IOW('V', BASE_VIDIOC_PRIVATE + 5, struct rkisp_ldchbuf_size)
+    _IOW('V', BASE_VIDIOC_PRIVATE + 5, struct rkisp_ldchbuf_size)
 
 #define ISP2X_MODULE_DPCC       BIT_ULL(0)
 #define ISP2X_MODULE_BLS        BIT_ULL(1)
@@ -162,10 +162,10 @@
 
 #define ISP2X_3DLUT_DATA_NUM        729
 
-#define ISP2X_LDCH_MESH_XY_NUM		0x80000
-#define ISP2X_LDCH_BUF_NUM	    	2
+#define ISP2X_LDCH_MESH_XY_NUM      0x80000
+#define ISP2X_LDCH_BUF_NUM          2
 
-#define ISP2X_THUNDERBOOT_VIDEO_BUF_NUM	30
+#define ISP2X_THUNDERBOOT_VIDEO_BUF_NUM 30
 
 /*
  * ISP2X_HDR_MODE_NOMAL: linear mode
@@ -173,9 +173,9 @@
  * ISP2X_HDR_MODE_X3: hdr three or line mode
  */
 enum isp2x_hdr_mode {
-	ISP2X_HDR_MODE_NOMAL,
-	ISP2X_HDR_MODE_X2,
-	ISP2X_HDR_MODE_X3,
+    ISP2X_HDR_MODE_NOMAL,
+    ISP2X_HDR_MODE_X2,
+    ISP2X_HDR_MODE_X3,
 };
 
 /* trigger event mode
@@ -188,17 +188,17 @@ enum isp2x_hdr_mode {
  * T_START_X3: isp read hdr three frame
  */
 enum isp2x_trigger_mode {
-	T_TRY = BIT(0),
-	T_TRY_YES = BIT(1),
-	T_TRY_NO = BIT(2),
+    T_TRY = BIT(0),
+    T_TRY_YES = BIT(1),
+    T_TRY_NO = BIT(2),
 
-	T_START_X1 = BIT(4),
-	T_START_X2 = BIT(5),
-	T_START_X3 = BIT(6),
+    T_START_X1 = BIT(4),
+    T_START_X2 = BIT(5),
+    T_START_X3 = BIT(6),
 };
 
 struct isp2x_csi_trigger {
-	/* timestamp in ns */
+    /* timestamp in ns */
     u64 frame_timestamp;
     u32 frame_id;
     int times;
@@ -718,13 +718,13 @@ struct isp2x_wdr_cfg {
 } __attribute__ ((packed));
 
 struct isp2x_dhaz_cfg {
-	u8 enhance_en;
-	u8 hist_chn;
-	u8 hpara_en;
-	u8 hist_en;
-	u8 dc_en;
-	u8 big_en;
-	u8 nobig_en;
+    u8 enhance_en;
+    u8 hist_chn;
+    u8 hpara_en;
+    u8 hist_en;
+    u8 dc_en;
+    u8 big_en;
+    u8 nobig_en;
 
     u8 yblk_th;
     u8 yhist_th;
@@ -902,24 +902,24 @@ struct isp2x_3dlut_cfg {
 } __attribute__ ((packed));
 
 enum isp2x_ldch_buf_stat {
-	LDCH_BUF_INIT = 0,
-	LDCH_BUF_WAIT2CHIP,
-	LDCH_BUF_CHIPINUSE,
+    LDCH_BUF_INIT = 0,
+    LDCH_BUF_WAIT2CHIP,
+    LDCH_BUF_CHIPINUSE,
 };
 
 struct rkisp_ldchbuf_info {
-	u32 buf_fd[ISP2X_LDCH_BUF_NUM];
-	u32 buf_size[ISP2X_LDCH_BUF_NUM];
+    u32 buf_fd[ISP2X_LDCH_BUF_NUM];
+    u32 buf_size[ISP2X_LDCH_BUF_NUM];
 } __attribute__ ((packed));
 
 struct rkisp_ldchbuf_size {
-	u32 meas_width;
-	u32 meas_height;
+    u32 meas_width;
+    u32 meas_height;
 } __attribute__ ((packed));
 
 struct isp2x_ldch_head {
-	enum isp2x_ldch_buf_stat stat;
-	u32 data_oft;
+    enum isp2x_ldch_buf_stat stat;
+    u32 data_oft;
 } __attribute__ ((packed));
 
 struct isp2x_ldch_cfg {
@@ -965,9 +965,9 @@ struct isp2x_rawawb_meas_cfg {
     u8 sw_rawawb_store_wp_flag_ls_idx2; //BLK_CTRL
     u8 sw_rawawb_store_wp_flag_ls_idx1; //BLK_CTRL
     u8 sw_rawawb_store_wp_flag_ls_idx0; //BLK_CTRL
-	u16 sw_rawawb_store_wp_th0;		//BLK_CTRL
-	u16 sw_rawawb_store_wp_th1;		//BLK_CTRL
-	u16 sw_rawawb_store_wp_th2;		//RAW_CTRL
+    u16 sw_rawawb_store_wp_th0;     //BLK_CTRL
+    u16 sw_rawawb_store_wp_th1;     //BLK_CTRL
+    u16 sw_rawawb_store_wp_th2;     //RAW_CTRL
     u16 sw_rawawb_v_offs;           //WIN_OFFS
     u16 sw_rawawb_h_offs;           //WIN_OFFS
     u16 sw_rawawb_v_size;           //WIN_SIZE
@@ -1439,7 +1439,7 @@ struct isp2x_isp_other_cfg {
     struct isp2x_dhaz_cfg dhaz_cfg;
     struct isp2x_gain_cfg gain_cfg;
     struct isp2x_3dlut_cfg isp3dlut_cfg;
-	struct isp2x_ldch_cfg ldch_cfg;
+    struct isp2x_ldch_cfg ldch_cfg;
 } __attribute__ ((packed));
 
 struct isp2x_isp_meas_cfg {
@@ -1464,7 +1464,7 @@ struct isp2x_isp_params_cfg {
     u64 module_ens;
     u64 module_cfg_update;
 
-	u32 frame_id;
+    u32 frame_id;
     struct isp2x_isp_meas_cfg meas;
     struct isp2x_isp_other_cfg others;  // must be last item
 } __attribute__ ((packed));
@@ -1573,6 +1573,12 @@ struct isp2x_sihst_stat {
     struct isp2x_sihst_win_stat win_stat[ISP2X_SIHIST_WIN_NUM];
 } __attribute__ ((packed));
 
+/*NOTE: name of rawae/rawhist channel has been renamed!
+   RawAE0 = RawAE lite,  addr=0x4500  <=> RawHIST0
+   RawAE1 = RawAE big2, addr=0x4600 <=> RawHIST1
+   RawAE2 = RawAE big3, addr=0x4700 <=> RawHIST2
+   RawAE3 = RawAE big1, addr=0x4400, extra aebig <=> RawHIST3
+*/
 struct isp2x_stat {
     struct isp2x_siawb_stat siawb;
     struct isp2x_rawawb_meas_stat rawawb;
@@ -1635,38 +1641,38 @@ struct rkisp_isp2x_luma_buffer {
  * struct rkisp_thunderboot_video_buf
  */
 struct rkisp_thunderboot_video_buf {
-	u32 index;
-	u32 frame_id;
-	u32 timestamp;
-	u32 time_reg;
-	u32 gain_reg;
-	u32 bufaddr;
-	u32 bufsize;
+    u32 index;
+    u32 frame_id;
+    u32 timestamp;
+    u32 time_reg;
+    u32 gain_reg;
+    u32 bufaddr;
+    u32 bufsize;
 } __attribute__ ((packed));
 
 /**
  * struct rkisp_thunderboot_resmem_head
  */
 struct rkisp_thunderboot_resmem_head {
-	u16 enable;
-	u16 complete;
-	u16 frm_total;
-	u16 hdr_mode;
-	u16 width;
-	u16 height;
-	u32 bus_fmt;
+    u16 enable;
+    u16 complete;
+    u16 frm_total;
+    u16 hdr_mode;
+    u16 width;
+    u16 height;
+    u32 bus_fmt;
 
-	struct rkisp_thunderboot_video_buf l_buf[ISP2X_THUNDERBOOT_VIDEO_BUF_NUM];
-	struct rkisp_thunderboot_video_buf m_buf[ISP2X_THUNDERBOOT_VIDEO_BUF_NUM];
-	struct rkisp_thunderboot_video_buf s_buf[ISP2X_THUNDERBOOT_VIDEO_BUF_NUM];
+    struct rkisp_thunderboot_video_buf l_buf[ISP2X_THUNDERBOOT_VIDEO_BUF_NUM];
+    struct rkisp_thunderboot_video_buf m_buf[ISP2X_THUNDERBOOT_VIDEO_BUF_NUM];
+    struct rkisp_thunderboot_video_buf s_buf[ISP2X_THUNDERBOOT_VIDEO_BUF_NUM];
 } __attribute__ ((packed));
 
 /**
  * struct rkisp_thunderboot_resmem - shared buffer for thunderboot with risc-v side
  */
 struct rkisp_thunderboot_resmem {
-	u32 resmem_padr;
-	u32 resmem_size;
+    u32 resmem_padr;
+    u32 resmem_size;
 } __attribute__ ((packed));
 
 #endif /* _UAPI_RKISP2_CONFIG_H */

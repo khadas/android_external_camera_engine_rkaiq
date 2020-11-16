@@ -424,7 +424,7 @@ AdpccResult_t dpcc_expert_mode_basic_params_init(Adpcc_basic_params_t *pBasic, C
 
         //mode 0x0000
         pBasic->arBasic[i].stage1_enable = pCalib->expert.stage1_Enable[i];
-        pBasic->arBasic[i].grayscale_mode = pCalib->expert.grayscale_mode[i];
+        pBasic->arBasic[i].grayscale_mode = pCalib->expert.grayscale_mode;
         pBasic->arBasic[i].enable = pCalib->enable;
 
         //output_mode 0x0004
@@ -442,136 +442,136 @@ AdpccResult_t dpcc_expert_mode_basic_params_init(Adpcc_basic_params_t *pBasic, C
         pBasic->arBasic[i].stage1_use_set_1 = pCalib->expert.stage1_use_set1[i];
 
         //methods_set_1 0x000c
-        pBasic->arBasic[i].sw_rk_red_blue1_en = pCalib->expert.set[0].red_blue_enable[0][i];
-        pBasic->arBasic[i].rg_red_blue1_enable = pCalib->expert.set[0].red_blue_enable[1][i];
-        pBasic->arBasic[i].rnd_red_blue1_enable = pCalib->expert.set[0].red_blue_enable[2][i];
-        pBasic->arBasic[i].ro_red_blue1_enable = pCalib->expert.set[0].red_blue_enable[3][i];
-        pBasic->arBasic[i].lc_red_blue1_enable = pCalib->expert.set[0].red_blue_enable[4][i];
-        pBasic->arBasic[i].pg_red_blue1_enable = pCalib->expert.set[0].red_blue_enable[5][i];
-        pBasic->arBasic[i].sw_rk_green1_en = pCalib->expert.set[0].green_enable[0][i];
-        pBasic->arBasic[i].rg_green1_enable = pCalib->expert.set[0].green_enable[1][i];
-        pBasic->arBasic[i].rnd_green1_enable = pCalib->expert.set[0].green_enable[2][i];
-        pBasic->arBasic[i].ro_green1_enable = pCalib->expert.set[0].green_enable[3][i];
-        pBasic->arBasic[i].lc_green1_enable = pCalib->expert.set[0].green_enable[4][i];
-        pBasic->arBasic[i].pg_green1_enable = pCalib->expert.set[0].green_enable[5][i];
+        pBasic->arBasic[i].sw_rk_red_blue1_en = pCalib->expert.set[0].rk.rb_enable[i];
+        pBasic->arBasic[i].rg_red_blue1_enable = pCalib->expert.set[0].rg.rb_enable[i];
+        pBasic->arBasic[i].rnd_red_blue1_enable = pCalib->expert.set[0].rnd.rb_enable[i];
+        pBasic->arBasic[i].ro_red_blue1_enable = pCalib->expert.set[0].ro.rb_enable[i];
+        pBasic->arBasic[i].lc_red_blue1_enable = pCalib->expert.set[0].lc.rb_enable[i];
+        pBasic->arBasic[i].pg_red_blue1_enable = pCalib->expert.set[0].pg.rb_enable[i];
+        pBasic->arBasic[i].sw_rk_green1_en = pCalib->expert.set[0].rk.g_enable[i];
+        pBasic->arBasic[i].rg_green1_enable = pCalib->expert.set[0].rg.g_enable[i];
+        pBasic->arBasic[i].rnd_green1_enable = pCalib->expert.set[0].rnd.g_enable[i];
+        pBasic->arBasic[i].ro_green1_enable = pCalib->expert.set[0].ro.g_enable[i];
+        pBasic->arBasic[i].lc_green1_enable = pCalib->expert.set[0].lc.g_enable[i];
+        pBasic->arBasic[i].pg_green1_enable = pCalib->expert.set[0].pg.g_enable[i];
 
         //methods_set_2 0x0010
-        pBasic->arBasic[i].sw_rk_red_blue2_en = pCalib->expert.set[1].red_blue_enable[0][i];
-        pBasic->arBasic[i].rg_red_blue2_enable = pCalib->expert.set[1].red_blue_enable[1][i];
-        pBasic->arBasic[i].rnd_red_blue2_enable = pCalib->expert.set[1].red_blue_enable[2][i];
-        pBasic->arBasic[i].ro_red_blue2_enable = pCalib->expert.set[1].red_blue_enable[3][i];
-        pBasic->arBasic[i].lc_red_blue2_enable = pCalib->expert.set[1].red_blue_enable[4][i];
-        pBasic->arBasic[i].pg_red_blue2_enable = pCalib->expert.set[1].red_blue_enable[5][i];
-        pBasic->arBasic[i].sw_rk_green2_en = pCalib->expert.set[1].green_enable[0][i];
-        pBasic->arBasic[i].rg_green2_enable = pCalib->expert.set[1].green_enable[1][i];
-        pBasic->arBasic[i].rnd_green2_enable = pCalib->expert.set[1].green_enable[2][i];
-        pBasic->arBasic[i].ro_green2_enable = pCalib->expert.set[1].green_enable[3][i];
-        pBasic->arBasic[i].lc_green2_enable = pCalib->expert.set[1].green_enable[4][i];
-        pBasic->arBasic[i].pg_green2_enable = pCalib->expert.set[1].green_enable[5][i];
+        pBasic->arBasic[i].sw_rk_red_blue2_en = pCalib->expert.set[1].rk.rb_enable[i];
+        pBasic->arBasic[i].rg_red_blue2_enable = pCalib->expert.set[1].rg.rb_enable[i];
+        pBasic->arBasic[i].rnd_red_blue2_enable = pCalib->expert.set[1].rnd.rb_enable[i];
+        pBasic->arBasic[i].ro_red_blue2_enable = pCalib->expert.set[1].ro.rb_enable[i];
+        pBasic->arBasic[i].lc_red_blue2_enable = pCalib->expert.set[1].lc.rb_enable[i];
+        pBasic->arBasic[i].pg_red_blue2_enable = pCalib->expert.set[1].pg.rb_enable[i];
+        pBasic->arBasic[i].sw_rk_green2_en = pCalib->expert.set[1].rk.g_enable[i];
+        pBasic->arBasic[i].rg_green2_enable = pCalib->expert.set[1].rg.g_enable[i];
+        pBasic->arBasic[i].rnd_green2_enable = pCalib->expert.set[1].rnd.g_enable[i];
+        pBasic->arBasic[i].ro_green2_enable = pCalib->expert.set[1].ro.g_enable[i];
+        pBasic->arBasic[i].lc_green2_enable = pCalib->expert.set[1].lc.g_enable[i];
+        pBasic->arBasic[i].pg_green2_enable = pCalib->expert.set[1].pg.g_enable[i];
 
         //methods_set_3 0x0014
-        pBasic->arBasic[i].sw_rk_red_blue3_en = pCalib->expert.set[2].red_blue_enable[0][i];
-        pBasic->arBasic[i].rg_red_blue3_enable = pCalib->expert.set[2].red_blue_enable[1][i];
-        pBasic->arBasic[i].rnd_red_blue3_enable = pCalib->expert.set[2].red_blue_enable[2][i];
-        pBasic->arBasic[i].ro_red_blue3_enable = pCalib->expert.set[2].red_blue_enable[3][i];
-        pBasic->arBasic[i].lc_red_blue3_enable = pCalib->expert.set[2].red_blue_enable[4][i];
-        pBasic->arBasic[i].pg_red_blue3_enable = pCalib->expert.set[2].red_blue_enable[5][i];
-        pBasic->arBasic[i].sw_rk_green3_en = pCalib->expert.set[2].green_enable[0][i];
-        pBasic->arBasic[i].rg_green3_enable = pCalib->expert.set[2].green_enable[1][i];
-        pBasic->arBasic[i].rnd_green3_enable = pCalib->expert.set[2].green_enable[2][i];
-        pBasic->arBasic[i].ro_green3_enable = pCalib->expert.set[2].green_enable[3][i];
-        pBasic->arBasic[i].lc_green3_enable = pCalib->expert.set[2].green_enable[4][i];
-        pBasic->arBasic[i].pg_green3_enable = pCalib->expert.set[2].green_enable[5][i];
+        pBasic->arBasic[i].sw_rk_red_blue3_en = pCalib->expert.set[2].rk.rb_enable[i];
+        pBasic->arBasic[i].rg_red_blue3_enable = pCalib->expert.set[2].rg.rb_enable[i];
+        pBasic->arBasic[i].rnd_red_blue3_enable = pCalib->expert.set[2].rnd.rb_enable[i];
+        pBasic->arBasic[i].ro_red_blue3_enable = pCalib->expert.set[2].ro.rb_enable[i];
+        pBasic->arBasic[i].lc_red_blue3_enable = pCalib->expert.set[2].lc.rb_enable[i];
+        pBasic->arBasic[i].pg_red_blue3_enable = pCalib->expert.set[2].pg.rb_enable[i];
+        pBasic->arBasic[i].sw_rk_green3_en = pCalib->expert.set[2].rk.g_enable[i];
+        pBasic->arBasic[i].rg_green3_enable = pCalib->expert.set[2].rg.g_enable[i];
+        pBasic->arBasic[i].rnd_green3_enable = pCalib->expert.set[2].rnd.g_enable[i];
+        pBasic->arBasic[i].ro_green3_enable = pCalib->expert.set[2].ro.g_enable[i];
+        pBasic->arBasic[i].lc_green3_enable = pCalib->expert.set[2].lc.g_enable[i];
+        pBasic->arBasic[i].pg_green3_enable = pCalib->expert.set[2].pg.g_enable[i];
 
         //line_thresh_1 0x0018
-        pBasic->arBasic[i].sw_mindis1_rb = pCalib->expert.set[0].line_thresh[0][i];
-        pBasic->arBasic[i].sw_mindis1_g = pCalib->expert.set[0].line_thresh[1][i];
-        pBasic->arBasic[i].line_thr_1_rb = pCalib->expert.set[0].line_thresh[2][i];
-        pBasic->arBasic[i].line_thr_1_g = pCalib->expert.set[0].line_thresh[3][i];
+        pBasic->arBasic[i].sw_mindis1_rb = pCalib->expert.set[0].rk.rb_sw_mindis[i];
+        pBasic->arBasic[i].sw_mindis1_g = pCalib->expert.set[0].rk.g_sw_mindis[i];
+        pBasic->arBasic[i].line_thr_1_rb = pCalib->expert.set[0].lc.rb_line_thr[i];
+        pBasic->arBasic[i].line_thr_1_g = pCalib->expert.set[0].lc.g_line_thr[i];
 
         //line_mad_fac_1 0x001c
-        pBasic->arBasic[i].sw_dis_scale_min1 = pCalib->expert.set[0].line_mad_fac[0][i];
-        pBasic->arBasic[i].sw_dis_scale_max1 = pCalib->expert.set[0].line_mad_fac[1][i];
-        pBasic->arBasic[i].line_mad_fac_1_rb = pCalib->expert.set[0].line_mad_fac[2][i];
-        pBasic->arBasic[i].line_mad_fac_1_g = pCalib->expert.set[0].line_mad_fac[3][i];
+        pBasic->arBasic[i].sw_dis_scale_min1 = pCalib->expert.set[0].rk.sw_dis_scale_min[i];
+        pBasic->arBasic[i].sw_dis_scale_max1 = pCalib->expert.set[0].rk.sw_dis_scale_max[i];
+        pBasic->arBasic[i].line_mad_fac_1_rb = pCalib->expert.set[0].lc.rb_line_mad_fac[i];
+        pBasic->arBasic[i].line_mad_fac_1_g = pCalib->expert.set[0].lc.g_line_mad_fac[i];
 
         //pg_fac_1 0x0020
-        pBasic->arBasic[i].pg_fac_1_rb = pCalib->expert.set[0].pg_fac[0][i];
-        pBasic->arBasic[i].pg_fac_1_g = pCalib->expert.set[0].pg_fac[1][i];
+        pBasic->arBasic[i].pg_fac_1_rb = pCalib->expert.set[0].pg.rb_pg_fac[i];
+        pBasic->arBasic[i].pg_fac_1_g = pCalib->expert.set[0].pg.g_pg_fac[i];
 
         //rnd_thresh_1 0x0024
-        pBasic->arBasic[i].rnd_thr_1_rb = pCalib->expert.set[0].rnd_thresh[0][i];
-        pBasic->arBasic[i].rnd_thr_1_g = pCalib->expert.set[0].rnd_thresh[1][i];
+        pBasic->arBasic[i].rnd_thr_1_rb = pCalib->expert.set[0].rnd.rb_rnd_thr[i];
+        pBasic->arBasic[i].rnd_thr_1_g = pCalib->expert.set[0].rnd.g_rnd_thr[i];
 
         //rg_fac_1 0x0028
-        pBasic->arBasic[i].rg_fac_1_rb = pCalib->expert.set[0].rg_fac[0][i];
-        pBasic->arBasic[i].rg_fac_1_g = pCalib->expert.set[0].rg_fac[1][i];
+        pBasic->arBasic[i].rg_fac_1_rb = pCalib->expert.set[0].rg.rb_rg_fac[i];
+        pBasic->arBasic[i].rg_fac_1_g = pCalib->expert.set[0].rg.g_rg_fac[i];
 
 
         //line_thresh_2 0x002c
-        pBasic->arBasic[i].sw_mindis2_rb = pCalib->expert.set[1].line_thresh[0][i];
-        pBasic->arBasic[i].sw_mindis2_g = pCalib->expert.set[1].line_thresh[1][i];
-        pBasic->arBasic[i].line_thr_2_rb = pCalib->expert.set[1].line_thresh[2][i];
-        pBasic->arBasic[i].line_thr_2_g = pCalib->expert.set[1].line_thresh[3][i];
+        pBasic->arBasic[i].sw_mindis2_rb = pCalib->expert.set[1].rk.rb_sw_mindis[i];
+        pBasic->arBasic[i].sw_mindis2_g = pCalib->expert.set[1].rk.g_sw_mindis[i];
+        pBasic->arBasic[i].line_thr_2_rb = pCalib->expert.set[1].lc.rb_line_thr[i];
+        pBasic->arBasic[i].line_thr_2_g = pCalib->expert.set[1].lc.g_line_thr[i];
 
         //line_mad_fac_2 0x0030
-        pBasic->arBasic[i].sw_dis_scale_min2 = pCalib->expert.set[1].line_mad_fac[0][i];
-        pBasic->arBasic[i].sw_dis_scale_max2 = pCalib->expert.set[1].line_mad_fac[1][i];
-        pBasic->arBasic[i].line_mad_fac_2_rb = pCalib->expert.set[1].line_mad_fac[2][i];
-        pBasic->arBasic[i].line_mad_fac_2_g = pCalib->expert.set[1].line_mad_fac[3][i];
+        pBasic->arBasic[i].sw_dis_scale_min2 = pCalib->expert.set[1].rk.sw_dis_scale_min[i];
+        pBasic->arBasic[i].sw_dis_scale_max2 = pCalib->expert.set[1].rk.sw_dis_scale_max[i];
+        pBasic->arBasic[i].line_mad_fac_2_rb = pCalib->expert.set[1].lc.rb_line_mad_fac[i];
+        pBasic->arBasic[i].line_mad_fac_2_g = pCalib->expert.set[1].lc.g_line_mad_fac[i];
 
         //pg_fac_2 0x0034
-        pBasic->arBasic[i].pg_fac_2_rb = pCalib->expert.set[1].pg_fac[0][i];
-        pBasic->arBasic[i].pg_fac_2_g = pCalib->expert.set[1].pg_fac[1][i];
+        pBasic->arBasic[i].pg_fac_2_rb = pCalib->expert.set[1].pg.rb_pg_fac[i];
+        pBasic->arBasic[i].pg_fac_2_g = pCalib->expert.set[1].pg.g_pg_fac[i];
 
         //rnd_thresh_2 0x0038
-        pBasic->arBasic[i].rnd_thr_2_rb = pCalib->expert.set[1].rnd_thresh[0][i];
-        pBasic->arBasic[i].rnd_thr_2_g = pCalib->expert.set[1].rnd_thresh[1][i];
+        pBasic->arBasic[i].rnd_thr_2_rb = pCalib->expert.set[1].rnd.rb_rnd_thr[i];
+        pBasic->arBasic[i].rnd_thr_2_g = pCalib->expert.set[1].rnd.g_rnd_thr[i];
 
         //rg_fac_2 0x003c
-        pBasic->arBasic[i].rg_fac_2_rb = pCalib->expert.set[1].rg_fac[0][i];
-        pBasic->arBasic[i].rg_fac_2_g = pCalib->expert.set[1].rg_fac[1][i];
+        pBasic->arBasic[i].rg_fac_2_rb = pCalib->expert.set[1].rg.rb_rg_fac[i];
+        pBasic->arBasic[i].rg_fac_2_g = pCalib->expert.set[1].rg.g_rg_fac[i];
 
 
         //line_thresh_3 0x0040
-        pBasic->arBasic[i].sw_mindis3_rb = pCalib->expert.set[2].line_thresh[0][i];
-        pBasic->arBasic[i].sw_mindis3_g = pCalib->expert.set[2].line_thresh[1][i];
-        pBasic->arBasic[i].line_thr_3_rb = pCalib->expert.set[2].line_thresh[2][i];
-        pBasic->arBasic[i].line_thr_3_g = pCalib->expert.set[2].line_thresh[3][i];
+        pBasic->arBasic[i].sw_mindis3_rb = pCalib->expert.set[2].rk.rb_sw_mindis[i];
+        pBasic->arBasic[i].sw_mindis3_g = pCalib->expert.set[2].rk.g_sw_mindis[i];
+        pBasic->arBasic[i].line_thr_3_rb = pCalib->expert.set[2].lc.rb_line_thr[i];
+        pBasic->arBasic[i].line_thr_3_g = pCalib->expert.set[2].lc.g_line_thr[i];
 
         //line_mad_fac_3 0x0044
-        pBasic->arBasic[i].sw_dis_scale_min3 = pCalib->expert.set[2].line_mad_fac[0][i];
-        pBasic->arBasic[i].sw_dis_scale_max3 = pCalib->expert.set[2].line_mad_fac[1][i];
-        pBasic->arBasic[i].line_mad_fac_3_rb = pCalib->expert.set[2].line_mad_fac[2][i];
-        pBasic->arBasic[i].line_mad_fac_3_g = pCalib->expert.set[2].line_mad_fac[3][i];
+        pBasic->arBasic[i].sw_dis_scale_min3 = pCalib->expert.set[2].rk.sw_dis_scale_min[i];
+        pBasic->arBasic[i].sw_dis_scale_max3 = pCalib->expert.set[2].rk.sw_dis_scale_max[i];
+        pBasic->arBasic[i].line_mad_fac_3_rb = pCalib->expert.set[2].lc.rb_line_mad_fac[i];
+        pBasic->arBasic[i].line_mad_fac_3_g = pCalib->expert.set[2].lc.g_line_mad_fac[i];
 
         //pg_fac_3 0x0048
-        pBasic->arBasic[i].pg_fac_3_rb = pCalib->expert.set[2].pg_fac[0][i];
-        pBasic->arBasic[i].pg_fac_3_g = pCalib->expert.set[2].pg_fac[1][i];
+        pBasic->arBasic[i].pg_fac_3_rb = pCalib->expert.set[2].pg.rb_pg_fac[i];
+        pBasic->arBasic[i].pg_fac_3_g = pCalib->expert.set[2].pg.g_pg_fac[i];
 
         //rnd_thresh_3 0x004c
-        pBasic->arBasic[i].rnd_thr_3_rb = pCalib->expert.set[2].rnd_thresh[0][i];
-        pBasic->arBasic[i].rnd_thr_3_g = pCalib->expert.set[2].rnd_thresh[1][i];
+        pBasic->arBasic[i].rnd_thr_3_rb = pCalib->expert.set[2].rnd.rb_rnd_thr[i];
+        pBasic->arBasic[i].rnd_thr_3_g = pCalib->expert.set[2].rnd.g_rnd_thr[i];
 
         //rg_fac_3 0x0050
-        pBasic->arBasic[i].rg_fac_3_rb = pCalib->expert.set[2].rg_fac[0][i];
-        pBasic->arBasic[i].rg_fac_3_g = pCalib->expert.set[2].rg_fac[1][i];
+        pBasic->arBasic[i].rg_fac_3_rb = pCalib->expert.set[2].rg.rb_rg_fac[i];
+        pBasic->arBasic[i].rg_fac_3_g = pCalib->expert.set[2].rg.g_rg_fac[i];
 
         //ro_limits 0x0054
-        pBasic->arBasic[i].ro_lim_3_rb = pCalib->expert.set[2].ro_lim[0][i];
-        pBasic->arBasic[i].ro_lim_3_g = pCalib->expert.set[2].ro_lim[1][i];
-        pBasic->arBasic[i].ro_lim_2_rb = pCalib->expert.set[1].ro_lim[0][i];
-        pBasic->arBasic[i].ro_lim_2_g = pCalib->expert.set[1].ro_lim[1][i];
-        pBasic->arBasic[i].ro_lim_1_rb = pCalib->expert.set[0].ro_lim[0][i];
-        pBasic->arBasic[i].ro_lim_1_g = pCalib->expert.set[0].ro_lim[1][i];
+        pBasic->arBasic[i].ro_lim_3_rb = pCalib->expert.set[2].ro.rb_ro_lim[i];
+        pBasic->arBasic[i].ro_lim_3_g = pCalib->expert.set[2].ro.g_ro_lim[i];
+        pBasic->arBasic[i].ro_lim_2_rb = pCalib->expert.set[1].ro.rb_ro_lim[i];
+        pBasic->arBasic[i].ro_lim_2_g = pCalib->expert.set[1].ro.g_ro_lim[i];
+        pBasic->arBasic[i].ro_lim_1_rb = pCalib->expert.set[0].ro.rb_ro_lim[i];
+        pBasic->arBasic[i].ro_lim_1_g = pCalib->expert.set[0].ro.g_ro_lim[i];
 
         //rnd_offs 0x0058
-        pBasic->arBasic[i].rnd_offs_3_rb = pCalib->expert.set[2].rnd_offs[0][i];
-        pBasic->arBasic[i].rnd_offs_3_g = pCalib->expert.set[2].rnd_offs[1][i];
-        pBasic->arBasic[i].rnd_offs_2_rb = pCalib->expert.set[1].rnd_offs[0][i];
-        pBasic->arBasic[i].rnd_offs_2_g = pCalib->expert.set[1].rnd_offs[1][i];
-        pBasic->arBasic[i].rnd_offs_1_rb = pCalib->expert.set[0].rnd_offs[0][i];
-        pBasic->arBasic[i].rnd_offs_1_g = pCalib->expert.set[0].rnd_offs[1][i];
+        pBasic->arBasic[i].rnd_offs_3_rb = pCalib->expert.set[2].rnd.rb_rnd_offs[i];
+        pBasic->arBasic[i].rnd_offs_3_g = pCalib->expert.set[2].rnd.g_rnd_offs[i];
+        pBasic->arBasic[i].rnd_offs_2_rb = pCalib->expert.set[1].rnd.rb_rnd_offs[i];
+        pBasic->arBasic[i].rnd_offs_2_g = pCalib->expert.set[1].rnd.g_rnd_offs[i];
+        pBasic->arBasic[i].rnd_offs_1_rb = pCalib->expert.set[0].rnd.rb_rnd_offs[i];
+        pBasic->arBasic[i].rnd_offs_1_g = pCalib->expert.set[0].rnd.g_rnd_offs[i];
 
     }
 
@@ -2711,6 +2711,7 @@ AdpccResult_t AdpccInit(AdpccContext_t **ppAdpccCtx, CamCalibDbContext_t *pCalib
 #if 1
     //init fix param for algo
     pAdpccCtx->stDpccCalib = pCalibDb->dpcc;
+    pAdpccCtx->stTool = pCalibDb->dpcc;
     dpcc_expert_mode_basic_params_init(&pAdpccCtx->stAuto.stBasicParams, &pAdpccCtx->stDpccCalib);
     dpcc_fast_mode_basic_params_init(&pAdpccCtx->stAuto.stFastMode, &pAdpccCtx->stDpccCalib);
     dpcc_pdaf_params_init(&pAdpccCtx->stAuto.stPdafParams, &pAdpccCtx->stDpccCalib.pdaf);
@@ -2809,6 +2810,7 @@ AdpccResult_t AdpccProcess(AdpccContext_t *pAdpccCtx, AdpccExpInfo_t *pExpInfo)
 
     if(pAdpccCtx->eMode == ADPCC_OP_MODE_AUTO) {
         bool fast_enable = pAdpccCtx->stAuto.stFastMode.fast_mode_en == 0 ? false : true;
+
         if(fast_enable == false)
             ret = Expert_mode_select_basic_params_by_ISO(&pAdpccCtx->stAuto.stBasicParams, &pAdpccCtx->stAuto.stBasicSelect, pExpInfo);
         else
@@ -2835,6 +2837,28 @@ AdpccResult_t AdpccProcess(AdpccContext_t *pAdpccCtx, AdpccExpInfo_t *pExpInfo)
         if(pAdpccCtx->stManual.stSensorDpcc.en)
             Api_Sensor_dpcc_process(pAdpccCtx);
     }
+    else if(pAdpccCtx->eMode == ADPCC_OP_MODE_TOOL) {
+        dpcc_expert_mode_basic_params_init(&pAdpccCtx->stAuto.stBasicParams, &pAdpccCtx->stTool);
+        dpcc_fast_mode_basic_params_init(&pAdpccCtx->stAuto.stFastMode, &pAdpccCtx->stTool);
+        dpcc_pdaf_params_init(&pAdpccCtx->stAuto.stPdafParams, &pAdpccCtx->stTool.pdaf);
+        dpcc_sensor_params_init(&pAdpccCtx->stAuto.stSensorDpcc, &pAdpccCtx->stTool);
+        memset(&pAdpccCtx->stAuto.stPdafParams, 0x00, sizeof(pAdpccCtx->stAuto.stPdafParams));
+
+        bool fast_enable = pAdpccCtx->stAuto.stFastMode.fast_mode_en == 0 ? false : true;
+        if(fast_enable == false)
+            ret = Expert_mode_select_basic_params_by_ISO(&pAdpccCtx->stAuto.stBasicParams, &pAdpccCtx->stAuto.stBasicSelect, pExpInfo);
+        else
+            ret = Fast_mode_select_basic_params_by_ISO(pAdpccCtx, &pAdpccCtx->stAuto.stBasicSelect, pExpInfo);
+
+        ret = select_bpt_params_by_ISO(&pAdpccCtx->stAuto.stBptParams, &pAdpccCtx->stAuto.stBptSelect, pExpInfo);
+        ret = select_pdaf_params_by_ISO(&pAdpccCtx->stAuto.stPdafParams, &pAdpccCtx->stAuto.stPdafSelect, pExpInfo);
+
+        //sensor dpcc
+        if(pAdpccCtx->stAuto.stSensorDpcc.en != 0 )
+            Sensor_dpcc_process(pAdpccCtx);
+    }
+    else
+        LOGE_ADPCC("%s(%d): Wrong api mode in dpcc!!!\n", __FUNCTION__, __LINE__);
 
 
     LOGI_ADPCC("%s(%d): exit!\n", __FUNCTION__, __LINE__);

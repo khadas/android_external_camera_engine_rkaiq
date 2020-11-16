@@ -37,6 +37,7 @@ typedef struct AdpccContext_s {
 
     Adpcc_Auto_Attr_t stAuto;
     Adpcc_Manual_Attr_t stManual;
+    CalibDb_Dpcc_t stTool;
 
     //xml param
     CalibDb_Dpcc_t stDpccCalib;

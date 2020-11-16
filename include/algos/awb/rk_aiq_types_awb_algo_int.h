@@ -76,19 +76,25 @@ typedef enum rk_aiq_wb_awb_alg_method_s {
     //add more
 } rk_aiq_wb_awb_alg_method_t;
 
+typedef enum hdr_frame_choose_mode_e {
+    hdr_frame_choose_mode_manual = 0,
+    hdr_frame_choose_mode_auto
+} hdr_frame_choose_mode_t;
+
 typedef struct rk_aiq_wb_awb_attrib_s {
     rk_aiq_wb_awb_alg_method_t algMethod;
     rk_aiq_wb_awb_tolerance_t tolerance;//wb gain diff th for awb gain update, set 0 to disable this function
     rk_aiq_wb_awb_runinterval_t runInterval;
-    bool sceneAdjustEn;//to do
-    bool colorBalanceEn;//to do
     bool cagaEn;
     bool wbGainAdjustEn;
-    bool wbGainDaylightClipEn;
+    int cct_lut_cfg_num;
+    cct_lut_cfg_lv_t cct_lut_cfg[CALD_AWB_CT_LV_NUM_MAX];
     bool wbGainClipEn;
-    bool extraLightEn;//to do
-    bool autoSatDecrEn;//to do
-    bool autoHdrFrameSelcEn;//to do
+    bool wbGainDaylightClipEn;
+    cct_clip_cfg_t cct_clip_cfg;
+    hdr_frame_choose_mode_t hdrFrameChooseMode;
+    unsigned char   hdrFrameChoose;
+    CalibDb_StatWindow_t measeureWindow;
 } rk_aiq_wb_awb_attrib_t;
 
 typedef enum rk_aiq_wb_op_mode_s {

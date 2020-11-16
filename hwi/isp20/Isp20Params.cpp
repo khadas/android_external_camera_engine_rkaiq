@@ -17,35 +17,37 @@
 
 #include <cstring>
 #include "Isp20Params.h"
+#include "isp21/rkisp21-config.h"
 
 namespace RkCam {
 
+template<class T>
 void
 Isp20Params::convertAiqAeToIsp20Params
 (
-    struct isp2x_isp_params_cfg& isp_cfg,
+    T& isp_cfg,
     const rk_aiq_isp_aec_meas_t& aec_meas
 )
 {
     /* ae update */
     if(/*aec_meas.ae_meas_en*/1) {
-        isp_cfg.module_ens |= 1LL << RK_ISP2X_RAWAE_LITE_ID;
-        isp_cfg.module_ens |= 1LL << RK_ISP2X_RAWAE_BIG1_ID;
-        isp_cfg.module_ens |= 1LL << RK_ISP2X_RAWAE_BIG2_ID;
-        isp_cfg.module_ens |= 1LL << RK_ISP2X_RAWAE_BIG3_ID;
+        isp_cfg.module_ens |= 1LL << RK_ISP2X_RAWAE_0_ID;
+        isp_cfg.module_ens |= 1LL << RK_ISP2X_RAWAE_1_ID;
+        isp_cfg.module_ens |= 1LL << RK_ISP2X_RAWAE_2_ID;
+        isp_cfg.module_ens |= 1LL << RK_ISP2X_RAWAE_3_ID;
         isp_cfg.module_ens |= 1LL << RK_ISP2X_YUVAE_ID;
-        if(/*aec_meas.ae_meas_update*/1) {
-            isp_cfg.module_en_update |= 1LL << RK_ISP2X_RAWAE_LITE_ID;
-            isp_cfg.module_cfg_update |= 1LL << RK_ISP2X_RAWAE_LITE_ID;
+        if(aec_meas.ae_meas_update) {
+            isp_cfg.module_en_update |= 1LL << RK_ISP2X_RAWAE_0_ID;
+            isp_cfg.module_cfg_update |= 1LL << RK_ISP2X_RAWAE_0_ID;
 
-            isp_cfg.module_en_update |= 1LL << RK_ISP2X_RAWAE_BIG1_ID;
-            isp_cfg.module_cfg_update |= 1LL << RK_ISP2X_RAWAE_BIG1_ID;
+            isp_cfg.module_en_update |= 1LL << RK_ISP2X_RAWAE_1_ID;
+            isp_cfg.module_cfg_update |= 1LL << RK_ISP2X_RAWAE_1_ID;
 
-            isp_cfg.module_en_update |= 1LL << RK_ISP2X_RAWAE_BIG2_ID;
-            isp_cfg.module_cfg_update |= 1LL << RK_ISP2X_RAWAE_BIG2_ID;
+            isp_cfg.module_en_update |= 1LL << RK_ISP2X_RAWAE_2_ID;
+            isp_cfg.module_cfg_update |= 1LL << RK_ISP2X_RAWAE_2_ID;
 
-            isp_cfg.module_en_update |= 1LL << RK_ISP2X_RAWAE_BIG3_ID;
-            isp_cfg.module_cfg_update |= 1LL << RK_ISP2X_RAWAE_BIG3_ID;
+            isp_cfg.module_en_update |= 1LL << RK_ISP2X_RAWAE_3_ID;
+            isp_cfg.module_cfg_update |= 1LL << RK_ISP2X_RAWAE_3_ID;
 
             isp_cfg.module_en_update |= 1LL << RK_ISP2X_YUVAE_ID;
             isp_cfg.module_cfg_update |= 1LL << RK_ISP2X_YUVAE_ID;
@@ -56,21 +58,21 @@ Isp20Params::convertAiqAeToIsp20Params
         return;
     }
 
-    memcpy(&isp_cfg.meas.rawae3, &aec_meas.rawae3, sizeof(aec_meas.rawae3));
+    memcpy(&isp_cfg.meas.rawae0, &aec_meas.rawae0, sizeof(aec_meas.rawae0));
     memcpy(&isp_cfg.meas.rawae1, &aec_meas.rawae1, sizeof(aec_meas.rawae1));
     memcpy(&isp_cfg.meas.rawae2, &aec_meas.rawae2, sizeof(aec_meas.rawae2));
-    memcpy(&isp_cfg.meas.rawae0, &aec_meas.rawae0, sizeof(aec_meas.rawae0));
+    memcpy(&isp_cfg.meas.rawae3, &aec_meas.rawae3, sizeof(aec_meas.rawae3));
     memcpy(&isp_cfg.meas.yuvae, &aec_meas.yuvae, sizeof(aec_meas.yuvae));
     /*
      *     LOGD_CAMHW_SUBM(ISP20PARAM_SUBM,"xuhf-debug: hist_meas-isp_cfg size: [%dx%d]-[%dx%d]-[%dx%d]-[%dx%d]\n",
-     *                     sizeof(aec_meas.rawae3),
-     *                     sizeof(isp_cfg.meas.rawae3),
+     *                     sizeof(aec_meas.rawae0),
+     *                     sizeof(isp_cfg.meas.rawae0),
      *                     sizeof(aec_meas.rawae1),
      *                     sizeof(isp_cfg.meas.rawae1),
      *                     sizeof(aec_meas.rawae2),
      *                     sizeof(isp_cfg.meas.rawae2),
-     *                     sizeof(aec_meas.rawae0),
-     *                     sizeof(isp_cfg.meas.rawae0));
+     *                     sizeof(aec_meas.rawae3),
+     *                     sizeof(isp_cfg.meas.rawae3));
      *
      *     LOGD_CAMHW_SUBM(ISP20PARAM_SUBM,"xuhf-debug: aec_meas: win size: [%dx%d]-[%dx%d]-[%dx%d]-[%dx%d]\n",
      *            aec_meas.rawae0.win.h_size,
@@ -94,33 +96,34 @@ Isp20Params::convertAiqAeToIsp20Params
      */
 }
 
+template<class T>
 void
 Isp20Params::convertAiqHistToIsp20Params
 (
-    struct isp2x_isp_params_cfg& isp_cfg,
+    T& isp_cfg,
     const rk_aiq_isp_hist_meas_t& hist_meas
 )
 {
     /* hist update */
     if(/*hist_meas.hist_meas_en*/1) {
-        isp_cfg.module_ens |= 1LL << RK_ISP2X_RAWHIST_LITE_ID;
-        isp_cfg.module_ens |= 1LL << RK_ISP2X_RAWHIST_BIG1_ID;
-        isp_cfg.module_ens |= 1LL << RK_ISP2X_RAWHIST_BIG2_ID;
-        isp_cfg.module_ens |= 1LL << RK_ISP2X_RAWHIST_BIG3_ID;
+        isp_cfg.module_ens |= 1LL << RK_ISP2X_RAWHIST_0_ID;
+        isp_cfg.module_ens |= 1LL << RK_ISP2X_RAWHIST_1_ID;
+        isp_cfg.module_ens |= 1LL << RK_ISP2X_RAWHIST_2_ID;
+        isp_cfg.module_ens |= 1LL << RK_ISP2X_RAWHIST_3_ID;
         isp_cfg.module_ens |= 1LL << RK_ISP2X_SIHST_ID;
 
-        if(/*hist_meas.hist_meas_update*/1) {
-            isp_cfg.module_en_update |= 1LL << RK_ISP2X_RAWHIST_LITE_ID;
-            isp_cfg.module_cfg_update |= 1LL << RK_ISP2X_RAWHIST_LITE_ID;
+        if(hist_meas.hist_meas_update) {
+            isp_cfg.module_en_update |= 1LL << RK_ISP2X_RAWHIST_0_ID;
+            isp_cfg.module_cfg_update |= 1LL << RK_ISP2X_RAWHIST_0_ID;
 
-            isp_cfg.module_en_update |= 1LL << RK_ISP2X_RAWHIST_BIG1_ID;
-            isp_cfg.module_cfg_update |= 1LL << RK_ISP2X_RAWHIST_BIG1_ID;
+            isp_cfg.module_en_update |= 1LL << RK_ISP2X_RAWHIST_1_ID;
+            isp_cfg.module_cfg_update |= 1LL << RK_ISP2X_RAWHIST_1_ID;
 
-            isp_cfg.module_en_update |= 1LL << RK_ISP2X_RAWHIST_BIG2_ID;
-            isp_cfg.module_cfg_update |= 1LL << RK_ISP2X_RAWHIST_BIG2_ID;
+            isp_cfg.module_en_update |= 1LL << RK_ISP2X_RAWHIST_2_ID;
+            isp_cfg.module_cfg_update |= 1LL << RK_ISP2X_RAWHIST_2_ID;
 
-            isp_cfg.module_en_update |= 1LL << RK_ISP2X_RAWHIST_BIG3_ID;
-            isp_cfg.module_cfg_update |= 1LL << RK_ISP2X_RAWHIST_BIG3_ID;
+            isp_cfg.module_en_update |= 1LL << RK_ISP2X_RAWHIST_3_ID;
+            isp_cfg.module_cfg_update |= 1LL << RK_ISP2X_RAWHIST_3_ID;
 
             isp_cfg.module_en_update |= 1LL << RK_ISP2X_SIHST_ID;
             isp_cfg.module_cfg_update |= 1LL << RK_ISP2X_SIHST_ID;
@@ -132,22 +135,22 @@ Isp20Params::convertAiqHistToIsp20Params
         return;
     }
 
-    memcpy(&isp_cfg.meas.rawhist3, &hist_meas.rawhist3, sizeof(hist_meas.rawhist3));
+    memcpy(&isp_cfg.meas.rawhist0, &hist_meas.rawhist0, sizeof(hist_meas.rawhist0));
     memcpy(&isp_cfg.meas.rawhist1, &hist_meas.rawhist1, sizeof(hist_meas.rawhist1));
     memcpy(&isp_cfg.meas.rawhist2, &hist_meas.rawhist2, sizeof(hist_meas.rawhist2));
-    memcpy(&isp_cfg.meas.rawhist0, &hist_meas.rawhist0, sizeof(hist_meas.rawhist0));
+    memcpy(&isp_cfg.meas.rawhist3, &hist_meas.rawhist3, sizeof(hist_meas.rawhist3));
     memcpy(&isp_cfg.meas.sihst, &hist_meas.sihist, sizeof(hist_meas.sihist));
 
     /*
      *     LOGD_CAMHW_SUBM(ISP20PARAM_SUBM,"xuhf-debug: hist_meas-isp_cfg size: [%dx%d]-[%dx%d]-[%dx%d]-[%dx%d]\n",
-     *                     sizeof(hist_meas.rawhist3),
-     *                     sizeof(isp_cfg.meas.rawhist3),
+     *                     sizeof(hist_meas.rawhist0),
+     *                     sizeof(isp_cfg.meas.rawhist0),
      *                     sizeof(hist_meas.rawhist1),
      *                     sizeof(isp_cfg.meas.rawhist1),
      *                     sizeof(hist_meas.rawhist2),
      *                     sizeof(isp_cfg.meas.rawhist2),
-     *                     sizeof(hist_meas.rawhist0),
-     *                     sizeof(isp_cfg.meas.rawhist0));
+     *                     sizeof(hist_meas.rawhist3),
+     *                     sizeof(isp_cfg.meas.rawhist3));
      *
      *     LOGD_CAMHW_SUBM(ISP20PARAM_SUBM,"xuhf-debug: hist_meas: hist win size: [%dx%d]-[%dx%d]-[%dx%d]-[%dx%d]\n",
      *                     hist_meas.rawhist0.win.h_size,
@@ -171,8 +174,9 @@ Isp20Params::convertAiqHistToIsp20Params
      */
 }
 
+template<class T>
 void
-Isp20Params::convertAiqAwbToIsp20Params(struct isp2x_isp_params_cfg& isp_cfg,
+Isp20Params::convertAiqAwbToIsp20Params(T& isp_cfg,
                                         const rk_aiq_awb_stat_cfg_v200_t& awb_meas, bool awb_cfg_udpate)
 {
     if(awb_cfg_udpate) {
@@ -618,9 +622,23 @@ Isp20Params::convertAiqAwbToIsp20Params(struct isp2x_isp_params_cfg& isp_cfg,
     awb_cfg_v200->sw_rawawb_store_wp_flag_ls_idx2   =     awb_meas.storeWpFlagIllu[2];
 }
 
-void Isp20Params::convertAiqMergeToIsp20Params(struct isp2x_isp_params_cfg& isp_cfg,
+template<class T>
+void Isp20Params::convertAiqMergeToIsp20Params(T& isp_cfg,
         const rk_aiq_isp_hdr_t& ahdr_data)
 {
+    if(ahdr_data.bTmoEn)
+    {
+        isp_cfg.module_en_update |= 1LL << RK_ISP2X_HDRMGE_ID;
+        isp_cfg.module_ens |= 1LL << RK_ISP2X_HDRMGE_ID;
+        isp_cfg.module_cfg_update |= 1LL << RK_ISP2X_HDRMGE_ID;
+    }
+    else
+    {
+        isp_cfg.module_en_update |= 1LL << RK_ISP2X_HDRMGE_ID;
+        isp_cfg.module_ens &= ~(1LL << RK_ISP2X_HDRMGE_ID);
+        isp_cfg.module_cfg_update &= ~(1LL << RK_ISP2X_HDRMGE_ID);
+    }
+
     isp_cfg.others.hdrmge_cfg.mode         = ahdr_data.MgeProcRes.sw_hdrmge_mode;
     isp_cfg.others.hdrmge_cfg.gain0_inv    = ahdr_data.MgeProcRes.sw_hdrmge_gain0_inv;
     isp_cfg.others.hdrmge_cfg.gain0         = ahdr_data.MgeProcRes.sw_hdrmge_gain0;
@@ -658,9 +676,22 @@ void Isp20Params::convertAiqMergeToIsp20Params(struct isp2x_isp_params_cfg& isp_
 #endif
 }
 
-void Isp20Params::convertAiqTmoToIsp20Params(struct isp2x_isp_params_cfg& isp_cfg,
+template<class T>
+void Isp20Params::convertAiqTmoToIsp20Params(T& isp_cfg,
         const rk_aiq_isp_hdr_t& ahdr_data)
 {
+    if(ahdr_data.bTmoEn)
+    {
+        isp_cfg.module_en_update |= 1LL << RK_ISP2X_HDRTMO_ID;
+        isp_cfg.module_ens |= 1LL << RK_ISP2X_HDRTMO_ID;
+        isp_cfg.module_cfg_update |= 1LL << RK_ISP2X_HDRTMO_ID;
+    }
+    else
+    {
+        isp_cfg.module_en_update |= 1LL << RK_ISP2X_HDRTMO_ID;
+        isp_cfg.module_ens &= ~(1LL << RK_ISP2X_HDRTMO_ID);
+        isp_cfg.module_cfg_update &= ~(1LL << RK_ISP2X_HDRTMO_ID);
+    }
 
     isp_cfg.others.hdrtmo_cfg.cnt_vsize     = ahdr_data.TmoProcRes.sw_hdrtmo_cnt_vsize;
     isp_cfg.others.hdrtmo_cfg.gain_ld_off2  = ahdr_data.TmoProcRes.sw_hdrtmo_gain_ld_off2;
@@ -741,8 +772,9 @@ void Isp20Params::convertAiqTmoToIsp20Params(struct isp2x_isp_params_cfg& isp_cf
 #endif
 }
 
+template<class T>
 void
-Isp20Params::convertAiqAfToIsp20Params(struct isp2x_isp_params_cfg& isp_cfg,
+Isp20Params::convertAiqAfToIsp20Params(T& isp_cfg,
                                        const rk_aiq_isp_af_meas_t& af_data, bool af_cfg_udpate)
 {
     if (!af_cfg_udpate)
@@ -784,8 +816,10 @@ Isp20Params::convertAiqAfToIsp20Params(struct isp2x_isp_params_cfg& isp_cfg,
 
 #define ISP2X_WBGAIN_FIXSCALE_BIT  8
 #define ISP2X_BLC_BIT_MAX 12
+
+template<class T>
 void
-Isp20Params::convertAiqAwbGainToIsp20Params(struct isp2x_isp_params_cfg& isp_cfg,
+Isp20Params::convertAiqAwbGainToIsp20Params(T& isp_cfg,
         const rk_aiq_wb_gain_t& awb_gain, const rk_aiq_isp_blc_t &blc, bool awb_gain_update)
 {
 
@@ -817,7 +851,8 @@ Isp20Params::convertAiqAwbGainToIsp20Params(struct isp2x_isp_params_cfg& isp_cfg
     cfg->gain_green_b   = Gb > max_wb_gain ? max_wb_gain : Gb;
 }
 
-void Isp20Params::convertAiqAgammaToIsp20Params(struct isp2x_isp_params_cfg& isp_cfg,
+template<class T>
+void Isp20Params::convertAiqAgammaToIsp20Params(T& isp_cfg,
         const AgammaProcRes_t& gamma_out_cfg)
 {
     if(gamma_out_cfg.gamma_en) {
@@ -840,8 +875,8 @@ void Isp20Params::convertAiqAgammaToIsp20Params(struct isp2x_isp_params_cfg& isp
     }
 }
 
-
-void Isp20Params::convertAiqAdehazeToIsp20Params(struct isp2x_isp_params_cfg& isp_cfg,
+template<class T>
+void Isp20Params::convertAiqAdehazeToIsp20Params(T& isp_cfg,
         const rk_aiq_dehaze_cfg_t& dhaze                     )
 {
     int i;
@@ -924,13 +959,17 @@ void Isp20Params::convertAiqAdehazeToIsp20Params(struct isp2x_isp_params_cfg& is
 }
 
 
+template<class T>
 void
-Isp20Params::convertAiqBlcToIsp20Params(struct isp2x_isp_params_cfg& isp_cfg,
+Isp20Params::convertAiqBlcToIsp20Params(T& isp_cfg,
                                         SmartPtr<RkAiqIspParamsProxy> aiq_results)
 {
     LOGD_CAMHW_SUBM(ISP20PARAM_SUBM, "%s:(%d) enter \n", __FUNCTION__, __LINE__);
 
-    if(aiq_results->data()->blc.stResult.enable) {
+    rk_aiq_isp_params_v20_t* isp20_result =
+        static_cast<rk_aiq_isp_params_v20_t*>(aiq_results->data().ptr());
+
+    if(isp20_result->blc.stResult.enable) {
         isp_cfg.module_ens |= ISP2X_MODULE_BLS;
     }
     isp_cfg.module_en_update |= ISP2X_MODULE_BLS;
@@ -951,23 +990,26 @@ Isp20Params::convertAiqBlcToIsp20Params(struct isp2x_isp_params_cfg& isp_cfg,
 
     isp_cfg.others.bls_cfg.bls_samples = 0;
 
-    isp_cfg.others.bls_cfg.fixed_val.r = aiq_results->data()->blc.stResult.blc_gr;
-    isp_cfg.others.bls_cfg.fixed_val.gr = aiq_results->data()->blc.stResult.blc_gr;
-    isp_cfg.others.bls_cfg.fixed_val.gb = aiq_results->data()->blc.stResult.blc_gr;
-    isp_cfg.others.bls_cfg.fixed_val.b = aiq_results->data()->blc.stResult.blc_gr;
+    isp_cfg.others.bls_cfg.fixed_val.r = isp20_result->blc.stResult.blc_gr;
+    isp_cfg.others.bls_cfg.fixed_val.gr = isp20_result->blc.stResult.blc_gr;
+    isp_cfg.others.bls_cfg.fixed_val.gb = isp20_result->blc.stResult.blc_gr;
+    isp_cfg.others.bls_cfg.fixed_val.b = isp20_result->blc.stResult.blc_gr;
 
     LOGD_CAMHW_SUBM(ISP20PARAM_SUBM, "%s:(%d) exit \n", __FUNCTION__, __LINE__);
 }
 
 
+template<class T>
 void
-Isp20Params::convertAiqDpccToIsp20Params(struct isp2x_isp_params_cfg& isp_cfg,
+Isp20Params::convertAiqDpccToIsp20Params(T& isp_cfg,
         SmartPtr<RkAiqIspParamsProxy> aiq_results)
 {
     LOGD_CAMHW_SUBM(ISP20PARAM_SUBM, "%s:(%d) enter \n", __FUNCTION__, __LINE__);
 
+    rk_aiq_isp_params_v20_t* isp20_result =
+        static_cast<rk_aiq_isp_params_v20_t*>(aiq_results->data().ptr());
     struct isp2x_dpcc_cfg * pDpccCfg = &isp_cfg.others.dpcc_cfg;
-    rk_aiq_isp_dpcc_t *pDpccRst = &aiq_results->data()->dpcc;
+    rk_aiq_isp_dpcc_t *pDpccRst = &isp20_result->dpcc;
 
     if(pDpccRst->stBasic.enable) {
         isp_cfg.module_ens |= ISP2X_MODULE_DPCC;
@@ -1185,8 +1227,9 @@ Isp20Params::convertAiqDpccToIsp20Params(struct isp2x_isp_params_cfg& isp_cfg,
 }
 
 
+template<class T>
 void
-Isp20Params::convertAiqLscToIsp20Params(struct isp2x_isp_params_cfg& isp_cfg,
+Isp20Params::convertAiqLscToIsp20Params(T& isp_cfg,
                                         const rk_aiq_lsc_cfg_t& lsc)
 {
 
@@ -1207,7 +1250,9 @@ Isp20Params::convertAiqLscToIsp20Params(struct isp2x_isp_params_cfg& isp_cfg,
     memcpy(cfg->gb_data_tbl, lsc.gb_data_tbl, sizeof(lsc.gb_data_tbl));
     memcpy(cfg->b_data_tbl, lsc.b_data_tbl, sizeof(lsc.b_data_tbl));
 }
-void Isp20Params::convertAiqCcmToIsp20Params(struct isp2x_isp_params_cfg& isp_cfg,
+
+template<class T>
+void Isp20Params::convertAiqCcmToIsp20Params(T& isp_cfg,
         const rk_aiq_ccm_cfg_t& ccm)
 {
     if(ccm.ccmEnable) {
@@ -1246,7 +1291,9 @@ void Isp20Params::convertAiqCcmToIsp20Params(struct isp2x_isp_params_cfg& isp_cf
 
 
 }
-void Isp20Params::convertAiqA3dlutToIsp20Params(struct isp2x_isp_params_cfg& isp_cfg,
+
+template<class T>
+void Isp20Params::convertAiqA3dlutToIsp20Params(T& isp_cfg,
         const rk_aiq_lut3d_cfg_t& lut3d_cfg)
 {
     if(lut3d_cfg.enable) {
@@ -1263,8 +1310,9 @@ void Isp20Params::convertAiqA3dlutToIsp20Params(struct isp2x_isp_params_cfg& isp
     memcpy(cfg->lut_b, lut3d_cfg.look_up_table_b, sizeof(cfg->lut_b));
 }
 
+template<class T>
 void
-Isp20Params::convertAiqRawnrToIsp20Params(struct isp2x_isp_params_cfg& isp_cfg,
+Isp20Params::convertAiqRawnrToIsp20Params(T& isp_cfg,
         rk_aiq_isp_rawnr_t& rawnr)
 {
 
@@ -1877,11 +1925,9 @@ Isp20Params::convertAiqSharpenToIsp20Params(struct rkispp_params_cfg& pp_cfg,
 #endif
 }
 
-
-
-
+template<class T>
 void
-Isp20Params::convertAiqGainToIsp20Params(struct isp2x_isp_params_cfg& isp_cfg,
+Isp20Params::convertAiqGainToIsp20Params(T& isp_cfg,
         rk_aiq_isp_gain_t& gain)
 {
     LOGD_CAMHW_SUBM(ISP20PARAM_SUBM, "%s:(%d) enter \n", __FUNCTION__, __LINE__);
@@ -1950,78 +1996,42 @@ Isp20Params::convertAiqResultsToIsp20Params(struct isp2x_isp_params_cfg& isp_cfg
         SmartPtr<RkAiqIspParamsProxy>& last_aiq_results)
 {
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    rk_aiq_isp_params_v20_t* isp20_result =
+        static_cast<rk_aiq_isp_params_v20_t*>(aiq_results->data().ptr());
 
-    convertAiqHistToIsp20Params(isp_cfg, aiq_results->data()->hist_meas);
-    convertAiqAeToIsp20Params(isp_cfg, aiq_results->data()->aec_meas);
-
-    if (_working_mode != RK_AIQ_WORKING_MODE_NORMAL)
-    {
-        isp_cfg.module_en_update |= 1LL << RK_ISP2X_HDRMGE_ID;
-        isp_cfg.module_ens |= 1LL << RK_ISP2X_HDRMGE_ID;
-        isp_cfg.module_cfg_update |= 1LL << RK_ISP2X_HDRMGE_ID;
-
-        isp_cfg.module_en_update |= 1LL << RK_ISP2X_HDRTMO_ID;
-        isp_cfg.module_ens |= 1LL << RK_ISP2X_HDRTMO_ID;
-        isp_cfg.module_cfg_update |= 1LL << RK_ISP2X_HDRTMO_ID;
-
-        convertAiqMergeToIsp20Params(isp_cfg, aiq_results->data()->ahdr_proc_res);
-        convertAiqTmoToIsp20Params(isp_cfg, aiq_results->data()->ahdr_proc_res);
-    }
-    else {
-        bool IsTmoOn = aiq_results->data()->ahdr_proc_res.isTmoOn;
-        if(IsTmoOn)
-        {
-            isp_cfg.module_en_update |= 1LL << RK_ISP2X_HDRMGE_ID;
-            isp_cfg.module_ens &= ~(1LL << RK_ISP2X_HDRMGE_ID);
-            isp_cfg.module_cfg_update &= ~(1LL << RK_ISP2X_HDRMGE_ID);
-
-            isp_cfg.module_en_update |= 1LL << RK_ISP2X_HDRTMO_ID;
-            isp_cfg.module_ens |= 1LL << RK_ISP2X_HDRTMO_ID;
-            isp_cfg.module_cfg_update |= 1LL << RK_ISP2X_HDRTMO_ID;
-
-            convertAiqTmoToIsp20Params(isp_cfg, aiq_results->data()->ahdr_proc_res);
-        }
-        else
-        {
-            isp_cfg.module_en_update |= 1LL << RK_ISP2X_HDRMGE_ID;
-            isp_cfg.module_ens &= ~(1LL << RK_ISP2X_HDRMGE_ID);
-            isp_cfg.module_cfg_update &= ~(1LL << RK_ISP2X_HDRMGE_ID);
-
-            isp_cfg.module_en_update |= 1LL << RK_ISP2X_HDRTMO_ID;
-            isp_cfg.module_ens &= ~(1LL << RK_ISP2X_HDRTMO_ID);
-            isp_cfg.module_cfg_update &= ~(1LL << RK_ISP2X_HDRTMO_ID);
-        }
-
-    }
-    convertAiqAwbGainToIsp20Params(isp_cfg, aiq_results->data()->awb_gain, aiq_results->data()->blc,
-                                   aiq_results->data()->awb_gain_update);
-    convertAiqAwbToIsp20Params(isp_cfg, aiq_results->data()->awb_cfg_v200, aiq_results->data()->awb_cfg_update);
-    convertAiqLscToIsp20Params(isp_cfg, aiq_results->data()->lsc);
-    convertAiqCcmToIsp20Params(isp_cfg, aiq_results->data()->ccm);
-    convertAiqAgammaToIsp20Params(isp_cfg, aiq_results->data()->agamma);
-    convertAiqBlcToIsp20Params(isp_cfg, aiq_results);
-    convertAiqDpccToIsp20Params(isp_cfg, aiq_results);
-    convertAiqRawnrToIsp20Params(isp_cfg, aiq_results->data()->rawnr);
-    convertAiqAfToIsp20Params(isp_cfg, aiq_results->data()->af_meas, aiq_results->data()->af_cfg_update);
-    convertAiqAdehazeToIsp20Params(isp_cfg, aiq_results->data()->adhaz_config);
-    convertAiqA3dlutToIsp20Params(isp_cfg, aiq_results->data()->lut3d);
-    if(aiq_results->data()->update_mask & RKAIQ_ISP_LDCH_ID)
-        convertAiqAldchToIsp20Params(isp_cfg, aiq_results->data()->ldch);
+    convertAiqHistToIsp20Params<struct isp2x_isp_params_cfg>(isp_cfg, isp20_result->hist_meas);
+    convertAiqAeToIsp20Params<struct isp2x_isp_params_cfg>(isp_cfg, isp20_result->aec_meas);
+    convertAiqMergeToIsp20Params<struct isp2x_isp_params_cfg>(isp_cfg, isp20_result->ahdr_proc_res);
+    convertAiqTmoToIsp20Params<struct isp2x_isp_params_cfg>(isp_cfg, isp20_result->ahdr_proc_res);
+    convertAiqAwbGainToIsp20Params<struct isp2x_isp_params_cfg>(isp_cfg, isp20_result->awb_gain, isp20_result->blc,
+            isp20_result->awb_gain_update);
+    convertAiqAwbToIsp20Params<struct isp2x_isp_params_cfg>(isp_cfg, isp20_result->awb_cfg, isp20_result->awb_cfg_update);
+    convertAiqLscToIsp20Params<struct isp2x_isp_params_cfg>(isp_cfg, isp20_result->lsc);
+    convertAiqCcmToIsp20Params<struct isp2x_isp_params_cfg>(isp_cfg, isp20_result->ccm);
+    convertAiqAgammaToIsp20Params<struct isp2x_isp_params_cfg>(isp_cfg, isp20_result->agamma);
+    convertAiqBlcToIsp20Params<struct isp2x_isp_params_cfg>(isp_cfg, aiq_results);
+    convertAiqDpccToIsp20Params<struct isp2x_isp_params_cfg>(isp_cfg, aiq_results);
+    convertAiqRawnrToIsp20Params<struct isp2x_isp_params_cfg>(isp_cfg, isp20_result->rawnr);
+    convertAiqAfToIsp20Params<struct isp2x_isp_params_cfg>(isp_cfg, isp20_result->af_meas, isp20_result->af_cfg_update);
+    convertAiqAdehazeToIsp20Params<struct isp2x_isp_params_cfg>(isp_cfg, isp20_result->adhaz_config);
+    convertAiqA3dlutToIsp20Params<struct isp2x_isp_params_cfg>(isp_cfg, isp20_result->lut3d);
+    if(isp20_result->update_mask & RKAIQ_ISP_LDCH_ID)
+        convertAiqAldchToIsp20Params<struct isp2x_isp_params_cfg>(isp_cfg, isp20_result->ldch);
 
     //must be at the end of isp module
-    convertAiqGainToIsp20Params(isp_cfg, aiq_results->data()->gain_config);
+    convertAiqGainToIsp20Params<struct isp2x_isp_params_cfg>(isp_cfg, isp20_result->gain_config);
     /*
      * enable the modules that has been verified to work properly on the board
      * TODO: enable all modules after validation in isp
      */
 #if 0
-    convertAiqCpToIsp20Params(isp_cfg, aiq_results->data()->cp);
-    convertAiqIeToIsp20Params(isp_cfg, aiq_results->data()->ie);
+    convertAiqCpToIsp20Params(isp_cfg, isp20_result->cp);
+    convertAiqIeToIsp20Params(isp_cfg, isp20_result->ie);
 #endif
-    convertAiqGicToIsp20Params(isp_cfg, aiq_results->data()->gic);
-    convertAiqAdemosaicToIsp20Params(isp_cfg, aiq_results);
-    convertAiqIeToIsp20Params(isp_cfg, aiq_results->data()->ie);
-    convertAiqCpToIsp20Params(isp_cfg, aiq_results->data()->cp);
+    convertAiqGicToIsp20Params<struct isp2x_isp_params_cfg>(isp_cfg, isp20_result->gic);
+    convertAiqAdemosaicToIsp20Params<struct isp2x_isp_params_cfg>(isp_cfg, aiq_results);
+    convertAiqIeToIsp20Params<struct isp2x_isp_params_cfg>(isp_cfg, isp20_result->ie);
+    convertAiqCpToIsp20Params<struct isp2x_isp_params_cfg>(isp_cfg, isp20_result->cp);
     last_aiq_results = aiq_results;
 
     return ret;
@@ -2099,11 +2109,15 @@ Isp20Params::checkIsp20Params(struct isp2x_isp_params_cfg& isp_cfg)
     return XCAM_RETURN_NO_ERROR;
 }
 
+template<class T>
 void
-Isp20Params::convertAiqAdemosaicToIsp20Params(struct isp2x_isp_params_cfg& isp_cfg,
+Isp20Params::convertAiqAdemosaicToIsp20Params(T& isp_cfg,
         SmartPtr<RkAiqIspParamsProxy> aiq_results)
 {
-    if (aiq_results->data()->demosaic.enable) {
+    rk_aiq_isp_params_v20_t* isp20_result =
+        static_cast<rk_aiq_isp_params_v20_t*>(aiq_results->data().ptr());
+
+    if (isp20_result->demosaic.enable) {
         isp_cfg.module_ens |= ISP2X_MODULE_DEBAYER;
         isp_cfg.module_en_update |= ISP2X_MODULE_DEBAYER;
         isp_cfg.module_cfg_update |= ISP2X_MODULE_DEBAYER;
@@ -2112,33 +2126,34 @@ Isp20Params::convertAiqAdemosaicToIsp20Params(struct isp2x_isp_params_cfg& isp_c
         isp_cfg.module_en_update |= ISP2X_MODULE_DEBAYER;
     }
 
-    isp_cfg.others.debayer_cfg.clip_en = aiq_results->data()->demosaic.clip_en;
-    isp_cfg.others.debayer_cfg.filter_c_en = aiq_results->data()->demosaic.filter_c_en;
-    isp_cfg.others.debayer_cfg.filter_g_en = aiq_results->data()->demosaic.filter_g_en;
-    isp_cfg.others.debayer_cfg.gain_offset = aiq_results->data()->demosaic.gain_offset;
-    isp_cfg.others.debayer_cfg.offset = aiq_results->data()->demosaic.offset;
-    isp_cfg.others.debayer_cfg.hf_offset = aiq_results->data()->demosaic.hf_offset;
-    isp_cfg.others.debayer_cfg.thed0 = aiq_results->data()->demosaic.thed0;
-    isp_cfg.others.debayer_cfg.thed1 = aiq_results->data()->demosaic.thed1;
-    isp_cfg.others.debayer_cfg.dist_scale = aiq_results->data()->demosaic.dist_scale;
-    isp_cfg.others.debayer_cfg.shift_num = aiq_results->data()->demosaic.shift_num;
-    isp_cfg.others.debayer_cfg.filter1_coe1 = aiq_results->data()->demosaic.filter1_coe[0];
-    isp_cfg.others.debayer_cfg.filter1_coe2 = aiq_results->data()->demosaic.filter1_coe[1];
-    isp_cfg.others.debayer_cfg.filter1_coe3 = aiq_results->data()->demosaic.filter1_coe[2];
-    isp_cfg.others.debayer_cfg.filter1_coe4 = aiq_results->data()->demosaic.filter1_coe[3];
-    isp_cfg.others.debayer_cfg.filter1_coe5 = aiq_results->data()->demosaic.filter1_coe[4];
-    isp_cfg.others.debayer_cfg.filter2_coe1 = aiq_results->data()->demosaic.filter2_coe[0];
-    isp_cfg.others.debayer_cfg.filter2_coe2 = aiq_results->data()->demosaic.filter2_coe[1];
-    isp_cfg.others.debayer_cfg.filter2_coe3 = aiq_results->data()->demosaic.filter2_coe[2];
-    isp_cfg.others.debayer_cfg.filter2_coe4 = aiq_results->data()->demosaic.filter2_coe[3];
-    isp_cfg.others.debayer_cfg.filter2_coe5 = aiq_results->data()->demosaic.filter2_coe[4];
-    isp_cfg.others.debayer_cfg.max_ratio = aiq_results->data()->demosaic.max_ratio;
-    isp_cfg.others.debayer_cfg.order_max = aiq_results->data()->demosaic.order_max;
-    isp_cfg.others.debayer_cfg.order_min = aiq_results->data()->demosaic.order_min;
+    isp_cfg.others.debayer_cfg.clip_en = isp20_result->demosaic.clip_en;
+    isp_cfg.others.debayer_cfg.filter_c_en = isp20_result->demosaic.filter_c_en;
+    isp_cfg.others.debayer_cfg.filter_g_en = isp20_result->demosaic.filter_g_en;
+    isp_cfg.others.debayer_cfg.gain_offset = isp20_result->demosaic.gain_offset;
+    isp_cfg.others.debayer_cfg.offset = isp20_result->demosaic.offset;
+    isp_cfg.others.debayer_cfg.hf_offset = isp20_result->demosaic.hf_offset;
+    isp_cfg.others.debayer_cfg.thed0 = isp20_result->demosaic.thed0;
+    isp_cfg.others.debayer_cfg.thed1 = isp20_result->demosaic.thed1;
+    isp_cfg.others.debayer_cfg.dist_scale = isp20_result->demosaic.dist_scale;
+    isp_cfg.others.debayer_cfg.shift_num = isp20_result->demosaic.shift_num;
+    isp_cfg.others.debayer_cfg.filter1_coe1 = isp20_result->demosaic.filter1_coe[0];
+    isp_cfg.others.debayer_cfg.filter1_coe2 = isp20_result->demosaic.filter1_coe[1];
+    isp_cfg.others.debayer_cfg.filter1_coe3 = isp20_result->demosaic.filter1_coe[2];
+    isp_cfg.others.debayer_cfg.filter1_coe4 = isp20_result->demosaic.filter1_coe[3];
+    isp_cfg.others.debayer_cfg.filter1_coe5 = isp20_result->demosaic.filter1_coe[4];
+    isp_cfg.others.debayer_cfg.filter2_coe1 = isp20_result->demosaic.filter2_coe[0];
+    isp_cfg.others.debayer_cfg.filter2_coe2 = isp20_result->demosaic.filter2_coe[1];
+    isp_cfg.others.debayer_cfg.filter2_coe3 = isp20_result->demosaic.filter2_coe[2];
+    isp_cfg.others.debayer_cfg.filter2_coe4 = isp20_result->demosaic.filter2_coe[3];
+    isp_cfg.others.debayer_cfg.filter2_coe5 = isp20_result->demosaic.filter2_coe[4];
+    isp_cfg.others.debayer_cfg.max_ratio = isp20_result->demosaic.max_ratio;
+    isp_cfg.others.debayer_cfg.order_max = isp20_result->demosaic.order_max;
+    isp_cfg.others.debayer_cfg.order_min = isp20_result->demosaic.order_min;
 }
 
+template<class T>
 void
-Isp20Params::convertAiqCpToIsp20Params(struct isp2x_isp_params_cfg& isp_cfg,
+Isp20Params::convertAiqCpToIsp20Params(T& isp_cfg,
                                        const rk_aiq_acp_params_t& cp_cfg)
 {
     struct isp2x_cproc_cfg* cproc_cfg = &isp_cfg.others.cproc_cfg;
@@ -2158,8 +2173,9 @@ Isp20Params::convertAiqCpToIsp20Params(struct isp2x_isp_params_cfg& isp_cfg,
     cproc_cfg->hue = (uint8_t)(cp_cfg.hue - 128);
 }
 
+template<class T>
 void
-Isp20Params::convertAiqIeToIsp20Params(struct isp2x_isp_params_cfg& isp_cfg,
+Isp20Params::convertAiqIeToIsp20Params(T& isp_cfg,
                                        const rk_aiq_isp_ie_t& ie_cfg)
 {
     struct isp2x_ie_cfg* ie_config = &isp_cfg.others.ie_cfg;
@@ -2251,8 +2267,9 @@ Isp20Params::convertAiqIeToIsp20Params(struct isp2x_isp_params_cfg& isp_cfg,
     }
 }
 
+template<class T>
 void
-Isp20Params::convertAiqAldchToIsp20Params(struct isp2x_isp_params_cfg& isp_cfg,
+Isp20Params::convertAiqAldchToIsp20Params(T& isp_cfg,
         const rk_aiq_isp_ldch_t& ldch_cfg)
 {
     struct isp2x_ldch_cfg  *pLdchCfg = &isp_cfg.others.ldch_cfg;
@@ -2272,8 +2289,9 @@ Isp20Params::convertAiqAldchToIsp20Params(struct isp2x_isp_params_cfg& isp_cfg,
     }
 }
 
+template<class T>
 void
-Isp20Params::convertAiqGicToIsp20Params(struct isp2x_isp_params_cfg& isp_cfg,
+Isp20Params::convertAiqGicToIsp20Params(T& isp_cfg,
                                         const rk_aiq_isp_gic_t& gic_cfg)
 {
     struct isp2x_gic_cfg *isp_gic_cfg = &isp_cfg.others.gic_cfg;
@@ -2506,7 +2524,7 @@ void Isp20Params::getModuleStatus(rk_aiq_module_id_t mId, bool& en)
         mod_id = RK_ISP2X_PP_TSHP_ID;
         break;
     case RK_MODULE_AE:
-        mod_id = RK_ISP2X_RAWAE_LITE_ID;
+        mod_id = RK_ISP2X_RAWAE_0_ID;
         break;
     case RK_MODULE_FEC:
         mod_id = RK_ISP2X_PP_TFEC_ID;
@@ -2625,12 +2643,14 @@ void
 Isp20Params::forceOverwriteAiqIspCfg(struct isp2x_isp_params_cfg& isp_cfg,
                                      SmartPtr<RkAiqIspParamsProxy> aiq_results)
 {
+    rk_aiq_isp_params_v20_t* isp20_result =
+        static_cast<rk_aiq_isp_params_v20_t*>(aiq_results->data().ptr());
     for (int i = 0; i <= RK_ISP2X_MAX_ID; i++) {
         if (getModuleForceFlag(i)) {
             switch (i) {
             case RK_ISP2X_DPCC_ID:
                 if (getModuleForceEn(RK_ISP2X_DPCC_ID)) {
-                    if(aiq_results->data()->dpcc.stBasic.enable) {
+                    if(isp20_result->dpcc.stBasic.enable) {
                         isp_cfg.module_ens |= ISP2X_MODULE_DPCC;
                         isp_cfg.module_en_update |= ISP2X_MODULE_DPCC;
                         isp_cfg.module_cfg_update |= ISP2X_MODULE_DPCC;
@@ -2646,7 +2666,7 @@ Isp20Params::forceOverwriteAiqIspCfg(struct isp2x_isp_params_cfg& isp_cfg,
                 break;
             case RK_ISP2X_BLS_ID:
                 if (getModuleForceEn(RK_ISP2X_BLS_ID)) {
-                    if(aiq_results->data()->blc.stResult.enable) {
+                    if(isp20_result->blc.stResult.enable) {
                         isp_cfg.module_ens |= ISP2X_MODULE_BLS;
                         isp_cfg.module_en_update |= ISP2X_MODULE_BLS;
                         isp_cfg.module_cfg_update |= ISP2X_MODULE_BLS;
@@ -2662,7 +2682,7 @@ Isp20Params::forceOverwriteAiqIspCfg(struct isp2x_isp_params_cfg& isp_cfg,
                 break;
             case RK_ISP2X_LSC_ID:
                 if (getModuleForceEn(RK_ISP2X_LSC_ID)) {
-                    if(aiq_results->data()->lsc.lsc_en) {
+                    if(isp20_result->lsc.lsc_en) {
                         isp_cfg.module_ens |= ISP2X_MODULE_LSC;
                         isp_cfg.module_en_update |= ISP2X_MODULE_LSC;
                         isp_cfg.module_cfg_update |= ISP2X_MODULE_LSC;
@@ -2678,7 +2698,7 @@ Isp20Params::forceOverwriteAiqIspCfg(struct isp2x_isp_params_cfg& isp_cfg,
                 break;
             case RK_ISP2X_CTK_ID:
                 if (getModuleForceEn(RK_ISP2X_CTK_ID)) {
-                    if(aiq_results->data()->lsc.lsc_en) {
+                    if(isp20_result->lsc.lsc_en) {
                         isp_cfg.module_ens |= ISP2X_MODULE_CCM;
                         isp_cfg.module_en_update |= ISP2X_MODULE_CCM;
                         isp_cfg.module_cfg_update |= ISP2X_MODULE_CCM;
@@ -2694,7 +2714,7 @@ Isp20Params::forceOverwriteAiqIspCfg(struct isp2x_isp_params_cfg& isp_cfg,
                 break;
             case RK_ISP2X_RAWAWB_ID:
                 if (getModuleForceEn(RK_ISP2X_RAWAWB_ID)) {
-                    if(aiq_results->data()->awb_cfg_v200.awbEnable) {
+                    if(isp20_result->awb_cfg.awbEnable) {
                         isp_cfg.module_ens |= ISP2X_MODULE_RAWAWB;
                         isp_cfg.module_en_update |= ISP2X_MODULE_RAWAWB;
                         isp_cfg.module_cfg_update |= ISP2X_MODULE_RAWAWB;
@@ -2710,7 +2730,7 @@ Isp20Params::forceOverwriteAiqIspCfg(struct isp2x_isp_params_cfg& isp_cfg,
                 break;
             case RK_ISP2X_GOC_ID:
                 if (getModuleForceEn(RK_ISP2X_GOC_ID)) {
-                    if(aiq_results->data()->agamma.gamma_en) {
+                    if(isp20_result->agamma.gamma_en) {
                         isp_cfg.module_ens |= ISP2X_MODULE_GOC;
                         isp_cfg.module_en_update |= ISP2X_MODULE_GOC;
                         isp_cfg.module_cfg_update |= ISP2X_MODULE_GOC;
@@ -2726,7 +2746,7 @@ Isp20Params::forceOverwriteAiqIspCfg(struct isp2x_isp_params_cfg& isp_cfg,
                 break;
             case RK_ISP2X_RAWNR_ID:
                 if (getModuleForceEn(RK_ISP2X_RAWNR_ID)) {
-                    if(aiq_results->data()->rawnr.rawnr_en) {
+                    if(isp20_result->rawnr.rawnr_en) {
                         isp_cfg.module_ens |= ISP2X_MODULE_RAWNR;
                         isp_cfg.module_en_update |= ISP2X_MODULE_RAWNR;
                         isp_cfg.module_cfg_update |= ISP2X_MODULE_RAWNR;
@@ -2742,7 +2762,7 @@ Isp20Params::forceOverwriteAiqIspCfg(struct isp2x_isp_params_cfg& isp_cfg,
                 break;
             case RK_ISP2X_3DLUT_ID:
                 if (getModuleForceEn(RK_ISP2X_3DLUT_ID)) {
-                    if(aiq_results->data()->rawnr.rawnr_en) {
+                    if(isp20_result->rawnr.rawnr_en) {
                         isp_cfg.module_ens |= ISP2X_MODULE_3DLUT;
                         isp_cfg.module_en_update |= ISP2X_MODULE_3DLUT;
                         isp_cfg.module_cfg_update |= ISP2X_MODULE_3DLUT;
@@ -2758,7 +2778,7 @@ Isp20Params::forceOverwriteAiqIspCfg(struct isp2x_isp_params_cfg& isp_cfg,
                 break;
             case RK_ISP2X_LDCH_ID:
                 if (getModuleForceEn(RK_ISP2X_LDCH_ID)) {
-                    if(aiq_results->data()->ldch.ldch_en) {
+                    if(isp20_result->ldch.ldch_en) {
                         isp_cfg.module_ens |= ISP2X_MODULE_LDCH;
                         isp_cfg.module_en_update |= ISP2X_MODULE_LDCH;
                         isp_cfg.module_cfg_update |= ISP2X_MODULE_LDCH;
@@ -2774,7 +2794,7 @@ Isp20Params::forceOverwriteAiqIspCfg(struct isp2x_isp_params_cfg& isp_cfg,
                 break;
             case RK_ISP2X_GIC_ID:
                 if (getModuleForceEn(RK_ISP2X_GIC_ID)) {
-                    if(aiq_results->data()->gic.gic_en) {
+                    if(isp20_result->gic.gic_en) {
                         isp_cfg.module_ens |= ISP2X_MODULE_GIC;
                         isp_cfg.module_en_update |= ISP2X_MODULE_GIC;
                         isp_cfg.module_cfg_update |= ISP2X_MODULE_GIC;
@@ -2790,7 +2810,7 @@ Isp20Params::forceOverwriteAiqIspCfg(struct isp2x_isp_params_cfg& isp_cfg,
                 break;
             case RK_ISP2X_GAIN_ID:
                 if (getModuleForceEn(RK_ISP2X_GAIN_ID)) {
-                    if(aiq_results->data()->gain_config.gain_table_en) {
+                    if(isp20_result->gain_config.gain_table_en) {
                         isp_cfg.module_ens |= ISP2X_MODULE_GAIN;
                         isp_cfg.module_en_update |= ISP2X_MODULE_GAIN;
                         isp_cfg.module_cfg_update |= ISP2X_MODULE_GAIN;
@@ -2806,7 +2826,7 @@ Isp20Params::forceOverwriteAiqIspCfg(struct isp2x_isp_params_cfg& isp_cfg,
                 break;
             case RK_ISP2X_DHAZ_ID:
                 if (getModuleForceEn(RK_ISP2X_DHAZ_ID)) {
-                    if(aiq_results->data()->adhaz_config.dehaze_en[0]) {
+                    if(isp20_result->adhaz_config.dehaze_en[0]) {
                         isp_cfg.module_ens |= ISP2X_MODULE_DHAZ;
                         isp_cfg.module_en_update |= ISP2X_MODULE_DHAZ;
                         isp_cfg.module_cfg_update |= ISP2X_MODULE_DHAZ;
@@ -2825,4 +2845,9 @@ Isp20Params::forceOverwriteAiqIspCfg(struct isp2x_isp_params_cfg& isp_cfg,
     }
     updateIspModuleForceEns(isp_cfg.module_ens);
 }
+
 }; //namspace RkCam
+
+//TODO: to solve template ld compile issue, add isp21 source file here now.
+#include "isp21/Isp21Params.cpp"
+

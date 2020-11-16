@@ -96,6 +96,7 @@ static XCamReturn AhdrPrepare(RkAiqAlgoCom* params)
 
     AhdrConfig(pAhdrCtx); //set default para
     memcpy(&pAhdrCtx->pCalibDB, &pCalibDb->ahdr, sizeof(CalibDb_Ahdr_Para_t));//load iq paras
+    memcpy(&pAhdrCtx->hdrAttr.stTool, &pCalibDb->ahdr, sizeof(CalibDb_Ahdr_Para_t));//load iq paras to stTool
 
     if (ret != AHDR_RET_SUCCESS) {
         LOGE_AHDR("%s AHDRUpdateConfig failed: %d", __FUNCTION__, ret);
@@ -133,7 +134,10 @@ static XCamReturn AhdrPreProcess(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* 
         pAhdrCtx->sence_mode = AHDR_HDR;
 
     LOGD_AHDR("%s:Current mode:%d\n", __FUNCTION__, pAhdrCtx->sence_mode);
-    AhdrSelectMode(pAhdrCtx, &pAhdrCtx->pCalibDB, pAhdrCtx->sence_mode);
+    if(pAhdrCtx->hdrAttr.opMode == HDR_OpMode_Tool)
+        AhdrSelectMode(pAhdrCtx, &pAhdrCtx->hdrAttr.stTool, pAhdrCtx->sence_mode);
+    else
+        AhdrSelectMode(pAhdrCtx, &pAhdrCtx->pCalibDB, pAhdrCtx->sence_mode);
 
     LOG1_AHDR("%s:Exit!\n", __FUNCTION__);
     return(XCAM_RETURN_NO_ERROR);
@@ -188,7 +192,8 @@ static XCamReturn AhdrProcess(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* out
 
     pAhdrCtx->AhdrProcRes.LongFrameMode = pAhdrCtx->SensorInfo.LongFrmMode;
     AhdrProcResParams->AhdrProcRes.isHdrGlobalTmo = pAhdrCtx->AhdrProcRes.isHdrGlobalTmo;
-    AhdrProcResParams->AhdrProcRes.isTmoOn = pAhdrCtx->AhdrProcRes.isTmoOn;
+    AhdrProcResParams->AhdrProcRes.bTmoEn = pAhdrCtx->AhdrProcRes.bTmoEn;
+    AhdrProcResParams->AhdrProcRes.isLinearTmo = pAhdrCtx->AhdrProcRes.isLinearTmo;
     memcpy(&AhdrProcResParams->AhdrProcRes.MgeProcRes, &pAhdrCtx->AhdrProcRes.MgeProcRes, sizeof(MgeProcRes_t));
     memcpy(&AhdrProcResParams->AhdrProcRes.TmoProcRes, &pAhdrCtx->AhdrProcRes.TmoProcRes, sizeof(TmoProcRes_t));
 

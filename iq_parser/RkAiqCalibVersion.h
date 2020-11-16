@@ -112,10 +112,30 @@
  *  - magic code:1056480
  *  - sensorinfo: rename CISTimeRegSumFac as CISHdrTimeRegSumFac
  *                add CISLinTimeRegMaxFac
+ * v1.3.8
+ *  - magic code:1058686
+ *  - AF: add afmeas_iso
+ * v1.3.9
+ *  - magic code:1054936
+ *  - Gamma: Remove gamma_out_mode curve_user
+ * v1.4.0
+ *  - magic code:1055312
+ *  - merge: change matrix from [1,6] to [1,13]
+ *  - tmo: change matrix from [1,6] to [1,13]
+ * v1.4.1
+ *  - magic code:1088367
+ *  - DPCC: redefine set cell struct
+  * v1.4.2
+ *  - magic code:1089142
+ *  - ACCM: support Hdr/Normal mode
+ *  * v1.4.3
+ *  - magic code:1088858
+ *  - change type of mCalibDb->awb from struct to list
+ *  - split  mCalibDb->awb into calib para and adjust para
  */
 
-#define RK_AIQ_CALIB_VERSION_REAL_V          "v1.3.7"
-#define RK_AIQ_CALIB_VERSION_MAGIC_V         "1056480"
+#define RK_AIQ_CALIB_VERSION_REAL_V          "v1.4.3"
+#define RK_AIQ_CALIB_VERSION_MAGIC_V         "1088858"
 
 
 /******* DO NOT EDIT THE FOLLOWINGS ***********/

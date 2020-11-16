@@ -148,7 +148,7 @@ typedef struct {
 } rk_sensor_full_info_t;
 
 class CamHwIsp20
-    : public CamHwBase, public Isp20Params, public V4l2Device 
+    : public CamHwBase, virtual public Isp20Params, public V4l2Device
     , public isp_drv_share_mem_ops_t {
 public:
     explicit CamHwIsp20();
@@ -165,8 +165,8 @@ public:
     virtual XCamReturn swWorkingModeDyn(int mode);
     virtual XCamReturn getSensorModeData(const char* sns_ent_name,
                                          rk_aiq_exposure_sensor_descriptor& sns_des);
-    XCamReturn setIspParamsSync(int frameId);
-    XCamReturn setIsppParamsSync(int frameId);
+    virtual XCamReturn setIspParamsSync(int frameId);
+    virtual XCamReturn setIsppParamsSync(int frameId);
     virtual XCamReturn setIspParams(SmartPtr<RkAiqIspParamsProxy>& ispParams);
     virtual XCamReturn setExposureParams(SmartPtr<RkAiqExpParamsProxy>& expPar);
     virtual XCamReturn setIrisParams(SmartPtr<RkAiqIrisParamsProxy>& irisPar, CalibDb_IrisType_t irisType);
@@ -205,7 +205,7 @@ public:
     XCamReturn setLensVcmCfg(rk_aiq_lens_vcmcfg& lens_cfg);
     XCamReturn setLensVcmCfg();
     virtual void getShareMemOps(isp_drv_share_mem_ops_t** mem_ops);
-private:
+protected:
     XCAM_DEAD_COPY(CamHwIsp20);
     enum cam_hw_state_e {
         CAM_HW_STATE_INVALID,
@@ -266,6 +266,7 @@ private:
                                    struct v4l2_subdev_format& sns_sd_fmt,
                                    __u32 sns_v4l_pix_fmt);
     XCamReturn setupHdrLink_vidcap(int hdr_mode, int cif_index, bool enable);
+    XCamReturn init_pp(rk_sensor_full_info_t *s_info);
     enum mipi_stream_idx {
         MIPI_STREAM_IDX_0   = 1,
         MIPI_STREAM_IDX_1   = 2,
@@ -282,7 +283,7 @@ private:
     static void releaseMemResource(void *mem_ctx);
     static void* getFreeItem(void *mem_ctx);
     uint32_t _isp_module_ens;
-    bool mNormalNoReadBack;
+    bool mNoReadBack;
     bool mIsDhazOn;
     rk_aiq_rotation_t _sharp_fbc_rotation;
 

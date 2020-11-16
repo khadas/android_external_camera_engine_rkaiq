@@ -34,54 +34,72 @@ public:
         , _force_module_flags(0) {};
     virtual ~Isp20Params() {};
 
-    virtual XCamReturn checkIsp20Params(struct isp2x_isp_params_cfg& isp_cfg);
-    virtual XCamReturn convertAiqResultsToIsp20Params(struct isp2x_isp_params_cfg& isp_cfg,
+    XCamReturn checkIsp20Params(struct isp2x_isp_params_cfg& isp_cfg);
+    XCamReturn convertAiqResultsToIsp20Params(struct isp2x_isp_params_cfg& isp_cfg,
             SmartPtr<RkAiqIspParamsProxy> aiq_results,
             SmartPtr<RkAiqIspParamsProxy>& last_aiq_results);
-    virtual XCamReturn convertAiqResultsToIsp20PpParams(struct rkispp_params_cfg& pp_cfg,
+    XCamReturn convertAiqResultsToIsp20PpParams(struct rkispp_params_cfg& pp_cfg,
             SmartPtr<RkAiqIsppParamsProxy> aiq_results);
     void set_working_mode(int mode);
     void setModuleStatus(rk_aiq_module_id_t mId, bool en);
     void getModuleStatus(rk_aiq_module_id_t mId, bool& en);
     void forceOverwriteAiqIsppCfg(struct rkispp_params_cfg& pp_cfg, SmartPtr<RkAiqIsppParamsProxy> aiq_results);
     void forceOverwriteAiqIspCfg(struct isp2x_isp_params_cfg& isp_cfg, SmartPtr<RkAiqIspParamsProxy> aiq_results);
-private:
+protected:
     XCAM_DEAD_COPY(Isp20Params);
-    void convertAiqAeToIsp20Params(struct isp2x_isp_params_cfg& isp_cfg,
+
+    template<class T>
+    void convertAiqAeToIsp20Params(T& isp_cfg,
                                    const rk_aiq_isp_aec_meas_t& aec_meas);
-    void convertAiqHistToIsp20Params(struct isp2x_isp_params_cfg& isp_cfg,
+    template<class T>
+    void convertAiqHistToIsp20Params(T& isp_cfg,
                                      const rk_aiq_isp_hist_meas_t& hist_meas);
-    void convertAiqAwbToIsp20Params(struct isp2x_isp_params_cfg& isp_cfg,
+    template<class T>
+    void convertAiqAwbToIsp20Params(T& isp_cfg,
                                     const rk_aiq_awb_stat_cfg_v200_t& awb_meas,
                                     bool awb_cfg_udpate);
-    void convertAiqAwbGainToIsp20Params(struct isp2x_isp_params_cfg& isp_cfg,
+    template<class T>
+    void convertAiqAwbGainToIsp20Params(T& isp_cfg,
                                         const rk_aiq_wb_gain_t& awb_gain, const rk_aiq_isp_blc_t &blc,
                                         bool awb_gain_update);
-    void convertAiqMergeToIsp20Params(struct isp2x_isp_params_cfg& isp_cfg,
+    template<class T>
+    void convertAiqMergeToIsp20Params(T& isp_cfg,
                                       const rk_aiq_isp_hdr_t& ahdr_data);
-    void convertAiqTmoToIsp20Params(struct isp2x_isp_params_cfg& isp_cfg,
+    template<class T>
+    void convertAiqTmoToIsp20Params(T& isp_cfg,
                                     const rk_aiq_isp_hdr_t& ahdr_data);
-    void convertAiqAdehazeToIsp20Params(struct isp2x_isp_params_cfg& isp_cfg,
+    template<class T>
+    void convertAiqAdehazeToIsp20Params(T& isp_cfg,
                                         const rk_aiq_dehaze_cfg_t& dhaze                     );
-    void convertAiqAgammaToIsp20Params(struct isp2x_isp_params_cfg& isp_cfg,
+    template<class T>
+    void convertAiqAgammaToIsp20Params(T& isp_cfg,
                                        const AgammaProcRes_t& gamma_out_cfg);
-    void convertAiqAdemosaicToIsp20Params(struct isp2x_isp_params_cfg& isp_cfg,
+    template<class T>
+    void convertAiqAdemosaicToIsp20Params(T& isp_cfg,
                                           SmartPtr<RkAiqIspParamsProxy> aiq_results);
-    void convertAiqLscToIsp20Params(struct isp2x_isp_params_cfg& isp_cfg,
+    template<class T>
+    void convertAiqLscToIsp20Params(T& isp_cfg,
                                     const rk_aiq_lsc_cfg_t& lsc);
-    void convertAiqBlcToIsp20Params(struct isp2x_isp_params_cfg& isp_cfg,
+    template<class T>
+    void convertAiqBlcToIsp20Params(T& isp_cfg,
                                     SmartPtr<RkAiqIspParamsProxy> aiq_results);
-    void convertAiqDpccToIsp20Params(struct isp2x_isp_params_cfg& isp_cfg,
+    template<class T>
+    void convertAiqDpccToIsp20Params(T& isp_cfg,
                                      SmartPtr<RkAiqIspParamsProxy> aiq_results);
-    void convertAiqCcmToIsp20Params(struct isp2x_isp_params_cfg& isp_cfg,
+    template<class T>
+    void convertAiqCcmToIsp20Params(T& isp_cfg,
                                     const rk_aiq_ccm_cfg_t& ccm);
-    void convertAiqA3dlutToIsp20Params(struct isp2x_isp_params_cfg& isp_cfg,
+    template<class T>
+    void convertAiqA3dlutToIsp20Params(T& isp_cfg,
                                        const rk_aiq_lut3d_cfg_t& lut3d_cfg);
-    void convertAiqCpToIsp20Params(struct isp2x_isp_params_cfg& isp_cfg,
+    template<class T>
+    void convertAiqCpToIsp20Params(T& isp_cfg,
                                    const rk_aiq_acp_params_t& lut3d_cfg);
-    void convertAiqIeToIsp20Params(struct isp2x_isp_params_cfg& isp_cfg,
+    template<class T>
+    void convertAiqIeToIsp20Params(T& isp_cfg,
                                    const rk_aiq_isp_ie_t& ie_cfg);
-    void convertAiqRawnrToIsp20Params(struct isp2x_isp_params_cfg& isp_cfg,
+    template<class T>
+    void convertAiqRawnrToIsp20Params(T& isp_cfg,
                                       rk_aiq_isp_rawnr_t& rawnr);
     void convertAiqTnrToIsp20Params(struct rkispp_params_cfg& pp_cfg,
                                     rk_aiq_isp_tnr_t& tnr);
@@ -91,15 +109,19 @@ private:
                                     rk_aiq_isp_ynr_t& ynr);
     void convertAiqSharpenToIsp20Params(struct rkispp_params_cfg& pp_cfg,
                                         rk_aiq_isp_sharpen_t& sharp, rk_aiq_isp_edgeflt_t& edgeflt);
-    void convertAiqAfToIsp20Params(struct isp2x_isp_params_cfg& isp_cfg,
+    template<class T>
+    void convertAiqAfToIsp20Params(T& isp_cfg,
                                    const rk_aiq_isp_af_meas_t& af_data, bool af_cfg_udpate);
-    void convertAiqGainToIsp20Params(struct isp2x_isp_params_cfg& isp_cfg,
+    template<class T>
+    void convertAiqGainToIsp20Params(T& isp_cfg,
                                      rk_aiq_isp_gain_t& gain);
-    void convertAiqAldchToIsp20Params(struct isp2x_isp_params_cfg& isp_cfg,
+    template<class T>
+    void convertAiqAldchToIsp20Params(T& isp_cfg,
                                       const rk_aiq_isp_ldch_t& ldch_cfg);
     void convertAiqFecToIsp20Params(struct rkispp_params_cfg& pp_cfg,
                                     rk_aiq_isp_fec_t& fec);
-    void convertAiqGicToIsp20Params(struct isp2x_isp_params_cfg& isp_cfg,
+    template<class T>
+    void convertAiqGicToIsp20Params(T& isp_cfg,
                                     const rk_aiq_isp_gic_t& gic_cfg);
     void convertAiqOrbToIsp20Params(struct rkispp_params_cfg& pp_cfg,
                                     rk_aiq_isp_orb_t& orb);

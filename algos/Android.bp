@@ -26,6 +26,7 @@ cc_defaults {
 	include_dirs: [
 		"external/camera_engine_rkaiq/include/algos",
 		"external/camera_engine_rkaiq/include",
+		"external/camera_engine_rkaiq/algos/",
 		"external/camera_engine_rkaiq/include/xcore/base",
 		"external/camera_engine_rkaiq/include/xcore",
 		"external/camera_engine_rkaiq/include/iq_parser",

@@ -78,7 +78,7 @@ typedef struct rk_sim_isp_v200_params_s {
     //adhaz
     rk_aiq_dehaze_cfg_t adhaz_config;
     //agamma
-    rk_aiq_gamma_cfg_t agamma_config;
+    AgammaProcRes_t agamma_config;
     //ahdr
     RkAiqAhdrProcResult_t ahdr_proc_res;
     //adpcc

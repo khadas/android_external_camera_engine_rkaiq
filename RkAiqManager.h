@@ -20,6 +20,7 @@
 
 #include "ICamHw.h"
 #include "RkAiqCore.h"
+#include "RkAiqCoreV21.h"
 #include "RkAiqCalibDb.h"
 #include "RkLumaCore.h"
 #include "rk_aiq.h"
@@ -199,6 +200,7 @@ private:
     bool mCurFlip;
     SmartPtr<RkAiqCpslParamsProxy> mDleayCpslParams;
     int mDelayCpslApplyFrmNum;
+    int mIspHwVer;
 };
 
 }; //namespace RkCam

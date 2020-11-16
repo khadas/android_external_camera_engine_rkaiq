@@ -205,6 +205,7 @@ typedef struct RkAiqAecHwConfig_s {
     rk_aiq_ae_meas_params_t ae_meas;
     rk_aiq_hist_meas_params_t hist_meas;
     int ae_swap;
+    int ae_sel;
 } RkAiqAecHwConfig_t;
 
 typedef struct RkAiqAecHwStatsRes_s {

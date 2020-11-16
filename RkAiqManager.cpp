@@ -18,6 +18,7 @@
 #include "RkAiqManager.h"
 #include "isp20/Isp20_module_dbg.h"
 #include "isp20/CamHwIsp20.h"
+#include "isp21/CamHwIsp21.h"
 #include <fcntl.h>
 #include <unistd.h>
 
@@ -185,6 +186,7 @@ RkAiqManager::init()
     hw_info.lens_supported = s_info->has_lens_vcm;
     hw_info.fl_strth_adj = s_info->fl_strth_adj_sup;
     hw_info.fl_ir_strth_adj = s_info->fl_ir_strth_adj_sup;
+    mIspHwVer = s_info->isp_hw_ver;
 #endif
     mRkAiqAnalyzer->setHwInfos(hw_info);
     ret = mRkAiqAnalyzer->init(mSnsEntName, mCalibDb);
@@ -454,12 +456,16 @@ RkAiqManager::applyAnalyzerResult(SmartPtr<RkAiqFullParamsProxy>& results)
 
     aiqParams = results->data().ptr();
 
-    if (mWorkingMode != RK_AIQ_WORKING_MODE_NORMAL) {
+#ifndef RK_SIMULATOR_HW
+    if (mWorkingMode != RK_AIQ_WORKING_MODE_NORMAL && mIspHwVer == 4) {
         SmartPtr<CamHwIsp20> mCamHwIsp20 = mCamHw.dynamic_cast_ptr<CamHwIsp20>();
-        bool isHdrGlobalTmo = aiqParams->mIspParams->data()->ahdr_proc_res.isHdrGlobalTmo;
+        rk_aiq_isp_params_v20_t* ispParams =
+            static_cast<rk_aiq_isp_params_v20_t*>(aiqParams->mIspParams->data().ptr());
+        bool isHdrGlobalTmo = ispParams->ahdr_proc_res.isHdrGlobalTmo;
 
-        mCamHwIsp20->setHdrGlobalTmoMode(aiqParams->mIspParams->data()->frame_id, isHdrGlobalTmo);
+        mCamHwIsp20->setHdrGlobalTmoMode(ispParams->frame_id, isHdrGlobalTmo);
     }
+#endif
 
 #ifdef RUNTIME_MODULE_DEBUG
 #ifndef RK_SIMULATOR_HW
@@ -489,9 +495,13 @@ RkAiqManager::applyAnalyzerResult(SmartPtr<RkAiqFullParamsProxy>& results)
         }
     }
 #else
+#ifndef RK_SIMULATOR_HW
     if (aiqParams->mCpslParams.ptr()) {
         SmartPtr<CamHwIsp20> mCamHwIsp20 = mCamHw.dynamic_cast_ptr<CamHwIsp20>();
-        int gray_mode = aiqParams->mIspParams->data()->ie.base.mode;
+        rk_aiq_isp_params_v2x_t* ispParams =
+            static_cast<rk_aiq_isp_params_v2x_t*>(aiqParams->mIspParams->data().ptr());
+
+        int gray_mode = ispParams->ie.base.mode;
 
         bool cpsl_ir_en = aiqParams->mCpslParams->data()->update_ir &&
                           aiqParams->mCpslParams->data()->ir.irc_on;
@@ -518,6 +528,7 @@ RkAiqManager::applyAnalyzerResult(SmartPtr<RkAiqFullParamsProxy>& results)
             LOGE_ANALYZER("setFlParams error %d", ret);
         mDleayCpslParams.release();
     }
+#endif
 #endif
 
     if (aiqParams->mExposureParams.ptr()) {
@@ -741,7 +752,7 @@ XCamReturn RkAiqManager::setSharpFbcRotation(rk_aiq_rotation_t rot)
 #ifndef RK_SIMULATOR_HW
     SmartPtr<CamHwIsp20> camHwIsp20 = mCamHw.dynamic_cast_ptr<CamHwIsp20>();
 
-    if (camHwIsp20.ptr())
+    if (camHwIsp20.ptr() && mIspHwVer == 4)
         return camHwIsp20->setSharpFbcRotation(rot);
     else
         return XCAM_RETURN_ERROR_FAILED;

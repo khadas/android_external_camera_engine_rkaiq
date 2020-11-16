@@ -2,7 +2,7 @@
 <matfile>
     <header type="struct" size="[1 1]">
         <code_xml_parse_version index="1" type="char" size="[1 6]">
-         v1.3.7
+         v1.4.2
         </code_xml_parse_version>
         <creation_date index="1" type="char" size="[1 10]">
             2020-06-19
@@ -20,7 +20,7 @@
             v1.1.2
         </generator_version>
         <magic_code_version index="1" type="int" size="[1 1]">
-	  [1056480]
+	  [1089142]
         </magic_code_version>
     </header>
     <sensor type="struct" size="[1 1]">
@@ -2264,6 +2264,190 @@
                     [0 ]
                 </v_size>
             </Window>
+         <afmeas_iso index="1" type="cell" size="[1 13]">
+             <cell index="1" type="struct" size="[1 1]">
+	         <iso index="1" type="double" size="[1 1]">
+	            [50]
+	         </iso>
+	         <afmThres index="1" type="double" size="[1 1]">
+	            [4]
+	         </afmThres>
+	         <gammaY index="1" type="double" size="[1 17]">
+                    [0 45 108 179 245 344 409 459 500 567 622 676 759 833 896 962 1023]
+                 </gammaY>
+                 <gaussWeight index="1" type="double" size="[1 3]">
+                    [32 16 8]
+                 </gaussWeight>
+             </cell>
+             <cell index="2" type="struct" size="[1 1]">
+	         <iso index="1" type="double" size="[1 1]">
+	            [100]
+	         </iso>
+	         <afmThres index="1" type="double" size="[1 1]">
+	            [4]
+	         </afmThres>
+	         <gammaY index="1" type="double" size="[1 17]">
+                    [0 45 108 179 245 344 409 459 500 567 622 676 759 833 896 962 1023]
+                 </gammaY>
+                 <gaussWeight index="1" type="double" size="[1 3]">
+                    [32 16 8]
+                 </gaussWeight>
+             </cell>
+             <cell index="3" type="struct" size="[1 1]">
+	         <iso index="1" type="double" size="[1 1]">
+	            [200]
+	         </iso>
+	         <afmThres index="1" type="double" size="[1 1]">
+	            [4]
+	         </afmThres>
+	         <gammaY index="1" type="double" size="[1 17]">
+                    [0 45 108 179 245 344 409 459 500 567 622 676 759 833 896 962 1023]
+                 </gammaY>
+                 <gaussWeight index="1" type="double" size="[1 3]">
+                    [32 16 8]
+                 </gaussWeight>
+             </cell>
+             <cell index="4" type="struct" size="[1 1]">
+	         <iso index="1" type="double" size="[1 1]">
+	            [400]
+	         </iso>
+	         <afmThres index="1" type="double" size="[1 1]">
+	            [4]
+	         </afmThres>
+	         <gammaY index="1" type="double" size="[1 17]">
+                    [0 45 108 179 245 344 409 459 500 567 622 676 759 833 896 962 1023]
+                 </gammaY>
+                  <gaussWeight index="1" type="double" size="[1 3]">
+                    [32 16 8]
+                 </gaussWeight>
+             </cell>
+             <cell index="5" type="struct" size="[1 1]">
+	         <iso index="1" type="double" size="[1 1]">
+	            [800]
+	         </iso>
+	         <afmThres index="1" type="double" size="[1 1]">
+	            [4]
+	         </afmThres>
+	         <gammaY index="1" type="double" size="[1 17]">
+                    [0 45 108 179 245 344 409 459 500 567 622 676 759 833 896 962 1023]
+                 </gammaY>
+                 <gaussWeight index="1" type="double" size="[1 3]">
+                    [32 16 8]
+                 </gaussWeight>
+             </cell>
+             <cell index="6" type="struct" size="[1 1]">
+	         <iso index="1" type="double" size="[1 1]">
+	            [1600]
+	         </iso>
+	         <afmThres index="1" type="double" size="[1 1]">
+	            [4]
+	         </afmThres>
+	         <gammaY index="1" type="double" size="[1 17]">
+                    [0 45 108 179 245 344 409 459 500 567 622 676 759 833 896 962 1023]
+                 </gammaY>
+                 <gaussWeight index="1" type="double" size="[1 3]">
+                    [32 16 8]
+                 </gaussWeight>
+             </cell>
+             <cell index="7" type="struct" size="[1 1]">
+	         <iso index="1" type="double" size="[1 1]">
+	            [3200]
+	         </iso>
+	         <afmThres index="1" type="double" size="[1 1]">
+	            [4]
+	         </afmThres>
+	         <gammaY index="1" type="double" size="[1 17]">
+                    [0 45 108 179 245 344 409 459 500 567 622 676 759 833 896 962 1023]
+                 </gammaY>
+                 <gaussWeight index="1" type="double" size="[1 3]">
+                    [32 16 8]
+                 </gaussWeight>
+             </cell>
+             <cell index="8" type="struct" size="[1 1]">
+	         <iso index="1" type="double" size="[1 1]">
+	            [6400]
+	         </iso>
+	         <afmThres index="1" type="double" size="[1 1]">
+	            [4]
+	         </afmThres>
+	         <gammaY index="1" type="double" size="[1 17]">
+                    [0 45 108 179 245 344 409 459 500 567 622 676 759 833 896 962 1023]
+                 </gammaY>
+                 <gaussWeight index="1" type="double" size="[1 3]">
+                    [32 16 8]
+                 </gaussWeight>
+             </cell>
+             <cell index="9" type="struct" size="[1 1]">
+	         <iso index="1" type="double" size="[1 1]">
+	            [12800]
+	         </iso>
+	         <afmThres index="1" type="double" size="[1 1]">
+	            [4]
+	         </afmThres>
+	         <gammaY index="1" type="double" size="[1 17]">
+                    [0 45 108 179 245 344 409 459 500 567 622 676 759 833 896 962 1023]
+                 </gammaY>
+                 <gaussWeight index="1" type="double" size="[1 3]">
+                    [32 16 8]
+                 </gaussWeight>
+             </cell>
+             <cell index="10" type="struct" size="[1 1]">
+	         <iso index="1" type="double" size="[1 1]">
+	            [25600]
+	         </iso>
+	         <afmThres index="1" type="double" size="[1 1]">
+	            [4]
+	         </afmThres>
+	         <gammaY index="1" type="double" size="[1 17]">
+                    [0 45 108 179 245 344 409 459 500 567 622 676 759 833 896 962 1023]
+                 </gammaY>
+                  <gaussWeight index="1" type="double" size="[1 3]">
+                    [32 16 8]
+                 </gaussWeight>
+             </cell>
+             <cell index="11" type="struct" size="[1 1]">
+	         <iso index="1" type="double" size="[1 1]">
+	            [51200]
+	         </iso>
+	         <afmThres index="1" type="double" size="[1 1]">
+	            [4]
+	         </afmThres>
+	         <gammaY index="1" type="double" size="[1 17]">
+                    [0 45 108 179 245 344 409 459 500 567 622 676 759 833 896 962 1023]
+                 </gammaY>
+                 <gaussWeight index="1" type="double" size="[1 3]">
+                    [32 16 8]
+                 </gaussWeight>
+             </cell>
+             <cell index="12" type="struct" size="[1 1]">
+	         <iso index="1" type="double" size="[1 1]">
+	            [102400]
+	         </iso>
+	         <afmThres index="1" type="double" size="[1 1]">
+	            [4]
+	         </afmThres>
+	         <gammaY index="1" type="double" size="[1 17]">
+                    [0 45 108 179 245 344 409 459 500 567 622 676 759 833 896 962 1023]
+                 </gammaY>
+                 <gaussWeight index="1" type="double" size="[1 3]">
+                    [32 16 8]
+                 </gaussWeight>
+             </cell>
+             <cell index="13" type="struct" size="[1 1]">
+	         <iso index="1" type="double" size="[1 1]">
+	            [204800]
+	         </iso>
+	         <afmThres index="1" type="double" size="[1 1]">
+	            [4]
+	         </afmThres>
+	         <gammaY index="1" type="double" size="[1 17]">
+                    [0 45 108 179 245 344 409 459 500 567 622 676 759 833 896 962 1023]
+                 </gammaY>
+                 <gaussWeight index="1" type="double" size="[1 3]">
+                    [32 16 8]
+                 </gaussWeight>
+             </cell>
+         </afmeas_iso>
             <fixed_mode index="1" type="struct" size="[1 1]">
                 <code index="1" type="double" size="[1 1]">
                     [8 ]
@@ -2313,12 +2497,6 @@
                 <OutFocusPos index="1" type="double" size="[1 1]">
                     [30 ]
                 </OutFocusPos>
-                <gammaY index="1" type="double" size="[1 17]">
-                    [0 45 108 179 245 344 409 459 500 567 622 676 759 833 896 962 1023 ]
-                </gammaY>
-                <gaussWeight index="1" type="double" size="[1 3]">
-                    [32 16 8 ]
-                </gaussWeight>
             </contrast_af>
             <laser_af index="1" type="struct" size="[1 3]">
                 <enable index="1" type="double" size="[1 1]">
@@ -2352,29 +2530,29 @@
             </vcmConfig>
         </AF>
             <MERGE index="1" type="struct" size="[1 1]">
-                <EnvLv index="1" type="double" size="[1 6]">
-                    [0.0000 0.1000 0.2000 0.3000 0.7000 1.0000 ]
+                <EnvLv index="1" type="double" size="[1 13]">
+                    [0 0.005 0.01 0.05 0.1 0.15  0.2 0.3 0.4 0.5 0.6 0.8 1.0]
                 </EnvLv>
-                <OECurve_smooth index="1" type="double" size="[1 6]">
-                    [0.4000 0.4000 0.4000 0.4000 0.4000 0.4000 ]
+                <OECurve_smooth index="1" type="double" size="[1 13]">
+                    [0.4000 0.4000 0.4000 0.4000 0.4000 0.4000 0.4000 0.4000 0.4000 0.4000 0.4000 0.4000 0.4]
                 </OECurve_smooth>
-                <OECurve_offset index="1" type="double" size="[1 6]">
-                    [0.9000 0.9000 0.9000 0.9000 0.9000 0.9000 ]
+                <OECurve_offset index="1" type="double" size="[1 13]">
+                    [210 210 210 210 210 210 210 210 210 210 210 210 210]
                 </OECurve_offset>
-                <MoveCoef index="1" type="double" size="[1 6]">
-                    [0.0000 0.1000 0.2000 0.3000 0.7000 1.0000 ]
+                <MoveCoef index="1" type="double" size="[1 13]">
+                    [0 0.005 0.01 0.05 0.1 0.15  0.2 0.3 0.4 0.5 0.6 0.8 1.0]
                 </MoveCoef>
-                <MDCurveLM_smooth index="1" type="double" size="[1 6]">
-                    [0.4000 0.4000 0.4000 0.4000 0.4000 0.4000 ]
+                <MDCurveLM_smooth index="1" type="double" size="[1 13]">
+                    [0.4000 0.4000 0.4000 0.4000 0.4000 0.4000 0.4000 0.4000 0.4000 0.4000 0.4000 0.4000 0.4]
                 </MDCurveLM_smooth>
-                <MDCurveLM_offset index="1" type="double" size="[1 6]">
-                    [0.3800 0.3800 0.3800 0.3800 0.3800 0.3800 ]
+                <MDCurveLM_offset index="1" type="double" size="[1 13]">
+                    [0.3800 0.3800 0.3800 0.3800 0.3800 0.3800 0.3800 0.3800 0.3800 0.3800 0.3800 0.3800 0.38]
                 </MDCurveLM_offset>
-                <MDCurveMS_smooth index="1" type="double" size="[1 6]">
-                    [0.4000 0.4000 0.4000 0.4000 0.4000 0.4000 ]
+                <MDCurveMS_smooth index="1" type="double" size="[1 13]">
+                    [0.4000 0.4000 0.4000 0.4000 0.4000 0.4000 0.4000 0.4000 0.4000 0.4000 0.4000 0.4000 0.4]
                 </MDCurveMS_smooth>
-                <MDCurveMS_offset index="1" type="double" size="[1 6]">
-                    [0.3800 0.3800 0.3800 0.3800 0.3800 0.3800 ]
+                <MDCurveMS_offset index="1" type="double" size="[1 13]">
+                    [0.3800 0.3800 0.3800 0.3800 0.3800 0.3800 0.3800 0.3800 0.3800 0.3800 0.3800 0.3800 0.38]
                 </MDCurveMS_offset>
                 <OECurve_damp index="1" type="double" size="[1 1]">
                     [0.3000 ]
@@ -2421,37 +2599,37 @@
                     <GlobalLumaMode index="1" type="double" size="[1 1]">
                         [1.0000 ]
                     </GlobalLumaMode>
-                    <EnvLv index="1" type="double" size="[1 6]">
-                        [0.0000 0.2000 0.4000 0.6000 0.8000 1.0000 ]
+                    <EnvLv index="1" type="double" size="[1 13]">
+                        [0 0.005 0.01 0.05 0.1 0.15  0.2 0.3 0.4 0.5 0.6 0.8 1.0]
                     </EnvLv>
-                    <ISO index="1" type="double" size="[1 6]">
-                        [50.0000 100.0000 200.0000 300.0000 400.0000 1600.0000 ]
+                    <ISO index="1" type="double" size="[1 13]">
+                        [50 100 200 400 800 1600 3200 6400 12800 25600 51200 102400 204800]
                     </ISO>
                     <Tolerance index="1" type="double" size="[1 1]">
                         [0.0000 ]
                     </Tolerance>
-                    <GlobalLuma index="1" type="double" size="[1 6]">
-                        [0.2500 0.2500 0.2500 0.2500 0.1700 0.1000 ]
+                    <GlobalLuma index="1" type="double" size="[1 13]">
+                        [0.2500 0.2500 0.2500 0.2500 0.1700 0.1 0.1 0.1 0.1 0.1 0.1 0.1 0.1]
                     </GlobalLuma>
 		</cell>
-		<cell index="1" type="struct" size="[1 1]">
-		<Name index="2" type="char" size="[1 8]">
+		<cell index="2" type="struct" size="[1 1]">
+		<Name index="1" type="char" size="[1 8]">
                   HDR
                   </Name>
                     <GlobalLumaMode index="1" type="double" size="[1 1]">
                         [1.0000 ]
                     </GlobalLumaMode>
-                    <EnvLv index="1" type="double" size="[1 6]">
-                        [0.0000 0.2000 0.4000 0.6000 0.8000 1.0000 ]
+                    <EnvLv index="1" type="double" size="[1 13]">
+                        [0 0.005 0.01 0.05 0.1 0.15  0.2 0.3 0.4 0.5 0.6 0.8 1.0]
                     </EnvLv>
-                    <ISO index="1" type="double" size="[1 6]">
-                        [50.0000 100.0000 200.0000 300.0000 400.0000 1600.0000 ]
+                    <ISO index="1" type="double" size="[1 13]">
+                        [50 100 200 400 800 1600 3200 6400 12800 25600 51200 102400 204800]
                     </ISO>
                     <Tolerance index="1" type="double" size="[1 1]">
                         [0.0000 ]
                     </Tolerance>
-                    <GlobalLuma index="1" type="double" size="[1 6]">
-                        [0.2500 0.2500 0.2500 0.2500 0.1700 0.1000 ]
+                    <GlobalLuma index="1" type="double" size="[1 13]">
+                        [0.2500 0.2500 0.2500 0.2500 0.1700 0.1 0.1 0.1 0.1 0.1 0.1 0.1 0.1]
                     </GlobalLuma>
 		</cell>
 		<cell index="3" type="struct" size="[1 1]">
@@ -2461,17 +2639,17 @@
                     <GlobalLumaMode index="1" type="double" size="[1 1]">
                         [1.0000 ]
                     </GlobalLumaMode>
-                    <EnvLv index="1" type="double" size="[1 6]">
-                        [0.0000 0.2000 0.4000 0.6000 0.8000 1.0000 ]
+                    <EnvLv index="1" type="double" size="[1 13]">
+                        [0 0.005 0.01 0.05 0.1 0.15  0.2 0.3 0.4 0.5 0.6 0.8 1.0]
                     </EnvLv>
-                    <ISO index="1" type="double" size="[1 6]">
-                        [50.0000 100.0000 200.0000 300.0000 400.0000 1600.0000 ]
+                    <ISO index="1" type="double" size="[1 13]">
+                        [50 100 200 400 800 1600 3200 6400 12800 25600 51200 102400 204800]
                     </ISO>
                     <Tolerance index="1" type="double" size="[1 1]">
                         [0.0000 ]
                     </Tolerance>
-                    <GlobalLuma index="1" type="double" size="[1 6]">
-                        [0.2500 0.2500 0.2500 0.2500 0.1700 0.1000 ]
+                    <GlobalLuma index="1" type="double" size="[1 13]">
+                        [0.2500 0.2500 0.2500 0.2500 0.1700 0.1 0.1 0.1 0.1 0.1 0.1 0.1 0.1]
                     </GlobalLuma>
 		</cell>
                 </GlobalLuma>
@@ -2483,17 +2661,17 @@
                     <DetailsHighLightMode index="1" type="double" size="[1 1]">
                         [0.0000 ]
                     </DetailsHighLightMode>
-                    <OEPdf index="1" type="double" size="[1 6]">
-                        [0.0000 0.1000 0.2000 0.3000 0.4000 0.5000 ]
+                    <OEPdf index="1" type="double" size="[1 13]">
+                        [0 0.05 0.1 0.15 0.2 0.25 0.3 0.35 0.4 0.45 0.5 0.8 1]
                     </OEPdf>
-                    <EnvLv index="1" type="double" size="[1 6]">
-                        [0.0000 0.2000 0.4000 0.6000 0.8000 1.0000 ]
+                    <EnvLv index="1" type="double" size="[1 13]">
+                        [0 0.005 0.01 0.05 0.1 0.15  0.2 0.3 0.4 0.5 0.6 0.8 1.0]
                     </EnvLv>
                     <Tolerance index="1" type="double" size="[1 1]">
                         [0.0000 ]
                     </Tolerance>
-                    <DetailsHighLight index="1" type="double" size="[1 6]">
-                        [0.5000 0.5000 0.5000 0.5000 0.5000 0.5000 ]
+                    <DetailsHighLight index="1" type="double" size="[1 13]">
+                        [0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5]
                     </DetailsHighLight>
                    </cell>
 		<cell index="2" type="struct" size="[1 1]">
@@ -2503,17 +2681,17 @@
                     <DetailsHighLightMode index="1" type="double" size="[1 1]">
                         [0.0000 ]
                     </DetailsHighLightMode>
-                    <OEPdf index="1" type="double" size="[1 6]">
-                        [0.0000 0.1000 0.2000 0.3000 0.4000 0.5000 ]
+                    <OEPdf index="1" type="double" size="[1 13]">
+                        [0 0.05 0.1 0.15 0.2 0.25 0.3 0.35 0.4 0.45 0.5 0.8 1]
                     </OEPdf>
-                    <EnvLv index="1" type="double" size="[1 6]">
-                        [0.0000 0.2000 0.4000 0.6000 0.8000 1.0000 ]
+                    <EnvLv index="1" type="double" size="[1 13]">
+                        [0 0.005 0.01 0.05 0.1 0.15  0.2 0.3 0.4 0.5 0.6 0.8 1.0]
                     </EnvLv>
                     <Tolerance index="1" type="double" size="[1 1]">
                         [0.0000 ]
                     </Tolerance>
-                    <DetailsHighLight index="1" type="double" size="[1 6]">
-                        [0.5000 0.5000 0.5000 0.5000 0.5000 0.5000 ]
+                    <DetailsHighLight index="1" type="double" size="[1 13]">
+                        [0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5]
                     </DetailsHighLight>
                    </cell>
 		<cell index="3" type="struct" size="[1 1]">
@@ -2523,17 +2701,17 @@
                     <DetailsHighLightMode index="1" type="double" size="[1 1]">
                         [0.0000 ]
                     </DetailsHighLightMode>
-                    <OEPdf index="1" type="double" size="[1 6]">
-                        [0.0000 0.1000 0.2000 0.3000 0.4000 0.5000 ]
+                    <OEPdf index="1" type="double" size="[1 13]">
+                        [0 0.05 0.1 0.15 0.2 0.25 0.3 0.35 0.4 0.45 0.5 0.8 1]
                     </OEPdf>
-                    <EnvLv index="1" type="double" size="[1 6]">
-                        [0.0000 0.2000 0.4000 0.6000 0.8000 1.0000 ]
+                    <EnvLv index="1" type="double" size="[1 13]">
+                        [0 0.005 0.01 0.05 0.1 0.15  0.2 0.3 0.4 0.5 0.6 0.8 1.0]
                     </EnvLv>
                     <Tolerance index="1" type="double" size="[1 1]">
                         [0.0000 ]
                     </Tolerance>
-                    <DetailsHighLight index="1" type="double" size="[1 6]">
-                        [0.5000 0.5000 0.5000 0.5000 0.5000 0.5000 ]
+                    <DetailsHighLight index="1" type="double" size="[1 13]">
+                        [0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5]
                     </DetailsHighLight>
                    </cell>
                 </DetailsHighLight>
@@ -2545,20 +2723,20 @@
                     <DetailsLowLightMode index="1" type="double" size="[1 1]">
                         [2.0000 ]
                     </DetailsLowLightMode>
-                    <FocusLuma index="1" type="double" size="[1 6]">
-                        [1.0000 20.0000 30.0000 40.0000 50.0000 60.0000 ]
+                    <FocusLuma index="1" type="double" size="[1 13]">
+                        [1 15 20 25 30 35 40 50 60 70 80 90 100]
                     </FocusLuma>
-                    <DarkPdf index="1" type="double" size="[1 6]">
-                        [0.0000 0.1000 0.2000 0.3000 0.4000 0.5000 ]
+                    <DarkPdf index="1" type="double" size="[1 13]">
+                        [0 0.05 0.1 0.15 0.2 0.25 0.3 0.35 0.4 0.45 0.5 0.8 1]
                     </DarkPdf>
-                    <ISO index="1" type="double" size="[1 6]">
-                        [50.0000 100.0000 200.0000 300.0000 400.0000 500.0000 ]
+                    <ISO index="1" type="double" size="[1 13]">
+                        [50 100 200 400 800 1600 3200 6400 12800 25600 51200 102400 204800]
                     </ISO>
                     <Tolerance index="1" type="double" size="[1 1]">
                         [0.0000 ]
                     </Tolerance>
-                    <DetailsLowLight index="1" type="double" size="[1 6]">
-                        [1.0000 1.0000 1.0000 1.0000 1.0000 1.0000 ]
+                    <DetailsLowLight index="1" type="double" size="[1 13]">
+                        [1 1 1 1 1 1 1 1 1 1 1 1 1]
                     </DetailsLowLight>
 		</cell>
 		<cell index="2" type="struct" size="[1 1]">
@@ -2568,20 +2746,20 @@
                     <DetailsLowLightMode index="1" type="double" size="[1 1]">
                         [2.0000 ]
                     </DetailsLowLightMode>
-                    <FocusLuma index="1" type="double" size="[1 6]">
-                        [1.0000 20.0000 30.0000 40.0000 50.0000 60.0000 ]
+                    <FocusLuma index="1" type="double" size="[1 13]">
+                        [1 15 20 25 30 35 40 50 60 70 80 90 100]
                     </FocusLuma>
-                    <DarkPdf index="1" type="double" size="[1 6]">
-                        [0.0000 0.1000 0.2000 0.3000 0.4000 0.5000 ]
+                    <DarkPdf index="1" type="double" size="[1 13]">
+                        [0 0.05 0.1 0.15 0.2 0.25 0.3 0.35 0.4 0.45 0.5 0.8 1]
                     </DarkPdf>
-                    <ISO index="1" type="double" size="[1 6]">
-                        [50.0000 100.0000 200.0000 300.0000 400.0000 500.0000 ]
+                    <ISO index="1" type="double" size="[1 13]">
+                        [50 100 200 400 800 1600 3200 6400 12800 25600 51200 102400 204800]
                     </ISO>
                     <Tolerance index="1" type="double" size="[1 1]">
                         [0.0000 ]
                     </Tolerance>
-                    <DetailsLowLight index="1" type="double" size="[1 6]">
-                        [1.0000 1.0000 1.0000 1.0000 1.0000 1.0000 ]
+                    <DetailsLowLight index="1" type="double" size="[1 13]">
+                        [1 1 1 1 1 1 1 1 1 1 1 1 1]
                     </DetailsLowLight>
 		</cell>
 		<cell index="3" type="struct" size="[1 1]">
@@ -2591,20 +2769,20 @@
                     <DetailsLowLightMode index="1" type="double" size="[1 1]">
                         [2.0000 ]
                     </DetailsLowLightMode>
-                    <FocusLuma index="1" type="double" size="[1 6]">
-                        [1.0000 20.0000 30.0000 40.0000 50.0000 60.0000 ]
+                    <FocusLuma index="1" type="double" size="[1 13]">
+                        [1 15 20 25 30 35 40 50 60 70 80 90 100]
                     </FocusLuma>
-                    <DarkPdf index="1" type="double" size="[1 6]">
-                        [0.0000 0.1000 0.2000 0.3000 0.4000 0.5000 ]
+                    <DarkPdf index="1" type="double" size="[1 13]">
+                        [0 0.05 0.1 0.15 0.2 0.25 0.3 0.35 0.4 0.45 0.5 0.8 1]
                     </DarkPdf>
-                    <ISO index="1" type="double" size="[1 6]">
-                        [50.0000 100.0000 200.0000 300.0000 400.0000 500.0000 ]
+                    <ISO index="1" type="double" size="[1 13]">
+                        [50 100 200 400 800 1600 3200 6400 12800 25600 51200 102400 204800]
                     </ISO>
                     <Tolerance index="1" type="double" size="[1 1]">
                         [0.0000 ]
                     </Tolerance>
-                    <DetailsLowLight index="1" type="double" size="[1 6]">
-                        [1.0000 1.0000 1.0000 1.0000 1.0000 1.0000 ]
+                    <DetailsLowLight index="1" type="double" size="[1 13]">
+                        [1 1 1 1 1 1 1 1 1 1 1 1 1]
                     </DetailsLowLight>
 		</cell>
                 </DetailsLowLight>
@@ -2622,17 +2800,17 @@
                 <Mode index="1" type="double" size="[1 1]">
                     [0]
                  </Mode> 
-                <DynamicRange index="1" type="double" size="[1 6]">
-                    [1 44 66 72 78 84]
+                <DynamicRange index="1" type="double" size="[1 13]">
+                    [1 20 30 44 48 55 60 66 68 72 78 80 84]
                  </DynamicRange> 
-              <EnvLv index="1" type="double" size="[1 6]">
-                  [0 0.2 0.4 0.6 0.8 1.0]
-               </EnvLv> 
+                    <EnvLv index="1" type="double" size="[1 13]">
+                        [0 0.005 0.01 0.05 0.1 0.15  0.2 0.3 0.4 0.5 0.6 0.8 1.0]
+                    </EnvLv>
 		<Tolerance index="1" type="double" size="[1 1]">
                     [0]
                  </Tolerance>
-                 <GlobalTMOStrength index="1" type="double" size="[1 6]">
-                    [0.5 0.5 0.5 0.5 0.5 0.5]
+                 <GlobalTMOStrength index="1" type="double" size="[1 13]">
+                    [0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5]
                  </GlobalTMOStrength>
 		</cell>
 		<cell index="2" type="struct" size="[1 1]">
@@ -2648,17 +2826,17 @@
                 <Mode index="1" type="double" size="[1 1]">
                     [0]
                  </Mode> 
-                <DynamicRange index="1" type="double" size="[1 6]">
-                    [1 44 66 72 78 84]
+                <DynamicRange index="1" type="double" size="[1 13]">
+                    [1 20 30 44 48 55 60 66 68 72 78 80 84]
                  </DynamicRange> 
-              <EnvLv index="1" type="double" size="[1 6]">
-                  [0 0.2 0.4 0.6 0.8 1.0]
-               </EnvLv> 
+                    <EnvLv index="1" type="double" size="[1 13]">
+                        [0 0.005 0.01 0.05 0.1 0.15  0.2 0.3 0.4 0.5 0.6 0.8 1.0]
+                    </EnvLv>
 		<Tolerance index="1" type="double" size="[1 1]">
                     [0]
                  </Tolerance>
-                 <GlobalTMOStrength index="1" type="double" size="[1 6]">
-                    [0.5 0.5 0.5 0.5 0.5 0.5]
+                 <GlobalTMOStrength index="1" type="double" size="[1 13]">
+                    [0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5]
                  </GlobalTMOStrength>
 		</cell>
 		<cell index="3" type="struct" size="[1 1]">
@@ -2674,17 +2852,17 @@
                 <Mode index="1" type="double" size="[1 1]">
                     [0]
                  </Mode> 
-                <DynamicRange index="1" type="double" size="[1 6]">
-                    [1 44 66 72 78 84]
+                <DynamicRange index="1" type="double" size="[1 13]">
+                    [1 20 30 44 48 55 60 66 68 72 78 80 84]
                  </DynamicRange> 
-              <EnvLv index="1" type="double" size="[1 6]">
-                  [0 0.2 0.4 0.6 0.8 1.0]
-               </EnvLv> 
+                    <EnvLv index="1" type="double" size="[1 13]">
+                        [0 0.005 0.01 0.05 0.1 0.15  0.2 0.3 0.4 0.5 0.6 0.8 1.0]
+                    </EnvLv>
 		<Tolerance index="1" type="double" size="[1 1]">
                     [0]
                  </Tolerance>
-                 <GlobalTMOStrength index="1" type="double" size="[1 6]">
-                    [0.5 0.5 0.5 0.5 0.5 0.5]
+                 <GlobalTMOStrength index="1" type="double" size="[1 13]">
+                    [0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5]
                  </GlobalTMOStrength>
 		</cell>
          </GlobalTMO>
@@ -2696,17 +2874,17 @@
                 <LocalTMOMode index="1" type="double" size="[1 1]">
                     [0]
                  </LocalTMOMode> 
-                <DynamicRange index="1" type="double" size="[1 6]">
-                    [1 44 66 72 78 84]
+                <DynamicRange index="1" type="double" size="[1 13]">
+                    [1 20 30 44 48 55 60 66 68 72 78 80 84]
                  </DynamicRange> 
-              <EnvLv index="1" type="double" size="[1 6]">
-                  [0 0.2 0.4 0.6 0.8 1.0]
-               </EnvLv> 
+                    <EnvLv index="1" type="double" size="[1 13]">
+                        [0 0.005 0.01 0.05 0.1 0.15  0.2 0.3 0.4 0.5 0.6 0.8 1.0]
+                    </EnvLv>
 		<Tolerance index="1" type="double" size="[1 1]">
                     [0]
                  </Tolerance>
-                 <LocalTMOStrength index="1" type="double" size="[1 6]">
-                    [0.3 0.3 0.3 0.3 0.3 0.3]
+                 <LocalTMOStrength index="1" type="double" size="[1 13]">
+                    [0.3 0.3 0.3 0.3 0.3 0.3 0.3 0.3 0.3 0.3 0.3 0.3 0.3]
                  </LocalTMOStrength>
 		</cell>
 		<cell index="2" type="struct" size="[1 1]">
@@ -2716,17 +2894,17 @@
                 <LocalTMOMode index="1" type="double" size="[1 1]">
                     [0]
                  </LocalTMOMode> 
-                <DynamicRange index="1" type="double" size="[1 6]">
-                    [1 44 66 72 78 84]
+                <DynamicRange index="1" type="double" size="[1 13]">
+                    [1 20 30 44 48 55 60 66 68 72 78 80 84]
                  </DynamicRange> 
-              <EnvLv index="1" type="double" size="[1 6]">
-                  [0 0.2 0.4 0.6 0.8 1.0]
-               </EnvLv> 
+                    <EnvLv index="1" type="double" size="[1 13]">
+                        [0 0.005 0.01 0.05 0.1 0.15  0.2 0.3 0.4 0.5 0.6 0.8 1.0]
+                    </EnvLv>
 		<Tolerance index="1" type="double" size="[1 1]">
                     [0]
                  </Tolerance>
-                 <LocalTMOStrength index="1" type="double" size="[1 6]">
-                    [0.3 0.3 0.3 0.3 0.3 0.3]
+                 <LocalTMOStrength index="1" type="double" size="[1 13]">
+                    [0.3 0.3 0.3 0.3 0.3 0.3 0.3 0.3 0.3 0.3 0.3 0.3 0.3]
                  </LocalTMOStrength>
 		</cell>
 		<cell index="3" type="struct" size="[1 1]">
@@ -2736,17 +2914,17 @@
                 <LocalTMOMode index="1" type="double" size="[1 1]">
                     [0]
                  </LocalTMOMode> 
-                <DynamicRange index="1" type="double" size="[1 6]">
-                    [1 44 66 72 78 84]
+                <DynamicRange index="1" type="double" size="[1 13]">
+                    [1 20 30 44 48 55 60 66 68 72 78 80 84]
                  </DynamicRange> 
-              <EnvLv index="1" type="double" size="[1 6]">
-                  [0 0.2 0.4 0.6 0.8 1.0]
-               </EnvLv> 
+                    <EnvLv index="1" type="double" size="[1 13]">
+                        [0 0.005 0.01 0.05 0.1 0.15  0.2 0.3 0.4 0.5 0.6 0.8 1.0]
+                    </EnvLv>
 		<Tolerance index="1" type="double" size="[1 1]">
                     [0]
                  </Tolerance>
-                 <LocalTMOStrength index="1" type="double" size="[1 6]">
-                    [0.3 0.3 0.3 0.3 0.3 0.3]
+                 <LocalTMOStrength index="1" type="double" size="[1 13]">
+                    [0.3 0.3 0.3 0.3 0.3 0.3 0.3 0.3 0.3 0.3 0.3 0.3 0.3]
                  </LocalTMOStrength>
 		</cell>
          </LocalTMO>
@@ -2829,8 +3007,8 @@
                 <Stage1_enable index="1" type="double" size="[1 13]">
                     [1 1 1 1 1 1 1 1 1 1 1 1 1 ]
                 </Stage1_enable>
-                <grayscale_mode index="1" type="double" size="[1 13]">
-                    [0 0 0 0 0 0 0 0 0 0 0 0 0 ]
+                <grayscale_mode index="1" type="double" size="[1 1]">
+                    [0]
                 </grayscale_mode>
                 <rk_out_sel index="1" type="double" size="[1 13]">
                     [1 1 1 1 1 1 1 1 1 1 1 1 1 ]
@@ -2853,165 +3031,327 @@
                 <stage1_use_fix_set index="1" type="double" size="[1 13]">
                     [0 0 0 0 0 0 0 0 0 0 0 0 0 ]
                 </stage1_use_fix_set>
-                <stage1_use_set3 index="1" type="double" size="[1 13]">
-                    [1 1 1 1 1 1 1 1 1 1 1 1 1 ]
-                </stage1_use_set3>
-                <stage1_use_set2 index="1" type="double" size="[1 13]">
-                    [1 1 1 1 1 1 1 1 1 1 1 1 1 ]
-                </stage1_use_set2>
                 <stage1_use_set1 index="1" type="double" size="[1 13]">
                     [0 0 0 0 0 0 0 0 0 0 0 0 0 ]
                 </stage1_use_set1>
+                <stage1_use_set2 index="1" type="double" size="[1 13]">
+                    [1 1 1 1 1 1 1 1 1 1 1 1 1 ]
+                </stage1_use_set2>
+                <stage1_use_set3 index="1" type="double" size="[1 13]">
+                    [1 1 1 1 1 1 1 1 1 1 1 1 1 ]
+                </stage1_use_set3>
                 <set_cell index="1" type="cell" size="[1 3]">
                     <cell index="1" type="struct" size="[1 1]">
-                        <red_blue_enable index="1" type="double" size="[6 13]">
-                            [0 0 0 0 0 0 0 0 0 0 0 0 0 
-                            1 1 1 1 1 1 1 1 1 1 1 1 1 
-                            1 1 1 1 1 1 1 1 1 1 1 1 1 
-                            1 1 1 1 1 1 1 1 1 1 1 1 1 
-                            0 0 0 0 0 0 0 0 0 0 0 0 0 
-                            1 1 1 1 1 1 1 1 1 1 1 1 1 ]
-                        </red_blue_enable>
-                        <green_enable index="1" type="double" size="[6 13]">
-                            [0 0 0 0 0 0 0 0 0 0 0 0 0 
-                            1 1 1 1 1 1 1 1 1 1 1 1 1 
-                            1 1 1 1 1 1 1 1 1 1 1 1 1 
-                            1 1 1 1 1 1 1 1 1 1 1 1 1 
-                            0 0 0 0 0 0 0 0 0 0 0 0 0 
-                            1 1 1 1 1 1 1 1 1 1 1 1 1 ]
-                        </green_enable>
-                        <line_thresh index="1" type="double" size="[4 13]">
-                            [0 0 0 0 0 0 0 0 0 0 0 0 0 
-                            0 0 0 0 0 0 0 0 0 0 0 0 0 
-                            8 8 8 8 8 8 8 8 8 8 8 8 8 
-                            8 8 8 8 8 8 8 8 8 8 8 8 8 ]
-                        </line_thresh>
-                        <line_mad_fac index="1" type="double" size="[4 13]">
-                            [0 0 0 0 0 0 0 0 0 0 0 0 0 
-                            0 0 0 0 0 0 0 0 0 0 0 0 0 
-                            4 4 4 4 4 4 4 4 4 4 4 4 4 
-                            4 4 4 4 4 4 4 4 4 4 4 4 4 ]
-                        </line_mad_fac>
-                        <pg_fac index="1" type="double" size="[2 13]">
-                            [8 8 8 8 8 8 8 8 8 8 8 8 8 
-                            8 8 8 8 8 8 8 8 8 8 8 8 8 ]
-                        </pg_fac>
-                        <rnd_thresh index="1" type="double" size="[2 13]">
-                            [10 10 10 10 10 10 10 10 10 10 10 10 10 
-                            10 10 10 10 10 10 10 10 10 10 10 10 10 ]
-                        </rnd_thresh>
-                        <rg_fac index="1" type="double" size="[2 13]">
-                            [32 32 32 32 32 32 32 32 32 32 32 32 32 
-                            32 32 32 32 32 32 32 32 32 32 32 32 32 ]
-                        </rg_fac>
-                        <rg_lim index="1" type="double" size="[2 13]">
-                            [1 1 1 1 1 1 1 1 1 1 1 1 1 
-                            1 1 1 1 1 1 1 1 1 1 1 1 1 ]
-                        </rg_lim>
-                        <rnd_offs index="1" type="double" size="[2 13]">
-                            [2 2 2 2 2 2 2 2 2 2 2 2 2 
-                            2 2 2 2 2 2 2 2 2 2 2 2 2 ]
-                        </rnd_offs>
+            <RK index="1" type="struct" size="[1 1]">
+                <RK_red_blue_enable index="1" type="double" size="[1 13]">
+                    [0 0 0 0 0 0 0 0 0 0 0 0 0  ]
+                </RK_red_blue_enable>
+                <RK_green_enable index="1" type="double" size="[1 13]">
+                    [0 0 0 0 0 0 0 0 0 0 0 0 0 ]
+                </RK_green_enable>
+                <rb_sw_mindis index="1" type="double" size="[1 13]">
+                    [0 0 0 0 0 0 0 0 0 0 0 0 0 ]
+                </rb_sw_mindis>
+                <g_sw_mindis index="1" type="double" size="[1 13]">
+                    [0 0 0 0 0 0 0 0 0 0 0 0 0 ]
+                </g_sw_mindis>
+                <sw_dis_scale_min index="1" type="double" size="[1 13]">
+                    [0 0 0 0 0 0 0 0 0 0 0 0 0 ]
+                </sw_dis_scale_min>
+                <sw_dis_scale_max index="1" type="double" size="[1 13]">
+                    [0 0 0 0 0 0 0 0 0 0 0 0 0 ]
+                </sw_dis_scale_max>
+            </RK>
+            <LC index="1" type="struct" size="[1 1]">
+                <LC_red_blue_enable index="1" type="double" size="[1 13]">
+                    [0 0 0 0 0 0 0 0 0 0 0 0 0]
+                </LC_red_blue_enable>
+                <LC_green_enable index="1" type="double" size="[1 13]">
+                    [0 0 0 0 0 0 0 0 0 0 0 0 0]
+                </LC_green_enable>
+                <rb_line_thr index="1" type="double" size="[1 13]">
+                    [8 8 8 8 8 8 8 8 8 8 8 8 8  ]
+                </rb_line_thr>
+                <g_line_thr index="1" type="double" size="[1 13]">
+                    [8 8 8 8 8 8 8 8 8 8 8 8 8  ]
+                </g_line_thr>
+                <rb_line_mad_fac index="1" type="double" size="[1 13]">
+                    [4 4 4 4 4 4 4 4 4 4 4 4 4]
+                </rb_line_mad_fac>
+                <g_line_mad_fac index="1" type="double" size="[1 13]">
+                    [4 4 4 4 4 4 4 4 4 4 4 4 4 ]
+                </g_line_mad_fac>
+            </LC>
+            <PG index="1" type="struct" size="[1 1]">
+                <PG_red_blue_enable index="1" type="double" size="[1 13]">
+                    [1 1 1 1 1 1 1 1 1 1 1 1 1 ]
+                </PG_red_blue_enable>
+                <PG_green_enable index="1" type="double" size="[1 13]">
+                    [1 1 1 1 1 1 1 1 1 1 1 1 1]
+                </PG_green_enable>
+                <rb_pg_fac index="1" type="double" size="[1 13]">
+                    [4 4 4 4 4 4 4 4 4 4 4 4 4 ]
+                </rb_pg_fac>
+                <g_pg_fac index="1" type="double" size="[1 13]">
+                    [3 3 3 3 3 3 3 3 3 3 3 3 3 ]
+                </g_pg_fac>
+            </PG>
+            <RND index="1" type="struct" size="[1 1]">
+                <RND_red_blue_enable index="1" type="double" size="[1 13]">
+                    [1 1 1 1 1 1 1 1 1 1 1 1 1 ]
+                </RND_red_blue_enable>
+                <RND_green_enable index="1" type="double" size="[1 13]">
+                    [1 1 1 1 1 1 1 1 1 1 1 1 1 ]
+                </RND_green_enable>
+                <rb_rnd_thr index="1" type="double" size="[1 13]">
+                    [10 10 10 10 10 10 10 10 10 10 10 10 10  ]
+                </rb_rnd_thr>
+                <g_rnd_thr index="1" type="double" size="[1 13]">
+                    [10 10 10 10 10 10 10 10 10 10 10 10 10  ]
+                </g_rnd_thr>
+                <rb_rnd_offs index="1" type="double" size="[1 13]">
+                    [3 3 3 3 3 3 3 3 3 3 3 3 3 ]
+                </rb_rnd_offs>
+                <g_rnd_offs index="1" type="double" size="[1 13]">
+                    [3 3 3 3 3 3 3 3 3 3 3 3 3 ]
+                </g_rnd_offs>
+            </RND>
+            <RG index="1" type="struct" size="[1 1]">
+                <RG_red_blue_enable index="1" type="double" size="[1 13]">
+                    [1 1 1 1 1 1 1 1 1 1 1 1 1  ]
+                </RG_red_blue_enable>
+                <RG_green_enable index="1" type="double" size="[1 13]">
+                    [1 1 1 1 1 1 1 1 1 1 1 1 1  ]
+                </RG_green_enable>
+                <rb_rg_fac index="1" type="double" size="[1 13]">
+                    [32 32 32 32 32 32 32 32 32 32 32 32 32 ]
+                </rb_rg_fac>
+                <g_rg_fac index="1" type="double" size="[1 13]">
+                    [32 32 32 32 32 32 32 32 32 32 32 32 32 ]
+                </g_rg_fac>
+            </RG>
+            <RO index="1" type="struct" size="[1 1]">
+                <RO_red_blue_enable index="1" type="double" size="[1 13]">
+                    [1 1 1 1 1 1 1 1 1 1 1 1 1 ]
+                </RO_red_blue_enable>
+                <RO_green_enable index="1" type="double" size="[1 13]">
+                    [1 1 1 1 1 1 1 1 1 1 1 1 1 ]
+                </RO_green_enable>
+                <rb_ro_lim index="1" type="double" size="[1 13]">
+                    [2 2 2 2 2 2 2 2 2 2 2 2 2 ]
+                </rb_ro_lim>
+                <g_ro_lim index="1" type="double" size="[1 13]">
+                    [2 2 2 2 2 2 2 2 2 2 2 2 2 ]
+                </g_ro_lim>
+            </RO>
                     </cell>
                     <cell index="2" type="struct" size="[1 1]">
-                        <red_blue_enable index="1" type="double" size="[6 13]">
-                            [1 1 1 1 1 1 1 1 1 0 0 0 0 
-                            0 0 0 0 0 0 0 0 0 0 0 0 0 
-                            0 0 0 0 0 0 0 0 0 0 0 0 0 
-                            1 1 1 1 1 1 1 1 1 0 0 0 0 
-                            1 1 1 1 1 1 1 1 1 0 0 0 0 
-                            1 1 1 1 1 1 1 1 1 0 0 0 0 ]
-                        </red_blue_enable>
-                        <green_enable index="1" type="double" size="[6 13]">
-                            [1 1 1 1 1 1 1 1 1 0 0 0 0 
-                            0 0 0 0 0 0 0 0 0 0 0 0 0 
-                            0 0 0 0 0 0 0 0 0 0 0 0 0 
-                            1 1 1 1 1 1 1 1 1 0 0 0 0 
-                            1 1 1 1 1 1 1 1 1 0 0 0 0 
-                            1 1 1 1 1 1 1 1 1 0 0 0 0 ]
-                        </green_enable>
-                        <line_thresh index="1" type="double" size="[4 13]">
-                            [20 20 12 2 2 2 0 0 0 0 0 0 0 
-                            20 20 12 2 2 2 0 0 0 0 0 0 0 
-                            20 20 12 2 2 2 0 0 0 0 0 0 0 
-                            20 20 12 2 2 2 0 0 0 0 0 0 0 ]
-                        </line_thresh>
-                        <line_mad_fac index="1" type="double" size="[4 13]">
-                            [12 12 8 1 1 1 1 1 1 1 1 1 1 
-                            12 12 8 1 1 1 1 1 1 1 1 1 1 
-                            10 10 6 1 1 1 1 1 1 1 1 1 1 
-                            10 10 6 1 1 1 1 1 1 1 1 1 1 ]
-                        </line_mad_fac>
-                        <pg_fac index="1" type="double" size="[2 13]">
-                            [5 5 5 3 1 1 1 1 1 1 1 1 1 
-                            4 4 4 2 1 1 1 1 1 1 1 1 1 ]
-                        </pg_fac>
-                        <rnd_thresh index="1" type="double" size="[2 13]">
-                            [0 0 0 0 0 0 8 8 8 8 8 8 8 
-                            0 0 0 0 0 0 8 8 8 8 8 8 8 ]
-                        </rnd_thresh>
-                        <rg_fac index="1" type="double" size="[2 13]">
-                            [0 0 0 0 0 0 8 8 8 8 8 8 8 
-                            0 0 0 0 0 0 8 8 8 8 8 8 8 ]
-                        </rg_fac>
-                        <rg_lim index="1" type="double" size="[2 13]">
-                            [2 2 2 2 3 3 3 3 3 3 3 3 3 
-                            2 2 2 2 3 3 3 3 3 3 3 3 3 ]
-                        </rg_lim>
-                        <rnd_offs index="1" type="double" size="[2 13]">
-                            [0 0 0 0 0 0 0 0 0 0 0 0 0 
-                            0 0 0 0 0 0 0 0 0 0 0 0 0 ]
-                        </rnd_offs>
+			<RK index="1" type="struct" size="[1 1]">
+                <RK_red_blue_enable index="1" type="double" size="[1 13]">
+                   [ 1 1 1 1 1 1 1 1 1 0 0 0 0  ]
+                </RK_red_blue_enable>
+                <RK_green_enable index="1" type="double" size="[1 13]">
+                    [1 1 1 1 1 1 1 1 1 0 0 0 0  ]
+                </RK_green_enable>
+                <rb_sw_mindis index="1" type="double" size="[1 13]">
+                    [20 20 12 2 2 2 0 0 0 0 0 0 0 ]
+                </rb_sw_mindis>
+                <g_sw_mindis index="1" type="double" size="[1 13]">
+                    [20 20 12 2 2 2 0 0 0 0 0 0 0 ]
+                </g_sw_mindis>
+                <sw_dis_scale_min index="1" type="double" size="[1 13]">
+                    [12 12 8 1 1 1 1 1 1 1 1 1 1  ]
+                </sw_dis_scale_min>
+                <sw_dis_scale_max index="1" type="double" size="[1 13]">
+                    [12 12 8 1 1 1 1 1 1 1 1 1 1  ]
+                </sw_dis_scale_max>
+            </RK>
+            <LC index="1" type="struct" size="[1 1]">
+                <LC_red_blue_enable index="1" type="double" size="[1 13]">
+                    [1 1 1 1 1 1 1 1 1 0 0 0 0 ]
+                </LC_red_blue_enable>
+                <LC_green_enable index="1" type="double" size="[1 13]">
+                    [1 1 1 1 1 1 1 1 1 0 0 0 0 ]
+                </LC_green_enable>
+                <rb_line_thr index="1" type="double" size="[1 13]">
+                    [20 20 12 2 2 2 0 0 0 0 0 0 0  ]
+                </rb_line_thr>
+                <g_line_thr index="1" type="double" size="[1 13]">
+                    [20 20 12 2 2 2 0 0 0 0 0 0 0  ]
+                </g_line_thr>
+                <rb_line_mad_fac index="1" type="double" size="[1 13]">
+                    [12 12 8 1 1 1 1 1 1 1 1 1 1 ]
+                </rb_line_mad_fac>
+                <g_line_mad_fac index="1" type="double" size="[1 13]">
+                    [12 12 8 1 1 1 1 1 1 1 1 1 1  ]
+                </g_line_mad_fac>
+            </LC>
+            <PG index="1" type="struct" size="[1 1]">
+                <PG_red_blue_enable index="1" type="double" size="[1 13]">
+                    [1 1 1 1 1 1 1 1 1 0 0 0 0 ]
+                </PG_red_blue_enable>
+                <PG_green_enable index="1" type="double" size="[1 13]">
+                    [1 1 1 1 1 1 1 1 1 0 0 0 0 ]
+                </PG_green_enable>
+                <rb_pg_fac index="1" type="double" size="[1 13]">
+                    [5 5 5 3 1 1 1 1 1 1 1 1 1 ]
+                </rb_pg_fac>
+                <g_pg_fac index="1" type="double" size="[1 13]">
+                    [4 4 4 2 1 1 1 1 1 1 1 1 1 ]
+                </g_pg_fac>
+            </PG>
+            <RND index="1" type="struct" size="[1 1]">
+                <RND_red_blue_enable index="1" type="double" size="[1 13]">
+                    [0 0 0 0 0 0 0 0 0 0 0 0 0]
+                </RND_red_blue_enable>
+                <RND_green_enable index="1" type="double" size="[1 13]">
+                    [0 0 0 0 0 0 0 0 0 0 0 0 0]
+                </RND_green_enable>
+                <rb_rnd_thr index="1" type="double" size="[1 13]">
+                    [0 0 0 0 0 0 8 8 8 8 8 8 8]
+                </rb_rnd_thr>
+                <g_rnd_thr index="1" type="double" size="[1 13]">
+                    [0 0 0 0 0 0 8 8 8 8 8 8 8  ]
+                </g_rnd_thr>
+                <rb_rnd_offs index="1" type="double" size="[1 13]">
+                    [0 0 0 0 0 0 0 0 0 0 0 0 0 ]
+                </rb_rnd_offs>
+                <g_rnd_offs index="1" type="double" size="[1 13]">
+                    [0 0 0 0 0 0 0 0 0 0 0 0 0 ]
+                </g_rnd_offs>
+            </RND>
+            <RG index="1" type="struct" size="[1 1]">
+                <RG_red_blue_enable index="1" type="double" size="[1 13]">
+                    [0 0 0 0 0 0 0 0 0 0 0 0 0]
+                </RG_red_blue_enable>
+                <RG_green_enable index="1" type="double" size="[1 13]">
+                    [0 0 0 0 0 0 0 0 0 0 0 0 0]
+                </RG_green_enable>
+                <rb_rg_fac index="1" type="double" size="[1 13]">
+                    [0 0 0 0 0 0 8 8 8 8 8 8 8 ]
+                </rb_rg_fac>
+                <g_rg_fac index="1" type="double" size="[1 13]">
+                    [0 0 0 0 0 0 8 8 8 8 8 8 8 ]
+                </g_rg_fac>
+            </RG>
+            <RO index="1" type="struct" size="[1 1]">
+                <RO_red_blue_enable index="1" type="double" size="[1 13]">
+                    [1 1 1 1 1 1 1 1 1 0 0 0 0  ]
+                </RO_red_blue_enable>
+                <RO_green_enable index="1" type="double" size="[1 13]">
+                    [1 1 1 1 1 1 1 1 1 0 0 0 0  ]
+                </RO_green_enable>
+                <rb_ro_lim index="1" type="double" size="[1 13]">
+                    [2 2 2 2 3 3 3 3 3 3 3 3 3]
+                </rb_ro_lim>
+                <g_ro_lim index="1" type="double" size="[1 13]">
+                    [2 2 2 2 3 3 3 3 3 3 3 3 3 ]
+                </g_ro_lim>
+		</RO>
                     </cell>
                     <cell index="3" type="struct" size="[1 1]">
-                        <red_blue_enable index="1" type="double" size="[6 13]">
-                            [0 0 0 0 0 0 0 0 0 0 0 0 0 
-                            0 0 0 0 0 0 0 0 0 0 0 0 0 
-                            1 1 1 1 1 1 1 1 1 1 1 1 1 
-                            1 1 1 1 1 1 1 1 1 1 1 1 1 
-                            0 0 0 0 0 0 0 0 0 0 0 0 0 
-                            0 0 0 0 0 0 0 0 0 0 0 0 0 ]
-                        </red_blue_enable>
-                        <green_enable index="1" type="double" size="[6 13]">
-                            [0 0 0 0 0 0 0 0 0 0 0 0 0 
-                            0 0 0 0 0 0 0 0 0 0 0 0 0 
-                            1 1 1 1 1 1 1 1 1 1 1 1 1 
-                            1 1 1 1 1 1 1 1 1 1 1 1 1 
-                            0 0 0 0 0 0 0 0 0 0 0 0 0 
-                            0 0 0 0 0 0 0 0 0 0 0 0 0 ]
-                        </green_enable>
-                        <line_thresh index="1" type="double" size="[4 13]">
-                            [0 0 0 0 0 0 0 0 0 0 0 0 0 
-                            0 0 0 0 0 0 0 0 0 0 0 0 0 
-                            1 1 1 1 1 1 1 1 1 1 1 1 1 
-                            1 1 1 1 1 1 1 1 1 1 1 1 1 ]
-                        </line_thresh>
-                        <line_mad_fac index="1" type="double" size="[4 13]">
-                            [0 0 0 0 0 0 0 0 0 0 0 0 0 
-                            0 0 0 0 0 0 0 0 0 0 0 0 0 
-                            2 2 2 2 2 2 2 2 2 2 2 2 2 
-                            2 2 2 2 2 2 2 2 2 2 2 2 2 ]
-                        </line_mad_fac>
-                        <pg_fac index="1" type="double" size="[2 13]">
-                            [1 1 1 1 1 1 1 1 1 1 1 1 1 
-                            1 1 1 1 1 1 1 1 1 1 1 1 1 ]
-                        </pg_fac>
-                        <rnd_thresh index="1" type="double" size="[2 13]">
-                            [4 4 4 4 4 4 4 4 4 4 4 4 4 
-                            4 4 4 4 4 4 4 4 4 4 4 4 4 ]
-                        </rnd_thresh>
-                        <rg_fac index="1" type="double" size="[2 13]">
-                            [2 2 2 2 2 2 2 2 2 2 2 2 2 
-                            2 2 2 2 2 2 2 2 2 2 2 2 2 ]
-                        </rg_fac>
-                        <rg_lim index="1" type="double" size="[2 13]">
-                            [2 2 2 2 2 3 3 3 3 3 3 3 1 
-                            2 2 2 2 2 3 3 3 3 3 3 3 1 ]
-                        </rg_lim>
-                        <rnd_offs index="1" type="double" size="[2 13]">
-                            [2 2 2 2 2 2 2 2 2 2 2 2 2 
-                            2 2 2 2 2 2 2 2 2 2 2 2 2 ]
-                        </rnd_offs>
+		<RK index="1" type="struct" size="[1 1]">
+                <RK_red_blue_enable index="1" type="double" size="[1 13]">
+                   [ 0 0 0 0 0 0 0 0 0 0 0 0 0   ]
+                </RK_red_blue_enable>
+                <RK_green_enable index="1" type="double" size="[1 13]">
+                    [0 0 0 0 0 0 0 0 0 0 0 0 0   ]
+                </RK_green_enable>
+                <rb_sw_mindis index="1" type="double" size="[1 13]">
+                    [0 0 0 0 0 0 0 0 0 0 0 0 0 ]
+                </rb_sw_mindis>
+                <g_sw_mindis index="1" type="double" size="[1 13]">
+                    [0 0 0 0 0 0 0 0 0 0 0 0 0 ]
+                </g_sw_mindis>
+                <sw_dis_scale_min index="1" type="double" size="[1 13]">
+                    [0 0 0 0 0 0 0 0 0 0 0 0 0]
+                </sw_dis_scale_min>
+                <sw_dis_scale_max index="1" type="double" size="[1 13]">
+                    [0 0 0 0 0 0 0 0 0 0 0 0 0 ]
+                </sw_dis_scale_max>
+            </RK>
+            <LC index="1" type="struct" size="[1 1]">
+                <LC_red_blue_enable index="1" type="double" size="[1 13]">
+                    [0 0 0 0 0 0 0 0 0 0 0 0 0  ]
+                </LC_red_blue_enable>
+                <LC_green_enable index="1" type="double" size="[1 13]">
+                    [0 0 0 0 0 0 0 0 0 0 0 0 0 ]
+                </LC_green_enable>
+                <rb_line_thr index="1" type="double" size="[1 13]">
+                    [1 1 1 1 1 1 1 1 1 1 1 1 1  ]
+                </rb_line_thr>
+                <g_line_thr index="1" type="double" size="[1 13]">
+                    [1 1 1 1 1 1 1 1 1 1 1 1 1  ]
+                </g_line_thr>
+                <rb_line_mad_fac index="1" type="double" size="[1 13]">
+                    [2 2 2 2 2 2 2 2 2 2 2 2 2 ]
+                </rb_line_mad_fac>
+                <g_line_mad_fac index="1" type="double" size="[1 13]">
+                    [2 2 2 2 2 2 2 2 2 2 2 2 2 ]
+                </g_line_mad_fac>
+            </LC>
+            <PG index="1" type="struct" size="[1 1]">
+                <PG_red_blue_enable index="1" type="double" size="[1 13]">
+                    [1 1 1 1 1 1 1 1 1 1 1 1 1 ]
+                </PG_red_blue_enable>
+                <PG_green_enable index="1" type="double" size="[1 13]">
+                    [1 1 1 1 1 1 1 1 1 1 1 1 1 ]
+                </PG_green_enable>
+                <rb_pg_fac index="1" type="double" size="[1 13]">
+                    [1 1 1 1 1 1 1 1 1 1 1 1 1 ]
+                </rb_pg_fac>
+                <g_pg_fac index="1" type="double" size="[1 13]">
+                    [1 1 1 1 1 1 1 1 1 1 1 1 1 ]
+                </g_pg_fac>
+            </PG>
+            <RND index="1" type="struct" size="[1 1]">
+                <RND_red_blue_enable index="1" type="double" size="[1 13]">
+                    [1 1 1 1 1 1 1 1 1 1 1 1 1   ]
+                </RND_red_blue_enable>
+                <RND_green_enable index="1" type="double" size="[1 13]">
+                    [1 1 1 1 1 1 1 1 1 1 1 1 1   ]
+                </RND_green_enable>
+                <rb_rnd_thr index="1" type="double" size="[1 13]">
+                    [4 4 4 4 4 4 4 4 4 4 4 4 4]
+                </rb_rnd_thr>
+                <g_rnd_thr index="1" type="double" size="[1 13]">
+                    [4 4 4 4 4 4 4 4 4 4 4 4 4]
+                </g_rnd_thr>
+                <rb_rnd_offs index="1" type="double" size="[1 13]">
+                    [2 2 2 2 2 2 2 2 2 2 2 2 2 ]
+                </rb_rnd_offs>
+                <g_rnd_offs index="1" type="double" size="[1 13]">
+                    [2 2 2 2 2 2 2 2 2 2 2 2 2 ]
+                </g_rnd_offs>
+            </RND>
+            <RG index="1" type="struct" size="[1 1]">
+                <RG_red_blue_enable index="1" type="double" size="[1 13]">
+                    [0 0 0 0 0 0 0 0 0 0 0 0 0   ]
+                </RG_red_blue_enable>
+                <RG_green_enable index="1" type="double" size="[1 13]">
+                    [0 0 0 0 0 0 0 0 0 0 0 0 0   ]
+                </RG_green_enable>
+                <rb_rg_fac index="1" type="double" size="[1 13]">
+                    [2 2 2 2 2 2 2 2 2 2 2 2 2 ]
+                </rb_rg_fac>
+                <g_rg_fac index="1" type="double" size="[1 13]">
+                    [2 2 2 2 2 2 2 2 2 2 2 2 2 ]
+                </g_rg_fac>
+            </RG>
+            <RO index="1" type="struct" size="[1 1]">
+                <RO_red_blue_enable index="1" type="double" size="[1 13]">
+                    [0 0 0 0 0 0 0 0 0 0 0 0 0 ]
+                </RO_red_blue_enable>
+                <RO_green_enable index="1" type="double" size="[1 13]">
+                    [0 0 0 0 0 0 0 0 0 0 0 0 0 ]
+                </RO_green_enable>
+                <rb_ro_lim index="1" type="double" size="[1 13]">
+                    [2 2 2 2 2 3 3 3 3 3 3 3 1]
+                </rb_ro_lim>
+                <g_ro_lim index="1" type="double" size="[1 13]">
+                    [2 2 2 2 2 3 3 3 3 3 3 3 1]
+                </g_ro_lim>
+		</RO>
                     </cell>
                 </set_cell>
             </Expert_mode>
@@ -5288,9 +5628,14 @@
             <enable index="1" type="char" size="[1 1]">
                 [1 ]
             </enable>
-            <damp_enable index="1" type="char" size="[1 1]">
-                [1 ]
-            </damp_enable>
+            <Mode index="1" type="cell" size="[1 2]">
+                <cell index="1" type="struct" size="[1 1]">
+	           <Name index="1" type="char" size="[1 13]">
+		      normal
+	           </Name>
+                    <damp_enable index="1" type="char" size="[1 1]">
+                        [1 ]
+                    </damp_enable>
             <lumaCCM index="1" type="struct" size="[1 1]">
                 <RGB2Y_para index="1" type="double" size="[1 3]">
                     [38.0000 75.0000 15.0000 ]
@@ -5701,6 +6046,426 @@
                     </ccOffsets>
                 </cell>
             </matrixAll>
+                </cell>
+                <cell index="1" type="struct" size="[1 1]">
+	           <Name index="1" type="char" size="[1 13]">
+	                hdr
+	           </Name>
+                    <damp_enable index="1" type="char" size="[1 1]">
+                        [1 ]
+                    </damp_enable>
+            <lumaCCM index="1" type="struct" size="[1 1]">
+                <RGB2Y_para index="1" type="double" size="[1 3]">
+                    [38.0000 75.0000 15.0000 ]
+                </RGB2Y_para>
+                <low_bound_pos_bit index="1" type="double" size="[1 1]">
+                    [0.0000 ]
+                </low_bound_pos_bit>
+                <y_alpha_curve index="1" type="double" size="[1 17]">
+                    [0.0000 64.0000 128.0000 192.0000 256.0000 320.0000 384.0000 448.0000 512.0000 576.0000 640.0000 704.0000 768.0000 832.0000 896.0000 960.0000 1024.0000 ]
+                </y_alpha_curve>
+                <gain_alphaScale_curve index="1" type="struct" size="[1 1]">
+                    <gain index="1" type="double" size="[1 9]">
+ [1 2.0 4.0 8.0 16.0 18.0 20.0000 24.0000 32.0000 ]
+                    </gain>
+                    <scale index="1" type="double" size="[1 9]">
+ [1 1 1 0.9 0.8 0.65 	0.45 0.15 0.1]
+                    </scale>
+                </gain_alphaScale_curve>
+            </lumaCCM>
+            <aCcmCof index="1" type="cell" size="[1 4]">
+                <illAll index="1" type="cell" size="[1 7]">
+                    <cell index="1" type="struct" size="[1 1]">
+                        <name index="1" type="char" size="[1 1]">
+                            A
+                        </name>
+                        <wbGain index="1" type="double" size="[1 2]">
+                            [0.7025 1.8275 ]
+                        </wbGain>
+                        <matrixUsed index="1" type="char" size="[1 10]">
+                            A_100 A_74 
+                        </matrixUsed>
+                        <gains index="1" type="double" size="[1 4]">
+                            [4.0000 8.0000 16.0000 32.0000 ]
+                        </gains>
+                        <sat index="1" type="double" size="[1 4]">
+                            [100.0000 100.0000 100.0000 100.0000 ]
+                        </sat>
+                    </cell>
+                    <cell index="5" type="struct" size="[1 1]">
+                        <name index="1" type="char" size="[1 3]">
+                            CWF
+                        </name>
+                        <wbGain index="1" type="double" size="[1 2]">
+                            [1.0810  1.4837 ]
+                        </wbGain>
+                        <matrixUsed index="1" type="char" size="[1 14]">
+                            CWF_100 CWF_74 
+                        </matrixUsed>
+                        <gains index="1" type="double" size="[1 4]">
+                            [4.0000 8.0000 16.0000 32.0000 ]
+                        </gains>
+                        <sat index="1" type="double" size="[1 4]">
+                            [100.0000 100.0000 100.0000 100.0000 ]
+                        </sat>
+                    </cell>
+                    <cell index="2" type="struct" size="[1 1]">
+                        <name index="1" type="char" size="[1 3]">
+                            D50
+                        </name>
+                        <wbGain index="1" type="double" size="[1 2]">
+                            [1.05 1.0  ]
+                        </wbGain>
+                        <matrixUsed index="1" type="char" size="[1 14]">
+                            D50_100 D50_74 
+                        </matrixUsed>
+                        <gains index="1" type="double" size="[1 4]">
+                            [4.0000 8.0000 16.0000 32.0000 ]
+                        </gains>
+                        <sat index="1" type="double" size="[1 4]">
+                            [100.0000 100.0000 100.0000 100.0000 ]
+                        </sat>
+                    </cell>
+                    <cell index="3" type="struct" size="[1 1]">
+                        <name index="1" type="char" size="[1 3]">
+                            D65
+                        </name>
+                        <wbGain index="1" type="double" size="[1 2]">
+                           [1.3155 0.7538 ]
+                        </wbGain>
+                        <matrixUsed index="1" type="char" size="[1 14]">
+                            D65_100 D65_74 
+                        </matrixUsed>
+                        <gains index="1" type="double" size="[1 4]">
+                            [4.0000 8.0000 16.0000 32.0000 ]
+                        </gains>
+                        <sat index="1" type="double" size="[1 4]">
+                            [100.0000 100.0000 100.0000 100.0000 ]
+                        </sat>
+                    </cell>
+                    <cell index="4" type="struct" size="[1 1]">
+                        <name index="1" type="char" size="[1 3]">
+                            D75
+                        </name>
+                        <wbGain index="1" type="double" size="[1 2]">
+                           [1.501 0.8077 ]
+                        </wbGain>
+                        <matrixUsed index="1" type="char" size="[1 14]">
+                            D75_100 D75_74 
+                        </matrixUsed>
+                        <gains index="1" type="double" size="[1 4]">
+                            [4.0000 8.0000 16.0000 32.0000 ]
+                        </gains>
+                        <sat index="1" type="double" size="[1 4]">
+                            [100.0000 100.0000 100.0000 100.0000 ]
+                        </sat>
+                    </cell>
+                    <cell index="4" type="struct" size="[1 1]">
+                        <name index="1" type="char" size="[1 2]">
+                            HZ
+                        </name>
+                        <wbGain index="1" type="double" size="[1 2]">
+                            [0.5606  2.4585]
+                        </wbGain>
+                        <matrixUsed index="1" type="char" size="[1 12]">
+                            HZ_100 HZ_74 
+                        </matrixUsed>
+                        <gains index="1" type="double" size="[1 4]">
+                            [4.0000 8.0000 16.0000 32.0000 ]
+                        </gains>
+                        <sat index="1" type="double" size="[1 4]">
+                            [100.0000 100.0000 100.0000 100.0000 ]
+                        </sat>
+                    </cell>
+                    <cell index="6" type="struct" size="[1 1]">
+                        <name index="1" type="char" size="[1 4]">
+                            TL84
+                        </name>
+                        <wbGain index="1" type="double" size="[1 2]">
+                            [0.8348 1.3877 ]
+                        </wbGain>
+                        <matrixUsed index="1" type="char" size="[1 16]">
+                            TL84_100 TL84_74 
+                        </matrixUsed>
+                        <gains index="1" type="double" size="[1 4]">
+                            [4.0000 8.0000 16.0000 32.0000 ]
+                        </gains>
+                        <sat index="1" type="double" size="[1 4]">
+                            [100.0000 100.0000 100.0000 100.0000 ]
+                        </sat>
+                    </cell>
+                </illAll>
+            </aCcmCof>
+            <matrixAll index="1" type="cell" size="[1 20]">
+                <cell index="1" type="struct" size="[1 5]">
+                    <name index="1" type="char" size="[1 5]">
+                        A_100
+                    </name>
+                    <illumination index="1" type="char" size="[1 1]">
+                        A
+                    </illumination>
+                    <saturation index="1" type="double" size="[1 1]">
+                        [100.0000 ]
+                    </saturation>
+                    <ccMatrix index="1" type="double" size="[3 3]">
+                     [1.6865 -0.9 0.2125 
+  -0.2139 0.9485 0.2654 
+  0.3512 -1.4490 2.0978]
+                    </ccMatrix>
+                    <ccOffsets index="1" type="double" size="[1 3]">
+                        [-0.0000 -0.0000 -0.0000 ]
+                    </ccOffsets>
+                </cell>
+                <cell index="2" type="struct" size="[1 5]">
+                    <name index="1" type="char" size="[1 4]">
+                        A_74
+                    </name>
+                    <illumination index="1" type="char" size="[1 1]">
+                        A
+                    </illumination>
+                    <saturation index="1" type="double" size="[1 1]">
+                        [74.0000 ]
+                    </saturation>
+                    <ccMatrix index="1" type="double" size="[3 3]">
+                        [1.2324 -0.6103 0.3779 
+  0.0013 0.6819 0.3168 
+  0.2513 -0.7199 1.4686 ]
+                    </ccMatrix>
+                    <ccOffsets index="1" type="double" size="[1 3]">
+                        [-0.0000 -0.0000 -0.0000 ]
+                    </ccOffsets>
+                </cell>
+                <cell index="3" type="struct" size="[1 5]">
+                    <name index="1" type="char" size="[1 7]">
+                        D50_100
+                    </name>
+                    <illumination index="1" type="char" size="[1 3]">
+                        D50
+                    </illumination>
+                    <saturation index="1" type="double" size="[1 1]">
+                        [100.0000 ]
+                    </saturation>
+                    <ccMatrix index="1" type="double" size="[3 3]">
+[2.0607 -1.1932 0.1325
+  -0.1010 1.1512 -0.0502 
+  0.2517 -0.6478 1.3961]
+                    </ccMatrix>
+                    <ccOffsets index="1" type="double" size="[1 3]">
+                        [-0.0000 -0.0000 -0.0000 ]
+                    </ccOffsets>
+                </cell>
+                <cell index="4" type="struct" size="[1 5]">
+                    <name index="1" type="char" size="[1 6]">
+                        D50_74
+                    </name>
+                    <illumination index="1" type="char" size="[1 3]">
+                        D50
+                    </illumination>
+                    <saturation index="1" type="double" size="[1 1]">
+                        [74.0000 ]
+                    </saturation>
+                    <ccMatrix index="1" type="double" size="[3 3]">
+                        [2.1832 -1.3257 0.1425 
+  0.2136 0.7797 0.0067 
+  0.3995 -0.4765 1.0770 ]
+                    </ccMatrix>
+                    <ccOffsets index="1" type="double" size="[1 3]">
+                        [-0.0000 -0.0000 -0.0000 ]
+                    </ccOffsets>
+                </cell>
+                <cell index="5" type="struct" size="[1 5]">
+                    <name index="1" type="char" size="[1 7]">
+                        D65_100
+                    </name>
+                    <illumination index="1" type="char" size="[1 3]">
+                        D65
+                    </illumination>
+                    <saturation index="1" type="double" size="[1 1]">
+                        [100.0000 ]
+                    </saturation>
+                    <ccMatrix index="1" type="double" size="[3 3]">
+[2.0839 -1.2243 0.1404 
+  -0.1226 1.12638 -0.0037 
+  0.1624 -0.5696 1.4072]
+                    </ccMatrix>
+                    <ccOffsets index="1" type="double" size="[1 3]">
+                        [-0.0000 -0.0000 -0.0000 ]
+                    </ccOffsets>
+                </cell>
+                <cell index="6" type="struct" size="[1 5]">
+                    <name index="1" type="char" size="[1 6]">
+                        D65_74
+                    </name>
+                    <illumination index="1" type="char" size="[1 3]">
+                        D65
+                    </illumination>
+                    <saturation index="1" type="double" size="[1 1]">
+                        [74.0000 ]
+                    </saturation>
+                    <ccMatrix index="1" type="double" size="[3 3]">
+                        [1.4602 -0.6984 0.2382 
+  0.1234 0.8197 0.0569 
+  0.2596 -0.3607 1.1011 ]
+                    </ccMatrix>
+                    <ccOffsets index="1" type="double" size="[1 3]">
+                        [0.0000 0.0000 0.0000 ]
+                    </ccOffsets>
+                </cell>
+                <cell index="7" type="struct" size="[1 5]">
+                    <name index="1" type="char" size="[1 7]">
+                        D75_100
+                    </name>
+                    <illumination index="1" type="char" size="[1 3]">
+                        D75
+                    </illumination>
+                    <saturation index="1" type="double" size="[1 1]">
+                        [100.0000 ]
+                    </saturation>
+                    <ccMatrix index="1" type="double" size="[3 3]">
+                        [2.1532 -1.3499 0.1967 
+  -0.1189 1.2246 -0.1057 
+  0.1184 -0.6388 1.5204 ]
+                    </ccMatrix>
+                    <ccOffsets index="1" type="double" size="[1 3]">
+                        [-0.0000 -0.0000 -0.0000]
+                    </ccOffsets>
+                </cell>
+                <cell index="8" type="struct" size="[1 5]">
+                    <name index="1" type="char" size="[1 6]">
+                        D75_74
+                    </name>
+                    <illumination index="1" type="char" size="[1 3]">
+                        D75
+                    </illumination>
+                    <saturation index="1" type="double" size="[1 1]">
+                        [74.0000 ]
+                    </saturation>
+                    <ccMatrix index="1" type="double" size="[3 3]">
+                        [1.7462 -0.9365 0.1903
+  0.0649 0.9692 -0.0341
+  0.2396 -0.4088 1.1692]
+                    </ccMatrix>
+                    <ccOffsets index="1" type="double" size="[1 3]">
+                        [0.0000 0.0000 0.0000 ]
+                    </ccOffsets>
+                </cell>
+                <cell index="9" type="struct" size="[1 5]">
+                    <name index="1" type="char" size="[1 7]">
+                        CWF_100
+                    </name>
+                    <illumination index="1" type="char" size="[1 3]">
+                        CWF
+                    </illumination>
+                    <saturation index="1" type="double" size="[1 1]">
+                        [100.0000 ]
+                    </saturation>
+                    <ccMatrix index="1" type="double" size="[3 3]">
+                        [2.2039 -1.4854 0.2815 
+  -0.0886 0.9642 0.1244 
+  0.2353 -0.6298 1.3945]
+                    </ccMatrix>
+                    <ccOffsets index="1" type="double" size="[1 3]">
+                        [-0.0000 -0.0000 -0.0000]
+                    </ccOffsets>
+                </cell>
+                <cell index="10" type="struct" size="[1 5]">
+                    <name index="1" type="char" size="[1 6]">
+                        CWF_74
+                    </name>
+                    <illumination index="1" type="char" size="[1 3]">
+                        CWF
+                    </illumination>
+                    <saturation index="1" type="double" size="[1 1]">
+                        [74.0000 ]
+                    </saturation>
+                    <ccMatrix index="1" type="double" size="[3 3]">
+                        [1.7958 -1.0867 0.2909 
+  0.0994 0.7265 0.1741 
+  0.3381 -0.4522 1.1141]
+                    </ccMatrix>
+                    <ccOffsets index="1" type="double" size="[1 3]">
+                        [0.0000 0.0000 -0.0000 ]
+                    </ccOffsets>
+                </cell>
+                <cell index="11" type="struct" size="[1 5]">
+                    <name index="1" type="char" size="[1 8]">
+                        TL84_100
+                    </name>
+                    <illumination index="1" type="char" size="[1 4]">
+                        TL84
+                    </illumination>
+                    <saturation index="1" type="double" size="[1 1]">
+                        [100.0000 ]
+                    </saturation>
+                    <ccMatrix index="1" type="double" size="[3 3]">
+[2.164844 -1.328907 0.164063
+  -0.185938 1.213282 -0.027344
+  0.121094 -0.703125 1.582031]
+                    </ccMatrix>
+                    <ccOffsets index="1" type="double" size="[1 3]">
+                        [-0.0000 -0.0000 -0.0000]
+                    </ccOffsets>
+                </cell>
+                <cell index="12" type="struct" size="[1 5]">
+                    <name index="1" type="char" size="[1 7]">
+                        TL84_74
+                    </name>
+                    <illumination index="1" type="char" size="[1 4]">
+                        TL84
+                    </illumination>
+                    <saturation index="1" type="double" size="[1 1]">
+                        [74.0000 ]
+                    </saturation>
+                    <ccMatrix index="1" type="double" size="[3 3]">
+                        [1.7556 -0.9304 0.1748 
+  0.0079 0.9609 0.0312 
+  0.2352 -0.4625 1.2273 ]
+                    </ccMatrix>
+                    <ccOffsets index="1" type="double" size="[1 3]">
+                        [0.0000 0.0000 0.0000 ]
+                    </ccOffsets>
+                </cell>
+                <cell index="13" type="struct" size="[1 5]">
+                    <name index="1" type="char" size="[1 6]">
+                        HZ_100
+                    </name>
+                    <illumination index="1" type="char" size="[1 2]">
+                        HZ
+                    </illumination>
+                    <saturation index="1" type="double" size="[1 1]">
+                        [100.0000 ]
+                    </saturation>
+                    <ccMatrix index="1" type="double" size="[3 3]">
+[1.5232 -0.8419 0.3187 
+  -0.0525 0.8644 0.1881 
+  0.2315 -0.7062 1.4747]
+                    </ccMatrix>
+                    <ccOffsets index="1" type="double" size="[1 3]">
+                        [-0.0000 -0.0000 -0.0000 ]
+                    </ccOffsets>
+                </cell>
+                <cell index="14" type="struct" size="[1 5]">
+                    <name index="1" type="char" size="[1 5]">
+                        HZ_74
+                    </name>
+                    <illumination index="1" type="char" size="[1 2]">
+                        HZ
+                    </illumination>
+                    <saturation index="1" type="double" size="[1 1]">
+                        [74.0000 ]
+                    </saturation>
+                    <ccMatrix index="1" type="double" size="[3 3]">
+                        [1.2235 -0.5689 0.3454
+ 0.0648 0.7004 0.2348 
+ 0.2851 -0.4767 1.1916 ]
+                    </ccMatrix>
+                    <ccOffsets index="1" type="double" size="[1 3]">
+                        [0.0000 0.0000 0.0000 ]
+                    </ccOffsets>
+                </cell>
+            </matrixAll>
+                </cell>
+            </Mode>
         </CCM>
         <UVNR index="1" type="struct" size="[1 1]">
             <Enable index="1" type="double" size="[1 1]">
@@ -6685,9 +7450,6 @@
             <gamma_en index="1" type="char" size="[1 1]">
                 [1 ]
             </gamma_en>
-            <gamma_out_mode index="1" type="char" size="[1 1]">
-                [0 ]
-            </gamma_out_mode>
             <gamma_out_segnum index="1" type="char" size="[1 1]">
                 [0 ]
             </gamma_out_segnum>
@@ -6703,12 +7465,6 @@
             <curve_night index="1" type="double" size="[1 45]">
                  [0.0000 1318.5949 1354.3842 1376.3601 1395.1966 1410.8937 1426.5907 1442.9157 1467.9849 1483.1002 1493.8203 1502.0289 1528.3538 1544.0970 1565.4052 1587.5804 1608.8686 1633.2190 1773.1344 1710.3888 1741.4341 1795.0000 1751.0000 1802.0000 1849.0000 1936.0000 1914.0000 1986.0000 1053.0000 1174.0000 1284.0000 1385.0000 1478.0000 1649.0000 1803.0000 1945.0000 2076.0000 2316.0000 2532.0000 2731.0000 2916.0000 3253.0000 3557.0000 3836.0000 4095.0000]
            </curve_night>
-            <curve_user1 index="1" type="double" size="[1 45]">
-                [0.0000 70.0000 98.0000 119.0000 137.0000 153.0000 167.0000 180.0000 193.0000 215.0000 235.0000 253.0000 271.0000 302.0000 330.0000 356.0000 380.0000 424.0000 463.0000 501.5723 544.8240 614.3358 669.9451 724.9262 784.2717 885.6884 974.0190 1056.0853 1130.5031 1270.9712 1406.8016 1528.8000 1638.0000 1813.9333 1971.6666 2117.2666 2244.6667 2481.2666 2687.5334 2863.4666 2990.8667 3203.2000 3360.9333 3482.2666 3600.0000 ]
-            </curve_user1>
-            <curve_user2 index="1" type="double" size="[1 45]">
-                [0.0000 78.5949 114.3842 136.3601 155.1966 170.8937 186.5907 202.9157 217.9849 243.1002 263.8203 282.0289 298.3538 324.0970 345.4052 367.5804 388.8686 433.2190 473.1344 510.3888 541.4341 595.0000 651.0000 702.0000 749.0000 836.0000 914.0000 986.0000 1053.0000 1174.0000 1284.0000 1385.0000 1478.0000 1649.0000 1803.0000 1945.0000 2076.0000 2316.0000 2532.0000 2731.0000 2916.0000 3253.0000 3557.0000 3836.0000 4095.0000 ]
-          </curve_user2>
         </GAMMA>
         <YNR index="1" type="struct" size="[1 1]">
             <Enable index="1" type="double" size="[1 1]">
@@ -33512,7 +34268,7 @@
                [0]
           </fixed_times>
             <threshold index="1" type="double" size="[1 1]">
-               [0.01]
+               [0.0002]
             </threshold>
           <threshold_level2 index="1" type="double" size="[1 1]">
                [1000]

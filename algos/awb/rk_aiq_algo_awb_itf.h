@@ -22,7 +22,7 @@
 
 #include "rk_aiq_algo_des.h"
 
-#define RKISP_ALGO_AWB_VERSION     "v0.0.a"
+#define RKISP_ALGO_AWB_VERSION     "v0.1.1"
 #define RKISP_ALGO_AWB_VENDOR      "Rockchip"
 #define RKISP_ALGO_AWB_DESCRIPTION "Rockchip Awb algo for ISP2.0"
 

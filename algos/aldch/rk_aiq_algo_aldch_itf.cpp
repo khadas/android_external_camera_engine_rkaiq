@@ -24,8 +24,10 @@
 
 RKAIQ_BEGIN_DECLARE
 
+static XCamReturn release_ldch_buf(LDCHContext_t* ldchCtx);
 static XCamReturn alloc_ldch_buf(LDCHContext_t* ldchCtx)
 {
+    release_ldch_buf(ldchCtx);
     rk_aiq_share_mem_config_t share_mem_config;
     share_mem_config.alloc_param.width =  ldchCtx->dst_width;
     share_mem_config.alloc_param.height = ldchCtx->dst_height;

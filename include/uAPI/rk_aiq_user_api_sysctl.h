@@ -26,6 +26,26 @@ RKAIQ_BEGIN_DECLARE
 typedef struct rk_aiq_sys_ctx_s rk_aiq_sys_ctx_t;
 
 /*!
+ * \brief pre-settings before init
+ *
+ * \param[in] sns_ent_name    active sensor media entity name. This represents the unique camera module
+ *                            in system. And the whole active pipeline could be retrieved by this.
+ * \param[in] mode            pipleline working mode, just used by \ref
+ *                            rk_aiq_uapi_sysctl_init to select iq file
+ *                            according to hdr mode. Unused if params \ref
+ *                            iq_file is specified.
+ * \param[in] iq_file         optional, forcely used this iq file
+ * \note Optional API, should be called before\ref rk_aiq_uapi_sysctl_init. This
+ *       API extends the functionality of \ref rk_aiq_uapi_sysctl_init. And just
+ *       used to help select the satisfied iq file when multiple iq files
+ *       exsist.
+ */
+XCamReturn
+rk_aiq_uapi_sysctl_preInit(const char* sns_ent_name,
+                           rk_aiq_working_mode_t mode,
+                           const char* force_iq_file);
+
+/*!
  * \brief initialze aiq control system context
  * Should call before any other APIs
  *

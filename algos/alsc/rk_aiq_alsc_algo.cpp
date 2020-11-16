@@ -574,6 +574,7 @@ XCamReturn AlscInit(alsc_handle_t *hAlsc, const CamCalibDbContext_t* calib)
     alsc_context->alscSwInfo.awbConverged = false;
     int caseIndex = USED_FOR_CASE_NORMAL;
     alsc_context->alscRest.caseIndex = caseIndex;
+    #if 0 //awbGain get from awb module
     bool lsFound;
     for(int i = 0; i < calib_lsc->aLscCof.illuNum[caseIndex]; i++) {
         if(strcmp(calib_lsc->aLscCof.illAll[caseIndex][i].illuName, calib->awb.stategy_cfg.lsForFirstFrame) == 0) {
@@ -589,6 +590,7 @@ XCamReturn AlscInit(alsc_handle_t *hAlsc, const CamCalibDbContext_t* calib)
                sizeof(alsc_context->alscSwInfo.awbGain));
         LOGD_ALSC("%s: alsc lsForFirstFrame:%s", __FUNCTION__, calib_lsc->aLscCof.illAll[caseIndex][0].illuName);
     }
+    #endif
     LOGI_ALSC("%s: alsc illunum:%d", __FUNCTION__, calib_lsc->aLscCof.illuNum[caseIndex]);
 
     // 1) gtet and reorder para

@@ -1604,7 +1604,7 @@ XCamReturn rk_aiq_uapi_setMHDRStrth(const rk_aiq_sys_ctx_t* ctx, bool on, unsign
         RKAIQ_IMGPROC_CHECK_RET(ret, "level(%d) is out of range, setMHDRStrth failed!");
     }
 
-    attr.level = level;
+    attr.stSetLevel.level = level;
     attr.opMode = HDR_OpMode_SET_LEVEL;
     ret = rk_aiq_user_api_ahdr_SetAttrib(ctx, attr);
     RKAIQ_IMGPROC_CHECK_RET(ret, "setMHDRStrth failed!");
@@ -1629,7 +1629,7 @@ XCamReturn rk_aiq_uapi_getMHDRStrth(const rk_aiq_sys_ctx_t* ctx, bool *on, unsig
     ret = rk_aiq_user_api_ahdr_GetAttrib(ctx, &attr);
     RKAIQ_IMGPROC_CHECK_RET(ret, "getMHDRStrth failed in get attrib!");
 
-    *level = attr.level;
+    *level = attr.stSetLevel.level;
     IMGPROC_FUNC_EXIT
     return ret;
 }
@@ -1660,7 +1660,7 @@ XCamReturn rk_aiq_uapi_getDarkAreaBoostStrth(const rk_aiq_sys_ctx_t* ctx, unsign
     ret = rk_aiq_user_api_ahdr_GetAttrib(ctx, &attr);
     RKAIQ_IMGPROC_CHECK_RET(ret, "getDarkAreaBoostStrth failed!");
     if (attr.opMode == HDR_OpMode_DarkArea)
-        *level = attr.level_Linear_Dark;
+        *level = attr.stDarkArea.level;
     else
         *level = 0;
     IMGPROC_FUNC_EXIT
@@ -1695,7 +1695,7 @@ XCamReturn rk_aiq_uapi_setDarkAreaBoostStrth(const rk_aiq_sys_ctx_t* ctx, unsign
         ret = XCAM_RETURN_ERROR_OUTOFRANGE;
         RKAIQ_IMGPROC_CHECK_RET(ret, "level(%d) is out of range, setDarkAreaBoostStrth failed!");
     }
-    attr.level_Linear_Dark = level;
+    attr.stDarkArea.level = level;
     attr.opMode = HDR_OpMode_DarkArea;
     ret = rk_aiq_user_api_ahdr_SetAttrib(ctx, attr);
     RKAIQ_IMGPROC_CHECK_RET(ret, "setDarkAreaBoostStrth failed!");
@@ -2452,6 +2452,24 @@ XCamReturn rk_aiq_uapi_setFecCorrectLevel(const rk_aiq_sys_ctx_t* ctx, int corre
     ret = rk_aiq_user_api_afec_GetAttrib(ctx, &fecAttr);
     RKAIQ_IMGPROC_CHECK_RET(ret, "get fec attrib failed!");
     fecAttr.correct_level = correctLevel;
+    ret = rk_aiq_user_api_afec_SetAttrib(ctx, fecAttr);
+    IMGPROC_FUNC_EXIT
+    return ret;
+}
+
+XCamReturn rk_aiq_uapi_setFecCorrectDirection(const rk_aiq_sys_ctx_t* ctx,
+                                              const fec_correct_direction_t direction)
+{
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    IMGPROC_FUNC_ENTER
+    if (ctx == NULL) {
+        ret = XCAM_RETURN_ERROR_PARAM;
+        RKAIQ_IMGPROC_CHECK_RET(ret, "param error!");
+    }
+    rk_aiq_fec_attrib_t fecAttr;
+    ret = rk_aiq_user_api_afec_GetAttrib(ctx, &fecAttr);
+    RKAIQ_IMGPROC_CHECK_RET(ret, "get fec attrib failed!");
+    fecAttr.direction = direction;
     ret = rk_aiq_user_api_afec_SetAttrib(ctx, fecAttr);
     IMGPROC_FUNC_EXIT
     return ret;

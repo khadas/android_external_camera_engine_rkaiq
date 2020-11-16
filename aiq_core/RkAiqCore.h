@@ -158,6 +158,12 @@ struct RkAiqHwInfo {
     bool lens_supported;
 };
 
+struct RkAiqAlgoDesCommExt {
+    RkAiqAlgoDesComm* des;
+    int algo_ver;
+    int module_hw_ver;
+};
+
 class RkAiqCore {
     friend class RkAiqCoreThread;
 public:
@@ -263,7 +269,7 @@ public:
     } RkAiqAlgosShared_t;
     RkAiqAlgosShared_t mAlogsSharedParams;
     isp_drv_share_mem_ops_t *mShareMemOps;
-private:
+protected:
     // in analyzer thread
     XCamReturn analyze(const SmartPtr<VideoBuffer> &buffer);
     SmartPtr<RkAiqFullParamsProxy> analyzeInternal();
@@ -274,40 +280,46 @@ private:
     XCamReturn processingPp();
     XCamReturn postProcess();
     XCamReturn postProcessPp();
-    XCamReturn convertIspstatsToAlgo(const SmartPtr<VideoBuffer> &buffer);
+    virtual XCamReturn convertIspstatsToAlgo(const SmartPtr<VideoBuffer> &buffer);
     SmartPtr<RkAiqHandle>* getCurAlgoTypeHandle(int algo_type);
     std::map<int, SmartPtr<RkAiqHandle>>* getAlgoTypeHandleMap(int algo_type);
-    SmartPtr<RkAiqHandle> newAlgoHandle(RkAiqAlgoDesComm* algo);
-    void addDefaultAlgos();
-    XCamReturn genIspAeResult(RkAiqFullParams* params);
-    XCamReturn genIspAwbResult(RkAiqFullParams* params);
-    XCamReturn genIspAfResult(RkAiqFullParams* params);
-    XCamReturn genIspAhdrResult(RkAiqFullParams* params);
-    XCamReturn genIspAnrResult(RkAiqFullParams* params);
-    XCamReturn genIspAdhazResult(RkAiqFullParams* params);
-    XCamReturn genIspAsdResult(RkAiqFullParams* params);
-    XCamReturn genIspAcpResult(RkAiqFullParams* params);
-    XCamReturn genIspAieResult(RkAiqFullParams* params);
-    XCamReturn genIspAsharpResult(RkAiqFullParams* params);
-    XCamReturn genIspA3dlutResult(RkAiqFullParams* params);
-    XCamReturn genIspAblcResult(RkAiqFullParams* params);
-    XCamReturn genIspAccmResult(RkAiqFullParams* params);
-    XCamReturn genIspAcgcResult(RkAiqFullParams* params);
-    XCamReturn genIspAdebayerResult(RkAiqFullParams* params);
-    XCamReturn genIspAdpccResult(RkAiqFullParams* params);
-    XCamReturn genIspAfecResult(RkAiqFullParams* params);
-    XCamReturn genIspAgammaResult(RkAiqFullParams* params);
-    XCamReturn genIspAgicResult(RkAiqFullParams* params);
-    XCamReturn genIspAldchResult(RkAiqFullParams* params);
-    XCamReturn genIspAlscResult(RkAiqFullParams* params);
-    XCamReturn genIspAorbResult(RkAiqFullParams* params);
-    XCamReturn genIspAr2yResult(RkAiqFullParams* params);
-    XCamReturn genIspAwdrResult(RkAiqFullParams* params);
-    XCamReturn genCpslResult(RkAiqFullParams* params);
+    void addDefaultAlgos(struct RkAiqAlgoDesCommExt* algoDes);
+    virtual SmartPtr<RkAiqHandle> newAlgoHandle(RkAiqAlgoDesComm* algo, bool generic, int hw_ver);
+    virtual void copyIspStats(RkAiqIspStats* from ,rk_aiq_isp_stats_t* to);
+    virtual XCamReturn genIspAeResult(RkAiqFullParams* params);
+    virtual XCamReturn genIspAwbResult(RkAiqFullParams* params);
+    virtual XCamReturn genIspAfResult(RkAiqFullParams* params);
+    virtual XCamReturn genIspAhdrResult(RkAiqFullParams* params);
+    virtual XCamReturn genIspAnrResult(RkAiqFullParams* params);
+    virtual XCamReturn genIspAdhazResult(RkAiqFullParams* params);
+    virtual XCamReturn genIspAsdResult(RkAiqFullParams* params);
+    virtual XCamReturn genIspAcpResult(RkAiqFullParams* params);
+    virtual XCamReturn genIspAieResult(RkAiqFullParams* params);
+    virtual XCamReturn genIspAsharpResult(RkAiqFullParams* params);
+    virtual XCamReturn genIspA3dlutResult(RkAiqFullParams* params);
+    virtual XCamReturn genIspAblcResult(RkAiqFullParams* params);
+    virtual XCamReturn genIspAccmResult(RkAiqFullParams* params);
+    virtual XCamReturn genIspAcgcResult(RkAiqFullParams* params);
+    virtual XCamReturn genIspAdebayerResult(RkAiqFullParams* params);
+    virtual XCamReturn genIspAdpccResult(RkAiqFullParams* params);
+    virtual XCamReturn genIspAfecResult(RkAiqFullParams* params);
+    virtual XCamReturn genIspAgammaResult(RkAiqFullParams* params);
+    virtual XCamReturn genIspAgicResult(RkAiqFullParams* params);
+    virtual XCamReturn genIspAldchResult(RkAiqFullParams* params);
+    virtual XCamReturn genIspAlscResult(RkAiqFullParams* params);
+    virtual XCamReturn genIspAorbResult(RkAiqFullParams* params);
+    virtual XCamReturn genIspAr2yResult(RkAiqFullParams* params);
+    virtual XCamReturn genIspAwdrResult(RkAiqFullParams* params);
+    virtual XCamReturn genCpslResult(RkAiqFullParams* params);
+    virtual XCamReturn genIspArawnrResult(RkAiqFullParams* params);
+    virtual XCamReturn genIspAmfnrResult(RkAiqFullParams* params);
+    virtual XCamReturn genIspAynrResult(RkAiqFullParams* params);
+    virtual XCamReturn genIspAcnrResult(RkAiqFullParams* params);
+    virtual XCamReturn genIspAdrcResult(RkAiqFullParams* params);
     void cacheIspStatsToList();
     void initCpsl();
 
-private:
+protected:
     enum rk_aiq_core_state_e {
         RK_AIQ_CORE_STATE_INVALID,
         RK_AIQ_CORE_STATE_INITED,
@@ -320,54 +332,16 @@ private:
     SmartPtr<RkAiqCoreThread> mRkAiqCorePpTh;
     int mState;
     RkAiqAnalyzerCb* mCb;
-    std::map<int, SmartPtr<RkAiqHandle>> mAeAlgoHandleMap;
-    std::map<int, SmartPtr<RkAiqHandle>> mAwbAlgoHandleMap;
-    std::map<int, SmartPtr<RkAiqHandle>> mAfAlgoHandleMap;
-    std::map<int, SmartPtr<RkAiqHandle>> mAhdrAlgoHandleMap;
-    std::map<int, SmartPtr<RkAiqHandle>> mAnrAlgoHandleMap;
-    std::map<int, SmartPtr<RkAiqHandle>> mAdhazAlgoHandleMap;
-    std::map<int, SmartPtr<RkAiqHandle>> mAsdAlgoHandleMap;
-    std::map<int, SmartPtr<RkAiqHandle>> mAcpAlgoHandleMap;
-    std::map<int, SmartPtr<RkAiqHandle>> mAsharpAlgoHandleMap;
-    std::map<int, SmartPtr<RkAiqHandle>> mA3dlutAlgoHandleMap;
-    std::map<int, SmartPtr<RkAiqHandle>> mAblcAlgoHandleMap;
-    std::map<int, SmartPtr<RkAiqHandle>> mAccmAlgoHandleMap;
-    std::map<int, SmartPtr<RkAiqHandle>> mAcgcAlgoHandleMap;
-    std::map<int, SmartPtr<RkAiqHandle>> mAdebayerAlgoHandleMap;
-    std::map<int, SmartPtr<RkAiqHandle>> mAdpccAlgoHandleMap;
-    std::map<int, SmartPtr<RkAiqHandle>> mAfecAlgoHandleMap;
-    std::map<int, SmartPtr<RkAiqHandle>> mAgammaAlgoHandleMap;
-    std::map<int, SmartPtr<RkAiqHandle>> mAgicAlgoHandleMap;
-    std::map<int, SmartPtr<RkAiqHandle>> mAieAlgoHandleMap;
-    std::map<int, SmartPtr<RkAiqHandle>> mAldchAlgoHandleMap;
-    std::map<int, SmartPtr<RkAiqHandle>> mAlscAlgoHandleMap;
-    std::map<int, SmartPtr<RkAiqHandle>> mAorbAlgoHandleMap;
-    std::map<int, SmartPtr<RkAiqHandle>> mAr2yAlgoHandleMap;
-    std::map<int, SmartPtr<RkAiqHandle>> mAwdrAlgoHandleMap;
-    SmartPtr<RkAiqHandle> mCurAhdrAlgoHdl;
-    SmartPtr<RkAiqHandle> mCurAnrAlgoHdl;
-    SmartPtr<RkAiqHandle> mCurAdhazAlgoHdl;
-    SmartPtr<RkAiqHandle> mCurAsdAlgoHdl;
-    SmartPtr<RkAiqHandle> mCurAcpAlgoHdl;
-    SmartPtr<RkAiqHandle> mCurAsharpAlgoHdl;
-    SmartPtr<RkAiqHandle> mCurA3dlutAlgoHdl;
-    SmartPtr<RkAiqHandle> mCurAblcAlgoHdl;
-    SmartPtr<RkAiqHandle> mCurAccmAlgoHdl;
-    SmartPtr<RkAiqHandle> mCurAcgcAlgoHdl;
-    SmartPtr<RkAiqHandle> mCurAdebayerAlgoHdl;
-    SmartPtr<RkAiqHandle> mCurAdpccAlgoHdl;
-    SmartPtr<RkAiqHandle> mCurAfecAlgoHdl;
-    SmartPtr<RkAiqHandle> mCurAgammaAlgoHdl;
-    SmartPtr<RkAiqHandle> mCurAgicAlgoHdl;
-    SmartPtr<RkAiqHandle> mCurAieAlgoHdl;
-    SmartPtr<RkAiqHandle> mCurAldchAlgoHdl;
-    SmartPtr<RkAiqHandle> mCurAlscAlgoHdl;
-    SmartPtr<RkAiqHandle> mCurAorbAlgoHdl;
-    SmartPtr<RkAiqHandle> mCurAr2yAlgoHdl;
-    SmartPtr<RkAiqHandle> mCurAwdrAlgoHdl;
-    SmartPtr<RkAiqHandle> mCurAeAlgoHdl;
-    SmartPtr<RkAiqHandle> mCurAwbAlgoHdl;
-    SmartPtr<RkAiqHandle> mCurAfAlgoHdl;
+    bool mHasPp;
+    // key1: algo type
+    // key2: algo id
+    std::map<int,map<int, SmartPtr<RkAiqHandle>>> mAlgoHandleMaps;
+    // key: algo type
+    std::map<int, SmartPtr<RkAiqHandle>> mCurAlgoHandleMaps;
+    // ordered algo list 
+    std::list<SmartPtr<RkAiqHandle>> mCurIspAlgoHandleList;
+    std::list<SmartPtr<RkAiqHandle>> mCurIsppAlgoHandleList;
+
     SmartPtr<RkAiqFullParamsPool> mAiqParamsPool;
     SmartPtr<RkAiqFullParamsProxy> mAiqCurParams;
     SmartPtr<RkAiqExpParamsPool> mAiqExpParamsPool;
@@ -391,6 +365,8 @@ private:
     SmartPtr<RkAiqStatsPool> mAiqStatsPool;
     std::list<SmartPtr<RkAiqStatsProxy>> mAiqStatsCachedList;
     std::map<rk_aiq_isp_stats_t*, SmartPtr<RkAiqStatsProxy>> mAiqStatsOutMap;
+    struct RkAiqAlgoDesCommExt* mAlgosDesArray; 
+    int mIspHwVer;
 };
 
 };

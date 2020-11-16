@@ -53,7 +53,6 @@
 #include "af/rk_aiq_af_hw_v200.h"
 #else
 #include "af/rk_aiq_types_af_algo.h"
-#include "adehaze/rk_aiq_types_adehaze_algo.h"
 
 #endif
 
@@ -274,6 +273,7 @@ typedef struct {
 typedef struct {
     rk_aiq_sensor_info_t    sensor_info;
     rk_aiq_lens_info_t      lens_info;
+    int  isp_hw_ver;
     bool has_lens_vcm; /*< has lens vcm */
     bool has_fl; /*< has flash light */
     bool fl_strth_adj_sup;
@@ -397,6 +397,11 @@ typedef struct {
     int UNKNOWN;
 } rk_aiq_isp_drc_t;
 
+typedef struct {
+    int UNKNOWN;
+} rk_aiq_isp_merge_t;
+
+
 typedef AgicConfig_t rk_aiq_isp_gic_t;
 
 typedef AdebayerConfig_t rk_aiq_isp_demosaic_t;
@@ -452,7 +457,11 @@ typedef struct {
 typedef struct {
     sint32_t frame_id;
     rk_aiq_isp_aec_stats_t aec_stats;
-    rk_aiq_awb_stat_res_v200_t awb_stats_v200;
+    int awb_hw_ver;
+    union {
+        rk_aiq_awb_stat_res_v200_t awb_stats_v200;
+        rk_aiq_awb_stat_res_v201_t awb_stats_v21;
+    };
     rk_aiq_isp_af_stats_t  af_stats;
 } rk_aiq_isp_stats_t;
 
@@ -592,6 +601,73 @@ typedef struct rk_aiq_cpsl_cap_s {
     rk_aiq_range_t sensitivity;
     rk_aiq_range_t strength_ir;
 } rk_aiq_cpsl_cap_t;
+
+// v21 types
+
+// drc , alias name of TMO
+typedef struct rk_aiq_isp_drc_v21_s {
+    //TODO:
+    void* place_holder;
+} rk_aiq_isp_drc_v21_t;
+
+typedef struct rk_aiq_isp_blc_v21_s {
+    rk_aiq_isp_blc_t v0;
+    //TODO: additional blc1 params
+} rk_aiq_isp_blc_v21_t;
+
+typedef struct rk_aiq_isp_wb_gain_v21_s {
+    //TODO:
+    void* place_holder;
+} rk_aiq_isp_wb_gain_v21_t;
+
+typedef struct rk_aiq_isp_gic_v21_s {
+    //TODO:
+    void* place_holder;
+} rk_aiq_isp_gic_v21_t;
+
+typedef struct rk_aiq_isp_ccm_v21_s {
+    //TODO:
+    void* place_holder;
+} rk_aiq_isp_ccm_v21_t;
+
+typedef struct rk_aiq_isp_dhaz_cfg_v21_s {
+    //TODO:
+    void* place_holder;
+} rk_aiq_isp_dhaz_cfg_v21_t;
+
+typedef struct rk_aiq_isp_dhaz_stats_v21_s {
+    //TODO:
+    void* place_holder;
+} rk_aiq_isp_dhaz_stats_v21_t;
+
+// baynr, alias name of rawnr
+typedef struct rk_aiq_isp_baynr_v21_s {
+    //TODO:
+    void* place_holder;
+} rk_aiq_isp_baynr_v21_t;
+
+typedef struct rk_aiq_isp_bay3d_v21_s {
+    //TODO:
+    void* place_holder;
+} rk_aiq_isp_bay3d_v21_t;
+
+typedef struct rk_aiq_isp_ynr_v21_s {
+    //TODO:
+    void* place_holder;
+} rk_aiq_isp_ynr_v21_t;
+
+typedef struct rk_aiq_isp_cnr_v21_s {
+    //TODO:
+    void* place_holder;
+} rk_aiq_isp_cnr_v21_t;
+
+typedef struct rk_aiq_isp_sharp_v21_s {
+    //TODO:
+    void* place_holder;
+} rk_aiq_isp_sharp_v21_t;
+
+typedef struct rk_aiq_awb_stat_res_v201_s rk_aiq_isp_raw_awb_meas_v21_t;
+typedef struct rk_aiq_awb_stat_res_v200_s rk_aiq_isp_raw_awb_meas_v20_t;
 
 typedef enum capture_raw_e {
     CAPTURE_RAW_ASYNC,

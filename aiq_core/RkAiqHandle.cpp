@@ -2885,4 +2885,544 @@ RkAiqAorbHandle::postProcess()
     return ret;
 }
 
+void
+RkAiqArawnrHandle::init()
+{
+    ENTER_ANALYZER_FUNCTION();
+
+    deInit();
+    mConfig       = (RkAiqAlgoCom*)(new RkAiqAlgoConfigArawnr());
+    mPreInParam   = (RkAiqAlgoCom*)(new RkAiqAlgoPreArawnr());
+    mPreOutParam  = (RkAiqAlgoResCom*)(new RkAiqAlgoPreResArawnr());
+    mProcInParam  = (RkAiqAlgoCom*)(new RkAiqAlgoProcArawnr());
+    mProcOutParam = (RkAiqAlgoResCom*)(new RkAiqAlgoProcResArawnr());
+    mPostInParam  = (RkAiqAlgoCom*)(new RkAiqAlgoPostArawnr());
+    mPostOutParam = (RkAiqAlgoResCom*)(new RkAiqAlgoPostResArawnr());
+
+    EXIT_ANALYZER_FUNCTION();
+}
+
+XCamReturn
+RkAiqArawnrHandle::prepare()
+{
+    ENTER_ANALYZER_FUNCTION();
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    RkAiqAlgoDescription* des = (RkAiqAlgoDescription*)mDes;
+
+    ret = RkAiqHandle::prepare();
+    RKAIQCORE_CHECK_RET(ret, "arawnr handle prepare failed");
+
+    // TODO config arawnr common params
+    RkAiqAlgoConfigArawnr* arawnr_config = (RkAiqAlgoConfigArawnr*)mConfig;
+
+    // id != 0 means the thirdparty's algo
+    if (mDes->id != 0) {
+        ret = des->prepare(mConfig);
+        RKAIQCORE_CHECK_RET(ret, "arawnr algo prepare failed");
+    }
+
+    EXIT_ANALYZER_FUNCTION();
+    return ret;
+}
+
+XCamReturn
+RkAiqArawnrHandle::preProcess()
+{
+    ENTER_ANALYZER_FUNCTION();
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    RkAiqAlgoDescription* des = (RkAiqAlgoDescription*)mDes;
+    RkAiqAlgoPreArawnr* arawnr_pre = (RkAiqAlgoPreArawnr*)mPreInParam;
+
+    ret = RkAiqHandle::preProcess();
+    RKAIQCORE_CHECK_RET(ret, "arawnr handle preProcess failed");
+
+    // TODO config common arawnr preprocess params
+
+    // id != 0 means the thirdparty's algo
+    if (mDes->id != 0) {
+        ret = des->pre_process(mPreInParam, mPreOutParam);
+        RKAIQCORE_CHECK_RET(ret, "arawnr handle pre_process failed");
+    }
+
+    EXIT_ANALYZER_FUNCTION();
+    return ret;
+}
+
+XCamReturn
+RkAiqArawnrHandle::processing()
+{
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    RkAiqAlgoDescription* des = (RkAiqAlgoDescription*)mDes;
+    RkAiqAlgoProcArawnr* arawnr_pre = (RkAiqAlgoProcArawnr*)mProcInParam;
+
+    ret = RkAiqHandle::processing();
+    RKAIQCORE_CHECK_RET(ret, "arawnr handle processing failed");
+
+    // TODO config common arawnr processing params
+
+    // id != 0 means the thirdparty's algo
+    if (mDes->id != 0) {
+        ret = des->processing(mProcInParam, mProcOutParam);
+        RKAIQCORE_CHECK_RET(ret, "arawnr algo processing failed");
+    }
+
+    EXIT_ANALYZER_FUNCTION();
+    return ret;
+}
+
+XCamReturn
+RkAiqArawnrHandle::postProcess()
+{
+    ENTER_ANALYZER_FUNCTION();
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    RkAiqAlgoDescription* des = (RkAiqAlgoDescription*)mDes;
+    RkAiqAlgoPostArawnr* arawnr_pre = (RkAiqAlgoPostArawnr*)mPostInParam;
+
+    ret = RkAiqHandle::postProcess();
+    RKAIQCORE_CHECK_RET(ret, "arawnr handle postProcess failed");
+
+    // TODO config common arawnr postProcess params
+
+    // id != 0 means the thirdparty's algo
+    if (mDes->id != 0) {
+        ret = des->post_process(mPostInParam, mPostOutParam);
+        RKAIQCORE_CHECK_RET(ret, "arawnr algo postProcess failed");
+    }
+
+    EXIT_ANALYZER_FUNCTION();
+    return ret;
+}
+
+void
+RkAiqAmfnrHandle::init()
+{
+    ENTER_ANALYZER_FUNCTION();
+
+    deInit();
+    mConfig       = (RkAiqAlgoCom*)(new RkAiqAlgoConfigAmfnr());
+    mPreInParam   = (RkAiqAlgoCom*)(new RkAiqAlgoPreAmfnr());
+    mPreOutParam  = (RkAiqAlgoResCom*)(new RkAiqAlgoPreResAmfnr());
+    mProcInParam  = (RkAiqAlgoCom*)(new RkAiqAlgoProcAmfnr());
+    mProcOutParam = (RkAiqAlgoResCom*)(new RkAiqAlgoProcResAmfnr());
+    mPostInParam  = (RkAiqAlgoCom*)(new RkAiqAlgoPostAmfnr());
+    mPostOutParam = (RkAiqAlgoResCom*)(new RkAiqAlgoPostResAmfnr());
+
+    EXIT_ANALYZER_FUNCTION();
+}
+
+XCamReturn
+RkAiqAmfnrHandle::prepare()
+{
+    ENTER_ANALYZER_FUNCTION();
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    RkAiqAlgoDescription* des = (RkAiqAlgoDescription*)mDes;
+
+    ret = RkAiqHandle::prepare();
+    RKAIQCORE_CHECK_RET(ret, "amfnr handle prepare failed");
+
+    // TODO config amfnr common params
+    RkAiqAlgoConfigAmfnr* amfnr_config = (RkAiqAlgoConfigAmfnr*)mConfig;
+
+    // id != 0 means the thirdparty's algo
+    if (mDes->id != 0) {
+        ret = des->prepare(mConfig);
+        RKAIQCORE_CHECK_RET(ret, "amfnr algo prepare failed");
+    }
+
+    EXIT_ANALYZER_FUNCTION();
+    return ret;
+}
+
+XCamReturn
+RkAiqAmfnrHandle::preProcess()
+{
+    ENTER_ANALYZER_FUNCTION();
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    RkAiqAlgoDescription* des = (RkAiqAlgoDescription*)mDes;
+    RkAiqAlgoPreAmfnr* amfnr_pre = (RkAiqAlgoPreAmfnr*)mPreInParam;
+
+    ret = RkAiqHandle::preProcess();
+    RKAIQCORE_CHECK_RET(ret, "amfnr handle preProcess failed");
+
+    // TODO config common amfnr preprocess params
+
+    // id != 0 means the thirdparty's algo
+    if (mDes->id != 0) {
+        ret = des->pre_process(mPreInParam, mPreOutParam);
+        RKAIQCORE_CHECK_RET(ret, "amfnr handle pre_process failed");
+    }
+
+    EXIT_ANALYZER_FUNCTION();
+    return ret;
+}
+
+XCamReturn
+RkAiqAmfnrHandle::processing()
+{
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    RkAiqAlgoDescription* des = (RkAiqAlgoDescription*)mDes;
+    RkAiqAlgoProcAmfnr* amfnr_pre = (RkAiqAlgoProcAmfnr*)mProcInParam;
+
+    ret = RkAiqHandle::processing();
+    RKAIQCORE_CHECK_RET(ret, "amfnr handle processing failed");
+
+    // TODO config common amfnr processing params
+
+    // id != 0 means the thirdparty's algo
+    if (mDes->id != 0) {
+        ret = des->processing(mProcInParam, mProcOutParam);
+        RKAIQCORE_CHECK_RET(ret, "amfnr algo processing failed");
+    }
+
+    EXIT_ANALYZER_FUNCTION();
+    return ret;
+}
+
+XCamReturn
+RkAiqAmfnrHandle::postProcess()
+{
+    ENTER_ANALYZER_FUNCTION();
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    RkAiqAlgoDescription* des = (RkAiqAlgoDescription*)mDes;
+    RkAiqAlgoPostAmfnr* amfnr_pre = (RkAiqAlgoPostAmfnr*)mPostInParam;
+
+    ret = RkAiqHandle::postProcess();
+    RKAIQCORE_CHECK_RET(ret, "amfnr handle postProcess failed");
+
+    // TODO config common amfnr postProcess params
+
+    // id != 0 means the thirdparty's algo
+    if (mDes->id != 0) {
+        ret = des->post_process(mPostInParam, mPostOutParam);
+        RKAIQCORE_CHECK_RET(ret, "amfnr algo postProcess failed");
+    }
+
+    EXIT_ANALYZER_FUNCTION();
+    return ret;
+}
+
+void
+RkAiqAynrHandle::init()
+{
+    ENTER_ANALYZER_FUNCTION();
+
+    deInit();
+    mConfig       = (RkAiqAlgoCom*)(new RkAiqAlgoConfigAynr());
+    mPreInParam   = (RkAiqAlgoCom*)(new RkAiqAlgoPreAynr());
+    mPreOutParam  = (RkAiqAlgoResCom*)(new RkAiqAlgoPreResAynr());
+    mProcInParam  = (RkAiqAlgoCom*)(new RkAiqAlgoProcAynr());
+    mProcOutParam = (RkAiqAlgoResCom*)(new RkAiqAlgoProcResAynr());
+    mPostInParam  = (RkAiqAlgoCom*)(new RkAiqAlgoPostAynr());
+    mPostOutParam = (RkAiqAlgoResCom*)(new RkAiqAlgoPostResAynr());
+
+    EXIT_ANALYZER_FUNCTION();
+}
+
+XCamReturn
+RkAiqAynrHandle::prepare()
+{
+    ENTER_ANALYZER_FUNCTION();
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    RkAiqAlgoDescription* des = (RkAiqAlgoDescription*)mDes;
+
+    ret = RkAiqHandle::prepare();
+    RKAIQCORE_CHECK_RET(ret, "aynr handle prepare failed");
+
+    // TODO config aynr common params
+    RkAiqAlgoConfigAynr* aynr_config = (RkAiqAlgoConfigAynr*)mConfig;
+
+    // id != 0 means the thirdparty's algo
+    if (mDes->id != 0) {
+        ret = des->prepare(mConfig);
+        RKAIQCORE_CHECK_RET(ret, "aynr algo prepare failed");
+    }
+
+    EXIT_ANALYZER_FUNCTION();
+    return ret;
+}
+
+XCamReturn
+RkAiqAynrHandle::preProcess()
+{
+    ENTER_ANALYZER_FUNCTION();
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    RkAiqAlgoDescription* des = (RkAiqAlgoDescription*)mDes;
+    RkAiqAlgoPreAynr* aynr_pre = (RkAiqAlgoPreAynr*)mPreInParam;
+
+    ret = RkAiqHandle::preProcess();
+    RKAIQCORE_CHECK_RET(ret, "aynr handle preProcess failed");
+
+    // TODO config common aynr preprocess params
+
+    // id != 0 means the thirdparty's algo
+    if (mDes->id != 0) {
+        ret = des->pre_process(mPreInParam, mPreOutParam);
+        RKAIQCORE_CHECK_RET(ret, "aynr handle pre_process failed");
+    }
+
+    EXIT_ANALYZER_FUNCTION();
+    return ret;
+}
+
+XCamReturn
+RkAiqAynrHandle::processing()
+{
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    RkAiqAlgoDescription* des = (RkAiqAlgoDescription*)mDes;
+    RkAiqAlgoProcAynr* aynr_pre = (RkAiqAlgoProcAynr*)mProcInParam;
+
+    ret = RkAiqHandle::processing();
+    RKAIQCORE_CHECK_RET(ret, "aynr handle processing failed");
+
+    // TODO config common aynr processing params
+
+    // id != 0 means the thirdparty's algo
+    if (mDes->id != 0) {
+        ret = des->processing(mProcInParam, mProcOutParam);
+        RKAIQCORE_CHECK_RET(ret, "aynr algo processing failed");
+    }
+
+    EXIT_ANALYZER_FUNCTION();
+    return ret;
+}
+
+XCamReturn
+RkAiqAynrHandle::postProcess()
+{
+    ENTER_ANALYZER_FUNCTION();
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    RkAiqAlgoDescription* des = (RkAiqAlgoDescription*)mDes;
+    RkAiqAlgoPostAynr* aynr_pre = (RkAiqAlgoPostAynr*)mPostInParam;
+
+    ret = RkAiqHandle::postProcess();
+    RKAIQCORE_CHECK_RET(ret, "aynr handle postProcess failed");
+
+    // TODO config common aynr postProcess params
+
+    // id != 0 means the thirdparty's algo
+    if (mDes->id != 0) {
+        ret = des->post_process(mPostInParam, mPostOutParam);
+        RKAIQCORE_CHECK_RET(ret, "aynr algo postProcess failed");
+    }
+
+    EXIT_ANALYZER_FUNCTION();
+    return ret;
+}
+
+void
+RkAiqAcnrHandle::init()
+{
+    ENTER_ANALYZER_FUNCTION();
+
+    deInit();
+    mConfig       = (RkAiqAlgoCom*)(new RkAiqAlgoConfigAcnr());
+    mPreInParam   = (RkAiqAlgoCom*)(new RkAiqAlgoPreAcnr());
+    mPreOutParam  = (RkAiqAlgoResCom*)(new RkAiqAlgoPreResAcnr());
+    mProcInParam  = (RkAiqAlgoCom*)(new RkAiqAlgoProcAcnr());
+    mProcOutParam = (RkAiqAlgoResCom*)(new RkAiqAlgoProcResAcnr());
+    mPostInParam  = (RkAiqAlgoCom*)(new RkAiqAlgoPostAcnr());
+    mPostOutParam = (RkAiqAlgoResCom*)(new RkAiqAlgoPostResAcnr());
+
+    EXIT_ANALYZER_FUNCTION();
+}
+
+XCamReturn
+RkAiqAcnrHandle::prepare()
+{
+    ENTER_ANALYZER_FUNCTION();
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    RkAiqAlgoDescription* des = (RkAiqAlgoDescription*)mDes;
+
+    ret = RkAiqHandle::prepare();
+    RKAIQCORE_CHECK_RET(ret, "acnr handle prepare failed");
+
+    // TODO config acnr common params
+    RkAiqAlgoConfigAcnr* acnr_config = (RkAiqAlgoConfigAcnr*)mConfig;
+
+    // id != 0 means the thirdparty's algo
+    if (mDes->id != 0) {
+        ret = des->prepare(mConfig);
+        RKAIQCORE_CHECK_RET(ret, "acnr algo prepare failed");
+    }
+
+    EXIT_ANALYZER_FUNCTION();
+    return ret;
+}
+
+XCamReturn
+RkAiqAcnrHandle::preProcess()
+{
+    ENTER_ANALYZER_FUNCTION();
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    RkAiqAlgoDescription* des = (RkAiqAlgoDescription*)mDes;
+    RkAiqAlgoPreAcnr* acnr_pre = (RkAiqAlgoPreAcnr*)mPreInParam;
+
+    ret = RkAiqHandle::preProcess();
+    RKAIQCORE_CHECK_RET(ret, "acnr handle preProcess failed");
+
+    // TODO config common acnr preprocess params
+
+    // id != 0 means the thirdparty's algo
+    if (mDes->id != 0) {
+        ret = des->pre_process(mPreInParam, mPreOutParam);
+        RKAIQCORE_CHECK_RET(ret, "acnr handle pre_process failed");
+    }
+
+    EXIT_ANALYZER_FUNCTION();
+    return ret;
+}
+
+XCamReturn
+RkAiqAcnrHandle::processing()
+{
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    RkAiqAlgoDescription* des = (RkAiqAlgoDescription*)mDes;
+    RkAiqAlgoProcAcnr* acnr_pre = (RkAiqAlgoProcAcnr*)mProcInParam;
+
+    ret = RkAiqHandle::processing();
+    RKAIQCORE_CHECK_RET(ret, "acnr handle processing failed");
+
+    // TODO config common acnr processing params
+
+    // id != 0 means the thirdparty's algo
+    if (mDes->id != 0) {
+        ret = des->processing(mProcInParam, mProcOutParam);
+        RKAIQCORE_CHECK_RET(ret, "acnr algo processing failed");
+    }
+
+    EXIT_ANALYZER_FUNCTION();
+    return ret;
+}
+
+XCamReturn
+RkAiqAcnrHandle::postProcess()
+{
+    ENTER_ANALYZER_FUNCTION();
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    RkAiqAlgoDescription* des = (RkAiqAlgoDescription*)mDes;
+    RkAiqAlgoPostAcnr* acnr_pre = (RkAiqAlgoPostAcnr*)mPostInParam;
+
+    ret = RkAiqHandle::postProcess();
+    RKAIQCORE_CHECK_RET(ret, "acnr handle postProcess failed");
+
+    // TODO config common acnr postProcess params
+
+    // id != 0 means the thirdparty's algo
+    if (mDes->id != 0) {
+        ret = des->post_process(mPostInParam, mPostOutParam);
+        RKAIQCORE_CHECK_RET(ret, "acnr algo postProcess failed");
+    }
+
+    EXIT_ANALYZER_FUNCTION();
+    return ret;
+}
+
+void
+RkAiqAdrcHandle::init()
+{
+    ENTER_ANALYZER_FUNCTION();
+
+    deInit();
+    mConfig       = (RkAiqAlgoCom*)(new RkAiqAlgoConfigAdrc());
+    mPreInParam   = (RkAiqAlgoCom*)(new RkAiqAlgoPreAdrc());
+    mPreOutParam  = (RkAiqAlgoResCom*)(new RkAiqAlgoPreResAdrc());
+    mProcInParam  = (RkAiqAlgoCom*)(new RkAiqAlgoProcAdrc());
+    mProcOutParam = (RkAiqAlgoResCom*)(new RkAiqAlgoProcResAdrc());
+    mPostInParam  = (RkAiqAlgoCom*)(new RkAiqAlgoPostAdrc());
+    mPostOutParam = (RkAiqAlgoResCom*)(new RkAiqAlgoPostResAdrc());
+
+    EXIT_ANALYZER_FUNCTION();
+}
+
+XCamReturn
+RkAiqAdrcHandle::prepare()
+{
+    ENTER_ANALYZER_FUNCTION();
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    RkAiqAlgoDescription* des = (RkAiqAlgoDescription*)mDes;
+
+    ret = RkAiqHandle::prepare();
+    RKAIQCORE_CHECK_RET(ret, "adrc handle prepare failed");
+
+    // TODO config adrc common params
+    RkAiqAlgoConfigAdrc* adrc_config = (RkAiqAlgoConfigAdrc*)mConfig;
+
+    // id != 0 means the thirdparty's algo
+    if (mDes->id != 0) {
+        ret = des->prepare(mConfig);
+        RKAIQCORE_CHECK_RET(ret, "adrc algo prepare failed");
+    }
+
+    EXIT_ANALYZER_FUNCTION();
+    return ret;
+}
+
+XCamReturn
+RkAiqAdrcHandle::preProcess()
+{
+    ENTER_ANALYZER_FUNCTION();
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    RkAiqAlgoDescription* des = (RkAiqAlgoDescription*)mDes;
+    RkAiqAlgoPreAdrc* adrc_pre = (RkAiqAlgoPreAdrc*)mPreInParam;
+
+    ret = RkAiqHandle::preProcess();
+    RKAIQCORE_CHECK_RET(ret, "adrc handle preProcess failed");
+
+    // TODO config common adrc preprocess params
+
+    // id != 0 means the thirdparty's algo
+    if (mDes->id != 0) {
+        ret = des->pre_process(mPreInParam, mPreOutParam);
+        RKAIQCORE_CHECK_RET(ret, "adrc handle pre_process failed");
+    }
+
+    EXIT_ANALYZER_FUNCTION();
+    return ret;
+}
+
+XCamReturn
+RkAiqAdrcHandle::processing()
+{
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    RkAiqAlgoDescription* des = (RkAiqAlgoDescription*)mDes;
+    RkAiqAlgoProcAdrc* adrc_pre = (RkAiqAlgoProcAdrc*)mProcInParam;
+
+    ret = RkAiqHandle::processing();
+    RKAIQCORE_CHECK_RET(ret, "adrc handle processing failed");
+
+    // TODO config common adrc processing params
+
+    // id != 0 means the thirdparty's algo
+    if (mDes->id != 0) {
+        ret = des->processing(mProcInParam, mProcOutParam);
+        RKAIQCORE_CHECK_RET(ret, "adrc algo processing failed");
+    }
+
+    EXIT_ANALYZER_FUNCTION();
+    return ret;
+}
+
+XCamReturn
+RkAiqAdrcHandle::postProcess()
+{
+    ENTER_ANALYZER_FUNCTION();
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    RkAiqAlgoDescription* des = (RkAiqAlgoDescription*)mDes;
+    RkAiqAlgoPostAdrc* adrc_pre = (RkAiqAlgoPostAdrc*)mPostInParam;
+
+    ret = RkAiqHandle::postProcess();
+    RKAIQCORE_CHECK_RET(ret, "adrc handle postProcess failed");
+
+    // TODO config common adrc postProcess params
+
+    // id != 0 means the thirdparty's algo
+    if (mDes->id != 0) {
+        ret = des->post_process(mPostInParam, mPostOutParam);
+        RKAIQCORE_CHECK_RET(ret, "adrc algo postProcess failed");
+    }
+
+    EXIT_ANALYZER_FUNCTION();
+    return ret;
+}
+
 }; //namespace RkCam

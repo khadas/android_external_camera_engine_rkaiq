@@ -28,6 +28,9 @@ rk_aiq_uapi_afec_SetAttrib(RkAiqAlgoContext *ctx,
 {
     FECHandle_t fec_contex = (FECHandle_t)ctx->hFEC;;
 
+    LOGD_AFEC("Fec setAttr en(%d), bypass(%d), correct_level(%d), direction(%d)\n",
+            attr.en, attr.bypass, attr.correct_level, attr.direction);
+
     if (fec_contex->fec_en != attr.en && \
         (fec_contex->eState == FEC_STATE_INITIALIZED || \
          fec_contex->eState == FEC_STATE_RUNNING)) {
@@ -64,6 +67,9 @@ rk_aiq_uapi_afec_GetAttrib(const RkAiqAlgoContext *ctx,
     FECHandle_t fec_contex = (FECHandle_t)ctx->hFEC;;
 
     memcpy(attr, &fec_contex->user_config, sizeof(rk_aiq_fec_attrib_t));
+
+    LOGD_AFEC("Fec getAttr en(%d), bypass(%d), correct_level(%d), direction(%d)\n",
+            attr->en, attr->bypass, attr->correct_level, attr->direction);
 
     return XCAM_RETURN_NO_ERROR;
 }

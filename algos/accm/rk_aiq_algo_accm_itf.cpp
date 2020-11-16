@@ -59,7 +59,8 @@ prepare(RkAiqAlgoCom* params)
 {
     LOGI_ACCM( "%s: (enter)\n", __FUNCTION__);
     accm_handle_t hAccm = (accm_handle_t)(params->ctx->accm_para);
-
+    //hdr mode
+    hAccm->accmSwInfo.hdr_mode = params->u.prepare.working_mode;
     RkAiqAlgoConfigAccmInt *para = (RkAiqAlgoConfigAccmInt*)params;
     AccmPrepare((accm_handle_t)(params->ctx->accm_para));
 
@@ -86,6 +87,7 @@ processing(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outparams)
     RkAiqAlgoProcResAccmInt *proResAccm = (RkAiqAlgoProcResAccmInt*)outparams;
     accm_handle_t hAccm = (accm_handle_t)(inparams->ctx->accm_para);
     RkAiqAlgoProcAccmInt* procPara = (RkAiqAlgoProcAccmInt*)inparams;
+    procAccm->accm_sw_info.hdr_mode = hAccm->accmRest.currentHdrNormalMode;
     procAccm->accm_sw_info.grayMode = procPara->rk_com.u.proc.gray_mode;
     hAccm->accmSwInfo = procAccm->accm_sw_info;
     LOGI_ACCM( "%s accm_proc_com.u.init:%d \n", __FUNCTION__, inparams->u.proc.init);

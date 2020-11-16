@@ -18,4 +18,10 @@ typedef struct {
     //unsigned char meshyf[FEC_MESH_XY_NUM_ALGO];
 } fec_preprocess_result_t;
 
+typedef enum fec_correct_direction_e {
+    FEC_CORRECT_DIRECTION_X = 0x1,
+    FEC_CORRECT_DIRECTION_Y,
+    FEC_CORRECT_DIRECTION_XY
+} fec_correct_direction_t;
+
 #endif

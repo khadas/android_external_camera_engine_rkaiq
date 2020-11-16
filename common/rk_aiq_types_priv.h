@@ -22,34 +22,28 @@
 
 #define RKAIQ_ISP_LDCH_ID           (1 << 0)
 
+// base struct
 typedef struct {
     uint32_t update_mask;
     uint32_t module_enable_mask;
     sint32_t frame_id;
+} rk_aiq_isp_params_t;
+
+// v2x params struct
+typedef struct : rk_aiq_isp_params_t {
     rk_aiq_isp_aec_meas_t   aec_meas;
     rk_aiq_isp_hist_meas_t  hist_meas;
     bool awb_cfg_update;
-    rk_aiq_awb_stat_cfg_v200_t   awb_cfg_v200;
-    rk_aiq_awb_stat_cfg_v201_t   awb_cfg_v201;
     bool awb_gain_update;
-    rk_aiq_wb_gain_t       awb_gain;
-    rk_aiq_isp_af_meas_t    af_meas;
+    rk_aiq_wb_gain_t        awb_gain;
     bool af_cfg_update;
-    rk_aiq_isp_blc_t        blc;
+    rk_aiq_isp_af_meas_t    af_meas;
     rk_aiq_isp_dpcc_t       dpcc;
-    RkAiqAhdrProcResult_t   ahdr_proc_res;//porc data for hw/simulator
-    rk_aiq_isp_rawnr_t      rawnr;
-    rk_aiq_isp_drc_t        drc;
-    rk_aiq_isp_gic_t        gic;
+    rk_aiq_isp_merge_t      merge;
     rk_aiq_lsc_cfg_t        lsc;
     rk_aiq_isp_demosaic_t   demosaic;
     rk_aiq_isp_ldch_t       ldch;
-    //rk_aiq_isp_fec_t        fec;
     rk_aiq_lut3d_cfg_t      lut3d;
-    //rk_aiq_isp_dehaze_t     dehaze;
-    rk_aiq_dehaze_cfg_t     adhaz_config;
-    rk_aiq_ccm_cfg_t        ccm;
-    //rk_aiq_isp_goc_t        goc;
     AgammaProcRes_t         agamma;
     rk_aiq_isp_wdr_t        wdr;
     rk_aiq_isp_csm_t        csm;
@@ -57,12 +51,43 @@ typedef struct {
     rk_aiq_isp_conv422_t    conv22;
     rk_aiq_isp_yuvconv_t    yuvconv;
     rk_aiq_isp_gain_t       gain_config;
-    //anr result
-    rkaiq_anr_procRes_t     rkaiq_anr_proc_res;
-    rkaiq_asharp_procRes_t  rkaiq_asharp_proc_res;
     rk_aiq_acp_params_t     cp;
     rk_aiq_isp_ie_t         ie;
-} rk_aiq_isp_params_t;
+#ifdef RK_SIMULATOR_HW
+    rkaiq_anr_procRes_t     rkaiq_anr_proc_res;
+    rkaiq_asharp_procRes_t  rkaiq_asharp_proc_res;
+#endif
+} rk_aiq_isp_params_v2x_t;
+
+// v20 params struct
+typedef struct : rk_aiq_isp_params_v2x_t {
+    rk_aiq_isp_blc_t           blc;
+    rk_aiq_dehaze_cfg_t        adhaz_config;
+    rk_aiq_ccm_cfg_t           ccm;
+    rk_aiq_isp_gic_t           gic;
+    // TMO
+    rk_aiq_isp_drc_t           drc;
+    rk_aiq_isp_rawnr_t         rawnr;
+    rk_aiq_awb_stat_cfg_v200_t awb_cfg;
+    // TODO: should be split to merge and tmo
+    RkAiqAhdrProcResult_t      ahdr_proc_res;//porc data for hw/simulator
+} rk_aiq_isp_params_v20_t;
+
+// v21 params struct
+typedef struct : rk_aiq_isp_params_v2x_t {
+    rk_aiq_isp_blc_v21_t        blc;
+    rk_aiq_isp_dhaz_cfg_v21_t   adhaz_config;
+    rk_aiq_ccm_cfg_t        ccm;
+    rk_aiq_isp_gic_v21_t        gic;
+    // TMO
+    rk_aiq_isp_drc_v21_t        drc;
+    rk_aiq_awb_stat_cfg_v201_t  awb_cfg;
+    rk_aiq_isp_baynr_v21_t      rawnr;
+    rk_aiq_isp_bay3d_v21_t      tnr;
+    rk_aiq_isp_ynr_v21_t        ynr;
+    rk_aiq_isp_cnr_v21_t        uvnr;
+    rk_aiq_isp_sharp_v21_t      sharp;
+} rk_aiq_isp_params_v21_t;
 
 #define RKAIQ_ISPP_TNR_ID           (1 << 0)
 #define RKAIQ_ISPP_NR_ID            (1 << 1)

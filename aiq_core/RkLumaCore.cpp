@@ -215,7 +215,6 @@ RkLumaCore::analyze(const SmartPtr<VideoBuffer> &buffer)
         if (hdrProcessCnt > 2)
             hdrProcessCnt = 2;
 
-        hdrProcessCnt = calib->fixed_times;
         if (mCb)
             mCb->rkLumaCalcDone(lumaStat->frame_id, hdrProcessCnt);
 

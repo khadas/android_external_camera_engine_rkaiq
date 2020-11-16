@@ -60,9 +60,10 @@ public:
                        SmartPtr<V4l2Device> mipi_rx_devs[3],
                        SmartPtr<V4l2SubDevice> isp_dev);
     void set_hdr_frame_readback_infos(int frame_id, int times);
+    void set_need_luma_rd_info(bool need) { _need_luma_rd_info = need; }
     XCamReturn notify_capture_raw();
     // should be called befor start
-    void set_working_mode(int mode, bool linked_to_isp);
+    void set_working_mode(int mode, bool linked_to_isp, bool nordbk);
     void set_loop_status(bool stat);
     XCamReturn capture_raw_ctl(capture_raw_t type, int count = 0, const char* capture_dir = nullptr, char* output_dir = nullptr);
     void set_hdr_global_tmo_mode(int frame_id, bool mode);
@@ -139,6 +140,7 @@ private:
     bool _is_multi_cam_conc;
     int _skip_num;
     int64_t _skip_to_seq;
+    bool _need_luma_rd_info;
     int calculate_stride_per_line(const struct capture_fmt& fmt,
                                   uint32_t& bytesPerLine);
     const struct capture_fmt* find_fmt(const uint32_t pixelformat);

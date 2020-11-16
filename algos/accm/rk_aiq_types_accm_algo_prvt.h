@@ -42,6 +42,7 @@ typedef struct accm_rest_s {
     Cam1x3FloatMatrix_t dampedCcOffset;
     float color_inhibition_level;
     float color_saturation_level;
+    CalibDb_CcmHdrNormalMode_t currentHdrNormalMode;
 } accm_rest_t;
 
 typedef struct illu_node_s {
@@ -51,7 +52,7 @@ typedef struct illu_node_s {
 
 typedef struct accm_context_s {
     const CalibDb_Ccm_t *calibCcm;//profile para
-    const CalibDb_CcmMatrixProfile_t *pCcmMatrixAll[CCM_ILLUMINATION_MAX][CCM_PROFILES_NUM_MAX];// reorder para //to do, change to pointer
+    const CalibDb_CcmMatrixProfile_t *pCcmMatrixAll[CCM_FOR_MODE_MAX][CCM_ILLUMINATION_MAX][CCM_PROFILES_NUM_MAX];// reorder para //to do, change to pointer
     accm_sw_info_t accmSwInfo;
     accm_rest_t accmRest;
     rk_aiq_ccm_cfg_t ccmHwConf; //hw para

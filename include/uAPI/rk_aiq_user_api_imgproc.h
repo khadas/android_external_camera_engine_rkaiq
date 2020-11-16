@@ -750,6 +750,15 @@ XCamReturn rk_aiq_uapi_setFecEn(const rk_aiq_sys_ctx_t* ctx, bool en);
 /*
 *****************************
 *
+* Desc: set corrective direction of FEC, valid only if aiq hasn't executed the 'prepare' action
+* Argument:
+*****************************
+*/
+XCamReturn rk_aiq_uapi_setFecCorrectDirection(const rk_aiq_sys_ctx_t* ctx,
+                                              const fec_correct_direction_t direction);
+/*
+*****************************
+*
 * Desc: The FEC module is still working in bypass state
 * Argument:
 *****************************

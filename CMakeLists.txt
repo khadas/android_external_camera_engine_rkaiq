@@ -27,7 +27,7 @@ set(BUILROOT_BUILD_PROJECT true)
 #set(RK_SIMULATOR_HW true)
 
 if(NOT RK_SIMULATOR_HW)
-set(GENMESH_ONLINE true)
+	set(GENMESH_ONLINE true)
 endif()
 
 # ----------------------------------------------------------------------------
@@ -37,13 +37,17 @@ if(RK_SIMULATOR_HW)
 	add_compile_options(-DRK_SIMULATOR_HW)
 elseif(BUILROOT_BUILD_PROJECT)
 	#add_compile_options(-DDISABLE_PP)
-	SET(CMAKE_C_COMPILER "/home/camera/camera/rv1109_sdk/buildroot/output/rockchip_puma/host/bin/arm-linux-gnueabihf-gcc")
-	SET(CMAKE_CXX_COMPILER "/home/camera/camera/rv1109_sdk/buildroot/output/rockchip_puma/host/bin/arm-linux-gnueabihf-g++")
-	#SET(CMAKE_C_COMPILER "/home/xuhf/isp2.0-hal/buildroot/output/host/bin/arm-buildroot-linux-uclibcgnueabihf-gcc")
-	#SET(CMAKE_CXX_COMPILER "/home/xuhf/isp2.0-hal/buildroot/output/host/bin/arm-buildroot-linux-uclibcgnueabihf-g++")
+	#add_compile_options(-DDISABLE_PP_STATS)
+	if(ARCH STREQUAL "aarch64")
+		SET(CMAKE_C_COMPILER "/home/camera/camera/rv1109_sdk/prebuilts/gcc/linux-x86/aarch64/gcc-linaro-6.3.1-2017.05-x86_64_aarch64-linux-gnu/bin/aarch64-linux-gnu-gcc")
+		SET(CMAKE_CXX_COMPILER "/home/camera/camera/rv1109_sdk/prebuilts/gcc/linux-x86/aarch64/gcc-linaro-6.3.1-2017.05-x86_64_aarch64-linux-gnu/bin/aarch64-linux-gnu-g++")
+	else()
+		SET(CMAKE_C_COMPILER "/home/camera/camera/rv1109_sdk/buildroot/output/rockchip_puma/host/bin/arm-linux-gnueabihf-gcc")
+		SET(CMAKE_CXX_COMPILER "/home/camera/camera/rv1109_sdk/buildroot/output/rockchip_puma/host/bin/arm-linux-gnueabihf-g++")
+	endif()
 else()
-	SET(CMAKE_C_COMPILER "${PROJECT_SOURCE_DIR}/../puma/prebuilts/gcc/linux-x86/arm/gcc-arm-8.3-2019.03-x86_64-arm-linux-gnueabihf/bin/arm-linux-gnueabihf-gcc")
-	SET(CMAKE_CXX_COMPILER "${PROJECT_SOURCE_DIR}/../puma/prebuilts/gcc/linux-x86/arm/gcc-arm-8.3-2019.03-x86_64-arm-linux-gnueabihf/bin/arm-linux-gnueabihf-g++")
+    SET(CMAKE_C_COMPILER "/home/hkj/isp2-fpga/fpga-ramdisk/toolchains/host/bin/arm-buildroot-linux-gnueabi-gcc")
+    SET(CMAKE_CXX_COMPILER "/home/hkj/isp2-fpga/fpga-ramdisk/toolchains/host/bin/arm-buildroot-linux-gnueabi-g++")
 endif()
 
 # ----------------------------------------------------------------------------
@@ -111,7 +115,9 @@ include/common/gen_mesh
 set (AIQ_CORE_SRC
 	aiq_core/RkAiqHandle.cpp
 	aiq_core/RkAiqHandleInt.cpp
+	aiq_core/RkAiqHandleIntV21.cpp
 	aiq_core/RkAiqCore.cpp
+	aiq_core/RkAiqCoreV21.cpp
 	aiq_core/RkLumaCore.cpp
 	)
 set (ALGO_COMMON_SRC
@@ -141,6 +147,8 @@ set (HWI_SRC
         hwi/isp20/Isp20StatsBuffer.cpp
         hwi/isp20/Isp20_module_dbg.cpp
         hwi/isp20/Isp20OfflineFrmRead.cpp
+		#hwi/isp21/Isp21Params.cpp
+        hwi/isp21/CamHwIsp21.cpp
         hwi/SensorHw.cpp
         hwi/LensHw.cpp
         hwi/FlashLight.cpp
@@ -154,6 +162,7 @@ set (IQ_PARSER_SRC
 	iq_parser/RkAiqCalibTag.cpp
 	iq_parser/tinyxml2.cpp
 	iq_parser/xmltags.cpp
+	iq_parser/RkAiqCalibApi.cpp
 	)
 set (UAPI_SRC
 	uAPI/rk_aiq_user_api_sysctl.cpp
@@ -219,9 +228,15 @@ endif()
 
 if(GENMESH_ONLINE)
     set (GENMESH_LIBS genMeshLib)
-    set (GENMESH_LIBS_DIR
-        ${PROJECT_SOURCE_DIR}/common/gen_mesh/genMesh_static_32bit/
-        )
+	if(ARCH STREQUAL "aarch64")
+		set (GENMESH_LIBS_DIR
+			${PROJECT_SOURCE_DIR}/common/gen_mesh/genMesh_static_64bit/
+			)
+	else()
+		set (GENMESH_LIBS_DIR
+			${PROJECT_SOURCE_DIR}/common/gen_mesh/genMesh_static_32bit/
+			)
+	endif()
     add_compile_options(-DGENMESH_ONLINE)
 endif()
 

@@ -824,7 +824,7 @@ SensorHw::set_working_mode(int mode)
     hdr_cfg.hdr_mode = hdr_mode;
     if (io_control(RKMODULE_SET_HDR_CFG, &hdr_cfg) < 0) {
         LOGE_CAMHW_SUBM(SENSOR_SUBM,"failed to set hdr mode %d", hdr_mode);
-        return XCAM_RETURN_ERROR_IOCTL;
+        //return XCAM_RETURN_ERROR_IOCTL;
     }
 
     _working_mode = mode;

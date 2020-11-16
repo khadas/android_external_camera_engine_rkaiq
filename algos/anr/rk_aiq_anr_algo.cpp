@@ -320,7 +320,7 @@ ANRresult_t ANRGetProcResult(ANRContext_t *pANRCtx, ANRProcResult_t* pANRResult)
         pANRResult->ynrEN = pANRCtx->stAuto.ynrEn;
         pANRResult->uvnrEn = pANRCtx->stAuto.uvnrEn;
 
-	 if(pANRCtx->stAuto.bayernrEn && pANRCtx->stAuto.stMfnr_dynamic.enable){
+	 if(pANRCtx->stAuto.mfnrEn && pANRCtx->stAuto.stMfnr_dynamic.enable){
 		pANRResult->mfnrEn = pANRCtx->stAuto.stMfnr_dynamic.mfnr_enable_state;
 	 }
 

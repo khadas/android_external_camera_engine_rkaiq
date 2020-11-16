@@ -23,24 +23,6 @@
 
 namespace RkCam {
 
-#if 0
-class RkAiqPartResults {
-public:
-    explicit RkAiqPartResults() {
-        mIspParams = NULL;
-        mExposureParams = NULL;
-        mFocusParams = NULL;
-    };
-    ~RkAiqPartResults() {};
-
-    rk_aiq_isp_params_t* mIspParams;
-    rk_aiq_exposure_params_comb_t* mExposureParams;
-    rk_aiq_focus_params_t* mFocusParams;
-
-private:
-    XCAM_DEAD_COPY (RkAiqPartResults);
-};
-#endif
 typedef struct RKAiqAecExpInfoWrapper_s {
     RKAiqAecExpInfo_t aecExpInfo;
     RKAiqAecExpInfo_t exp_tbl[MAX_AEC_EFFECT_FNUM];
@@ -89,7 +71,8 @@ typedef SharedItemPool<rk_aiq_iris_params_wrapper_t> RkAiqIrisParamsPool;
 typedef SharedItemProxy<rk_aiq_iris_params_wrapper_t> RkAiqIrisParamsProxy;
 typedef SharedItemPool<rk_aiq_af_info_wrapper_t> RkAiqAfInfoPool;
 typedef SharedItemProxy<rk_aiq_af_info_wrapper_t> RkAiqAfInfoProxy;
-typedef SharedItemPool<rk_aiq_isp_params_t> RkAiqIspParamsPool;
+typedef SharedItemPool<rk_aiq_isp_params_v20_t> RkAiqIspParamsPool;
+typedef SharedItemPool<rk_aiq_isp_params_v21_t> RkAiqIspParamsV21Pool;
 typedef SharedItemProxy<rk_aiq_isp_params_t> RkAiqIspParamsProxy;
 typedef SharedItemPool<rk_aiq_focus_params_t> RkAiqFocusParamsPool;
 typedef SharedItemProxy<rk_aiq_focus_params_t> RkAiqFocusParamsProxy;

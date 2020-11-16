@@ -64,6 +64,24 @@ static void getFilePathName(char* iqFile, char *location)
     LOGD("calibdb file is %s", location);
 }
 
+static void getFilePathName2(char* iqFile, char *newName)
+{
+    char dir[CALIBDB_PATH_LEN];
+    char name[CALIBDB_PATH_LEN];
+    char *srcfile = strdup(iqFile);
+    char *pstart = strrchr(srcfile, '/');
+    char *pend = strrchr(srcfile, '.');
+    *pend = '\0';
+    strcpy(name, pstart + 1);
+    if (calibGetEnviromentPath(CALIBDB_ENV_PATH_STR, dir)) {
+        sprintf(newName, "%s/%s_write.xml", dir, name);
+    } else {
+        sprintf(newName, "%s_write.xml", srcfile);
+    }
+    free(srcfile);
+    LOGD("calibdb file is %s", newName);
+}
+
 static bool isDataBinExist(char* iqFile) {
     char path[CALIBDB_PATH_LEN];
 
@@ -202,6 +220,9 @@ void RkAiqCalibDb::releaseCalibDb()
     for (it = mCalibDbsMap.begin(); it != mCalibDbsMap.end(); it++) {
         CamCalibDbContext_t *pCalibDb = it->second;
         if(pCalibDb) {
+            clear_list(&pCalibDb->awb_adjust_para);
+            clear_list(&pCalibDb->awb_calib_para_v200);
+            clear_list(&pCalibDb->awb_calib_para_v201);
             LOGI("releaseCalibDb!");
             delete pCalibDb;
         }
@@ -251,6 +272,44 @@ void RkAiqCalibDb::createCalibDbBinFromXml(char* iqFile)
     }
 }
 
+void RkAiqCalibDb::parseXmlandWriteXml(char* iqFile)
+{
+    CamCalibDbContext_t *pCalibDb = new CamCalibDbContext_t();
+    if (pCalibDb) {
+        if (0 == access(iqFile, F_OK)) {
+            RkAiqCalibParser  parser(pCalibDb);
+            if (parser.doParse(iqFile)) {
+                uint32_t magicCode = calib_check_calc_checksum();
+                if (magicCode != pCalibDb->header.magic_code) {
+                    LOGE("magic code is not matched! calculated:%u, readed:%u", magicCode, pCalibDb->header.magic_code);
+                }else {
+                    printf("create calibdb from %s success, magic code %u.", iqFile, magicCode);
+                    char iqFileOutput[CALIBDB_PATH_LEN];
+                    getFilePathName2(iqFile, iqFileOutput);
+                    parser.updateXmlParseReadWriteFlag(XML_PARSER_WRITE);
+                    if (parser.doGenerate(iqFile, iqFileOutput)) {
+                        string str(iqFile);
+                        mCalibDbsMap[str] = pCalibDb;
+                        LOGD("generate calibdb from %s to %s success.", iqFile, iqFileOutput);
+                    }
+                    else {
+                        LOGE("generate %s to %s failed.", iqFile, iqFileOutput);
+                    }
+                }
+            } else {
+                LOGE("parse %s failed.", iqFile);
+            }
+        } else {
+            LOGE("%s is not found!", iqFile);
+        }
+        delete pCalibDb;
+    }
+}
 }; //namespace RkCam
+
+
+
+
+
 
 

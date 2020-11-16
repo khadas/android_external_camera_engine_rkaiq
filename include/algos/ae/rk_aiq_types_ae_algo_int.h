@@ -151,6 +151,26 @@ typedef enum CamerIcRawSwapMode_e {
 
 /*****************************************************************************/
 /**
+ *          CamerIcRawAe3SelMode_t
+ *
+ * @brief   data sel type of RAWAE3
+ *
+ *   bit: 0x00   chn[0]
+ *         0x01   chn[1]
+ *         0x02   chn[2]
+ *         0x03   tmo
+ *
+ */
+/*****************************************************************************/
+typedef enum CamerIcRawAe3SelMode_e {
+    AEC_RAWSEL_MODE_CHN_0    = 0,
+    AEC_RAWSEL_MODE_CHN_1    = 1,
+    AEC_RAWSEL_MODE_CHN_2    = 2,
+    AEC_RAWSEL_MODE_TMO      = 3,
+} CamerIcRawAe3SelMode_t;
+
+/*****************************************************************************/
+/**
  *          AIrisFNO_e
  *
  * @brief   enum Auto Iris FNO
@@ -311,7 +331,6 @@ typedef RKAiqAecExpInfo_t ExpInfo_t;
  * @brief   AEC Module configuration structure isp2; used for re-configuration as well
  *
  *****************************************************************************/
-
 typedef struct Aec_Sensor_nr_switch_s {
     bool valid;
     uint32_t direct;
@@ -319,6 +338,12 @@ typedef struct Aec_Sensor_nr_switch_s {
     uint32_t down_thres;
     uint32_t div_coeff;
 } Aec_Sensor_nr_switch_t;
+
+typedef struct Aec_uapi_advanced_attr_s {
+    bool    enable;
+    uint8_t DayGridWeights[RAWAEBIG_WIN_NUM];
+    uint8_t NightGridWeights[RAWAEBIG_WIN_NUM];
+} Aec_uapi_advanced_attr_t;
 
 typedef struct AecConfig_s {
 
@@ -346,6 +371,9 @@ typedef struct AecConfig_s {
 
     int                           RawWidth;
     int                           RawHeight;
+
+    /*add for api using advanced params*/
+    Aec_uapi_advanced_attr_t      ApiAdvanced;
 
     /*update attr flag*/
     bool                          IsReconfig;

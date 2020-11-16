@@ -22,6 +22,7 @@
 #else
 #include "isp20/CamHwIsp20.h"
 #include "isp20/Isp20_module_dbg.h"
+#include "isp21/CamHwIsp21.h"
 #endif
 
 using namespace RkCam;
@@ -34,6 +35,7 @@ typedef struct rk_aiq_sys_ctx_s {
     SmartPtr<RkAiqCore> _analyzer;
     SmartPtr<RkLumaCore> _lumaAnalyzer;
     CamCalibDbContext_t *_calibDb;
+    int _isp_hw_ver;
 } rk_aiq_sys_ctx_t;
 
 #define RKAIQSYS_CHECK_RET(cond, ret, format, ...) \
@@ -46,12 +48,37 @@ typedef struct rk_aiq_sys_ctx_s {
 
 RKAIQ_BEGIN_DECLARE
 
+typedef struct rk_aiq_sys_preinit_cfg_s {
+   rk_aiq_working_mode_t mode;
+   std::string force_iq_file;
+} rk_aiq_sys_preinit_cfg_t;
+
+static std::map<std::string, rk_aiq_sys_preinit_cfg_t> g_rk_aiq_sys_preinit_cfg_map;
+
+XCamReturn
+rk_aiq_uapi_sysctl_preInit(const char* sns_ent_name,
+                           rk_aiq_working_mode_t mode,
+                           const char* force_iq_file)
+{
+    std::string sns_ent_name_str(sns_ent_name);
+    rk_aiq_sys_preinit_cfg_t cfg;
+
+    cfg.mode = mode;
+    if (force_iq_file)
+        cfg.force_iq_file = force_iq_file;
+    g_rk_aiq_sys_preinit_cfg_map[sns_ent_name_str] = cfg;
+
+    return XCAM_RETURN_NO_ERROR;
+}
+
 rk_aiq_sys_ctx_t*
 rk_aiq_uapi_sysctl_init(const char* sns_ent_name,
                         const char* config_file_dir,
                         rk_aiq_error_cb err_cb,
                         rk_aiq_metas_cb metas_cb)
 {
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+
     ENTER_XCORE_FUNCTION();
 
     char config_file[256];
@@ -80,43 +107,80 @@ rk_aiq_uapi_sysctl_init(const char* sns_ent_name,
 #ifdef RK_SIMULATOR_HW
     ctx->_camHw = new CamHwSimulator();
 #else
-    ctx->_camHw = new CamHwIsp20();
-    // use auto selected iq file
-    if (is_ent_name) {
-        char iq_file[128] = {'\0'};
-        CamHwIsp20::selectIqFile(sns_ent_name, iq_file);
-
-        char* hdr_mode = getenv("HDR_MODE");
-        int start = strlen(iq_file) - strlen(".xml");
-        if (hdr_mode) {
-            iq_file[start] = '\0';
-            if (strstr(hdr_mode, "32"))
-                strcat(iq_file, "-hdr3.xml");
-            else
-                strcat(iq_file, "_normal.xml");
+    rk_aiq_static_info_t* s_info = CamHwIsp20::getStaticCamHwInfo(sns_ent_name);
+    if (s_info->isp_hw_ver == 4)
+        ctx->_camHw = new CamHwIsp20();
+    else if (s_info->isp_hw_ver == 5)
+        ctx->_camHw = new CamHwIsp21();
+    else {
+        LOGE("do not support this isp hw version %d !", s_info->isp_hw_ver);
+        goto error;
+    }
+    // use user defined iq file
+    {
+        std::map<std::string, rk_aiq_sys_preinit_cfg_t>::iterator it =
+            g_rk_aiq_sys_preinit_cfg_map.find(std::string(ctx->_sensor_entity_name));
+        int user_hdr_mode = -1;
+        bool user_spec_iq = false;
+        if (it != g_rk_aiq_sys_preinit_cfg_map.end()) {
+            if (!it->second.force_iq_file.empty()) {
+                sprintf(config_file, "%s/%s", config_file_dir, it->second.force_iq_file.c_str());
+                LOGI("use user sepcified iq file %s", config_file);
+                user_spec_iq = true;
+            } else {
+                user_hdr_mode = it->second.mode;
+                LOGI("selected by user sepcified hdr mode %d", user_hdr_mode);
+            }
         }
 
-        if (config_file_dir) {
-            sprintf(config_file, "%s/%s", config_file_dir, iq_file);
-        } else {
-            sprintf(config_file, "%s/%s", RKAIQ_DEFAULT_IQ_PATH, iq_file);
-        }
+        // use auto selected iq file
+        if (is_ent_name && !user_spec_iq) {
+            char iq_file[128] = {'\0'};
+            CamHwIsp20::selectIqFile(sns_ent_name, iq_file);
 
-        // use default iq file
-        if (hdr_mode && access(config_file, F_OK)) {
-            LOGW("%s not exist, will use the default !", config_file);
-            if (strstr(hdr_mode, "32"))
-                start = strlen(config_file) - strlen("-hdr3.xml");
-            else
-                start = strlen(config_file) - strlen("_normal.xml");
-            config_file[start] = '\0';
-            strcat(config_file, ".xml");
+            char* hdr_mode = getenv("HDR_MODE");
+            int start = strlen(iq_file) - strlen(".xml");
+
+            if (user_hdr_mode != -1) {
+                iq_file[start] = '\0';
+                if (user_hdr_mode == RK_AIQ_WORKING_MODE_ISP_HDR3)
+                    strcat(iq_file, "-hdr3.xml");
+                else
+                    strcat(iq_file, "_normal.xml");
+            } else if (hdr_mode) {
+                iq_file[start] = '\0';
+                if (strstr(hdr_mode, "32"))
+                    strcat(iq_file, "-hdr3.xml");
+                else
+                    strcat(iq_file, "_normal.xml");
+            }
+
+            if (config_file_dir) {
+                sprintf(config_file, "%s/%s", config_file_dir, iq_file);
+            } else {
+                sprintf(config_file, "%s/%s", RKAIQ_DEFAULT_IQ_PATH, iq_file);
+            }
+
+            // use default iq file
+            if (hdr_mode && access(config_file, F_OK)) {
+                LOGW("%s not exist, will use the default !", config_file);
+                if (strstr(hdr_mode, "32"))
+                    start = strlen(config_file) - strlen("-hdr3.xml");
+                else
+                    start = strlen(config_file) - strlen("_normal.xml");
+                config_file[start] = '\0';
+                strcat(config_file, ".xml");
+            }
+            LOGI("use iq file %s", config_file);
         }
-        LOGI("use iq file %s", config_file);
     }
 #endif
     ctx->_rkAiqManager->setCamHw(ctx->_camHw);
-    ctx->_analyzer = new RkAiqCore();
+    if (s_info->isp_hw_ver == 4)
+        ctx->_analyzer = new RkAiqCore();
+    else if (s_info->isp_hw_ver == 5)
+        ctx->_analyzer = new RkAiqCoreV21();
+
     if (is_ent_name && config_file_dir) {
         ctx->_analyzer->setResrcPath(config_file_dir);
     } else
@@ -125,23 +189,34 @@ rk_aiq_uapi_sysctl_init(const char* sns_ent_name,
     ctx->_lumaAnalyzer = new RkLumaCore();
     ctx->_rkAiqManager->setLumaAnalyzer(ctx->_lumaAnalyzer);
     ctx->_calibDb = RkAiqCalibDb::createCalibDb(config_file);
+    if (!ctx->_calibDb)
+        goto error;
     ctx->_rkAiqManager->setAiqCalibDb(ctx->_calibDb);
-    XCamReturn ret = ctx->_rkAiqManager->init();
-    if (ret) {
-        LOGE("_rkAiqManager init error!");
-        rk_aiq_uapi_sysctl_deinit(ctx);
-        return NULL;
-    }
+    ret = ctx->_rkAiqManager->init();
+    if (ret)
+        goto error;
 
     EXIT_XCORE_FUNCTION();
 
     return ctx;
+
+error:
+    LOGE("_rkAiqManager init error!");
+    rk_aiq_uapi_sysctl_deinit(ctx);
+    return NULL;
 }
 
 void
 rk_aiq_uapi_sysctl_deinit(rk_aiq_sys_ctx_t* ctx)
 {
     ENTER_XCORE_FUNCTION();
+
+    std::map<std::string, rk_aiq_sys_preinit_cfg_t>::iterator it =
+        g_rk_aiq_sys_preinit_cfg_map.find(std::string(ctx->_sensor_entity_name));
+    if (it != g_rk_aiq_sys_preinit_cfg_map.end()) {
+        g_rk_aiq_sys_preinit_cfg_map.erase(it);
+        LOGI("unset user specific iq file.");
+    }
 
     if (ctx->_rkAiqManager.ptr())
         ctx->_rkAiqManager->deInit();

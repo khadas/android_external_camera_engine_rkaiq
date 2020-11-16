@@ -19,8 +19,9 @@ rk_aiq_uapi_ahdr_SetAttrib
 
     //Todo
     pAhdrCtx->hdrAttr.opMode = attr.opMode;
-    pAhdrCtx->hdrAttr.level = attr.level;
-    pAhdrCtx->hdrAttr.level_Linear_Dark = attr.level_Linear_Dark;
+    memcpy(&pAhdrCtx->hdrAttr.stSetLevel, &attr.stSetLevel, sizeof(FastMode_t));
+    memcpy(&pAhdrCtx->hdrAttr.stDarkArea, &attr.stDarkArea, sizeof(DarkArea_t));
+    memcpy(&pAhdrCtx->hdrAttr.stTool, &attr.stTool, sizeof(CalibDb_Ahdr_Para_t));
 
     if (need_sync == true)
     {
@@ -81,14 +82,14 @@ rk_aiq_uapi_ahdr_GetAttrib
     AhdrContext_t* pAhdrCtx = (AhdrContext_t*)ctx->AhdrInstConfig.hAhdr;
 
     attr->opMode = pAhdrCtx->hdrAttr.opMode;
-    attr->level = pAhdrCtx->hdrAttr.level;
-    attr->level_Linear_Dark = pAhdrCtx->hdrAttr.level_Linear_Dark;
 
     memcpy(&attr->stAuto.stMgeAuto, &pAhdrCtx->hdrAttr.stAuto.stMgeAuto, sizeof(amgeAttr_t));
     memcpy(&attr->stAuto.stTmoAuto, &pAhdrCtx->hdrAttr.stAuto.stTmoAuto, sizeof(atmoAttr_t));
-
     memcpy(&attr->stManual.stMgeManual, &pAhdrCtx->hdrAttr.stManual.stMgeManual, sizeof(mmgeAttr_t));
     memcpy(&attr->stManual.stTmoManual, &pAhdrCtx->hdrAttr.stManual.stTmoManual, sizeof(mtmoAttr_t));
+    memcpy(&attr->stSetLevel, &pAhdrCtx->hdrAttr.stSetLevel, sizeof(FastMode_t));
+    memcpy(&attr->stDarkArea, &pAhdrCtx->hdrAttr.stDarkArea, sizeof(DarkArea_t));
+    memcpy(&attr->stTool, &pAhdrCtx->hdrAttr.stTool, sizeof(CalibDb_Ahdr_Para_t));
     memcpy(&attr->CtlInfo, &pAhdrCtx->hdrAttr.CtlInfo, sizeof(CurrCtlData_t));
     memcpy(&attr->RegInfo, &pAhdrCtx->hdrAttr.RegInfo, sizeof(CurrRegData_t));
 

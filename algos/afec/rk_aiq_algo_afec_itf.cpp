@@ -26,8 +26,11 @@
 
 RKAIQ_BEGIN_DECLARE
 
+static XCamReturn release_fec_buf(FECContext_t* fecCtx);
 static XCamReturn alloc_fec_buf(FECContext_t* fecCtx)
 {
+    // release-first
+    release_fec_buf(fecCtx);
     rk_aiq_share_mem_config_t share_mem_config;
     share_mem_config.alloc_param.width =  fecCtx->dst_width;
     share_mem_config.alloc_param.height = fecCtx->dst_height;
@@ -117,6 +120,10 @@ create_context(RkAiqAlgoContext **context, const AlgoCtxInstanceCfg* cfg)
             fecCtx->camCoeff.a3, fecCtx->camCoeff.a4);
 #endif
     fecCtx->correct_level = calib_fec->correct_level;
+    fecCtx->correct_direction = FEC_CORRECT_DIRECTION_XY;
+    fecCtx->fecParams.correctX = 1;
+    fecCtx->fecParams.correctY = 1;
+    fecCtx->fecParams.saveMesh4bin = 0;
     memset(&fecCtx->user_config, 0, sizeof(fecCtx->user_config));
 
     ctx->hFEC->eState = FEC_STATE_INVALID;
@@ -319,9 +326,25 @@ prepare(RkAiqAlgoCom* params)
 
     double correct_level = fecCtx->correct_level;
     if (fecCtx->isAttribUpdated) {
+        fecCtx->fec_en = fecCtx->user_config.en;
         if (fecCtx->user_config.bypass)
             correct_level = 0;
-        fecCtx->fec_en = fecCtx->user_config.en;
+        correct_level = fecCtx->user_config.correct_level;
+        switch (fecCtx->user_config.direction) {
+            case FEC_CORRECT_DIRECTION_X:
+                fecCtx->fecParams.correctY = 0;
+                fecCtx->correct_direction = fecCtx->user_config.direction;
+                break;
+            case FEC_CORRECT_DIRECTION_Y:
+                fecCtx->fecParams.correctX = 0;
+                fecCtx->correct_direction = fecCtx->user_config.direction;
+                break;
+            default:
+                break;
+        }
+        if (fecCtx->fecParams.saveMesh4bin)
+            sprintf(fecCtx->fecParams.mesh4binPath, "/tmp/");
+
         fecCtx->isAttribUpdated = false;
     } else {
         fecCtx->user_config.en = fecCtx->fec_en;
@@ -329,12 +352,6 @@ prepare(RkAiqAlgoCom* params)
     fecCtx->user_config.correct_level = correct_level ;
 
 #if GENMESH_ONLINE
-    fecCtx->user_config.correct_level = correct_level;
-	fecCtx->fecParams.correctX = 1;
-	fecCtx->fecParams.correctY = 1;
-	fecCtx->fecParams.saveMesh4bin = 0;
-	sprintf(fecCtx->fecParams.mesh4binPath, "/tmp/");
-
     // deinit firtly
     if (fecCtx->fecParams.mapx)
         genFecMeshDeInit(fecCtx->fecParams);
@@ -353,9 +370,11 @@ prepare(RkAiqAlgoCom* params)
     alloc_fec_buf(fecCtx);
     get_fec_buf(fecCtx);
     fecCtx->fec_mesh_size = fecCtx->fecParams.meshSize4bin;
-    LOGI_AFEC("(%s) en: %d, bypass(%d), correct_level(%d), dimen(%d-%d), mesh dimen(%d-%d), size(%d)",
-              fecCtx->meshfile, fecCtx->fec_en,
-              fecCtx->user_config.bypass, fecCtx->user_config.correct_level,
+    LOGI_AFEC("en: %d, bypass(%d), correct_level(%d), direction(%d), dimen(%d-%d), mesh dimen(%d-%d), size(%d)",
+              fecCtx->fec_en,
+              fecCtx->user_config.bypass,
+              fecCtx->user_config.correct_level,
+              fecCtx->correct_direction,
               fecCtx->src_width, fecCtx->src_height,
               fecCtx->fec_mesh_h_size, fecCtx->fec_mesh_v_size,
               fecCtx->fec_mesh_size);
@@ -442,11 +461,11 @@ processing(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outparams)
             fecPreOut->afec_result.update = 0;
         }
 
-        LOGV_AFEC("en(%d), user en(%d), bypass(%d), level(%d), result update(%d)\n",
+        LOGV_AFEC("en(%d), bypass(%d), level(%d), direction(%d), result update(%d)\n",
                 fecCtx->fec_en,
-                fecCtx->user_config.en,
                 fecCtx->user_config.bypass,
-                fecCtx->user_config.correct_level,
+                fecCtx->correct_level,
+                fecCtx->correct_direction,
                 fecPreOut->afec_result.update);
     }
 

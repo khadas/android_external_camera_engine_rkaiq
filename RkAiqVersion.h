@@ -273,7 +273,6 @@
  * - change vicap tx buf num from 6 to 4
  * - AFEC: fixed bug fec can't be dynamically switched on and off
  * - fix TMO,dehaze bugs
- * - optimize ldch & fec memory usage 
  * - isp driver v0.1.9
  */
 

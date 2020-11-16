@@ -11,7 +11,7 @@
 #ifndef __RK_AIQ_TYPES_AHDR_ALGO_INT_H__
 #define __RK_AIQ_TYPES_AHDR_ALGO_INT_H__
 
-//#include "rk_aiq_types.h"
+#include "RkAiqCalibDbTypes.h"
 
 enum {
     AHDR_NORMAL = 0,
@@ -22,41 +22,41 @@ enum {
 typedef struct globalLuma_s
 {
     float globalLumaMode;
-    float EnvLv[6];
-    float ISO[6];
+    float EnvLv[13];
+    float ISO[13];
     float Tolerance;
-    float GlobeLuma[6];
+    float GlobeLuma[13];
 
 } globalLuma_t ;
 
 typedef struct detailsHighLight_s
 {
     float DetailsHighLightMode;
-    float OEPdf[6];
-    float EnvLv[6];
+    float OEPdf[13];
+    float EnvLv[13];
     float Tolerance;
-    float DetailsHighLight[6];
+    float DetailsHighLight[13];
 
 } detailsHighLight_t ;
 
 typedef struct detailsLowLight_s
 {
     float DetailsLowLightMode;
-    float FocusLuma[6];
-    float DarkPdf[6];
-    float ISO[6];//use long frame
+    float FocusLuma[13];
+    float DarkPdf[13];
+    float ISO[13];//use long frame
     float Tolerance;
-    float DetailsLowLight[6];
+    float DetailsLowLight[13];
 
 } detailsLowLight_t ;
 
 typedef struct localtmo_s
 {
     float localtmoMode;
-    float DynamicRange[6];
-    float EnvLv[6];
+    float DynamicRange[13];
+    float EnvLv[13];
     float Tolerance;
-    float LocalTmoStrength[6];
+    float LocalTmoStrength[13];
 
 } localtmo_t ;
 
@@ -65,15 +65,16 @@ typedef struct globaltmo_s
     bool isHdrGlobalTmo;
     float mode;
     float iir;
-    float DynamicRange[6];
-    float EnvLv[6];
+    float DynamicRange[13];
+    float EnvLv[13];
     float Tolerance;
-    float GlobalTmoStrength[6];
+    float GlobalTmoStrength[13];
 } globaltmo_t;
 
 typedef struct tmo_config_s
 {
-    bool isTmoOn;
+    bool bTmoEn;
+    bool isLinearTmo;
     globalLuma_t Luma;
     detailsHighLight_t DtsHiLit;
     detailsLowLight_t DtsLoLit;
@@ -85,14 +86,14 @@ typedef struct tmo_config_s
 
 typedef struct merge_config_s {
     int MergeMode;
-    float EnvLv[6]; //0: dark 1:bright
-    float MoveCoef[6];
-    float OECurve_smooth[6];  //current over exposure curve slope
-    float OECurve_offset[6];  //current over exposure curve offset
-    float MDCurveLM_smooth[6];  //Move Detect curve slope betwwen long frame and middle frame
-    float MDCurveLM_offset[6];  //Move Detect curve offset betwwen long frame and middle frame
-    float MDCurveMS_smooth[6];  //Move Detect curve slope betwwen middle frame and short frame
-    float MDCurveMS_offset[6];  //Move Detect curve slope betwwen middle frame and short frame
+    float EnvLv[13]; //0: dark 1:bright
+    float MoveCoef[13];
+    float OECurve_smooth[13];  //current over exposure curve slope
+    float OECurve_offset[13];  //current over exposure curve offset
+    float MDCurveLM_smooth[13];  //Move Detect curve slope betwwen long frame and middle frame
+    float MDCurveLM_offset[13];  //Move Detect curve offset betwwen long frame and middle frame
+    float MDCurveMS_smooth[13];  //Move Detect curve slope betwwen middle frame and short frame
+    float MDCurveMS_offset[13];  //Move Detect curve slope betwwen middle frame and short frame
     float OECurve_damp;
     float MDCurveLM_damp;
     float MDCurveMS_damp ;
@@ -142,7 +143,6 @@ typedef struct amgeAttr_s
 
 typedef struct atmoAttr_S
 {
-    bool Enable;
     tmoCtrlData_t stGlobeLuma;
     tmoCtrlData_t stDtlsLL;
     tmoCtrlData_t stDtlsHL;
@@ -158,7 +158,6 @@ typedef struct mmgeAttr_S
     float MDCurveLM_offset;
     float MDCurveMS_smooth;
     float MDCurveMS_offset;
-
     float dampOE;
     float dampMDLM;
     float dampMDMS;
@@ -172,7 +171,6 @@ typedef struct mtmoAttr_S
     float stDtlsLL;
     float stLocalTMOStrength;
     float stGlobalTMOStrength;
-
     float damp;
 } mtmoAttr_t;
 
@@ -198,6 +196,7 @@ typedef enum hdr_OpMode_s {
     HDR_OpMode_MANU = 2, //run api manual ahdr
     HDR_OpMode_SET_LEVEL = 3, // its prevously fast mode, run api set level
     HDR_OpMode_DarkArea = 4, // for dark area luma inprove, no matter the scene is night, normal, or hdr
+    HDR_OpMode_Tool = 5, // for dark area luma inprove, no matter the scene is night, normal, or hdr
 } hdr_OpMode_t;
 
 typedef struct CurrCtlData_s
@@ -233,15 +232,26 @@ typedef struct CurrRegData_s
     float GlobaltmoStrength;
 } CurrRegData_t;
 
+typedef struct DarkArea_s
+{
+    int level;
+} DarkArea_t;
+
+typedef struct FastMode_s
+{
+    int level;
+} FastMode_t;
+
 typedef struct hdrAttr_s
 {
     hdr_OpMode_t    opMode;
     ahdrAttr_t    stAuto;
     mhdrAttr_t stManual;
-    int level;
-    int level_Linear_Dark;
+    FastMode_t stSetLevel;
+    DarkArea_t stDarkArea;
     CurrCtlData_t CtlInfo;
     CurrRegData_t RegInfo;
+    CalibDb_Ahdr_Para_t stTool;
 } hdrAttr_t;
 
 typedef struct MgeProcRes_s
@@ -309,7 +319,8 @@ typedef struct RkAiqAhdrProcResult_s
     hdrAttr_t hdrAttr;
     bool LongFrameMode;
     bool isHdrGlobalTmo;
-    bool isTmoOn;
+    bool bTmoEn;
+    bool isLinearTmo;
 } RkAiqAhdrProcResult_t;
 
 

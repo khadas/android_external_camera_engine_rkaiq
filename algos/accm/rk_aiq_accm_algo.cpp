@@ -347,21 +347,21 @@ void Saturationadjust(float fScale, accm_handle_t hAccm )
 }
 
 
-XCamReturn CamCalibDbGetCcmProfileByName(const CalibDb_Ccm_t *calibCcm, char* name, const CalibDb_CcmMatrixProfile_t **pCcmMatrixProfile)
+XCamReturn CamCalibDbGetCcmProfileByName(const CalibDb_Ccm_t *calibCcm, int mode_idx, char* name, const CalibDb_CcmMatrixProfile_t **pCcmMatrixProfile)
 {
     LOGI_ACCM("%s: (enter)\n", __FUNCTION__);
 
     XCamReturn ret = XCAM_RETURN_ERROR_FAILED;
 
-    for(int i = 0; i < calibCcm->matrixAllNum; i++) {
-        if(strcmp(calibCcm->matrixAll[i].name, name) == 0) {
-            *pCcmMatrixProfile = &calibCcm->matrixAll[i];
+    for(int i = 0; i <calibCcm->mode_cell[mode_idx].matrixAllNum; i++) {
+        if(strcmp(calibCcm->mode_cell[mode_idx].matrixAll[i].name, name) == 0) {
+            *pCcmMatrixProfile = &calibCcm->mode_cell[mode_idx].matrixAll[i];
             ret = XCAM_RETURN_NO_ERROR;
             break;
         }
     }
     if(ret != XCAM_RETURN_NO_ERROR) {
-        LOGE_ACCM("can't find %s in matrixAll\n", name);
+        LOGE_ACCM("can't find %s in matrixAll \n", name);
     }
     LOGI_ACCM("%s: (exit)\n", __FUNCTION__);
 
@@ -429,7 +429,8 @@ static void StableIlluEstimation(List l, int listSize, int illuNum, float varian
 
 XCamReturn AccmAutoConfig
 (
-    accm_handle_t hAccm
+    accm_handle_t hAccm,
+    int mode_idx
 ) {
 
     LOGI_ACCM("%s: (enter) count:%d\n", __FUNCTION__, hAccm->count);
@@ -448,11 +449,11 @@ XCamReturn AccmAutoConfig
     //1)
     int dominateIlluListSize = 15;//to do from xml;
     float varianceLumaTh = 0.006;//to do from xml;
-    ret = illuminant_index_estimation_ccm(hAccm->calibCcm->aCcmCof.illuNum, hAccm->calibCcm->aCcmCof.illAll,
+    ret = illuminant_index_estimation_ccm(hAccm->calibCcm->mode_cell[mode_idx].aCcmCof.illuNum, hAccm->calibCcm->mode_cell[mode_idx].aCcmCof.illAll,
                                           hAccm->accmSwInfo.awbGain, &dominateIlluProfileIdx);
     RETURN_RESULT_IF_DIFFERENT(ret, XCAM_RETURN_NO_ERROR);
     UpdateDominateIlluList(&hAccm->accmRest.dominateIlluList, dominateIlluProfileIdx, dominateIlluListSize);
-    StableIlluEstimation(hAccm->accmRest.dominateIlluList, dominateIlluListSize, hAccm->calibCcm->aCcmCof.illuNum,
+    StableIlluEstimation(hAccm->accmRest.dominateIlluList, dominateIlluListSize, hAccm->calibCcm->mode_cell[mode_idx].aCcmCof.illuNum,
         hAccm->accmSwInfo.varianceLuma ,varianceLumaTh, hAccm->accmSwInfo.awbConverged,
         hAccm->accmRest.dominateIlluProfileIdx, &dominateIlluProfileIdx);
 
@@ -461,7 +462,7 @@ XCamReturn AccmAutoConfig
     // 2)
     float sensorGain =  hAccm->accmSwInfo.sensorGain;
     float fSaturation;
-    pDomIlluProfile = &hAccm->calibCcm->aCcmCof.illAll[dominateIlluProfileIdx];
+    pDomIlluProfile = &hAccm->calibCcm->mode_cell[mode_idx].aCcmCof.illAll[dominateIlluProfileIdx];
     interpolation(pDomIlluProfile->saturationCurve.pSensorGain,
                   pDomIlluProfile->saturationCurve.pSaturation,
                   pDomIlluProfile->saturationCurve.arraySize,
@@ -470,7 +471,7 @@ XCamReturn AccmAutoConfig
     hAccm->accmRest.fSaturation =  fSaturation;
 
     //3)
-    ret = SatSelectCcmProfiles( hAccm->accmRest.fSaturation, pDomIlluProfile->matrixUsedNO, hAccm->pCcmMatrixAll[dominateIlluProfileIdx],
+    ret = SatSelectCcmProfiles( hAccm->accmRest.fSaturation, pDomIlluProfile->matrixUsedNO, hAccm->pCcmMatrixAll[mode_idx][dominateIlluProfileIdx],
                                 &pCcmProfile1, &pCcmProfile2);
     if (ret == XCAM_RETURN_NO_ERROR) {
         if (pCcmProfile1 && pCcmProfile2)
@@ -512,7 +513,7 @@ XCamReturn AccmAutoConfig
 
         if(j <= (1 << i))
         {
-            fScale = hAccm->calibCcm->luma_ccm.alpha_scale[i];
+            fScale = hAccm->calibCcm->mode_cell[mode_idx].luma_ccm.alpha_scale[i];
             break;
         }
     }
@@ -563,7 +564,7 @@ XCamReturn AccmAutoConfig
 
 
       // 7) . Damping
-    ret = Damping((hAccm->calibCcm->damp_enable && hAccm->count > 1) ? hAccm->accmSwInfo.awbIIRDampCoef : 0,
+    ret = Damping((hAccm->calibCcm->mode_cell[mode_idx].damp_enable && hAccm->count > 1) ? hAccm->accmSwInfo.awbIIRDampCoef : 0,
                   &hAccm->accmRest.undampedCcmMatrix, &hAccm->accmRest.dampedCcmMatrix,
                   &hAccm->accmRest.undampedCcOffset, &hAccm->accmRest.dampedCcOffset);
 
@@ -573,7 +574,7 @@ XCamReturn AccmAutoConfig
     memcpy(hAccm->ccmHwConf.matrix, &hAccm->accmRest.dampedCcmMatrix, sizeof(Cam3x3FloatMatrix_t));
     memcpy(hAccm->ccmHwConf.offs, &hAccm->accmRest.dampedCcOffset, sizeof(Cam1x3FloatMatrix_t));
     for(int i = 0; i < CCM_CURVE_DOT_NUM; i++) {
-        hAccm->ccmHwConf.alp_y[i] = fScale * hAccm->calibCcm->luma_ccm.y_alpha_curve[i];
+        hAccm->ccmHwConf.alp_y[i] = fScale * hAccm->calibCcm->mode_cell[mode_idx].luma_ccm.y_alpha_curve[i];
     }
 
 
@@ -611,11 +612,15 @@ XCamReturn AccmConfig
     if(hAccm->updateAtt) {
         hAccm->mCurAtt = hAccm->mNewAtt;
     }
+
     LOGD_ACCM("%s: byPass: %d  mode:%d \n", __FUNCTION__, hAccm->mCurAtt.byPass, hAccm->mCurAtt.mode);
     if(hAccm->mCurAtt.byPass != true && hAccm->accmSwInfo.grayMode != true) {
         hAccm->ccmHwConf.ccmEnable = true;
+
+        CalibDb_CcmHdrNormalMode_t currentHdrNormalMode = hAccm->accmRest.currentHdrNormalMode;
+
         if(hAccm->mCurAtt.mode == RK_AIQ_CCM_MODE_AUTO) {
-            AccmAutoConfig(hAccm);
+            AccmAutoConfig(hAccm, currentHdrNormalMode);
         } else if(hAccm->mCurAtt.mode == RK_AIQ_CCM_MODE_MANUAL) {
             AccmManualConfig(hAccm);
         } else {
@@ -700,61 +705,83 @@ XCamReturn AccmInit(accm_handle_t *hAccm, const CamCalibDbContext_t* calib)
     accm_context->accmSwInfo.awbIIRDampCoef = 0;
     accm_context->accmSwInfo.varianceLuma = 255;
     accm_context->accmSwInfo.awbConverged = false;
+
+
+        // 1. check normal or hdr mode
+
+    CalibDb_CcmHdrNormalMode_t currentHdrNormalMode = CCM_FOR_MODE_NORMAL;
+
+    if (accm_context->accmSwInfo.hdr_mode== RK_AIQ_WORKING_MODE_NORMAL){
+        currentHdrNormalMode = CCM_FOR_MODE_NORMAL;
+    }else if(accm_context->accmSwInfo.hdr_mode > RK_AIQ_WORKING_MODE_NORMAL && accm_context->accmSwInfo.hdr_mode <= RK_AIQ_WORKING_MODE_ISP_HDR3){
+        currentHdrNormalMode = CCM_FOR_MODE_HDR;
+    }else{
+        LOGE_ACCM("%s: Current hdr mode (%d) is invalid!Defaults to normal mode.  \n", __FUNCTION__, accm_context->accmSwInfo.hdr_mode);
+        currentHdrNormalMode = CCM_FOR_MODE_NORMAL;
+    }
+
+    if (!calib_ccm->mode_cell[currentHdrNormalMode].valid){
+        LOGE_ACCM("%s: Current mode (%d) is not found in iq.  \n", __FUNCTION__, accm_context->accmSwInfo.hdr_mode);
+        return XCAM_RETURN_ERROR_FAILED;
+    }
+    accm_context->accmRest.currentHdrNormalMode = currentHdrNormalMode;
+#if 0 //awbGain get from awb module
     bool lsFound;
-    for(int i = 0; i < calib_ccm->aCcmCof.illuNum; i++) {
-        if(strcmp(calib_ccm->aCcmCof.illAll[i].illuName, calib->awb.stategy_cfg.lsForFirstFrame) == 0) {
-            memcpy(accm_context->accmSwInfo.awbGain, calib_ccm->aCcmCof.illAll[i].awbGain,
+
+    for(int i = 0; i < calib_ccm->mode_cell[currentHdrNormalMode].aCcmCof.illuNum; i++) {
+        if(strcmp(calib_ccm->mode_cell[currentHdrNormalMode].aCcmCof.illAll[i].illuName, calib->awb.stategy_cfg.lsForFirstFrame) == 0) {
+            memcpy(accm_context->accmSwInfo.awbGain, calib_ccm->mode_cell[currentHdrNormalMode].aCcmCof.illAll[i].awbGain,
                    sizeof(accm_context->accmSwInfo.awbGain));
             lsFound = true;
-            LOGD_ACCM("%s: accm lsForFirstFrame:%s", __FUNCTION__, calib_ccm->aCcmCof.illAll[i].illuName);
+            LOGD_ACCM("%s: accm lsForFirstFrame:%s", __FUNCTION__, calib_ccm->mode_cell[currentHdrNormalMode].aCcmCof.illAll[i].illuName);
             break;
         }
     }
-    if(calib_ccm->aCcmCof.illuNum > 0 && lsFound == false) {
-        memcpy(accm_context->accmSwInfo.awbGain, calib_ccm->aCcmCof.illAll[0].awbGain,
+    if(calib_ccm->mode_cell[currentHdrNormalMode].aCcmCof.illuNum > 0 && lsFound == false) {
+        memcpy(accm_context->accmSwInfo.awbGain, calib_ccm->mode_cell[currentHdrNormalMode].aCcmCof.illAll[0].awbGain,
                sizeof(accm_context->accmSwInfo.awbGain));
-        LOGD_ACCM("%s: accm lsForFirstFrame:%s", __FUNCTION__, calib_ccm->aCcmCof.illAll[0].illuName);
+        LOGD_ACCM("%s: accm lsForFirstFrame:%s", __FUNCTION__, calib_ccm->mode_cell[currentHdrNormalMode].aCcmCof.illAll[0].illuName);
     }
+#endif
+    LOGI_ACCM("%s: accm illunum:%d", __FUNCTION__, calib_ccm->mode_cell[currentHdrNormalMode].aCcmCof.illuNum);
+    //Config  accm_context->pCcmMatrixAll (normal and hdr)
+    for (int idx = 0; idx < calib_ccm->modecellNum; idx++){
+       // 1) get and reorder para
+        for(int i = 0; i < calib_ccm->mode_cell[idx].aCcmCof.illuNum; i++) {
+            for (int j = 0; j < calib_ccm->mode_cell[idx].aCcmCof.illAll[i].matrixUsedNO; j++) {
+                char name[CCM_PROFILE_NAME];
+                sprintf(name, "%s", calib_ccm->mode_cell[idx].aCcmCof.illAll[i].matrixUsed[j]);
+                const CalibDb_CcmMatrixProfile_t* pCcmMatrixProfile = NULL;
+                // get a ccm-profile from database
+                ret = CamCalibDbGetCcmProfileByName(calib_ccm, idx, name, &pCcmMatrixProfile);
+                RETURN_RESULT_IF_DIFFERENT(ret, XCAM_RETURN_NO_ERROR);
+                // store ccm-profile in pointer array
+                accm_context->pCcmMatrixAll[idx][i][j] = pCcmMatrixProfile;
+                LOGD_ACCM("CCM name  %s coef:%f,%f,%f  %f,%f,%f  %f,%f,%f  \n", name,
+                          accm_context->pCcmMatrixAll[idx][i][j]->CrossTalkCoeff.fCoeff[0],
+                          accm_context->pCcmMatrixAll[idx][i][j]->CrossTalkCoeff.fCoeff[1],
+                          accm_context->pCcmMatrixAll[idx][i][j]->CrossTalkCoeff.fCoeff[2],
+                          accm_context->pCcmMatrixAll[idx][i][j]->CrossTalkCoeff.fCoeff[3],
+                          accm_context->pCcmMatrixAll[idx][i][j]->CrossTalkCoeff.fCoeff[4],
+                          accm_context->pCcmMatrixAll[idx][i][j]->CrossTalkCoeff.fCoeff[5],
+                          accm_context->pCcmMatrixAll[idx][i][j]->CrossTalkCoeff.fCoeff[6],
+                          accm_context->pCcmMatrixAll[idx][i][j]->CrossTalkCoeff.fCoeff[7],
+                          accm_context->pCcmMatrixAll[idx][i][j]->CrossTalkCoeff.fCoeff[8]);
+                LOGD_ACCM("CCM name  %s off:%f,%f,%f  \n", name,
+                          accm_context->pCcmMatrixAll[idx][i][j]->CrossTalkOffset.fCoeff[0],
+                          accm_context->pCcmMatrixAll[idx][i][j]->CrossTalkOffset.fCoeff[1],
+                          accm_context->pCcmMatrixAll[idx][i][j]->CrossTalkOffset.fCoeff[2]);
 
-    LOGI_ACCM("%s: accm illunum:%d", __FUNCTION__, calib_ccm->aCcmCof.illuNum);
-    // 1) gtet and reorder para
-    for(int i = 0; i < calib_ccm->aCcmCof.illuNum; i++) {
-        for (int j = 0; j < calib_ccm->aCcmCof.illAll[i].matrixUsedNO; j++) {
-            char name[CCM_PROFILE_NAME];
-            sprintf(name, "%s", calib_ccm->aCcmCof.illAll[i].matrixUsed[j]);
-            const CalibDb_CcmMatrixProfile_t* pCcmMatrixProfile = NULL;
-            // get a ccm-profile from database
-            ret = CamCalibDbGetCcmProfileByName(calib_ccm, name, &pCcmMatrixProfile);
-            RETURN_RESULT_IF_DIFFERENT(ret, XCAM_RETURN_NO_ERROR);
-            // store ccm-profile in pointer array
-            accm_context->pCcmMatrixAll[i][j] = pCcmMatrixProfile;
-            LOGD_ACCM("CCM name  %s coef:%f,%f,%f  %f,%f,%f  %f,%f,%f  \n", name,
-                      accm_context->pCcmMatrixAll[i][j]->CrossTalkCoeff.fCoeff[0],
-                      accm_context->pCcmMatrixAll[i][j]->CrossTalkCoeff.fCoeff[1],
-                      accm_context->pCcmMatrixAll[i][j]->CrossTalkCoeff.fCoeff[2],
-                      accm_context->pCcmMatrixAll[i][j]->CrossTalkCoeff.fCoeff[3],
-                      accm_context->pCcmMatrixAll[i][j]->CrossTalkCoeff.fCoeff[4],
-                      accm_context->pCcmMatrixAll[i][j]->CrossTalkCoeff.fCoeff[5],
-                      accm_context->pCcmMatrixAll[i][j]->CrossTalkCoeff.fCoeff[6],
-                      accm_context->pCcmMatrixAll[i][j]->CrossTalkCoeff.fCoeff[7],
-                      accm_context->pCcmMatrixAll[i][j]->CrossTalkCoeff.fCoeff[8]);
-            LOGD_ACCM("CCM name  %s off:%f,%f,%f  \n", name,
-                      accm_context->pCcmMatrixAll[i][j]->CrossTalkOffset.fCoeff[0],
-                      accm_context->pCcmMatrixAll[i][j]->CrossTalkOffset.fCoeff[1],
-                      accm_context->pCcmMatrixAll[i][j]->CrossTalkOffset.fCoeff[2]);
+            }
+            // order ccm-profiles by saturation
+            ret = AwbOrderCcmProfilesBySaturation(accm_context->pCcmMatrixAll[idx][i],
+                                                  calib_ccm->mode_cell[idx].aCcmCof.illAll[i].matrixUsedNO);
+            //RETURN_RESULT_IF_DIFFERENT(result, XCAM_RETURN_NO_ERROR);
 
         }
-        // order ccm-profiles by saturation
-        ret = AwbOrderCcmProfilesBySaturation(accm_context->pCcmMatrixAll[i],
-                                              calib_ccm->aCcmCof.illAll[i].matrixUsedNO);
-        //RETURN_RESULT_IF_DIFFERENT(result, XCAM_RETURN_NO_ERROR);
-
     }
-    accm_context->count = 0;
 
-    accm_context->ccmHwConf.bound_bit = accm_context->calibCcm->luma_ccm.low_bound_pos_bit;
-    memcpy( accm_context->ccmHwConf.rgb2y_para, accm_context->calibCcm->luma_ccm.rgb2y_para,
-            sizeof(accm_context->calibCcm->luma_ccm.rgb2y_para));
+    accm_context->count = 0;
 
     accm_context->mCurAtt.byPass = !(calib_ccm->enable);
     accm_context->mCurAtt.mode = RK_AIQ_CCM_MODE_AUTO;
@@ -791,6 +818,28 @@ XCamReturn AccmPrepare(accm_handle_t hAccm)
 
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
 
+    CalibDb_CcmHdrNormalMode_t currentHdrNormalMode = CCM_FOR_MODE_NORMAL;
+
+    if (hAccm->accmSwInfo.hdr_mode== RK_AIQ_WORKING_MODE_NORMAL){
+        currentHdrNormalMode = CCM_FOR_MODE_NORMAL;
+    }else if(hAccm->accmSwInfo.hdr_mode > RK_AIQ_WORKING_MODE_NORMAL && hAccm->accmSwInfo.hdr_mode <= RK_AIQ_WORKING_MODE_ISP_HDR3){
+        currentHdrNormalMode = CCM_FOR_MODE_HDR;
+    }else{
+        LOGE_ACCM("%s: Current hdr mode (%d) is invalid!Defaults to normal mode.  \n", __FUNCTION__, hAccm->accmSwInfo.hdr_mode);
+        currentHdrNormalMode = CCM_FOR_MODE_NORMAL;
+    }
+
+    if (!hAccm->calibCcm->mode_cell[currentHdrNormalMode].valid){
+        LOGE_ACCM("%s: Current mode (%d) is not found in iq.  \n", __FUNCTION__, hAccm->accmSwInfo.hdr_mode);
+        return XCAM_RETURN_ERROR_FAILED;
+    }
+    hAccm->accmRest.currentHdrNormalMode = currentHdrNormalMode;
+
+    LOGD_ACCM("Current mode is : %s  \n", hAccm->calibCcm->mode_cell[currentHdrNormalMode].name);
+
+    hAccm->ccmHwConf.bound_bit = hAccm->calibCcm->mode_cell[currentHdrNormalMode].luma_ccm.low_bound_pos_bit;
+    memcpy( hAccm->ccmHwConf.rgb2y_para, hAccm->calibCcm->mode_cell[currentHdrNormalMode].luma_ccm.rgb2y_para,
+            sizeof(hAccm->calibCcm->mode_cell[currentHdrNormalMode].luma_ccm.rgb2y_para));
 
     LOGI_ACCM("%s: (exit)\n", __FUNCTION__);
     return ret;

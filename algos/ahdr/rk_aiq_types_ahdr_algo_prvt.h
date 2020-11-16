@@ -17,10 +17,10 @@
 #include "ae/rk_aiq_types_ae_algo_int.h"
 #include "af/rk_aiq_types_af_algo_int.h"
 #include "rk_aiq_algo_types.h"
-#include "RkAiqCalibDbTypes.h"
+//#include "RkAiqCalibDbTypes.h"
 #include "xcam_log.h"
-#include "ae/rk_aiq_types_ae_algo_int.h"
-#include "af/rk_aiq_af_hw_v200.h"
+//#include "ae/rk_aiq_types_ae_algo_int.h"
+//#include "af/rk_aiq_af_hw_v200.h"
 #include "rk_aiq_types_ahdr_stat_v200.h"
 //#include "rk_aiq_types_ahdr_algo_int.h"
 
@@ -61,7 +61,7 @@
 #define ENVLVMIN     (0.0)
 #define MOVECOEFMAX     (1.0)
 #define MOVECOEFMIN     (0.0)
-#define OEPDFMAX     (0.5)
+#define OEPDFMAX     (1.0)
 #define OEPDFMIN     (0.0)
 #define FOCUSLUMAMAX     (100)
 #define FOCUSLUMAMIN     (1)
@@ -101,10 +101,10 @@
 #define GLOBELUMAMIN     (51)
 #define DETAILSHIGHLIGHTMAX     (1023)
 #define DETAILSHIGHLIGHTMIN     (51)
-#define DARKPDFMAX     (0.5)
-#define ISOMIN     (50)
-#define ISOMAX     (12800)
+#define DARKPDFMAX     (1)
 #define DARKPDFMIN     (0)
+#define ISOMIN     (50)
+#define ISOMAX     (204800)
 #define DETAILSLOWLIGHTMAX     (63)
 #define DETAILSLOWLIGHTMIN     (16)
 #define DYNAMICRANGEMAX     (84)
@@ -115,6 +115,9 @@
 #define IQPARAMIN     (0)
 #define IQDETAILSLOWLIGHTMAX     (4)
 #define IQDETAILSLOWLIGHTMIN     (1)
+
+#define AHDR_MAX_IQ_DOTS (13)
+
 
 
 
@@ -235,7 +238,8 @@ typedef struct AhdrProcResData_s
     MgeProcRes_t MgeProcRes;
     bool LongFrameMode;
     bool isHdrGlobalTmo;
-    bool isTmoOn;
+    bool bTmoEn;
+    bool isLinearTmo;
 } AhdrProcResData_t;
 
 typedef struct SensorInfo_s

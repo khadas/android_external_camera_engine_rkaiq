@@ -60,6 +60,7 @@ typedef struct FECContext_s {
     unsigned int fec_mesh_v_size;
     unsigned int fec_mesh_size;
     int correct_level;
+    fec_correct_direction_t correct_direction;
     int src_width;
     int src_height;
     int dst_width;

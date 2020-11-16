@@ -49,6 +49,9 @@ public:
     int getAlgoId() {
         return mDes->id;
     }
+    int getAlgoType() {
+        return mDes->type;
+    }
     virtual XCamReturn updateConfig(bool needSync) {
         return XCAM_RETURN_NO_ERROR;
     };
@@ -116,6 +119,12 @@ RKAIQHANDLE(Aldch);
 RKAIQHANDLE(Ar2y);
 RKAIQHANDLE(Awdr);
 RKAIQHANDLE(Aorb);
+RKAIQHANDLE(Amfnr);
+RKAIQHANDLE(Aynr);
+RKAIQHANDLE(Acnr);
+RKAIQHANDLE(Arawnr);
+RKAIQHANDLE(Adrc);
+RKAIQHANDLE(AdrcV21);
 
 }; //namespace RkCam
 

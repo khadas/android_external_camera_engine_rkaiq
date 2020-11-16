@@ -138,10 +138,12 @@ const struct capture_fmt Isp20PollThread::csirx_fmts[] =
         .bpp = { 10 },
     }, {
         .fourcc = V4L2_PIX_FMT_SRGGB12,
+        .bayer_fmt = 3,
         .pcpp = 2,
         .bpp = { 12 },
     }, {
         .fourcc = V4L2_PIX_FMT_SGRBG12,
+        .bayer_fmt = 2,
         .pcpp = 2,
         .bpp = { 12 },
     }, {
@@ -402,6 +404,7 @@ Isp20PollThread::Isp20PollThread()
     , _is_multi_cam_conc(false)
     , _skip_num(0)
     , _skip_to_seq(0)
+    , _need_luma_rd_info(true)
 {
     for (int i = 0; i < 3; i++) {
         SmartPtr<MipiPollThread> mipi_poll = new MipiPollThread(this, ISP_POLL_MIPI_TX, i);
@@ -495,7 +498,7 @@ Isp20PollThread::stop ()
 }
 
 void
-Isp20PollThread::set_working_mode(int mode, bool linked_to_isp)
+Isp20PollThread::set_working_mode(int mode, bool linked_to_isp, bool nordbk)
 {
     _working_mode = mode;
     _linked_to_isp = linked_to_isp;
@@ -512,6 +515,9 @@ Isp20PollThread::set_working_mode(int mode, bool linked_to_isp)
     default:
         _mipi_dev_max = 1;
     }
+
+    if (nordbk)
+        _mipi_dev_max = 0;
 }
 
 void
@@ -854,6 +860,7 @@ Isp20PollThread::trigger_readback()
             }
 
             struct isp2x_csi_trigger tg = {
+                .frame_timestamp = 0,
                 .frame_id = sequence,
                 .times = 0,
                 .mode = _mipi_dev_max == 1 ? T_START_X1 :
@@ -896,6 +903,11 @@ out:
 void
 Isp20PollThread::match_lumadetect_map(uint32_t sequence, sint32_t &additional_times)
 {
+    if (!_need_luma_rd_info) {
+        additional_times = 0;
+        return ;
+    }
+
     std::map<uint32_t, int>::iterator it_times_del;
     for (std::map<uint32_t, int>::iterator iter = _isp_hdr_fid2times_map.begin();
             iter != _isp_hdr_fid2times_map.end();) {
@@ -951,6 +963,8 @@ Isp20PollThread::write_metadata_to_file(const char* dir_path,
     FILE *fp = nullptr;
     char file_name[64] = {0};
     char buffer[256] = {0};
+    rk_aiq_isp_params_v20_t* isp20_params =
+        static_cast<rk_aiq_isp_params_v20_t*>(ispParams->data().ptr());
 
     snprintf(file_name, sizeof(file_name), "%s/meta_data", dir_path);
 
@@ -969,10 +983,10 @@ Isp20PollThread::write_metadata_to_file(const char* dir_path,
                      expParams->data()->aecExpInfo.HdrExp[2].exp_real_params.integration_time,
                      expParams->data()->aecExpInfo.HdrExp[1].exp_real_params.integration_time,
                      expParams->data()->aecExpInfo.HdrExp[0].exp_real_params.integration_time,
-                     ispParams->data()->awb_gain.rgain,
-                     ispParams->data()->awb_gain.grgain,
-                     ispParams->data()->awb_gain.gbgain,
-                     ispParams->data()->awb_gain.bgain,
+                     isp20_params->awb_gain.rgain,
+                     isp20_params->awb_gain.grgain,
+                     isp20_params->awb_gain.gbgain,
+                     isp20_params->awb_gain.bgain,
                      1);
         } else if (_working_mode == RK_AIQ_ISP_HDR_MODE_2_FRAME_HDR || \
                    _working_mode == RK_AIQ_ISP_HDR_MODE_2_LINE_HDR) {
@@ -981,14 +995,14 @@ Isp20PollThread::write_metadata_to_file(const char* dir_path,
                      "frame%08d-l_s-gain[%08.5f_%08.5f]-time[%08.5f_%08.5f]-"
                      "awbGain[%08.4f_%08.4f_%08.4f_%08.4f]-dgain[%08d]\n",
                      frame_id,
-                     expParams->data()->aecExpInfo.HdrExp[2].exp_real_params.analog_gain,
+                     expParams->data()->aecExpInfo.HdrExp[1].exp_real_params.analog_gain,
                      expParams->data()->aecExpInfo.HdrExp[0].exp_real_params.analog_gain,
-                     expParams->data()->aecExpInfo.HdrExp[2].exp_real_params.integration_time,
+                     expParams->data()->aecExpInfo.HdrExp[1].exp_real_params.integration_time,
                      expParams->data()->aecExpInfo.HdrExp[0].exp_real_params.integration_time,
-                     ispParams->data()->awb_gain.rgain,
-                     ispParams->data()->awb_gain.grgain,
-                     ispParams->data()->awb_gain.gbgain,
-                     ispParams->data()->awb_gain.bgain,
+                     isp20_params->awb_gain.rgain,
+                     isp20_params->awb_gain.grgain,
+                     isp20_params->awb_gain.gbgain,
+                     isp20_params->awb_gain.bgain,
                      1);
         } else {
             snprintf(buffer,
@@ -998,10 +1012,10 @@ Isp20PollThread::write_metadata_to_file(const char* dir_path,
                      frame_id,
                      expParams->data()->aecExpInfo.LinearExp.exp_real_params.analog_gain,
                      expParams->data()->aecExpInfo.LinearExp.exp_real_params.integration_time,
-                     ispParams->data()->awb_gain.rgain,
-                     ispParams->data()->awb_gain.grgain,
-                     ispParams->data()->awb_gain.gbgain,
-                     ispParams->data()->awb_gain.bgain,
+                     isp20_params->awb_gain.rgain,
+                     isp20_params->awb_gain.grgain,
+                     isp20_params->awb_gain.gbgain,
+                     isp20_params->awb_gain.bgain,
                      1);
         }
 

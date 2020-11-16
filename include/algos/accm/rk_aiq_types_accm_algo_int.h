@@ -33,6 +33,7 @@ typedef struct accm_sw_info_s {
     float varianceLuma;
     bool grayMode;
     bool awbConverged;
+    int hdr_mode;
 } accm_sw_info_t;
 
 typedef struct rk_aiq_ccm_mccm_attrib_s {

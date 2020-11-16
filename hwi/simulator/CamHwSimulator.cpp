@@ -278,7 +278,7 @@ CamHwSimulator::setIspParams(SmartPtr<RkAiqIspParamsProxy>& ispParams)
     g_simisp_params.adhaz_config = ispParams->data()->adhaz_config;
 
     //agamma
-    g_simisp_params.agamma_config = ispParams->data()->agamma_config;
+    g_simisp_params.agamma_config = ispParams->data()->agamma;
 
     g_simisp_params.blc = ispParams->data()->blc;
 

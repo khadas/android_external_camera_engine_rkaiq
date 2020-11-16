@@ -53,9 +53,10 @@ typedef enum AdpccState_e {
 } AdpccState_t;
 
 typedef enum AdpccOPMode_e {
-    ADPCC_OP_MODE_INVALID           = 0,                   /**< initialization value */
+    ADPCC_OP_MODE_INVALID        = 0,                   /**< initialization value */
     ADPCC_OP_MODE_AUTO            = 1,                   /**< instance is created, but not initialized */
-    ADPCC_OP_MODE_MANUAL              = 2,                   /**< instance is confiured (ready to start) or stopped */
+    ADPCC_OP_MODE_MANUAL          = 2,                   /**< instance is confiured (ready to start) or stopped */
+    ADPCC_OP_MODE_TOOL            = 3,                   /**< instance is confiured (ready to start) or stopped */
     ADPCC_OP_MODE_MAX                                      /**< max */
 } AdpccOPMode_t;
 
@@ -356,6 +357,7 @@ typedef struct rk_aiq_dpcc_attrib_s {
     AdpccOPMode_t eMode;
     Adpcc_Auto_Attr_t stAuto;
     Adpcc_Manual_Attr_t stManual;
+    CalibDb_Dpcc_t stTool;
 } rk_aiq_dpcc_attrib_t;
 
 typedef struct AdpccExpInfo_s {
