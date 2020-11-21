@@ -76,13 +76,15 @@ static XCamReturn aiqGenLdchMeshInit(LDCHContext_t* ldchCtx)
     ldchCtx->lut_h_size = (ldchCtx->ldchParams.meshSizeW + 1) / 2; //word unit
     ldchCtx->lut_v_size = ldchCtx->ldchParams.meshSizeH;
     ldchCtx->lut_mapxy_size = ldchCtx->ldchParams.meshSize * sizeof(unsigned short);
-    LOGI_ALDCH("ldch en %d, h/v size(%dx%d), mapxy size(%d), correct_level: %d",
+    LOGI_ALDCH("ldch en %d, h/v size(%dx%d), mapxy size(%d), correct_level(%d), maxLevel(%d)",
                ldchCtx->ldch_en,
                ldchCtx->lut_h_size,
                ldchCtx->lut_v_size,
                ldchCtx->lut_mapxy_size ,
-               ldchCtx->correct_level);
+               ldchCtx->correct_level,
+               ldchCtx->ldchParams.maxLevel);
     alloc_ldch_buf(ldchCtx);
+
     get_ldch_buf(ldchCtx);
     ldchCtx->genLdchMeshInit = true;
 
@@ -111,7 +113,7 @@ create_context(RkAiqAlgoContext **context, const AlgoCtxInstanceCfg* cfg)
     /* return handle */
     *context = ctx;
 
-#if GENMESH_ONLINE
+#ifdef GENMESH_ONLINE
     ctx->hLDCH->isAttribUpdated = false;
     ctx->hLDCH->aldchReadMeshThread = new RKAiqAldchThread(ctx->hLDCH);
     /* ctx->hLDCH->aldchReadMeshThread->triger_start(); */
@@ -124,7 +126,7 @@ create_context(RkAiqAlgoContext **context, const AlgoCtxInstanceCfg* cfg)
 
     ldchCtx->ldch_en = calib_ldch->ldch_en;
     memcpy(ldchCtx->meshfile, calib_ldch->meshfile, sizeof(ldchCtx->meshfile));
-#if GENMESH_ONLINE
+#ifdef GENMESH_ONLINE
     ldchCtx->camCoeff.cx = calib_ldch->light_center[0];
     ldchCtx->camCoeff.cy = calib_ldch->light_center[1];
     ldchCtx->camCoeff.a0 = calib_ldch->coefficient[0];
@@ -160,12 +162,12 @@ destroy_context(RkAiqAlgoContext *context)
     LDCHHandle_t hLDCH = (LDCHHandle_t)context->hLDCH;
     LDCHContext_t* ldchCtx = (LDCHContext_t*)hLDCH;
 
-#if GENMESH_ONLINE
+#ifdef GENMESH_ONLINE
     ldchCtx->aldchReadMeshThread->triger_stop();
     ldchCtx->aldchReadMeshThread->stop();
 #endif
 
-#if GENMESH_ONLINE
+#ifdef GENMESH_ONLINE
 	genLdchMeshDeInit(ldchCtx->ldchParams);
 #endif
     release_ldch_buf(ldchCtx);
@@ -186,7 +188,7 @@ prepare(RkAiqAlgoCom* params)
 #if 0 //moved to create_ctx
     ldchCtx->ldch_en = rkaiqAldchConfig->aldch_calib_cfg.ldch_en;
     memcpy(ldchCtx->meshfile, rkaiqAldchConfig->aldch_calib_cfg.meshfile, sizeof(ldchCtx->meshfile));
-#if GENMESH_ONLINE
+#ifdef GENMESH_ONLINE
     ldchCtx->camCoeff.cx = rkaiqAldchConfig->aldch_calib_cfg.light_center[0];
     ldchCtx->camCoeff.cy = rkaiqAldchConfig->aldch_calib_cfg.light_center[1];
     ldchCtx->camCoeff.a0 = rkaiqAldchConfig->aldch_calib_cfg.coefficient[0];
@@ -209,7 +211,7 @@ prepare(RkAiqAlgoCom* params)
     ldchCtx->dst_height = params->u.prepare.sns_op_height;
     ldchCtx->resource_path = rkaiqAldchConfig->resource_path;
     ldchCtx->share_mem_ops = rkaiqAldchConfig->mem_ops_ptr;
-#if GENMESH_ONLINE
+#ifdef GENMESH_ONLINE
     // process the new attrib set before prepare
     hLDCH->aldchReadMeshThread->triger_stop();
     hLDCH->aldchReadMeshThread->stop();
@@ -397,7 +399,7 @@ bool RKAiqAldchThread::loop()
         LOGW_ANALYZER("RKAiqAldchThread got empty attrib, stop thread");
         return false;
     }
-#if GENMESH_ONLINE
+#ifdef GENMESH_ONLINE
     if (attrib->en && (hLDCH->ldch_en != attrib->en || \
 	    attrib->correct_level != hLDCH->correct_level)) {
         aiqGenLdchMeshInit(hLDCH);

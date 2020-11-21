@@ -626,7 +626,8 @@ template<class T>
 void Isp20Params::convertAiqMergeToIsp20Params(T& isp_cfg,
         const rk_aiq_isp_hdr_t& ahdr_data)
 {
-    if(ahdr_data.bTmoEn)
+    // TODO: could be always on ? isp driver would do the right thing
+    if(1/*ahdr_data.bTmoEn*/)
     {
         isp_cfg.module_en_update |= 1LL << RK_ISP2X_HDRMGE_ID;
         isp_cfg.module_ens |= 1LL << RK_ISP2X_HDRMGE_ID;

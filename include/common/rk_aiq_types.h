@@ -30,6 +30,8 @@
 #include "a3dlut/rk_aiq_types_a3dlut_algo.h"
 #include "ahdr/rk_aiq_types_ahdr_algo_int.h"
 #include "ahdr/rk_aiq_types_ahdr_algo.h"
+#include "adrc/rk_aiq_types_adrc_algo_int.h"
+#include "adrc/rk_aiq_types_adrc_algo.h"
 #include "agamma/rk_aiq_types_agamma_algo_int.h"
 #include "adehaze/rk_aiq_types_adehaze_algo.h"
 #include "acp/rk_aiq_types_acp_algo.h"
@@ -47,6 +49,11 @@
 #include "agic/rk_aiq_types_algo_agic.h"
 #include "aldch/rk_aiq_types_aldch_algo.h"
 #include "afec/rk_aiq_types_afec_algo.h"
+#include "asharp3/rk_aiq_types_asharp_algo_v3.h"
+#include "aynr2/rk_aiq_types_aynr_algo_v2.h"
+#include "acnr/rk_aiq_types_acnr_algo_v1.h"
+#include "arawnr2/rk_aiq_types_abayernr_algo_v2.h"
+
 
 #ifdef RK_SIMULATOR_HW
 #include "simulator/isp20_hw_simulator.h"
@@ -395,10 +402,6 @@ typedef struct {
 
 typedef struct {
     int UNKNOWN;
-} rk_aiq_isp_drc_t;
-
-typedef struct {
-    int UNKNOWN;
 } rk_aiq_isp_merge_t;
 
 
@@ -466,6 +469,8 @@ typedef struct {
 } rk_aiq_isp_stats_t;
 
 typedef RkAiqAhdrProcResult_t rk_aiq_isp_hdr_t;
+typedef RkAiqAdrcProcResult_t rk_aiq_isp_drc_t;
+
 
 #if 1
 typedef RKAnr_Bayernr_Fix_t rk_aiq_isp_rawnr_t;
@@ -605,10 +610,12 @@ typedef struct rk_aiq_cpsl_cap_s {
 // v21 types
 
 // drc , alias name of TMO
-typedef struct rk_aiq_isp_drc_v21_s {
+/*typedef struct rk_aiq_isp_drc_v21_s {
     //TODO:
     void* place_holder;
-} rk_aiq_isp_drc_v21_t;
+} rk_aiq_isp_drc_v21_t;*/
+
+typedef RkAiqAdrcProcResult_t rk_aiq_isp_drc_v21_t;
 
 typedef struct rk_aiq_isp_blc_v21_s {
     rk_aiq_isp_blc_t v0;
@@ -641,30 +648,49 @@ typedef struct rk_aiq_isp_dhaz_stats_v21_s {
 } rk_aiq_isp_dhaz_stats_v21_t;
 
 // baynr, alias name of rawnr
+#if 0
 typedef struct rk_aiq_isp_baynr_v21_s {
     //TODO:
     void* place_holder;
 } rk_aiq_isp_baynr_v21_t;
+#else
+typedef RK_Bayernr_Fix_V2_t rk_aiq_isp_baynr_v21_t ;
 
+#endif
 typedef struct rk_aiq_isp_bay3d_v21_s {
     //TODO:
     void* place_holder;
 } rk_aiq_isp_bay3d_v21_t;
 
+#if 0
 typedef struct rk_aiq_isp_ynr_v21_s {
     //TODO:
     void* place_holder;
 } rk_aiq_isp_ynr_v21_t;
+#else
+typedef RK_YNR_Fix_V2_t rk_aiq_isp_ynr_v21_t ;
 
+#endif
+
+#if 0
 typedef struct rk_aiq_isp_cnr_v21_s {
     //TODO:
     void* place_holder;
 } rk_aiq_isp_cnr_v21_t;
+#else
+typedef RK_CNR_Fix_V1_t rk_aiq_isp_cnr_v21_t ;
 
+#endif
+
+#if 0
 typedef struct rk_aiq_isp_sharp_v21_s {
     //TODO:
     void* place_holder;
 } rk_aiq_isp_sharp_v21_t;
+#else
+typedef RK_SHARP_Fix_V3_t rk_aiq_isp_sharp_v21_t ;
+
+#endif
 
 typedef struct rk_aiq_awb_stat_res_v201_s rk_aiq_isp_raw_awb_meas_v21_t;
 typedef struct rk_aiq_awb_stat_res_v200_s rk_aiq_isp_raw_awb_meas_v20_t;

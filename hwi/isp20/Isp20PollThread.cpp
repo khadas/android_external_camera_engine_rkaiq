@@ -28,8 +28,14 @@
 #define DIV_ROUND_UP(n, d) (((n) + (d) - 1) / (d))
 #endif
 
+#ifdef ANDROID_OS
+#define DEFAULT_CAPTURE_RAW_PATH "/data/capture_image"
+#define CAPTURE_CNT_FILENAME "/data/.capture_cnt"
+#else
 #define DEFAULT_CAPTURE_RAW_PATH "/tmp/capture_image"
 #define CAPTURE_CNT_FILENAME "/tmp/.capture_cnt"
+#endif
+
 #define WRITE_RAW_FILE_HEADER
 #define WRITE_ISP_REG
 #define WRITE_ISPP_REG
@@ -1254,36 +1260,36 @@ Isp20PollThread::write_reg_to_file(uint32_t base_addr, uint32_t offset_addr,
     char cmd_buffer[128] = {0};
 
     if (base_addr == ISP_REGS_BASE) {
-#if 1
+#ifdef ANDROID_OS
+        snprintf(cmd_buffer, sizeof(cmd_buffer),
+                 "/system/xbin/io -4 -l 0x%x 0x%x > %s/frame%d_isp_reg",
+                 len,
+                 base_addr + offset_addr,
+                 raw_dir_path,
+                 sequence);
+#else
         snprintf(cmd_buffer, sizeof(cmd_buffer),
                  "io -4 -l 0x%x 0x%x > %s/frame%d_isp_reg",
                  len,
                  base_addr + offset_addr,
                  raw_dir_path,
                  sequence);
-#else
-        snprintf(cmd_buffer, sizeof(cmd_buffer),
-                 "io -4 -r -f %s/frame%d_isp_reg -l 0x%x 0x%x",
-                 raw_dir_path,
-                 sequence,
-                 len,
-                 base_addr + offset_addr);
 #endif
     } else {
-#if 1
+#ifdef ANDROID_OS
         snprintf(cmd_buffer, sizeof(cmd_buffer),
-                 "io -4 -l 0x%x 0x%x > %s/frame%d_ispp_reg",
+                 "/system/xbin/io -4 -l 0x%x 0x%x > %s/frame%d_ispp_reg",
                  len,
                  base_addr + offset_addr,
                  raw_dir_path,
                  sequence);
 #else
         snprintf(cmd_buffer, sizeof(cmd_buffer),
-                 "io -4 -r -f %s/frame%d_isppp_reg -l 0x%x 0x%x",
-                 raw_dir_path,
-                 sequence,
+                 "io -4 -l 0x%x 0x%x > %s/frame%d_ispp_reg",
                  len,
-                 base_addr + offset_addr);
+                 base_addr + offset_addr,
+                 raw_dir_path,
+                 sequence);
 #endif
     }
 

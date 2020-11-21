@@ -37,6 +37,7 @@ public:
 private:
     void gen_full_isp_params(const struct isp21_isp_params_cfg* update_params,
                              struct isp21_isp_params_cfg* full_params);
+	XCamReturn overrideExpRatioV21ToAiqResults(const sint32_t frameId, int module_id, SmartPtr<RkAiqIspParamsProxy>& aiq_results);
     struct isp21_isp_params_cfg _full_active_isp21_params;
 };
 

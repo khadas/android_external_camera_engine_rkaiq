@@ -50,6 +50,7 @@ uint32_t calib_sensor_sub_tags[] = {
     CALIB_SENSOR_AF_TAG_ID,
     CALIB_SENSOR_AHDR_MERGE_TAG_ID,
     CALIB_SENSOR_AHDR_TMO_TAG_ID,
+    CALIB_SENSOR_DRC_TAG_ID,
     CALIB_SENSOR_BLC_TAG_ID,
     CALIB_SENSOR_DPCC_TAG_ID,
     CALIB_SENSOR_BAYERNR_TAG_ID,
@@ -73,6 +74,10 @@ uint32_t calib_sensor_sub_tags[] = {
     CALIB_SENSOR_LUMA_DETECT_TAG_ID,
     CALIB_SENSOR_ORB_TAG_ID,
     CALIB_SENSOR_COLOR_AS_GREY_TAG_ID,
+    CALIB_SENSOR_BAYERNR_V2_TAG_ID,
+    CALIB_SENSOR_YNR_V2_TAG_ID,
+    CALIB_SENSOR_CNR_V1_TAG_ID,
+    CALIB_SENSOR_SHARP_V3_TAG_ID,
 };
 
 uint32_t calib_sensor_awb_sub_tags[] = {
@@ -834,6 +839,57 @@ uint32_t calib_sensor_ahdr_GlobalTMO_sub_tags[] = {
     CALIB_SENSOR_AHDR_TMO_GLOBALTMO_ENVLV_TAG_ID,
     CALIB_SENSOR_AHDR_TMO_GLOBALTMO_TOLERANCE_TAG_ID,
     CALIB_SENSOR_AHDR_TMO_GLOBALTMO_STRENGTH_TAG_ID,
+};
+
+uint32_t calib_sensor_Drc_sub_tags[] = {
+    CALIB_SENSOR_DRC_CALIBPARA_TAG_ID,
+	CALIB_SENSOR_DRC_TUNINGPARA_TAG_ID,
+};
+
+uint32_t calib_sensor_Drc_CalibPara_sub_tags[] = {
+    CALIB_SENSOR_DRC_SCENE_TAG_ID,
+	CALIB_SENSOR_DRC_POSITION_TAG_ID,
+	CALIB_SENSOR_DRC_OFFSET_POW2_TAG_ID,
+	CALIB_SENSOR_DRC_LPDETAIL_RATIO_TAG_ID,
+	CALIB_SENSOR_DRC_HPDETAIL_RATIO_TAG_ID,
+	CALIB_SENSOR_DRC_WEIPRE_FRAME_TAG_ID,
+	CALIB_SENSOR_DRC_WEICUR_PIX_TAG_ID,
+	CALIB_SENSOR_DRC_EDGE_SCL_TAG_ID,
+	CALIB_SENSOR_DRC_MOTION_SCL_TAG_ID,
+	CALIB_SENSOR_DRC_FORCE_SGM_INV0_TAG_ID,
+	CALIB_SENSOR_DRC_SPACE_SGM_INV0_TAG_ID,
+	CALIB_SENSOR_DRC_SPACE_SGM_INV1_TAG_ID,
+	CALIB_SENSOR_DRC_RANGE_SGM_INV0_TAG_ID,
+	CALIB_SENSOR_DRC_RANGE_SGM_INV1_TAG_ID,
+	CALIB_SENSOR_DRC_WEIG_BILAT_TAG_ID,
+	CALIB_SENSOR_DRC_WEIG_MAXL_TAG_ID,
+	CALIB_SENSOR_DRC_MIN_OGAIN_TAG_ID,
+	CALIB_SENSOR_DRC_IIR_FRAME_TAG_ID,
+	CALIB_SENSOR_DRC_GAIN_TAG_ID,
+	CALIB_SENSOR_DRC_SCALE_Y0_TAG_ID,
+};
+
+uint32_t calib_sensor_Drc_TuningPara_sub_tags[] = {
+    CALIB_SENSOR_DRC_SCENE_TAG_ID,
+	CALIB_SENSOR_DRC_POSITION_TAG_ID,
+	CALIB_SENSOR_DRC_OFFSET_POW2_TAG_ID,
+	CALIB_SENSOR_DRC_LPDETAIL_RATIO_TAG_ID,
+	CALIB_SENSOR_DRC_HPDETAIL_RATIO_TAG_ID,
+	CALIB_SENSOR_DRC_WEIPRE_FRAME_TAG_ID,
+	CALIB_SENSOR_DRC_WEICUR_PIX_TAG_ID,
+	CALIB_SENSOR_DRC_EDGE_SCL_TAG_ID,
+	CALIB_SENSOR_DRC_MOTION_SCL_TAG_ID,
+	CALIB_SENSOR_DRC_FORCE_SGM_INV0_TAG_ID,
+	CALIB_SENSOR_DRC_SPACE_SGM_INV0_TAG_ID,
+	CALIB_SENSOR_DRC_SPACE_SGM_INV1_TAG_ID,
+	CALIB_SENSOR_DRC_RANGE_SGM_INV0_TAG_ID,
+	CALIB_SENSOR_DRC_RANGE_SGM_INV1_TAG_ID,
+	CALIB_SENSOR_DRC_WEIG_BILAT_TAG_ID,
+	CALIB_SENSOR_DRC_WEIG_MAXL_TAG_ID,
+	CALIB_SENSOR_DRC_MIN_OGAIN_TAG_ID,
+	CALIB_SENSOR_DRC_IIR_FRAME_TAG_ID,
+	CALIB_SENSOR_DRC_GAIN_TAG_ID,
+	CALIB_SENSOR_DRC_SCALE_Y0_TAG_ID,
 };
 
 uint32_t calib_sensor_blc_sub_tags[] = {
@@ -1636,6 +1692,153 @@ uint32_t calib_system_EXP_DELAY_Normal_sub_tags[] = {
     CALIB_SYSTEM_EXP_DELAY_GAIN_TAG_ID,
     CALIB_SYSTEM_EXP_DELAY_DCG_TAG_ID,
 };
+
+uint32_t calib_sensor_bayernr_v2_sub_tags[] = {
+	CALIB_SENSOR_BAYERNR_V2_MODE_NAME_TAG_ID,
+	CALIB_SENSOR_BAYERNR_V2_BAYERNR2D_TAG_ID,
+	CALIB_SENSOR_BAYERNR_V2_BAYERNR3D_TAG_ID
+};
+
+uint32_t calib_sensor_bayernr_v2_bayernr2D_sub_tags[] = {
+	CALIB_SENSOR_BAYERNR_V2_BAYERNR2D_ENABLE_TAG_ID,
+	CALIB_SENSOR_BAYERNR_V2_BAYERNR2D_SETTING_TAG_ID,
+};
+
+uint32_t calib_sensor_bayernr_v2_bayernr3D_sub_tags[] = {
+	CALIB_SENSOR_BAYERNR_V2_BAYERNR3D_ENABLE_TAG_ID,
+	CALIB_SENSOR_BAYERNR_V2_BAYERNR3D_SETTING_TAG_ID,
+};
+
+uint32_t calib_sensor_bayernr_v2_bayernr2D_setting_sub_tags[] = {	
+    CALIB_SENSOR_BAYERNR_V2_BAYERNR2D_SNR_MODE_TAG_ID,
+    CALIB_SENSOR_BAYERNR_V2_BAYERNR2D_SENSOR_MODE_TAG_ID,
+    CALIB_SENSOR_BAYERNR_V2_BAYERNR2D_ISO_TAG_ID,
+    CALIB_SENSOR_BAYERNR_V2_BAYERNR2D_FILTER_STRENGTH_TAG_ID,
+    CALIB_SENSOR_BAYERNR_V2_BAYERNR2D_GAUSS_GUIDE_TAG_ID,
+    CALIB_SENSOR_BAYERNR_V2_BAYERNR2D_LUMA_POINT_TAG_ID,
+    CALIB_SENSOR_BAYERNR_V2_BAYERNR2D_SIGMA_TAG_ID,
+    CALIB_SENSOR_BAYERNR_V2_BAYERNR2D_EDGESOFTS_TAG_ID,
+    CALIB_SENSOR_BAYERNR_V2_BAYERNR2D_RATIO_TAG_ID,
+    CALIB_SENSOR_BAYERNR_V2_BAYERNR2D_WEIGHT_TAG_ID,
+	
+};
+
+uint32_t calib_sensor_bayernr_v2_bayernr3D_setting_sub_tags[] = {
+	CALIB_SENSOR_BAYERNR_V2_BAYERNR3D_SNR_MODE_TAG_ID,
+    CALIB_SENSOR_BAYERNR_V2_BAYERNR3D_SENSOR_MODE_TAG_ID,
+    CALIB_SENSOR_BAYERNR_V2_BAYERNR3D_ISO_TAG_ID,
+    CALIB_SENSOR_BAYERNR_V2_BAYERNR3D_FILTER_STRENGTH_TAG_ID,
+    CALIB_SENSOR_BAYERNR_V2_BAYERNR3D_SP_FILTER_STRENGTH_TAG_ID,
+	CALIB_SENSOR_BAYERNR_V2_BAYERNR3D_LO_CLIPWGT_TAG_ID,
+	CALIB_SENSOR_BAYERNR_V2_BAYERNR3D_HI_CLIPWGT_TAG_ID,
+	CALIB_SENSOR_BAYERNR_V2_BAYERNR3D_SOFTWGT_TAG_ID,
+	CALIB_SENSOR_BAYERNR_V2_BAYERNR3D_LUMA_POINT_TAG_ID,
+    CALIB_SENSOR_BAYERNR_V2_BAYERNR3D_SIGMA_TAG_ID,
+};
+
+uint32_t calib_sensor_ynr_v2_sub_tags[] = {
+	CALIB_SENSOR_YNR_V2_MODE_NAME_TAG_ID,
+	CALIB_SENSOR_YNR_V2_ENABLE_TAG_ID,
+	CALIB_SENSOR_YNR_V2_SETTING_TAG_ID
+};
+
+uint32_t calib_sensor_ynr_v2_setting_sub_tags[] = {
+	CALIB_SENSOR_YNR_V2_SNR_MODE_TAG_ID,
+    CALIB_SENSOR_YNR_V2_SENSOR_MODE_TAG_ID,
+    CALIB_SENSOR_YNR_V2_ISO_TAG_ID,
+    CALIB_SENSOR_YNR_V2_BFT3X3_BYPASS_TAG_ID,
+    CALIB_SENSOR_YNR_V2_LBFT5X5_BYPASS_TAG_ID,
+    CALIB_SENSOR_YNR_V2_LGFT3X3_BYPASS_TAG_ID,
+    CALIB_SENSOR_YNR_V2_FLT1X1_BYPASS_TAG_ID,
+    CALIB_SENSOR_YNR_V2_SFT5X5_BYPASS_TAG_ID,
+    CALIB_SENSOR_YNR_V2_RNR_STRENGTH_TAG_ID,
+    CALIB_SENSOR_YNR_V2_SIGMA_CURVE_TAG_ID,
+    CALIB_SENSOR_YNR_V2_YNR_CI_TAG_ID,
+    CALIB_SENSOR_YNR_V2_LOW_BF_TAG_ID,
+    CALIB_SENSOR_YNR_V2_LOW_THRED_ADJ_TAG_ID,
+    CALIB_SENSOR_YNR_V2_LOW_PEAK_SUPRESS_TAG_ID,
+    CALIB_SENSOR_YNR_V2_LOW_EDGE_ADJ_THRESH_TAG_ID,
+    CALIB_SENSOR_YNR_V2_LOW_CENTRE_WEIGHT_TAG_ID,
+    CALIB_SENSOR_YNR_V2_LOW_DIST_ADJ_TAG_ID,
+    CALIB_SENSOR_YNR_V2_LOW_WEIGHT_TAG_ID,
+    CALIB_SENSOR_YNR_V2_LOW_FILT_STRENGTH_TAG_ID,
+    CALIB_SENSOR_YNR_V2_LOW_BI_WEIGHT_TAG_ID,
+    CALIB_SENSOR_YNR_V2_BASE_FILT_WEIGHT_TAG_ID,
+    CALIB_SENSOR_YNR_V2_HIGH_THRED_ADJ_TAG_ID,
+    CALIB_SENSOR_YNR_V2_HIGH_WEIGHT_TAG_ID,
+    CALIB_SENSOR_YNR_V2_HIGH_DIRECTION_WEIGHT_TAG_ID,
+    CALIB_SENSOR_YNR_V2_HI_MIN_ADJ_TAG_ID,
+    CALIB_SENSOR_YNR_V2_HI_EDGE_THRED_TAG_ID,
+};
+
+//cnr v1   
+uint32_t calib_sensor_cnr_v1_sub_tags[] = {
+	CALIB_SENSOR_CNR_V1_MODE_NAME_TAG_ID,
+	CALIB_SENSOR_CNR_V1_ENABLE_TAG_ID,
+	CALIB_SENSOR_CNR_V1_SETTING_TAG_ID,
+};
+
+uint32_t calib_sensor_cnr_v1_setting_sub_tags[] = {
+	CALIB_SENSOR_CNR_V1_SNR_MODE_TAG_ID,
+    CALIB_SENSOR_CNR_V1_SENSOR_MODE_TAG_ID,
+    CALIB_SENSOR_CNR_V1_ISO_TAG_ID,
+    CALIB_SENSOR_CNR_V1_HF_BYPASS_TAG_ID,
+    CALIB_SENSOR_CNR_V1_LF_BYPASS_TAG_ID,
+    CALIB_SENSOR_CNR_V1_CNR_EXGAIN_TAG_ID,
+    CALIB_SENSOR_CNR_V1_CNR_G_GAIN_TAG_ID,
+    CALIB_SENSOR_CNR_V1_COLOR_SAT_ADJ_TAG_ID,
+    CALIB_SENSOR_CNR_V1_COLOR_SAT_ADJ_ALPHA_TAG_ID,
+    CALIB_SENSOR_CNR_V1_HF_SPIKERS_REDUCION_STRENGTH_TAG_ID,
+    CALIB_SENSOR_CNR_V1_HF_DENOISE_STRENGTH_TAG_ID,
+    CALIB_SENSOR_CNR_V1_HF_COLOR_SAT_TAG_ID,
+    CALIB_SENSOR_CNR_V1_HF_DENOISE_ALPHA_TAG_ID,
+    CALIB_SENSOR_CNR_V1_HF_BF_WGT_CLIP_TAG_ID,
+    CALIB_SENSOR_CNR_V1_THUMB_SPIKERS_REDUCION_STRENGTH_TAG_ID,
+    CALIB_SENSOR_CNR_V1_THUMB_DENOISE_STRENGTH_TAG_ID,
+    CALIB_SENSOR_CNR_V1_THUMB_COLOR_SAT_TAG_ID,
+    CALIB_SENSOR_CNR_V1_LF_DENOISE_STRENGTH_TAG_ID,
+    CALIB_SENSOR_CNR_V1_LF_COLOR_SAT_TAG_ID,
+    CALIB_SENSOR_CNR_V1_LF_DENOISE_ALPHA_TAG_ID,
+	CALIB_SENSOR_CNR_V1_KERNEL_5X5_TAG_ID,
+};
+
+
+	 
+//sharpV3
+uint32_t calib_sensor_sharp_v3_sub_tags[] = {
+	CALIB_SENSOR_SHARP_V3_MODE_NAME_TAG_ID,
+	CALIB_SENSOR_SHARP_V3_ENABLE_TAG_ID,
+	CALIB_SENSOR_SHARP_V3_SETTING_TAG_ID,
+};
+
+uint32_t calib_sensor_sharp_v3_setting_sub_tags[] = {
+	CALIB_SENSOR_SHARP_V3_SNR_MODE_TAG_ID,
+	CALIB_SENSOR_SHARP_V3_SENSOR_MODE_TAG_ID,
+	CALIB_SENSOR_SHARP_V3_ISO_TAG_ID,
+	CALIB_SENSOR_SHARP_V3_LUMA_POINT_TAG_ID,
+	CALIB_SENSOR_SHARP_V3_LUMA_SIGMA_TAG_ID,
+	CALIB_SENSOR_SHARP_V3_PBF_GAIN_TAG_ID,
+	CALIB_SENSOR_SHARP_V3_PBF_ADD_TAG_ID,
+	CALIB_SENSOR_SHARP_V3_PBF_RATIO_TAG_ID,
+	CALIB_SENSOR_SHARP_V3_GAUSS_RATIO_TAG_ID,
+	CALIB_SENSOR_SHARP_V3_SHARP_RATIO_TAG_ID,
+	CALIB_SENSOR_SHARP_V3_HF_CLIP_TAG_ID,
+	CALIB_SENSOR_SHARP_V3_BF_GAIN_TAG_ID,
+	CALIB_SENSOR_SHARP_V3_BF_ADD_TAG_ID,
+	CALIB_SENSOR_SHARP_V3_BF_RATIO_TAG_ID,
+	CALIB_SENSOR_SHARP_V3_LOCAL_STRENGTH_TAG_ID,
+	CALIB_SENSOR_SHARP_V3_PREFILTER_COEFF_TAG_ID,
+	CALIB_SENSOR_SHARP_V3_GAUSSFILTER_COEFF_TAG_ID,
+	CALIB_SENSOR_SHARP_V3_HBFFILTER_COEFF_TAG_ID,
+	CALIB_SENSOR_SHARP_V3_SHARP_RATIO_H_TAG_ID,
+	CALIB_SENSOR_SHARP_V3_SHARP_RATIO_M_TAG_ID,
+	CALIB_SENSOR_SHARP_V3_SHARP_RATIO_L_TAG_ID,
+	CALIB_SENSOR_SHARP_V3_CLIP_HF_TAG_ID,
+	CALIB_SENSOR_SHARP_V3_CLIP_MF_TAG_ID,
+	CALIB_SENSOR_SHARP_V3_CLIP_LF_TAG_ID,
+	CALIB_SENSOR_SHARP_V3_LOCAL_WGT_TAG_ID,
+};
+
 
 // TODO: list all tag infos
 calib_tag_info_t g_calib_tag_infos[CALIB_IQ_TAG_END] = {
@@ -3584,6 +3787,100 @@ calib_tag_info_t g_calib_tag_infos[CALIB_IQ_TAG_END] = {
     {   "Damp", CALIB_TAG_TYPE_DOUBLE, {1, 1},
         check_tags_array_ignore, NULL
     },
+
+	//Drc
+	[CALIB_SENSOR_DRC_TAG_ID]         =
+    {   "DRC", CALIB_TAG_TYPE_STRUCT, {-1, -1},
+        check_tags_array_info(calib_sensor_Drc_sub_tags), NULL
+    },
+    [CALIB_SENSOR_DRC_CALIBPARA_TAG_ID]         =
+    {   "CalibPara", CALIB_TAG_TYPE_CELL, {-1, -1},
+        check_tags_array_info(calib_sensor_Drc_CalibPara_sub_tags), NULL
+    },
+    [CALIB_SENSOR_DRC_TUNINGPARA_TAG_ID]         =
+    {   "TuningPara", CALIB_TAG_TYPE_CELL, {-1, -1},
+        check_tags_array_info(calib_sensor_Drc_TuningPara_sub_tags), NULL
+    },
+    [CALIB_SENSOR_DRC_SCENE_TAG_ID]         =
+    {   "Scene", CALIB_TAG_TYPE_CHAR, {-1, -1},
+        check_tags_array_ignore, NULL
+    },
+    [CALIB_SENSOR_DRC_POSITION_TAG_ID]         =
+    {   "sw_adrc_position", CALIB_TAG_TYPE_INT, {-1, -1},
+        check_tags_array_ignore, NULL
+    },
+    [CALIB_SENSOR_DRC_OFFSET_POW2_TAG_ID]         =
+    {   "sw_adrc_offset_pow2", CALIB_TAG_TYPE_INT, {-1, -1},
+        check_tags_array_ignore, NULL
+    },
+    [CALIB_SENSOR_DRC_LPDETAIL_RATIO_TAG_ID]         =
+    {   "sw_adrc_lpdetail_ratio", CALIB_TAG_TYPE_INT, {-1, -1},
+        check_tags_array_ignore, NULL
+    },
+    [CALIB_SENSOR_DRC_HPDETAIL_RATIO_TAG_ID]         =
+    {   "sw_adrc_hpdetail_ratio", CALIB_TAG_TYPE_INT, {-1, -1},
+        check_tags_array_ignore, NULL
+    },
+    [CALIB_SENSOR_DRC_WEIPRE_FRAME_TAG_ID]         =
+    {   "sw_adrc_weipre_frame", CALIB_TAG_TYPE_INT, {-1, -1},
+        check_tags_array_ignore, NULL
+    },
+	[CALIB_SENSOR_DRC_WEICUR_PIX_TAG_ID]		   =
+	{	"sw_adrc_weicur_pix", CALIB_TAG_TYPE_INT, {-1, -1},
+		check_tags_array_ignore, NULL
+	},
+	[CALIB_SENSOR_DRC_EDGE_SCL_TAG_ID]		   =
+	{	"sw_adrc_edge_scl", CALIB_TAG_TYPE_INT, {-1, -1},
+		check_tags_array_ignore, NULL
+	},
+	[CALIB_SENSOR_DRC_MOTION_SCL_TAG_ID]		   =
+	{	"sw_adrc_motion_scl", CALIB_TAG_TYPE_INT, {-1, -1},
+		check_tags_array_ignore, NULL
+	},
+	[CALIB_SENSOR_DRC_FORCE_SGM_INV0_TAG_ID]		   =
+	{	"sw_adrc_force_sgm_inv0", CALIB_TAG_TYPE_INT, {-1, -1},
+		check_tags_array_ignore, NULL
+	},
+	[CALIB_SENSOR_DRC_SPACE_SGM_INV0_TAG_ID]		   =
+	{	"sw_adrc_space_sgm_inv0", CALIB_TAG_TYPE_INT, {-1, -1},
+		check_tags_array_ignore, NULL
+	},
+	[CALIB_SENSOR_DRC_SPACE_SGM_INV1_TAG_ID]		   =
+	{	"sw_adrc_space_sgm_inv1", CALIB_TAG_TYPE_INT, {-1, -1},
+		check_tags_array_ignore, NULL
+	},
+	[CALIB_SENSOR_DRC_RANGE_SGM_INV0_TAG_ID]		   =
+	{	"sw_adrc_range_sgm_inv0", CALIB_TAG_TYPE_INT, {-1, -1},
+		check_tags_array_ignore, NULL
+	},
+	[CALIB_SENSOR_DRC_RANGE_SGM_INV1_TAG_ID]		   =
+	{	"sw_adrc_range_sgm_inv1", CALIB_TAG_TYPE_INT, {-1, -1},
+		check_tags_array_ignore, NULL
+	},
+	[CALIB_SENSOR_DRC_WEIG_BILAT_TAG_ID]		   =
+	{	"sw_adrc_weig_bilat", CALIB_TAG_TYPE_INT, {-1, -1},
+		check_tags_array_ignore, NULL
+	},
+	[CALIB_SENSOR_DRC_WEIG_MAXL_TAG_ID]		   =
+	{	"sw_adrc_weig_maxl", CALIB_TAG_TYPE_INT, {-1, -1},
+		check_tags_array_ignore, NULL
+	},
+	[CALIB_SENSOR_DRC_MIN_OGAIN_TAG_ID]		   =
+	{	"sw_adrc_min_ogain", CALIB_TAG_TYPE_INT, {-1, -1},
+		check_tags_array_ignore, NULL
+	},
+	[CALIB_SENSOR_DRC_IIR_FRAME_TAG_ID]		   =
+	{	"iir_frame", CALIB_TAG_TYPE_INT, {-1, -1},
+		check_tags_array_ignore, NULL
+	},
+	[CALIB_SENSOR_DRC_GAIN_TAG_ID]		   =
+	{	"adrc_gain", CALIB_TAG_TYPE_INT, {-1, -1},
+		check_tags_array_ignore, NULL
+	},
+	[CALIB_SENSOR_DRC_SCALE_Y0_TAG_ID]		   =
+	{	"sw_adrc_scale_y0", CALIB_TAG_TYPE_INT, {-1, -1},
+		check_tags_array_ignore, NULL
+	},
 
     [CALIB_SENSOR_BLC_TAG_ID]         =
     {   "BLC", CALIB_TAG_TYPE_STRUCT, {-1, -1},
@@ -5874,6 +6171,469 @@ calib_tag_info_t g_calib_tag_infos[CALIB_IQ_TAG_END] = {
         check_tags_array_ignore, NULL
     },
 
+	//bayernrV2
+	[CALIB_SENSOR_BAYERNR_V2_TAG_ID]         =
+    {   "BAYERNR_V2", CALIB_TAG_TYPE_CELL, {-1, -1},
+        check_tags_array_info(calib_sensor_bayernr_v2_sub_tags), NULL
+    },
+    [CALIB_SENSOR_BAYERNR_V2_MODE_NAME_TAG_ID]         =
+    {   "ModeName", CALIB_TAG_TYPE_CHAR, {-1, -1},
+        check_tags_array_ignore, NULL
+    },
+    [CALIB_SENSOR_BAYERNR_V2_BAYERNR2D_TAG_ID]         =
+    {   "Bayernr2D", CALIB_TAG_TYPE_STRUCT, {-1, -1},
+        check_tags_array_info(calib_sensor_bayernr_v2_bayernr2D_sub_tags), NULL
+    },
+    [CALIB_SENSOR_BAYERNR_V2_BAYERNR2D_ENABLE_TAG_ID]         =
+    {   "Enable", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
+        check_tags_array_ignore, NULL
+    },
+    [CALIB_SENSOR_BAYERNR_V2_BAYERNR2D_SETTING_TAG_ID]		 =
+    {   "Setting", CALIB_TAG_TYPE_CELL, {-1, -1},
+		check_tags_array_info(calib_sensor_bayernr_v2_bayernr2D_setting_sub_tags), NULL
+    },
+    [CALIB_SENSOR_BAYERNR_V2_BAYERNR2D_SNR_MODE_TAG_ID]         =
+    {   "SNR_Mode", CALIB_TAG_TYPE_CHAR, {-1, -1},
+        check_tags_array_ignore, NULL
+    },
+    [CALIB_SENSOR_BAYERNR_V2_BAYERNR2D_SENSOR_MODE_TAG_ID]         =
+    {   "Sensor_Mode", CALIB_TAG_TYPE_CHAR, {-1, -1},
+        check_tags_array_ignore, NULL
+    },
+    [CALIB_SENSOR_BAYERNR_V2_BAYERNR2D_ISO_TAG_ID]         =
+    {   "ISO", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
+        check_tags_array_ignore, NULL
+    },
+    [CALIB_SENSOR_BAYERNR_V2_BAYERNR2D_FILTER_STRENGTH_TAG_ID]         =
+    {   "filter_strength", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
+        check_tags_array_ignore, NULL
+    },
+    [CALIB_SENSOR_BAYERNR_V2_BAYERNR2D_GAUSS_GUIDE_TAG_ID]         =
+    {   "gauss_guide", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
+        check_tags_array_ignore, NULL
+    },
+    [CALIB_SENSOR_BAYERNR_V2_BAYERNR2D_LUMA_POINT_TAG_ID]         =
+    {   "lumapoint", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
+        check_tags_array_ignore, NULL
+    },
+    [CALIB_SENSOR_BAYERNR_V2_BAYERNR2D_SIGMA_TAG_ID]         =
+    {   "sigma", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
+        check_tags_array_ignore, NULL
+    },
+    [CALIB_SENSOR_BAYERNR_V2_BAYERNR2D_EDGESOFTS_TAG_ID]         =
+    {   "edgesofts", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
+        check_tags_array_ignore, NULL
+    },
+    [CALIB_SENSOR_BAYERNR_V2_BAYERNR2D_RATIO_TAG_ID]         =
+    {   "ratio", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
+        check_tags_array_ignore, NULL
+    },
+    [CALIB_SENSOR_BAYERNR_V2_BAYERNR2D_WEIGHT_TAG_ID]         =
+    {   "weight", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
+        check_tags_array_ignore, NULL
+    },
+
+//bayernrv2_3d
+	#if 1
+	[CALIB_SENSOR_BAYERNR_V2_BAYERNR3D_TAG_ID]		   =
+   {   "Bayernr3D", CALIB_TAG_TYPE_STRUCT, {-1, -1},
+	   check_tags_array_info(calib_sensor_bayernr_v2_bayernr3D_sub_tags), NULL
+   },
+   [CALIB_SENSOR_BAYERNR_V2_BAYERNR3D_ENABLE_TAG_ID]		 =
+   {   "Enable", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
+	   check_tags_array_ignore, NULL
+   },
+   [CALIB_SENSOR_BAYERNR_V2_BAYERNR3D_SETTING_TAG_ID]		 =
+   {   "Setting", CALIB_TAG_TYPE_CELL, {-1, -1},
+		check_tags_array_info(calib_sensor_bayernr_v2_bayernr3D_setting_sub_tags), NULL
+   },
+   [CALIB_SENSOR_BAYERNR_V2_BAYERNR3D_SNR_MODE_TAG_ID]		   =
+   {   "SNR_Mode", CALIB_TAG_TYPE_CHAR, {-1, -1},
+	   check_tags_array_ignore, NULL
+   },
+   [CALIB_SENSOR_BAYERNR_V2_BAYERNR3D_SENSOR_MODE_TAG_ID]		  =
+   {   "Sensor_Mode", CALIB_TAG_TYPE_CHAR, {-1, -1},
+	   check_tags_array_ignore, NULL
+   },
+   [CALIB_SENSOR_BAYERNR_V2_BAYERNR3D_ISO_TAG_ID]		  =
+   {   "ISO", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
+	   check_tags_array_ignore, NULL
+   },
+   [CALIB_SENSOR_BAYERNR_V2_BAYERNR3D_FILTER_STRENGTH_TAG_ID]		  =
+   {   "filter_strength", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
+	   check_tags_array_ignore, NULL
+   },
+   [CALIB_SENSOR_BAYERNR_V2_BAYERNR3D_SP_FILTER_STRENGTH_TAG_ID]		  =
+   {   "sp_filter_strength", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
+	   check_tags_array_ignore, NULL
+   },
+   [CALIB_SENSOR_BAYERNR_V2_BAYERNR3D_LO_CLIPWGT_TAG_ID] 		=
+   {   "lo_clipwgt", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
+	   check_tags_array_ignore, NULL
+   },
+   [CALIB_SENSOR_BAYERNR_V2_BAYERNR3D_HI_CLIPWGT_TAG_ID] 		=
+   {   "hi_clipwgt", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
+	   check_tags_array_ignore, NULL
+   },
+   [CALIB_SENSOR_BAYERNR_V2_BAYERNR3D_SOFTWGT_TAG_ID]		 =
+   {   "softwgt", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
+	   check_tags_array_ignore, NULL
+   },	
+   [CALIB_SENSOR_BAYERNR_V2_BAYERNR3D_LUMA_POINT_TAG_ID]		 =
+   {   "lumapoint", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
+	   check_tags_array_ignore, NULL
+   },
+   [CALIB_SENSOR_BAYERNR_V2_BAYERNR3D_SIGMA_TAG_ID] 		=
+   {   "sigma", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
+	   check_tags_array_ignore, NULL
+   },
+   #endif
+
+
+	//ynrV2
+	[CALIB_SENSOR_YNR_V2_TAG_ID]         =
+    {   "YNR_V2", CALIB_TAG_TYPE_CELL, {-1, -1},
+        check_tags_array_info(calib_sensor_ynr_v2_sub_tags), NULL
+    },
+    [CALIB_SENSOR_YNR_V2_MODE_NAME_TAG_ID]         =
+    {   "ModeName", CALIB_TAG_TYPE_CHAR, {-1, -1},
+        check_tags_array_ignore, NULL
+    },
+    [CALIB_SENSOR_YNR_V2_ENABLE_TAG_ID]         =
+    {   "Enable", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
+        check_tags_array_ignore, NULL
+    },
+    [CALIB_SENSOR_YNR_V2_SETTING_TAG_ID]         =
+    {   "Setting", CALIB_TAG_TYPE_CELL, {-1, -1},
+        check_tags_array_info(calib_sensor_ynr_v2_setting_sub_tags), NULL
+    },
+    [CALIB_SENSOR_YNR_V2_SNR_MODE_TAG_ID]		   =
+    {   "SNR_Mode", CALIB_TAG_TYPE_CHAR, {-1, -1},
+	   check_tags_array_ignore, NULL
+    },
+    [CALIB_SENSOR_YNR_V2_SENSOR_MODE_TAG_ID]		  =
+    {   "Sensor_Mode", CALIB_TAG_TYPE_CHAR, {-1, -1},
+	   check_tags_array_ignore, NULL
+    },
+    [CALIB_SENSOR_YNR_V2_ISO_TAG_ID]		  =
+    {   "iso", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
+	   check_tags_array_ignore, NULL
+    },
+    [CALIB_SENSOR_YNR_V2_BFT3X3_BYPASS_TAG_ID]		  =
+    {   "ynr_bft3x3_bypass", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
+	   check_tags_array_ignore, NULL
+    },
+    [CALIB_SENSOR_YNR_V2_LBFT5X5_BYPASS_TAG_ID]		  =
+    {   "ynr_lbft5x5_bypass", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
+	   check_tags_array_ignore, NULL
+    },
+    [CALIB_SENSOR_YNR_V2_LGFT3X3_BYPASS_TAG_ID]		  =
+    {   "ynr_lgft3x3_bypass", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
+	   check_tags_array_ignore, NULL
+    },
+	[CALIB_SENSOR_YNR_V2_FLT1X1_BYPASS_TAG_ID]		  =
+    {   "ynr_flt1x1_bypass", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
+	   check_tags_array_ignore, NULL
+    },
+	[CALIB_SENSOR_YNR_V2_SFT5X5_BYPASS_TAG_ID]		  =
+    {   "ynr_sft5x5_bypass", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
+	   check_tags_array_ignore, NULL
+    },
+   	[CALIB_SENSOR_YNR_V2_RNR_STRENGTH_TAG_ID]		  =
+    {   "rnr_strength", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
+	   check_tags_array_ignore, NULL
+    },
+    [CALIB_SENSOR_YNR_V2_SIGMA_CURVE_TAG_ID]		  =
+    {   "sigma_curve", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
+	   check_tags_array_ignore, NULL
+    },
+    [CALIB_SENSOR_YNR_V2_YNR_CI_TAG_ID]		  =
+    {   "ynr_ci", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
+	   check_tags_array_ignore, NULL
+    },
+    [CALIB_SENSOR_YNR_V2_LOW_BF_TAG_ID]		  =
+    {   "low_bf", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
+	   check_tags_array_ignore, NULL
+    },
+    [CALIB_SENSOR_YNR_V2_LOW_THRED_ADJ_TAG_ID]		  =
+    {   "low_thred_adj", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
+	   check_tags_array_ignore, NULL
+    },
+    [CALIB_SENSOR_YNR_V2_LOW_PEAK_SUPRESS_TAG_ID]		  =
+    {   "low_peak_supress", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
+	   check_tags_array_ignore, NULL
+    },
+    [CALIB_SENSOR_YNR_V2_LOW_EDGE_ADJ_THRESH_TAG_ID]		  =
+    {   "low_edge_adj_thresh", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
+	   check_tags_array_ignore, NULL
+    },
+    [CALIB_SENSOR_YNR_V2_LOW_CENTRE_WEIGHT_TAG_ID]		  =
+    {   "low_center_weight", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
+	   check_tags_array_ignore, NULL
+    },
+    [CALIB_SENSOR_YNR_V2_LOW_DIST_ADJ_TAG_ID]		  =
+    {   "low_dist_adj", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
+	   check_tags_array_ignore, NULL
+    },
+    [CALIB_SENSOR_YNR_V2_LOW_WEIGHT_TAG_ID]		  =
+    {   "low_weight", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
+	   check_tags_array_ignore, NULL
+    },
+    [CALIB_SENSOR_YNR_V2_LOW_FILT_STRENGTH_TAG_ID]		  =
+    {   "low_filt_strength", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
+	   check_tags_array_ignore, NULL
+    },
+    [CALIB_SENSOR_YNR_V2_LOW_BI_WEIGHT_TAG_ID]		  =
+    {   "low_bi_weight", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
+	   check_tags_array_ignore, NULL
+    },
+    [CALIB_SENSOR_YNR_V2_BASE_FILT_WEIGHT_TAG_ID]		  =
+    {   "base_filter_weight", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
+	   check_tags_array_ignore, NULL
+    },
+    [CALIB_SENSOR_YNR_V2_HIGH_THRED_ADJ_TAG_ID]		  =
+    {   "high_thred_adj", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
+	   check_tags_array_ignore, NULL
+    },
+    [CALIB_SENSOR_YNR_V2_HIGH_WEIGHT_TAG_ID]		  =
+    {   "high_weight", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
+	   check_tags_array_ignore, NULL
+    },
+    [CALIB_SENSOR_YNR_V2_HIGH_DIRECTION_WEIGHT_TAG_ID]		  =
+    {   "high_direction_weight", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
+	   check_tags_array_ignore, NULL
+    },
+    [CALIB_SENSOR_YNR_V2_HI_MIN_ADJ_TAG_ID]		  =
+    {   "hi_min_adj", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
+	   check_tags_array_ignore, NULL
+    },
+    [CALIB_SENSOR_YNR_V2_HI_EDGE_THRED_TAG_ID]		  =
+    {   "hi_edge_thed", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
+	   check_tags_array_ignore, NULL
+    },
+
+   //cnr v1
+
+    [CALIB_SENSOR_CNR_V1_TAG_ID]         =
+    {   "CNR_V1", CALIB_TAG_TYPE_CELL, {-1, -1},
+        check_tags_array_info(calib_sensor_cnr_v1_sub_tags), NULL
+    },
+    [CALIB_SENSOR_CNR_V1_MODE_NAME_TAG_ID]         =
+    {   "ModeName", CALIB_TAG_TYPE_CHAR, {-1, -1},
+        check_tags_array_ignore, NULL
+    },
+    [CALIB_SENSOR_CNR_V1_ENABLE_TAG_ID]         =
+    {   "Enable", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
+        check_tags_array_ignore, NULL
+    },
+    [CALIB_SENSOR_CNR_V1_SETTING_TAG_ID]         =
+    {   "Setting", CALIB_TAG_TYPE_CELL, {-1, -1},
+        check_tags_array_info(calib_sensor_cnr_v1_setting_sub_tags), NULL
+    },
+    [CALIB_SENSOR_CNR_V1_SNR_MODE_TAG_ID]		   =
+    {   "SNR_Mode", CALIB_TAG_TYPE_CHAR, {-1, -1},
+	   check_tags_array_ignore, NULL
+    },
+    [CALIB_SENSOR_CNR_V1_SENSOR_MODE_TAG_ID]		  =
+    {   "Sensor_Mode", CALIB_TAG_TYPE_CHAR, {-1, -1},
+	   check_tags_array_ignore, NULL
+    },
+    [CALIB_SENSOR_CNR_V1_ISO_TAG_ID]		  =
+    {   "iso", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
+	   check_tags_array_ignore, NULL
+    },
+    [CALIB_SENSOR_CNR_V1_HF_BYPASS_TAG_ID]		  =
+    {   "hf_bypass", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
+	   check_tags_array_ignore, NULL
+    },
+    [CALIB_SENSOR_CNR_V1_LF_BYPASS_TAG_ID]		  =
+    {   "lf_bypass", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
+	   check_tags_array_ignore, NULL
+    },
+    [CALIB_SENSOR_CNR_V1_CNR_EXGAIN_TAG_ID]		  =
+    {   "cnr_exgain", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
+	   check_tags_array_ignore, NULL
+    },
+    [CALIB_SENSOR_CNR_V1_CNR_G_GAIN_TAG_ID]		  =
+    {   "cnr_g_gain", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
+	   check_tags_array_ignore, NULL
+    },
+    [CALIB_SENSOR_CNR_V1_COLOR_SAT_ADJ_TAG_ID]		  =
+    {   "color_sat_adj", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
+	   check_tags_array_ignore, NULL
+    },
+    [CALIB_SENSOR_CNR_V1_COLOR_SAT_ADJ_ALPHA_TAG_ID]		  =
+    {   "color_sat_adj_alpha", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
+	   check_tags_array_ignore, NULL
+    },
+    [CALIB_SENSOR_CNR_V1_HF_SPIKERS_REDUCION_STRENGTH_TAG_ID]		  =
+    {   "hf_spikes_reducion_strength", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
+	   check_tags_array_ignore, NULL
+    },
+    [CALIB_SENSOR_CNR_V1_HF_DENOISE_STRENGTH_TAG_ID]		  =
+    {   "hf_denoise_strength", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
+	   check_tags_array_ignore, NULL
+    },
+    [CALIB_SENSOR_CNR_V1_HF_COLOR_SAT_TAG_ID]		  =
+    {   "hf_color_sat", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
+	   check_tags_array_ignore, NULL
+    },
+    [CALIB_SENSOR_CNR_V1_HF_DENOISE_ALPHA_TAG_ID]		  =
+    {   "hf_denoise_alpha", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
+	   check_tags_array_ignore, NULL
+    },
+    [CALIB_SENSOR_CNR_V1_HF_BF_WGT_CLIP_TAG_ID]		  =
+    {   "hf_bf_wgt_clip", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
+	   check_tags_array_ignore, NULL
+    },
+    [CALIB_SENSOR_CNR_V1_THUMB_SPIKERS_REDUCION_STRENGTH_TAG_ID]		  =
+    {   "thumb_spikes_reducion_strength", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
+	   check_tags_array_ignore, NULL
+    },
+    [CALIB_SENSOR_CNR_V1_THUMB_DENOISE_STRENGTH_TAG_ID]		  =
+    {   "thumb_denoise_strength", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
+	   check_tags_array_ignore, NULL
+    },
+    [CALIB_SENSOR_CNR_V1_THUMB_COLOR_SAT_TAG_ID]		  =
+    {   "thumb_color_sat", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
+	   check_tags_array_ignore, NULL
+    },
+    [CALIB_SENSOR_CNR_V1_LF_DENOISE_STRENGTH_TAG_ID]		  =
+    {   "lf_denoise_strength", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
+	   check_tags_array_ignore, NULL
+    },
+    [CALIB_SENSOR_CNR_V1_LF_COLOR_SAT_TAG_ID]		  =
+    {   "lf_color_sat", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
+	   check_tags_array_ignore, NULL
+    },
+    [CALIB_SENSOR_CNR_V1_LF_DENOISE_ALPHA_TAG_ID]		  =
+    {   "lf_denoise_alpha", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
+	   check_tags_array_ignore, NULL
+    },
+	[CALIB_SENSOR_CNR_V1_KERNEL_5X5_TAG_ID]		  =
+    {   "kernel_5x5", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
+	   check_tags_array_ignore, NULL
+    },
+
+
+	// sharpV3
+    [CALIB_SENSOR_SHARP_V3_TAG_ID]         =
+    {   "Sharp_V3", CALIB_TAG_TYPE_CELL, {-1, -1},
+        check_tags_array_info(calib_sensor_sharp_v3_sub_tags), NULL
+    },
+    [CALIB_SENSOR_SHARP_V3_MODE_NAME_TAG_ID]         =
+    {   "ModeName", CALIB_TAG_TYPE_CHAR, {-1, -1},
+        check_tags_array_ignore, NULL
+    },
+    [CALIB_SENSOR_SHARP_V3_ENABLE_TAG_ID]         =
+    {   "Enable", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
+        check_tags_array_ignore, NULL
+    },
+    [CALIB_SENSOR_SHARP_V3_SETTING_TAG_ID]         =
+    {   "Setting", CALIB_TAG_TYPE_CELL, {-1, -1},
+        check_tags_array_info(calib_sensor_sharp_v3_setting_sub_tags), NULL
+    },
+    [CALIB_SENSOR_SHARP_V3_SNR_MODE_TAG_ID]		   =
+    {   "SNR_Mode", CALIB_TAG_TYPE_CHAR, {-1, -1},
+	   check_tags_array_ignore, NULL
+    },
+    [CALIB_SENSOR_SHARP_V3_SENSOR_MODE_TAG_ID]		  =
+    {   "Sensor_Mode", CALIB_TAG_TYPE_CHAR, {-1, -1},
+	   check_tags_array_ignore, NULL
+    },
+    [CALIB_SENSOR_SHARP_V3_ISO_TAG_ID]		  =
+    {   "iso", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
+	   check_tags_array_ignore, NULL
+    },
+	[CALIB_SENSOR_SHARP_V3_LUMA_POINT_TAG_ID]		  =
+    {   "luma_point", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
+	   check_tags_array_ignore, NULL
+    },
+    [CALIB_SENSOR_SHARP_V3_LUMA_SIGMA_TAG_ID]		  =
+    {   "luma_sigma", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
+	   check_tags_array_ignore, NULL
+    },
+    [CALIB_SENSOR_SHARP_V3_PBF_GAIN_TAG_ID]		  =
+    {   "pbf_gain", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
+	   check_tags_array_ignore, NULL
+    },
+    [CALIB_SENSOR_SHARP_V3_PBF_ADD_TAG_ID]		  =
+    {   "pbf_add", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
+	   check_tags_array_ignore, NULL
+    },
+    [CALIB_SENSOR_SHARP_V3_PBF_RATIO_TAG_ID]		  =
+    {   "pbf_ratio", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
+	   check_tags_array_ignore, NULL
+    },
+    [CALIB_SENSOR_SHARP_V3_GAUSS_RATIO_TAG_ID]		  =
+    {   "gaus_ratio", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
+	   check_tags_array_ignore, NULL
+    },
+    [CALIB_SENSOR_SHARP_V3_SHARP_RATIO_TAG_ID]		  =
+    {   "sharp_ratio", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
+	   check_tags_array_ignore, NULL
+    },
+	[CALIB_SENSOR_SHARP_V3_HF_CLIP_TAG_ID]		  =
+    {   "hf_clip", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
+	   check_tags_array_ignore, NULL
+    },
+    [CALIB_SENSOR_SHARP_V3_BF_GAIN_TAG_ID]		  =
+    {   "bf_gain", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
+	   check_tags_array_ignore, NULL
+    },
+    [CALIB_SENSOR_SHARP_V3_BF_ADD_TAG_ID]		  =
+    {   "bf_add", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
+	   check_tags_array_ignore, NULL
+    },
+    [CALIB_SENSOR_SHARP_V3_BF_RATIO_TAG_ID]		  =
+    {   "bf_ratio", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
+	   check_tags_array_ignore, NULL
+    },
+    [CALIB_SENSOR_SHARP_V3_LOCAL_STRENGTH_TAG_ID]		  =
+    {   "local_sharp_strength", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
+	   check_tags_array_ignore, NULL
+    },
+    [CALIB_SENSOR_SHARP_V3_PREFILTER_COEFF_TAG_ID]		  =
+    {   "prefilter_coeff", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
+	   check_tags_array_ignore, NULL
+    },
+    [CALIB_SENSOR_SHARP_V3_GAUSSFILTER_COEFF_TAG_ID]		  =
+    {   "GaussianFilter_coeff", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
+	   check_tags_array_ignore, NULL
+    },
+    [CALIB_SENSOR_SHARP_V3_HBFFILTER_COEFF_TAG_ID]		  =
+    {   "hfBilateralFilter_coeff", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
+	   check_tags_array_ignore, NULL
+    },
+    [CALIB_SENSOR_SHARP_V3_SHARP_RATIO_H_TAG_ID]		  =
+    {   "sharp_ratio_h", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
+	   check_tags_array_ignore, NULL
+    },
+    [CALIB_SENSOR_SHARP_V3_SHARP_RATIO_M_TAG_ID]		  =
+    {   "sharp_ratio_m", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
+	   check_tags_array_ignore, NULL
+    },
+    [CALIB_SENSOR_SHARP_V3_SHARP_RATIO_L_TAG_ID]		  =
+    {   "sharp_ratio_l", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
+	   check_tags_array_ignore, NULL
+    },
+    [CALIB_SENSOR_SHARP_V3_CLIP_HF_TAG_ID]		  =
+    {   "clip_hf", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
+	   check_tags_array_ignore, NULL
+    },
+    [CALIB_SENSOR_SHARP_V3_CLIP_MF_TAG_ID]		  =
+    {   "clip_mf", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
+	   check_tags_array_ignore, NULL
+    },
+    [CALIB_SENSOR_SHARP_V3_CLIP_LF_TAG_ID]		  =
+    {   "clip_lf", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
+	   check_tags_array_ignore, NULL
+    },
+    [CALIB_SENSOR_SHARP_V3_LOCAL_WGT_TAG_ID]		  =
+    {   "local_wgt", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
+	   check_tags_array_ignore, NULL
+    },
+   
     // System
     [CALIB_SYSTEM_TAG_ID]         =
     {   "system", CALIB_TAG_TYPE_STRUCT, {-1, -1},

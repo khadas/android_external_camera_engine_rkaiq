@@ -10,7 +10,13 @@
 #define CALIBDB_MAX_MODE_NUM 5
 #define CALIBDB_MAX_MODE_NAME_LENGTH (20)
 #define CALIBDB_MAX_SCENE_NAME_LENGTH (10)
+#define ISP21_DRC_Y_NUM				17
+#define RK_BAYERNR_V2_MAX_ISO_NUM (CALIBDB_MAX_ISO_LEVEL)
+#define RK_YNR_V2_MAX_ISO_NUM (CALIBDB_MAX_ISO_LEVEL)
+#define RK_CNR_V1_MAX_ISO_NUM (CALIBDB_MAX_ISO_LEVEL)
 
+#define RK_SHARP_V3_MAX_ISO_NUM (CALIBDB_MAX_ISO_LEVEL)
+#define RK_SHARP_V3_LUMA_POINT_NUM (8)
 /*****************************************************************************/
 /**
  * @brief   ISP2.0 AEC Algo Params
@@ -1014,6 +1020,34 @@ typedef struct CalibDb_Ahdr_Para_s {
     CalibDb_HdrTmo_t tmo;
 } CalibDb_Ahdr_Para_t;
 
+typedef struct CalibDb_Drc_ModeCell_s {
+	char scene[CALIBDB_MAX_MODE_NAME_LENGTH];
+    int sw_drc_offset_pow2;//
+	int sw_drc_position;
+	int sw_drc_hpdetail_ratio;
+	int sw_drc_lpdetail_ratio;
+	int sw_drc_weicur_pix;//
+	int sw_drc_weipre_frame;//
+	int sw_drc_force_sgm_inv0;//
+	int sw_drc_motion_scl;//
+	int sw_drc_edge_scl;//
+	int sw_drc_space_sgm_inv1;//
+	int sw_drc_space_sgm_inv0;//
+	int sw_drc_range_sgm_inv1;//
+	int sw_drc_range_sgm_inv0;//
+	int sw_drc_weig_maxl;//
+	int sw_drc_weig_bilat;//
+	int sw_drc_scale_y[ISP21_DRC_Y_NUM];//
+	int sw_drc_iir_frame;
+	int sw_drc_gain;
+	int sw_drc_min_ogain;//
+} CalibDb_Drc_ModeCell_t;
+
+typedef struct CalibDb_Adrc_Para_s {
+    CalibDb_Drc_ModeCell_t calib[CALIBDB_MAX_MODE_NUM];
+	CalibDb_Drc_ModeCell_t tuning[CALIBDB_MAX_MODE_NUM];
+} CalibDb_Adrc_Para_t;
+
 typedef struct CalibDb_Blc_ModeCell_s {
     char name[CALIBDB_MAX_MODE_NAME_LENGTH];
     float iso[CALIBDB_BLC_MAX_ISO_LEVEL];
@@ -1944,6 +1978,233 @@ typedef struct CalibDb_ColorAsGrey_s {
     int enable;
 } CalibDb_ColorAsGrey_t;
 
+
+//bayernrV2
+
+////////////////////calibdb type ////////////////////////////////////////////////
+
+typedef struct Calibdb_Bayernr_2Dparams_V2_s{
+	struct list_head listItem;
+
+	char snr_mode[CALIBDB_NR_SHARP_NAME_LENGTH];
+    char sensor_mode[CALIBDB_NR_SHARP_MODE_LENGTH];
+		
+	float iso[RK_BAYERNR_V2_MAX_ISO_NUM];
+	
+	float bayernrv2_filter_strength_r[RK_BAYERNR_V2_MAX_ISO_NUM];
+	int   bayernrv2_filter_lumapoint_r[16];
+	int   bayernrv2_filter_sigma_r[RK_BAYERNR_V2_MAX_ISO_NUM][16];
+	float bayernrv2_filter_edgesofts_r[RK_BAYERNR_V2_MAX_ISO_NUM];
+	float bayernrv2_filter_soft_threshold_ratio_r[RK_BAYERNR_V2_MAX_ISO_NUM];
+	float bayernrv2_filter_out_wgt_r[RK_BAYERNR_V2_MAX_ISO_NUM];
+	int   bayernrv2_gauss_guide_r[RK_BAYERNR_V2_MAX_ISO_NUM];	
+
+	//not use in xml param
+	float bayernrv2_edge_filter_lumapoint_r[8];
+	float bayernrv2_edge_filter_wgt_r[RK_BAYERNR_V2_MAX_ISO_NUM][8];
+	
+}Calibdb_Bayernr_2Dparams_V2_t;
+
+
+typedef struct CalibDb_Bayernr_2DSetting_V2_s {
+    // bayernr version
+	int bayernrv2_2dnr_enable;
+
+	// bayernr settting for hcg & lcg 
+	struct list_head listHead;
+	
+} CalibDb_Bayernr_2DSetting_V2_t;
+
+typedef struct CalibDb_Bayernr_3DParams_V2_s {
+    struct list_head listItem;
+
+	char snr_mode[CALIBDB_NR_SHARP_NAME_LENGTH];
+    char sensor_mode[CALIBDB_NR_SHARP_MODE_LENGTH];
+	
+	float iso[RK_BAYERNR_V2_MAX_ISO_NUM];
+	float bayernrv2_tnr_filter_strength_r[RK_BAYERNR_V2_MAX_ISO_NUM];
+	float bayernrv2_tnr_sp_filter_strength_r[RK_BAYERNR_V2_MAX_ISO_NUM];
+	float bayernrv2_tnr_lo_clipwgt_r[RK_BAYERNR_V2_MAX_ISO_NUM];
+	float bayernrv2_tnr_hi_clipwgt_r[RK_BAYERNR_V2_MAX_ISO_NUM];
+	float bayernrv2_tnr_softwgt_r[RK_BAYERNR_V2_MAX_ISO_NUM];
+
+	int   bayernrv2_lumapoint_r[16];
+	int   bayernrv2_sigma_r[RK_BAYERNR_V2_MAX_ISO_NUM][16];
+} CalibDb_Bayernr_3DParams_V2_t;
+
+typedef struct CalibDb_Bayernr_3DSetting_V2_s {
+    // bayernr version
+	int bayernrv2_tnr_enable;
+
+	// bayernr settting for hcg & lcg 
+	struct list_head listHead;
+}CalibDb_Bayernr_3DSetting_V2_t;
+
+
+typedef struct CalibDb_Bayernr_V2_t {
+	struct list_head listItem;
+	
+	char modeName[64];
+
+	CalibDb_Bayernr_2DSetting_V2_t st2DParams;
+	CalibDb_Bayernr_3DSetting_V2_t st3DParams;
+	
+}CalibDb_Bayernr_V2_t;
+
+
+typedef struct Calibdb_Ynr_params_V2_s{
+	struct list_head listItem;
+	char snr_mode[64];
+	char sensor_mode[64];
+
+	float iso[RK_YNR_V2_MAX_ISO_NUM];
+	float ciISO_V2[2][RK_YNR_V2_MAX_ISO_NUM]; 
+	float sigmaCurve[RK_YNR_V2_MAX_ISO_NUM][5];
+
+	// low frequency
+	float ynr_rnr_strength_V2[RK_YNR_V2_MAX_ISO_NUM][17];
+	int ynr_bft3x3_bypass_V2[RK_YNR_V2_MAX_ISO_NUM];
+	int ynr_lbft5x5_bypass_V2[RK_YNR_V2_MAX_ISO_NUM];
+	int ynr_lgft3x3_bypass_V2[RK_YNR_V2_MAX_ISO_NUM];
+	int ynr_flt1x1_bypass_V2[RK_YNR_V2_MAX_ISO_NUM];
+	int ynr_sft5x5_bypass_V2[RK_YNR_V2_MAX_ISO_NUM];
+	float ynr_low_bf_V2[2][RK_YNR_V2_MAX_ISO_NUM];
+	float ynr_low_thred_adj_V2[RK_YNR_V2_MAX_ISO_NUM];
+	float ynr_low_peak_supress_V2[RK_YNR_V2_MAX_ISO_NUM];
+	float ynr_low_edge_adj_thresh_V2[RK_YNR_V2_MAX_ISO_NUM];
+	float ynr_low_center_weight_V2[RK_YNR_V2_MAX_ISO_NUM];
+	float ynr_low_dist_adj_V2[RK_YNR_V2_MAX_ISO_NUM];
+	float ynr_low_weight_V2[RK_YNR_V2_MAX_ISO_NUM];
+	float ynr_low_filt_strength_V2[2][RK_YNR_V2_MAX_ISO_NUM];
+	float ynr_low_bi_weight_V2[RK_YNR_V2_MAX_ISO_NUM];
+
+	// high frequency
+	float ynr_base_filter_weight_V2[3][RK_YNR_V2_MAX_ISO_NUM];
+	float ynr_high_thred_adj_V2[RK_YNR_V2_MAX_ISO_NUM];
+	float ynr_high_weight_V2[RK_YNR_V2_MAX_ISO_NUM];
+	float ynr_direction_weight_V2[RK_YNR_V2_MAX_ISO_NUM][8];
+	float ynr_hi_min_adj_V2[RK_YNR_V2_MAX_ISO_NUM];
+	float ynr_hi_edge_thed_V2[RK_YNR_V2_MAX_ISO_NUM];
+	
+}Calibdb_Ynr_params_V2_t;
+
+typedef struct Calibdb_Ynr_V2_s{
+	struct list_head listItem;
+	char modeName[64];
+	int enable;
+	
+	struct list_head listHead;
+}Calibdb_Ynr_V2_t;
+
+
+typedef struct Calibdb_Cnr_params_V1_s 
+{
+	struct list_head listItem;
+	char snr_mode[64];
+	char sensor_mode[64];
+	
+	int enable;
+	float iso[RK_CNR_V1_MAX_ISO_NUM];
+	int	rkcnr_hq_bila_bypass[RK_CNR_V1_MAX_ISO_NUM];
+	int	rkcnr_lq_bila_bypass[RK_CNR_V1_MAX_ISO_NUM];
+
+	// gain
+	float rkcnr_exgain[RK_CNR_V1_MAX_ISO_NUM];
+	float rkcnr_g_gain[RK_CNR_V1_MAX_ISO_NUM];
+
+	//
+	float ratio[RK_CNR_V1_MAX_ISO_NUM];
+	float offset[RK_CNR_V1_MAX_ISO_NUM];
+
+	// step1
+	// median filter
+	float medRatio1[RK_CNR_V1_MAX_ISO_NUM];
+
+	// bilateral filter
+	float sigmaR1[RK_CNR_V1_MAX_ISO_NUM];
+	float uvgain1[RK_CNR_V1_MAX_ISO_NUM];
+	float bfRatio1[RK_CNR_V1_MAX_ISO_NUM];
+	int	 hbf_wgt_clip[RK_CNR_V1_MAX_ISO_NUM];
+
+
+	// step2
+	// median filter
+	float medRatio2[RK_CNR_V1_MAX_ISO_NUM];
+
+	// bilateral filter
+	float sigmaR2[RK_CNR_V1_MAX_ISO_NUM];
+	float uvgain2[RK_CNR_V1_MAX_ISO_NUM];
+	float bfRatio2[RK_CNR_V1_MAX_ISO_NUM];
+
+
+	// step3
+	// bilateral filter
+	float sigmaR3[RK_CNR_V1_MAX_ISO_NUM];
+	float uvgain3[RK_CNR_V1_MAX_ISO_NUM];
+	float bfRatio3[RK_CNR_V1_MAX_ISO_NUM];
+
+	// bilateral filter kernels
+	float kernel_5x5_table[5];
+}Calibdb_Cnr_params_V1_t;
+
+typedef struct Calibdb_Cnr_V1_s{
+	struct list_head listItem;
+	char modeName[64];
+	int enable;
+	
+	struct list_head listHead;
+}Calibdb_Cnr_V1_t;
+
+
+typedef struct Calibdb_Sharp_params_V3_s
+{
+	struct list_head listItem;
+	char snr_mode[64];
+	char sensor_mode[64];
+	float iso[RK_SHARP_V3_MAX_ISO_NUM];
+	
+	short luma_point		[RK_SHARP_V3_LUMA_POINT_NUM];
+	short luma_sigma		[RK_SHARP_V3_MAX_ISO_NUM][RK_SHARP_V3_LUMA_POINT_NUM];
+	float pbf_gain			[RK_SHARP_V3_MAX_ISO_NUM];
+	float pbf_add			[RK_SHARP_V3_MAX_ISO_NUM];
+	float pbf_ratio			[RK_SHARP_V3_MAX_ISO_NUM];
+	float gaus_ratio		[RK_SHARP_V3_MAX_ISO_NUM];
+	float sharp_ratio		[RK_SHARP_V3_MAX_ISO_NUM];
+	short lum_clip_h		[RK_SHARP_V3_MAX_ISO_NUM][RK_SHARP_V3_LUMA_POINT_NUM];
+	float bf_gain			[RK_SHARP_V3_MAX_ISO_NUM];
+	float bf_add			[RK_SHARP_V3_MAX_ISO_NUM];
+	float bf_ratio			[RK_SHARP_V3_MAX_ISO_NUM];
+	short ehf_th			[RK_SHARP_V3_MAX_ISO_NUM][RK_SHARP_V3_LUMA_POINT_NUM];
+
+	float kernel_pre_bila_filter[9][RK_SHARP_V3_MAX_ISO_NUM];
+	float kernel_range_filter	[9][RK_SHARP_V3_MAX_ISO_NUM];
+	float kernel_bila_filter	[9][RK_SHARP_V3_MAX_ISO_NUM];
+
+	//////////////////////////////////////////////////////////////////////////
+	// test params
+	float sharp_ratio_h		[RK_SHARP_V3_MAX_ISO_NUM];
+	float sharp_ratio_m		[RK_SHARP_V3_MAX_ISO_NUM];
+	float sharp_ratio_l		[RK_SHARP_V3_MAX_ISO_NUM];
+	short clip_hf			[RK_SHARP_V3_MAX_ISO_NUM][RK_SHARP_V3_LUMA_POINT_NUM];
+	short clip_mf			[RK_SHARP_V3_MAX_ISO_NUM][RK_SHARP_V3_LUMA_POINT_NUM];
+	short clip_lf			[RK_SHARP_V3_MAX_ISO_NUM][RK_SHARP_V3_LUMA_POINT_NUM];
+	short local_wgt			[RK_SHARP_V3_MAX_ISO_NUM][RK_SHARP_V3_LUMA_POINT_NUM];
+
+	short kernel_hf_filter	[RK_SHARP_V3_MAX_ISO_NUM][9];
+	short kernel_mf_filter	[RK_SHARP_V3_MAX_ISO_NUM][9];
+	short kernel_lf_filter	[RK_SHARP_V3_MAX_ISO_NUM][9];
+}Calibdb_Sharp_params_V3_t;
+
+
+typedef struct Calibdb_Sharp_V3_s{
+	struct list_head listItem;
+	char modeName[64];
+	int enable;
+	
+	struct list_head listHead;
+}Calibdb_Sharp_V3_t;
+
+
 typedef struct CamCalibDbContext_s {
     CalibDb_Header_t header;
     list_head awb_calib_para_v200;
@@ -1953,6 +2214,7 @@ typedef struct CamCalibDbContext_s {
     CalibDb_Aec_Para_t aec;
     CalibDb_AF_t af;
     CalibDb_Ahdr_Para_t ahdr;
+	CalibDb_Adrc_Para_t adrc;
     CalibDb_Blc_t blc;
     CalibDb_Dpcc_t dpcc;
     CalibDb_BayerNr_t bayerNr;
@@ -1976,6 +2238,12 @@ typedef struct CamCalibDbContext_s {
     CalibDb_Cpsl_t cpsl;
     CalibDb_ColorAsGrey_t colorAsGrey;
     CalibDb_System_t  sysContrl;
+
+	//vw
+	struct list_head list_bayernr_v2;
+	struct list_head list_ynr_v2;
+	struct list_head list_cnr_v1;
+	struct list_head list_sharp_v3;
 } CamCalibDbContext_t;
 
 #endif

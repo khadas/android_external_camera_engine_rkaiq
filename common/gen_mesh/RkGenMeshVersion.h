@@ -45,23 +45,47 @@
   
   * v1.0.1
   *  - date: 2020-09-15
-  *  - LDCH: optimize the "calcLdchMaxLevel" function to reduce the cost time
+  *  - LDCH: optimize the "calcLdchMaxLevel" function to reduce the cost time,
+			 and it takes about 160ms in PC
 
   * v1.0.2
   *  - date: 2020-09-16
   *  - LDCH: continue to optimize the "calcLdchMaxLevel" function to reduce the cost time,
-			 and it reduces two-thirds of cost time than last version
+			 and it takes about 50ms in PC
+
+  * v1.0.3
+  *  - date: 2020-09-17
+  *  - LDCH: continue to optimize the "calcLdchMaxLevel" function to reduce the cost time,
+			 and it takes about 8ms in PC
 
   * v2.0.0
   *  - date: 2020-09-17
-  *  - LDCH: continue to optimize the "calcLdchMaxLevel" function to reduce the cost time,
-             and it only takes 3-4 seconds in PC
   *  - FEC&LDCH: change to use rho-cotTheta(or rho-tanTheta) in polynomial fitting,
                  and it saves some time in function "genFECMeshNLevel" and "genLDCMeshNLevel" for each level
-  */
+  *  - LDCH: continue to optimize the "calcLdchMaxLevel" function to reduce the cost time,
+			 and it only takes 4ms in PC
 
-#define RK_GENMESH_VERSION_REAL_V "v2.0.0"
-#define RK_GENMESH_RELEASE_DATE "2020-09-17"
+  * v2.0.1
+  *  - date: 2020-09-18
+  *  - FEC&LDCH: due to a bug in polynomial fitting, last version will returns error when the I/O resolutions are different,
+                 it has been solved in this version
+	 - FEC: the fixed-point number is changed from 7 to 8
+
+  * v2.0.2
+  *  - date: 2020-09-23
+  *  - FEC&LDCH: adjust some code to facilitate branch prediction logic and reduce unnecessary memory references to improve efficiency
+
+  * v2.0.3
+  *  - date: 2020-10-10
+  *  - FEC&LDCH: fix some small bugs
+  
+  * v2.0.4
+  *  - date: 2020-10-15
+  *  - FEC: change mesh border frome (srcW-3, srcH-3) to (srcW-1, srcH-1)
+*/
+
+#define RK_GENMESH_VERSION_REAL_V "v2.0.4"
+#define RK_GENMESH_RELEASE_DATE "2020-10-15"
 
   /******* DO NOT EDIT THE FOLLOWINGS *******/
 

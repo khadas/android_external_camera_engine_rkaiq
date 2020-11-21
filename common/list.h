@@ -243,16 +243,16 @@ static inline void list_splice(struct list_head *list, struct list_head *head)
  */
 static inline void list_prepare_item(void* p_item) {
 	//ASSERT(p_item != NULL);
-	((list_head*)p_item)->next = NULL;
-	((list_head*)p_item)->prev = NULL;
+	((struct list_head*)p_item)->next = NULL;
+	((struct list_head*)p_item)->prev = NULL;
 }
 /**
  * print_list -print list.
  * param:   head  The list item to be printed.
  */
-static int  get_list_num(const list_head* head)
+static int  get_list_num(const struct list_head* head)
 {
-	list_head* p;
+	struct list_head* p;
 	p = head->next;
     int num =0;
 	while (p != head)
@@ -270,7 +270,7 @@ static int  get_list_num(const list_head* head)
  */
 static void print_list(list_head* head)
 {
-	list_head* p;
+	struct list_head* p;
 	p = head->next;
 	while (p != head)
 	{
@@ -285,7 +285,7 @@ static void print_list(list_head* head)
  * param:   l  The list item to be cleared.
  */
 static void clear_list(list_head* l) {
-	list_head* p;
+	struct list_head* p;
     if(l==NULL){
         return;
     }

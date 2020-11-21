@@ -114,6 +114,17 @@ XCamReturn RkAiqHandleIntCom::configInparamsCom(RkAiqAlgoCom* com, int type)
     case RK_AIQ_ALGO_TYPE_ASD:
         GET_RK_COM(Asd);
         break;
+	case RK_AIQ_ALGO_TYPE_ADRC:
+        GET_RK_COM(Adrc);
+	case RK_AIQ_ALGO_TYPE_AYNR:
+        GET_RK_COM(Aynr);
+        break;
+	case RK_AIQ_ALGO_TYPE_ACNR:
+        GET_RK_COM(Acnr);
+        break;
+	case RK_AIQ_ALGO_TYPE_ARAWNR:
+        GET_RK_COM(Arawnr);
+        break;
     default:
         LOGE_ANALYZER("wrong algo type !");
     }
@@ -6096,6 +6107,10 @@ RkAiqAdrcHandleInt::prepare()
 
     RkAiqAlgoConfigAdrcInt* adrc_config_int = (RkAiqAlgoConfigAdrcInt*)mConfig;
     RkAiqCore::RkAiqAlgosShared_t* shared = &mAiqCore->mAlogsSharedParams;
+
+	adrc_config_int->rawHeight = shared->snsDes.isp_acq_height;
+    adrc_config_int->rawWidth = shared->snsDes.isp_acq_width;
+    adrc_config_int->working_mode = shared->working_mode;
 
     RkAiqAlgoDescription* des = (RkAiqAlgoDescription*)mDes;
     ret = des->prepare(mConfig);

@@ -57,6 +57,8 @@ typedef struct : rk_aiq_isp_params_t {
     rkaiq_anr_procRes_t     rkaiq_anr_proc_res;
     rkaiq_asharp_procRes_t  rkaiq_asharp_proc_res;
 #endif
+    // TODO: should be split to merge and tmo
+    RkAiqAhdrProcResult_t      ahdr_proc_res;//porc data for hw/simulator
 } rk_aiq_isp_params_v2x_t;
 
 // v20 params struct
@@ -69,8 +71,6 @@ typedef struct : rk_aiq_isp_params_v2x_t {
     rk_aiq_isp_drc_t           drc;
     rk_aiq_isp_rawnr_t         rawnr;
     rk_aiq_awb_stat_cfg_v200_t awb_cfg;
-    // TODO: should be split to merge and tmo
-    RkAiqAhdrProcResult_t      ahdr_proc_res;//porc data for hw/simulator
 } rk_aiq_isp_params_v20_t;
 
 // v21 params struct

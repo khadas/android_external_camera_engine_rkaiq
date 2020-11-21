@@ -25,12 +25,6 @@ struct CameraCoeff
 	double a0, a2, a3, a4;					// 镜头的畸变系数
 	double c, d, e;							// 内参[c d;e 1]
 	double sf;								// sf控制视角，sf越大视角越大
-	/* level = 0时的rho-theta多项式拟合 */
-	int invPolyNum0;						// 系数个数
-	double invPolyCoeff0[21];				// 多项式系数，最高次数20次
-	/* level = 255时的rho-theta多项式拟合 */
-	int invPolyNum255;						// 系数个数
-	double invPolyCoeff255[21];				// 多项式系数，最高次数20次
 
 	/* level = 0时的rho-tanTheta多项式拟合 */
 	int invPolyTanNum0;						// 系数个数

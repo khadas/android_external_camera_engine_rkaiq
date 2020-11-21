@@ -164,4 +164,1117 @@ RkAiqAdrcV1HandleInt::postProcess()
     return ret;
 }
 
+
+void
+RkAiqAsharpV3HandleInt::init()
+{
+    ENTER_ANALYZER_FUNCTION();
+
+    RkAiqAsharpHandle::deInit();
+    mConfig       = (RkAiqAlgoCom*)(new RkAiqAlgoConfigAsharpV3Int());
+    mPreInParam   = (RkAiqAlgoCom*)(new RkAiqAlgoPreAsharpV3Int());
+    mPreOutParam  = (RkAiqAlgoResCom*)(new RkAiqAlgoPreResAsharpV3Int());
+    mProcInParam  = (RkAiqAlgoCom*)(new RkAiqAlgoProcAsharpV3Int());
+    mProcOutParam = (RkAiqAlgoResCom*)(new RkAiqAlgoProcResAsharpV3Int());
+    mPostInParam  = (RkAiqAlgoCom*)(new RkAiqAlgoPostAsharpV3Int());
+    mPostOutParam = (RkAiqAlgoResCom*)(new RkAiqAlgoPostResAsharpV3Int());
+
+    EXIT_ANALYZER_FUNCTION();
+}
+
+
+XCamReturn
+RkAiqAsharpV3HandleInt::updateConfig(bool needSync)
+{
+    ENTER_ANALYZER_FUNCTION();
+
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    if (needSync)
+        mCfgMutex.lock();
+    // if something changed
+    if (updateAtt) {
+        mCurAtt = mNewAtt;
+        updateAtt = false;
+        // TODO
+        //rk_aiq_uapi_asharp_SetAttrib_V3(mAlgoCtx, &mCurAtt, false);
+        sendSignal();
+    }
+
+    if(updateIQpara) {
+        mCurIQPara = mNewIQPara;
+        updateIQpara = false;
+        // TODO
+        //rk_aiq_uapi_asharp_SetIQpara_V3(mAlgoCtx, &mCurIQPara, false);
+        sendSignal();
+    }
+
+    if (needSync)
+        mCfgMutex.unlock();
+
+
+    EXIT_ANALYZER_FUNCTION();
+    return ret;
+}
+
+XCamReturn
+RkAiqAsharpV3HandleInt::setAttrib(rk_aiq_sharp_attrib_v3_t *att)
+{
+    ENTER_ANALYZER_FUNCTION();
+
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    mCfgMutex.lock();
+    //TODO
+    // check if there is different between att & mCurAtt
+    // if something changed, set att to mNewAtt, and
+    // the new params will be effective later when updateConfig
+    // called by RkAiqCore
+
+    // if something changed
+    if (0 != memcmp(&mCurAtt, att, sizeof(rk_aiq_sharp_attrib_v3_t))) {
+        mNewAtt = *att;
+        updateAtt = true;
+        waitSignal();
+    }
+
+    mCfgMutex.unlock();
+
+    EXIT_ANALYZER_FUNCTION();
+    return ret;
+}
+
+XCamReturn
+RkAiqAsharpV3HandleInt::getAttrib(rk_aiq_sharp_attrib_v3_t *att)
+{
+    ENTER_ANALYZER_FUNCTION();
+
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+
+    //rk_aiq_uapi_asharp_GetAttrib(mAlgoCtx, att);
+
+    EXIT_ANALYZER_FUNCTION();
+    return ret;
+}
+
+XCamReturn
+RkAiqAsharpV3HandleInt::setIQPara(rk_aiq_sharp_IQPara_V3_t *para)
+{
+    ENTER_ANALYZER_FUNCTION();
+
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    mCfgMutex.lock();
+    //TODO
+    // check if there is different between att & mCurAtt
+    // if something changed, set att to mNewAtt, and
+    // the new params will be effective later when updateConfig
+    // called by RkAiqCore
+
+    // if something changed
+    if (0 != memcmp(&mCurIQPara, para, sizeof(rk_aiq_sharp_IQPara_V3_t))) {
+        mNewIQPara = *para;
+        updateIQpara = true;
+        waitSignal();
+    }
+
+    mCfgMutex.unlock();
+
+    EXIT_ANALYZER_FUNCTION();
+    return ret;
+}
+
+XCamReturn
+RkAiqAsharpV3HandleInt::getIQPara(rk_aiq_sharp_IQPara_V3_t *para)
+{
+    ENTER_ANALYZER_FUNCTION();
+
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+
+   // rk_aiq_uapi_asharp_GetIQpara(mAlgoCtx, para);
+
+    EXIT_ANALYZER_FUNCTION();
+    return ret;
+}
+
+
+XCamReturn
+RkAiqAsharpV3HandleInt::setStrength(float fPercent)
+{
+    ENTER_ANALYZER_FUNCTION();
+
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+
+    //rk_aiq_uapi_asharp_SetStrength(mAlgoCtx, fPercent);
+
+    EXIT_ANALYZER_FUNCTION();
+    return ret;
+}
+
+
+XCamReturn
+RkAiqAsharpV3HandleInt::getStrength(float *pPercent)
+{
+    ENTER_ANALYZER_FUNCTION();
+
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+
+    //rk_aiq_uapi_asharp_GetStrength(mAlgoCtx, pPercent);
+
+    EXIT_ANALYZER_FUNCTION();
+    return ret;
+}
+
+
+XCamReturn
+RkAiqAsharpV3HandleInt::prepare()
+{
+    ENTER_ANALYZER_FUNCTION();
+
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+
+    ret = RkAiqAsharpHandle::prepare();
+    RKAIQCORE_CHECK_RET(ret, "asharp handle prepare failed");
+
+    RkAiqAlgoConfigAsharpV3Int* asharp_config_int = (RkAiqAlgoConfigAsharpV3Int*)mConfig;
+
+    RkAiqAlgoDescription* des = (RkAiqAlgoDescription*)mDes;
+    ret = des->prepare(mConfig);
+    RKAIQCORE_CHECK_RET(ret, "asharp algo prepare failed");
+
+    EXIT_ANALYZER_FUNCTION();
+    return XCAM_RETURN_NO_ERROR;
+}
+
+XCamReturn
+RkAiqAsharpV3HandleInt::preProcess()
+{
+    ENTER_ANALYZER_FUNCTION();
+
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+
+    RkAiqAlgoPreAsharpV3Int* asharp_pre_int = (RkAiqAlgoPreAsharpV3Int*)mPreInParam;
+    RkAiqAlgoPreResAsharpV3Int* asharp_pre_res_int = (RkAiqAlgoPreResAsharpV3Int*)mPreOutParam;
+    RkAiqCore::RkAiqAlgosShared_t* shared = &mAiqCore->mAlogsSharedParams;
+    RkAiqIspStats* ispStats = &shared->ispStats;
+    RkAiqPreResComb* comb = &shared->preResComb;
+
+    ret = RkAiqAsharpHandle::preProcess();
+    if (ret) {
+        comb->asharp_pre_res = NULL;
+        RKAIQCORE_CHECK_RET(ret, "asharp handle preProcess failed");
+    }
+
+    comb->asharp_pre_res = NULL;
+
+    RkAiqAlgoDescription* des = (RkAiqAlgoDescription*)mDes;
+    ret = des->pre_process(mPreInParam, mPreOutParam);
+    RKAIQCORE_CHECK_RET(ret, "asharp algo pre_process failed");
+    // set result to mAiqCore
+    comb->asharp_pre_res = (RkAiqAlgoPreResAsharp*)asharp_pre_res_int;
+
+    EXIT_ANALYZER_FUNCTION();
+    return XCAM_RETURN_NO_ERROR;
+}
+
+XCamReturn
+RkAiqAsharpV3HandleInt::processing()
+{
+    ENTER_ANALYZER_FUNCTION();
+
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+
+    RkAiqAlgoProcAsharpV3Int* asharp_proc_int = (RkAiqAlgoProcAsharpV3Int*)mProcInParam;
+    RkAiqAlgoProcResAsharpV3Int* asharp_proc_res_int = (RkAiqAlgoProcResAsharpV3Int*)mProcOutParam;
+    RkAiqCore::RkAiqAlgosShared_t* shared = &mAiqCore->mAlogsSharedParams;
+    RkAiqProcResComb* comb = &shared->procResComb;
+    RkAiqIspStats* ispStats = &shared->ispStats;
+    static int asharp_proc_framecnt = 0;
+    asharp_proc_framecnt++;
+
+    ret = RkAiqAsharpHandle::processing();
+    if (ret) {
+        comb->asharp_proc_res = NULL;
+        RKAIQCORE_CHECK_RET(ret, "asharp handle processing failed");
+    }
+
+    comb->asharp_proc_res = NULL;
+
+    // TODO: fill procParam
+    asharp_proc_int->iso = shared->iso;
+    asharp_proc_int->hdr_mode = shared->working_mode;
+
+    RkAiqAlgoDescription* des = (RkAiqAlgoDescription*)mDes;
+    ret = des->processing(mProcInParam, mProcOutParam);
+    RKAIQCORE_CHECK_RET(ret, "asharp algo processing failed");
+
+    comb->asharp_proc_res = (RkAiqAlgoProcResAsharp*)asharp_proc_res_int;
+
+    EXIT_ANALYZER_FUNCTION();
+    return ret;
+}
+
+XCamReturn
+RkAiqAsharpV3HandleInt::postProcess()
+{
+    ENTER_ANALYZER_FUNCTION();
+
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+
+    RkAiqAlgoPostAsharpV3Int* asharp_post_int = (RkAiqAlgoPostAsharpV3Int*)mPostInParam;
+    RkAiqAlgoPostResAsharpV3Int* asharp_post_res_int = (RkAiqAlgoPostResAsharpV3Int*)mPostOutParam;
+    RkAiqCore::RkAiqAlgosShared_t* shared = &mAiqCore->mAlogsSharedParams;
+    RkAiqPostResComb* comb = &shared->postResComb;
+    RkAiqIspStats* ispStats = &shared->ispStats;
+
+    ret = RkAiqAsharpHandle::postProcess();
+    if (ret) {
+        comb->asharp_post_res = NULL;
+        RKAIQCORE_CHECK_RET(ret, "asharp handle postProcess failed");
+        return ret;
+    }
+
+    comb->asharp_post_res = NULL;
+    RkAiqAlgoDescription* des = (RkAiqAlgoDescription*)mDes;
+    ret = des->post_process(mPostInParam, mPostOutParam);
+    RKAIQCORE_CHECK_RET(ret, "asharp algo post_process failed");
+    // set result to mAiqCore
+    comb->asharp_post_res = (RkAiqAlgoPostResAsharp*)asharp_post_res_int ;
+
+    EXIT_ANALYZER_FUNCTION();
+    return ret;
+}
+
+
+void
+RkAiqAynrV2HandleInt::init()
+{
+    ENTER_ANALYZER_FUNCTION();
+
+    RkAiqAynrHandle::deInit();
+    mConfig       = (RkAiqAlgoCom*)(new RkAiqAlgoConfigAynrV2Int());
+    mPreInParam   = (RkAiqAlgoCom*)(new RkAiqAlgoPreAynrV2Int());
+    mPreOutParam  = (RkAiqAlgoResCom*)(new RkAiqAlgoPreResAynrV2Int());
+    mProcInParam  = (RkAiqAlgoCom*)(new RkAiqAlgoProcAynrV2Int());
+    mProcOutParam = (RkAiqAlgoResCom*)(new RkAiqAlgoProcResAynrV2Int());
+    mPostInParam  = (RkAiqAlgoCom*)(new RkAiqAlgoPostAynrV2Int());
+    mPostOutParam = (RkAiqAlgoResCom*)(new RkAiqAlgoPostResAynrV2Int());
+
+    EXIT_ANALYZER_FUNCTION();
+}
+
+
+XCamReturn
+RkAiqAynrV2HandleInt::updateConfig(bool needSync)
+{
+    ENTER_ANALYZER_FUNCTION();
+
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    if (needSync)
+        mCfgMutex.lock();
+    // if something changed
+    if (updateAtt) {
+        mCurAtt = mNewAtt;
+        updateAtt = false;
+        // TODO
+        //rk_aiq_uapi_asharp_SetAttrib_V3(mAlgoCtx, &mCurAtt, false);
+        sendSignal();
+    }
+
+    if(updateIQpara) {
+        mCurIQPara = mNewIQPara;
+        updateIQpara = false;
+        // TODO
+        //rk_aiq_uapi_asharp_SetIQpara_V3(mAlgoCtx, &mCurIQPara, false);
+        sendSignal();
+    }
+
+    if (needSync)
+        mCfgMutex.unlock();
+
+
+    EXIT_ANALYZER_FUNCTION();
+    return ret;
+}
+
+XCamReturn
+RkAiqAynrV2HandleInt::setAttrib(rk_aiq_ynr_attrib_v2_t *att)
+{
+    ENTER_ANALYZER_FUNCTION();
+
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    mCfgMutex.lock();
+    //TODO
+    // check if there is different between att & mCurAtt
+    // if something changed, set att to mNewAtt, and
+    // the new params will be effective later when updateConfig
+    // called by RkAiqCore
+
+    // if something changed
+    if (0 != memcmp(&mCurAtt, att, sizeof(rk_aiq_ynr_attrib_v2_t))) {
+        mNewAtt = *att;
+        updateAtt = true;
+        waitSignal();
+    }
+
+    mCfgMutex.unlock();
+
+    EXIT_ANALYZER_FUNCTION();
+    return ret;
+}
+
+XCamReturn
+RkAiqAynrV2HandleInt::getAttrib(rk_aiq_ynr_attrib_v2_t *att)
+{
+    ENTER_ANALYZER_FUNCTION();
+
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+
+    //rk_aiq_uapi_asharp_GetAttrib(mAlgoCtx, att);
+
+    EXIT_ANALYZER_FUNCTION();
+    return ret;
+}
+
+XCamReturn
+RkAiqAynrV2HandleInt::setIQPara(rk_aiq_ynr_IQPara_V2_t *para)
+{
+    ENTER_ANALYZER_FUNCTION();
+
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    mCfgMutex.lock();
+    //TODO
+    // check if there is different between att & mCurAtt
+    // if something changed, set att to mNewAtt, and
+    // the new params will be effective later when updateConfig
+    // called by RkAiqCore
+
+    // if something changed
+    if (0 != memcmp(&mCurIQPara, para, sizeof(rk_aiq_ynr_IQPara_V2_t))) {
+        mNewIQPara = *para;
+        updateIQpara = true;
+        waitSignal();
+    }
+
+    mCfgMutex.unlock();
+
+    EXIT_ANALYZER_FUNCTION();
+    return ret;
+}
+
+XCamReturn
+RkAiqAynrV2HandleInt::getIQPara(rk_aiq_ynr_IQPara_V2_t *para)
+{
+    ENTER_ANALYZER_FUNCTION();
+
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+
+   // rk_aiq_uapi_asharp_GetIQpara(mAlgoCtx, para);
+
+    EXIT_ANALYZER_FUNCTION();
+    return ret;
+}
+
+
+XCamReturn
+RkAiqAynrV2HandleInt::setStrength(float fPercent)
+{
+    ENTER_ANALYZER_FUNCTION();
+
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+
+    //rk_aiq_uapi_asharp_SetStrength(mAlgoCtx, fPercent);
+
+    EXIT_ANALYZER_FUNCTION();
+    return ret;
+}
+
+
+XCamReturn
+RkAiqAynrV2HandleInt::getStrength(float *pPercent)
+{
+    ENTER_ANALYZER_FUNCTION();
+
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+
+    //rk_aiq_uapi_asharp_GetStrength(mAlgoCtx, pPercent);
+
+    EXIT_ANALYZER_FUNCTION();
+    return ret;
+}
+
+
+XCamReturn
+RkAiqAynrV2HandleInt::prepare()
+{
+    ENTER_ANALYZER_FUNCTION();
+
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+
+    ret = RkAiqAynrHandle::prepare();
+    RKAIQCORE_CHECK_RET(ret, "aynr handle prepare failed");
+
+    RkAiqAlgoConfigAynrV2Int* aynr_config_int = (RkAiqAlgoConfigAynrV2Int*)mConfig;
+
+    RkAiqAlgoDescription* des = (RkAiqAlgoDescription*)mDes;
+    ret = des->prepare(mConfig);
+    RKAIQCORE_CHECK_RET(ret, "aynr algo prepare failed");
+
+    EXIT_ANALYZER_FUNCTION();
+    return XCAM_RETURN_NO_ERROR;
+}
+
+XCamReturn
+RkAiqAynrV2HandleInt::preProcess()
+{
+    ENTER_ANALYZER_FUNCTION();
+
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+
+    RkAiqAlgoPreAynrV2Int* aynr_pre_int = (RkAiqAlgoPreAynrV2Int*)mPreInParam;
+    RkAiqAlgoPreResAynrV2Int* aynr_pre_res_int = (RkAiqAlgoPreResAynrV2Int*)mPreOutParam;
+    RkAiqCore::RkAiqAlgosShared_t* shared = &mAiqCore->mAlogsSharedParams;
+    RkAiqIspStats* ispStats = &shared->ispStats;
+    RkAiqPreResComb* comb = &shared->preResComb;
+
+    ret = RkAiqAynrHandle::preProcess();
+    if (ret) {
+        comb->aynr_pre_res = NULL;
+        RKAIQCORE_CHECK_RET(ret, "aynr handle preProcess failed");
+    }
+
+    comb->aynr_pre_res = NULL;
+
+    RkAiqAlgoDescription* des = (RkAiqAlgoDescription*)mDes;
+    ret = des->pre_process(mPreInParam, mPreOutParam);
+    RKAIQCORE_CHECK_RET(ret, "aynr algo pre_process failed");
+    // set result to mAiqCore
+    comb->aynr_pre_res = (RkAiqAlgoPreResAynr*)aynr_pre_res_int;
+
+    EXIT_ANALYZER_FUNCTION();
+    return XCAM_RETURN_NO_ERROR;
+}
+
+XCamReturn
+RkAiqAynrV2HandleInt::processing()
+{
+    ENTER_ANALYZER_FUNCTION();
+
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+
+    RkAiqAlgoProcAynrV2Int* aynr_proc_int = (RkAiqAlgoProcAynrV2Int*)mProcInParam;
+    RkAiqAlgoProcResAynrV2Int* aynr_proc_res_int = (RkAiqAlgoProcResAynrV2Int*)mProcOutParam;
+    RkAiqCore::RkAiqAlgosShared_t* shared = &mAiqCore->mAlogsSharedParams;
+    RkAiqProcResComb* comb = &shared->procResComb;
+    RkAiqIspStats* ispStats = &shared->ispStats;
+    static int aynr_proc_framecnt = 0;
+    aynr_proc_framecnt++;
+
+    ret = RkAiqAynrHandle::processing();
+    if (ret) {
+        comb->aynr_proc_res = NULL;
+        RKAIQCORE_CHECK_RET(ret, "aynr handle processing failed");
+    }
+
+    comb->aynr_proc_res = NULL;
+
+    // TODO: fill procParam
+    aynr_proc_int->iso = shared->iso;
+    aynr_proc_int->hdr_mode = shared->working_mode;
+
+    RkAiqAlgoDescription* des = (RkAiqAlgoDescription*)mDes;
+    ret = des->processing(mProcInParam, mProcOutParam);
+    RKAIQCORE_CHECK_RET(ret, "aynr algo processing failed");
+
+    comb->aynr_proc_res = (RkAiqAlgoProcResAynr*)aynr_proc_res_int;
+
+    EXIT_ANALYZER_FUNCTION();
+    return ret;
+}
+
+XCamReturn
+RkAiqAynrV2HandleInt::postProcess()
+{
+    ENTER_ANALYZER_FUNCTION();
+
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+
+    RkAiqAlgoPostAynrV2Int* aynr_post_int = (RkAiqAlgoPostAynrV2Int*)mPostInParam;
+    RkAiqAlgoPostResAynrV2Int* aynr_post_res_int = (RkAiqAlgoPostResAynrV2Int*)mPostOutParam;
+    RkAiqCore::RkAiqAlgosShared_t* shared = &mAiqCore->mAlogsSharedParams;
+    RkAiqPostResComb* comb = &shared->postResComb;
+    RkAiqIspStats* ispStats = &shared->ispStats;
+
+    ret = RkAiqAynrHandle::postProcess();
+    if (ret) {
+        comb->aynr_post_res = NULL;
+        RKAIQCORE_CHECK_RET(ret, "aynr handle postProcess failed");
+        return ret;
+    }
+
+    comb->aynr_post_res = NULL;
+    RkAiqAlgoDescription* des = (RkAiqAlgoDescription*)mDes;
+    ret = des->post_process(mPostInParam, mPostOutParam);
+    RKAIQCORE_CHECK_RET(ret, "aynr algo post_process failed");
+    // set result to mAiqCore
+    comb->aynr_post_res = (RkAiqAlgoPostResAynr*)aynr_post_res_int ;
+
+    EXIT_ANALYZER_FUNCTION();
+    return ret;
+}
+
+
+void
+RkAiqAcnrV1HandleInt::init()
+{
+    ENTER_ANALYZER_FUNCTION();
+
+    RkAiqAcnrHandle::deInit();
+    mConfig       = (RkAiqAlgoCom*)(new RkAiqAlgoConfigAcnrV1Int());
+    mPreInParam   = (RkAiqAlgoCom*)(new RkAiqAlgoPreAcnrV1Int());
+    mPreOutParam  = (RkAiqAlgoResCom*)(new RkAiqAlgoPreResAcnrV1Int());
+    mProcInParam  = (RkAiqAlgoCom*)(new RkAiqAlgoProcAcnrV1Int());
+    mProcOutParam = (RkAiqAlgoResCom*)(new RkAiqAlgoProcResAcnrV1Int());
+    mPostInParam  = (RkAiqAlgoCom*)(new RkAiqAlgoPostAcnrV1Int());
+    mPostOutParam = (RkAiqAlgoResCom*)(new RkAiqAlgoPostResAcnrV1Int());
+
+    EXIT_ANALYZER_FUNCTION();
+}
+
+
+XCamReturn
+RkAiqAcnrV1HandleInt::updateConfig(bool needSync)
+{
+    ENTER_ANALYZER_FUNCTION();
+
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    if (needSync)
+        mCfgMutex.lock();
+    // if something changed
+    if (updateAtt) {
+        mCurAtt = mNewAtt;
+        updateAtt = false;
+        // TODO
+        //rk_aiq_uapi_asharp_SetAttrib_V3(mAlgoCtx, &mCurAtt, false);
+        sendSignal();
+    }
+
+    if(updateIQpara) {
+        mCurIQPara = mNewIQPara;
+        updateIQpara = false;
+        // TODO
+        //rk_aiq_uapi_asharp_SetIQpara_V3(mAlgoCtx, &mCurIQPara, false);
+        sendSignal();
+    }
+
+    if (needSync)
+        mCfgMutex.unlock();
+
+
+    EXIT_ANALYZER_FUNCTION();
+    return ret;
+}
+
+XCamReturn
+RkAiqAcnrV1HandleInt::setAttrib(rk_aiq_cnr_attrib_v1_t *att)
+{
+    ENTER_ANALYZER_FUNCTION();
+
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    mCfgMutex.lock();
+    //TODO
+    // check if there is different between att & mCurAtt
+    // if something changed, set att to mNewAtt, and
+    // the new params will be effective later when updateConfig
+    // called by RkAiqCore
+
+    // if something changed
+    if (0 != memcmp(&mCurAtt, att, sizeof(rk_aiq_cnr_attrib_v1_t))) {
+        mNewAtt = *att;
+        updateAtt = true;
+        waitSignal();
+    }
+
+    mCfgMutex.unlock();
+
+    EXIT_ANALYZER_FUNCTION();
+    return ret;
+}
+
+XCamReturn
+RkAiqAcnrV1HandleInt::getAttrib(rk_aiq_cnr_attrib_v1_t *att)
+{
+    ENTER_ANALYZER_FUNCTION();
+
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+
+    //rk_aiq_uapi_asharp_GetAttrib(mAlgoCtx, att);
+
+    EXIT_ANALYZER_FUNCTION();
+    return ret;
+}
+
+XCamReturn
+RkAiqAcnrV1HandleInt::setIQPara(rk_aiq_cnr_IQPara_V1_t *para)
+{
+    ENTER_ANALYZER_FUNCTION();
+
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    mCfgMutex.lock();
+    //TODO
+    // check if there is different between att & mCurAtt
+    // if something changed, set att to mNewAtt, and
+    // the new params will be effective later when updateConfig
+    // called by RkAiqCore
+
+    // if something changed
+    if (0 != memcmp(&mCurIQPara, para, sizeof(rk_aiq_cnr_IQPara_V1_t))) {
+        mNewIQPara = *para;
+        updateIQpara = true;
+        waitSignal();
+    }
+
+    mCfgMutex.unlock();
+
+    EXIT_ANALYZER_FUNCTION();
+    return ret;
+}
+
+XCamReturn
+RkAiqAcnrV1HandleInt::getIQPara(rk_aiq_cnr_IQPara_V1_t *para)
+{
+    ENTER_ANALYZER_FUNCTION();
+
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+
+   // rk_aiq_uapi_asharp_GetIQpara(mAlgoCtx, para);
+
+    EXIT_ANALYZER_FUNCTION();
+    return ret;
+}
+
+
+XCamReturn
+RkAiqAcnrV1HandleInt::setStrength(float fPercent)
+{
+    ENTER_ANALYZER_FUNCTION();
+
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+
+    //rk_aiq_uapi_asharp_SetStrength(mAlgoCtx, fPercent);
+
+    EXIT_ANALYZER_FUNCTION();
+    return ret;
+}
+
+
+XCamReturn
+RkAiqAcnrV1HandleInt::getStrength(float *pPercent)
+{
+    ENTER_ANALYZER_FUNCTION();
+
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+
+    //rk_aiq_uapi_asharp_GetStrength(mAlgoCtx, pPercent);
+
+    EXIT_ANALYZER_FUNCTION();
+    return ret;
+}
+
+
+XCamReturn
+RkAiqAcnrV1HandleInt::prepare()
+{
+    ENTER_ANALYZER_FUNCTION();
+
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+
+    ret = RkAiqAcnrHandle::prepare();
+    RKAIQCORE_CHECK_RET(ret, "acnr handle prepare failed");
+
+    RkAiqAlgoConfigAcnrV1Int* acnr_config_int = (RkAiqAlgoConfigAcnrV1Int*)mConfig;
+
+    RkAiqAlgoDescription* des = (RkAiqAlgoDescription*)mDes;
+    ret = des->prepare(mConfig);
+    RKAIQCORE_CHECK_RET(ret, "acnr algo prepare failed");
+
+    EXIT_ANALYZER_FUNCTION();
+    return XCAM_RETURN_NO_ERROR;
+}
+
+XCamReturn
+RkAiqAcnrV1HandleInt::preProcess()
+{
+    ENTER_ANALYZER_FUNCTION();
+
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+
+    RkAiqAlgoPreAcnrV1Int* acnr_pre_int = (RkAiqAlgoPreAcnrV1Int*)mPreInParam;
+    RkAiqAlgoPreResAcnrV1Int* acnr_pre_res_int = (RkAiqAlgoPreResAcnrV1Int*)mPreOutParam;
+    RkAiqCore::RkAiqAlgosShared_t* shared = &mAiqCore->mAlogsSharedParams;
+    RkAiqIspStats* ispStats = &shared->ispStats;
+    RkAiqPreResComb* comb = &shared->preResComb;
+
+    ret = RkAiqAcnrHandle::preProcess();
+    if (ret) {
+        comb->acnr_pre_res = NULL;
+        RKAIQCORE_CHECK_RET(ret, "acnr handle preProcess failed");
+    }
+
+    comb->acnr_pre_res = NULL;
+
+    RkAiqAlgoDescription* des = (RkAiqAlgoDescription*)mDes;
+    ret = des->pre_process(mPreInParam, mPreOutParam);
+    RKAIQCORE_CHECK_RET(ret, "acnr algo pre_process failed");
+    // set result to mAiqCore
+    comb->acnr_pre_res = (RkAiqAlgoPreResAcnr*)acnr_pre_res_int;
+
+    EXIT_ANALYZER_FUNCTION();
+    return XCAM_RETURN_NO_ERROR;
+}
+
+XCamReturn
+RkAiqAcnrV1HandleInt::processing()
+{
+    ENTER_ANALYZER_FUNCTION();
+
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+
+    RkAiqAlgoProcAcnrV1Int* acnr_proc_int = (RkAiqAlgoProcAcnrV1Int*)mProcInParam;
+    RkAiqAlgoProcResAcnrV1Int* acnr_proc_res_int = (RkAiqAlgoProcResAcnrV1Int*)mProcOutParam;
+    RkAiqCore::RkAiqAlgosShared_t* shared = &mAiqCore->mAlogsSharedParams;
+    RkAiqProcResComb* comb = &shared->procResComb;
+    RkAiqIspStats* ispStats = &shared->ispStats;
+    static int acnr_proc_framecnt = 0;
+    acnr_proc_framecnt++;
+
+    ret = RkAiqAcnrHandle::processing();
+    if (ret) {
+        comb->acnr_proc_res = NULL;
+        RKAIQCORE_CHECK_RET(ret, "acnr handle processing failed");
+    }
+
+    comb->acnr_proc_res = NULL;
+
+    // TODO: fill procParam
+    acnr_proc_int->iso = shared->iso;
+    acnr_proc_int->hdr_mode = shared->working_mode;
+
+    RkAiqAlgoDescription* des = (RkAiqAlgoDescription*)mDes;
+    ret = des->processing(mProcInParam, mProcOutParam);
+    RKAIQCORE_CHECK_RET(ret, "aynr algo processing failed");
+
+    comb->acnr_proc_res = (RkAiqAlgoProcResAcnr*)acnr_proc_res_int;
+
+    EXIT_ANALYZER_FUNCTION();
+    return ret;
+}
+
+XCamReturn
+RkAiqAcnrV1HandleInt::postProcess()
+{
+    ENTER_ANALYZER_FUNCTION();
+
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+
+    RkAiqAlgoPostAcnrV1Int* acnr_post_int = (RkAiqAlgoPostAcnrV1Int*)mPostInParam;
+    RkAiqAlgoPostResAcnrV1Int* acnr_post_res_int = (RkAiqAlgoPostResAcnrV1Int*)mPostOutParam;
+    RkAiqCore::RkAiqAlgosShared_t* shared = &mAiqCore->mAlogsSharedParams;
+    RkAiqPostResComb* comb = &shared->postResComb;
+    RkAiqIspStats* ispStats = &shared->ispStats;
+
+    ret = RkAiqAcnrHandle::postProcess();
+    if (ret) {
+        comb->aynr_post_res = NULL;
+        RKAIQCORE_CHECK_RET(ret, "acnr handle postProcess failed");
+        return ret;
+    }
+
+    comb->acnr_post_res = NULL;
+    RkAiqAlgoDescription* des = (RkAiqAlgoDescription*)mDes;
+    ret = des->post_process(mPostInParam, mPostOutParam);
+    RKAIQCORE_CHECK_RET(ret, "acnr algo post_process failed");
+    // set result to mAiqCore
+    comb->acnr_post_res = (RkAiqAlgoPostResAcnr*)acnr_post_res_int ;
+
+    EXIT_ANALYZER_FUNCTION();
+    return ret;
+}
+
+
+void
+RkAiqArawnrV2HandleInt::init()
+{
+    ENTER_ANALYZER_FUNCTION();
+
+    RkAiqArawnrHandle::deInit();
+    mConfig       = (RkAiqAlgoCom*)(new RkAiqAlgoConfigArawnrV2Int());
+    mPreInParam   = (RkAiqAlgoCom*)(new RkAiqAlgoPreArawnrV2Int());
+    mPreOutParam  = (RkAiqAlgoResCom*)(new RkAiqAlgoPreResArawnrV2Int());
+    mProcInParam  = (RkAiqAlgoCom*)(new RkAiqAlgoProcArawnrV2Int());
+    mProcOutParam = (RkAiqAlgoResCom*)(new RkAiqAlgoProcResArawnrV2Int());
+    mPostInParam  = (RkAiqAlgoCom*)(new RkAiqAlgoPostArawnrV2Int());
+    mPostOutParam = (RkAiqAlgoResCom*)(new RkAiqAlgoPostResArawnrV2Int());
+
+    EXIT_ANALYZER_FUNCTION();
+}
+
+
+XCamReturn
+RkAiqArawnrV2HandleInt::updateConfig(bool needSync)
+{
+    ENTER_ANALYZER_FUNCTION();
+
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    if (needSync)
+        mCfgMutex.lock();
+    // if something changed
+    if (updateAtt) {
+        mCurAtt = mNewAtt;
+        updateAtt = false;
+        // TODO
+        //rk_aiq_uapi_asharp_SetAttrib_V3(mAlgoCtx, &mCurAtt, false);
+        sendSignal();
+    }
+
+    if(updateIQpara) {
+        mCurIQPara = mNewIQPara;
+        updateIQpara = false;
+        // TODO
+        //rk_aiq_uapi_asharp_SetIQpara_V3(mAlgoCtx, &mCurIQPara, false);
+        sendSignal();
+    }
+
+    if (needSync)
+        mCfgMutex.unlock();
+
+
+    EXIT_ANALYZER_FUNCTION();
+    return ret;
+}
+
+XCamReturn
+RkAiqArawnrV2HandleInt::setAttrib(rk_aiq_bayernr_attrib_v2_t *att)
+{
+    ENTER_ANALYZER_FUNCTION();
+
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    mCfgMutex.lock();
+    //TODO
+    // check if there is different between att & mCurAtt
+    // if something changed, set att to mNewAtt, and
+    // the new params will be effective later when updateConfig
+    // called by RkAiqCore
+
+    // if something changed
+    if (0 != memcmp(&mCurAtt, att, sizeof(rk_aiq_bayernr_attrib_v2_t))) {
+        mNewAtt = *att;
+        updateAtt = true;
+        waitSignal();
+    }
+
+    mCfgMutex.unlock();
+
+    EXIT_ANALYZER_FUNCTION();
+    return ret;
+}
+
+XCamReturn
+RkAiqArawnrV2HandleInt::getAttrib(rk_aiq_bayernr_attrib_v2_t *att)
+{
+    ENTER_ANALYZER_FUNCTION();
+
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+
+    //rk_aiq_uapi_asharp_GetAttrib(mAlgoCtx, att);
+
+    EXIT_ANALYZER_FUNCTION();
+    return ret;
+}
+
+XCamReturn
+RkAiqArawnrV2HandleInt::setIQPara(rk_aiq_bayernr_IQPara_V2_t *para)
+{
+    ENTER_ANALYZER_FUNCTION();
+
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    mCfgMutex.lock();
+    //TODO
+    // check if there is different between att & mCurAtt
+    // if something changed, set att to mNewAtt, and
+    // the new params will be effective later when updateConfig
+    // called by RkAiqCore
+
+    // if something changed
+    if (0 != memcmp(&mCurIQPara, para, sizeof(rk_aiq_bayernr_IQPara_V2_t))) {
+        mNewIQPara = *para;
+        updateIQpara = true;
+        waitSignal();
+    }
+
+    mCfgMutex.unlock();
+
+    EXIT_ANALYZER_FUNCTION();
+    return ret;
+}
+
+XCamReturn
+RkAiqArawnrV2HandleInt::getIQPara(rk_aiq_bayernr_IQPara_V2_t *para)
+{
+    ENTER_ANALYZER_FUNCTION();
+
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+
+   // rk_aiq_uapi_asharp_GetIQpara(mAlgoCtx, para);
+
+    EXIT_ANALYZER_FUNCTION();
+    return ret;
+}
+
+
+XCamReturn
+RkAiqArawnrV2HandleInt::setStrength(float fPercent)
+{
+    ENTER_ANALYZER_FUNCTION();
+
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+
+    //rk_aiq_uapi_asharp_SetStrength(mAlgoCtx, fPercent);
+
+    EXIT_ANALYZER_FUNCTION();
+    return ret;
+}
+
+
+XCamReturn
+RkAiqArawnrV2HandleInt::getStrength(float *pPercent)
+{
+    ENTER_ANALYZER_FUNCTION();
+
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+
+    //rk_aiq_uapi_asharp_GetStrength(mAlgoCtx, pPercent);
+
+    EXIT_ANALYZER_FUNCTION();
+    return ret;
+}
+
+
+XCamReturn
+RkAiqArawnrV2HandleInt::prepare()
+{
+    ENTER_ANALYZER_FUNCTION();
+
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+
+    ret = RkAiqArawnrHandle::prepare();
+    RKAIQCORE_CHECK_RET(ret, "arawnr handle prepare failed");
+
+    RkAiqAlgoConfigArawnrV2Int* aynr_config_int = (RkAiqAlgoConfigArawnrV2Int*)mConfig;
+
+    RkAiqAlgoDescription* des = (RkAiqAlgoDescription*)mDes;
+    ret = des->prepare(mConfig);
+    RKAIQCORE_CHECK_RET(ret, "arawnr algo prepare failed");
+
+    EXIT_ANALYZER_FUNCTION();
+    return XCAM_RETURN_NO_ERROR;
+}
+
+XCamReturn
+RkAiqArawnrV2HandleInt::preProcess()
+{
+    ENTER_ANALYZER_FUNCTION();
+
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+
+    RkAiqAlgoPreArawnrV2Int* arawnr_pre_int = (RkAiqAlgoPreArawnrV2Int*)mPreInParam;
+    RkAiqAlgoPreResArawnrV2Int* arawnr_pre_res_int = (RkAiqAlgoPreResArawnrV2Int*)mPreOutParam;
+    RkAiqCore::RkAiqAlgosShared_t* shared = &mAiqCore->mAlogsSharedParams;
+    RkAiqIspStats* ispStats = &shared->ispStats;
+    RkAiqPreResComb* comb = &shared->preResComb;
+
+    ret = RkAiqArawnrHandle::preProcess();
+    if (ret) {
+        comb->arawnr_pre_res = NULL;
+        RKAIQCORE_CHECK_RET(ret, "arawnr handle preProcess failed");
+    }
+
+    comb->arawnr_pre_res = NULL;
+
+    RkAiqAlgoDescription* des = (RkAiqAlgoDescription*)mDes;
+    ret = des->pre_process(mPreInParam, mPreOutParam);
+    RKAIQCORE_CHECK_RET(ret, "arawnr algo pre_process failed");
+    // set result to mAiqCore
+    comb->arawnr_pre_res = (RkAiqAlgoPreResArawnr*)arawnr_pre_res_int;
+
+    EXIT_ANALYZER_FUNCTION();
+    return XCAM_RETURN_NO_ERROR;
+}
+
+XCamReturn
+RkAiqArawnrV2HandleInt::processing()
+{
+    ENTER_ANALYZER_FUNCTION();
+
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+
+    RkAiqAlgoProcArawnrV2Int* arawnr_proc_int = (RkAiqAlgoProcArawnrV2Int*)mProcInParam;
+    RkAiqAlgoProcResArawnrV2Int* arawnr_proc_res_int = (RkAiqAlgoProcResArawnrV2Int*)mProcOutParam;
+    RkAiqCore::RkAiqAlgosShared_t* shared = &mAiqCore->mAlogsSharedParams;
+    RkAiqProcResComb* comb = &shared->procResComb;
+    RkAiqIspStats* ispStats = &shared->ispStats;
+    static int arawnr_proc_framecnt = 0;
+    arawnr_proc_framecnt++;
+
+    ret = RkAiqArawnrHandle::processing();
+    if (ret) {
+        comb->arawnr_proc_res = NULL;
+        RKAIQCORE_CHECK_RET(ret, "aynr handle processing failed");
+    }
+
+    comb->arawnr_proc_res = NULL;
+
+    // TODO: fill procParam
+    arawnr_proc_int->iso = shared->iso;
+    arawnr_proc_int->hdr_mode = shared->working_mode;
+
+    RkAiqAlgoDescription* des = (RkAiqAlgoDescription*)mDes;
+    ret = des->processing(mProcInParam, mProcOutParam);
+    RKAIQCORE_CHECK_RET(ret, "aynr algo processing failed");
+
+    comb->arawnr_proc_res = (RkAiqAlgoProcResArawnr*)arawnr_proc_res_int;
+
+    EXIT_ANALYZER_FUNCTION();
+    return ret;
+}
+
+XCamReturn
+RkAiqArawnrV2HandleInt::postProcess()
+{
+    ENTER_ANALYZER_FUNCTION();
+
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+
+    RkAiqAlgoPostArawnrV2Int* arawnr_post_int = (RkAiqAlgoPostArawnrV2Int*)mPostInParam;
+    RkAiqAlgoPostResArawnrV2Int* arawnr_post_res_int = (RkAiqAlgoPostResArawnrV2Int*)mPostOutParam;
+    RkAiqCore::RkAiqAlgosShared_t* shared = &mAiqCore->mAlogsSharedParams;
+    RkAiqPostResComb* comb = &shared->postResComb;
+    RkAiqIspStats* ispStats = &shared->ispStats;
+
+    ret = RkAiqArawnrHandle::postProcess();
+    if (ret) {
+        comb->aynr_post_res = NULL;
+        RKAIQCORE_CHECK_RET(ret, "arawnr handle postProcess failed");
+        return ret;
+    }
+
+    comb->aynr_post_res = NULL;
+    RkAiqAlgoDescription* des = (RkAiqAlgoDescription*)mDes;
+    ret = des->post_process(mPostInParam, mPostOutParam);
+    RKAIQCORE_CHECK_RET(ret, "arawnr algo post_process failed");
+    // set result to mAiqCore
+    comb->arawnr_post_res = (RkAiqAlgoPostResArawnr*)arawnr_post_res_int ;
+
+    EXIT_ANALYZER_FUNCTION();
+    return ret;
+}
+
+
 }; //namespace RkCam

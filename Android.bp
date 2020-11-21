@@ -2,6 +2,19 @@ subdirs = [
 	"algos",
 ]
 
+cc_prebuilt_library_static {
+    name: "libgenMeshLib",
+    vendor: true,
+    arch: {
+        arm: {
+            srcs: ["common/gen_mesh/android/genMesh_static_32bit/libgenMeshLib.a"],
+        },
+        arm64: {
+            srcs: ["common/gen_mesh/android/genMesh_static_64bit/libgenMeshLib.a"],
+        },
+    },
+}
+
 cc_library_shared {
 	name: "librkaiq",
 	vendor: true,
@@ -26,21 +39,21 @@ cc_library_shared {
 		"include/common/mediactl",
     ],
     export_include_dirs: [
-            "xcore",
-            "xcore/base",
-            "aiq_core",
-            "algos",
-            "iq_parser",
-            "uAPI",
-            "common",
-            "include",
-            "include/iq_parser",
-            "include/uAPI",
-            "include/xcore",
-            "include/common",
-            "include/common/mediactl",
-            "include/xcore/base",
-            "include/algos",
+                    "xcore",
+                    "xcore/base",
+                    "aiq_core",
+                    "algos",
+                    "iq_parser",
+                    "uAPI",
+                    "common",
+                    "include",
+                    "include/iq_parser",
+                    "include/uAPI",
+                    "include/xcore",
+                    "include/common",
+                    "include/common/mediactl",
+                    "include/xcore/base",
+                    "include/algos",
     ],
 
     header_libs: [
@@ -105,6 +118,7 @@ cc_library_shared {
 		
 		"RkAiqManager.cpp",
         "common/mediactl/mediactl.c",
+        "common/gen_mesh/genMesh.cpp",
     ],
 
 	static_libs: [
@@ -124,7 +138,7 @@ cc_library_shared {
         "librkaiq_adebayer",
         "librkaiq_adpcc",
         "librkaiq_afec",
-		"librkaiq_agamma",
+        "librkaiq_agamma",
         "librkaiq_agic",
         "librkaiq_aie",
         "librkaiq_aldch",
@@ -132,6 +146,12 @@ cc_library_shared {
         "librkaiq_aorb",
         "librkaiq_ar2y",
         "librkaiq_awdr",
+        "librkaiq_adrc",
+        "librkaiq_asharp_v3",
+        "librkaiq_aynr_v2",
+        "librkaiq_acnr_v1",
+        "librkaiq_arawnr_v2",
+        "libgenMeshLib",
     ],
 	
 	 cflags: [

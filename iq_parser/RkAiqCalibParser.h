@@ -23,7 +23,7 @@
 #include "RkAiqCalibDbTypes.h"
 #include "RkAiqCalibTag.h"
 #include "xmltags.h"
-#include "../../iq_parser/RkAiqCalibApi.h"
+#include "RkAiqCalibApi.h"
 
 using namespace tinyxml2;
 
@@ -203,6 +203,9 @@ private:
     bool parseEntrySensorAhdrTmoDetailsLowLight(const XMLElement* pelement, void* param = NULL);
     bool parseEntrySensorAhdrLocalTMO(const XMLElement* pelement, void* param = NULL);
     bool parseEntrySensorAhdrGlobalTMO(const XMLElement* pelement, void* param = NULL);
+	bool parseEntrySensorDrc(const XMLElement* pelement, void* param = NULL);
+	bool parseEntrySensorDrcCalibPara(const XMLElement* pelement, void* param = NULL);
+	bool parseEntrySensorDrcTuningPara(const XMLElement* pelement, void* param = NULL);
     bool parseEntrySensorBlcModeCell(const XMLElement* pelement, void* param = NULL);
     bool parseEntrySensorBlc(const XMLElement* pelement, void* param = NULL);
     bool parseEntrySensorLut3d(const XMLElement* pelement, void* param = NULL);
@@ -295,6 +298,70 @@ private:
     bool parseEntrySystemExpDelay(const XMLElement* pelement, void* param = NULL);
     bool parseEntrySystem(const XMLElement*, void* param = NULL);
 
+	bool parseEntrySensorBayernrV2
+	(
+	    const XMLElement* pelement,
+	    void* param = NULL
+	) ;
+
+	bool parseEntryBayernrV2Setting_2D
+	(
+		const XMLElement*	pelement,
+		void*				 param,
+		int 				 index
+	);
+
+	bool parseEntryBayernrV2Setting_3D
+	(
+		const XMLElement*	pelement,
+		void*				 param,
+		int 				 index
+	);
+
+	bool parseEntrySensorBayernrV2Setting2D
+	(
+		const XMLElement*	pelement,
+		void*				 param
+	);
+
+	bool parseEntrySensorBayernrV2Setting3D
+	(
+		const XMLElement*	pelement,
+		void*				 param
+	);
+	bool parseEntrySensorYnrV2
+	(
+	    const XMLElement* pelement,
+	    void* param
+	);
+	bool parseEntryYnrV2Setting
+	(
+	    const XMLElement*   pelement,
+	    void*                param,
+	    int                  index
+	);
+	bool parseEntrySensorCnrV1
+	(
+	    const XMLElement* pelement,
+	    void* param
+	);
+	bool parseEntryCnrV1Setting
+	(
+	    const XMLElement*   pelement,
+	    void*                param,
+	    int                  index
+	);
+	bool parseEntrySharpV3Setting
+	(
+	    const XMLElement*   pelement,
+	    void*                param,
+	    int                  index
+	);
+	bool parseEntrySensorSharpV3
+	(
+	    const XMLElement* pelement,
+	    void* param
+	);
 public:
     explicit RkAiqCalibParser(CamCalibDbContext_t *pCalibDb);
     virtual ~RkAiqCalibParser();

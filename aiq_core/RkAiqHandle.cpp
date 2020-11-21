@@ -624,7 +624,7 @@ RkAiqAhdrHandle::preProcess()
         // TODO: keep last result ?
         //         comb->ahdr_proc_res = NULL;
         //
-        return XCAM_RETURN_BYPASS;
+        //return XCAM_RETURN_BYPASS;
     }
     // TODO config common ahdr preprocess params
 
@@ -656,7 +656,7 @@ RkAiqAhdrHandle::processing()
         // TODO: keep last result ?
         //         comb->ahdr_proc_res = NULL;
         //
-        return XCAM_RETURN_BYPASS;
+        //return XCAM_RETURN_BYPASS;
     }
     // TODO config common ahdr processing params
 
@@ -689,7 +689,7 @@ RkAiqAhdrHandle::postProcess()
         // TODO: keep last result ?
         //         comb->ahdr_proc_res = NULL;
         //
-        return XCAM_RETURN_BYPASS;
+        //return XCAM_RETURN_BYPASS;
     }
     // TODO config common ahdr postProcess params
 

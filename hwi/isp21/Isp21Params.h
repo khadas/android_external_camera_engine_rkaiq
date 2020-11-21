@@ -59,6 +59,8 @@ private:
                                     rk_aiq_isp_ynr_v21_t& ynr);
     void convertAiqSharpenToIsp21Params(struct isp21_isp_params_cfg& isp_cfg,
                                         rk_aiq_isp_sharp_v21_t& sharp);
+	void convertAiqDrcToIsp21Params(struct isp21_isp_params_cfg& isp_cfg,
+                                        rk_aiq_isp_drc_v21_t& adrc_data);
 };
 
 };

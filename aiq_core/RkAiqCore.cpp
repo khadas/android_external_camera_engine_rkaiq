@@ -27,6 +27,7 @@
 #include "anr/rk_aiq_algo_anr_itf.h"
 #include "asd/rk_aiq_algo_asd_itf.h"
 #include "ahdr/rk_aiq_algo_ahdr_itf.h"
+#include "adrc/rk_aiq_algo_adrc_itf.h"
 #include "asharp/rk_aiq_algo_asharp_itf.h"
 #include "adehaze/rk_aiq_algo_adhaz_itf.h"
 #include "ablc/rk_aiq_algo_ablc_itf.h"
@@ -86,6 +87,7 @@ static struct RkAiqAlgoDesCommExt g_default_3a_des[] = {
     { (RkAiqAlgoDesComm*)&g_RkIspAlgoDescAfec, 0, 0 },
     { (RkAiqAlgoDesComm*)&g_RkIspAlgoDescAcgc, 0, 0 },
     { (RkAiqAlgoDesComm*)&g_RkIspAlgoDescAsd, 0, 0 },
+    // { (RkAiqAlgoDesComm*)&g_RkIspAlgoDescAdrc, 0,0 },
     { NULL, 0, 0 },
 };
 
@@ -1762,10 +1764,78 @@ RkAiqCore::genIspAdrcResult(RkAiqFullParams* params)
 {
     ENTER_ANALYZER_FUNCTION();
 
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    RkAiqAlgoProcResAdrc* adrc_com =
+        mAlogsSharedParams.procResComb.adrc_proc_res;
+    rk_aiq_isp_params_v20_t* isp_param =
+        static_cast<rk_aiq_isp_params_v20_t*>(params->mIspParams->data().ptr());
+
+    if (!adrc_com) {
+        LOGD_ANALYZER("no adrc result");
+        return XCAM_RETURN_NO_ERROR;
+    }
+
+    // TODO: gen ahdr common result
+
+    SmartPtr<RkAiqHandle>* handle = getCurAlgoTypeHandle(RK_AIQ_ALGO_TYPE_ADRC);
+    int algo_id = (*handle)->getAlgoId();
+
+    // gen rk ahdr result
+    if (algo_id == 0) {
+        RkAiqAlgoProcResAdrcInt* ahdr_rk = (RkAiqAlgoProcResAdrcInt*)adrc_com;
+
+    
+       isp_param->drc.DrcProcRes.sw_drc_offset_pow2     = ahdr_rk->AdrcProcRes.DrcProcRes.sw_drc_offset_pow2;
+    isp_param->drc.DrcProcRes.sw_drc_compres_scl  = ahdr_rk->AdrcProcRes.DrcProcRes.sw_drc_compres_scl;
+    isp_param->drc.DrcProcRes.sw_drc_position  = ahdr_rk->AdrcProcRes.DrcProcRes.sw_drc_position;
+    isp_param->drc.DrcProcRes.sw_drc_delta_scalein        = ahdr_rk->AdrcProcRes.DrcProcRes.sw_drc_delta_scalein;
+    isp_param->drc.DrcProcRes.sw_drc_hpdetail_ratio      = ahdr_rk->AdrcProcRes.DrcProcRes.sw_drc_hpdetail_ratio;
+    isp_param->drc.DrcProcRes.sw_drc_lpdetail_ratio     = ahdr_rk->AdrcProcRes.DrcProcRes.sw_drc_lpdetail_ratio;
+    isp_param->drc.DrcProcRes.sw_drc_weicur_pix      = ahdr_rk->AdrcProcRes.DrcProcRes.sw_drc_weicur_pix;
+    isp_param->drc.DrcProcRes.sw_drc_weipre_frame  = ahdr_rk->AdrcProcRes.DrcProcRes.sw_drc_weipre_frame;
+    isp_param->drc.DrcProcRes.sw_drc_force_sgm_inv0   = ahdr_rk->AdrcProcRes.DrcProcRes.sw_drc_force_sgm_inv0;
+    isp_param->drc.DrcProcRes.sw_drc_motion_scl     = ahdr_rk->AdrcProcRes.DrcProcRes.sw_drc_motion_scl;
+    isp_param->drc.DrcProcRes.sw_drc_edge_scl   = ahdr_rk->AdrcProcRes.DrcProcRes.sw_drc_edge_scl;
+    isp_param->drc.DrcProcRes.sw_drc_space_sgm_inv1    = ahdr_rk->AdrcProcRes.DrcProcRes.sw_drc_space_sgm_inv1;
+    isp_param->drc.DrcProcRes.sw_drc_space_sgm_inv0     = ahdr_rk->AdrcProcRes.DrcProcRes.sw_drc_range_sgm_inv1;
+    isp_param->drc.DrcProcRes.sw_drc_range_sgm_inv1     = ahdr_rk->AdrcProcRes.DrcProcRes.sw_drc_range_sgm_inv0;
+    isp_param->drc.DrcProcRes.sw_drc_range_sgm_inv0 = ahdr_rk->AdrcProcRes.DrcProcRes.sw_drc_space_sgm_inv0;
+    isp_param->drc.DrcProcRes.sw_drc_weig_maxl    = ahdr_rk->AdrcProcRes.DrcProcRes.sw_drc_weig_maxl;
+    isp_param->drc.DrcProcRes.sw_drc_weig_bilat  = ahdr_rk->AdrcProcRes.DrcProcRes.sw_drc_weig_bilat;
+    isp_param->drc.DrcProcRes.sw_drc_iir_weight  = ahdr_rk->AdrcProcRes.DrcProcRes.sw_drc_iir_weight;
+    isp_param->drc.DrcProcRes.sw_drc_min_ogain  = ahdr_rk->AdrcProcRes.DrcProcRes.sw_drc_min_ogain;
+	for(int i=0;i<17;i++){
+    isp_param->drc.DrcProcRes.sw_drc_gain_y[i]    = ahdr_rk->AdrcProcRes.DrcProcRes.sw_drc_gain_y[i];
+    isp_param->drc.DrcProcRes.sw_drc_compres_y[i]    = ahdr_rk->AdrcProcRes.DrcProcRes.sw_drc_compres_y[i];
+    isp_param->drc.DrcProcRes.sw_drc_scale_y[i]    = ahdr_rk->AdrcProcRes.DrcProcRes.sw_drc_scale_y[i];
+		}
+          
+        
+        isp_param->drc.isHdrGlobalTmo =
+            ahdr_rk->AdrcProcRes.isHdrGlobalTmo;
+
+        isp_param->drc.bTmoEn =
+            ahdr_rk->AdrcProcRes.bTmoEn;
+
+        isp_param->drc.isLinearTmo =
+            ahdr_rk->AdrcProcRes.isLinearTmo;
+
+		LOGE("sw_drc_offset_pow2 %d", isp_param->drc.DrcProcRes.sw_drc_offset_pow2);
+		LOGE("sw_drc_compres_scl %d", isp_param->drc.DrcProcRes.sw_drc_compres_scl);
+		LOGE("sw_drc_position %d", isp_param->drc.DrcProcRes.sw_drc_position);
+		LOGE("sw_drc_delta_scalein %d", isp_param->drc.DrcProcRes.sw_drc_delta_scalein);
+		LOGE("sw_drc_hpdetail_ratio %d", isp_param->drc.DrcProcRes.sw_drc_hpdetail_ratio);
+		LOGE("sw_drc_lpdetail_ratio %d", isp_param->drc.DrcProcRes.sw_drc_lpdetail_ratio);
+		LOGE("sw_drc_weicur_pix %d", isp_param->drc.DrcProcRes.sw_drc_weicur_pix);
+		
+
+    }
+
     EXIT_ANALYZER_FUNCTION();
 
-    return XCAM_RETURN_NO_ERROR;
+    return ret;
 }
+
 
 XCamReturn
 RkAiqCore::pushStats(SmartPtr<VideoBuffer> &buffer)

@@ -146,6 +146,7 @@
 
 #define ISP2X_CCM_CURVE_NUM     17
 
+
 /* WDR */
 #define ISP2X_WDR_SIZE          48
 
@@ -586,7 +587,7 @@ struct isp2x_hdrtmo_cfg {
     u16 maxgain;
     u16 maxpalpha;
 } __attribute__ ((packed));
-
+ 
 struct isp2x_hdrtmo_stat {
     u16 lglow;
     u16 lgmin;
@@ -1435,7 +1436,7 @@ struct isp2x_isp_other_cfg {
     struct isp2x_superimp_cfg superimp_cfg;
     struct isp2x_sdg_cfg sdg_cfg;
     struct isp2x_bdm_config bdm_cfg;
-    struct isp2x_hdrtmo_cfg hdrtmo_cfg;
+    struct isp2x_hdrtmo_cfg hdrtmo_cfg; 
     struct isp2x_dhaz_cfg dhaz_cfg;
     struct isp2x_gain_cfg gain_cfg;
     struct isp2x_3dlut_cfg isp3dlut_cfg;

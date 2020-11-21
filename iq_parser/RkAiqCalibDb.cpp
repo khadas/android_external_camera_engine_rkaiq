@@ -22,6 +22,8 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <stdio.h>
+#include "RkAiqCalibApi.h"
+
 
 #define FUNC_ENTER LOG1("%s enter", __FUNCTION__);
 #define FUNC_EXIT LOG1("%s exit", __FUNCTION__);
@@ -223,6 +225,8 @@ void RkAiqCalibDb::releaseCalibDb()
             clear_list(&pCalibDb->awb_adjust_para);
             clear_list(&pCalibDb->awb_calib_para_v200);
             clear_list(&pCalibDb->awb_calib_para_v201);
+
+			CamCalibDbRelease(pCalibDb);
             LOGI("releaseCalibDb!");
             delete pCalibDb;
         }

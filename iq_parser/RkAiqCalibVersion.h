@@ -134,8 +134,8 @@
  *  - split  mCalibDb->awb into calib para and adjust para
  */
 
-#define RK_AIQ_CALIB_VERSION_REAL_V          "v1.4.3"
-#define RK_AIQ_CALIB_VERSION_MAGIC_V         "1088858"
+#define RK_AIQ_CALIB_VERSION_REAL_V          "v1.4.4"
+#define RK_AIQ_CALIB_VERSION_MAGIC_V         "1255543"
 
 
 /******* DO NOT EDIT THE FOLLOWINGS ***********/

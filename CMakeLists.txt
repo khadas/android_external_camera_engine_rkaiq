@@ -76,6 +76,7 @@ uAPI
 #../core/inc/orb
 #../core/inc/common
 ./
+./common/
 include
 include/common
 include/common/mediactl
@@ -98,6 +99,7 @@ include/algos/afec
 include/algos/agamma
 include/algos/agic
 include/algos/ahdr
+include/algos/adrc
 include/algos/aie
 include/algos/aldch
 include/algos/alsc
@@ -108,6 +110,9 @@ include/algos/asd
 include/algos/asharp
 include/algos/awb
 include/algos/awdr
+include/algos/asharp3
+include/algos/aynr2
+include/algos/acnr
 include/common/gen_mesh
 )
 #source directory
@@ -230,11 +235,11 @@ if(GENMESH_ONLINE)
     set (GENMESH_LIBS genMeshLib)
 	if(ARCH STREQUAL "aarch64")
 		set (GENMESH_LIBS_DIR
-			${PROJECT_SOURCE_DIR}/common/gen_mesh/genMesh_static_64bit/
+			${PROJECT_SOURCE_DIR}/common/gen_mesh/linux/genMesh_static_64bit/
 			)
 	else()
 		set (GENMESH_LIBS_DIR
-			${PROJECT_SOURCE_DIR}/common/gen_mesh/genMesh_static_32bit/
+			${PROJECT_SOURCE_DIR}/common/gen_mesh/linux/genMesh_static_32bit/
 			)
 	endif()
     add_compile_options(-DGENMESH_ONLINE)
@@ -296,7 +301,7 @@ link_directories("${LIBRARY_OUTPUT_PATH}")
 target_link_libraries(rkaiq rkaiq_ae rkaiq_awb rkaiq_af rkaiq_anr rkaiq_asd rkaiq_ahdr
 	rkaiq_acp rkaiq_asharp rkaiq_adhaz rkaiq_a3dlut rkaiq_ablc rkaiq_accm rkaiq_acgc
 	rkaiq_adebayer rkaiq_adpcc rkaiq_afec rkaiq_agamma rkaiq_agic rkaiq_aie rkaiq_aldch
-	rkaiq_alsc rkaiq_aorb rkaiq_ar2y rkaiq_awdr ${OPENCV_LIBS}
+	rkaiq_alsc rkaiq_aorb rkaiq_ar2y rkaiq_awdr rkaiq_adrc rkaiq_asharp_v3 rkaiq_aynr_v2 rkaiq_acnr_v1 rkaiq_arawnr_v2 ${OPENCV_LIBS}
 	${OPENCV_3RDPARTY_LIBS} ${GENMESH_LIBS} ${LINK_ASAN} pthread)
 
 set (VERSIONFILEPATH ${PROJECT_SOURCE_DIR}/)

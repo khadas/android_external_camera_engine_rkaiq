@@ -1283,7 +1283,6 @@ struct v4l2_bt_timings {
 #define V4L2_DV_BT_STD_DMT  (1 << 1)  /* VESA Discrete Monitor Timings */
 #define V4L2_DV_BT_STD_CVT  (1 << 2)  /* VESA Coordinated Video Timings */
 #define V4L2_DV_BT_STD_GTF  (1 << 3)  /* VESA Generalized Timings Formula */
-#define V4L2_DV_BT_STD_SDI (1 << 4)    /* SDI Timings */
 
 /* Flags */
 
@@ -1315,36 +1314,6 @@ struct v4l2_bt_timings {
  * use the range 16-235) as opposed to 0-255. All formats defined in CEA-861
  * except for the 640x480 format are CE formats. */
 #define V4L2_DV_FL_IS_CE_VIDEO          (1 << 4)
-/* Some formats like SMPTE-125M have an interlaced signal with a odd
- * total height. For these formats, if this flag is set, the first
- * field has the extra line. If not, it is the second field.
- */
-#define V4L2_DV_FL_FIRST_FIELD_EXTRA_LINE (1 << 5)
-/*
- * If set, then the picture_aspect field is valid. Otherwise assume that the
- * pixels are square, so the picture aspect ratio is the same as the width to
- * height ratio.
- */
-#define V4L2_DV_FL_HAS_PICTURE_ASPECT (1 << 6)
-/*
- * If set, then the cea861_vic field is valid and contains the Video
- * Identification Code as per the CEA-861 standard.
- */
-#define V4L2_DV_FL_HAS_CEA861_VIC (1 << 7)
-/*
- * If set, then the hdmi_vic field is valid and contains the Video
- * Identification Code as per the HDMI standard (HDMI Vendor Specific
- * InfoFrame).
- */
-#define V4L2_DV_FL_HAS_HDMI_VIC (1 << 8)
-/*
- * CEA-861 specific: only valid for video receivers.
- * If set, then HW can detect the difference between regular FPS and
- * 1000/1001 FPS. Note: This flag is only valid for HDMI VIC codes with
- * the V4L2_DV_FL_CAN_REDUCE_FPS flag set.
- */
-#define V4L2_DV_FL_CAN_DETECT_REDUCED_FPS (1 << 9)
-
 
 /* A few useful defines to calculate the total blanking and frame sizes */
 #define V4L2_DV_BT_BLANKING_WIDTH(bt) \

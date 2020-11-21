@@ -34,12 +34,12 @@ endif()
 
 if(ADD_RK_AIQ)
 add_compile_options(-DADD_RK_AIQ)
-SET(RK_AIQ_LIB_DIR ${PROJECT_SOURCE_DIR}/../rk_aiq/build/linux/all_lib/${CMAKE_BUILD_TYPE})
+SET(RK_AIQ_LIB_DIR ${PROJECT_SOURCE_DIR}/../../build/linux/all_lib/${CMAKE_BUILD_TYPE})
 message("rkaiq lib path" ${RK_AIQ_LIB_DIR})
 SET(RK_AIQ_LIB rkaiq)
 endif()
 
-set(RK_AIQ_SOURCE_DIR ${PROJECT_SOURCE_DIR}/../rk_aiq)
+set(RK_AIQ_SOURCE_DIR ${PROJECT_SOURCE_DIR}/../../)
 message("rkaiq src path" ${RK_AIQ_SOURCE_DIR})
 #head file path
 include_directories(
@@ -63,6 +63,7 @@ set (DIR_SRCS
 	${RK_AIQ_SOURCE_DIR}/iq_parser/tinyxml2.cpp
 	${RK_AIQ_SOURCE_DIR}/iq_parser/xmltags.cpp
 	${RK_AIQ_SOURCE_DIR}/xcore/xcam_log.cpp
+	${RK_AIQ_SOURCE_DIR}/iq_parser/RkAiqCalibApi.cpp
     )
 
 # set output binary path

@@ -116,17 +116,17 @@ RESULT MergeGetCurrIOData
 
     pAhdrCtx->AhdrProcRes.MgeProcRes.sw_hdrmge_gain2 = (int)SHIFT6BIT(pAhdrCtx->CurrHandleData.CurrL2L_Ratio);
 
-    LOGV_AHDR("%s:  Merge set IOdata to register:\n", __FUNCTION__);
-    LOGV_AHDR("%s:  sw_hdrmge_mode:%d \n", __FUNCTION__, pAhdrCtx->AhdrProcRes.MgeProcRes.sw_hdrmge_mode);
-    LOGV_AHDR("%s:  sw_hdrmge_ms_dif_0p8:%d \n", __FUNCTION__, pAhdrCtx->AhdrProcRes.MgeProcRes.sw_hdrmge_ms_dif_0p8);
-    LOGV_AHDR("%s:  sw_hdrmge_lm_dif_0p9:%d \n", __FUNCTION__, pAhdrCtx->AhdrProcRes.MgeProcRes.sw_hdrmge_lm_dif_0p9);
-    LOGV_AHDR("%s:  sw_hdrmge_ms_dif_0p15:%d \n", __FUNCTION__, pAhdrCtx->AhdrProcRes.MgeProcRes.sw_hdrmge_ms_dif_0p15);
-    LOGV_AHDR("%s:  sw_hdrmge_gain1:%d \n", __FUNCTION__, pAhdrCtx->AhdrProcRes.MgeProcRes.sw_hdrmge_gain1);
-    LOGV_AHDR("%s:  sw_hdrmge_gain1_inv:%d \n", __FUNCTION__, pAhdrCtx->AhdrProcRes.MgeProcRes.sw_hdrmge_gain1_inv);
-    LOGV_AHDR("%s:  sw_hdrmge_gain2:%d \n", __FUNCTION__, pAhdrCtx->AhdrProcRes.MgeProcRes.sw_hdrmge_gain2);
-    LOGV_AHDR("%s:  sw_hdrmge_gain0:%d \n", __FUNCTION__, pAhdrCtx->AhdrProcRes.MgeProcRes.sw_hdrmge_gain0);
-    LOGV_AHDR("%s:  sw_hdrmge_gain0_inv:%d \n", __FUNCTION__, pAhdrCtx->AhdrProcRes.MgeProcRes.sw_hdrmge_gain0_inv);
-    LOGV_AHDR("%s:  sw_hdrmge_lm_dif_0p15:%d \n", __FUNCTION__, pAhdrCtx->AhdrProcRes.MgeProcRes.sw_hdrmge_lm_dif_0p15);
+    LOGD_AHDR("%s:  Merge set IOdata to register:\n", __FUNCTION__);
+    LOGD_AHDR("%s:  sw_hdrmge_mode:%d \n", __FUNCTION__, pAhdrCtx->AhdrProcRes.MgeProcRes.sw_hdrmge_mode);
+    LOGD_AHDR("%s:  sw_hdrmge_ms_dif_0p8:%d \n", __FUNCTION__, pAhdrCtx->AhdrProcRes.MgeProcRes.sw_hdrmge_ms_dif_0p8);
+    LOGD_AHDR("%s:  sw_hdrmge_lm_dif_0p9:%d \n", __FUNCTION__, pAhdrCtx->AhdrProcRes.MgeProcRes.sw_hdrmge_lm_dif_0p9);
+    LOGD_AHDR("%s:  sw_hdrmge_ms_dif_0p15:%d \n", __FUNCTION__, pAhdrCtx->AhdrProcRes.MgeProcRes.sw_hdrmge_ms_dif_0p15);
+    LOGD_AHDR("%s:  sw_hdrmge_gain1:%d \n", __FUNCTION__, pAhdrCtx->AhdrProcRes.MgeProcRes.sw_hdrmge_gain1);
+    LOGD_AHDR("%s:  sw_hdrmge_gain1_inv:%d \n", __FUNCTION__, pAhdrCtx->AhdrProcRes.MgeProcRes.sw_hdrmge_gain1_inv);
+    LOGD_AHDR("%s:  sw_hdrmge_gain2:%d \n", __FUNCTION__, pAhdrCtx->AhdrProcRes.MgeProcRes.sw_hdrmge_gain2);
+    LOGD_AHDR("%s:  sw_hdrmge_gain0:%d \n", __FUNCTION__, pAhdrCtx->AhdrProcRes.MgeProcRes.sw_hdrmge_gain0);
+    LOGD_AHDR("%s:  sw_hdrmge_gain0_inv:%d \n", __FUNCTION__, pAhdrCtx->AhdrProcRes.MgeProcRes.sw_hdrmge_gain0_inv);
+    LOGD_AHDR("%s:  sw_hdrmge_lm_dif_0p15:%d \n", __FUNCTION__, pAhdrCtx->AhdrProcRes.MgeProcRes.sw_hdrmge_lm_dif_0p15);
     for(int i = 0; i < 17; i++)
         LOGV_AHDR("%s:  sw_hdrmge_e_y[%d]:%d \n", __FUNCTION__, i, pAhdrCtx->AhdrProcRes.MgeProcRes.sw_hdrmge_e_y[i]);
     for(int i = 0; i < 17; i++)

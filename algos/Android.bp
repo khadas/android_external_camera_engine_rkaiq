@@ -21,7 +21,8 @@ cc_defaults {
         "-Wno-unused-parameter",
         "-Wno-extern-c-compat",
 		"-Wno-missing-braces",
-		"-Wno-missing-field-initializers"
+		"-Wno-missing-field-initializers", 
+        "-DGENMESH_ONLINE"
 	],
 	include_dirs: [
 		"external/camera_engine_rkaiq/include/algos",
@@ -258,6 +259,20 @@ cc_library_static {
 }
 
 cc_library_static {
+	name: "librkaiq_adrc",
+	vendor: true,
+	defaults: ["algo_defaults"],	
+	
+	include_dirs: [
+		"external/camera_engine_rkaiq/include/algos/adrc",
+	],
+	srcs: [
+		"adrc/rk_aiq_algo_adrc_itf.cpp",
+		"adrc/rk_aiq_adrc_algo.cpp",
+	],
+}
+
+cc_library_static {
 	name: "librkaiq_anr",
 	vendor: true,
 	defaults: ["algo_defaults"],	
@@ -330,5 +345,69 @@ cc_library_static {
 	
 	srcs: [
 		"acgc/rk_aiq_algo_acgc_itf.cpp",
+	],
+}
+
+cc_library_static {
+	name: "librkaiq_asharp_v3",
+	vendor: true,
+	defaults: ["algo_defaults"],	
+	
+	include_dirs: [
+		"external/camera_engine_rkaiq/include/algos/asharp3",
+	],
+	srcs: [
+		"asharp3/rk_aiq_asharp_algo_itf_v3.cpp",
+		"asharp3/rk_aiq_asharp_algo_sharp_v3.cpp",
+		"asharp3/rk_aiq_asharp_algo_v3.cpp",
+		"asharp3/rk_aiq_uapi_asharp_int_v3.cpp",
+	],
+}
+
+cc_library_static {
+	name: "librkaiq_aynr_v2",
+	vendor: true,
+	defaults: ["algo_defaults"],	
+	
+	include_dirs: [
+		"external/camera_engine_rkaiq/include/algos/aynr2",
+	],
+	srcs: [
+		"aynr2/rk_aiq_aynr_algo_itf_v2.cpp",
+		"aynr2/rk_aiq_aynr_algo_ynr_v2.cpp",
+		"aynr2/rk_aiq_aynr_algo_v2.cpp",
+		"aynr2/rk_aiq_uapi_aynr_int_v2.cpp",
+	],
+}
+
+cc_library_static {
+	name: "librkaiq_acnr_v1",
+	vendor: true,
+	defaults: ["algo_defaults"],	
+	
+	include_dirs: [
+		"external/camera_engine_rkaiq/include/algos/acnr",
+	],
+	srcs: [
+		"acnr/rk_aiq_acnr_algo_itf_v1.cpp",
+		"acnr/rk_aiq_acnr_algo_cnr_v1.cpp",
+		"acnr/rk_aiq_acnr_algo_v1.cpp",
+		"acnr/rk_aiq_uapi_acnr_int_v1.cpp",
+	],
+}
+
+cc_library_static {
+	name: "librkaiq_arawnr_v2",
+	vendor: true,
+	defaults: ["algo_defaults"],	
+	
+	include_dirs: [
+		"external/camera_engine_rkaiq/include/algos/arawnr2",
+	],
+	srcs: [
+		"arawnr2/rk_aiq_abayernr_algo_itf_v2.cpp",
+		"arawnr2/rk_aiq_abayernr_algo_bayernr_v2.cpp",
+		"arawnr2/rk_aiq_abayernr_algo_v2.cpp",
+		"arawnr2/rk_aiq_uapi_abayernr_int_v2.cpp",
 	],
 }

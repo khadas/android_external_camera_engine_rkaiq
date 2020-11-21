@@ -33,8 +33,16 @@
 #define FMT_NUM_PLANES 1
 
 #define BUFFER_COUNT 8
+
+#ifdef ANDROID_OS
+#define CAPTURE_RAW_PATH "/data"
+#define DEFAULT_CAPTURE_RAW_PATH "/data/capture_image"
+#else
 #define CAPTURE_RAW_PATH "/tmp"
+#define DEFAULT_CAPTURE_RAW_PATH "/tmp/capture_image"
+#endif
 #define CAPTURE_CNT_FILENAME ".capture_cnt"
+
 //#define ENABLE_UAPI_TEST
 
 struct buffer {
@@ -810,7 +818,7 @@ static void process_image(const void *p, int sequence,int size, demo_context_t *
 
         if (ctx->is_capture_yuv) {
             if (!ctx->_is_yuv_dir_exist) {
-                creat_yuv_dir(CAPTURE_RAW_PATH, ctx);
+                creat_yuv_dir(DEFAULT_CAPTURE_RAW_PATH, ctx);
             }
 
             if (ctx->_is_yuv_dir_exist) {

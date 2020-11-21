@@ -912,8 +912,37 @@ CamHwIsp20::getBindedSnsEntNmByVd(const char* vd)
                 strstr(s_full_info->ispp_info->pp_scale1_path, vd) ||
                 strstr(s_full_info->ispp_info->pp_scale2_path, vd) ||
                 strstr(s_full_info->isp_info->main_path, vd) ||
-                strstr(s_full_info->isp_info->self_path, vd))
-            return  s_full_info->sensor_name.c_str();
+                strstr(s_full_info->isp_info->self_path, vd)) {
+            // check linked
+            FILE *fp = NULL;
+            struct media_device *device = NULL;
+            uint32_t nents, j = 0, i = 0;
+            const struct media_entity_desc *entity_info = NULL;
+            struct media_entity *entity = NULL;
+            media_pad *src_pad_s = NULL;
+            char sys_path[64], devpath[32];
+
+            snprintf (sys_path, 64, "/dev/media%d", s_full_info->media_node_index);
+            fp = fopen (sys_path, "r");
+            if (!fp)
+                continue;
+            fclose (fp);
+            device = media_device_new (sys_path);
+
+            /* Enumerate entities, pads and links. */
+            media_device_enumerate (device);
+            entity = media_get_entity_by_name(device,
+                                              s_full_info->sensor_name.c_str(),
+                                              s_full_info->sensor_name.size());
+            entity_info = media_entity_get_info(entity);
+            if (entity && entity->num_links > 0) {
+                if (entity->links[0].flags == MEDIA_LNK_FL_ENABLED) {
+                    media_device_unref (device);
+                    return  s_full_info->sensor_name.c_str();
+                }
+            }
+            media_device_unref (device);
+        }
     }
 
     return NULL;
@@ -2651,7 +2680,7 @@ CamHwIsp20::gen_full_isp_params(const struct isp2x_isp_params_cfg* update_params
                 break;
             case RK_ISP2X_HDRTMO_ID:
                 full_params->others.hdrtmo_cfg = update_params->others.hdrtmo_cfg;
-                break;
+                break; 
             case RK_ISP2X_CTK_ID:
                 full_params->others.ccm_cfg = update_params->others.ccm_cfg;
                 break;

@@ -67,7 +67,7 @@ protected:
                                       const rk_aiq_isp_hdr_t& ahdr_data);
     template<class T>
     void convertAiqTmoToIsp20Params(T& isp_cfg,
-                                    const rk_aiq_isp_hdr_t& ahdr_data);
+                                    const rk_aiq_isp_hdr_t& ahdr_data); 
     template<class T>
     void convertAiqAdehazeToIsp20Params(T& isp_cfg,
                                         const rk_aiq_dehaze_cfg_t& dhaze                     );
