@@ -411,6 +411,7 @@ Isp20PollThread::Isp20PollThread()
     , _skip_num(0)
     , _skip_to_seq(0)
     , _need_luma_rd_info(true)
+    , _mipi_dev_max(0)
 {
     for (int i = 0; i < 3; i++) {
         SmartPtr<MipiPollThread> mipi_poll = new MipiPollThread(this, ISP_POLL_MIPI_TX, i);

@@ -324,7 +324,7 @@ Asharp3_result_t sharp_select_params_by_ISO_V3(
     gain_high = MIN(MAX(gain_high, 0), max_iso_step - 1);
 #endif
 
-	LOGE_ASHARP("%s:%d iso:%d gainlow:%d gian_high:%d\n", __FUNCTION__, __LINE__, iso, gain_high, gain_high);
+	LOGD_ASHARP("%s:%d iso:%d gainlow:%d gian_high:%d\n", __FUNCTION__, __LINE__, iso, gain_high, gain_high);
 
 	pSelect->enable = pParams->enable;
 	pSelect->pbf_gain = INTERP_V3(pParams->pbf_gain[gain_low], pParams->pbf_gain[gain_high], ratio);
