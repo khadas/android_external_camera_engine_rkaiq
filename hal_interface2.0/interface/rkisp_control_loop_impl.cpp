@@ -46,8 +46,8 @@
 
 #include "isp20/CamHwIsp20.h"
 
-#define RK_3A_TUNING_FILE_PATH  "/vendor/etc/camera/rkisp1"
-#define RK_3A_TUNING_FILE_PATH2 "/vendor/etc/camera/rkisp1/"
+#define RK_3A_TUNING_FILE_PATH  "/vendor/etc/camera/rkisp2"
+#define RK_3A_TUNING_FILE_PATH2 "/vendor/etc/camera/rkisp2/"
 
 #define MAX_MEDIA_INDEX 16
 #define MAX_SENSOR_NUM  16
