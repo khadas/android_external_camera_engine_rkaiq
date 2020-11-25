@@ -214,16 +214,16 @@ static int __rkisp_get_iq_exp_infos(SmartPtr<V4l2SubDevice> subDev, rkisp_metada
 	strcat(iq_file_full_name, iq_file_name);
 	if (access(iq_file_full_name, F_OK) == 0) {
 		calibdb_p = RkAiqCalibDb::createCalibDb(iq_file_full_name);
-		if (calibdb_p) {
-			CalibDb_AecGainRange_t* GainRange;
-			GainRange = &(calibdb_p->sensor.GainRange);
-			array_size = calibdb_p->sensor.GainRange.array_size;
-			metadata_info->gain_range[0] = calibdb_p->sensor.GainRange.pGainRange[0];
-			metadata_info->gain_range[1] = calibdb_p->sensor.GainRange.pGainRange[array_size];
-			array_size = calibdb_p->aec.CommCtrl.stAeRoute.LinAeSeperate[0].array_size;
-			metadata_info->time_range[0] = calibdb_p->aec.CommCtrl.stAeRoute.LinAeSeperate[0].TimeDot[0];
-			metadata_info->time_range[1] = calibdb_p->aec.CommCtrl.stAeRoute.LinAeSeperate[0].TimeDot[array_size];
-		}
+		// if (calibdb_p) {
+		// 	CalibDb_AecGainRange_t* GainRange;
+		// 	GainRange = &(calibdb_p->sensor.GainRange);
+		// 	array_size = calibdb_p->sensor.GainRange.array_size;
+		// 	metadata_info->gain_range[0] = calibdb_p->sensor.GainRange.pGainRange[0];
+		// 	metadata_info->gain_range[1] = calibdb_p->sensor.GainRange.pGainRange[array_size];
+		// 	array_size = calibdb_p->aec.CommCtrl.stAeRoute.LinAeSeperate[0].array_size;
+		// 	metadata_info->time_range[0] = calibdb_p->aec.CommCtrl.stAeRoute.LinAeSeperate[0].TimeDot[0];
+		// 	metadata_info->time_range[1] = calibdb_p->aec.CommCtrl.stAeRoute.LinAeSeperate[0].TimeDot[array_size];
+		// }
 	}else {
 		LOGW("calib file %s not found! Ignore it if not raw sensor.", iq_file_full_name);
 	}
