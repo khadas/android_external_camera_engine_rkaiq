@@ -1761,16 +1761,16 @@ CamHwIsp20::setExpDelayInfo(int mode)
     sensorHw = mSensorDev.dynamic_cast_ptr<SensorHw>();
 
     if(mode != RK_AIQ_WORKING_MODE_NORMAL) {
-        sensorHw->set_exp_delay_info(mCalibDb->sysContrl.exp_delay.Hdr.time_delay,
-                                     mCalibDb->sysContrl.exp_delay.Hdr.gain_delay,
-                                     mCalibDb->sysContrl.dcg.Hdr.support_en ? \
-                                     mCalibDb->sysContrl.exp_delay.Hdr.dcg_delay : -1);
+        sensorHw->set_exp_delay_info(mCalibDb->expset.CISExpUpdate.Hdr.time_update,
+                                     mCalibDb->expset.CISExpUpdate.Hdr.gain_update,
+                                     mCalibDb->expset.CISDcgSet.Hdr.support_en ? \
+                                     mCalibDb->expset.CISExpUpdate.Hdr.dcg_update : -1);
 
     } else {
-        sensorHw->set_exp_delay_info(mCalibDb->sysContrl.exp_delay.Normal.time_delay,
-                                     mCalibDb->sysContrl.exp_delay.Normal.gain_delay,
-                                     mCalibDb->sysContrl.dcg.Normal.support_en ? \
-                                     mCalibDb->sysContrl.exp_delay.Normal.dcg_delay : -1);
+        sensorHw->set_exp_delay_info(mCalibDb->expset.CISExpUpdate.Normal.time_update,
+                                     mCalibDb->expset.CISExpUpdate.Normal.gain_update,
+                                     mCalibDb->expset.CISDcgSet.Normal.support_en ? \
+                                     mCalibDb->expset.CISExpUpdate.Normal.dcg_update : -1);
     }
 
     EXIT_CAMHW_FUNCTION();
@@ -2464,6 +2464,7 @@ CamHwIsp20::overrideExpRatioToAiqResults(const sint32_t frameId,
             curSExpo = curFrameExpParam->data()->aecExpInfo.HdrExp[0].exp_real_params.analog_gain * \
                        curFrameExpParam->data()->aecExpInfo.HdrExp[0].exp_real_params.integration_time;
         }
+
         float nextRatioLS = nextLExpo / nextSExpo;
         float nextRatioLM = nextLExpo / nextMExpo;
         float curRatioLS = curLExpo / curSExpo;
@@ -2572,6 +2573,7 @@ CamHwIsp20::overrideExpRatioToAiqResults(const sint32_t frameId,
                         isp20_result->ahdr_proc_res.MgeProcRes.sw_hdrmge_gain0_inv,
                         isp20_result->ahdr_proc_res.MgeProcRes.sw_hdrmge_gain1,
                         isp20_result->ahdr_proc_res.MgeProcRes.sw_hdrmge_gain1_inv);
+
         break;
     }
     case RK_ISP2X_PP_TNR_ID:
@@ -2680,7 +2682,7 @@ CamHwIsp20::gen_full_isp_params(const struct isp2x_isp_params_cfg* update_params
                 break;
             case RK_ISP2X_HDRTMO_ID:
                 full_params->others.hdrtmo_cfg = update_params->others.hdrtmo_cfg;
-                break; 
+                break;
             case RK_ISP2X_CTK_ID:
                 full_params->others.ccm_cfg = update_params->others.ccm_cfg;
                 break;
@@ -3286,13 +3288,13 @@ CamHwIsp20::setExposureParams(SmartPtr<RkAiqExpParamsProxy>& expPar)
 }
 
 XCamReturn
-CamHwIsp20::setIrisParams(SmartPtr<RkAiqIrisParamsProxy>& irisPar, CalibDb_IrisType_t irisType)
+CamHwIsp20::setIrisParams(SmartPtr<RkAiqIrisParamsProxy>& irisPar, RkAiqIrisType_t irisType)
 {
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
     ENTER_CAMHW_FUNCTION();
     SmartPtr<LensHw> mLensSubdev = mLensDev.dynamic_cast_ptr<LensHw>();
 
-    if(irisType == IRIS_P_TYPE) {   //P-iris
+    if(irisType == RKAIQ_IRIS_P_TYPE) {   //P-iris
         int step = irisPar->data()->PIris.step;
         bool update = irisPar->data()->PIris.update;
 
@@ -3303,7 +3305,7 @@ CamHwIsp20::setIrisParams(SmartPtr<RkAiqIrisParamsProxy>& irisPar, CalibDb_IrisT
                 return XCAM_RETURN_ERROR_IOCTL;
             }
         }
-    } else if(irisType == IRIS_DC_TYPE) {
+    } else if(irisType == RKAIQ_IRIS_DC_TYPE) {
         //DC-iris
         int PwmDuty = irisPar->data()->DCIris.pwmDuty;
         bool update = irisPar->data()->DCIris.update;

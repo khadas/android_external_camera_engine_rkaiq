@@ -53,10 +53,10 @@ XCamReturn rk_aiq_user_api_ae_getExpSwAttr
 
     return (ret);
 }
-XCamReturn rk_aiq_user_api_ae_setLinAeDayRouteAttr
+XCamReturn rk_aiq_user_api_ae_setLinAeRouteAttr
 (
     const rk_aiq_sys_ctx_t* sys_ctx,
-    const Uapi_LinAeRouteAttr_t linAeDayRouteAttr
+    const Uapi_LinAeRouteAttr_t linAeRouteAttr
 ) {
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
     CHECK_USER_API_ENABLE(RK_AIQ_ALGO_TYPE_AE);
@@ -65,15 +65,15 @@ XCamReturn rk_aiq_user_api_ae_setLinAeDayRouteAttr
         algoHandle<RkAiqAeHandleInt>(sys_ctx, RK_AIQ_ALGO_TYPE_AE);
 
     if (algo_handle) {
-        return algo_handle->setLinAeDayRouteAttr(linAeDayRouteAttr);
+        return algo_handle->setLinAeRouteAttr(linAeRouteAttr);
     }
 
     return(ret);
 }
-XCamReturn rk_aiq_user_api_ae_getLinAeDayRouteAttr
+XCamReturn rk_aiq_user_api_ae_getLinAeRouteAttr
 (
     const rk_aiq_sys_ctx_t* sys_ctx,
-    Uapi_LinAeRouteAttr_t* pLinAeDayRouteAttr
+    Uapi_LinAeRouteAttr_t* pLinAeRouteAttr
 ) {
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
 
@@ -81,51 +81,16 @@ XCamReturn rk_aiq_user_api_ae_getLinAeDayRouteAttr
         algoHandle<RkAiqAeHandleInt>(sys_ctx, RK_AIQ_ALGO_TYPE_AE);
 
     if (algo_handle) {
-        return algo_handle->getLinAeDayRouteAttr(pLinAeDayRouteAttr);
+        return algo_handle->getLinAeRouteAttr(pLinAeRouteAttr);
     }
 
     return(ret);
 
 }
-XCamReturn rk_aiq_user_api_ae_setHdrAeDayRouteAttr
+XCamReturn rk_aiq_user_api_ae_setHdrAeRouteAttr
 (
     const rk_aiq_sys_ctx_t* sys_ctx,
-    const Uapi_HdrAeRouteAttr_t hdrAeDayRouteAttr
-) {
-    XCamReturn ret = XCAM_RETURN_NO_ERROR;
-    CHECK_USER_API_ENABLE(RK_AIQ_ALGO_TYPE_AE);
-
-    RkAiqAeHandleInt* algo_handle =
-        algoHandle<RkAiqAeHandleInt>(sys_ctx, RK_AIQ_ALGO_TYPE_AE);
-
-    if (algo_handle) {
-        return algo_handle->setHdrAeDayRouteAttr(hdrAeDayRouteAttr);
-    }
-
-    return(ret);
-
-}
-XCamReturn rk_aiq_user_api_ae_getHdrAeDayRouteAttr
-(
-    const rk_aiq_sys_ctx_t* sys_ctx,
-    Uapi_HdrAeRouteAttr_t* pHdrAeDayRouteAttr
-) {
-    XCamReturn ret = XCAM_RETURN_NO_ERROR;
-
-    RkAiqAeHandleInt* algo_handle =
-        algoHandle<RkAiqAeHandleInt>(sys_ctx, RK_AIQ_ALGO_TYPE_AE);
-
-    if (algo_handle) {
-        return algo_handle->getHdrAeDayRouteAttr(pHdrAeDayRouteAttr);
-    }
-
-    return(ret);
-
-}
-XCamReturn rk_aiq_user_api_ae_setLinAeNightRouteAttr
-(
-    const rk_aiq_sys_ctx_t* sys_ctx,
-    const Uapi_LinAeRouteAttr_t linAeNightRouteAttr
+    const Uapi_HdrAeRouteAttr_t hdrAeRouteAttr
 ) {
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
     CHECK_USER_API_ENABLE(RK_AIQ_ALGO_TYPE_AE);
@@ -134,15 +99,16 @@ XCamReturn rk_aiq_user_api_ae_setLinAeNightRouteAttr
         algoHandle<RkAiqAeHandleInt>(sys_ctx, RK_AIQ_ALGO_TYPE_AE);
 
     if (algo_handle) {
-        return algo_handle->setLinAeNightRouteAttr(linAeNightRouteAttr);
+        return algo_handle->setHdrAeRouteAttr(hdrAeRouteAttr);
     }
 
     return(ret);
+
 }
-XCamReturn rk_aiq_user_api_ae_getLinAeNightRouteAttr
+XCamReturn rk_aiq_user_api_ae_getHdrAeRouteAttr
 (
     const rk_aiq_sys_ctx_t* sys_ctx,
-    Uapi_LinAeRouteAttr_t* pLinAeNightRouteAttr
+    Uapi_HdrAeRouteAttr_t* pHdrAeRouteAttr
 ) {
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
 
@@ -150,42 +116,7 @@ XCamReturn rk_aiq_user_api_ae_getLinAeNightRouteAttr
         algoHandle<RkAiqAeHandleInt>(sys_ctx, RK_AIQ_ALGO_TYPE_AE);
 
     if (algo_handle) {
-        return algo_handle->getLinAeNightRouteAttr(pLinAeNightRouteAttr);
-    }
-
-    return(ret);
-
-}
-XCamReturn rk_aiq_user_api_ae_setHdrAeNightRouteAttr
-(
-    const rk_aiq_sys_ctx_t* sys_ctx,
-    const Uapi_HdrAeRouteAttr_t hdrAeNightRouteAttr
-) {
-    XCamReturn ret = XCAM_RETURN_NO_ERROR;
-    CHECK_USER_API_ENABLE(RK_AIQ_ALGO_TYPE_AE);
-
-    RkAiqAeHandleInt* algo_handle =
-        algoHandle<RkAiqAeHandleInt>(sys_ctx, RK_AIQ_ALGO_TYPE_AE);
-
-    if (algo_handle) {
-        return algo_handle->setHdrAeNightRouteAttr(hdrAeNightRouteAttr);
-    }
-
-    return(ret);
-
-}
-XCamReturn rk_aiq_user_api_ae_getHdrAeNightRouteAttr
-(
-    const rk_aiq_sys_ctx_t* sys_ctx,
-    Uapi_HdrAeRouteAttr_t* pHdrAeNightRouteAttr
-) {
-    XCamReturn ret = XCAM_RETURN_NO_ERROR;
-
-    RkAiqAeHandleInt* algo_handle =
-        algoHandle<RkAiqAeHandleInt>(sys_ctx, RK_AIQ_ALGO_TYPE_AE);
-
-    if (algo_handle) {
-        return algo_handle->getHdrAeNightRouteAttr(pHdrAeNightRouteAttr);
+        return algo_handle->getHdrAeRouteAttr(pHdrAeRouteAttr);
     }
 
     return(ret);

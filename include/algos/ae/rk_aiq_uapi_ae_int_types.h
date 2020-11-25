@@ -52,8 +52,7 @@ typedef struct Uapi_ExpSwAttr_s {
     uint8_t                  AecRunInterval;
     RKAiqOPMode_t            AecOpType;
     //GridWeight
-    Cam5x5UCharMatrix_t      DayGridWeights;
-    Cam5x5UCharMatrix_t      NightGridWeights;
+    uint8_t                  GridWeights[ISP2_RAWAE_WINNUM_MAX];
 
     //DayOrNight Switch
     uint8_t                  DNTrigger;
@@ -65,8 +64,6 @@ typedef struct Uapi_ExpSwAttr_s {
     Uapi_AeAttr_t            stAuto;
     Uapi_MeAttr_t            stManual;
     Uapi_ExpInitExp_t        stInitExp;
-
-    Uapi_ExpSwAttr_Advanced_t stAdvanced;
 } Uapi_ExpSwAttr_t;
 
 /*****************************************************************************/
@@ -108,6 +105,12 @@ typedef struct Uapi_ExpQueryInfo_s {
     float             LinePeriodsPerField;
     float             PixelPeriodsPerLine;
     float             PixelClockFreqMHZ;
+
+    Uapi_LinAeRange_t   LinExpRange;
+    Uapi_HdrAeRange_t   HdrExpRange;
+
+    Uapi_HdrAeRouteAttr_t HdrAeRoute;
+    Uapi_LinAeRouteAttr_t LinAeRoute;
 
 } Uapi_ExpQueryInfo_t;
 

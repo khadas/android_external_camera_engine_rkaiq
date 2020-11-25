@@ -132,10 +132,18 @@
  *  - magic code:1088858
  *  - change type of mCalibDb->awb from struct to list
  *  - split  mCalibDb->awb into calib para and adjust para
+ *  * v1.4.4
+ *  - magic code:1258030
+ *  - modify aec iq struct as list
+ *  - Ae params include CalibPara/TunePara
+ *  * v1.4.5
+ *  - magic code:1258987
+ *  - delete sensorinfo/moduleinfo/system in IQ
+ *  - add expset/module in IQ
  */
 
-#define RK_AIQ_CALIB_VERSION_REAL_V          "v1.4.4"
-#define RK_AIQ_CALIB_VERSION_MAGIC_V         "1255543"
+#define RK_AIQ_CALIB_VERSION_REAL_V          "v1.4.5"
+#define RK_AIQ_CALIB_VERSION_MAGIC_V         "1258987"
 
 
 /******* DO NOT EDIT THE FOLLOWINGS ***********/

@@ -48,6 +48,7 @@ typedef struct RkAiqPirisInfoWrapper_s {
 } RkAiqPirisInfoWrapper_t;
 
 typedef struct RkAiqIrisInfoWrapper_s {
+    RkAiqIrisType_t           IrisType;
     RkAiqPirisInfoWrapper_t   PIris;
     RkAiqDCIrisParam_t        DCIris;
     uint64_t                  sofTime;

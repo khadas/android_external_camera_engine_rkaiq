@@ -238,13 +238,6 @@ RkAiqManager::prepare(uint32_t width, uint32_t height, rk_aiq_working_mode_t mod
     if (mode == RK_AIQ_WORKING_MODE_NORMAL) {
         working_mode_hw = mode;
     } else {
-        // depreate mCalibDb->sysContrl.hdr_mode
-        /* if (mode != RK_AIQ_HDR_GET_WORKING_MODE(mCalibDb->sysContrl.hdr_mode)) { */
-        /*     ret = XCAM_RETURN_ERROR_PARAM; */
-        /*     RKAIQMNG_CHECK_RET(ret, "Not supported HDR mode!"); */
-        /* } else { */
-        /*     working_mode_hw = mCalibDb->sysContrl.hdr_mode; */
-        /* } */
         if (mode == RK_AIQ_WORKING_MODE_ISP_HDR2)
             working_mode_hw = RK_AIQ_ISP_HDR_MODE_2_FRAME_HDR;
         else if (mode == RK_AIQ_WORKING_MODE_ISP_HDR3)
@@ -254,9 +247,9 @@ RkAiqManager::prepare(uint32_t width, uint32_t height, rk_aiq_working_mode_t mod
     }
     mCamHw->setCalib(mCalibDb);
     if(mode != RK_AIQ_WORKING_MODE_NORMAL)
-        ret = mCamHw->prepare(width, height, working_mode_hw, mCalibDb->sysContrl.exp_delay.Hdr.time_delay, mCalibDb->sysContrl.exp_delay.Hdr.gain_delay);
+        ret = mCamHw->prepare(width, height, working_mode_hw, mCalibDb->expset.CISExpUpdate.Hdr.time_update, mCalibDb->expset.CISExpUpdate.Hdr.gain_update);
     else
-        ret = mCamHw->prepare(width, height, working_mode_hw, mCalibDb->sysContrl.exp_delay.Normal.time_delay, mCalibDb->sysContrl.exp_delay.Normal.gain_delay);
+        ret = mCamHw->prepare(width, height, working_mode_hw, mCalibDb->expset.CISExpUpdate.Normal.time_update, mCalibDb->expset.CISExpUpdate.Normal.gain_update);
 
     RKAIQMNG_CHECK_RET(ret, "camhw prepare error %d", ret);
 
@@ -507,7 +500,7 @@ RkAiqManager::applyAnalyzerResult(SmartPtr<RkAiqFullParamsProxy>& results)
         bool cpsl_ir_en = aiqParams->mCpslParams->data()->update_ir &&
                           aiqParams->mCpslParams->data()->ir.irc_on;
         bool cpsl_update = aiqParams->mCpslParams->data()->update_ir ||
-                          aiqParams->mCpslParams->data()->update_fl;
+                           aiqParams->mCpslParams->data()->update_fl;
 
         if (cpsl_ir_en) {
             mDelayCpslApplyFrmNum = 2;
@@ -582,7 +575,7 @@ RkAiqManager::applyAnalyzerResult(SmartPtr<RkAiqFullParamsProxy>& results)
 set_exp_end:
 
     if (aiqParams->mIrisParams.ptr()) {
-        ret = mCamHw->setIrisParams(aiqParams->mIrisParams, mCalibDb->aec.CommCtrl.stIris.IrisType);
+        ret = mCamHw->setIrisParams(aiqParams->mIrisParams, aiqParams->mIrisParams->data()->IrisType);
         if (ret)
             LOGE_ANALYZER("setIrisParams error %d", ret);
     }
@@ -801,8 +794,8 @@ XCamReturn RkAiqManager::getMirrorFlip(bool& mirror, bool& flip)
 void RkAiqManager::setDefMirrorFlip()
 {
     /* set defalut mirror & flip from iq*/
-    bool def_mirr = mCalibDb->sensor.flip & 0x1 ? true : false;
-    bool def_flip = mCalibDb->sensor.flip & 0x2 ? true : false;
+    bool def_mirr = mCalibDb->expset.CISFlip & 0x1 ? true : false;
+    bool def_flip = mCalibDb->expset.CISFlip & 0x2 ? true : false;
     setMirrorFlip(def_mirr, def_flip, 0);
 }
 

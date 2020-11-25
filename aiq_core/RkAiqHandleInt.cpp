@@ -114,7 +114,7 @@ XCamReturn RkAiqHandleIntCom::configInparamsCom(RkAiqAlgoCom* com, int type)
     case RK_AIQ_ALGO_TYPE_ASD:
         GET_RK_COM(Asd);
         break;
-	case RK_AIQ_ALGO_TYPE_ADRC:
+    case RK_AIQ_ALGO_TYPE_ADRC:
         GET_RK_COM(Adrc);
 	case RK_AIQ_ALGO_TYPE_AYNR:
         GET_RK_COM(Aynr);
@@ -216,32 +216,18 @@ RkAiqAeHandleInt::updateConfig(bool needSync)
         rk_aiq_uapi_ae_setHdrExpAttr(mAlgoCtx, &mCurHdrExpAttr, false);
         sendSignal();
     }
-    if (updateLinAeDayRouteAttr) {
-        mCurLinAeDayRouteAttr = mNewLinAeDayRouteAttr;
-        updateLinAeDayRouteAttr = false;
+    if (updateLinAeRouteAttr) {
+        mCurLinAeRouteAttr = mNewLinAeRouteAttr;
+        updateLinAeRouteAttr = false;
         updateAtt = true;
-        rk_aiq_uapi_ae_setLinAeDayRouteAttr(mAlgoCtx, &mCurLinAeDayRouteAttr, false);
+        rk_aiq_uapi_ae_setLinAeRouteAttr(mAlgoCtx, &mCurLinAeRouteAttr, false);
         sendSignal();
     }
-    if (updateHdrAeDayRouteAttr) {
-        mCurHdrAeDayRouteAttr = mNewHdrAeDayRouteAttr;
-        updateHdrAeDayRouteAttr = false;
+    if (updateHdrAeRouteAttr) {
+        mCurHdrAeRouteAttr = mNewHdrAeRouteAttr;
+        updateHdrAeRouteAttr = false;
         updateAtt = true;
-        rk_aiq_uapi_ae_setHdrAeDayRouteAttr(mAlgoCtx, &mCurHdrAeDayRouteAttr, false);
-        sendSignal();
-    }
-    if (updateLinAeNightRouteAttr) {
-        mCurLinAeNightRouteAttr = mNewLinAeNightRouteAttr;
-        updateLinAeNightRouteAttr = false;
-        updateAtt = true;
-        rk_aiq_uapi_ae_setLinAeNightRouteAttr(mAlgoCtx, &mCurLinAeNightRouteAttr, false);
-        sendSignal();
-    }
-    if (updateHdrAeNightRouteAttr) {
-        mCurHdrAeNightRouteAttr = mNewHdrAeNightRouteAttr;
-        updateHdrAeNightRouteAttr = false;
-        updateAtt = true;
-        rk_aiq_uapi_ae_setHdrAeNightRouteAttr(mAlgoCtx, &mCurHdrAeNightRouteAttr, false);
+        rk_aiq_uapi_ae_setHdrAeRouteAttr(mAlgoCtx, &mCurHdrAeRouteAttr, false);
         sendSignal();
     }
     if (updateExpWinAttr) {
@@ -374,7 +360,7 @@ RkAiqAeHandleInt::getHdrExpAttr (Uapi_HdrExpAttr_t* pHdrExpAttr)
     return ret;
 }
 XCamReturn
-RkAiqAeHandleInt::setLinAeDayRouteAttr(Uapi_LinAeRouteAttr_t LinAeDayRouteAttr)
+RkAiqAeHandleInt::setLinAeRouteAttr(Uapi_LinAeRouteAttr_t LinAeRouteAttr)
 {
     ENTER_ANALYZER_FUNCTION();
 
@@ -388,9 +374,9 @@ RkAiqAeHandleInt::setLinAeDayRouteAttr(Uapi_LinAeRouteAttr_t LinAeDayRouteAttr)
 
     // if something changed
 
-    if (0 != memcmp(&mCurLinAeDayRouteAttr, &LinAeDayRouteAttr, sizeof(Uapi_LinAeRouteAttr_t))) {
-        mNewLinAeDayRouteAttr = LinAeDayRouteAttr;
-        updateLinAeDayRouteAttr = true;
+    if (0 != memcmp(&mCurLinAeRouteAttr, &LinAeRouteAttr, sizeof(Uapi_LinAeRouteAttr_t))) {
+        mNewLinAeRouteAttr = LinAeRouteAttr;
+        updateLinAeRouteAttr = true;
         waitSignal();
     }
     mCfgMutex.unlock();
@@ -399,19 +385,19 @@ RkAiqAeHandleInt::setLinAeDayRouteAttr(Uapi_LinAeRouteAttr_t LinAeDayRouteAttr)
     return ret;
 }
 XCamReturn
-RkAiqAeHandleInt::getLinAeDayRouteAttr(Uapi_LinAeRouteAttr_t* pLinAeDayRouteAttr)
+RkAiqAeHandleInt::getLinAeRouteAttr(Uapi_LinAeRouteAttr_t* pLinAeRouteAttr)
 {
     ENTER_ANALYZER_FUNCTION();
 
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
 
-    rk_aiq_uapi_ae_getLinAeDayRouteAttr(mAlgoCtx, pLinAeDayRouteAttr);
+    rk_aiq_uapi_ae_getLinAeRouteAttr(mAlgoCtx, pLinAeRouteAttr);
 
     EXIT_ANALYZER_FUNCTION();
     return ret;
 }
 XCamReturn
-RkAiqAeHandleInt::setHdrAeDayRouteAttr(Uapi_HdrAeRouteAttr_t HdrAeDayRouteAttr)
+RkAiqAeHandleInt::setHdrAeRouteAttr(Uapi_HdrAeRouteAttr_t HdrAeRouteAttr)
 {
     ENTER_ANALYZER_FUNCTION();
 
@@ -424,9 +410,9 @@ RkAiqAeHandleInt::setHdrAeDayRouteAttr(Uapi_HdrAeRouteAttr_t HdrAeDayRouteAttr)
     // called by RkAiqCore
 
     // if something changed
-    if (0 != memcmp(&mCurHdrAeDayRouteAttr, &HdrAeDayRouteAttr, sizeof(Uapi_HdrAeRouteAttr_t))) {
-        mNewHdrAeDayRouteAttr = HdrAeDayRouteAttr;
-        updateHdrAeDayRouteAttr = true;
+    if (0 != memcmp(&mCurHdrAeRouteAttr, &HdrAeRouteAttr, sizeof(Uapi_HdrAeRouteAttr_t))) {
+        mNewHdrAeRouteAttr = HdrAeRouteAttr;
+        updateHdrAeRouteAttr = true;
         waitSignal();
     }
     mCfgMutex.unlock();
@@ -435,92 +421,16 @@ RkAiqAeHandleInt::setHdrAeDayRouteAttr(Uapi_HdrAeRouteAttr_t HdrAeDayRouteAttr)
     return ret;
 }
 XCamReturn
-RkAiqAeHandleInt::getHdrAeDayRouteAttr(Uapi_HdrAeRouteAttr_t* pHdrAeDayRouteAttr)
+RkAiqAeHandleInt::getHdrAeRouteAttr(Uapi_HdrAeRouteAttr_t* pHdrAeRouteAttr)
 {
     ENTER_ANALYZER_FUNCTION();
 
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
 
-    rk_aiq_uapi_ae_getHdrAeDayRouteAttr(mAlgoCtx, pHdrAeDayRouteAttr);
+    rk_aiq_uapi_ae_getHdrAeRouteAttr(mAlgoCtx, pHdrAeRouteAttr);
 
     EXIT_ANALYZER_FUNCTION();
     return ret;
-
-}
-
-XCamReturn
-RkAiqAeHandleInt::setLinAeNightRouteAttr(Uapi_LinAeRouteAttr_t LinAeNightRouteAttr)
-{
-    ENTER_ANALYZER_FUNCTION();
-
-    XCamReturn ret = XCAM_RETURN_NO_ERROR;
-    mCfgMutex.lock();
-    //TODO
-    // check if there is different between att & mCurAtt
-    // if something changed, set att to mNewAtt, and
-    // the new params will be effective later when updateConfig
-    // called by RkAiqCore
-
-    // if something changed
-
-    if (0 != memcmp(&mCurLinAeNightRouteAttr, &LinAeNightRouteAttr, sizeof(Uapi_LinAeRouteAttr_t))) {
-        mNewLinAeNightRouteAttr = LinAeNightRouteAttr;
-        updateLinAeNightRouteAttr = true;
-        waitSignal();
-    }
-    mCfgMutex.unlock();
-
-    EXIT_ANALYZER_FUNCTION();
-    return ret;
-}
-XCamReturn
-RkAiqAeHandleInt::getLinAeNightRouteAttr(Uapi_LinAeRouteAttr_t* pLinAeNightRouteAttr)
-{
-    ENTER_ANALYZER_FUNCTION();
-
-    XCamReturn ret = XCAM_RETURN_NO_ERROR;
-
-    rk_aiq_uapi_ae_getLinAeNightRouteAttr(mAlgoCtx, pLinAeNightRouteAttr);
-
-    EXIT_ANALYZER_FUNCTION();
-    return ret;
-}
-XCamReturn
-RkAiqAeHandleInt::setHdrAeNightRouteAttr(Uapi_HdrAeRouteAttr_t HdrAeNightRouteAttr)
-{
-    ENTER_ANALYZER_FUNCTION();
-
-    XCamReturn ret = XCAM_RETURN_NO_ERROR;
-    mCfgMutex.lock();
-    //TODO
-    // check if there is different between att & mCurAtt
-    // if something changed, set att to mNewAtt, and
-    // the new params will be effective later when updateConfig
-    // called by RkAiqCore
-
-    // if something changed
-    if (0 != memcmp(&mCurHdrAeNightRouteAttr, &HdrAeNightRouteAttr, sizeof(Uapi_HdrAeRouteAttr_t))) {
-        mNewHdrAeNightRouteAttr = HdrAeNightRouteAttr;
-        updateHdrAeNightRouteAttr = true;
-        waitSignal();
-    }
-    mCfgMutex.unlock();
-
-    EXIT_ANALYZER_FUNCTION();
-    return ret;
-}
-XCamReturn
-RkAiqAeHandleInt::getHdrAeNightRouteAttr(Uapi_HdrAeRouteAttr_t* pHdrAeNightRouteAttr)
-{
-    ENTER_ANALYZER_FUNCTION();
-
-    XCamReturn ret = XCAM_RETURN_NO_ERROR;
-
-    rk_aiq_uapi_ae_getHdrAeNightRouteAttr(mAlgoCtx, pHdrAeNightRouteAttr);
-
-    EXIT_ANALYZER_FUNCTION();
-    return ret;
-
 }
 
 XCamReturn
@@ -6108,7 +6018,7 @@ RkAiqAdrcHandleInt::prepare()
     RkAiqAlgoConfigAdrcInt* adrc_config_int = (RkAiqAlgoConfigAdrcInt*)mConfig;
     RkAiqCore::RkAiqAlgosShared_t* shared = &mAiqCore->mAlogsSharedParams;
 
-	adrc_config_int->rawHeight = shared->snsDes.isp_acq_height;
+    adrc_config_int->rawHeight = shared->snsDes.isp_acq_height;
     adrc_config_int->rawWidth = shared->snsDes.isp_acq_width;
     adrc_config_int->working_mode = shared->working_mode;
 

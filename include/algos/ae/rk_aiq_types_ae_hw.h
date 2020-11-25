@@ -255,7 +255,14 @@ typedef struct {
     bool       update;
 } RkAiqDCIrisParam_t;
 
+typedef enum RkAiqIrisType_e {
+    RKAIQ_IRIS_DC_TYPE = 0,
+    RKAIQ_IRIS_P_TYPE = 1,
+    RKAIQ_IRIS_INVALID_TYPE,
+} RkAiqIrisType_t;
+
 typedef struct {
+    RkAiqIrisType_t     IrisType;
     RkAiqPIrisParam_t   PIris;
     RkAiqDCIrisParam_t  DCIris;
 } RkAiqIrisParamComb_t;

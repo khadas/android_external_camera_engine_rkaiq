@@ -161,7 +161,7 @@ CamCalibDbContext_t* RkAiqCalibDb::createCalibDb(char* iqFile)
                     uint32_t magicCode = calib_check_calc_checksum();
                     if (magicCode != pCalibDb->header.magic_code) {
                         LOGE("magic code is not matched! calculated:%u, readed:%u", magicCode, pCalibDb->header.magic_code);
-                    }else {
+                    } else {
                         mCalibDbsMap[str] = pCalibDb;
                         LOGD("create calibdb from %s success.", iqFile);
                         return pCalibDb;
@@ -174,7 +174,7 @@ CamCalibDbContext_t* RkAiqCalibDb::createCalibDb(char* iqFile)
                     uint32_t magicCode = calib_check_calc_checksum();
                     if (magicCode != pCalibDb->header.magic_code) {
                         LOGE("magic code is not matched! calculated:%u, readed:%u", magicCode, pCalibDb->header.magic_code);
-                    }else {
+                    } else {
                         mCalibDbsMap[str] = pCalibDb;
                         LOGD("get calibdb from bin success.");
                         return pCalibDb;
@@ -224,9 +224,11 @@ void RkAiqCalibDb::releaseCalibDb()
         if(pCalibDb) {
             clear_list(&pCalibDb->awb_adjust_para);
             clear_list(&pCalibDb->awb_calib_para_v200);
-            clear_list(&pCalibDb->awb_calib_para_v201);
-
+            clear_list(&pCalibDb->awb_calib_para_v201);			
+            clear_list(&pCalibDb->aec_calib_para);
+            clear_list(&pCalibDb->aec_tune_para);
 			CamCalibDbRelease(pCalibDb);
+			
             LOGI("releaseCalibDb!");
             delete pCalibDb;
         }
@@ -259,7 +261,7 @@ void RkAiqCalibDb::createCalibDbBinFromXml(char* iqFile)
                 uint32_t magicCode = calib_check_calc_checksum();
                 if (magicCode != pCalibDb->header.magic_code) {
                     LOGE("magic code is not matched! calculated:%u, readed:%u", magicCode, pCalibDb->header.magic_code);
-                }else {
+                } else {
                     LOGI("create calibdb from %s success, magic code %u.", iqFile, magicCode);
                     if (calibSaveToFile(iqFile, pCalibDb))
                         LOGD("save to bin success.");
@@ -286,7 +288,7 @@ void RkAiqCalibDb::parseXmlandWriteXml(char* iqFile)
                 uint32_t magicCode = calib_check_calc_checksum();
                 if (magicCode != pCalibDb->header.magic_code) {
                     LOGE("magic code is not matched! calculated:%u, readed:%u", magicCode, pCalibDb->header.magic_code);
-                }else {
+                } else {
                     printf("create calibdb from %s success, magic code %u.", iqFile, magicCode);
                     char iqFileOutput[CALIBDB_PATH_LEN];
                     getFilePathName2(iqFile, iqFileOutput);

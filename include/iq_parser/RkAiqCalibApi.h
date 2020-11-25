@@ -57,6 +57,12 @@
 
 #endif
 
+bool AddAecCalibProfile2AecCalibList(list_head *profile_list, CalibDb_Aec_CalibPara_t* pAddAec);
+bool GetAecProfileFromAecCalibListBySceneName(const list_head* profile_list, const char* name, CalibDb_Aec_CalibPara_t** pAecProfile, int *name_index = NULL);
+bool GetAecProfileFromAecCalibListByIdx(const list_head* profile_list, int idx, const CalibDb_Aec_CalibPara_t** pAecProfile) ;
+bool AddAecTuneProfile2AecTuneList(list_head *profile_list, CalibDb_Aec_TunePara_t* pAddAec);
+bool GetAecProfileFromAecTuneListBySceneName(const list_head* profile_list, const char* name, CalibDb_Aec_TunePara_t** pAecProfile);
+bool GetAecProfileFromAecTuneListByIdx(const list_head* profile_list, int idx, const CalibDb_Aec_TunePara_t** pAecProfile) ;
 bool AddAwbCalibV200Profile2AwbCalibV200List(list_head *profile_list, CalibDb_Awb_Calib_Para_V200_t* pAddAwb);
 bool GetAwbProfileFromAwbCalibV200ListBySceneName(const list_head* profile_list, const char* name, CalibDb_Awb_Calib_Para_V200_t** pAwbProfile, int *name_index = NULL);
 bool GetAwbProfileFromAwbCalibV200ListByIdx(const list_head* profile_list, int idx,const CalibDb_Awb_Calib_Para_V200_t** pAwbProfile) ;

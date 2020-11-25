@@ -122,7 +122,7 @@ Isp21Params::convertAiqAdehazeToIsp21Params(struct isp21_isp_params_cfg& isp_cfg
     dhaz_cfg.hist_en = 0;
     dhaz_cfg.hpara_en = 0;
     dhaz_cfg.air_lc_en = 0;
-    dhaz_cfg.enhance_value = 0x600;
+    dhaz_cfg.enhance_value = 0x500;
     dhaz_cfg.enhance_chroma = 0x4cc;
     dhaz_cfg.dc_min_th = 0x40;
     dhaz_cfg.dc_max_th = 0xc0;

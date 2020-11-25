@@ -105,17 +105,17 @@ private:
     bool parseEntrySensorAwb(const XMLElement*, void* param = NULL);
     bool parseEntrySensorAwbCalibParaV200(const XMLElement*, void* param, int index);
     bool parseEntrySensorAwbCalibParaV201(const XMLElement*, void* param, int index);
-    bool parseEntrySensorAwbAdjustPara(const XMLElement*, void* param,int index);
+    bool parseEntrySensorAwbAdjustPara(const XMLElement*, void* param, int index);
     bool parseEntrySensorAwbMeasureGlobalsV200(const XMLElement*, void* param = NULL);
-    bool parseEntrySensorAwbMeasureLightSourcesV200(const XMLElement*, void* param , int index);
+    bool parseEntrySensorAwbMeasureLightSourcesV200(const XMLElement*, void* param, int index);
     bool parseEntrySensorAwbMeasureGlobalsV201(const XMLElement*, void* param = NULL);
     bool parseEntrySensorAwbLightXYRegionV201(const XMLElement*, void* param = NULL);
     bool parseEntrySensorAwbLightRTYUVRegionV201(const XMLElement*, void* param = NULL);
     bool parseEntrySensorAwbMeasureLightSourcesV201(const XMLElement*, void* param, int index);
-    bool parseEntrySensorAwbStategyLightSources(const XMLElement*, void* param , int index);
+    bool parseEntrySensorAwbStategyLightSources(const XMLElement*, void* param, int index);
     bool parseEntrySensorAwbStategyGlobals(const XMLElement*, void* param = NULL);
-    bool parseEntrySensorAwbLsForYuvDet(const XMLElement*, void* param , int index);
-    bool parseEntrySensorAwbLsForYuvDetV201(const XMLElement*, void* param , int index);
+    bool parseEntrySensorAwbLsForYuvDet(const XMLElement*, void* param, int index);
+    bool parseEntrySensorAwbLsForYuvDetV201(const XMLElement*, void* param, int index);
     bool parseEntrySensorAwbWindowV201(const XMLElement*, void* param, int index);
     bool parseEntrySensorAwbMeasureWindowV201(const XMLElement*, void* param = NULL);
     bool parseEntrySensorAwbLimitRangeV201(const XMLElement*, void* param = NULL);
@@ -135,8 +135,6 @@ private:
     bool parseEntrySensorAwbColBlkV201(const XMLElement*, void* param, int index);
     bool parseEntrySensorAwbLsForEstimationV201(const XMLElement*, void* param, int index);
 
-
-
     bool parseEntrySensorAwbwbGainAdjust(const XMLElement*, void* param = NULL);
     bool parseEntrySensorAwbDampFactor(const XMLElement*, void* param = NULL);
     bool parseEntrySensorAwbXyRegionStableSelection(const XMLElement*, void* param = NULL);
@@ -144,15 +142,16 @@ private:
     bool parseEntrySensorAwbwbGainClipV200(const XMLElement*, void* param = NULL);
     bool parseEntrySensorAwbwbGainDaylightClipV201(const XMLElement*, void* param = NULL);
     bool parseEntrySensorAwbwbGainClipV201(const XMLElement*, void* param = NULL);
-    bool parseEntrySensorAwbCctLutAll(const XMLElement*, void* param , int index);
-    bool parseEntrySensorAwbGlobalsExclude(const XMLElement*, void* param , int index);
+    bool parseEntrySensorAwbCctLutAll(const XMLElement*, void* param, int index);
+    bool parseEntrySensorAwbGlobalsExclude(const XMLElement*, void* param, int index);
     bool parseEntrySensorAwbLightXYRegion(const XMLElement*, void* param = NULL);
     bool parseEntrySensorAwbLightYUVRegion(const XMLElement*, void* param = NULL);
-    bool parseEntrySensorAwbGlobalsExcludeV201(const XMLElement*, void* param , int index);
+    bool parseEntrySensorAwbGlobalsExcludeV201(const XMLElement*, void* param, int index);
     bool parseEntrySensorAwbLightSources(const XMLElement*, void* param = NULL);
     bool parseEntrySensorAwbRemosaicPara(const XMLElement*, void* param = NULL);
-    bool parseEntrySensorAecLinAlterExp(const XMLElement*, void* param = NULL);
-    bool parseEntrySensorAecHdrAlterExp(const XMLElement*, void* param = NULL);
+
+    bool parseEntrySensorAecLinAlterExp(const XMLElement*, void* param, int index);
+    bool parseEntrySensorAecHdrAlterExp(const XMLElement*, void* param, int index);
     bool parseEntrySensorAecAlterExp(const XMLElement*, void* param = NULL);
     bool parseEntrySensorAecSyncTest(const XMLElement*, void* param = NULL);
     bool parseEntrySensorAecSpeed(const XMLElement*, void* param = NULL);
@@ -168,7 +167,6 @@ private:
     bool parseEntrySensorAecInitValueLinearAE(const XMLElement*, void* param = NULL);
     bool parseEntrySensorAecInitValueHdrAE(const XMLElement*, void* param = NULL);
     bool parseEntrySensorAecInitValue(const XMLElement*, void* param = NULL);
-    bool parseEntrySensorAecGridWeight(const XMLElement*, void* param = NULL);
     bool parseEntrySensorAecIrisCtrlPAttr(const XMLElement*, void* param = NULL);
     bool parseEntrySensorAecIrisCtrlDCAttr(const XMLElement*, void* param = NULL);
     bool parseEntrySensorAecIrisCtrl(const XMLElement*, void* param = NULL);
@@ -176,13 +174,13 @@ private:
     bool parseEntrySensorAecManualCtrlHdrAE(const XMLElement*, void* param = NULL);
     bool parseEntrySensorAecManualCtrl(const XMLElement*, void* param = NULL);
     bool parseEntrySensorAecEnvLvCalib(const XMLElement*, void* param = NULL);
+    bool parseEntrySensorAecLinearRoute(const XMLElement*, void* param = NULL);
+    bool parseEntrySensorAecHdrRoute(const XMLElement*, void* param = NULL);
     bool parseEntrySensorAecRoute(const XMLElement*, void* param = NULL);
-    bool parseEntrySensorLinearAECtrlAoe(const XMLElement*, void* param = NULL);
-    bool parseEntrySensorLinearAECtrl(const XMLElement*, void* param = NULL);
-    bool parseEntrySensorLinearAECtrlWeightMethod(const XMLElement*, void* param = NULL);
-    bool parseEntrySensorLinearAECtrlDarkROIMethod(const XMLElement*, void* param = NULL);
+    bool parseEntrySensorAecLinearAeDynamicPoint(const XMLElement*, void* param = NULL);
     bool parseEntrySensorLinearAECtrlBackLight(const XMLElement*, void* param = NULL);
     bool parseEntrySensorLinearAECtrlOverExp(const XMLElement*, void* param = NULL);
+    bool parseEntrySensorLinearAECtrl(const XMLElement*, void* param = NULL);
     bool parseEntrySensorIntervalAdjustStrategy(const XMLElement*, void* param = NULL);
     bool parseEntrySensorLinearAECtrlHist2hal(const XMLElement*, void* param = NULL);
     bool parseEntrySensorHdrAECtrlExpRatioCtrl(const XMLElement*, void* param = NULL);
@@ -191,10 +189,11 @@ private:
     bool parseEntrySensorHdrAECtrlMframeCtrl(const XMLElement*, void* param = NULL);
     bool parseEntrySensorHdrAECtrlSframeCtrl(const XMLElement*, void* param = NULL);
     bool parseEntrySensorHdrAECtrl(const XMLElement*, void* param = NULL);
+    bool parseEntrySensorAecWinScale(const XMLElement*, void* param = NULL);
+    bool parseEntrySensorAecCalibPara(const XMLElement*, void* param, int index);
+    bool parseEntrySensorAecTunePara(const XMLElement*, void* param, int index);
     bool parseEntrySensorAec(const XMLElement*, void* param = NULL);
-    bool parseEntrySensorAecLinearAeRoute(const XMLElement*, void* param = NULL);
-    bool parseEntrySensorAecHdrAeRoute(const XMLElement*, void* param = NULL);
-    bool parseEntrySensorAecLinearAeDynamicPoint(const XMLElement*, void* param = NULL);
+
     bool parseEntrySensorAhdrMerge(const XMLElement* pelement, void* param = NULL);
     bool parseEntrySensorAhdrTmo(const XMLElement* pelement, void* param = NULL);
     bool parseEntrySensorAhdrTmoEn(const XMLElement* pelement, void* param = NULL);
@@ -203,9 +202,9 @@ private:
     bool parseEntrySensorAhdrTmoDetailsLowLight(const XMLElement* pelement, void* param = NULL);
     bool parseEntrySensorAhdrLocalTMO(const XMLElement* pelement, void* param = NULL);
     bool parseEntrySensorAhdrGlobalTMO(const XMLElement* pelement, void* param = NULL);
-	bool parseEntrySensorDrc(const XMLElement* pelement, void* param = NULL);
-	bool parseEntrySensorDrcCalibPara(const XMLElement* pelement, void* param = NULL);
-	bool parseEntrySensorDrcTuningPara(const XMLElement* pelement, void* param = NULL);
+    bool parseEntrySensorDrc(const XMLElement* pelement, void* param = NULL);
+    bool parseEntrySensorDrcCalibPara(const XMLElement* pelement, void* param = NULL);
+    bool parseEntrySensorDrcTuningPara(const XMLElement* pelement, void* param = NULL);
     bool parseEntrySensorBlcModeCell(const XMLElement* pelement, void* param = NULL);
     bool parseEntrySensorBlc(const XMLElement* pelement, void* param = NULL);
     bool parseEntrySensorLut3d(const XMLElement* pelement, void* param = NULL);
@@ -280,88 +279,91 @@ private:
     bool parseEntrySensorFec(const XMLElement* pelement, void* param = NULL);
     bool parseEntrySensorLumaDetect(const XMLElement* pelement, void* param = NULL);
     bool parseEntrySensorOrb(const XMLElement* pelement, void* param = NULL);
-    bool parseEntrySensorInfoGainRange(const XMLElement* pelement, void* param = NULL);
-    bool parseEntrySensorInfo(const XMLElement* pelement, void* param = NULL);
-    bool parseEntrySensorModuleInfo(const XMLElement* pelement, void* param = NULL);
     bool parseEntrySensorCpsl(const XMLElement* pelement, void* param = NULL);
     bool parseEntrySensorColorAsGrey(const XMLElement* pelement, void* param = NULL);
-    bool parseEntrySystemHDR(const XMLElement* pelement, void* param = NULL);
-    bool parseEntrySystemDcgNormalGainCtrl(const XMLElement* pelement, void* param = NULL);
-    bool parseEntrySystemDcgHdrGainCtrl(const XMLElement* pelement, void* param = NULL);
-    bool parseEntrySystemDcgNormalEnvCtrl(const XMLElement* pelement, void* param = NULL);
-    bool parseEntrySystemDcgHdrEnvCtrl(const XMLElement* pelement, void* param = NULL);
-    bool parseEntrySystemDcgNormalSetting(const XMLElement* pelement, void* param = NULL);
-    bool parseEntrySystemDcgHdrSetting(const XMLElement* pelement, void* param = NULL);
-    bool parseEntrySystemDcgSetting(const XMLElement* pelement, void* param = NULL);
-    bool parseEntrySystemExpDelayHdr(const XMLElement* pelement, void* param = NULL);
-    bool parseEntrySystemExpDelayNormal(const XMLElement* pelement, void* param = NULL);
-    bool parseEntrySystemExpDelay(const XMLElement* pelement, void* param = NULL);
-    bool parseEntrySystem(const XMLElement*, void* param = NULL);
+    bool parseEntryExpSet(const XMLElement* pelement, void* param = NULL);
+    bool parseEntryExpSetGain2Reg(const XMLElement* pelement, void* param = NULL);
+    bool parseEntryExpSetGainSet(const XMLElement* pelement, void* param = NULL);
+    bool parseEntryExpSetTimeSet(const XMLElement* pelement, void* param = NULL);
+    bool parseEntryExpSetHdrTimeSet(const XMLElement* pelement, void* param = NULL);
+    bool parseEntryExpSetNormalTimeSet(const XMLElement* pelement, void* param = NULL);
+    bool parseEntryExpSetHdrSet(const XMLElement* pelement, void* param = NULL);
+    bool parseEntryExpSetDcgSet(const XMLElement* pelement, void* param = NULL);
+    bool parseEntryExpSetDcgNormalSet(const XMLElement* pelement, void* param = NULL);
+    bool parseEntryExpSetDcgHdrSet(const XMLElement* pelement, void* param = NULL);
+    bool parseEntryExpSetDcgNormalGainCtrl(const XMLElement* pelement, void* param = NULL);
+    bool parseEntryExpSetDcgHdrGainCtrl(const XMLElement* pelement, void* param = NULL);
+    bool parseEntryExpSetDcgNormalEnvCtrl(const XMLElement* pelement, void* param = NULL);
+    bool parseEntryExpSetDcgHdrEnvCtrl(const XMLElement* pelement, void* param = NULL);
+    bool parseEntryExpSetExpUpdateHdr(const XMLElement* pelement, void* param = NULL);
+    bool parseEntryExpSetExpUpdateNormal(const XMLElement* pelement, void* param = NULL);
+    bool parseEntryExpSetExpUpdate(const XMLElement* pelement, void* param = NULL);
+    bool parseEntryModuleInfo(const XMLElement* pelement, void* param = NULL);
 
-	bool parseEntrySensorBayernrV2
-	(
-	    const XMLElement* pelement,
-	    void* param = NULL
-	) ;
+    bool parseEntrySensorBayernrV2
+    (
+        const XMLElement* pelement,
+        void* param = NULL
+    ) ;
 
-	bool parseEntryBayernrV2Setting_2D
-	(
-		const XMLElement*	pelement,
-		void*				 param,
-		int 				 index
-	);
+    bool parseEntryBayernrV2Setting_2D
+    (
+        const XMLElement*   pelement,
+        void*                param,
+        int                  index
+    );
 
-	bool parseEntryBayernrV2Setting_3D
-	(
-		const XMLElement*	pelement,
-		void*				 param,
-		int 				 index
-	);
+    bool parseEntryBayernrV2Setting_3D
+    (
+        const XMLElement*   pelement,
+        void*                param,
+        int                  index
+    );
 
-	bool parseEntrySensorBayernrV2Setting2D
-	(
-		const XMLElement*	pelement,
-		void*				 param
-	);
+    bool parseEntrySensorBayernrV2Setting2D
+    (
+        const XMLElement*   pelement,
+        void*                param
+    );
 
-	bool parseEntrySensorBayernrV2Setting3D
-	(
-		const XMLElement*	pelement,
-		void*				 param
-	);
-	bool parseEntrySensorYnrV2
-	(
-	    const XMLElement* pelement,
-	    void* param
-	);
-	bool parseEntryYnrV2Setting
-	(
-	    const XMLElement*   pelement,
-	    void*                param,
-	    int                  index
-	);
-	bool parseEntrySensorCnrV1
-	(
-	    const XMLElement* pelement,
-	    void* param
-	);
-	bool parseEntryCnrV1Setting
-	(
-	    const XMLElement*   pelement,
-	    void*                param,
-	    int                  index
-	);
-	bool parseEntrySharpV3Setting
-	(
-	    const XMLElement*   pelement,
-	    void*                param,
-	    int                  index
-	);
-	bool parseEntrySensorSharpV3
-	(
-	    const XMLElement* pelement,
-	    void* param
-	);
+    bool parseEntrySensorBayernrV2Setting3D
+    (
+        const XMLElement*   pelement,
+        void*                param
+    );
+    bool parseEntrySensorYnrV2
+    (
+        const XMLElement* pelement,
+        void* param
+    );
+    bool parseEntryYnrV2Setting
+    (
+        const XMLElement*   pelement,
+        void*                param,
+        int                  index
+    );
+    bool parseEntrySensorCnrV1
+    (
+        const XMLElement* pelement,
+        void* param
+    );
+    bool parseEntryCnrV1Setting
+    (
+        const XMLElement*   pelement,
+        void*                param,
+        int                  index
+    );
+    bool parseEntrySharpV3Setting
+    (
+        const XMLElement*   pelement,
+        void*                param,
+        int                  index
+    );
+    bool parseEntrySensorSharpV3
+    (
+        const XMLElement* pelement,
+        void* param
+    );
 public:
     explicit RkAiqCalibParser(CamCalibDbContext_t *pCalibDb);
     virtual ~RkAiqCalibParser();

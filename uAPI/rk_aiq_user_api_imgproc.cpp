@@ -92,26 +92,10 @@ XCamReturn rk_aiq_uapi_setExpMode(const rk_aiq_sys_ctx_t* ctx, opMode_t mode)
             expSwAttr.AecOpType = RK_AIQ_OP_MODE_MANUAL;
             expSwAttr.stManual.stHdrMe.ManualGainEn = true;
             expSwAttr.stManual.stHdrMe.ManualTimeEn = true;
-            expSwAttr.stManual.stHdrMe.GainValue.fCoeff[0] =
-                ctx->_calibDb->aec.CommCtrl.stInitExp.stHdrExpInitExp.InitGainValue.fCoeff[0];
-            expSwAttr.stManual.stHdrMe.GainValue.fCoeff[1] =
-                ctx->_calibDb->aec.CommCtrl.stInitExp.stHdrExpInitExp.InitGainValue.fCoeff[1];
-            expSwAttr.stManual.stHdrMe.GainValue.fCoeff[2] =
-                ctx->_calibDb->aec.CommCtrl.stInitExp.stHdrExpInitExp.InitGainValue.fCoeff[2];
-            expSwAttr.stManual.stHdrMe.TimeValue.fCoeff[0] =
-                ctx->_calibDb->aec.CommCtrl.stInitExp.stHdrExpInitExp.InitTimeValue.fCoeff[0];
-            expSwAttr.stManual.stHdrMe.TimeValue.fCoeff[1] =
-                ctx->_calibDb->aec.CommCtrl.stInitExp.stHdrExpInitExp.InitTimeValue.fCoeff[1];
-            expSwAttr.stManual.stHdrMe.TimeValue.fCoeff[2] =
-                ctx->_calibDb->aec.CommCtrl.stInitExp.stHdrExpInitExp.InitTimeValue.fCoeff[2];
         } else {
             expSwAttr.AecOpType = RK_AIQ_OP_MODE_MANUAL;
             expSwAttr.stManual.stLinMe.ManualGainEn = true;
             expSwAttr.stManual.stLinMe.ManualTimeEn = true;
-            expSwAttr.stManual.stLinMe.GainValue =
-                ctx->_calibDb->aec.CommCtrl.stInitExp.stLinExpInitExp.InitGainValue;
-            expSwAttr.stManual.stLinMe.TimeValue =
-                ctx->_calibDb->aec.CommCtrl.stInitExp.stLinExpInitExp.InitTimeValue;
         }
     } else {
         ret = XCAM_RETURN_ERROR_PARAM;
@@ -2458,7 +2442,7 @@ XCamReturn rk_aiq_uapi_setFecCorrectLevel(const rk_aiq_sys_ctx_t* ctx, int corre
 }
 
 XCamReturn rk_aiq_uapi_setFecCorrectDirection(const rk_aiq_sys_ctx_t* ctx,
-                                              const fec_correct_direction_t direction)
+        const fec_correct_direction_t direction)
 {
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
     IMGPROC_FUNC_ENTER

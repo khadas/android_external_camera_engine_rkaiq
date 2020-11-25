@@ -123,26 +123,26 @@ void AdrcApiOffConfig
 
     pAdrcCtx->AdrcConfig.sw_drc_offset_pow2 = 8;
     pAdrcCtx->AdrcConfig.sw_drc_position = 4096 ;//
-    pAdrcCtx->AdrcConfig.sw_drc_hpdetail_ratio= 0 ;
-    pAdrcCtx->AdrcConfig.sw_drc_lpdetail_ratio= 0 ;
+    pAdrcCtx->AdrcConfig.sw_drc_hpdetail_ratio = 0 ;
+    pAdrcCtx->AdrcConfig.sw_drc_lpdetail_ratio = 0 ;
     pAdrcCtx->AdrcConfig.sw_drc_weicur_pix = 96 ;
-    pAdrcCtx->AdrcConfig.sw_drc_weipre_frame= 255;
-    pAdrcCtx->AdrcConfig.sw_drc_force_sgm_inv0= 0 ;
-    pAdrcCtx->AdrcConfig.sw_drc_motion_scl= 0 ;
-    pAdrcCtx->AdrcConfig.sw_drc_edge_scl= 16 ;
+    pAdrcCtx->AdrcConfig.sw_drc_weipre_frame = 255;
+    pAdrcCtx->AdrcConfig.sw_drc_force_sgm_inv0 = 0 ;
+    pAdrcCtx->AdrcConfig.sw_drc_motion_scl = 0 ;
+    pAdrcCtx->AdrcConfig.sw_drc_edge_scl = 16 ;
     pAdrcCtx->AdrcConfig.sw_drc_space_sgm_inv1 = 4068 ;
     pAdrcCtx->AdrcConfig.sw_drc_space_sgm_inv0 = 3968 ;
     pAdrcCtx->AdrcConfig.sw_drc_range_sgm_inv1 = 1024 ;
     pAdrcCtx->AdrcConfig.sw_drc_range_sgm_inv0 = 1024;
-    pAdrcCtx->AdrcConfig.sw_drc_weig_maxl= 0 ;
-    pAdrcCtx->AdrcConfig.sw_drc_weig_bilat= 16 ;
+    pAdrcCtx->AdrcConfig.sw_drc_weig_maxl = 0 ;
+    pAdrcCtx->AdrcConfig.sw_drc_weig_bilat = 16 ;
     pAdrcCtx->AdrcConfig.sw_drc_iir_frame = 16 ;
-	pAdrcCtx->AdrcConfig.sw_drc_gain = 1024 ;
-    pAdrcCtx->AdrcConfig.sw_drc_min_ogain= 0 ;
+    pAdrcCtx->AdrcConfig.sw_drc_gain = 1024 ;
+    pAdrcCtx->AdrcConfig.sw_drc_min_ogain = 0 ;
     for(int i = 0; i < ISP21_DRC_Y_NUM; ++i)
         pAdrcCtx->AdrcConfig.sw_drc_scale_y[i] = 80 ;
 
-	
+
     LOGI_AHDR( "%s:exit!\n", __FUNCTION__);
 }
 
@@ -170,24 +170,24 @@ void AdrcConfig
     //config default AdrcPrevData data
     pAdrcCtx->AdrcPrevData.DrcHandleData.sw_drc_offset_pow2 = 8;
     pAdrcCtx->AdrcPrevData.DrcHandleData.sw_drc_compres_scl = 20000;
-	pAdrcCtx->AdrcPrevData.DrcHandleData.sw_drc_position = 0.005 ;
-    pAdrcCtx->AdrcPrevData.DrcHandleData.sw_drc_delta_scalein= 0.01 ;
-    pAdrcCtx->AdrcPrevData.DrcHandleData.sw_drc_hpdetail_ratio= 0 ;
-    pAdrcCtx->AdrcPrevData.DrcHandleData.sw_drc_lpdetail_ratio= 0 ;
+    pAdrcCtx->AdrcPrevData.DrcHandleData.sw_drc_position = 0.005 ;
+    pAdrcCtx->AdrcPrevData.DrcHandleData.sw_drc_delta_scalein = 0.01 ;
+    pAdrcCtx->AdrcPrevData.DrcHandleData.sw_drc_hpdetail_ratio = 0 ;
+    pAdrcCtx->AdrcPrevData.DrcHandleData.sw_drc_lpdetail_ratio = 0 ;
     pAdrcCtx->AdrcPrevData.DrcHandleData.sw_drc_weicur_pix = 96 ;
-    pAdrcCtx->AdrcPrevData.DrcHandleData.sw_drc_weipre_frame= 255;
-    pAdrcCtx->AdrcPrevData.DrcHandleData.sw_drc_force_sgm_inv0= 0 ;
-    pAdrcCtx->AdrcPrevData.DrcHandleData.sw_drc_motion_scl= 0 ;
-    pAdrcCtx->AdrcPrevData.DrcHandleData.sw_drc_edge_scl= 16 ;
+    pAdrcCtx->AdrcPrevData.DrcHandleData.sw_drc_weipre_frame = 255;
+    pAdrcCtx->AdrcPrevData.DrcHandleData.sw_drc_force_sgm_inv0 = 0 ;
+    pAdrcCtx->AdrcPrevData.DrcHandleData.sw_drc_motion_scl = 0 ;
+    pAdrcCtx->AdrcPrevData.DrcHandleData.sw_drc_edge_scl = 16 ;
     pAdrcCtx->AdrcPrevData.DrcHandleData.sw_drc_space_sgm_inv1 = 4068 ;
     pAdrcCtx->AdrcPrevData.DrcHandleData.sw_drc_space_sgm_inv0 = 3968 ;
     pAdrcCtx->AdrcPrevData.DrcHandleData.sw_drc_range_sgm_inv1 = 1024 ;
     pAdrcCtx->AdrcPrevData.DrcHandleData.sw_drc_range_sgm_inv0 = 1024;
-    pAdrcCtx->AdrcPrevData.DrcHandleData.sw_drc_weig_maxl= 0 ;
-    pAdrcCtx->AdrcPrevData.DrcHandleData.sw_drc_weig_bilat= 16 ;
+    pAdrcCtx->AdrcPrevData.DrcHandleData.sw_drc_weig_maxl = 0 ;
+    pAdrcCtx->AdrcPrevData.DrcHandleData.sw_drc_weig_bilat = 16 ;
     pAdrcCtx->AdrcPrevData.DrcHandleData.sw_drc_iir_weight = 60 ;
-	pAdrcCtx->AdrcPrevData.DrcHandleData.sw_drc_adrc_gain = 1024 ;
-    pAdrcCtx->AdrcPrevData.DrcHandleData.sw_drc_min_ogain= 0 ;
+    pAdrcCtx->AdrcPrevData.DrcHandleData.sw_drc_adrc_gain = 1024 ;
+    pAdrcCtx->AdrcPrevData.DrcHandleData.sw_drc_min_ogain = 0 ;
     for(int i = 0; i < ISP21_DRC_Y_NUM; ++i)
     {
         pAdrcCtx->AdrcPrevData.DrcHandleData.sw_drc_gain_y[i] = 80 ;
@@ -204,7 +204,7 @@ void AdrcGetStats
 ) {
     LOG1_AHDR( "%s:enter!\n", __FUNCTION__);
 
-    
+
 
 
     LOG1_AHDR( "%s:exit!\n", __FUNCTION__);
@@ -240,14 +240,14 @@ void AdrcGetAeResult
         pAdrcCtx->CurrHandleData.Ratio = pAdrcCtx->CurrAeResult.M2S_Ratio;
         pAdrcCtx->CurrAeResult.ISO = AecHdrPreResult.HdrExp[1].exp_real_params.analog_gain * 50.0;
         pAdrcCtx->CurrAeResult.GlobalEnvLv = AecHdrPreResult.GlobalEnvLv[1];
-		pAdrcCtx->CurrAeResult.OEPdf = AecHdrPreResult.OverExpROIPdf[1];
+        pAdrcCtx->CurrAeResult.OEPdf = AecHdrPreResult.OverExpROIPdf[1];
         pAdrcCtx->CurrAeResult.DarkPdf = AecHdrPreResult.LowLightROIPdf[1];
         break;
     case 3:
         pAdrcCtx->CurrHandleData.Ratio = pAdrcCtx->CurrAeResult.L2M_Ratio * pAdrcCtx->CurrAeResult.M2S_Ratio;
         pAdrcCtx->CurrAeResult.ISO = AecHdrPreResult.HdrExp[2].exp_real_params.analog_gain * 50.0;
         pAdrcCtx->CurrAeResult.GlobalEnvLv = AecHdrPreResult.GlobalEnvLv[2];
-		pAdrcCtx->CurrAeResult.OEPdf = AecHdrPreResult.OverExpROIPdf[1];
+        pAdrcCtx->CurrAeResult.OEPdf = AecHdrPreResult.OverExpROIPdf[1];
         pAdrcCtx->CurrAeResult.DarkPdf = AecHdrPreResult.LowLightROIPdf[1];
         break;
     default:
@@ -272,42 +272,42 @@ void AdrcGetCurrData
 ) {
     LOG1_AHDR( "%s:enter!\n", __FUNCTION__);
 
-	pAdrcCtx->CurrHandleData.DrcHandleData.sw_drc_offset_pow2 = (float)(pAdrcCtx->AdrcConfig.sw_drc_offset_pow2);
+    pAdrcCtx->CurrHandleData.DrcHandleData.sw_drc_offset_pow2 = (float)(pAdrcCtx->AdrcConfig.sw_drc_offset_pow2);
     pAdrcCtx->CurrHandleData.DrcHandleData.sw_drc_position = (float)(pAdrcCtx->AdrcConfig.sw_drc_position);
-    pAdrcCtx->CurrHandleData.DrcHandleData.sw_drc_hpdetail_ratio= (float)(pAdrcCtx->AdrcConfig.sw_drc_hpdetail_ratio);
-    pAdrcCtx->CurrHandleData.DrcHandleData.sw_drc_lpdetail_ratio= (float)(pAdrcCtx->AdrcConfig.sw_drc_lpdetail_ratio);
+    pAdrcCtx->CurrHandleData.DrcHandleData.sw_drc_hpdetail_ratio = (float)(pAdrcCtx->AdrcConfig.sw_drc_hpdetail_ratio);
+    pAdrcCtx->CurrHandleData.DrcHandleData.sw_drc_lpdetail_ratio = (float)(pAdrcCtx->AdrcConfig.sw_drc_lpdetail_ratio);
     pAdrcCtx->CurrHandleData.DrcHandleData.sw_drc_weicur_pix = (float)(pAdrcCtx->AdrcConfig.sw_drc_weicur_pix);
-    pAdrcCtx->CurrHandleData.DrcHandleData.sw_drc_weipre_frame= (float)(pAdrcCtx->AdrcConfig.sw_drc_weipre_frame);
-    pAdrcCtx->CurrHandleData.DrcHandleData.sw_drc_force_sgm_inv0= (float)(pAdrcCtx->AdrcConfig.sw_drc_force_sgm_inv0);
-    pAdrcCtx->CurrHandleData.DrcHandleData.sw_drc_motion_scl= (float)(pAdrcCtx->AdrcConfig.sw_drc_motion_scl);
-    pAdrcCtx->CurrHandleData.DrcHandleData.sw_drc_edge_scl= (float)(pAdrcCtx->AdrcConfig.sw_drc_edge_scl);
+    pAdrcCtx->CurrHandleData.DrcHandleData.sw_drc_weipre_frame = (float)(pAdrcCtx->AdrcConfig.sw_drc_weipre_frame);
+    pAdrcCtx->CurrHandleData.DrcHandleData.sw_drc_force_sgm_inv0 = (float)(pAdrcCtx->AdrcConfig.sw_drc_force_sgm_inv0);
+    pAdrcCtx->CurrHandleData.DrcHandleData.sw_drc_motion_scl = (float)(pAdrcCtx->AdrcConfig.sw_drc_motion_scl);
+    pAdrcCtx->CurrHandleData.DrcHandleData.sw_drc_edge_scl = (float)(pAdrcCtx->AdrcConfig.sw_drc_edge_scl);
     pAdrcCtx->CurrHandleData.DrcHandleData.sw_drc_space_sgm_inv1 = (float)(pAdrcCtx->AdrcConfig.sw_drc_space_sgm_inv1);
     pAdrcCtx->CurrHandleData.DrcHandleData.sw_drc_space_sgm_inv0 = (float)(pAdrcCtx->AdrcConfig.sw_drc_space_sgm_inv0);
     pAdrcCtx->CurrHandleData.DrcHandleData.sw_drc_range_sgm_inv1 = (float)(pAdrcCtx->AdrcConfig.sw_drc_range_sgm_inv1);
     pAdrcCtx->CurrHandleData.DrcHandleData.sw_drc_range_sgm_inv0 = (float)(pAdrcCtx->AdrcConfig.sw_drc_range_sgm_inv0);
-    pAdrcCtx->CurrHandleData.DrcHandleData.sw_drc_weig_maxl= (float)(pAdrcCtx->AdrcConfig.sw_drc_weig_maxl);
-	pAdrcCtx->CurrHandleData.DrcHandleData.sw_drc_adrc_gain = (float)(pAdrcCtx->AdrcConfig.sw_drc_gain);
-    pAdrcCtx->CurrHandleData.DrcHandleData.sw_drc_weig_bilat= (float)(pAdrcCtx->AdrcConfig.sw_drc_weig_bilat);
-    pAdrcCtx->CurrHandleData.DrcHandleData.sw_drc_min_ogain= (float)(pAdrcCtx->AdrcConfig.sw_drc_min_ogain);
-	for(int i = 0; i < ISP21_DRC_Y_NUM; ++i){
+    pAdrcCtx->CurrHandleData.DrcHandleData.sw_drc_weig_maxl = (float)(pAdrcCtx->AdrcConfig.sw_drc_weig_maxl);
+    pAdrcCtx->CurrHandleData.DrcHandleData.sw_drc_adrc_gain = (float)(pAdrcCtx->AdrcConfig.sw_drc_gain);
+    pAdrcCtx->CurrHandleData.DrcHandleData.sw_drc_weig_bilat = (float)(pAdrcCtx->AdrcConfig.sw_drc_weig_bilat);
+    pAdrcCtx->CurrHandleData.DrcHandleData.sw_drc_min_ogain = (float)(pAdrcCtx->AdrcConfig.sw_drc_min_ogain);
+    for(int i = 0; i < ISP21_DRC_Y_NUM; ++i) {
         pAdrcCtx->CurrHandleData.DrcHandleData.sw_drc_scale_y[i] = (float)(pAdrcCtx->AdrcConfig.sw_drc_scale_y[i]) ;
-		pAdrcCtx->CurrHandleData.DrcHandleData.sw_drc_gain_y[i] = 0.0 ;
-		pAdrcCtx->CurrHandleData.DrcHandleData.sw_drc_compres_y[i] = 0.0 ;
-		}
+        pAdrcCtx->CurrHandleData.DrcHandleData.sw_drc_gain_y[i] = 0.0 ;
+        pAdrcCtx->CurrHandleData.DrcHandleData.sw_drc_compres_y[i] = 0.0 ;
+    }
 
-	float iir_frame = (float)(MIN(pAdrcCtx->frameCnt + 1, pAdrcCtx->AdrcConfig.sw_drc_iir_frame));
-	pAdrcCtx->CurrHandleData.DrcHandleData.sw_drc_iir_weight= 64.0*(iir_frame-1)/iir_frame;
+    float iir_frame = (float)(MIN(pAdrcCtx->frameCnt + 1, pAdrcCtx->AdrcConfig.sw_drc_iir_frame));
+    pAdrcCtx->CurrHandleData.DrcHandleData.sw_drc_iir_weight = 64.0 * (iir_frame - 1) / iir_frame;
 
-	pAdrcCtx->CurrHandleData.DrcHandleData.sw_drc_compres_scl =  20000.0;
+    pAdrcCtx->CurrHandleData.DrcHandleData.sw_drc_compres_scl =  20000.0;
 
-	int ISP_RAW_BIT= 12;
-	int MFHDR_LOG_Q_BITS =11;
-	int dstbits = ISP_RAW_BIT << MFHDR_LOG_Q_BITS;
-	int offsetbits_int = pAdrcCtx->AdrcConfig.sw_drc_offset_pow2;
-	int offsetbits = offsetbits_int << MFHDR_LOG_Q_BITS;
-	int validbits = dstbits - offsetbits;
-	int delta_scalein = (256 << MFHDR_LOG_Q_BITS) / validbits;
-	pAdrcCtx->CurrHandleData.DrcHandleData.sw_drc_delta_scalein= (float)delta_scalein;
+    int ISP_RAW_BIT = 12;
+    int MFHDR_LOG_Q_BITS = 11;
+    int dstbits = ISP_RAW_BIT << MFHDR_LOG_Q_BITS;
+    int offsetbits_int = pAdrcCtx->AdrcConfig.sw_drc_offset_pow2;
+    int offsetbits = offsetbits_int << MFHDR_LOG_Q_BITS;
+    int validbits = dstbits - offsetbits;
+    int delta_scalein = (256 << MFHDR_LOG_Q_BITS) / validbits;
+    pAdrcCtx->CurrHandleData.DrcHandleData.sw_drc_delta_scalein = (float)delta_scalein;
 
 
     LOG1_AHDR( "%s:exit!\n", __FUNCTION__);
@@ -324,10 +324,10 @@ void AdrcGetSensorInfo
 
     for(int i = 0; i < 3; i++)
     {
-        pAdrcCtx->SensorInfo.HdrMinGain[i] = AecHdrProcResult.HdrMinGain[i];
-        pAdrcCtx->SensorInfo.HdrMaxGain[i] = AecHdrProcResult.HdrMaxGain[i];
-        pAdrcCtx->SensorInfo.HdrMinIntegrationTime[i] = AecHdrProcResult.HdrMinIntegrationTime[i];
-        pAdrcCtx->SensorInfo.HdrMaxIntegrationTime[i] = AecHdrProcResult.HdrMaxIntegrationTime[i];
+        pAdrcCtx->SensorInfo.HdrMinGain[i] = AecHdrProcResult.HdrExpRange.stGainRange[i].Min;
+        pAdrcCtx->SensorInfo.HdrMaxGain[i] = AecHdrProcResult.HdrExpRange.stGainRange[i].Max;
+        pAdrcCtx->SensorInfo.HdrMinIntegrationTime[i] = AecHdrProcResult.HdrExpRange.stExpTimeRange[i].Min;
+        pAdrcCtx->SensorInfo.HdrMaxIntegrationTime[i] = AecHdrProcResult.HdrExpRange.stExpTimeRange[i].Max;
     }
 
     if(pAdrcCtx->FrameNumber == 2)
@@ -365,7 +365,7 @@ void AdrcApiSetLevel
 {
     LOG1_AHDR("%s:enter!\n", __FUNCTION__);
 
-    
+
 
     LOG1_AHDR( "%s:exit!\n", __FUNCTION__);
 }
@@ -455,28 +455,28 @@ void AdrcSelectMode
     DCT_ASSERT(pAdrcCtx != NULL);
     DCT_ASSERT(pCalibDb != NULL);
 
-	pAdrcCtx->AdrcConfig.sw_drc_offset_pow2 = pCalibDb->calib[mode].sw_drc_offset_pow2;
+    pAdrcCtx->AdrcConfig.sw_drc_offset_pow2 = pCalibDb->calib[mode].sw_drc_offset_pow2;
     pAdrcCtx->AdrcConfig.sw_drc_position = pCalibDb->calib[mode].sw_drc_position;
-    pAdrcCtx->AdrcConfig.sw_drc_hpdetail_ratio= pCalibDb->calib[mode].sw_drc_hpdetail_ratio;
-    pAdrcCtx->AdrcConfig.sw_drc_lpdetail_ratio= pCalibDb->calib[mode].sw_drc_lpdetail_ratio;
+    pAdrcCtx->AdrcConfig.sw_drc_hpdetail_ratio = pCalibDb->calib[mode].sw_drc_hpdetail_ratio;
+    pAdrcCtx->AdrcConfig.sw_drc_lpdetail_ratio = pCalibDb->calib[mode].sw_drc_lpdetail_ratio;
     pAdrcCtx->AdrcConfig.sw_drc_weicur_pix = pCalibDb->calib[mode].sw_drc_weicur_pix;
-    pAdrcCtx->AdrcConfig.sw_drc_weipre_frame= pCalibDb->calib[mode].sw_drc_weipre_frame;
-    pAdrcCtx->AdrcConfig.sw_drc_force_sgm_inv0= pCalibDb->calib[mode].sw_drc_force_sgm_inv0;
-    pAdrcCtx->AdrcConfig.sw_drc_motion_scl= pCalibDb->calib[mode].sw_drc_motion_scl;
-    pAdrcCtx->AdrcConfig.sw_drc_edge_scl= pCalibDb->calib[mode].sw_drc_edge_scl;
+    pAdrcCtx->AdrcConfig.sw_drc_weipre_frame = pCalibDb->calib[mode].sw_drc_weipre_frame;
+    pAdrcCtx->AdrcConfig.sw_drc_force_sgm_inv0 = pCalibDb->calib[mode].sw_drc_force_sgm_inv0;
+    pAdrcCtx->AdrcConfig.sw_drc_motion_scl = pCalibDb->calib[mode].sw_drc_motion_scl;
+    pAdrcCtx->AdrcConfig.sw_drc_edge_scl = pCalibDb->calib[mode].sw_drc_edge_scl;
     pAdrcCtx->AdrcConfig.sw_drc_space_sgm_inv1 = pCalibDb->calib[mode].sw_drc_space_sgm_inv1;
     pAdrcCtx->AdrcConfig.sw_drc_space_sgm_inv0 = pCalibDb->calib[mode].sw_drc_space_sgm_inv0;
     pAdrcCtx->AdrcConfig.sw_drc_range_sgm_inv1 = pCalibDb->calib[mode].sw_drc_range_sgm_inv1;
     pAdrcCtx->AdrcConfig.sw_drc_range_sgm_inv0 = pCalibDb->calib[mode].sw_drc_range_sgm_inv0;
-    pAdrcCtx->AdrcConfig.sw_drc_weig_maxl= pCalibDb->calib[mode].sw_drc_weig_maxl;
-    pAdrcCtx->AdrcConfig.sw_drc_weig_bilat= pCalibDb->calib[mode].sw_drc_weig_bilat;
+    pAdrcCtx->AdrcConfig.sw_drc_weig_maxl = pCalibDb->calib[mode].sw_drc_weig_maxl;
+    pAdrcCtx->AdrcConfig.sw_drc_weig_bilat = pCalibDb->calib[mode].sw_drc_weig_bilat;
     pAdrcCtx->AdrcConfig.sw_drc_iir_frame = pCalibDb->calib[mode].sw_drc_iir_frame;
-	pAdrcCtx->AdrcConfig.sw_drc_gain = pCalibDb->calib[mode].sw_drc_gain;
-    pAdrcCtx->AdrcConfig.sw_drc_min_ogain= pCalibDb->calib[mode].sw_drc_min_ogain;
-	for(int i = 0; i < ISP21_DRC_Y_NUM; ++i)
+    pAdrcCtx->AdrcConfig.sw_drc_gain = pCalibDb->calib[mode].sw_drc_gain;
+    pAdrcCtx->AdrcConfig.sw_drc_min_ogain = pCalibDb->calib[mode].sw_drc_min_ogain;
+    for(int i = 0; i < ISP21_DRC_Y_NUM; ++i)
         pAdrcCtx->AdrcConfig.sw_drc_scale_y[i] = pCalibDb->calib[mode].sw_drc_scale_y[i] ;
 #if 0
-	LOGE_AHDR("%s:  sw_drc_offset_pow2:%d\n", __FUNCTION__, pAdrcCtx->AdrcConfig.sw_drc_offset_pow2);
+    LOGE_AHDR("%s:  sw_drc_offset_pow2:%d\n", __FUNCTION__, pAdrcCtx->AdrcConfig.sw_drc_offset_pow2);
     LOGE_AHDR("%s:  sw_drc_position:%d\n", __FUNCTION__, pAdrcCtx->AdrcConfig.sw_drc_position);
     LOGE_AHDR("%s:  sw_drc_hpdetail_ratio:%d\n", __FUNCTION__, pAdrcCtx->AdrcConfig.sw_drc_hpdetail_ratio);
     LOGE_AHDR("%s:  sw_drc_lpdetail_ratio:%d\n", __FUNCTION__, pAdrcCtx->AdrcConfig.sw_drc_lpdetail_ratio);
@@ -492,7 +492,7 @@ void AdrcSelectMode
     LOGE_AHDR("%s:  sw_drc_weig_maxl:%d\n", __FUNCTION__, pAdrcCtx->AdrcConfig.sw_drc_weig_maxl);
     LOGE_AHDR("%s:  sw_drc_gain:%d\n", __FUNCTION__, pAdrcCtx->AdrcConfig.sw_drc_gain);
     LOGE_AHDR("%s:  sw_drc_iir_frame:%d\n", __FUNCTION__, pAdrcCtx->AdrcConfig.sw_drc_iir_frame);
-	LOGE_AHDR("%s:  sw_drc_min_ogain:%d\n", __FUNCTION__, pAdrcCtx->AdrcConfig.sw_drc_min_ogain);
+    LOGE_AHDR("%s:  sw_drc_min_ogain:%d\n", __FUNCTION__, pAdrcCtx->AdrcConfig.sw_drc_min_ogain);
 
 #endif
     LOG1_AHDR( "%s:exit!\n", __FUNCTION__);
@@ -536,7 +536,7 @@ void AdrcUpdateConfig
     pAdrcCtx->CurrHandleData.DynamicRange = pAdrcCtx->CurrAeResult.DynamicRange;
     pAdrcCtx->CurrHandleData.DynamicRange = LIMIT_VALUE(pAdrcCtx->CurrHandleData.DynamicRange, DYNAMICRANGEMAX, DYNAMICRANGEMIN);
 
-	pAdrcCtx->drcAttr.opMode = DRC_OPMODE_API_OFF;
+    pAdrcCtx->drcAttr.opMode = DRC_OPMODE_API_OFF;
     if(pAdrcCtx->drcAttr.opMode == DRC_OPMODE_API_OFF)
     {
         LOGD_AHDR("%s:  Ahdr api OFF!! Current Handle data:\n", __FUNCTION__);
@@ -566,7 +566,7 @@ void AdrcUpdateConfig
     {
         LOGD_AHDR("%s:  Ahdr api DarkArea!! Current Handle data:\n", __FUNCTION__);
         AdrcIQUpdate(pAdrcCtx, AecHdrPreResult, AfPreResult);
-  
+
 
     }
     else if(pAdrcCtx->drcAttr.opMode == DRC_OPMODE_TOOL)
@@ -594,7 +594,7 @@ bool DrcSetGlobalTMO
 
     bool returnValue = false;
 
-    
+
 
     return returnValue;
 
@@ -693,34 +693,34 @@ void DrcGetCurrIOData
 {
     LOG1_AHDR("%s:Enter!\n", __FUNCTION__);
 
-	pAdrcCtx->AdrcProcRes.DrcProcRes.sw_drc_offset_pow2 = (int)(pAdrcCtx->CurrHandleData.DrcHandleData.sw_drc_offset_pow2);
+    pAdrcCtx->AdrcProcRes.DrcProcRes.sw_drc_offset_pow2 = (int)(pAdrcCtx->CurrHandleData.DrcHandleData.sw_drc_offset_pow2);
     pAdrcCtx->AdrcProcRes.DrcProcRes.sw_drc_compres_scl =  (int)(pAdrcCtx->CurrHandleData.DrcHandleData.sw_drc_compres_scl);
     pAdrcCtx->AdrcProcRes.DrcProcRes.sw_drc_position = (int)(pAdrcCtx->CurrHandleData.DrcHandleData.sw_drc_position);
-    pAdrcCtx->AdrcProcRes.DrcProcRes.sw_drc_delta_scalein= (int)(pAdrcCtx->CurrHandleData.DrcHandleData.sw_drc_delta_scalein);
-    pAdrcCtx->AdrcProcRes.DrcProcRes.sw_drc_hpdetail_ratio= (int)(pAdrcCtx->CurrHandleData.DrcHandleData.sw_drc_hpdetail_ratio);
-    pAdrcCtx->AdrcProcRes.DrcProcRes.sw_drc_lpdetail_ratio= (int)(pAdrcCtx->CurrHandleData.DrcHandleData.sw_drc_lpdetail_ratio);
+    pAdrcCtx->AdrcProcRes.DrcProcRes.sw_drc_delta_scalein = (int)(pAdrcCtx->CurrHandleData.DrcHandleData.sw_drc_delta_scalein);
+    pAdrcCtx->AdrcProcRes.DrcProcRes.sw_drc_hpdetail_ratio = (int)(pAdrcCtx->CurrHandleData.DrcHandleData.sw_drc_hpdetail_ratio);
+    pAdrcCtx->AdrcProcRes.DrcProcRes.sw_drc_lpdetail_ratio = (int)(pAdrcCtx->CurrHandleData.DrcHandleData.sw_drc_lpdetail_ratio);
     pAdrcCtx->AdrcProcRes.DrcProcRes.sw_drc_weicur_pix = (int)(pAdrcCtx->CurrHandleData.DrcHandleData.sw_drc_weicur_pix);
-    pAdrcCtx->AdrcProcRes.DrcProcRes.sw_drc_weipre_frame= (int)(pAdrcCtx->CurrHandleData.DrcHandleData.sw_drc_weipre_frame);
-    pAdrcCtx->AdrcProcRes.DrcProcRes.sw_drc_force_sgm_inv0= (int)(pAdrcCtx->CurrHandleData.DrcHandleData.sw_drc_force_sgm_inv0);
-    pAdrcCtx->AdrcProcRes.DrcProcRes.sw_drc_motion_scl= (int)(pAdrcCtx->CurrHandleData.DrcHandleData.sw_drc_motion_scl);
-    pAdrcCtx->AdrcProcRes.DrcProcRes.sw_drc_edge_scl= (int)(pAdrcCtx->CurrHandleData.DrcHandleData.sw_drc_edge_scl);
+    pAdrcCtx->AdrcProcRes.DrcProcRes.sw_drc_weipre_frame = (int)(pAdrcCtx->CurrHandleData.DrcHandleData.sw_drc_weipre_frame);
+    pAdrcCtx->AdrcProcRes.DrcProcRes.sw_drc_force_sgm_inv0 = (int)(pAdrcCtx->CurrHandleData.DrcHandleData.sw_drc_force_sgm_inv0);
+    pAdrcCtx->AdrcProcRes.DrcProcRes.sw_drc_motion_scl = (int)(pAdrcCtx->CurrHandleData.DrcHandleData.sw_drc_motion_scl);
+    pAdrcCtx->AdrcProcRes.DrcProcRes.sw_drc_edge_scl = (int)(pAdrcCtx->CurrHandleData.DrcHandleData.sw_drc_edge_scl);
     pAdrcCtx->AdrcProcRes.DrcProcRes.sw_drc_space_sgm_inv1 = (int)(pAdrcCtx->CurrHandleData.DrcHandleData.sw_drc_space_sgm_inv1);
     pAdrcCtx->AdrcProcRes.DrcProcRes.sw_drc_space_sgm_inv0 = (int)(pAdrcCtx->CurrHandleData.DrcHandleData.sw_drc_space_sgm_inv0);
     pAdrcCtx->AdrcProcRes.DrcProcRes.sw_drc_range_sgm_inv1 = (int)(pAdrcCtx->CurrHandleData.DrcHandleData.sw_drc_range_sgm_inv1);
     pAdrcCtx->AdrcProcRes.DrcProcRes.sw_drc_range_sgm_inv0 = (int)(pAdrcCtx->CurrHandleData.DrcHandleData.sw_drc_range_sgm_inv0);
-    pAdrcCtx->AdrcProcRes.DrcProcRes.sw_drc_weig_maxl= (int)(pAdrcCtx->CurrHandleData.DrcHandleData.sw_drc_weig_maxl);
-    pAdrcCtx->AdrcProcRes.DrcProcRes.sw_drc_weig_bilat= (int)(pAdrcCtx->CurrHandleData.DrcHandleData.sw_drc_weig_bilat);
-	pAdrcCtx->AdrcProcRes.DrcProcRes.sw_drc_adrc_gain= (int)(pAdrcCtx->CurrHandleData.DrcHandleData.sw_drc_adrc_gain);
-    pAdrcCtx->AdrcProcRes.DrcProcRes.sw_drc_iir_weight= (int)(pAdrcCtx->CurrHandleData.DrcHandleData.sw_drc_iir_weight);
-    pAdrcCtx->AdrcProcRes.DrcProcRes.sw_drc_min_ogain= (int)(pAdrcCtx->CurrHandleData.DrcHandleData.sw_drc_min_ogain);
-	for(int i = 0; i < ISP21_DRC_Y_NUM; ++i)
+    pAdrcCtx->AdrcProcRes.DrcProcRes.sw_drc_weig_maxl = (int)(pAdrcCtx->CurrHandleData.DrcHandleData.sw_drc_weig_maxl);
+    pAdrcCtx->AdrcProcRes.DrcProcRes.sw_drc_weig_bilat = (int)(pAdrcCtx->CurrHandleData.DrcHandleData.sw_drc_weig_bilat);
+    pAdrcCtx->AdrcProcRes.DrcProcRes.sw_drc_adrc_gain = (int)(pAdrcCtx->CurrHandleData.DrcHandleData.sw_drc_adrc_gain);
+    pAdrcCtx->AdrcProcRes.DrcProcRes.sw_drc_iir_weight = (int)(pAdrcCtx->CurrHandleData.DrcHandleData.sw_drc_iir_weight);
+    pAdrcCtx->AdrcProcRes.DrcProcRes.sw_drc_min_ogain = (int)(pAdrcCtx->CurrHandleData.DrcHandleData.sw_drc_min_ogain);
+    for(int i = 0; i < ISP21_DRC_Y_NUM; ++i)
     {
         pAdrcCtx->AdrcProcRes.DrcProcRes.sw_drc_gain_y[i] = (int)(pAdrcCtx->CurrHandleData.DrcHandleData.sw_drc_gain_y[i]) ;
         pAdrcCtx->AdrcProcRes.DrcProcRes.sw_drc_compres_y[i] = (int)(pAdrcCtx->CurrHandleData.DrcHandleData.sw_drc_compres_y[i]) ;
         pAdrcCtx->AdrcProcRes.DrcProcRes.sw_drc_scale_y[i] = (int)(pAdrcCtx->CurrHandleData.DrcHandleData.sw_drc_scale_y[i]) ;
     }
 
-	LOGD_AHDR("%s:  sw_drc_offset_pow2:%d\n", __FUNCTION__, pAdrcCtx->AdrcProcRes.DrcProcRes.sw_drc_offset_pow2);
+    LOGD_AHDR("%s:  sw_drc_offset_pow2:%d\n", __FUNCTION__, pAdrcCtx->AdrcProcRes.DrcProcRes.sw_drc_offset_pow2);
     LOGD_AHDR("%s:  sw_drc_compres_scl:%d\n", __FUNCTION__, pAdrcCtx->AdrcProcRes.DrcProcRes.sw_drc_compres_scl);
     LOGD_AHDR("%s:  sw_drc_position:%d\n", __FUNCTION__, pAdrcCtx->AdrcProcRes.DrcProcRes.sw_drc_position);
     LOGD_AHDR("%s:  sw_drc_delta_scalein:%d\n", __FUNCTION__, pAdrcCtx->AdrcProcRes.DrcProcRes.sw_drc_delta_scalein);
@@ -738,7 +738,7 @@ void DrcGetCurrIOData
     LOGD_AHDR("%s:  sw_drc_weig_maxl:%d\n", __FUNCTION__, pAdrcCtx->AdrcProcRes.DrcProcRes.sw_drc_weig_maxl);
     LOGD_AHDR("%s:  sw_drc_weig_bilat:%d\n", __FUNCTION__, pAdrcCtx->AdrcProcRes.DrcProcRes.sw_drc_adrc_gain);
     LOGD_AHDR("%s:  sw_drc_iir_weight:%d\n", __FUNCTION__, pAdrcCtx->AdrcProcRes.DrcProcRes.sw_drc_iir_weight);
-	LOGD_AHDR("%s:  sw_drc_min_ogain:%d\n", __FUNCTION__, pAdrcCtx->AdrcProcRes.DrcProcRes.sw_drc_min_ogain);
+    LOGD_AHDR("%s:  sw_drc_min_ogain:%d\n", __FUNCTION__, pAdrcCtx->AdrcProcRes.DrcProcRes.sw_drc_min_ogain);
 
     LOG1_AHDR("%s:Eixt!\n", __FUNCTION__);
 }
@@ -753,9 +753,9 @@ void DrcProcessing
 {
     LOG1_AHDR("%s:Enter!\n", __FUNCTION__);
 
- 	//damp
+    //damp
 
-    
+
     //get current IO data
     DrcGetCurrIOData(pAdrcCtx);
 

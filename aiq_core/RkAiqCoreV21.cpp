@@ -68,7 +68,7 @@ namespace RkCam {
  * will run these algos one by one.
  */
 static struct RkAiqAlgoDesCommExt g_default_3a_des_v21[] = {
-    { (RkAiqAlgoDesComm*)&g_RkIspAlgoDescAe, 0, 0, },
+    { (RkAiqAlgoDesComm*)&g_RkIspAlgoDescAe, 0, 1 },
     { (RkAiqAlgoDesComm*)&g_RkIspAlgoDescAdebayer, 0, 0 },
     { (RkAiqAlgoDesComm*)&g_RkIspAlgoDescAwb, 0, 0 },
     { (RkAiqAlgoDesComm*)&g_RkIspAlgoDescAgamma, 0, 0 },
@@ -184,10 +184,10 @@ RkAiqCoreV21::convertIspstatsToAlgo(const SmartPtr<VideoBuffer> &buffer)
     struct rkisp_isp21_stat_buffer *stats;
 
     SmartPtr<RkAiqExpParamsProxy> expParams = buf->get_exp_params();
-	if (!buf->get_isp_params().ptr()) {
-		LOGW("no effect isp params..");
-		return ret;
-	}
+    if (!buf->get_isp_params().ptr()) {
+        LOGW("no effect isp params..");
+        return ret;
+    }
     rk_aiq_isp_params_v21_t* ispParams =
         static_cast<rk_aiq_isp_params_v21_t*>(buf->get_isp_params()->data().ptr());
     SmartPtr<RkAiqAfInfoProxy> afParams = buf->get_af_params();
@@ -238,7 +238,7 @@ RkAiqCoreV21::convertIspstatsToAlgo(const SmartPtr<VideoBuffer> &buffer)
         mAlogsSharedParams.ispStats.awb_stats_v201.blockResult[i].WpNo = stats->params.rawawb.ramdata[i].wp;
     }
 
-    for(int i = 0; i< RK_AIQ_AWB_WP_HIST_BIN_NUM; i++){
+    for(int i = 0; i < RK_AIQ_AWB_WP_HIST_BIN_NUM; i++) {
         mAlogsSharedParams.ispStats.awb_stats_v201.WpNoHist[i] = stats->params.rawawb.ro_yhist_bin[i];
 
     }
@@ -618,12 +618,12 @@ RkAiqCoreV21::genIspAdrcResult(RkAiqFullParams* params)
 
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
 
-	RkAiqAlgoProcResAdrc* adrc_com =
+    RkAiqAlgoProcResAdrc* adrc_com =
         mAlogsSharedParams.procResComb.adrc_proc_res;
     rk_aiq_isp_params_v21_t* isp_param =
         static_cast<rk_aiq_isp_params_v21_t*>(params->mIspParams->data().ptr());
 
-	if (!adrc_com) {
+    if (!adrc_com) {
         LOGD_ANALYZER("no adrc result");
         return XCAM_RETURN_NO_ERROR;
     }
@@ -633,49 +633,49 @@ RkAiqCoreV21::genIspAdrcResult(RkAiqFullParams* params)
     SmartPtr<RkAiqHandle>* handle = getCurAlgoTypeHandle(RK_AIQ_ALGO_TYPE_ADRC);
     int algo_id = (*handle)->getAlgoId();
 
-	
-	// gen rk adrc result
-		if (algo_id == 0) {
-			
-			RkAiqAlgoProcResAdrcInt* ahdr_rk = (RkAiqAlgoProcResAdrcInt*)adrc_com;
-			
-				
-				   isp_param->drc.DrcProcRes.sw_drc_offset_pow2 	= ahdr_rk->AdrcProcRes.DrcProcRes.sw_drc_offset_pow2;
-				isp_param->drc.DrcProcRes.sw_drc_compres_scl  = ahdr_rk->AdrcProcRes.DrcProcRes.sw_drc_compres_scl;
-				isp_param->drc.DrcProcRes.sw_drc_position  = ahdr_rk->AdrcProcRes.DrcProcRes.sw_drc_position;
-				isp_param->drc.DrcProcRes.sw_drc_delta_scalein		  = ahdr_rk->AdrcProcRes.DrcProcRes.sw_drc_delta_scalein;
-				isp_param->drc.DrcProcRes.sw_drc_hpdetail_ratio 	 = ahdr_rk->AdrcProcRes.DrcProcRes.sw_drc_hpdetail_ratio;
-				isp_param->drc.DrcProcRes.sw_drc_lpdetail_ratio 	= ahdr_rk->AdrcProcRes.DrcProcRes.sw_drc_lpdetail_ratio;
-				isp_param->drc.DrcProcRes.sw_drc_weicur_pix 	 = ahdr_rk->AdrcProcRes.DrcProcRes.sw_drc_weicur_pix;
-				isp_param->drc.DrcProcRes.sw_drc_weipre_frame  = ahdr_rk->AdrcProcRes.DrcProcRes.sw_drc_weipre_frame;
-				isp_param->drc.DrcProcRes.sw_drc_force_sgm_inv0   = ahdr_rk->AdrcProcRes.DrcProcRes.sw_drc_force_sgm_inv0;
-				isp_param->drc.DrcProcRes.sw_drc_motion_scl 	= ahdr_rk->AdrcProcRes.DrcProcRes.sw_drc_motion_scl;
-				isp_param->drc.DrcProcRes.sw_drc_edge_scl	= ahdr_rk->AdrcProcRes.DrcProcRes.sw_drc_edge_scl;
-				isp_param->drc.DrcProcRes.sw_drc_space_sgm_inv1    = ahdr_rk->AdrcProcRes.DrcProcRes.sw_drc_space_sgm_inv1;
-				isp_param->drc.DrcProcRes.sw_drc_space_sgm_inv0 	= ahdr_rk->AdrcProcRes.DrcProcRes.sw_drc_space_sgm_inv0;
-				isp_param->drc.DrcProcRes.sw_drc_range_sgm_inv1 	= ahdr_rk->AdrcProcRes.DrcProcRes.sw_drc_range_sgm_inv1;
-				isp_param->drc.DrcProcRes.sw_drc_range_sgm_inv0 = ahdr_rk->AdrcProcRes.DrcProcRes.sw_drc_range_sgm_inv0;
-				isp_param->drc.DrcProcRes.sw_drc_weig_maxl	  = ahdr_rk->AdrcProcRes.DrcProcRes.sw_drc_weig_maxl;
-				isp_param->drc.DrcProcRes.sw_drc_weig_bilat  = ahdr_rk->AdrcProcRes.DrcProcRes.sw_drc_weig_bilat;
-				isp_param->drc.DrcProcRes.sw_drc_iir_weight  = ahdr_rk->AdrcProcRes.DrcProcRes.sw_drc_iir_weight;
-				isp_param->drc.DrcProcRes.sw_drc_min_ogain	= ahdr_rk->AdrcProcRes.DrcProcRes.sw_drc_min_ogain;
-				isp_param->drc.DrcProcRes.sw_drc_adrc_gain	= ahdr_rk->AdrcProcRes.DrcProcRes.sw_drc_adrc_gain;
-				for(int i=0;i<17;i++){
-				isp_param->drc.DrcProcRes.sw_drc_gain_y[i]	  = ahdr_rk->AdrcProcRes.DrcProcRes.sw_drc_gain_y[i];
-				isp_param->drc.DrcProcRes.sw_drc_compres_y[i]	 = ahdr_rk->AdrcProcRes.DrcProcRes.sw_drc_compres_y[i];
-				isp_param->drc.DrcProcRes.sw_drc_scale_y[i]    = ahdr_rk->AdrcProcRes.DrcProcRes.sw_drc_scale_y[i];
-					}
-					  
-					
-					isp_param->drc.isHdrGlobalTmo =
-						ahdr_rk->AdrcProcRes.isHdrGlobalTmo;
-			
-					isp_param->drc.bTmoEn =
-						ahdr_rk->AdrcProcRes.bTmoEn;
-			
-					isp_param->drc.isLinearTmo =
-						ahdr_rk->AdrcProcRes.isLinearTmo;
-		}
+
+    // gen rk adrc result
+    if (algo_id == 0) {
+
+        RkAiqAlgoProcResAdrcInt* ahdr_rk = (RkAiqAlgoProcResAdrcInt*)adrc_com;
+
+
+        isp_param->drc.DrcProcRes.sw_drc_offset_pow2     = ahdr_rk->AdrcProcRes.DrcProcRes.sw_drc_offset_pow2;
+        isp_param->drc.DrcProcRes.sw_drc_compres_scl  = ahdr_rk->AdrcProcRes.DrcProcRes.sw_drc_compres_scl;
+        isp_param->drc.DrcProcRes.sw_drc_position  = ahdr_rk->AdrcProcRes.DrcProcRes.sw_drc_position;
+        isp_param->drc.DrcProcRes.sw_drc_delta_scalein        = ahdr_rk->AdrcProcRes.DrcProcRes.sw_drc_delta_scalein;
+        isp_param->drc.DrcProcRes.sw_drc_hpdetail_ratio      = ahdr_rk->AdrcProcRes.DrcProcRes.sw_drc_hpdetail_ratio;
+        isp_param->drc.DrcProcRes.sw_drc_lpdetail_ratio     = ahdr_rk->AdrcProcRes.DrcProcRes.sw_drc_lpdetail_ratio;
+        isp_param->drc.DrcProcRes.sw_drc_weicur_pix      = ahdr_rk->AdrcProcRes.DrcProcRes.sw_drc_weicur_pix;
+        isp_param->drc.DrcProcRes.sw_drc_weipre_frame  = ahdr_rk->AdrcProcRes.DrcProcRes.sw_drc_weipre_frame;
+        isp_param->drc.DrcProcRes.sw_drc_force_sgm_inv0   = ahdr_rk->AdrcProcRes.DrcProcRes.sw_drc_force_sgm_inv0;
+        isp_param->drc.DrcProcRes.sw_drc_motion_scl     = ahdr_rk->AdrcProcRes.DrcProcRes.sw_drc_motion_scl;
+        isp_param->drc.DrcProcRes.sw_drc_edge_scl   = ahdr_rk->AdrcProcRes.DrcProcRes.sw_drc_edge_scl;
+        isp_param->drc.DrcProcRes.sw_drc_space_sgm_inv1    = ahdr_rk->AdrcProcRes.DrcProcRes.sw_drc_space_sgm_inv1;
+        isp_param->drc.DrcProcRes.sw_drc_space_sgm_inv0     = ahdr_rk->AdrcProcRes.DrcProcRes.sw_drc_space_sgm_inv0;
+        isp_param->drc.DrcProcRes.sw_drc_range_sgm_inv1     = ahdr_rk->AdrcProcRes.DrcProcRes.sw_drc_range_sgm_inv1;
+        isp_param->drc.DrcProcRes.sw_drc_range_sgm_inv0 = ahdr_rk->AdrcProcRes.DrcProcRes.sw_drc_range_sgm_inv0;
+        isp_param->drc.DrcProcRes.sw_drc_weig_maxl    = ahdr_rk->AdrcProcRes.DrcProcRes.sw_drc_weig_maxl;
+        isp_param->drc.DrcProcRes.sw_drc_weig_bilat  = ahdr_rk->AdrcProcRes.DrcProcRes.sw_drc_weig_bilat;
+        isp_param->drc.DrcProcRes.sw_drc_iir_weight  = ahdr_rk->AdrcProcRes.DrcProcRes.sw_drc_iir_weight;
+        isp_param->drc.DrcProcRes.sw_drc_min_ogain  = ahdr_rk->AdrcProcRes.DrcProcRes.sw_drc_min_ogain;
+        isp_param->drc.DrcProcRes.sw_drc_adrc_gain  = ahdr_rk->AdrcProcRes.DrcProcRes.sw_drc_adrc_gain;
+        for(int i = 0; i < 17; i++) {
+            isp_param->drc.DrcProcRes.sw_drc_gain_y[i]    = ahdr_rk->AdrcProcRes.DrcProcRes.sw_drc_gain_y[i];
+            isp_param->drc.DrcProcRes.sw_drc_compres_y[i]    = ahdr_rk->AdrcProcRes.DrcProcRes.sw_drc_compres_y[i];
+            isp_param->drc.DrcProcRes.sw_drc_scale_y[i]    = ahdr_rk->AdrcProcRes.DrcProcRes.sw_drc_scale_y[i];
+        }
+
+
+        isp_param->drc.isHdrGlobalTmo =
+            ahdr_rk->AdrcProcRes.isHdrGlobalTmo;
+
+        isp_param->drc.bTmoEn =
+            ahdr_rk->AdrcProcRes.bTmoEn;
+
+        isp_param->drc.isLinearTmo =
+            ahdr_rk->AdrcProcRes.isLinearTmo;
+    }
 
     EXIT_ANALYZER_FUNCTION();
 

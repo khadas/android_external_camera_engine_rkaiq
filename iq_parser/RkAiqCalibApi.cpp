@@ -221,6 +221,178 @@ static void ClearYnrV2ProfileList(struct list_head *profile_list) {
 	 
  }
 /******************************************************************************
+ * AddAecCalibProfile2AecCalibList
+ *****************************************************************************/
+bool AddAecCalibProfile2AecCalibList
+(
+    list_head *profile_list,
+    CalibDb_Aec_CalibPara_t* pAddAec
+) {
+    CalibDb_Aec_CalibPara_t* pNewAec = NULL;
+
+    // initial check
+    if(pAddAec == NULL ) {
+        LOGE("pNewAec is invalid");
+        return(false);
+    }
+    // check if scene already exists
+    CalibDb_Aec_CalibPara_t* pAecFind = NULL;
+    GetAecProfileFromAecCalibListBySceneName(profile_list, pAddAec->scene, &pAecFind);
+    if(pAecFind == NULL) {
+        pNewAec = (CalibDb_Aec_CalibPara_t*)malloc(sizeof(CalibDb_Aec_CalibPara_t));
+        //printf("%p\n", pNewAec);
+        memcpy(pNewAec, pAddAec, sizeof(CalibDb_Aec_CalibPara_t));
+        list_prepare_item(pNewAec);
+        list_add_tail((list_head*)pNewAec, profile_list);
+        return (true);
+    } else {
+        LOGE("aec scene (%s) is repeated", pAecFind->scene);
+        return (false);
+    }
+}
+
+/******************************************************************************
+ * GetAecProfileFromAecCalibListBySceneName
+ *****************************************************************************/
+bool GetAecProfileFromAecCalibListBySceneName
+(
+    const list_head* profile_list,
+    const char* scene,
+    CalibDb_Aec_CalibPara_t** pAecProfile,
+    int *scene_index
+) {
+    list_head* p;
+    p = profile_list->next;
+    if(scene_index != NULL) {
+        *scene_index = 0;
+    }
+    while (p != profile_list)
+    {
+        CalibDb_Aec_CalibPara_t* pProfile = container_of(p, CalibDb_Aec_CalibPara_t, listHead);
+        //printf("%s  %p ", pProfile->scene, p);
+        if (!strncmp(pProfile->scene, scene, sizeof(pProfile->scene))) {
+            *pAecProfile = pProfile;
+            break;
+        }
+        p = p->next;
+        if(scene_index != NULL) {
+            *scene_index = *scene_index + 1;
+        }
+    }
+    return(true);
+}
+
+
+/******************************************************************************
+ * GetAecProfileFromAecCalibListByIdx
+ *****************************************************************************/
+bool GetAecProfileFromAecCalibListByIdx
+(
+    const list_head* profile_list,
+    int idx,
+    const CalibDb_Aec_CalibPara_t** pAecProfile
+) {
+    list_head* p;
+    p = profile_list->next;
+    int cnt = 0;
+    while (p != profile_list)
+    {
+        if (cnt == idx) {
+            CalibDb_Aec_CalibPara_t* pProfile = container_of(p, CalibDb_Aec_CalibPara_t, listHead);
+            //printf("%p ", pProfile);
+            *pAecProfile = pProfile;
+            break;
+        }
+        cnt++;
+        p = p->next;
+    }
+    return(true);
+}
+
+/******************************************************************************
+ * AddAecTuneProfile2AecTuneList
+ *****************************************************************************/
+bool AddAecTuneProfile2AecTuneList
+(
+    list_head *profile_list,
+    CalibDb_Aec_TunePara_t* pAddAec
+) {
+    CalibDb_Aec_TunePara_t* pNewAec = NULL;
+
+    // initial check
+    if(pAddAec == NULL ) {
+        LOGE("pNewAec is invalid");
+        return(false);
+    }
+    // check if scene already exists
+    CalibDb_Aec_TunePara_t* pAecFind = NULL;
+    GetAecProfileFromAecTuneListBySceneName(profile_list, pAddAec->scene, &pAecFind);
+    if(pAecFind == NULL) {
+        pNewAec = (CalibDb_Aec_TunePara_t*)malloc(sizeof(CalibDb_Aec_TunePara_t));
+        //printf("%p\n", pNewAec);
+        memcpy(pNewAec, pAddAec, sizeof(CalibDb_Aec_TunePara_t));
+        list_prepare_item(pNewAec);
+        list_add_tail((list_head*)pNewAec, profile_list);
+        return (true);
+    } else {
+        LOGE("aec scene (%s) is repeated", pAecFind->scene);
+        return (false);
+    }
+}
+
+
+/******************************************************************************
+ * GetAecProfileFromAecCalibListBySceneName
+ *****************************************************************************/
+bool GetAecProfileFromAecTuneListBySceneName
+(
+    const list_head* profile_list,
+    const char* scene,
+    CalibDb_Aec_TunePara_t** pAecProfile
+) {
+    list_head* p;
+    p = profile_list->next;
+    while (p != profile_list)
+    {
+        CalibDb_Aec_TunePara_t* pProfile = container_of(p, CalibDb_Aec_TunePara_t, listHead);
+        //printf("%s  %p ", pProfile->scene, p);
+        if (!strncmp(pProfile->scene, scene, sizeof(pProfile->scene))) {
+            *pAecProfile = pProfile;
+            break;
+        }
+        p = p->next;
+    }
+    return(true);
+}
+
+
+/******************************************************************************
+ * GetAecProfileFromAecCalibListByIdx
+ *****************************************************************************/
+bool GetAecProfileFromAecTuneListByIdx
+(
+    const list_head* profile_list,
+    int idx,
+    const CalibDb_Aec_TunePara_t** pAecProfile
+) {
+    list_head* p;
+    p = profile_list->next;
+    int cnt = 0;
+    while (p != profile_list)
+    {
+        if (cnt == idx) {
+            CalibDb_Aec_TunePara_t* pProfile = container_of(p, CalibDb_Aec_TunePara_t, listHead);
+            //printf("%p ", pProfile);
+            *pAecProfile = pProfile;
+            break;
+        }
+        cnt++;
+        p = p->next;
+    }
+    return(true);
+}
+
+/******************************************************************************
  * AddAwbCalibV200Profile2AwbCalibV200List
  *****************************************************************************/
 bool AddAwbCalibV200Profile2AwbCalibV200List
@@ -231,22 +403,22 @@ bool AddAwbCalibV200Profile2AwbCalibV200List
     CalibDb_Awb_Calib_Para_V200_t* pNewAwb = NULL;
 
     // check if pAddAwb  is valid
-    if(pAddAwb ==NULL ){
+    if(pAddAwb == NULL ) {
         LOGE("pNewAwb is invalid");
         return(false);
     }
     // check if scene already exists
     CalibDb_Awb_Calib_Para_V200_t* pAwbFind = NULL;
-    GetAwbProfileFromAwbCalibV200ListBySceneName(profile_list,pAddAwb->scene,&pAwbFind);
-    if(pAwbFind == NULL){
+    GetAwbProfileFromAwbCalibV200ListBySceneName(profile_list, pAddAwb->scene, &pAwbFind);
+    if(pAwbFind == NULL) {
         pNewAwb = (CalibDb_Awb_Calib_Para_V200_t*)malloc(sizeof(CalibDb_Awb_Calib_Para_V200_t));
         //printf("%p\n", pNewAwb);
         memcpy(pNewAwb, pAddAwb, sizeof(CalibDb_Awb_Calib_Para_V200_t));
         list_prepare_item(pNewAwb);
-        list_add_tail((list_head*)pNewAwb , profile_list);
+        list_add_tail((list_head*)pNewAwb, profile_list);
         return (true);
-    }else{
-        LOGE("awb scene (%s) is repeated",pAwbFind->scene);
+    } else {
+        LOGE("awb scene (%s) is repeated", pAwbFind->scene);
         return (false);
     }
 }
@@ -264,7 +436,7 @@ bool GetAwbProfileFromAwbCalibV200ListBySceneName
 ) {
     list_head* p;
     p = profile_list->next;
-    if(scene_index != NULL){
+    if(scene_index != NULL) {
         *scene_index = 0;
     }
     while (p != profile_list)
@@ -276,8 +448,8 @@ bool GetAwbProfileFromAwbCalibV200ListBySceneName
             break;
         }
         p = p->next;
-        if(scene_index != NULL){
-            *scene_index = *scene_index +1;
+        if(scene_index != NULL) {
+            *scene_index = *scene_index + 1;
         }
     }
     return(true);
@@ -298,7 +470,7 @@ bool GetAwbProfileFromAwbCalibV200ListByIdx
     int cnt = 0;
     while (p != profile_list)
     {
-        if (cnt==idx) {
+        if (cnt == idx) {
             CalibDb_Awb_Calib_Para_V200_t* pProfile = container_of(p, CalibDb_Awb_Calib_Para_V200_t, listHead);
             //printf("%p ", pProfile);
             *pAwbProfile = pProfile;
@@ -321,22 +493,22 @@ bool AddAwbCalibV201Profile2AwbCalibV201List
     CalibDb_Awb_Calib_Para_V201_t* pNewAwb = NULL;
 
     // check if pAddAwb  is valid
-    if(pAddAwb ==NULL ){
+    if(pAddAwb == NULL ) {
         LOGE("pNewAwb is invalid");
         return(false);
     }
     // check if scene already exists
     CalibDb_Awb_Calib_Para_V201_t* pAwbFind = NULL;
-    GetAwbProfileFromAwbCalibV201ListBySceneName(profile_list,pAddAwb->scene,&pAwbFind);
-    if(pAwbFind == NULL){
+    GetAwbProfileFromAwbCalibV201ListBySceneName(profile_list, pAddAwb->scene, &pAwbFind);
+    if(pAwbFind == NULL) {
         pNewAwb = (CalibDb_Awb_Calib_Para_V201_t*)malloc(sizeof(CalibDb_Awb_Calib_Para_V201_t));
         //printf("%p\n", pNewAwb);
         memcpy(pNewAwb, pAddAwb, sizeof(CalibDb_Awb_Calib_Para_V201_t));
         list_prepare_item(pNewAwb);
-        list_add_tail((list_head*)pNewAwb , profile_list);
+        list_add_tail((list_head*)pNewAwb, profile_list);
         return (true);
-    }else{
-        LOGE("awb scene (%s) is repeated",pAwbFind->scene);
+    } else {
+        LOGE("awb scene (%s) is repeated", pAwbFind->scene);
         return (false);
     }
 }
@@ -354,7 +526,7 @@ bool GetAwbProfileFromAwbCalibV201ListBySceneName
 ) {
     list_head* p;
     p = profile_list->next;
-    if(scene_index != NULL){
+    if(scene_index != NULL) {
         *scene_index = 0;
     }
     while (p != profile_list)
@@ -366,8 +538,8 @@ bool GetAwbProfileFromAwbCalibV201ListBySceneName
             break;
         }
         p = p->next;
-        if(scene_index != NULL){
-            *scene_index = *scene_index +1;
+        if(scene_index != NULL) {
+            *scene_index = *scene_index + 1;
         }
     }
     return(true);
@@ -388,7 +560,7 @@ bool GetAwbProfileFromAwbCalibV201ListByIdx
     int cnt = 0;
     while (p != profile_list)
     {
-        if (cnt==idx) {
+        if (cnt == idx) {
             CalibDb_Awb_Calib_Para_V201_t* pProfile = container_of(p, CalibDb_Awb_Calib_Para_V201_t, listHead);
             //printf("%p ", pProfile);
             *pAwbProfile = pProfile;
@@ -411,22 +583,22 @@ bool AddAwbAdjustProfile2AwbAdjustList
     CalibDb_Awb_Adjust_Para_t* pNewAwb = NULL;
 
     // check if pAddAwb  is valid
-    if(pAddAwb ==NULL ){
+    if(pAddAwb == NULL ) {
         LOGE("pNewAwb is invalid");
         return(false);
     }
     // check if scene already exists
     CalibDb_Awb_Adjust_Para_t* pAwbFind = NULL;
-    GetAwbProfileFromAwbAdjustListBySceneName(profile_list,pAddAwb->scene,&pAwbFind);
-    if(pAwbFind == NULL){
+    GetAwbProfileFromAwbAdjustListBySceneName(profile_list, pAddAwb->scene, &pAwbFind);
+    if(pAwbFind == NULL) {
         pNewAwb = (CalibDb_Awb_Adjust_Para_t*)malloc(sizeof(CalibDb_Awb_Adjust_Para_t));
         //printf("%p\n", pNewAwb);
         memcpy(pNewAwb, pAddAwb, sizeof(CalibDb_Awb_Adjust_Para_t));
         list_prepare_item(pNewAwb);
-        list_add_tail((list_head*)pNewAwb , profile_list);
+        list_add_tail((list_head*)pNewAwb, profile_list);
         return (true);
-    }else{
-        LOGE("awb scene (%s) is repeated",pAwbFind->scene);
+    } else {
+        LOGE("awb scene (%s) is repeated", pAwbFind->scene);
         return (false);
     }
 }
@@ -471,7 +643,7 @@ bool GetAwbProfileFromAwbAdjustListByIdx
     int cnt = 0;
     while (p != profile_list)
     {
-        if (cnt==idx) {
+        if (cnt == idx) {
             CalibDb_Awb_Adjust_Para_t* pProfile = container_of(p, CalibDb_Awb_Adjust_Para_t, listHead);
             //printf("%p ", pProfile);
             *pAwbProfile = pProfile;

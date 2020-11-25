@@ -622,11 +622,17 @@ Abayernr_result_t bayernr2D_fix_transfer_V2(RK_Bayernr_2D_Params_V2_Select_t* pS
 
 	// ISP_BAYNR_3A00_THLD
 	pFix->baynr_diff_thld = LUTPRECISION_FIX;
+	if(pFix->baynr_diff_thld > 0x3ff){
+		pFix->baynr_diff_thld = 0x3ff;
+	}
 	pFix->baynr_softthld = (int)(pSelect->bayernrv2_filter_soft_threshold_ratio * (1 << 10));
 
 	// ISP_BAYNR_3A00_W1_STRENG
 	pFix->bltflt_streng = (int)(pSelect->bayernrv2_filter_strength * (1 << FIXBILSTRG));
 	pFix->baynr_reg_w1 = (int)(pSelect->bayernrv2_filter_out_wgt * (1 << 10));
+	if(pFix->baynr_reg_w1 > 0x3ff){
+		pFix->baynr_reg_w1 = 0x3ff;
+	}
 
 	// ISP_BAYNR_3A00_SIGMAX0-15   ISP_BAYNR_3A00_SIGMAY0-15
 	for(i=0; i<16; i++){
