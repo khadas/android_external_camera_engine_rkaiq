@@ -35,6 +35,7 @@ create_context(RkAiqAlgoContext **context, const AlgoCtxInstanceCfg* cfg)
     }
     LOGI_AGIC("%s: (enter)\n", __FUNCTION__ );
     AgicInit(&ctx->agicCtx);
+    ctx->agicCtx.HWversion = cfg->module_hw_version;//get hadrware version
     *context = ctx;
     LOGI_AGIC("%s: (exit)\n", __FUNCTION__ );
     return result;
@@ -65,6 +66,9 @@ prepare(RkAiqAlgoCom* params)
     RkAiqAlgoConfigAgicInt* pCfgParam = (RkAiqAlgoConfigAgicInt*)params;
     pAgicCtx->pCalibDb = pCfgParam->rk_com.u.prepare.calib;
     AgicStart(pAgicCtx);
+
+    pAgicCtx->working_mode = pCfgParam->agic_config_com.com.u.prepare.working_mode;
+
     LOGI_AGIC("%s: (exit)\n", __FUNCTION__ );
     return result;
 
@@ -73,6 +77,17 @@ prepare(RkAiqAlgoCom* params)
 static XCamReturn
 pre_process(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outparams)
 {
+    RkAiqAlgoConfigAgicInt* config = (RkAiqAlgoConfigAgicInt*)inparams;
+    RkAiqAlgoPreResAgicInt* pAgicPreResParams = (RkAiqAlgoPreResAgicInt*)outparams;
+    AgicContext_t* pAgicCtx = (AgicContext_t *)&inparams->ctx->agicCtx;
+
+    if (config->rk_com.u.proc.gray_mode)
+        pAgicCtx->Gic_Scene_mode = GIC_NIGHT;
+    else if (GIC_NORMAL == pAgicCtx->working_mode)
+        pAgicCtx->Gic_Scene_mode = GIC_NORMAL;
+    else
+        pAgicCtx->Gic_Scene_mode = GIC_HDR;
+
     return XCAM_RETURN_NO_ERROR;
 }
 
@@ -108,8 +123,11 @@ processing(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outparams)
         LOGE_AGIC("%s: pAEPreRes is NULL, so use default instead \n", __FUNCTION__);
     }
 
-    AgicProcess(pAgicCtx, iso);
-    AgicGetProcResult(pAgicCtx, &pAgicProcResParams->gicRes);
+    pAgicCtx->Gic_Scene_mode = 0;
+    AgicProcess(pAgicCtx, iso, pAgicCtx->Gic_Scene_mode, pAgicCtx->HWversion);
+    AgicGetProcResult(pAgicCtx, pAgicCtx->HWversion);
+
+    memcpy(&pAgicProcResParams->gicRes, &pAgicCtx->ProcRes, sizeof(AgicProcResult_t));
 
     LOGI_AGIC("%s: (exit)\n", __FUNCTION__ );
     return result;

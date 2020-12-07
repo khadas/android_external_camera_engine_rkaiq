@@ -64,7 +64,7 @@ typedef struct : rk_aiq_isp_params_t {
 // v20 params struct
 typedef struct : rk_aiq_isp_params_v2x_t {
     rk_aiq_isp_blc_t           blc;
-    rk_aiq_dehaze_cfg_t        adhaz_config;
+    rk_aiq_isp_dehaze_t        adhaz;
     rk_aiq_ccm_cfg_t           ccm;
     rk_aiq_isp_gic_t           gic;
     // TMO
@@ -76,7 +76,7 @@ typedef struct : rk_aiq_isp_params_v2x_t {
 // v21 params struct
 typedef struct : rk_aiq_isp_params_v2x_t {
     rk_aiq_isp_blc_v21_t        blc;
-    rk_aiq_isp_dhaz_cfg_v21_t   adhaz_config;
+    rk_aiq_isp_dehaze_v21_t   adhaz;
     rk_aiq_ccm_cfg_t        ccm;
     rk_aiq_isp_gic_v21_t        gic;
     // TMO
@@ -119,7 +119,7 @@ typedef struct isp_drv_share_mem_ops_s {
     alloc_mem_t alloc_mem;
     release_mem_t release_mem;
     get_free_item_t get_free_item;
-}isp_drv_share_mem_ops_t;
+} isp_drv_share_mem_ops_t;
 
 typedef struct rk_aiq_ldch_share_mem_info_s {
     int size;

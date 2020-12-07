@@ -772,7 +772,7 @@ RkAiqAwbHandleInt::preProcess()
     RkAiqCore::RkAiqAlgosShared_t* shared = &mAiqCore->mAlogsSharedParams;
     RkAiqPreResComb* comb = &shared->preResComb;
     RkAiqIspStats* ispStats = &shared->ispStats;
-    shared->hardware_version = 1;//todo2
+    int module_hw_version = shared->ctxCfigs[RK_AIQ_ALGO_TYPE_AWB].cfg_com.module_hw_version;
     ret = RkAiqAwbHandle::preProcess();
     if (ret) {
         comb->awb_pre_res = NULL;
@@ -780,7 +780,7 @@ RkAiqAwbHandleInt::preProcess()
     }
     comb->awb_pre_res = NULL;
 #ifdef RK_SIMULATOR_HW
-    if(shared->hardware_version == 0) {
+    if(module_hw_version == AWB_HARDWARE_V200) {
         awb_pre_int->awb_hw0_statis = ispStats->awb_stats;
         awb_pre_int->awb_cfg_effect_v200 = ispStats->awb_cfg_effect_v200;
     } else {
@@ -788,7 +788,7 @@ RkAiqAwbHandleInt::preProcess()
         awb_pre_int->awb_cfg_effect_v201 = ispStats->awb_cfg_effect_v201;
     }
 #else
-    if(shared->hardware_version == 0) {
+    if(module_hw_version == AWB_HARDWARE_V200) {//v200
         awb_pre_int->awb_cfg_effect_v200 = ispStats->awb_cfg_effect_v200;
 
         for(int i = 0; i < awb_pre_int->awb_cfg_effect_v200.lightNum; i++) {
@@ -839,7 +839,7 @@ RkAiqAwbHandleInt::preProcess()
 
 
     } else {
-        //V201 TO DO
+        //v201
         awb_pre_int->awb_hw1_statis  = ispStats->awb_stats_v201;
         awb_pre_int->awb_cfg_effect_v201 = ispStats->awb_cfg_effect_v201;
     }

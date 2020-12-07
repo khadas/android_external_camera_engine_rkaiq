@@ -29,16 +29,6 @@
 
 //RKAIQ_BEGIN_DECLARE
 
-#ifndef MIN
-#define MIN(a,b)             ((a) <= (b) ? (a):(b))
-#endif
-#ifndef MAX
-#define MAX(a,b)             ((a) >= (b) ? (a):(b))
-#endif
-
-#define MIN2(a, b) ((a) > (b) ? (b) : (a))
-#define CLIP(a, min_v, max_v)			    (((a) < (min_v)) ? (min_v) : (((a) > (max_v)) ? (max_v) : (a)))
-
 // fix bit
 #define		RK_CNR_V1_sgmGain				4
 #define		RK_CNR_V1_sgmRatio				4

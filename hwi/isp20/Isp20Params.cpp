@@ -878,20 +878,82 @@ void Isp20Params::convertAiqAgammaToIsp20Params(T& isp_cfg,
 
 template<class T>
 void Isp20Params::convertAiqAdehazeToIsp20Params(T& isp_cfg,
-        const rk_aiq_dehaze_cfg_t& dhaze                     )
+        const rk_aiq_isp_dehaze_t& dhaze                     )
 {
     int i;
 
     int rawWidth = 1920;
     int rawHeight = 1080;
 
-    if(dhaze.dehaze_en[0]) {
+    if(dhaze.enable) {
         isp_cfg.module_ens |= ISP2X_MODULE_DHAZ;
         isp_cfg.module_en_update |= ISP2X_MODULE_DHAZ;
         isp_cfg.module_cfg_update |= ISP2X_MODULE_DHAZ;
     }
     struct isp2x_dhaz_cfg *  cfg = &isp_cfg.others.dhaz_cfg;
 
+    cfg->enhance_en     = dhaze.enhance_en;
+    cfg->hist_chn   = dhaze.hist_chn;
+    cfg->hpara_en   = dhaze.hpara_en;
+    cfg->hist_en    = dhaze.hist_en;
+    cfg->dc_en  = dhaze.dc_en;
+    cfg->big_en     = dhaze.big_en;
+    cfg->nobig_en   = dhaze.nobig_en;
+    cfg->yblk_th    = dhaze.yblk_th;
+    cfg->yhist_th   = dhaze.yhist_th;
+    cfg->dc_max_th  = dhaze.dc_max_th;
+    cfg->dc_min_th  = dhaze.dc_min_th;
+    cfg->wt_max     = dhaze.wt_max;
+    cfg->bright_max     = dhaze.bright_max;
+    cfg->bright_min     = dhaze.bright_min;
+    cfg->tmax_base  = dhaze.tmax_base;
+    cfg->dark_th    = dhaze.dark_th;
+    cfg->air_max    = dhaze.air_max;
+    cfg->air_min    = dhaze.air_min;
+    cfg->tmax_max   = dhaze.tmax_max;
+    cfg->tmax_off   = dhaze.tmax_off;
+    cfg->hist_k     = dhaze.hist_k;
+    cfg->hist_th_off    = dhaze.hist_th_off;
+    cfg->hist_min   = dhaze.hist_min;
+    cfg->hist_gratio    = dhaze.hist_gratio;
+    cfg->hist_scale     = dhaze.hist_scale;
+    cfg->enhance_value  = dhaze.enhance_value;
+    cfg->iir_wt_sigma   = dhaze.iir_wt_sigma;
+    cfg->iir_sigma  = dhaze.iir_sigma;
+    cfg->stab_fnum  = dhaze.stab_fnum;
+    cfg->iir_tmax_sigma     = dhaze.iir_tmax_sigma;
+    cfg->iir_air_sigma  = dhaze.iir_air_sigma;
+    cfg->cfg_wt     = dhaze.cfg_wt;
+    cfg->cfg_air    = dhaze.cfg_air;
+    cfg->cfg_alpha  = dhaze.cfg_alpha;
+    cfg->cfg_gratio     = dhaze.cfg_gratio;
+    cfg->cfg_tmax   = dhaze.cfg_tmax;
+    cfg->dc_weitcur     = dhaze.dc_weitcur;
+    cfg->dc_thed    = dhaze.dc_thed;
+    cfg->sw_dhaz_dc_bf_h0   = dhaze.sw_dhaz_dc_bf_h0;
+    cfg->sw_dhaz_dc_bf_h1   = dhaze.sw_dhaz_dc_bf_h1;
+    cfg->sw_dhaz_dc_bf_h2   = dhaze.sw_dhaz_dc_bf_h2;
+    cfg->sw_dhaz_dc_bf_h3   = dhaze.sw_dhaz_dc_bf_h3;
+    cfg->sw_dhaz_dc_bf_h4   = dhaze.sw_dhaz_dc_bf_h4;
+    cfg->sw_dhaz_dc_bf_h5   = dhaze.sw_dhaz_dc_bf_h5;
+    cfg->air_weitcur    = dhaze.air_weitcur;
+    cfg->air_thed   = dhaze.air_thed;
+    cfg->air_bf_h0  = dhaze.air_bf_h0;
+    cfg->air_bf_h1  = dhaze.air_bf_h1;
+    cfg->air_bf_h2  = dhaze.air_bf_h2;
+    cfg->gaus_h0    = dhaze.gaus_h0;
+    cfg->gaus_h1    = dhaze.gaus_h1;
+    cfg->gaus_h2    = dhaze.gaus_h2;
+
+    for(int i = 0; i < 6; i++) {
+        cfg->conv_t0[i]   = dhaze.conv_t0[i];
+        cfg->conv_t1[i]   = dhaze.conv_t1[i];
+        cfg->conv_t2[i]   = dhaze.conv_t2[i];
+    }
+
+
+
+#if 0
     // cfg->dehaze_en      = int(dhaze.dehaze_en[0]);  //0~1  , (1bit) dehaze_en
     cfg->dc_en    = int(dhaze.dehaze_en[1]);  //0~1  , (1bit) dc_en
     cfg->hist_en          = int(dhaze.dehaze_en[2]);  //0~1  , (1bit) hist_en
@@ -956,7 +1018,7 @@ void Isp20Params::convertAiqAdehazeToIsp20Params(T& isp_cfg,
         cfg->conv_t1[i]     = int(dhaze.dehaze_hist_t1[i]);
         cfg->conv_t2[i]     = int(dhaze.dehaze_hist_t2[i]);
     }
-
+#endif
 }
 
 
@@ -2014,7 +2076,7 @@ Isp20Params::convertAiqResultsToIsp20Params(struct isp2x_isp_params_cfg& isp_cfg
     convertAiqDpccToIsp20Params<struct isp2x_isp_params_cfg>(isp_cfg, aiq_results);
     convertAiqRawnrToIsp20Params<struct isp2x_isp_params_cfg>(isp_cfg, isp20_result->rawnr);
     convertAiqAfToIsp20Params<struct isp2x_isp_params_cfg>(isp_cfg, isp20_result->af_meas, isp20_result->af_cfg_update);
-    convertAiqAdehazeToIsp20Params<struct isp2x_isp_params_cfg>(isp_cfg, isp20_result->adhaz_config);
+    convertAiqAdehazeToIsp20Params<struct isp2x_isp_params_cfg>(isp_cfg, isp20_result->adhaz);
     convertAiqA3dlutToIsp20Params<struct isp2x_isp_params_cfg>(isp_cfg, isp20_result->lut3d);
     if(isp20_result->update_mask & RKAIQ_ISP_LDCH_ID)
         convertAiqAldchToIsp20Params<struct isp2x_isp_params_cfg>(isp_cfg, isp20_result->ldch);
@@ -2305,71 +2367,38 @@ Isp20Params::convertAiqGicToIsp20Params(T& isp_cfg,
         isp_cfg.module_ens &= ~ISP2X_MODULE_GIC;
         isp_cfg.module_en_update |= ISP2X_MODULE_GIC;
     }
-    isp_gic_cfg->edge_open = gic_cfg.edge_open;
-    isp_gic_cfg->regmingradthrdark2 = gic_cfg.regmingradthrdark2;
-    isp_gic_cfg->regmingradthrdark1 = gic_cfg.regmingradthrdark1;
-    isp_gic_cfg->regminbusythre = gic_cfg.regminbusythre;
-    isp_gic_cfg->regdarkthre = gic_cfg.regdarkthre;
-    isp_gic_cfg->regmaxcorvboth = gic_cfg.regmaxcorvboth;
-    isp_gic_cfg->regdarktthrehi = gic_cfg.regdarktthrehi;
-    //isp_gic_cfg->regkgrad2dark = gic_cfg.regkgrad2dark;
-    //isp_gic_cfg->regkgrad1dark = gic_cfg.regkgrad1dark;
-    isp_gic_cfg->regkgrad2dark = (int)(log(double(gic_cfg.regkgrad2dark)) / log((double)2) + 0.5f);
-    isp_gic_cfg->regkgrad1dark = (int)(log(double(gic_cfg.regkgrad1dark)) / log((double)2) + 0.5f);
 
-    isp_gic_cfg->regstrengthglobal_fix =  (int)(gic_cfg.globalStrength * (1 << 7));
-    if (isp_gic_cfg->regstrengthglobal_fix > (1 << 7) - 1)
-        isp_gic_cfg->regstrengthglobal_fix = 7 + 1;
-    else
-        isp_gic_cfg->regstrengthglobal_fix = int(log(double((1 << 7) - isp_gic_cfg->regstrengthglobal_fix)) / log((double)2) + 0.5f);
-
-    //isp_gic_cfg->regdarkthrestep = gic_cfg.regdarkthrestep;
-    isp_gic_cfg->regdarkthrestep = int(log(double(gic_cfg.regdarktthrehi - gic_cfg.regdarkthre)) / log((double)2) + 0.5f);
-    //isp_gic_cfg->regkgrad2 = gic_cfg.regkgrad2;
-    //isp_gic_cfg->regkgrad1 = gic_cfg.regkgrad1;
-    isp_gic_cfg->regkgrad2 = (int)(log(double(gic_cfg.regkgrad2)) / log((double)2) + 0.5f);
-    isp_gic_cfg->regkgrad1 = (int)(log(double(gic_cfg.regkgrad1)) / log((double)2) + 0.5f);
-
-    //isp_gic_cfg->reggbthre = gic_cfg.regdarkthre;
-    isp_gic_cfg->reggbthre = int(log(double(gic_cfg.reggbthre)) / log((double)2) + 0.5f);
-    isp_gic_cfg->regmaxcorv = gic_cfg.regmaxcorv;
-
-    isp_gic_cfg->regmingradthr1 = gic_cfg.regmingradthr1;
-    //isp_gic_cfg->regmingradthr2 = gic_cfg.regmingradthr2;
-    isp_gic_cfg->regmingradthr2 = isp_gic_cfg->regmingradthr1;
-
-    isp_gic_cfg->gr_ratio = gic_cfg.gr_ratio;
-    isp_gic_cfg->dnloscale = (int)(gic_cfg.dnloscale * (1 << 7));
-    isp_gic_cfg->dnhiscale = (int)(gic_cfg.dnhiscale * (1 << 7));
-    isp_gic_cfg->reglumapointsstep = gic_cfg.reglumapointsstep;
-    isp_gic_cfg->gvaluelimitlo = (int)gic_cfg.gvaluelimitlo;
-    isp_gic_cfg->gvaluelimithi = (int)gic_cfg.gvaluelimithi;
-    isp_gic_cfg->fusionratiohilimt1 = (int)(gic_cfg.fusionratiohilimt1 * (1 << 7));
-    isp_gic_cfg->regstrength_fix = (int)(gic_cfg.textureStrength * (1 << 7));
-
-    for (int i = 0; i < 15; i++)
-    {
-        isp_gic_cfg->sigma_y[i] = (int)(gic_cfg.sigma_y[i] * (1 << 7));
-    }
-
-    isp_gic_cfg->noise_cut_en = gic_cfg.noise_cut_en;
-    isp_gic_cfg->noise_coe_a = gic_cfg.noise_coe_a;
-    isp_gic_cfg->noise_coe_b = gic_cfg.noise_coe_b;
-    isp_gic_cfg->diff_clip = gic_cfg.diff_clip;
-
-#define GIC_SWAP(_T_,A,B) { _T_ tmp = (A); (A) = (B); (B) = tmp; }
-
-    if (isp_gic_cfg->regkgrad2dark < isp_gic_cfg->regkgrad2)
-        GIC_SWAP(u8, isp_gic_cfg->regkgrad2dark, isp_gic_cfg->regkgrad2);
-
-    if (isp_gic_cfg->regmingradthrdark1 < isp_gic_cfg->regmingradthr1)
-        GIC_SWAP(u16, isp_gic_cfg->regmingradthrdark1, isp_gic_cfg->regmingradthr1);
-
-    if (isp_gic_cfg->regmingradthrdark2 < isp_gic_cfg->regmingradthr2)
-        GIC_SWAP(u16, isp_gic_cfg->regmingradthrdark2, isp_gic_cfg->regmingradthr2);
-
-    if (isp_gic_cfg->regdarktthrehi < isp_gic_cfg->regdarkthre)
-        GIC_SWAP(u16, isp_gic_cfg->regdarktthrehi, isp_gic_cfg->regdarkthre);
+    isp_gic_cfg->edge_open = gic_cfg.ProcResV20.edge_open;
+    isp_gic_cfg->regmingradthrdark2 = gic_cfg.ProcResV20.regmingradthrdark2;
+    isp_gic_cfg->regmingradthrdark1  = gic_cfg.ProcResV20.regmingradthrdark1;
+    isp_gic_cfg->regminbusythre  = gic_cfg.ProcResV20.regminbusythre;
+    isp_gic_cfg->regdarkthre  = gic_cfg.ProcResV20.regdarkthre;
+    isp_gic_cfg->regmaxcorvboth  = gic_cfg.ProcResV20.regmaxcorvboth;
+    isp_gic_cfg->regdarktthrehi  = gic_cfg.ProcResV20.regdarktthrehi;
+    isp_gic_cfg->regkgrad2dark  = gic_cfg.ProcResV20.regkgrad2dark;
+    isp_gic_cfg->regkgrad1dark  = gic_cfg.ProcResV20.regkgrad1dark;
+    isp_gic_cfg->regstrengthglobal_fix  = gic_cfg.ProcResV20.regstrengthglobal_fix;
+    isp_gic_cfg->regdarkthrestep  = gic_cfg.ProcResV20.regdarkthrestep;
+    isp_gic_cfg->regkgrad2  = gic_cfg.ProcResV20.regkgrad2;
+    isp_gic_cfg->regkgrad1  = gic_cfg.ProcResV20.regkgrad1;
+    isp_gic_cfg->reggbthre  = gic_cfg.ProcResV20.reggbthre;
+    isp_gic_cfg->regmaxcorv  = gic_cfg.ProcResV20.regmaxcorv;
+    isp_gic_cfg->regmingradthr2  = gic_cfg.ProcResV20.regmingradthr2;
+    isp_gic_cfg->regmingradthr1  = gic_cfg.ProcResV20.regmingradthr1;
+    isp_gic_cfg->gr_ratio  = gic_cfg.ProcResV20.gr_ratio;
+    isp_gic_cfg->dnhiscale = gic_cfg.ProcResV20.dnhiscale;
+    isp_gic_cfg->dnloscale = gic_cfg.ProcResV20.dnloscale;
+    isp_gic_cfg->reglumapointsstep  = gic_cfg.ProcResV20.reglumapointsstep;
+    isp_gic_cfg->gvaluelimithi = gic_cfg.ProcResV20.gvaluelimithi;
+    isp_gic_cfg->gvaluelimitlo = gic_cfg.ProcResV20.gvaluelimitlo;
+    isp_gic_cfg->fusionratiohilimt1  = gic_cfg.ProcResV20.fusionratiohilimt1;
+    isp_gic_cfg->regstrength_fix  = gic_cfg.ProcResV20.regstrength_fix;
+    isp_gic_cfg->noise_cut_en = gic_cfg.ProcResV20.noise_cut_en;
+    isp_gic_cfg->noise_coe_a = gic_cfg.ProcResV20.noise_coe_a;
+    isp_gic_cfg->noise_coe_b = gic_cfg.ProcResV20.noise_coe_b;
+    isp_gic_cfg->diff_clip = gic_cfg.ProcResV20.diff_clip;
+    for(int i = 0; i < 15; i++)
+        isp_gic_cfg->sigma_y[i]  = gic_cfg.ProcResV20.sigma_y[i];
 }
 
 void
@@ -2827,7 +2856,7 @@ Isp20Params::forceOverwriteAiqIspCfg(struct isp2x_isp_params_cfg& isp_cfg,
                 break;
             case RK_ISP2X_DHAZ_ID:
                 if (getModuleForceEn(RK_ISP2X_DHAZ_ID)) {
-                    if(isp20_result->adhaz_config.dehaze_en[0]) {
+                    if(isp20_result->adhaz.enable) {
                         isp_cfg.module_ens |= ISP2X_MODULE_DHAZ;
                         isp_cfg.module_en_update |= ISP2X_MODULE_DHAZ;
                         isp_cfg.module_cfg_update |= ISP2X_MODULE_DHAZ;

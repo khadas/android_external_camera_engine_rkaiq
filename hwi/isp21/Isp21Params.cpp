@@ -108,36 +108,77 @@ Isp21Params::convertAiqBlcToIsp21Params(struct isp21_isp_params_cfg& isp_cfg,
 
 void
 Isp21Params::convertAiqAdehazeToIsp21Params(struct isp21_isp_params_cfg& isp_cfg,
-        const rk_aiq_isp_dhaz_cfg_v21_t& dhaze)
+        const rk_aiq_isp_dehaze_v21_t& dhaze)
 {
-    // TODO: test params, enable enhance
-    isp_cfg.module_ens |= ISP2X_MODULE_DHAZ;
-    isp_cfg.module_en_update |= ISP2X_MODULE_DHAZ;
-    isp_cfg.module_cfg_update |= ISP2X_MODULE_DHAZ;
 
-    struct isp21_dhaz_cfg& dhaz_cfg = isp_cfg.others.dhaz_cfg;
+    bool enable = true;
+    if(enable) {
+        isp_cfg.module_en_update |= ISP2X_MODULE_DHAZ;
+        isp_cfg.module_ens |= ISP2X_MODULE_DHAZ;
+        isp_cfg.module_cfg_update |= ISP2X_MODULE_DHAZ;
+    }
+    else {
+        isp_cfg.module_en_update |= ISP2X_MODULE_DHAZ;
+        isp_cfg.module_ens &= ~(ISP2X_MODULE_DHAZ);
+        isp_cfg.module_cfg_update &= ~(ISP2X_MODULE_DHAZ);
+    }
 
-    dhaz_cfg.dc_en = 0x1;
-    dhaz_cfg.enhance_en = 0x1;
-    dhaz_cfg.hist_en = 0;
-    dhaz_cfg.hpara_en = 0;
-    dhaz_cfg.air_lc_en = 0;
-    dhaz_cfg.enhance_value = 0x500;
-    dhaz_cfg.enhance_chroma = 0x4cc;
-    dhaz_cfg.dc_min_th = 0x40;
-    dhaz_cfg.dc_max_th = 0xc0;
-    dhaz_cfg.yhist_th = 0xf9;
-    dhaz_cfg.yblk_th = 0x1b;
-    dhaz_cfg.dark_th = 0xfa;
-    dhaz_cfg.bright_min = 0xb4;
-    dhaz_cfg.bright_max = 0xf0;
-    dhaz_cfg.wt_max = 0x0e6;
-    dhaz_cfg.air_min = 0xe6;
-    dhaz_cfg.air_max = 0xfa;
-    dhaz_cfg.tmax_base = 0x7d;
-    dhaz_cfg.dark_th = 0xfa;
-    dhaz_cfg.tmax_off = 0x066;
-    dhaz_cfg.tmax_max = 0x200;
+    struct isp21_dhaz_cfg *  cfg = &isp_cfg.others.dhaz_cfg;
+
+    //isp_cfg.others.dhaz_cfg.enhance_en = dhaze.enhance_en;
+    //isp_cfg.others.dhaz_cfg.dc_en  = dhaze.dc_en;
+    //LOGE_CAMHW_SUBM(ISP20PARAM_SUBM, "%s:(%d) cfg->dc_en:%d cfg->enhance_en:%d\n", __FUNCTION__, __LINE__, cfg->dc_en,cfg->enhance_en);
+
+    cfg->enhance_en     = dhaze.enhance_en;
+    cfg->air_lc_en  = dhaze.air_lc_en;
+    cfg->hpara_en   = dhaze.hpara_en;
+    cfg->hist_en    = dhaze.hist_en;
+    cfg->dc_en  = dhaze.dc_en;
+    cfg->yblk_th    = dhaze.yblk_th;
+    cfg->yhist_th   = dhaze.yhist_th;
+    cfg->dc_max_th  = dhaze.dc_max_th;
+    cfg->dc_min_th  = dhaze.dc_min_th;
+    cfg->wt_max     = dhaze.wt_max;
+    cfg->bright_max     = dhaze.bright_max;
+    cfg->bright_min     = dhaze.bright_min;
+    cfg->tmax_base  = dhaze.tmax_base;
+    cfg->dark_th    = dhaze.dark_th;
+    cfg->air_max    = dhaze.air_max;
+    cfg->air_min    = dhaze.air_min;
+    cfg->tmax_max   = dhaze.tmax_max;
+    cfg->tmax_off   = dhaze.tmax_off;
+    cfg->hist_k     = dhaze.hist_k;
+    cfg->hist_th_off    = dhaze.hist_th_off;
+    cfg->hist_min   = dhaze.hist_min;
+    cfg->hist_gratio    = dhaze.hist_gratio;
+    cfg->hist_scale     = dhaze.hist_scale;
+    cfg->enhance_value  = dhaze.enhance_value;
+    cfg->enhance_chroma     = dhaze.enhance_chroma;
+    cfg->iir_wt_sigma   = dhaze.iir_wt_sigma;
+    cfg->iir_sigma  = dhaze.iir_sigma;
+    cfg->stab_fnum  = dhaze.stab_fnum;
+    cfg->iir_tmax_sigma     = dhaze.iir_tmax_sigma;
+    cfg->iir_air_sigma  = dhaze.iir_air_sigma;
+    cfg->iir_pre_wet    = dhaze.iir_pre_wet;
+    cfg->cfg_wt     = dhaze.cfg_wt;
+    cfg->cfg_air    = dhaze.cfg_air;
+    cfg->cfg_alpha  = dhaze.cfg_alpha;
+    cfg->cfg_gratio     = dhaze.cfg_gratio;
+    cfg->cfg_tmax   = dhaze.cfg_tmax;
+    cfg->range_sima     = dhaze.range_sima;
+    cfg->space_sigma_cur    = dhaze.space_sigma_cur;
+    cfg->space_sigma_pre    = dhaze.space_sigma_pre;
+    cfg->dc_weitcur     = dhaze.dc_weitcur;
+    cfg->bf_weight  = dhaze.bf_weight;
+    cfg->gaus_h0    = dhaze.gaus_h0;
+    cfg->gaus_h1    = dhaze.gaus_h1;
+    cfg->gaus_h2    = dhaze.gaus_h2;
+
+    for(int i = 0; i < 17; i++)
+        cfg->enh_curve[i]     = dhaze.enh_curve[i];
+
+    //LOGE_CAMHW_SUBM(ISP20PARAM_SUBM, "%s:(%d) cfg->dc_en:%d cfg->enhance_en:%d\n", __FUNCTION__, __LINE__, cfg->dc_en,cfg->enhance_en);
+
 }
 
 void
@@ -212,9 +253,10 @@ Isp21Params::convertAiqAwbToIsp21Params(struct isp21_isp_params_cfg& isp_cfg,
         return;
     }
     struct isp21_rawawb_meas_cfg * awb_cfg_v201 = &isp_cfg.meas.rawawb;
+    awb_cfg_v201->rawawb_sel                =    awb_meas.frameChoose;
     awb_cfg_v201->sw_rawawb_xy_en0          =  awb_meas.xyDetectionEnable[RK_AIQ_AWB_XY_TYPE_NORMAL_V201];
     awb_cfg_v201->sw_rawawb_uv_en0          =  awb_meas.uvDetectionEnable[RK_AIQ_AWB_XY_TYPE_NORMAL_V201];
-    awb_cfg_v201->sw_rawawb_3dyuv_en0          =  awb_meas.threeDyuvEnable[RK_AIQ_AWB_XY_TYPE_NORMAL_V201];
+    awb_cfg_v201->sw_rawawb_3dyuv_en0       =  awb_meas.threeDyuvEnable[RK_AIQ_AWB_XY_TYPE_NORMAL_V201];
     awb_cfg_v201->sw_rawawb_xy_en1          =  awb_meas.xyDetectionEnable[RK_AIQ_AWB_XY_TYPE_BIG_V201];
     awb_cfg_v201->sw_rawawb_uv_en1          =  awb_meas.uvDetectionEnable[RK_AIQ_AWB_XY_TYPE_BIG_V201];
     awb_cfg_v201->sw_rawawb_3dyuv_en1          =  awb_meas.threeDyuvEnable[RK_AIQ_AWB_XY_TYPE_BIG_V201];
@@ -580,71 +622,72 @@ void
 Isp21Params::convertAiqRawnrToIsp21Params(struct isp21_isp_params_cfg& isp_cfg,
         rk_aiq_isp_baynr_v21_t& rawnr)
 {
-	struct isp21_baynr_cfg * p2DCfg = &isp_cfg.others.baynr_cfg;
-	struct isp21_bay3d_cfg * p3DCfg = &isp_cfg.others.bay3d_cfg;
-	
-	
-	LOGD_ANR("%s:%d: enter\n", __FUNCTION__, __LINE__);
 
-	//bayernr 2d
-	if(rawnr.st2DParam.baynr_en) {
-		isp_cfg.module_ens |= ISP2X_MODULE_BAYNR;
-	}else{
-		isp_cfg.module_ens &= ~ISP2X_MODULE_BAYNR;
-	}	
-
-	if(rawnr.st3DParam.bay3d_en_i) {
-		isp_cfg.module_ens |= ISP2X_MODULE_BAY3D;
-		isp_cfg.module_ens |= ISP2X_MODULE_BAYNR;
-	}else{
-		isp_cfg.module_ens &= ~ISP2X_MODULE_BAY3D;
-	}
-
-	isp_cfg.module_en_update |= ISP2X_MODULE_BAYNR;
-	isp_cfg.module_cfg_update |= ISP2X_MODULE_BAYNR;
-	isp_cfg.module_en_update |= ISP2X_MODULE_BAY3D;
-	isp_cfg.module_cfg_update |= ISP2X_MODULE_BAY3D;
-	
-	
-	p2DCfg->sw_baynr_gauss_en = rawnr.st2DParam.baynr_gauss_en;
-	p2DCfg->sw_baynr_log_bypass = rawnr.st2DParam.baynr_log_bypass;
-	
-	p2DCfg->sw_baynr_dgain1 = rawnr.st2DParam.baynr_dgain[1];
-	p2DCfg->sw_baynr_dgain0 = rawnr.st2DParam.baynr_dgain[0];
-	p2DCfg->sw_baynr_dgain2 = rawnr.st2DParam.baynr_dgain[2];
-	
-	p2DCfg->sw_baynr_pix_diff = rawnr.st2DParam.baynr_pix_diff;
-	p2DCfg->sw_baynr_diff_thld = rawnr.st2DParam.baynr_diff_thld;
-	p2DCfg->sw_baynr_softthld = rawnr.st2DParam.baynr_softthld;
-
-	p2DCfg->sw_bltflt_streng = rawnr.st2DParam.bltflt_streng;
-	p2DCfg->sw_baynr_reg_w1 = rawnr.st2DParam.baynr_reg_w1;
-
-	for(int i=0; i<ISP21_BAYNR_XY_NUM; i++){
-		p2DCfg->sw_sigma_x[i] = rawnr.st2DParam.sigma_x[i];
-		p2DCfg->sw_sigma_y[i] = rawnr.st2DParam.sigma_y[i];
-	}
-	
-	p2DCfg->weit_d2 = rawnr.st2DParam.weit_d[2];
-	p2DCfg->weit_d1 = rawnr.st2DParam.weit_d[1];
-	p2DCfg->weit_d0 = rawnr.st2DParam.weit_d[0];
+    struct isp21_baynr_cfg * p2DCfg = &isp_cfg.others.baynr_cfg;
+    struct isp21_bay3d_cfg * p3DCfg = &isp_cfg.others.bay3d_cfg;
 
 
-	//bayernr 3d
-	
-	p3DCfg->sw_bay3d_exp_sel = rawnr.st3DParam.bay3d_exp_sel;
-	p3DCfg->sw_bay3d_bypass_en = rawnr.st3DParam.bay3d_bypass_en;
-	p3DCfg->sw_bay3d_pk_en = rawnr.st3DParam.bay3d_pk_en;
-	p3DCfg->sw_bay3d_softwgt = rawnr.st3DParam.bay3d_softwgt;
-	p3DCfg->sw_bay3d_glbpk2 = rawnr.st3DParam.bay3d_glbpk2;
-	p3DCfg->sw_bay3d_str = rawnr.st3DParam.bay3d_str;
-	p3DCfg->sw_bay3d_wgtlmt_h = rawnr.st3DParam.bay3d_wgtlmt_h;
-	p3DCfg->sw_bay3d_wgtlmt_l = rawnr.st3DParam.bay3d_wgtlmt_l;
+    LOGD_ANR("%s:%d: enter\n", __FUNCTION__, __LINE__);
 
-	for(int i=0; i<ISP21_BAY3D_XY_NUM; i++){
-		p3DCfg->sw_bay3d_sig_x[i] = rawnr.st3DParam.bay3d_sig_x[i];
-		p3DCfg->sw_bay3d_sig_y[i] = rawnr.st3DParam.bay3d_sig_y[i];
-	}
+    //bayernr 2d
+    if(rawnr.st2DParam.baynr_en) {
+        isp_cfg.module_ens |= ISP2X_MODULE_BAYNR;
+    } else {
+        isp_cfg.module_ens &= ~ISP2X_MODULE_BAYNR;
+    }
+
+    if(rawnr.st3DParam.bay3d_en_i) {
+        isp_cfg.module_ens |= ISP2X_MODULE_BAY3D;
+        isp_cfg.module_ens |= ISP2X_MODULE_BAYNR;
+    } else {
+        isp_cfg.module_ens &= ~ISP2X_MODULE_BAY3D;
+    }
+
+    isp_cfg.module_en_update |= ISP2X_MODULE_BAYNR;
+    isp_cfg.module_cfg_update |= ISP2X_MODULE_BAYNR;
+    isp_cfg.module_en_update |= ISP2X_MODULE_BAY3D;
+    isp_cfg.module_cfg_update |= ISP2X_MODULE_BAY3D;
+
+
+    p2DCfg->sw_baynr_gauss_en = rawnr.st2DParam.baynr_gauss_en;
+    p2DCfg->sw_baynr_log_bypass = rawnr.st2DParam.baynr_log_bypass;
+
+    p2DCfg->sw_baynr_dgain1 = rawnr.st2DParam.baynr_dgain[1];
+    p2DCfg->sw_baynr_dgain0 = rawnr.st2DParam.baynr_dgain[0];
+    p2DCfg->sw_baynr_dgain2 = rawnr.st2DParam.baynr_dgain[2];
+
+    p2DCfg->sw_baynr_pix_diff = rawnr.st2DParam.baynr_pix_diff;
+    p2DCfg->sw_baynr_diff_thld = rawnr.st2DParam.baynr_diff_thld;
+    p2DCfg->sw_baynr_softthld = rawnr.st2DParam.baynr_softthld;
+
+    p2DCfg->sw_bltflt_streng = rawnr.st2DParam.bltflt_streng;
+    p2DCfg->sw_baynr_reg_w1 = rawnr.st2DParam.baynr_reg_w1;
+
+    for(int i = 0; i < ISP21_BAYNR_XY_NUM; i++) {
+        p2DCfg->sw_sigma_x[i] = rawnr.st2DParam.sigma_x[i];
+        p2DCfg->sw_sigma_y[i] = rawnr.st2DParam.sigma_y[i];
+    }
+
+    p2DCfg->weit_d2 = rawnr.st2DParam.weit_d[2];
+    p2DCfg->weit_d1 = rawnr.st2DParam.weit_d[1];
+    p2DCfg->weit_d0 = rawnr.st2DParam.weit_d[0];
+
+
+    //bayernr 3d
+
+    p3DCfg->sw_bay3d_exp_sel = rawnr.st3DParam.bay3d_exp_sel;
+    p3DCfg->sw_bay3d_bypass_en = rawnr.st3DParam.bay3d_bypass_en;
+    p3DCfg->sw_bay3d_pk_en = rawnr.st3DParam.bay3d_pk_en;
+    p3DCfg->sw_bay3d_softwgt = rawnr.st3DParam.bay3d_softwgt;
+    p3DCfg->sw_bay3d_glbpk2 = rawnr.st3DParam.bay3d_glbpk2;
+    p3DCfg->sw_bay3d_str = rawnr.st3DParam.bay3d_str;
+    p3DCfg->sw_bay3d_wgtlmt_h = rawnr.st3DParam.bay3d_wgtlmt_h;
+    p3DCfg->sw_bay3d_wgtlmt_l = rawnr.st3DParam.bay3d_wgtlmt_l;
+
+    for(int i = 0; i < ISP21_BAY3D_XY_NUM; i++) {
+        p3DCfg->sw_bay3d_sig_x[i] = rawnr.st3DParam.bay3d_sig_x[i];
+        p3DCfg->sw_bay3d_sig_y[i] = rawnr.st3DParam.bay3d_sig_y[i];
+    }
 
 }
 
@@ -659,206 +702,204 @@ void
 Isp21Params::convertAiqUvnrToIsp21Params(struct isp21_isp_params_cfg& isp_cfg,
         rk_aiq_isp_cnr_v21_t& uvnr)
 {
-	struct isp21_cnr_cfg * pCfg = &isp_cfg.others.cnr_cfg;
+    struct isp21_cnr_cfg * pCfg = &isp_cfg.others.cnr_cfg;
 
-	LOGD_ANR("%s:%d: enter\n", __FUNCTION__, __LINE__);
-	
-    
-	isp_cfg.module_ens |= ISP2X_MODULE_CNR;
+    LOGD_ANR("%s:%d: enter\n", __FUNCTION__, __LINE__);
+
+    isp_cfg.module_ens |= ISP2X_MODULE_CNR;
     isp_cfg.module_en_update |= ISP2X_MODULE_CNR;
     isp_cfg.module_cfg_update |= ISP2X_MODULE_CNR;
 
-	pCfg->sw_cnr_thumb_mix_cur_en = uvnr.cnr_thumb_mix_cur_en;
-	pCfg->sw_cnr_lq_bila_bypass = uvnr.cnr_lq_bila_bypass;
-	pCfg->sw_cnr_hq_bila_bypass = uvnr.cnr_hq_bila_bypass;
-	pCfg->sw_cnr_exgain_bypass = uvnr.cnr_exgain_bypass;
-	
-	if(uvnr.cnr_en_i == 0) {
-		pCfg->sw_cnr_lq_bila_bypass = 0x01;
-		pCfg->sw_cnr_hq_bila_bypass = 0x01;
-		pCfg->sw_cnr_exgain_bypass = 0x01;
-	}
-	
-	pCfg->sw_cnr_exgain_mux = uvnr.cnr_exgain_mux;
-	pCfg->sw_cnr_gain_iso = uvnr.cnr_gain_iso;
+    pCfg->sw_cnr_thumb_mix_cur_en = uvnr.cnr_thumb_mix_cur_en;
+    pCfg->sw_cnr_lq_bila_bypass = uvnr.cnr_lq_bila_bypass;
+    pCfg->sw_cnr_hq_bila_bypass = uvnr.cnr_hq_bila_bypass;
+    pCfg->sw_cnr_exgain_bypass = uvnr.cnr_exgain_bypass;
 
-	pCfg->sw_cnr_gain_offset = uvnr.cnr_gain_offset;
-	pCfg->sw_cnr_gain_1sigma = uvnr.cnr_gain_1sigma;
-	pCfg->sw_cnr_gain_uvgain1 = uvnr.cnr_gain_uvgain1;
-	pCfg->sw_cnr_gain_uvgain0 = uvnr.cnr_gain_uvgain0;
-	pCfg->sw_cnr_lmed3_alpha = uvnr.cnr_lmed3_alpha;
-	pCfg->sw_cnr_lbf5_gain_y = uvnr.cnr_lbf5_gain_y;
-	pCfg->sw_cnr_lbf5_gain_c = uvnr.cnr_lbf5_gain_c;
-	
-	pCfg->sw_cnr_lbf5_weit_d3 = uvnr.cnr_lbf5_weit_d[3];
-	pCfg->sw_cnr_lbf5_weit_d2 = uvnr.cnr_lbf5_weit_d[2];
-	pCfg->sw_cnr_lbf5_weit_d1 = uvnr.cnr_lbf5_weit_d[1];
-	pCfg->sw_cnr_lbf5_weit_d0 = uvnr.cnr_lbf5_weit_d[0];
-	pCfg->sw_cnr_lbf5_weit_d4 = uvnr.cnr_lbf5_weit_d[4];
-	
-	pCfg->sw_cnr_hmed3_alpha = uvnr.cnr_hmed3_alpha;
-	pCfg->sw_cnr_hbf5_weit_src = uvnr.cnr_hbf5_weit_src;
-	pCfg->sw_cnr_hbf5_min_wgt = uvnr.cnr_hbf5_min_wgt;	
-	pCfg->sw_cnr_hbf5_sigma = uvnr.cnr_hbf5_sigma;
-	pCfg->sw_cnr_lbf5_weit_src = uvnr.cnr_lbf5_weit_src;
-	pCfg->sw_cnr_lbf3_sigma = uvnr.cnr_lbf3_sigma;
-	
-	
+    if(uvnr.cnr_en_i == 0) {
+        pCfg->sw_cnr_lq_bila_bypass = 0x01;
+        pCfg->sw_cnr_hq_bila_bypass = 0x01;
+        pCfg->sw_cnr_exgain_bypass = 0x01;
+    }
+
+    pCfg->sw_cnr_exgain_mux = uvnr.cnr_exgain_mux;
+    pCfg->sw_cnr_gain_iso = uvnr.cnr_gain_iso;
+
+    pCfg->sw_cnr_gain_offset = uvnr.cnr_gain_offset;
+    pCfg->sw_cnr_gain_1sigma = uvnr.cnr_gain_1sigma;
+    pCfg->sw_cnr_gain_uvgain1 = uvnr.cnr_gain_uvgain1;
+    pCfg->sw_cnr_gain_uvgain0 = uvnr.cnr_gain_uvgain0;
+    pCfg->sw_cnr_lmed3_alpha = uvnr.cnr_lmed3_alpha;
+    pCfg->sw_cnr_lbf5_gain_y = uvnr.cnr_lbf5_gain_y;
+    pCfg->sw_cnr_lbf5_gain_c = uvnr.cnr_lbf5_gain_c;
+
+    pCfg->sw_cnr_lbf5_weit_d3 = uvnr.cnr_lbf5_weit_d[3];
+    pCfg->sw_cnr_lbf5_weit_d2 = uvnr.cnr_lbf5_weit_d[2];
+    pCfg->sw_cnr_lbf5_weit_d1 = uvnr.cnr_lbf5_weit_d[1];
+    pCfg->sw_cnr_lbf5_weit_d0 = uvnr.cnr_lbf5_weit_d[0];
+    pCfg->sw_cnr_lbf5_weit_d4 = uvnr.cnr_lbf5_weit_d[4];
+
+    pCfg->sw_cnr_hmed3_alpha = uvnr.cnr_hmed3_alpha;
+    pCfg->sw_cnr_hbf5_weit_src = uvnr.cnr_hbf5_weit_src;
+    pCfg->sw_cnr_hbf5_min_wgt = uvnr.cnr_hbf5_min_wgt;
+    pCfg->sw_cnr_hbf5_sigma = uvnr.cnr_hbf5_sigma;
+    pCfg->sw_cnr_lbf5_weit_src = uvnr.cnr_lbf5_weit_src;
+    pCfg->sw_cnr_lbf3_sigma = uvnr.cnr_lbf3_sigma;
+
 }
 
 void
 Isp21Params::convertAiqYnrToIsp21Params(struct isp21_isp_params_cfg& isp_cfg,
                                         rk_aiq_isp_ynr_v21_t& ynr)
 {
-	struct isp21_ynr_cfg * pCfg = &isp_cfg.others.ynr_cfg;
+    struct isp21_ynr_cfg * pCfg = &isp_cfg.others.ynr_cfg;
 
-	LOGD_ANR("%s:%d: enter\n", __FUNCTION__, __LINE__);
+    LOGD_ANR("%s:%d: enter\n", __FUNCTION__, __LINE__);
 
-	isp_cfg.module_ens |= ISP2X_MODULE_YNR;
+    isp_cfg.module_ens |= ISP2X_MODULE_YNR;
     isp_cfg.module_en_update |= ISP2X_MODULE_YNR;
     isp_cfg.module_cfg_update |= ISP2X_MODULE_YNR;
-	
-	pCfg->sw_ynr_thumb_mix_cur_en = ynr.ynr_thumb_mix_cur_en;
-	pCfg->sw_ynr_global_gain_alpha = ynr.ynr_global_gain_alpha;
-	pCfg->sw_ynr_global_gain = ynr.ynr_global_gain;
-	pCfg->sw_ynr_flt1x1_bypass_sel = ynr.ynr_flt1x1_bypass_sel;
-	
-	pCfg->sw_ynr_sft5x5_bypass = ynr.ynr_sft5x5_bypass;
-	pCfg->sw_ynr_flt1x1_bypass = ynr.ynr_flt1x1_bypass;
-	pCfg->sw_ynr_lgft3x3_bypass = ynr.ynr_lgft3x3_bypass;
-	pCfg->sw_ynr_lbft5x5_bypass = ynr.ynr_lbft5x5_bypass;
-	pCfg->sw_ynr_bft3x3_bypass = ynr.ynr_bft3x3_bypass;
-	if(ynr.ynr_en == 0) {
-		pCfg->sw_ynr_sft5x5_bypass = 0x01;
-		pCfg->sw_ynr_flt1x1_bypass = 0x01;
-		pCfg->sw_ynr_lgft3x3_bypass = 0x01;
-		pCfg->sw_ynr_lbft5x5_bypass = 0x01;
-		pCfg->sw_ynr_bft3x3_bypass = 0x01;
-	}
 
-	pCfg->sw_ynr_rnr_max_r = ynr.ynr_rnr_max_r;
-	pCfg->sw_ynr_low_bf_inv1 = ynr.ynr_low_bf_inv[1];
-	pCfg->sw_ynr_low_bf_inv0 = ynr.ynr_low_bf_inv[0];
-	pCfg->sw_ynr_low_peak_supress = ynr.ynr_low_peak_supress;
-	pCfg->sw_ynr_low_thred_adj = ynr.ynr_low_thred_adj;
-	pCfg->sw_ynr_low_dist_adj = ynr.ynr_low_dist_adj;
+    pCfg->sw_ynr_thumb_mix_cur_en = ynr.ynr_thumb_mix_cur_en;
+    pCfg->sw_ynr_global_gain_alpha = ynr.ynr_global_gain_alpha;
+    pCfg->sw_ynr_global_gain = ynr.ynr_global_gain;
+    pCfg->sw_ynr_flt1x1_bypass_sel = ynr.ynr_flt1x1_bypass_sel;
 
-	pCfg->sw_ynr_low_edge_adj_thresh = ynr.ynr_low_edge_adj_thresh;
-	pCfg->sw_ynr_low_bi_weight = ynr.ynr_low_bi_weight;
-	pCfg->sw_ynr_low_weight = ynr.ynr_low_weight;
-	pCfg->sw_ynr_low_center_weight = ynr.ynr_low_center_weight;
-	pCfg->sw_ynr_hi_min_adj = ynr.ynr_hi_min_adj;
-	pCfg->sw_ynr_high_thred_adj = ynr.ynr_high_thred_adj;
+    pCfg->sw_ynr_sft5x5_bypass = ynr.ynr_sft5x5_bypass;
+    pCfg->sw_ynr_flt1x1_bypass = ynr.ynr_flt1x1_bypass;
+    pCfg->sw_ynr_lgft3x3_bypass = ynr.ynr_lgft3x3_bypass;
+    pCfg->sw_ynr_lbft5x5_bypass = ynr.ynr_lbft5x5_bypass;
+    pCfg->sw_ynr_bft3x3_bypass = ynr.ynr_bft3x3_bypass;
+    if(ynr.ynr_en == 0) {
+        pCfg->sw_ynr_sft5x5_bypass = 0x01;
+        pCfg->sw_ynr_flt1x1_bypass = 0x01;
+        pCfg->sw_ynr_lgft3x3_bypass = 0x01;
+        pCfg->sw_ynr_lbft5x5_bypass = 0x01;
+        pCfg->sw_ynr_bft3x3_bypass = 0x01;
+    }
 
-	pCfg->sw_ynr_high_retain_weight = ynr.ynr_high_retain_weight;
-	pCfg->sw_ynr_hi_edge_thed = ynr.ynr_hi_edge_thed;
-	
-	pCfg->sw_ynr_base_filter_weight2 = ynr.ynr_base_filter_weight[2];
-	pCfg->sw_ynr_base_filter_weight1 = ynr.ynr_base_filter_weight[1];
-	pCfg->sw_ynr_base_filter_weight0 = ynr.ynr_base_filter_weight[0];
-	
-	pCfg->sw_ynr_low_gauss1_coeff2 = ynr.ynr_low_gauss1_coeff[2];
-	pCfg->sw_ynr_low_gauss1_coeff1 = ynr.ynr_low_gauss1_coeff[1];
-	pCfg->sw_ynr_low_gauss1_coeff0 = ynr.ynr_low_gauss1_coeff[0];
+    pCfg->sw_ynr_rnr_max_r = ynr.ynr_rnr_max_r;
+    pCfg->sw_ynr_low_bf_inv1 = ynr.ynr_low_bf_inv[1];
+    pCfg->sw_ynr_low_bf_inv0 = ynr.ynr_low_bf_inv[0];
+    pCfg->sw_ynr_low_peak_supress = ynr.ynr_low_peak_supress;
+    pCfg->sw_ynr_low_thred_adj = ynr.ynr_low_thred_adj;
+    pCfg->sw_ynr_low_dist_adj = ynr.ynr_low_dist_adj;
 
-	pCfg->sw_ynr_low_gauss2_coeff2 = ynr.ynr_low_gauss2_coeff[2];
-	pCfg->sw_ynr_low_gauss2_coeff1 = ynr.ynr_low_gauss2_coeff[1];
-	pCfg->sw_ynr_low_gauss2_coeff0 = ynr.ynr_low_gauss2_coeff[0];
+    pCfg->sw_ynr_low_edge_adj_thresh = ynr.ynr_low_edge_adj_thresh;
+    pCfg->sw_ynr_low_bi_weight = ynr.ynr_low_bi_weight;
+    pCfg->sw_ynr_low_weight = ynr.ynr_low_weight;
+    pCfg->sw_ynr_low_center_weight = ynr.ynr_low_center_weight;
+    pCfg->sw_ynr_hi_min_adj = ynr.ynr_hi_min_adj;
+    pCfg->sw_ynr_high_thred_adj = ynr.ynr_high_thred_adj;
 
-	pCfg->sw_ynr_direction_weight3 = ynr.ynr_direction_weight[3];
-	pCfg->sw_ynr_direction_weight2 = ynr.ynr_direction_weight[2];
-	pCfg->sw_ynr_direction_weight1 = ynr.ynr_direction_weight[1];
-	pCfg->sw_ynr_direction_weight0 = ynr.ynr_direction_weight[0];
+    pCfg->sw_ynr_high_retain_weight = ynr.ynr_high_retain_weight;
+    pCfg->sw_ynr_hi_edge_thed = ynr.ynr_hi_edge_thed;
 
-	pCfg->sw_ynr_direction_weight7 = ynr.ynr_direction_weight[7];
-	pCfg->sw_ynr_direction_weight6 = ynr.ynr_direction_weight[6];
-	pCfg->sw_ynr_direction_weight5 = ynr.ynr_direction_weight[5];
-	pCfg->sw_ynr_direction_weight4 = ynr.ynr_direction_weight[4];
+    pCfg->sw_ynr_base_filter_weight2 = ynr.ynr_base_filter_weight[2];
+    pCfg->sw_ynr_base_filter_weight1 = ynr.ynr_base_filter_weight[1];
+    pCfg->sw_ynr_base_filter_weight0 = ynr.ynr_base_filter_weight[0];
 
-	for(int i=0; i<ISP21_YNR_XY_NUM; i++){
-		pCfg->sw_ynr_luma_points_x[i] = ynr.ynr_luma_points_x[i];
-		pCfg->sw_ynr_lsgm_y[i] = ynr.ynr_lsgm_y[i];
-		pCfg->sw_ynr_hsgm_y[i] = ynr.ynr_hsgm_y[i];
-		pCfg->sw_ynr_rnr_strength3[i] = ynr.ynr_rnr_strength[i];
-	}
+    pCfg->sw_ynr_low_gauss1_coeff2 = ynr.ynr_low_gauss1_coeff[2];
+    pCfg->sw_ynr_low_gauss1_coeff1 = ynr.ynr_low_gauss1_coeff[1];
+    pCfg->sw_ynr_low_gauss1_coeff0 = ynr.ynr_low_gauss1_coeff[0];
 
-	LOGD_ANR("%s:%d: exit\n", __FUNCTION__, __LINE__);
-	
+    pCfg->sw_ynr_low_gauss2_coeff2 = ynr.ynr_low_gauss2_coeff[2];
+    pCfg->sw_ynr_low_gauss2_coeff1 = ynr.ynr_low_gauss2_coeff[1];
+    pCfg->sw_ynr_low_gauss2_coeff0 = ynr.ynr_low_gauss2_coeff[0];
+
+    pCfg->sw_ynr_direction_weight3 = ynr.ynr_direction_weight[3];
+    pCfg->sw_ynr_direction_weight2 = ynr.ynr_direction_weight[2];
+    pCfg->sw_ynr_direction_weight1 = ynr.ynr_direction_weight[1];
+    pCfg->sw_ynr_direction_weight0 = ynr.ynr_direction_weight[0];
+
+    pCfg->sw_ynr_direction_weight7 = ynr.ynr_direction_weight[7];
+    pCfg->sw_ynr_direction_weight6 = ynr.ynr_direction_weight[6];
+    pCfg->sw_ynr_direction_weight5 = ynr.ynr_direction_weight[5];
+    pCfg->sw_ynr_direction_weight4 = ynr.ynr_direction_weight[4];
+
+    for(int i = 0; i < ISP21_YNR_XY_NUM; i++) {
+        pCfg->sw_ynr_luma_points_x[i] = ynr.ynr_luma_points_x[i];
+        pCfg->sw_ynr_lsgm_y[i] = ynr.ynr_lsgm_y[i];
+        pCfg->sw_ynr_hsgm_y[i] = ynr.ynr_hsgm_y[i];
+        pCfg->sw_ynr_rnr_strength3[i] = ynr.ynr_rnr_strength[i];
+    }
+
+    LOGD_ANR("%s:%d: exit\n", __FUNCTION__, __LINE__);
+
 }
 
 void
 Isp21Params::convertAiqSharpenToIsp21Params(struct isp21_isp_params_cfg& isp_cfg,
         rk_aiq_isp_sharp_v21_t& sharp)
 {
-	struct isp21_sharp_cfg * pCfg = &isp_cfg.others.sharp_cfg;
+    struct isp21_sharp_cfg * pCfg = &isp_cfg.others.sharp_cfg;
 
-	LOGD_ASHARP("%s:%d: enter\n", __FUNCTION__, __LINE__);
-	
-	isp_cfg.module_ens |= ISP2X_MODULE_SHARP;
+    LOGD_ASHARP("%s:%d: enter\n", __FUNCTION__, __LINE__);
+
+    isp_cfg.module_ens |= ISP2X_MODULE_SHARP;
     isp_cfg.module_en_update |= ISP2X_MODULE_SHARP;
     isp_cfg.module_cfg_update |= ISP2X_MODULE_SHARP;
-	
-	pCfg->sw_sharp_bypass = sharp.sharp_bypass;
-	if(sharp.sharp_en == 0) {
-		pCfg->sw_sharp_bypass = 0x01;
-	}
-	
-	pCfg->sw_sharp_sharp_ratio = sharp.sharp_sharp_ratio;
-	pCfg->sw_sharp_bf_ratio = sharp.sharp_bf_ratio;
-	pCfg->sw_sharp_gaus_ratio = sharp.sharp_gaus_ratio;
-	pCfg->sw_sharp_pbf_ratio = sharp.sharp_pbf_ratio;
 
-	for(int i=0; i<ISP21_SHARP_X_NUM; i++){
-		pCfg->sw_sharp_luma_dx[i] = sharp.sharp_luma_dx[i];
-	}
+    pCfg->sw_sharp_bypass = sharp.sharp_bypass;
+    if(sharp.sharp_en == 0) {
+        pCfg->sw_sharp_bypass = 0x01;
+    }
 
-	for(int i=0; i<ISP21_SHARP_Y_NUM; i++){
-		pCfg->sw_sharp_pbf_sigma_inv[i] = sharp.sharp_pbf_sigma_inv[i];
-	}
+    pCfg->sw_sharp_sharp_ratio = sharp.sharp_sharp_ratio;
+    pCfg->sw_sharp_bf_ratio = sharp.sharp_bf_ratio;
+    pCfg->sw_sharp_gaus_ratio = sharp.sharp_gaus_ratio;
+    pCfg->sw_sharp_pbf_ratio = sharp.sharp_pbf_ratio;
 
-	for(int i=0; i<ISP21_SHARP_Y_NUM; i++){
-		pCfg->sw_sharp_bf_sigma_inv[i] = sharp.sharp_bf_sigma_inv[i];
-	}
-	
-	pCfg->sw_sharp_bf_sigma_shift = sharp.sharp_bf_sigma_shift;
-	pCfg->sw_sharp_pbf_sigma_shift = sharp.sharp_pbf_sigma_shift;
+    for(int i = 0; i < ISP21_SHARP_X_NUM; i++) {
+        pCfg->sw_sharp_luma_dx[i] = sharp.sharp_luma_dx[i];
+    }
 
-	for(int i=0; i<ISP21_SHARP_Y_NUM; i++){
-		pCfg->sw_sharp_ehf_th[i] = sharp.sharp_ehf_th[i];
-	}
+    for(int i = 0; i < ISP21_SHARP_Y_NUM; i++) {
+        pCfg->sw_sharp_pbf_sigma_inv[i] = sharp.sharp_pbf_sigma_inv[i];
+    }
 
-	for(int i=0; i<ISP21_SHARP_Y_NUM; i++){
-		pCfg->sw_sharp_clip_hf[i] = sharp.sharp_clip_hf[i];
-	}
-	
-	pCfg->sw_sharp_pbf_coef_2 = sharp.sharp_pbf_coef[2];
-	pCfg->sw_sharp_pbf_coef_1 = sharp.sharp_pbf_coef[1];
-	pCfg->sw_sharp_pbf_coef_0 = sharp.sharp_pbf_coef[0];
+    for(int i = 0; i < ISP21_SHARP_Y_NUM; i++) {
+        pCfg->sw_sharp_bf_sigma_inv[i] = sharp.sharp_bf_sigma_inv[i];
+    }
 
-	pCfg->sw_sharp_bf_coef_2 = sharp.sharp_bf_coef[2];
-	pCfg->sw_sharp_bf_coef_1 = sharp.sharp_bf_coef[1];
-	pCfg->sw_sharp_bf_coef_0 = sharp.sharp_bf_coef[0];
+    pCfg->sw_sharp_bf_sigma_shift = sharp.sharp_bf_sigma_shift;
+    pCfg->sw_sharp_pbf_sigma_shift = sharp.sharp_pbf_sigma_shift;
 
-	pCfg->sw_sharp_gaus_coef_2 = sharp.sharp_gaus_coef[2];
-	pCfg->sw_sharp_gaus_coef_1 = sharp.sharp_gaus_coef[1];
-	pCfg->sw_sharp_gaus_coef_0 = sharp.sharp_gaus_coef[0];
+    for(int i = 0; i < ISP21_SHARP_Y_NUM; i++) {
+        pCfg->sw_sharp_ehf_th[i] = sharp.sharp_ehf_th[i];
+    }
 
-	LOGD_ASHARP("%s:%d: exit\n", __FUNCTION__, __LINE__);
-	
+    for(int i = 0; i < ISP21_SHARP_Y_NUM; i++) {
+        pCfg->sw_sharp_clip_hf[i] = sharp.sharp_clip_hf[i];
+    }
+
+    pCfg->sw_sharp_pbf_coef_2 = sharp.sharp_pbf_coef[2];
+    pCfg->sw_sharp_pbf_coef_1 = sharp.sharp_pbf_coef[1];
+    pCfg->sw_sharp_pbf_coef_0 = sharp.sharp_pbf_coef[0];
+
+    pCfg->sw_sharp_bf_coef_2 = sharp.sharp_bf_coef[2];
+    pCfg->sw_sharp_bf_coef_1 = sharp.sharp_bf_coef[1];
+    pCfg->sw_sharp_bf_coef_0 = sharp.sharp_bf_coef[0];
+
+    pCfg->sw_sharp_gaus_coef_2 = sharp.sharp_gaus_coef[2];
+    pCfg->sw_sharp_gaus_coef_1 = sharp.sharp_gaus_coef[1];
+    pCfg->sw_sharp_gaus_coef_0 = sharp.sharp_gaus_coef[0];
+
+    LOGD_ASHARP("%s:%d: exit\n", __FUNCTION__, __LINE__);
+
 }
 void
 Isp21Params::convertAiqDrcToIsp21Params(struct isp21_isp_params_cfg& isp_cfg,
-        rk_aiq_isp_drc_v21_t& adrc_data)
+                                        rk_aiq_isp_drc_v21_t& adrc_data)
 {
-	bool enable = adrc_data.bTmoEn;
-	if(enable)
+    bool enable = adrc_data.bTmoEn;
+    if(enable)
     {
         isp_cfg.module_en_update |= 1LL << Rk_ISP21_DRC_ID;
         isp_cfg.module_ens |= 1LL << Rk_ISP21_DRC_ID;
         isp_cfg.module_cfg_update |= 1LL << Rk_ISP21_DRC_ID;
     }
-	else
-		{
+    else
+    {
         isp_cfg.module_en_update |= 1LL << Rk_ISP21_DRC_ID;
         isp_cfg.module_ens &= ~(1LL << Rk_ISP21_DRC_ID);
         isp_cfg.module_cfg_update &= ~(1LL << Rk_ISP21_DRC_ID);
@@ -883,26 +924,95 @@ Isp21Params::convertAiqDrcToIsp21Params(struct isp21_isp_params_cfg& isp_cfg,
     isp_cfg.others.drc_cfg.sw_drc_weig_bilat  = adrc_data.DrcProcRes.sw_drc_weig_bilat;
     isp_cfg.others.drc_cfg.sw_drc_iir_weight  = adrc_data.DrcProcRes.sw_drc_iir_weight;
     isp_cfg.others.drc_cfg.sw_drc_min_ogain  = adrc_data.DrcProcRes.sw_drc_min_ogain;
-	for(int i=0;i<17;i++){
-    isp_cfg.others.drc_cfg.sw_drc_gain_y[i]    = adrc_data.DrcProcRes.sw_drc_gain_y[i];
-    isp_cfg.others.drc_cfg.sw_drc_compres_y[i]    = adrc_data.DrcProcRes.sw_drc_compres_y[i];
-    isp_cfg.others.drc_cfg.sw_drc_scale_y[i]    = adrc_data.DrcProcRes.sw_drc_scale_y[i];
-		}
-    
+
+    for(int i = 0; i < 17; i++) {
+        isp_cfg.others.drc_cfg.sw_drc_gain_y[i]    = adrc_data.DrcProcRes.sw_drc_gain_y[i];
+        isp_cfg.others.drc_cfg.sw_drc_compres_y[i]    = adrc_data.DrcProcRes.sw_drc_compres_y[i];
+        isp_cfg.others.drc_cfg.sw_drc_scale_y[i]    = adrc_data.DrcProcRes.sw_drc_scale_y[i];
+    }
+
 #if 0
     LOGE_CAMHW_SUBM(ISP20PARAM_SUBM, "%d: sw_drc_offset_pow2 %d", __LINE__, isp_cfg.others.drc_cfg.sw_drc_offset_pow2);
-		LOGE_CAMHW_SUBM(ISP20PARAM_SUBM, "sw_drc_offset_pow2 %d", isp_cfg.others.drc_cfg.sw_drc_offset_pow2);
-		LOGE_CAMHW_SUBM(ISP20PARAM_SUBM, "sw_drc_compres_scl %d", isp_cfg.others.drc_cfg.sw_drc_compres_scl);
-		LOGE_CAMHW_SUBM(ISP20PARAM_SUBM, "sw_drc_position %d", isp_cfg.others.drc_cfg.sw_drc_position);
-		LOGE_CAMHW_SUBM(ISP20PARAM_SUBM, "sw_drc_delta_scalein %d", isp_cfg.others.drc_cfg.sw_drc_delta_scalein);
-		LOGE_CAMHW_SUBM(ISP20PARAM_SUBM, "sw_drc_hpdetail_ratio %d", isp_cfg.others.drc_cfg.sw_drc_hpdetail_ratio);
-		LOGE_CAMHW_SUBM(ISP20PARAM_SUBM, "sw_drc_lpdetail_ratio %d", isp_cfg.others.drc_cfg.sw_drc_lpdetail_ratio);
-		LOGE_CAMHW_SUBM(ISP20PARAM_SUBM, "sw_drc_weicur_pix %d", isp_cfg.others.drc_cfg.sw_drc_weicur_pix);
+    LOGE_CAMHW_SUBM(ISP20PARAM_SUBM, "sw_drc_offset_pow2 %d", isp_cfg.others.drc_cfg.sw_drc_offset_pow2);
+    LOGE_CAMHW_SUBM(ISP20PARAM_SUBM, "sw_drc_compres_scl %d", isp_cfg.others.drc_cfg.sw_drc_compres_scl);
+    LOGE_CAMHW_SUBM(ISP20PARAM_SUBM, "sw_drc_position %d", isp_cfg.others.drc_cfg.sw_drc_position);
+    LOGE_CAMHW_SUBM(ISP20PARAM_SUBM, "sw_drc_delta_scalein %d", isp_cfg.others.drc_cfg.sw_drc_delta_scalein);
+    LOGE_CAMHW_SUBM(ISP20PARAM_SUBM, "sw_drc_hpdetail_ratio %d", isp_cfg.others.drc_cfg.sw_drc_hpdetail_ratio);
+    LOGE_CAMHW_SUBM(ISP20PARAM_SUBM, "sw_drc_lpdetail_ratio %d", isp_cfg.others.drc_cfg.sw_drc_lpdetail_ratio);
+    LOGE_CAMHW_SUBM(ISP20PARAM_SUBM, "sw_drc_weicur_pix %d", isp_cfg.others.drc_cfg.sw_drc_weicur_pix);
 
-    
 #endif
 }
 
+void
+Isp21Params::convertAiqAgicToIsp21Params(struct isp21_isp_params_cfg& isp_cfg,
+        rk_aiq_isp_gic_v21_t& agic)
+{
+    bool enable = agic.gic_en;
+    if(enable)
+    {
+        isp_cfg.module_en_update |= 1LL << RK_ISP2X_GIC_ID;
+        isp_cfg.module_ens |= 1LL << RK_ISP2X_GIC_ID;
+        isp_cfg.module_cfg_update |= 1LL << RK_ISP2X_GIC_ID;
+    }
+    else
+    {
+        isp_cfg.module_en_update |= 1LL << RK_ISP2X_GIC_ID;
+        isp_cfg.module_ens &= ~(1LL << RK_ISP2X_GIC_ID);
+        isp_cfg.module_cfg_update &= ~(1LL << RK_ISP2X_GIC_ID);
+    }
+
+    isp_cfg.others.gic_cfg.regmingradthrdark2 = agic.ProcResV21.regmingradthrdark2;
+    isp_cfg.others.gic_cfg.regmingradthrdark1  = agic.ProcResV21.regmingradthrdark1;
+    isp_cfg.others.gic_cfg.regminbusythre  = agic.ProcResV21.regminbusythre;
+    isp_cfg.others.gic_cfg.regdarkthre  = agic.ProcResV21.regdarkthre;
+
+    isp_cfg.others.gic_cfg.regmaxcorvboth  = agic.ProcResV21.regmaxcorvboth;
+    isp_cfg.others.gic_cfg.regdarktthrehi  = agic.ProcResV21.regdarktthrehi;
+    isp_cfg.others.gic_cfg.regkgrad2dark  = agic.ProcResV21.regkgrad2dark;
+    isp_cfg.others.gic_cfg.regkgrad1dark  = agic.ProcResV21.regkgrad1dark;
+    isp_cfg.others.gic_cfg.regstrengthglobal_fix  = agic.ProcResV21.regstrengthglobal_fix;
+    isp_cfg.others.gic_cfg.regdarkthrestep  = agic.ProcResV21.regdarkthrestep;
+    isp_cfg.others.gic_cfg.regkgrad2  = agic.ProcResV21.regkgrad2;
+    isp_cfg.others.gic_cfg.regkgrad1  = agic.ProcResV21.regkgrad1;
+    isp_cfg.others.gic_cfg.reggbthre  = agic.ProcResV21.reggbthre;
+
+    isp_cfg.others.gic_cfg.regmaxcorv  = agic.ProcResV21.regmaxcorv;
+    isp_cfg.others.gic_cfg.regmingradthr2  = agic.ProcResV21.regmingradthr2;
+    isp_cfg.others.gic_cfg.regmingradthr1  = agic.ProcResV21.regmingradthr1;
+    isp_cfg.others.gic_cfg.gr_ratio  = agic.ProcResV21.gr_ratio;
+    isp_cfg.others.gic_cfg.noise_scale  = agic.ProcResV21.noise_scale;
+    isp_cfg.others.gic_cfg.noise_base  = agic.ProcResV21.noise_base;
+    isp_cfg.others.gic_cfg.diff_clip  = agic.ProcResV21.diff_clip;
+    for(int i = 0; i < 15; i++)
+        isp_cfg.others.gic_cfg.sigma_y[i]  = agic.ProcResV21.sigma_y[i];
+
+
+#if 0
+    LOGE_CAMHW_SUBM(ISP20PARAM_SUBM, "%d: regmingradthrdark2 %d", __LINE__, isp_cfg.others.gic_cfg.drc_cfg.regmingradthrdark2);
+    LOGE_CAMHW_SUBM(ISP20PARAM_SUBM, "%d: regmingradthrdark1 %d", __LINE__, isp_cfg.others.gic_cfg.drc_cfg.regmingradthrdark1);
+    LOGE_CAMHW_SUBM(ISP20PARAM_SUBM, "%d: regminbusythre %d", __LINE__, isp_cfg.others.gic_cfg.drc_cfg.regminbusythre);
+
+    LOGE_CAMHW_SUBM(ISP20PARAM_SUBM, "%d: regdarkthre %d", __LINE__, isp_cfg.others.gic_cfg.drc_cfg.regdarkthre);
+    LOGE_CAMHW_SUBM(ISP20PARAM_SUBM, "%d: regmaxcorvboth %d", __LINE__, isp_cfg.others.gic_cfg.drc_cfg.regmaxcorvboth);
+    LOGE_CAMHW_SUBM(ISP20PARAM_SUBM, "%d: regdarktthrehi %d", __LINE__, isp_cfg.others.gic_cfg.drc_cfg.regdarktthrehi);
+    LOGE_CAMHW_SUBM(ISP20PARAM_SUBM, "%d: regkgrad2dark %d", __LINE__, isp_cfg.others.gic_cfg.drc_cfg.regkgrad2dark);
+    LOGE_CAMHW_SUBM(ISP20PARAM_SUBM, "%d: regkgrad1dark %d", __LINE__, isp_cfg.others.gic_cfg.drc_cfg.regkgrad1dark);
+    LOGE_CAMHW_SUBM(ISP20PARAM_SUBM, "%d: regstrengthglobal_fix %d", __LINE__, isp_cfg.others.gic_cfg.drc_cfg.regstrengthglobal_fix);
+    LOGE_CAMHW_SUBM(ISP20PARAM_SUBM, "%d: regdarkthrestep %d", __LINE__, isp_cfg.others.gic_cfg.drc_cfg.regdarkthrestep);
+    LOGE_CAMHW_SUBM(ISP20PARAM_SUBM, "%d: regkgrad2 %d", __LINE__, isp_cfg.others.gic_cfg.drc_cfg.regkgrad2);
+    LOGE_CAMHW_SUBM(ISP20PARAM_SUBM, "%d: regkgrad1 %d", __LINE__, isp_cfg.others.gic_cfg.drc_cfg.regkgrad1);
+    LOGE_CAMHW_SUBM(ISP20PARAM_SUBM, "%d: reggbthre %d", __LINE__, isp_cfg.others.gic_cfg.drc_cfg.reggbthre);
+    LOGE_CAMHW_SUBM(ISP20PARAM_SUBM, "%d: regmaxcorv %d", __LINE__, isp_cfg.others.gic_cfg.drc_cfg.regmaxcorv);
+    LOGE_CAMHW_SUBM(ISP20PARAM_SUBM, "%d: regmingradthr2 %d", __LINE__, isp_cfg.others.gic_cfg.drc_cfg.regmingradthr2);
+    LOGE_CAMHW_SUBM(ISP20PARAM_SUBM, "%d: regmingradthr1 %d", __LINE__, isp_cfg.others.gic_cfg.drc_cfg.regmingradthr1);
+    LOGE_CAMHW_SUBM(ISP20PARAM_SUBM, "%d: gr_ratio %d", __LINE__, isp_cfg.others.gic_cfg.drc_cfg.gr_ratio);
+    LOGE_CAMHW_SUBM(ISP20PARAM_SUBM, "%d: noise_scale %d", __LINE__, isp_cfg.others.gic_cfg.drc_cfg.noise_scale);
+    LOGE_CAMHW_SUBM(ISP20PARAM_SUBM, "%d: noise_base %d", __LINE__, isp_cfg.others.gic_cfg.drc_cfg.noise_base);
+    LOGE_CAMHW_SUBM(ISP20PARAM_SUBM, "%d: diff_clip %d", __LINE__, isp_cfg.others.gic_cfg.drc_cfg.diff_clip);
+
+#endif
+}
 
 XCamReturn
 Isp21Params::convertAiqResultsToIsp21Params(struct isp21_isp_params_cfg& isp_cfg,
@@ -934,11 +1044,12 @@ Isp21Params::convertAiqResultsToIsp21Params(struct isp21_isp_params_cfg& isp_cfg
     convertAiqUvnrToIsp21Params(isp_cfg, isp21_result->uvnr);
     convertAiqSharpenToIsp21Params(isp_cfg, isp21_result->sharp);
     convertAiqAfToIsp20Params<struct isp21_isp_params_cfg>(isp_cfg, isp21_result->af_meas, isp21_result->af_cfg_update);
-    convertAiqAdehazeToIsp21Params(isp_cfg, isp21_result->adhaz_config);
+    convertAiqAdehazeToIsp21Params(isp_cfg, isp21_result->adhaz);
     convertAiqA3dlutToIsp20Params<struct isp21_isp_params_cfg>(isp_cfg, isp21_result->lut3d);
     if(isp21_result->update_mask & RKAIQ_ISP_LDCH_ID)
         convertAiqAldchToIsp20Params<struct isp21_isp_params_cfg>(isp_cfg, isp21_result->ldch);
-	convertAiqDrcToIsp21Params(isp_cfg, isp21_result->drc);
+    convertAiqDrcToIsp21Params(isp_cfg, isp21_result->drc);
+    convertAiqAgicToIsp21Params(isp_cfg, isp21_result->gic);
 
     //must be at the end of isp module
     /* convertAiqGainToIsp20Params<struct isp21_isp_params_cfg>(isp_cfg, isp21_result->gain_config); */

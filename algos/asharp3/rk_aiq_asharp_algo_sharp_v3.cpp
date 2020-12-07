@@ -192,10 +192,13 @@ Asharp3_result_t sharp_init_params_V3(RK_SHARP_Params_V3_t *pSharpParams, Calibd
         return ASHARP3_RET_NULL_POINTER;
     }
 
+	for(i=0; i<RK_SHARP_V3_LUMA_POINT_NUM; i++){
+		pSharpParams->luma_point[i] = pCalibParms->luma_point[i];
+	}
+	
 	for(i=0; i<RK_SHARP_V3_MAX_ISO_NUM; i++){
 		pSharpParams->iso[i] = pCalibParms->iso[i];
-		pSharpParams->luma_point[i] = pCalibParms->luma_point[i];
-		
+				
 		for(j=0; j<RK_SHARP_V3_LUMA_POINT_NUM; j++){			
 			pSharpParams->luma_sigma[i][j] = pCalibParms->luma_sigma[i][j];
 			pSharpParams->lum_clip_h[i][j] = pCalibParms->lum_clip_h[i][j];

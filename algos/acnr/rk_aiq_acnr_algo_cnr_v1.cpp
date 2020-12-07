@@ -3,8 +3,6 @@
 
 RKAIQ_BEGIN_DECLARE
 
-Acnr_result_t cnr_fix_LOGD_ANR_V1(RK_CNR_Fix_V1_t  * pFix);
-
 Acnr_result_t cnr_get_mode_by_name_V1(struct list_head* pCalibdbList, char *name, Calibdb_Cnr_V1_t** ppProfile)
 {
 	int i = 0;
@@ -434,7 +432,7 @@ Acnr_result_t cnr_fix_transfer_V1(RK_CNR_Params_V1_Select_t *pSelect, RK_CNR_Fix
 	pFix->cnr_lbf5_weit_src = CLIP(pFix->cnr_lbf5_weit_src, 0, 128);
 
 
-	cnr_fix_LOGD_ANR_V1(pFix);
+	cnr_fix_printf_V1(pFix);
 	
     LOGI_ANR("%s:(%d) exit \n", __FUNCTION__, __LINE__);
 
@@ -442,7 +440,7 @@ Acnr_result_t cnr_fix_transfer_V1(RK_CNR_Params_V1_Select_t *pSelect, RK_CNR_Fix
 }
 
 
-Acnr_result_t cnr_fix_LOGD_ANR_V1(RK_CNR_Fix_V1_t  * pFix)
+Acnr_result_t cnr_fix_printf_V1(RK_CNR_Fix_V1_t  * pFix)
 {
     int i = 0;
     LOGI_ANR("%s:(%d) enter \n", __FUNCTION__, __LINE__);

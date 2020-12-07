@@ -78,14 +78,10 @@
   * v2.0.3
   *  - date: 2020-10-10
   *  - FEC&LDCH: fix some small bugs
-  
-  * v2.0.4
-  *  - date: 2020-10-15
-  *  - FEC: change mesh border frome (srcW-3, srcH-3) to (srcW-1, srcH-1)
-*/
+  */
 
-#define RK_GENMESH_VERSION_REAL_V "v2.0.4"
-#define RK_GENMESH_RELEASE_DATE "2020-10-15"
+#define RK_GENMESH_VERSION_REAL_V "v2.0.3"
+#define RK_GENMESH_RELEASE_DATE "2020-10-10"
 
   /******* DO NOT EDIT THE FOLLOWINGS *******/
 

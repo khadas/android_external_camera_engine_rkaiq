@@ -4,9 +4,6 @@
 
 RKAIQ_BEGIN_DECLARE
 
-Abayernr_result_t bayernr2D_fix_LOGD_ANR_V2(RK_Bayernr_2D_Fix_V2_t * pFix);
-Abayernr_result_t bayernr3D_fix_LOGD_ANR_V2(RK_Bayernr_3D_Fix_V2_t * pFix);
-
 Abayernr_result_t bayernr_get_mode_by_name_V2(struct list_head *pCalibdbList, char *name, CalibDb_Bayernr_V2_t** ppProfile)
 {
 	int i = 0;
@@ -615,29 +612,31 @@ Abayernr_result_t bayernr2D_fix_transfer_V2(RK_Bayernr_2D_Params_V2_Select_t* pS
 	// ISP_BAYNR_3A00_DGAIN0-2
 	for(i=0; i<framenum; i++){
 		pFix->baynr_dgain[i] = dGain[i] / ( 1 << (FIXNLMCALC - FIXGAINBIT));
+		pFix->baynr_dgain[i] = CLIP(pFix->baynr_dgain[i], 0, 0xffff);
 	}
 
 	// ISP_BAYNR_3A00_PIXDIFF
 	pFix->baynr_pix_diff = FIXDIFMAX - 1;
+	pFix->baynr_pix_diff = CLIP(pFix->baynr_pix_diff, 0, 0x3fff);
 
 	// ISP_BAYNR_3A00_THLD
 	pFix->baynr_diff_thld = LUTPRECISION_FIX;
-	if(pFix->baynr_diff_thld > 0x3ff){
-		pFix->baynr_diff_thld = 0x3ff;
-	}
+	pFix->baynr_diff_thld = CLIP(pFix->baynr_diff_thld, 0, 0x3ff);
 	pFix->baynr_softthld = (int)(pSelect->bayernrv2_filter_soft_threshold_ratio * (1 << 10));
+	pFix->baynr_softthld = CLIP(pFix->baynr_softthld, 0, 0x3ff);
 
 	// ISP_BAYNR_3A00_W1_STRENG
 	pFix->bltflt_streng = (int)(pSelect->bayernrv2_filter_strength * (1 << FIXBILSTRG));
+	pFix->bltflt_streng = CLIP(pFix->bltflt_streng, 0, 0xfff);
 	pFix->baynr_reg_w1 = (int)(pSelect->bayernrv2_filter_out_wgt * (1 << 10));
-	if(pFix->baynr_reg_w1 > 0x3ff){
-		pFix->baynr_reg_w1 = 0x3ff;
-	}
+	pFix->baynr_reg_w1 = CLIP(pFix->baynr_reg_w1, 0, 0x3ff);
 
 	// ISP_BAYNR_3A00_SIGMAX0-15   ISP_BAYNR_3A00_SIGMAY0-15
 	for(i=0; i<16; i++){
 		pFix->sigma_x[i] = bayernr_get_trans_V2(pSelect->bayernrv2_filter_lumapoint[i]);
 		pFix->sigma_y[i] = pSelect->bayernrv2_filter_sigma[i];
+		pFix->sigma_x[i] = CLIP(pFix->sigma_x[i], 0, 0xffff);
+		pFix->sigma_y[i] = CLIP(pFix->sigma_y[i], 0, 0xffff);
 	}
 
 	// ISP_BAYNR_3A00_WRIT_D
@@ -660,8 +659,12 @@ Abayernr_result_t bayernr2D_fix_transfer_V2(RK_Bayernr_2D_Params_V2_Select_t* pS
 	pFix->weit_d[1] = bayernr_sw_bil_gauss_weight[10];
 	pFix->weit_d[2] = bayernr_sw_bil_gauss_weight[11];
 	#endif
-
-	bayernr2D_fix_LOGD_ANR_V2(pFix);
+	pFix->weit_d[0] = CLIP(pFix->weit_d[0], 0, 0x3ff);
+	pFix->weit_d[1] = CLIP(pFix->weit_d[1], 0, 0x3ff);
+	pFix->weit_d[2] = CLIP(pFix->weit_d[2], 0, 0x3ff);
+	
+	
+	bayernr2D_fix_printf_V2(pFix);
 	
 	return ABAYERNR_RET_SUCCESS;
 
@@ -679,32 +682,43 @@ Abayernr_result_t bayernr3D_fix_transfer_V2(RK_Bayernr_3D_Params_V2_Select_t* pS
 
 	// BAY3D_BAY3D_KALRATIO 
 	pFix->bay3d_softwgt = (int)(pSelect->bayernrv2_tnr_softwgt * (1 << FIXTNRSFT));
+	pFix->bay3d_softwgt = CLIP(pFix->bay3d_softwgt, 0, 0x3ff);
+	
 	pFix->bay3d_sigratio = (int)(1.5 * (1 << 10));	//(pSelect->bayertnr_sigratio*(1<<FIXBILSTRG));
+	pFix->bay3d_sigratio = CLIP(pFix->bay3d_sigratio, 0, 0x3fff);
 
 	// BAY3D_BAY3D_GLBPK2 
 	pFix->bay3d_glbpk2 = 1024;
+	pFix->bay3d_sigratio = CLIP(pFix->bay3d_sigratio, 0, 0xfffffff);
 
 	// BAY3D_BAY3D_KALSTR 
 	pFix->bay3d_exp_str = (int)(pSelect->bayernrv2_tnr_filter_strength * (1 << 10));//	(int)(0.06*(1<<10));	// less, filter strong	// classic is 0.1
+	pFix->bay3d_exp_str = CLIP(pFix->bay3d_exp_str, 0, 0x100);
 	pFix->bay3d_str = (int)(1.0 * (1 << FIXTNRSTG));
+	pFix->bay3d_str = CLIP(pFix->bay3d_str, 0, 0x100);
 
 	// BAY3D_BAY3D_WGTLMT 
 	pFix->bay3d_wgtlmt_h = (int)(((float)1 - pSelect->bayernrv2_tnr_hi_clipwgt) * (1 << FIXTNRWGT)); 	// 0.0325
+	pFix->bay3d_wgtlmt_h = CLIP(pFix->bay3d_wgtlmt_h, 0, 0x3ff);
 	pFix->bay3d_wgtlmt_l = (int)(((float)1 - pSelect->bayernrv2_tnr_lo_clipwgt) * (1 << FIXTNRWGT)); 	// 0.0325
+	pFix->bay3d_wgtlmt_l = CLIP(pFix->bay3d_wgtlmt_l, 0, 0x3ff);
 
 	// BAY3D_BAY3D_SIG_X0  
 	for(i=0;i<16;i++)
 	{
 		pFix->bay3d_sig_x[i] = bayernr_get_trans_V2(pSelect->bayernrv2_tnr_lumapoint[i]);
+		pFix->bay3d_sig_x[i] = CLIP(pFix->bay3d_sig_x[i], 0, 0xffff);
+		
 		pFix->bay3d_sig_y[i] = pSelect->bayernrv2_tnr_sigma[i];
+		pFix->bay3d_sig_y[i] = CLIP(pFix->bay3d_sig_y[i], 0, 0xffff);
 	}	
 
-	bayernr3D_fix_LOGD_ANR_V2(pFix);
+	bayernr3D_fix_printf_V2(pFix);
 
 	return ABAYERNR_RET_SUCCESS;
 }
 
-Abayernr_result_t bayernr2D_fix_LOGD_ANR_V2(RK_Bayernr_2D_Fix_V2_t * pFix)
+Abayernr_result_t bayernr2D_fix_printf_V2(RK_Bayernr_2D_Fix_V2_t * pFix)
 {
     //FILE *fp = fopen("bayernr_regsiter.dat", "wb+");
     Abayernr_result_t res = ABAYERNR_RET_SUCCESS;
@@ -731,7 +745,7 @@ Abayernr_result_t bayernr2D_fix_LOGD_ANR_V2(RK_Bayernr_2D_Fix_V2_t * pFix)
 	LOGD_ANR("(0x000c) pix_diff:0x%x \n",
              pFix->baynr_pix_diff);
 
-	// ISP_BAYNR_3A00_THLD(0x000d)
+	// ISP_BAYNR_3A00_THLD(0x0010)
 	LOGD_ANR("(0x000d) diff_thld:0x%x softthld:0x%x \n",
              pFix->baynr_diff_thld,
              pFix->baynr_softthld);
@@ -764,7 +778,7 @@ Abayernr_result_t bayernr2D_fix_LOGD_ANR_V2(RK_Bayernr_2D_Fix_V2_t * pFix)
 }
 
 
-Abayernr_result_t bayernr3D_fix_LOGD_ANR_V2(RK_Bayernr_3D_Fix_V2_t * pFix)
+Abayernr_result_t bayernr3D_fix_printf_V2(RK_Bayernr_3D_Fix_V2_t * pFix)
 {
     //FILE *fp = fopen("bayernr_regsiter.dat", "wb+");
     Abayernr_result_t res = ABAYERNR_RET_SUCCESS;

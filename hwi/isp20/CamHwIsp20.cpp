@@ -2832,16 +2832,6 @@ void CamHwIsp20::dump_isp_config(struct isp2x_isp_params_cfg* isp_params,
     for(int i = 0; i < ISP2X_GIC_SIGMA_Y_NUM; i++) {
         LOGD_CAMHW_SUBM(ISP20HW_SUBM, "sigma_y[%d]=%d\n", i, isp_params->others.gic_cfg.sigma_y[i]);
     }
-    LOGD_CAMHW_SUBM(ISP20HW_SUBM, "aiq_results: gic: dnloscale=%f, dnhiscale=%f,gvaluelimitlo=%f,gvaluelimithi=%f,fusionratiohilimt1=%f"
-                    "textureStrength=%f,globalStrength=%f,noiseCurve_0=%f,noiseCurve_1=%f",
-                    isp20_result->gic.dnloscale, isp20_result->gic.dnhiscale,
-                    isp20_result->gic.gvaluelimitlo, isp20_result->gic.gvaluelimithi,
-                    isp20_result->gic.fusionratiohilimt1, isp20_result->gic.textureStrength,
-                    isp20_result->gic.globalStrength, isp20_result->gic.noiseCurve_0,
-                    isp20_result->gic.noiseCurve_1);
-    for(int i = 0; i < ISP2X_GIC_SIGMA_Y_NUM; i++) {
-        LOGD_CAMHW_SUBM(ISP20HW_SUBM, "sigma[%d]=%f\n", i, isp20_result->gic.sigma_y[i]);
-    }
 
 }
 
@@ -2949,7 +2939,7 @@ CamHwIsp20::setIspParamsSync(int frameId)
                             _full_active_isp_params.module_en_update,
                             _full_active_isp_params.module_cfg_update);
 
-            setDhazState(isp20_result->adhaz_config.dehaze_en[0]);
+            setDhazState(isp20_result->adhaz.enable);
             LOGD_CAMHW_SUBM(ISP20HW_SUBM, "device(%s) queue buffer index %d, queue cnt %d, check exit status again[exit: %d]",
                             XCAM_STR (mIspParamsDev->get_device_name()),
                             buf_index, mIspParamsDev->get_queued_bufcnt(), _is_exit);
@@ -4278,7 +4268,7 @@ CamHwIsp20::setIrcutParams(bool on)
     return ret;
 }
 
-void CamHwIsp20::setDhazState(float& on)
+void CamHwIsp20::setDhazState(bool on)
 {
     if (on)
         mIsDhazOn = true;

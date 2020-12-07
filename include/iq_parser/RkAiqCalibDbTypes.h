@@ -1491,44 +1491,76 @@ typedef struct CalibDb_YNR_s {
     CalibDb_YNR_ModeCell_t mode_cell[CALIBDB_MAX_MODE_NUM];
 } CalibDb_YNR_t;
 
-struct CalibDb_Gic_ISO_s {
-    float iso;
-    float min_busy_thre;
-    float min_grad_thr1;
-    float min_grad_thr2 ;
-    float k_grad1;
-    float k_grad2 ;
-    float smoothness_gb;
-    float smoothness_gb_weak;
-    float gb_thre ;
-    float maxCorV ;
-    float maxCorVboth;
-    float maxCutV ;
-    float dark_thre;
-    float dark_threHi;
-    float k_grad1_dark;
-    float k_grad2_dark ;
-    float min_grad_thr_dark1;
-    float min_grad_thr_dark2 ;
-    float GValueLimitLo ;
-    float GValueLimitHi;
-    float textureStrength ;
-    float ScaleLo ;
-    float ScaleHi ;
-    float noiseCurve_0 ;
-    float noiseCurve_1 ;
-    float globalStrength;
-    float noise_coea ;
-    float noise_coeb;
-    float diff_clip;
-};
+typedef struct CalibDb_Gic_setting_v20_s {
+    float iso[CALIBDB_ISO_NUM];
+    float min_busy_thre[CALIBDB_ISO_NUM];
+    float min_grad_thr1[CALIBDB_ISO_NUM];
+    float min_grad_thr2[CALIBDB_ISO_NUM] ;
+    float k_grad1[CALIBDB_ISO_NUM];
+    float k_grad2[CALIBDB_ISO_NUM] ;
+    float gb_thre[CALIBDB_ISO_NUM] ;
+    float maxCorV[CALIBDB_ISO_NUM] ;
+    float maxCorVboth[CALIBDB_ISO_NUM];
+    float dark_thre[CALIBDB_ISO_NUM];
+    float dark_threHi[CALIBDB_ISO_NUM];
+    float k_grad1_dark[CALIBDB_ISO_NUM];
+    float k_grad2_dark[CALIBDB_ISO_NUM] ;
+    float min_grad_thr_dark1[CALIBDB_ISO_NUM];
+    float min_grad_thr_dark2[CALIBDB_ISO_NUM] ;
+    float GValueLimitLo[CALIBDB_ISO_NUM] ;
+    float GValueLimitHi[CALIBDB_ISO_NUM];
+    float textureStrength[CALIBDB_ISO_NUM] ;
+    float ScaleLo[CALIBDB_ISO_NUM] ;
+    float ScaleHi[CALIBDB_ISO_NUM] ;
+    float globalStrength[CALIBDB_ISO_NUM];
+    float noise_coea[CALIBDB_ISO_NUM] ;
+    float noise_coeb[CALIBDB_ISO_NUM];
+    float diff_clip[CALIBDB_ISO_NUM];
+} CalibDb_Gic_setting_v20_t;
 
-typedef struct CalibDb_Gic_s {
+typedef struct CalibDb_Gic_ModeCell_v20_s {
+    char scene[CALIBDB_MAX_MODE_NAME_LENGTH];
     unsigned char gic_en;
     unsigned char edge_en;
     unsigned char gr_ration;
     unsigned char noise_cut_en;
-    struct CalibDb_Gic_ISO_s gic_iso[CALIBDB_ISO_NUM];
+    CalibDb_Gic_setting_v20_t setting;
+} CalibDb_Gic_ModeCell_v20_t;
+
+typedef struct CalibDb_Gic_setting_v21_s {
+    float iso[CALIBDB_ISO_NUM];
+    float min_busy_thre[CALIBDB_ISO_NUM];
+    float min_grad_thr1[CALIBDB_ISO_NUM];
+    float min_grad_thr2[CALIBDB_ISO_NUM] ;
+    float k_grad1[CALIBDB_ISO_NUM];
+    float k_grad2[CALIBDB_ISO_NUM] ;
+    float gb_thre[CALIBDB_ISO_NUM] ;
+    float maxCorV[CALIBDB_ISO_NUM] ;
+    float maxCorVboth[CALIBDB_ISO_NUM];
+    float dark_thre[CALIBDB_ISO_NUM];
+    float dark_threHi[CALIBDB_ISO_NUM];
+    float k_grad1_dark[CALIBDB_ISO_NUM];
+    float k_grad2_dark[CALIBDB_ISO_NUM] ;
+    float min_grad_thr_dark1[CALIBDB_ISO_NUM];
+    float min_grad_thr_dark2[CALIBDB_ISO_NUM] ;
+    float NoiseScale[CALIBDB_ISO_NUM] ;
+    float NoiseBase[CALIBDB_ISO_NUM] ;
+    float globalStrength[CALIBDB_ISO_NUM];
+    float diff_clip[CALIBDB_ISO_NUM];
+} CalibDb_Gic_setting_v21_t;
+
+typedef struct CalibDb_Gic_ModeCell_v21_s {
+    char scene[CALIBDB_MAX_MODE_NAME_LENGTH];
+    unsigned char gic_en;
+    unsigned char gr_ration;
+    CalibDb_Gic_setting_v21_t setting;
+} CalibDb_Gic_ModeCell_v21_t;
+
+typedef struct CalibDb_Gic_s {
+    CalibDb_Gic_ModeCell_v20_t calib_v20[CALIBDB_MAX_MODE_NUM];
+    CalibDb_Gic_ModeCell_v20_t tuning_v20[CALIBDB_MAX_MODE_NUM];
+    CalibDb_Gic_ModeCell_v21_t calib_v21[CALIBDB_MAX_MODE_NUM];
+    CalibDb_Gic_ModeCell_v21_t tuning_v21[CALIBDB_MAX_MODE_NUM];
 } CalibDb_Gic_t;
 
 struct CalibDb_awb_uv_ratio_s {
@@ -1690,16 +1722,15 @@ typedef struct CalibDb_EdgeFilter_s {
     CalibDb_EdgeFilter_ModeCell_t mode_cell[CALIBDB_MAX_MODE_NUM];
 } CalibDb_EdgeFilter_t;
 
-struct CalibDb_IIR_setting_s {
+typedef struct CalibDb_IIR_setting_v20_s {
     float stab_fnum;
     float sigma;
     float wt_sigma;
     float air_sigma;
     float tmax_sigma;
-};
+} CalibDb_IIR_setting_v20_t;
 
-struct CalibDb_Dehaze_Setting_s {
-    char name[CALIBDB_MAX_MODE_NAME_LENGTH];
+typedef struct CalibDb_Dehaze_Setting_v20_s {
     float en;
     float iso[9];
     float dc_min_th[9];
@@ -1722,18 +1753,16 @@ struct CalibDb_Dehaze_Setting_s {
     float dc_weitcur[9];
     float air_thed[9];
     float air_weitcur[9];
-    struct CalibDb_IIR_setting_s IIR_setting;
-};
+    CalibDb_IIR_setting_v20_t IIR_setting;
+} CalibDb_Dehaze_Setting_v20_t;
 
-struct CalibDb_Enhance_Setting_s {
-    char name[CALIBDB_MAX_MODE_NAME_LENGTH];
+typedef struct CalibDb_Enhance_Setting_v20_s {
     float en;
     float iso[9];
     float enhance_value[9];
-};
+} CalibDb_Enhance_Setting_v20_t;
 
-struct CalibDb_Hist_setting_s {
-    char name[CALIBDB_MAX_MODE_NAME_LENGTH];
+typedef struct CalibDb_Hist_setting_v20_s {
     float en;
     float iso[9];
     unsigned char  hist_channel[9];
@@ -1744,16 +1773,90 @@ struct CalibDb_Hist_setting_s {
     float hist_min[9];
     float hist_scale[9];
     float cfg_gratio[9];
-};
+} CalibDb_Hist_setting_v20_t;
+
+typedef struct CalibDb_Dehaze_ModeCell_v20_s {
+    char scene[CALIBDB_MAX_MODE_NAME_LENGTH];
+    float en;
+    float cfg_alpha;
+    CalibDb_Dehaze_Setting_v20_t dehaze_setting;
+    CalibDb_Enhance_Setting_v20_t enhance_setting;
+    CalibDb_Hist_setting_v20_t hist_setting;
+} CalibDb_Dehaze_ModeCell_v20_t;
+
+typedef struct CalibDb_IIR_setting_v21_s {
+    float stab_fnum;
+    float sigma;
+    float wt_sigma;
+    float air_sigma;
+    float tmax_sigma;
+    float pre_wet;
+} CalibDb_IIR_setting_v21_t;
+
+typedef struct CalibDb_Dehaze_Setting_v21_s {
+    float en;
+    float iso[9];
+    float air_lc_en[9];
+    float dc_min_th[9];
+    float dc_max_th[9];
+    float yhist_th[9];
+    float yblk_th[9];
+    float dark_th[9];
+    float bright_min[9];
+    float bright_max[9];
+    float wt_max[9];
+    float air_min[9];
+    float air_max[9];
+    float tmax_base[9];
+    float tmax_off[9];
+    float tmax_max[9];
+    float cfg_wt[9];
+    float cfg_air[9];
+    float cfg_tmax[9];
+    float dc_weitcur[9];
+    float bf_weight[9];
+    float range_sigma[9];
+    float space_sigma_pre[9];
+    float space_sigma_cur[9];
+    CalibDb_IIR_setting_v21_t IIR_setting;
+} CalibDb_Dehaze_Setting_v21_t;
+
+typedef struct CalibDb_Enhance_Setting_v21_s {
+    float en;
+    float iso[9];
+    float enhance_value[9];
+    float enhance_chroma[9];
+    float enhance_curve[17];
+} CalibDb_Enhance_Setting_v21_t;
+
+typedef struct CalibDb_Hist_setting_v21_s {
+    float en;
+    float iso[9];
+    unsigned char  hist_para_en[9];
+    float hist_gratio[9];
+    float hist_th_off[9];
+    float hist_k[9];
+    float hist_min[9];
+    float hist_scale[9];
+    float cfg_gratio[9];
+} CalibDb_Hist_setting_v21_t;
+
+typedef struct CalibDb_Dehaze_ModeCell_v21_s {
+    char scene[CALIBDB_MAX_MODE_NAME_LENGTH];
+    float en;
+    float cfg_alpha;
+    CalibDb_Dehaze_Setting_v21_t dehaze_setting;
+    CalibDb_Enhance_Setting_v21_t enhance_setting;
+    CalibDb_Hist_setting_v21_t hist_setting;
+
+} CalibDb_Dehaze_ModeCell_v21_t;
 
 typedef struct CalibDb_Dehaze_s {
-    float en;
-    float cfg_alpha_normal;
-    float cfg_alpha_hdr;
-    float cfg_alpha_night;
-    struct CalibDb_Dehaze_Setting_s dehaze_setting[CALIBDB_MAX_MODE_NUM];
-    struct CalibDb_Enhance_Setting_s enhance_setting[CALIBDB_MAX_MODE_NUM];
-    struct CalibDb_Hist_setting_s hist_setting[CALIBDB_MAX_MODE_NUM];
+    CalibDb_Dehaze_ModeCell_v20_t calib_v20[CALIBDB_MAX_MODE_NUM];
+    CalibDb_Dehaze_ModeCell_v20_t tuning_v20[CALIBDB_MAX_MODE_NUM];
+    CalibDb_Dehaze_ModeCell_v21_t calib_v21[CALIBDB_MAX_MODE_NUM];
+    CalibDb_Dehaze_ModeCell_v21_t tuning_v21[CALIBDB_MAX_MODE_NUM];
+
 } CalibDb_Dehaze_t;
 
 typedef enum CalibDb_Af_SearchDir_s {

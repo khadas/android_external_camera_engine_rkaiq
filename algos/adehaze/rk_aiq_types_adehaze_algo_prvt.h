@@ -25,6 +25,9 @@
 
 RKAIQ_BEGIN_DECLARE
 
+#define LIMIT_VALUE(value,max_value,min_value)      (value > max_value? max_value : value < min_value ? min_value : value)
+
+
 typedef struct AdehazeHandle_s {
     rk_aiq_dehaze_cfg_t adhaz_config;
     CalibDb_Dehaze_t calib_dehaz;
@@ -33,6 +36,8 @@ typedef struct AdehazeHandle_s {
     int working_mode;
     int Dehaze_Scene_mode;
     adehaze_sw_t AdehazeAtrr;
+    RkAiqAdehazeProcResult_t ProcRes;
+    int HWversion; //0:isp2.0 1:isp2.1
 } AdehazeHandle_t;
 
 

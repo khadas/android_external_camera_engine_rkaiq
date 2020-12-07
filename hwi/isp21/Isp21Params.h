@@ -35,11 +35,11 @@ public:
 private:
     XCAM_DEAD_COPY(Isp21Params);
     void convertAiqAwbGainToIsp21Params(struct isp21_isp_params_cfg& isp_cfg,
-            const rk_aiq_wb_gain_t& awb_gain, SmartPtr<RkAiqIspParamsProxy> aiq_results, bool awb_gain_update);
+                                        const rk_aiq_wb_gain_t& awb_gain, SmartPtr<RkAiqIspParamsProxy> aiq_results, bool awb_gain_update);
     void convertAiqBlcToIsp21Params(struct isp21_isp_params_cfg& isp_cfg,
                                     SmartPtr<RkAiqIspParamsProxy> aiq_results);
     void convertAiqAdehazeToIsp21Params(struct isp21_isp_params_cfg& isp_cfg,
-                                        const rk_aiq_isp_dhaz_cfg_v21_t& dhaze);
+                                        const rk_aiq_isp_dehaze_v21_t& dhaze);
     void convertAiqCcmToIsp21Params(struct isp21_isp_params_cfg& isp_cfg,
                                     const rk_aiq_ccm_cfg_t& ccm);
     void convertAiqTmoToIsp21Params(struct isp21_isp_params_cfg& isp_cfg,
@@ -59,8 +59,10 @@ private:
                                     rk_aiq_isp_ynr_v21_t& ynr);
     void convertAiqSharpenToIsp21Params(struct isp21_isp_params_cfg& isp_cfg,
                                         rk_aiq_isp_sharp_v21_t& sharp);
-	void convertAiqDrcToIsp21Params(struct isp21_isp_params_cfg& isp_cfg,
-                                        rk_aiq_isp_drc_v21_t& adrc_data);
+    void convertAiqDrcToIsp21Params(struct isp21_isp_params_cfg& isp_cfg,
+                                    rk_aiq_isp_drc_v21_t& adrc_data);
+    void convertAiqAgicToIsp21Params(struct isp21_isp_params_cfg& isp_cfg,
+                                     rk_aiq_isp_gic_v21_t& agic);
 };
 
 };

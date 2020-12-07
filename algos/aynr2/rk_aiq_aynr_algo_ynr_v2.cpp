@@ -3,7 +3,6 @@
 
 RKAIQ_BEGIN_DECLARE
 
-Aynr_result_t ynr_fix_LOGD_ANR_V2(RK_YNR_Fix_V2_t * pFix);
 
 Aynr_result_t ynr_get_mode_by_name_V2(struct list_head* pCalibdbList, char *name, Calibdb_Ynr_V2_t** ppProfile)
 {
@@ -420,7 +419,10 @@ Aynr_result_t ynr_fix_transfer_V2(RK_YNR_Params_V2_Select_t* pSelect, RK_YNR_Fix
         return AYNR_RET_NULL_POINTER;
     }
 	 
-	LOGD_ANR("%s:%d strength:%f\n", __FUNCTION__, __LINE__, fStrength);
+	LOGD_ANR("%s:%d strength:%f raw:width:%d height:%d\n", 
+		__FUNCTION__, __LINE__, 
+		fStrength, pExpInfo->rawHeight, pExpInfo->rawWidth);
+	
 	if(fStrength <= 0.0){
 		fStrength = 0.000001;
 	}
@@ -447,33 +449,47 @@ Aynr_result_t ynr_fix_transfer_V2(RK_YNR_Params_V2_Select_t* pSelect, RK_YNR_Fix
 	int E = abs(ceil(r_sq_inv_log));
 	int M = ROUND_F((pow(2, r_sq_inv_log + E)) * 256);
 	pFix->ynr_rnr_max_r = (M << 5) + E; // check: (M/256)/(1<<E) = r_sq_inv
+	pFix->ynr_rnr_max_r = CLIP(pFix->ynr_rnr_max_r, 0, 0x3fff);
 
 	// YNR_2700_LOWNR_CTRL0 (0x0010)
 	pFix->ynr_low_bf_inv[1] = (int)(1.0f / pSelect->ynr_low_bf_V2[1] * (1 << 9));
+	pFix->ynr_low_bf_inv[1] = CLIP(pFix->ynr_low_bf_inv[1], 0, 0x3fff);
 	pFix->ynr_low_bf_inv[0] = (int)(1.0f / pSelect->ynr_low_bf_V2[0] * (1 << 9));
+	pFix->ynr_low_bf_inv[0] = CLIP(pFix->ynr_low_bf_inv[0], 0, 0x3fff);
 	
 
 	// YNR_2700_LOWNR_CTRL1  (0x0014)
 	pFix->ynr_low_peak_supress = (int)(pSelect->ynr_low_peak_supress_V2 * (1 << 7));
+	pFix->ynr_low_peak_supress = CLIP(pFix->ynr_low_peak_supress, 0, 0x80);
 	pFix->ynr_low_thred_adj = (int)(pSelect->ynr_low_thred_adj_V2 * (1 << 6));
+	pFix->ynr_low_thred_adj = CLIP(pFix->ynr_low_thred_adj, 0, 0x7ff);
 
 	// YNR_2700_LOWNR_CTRL2 (0x0018)
 	pFix->ynr_low_dist_adj = (int)(pSelect->ynr_low_dist_adj_V2 * (1 << 2));
+	pFix->ynr_low_dist_adj = CLIP(pFix->ynr_low_dist_adj, 0, 0x1ff);
 	pFix->ynr_low_edge_adj_thresh = (int)(pSelect->ynr_low_edge_adj_thresh_V2);
+	pFix->ynr_low_edge_adj_thresh = CLIP(pFix->ynr_low_edge_adj_thresh, 0, 0x3ff);
 	
 
 	// YNR_2700_LOWNR_CTRL3 (0x001c)
 	pFix->ynr_low_bi_weight = (int)(pSelect->ynr_low_bi_weight_V2 * (1 << 7));
+	pFix->ynr_low_bi_weight = CLIP(pFix->ynr_low_bi_weight, 0, 0x80);
 	pFix->ynr_low_weight = (int)(pSelect->ynr_low_weight_V2 * (1 << 7));
+	pFix->ynr_low_weight = CLIP(pFix->ynr_low_weight, 0, 0x80);
 	pFix->ynr_low_center_weight = (int)(pSelect->ynr_low_center_weight_V2 * (1 << 10));
+	pFix->ynr_low_center_weight = CLIP(pFix->ynr_low_center_weight, 0, 0x400);
 
 	// YNR_2700_HIGHNR_CTRL0 (0x0020)
 	pFix->ynr_hi_min_adj = (int)(pSelect->ynr_hi_min_adj_V2 * (1 << 6));
+	pFix->ynr_hi_min_adj = CLIP(pFix->ynr_hi_min_adj, 0, 0x3f);
 	pFix->ynr_high_thred_adj = (int)(pSelect->ynr_high_thred_adj_V2 * (1 << 6));
+	pFix->ynr_high_thred_adj = CLIP(pFix->ynr_high_thred_adj, 0, 0x7ff);
 
 	// YNR_2700_HIGHNR_CTRL1  (0x0024)
 	pFix->ynr_high_retain_weight = (1 << 7) - (int)(pSelect->ynr_high_weight_V2 * (1 << 7));
+	pFix->ynr_high_retain_weight = CLIP(pFix->ynr_high_retain_weight, 0, 0x80);
 	pFix->ynr_hi_edge_thed = (int)(pSelect->ynr_hi_edge_thed_V2);
+	pFix->ynr_hi_edge_thed = CLIP(pFix->ynr_hi_edge_thed, 0, 0xff);
 
 	// YNR_2700_HIGHNR_BASE_FILTER_WEIGHT  (0x0028)
 	w2 = int(pSelect->ynr_base_filter_weight3_V2 * 64 / 2 + 0.5);
@@ -482,6 +498,9 @@ Aynr_result_t ynr_fix_transfer_V2(RK_YNR_Params_V2_Select_t* pSelect, RK_YNR_Fix
 	pFix->ynr_base_filter_weight[0] = w0;
 	pFix->ynr_base_filter_weight[1] = w1;
 	pFix->ynr_base_filter_weight[2] = w2;
+	pFix->ynr_base_filter_weight[0] = CLIP(pFix->ynr_base_filter_weight[0], 0, 0x40);
+	pFix->ynr_base_filter_weight[1] = CLIP(pFix->ynr_base_filter_weight[1], 0, 0x1f);
+	pFix->ynr_base_filter_weight[2] = CLIP(pFix->ynr_base_filter_weight[2], 0, 0xf);
 
 	// YNR_2700_GAUSS1_COEFF  (0x0030)
 	float filter1_sigma = pSelect->ynr_low_filt1_strength_V2;
@@ -494,6 +513,9 @@ Aynr_result_t ynr_fix_transfer_V2(RK_YNR_Params_V2_Select_t* pSelect, RK_YNR_Fix
 	pFix->ynr_low_gauss1_coeff[0] = w0;
 	pFix->ynr_low_gauss1_coeff[1] = w1;
 	pFix->ynr_low_gauss1_coeff[2] = w2;
+	pFix->ynr_low_gauss1_coeff[0] = CLIP(pFix->ynr_low_gauss1_coeff[0], 0, 0x3f);
+	pFix->ynr_low_gauss1_coeff[1] = CLIP(pFix->ynr_low_gauss1_coeff[1], 0, 0x3f);
+	pFix->ynr_low_gauss1_coeff[2] = CLIP(pFix->ynr_low_gauss1_coeff[2], 0, 0x100);
 
 	// YNR_2700_GAUSS2_COEFF  (0x0034)
 	float filter2_sigma = pSelect->ynr_low_filt2_strength_V2;
@@ -506,11 +528,15 @@ Aynr_result_t ynr_fix_transfer_V2(RK_YNR_Params_V2_Select_t* pSelect, RK_YNR_Fix
 	pFix->ynr_low_gauss2_coeff[0] = w0;
 	pFix->ynr_low_gauss2_coeff[1] = w1;
 	pFix->ynr_low_gauss2_coeff[2] = w2;
+	pFix->ynr_low_gauss2_coeff[0] = CLIP(pFix->ynr_low_gauss2_coeff[0], 0, 0x3f);
+	pFix->ynr_low_gauss2_coeff[1] = CLIP(pFix->ynr_low_gauss2_coeff[1], 0, 0x3f);
+	pFix->ynr_low_gauss2_coeff[2] = CLIP(pFix->ynr_low_gauss2_coeff[2], 0, 0x100);
 	
 
 	// YNR_2700_DIRECTION_W_0_3  (0x0038 - 0x003c)
 	for (int i = 0; i < 8; i++){
 		pFix->ynr_direction_weight[i] = (int)(pSelect->ynr_direction_weight_V2[i] * (1 << 4));
+		pFix->ynr_direction_weight[i] = CLIP(pFix->ynr_direction_weight[i], 0, 0x10);
 	}
 
 	// YNR_2700_SGM_DX_0_1 (0x0040 - 0x0060)
@@ -518,20 +544,24 @@ Aynr_result_t ynr_fix_transfer_V2(RK_YNR_Params_V2_Select_t* pSelect, RK_YNR_Fix
 	// YNR_2700_HSGM_Y_0_1 (0x00a0- 0x00c0)
 	for (int i = 0; i < YNR_V2_ISO_CURVE_POINT_NUM; i++){
 		pFix->ynr_luma_points_x[i] = pSelect->lumaPoints_V2[i];
+		pFix->ynr_luma_points_x[i] = CLIP(pFix->ynr_luma_points_x[i], 0, 0x400);
 		pFix->ynr_lsgm_y[i] = (int)(pSelect->noiseSigma_V2[i] * pSelect->ciISO_V2[0] * (1 << YNR_V2_NOISE_SIGMA_FIX_BIT));
+		pFix->ynr_lsgm_y[i] = CLIP(pFix->ynr_lsgm_y[i], 0, 0xfff);
 		pFix->ynr_hsgm_y[i] = (int)(pSelect->noiseSigma_V2[i] * pSelect->ciISO_V2[1] * (1 << YNR_V2_NOISE_SIGMA_FIX_BIT));
+		pFix->ynr_hsgm_y[i] = CLIP(pFix->ynr_hsgm_y[i], 0, 0xfff);
 	}
 
 	// YNR_2700_RNR_STRENGTH03 (0x00d0- 0x00e0)
 	for (int i = 0; i < 17; i++){
 		pFix->ynr_rnr_strength[i] = int(pSelect->ynr_rnr_strength_V2[i] * 16);
+		pFix->ynr_rnr_strength[i] = CLIP(pFix->ynr_rnr_strength[i], 0, 0xff);
 	}
 
-	ynr_fix_LOGD_ANR_V2(pFix);
+	ynr_fix_printf_V2(pFix);
     return res;
 }
 
-Aynr_result_t ynr_fix_LOGD_ANR_V2(RK_YNR_Fix_V2_t * pFix)
+Aynr_result_t ynr_fix_printf_V2(RK_YNR_Fix_V2_t * pFix)
 {
     LOGD_ANR("%s:(%d) enter \n", __FUNCTION__, __LINE__);
 

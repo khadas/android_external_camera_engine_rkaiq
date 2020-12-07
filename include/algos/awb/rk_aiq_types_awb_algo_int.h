@@ -123,6 +123,12 @@ typedef enum rk_aiq_wb_lock_state_s {
     RK_AIQ_WB_LOCK_MAX
 } rk_aiq_wb_lock_state_t;
 
+typedef enum awb_hardware_version_e
+{
+    AWB_HARDWARE_V200 = 0,
+    AWB_HARDWARE_V201 = 1,
+    AWB_HARDWARE_VMAX
+} awb_hardware_version_t;
 
 #endif
 

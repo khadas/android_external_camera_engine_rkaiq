@@ -111,6 +111,35 @@ float AdrcAdrcGetCurrPara
     return outPara;
     LOG1_AHDR( "%s:exit!\n", __FUNCTION__);
 }
+
+/******************************************************************************
+* CalibrateDrcGainY()
+*****************************************************************************/
+void CalibrateDrcGainY( DrcProcRes_t *para)
+{
+    LOG1_AHDR("%s:Enter!\n", __FUNCTION__);
+
+    float detailslowlight = 0.2;
+    float tmp = 0;
+
+    float luma[17] = { 0, 256, 512, 768, 1024, 1280, 1536, 1792, 2048, 2304, 2560, 2816, 3072, 3328, 3584, 3840, 4096 };
+    float gainTable[17];
+    float maxgain = (float)(para->sw_drc_adrc_gain);
+
+    for(int i = 0; i < 17; ++i)
+    {
+
+        tmp = luma[i];
+        tmp = 1 - detailslowlight * pow((1 - tmp / 4096), 2);
+        gainTable[i] = pow(maxgain, tmp);
+        para->sw_drc_gain_y[i] = (int)(gainTable[i]) ;
+    }
+
+
+    LOG1_AHDR("%s:Eixt!\n", __FUNCTION__);
+
+}
+
 /******************************************************************************
  * AdrcApiOffConfig()
  *set default AdrcConfig data
@@ -710,7 +739,7 @@ void DrcGetCurrIOData
     pAdrcCtx->AdrcProcRes.DrcProcRes.sw_drc_range_sgm_inv0 = (int)(pAdrcCtx->CurrHandleData.DrcHandleData.sw_drc_range_sgm_inv0);
     pAdrcCtx->AdrcProcRes.DrcProcRes.sw_drc_weig_maxl = (int)(pAdrcCtx->CurrHandleData.DrcHandleData.sw_drc_weig_maxl);
     pAdrcCtx->AdrcProcRes.DrcProcRes.sw_drc_weig_bilat = (int)(pAdrcCtx->CurrHandleData.DrcHandleData.sw_drc_weig_bilat);
-    pAdrcCtx->AdrcProcRes.DrcProcRes.sw_drc_adrc_gain = (int)(pAdrcCtx->CurrHandleData.DrcHandleData.sw_drc_adrc_gain);
+    pAdrcCtx->AdrcProcRes.DrcProcRes.sw_drc_adrc_gain = (int)(pAdrcCtx->CurrHandleData.DrcHandleData.sw_drc_adrc_gain * 1024 + 0.5);
     pAdrcCtx->AdrcProcRes.DrcProcRes.sw_drc_iir_weight = (int)(pAdrcCtx->CurrHandleData.DrcHandleData.sw_drc_iir_weight);
     pAdrcCtx->AdrcProcRes.DrcProcRes.sw_drc_min_ogain = (int)(pAdrcCtx->CurrHandleData.DrcHandleData.sw_drc_min_ogain);
     for(int i = 0; i < ISP21_DRC_Y_NUM; ++i)
@@ -719,6 +748,9 @@ void DrcGetCurrIOData
         pAdrcCtx->AdrcProcRes.DrcProcRes.sw_drc_compres_y[i] = (int)(pAdrcCtx->CurrHandleData.DrcHandleData.sw_drc_compres_y[i]) ;
         pAdrcCtx->AdrcProcRes.DrcProcRes.sw_drc_scale_y[i] = (int)(pAdrcCtx->CurrHandleData.DrcHandleData.sw_drc_scale_y[i]) ;
     }
+
+    //get sw_drc_gain_y
+    CalibrateDrcGainY(&pAdrcCtx->AdrcProcRes.DrcProcRes) ;
 
     LOGD_AHDR("%s:  sw_drc_offset_pow2:%d\n", __FUNCTION__, pAdrcCtx->AdrcProcRes.DrcProcRes.sw_drc_offset_pow2);
     LOGD_AHDR("%s:  sw_drc_compres_scl:%d\n", __FUNCTION__, pAdrcCtx->AdrcProcRes.DrcProcRes.sw_drc_compres_scl);
@@ -736,9 +768,12 @@ void DrcGetCurrIOData
     LOGD_AHDR("%s:  sw_drc_range_sgm_inv1:%d\n", __FUNCTION__, pAdrcCtx->AdrcProcRes.DrcProcRes.sw_drc_range_sgm_inv1);
     LOGD_AHDR("%s:  sw_drc_range_sgm_inv0:%d\n", __FUNCTION__, pAdrcCtx->AdrcProcRes.DrcProcRes.sw_drc_range_sgm_inv0);
     LOGD_AHDR("%s:  sw_drc_weig_maxl:%d\n", __FUNCTION__, pAdrcCtx->AdrcProcRes.DrcProcRes.sw_drc_weig_maxl);
-    LOGD_AHDR("%s:  sw_drc_weig_bilat:%d\n", __FUNCTION__, pAdrcCtx->AdrcProcRes.DrcProcRes.sw_drc_adrc_gain);
+    LOGD_AHDR("%s:  sw_drc_weig_bilat:%d\n", __FUNCTION__, pAdrcCtx->AdrcProcRes.DrcProcRes.sw_drc_weig_bilat);
+    LOGD_AHDR("%s:  sw_drc_adrc_gain:%d\n", __FUNCTION__, pAdrcCtx->AdrcProcRes.DrcProcRes.sw_drc_adrc_gain);
     LOGD_AHDR("%s:  sw_drc_iir_weight:%d\n", __FUNCTION__, pAdrcCtx->AdrcProcRes.DrcProcRes.sw_drc_iir_weight);
     LOGD_AHDR("%s:  sw_drc_min_ogain:%d\n", __FUNCTION__, pAdrcCtx->AdrcProcRes.DrcProcRes.sw_drc_min_ogain);
+    for(int i = 0; i < 17; i++)
+        LOGD_AHDR("%s:  sw_drc_gain_y[%d]:%d\n", __FUNCTION__, i, pAdrcCtx->AdrcProcRes.DrcProcRes.sw_drc_gain_y[i]);
 
     LOG1_AHDR("%s:Eixt!\n", __FUNCTION__);
 }

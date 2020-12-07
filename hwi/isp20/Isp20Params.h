@@ -70,7 +70,7 @@ protected:
                                     const rk_aiq_isp_hdr_t& ahdr_data); 
     template<class T>
     void convertAiqAdehazeToIsp20Params(T& isp_cfg,
-                                        const rk_aiq_dehaze_cfg_t& dhaze                     );
+                                        const rk_aiq_isp_dehaze_t& dhaze                     );
     template<class T>
     void convertAiqAgammaToIsp20Params(T& isp_cfg,
                                        const AgammaProcRes_t& gamma_out_cfg);

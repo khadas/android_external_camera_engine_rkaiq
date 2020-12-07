@@ -251,8 +251,8 @@ CamHwIsp21::overrideExpRatioV21ToAiqResults(const sint32_t frameId,
                     nextFrameExpParam->data()->aecExpInfo.HdrExp[0].exp_real_params.integration_time);
 
     switch (module_id) {
-	case Rk_ISP21_DRC_ID:
-		{
+    case Rk_ISP21_DRC_ID:
+    {
         float nextLExpo = 0;
         float nextMExpo = 0;
         float nextSExpo = 0;
@@ -262,54 +262,48 @@ CamHwIsp21::overrideExpRatioV21ToAiqResults(const sint32_t frameId,
             nextMExpo = nextLExpo;
             nextSExpo = nextFrameExpParam->data()->aecExpInfo.HdrExp[0].exp_real_params.analog_gain * \
                         nextFrameExpParam->data()->aecExpInfo.HdrExp[0].exp_real_params.integration_time;
-        } 
+        }
         float nextRatioLS = nextLExpo / nextSExpo;
 
-		float MFHDR_LOG_Q_BITS =11;
-		float adrc_gain =(float)(isp21_result->drc.DrcProcRes.sw_drc_adrc_gain);
-		float log_ratio2 = log(nextRatioLS * adrc_gain / 1024) / log(2.0f) + 12;
-		
-		float offsetbits_int = (float)(isp21_result->drc.DrcProcRes.sw_drc_offset_pow2);
-		float offsetbits = offsetbits_int * pow(2, MFHDR_LOG_Q_BITS);
-		float hdrbits = log_ratio2 * pow(2, MFHDR_LOG_Q_BITS);
-		float hdrvalidbits = hdrbits - offsetbits;
-		float compres_scl = (12 *pow(2,MFHDR_LOG_Q_BITS * 2)) / hdrvalidbits;
+        //get sw_drc_compres_scl
+        float MFHDR_LOG_Q_BITS = 11;
+        float adrc_gain = (float)(isp21_result->drc.DrcProcRes.sw_drc_adrc_gain);
+        float log_ratio2 = log(nextRatioLS * adrc_gain / 1024) / log(2.0f) + 12;
+        float offsetbits_int = (float)(isp21_result->drc.DrcProcRes.sw_drc_offset_pow2);
+        float offsetbits = offsetbits_int * pow(2, MFHDR_LOG_Q_BITS);
+        float hdrbits = log_ratio2 * pow(2, MFHDR_LOG_Q_BITS);
+        float hdrvalidbits = hdrbits - offsetbits;
+        float compres_scl = (12 * pow(2, MFHDR_LOG_Q_BITS * 2)) / hdrvalidbits;
+        isp21_result->drc.DrcProcRes.sw_drc_compres_scl = (int)(compres_scl);
 
-		isp21_result->drc.DrcProcRes.sw_drc_compres_scl = (int)(compres_scl);
+        //get sw_drc_min_ogain
+        float sw_drc_min_ogain = 1 / (nextRatioLS * adrc_gain);
+        isp21_result->drc.DrcProcRes.sw_drc_min_ogain = (int)(sw_drc_min_ogain * pow(2, 15) + 0.5);
 
-		float adrc_gain_lut_bits = 12;
-		float sx1 = pow(2, adrc_gain_lut_bits), sx;
-		float curveparam, curveparam2, curveparam3, tmp;
-		float drc_gainbits = 10;
-		float adrc_alpha = pow(2, adrc_gain_lut_bits);
-		float luma[17] = { 0, 256, 512, 768, 1024, 1280, 1536, 1792, 2048, 2304, 2560, 2816, 3072, 3328, 3584, 3840, 4096 };
-		float luma2[17] = { 0, 1024, 2048, 3072, 4096, 5120, 6144, 7168, 8192, 10240, 12288, 14336, 16384, 18432, 20480, 22528, 24576 };
-		float gainTable[17],curveTable[17];
-		float ISP_RAW_BIT =12;
-		float dstbits = ISP_RAW_BIT * pow(2, MFHDR_LOG_Q_BITS);
-		float validbits = dstbits - offsetbits;
-		float maxgain = (float)(isp21_result->drc.DrcProcRes.sw_drc_adrc_gain);
+        //get sw_drc_compres_y
+        float curveparam, curveparam2, curveparam3, tmp;
+        float luma2[17] = { 0, 1024, 2048, 3072, 4096, 5120, 6144, 7168, 8192, 10240, 12288, 14336, 16384, 18432, 20480, 22528, 24576 };
+        float curveTable[17];
+        float ISP_RAW_BIT = 12;
+        float dstbits = ISP_RAW_BIT * pow(2, MFHDR_LOG_Q_BITS);
+        float validbits = dstbits - offsetbits;
 
-		for(int i = 0; i < ISP21_DRC_Y_NUM; ++i)
-	    {
+        for(int i = 0; i < ISP21_DRC_Y_NUM; ++i)
+        {
 
-			curveparam = (float)(validbits - 0) / (hdrvalidbits - validbits);
-			curveparam2 = validbits * (1 + curveparam);
-			curveparam3 = hdrvalidbits * curveparam;
-		
-			sx = luma[i];
-			sx = sx1 - ((sx1 - sx) * (sx1 - sx) /pow(2, adrc_gain_lut_bits));
-			sx = ((sx - sx1) * adrc_alpha) /pow(2, adrc_gain_lut_bits);
-			gainTable[i] = maxgain * pow(maxgain / pow(2, drc_gainbits), sx / sx1);	
-			tmp = luma2[i] * hdrvalidbits / 24576;
-			curveTable[i] = (tmp * curveparam2 / (tmp + curveparam3));
-		
-	        isp21_result->drc.DrcProcRes.sw_drc_gain_y[i] = (int)(gainTable[i]) ;
-	        isp21_result->drc.DrcProcRes.sw_drc_compres_y[i] = (int)(curveTable[i]) ;
-	    }
+            curveparam = (float)(validbits - 0) / (hdrvalidbits - validbits);
+            curveparam2 = validbits * (1 + curveparam);
+            curveparam3 = hdrvalidbits * curveparam;
+            tmp = luma2[i] * hdrvalidbits / 24576;
+            curveTable[i] = (tmp * curveparam2 / (tmp + curveparam3));
+            isp21_result->drc.DrcProcRes.sw_drc_compres_y[i] = (int)(curveTable[i]) ;
+        }
 
-		LOGD_CAMHW_SUBM(ISP20HW_SUBM, "nextRatioLS:%f sw_drc_compres_scl: %d!\n", nextRatioLS,isp21_result->drc.DrcProcRes.sw_drc_compres_scl);
-		
+        LOGD_CAMHW_SUBM(ISP20HW_SUBM, "nextRatioLS:%f sw_drc_compres_scl:%d sw_drc_min_ogain:%d\n",
+                        nextRatioLS, isp21_result->drc.DrcProcRes.sw_drc_compres_scl, isp21_result->drc.DrcProcRes.sw_drc_min_ogain);
+        for(int i = 0; i < ISP21_DRC_Y_NUM; ++i)
+            LOGD_CAMHW_SUBM(ISP20HW_SUBM, "sw_drc_compres_y[%d]:%d\n", i, isp21_result->drc.DrcProcRes.sw_drc_compres_y[i]);
+
         break;
     }
     default:
@@ -378,7 +372,7 @@ CamHwIsp21::setIspParamsSync(int frameId)
 #if 1
     if (RK_AIQ_HDR_GET_WORKING_MODE(_hdr_mode) != RK_AIQ_WORKING_MODE_NORMAL) {
         ret = overrideExpRatioToAiqResults(frameId, RK_ISP2X_HDRTMO_ID, aiq_results);
-		ret = overrideExpRatioV21ToAiqResults(frameId, Rk_ISP21_DRC_ID, aiq_results);
+        ret = overrideExpRatioV21ToAiqResults(frameId, Rk_ISP21_DRC_ID, aiq_results);
         if (ret != XCAM_RETURN_NO_ERROR) {
             LOGE_CAMHW_SUBM(ISP20HW_SUBM, "convertExpRatioToAiqResults error!\n");
         }

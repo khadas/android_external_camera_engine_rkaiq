@@ -34,7 +34,7 @@
 
 #define BUFFER_COUNT 8
 
-#ifdef ANDROID_OS
+#ifdef ANDROID
 #define CAPTURE_RAW_PATH "/data"
 #define DEFAULT_CAPTURE_RAW_PATH "/data/capture_image"
 #else

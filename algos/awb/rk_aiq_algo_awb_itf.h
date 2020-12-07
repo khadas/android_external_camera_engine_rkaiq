@@ -22,19 +22,14 @@
 
 #include "rk_aiq_algo_des.h"
 
-#define RKISP_ALGO_AWB_VERSION     "v0.1.1"
+#define RKISP_ALGO_AWB_VERSION     "v0.1.4"
 #define RKISP_ALGO_AWB_VENDOR      "Rockchip"
 #define RKISP_ALGO_AWB_DESCRIPTION "Rockchip Awb algo for ISP2.0"
 
 XCAM_BEGIN_DECLARE
 
 extern RkAiqAlgoDescription g_RkIspAlgoDescAwb;
-typedef enum _awb_hardware_version
-{
-    AWB_HARDWARE_V200 = 0,
-    AWB_HARDWARE_V201 = 1,
-    AWB_HARDWARE_VMAX
-} awb_hardware_version;
+
 
 XCAM_END_DECLARE
 

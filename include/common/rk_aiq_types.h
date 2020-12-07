@@ -33,7 +33,7 @@
 #include "adrc/rk_aiq_types_adrc_algo_int.h"
 #include "adrc/rk_aiq_types_adrc_algo.h"
 #include "agamma/rk_aiq_types_agamma_algo_int.h"
-#include "adehaze/rk_aiq_types_adehaze_algo.h"
+#include "adehaze/rk_aiq_types_adehaze_algo_int.h"
 #include "acp/rk_aiq_types_acp_algo.h"
 #include "aie/rk_aiq_types_aie_algo_int.h"
 #include "aorb/rk_aiq_types_orb_algo.h"
@@ -405,7 +405,7 @@ typedef struct {
 } rk_aiq_isp_merge_t;
 
 
-typedef AgicConfig_t rk_aiq_isp_gic_t;
+typedef AgicProcResult_t rk_aiq_isp_gic_t;
 
 typedef AdebayerConfig_t rk_aiq_isp_demosaic_t;
 
@@ -470,6 +470,9 @@ typedef struct {
 
 typedef RkAiqAhdrProcResult_t rk_aiq_isp_hdr_t;
 typedef RkAiqAdrcProcResult_t rk_aiq_isp_drc_t;
+
+typedef AdehazeV20ProcResult_t rk_aiq_isp_dehaze_t;
+
 
 
 #if 1
@@ -627,20 +630,19 @@ typedef struct rk_aiq_isp_wb_gain_v21_s {
     void* place_holder;
 } rk_aiq_isp_wb_gain_v21_t;
 
-typedef struct rk_aiq_isp_gic_v21_s {
-    //TODO:
-    void* place_holder;
-} rk_aiq_isp_gic_v21_t;
+typedef AgicProcResult_t rk_aiq_isp_gic_v21_t;
 
 typedef struct rk_aiq_isp_ccm_v21_s {
     //TODO:
     void* place_holder;
 } rk_aiq_isp_ccm_v21_t;
-
+/*
 typedef struct rk_aiq_isp_dhaz_cfg_v21_s {
     //TODO:
     void* place_holder;
-} rk_aiq_isp_dhaz_cfg_v21_t;
+} rk_aiq_isp_dhaz_cfg_v21_t;*/
+
+typedef AdehazeV21ProcResult_t rk_aiq_isp_dehaze_v21_t;
 
 typedef struct rk_aiq_isp_dhaz_stats_v21_s {
     //TODO:

@@ -38,6 +38,8 @@ create_context(RkAiqAlgoContext **context, const AlgoCtxInstanceCfg* cfg)
     CamCalibDbContext_t* calib = instanc_int->calib;
 
     ret = AdehazeInit(&AdehazeHandle, calib);
+    AdehazeHandle->HWversion = instanc_int->cfg_com.isp_hw_version;//get hadrware version
+
     *context = (RkAiqAlgoContext *)(AdehazeHandle);
     return ret;
 }
@@ -150,9 +152,14 @@ processing(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outparams)
 
     iso = stExpInfo.arIso[stExpInfo.hdr_mode];
 
-    LOGD_ADEHAZE("hdr_mode=%d,iso=%d Scene mode =%d\n", stExpInfo.hdr_mode, iso, AdehazeHandle->Dehaze_Scene_mode);
-    ret = AdehazeProcess(AdehazeHandle, iso, AdehazeHandle->Dehaze_Scene_mode);
-    memcpy(&procResPara->adhaz_config, &AdehazeHandle->adhaz_config, sizeof(rk_aiq_dehaze_cfg_t));
+    AdehazeHandle->Dehaze_Scene_mode = 0;
+
+    LOGD_ADEHAZE("hardware_version:%d hdr_mode=%d,iso=%d Scene mode =%d\n", AdehazeHandle->HWversion,
+                 stExpInfo.hdr_mode, iso, AdehazeHandle->Dehaze_Scene_mode);
+    ret = AdehazeProcess(AdehazeHandle, iso, AdehazeHandle->Dehaze_Scene_mode, AdehazeHandle->HWversion);
+    AdehazeHandle->ProcRes.ProcResV20.enable = true;
+    AdehazeHandle->ProcRes.ProcResV21.enable = true;
+    memcpy(&procResPara->AdehzeProcRes, &AdehazeHandle->ProcRes, sizeof(RkAiqAdehazeProcResult_t));
     return ret;
 }
 

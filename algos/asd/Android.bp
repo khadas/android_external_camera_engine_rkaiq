@@ -4,10 +4,10 @@ cc_prebuilt_library_static {
 		vendor: true,
 		arch: {
 		  arm: {
-			  srcs: ["arm/librkaiq_asd.a"],
+			  srcs: ["android/arm/librkaiq_asd.a"],
 		  },
 		  arm64: {
-			  srcs: ["arm64/librkaiq_asd.a"],
+			  srcs: ["android/arm64/librkaiq_asd.a"],
 		  },
 		},
 }

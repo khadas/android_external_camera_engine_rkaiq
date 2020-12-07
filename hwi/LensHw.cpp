@@ -89,6 +89,12 @@ LensHw::start()
     SmartLock locker (_mutex);
 
     _rec_sof_idx = 0;
+    _piris_step = 0;
+    _last_piris_step = 0;
+    _dciris_pwmduty = 0;
+    _last_dciris_pwmduty = 0;
+    _focus_pos = -1;
+    _zoom_pos = -1;
     memset(_frame_time, 0, sizeof(_frame_time));
     memset(_frame_sequence, 0, sizeof(_frame_sequence));
     queryLensSupport();

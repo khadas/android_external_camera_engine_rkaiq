@@ -308,7 +308,7 @@ typedef struct _RkAiqAlgoProcAdhaz {
 
 typedef struct _RkAiqAlgoProcResAdhaz {
     RkAiqAlgoResCom proc_res_com;
-    rk_aiq_dehaze_cfg_t adhaz_config;
+    RkAiqAdehazeProcResult_t AdehzeProcRes;
 } RkAiqAlgoProcResAdhaz;
 
 typedef struct _RkAiqAlgoPostAdhaz {

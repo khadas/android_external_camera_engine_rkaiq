@@ -979,7 +979,7 @@ RkAiqCore::genIspAdhazResult(RkAiqFullParams* params)
     // TODO: gen adhaz common result
     RkAiqAlgoProcResAdhaz* adhaz_rk = (RkAiqAlgoProcResAdhaz*)adhaz_com;
 
-    isp_param->adhaz_config = adhaz_rk->adhaz_config;
+    isp_param->adhaz = adhaz_rk->AdehzeProcRes.ProcResV20;
 
     SmartPtr<RkAiqHandle>* handle = getCurAlgoTypeHandle(RK_AIQ_ALGO_TYPE_ADHAZ);
     int algo_id = (*handle)->getAlgoId();
@@ -988,6 +988,64 @@ RkAiqCore::genIspAdhazResult(RkAiqFullParams* params)
     if (algo_id == 0) {
         RkAiqAlgoProcResAdhazInt* adhaz_rk = (RkAiqAlgoProcResAdhazInt*)adhaz_com;
 
+        isp_param->adhaz.enhance_en     = adhaz_rk->adhaz_proc_res_com.AdehzeProcRes.ProcResV20.enhance_en;
+        isp_param->adhaz.hist_chn   = adhaz_rk->adhaz_proc_res_com.AdehzeProcRes.ProcResV20.hist_chn;
+        isp_param->adhaz.hpara_en   = adhaz_rk->adhaz_proc_res_com.AdehzeProcRes.ProcResV20.hpara_en;
+        isp_param->adhaz.hist_en    = adhaz_rk->adhaz_proc_res_com.AdehzeProcRes.ProcResV20.hist_en;
+        isp_param->adhaz.dc_en  = adhaz_rk->adhaz_proc_res_com.AdehzeProcRes.ProcResV20.dc_en;
+        isp_param->adhaz.big_en     = adhaz_rk->adhaz_proc_res_com.AdehzeProcRes.ProcResV20.big_en;
+        isp_param->adhaz.nobig_en   = adhaz_rk->adhaz_proc_res_com.AdehzeProcRes.ProcResV20.nobig_en;
+        isp_param->adhaz.yblk_th    = adhaz_rk->adhaz_proc_res_com.AdehzeProcRes.ProcResV20.yblk_th;
+        isp_param->adhaz.yhist_th   = adhaz_rk->adhaz_proc_res_com.AdehzeProcRes.ProcResV20.yhist_th;
+        isp_param->adhaz.dc_max_th  = adhaz_rk->adhaz_proc_res_com.AdehzeProcRes.ProcResV20.dc_max_th;
+        isp_param->adhaz.dc_min_th  = adhaz_rk->adhaz_proc_res_com.AdehzeProcRes.ProcResV20.dc_min_th;
+        isp_param->adhaz.wt_max     = adhaz_rk->adhaz_proc_res_com.AdehzeProcRes.ProcResV20.wt_max;
+        isp_param->adhaz.bright_max     = adhaz_rk->adhaz_proc_res_com.AdehzeProcRes.ProcResV20.bright_max;
+        isp_param->adhaz.bright_min     = adhaz_rk->adhaz_proc_res_com.AdehzeProcRes.ProcResV20.bright_min;
+        isp_param->adhaz.tmax_base  = adhaz_rk->adhaz_proc_res_com.AdehzeProcRes.ProcResV20.tmax_base;
+        isp_param->adhaz.dark_th    = adhaz_rk->adhaz_proc_res_com.AdehzeProcRes.ProcResV20.dark_th;
+        isp_param->adhaz.air_max    = adhaz_rk->adhaz_proc_res_com.AdehzeProcRes.ProcResV20.air_max;
+        isp_param->adhaz.air_min    = adhaz_rk->adhaz_proc_res_com.AdehzeProcRes.ProcResV20.air_min;
+        isp_param->adhaz.tmax_max   = adhaz_rk->adhaz_proc_res_com.AdehzeProcRes.ProcResV20.tmax_max;
+        isp_param->adhaz.tmax_off   = adhaz_rk->adhaz_proc_res_com.AdehzeProcRes.ProcResV20.tmax_off;
+        isp_param->adhaz.hist_k     = adhaz_rk->adhaz_proc_res_com.AdehzeProcRes.ProcResV20.hist_k;
+        isp_param->adhaz.hist_th_off    = adhaz_rk->adhaz_proc_res_com.AdehzeProcRes.ProcResV20.hist_th_off;
+        isp_param->adhaz.hist_min   = adhaz_rk->adhaz_proc_res_com.AdehzeProcRes.ProcResV20.hist_min;
+        isp_param->adhaz.hist_gratio    = adhaz_rk->adhaz_proc_res_com.AdehzeProcRes.ProcResV20.hist_gratio;
+        isp_param->adhaz.hist_scale     = adhaz_rk->adhaz_proc_res_com.AdehzeProcRes.ProcResV20.hist_scale;
+        isp_param->adhaz.enhance_value  = adhaz_rk->adhaz_proc_res_com.AdehzeProcRes.ProcResV20.enhance_value;
+        isp_param->adhaz.iir_wt_sigma   = adhaz_rk->adhaz_proc_res_com.AdehzeProcRes.ProcResV20.iir_wt_sigma;
+        isp_param->adhaz.iir_sigma  = adhaz_rk->adhaz_proc_res_com.AdehzeProcRes.ProcResV20.iir_sigma;
+        isp_param->adhaz.stab_fnum  = adhaz_rk->adhaz_proc_res_com.AdehzeProcRes.ProcResV20.stab_fnum;
+        isp_param->adhaz.iir_tmax_sigma     = adhaz_rk->adhaz_proc_res_com.AdehzeProcRes.ProcResV20.iir_tmax_sigma;
+        isp_param->adhaz.iir_air_sigma  = adhaz_rk->adhaz_proc_res_com.AdehzeProcRes.ProcResV20.iir_air_sigma;
+        isp_param->adhaz.cfg_wt     = adhaz_rk->adhaz_proc_res_com.AdehzeProcRes.ProcResV20.cfg_wt;
+        isp_param->adhaz.cfg_air    = adhaz_rk->adhaz_proc_res_com.AdehzeProcRes.ProcResV20.cfg_air;
+        isp_param->adhaz.cfg_alpha  = adhaz_rk->adhaz_proc_res_com.AdehzeProcRes.ProcResV20.cfg_alpha;
+        isp_param->adhaz.cfg_gratio     = adhaz_rk->adhaz_proc_res_com.AdehzeProcRes.ProcResV20.cfg_gratio;
+        isp_param->adhaz.cfg_tmax   = adhaz_rk->adhaz_proc_res_com.AdehzeProcRes.ProcResV20.cfg_tmax;
+        isp_param->adhaz.dc_weitcur     = adhaz_rk->adhaz_proc_res_com.AdehzeProcRes.ProcResV20.dc_weitcur;
+        isp_param->adhaz.dc_thed    = adhaz_rk->adhaz_proc_res_com.AdehzeProcRes.ProcResV20.dc_thed;
+        isp_param->adhaz.sw_dhaz_dc_bf_h0   = adhaz_rk->adhaz_proc_res_com.AdehzeProcRes.ProcResV20.sw_dhaz_dc_bf_h0;
+        isp_param->adhaz.sw_dhaz_dc_bf_h1   = adhaz_rk->adhaz_proc_res_com.AdehzeProcRes.ProcResV20.sw_dhaz_dc_bf_h1;
+        isp_param->adhaz.sw_dhaz_dc_bf_h2   = adhaz_rk->adhaz_proc_res_com.AdehzeProcRes.ProcResV20.sw_dhaz_dc_bf_h2;
+        isp_param->adhaz.sw_dhaz_dc_bf_h3   = adhaz_rk->adhaz_proc_res_com.AdehzeProcRes.ProcResV20.sw_dhaz_dc_bf_h3;
+        isp_param->adhaz.sw_dhaz_dc_bf_h4   = adhaz_rk->adhaz_proc_res_com.AdehzeProcRes.ProcResV20.sw_dhaz_dc_bf_h4;
+        isp_param->adhaz.sw_dhaz_dc_bf_h5   = adhaz_rk->adhaz_proc_res_com.AdehzeProcRes.ProcResV20.sw_dhaz_dc_bf_h5;
+        isp_param->adhaz.air_weitcur    = adhaz_rk->adhaz_proc_res_com.AdehzeProcRes.ProcResV20.air_weitcur;
+        isp_param->adhaz.air_thed   = adhaz_rk->adhaz_proc_res_com.AdehzeProcRes.ProcResV20.air_thed;
+        isp_param->adhaz.air_bf_h0  = adhaz_rk->adhaz_proc_res_com.AdehzeProcRes.ProcResV20.air_bf_h0;
+        isp_param->adhaz.air_bf_h1  = adhaz_rk->adhaz_proc_res_com.AdehzeProcRes.ProcResV20.air_bf_h1;
+        isp_param->adhaz.air_bf_h2  = adhaz_rk->adhaz_proc_res_com.AdehzeProcRes.ProcResV20.air_bf_h2;
+        isp_param->adhaz.gaus_h0    = adhaz_rk->adhaz_proc_res_com.AdehzeProcRes.ProcResV20.gaus_h0;
+        isp_param->adhaz.gaus_h1    = adhaz_rk->adhaz_proc_res_com.AdehzeProcRes.ProcResV20.gaus_h1;
+        isp_param->adhaz.gaus_h2    = adhaz_rk->adhaz_proc_res_com.AdehzeProcRes.ProcResV20.gaus_h2;
+
+        for(int i = 0; i < 6; i++) {
+            isp_param->adhaz.conv_t0[i]   = adhaz_rk->adhaz_proc_res_com.AdehzeProcRes.ProcResV20.conv_t0[i];
+            isp_param->adhaz.conv_t1[i]   = adhaz_rk->adhaz_proc_res_com.AdehzeProcRes.ProcResV20.conv_t1[i];
+            isp_param->adhaz.conv_t2[i]   = adhaz_rk->adhaz_proc_res_com.AdehzeProcRes.ProcResV20.conv_t2[i];
+        }
 
     }
 
@@ -1505,7 +1563,7 @@ RkAiqCore::genIspAgicResult(RkAiqFullParams* params)
     // gen rk agic result
     if (algo_id == 0) {
         RkAiqAlgoProcResAgicInt* agic_rk = (RkAiqAlgoProcResAgicInt*)agic_com;
-        memcpy(&isp_param->gic, &agic_rk->gicRes.config, sizeof(AgicConfig_t));
+        memcpy(&isp_param->gic, &agic_rk->gicRes, sizeof(AgicProcResult_t));
     }
 
     EXIT_ANALYZER_FUNCTION();
@@ -1904,6 +1962,7 @@ RkAiqCore::addDefaultAlgos(struct RkAiqAlgoDesCommExt* algoDes)
         int algo_type = algoDes[i].des->type;
         mAlogsSharedParams.ctxCfigs[algo_type].calib =
             const_cast<CamCalibDbContext_t*>(mAlogsSharedParams.calib);
+        mAlogsSharedParams.ctxCfigs[algo_type].cfg_com.module_hw_version = algoDes[i].module_hw_ver;
         algoMap[0] = newAlgoHandle(algoDes[i].des, false, algoDes[i].algo_ver);
         if (!algoMap[0].ptr()) {
             LOGE_ANALYZER("new algo_type %d handle failed", algo_type);
