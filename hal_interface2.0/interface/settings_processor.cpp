@@ -1209,6 +1209,11 @@ SettingsProcessor::processRequestSettings(const CameraMetadata &settings,
                              AiqInputParams &aiqparams) {
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
 
+    camera_metadata_ro_entry mode_3dnr = settings.find(RK_NR_FEATURE_3DNR_MODE);
+    if(mode_3dnr.count == 1) {
+	LOGI("3dnrmode:%d",mode_3dnr.data.u8[0]);
+    }
+
     // get use case
     aiqparams.frameUseCase = AIQ_FRAME_USECASE_PREVIEW;
     camera_metadata_ro_entry entry = settings.find(ANDROID_CONTROL_CAPTURE_INTENT);
