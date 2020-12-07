@@ -527,12 +527,11 @@ AiqCameraHalAdapter::updateAwbMetaParams(XCamAwbParam *awbParams){
     if (ret) {
         LOGE("%s(%d) Awb GetAttrib failed!\n", __FUNCTION__, __LINE__);
     }
-/*
+
     ret = rk_aiq_user_api_awb_GetAttrib(_aiq_ctx, &stAwbttr);
     if (ret) {
         LOGE("%s(%d) Awb GetAttrib failed!\n", __FUNCTION__, __LINE__);
     }
-*/
     switch (awbParams->mode) {
     case XCAM_AWB_MODE_MANUAL:
         stAwbttr.mode = RK_AIQ_WB_MODE_MANUAL;
@@ -619,12 +618,11 @@ AiqCameraHalAdapter::updateAwbMetaParams(XCamAwbParam *awbParams){
         if (ret) {
             LOGE("%s(%d) accm SetAttrib failed!\n", __FUNCTION__, __LINE__);
         }
-/*
         ret = rk_aiq_user_api_awb_SetAttrib(_aiq_ctx, stAwbttr);
         if (ret) {
             LOGE("%s(%d) Awb SetAttrib failed!\n", __FUNCTION__, __LINE__);
         }
-*/
+
     } else {
         ret = rk_aiq_uapi_lockAWB(_aiq_ctx);
         if (ret) {
