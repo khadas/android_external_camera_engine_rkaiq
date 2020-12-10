@@ -249,7 +249,7 @@ Device topology
 
 2）运行rkaiq_3A_server程序；
 开一个cmd窗口:adb shell
-rk1126_r:/ # rkaiq_3A_serverrkaiq_3A_server &
+rk1126_r:/ # rkaiq_3A_server &
 
 3）获取带效果处理的数据流
 开另外一个cmd窗口,运行如下命令：/data/NV12.yuv 就是处理后的YUV数据

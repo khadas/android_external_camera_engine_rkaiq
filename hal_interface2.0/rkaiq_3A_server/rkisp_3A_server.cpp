@@ -246,7 +246,7 @@ int rkaiq_get_media_info() {
     media_device_unref(device);
   }
 
-  if (find_sensor && find_isp && find_ispp)
+  if (find_sensor && (find_isp || find_ispp))
     return 0;
 
   ERR("find_sensor %d find_isp %d find_ispp %d\n",
@@ -295,7 +295,7 @@ static void init_engine(void)
     params.staticMeta = NULL;
     params.width = width;
     params.height = height;
-    params.work_mode = "HDR2";
+    params.work_mode = "NORMAL";
 
     for (int i = 0; i < CAMS_NUM_MAX; i++) {
         if (!media_info.cams[i].link_enabled) {
@@ -471,7 +471,7 @@ int main(int argc, char **argv)
         //if (rkisp_get_media_info(mdev_path)) //not used now
         if (rkaiq_get_media_info())
             errno_exit("Bad media topology\n");
-        
+
         if(find_ispp) {
             strncpy(cur_dev_path, media_info.sd_ispp_path, FILE_PATH_LEN);
             isp_fd = open(cur_dev_path, O_RDWR);
