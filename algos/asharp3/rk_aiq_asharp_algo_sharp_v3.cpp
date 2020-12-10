@@ -535,7 +535,7 @@ Asharp3_result_t sharp_fix_transfer_V3(RK_SHARP_Params_V3_Select_t *pSelect, RK_
 	pFix->sharp_pbf_ratio = CLIP(pFix->sharp_pbf_ratio, 0, 128);
 
 	for(int k = 0; k < RK_SHARP_V3_LUMA_POINT_NUM - 1; k ++){
-		pFix->sharp_luma_dx[k] = CLIP(pFix->sharp_luma_dx[k], 0, 1023);
+		pFix->sharp_luma_dx[k] = CLIP(pFix->sharp_luma_dx[k], 0, 15);
 	}
 	
 	for(int k = 0; k < RK_SHARP_V3_LUMA_POINT_NUM; k ++){	

@@ -116,13 +116,13 @@ XCamReturn RkAiqHandleIntCom::configInparamsCom(RkAiqAlgoCom* com, int type)
         break;
     case RK_AIQ_ALGO_TYPE_ADRC:
         GET_RK_COM(Adrc);
-	case RK_AIQ_ALGO_TYPE_AYNR:
+    case RK_AIQ_ALGO_TYPE_AYNR:
         GET_RK_COM(Aynr);
         break;
-	case RK_AIQ_ALGO_TYPE_ACNR:
+    case RK_AIQ_ALGO_TYPE_ACNR:
         GET_RK_COM(Acnr);
         break;
-	case RK_AIQ_ALGO_TYPE_ARAWNR:
+    case RK_AIQ_ALGO_TYPE_ARAWNR:
         GET_RK_COM(Arawnr);
         break;
     default:
@@ -1874,6 +1874,10 @@ RkAiqAdhazHandleInt::prepare()
 
     adhaz_config_int->calib = shared->calib;
 
+    adhaz_config_int->rawHeight = shared->snsDes.isp_acq_height;
+    adhaz_config_int->rawWidth = shared->snsDes.isp_acq_width;
+    adhaz_config_int->working_mode = shared->working_mode;
+
     RkAiqAlgoDescription* des = (RkAiqAlgoDescription*)mDes;
     ret = des->prepare(mConfig);
     RKAIQCORE_CHECK_RET(ret, "adhaz algo prepare failed");
@@ -1936,6 +1940,40 @@ RkAiqAdhazHandleInt::processing()
     if (ret) {
         comb->adhaz_proc_res = NULL;
         RKAIQCORE_CHECK_RET(ret, "adhaz handle processing failed");
+    }
+
+    if(!shared->ispStats.adehaze_stats_valid && !shared->init) {
+        LOGD("no adehaze stats, ignore!");
+        // TODO: keep last result ?
+        //
+        //
+        return XCAM_RETURN_BYPASS;
+    } else {
+        if(shared->ctxCfigs[RK_AIQ_ALGO_TYPE_ADHAZ].cfg_com.isp_hw_version == 0)
+            memcpy(&adhaz_proc_int->stats.dehaze_stats_v20, &ispStats->adehaze_stats.dehaze_stats_v20, sizeof(dehaze_stats_v20_t));
+        else if(shared->ctxCfigs[RK_AIQ_ALGO_TYPE_ADHAZ].cfg_com.isp_hw_version == 1);
+        memcpy(&adhaz_proc_int->stats.dehaze_stats_v21, &ispStats->adehaze_stats.dehaze_stats_v21, sizeof(dehaze_stats_v21_t));
+        memcpy(adhaz_proc_int->stats.other_stats.tmo_luma,
+               ispStats->aec_stats.ae_data.extra.rawae_big.channelg_xy, sizeof(adhaz_proc_int->stats.other_stats.tmo_luma));
+
+        if(shared->working_mode == RK_AIQ_ISP_HDR_MODE_3_FRAME_HDR || shared->working_mode == RK_AIQ_ISP_HDR_MODE_3_LINE_HDR)
+        {
+            memcpy(adhaz_proc_int->stats.other_stats.short_luma,
+                   ispStats->aec_stats.ae_data.chn[0].rawae_big.channelg_xy, sizeof(adhaz_proc_int->stats.other_stats.short_luma));
+            memcpy(adhaz_proc_int->stats.other_stats.middle_luma,
+                   ispStats->aec_stats.ae_data.chn[1].rawae_lite.channelg_xy, sizeof(adhaz_proc_int->stats.other_stats.middle_luma));
+            memcpy(adhaz_proc_int->stats.other_stats.long_luma,
+                   ispStats->aec_stats.ae_data.chn[2].rawae_big.channelg_xy, sizeof(adhaz_proc_int->stats.other_stats.long_luma));
+        }
+        else if(shared->working_mode == RK_AIQ_ISP_HDR_MODE_2_FRAME_HDR || shared->working_mode == RK_AIQ_ISP_HDR_MODE_2_LINE_HDR)
+        {
+            memcpy(adhaz_proc_int->stats.other_stats.short_luma,
+                   ispStats->aec_stats.ae_data.chn[0].rawae_big.channelg_xy, sizeof(adhaz_proc_int->stats.other_stats.short_luma));
+            memcpy(adhaz_proc_int->stats.other_stats.long_luma,
+                   ispStats->aec_stats.ae_data.chn[1].rawae_big.channelg_xy, sizeof(adhaz_proc_int->stats.other_stats.long_luma));
+        }
+        else
+            LOGD("Wrong working mode!!!");
     }
 
     adhaz_proc_int->pCalibDehaze = shared->calib;

@@ -656,6 +656,65 @@ XCamReturn AdehazeProcessV21(AdehazeHandle_t* para, int iso, int mode, int versi
     LOG1_ADEHAZE("EXIT: %s \n", __func__);
     return ret;
 }
+void AdehazeGetStats
+(
+    AdehazeHandle_t*           pAdehazeCtx,
+    rkisp_adehaze_stats_t*         ROData
+) {
+    LOG1_AHDR( "%s:enter!\n", __FUNCTION__);
+    LOGV_ADEHAZE("%s:  Ahdr RO data from register:\n", __FUNCTION__);
+
+    if(pAdehazeCtx->HWversion == 0) {
+        pAdehazeCtx->stats.dehaze_stats_v20.dhaz_adp_air_base = ROData->dehaze_stats_v20.dhaz_adp_air_base;
+        pAdehazeCtx->stats.dehaze_stats_v20.dhaz_adp_wt = ROData->dehaze_stats_v20.dhaz_adp_wt;
+        pAdehazeCtx->stats.dehaze_stats_v20.dhaz_adp_gratio = ROData->dehaze_stats_v20.dhaz_adp_gratio;
+        pAdehazeCtx->stats.dehaze_stats_v20.dhaz_adp_tmax = ROData->dehaze_stats_v20.dhaz_adp_tmax;
+        for(int i = 0; i < 64; i++) {
+            pAdehazeCtx->stats.dehaze_stats_v20.h_b_iir[i] = ROData->dehaze_stats_v20.h_b_iir[i];
+            pAdehazeCtx->stats.dehaze_stats_v20.h_g_iir[i] = ROData->dehaze_stats_v20.h_g_iir[i];
+            pAdehazeCtx->stats.dehaze_stats_v20.h_r_iir[i] = ROData->dehaze_stats_v20.h_r_iir[i];
+        }
+
+        LOGV_ADEHAZE("%s:  dhaz_adp_air_base:%d dhaz_adp_wt:%d dhaz_adp_gratio:%d dhaz_adp_tmax:%d\n", __FUNCTION__,
+                     pAdehazeCtx->stats.dehaze_stats_v20.dhaz_adp_air_base, pAdehazeCtx->stats.dehaze_stats_v20.dhaz_adp_wt,
+                     pAdehazeCtx->stats.dehaze_stats_v20.dhaz_adp_gratio, pAdehazeCtx->stats.dehaze_stats_v20.dhaz_adp_tmax);
+        for(int i = 0; i < 64; i++) {
+            LOGV_ADEHAZE("%s:  h_b_iir[%d]:%d:\n", __FUNCTION__, i, pAdehazeCtx->stats.dehaze_stats_v20.h_b_iir[i]);
+            LOGV_ADEHAZE("%s:  h_g_iir[%d]:%d:\n", __FUNCTION__, i, pAdehazeCtx->stats.dehaze_stats_v20.h_g_iir[i]);
+            LOGV_ADEHAZE("%s:  h_r_iir[%d]:%d:\n", __FUNCTION__, i, pAdehazeCtx->stats.dehaze_stats_v20.h_r_iir[i]);
+        }
+    }
+    else if(pAdehazeCtx->HWversion == 1) {
+        pAdehazeCtx->stats.dehaze_stats_v21.dhaz_adp_air_base = ROData->dehaze_stats_v21.dhaz_adp_air_base;
+        pAdehazeCtx->stats.dehaze_stats_v21.dhaz_adp_wt = ROData->dehaze_stats_v21.dhaz_adp_wt;
+        pAdehazeCtx->stats.dehaze_stats_v21.dhaz_adp_gratio = ROData->dehaze_stats_v21.dhaz_adp_gratio;
+        pAdehazeCtx->stats.dehaze_stats_v21.dhaz_adp_tmax = ROData->dehaze_stats_v21.dhaz_adp_tmax;
+        for(int i = 0; i < 64; i++)
+            pAdehazeCtx->stats.dehaze_stats_v21.h_rgb_iir[i] = ROData->dehaze_stats_v21.h_rgb_iir[i];
+
+        LOGV_ADEHAZE("%s:  dhaz_adp_air_base:%d dhaz_adp_wt:%d dhaz_adp_gratio:%d dhaz_adp_tmax:%d\n", __FUNCTION__,
+                     pAdehazeCtx->stats.dehaze_stats_v21.dhaz_adp_air_base, pAdehazeCtx->stats.dehaze_stats_v21.dhaz_adp_wt,
+                     pAdehazeCtx->stats.dehaze_stats_v21.dhaz_adp_gratio, pAdehazeCtx->stats.dehaze_stats_v21.dhaz_adp_tmax);
+        for(int i = 0; i < 64; i++)
+            LOGV_ADEHAZE("%s:  h_rgb_iir[%d]:%d:\n", __FUNCTION__, i, pAdehazeCtx->stats.dehaze_stats_v21.h_rgb_iir[i]);
+    }
+
+    //get other stats from stats
+    for(int i = 0; i < 225; i++)
+    {
+        pAdehazeCtx->stats.other_stats.short_luma[i] = ROData->other_stats.short_luma[i];
+        pAdehazeCtx->stats.other_stats.long_luma[i] = ROData->other_stats.long_luma[i];
+        pAdehazeCtx->stats.other_stats.tmo_luma[i] = ROData->other_stats.tmo_luma[i];
+    }
+
+    if(pAdehazeCtx->FrameNumber == 3)
+    {
+        for(int i = 0; i < 25; i++)
+            pAdehazeCtx->stats.other_stats.middle_luma[i] = ROData->other_stats.middle_luma[i];
+    }
+
+    LOG1_AHDR( "%s:exit!\n", __FUNCTION__);
+}
 
 XCamReturn AdehazeInit(AdehazeHandle_t** para, CamCalibDbContext_t* calib)
 {
@@ -691,7 +750,9 @@ XCamReturn AdehazeProcess(AdehazeHandle_t* para, int iso, int mode, int version)
     LOG1_ADEHAZE("ENTER: %s \n", __func__);
 
     if(version == 0) {
-        para->adhaz_config.dehaze_en[4] = 0x1;
+        //big mode
+        para->ProcRes.ProcResV20.big_en = para->width > DEHAZEBIGMODE ? 1 : 0;
+        para->ProcRes.ProcResV20.nobig_en = (int)(1 - para->ProcRes.ProcResV20.big_en);
 
         LOGD_ADEHAZE("%s ISO:%d mode:%d\n", __func__, iso, mode);
 

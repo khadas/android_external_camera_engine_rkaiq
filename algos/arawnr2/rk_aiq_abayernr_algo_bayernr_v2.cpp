@@ -633,7 +633,8 @@ Abayernr_result_t bayernr2D_fix_transfer_V2(RK_Bayernr_2D_Params_V2_Select_t* pS
 
 	// ISP_BAYNR_3A00_SIGMAX0-15   ISP_BAYNR_3A00_SIGMAY0-15
 	for(i=0; i<16; i++){
-		pFix->sigma_x[i] = bayernr_get_trans_V2(pSelect->bayernrv2_filter_lumapoint[i]);
+		//pFix->sigma_x[i] = bayernr_get_trans_V2(pSelect->bayernrv2_filter_lumapoint[i]);
+		pFix->sigma_x[i] = pSelect->bayernrv2_filter_lumapoint[i];
 		pFix->sigma_y[i] = pSelect->bayernrv2_filter_sigma[i];
 		pFix->sigma_x[i] = CLIP(pFix->sigma_x[i], 0, 0xffff);
 		pFix->sigma_y[i] = CLIP(pFix->sigma_y[i], 0, 0xffff);
@@ -655,13 +656,23 @@ Abayernr_result_t bayernr2D_fix_transfer_V2(RK_Bayernr_2D_Params_V2_Select_t* pS
 		bayernr_sw_bil_gauss_weight[i + 8] = (int)(tmp2*(1<<FIXVSTINV));
 	}
 
-	pFix->weit_d[0] = bayernr_sw_bil_gauss_weight[12];
-	pFix->weit_d[1] = bayernr_sw_bil_gauss_weight[10];
-	pFix->weit_d[2] = bayernr_sw_bil_gauss_weight[11];
-	#endif
+	if(0){
+		//gray mode
+		pFix->weit_d[0] = bayernr_sw_bil_gauss_weight[12];
+		pFix->weit_d[1] = bayernr_sw_bil_gauss_weight[10];
+		pFix->weit_d[2] = bayernr_sw_bil_gauss_weight[11];
+		
+	}else{		
+		pFix->weit_d[0] = bayernr_sw_bil_gauss_weight[13];
+		pFix->weit_d[1] = bayernr_sw_bil_gauss_weight[14];
+		pFix->weit_d[2] = bayernr_sw_bil_gauss_weight[15];
+	}
+
 	pFix->weit_d[0] = CLIP(pFix->weit_d[0], 0, 0x3ff);
 	pFix->weit_d[1] = CLIP(pFix->weit_d[1], 0, 0x3ff);
 	pFix->weit_d[2] = CLIP(pFix->weit_d[2], 0, 0x3ff);
+	#endif
+	
 	
 	
 	bayernr2D_fix_printf_V2(pFix);
@@ -689,7 +700,7 @@ Abayernr_result_t bayernr3D_fix_transfer_V2(RK_Bayernr_3D_Params_V2_Select_t* pS
 
 	// BAY3D_BAY3D_GLBPK2 
 	pFix->bay3d_glbpk2 = 1024;
-	pFix->bay3d_sigratio = CLIP(pFix->bay3d_sigratio, 0, 0xfffffff);
+	pFix->bay3d_glbpk2 = CLIP(pFix->bay3d_glbpk2, 0, 0xfffffff);
 
 	// BAY3D_BAY3D_KALSTR 
 	pFix->bay3d_exp_str = (int)(pSelect->bayernrv2_tnr_filter_strength * (1 << 10));//	(int)(0.06*(1<<10));	// less, filter strong	// classic is 0.1
@@ -706,7 +717,8 @@ Abayernr_result_t bayernr3D_fix_transfer_V2(RK_Bayernr_3D_Params_V2_Select_t* pS
 	// BAY3D_BAY3D_SIG_X0  
 	for(i=0;i<16;i++)
 	{
-		pFix->bay3d_sig_x[i] = bayernr_get_trans_V2(pSelect->bayernrv2_tnr_lumapoint[i]);
+		//pFix->bay3d_sig_x[i] = bayernr_get_trans_V2(pSelect->bayernrv2_tnr_lumapoint[i]);
+		pFix->bay3d_sig_x[i] = pSelect->bayernrv2_tnr_lumapoint[i];
 		pFix->bay3d_sig_x[i] = CLIP(pFix->bay3d_sig_x[i], 0, 0xffff);
 		
 		pFix->bay3d_sig_y[i] = pSelect->bayernrv2_tnr_sigma[i];

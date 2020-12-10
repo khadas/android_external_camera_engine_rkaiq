@@ -22,27 +22,36 @@
 
 #include "adehaze/rk_aiq_types_adehaze_algo_int.h"
 #include "RkAiqCalibDbTypes.h"
+#include "rk_aiq_types_adehaze_stat.h"
 
-RKAIQ_BEGIN_DECLARE
+#include "rk_aiq_algo_types.h"
+#include "xcam_log.h"
+
+
+
 
 #define LIMIT_VALUE(value,max_value,min_value)      (value > max_value? max_value : value < min_value ? min_value : value)
+#define DEHAZEBIGMODE     (2560)
+#define RK_DEHAZE_ISO_NUM 9
+#define FUNCTION_ENABLE 1
+#define FUNCTION_DISABLE 0
 
 
 typedef struct AdehazeHandle_s {
-    rk_aiq_dehaze_cfg_t adhaz_config;
     CalibDb_Dehaze_t calib_dehaz;
     CamCalibDbContext_t* pCalibDb;
+    adehaze_sw_t AdehazeAtrr;
+    RkAiqAdehazeProcResult_t ProcRes;
+    rkisp_adehaze_stats_t stats;
+    int HWversion; //0:isp2.0 1:isp2.1
+    int width;
+    int height;
     int strength;
     int working_mode;
     int Dehaze_Scene_mode;
-    adehaze_sw_t AdehazeAtrr;
-    RkAiqAdehazeProcResult_t ProcRes;
-    int HWversion; //0:isp2.0 1:isp2.1
+    int FrameNumber;
 } AdehazeHandle_t;
 
-
-
-RKAIQ_END_DECLARE
 
 #endif
 

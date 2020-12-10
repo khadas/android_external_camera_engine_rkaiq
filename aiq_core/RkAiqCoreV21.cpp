@@ -246,6 +246,16 @@ RkAiqCoreV21::convertIspstatsToAlgo(const SmartPtr<VideoBuffer> &buffer)
     //mAlogsSharedParams.ispStats.awb_stats_valid = ISP2X_STAT_RAWAWB(stats->meas_type)? true:false;
     mAlogsSharedParams.ispStats.awb_stats_valid = stats->meas_type >> 5 & 1;
 
+    //dehaze
+    mAlogsSharedParams.ispStats.adehaze_stats_valid = stats->meas_type >> 17 & 1;
+    mAlogsSharedParams.ispStats.adehaze_stats.dehaze_stats_v21.dhaz_adp_air_base = stats->params.dhaz.dhaz_adp_air_base;
+    mAlogsSharedParams.ispStats.adehaze_stats.dehaze_stats_v21.dhaz_adp_wt = stats->params.dhaz.dhaz_adp_wt;
+    mAlogsSharedParams.ispStats.adehaze_stats.dehaze_stats_v21.dhaz_adp_gratio = stats->params.dhaz.dhaz_adp_gratio;
+    mAlogsSharedParams.ispStats.adehaze_stats.dehaze_stats_v21.dhaz_adp_wt = stats->params.dhaz.dhaz_adp_wt;
+    for(int i = 0; i < 64; i++)
+        mAlogsSharedParams.ispStats.adehaze_stats.dehaze_stats_v21.h_rgb_iir[i] = stats->params.dhaz.h_rgb_iir[i];
+
+
     //ae stats v2.1
 
     mAlogsSharedParams.ispStats.aec_stats_valid = (stats->meas_type >> 11) & (0x01) ? true : false;

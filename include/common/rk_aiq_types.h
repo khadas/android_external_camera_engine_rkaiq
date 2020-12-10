@@ -34,6 +34,7 @@
 #include "adrc/rk_aiq_types_adrc_algo.h"
 #include "agamma/rk_aiq_types_agamma_algo_int.h"
 #include "adehaze/rk_aiq_types_adehaze_algo_int.h"
+#include "adehaze/rk_aiq_types_adehaze_algo.h"
 #include "acp/rk_aiq_types_acp_algo.h"
 #include "aie/rk_aiq_types_aie_algo_int.h"
 #include "aorb/rk_aiq_types_orb_algo.h"

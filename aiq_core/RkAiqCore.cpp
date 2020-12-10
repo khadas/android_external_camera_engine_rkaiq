@@ -2396,6 +2396,18 @@ RkAiqCore::convertIspstatsToAlgo(const SmartPtr<VideoBuffer> &buffer)
     for(int i = 0; i < 32; i++)
         mAlogsSharedParams.ispStats.ahdr_stats.tmo_stats.ro_array_min_max[i] = stats->params.hdrtmo.min_max[i];
 
+    //dehaze
+    mAlogsSharedParams.ispStats.adehaze_stats_valid = stats->meas_type >> 17 & 1;
+    mAlogsSharedParams.ispStats.adehaze_stats.dehaze_stats_v20.dhaz_adp_air_base = stats->params.dhaz.dhaz_adp_air_base;
+    mAlogsSharedParams.ispStats.adehaze_stats.dehaze_stats_v20.dhaz_adp_wt = stats->params.dhaz.dhaz_adp_wt;
+    mAlogsSharedParams.ispStats.adehaze_stats.dehaze_stats_v20.dhaz_adp_gratio = stats->params.dhaz.dhaz_adp_gratio;
+    mAlogsSharedParams.ispStats.adehaze_stats.dehaze_stats_v20.dhaz_adp_wt = stats->params.dhaz.dhaz_adp_wt;
+    for(int i = 0; i < 64; i++) {
+        mAlogsSharedParams.ispStats.adehaze_stats.dehaze_stats_v20.h_b_iir[i] = stats->params.dhaz.h_b_iir[i];
+        mAlogsSharedParams.ispStats.adehaze_stats.dehaze_stats_v20.h_g_iir[i] = stats->params.dhaz.h_g_iir[i];
+        mAlogsSharedParams.ispStats.adehaze_stats.dehaze_stats_v20.h_r_iir[i] = stats->params.dhaz.h_r_iir[i];
+    }
+
     //ae
     mAlogsSharedParams.ispStats.aec_stats_valid = (stats->meas_type >> 11) & (0x01) ? true : false;
 

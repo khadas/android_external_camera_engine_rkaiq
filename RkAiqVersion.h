@@ -274,10 +274,15 @@
  * - AFEC: fixed bug fec can't be dynamically switched on and off
  * - fix TMO,dehaze bugs
  * - isp driver v0.1.9
+ * v2.3.0
+ * - calib db: v1.4.5 magic code: 1258987 
+ * - initial version of isp v21
+ *   - enable all algos except asd
+ *   - compatible with isp v20 
  */
 
-#define RK_AIQ_VERSION_REAL_V "v1.3.0"
-#define RK_AIQ_RELEASE_DATE "2020-10-17"
+#define RK_AIQ_VERSION_REAL_V "v2.3.0"
+#define RK_AIQ_RELEASE_DATE "2020-12-09"
 
 /******* DO NOT EDIT THE FOLLOWINGS ***********/
 

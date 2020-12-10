@@ -100,6 +100,8 @@ public:
     bool orb_stats_valid;
     rkisp_ahdr_stats_t ahdr_stats;
     bool ahdr_stats_valid;
+    rkisp_adehaze_stats_t adehaze_stats;
+    bool adehaze_stats_valid;
     uint32_t frame_id;
 private:
     XCAM_DEAD_COPY (RkAiqIspStats);
@@ -285,7 +287,7 @@ protected:
     std::map<int, SmartPtr<RkAiqHandle>>* getAlgoTypeHandleMap(int algo_type);
     void addDefaultAlgos(struct RkAiqAlgoDesCommExt* algoDes);
     virtual SmartPtr<RkAiqHandle> newAlgoHandle(RkAiqAlgoDesComm* algo, bool generic, int hw_ver);
-    virtual void copyIspStats(RkAiqIspStats* from ,rk_aiq_isp_stats_t* to);
+    virtual void copyIspStats(RkAiqIspStats* from, rk_aiq_isp_stats_t* to);
     virtual XCamReturn genIspAeResult(RkAiqFullParams* params);
     virtual XCamReturn genIspAwbResult(RkAiqFullParams* params);
     virtual XCamReturn genIspAfResult(RkAiqFullParams* params);
@@ -335,10 +337,10 @@ protected:
     bool mHasPp;
     // key1: algo type
     // key2: algo id
-    std::map<int,map<int, SmartPtr<RkAiqHandle>>> mAlgoHandleMaps;
+    std::map<int, map<int, SmartPtr<RkAiqHandle>>> mAlgoHandleMaps;
     // key: algo type
     std::map<int, SmartPtr<RkAiqHandle>> mCurAlgoHandleMaps;
-    // ordered algo list 
+    // ordered algo list
     std::list<SmartPtr<RkAiqHandle>> mCurIspAlgoHandleList;
     std::list<SmartPtr<RkAiqHandle>> mCurIsppAlgoHandleList;
 
@@ -365,7 +367,7 @@ protected:
     SmartPtr<RkAiqStatsPool> mAiqStatsPool;
     std::list<SmartPtr<RkAiqStatsProxy>> mAiqStatsCachedList;
     std::map<rk_aiq_isp_stats_t*, SmartPtr<RkAiqStatsProxy>> mAiqStatsOutMap;
-    struct RkAiqAlgoDesCommExt* mAlgosDesArray; 
+    struct RkAiqAlgoDesCommExt* mAlgosDesArray;
     int mIspHwVer;
 };
 

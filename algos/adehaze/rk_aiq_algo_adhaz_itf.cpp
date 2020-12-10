@@ -70,6 +70,14 @@ prepare(RkAiqAlgoCom* params)
 
     AdehazeHandle->working_mode = config->adhaz_config_com.com.u.prepare.working_mode;
 
+    if (AdehazeHandle->working_mode < RK_AIQ_WORKING_MODE_ISP_HDR2)
+        AdehazeHandle->FrameNumber = 1;
+    else if (AdehazeHandle->working_mode < RK_AIQ_WORKING_MODE_ISP_HDR3 &&
+             AdehazeHandle->working_mode >= RK_AIQ_WORKING_MODE_ISP_HDR2)
+        AdehazeHandle->FrameNumber = 2;
+    else
+        AdehazeHandle->FrameNumber = 3;
+
     //TO DO
 //    iso = 50;
 //    ret = AdehazeConfig(calib_dehaze, AdehazeHandle, iso, AdehazeHandle->Dehaze_Scene_mode);
@@ -83,6 +91,9 @@ pre_process(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outparams)
 {
     RkAiqAlgoConfigAdhazInt* config = (RkAiqAlgoConfigAdhazInt*)inparams;
     AdehazeHandle_t * AdehazeHandle = (AdehazeHandle_t *)inparams->ctx;
+
+    AdehazeHandle->width = config->rawWidth;
+    AdehazeHandle->height = config->rawHeight;
 
     if (config->rk_com.u.proc.gray_mode)
         AdehazeHandle->Dehaze_Scene_mode = DEHAZE_NIGHT;
@@ -102,6 +113,8 @@ processing(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outparams)
     AdehazeHandle_t * AdehazeHandle = (AdehazeHandle_t *)inparams->ctx;
     RkAiqAlgoProcAdhazInt* procPara = (RkAiqAlgoProcAdhazInt*)inparams;
     RkAiqAlgoProcResAdhaz* procResPara = (RkAiqAlgoProcResAdhaz*)outparams;
+    AdehazeGetStats(AdehazeHandle, &procPara->stats);
+
     AdehazeExpInfo_t stExpInfo;
     memset(&stExpInfo, 0x00, sizeof(AdehazeExpInfo_t));
 

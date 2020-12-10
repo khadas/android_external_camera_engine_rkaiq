@@ -23,40 +23,11 @@
 #include "adehaze/rk_aiq_types_adehaze_algo.h"
 
 
-RKAIQ_BEGIN_DECLARE
-
-
-#define RK_DEHAZE_ISO_NUM 9
-#define FUNCTION_ENABLE 1
-#define FUNCTION_DISABLE 0
-
-#define LIMIT_VALUE(value,max_value,min_value)      (value > max_value? max_value : value < min_value ? min_value : value)
-
-
-
 enum {
     DEHAZE_NORMAL = 0,
     DEHAZE_HDR = 1,
     DEHAZE_NIGHT = 2
 };
-
-typedef struct RKAiqAdhazConfig_s
-{
-    float dehaze_en         [5];
-    float dehaze_self_adp   [7]; //-
-    float dehaze_range_adj  [6];
-    float dehaze_hist_para  [4];
-    float dehaze_enhance    [4];
-    float dehaze_iir_control[5];
-    float dehaze_user_config[5];
-    float dehaze_bi_para    [4]; //-
-    float dehaze_dc_bf_h   [25];
-    float dehaze_air_bf_h   [9];
-    float dehaze_gaus_h     [9];
-    float dehaze_hist_t0    [6]; //-
-    float dehaze_hist_t1    [6]; //-
-    float dehaze_hist_t2    [6]; //-
-} RKAiqAdhazConfig_t;
 
 typedef struct rk_aiq_dehaze_M_attrib_s {
     int strength;
@@ -216,9 +187,6 @@ typedef struct RkAiqAdehazeProcResult_s
     };
 
 } RkAiqAdehazeProcResult_t;
-
-
-RKAIQ_END_DECLARE
 
 #endif
 
