@@ -2932,8 +2932,9 @@ CamHwIsp20::setIspParamsSync(int frameId)
                                 buf_index, errno, strerror(errno));
                 return ret;
             }
-
+            _mutex.lock();
             _effecting_ispparm_map[frameId] = aiq_results;
+            _mutex.unlock();
             LOGD_CAMHW_SUBM(ISP20HW_SUBM, "ispparam ens 0x%llx, en_up 0x%llx, cfg_up 0x%llx",
                             _full_active_isp_params.module_ens,
                             _full_active_isp_params.module_en_update,
