@@ -16,6 +16,7 @@
  * limitations under the License.
  *
  */
+#define LOG_TAG "AiqCameraHalAdapter"
 
 #include "AiqCameraHalAdapter.h"
 #include <utils/Errors.h>
@@ -37,6 +38,7 @@
 #include "rkcamera_vendor_tags.h"
 #include "settings_processor.h"
 #include "RkAiqVersion.h"
+#include "RkAiqCalibVersion.h"
 
 #define DEFAULT_ENTRY_CAP 64
 #define DEFAULT_DATA_CAP 1024
@@ -44,10 +46,13 @@
 #include <cutils/properties.h>
 #define PROPERTY_VALUE_MAX 32
 #define CAM_RKAIQ_PROPERTY_KEY  "vendor.cam.librkaiq.ver"
+#define CAM_RKAIQ_CALIB_PROPERTY_KEY  "vendor.cam.librkaiqCalib.ver"
 #define CAM_RKAIQ_ADAPTER_APROPERTY_KEY  "vendor.cam.librkaiqAdapter.ver"
 
 static char rkAiqVersion[PROPERTY_VALUE_MAX] = RK_AIQ_VERSION;
+static char rkAiqCalibVersion[PROPERTY_VALUE_MAX] = RK_AIQ_CALIB_VERSION;
 static char rkAiqAdapterVersion[PROPERTY_VALUE_MAX] = CONFIG_AIQ_ADAPTER_LIB_VERSION;
+
 using namespace android::camera2;
 
 AiqCameraHalAdapter::AiqCameraHalAdapter(SmartPtr<RkAiqManager> rkAiqManager,SmartPtr<RkAiqCore> analyzer,SmartPtr<ICamHw> camHw)
@@ -1294,6 +1299,7 @@ static void rk_aiqAdapt_init_lib(void) __attribute__((constructor));
 static void rk_aiqAdapt_init_lib(void)
 {
 	property_set(CAM_RKAIQ_PROPERTY_KEY,rkAiqVersion);
+	property_set(CAM_RKAIQ_CALIB_PROPERTY_KEY,rkAiqCalibVersion);
 	property_set(CAM_RKAIQ_ADAPTER_APROPERTY_KEY,rkAiqAdapterVersion);
 }
 
