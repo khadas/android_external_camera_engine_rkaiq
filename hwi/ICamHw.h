@@ -30,7 +30,7 @@ using namespace XCam;
 typedef struct ispHwEvt_s {
     int evt_code;
     union {
-
+        uint32_t frame_id;
     } msg;
 } ispHwEvt_t;
 

@@ -67,6 +67,8 @@ namespace RkCam {
 
 #define SENSOR_SUBM (0x4)
 
+class IspEvtsListener;
+
 class SensorHw : public V4l2SubDevice {
 public:
     explicit SensorHw(const char* name);
@@ -77,6 +79,7 @@ public:
                                  rk_aiq_exposure_sensor_descriptor& sns_des);
 
     XCamReturn handle_sof(int64_t time, int frameid);
+    void set_sof_evt_listener(IspEvtsListener* listener) { _evt_listener = listener; }
     int get_pixel(rk_aiq_exposure_sensor_descriptor* sns_des);
     int get_blank(rk_aiq_exposure_sensor_descriptor* sns_des);
     int get_exposure_range(rk_aiq_exposure_sensor_descriptor* sns_des);
@@ -119,6 +122,7 @@ private:
     bool _mirror;
     bool _flip;
     bool _update_mirror_flip;
+    IspEvtsListener* _evt_listener;
     int get_sensor_fps(float& fps);
     XCamReturn setLinearSensorExposure(RKAiqAecExpInfo_t* expPar);
     XCamReturn setHdrSensorExposure(RKAiqAecExpInfo_t* expPar);

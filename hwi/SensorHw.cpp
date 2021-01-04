@@ -17,6 +17,7 @@
 
 #include <linux/v4l2-subdev.h>
 #include "SensorHw.h"
+#include "ICamHw.h"
 
 namespace RkCam {
 
@@ -40,6 +41,7 @@ SensorHw::SensorHw(const char* name)
     _flip = false;
     _mirror = false;
     _update_mirror_flip = false;
+    _evt_listener = nullptr;
     EXIT_CAMHW_FUNCTION();
 }
 
@@ -737,6 +739,12 @@ SensorHw::handle_sof(int64_t time, int frameid)
         }
 
         _mutex.unlock();
+    }
+
+    if (_evt_listener) {
+        ispHwEvt_t evt;
+        evt.msg.frame_id = frameid;
+        _evt_listener->ispEvtsCb(&evt);
     }
 
     EXIT_CAMHW_FUNCTION();

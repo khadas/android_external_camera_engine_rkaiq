@@ -1916,7 +1916,9 @@ CamHwIsp20::prepare(uint32_t width, uint32_t height, int mode, int t_delay, int 
         prepare_cif_mipi();
 
     isp20Pollthread->set_event_handle_dev(sensorHw);
-
+    if (mIspEvtsListener) {
+        sensorHw->set_sof_evt_listener(mIspEvtsListener);
+    }
     _state = CAM_HW_STATE_PREPARED;
     EXIT_CAMHW_FUNCTION();
     return ret;

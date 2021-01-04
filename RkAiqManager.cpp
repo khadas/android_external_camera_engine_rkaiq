@@ -198,7 +198,7 @@ RkAiqManager::init()
 
     mCamHw->setIspLumaListener(this);
     mCamHw->setIspStatsListener(this);
-    mCamHw->setEvtsListener(NULL);
+    mCamHw->setEvtsListener(this);
     ret = mCamHw->init(mSnsEntName);
     RKAIQMNG_CHECK_RET(ret, "camHw init error %d !", ret);
     _state = AIQ_STATE_INITED;
@@ -428,6 +428,13 @@ RkAiqManager::ispEvtsCb(ispHwEvt_t* evt)
 {
     //TODO
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
+
+    if (mMetasCb) {
+        rk_aiq_metas_t metas;
+        metas.frame_id = evt->msg.frame_id;
+        return (*mMetasCb)(&metas);
+    }
+
     return ret;
 }
 
