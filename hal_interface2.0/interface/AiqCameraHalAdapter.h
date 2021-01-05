@@ -96,6 +96,7 @@ enum USE_CASE {
 enum MessageId {
     MESSAGE_ID_EXIT = 0,            // call requestExitAndWait
     MESSAGE_ID_ISP_STAT_DONE,
+    MESSAGE_ID_ISP_SOF_DONE,
     MESSAGE_ID_RKAIQ_CAL_DONE,       // partial metadata
     MESSAGE_ID_FLUSH,
     // max number of messages
@@ -129,6 +130,7 @@ struct Message {
 class AiqCameraHalAdapter:
     public RkAiqAnalyzerCb,
     public IspStatsListener,
+    public IspEvtsListener,
     public IMessageHandler
 {
 private:
@@ -137,6 +139,7 @@ private:
     SmartPtr<ICamHw> _camHw;
     SmartPtr<RkAiqAnalyzerCb> _RkAiqAnalyzerCb;
     SmartPtr<IspStatsListener> _IspStatsListener;
+    SmartPtr<IspEvtsListener> _IspEvtsListener;
 
     const cl_result_callback_ops_t *mCallbackOps;
 
@@ -173,6 +176,7 @@ private:  /* Methods */
     virtual void messageThreadLoop();
     status_t handleMessageExit(Message &msg);
     status_t handleIspStatCb(Message &msg);
+    status_t handleIspSofCb(Message &msg);
     status_t handleRkAiqCalcDone(Message &msg);
     status_t handleMessageFlush(Message &msg);
 
@@ -204,6 +208,7 @@ public:
     virtual void rkAiqCalcFailed(const char* msg);
 
     virtual XCamReturn ispStatsCb(SmartPtr<VideoBuffer>& ispStats);
+    virtual XCamReturn ispEvtsCb(ispHwEvt_t* evt);
 
     SmartPtr<AiqInputParams> getAiqInputParams();
     void set_aiq_ctx(rk_aiq_sys_ctx_t* aiq_ctx) { _aiq_ctx = aiq_ctx; };

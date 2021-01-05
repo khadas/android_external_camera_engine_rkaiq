@@ -65,7 +65,9 @@ AiqCameraHalAdapter::AiqCameraHalAdapter(SmartPtr<RkAiqManager> rkAiqManager,Sma
   _metadata (NULL),
   mThreadRunning(false),
   mMessageQueue("AiqAdatperThread", static_cast<int>(MESSAGE_ID_MAX)),
-  mMessageThread(nullptr)
+  mMessageThread(nullptr),
+  _IspStatsListener(nullptr),
+  _IspEvtsListener(nullptr)
 {
     int32_t status = OK;
     LOGD("@%s %d:", __FUNCTION__, __LINE__);
@@ -114,7 +116,9 @@ AiqCameraHalAdapter::init(const cl_result_callback_ops_t* callbacks){
         this->_RkAiqAnalyzerCb = _rkAiqManager;
         this->mCallbackOps = callbacks;
         this->_camHw->setIspStatsListener(this);
+        this->_camHw->setEvtsListener(this);
         this->_IspStatsListener = _rkAiqManager;
+        this->_IspEvtsListener = _rkAiqManager;
     }
 }
 
@@ -127,6 +131,7 @@ AiqCameraHalAdapter::deInit(){
     this->_camHw = nullptr;
     this->_RkAiqAnalyzerCb = nullptr;
     this->_IspStatsListener = nullptr;
+    this->_IspEvtsListener = nullptr;
     requestExitAndWait();
     if (mMessageThread != nullptr) {
         mMessageThread.reset();
@@ -154,13 +159,29 @@ XCamReturn
 AiqCameraHalAdapter::ispStatsCb(SmartPtr<VideoBuffer>& ispStats){
     LOGD("@%s %d:", __FUNCTION__, __LINE__);
     //TODO
+#if 0
     //set_sensor_mode_data()
     Message msg;
     msg.id = MESSAGE_ID_ISP_STAT_DONE;
     mMessageQueue.send(&msg, MESSAGE_ID_ISP_STAT_DONE);
-
+#endif
     if(this->_IspStatsListener.ptr()){
         return this->_IspStatsListener->ispStatsCb(ispStats);
+    }
+
+    return XCAM_RETURN_NO_ERROR;
+}
+
+XCamReturn
+AiqCameraHalAdapter::ispEvtsCb(ispHwEvt_t* evt){
+    LOGD("@%s %d:", __FUNCTION__, __LINE__);
+#if 1
+    Message msg;
+    msg.id = MESSAGE_ID_ISP_SOF_DONE;
+    mMessageQueue.send(&msg, MESSAGE_ID_ISP_SOF_DONE);
+#endif
+    if(this->_IspEvtsListener.ptr()){
+        return this->_IspEvtsListener->ispEvtsCb(evt);
     }
     return XCAM_RETURN_NO_ERROR;
 }
@@ -495,7 +516,8 @@ AiqCameraHalAdapter::updateAfMetaParams(XCamAfParam *afParams){
     pthread_mutex_lock(&_aiq_ctx_mutex);
     //when in Locked state, not run AF Algorithm
     if (mAfState->getState() != ANDROID_CONTROL_AF_STATE_FOCUSED_LOCKED) {
-        ret = rk_aiq_uapi_lockFocus(_aiq_ctx);
+        LOGD("%s(%d) AF_STATE_UNLOCKED !\n", __FUNCTION__, __LINE__);
+        ret = rk_aiq_uapi_unlockFocus(_aiq_ctx);
         if (ret) {
             LOGE("%s(%d) Af set unlock failed!\n", __FUNCTION__, __LINE__);
         }
@@ -505,7 +527,7 @@ AiqCameraHalAdapter::updateAfMetaParams(XCamAfParam *afParams){
             LOGE("%s(%d) Af SetAttrib failed!\n", __FUNCTION__, __LINE__);
         }
     } else {
-        ret = rk_aiq_uapi_unlockFocus(_aiq_ctx);
+        ret = rk_aiq_uapi_lockFocus(_aiq_ctx);
         if (ret) {
             LOGE("%s(%d) Af set lock failed!\n", __FUNCTION__, __LINE__);
         }
@@ -614,20 +636,21 @@ AiqCameraHalAdapter::updateAwbMetaParams(XCamAwbParam *awbParams){
     pthread_mutex_lock(&_aiq_ctx_mutex);
     //when in Locked state, not run AWB Algorithm
     if (mAwbState->getState() != ANDROID_CONTROL_AWB_STATE_LOCKED) {
+        LOGD("%s(%d) AWB_STATE_UNLOCKED !\n", __FUNCTION__, __LINE__);
         ret = rk_aiq_uapi_unlockAWB(_aiq_ctx);
         if (ret) {
             LOGE("%s(%d) Awb Set unlock failed!\n", __FUNCTION__, __LINE__);
         }
 
-        ret = rk_aiq_user_api_accm_SetAttrib(_aiq_ctx, setCcm);
-        if (ret) {
-            LOGE("%s(%d) accm SetAttrib failed!\n", __FUNCTION__, __LINE__);
-        }
+        //Not used now, for it resume 60ms in this callback
+//        ret = rk_aiq_user_api_accm_SetAttrib(_aiq_ctx, setCcm);
+//        if (ret) {
+//            LOGE("%s(%d) accm SetAttrib failed!\n", __FUNCTION__, __LINE__);
+//        }
         ret = rk_aiq_user_api_awb_SetAttrib(_aiq_ctx, stAwbttr);
         if (ret) {
             LOGE("%s(%d) Awb SetAttrib failed!\n", __FUNCTION__, __LINE__);
         }
-
     } else {
         ret = rk_aiq_uapi_lockAWB(_aiq_ctx);
         if (ret) {
@@ -1220,6 +1243,9 @@ AiqCameraHalAdapter::messageThreadLoop()
         case MESSAGE_ID_ISP_STAT_DONE:
             status = handleIspStatCb(msg);
             break;
+        case MESSAGE_ID_ISP_SOF_DONE:
+            status = handleIspSofCb(msg);
+            break;
         case MESSAGE_ID_RKAIQ_CAL_DONE:
             status = handleRkAiqCalcDone(msg);
             break;
@@ -1276,6 +1302,21 @@ AiqCameraHalAdapter::handleIspStatCb(Message &msg)
 }
 
 status_t
+AiqCameraHalAdapter::handleIspSofCb(Message &msg)
+{
+    status_t status = OK;
+
+    LOGD("@%s %d:", __FUNCTION__, __LINE__);
+    this->processResults();
+    setAiqInputParams(this->getAiqInputParams());
+    LOGD("@%s : reqId %d", __FUNCTION__, _inputParams.ptr() ? _inputParams->reqId : -1);
+    // update 3A states
+    pre_process_3A_states(_inputParams);
+    updateMetaParams();
+    return status;
+}
+
+status_t
 AiqCameraHalAdapter::handleRkAiqCalcDone(Message &msg)
 {
     status_t status = OK;
@@ -1291,6 +1332,7 @@ AiqCameraHalAdapter::handleMessageFlush(Message &msg)
 
     LOGD("@%s %d:", __FUNCTION__, __LINE__);
     mMessageQueue.remove(MESSAGE_ID_ISP_STAT_DONE);
+    mMessageQueue.remove(MESSAGE_ID_ISP_SOF_DONE);
     mMessageQueue.remove(MESSAGE_ID_RKAIQ_CAL_DONE);
     return status;
 }
