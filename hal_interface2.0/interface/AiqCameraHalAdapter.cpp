@@ -157,7 +157,7 @@ SmartPtr<AiqInputParams> AiqCameraHalAdapter:: getAiqInputParams()
 
 XCamReturn 
 AiqCameraHalAdapter::ispStatsCb(SmartPtr<VideoBuffer>& ispStats){
-    LOGD("@%s %d:", __FUNCTION__, __LINE__);
+    ALOGD("@%s %d:", __FUNCTION__, __LINE__);
     //TODO
 #if 0
     //set_sensor_mode_data()
@@ -399,7 +399,7 @@ AiqCameraHalAdapter::updateAeMetaParams(XCamAeParam *aeParams){
 
     /*auto ExpTimeRange & ExpGainRange*/
     stExpSwAttr.stAuto.stLinAeRange.stExpTimeRange.Max = (float) aeParams->exposure_time_max / 1000.0 / 1000.0 / 1000.0;
-    stExpSwAttr.stAuto.stLinAeRange.stExpTimeRange.Min = (float) aeParams->exposure_time_min /  1000.0 / 1000.0 / 1000.0;
+    stExpSwAttr.stAuto.stLinAeRange.stExpTimeRange.Min = (float) aeParams->exposure_time_min / 1000.0 / 1000.0 / 1000.0;
     stExpSwAttr.stAuto.stLinAeRange.stGainRange.Max = aeParams->max_analog_gain;
     for(int i = 0; i < 3; i++) {
         stExpSwAttr.stAuto.stHdrAeRange.stExpTimeRange[i].Max = (float) aeParams->exposure_time_max / 1000.0 / 1000.0 / 1000.0;
@@ -420,6 +420,16 @@ AiqCameraHalAdapter::updateAeMetaParams(XCamAeParam *aeParams){
         stExpWin.v_offs = aeParams->window.y_start;
         stExpWin.h_size = aeParams->window.x_end - aeParams->window.x_start;
         stExpWin.v_size = aeParams->window.y_end - aeParams->window.y_start;
+    }
+
+    if (aeParams->exposure_time_max == aeParams->exposure_time_min) {
+        stExpSwAttr.stAuto.stFrmRate.isFpsFix = true;
+        stExpSwAttr.stAuto.stFrmRate.FpsValue = 1e9 / aeParams->exposure_time_max;
+        LOGD("@%s:aeParams->exposure_time_max(%lld), stFrmRate.FpsValue:%d", __FUNCTION__,
+                aeParams->exposure_time_max, stExpSwAttr.stAuto.stFrmRate.FpsValue);
+    } else {
+        stExpSwAttr.stAuto.stFrmRate.isFpsFix = false;
+        LOGD("@%s:framerate is not fixed!", __FUNCTION__);
     }
 
     pthread_mutex_lock(&_aiq_ctx_mutex);
@@ -1224,6 +1234,7 @@ void AiqCameraHalAdapter::rkAiqCalcFailed(const char* msg){
         this->_RkAiqAnalyzerCb->rkAiqCalcFailed(msg);
     }
 }
+
 void
 AiqCameraHalAdapter::messageThreadLoop()
 {
