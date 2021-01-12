@@ -35,7 +35,7 @@ Abayernr_result_t bayernr_get_mode_by_name_V2(struct list_head *pCalibdbList, ch
 			__FUNCTION__, __LINE__, pProfile->modeName, p);
         if (!strncmp(pProfile->modeName, name, sizeof(pProfile->modeName))) {
             *ppProfile = pProfile;
-            break;
+            return res;
         }
         p = p->next;
     }
@@ -82,7 +82,7 @@ Abayernr_result_t bayernr2D_get_setting_by_name_V2(struct list_head *pSettingLis
 			__FUNCTION__, __LINE__,pSetting->snr_mode, p);
         if (!strncmp(pSetting->snr_mode, name, sizeof(pSetting->snr_mode))) {
             *ppSetting = pSetting;
-            break;
+            return res;
         }
         p = p->next;
     }
@@ -124,7 +124,7 @@ Abayernr_result_t bayernr3D_get_setting_by_name_V2(struct list_head *pSettingLis
 			__FUNCTION__, __LINE__, pSetting->snr_mode, p);
         if (!strncmp(pSetting->snr_mode, name, sizeof(pSetting->snr_mode))) {
             *ppSetting = pSetting;
-            break;
+            return res;
         }
         p = p->next;
     }

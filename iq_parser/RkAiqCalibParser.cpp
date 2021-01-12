@@ -5380,7 +5380,7 @@ bool RkAiqCalibParser::parseEntrySensorAecFrameRateMode
             DCT_ASSERT((no == subTag.Size()));
         }
         else if (XML_CHECK_TAGID_COMPARE(CALIB_SENSOR_AEC_FPSVALUE_TAG_ID)) {
-            int no = ParseUcharArray(psubchild, &paec_frm->FpsValue, subTag.Size());
+            int no = ParseFloatArray(psubchild, &paec_frm->FpsValue, subTag.Size());
             DCT_ASSERT((no == subTag.Size()));
         }
         else {
@@ -15340,6 +15340,11 @@ bool RkAiqCalibParser::parseEntryExpSetHdrTimeSet
         }
         else if (XML_CHECK_TAGID_COMPARE(CALIB_EXPSET_CISTIMEREG_MIN_TAG_ID) && indexValid) {
             int no = ParseUshortArray(psubchild, &mCalibDb->expset.CISTimeSet.Hdr[index].CISTimeRegMin, 1);
+            DCT_ASSERT((no == secsubTag.Size()));
+        }
+        else if (XML_CHECK_TAGID_COMPARE(CALIB_EXPSET_CISTIMEREG_MAX_TAG_ID) && indexValid) {
+            int i = (sizeof(mCalibDb->expset.CISTimeSet.Hdr[index].CISTimeRegMax) / sizeof(mCalibDb->expset.CISTimeSet.Hdr[index].CISTimeRegMax.Coeff[0]));
+            int no = ParseIntArray(psubchild, mCalibDb->expset.CISTimeSet.Hdr[index].CISTimeRegMax.Coeff, i);
             DCT_ASSERT((no == secsubTag.Size()));
         }
         psubchild = psubchild->NextSibling();

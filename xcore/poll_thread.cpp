@@ -462,7 +462,7 @@ XCamReturn PollThread::stop ()
 }
 
 XCamReturn
-PollThread::notify_sof (int64_t time, int frameid)
+PollThread::notify_sof (uint64_t time, int frameid)
 {
     XCAM_UNUSED (time);
     XCAM_UNUSED (frameid);

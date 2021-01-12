@@ -200,6 +200,7 @@ enum isp2x_trigger_mode {
 
 struct isp2x_csi_trigger {
     /* timestamp in ns */
+    u64 sof_timestamp;
     u64 frame_timestamp;
     u32 frame_id;
     int times;
@@ -1460,6 +1461,20 @@ struct isp2x_isp_meas_cfg {
     struct isp2x_sihst_cfg sihst;
 } __attribute__ ((packed));
 
+
+struct sensor_exposure_s {
+    u32 fine_integration_time;
+    u32 coarse_integration_time;
+    u32 analog_gain_code_global;
+    u32 digital_gain_global;
+    u32 isp_digital_gain;
+} __attribute__ ((packed));
+
+struct sensor_exposure_cfg {
+    struct sensor_exposure_s linear_exp;
+    struct sensor_exposure_s hdr_exp[3];
+} __attribute__ ((packed));
+
 struct isp2x_isp_params_cfg {
     u64 module_en_update;
     u64 module_ens;
@@ -1467,7 +1482,8 @@ struct isp2x_isp_params_cfg {
 
     u32 frame_id;
     struct isp2x_isp_meas_cfg meas;
-    struct isp2x_isp_other_cfg others;  // must be last item
+    struct isp2x_isp_other_cfg others;
+    struct sensor_exposure_cfg exposure;
 } __attribute__ ((packed));
 
 struct isp2x_siawb_meas {

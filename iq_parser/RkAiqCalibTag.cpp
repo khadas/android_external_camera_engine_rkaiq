@@ -1782,6 +1782,7 @@ uint32_t calib_expset_timeset_hdr_sub_tags[] = {
     CALIB_EXPSET_CISHDRTIMEREG_SUMFAC_TAG_ID,
     CALIB_EXPSET_CISTIMEREG_ODEVITY_TAG_ID,
     CALIB_EXPSET_CISTIMEREG_MIN_TAG_ID,
+    CALIB_EXPSET_CISTIMEREG_MAX_TAG_ID,
 };
 
 uint32_t calib_expset_hdrset_sub_tags[] = {
@@ -6848,6 +6849,10 @@ calib_tag_info_t g_calib_tag_infos[CALIB_IQ_TAG_END] = {
     },
     [CALIB_EXPSET_CISTIMEREG_MIN_TAG_ID]         =
     {   "CISTimeRegMin", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
+        check_tags_array_ignore, NULL
+    },
+    [CALIB_EXPSET_CISTIMEREG_MAX_TAG_ID]         =
+    {   "CISTimeRegMax", CALIB_TAG_TYPE_DOUBLE, {-1, -1},
         check_tags_array_ignore, NULL
     },
     [CALIB_EXPSET_CISMINFPS_TAG_ID]         =

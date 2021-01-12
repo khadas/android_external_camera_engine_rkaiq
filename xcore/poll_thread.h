@@ -86,7 +86,7 @@ protected:
     virtual SmartPtr<VideoBuffer> new_video_buffer(SmartPtr<V4l2Buffer> buf,
             SmartPtr<V4l2Device> dev,
             int type);
-    virtual XCamReturn notify_sof (int64_t time, int frameid);
+    virtual XCamReturn notify_sof (uint64_t time, int frameid);
 
 private:
     XCamReturn create_stop_fds ();

@@ -320,7 +320,7 @@ Isp20PollThread::new_video_buffer(SmartPtr<V4l2Buffer> buf,
 }
 
 XCamReturn
-Isp20PollThread::notify_sof (int64_t time, int frameid)
+Isp20PollThread::notify_sof (uint64_t time, int frameid)
 {
     ENTER_CAMHW_FUNCTION();
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
@@ -332,6 +332,12 @@ Isp20PollThread::notify_sof (int64_t time, int frameid)
     }
     if (_focus_handle_dev.ptr())
         _focus_handle_dev->handle_sof(time, frameid);
+
+    _sof_map_mutex.lock();
+    while (_sof_timestamp_map.size() > 8)
+        _sof_timestamp_map.erase(_sof_timestamp_map.begin());
+    _sof_timestamp_map[frameid] = time;
+    _sof_map_mutex.unlock();
     EXIT_CAMHW_FUNCTION();
 
     return ret;
@@ -435,6 +441,7 @@ Isp20PollThread::Isp20PollThread()
 Isp20PollThread::~Isp20PollThread()
 {
     stop();
+    _sof_timestamp_map.clear();
 
     LOGD_CAMHW_SUBM(ISP20POLL_SUBM, "~Isp20PollThread destructed");
 }
@@ -867,6 +874,7 @@ Isp20PollThread::trigger_readback()
             }
 
             struct isp2x_csi_trigger tg = {
+                .sof_timestamp = 0,
                 .frame_timestamp = 0,
                 .frame_id = sequence,
                 .times = 0,
@@ -884,10 +892,16 @@ Isp20PollThread::trigger_readback()
                 tg.times = 2;
             if (_is_multi_cam_conc && (tg.times < 1))
                 tg.times = 1;
+
+            uint64_t sof_timestamp;
+            match_sof_timestamp_map(tg.frame_id, sof_timestamp);
+            tg.sof_timestamp = sof_timestamp;
             tg.frame_timestamp = buf_proxy->get_timestamp () * 1000;
             // tg.times = 1;//fixed to three times readback
-            LOGD_CAMHW_SUBM(ISP20POLL_SUBM, "%s frame[%d]:ts %" PRId64 "ms, isHdrGlobalTmo(%d), readback %dtimes \n",
-                            __func__, sequence,
+            LOGD_CAMHW_SUBM(ISP20POLL_SUBM,
+                            "frame[%d]: sof_ts %" PRId64 "ms, frame_ts %" PRId64 "ms, globalTmo(%d), readback(%d)\n",
+                            sequence,
+                            tg.sof_timestamp / 1000 / 1000,
                             tg.frame_timestamp / 1000 / 1000,
                             isHdrGlobalTmo,
                             tg.times);
@@ -958,6 +972,26 @@ Isp20PollThread::match_globaltmostate_map(uint32_t sequence, bool &isHdrGlobalTm
                             __func__, sequence, iter->first);
             break;
         }
+    }
+}
+
+XCamReturn
+Isp20PollThread::match_sof_timestamp_map(sint32_t sequence, uint64_t &timestamp)
+{
+    std::map<int, uint64_t>::iterator it;
+    sint32_t search_id = sequence < 0 ? 0 : sequence;
+
+    _sof_map_mutex.lock();
+    it = _sof_timestamp_map.find(search_id);
+    _sof_map_mutex.unlock();
+    if (it != _sof_timestamp_map.end()) {
+        timestamp = it->second;
+        return XCAM_RETURN_NO_ERROR;
+    } else {
+        LOGE_CAMHW_SUBM(ISP20POLL_SUBM,
+                "can't find frameid(%d), get sof timestamp failed!\n",
+                sequence);
+        return XCAM_RETURN_ERROR_FAILED;
     }
 }
 

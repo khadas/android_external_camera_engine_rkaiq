@@ -131,7 +131,7 @@ void CalibrateDrcGainY( DrcProcRes_t *para)
 
         tmp = luma[i];
         tmp = 1 - detailslowlight * pow((1 - tmp / 4096), 2);
-        gainTable[i] = pow(maxgain, tmp);
+        gainTable[i] = 1024 * pow(maxgain / 1024, tmp);
         para->sw_drc_gain_y[i] = (int)(gainTable[i]) ;
     }
 

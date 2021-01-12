@@ -89,7 +89,7 @@ protected:
     SmartPtr<VideoBuffer> new_video_buffer(SmartPtr<V4l2Buffer> buf,
                                            SmartPtr<V4l2Device> dev,
                                            int type);
-    virtual XCamReturn notify_sof (int64_t time, int frameid);
+    virtual XCamReturn notify_sof (uint64_t time, int frameid);
 private:
     XCamReturn mipi_poll_buffer_loop (int type, int dev_index);
     XCamReturn create_stop_fds_mipi ();
@@ -137,6 +137,8 @@ private:
     Cond _capture_image_cond;
     capture_raw_t _capture_raw_type;
     std::map<uint32_t, bool> _hdr_global_tmo_state_map;
+    std::map<sint32_t, uint64_t> _sof_timestamp_map;
+    Mutex _sof_map_mutex;
     bool _is_multi_cam_conc;
     int _skip_num;
     int64_t _skip_to_seq;
@@ -164,6 +166,7 @@ private:
     void match_lumadetect_map(uint32_t sequence, sint32_t &additional_times);
     void match_globaltmostate_map(uint32_t sequence, bool &isHdrGlobalTmo);
     bool check_skip_frame(int32_t skip_seq);
+    XCamReturn match_sof_timestamp_map(sint32_t sequence, uint64_t &timestamp);
 };
 
 }

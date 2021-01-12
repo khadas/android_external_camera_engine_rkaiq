@@ -35,7 +35,7 @@ Aynr_result_t ynr_get_mode_by_name_V2(struct list_head* pCalibdbList, char *name
 			__FUNCTION__, __LINE__, pProfile->modeName, p);
         if (!strncmp(pProfile->modeName, name, sizeof(pProfile->modeName))) {
             *ppProfile = pProfile;
-            break;
+            return res;
         }
         p = p->next;
     }
@@ -83,7 +83,7 @@ Aynr_result_t ynr_get_setting_by_name_V2(struct list_head *pSettingList, char *n
 			__FUNCTION__, __LINE__,pSetting->snr_mode, p);
         if (!strncmp(pSetting->snr_mode, name, sizeof(pSetting->snr_mode))) {
             *ppSetting = pSetting;
-            break;
+            return res;
         }
         p = p->next;
     }

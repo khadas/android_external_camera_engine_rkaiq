@@ -282,7 +282,7 @@ typedef struct _RkAiqAlgoPreAeInt {
 
 typedef struct _RkAiqAlgoPreResAeInt {
     RkAiqAlgoPreResAe ae_pre_res_com;
-    AecPreResult_t    ae_pre_res_rk;;
+    AecPreResult_t    ae_pre_res_rk;
 } RkAiqAlgoPreResAeInt;
 
 typedef struct _RkAiqAlgoProcAeInt {

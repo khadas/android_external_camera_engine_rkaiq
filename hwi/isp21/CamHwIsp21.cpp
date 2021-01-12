@@ -277,7 +277,7 @@ CamHwIsp21::overrideExpRatioV21ToAiqResults(const sint32_t frameId,
         isp21_result->drc.DrcProcRes.sw_drc_compres_scl = (int)(compres_scl);
 
         //get sw_drc_min_ogain
-        float sw_drc_min_ogain = 1 / (nextRatioLS * adrc_gain);
+        float sw_drc_min_ogain = 1 / (nextRatioLS * adrc_gain / 1024);
         isp21_result->drc.DrcProcRes.sw_drc_min_ogain = (int)(sw_drc_min_ogain * pow(2, 15) + 0.5);
 
         //get sw_drc_compres_y
@@ -419,6 +419,7 @@ CamHwIsp21::setIspParamsSync(int frameId)
                                 buf_index, errno, strerror(errno));
                 return ret;
             }
+
             CamHwIsp20::_mutex.lock();
             _effecting_ispparm_map[frameId] = aiq_results;
             CamHwIsp20::_mutex.unlock();

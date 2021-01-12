@@ -46,6 +46,7 @@ typedef CalibDb_MeAttr_t Uapi_MeAttr_t;
 typedef Aec_uapi_advanced_attr_t Uapi_ExpSwAttr_Advanced_t;
 
 typedef struct Uapi_ExpSwAttr_s {
+    uint8_t                          enable;
     CalibDb_CamRawStatsMode_t        RawStatsMode;
     CalibDb_CamHistStatsMode_t       HistStatsMode;
     CalibDb_CamYRangeMode_t          YRangeMode;

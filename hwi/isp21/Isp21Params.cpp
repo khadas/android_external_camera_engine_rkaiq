@@ -678,8 +678,13 @@ Isp21Params::convertAiqRawnrToIsp21Params(struct isp21_isp_params_cfg& isp_cfg,
     p3DCfg->sw_bay3d_exp_sel = rawnr.st3DParam.bay3d_exp_sel;
     p3DCfg->sw_bay3d_bypass_en = rawnr.st3DParam.bay3d_bypass_en;
     p3DCfg->sw_bay3d_pk_en = rawnr.st3DParam.bay3d_pk_en;
+	
     p3DCfg->sw_bay3d_softwgt = rawnr.st3DParam.bay3d_softwgt;
+	p3DCfg->sw_bay3d_sigratio = rawnr.st3DParam.bay3d_sigratio;
+	
     p3DCfg->sw_bay3d_glbpk2 = rawnr.st3DParam.bay3d_glbpk2;
+
+	p3DCfg->sw_bay3d_exp_str = rawnr.st3DParam.bay3d_exp_str;
     p3DCfg->sw_bay3d_str = rawnr.st3DParam.bay3d_str;
     p3DCfg->sw_bay3d_wgtlmt_h = rawnr.st3DParam.bay3d_wgtlmt_h;
     p3DCfg->sw_bay3d_wgtlmt_l = rawnr.st3DParam.bay3d_wgtlmt_l;

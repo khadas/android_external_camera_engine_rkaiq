@@ -24,12 +24,6 @@
  */
 /*****************************************************************************/
 
-#define AEC_DYNAMIC_SETPOINT_NAME   ( 20U )
-typedef char                        AecDynamicSetpointName_t[AEC_DYNAMIC_SETPOINT_NAME];
-
-#define AEC_EXP_SEPARATE_NAME       ( 20U )
-typedef char                        AecExpSeparateName_t[AEC_EXP_SEPARATE_NAME];
-
 typedef enum _CalibDb_HdrAeRatioType_e {
     RKAIQ_HDRAE_RATIOTYPE_MODE_INVALID    = 0,
     RKAIQ_HDRAE_RATIOTYPE_MODE_AUTO   = 1,
@@ -216,7 +210,7 @@ typedef struct CalibDb_HdrAeRange_s {
 
 typedef struct CalibDb_AeFrmRateAttr_s {
     bool             isFpsFix;
-    uint8_t          FpsValue;
+    float            FpsValue;
 } CalibDb_AeFrmRateAttr_t;
 
 typedef struct CalibDb_AntiFlickerAttr_s {
@@ -2014,6 +2008,7 @@ typedef struct CalibDb_CISTimeSet_s {
     Cam2x1FloatMatrix_t     CISHdrTimeRegSumFac;
     Cam2x1FloatMatrix_t     CISLinTimeRegMaxFac;
     uint16_t                CISTimeRegMin;
+    Cam1x3IntMatrix_t       CISTimeRegMax; //specially for Hdr that has limit on sframe/mframe, requiring max time line.value 0: no limit
     Cam2x1FloatMatrix_t     CISTimeRegOdevity;
     uint8_t                 CISTimeRegUnEqualEn;
 } CalibDb_CISTimeSet_t;
