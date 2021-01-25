@@ -485,6 +485,14 @@ get_isp_subdevs(struct media_device *device, const char *devpath, rk_aiq_isp_t* 
         if(entity_name) {
             strncpy(isp_info[index].mipi_dphy_rx_path, entity_name, sizeof(isp_info[index].mipi_dphy_rx_path));
         }
+    } else {
+        entity = media_get_entity_by_name(device, "rockchip-csi2-dphy0", strlen("rockchip-csi2-dphy0"));
+        if(entity) {
+            entity_name = media_entity_get_devname (entity);
+            if(entity_name) {
+                strncpy(isp_info[index].mipi_dphy_rx_path, entity_name, sizeof(isp_info[index].mipi_dphy_rx_path));
+            }
+        }
     }
 
 
@@ -587,7 +595,15 @@ get_cif_subdevs(struct media_device *device, const char *devpath, rk_aiq_cif_inf
     if(entity) {
         entity_name = media_entity_get_devname (entity);
         if(entity_name) {
-            strncpy(cif_info[index].mipi_dphy_rx_path, entity_name, sizeof(cif_info[index].mipi_csi2_sd_path));
+            strncpy(cif_info[index].mipi_dphy_rx_path, entity_name, sizeof(cif_info[index].mipi_dphy_rx_path));
+        }
+    } else {
+        entity = media_get_entity_by_name(device, "rockchip-csi2-dphy0", strlen("rockchip-csi2-dphy0"));
+        if(entity) {
+            entity_name = media_entity_get_devname (entity);
+            if(entity_name) {
+                strncpy(cif_info[index].mipi_dphy_rx_path, entity_name, sizeof(cif_info[index].mipi_dphy_rx_path));
+            }
         }
     }
 
