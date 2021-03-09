@@ -34,6 +34,7 @@
 #include <mediactl/mediactl-priv.h>
 
 //local
+#include "rkisp_control_aiq.h"
 #include "rkisp_control_loop.h"
 #include "rk_aiq_user_api_sysctl.h"
 #include "rkcamera_vendor_tags.h"
@@ -445,5 +446,38 @@ void rkisp_cl_deinit(void* cl_ctx) {
     if (gAiqCameraHalAdapter){
         delete gAiqCameraHalAdapter;
     }
+}
+
+int rkisp_cl_setBrightness(const void* cl_ctx, unsigned int level) {
+    AiqCameraHalAdapter * gAiqCameraHalAdapter = AIQ_CONTEXT_CAST (cl_ctx);
+    rk_aiq_sys_ctx_t *aiq_ctx = gAiqCameraHalAdapter->get_aiq_ctx();
+    return (int) rk_aiq_uapi_setBrightness(aiq_ctx, level);
+}
+int rkisp_cl_getBrightness(const void* cl_ctx, unsigned int*level) {
+    AiqCameraHalAdapter * gAiqCameraHalAdapter = AIQ_CONTEXT_CAST (cl_ctx);
+    rk_aiq_sys_ctx_t *aiq_ctx = gAiqCameraHalAdapter->get_aiq_ctx();
+    return (int) rk_aiq_uapi_getBrightness(aiq_ctx, level);
+}
+
+int rkisp_cl_setContrast(const void* cl_ctx, unsigned int level) {
+    AiqCameraHalAdapter * gAiqCameraHalAdapter = AIQ_CONTEXT_CAST (cl_ctx);
+    rk_aiq_sys_ctx_t *aiq_ctx = gAiqCameraHalAdapter->get_aiq_ctx();
+    return (int) rk_aiq_uapi_setContrast(aiq_ctx, level);
+}
+int rkisp_cl_getContrast(const void* cl_ctx, unsigned int *level) {
+    AiqCameraHalAdapter * gAiqCameraHalAdapter = AIQ_CONTEXT_CAST (cl_ctx);
+    rk_aiq_sys_ctx_t *aiq_ctx = gAiqCameraHalAdapter->get_aiq_ctx();
+    return (int) rk_aiq_uapi_getContrast(aiq_ctx, level);
+}
+
+int rkisp_cl_setSaturation(const void* cl_ctx, unsigned int level) {
+    AiqCameraHalAdapter * gAiqCameraHalAdapter = AIQ_CONTEXT_CAST (cl_ctx);
+    rk_aiq_sys_ctx_t *aiq_ctx = gAiqCameraHalAdapter->get_aiq_ctx();
+    return (int) rk_aiq_uapi_setSaturation(aiq_ctx, level);
+}
+int rkisp_cl_getSaturation(const void* cl_ctx, unsigned int *level) {
+    AiqCameraHalAdapter * gAiqCameraHalAdapter = AIQ_CONTEXT_CAST (cl_ctx);
+    rk_aiq_sys_ctx_t *aiq_ctx = gAiqCameraHalAdapter->get_aiq_ctx();
+    return (int) rk_aiq_uapi_getSaturation(aiq_ctx, level);
 }
 

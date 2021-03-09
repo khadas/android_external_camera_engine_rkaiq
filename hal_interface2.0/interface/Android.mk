@@ -109,6 +109,7 @@ LOCAL_C_INCLUDES += \
 #local
 LOCAL_C_INCLUDES += \
 	$(MY_LOCAL_PATH)/include/ \
+	$(MY_LOCAL_PATH)/include_aiq/ \
 	$(MY_LOCAL_PATH)/xcore/ \
 	$(MY_LOCAL_PATH)/common/
 
@@ -127,5 +128,6 @@ LOCAL_HEADER_LIBRARIES += \
 endif
 
 LOCAL_MODULE:= librkisp
+LOCAL_EXPORT_C_INCLUDE_DIRS := $(LOCAL_PATH)/include_aiq
 
 include $(BUILD_SHARED_LIBRARY)
