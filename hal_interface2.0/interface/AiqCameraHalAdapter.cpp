@@ -296,6 +296,23 @@ AiqCameraHalAdapter::set_control_params(const int request_frame_id,
             }
         }
     }
+
+    camera_metadata_entry entry = inputParams->settings.find(RK_CONTROL_AIQ_BRIGHTNESS);
+    if(entry.count == 1) {
+	    LOGI("RK_CONTROL_AIQ_BRIGHTNESS:%d",entry.data.u8[0]);
+        rk_aiq_uapi_setBrightness(get_aiq_ctx(), entry.data.u8[0]);
+    }
+    entry = inputParams->settings.find(RK_CONTROL_AIQ_CONTRAST);
+    if(entry.count == 1) {
+	    LOGI("RK_CONTROL_AIQ_CONTRAST:%d",entry.data.u8[0]);
+        rk_aiq_uapi_setContrast(get_aiq_ctx(), entry.data.u8[0]);
+    }
+    entry = inputParams->settings.find(RK_CONTROL_AIQ_SATURATION);
+    if(entry.count == 1) {
+	    LOGI("RK_CONTROL_AIQ_SATURATION:%d",entry.data.u8[0]);
+        rk_aiq_uapi_setSaturation(get_aiq_ctx(), entry.data.u8[0]);
+    }
+
     return ret;
 }
 
@@ -837,6 +854,21 @@ AiqCameraHalAdapter::processResults(){
 
     rkisp_cl_frame_metadata_s cb_result;
     cb_result.id = id;
+
+    unsigned int level = 0;
+    uint8_t value = 0;
+    rk_aiq_uapi_getBrightness(get_aiq_ctx(), &level);
+    value = level;
+    _metadata->update(RK_CONTROL_AIQ_BRIGHTNESS,&value,1);
+
+    rk_aiq_uapi_getContrast(get_aiq_ctx(), &level);
+    value = level;
+    _metadata->update(RK_CONTROL_AIQ_CONTRAST,&value,1);
+
+    rk_aiq_uapi_getSaturation(get_aiq_ctx(), &level);
+    value = level;
+    _metadata->update(RK_CONTROL_AIQ_SATURATION,&value,1);
+
     cb_result.metas = _metadata->getAndLock();
     if (mCallbackOps)
         mCallbackOps->metadata_result_callback(mCallbackOps, &cb_result);
