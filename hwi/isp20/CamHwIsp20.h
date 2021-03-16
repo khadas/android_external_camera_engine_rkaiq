@@ -199,7 +199,7 @@ public:
     }
     XCamReturn setSensorFlip(bool mirror, bool flip, int skip_frm_cnt);
     XCamReturn getSensorFlip(bool& mirror, bool& flip);
-    void setMulCamConc(bool cc);
+    virtual void setMulCamConc(bool cc);
     XCamReturn getZoomPosition(int& position);
     XCamReturn getLensVcmCfg(rk_aiq_lens_vcmcfg& lens_cfg);
     XCamReturn setLensVcmCfg(rk_aiq_lens_vcmcfg& lens_cfg);

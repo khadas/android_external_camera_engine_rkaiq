@@ -127,7 +127,7 @@ RkAiqCore::RkAiqCore()
     , mAiqParamsPool(new RkAiqFullParamsPool("RkAiqFullParams", 4))
     , mAiqExpParamsPool(new RkAiqExpParamsPool("RkAiqExpParams", 4))
     , mAiqIrisParamsPool(new RkAiqIrisParamsPool("RkAiqIrisParams", 4))
-    , mAiqIspParamsPool(new RkAiqIspParamsPool("RkAiqIspParams", RkAiqCore::DEFAULT_POOL_SIZE))
+    //, mAiqIspParamsPool(new RkAiqIspParamsPool("RkAiqIspParams", RkAiqCore::DEFAULT_POOL_SIZE))
     , mAiqFocusParamsPool(new RkAiqFocusParamsPool("RkAiqFocusParams", 4))
     , mAiqCpslParamsPool(new RkAiqCpslParamsPool("RkAiqCpslParamsPool", 4))
     , mAiqStatsPool(new RkAiqStatsPool("RkAiqStatsPool", 4))
@@ -143,6 +143,8 @@ RkAiqCore::RkAiqCore()
 
     SmartPtr<RkAiqFullParams> fullParam = new RkAiqFullParams();
     mAiqCurParams = new RkAiqFullParamsProxy(fullParam );
+    mAiqIspParamsPool = new RkAiqIspParamsV20Pool("RkAiqIspParamsV20", RkAiqCore::DEFAULT_POOL_SIZE);
+    mAiqIspParamsPool->init(RkAiqCore::DEFAULT_POOL_SIZE);
     mHasPp = true;
     mAlgosDesArray = g_default_3a_des;
     mIspHwVer  = 0;

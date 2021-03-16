@@ -70,9 +70,13 @@ public:
     uint32_t get_free_item_size () {
         return _item_list.size ();
     }
-
+public:
+    int8_t init(uint32_t max_count = 8);
+protected:
+    virtual void* _allocate_data () { return NULL; };
 private:
     SmartPtr<T> allocate_data ();
+    uint32_t construct_pool(uint32_t count);
     void release (SmartPtr<T> &data);
     XCAM_DEAD_COPY (SharedItemPool);
 

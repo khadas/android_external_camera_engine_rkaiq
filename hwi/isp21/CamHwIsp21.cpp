@@ -456,4 +456,10 @@ CamHwIsp21::setIsppParamsSync(int frameId)
     return XCAM_RETURN_NO_ERROR;
 }
 
+void CamHwIsp21::setMulCamConc(bool cc)
+{
+    mNoReadBack = !cc;
+    return CamHwIsp20::setMulCamConc(cc);
+}
+
 };

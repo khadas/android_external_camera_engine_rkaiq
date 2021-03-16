@@ -279,10 +279,14 @@
  * - initial version of isp v21
  *   - enable all algos except asd
  *   - compatible with isp v20 
+ * v2.3.1
+ * - isp21 support multi cams
+ * - isp driver v1.0x5.2
+ * - support multi cams
  */
 
-#define RK_AIQ_VERSION_REAL_V "v2.3.0"
-#define RK_AIQ_RELEASE_DATE "2020-12-09"
+#define RK_AIQ_VERSION_REAL_V "v2.3.1"
+#define RK_AIQ_RELEASE_DATE "2021-03-16"
 
 /******* DO NOT EDIT THE FOLLOWINGS ***********/
 

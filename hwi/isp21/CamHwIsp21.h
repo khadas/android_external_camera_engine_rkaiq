@@ -34,6 +34,7 @@ public:
     XCamReturn setIspParamsSync(int frameId);
     XCamReturn setIsppParamsSync(int frameId);
     XCamReturn setIsppParams(SmartPtr<RkAiqIsppParamsProxy>& isppParams);
+    virtual void setMulCamConc(bool cc);
 private:
     void gen_full_isp_params(const struct isp21_isp_params_cfg* update_params,
                              struct isp21_isp_params_cfg* full_params);

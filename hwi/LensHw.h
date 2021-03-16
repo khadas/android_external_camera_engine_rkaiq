@@ -52,7 +52,7 @@ struct rk_cam_motor_tim {
 #define RK_VIDIOC_SET_VCM_CFG \
     _IOW('V', BASE_VIDIOC_PRIVATE + 4, struct rk_cam_vcm_cfg)
 
-#define LENSHW_RECORD_SOF_NUM   8
+#define LENSHW_RECORD_SOF_NUM   256
 
 using namespace XCam;
 

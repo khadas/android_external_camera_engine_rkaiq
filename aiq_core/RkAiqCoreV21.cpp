@@ -116,6 +116,8 @@ RkAiqCoreV21::RkAiqCoreV21()
     mHasPp = false;
     mIspHwVer = 1;
     mAlgosDesArray = g_default_3a_des_v21;
+    mAiqIspParamsPool = new RkAiqIspParamsV21Pool("RkAiqIspParamsV21", RkAiqCore::DEFAULT_POOL_SIZE);
+    mAiqIspParamsPool->init(RkAiqCore::DEFAULT_POOL_SIZE);
 
     EXIT_ANALYZER_FUNCTION();
 }
@@ -711,8 +713,11 @@ RkAiqCoreV21::genIspAwbResult(RkAiqFullParams* params)
         return XCAM_RETURN_NO_ERROR;
     }
     // TODO: gen awb common result
-    RkAiqCore::genIspAwbResult(params);
+    //RkAiqCore::genIspAwbResult(params);
     RkAiqAlgoProcResAwb* awb_rk = (RkAiqAlgoProcResAwb*)awb_com;
+    isp_param->awb_gain_update = awb_rk->awb_gain_update;
+    isp_param->awb_cfg_update = awb_rk->awb_cfg_update;
+    isp_param->awb_gain = awb_rk->awb_gain_algo;
     isp_param->awb_cfg = awb_rk->awb_hw1_para;
     SmartPtr<RkAiqHandle>* handle = getCurAlgoTypeHandle(RK_AIQ_ALGO_TYPE_AWB);
     int algo_id = (*handle)->getAlgoId();

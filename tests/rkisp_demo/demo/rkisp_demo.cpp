@@ -1686,6 +1686,8 @@ static void rkisp_routine(demo_context_t *ctx)
             if (ctx->writeFileSync)
                 rk_aiq_uapi_debug_captureRawYuvSync(ctx->aiq_ctx, CAPTURE_RAW_AND_YUV_SYNC);
 
+            // test multi cameras working simutaneously
+            rk_aiq_uapi_sysctl_setMulCamConc(ctx->aiq_ctx, true);
             /*
              * rk_aiq_uapi_setFecEn(ctx->aiq_ctx, true);
              * rk_aiq_uapi_setFecCorrectDirection(ctx->aiq_ctx, FEC_CORRECT_DIRECTION_Y);

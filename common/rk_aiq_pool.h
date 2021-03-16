@@ -72,8 +72,7 @@ typedef SharedItemPool<rk_aiq_iris_params_wrapper_t> RkAiqIrisParamsPool;
 typedef SharedItemProxy<rk_aiq_iris_params_wrapper_t> RkAiqIrisParamsProxy;
 typedef SharedItemPool<rk_aiq_af_info_wrapper_t> RkAiqAfInfoPool;
 typedef SharedItemProxy<rk_aiq_af_info_wrapper_t> RkAiqAfInfoProxy;
-typedef SharedItemPool<rk_aiq_isp_params_v20_t> RkAiqIspParamsPool;
-typedef SharedItemPool<rk_aiq_isp_params_v21_t> RkAiqIspParamsV21Pool;
+typedef SharedItemPool<rk_aiq_isp_params_t> RkAiqIspParamsPool;
 typedef SharedItemProxy<rk_aiq_isp_params_t> RkAiqIspParamsProxy;
 typedef SharedItemPool<rk_aiq_focus_params_t> RkAiqFocusParamsPool;
 typedef SharedItemProxy<rk_aiq_focus_params_t> RkAiqFocusParamsProxy;
@@ -152,6 +151,20 @@ private:
 };
 
 typedef SharedItemProxy<RkAiqFullParams> RkAiqFullParamsProxy;
+
+template<typename T>
+class SharedItemPoolIsp2x : public RkAiqIspParamsPool
+{
+public:
+    explicit SharedItemPoolIsp2x(const char* name, uint32_t max_count = 8)
+        : RkAiqIspParamsPool(name, max_count) {};
+    virtual ~SharedItemPoolIsp2x() {};
+protected:
+    void* _allocate_data () { return new T(); };
+};
+
+typedef SharedItemPoolIsp2x<rk_aiq_isp_params_v20_t> RkAiqIspParamsV20Pool;
+typedef SharedItemPoolIsp2x<rk_aiq_isp_params_v21_t> RkAiqIspParamsV21Pool;
 
 };
 

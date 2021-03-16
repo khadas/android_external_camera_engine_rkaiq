@@ -20,15 +20,12 @@
 namespace RkCam {
 
 template<typename T>
-SharedItemPool<T>::SharedItemPool(const char* name, uint32_t max_count)
-    : _name(name ? name : "default")
-    , _allocated_num(0)
-    , _max_count(max_count)
+uint32_t SharedItemPool<T>::construct_pool(uint32_t max_count)
 {
-    LOG1("ENTER SharedItemPool<%s>:%s", _name, __FUNCTION__);
     uint32_t i = 0;
 
-    XCAM_ASSERT (_max_count);
+    if (max_count <= 0)
+        return 0;
 
     for (i = _allocated_num; i < max_count; ++i) {
         SmartPtr<T> new_data = allocate_data ();
@@ -44,7 +41,32 @@ SharedItemPool<T>::SharedItemPool(const char* name, uint32_t max_count)
     _max_count = i;
     _allocated_num = _max_count;
 
+    return _allocated_num;
+}
+
+template<typename T>
+SharedItemPool<T>::SharedItemPool(const char* name, uint32_t max_count)
+    : _name(name ? name : "default")
+    , _allocated_num(0)
+    , _max_count(max_count)
+{
+    LOG1("ENTER SharedItemPool<%s>:%s", _name, __FUNCTION__);
+    construct_pool(max_count);
     LOG1("EXIT SharedItemPool<%s>:%s", _name, __FUNCTION__);
+}
+
+template<typename T>
+int8_t SharedItemPool<T>::init(uint32_t max_count)
+{
+    XCAM_ASSERT (max_count);
+
+    _item_list.clear();
+    _allocated_num = 0;
+
+    if (construct_pool(max_count))
+        return 0;
+    else
+        return -1;
 }
 
 template<typename T>
@@ -58,7 +80,11 @@ template<typename T>
 SmartPtr<T>
 SharedItemPool<T>::allocate_data ()
 {
-    return new T();
+    void* temp = _allocate_data();
+    if (temp)
+        return SmartPtr<T>((T*)temp);
+    else
+        return new T();
 }
 
 template<typename T>
