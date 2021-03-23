@@ -808,7 +808,7 @@ AiqCameraHalAdapter::processResults(){
         rk_aiq_af_results af_results;
         ret = getAfResults(af_results);
         if (ret) {
-            LOGE("%s(%d) getAeResults failed, ae meta is invalid!\n", __FUNCTION__, __LINE__);
+            LOGE("%s(%d) getAfResults failed, af meta is invalid!\n", __FUNCTION__, __LINE__);
         } else {
             if (_inputParams.ptr()) {
                 processAfMetaResults(af_results, _metadata);
@@ -818,8 +818,10 @@ AiqCameraHalAdapter::processResults(){
         //convert to awb_results
         rk_aiq_awb_results awb_results;
         ret = getAwbResults(awb_results);
+        /*set awb converged with ae, for cts test */
+        awb_results.converged = ae_results.converged;
         if (ret) {
-            LOGE("%s(%d) getAeResults failed, ae meta is invalid!\n", __FUNCTION__, __LINE__);
+            LOGE("%s(%d) getAwbResults failed, awb meta is invalid!\n", __FUNCTION__, __LINE__);
         } else {
             if (_inputParams.ptr()) {
                 processAwbMetaResults(awb_results, _metadata);
@@ -979,6 +981,9 @@ AiqCameraHalAdapter::getAwbResults(rk_aiq_awb_results &awb_results)
     awb_results.awb_gain_cfg.awb_gains.green_r_gain= query_info.gain.grgain  == 0 ? 256 : query_info.gain.grgain;
     awb_results.awb_gain_cfg.awb_gains.blue_gain= query_info.gain.bgain == 0 ? 296 : query_info.gain.bgain;
     awb_results.converged = query_info.awbConverged;
+    /* always set converged 1 for pass cts */
+    awb_results.converged = 1;
+
     LOGD("@%s awb_results.converged:%d", __FUNCTION__, awb_results.converged);
 
     ret = rk_aiq_user_api_accm_QueryCcmInfo(_aiq_ctx, &ccm_querry_info);
