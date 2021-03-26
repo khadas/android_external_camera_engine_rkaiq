@@ -1244,6 +1244,8 @@ CamHwIsp20::setupPipelineFmtCif(struct v4l2_subdev_selection& sns_sd_sel,
     LOGD_CAMHW_SUBM(ISP20HW_SUBM, "mipi tx/rx fmt info: fmt 0x%x, %dx%d !",
                     sns_v4l_pix_fmt, sns_sd_sel.r.width, sns_sd_sel.r.height);
 
+#ifndef ANDROID_OS // Android camera hal will set pipeline itself
+
     // set isp sink fmt, same as sensor bounds - crop
     struct v4l2_subdev_format isp_sink_fmt;
 
@@ -1324,7 +1326,7 @@ CamHwIsp20::setupPipelineFmtCif(struct v4l2_subdev_selection& sns_sd_sel,
 
     LOGD_CAMHW_SUBM(ISP20HW_SUBM, "isp src fmt info: fmt 0x%x, %dx%d !",
                     isp_src_fmt.format.code, isp_src_fmt.format.width, isp_src_fmt.format.height);
-
+#endif
     return ret;
 
 }

@@ -83,6 +83,15 @@ int rkisp_cl_setSaturation(const void* cl_ctx, unsigned int level);
  */
 int rkisp_cl_getSaturation(const void* cl_ctx, unsigned int *level);
 
+/*!
+ * \brief set multiple cameras working concurrently
+ * Notify this AIQ ctx will run with other sensor's AIQ ctx.
+
+ * \param[in] cc        set cams concurrently used or not
+ * \note should be called before rk_aiq_uapi_sysctl_start
+ */
+void setMulCamConc(const void* cl_ctx, bool cc);
+
 #ifdef __cplusplus
 }
 #endif // __cplusplus

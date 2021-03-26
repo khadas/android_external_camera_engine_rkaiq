@@ -157,7 +157,7 @@ SmartPtr<AiqInputParams> AiqCameraHalAdapter:: getAiqInputParams()
 
 XCamReturn 
 AiqCameraHalAdapter::ispStatsCb(SmartPtr<VideoBuffer>& ispStats){
-    ALOGD("@%s %d:", __FUNCTION__, __LINE__);
+    LOGD("@%s %d:", __FUNCTION__, __LINE__);
     //TODO
 #if 0
     //set_sensor_mode_data()

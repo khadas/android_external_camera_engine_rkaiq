@@ -481,3 +481,8 @@ int rkisp_cl_getSaturation(const void* cl_ctx, unsigned int *level) {
     return (int) rk_aiq_uapi_getSaturation(aiq_ctx, level);
 }
 
+void setMulCamConc(const void* cl_ctx, bool cc) {
+    AiqCameraHalAdapter * gAiqCameraHalAdapter = AIQ_CONTEXT_CAST (cl_ctx);
+    rk_aiq_sys_ctx_t *aiq_ctx = gAiqCameraHalAdapter->get_aiq_ctx();
+    rk_aiq_uapi_sysctl_setMulCamConc(aiq_ctx, true);
+}
