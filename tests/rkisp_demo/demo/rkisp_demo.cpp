@@ -1679,7 +1679,7 @@ static void rkisp_routine(demo_context_t *ctx)
 		#ifndef ANDROID
 		    ctx->aiq_ctx = rk_aiq_uapi_sysctl_init(sns_entity_name, "/oem/etc/iqfiles", NULL, NULL);
         #else
-		    ctx->aiq_ctx = rk_aiq_uapi_sysctl_init(sns_entity_name, "/data/etc/iqfiles", NULL, NULL);
+		    ctx->aiq_ctx = rk_aiq_uapi_sysctl_init(sns_entity_name, "/vendor/etc/camera/rkisp2", NULL, NULL);
         #endif
         if (ctx->aiq_ctx) {
             printf("%s:-------- init mipi tx/rx -------------\n",get_sensor_name(ctx));
