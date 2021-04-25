@@ -919,6 +919,9 @@ AiqCameraHalAdapter::getAeResults(rk_aiq_ae_results &ae_results)
     ae_results.sensor_exposure.frame_length_lines = gtExpResInfo.CurExpInfo.frame_length_lines;
     ae_results.sensor_exposure.line_length_pixels = gtExpResInfo.CurExpInfo.line_length_pixels;
     ae_results.converged = gtExpResInfo.IsConverged;
+    ae_results.meanluma = gtExpResInfo.MeanLuma;
+    ae_results.converged = 1;
+
     LOGD("@%s ae_results.converged:%d",__FUNCTION__, ae_results.converged);
     return ret;
 }
@@ -1021,6 +1024,13 @@ AiqCameraHalAdapter::processAeMetaResults(rk_aiq_ae_results &ae_result, CameraMe
     //# ANDROID_METADATA_Dynamic android.statistics.sceneFlicker done
     metadata->update(ANDROID_STATISTICS_SCENE_FLICKER,
                                     &sceneFlickerMode, 1);
+
+    if ((mMeanLuma > 18.0f && ae_result.meanluma < 18.0f)
+        || (mMeanLuma < 18.0f && ae_result.meanluma > 18.0f)) {
+        mMeanLuma = ae_result.meanluma;
+        LOGE("update RK_MEANLUMA_VALUE:%f", mMeanLuma);
+        metadata->update(RK_MEANLUMA_VALUE,&mMeanLuma,1);
+    }
 
     rk_aiq_exposure_sensor_descriptor sns_des;
     ret = _aiq_ctx->_camHw->getSensorModeData(_aiq_ctx->_sensor_entity_name, sns_des);

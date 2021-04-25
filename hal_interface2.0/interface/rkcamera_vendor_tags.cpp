@@ -23,7 +23,8 @@
 uint32_t rkcamera3_ext3_section_bounds[RKCAMERA3_EXT_SECTION_COUNT][2] = {
     { (uint32_t) RKCAMERA3_PRIVATEDATA_START,       (uint32_t) RKCAMERA3_PRIVATEDATA_END },
     { (uint32_t) RK_NR_FEATURE_START,               (uint32_t) RK_NR_FEATURE_END },
-    { (uint32_t) RK_CONTROL_AIQ_START,               (uint32_t) RK_CONTROL_AIQ_END }
+    { (uint32_t) RK_CONTROL_AIQ_START,               (uint32_t) RK_CONTROL_AIQ_END },
+    { (uint32_t) RK_MEANLUMA_START,               (uint32_t) RK_MEANLUMA_END}
 };
 
 typedef struct vendor_tag_info {
@@ -35,6 +36,7 @@ const char *rkcamera3_ext_section_names[RKCAMERA3_EXT_SECTION_COUNT] = {
     "org.codeaurora.rkcamera3.privatedata",
     "com.rockchip.nrfeature",
     "com.rockchip.control.aiq",
+    "com.rockchip.luma",
 };
 
 vendor_tag_info_t rkcamera3_privatedata[RKCAMERA3_PRIVATEDATA_END - RKCAMERA3_PRIVATEDATA_START] = {
@@ -56,10 +58,16 @@ vendor_tag_info_t rk_control_aiq[RK_CONTROL_AIQ_END -
     { "saturation",   TYPE_BYTE }
 };
 
+vendor_tag_info_t rk_meanluma[RK_MEANLUMA_END -
+        RK_MEANLUMA_START] = {
+    { "meanluma",   TYPE_FLOAT }
+};
+
 vendor_tag_info_t *rkcamera3_tag_info[RKCAMERA3_EXT_SECTION_COUNT] = {
     rkcamera3_privatedata,
     rk_nr_feature_3dnr,
-    rk_control_aiq
+    rk_control_aiq,
+    rk_meanluma
 };
 
 uint32_t rkcamera3_all_tags[] = {

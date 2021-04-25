@@ -172,6 +172,7 @@ private:  /* Members */
     bool mThreadRunning;
     MessageQueue<Message, MessageId> mMessageQueue;
     std::unique_ptr<MessageThread> mMessageThread;
+    float mMeanLuma = 1.0f;
 
 private:  /* Methods */
     /* IMessageHandler overloads */

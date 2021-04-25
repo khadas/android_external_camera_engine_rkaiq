@@ -859,6 +859,7 @@ typedef struct
     rk_aiq_aec_config aec_config_result;
     rk_aiq_hist_config hist_config_result;
     /* TODO: add flash params, hdr params */
+    float meanluma;
 } rk_aiq_ae_results;
 
 /*!
