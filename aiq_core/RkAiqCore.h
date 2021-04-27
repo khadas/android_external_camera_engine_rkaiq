@@ -245,6 +245,7 @@ public:
         int iso;
         AlgoCtxInstanceCfgInt ctxCfigs[RK_AIQ_ALGO_TYPE_MAX];
         rk_aiq_cpsl_cfg_t cpslCfg;
+        int conf_type;
         const char* resourcePath;
         bool sns_mirror;
         bool sns_flip;
@@ -267,6 +268,7 @@ public:
             resourcePath = NULL;
             sns_mirror = false;
             sns_flip = false;
+            conf_type = RK_AIQ_ALGO_CONFTYPE_INIT;
         }
     } RkAiqAlgosShared_t;
     RkAiqAlgosShared_t mAlogsSharedParams;

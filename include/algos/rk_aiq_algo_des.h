@@ -106,6 +106,15 @@ typedef struct _RkAiqAlgoDesComm {
 // base structs in order to abstract same interface
 // for all algos
 
+typedef enum RkAiqAlgoConfType_e {
+    RK_AIQ_ALGO_CONFTYPE_INIT = 0,
+    RK_AIQ_ALGO_CONFTYPE_UPDATECALIB = 0x01,
+    RK_AIQ_ALGO_CONFTYPE_CHANGEMODE = 0x02,
+    RK_AIQ_ALGO_CONFTYPE_NEEDRESET = 0x04,
+    RK_AIQ_ALGO_CONFTYPE_CHANGERES = 0x08,
+    RK_AIQ_ALGO_CONFTYPE_MAX
+} RkAiqAlgoConfType_t;
+
 typedef struct _RkAiqAlgoCom {
     RkAiqAlgoContext *ctx;
     uint32_t frame_id;
@@ -114,6 +123,7 @@ typedef struct _RkAiqAlgoCom {
             int working_mode; // real type is rk_aiq_working_mode_t or rk_aiq_isp_hdr_mode_t
             int sns_op_width;
             int sns_op_height;
+            int conf_type;
         } prepare; //for prepare function
 
         struct {

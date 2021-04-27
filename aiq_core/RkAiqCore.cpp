@@ -312,6 +312,18 @@ RkAiqCore::prepare(const rk_aiq_exposure_sensor_descriptor* sensor_des,
         return XCAM_RETURN_NO_ERROR;
     }
 
+    bool res_changed = (mAlogsSharedParams.snsDes.isp_acq_width != 0) &&
+        (sensor_des->isp_acq_width != mAlogsSharedParams.snsDes.isp_acq_width ||
+        sensor_des->isp_acq_height != mAlogsSharedParams.snsDes.isp_acq_height);
+
+    if (res_changed /*|| 
+        mState == RK_AIQ_CORE_STATE_STOPED*/) {
+        mAlogsSharedParams.conf_type = RK_AIQ_ALGO_CONFTYPE_CHANGERES;
+        LOGD_ANALYZER("resolution changed !");
+    } else {
+        mAlogsSharedParams.conf_type = RK_AIQ_ALGO_CONFTYPE_INIT;
+    }
+
     mAlogsSharedParams.snsDes = *sensor_des;
     mAlogsSharedParams.working_mode = mode;
 
