@@ -86,8 +86,8 @@ LOCAL_C_INCLUDES += \
 	external/camera_engine_rkaiq/hwi \
 	external/camera_engine_rkaiq/iq_parser \
 	external/camera_engine_rkaiq/uAPI \
+	external/camera_engine_rkaiq/uAPI2 \
 	external/camera_engine_rkaiq/common \
-	external/camera_engine_rkaiq/common/linux \
 	external/camera_engine_rkaiq/include \
 	external/camera_engine_rkaiq/include/iq_parser \
 	external/camera_engine_rkaiq/include/uAPI \
@@ -119,6 +119,14 @@ LOCAL_STATIC_LIBRARIES += android.hardware.camera.common@1.0-helper
 LOCAL_CFLAGS += -DANDROID_VERSION_ABOVE_8_X
 LOCAL_CFLAGS += -DANDROID_PLATEFORM
 LOCAL_CFLAGS += -DANDROID_OS
+
+ifeq (rk356x, $(strip $(TARGET_BOARD_PLATFORM)))
+LOCAL_CFLAGS += -DISP_HW_V21
+endif
+
+ifeq (rv1126, $(strip $(TARGET_BOARD_PLATFORM)))
+LOCAL_CFLAGS += -DISP_HW_V20
+endif
 
 LOCAL_HEADER_LIBRARIES += \
 	libhardware_headers \

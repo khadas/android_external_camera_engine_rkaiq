@@ -131,18 +131,14 @@ struct Message {
 
 //namespace RkCam {
 class AiqCameraHalAdapter:
-    public RkAiqAnalyzerCb,
-    public IspStatsListener,
-    public IspEvtsListener,
+    public HwResListener,
     public IMessageHandler
 {
 private:
     SmartPtr<RkAiqManager> _rkAiqManager;
     SmartPtr<RkAiqCore> _analyzer;
     SmartPtr<ICamHw> _camHw;
-    SmartPtr<RkAiqAnalyzerCb> _RkAiqAnalyzerCb;
-    SmartPtr<IspStatsListener> _IspStatsListener;
-    SmartPtr<IspEvtsListener> _IspEvtsListener;
+    SmartPtr<HwResListener> _hwResListener;
 
     const cl_result_callback_ops_t *mCallbackOps;
 
@@ -169,11 +165,19 @@ private:  /* Members */
     /**
      * Thread control members
      */
-    bool mThreadRunning;
+    std::atomic<bool> mThreadRunning;
     MessageQueue<Message, MessageId> mMessageQueue;
-    std::unique_ptr<MessageThread> mMessageThread;
+    std::unique_ptr<android::camera2::MessageThread> mMessageThread;
     float mMeanLuma = 1.0f;
+    enum aiq_state_e {
+        AIQ_ADAPTER_STATE_INVALID,
+        AIQ_ADAPTER_STATE_INITED,
+        AIQ_ADAPTER_STATE_PREPARED,
+        AIQ_ADAPTER_STATE_STARTED,
+        AIQ_ADAPTER_STATE_STOPED,
+    };
 
+    int _state;
 private:  /* Methods */
     /* IMessageHandler overloads */
     status_t requestExitAndWait();
@@ -193,6 +197,8 @@ public:
     explicit AiqCameraHalAdapter(SmartPtr<RkAiqManager> _rkAiqManager,SmartPtr<RkAiqCore> _analyzer,SmartPtr<ICamHw> _camHw);
     virtual ~AiqCameraHalAdapter();
     void init(const cl_result_callback_ops_t* callbacks);
+    void start();
+    void stop();
     void deInit();
     void processResults();
     void processResultsDebug(SmartPtr<RkAiqFullParamsProxy> &results);
@@ -201,18 +207,14 @@ public:
     XCamReturn getAfResults(rk_aiq_af_results &af_results);
     void getAfResultsDebug(rk_aiq_af_results &af_results, SmartPtr<rk_aiq_focus_params_t> focus_param);
     XCamReturn getAwbResults(rk_aiq_awb_results &awb_results);
-    void getAwbResultsDebug(rk_aiq_awb_results &awb_results, SmartPtr<rk_aiq_isp_params_t> isp_param);
+    void getAwbResultsDebug(rk_aiq_awb_results &awb_results, SmartPtr<rk_aiq_isp_stats_t> isp_param);
     void updateParams(SmartPtr<VideoBuffer>& ispStats);
     void updateAeParams(XCamAeParam *aeParams);
     void updateAwbParams(XCamAwbParam *awbParams);
     void updateAfParams(XCamAfParam *afParams);
     void setFrameParams(const struct rkisp_cl_frame_rkaiq_s* frame_params);
 
-    virtual void rkAiqCalcDone(SmartPtr<RkAiqFullParamsProxy> &results);
-    virtual void rkAiqCalcFailed(const char* msg);
-
-    virtual XCamReturn ispStatsCb(SmartPtr<VideoBuffer>& ispStats);
-    virtual XCamReturn ispEvtsCb(ispHwEvt_t* evt);
+    virtual XCamReturn hwResCb(SmartPtr<VideoBuffer>& hwres);
 
     SmartPtr<AiqInputParams> getAiqInputParams();
     void set_aiq_ctx(rk_aiq_sys_ctx_t* aiq_ctx) { _aiq_ctx = aiq_ctx; };
