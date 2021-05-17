@@ -128,22 +128,24 @@
   * v1.4.2
  *  - magic code:1089142
  *  - ACCM: support Hdr/Normal mode
- *  * v1.4.3
- *  - magic code:1088858
- *  - change type of mCalibDb->awb from struct to list
- *  - split  mCalibDb->awb into calib para and adjust para
- *  * v1.4.4
- *  - magic code:1258030
- *  - modify aec iq struct as list
- *  - Ae params include CalibPara/TunePara
- *  * v1.4.5
- *  - magic code:1258987
- *  - delete sensorinfo/moduleinfo/system in IQ
- *  - add expset/module in IQ
+ * v1.4.3
+ *  - magic code:1123951
+ *  - ACPROC: support hue/bright/saturation settings
+ *  - AIE: support ie mode setting
+ * v1.4.4
+ *  - mfnr: add motion detect module enable/disable control
+  * v1.4.5
+ *  - sharp & edgefilter: add kernel coeffs interpolation
+ *v1.4.6
+ *  - AF: add SceneDiff/ValidValue/WeightMatrix/zoomfocus_tbl
+ *v1.4.7
+ *  - mfnr:motion_detection: rename reserved9&reserved8 to
+ *  - frame_limit_y&frame_limit_uv.
+*v1.4.8
+ *  -AWB: add wbGainOffset in AWB
  */
-
-#define RK_AIQ_CALIB_VERSION_REAL_V          "v1.4.5"
-#define RK_AIQ_CALIB_VERSION_MAGIC_V         "1258987"
+#define RK_AIQ_CALIB_VERSION_REAL_V          "v1.4.8"
+#define RK_AIQ_CALIB_VERSION_MAGIC_V         "1170944"
 
 
 /******* DO NOT EDIT THE FOLLOWINGS ***********/

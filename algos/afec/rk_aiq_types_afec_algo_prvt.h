@@ -55,6 +55,7 @@ class RKAiqAfecThread;
 typedef struct FECContext_s {
     unsigned char initialized;
     unsigned int fec_en;
+    fec_correct_mode_t mode;
     unsigned int mesh_density; //0:16x8 1:32x16
     unsigned int fec_mesh_h_size;
     unsigned int fec_mesh_v_size;
@@ -121,6 +122,10 @@ public:
     bool push_attr (const SmartPtr<rk_aiq_fec_cfg_t> buffer) {
         mAttrQueue.push (buffer);
         return true;
+    };
+
+    bool is_empty () {
+        return mAttrQueue.is_empty();
     };
 
     void clear_attr () {

@@ -27,6 +27,7 @@ RKAIQ_BEGIN_DECLARE
 static XCamReturn
 create_context(RkAiqAlgoContext **context, const AlgoCtxInstanceCfg* cfg)
 {
+    LOGI_AGIC("%s(%d): enter!\n", __FUNCTION__, __LINE__);
     XCamReturn result = XCAM_RETURN_NO_ERROR;
     RkAiqAlgoContext *ctx = new RkAiqAlgoContext();
     if (ctx == NULL) {
@@ -34,10 +35,12 @@ create_context(RkAiqAlgoContext **context, const AlgoCtxInstanceCfg* cfg)
         return XCAM_RETURN_ERROR_MEM;
     }
     LOGI_AGIC("%s: (enter)\n", __FUNCTION__ );
-    AgicInit(&ctx->agicCtx);
-    ctx->agicCtx.HWversion = cfg->module_hw_version;//get hadrware version
+    AlgoCtxInstanceCfgInt* instanc_int = (AlgoCtxInstanceCfgInt*)cfg;
+    CamCalibDbV2Context_t* calibv2 = instanc_int->calibv2;
+    AgicInit(&ctx->agicCtx, calibv2);
+
     *context = ctx;
-    LOGI_AGIC("%s: (exit)\n", __FUNCTION__ );
+    LOGI_AGIC("%s(%d): Exit!\n", __FUNCTION__, __LINE__);
     return result;
 
 }
@@ -45,38 +48,57 @@ create_context(RkAiqAlgoContext **context, const AlgoCtxInstanceCfg* cfg)
 static XCamReturn
 destroy_context(RkAiqAlgoContext *context)
 {
-    XCamReturn result = XCAM_RETURN_NO_ERROR;
+    LOGI_AGIC("%s(%d): enter!\n", __FUNCTION__, __LINE__);
 
-    LOGI_AGIC("%s: (enter)\n", __FUNCTION__ );
+    XCamReturn result = XCAM_RETURN_NO_ERROR;
     AgicContext_t* pAgicCtx = (AgicContext_t*)&context->agicCtx;
     AgicRelease(pAgicCtx);
     delete context;
-    LOGI_AGIC("%s: (exit)\n", __FUNCTION__ );
-    return result;
 
+    LOGI_AGIC("%s(%d): Exit!\n", __FUNCTION__, __LINE__);
+    return result;
 }
 
 static XCamReturn
 prepare(RkAiqAlgoCom* params)
 {
-    XCamReturn result = XCAM_RETURN_NO_ERROR;
+    LOGI_AGIC("%s(%d): enter!\n", __FUNCTION__, __LINE__);
 
-    LOGI_AGIC("%s: (enter)\n", __FUNCTION__ );
+    XCamReturn result = XCAM_RETURN_NO_ERROR;
     AgicContext_t* pAgicCtx = (AgicContext_t *)&params->ctx->agicCtx;
     RkAiqAlgoConfigAgicInt* pCfgParam = (RkAiqAlgoConfigAgicInt*)params;
-    pAgicCtx->pCalibDb = pCfgParam->rk_com.u.prepare.calib;
-    AgicStart(pAgicCtx);
+    CamCalibDbV2Context_t* calibv2 = pCfgParam->rk_com.u.prepare.calibv2;
+
+
+
+    if(!!(params->u.prepare.conf_type & RK_AIQ_ALGO_CONFTYPE_UPDATECALIB )) {
+        LOGD_AGIC("%s: Agic Reload Para!\n", __FUNCTION__);
+
+        if(CHECK_ISP_HW_V20()) {
+            CalibDbV2_Gic_V20_t* calibv2_agic_calib_V20 =
+                (CalibDbV2_Gic_V20_t*)(CALIBDBV2_GET_MODULE_PTR(calibv2, agic_calib_v20));
+            memcpy(pAgicCtx->full_param.gic_v20, calibv2_agic_calib_V20, sizeof(CalibDbV2_Gic_V20_t));
+        } else if(CHECK_ISP_HW_V21()) {
+            CalibDbV2_Gic_V21_t* calibv2_agic_calib_V21 =
+                (CalibDbV2_Gic_V21_t*)(CALIBDBV2_GET_MODULE_PTR(calibv2, agic_calib_v21));
+            memcpy(pAgicCtx->full_param.gic_v21, calibv2_agic_calib_V21, sizeof(CalibDbV2_Gic_V21_t));
+        }
+
+        pAgicCtx->calib_changed = true;
+
+    }
 
     pAgicCtx->working_mode = pCfgParam->agic_config_com.com.u.prepare.working_mode;
 
-    LOGI_AGIC("%s: (exit)\n", __FUNCTION__ );
+    LOGI_AGIC("%s(%d): Exit!\n", __FUNCTION__, __LINE__);
     return result;
-
 }
 
 static XCamReturn
 pre_process(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outparams)
 {
+    LOGI_AGIC("%s(%d): enter!\n", __FUNCTION__, __LINE__);
+
     RkAiqAlgoConfigAgicInt* config = (RkAiqAlgoConfigAgicInt*)inparams;
     RkAiqAlgoPreResAgicInt* pAgicPreResParams = (RkAiqAlgoPreResAgicInt*)outparams;
     AgicContext_t* pAgicCtx = (AgicContext_t *)&inparams->ctx->agicCtx;
@@ -88,48 +110,52 @@ pre_process(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outparams)
     else
         pAgicCtx->Gic_Scene_mode = GIC_HDR;
 
+    LOGI_AGIC("%s(%d): Exit!\n", __FUNCTION__, __LINE__);
     return XCAM_RETURN_NO_ERROR;
 }
 
 static XCamReturn
 processing(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outparams)
 {
+    LOGI_AGIC("%s(%d): enter!\n", __FUNCTION__, __LINE__);
     XCamReturn result = XCAM_RETURN_NO_ERROR;
     int iso = 50;
     RkAiqAlgoProcAgicInt* pAgicProcParams = (RkAiqAlgoProcAgicInt*)inparams;
     RkAiqAlgoProcResAgicInt* pAgicProcResParams = (RkAiqAlgoProcResAgicInt*)outparams;
     AgicContext_t* pAgicCtx = (AgicContext_t *)&inparams->ctx->agicCtx;
+    RKAiqAecExpInfo_t* aeCurExp = pAgicProcParams->rk_com.u.proc.curExp;
 
-    LOGI_AGIC("%s: (enter)\n", __FUNCTION__ );
-
-    RkAiqAlgoPreResAeInt* pAEPreRes =
-        (RkAiqAlgoPreResAeInt*)(pAgicProcParams->rk_com.u.proc.pre_res_comb->ae_pre_res);
-
-    if(pAEPreRes != NULL) {
+    if(aeCurExp != NULL) {
         if(pAgicProcParams->hdr_mode == RK_AIQ_WORKING_MODE_NORMAL) {
-            iso = pAEPreRes->ae_pre_res_rk.LinearExp.exp_real_params.analog_gain * 50;
+            iso = aeCurExp->LinearExp.exp_real_params.analog_gain * 50;
             LOGD_AGIC("%s:NORMAL:iso=%d,again=%f\n", __FUNCTION__, iso,
-                      pAEPreRes->ae_pre_res_rk.LinearExp.exp_real_params.analog_gain);
+                      aeCurExp->LinearExp.exp_real_params.analog_gain);
         } else if(RK_AIQ_HDR_GET_WORKING_MODE(pAgicProcParams->hdr_mode) == RK_AIQ_WORKING_MODE_ISP_HDR2) {
-            iso = pAEPreRes->ae_pre_res_rk.HdrExp[1].exp_real_params.analog_gain * 50;
+            iso = aeCurExp->HdrExp[1].exp_real_params.analog_gain * 50;
             LOGD_AGIC("%s:HDR2:iso=%d,again=%f\n", __FUNCTION__, iso,
-                      pAEPreRes->ae_pre_res_rk.HdrExp[1].exp_real_params.analog_gain);
+                      aeCurExp->HdrExp[1].exp_real_params.analog_gain);
         } else if(RK_AIQ_HDR_GET_WORKING_MODE(pAgicProcParams->hdr_mode) == RK_AIQ_WORKING_MODE_ISP_HDR3) {
-            iso = pAEPreRes->ae_pre_res_rk.HdrExp[2].exp_real_params.analog_gain * 50;
+            iso = aeCurExp->HdrExp[2].exp_real_params.analog_gain * 50;
             LOGD_AGIC("%s:HDR3:iso=%d,again=%f\n", __FUNCTION__, iso,
-                      pAEPreRes->ae_pre_res_rk.HdrExp[2].exp_real_params.analog_gain);
+                      aeCurExp->HdrExp[2].exp_real_params.analog_gain);
         }
     } else {
         LOGE_AGIC("%s: pAEPreRes is NULL, so use default instead \n", __FUNCTION__);
     }
 
     pAgicCtx->Gic_Scene_mode = 0;
-    AgicProcess(pAgicCtx, iso, pAgicCtx->Gic_Scene_mode, pAgicCtx->HWversion);
-    AgicGetProcResult(pAgicCtx, pAgicCtx->HWversion);
+    if (pAgicCtx->last_iso != iso || pAgicCtx->calib_changed) {
+        AgicProcess(pAgicCtx, iso, pAgicCtx->Gic_Scene_mode);
+        AgicGetProcResult(pAgicCtx);
+        pAgicCtx->calib_changed = false;
+        pAgicCtx->ProcRes.gic_cfg_update = true;
+    } else {
+        pAgicCtx->ProcRes.gic_cfg_update = false;
+    }
 
     memcpy(&pAgicProcResParams->gicRes, &pAgicCtx->ProcRes, sizeof(AgicProcResult_t));
 
-    LOGI_AGIC("%s: (exit)\n", __FUNCTION__ );
+    LOGI_AGIC("%s(%d): Exit!\n", __FUNCTION__, __LINE__);
     return result;
 
 }

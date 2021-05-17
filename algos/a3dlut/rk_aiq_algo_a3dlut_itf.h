@@ -22,7 +22,7 @@
 
 #include "rk_aiq_algo_des.h"
 
-#define RKISP_ALGO_A3DLUT_VERSION     "v0.0.9"
+#define RKISP_ALGO_A3DLUT_VERSION     "v0.0.a"
 #define RKISP_ALGO_A3DLUT_VENDOR      "Rockchip"
 #define RKISP_ALGO_A3DLUT_DESCRIPTION "Rockchip A3dlut algo for ISP2.0"
 

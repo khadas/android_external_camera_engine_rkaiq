@@ -21,17 +21,25 @@
 #define _RK_AIQ_ACCM_ALGO_H_
 #include "accm/rk_aiq_types_accm_algo_prvt.h"
 #include "RkAiqCalibDbTypes.h"
+#include "RkAiqCalibDbTypesV2.h"
+#include "RkAiqCalibDbV2Helper.h"
+
 
 RKAIQ_BEGIN_DECLARE
 
-XCamReturn AccmInit(accm_handle_t *hAccm, const CamCalibDbContext_t* calib);
+XCamReturn AccmInit(accm_handle_t *hAccm, const CamCalibDbV2Context_t* calibv2);
 XCamReturn AccmRelease(accm_handle_t hAccm);
 XCamReturn AccmPrepare(accm_handle_t hAccm);
 XCamReturn AccmConfig(accm_handle_t hAccm);
 XCamReturn AccmPreProc(accm_handle_t hAccm);
 XCamReturn AccmProcessing(accm_handle_t hAccm);
-XCamReturn illuminant_index_estimation_ccm(int light_num, const CalibDb_AccmCof_ill_t illAll[], float awbGain[2], int* illuminant_index);
-XCamReturn CamCalibDbGetCcmProfileByName(const CalibDb_Ccm_t *calibCcm,  int mode_idx, char* name, const CalibDb_CcmMatrixProfile_t **pCcmMatrixProfile);
+XCamReturn illuminant_index_estimation_ccm(int light_num, const CalibDbV2_Ccm_Accm_Cof_Para_t illAll[], float awbGain[2], int* illuminant_index);
+XCamReturn CamCalibDbGetCcmProfileByName(const CalibDbV2_Ccm_Tuning_Para_t *calibCcm, char* name, const CalibDbV2_Ccm_Ccm_Matrix_Para_t **pCcmMatrixProfile);
+XCamReturn Swinfo_wbgain_init(float awbGain[2], const CalibDbV2_Ccm_Tuning_Para_t *pCalib, const char* illuName);
+XCamReturn pCcmMatrixAll_init(accm_context_t* accm_context, const CalibDbV2_Ccm_Tuning_Para_t *pCalib );
+
+
+
 
 RKAIQ_END_DECLARE
 

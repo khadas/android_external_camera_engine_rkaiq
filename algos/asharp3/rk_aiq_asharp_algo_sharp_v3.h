@@ -26,6 +26,12 @@ Asharp3_result_t sharp_fix_transfer_V3(RK_SHARP_Params_V3_Select_t *pSelect, RK_
 
 Asharp3_result_t sharp_fix_printf_V3(RK_SHARP_Fix_V3_t  * pFix);
 
+Asharp3_result_t sharp_get_setting_by_name_json_V3(CalibDbV2_SharpV3_t *pCalibdbV2, char *name, int *tuning_idx);
+
+Asharp3_result_t sharp_init_params_json_V3(RK_SHARP_Params_V3_t *pSharpParams, CalibDbV2_SharpV3_t *pCalibdbV2, int tuning_idx);
+
+Asharp3_result_t sharp_config_setting_param_json_V3(RK_SHARP_Params_V3_t *pParams, CalibDbV2_SharpV3_t *pCalibdbV2, char* param_mode, char * snr_name);
+
 
 RKAIQ_END_DECLARE
 

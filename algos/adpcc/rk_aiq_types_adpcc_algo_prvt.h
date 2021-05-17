@@ -22,11 +22,14 @@
 
 #include "adpcc/rk_aiq_types_adpcc_algo_int.h"
 #include "RkAiqCalibDbTypes.h"
+#include "RkAiqCalibDbTypesV2.h"
 #include "base/xcam_log.h"
 #include "base/xcam_common.h"
 
-RKAIQ_BEGIN_DECLARE
 
+#define LIMIT_VALUE(value,max_value,min_value)      (value > max_value? max_value : value < min_value ? min_value : value)
+#define FASTMODELEVELMAX     (10)
+#define FASTMODELEVELMIN     (1)
 
 
 typedef struct AdpccContext_s {
@@ -37,10 +40,9 @@ typedef struct AdpccContext_s {
 
     Adpcc_Auto_Attr_t stAuto;
     Adpcc_Manual_Attr_t stManual;
-    CalibDb_Dpcc_t stTool;
-
+    CalibDbV2_Dpcc_t stTool;
     //xml param
-    CalibDb_Dpcc_t stDpccCalib;
+    CalibDbV2_Dpcc_t stDpccCalib;
     //html param
     Adpcc_html_param_t stParams;
 
@@ -51,10 +53,15 @@ typedef struct AdpccContext_s {
     Adpcc_pre_ae_res_t PreAe;
 
     bool isBlackSensor;
+
+    int prepare_type;
 } AdpccContext_t;
 
+typedef struct _RkAiqAlgoContext {
+    AdpccContext_t pAdpccCtx;
+} RkAiqAlgoContext;
 
-RKAIQ_END_DECLARE
+
 
 #endif
 

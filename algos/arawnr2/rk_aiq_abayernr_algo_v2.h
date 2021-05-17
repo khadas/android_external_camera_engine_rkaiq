@@ -14,10 +14,10 @@ RKAIQ_BEGIN_DECLARE
 
 Abayernr_result_t Abayernr_Start_V2(Abayernr_Context_V2_t *pAbayernrCtx);
 
-Abayernr_result_t Abayernr_Stop_V2(Abayernr_Context_V2_t *pAbayernrCtx); 
+Abayernr_result_t Abayernr_Stop_V2(Abayernr_Context_V2_t *pAbayernrCtx);
 
 //anr inint
-Abayernr_result_t Abayernr_Init_V2(Abayernr_Context_V2_t **ppAbayernrCtx, CamCalibDbContext_t *pCalibDb);
+Abayernr_result_t Abayernr_Init_V2(Abayernr_Context_V2_t **ppAbayernrCtx, void *pCalibDb);
 
 //anr release
 Abayernr_result_t Abayernr_Release_V2(Abayernr_Context_V2_t *pAbayernrCtx);

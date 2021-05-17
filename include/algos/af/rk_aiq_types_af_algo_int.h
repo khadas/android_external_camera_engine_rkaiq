@@ -55,6 +55,8 @@ typedef struct rk_aiq_af_attrib_s {
     unsigned short infinityModeDefCode;
 
     rk_aiq_af_algo_meas_t manual_meascfg;
+
+    int zoom_zero_pos;
 } rk_aiq_af_attrib_t;
 
 #endif

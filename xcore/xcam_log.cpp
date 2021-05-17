@@ -45,13 +45,13 @@ static char log_file_name[XCAM_MAX_STR_SIZE] = {0};
  * meaning: [sub modules] [level]
  *
  * bit:      21        20       19      18       17     16     15        14     13       12
- * meaning: [ADEBAYER][AGIC]   [ALSC]   [ANR]  [AHDR] [ADPCC]  [ABLC]    [AF]   [AWB]   [AEC]
+ * meaning: [ADEBAYER][AGIC]   [ALSC]   [ANR]  [ATMO] [ADPCC]  [ABLC]    [AF]   [AWB]   [AEC]
  *
  * bit:      31        30       29      28       27     26     25        24     23       22
  * meaning: [ASHARP]  [AIE]    [ACP]    [AR2Y] [ALDCH][A3DLUT] [ADEHAZE] [AWDR] [AGAMMA][ACCM]
  *
- * bit:     [63-39]                     38       37     36     35        34     33       32
- * meaning:  [U]                        [CAMHW]  [ANALYZER][XCORE][ASD]  [AFEC] [ACGC]  [AORB]
+ * bit:     [63-39]          40     39      38       37     36     35        34     33       32
+ * meaning:  [U]              [AMERGE]  [ADEGAMMA ]   [CAMHW]  [ANALYZER][XCORE][ASD]  [AFEC] [ACGC]  [AORB]
  *
  * [U] means unused now.
  * [level]: use 4 bits to define log levels.
@@ -82,19 +82,21 @@ static char log_file_name[XCAM_MAX_STR_SIZE] = {0};
  */
 static unsigned long long g_cam_engine_log_level = 0xff0;
 
+#if 0
 typedef struct xcore_cam_log_module_info_s {
     const char* module_name;
     int log_level;
     int sub_modules;
 } xcore_cam_log_module_info_t;
+#endif
 
-static xcore_cam_log_module_info_t g_xcore_log_infos[XCORE_LOG_MODULE_MAX] = {
+xcore_cam_log_module_info_t g_xcore_log_infos[XCORE_LOG_MODULE_MAX] = {
     { "AEC", XCORE_LOG_LEVEL_ERR, 0xff}, // XCORE_LOG_MODULE_AEC
     { "AWB", XCORE_LOG_LEVEL_ERR, 0xff}, // XCORE_LOG_MODULE_AWB
     { "AF", XCORE_LOG_LEVEL_ERR, 0xff}, // XCORE_LOG_MODULE_AF
     { "ABLC", XCORE_LOG_LEVEL_ERR, 0xff}, // XCORE_LOG_MODULE_ABLC
     { "ADPCC", XCORE_LOG_LEVEL_ERR, 0xff}, // XCORE_LOG_MODULE_ADPCC
-    { "AHDR", XCORE_LOG_LEVEL_ERR, 0xff}, // XCORE_LOG_MODULE_AHDR
+    { "ATMO", XCORE_LOG_LEVEL_ERR, 0xff}, // XCORE_LOG_MODULE_ATMO
     { "ANR", XCORE_LOG_LEVEL_ERR, 0xff}, // XCORE_LOG_MODULE_ANR
     { "ALSC", XCORE_LOG_LEVEL_ERR, 0xff}, // XCORE_LOG_MODULE_ALSC
     { "AGIC", XCORE_LOG_LEVEL_ERR, 0xff}, // XCORE_LOG_MODULE_AGIC
@@ -116,6 +118,9 @@ static xcore_cam_log_module_info_t g_xcore_log_infos[XCORE_LOG_MODULE_MAX] = {
     { "XCORE", XCORE_LOG_LEVEL_ERR, 0xff}, // XCORE_LOG_MODULE_XCORE
     { "ANALYZER", XCORE_LOG_LEVEL_ERR, 0xff}, // XCORE_LOG_MODULE_ANALYZER
     { "CAMHW", XCORE_LOG_LEVEL_ERR, 0xff}, // XCORE_LOG_MODULE_CAMHW
+    { "ADEGAMMA", XCORE_LOG_LEVEL_ERR, 0xff}, // XCORE_LOG_MODULE_ADEGAMMA
+    { "AMERGE", XCORE_LOG_LEVEL_ERR, 0xff}, // XCORE_LOG_MODULE_AMERGE
+    { "AMD", XCORE_LOG_LEVEL_ERR, 0xff}, // XCORE_LOG_MODULE_AMMD
 };
 
 bool xcam_get_enviroment_value(const char* variable, unsigned long long* value)
@@ -132,6 +137,36 @@ bool xcam_get_enviroment_value(const char* variable, unsigned long long* value)
         return true;
     }
     return false;
+}
+
+void xcam_get_runtime_log_level() {
+    const char* file_name = "/tmp/.rkaiq_log";
+
+    if (!access(file_name, F_OK)) {
+        FILE *fp = fopen(file_name, "r");
+        char level[64] = {'\0'};
+
+        if (!fp)
+            return;
+
+        fseek(fp, 0, SEEK_SET);
+        if (fp && fread(level, 1, sizeof (level), fp) > 0) {
+            for (int i = 0; i < XCORE_LOG_MODULE_MAX; i++) {
+                g_xcore_log_infos[i].log_level = 0;
+                g_xcore_log_infos[i].sub_modules = 0;
+            }
+            g_cam_engine_log_level = strtoull(level, nullptr, 16);
+            unsigned long long module_mask = g_cam_engine_log_level >> 12;
+            for (int i = 0; i < XCORE_LOG_MODULE_MAX; i++) {
+                if (module_mask & (1 << i)) {
+                    g_xcore_log_infos[i].log_level = g_cam_engine_log_level & 0xf;
+                    g_xcore_log_infos[i].sub_modules = (g_cam_engine_log_level >> 4) & 0xff;
+                }
+            }
+        }
+
+        fclose (fp);
+    }
 }
 
 int xcam_get_log_level() {
@@ -162,52 +197,49 @@ char* timeString() {
     gettimeofday(&tv, NULL);
     struct tm * timeinfo = localtime(&tv.tv_sec);
     static char timeStr[64];
-    sprintf(timeStr, "%.2d:%.2d:%.2d.%ld", timeinfo->tm_hour, timeinfo->tm_min, timeinfo->tm_sec, tv.tv_usec);
+    sprintf(timeStr, "%.2d:%.2d:%.2d.%.6ld", timeinfo->tm_hour, timeinfo->tm_min, timeinfo->tm_sec, tv.tv_usec);
     return timeStr;
 }
 
 void xcam_print_log (int module, int sub_modules, int level, const char* format, ...) {
-    if (level <= g_xcore_log_infos[module].log_level &&
-            (sub_modules & g_xcore_log_infos[module].sub_modules)) {
-        char buffer[XCAM_MAX_STR_SIZE] = {0};
-        va_list va_list;
-        va_start (va_list, format);
-        vsnprintf (buffer, XCAM_MAX_STR_SIZE, format, va_list);
-        va_end (va_list);
+    char buffer[XCAM_MAX_STR_SIZE] = {0};
+    va_list va_list;
+    va_start (va_list, format);
+    vsnprintf (buffer, XCAM_MAX_STR_SIZE, format, va_list);
+    va_end (va_list);
 
-        if (strlen (log_file_name) > 0) {
-            FILE* p_file = fopen (log_file_name, "ab+");
-            if (NULL != p_file) {
-                fwrite (buffer, sizeof (buffer[0]), strlen (buffer), p_file);
-                fclose (p_file);
-            } else {
-                printf("error! can't open log file !\n");
-            }
-            return ;
+    if (strlen (log_file_name) > 0) {
+        FILE* p_file = fopen (log_file_name, "ab+");
+        if (NULL != p_file) {
+            fwrite (buffer, sizeof (buffer[0]), strlen (buffer), p_file);
+            fclose (p_file);
+        } else {
+            printf("error! can't open log file !\n");
         }
-#ifdef ANDROID_OS
-        switch(level) {
-        case XCORE_LOG_LEVEL_ERR:
-            ALOGE("[%s]:%s", g_xcore_log_infos[module].module_name, buffer);
-            break;
-        case XCORE_LOG_LEVEL_WARNING:
-            ALOGW("[%s]:%s", g_xcore_log_infos[module].module_name, buffer);
-            break;
-        case XCORE_LOG_LEVEL_INFO:
-            ALOGI("[%s]:%s", g_xcore_log_infos[module].module_name, buffer);
-            break;
-        case XCORE_LOG_LEVEL_VERBOSE:
-            ALOGV("[%s]:%s", g_xcore_log_infos[module].module_name, buffer);
-            break;
-        case XCORE_LOG_LEVEL_DEBUG:
-        default:
-            ALOGD("[%s]:%s", g_xcore_log_infos[module].module_name, buffer);
-            break;
-        }
-#else
-        printf ("[%s][%s]:%s", timeString(), g_xcore_log_infos[module].module_name, buffer);
-#endif
+        return ;
     }
+#ifdef ANDROID_OS
+    switch(level) {
+    case XCORE_LOG_LEVEL_ERR:
+        ALOGE("[%s]:%s", g_xcore_log_infos[module].module_name, buffer);
+        break;
+    case XCORE_LOG_LEVEL_WARNING:
+        ALOGW("[%s]:%s", g_xcore_log_infos[module].module_name, buffer);
+        break;
+    case XCORE_LOG_LEVEL_INFO:
+        ALOGI("[%s]:%s", g_xcore_log_infos[module].module_name, buffer);
+        break;
+    case XCORE_LOG_LEVEL_VERBOSE:
+        ALOGV("[%s]:%s", g_xcore_log_infos[module].module_name, buffer);
+        break;
+    case XCORE_LOG_LEVEL_DEBUG:
+    default:
+        ALOGD("[%s]:%s", g_xcore_log_infos[module].module_name, buffer);
+        break;
+    }
+#else
+    printf ("[%s][%s]:%s", timeString(), g_xcore_log_infos[module].module_name, buffer);
+#endif
 }
 
 void xcam_set_log (const char* file_name) {

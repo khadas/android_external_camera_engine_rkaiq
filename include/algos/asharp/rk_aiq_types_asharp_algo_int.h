@@ -22,6 +22,7 @@
 #include "rk_aiq_comm.h"
 #include "RkAiqCalibDbTypes.h"
 #include "asharp/rk_aiq_types_asharp_algo.h"
+#include "RkAiqCalibDbTypesV2.h"
 
 
 RKAIQ_BEGIN_DECLARE
@@ -95,13 +96,22 @@ typedef struct RKAsharp_Sharp_HW_Params_s
     float hbf_gain      [MAX_ISO_STEP];
     float hbf_add       [MAX_ISO_STEP];
     short ehf_th        [MAX_ISO_STEP];
+    float pbf_coeff_percent[MAX_ISO_STEP];
+    float rf_m_coeff_percent[MAX_ISO_STEP];
+    float rf_h_coeff_percent[MAX_ISO_STEP];
+    float hbf_coeff_percent[MAX_ISO_STEP];
 
+    
     float gaus_luma_kernel  [MAX_ISO_STEP][RKSHAPRENHW_PBF_DIAM * RKSHAPRENHW_PBF_DIAM];
-    float kernel_pbf    [MAX_ISO_STEP][RKSHAPRENHW_PBF_DIAM * RKSHAPRENHW_PBF_DIAM];
-    float h_rf_m        [MAX_ISO_STEP][RKSHAPRENHW_MRF_DIAM * RKSHAPRENHW_MRF_DIAM];
+    float kernel_pbf_l    [MAX_ISO_STEP][RKSHAPRENHW_PBF_DIAM * RKSHAPRENHW_PBF_DIAM];
+    float kernel_pbf_h    [MAX_ISO_STEP][RKSHAPRENHW_PBF_DIAM * RKSHAPRENHW_PBF_DIAM];
+    float h_rf_m_l        [MAX_ISO_STEP][RKSHAPRENHW_MRF_DIAM * RKSHAPRENHW_MRF_DIAM];
+    float h_rf_m_h        [MAX_ISO_STEP][RKSHAPRENHW_MRF_DIAM * RKSHAPRENHW_MRF_DIAM];
     float kernel_mbf    [MAX_ISO_STEP][RKSHAPRENHW_MBF_DIAM_Y * RKSHAPRENHW_MBF_DIAM_X];
-    float h_rf_h        [MAX_ISO_STEP][RKSHAPRENHW_HRF_DIAM * RKSHAPRENHW_HRF_DIAM];
-    float kernel_hbf    [MAX_ISO_STEP][RKSHAPRENHW_HBF_DIAM * RKSHAPRENHW_HBF_DIAM];
+    float h_rf_h_l        [MAX_ISO_STEP][RKSHAPRENHW_HRF_DIAM * RKSHAPRENHW_HRF_DIAM];
+    float h_rf_h_h        [MAX_ISO_STEP][RKSHAPRENHW_HRF_DIAM * RKSHAPRENHW_HRF_DIAM];
+    float kernel_hbf_l    [MAX_ISO_STEP][RKSHAPRENHW_HBF_DIAM * RKSHAPRENHW_HBF_DIAM];
+    float kernel_hbf_h    [MAX_ISO_STEP][RKSHAPRENHW_HBF_DIAM * RKSHAPRENHW_HBF_DIAM];
 
 } RKAsharp_Sharp_HW_Params_t;
 
@@ -253,7 +263,9 @@ typedef struct RKAsharp_EdgeFilter_Params_s
     float h3_p_coef_5x5         [MAX_ISO_STEP][RKEDGEFILTER_DIR_SMTH_DIAM   * RKEDGEFILTER_DIR_SMTH_DIAM];
     float h_coef_5x5            [MAX_ISO_STEP][RKEDGEFILTER_GAUS_DIAM       * RKEDGEFILTER_GAUS_DIAM];
     float gf_coef_3x3           [MAX_ISO_STEP][RKEDGEFILTER_SHRP_DIAM       * RKEDGEFILTER_SHRP_DIAM];
-    float dog_kernel            [MAX_ISO_STEP][RKEDGEFILTER_DOG_DIAM        * RKEDGEFILTER_DOG_DIAM];
+    float dog_kernel_l            [MAX_ISO_STEP][RKEDGEFILTER_DOG_DIAM        * RKEDGEFILTER_DOG_DIAM];
+    float dog_kernel_h            [MAX_ISO_STEP][RKEDGEFILTER_DOG_DIAM        * RKEDGEFILTER_DOG_DIAM];
+    float dog_kernel_percent      [MAX_ISO_STEP];
 } RKAsharp_EdgeFilter_Params_t;
 
 typedef struct RKAsharp_EdgeFilter_Params_Select_s
@@ -382,7 +394,18 @@ typedef struct AsharpExpInfo_s {
     float arAGain[3];
     float arDGain[3];
     int   arIso[3];
+    int   arDcgMode[3];
+    int   cur_snr_mode;
 	int   snr_mode;
+
+	float preTime[3];
+	float preAGain[3];
+	float preDGain[3];
+	int preIso[3];
+	int preDcgMode[3];
+    int pre_snr_mode;
+	
+	int mfnr_mode_3to1;
 } AsharpExpInfo_t;
 
 typedef enum rk_aiq_sharp_module_e{
@@ -397,6 +420,15 @@ typedef struct rk_aiq_sharp_IQpara_s{
 	CalibDb_Sharp_t stSharpPara;
     CalibDb_EdgeFilter_t stEdgeFltPara;
 }rk_aiq_sharp_IQpara_t;
+
+
+typedef struct rk_aiq_sharp_JsonPara_s{
+	int module_bits;
+	
+	CalibDbV2_SharpV1_t sharp_v1;
+    CalibDbV2_Edgefilter_t edgefilter_v1;
+}rk_aiq_sharp_JsonPara_t;
+
 
 RKAIQ_END_DECLARE
 

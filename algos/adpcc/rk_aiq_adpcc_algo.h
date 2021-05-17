@@ -7,10 +7,13 @@
 #include "base/xcam_log.h"
 #include "rk_aiq_comm.h"
 #include "RkAiqCalibDbTypes.h"
+#include "RkAiqCalibDbTypesV2.h"
+#include "RkAiqCalibDbV2Helper.h"
 #include "adpcc/rk_aiq_types_adpcc_algo_prvt.h"
 
 
-AdpccResult_t AdpccInit(AdpccContext_t **ppAdpccCtx, CamCalibDbContext_t *pCalibDb);
+AdpccResult_t AdpccReloadPara(AdpccContext_t *pAdpccCtx, CamCalibDbV2Context_t *pCalibDb);
+AdpccResult_t AdpccInit(AdpccContext_t **ppAdpccCtx, CamCalibDbV2Context_t *pCalibDb);
 
 AdpccResult_t AdpccRelease(AdpccContext_t *pAdpccCtx);
 

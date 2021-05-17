@@ -18,11 +18,12 @@
 #ifndef _CAM_HW_BASE_H_
 #define _CAM_HW_BASE_H_
 
-#include <map>
+//#include <map>
 #include <string>
 #include "xcam_thread.h"
 #include "ICamHw.h"
 #include "v4l2_device.h"
+#include "fake_v4l2_device.h"
 #include "poll_thread.h"
 #ifndef RK_SIMULATOR_HW
 #include "FlashLight.h"
@@ -44,6 +45,9 @@ public:
     virtual void setCalib(const CamCalibDbContext_t* calib) {
         mCalibDb = calib;
     }
+    virtual void setCalib(const CamCalibDbV2Context_t* calibv2) {
+        mCalibDbV2 = calibv2;
+    }
     virtual XCamReturn prepare(uint32_t width, uint32_t height, int mode, int t_dealy, int g_delay);
     virtual XCamReturn start();
     virtual XCamReturn stop();
@@ -57,22 +61,24 @@ public:
     };
     virtual XCamReturn getSensorModeData(const char* sns_ent_name,
                                          rk_aiq_exposure_sensor_descriptor& sns_des);
-    virtual XCamReturn setIspParams(SmartPtr<RkAiqIspParamsProxy>& ispParams);
-    virtual XCamReturn setExposureParams(SmartPtr<RkAiqExpParamsProxy>& expPar);
-    virtual XCamReturn setIrisParams(SmartPtr<RkAiqIrisParamsProxy>& irisPar, CalibDb_IrisType_t irisType);
-    virtual XCamReturn setFocusParams(SmartPtr<RkAiqFocusParamsProxy>& focus_params);
-    virtual XCamReturn setCpslParams(SmartPtr<RkAiqCpslParamsProxy>& cpsl_params);
-    virtual XCamReturn setIsppParams(SmartPtr<RkAiqIsppParamsProxy>& isppParams);
-    virtual XCamReturn setIsppStatsListener(IsppStatsListener* isppStatsListener);
-    virtual XCamReturn setIspLumaListener(IspLumaListener* lumaListener);
-    virtual XCamReturn setIspStatsListener(IspStatsListener* statsListener);
-    virtual XCamReturn setEvtsListener(IspEvtsListener* evtListener);
-    virtual XCamReturn setHdrProcessCount(int frame_id, int count) {
+    virtual XCamReturn setHwResListener(HwResListener* resListener);
+    virtual XCamReturn setHdrProcessCount(rk_aiq_luma_params_t luma_params) {
         return XCAM_RETURN_ERROR_FAILED;
     };
+    virtual XCamReturn applyAnalyzerResult(SmartPtr<SharedItemBase> base, bool sync) {
+        return  XCAM_RETURN_ERROR_FAILED;
+    };
+    virtual XCamReturn applyAnalyzerResult(cam3aResultList& list) {
+        return  XCAM_RETURN_ERROR_FAILED;
+    }
     // from PollCallback
     virtual XCamReturn poll_buffer_ready (SmartPtr<VideoBuffer> &buf, int type);
     virtual XCamReturn poll_buffer_failed (int64_t timestamp, const char *msg);
+    virtual XCamReturn poll_event_ready (uint32_t sequence, int type);
+    virtual XCamReturn poll_event_failed (int64_t timestamp, const char *msg);
+    virtual XCamReturn poll_buffer_ready (SmartPtr<VideoBuffer> &buf);
+    virtual XCamReturn poll_buffer_ready (SmartPtr<V4l2BufferProxy> &buf, int dev_index) { return XCAM_RETURN_ERROR_FAILED; };
+
     virtual XCamReturn notify_capture_raw() {
         return  XCAM_RETURN_ERROR_FAILED;
     }
@@ -81,13 +87,16 @@ public:
                                        char* output_dir = nullptr) {
         return  XCAM_RETURN_ERROR_FAILED;
     }
-    virtual XCamReturn enqueueBuffer(struct rk_aiq_vbuf *vbuf) {
+    virtual XCamReturn enqueueRawBuffer(void *vbuf, bool sync) {
         return  XCAM_RETURN_ERROR_FAILED;
     }
-    virtual XCamReturn offlineRdJobPrepare() {
+    virtual XCamReturn enqueueRawFile(const char *path) {
         return  XCAM_RETURN_ERROR_FAILED;
     }
-    virtual XCamReturn offlineRdJobDone() {
+    virtual XCamReturn registRawdataCb(void (*callback)(void *)) {
+        return  XCAM_RETURN_ERROR_FAILED;
+    }
+    virtual XCamReturn rawdataPrepare(rk_aiq_raw_prop_t prop) {
         return  XCAM_RETURN_ERROR_FAILED;
     }
     virtual XCamReturn setSensorFlip(bool mirror, bool flip, int skip_frm_cnt) {
@@ -105,10 +114,28 @@ public:
     virtual XCamReturn getLensVcmCfg(rk_aiq_lens_vcmcfg& lens_cfg) {
         return  XCAM_RETURN_ERROR_FAILED;
     }
+    virtual XCamReturn FocusCorrection() {
+        return  XCAM_RETURN_ERROR_FAILED;
+    }
+    virtual XCamReturn ZoomCorrection() {
+        return  XCAM_RETURN_ERROR_FAILED;
+    }
     virtual void getShareMemOps(isp_drv_share_mem_ops_t** mem_ops) {};
+    virtual XCamReturn getEffectiveIspParams(rkisp_effect_params_v20& ispParams, int frame_id) {
+        return  XCAM_RETURN_ERROR_FAILED;
+    };
+    uint64_t getIspModuleEnState() {
+        return true;
+    };
+    virtual XCamReturn setIspStreamMode(rk_isp_stream_mode_t mode) {
+        return XCAM_RETURN_ERROR_FAILED;
+    }
+    virtual rk_isp_stream_mode_t getIspStreamMode() {
+        return RK_ISP_STREAM_MODE_INVALID;
+    }
+    HwResListener* mHwResLintener;
 protected:
-    SmartPtr<V4l2Device> mIsppStatsDev;
-    SmartPtr<V4l2Device> mIsppParamsDev;
+    SmartPtr<V4l2Device> mIsppFecParamsDev;
     SmartPtr<V4l2Device> mIspLumaDev;
     SmartPtr<V4l2Device> mIspStatsDev;
     SmartPtr<V4l2Device> mIspParamsDev;
@@ -116,20 +143,14 @@ protected:
     SmartPtr<V4l2SubDevice> mSensorDev;
     SmartPtr<V4l2SubDevice> mLensDev;
     SmartPtr<V4l2SubDevice> mIrcutDev;
+    SmartPtr<V4l2Device> mIspSpDev;
 #ifndef RK_SIMULATOR_HW
     SmartPtr<FlashLightHw> mFlashLight;
     SmartPtr<FlashLightHw> mFlashLightIr;
 #endif
-    SmartPtr<PollThread> mPollthread;
-    SmartPtr<PollThread> mPollLumathread;
-    SmartPtr<PollThread> mPollIsppthread;
-    SmartPtr<Thread> mOfflineRdThread;
-    IsppStatsListener* mIsppStatsListener;
-    IspLumaListener* mIspLumaListener;
-    IspStatsListener* mIspStatsLintener;
-    IspEvtsListener* mIspEvtsListener;
     int mWorkingMode;
     const CamCalibDbContext_t* mCalibDb;
+    const CamCalibDbV2Context_t* mCalibDbV2;
     bool mKpHwSt;
 private:
     XCAM_DEAD_COPY (CamHwBase);

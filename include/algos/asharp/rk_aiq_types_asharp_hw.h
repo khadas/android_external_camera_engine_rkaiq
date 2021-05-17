@@ -61,11 +61,11 @@ typedef struct RKAsharp_Sharp_HW_Fix_s {
 } RKAsharp_Sharp_HW_Fix_t;
 
 typedef struct RKAsharp_Sharp_HW_V2_Fix_s {
-
+    void* place_holder[1];
 } RKAsharp_Sharp_HW_V2_Fix_t;
 
 typedef struct RKAsharp_Sharp_HW_V3_Fix_s {
-
+    void* place_holder[1];
 } RKAsharp_Sharp_HW_V3_Fix_t;
 
 

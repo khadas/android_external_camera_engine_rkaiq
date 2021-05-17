@@ -31,6 +31,8 @@ rk_aiq_uapi_a3dlut_Query3dlutInfo(const RkAiqAlgoContext *ctx,
 {
 
     alut3d_context_t* alut3d_context = (alut3d_context_t*)ctx->a3dlut_para;
+    lut3d_querry_info->alpha = alut3d_context->restinfo.alpha;
+    strcpy(lut3d_querry_info->name, alut3d_context->restinfo.pLutProfile->name);
     memcpy(lut3d_querry_info->look_up_table_b, alut3d_context->lut3d_hw_conf.look_up_table_b,
            sizeof(lut3d_querry_info->look_up_table_b));
     memcpy(lut3d_querry_info->look_up_table_g, alut3d_context->lut3d_hw_conf.look_up_table_g,

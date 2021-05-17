@@ -25,20 +25,29 @@
 namespace RkCam {
 
 class CamHwIsp21
-    : public CamHwIsp20
+    : virtual public CamHwIsp20
     , virtual public Isp21Params {
 public:
     explicit CamHwIsp21();
     virtual ~CamHwIsp21();
     virtual XCamReturn init(const char* sns_ent_name);
+    virtual XCamReturn stop();
     XCamReturn setIspParamsSync(int frameId);
     XCamReturn setIsppParamsSync(int frameId);
-    XCamReturn setIsppParams(SmartPtr<RkAiqIsppParamsProxy>& isppParams);
-    virtual void setMulCamConc(bool cc);
+protected:
+    virtual XCamReturn setIspConfig();
+    virtual XCamReturn dispatchResult(SmartPtr<cam3aResult> cam3a_result);
+    virtual XCamReturn dispatchResult(cam3aResultList& list);
+    virtual bool isOnlineByWorkingMode();
 private:
     void gen_full_isp_params(const struct isp21_isp_params_cfg* update_params,
-                             struct isp21_isp_params_cfg* full_params);
-	XCamReturn overrideExpRatioV21ToAiqResults(const sint32_t frameId, int module_id, SmartPtr<RkAiqIspParamsProxy>& aiq_results);
+                             struct isp21_isp_params_cfg* full_params,
+                             uint64_t* module_en_update_partial,
+                             uint64_t* module_cfg_update_partial);
+    virtual XCamReturn overrideExpRatioToAiqResults(const sint32_t frameId,
+            int module_id,
+            cam3aResultList &results,
+            int hdr_mode);
     struct isp21_isp_params_cfg _full_active_isp21_params;
 };
 

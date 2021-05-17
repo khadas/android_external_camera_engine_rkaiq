@@ -3,15 +3,10 @@
 
 #include "base/xcam_common.h"
 #include "rk_aiq_algo_des.h"
-#include "rk_aiq_types_ahdr_algo_int.h"
+#include "rk_aiq_types_adrc_algo_int.h"
 
 
-// TODO: move the structs define to a separate file,
-//TODO: move the structs define to a separate file,
-// eg. rk_aiq_uapi_awb_types.h ?
-
-typedef hdrAttr_t ahdr_attrib_t;
-
+typedef drcAttr_t drc_attrib_t;
 
 // need_sync means the implementation should consider
 // the thread synchronization
@@ -21,14 +16,14 @@ typedef hdrAttr_t ahdr_attrib_t;
 // the case of need_sync == false; need_sync is for future usage.
 
 XCamReturn
-rk_aiq_uapi_ahdr_SetAttrib(RkAiqAlgoContext *ctx,
-                           ahdr_attrib_t attr,
+rk_aiq_uapi_adrc_SetAttrib(RkAiqAlgoContext *ctx,
+                           drc_attrib_t attr,
                            bool need_sync);
 
 
 XCamReturn
-rk_aiq_uapi_ahdr_GetAttrib(RkAiqAlgoContext *ctx,
-                           ahdr_attrib_t *attr);
+rk_aiq_uapi_adrc_GetAttrib(RkAiqAlgoContext *ctx,
+                           drc_attrib_t *attr);
 
 
 #endif

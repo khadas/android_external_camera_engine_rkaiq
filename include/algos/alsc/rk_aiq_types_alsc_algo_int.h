@@ -32,6 +32,7 @@ typedef struct alsc_sw_info_s {
     float varianceLuma;
     bool grayMode;
     bool awbConverged;
+    int prepare_type;
 } alsc_sw_info_t;
 
 typedef struct rk_aiq_lsc_mlsc_attrib_s {

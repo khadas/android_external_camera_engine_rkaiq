@@ -25,7 +25,7 @@
 #include "af/rk_aiq_algo_af_itf.h"
 #include "anr/rk_aiq_algo_anr_itf.h"
 #include "asd/rk_aiq_algo_asd_itf.h"
-#include "ahdr/rk_aiq_algo_ahdr_itf.h"
+#include "amerge/rk_aiq_algo_amerge_itf.h"
 #include "adrc/rk_aiq_algo_adrc_itf.h"
 
 #include "asharp/rk_aiq_algo_asharp_itf.h"
@@ -37,6 +37,7 @@
 #include "adebayer/rk_aiq_algo_adebayer_itf.h"
 #include "accm/rk_aiq_algo_accm_itf.h"
 #include "agamma/rk_aiq_algo_agamma_itf.h"
+#include "adegamma/rk_aiq_algo_adegamma_itf.h"
 #include "awdr/rk_aiq_algo_awdr_itf.h"
 #include "a3dlut/rk_aiq_algo_a3dlut_itf.h"
 #include "aldch/rk_aiq_algo_aldch_itf.h"
@@ -61,51 +62,90 @@
 #endif
 #include <fcntl.h>
 #include <unistd.h>
+#include "RkAiqResourceTranslatorV21.h"
+#include "RkAiqAnalyzeGroupManager.h"
 
 namespace RkCam {
 /*
  * isp/ispp pipeline algos ordered array, and the analyzer
  * will run these algos one by one.
  */
+
+/*
+ * isp gets the stats from frame n-1,
+ * and the new parameters take effect on frame n+1
+ */
+#define ISP_PARAMS_EFFECT_DELAY_CNT 2
+
+static RkAiqGrpCondition_t aeGrpCondV21[]       = {
+    [0] = { XCAM_MESSAGE_AEC_STATS_OK,      ISP_PARAMS_EFFECT_DELAY_CNT },
+};
+static RkAiqGrpConditions_t aeGrpCondsV21       = { grp_conds_array_info(aeGrpCondV21) };
+
+static RkAiqGrpCondition_t awbGrpCond[]         = {
+    [0] = { XCAM_MESSAGE_AE_PRE_RES_OK,     0 },
+    [1] = { XCAM_MESSAGE_AWB_STATS_OK,      ISP_PARAMS_EFFECT_DELAY_CNT },
+};
+static RkAiqGrpConditions_t  awbGrpConds        = { grp_conds_array_info(awbGrpCond) };
+
+static RkAiqGrpCondition_t afGrpCondV21[]     = {
+    [0] = { XCAM_MESSAGE_SOF_INFO_OK,       0 },
+    [1] = { XCAM_MESSAGE_AE_PRE_RES_OK,     0 },
+    [2] = { XCAM_MESSAGE_AE_PROC_RES_OK,    0 },
+    [3] = { XCAM_MESSAGE_AF_STATS_OK,       ISP_PARAMS_EFFECT_DELAY_CNT },
+    [4] = { XCAM_MESSAGE_AEC_STATS_OK,      ISP_PARAMS_EFFECT_DELAY_CNT },
+};
+static RkAiqGrpConditions_t  afGrpCondsV21    = { grp_conds_array_info(afGrpCondV21) };
+
+static RkAiqGrpCondition_t otherGrpCondV21[]    = {
+    [0] = { XCAM_MESSAGE_SOF_INFO_OK,       0 },
+};
+static RkAiqGrpConditions_t  otherGrpCondsV21   = { grp_conds_array_info(otherGrpCondV21) };
+
+static RkAiqGrpCondition_t grp0Cond[]           = {
+    [0] = { XCAM_MESSAGE_SOF_INFO_OK,       0 },
+    [1] = { XCAM_MESSAGE_AE_PRE_RES_OK,     0 },
+    [2] = { XCAM_MESSAGE_AE_PROC_RES_OK,    0 },
+    [3] = { XCAM_MESSAGE_AEC_STATS_OK,      ISP_PARAMS_EFFECT_DELAY_CNT },
+    [4] = { XCAM_MESSAGE_AWB_STATS_OK,      ISP_PARAMS_EFFECT_DELAY_CNT },
+};
+static RkAiqGrpConditions_t  grp0Conds          = { grp_conds_array_info(grp0Cond) };
+
+static RkAiqGrpCondition_t grp1Cond[]           = {
+    [0] = { XCAM_MESSAGE_SOF_INFO_OK,       0 },
+    [1] = { XCAM_MESSAGE_AWB_PROC_RES_OK,   0 },
+};
+static RkAiqGrpConditions_t  grp1Conds          = { grp_conds_array_info(grp1Cond) };
+
 static struct RkAiqAlgoDesCommExt g_default_3a_des_v21[] = {
-    { (RkAiqAlgoDesComm*)&g_RkIspAlgoDescAe, 0, 1 },
-    { (RkAiqAlgoDesComm*)&g_RkIspAlgoDescAdebayer, 0, 0 },
-    { (RkAiqAlgoDesComm*)&g_RkIspAlgoDescAwb, 0, 1 },
-    { (RkAiqAlgoDesComm*)&g_RkIspAlgoDescAgamma, 0, 0 },
-    { (RkAiqAlgoDesComm*)&g_RkIspAlgoDescAcp, 0, 0 },
-    { (RkAiqAlgoDesComm*)&g_RkIspAlgoDescAie, 0, 0 },
-    { (RkAiqAlgoDesComm*)&g_RkIspAlgoDescAdpcc, 0, 0 },
-    { (RkAiqAlgoDesComm*)&g_RkIspAlgoDescAldch, 0, 0 },
-    { (RkAiqAlgoDesComm*)&g_RkIspAlgoDescA3dlut, 0, 0 },
-    { (RkAiqAlgoDesComm*)&g_RkIspAlgoDescAcgc, 0, 0 },
-    { (RkAiqAlgoDesComm*)&g_RkIspAlgoDescAr2y, 0, 0 },
-    { (RkAiqAlgoDesComm*)&g_RkIspAlgoDescAlsc, 0, 0 },
-    { (RkAiqAlgoDesComm*)&g_RkIspAlgoDescAccm, 0, 0 },
-    { (RkAiqAlgoDesComm*)&g_RkIspAlgoDescAf, 0, 0 },
-    { (RkAiqAlgoDesComm*)&g_RkIspAlgoDescAblc, 0, 0 },
-    { (RkAiqAlgoDesComm*)&g_RkIspAlgoDescAhdr, 0, 0 },
-    { (RkAiqAlgoDesComm*)&g_RkIspAlgoDescAdrc, 0, 0 },
-    { (RkAiqAlgoDesComm*)&g_RkIspAlgoDescAsharpV3, 3, 3 },
-    { (RkAiqAlgoDesComm*)&g_RkIspAlgoDescAynrV2, 2, 2 },
-    { (RkAiqAlgoDesComm*)&g_RkIspAlgoDescAcnrV1, 1, 1 },
-    { (RkAiqAlgoDesComm*)&g_RkIspAlgoDescArawnrV2, 2, 2 },
-    { (RkAiqAlgoDesComm*)&g_RkIspAlgoDescAdhaz, 0, 1 },
-    { (RkAiqAlgoDesComm*)&g_RkIspAlgoDescAgic, 0, 1 },
-#if 0
-    { (RkAiqAlgoDesComm*)&g_RkIspAlgoDescAhdr, 0, 0 },
-    /* { (RkAiqAlgoDesComm*)&g_RkIspAlgoDescAnr,0, 0 }, */
-    { (RkAiqAlgoDesComm*)&g_RkIspAlgoDescAwdr, 0, 0 },
-    { (RkAiqAlgoDesComm*)&g_RkIspAlgoDescAdhaz, 0, 0 },
-    { (RkAiqAlgoDesComm*)&g_RkIspAlgoDescAsharp, 0, 0 },
-    { (RkAiqAlgoDesComm*)&g_RkIspAlgoDescAsd, 0, 0 },
-    // TODO
-    /* { (RkAiqAlgoDesComm*)&g_RkIspAlgoDescAdrc, 0, 0 }, */
-    /* { (RkAiqAlgoDesComm*)&g_RkIspAlgoDescArawnr, 0, 0 }, */
-    /* { (RkAiqAlgoDesComm*)&g_RkIspAlgoDescAmfnr, 0, 0 }, */
-    /* { (RkAiqAlgoDesComm*)&g_RkIspAlgoDescAynr, 0, 0 }, */
-    /* { (RkAiqAlgoDesComm*)&g_RkIspAlgoDescAcnr, 0, 0 }, */
-#endif
-    { NULL, 0, 0 },
+    { &g_RkIspAlgoDescAe.common, RK_AIQ_CORE_ANALYZE_AE, 0, 1, aeGrpCondsV21 },
+    { &g_RkIspAlgoDescAwb.common, RK_AIQ_CORE_ANALYZE_AWB, 1, 1, awbGrpConds },
+    { &g_RkIspAlgoDescAdebayer.common, RK_AIQ_CORE_ANALYZE_GRP0, 0, 0, grp0Conds },
+    { &g_RkIspAlgoDescAgamma.common, RK_AIQ_CORE_ANALYZE_GRP0, 0, 0, grp0Conds },
+    { &g_RkIspAlgoDescAdegamma.common, RK_AIQ_CORE_ANALYZE_GRP0, 0, 0, grp0Conds },
+    { &g_RkIspAlgoDescAmerge.common, RK_AIQ_CORE_ANALYZE_GRP0, 0, 0, grp0Conds },
+    { &g_RkIspAlgoDescAdhaz.common, RK_AIQ_CORE_ANALYZE_GRP0, 0, 1, grp0Conds },
+    { &g_RkIspAlgoDescArawnrV2.common, RK_AIQ_CORE_ANALYZE_GRP0, 2, 2, grp0Conds },
+    { &g_RkIspAlgoDescAynrV2.common, RK_AIQ_CORE_ANALYZE_GRP0, 2, 2, grp0Conds },
+    { &g_RkIspAlgoDescAcnrV1.common, RK_AIQ_CORE_ANALYZE_GRP0, 1, 1, grp0Conds },
+    { &g_RkIspAlgoDescAsharpV3.common, RK_AIQ_CORE_ANALYZE_GRP0, 3, 3, grp0Conds },
+    { &g_RkIspAlgoDescAdrc.common, RK_AIQ_CORE_ANALYZE_GRP0, 0, 0, grp0Conds },
+    { &g_RkIspAlgoDescA3dlut.common, RK_AIQ_CORE_ANALYZE_GRP1, 0, 0, grp1Conds },
+    { &g_RkIspAlgoDescAlsc.common, RK_AIQ_CORE_ANALYZE_GRP1, 0, 0, grp1Conds },
+    { &g_RkIspAlgoDescAccm.common, RK_AIQ_CORE_ANALYZE_GRP1, 0, 0, grp1Conds },
+    { &g_RkIspAlgoDescAcp.common, RK_AIQ_CORE_ANALYZE_OTHER, 0, 0, otherGrpCondsV21 },
+    { &g_RkIspAlgoDescAie.common, RK_AIQ_CORE_ANALYZE_OTHER, 0, 0, otherGrpCondsV21 },
+    { &g_RkIspAlgoDescAdpcc.common, RK_AIQ_CORE_ANALYZE_OTHER, 0, 0, otherGrpCondsV21},
+    { &g_RkIspAlgoDescAldch.common, RK_AIQ_CORE_ANALYZE_OTHER, 0, 0, otherGrpCondsV21 },
+    { &g_RkIspAlgoDescAcgc.common, RK_AIQ_CORE_ANALYZE_OTHER, 0, 0, otherGrpCondsV21 },
+    { &g_RkIspAlgoDescAr2y.common, RK_AIQ_CORE_ANALYZE_OTHER, 0, 0, otherGrpCondsV21 },
+    { &g_RkIspAlgoDescAf.common, RK_AIQ_CORE_ANALYZE_AF, 0, 0, afGrpCondsV21 },
+    { &g_RkIspAlgoDescAblc.common, RK_AIQ_CORE_ANALYZE_OTHER, 0, 0, otherGrpCondsV21 },
+    { &g_RkIspAlgoDescAgic.common, RK_AIQ_CORE_ANALYZE_OTHER, 0, 1, otherGrpCondsV21 },
+    { &g_RkIspAlgoDescAwdr.common, RK_AIQ_CORE_ANALYZE_OTHER, 0, 0, otherGrpCondsV21 },
+    { &g_RkIspAlgoDescAsd.common, RK_AIQ_CORE_ANALYZE_OTHER, 0, 0, otherGrpCondsV21 },
+
+    { NULL, RK_AIQ_CORE_ANALYZE_ALL, 0, 0 },
 };
 
 RkAiqCoreV21::RkAiqCoreV21()
@@ -116,8 +156,8 @@ RkAiqCoreV21::RkAiqCoreV21()
     mHasPp = false;
     mIspHwVer = 1;
     mAlgosDesArray = g_default_3a_des_v21;
-    mAiqIspParamsPool = new RkAiqIspParamsV21Pool("RkAiqIspParamsV21", RkAiqCore::DEFAULT_POOL_SIZE);
-    mAiqIspParamsPool->init(RkAiqCore::DEFAULT_POOL_SIZE);
+
+    mTranslator = new  RkAiqResourceTranslatorV21();
 
     EXIT_ANALYZER_FUNCTION();
 }
@@ -129,6 +169,357 @@ RkAiqCoreV21::~RkAiqCoreV21()
     EXIT_ANALYZER_FUNCTION();
 }
 
+void
+RkAiqCoreV21::newAiqParamsPool()
+{
+    for (auto algoHdl : mCurIspAlgoHandleList) {
+        if (algoHdl.ptr() && algoHdl->getEnable()) {
+            switch (algoHdl->getAlgoType()) {
+            case RK_AIQ_ALGO_TYPE_AE:
+                mAiqExpParamsPool           = new RkAiqExpParamsPool("RkAiqExpParams", MAX_AEC_EFFECT_FNUM * 4);
+                mAiqIrisParamsPool          = new RkAiqIrisParamsPool("RkAiqIrisParams", 4);
+                mAiqIspAecParamsPool        = new RkAiqIspAecParamsPool("RkAiqIspAecParams", RkAiqCore::DEFAULT_POOL_SIZE);
+                mAiqIspHistParamsPool       = new RkAiqIspHistParamsPool("RkAiqIspHistParams", RkAiqCore::DEFAULT_POOL_SIZE);
+                break;
+            case RK_AIQ_ALGO_TYPE_AWB:
+                mAiqIspAwbV21ParamsPool     = new RkAiqIspAwbParamsPoolV21("RkAiqIspAwbV21Params", RkAiqCore::DEFAULT_POOL_SIZE);
+                mAiqIspAwbGainParamsPool    = new RkAiqIspAwbGainParamsPool("RkAiqIspAwbGainParams", RkAiqCore::DEFAULT_POOL_SIZE);
+                break;
+            case RK_AIQ_ALGO_TYPE_AF:
+                mAiqFocusParamsPool         = new RkAiqFocusParamsPool("RkAiqFocusParams", 4);
+                mAiqIspAfParamsPool         = new RkAiqIspAfParamsPool("RkAiqIspAfParams", RkAiqCore::DEFAULT_POOL_SIZE);
+                break;
+            case RK_AIQ_ALGO_TYPE_ADPCC:
+                mAiqIspDpccParamsPool       = new RkAiqIspDpccParamsPool("RkAiqIspDpccParams", RkAiqCore::DEFAULT_POOL_SIZE);
+                break;
+            case RK_AIQ_ALGO_TYPE_AMERGE:
+                mAiqIspMergeParamsPool      = new RkAiqIspMergeParamsPool("RkAiqIspMergeParams", RkAiqCore::DEFAULT_POOL_SIZE);
+                break;
+            case RK_AIQ_ALGO_TYPE_ADHAZ:
+                mAiqIspDehazeV21ParamsPool  = new RkAiqIspDehazeParamsPoolV21("RkAiqIspDehazeV21Params", RkAiqCore::DEFAULT_POOL_SIZE);
+                break;
+            case RK_AIQ_ALGO_TYPE_A3DLUT:
+                mAiqIspLut3dParamsPool      = new RkAiqIspLut3dParamsPool("RkAiqIspLut3dParams", RkAiqCore::DEFAULT_POOL_SIZE);
+                break;
+            case RK_AIQ_ALGO_TYPE_ACCM:
+                mAiqIspCcmParamsPool        = new RkAiqIspCcmParamsPool("RkAiqIspCcmParams", RkAiqCore::DEFAULT_POOL_SIZE);
+                break;
+            case RK_AIQ_ALGO_TYPE_ALSC:
+                mAiqIspLscParamsPool        = new RkAiqIspLscParamsPool("RkAiqIspLscParams", RkAiqCore::DEFAULT_POOL_SIZE);
+                break;
+            case RK_AIQ_ALGO_TYPE_ABLC:
+                mAiqIspBlcV21ParamsPool     = new RkAiqIspBlcParamsPoolV21("RkAiqIspBlcParamsV21", RkAiqCore::DEFAULT_POOL_SIZE);
+                break;
+            case RK_AIQ_ALGO_TYPE_ARAWNR:
+                mAiqIspBaynrV21ParamsPool      = new RkAiqIspBaynrParamsPoolV21("RkAiqIspRawnrParams", RkAiqCore::DEFAULT_POOL_SIZE);
+                break;
+            case RK_AIQ_ALGO_TYPE_AGIC:
+                mAiqIspGicV21ParamsPool     = new RkAiqIspGicParamsPoolV21("RkAiqIspGicV21Params", RkAiqCore::DEFAULT_POOL_SIZE);
+                break;
+            case RK_AIQ_ALGO_TYPE_ADEBAYER:
+                mAiqIspDebayerParamsPool    = new RkAiqIspDebayerParamsPool("RkAiqIspDebayerParams", RkAiqCore::DEFAULT_POOL_SIZE);
+                break;
+            case RK_AIQ_ALGO_TYPE_ALDCH:
+                mAiqIspLdchParamsPool       = new RkAiqIspLdchParamsPool("RkAiqIspLdchParams", RkAiqCore::DEFAULT_POOL_SIZE);
+                break;
+            case RK_AIQ_ALGO_TYPE_AGAMMA:
+                mAiqIspAgammaParamsPool     = new RkAiqIspAgammaParamsPool("RkAiqIspAgammaParams", RkAiqCore::DEFAULT_POOL_SIZE);
+                break;
+            case RK_AIQ_ALGO_TYPE_ADEGAMMA:
+                mAiqIspAdegammaParamsPool     = new RkAiqIspAdegammaParamsPool("RkAiqIspAdegammaParams", RkAiqCore::DEFAULT_POOL_SIZE);
+                break;
+            case RK_AIQ_ALGO_TYPE_AWDR:
+                mAiqIspWdrParamsPool        = new RkAiqIspWdrParamsPool("RkAiqIspWdrParams", RkAiqCore::DEFAULT_POOL_SIZE);
+                break;
+            case RK_AIQ_ALGO_TYPE_AR2Y:
+                mAiqIspCsmParamsPool        = new RkAiqIspCsmParamsPool("RkAiqIspCsmParams", RkAiqCore::DEFAULT_POOL_SIZE);
+                break;
+            case RK_AIQ_ALGO_TYPE_ACGC:
+                mAiqIspCgcParamsPool        = new RkAiqIspCgcParamsPool("RkAiqIspCgcParams", RkAiqCore::DEFAULT_POOL_SIZE);
+                break;
+            case RK_AIQ_ALGO_TYPE_ACP:
+                mAiqIspCpParamsPool         = new RkAiqIspCpParamsPool("RkAiqIspCpParams", RkAiqCore::DEFAULT_POOL_SIZE);
+                break;
+            case RK_AIQ_ALGO_TYPE_AIE:
+                mAiqIspIeParamsPool         = new RkAiqIspIeParamsPool("RkAiqIspIeParams", RkAiqCore::DEFAULT_POOL_SIZE);
+                break;
+            case RK_AIQ_ALGO_TYPE_AYNR:
+                mAiqIspYnrV21ParamsPool     = new RkAiqIspYnrParamsPoolV21("RkAiqIspYnrV21Params", RkAiqCore::DEFAULT_POOL_SIZE);
+                break;
+            case RK_AIQ_ALGO_TYPE_ACNR:
+                mAiqIspCnrV21ParamsPool     = new RkAiqIspCnrParamsPoolV21("RkAiqIspCnrV21Params", RkAiqCore::DEFAULT_POOL_SIZE);
+                break;
+            case RK_AIQ_ALGO_TYPE_ASHARP:
+                mAiqIspSharpenV21ParamsPool   = new RkAiqIspSharpenParamsPoolV21("RkAiqIspSharpenV21Params", RkAiqCore::DEFAULT_POOL_SIZE);
+                break;
+            case RK_AIQ_ALGO_TYPE_ADRC:
+                mAiqIspDrcV21ParamsPool     = new RkAiqIspDrcParamsPoolV21("RkAiqIspDrcV21Params", RkAiqCore::DEFAULT_POOL_SIZE);
+                break;
+            default:
+                break;
+            }
+        }
+    }
+}
+
+XCamReturn
+RkAiqCoreV21::getAiqParamsBuffer(RkAiqFullParams* aiqParams, enum rk_aiq_core_analyze_type_e type)
+{
+#define NEW_PARAMS_BUFFER(lc, BC) \
+    if (mAiqIsp##lc##ParamsPool->has_free_items()) { \
+        aiqParams->m##lc##Params = mAiqIsp##lc##ParamsPool->get_item(); \
+    } else { \
+        LOGE_ANALYZER("no free %s buffer!", #BC); \
+        return XCAM_RETURN_ERROR_MEM; \
+    } \
+
+#define NEW_PARAMS_BUFFER_V21(lc, BC) \
+    if (mAiqIsp##lc##V21ParamsPool->has_free_items()) { \
+        aiqParams->m##lc##V21Params = mAiqIsp##lc##V21ParamsPool->get_item(); \
+    } else { \
+        LOGE_ANALYZER("no free %s buffer!", #BC); \
+        return XCAM_RETURN_ERROR_MEM; \
+    } \
+
+    std::list<int>& algo_list =
+        mRkAiqCoreGroupManager->getGroupAlgoList(type);
+
+    for (auto algo_type : algo_list) {
+        SmartPtr<RkAiqHandle>* algoHdl = getCurAlgoTypeHandle(algo_type);
+        if (!(algoHdl && (*algoHdl)->getEnable()))
+                continue;
+
+        switch (algo_type) {
+        case RK_AIQ_ALGO_TYPE_AE:
+            if (mAiqExpParamsPool->has_free_items()) {
+                aiqParams->mExposureParams = mAiqExpParamsPool->get_item();
+            } else {
+                LOGE_ANALYZER("no free exposure params buffer!");
+                return XCAM_RETURN_ERROR_MEM;
+            }
+
+            if (mAiqIrisParamsPool->has_free_items()) {
+                aiqParams->mIrisParams = mAiqIrisParamsPool->get_item();
+            } else {
+                LOGE_ANALYZER("no free iris params buffer!");
+                return XCAM_RETURN_ERROR_MEM;
+            }
+
+            NEW_PARAMS_BUFFER(Aec, aec);
+            NEW_PARAMS_BUFFER(Hist, hist);
+            break;
+        case RK_AIQ_ALGO_TYPE_AWB:
+            NEW_PARAMS_BUFFER_V21(Awb, awb);
+            NEW_PARAMS_BUFFER(AwbGain, awb_gain);
+            break;
+        case RK_AIQ_ALGO_TYPE_AF:
+            if (mAiqFocusParamsPool->has_free_items()) {
+                aiqParams->mFocusParams = mAiqFocusParamsPool->get_item();
+            } else {
+                LOGE_ANALYZER("no free focus params buffer!");
+                return XCAM_RETURN_ERROR_MEM;
+            }
+            NEW_PARAMS_BUFFER(Af, af);
+            break;
+        case RK_AIQ_ALGO_TYPE_ABLC:
+            NEW_PARAMS_BUFFER_V21(Blc, blc);
+            break;
+        case RK_AIQ_ALGO_TYPE_ADPCC:
+            NEW_PARAMS_BUFFER(Dpcc, dpcc);
+            break;
+        case RK_AIQ_ALGO_TYPE_AMERGE:
+            NEW_PARAMS_BUFFER(Merge, merge);
+            break;
+        case RK_AIQ_ALGO_TYPE_ALSC:
+            NEW_PARAMS_BUFFER(Lsc, lsc);
+            break;
+        case RK_AIQ_ALGO_TYPE_AGIC:
+            NEW_PARAMS_BUFFER_V21(Gic, gic);
+            break;
+        case RK_AIQ_ALGO_TYPE_ADEBAYER:
+            NEW_PARAMS_BUFFER(Debayer, debayer);
+            break;
+        case RK_AIQ_ALGO_TYPE_ACCM:
+            NEW_PARAMS_BUFFER(Ccm, ccm);
+            break;
+        case RK_AIQ_ALGO_TYPE_AGAMMA:
+            NEW_PARAMS_BUFFER(Agamma, agamma);
+            break;
+        case RK_AIQ_ALGO_TYPE_ADEGAMMA:
+            NEW_PARAMS_BUFFER(Adegamma, adegamma);
+            break;
+        case RK_AIQ_ALGO_TYPE_AWDR:
+            NEW_PARAMS_BUFFER(Wdr, wdr);
+            break;
+        case RK_AIQ_ALGO_TYPE_ADHAZ:
+            NEW_PARAMS_BUFFER_V21(Dehaze, dehaze);
+            break;
+        case RK_AIQ_ALGO_TYPE_A3DLUT:
+            NEW_PARAMS_BUFFER(Lut3d, lut3d);
+            break;
+        case RK_AIQ_ALGO_TYPE_ALDCH:
+            NEW_PARAMS_BUFFER(Ldch, ldch);
+            break;
+        case RK_AIQ_ALGO_TYPE_AR2Y:
+            break;
+        case RK_AIQ_ALGO_TYPE_ACP:
+            NEW_PARAMS_BUFFER(Cp, cp);
+            break;
+        case RK_AIQ_ALGO_TYPE_AIE:
+            NEW_PARAMS_BUFFER(Ie, ie);
+            break;
+        case RK_AIQ_ALGO_TYPE_ACGC:
+            NEW_PARAMS_BUFFER(Cgc, cgc);
+            break;
+        case RK_AIQ_ALGO_TYPE_ASD:
+            break;
+        case RK_AIQ_ALGO_TYPE_ADRC:
+            NEW_PARAMS_BUFFER_V21(Drc, drc);
+            break;
+        case RK_AIQ_ALGO_TYPE_ARAWNR:
+            NEW_PARAMS_BUFFER_V21(Baynr, baynr);
+            break;
+        case RK_AIQ_ALGO_TYPE_AMFNR:
+            NEW_PARAMS_BUFFER(Tnr, tnr);
+            break;
+        case RK_AIQ_ALGO_TYPE_AYNR:
+            NEW_PARAMS_BUFFER_V21(Ynr, ynr);
+            break;
+        case RK_AIQ_ALGO_TYPE_ACNR:
+            NEW_PARAMS_BUFFER_V21(Cnr, cnr);
+            break;
+        case RK_AIQ_ALGO_TYPE_ASHARP:
+            NEW_PARAMS_BUFFER_V21(Sharpen, sharpen);
+            break;
+        default:
+            break;
+        }
+    }
+
+    return XCAM_RETURN_NO_ERROR;
+}
+
+XCamReturn
+RkAiqCoreV21::genIspParamsResult(RkAiqFullParams *aiqParams, enum rk_aiq_core_analyze_type_e type)
+{
+    SmartPtr<RkAiqFullParams> curParams = mAiqCurParams->data();
+    for (auto algoHdl : mCurIspAlgoHandleList) {
+        if (algoHdl.ptr() && algoHdl->getEnable() &&
+                (mAlgoTypeToGrpMaskMap[algoHdl->getAlgoType()] & grpId2GrpMask(type))) {
+            switch (algoHdl->getAlgoType()) {
+                case RK_AIQ_ALGO_TYPE_AE:
+                    genIspAeResult(aiqParams);
+                    curParams->mExposureParams = aiqParams->mExposureParams;
+                    curParams->mAecParams      = aiqParams->mAecParams;
+                    curParams->mHistParams     = aiqParams->mHistParams;
+                    break;
+                case RK_AIQ_ALGO_TYPE_AWB:
+                    genIspAwbResult(aiqParams);
+                    curParams->mAwbV21Params  = aiqParams->mAwbV21Params;
+                    curParams->mAwbGainParams = aiqParams->mAwbGainParams;
+                    break;
+                case RK_AIQ_ALGO_TYPE_AF:
+                    genIspAfResult(aiqParams);
+                    curParams->mAfParams    = aiqParams->mAfParams;
+                    curParams->mFocusParams = aiqParams->mFocusParams;
+                    break;
+                case RK_AIQ_ALGO_TYPE_ABLC:
+                    genIspAblcResult(aiqParams);
+                    curParams->mBlcV21Params = aiqParams->mBlcV21Params;
+                    break;
+                case RK_AIQ_ALGO_TYPE_ADPCC:
+                    genIspAdpccResult(aiqParams);
+                    curParams->mDpccParams = aiqParams->mDpccParams;
+                    break;
+                case RK_AIQ_ALGO_TYPE_AMERGE:
+                    genIspAmergeResult(aiqParams);
+                    curParams->mMergeParams = aiqParams->mMergeParams;
+                    break;
+                case RK_AIQ_ALGO_TYPE_ALSC:
+                    genIspAlscResult(aiqParams);
+                    curParams->mLscParams = aiqParams->mLscParams;
+                    break;
+                case RK_AIQ_ALGO_TYPE_AGIC:
+                    genIspAgicResult(aiqParams);
+                    curParams->mGicV21Params = aiqParams->mGicV21Params;
+                    break;
+                case RK_AIQ_ALGO_TYPE_ADEBAYER:
+                    genIspAdebayerResult(aiqParams);
+                    curParams->mDebayerParams = aiqParams->mDebayerParams;
+                    break;
+                case RK_AIQ_ALGO_TYPE_ACCM:
+                    genIspAccmResult(aiqParams);
+                    curParams->mCcmParams = aiqParams->mCcmParams;
+                    break;
+                case RK_AIQ_ALGO_TYPE_AGAMMA:
+                    genIspAgammaResult(aiqParams);
+                    curParams->mAgammaParams = aiqParams->mAgammaParams;
+                    break;
+                case RK_AIQ_ALGO_TYPE_ADEGAMMA:
+                    genIspAdegammaResult(aiqParams);
+                    curParams->mAdegammaParams = aiqParams->mAdegammaParams;
+                    break;
+                case RK_AIQ_ALGO_TYPE_AWDR:
+                    genIspAwdrResult(aiqParams);
+                    curParams->mWdrParams = aiqParams->mWdrParams;
+                    break;
+                case RK_AIQ_ALGO_TYPE_ADHAZ:
+                    genIspAdhazResult(aiqParams);
+                    curParams->mDehazeV21Params = aiqParams->mDehazeV21Params;
+                    break;
+                case RK_AIQ_ALGO_TYPE_A3DLUT:
+                    genIspA3dlutResult(aiqParams);
+                    curParams->mLut3dParams = aiqParams->mLut3dParams;
+                    break;
+                case RK_AIQ_ALGO_TYPE_ALDCH:
+                    genIspAldchResult(aiqParams);
+                    curParams->mLdchParams = aiqParams->mLdchParams;
+                    break;
+                case RK_AIQ_ALGO_TYPE_AR2Y:
+                    genIspAr2yResult(aiqParams);
+                    break;
+                case RK_AIQ_ALGO_TYPE_ACP:
+                    genIspAcpResult(aiqParams);
+                    curParams->mCpParams = aiqParams->mCpParams;
+                    break;
+                case RK_AIQ_ALGO_TYPE_AIE:
+                    genIspAieResult(aiqParams);
+                    curParams->mIeParams = aiqParams->mIeParams;
+                    break;
+                case RK_AIQ_ALGO_TYPE_ACGC:
+                    genIspAcgcResult(aiqParams);
+                    curParams->mCgcParams = aiqParams->mCgcParams;
+                    break;
+                case RK_AIQ_ALGO_TYPE_ASD:
+                    break;
+                case RK_AIQ_ALGO_TYPE_ADRC:
+                    genIspAdrcResult(aiqParams);
+                    curParams->mDrcV21Params = aiqParams->mDrcV21Params;
+                    break;
+                case RK_AIQ_ALGO_TYPE_ARAWNR:
+                    genIspArawnrResult(aiqParams);
+                    curParams->mBaynrV21Params = aiqParams->mBaynrV21Params;
+                    break;
+                case RK_AIQ_ALGO_TYPE_ACNR:
+                    genIspAcnrResult(aiqParams);
+                    curParams->mCnrV21Params = aiqParams->mCnrV21Params;
+                    break;
+                case RK_AIQ_ALGO_TYPE_AYNR:
+                    genIspAynrResult(aiqParams);
+                    curParams->mYnrV21Params = aiqParams->mYnrV21Params;
+                    break;
+                case RK_AIQ_ALGO_TYPE_ASHARP:
+                    genIspAsharpResult(aiqParams);
+                    curParams->mSharpenV21Params = aiqParams->mSharpenV21Params;
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
+
+    return XCAM_RETURN_NO_ERROR;
+}
 SmartPtr<RkAiqHandle>
 RkAiqCoreV21::newAlgoHandle(RkAiqAlgoDesComm* algo, bool generic, int version)
 {
@@ -157,303 +548,32 @@ RkAiqCoreV21::newAlgoHandle(RkAiqAlgoDesComm* algo, bool generic, int version)
     typedef RkAiqAynrHandle RkAiqAynrV2Handle;
     typedef RkAiqAcnrHandle RkAiqAcnrV1Handle;
     typedef RkAiqArawnrHandle RkAiqArawnrV2Handle;
+    typedef RkAiqAwbHandle RkAiqAwbV21Handle;
 
     NEW_ALGO_HANDLE_WITH_V(Adrc, ADRC, 1);
     NEW_ALGO_HANDLE_WITH_V(Asharp, ASHARP, 3);
     NEW_ALGO_HANDLE_WITH_V(Aynr, AYNR, 2);
     NEW_ALGO_HANDLE_WITH_V(Acnr, ACNR, 1);
     NEW_ALGO_HANDLE_WITH_V(Arawnr, ARAWNR, 2);
-
+    NEW_ALGO_HANDLE_WITH_V(Awb, AWB, 21);
     return NULL;
 }
 
 void
-RkAiqCoreV21::copyIspStats(RkAiqIspStats* from, rk_aiq_isp_stats_t* to)
+RkAiqCoreV21::copyIspStats(SmartPtr<RkAiqAecStatsProxy>& aecStat,
+                        SmartPtr<RkAiqAwbStatsProxy>& awbStat,
+                        SmartPtr<RkAiqAfStatsProxy>& afStat,
+                        rk_aiq_isp_stats_t* to)
 {
-    to->aec_stats = from->aec_stats;
+    if (aecStat.ptr()) {
+        to->aec_stats = aecStat->data()->aec_stats;
+        to->frame_id = aecStat->data()->frame_id;
+    }
     to->awb_hw_ver = 1;
-    to->awb_stats_v21 = from->awb_stats_v201;
-    to->af_stats = from->af_stats;
-    to->frame_id = from->frame_id;
-}
-
-XCamReturn
-RkAiqCoreV21::convertIspstatsToAlgo(const SmartPtr<VideoBuffer> &buffer)
-{
-    XCamReturn ret = XCAM_RETURN_NO_ERROR;
-#ifndef RK_SIMULATOR_HW
-    const SmartPtr<Isp20StatsBuffer> buf =
-        buffer.dynamic_cast_ptr<Isp20StatsBuffer>();
-    struct rkisp_isp21_stat_buffer *stats;
-
-    SmartPtr<RkAiqExpParamsProxy> expParams = buf->get_exp_params();
-    if (!buf->get_isp_params().ptr()) {
-        LOGW("no effect isp params..");
-        return ret;
-    }
-    rk_aiq_isp_params_v21_t* ispParams =
-        static_cast<rk_aiq_isp_params_v21_t*>(buf->get_isp_params()->data().ptr());
-    SmartPtr<RkAiqAfInfoProxy> afParams = buf->get_af_params();
-    SmartPtr<RkAiqIrisParamsProxy> irisParams = buf->get_iris_params();
-
-    stats = (struct rkisp_isp21_stat_buffer*)(buf->get_v4l2_userptr());
-    if(stats == NULL) {
-        LOGE("fail to get stats ,ignore\n");
-        return XCAM_RETURN_BYPASS;
-    }
-    LOGI_ANALYZER("stats: frame_id: %d,  meas_type; 0x%x",
-                  stats->frame_id, stats->meas_type);
-
-    mAlogsSharedParams.frameId = stats->frame_id;
-
-    if(ispParams == NULL) {
-        LOGE("fail to get ispParams ,ignore\n");
-        return XCAM_RETURN_BYPASS;
-    }
-
-    // TODO: do awb/ae/af/hdr stats convert
-
-    //awb2.1
-
-    mAlogsSharedParams.ispStats.awb_cfg_effect_v201 = ispParams->awb_cfg;
-    mAlogsSharedParams.ispStats.awb_cfg_effect_valid = true;
-
-    for(int i = 0; i < mAlogsSharedParams.ispStats.awb_cfg_effect_v201.lightNum; i++) {
-        mAlogsSharedParams.ispStats.awb_stats_v201.light[i].xYType[RK_AIQ_AWB_XY_TYPE_NORMAL_V201].RgainValue =
-            stats->params.rawawb.ro_rawawb_sum_rgain_nor[i];
-        mAlogsSharedParams.ispStats.awb_stats_v201.light[i].xYType[RK_AIQ_AWB_XY_TYPE_NORMAL_V201].BgainValue =
-            stats->params.rawawb.ro_rawawb_sum_bgain_nor[i];
-        mAlogsSharedParams.ispStats.awb_stats_v201.light[i].xYType[RK_AIQ_AWB_XY_TYPE_NORMAL_V201].WpNo =
-            stats->params.rawawb.ro_rawawb_wp_num_nor[i];
-        mAlogsSharedParams.ispStats.awb_stats_v201.light[i].xYType[RK_AIQ_AWB_XY_TYPE_BIG_V201].RgainValue =
-            stats->params.rawawb.ro_rawawb_sum_rgain_big[i];
-        mAlogsSharedParams.ispStats.awb_stats_v201.light[i].xYType[RK_AIQ_AWB_XY_TYPE_BIG_V201].BgainValue =
-            stats->params.rawawb.ro_rawawb_sum_bgain_big[i];
-        mAlogsSharedParams.ispStats.awb_stats_v201.light[i].xYType[RK_AIQ_AWB_XY_TYPE_BIG_V201].WpNo =
-            stats->params.rawawb.ro_rawawb_wp_num_big[i];
-
-    }
-
-    for(int i = 0; i < RK_AIQ_AWB_GRID_NUM_TOTAL; i++) {
-        mAlogsSharedParams.ispStats.awb_stats_v201.blockResult[i].Rvalue = stats->params.rawawb.ramdata[i].r;
-        mAlogsSharedParams.ispStats.awb_stats_v201.blockResult[i].Gvalue = stats->params.rawawb.ramdata[i].g;
-        mAlogsSharedParams.ispStats.awb_stats_v201.blockResult[i].Bvalue = stats->params.rawawb.ramdata[i].b;
-        mAlogsSharedParams.ispStats.awb_stats_v201.blockResult[i].WpNo = stats->params.rawawb.ramdata[i].wp;
-    }
-
-    for(int i = 0; i < RK_AIQ_AWB_WP_HIST_BIN_NUM; i++) {
-        mAlogsSharedParams.ispStats.awb_stats_v201.WpNoHist[i] = stats->params.rawawb.ro_yhist_bin[i];
-
-    }
-    //mAlogsSharedParams.ispStats.awb_stats_valid = ISP2X_STAT_RAWAWB(stats->meas_type)? true:false;
-    mAlogsSharedParams.ispStats.awb_stats_valid = stats->meas_type >> 5 & 1;
-
-    //dehaze
-    mAlogsSharedParams.ispStats.adehaze_stats_valid = stats->meas_type >> 17 & 1;
-    mAlogsSharedParams.ispStats.adehaze_stats.dehaze_stats_v21.dhaz_adp_air_base = stats->params.dhaz.dhaz_adp_air_base;
-    mAlogsSharedParams.ispStats.adehaze_stats.dehaze_stats_v21.dhaz_adp_wt = stats->params.dhaz.dhaz_adp_wt;
-    mAlogsSharedParams.ispStats.adehaze_stats.dehaze_stats_v21.dhaz_adp_gratio = stats->params.dhaz.dhaz_adp_gratio;
-    mAlogsSharedParams.ispStats.adehaze_stats.dehaze_stats_v21.dhaz_adp_wt = stats->params.dhaz.dhaz_adp_wt;
-    for(int i = 0; i < 64; i++)
-        mAlogsSharedParams.ispStats.adehaze_stats.dehaze_stats_v21.h_rgb_iir[i] = stats->params.dhaz.h_rgb_iir[i];
-
-
-    //ae stats v2.1
-
-    mAlogsSharedParams.ispStats.aec_stats_valid = (stats->meas_type >> 11) & (0x01) ? true : false;
-
-    /*rawae stats*/
-    uint8_t AeSwapMode, AeSelMode;
-    AeSwapMode = ispParams->aec_meas.rawae0.rawae_sel;
-    AeSelMode = ispParams->aec_meas.rawae3.rawae_sel;
-
-    switch(AeSwapMode) {
-    case AEC_RAWSWAP_MODE_S_LITE:
-        for(int i = 0; i < ISP2X_RAWAEBIG_MEAN_NUM; i++) {
-            if(i < ISP2X_RAWAELITE_MEAN_NUM) {
-                mAlogsSharedParams.ispStats.aec_stats.ae_data.chn[0].rawae_lite.channelr_xy[i] = stats->params.rawae0.data[i].channelr_xy;
-                mAlogsSharedParams.ispStats.aec_stats.ae_data.chn[0].rawae_lite.channelg_xy[i] = stats->params.rawae0.data[i].channelg_xy;
-                mAlogsSharedParams.ispStats.aec_stats.ae_data.chn[0].rawae_lite.channelb_xy[i] = stats->params.rawae0.data[i].channelb_xy;
-            }
-            mAlogsSharedParams.ispStats.aec_stats.ae_data.chn[1].rawae_big.channelr_xy[i] = stats->params.rawae1.data[i].channelr_xy;
-            mAlogsSharedParams.ispStats.aec_stats.ae_data.chn[1].rawae_big.channelg_xy[i] = stats->params.rawae1.data[i].channelg_xy;
-            mAlogsSharedParams.ispStats.aec_stats.ae_data.chn[1].rawae_big.channelb_xy[i] = stats->params.rawae1.data[i].channelb_xy;
-
-            if(i < ISP2X_RAWAEBIG_SUBWIN_NUM) {
-                mAlogsSharedParams.ispStats.aec_stats.ae_data.chn[1].rawae_big.wndx_sumr[i] = stats->params.rawae1.sumr[i];
-                mAlogsSharedParams.ispStats.aec_stats.ae_data.chn[1].rawae_big.wndx_sumg[i] = stats->params.rawae1.sumg[i];
-                mAlogsSharedParams.ispStats.aec_stats.ae_data.chn[1].rawae_big.wndx_sumb[i] = stats->params.rawae1.sumb[i];
-            }
-        }
-        memcpy(mAlogsSharedParams.ispStats.aec_stats.ae_data.chn[0].rawhist_lite.bins, stats->params.rawhist0.hist_bin, ISP2X_HIST_BIN_N_MAX * sizeof(u32));
-        memcpy(mAlogsSharedParams.ispStats.aec_stats.ae_data.chn[1].rawhist_big.bins, stats->params.rawhist1.hist_bin, ISP2X_HIST_BIN_N_MAX * sizeof(u32));
-        break;
-
-    case AEC_RAWSWAP_MODE_M_LITE:
-        for(int i = 0; i < ISP2X_RAWAEBIG_MEAN_NUM; i++) {
-            if(i < ISP2X_RAWAELITE_MEAN_NUM) {
-                mAlogsSharedParams.ispStats.aec_stats.ae_data.chn[1].rawae_lite.channelr_xy[i] = stats->params.rawae0.data[i].channelr_xy;
-                mAlogsSharedParams.ispStats.aec_stats.ae_data.chn[1].rawae_lite.channelg_xy[i] = stats->params.rawae0.data[i].channelg_xy;
-                mAlogsSharedParams.ispStats.aec_stats.ae_data.chn[1].rawae_lite.channelb_xy[i] = stats->params.rawae0.data[i].channelb_xy;
-            }
-            mAlogsSharedParams.ispStats.aec_stats.ae_data.chn[0].rawae_big.channelr_xy[i] = stats->params.rawae1.data[i].channelr_xy;
-            mAlogsSharedParams.ispStats.aec_stats.ae_data.chn[0].rawae_big.channelg_xy[i] = stats->params.rawae1.data[i].channelg_xy;
-            mAlogsSharedParams.ispStats.aec_stats.ae_data.chn[0].rawae_big.channelb_xy[i] = stats->params.rawae1.data[i].channelb_xy;
-
-            if(i < ISP2X_RAWAEBIG_SUBWIN_NUM) {
-                mAlogsSharedParams.ispStats.aec_stats.ae_data.chn[0].rawae_big.wndx_sumr[i] = stats->params.rawae1.sumr[i];
-                mAlogsSharedParams.ispStats.aec_stats.ae_data.chn[0].rawae_big.wndx_sumg[i] = stats->params.rawae1.sumg[i];
-                mAlogsSharedParams.ispStats.aec_stats.ae_data.chn[0].rawae_big.wndx_sumb[i] = stats->params.rawae1.sumb[i];
-            }
-        }
-        memcpy(mAlogsSharedParams.ispStats.aec_stats.ae_data.chn[0].rawhist_big.bins, stats->params.rawhist1.hist_bin, ISP2X_HIST_BIN_N_MAX * sizeof(u32));
-        memcpy(mAlogsSharedParams.ispStats.aec_stats.ae_data.chn[1].rawhist_lite.bins, stats->params.rawhist0.hist_bin, ISP2X_HIST_BIN_N_MAX * sizeof(u32));
-        break;
-
-    default:
-        LOGE("wrong AeSwapMode=%d\n", AeSwapMode);
-        return XCAM_RETURN_ERROR_PARAM;
-        break;
-    }
-
-    switch(AeSelMode) {
-    case AEC_RAWSEL_MODE_CHN_0:
-        for(int i = 0; i < ISP2X_RAWAEBIG_MEAN_NUM; i++) {
-
-            mAlogsSharedParams.ispStats.aec_stats.ae_data.chn[0].rawae_big.channelr_xy[i] = stats->params.rawae3.data[i].channelr_xy;
-            mAlogsSharedParams.ispStats.aec_stats.ae_data.chn[0].rawae_big.channelg_xy[i] = stats->params.rawae3.data[i].channelg_xy;
-            mAlogsSharedParams.ispStats.aec_stats.ae_data.chn[0].rawae_big.channelb_xy[i] = stats->params.rawae3.data[i].channelb_xy;
-
-            if(i < ISP2X_RAWAEBIG_SUBWIN_NUM) {
-                mAlogsSharedParams.ispStats.aec_stats.ae_data.chn[0].rawae_big.wndx_sumr[i] = stats->params.rawae3.sumr[i];
-                mAlogsSharedParams.ispStats.aec_stats.ae_data.chn[0].rawae_big.wndx_sumg[i] = stats->params.rawae3.sumg[i];
-                mAlogsSharedParams.ispStats.aec_stats.ae_data.chn[0].rawae_big.wndx_sumb[i] = stats->params.rawae3.sumb[i];
-            }
-        }
-        memcpy(mAlogsSharedParams.ispStats.aec_stats.ae_data.chn[0].rawhist_big.bins, stats->params.rawhist3.hist_bin, ISP2X_HIST_BIN_N_MAX * sizeof(u32));
-        break;
-
-    case AEC_RAWSEL_MODE_CHN_1:
-        for(int i = 0; i < ISP2X_RAWAEBIG_MEAN_NUM; i++) {
-
-            mAlogsSharedParams.ispStats.aec_stats.ae_data.chn[1].rawae_big.channelr_xy[i] = stats->params.rawae3.data[i].channelr_xy;
-            mAlogsSharedParams.ispStats.aec_stats.ae_data.chn[1].rawae_big.channelg_xy[i] = stats->params.rawae3.data[i].channelg_xy;
-            mAlogsSharedParams.ispStats.aec_stats.ae_data.chn[1].rawae_big.channelb_xy[i] = stats->params.rawae3.data[i].channelb_xy;
-
-            if(i < ISP2X_RAWAEBIG_SUBWIN_NUM) {
-                mAlogsSharedParams.ispStats.aec_stats.ae_data.chn[1].rawae_big.wndx_sumr[i] = stats->params.rawae3.sumr[i];
-                mAlogsSharedParams.ispStats.aec_stats.ae_data.chn[1].rawae_big.wndx_sumg[i] = stats->params.rawae3.sumg[i];
-                mAlogsSharedParams.ispStats.aec_stats.ae_data.chn[1].rawae_big.wndx_sumb[i] = stats->params.rawae3.sumb[i];
-            }
-        }
-        memcpy(mAlogsSharedParams.ispStats.aec_stats.ae_data.chn[1].rawhist_big.bins, stats->params.rawhist3.hist_bin, ISP2X_HIST_BIN_N_MAX * sizeof(u32));
-        break;
-
-    case AEC_RAWSEL_MODE_TMO:
-        for(int i = 0; i < ISP2X_RAWAEBIG_MEAN_NUM; i++) {
-
-            mAlogsSharedParams.ispStats.aec_stats.ae_data.extra.rawae_big.channelr_xy[i] = stats->params.rawae3.data[i].channelr_xy;
-            mAlogsSharedParams.ispStats.aec_stats.ae_data.extra.rawae_big.channelg_xy[i] = stats->params.rawae3.data[i].channelg_xy;
-            mAlogsSharedParams.ispStats.aec_stats.ae_data.extra.rawae_big.channelb_xy[i] = stats->params.rawae3.data[i].channelb_xy;
-
-            if(i < ISP2X_RAWAEBIG_SUBWIN_NUM) {
-                mAlogsSharedParams.ispStats.aec_stats.ae_data.extra.rawae_big.wndx_sumr[i] = stats->params.rawae3.sumr[i];
-                mAlogsSharedParams.ispStats.aec_stats.ae_data.extra.rawae_big.wndx_sumg[i] = stats->params.rawae3.sumg[i];
-                mAlogsSharedParams.ispStats.aec_stats.ae_data.extra.rawae_big.wndx_sumb[i] = stats->params.rawae3.sumb[i];
-            }
-        }
-        memcpy(mAlogsSharedParams.ispStats.aec_stats.ae_data.extra.rawhist_big.bins, stats->params.rawhist3.hist_bin, ISP2X_HIST_BIN_N_MAX * sizeof(u32));
-        break;
-
-    default:
-        LOGE("wrong AeSelMode=%d\n", AeSelMode);
-        return XCAM_RETURN_ERROR_PARAM;
-    }
-
-    /*yuvae stats*/
-    for(int i = 0; i < ISP2X_YUVAE_MEAN_NUM; i++) {
-        mAlogsSharedParams.ispStats.aec_stats.ae_data.yuvae.mean[i] = stats->params.yuvae.mean[i];
-        if(i < ISP2X_YUVAE_SUBWIN_NUM)
-            mAlogsSharedParams.ispStats.aec_stats.ae_data.yuvae.ro_yuvae_sumy[i] = stats->params.yuvae.ro_yuvae_sumy[i];
-    }
-
-    /*
-     *         unsigned long chn0_mean = 0, chn1_mean = 0;
-     *         for(int i = 0; i < ISP2X_RAWAEBIG_MEAN_NUM; i++) {
-     *             chn0_mean += stats->params.rawae1.data[i].channelg_xy;
-     *             chn1_mean += stats->params.rawae3.data[i].channelg_xy;
-     *         }
-     *
-     *
-     *         printf("frame[%d]: chn[0-1]_g_mean_xy: %ld-%ld\n",
-     *                 stats->frame_id, chn0_mean/ISP2X_RAWAEBIG_MEAN_NUM,
-     *                 chn1_mean/ISP2X_RAWAEBIG_MEAN_NUM);
-     */
-
-    //expsoure params
-    if (expParams.ptr()) {
-
-        mAlogsSharedParams.ispStats.aec_stats.ae_exp = expParams->data()->aecExpInfo;
-        /*
-         * printf("%s: L: [0x%x-0x%x], M: [0x%x-0x%x], S: [0x%x-0x%x]\n",
-         *        __func__,
-         *        expParams->data()->aecExpInfo.HdrExp[2].exp_sensor_params.coarse_integration_time,
-         *        expParams->data()->aecExpInfo.HdrExp[2].exp_sensor_params.analog_gain_code_global,
-         *        expParams->data()->aecExpInfo.HdrExp[1].exp_sensor_params.coarse_integration_time,
-         *        expParams->data()->aecExpInfo.HdrExp[1].exp_sensor_params.analog_gain_code_global,
-         *        expParams->data()->aecExpInfo.HdrExp[0].exp_sensor_params.coarse_integration_time,
-         *        expParams->data()->aecExpInfo.HdrExp[0].exp_sensor_params.analog_gain_code_global);
-         */
-    }
-
-    //iris params
-    if (irisParams.ptr()) {
-
-        float sof_time = (float)irisParams->data()->sofTime / 1000000000.0f;
-        float start_time = (float)irisParams->data()->PIris.StartTim.tv_sec + (float)irisParams->data()->PIris.StartTim.tv_usec / 1000000.0f;
-        float end_time = (float)irisParams->data()->PIris.EndTim.tv_sec + (float)irisParams->data()->PIris.EndTim.tv_usec / 1000000.0f;
-        float frm_intval = 1 / (mAlogsSharedParams.ispStats.aec_stats.ae_exp.pixel_clock_freq_mhz * 1000000.0f /
-                                (float)mAlogsSharedParams.ispStats.aec_stats.ae_exp.line_length_pixels / (float)mAlogsSharedParams.ispStats.aec_stats.ae_exp.frame_length_lines);
-
-        /*printf("%s: step=%d,last-step=%d,start-tim=%f,end-tim=%f,sof_tim=%f\n",
-            __func__,
-            mAlogsSharedParams.ispStats.aec_stats.ae_exp.Iris.PIris.step,
-            irisParams->data()->PIris.laststep,start_time,end_time,sof_time);
-        */
-
-        if(sof_time < end_time + frm_intval)
-            mAlogsSharedParams.ispStats.aec_stats.ae_exp.Iris.PIris.step = irisParams->data()->PIris.laststep;
-        else
-            mAlogsSharedParams.ispStats.aec_stats.ae_exp.Iris.PIris.step = irisParams->data()->PIris.step;
-    }
-
-    //af
-    {
-        mAlogsSharedParams.ispStats.af_stats_valid =
-            (stats->meas_type >> 6) & (0x01) ? true : false;
-        mAlogsSharedParams.ispStats.af_stats.roia_luminance =
-            stats->params.rawaf.afm_lum[0];
-        mAlogsSharedParams.ispStats.af_stats.roib_sharpness =
-            stats->params.rawaf.afm_sum[1];
-        mAlogsSharedParams.ispStats.af_stats.roib_luminance =
-            stats->params.rawaf.afm_lum[1];
-        memcpy(mAlogsSharedParams.ispStats.af_stats.global_sharpness,
-               stats->params.rawaf.ramdata, ISP2X_RAWAF_SUMDATA_NUM * sizeof(u32));
-
-        mAlogsSharedParams.ispStats.af_stats.roia_sharpness = 0LL;
-        for (int i = 0; i < ISP2X_RAWAF_SUMDATA_NUM; i++)
-            mAlogsSharedParams.ispStats.af_stats.roia_sharpness += stats->params.rawaf.ramdata[i];
-
-        if(afParams.ptr()) {
-            mAlogsSharedParams.ispStats.af_stats.focus_endtim = afParams->data()->focusEndTim;
-            mAlogsSharedParams.ispStats.af_stats.focus_starttim = afParams->data()->focusStartTim;
-            mAlogsSharedParams.ispStats.af_stats.zoom_endtim = afParams->data()->zoomEndTim;
-            mAlogsSharedParams.ispStats.af_stats.zoom_starttim = afParams->data()->zoomStartTim;
-            mAlogsSharedParams.ispStats.af_stats.sof_tim = afParams->data()->sofTime;
-        }
-    }
-#endif
-    return ret;
+    if (awbStat.ptr())
+        to->awb_stats_v21 = awbStat->data()->awb_stats_v201;
+    if (afStat.ptr())
+        to->af_stats = afStat->data()->af_stats;
 }
 
 XCamReturn
@@ -462,10 +582,11 @@ RkAiqCoreV21::genIspArawnrResult(RkAiqFullParams* params)
     ENTER_ANALYZER_FUNCTION();
 
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    SmartPtr<RkAiqHandle>* handle = getCurAlgoTypeHandle(RK_AIQ_ALGO_TYPE_ARAWNR);
+    RkAiqCore::RkAiqAlgosGroupShared_t* shared =
+        (RkAiqCore::RkAiqAlgosGroupShared_t*)((*handle)->getGroupShared());
     RkAiqAlgoProcResArawnr* arawnr_com =
-        mAlogsSharedParams.procResComb.arawnr_proc_res;
-    rk_aiq_isp_params_v21_t* isp_param =
-        static_cast<rk_aiq_isp_params_v21_t*>(params->mIspParams->data().ptr());
+        shared->procResComb.arawnr_proc_res;
 
     if (!arawnr_com) {
         LOGD_ANALYZER("no arawnr result");
@@ -474,39 +595,25 @@ RkAiqCoreV21::genIspArawnrResult(RkAiqFullParams* params)
 
     // TODO: gen asharp common result
 
-    SmartPtr<RkAiqHandle>* handle = getCurAlgoTypeHandle(RK_AIQ_ALGO_TYPE_ACNR);
     int algo_id = (*handle)->getAlgoId();
 
     // gen rk asharp result
     if (algo_id == 0) {
         RkAiqAlgoProcResArawnrV2Int* arawnr_rk = (RkAiqAlgoProcResArawnrV2Int*)arawnr_com;
 
-#ifdef RK_SIMULATOR_HW
         LOGD_ANR("oyyf: %s:%d output isp param start\n", __FUNCTION__, __LINE__);
-        //TODO
-#if 0
-        memcpy(&isp_param->sharp,
-               &asharp_rk->stAsharpProcResult.stSelect,
-               sizeof(RK_SHARP_Params_V3_Select_t));
-#endif
 
-        LOGD_ANR("oyyf: %s:%d output isp param end \n", __FUNCTION__, __LINE__);
-#else
-        LOGD_ANR("oyyf: %s:%d output isp param start\n", __FUNCTION__, __LINE__);
-        memcpy(&isp_param->rawnr.st2DParam,
+        rk_aiq_isp_baynr_params_v21_t* rawnr_param = params->mBaynrV21Params->data().ptr();
+        setResultExpectedEffId(rawnr_param->frame_id, RK_AIQ_ALGO_TYPE_ARAWNR);
+        memcpy(&rawnr_param->result.st2DParam,
                &arawnr_rk->stArawnrProcResult.st2DFix,
                sizeof(RK_Bayernr_2D_Fix_V2_t));
 
-        memcpy(&isp_param->rawnr.st3DParam,
+        memcpy(&rawnr_param->result.st3DParam,
                &arawnr_rk->stArawnrProcResult.st3DFix,
                sizeof(RK_Bayernr_3D_Fix_V2_t));
         LOGD_ANR("oyyf: %s:%d output isp param end \n", __FUNCTION__, __LINE__);
-
-#endif
-
     }
-
-
 
     EXIT_ANALYZER_FUNCTION();
 
@@ -531,10 +638,11 @@ RkAiqCoreV21::genIspAynrResult(RkAiqFullParams* params)
     ENTER_ANALYZER_FUNCTION();
 
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    SmartPtr<RkAiqHandle>* handle = getCurAlgoTypeHandle(RK_AIQ_ALGO_TYPE_AYNR);
+    RkAiqCore::RkAiqAlgosGroupShared_t* shared =
+        (RkAiqCore::RkAiqAlgosGroupShared_t*)((*handle)->getGroupShared());
     RkAiqAlgoProcResAynr* aynr_com =
-        mAlogsSharedParams.procResComb.aynr_proc_res;
-    rk_aiq_isp_params_v21_t* isp_param =
-        static_cast<rk_aiq_isp_params_v21_t*>(params->mIspParams->data().ptr());
+        shared->procResComb.aynr_proc_res;
 
     if (!aynr_com) {
         LOGD_ANALYZER("no aynr result");
@@ -543,31 +651,20 @@ RkAiqCoreV21::genIspAynrResult(RkAiqFullParams* params)
 
     // TODO: gen asharp common result
 
-    SmartPtr<RkAiqHandle>* handle = getCurAlgoTypeHandle(RK_AIQ_ALGO_TYPE_AYNR);
     int algo_id = (*handle)->getAlgoId();
 
     // gen rk asharp result
     if (algo_id == 0) {
         RkAiqAlgoProcResAynrV2Int* aynr_rk = (RkAiqAlgoProcResAynrV2Int*)aynr_com;
 
-#ifdef RK_SIMULATOR_HW
         LOGD_ANR("oyyf: %s:%d output isp param start\n", __FUNCTION__, __LINE__);
-        //TODO
-#if 0
-        memcpy(&isp_param->sharp,
-               &asharp_rk->stAsharpProcResult.stSelect,
-               sizeof(RK_SHARP_Params_V3_Select_t));
-#endif
 
-        LOGD_ANR("oyyf: %s:%d output isp param end \n", __FUNCTION__, __LINE__);
-#else
-        LOGD_ANR("oyyf: %s:%d output isp param start\n", __FUNCTION__, __LINE__);
-        memcpy(&isp_param->ynr,
+        rk_aiq_isp_ynr_params_v21_t* ynr_param = params->mYnrV21Params->data().ptr();
+        setResultExpectedEffId(ynr_param->frame_id, RK_AIQ_ALGO_TYPE_AYNR);
+        memcpy(&ynr_param->result,
                &aynr_rk->stAynrProcResult.stFix,
                sizeof(RK_YNR_Fix_V2_t));
         LOGD_ANR("oyyf: %s:%d output isp param end \n", __FUNCTION__, __LINE__);
-
-#endif
     }
 
     EXIT_ANALYZER_FUNCTION();
@@ -581,10 +678,11 @@ RkAiqCoreV21::genIspAcnrResult(RkAiqFullParams* params)
     ENTER_ANALYZER_FUNCTION();
 
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    SmartPtr<RkAiqHandle>* handle = getCurAlgoTypeHandle(RK_AIQ_ALGO_TYPE_ACNR);
+    RkAiqCore::RkAiqAlgosGroupShared_t* shared =
+        (RkAiqCore::RkAiqAlgosGroupShared_t*)((*handle)->getGroupShared());
     RkAiqAlgoProcResAcnr* acnr_com =
-        mAlogsSharedParams.procResComb.acnr_proc_res;
-    rk_aiq_isp_params_v21_t* isp_param =
-        static_cast<rk_aiq_isp_params_v21_t*>(params->mIspParams->data().ptr());
+        shared->procResComb.acnr_proc_res;
 
     if (!acnr_com) {
         LOGD_ANALYZER("no aynr result");
@@ -593,33 +691,20 @@ RkAiqCoreV21::genIspAcnrResult(RkAiqFullParams* params)
 
     // TODO: gen asharp common result
 
-    SmartPtr<RkAiqHandle>* handle = getCurAlgoTypeHandle(RK_AIQ_ALGO_TYPE_ACNR);
     int algo_id = (*handle)->getAlgoId();
 
     // gen rk asharp result
     if (algo_id == 0) {
         RkAiqAlgoProcResAcnrV1Int* acnr_rk = (RkAiqAlgoProcResAcnrV1Int*)acnr_com;
 
-#ifdef RK_SIMULATOR_HW
         LOGD_ANR("oyyf: %s:%d output isp param start\n", __FUNCTION__, __LINE__);
-        //TODO
-#if 0
-        memcpy(&isp_param->sharp,
-               &asharp_rk->stAsharpProcResult.stSelect,
-               sizeof(RK_SHARP_Params_V3_Select_t));
-#endif
-
-        LOGD_ANR("oyyf: %s:%d output isp param end \n", __FUNCTION__, __LINE__);
-#else
-        LOGD_ANR("oyyf: %s:%d output isp param start\n", __FUNCTION__, __LINE__);
-        memcpy(&isp_param->uvnr,
+        rk_aiq_isp_cnr_params_v21_t* cnr_param = params->mCnrV21Params->data().ptr();
+        setResultExpectedEffId(cnr_param->frame_id, RK_AIQ_ALGO_TYPE_ACNR);
+        memcpy(&cnr_param->result,
                &acnr_rk->stAcnrProcResult.stFix,
                sizeof(RK_CNR_Fix_V1_t));
         LOGD_ANR("oyyf: %s:%d output isp param end \n", __FUNCTION__, __LINE__);
-
-#endif
     }
-
 
     EXIT_ANALYZER_FUNCTION();
 
@@ -633,10 +718,11 @@ RkAiqCoreV21::genIspAdrcResult(RkAiqFullParams* params)
 
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
 
+    SmartPtr<RkAiqHandle>* handle = getCurAlgoTypeHandle(RK_AIQ_ALGO_TYPE_ADRC);
+    RkAiqCore::RkAiqAlgosGroupShared_t* shared =
+        (RkAiqCore::RkAiqAlgosGroupShared_t*)((*handle)->getGroupShared());
     RkAiqAlgoProcResAdrc* adrc_com =
-        mAlogsSharedParams.procResComb.adrc_proc_res;
-    rk_aiq_isp_params_v21_t* isp_param =
-        static_cast<rk_aiq_isp_params_v21_t*>(params->mIspParams->data().ptr());
+        shared->procResComb.adrc_proc_res;
 
     if (!adrc_com) {
         LOGD_ANALYZER("no adrc result");
@@ -645,50 +731,52 @@ RkAiqCoreV21::genIspAdrcResult(RkAiqFullParams* params)
     // TODO: gen adrc common result
     //RkAiqCore::genIspAdrcResult(params);
     RkAiqAlgoProcResAdrc* adrc_rk = (RkAiqAlgoProcResAdrc*)adrc_com;
-    SmartPtr<RkAiqHandle>* handle = getCurAlgoTypeHandle(RK_AIQ_ALGO_TYPE_ADRC);
     int algo_id = (*handle)->getAlgoId();
 
 
     // gen rk adrc result
     if (algo_id == 0) {
-
         RkAiqAlgoProcResAdrcInt* ahdr_rk = (RkAiqAlgoProcResAdrcInt*)adrc_com;
 
+        rk_aiq_isp_drc_params_v21_t* drc_param = params->mDrcV21Params->data().ptr();
+        setResultExpectedEffId(drc_param->frame_id, RK_AIQ_ALGO_TYPE_ADRC);
 
-        isp_param->drc.DrcProcRes.sw_drc_offset_pow2     = ahdr_rk->AdrcProcRes.DrcProcRes.sw_drc_offset_pow2;
-        isp_param->drc.DrcProcRes.sw_drc_compres_scl  = ahdr_rk->AdrcProcRes.DrcProcRes.sw_drc_compres_scl;
-        isp_param->drc.DrcProcRes.sw_drc_position  = ahdr_rk->AdrcProcRes.DrcProcRes.sw_drc_position;
-        isp_param->drc.DrcProcRes.sw_drc_delta_scalein        = ahdr_rk->AdrcProcRes.DrcProcRes.sw_drc_delta_scalein;
-        isp_param->drc.DrcProcRes.sw_drc_hpdetail_ratio      = ahdr_rk->AdrcProcRes.DrcProcRes.sw_drc_hpdetail_ratio;
-        isp_param->drc.DrcProcRes.sw_drc_lpdetail_ratio     = ahdr_rk->AdrcProcRes.DrcProcRes.sw_drc_lpdetail_ratio;
-        isp_param->drc.DrcProcRes.sw_drc_weicur_pix      = ahdr_rk->AdrcProcRes.DrcProcRes.sw_drc_weicur_pix;
-        isp_param->drc.DrcProcRes.sw_drc_weipre_frame  = ahdr_rk->AdrcProcRes.DrcProcRes.sw_drc_weipre_frame;
-        isp_param->drc.DrcProcRes.sw_drc_force_sgm_inv0   = ahdr_rk->AdrcProcRes.DrcProcRes.sw_drc_force_sgm_inv0;
-        isp_param->drc.DrcProcRes.sw_drc_motion_scl     = ahdr_rk->AdrcProcRes.DrcProcRes.sw_drc_motion_scl;
-        isp_param->drc.DrcProcRes.sw_drc_edge_scl   = ahdr_rk->AdrcProcRes.DrcProcRes.sw_drc_edge_scl;
-        isp_param->drc.DrcProcRes.sw_drc_space_sgm_inv1    = ahdr_rk->AdrcProcRes.DrcProcRes.sw_drc_space_sgm_inv1;
-        isp_param->drc.DrcProcRes.sw_drc_space_sgm_inv0     = ahdr_rk->AdrcProcRes.DrcProcRes.sw_drc_space_sgm_inv0;
-        isp_param->drc.DrcProcRes.sw_drc_range_sgm_inv1     = ahdr_rk->AdrcProcRes.DrcProcRes.sw_drc_range_sgm_inv1;
-        isp_param->drc.DrcProcRes.sw_drc_range_sgm_inv0 = ahdr_rk->AdrcProcRes.DrcProcRes.sw_drc_range_sgm_inv0;
-        isp_param->drc.DrcProcRes.sw_drc_weig_maxl    = ahdr_rk->AdrcProcRes.DrcProcRes.sw_drc_weig_maxl;
-        isp_param->drc.DrcProcRes.sw_drc_weig_bilat  = ahdr_rk->AdrcProcRes.DrcProcRes.sw_drc_weig_bilat;
-        isp_param->drc.DrcProcRes.sw_drc_iir_weight  = ahdr_rk->AdrcProcRes.DrcProcRes.sw_drc_iir_weight;
-        isp_param->drc.DrcProcRes.sw_drc_min_ogain  = ahdr_rk->AdrcProcRes.DrcProcRes.sw_drc_min_ogain;
-        isp_param->drc.DrcProcRes.sw_drc_adrc_gain  = ahdr_rk->AdrcProcRes.DrcProcRes.sw_drc_adrc_gain;
+        drc_param->result.DrcProcRes.sw_drc_offset_pow2     = ahdr_rk->AdrcProcRes.DrcProcRes.sw_drc_offset_pow2;
+        drc_param->result.DrcProcRes.sw_drc_compres_scl  = ahdr_rk->AdrcProcRes.DrcProcRes.sw_drc_compres_scl;
+        drc_param->result.DrcProcRes.sw_drc_position  = ahdr_rk->AdrcProcRes.DrcProcRes.sw_drc_position;
+        drc_param->result.DrcProcRes.sw_drc_delta_scalein        = ahdr_rk->AdrcProcRes.DrcProcRes.sw_drc_delta_scalein;
+        drc_param->result.DrcProcRes.sw_drc_hpdetail_ratio      = ahdr_rk->AdrcProcRes.DrcProcRes.sw_drc_hpdetail_ratio;
+        drc_param->result.DrcProcRes.sw_drc_lpdetail_ratio     = ahdr_rk->AdrcProcRes.DrcProcRes.sw_drc_lpdetail_ratio;
+        drc_param->result.DrcProcRes.sw_drc_weicur_pix      = ahdr_rk->AdrcProcRes.DrcProcRes.sw_drc_weicur_pix;
+        drc_param->result.DrcProcRes.sw_drc_weipre_frame  = ahdr_rk->AdrcProcRes.DrcProcRes.sw_drc_weipre_frame;
+        drc_param->result.DrcProcRes.sw_drc_force_sgm_inv0   = ahdr_rk->AdrcProcRes.DrcProcRes.sw_drc_force_sgm_inv0;
+        drc_param->result.DrcProcRes.sw_drc_motion_scl     = ahdr_rk->AdrcProcRes.DrcProcRes.sw_drc_motion_scl;
+        drc_param->result.DrcProcRes.sw_drc_edge_scl   = ahdr_rk->AdrcProcRes.DrcProcRes.sw_drc_edge_scl;
+        drc_param->result.DrcProcRes.sw_drc_space_sgm_inv1    = ahdr_rk->AdrcProcRes.DrcProcRes.sw_drc_space_sgm_inv1;
+        drc_param->result.DrcProcRes.sw_drc_space_sgm_inv0     = ahdr_rk->AdrcProcRes.DrcProcRes.sw_drc_space_sgm_inv0;
+        drc_param->result.DrcProcRes.sw_drc_range_sgm_inv1     = ahdr_rk->AdrcProcRes.DrcProcRes.sw_drc_range_sgm_inv1;
+        drc_param->result.DrcProcRes.sw_drc_range_sgm_inv0 = ahdr_rk->AdrcProcRes.DrcProcRes.sw_drc_range_sgm_inv0;
+        drc_param->result.DrcProcRes.sw_drc_weig_maxl    = ahdr_rk->AdrcProcRes.DrcProcRes.sw_drc_weig_maxl;
+        drc_param->result.DrcProcRes.sw_drc_weig_bilat  = ahdr_rk->AdrcProcRes.DrcProcRes.sw_drc_weig_bilat;
+        drc_param->result.DrcProcRes.sw_drc_iir_weight  = ahdr_rk->AdrcProcRes.DrcProcRes.sw_drc_iir_weight;
+        drc_param->result.DrcProcRes.sw_drc_min_ogain  = ahdr_rk->AdrcProcRes.DrcProcRes.sw_drc_min_ogain;
+        drc_param->result.DrcProcRes.sw_drc_adrc_gain  = ahdr_rk->AdrcProcRes.DrcProcRes.sw_drc_adrc_gain;
         for(int i = 0; i < 17; i++) {
-            isp_param->drc.DrcProcRes.sw_drc_gain_y[i]    = ahdr_rk->AdrcProcRes.DrcProcRes.sw_drc_gain_y[i];
-            isp_param->drc.DrcProcRes.sw_drc_compres_y[i]    = ahdr_rk->AdrcProcRes.DrcProcRes.sw_drc_compres_y[i];
-            isp_param->drc.DrcProcRes.sw_drc_scale_y[i]    = ahdr_rk->AdrcProcRes.DrcProcRes.sw_drc_scale_y[i];
+            drc_param->result.DrcProcRes.sw_drc_gain_y[i]    = ahdr_rk->AdrcProcRes.DrcProcRes.sw_drc_gain_y[i];
+            drc_param->result.DrcProcRes.sw_drc_compres_y[i]    = ahdr_rk->AdrcProcRes.DrcProcRes.sw_drc_compres_y[i];
+            drc_param->result.DrcProcRes.sw_drc_scale_y[i]    = ahdr_rk->AdrcProcRes.DrcProcRes.sw_drc_scale_y[i];
         }
 
+        drc_param->result.CompressMode =
+            ahdr_rk->AdrcProcRes.CompressMode;
 
-        isp_param->drc.isHdrGlobalTmo =
+        drc_param->result.isHdrGlobalTmo =
             ahdr_rk->AdrcProcRes.isHdrGlobalTmo;
 
-        isp_param->drc.bTmoEn =
+        drc_param->result.bTmoEn =
             ahdr_rk->AdrcProcRes.bTmoEn;
 
-        isp_param->drc.isLinearTmo =
+        drc_param->result.isLinearTmo =
             ahdr_rk->AdrcProcRes.isLinearTmo;
     }
 
@@ -703,10 +791,11 @@ RkAiqCoreV21::genIspAwbResult(RkAiqFullParams* params)
     ENTER_ANALYZER_FUNCTION();
 
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    SmartPtr<RkAiqHandle>* handle = getCurAlgoTypeHandle(RK_AIQ_ALGO_TYPE_AWB);
+    RkAiqCore::RkAiqAlgosGroupShared_t* shared =
+        (RkAiqCore::RkAiqAlgosGroupShared_t*)((*handle)->getGroupShared());
     RkAiqAlgoProcResAwb* awb_com =
-        mAlogsSharedParams.procResComb.awb_proc_res;
-    rk_aiq_isp_params_v21_t* isp_param =
-        static_cast<rk_aiq_isp_params_v21_t*>(params->mIspParams->data().ptr());
+        shared->procResComb.awb_proc_res;
 
     if (!awb_com) {
         LOGD_ANALYZER("no awb result");
@@ -715,11 +804,18 @@ RkAiqCoreV21::genIspAwbResult(RkAiqFullParams* params)
     // TODO: gen awb common result
     //RkAiqCore::genIspAwbResult(params);
     RkAiqAlgoProcResAwb* awb_rk = (RkAiqAlgoProcResAwb*)awb_com;
-    isp_param->awb_gain_update = awb_rk->awb_gain_update;
-    isp_param->awb_cfg_update = awb_rk->awb_cfg_update;
-    isp_param->awb_gain = awb_rk->awb_gain_algo;
-    isp_param->awb_cfg = awb_rk->awb_hw1_para;
-    SmartPtr<RkAiqHandle>* handle = getCurAlgoTypeHandle(RK_AIQ_ALGO_TYPE_AWB);
+
+    rk_aiq_isp_awb_params_v21_t *awb_param = params->mAwbV21Params->data().ptr();
+    rk_aiq_isp_awb_gain_params_v20_t *awb_gain_param = params->mAwbGainParams->data().ptr();
+    setResultExpectedEffId(awb_param->frame_id, RK_AIQ_ALGO_TYPE_AWB);
+    setResultExpectedEffId(awb_gain_param->frame_id, RK_AIQ_ALGO_TYPE_AWB);
+
+    awb_gain_param->update_mask = awb_rk->awb_gain_update;
+    awb_gain_param->result = awb_rk->awb_gain_algo;
+
+    awb_param->update_mask = awb_rk->awb_cfg_update;
+    awb_param->result = awb_rk->awb_hw1_para;
+
     int algo_id = (*handle)->getAlgoId();
 
     // gen rk awb result
@@ -739,10 +835,11 @@ RkAiqCoreV21::genIspAblcResult(RkAiqFullParams* params)
 
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
 
+    SmartPtr<RkAiqHandle>* handle = getCurAlgoTypeHandle(RK_AIQ_ALGO_TYPE_ABLC);
+    RkAiqCore::RkAiqAlgosGroupShared_t* shared =
+        (RkAiqCore::RkAiqAlgosGroupShared_t*)((*handle)->getGroupShared());
     RkAiqAlgoProcResAblc* ablc_com =
-        mAlogsSharedParams.procResComb.ablc_proc_res;
-    rk_aiq_isp_params_v21_t* isp_param =
-        static_cast<rk_aiq_isp_params_v21_t*>(params->mIspParams->data().ptr());
+        shared->procResComb.ablc_proc_res;
 
     if (!ablc_com) {
         LOGD_ANALYZER("no ablc result");
@@ -751,14 +848,15 @@ RkAiqCoreV21::genIspAblcResult(RkAiqFullParams* params)
 
     // TODO: gen ablc common result
 
-    SmartPtr<RkAiqHandle>* handle = getCurAlgoTypeHandle(RK_AIQ_ALGO_TYPE_ABLC);
     int algo_id = (*handle)->getAlgoId();
 
     // gen rk ablc result
     if (algo_id == 0) {
         RkAiqAlgoProcResAblcInt* ablc_rk = (RkAiqAlgoProcResAblcInt*)ablc_com;
+        rk_aiq_isp_blc_params_v21_t *blc_param = params->mBlcV21Params->data().ptr();
+        setResultExpectedEffId(blc_param->frame_id, RK_AIQ_ALGO_TYPE_ABLC);
 
-        memcpy(&isp_param->blc.v0, &ablc_rk->ablc_proc_res,
+        memcpy(&blc_param->result.v0, &ablc_rk->ablc_proc_res,
                sizeof(rk_aiq_isp_blc_t));
     }
 
@@ -774,11 +872,11 @@ RkAiqCoreV21::genIspAgicResult(RkAiqFullParams* params)
 
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
 
-
+    SmartPtr<RkAiqHandle>* handle = getCurAlgoTypeHandle(RK_AIQ_ALGO_TYPE_AGIC);
+    RkAiqCore::RkAiqAlgosGroupShared_t* shared =
+        (RkAiqCore::RkAiqAlgosGroupShared_t*)((*handle)->getGroupShared());
     RkAiqAlgoProcResAgic* agic_com =
-        mAlogsSharedParams.procResComb.agic_proc_res;
-    rk_aiq_isp_params_v21_t* isp_param =
-        static_cast<rk_aiq_isp_params_v21_t*>(params->mIspParams->data().ptr());
+        shared->procResComb.agic_proc_res;
 
     if (!agic_com) {
         LOGD_ANALYZER("no gic result");
@@ -787,38 +885,37 @@ RkAiqCoreV21::genIspAgicResult(RkAiqFullParams* params)
     // TODO: gen adrc common result
     //RkAiqCore::genIspAdrcResult(params);
     RkAiqAlgoProcResAgic* agic_rk = (RkAiqAlgoProcResAgic*)agic_com;
-    SmartPtr<RkAiqHandle>* handle = getCurAlgoTypeHandle(RK_AIQ_ALGO_TYPE_AGIC);
     int algo_id = (*handle)->getAlgoId();
-
 
     // gen rk adrc result
     if (algo_id == 0) {
-
         RkAiqAlgoProcResAgicInt* agic_rk = (RkAiqAlgoProcResAgicInt*)agic_com;
+        rk_aiq_isp_gic_params_v21_t *gic_param = params->mGicV21Params->data().ptr();
+        setResultExpectedEffId(gic_param->frame_id, RK_AIQ_ALGO_TYPE_AGIC);
 
-        isp_param->gic.gic_en     = agic_rk->gicRes.gic_en;
-        isp_param->gic.ProcResV21.regmingradthrdark2  = agic_rk->gicRes.ProcResV21.regmingradthrdark2;
-        isp_param->gic.ProcResV21.regmingradthrdark1  = agic_rk->gicRes.ProcResV21.regmingradthrdark1;
-        isp_param->gic.ProcResV21.regminbusythre  = agic_rk->gicRes.ProcResV21.regminbusythre;
-        isp_param->gic.ProcResV21.regdarkthre  = agic_rk->gicRes.ProcResV21.regdarkthre;
-        isp_param->gic.ProcResV21.regmaxcorvboth  = agic_rk->gicRes.ProcResV21.regmaxcorvboth;
-        isp_param->gic.ProcResV21.regdarktthrehi  = agic_rk->gicRes.ProcResV21.regdarktthrehi;
-        isp_param->gic.ProcResV21.regkgrad2dark  = agic_rk->gicRes.ProcResV21.regkgrad2dark;
-        isp_param->gic.ProcResV21.regkgrad1dark  = agic_rk->gicRes.ProcResV21.regkgrad1dark;
-        isp_param->gic.ProcResV21.regstrengthglobal_fix  = agic_rk->gicRes.ProcResV21.regstrengthglobal_fix;
-        isp_param->gic.ProcResV21.regdarkthrestep  = agic_rk->gicRes.ProcResV21.regdarkthrestep;
-        isp_param->gic.ProcResV21.regkgrad2  = agic_rk->gicRes.ProcResV21.regkgrad2;
-        isp_param->gic.ProcResV21.regkgrad1  = agic_rk->gicRes.ProcResV21.regkgrad1;
-        isp_param->gic.ProcResV21.reggbthre  = agic_rk->gicRes.ProcResV21.reggbthre;
-        isp_param->gic.ProcResV21.regmaxcorv  = agic_rk->gicRes.ProcResV21.regmaxcorv;
-        isp_param->gic.ProcResV21.regmingradthr2  = agic_rk->gicRes.ProcResV21.regmingradthr2;
-        isp_param->gic.ProcResV21.regmingradthr1  = agic_rk->gicRes.ProcResV21.regmingradthr1;
-        isp_param->gic.ProcResV21.gr_ratio  = agic_rk->gicRes.ProcResV21.gr_ratio;
-        isp_param->gic.ProcResV21.noise_scale  = agic_rk->gicRes.ProcResV21.noise_scale;
-        isp_param->gic.ProcResV21.noise_base  = agic_rk->gicRes.ProcResV21.noise_base;
-        isp_param->gic.ProcResV21.diff_clip  = agic_rk->gicRes.ProcResV21.diff_clip;
+        gic_param->result.gic_en  = agic_rk->gicRes.gic_en;
+        gic_param->result.ProcResV21.regmingradthrdark2  = agic_rk->gicRes.ProcResV21.regmingradthrdark2;
+        gic_param->result.ProcResV21.regmingradthrdark1  = agic_rk->gicRes.ProcResV21.regmingradthrdark1;
+        gic_param->result.ProcResV21.regminbusythre  = agic_rk->gicRes.ProcResV21.regminbusythre;
+        gic_param->result.ProcResV21.regdarkthre  = agic_rk->gicRes.ProcResV21.regdarkthre;
+        gic_param->result.ProcResV21.regmaxcorvboth  = agic_rk->gicRes.ProcResV21.regmaxcorvboth;
+        gic_param->result.ProcResV21.regdarktthrehi  = agic_rk->gicRes.ProcResV21.regdarktthrehi;
+        gic_param->result.ProcResV21.regkgrad2dark  = agic_rk->gicRes.ProcResV21.regkgrad2dark;
+        gic_param->result.ProcResV21.regkgrad1dark  = agic_rk->gicRes.ProcResV21.regkgrad1dark;
+        gic_param->result.ProcResV21.regstrengthglobal_fix  = agic_rk->gicRes.ProcResV21.regstrengthglobal_fix;
+        gic_param->result.ProcResV21.regdarkthrestep  = agic_rk->gicRes.ProcResV21.regdarkthrestep;
+        gic_param->result.ProcResV21.regkgrad2  = agic_rk->gicRes.ProcResV21.regkgrad2;
+        gic_param->result.ProcResV21.regkgrad1  = agic_rk->gicRes.ProcResV21.regkgrad1;
+        gic_param->result.ProcResV21.reggbthre  = agic_rk->gicRes.ProcResV21.reggbthre;
+        gic_param->result.ProcResV21.regmaxcorv  = agic_rk->gicRes.ProcResV21.regmaxcorv;
+        gic_param->result.ProcResV21.regmingradthr2  = agic_rk->gicRes.ProcResV21.regmingradthr2;
+        gic_param->result.ProcResV21.regmingradthr1  = agic_rk->gicRes.ProcResV21.regmingradthr1;
+        gic_param->result.ProcResV21.gr_ratio  = agic_rk->gicRes.ProcResV21.gr_ratio;
+        gic_param->result.ProcResV21.noise_scale  = agic_rk->gicRes.ProcResV21.noise_scale;
+        gic_param->result.ProcResV21.noise_base  = agic_rk->gicRes.ProcResV21.noise_base;
+        gic_param->result.ProcResV21.diff_clip  = agic_rk->gicRes.ProcResV21.diff_clip;
         for(int i = 0; i < 15; i++)
-            isp_param->gic.ProcResV21.sigma_y[i]  = agic_rk->gicRes.ProcResV21.sigma_y[i];
+            gic_param->result.ProcResV21.sigma_y[i]  = agic_rk->gicRes.ProcResV21.sigma_y[i];
 
     }
 
@@ -834,10 +931,11 @@ RkAiqCoreV21::genIspAccmResult(RkAiqFullParams* params)
 
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
 
+    SmartPtr<RkAiqHandle>* handle = getCurAlgoTypeHandle(RK_AIQ_ALGO_TYPE_ACCM);
+    RkAiqCore::RkAiqAlgosGroupShared_t* shared =
+        (RkAiqCore::RkAiqAlgosGroupShared_t*)((*handle)->getGroupShared());
     RkAiqAlgoProcResAccm* accm_com =
-        mAlogsSharedParams.procResComb.accm_proc_res;
-    rk_aiq_isp_params_v21_t*  isp_param =
-        static_cast<rk_aiq_isp_params_v21_t*>(params->mIspParams->data().ptr());
+        shared->procResComb.accm_proc_res;
 
     if (!accm_com) {
         LOGD_ANALYZER("no accm result");
@@ -846,9 +944,10 @@ RkAiqCoreV21::genIspAccmResult(RkAiqFullParams* params)
 
     // TODO: gen accm common result
     RkAiqAlgoProcResAccm* accm_rk = (RkAiqAlgoProcResAccm*)accm_com;
-    isp_param->ccm = accm_rk->accm_hw_conf;
+    rk_aiq_isp_ccm_params_v20_t *ccm_param = params->mCcmParams->data().ptr();
+    setResultExpectedEffId(ccm_param->frame_id, RK_AIQ_ALGO_TYPE_ACCM);
+    ccm_param->result = accm_rk->accm_hw_conf;
 
-    SmartPtr<RkAiqHandle>* handle = getCurAlgoTypeHandle(RK_AIQ_ALGO_TYPE_ACCM);
     int algo_id = (*handle)->getAlgoId();
 
     // gen rk accm result
@@ -868,10 +967,11 @@ RkAiqCoreV21::genIspAdhazResult(RkAiqFullParams* params)
 
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
 
+    SmartPtr<RkAiqHandle>* handle = getCurAlgoTypeHandle(RK_AIQ_ALGO_TYPE_ADHAZ);
+    RkAiqCore::RkAiqAlgosGroupShared_t* shared =
+        (RkAiqCore::RkAiqAlgosGroupShared_t*)((*handle)->getGroupShared());
     RkAiqAlgoProcResAdhaz* adhaz_com =
-        mAlogsSharedParams.procResComb.adhaz_proc_res;
-    rk_aiq_isp_params_v21_t* isp_param =
-        static_cast<rk_aiq_isp_params_v21_t*>(params->mIspParams->data().ptr());
+        shared->procResComb.adhaz_proc_res;
 
     if (!adhaz_com) {
         LOGD_ANALYZER("no adehaze result");
@@ -880,64 +980,63 @@ RkAiqCoreV21::genIspAdhazResult(RkAiqFullParams* params)
     // TODO: gen adrc common result
     //RkAiqCore::genIspAdrcResult(params);
     RkAiqAlgoProcResAdhaz* adhaz_rk = (RkAiqAlgoProcResAdhaz*)adhaz_com;
-    SmartPtr<RkAiqHandle>* handle = getCurAlgoTypeHandle(RK_AIQ_ALGO_TYPE_ADRC);
     int algo_id = (*handle)->getAlgoId();
-
 
     // gen rk adrc result
     if (algo_id == 0) {
-
         RkAiqAlgoProcResAdhazInt* adhaz_rk = (RkAiqAlgoProcResAdhazInt*)adhaz_com;
+        rk_aiq_isp_dehaze_params_v21_t* dehaze_param = params->mDehazeV21Params->data().ptr();
+        setResultExpectedEffId(dehaze_param->frame_id, RK_AIQ_ALGO_TYPE_ADHAZ);
 
-        isp_param->adhaz.enhance_en     = adhaz_rk->adhaz_proc_res_com.AdehzeProcRes.ProcResV21.enhance_en;
-        isp_param->adhaz.air_lc_en  = adhaz_rk->adhaz_proc_res_com.AdehzeProcRes.ProcResV21.air_lc_en;
-        isp_param->adhaz.hpara_en   = adhaz_rk->adhaz_proc_res_com.AdehzeProcRes.ProcResV21.hpara_en;
-        isp_param->adhaz.hist_en    = adhaz_rk->adhaz_proc_res_com.AdehzeProcRes.ProcResV21.hist_en;
-        isp_param->adhaz.dc_en  = adhaz_rk->adhaz_proc_res_com.AdehzeProcRes.ProcResV21.dc_en;
-        isp_param->adhaz.yblk_th    = adhaz_rk->adhaz_proc_res_com.AdehzeProcRes.ProcResV21.yblk_th;
-        isp_param->adhaz.yhist_th   = adhaz_rk->adhaz_proc_res_com.AdehzeProcRes.ProcResV21.yhist_th;
-        isp_param->adhaz.dc_max_th  = adhaz_rk->adhaz_proc_res_com.AdehzeProcRes.ProcResV21.dc_max_th;
-        isp_param->adhaz.dc_min_th  = adhaz_rk->adhaz_proc_res_com.AdehzeProcRes.ProcResV21.dc_min_th;
-        isp_param->adhaz.wt_max     = adhaz_rk->adhaz_proc_res_com.AdehzeProcRes.ProcResV21.wt_max;
-        isp_param->adhaz.bright_max     = adhaz_rk->adhaz_proc_res_com.AdehzeProcRes.ProcResV21.bright_max;
-        isp_param->adhaz.bright_min     = adhaz_rk->adhaz_proc_res_com.AdehzeProcRes.ProcResV21.bright_min;
-        isp_param->adhaz.tmax_base  = adhaz_rk->adhaz_proc_res_com.AdehzeProcRes.ProcResV21.tmax_base;
-        isp_param->adhaz.dark_th    = adhaz_rk->adhaz_proc_res_com.AdehzeProcRes.ProcResV21.dark_th;
-        isp_param->adhaz.air_max    = adhaz_rk->adhaz_proc_res_com.AdehzeProcRes.ProcResV21.air_max;
-        isp_param->adhaz.air_min    = adhaz_rk->adhaz_proc_res_com.AdehzeProcRes.ProcResV21.air_min;
-        isp_param->adhaz.tmax_max   = adhaz_rk->adhaz_proc_res_com.AdehzeProcRes.ProcResV21.tmax_max;
-        isp_param->adhaz.tmax_off   = adhaz_rk->adhaz_proc_res_com.AdehzeProcRes.ProcResV21.tmax_off;
-        isp_param->adhaz.hist_k     = adhaz_rk->adhaz_proc_res_com.AdehzeProcRes.ProcResV21.hist_k;
-        isp_param->adhaz.hist_th_off    = adhaz_rk->adhaz_proc_res_com.AdehzeProcRes.ProcResV21.hist_th_off;
-        isp_param->adhaz.hist_min   = adhaz_rk->adhaz_proc_res_com.AdehzeProcRes.ProcResV21.hist_min;
-        isp_param->adhaz.hist_gratio    = adhaz_rk->adhaz_proc_res_com.AdehzeProcRes.ProcResV21.hist_gratio;
-        isp_param->adhaz.hist_scale     = adhaz_rk->adhaz_proc_res_com.AdehzeProcRes.ProcResV21.hist_scale;
-        isp_param->adhaz.enhance_value  = adhaz_rk->adhaz_proc_res_com.AdehzeProcRes.ProcResV21.enhance_value;
-        isp_param->adhaz.enhance_chroma     = adhaz_rk->adhaz_proc_res_com.AdehzeProcRes.ProcResV21.enhance_chroma;
-        isp_param->adhaz.iir_wt_sigma   = adhaz_rk->adhaz_proc_res_com.AdehzeProcRes.ProcResV21.iir_wt_sigma;
-        isp_param->adhaz.iir_sigma  = adhaz_rk->adhaz_proc_res_com.AdehzeProcRes.ProcResV21.iir_sigma;
-        isp_param->adhaz.stab_fnum  = adhaz_rk->adhaz_proc_res_com.AdehzeProcRes.ProcResV21.stab_fnum;
-        isp_param->adhaz.iir_tmax_sigma     = adhaz_rk->adhaz_proc_res_com.AdehzeProcRes.ProcResV21.iir_tmax_sigma;
-        isp_param->adhaz.iir_air_sigma  = adhaz_rk->adhaz_proc_res_com.AdehzeProcRes.ProcResV21.iir_air_sigma;
-        isp_param->adhaz.iir_pre_wet    = adhaz_rk->adhaz_proc_res_com.AdehzeProcRes.ProcResV21.iir_pre_wet;
-        isp_param->adhaz.cfg_wt     = adhaz_rk->adhaz_proc_res_com.AdehzeProcRes.ProcResV21.cfg_wt;
-        isp_param->adhaz.cfg_air    = adhaz_rk->adhaz_proc_res_com.AdehzeProcRes.ProcResV21.cfg_air;
-        isp_param->adhaz.cfg_alpha  = adhaz_rk->adhaz_proc_res_com.AdehzeProcRes.ProcResV21.cfg_alpha;
-        isp_param->adhaz.cfg_gratio     = adhaz_rk->adhaz_proc_res_com.AdehzeProcRes.ProcResV21.cfg_gratio;
-        isp_param->adhaz.cfg_tmax   = adhaz_rk->adhaz_proc_res_com.AdehzeProcRes.ProcResV21.cfg_tmax;
-        isp_param->adhaz.range_sima     = adhaz_rk->adhaz_proc_res_com.AdehzeProcRes.ProcResV21.range_sima;
-        isp_param->adhaz.space_sigma_cur    = adhaz_rk->adhaz_proc_res_com.AdehzeProcRes.ProcResV21.space_sigma_cur;
-        isp_param->adhaz.space_sigma_pre    = adhaz_rk->adhaz_proc_res_com.AdehzeProcRes.ProcResV21.space_sigma_pre;
-        isp_param->adhaz.dc_weitcur     = adhaz_rk->adhaz_proc_res_com.AdehzeProcRes.ProcResV21.dc_weitcur;
-        isp_param->adhaz.bf_weight  = adhaz_rk->adhaz_proc_res_com.AdehzeProcRes.ProcResV21.bf_weight;
-        isp_param->adhaz.gaus_h0    = adhaz_rk->adhaz_proc_res_com.AdehzeProcRes.ProcResV21.gaus_h0;
-        isp_param->adhaz.gaus_h1    = adhaz_rk->adhaz_proc_res_com.AdehzeProcRes.ProcResV21.gaus_h1;
-        isp_param->adhaz.gaus_h2    = adhaz_rk->adhaz_proc_res_com.AdehzeProcRes.ProcResV21.gaus_h2;
+        dehaze_param->result.enhance_en     = adhaz_rk->adhaz_proc_res_com.AdehzeProcRes.ProcResV21.enhance_en;
+        dehaze_param->result.air_lc_en  = adhaz_rk->adhaz_proc_res_com.AdehzeProcRes.ProcResV21.air_lc_en;
+        dehaze_param->result.hpara_en   = adhaz_rk->adhaz_proc_res_com.AdehzeProcRes.ProcResV21.hpara_en;
+        dehaze_param->result.hist_en    = adhaz_rk->adhaz_proc_res_com.AdehzeProcRes.ProcResV21.hist_en;
+        dehaze_param->result.dc_en  = adhaz_rk->adhaz_proc_res_com.AdehzeProcRes.ProcResV21.dc_en;
+        dehaze_param->result.yblk_th    = adhaz_rk->adhaz_proc_res_com.AdehzeProcRes.ProcResV21.yblk_th;
+        dehaze_param->result.yhist_th   = adhaz_rk->adhaz_proc_res_com.AdehzeProcRes.ProcResV21.yhist_th;
+        dehaze_param->result.dc_max_th  = adhaz_rk->adhaz_proc_res_com.AdehzeProcRes.ProcResV21.dc_max_th;
+        dehaze_param->result.dc_min_th  = adhaz_rk->adhaz_proc_res_com.AdehzeProcRes.ProcResV21.dc_min_th;
+        dehaze_param->result.wt_max     = adhaz_rk->adhaz_proc_res_com.AdehzeProcRes.ProcResV21.wt_max;
+        dehaze_param->result.bright_max     = adhaz_rk->adhaz_proc_res_com.AdehzeProcRes.ProcResV21.bright_max;
+        dehaze_param->result.bright_min     = adhaz_rk->adhaz_proc_res_com.AdehzeProcRes.ProcResV21.bright_min;
+        dehaze_param->result.tmax_base  = adhaz_rk->adhaz_proc_res_com.AdehzeProcRes.ProcResV21.tmax_base;
+        dehaze_param->result.dark_th    = adhaz_rk->adhaz_proc_res_com.AdehzeProcRes.ProcResV21.dark_th;
+        dehaze_param->result.air_max    = adhaz_rk->adhaz_proc_res_com.AdehzeProcRes.ProcResV21.air_max;
+        dehaze_param->result.air_min    = adhaz_rk->adhaz_proc_res_com.AdehzeProcRes.ProcResV21.air_min;
+        dehaze_param->result.tmax_max   = adhaz_rk->adhaz_proc_res_com.AdehzeProcRes.ProcResV21.tmax_max;
+        dehaze_param->result.tmax_off   = adhaz_rk->adhaz_proc_res_com.AdehzeProcRes.ProcResV21.tmax_off;
+        dehaze_param->result.hist_k     = adhaz_rk->adhaz_proc_res_com.AdehzeProcRes.ProcResV21.hist_k;
+        dehaze_param->result.hist_th_off    = adhaz_rk->adhaz_proc_res_com.AdehzeProcRes.ProcResV21.hist_th_off;
+        dehaze_param->result.hist_min   = adhaz_rk->adhaz_proc_res_com.AdehzeProcRes.ProcResV21.hist_min;
+        dehaze_param->result.hist_gratio    = adhaz_rk->adhaz_proc_res_com.AdehzeProcRes.ProcResV21.hist_gratio;
+        dehaze_param->result.hist_scale     = adhaz_rk->adhaz_proc_res_com.AdehzeProcRes.ProcResV21.hist_scale;
+        dehaze_param->result.enhance_value  = adhaz_rk->adhaz_proc_res_com.AdehzeProcRes.ProcResV21.enhance_value;
+        dehaze_param->result.enhance_chroma     = adhaz_rk->adhaz_proc_res_com.AdehzeProcRes.ProcResV21.enhance_chroma;
+        dehaze_param->result.iir_wt_sigma   = adhaz_rk->adhaz_proc_res_com.AdehzeProcRes.ProcResV21.iir_wt_sigma;
+        dehaze_param->result.iir_sigma  = adhaz_rk->adhaz_proc_res_com.AdehzeProcRes.ProcResV21.iir_sigma;
+        dehaze_param->result.stab_fnum  = adhaz_rk->adhaz_proc_res_com.AdehzeProcRes.ProcResV21.stab_fnum;
+        dehaze_param->result.iir_tmax_sigma     = adhaz_rk->adhaz_proc_res_com.AdehzeProcRes.ProcResV21.iir_tmax_sigma;
+        dehaze_param->result.iir_air_sigma  = adhaz_rk->adhaz_proc_res_com.AdehzeProcRes.ProcResV21.iir_air_sigma;
+        dehaze_param->result.iir_pre_wet    = adhaz_rk->adhaz_proc_res_com.AdehzeProcRes.ProcResV21.iir_pre_wet;
+        dehaze_param->result.cfg_wt     = adhaz_rk->adhaz_proc_res_com.AdehzeProcRes.ProcResV21.cfg_wt;
+        dehaze_param->result.cfg_air    = adhaz_rk->adhaz_proc_res_com.AdehzeProcRes.ProcResV21.cfg_air;
+        dehaze_param->result.cfg_alpha  = adhaz_rk->adhaz_proc_res_com.AdehzeProcRes.ProcResV21.cfg_alpha;
+        dehaze_param->result.cfg_gratio     = adhaz_rk->adhaz_proc_res_com.AdehzeProcRes.ProcResV21.cfg_gratio;
+        dehaze_param->result.cfg_tmax   = adhaz_rk->adhaz_proc_res_com.AdehzeProcRes.ProcResV21.cfg_tmax;
+        dehaze_param->result.range_sima     = adhaz_rk->adhaz_proc_res_com.AdehzeProcRes.ProcResV21.range_sima;
+        dehaze_param->result.space_sigma_cur    = adhaz_rk->adhaz_proc_res_com.AdehzeProcRes.ProcResV21.space_sigma_cur;
+        dehaze_param->result.space_sigma_pre    = adhaz_rk->adhaz_proc_res_com.AdehzeProcRes.ProcResV21.space_sigma_pre;
+        dehaze_param->result.dc_weitcur     = adhaz_rk->adhaz_proc_res_com.AdehzeProcRes.ProcResV21.dc_weitcur;
+        dehaze_param->result.bf_weight  = adhaz_rk->adhaz_proc_res_com.AdehzeProcRes.ProcResV21.bf_weight;
+        dehaze_param->result.gaus_h0    = adhaz_rk->adhaz_proc_res_com.AdehzeProcRes.ProcResV21.gaus_h0;
+        dehaze_param->result.gaus_h1    = adhaz_rk->adhaz_proc_res_com.AdehzeProcRes.ProcResV21.gaus_h1;
+        dehaze_param->result.gaus_h2    = adhaz_rk->adhaz_proc_res_com.AdehzeProcRes.ProcResV21.gaus_h2;
 
-        //LOGE_ANALYZER("dc_en%d enhance_en:%d",isp_param->adhaz.dc_en,isp_param->adhaz.enhance_en);
+        //LOGE_ANALYZER("dc_en%d enhance_en:%d",dehaze_param->result.dc_en,dehaze_param->result.enhance_en);
 
         for(int i = 0; i < 17; i++)
-            isp_param->adhaz.enh_curve[i]     = adhaz_rk->adhaz_proc_res_com.AdehzeProcRes.ProcResV21.enh_curve[i];
+            dehaze_param->result.enh_curve[i]     = adhaz_rk->adhaz_proc_res_com.AdehzeProcRes.ProcResV21.enh_curve[i];
 
     }
 
@@ -952,10 +1051,11 @@ RkAiqCoreV21::genIspAsharpResult(RkAiqFullParams* params)
     ENTER_ANALYZER_FUNCTION();
 
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    SmartPtr<RkAiqHandle>* handle = getCurAlgoTypeHandle(RK_AIQ_ALGO_TYPE_ASHARP);
+    RkAiqCore::RkAiqAlgosGroupShared_t* shared =
+        (RkAiqCore::RkAiqAlgosGroupShared_t*)((*handle)->getGroupShared());
     RkAiqAlgoProcResAsharp* asharp_com =
-        mAlogsSharedParams.procResComb.asharp_proc_res;
-    rk_aiq_isp_params_v21_t* isp_param =
-        static_cast<rk_aiq_isp_params_v21_t*>(params->mIspParams->data().ptr());
+        shared->procResComb.asharp_proc_res;
 
     if (!asharp_com) {
         LOGD_ANALYZER("no asharp result");
@@ -964,31 +1064,20 @@ RkAiqCoreV21::genIspAsharpResult(RkAiqFullParams* params)
 
     // TODO: gen asharp common result
 
-    SmartPtr<RkAiqHandle>* handle = getCurAlgoTypeHandle(RK_AIQ_ALGO_TYPE_ASHARP);
     int algo_id = (*handle)->getAlgoId();
 
     // gen rk asharp result
     if (algo_id == 0) {
         RkAiqAlgoProcResAsharpV3Int* asharp_rk = (RkAiqAlgoProcResAsharpV3Int*)asharp_com;
 
-#ifdef RK_SIMULATOR_HW
         LOGD_ANR("oyyf: %s:%d output isp param start\n", __FUNCTION__, __LINE__);
-        //TODO
-#if 0
-        memcpy(&isp_param->sharp,
-               &asharp_rk->stAsharpProcResult.stSelect,
-               sizeof(RK_SHARP_Params_V3_Select_t));
-#endif
 
-        LOGD_ANR("oyyf: %s:%d output isp param end \n", __FUNCTION__, __LINE__);
-#else
-        LOGD_ANR("oyyf: %s:%d output isp param start\n", __FUNCTION__, __LINE__);
-        memcpy(&isp_param->sharp,
+        rk_aiq_isp_sharpen_params_v21_t* sharp_param = params->mSharpenV21Params->data().ptr();
+        setResultExpectedEffId(sharp_param->frame_id, RK_AIQ_ALGO_TYPE_ASHARP);
+        memcpy(&sharp_param->result,
                &asharp_rk->stAsharpProcResult.stFix,
                sizeof(RK_SHARP_Fix_V3_t));
         LOGD_ANR("oyyf: %s:%d output isp param end \n", __FUNCTION__, __LINE__);
-
-#endif
     }
 
     EXIT_ANALYZER_FUNCTION();

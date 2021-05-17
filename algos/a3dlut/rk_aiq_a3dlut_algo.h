@@ -20,16 +20,23 @@
 #ifndef _RK_AIQ_A3DLUT_ALGO_H_
 #define _RK_AIQ_A3DLUT_ALGO_H_
 
+#include "RkAiqCalibDbTypes.h"
+#include "RkAiqCalibDbTypesV2.h"
+#include "RkAiqCalibDbV2Helper.h"
 #include "a3dlut/rk_aiq_types_a3dlut_algo_prvt.h"
 
 RKAIQ_BEGIN_DECLARE
 
-XCamReturn Alut3dInit(alut3d_handle_t *hAlut3d, const CamCalibDbContext_t* calib);
+//XCamReturn Alut3dInit(alut3d_handle_t *hAlut3d, const CamCalibDbContext_t* calib);
+XCamReturn Alut3dInit(alut3d_handle_t *hAlut3d, const CamCalibDbV2Context_t* calibv2);
 XCamReturn Alut3dRelease(alut3d_handle_t hAlut3d);
 XCamReturn Alut3dPrepare(alut3d_handle_t hAlut3d);
 XCamReturn Alut3dConfig(alut3d_handle_t hAlut3d);
 XCamReturn Alut3dPreProc(alut3d_handle_t hAlut3d);
 XCamReturn Alut3dProcessing(alut3d_handle_t hAlut3d);
+
+
+
 
 RKAIQ_END_DECLARE
 

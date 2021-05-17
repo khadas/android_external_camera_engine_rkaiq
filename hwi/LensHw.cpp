@@ -81,12 +81,13 @@ LensHw::queryLensSupport()
     return XCAM_RETURN_NO_ERROR;
 }
 
-
 XCamReturn
-LensHw::start()
+LensHw::start_internal()
 {
     ENTER_CAMHW_FUNCTION();
-    SmartLock locker (_mutex);
+
+    if (_active)
+        return XCAM_RETURN_NO_ERROR;
 
     _rec_sof_idx = 0;
     _piris_step = 0;
@@ -95,11 +96,25 @@ LensHw::start()
     _last_dciris_pwmduty = 0;
     _focus_pos = -1;
     _zoom_pos = -1;
+    memset(&_focus_tim, 0, sizeof(_focus_tim));
+    memset(&_zoom_tim, 0, sizeof(_zoom_tim));
     memset(_frame_time, 0, sizeof(_frame_time));
     memset(_frame_sequence, 0, sizeof(_frame_sequence));
     queryLensSupport();
 
     _active = true;
+    EXIT_CAMHW_FUNCTION();
+    return XCAM_RETURN_NO_ERROR;
+}
+
+XCamReturn
+LensHw::start()
+{
+    ENTER_CAMHW_FUNCTION();
+    SmartLock locker (_mutex);
+
+    start_internal();
+
     EXIT_CAMHW_FUNCTION();
     return XCAM_RETURN_NO_ERROR;
 }
@@ -178,13 +193,17 @@ LensHw::setFocusParams(int position)
         return XCAM_RETURN_NO_ERROR;
     }
 
-    if (_focus_pos == position)
-        return XCAM_RETURN_NO_ERROR;
+    if (!_active)
+        start_internal();
+
+    if (position < _focus_query.minimum)
+        position = _focus_query.minimum;
+    if (position > _focus_query.maximum)
+        position = _focus_query.maximum;
 
     xcam_mem_clear (control);
     control.id = V4L2_CID_FOCUS_ABSOLUTE;
-    control.value = _focus_query.minimum + (_focus_query.maximum - _focus_query.minimum) * position / 64;
-    control.value = (control.value + _focus_query.step - 1) / _focus_query.step * _focus_query.step;
+    control.value = position;
 
     LOGD_CAMHW_SUBM(LENS_SUBM, "|||set focus result: %d, control.value %d", position, control.value);
     if (io_control (VIDIOC_S_CTRL, &control) < 0) {
@@ -215,6 +234,9 @@ LensHw::setPIrisParams(int step)
         LOGE_CAMHW_SUBM(LENS_SUBM, "iris is not supported");
         return XCAM_RETURN_NO_ERROR;
     }
+
+    if (!_active)
+        start_internal();
 
     if (_piris_step == step)
         return XCAM_RETURN_NO_ERROR;
@@ -255,6 +277,9 @@ LensHw::setDCIrisParams(int pwmDuty)
         LOGE_CAMHW_SUBM(LENS_SUBM, "iris is not supported");
         return XCAM_RETURN_NO_ERROR;
     }
+
+    if (!_active)
+        start_internal();
 
     if (_dciris_pwmduty == pwmDuty)
         return XCAM_RETURN_NO_ERROR;
@@ -315,13 +340,16 @@ LensHw::setZoomParams(int position)
         return XCAM_RETURN_NO_ERROR;
     }
 
-    if (_zoom_pos == position)
-        return XCAM_RETURN_NO_ERROR;
+    if (!_active)
+        start_internal();
 
+    if (position < _zoom_query.minimum)
+        position = _zoom_query.minimum;
+    if (position > _zoom_query.maximum)
+        position = _zoom_query.maximum;
     xcam_mem_clear (control);
     control.id = V4L2_CID_ZOOM_ABSOLUTE;
-    control.value = _zoom_query.minimum + (_zoom_query.maximum - _zoom_query.minimum) * position / 2000;
-    control.value = (control.value + _zoom_query.step - 1) / _zoom_query.step * _zoom_query.step;
+    control.value = position;
 
     LOGD_CAMHW_SUBM(LENS_SUBM, "||| set zoom result: %d, control.value %d", position, control.value);
     if (io_control (VIDIOC_S_CTRL, &control) < 0) {
@@ -360,7 +388,7 @@ LensHw::getFocusParams(int* position)
         LOGE_CAMHW_SUBM(LENS_SUBM, "get focus result failed");
         return XCAM_RETURN_ERROR_IOCTL;
     }
-    *position = (control.value - _focus_query.minimum) * 64 / (_focus_query.maximum - _focus_query.minimum);
+    *position = control.value;
     LOGD_CAMHW_SUBM(LENS_SUBM, "|||get focus result: %d, control.value %d", *position, control.value);
 
     _focus_pos = *position;
@@ -388,10 +416,54 @@ LensHw::getZoomParams(int* position)
         LOGE_CAMHW_SUBM(LENS_SUBM, "get zoom result failed");
         return XCAM_RETURN_ERROR_IOCTL;
     }
-    *position = (control.value - _zoom_query.minimum) * 2000 / (_zoom_query.maximum - _zoom_query.minimum);
+    *position = control.value;
     LOGD_CAMHW_SUBM(LENS_SUBM, "|||get zoom result: %d, control.value %d", *position, control.value);
 
     _zoom_pos = *position;
+
+    EXIT_CAMHW_FUNCTION();
+    return XCAM_RETURN_NO_ERROR;
+}
+
+XCamReturn
+LensHw::FocusCorrection()
+{
+    ENTER_CAMHW_FUNCTION();
+    SmartLock locker (_mutex);
+    struct v4l2_control control;
+    int correction = 0;
+
+    if (!_focus_enable) {
+        LOGE_CAMHW_SUBM(LENS_SUBM, "focus is not supported");
+        return XCAM_RETURN_ERROR_FAILED;
+    }
+
+    if (io_control (RK_VIDIOC_FOCUS_CORRECTION, &correction) < 0) {
+        LOGE_CAMHW_SUBM(LENS_SUBM, "focus correction failed");
+        return XCAM_RETURN_ERROR_IOCTL;
+    }
+
+    EXIT_CAMHW_FUNCTION();
+    return XCAM_RETURN_NO_ERROR;
+}
+
+XCamReturn
+LensHw::ZoomCorrection()
+{
+    ENTER_CAMHW_FUNCTION();
+    SmartLock locker (_mutex);
+    struct v4l2_control control;
+    int correction = 0;
+
+    if (!_zoom_enable) {
+        LOGE_CAMHW_SUBM(LENS_SUBM, "zoom is not supported");
+        return XCAM_RETURN_ERROR_FAILED;
+    }
+
+    if (io_control (RK_VIDIOC_ZOOM_CORRECTION, &correction) < 0) {
+        LOGE_CAMHW_SUBM(LENS_SUBM, "zoom correction failed");
+        return XCAM_RETURN_ERROR_IOCTL;
+    }
 
     EXIT_CAMHW_FUNCTION();
     return XCAM_RETURN_NO_ERROR;
@@ -485,6 +557,8 @@ LensHw::getAfInfoParams(SmartPtr<RkAiqAfInfoProxy>& afInfo, int frame_id)
     afInfo->data()->focusEndTim = _focus_tim.vcm_end_t;
     afInfo->data()->zoomStartTim = _zoom_tim.vcm_start_t;
     afInfo->data()->zoomEndTim = _zoom_tim.vcm_end_t;
+    afInfo->data()->focusCode = _focus_pos;
+    afInfo->data()->zoomCode = _zoom_pos;
     if (i < LENSHW_RECORD_SOF_NUM) {
         afInfo->data()->sofTime = _frame_time[i];
     } else {

@@ -38,16 +38,20 @@ typedef struct Aynr_Context_V2_s {
     Aynr_Auto_Attr_V2_t stAuto;
     Aynr_Manual_Attr_V2_t stManual;
 
-    struct list_head* list_ynr_v2; 
-	
-	float fYnr_SF_Strength;
+    struct list_head* list_ynr_v2;
 
-	bool isIQParaUpdate;
-	bool isGrayMode;
-	Aynr_ParamMode_t eParamMode;
+    float fYnr_SF_Strength;
 
-	int rawWidth;
-	int rawHeight;
+    bool isIQParaUpdate;
+    bool isGrayMode;
+    Aynr_ParamMode_t eParamMode;
+
+    int rawWidth;
+    int rawHeight;
+    int prepare_type;
+
+    CalibDbV2_YnrV2_t ynr_v2;
+    int isReCalculate;
 } Aynr_Context_V2_t;
 
 

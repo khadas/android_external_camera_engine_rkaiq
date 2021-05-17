@@ -19,6 +19,11 @@
 #define _RK_AIQ_USER_API_ANR_H_
 
 #include "anr/rk_aiq_uapi_anr_int.h"
+#include "arawnr/rk_aiq_uapi_abayernr_int_v1.h"
+#include "aynr/rk_aiq_uapi_aynr_int_v1.h"
+#include "auvnr/rk_aiq_uapi_auvnr_int_v1.h"
+#include "amfnr/rk_aiq_uapi_amfnr_int_v1.h"
+
 
 typedef struct rk_aiq_sys_ctx_s rk_aiq_sys_ctx_t;
 

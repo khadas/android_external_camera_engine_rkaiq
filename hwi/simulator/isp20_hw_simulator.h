@@ -25,8 +25,10 @@
 #include "anr/rk_aiq_types_anr_algo_int.h"
 #include "asharp/rk_aiq_types_asharp_algo_int.h"
 #include "adebayer/rk_aiq_types_algo_adebayer.h"
-#include "ahdr/rk_aiq_types_ahdr_algo_int.h"
-#include "ahdr/rk_aiq_types_ahdr_algo.h"
+#include "atmo/rk_aiq_types_atmo_algo_int.h"
+#include "atmo/rk_aiq_types_atmo_algo.h"
+#include "amerge/rk_aiq_types_amerge_algo_int.h"
+#include "amerge/rk_aiq_types_amerge_algo.h"
 #include "agamma/rk_aiq_types_agamma_algo_prvt.h"
 #include "aorb/rk_aiq_orb_hw.h"
 #include "adpcc/rk_aiq_types_adpcc_algo_int.h"
@@ -58,11 +60,11 @@ typedef struct rk_sim_isp_v200_stats_s {
     //orb
     bool valid_orb;
     sim_orb_stat_t orb;
-    //ahdr
+    //atmo
     unsigned short  rawWidth;               // rawÍ¼¿í
     unsigned short  rawHeight;
-    bool valid_ahdr;
-    rkisp_ahdr_stats_t ahdr;
+    bool valid_atmo;
+    rkisp_atmo_stats_t atmo;
 } rk_sim_isp_v200_stats_t;
 
 typedef struct rk_sim_isp_v200_params_s {
@@ -79,14 +81,16 @@ typedef struct rk_sim_isp_v200_params_s {
     rk_aiq_dehaze_cfg_t adhaz_config;
     //agamma
     AgammaProcRes_t agamma_config;
-    //ahdr
-    RkAiqAhdrProcResult_t ahdr_proc_res;
+    //amerge
+    RkAiqAmergeProcResult_t amerge_proc_res;
+    //atmo
+    RkAiqAtmoProcResult_t atmo_proc_res;
     //adpcc
     AdpccProcResult_t   dpcc;
     //adebayer
     AdebayerConfig_t adebayer_config;
     //ablc
-    AblcProcResult_t blc;
+    AblcProc_t blc;
     //agic
     AgicConfig_t agic_config;
     rk_aiq_lsc_cfg_t lscHwConf;

@@ -41,7 +41,7 @@ typedef enum rk_aiq_blk_stat_mode_v200_e {
     RK_AIQ_AWB_BLK_STAT_MODE_UVWP_V200 = 2,
     RK_AIQ_AWB_BLK_STAT_MODE_XYWP_V200 = 3,
     RK_AIQ_AWB_BLK_STAT_MODE_MAX_V200
-} rk_aiq_blk_stat_mode_v200_t;
+} rk_aiq_blk_stat_mode_v200_t;//cxf333 repeat
 typedef struct rk_aiq_awb_exc_range_s {
     rk_aiq_awb_exc_range_domain_t domain;
     bool excludeEnable;// 0 disable,1 eanble;
@@ -115,6 +115,8 @@ typedef struct rk_aiq_awb_stat_res_v200_s {
     rk_aiq_awb_stat_wp_res_light_v200_t multiwindowLightResult[RK_AIQ_AWB_MAX_WHITEREGIONS_NUM];
     //window in xy or uv domain
     rk_aiq_awb_stat_wp_res_v200_t excWpRangeResult[RK_AIQ_AWB_STAT_WP_RANGE_NUM_V200];
+
+    rk_aiq_awb_stat_cfg_v200_t  awb_cfg_effect_v200;
 } rk_aiq_awb_stat_res_v200_t;
 
 #endif

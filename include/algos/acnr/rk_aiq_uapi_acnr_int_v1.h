@@ -12,7 +12,22 @@
 // sync should be done in inner. now we just need implement
 // the case of need_sync == false; need_sync is for future usage.
 
+XCamReturn
+rk_aiq_uapi_acnrV1_SetAttrib(RkAiqAlgoContext *ctx,
+                             rk_aiq_cnr_attrib_v1_t *attr,
+                             bool need_sync);
 
+XCamReturn
+rk_aiq_uapi_acnrV1_GetAttrib(const RkAiqAlgoContext *ctx,
+                             rk_aiq_cnr_attrib_v1_t *attr);
+
+XCamReturn
+rk_aiq_uapi_acnrV1_SetChromaSFStrength(const RkAiqAlgoContext *ctx,
+                                       float fPercent);
+
+XCamReturn
+rk_aiq_uapi_acnrV1_GetChromaSFStrength(const RkAiqAlgoContext *ctx,
+                                       float *pPercent);
 
 
 #endif

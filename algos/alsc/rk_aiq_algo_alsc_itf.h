@@ -22,7 +22,7 @@
 
 #include "rk_aiq_algo_des.h"
 
-#define RKISP_ALGO_ALSC_VERSION     "v0.0.9"
+#define RKISP_ALGO_ALSC_VERSION     "v0.0.b"
 #define RKISP_ALGO_ALSC_VENDOR      "Rockchip"
 #define RKISP_ALGO_ALSC_DESCRIPTION "Rockchip Alsc algo for ISP2.0"
 
@@ -32,4 +32,4 @@ extern RkAiqAlgoDescription g_RkIspAlgoDescAlsc;
 
 XCAM_END_DECLARE
 
-#endif //_RK_AIQ_ALGO_ALSC_ITF_H_ 
+#endif //_RK_AIQ_ALGO_ALSC_ITF_H_

@@ -54,7 +54,18 @@ public:
         return XCAM_RETURN_NO_ERROR;
     };
     virtual void getShareMemOps(isp_drv_share_mem_ops_t** mem_ops) {};
-    
+    virtual XCamReturn enqueueRawBuffer(struct rk_aiq_vbuf *vbuf, bool sync) {
+        return  XCAM_RETURN_ERROR_FAILED;
+    }
+    virtual XCamReturn enqueueRawFile(const char *path) {
+        return  XCAM_RETURN_ERROR_FAILED;
+    }
+    virtual XCamReturn registRawdataCb(void (*callback)(void *)) {
+        return  XCAM_RETURN_ERROR_FAILED;
+    }
+    virtual XCamReturn rawdataPrepare(rk_aiq_raw_prop_t prop) {
+        return  XCAM_RETURN_ERROR_FAILED;
+    }
 private:
     XCAM_DEAD_COPY (CamHwSimulator);
 };

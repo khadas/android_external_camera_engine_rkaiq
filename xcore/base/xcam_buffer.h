@@ -101,9 +101,10 @@ struct _XCamVideoBuffer {
     XCamVideoBufferInfo   info;
     uint32_t              mem_type;
     int64_t               timestamp;
+    uint32_t              frame_id;
 
     void      (*ref) (XCamVideoBuffer *);
-    void      (*unref) (XCamVideoBuffer *);
+    uint32_t  (*unref) (XCamVideoBuffer *);
     uint8_t  *(*map) (XCamVideoBuffer *);
     void      (*unmap) (XCamVideoBuffer *);
     int       (*get_fd) (XCamVideoBuffer *);
@@ -112,8 +113,15 @@ struct _XCamVideoBuffer {
 typedef struct _XCamVideoBufferIntel XCamVideoBufferIntel;
 struct _XCamVideoBufferIntel {
     XCamVideoBuffer     base;
-
     void     *(*get_bo) (XCamVideoBufferIntel *);
+};
+
+typedef struct _XCamVideoBufferRK XCamVideoBufferRK;
+struct _XCamVideoBufferRK {
+    XCamVideoBuffer     base;
+    void*               pUserContext;
+    void     *(*get_bo) (XCamVideoBufferRK *);
+    void      (*notify) (void *, XCamVideoBuffer *);
 };
 
 #define xcam_video_buffer_ref(buf) (buf)->ref(buf)
@@ -127,7 +135,7 @@ XCamReturn
 xcam_video_buffer_info_reset (
     XCamVideoBufferInfo *info,
     uint32_t format, uint32_t width, uint32_t height,
-    uint32_t aligned_width, uint32_t aligned_height, uint32_t size);
+    uint32_t aligned_width, uint32_t aligned_height, uint32_t size, bool compacted);
 
 XCamReturn
 xcam_video_buffer_get_planar_info (

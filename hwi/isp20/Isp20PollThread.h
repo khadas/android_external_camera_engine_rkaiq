@@ -52,19 +52,18 @@ public:
     explicit Isp20PollThread();
     virtual ~Isp20PollThread();
 
-    bool set_event_handle_dev(SmartPtr<SensorHw> &dev);
+    bool set_event_handle_dev(SmartPtr<BaseSensorHw> &dev);
     bool set_iris_handle_dev(SmartPtr<LensHw> &dev);
     bool set_focus_handle_dev(SmartPtr<LensHw> &dev);
-    bool set_rx_handle_dev(CamHwIsp20* dev);
+    bool setCamHw(ICamHw *dev);
     void set_mipi_devs(SmartPtr<V4l2Device> mipi_tx_devs[3],
                        SmartPtr<V4l2Device> mipi_rx_devs[3],
                        SmartPtr<V4l2SubDevice> isp_dev);
-    void set_hdr_frame_readback_infos(int frame_id, int times);
+    void set_hdr_frame_readback_infos(rk_aiq_luma_params_t luma_params);
     void set_need_luma_rd_info(bool need) { _need_luma_rd_info = need; }
     XCamReturn notify_capture_raw();
     // should be called befor start
     void set_working_mode(int mode, bool linked_to_isp, bool nordbk);
-    void set_loop_status(bool stat);
     XCamReturn capture_raw_ctl(capture_raw_t type, int count = 0, const char* capture_dir = nullptr, char* output_dir = nullptr);
     void set_hdr_global_tmo_mode(int frame_id, bool mode);
     virtual XCamReturn start();
@@ -73,6 +72,7 @@ public:
         _is_multi_cam_conc = cc;
     }
     void skip_frames(int skip_num, int32_t skip_seq);
+    XCamReturn getEffectiveLumaParams(int frame_id, rk_aiq_luma_params_t& luma_params);
     enum {
         ISP_POLL_MIPI_TX,
         ISP_POLL_MIPI_RX,
@@ -108,7 +108,7 @@ private:
     SmartPtr<V4l2SubDevice> _isp_core_dev;
     isp_mipi_dev_info_t _isp_mipi_tx_infos[3];
     isp_mipi_dev_info_t _isp_mipi_rx_infos[3];
-    std::map<uint32_t, int> _isp_hdr_fid2times_map;
+    std::map<uint32_t, rk_aiq_luma_params_t> _isp_hdr_fid2times_map;
     std::map<uint32_t, bool> _isp_hdr_fid2ready_map;
     int _working_mode;
     bool _linked_to_isp;
@@ -116,16 +116,17 @@ private:
     Mutex _mipi_buf_mutex;
     Mutex _mipi_trigger_mutex;
     bool _first_trigger;
-    bool _loop_vain;
+    bool _cache_tx_data;
 private:
     XCAM_DEAD_COPY(Isp20PollThread);
-    SmartPtr<SensorHw> _event_handle_dev;
+    SmartPtr<BaseSensorHw> _event_handle_dev;
     SmartPtr<LensHw> _iris_handle_dev;
     SmartPtr<LensHw> _focus_handle_dev;
-    CamHwIsp20* _rx_handle_dev;
+    ICamHw *mCamHw;
     uint32_t sns_width;
     uint32_t sns_height;
     uint32_t pixelformat;
+    uint32_t _stride_perline;
     char raw_dir_path[64];
     char user_set_raw_dir[64];
     bool _is_raw_dir_exist;
@@ -153,9 +154,11 @@ private:
                                  int sequence, void* userptr, int size);
     void write_reg_to_file(uint32_t base_addr, uint32_t offset_addr,
                            int len, int sequence);
-    void write_metadata_to_file(const char* dir_path, int frame_id,
-                                SmartPtr<RkAiqIspParamsProxy>& ispParams,
-                                SmartPtr<RkAiqExpParamsProxy>& expParams);
+    void write_metadata_to_file(const char* dir_path,
+            int frame_id,
+            rkisp_effect_params_v20& ispParams,
+            SmartPtr<RkAiqExpParamsProxy>& expParams,
+            SmartPtr<RkAiqAfInfoProxy>& afParams);
     bool get_value_from_file(const char* path, int& value, uint32_t& frameId);
     bool set_value_to_file(const char* path, int value, uint32_t sequence = 0);
     int detect_capture_raw_status(const char* file_name, uint32_t sequence);

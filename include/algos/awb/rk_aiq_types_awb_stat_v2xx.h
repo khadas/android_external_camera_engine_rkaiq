@@ -23,8 +23,9 @@
 #ifndef __RK_AIQ_TYPE_AWB_STAT_V2XX_H__
 #define __RK_AIQ_TYPE_AWB_STAT_V2XX_H__
 #include "rk_aiq_comm.h"
-#define TIME_SHARE_TEST
+//#define TIME_SHARE_TEST
 #define TIME_SHARE_MODE
+#define RK_AIQ_AWB_STAT_YUV_ILL_OFF 7
 #define RK_AIQ_AWB_MAX_WHITEREGIONS_NUM       7
 #define RK_AIQ_AWB_YUV_LS_PARA_NUM 4
 #define RK_AIQ_AWB_GRID_NUM_VERHOR           15
@@ -40,7 +41,7 @@ typedef enum rk_aiq_down_scale_mode_e {
     RK_AIQ_AWB_DS_4X4 = 0,
     RK_AIQ_AWB_DS_8X8 = 1,
     RK_AIQ_AWB_DS_MAX
-} rk_aiq_down_scale_mode_t;
+} rk_aiq_down_scale_mode_t;//cxf333 repeat
 
 typedef struct rk_aiq_rgb2xy_para_s {
     unsigned short pseudoLuminanceWeight[3];
@@ -64,7 +65,7 @@ typedef struct rk_aiq_awb_uv_range_para_s {
 typedef struct rk_aiq_awb_3dyuv_range_para_s {
     int b_uv;            //17+0 s
     int slope_inv_neg_uv; //9+10s //-1/k
-    int slope_factor_uv; //9+10s // 1/(-1/k+k)
+    int slope_factor_uv; //1+14s // 1/(-1/k+k)
     int slope_ydis;        //9+10s //k
     int b_ydis;            //17+0s
     unsigned char ref_u;   //8u

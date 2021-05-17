@@ -91,6 +91,7 @@ PollThread::PollThread ()
     : _poll_callback (NULL)
     , frameid (0)
 {
+#if 0
     SmartPtr<EventPollThread> event_loop = new EventPollThread(this);
     XCAM_ASSERT (event_loop.ptr ());
     _event_loop = event_loop;
@@ -127,7 +128,7 @@ PollThread::PollThread ()
     _isp_params_poll_stop_fd[1] = -1;
     _isp_pparams_poll_stop_fd[0] = -1;
     _isp_pparams_poll_stop_fd[1] = -1;
-
+#endif
     XCAM_LOG_DEBUG ("PollThread constructed");
 }
 
@@ -534,6 +535,13 @@ PollThread::poll_subdev_event_loop ()
     }
 
     ret = handle_events (event);
+
+    XCAM_ASSERT (_poll_callback);
+
+    if (_poll_callback && event.type == V4L2_EVENT_FRAME_SYNC)
+        return _poll_callback->poll_event_ready (event.u.frame_sync.frame_sequence,
+                                                 event.type);
+
     return ret;
 }
 
@@ -555,7 +563,7 @@ PollThread::poll_buffer_loop (int type)
     SmartPtr<V4l2Buffer> buf;
     SmartPtr<V4l2Device> dev;
     int stop_fd = -1;
-
+#if 0
     if (type == ISP_POLL_LUMA) {
         dev = _isp_luma_dev;
         stop_fd = _luma_poll_stop_fd[0];
@@ -604,7 +612,7 @@ PollThread::poll_buffer_loop (int type)
 
         return _poll_callback->poll_buffer_ready (video_buf, type);
     }
-
+#endif
     return ret;
 }
 

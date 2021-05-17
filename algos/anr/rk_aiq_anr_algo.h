@@ -49,6 +49,11 @@ ANRresult_t ANRConfigSettingParam(ANRContext_t *pANRCtx, ANRParamMode_t eParamMo
 ANRresult_t ANRParamModeProcess(ANRContext_t *pANRCtx, ANRExpInfo_t *pExpInfo, ANRParamMode_t *mode);
 
 
+ANRresult_t ANRInit_json(ANRContext_t **ppANRCtx, CamCalibDbV2Context_t *pCalibDbV2);
+
+ANRresult_t ANRConfigParamJson(ANRContext_t *pANRCtx, ANRParamMode_t eParamMode, int snr_mode);
+
+
 RKAIQ_END_DECLARE
 
 #endif

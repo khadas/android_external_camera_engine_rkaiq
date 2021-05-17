@@ -38,6 +38,7 @@ public:
     static void createCalibDbBinFromXml(char* iqFile);
     static void parseXmlandWriteXml(char* iqFile);
 private:
+    static void initCalibDb(CamCalibDbContext_t* pCalibDb);
     static map<string, CamCalibDbContext_t*> mCalibDbsMap;
     static XCam::Mutex mMutex;
 };

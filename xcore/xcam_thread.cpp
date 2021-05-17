@@ -83,8 +83,10 @@ Thread::thread_func (void *user_data)
 
     thread->stopped ();
 
-    SmartLock locker(thread->_mutex);
-    thread->_stopped = true;
+    {
+        SmartLock locker(thread->_mutex);
+        thread->_stopped = true;
+    }
     thread->_exit_cond.broadcast ();
 
     return 0;
@@ -140,11 +142,10 @@ bool Thread::stop ()
     XCAM_LOG_DEBUG ("stop thread(%s) _started: %d _stopped: %d",
                     XCAM_STR(_name), _started, _stopped);
 
+    emit_stop();
+
     SmartLock locker(_mutex);
-    if (_started) {
-        _started = false;
-    }
-    if (!_stopped) {
+    while (!_stopped) {
         _exit_cond.wait(_mutex);
     }
     return true;

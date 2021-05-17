@@ -157,7 +157,7 @@ void GenMeshTable(int imgWidth, int imgHeight, int meshStepW, int meshStepH, int
     FILE *fpMeshXY = fopen("MeshXY.bin", "wb");
     if (fpMeshXY == NULL) {
         printf("MeshXY.bin open error!!!");
-        return;
+        goto err;
     }
     fwrite(&imgWidth, sizeof(unsigned short), 1, fpMeshXY);
     fwrite(&imgHeight, sizeof(unsigned short), 1, fpMeshXY);
@@ -168,52 +168,57 @@ void GenMeshTable(int imgWidth, int imgHeight, int meshStepW, int meshStepH, int
     fwrite(pMeshXY, sizeof(unsigned short), meshSizeW * meshSizeH * 2 * 2, fpMeshXY);
     if (fclose(fpMeshXY) != 0) {
         printf("MeshXY.bin close error!!!");
-        return;
+        goto err;
     }
     /* MeshXI.bin */
     FILE *fpMeshXI = fopen("MeshXI.bin", "wb");
     if (fpMeshXI == NULL) {
         printf("MeshXI.bin open error!!!");
-        return;
+        goto err;
     }
     fwrite(pMeshXI, sizeof(unsigned short), meshSizeW * meshSizeH, fpMeshXI);
     if (fclose(fpMeshXI) != 0) {
         printf("MeshXI.bin close error!!!");
-        return;
+        goto err;
     }
     /* MeshXF.bin */
     FILE *fpMeshXF = fopen("MeshXF.bin", "wb");
     if (fpMeshXF == NULL) {
         printf("MeshXF.bin open error!!!");
-        return;
+        goto err;
     }
     fwrite(pMeshXF, sizeof(unsigned char), meshSizeW * meshSizeH, fpMeshXF);
     if (fclose(fpMeshXF) != 0) {
         printf("MeshXF.bin close error!!!");
-        return;
+        goto err;
     }
     /* MeshYI.bin */
     FILE *fpMeshYI = fopen("MeshYI.bin", "wb");
     if (fpMeshYI == NULL) {
         printf("MeshYI.bin open error!!!");
-        return;
+        goto err;
     }
     fwrite(pMeshYI, sizeof(unsigned short), meshSizeW * meshSizeH, fpMeshYI);
     if (fclose(fpMeshYI) != 0) {
         printf("MeshYI.bin close error!!!");
-        return;
+        goto err;
     }
     /* MeshYF.bin */
     FILE *fpMeshYF = fopen("MeshYF.bin", "wb");
     if (fpMeshYF == NULL) {
         printf("MeshYF.bin open error!!!");
-        return;
+        goto err;
     }
     fwrite(pMeshYF, sizeof(unsigned char), meshSizeW * meshSizeH, fpMeshYF);
     if (fclose(fpMeshYF) != 0) {
         printf("MeshYF.bin close error!!!");
-        return;
+        goto err;
     }
+
+err:
+    delete[] mapx;
+    delete[] mapy;
+    delete[] mapz;
 }
 
 int gen_default_mesh_table(int imgWidth, int imgHeight, int mesh_density,

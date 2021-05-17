@@ -13,6 +13,25 @@
 // the case of need_sync == false; need_sync is for future usage.
 
 
+XCamReturn
+rk_aiq_uapi_aynrV2_SetAttrib(RkAiqAlgoContext *ctx,
+                             rk_aiq_ynr_attrib_v2_t *attr,
+                             bool need_sync);
+
+XCamReturn
+rk_aiq_uapi_aynrV2_GetAttrib(const RkAiqAlgoContext *ctx,
+                             rk_aiq_ynr_attrib_v2_t *attr);
+
+XCamReturn
+rk_aiq_uapi_aynrV2_SetLumaSFStrength(const RkAiqAlgoContext *ctx,
+                                     float fPercent);
+
+XCamReturn
+rk_aiq_uapi_aynrV2_GetLumaSFStrength(const RkAiqAlgoContext *ctx,
+                                     float *pPercent);
+
+
+
 
 
 #endif

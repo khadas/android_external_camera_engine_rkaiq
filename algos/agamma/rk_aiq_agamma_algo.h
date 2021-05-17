@@ -22,12 +22,13 @@
 
 #include "rk_aiq_comm.h"
 #include "RkAiqCalibDbTypes.h"
+#include "RkAiqCalibDbV2Helper.h"
 #include "agamma/rk_aiq_types_agamma_algo_prvt.h"
 
 
 RKAIQ_BEGIN_DECLARE
 
-XCamReturn AgammaInit(AgammaHandle_t** para, CamCalibDbContext_t* calib);
+XCamReturn AgammaInit(AgammaHandle_t** para, CamCalibDbV2Context_t* calib);
 XCamReturn AgammaRelease(AgammaHandle_t* para);
 XCamReturn AgammaPreProc(AgammaHandle_t* para);
 void AgammaProcessing(AgammaHandle_t* para);

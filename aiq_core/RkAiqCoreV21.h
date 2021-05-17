@@ -32,8 +32,11 @@ public:
     virtual ~RkAiqCoreV21();
 protected:
     SmartPtr<RkAiqHandle> newAlgoHandle(RkAiqAlgoDesComm* algo, bool generic, int hw_ver);
-    void copyIspStats(RkAiqIspStats* from ,rk_aiq_isp_stats_t* to);
-    XCamReturn convertIspstatsToAlgo(const SmartPtr<VideoBuffer> &buffer);
+    void copyIspStats(SmartPtr<RkAiqAecStatsProxy>& aecStat,
+                      SmartPtr<RkAiqAwbStatsProxy>& awbStat,
+                      SmartPtr<RkAiqAfStatsProxy>& afStat,
+                      rk_aiq_isp_stats_t* to);
+    XCamReturn genIspParamsResult(RkAiqFullParams *aiqParams, enum rk_aiq_core_analyze_type_e type);
     XCamReturn genIspArawnrResult(RkAiqFullParams* params);
     XCamReturn genIspAmfnrResult(RkAiqFullParams* params);
     XCamReturn genIspAynrResult(RkAiqFullParams* params);
@@ -45,6 +48,9 @@ protected:
     XCamReturn genIspAccmResult(RkAiqFullParams* params);
     XCamReturn genIspAdhazResult(RkAiqFullParams* params);
     XCamReturn genIspAsharpResult(RkAiqFullParams* params);
+    void newAiqParamsPool();
+    XCamReturn getAiqParamsBuffer(RkAiqFullParams* aiqParams, enum rk_aiq_core_analyze_type_e type);
+
 private:
 };
 

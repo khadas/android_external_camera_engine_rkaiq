@@ -20,12 +20,10 @@
 #include "rk_aiq_algo_types_int.h"
 #include "adpcc/rk_aiq_algo_adpcc_itf.h"
 #include "adpcc/rk_aiq_adpcc_algo.h"
+#include "adpcc/rk_aiq_types_adpcc_algo_prvt.h"
+
 
 RKAIQ_BEGIN_DECLARE
-
-typedef struct _RkAiqAlgoContext {
-    void* place_holder[0];
-} RkAiqAlgoContext;
 
 
 static XCamReturn
@@ -36,16 +34,14 @@ create_context(RkAiqAlgoContext **context, const AlgoCtxInstanceCfg* cfg)
     LOGI_ADPCC("%s: (enter)\n", __FUNCTION__ );
     AlgoCtxInstanceCfgInt *cfgInt = (AlgoCtxInstanceCfgInt*)cfg;
 
-#if 1
     AdpccContext_t* pAdpccCtx = NULL;
-    AdpccResult_t ret = AdpccInit(&pAdpccCtx, cfgInt->calib);//load iq paras
+    AdpccResult_t ret = AdpccInit(&pAdpccCtx, cfgInt->calibv2);//load json paras
     if(ret != ADPCC_RET_SUCCESS) {
         result = XCAM_RETURN_ERROR_FAILED;
         LOGE_ADPCC("%s: Initializaion Adpcc failed (%d)\n", __FUNCTION__, ret);
     } else {
         *context = (RkAiqAlgoContext *)(pAdpccCtx);
     }
-#endif
 
     LOGI_ADPCC("%s: (exit)\n", __FUNCTION__ );
     return result;
@@ -76,20 +72,20 @@ prepare(RkAiqAlgoCom* params)
 {
     XCamReturn result = XCAM_RETURN_NO_ERROR;
 
-    LOGI_ADPCC("%s: (enter)\n", __FUNCTION__ );
+    LOGE_ADPCC("%s: (enter)\n", __FUNCTION__ );
 
-#if 1
     AdpccContext_t* pAdpccCtx = (AdpccContext_t *)params->ctx;
     RkAiqAlgoConfigAdpccInt* pCfgParam = (RkAiqAlgoConfigAdpccInt*)params;
     AdpccConfig_t* pAdpccConfig = &pCfgParam->stAdpccConfig;
+    pAdpccCtx->prepare_type = params->u.prepare.conf_type;
 
-    AdpccResult_t ret = AdpccConfig(pAdpccCtx, pAdpccConfig);
-    if(ret != ADPCC_RET_SUCCESS) {
-        result = XCAM_RETURN_ERROR_FAILED;
-        LOGE_ADPCC("%s: config Adpcc failed (%d)\n", __FUNCTION__, ret);
+    if(!!(params->u.prepare.conf_type & RK_AIQ_ALGO_CONFTYPE_UPDATECALIB )) {
+        AdpccResult_t ret = AdpccReloadPara(pAdpccCtx, pCfgParam->rk_com.u.prepare.calibv2);
+        if(ret != ADPCC_RET_SUCCESS) {
+            result = XCAM_RETURN_ERROR_FAILED;
+            LOGE_ADPCC("%s: Adpcc Reload Para failed (%d)\n", __FUNCTION__, ret);
+        }
     }
-
-#endif
 
     LOGI_ADPCC("%s: (exit)\n", __FUNCTION__ );
     return result;
@@ -146,21 +142,19 @@ processing(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outparams)
         stExpInfo.hdr_mode = 2;
     }
 
-#if 1
-    RkAiqAlgoPreResAeInt* pAEPreRes =
-        (RkAiqAlgoPreResAeInt*)(pAdpccProcParams->rk_com.u.proc.pre_res_comb->ae_pre_res);
+    RKAiqAecExpInfo_t* pAERes = pAdpccProcParams->rk_com.u.proc.curExp;
 
-    if(pAEPreRes != NULL) {
+    if(pAERes != NULL) {
         if(pAdpccProcParams->hdr_mode == RK_AIQ_WORKING_MODE_NORMAL) {
-            stExpInfo.arPreResAGain[0] = pAEPreRes->ae_pre_res_rk.LinearExp.exp_real_params.analog_gain;
-            stExpInfo.arPreResDGain[0] = pAEPreRes->ae_pre_res_rk.LinearExp.exp_real_params.digital_gain;
-            stExpInfo.arPreResTime[0] = pAEPreRes->ae_pre_res_rk.LinearExp.exp_real_params.integration_time;
+            stExpInfo.arPreResAGain[0] = pAERes->LinearExp.exp_real_params.analog_gain;
+            stExpInfo.arPreResDGain[0] = pAERes->LinearExp.exp_real_params.digital_gain;
+            stExpInfo.arPreResTime[0] = pAERes->LinearExp.exp_real_params.integration_time;
             stExpInfo.arPreResIso[0] = stExpInfo.arPreResAGain[0] * 50;
         } else {
             for(int i = 0; i < 3; i++) {
-                stExpInfo.arPreResAGain[i] = pAEPreRes->ae_pre_res_rk.HdrExp[i].exp_real_params.analog_gain;
-                stExpInfo.arPreResDGain[i] = pAEPreRes->ae_pre_res_rk.HdrExp[i].exp_real_params.digital_gain;
-                stExpInfo.arPreResTime[i] = pAEPreRes->ae_pre_res_rk.HdrExp[i].exp_real_params.integration_time;
+                stExpInfo.arPreResAGain[i] = pAERes->HdrExp[i].exp_real_params.analog_gain;
+                stExpInfo.arPreResDGain[i] = pAERes->HdrExp[i].exp_real_params.digital_gain;
+                stExpInfo.arPreResTime[i] = pAERes->HdrExp[i].exp_real_params.integration_time;
                 stExpInfo.arPreResIso[i] = stExpInfo.arPreResAGain[i] * stExpInfo.arPreResDGain[i] * 50;
 
                 LOGD_ADPCC("%s:%d index:%d again:%f dgain:%f time:%f iso:%d hdr_mode:%d\n",
@@ -174,79 +168,8 @@ processing(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outparams)
             }
         }
     } else {
-        LOGE_ADPCC("%s:%d pAEPreRes is NULL, so use default instead \n", __FUNCTION__, __LINE__);
+        LOGE_ADPCC("%s:%d pAERes is NULL, so use default instead \n", __FUNCTION__, __LINE__);
     }
-
-
-    RkAiqAlgoProcResAeInt* pAEProcRes =
-        (RkAiqAlgoProcResAeInt*)(pAdpccProcParams->rk_com.u.proc.proc_res_comb->ae_proc_res);
-
-    if(pAEProcRes != NULL) {
-        int cnt = pAEProcRes->ae_proc_res_rk.exp_set_cnt;
-        if(cnt != 0) {
-            if(pAdpccProcParams->hdr_mode == RK_AIQ_WORKING_MODE_NORMAL) {
-                stExpInfo.arProcResAGain[0] = pAEProcRes->ae_proc_res_rk.exp_set_tbl[cnt - 1].LinearExp.exp_real_params.analog_gain;
-                stExpInfo.arProcResDGain[0] = pAEProcRes->ae_proc_res_rk.exp_set_tbl[cnt - 1].LinearExp.exp_real_params.digital_gain;
-                stExpInfo.arProcResTime[0] = pAEProcRes->ae_proc_res_rk.exp_set_tbl[cnt - 1].LinearExp.exp_real_params.integration_time;
-                stExpInfo.arProcResIso[0] = stExpInfo.arProcResAGain[0] * 50;
-
-                pAdpccCtx->PreAe.arProcResIso[0] = stExpInfo.arProcResIso[0];
-                pAdpccCtx->PreAe.arProcResAGain[0] = stExpInfo.arProcResAGain[0];
-                pAdpccCtx->PreAe.arProcResDGain[0] = stExpInfo.arProcResDGain[0];
-                pAdpccCtx->PreAe.arProcResTime[0] = stExpInfo.arProcResTime[0];
-            } else {
-                for(int i = 0; i < 3; i++) {
-                    stExpInfo.arProcResAGain[i] = pAEProcRes->ae_proc_res_rk.exp_set_tbl[cnt - 1].HdrExp[i].exp_real_params.analog_gain;
-                    stExpInfo.arProcResDGain[i] = pAEProcRes->ae_proc_res_rk.exp_set_tbl[cnt - 1].HdrExp[i].exp_real_params.digital_gain;
-                    stExpInfo.arProcResTime[i] = pAEProcRes->ae_proc_res_rk.exp_set_tbl[cnt - 1].HdrExp[i].exp_real_params.integration_time;
-                    stExpInfo.arProcResIso[i] = stExpInfo.arProcResAGain[i] * stExpInfo.arProcResDGain[i] * 50;
-
-                    pAdpccCtx->PreAe.arProcResIso[i] = stExpInfo.arProcResIso[i];
-                    pAdpccCtx->PreAe.arProcResAGain[i] = stExpInfo.arProcResAGain[i];
-                    pAdpccCtx->PreAe.arProcResDGain[i] = stExpInfo.arProcResDGain[i];
-                    pAdpccCtx->PreAe.arProcResTime[i] = stExpInfo.arProcResTime[i];
-                    LOGD_ADPCC("%s:%d index:%d again:%f dgain:%f time:%f iso:%d hdr_mode:%d\n",
-                               __FUNCTION__, __LINE__,
-                               i,
-                               stExpInfo.arProcResAGain[i],
-                               stExpInfo.arProcResDGain[i],
-                               stExpInfo.arProcResTime[i],
-                               stExpInfo.arProcResIso[i],
-                               stExpInfo.hdr_mode);
-                }
-            }
-        }
-        else
-        {
-            if(pAdpccProcParams->hdr_mode == RK_AIQ_WORKING_MODE_NORMAL) {
-                stExpInfo.arProcResAGain[0] = pAdpccCtx->PreAe.arProcResAGain[0];
-                stExpInfo.arProcResDGain[0] = pAdpccCtx->PreAe.arProcResDGain[0];
-                stExpInfo.arProcResTime[0] = pAdpccCtx->PreAe.arProcResTime[0];
-                stExpInfo.arProcResIso[0] = pAdpccCtx->PreAe.arProcResIso[0];
-            } else {
-                for(int i = 0; i < 3; i++) {
-                    stExpInfo.arProcResAGain[i] = pAdpccCtx->PreAe.arProcResAGain[i];
-                    stExpInfo.arProcResDGain[i] = pAdpccCtx->PreAe.arProcResDGain[i];
-                    stExpInfo.arProcResTime[i] = pAdpccCtx->PreAe.arProcResTime[i];
-                    stExpInfo.arProcResIso[i] = pAdpccCtx->PreAe.arProcResIso[i];
-
-                    LOGD_ADPCC("%s:%d index:%d again:%f dgain:%f time:%f iso:%d hdr_mode:%d\n",
-                               __FUNCTION__, __LINE__,
-                               i,
-                               stExpInfo.arProcResAGain[i],
-                               stExpInfo.arProcResDGain[i],
-                               stExpInfo.arProcResTime[i],
-                               stExpInfo.arProcResIso[i],
-                               stExpInfo.hdr_mode);
-                }
-            }
-        }
-    }
-    else
-        LOGE_ADPCC("%s:%d pAEProcRes is NULL, so use default instead \n", __FUNCTION__, __LINE__);
-
-
-#endif
 
     AdpccResult_t ret = AdpccProcess(pAdpccCtx, &stExpInfo);
     if(ret != ADPCC_RET_SUCCESS) {

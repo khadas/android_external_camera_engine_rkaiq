@@ -26,7 +26,7 @@ xcam_video_buffer_info_reset (
     XCamVideoBufferInfo *info,
     uint32_t format,
     uint32_t width, uint32_t height,
-    uint32_t aligned_width, uint32_t aligned_height, uint32_t size)
+    uint32_t aligned_width, uint32_t aligned_height, uint32_t size, bool compacted)
 {
     uint32_t image_size = 0;
     uint32_t i = 0;
@@ -122,7 +122,10 @@ xcam_video_buffer_info_reset (
     case V4L2_PIX_FMT_SRGGB8:
         info->color_bits = 8;
         info->components = 1;
-        info->strides [0] = aligned_width;
+        if (compacted)
+            info->strides [0] = XCAM_ALIGN_UP(aligned_width, 256);
+        else
+            info->strides [0] = aligned_width;
         info->offsets [0] = 0;
         image_size = info->strides [0] * aligned_height;
         break;
@@ -133,7 +136,10 @@ xcam_video_buffer_info_reset (
     case V4L2_PIX_FMT_SRGGB10:
         info->color_bits = 10;
         info->components = 1;
-        info->strides [0] = aligned_width * 2;
+        if (compacted)
+            info->strides [0] = XCAM_ALIGN_UP((aligned_width * info->color_bits) / 8, 256);
+        else
+            info->strides [0] = aligned_width * 2;
         info->offsets [0] = 0;
         image_size = info->strides [0] * aligned_height;
         break;
@@ -144,7 +150,10 @@ xcam_video_buffer_info_reset (
     case V4L2_PIX_FMT_SRGGB12:
         info->color_bits = 12;
         info->components = 1;
-        info->strides [0] = aligned_width * 2;
+        if (compacted)
+            info->strides [0] = XCAM_ALIGN_UP((aligned_width * info->color_bits) / 8, 256);
+        else
+            info->strides [0] = aligned_width * 2;
         info->offsets [0] = 0;
         image_size = info->strides [0] * aligned_height;
         break;
@@ -153,7 +162,10 @@ xcam_video_buffer_info_reset (
     case XCAM_PIX_FMT_SGRBG16:
         info->color_bits = 16;
         info->components = 1;
-        info->strides [0] = aligned_width * 2;
+        if (compacted)
+            info->strides [0] = XCAM_ALIGN_UP((aligned_width * 2), 256);
+        else
+            info->strides [0] = aligned_width * 2;
         info->offsets [0] = 0;
         image_size = info->strides [0] * aligned_height;
         break;

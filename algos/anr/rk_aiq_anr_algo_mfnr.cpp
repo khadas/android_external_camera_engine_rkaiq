@@ -1,85 +1,91 @@
 #include "rk_aiq_anr_algo_mfnr.h"
 
-ANRresult_t mfnr_get_mode_cell_idx_by_name(CalibDb_MFNR_t *pCalibdb, char *name, int *mode_idx)
+#define ANR_MFNR_SIGMA_X_SHIFT_BITS (0)
+ANRresult_t mfnr_get_mode_cell_idx_by_name(CalibDb_MFNR_2_t *pCalibdb, const char *name, int *mode_idx)
 {
-	int i = 0;
-	ANRresult_t res = ANR_RET_SUCCESS;
+    int i = 0;
+    ANRresult_t res = ANR_RET_SUCCESS;
 
-	if(pCalibdb == NULL){
-		LOGE_ANR("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
-		return ANR_RET_NULL_POINTER;
-	}
+    if(pCalibdb == NULL) {
+        LOGE_ANR("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
+        return ANR_RET_NULL_POINTER;
+    }
 
-	if(name == NULL){
-		LOGE_ANR("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
-		return ANR_RET_NULL_POINTER;
-	}
+    if(name == NULL) {
+        LOGE_ANR("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
+        return ANR_RET_NULL_POINTER;
+    }
 
-	if(mode_idx == NULL){
-		LOGE_ANR("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
-		return ANR_RET_NULL_POINTER;
-	}
+    if(mode_idx == NULL) {
+        LOGE_ANR("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
+        return ANR_RET_NULL_POINTER;
+    }
 
-	for(i=0; i<CALIBDB_NR_SHARP_SETTING_LEVEL; i++){
-		if(strncmp(name, pCalibdb->mode_cell[i].name, sizeof(pCalibdb->mode_cell[i].name)) == 0){
-			break;
-		}
-	}
+    if(pCalibdb->mode_num < 1) {
+        LOGE_ANR("%s(%d): mfnr mode cell num is zero\n", __FUNCTION__, __LINE__);
+        return ANR_RET_NULL_POINTER;
+    }
 
-	if(i<CALIBDB_MAX_MODE_NUM){
-		*mode_idx = i;
-		res = ANR_RET_SUCCESS;
-	}else{
-		*mode_idx = 0;
-		res = ANR_RET_FAILURE;
-	}
+    for(i = 0; i < pCalibdb->mode_num; i++) {
+        if(strncmp(name, pCalibdb->mode_cell[i].name, sizeof(pCalibdb->mode_cell[i].name)) == 0) {
+            break;
+        }
+    }
 
-	LOGD_ANR("%s:%d mode_name:%s  mode_idx:%d i:%d \n",__FUNCTION__, __LINE__, name, *mode_idx, i);
-	return res;
+    if(i < pCalibdb->mode_num) {
+        *mode_idx = i;
+        res = ANR_RET_SUCCESS;
+    } else {
+        *mode_idx = 0;
+        res = ANR_RET_FAILURE;
+    }
+
+    LOGD_ANR("%s:%d mode_name:%s  mode_idx:%d i:%d \n", __FUNCTION__, __LINE__, name, *mode_idx, i);
+    return res;
 
 }
 
 
-ANRresult_t mfnr_get_setting_idx_by_name(CalibDb_MFNR_t *pCalibdb, char *name, int mode_idx, int *setting_idx)
+ANRresult_t mfnr_get_setting_idx_by_name(CalibDb_MFNR_2_t *pCalibdb, char *name, int mode_idx, int *setting_idx)
 {
-	int i = 0;
-	ANRresult_t res = ANR_RET_SUCCESS;
+    int i = 0;
+    ANRresult_t res = ANR_RET_SUCCESS;
 
-	if(pCalibdb == NULL){
-		LOGE_ANR("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
-		return ANR_RET_NULL_POINTER;
-	}
+    if(pCalibdb == NULL) {
+        LOGE_ANR("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
+        return ANR_RET_NULL_POINTER;
+    }
 
-	if(name == NULL){
-		LOGE_ANR("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
-		return ANR_RET_NULL_POINTER;
-	}
+    if(name == NULL) {
+        LOGE_ANR("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
+        return ANR_RET_NULL_POINTER;
+    }
 
-	if(setting_idx == NULL){
-		LOGE_ANR("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
-		return ANR_RET_NULL_POINTER;
-	}
+    if(setting_idx == NULL) {
+        LOGE_ANR("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
+        return ANR_RET_NULL_POINTER;
+    }
 
-	for(i=0; i<CALIBDB_NR_SHARP_SETTING_LEVEL; i++){
-		if(strncmp(name, pCalibdb->mode_cell[mode_idx].setting[i].snr_mode, sizeof(pCalibdb->mode_cell[mode_idx].setting[i].snr_mode)) == 0){
-			break;
-		}
-	}
+    for(i = 0; i < CALIBDB_NR_SHARP_SETTING_LEVEL; i++) {
+        if(strncmp(name, pCalibdb->mode_cell[mode_idx].setting[i].snr_mode, sizeof(pCalibdb->mode_cell[mode_idx].setting[i].snr_mode)) == 0) {
+            break;
+        }
+    }
 
-	if(i<CALIBDB_NR_SHARP_SETTING_LEVEL){
-		*setting_idx = i;
-		res = ANR_RET_SUCCESS;
-	}else{
-		*setting_idx = 0;
-		res = ANR_RET_FAILURE;
-	}
+    if(i < CALIBDB_NR_SHARP_SETTING_LEVEL) {
+        *setting_idx = i;
+        res = ANR_RET_SUCCESS;
+    } else {
+        *setting_idx = 0;
+        res = ANR_RET_FAILURE;
+    }
 
-	LOGD_ANR("%s:%d snr_name:%s  snr_idx:%d i:%d \n",__FUNCTION__, __LINE__, name, *setting_idx, i);
-	return res;
+    LOGD_ANR("%s:%d snr_name:%s  snr_idx:%d i:%d \n", __FUNCTION__, __LINE__, name, *setting_idx, i);
+    return res;
 
 }
 
-ANRresult_t init_mfnr_dynamic_params(RKAnr_Mfnr_Dynamic_t *pDynamic, CalibDb_MFNR_t *pCalibdb, int mode_idx)
+ANRresult_t init_mfnr_dynamic_params(RKAnr_Mfnr_Dynamic_t *pDynamic, CalibDb_MFNR_2_t *pCalibdb, int mode_idx)
 {
     ANRresult_t res = ANR_RET_SUCCESS;
     int i = 0;
@@ -95,99 +101,162 @@ ANRresult_t init_mfnr_dynamic_params(RKAnr_Mfnr_Dynamic_t *pDynamic, CalibDb_MFN
         return ANR_RET_NULL_POINTER;
     }
 
-   pDynamic->enable = pCalibdb->mode_cell[mode_idx].dynamic.enable;
-   pDynamic->lowth_iso = pCalibdb->mode_cell[mode_idx].dynamic.lowth_iso;
-   pDynamic->lowth_time = pCalibdb->mode_cell[mode_idx].dynamic.lowth_time;
-   pDynamic->highth_iso = pCalibdb->mode_cell[mode_idx].dynamic.highth_iso;
-   pDynamic->highth_time = pCalibdb->mode_cell[mode_idx].dynamic.highth_time;
+    pDynamic->enable = pCalibdb->mode_cell[mode_idx].dynamic.enable;
+    pDynamic->lowth_iso = pCalibdb->mode_cell[mode_idx].dynamic.lowth_iso;
+    pDynamic->lowth_time = pCalibdb->mode_cell[mode_idx].dynamic.lowth_time;
+    pDynamic->highth_iso = pCalibdb->mode_cell[mode_idx].dynamic.highth_iso;
+    pDynamic->highth_time = pCalibdb->mode_cell[mode_idx].dynamic.highth_time;
 
-   LOGD_ANR("dynamic final param mode:%d \n", mode_idx);
-   return res;
+    LOGD_ANR("dynamic final param mode:%d \n", mode_idx);
+    return res;
 
 }
 
-ANRresult_t mfnr_config_dynamic_param(RKAnr_Mfnr_Dynamic_t *pDynamic,  CalibDb_MFNR_t *pCalibdb, char* param_mode)
+ANRresult_t mfnr_config_dynamic_param(RKAnr_Mfnr_Dynamic_t *pDynamic,  CalibDb_MFNR_2_t *pCalibdb, char* param_mode)
 {
-	
-	ANRresult_t res = ANR_RET_SUCCESS;
-	int mode_idx = 0;
-	int setting_idx = 0;
 
-	if(pDynamic == NULL){
-		LOGE_ANR("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
-		return ANR_RET_NULL_POINTER;
-	}
+    ANRresult_t res = ANR_RET_SUCCESS;
+    int mode_idx = 0;
+    int setting_idx = 0;
 
-	if(pCalibdb == NULL){
-		LOGE_ANR("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
-		return ANR_RET_NULL_POINTER;
-	}
+    if(pDynamic == NULL) {
+        LOGE_ANR("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
+        return ANR_RET_NULL_POINTER;
+    }
 
-	if(param_mode == NULL){
-		LOGE_ANR("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
-		return ANR_RET_NULL_POINTER;
-	}
-	
-	res = mfnr_get_mode_cell_idx_by_name(pCalibdb, param_mode, &mode_idx);
-	if(res != ANR_RET_SUCCESS){
-		LOGW_ANR("%s(%d): error!!!	can't find mode name in iq files, use 0 instead\n", __FUNCTION__, __LINE__);
-	}
+    if(pCalibdb == NULL) {
+        LOGE_ANR("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
+        return ANR_RET_NULL_POINTER;
+    }
 
-	res = init_mfnr_dynamic_params(pDynamic, pCalibdb, mode_idx);
+    if(param_mode == NULL) {
+        LOGE_ANR("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
+        return ANR_RET_NULL_POINTER;
+    }
 
-	LOGD_ANR("final param mode:%d snr_mode:%d\n", mode_idx);
-	return res;
-	
+    res = mfnr_get_mode_cell_idx_by_name(pCalibdb, param_mode, &mode_idx);
+    if(res != ANR_RET_SUCCESS) {
+        LOGW_ANR("%s(%d): error!!!	can't find mode name in iq files, use 0 instead\n", __FUNCTION__, __LINE__);
+    }
+
+    res = init_mfnr_dynamic_params(pDynamic, pCalibdb, mode_idx);
+
+    LOGD_ANR("final param mode:%d snr_mode:%d\n", mode_idx);
+    return res;
+
 }
 
-ANRresult_t mfnr_config_setting_param(RKAnr_Mfnr_Params_t *pParams, CalibDb_MFNR_t *pCalibdb, char* param_mode, char* snr_name)
+ANRresult_t mfnr_config_motion_param_json(CalibDb_MFNR_Motion_t *pMotion,  CalibDbV2_MFNR_t *pCalibdb, char* param_mode)
 {
-	ANRresult_t res = ANR_RET_SUCCESS;
-	int mode_idx = 0;
-	int setting_idx = 0;
 
-	if(pParams == NULL){
-		LOGE_ANR("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
-		return ANR_RET_NULL_POINTER;
-	}
+    ANRresult_t res = ANR_RET_SUCCESS;
+    int mode_idx = 0;
+    int setting_idx = 0;
+    CalibDbV2_MFNR_TuningPara_Motion_ISO_t *pMotion_ISO = NULL;
 
-	if(pCalibdb == NULL){
-		LOGE_ANR("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
-		return ANR_RET_NULL_POINTER;
-	}
+    if(pMotion == NULL) {
+        LOGE_ANR("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
+        return ANR_RET_NULL_POINTER;
+    }
 
-	if(param_mode == NULL){
-		LOGE_ANR("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
-		return ANR_RET_NULL_POINTER;
-	}
+    if(pCalibdb == NULL) {
+        LOGE_ANR("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
+        return ANR_RET_NULL_POINTER;
+    }
 
-	if(snr_name == NULL){
-		LOGE_ANR("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
-		return ANR_RET_NULL_POINTER;
-	}
-	
-	res = mfnr_get_mode_cell_idx_by_name(pCalibdb, param_mode, &mode_idx);
-	if(res != ANR_RET_SUCCESS){
-		LOGW_ANR("%s(%d): error!!!	can't find mode name in iq files, use 0 instead\n", __FUNCTION__, __LINE__);
-	}
+    if(param_mode == NULL) {
+        LOGE_ANR("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
+        return ANR_RET_NULL_POINTER;
+    }
 
-	res = mfnr_get_setting_idx_by_name(pCalibdb, snr_name, mode_idx, &setting_idx);
-	if(res != ANR_RET_SUCCESS){
-		LOGW_ANR("%s(%d): error!!!  can't find setting in iq files, use 0 instead\n", __FUNCTION__, __LINE__);
-	}
 
-	res = init_mfnr_params(pParams, pCalibdb, mode_idx, setting_idx);
+    pMotion->enable = pCalibdb->TuningPara.motion_detect_en;
 
-	LOGD_ANR("final param mode:%d snr_mode:%d\n", mode_idx, setting_idx);
-	return res;
+    for(int i = 0; i < pCalibdb->TuningPara.Motion.Motion_ISO_len; i++) {
+        pMotion_ISO = &pCalibdb->TuningPara.Motion.Motion_ISO[i];
+
+        pMotion->iso[i] = pMotion_ISO->iso;
+        pMotion->sigmaHScale[i] = pMotion_ISO->sigmaHScale;
+        pMotion->sigmaLScale[i] = pMotion_ISO->sigmaLScale;
+        pMotion->lightClp[i] = pMotion_ISO->lightClp;
+        pMotion->uvWeight[i] = pMotion_ISO->uvWeight;
+
+        pMotion->mfnrSigmaScale[i] = pMotion_ISO->mfnrSigmaScale;
+        pMotion->yuvnrGainScale0[i] = pMotion_ISO->yuvnrGainScale0;
+        pMotion->yuvnrGainScale1[i] = pMotion_ISO->yuvnrGainScale1;
+        pMotion->yuvnrGainScale2[i] = pMotion_ISO->yuvnrGainScale2;
+
+        pMotion->frame_limit_uv[i] = pMotion_ISO->frame_limit_uv;
+        pMotion->frame_limit_y[i] = pMotion_ISO->frame_limit_y;
+
+        pMotion->reserved0[i] = 1;
+        pMotion->reserved1[i] = 1;
+        pMotion->reserved2[i] = 1;
+        pMotion->reserved3[i] = 1;
+        pMotion->reserved4[i] = 1;
+        pMotion->reserved5[i] = 1;
+        pMotion->reserved6[i] = 1;
+        pMotion->reserved7[i] = 1;
+    }
+
+
+    LOGD_ANR("final param mode:%d snr_mode:%d\n", mode_idx);
+    return res;
 
 }
 
-ANRresult_t init_mfnr_params(RKAnr_Mfnr_Params_t *pParams, CalibDb_MFNR_t *pCalibdb, int mode_idx, int setting_idx)
+
+ANRresult_t mfnr_config_setting_param(RKAnr_Mfnr_Params_t *pParams, CalibDb_MFNR_2_t *pCalibdb, char* param_mode, char* snr_name)
+{
+    ANRresult_t res = ANR_RET_SUCCESS;
+    int mode_idx = 0;
+    int setting_idx = 0;
+
+    if(pParams == NULL) {
+        LOGE_ANR("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
+        return ANR_RET_NULL_POINTER;
+    }
+
+    if(pCalibdb == NULL) {
+        LOGE_ANR("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
+        return ANR_RET_NULL_POINTER;
+    }
+
+    if(param_mode == NULL) {
+        LOGE_ANR("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
+        return ANR_RET_NULL_POINTER;
+    }
+
+    if(snr_name == NULL) {
+        LOGE_ANR("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
+        return ANR_RET_NULL_POINTER;
+    }
+
+    res = mfnr_get_mode_cell_idx_by_name(pCalibdb, param_mode, &mode_idx);
+    if(res != ANR_RET_SUCCESS) {
+        LOGW_ANR("%s(%d): error!!!	can't find mode name in iq files, use 0 instead\n", __FUNCTION__, __LINE__);
+    }
+
+    res = mfnr_get_setting_idx_by_name(pCalibdb, snr_name, mode_idx, &setting_idx);
+    if(res != ANR_RET_SUCCESS) {
+        LOGW_ANR("%s(%d): error!!!  can't find setting in iq files, use 0 instead\n", __FUNCTION__, __LINE__);
+    }
+
+    res = init_mfnr_params(pParams, pCalibdb, mode_idx, setting_idx);
+
+    LOGD_ANR("final param mode:%d snr_mode:%d\n", mode_idx, setting_idx);
+    return res;
+
+}
+
+ANRresult_t init_mfnr_params(RKAnr_Mfnr_Params_t *pParams, CalibDb_MFNR_2_t *pCalibdb, int mode_idx, int setting_idx)
 {
     ANRresult_t res = ANR_RET_SUCCESS;
     int i = 0;
     int j = 0;
+    int step_y =  (1 << (Y_CALIBRATION_BITS - 8));
+    int range_sample = 1 << (Y_CALIBRATION_BITS - ANR_MFNR_SIGMA_X_SHIFT_BITS);
+    int step_sample = 1 << ANR_MFNR_SIGMA_X_SHIFT_BITS;
 
     if(pParams == NULL) {
         LOGE_ANR("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
@@ -214,159 +283,159 @@ ANRresult_t init_mfnr_params(RKAnr_Mfnr_Params_t *pParams, CalibDb_MFNR_t *pCali
     max_lvl_uv = pCalibdb->max_level_uv;
     pParams->back_ref_num = pCalibdb->back_ref_num;
 
-	CalibDb_MFNR_Setting_t *pSetting = &pCalibdb->mode_cell[mode_idx].setting[setting_idx];
+    CalibDb_MFNR_Setting_t *pSetting = &pCalibdb->mode_cell[mode_idx].setting[setting_idx];
     for(int lvl = 0; lvl < max_lvl; lvl++) {
         for (i = 0; i < max_iso_step; i++)
             pParams->weight_limit_y[i][lvl] = pSetting->mfnr_iso[i].weight_limit_y[lvl];
     }
 
-	for(int lvl = 0; lvl < max_lvl_uv; lvl++){
-        for (i=0;i<max_iso_step;i++)
+    for(int lvl = 0; lvl < max_lvl_uv; lvl++) {
+        for (i = 0; i < max_iso_step; i++)
             pParams->weight_limit_uv[i][lvl] = pSetting->mfnr_iso[i].weight_limit_uv[lvl];
     }
 
-	for(int j = 0; j < 4; j++){
-        for (i=0;i<max_iso_step;i++)
+    for(int j = 0; j < 4; j++) {
+        for (i = 0; i < max_iso_step; i++)
             pParams->ratio_frq[i][j] = pSetting->mfnr_iso[i].ratio_frq[j];
     }
 
-	for(int lvl = 0; lvl < max_lvl_uv; lvl++){
-        for (i=0;i<max_iso_step;i++)
+    for(int lvl = 0; lvl < max_lvl_uv; lvl++) {
+        for (i = 0; i < max_iso_step; i++)
             pParams->luma_w_in_chroma[i][lvl] = pSetting->mfnr_iso[i].luma_w_in_chroma[lvl];
     }
 
-	for(j=0; j<4; j++){
-		for(i=0; i<2; i++)
-			pParams->awb_uv_ratio[j][i] = pCalibdb->uv_ratio[j].ratio[i];
-	}
+    for(j = 0; j < 4; j++) {
+        for(i = 0; i < 2; i++)
+            pParams->awb_uv_ratio[j][i] = pCalibdb->uv_ratio[j].ratio[i];
+    }
 
-	for(int j = 0; j < polyorder + 1; j++){
-        for (i=0;i<max_iso_step;i++)
+    for(int j = 0; j < polyorder + 1; j++) {
+        for (i = 0; i < max_iso_step; i++)
             pParams->curve[i][j] = pSetting->mfnr_iso[i].noise_curve[j];
     }
 
-	for (i=0;i<max_iso_step;i++){
+    for (i = 0; i < max_iso_step; i++) {
         pParams->curve_x0[i] = pSetting->mfnr_iso[i].noise_curve_x00;
     }
 
 
-    for (j = 0; j < max_lvl; j++){
-        for (i=0;i<max_iso_step;i++){
+    for (j = 0; j < max_lvl; j++) {
+        for (i = 0; i < max_iso_step; i++) {
             pParams->ci[i][0][j] = pSetting->mfnr_iso[i].y_lo_noiseprofile[j];
-			pParams->ci[i][1][j] = pSetting->mfnr_iso[i].y_hi_noiseprofile[j];
+            pParams->ci[i][1][j] = pSetting->mfnr_iso[i].y_hi_noiseprofile[j];
             pParams->scale[i][0][j] = pSetting->mfnr_iso[i].y_lo_bfscale[j];
-			pParams->scale[i][1][j] = pSetting->mfnr_iso[i].y_hi_bfscale[j];
+            pParams->scale[i][1][j] = pSetting->mfnr_iso[i].y_hi_bfscale[j];
         }
     }
 
-	for (j = 0; j < lumancurve_step; j++){
-        for (i=0;i<max_iso_step;i++){
+    for (j = 0; j < lumancurve_step; j++) {
+        for (i = 0; i < max_iso_step; i++) {
             pParams->lumanrpoint[i][dir_lo][j] = pSetting->mfnr_iso[i].y_lumanrpoint[j];
-			pParams->lumanrcurve[i][dir_lo][j] = pSetting->mfnr_iso[i].y_lumanrcurve[j];
-			pParams->lumanrpoint[i][dir_hi][j] = pSetting->mfnr_iso[i].y_lumanrpoint[j];
-			pParams->lumanrcurve[i][dir_hi][j] = pSetting->mfnr_iso[i].y_lumanrcurve[j];
+            pParams->lumanrcurve[i][dir_lo][j] = pSetting->mfnr_iso[i].y_lumanrcurve[j];
+            pParams->lumanrpoint[i][dir_hi][j] = pSetting->mfnr_iso[i].y_lumanrpoint[j];
+            pParams->lumanrcurve[i][dir_hi][j] = pSetting->mfnr_iso[i].y_lumanrcurve[j];
         }
     }
 
-	for (i=0;i<max_iso_step;i++){
+    for (i = 0; i < max_iso_step; i++) {
         pParams->dnstr[i][dir_lo] = pSetting->mfnr_iso[i].y_denoisestrength;
-		pParams->dnstr[i][dir_hi] = pParams->dnstr[i][dir_lo];
+        pParams->dnstr[i][dir_hi] = pParams->dnstr[i][dir_lo];
     }
 
 
-    for(int j = 0; j < 6; j++){
-        for (i=0;i<max_iso_step;i++){
+    for(int j = 0; j < 6; j++) {
+        for (i = 0; i < max_iso_step; i++) {
             pParams->gfdelta[i][0][0][j] = pSetting->mfnr_iso[i].y_lo_lvl0_gfdelta[j];
-			pParams->gfdelta[i][1][0][j] = pSetting->mfnr_iso[i].y_hi_lvl0_gfdelta[j];
+            pParams->gfdelta[i][1][0][j] = pSetting->mfnr_iso[i].y_hi_lvl0_gfdelta[j];
         }
     }
 
-	for(int j = 0; j < 3; j++){
-        for (i=0;i<max_iso_step;i++){
-			pParams->gfdelta[i][0][1][j] = pSetting->mfnr_iso[i].y_lo_lvl1_gfdelta[j];
-			pParams->gfdelta[i][0][2][j] = pSetting->mfnr_iso[i].y_lo_lvl2_gfdelta[j];
-			pParams->gfdelta[i][0][3][j] = pSetting->mfnr_iso[i].y_lo_lvl3_gfdelta[j];
+    for(int j = 0; j < 3; j++) {
+        for (i = 0; i < max_iso_step; i++) {
+            pParams->gfdelta[i][0][1][j] = pSetting->mfnr_iso[i].y_lo_lvl1_gfdelta[j];
+            pParams->gfdelta[i][0][2][j] = pSetting->mfnr_iso[i].y_lo_lvl2_gfdelta[j];
+            pParams->gfdelta[i][0][3][j] = pSetting->mfnr_iso[i].y_lo_lvl3_gfdelta[j];
 
-			pParams->gfdelta[i][1][1][j] = pSetting->mfnr_iso[i].y_hi_lvl1_gfdelta[j];
-			pParams->gfdelta[i][1][2][j] = pSetting->mfnr_iso[i].y_hi_lvl2_gfdelta[j];
-			pParams->gfdelta[i][1][3][j] = pSetting->mfnr_iso[i].y_hi_lvl3_gfdelta[j];
+            pParams->gfdelta[i][1][1][j] = pSetting->mfnr_iso[i].y_hi_lvl1_gfdelta[j];
+            pParams->gfdelta[i][1][2][j] = pSetting->mfnr_iso[i].y_hi_lvl2_gfdelta[j];
+            pParams->gfdelta[i][1][3][j] = pSetting->mfnr_iso[i].y_hi_lvl3_gfdelta[j];
         }
     }
 
-    for (j = 0; j < max_lvl_uv; j++){
-        for (i=0;i<max_iso_step;i++){
+    for (j = 0; j < max_lvl_uv; j++) {
+        for (i = 0; i < max_iso_step; i++) {
             pParams->ci_uv[i][0][j] = pSetting->mfnr_iso[i].uv_lo_noiseprofile[j];
-			pParams->ci_uv[i][1][j] = pSetting->mfnr_iso[i].uv_hi_noiseprofile[j];
+            pParams->ci_uv[i][1][j] = pSetting->mfnr_iso[i].uv_hi_noiseprofile[j];
             pParams->scale_uv[i][0][j] = pSetting->mfnr_iso[i].uv_lo_bfscale[j];
-			pParams->scale_uv[i][1][j] = pSetting->mfnr_iso[i].uv_hi_bfscale[j];
+            pParams->scale_uv[i][1][j] = pSetting->mfnr_iso[i].uv_hi_bfscale[j];
 
-			LOGI_ANR("j:%d i:%d ci:%f %f scale:%f %f\n", j, i,
-				pParams->ci_uv[i][0][j],
-				pParams->ci_uv[i][1][j],
-				pParams->scale_uv[i][0][j],
-				pParams->scale_uv[i][1][j]);
+            LOGI_ANR("j:%d i:%d ci:%f %f scale:%f %f\n", j, i,
+                     pParams->ci_uv[i][0][j],
+                     pParams->ci_uv[i][1][j],
+                     pParams->scale_uv[i][0][j],
+                     pParams->scale_uv[i][1][j]);
         }
     }
 
-	for (j = 0; j < lumancurve_step; j++){
-        for (i=0;i<max_iso_step;i++){
+    for (j = 0; j < lumancurve_step; j++) {
+        for (i = 0; i < max_iso_step; i++) {
             pParams->lumanrpoint_uv[i][dir_lo][j] = pSetting->mfnr_iso[i].uv_lumanrpoint[j];
-			pParams->lumanrcurve_uv[i][dir_lo][j] = pSetting->mfnr_iso[i].uv_lumanrcurve[j];
-			pParams->lumanrpoint_uv[i][dir_hi][j] = pSetting->mfnr_iso[i].uv_lumanrpoint[j];
-			pParams->lumanrcurve_uv[i][dir_hi][j] = pSetting->mfnr_iso[i].uv_lumanrcurve[j];
+            pParams->lumanrcurve_uv[i][dir_lo][j] = pSetting->mfnr_iso[i].uv_lumanrcurve[j];
+            pParams->lumanrpoint_uv[i][dir_hi][j] = pSetting->mfnr_iso[i].uv_lumanrpoint[j];
+            pParams->lumanrcurve_uv[i][dir_hi][j] = pSetting->mfnr_iso[i].uv_lumanrcurve[j];
         }
     }
 
-	for (i=0;i<max_iso_step;i++){
+    for (i = 0; i < max_iso_step; i++) {
         pParams->dnstr_uv[i][dir_lo] = pSetting->mfnr_iso[i].uv_denoisestrength;
-		pParams->dnstr_uv[i][dir_hi] = pParams->dnstr_uv[i][dir_lo];
-		LOGI_ANR("%d: dnstr_uv:%f %f\n", i,
-			pParams->dnstr_uv[i][dir_lo],
-			pParams->dnstr_uv[i][dir_hi]);
+        pParams->dnstr_uv[i][dir_hi] = pParams->dnstr_uv[i][dir_lo];
+        LOGI_ANR("%d: dnstr_uv:%f %f\n", i,
+                 pParams->dnstr_uv[i][dir_lo],
+                 pParams->dnstr_uv[i][dir_hi]);
     }
 
-	for(int j = 0; j < 6; j++){
-        for (i=0;i<max_iso_step;i++){
+    for(int j = 0; j < 6; j++) {
+        for (i = 0; i < max_iso_step; i++) {
             pParams->gfdelta_uv[i][0][0][j] = pSetting->mfnr_iso[i].uv_lo_lvl0_gfdelta[j];
-			pParams->gfdelta_uv[i][1][0][j] = pSetting->mfnr_iso[i].uv_hi_lvl0_gfdelta[j];
+            pParams->gfdelta_uv[i][1][0][j] = pSetting->mfnr_iso[i].uv_hi_lvl0_gfdelta[j];
         }
     }
 
-	for(int j = 0; j < 3; j++){
-		for (i=0;i<max_iso_step;i++){
-			pParams->gfdelta_uv[i][0][1][j] = pSetting->mfnr_iso[i].uv_lo_lvl1_gfdelta[j];
-			pParams->gfdelta_uv[i][0][2][j] = pSetting->mfnr_iso[i].uv_lo_lvl2_gfdelta[j];
-			pParams->gfdelta_uv[i][1][1][j] = pSetting->mfnr_iso[i].uv_hi_lvl1_gfdelta[j];
-			pParams->gfdelta_uv[i][1][2][j] = pSetting->mfnr_iso[i].uv_hi_lvl2_gfdelta[j];
-		}
-	}
+    for(int j = 0; j < 3; j++) {
+        for (i = 0; i < max_iso_step; i++) {
+            pParams->gfdelta_uv[i][0][1][j] = pSetting->mfnr_iso[i].uv_lo_lvl1_gfdelta[j];
+            pParams->gfdelta_uv[i][0][2][j] = pSetting->mfnr_iso[i].uv_lo_lvl2_gfdelta[j];
+            pParams->gfdelta_uv[i][1][1][j] = pSetting->mfnr_iso[i].uv_hi_lvl1_gfdelta[j];
+            pParams->gfdelta_uv[i][1][2][j] = pSetting->mfnr_iso[i].uv_hi_lvl2_gfdelta[j];
+        }
+    }
 
 
-    for(int j = 0; j < 6; j++){
-        for (i=0;i<max_iso_step;i++){
+    for(int j = 0; j < 6; j++) {
+        for (i = 0; i < max_iso_step; i++) {
             pParams->gfsigma[i][0][j] = pSetting->mfnr_iso[i].lvl0_gfsigma[j];
         }
     }
 
-	for(int j = 0; j < 3; j++){
-        for (i=0;i<max_iso_step;i++){
+    for(int j = 0; j < 3; j++) {
+        for (i = 0; i < max_iso_step; i++) {
             pParams->gfsigma[i][1][j] = pSetting->mfnr_iso[i].lvl1_gfsigma[j];
-			pParams->gfsigma[i][2][j] = pSetting->mfnr_iso[i].lvl2_gfsigma[j];
-			pParams->gfsigma[i][3][j] = pSetting->mfnr_iso[i].lvl3_gfsigma[j];
+            pParams->gfsigma[i][2][j] = pSetting->mfnr_iso[i].lvl2_gfsigma[j];
+            pParams->gfsigma[i][3][j] = pSetting->mfnr_iso[i].lvl3_gfsigma[j];
         }
     }
 
-	for (i=0;i<max_iso_step;i++){
+    for (i = 0; i < max_iso_step; i++) {
         int64_t curve_x0 = (int)pParams->curve_x0[i];
-        for (j = 0; j < range; j++){
+        for (j = 0; j < range; j++) {
             int64_t X[5];
             double y;
 
             X[0] = 1;
             y = pParams->curve[i][polyorder];
-            for(int order = 1; order < polyorder + 1; order++){
+            for(int order = 1; order < polyorder + 1; order++) {
                 X[order] = X[order - 1] * j;
-                y = y + (double)X[order] * pParams->curve[i][polyorder-order];
+                y = y + (double)X[order] * pParams->curve[i][polyorder - order];
             }
 
             if(j > curve_x0)
@@ -374,18 +443,503 @@ ANRresult_t init_mfnr_params(RKAnr_Mfnr_Params_t *pParams, CalibDb_MFNR_t *pCali
             else
                 pParams->noise_sigma[i][j] = y;
         }
+        for(j = 0; j < range_sample; j++) {
+            pParams->noise_sigma[i][j] = pParams->noise_sigma[i][j * step_sample] / step_y;
+        }
+        for(j = range_sample; j < range; j++) {
+            pParams->noise_sigma[i][j] = 0;
+        }
+        pParams->curve_x0[i] =  pParams->curve_x0[i] / step_sample;
     }
 
-	#ifndef RK_SIMULATOR_HW
-	for (i=0;i<max_iso_step;i++){
-         pParams->iso[i] = pSetting->mfnr_iso[i].iso;
-    	}
-	#endif
+#ifndef RK_SIMULATOR_HW
+    pParams->motion_detection_enable = pCalibdb->mode_cell[mode_idx].motion.enable & pCalibdb->motion_detect_en;
+    for(int j = 0; j < MAX_ISO_STEP; j++)
+    {
+        pParams->mfnr_sigma_scale[j] = pCalibdb->mode_cell[mode_idx].motion.mfnrSigmaScale[j];
+    }
+#endif
+
+#ifndef RK_SIMULATOR_HW
+    for (i = 0; i < max_iso_step; i++) {
+        pParams->iso[i] = pSetting->mfnr_iso[i].iso;
+    }
+#endif
+
+    LOGD_ANR("oyyf mfnr iso50: lbfscale:%f hbfscale:%f strength:%f %f\n",
+             pParams->scale[0][0][0],
+             pParams->scale[0][1][0],
+             pParams->dnstr[0][0],
+             pParams->dnstr[0][1]);
 
     //memcpy(pParams->mfnr_ver_char, pCalibdb->version, sizeof(pParams->mfnr_ver_char));
     LOGI_ANR("%s(%d): exit!\n", __FUNCTION__, __LINE__);
 
     return res;
+}
+
+
+ANRresult_t mfnr_get_setting_idx_by_name_json(CalibDbV2_MFNR_t *pCalibdb, char *name, int* calib_idx, int *tuning_idx)
+{
+    int i = 0;
+    ANRresult_t res = ANR_RET_SUCCESS;
+
+    if(pCalibdb == NULL) {
+        LOGE_ANR("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
+        return ANR_RET_NULL_POINTER;
+    }
+
+    if(name == NULL) {
+        LOGE_ANR("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
+        return ANR_RET_NULL_POINTER;
+    }
+
+    if(calib_idx == NULL) {
+        LOGE_ANR("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
+        return ANR_RET_NULL_POINTER;
+    }
+
+    if(tuning_idx == NULL) {
+        LOGE_ANR("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
+        return ANR_RET_NULL_POINTER;
+    }
+
+    for(i = 0; i < pCalibdb->TuningPara.Setting_len; i++) {
+        if(strncmp(name, pCalibdb->TuningPara.Setting[i].SNR_Mode, strlen(name)*sizeof(char)) == 0) {
+            break;
+        }
+    }
+
+    if(i < pCalibdb->TuningPara.Setting_len) {
+        *tuning_idx = i;
+    } else {
+        *tuning_idx = 0;
+    }
+
+    for(i = 0; i < pCalibdb->CalibPara.Setting_len; i++) {
+        if(strncmp(name, pCalibdb->CalibPara.Setting[i].SNR_Mode, strlen(name)*sizeof(char)) == 0) {
+            break;
+        }
+    }
+
+    if(i < pCalibdb->CalibPara.Setting_len) {
+        *calib_idx = i;
+    } else {
+        *calib_idx = 0;
+    }
+
+    LOGD_ANR("%s:%d snr_name:%s  snr_idx:%d i:%d \n", __FUNCTION__, __LINE__, name, *calib_idx, i);
+    return res;
+
+}
+
+
+ANRresult_t mfnr_config_dynamic_param_json(RKAnr_Mfnr_Dynamic_t *pDynamic,  CalibDbV2_MFNR_t *pCalibdb, char* param_mode)
+{
+
+    ANRresult_t res = ANR_RET_SUCCESS;
+    int mode_idx = 0;
+    int setting_idx = 0;
+
+    if(pDynamic == NULL) {
+        LOGE_ANR("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
+        return ANR_RET_NULL_POINTER;
+    }
+
+    if(pCalibdb == NULL) {
+        LOGE_ANR("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
+        return ANR_RET_NULL_POINTER;
+    }
+
+    if(param_mode == NULL) {
+        LOGE_ANR("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
+        return ANR_RET_NULL_POINTER;
+    }
+
+    res = init_mfnr_dynamic_params_json(pDynamic, pCalibdb);
+
+    return res;
+
+}
+
+ANRresult_t init_mfnr_params_json(RKAnr_Mfnr_Params_t *pParams, CalibDbV2_MFNR_t *pCalibdb, int calib_idx, int tuning_idx)
+{
+    ANRresult_t res = ANR_RET_SUCCESS;
+    int i = 0;
+    int j = 0;
+    int step_y =  (1 << (Y_CALIBRATION_BITS - 8));
+    int range_sample = 1 << (Y_CALIBRATION_BITS - ANR_MFNR_SIGMA_X_SHIFT_BITS);
+    int step_sample = 1 << ANR_MFNR_SIGMA_X_SHIFT_BITS;
+
+    if(pParams == NULL) {
+        LOGE_ANR("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
+        return ANR_RET_NULL_POINTER;
+    }
+
+    if(pCalibdb == NULL) {
+        LOGE_ANR("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
+        return ANR_RET_NULL_POINTER;
+    }
+
+    int max_iso_step        = MAX_ISO_STEP;
+    int dir_num             = MFNR_DIR_NUM;
+    int polyorder           = MFNR_POLYORDER;
+    int max_lvl             = MFNR_MAX_LVL;
+    int max_lvl_uv          = MFNR_MAX_LVL_UV;
+    int lumancurve_step     = LUMANRCURVE_STEP;
+    int range               = 1 << Y_CALIBRATION_BITS;
+    int dir_lo              = DIR_LO;
+    int dir_hi              = DIR_HI;
+
+
+    max_lvl = 4;
+    max_lvl_uv = 3;
+    pParams->back_ref_num = 0;
+
+    CalibDbV2_MFNR_TuningPara_Setting_t *pTuningSetting = &pCalibdb->TuningPara.Setting[tuning_idx];
+    CalibDbV2_MFNR_CalibPara_Setting_t *pCalibSetting = &pCalibdb->CalibPara.Setting[calib_idx];
+    CalibDbV2_MFNR_TuningPara_Setting_ISO_t *pTuningISO = NULL;
+    CalibDbV2_MFNR_CalibPara_Setting_ISO_t *pCalibISO = NULL;
+
+#ifndef RK_SIMULATOR_HW
+    pParams->motion_detection_enable = pCalibdb->TuningPara.motion_detect_en;
+#endif
+
+    for (i = 0; i < pTuningSetting->Tuning_ISO_len; i++) {
+        pTuningISO = &pTuningSetting->Tuning_ISO[i];
+
+#ifndef RK_SIMULATOR_HW
+        pParams->iso[i] = pTuningISO->iso;
+#endif
+
+        pParams->weight_limit_y[i][0] = pTuningISO->weight_limit_y_0;
+        pParams->weight_limit_y[i][1] = pTuningISO->weight_limit_y_1;
+        pParams->weight_limit_y[i][2] = pTuningISO->weight_limit_y_2;
+        pParams->weight_limit_y[i][3] = pTuningISO->weight_limit_y_3;
+
+        pParams->weight_limit_uv[i][0] = pTuningISO->weight_limit_uv_0;
+        pParams->weight_limit_uv[i][1] = pTuningISO->weight_limit_uv_1;
+        pParams->weight_limit_uv[i][2] = pTuningISO->weight_limit_uv_2;
+
+        pParams->ratio_frq[i][0] = pTuningISO->ratio_frq_y_l;
+        pParams->ratio_frq[i][1] = pTuningISO->ratio_frq_y_h;
+        pParams->ratio_frq[i][2] = pTuningISO->ratio_frq_uv_l;
+        pParams->ratio_frq[i][3] = pTuningISO->ratio_frq_uv_h;
+
+        pParams->luma_w_in_chroma[i][0] = pTuningISO->luma_w_in_chroma_0;
+        pParams->luma_w_in_chroma[i][1] = pTuningISO->luma_w_in_chroma_1;
+        pParams->luma_w_in_chroma[i][2] = pTuningISO->luma_w_in_chroma_2;
+
+        pParams->scale[i][0][0] = pTuningISO->y_lo_bfscale_0;
+        pParams->scale[i][0][1] = pTuningISO->y_lo_bfscale_1;
+        pParams->scale[i][0][2] = pTuningISO->y_lo_bfscale_2;
+        pParams->scale[i][0][3] = pTuningISO->y_lo_bfscale_3;
+
+        pParams->scale[i][1][0] = pTuningISO->y_hi_bfscale_0;
+        pParams->scale[i][1][1] = pTuningISO->y_hi_bfscale_1;
+        pParams->scale[i][1][2] = pTuningISO->y_hi_bfscale_2;
+        pParams->scale[i][1][3] = pTuningISO->y_hi_bfscale_3;
+
+        for (j = 0; j < lumancurve_step; j++) {
+            pParams->lumanrpoint[i][dir_lo][j] = pTuningISO->luma_para.y_lumanrpoint[j];
+            pParams->lumanrcurve[i][dir_lo][j] = pTuningISO->luma_para.y_lumanrcurve[j];
+            pParams->lumanrpoint[i][dir_hi][j] = pTuningISO->luma_para.y_lumanrpoint[j];
+            pParams->lumanrcurve[i][dir_hi][j] = pTuningISO->luma_para.y_lumanrcurve[j];
+
+            pParams->lumanrpoint_uv[i][dir_lo][j] = pTuningISO->luma_para.uv_lumanrpoint[j];
+            pParams->lumanrcurve_uv[i][dir_lo][j] = pTuningISO->luma_para.uv_lumanrcurve[j];
+            pParams->lumanrpoint_uv[i][dir_hi][j] = pTuningISO->luma_para.uv_lumanrpoint[j];
+            pParams->lumanrcurve_uv[i][dir_hi][j] = pTuningISO->luma_para.uv_lumanrcurve[j];
+        }
+
+        pParams->dnstr[i][dir_lo] = pTuningISO->y_denoisestrength;
+        pParams->dnstr[i][dir_hi] = pParams->dnstr[i][dir_lo];
+
+        pParams->dnstr_uv[i][dir_lo] = pTuningISO->uv_denoisestrength;
+        pParams->dnstr_uv[i][dir_hi] = pParams->dnstr_uv[i][dir_lo];
+
+        pParams->scale_uv[i][0][0] = pTuningISO->uv_lo_bfscale_0;
+        pParams->scale_uv[i][0][1] = pTuningISO->uv_lo_bfscale_1;
+        pParams->scale_uv[i][0][2] = pTuningISO->uv_lo_bfscale_2;
+
+        pParams->scale_uv[i][1][0] = pTuningISO->uv_hi_bfscale_0;
+        pParams->scale_uv[i][1][1] = pTuningISO->uv_hi_bfscale_1;
+        pParams->scale_uv[i][1][2] = pTuningISO->uv_hi_bfscale_2;
+
+
+        for(int j = 0; j < 6; j++) {
+            pParams->gfdelta[i][0][0][j] = pTuningISO->y_gfdelta_para.y_lo_lvl0_gfdelta[j];
+            pParams->gfdelta[i][1][0][j] = pTuningISO->y_gfdelta_para.y_hi_lvl0_gfdelta[j];
+            pParams->gfdelta_uv[i][0][0][j] = pTuningISO->uv_gfdelta_para.uv_lo_lvl0_gfdelta[j];
+            pParams->gfdelta_uv[i][1][0][j] = pTuningISO->uv_gfdelta_para.uv_hi_lvl0_gfdelta[j];
+            pParams->gfsigma[i][0][j] = pTuningISO->gfsigma_para.lvl0_gfsigma[j];
+        }
+
+        for(int j = 0; j < 3; j++) {
+            pParams->gfdelta[i][0][1][j] = pTuningISO->y_gfdelta_para.y_lo_lvl1_gfdelta[j];
+            pParams->gfdelta[i][0][2][j] = pTuningISO->y_gfdelta_para.y_lo_lvl2_gfdelta[j];
+            pParams->gfdelta[i][0][3][j] = pTuningISO->y_gfdelta_para.y_lo_lvl3_gfdelta[j];
+
+            pParams->gfdelta[i][1][1][j] = pTuningISO->y_gfdelta_para.y_hi_lvl1_gfdelta[j];
+            pParams->gfdelta[i][1][2][j] = pTuningISO->y_gfdelta_para.y_hi_lvl2_gfdelta[j];
+            pParams->gfdelta[i][1][3][j] = pTuningISO->y_gfdelta_para.y_hi_lvl3_gfdelta[j];
+
+            pParams->gfdelta_uv[i][0][1][j] = pTuningISO->uv_gfdelta_para.uv_lo_lvl1_gfdelta[j];
+            pParams->gfdelta_uv[i][0][2][j] = pTuningISO->uv_gfdelta_para.uv_lo_lvl2_gfdelta[j];
+            pParams->gfdelta_uv[i][1][1][j] = pTuningISO->uv_gfdelta_para.uv_hi_lvl1_gfdelta[j];
+            pParams->gfdelta_uv[i][1][2][j] = pTuningISO->uv_gfdelta_para.uv_hi_lvl2_gfdelta[j];
+
+            pParams->gfsigma[i][1][j] = pTuningISO->gfsigma_para.lvl1_gfsigma[j];
+            pParams->gfsigma[i][2][j] = pTuningISO->gfsigma_para.lvl2_gfsigma[j];
+            pParams->gfsigma[i][3][j] = pTuningISO->gfsigma_para.lvl3_gfsigma[j];
+        }
+
+#ifndef RK_SIMULATOR_HW
+        pParams->mfnr_sigma_scale[i] = pCalibdb->TuningPara.Motion.Motion_ISO[i].mfnrSigmaScale;
+#endif
+
+    }
+
+
+    for (i = 0; i < pCalibSetting->Calib_ISO_len; i++) {
+        pCalibISO = &pCalibSetting->Calib_ISO[i];
+        for(int j = 0; j < polyorder + 1; j++) {
+            pParams->curve[i][j] = pCalibISO->noise_curve[j];
+        }
+        pParams->curve_x0[i] = pCalibISO->noise_curve_x00;
+
+        for (j = 0; j < max_lvl; j++) {
+            pParams->ci[i][0][j] = pCalibISO->y_lo_noiseprofile[j];
+            pParams->ci[i][1][j] = pCalibISO->y_hi_noiseprofile[j];
+        }
+
+        for (j = 0; j < max_lvl_uv; j++) {
+            pParams->ci_uv[i][0][j] = pCalibISO->uv_lo_noiseprofile[j];
+            pParams->ci_uv[i][1][j] = pCalibISO->uv_hi_noiseprofile[j];
+        }
+    }
+
+    for(j = 0; j < 4; j++) {
+        for(i = 0; i < 2; i++)
+            pParams->awb_uv_ratio[j][i] = 0;
+    }
+
+
+
+    for (i = 0; i < pTuningSetting->Tuning_ISO_len; i++) {
+        int64_t curve_x0 = (int)pParams->curve_x0[i];
+        for (j = 0; j < range; j++) {
+            int64_t X[5];
+            double y;
+
+            X[0] = 1;
+            y = pParams->curve[i][polyorder];
+            for(int order = 1; order < polyorder + 1; order++) {
+                X[order] = X[order - 1] * j;
+                y = y + (double)X[order] * pParams->curve[i][polyorder - order];
+            }
+
+            if(j > curve_x0)
+                pParams->noise_sigma[i][j] = pParams->noise_sigma[i][curve_x0];
+            else
+                pParams->noise_sigma[i][j] = y;
+        }
+        for(j = 0; j < range_sample; j++) {
+            pParams->noise_sigma[i][j] = pParams->noise_sigma[i][j * step_sample] / step_y;
+        }
+        for(j = range_sample; j < range; j++) {
+            pParams->noise_sigma[i][j] = 0;
+        }
+        pParams->curve_x0[i] =  pParams->curve_x0[i] / step_sample;
+    }
+
+
+    LOGD_ANR("oyyf mfnr iso50: lbfscale:%f hbfscale:%f strength:%f %f\n",
+             pParams->scale[0][0][0],
+             pParams->scale[0][1][0],
+             pParams->dnstr[0][0],
+             pParams->dnstr[0][1]);
+
+    //memcpy(pParams->mfnr_ver_char, pCalibdb->version, sizeof(pParams->mfnr_ver_char));
+    LOGI_ANR("%s(%d): exit!\n", __FUNCTION__, __LINE__);
+
+    mfnr_algo_param_printf(pParams);
+
+    return res;
+}
+
+ANRresult_t mfnr_algo_param_printf(RKAnr_Mfnr_Params_t *pParams)
+{
+    int i, j;
+
+    if(pParams != NULL) {
+
+        for(i = 0; i < MAX_ISO_STEP; i++) {
+#ifndef RK_SIMULATOR_HW
+            LOGD_ANR("mfnr: ISO:%f\n", pParams->iso[i]);
+#endif
+
+            LOGD_ANR("noise_curve: %lf %lf %lf %lf %lf curve_x0:%f\n",
+                     pParams->curve[i][0],
+                     pParams->curve[i][1],
+                     pParams->curve[i][2],
+                     pParams->curve[i][3],
+                     pParams->curve[i][4],
+                     pParams->curve_x0[i]);
+
+            LOGD_ANR("y_lo_noiseprofile: %f %f %f %f\n",
+                     pParams->ci[i][0][0],
+                     pParams->ci[i][0][1],
+                     pParams->ci[i][0][2],
+                     pParams->ci[i][0][3]);
+
+            LOGD_ANR("Y_hi_noiseprofile: %f %f %f %f\n",
+                     pParams->ci[i][1][0],
+                     pParams->ci[i][1][1],
+                     pParams->ci[i][1][2],
+                     pParams->ci[i][1][3]);
+
+            LOGD_ANR("uv_lo_noiseprofile: %f %f %f \n",
+                     pParams->ci_uv[i][0][0],
+                     pParams->ci_uv[i][0][1],
+                     pParams->ci_uv[i][0][2]);
+
+            LOGD_ANR("uv_hi_noiseprofile: %f %f %f \n",
+                     pParams->ci_uv[i][1][0],
+                     pParams->ci_uv[i][1][1],
+                     pParams->ci_uv[i][1][2]);
+
+            LOGD_ANR("Y_weight_limit: %d %d %d %d\n",
+                     pParams->weight_limit_y[i][0],
+                     pParams->weight_limit_y[i][1],
+                     pParams->weight_limit_y[i][2],
+                     pParams->weight_limit_y[i][3]);
+
+            LOGD_ANR("uv_weight_limit: %d %d %d \n",
+                     pParams->weight_limit_uv[i][0],
+                     pParams->weight_limit_uv[i][1],
+                     pParams->weight_limit_uv[i][2]);
+
+            LOGD_ANR("ratio_frq: %f %f %f %f\n",
+                     pParams->ratio_frq[i][0],
+                     pParams->ratio_frq[i][1],
+                     pParams->ratio_frq[i][2],
+                     pParams->ratio_frq[i][3]);
+
+            LOGD_ANR("luma_w_in_chroma: %f %f %f \n",
+                     pParams->luma_w_in_chroma[i][0],
+                     pParams->luma_w_in_chroma[i][1],
+                     pParams->luma_w_in_chroma[i][2]);
+
+            LOGD_ANR("y_lo_scale: %f %f %f %f\n",
+                     pParams->scale[i][0][0],
+                     pParams->scale[i][0][1],
+                     pParams->scale[i][0][2],
+                     pParams->scale[i][0][3]);
+
+            LOGD_ANR("Y_hi_scale: %f %f %f %f\n",
+                     pParams->scale[i][1][0],
+                     pParams->scale[i][1][1],
+                     pParams->scale[i][1][2],
+                     pParams->scale[i][1][3]);
+
+            LOGD_ANR("y_denoiseStrength: %f  uv_denoiseStrength:%f \n",
+                     pParams->dnstr[i][0],
+                     pParams->dnstr_uv[i][0]);
+
+
+            LOGD_ANR("uv_lo_scale: %f %f %f\n",
+                     pParams->scale_uv[i][0][0],
+                     pParams->scale_uv[i][0][1],
+                     pParams->scale_uv[i][0][2]);
+
+            LOGD_ANR("uv_hi_scale: %f %f %f\n",
+                     pParams->scale_uv[i][1][0],
+                     pParams->scale_uv[i][1][1],
+                     pParams->scale_uv[i][1][2]);
+
+
+            for (j = 0; j < 6; j++) {
+                LOGD_ANR("y luma: %f %f   \n",
+                         pParams->lumanrpoint[i][0][j],
+                         pParams->lumanrcurve[i][0][j]);
+            }
+
+            for (j = 0; j < 6; j++) {
+                LOGD_ANR("uv luma: %f %f   \n",
+                         pParams->lumanrpoint_uv[i][0][j],
+                         pParams->lumanrcurve_uv[i][0][j]);
+            }
+
+        }
+    }
+
+    return ANR_RET_SUCCESS;
+}
+
+ANRresult_t init_mfnr_dynamic_params_json(RKAnr_Mfnr_Dynamic_t *pDynamic, CalibDbV2_MFNR_t *pCalibdb)
+{
+    ANRresult_t res = ANR_RET_SUCCESS;
+    int i = 0;
+    int j = 0;
+
+    if(pDynamic == NULL) {
+        LOGE_ANR("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
+        return ANR_RET_NULL_POINTER;
+    }
+
+    if(pCalibdb == NULL) {
+        LOGE_ANR("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
+        return ANR_RET_NULL_POINTER;
+    }
+
+    pDynamic->enable = pCalibdb->TuningPara.Dynamic.Enable;
+    pDynamic->lowth_iso = pCalibdb->TuningPara.Dynamic.LowTh_iso;
+    pDynamic->lowth_time = pCalibdb->TuningPara.Dynamic.LowTh_time;
+    pDynamic->highth_iso = pCalibdb->TuningPara.Dynamic.HighTh_iso;
+    pDynamic->highth_time = pCalibdb->TuningPara.Dynamic.HighTh_time;
+
+    //LOGD_ANR("dynamic final param mode:%d \n", mode_idx);
+    return res;
+
+}
+
+ANRresult_t mfnr_config_setting_param_json(RKAnr_Mfnr_Params_t *pParams, CalibDbV2_MFNR_t *pCalibdb, char* param_mode, char* snr_name)
+{
+    ANRresult_t res = ANR_RET_SUCCESS;
+    int calib_idx = 0;
+    int setting_idx = 0;
+
+    if(pParams == NULL) {
+        LOGE_ANR("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
+        return ANR_RET_NULL_POINTER;
+    }
+
+    if(pCalibdb == NULL) {
+        LOGE_ANR("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
+        return ANR_RET_NULL_POINTER;
+    }
+
+    if(param_mode == NULL) {
+        LOGE_ANR("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
+        return ANR_RET_NULL_POINTER;
+    }
+
+    if(snr_name == NULL) {
+        LOGE_ANR("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
+        return ANR_RET_NULL_POINTER;
+    }
+
+    res = mfnr_get_setting_idx_by_name_json(pCalibdb, snr_name, &calib_idx, &setting_idx);
+    if(res != ANR_RET_SUCCESS) {
+        LOGW_ANR("%s(%d): error!!!  can't find setting in iq files, use 0 instead\n", __FUNCTION__, __LINE__);
+    }
+
+    res = init_mfnr_params_json(pParams, pCalibdb, calib_idx, setting_idx);
+
+    LOGD_ANR("final param mode:%d snr_mode:%d\n", calib_idx, setting_idx);
+    return res;
+
 }
 
 
@@ -409,7 +963,11 @@ ANRresult_t select_mfnr_params_by_ISO(RKAnr_Mfnr_Params_t *stmfnrParams,    RKAn
         return ANR_RET_NULL_POINTER;
     }
 
-    iso = pExpInfo->arIso[pExpInfo->hdr_mode];
+    if(pExpInfo->mfnr_mode_3to1) {
+        iso = pExpInfo->preIso[pExpInfo->hdr_mode];
+    } else {
+        iso = pExpInfo->arIso[pExpInfo->hdr_mode];
+    }
 
     int i, j;
     int iso_low = iso, iso_high = iso;
@@ -421,17 +979,17 @@ ANRresult_t select_mfnr_params_by_ISO(RKAnr_Mfnr_Params_t *stmfnrParams,    RKAn
     int max_lvl             = MFNR_MAX_LVL;
     int max_lvl_uv          = MFNR_MAX_LVL_UV;
     int lumancurve_step     = LUMANRCURVE_STEP;
-    int range               = (1 << Y_CALIBRATION_BITS);
-    int step                = (1 << (Y_CALIBRATION_BITS - bits_proc));
-    int step_x              = (1 << (Y_CALIBRATION_BITS - Y_SIGMA_TABLE_BITS));
-    int step_x1             = (1 << (Y_CALIBRATION_BITS - bits_proc));
-    int step_y              = (1 << (Y_CALIBRATION_BITS - bits_proc));
-    int step_x_dehz         = (1 << (Y_CALIBRATION_BITS - Y_SIGMA_TABLE_BITS_DEHAZE));
-    double noise_sigma_tmp[(1 << Y_CALIBRATION_BITS) + 1];
+    int range               = (1 << (Y_CALIBRATION_BITS - ANR_MFNR_SIGMA_X_SHIFT_BITS));
+    int step                = (1 << (Y_CALIBRATION_BITS - bits_proc - ANR_MFNR_SIGMA_X_SHIFT_BITS));
+    int step_x              = (1 << (Y_CALIBRATION_BITS - Y_SIGMA_TABLE_BITS - ANR_MFNR_SIGMA_X_SHIFT_BITS));
+    int step_x1             = (1 << (Y_CALIBRATION_BITS - bits_proc - ANR_MFNR_SIGMA_X_SHIFT_BITS));
+    //int step_y              = (1 << (Y_CALIBRATION_BITS - bits_proc));
+    int step_x_dehz         = (1 << (Y_CALIBRATION_BITS - Y_SIGMA_TABLE_BITS_DEHAZE - ANR_MFNR_SIGMA_X_SHIFT_BITS));
+    double noise_sigma_tmp[(1 << (Y_CALIBRATION_BITS - ANR_MFNR_SIGMA_X_SHIFT_BITS) ) + 1];
 
 #ifndef RK_SIMULATOR_HW
     for (i = 0; i < MAX_ISO_STEP - 1; i++) {
-        if(iso >= stmfnrParams->iso[i] && iso_low <= stmfnrParams->iso[i + 1]) {
+        if(iso >= stmfnrParams->iso[i] && iso <= stmfnrParams->iso[i + 1]) {
             iso_low = stmfnrParams->iso[i];
             iso_high = stmfnrParams->iso[i + 1];
             gain_low = i;
@@ -441,20 +999,22 @@ ANRresult_t select_mfnr_params_by_ISO(RKAnr_Mfnr_Params_t *stmfnrParams,    RKAn
         }
     }
 
-    if(iso < stmfnrParams->iso[0]) {
-        iso_low = stmfnrParams->iso[0];
-        iso_high = stmfnrParams->iso[1];
-        gain_low = 0;
-        gain_high = 1;
-        ratio = 0;
-    }
+    if(i == MAX_ISO_STEP - 1) {
+        if(iso < stmfnrParams->iso[0]) {
+            iso_low = stmfnrParams->iso[0];
+            iso_high = stmfnrParams->iso[1];
+            gain_low = 0;
+            gain_high = 1;
+            ratio = 0;
+        }
 
-    if(iso > stmfnrParams->iso[MAX_ISO_STEP - 1]) {
-        iso_low = stmfnrParams->iso[MAX_ISO_STEP - 2];
-        iso_high = stmfnrParams->iso[MAX_ISO_STEP - 1];
-        gain_low = MAX_ISO_STEP - 2;
-        gain_high = MAX_ISO_STEP - 1;
-        ratio = 1;
+        if(iso > stmfnrParams->iso[MAX_ISO_STEP - 1]) {
+            iso_low = stmfnrParams->iso[MAX_ISO_STEP - 2];
+            iso_high = stmfnrParams->iso[MAX_ISO_STEP - 1];
+            gain_low = MAX_ISO_STEP - 2;
+            gain_high = MAX_ISO_STEP - 1;
+            ratio = 1;
+        }
     }
 #else
     for (i = MAX_ISO_STEP - 1; i >= 0; i--)
@@ -688,10 +1248,10 @@ ANRresult_t select_mfnr_params_by_ISO(RKAnr_Mfnr_Params_t *stmfnrParams,    RKAn
 
 
     for (i = 0; i < range; i += step_x)
-        stmfnrParamsSelected->noise_sigma[i / step_x]             = noise_sigma_tmp[i]                    / step_y;
+        stmfnrParamsSelected->noise_sigma[i / step_x]             = noise_sigma_tmp[i] ;
 
     for (i = 0; i < MAX_INTEPORATATION_LUMAPOINT; i++) {
-        stmfnrParamsSelected->noise_sigma_sample[i]             = noise_sigma_tmp[fix_x_pos[i]]       / step_y;
+        stmfnrParamsSelected->noise_sigma_sample[i]             = noise_sigma_tmp[fix_x_pos[i]];
         stmfnrParamsSelected->noise_sigma_sample[i] = ABS(stmfnrParamsSelected->noise_sigma_sample[i]);
     }
     for (i = 0; i < MAX_INTEPORATATION_LUMAPOINT; i++)
@@ -699,7 +1259,7 @@ ANRresult_t select_mfnr_params_by_ISO(RKAnr_Mfnr_Params_t *stmfnrParams,    RKAn
 
 
     for (i = 0; i < MAX_INTEPORATATION_LUMAPOINT; i++) {
-        stmfnrParamsSelected->noise_sigma_dehaze[i]             = noise_sigma_tmp[fix_x_pos[i]]       / step_y;
+        stmfnrParamsSelected->noise_sigma_dehaze[i]             = noise_sigma_tmp[fix_x_pos[i]];
         stmfnrParamsSelected->noise_sigma_dehaze[i] = ABS(stmfnrParamsSelected->noise_sigma_dehaze[i]);
     }
     for (i = 0; i < MAX_INTEPORATATION_LUMAPOINT; i++)
@@ -771,52 +1331,55 @@ ANRresult_t select_mfnr_params_by_ISO(RKAnr_Mfnr_Params_t *stmfnrParams,    RKAn
 
 #endif
 
+#if 1
+    if(stmfnrParams->motion_detection_enable) {
+        stmfnrParamsSelected->mfnr_sigma_scale = ((stmfnrParams->mfnr_sigma_scale[gain_high] * ratio + stmfnrParams->mfnr_sigma_scale[gain_low] * (1 - ratio))) ;
+    } else {
+        stmfnrParamsSelected->mfnr_sigma_scale = 1.0;
+    }
+    LOGD_ANR("mfnr motion detetion enable:%d mfnr_sigma_scale:%f\n",
+             stmfnrParams->motion_detection_enable,
+             stmfnrParamsSelected->mfnr_sigma_scale);
+#endif
 //for (i = 0; i < range; i++)
 //    noise_sigma_tmp[i]                          = ROUND_F(noise_sigma_tmp[i] * (1 << 12)) >>  ;
 
 
     double noise_sigma_max = 0;
     double noise_sigma_limit = 1 << MFNR_F_INTE_SIGMA;
-    double sigma_ratio = 1.0;
-    double sigma_ratio_inv = 1.0;
-    for(int i = 0; i < MAX_INTEPORATATION_LUMAPOINT;      i++)
+    double sigma_scale          = 1.0;
+    double scale_scale          = 1.0;
+    for(int i = 0; i < MAX_INTEPORATATION_LUMAPOINT; i++)
         noise_sigma_max = MAX(stmfnrParamsSelected->noise_sigma_sample[i], noise_sigma_max);
 
-    if(noise_sigma_max > noise_sigma_limit)
-    {
-        if(noise_sigma_max <= noise_sigma_limit)
-        {
-            sigma_ratio       = 1;
-            sigma_ratio_inv   = 1;
-        }
-        else if(noise_sigma_max <= noise_sigma_limit * 2)
-        {
-            sigma_ratio       = 2;
-            sigma_ratio_inv   = 1.0 / 2;
-        }
-        else if(noise_sigma_max <= noise_sigma_limit * 4)
-        {
-            sigma_ratio       = 4;
-            sigma_ratio_inv   = 1.0 / 4;
-        }
-        else
-        {
-            LOGE_ANR("%s:%d noise_sigma is too big\n", __FUNCTION__, __LINE__);
-        }
-        if(sigma_ratio !=  1)
-        {
-            for(int i = 0; i < MAX_INTEPORATATION_LUMAPOINT;       i++)
-                stmfnrParamsSelected->noise_sigma_sample[i]         = stmfnrParamsSelected->noise_sigma_sample[i]   * sigma_ratio_inv;
-            for(int i = 0; i < MAX_INTEPORATATION_LUMAPOINT;       i++)
-                stmfnrParamsSelected->noise_sigma_dehaze[i]         = stmfnrParamsSelected->noise_sigma_dehaze[i]   * sigma_ratio_inv;
-            for(int dir_idx = 0; dir_idx < dir_num; dir_idx++)
-                for(int lvl = 0; lvl < max_lvl; lvl++)
-                    stmfnrParamsSelected->scale[dir_idx][lvl]       = stmfnrParamsSelected->scale[dir_idx][lvl]     * sigma_ratio;
-            for(int dir_idx = 0; dir_idx < dir_num; dir_idx++)
-                for(int lvl = 0; lvl < max_lvl_uv; lvl++)
-                    stmfnrParamsSelected->scale_uv[dir_idx][lvl]    = stmfnrParamsSelected->scale_uv[dir_idx][lvl]  * sigma_ratio;
-        }
+    if(noise_sigma_max * stmfnrParamsSelected->mfnr_sigma_scale <= noise_sigma_limit) {
+        scale_scale = 1;
+        sigma_scale = stmfnrParamsSelected->mfnr_sigma_scale;
+    } else {
+        scale_scale = noise_sigma_limit / (noise_sigma_max * stmfnrParamsSelected->mfnr_sigma_scale);
+        sigma_scale = stmfnrParamsSelected->mfnr_sigma_scale * scale_scale;
     }
+
+    if(scale_scale != 1.0 || sigma_scale != 1.0)
+    {
+        for(int i = 0; i < MAX_INTEPORATATION_LUMAPOINT; i++)
+            stmfnrParamsSelected->noise_sigma_sample[i] = stmfnrParamsSelected->noise_sigma_sample[i] * sigma_scale;
+        for(int i = 0; i < MAX_INTEPORATATION_LUMAPOINT; i++)
+            stmfnrParamsSelected->noise_sigma_dehaze[i] = stmfnrParamsSelected->noise_sigma_dehaze[i] * sigma_scale;
+        for(int dir_idx = 0; dir_idx < dir_num; dir_idx++)
+            for(int lvl = 0; lvl < max_lvl; lvl++)
+                stmfnrParamsSelected->scale[dir_idx][lvl] = stmfnrParamsSelected->scale[dir_idx][lvl] * scale_scale;
+        for(int dir_idx = 0; dir_idx < dir_num; dir_idx++)
+            for(int lvl = 0; lvl < max_lvl_uv; lvl++)
+                stmfnrParamsSelected->scale_uv[dir_idx][lvl] = stmfnrParamsSelected->scale_uv[dir_idx][lvl] * scale_scale;
+    }
+
+    LOGD_ANR("mfnr final sigma_max:%f motion_scale:%f sigma_limit:%f sigma_scale:%f scale_scale:%f\n",
+             noise_sigma_max,
+             stmfnrParamsSelected->mfnr_sigma_scale,
+             noise_sigma_limit,
+             sigma_scale,
+             scale_scale);
 
     return res;
 
@@ -933,15 +1496,22 @@ ANRresult_t mfnr_fix_transfer(RKAnr_Mfnr_Params_Select_t* tnr, RKAnr_Mfnr_Fix_t 
         return ANR_RET_NULL_POINTER;
     }
 
-	LOGD_ANR("%s:%d iso:%d strength:%f\n", __FUNCTION__, __LINE__, pExpInfo->arIso[pExpInfo->hdr_mode], fLumaStrength);
-	if(fLumaStrength <= 0.0){
-		fLumaStrength = 0.000001;
-	}
-	
+    LOGD_ANR("%s:%d iso:%d strength:%f\n", __FUNCTION__, __LINE__, pExpInfo->arIso[pExpInfo->hdr_mode], fLumaStrength);
+    if(fLumaStrength <= 0.0) {
+        fLumaStrength = 0.000001;
+    }
+
     int i = 0;
     unsigned long tmp = 0;
-    int mIso_last = pExpInfo->arIso[pExpInfo->hdr_mode];
-    int mIso = pExpInfo->arIso[pExpInfo->hdr_mode];
+    int mIso_last = 50;
+    int mIso = 50;
+    if(pExpInfo->mfnr_mode_3to1) {
+        mIso_last = pExpInfo->preIso[pExpInfo->hdr_mode];
+        mIso = pExpInfo->arIso[pExpInfo->hdr_mode];
+    } else {
+        mIso_last = pExpInfo->arIso[pExpInfo->hdr_mode];
+        mIso = pExpInfo->arIso[pExpInfo->hdr_mode];
+    }
     double gain_glb_filt;
     double gain_glb_ref1;
     double gain_glb_filt_sqrt;
@@ -979,27 +1549,27 @@ ANRresult_t mfnr_fix_transfer(RKAnr_Mfnr_Params_Select_t* tnr, RKAnr_Mfnr_Fix_t 
     pMfnrCfg->optc_en = 1;
     pMfnrCfg->gain_en = 1;
 
-    //0x0088   
+    //0x0088
     tmp = (tnr->weight_limit_y[0] / fLumaStrength);
-	if(tmp > 0xff){
-		tmp = 0xff;
-	}
-	pMfnrCfg->pk0_y = (unsigned char)tmp;
+    if(tmp > 0xff) {
+        tmp = 0xff;
+    }
+    pMfnrCfg->pk0_y = (unsigned char)tmp;
 
-	tmp = (tnr->weight_limit_y[max_lvl - 1] / fLumaStrength);
-	if(tmp > 0xff){
-		tmp = 0xff;
-	}
+    tmp = (tnr->weight_limit_y[max_lvl - 1] / fLumaStrength);
+    if(tmp > 0xff) {
+        tmp = 0xff;
+    }
     pMfnrCfg->pk1_y = (unsigned char)tmp;
-	tmp = (tnr->weight_limit_uv[0] / fChromaStrength );
-	if(tmp > 0xff){
-		tmp = 0xff;
-	}
+    tmp = (tnr->weight_limit_uv[0] / fChromaStrength );
+    if(tmp > 0xff) {
+        tmp = 0xff;
+    }
     pMfnrCfg->pk0_c = (unsigned char)tmp;
-	tmp = (tnr->weight_limit_uv[max_lvl_uv - 1] / fChromaStrength);
-	if(tmp > 0xff){
-		tmp = 0xff;
-	}
+    tmp = (tnr->weight_limit_uv[max_lvl_uv - 1] / fChromaStrength);
+    if(tmp > 0xff) {
+        tmp = 0xff;
+    }
     pMfnrCfg->pk1_c = (unsigned char)tmp;
 
     //0x008c
@@ -1179,7 +1749,7 @@ ANRresult_t mfnr_fix_Printf(RKAnr_Mfnr_Fix_t  * pMfnrCfg)
              pMfnrCfg->pk1_c);
 
     //0x008c
-    LOGD_ANR("(0x008c) glb_gain_cur:%d glb_gain_nxt:%d \n",
+    LOGD_ANR("mfnr (0x008c) glb_gain_cur:%d glb_gain_nxt:%d \n",
              pMfnrCfg->glb_gain_cur,
              pMfnrCfg->glb_gain_nxt);
 
@@ -1353,7 +1923,7 @@ ANRresult_t mfnr_dynamic_calc(RKAnr_Mfnr_Dynamic_t  * pDynamic, ANRExpInfo_t *pE
     float time = pExpInfo->arTime[pExpInfo->hdr_mode];
     float iso = pExpInfo->arIso[pExpInfo->hdr_mode];
     float exp = time * iso;
-	
+
     if(pDynamic == NULL) {
         LOGE_ANR("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
         return ANR_RET_NULL_POINTER;
@@ -1364,21 +1934,169 @@ ANRresult_t mfnr_dynamic_calc(RKAnr_Mfnr_Dynamic_t  * pDynamic, ANRExpInfo_t *pE
         return ANR_RET_NULL_POINTER;
     }
 
-	
-    if(iso >= pDynamic->highth_iso && time >= pDynamic->highth_time){
-	 pDynamic->mfnr_enable_state = 1;
-    }else if(iso <= pDynamic->lowth_iso && time <= pDynamic->lowth_time){
-	 pDynamic->mfnr_enable_state = 0;
+
+    if(iso >= pDynamic->highth_iso && time >= pDynamic->highth_time) {
+        pDynamic->mfnr_enable_state = 1;
+    } else if(iso <= pDynamic->lowth_iso && time <= pDynamic->lowth_time) {
+        pDynamic->mfnr_enable_state = 0;
     }
 
-	LOGD_ANR("%s:%d mfnr: cur:%f %f  highth:%f %f  lowth:%f %f  finnal:%d\n", 
-		__FUNCTION__, __LINE__, 
-		iso, time, 
-		pDynamic->highth_iso, pDynamic->highth_time,
-		pDynamic->lowth_iso, pDynamic->lowth_time,
-		pDynamic->mfnr_enable_state);
-	
+    LOGD_ANR("%s:%d mfnr: cur:%f %f  highth:%f %f  lowth:%f %f  finnal:%d\n",
+             __FUNCTION__, __LINE__,
+             iso, time,
+             pDynamic->highth_iso, pDynamic->highth_time,
+             pDynamic->lowth_iso, pDynamic->lowth_time,
+             pDynamic->mfnr_enable_state);
+
     return res;
 }
 
+
+ANRresult_t mfnr_calibdbV2_assign(CalibDbV2_MFNR_t *pDst, CalibDbV2_MFNR_t *pSrc)
+{
+    ANRresult_t res = ANR_RET_SUCCESS;
+    CalibDbV2_MFNR_CalibPara_t *pSrcCalibParaV2 = NULL;
+    CalibDbV2_MFNR_TuningPara_t *pSrcTuningParaV2 = NULL;
+    CalibDbV2_MFNR_CalibPara_t *pDstCalibParaV2 = NULL;
+    CalibDbV2_MFNR_TuningPara_t *pDstTuningParaV2 = NULL;
+    int setting_len = 0;
+    int iso_len = 0;
+
+
+    if(pDst == NULL) {
+        LOGE_ANR("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
+        return ANR_RET_NULL_POINTER;
+    }
+
+    if(pSrc == NULL) {
+        LOGE_ANR("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
+        return ANR_RET_NULL_POINTER;
+    }
+
+    mfnr_calibdbV2_free(pDst);
+
+    pSrcCalibParaV2 = &pSrc->CalibPara;
+    pSrcTuningParaV2 = &pSrc->TuningPara;
+    pDstCalibParaV2 = &pDst->CalibPara;
+    pDstTuningParaV2 = &pDst->TuningPara;
+
+    //assign the value
+    pDst->Version = strdup(pSrc->Version);
+    pDstTuningParaV2->enable = pSrcTuningParaV2->enable;
+    pDstTuningParaV2->mode_3to1 = pSrcTuningParaV2->mode_3to1;
+    pDstTuningParaV2->local_gain_en = pSrcTuningParaV2->local_gain_en;
+    pDstTuningParaV2->motion_detect_en = pSrcTuningParaV2->motion_detect_en;
+
+    //malloc iso size
+    setting_len = pSrcCalibParaV2->Setting_len;
+    pDstCalibParaV2->Setting = (CalibDbV2_MFNR_CalibPara_Setting_t *)malloc(setting_len * sizeof(CalibDbV2_MFNR_CalibPara_Setting_t));
+    memset(pDstCalibParaV2->Setting,  0x00, setting_len * sizeof(CalibDbV2_MFNR_CalibPara_Setting_t));
+    pDstCalibParaV2->Setting_len = setting_len;
+
+    for(int i = 0; i < setting_len; i++) {
+        iso_len = pSrcCalibParaV2->Setting[i].Calib_ISO_len;
+        pDstCalibParaV2->Setting[i].Calib_ISO =  (CalibDbV2_MFNR_CalibPara_Setting_ISO_t *)malloc(iso_len * sizeof(CalibDbV2_MFNR_CalibPara_Setting_ISO_t));
+        memset(pDstCalibParaV2->Setting[i].Calib_ISO, 0x00, iso_len * sizeof(CalibDbV2_MFNR_CalibPara_Setting_ISO_t));
+        pDstCalibParaV2->Setting[i].Calib_ISO_len = iso_len;
+    }
+
+    for(int i = 0; i < setting_len; i++) {
+        iso_len = pSrcCalibParaV2->Setting[i].Calib_ISO_len;
+        pDstCalibParaV2->Setting[i].SNR_Mode = strdup(pSrcCalibParaV2->Setting[i].SNR_Mode);
+        pDstCalibParaV2->Setting[i].Sensor_Mode = strdup(pSrcCalibParaV2->Setting[i].Sensor_Mode);
+
+        for(int j = 0; j < iso_len; j++) {
+            pDstCalibParaV2->Setting[i].Calib_ISO[j] = pSrcCalibParaV2->Setting[i].Calib_ISO[j];
+        }
+    }
+
+
+    setting_len = pSrcTuningParaV2->Setting_len;
+    pDstTuningParaV2->Setting = (CalibDbV2_MFNR_TuningPara_Setting_t *)malloc(setting_len * sizeof(CalibDbV2_MFNR_TuningPara_Setting_t));
+    memset(pDstTuningParaV2->Setting, 0x00, setting_len * sizeof(CalibDbV2_MFNR_TuningPara_Setting_t));
+    pDstTuningParaV2->Setting_len = setting_len;
+
+    for(int i = 0; i < setting_len; i++) {
+        iso_len = pSrcTuningParaV2->Setting[i].Tuning_ISO_len;
+        pDstTuningParaV2->Setting[i].Tuning_ISO = (CalibDbV2_MFNR_TuningPara_Setting_ISO_t *)malloc(iso_len * sizeof(CalibDbV2_MFNR_TuningPara_Setting_ISO_t));
+        memset(pDstTuningParaV2->Setting[i].Tuning_ISO, 0x00, iso_len * sizeof(CalibDbV2_MFNR_TuningPara_Setting_ISO_t));
+        pDstTuningParaV2->Setting[i].Tuning_ISO_len = iso_len;
+    }
+
+    for(int i = 0; i < setting_len; i++) {
+        iso_len = pSrcTuningParaV2->Setting[i].Tuning_ISO_len;
+        pDstTuningParaV2->Setting[i].SNR_Mode = strdup(pSrcCalibParaV2->Setting[i].SNR_Mode);
+        pDstTuningParaV2->Setting[i].Sensor_Mode = strdup(pSrcCalibParaV2->Setting[i].Sensor_Mode);
+
+        for(int j = 0; j < iso_len; j++) {
+            pDstTuningParaV2->Setting[i].Tuning_ISO[j] = pSrcTuningParaV2->Setting[i].Tuning_ISO[j];
+        }
+    }
+
+    //motion
+    iso_len = pSrcTuningParaV2->Motion.Motion_ISO_len;
+    pDstTuningParaV2->Motion.Motion_ISO = (CalibDbV2_MFNR_TuningPara_Motion_ISO_t *)malloc(iso_len * sizeof(CalibDbV2_MFNR_TuningPara_Motion_ISO_t));
+    memset(pDstTuningParaV2->Motion.Motion_ISO, 0x00, iso_len * sizeof(CalibDbV2_MFNR_TuningPara_Motion_ISO_t));
+    pDstTuningParaV2->Motion.Motion_ISO_len = iso_len;
+    for(int j = 0; j < iso_len; j++) {
+        pDstTuningParaV2->Motion.Motion_ISO[j] = pSrcTuningParaV2->Motion.Motion_ISO[j];
+    }
+
+    //dynamic
+    pDstTuningParaV2->Dynamic = pSrcTuningParaV2->Dynamic;
+
+    return res;
+}
+
+
+
+void mfnr_calibdbV2_free(CalibDbV2_MFNR_t *pCalibdbV2)
+{
+    if(pCalibdbV2) {
+        if(pCalibdbV2->Version) {
+            free(pCalibdbV2->Version);
+        }
+
+        if(pCalibdbV2->CalibPara.Setting) {
+            for(int i = 0; i < pCalibdbV2->CalibPara.Setting_len; i++) {
+                if(pCalibdbV2->CalibPara.Setting[i].Calib_ISO) {
+                    if(pCalibdbV2->CalibPara.Setting[i].Calib_ISO) {
+                        free(pCalibdbV2->CalibPara.Setting[i].Calib_ISO);
+                    }
+                    if(pCalibdbV2->CalibPara.Setting[i].SNR_Mode) {
+                        free(pCalibdbV2->CalibPara.Setting[i].SNR_Mode);
+                    }
+                    if(pCalibdbV2->CalibPara.Setting[i].Sensor_Mode) {
+                        free(pCalibdbV2->CalibPara.Setting[i].Sensor_Mode);
+                    }
+                }
+            }
+            free(pCalibdbV2->CalibPara.Setting);
+        }
+
+
+        if(pCalibdbV2->TuningPara.Setting) {
+            for(int i = 0; i < pCalibdbV2->TuningPara.Setting_len; i++) {
+                if(pCalibdbV2->TuningPara.Setting[i].Tuning_ISO) {
+                    if(pCalibdbV2->TuningPara.Setting[i].Tuning_ISO) {
+                        free(pCalibdbV2->TuningPara.Setting[i].Tuning_ISO);
+                    }
+                    if(pCalibdbV2->TuningPara.Setting[i].SNR_Mode) {
+                        free(pCalibdbV2->TuningPara.Setting[i].SNR_Mode);
+                    }
+                    if(pCalibdbV2->TuningPara.Setting[i].Sensor_Mode) {
+                        free(pCalibdbV2->TuningPara.Setting[i].Sensor_Mode);
+                    }
+                }
+            }
+            free(pCalibdbV2->TuningPara.Setting);
+        }
+
+        if(pCalibdbV2->TuningPara.Motion.Motion_ISO) {
+            free(pCalibdbV2->TuningPara.Motion.Motion_ISO);
+        }
+
+    }
+
+}
 

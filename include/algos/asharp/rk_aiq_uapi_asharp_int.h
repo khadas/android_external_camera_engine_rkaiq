@@ -33,11 +33,20 @@ rk_aiq_uapi_asharp_GetIQpara(const RkAiqAlgoContext *ctx,
 
 XCamReturn
 rk_aiq_uapi_asharp_SetStrength(const RkAiqAlgoContext *ctx,
-                             float fPercent);
+                               float fPercent);
 
 XCamReturn
 rk_aiq_uapi_asharp_GetStrength(const RkAiqAlgoContext *ctx,
-                             float *pPercent);
+                               float *pPercent);
+
+XCamReturn
+rk_aiq_uapi_asharp_SetJsonpara(RkAiqAlgoContext *ctx,
+                               rk_aiq_sharp_JsonPara_t *para,
+                               bool need_sync);
+
+XCamReturn
+rk_aiq_uapi_asharp_GetJsonpara(const RkAiqAlgoContext *ctx,
+                               rk_aiq_sharp_JsonPara_t *para);
 
 
 #endif

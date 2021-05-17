@@ -2,20 +2,11 @@
 #include "rk_aiq_types_algo_agic_prvt.h"
 
 
-static int
-AgicFullParamsInit
-(
-    AgicContext_t *pAgicCtx
-)
-{
-    memcpy(&pAgicCtx->full_param, &pAgicCtx->pCalibDb->gic, sizeof(pAgicCtx->pCalibDb->gic));
-    return XCAM_RETURN_NO_ERROR;
-}
-
 XCamReturn
 AgicInit
 (
-    AgicContext_t *pAgicCtx
+    AgicContext_t *pAgicCtx,
+    CamCalibDbV2Context_t* calib
 )
 {
     LOGI_AGIC("%s(%d): enter!\n", __FUNCTION__, __LINE__);
@@ -25,6 +16,18 @@ AgicInit
     }
     memset(pAgicCtx, 0, sizeof(AgicContext_t));
     pAgicCtx->state = AGIC_STATE_INITIALIZED;
+
+    if(CHECK_ISP_HW_V20()) {
+        CalibDbV2_Gic_V20_t* calibv2_agic_calib_V20 =
+            (CalibDbV2_Gic_V20_t*)(CALIBDBV2_GET_MODULE_PTR(calib, agic_calib_v20));
+        pAgicCtx->full_param.gic_v20 = calibv2_agic_calib_V20;
+    } else if(CHECK_ISP_HW_V21()) {
+        CalibDbV2_Gic_V21_t* calibv2_agic_calib_V21 =
+            (CalibDbV2_Gic_V21_t*)(CALIBDBV2_GET_MODULE_PTR(calib, agic_calib_v21));
+        pAgicCtx->full_param.gic_v21 = calibv2_agic_calib_V21;
+    }
+    pAgicCtx->calib_changed = true;
+    pAgicCtx->state = AGIC_STATE_RUNNING;
 
     LOGI_AGIC("%s(%d): exit!\n", __FUNCTION__, __LINE__);
     return XCAM_RETURN_NO_ERROR;
@@ -43,24 +46,6 @@ AgicRelease
     }
     AgicStop(pAgicCtx);
 
-    LOGI_AGIC("%s(%d): exit!\n", __FUNCTION__, __LINE__);
-    return XCAM_RETURN_NO_ERROR;
-}
-
-XCamReturn
-AgicStart
-(
-    AgicContext_t *pAgicCtx
-)
-{
-    LOGI_AGIC("%s(%d): enter!\n", __FUNCTION__, __LINE__);
-
-    if(pAgicCtx == NULL) {
-        LOGE_AGIC("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
-        return XCAM_RETURN_ERROR_PARAM;
-    }
-    AgicFullParamsInit(pAgicCtx);//load iq gic para
-    pAgicCtx->state = AGIC_STATE_RUNNING;
     LOGI_AGIC("%s(%d): exit!\n", __FUNCTION__, __LINE__);
     return XCAM_RETURN_NO_ERROR;
 }
@@ -216,15 +201,14 @@ void AgicGetProcResultV20
 void AgicProcessV20
 (
     AgicContext_t *pAgicCtx,
-    int ISO,
-    int mode,
-    int HWversion
+    int ISO
 )
 {
     LOGI_AGIC("%s(%d): enter!\n", __FUNCTION__, __LINE__);
 
     float ave1 = 0.0f, noiseSigma = 0.0f;
     short ratio = 0;
+    short LumaPoints[] = { 0, 128, 256, 384, 512, 640, 768, 896, 1024, 1536, 2048, 2560, 3072, 3584, 4096 };
     short min_busy_threHi = 0, min_busy_threLo = 0;
     short min_grad_thrHi = 0, min_grad_thrLo = 0, min_grad_thr2Hi = 0, min_grad_thr2Lo = 0;
     short k_grad1Hi = 0, k_grad1Lo = 0, k_grad2Hi = 0, k_grad2Lo = 0;
@@ -241,6 +225,8 @@ void AgicProcessV20
     float gValueLimitHiHi = 0.0f, gValueLimitHiLo = 0.0f;
     float gValueLimitLoHi = 0.0f, gValueLimitLoLo = 0.0f;
     int index, iso_hi = 0, iso_lo = 0;
+    float pNoiseCurveGicHi_0 = 0.0f, pNoiseCurveGicHi_1 = 0.0f;
+    float pNoiseCurveGicLo_0 = 0.0f, pNoiseCurveGicLo_1 = 0.0f;
 
     LOGI_AGIC("%s(%d): enter, ISO=%d\n", __FUNCTION__, __LINE__, ISO);
 
@@ -251,13 +237,13 @@ void AgicProcessV20
         index = 0;
         ratio = 0;
     } else if (ISO > 12800) {
-        index = CALIBDB_ISO_NUM - 2;
+        index = pAgicCtx->full_param.gic_v20->GicTuningPara.GicData.ISO_len - 2;
         ratio = (1 << 4);
     } else {
-        for (index = 0; index < (CALIBDB_ISO_NUM - 1); index++)
+        for (index = 0; index < (pAgicCtx->full_param.gic_v20->GicTuningPara.GicData.ISO_len - 2); index++)
         {
-            iso_lo = (int)(pAgicCtx->full_param.calib_v20[mode].setting.iso[index]);
-            iso_hi = (int)(pAgicCtx->full_param.calib_v20[mode].setting.iso[index + 1]);
+            iso_lo = (int)(pAgicCtx->full_param.gic_v20->GicTuningPara.GicData.ISO[index]);
+            iso_hi = (int)(pAgicCtx->full_param.gic_v20->GicTuningPara.GicData.ISO[index + 1]);
             LOGD_AGIC("index=%d,  iso_lo=%d, iso_hi=%d\n", index, iso_lo, iso_hi);
             if (ISO > iso_lo && ISO <= iso_hi)
             {
@@ -266,56 +252,60 @@ void AgicProcessV20
         }
         ratio = ((ISO - iso_lo) * (1 << 4)) / (iso_hi - iso_lo);
     }
-    min_busy_threHi      = pAgicCtx->full_param.calib_v20[mode].setting.min_busy_thre[index + 1];
-    min_busy_threLo      = pAgicCtx->full_param.calib_v20[mode].setting.min_busy_thre[index];
-    min_grad_thrHi       = pAgicCtx->full_param.calib_v20[mode].setting.min_grad_thr1[index + 1];
-    min_grad_thrLo       = pAgicCtx->full_param.calib_v20[mode].setting.min_grad_thr1[index];
-    min_grad_thr2Hi      = pAgicCtx->full_param.calib_v20[mode].setting.min_grad_thr2[index + 1];
-    min_grad_thr2Lo      = pAgicCtx->full_param.calib_v20[mode].setting.min_grad_thr2[index];
-    k_grad1Hi            = pAgicCtx->full_param.calib_v20[mode].setting.k_grad1[index + 1];
-    k_grad1Lo            = pAgicCtx->full_param.calib_v20[mode].setting.k_grad1[index];
-    k_grad2Hi            = pAgicCtx->full_param.calib_v20[mode].setting.k_grad2[index + 1];
-    k_grad2Lo            = pAgicCtx->full_param.calib_v20[mode].setting.k_grad2[index];
-    gb_threHi            = pAgicCtx->full_param.calib_v20[mode].setting.gb_thre[index + 1];
-    gb_threLo            = pAgicCtx->full_param.calib_v20[mode].setting.gb_thre[index];
-    maxCorVHi            = pAgicCtx->full_param.calib_v20[mode].setting.maxCorV[index + 1];
-    maxCorVLo            = pAgicCtx->full_param.calib_v20[mode].setting.maxCorV[index];
-    maxCorVbothHi        = pAgicCtx->full_param.calib_v20[mode].setting.maxCorVboth[index + 1];
-    maxCorVbothLo        = pAgicCtx->full_param.calib_v20[mode].setting.maxCorVboth[index];
-    dark_threHi          = pAgicCtx->full_param.calib_v20[mode].setting.dark_thre[index + 1];
-    dark_threLo          = pAgicCtx->full_param.calib_v20[mode].setting.dark_thre[index];
-    dark_threUpHi        = pAgicCtx->full_param.calib_v20[mode].setting.dark_threHi[index + 1];
-    dark_threUpLo        = pAgicCtx->full_param.calib_v20[mode].setting.dark_threHi[index];
-    k_grad1_darkHi       = pAgicCtx->full_param.calib_v20[mode].setting.k_grad1_dark[index + 1];
-    k_grad1_darkLo       = pAgicCtx->full_param.calib_v20[mode].setting.k_grad1_dark[index];
-    k_grad2_darkHi       = pAgicCtx->full_param.calib_v20[mode].setting.k_grad2_dark[index + 1];
-    k_grad2_darkLo       = pAgicCtx->full_param.calib_v20[mode].setting.k_grad2_dark[index];
-    min_grad_thr_dark1Hi = pAgicCtx->full_param.calib_v20[mode].setting.min_grad_thr_dark1[index + 1];
-    min_grad_thr_dark1Lo = pAgicCtx->full_param.calib_v20[mode].setting.min_grad_thr_dark1[index];
-    min_grad_thr_dark2Hi = pAgicCtx->full_param.calib_v20[mode].setting.min_grad_thr_dark2[index + 1];
-    min_grad_thr_dark2Lo = pAgicCtx->full_param.calib_v20[mode].setting.min_grad_thr_dark2[index];
-    scaleHiHi            = pAgicCtx->full_param.calib_v20[mode].setting.ScaleHi[index + 1];
-    scaleHiLo            = pAgicCtx->full_param.calib_v20[mode].setting.ScaleHi[index];
-    scaleLoHi            = pAgicCtx->full_param.calib_v20[mode].setting.ScaleLo[index + 1];
-    scaleLoLo            = pAgicCtx->full_param.calib_v20[mode].setting.ScaleLo[index];
-    strengthHi           = pAgicCtx->full_param.calib_v20[mode].setting.textureStrength[index + 1];
-    strengthLo           = pAgicCtx->full_param.calib_v20[mode].setting.textureStrength[index];
-    strengthGlobalHi     = pAgicCtx->full_param.calib_v20[mode].setting.globalStrength[index + 1];
-    strengthGlobalLo     = pAgicCtx->full_param.calib_v20[mode].setting.globalStrength[index];
-    gValueLimitHiHi      = pAgicCtx->full_param.calib_v20[mode].setting.GValueLimitHi[index + 1];
-    gValueLimitHiLo      = pAgicCtx->full_param.calib_v20[mode].setting.GValueLimitHi[index];
-    gValueLimitLoHi      = pAgicCtx->full_param.calib_v20[mode].setting.GValueLimitLo[index + 1];
-    gValueLimitLoLo      = pAgicCtx->full_param.calib_v20[mode].setting.GValueLimitLo[index];
-    noiseCoeaHi          = pAgicCtx->full_param.calib_v20[mode].setting.noise_coea[index + 1];
-    noiseCoeaLo          = pAgicCtx->full_param.calib_v20[mode].setting.noise_coea[index];
-    noiseCoebHi          = pAgicCtx->full_param.calib_v20[mode].setting.noise_coeb[index + 1];
-    noiseCoebLo          = pAgicCtx->full_param.calib_v20[mode].setting.noise_coeb[index];
-    diffClipHi           = pAgicCtx->full_param.calib_v20[mode].setting.diff_clip[index + 1];
-    diffClipLo           = pAgicCtx->full_param.calib_v20[mode].setting.diff_clip[index];
+    min_busy_threHi      = pAgicCtx->full_param.gic_v20->GicTuningPara.GicData.min_busy_thre[index + 1];
+    min_busy_threLo      = pAgicCtx->full_param.gic_v20->GicTuningPara.GicData.min_busy_thre[index];
+    min_grad_thrHi       = pAgicCtx->full_param.gic_v20->GicTuningPara.GicData.min_grad_thr1[index + 1];
+    min_grad_thrLo       = pAgicCtx->full_param.gic_v20->GicTuningPara.GicData.min_grad_thr1[index];
+    min_grad_thr2Hi      = pAgicCtx->full_param.gic_v20->GicTuningPara.GicData.min_grad_thr2[index + 1];
+    min_grad_thr2Lo      = pAgicCtx->full_param.gic_v20->GicTuningPara.GicData.min_grad_thr2[index];
+    k_grad1Hi            = pAgicCtx->full_param.gic_v20->GicTuningPara.GicData.k_grad1[index + 1];
+    k_grad1Lo            = pAgicCtx->full_param.gic_v20->GicTuningPara.GicData.k_grad1[index];
+    k_grad2Hi            = pAgicCtx->full_param.gic_v20->GicTuningPara.GicData.k_grad2[index + 1];
+    k_grad2Lo            = pAgicCtx->full_param.gic_v20->GicTuningPara.GicData.k_grad2[index];
+    gb_threHi            = pAgicCtx->full_param.gic_v20->GicTuningPara.GicData.gb_thre[index + 1];
+    gb_threLo            = pAgicCtx->full_param.gic_v20->GicTuningPara.GicData.gb_thre[index];
+    maxCorVHi            = pAgicCtx->full_param.gic_v20->GicTuningPara.GicData.maxCorV[index + 1];
+    maxCorVLo            = pAgicCtx->full_param.gic_v20->GicTuningPara.GicData.maxCorV[index];
+    maxCorVbothHi        = pAgicCtx->full_param.gic_v20->GicTuningPara.GicData.maxCorVboth[index + 1];
+    maxCorVbothLo        = pAgicCtx->full_param.gic_v20->GicTuningPara.GicData.maxCorVboth[index];
+    dark_threHi          = pAgicCtx->full_param.gic_v20->GicTuningPara.GicData.dark_thre[index + 1];
+    dark_threLo          = pAgicCtx->full_param.gic_v20->GicTuningPara.GicData.dark_thre[index];
+    dark_threUpHi        = pAgicCtx->full_param.gic_v20->GicTuningPara.GicData.dark_threHi[index + 1];
+    dark_threUpLo        = pAgicCtx->full_param.gic_v20->GicTuningPara.GicData.dark_threHi[index];
+    k_grad1_darkHi       = pAgicCtx->full_param.gic_v20->GicTuningPara.GicData.k_grad1_dark[index + 1];
+    k_grad1_darkLo       = pAgicCtx->full_param.gic_v20->GicTuningPara.GicData.k_grad1_dark[index];
+    k_grad2_darkHi       = pAgicCtx->full_param.gic_v20->GicTuningPara.GicData.k_grad2_dark[index + 1];
+    k_grad2_darkLo       = pAgicCtx->full_param.gic_v20->GicTuningPara.GicData.k_grad2_dark[index];
+    min_grad_thr_dark1Hi = pAgicCtx->full_param.gic_v20->GicTuningPara.GicData.min_grad_thr_dark1[index + 1];
+    min_grad_thr_dark1Lo = pAgicCtx->full_param.gic_v20->GicTuningPara.GicData.min_grad_thr_dark1[index];
+    min_grad_thr_dark2Hi = pAgicCtx->full_param.gic_v20->GicTuningPara.GicData.min_grad_thr_dark2[index + 1];
+    min_grad_thr_dark2Lo = pAgicCtx->full_param.gic_v20->GicTuningPara.GicData.min_grad_thr_dark2[index];
+    pNoiseCurveGicHi_0 = pAgicCtx->full_param.gic_v20->GicTuningPara.GicData.noiseCurve_0[index + 1];
+    pNoiseCurveGicLo_0 = pAgicCtx->full_param.gic_v20->GicTuningPara.GicData.noiseCurve_0[index];
+    pNoiseCurveGicHi_1 = pAgicCtx->full_param.gic_v20->GicTuningPara.GicData.noiseCurve_1[index + 1];
+    pNoiseCurveGicLo_1 = pAgicCtx->full_param.gic_v20->GicTuningPara.GicData.noiseCurve_1[index];
+    scaleHiHi            = pAgicCtx->full_param.gic_v20->GicTuningPara.GicData.ScaleHi[index + 1];
+    scaleHiLo            = pAgicCtx->full_param.gic_v20->GicTuningPara.GicData.ScaleHi[index];
+    scaleLoHi            = pAgicCtx->full_param.gic_v20->GicTuningPara.GicData.ScaleLo[index + 1];
+    scaleLoLo            = pAgicCtx->full_param.gic_v20->GicTuningPara.GicData.ScaleLo[index];
+    strengthHi           = pAgicCtx->full_param.gic_v20->GicTuningPara.GicData.textureStrength[index + 1];
+    strengthLo           = pAgicCtx->full_param.gic_v20->GicTuningPara.GicData.textureStrength[index];
+    strengthGlobalHi     = pAgicCtx->full_param.gic_v20->GicTuningPara.GicData.globalStrength[index + 1];
+    strengthGlobalLo     = pAgicCtx->full_param.gic_v20->GicTuningPara.GicData.globalStrength[index];
+    gValueLimitHiHi      = pAgicCtx->full_param.gic_v20->GicTuningPara.GicData.GValueLimitHi[index + 1];
+    gValueLimitHiLo      = pAgicCtx->full_param.gic_v20->GicTuningPara.GicData.GValueLimitHi[index];
+    gValueLimitLoHi      = pAgicCtx->full_param.gic_v20->GicTuningPara.GicData.GValueLimitLo[index + 1];
+    gValueLimitLoLo      = pAgicCtx->full_param.gic_v20->GicTuningPara.GicData.GValueLimitLo[index];
+    noiseCoeaHi          = pAgicCtx->full_param.gic_v20->GicTuningPara.GicData.noise_coea[index + 1];
+    noiseCoeaLo          = pAgicCtx->full_param.gic_v20->GicTuningPara.GicData.noise_coea[index];
+    noiseCoebHi          = pAgicCtx->full_param.gic_v20->GicTuningPara.GicData.noise_coeb[index + 1];
+    noiseCoebLo          = pAgicCtx->full_param.gic_v20->GicTuningPara.GicData.noise_coeb[index];
+    diffClipHi           = pAgicCtx->full_param.gic_v20->GicTuningPara.GicData.diff_clip[index + 1];
+    diffClipLo           = pAgicCtx->full_param.gic_v20->GicTuningPara.GicData.diff_clip[index];
 
     float ratioF = ratio / 16.0f;
-    pAgicCtx->ConfigData.ConfigV20.gic_en = pAgicCtx->full_param.calib_v20[mode].gic_en;
-    pAgicCtx->ConfigData.ConfigV20.edge_open = pAgicCtx->full_param.calib_v20[mode].edge_en;
+    pAgicCtx->ConfigData.ConfigV20.gic_en = pAgicCtx->full_param.gic_v20->GicTuningPara.enable ? 1 : 0;
+    pAgicCtx->ConfigData.ConfigV20.edge_open = pAgicCtx->full_param.gic_v20->GicTuningPara.edge_en ? 1 : 0;
     pAgicCtx->ConfigData.ConfigV20.regmingradthrdark1 = (ratio * (min_grad_thr_dark1Hi - min_grad_thr_dark1Lo) + min_grad_thr_dark1Lo * (1 << 4) + (1 << 3)) >> 4;
     pAgicCtx->ConfigData.ConfigV20.regmingradthrdark2 = (ratio * (min_grad_thr_dark2Hi - min_grad_thr_dark2Lo) + min_grad_thr_dark2Lo * (1 << 4) + (1 << 3)) >> 4;
     pAgicCtx->ConfigData.ConfigV20.regminbusythre = (ratio * (min_busy_threHi - min_busy_threLo) + min_busy_threLo * (1 << 4) + (1 << 3)) >> 4;
@@ -331,7 +321,7 @@ void AgicProcessV20
     pAgicCtx->ConfigData.ConfigV20.regmaxcorv = (ratio * (maxCorVHi - maxCorVLo) + maxCorVLo * (1 << 4) + (1 << 3)) >> 4;
     pAgicCtx->ConfigData.ConfigV20.regmingradthr1 = (ratio * (min_grad_thrHi - min_grad_thrLo) + min_grad_thrLo * (1 << 4) + (1 << 3)) >> 4;
     pAgicCtx->ConfigData.ConfigV20.regmingradthr2 = (ratio * (min_grad_thr2Hi - min_grad_thr2Lo) + min_grad_thr2Lo * (1 << 4) + (1 << 3)) >> 4;
-    pAgicCtx->ConfigData.ConfigV20.gr_ratio = pAgicCtx->full_param.calib_v20[mode].gr_ration;
+    pAgicCtx->ConfigData.ConfigV20.gr_ratio = pAgicCtx->full_param.gic_v20->GicTuningPara.gr_ration;
     pAgicCtx->ConfigData.ConfigV20.dnhiscale = ratioF * (scaleHiHi - scaleHiLo) + scaleHiLo;
     pAgicCtx->ConfigData.ConfigV20.dnloscale = ratioF * (scaleLoHi - scaleLoLo) + scaleLoLo;
     pAgicCtx->ConfigData.ConfigV20.reglumapointsstep = 7;
@@ -339,9 +329,20 @@ void AgicProcessV20
     pAgicCtx->ConfigData.ConfigV20.gvaluelimitlo = ratioF * (gValueLimitLoHi - gValueLimitLoLo) + gValueLimitLoLo;
     pAgicCtx->ConfigData.ConfigV20.fusionratiohilimt1 = 0.75;
     pAgicCtx->ConfigData.ConfigV20.textureStrength = ratioF * (strengthHi - strengthLo) + strengthLo;
-    for (int i = 0; i < 15; i++)
+    pAgicCtx->ConfigData.ConfigV20.noiseCurve_0 = ratioF * (pNoiseCurveGicHi_0 - pNoiseCurveGicLo_0) + pNoiseCurveGicLo_0;
+    pAgicCtx->ConfigData.ConfigV20.noiseCurve_1 =  ratioF * (pNoiseCurveGicHi_1 - pNoiseCurveGicLo_1) + pNoiseCurveGicLo_1;
+
+    for (int i = 0; i < 15; i++) {
+        ave1 = LumaPoints[i];
+        noiseSigma = pAgicCtx->ConfigData.ConfigV20.noiseCurve_0 * sqrt(ave1) +  pAgicCtx->ConfigData.ConfigV20.noiseCurve_1;
+        if (noiseSigma < 0)
+        {
+            noiseSigma = 0;
+        }
         pAgicCtx->ConfigData.ConfigV20.sigma_y[i] = noiseSigma;
-    pAgicCtx->ConfigData.ConfigV20.noise_cut_en = pAgicCtx->full_param.calib_v20[mode].noise_cut_en;
+    }
+
+    pAgicCtx->ConfigData.ConfigV20.noise_cut_en = pAgicCtx->full_param.gic_v20->GicTuningPara.noise_cut_en ? 1 : 0;
     pAgicCtx->ConfigData.ConfigV20.noise_coe_a = (ratio * (noiseCoeaHi - noiseCoeaLo) + noiseCoeaLo * (1 << 4) + (1 << 3)) >> 4;
     pAgicCtx->ConfigData.ConfigV20.noise_coe_b = (ratio * (noiseCoebHi - noiseCoebLo) + noiseCoebLo * (1 << 4) + (1 << 3)) >> 4;
     pAgicCtx->ConfigData.ConfigV20.diff_clip = (ratio * (diffClipHi - diffClipLo) +  diffClipLo * (1 << 4) + (1 << 3)) >> 4;
@@ -375,15 +376,14 @@ void AgicProcessV20
 void AgicProcessV21
 (
     AgicContext_t *pAgicCtx,
-    int ISO,
-    int mode,
-    int HWversion
+    int ISO
 )
 {
     LOGI_AGIC("%s(%d): enter!\n", __FUNCTION__, __LINE__);
 
     float ave1 = 0.0f, noiseSigma = 0.0f;
     short ratio = 0;
+    short LumaPoints[] = { 0, 128, 256, 384, 512, 640, 768, 896, 1024, 1536, 2048, 2560, 3072, 3584, 4096 };
     short min_busy_threHi = 0, min_busy_threLo = 0;
     short min_grad_thrHi = 0, min_grad_thrLo = 0, min_grad_thr2Hi = 0, min_grad_thr2Lo = 0;
     short k_grad1Hi = 0, k_grad1Lo = 0, k_grad2Hi = 0, k_grad2Lo = 0;
@@ -397,6 +397,8 @@ void AgicProcessV21
     float NoiseScaleHi = 0.0f, NoiseScaleLo = 0.0f;
     float NoiseBaseHi = 0.0f, NoiseBaseLo = 0.0f;
     int index, iso_hi = 0, iso_lo = 0;
+    float pNoiseCurveGicHi_0 = 0.0f, pNoiseCurveGicHi_1 = 0.0f;
+    float pNoiseCurveGicLo_0 = 0.0f, pNoiseCurveGicLo_1 = 0.0f;
 
     LOGI_AGIC("%s(%d): enter, ISO=%d\n", __FUNCTION__, __LINE__, ISO);
 
@@ -408,13 +410,13 @@ void AgicProcessV21
         index = 0;
         ratio = 0;
     } else if (ISO > 12800) {
-        index = CALIBDB_ISO_NUM - 2;
+        index = pAgicCtx->full_param.gic_v21->GicTuningPara.GicData.ISO_len - 2;
         ratio = (1 << 4);
     } else {
-        for (index = 0; index < (CALIBDB_ISO_NUM - 1); index++)
+        for (index = 0; index < (pAgicCtx->full_param.gic_v21->GicTuningPara.GicData.ISO_len - 1); index++)
         {
-            iso_lo = (int)(pAgicCtx->full_param.calib_v21[mode].setting.iso[index]);
-            iso_hi = (int)(pAgicCtx->full_param.calib_v21[mode].setting.iso[index + 1]);
+            iso_lo = (int)(pAgicCtx->full_param.gic_v21->GicTuningPara.GicData.ISO[index]);
+            iso_hi = (int)(pAgicCtx->full_param.gic_v21->GicTuningPara.GicData.ISO[index + 1]);
             LOGD_AGIC("index=%d,  iso_lo=%d, iso_hi=%d\n", index, iso_lo, iso_hi);
             if (ISO > iso_lo && ISO <= iso_hi)
             {
@@ -424,45 +426,49 @@ void AgicProcessV21
         ratio = ((ISO - iso_lo) * (1 << 4)) / (iso_hi - iso_lo);
     }
 
-    min_busy_threHi      = pAgicCtx->full_param.calib_v21[mode].setting.min_busy_thre[index + 1];
-    min_busy_threLo      = pAgicCtx->full_param.calib_v21[mode].setting.min_busy_thre[index];
-    min_grad_thrHi       = pAgicCtx->full_param.calib_v21[mode].setting.min_grad_thr1[index + 1];
-    min_grad_thrLo       = pAgicCtx->full_param.calib_v21[mode].setting.min_grad_thr1[index];
-    min_grad_thr2Hi      = pAgicCtx->full_param.calib_v21[mode].setting.min_grad_thr2[index + 1];
-    min_grad_thr2Lo      = pAgicCtx->full_param.calib_v21[mode].setting.min_grad_thr2[index];
-    k_grad1Hi            = pAgicCtx->full_param.calib_v21[mode].setting.k_grad1[index + 1];
-    k_grad1Lo            = pAgicCtx->full_param.calib_v21[mode].setting.k_grad1[index];
-    k_grad2Hi            = pAgicCtx->full_param.calib_v21[mode].setting.k_grad2[index + 1];
-    k_grad2Lo            = pAgicCtx->full_param.calib_v21[mode].setting.k_grad2[index];
-    gb_threHi            = pAgicCtx->full_param.calib_v21[mode].setting.gb_thre[index + 1];
-    gb_threLo            = pAgicCtx->full_param.calib_v21[mode].setting.gb_thre[index];
-    maxCorVHi            = pAgicCtx->full_param.calib_v21[mode].setting.maxCorV[index + 1];
-    maxCorVLo            = pAgicCtx->full_param.calib_v21[mode].setting.maxCorV[index];
-    maxCorVbothHi        = pAgicCtx->full_param.calib_v21[mode].setting.maxCorVboth[index + 1];
-    maxCorVbothLo        = pAgicCtx->full_param.calib_v21[mode].setting.maxCorVboth[index];
-    dark_threHi          = pAgicCtx->full_param.calib_v21[mode].setting.dark_thre[index + 1];
-    dark_threLo          = pAgicCtx->full_param.calib_v21[mode].setting.dark_thre[index];
-    dark_threUpHi        = pAgicCtx->full_param.calib_v21[mode].setting.dark_threHi[index + 1];
-    dark_threUpLo        = pAgicCtx->full_param.calib_v21[mode].setting.dark_threHi[index];
-    k_grad1_darkHi       = pAgicCtx->full_param.calib_v21[mode].setting.k_grad1_dark[index + 1];
-    k_grad1_darkLo       = pAgicCtx->full_param.calib_v21[mode].setting.k_grad1_dark[index];
-    k_grad2_darkHi       = pAgicCtx->full_param.calib_v21[mode].setting.k_grad2_dark[index + 1];
-    k_grad2_darkLo       = pAgicCtx->full_param.calib_v21[mode].setting.k_grad2_dark[index];
-    min_grad_thr_dark1Hi = pAgicCtx->full_param.calib_v21[mode].setting.min_grad_thr_dark1[index + 1];
-    min_grad_thr_dark1Lo = pAgicCtx->full_param.calib_v21[mode].setting.min_grad_thr_dark1[index];
-    min_grad_thr_dark2Hi = pAgicCtx->full_param.calib_v21[mode].setting.min_grad_thr_dark2[index + 1];
-    min_grad_thr_dark2Lo = pAgicCtx->full_param.calib_v21[mode].setting.min_grad_thr_dark2[index];
-    strengthGlobalHi     = pAgicCtx->full_param.calib_v21[mode].setting.globalStrength[index + 1];
-    strengthGlobalLo     = pAgicCtx->full_param.calib_v21[mode].setting.globalStrength[index];
-    diffClipHi           = pAgicCtx->full_param.calib_v21[mode].setting.diff_clip[index + 1];
-    diffClipLo           = pAgicCtx->full_param.calib_v21[mode].setting.diff_clip[index];
-    NoiseScaleHi      = pAgicCtx->full_param.calib_v21[mode].setting.NoiseScale[index + 1];
-    NoiseScaleLo      = pAgicCtx->full_param.calib_v21[mode].setting.NoiseScale[index];
-    NoiseBaseHi      = pAgicCtx->full_param.calib_v21[mode].setting.NoiseBase[index + 1];
-    NoiseBaseLo      = pAgicCtx->full_param.calib_v21[mode].setting.NoiseBase[index];
+    min_busy_threHi      = pAgicCtx->full_param.gic_v21->GicTuningPara.GicData.min_busy_thre[index + 1];
+    min_busy_threLo      = pAgicCtx->full_param.gic_v21->GicTuningPara.GicData.min_busy_thre[index];
+    min_grad_thrHi       = pAgicCtx->full_param.gic_v21->GicTuningPara.GicData.min_grad_thr1[index + 1];
+    min_grad_thrLo       = pAgicCtx->full_param.gic_v21->GicTuningPara.GicData.min_grad_thr1[index];
+    min_grad_thr2Hi      = pAgicCtx->full_param.gic_v21->GicTuningPara.GicData.min_grad_thr2[index + 1];
+    min_grad_thr2Lo      = pAgicCtx->full_param.gic_v21->GicTuningPara.GicData.min_grad_thr2[index];
+    k_grad1Hi            = pAgicCtx->full_param.gic_v21->GicTuningPara.GicData.k_grad1[index + 1];
+    k_grad1Lo            = pAgicCtx->full_param.gic_v21->GicTuningPara.GicData.k_grad1[index];
+    k_grad2Hi            = pAgicCtx->full_param.gic_v21->GicTuningPara.GicData.k_grad2[index + 1];
+    k_grad2Lo            = pAgicCtx->full_param.gic_v21->GicTuningPara.GicData.k_grad2[index];
+    gb_threHi            = pAgicCtx->full_param.gic_v21->GicTuningPara.GicData.gb_thre[index + 1];
+    gb_threLo            = pAgicCtx->full_param.gic_v21->GicTuningPara.GicData.gb_thre[index];
+    maxCorVHi            = pAgicCtx->full_param.gic_v21->GicTuningPara.GicData.maxCorV[index + 1];
+    maxCorVLo            = pAgicCtx->full_param.gic_v21->GicTuningPara.GicData.maxCorV[index];
+    maxCorVbothHi        = pAgicCtx->full_param.gic_v21->GicTuningPara.GicData.maxCorVboth[index + 1];
+    maxCorVbothLo        = pAgicCtx->full_param.gic_v21->GicTuningPara.GicData.maxCorVboth[index];
+    dark_threHi          = pAgicCtx->full_param.gic_v21->GicTuningPara.GicData.dark_thre[index + 1];
+    dark_threLo          = pAgicCtx->full_param.gic_v21->GicTuningPara.GicData.dark_thre[index];
+    dark_threUpHi        = pAgicCtx->full_param.gic_v21->GicTuningPara.GicData.dark_threHi[index + 1];
+    dark_threUpLo        = pAgicCtx->full_param.gic_v21->GicTuningPara.GicData.dark_threHi[index];
+    k_grad1_darkHi       = pAgicCtx->full_param.gic_v21->GicTuningPara.GicData.k_grad1_dark[index + 1];
+    k_grad1_darkLo       = pAgicCtx->full_param.gic_v21->GicTuningPara.GicData.k_grad1_dark[index];
+    k_grad2_darkHi       = pAgicCtx->full_param.gic_v21->GicTuningPara.GicData.k_grad2_dark[index + 1];
+    k_grad2_darkLo       = pAgicCtx->full_param.gic_v21->GicTuningPara.GicData.k_grad2_dark[index];
+    min_grad_thr_dark1Hi = pAgicCtx->full_param.gic_v21->GicTuningPara.GicData.min_grad_thr_dark1[index + 1];
+    min_grad_thr_dark1Lo = pAgicCtx->full_param.gic_v21->GicTuningPara.GicData.min_grad_thr_dark1[index];
+    min_grad_thr_dark2Hi = pAgicCtx->full_param.gic_v21->GicTuningPara.GicData.min_grad_thr_dark2[index + 1];
+    min_grad_thr_dark2Lo = pAgicCtx->full_param.gic_v21->GicTuningPara.GicData.min_grad_thr_dark2[index];
+    pNoiseCurveGicHi_0 = pAgicCtx->full_param.gic_v21->GicTuningPara.GicData.noiseCurve_0[index + 1];
+    pNoiseCurveGicLo_0 = pAgicCtx->full_param.gic_v21->GicTuningPara.GicData.noiseCurve_0[index];
+    pNoiseCurveGicHi_1 = pAgicCtx->full_param.gic_v21->GicTuningPara.GicData.noiseCurve_1[index + 1];
+    pNoiseCurveGicLo_1 = pAgicCtx->full_param.gic_v21->GicTuningPara.GicData.noiseCurve_1[index];
+    strengthGlobalHi     = pAgicCtx->full_param.gic_v21->GicTuningPara.GicData.globalStrength[index + 1];
+    strengthGlobalLo     = pAgicCtx->full_param.gic_v21->GicTuningPara.GicData.globalStrength[index];
+    diffClipHi           = pAgicCtx->full_param.gic_v21->GicTuningPara.GicData.diff_clip[index + 1];
+    diffClipLo           = pAgicCtx->full_param.gic_v21->GicTuningPara.GicData.diff_clip[index];
+    NoiseScaleHi      = pAgicCtx->full_param.gic_v21->GicTuningPara.GicData.NoiseScale[index + 1];
+    NoiseScaleLo      = pAgicCtx->full_param.gic_v21->GicTuningPara.GicData.NoiseScale[index];
+    NoiseBaseHi      = pAgicCtx->full_param.gic_v21->GicTuningPara.GicData.NoiseBase[index + 1];
+    NoiseBaseLo      = pAgicCtx->full_param.gic_v21->GicTuningPara.GicData.NoiseBase[index];
 
     float ratioF = ratio / 16.0f;
-    pAgicCtx->ConfigData.ConfigV21.gic_en = pAgicCtx->full_param.calib_v21[mode].gic_en;
+    pAgicCtx->ConfigData.ConfigV21.gic_en = pAgicCtx->full_param.gic_v21->GicTuningPara.enable ? 1 : 0;
     pAgicCtx->ConfigData.ConfigV21.regmingradthrdark1 = (ratio * (min_grad_thr_dark1Hi - min_grad_thr_dark1Lo) + min_grad_thr_dark1Lo * (1 << 4) + (1 << 3)) >> 4;
     pAgicCtx->ConfigData.ConfigV21.regmingradthrdark2 = (ratio * (min_grad_thr_dark2Hi - min_grad_thr_dark2Lo) + min_grad_thr_dark2Lo * (1 << 4) + (1 << 3)) >> 4;
     pAgicCtx->ConfigData.ConfigV21.regminbusythre = (ratio * (min_busy_threHi - min_busy_threLo) + min_busy_threLo * (1 << 4) + (1 << 3)) >> 4;
@@ -477,11 +483,21 @@ void AgicProcessV21
     pAgicCtx->ConfigData.ConfigV21.regmaxcorv = (ratio * (maxCorVHi - maxCorVLo) + maxCorVLo * (1 << 4) + (1 << 3)) >> 4;
     pAgicCtx->ConfigData.ConfigV21.regmingradthr1 = (ratio * (min_grad_thrHi - min_grad_thrLo) + min_grad_thrLo * (1 << 4) + (1 << 3)) >> 4;
     pAgicCtx->ConfigData.ConfigV21.regmingradthr2 = (ratio * (min_grad_thr2Hi - min_grad_thr2Lo) + min_grad_thr2Lo * (1 << 4) + (1 << 3)) >> 4;
-    pAgicCtx->ConfigData.ConfigV21.gr_ratio = pAgicCtx->full_param.calib_v21[mode].gr_ration;
+    pAgicCtx->ConfigData.ConfigV21.gr_ratio = pAgicCtx->full_param.gic_v21->GicTuningPara.gr_ration;
     pAgicCtx->ConfigData.ConfigV21.noise_scale = ratioF * (NoiseScaleHi - NoiseScaleLo) + NoiseScaleLo;
     pAgicCtx->ConfigData.ConfigV21.noise_base = ratioF * (NoiseBaseHi - NoiseBaseLo) + NoiseBaseLo;
-    for (int i = 0; i < 15; i++)
-        pAgicCtx->ConfigData.ConfigV21.sigma_y[i] = noiseSigma;
+    pAgicCtx->ConfigData.ConfigV21.noiseCurve_0 = ratioF * (pNoiseCurveGicHi_0 - pNoiseCurveGicLo_0) + pNoiseCurveGicLo_0;
+    pAgicCtx->ConfigData.ConfigV21.noiseCurve_1 =  ratioF * (pNoiseCurveGicHi_1 - pNoiseCurveGicLo_1) + pNoiseCurveGicLo_1;
+
+    for (int i = 0; i < 15; i++) {
+        ave1 = LumaPoints[i];
+        noiseSigma = pAgicCtx->ConfigData.ConfigV21.noiseCurve_0 * sqrt(ave1) +  pAgicCtx->ConfigData.ConfigV21.noiseCurve_1;
+        if (noiseSigma < 0)
+        {
+            noiseSigma = 0;
+        }
+        pAgicCtx->ConfigData.ConfigV20.sigma_y[i] = noiseSigma;
+    }
 
     pAgicCtx->ConfigData.ConfigV21.globalStrength = ratioF * (strengthGlobalHi - strengthGlobalLo) + strengthGlobalLo;
     pAgicCtx->ConfigData.ConfigV21.diff_clip = (ratio * (diffClipHi - diffClipLo) +  diffClipLo * (1 << 4) + (1 << 3)) >> 4;
@@ -546,16 +562,15 @@ AgicProcess
 (
     AgicContext_t *pAgicCtx,
     int ISO,
-    int mode,
-    int HWversion
+    int mode
 )
 {
     LOGI_AGIC("%s(%d): enter!\n", __FUNCTION__, __LINE__);
 
-    if(HWversion == 0)
-        AgicProcessV20(pAgicCtx, ISO, mode, HWversion);
-    else if(HWversion == 1)
-        AgicProcessV21(pAgicCtx, ISO, mode, HWversion);
+    if(CHECK_ISP_HW_V20())
+        AgicProcessV20(pAgicCtx, ISO);
+    else if(CHECK_ISP_HW_V21())
+        AgicProcessV21(pAgicCtx, ISO);
     else
         LOGE_AGIC(" %s:Wrong hardware version!! \n", __func__);
 
@@ -567,8 +582,7 @@ AgicProcess
 XCamReturn
 AgicGetProcResult
 (
-    AgicContext_t*    pAgicCtx,
-    int HWversion
+    AgicContext_t*    pAgicCtx
 )
 {
     LOGI_AGIC("%s(%d): enter!\n", __FUNCTION__, __LINE__);
@@ -578,9 +592,9 @@ AgicGetProcResult
         return XCAM_RETURN_ERROR_PARAM;
     }
 
-    if(HWversion == 0)
+    if(CHECK_ISP_HW_V20())
         AgicGetProcResultV20(pAgicCtx);
-    else if(HWversion == 1)
+    else if(CHECK_ISP_HW_V21())
         AgicGetProcResultV21(pAgicCtx);
     else
         LOGE_AGIC(" %s:Wrong hardware version!! \n", __func__);

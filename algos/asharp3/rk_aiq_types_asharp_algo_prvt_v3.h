@@ -38,16 +38,21 @@ typedef struct Asharp_Context_V3_s {
     Asharp_Auto_Attr_V3_t stAuto;
     Asharp_Manual_Attr_V3_t stManual;
 
-    struct list_head* list_sharp_v3; 
-	
-	float fYnr_SF_Strength;
+    struct list_head* list_sharp_v3;
 
-	bool isIQParaUpdate;
-	bool isGrayMode;
-	Asharp3_ParamMode_t eParamMode;
+    float fSharp_Strength;
 
-	int rawWidth;
-	int rawHeight;
+    bool isIQParaUpdate;
+    bool isGrayMode;
+    Asharp3_ParamMode_t eParamMode;
+
+    int rawWidth;
+    int rawHeight;
+
+    int prepare_type;
+    CalibDbV2_SharpV3_t sharp_v3;
+
+    int isReCalculate;
 } Asharp_Context_V3_t;
 
 

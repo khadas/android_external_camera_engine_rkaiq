@@ -22,9 +22,10 @@
 
 #include "rk_aiq_algo_types_int.h"
 
-#define RKISP_ALGO_ACCM_VERSION     "v0.0.10"
+#define RKISP_ALGO_ACCM_VERSION     "v0.0.a"
 #define RKISP_ALGO_ACCM_VENDOR      "Rockchip"
 #define RKISP_ALGO_ACCM_DESCRIPTION "Rockchip Accm algo for ISP2.0"
+#include "rk_aiq_algo_des.h"
 
 XCAM_BEGIN_DECLARE
 
@@ -32,4 +33,4 @@ extern RkAiqAlgoDescription g_RkIspAlgoDescAccm;
 
 XCAM_END_DECLARE
 
-#endif //_RK_AIQ_ALGO_ACCM_ITF_H_ 
+#endif //_RK_AIQ_ALGO_ACCM_ITF_H_

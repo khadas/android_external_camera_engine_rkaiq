@@ -40,9 +40,8 @@
  * @{
  *
  */
-#include "RkAiqCalibDbTypes.h"
+#include "RkAiqCalibDbTypesV2.h"
 #include "rk_aiq_types_ae_algo.h"
-#include "awb/rk_aiq_types_awb_algo_int.h"
 
 
 #define MAX_HDR_FRAMENUM  (3)
@@ -96,6 +95,27 @@ typedef enum {
     ECM = 0x40,
     HDRECM = 0x80,
 } AecLogLevel_t;
+/*****************************************************************************/
+/**
+ * @brief   update config of ae
+ */
+/*****************************************************************************/
+typedef enum {
+    UPDATE_PREPARE   = 0x00, //including configtype=init/changeworingmode/reset
+    UPDATE_EXPSWATTR = 0x01,
+    UPDATE_LINEXPATTR = 0x02,
+    UPDATE_HDREXPATTR = 0x04,
+    UPDATE_LINAEROUTEATTR = 0x08,
+    UPDATE_HDRAEROUTEATTR = 0x10,
+    UPDATE_IRISATTR = 0x20,
+    UPDATE_SYNCTESTATTR = 0x40,
+    UPDATE_EXPWINATTR = 0x80,
+    UPDATE_EXPINFO = 0x100, //including vts/dcg
+    UPDATE_EXPHWATTR = 0x200, //including aec_meas/hist_meass
+    UPDATE_RESOLUTION = 0x400,
+    UPDATE_CALIB = 0xffff,//update iq file
+} AecUpdateAttrMode_t;
+
 /*****************************************************************************/
 /**
  * @brief   CamerIcIspStats related params
@@ -307,6 +327,11 @@ typedef enum
     VB_RGB = 1, //use (visible light/no light) as supplement light, rgb night mode (software)
 } AecNightMode_t;
 
+typedef struct Aec_daynight_th_s {
+    float         fac_th;
+    uint8_t       holdon_times_th;
+} Aec_daynight_th_t;
+
 /*****************************************************************************/
 /**
  *          Aec_stat_t
@@ -333,18 +358,34 @@ typedef struct Aec_Sensor_nr_switch_s {
     uint32_t div_coeff;
 } Aec_Sensor_nr_switch_t;
 
-typedef struct Aec_uapi_advanced_attr_s {
-    bool    enable;
-    uint8_t DayGridWeights[RAWAEBIG_WIN_NUM];
-    uint8_t NightGridWeights[RAWAEBIG_WIN_NUM];
-} Aec_uapi_advanced_attr_t;
+typedef struct Aec_AeRange_s {
+    float                   Min;
+    float                   Max;
+} Aec_AeRange_t;
 
-typedef enum IspHwVersion_e
-{
-    ISP_HARDWARE_V20 = 0,  //for rv1109 & rv1126
-    ISP_HARDWARE_V21 = 1,  //for rk3566
-    ISP_HARDWARE_MAX,
-} IspHwVersion_t;
+typedef struct Aec_LinAeRange_s {
+    Aec_AeRange_t      stExpTimeRange;
+    Aec_AeRange_t      stGainRange;
+    Aec_AeRange_t      stIspDGainRange;
+    Aec_AeRange_t      stPIrisRange;
+} Aec_LinAeRange_t;
+
+typedef struct Aec_HdrAeRange_s {
+    Aec_AeRange_t      stExpTimeRange[3];
+    Aec_AeRange_t      stGainRange[3];
+    Aec_AeRange_t      stIspDGainRange[3];
+    Aec_AeRange_t      stPIrisRange;
+} Aec_HdrAeRange_t;
+
+typedef struct Aec_uapi_advanced_attr_s {
+    bool                          enable;
+    uint8_t                       GridWeights[15 * 15];
+    uint8_t                       DayGridWeights[RAWAEBIG_WIN_NUM];
+    uint8_t                       NightGridWeights[RAWAEBIG_WIN_NUM];
+    bool                          SetAeRangeEn;
+    Aec_LinAeRange_t              SetLinAeRange;
+    Aec_HdrAeRange_t              SetHdrAeRange;
+} Aec_uapi_advanced_attr_t;
 
 typedef enum AecHwVersion_e
 {
@@ -354,22 +395,20 @@ typedef enum AecHwVersion_e
 } AecHwVersion_t;
 
 typedef struct AecConfig_s {
-    /*List params*/
-    CalibDb_Aec_CalibPara_t*      pCalibPara;
-    CalibDb_Aec_TunePara_t*       pTunePara;
-    char                          SceneName[20];
-    int                           CalibListNum;
-    int                           TuneListNum;
 
     /*Aec Ctrl Configuration from calibdb, support User Api input Ctrl configuration*/
-    CalibDb_Aec_CalibPara_t       CalibPara;
-    CalibDb_AecCommon_Attr_t      CommCtrl;
-    CalibDb_LinearAE_Attr_t       LinearAeCtrl;
-    CalibDb_HdrAE_Attr_t          HdrAeCtrl;
-    RkAiqAecHwConfig_t            HwCtrl;
-    CalibDb_ExpSet_para_t         ExpSet;
-    CalibDb_Module_Info_t         ModuleInfo;
 
+    //V2: json params
+    CalibDb_AecCommon_AttrV2_t    CommCtrlV2;
+    CalibDb_LinearAE_AttrV2_t     LinearAeCtrlV2;
+    CalibDb_HdrAE_AttrV2_t        HdrAeCtrlV2;
+    CalibDb_AecIrisCtrlV2_t       IrisCtrl;
+    CalibDb_AeSyncTestV2_t        SyncTest; //special module for debug
+    CalibDb_Sensor_ParaV2_t       SensorInfoV2;
+    CalibDb_Module_ParaV2_t       ModuleInfoV2;
+
+
+    RkAiqAecHwConfig_t            HwCtrl;
     AecHwVersion_t                AecHwVers;
 
     int                           Workingmode;
@@ -383,12 +422,18 @@ typedef struct AecConfig_s {
 
     /*continue to use some old params to keep the same with AecConfig_t*/
     AecDampingMode_t              DampingMode;              /**< damping mode */
+    AecEcmFlickerPeriod_t         EcmFlickerSelect;        /**< flicker period selection */
 
     int                           RawWidth;
     int                           RawHeight;
 
+    /*add for api using advanced params*/
+    Aec_uapi_advanced_attr_t      ApiAdvanced;
+    Aec_LinAeRange_t              LinAeRange;
+    Aec_HdrAeRange_t              HdrAeRange;
+
     /*update attr flag*/
-    bool                          IsReconfig;
+    uint16_t                      IsReconfig;
 } AecConfig_t;
 /*****************************************************************************/
 /**
@@ -410,14 +455,6 @@ typedef struct AeInstanceConfig_s {
  * @brief   ISP2.0 AEC Algo Result Params
  */
 /*****************************************************************************/
-
-typedef struct CISFeature_s {
-    uint8_t SNR;
-    uint8_t DR;
-    uint8_t Sat;
-    uint8_t SEN;
-} CISFeature_t;
-
 typedef struct AecPreResult_s {
     float MeanLuma[MAX_HDR_FRAMENUM];
     float LowLightLuma[MAX_HDR_FRAMENUM];
@@ -440,8 +477,6 @@ typedef struct AecPreResult_s {
     RkAiqExpParamComb_t HdrExp[MAX_HDR_FRAMENUM];
 
     CamerIcHistBins_t AeRawHistBin[3];
-    CISFeature_t CISFeature;
-
 } AecPreResult_t;
 
 /*****************************************************************************/
@@ -453,7 +488,7 @@ typedef struct AecPreResult_s {
 /*****************************************************************************/
 typedef struct AecProcResult_s {
     /***Common results****/
-    uint32_t                      FramdId;
+    int                           FramdId;
     RKAiqAecExpInfo_t             cur_ae_exp;
     RKAiqAecExpInfo_t             new_ae_exp;
     rk_aiq_ae_meas_params_t       ae_meas;
@@ -464,31 +499,44 @@ typedef struct AecProcResult_s {
     unsigned int                  actives;
     bool                          auto_adjust_fps;
 
-    CalibDb_AecDayNightMode_t     DNMode;
-    uint8_t                       DNTrigger;
-
     RKAiqAecExpInfo_t             InterpExp[MAX_AEC_EFFECT_FNUM];
-    RKAiqAecExpInfo_t             exp_set_tbl[MAX_AEC_EFFECT_FNUM];
+
+    RKAiqAecExpInfo_t             exp_set_tbl[MAX_AEC_EFFECT_FNUM + 1];
     int                           exp_set_cnt;
 
     /***LinearAe results****/
-    float                         MeanLuma;
-    float                         LumaDeviation;
+    float                         InputExposure;
+    float                         Exposure;
+
+    float                         MinGain;
+    float                         MaxGain;
+    float                         MaxGainRange;
+    float                         MinIntegrationTime;
+    float                         MaxIntegrationTime;
+
     uint8_t                       GridWeights[ISP2_RAWAE_WINNUM_MAX];//used for histogram calculation
 
-    CalibDb_LinAeRange_t          LinExpRange;
+    float                         MeanLuma;
+    float                         LumaDeviation;
 
     /***Hdr results****/
     bool                          LongFrmMode;
     float                         HdrMeanLuma[3];
     float                         HdrLumaDeviation[MAX_HDR_FRAMENUM];
-    uint8_t                       HdrGridWeights[3][ISP2_RAWAE_WINNUM_MAX];//used for histogram calculation
 
-    CalibDb_HdrAeRange_t          HdrExpRange;
+    float                         HdrInputExposure[MAX_HDR_FRAMENUM];
+    float                         HdrExposure[MAX_HDR_FRAMENUM];
+    float                         HdrMinGain[MAX_HDR_FRAMENUM];
+    float                         HdrMaxGain[MAX_HDR_FRAMENUM];
+    float                         HdrMinIntegrationTime[MAX_HDR_FRAMENUM];
+    float                         HdrMaxIntegrationTime[MAX_HDR_FRAMENUM];
+
+    uint8_t                       HdrGridWeights[3][ISP2_RAWAE_WINNUM_MAX];//used for histogram calculation
 } AecProcResult_t;
 
 typedef struct AecPostResult_s {
     RkAiqDCIrisParam_t      DCIris;
+
 } AecPostResult_t;
 
 /* @} AEC */

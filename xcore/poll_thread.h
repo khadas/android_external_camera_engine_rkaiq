@@ -25,15 +25,8 @@
 #include <xcam_mutex.h>
 #include <v4l2_buffer_proxy.h>
 #include <v4l2_device.h>
-
-enum {
-    ISP_POLL_LUMA,
-    ISP_POLL_3A_STATS,
-    ISP_POLL_PARAMS,
-    ISP_POLL_POST_PARAMS,
-    ISPP_POLL_STATS,
-    ISP_POLL_POST_MAX,
-};
+#include "xcam_thread.h"
+#include "rk_aiq_types_priv.h"
 
 namespace XCam {
 
@@ -44,6 +37,10 @@ public:
     virtual ~PollCallback() {}
     virtual XCamReturn poll_buffer_ready (SmartPtr<VideoBuffer> &buf, int type) = 0;
     virtual XCamReturn poll_buffer_failed (int64_t timestamp, const char *msg) = 0;
+    virtual XCamReturn poll_event_ready (uint32_t sequence, int type) = 0;
+    virtual XCamReturn poll_event_failed (int64_t timestamp, const char *msg) = 0;
+    virtual XCamReturn poll_buffer_ready (SmartPtr<VideoBuffer> &buf) = 0;
+    virtual XCamReturn poll_buffer_ready (SmartPtr<V4l2BufferProxy> &buf, int dev_index) = 0;
 
 private:
     XCAM_DEAD_COPY (PollCallback);

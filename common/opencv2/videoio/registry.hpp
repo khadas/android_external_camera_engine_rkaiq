@@ -15,7 +15,7 @@ Runtime configuration options:
 - enable debug mode: `OPENCV_VIDEOIO_DEBUG=1`
 - change backend priority: `OPENCV_VIDEOIO_PRIORITY_<backend>=9999`
 - disable backend: `OPENCV_VIDEOIO_PRIORITY_<backend>=0`
-- specify list of backends with high priority (>100000): `OPENCV_VIDEOIO_PRIORITY_LIST=FFMPEG,GSTREAMER`
+- specify list of backends with high priority (>100000): `OPENCV_VIDEOIO_PRIORITY_LIST=XXMPEG,GSTREAMER`
 
 @{
  */

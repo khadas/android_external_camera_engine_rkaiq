@@ -292,14 +292,56 @@ XCamReturn
 rk_aiq_uapi_sysctl_queryCpsLtCap(const rk_aiq_sys_ctx_t* ctx,
                                  rk_aiq_cpsl_cap_t* cap);
 
-int32_t
-rk_aiq_uapi_enqueue_buffer(const rk_aiq_sys_ctx_t* ctx, struct rk_aiq_vbuf *vbuf);
+/*!
+ * \brief prepare RK-raw-format data process environment
+ *
+ * \param[in] ctx             context
+ * \param[in] prop            prepare params
+ * \return return 0 if success
+ */
+XCamReturn
+rk_aiq_uapi_sysctl_prepareRkRaw(const rk_aiq_sys_ctx_t* ctx, rk_aiq_raw_prop_t prop);
 
-int32_t
-offlineRdJobPrepare(const rk_aiq_sys_ctx_t* ctx);
+/*!
+ * \brief queue RK-Raw-format buffer into aiq control system
+ *
+ * \param[in] ctx             context
+ * \param[in] rawdata         RK-Raw-format buffer
+ * \param[in] sync            sync flag, true means sync mode,calling process will be blocked,
+ *                            until the queued frame is processed. false means async mode, calling
+ *                            process is not blocked, if you want to free rawdata or reuse it, callback
+ *                            should be registered,after frame is processed, callback function would be called.
+ * \return return 0 if success
+ */
+XCamReturn
+rk_aiq_uapi_sysctl_enqueueRkRawBuf(const rk_aiq_sys_ctx_t* ctx, void *rawdata, bool sync);
 
-int32_t
-offlineRdJobDone(const rk_aiq_sys_ctx_t* ctx);
+/*!
+ * \brief queue RK-Raw-format file into aiq control system
+ *
+ * \param[in] ctx             context
+ * \param[in] path            RK-Raw-format file path
+ * calling process will be blocked until the queued frame is processed
+ * \return return 0 if success
+ */
+XCamReturn
+rk_aiq_uapi_sysctl_enqueueRkRawFile(const rk_aiq_sys_ctx_t* ctx, const char *path);
+
+/*!
+ * \brief regist RK-Raw-format buffer callback into aiq control system
+ *
+ * \param[in] ctx             context
+ * \param[in] callback        callback function pointer
+ * if callback function is registered,  (when rk_aiq_uapi_sysctl_enqueueRkRawBuf used in sync mode)
+ * callback will be called in sync after the queued raw buffer is processed, raw buffer pointer
+ * which passed into aiq by rk_aiq_uapi_sysctl_enqueueRkRawBuf would be passed back into the callback
+ * function you registered.
+ * this function is not required.
+ *
+ * \return return 0 if success
+ */
+XCamReturn
+rk_aiq_uapi_sysctl_registRkRawCb(const rk_aiq_sys_ctx_t* ctx, void (*callback)(void*));
 
 /*!
  * \brief set the bypass stream rotation
@@ -337,6 +379,60 @@ rk_aiq_uapi_sysctl_swWorkingModeDyn(const rk_aiq_sys_ctx_t* ctx, rk_aiq_working_
  */
 void
 rk_aiq_uapi_sysctl_setMulCamConc(const rk_aiq_sys_ctx_t* ctx, bool cc);
+
+/*!
+ * \brief set crop window of isp input
+ * This API will affect the isp pipeline resolution.
+ *
+ * \param[in] rect      set cams crop prop
+ * \note Optinal API, should be called before rk_aiq_uapi_sysctl_prepare
+ */
+XCamReturn
+rk_aiq_uapi_sysctl_setCrop(const rk_aiq_sys_ctx_t* sys_ctx, rk_aiq_rect_t rect);
+
+/*!
+ * \brief get crop window of isp input
+ *
+ * \param[in] rect       get cams crop prop
+ */
+XCamReturn
+rk_aiq_uapi_sysctl_getCrop(const rk_aiq_sys_ctx_t* sys_ctx, rk_aiq_rect_t *rect);
+
+/*!
+ * \brief apply an new iq file when stream on
+ *
+ * \param[in] iqfile       iqfile which will be applied
+ */
+XCamReturn
+rk_aiq_uapi_sysctl_updateIq(rk_aiq_sys_ctx_t* sys_ctx, char* iqfile);
+
+XCamReturn
+rk_aiq_uapi_sysctl_tuning(const rk_aiq_sys_ctx_t* sys_ctx, char* param);
+
+char* rk_aiq_uapi_sysctl_readiq(const rk_aiq_sys_ctx_t* sys_ctx, char* param);
+
+/*!
+ * \brief register mems sensor handler interface
+ *
+ * \param[in] intf          mems sensor interfaces
+ */
+XCamReturn
+rk_aiq_uapi_sysctl_regMemsSensorIntf(const rk_aiq_sys_ctx_t* sys_ctx,
+                                     const rk_aiq_mems_sensor_intf_t* intf);
+
+
+/**
+ * @brief switch calibDB for different scene
+ *
+ * @param sys_ctx
+ * @param main_scene  main scene name
+ * @param sub_scene   sub scenen name
+ *
+ * @return 0 if no error
+ */
+int rk_aiq_uapi_sysctl_switch_scene(const rk_aiq_sys_ctx_t* sys_ctx,
+                                    const char* main_scene,
+                                    const char* sub_scene);
 
 RKAIQ_END_DECLARE
 

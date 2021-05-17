@@ -26,34 +26,39 @@
 #include "rk_aiq_comm.h"
 #include "RkAiqCalibDbTypes.h"
 #include "acnr/rk_aiq_types_acnr_algo_v1.h"
+#include "RkAiqCalibDbTypesV2.h"
+#include "RkAiqCalibDbV2Helper.h"
+#include "cnr_head_v1.h"
+
 
 //RKAIQ_BEGIN_DECLARE
 
+#define ACNRV1_RECALCULATE_DELTA_ISO       (10)
 // fix bit
-#define		RK_CNR_V1_sgmGain				4
-#define		RK_CNR_V1_sgmRatio				4
-#define		RK_CNR_V1_log2e					6
-#define		RK_CNR_V1_gainRatio				7
+#define     RK_CNR_V1_sgmGain               4
+#define     RK_CNR_V1_sgmRatio              4
+#define     RK_CNR_V1_log2e                 6
+#define     RK_CNR_V1_gainRatio             7
 
-#define		RK_CNR_V1_ratio					0
-#define		RK_CNR_V1_offset				4
+#define     RK_CNR_V1_ratio                 0
+#define     RK_CNR_V1_offset                4
 
-#define		RK_CNR_V1_uvgain_local			4  
-#define		RK_CNR_V1_kernels				7
+#define     RK_CNR_V1_uvgain_local          4
+#define     RK_CNR_V1_kernels               7
 
-#define		RK_CNR_V1_medRatio				4		
-#define		RK_CNR_V1_sigmaR				0  
-#define		RK_CNR_V1_sigmaD				0 
-#define		RK_CNR_V1_uvgain				4  
+#define     RK_CNR_V1_medRatio              4
+#define     RK_CNR_V1_sigmaR                0
+#define     RK_CNR_V1_sigmaD                0
+#define     RK_CNR_V1_uvgain                4
 
 //exp(-x)
-#define		RK_CNR_V1_exp2_lut_num			15 
-#define		RK_CNR_V1_exp2_lut_x			7 
-#define		RK_CNR_V1_exp2_lut_y			7 
+#define     RK_CNR_V1_exp2_lut_num          15
+#define     RK_CNR_V1_exp2_lut_x            7
+#define     RK_CNR_V1_exp2_lut_y            7
 
-#define		RK_CNR_V1_bfRatio				RK_CNR_V1_exp2_lut_y  
+#define     RK_CNR_V1_bfRatio               RK_CNR_V1_exp2_lut_y
 
-#define		RK_CNR_V1_SIGMA_FIX_BIT			8
+#define     RK_CNR_V1_SIGMA_FIX_BIT         8
 
 
 typedef enum Acnr_result_e {
@@ -87,7 +92,7 @@ typedef enum Acnr_OPMode_e {
 } Acnr_OPMode_t;
 
 typedef enum Acnr_ParamMode_e {
-	ACNR_PARAM_MODE_INVALID           = 0, 
+    ACNR_PARAM_MODE_INVALID           = 0,
     ACNR_PARAM_MODE_NORMAL          = 1,                   /**< initialization value */
     ACNR_PARAM_MODE_HDR              = 2,                   /**< instance is created, but not initialized */
     ACNR_PARAM_MODE_GRAY            = 3,                   /**< instance is confiured (ready to start) or stopped */
@@ -100,109 +105,107 @@ typedef struct Acnr_ExpInfo_s {
     float arAGain[3];
     float arDGain[3];
     int   arIso[3];
-	int   snr_mode;
-	int rawWidth;
-	int rawHeight;
+    int   snr_mode;
+    int rawWidth;
+    int rawHeight;
 } Acnr_ExpInfo_t;
 
-typedef struct RK_CNR_Params_V1_s 
+typedef struct RK_CNR_Params_V1_s
 {
-	int enable;
-	float iso[RK_CNR_V1_MAX_ISO_NUM];
-	int	rkcnr_hq_bila_bypass[RK_CNR_V1_MAX_ISO_NUM];
-	int	rkcnr_lq_bila_bypass[RK_CNR_V1_MAX_ISO_NUM];
+    int enable;
+    float iso[RK_CNR_V1_MAX_ISO_NUM];
+    int rkcnr_hq_bila_bypass[RK_CNR_V1_MAX_ISO_NUM];
+    int rkcnr_lq_bila_bypass[RK_CNR_V1_MAX_ISO_NUM];
 
-	// gain
-	float rkcnr_exgain[RK_CNR_V1_MAX_ISO_NUM];
-	float rkcnr_g_gain[RK_CNR_V1_MAX_ISO_NUM];
+    // gain
+    float rkcnr_exgain[RK_CNR_V1_MAX_ISO_NUM];
+    float rkcnr_g_gain[RK_CNR_V1_MAX_ISO_NUM];
 
-	//
-	float ratio[RK_CNR_V1_MAX_ISO_NUM];
-	float offset[RK_CNR_V1_MAX_ISO_NUM];
+    //
+    float ratio[RK_CNR_V1_MAX_ISO_NUM];
+    float offset[RK_CNR_V1_MAX_ISO_NUM];
 
-	// step1
-	// median filter
-	float medRatio1[RK_CNR_V1_MAX_ISO_NUM];
+    // step1
+    // median filter
+    float medRatio1[RK_CNR_V1_MAX_ISO_NUM];
 
-	// bilateral filter
-	float sigmaR1[RK_CNR_V1_MAX_ISO_NUM];
-	float uvgain1[RK_CNR_V1_MAX_ISO_NUM];
-	float bfRatio1[RK_CNR_V1_MAX_ISO_NUM];
-	int	 hbf_wgt_clip[RK_CNR_V1_MAX_ISO_NUM];
-
-
-	// step2
-	// median filter
-	float medRatio2[RK_CNR_V1_MAX_ISO_NUM];
-
-	// bilateral filter
-	float sigmaR2[RK_CNR_V1_MAX_ISO_NUM];
-	float uvgain2[RK_CNR_V1_MAX_ISO_NUM];
-	float bfRatio2[RK_CNR_V1_MAX_ISO_NUM];
+    // bilateral filter
+    float sigmaR1[RK_CNR_V1_MAX_ISO_NUM];
+    float uvgain1[RK_CNR_V1_MAX_ISO_NUM];
+    float bfRatio1[RK_CNR_V1_MAX_ISO_NUM];
+    int  hbf_wgt_clip[RK_CNR_V1_MAX_ISO_NUM];
 
 
-	// step3
-	// bilateral filter
-	float sigmaR3[RK_CNR_V1_MAX_ISO_NUM];
-	float uvgain3[RK_CNR_V1_MAX_ISO_NUM];
-	float bfRatio3[RK_CNR_V1_MAX_ISO_NUM];
+    // step2
+    // median filter
+    float medRatio2[RK_CNR_V1_MAX_ISO_NUM];
 
-	// bilateral filter kernels
-	float kernel_5x5_table[5];
-}RK_CNR_Params_V1_t;
+    // bilateral filter
+    float sigmaR2[RK_CNR_V1_MAX_ISO_NUM];
+    float uvgain2[RK_CNR_V1_MAX_ISO_NUM];
 
-typedef struct RK_CNR_Params_V1_Select_s 
+    // step3
+    // bilateral filter
+    float sigmaR3[RK_CNR_V1_MAX_ISO_NUM];
+    float uvgain3[RK_CNR_V1_MAX_ISO_NUM];
+    float bfRatio3[RK_CNR_V1_MAX_ISO_NUM];
+
+    // bilateral filter kernels
+    float kernel_5x5_table[5];
+} RK_CNR_Params_V1_t;
+
+typedef struct RK_CNR_Params_V1_Select_s
 {
-	int enable;
-	
-	// bypass
-	int	rkcnr_hq_bila_bypass;
-	int	rkcnr_lq_bila_bypass;
+    int enable;
 
-	// gain
-	float rkcnr_exgain;
-	float rkcnr_g_gain;
-	
-	//
-	float ratio;
-	float offset;
+    // bypass
+    int rkcnr_hq_bila_bypass;
+    int rkcnr_lq_bila_bypass;
 
-	// step1
-	// median filter
-	float medRatio1;
+    // gain
+    float rkcnr_exgain;
+    float rkcnr_g_gain;
 
-	// bilateral filter
-	float sigmaR1;
-	float uvgain1;
-	float bfRatio1;
-	int	hbf_wgt_clip;
+    //
+    float ratio;
+    float offset;
 
-	// step2
+    // step1
+    // median filter
+    float medRatio1;
 
-	// median filter
-	float medRatio2;
+    // bilateral filter
+    float sigmaR1;
+    float uvgain1;
+    float bfRatio1;
+    int hbf_wgt_clip;
 
-	// bilateral filter
-	float sigmaR2;
-	float uvgain2;
+    // step2
 
-	// step3
-	// bilateral filter
-	float sigmaR3;
-	float uvgain3;
-	float bfRatio3;
+    // median filter
+    float medRatio2;
 
-	// bilateral filter kernels
-	float kernel_5x5_table[5];
+    // bilateral filter
+    float sigmaR2;
+    float uvgain2;
 
-}RK_CNR_Params_V1_Select_t;
+    // step3
+    // bilateral filter
+    float sigmaR3;
+    float uvgain3;
+    float bfRatio3;
+
+    // bilateral filter kernels
+    float kernel_5x5_table[5];
+
+} RK_CNR_Params_V1_Select_t;
 
 
 typedef struct Acnr_Manual_Attr_V1_s
 {
     int cnrEn;
-	RK_CNR_Params_V1_Select_t stSelect;
-	
+    RK_CNR_Params_V1_Select_t stSelect;
+
 } Acnr_Manual_Attr_V1_t;
 
 typedef struct Acnr_Auto_Attr_V1_s
@@ -210,7 +213,7 @@ typedef struct Acnr_Auto_Attr_V1_s
     //all ISO params and select param
     int cnrEn;
 
-	RK_CNR_Params_V1_t stParams;
+    RK_CNR_Params_V1_t stParams;
     RK_CNR_Params_V1_Select_t stSelect;
 
 } Acnr_Auto_Attr_V1_t;
@@ -223,15 +226,17 @@ typedef struct Acnr_ProcResult_V1_s {
 
     //for hw register
     RK_CNR_Fix_V1_t stFix;
-	
+
+    bool isNeedUpdate;
+
 } Acnr_ProcResult_V1_t;
 
 
 typedef struct Acnr_Config_V1_s {
     Acnr_State_t eState;
     Acnr_OPMode_t eMode;
-	int rawHeight;
-	int rawWidth;
+    int rawHeight;
+    int rawWidth;
 } Acnr_Config_V1_t;
 
 
@@ -243,7 +248,7 @@ typedef struct rk_aiq_cnr_attrib_v1_s {
 
 
 typedef struct rk_aiq_cnr_IQPara_V1_s {
-	struct list_head* listHead;
+    struct list_head* listHead;
 } rk_aiq_cnr_IQPara_V1_t;
 
 

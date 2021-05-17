@@ -1,311 +1,134 @@
 #include "acnr/rk_aiq_uapi_acnr_int_v1.h"
 #include "acnr/rk_aiq_types_acnr_algo_prvt_v1.h"
 
+#if 1
+#define ACNRV1_CHROMA_SF_STRENGTH_MAX_PERCENT (100.0)
+
+
+XCamReturn
+rk_aiq_uapi_acnrV1_SetAttrib(RkAiqAlgoContext *ctx,
+                             rk_aiq_cnr_attrib_v1_t *attr,
+                             bool need_sync)
+{
+
+    Acnr_Context_V1_t* pCtx = (Acnr_Context_V1_t*)ctx;
+
+    pCtx->eMode = attr->eMode;
+    pCtx->stAuto = attr->stAuto;
+    pCtx->stManual = attr->stManual;
+    pCtx->isReCalculate |= 1;
+
+    return XCAM_RETURN_NO_ERROR;
+}
+
+XCamReturn
+rk_aiq_uapi_acnrV1_GetAttrib(const RkAiqAlgoContext *ctx,
+                             rk_aiq_cnr_attrib_v1_t *attr)
+{
+
+    Acnr_Context_V1_t* pCtx = (Acnr_Context_V1_t*)ctx;
+
+    attr->eMode = pCtx->eMode;
+    memcpy(&attr->stAuto, &pCtx->stAuto, sizeof(attr->stAuto));
+    memcpy(&attr->stManual, &pCtx->stManual, sizeof(attr->stManual));
+
+    return XCAM_RETURN_NO_ERROR;
+}
+
 #if 0
-#define NR_STRENGTH_MAX_PERCENT (50.0)
-#define NR_LUMA_TF_STRENGTH_MAX_PERCENT NR_STRENGTH_MAX_PERCENT
-#define NR_LUMA_SF_STRENGTH_MAX_PERCENT (100.0)
-#define NR_CHROMA_TF_STRENGTH_MAX_PERCENT NR_STRENGTH_MAX_PERCENT
-#define NR_CHROMA_SF_STRENGTH_MAX_PERCENT NR_STRENGTH_MAX_PERCENT
-#define NR_RAWNR_SF_STRENGTH_MAX_PERCENT (80.0)
-
 XCamReturn
-rk_aiq_uapi_anr_SetAttrib(RkAiqAlgoContext *ctx,
-                          rk_aiq_nr_attrib_t *attr,
-                          bool need_sync)
+rk_aiq_uapi_acnrV1_SetIQPara(RkAiqAlgoContext *ctx,
+                             rk_aiq_nr_IQPara_t *pPara,
+                             bool need_sync)
 {
 
-    ANRContext_t* pAnrCtx = (ANRContext_t*)ctx;
+    Acnr_Context_V1_t* pCtx = (Acnr_Context_V1_t*)ctx;
 
-    pAnrCtx->eMode = attr->eMode;
-    pAnrCtx->stAuto = attr->stAuto;
-    pAnrCtx->stManual = attr->stManual;
+    if(pPara->module_bits & (1 << ANR_MODULE_BAYERNR)) {
+        pCtx->stBayernrCalib = pPara->stBayernrPara;
+        pCtx->isIQParaUpdate = true;
+    }
 
-    return XCAM_RETURN_NO_ERROR;
-}
+    if(pPara->module_bits & (1 << ANR_MODULE_MFNR)) {
+        pCtx->stMfnrCalib = pPara->stMfnrPara;
+        pCtx->isIQParaUpdate = true;
+    }
 
-XCamReturn
-rk_aiq_uapi_anr_GetAttrib(const RkAiqAlgoContext *ctx,
-                          rk_aiq_nr_attrib_t *attr)
-{
+    if(pPara->module_bits & (1 << ANR_MODULE_UVNR)) {
+        pCtx->stUvnrCalib = pPara->stUvnrPara;
+        pCtx->isIQParaUpdate = true;
+    }
 
-    ANRContext_t* pAnrCtx = (ANRContext_t*)ctx;
-
-    attr->eMode = pAnrCtx->eMode;
-    memcpy(&attr->stAuto, &pAnrCtx->stAuto, sizeof(ANR_Auto_Attr_t));
-    memcpy(&attr->stManual, &pAnrCtx->stManual, sizeof(ANR_Manual_Attr_t));
-
-    return XCAM_RETURN_NO_ERROR;
-}
-
-XCamReturn
-rk_aiq_uapi_anr_SetIQPara(RkAiqAlgoContext *ctx,
-                          rk_aiq_nr_IQPara_t *pPara,
-                          bool need_sync)
-{
-
-    ANRContext_t* pAnrCtx = (ANRContext_t*)ctx;
-
-	if(pPara->module_bits & (1 << ANR_MODULE_BAYERNR)){
-		pAnrCtx->stBayernrCalib = pPara->stBayernrPara;
-		pAnrCtx->isIQParaUpdate = true;
-	}
-
-	if(pPara->module_bits & (1 << ANR_MODULE_MFNR)){
-		pAnrCtx->stMfnrCalib = pPara->stMfnrPara;
-		pAnrCtx->isIQParaUpdate = true;
-	}
-
-	if(pPara->module_bits & (1 << ANR_MODULE_UVNR)){
-		pAnrCtx->stUvnrCalib = pPara->stUvnrPara;
-		pAnrCtx->isIQParaUpdate = true;
-	}
-
-	if(pPara->module_bits & (1 << ANR_MODULE_YNR)){
-		pAnrCtx->stYnrCalib = pPara->stYnrPara;
-		pAnrCtx->isIQParaUpdate = true;
-	}
+    if(pPara->module_bits & (1 << ANR_MODULE_YNR)) {
+        pCtx->stYnrCalib = pPara->stYnrPara;
+        pCtx->isIQParaUpdate = true;
+    }
 
     return XCAM_RETURN_NO_ERROR;
 }
 
 
 XCamReturn
-rk_aiq_uapi_anr_GetIQPara(RkAiqAlgoContext *ctx,
-                          rk_aiq_nr_IQPara_t *pPara)
+rk_aiq_uapi_acnrV1_GetIQPara(RkAiqAlgoContext *ctx,
+                             rk_aiq_nr_IQPara_t *pPara)
 {
 
-	ANRContext_t* pAnrCtx = (ANRContext_t*)ctx;
+    Acnr_Context_V1_t* pCtx = (Acnr_Context_V1_t*)ctx;
 
-	pPara->stBayernrPara = pAnrCtx->stBayernrCalib;
-	pPara->stMfnrPara = pAnrCtx->stMfnrCalib;
-	pPara->stUvnrPara = pAnrCtx->stUvnrCalib;
-	pPara->stYnrPara = pAnrCtx->stYnrCalib;
-	
+    pPara->stBayernrPara = pCtx->stBayernrCalib;
+    pPara->stMfnrPara = pCtx->stMfnrCalib;
+    pPara->stUvnrPara = pCtx->stUvnrCalib;
+    pPara->stYnrPara = pCtx->stYnrCalib;
+
+    return XCAM_RETURN_NO_ERROR;
+}
+#endif
+
+
+XCamReturn
+rk_aiq_uapi_acnrV1_SetChromaSFStrength(const RkAiqAlgoContext *ctx,
+                                       float fPercent)
+{
+    Acnr_Context_V1_t* pCtx = (Acnr_Context_V1_t*)ctx;
+
+    float fStrength = 1.0f;
+    float fMax = ACNRV1_CHROMA_SF_STRENGTH_MAX_PERCENT;
+
+    if(fPercent <= 0.5) {
+        fStrength =  fPercent / 0.5;
+    } else {
+        fStrength = (fPercent - 0.5) * (fMax - 1) * 2 + 1;
+    }
+
+    pCtx->fCnr_SF_Strength = fStrength;
+    pCtx->isReCalculate |= 1;
+
     return XCAM_RETURN_NO_ERROR;
 }
 
 
 XCamReturn
-rk_aiq_uapi_anr_SetLumaSFStrength(const RkAiqAlgoContext *ctx,
-                          float fPercent)
+rk_aiq_uapi_acnrV1_GetChromaSFStrength(const RkAiqAlgoContext *ctx,
+                                       float *pPercent)
 {
-	ANRContext_t* pAnrCtx = (ANRContext_t*)ctx;
+    Acnr_Context_V1_t* pCtx = (Acnr_Context_V1_t*)ctx;
 
-	float fStrength = 1.0f;
-	float fMax = NR_LUMA_SF_STRENGTH_MAX_PERCENT;
+    float fStrength = 1.0f;
+    float fMax = ACNRV1_CHROMA_SF_STRENGTH_MAX_PERCENT;
 
-    
-	if(fPercent <= 0.5){
-		fStrength =  fPercent /0.5;
-	}else{
-		fStrength = (fPercent - 0.5)*(fMax - 1)*2 + 1;
-	}
+    fStrength = pCtx->fCnr_SF_Strength;
 
-	if(fStrength > 1){
-		pAnrCtx->fRawnr_SF_Strength = fStrength / 2.0;
-		pAnrCtx->fLuma_SF_Strength = 1;
-	}else{
-		pAnrCtx->fRawnr_SF_Strength = fStrength;
-		pAnrCtx->fLuma_SF_Strength = fStrength;
-	}
 
-	return XCAM_RETURN_NO_ERROR;
+    if(fStrength <= 1) {
+        *pPercent = fStrength * 0.5;
+    } else {
+        *pPercent = (fStrength - 1) / ((fMax - 1) * 2) + 0.5;
+    }
+
+
+    return XCAM_RETURN_NO_ERROR;
 }
 
-
-XCamReturn
-rk_aiq_uapi_anr_SetLumaTFStrength(const RkAiqAlgoContext *ctx,
-                          float fPercent)
-{
-	ANRContext_t* pAnrCtx = (ANRContext_t*)ctx;
-	
-	float fStrength = 1.0;
-	float fMax = NR_LUMA_TF_STRENGTH_MAX_PERCENT;
-
-	if(fPercent <= 0.5){
-		fStrength =  fPercent /0.5;
-	}else{
-		fStrength = (fPercent - 0.5)*(fMax - 1) * 2 + 1;
-	}
-
-	pAnrCtx->fLuma_TF_Strength = fStrength;
-
-	return XCAM_RETURN_NO_ERROR;
-}
-
-
-XCamReturn
-rk_aiq_uapi_anr_GetLumaSFStrength(const RkAiqAlgoContext *ctx,
-                          float *pPercent)
-{
-	ANRContext_t* pAnrCtx = (ANRContext_t*)ctx;
-
-	float fStrength = 1.0f;
-	float fMax = NR_LUMA_SF_STRENGTH_MAX_PERCENT;
-
-	
-	fStrength = pAnrCtx->fLuma_SF_Strength;
-
-	if(fStrength <= 1){
-		*pPercent = fStrength * 0.5;
-	}else{
-		*pPercent = 2 * (fStrength - 1)/(fMax - 1) + 0.5;
-	}
-
-	return XCAM_RETURN_NO_ERROR;
-}
-
-
-XCamReturn
-rk_aiq_uapi_anr_GetLumaTFStrength(const RkAiqAlgoContext *ctx,
-                          float *pPercent)
-{
-	ANRContext_t* pAnrCtx = (ANRContext_t*)ctx;
-	
-	float fStrength = 1.0;
-	float fMax = NR_LUMA_TF_STRENGTH_MAX_PERCENT;
-
-	fStrength = pAnrCtx->fLuma_TF_Strength;
-
-	if(fStrength <= 1){
-		*pPercent = fStrength * 0.5;
-	}else{
-		*pPercent = 2 * (fStrength - 1)/(fMax - 1) + 0.5;
-	}
-
-	return XCAM_RETURN_NO_ERROR;
-}
-
-
-XCamReturn
-rk_aiq_uapi_anr_SetChromaSFStrength(const RkAiqAlgoContext *ctx,
-                          float fPercent)
-{
-	ANRContext_t* pAnrCtx = (ANRContext_t*)ctx;
-
-	float fStrength = 1.0f;
-	float fMax = NR_CHROMA_SF_STRENGTH_MAX_PERCENT;
-
-	if(fPercent <= 0.5){
-		fStrength =  fPercent /0.5;
-	}else{
-		fStrength = (fPercent - 0.5)*(fMax - 1) * 2 + 1;
-	}
-
-	pAnrCtx->fChroma_SF_Strength = fStrength;
-
-	return XCAM_RETURN_NO_ERROR;
-}
-
-
-XCamReturn
-rk_aiq_uapi_anr_SetChromaTFStrength(const RkAiqAlgoContext *ctx,
-                          float fPercent)
-{
-	ANRContext_t* pAnrCtx = (ANRContext_t*)ctx;
-	
-	float fStrength = 1.0;
-	float fMax = NR_CHROMA_TF_STRENGTH_MAX_PERCENT;
-
-	if(fPercent <= 0.5){
-		fStrength =  fPercent /0.5;
-	}else{
-		fStrength = (fPercent - 0.5)*(fMax - 1) * 2 + 1;
-	}
-
-	pAnrCtx->fChroma_TF_Strength = fStrength;
-
-	return XCAM_RETURN_NO_ERROR;
-}
-
-
-XCamReturn
-rk_aiq_uapi_anr_GetChromaSFStrength(const RkAiqAlgoContext *ctx,
-                          float *pPercent)
-{
-	ANRContext_t* pAnrCtx = (ANRContext_t*)ctx;
-
-	float fStrength = 1.0f;
-	float fMax = NR_CHROMA_SF_STRENGTH_MAX_PERCENT;
-	
-	fStrength = pAnrCtx->fChroma_SF_Strength;
-	
-	
-	if(fStrength <= 1){
-		*pPercent = fStrength * 0.5;
-	}else{
-		*pPercent = 2 * (fStrength - 1)/(fMax - 1) + 0.5;
-	}
-	
-
-	return XCAM_RETURN_NO_ERROR;
-}
-
-
-XCamReturn
-rk_aiq_uapi_anr_GetChromaTFStrength(const RkAiqAlgoContext *ctx,
-                          float *pPercent)
-{
-	ANRContext_t* pAnrCtx = (ANRContext_t*)ctx;
-	
-	float fStrength = 1.0;
-	float fMax = NR_CHROMA_TF_STRENGTH_MAX_PERCENT;
-
-	fStrength = pAnrCtx->fChroma_TF_Strength;
-
-	if(fStrength <= 1){
-		*pPercent = fStrength * 0.5;
-	}else{
-		*pPercent = 2 * (fStrength - 1)/(fMax - 1) + 0.5;
-	}
-
-	return XCAM_RETURN_NO_ERROR;
-}
-
-
-XCamReturn
-rk_aiq_uapi_anr_SetRawnrSFStrength(const RkAiqAlgoContext *ctx,
-                          float fPercent)
-{
-	ANRContext_t* pAnrCtx = (ANRContext_t*)ctx;
-	
-	float fStrength = 1.0;
-	float fMax = NR_RAWNR_SF_STRENGTH_MAX_PERCENT;
-
-	if(fPercent <= 0.5){
-		fStrength =  fPercent /0.5;
-	}else{
-		fStrength = (fPercent - 0.5)*(fMax - 1) * 2 + 1;
-	}
-
-	pAnrCtx->fRawnr_SF_Strength = fStrength;
-
-	return XCAM_RETURN_NO_ERROR;
-}
-
-
-XCamReturn
-rk_aiq_uapi_anr_GetRawnrSFStrength(const RkAiqAlgoContext *ctx,
-                          float *pPercent)
-{
-	ANRContext_t* pAnrCtx = (ANRContext_t*)ctx;
-
-	float fStrength = 1.0f;
-	float fMax = NR_RAWNR_SF_STRENGTH_MAX_PERCENT;
-	
-	fStrength = pAnrCtx->fRawnr_SF_Strength;
-	
-	
-	if(fStrength <= 1){
-		*pPercent = fStrength * 0.5;
-	}else{
-		*pPercent = 2 * (fStrength - 1)/(fMax - 1) + 0.5;
-	}
-	
-
-	return XCAM_RETURN_NO_ERROR;
-}
 
 #endif
 

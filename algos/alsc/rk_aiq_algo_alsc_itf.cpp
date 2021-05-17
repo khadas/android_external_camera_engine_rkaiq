@@ -29,63 +29,68 @@ RKAIQ_BEGIN_DECLARE
 static XCamReturn
 create_context(RkAiqAlgoContext **context, const AlgoCtxInstanceCfg* cfg)
 {
-    LOGI_ALSC( "%s: (enter)\n", __FUNCTION__);
+    LOG1_ALSC( "%s: (enter)\n", __FUNCTION__);
     AlgoCtxInstanceCfgInt *cfgInt = (AlgoCtxInstanceCfgInt*)cfg;
     RkAiqAlgoContext *ctx = new RkAiqAlgoContext();
     if (ctx == NULL) {
         LOGE_ALSC( "%s: create alsc context fail!\n", __FUNCTION__);
         return XCAM_RETURN_ERROR_MEM;
     }
-    AlscInit(&ctx->alsc_para, cfgInt->calib);
+    AlscInit(&ctx->alsc_para, cfgInt->calibv2);
     *context = ctx;
-    LOGI_ALSC( "%s: (exit)\n", __FUNCTION__);
+    LOG1_ALSC( "%s: (exit)\n", __FUNCTION__);
     return XCAM_RETURN_NO_ERROR;
 }
 
 static XCamReturn
 destroy_context(RkAiqAlgoContext *context)
 {
-    LOGI_ALSC( "%s: (enter)\n", __FUNCTION__);
+    LOG1_ALSC( "%s: (enter)\n", __FUNCTION__);
 
     AlscRelease((alsc_handle_t)context->alsc_para);
     delete context;
     context = NULL;
-    LOGI_ALSC( "%s: (exit)\n", __FUNCTION__);
+    LOG1_ALSC( "%s: (exit)\n", __FUNCTION__);
     return XCAM_RETURN_NO_ERROR;
 }
 
 static XCamReturn
 prepare(RkAiqAlgoCom* params)
 {
-    LOGI_ALSC( "%s: (enter)\n", __FUNCTION__);
+    LOG1_ALSC( "%s: (enter)\n", __FUNCTION__);
     alsc_handle_t hAlsc = (alsc_handle_t)(params->ctx->alsc_para);
 
     RkAiqAlgoConfigAlscInt *para = (RkAiqAlgoConfigAlscInt *)params;
 
-    sprintf(hAlsc->curResName, "%dx%d", para->alsc_config_com.com.u.prepare.sns_op_width,
+    sprintf(hAlsc->cur_res.name, "%dx%d", para->alsc_config_com.com.u.prepare.sns_op_width,
             para->alsc_config_com.com.u.prepare.sns_op_height );
-
+    hAlsc->alscSwInfo.prepare_type = params->u.prepare.conf_type;
+   if(!!(params->u.prepare.conf_type & RK_AIQ_ALGO_CONFTYPE_UPDATECALIB )){
+       RkAiqAlgoConfigAlscInt* confPara = (RkAiqAlgoConfigAlscInt*)params;
+       hAlsc->calibLscV2 =
+            (CalibDbV2_LSC_t*)(CALIBDBV2_GET_MODULE_PTR(confPara->rk_com.u.prepare.calibv2, lsc_v2));
+   }
     AlscPrepare((alsc_handle_t)(params->ctx->alsc_para));
 
-    LOGI_ALSC( "%s: (exit)\n", __FUNCTION__);
+    LOG1_ALSC( "%s: (exit)\n", __FUNCTION__);
     return XCAM_RETURN_NO_ERROR;
 }
 
 static XCamReturn
 pre_process(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outparams)
 {
-    LOGI_ALSC( "%s: (enter)\n", __FUNCTION__);
+    LOG1_ALSC( "%s: (enter)\n", __FUNCTION__);
 
     AlscPreProc((alsc_handle_t)(inparams->ctx->alsc_para));
 
-    LOGI_ALSC( "%s: (exit)\n", __FUNCTION__);
+    LOG1_ALSC( "%s: (exit)\n", __FUNCTION__);
     return XCAM_RETURN_NO_ERROR;
 }
 
 static XCamReturn
 processing(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outparams)
 {
-    LOGI_ALSC( "%s: (enter)\n", __FUNCTION__);
+    LOG1_ALSC( "%s: (enter)\n", __FUNCTION__);
 
     RkAiqAlgoProcAlscInt *procAlsc = (RkAiqAlgoProcAlscInt*)inparams;
     RkAiqAlgoProcResAlscInt *proResAlsc = (RkAiqAlgoProcResAlscInt*)outparams;
@@ -93,25 +98,39 @@ processing(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outparams)
     RkAiqAlgoProcAlscInt* procPara = (RkAiqAlgoProcAlscInt*)inparams;
     procAlsc->alsc_sw_info.grayMode = procPara->rk_com.u.proc.gray_mode;
     hAlsc->alscSwInfo = procAlsc->alsc_sw_info;
-    LOGI_ALSC( "%s alsc_proc_com.u.init:%d \n", __FUNCTION__, inparams->u.proc.init);
+    //LOGI_ALSC( "%s alsc_proc_com.u.init:%d \n", __FUNCTION__, inparams->u.proc.init);
     LOGD_ALSC( "%s: sensorGain:%f, awbGain:%f,%f, resName:%s, awbIIRDampCoef:%f\n", __FUNCTION__,
                hAlsc->alscSwInfo.sensorGain,
                hAlsc->alscSwInfo.awbGain[0], hAlsc->alscSwInfo.awbGain[1],
-               hAlsc->curResName, hAlsc->alscSwInfo.awbIIRDampCoef);
+               hAlsc->cur_res.name, hAlsc->alscSwInfo.awbIIRDampCoef);
 
     AlscConfig(hAlsc);
     memcpy(&proResAlsc->alsc_proc_res_com.alsc_hw_conf, &hAlsc->lscHwConf, sizeof(rk_aiq_lsc_cfg_t));
 
-    LOGI_ALSC( "%s: (exit)\n", __FUNCTION__);
+#if 1
+    if (procAlsc->tx != nullptr) {
+        XCamVideoBuffer* txBuf = procAlsc->tx;
+        /*
+         * If the subsequent flow also needs the data from the previous frame,
+         * it will need to add a reference
+         */
+        txBuf->ref(txBuf);
+        LOGD_ALSC("tx buf fd is: %d", txBuf->get_fd(txBuf));
+        uint8_t *virTxBuf = txBuf->map(txBuf);
+        txBuf->unref(txBuf);
+    }
+#endif
+
+    LOG1_ALSC( "%s: (exit)\n", __FUNCTION__);
     return XCAM_RETURN_NO_ERROR;
 }
 
 static XCamReturn
 post_process(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outparams)
 {
-    LOGI_ALSC( "%s: (enter)\n", __FUNCTION__);
+    LOG1_ALSC( "%s: (enter)\n", __FUNCTION__);
 
-    LOGI_ALSC( "%s: (exit)\n", __FUNCTION__);
+    LOG1_ALSC( "%s: (exit)\n", __FUNCTION__);
     return XCAM_RETURN_NO_ERROR;
 
 }

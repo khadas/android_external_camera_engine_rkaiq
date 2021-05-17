@@ -22,6 +22,14 @@
 
 typedef struct rk_aiq_sys_ctx_s rk_aiq_sys_ctx_t;
 
+typedef struct rk_aiq_dpcc_attrib_s {
+    AdpccOPMode_t eMode;
+    Adpcc_Auto_Attr_t stAuto;
+    Adpcc_Manual_Attr_t stManual;
+    CalibDb_Dpcc_t stTool;
+} rk_aiq_dpcc_attrib_t;
+
+
 RKAIQ_BEGIN_DECLARE
 
 XCamReturn

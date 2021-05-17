@@ -19,7 +19,6 @@
 
 #ifndef _RK_AIQ_TYPES_ACCM_ALGO_PRVT_H_
 #define _RK_AIQ_TYPES_ACCM_ALGO_PRVT_H_
-#include "RkAiqCalibDbTypes.h"
 #include "accm/rk_aiq_types_accm_algo_int.h"
 #include "xcam_log.h"
 #include "xcam_common.h"
@@ -29,20 +28,19 @@
 RKAIQ_BEGIN_DECLARE
 #define CCM_CURVE_DOT_NUM 17
 
-
 typedef struct accm_rest_s {
     float fSaturation;
     List dominateIlluList;//to record domain illuminant
+    List problist;
     int dominateIlluProfileIdx;
-    const CalibDb_CcmMatrixProfile_t *pCcmProfile1;
-    const CalibDb_CcmMatrixProfile_t *pCcmProfile2;
-    Cam3x3FloatMatrix_t undampedCcmMatrix;
-    Cam3x3FloatMatrix_t dampedCcmMatrix;
-    Cam1x3FloatMatrix_t undampedCcOffset;
-    Cam1x3FloatMatrix_t dampedCcOffset;
+    const CalibDbV2_Ccm_Ccm_Matrix_Para_t *pCcmProfile1;
+    const CalibDbV2_Ccm_Ccm_Matrix_Para_t *pCcmProfile2;
+    float undampedCcmMatrix[9];
+    float dampedCcmMatrix[9];
+    float undampedCcOffset[3];
+    float dampedCcOffset[3];
     float color_inhibition_level;
     float color_saturation_level;
-    CalibDb_CcmHdrNormalMode_t currentHdrNormalMode;
 } accm_rest_t;
 
 typedef struct illu_node_s {
@@ -50,9 +48,16 @@ typedef struct illu_node_s {
     unsigned int value;
 } illu_node_t;
 
+typedef struct prob_node_s {
+    void*        p_next;       /**< for adding to a list */
+    unsigned int value;
+    float prob;
+} prob_node_t;
+
+
 typedef struct accm_context_s {
-    const CalibDb_Ccm_t *calibCcm;//profile para
-    const CalibDb_CcmMatrixProfile_t *pCcmMatrixAll[CCM_FOR_MODE_MAX][CCM_ILLUMINATION_MAX][CCM_PROFILES_NUM_MAX];// reorder para //to do, change to pointer
+    const CalibDbV2_Ccm_Para_V2_t *calibV2Ccm; // json para
+    const CalibDbV2_Ccm_Ccm_Matrix_Para_t *pCcmMatrixAll[CCM_ILLUMINATION_MAX][CCM_PROFILES_NUM_MAX];// reorder para //to do, change to pointer
     accm_sw_info_t accmSwInfo;
     accm_rest_t accmRest;
     rk_aiq_ccm_cfg_t ccmHwConf; //hw para
@@ -61,6 +66,8 @@ typedef struct accm_context_s {
     rk_aiq_ccm_attrib_t mCurAtt;
     rk_aiq_ccm_attrib_t mNewAtt;
     bool updateAtt;
+    bool update;
+    bool calib_update;
 } accm_context_t ;
 
 typedef accm_context_t* accm_handle_t ;

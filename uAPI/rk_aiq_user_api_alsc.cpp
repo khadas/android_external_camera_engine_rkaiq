@@ -27,7 +27,9 @@ RKAIQ_BEGIN_DECLARE
 XCamReturn
 rk_aiq_user_api_alsc_SetAttrib(const rk_aiq_sys_ctx_t* sys_ctx, rk_aiq_lsc_attrib_t attr)
 {
+    CHECK_USER_API_ENABLE2(sys_ctx);
     CHECK_USER_API_ENABLE(RK_AIQ_ALGO_TYPE_ALSC);
+    RKAIQ_API_SMART_LOCK(sys_ctx);
     /*  RkAiqAlscHandleInt* algo_handle =
           algoHandle<RkAiqAlscHandleInt>(sys_ctx, RK_AIQ_ALGO_TYPE_ALSC);
 
@@ -41,6 +43,7 @@ rk_aiq_user_api_alsc_SetAttrib(const rk_aiq_sys_ctx_t* sys_ctx, rk_aiq_lsc_attri
 XCamReturn
 rk_aiq_user_api_alsc_GetAttrib(const rk_aiq_sys_ctx_t* sys_ctx, rk_aiq_lsc_attrib_t *attr)
 {
+    RKAIQ_API_SMART_LOCK(sys_ctx);
     RkAiqAlscHandleInt* algo_handle =
         algoHandle<RkAiqAlscHandleInt>(sys_ctx, RK_AIQ_ALGO_TYPE_ALSC);
 
@@ -54,6 +57,7 @@ rk_aiq_user_api_alsc_GetAttrib(const rk_aiq_sys_ctx_t* sys_ctx, rk_aiq_lsc_attri
 XCamReturn
 rk_aiq_user_api_alsc_QueryLscInfo(const rk_aiq_sys_ctx_t* sys_ctx, rk_aiq_lsc_querry_info_t *lsc_querry_info)
 {
+    RKAIQ_API_SMART_LOCK(sys_ctx);
     RkAiqAlscHandleInt* algo_handle =
         algoHandle<RkAiqAlscHandleInt>(sys_ctx, RK_AIQ_ALGO_TYPE_ALSC);
 

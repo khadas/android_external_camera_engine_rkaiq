@@ -51,6 +51,7 @@ rk_aiq_uapi_afec_SetAttrib(RkAiqAlgoContext *ctx,
         SmartPtr<rk_aiq_fec_attrib_t> attrPtr = new rk_aiq_fec_attrib_t;
 
         attrPtr->en = fec_contex->user_config.en;
+        attrPtr->mode = fec_contex->user_config.mode;
         attrPtr->bypass = fec_contex->user_config.bypass;
         attrPtr->correct_level = fec_contex->user_config.correct_level;
         fec_contex->afecReadMeshThread->clear_attr();

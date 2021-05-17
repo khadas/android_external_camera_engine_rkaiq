@@ -24,6 +24,7 @@
 #include "v4l2_device.h"
 #include "rk_aiq_pool.h"
 #include "linux/rk-camera-module.h"
+#include "v4l2_buffer_proxy.h"
 
 /************ BELOW FROM kernel/include/uapi/linux/rk-preisp.h ************/
 
@@ -67,34 +68,57 @@ namespace RkCam {
 
 #define SENSOR_SUBM (0x4)
 
-class IspEvtsListener;
+class BaseSensorHw : public V4l2SubDevice {
+public:
+    explicit BaseSensorHw(const char* name): V4l2SubDevice (name) {}
+    virtual ~BaseSensorHw() {}
+     virtual XCamReturn setExposureParams(SmartPtr<RkAiqExpParamsProxy>& expPar) { return XCAM_RETURN_NO_ERROR;}
+    virtual XCamReturn getSensorModeData(const char* sns_ent_name,
+                                 rk_aiq_exposure_sensor_descriptor& sns_des) { return XCAM_RETURN_NO_ERROR;}
 
-class SensorHw : public V4l2SubDevice {
+    virtual XCamReturn handle_sof(int64_t time, int frameid) { return XCAM_RETURN_NO_ERROR;}
+    virtual int get_pixel(rk_aiq_exposure_sensor_descriptor* sns_des)   { return 0;}
+    virtual int get_blank(rk_aiq_exposure_sensor_descriptor* sns_des) { return 0;}
+    virtual int get_exposure_range(rk_aiq_exposure_sensor_descriptor* sns_des) { return 0;}
+    virtual int get_format(rk_aiq_exposure_sensor_descriptor* sns_des) { return 0;}
+
+    virtual XCamReturn get_sensor_descriptor (rk_aiq_exposure_sensor_descriptor* sns_des) { return XCAM_RETURN_NO_ERROR;}
+    virtual XCamReturn getEffectiveExpParams(SmartPtr<RkAiqExpParamsProxy>& ExpParams, int frame_id) { return XCAM_RETURN_NO_ERROR;}
+    virtual XCamReturn set_working_mode(int mode) { return XCAM_RETURN_NO_ERROR;}
+    virtual XCamReturn set_exp_delay_info(int time_delay, int gain_delay, int hcg_lcg_mode_delay) { return XCAM_RETURN_NO_ERROR;}
+    virtual XCamReturn set_mirror_flip(bool mirror, bool flip, int32_t& skip_frame_sequence) { return XCAM_RETURN_NO_ERROR;}
+    virtual XCamReturn get_mirror_flip(bool& mirror, bool& flip) { return XCAM_RETURN_NO_ERROR;}
+    virtual XCamReturn start(bool prepared = false) { return XCAM_RETURN_NO_ERROR;}
+    virtual XCamReturn stop() { return XCAM_RETURN_NO_ERROR;}
+    virtual XCamReturn on_dqueue(int dev_idx, SmartPtr<V4l2BufferProxy> buf_proxy) { return XCAM_RETURN_NO_ERROR; }
+    virtual bool is_virtual_sensor() { return false; }
+protected:
+    XCAM_DEAD_COPY (BaseSensorHw);
+};
+
+class SensorHw : public BaseSensorHw {
 public:
     explicit SensorHw(const char* name);
     virtual ~SensorHw();
 
-    XCamReturn setExposureParams(SmartPtr<RkAiqExpParamsProxy>& expPar);
-    XCamReturn getSensorModeData(const char* sns_ent_name,
+    virtual XCamReturn setExposureParams(SmartPtr<RkAiqExpParamsProxy>& expPar);
+    virtual XCamReturn getSensorModeData(const char* sns_ent_name,
                                  rk_aiq_exposure_sensor_descriptor& sns_des);
 
-    XCamReturn handle_sof(int64_t time, int frameid);
-    void set_sof_evt_listener(IspEvtsListener* listener) { _evt_listener = listener; }
-    int get_pixel(rk_aiq_exposure_sensor_descriptor* sns_des);
-    int get_blank(rk_aiq_exposure_sensor_descriptor* sns_des);
-    int get_exposure_range(rk_aiq_exposure_sensor_descriptor* sns_des);
-    int get_format(rk_aiq_exposure_sensor_descriptor* sns_des);
+    virtual XCamReturn handle_sof(int64_t time, int frameid);
+    virtual int get_pixel(rk_aiq_exposure_sensor_descriptor* sns_des);
+    virtual int get_blank(rk_aiq_exposure_sensor_descriptor* sns_des);
+    virtual int get_exposure_range(rk_aiq_exposure_sensor_descriptor* sns_des);
+    virtual int get_format(rk_aiq_exposure_sensor_descriptor* sns_des);
 
-    XCamReturn get_sensor_descriptor (rk_aiq_exposure_sensor_descriptor* sns_des);
-    XCamReturn get_sensor_mode_data (struct isp_supplemental_sensor_mode_data &sensor_mode_data,
-                                     int frame_id = -1);
-    XCamReturn getEffectiveExpParams(SmartPtr<RkAiqExpParamsProxy>& ExpParams, int frame_id);
-    XCamReturn set_working_mode(int mode);
-    XCamReturn set_exp_delay_info(int time_delay, int gain_delay, int hcg_lcg_mode_delay);
-    XCamReturn set_mirror_flip(bool mirror, bool flip, int32_t& skip_frame_sequence);
-    XCamReturn get_mirror_flip(bool& mirror, bool& flip);
-    XCamReturn start();
-    XCamReturn stop();
+    virtual XCamReturn get_sensor_descriptor (rk_aiq_exposure_sensor_descriptor* sns_des);
+    virtual XCamReturn getEffectiveExpParams(SmartPtr<RkAiqExpParamsProxy>& ExpParams, int frame_id);
+    virtual XCamReturn set_working_mode(int mode);
+    virtual XCamReturn set_exp_delay_info(int time_delay, int gain_delay, int hcg_lcg_mode_delay);
+    virtual XCamReturn set_mirror_flip(bool mirror, bool flip, int32_t& skip_frame_sequence);
+    virtual XCamReturn get_mirror_flip(bool& mirror, bool& flip);
+    virtual XCamReturn start(bool prepared = false);
+    virtual XCamReturn stop();
 
 private:
     XCAM_DEAD_COPY (SensorHw);
@@ -122,13 +146,11 @@ private:
     bool _mirror;
     bool _flip;
     bool _update_mirror_flip;
-    IspEvtsListener* _evt_listener;
     int get_sensor_fps(float& fps);
     XCamReturn setLinearSensorExposure(RKAiqAecExpInfo_t* expPar);
     XCamReturn setHdrSensorExposure(RKAiqAecExpInfo_t* expPar);
     XCamReturn setExposure(int frameid);
     XCamReturn setSensorDpcc(Sensor_dpcc_res_t* SensorDpccInfo);
-    uint32_t get_v4l2_pixelformat(uint32_t pixelcode);
     XCamReturn composeExpParam( RKAiqAecExpInfo_t* timeValid, RKAiqAecExpInfo_t* gainValid, RKAiqAecExpInfo_t* dcgGainModeValid, RKAiqAecExpInfo_t* newExp);
     int get_nr_switch(rk_aiq_sensor_nr_switch_t* nr_switch);
     XCamReturn _set_mirror_flip();

@@ -23,7 +23,7 @@
 
 RKAIQ_BEGIN_DECLARE
 
-XCamReturn AlscInit(alsc_handle_t *hAlsc, const CamCalibDbContext_t* calib);
+XCamReturn AlscInit(alsc_handle_t *hAlsc, const CamCalibDbV2Context_t* calib2);
 XCamReturn AlscRelease(alsc_handle_t hAlsc);
 XCamReturn AlscPrepare(alsc_handle_t hAlsc);
 XCamReturn AlscConfig(alsc_handle_t hAlsc);

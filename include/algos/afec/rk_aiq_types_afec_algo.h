@@ -16,6 +16,7 @@ typedef struct {
     //unsigned char meshxf[FEC_MESH_XY_NUM_ALGO];
     //unsigned short meshyi[FEC_MESH_XY_NUM_ALGO];
     //unsigned char meshyf[FEC_MESH_XY_NUM_ALGO];
+    int img_buf_index;
 } fec_preprocess_result_t;
 
 typedef enum fec_correct_direction_e {
@@ -23,5 +24,11 @@ typedef enum fec_correct_direction_e {
     FEC_CORRECT_DIRECTION_Y,
     FEC_CORRECT_DIRECTION_XY
 } fec_correct_direction_t;
+
+typedef enum fec_correct_mode_e {
+    FEC_COMPRES_IMAGE_KEEP_FOV = 0x1,
+    FEC_KEEP_ASPECT_RATIO_REDUCE_FOV,
+    FEC_ALTER_ASPECT_RATIO_KEEP_FOV
+} fec_correct_mode_t;
 
 #endif

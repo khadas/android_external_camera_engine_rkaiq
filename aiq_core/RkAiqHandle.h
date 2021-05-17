@@ -20,42 +20,43 @@
 #ifndef _RK_AIQ_HANDLE_H_
 #define _RK_AIQ_HANDLE_H_
 
-#include "rk_aiq_types.h"
 #include "rk_aiq_algo_types.h"
+#include "rk_aiq_types.h"
 
 namespace RkCam {
 
 class RkAiqCore;
+struct RkAiqAlgosGroupShared_s;
+
 class RkAiqHandle {
-public:
+ public:
     explicit RkAiqHandle(RkAiqAlgoDesComm* des, RkAiqCore* aiqCore);
     virtual ~RkAiqHandle();
-    void setEnable(bool enable) {
-        mEnable = enable;
-    };
-    void setReConfig(bool reconfig) {
-        mReConfig = reconfig;
-    };
-    bool getEnable() {
-        return mEnable;
-    };
+    void setEnable(bool enable) { mEnable = enable; };
+    void setReConfig(bool reconfig) { mReConfig = reconfig; };
+    bool getEnable() { return mEnable; };
     virtual XCamReturn prepare();
     virtual XCamReturn preProcess();
     virtual XCamReturn processing();
     virtual XCamReturn postProcess();
-    RkAiqAlgoContext* getAlgoCtx() {
-        return mAlgoCtx;
+    RkAiqAlgoContext* getAlgoCtx() { return mAlgoCtx; }
+    int getAlgoId() { return mDes->id; }
+    int getAlgoType() { return mDes->type; }
+    void setGroupId(int32_t gId) {
+        mGroupId = gId;
     }
-    int getAlgoId() {
-        return mDes->id;
+    int32_t getGroupId() {
+       return mGroupId;
     }
-    int getAlgoType() {
-        return mDes->type;
+    void setGroupShared(void* grp_shared) {
+        mAlogsGroupSharedParams = grp_shared;
     }
-    virtual XCamReturn updateConfig(bool needSync) {
-        return XCAM_RETURN_NO_ERROR;
-    };
-protected:
+    void* getGroupShared() {
+       return mAlogsGroupSharedParams;
+    }
+    virtual XCamReturn updateConfig(bool needSync) { return XCAM_RETURN_NO_ERROR; };
+
+ protected:
     virtual void init() = 0;
     virtual void deInit();
     enum {
@@ -65,40 +66,44 @@ protected:
         RKAIQ_CONFIG_COM_POST,
     };
     virtual XCamReturn configInparamsCom(RkAiqAlgoCom* com, int type);
-    RkAiqAlgoCom*     mConfig;
-    RkAiqAlgoCom*     mPreInParam;
-    RkAiqAlgoResCom*  mPreOutParam;
-    RkAiqAlgoCom*     mProcInParam;
-    RkAiqAlgoResCom*  mProcOutParam;
-    RkAiqAlgoCom*     mPostInParam;
-    RkAiqAlgoResCom*  mPostOutParam;
+    RkAiqAlgoCom* mConfig;
+    RkAiqAlgoCom* mPreInParam;
+    RkAiqAlgoResCom* mPreOutParam;
+    RkAiqAlgoCom* mProcInParam;
+    RkAiqAlgoResCom* mProcOutParam;
+    RkAiqAlgoCom* mPostInParam;
+    RkAiqAlgoResCom* mPostOutParam;
     RkAiqAlgoDesComm* mDes;
     RkAiqAlgoContext* mAlgoCtx;
-    RkAiqCore*        mAiqCore;
-    bool              mEnable;
-    bool              mReConfig;
+    RkAiqCore* mAiqCore;
+    bool mEnable;
+    bool mReConfig;
+    uint32_t mGroupId;
+    void* mAlogsGroupSharedParams;
 };
 
-#define RKAIQHANDLE(algo) \
-    class RkAiq##algo##Handle: virtual public RkAiqHandle { \
-    public: \
+#define RKAIQHANDLE(algo)                                                       \
+    class RkAiq##algo##Handle : virtual public RkAiqHandle {                    \
+     public:                                                                    \
         explicit RkAiq##algo##Handle(RkAiqAlgoDesComm* des, RkAiqCore* aiqCore) \
-                    : RkAiqHandle(des, aiqCore) {}; \
-        virtual ~RkAiq##algo##Handle() { deInit(); }; \
-        virtual XCamReturn prepare(); \
-        virtual XCamReturn preProcess(); \
-        virtual XCamReturn processing(); \
-        virtual XCamReturn postProcess(); \
-    protected: \
-        virtual void init(); \
-        virtual void deInit() { RkAiqHandle::deInit(); }; \
+            : RkAiqHandle(des, aiqCore){};                                      \
+        virtual ~RkAiq##algo##Handle() { deInit(); };                           \
+        virtual XCamReturn prepare();                                           \
+        virtual XCamReturn preProcess();                                        \
+        virtual XCamReturn processing();                                        \
+        virtual XCamReturn postProcess();                                       \
+                                                                                \
+     protected:                                                                 \
+        virtual void init();                                                    \
+        virtual void deInit() { RkAiqHandle::deInit(); };                       \
     }
 
 // define
 RKAIQHANDLE(Ae);
 RKAIQHANDLE(Awb);
 RKAIQHANDLE(Af);
-RKAIQHANDLE(Ahdr);
+RKAIQHANDLE(Amerge);
+RKAIQHANDLE(Atmo);
 RKAIQHANDLE(Anr);
 RKAIQHANDLE(Alsc);
 RKAIQHANDLE(Asharp);
@@ -113,6 +118,7 @@ RKAIQHANDLE(Adebayer);
 RKAIQHANDLE(Adpcc);
 RKAIQHANDLE(Afec);
 RKAIQHANDLE(Agamma);
+RKAIQHANDLE(Adegamma);
 RKAIQHANDLE(Agic);
 RKAIQHANDLE(Aie);
 RKAIQHANDLE(Aldch);
@@ -125,7 +131,10 @@ RKAIQHANDLE(Acnr);
 RKAIQHANDLE(Arawnr);
 RKAIQHANDLE(Adrc);
 RKAIQHANDLE(AdrcV21);
+RKAIQHANDLE(Aeis);
+RKAIQHANDLE(Amd);
+RKAIQHANDLE(Again);
 
-}; //namespace RkCam
+};  // namespace RkCam
 
 #endif

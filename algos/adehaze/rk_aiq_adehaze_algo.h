@@ -22,17 +22,22 @@
 
 #include "rk_aiq_comm.h"
 #include "RkAiqCalibDbTypes.h"
+#include "RkAiqCalibDbV2Helper.h"
 #include "adehaze/rk_aiq_types_adehaze_algo_prvt.h"
 #include "rk_aiq_types_adehaze_stat.h"
+#include "rk_aiq_algo_types_int.h"
 
 
 
 RKAIQ_BEGIN_DECLARE
 
 void AdehazeGetStats(AdehazeHandle_t* pAdehazeCtx, rkisp_adehaze_stats_t* ROData);
-XCamReturn AdehazeInit(AdehazeHandle_t** para, CamCalibDbContext_t* calib);
+XCamReturn AdehazeInit(AdehazeHandle_t** para, CamCalibDbV2Context_t* calib);
 XCamReturn AdehazeRelease(AdehazeHandle_t* para);
-XCamReturn AdehazeProcess(AdehazeHandle_t* para, int iso, int mode, int version);
+XCamReturn AdehazeProcess(AdehazeHandle_t* para, AdehazeVersion_t version);
+bool AdehazeByPassProcessing(AdehazeHandle_t* pAdehazeCtx);
+void AdehazeGetEnvLv(AdehazeHandle_t* pAdehazeCtx, RkAiqAlgoPreResAeInt* pAecPreRes);
+
 
 RKAIQ_END_DECLARE
 

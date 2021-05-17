@@ -788,6 +788,7 @@
 #define CALIB_SENSOR_MFNR_SETTING_NAME                                    "name"
 #define CALIB_SENSOR_MFNR_SETTING_MODE                                    "mode"
 #define CALIB_SENSOR_MFNR_LOCAL_GAIN_EN                                   "local_gain_en"
+#define CALIB_SENSOR_MFNR_MOTION_DETECT_EN                                "motion_detect_en"
 #define CALIB_SENSOR_MFNR_MODE                                            "mode"
 #define CALIB_SENSOR_MFNR_MAX_LEVEL                                       "max_level"
 #define CALIB_SENSOR_MFNR_MAX_LEVEL_UV                                    "max_level_uv"
@@ -950,6 +951,7 @@
 #define CALIB_SENSOR_DEHAZE_ISO_DC_WEITCUR                  "dc_weitcur"
 #define CALIB_SENSOR_DEHAZE_ISO_AIR_THED                    "air_thed"
 #define CALIB_SENSOR_DEHAZE_ISO_AIR_WEITCUR                 "air_weitcur"
+
 /******************************************************************************
  * XML ExpSet section
  *****************************************************************************/
@@ -1001,7 +1003,26 @@
 #define CALIB_EXPSET_EXP_UPDATE_TIME             "time_update"
 #define CALIB_EXPSET_EXP_UPDATE_GAIN             "gain_update"
 #define CALIB_EXPSET_EXP_UPDATE_DCG              "dcg_update"
+/******************************************************************************
+ * XML SENSORINFO section
+ *****************************************************************************/
+#define CALIB_SENSOR_SENSORINFO                             "SENSORINFO"
+#define CALIB_SENSOR_SENSORINFO_GAINRANGE                   "GainRange"
+#define CALIB_SENSOR_SENSORINFO_GAINRANGE_ISLINEAR          "IsLinear"
+#define CALIB_SENSOR_SENSORINFO_GAINRANGE_LINEAR            "Linear"
+#define CALIB_SENSOR_SENSORINFO_GAINRANGE_NONLINEAR         "NonLinear"
+#define CALIB_SENSOR_SENSORINFO_GAINRANGE_NONLINEAR_DB      "DB_MODE"
 
+#define CALIB_SENSOR_SENSORINFO_TIMEFACTOR                  "TimeFactor"
+#define CALIB_SENSOR_SENSORINFO_CISTIMEREG_SUMFAC           "CISTimeRegSumFac"
+#define CALIB_SENSOR_SENSORINFO_CISTIMEREG_ODEVITY          "CISTimeRegOdevity"
+#define CALIB_SENSOR_SENSORINFO_CISTIMEREG_UNEQUALEN        "CISTimeRegUnEqualEn"
+#define CALIB_SENSOR_SENSORINFO_CISTIMEREG_MIN              "CISTimeRegMin"
+#define CALIB_SENSOR_SENSORINFO_CISMINFPS                   "CISMinFps"
+#define CALIB_SENSOR_SENSORINFO_CISAGAIN_RANGE              "CISAgainRange"
+#define CALIB_SENSOR_SENSORINFO_CISEXTRAAGAIN_RANGE         "CISExtraAgainRange"
+#define CALIB_SENSOR_SENSORINFO_CISDGAIN_RANGE              "CISDgainRange"
+#define CALIB_SENSOR_SENSORINFO_CISISPDGAIN_RANGE           "CISIspDgainRange"
 
 /******************************************************************************
  * XML AF section
@@ -1024,6 +1045,7 @@
 #define    CALIB_SENSOR_AF_SEARCH_STRATEGY_ADAPTIVE    "ADAPTIVE_RANGE"
 #define    CALIB_SENSOR_AF_SEARCH_STRATEGY_HILLCLIMB   "HILLCLIMBING"
 #define    CALIB_SENSOR_AF_SEARCH_STRATEGY_FULL        "FULL_RANGE"
+#define    CALIB_SENSOR_AF_SEARCH_STRATEGY_MUTIWIN     "MUTI_WINDOW"
 #define    CALIB_SENSOR_AF_DIR_POSITIVE                "POSITIVE"
 #define    CALIB_SENSOR_AF_DIR_NEGATIVE                "NEGATIVE"
 #define    CALIB_SENSOR_AF_DIR_ADAPTIVE                "ADAPTIVE"
@@ -1063,6 +1085,12 @@
 #define    CALIB_SENSOR_FEC_CORRECT_LEVEL               "correct_level"
 
 /******************************************************************************
+ * XML EIS section
+ *****************************************************************************/
+#define    CALIB_SENSOR_EIS                             "EIS"
+#define    CALIB_SENSOR_EIS_ENABLE                      "enable"
+
+/******************************************************************************
  * XML LUMA DETECT section
  *****************************************************************************/
 #define    CALIB_SENSOR_LUMA_DETECT                     "LUMADETECT"
@@ -1095,6 +1123,16 @@
 *****************************************************************************/
 #define    CALIB_SENSOR_COLOR_AS_GREY                     "COLOR_AS_GREY"
 #define    CALIB_SENSOR_COLOR_AS_GREY_ENABLE              "enable"
+
+/******************************************************************************
+* XML CPROC section
+*****************************************************************************/
+#define    CALIB_SENSOR_CPROC                             "CPROC"
+#define    CALIB_SENSOR_CPROC_ENABLE                      "enable"
+#define    CALIB_SENSOR_CPROC_BRIGHTNESS                  "brightness"
+#define    CALIB_SENSOR_CPROC_CONTRAST                    "contrast"
+#define    CALIB_SENSOR_CPROC_SATURATION                  "saturation"
+#define    CALIB_SENSOR_CPROC_HUE                         "hue"
 
 /******************************************************************************
  * XML system section

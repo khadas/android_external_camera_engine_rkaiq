@@ -14,10 +14,10 @@ RKAIQ_BEGIN_DECLARE
 
 Asharp3_result_t Asharp_Start_V3(Asharp_Context_V3_t *pAsharpCtx);
 
-Asharp3_result_t Asharp_Stop_V3(Asharp_Context_V3_t *pAsharpCtx); 
+Asharp3_result_t Asharp_Stop_V3(Asharp_Context_V3_t *pAsharpCtx);
 
 //anr inint
-Asharp3_result_t Asharp_Init_V3(Asharp_Context_V3_t **ppAsharpCtx, CamCalibDbContext_t *pCalibDb);
+Asharp3_result_t Asharp_Init_V3(Asharp_Context_V3_t **ppAsharpCtx, void *pCalibDb);
 
 //anr release
 Asharp3_result_t Asharp_Release_V3(Asharp_Context_V3_t *pAsharpCtx);

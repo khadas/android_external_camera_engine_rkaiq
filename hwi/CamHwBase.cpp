@@ -56,8 +56,8 @@ CamHwBase::start()
     // subscribe events
     // start devices
     // start pollthread
-    mPollthread->start();
-    mPollLumathread->start();
+//    mPollthread->start();
+//    mPollLumathread->start();
 
     return XCAM_RETURN_NO_ERROR;
 }
@@ -69,8 +69,8 @@ CamHwBase::stop()
     // unsubscribe events
     // stop pollthread
     // stop devices
-    mPollthread->stop();
-    mPollLumathread->stop();
+//    mPollthread->stop();
+//    mPollLumathread->stop();
 
     return XCAM_RETURN_NO_ERROR;
 }
@@ -95,76 +95,26 @@ CamHwBase::getSensorModeData(const char* sns_ent_name,
 }
 
 XCamReturn
-CamHwBase::setIspParams(SmartPtr<RkAiqIspParamsProxy>& ispParams)
+CamHwBase::setHwResListener(HwResListener* resListener)
 {
-    return XCAM_RETURN_NO_ERROR;
-}
-
-XCamReturn
-CamHwBase::setExposureParams(SmartPtr<RkAiqExpParamsProxy>& expPar)
-{
-    return XCAM_RETURN_NO_ERROR;
-}
-
-XCamReturn
-CamHwBase::setIrisParams(SmartPtr<RkAiqIrisParamsProxy>& irisPar, CalibDb_IrisType_t irisType)
-{
-    return XCAM_RETURN_NO_ERROR;
-}
-
-XCamReturn
-CamHwBase::setFocusParams(SmartPtr<RkAiqFocusParamsProxy>& focus_params)
-{
-    return XCAM_RETURN_NO_ERROR;
-}
-
-XCamReturn
-CamHwBase::setIsppParams(SmartPtr<RkAiqIsppParamsProxy>& isppParams)
-{
-    return XCAM_RETURN_NO_ERROR;
-}
-
-XCamReturn
-CamHwBase::setIspLumaListener(IspLumaListener* lumaListener)
-{
-    mIspLumaListener = lumaListener;
-
-    return XCAM_RETURN_NO_ERROR;
-}
-
-XCamReturn
-CamHwBase::setIsppStatsListener(IsppStatsListener* isppStatsListener)
-{
-    mIsppStatsListener = isppStatsListener;
-
-    return XCAM_RETURN_NO_ERROR;
-}
-
-XCamReturn
-CamHwBase::setIspStatsListener(IspStatsListener* statsListener)
-{
-    mIspStatsLintener = statsListener;
-
-    return XCAM_RETURN_NO_ERROR;
-}
-
-XCamReturn
-CamHwBase::setEvtsListener(IspEvtsListener* evtListener)
-{
-    mIspEvtsListener = evtListener;
+    mHwResLintener = resListener;
 
     return XCAM_RETURN_NO_ERROR;
 }
 
 XCamReturn
 CamHwBase::poll_buffer_ready (SmartPtr<VideoBuffer> &buf, int type)
-{
-    if ((type == ISP_POLL_3A_STATS || type == ISPP_POLL_STATS) && mIspStatsLintener) {
-        return mIspStatsLintener->ispStatsCb(buf);
-    }
+{//not used
+    assert(0);
 
-    if (type == ISP_POLL_LUMA && mIspLumaListener) {
-        return mIspLumaListener->ispLumaCb(buf);
+    return XCAM_RETURN_NO_ERROR;
+}
+
+XCamReturn
+CamHwBase::poll_buffer_ready (SmartPtr<VideoBuffer> &buf)
+{
+    if (mHwResLintener) {
+        return mHwResLintener->hwResCb(buf);
     }
 
     return XCAM_RETURN_NO_ERROR;
@@ -177,9 +127,15 @@ CamHwBase::poll_buffer_failed (int64_t timestamp, const char *msg)
     return XCAM_RETURN_ERROR_FAILED;
 }
 
-XCamReturn CamHwBase::setCpslParams(SmartPtr<RkAiqCpslParamsProxy>& cpsl_params)
+XCamReturn
+CamHwBase::poll_event_ready (uint32_t sequence, int type)
 {
     return XCAM_RETURN_NO_ERROR;
 }
 
+XCamReturn
+CamHwBase::poll_event_failed (int64_t timestamp, const char *msg)
+{
+    return XCAM_RETURN_ERROR_FAILED;
+}
 }; //namspace RkCam

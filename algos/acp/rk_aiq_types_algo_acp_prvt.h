@@ -3,11 +3,13 @@
 
 #include "base/xcam_common.h"
 #include "RkAiqCalibDbTypes.h"
+#include "RkAiqCalibDbTypesV2.h"
 #include "xcam_log.h"
 #include "rk_aiq_types_acp_algo.h"
 
 typedef struct AcpContext_s {
     CamCalibDbContext_t* calib;
+    CamCalibDbV2Context_t *calibv2;
     rk_aiq_acp_params_t params;
 } AcpContext_t;
 

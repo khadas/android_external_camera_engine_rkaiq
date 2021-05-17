@@ -26,28 +26,32 @@
 #include "rk_aiq_comm.h"
 #include "RkAiqCalibDbTypes.h"
 #include "asharp3/rk_aiq_types_asharp_algo_v3.h"
+#include "RkAiqCalibDbTypesV2.h"
+#include "RkAiqCalibDbV2Helper.h"
+#include "sharp_head_v3.h"
+
 
 RKAIQ_BEGIN_DECLARE
+#define ASHARPV3_RECALCULATE_DELTA_ISO        (10)
+#define RK_SHARP_V3_PBF_DIAM                    3
+#define RK_SHARP_V3_RF_DIAM                     3
+#define RK_SHARP_V3_BF_DIAM                     3
+#define RK_SHARP_V3_AVG_DIAM                    3
 
-#define	RK_SHARP_V3_PBF_DIAM					3
-#define	RK_SHARP_V3_RF_DIAM						3
-#define	RK_SHARP_V3_BF_DIAM						3
-#define	RK_SHARP_V3_AVG_DIAM					3
+#define RK_SHARP_V3_HF_DIAM                     3
+#define RK_SHARP_V3_MF_DIAM                     5
+#define RK_SHARP_V3_LF_DIAM                     9
+#define RK_SHARP_V3_WGT_FILTER_DIAM             5
 
-#define	RK_SHARP_V3_HF_DIAM						3
-#define	RK_SHARP_V3_MF_DIAM						5
-#define	RK_SHARP_V3_LF_DIAM						9
-#define	RK_SHARP_V3_WGT_FILTER_DIAM				5
+#define rk_sharp_V3_sharp_ratio_fix_bits        2
+#define rk_sharp_V3_gaus_ratio_fix_bits         7
+#define rk_sharp_V3_bf_ratio_fix_bits           7
+#define rk_sharp_V3_pbfCoeff_fix_bits           7
+#define rk_sharp_V3_rfCoeff_fix_bits            7
+#define rk_sharp_V3_hbfCoeff_fix_bits           7
 
-#define rk_sharp_V3_sharp_ratio_fix_bits		2
-#define rk_sharp_V3_gaus_ratio_fix_bits			7
-#define rk_sharp_V3_bf_ratio_fix_bits			7
-#define rk_sharp_V3_pbfCoeff_fix_bits			7
-#define	rk_sharp_V3_rfCoeff_fix_bits			7
-#define	rk_sharp_V3_hbfCoeff_fix_bits			7		
-
-#define INTERP_V3(x0, x1, ratio)			((ratio) * ((x1) - (x0)) + x0)
-#define CLIP(a, min_v, max_v)			    (((a) < (min_v)) ? (min_v) : (((a) > (max_v)) ? (max_v) : (a)))
+#define INTERP_V3(x0, x1, ratio)            ((ratio) * ((x1) - (x0)) + x0)
+#define CLIP(a, min_v, max_v)               (((a) < (min_v)) ? (min_v) : (((a) > (max_v)) ? (max_v) : (a)))
 
 
 #if 1
@@ -82,7 +86,7 @@ typedef enum Asharp3_OPMode_e {
 } Asharp3_OPMode_t;
 
 typedef enum Asharp3_ParamMode_e {
-	ASHARP3_PARAM_MODE_INVALID           = 0, 
+    ASHARP3_PARAM_MODE_INVALID           = 0,
     ASHARP3_PARAM_MODE_NORMAL          = 1,                   /**< initialization value */
     ASHARP3_PARAM_MODE_HDR              = 2,                   /**< instance is created, but not initialized */
     ASHARP3_PARAM_MODE_GRAY            = 3,                   /**< instance is confiured (ready to start) or stopped */
@@ -97,103 +101,103 @@ typedef struct Asharp3_ExpInfo_s {
     float arAGain[3];
     float arDGain[3];
     int   arIso[3];
-	int   snr_mode;
-	int rawWidth;
-	int rawHeight;
+    int   snr_mode;
+    int rawWidth;
+    int rawHeight;
 } Asharp3_ExpInfo_t;
 
 
 typedef struct RK_SHARP_Params_V3_s
 {
-	int enable;
+    int enable;
 
-	int iso[RK_SHARP_V3_MAX_ISO_NUM];
-	short luma_point		[RK_SHARP_V3_LUMA_POINT_NUM];
-	short luma_sigma		[RK_SHARP_V3_MAX_ISO_NUM][RK_SHARP_V3_LUMA_POINT_NUM];
-	float pbf_gain			[RK_SHARP_V3_MAX_ISO_NUM];
-	float pbf_add			[RK_SHARP_V3_MAX_ISO_NUM];
-	float pbf_ratio			[RK_SHARP_V3_MAX_ISO_NUM];
-	float gaus_ratio		[RK_SHARP_V3_MAX_ISO_NUM];
-	float sharp_ratio		[RK_SHARP_V3_MAX_ISO_NUM];
-	short lum_clip_h		[RK_SHARP_V3_MAX_ISO_NUM][RK_SHARP_V3_LUMA_POINT_NUM];
-	float bf_gain			[RK_SHARP_V3_MAX_ISO_NUM];
-	float bf_add			[RK_SHARP_V3_MAX_ISO_NUM];
-	float bf_ratio			[RK_SHARP_V3_MAX_ISO_NUM];
-	short ehf_th			[RK_SHARP_V3_MAX_ISO_NUM][RK_SHARP_V3_LUMA_POINT_NUM];
+    int iso[RK_SHARP_V3_MAX_ISO_NUM];
+    short luma_point        [RK_SHARP_V3_LUMA_POINT_NUM];
+    short luma_sigma        [RK_SHARP_V3_MAX_ISO_NUM][RK_SHARP_V3_LUMA_POINT_NUM];
+    float pbf_gain          [RK_SHARP_V3_MAX_ISO_NUM];
+    float pbf_add           [RK_SHARP_V3_MAX_ISO_NUM];
+    float pbf_ratio         [RK_SHARP_V3_MAX_ISO_NUM];
+    float gaus_ratio        [RK_SHARP_V3_MAX_ISO_NUM];
+    float sharp_ratio       [RK_SHARP_V3_MAX_ISO_NUM];
+    short lum_clip_h        [RK_SHARP_V3_MAX_ISO_NUM][RK_SHARP_V3_LUMA_POINT_NUM];
+    float bf_gain           [RK_SHARP_V3_MAX_ISO_NUM];
+    float bf_add            [RK_SHARP_V3_MAX_ISO_NUM];
+    float bf_ratio          [RK_SHARP_V3_MAX_ISO_NUM];
+    short ehf_th            [RK_SHARP_V3_MAX_ISO_NUM][RK_SHARP_V3_LUMA_POINT_NUM];
 
-	float kernel_pre_bila_filter[RK_SHARP_V3_MAX_ISO_NUM][RK_SHARP_V3_PBF_DIAM * RK_SHARP_V3_PBF_DIAM];
-	float kernel_range_filter	[RK_SHARP_V3_MAX_ISO_NUM][RK_SHARP_V3_RF_DIAM * RK_SHARP_V3_RF_DIAM];
-	float kernel_bila_filter	[RK_SHARP_V3_MAX_ISO_NUM][RK_SHARP_V3_BF_DIAM * RK_SHARP_V3_BF_DIAM];
+    float kernel_pre_bila_filter[RK_SHARP_V3_MAX_ISO_NUM][RK_SHARP_V3_PBF_DIAM * RK_SHARP_V3_PBF_DIAM];
+    float kernel_range_filter   [RK_SHARP_V3_MAX_ISO_NUM][RK_SHARP_V3_RF_DIAM * RK_SHARP_V3_RF_DIAM];
+    float kernel_bila_filter    [RK_SHARP_V3_MAX_ISO_NUM][RK_SHARP_V3_BF_DIAM * RK_SHARP_V3_BF_DIAM];
 
-	#if 1
-	//////////////////////////////////////////////////////////////////////////
-	// test params
-	float sharp_ratio_h		[RK_SHARP_V3_MAX_ISO_NUM];
-	float sharp_ratio_m		[RK_SHARP_V3_MAX_ISO_NUM];
-	float sharp_ratio_l		[RK_SHARP_V3_MAX_ISO_NUM];
-	short clip_hf			[RK_SHARP_V3_MAX_ISO_NUM][RK_SHARP_V3_LUMA_POINT_NUM];
-	short clip_mf			[RK_SHARP_V3_MAX_ISO_NUM][RK_SHARP_V3_LUMA_POINT_NUM];
-	short clip_lf			[RK_SHARP_V3_MAX_ISO_NUM][RK_SHARP_V3_LUMA_POINT_NUM];
-	short local_wgt			[RK_SHARP_V3_MAX_ISO_NUM][RK_SHARP_V3_LUMA_POINT_NUM];
+#if 1
+    //////////////////////////////////////////////////////////////////////////
+    // test params
+    float sharp_ratio_h     [RK_SHARP_V3_MAX_ISO_NUM];
+    float sharp_ratio_m     [RK_SHARP_V3_MAX_ISO_NUM];
+    float sharp_ratio_l     [RK_SHARP_V3_MAX_ISO_NUM];
+    short clip_hf           [RK_SHARP_V3_MAX_ISO_NUM][RK_SHARP_V3_LUMA_POINT_NUM];
+    short clip_mf           [RK_SHARP_V3_MAX_ISO_NUM][RK_SHARP_V3_LUMA_POINT_NUM];
+    short clip_lf           [RK_SHARP_V3_MAX_ISO_NUM][RK_SHARP_V3_LUMA_POINT_NUM];
+    short local_wgt         [RK_SHARP_V3_MAX_ISO_NUM][RK_SHARP_V3_LUMA_POINT_NUM];
 
-	short kernel_hf_filter	[RK_SHARP_V3_MAX_ISO_NUM][RK_SHARP_V3_HF_DIAM * RK_SHARP_V3_HF_DIAM];
-	short kernel_mf_filter	[RK_SHARP_V3_MAX_ISO_NUM][RK_SHARP_V3_MF_DIAM * RK_SHARP_V3_MF_DIAM];
-	short kernel_lf_filter	[RK_SHARP_V3_MAX_ISO_NUM][RK_SHARP_V3_LF_DIAM * RK_SHARP_V3_LF_DIAM];
-	#endif
-	
-}RK_SHARP_Params_V3_t;
+    short kernel_hf_filter  [RK_SHARP_V3_MAX_ISO_NUM][RK_SHARP_V3_HF_DIAM * RK_SHARP_V3_HF_DIAM];
+    short kernel_mf_filter  [RK_SHARP_V3_MAX_ISO_NUM][RK_SHARP_V3_MF_DIAM * RK_SHARP_V3_MF_DIAM];
+    short kernel_lf_filter  [RK_SHARP_V3_MAX_ISO_NUM][RK_SHARP_V3_LF_DIAM * RK_SHARP_V3_LF_DIAM];
+#endif
+
+} RK_SHARP_Params_V3_t;
 
 typedef struct RK_SHARP_Params_V3_Select_s
 {
-	int enable;
-	
-	short luma_point	[RK_SHARP_V3_LUMA_POINT_NUM];
-	short luma_sigma	[RK_SHARP_V3_LUMA_POINT_NUM];
-	float pbf_gain		;
-	float pbf_add		;
-	float pbf_ratio		;
-	float gaus_ratio	;
-	float sharp_ratio	;
-	short lum_clip_h	[RK_SHARP_V3_LUMA_POINT_NUM];
-	float bf_gain		;
-	float bf_add		;
-	float bf_ratio		;
-	short ehf_th		[RK_SHARP_V3_LUMA_POINT_NUM];
+    int enable;
 
-	float kernel_pre_bila_filter[RK_SHARP_V3_PBF_DIAM * RK_SHARP_V3_PBF_DIAM];
-	float kernel_range_filter	[RK_SHARP_V3_RF_DIAM * RK_SHARP_V3_RF_DIAM];
-	float kernel_bila_filter	[RK_SHARP_V3_BF_DIAM * RK_SHARP_V3_BF_DIAM];
+    short luma_point    [RK_SHARP_V3_LUMA_POINT_NUM];
+    short luma_sigma    [RK_SHARP_V3_LUMA_POINT_NUM];
+    float pbf_gain      ;
+    float pbf_add       ;
+    float pbf_ratio     ;
+    float gaus_ratio    ;
+    float sharp_ratio   ;
+    short lum_clip_h    [RK_SHARP_V3_LUMA_POINT_NUM];
+    float bf_gain       ;
+    float bf_add        ;
+    float bf_ratio      ;
+    short ehf_th        [RK_SHARP_V3_LUMA_POINT_NUM];
 
-	#if 1
-	//////////////////////////////////////////////////////////////////////////
-	// test params
-	float sharp_ratio_h		;
-	float sharp_ratio_m		;
-	float sharp_ratio_l		;
-	short clip_hf			[RK_SHARP_V3_LUMA_POINT_NUM];
-	short clip_mf			[RK_SHARP_V3_LUMA_POINT_NUM];
-	short clip_lf			[RK_SHARP_V3_LUMA_POINT_NUM];
-	short local_wgt			[RK_SHARP_V3_LUMA_POINT_NUM];
+    float kernel_pre_bila_filter[RK_SHARP_V3_PBF_DIAM * RK_SHARP_V3_PBF_DIAM];
+    float kernel_range_filter   [RK_SHARP_V3_RF_DIAM * RK_SHARP_V3_RF_DIAM];
+    float kernel_bila_filter    [RK_SHARP_V3_BF_DIAM * RK_SHARP_V3_BF_DIAM];
 
-	short kernel_hf_filter	[RK_SHARP_V3_HF_DIAM * RK_SHARP_V3_HF_DIAM];
-	short kernel_mf_filter	[RK_SHARP_V3_MF_DIAM * RK_SHARP_V3_MF_DIAM];
-	short kernel_lf_filter	[RK_SHARP_V3_LF_DIAM * RK_SHARP_V3_LF_DIAM];
-	#endif
-	
-}RK_SHARP_Params_V3_Select_t;
+#if 1
+    //////////////////////////////////////////////////////////////////////////
+    // test params
+    float sharp_ratio_h     ;
+    float sharp_ratio_m     ;
+    float sharp_ratio_l     ;
+    short clip_hf           [RK_SHARP_V3_LUMA_POINT_NUM];
+    short clip_mf           [RK_SHARP_V3_LUMA_POINT_NUM];
+    short clip_lf           [RK_SHARP_V3_LUMA_POINT_NUM];
+    short local_wgt         [RK_SHARP_V3_LUMA_POINT_NUM];
+
+    short kernel_hf_filter  [RK_SHARP_V3_HF_DIAM * RK_SHARP_V3_HF_DIAM];
+    short kernel_mf_filter  [RK_SHARP_V3_MF_DIAM * RK_SHARP_V3_MF_DIAM];
+    short kernel_lf_filter  [RK_SHARP_V3_LF_DIAM * RK_SHARP_V3_LF_DIAM];
+#endif
+
+} RK_SHARP_Params_V3_Select_t;
 
 
 typedef struct Asharp_Manual_Attr_V3_s
 {
-	RK_SHARP_Params_V3_Select_t stSelect;
-	
+    RK_SHARP_Params_V3_Select_t stSelect;
+
 } Asharp_Manual_Attr_V3_t;
 
 typedef struct Asharp_Auto_Attr_V3_s
 {
     //all ISO params and select param
 
-	RK_SHARP_Params_V3_t stParams;
+    RK_SHARP_Params_V3_t stParams;
     RK_SHARP_Params_V3_Select_t stSelect;
 
 } Asharp_Auto_Attr_V3_t;
@@ -206,15 +210,17 @@ typedef struct Asharp_ProcResult_V3_s {
 
     //for hw register
     RK_SHARP_Fix_V3_t stFix;
-	
+
+    bool isNeedUpdate;
+
 } Asharp_ProcResult_V3_t;
 
 
 typedef struct Asharp_Config_V3_s {
     Asharp3_State_t eState;
     Asharp3_OPMode_t eMode;
-	int rawHeight;
-	int rawWidth;
+    int rawHeight;
+    int rawWidth;
 } Asharp_Config_V3_t;
 
 
@@ -226,7 +232,7 @@ typedef struct rk_aiq_sharp_attrib_v3_s {
 
 
 typedef struct rk_aiq_sharp_IQPara_V3_s {
-	struct list_head* listHead;
+    struct list_head* listHead;
 } rk_aiq_sharp_IQPara_V3_t;
 
 

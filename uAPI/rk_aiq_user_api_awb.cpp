@@ -28,7 +28,9 @@ RKAIQ_BEGIN_DECLARE
 XCamReturn
 rk_aiq_user_api_awb_SetAttrib(const rk_aiq_sys_ctx_t* sys_ctx, rk_aiq_wb_attrib_t attr)
 {
+    CHECK_USER_API_ENABLE2(sys_ctx);
     CHECK_USER_API_ENABLE(RK_AIQ_ALGO_TYPE_AWB);
+    RKAIQ_API_SMART_LOCK(sys_ctx);
     RkAiqAwbHandleInt* algo_handle =
         algoHandle<RkAiqAwbHandleInt>(sys_ctx, RK_AIQ_ALGO_TYPE_AWB);
 
@@ -42,6 +44,7 @@ rk_aiq_user_api_awb_SetAttrib(const rk_aiq_sys_ctx_t* sys_ctx, rk_aiq_wb_attrib_
 XCamReturn
 rk_aiq_user_api_awb_GetAttrib(const rk_aiq_sys_ctx_t* sys_ctx, rk_aiq_wb_attrib_t *attr)
 {
+    RKAIQ_API_SMART_LOCK(sys_ctx);
     RkAiqAwbHandleInt* algo_handle =
         algoHandle<RkAiqAwbHandleInt>(sys_ctx, RK_AIQ_ALGO_TYPE_AWB);
 
@@ -55,6 +58,7 @@ rk_aiq_user_api_awb_GetAttrib(const rk_aiq_sys_ctx_t* sys_ctx, rk_aiq_wb_attrib_
 XCamReturn
 rk_aiq_user_api_awb_GetCCT(const rk_aiq_sys_ctx_t* sys_ctx, rk_aiq_wb_cct_t *cct)
 {
+    RKAIQ_API_SMART_LOCK(sys_ctx);
     RkAiqAwbHandleInt* algo_handle =
         algoHandle<RkAiqAwbHandleInt>(sys_ctx, RK_AIQ_ALGO_TYPE_AWB);
 
@@ -68,6 +72,7 @@ rk_aiq_user_api_awb_GetCCT(const rk_aiq_sys_ctx_t* sys_ctx, rk_aiq_wb_cct_t *cct
 XCamReturn
 rk_aiq_user_api_awb_QueryWBInfo(const rk_aiq_sys_ctx_t* sys_ctx, rk_aiq_wb_querry_info_t *wb_querry_info)
 {
+    RKAIQ_API_SMART_LOCK(sys_ctx);
     RkAiqAwbHandleInt* algo_handle =
         algoHandle<RkAiqAwbHandleInt>(sys_ctx, RK_AIQ_ALGO_TYPE_AWB);
 
@@ -81,6 +86,7 @@ rk_aiq_user_api_awb_QueryWBInfo(const rk_aiq_sys_ctx_t* sys_ctx, rk_aiq_wb_querr
 XCamReturn
 rk_aiq_user_api_awb_Lock(const rk_aiq_sys_ctx_t* sys_ctx)
 {
+    RKAIQ_API_SMART_LOCK(sys_ctx);
     RkAiqAwbHandleInt* algo_handle =
         algoHandle<RkAiqAwbHandleInt>(sys_ctx, RK_AIQ_ALGO_TYPE_AWB);
 
@@ -94,6 +100,7 @@ rk_aiq_user_api_awb_Lock(const rk_aiq_sys_ctx_t* sys_ctx)
 XCamReturn
 rk_aiq_user_api_awb_Unlock(const rk_aiq_sys_ctx_t* sys_ctx)
 {
+    RKAIQ_API_SMART_LOCK(sys_ctx);
     RkAiqAwbHandleInt* algo_handle =
         algoHandle<RkAiqAwbHandleInt>(sys_ctx, RK_AIQ_ALGO_TYPE_AWB);
 

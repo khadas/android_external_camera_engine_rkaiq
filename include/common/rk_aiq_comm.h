@@ -28,6 +28,8 @@
 #define RKAIQ_END_DECLARE
 #endif
 
+RKAIQ_BEGIN_DECLARE
+
 typedef enum {
     BOOL_FALSE = 0,
     BOOL_TRUE = (!BOOL_FALSE)
@@ -80,7 +82,7 @@ typedef enum RKAiqOPMode_e {
 #define CLIPBIT(a,b) ((a)>((1<<(b))-1)?((1<<(b))-1):(a))
 #define SWAP(_T_,A,B)                   { _T_ tmp = (A); (A) = (B); (B) = tmp; }
 #define MIN2(a, b) ((a) > (b) ? (b) : (a))
-#define CLIP(a, min_v, max_v)			    (((a) < (min_v)) ? (min_v) : (((a) > (max_v)) ? (max_v) : (a)))
+#define CLIP(a, min_v, max_v)               (((a) < (min_v)) ? (min_v) : (((a) > (max_v)) ? (max_v) : (a)))
 
 
 #define RETURN_RESULT_IF_DIFFERENT( cur_res, exp_res ) if ( exp_res != cur_res ) { return ( cur_res ); }
@@ -122,8 +124,14 @@ typedef struct Cam5x5UCharMatrix_s {
     uint8_t uCoeff[5 * 5];            /**< array of 5x5 unsigned char values */
 } Cam5x5UCharMatrix_t;
 
+typedef struct Cam15x15UCharMatrix_s {
+    uint8_t uCoeff[15 * 15];            /**< array of 15x15 unsigned char values */
+} Cam15x15UCharMatrix_t;
+
+
 typedef struct Cam1x3IntMatrix_s
 {
+    // M4_ARRAY_DESC("Coeff", "s32", M4_SIZE(1,3), M4_RANGE(-65535,65535), "0", M4_DIGIT(0), M4_DYNAMIC(0))
     int Coeff[3];
 } Cam1x3IntMatrix_t;
 
@@ -194,6 +202,7 @@ typedef struct Cam1x1FloatMatrix_s {
  */
 /*****************************************************************************/
 typedef struct Cam1x3FloatMatrix_s {
+    // M4_ARRAY_DESC("fCoeff", "f32", M4_SIZE(1,3), M4_RANGE(-65535,65535), "0", M4_DIGIT(6), M4_DYNAMIC(0))
     float fCoeff[3];
 } Cam1x3FloatMatrix_t;
 
@@ -207,6 +216,7 @@ typedef struct Cam1x3FloatMatrix_s {
  */
 /*****************************************************************************/
 typedef struct Cam1x4FloatMatrix_s {
+    // M4_ARRAY_DESC("fCoeff", "f32", M4_SIZE(1,4), M4_RANGE(-65535,65535), "0", M4_DIGIT(6), M4_DYNAMIC(0))
     float fCoeff[4];
 } Cam1x4FloatMatrix_t;
 
@@ -261,6 +271,7 @@ typedef struct Cam1x16FloatMatrix_s {
  */
 /*****************************************************************************/
 typedef struct Cam2x1FloatMatrix {
+    // M4_ARRAY_DESC("fCoeff", "f32", M4_SIZE(1,2), M4_RANGE(-65535,65535), "0", M4_DIGIT(6), M4_DYNAMIC(0))
     float fCoeff[2];
 } Cam2x1FloatMatrix_t;
 
@@ -369,6 +380,7 @@ typedef struct Cam17x17FloatMatrix_s {
  */
 /*****************************************************************************/
 typedef struct Cam1x3ShortMatrix_s {
+    // M4_ARRAY_DESC("fCoeff", "s16", M4_SIZE(1,3), M4_RANGE(-65535,65535), "0", M4_DIGIT(0), M4_DYNAMIC(0))
     int16_t Coeff[3];
 } Cam1x3ShortMatrix_t;
 
@@ -414,6 +426,7 @@ typedef struct Cam1x17UShortMatrix_s {
  */
 /*****************************************************************************/
 typedef struct Cam17x17UShortMatrix_s {
+    // M4_ARRAY_DESC("uCoeff", "u16", M4_SIZE(17,17), M4_RANGE(0,10000), "1024", M4_DIGIT(0), M4_DYNAMIC(0))
     uint16_t uCoeff[17 * 17];
 } Cam17x17UShortMatrix_t;
 
@@ -469,16 +482,15 @@ typedef enum {
     RK_MODULE_MAX
 } rk_aiq_module_id_t;
 
-struct rk_aiq_vbuf_info {
-    uint32_t frame_id;
-    uint32_t timestamp;
-    uint32_t exp_time;
-    uint32_t exp_gain;
-    uint8_t *data_addr;
-    uint32_t data_length;
-};
-struct rk_aiq_vbuf {
-    struct rk_aiq_vbuf_info buf_info[3];/*index: 0-short,1-medium,2-long*/
-};
+
+extern int g_rkaiq_isp_hw_ver;
+
+#define CHECK_ISP_HW_V20() \
+    (g_rkaiq_isp_hw_ver == 20 ? true : false)
+
+#define CHECK_ISP_HW_V21() \
+    (g_rkaiq_isp_hw_ver == 21 ? true : false)
+
+RKAIQ_END_DECLARE
 
 #endif

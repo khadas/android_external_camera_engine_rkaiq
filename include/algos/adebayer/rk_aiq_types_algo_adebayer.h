@@ -18,6 +18,7 @@ typedef struct AdebayerConfig_s{
     unsigned char shift_num;
     unsigned char order_max;
     unsigned char order_min;
+             bool updatecfg;
 }AdebayerConfig_t;
 
 typedef struct AdebayerProcResult_s{

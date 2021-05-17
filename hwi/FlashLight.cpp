@@ -17,7 +17,7 @@
 
 #include "FlashLight.h"
 #include "xcam_log.h"
-#include "rk-led-flash.h"
+#include "linux/rk-led-flash.h"
 
 namespace RkCam {
 

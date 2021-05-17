@@ -15,6 +15,8 @@ AsharpResult_t AsharpStart(AsharpContext_t *pAsharpCtx);
 
 AsharpResult_t AsharpStop(AsharpContext_t *pAsharpCtx);
 
+AsharpResult_t AsharpIQParaUpdate(AsharpContext_t *pAsharpCtx);
+
 AsharpResult_t AsharpInit(AsharpContext_t **ppAsharpCtx, CamCalibDbContext_t *pCalibDb);
 
 AsharpResult_t AsharpRelease(AsharpContext_t *pAsharpCtx);
@@ -34,6 +36,10 @@ AsharpResult_t Asharp_fix_Printf(RKAsharp_Sharp_HW_Fix_t  * pSharpCfg, RKAsharp_
 AsharpResult_t ASharpConfigSettingParam(AsharpContext_t *pAsharpCtx, AsharpParamMode_t param_mode, int snr_mode);
 
 AsharpResult_t AsharpParamModeProcess(AsharpContext_t *pAsharpCtx, AsharpExpInfo_t *pExpInfo, AsharpParamMode_t *mode);
+
+AsharpResult_t ASharpConfigSettingParam_json(AsharpContext_t *pAsharpCtx, AsharpParamMode_t param_mode, int snr_mode);
+
+AsharpResult_t AsharpInit_json(AsharpContext_t **ppAsharpCtx, CamCalibDbV2Context_t *pCalibDbV2);
 
 RKAIQ_END_DECLARE
 

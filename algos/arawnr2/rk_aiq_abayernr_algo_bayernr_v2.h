@@ -40,6 +40,19 @@ Abayernr_result_t bayernr2D_fix_printf_V2(RK_Bayernr_2D_Fix_V2_t * pFix);
 
 Abayernr_result_t bayernr3D_fix_printf_V2(RK_Bayernr_3D_Fix_V2_t * pFix);
 
+Abayernr_result_t bayernr2D_get_setting_by_name_json_V2(CalibDbV2_BayerNrV2_t* pCalibdb, char *name, int *calib_idx, int *tuning_idx);
+
+Abayernr_result_t bayernr2D_init_params_json_V2(RK_Bayernr_2D_Params_V2_t *pParams, CalibDbV2_BayerNrV2_t* pCalibdb, int calib_idx, int tuning_idx);
+
+Abayernr_result_t bayernr2D_config_setting_param_json_V2(RK_Bayernr_2D_Params_V2_t *pParams, CalibDbV2_BayerNrV2_t* pCalibdbV2, char* param_mode, char * snr_name);
+
+Abayernr_result_t bayernr3D_get_setting_by_name_json_V2(CalibDbV2_BayerNrV2_t* pCalibdb, char *name, int *calib_idx, int *tuning_idx);
+
+Abayernr_result_t bayernr3D_init_params_json_V2(RK_Bayernr_3D_Params_V2_t *pParams, CalibDbV2_BayerNrV2_t* pCalibdb, int calib_idx, int tuning_idx);
+
+Abayernr_result_t bayernr3D_config_setting_param_json_V2(RK_Bayernr_3D_Params_V2_t *pParams, CalibDbV2_BayerNrV2_t* pCalibdbV2, char* param_mode, char * snr_name);
+
+
 XCAM_END_DECLARE
 
 

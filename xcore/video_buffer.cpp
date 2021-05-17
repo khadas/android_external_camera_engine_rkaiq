@@ -49,13 +49,32 @@ VideoBufferInfo::init (
     uint32_t format,
     uint32_t width, uint32_t height,
     uint32_t aligned_width, uint32_t aligned_height,
-    uint32_t size)
+    uint32_t size, bool compacted)
 {
 
     XCamVideoBufferInfo *info = this;
 
     return (xcam_video_buffer_info_reset (
-                info, format, width, height, aligned_width, aligned_height, size) == XCAM_RETURN_NO_ERROR);
+                info, format, width, height, aligned_width, aligned_height, size, compacted) == XCAM_RETURN_NO_ERROR);
+}
+
+bool
+VideoBufferInfo::fill (const XCamVideoBufferInfo &info)
+{
+	format = info.format;
+	color_bits = info.color_bits;
+	width = info.width;
+	height = info.height;
+	aligned_width = info.aligned_width;
+	aligned_height = info.aligned_height;
+	size = info.size;
+	components = info.components;
+	for (int i = 0; i < XCAM_VIDEO_MAX_COMPONENTS; i++) {
+		strides[i] = info.strides[i];
+		offsets[i] = info.offsets[i];
+	}
+
+	return true;
 }
 
 bool

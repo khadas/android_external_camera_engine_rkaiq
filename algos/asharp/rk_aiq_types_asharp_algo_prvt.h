@@ -24,6 +24,8 @@
 #include "RkAiqCalibDbTypes.h"
 #include "xcam_log.h"
 #include "xcam_common.h"
+#include "RkAiqCalibDbTypesV2.h"
+#include "RkAiqCalibDbV2Helper.h"
 
 RKAIQ_BEGIN_DECLARE
 
@@ -63,14 +65,22 @@ typedef struct AsharpContext_s {
     Asharp_Manual_Attr_t stManual;
 
     //xml
-    CalibDb_Sharp_t stSharpCalib;
-    CalibDb_EdgeFilter_t stEdgeFltCalib;
+    CalibDb_Sharp_2_t stSharpCalib;
+    CalibDb_EdgeFilter_2_t stEdgeFltCalib;
 
     float fStrength;
 
 	bool isIQParaUpdate;
 	bool isGrayMode;
 	AsharpParamMode_t eParamMode;
+
+	int prepare_type;
+	int mfnr_mode_3to1;
+
+	//json
+	CalibDbV2_Edgefilter_t edgefilter_v1;	
+	CalibDbV2_SharpV1_t sharp_v1;
+	
 } AsharpContext_t;
 
 

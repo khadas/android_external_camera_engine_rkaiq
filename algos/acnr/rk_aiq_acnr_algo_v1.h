@@ -14,10 +14,10 @@ RKAIQ_BEGIN_DECLARE
 
 Acnr_result_t Acnr_Start_V1(Acnr_Context_V1_t *pAcnrCtx);
 
-Acnr_result_t Acnr_Stop_V1(Acnr_Context_V1_t *pAcnrCtx); 
+Acnr_result_t Acnr_Stop_V1(Acnr_Context_V1_t *pAcnrCtx);
 
 //anr inint
-Acnr_result_t Acnr_Init_V1(Acnr_Context_V1_t **ppAcnrCtx, CamCalibDbContext_t *pCalibDb);
+Acnr_result_t Acnr_Init_V1(Acnr_Context_V1_t **ppAcnrCtx, void *pCalibDb);
 
 //anr release
 Acnr_result_t Acnr_Release_V1(Acnr_Context_V1_t *pAcnrCtx);

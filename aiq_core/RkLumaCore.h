@@ -27,6 +27,7 @@
 #include "video_buffer.h"
 #include "rk_aiq_luma.h"
 #include "RkAiqCalibDbTypes.h"
+#include "rk_aiq_types.h"
 
 using namespace XCam;
 namespace RkCam {
@@ -45,7 +46,7 @@ class RkLumaAnalyzerCb {
 public:
     explicit RkLumaAnalyzerCb() {};
     virtual ~RkLumaAnalyzerCb() {};
-    virtual void rkLumaCalcDone(int frame_id, int count) = 0;
+    virtual void rkLumaCalcDone(rk_aiq_luma_params_t luma_params) = 0;
     virtual void rkLumaCalcFailed(const char* msg) = 0;
 private:
     XCAM_DEAD_COPY (RkLumaAnalyzerCb);
@@ -66,6 +67,7 @@ public:
     };
 
     void triger_start() {
+        mStatsQueue.clear ();
         mStatsQueue.resume_pop ();
     };
 
@@ -98,7 +100,7 @@ public:
     }
 
     // called only once
-    XCamReturn init(const CalibDb_LUMA_DETECT_t* lumaDetect);
+    XCamReturn init(const CalibDbV2_LUMA_DETECT_t* lumaDetect);
     // called only once
     XCamReturn deInit();
     // start analyze thread
@@ -126,7 +128,7 @@ private:
     RkLumaAnalyzerCb* mCb;
     SmartPtr<RkLumaCoreThread> mRkLumaCoreTh;
     SafeList<isp_luma_stat_t> mLumaQueueFIFO;
-    const CalibDb_LUMA_DETECT_t* calib;
+    const CalibDbV2_LUMA_DETECT_t* calib;
 
     static uint16_t DEFAULT_POOL_SIZE;
 };

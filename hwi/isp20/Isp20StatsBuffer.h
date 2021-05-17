@@ -22,6 +22,8 @@
 
 #include "rk_aiq_pool.h"
 #include "v4l2_buffer_proxy.h"
+#include "ICamHw.h"
+#include "SensorHw.h"
 
 using namespace XCam;
 
@@ -32,20 +34,20 @@ class Isp20StatsBuffer
 public:
     explicit Isp20StatsBuffer(SmartPtr<V4l2Buffer> buf,
                               SmartPtr<V4l2Device> &device,
-                              SmartPtr<RkAiqIspParamsProxy> IspParams,
-                              SmartPtr<RkAiqExpParamsProxy> ExpParams,
+                              SmartPtr<BaseSensorHw> sensor,
+                              ICamHw *camHw,
                               SmartPtr<RkAiqAfInfoProxy> AfParams,
                               SmartPtr<RkAiqIrisParamsProxy> IrisParams);
     virtual ~Isp20StatsBuffer() {};
 
-    SmartPtr<RkAiqExpParamsProxy>& get_exp_params () {
-        // XCAM_ASSERT (_expParams.ptr ());
-        return _expParams;
+    XCamReturn getEffectiveExpParams (uint32_t frameId, SmartPtr<RkAiqExpParamsProxy>& expParams) {
+        XCAM_ASSERT (mSensor.ptr ());
+        return mSensor->getEffectiveExpParams(expParams, frameId);
     }
 
-    SmartPtr<RkAiqIspParamsProxy>& get_isp_params () {
-        // XCAM_ASSERT (_ispParams.ptr ());
-        return _ispParams;
+    XCamReturn getEffectiveIspParams(uint32_t frameId, rkisp_effect_params_v20& ispParams) {
+        XCAM_ASSERT (mCamHw);
+        return mCamHw->getEffectiveIspParams(ispParams, frameId);
     }
 
     SmartPtr<RkAiqAfInfoProxy>& get_af_params () {
@@ -55,13 +57,37 @@ public:
     SmartPtr<RkAiqIrisParamsProxy>& get_iris_params () {
         return _irisParams;
     }
-
 private:
     XCAM_DEAD_COPY(Isp20StatsBuffer);
-    SmartPtr<RkAiqExpParamsProxy> _expParams;
-    SmartPtr<RkAiqIspParamsProxy> _ispParams;
+    SmartPtr<BaseSensorHw> mSensor;
+    ICamHw *mCamHw;
     SmartPtr<RkAiqAfInfoProxy> _afParams;
     SmartPtr<RkAiqIrisParamsProxy> _irisParams;
+};
+
+class SofEventData : public BufferData
+{
+public:
+    explicit SofEventData () {}
+    ~SofEventData() {}
+    virtual uint8_t *map () {return NULL;}
+    virtual bool unmap () {return false;}
+    int64_t _timestamp;
+    int _frameid;
+};
+
+class SofEventBuffer
+    : public BufferProxy {
+public:
+    explicit SofEventBuffer(SmartPtr<SofEventData> &buf,
+                              SmartPtr<V4l2Device> &device);
+    virtual ~SofEventBuffer() {};
+    SmartPtr<SofEventData> get_data();
+private:
+    XCAM_DEAD_COPY(SofEventBuffer);
+    //SmartPtr<RkAiqSofInfoProxy> _sofParams;
+    //SmartPtr<RKAiqSofInfo_t> _sofInfo;
+    //SmartPtr<SofEventData> _event_data;
 };
 }
 

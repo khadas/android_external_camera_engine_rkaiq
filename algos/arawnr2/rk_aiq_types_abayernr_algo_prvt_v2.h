@@ -28,29 +28,29 @@
 //RKAIQ_BEGIN_DECLARE
 
 // fix define
-#define FIXVSTINV       10	    // VST fix
-#define FIXSQRTBIT      30	    // SQRT fix bits
-#define FIXSQRTDIV      1	    // SQRT fix
-#define FIXNLMCALC      10	    // NLM calc fix
-#define FIXGAINBIT      8	    // NLM calc fix
-#define FIXBILSTRG      8	    // BIL flt strength calc fix
-#define FIXNLMSQRT      6	    // NLM SQRT fix, FIXNLMSQRT*2 nee less FIXNLMCALC
+#define FIXVSTINV       10      // VST fix
+#define FIXSQRTBIT      30      // SQRT fix bits
+#define FIXSQRTDIV      1       // SQRT fix
+#define FIXNLMCALC      10      // NLM calc fix
+#define FIXGAINBIT      8       // NLM calc fix
+#define FIXBILSTRG      8       // BIL flt strength calc fix
+#define FIXNLMSQRT      6       // NLM SQRT fix, FIXNLMSQRT*2 nee less FIXNLMCALC
 #define FIXGAUSBIT      8       // gauss weight fix bits;
 #define FIXTNRWGT       10
 #define FIXTNRDIF       10
 #define FIXTNRSFT       10
 #define FIXTNRSTG       8
-#define FIXTNREXP       20      //20	    // TNR EXP fix bits
-#define FIXTNREXPMOD    14      //20	    // TNR EXP fix bits
+#define FIXTNREXP       20      //20        // TNR EXP fix bits
+#define FIXTNREXPMOD    14      //20        // TNR EXP fix bits
 #define FIXTNRSQRT      30
 #define FIXGAINOUT      8
 
-#define FIXEXPBIT      20	    // EXP fix bits
-#define FIXEXP2BIT     10	    // EXP fix bits
-#define FIXEXPDIV      1	    // EXP fix
+#define FIXEXPBIT      20       // EXP fix bits
+#define FIXEXP2BIT     10       // EXP fix bits
+#define FIXEXPDIV      1        // EXP fix
 
-#define FIXMERGEWG      10	    // HDR merge weight
-#define FIXTMOWG        12	    // HDR TMO weight
+#define FIXMERGEWG      10      // HDR merge weight
+#define FIXTMOWG        12      // HDR TMO weight
 
 #define FIXDIFMAX       ((long long)1<<(14))     // DIFF USE 12bits
 #define DIVSUBBIT       1                        // div sub bits
@@ -76,13 +76,19 @@ typedef struct Abayernr_Context_V2_s {
     Abayernr_Auto_Attr_V2_t stAuto;
     Abayernr_Manual_Attr_V2_t stManual;
 
-    struct list_head* list_bayernr_v2; 
-	
-	float fRawnr_SF_Strength;
+    struct list_head* list_bayernr_v2;
 
-	bool isIQParaUpdate;
-	bool isGrayMode;
-	Abayernr_ParamMode_t eParamMode;
+    float fRawnr_SF_Strength;
+    float fRawnr_TF_Strength;
+
+    bool isIQParaUpdate;
+    bool isGrayMode;
+    Abayernr_ParamMode_t eParamMode;
+    int prepare_type;
+
+    CalibDbV2_BayerNrV2_t bayernr_v2;
+
+    int isReCalculate;
 } Abayernr_Context_V2_t;
 
 

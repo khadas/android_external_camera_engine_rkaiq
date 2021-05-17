@@ -24,6 +24,13 @@
 
 RKAIQ_BEGIN_DECLARE
 
+typedef struct rk_aiq_ccm_matrix_s {
+    // M4_ARRAY_DESC("matrix", "f32", M4_SIZE(3,3), M4_RANGE(-8,7.992), "[1.0000,0.0000,0.0000,0.0000,1.0000,0.0000,0.0000,0.0000,1.0000]", M4_DIGIT(4), M4_DYNAMIC(0))
+    float  matrix[9];
+    // M4_ARRAY_DESC("offs", "f32", M4_SIZE(1,3), M4_RANGE(-4095,4095), "0", M4_DIGIT(1), M4_DYNAMIC(0))
+    float  offs[3];
+} rk_aiq_ccm_matrix_t;
+
 
 RKAIQ_END_DECLARE
 

@@ -44,6 +44,27 @@ AsharpResult_t AsharpStop(AsharpContext_t *pAsharpCtx)
     return (ASHARP_RET_SUCCESS);
 }
 
+//anr reconfig
+AsharpResult_t AsharpIQParaUpdate(AsharpContext_t *pAsharpCtx)
+{
+    LOGI_ASHARP("%s(%d): enter!\n", __FUNCTION__, __LINE__);
+    //need todo what?
+	
+	if(pAsharpCtx->isIQParaUpdate){	
+		LOGD_ASHARP(" update iq para\n");
+		#if(ASHARP_USE_JSON_PARA)
+		ASharpConfigSettingParam_json(pAsharpCtx, pAsharpCtx->eParamMode, pAsharpCtx->stExpInfo.snr_mode);
+		#else
+		ASharpConfigSettingParam(pAsharpCtx, pAsharpCtx->eParamMode, pAsharpCtx->stExpInfo.snr_mode);
+		#endif
+		pAsharpCtx->isIQParaUpdate = false;
+	}
+	
+    LOGI_ASHARP("%s(%d): exit!\n", __FUNCTION__, __LINE__);
+    return ASHARP_RET_SUCCESS;
+}
+
+
 AsharpResult_t AsharpInit(AsharpContext_t **ppAsharpCtx, CamCalibDbContext_t *pCalibDb)
 {
     AsharpContext_t * pAsharpCtx;
@@ -66,8 +87,12 @@ AsharpResult_t AsharpInit(AsharpContext_t **ppAsharpCtx, CamCalibDbContext_t *pC
 
 #if ASHARP_USE_XML_FILE
     //get v1 params from xml file
-    pAsharpCtx->stSharpCalib = pCalibDb->sharp;
-    pAsharpCtx->stEdgeFltCalib = pCalibDb->edgeFilter;
+    pAsharpCtx->stSharpCalib =
+        *(CalibDb_Sharp_2_t*)(CALIBDB_GET_MODULE_PTR((void*)pCalibDb, sharp));
+    pAsharpCtx->stEdgeFltCalib =
+        *(CalibDb_EdgeFilter_2_t*)(CALIBDB_GET_MODULE_PTR((void*)pCalibDb, edgeFilter));
+	pAsharpCtx->mfnr_mode_3to1 =
+        ((CalibDb_MFNR_2_t*)(CALIBDB_GET_MODULE_PTR((void*)pCalibDb, mfnr)))->mode_3to1;;
 #endif
 
 #ifdef RK_SIMULATOR_HW
@@ -88,7 +113,7 @@ AsharpResult_t AsharpInit(AsharpContext_t **ppAsharpCtx, CamCalibDbContext_t *pC
 
 
 #if ASHARP_USE_XML_FILE
-	pAsharpCtx->stExpInfo.snr_mode = 1;
+	pAsharpCtx->stExpInfo.snr_mode = 0;
 	pAsharpCtx->eParamMode = ASHARP_PARAM_MODE_NORMAL;
 	ASharpConfigSettingParam(pAsharpCtx, pAsharpCtx->eParamMode, pAsharpCtx->stExpInfo.snr_mode);
 #endif
@@ -104,6 +129,80 @@ AsharpResult_t AsharpInit(AsharpContext_t **ppAsharpCtx, CamCalibDbContext_t *pC
     LOGI_ASHARP("%s(%d): exit!\n", __FUNCTION__, __LINE__);
     return ASHARP_RET_SUCCESS;
 }
+
+
+
+AsharpResult_t AsharpInit_json(AsharpContext_t **ppAsharpCtx, CamCalibDbV2Context_t *pCalibDbV2)
+{
+    AsharpContext_t * pAsharpCtx;
+
+    LOGI_ASHARP("%s(%d): enter!\n", __FUNCTION__, __LINE__);
+
+    pAsharpCtx = (AsharpContext_t *)malloc(sizeof(AsharpContext_t));
+    if(pAsharpCtx == NULL) {
+        LOGE_ASHARP("%s(%d): malloc fail\n", __FUNCTION__, __LINE__);
+        return ASHARP_RET_NULL_POINTER;
+    }
+
+    memset(pAsharpCtx, 0x00, sizeof(AsharpContext_t));
+    pAsharpCtx->eState = ASHARP_STATE_INITIALIZED;
+    *ppAsharpCtx = pAsharpCtx;
+    pAsharpCtx->fStrength = 1.0;
+	
+    //init params config
+    pAsharpCtx->eMode = ASHARP_OP_MODE_AUTO;
+
+#if ASHARP_USE_JSON_PARA
+    //get v1 params from xml file
+
+	CalibDbV2_SharpV1_t* calibv2_sharp_v1 =
+            (CalibDbV2_SharpV1_t*)(CALIBDBV2_GET_MODULE_PTR(pCalibDbV2, sharp_v1));
+	sharp_calibdbV2_assign(&pAsharpCtx->sharp_v1, calibv2_sharp_v1);
+
+	CalibDbV2_Edgefilter_t* calibv2_edgefilter_v1 =
+            (CalibDbV2_Edgefilter_t*)(CALIBDBV2_GET_MODULE_PTR(pCalibDbV2, edgefilter_v1));	 	
+	edgefilter_calibdbV2_assign(&pAsharpCtx->edgefilter_v1, calibv2_edgefilter_v1);
+	
+	CalibDbV2_MFNR_t* calibv2_mfnr_v1 =
+            (CalibDbV2_MFNR_t*)(CALIBDBV2_GET_MODULE_PTR(pCalibDbV2, mfnr_v1));
+    pAsharpCtx->mfnr_mode_3to1 = calibv2_mfnr_v1->TuningPara.mode_3to1;
+#endif
+
+#ifdef RK_SIMULATOR_HW
+    //get v2 params from html file
+    FILE *fp2 = fopen("rkaiq_asharp_html_params.bin", "rb");
+    if(fp2 != NULL) {
+        memset(&pAsharpCtx->stAuto.stSharpParam, 0, sizeof(RKAsharp_Sharp_Params_t));
+        fread(&pAsharpCtx->stAuto.stSharpParam, 1, sizeof(RKAsharp_Sharp_Params_t), fp2);
+        memset(&pAsharpCtx->stAuto.stEdgefilterParams, 0, sizeof(RKAsharp_EdgeFilter_Params_t));
+        fread(&pAsharpCtx->stAuto.stEdgefilterParams, 1, sizeof(RKAsharp_EdgeFilter_Params_t), fp2);
+        fclose(fp2);
+        LOGD_ASHARP("oyyf: %s:(%d) read sharp html param file sucess! \n", __FUNCTION__, __LINE__);
+    } else {
+        LOGE_ASHARP("oyyf: %s:(%d) read sharp html param file failed! \n", __FUNCTION__, __LINE__);
+        return ASHARP_RET_FAILURE;
+    }
+#endif
+
+
+#if ASHARP_USE_JSON_PARA
+	pAsharpCtx->stExpInfo.snr_mode = 0;
+	pAsharpCtx->eParamMode = ASHARP_PARAM_MODE_NORMAL;
+	ASharpConfigSettingParam_json(pAsharpCtx, pAsharpCtx->eParamMode, pAsharpCtx->stExpInfo.snr_mode);
+#endif
+
+    LOGD_ASHARP("%s(%d): sharp %f %f %f %f %f %f", __FUNCTION__, __LINE__,
+                pAsharpCtx->stAuto.stSharpParam.rk_sharpen_params_V1.hratio[0],
+                pAsharpCtx->stAuto.stSharpParam.rk_sharpen_params_V1.lratio[0],
+                pAsharpCtx->stAuto.stSharpParam.rk_sharpen_params_V1.H_ratio[0],
+                pAsharpCtx->stAuto.stSharpParam.rk_sharpen_params_V1.M_ratio[0],
+                pAsharpCtx->stAuto.stSharpParam.rk_sharpen_params_V1.hbf_gain[0],
+                pAsharpCtx->stAuto.stSharpParam.rk_sharpen_params_V1.hbf_ratio[0]);
+
+    LOGI_ASHARP("%s(%d): exit!\n", __FUNCTION__, __LINE__);
+    return ASHARP_RET_SUCCESS;
+}
+
 
 //anr release
 AsharpResult_t AsharpRelease(AsharpContext_t *pAsharpCtx)
@@ -127,6 +226,9 @@ AsharpResult_t AsharpRelease(AsharpContext_t *pAsharpCtx)
             || (ASHARP_STATE_LOCKED == pAsharpCtx->eState)) {
         return (ASHARP_RET_BUSY);
     }
+
+	sharp_calibdbV2_free(&pAsharpCtx->sharp_v1);
+	edgefilter_calibdbV2_free(&pAsharpCtx->edgefilter_v1);
 	
     memset(pAsharpCtx, 0x00, sizeof(AsharpContext_t));
     free(pAsharpCtx);
@@ -152,7 +254,10 @@ AsharpResult_t AsharpPrepare(AsharpContext_t *pAsharpCtx, AsharpConfig_t* pAshar
 
     //pAsharpCtx->eMode = pAsharpConfig->eMode;
     //pAsharpCtx->eState = pAsharpConfig->eState;
-
+	if(!!(pAsharpCtx->prepare_type & RK_AIQ_ALGO_CONFTYPE_UPDATECALIB)){	
+		AsharpIQParaUpdate(pAsharpCtx);
+	}
+		
 	AsharpStart(pAsharpCtx);
 	
     LOGI_ASHARP("%s(%d): exit!\n", __FUNCTION__, __LINE__);
@@ -165,22 +270,6 @@ AsharpResult_t AsharpReConfig(AsharpContext_t *pAsharpCtx, AsharpConfig_t* pAsha
     LOGI_ASHARP("%s(%d): enter!\n", __FUNCTION__, __LINE__);
     //need todo what?
 
-    LOGI_ASHARP("%s(%d): exit!\n", __FUNCTION__, __LINE__);
-    return ASHARP_RET_SUCCESS;
-}
-
-//anr reconfig
-AsharpResult_t AsharpIQParaUpdate(AsharpContext_t *pAsharpCtx)
-{
-    LOGI_ASHARP("%s(%d): enter!\n", __FUNCTION__, __LINE__);
-    //need todo what?
-	
-	if(pAsharpCtx->isIQParaUpdate){	
-		LOGD_ASHARP(" update iq para\n");
-		ASharpConfigSettingParam(pAsharpCtx, pAsharpCtx->eParamMode, pAsharpCtx->stExpInfo.snr_mode);
-		pAsharpCtx->isIQParaUpdate = false;
-	}
-	
     LOGI_ASHARP("%s(%d): exit!\n", __FUNCTION__, __LINE__);
     return ASHARP_RET_SUCCESS;
 }
@@ -219,12 +308,22 @@ AsharpResult_t AsharpProcess(AsharpContext_t *pAsharpCtx, AsharpExpInfo_t *pExpI
 	}
 
 	AsharpParamModeProcess(pAsharpCtx, pExpInfo, &mode);
-		
+	pExpInfo->mfnr_mode_3to1 = pAsharpCtx->mfnr_mode_3to1;
+    if(pExpInfo->mfnr_mode_3to1){
+        pExpInfo->snr_mode = pExpInfo->pre_snr_mode;
+    }else{
+        pExpInfo->snr_mode = pExpInfo->cur_snr_mode;
+    }
+
 	#if ASHARP_USE_XML_FILE
 	if(pExpInfo->snr_mode != pAsharpCtx->stExpInfo.snr_mode || pAsharpCtx->eParamMode != mode){
 		LOGD_ASHARP(" sharp mode:%d snr_mode:%d\n", mode, pExpInfo->snr_mode);
 		pAsharpCtx->eParamMode = mode;
+		#if(ASHARP_USE_JSON_PARA)
+		ASharpConfigSettingParam_json(pAsharpCtx, pAsharpCtx->eParamMode, pExpInfo->snr_mode);	
+		#else
 		ASharpConfigSettingParam(pAsharpCtx, pAsharpCtx->eParamMode, pExpInfo->snr_mode);	
+		#endif
 	}
 	#endif
     memcpy(&pAsharpCtx->stExpInfo, pExpInfo, sizeof(AsharpExpInfo_t));
@@ -506,7 +605,7 @@ AsharpResult_t ASharpConfigSettingParam(AsharpContext_t *pAsharpCtx, AsharpParam
 		sprintf(snr_name, "%s", "LSNR");
 	}else{
 		LOGE_ASHARP("%s(%d): not support snr mode!\n", __FUNCTION__, __LINE__);
-		sprintf(snr_name, "%s", "HSNR");
+		sprintf(snr_name, "%s", "LSNR");
 	}
 
 	pAsharpCtx->stAuto.sharpEn = pAsharpCtx->stSharpCalib.enable;
@@ -538,6 +637,48 @@ AsharpResult_t AsharpParamModeProcess(AsharpContext_t *pAsharpCtx, AsharpExpInfo
 	}
 
 	return res;
+}
+
+
+AsharpResult_t ASharpConfigSettingParam_json(AsharpContext_t *pAsharpCtx, AsharpParamMode_t param_mode, int snr_mode)
+{
+	char mode_name[CALIBDB_MAX_MODE_NAME_LENGTH];
+	char snr_name[CALIBDB_NR_SHARP_NAME_LENGTH];
+	memset(mode_name, 0x00, sizeof(mode_name));
+	memset(snr_name, 0x00, sizeof(snr_name));
+
+	if(pAsharpCtx == NULL) {
+        	LOGE_ASHARP("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
+        	return ASHARP_RET_NULL_POINTER;
+    	}
+
+	
+	if(param_mode == ASHARP_PARAM_MODE_NORMAL){
+		sprintf(mode_name, "%s", "normal");
+	}else if(param_mode == ASHARP_PARAM_MODE_HDR){
+		sprintf(mode_name, "%s", "hdr");
+	}else if(param_mode == ASHARP_PARAM_MODE_GRAY){
+		sprintf(mode_name, "%s", "gray");
+	}else{
+		LOGE_ASHARP("%s(%d): not support mode cell name!\n", __FUNCTION__, __LINE__);
+		sprintf(mode_name, "%s", "normal");
+	}
+
+	if(snr_mode == 1){
+		sprintf(snr_name, "%s", "HSNR");
+	}else if(snr_mode == 0){
+		sprintf(snr_name, "%s", "LSNR");
+	}else{
+		LOGE_ASHARP("%s(%d): not support snr mode!\n", __FUNCTION__, __LINE__);
+		sprintf(snr_name, "%s", "LSNR");
+	}
+
+	pAsharpCtx->stAuto.sharpEn = pAsharpCtx->sharp_v1.TuningPara.enable;
+	sharp_config_setting_param_v1_json(&pAsharpCtx->stAuto.stSharpParam.rk_sharpen_params_V1, &pAsharpCtx->sharp_v1, mode_name,  snr_name);
+	pAsharpCtx->stAuto.edgeFltEn = pAsharpCtx->edgefilter_v1.TuningPara.enable;
+	edgefilter_config_setting_param_json(&pAsharpCtx->stAuto.stEdgefilterParams, &pAsharpCtx->edgefilter_v1, mode_name, snr_name);
+
+	return ASHARP_RET_SUCCESS;
 }
 
 RKAIQ_END_DECLARE

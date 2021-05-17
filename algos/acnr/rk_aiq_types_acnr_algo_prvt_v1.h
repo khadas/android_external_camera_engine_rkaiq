@@ -38,16 +38,21 @@ typedef struct Acnr_Context_V1_s {
     Acnr_Auto_Attr_V1_t stAuto;
     Acnr_Manual_Attr_V1_t stManual;
 
-    struct list_head* list_cnr_v1; 
-	
-	float fCnr_SF_Strength;
+    struct list_head* list_cnr_v1;
 
-	bool isIQParaUpdate;
-	bool isGrayMode;
-	Acnr_ParamMode_t eParamMode;
+    float fCnr_SF_Strength;
 
-	int rawWidth;
-	int rawHeight;
+    bool isIQParaUpdate;
+    bool isGrayMode;
+    Acnr_ParamMode_t eParamMode;
+
+    int rawWidth;
+    int rawHeight;
+
+    int prepare_type;
+    CalibDbV2_CNR_t cnr_v1;
+
+    int isReCalculate;
 } Acnr_Context_V1_t;
 
 

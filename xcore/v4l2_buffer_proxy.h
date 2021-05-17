@@ -56,7 +56,7 @@ public:
         _length = value;
     }
 
-    const uint32_t get_length () {
+    uint32_t get_length () const {
         return _length;
     }
 
@@ -102,6 +102,12 @@ public:
     virtual uint8_t *map ();
     virtual bool unmap ();
     virtual int get_fd ();
+    void set_reserved(uintptr_t reserved) {
+        _reserved = reserved;
+    }
+    uintptr_t get_reserved() {
+        return _reserved;
+    }
 
 private:
     XCAM_DEAD_COPY (V4l2Buffer);
@@ -113,6 +119,7 @@ private:
     int _expbuf_fd;
     uintptr_t _expbuf_usrptr;
     std::atomic<char> _queued;
+    uintptr_t _reserved;
 };
 
 class V4l2BufferProxy
@@ -135,6 +142,10 @@ public:
         return get_v4l2_buf().length;
     }
 
+    int get_v4l2_buf_planar_length (int planar_index) {
+        return get_v4l2_buf().m.planes[planar_index].length;
+    }
+
     int get_expbuf_fd () {
         SmartPtr<V4l2Buffer> v4l2buf = get_buffer_data().dynamic_cast_ptr<V4l2Buffer> ();
         XCAM_ASSERT (v4l2buf.ptr());
@@ -142,15 +153,35 @@ public:
     }
 
     uintptr_t get_v4l2_userptr () {
+    #if 0
         if (V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE == get_v4l2_buf().type ||
                 V4L2_BUF_TYPE_VIDEO_OUTPUT_MPLANE == get_v4l2_buf().type)
             return get_v4l2_buf().m.planes[0].m.userptr;
+        else
+            return get_v4l2_buf().m.userptr;
+    #else
+        SmartPtr<V4l2Buffer> v4l2buf = get_buffer_data().dynamic_cast_ptr<V4l2Buffer> ();
+        XCAM_ASSERT (v4l2buf.ptr());
+        return v4l2buf->get_expbuf_usrptr();
+    #endif
+    }
+
+    uintptr_t get_v4l2_planar_userptr (int planar_index) {
+        if (V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE == get_v4l2_buf().type ||
+                V4L2_BUF_TYPE_VIDEO_OUTPUT_MPLANE == get_v4l2_buf().type)
+            return get_v4l2_buf().m.planes[planar_index].m.userptr;
         else
             return get_v4l2_buf().m.userptr;
     }
 
     uint32_t get_sequence () {
         return get_v4l2_buf().sequence;
+    }
+
+    uintptr_t get_reserved() {
+        SmartPtr<V4l2Buffer> v4l2buf = get_buffer_data().dynamic_cast_ptr<V4l2Buffer> ();
+        XCAM_ASSERT (v4l2buf.ptr());
+        return v4l2buf->get_reserved();
     }
 
 private:

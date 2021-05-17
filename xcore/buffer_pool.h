@@ -117,7 +117,7 @@ private:
     void release (SmartPtr<BufferData> &data);
     XCAM_DEAD_COPY (BufferPool);
 
-private:
+protected:
     Mutex                    _mutex;
     VideoBufferInfo          _buffer_info;
     SafeList<BufferData>     _buf_list;

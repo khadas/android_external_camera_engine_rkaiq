@@ -25,6 +25,7 @@
 
 #include "awb/rk_aiq_types_awb_algo.h"
 #include "RkAiqCalibDbTypes.h"
+#include "RkAiqCalibDbTypesV2.h"
 
 typedef enum rk_aiq_wb_scene_e {
     RK_AIQ_WBCT_INCANDESCENT = 0,
@@ -81,20 +82,31 @@ typedef enum hdr_frame_choose_mode_e {
     hdr_frame_choose_mode_auto
 } hdr_frame_choose_mode_t;
 
+typedef struct rk_aiq_wb_awb_cct_lut_cfg_lv_s {
+    float lv;
+    int ct_grid_num;
+    int cri_grid_num;
+    float ct_range[2];//min,max, equal distance sapmle
+    float cri_range[2];//min,max
+    float ct_lut_out[CALD_AWB_CT_GRID_NUM_MAX * CALD_AWB_CRI_GRID_NUM_MAX];
+    float cri_lut_out[CALD_AWB_CT_GRID_NUM_MAX * CALD_AWB_CRI_GRID_NUM_MAX];
+} rk_aiq_wb_awb_cct_lut_cfg_lv_t;
+
 typedef struct rk_aiq_wb_awb_attrib_s {
     rk_aiq_wb_awb_alg_method_t algMethod;
-    rk_aiq_wb_awb_tolerance_t tolerance;//wb gain diff th for awb gain update, set 0 to disable this function
-    rk_aiq_wb_awb_runinterval_t runInterval;
+    CalibDb_Awb_tolerance_t tolerance;//wb gain diff th for awb gain update, set 0 to disable this function
+    CalibDb_Awb_runinterval_t runInterval;
     bool cagaEn;
     bool wbGainAdjustEn;
     int cct_lut_cfg_num;
-    cct_lut_cfg_lv_t cct_lut_cfg[CALD_AWB_CT_LV_NUM_MAX];
+    rk_aiq_wb_awb_cct_lut_cfg_lv_t cct_lut_cfg[CALD_AWB_CT_LV_NUM_MAX];
     bool wbGainClipEn;
     bool wbGainDaylightClipEn;
-    cct_clip_cfg_t cct_clip_cfg;
+    CalibDb_Awb_Cct_Clip_Cfg_t cct_clip_cfg;
     hdr_frame_choose_mode_t hdrFrameChooseMode;
     unsigned char   hdrFrameChoose;
     CalibDb_StatWindow_t measeureWindow;
+    CalibDb_Awb_gain_offset_cfg_t wbGainOffset;
 } rk_aiq_wb_awb_attrib_t;
 
 typedef enum rk_aiq_wb_op_mode_s {
@@ -114,6 +126,7 @@ typedef struct rk_aiq_wb_querry_info_s {
     rk_aiq_wb_gain_t gain;
     rk_aiq_wb_cct_t cctGloabl;
     bool awbConverged;
+    uint32_t LVValue;
 } rk_aiq_wb_querry_info_t;
 
 typedef enum rk_aiq_wb_lock_state_s {
@@ -129,6 +142,60 @@ typedef enum awb_hardware_version_e
     AWB_HARDWARE_V201 = 1,
     AWB_HARDWARE_VMAX
 } awb_hardware_version_t;
+
+
+typedef struct rk_aiq_uapiV2_wb_awb_wbGainAdjustLut_s {
+  // M4_NUMBER_DESC("lumaValue", "f32", M4_RANGE(0, 255000), "0", M4_DIGIT(0))
+  float lumaValue;
+  // M4_NUMBER_DESC("ct_grid_num", "s32", M4_RANGE(0, 32), "0", M4_DIGIT(0))
+  int ct_grid_num;
+  // M4_NUMBER_DESC("cri_grid_num", "s32", M4_RANGE(0, 32), "0", M4_DIGIT(0))
+  int cri_grid_num;
+  // M4_ARRAY_DESC("ct_in_range", "f32", M4_SIZE(1,2), M4_RANGE(0,10000), "0", M4_DIGIT(0), M4_DYNAMIC(0))
+  float ct_in_range[2];//min,max, equal distance sapmle
+  // M4_ARRAY_DESC("cri_in_range", "f32", M4_SIZE(1,2), M4_RANGE(-2,2), "0", M4_DIGIT(4), M4_DYNAMIC(0))
+  float cri_in_range[2];//min,max
+  // M4_ARRAY_DESC("ct_lut_out", "f32", M4_SIZE(9,7), M4_RANGE(0,10000), "0", M4_DIGIT(0), M4_DYNAMIC(0))
+  float *ct_lut_out;//size is ct_grid_num*cri_grid_num
+  // M4_ARRAY_DESC("cri_lut_out", "f32", M4_SIZE(9,7), M4_RANGE(-2,2), "0", M4_DIGIT(4), M4_DYNAMIC(0))
+  float *cri_lut_out;
+} rk_aiq_uapiV2_wb_awb_wbGainAdjustLut_t;
+
+typedef struct rk_aiq_uapiV2_wb_awb_wbGainAdjust_s {
+  // M4_BOOL_DESC("enable", "1")
+  bool enable;
+  // M4_STRUCT_LIST_DESC("lutAll", M4_SIZE(1,8), "normal_ui_style")
+  rk_aiq_uapiV2_wb_awb_wbGainAdjustLut_t *lutAll;
+  int lutAll_len;
+} rk_aiq_uapiV2_wb_awb_wbGainAdjust_t;
+
+
+typedef struct rk_aiq_uapiV2_wbV21_awb_attrib_s {
+    rk_aiq_uapiV2_wb_awb_wbGainAdjust_t wbGainAdjust;
+    CalibDbV2_Awb_gain_offset_cfg_t wbGainOffset;
+} rk_aiq_uapiV2_wbV21_awb_attrib_t;
+
+typedef struct rk_aiq_uapiV2_wbV20_awb_attrib_s {
+    rk_aiq_uapiV2_wb_awb_wbGainAdjust_t wbGainAdjust;
+    CalibDbV2_Awb_gain_offset_cfg_t wbGainOffset;
+    CalibDbV2_Awb_Mul_Win_t  multiWindow;
+} rk_aiq_uapiV2_wbV20_awb_attrib_t;
+
+
+typedef struct rk_aiq_uapiV2_wbV21_attrib_s {
+    bool byPass;
+    rk_aiq_wb_op_mode_t mode;
+    rk_aiq_wb_mwb_attrib_t stManual;
+    rk_aiq_uapiV2_wbV21_awb_attrib_t stAuto;
+} rk_aiq_uapiV2_wbV21_attrib_t;
+
+typedef struct rk_aiq_uapiV2_wbV20_attrib_s {
+    bool byPass;
+    rk_aiq_wb_op_mode_t mode;
+    rk_aiq_wb_mwb_attrib_t stManual;
+    rk_aiq_uapiV2_wbV20_awb_attrib_t stAuto;
+} rk_aiq_uapiV2_wbV20_attrib_t;
+
 
 #endif
 

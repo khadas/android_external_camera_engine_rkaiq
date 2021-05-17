@@ -671,7 +671,22 @@ public:
     */
     virtual XMLNode* ShallowClone( XMLDocument* document ) const = 0;
 
-    /**
+	/**
+	Make a copy of this node and all its children.
+
+	If the 'target' is null, then the nodes will
+	be allocated in the current document. If 'target'
+	is specified, the memory will be allocated is the
+	specified XMLDocument.
+
+	NOTE: This is probably not the correct tool to
+	copy a document, since XMLDocuments can have multiple
+	top level XMLNodes. You probably want to use
+	XMLDocument::DeepCopy()
+	*/
+	XMLNode* DeepClone(XMLDocument* target) const;
+    
+	/**
         Test if 2 nodes are the same, but don't test children.
         The 2 nodes do not need to be in the same Document.
 

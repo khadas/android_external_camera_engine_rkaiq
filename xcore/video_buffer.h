@@ -44,7 +44,9 @@ struct VideoBufferInfo
     bool init (
         uint32_t format,
         uint32_t width, uint32_t height,
-        uint32_t aligned_width = 0, uint32_t aligned_height = 0, uint32_t size = 0);
+        uint32_t aligned_width = 0, uint32_t aligned_height = 0, uint32_t size = 0, bool compacted = false);
+
+    bool fill (const XCamVideoBufferInfo &info);
 
     bool get_planar_info (
         VideoBufferPlanarInfo &planar, const uint32_t index = 0) const;
@@ -112,7 +114,7 @@ public:
 
     template <typename MetaType>
     SmartPtr<MetaType> find_typed_metadata ();
-
+    int _buf_type;
 private:
     XCAM_DEAD_COPY (VideoBuffer);
 

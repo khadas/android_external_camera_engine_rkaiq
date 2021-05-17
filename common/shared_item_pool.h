@@ -19,43 +19,79 @@
 #define RKCAM_SHARED_ITEM_POOL_H
 
 #include "safe_list.h"
+#include "buffer_pool.h"
 
 using namespace XCam;
 
 namespace RkCam {
 
-template<typename T> class SharedItemPool;
-
-template<typename T>
-class SharedItemProxy
-{
+class SharedItemData : public BufferData {
 public:
-    explicit SharedItemProxy(const SmartPtr<T> &data) : _data(data) {};
-    ~SharedItemProxy() {
-        if (_pool.ptr())
-            _pool->release(_data);
-        _data.release();
+    explicit SharedItemData ():BufferData() {}
+    uint8_t *map () { return NULL; }
+    bool unmap () { return true; }
+    virtual void reset() {
     };
 
-    void set_buf_pool (SmartPtr<SharedItemPool<T>> pool) {
-        _pool = pool;
+public:
+    virtual ~SharedItemData () {}
+
+private:
+    XCAM_DEAD_COPY (SharedItemData);
+};
+
+class SharedItemBase : public BufferProxy {
+public:
+    explicit SharedItemBase (const SmartPtr<SharedItemData> &data):BufferProxy(data) {}
+    virtual ~SharedItemBase () {
+        get_buffer_data ().dynamic_cast_ptr<SharedItemData>()->reset();
     }
 
+    void setType(uint32_t type) { _type = type; }
+    void setId(uint32_t id) { _id = id; }
+
+    int getType() { return _type; }
+    uint32_t getId() { return _id; }
+
+protected:
+    XCAM_DEAD_COPY (SharedItemBase);
+    SmartPtr<SharedItemData> get_buffer_data () {
+        return BufferProxy::get_buffer_data().dynamic_cast_ptr<SharedItemData>();
+    }
+    uint32_t _type;
+    uint32_t _id;
+};
+
+//template<typename T> class SharedItemPool;
+
+template<typename T>
+class SharedItemProxy : public SharedItemBase
+{
+public:
+    explicit SharedItemProxy(const SmartPtr<T> &data) : SharedItemBase(data), _data(data) {};
+    ~SharedItemProxy() {/* _data->reset();*/ };
     SmartPtr<T> &data() {
+#if 0 // dynamic_cast_ptr has performance issue
+        return BufferProxy::get_buffer_data ().template dynamic_cast_ptr<T>();
+#else
         return _data;
+#endif
     }
-
+    uint8_t *map () {
+#if 0 // dynamic_cast_ptr has performance issue
+        return (uint8_t *)BufferProxy::get_buffer_data ().template dynamic_cast_ptr<T>().ptr();
+#else
+        return (uint8_t *)_data.ptr();
+#endif
+    }
 private:
+    SmartPtr<T>       _data;
     XCAM_DEAD_COPY (SharedItemProxy);
-
-private:
-    SmartPtr<T>                       _data;
-    SmartPtr<SharedItemPool<T>>       _pool;
 };
 
 template<typename T>
 class SharedItemPool
-    : public RefObj
+    : public BufferPool
 {
     friend class SharedItemProxy<T>;
 
@@ -64,27 +100,18 @@ public:
     virtual ~SharedItemPool();
 
     SmartPtr<SharedItemProxy<T>> get_item();
-    bool has_free_items () {
-        return !_item_list.is_empty ();
-    }
-    uint32_t get_free_item_size () {
-        return _item_list.size ();
-    }
-public:
     int8_t init(uint32_t max_count = 8);
-protected:
-    virtual void* _allocate_data () { return NULL; };
+    bool has_free_items () {
+        return has_free_buffers();
+    }
 private:
-    SmartPtr<T> allocate_data ();
-    uint32_t construct_pool(uint32_t count);
-    void release (SmartPtr<T> &data);
     XCAM_DEAD_COPY (SharedItemPool);
 
-private:
-    SafeList<T>              _item_list;
-    uint32_t                 _allocated_num;
-    uint32_t                 _max_count;
+protected:
     const char*              _name;
+    uint32_t                 _max_count;
+    virtual SmartPtr<BufferData> allocate_data (const VideoBufferInfo &buffer_info);
+    virtual SmartPtr<BufferProxy> create_buffer_from_data (SmartPtr<BufferData> &data);
 };
 
 };

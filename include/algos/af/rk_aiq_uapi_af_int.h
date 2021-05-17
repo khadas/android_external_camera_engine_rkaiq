@@ -33,5 +33,7 @@ XCamReturn
 rk_aiq_uapi_af_setZoomPos(const RkAiqAlgoContext *ctx, int zoom_pos);
 XCamReturn
 rk_aiq_uapi_af_getSearchPath(const RkAiqAlgoContext *ctx, rk_aiq_af_sec_path_t* path);
+XCamReturn
+rk_aiq_uapi_af_getSearchResult(const RkAiqAlgoContext *ctx, rk_aiq_af_result_t* result);
 
 #endif

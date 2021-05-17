@@ -22,8 +22,11 @@
 #include "RkAiqCore.h"
 #include "RkAiqCoreV21.h"
 #include "RkAiqCalibDb.h"
+#include "RkAiqCalibDbV2.h"
 #include "RkLumaCore.h"
 #include "rk_aiq.h"
+#include <memory>
+#include <list>
 
 namespace RkCam {
 
@@ -101,6 +104,7 @@ public:
     };
 
     void triger_start() {
+        mAiqRstQueue.clear ();
         mAiqRstQueue.resume_pop ();
     };
 
@@ -121,10 +125,11 @@ private:
 };
 
 class RkAiqManager
-    : public IspStatsListener
+    :/* public IspStatsListener
     , public IsppStatsListener
     , public IspLumaListener
     , public IspEvtsListener
+    ,*/ public HwResListener
     , public RkAiqAnalyzerCb
     , public RkLumaAnalyzerCb {
     friend RkAiqRstApplyThread;
@@ -137,12 +142,15 @@ public:
     void setCamHw(SmartPtr<ICamHw>& camhw);
     void setAnalyzer(SmartPtr<RkAiqCore> analyzer);
     void setAiqCalibDb(const CamCalibDbContext_t* calibDb);
+    void setAiqCalibDb(const CamCalibDbV2Context_t* calibDb);
     void setLumaAnalyzer(SmartPtr<RkLumaCore> analyzer);
     XCamReturn init();
     XCamReturn prepare(uint32_t width, uint32_t height, rk_aiq_working_mode_t mode);
     XCamReturn start();
     XCamReturn stop(bool keep_ext_hw_st = false);
     XCamReturn deInit();
+    XCamReturn updateCalibDb(const CamCalibDbV2Context_t* newCalibDb);
+    #if 0
     // from IsppStatsListener
     XCamReturn isppStatsCb(SmartPtr<VideoBuffer>& isppStats);
     // from IspLumaListener
@@ -151,23 +159,29 @@ public:
     XCamReturn ispStatsCb(SmartPtr<VideoBuffer>& ispStats);
     // from IspEvtsListener
     XCamReturn ispEvtsCb(ispHwEvt_t* evt);
+    #endif
+    XCamReturn hwResCb(SmartPtr<VideoBuffer>& hwres);
     // from RkAiqAnalyzerCb
     void rkAiqCalcDone(SmartPtr<RkAiqFullParamsProxy>& results);
     void rkAiqCalcFailed(const char* msg);
     // from RkLumaAnalyzerCb
-    void rkLumaCalcDone(int frame_id, int count);
+    void rkLumaCalcDone(rk_aiq_luma_params_t luma_params);
     void rkLumaCalcFailed(const char* msg);
     XCamReturn setModuleCtl(rk_aiq_module_id_t mId, bool mod_en);
     XCamReturn getModuleCtl(rk_aiq_module_id_t mId, bool& mod_en);
-    XCamReturn enqueueBuffer(struct rk_aiq_vbuf *vbuf);
-    XCamReturn offlineRdJobPrepare();
-    XCamReturn offlineRdJobDone();
+    XCamReturn enqueueRawBuffer(void *rawdata, bool sync);
+    XCamReturn enqueueRawFile(const char *path);
+    XCamReturn registRawdataCb(void (*callback)(void *));
+    XCamReturn rawdataPrepare(rk_aiq_raw_prop_t prop);
     XCamReturn setSharpFbcRotation(rk_aiq_rotation_t rot);
     XCamReturn setMirrorFlip(bool mirror, bool flip, int skip_frm_cnt);
     XCamReturn getMirrorFlip(bool& mirror, bool& flip);
     void setDefMirrorFlip();
     XCamReturn swWorkingModeDyn_msg(rk_aiq_working_mode_t mode);
     void setMulCamConc(bool cc);
+    CamCalibDbV2Context_t* getCurrentCalibDBV2(void);
+    XCamReturn calibTuning(const CamCalibDbV2Context_t* aiqCalib,
+                           AlgoList& change_list);
 protected:
     XCamReturn applyAnalyzerResult(SmartPtr<RkAiqFullParamsProxy>& results);
     XCamReturn swWorkingModeDyn(rk_aiq_working_mode_t mode);
@@ -190,6 +204,7 @@ private:
     rk_aiq_metas_cb mMetasCb;
     const char* mSnsEntName;
     const CamCalibDbContext_t* mCalibDb;
+    CamCalibDbV2Context_t* mCalibDbV2;
     rk_aiq_working_mode_t mWorkingMode;
     rk_aiq_working_mode_t mOldWkModeForGray;
     bool mWkSwitching;

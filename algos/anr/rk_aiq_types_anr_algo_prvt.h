@@ -24,6 +24,9 @@
 #include "RkAiqCalibDbTypes.h"
 #include "xcam_log.h"
 #include "xcam_common.h"
+#include "RkAiqCalibDbTypesV2.h"
+#include "RkAiqCalibDbV2Helper.h"
+
 
 RKAIQ_BEGIN_DECLARE
 
@@ -184,9 +187,11 @@ RKAIQ_BEGIN_DECLARE
 
 
 typedef struct ANRGainState_s {
+    int gain_stat_full_last;
     int gainState;
-    float gain_th0;
-    float gain_th1;
+    int gainState_last;
+    float gain_th0[2];
+    float gain_th1[2];
     float gain_cur;
     float ratio;
 } ANRGainState_t;
@@ -204,10 +209,10 @@ typedef struct ANRContext_s {
 
     int refYuvBit;
 
-    CalibDb_BayerNr_t stBayernrCalib;
-    CalibDb_MFNR_t stMfnrCalib;
-    CalibDb_UVNR_t stUvnrCalib;
-    CalibDb_YNR_t stYnrCalib;
+    CalibDb_BayerNr_2_t stBayernrCalib;
+    CalibDb_MFNR_2_t stMfnrCalib;
+    CalibDb_UVNR_2_t stUvnrCalib;
+    CalibDb_YNR_2_t stYnrCalib;
 
     ANRGainState_t stGainState;
 	
@@ -220,6 +225,16 @@ typedef struct ANRContext_s {
 	bool isIQParaUpdate;
 	bool isGrayMode;
 	ANRParamMode_t eParamMode;
+
+	int prepare_type;
+
+	//json
+	CalibDbV2_BayerNrV1_t bayernr_v1;
+  	CalibDbV2_MFNR_t mfnr_v1;
+  	CalibDbV2_UVNR_t uvnr_v1;
+  	CalibDbV2_YnrV1_t ynr_v1;
+
+	CalibDb_MFNR_Motion_t  stMotion;
 } ANRContext_t;
 
 

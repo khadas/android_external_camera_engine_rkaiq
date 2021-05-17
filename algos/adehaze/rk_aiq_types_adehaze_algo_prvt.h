@@ -22,6 +22,8 @@
 
 #include "adehaze/rk_aiq_types_adehaze_algo_int.h"
 #include "RkAiqCalibDbTypes.h"
+#include "RkAiqCalibDbTypesV2.h"
+
 #include "rk_aiq_types_adehaze_stat.h"
 
 #include "rk_aiq_algo_types.h"
@@ -36,20 +38,43 @@
 #define FUNCTION_ENABLE 1
 #define FUNCTION_DISABLE 0
 
+#define ENVLVMAX     (1.0)
+#define ENVLVMIN     (0.0)
+
+
+typedef struct AdehazeAePreResV20_s {
+    float ISO;
+    dehaze_api_mode_t ApiMode;
+} AdehazeAePreResV20_t;
+
+typedef struct AdehazeAePreResV21_s {
+    float EnvLv;
+    dehaze_api_mode_t ApiMode;
+} AdehazeAePreResV21_t;
+
+typedef struct AdehazeAePreRes_s {
+    union {
+        AdehazeAePreResV20_t V20;
+        AdehazeAePreResV21_t V21;
+    };
+} AdehazeAePreRes_t;
 
 typedef struct AdehazeHandle_s {
-    CalibDb_Dehaze_t calib_dehaz;
-    CamCalibDbContext_t* pCalibDb;
-    adehaze_sw_t AdehazeAtrr;
+    adehaze_sw_V2_t AdehazeAtrr;
+    CalibDbV2_dehaze_V21_t calib_dehazV21;
+    CalibDbV2_dehaze_V20_t calib_dehazV20;
     RkAiqAdehazeProcResult_t ProcRes;
     rkisp_adehaze_stats_t stats;
-    int HWversion; //0:isp2.0 1:isp2.1
+    AdehazeVersion_t HWversion;
+    AdehazeAePreRes_t CurrData;
+    AdehazeAePreRes_t PreData;
+    bool byPassProc;
     int width;
     int height;
     int strength;
     int working_mode;
-    int Dehaze_Scene_mode;
     int FrameNumber;
+    int FrameID;
 } AdehazeHandle_t;
 
 

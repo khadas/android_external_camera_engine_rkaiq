@@ -61,7 +61,8 @@ typedef enum RkAiqAlgoType_e {
     RK_AIQ_ALGO_TYPE_AF,
     RK_AIQ_ALGO_TYPE_ABLC,
     RK_AIQ_ALGO_TYPE_ADPCC,
-    RK_AIQ_ALGO_TYPE_AHDR,
+    RK_AIQ_ALGO_TYPE_AMERGE,
+    RK_AIQ_ALGO_TYPE_ATMO,
     RK_AIQ_ALGO_TYPE_ANR,
     RK_AIQ_ALGO_TYPE_ALSC,
     RK_AIQ_ALGO_TYPE_AGIC,
@@ -77,14 +78,19 @@ typedef enum RkAiqAlgoType_e {
     RK_AIQ_ALGO_TYPE_AIE,
     RK_AIQ_ALGO_TYPE_ASHARP,
     RK_AIQ_ALGO_TYPE_AORB,
-    RK_AIQ_ALGO_TYPE_AFEC,
     RK_AIQ_ALGO_TYPE_ACGC,
     RK_AIQ_ALGO_TYPE_ASD,
     RK_AIQ_ALGO_TYPE_ADRC,
+	RK_AIQ_ALGO_TYPE_ADEGAMMA,
+
     RK_AIQ_ALGO_TYPE_ARAWNR,
     RK_AIQ_ALGO_TYPE_AMFNR,
     RK_AIQ_ALGO_TYPE_AYNR,
     RK_AIQ_ALGO_TYPE_ACNR,
+    RK_AIQ_ALGO_TYPE_AEIS,
+    RK_AIQ_ALGO_TYPE_AFEC,
+    RK_AIQ_ALGO_TYPE_AMD,
+    RK_AIQ_ALGO_TYPE_AGAIN,
     RK_AIQ_ALGO_TYPE_MAX
 } RkAiqAlgoType_t;
 
@@ -109,9 +115,10 @@ typedef struct _RkAiqAlgoDesComm {
 typedef enum RkAiqAlgoConfType_e {
     RK_AIQ_ALGO_CONFTYPE_INIT = 0,
     RK_AIQ_ALGO_CONFTYPE_UPDATECALIB = 0x01,
-    RK_AIQ_ALGO_CONFTYPE_CHANGEMODE = 0x02,
-    RK_AIQ_ALGO_CONFTYPE_NEEDRESET = 0x04,
-    RK_AIQ_ALGO_CONFTYPE_CHANGERES = 0x08,
+    RK_AIQ_ALGO_CONFTYPE_CHANGEMODE  = 0x02,
+    RK_AIQ_ALGO_CONFTYPE_NEEDRESET   = 0x04,
+    RK_AIQ_ALGO_CONFTYPE_CHANGERES   = 0x08,
+    RK_AIQ_ALGO_CONFTYPE_KEEPSTATUS  = 0x10,
     RK_AIQ_ALGO_CONFTYPE_MAX
 } RkAiqAlgoConfType_t;
 
@@ -134,7 +141,7 @@ typedef struct _RkAiqAlgoCom {
 } RkAiqAlgoCom;
 
 typedef struct _RkAiqAlgoResCom {
-    void* palce_holder[0];
+    void* palce_holder[1];
 } RkAiqAlgoResCom;
 
 typedef struct _RkAiqAlgoDescription {

@@ -14,12 +14,12 @@
 
 XCamReturn
 rk_aiq_uapi_adehaze_SetAttrib(RkAiqAlgoContext *ctx,
-                              adehaze_sw_t attr,
+                              adehaze_sw_V2_t attr,
                               bool need_sync);
 
 XCamReturn
 rk_aiq_uapi_adehaze_GetAttrib(RkAiqAlgoContext *ctx,
-                              adehaze_sw_t *attr);
+                              adehaze_sw_V2_t *attr);
 
 #endif
 

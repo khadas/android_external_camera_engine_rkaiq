@@ -53,6 +53,7 @@ public:
     bool set_device_name (const char *name);
     bool set_sensor_id (int id);
     bool set_capture_mode (uint32_t capture_mode);
+    bool set_mplanes_count (uint32_t planes_count);
 
     int get_fd () const {
         return _fd;
@@ -97,12 +98,14 @@ public:
     bool set_framerate (uint32_t n, uint32_t d);
     void get_framerate (uint32_t &n, uint32_t &d);
 
-    XCamReturn open ();
-    XCamReturn close ();
+    virtual XCamReturn open ();
+    virtual XCamReturn close ();
 
     XCamReturn query_cap(struct v4l2_capability &cap);
+    XCamReturn get_crop (struct v4l2_crop &crop);
+    XCamReturn set_crop (struct v4l2_crop &crop);
     // set_format
-    XCamReturn get_format (struct v4l2_format &format);
+    virtual XCamReturn get_format (struct v4l2_format &format);
     XCamReturn set_format (struct v4l2_format &format);
     XCamReturn set_format (
         uint32_t width, uint32_t height, uint32_t pixelformat,
@@ -114,16 +117,20 @@ public:
     virtual XCamReturn stop ();
     XCamReturn prepare ();
 
-    int poll_event (int timeout_msec, int stop_fd);
+    virtual int poll_event (int timeout_msec, int stop_fd);
 
     SmartPtr<V4l2Buffer> get_buffer_by_index (int index);
     virtual XCamReturn dequeue_buffer (SmartPtr<V4l2Buffer> &buf);
     virtual XCamReturn queue_buffer (SmartPtr<V4l2Buffer> &buf, bool locked = false);
     XCamReturn return_buffer (SmartPtr<V4l2Buffer> &buf);
+    XCamReturn return_buffer_to_pool (SmartPtr<V4l2Buffer> &buf);
     // get free buf for type V4L2_BUF_TYPE_xxx_OUTPUT
     XCamReturn get_buffer (SmartPtr<V4l2Buffer> &buf, int index = -1) const;
     // use as less as possible
     virtual int io_control (int cmd, void *arg);
+    virtual int get_use_type() { return 0;}
+    virtual void set_use_type(int type) {}
+    SmartPtr<V4l2Buffer> get_available_buffer ();
 
 protected:
 
@@ -164,6 +171,7 @@ protected:
     uint32_t            _buf_count;
     uint32_t            _queued_bufcnt;
     mutable Mutex      _buf_mutex;
+    int32_t            _mplanes_count;
     XCamReturn buffer_new();
     XCamReturn buffer_del();
 };
@@ -174,13 +182,13 @@ class V4l2SubDevice
 public:
     explicit V4l2SubDevice (const char *name = NULL);
 
-    XCamReturn subscribe_event (int event);
-    XCamReturn unsubscribe_event (int event);
-    XCamReturn dequeue_event (struct v4l2_event &event);
-    XCamReturn get_selection (int pad, uint32_t target, struct v4l2_subdev_selection &select);
-    XCamReturn setFormat(struct v4l2_subdev_format &aFormat);
-    XCamReturn getFormat(struct v4l2_subdev_format &aFormat);
-    XCamReturn set_selection (struct v4l2_subdev_selection &aSelection);
+    virtual XCamReturn subscribe_event (int event);
+    virtual XCamReturn unsubscribe_event (int event);
+    virtual XCamReturn dequeue_event (struct v4l2_event &event);
+    virtual XCamReturn get_selection (int pad, uint32_t target, struct v4l2_subdev_selection &select);
+    virtual XCamReturn setFormat(struct v4l2_subdev_format &aFormat);
+    virtual XCamReturn getFormat(struct v4l2_subdev_format &aFormat);
+    virtual XCamReturn set_selection (struct v4l2_subdev_selection &aSelection);
 
     virtual XCamReturn start (bool prepared = false);
     virtual XCamReturn stop ();

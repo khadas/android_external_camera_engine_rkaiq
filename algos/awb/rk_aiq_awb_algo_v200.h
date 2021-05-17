@@ -25,7 +25,7 @@
 #include "rk_aiq_types_awb_stat_v200.h"
 #include "rk_aiq_types_awb_algo_prvt.h"
 
-XCamReturn AwbInitV200(awb_contex_t** para, const CamCalibDbContext_t* calib);
+XCamReturn AwbInitV200(awb_contex_t** para, const CamCalibDbV2Context_t* calib);
 XCamReturn AwbPrepareV200(awb_contex_t *para);
 XCamReturn AwbReconfigV200(awb_contex_t *para);
 XCamReturn AwbPreProcV200(rk_aiq_awb_stat_res_v200_t awb_measure_result, awb_contex_t* para);

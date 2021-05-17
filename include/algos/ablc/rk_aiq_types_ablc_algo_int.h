@@ -22,11 +22,10 @@
 #define _RK_AIQ_TYPE_ABLC_ALGO_INT_H_
 #include "ablc/rk_aiq_types_ablc_algo.h"
 #include "RkAiqCalibDbTypes.h"
+#include "RkAiqCalibDbTypesV2.h"
 
 
-RKAIQ_BEGIN_DECLARE
-
-#define BLC_MAX_ISO_LEVEL CALIBDB_BLC_MAX_ISO_LEVEL
+#define ABLC_RECALCULATE_DELTE_ISO  (10)
 
 typedef enum AblcResult_e {
     ABLC_RET_SUCCESS            = 0,   // this has to be 0, if clauses rely on it
@@ -52,58 +51,40 @@ typedef enum AblcState_e {
 } AblcState_t;
 
 typedef enum AblcOPMode_e {
-    ABLC_OP_MODE_INVALID          = 0,                    /**< initialization value */
-    ABLC_OP_MODE_AUTO             = 1,                   /**< instance is created, but not initialized */
-    ABLC_OP_MODE_MANUAL           = 2,                   /**< instance is confiured (ready to start) or stopped */
-    ABLC_OP_MODE_MAX                                      /**< max */
+    ABLC_OP_MODE_API_OFF          = 0,                    /**< initialization value */
+    ABLC_OP_MODE_API_TOOL             = 1,                   /**< instance is created, but not initialized */
+    ABLC_OP_MODE_API_MANUAL           = 2,                   /**< instance is confiured (ready to start) or stopped */
+    ABLC_OP_MODE_API_MAX                                      /**< max */
 } AblcOPMode_t;
 
 typedef enum AblcParamMode_e {
     ABLC_PARAM_MODE_INVALID          = 0,                    /**< initialization value */
     ABLC_PARAM_MODE_NORMAL             = 1,                   /**< instance is created, but not initialized */
-    ABLC_PARAM_MODE_HDR           = 2,                   /**< instance is confiured (ready to start) or stopped */                               
+    ABLC_PARAM_MODE_HDR           = 2,                   /**< instance is confiured (ready to start) or stopped */
     ABLC_PARAM_MODE_MAX                                        /**< max */
 } AblcParamMode_t;
 
-
-typedef struct AblcParams_s {
-    int enable;
-    int iso[BLC_MAX_ISO_LEVEL];
-    short int blc_r[BLC_MAX_ISO_LEVEL];
-    short int blc_gr[BLC_MAX_ISO_LEVEL];
-    short int blc_gb[BLC_MAX_ISO_LEVEL];
-    short int blc_b[BLC_MAX_ISO_LEVEL];
-} AblcParams_t;
-
-typedef struct AblcParamsSelect_s {
-    int enable;
+typedef struct AblcManualAttr_s {
+    bool enable;
     short int blc_r;
     short int blc_gr;
     short int blc_gb;
     short int blc_b;
-} AblcParamsSelect_t;
-
-typedef struct AblcManualAttr_s {
-    AblcParamsSelect_t stSelect;
 } AblcManualAttr_t;
 
-typedef struct AblcAutoAttr_s {
-    AblcParams_t stParams;
-    AblcParamsSelect_t stSelect;
-} AblcAutoAttr_t;
+typedef struct AblcProc_s {
+    bool enable;
+    short int blc_r;
+    short int blc_gr;
+    short int blc_gb;
+    short int blc_b;
 
-typedef struct AblcProcResult_s {
-    AblcParamsSelect_t stResult;
-} AblcProcResult_t;
-
-typedef struct AblcConfig_s {
-    AblcState_t eState;
-    AblcOPMode_t eMode;
-} AblcConfig_t;
+    bool isNeedUpdate;
+} AblcProc_t;
 
 typedef struct rk_aiq_blc_attrib_s {
     AblcOPMode_t eMode;
-    AblcAutoAttr_t stAuto;
+    CalibDbV2_Ablc_t stTool;
     AblcManualAttr_t stManual;
 } rk_aiq_blc_attrib_t;
 
@@ -114,8 +95,6 @@ typedef struct AblcExpInfo_s {
     float arDGain[3];
     int   arIso[3];
 } AblcExpInfo_t;
-
-RKAIQ_END_DECLARE
 
 #endif
 

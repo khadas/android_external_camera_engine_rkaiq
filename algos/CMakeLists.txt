@@ -48,11 +48,6 @@ if(EXISTS "${CMAKE_SOURCE_DIR}/algos/ae/rk_aiq_algo_ae_itf.cpp")
 	set_target_properties(rkaiq_ae PROPERTIES CXX_VISIBILITY_PRESET default)
 else()
 	message(STATUS "Can NOT found ${CMAKE_SOURCE_DIR}/algos/ae/rk_aiq_algo_ae_itf.cpp. Using lib")
-	if(ARCH STREQUAL "aarch64")
-		file(COPY ${CMAKE_SOURCE_DIR}/algos/ae/linux/arm64/librkaiq_ae.a DESTINATION ${LIBRARY_OUTPUT_PATH})
-	else()
-		file(COPY ${CMAKE_SOURCE_DIR}/algos/ae/linux/arm/librkaiq_ae.a DESTINATION ${LIBRARY_OUTPUT_PATH})
-	endif()
 	add_library(rkaiq_ae STATIC IMPORTED)
 	set_target_properties(rkaiq_ae PROPERTIES IMPORTED_LOCATION
         "${PREFIX}rkaiq_ae.${SUFFIX}")
@@ -76,6 +71,7 @@ set (AWB_SRC
 	awb/rk_aiq_awb_algo_v201.cpp
 	awb/rk_aiq_algo_awb_itf.cpp
 	awb/rk_aiq_uapi_awb_int.cpp
+	awb/rk_aiq_uapiv2_awb_int.cpp
     )
 
 if(EXISTS "${CMAKE_SOURCE_DIR}/algos/awb/rk_aiq_algo_awb_itf.cpp")
@@ -87,11 +83,6 @@ if(EXISTS "${CMAKE_SOURCE_DIR}/algos/awb/rk_aiq_algo_awb_itf.cpp")
 	set_target_properties(rkaiq_awb PROPERTIES CXX_VISIBILITY_PRESET default)
 else()
 	message(STATUS "Can NOT found ${CMAKE_SOURCE_DIR}/algos/awb/rk_aiq_algo_awb_itf.cpp. Using lib")
-	if(ARCH STREQUAL "aarch64")
-		file(COPY ${CMAKE_SOURCE_DIR}/algos/awb/linux/arm64/librkaiq_awb.a DESTINATION ${LIBRARY_OUTPUT_PATH})
-	else()
-		file(COPY ${CMAKE_SOURCE_DIR}/algos/awb/linux/arm/librkaiq_awb.a DESTINATION ${LIBRARY_OUTPUT_PATH})
-	endif()
 	add_library(rkaiq_awb STATIC IMPORTED)
 	set_target_properties(rkaiq_awb PROPERTIES IMPORTED_LOCATION
         "${PREFIX}rkaiq_awb.${SUFFIX}")
@@ -120,11 +111,6 @@ if(EXISTS "${CMAKE_SOURCE_DIR}/algos/af/rk_aiq_algo_af_itf.cpp")
 	set_target_properties(rkaiq_af PROPERTIES CXX_VISIBILITY_PRESET default)
 else()
 	message(STATUS "Can NOT found ${CMAKE_SOURCE_DIR}/algos/af/rk_aiq_algo_af_itf.cpp. Using lib")
-	if(ARCH STREQUAL "aarch64")
-		file(COPY ${CMAKE_SOURCE_DIR}/algos/af/linux/arm64/librkaiq_af.a DESTINATION ${LIBRARY_OUTPUT_PATH})
-	else()
-		file(COPY ${CMAKE_SOURCE_DIR}/algos/af/linux/arm/librkaiq_af.a DESTINATION ${LIBRARY_OUTPUT_PATH})
-	endif()
 	add_library(rkaiq_af STATIC IMPORTED)
 	set_target_properties(rkaiq_af PROPERTIES IMPORTED_LOCATION
         "${PREFIX}rkaiq_af.${SUFFIX}")
@@ -133,30 +119,53 @@ else()
 endif()
 
 # ----------------------------------------------------------------------------
-# add ahdr implement
+# add amerge implement
 # ----------------------------------------------------------------------------
-set (AHDR_SRC
-	ahdr/rk_aiq_algo_ahdr_itf.cpp
-	ahdr/rk_aiq_ahdr_algo.cpp
-    ahdr/rk_aiq_ahdr_algo_merge.cpp
-    ahdr/rk_aiq_ahdr_algo_tmo.cpp
-	ahdr/rk_aiq_uapi_ahdr_int.cpp
+set (AMERGE_SRC
+	amerge/rk_aiq_algo_amerge_itf.cpp
+	amerge/rk_aiq_amerge_algo.cpp
+	amerge/rk_aiq_uapi_amerge_int.cpp
     )
 
-if(EXISTS "${CMAKE_SOURCE_DIR}/algos/ahdr/rk_aiq_algo_ahdr_itf.cpp")
+if(EXISTS "${CMAKE_SOURCE_DIR}/algos/amerge/rk_aiq_algo_amerge_itf.cpp")
 	message(${LIBRARY_OUTPUT_PATH})
-	add_library(rkaiq_ahdr STATIC ${AHDR_SRC})
-	set_target_properties(rkaiq_ahdr PROPERTIES FOLDER "algos/ahdr")
-	set_target_properties(rkaiq_ahdr PROPERTIES CLEAN_DIRECT_OUTPUT 1)
-	set_target_properties(rkaiq_ahdr PROPERTIES C_VISIBILITY_PRESET default)
-	set_target_properties(rkaiq_ahdr PROPERTIES CXX_VISIBILITY_PRESET default)
+	add_library(rkaiq_amerge STATIC ${AMERGE_SRC})
+	set_target_properties(rkaiq_amerge PROPERTIES FOLDER "algos/amerge")
+	set_target_properties(rkaiq_amerge PROPERTIES CLEAN_DIRECT_OUTPUT 1)
+	set_target_properties(rkaiq_amerge PROPERTIES C_VISIBILITY_PRESET default)
+	set_target_properties(rkaiq_amerge PROPERTIES CXX_VISIBILITY_PRESET default)
 else()
-	message(STATUS "Can NOT found ${CMAKE_SOURCE_DIR}/algos/ahdr/rk_aiq_algo_ahdr_itf.cpp. Using lib")
-	add_library(rkaiq_ahdr STATIC IMPORTED)
-	set_target_properties(rkaiq_ahdr PROPERTIES IMPORTED_LOCATION
-        "${PREFIX}rkaiq_ahdr.${SUFFIX}")
-	set_target_properties(rkaiq_ahdr PROPERTIES IMPORTED_IMPLIB
-        "${PREFIX}rkaiq_ahdr.${SUFFIX}")
+	message(STATUS "Can NOT found ${CMAKE_SOURCE_DIR}/algos/amerge/rk_aiq_algo_amerge_itf.cpp. Using lib")
+	add_library(rkaiq_amerge STATIC IMPORTED)
+	set_target_properties(rkaiq_amerge PROPERTIES IMPORTED_LOCATION
+        "${PREFIX}rkaiq_amerge.${SUFFIX}")
+	set_target_properties(rkaiq_amerge PROPERTIES IMPORTED_IMPLIB
+        "${PREFIX}rkaiq_amerge.${SUFFIX}")
+endif()
+
+# ----------------------------------------------------------------------------
+# add atmo implement
+# ----------------------------------------------------------------------------
+set (ATMO_SRC
+	atmo/rk_aiq_algo_atmo_itf.cpp
+	atmo/rk_aiq_atmo_algo.cpp
+	atmo/rk_aiq_uapi_atmo_int.cpp
+    )
+
+if(EXISTS "${CMAKE_SOURCE_DIR}/algos/atmo/rk_aiq_algo_atmo_itf.cpp")
+	message(${LIBRARY_OUTPUT_PATH})
+	add_library(rkaiq_atmo STATIC ${ATMO_SRC})
+	set_target_properties(rkaiq_atmo PROPERTIES FOLDER "algos/atmo")
+	set_target_properties(rkaiq_atmo PROPERTIES CLEAN_DIRECT_OUTPUT 1)
+	set_target_properties(rkaiq_atmo PROPERTIES C_VISIBILITY_PRESET default)
+	set_target_properties(rkaiq_atmo PROPERTIES CXX_VISIBILITY_PRESET default)
+else()
+	message(STATUS "Can NOT found ${CMAKE_SOURCE_DIR}/algos/atmo/rk_aiq_algo_atmo_itf.cpp. Using lib")
+	add_library(rkaiq_atmo STATIC IMPORTED)
+	set_target_properties(rkaiq_atmo PROPERTIES IMPORTED_LOCATION
+        "${PREFIX}rkaiq_atmo.${SUFFIX}")
+	set_target_properties(rkaiq_atmo PROPERTIES IMPORTED_IMPLIB
+        "${PREFIX}rkaiq_atmo.${SUFFIX}")
 endif()
 
 # ----------------------------------------------------------------------------
@@ -165,6 +174,7 @@ endif()
 set (ADRC_SRC
 	adrc/rk_aiq_algo_adrc_itf.cpp
 	adrc/rk_aiq_adrc_algo.cpp
+	adrc/rk_aiq_uapi_adrc_int.cpp
     )
 
 if(EXISTS "${CMAKE_SOURCE_DIR}/algos/adrc/rk_aiq_algo_adrc_itf.cpp")
@@ -175,7 +185,7 @@ if(EXISTS "${CMAKE_SOURCE_DIR}/algos/adrc/rk_aiq_algo_adrc_itf.cpp")
 	set_target_properties(rkaiq_adrc PROPERTIES C_VISIBILITY_PRESET default)
 	set_target_properties(rkaiq_adrc PROPERTIES CXX_VISIBILITY_PRESET default)
 else()
-	message(STATUS "Can NOT found 
+	message(STATUS "Can NOT found
 	${CMAKE_SOURCE_DIR}/algos/adrc/rk_aiq_algo_adrc_itf.cpp. Using lib")
 	add_library(rkaiq_adrc STATIC IMPORTED)
 	set_target_properties(rkaiq_adrc PROPERTIES IMPORTED_LOCATION
@@ -259,11 +269,6 @@ if(EXISTS "${CMAKE_SOURCE_DIR}/algos/asd/rk_aiq_algo_asd_itf.cpp")
 	set_target_properties(rkaiq_asd PROPERTIES CXX_VISIBILITY_PRESET default)
 else()
 	message(STATUS "Can NOT found ${CMAKE_SOURCE_DIR}/algos/asd/rk_aiq_algo_asd_itf.cpp. Using lib")
-	if(ARCH STREQUAL "aarch64")
-		file(COPY ${CMAKE_SOURCE_DIR}/algos/asd/linux/arm64/librkaiq_asd.a DESTINATION ${LIBRARY_OUTPUT_PATH})
-	else()
-		file(COPY ${CMAKE_SOURCE_DIR}/algos/asd/linux/arm/librkaiq_asd.a DESTINATION ${LIBRARY_OUTPUT_PATH})
-	endif()
 	add_library(rkaiq_asd STATIC IMPORTED)
 	set_target_properties(rkaiq_asd PROPERTIES IMPORTED_LOCATION
         "${PREFIX}rkaiq_asd.${SUFFIX}")
@@ -301,7 +306,7 @@ endif()
 set (ADHAZ_SRC
 	adehaze/rk_aiq_algo_adhaz_itf.cpp
     adehaze/rk_aiq_adehaze_algo.cpp
-   
+
     adehaze/rk_aiq_uapi_adehaze_int.cpp
 
     )
@@ -502,7 +507,7 @@ set (AGAMMA_SRC
 	agamma/rk_aiq_algo_agamma_itf.cpp
 	agamma/rk_aiq_agamma_algo.cpp
     agamma/rk_aiq_uapi_agamma_int.cpp
-	
+
     )
 
 
@@ -520,6 +525,33 @@ else()
         "${PREFIX}rkaiq_agamma.${SUFFIX}")
 	set_target_properties(rkaiq_agamma PROPERTIES IMPORTED_IMPLIB
         "${PREFIX}rkaiq_agamma.${SUFFIX}")
+endif()
+
+# ----------------------------------------------------------------------------
+# add adegamma implement
+# ----------------------------------------------------------------------------
+set (ADEGAMMA_SRC
+	adegamma/rk_aiq_algo_adegamma_itf.cpp
+	adegamma/rk_aiq_adegamma_algo.cpp
+    adegamma/rk_aiq_uapi_adegamma_int.cpp
+    )
+
+
+if(EXISTS "${CMAKE_SOURCE_DIR}/algos/adegamma/rk_aiq_algo_adegamma_itf.cpp")
+	message(${LIBRARY_OUTPUT_PATH})
+	add_library(rkaiq_adegamma STATIC ${ADEGAMMA_SRC})
+	set_target_properties(rkaiq_adegamma PROPERTIES FOLDER "algos/adegamma")
+	set_target_properties(rkaiq_adegamma PROPERTIES CLEAN_DIRECT_OUTPUT 1)
+	set_target_properties(rkaiq_adegamma PROPERTIES C_VISIBILITY_PRESET default)
+	set_target_properties(rkaiq_adegamma PROPERTIES CXX_VISIBILITY_PRESET default)
+else()
+	message(STATUS "Can NOT found
+	${CMAKE_SOURCE_DIR}/algos/adegamma/rk_aiq_algo_adegamma_itf.cpp. Using lib")
+	add_library(rkaiq_adegamma STATIC IMPORTED)
+	set_target_properties(rkaiq_adegamma PROPERTIES IMPORTED_LOCATION
+        "${PREFIX}rkaiq_adegamma.${SUFFIX}")
+	set_target_properties(rkaiq_adegamma PROPERTIES IMPORTED_IMPLIB
+        "${PREFIX}rkaiq_adegamma.${SUFFIX}")
 endif()
 
 # ----------------------------------------------------------------------------
@@ -552,6 +584,7 @@ endif()
 # ----------------------------------------------------------------------------
 set (AIE_SRC
 	aie/rk_aiq_algo_aie_itf.cpp
+	aie/rk_aiq_algo_aie_int.cpp
     )
 
 if(EXISTS "${CMAKE_SOURCE_DIR}/algos/aie/rk_aiq_algo_aie_itf.cpp")
@@ -758,7 +791,7 @@ set (ACNR_V1_SRC
 if(EXISTS "${CMAKE_SOURCE_DIR}/algos/acnr/rk_aiq_acnr_algo_itf_v1.cpp")
 	message(${LIBRARY_OUTPUT_PATH})
 	add_library(rkaiq_acnr_v1 STATIC ${ACNR_V1_SRC})
-	set_target_properties(rkaiq_acnr_v1 PROPERTIES FOLDER "algos/acnr1")
+	set_target_properties(rkaiq_acnr_v1 PROPERTIES FOLDER "algos/acnr")
 	set_target_properties(rkaiq_acnr_v1 PROPERTIES CLEAN_DIRECT_OUTPUT 1)
 	set_target_properties(rkaiq_acnr_v1 PROPERTIES C_VISIBILITY_PRESET default)
 	set_target_properties(rkaiq_acnr_v1 PROPERTIES CXX_VISIBILITY_PRESET default)
@@ -796,4 +829,195 @@ else()
         "${PREFIX}rkaiq_arawnr_v2.${SUFFIX}")
 	set_target_properties(rkaiq_arawnr_v2 PROPERTIES IMPORTED_IMPLIB
         "${PREFIX}rkaiq_arawnr_v2.${SUFFIX}")
+endif()
+
+set(AEIS_SRC
+    aeis/eis_loader.cpp
+    aeis/scaler_service.cpp
+    aeis/remap_backend.cpp
+    aeis/imu_service.cpp
+    aeis/eis_algo_service.cpp
+    aeis/rk_aiq_uapi_aeis_int.cpp
+    aeis/rk_aiq_algo_aeis_itf.cpp)
+
+if(EXISTS "${CMAKE_SOURCE_DIR}/algos/aeis/rk_aiq_algo_aeis_itf.cpp")
+	message(${LIBRARY_OUTPUT_PATH})
+    add_library(rkaiq_aeis STATIC ${AEIS_SRC})
+    set_target_properties(rkaiq_aeis PROPERTIES FOLDER "algos/aeis")
+	set_target_properties(rkaiq_aeis PROPERTIES CLEAN_DIRECT_OUTPUT 1)
+	set_target_properties(rkaiq_aeis PROPERTIES C_VISIBILITY_PRESET default)
+	set_target_properties(rkaiq_aeis PROPERTIES CXX_VISIBILITY_PRESET default)
+else()
+	message(STATUS "Can NOT found ${CMAKE_SOURCE_DIR}/algos/aeis/rk_aiq_algo_aeis_itf.cpp. Using lib")
+	add_library(rkaiq_aeis STATIC IMPORTED)
+	set_target_properties(rkaiq_aeis PROPERTIES IMPORTED_LOCATION
+        "${PREFIX}rkaiq_aeis.${SUFFIX}")
+	set_target_properties(rkaiq_aeis PROPERTIES IMPORTED_IMPLIB
+        "${PREFIX}rkaiq_aeis.${SUFFIX}")
+endif()
+
+
+
+add_library(dvs_gyro SHARED IMPORTED GLOBAL)
+set_target_properties(dvs_gyro PROPERTIES
+    IMPORTED_LOCATION "${CMAKE_SOURCE_DIR}/algos/aeis/lib/libdvs_gyro.so"
+    INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_SOURCE_DIR}/algos/aeis")
+
+# ----------------------------------------------------------------------------
+# add amd implement
+# ----------------------------------------------------------------------------
+set (AMD_SRC
+	amd/rk_aiq_algo_amd_itf.cpp
+    )
+
+if(EXISTS "${CMAKE_SOURCE_DIR}/algos/amd/rk_aiq_algo_amd_itf.cpp")
+    file(COPY ${CMAKE_SOURCE_DIR}/algos/amd/md_lib/librkaiq_tnr_md.a 	DESTINATION ${LIBRARY_OUTPUT_PATH})
+    add_library(rkaiq_tnr_md STATIC IMPORTED)
+    set_target_properties(rkaiq_tnr_md PROPERTIES IMPORTED_LOCATION 	"${PREFIX}rkaiq_tnr_md.${SUFFIX}")
+    set_target_properties(rkaiq_tnr_md PROPERTIES IMPORTED_IMPLIB 	    "${PREFIX}rkaiq_tnr_md.${SUFFIX}")
+
+	message(${LIBRARY_OUTPUT_PATH})
+	add_library(rkaiq_amd STATIC ${AMD_SRC})
+	set_target_properties(rkaiq_amd PROPERTIES FOLDER "algos/amd")
+	set_target_properties(rkaiq_amd PROPERTIES CLEAN_DIRECT_OUTPUT 1)
+	set_target_properties(rkaiq_amd PROPERTIES C_VISIBILITY_PRESET default)
+	set_target_properties(rkaiq_amd PROPERTIES CXX_VISIBILITY_PRESET default)
+else()
+	message(STATUS "Can NOT found ${CMAKE_SOURCE_DIR}/algos/amd/rk_aiq_amd_algo_itf.cpp. Using lib")
+	add_library(rkaiq_amd STATIC IMPORTED)
+	set_target_properties(rkaiq_amd PROPERTIES IMPORTED_LOCATION
+        "${PREFIX}rkaiq_amd.${SUFFIX}")
+	set_target_properties(rkaiq_amd PROPERTIES IMPORTED_IMPLIB
+        "${PREFIX}rkaiq_amd.${SUFFIX}")
+endif()
+
+# ----------------------------------------------------------------------------
+# add arawnr1 implement
+# ----------------------------------------------------------------------------
+set (ARAWNR_V1_SRC
+	arawnr/rk_aiq_abayernr_algo_itf_v1.cpp
+	arawnr/rk_aiq_abayernr_algo_bayernr_v1.cpp
+	arawnr/rk_aiq_abayernr_algo_v1.cpp
+	arawnr/rk_aiq_uapi_abayernr_int_v1.cpp
+    )
+
+if(EXISTS "${CMAKE_SOURCE_DIR}/algos/arawnr/rk_aiq_abayernr_algo_itf_v1.cpp")
+	message(${LIBRARY_OUTPUT_PATH})
+	add_library(rkaiq_arawnr_v1 STATIC ${ARAWNR_V1_SRC})
+	set_target_properties(rkaiq_arawnr_v1 PROPERTIES FOLDER "algos/arawnr")
+	set_target_properties(rkaiq_arawnr_v1 PROPERTIES CLEAN_DIRECT_OUTPUT 1)
+	set_target_properties(rkaiq_arawnr_v1 PROPERTIES C_VISIBILITY_PRESET default)
+	set_target_properties(rkaiq_arawnr_v1 PROPERTIES CXX_VISIBILITY_PRESET default)
+else()
+	message(STATUS "Can NOT found ${CMAKE_SOURCE_DIR}/algos/arawnr/rk_aiq_abayernr_algo_itf_v1.cpp. Using lib")
+	add_library(rkaiq_arawnr_v1 STATIC IMPORTED)
+	set_target_properties(rkaiq_arawnr_v1 PROPERTIES IMPORTED_LOCATION
+        "${PREFIX}rkaiq_arawnr_v1.${SUFFIX}")
+	set_target_properties(rkaiq_arawnr_v1 PROPERTIES IMPORTED_IMPLIB
+        "${PREFIX}rkaiq_arawnr_v1.${SUFFIX}")
+endif()
+
+# ----------------------------------------------------------------------------
+# add aynr1 implement
+# ----------------------------------------------------------------------------
+set (AYNR_V1_SRC
+	aynr/rk_aiq_aynr_algo_itf_v1.cpp
+	aynr/rk_aiq_aynr_algo_ynr_v1.cpp
+	aynr/rk_aiq_aynr_algo_v1.cpp
+	aynr/rk_aiq_uapi_aynr_int_v1.cpp
+    )
+
+if(EXISTS "${CMAKE_SOURCE_DIR}/algos/aynr/rk_aiq_aynr_algo_itf_v1.cpp")
+	message(${LIBRARY_OUTPUT_PATH})
+	add_library(rkaiq_aynr_v1 STATIC ${AYNR_V1_SRC})
+	set_target_properties(rkaiq_aynr_v1 PROPERTIES FOLDER "algos/aynr")
+	set_target_properties(rkaiq_aynr_v1 PROPERTIES CLEAN_DIRECT_OUTPUT 1)
+	set_target_properties(rkaiq_aynr_v1 PROPERTIES C_VISIBILITY_PRESET default)
+	set_target_properties(rkaiq_aynr_v1 PROPERTIES CXX_VISIBILITY_PRESET default)
+else()
+	message(STATUS "Can NOT found ${CMAKE_SOURCE_DIR}/algos/aynr/rk_aiq_aynr_algo_itf_v1.cpp. Using lib")
+	add_library(rkaiq_aynr_v1 STATIC IMPORTED)
+	set_target_properties(rkaiq_aynr_v1 PROPERTIES IMPORTED_LOCATION
+        "${PREFIX}rkaiq_aynr_v1.${SUFFIX}")
+	set_target_properties(rkaiq_aynr_v1 PROPERTIES IMPORTED_IMPLIB
+        "${PREFIX}rkaiq_aynr_v1.${SUFFIX}")
+endif()
+
+# ----------------------------------------------------------------------------
+# add auvnr1 implement
+# ----------------------------------------------------------------------------
+set (AUVNR_V1_SRC
+	auvnr/rk_aiq_auvnr_algo_itf_v1.cpp
+	auvnr/rk_aiq_auvnr_algo_uvnr_v1.cpp
+	auvnr/rk_aiq_auvnr_algo_v1.cpp
+	auvnr/rk_aiq_uapi_auvnr_int_v1.cpp
+    )
+
+if(EXISTS "${CMAKE_SOURCE_DIR}/algos/auvnr/rk_aiq_auvnr_algo_itf_v1.cpp")
+	message(${LIBRARY_OUTPUT_PATH})
+	add_library(rkaiq_auvnr_v1 STATIC ${AUVNR_V1_SRC})
+	set_target_properties(rkaiq_auvnr_v1 PROPERTIES FOLDER "algos/auvnr")
+	set_target_properties(rkaiq_auvnr_v1 PROPERTIES CLEAN_DIRECT_OUTPUT 1)
+	set_target_properties(rkaiq_auvnr_v1 PROPERTIES C_VISIBILITY_PRESET default)
+	set_target_properties(rkaiq_auvnr_v1 PROPERTIES CXX_VISIBILITY_PRESET default)
+else()
+	message(STATUS "Can NOT found ${CMAKE_SOURCE_DIR}/algos/auvnr/rk_aiq_auvnr_algo_itf_v1.cpp. Using lib")
+	add_library(rkaiq_auvnr_v1 STATIC IMPORTED)
+	set_target_properties(rkaiq_auvnr_v1 PROPERTIES IMPORTED_LOCATION
+        "${PREFIX}rkaiq_auvnr_v1.${SUFFIX}")
+	set_target_properties(rkaiq_auvnr_v1 PROPERTIES IMPORTED_IMPLIB
+        "${PREFIX}rkaiq_auvnr_v1.${SUFFIX}")
+endif()
+
+# ----------------------------------------------------------------------------
+# add amfnr v1 implement
+# ----------------------------------------------------------------------------
+set (AMFNR_V1_SRC
+	amfnr/rk_aiq_amfnr_algo_itf_v1.cpp
+	amfnr/rk_aiq_amfnr_algo_mfnr_v1.cpp
+	amfnr/rk_aiq_amfnr_algo_v1.cpp
+	amfnr/rk_aiq_uapi_amfnr_int_v1.cpp
+    )
+
+if(EXISTS "${CMAKE_SOURCE_DIR}/algos/amfnr/rk_aiq_amfnr_algo_itf_v1.cpp")
+	message(${LIBRARY_OUTPUT_PATH})
+	add_library(rkaiq_amfnr_v1 STATIC ${AMFNR_V1_SRC})
+	set_target_properties(rkaiq_amfnr_v1 PROPERTIES FOLDER "algos/amfnr")
+	set_target_properties(rkaiq_amfnr_v1 PROPERTIES CLEAN_DIRECT_OUTPUT 1)
+	set_target_properties(rkaiq_amfnr_v1 PROPERTIES C_VISIBILITY_PRESET default)
+	set_target_properties(rkaiq_amfnr_v1 PROPERTIES CXX_VISIBILITY_PRESET default)
+else()
+	message(STATUS "Can NOT found ${CMAKE_SOURCE_DIR}/algos/amfnr/rk_aiq_amfnr_algo_itf_v1.cpp. Using lib")
+	add_library(rkaiq_amfnr_v1 STATIC IMPORTED)
+	set_target_properties(rkaiq_amfnr_v1 PROPERTIES IMPORTED_LOCATION
+        "${PREFIX}rkaiq_amfnr_v1.${SUFFIX}")
+	set_target_properties(rkaiq_amfnr_v1 PROPERTIES IMPORTED_IMPLIB
+        "${PREFIX}rkaiq_amfnr_v1.${SUFFIX}")
+endif()
+
+
+# ----------------------------------------------------------------------------
+# add again v1 implement
+# ----------------------------------------------------------------------------
+set (AGAIN_V1_SRC
+	again/rk_aiq_again_algo_itf.cpp
+	again/rk_aiq_again_algo_gain.cpp
+	again/rk_aiq_again_algo.cpp
+	again/rk_aiq_uapi_again_int.cpp
+    )
+
+if(EXISTS "${CMAKE_SOURCE_DIR}/algos/again/rk_aiq_again_algo_itf.cpp")
+	message(${LIBRARY_OUTPUT_PATH})
+	add_library(rkaiq_again_v1 STATIC ${AGAIN_V1_SRC})
+	set_target_properties(rkaiq_again_v1 PROPERTIES FOLDER "algos/again")
+	set_target_properties(rkaiq_again_v1 PROPERTIES CLEAN_DIRECT_OUTPUT 1)
+	set_target_properties(rkaiq_again_v1 PROPERTIES C_VISIBILITY_PRESET default)
+	set_target_properties(rkaiq_again_v1 PROPERTIES CXX_VISIBILITY_PRESET default)
+else()
+	message(STATUS "Can NOT found ${CMAKE_SOURCE_DIR}/algos/again/rk_aiq_again_algo_itf.cpp. Using lib")
+	add_library(rkaiq_again_v1 STATIC IMPORTED)
+	set_target_properties(rkaiq_again_v1 PROPERTIES IMPORTED_LOCATION
+        "${PREFIX}rkaiq_again_v1.${SUFFIX}")
+	set_target_properties(rkaiq_again_v1 PROPERTIES IMPORTED_IMPLIB
+        "${PREFIX}rkaiq_again_v1.${SUFFIX}")
 endif()

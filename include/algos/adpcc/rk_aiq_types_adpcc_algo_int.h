@@ -20,13 +20,12 @@
 #ifndef _RK_AIQ_TYPE_ADPCC_ALGO_INT_H_
 #define _RK_AIQ_TYPE_ADPCC_ALGO_INT_H_
 #include "RkAiqCalibDbTypes.h"
+#include "RkAiqCalibDbTypesV2.h"
 #include "adpcc/rk_aiq_types_adpcc_algo.h"
 #include "base/xcam_common.h"
 
 
-RKAIQ_BEGIN_DECLARE
-
-#define DPCC_MAX_ISO_LEVEL CALIBDB_MAX_ISO_LEVEL
+#define DPCC_MAX_ISO_LEVEL CALIBDB_ADPCC_KNOTS_NUM
 #define DPCC_PDAF_POINT_NUM (16)
 
 typedef enum AdpccResult_e {
@@ -56,7 +55,7 @@ typedef enum AdpccOPMode_e {
     ADPCC_OP_MODE_INVALID        = 0,                   /**< initialization value */
     ADPCC_OP_MODE_AUTO            = 1,                   /**< instance is created, but not initialized */
     ADPCC_OP_MODE_MANUAL          = 2,                   /**< instance is confiured (ready to start) or stopped */
-    ADPCC_OP_MODE_TOOL            = 3,                   /**< instance is confiured (ready to start) or stopped */
+    //ADPCC_OP_MODE_TOOL            = 3,                   /**< instance is confiured (ready to start) or stopped */
     ADPCC_OP_MODE_MAX                                      /**< max */
 } AdpccOPMode_t;
 
@@ -353,12 +352,12 @@ typedef struct AdpccConfig_s {
     AdpccState_t eState;
 } AdpccConfig_t;
 
-typedef struct rk_aiq_dpcc_attrib_s {
+typedef struct rk_aiq_dpcc_attrib_V20_s {
     AdpccOPMode_t eMode;
     Adpcc_Auto_Attr_t stAuto;
     Adpcc_Manual_Attr_t stManual;
-    CalibDb_Dpcc_t stTool;
-} rk_aiq_dpcc_attrib_t;
+    //CalibDbV2_Dpcc_t stTool;
+} rk_aiq_dpcc_attrib_V20_t;
 
 typedef struct AdpccExpInfo_s {
     int hdr_mode;
@@ -388,11 +387,4 @@ typedef struct Adpcc_pre_ae_res_s {
 } Adpcc_pre_ae_res_t;
 
 
-RKAIQ_END_DECLARE
-
 #endif
-
-
-
-
-

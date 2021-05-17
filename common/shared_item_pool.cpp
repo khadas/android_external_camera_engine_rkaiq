@@ -20,53 +20,15 @@
 namespace RkCam {
 
 template<typename T>
-uint32_t SharedItemPool<T>::construct_pool(uint32_t max_count)
-{
-    uint32_t i = 0;
-
-    if (max_count <= 0)
-        return 0;
-
-    for (i = _allocated_num; i < max_count; ++i) {
-        SmartPtr<T> new_data = allocate_data ();
-        if (!new_data.ptr ())
-            break;
-        _item_list.push (new_data);
-    }
-
-    if (i != _max_count) {
-        LOGW("SharedItemPool<%s> expect to reserve %d data but only reserved %d",
-             _name, max_count, i);
-    }
-    _max_count = i;
-    _allocated_num = _max_count;
-
-    return _allocated_num;
-}
-
-template<typename T>
 SharedItemPool<T>::SharedItemPool(const char* name, uint32_t max_count)
-    : _name(name ? name : "default")
-    , _allocated_num(0)
+    : BufferPool()
+    ,_name(name ? name : "default")
     , _max_count(max_count)
 {
     LOG1("ENTER SharedItemPool<%s>:%s", _name, __FUNCTION__);
-    construct_pool(max_count);
+    if (_max_count > 0)
+        reserve (_max_count);
     LOG1("EXIT SharedItemPool<%s>:%s", _name, __FUNCTION__);
-}
-
-template<typename T>
-int8_t SharedItemPool<T>::init(uint32_t max_count)
-{
-    XCAM_ASSERT (max_count);
-
-    _item_list.clear();
-    _allocated_num = 0;
-
-    if (construct_pool(max_count))
-        return 0;
-    else
-        return -1;
 }
 
 template<typename T>
@@ -77,43 +39,63 @@ SharedItemPool<T>::~SharedItemPool()
 }
 
 template<typename T>
-SmartPtr<T>
-SharedItemPool<T>::allocate_data ()
+int8_t SharedItemPool<T>::init(uint32_t max_count)
 {
-    void* temp = _allocate_data();
-    if (temp)
-        return SmartPtr<T>((T*)temp);
-    else
-        return new T();
-}
+    if (_max_count > 0)
+        return -1;
+    if (!reserve (max_count))
+        return -1;
 
-template<typename T>
-void
-SharedItemPool<T>::release (SmartPtr<T> &data)
-{
-    LOG1("ENTER SharedItemPool<%s>:%s", _name, __FUNCTION__);
-    _item_list.push (data);
-    LOG1("EXIT SharedItemPool<%s>:%s", _name, __FUNCTION__);
+    _max_count = get_free_buffer_size ();
+    
+    return 0;
 }
 
 template<typename T>
 SmartPtr<SharedItemProxy<T>>
-                          SharedItemPool<T>::get_item()
+SharedItemPool<T>::get_item()
 {
-    LOG1("ENTER SharedItemPool<%s>:%s", _name, __FUNCTION__);
+#if 0 // dynamic_cast_ptr has performance issue
+    SmartPtr<VideoBuffer> buf = get_buffer();
+    SmartPtr<SharedItemProxy<T>> proxy =
+        buf.dynamic_cast_ptr<SharedItemProxy<T>>() ;
+    return proxy;
+#else
+    // get buf directly, save one call of dynamic_cast_ptr
     SmartPtr<SharedItemProxy<T>> ret_buf;
-    SmartPtr<T> data;
+    SmartPtr<BufferData> data;
 
-    data = _item_list.pop ();
+    {
+        SmartLock lock (_mutex);
+        if (!_started)
+            return NULL;
+    }
+
+    data = _buf_list.pop ();
     if (!data.ptr ()) {
-        LOGD("SharedItemPool<%s> failed to get buffer", _name);
+        XCAM_LOG_DEBUG ("BufferPool failed to get buffer");
         return NULL;
     }
-    ret_buf = new SharedItemProxy<T>(data);
-    ret_buf->set_buf_pool (SmartPtr<SharedItemPool<T>>(this));
-    LOG1("EXIT SharedItemPool<%s>:%s", _name, __FUNCTION__);
+    SmartPtr<T> data_t = data.dynamic_cast_ptr<T>();
+    ret_buf = new SharedItemProxy<T> (data_t);;
+    ret_buf->set_buf_pool (SmartPtr<BufferPool>(this));
 
     return ret_buf;
+#endif
+}
+
+template<typename T>
+SmartPtr<BufferData> SharedItemPool<T>::allocate_data (const VideoBufferInfo &buffer_info)
+{
+    return new T();
+}
+
+template<typename T>
+SmartPtr<BufferProxy> SharedItemPool<T>::create_buffer_from_data (SmartPtr<BufferData> &data)
+{
+    XCAM_ASSERT (data.ptr ());
+    SmartPtr<T> data_t = data.dynamic_cast_ptr<T>();
+    return new SharedItemProxy<T> (data_t);
 }
 
 };

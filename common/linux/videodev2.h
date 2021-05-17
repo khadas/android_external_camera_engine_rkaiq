@@ -651,6 +651,7 @@ struct v4l2_pix_format {
 
 #define V4L2_PIX_FMT_FBC2     v4l2_fourcc('F', 'B', 'C', '2') /* Rockchip yuv422sp frame buffer compression encoder */
 #define V4L2_PIX_FMT_FBC0     v4l2_fourcc('F', 'B', 'C', '0') /* Rockchip yuv420sp frame buffer compression encoder */
+#define V4L2_PIX_FMT_FBCG     v4l2_fourcc('F', 'B', 'C', 'G')
 /* Meta-data formats */
 #define V4L2_META_FMT_UVC         v4l2_fourcc('U', 'V', 'C', 'H') /* UVC Payload Header metadata */
 
@@ -1344,6 +1345,8 @@ struct v4l2_bt_timings {
  * the V4L2_DV_FL_CAN_REDUCE_FPS flag set.
  */
 #define V4L2_DV_FL_CAN_DETECT_REDUCED_FPS (1 << 9)
+
+
 /* A few useful defines to calculate the total blanking and frame sizes */
 #define V4L2_DV_BT_BLANKING_WIDTH(bt) \
     ((bt)->hfrontporch + (bt)->hsync + (bt)->hbackporch)

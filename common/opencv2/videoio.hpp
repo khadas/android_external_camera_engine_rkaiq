@@ -114,7 +114,7 @@ enum VideoCaptureAPIs {
        CAP_OPENNI2_ASUS = 1610,         //!< OpenNI2 (for Asus Xtion and Occipital Structure sensors)
        CAP_GPHOTO2      = 1700,         //!< gPhoto2 connection
        CAP_GSTREAMER    = 1800,         //!< GStreamer
-       CAP_FFMPEG       = 1900,         //!< Open and record video file or stream using the FFMPEG library
+       CAP_XXMPEG       = 1900,         //!< Open and record video file or stream using the XXMPEG library
        CAP_IMAGES       = 2000,         //!< OpenCV Image Sequence (e.g. img_%02d.jpg)
        CAP_ARAVIS       = 2100,         //!< Aravis SDK
        CAP_OPENCV_MJPEG = 2200,         //!< Built-in OpenCV MotionJPEG codec
@@ -175,7 +175,7 @@ enum VideoCaptureProperties {
        CAP_PROP_CHANNEL       =43, //!< Video input or Channel Number (only for those cameras that support)
        CAP_PROP_AUTO_WB       =44, //!< enable/ disable auto white-balance
        CAP_PROP_WB_TEMPERATURE=45, //!< white-balance color temperature
-       CAP_PROP_CODEC_PIXEL_FORMAT =46,    //!< (read-only) codec's pixel format. 4-character code - see VideoWriter::fourcc . Subset of [AV_PIX_FMT_*](https://github.com/FFmpeg/FFmpeg/blob/master/libavcodec/raw.c) or -1 if unknown
+       CAP_PROP_CODEC_PIXEL_FORMAT =46,    //!< (read-only) codec's pixel format. 4-character code - see VideoWriter::fourcc . Subset of [AV_PIX_FMT_*](https://github.com/XXmpeg/XXmpeg/blob/master/libavcodec/raw.c) or -1 if unknown
 #ifndef CV_DOXYGEN
        CV__CAP_PROP_LATEST
 #endif
@@ -625,7 +625,7 @@ public:
       Note that each video stream or IP camera feed has its own URL scheme. Please refer to the
       documentation of source stream to know the right URL.
     @param apiPreference preferred Capture API backends to use. Can be used to enforce a specific reader
-    implementation if multiple are available: e.g. cv::CAP_FFMPEG or cv::CAP_IMAGES or cv::CAP_DSHOW.
+    implementation if multiple are available: e.g. cv::CAP_XXMPEG or cv::CAP_IMAGES or cv::CAP_DSHOW.
     @sa The list of supported API backends cv::VideoCaptureAPIs
     */
     CV_WRAP VideoCapture(const String& filename, int apiPreference = CAP_ANY);
@@ -845,8 +845,8 @@ public:
     /** @brief Default constructors
 
     The constructors/functions initialize video writers.
-    -   On Linux FFMPEG is used to write videos;
-    -   On Windows FFMPEG or MSWF or DSHOW is used;
+    -   On Linux XXMPEG is used to write videos;
+    -   On Windows XXMPEG or MSWF or DSHOW is used;
     -   On MacOSX AVFoundation is used.
      */
     CV_WRAP VideoWriter();
@@ -856,7 +856,7 @@ public:
     @param fourcc 4-character code of codec used to compress the frames. For example,
     VideoWriter::fourcc('P','I','M','1') is a MPEG-1 codec, VideoWriter::fourcc('M','J','P','G') is a
     motion-jpeg codec etc. List of codes can be obtained at [Video Codecs by
-    FOURCC](http://www.fourcc.org/codecs.php) page. FFMPEG backend with MP4 container natively uses
+    FOURCC](http://www.fourcc.org/codecs.php) page. XXMPEG backend with MP4 container natively uses
     other values as fourcc code: see [ObjectType](http://www.mp4ra.org/codecs.html),
     so you may receive a warning message from OpenCV about fourcc code conversion.
     @param fps Framerate of the created video stream.
@@ -869,15 +869,15 @@ public:
     - To save image sequence use a proper filename (eg. `img_%02d.jpg`) and `fourcc=0`
       OR `fps=0`. Use uncompressed image format (eg. `img_%02d.BMP`) to save raw frames.
     - Most codecs are lossy. If you want lossless video file you need to use a lossless codecs
-      (eg. FFMPEG FFV1, Huffman HFYU, Lagarith LAGS, etc...)
-    - If FFMPEG is enabled, using `codec=0; fps=0;` you can create an uncompressed (raw) video file.
+      (eg. XXMPEG FFV1, Huffman HFYU, Lagarith LAGS, etc...)
+    - If XXMPEG is enabled, using `codec=0; fps=0;` you can create an uncompressed (raw) video file.
     */
     CV_WRAP VideoWriter(const String& filename, int fourcc, double fps,
                 Size frameSize, bool isColor = true);
 
     /** @overload
     The `apiPreference` parameter allows to specify API backends to use. Can be used to enforce a specific reader implementation
-    if multiple are available: e.g. cv::CAP_FFMPEG or cv::CAP_GSTREAMER.
+    if multiple are available: e.g. cv::CAP_XXMPEG or cv::CAP_GSTREAMER.
      */
     CV_WRAP VideoWriter(const String& filename, int apiPreference, int fourcc, double fps,
                 Size frameSize, bool isColor = true);

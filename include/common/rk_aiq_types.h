@@ -22,17 +22,20 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "rk_aiq_comm.h"
+#include "rk_aiq_mems_sensor.h"
 #include "adebayer/rk_aiq_types_algo_adebayer.h"
 #include "ae/rk_aiq_types_ae_algo.h"
 #include "awb/rk_aiq_types_awb_algo.h"
 #include "alsc/rk_aiq_types_alsc_algo.h"
 #include "accm/rk_aiq_types_accm_algo.h"
 #include "a3dlut/rk_aiq_types_a3dlut_algo.h"
-#include "ahdr/rk_aiq_types_ahdr_algo_int.h"
-#include "ahdr/rk_aiq_types_ahdr_algo.h"
+#include "amerge/rk_aiq_types_amerge_algo_int.h"
+#include "atmo/rk_aiq_types_atmo_algo_int.h"
+#include "atmo/rk_aiq_types_atmo_algo.h"
 #include "adrc/rk_aiq_types_adrc_algo_int.h"
 #include "adrc/rk_aiq_types_adrc_algo.h"
 #include "agamma/rk_aiq_types_agamma_algo_int.h"
+#include "adegamma/rk_aiq_types_adegamma_algo_int.h"
 #include "adehaze/rk_aiq_types_adehaze_algo_int.h"
 #include "adehaze/rk_aiq_types_adehaze_algo.h"
 #include "acp/rk_aiq_types_acp_algo.h"
@@ -47,13 +50,22 @@
 #include "adpcc/rk_aiq_types_adpcc_algo_int.h"
 #include "ablc/rk_aiq_types_ablc_algo.h"
 #include "ablc/rk_aiq_types_ablc_algo_int.h"
-#include "agic/rk_aiq_types_algo_agic.h"
+#include "agic/rk_aiq_types_algo_agic_int.h"
 #include "aldch/rk_aiq_types_aldch_algo.h"
 #include "afec/rk_aiq_types_afec_algo.h"
 #include "asharp3/rk_aiq_types_asharp_algo_v3.h"
 #include "aynr2/rk_aiq_types_aynr_algo_v2.h"
 #include "acnr/rk_aiq_types_acnr_algo_v1.h"
 #include "arawnr2/rk_aiq_types_abayernr_algo_v2.h"
+#include "amd/rk_aiq_types_amd_algo.h"
+#include "arawnr/rk_aiq_types_abayernr_algo_v1.h"
+#include "amfnr/rk_aiq_types_amfnr_algo_v1.h"
+#include "aynr/rk_aiq_types_aynr_algo_v1.h"
+#include "auvnr/rk_aiq_types_auvnr_algo_v1.h"
+#include "again/rk_aiq_types_again_algo.h"
+
+
+
 
 
 #ifdef RK_SIMULATOR_HW
@@ -64,6 +76,9 @@
 
 #endif
 
+#define ANR_NO_SEPERATE_MARCO (0)
+
+
 #define rk_fmt_fourcc(a, b, c, d)\
     ((uint32_t)(a) | ((uint32_t)(b) << 8) | ((uint32_t)(c) << 16) | ((uint32_t)(d) << 24))
 #define rk_fmt_fourcc_be(a, b, c, d)    (rk_fmt_fourcc(a, b, c, d) | (1 << 31))
@@ -73,6 +88,13 @@ typedef struct rk_aiq_range_s {
     float max;
     float step;
 } rk_aiq_range_t;
+
+typedef struct rk_aiq_rect_s {
+    int left;
+    int top;
+    int width;
+    int height;
+} rk_aiq_rect_t;
 
 typedef enum rk_aiq_rotation_e {
     RK_AIQ_ROTATION_0,
@@ -322,6 +344,18 @@ typedef struct {
     float sharpness[64];
 } rk_aiq_af_sec_path_t;
 
+typedef struct {
+    rk_aiq_af_sec_stat_t stat;
+    int32_t final_pos;
+} rk_aiq_af_result_t;
+
+typedef struct {
+    int min_pos;
+    int max_pos;
+    float min_fl;
+    float max_fl;
+} rk_aiq_af_zoomrange;
+
 // sensor
 typedef struct {
     unsigned short line_periods_vertical_blanking;
@@ -401,14 +435,10 @@ typedef struct {
     unsigned int max_feature;
 } rk_aiq_isp_orb_t;
 
-typedef struct {
-    int UNKNOWN;
-} rk_aiq_isp_merge_t;
-
 
 typedef AgicProcResult_t rk_aiq_isp_gic_t;
 
-typedef AdebayerConfig_t rk_aiq_isp_demosaic_t;
+typedef AdebayerConfig_t rk_aiq_isp_debayer_t;
 
 typedef struct {
     unsigned char  equ_segm;
@@ -442,6 +472,8 @@ typedef struct {
 
 typedef struct {
     unsigned char fec_en;
+    int usage;
+    unsigned char config;
     unsigned char crop_en;
     unsigned int crop_width;
     unsigned int crop_height;
@@ -452,6 +484,9 @@ typedef struct {
     //unsigned char sw_mesh_xf[FEC_MESH_XY_NUM_ALGO];
     //unsigned short sw_mesh_yi[FEC_MESH_XY_NUM_ALGO];
     //unsigned char sw_mesh_yf[FEC_MESH_XY_NUM_ALGO];
+    int img_buf_index;
+    int img_buf_size;
+    int32_t frame_id;
 } rk_aiq_isp_fec_t;
 
 typedef struct {
@@ -469,18 +504,25 @@ typedef struct {
     rk_aiq_isp_af_stats_t  af_stats;
 } rk_aiq_isp_stats_t;
 
-typedef RkAiqAhdrProcResult_t rk_aiq_isp_hdr_t;
+typedef RkAiqAmergeProcResult_t rk_aiq_isp_merge_t;
+typedef RkAiqAtmoProcResult_t rk_aiq_isp_tmo_t;
+
 typedef RkAiqAdrcProcResult_t rk_aiq_isp_drc_t;
 
 typedef AdehazeV20ProcResult_t rk_aiq_isp_dehaze_t;
 
 
-
-#if 1
+#if ANR_NO_SEPERATE_MARCO
 typedef RKAnr_Bayernr_Fix_t rk_aiq_isp_rawnr_t;
 typedef RKAnr_Mfnr_Fix_t rk_aiq_isp_tnr_t;
 typedef RKAnr_Ynr_Fix_t rk_aiq_isp_ynr_t;
 typedef RKAnr_Uvnr_Fix_t rk_aiq_isp_uvnr_t;
+typedef ANRProcResult_t rkaiq_anr_procRes_t;
+#else
+typedef RK_Bayernr_Fix_V1_t rk_aiq_isp_rawnr_t;
+typedef RK_MFNR_Fix_V1_t rk_aiq_isp_tnr_t;
+typedef RK_YNR_Fix_V1_t rk_aiq_isp_ynr_t;
+typedef RK_UVNR_Fix_V1_t rk_aiq_isp_uvnr_t;
 typedef ANRProcResult_t rkaiq_anr_procRes_t;
 #endif
 
@@ -490,7 +532,7 @@ typedef RKAsharp_Edgefilter_Fix_t rk_aiq_isp_edgeflt_t;
 typedef AsharpProcResult_t rkaiq_asharp_procRes_t;
 #endif
 
-typedef AblcProcResult_t rk_aiq_isp_blc_t;
+typedef AblcProc_t rk_aiq_isp_blc_t;
 typedef AdpccProcResult_t rk_aiq_isp_dpcc_t;
 
 typedef RKAnr_Gain_Fix_t rk_aiq_isp_gain_t;
@@ -703,5 +745,31 @@ typedef enum capture_raw_e {
     CAPTURE_RAW_SYNC,
     CAPTURE_RAW_AND_YUV_SYNC,
 } capture_raw_t;
+
+typedef enum rk_aiq_rawbuf_type_s {
+    RK_AIQ_RAW_ADDR,
+    RK_AIQ_RAW_FD,
+    RK_AIQ_RAW_DATA,
+    RK_AIQ_RAW_FILE
+} rk_aiq_rawbuf_type_t;
+
+typedef struct rk_aiq_raw_prop_s {
+    uint32_t frame_width;
+    uint32_t frame_height;
+    rk_aiq_format_t format;
+    rk_aiq_rawbuf_type_t rawbuf_type;
+} rk_aiq_raw_prop_t;
+
+typedef struct {
+    int frame_id;
+    uint16_t hdrProcessCnt;
+    unsigned int luma[3][16];
+} rk_aiq_luma_params_t;
+
+typedef enum rk_isp_stream_mode_e {
+    RK_ISP_STREAM_MODE_INVALID = -1,
+    RK_ISP_STREAM_MODE_ONLNIE,
+    RK_ISP_STREAM_MODE_OFFLNIE,
+} rk_isp_stream_mode_t;
 
 #endif

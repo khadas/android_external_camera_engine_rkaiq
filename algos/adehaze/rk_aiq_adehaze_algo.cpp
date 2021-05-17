@@ -80,41 +80,50 @@ int LinearInterpEnable(const float *pX, const unsigned char *pY, float posx, int
 
 }
 
-void EnableSetting(CalibDb_Dehaze_t* para, RkAiqAdehazeProcResult_t* ProcRes, int iso, int mode)
+void EnableSetting(CalibDbV2_dehaze_V20_t* para, RkAiqAdehazeProcResult_t* ProcRes)
 {
     LOG1_ADEHAZE("ENTER: %s \n", __func__);
 
-    ProcRes->ProcResV20.enable = para->calib_v20[mode].en != 0 ? true : false;
+    ProcRes->ProcResV20.enable = true;
 
     bool dehaze_enable = false;
     bool enhance_enable = false;
-    if(para->calib_v20[mode].dehaze_setting.en != 0 && para->calib_v20[mode].enhance_setting.en != 0)
-    {
-        ProcRes->ProcResV20.dc_en = 1;
-        ProcRes->ProcResV20.enhance_en = 1;
+
+    if(para->DehazeTuningPara.Enable) {
+        if(para->DehazeTuningPara.dehaze_setting.en && para->DehazeTuningPara.enhance_setting.en)
+        {
+            ProcRes->ProcResV20.dc_en = 1;
+            ProcRes->ProcResV20.enhance_en = 1;
+        }
+        else if(para->DehazeTuningPara.dehaze_setting.en && !para->DehazeTuningPara.enhance_setting.en)
+        {
+            ProcRes->ProcResV20.dc_en = 1;
+            ProcRes->ProcResV20.enhance_en = 0;
+        }
+        else if(!para->DehazeTuningPara.dehaze_setting.en && para->DehazeTuningPara.enhance_setting.en)
+        {
+            ProcRes->ProcResV20.dc_en = 1;
+            ProcRes->ProcResV20.enhance_en = 1;
+        }
+        else
+        {
+            ProcRes->ProcResV20.dc_en = 0;
+            ProcRes->ProcResV20.enhance_en = 0;
+        }
+
+        if(para->DehazeTuningPara.hist_setting.en)
+            ProcRes->ProcResV20.hist_en = 0x1;
+        else
+            ProcRes->ProcResV20.hist_en = 0;
     }
-    else if(para->calib_v20[mode].dehaze_setting.en != 0 && para->calib_v20[mode].enhance_setting.en == 0)
-    {
-        ProcRes->ProcResV20.dc_en = 1;
-        ProcRes->ProcResV20.enhance_en = 0;
-    }
-    else if(para->calib_v20[mode].dehaze_setting.en == 0 && para->calib_v20[mode].enhance_setting.en != 0)
-    {
-        ProcRes->ProcResV20.dc_en = 1;
-        ProcRes->ProcResV20.enhance_en = 1;
-    }
-    else
-    {
+    else {
         ProcRes->ProcResV20.dc_en = 0;
         ProcRes->ProcResV20.enhance_en = 0;
+        ProcRes->ProcResV20.hist_en = 0;
     }
+
     dehaze_enable = (ProcRes->ProcResV20.dc_en & 0x1) && (!(ProcRes->ProcResV20.enhance_en & 0x1));
     enhance_enable = (ProcRes->ProcResV20.dc_en & 0x1) && (ProcRes->ProcResV20.enhance_en & 0x1);
-
-    if(para->calib_v20[mode].hist_setting.en != 0)
-        ProcRes->ProcResV20.hist_en = 0x1;
-    else
-        ProcRes->ProcResV20.hist_en = 0;
 
     LOGD_ADEHAZE(" %s: Dehaze fuction en:%d\n", __func__, ProcRes->ProcResV20.enable);
     LOGD_ADEHAZE(" %s: Dehaze en:%d, Enhance en:%d, Hist en:%d\n", __func__, dehaze_enable, enhance_enable, ProcRes->ProcResV20.hist_en);
@@ -122,41 +131,48 @@ void EnableSetting(CalibDb_Dehaze_t* para, RkAiqAdehazeProcResult_t* ProcRes, in
     LOG1_ADEHAZE("EIXT: %s \n", __func__);
 }
 
-void EnableSettingV21(CalibDb_Dehaze_t* para, RkAiqAdehazeProcResult_t* ProcRes, int iso, int mode)
+void EnableSettingV21(CalibDbV2_dehaze_V21_t* pCalibV21, RkAiqAdehazeProcResult_t* ProcRes)
 {
     LOG1_ADEHAZE("ENTER: %s \n", __func__);
 
-    ProcRes->ProcResV21.enable = para->calib_v21[mode].en != 0 ? true : false;
+    ProcRes->ProcResV21.enable = pCalibV21->DehazeTuningPara.Enable;
 
     bool dehaze_enable = false;
     bool enhance_enable = false;
-    if(para->calib_v21[mode].dehaze_setting.en != 0 && para->calib_v21[mode].enhance_setting.en != 0)
-    {
-        ProcRes->ProcResV21.dc_en = 1;
-        ProcRes->ProcResV21.enhance_en = 1;
+    if(pCalibV21->DehazeTuningPara.Enable) {
+        if(pCalibV21->DehazeTuningPara.dehaze_setting.en && pCalibV21->DehazeTuningPara.enhance_setting.en)
+        {
+            ProcRes->ProcResV21.dc_en = 1;
+            ProcRes->ProcResV21.enhance_en = 1;
+        }
+        else if(pCalibV21->DehazeTuningPara.dehaze_setting.en && !pCalibV21->DehazeTuningPara.enhance_setting.en)
+        {
+            ProcRes->ProcResV21.dc_en = 1;
+            ProcRes->ProcResV21.enhance_en = 0;
+        }
+        else if(!pCalibV21->DehazeTuningPara.dehaze_setting.en && pCalibV21->DehazeTuningPara.enhance_setting.en)
+        {
+            ProcRes->ProcResV21.dc_en = 1;
+            ProcRes->ProcResV21.enhance_en = 1;
+        }
+        else
+        {
+            ProcRes->ProcResV21.dc_en = 0;
+            ProcRes->ProcResV21.enhance_en = 0;
+        }
+
+        if(pCalibV21->DehazeTuningPara.hist_setting.en)
+            ProcRes->ProcResV21.hist_en = 0x1;
+        else
+            ProcRes->ProcResV21.hist_en = 0;
     }
-    else if(para->calib_v21[mode].dehaze_setting.en != 0 && para->calib_v21[mode].enhance_setting.en == 0)
-    {
-        ProcRes->ProcResV21.dc_en = 1;
-        ProcRes->ProcResV21.enhance_en = 0;
-    }
-    else if(para->calib_v21[mode].dehaze_setting.en == 0 && para->calib_v21[mode].enhance_setting.en != 0)
-    {
-        ProcRes->ProcResV21.dc_en = 1;
-        ProcRes->ProcResV21.enhance_en = 1;
-    }
-    else
-    {
+    else {
         ProcRes->ProcResV21.dc_en = 0;
         ProcRes->ProcResV21.enhance_en = 0;
+        ProcRes->ProcResV21.hist_en = 0;
     }
     dehaze_enable = (ProcRes->ProcResV21.dc_en & 0x1) && (!(ProcRes->ProcResV21.enhance_en & 0x1));
     enhance_enable = (ProcRes->ProcResV21.dc_en & 0x1) && (ProcRes->ProcResV21.enhance_en & 0x1);
-
-    if(para->calib_v21[mode].hist_setting.en != 0)
-        ProcRes->ProcResV21.hist_en = 0x1;
-    else
-        ProcRes->ProcResV21.hist_en = 0;
 
     LOGD_ADEHAZE(" %s: Dehaze fuction en:%d\n", __func__, ProcRes->ProcResV21.enable);
     LOGD_ADEHAZE(" %s: Dehaze en:%d, Enhance en:%d, Hist en:%d\n", __func__, dehaze_enable, enhance_enable, ProcRes->ProcResV21.hist_en);
@@ -164,43 +180,44 @@ void EnableSettingV21(CalibDb_Dehaze_t* para, RkAiqAdehazeProcResult_t* ProcRes,
     LOG1_ADEHAZE("EIXT: %s \n", __func__);
 }
 
-void GetDehazeParams(CalibDb_Dehaze_t* para, RkAiqAdehazeProcResult_t* ProcRes, int iso, int mode)
+void GetDehazeParams(CalibDbV2_dehaze_V20_t* pCalib, RkAiqAdehazeProcResult_t* ProcRes, float variate)
 {
     LOG1_ADEHAZE("ENTER: %s \n", __func__);
 
+    int iso_len = pCalib->DehazeTuningPara.dehaze_setting.DehazeData.ISO_len;
     // dehaze_self_adp[7]
-    float dc_min_th = LinearInterp(para->calib_v20[mode].dehaze_setting.iso, para->calib_v20[mode].dehaze_setting.dc_min_th, iso, RK_DEHAZE_ISO_NUM);
-    float dc_max_th = LinearInterp(para->calib_v20[mode].dehaze_setting.iso, para->calib_v20[mode].dehaze_setting.dc_max_th, iso, RK_DEHAZE_ISO_NUM);
-    float yhist_th = LinearInterp(para->calib_v20[mode].dehaze_setting.iso, para->calib_v20[mode].dehaze_setting.yhist_th, iso,  RK_DEHAZE_ISO_NUM);
-    float yblk_th = LinearInterp(para->calib_v20[mode].dehaze_setting.iso, para->calib_v20[mode].dehaze_setting.yblk_th, iso, RK_DEHAZE_ISO_NUM);
-    float dark_th = LinearInterp(para->calib_v20[mode].dehaze_setting.iso, para->calib_v20[mode].dehaze_setting.dark_th, iso, RK_DEHAZE_ISO_NUM);
-    float bright_min = LinearInterp(para->calib_v20[mode].dehaze_setting.iso, para->calib_v20[mode].dehaze_setting.bright_min, iso, RK_DEHAZE_ISO_NUM);
-    float bright_max = LinearInterp(para->calib_v20[mode].dehaze_setting.iso, para->calib_v20[mode].dehaze_setting.bright_max, iso, RK_DEHAZE_ISO_NUM);
+    float dc_min_th = LinearInterp(pCalib->DehazeTuningPara.dehaze_setting.DehazeData.ISO, pCalib->DehazeTuningPara.dehaze_setting.DehazeData.dc_min_th, variate, iso_len);
+    float dc_max_th = LinearInterp(pCalib->DehazeTuningPara.dehaze_setting.DehazeData.ISO, pCalib->DehazeTuningPara.dehaze_setting.DehazeData.dc_max_th, variate, iso_len);
+    float yhist_th = LinearInterp(pCalib->DehazeTuningPara.dehaze_setting.DehazeData.ISO, pCalib->DehazeTuningPara.dehaze_setting.DehazeData.yhist_th, variate,  iso_len);
+    float yblk_th = LinearInterp(pCalib->DehazeTuningPara.dehaze_setting.DehazeData.ISO, pCalib->DehazeTuningPara.dehaze_setting.DehazeData.yblk_th, variate, iso_len);
+    float dark_th = LinearInterp(pCalib->DehazeTuningPara.dehaze_setting.DehazeData.ISO, pCalib->DehazeTuningPara.dehaze_setting.DehazeData.dark_th, variate, iso_len);
+    float bright_min = LinearInterp(pCalib->DehazeTuningPara.dehaze_setting.DehazeData.ISO, pCalib->DehazeTuningPara.dehaze_setting.DehazeData.bright_min, variate, iso_len);
+    float bright_max = LinearInterp(pCalib->DehazeTuningPara.dehaze_setting.DehazeData.ISO, pCalib->DehazeTuningPara.dehaze_setting.DehazeData.bright_max, variate, iso_len);
 
     // dehaze_range_adj[6]
-    float wt_max = LinearInterp(para->calib_v20[mode].dehaze_setting.iso, para->calib_v20[mode].dehaze_setting.wt_max, iso, RK_DEHAZE_ISO_NUM);
-    float air_max = LinearInterp(para->calib_v20[mode].dehaze_setting.iso, para->calib_v20[mode].dehaze_setting.air_max, iso, RK_DEHAZE_ISO_NUM);
-    float air_min = LinearInterp(para->calib_v20[mode].dehaze_setting.iso, para->calib_v20[mode].dehaze_setting.air_min, iso, RK_DEHAZE_ISO_NUM);
-    float tmax_base = LinearInterp(para->calib_v20[mode].dehaze_setting.iso, para->calib_v20[mode].dehaze_setting.tmax_base, iso, RK_DEHAZE_ISO_NUM);
-    float tmax_off = LinearInterp(para->calib_v20[mode].dehaze_setting.iso, para->calib_v20[mode].dehaze_setting.tmax_off, iso, RK_DEHAZE_ISO_NUM);
-    float tmax_max = LinearInterp(para->calib_v20[mode].dehaze_setting.iso, para->calib_v20[mode].dehaze_setting.tmax_max, iso, RK_DEHAZE_ISO_NUM);
+    float wt_max = LinearInterp(pCalib->DehazeTuningPara.dehaze_setting.DehazeData.ISO, pCalib->DehazeTuningPara.dehaze_setting.DehazeData.wt_max, variate, iso_len);
+    float air_max = LinearInterp(pCalib->DehazeTuningPara.dehaze_setting.DehazeData.ISO, pCalib->DehazeTuningPara.dehaze_setting.DehazeData.air_max, variate, iso_len);
+    float air_min = LinearInterp(pCalib->DehazeTuningPara.dehaze_setting.DehazeData.ISO, pCalib->DehazeTuningPara.dehaze_setting.DehazeData.air_min, variate, iso_len);
+    float tmax_base = LinearInterp(pCalib->DehazeTuningPara.dehaze_setting.DehazeData.ISO, pCalib->DehazeTuningPara.dehaze_setting.DehazeData.tmax_base, variate, iso_len);
+    float tmax_off = LinearInterp(pCalib->DehazeTuningPara.dehaze_setting.DehazeData.ISO, pCalib->DehazeTuningPara.dehaze_setting.DehazeData.tmax_off, variate, iso_len);
+    float tmax_max = LinearInterp(pCalib->DehazeTuningPara.dehaze_setting.DehazeData.ISO, pCalib->DehazeTuningPara.dehaze_setting.DehazeData.tmax_max, variate, iso_len);
 
     // dehaze_iir_control[5]
-    float stab_fnum = para->calib_v20[mode].dehaze_setting.IIR_setting.stab_fnum;
-    float sigma = para->calib_v20[mode].dehaze_setting.IIR_setting.sigma;
-    float wt_sigma = para->calib_v20[mode].dehaze_setting.IIR_setting.wt_sigma;
-    float air_sigma = para->calib_v20[mode].dehaze_setting.IIR_setting.air_sigma;
-    float tmax_sigma = para->calib_v20[mode].dehaze_setting.IIR_setting.tmax_sigma;
+    float stab_fnum = pCalib->DehazeTuningPara.dehaze_setting.stab_fnum;
+    float sigma = pCalib->DehazeTuningPara.dehaze_setting.sigma;
+    float wt_sigma = pCalib->DehazeTuningPara.dehaze_setting.wt_sigma;
+    float air_sigma = pCalib->DehazeTuningPara.dehaze_setting.air_sigma;
+    float tmax_sigma = pCalib->DehazeTuningPara.dehaze_setting.tmax_sigma;
 
-    float cfg_wt = LinearInterp(para->calib_v20[mode].dehaze_setting.iso, para->calib_v20[mode].dehaze_setting.cfg_wt, iso, RK_DEHAZE_ISO_NUM);
-    float cfg_air = LinearInterp(para->calib_v20[mode].dehaze_setting.iso, para->calib_v20[mode].dehaze_setting.cfg_air, iso, RK_DEHAZE_ISO_NUM);
-    float cfg_tmax = LinearInterp(para->calib_v20[mode].dehaze_setting.iso, para->calib_v20[mode].dehaze_setting.cfg_tmax, iso, RK_DEHAZE_ISO_NUM);
+    float cfg_wt = LinearInterp(pCalib->DehazeTuningPara.dehaze_setting.DehazeData.ISO, pCalib->DehazeTuningPara.dehaze_setting.DehazeData.cfg_wt, variate, iso_len);
+    float cfg_air = LinearInterp(pCalib->DehazeTuningPara.dehaze_setting.DehazeData.ISO, pCalib->DehazeTuningPara.dehaze_setting.DehazeData.cfg_air, variate, iso_len);
+    float cfg_tmax = LinearInterp(pCalib->DehazeTuningPara.dehaze_setting.DehazeData.ISO, pCalib->DehazeTuningPara.dehaze_setting.DehazeData.cfg_tmax, variate, iso_len);
 
     // dehaze_bi_para[4]
-    float dc_thed = LinearInterp(para->calib_v20[mode].dehaze_setting.iso, para->calib_v20[mode].dehaze_setting.dc_thed, iso, RK_DEHAZE_ISO_NUM);
-    float dc_weitcur = LinearInterp(para->calib_v20[mode].dehaze_setting.iso, para->calib_v20[mode].dehaze_setting.dc_weitcur, iso, RK_DEHAZE_ISO_NUM);
-    float air_thed = LinearInterp(para->calib_v20[mode].dehaze_setting.iso, para->calib_v20[mode].dehaze_setting.air_thed, iso, RK_DEHAZE_ISO_NUM);
-    float air_weitcur = LinearInterp(para->calib_v20[mode].dehaze_setting.iso, para->calib_v20[mode].dehaze_setting.air_weitcur, iso, RK_DEHAZE_ISO_NUM);
+    float dc_thed = LinearInterp(pCalib->DehazeTuningPara.dehaze_setting.DehazeData.ISO, pCalib->DehazeTuningPara.dehaze_setting.DehazeData.dc_thed, variate, iso_len);
+    float dc_weitcur = LinearInterp(pCalib->DehazeTuningPara.dehaze_setting.DehazeData.ISO, pCalib->DehazeTuningPara.dehaze_setting.DehazeData.dc_weitcur, variate, iso_len);
+    float air_thed = LinearInterp(pCalib->DehazeTuningPara.dehaze_setting.DehazeData.ISO, pCalib->DehazeTuningPara.dehaze_setting.DehazeData.air_thed, variate, iso_len);
+    float air_weitcur = LinearInterp(pCalib->DehazeTuningPara.dehaze_setting.DehazeData.ISO, pCalib->DehazeTuningPara.dehaze_setting.DehazeData.air_weitcur, variate, iso_len);
 
     // dehaze_dc_bf_h[25]
     float dc_bf_h[25] = {12.0000, 17.0000, 19.0000, 17.0000, 12.0000,
@@ -220,6 +237,12 @@ void GetDehazeParams(CalibDb_Dehaze_t* para, RkAiqAdehazeProcResult_t* ProcRes, 
                        2.0000, 4.0000, 2.0000
                       };
 
+    LOGD_ADEHAZE("%s dc_min_th:%f dc_max_th:%f yhist_th:%f yblk_th:%f dark_th:%f bright_min:%f bright_max:%f\n", __func__, dc_min_th, dc_max_th, yhist_th, yblk_th, dark_th, bright_min, bright_max);
+    LOGD_ADEHAZE("%s wt_max:%f air_max:%f air_min:%f tmax_base:%f tmax_off:%f tmax_max:%f\n", __func__, wt_max, air_max, air_min, tmax_base, tmax_off, tmax_max);
+    LOGD_ADEHAZE("%s stab_fnum:%f sigma:%f wt_sigma:%f air_sigma:%f tmax_sigma:%f\n", __func__, stab_fnum, sigma, wt_sigma, air_sigma, tmax_sigma);
+    LOGD_ADEHAZE("%s  cfg_wt:%f cfg_air:%f cfg_tmax:%f\n", __func__, cfg_wt, cfg_air, cfg_tmax);
+    LOGD_ADEHAZE("%s dc_thed:%f dc_weitcur:%f air_thed:%f air_weitcur:%f\n", __func__, dc_thed, dc_weitcur, air_thed, air_weitcur);
+
     int rawWidth = 1920;
     int rawHeight = 1080;
     ProcRes->ProcResV20.dc_min_th    = int(dc_min_th); //0~255, (8bit) dc_min_th
@@ -229,24 +252,30 @@ void GetDehazeParams(CalibDb_Dehaze_t* para, RkAiqAdehazeProcResult_t* ProcRes, 
     ProcRes->ProcResV20.dark_th    = int(dark_th);  //0~255, (8bit) dark_th
     ProcRes->ProcResV20.bright_min   = int(bright_min);  //0~255, (8bit) bright_min
     ProcRes->ProcResV20.bright_max   = int(bright_max);  //0~255, (8bit) bright_max
+
+
     ProcRes->ProcResV20.wt_max   = int(wt_max * 256); //0~255, (9bit) wt_max
     ProcRes->ProcResV20.air_min   = int(air_min);  //0~255, (8bit) air_min
     ProcRes->ProcResV20.air_max   = int(air_max);  //0~256, (8bit) air_max
     ProcRes->ProcResV20.tmax_base   = int(tmax_base);  //0~255, (8bit) tmax_base
     ProcRes->ProcResV20.tmax_off   = int(tmax_off * 1024); //0~1024,(10bit) tmax_off
     ProcRes->ProcResV20.tmax_max   = int(tmax_max * 1024); //0~1024,(10bit) tmax_max
+
     ProcRes->ProcResV20.stab_fnum = int(stab_fnum);  //1~31,  (5bit) stab_fnum
     ProcRes->ProcResV20.iir_sigma = int(sigma);  //0~255, (8bit) sigma
     ProcRes->ProcResV20.iir_wt_sigma = int(wt_sigma * 8 + 0.5); //       (11bit),8bit+3bit, wt_sigma
     ProcRes->ProcResV20.iir_air_sigma = int(air_sigma);  //       (8bit) air_sigma
     ProcRes->ProcResV20.iir_tmax_sigma = int(tmax_sigma * 1024 + 0.5);  //       (11bit) tmax_sigma
+
     ProcRes->ProcResV20.cfg_wt = int(cfg_wt * 256); //0~256, (9bit) cfg_wt
     ProcRes->ProcResV20.cfg_air = int(cfg_air);  //0~255, (8bit) cfg_air
     ProcRes->ProcResV20.cfg_tmax = int(cfg_tmax * 1024); //0~1024,(11bit) cfg_tmax
+
     ProcRes->ProcResV20.dc_thed      = int(dc_thed);  //0~255, (8bit) dc_thed
     ProcRes->ProcResV20.dc_weitcur       = int(dc_weitcur * 256 + 0.5); //0~256, (9bit) dc_weitcur
     ProcRes->ProcResV20.air_thed     = int(air_thed);  //0~255, (8bit) air_thed
     ProcRes->ProcResV20.air_weitcur      = int(air_weitcur * 256 + 0.5);  //0~256, (9bit) air_weitcur
+
     ProcRes->ProcResV20.gaus_h0    = int(gaus_h[4]);//h0~h2  从大到小
     ProcRes->ProcResV20.gaus_h1    = int(gaus_h[1]);
     ProcRes->ProcResV20.gaus_h2    = int(gaus_h[0]);
@@ -260,52 +289,66 @@ void GetDehazeParams(CalibDb_Dehaze_t* para, RkAiqAdehazeProcResult_t* ProcRes, 
     ProcRes->ProcResV20.air_bf_h1  = int(air_bf_h[1]);
     ProcRes->ProcResV20.air_bf_h2  = int(air_bf_h[0]);
 
+    LOGD_ADEHAZE("%s dc_min_th:%d dc_max_th:%d yhist_th:%d yblk_th:%d dark_th:%d bright_min:%d bright_max:%d\n", __func__, ProcRes->ProcResV20.dc_min_th,
+                 ProcRes->ProcResV20.dc_max_th, ProcRes->ProcResV20.yhist_th, ProcRes->ProcResV20.yblk_th, ProcRes->ProcResV20.dark_th,
+                 ProcRes->ProcResV20.bright_min, ProcRes->ProcResV20.bright_max);
+    LOGD_ADEHAZE("%s wt_max:%d air_max:%d air_min:%d tmax_base:%d tmax_off:%d tmax_max:%d\n", __func__, ProcRes->ProcResV20.wt_max,
+                 ProcRes->ProcResV20.air_max, ProcRes->ProcResV20.air_min, ProcRes->ProcResV20.tmax_base,
+                 ProcRes->ProcResV20.tmax_off, ProcRes->ProcResV20.tmax_max);
+    LOGD_ADEHAZE("%s stab_fnum:%d sigma:%d wt_sigma:%d air_sigma:%d tmax_sigma:%d\n", __func__, ProcRes->ProcResV20.stab_fnum,
+                 ProcRes->ProcResV20.iir_sigma, ProcRes->ProcResV20.iir_wt_sigma, ProcRes->ProcResV20.iir_air_sigma,
+                 ProcRes->ProcResV20.iir_tmax_sigma);
+    LOGD_ADEHAZE("%s  cfg_wt:%d cfg_air:%d cfg_tmax:%d\n", __func__, ProcRes->ProcResV20.cfg_wt, ProcRes->ProcResV20.cfg_air, ProcRes->ProcResV20.cfg_tmax);
+    LOGD_ADEHAZE("%s dc_thed:%d dc_weitcur:%d air_thed:%d air_weitcur:%d\n", __func__, ProcRes->ProcResV20.dc_thed,
+                 ProcRes->ProcResV20.dc_weitcur, ProcRes->ProcResV20.air_thed, ProcRes->ProcResV20.air_weitcur);
+
 
     LOG1_ADEHAZE("EIXT: %s \n", __func__);
 }
 
-void GetDehazeParamsV21(CalibDb_Dehaze_t* para, RkAiqAdehazeProcResult_t* ProcRes, int iso, int mode)
+void GetDehazeParamsV21(CalibDbV2_dehaze_V21_t* pCalibV21, RkAiqAdehazeProcResult_t* ProcRes, float variate)
 {
     LOG1_ADEHAZE("ENTER: %s \n", __func__);
 
-    float air_lc_en = LinearInterp(para->calib_v21[mode].dehaze_setting.iso, para->calib_v21[mode].dehaze_setting.air_lc_en, iso, RK_DEHAZE_ISO_NUM);
+    int EnvLv_len = pCalibV21->DehazeTuningPara.dehaze_setting.DehazeData.EnvLv_len;
+    bool air_lc_en = pCalibV21->DehazeTuningPara.dehaze_setting.air_lc_en;
 
     // dehaze_self_adp[7]
-    float dc_min_th = LinearInterp(para->calib_v21[mode].dehaze_setting.iso, para->calib_v21[mode].dehaze_setting.dc_min_th, iso, RK_DEHAZE_ISO_NUM);
-    float dc_max_th = LinearInterp(para->calib_v21[mode].dehaze_setting.iso, para->calib_v21[mode].dehaze_setting.dc_max_th, iso, RK_DEHAZE_ISO_NUM);
-    float yhist_th = LinearInterp(para->calib_v21[mode].dehaze_setting.iso, para->calib_v21[mode].dehaze_setting.yhist_th, iso,  RK_DEHAZE_ISO_NUM);
-    float yblk_th = LinearInterp(para->calib_v21[mode].dehaze_setting.iso, para->calib_v21[mode].dehaze_setting.yblk_th, iso, RK_DEHAZE_ISO_NUM);
-    float dark_th = LinearInterp(para->calib_v21[mode].dehaze_setting.iso, para->calib_v21[mode].dehaze_setting.dark_th, iso, RK_DEHAZE_ISO_NUM);
-    float bright_min = LinearInterp(para->calib_v21[mode].dehaze_setting.iso, para->calib_v21[mode].dehaze_setting.bright_min, iso, RK_DEHAZE_ISO_NUM);
-    float bright_max = LinearInterp(para->calib_v21[mode].dehaze_setting.iso, para->calib_v21[mode].dehaze_setting.bright_max, iso, RK_DEHAZE_ISO_NUM);
+    float dc_min_th = LinearInterp(pCalibV21->DehazeTuningPara.dehaze_setting.DehazeData.EnvLv, pCalibV21->DehazeTuningPara.dehaze_setting.DehazeData.dc_min_th, variate, EnvLv_len);
+    float dc_max_th = LinearInterp(pCalibV21->DehazeTuningPara.dehaze_setting.DehazeData.EnvLv, pCalibV21->DehazeTuningPara.dehaze_setting.DehazeData.dc_max_th, variate, EnvLv_len);
+    float yhist_th = LinearInterp(pCalibV21->DehazeTuningPara.dehaze_setting.DehazeData.EnvLv, pCalibV21->DehazeTuningPara.dehaze_setting.DehazeData.yhist_th, variate,  EnvLv_len);
+    float yblk_th = LinearInterp(pCalibV21->DehazeTuningPara.dehaze_setting.DehazeData.EnvLv, pCalibV21->DehazeTuningPara.dehaze_setting.DehazeData.yblk_th, variate, EnvLv_len);
+    float dark_th = LinearInterp(pCalibV21->DehazeTuningPara.dehaze_setting.DehazeData.EnvLv, pCalibV21->DehazeTuningPara.dehaze_setting.DehazeData.dark_th, variate, EnvLv_len);
+    float bright_min = LinearInterp(pCalibV21->DehazeTuningPara.dehaze_setting.DehazeData.EnvLv, pCalibV21->DehazeTuningPara.dehaze_setting.DehazeData.bright_min, variate, EnvLv_len);
+    float bright_max = LinearInterp(pCalibV21->DehazeTuningPara.dehaze_setting.DehazeData.EnvLv, pCalibV21->DehazeTuningPara.dehaze_setting.DehazeData.bright_max, variate, EnvLv_len);
 
     // dehaze_range_adj[6]
-    float wt_max = LinearInterp(para->calib_v21[mode].dehaze_setting.iso, para->calib_v21[mode].dehaze_setting.wt_max, iso, RK_DEHAZE_ISO_NUM);
-    float air_max = LinearInterp(para->calib_v21[mode].dehaze_setting.iso, para->calib_v21[mode].dehaze_setting.air_max, iso, RK_DEHAZE_ISO_NUM);
-    float air_min = LinearInterp(para->calib_v21[mode].dehaze_setting.iso, para->calib_v21[mode].dehaze_setting.air_min, iso, RK_DEHAZE_ISO_NUM);
-    float tmax_base = LinearInterp(para->calib_v21[mode].dehaze_setting.iso, para->calib_v21[mode].dehaze_setting.tmax_base, iso, RK_DEHAZE_ISO_NUM);
-    float tmax_off = LinearInterp(para->calib_v21[mode].dehaze_setting.iso, para->calib_v21[mode].dehaze_setting.tmax_off, iso, RK_DEHAZE_ISO_NUM);
-    float tmax_max = LinearInterp(para->calib_v21[mode].dehaze_setting.iso, para->calib_v21[mode].dehaze_setting.tmax_max, iso, RK_DEHAZE_ISO_NUM);
+    float wt_max = LinearInterp(pCalibV21->DehazeTuningPara.dehaze_setting.DehazeData.EnvLv, pCalibV21->DehazeTuningPara.dehaze_setting.DehazeData.wt_max, variate, EnvLv_len);
+    float air_max = LinearInterp(pCalibV21->DehazeTuningPara.dehaze_setting.DehazeData.EnvLv, pCalibV21->DehazeTuningPara.dehaze_setting.DehazeData.air_max, variate, EnvLv_len);
+    float air_min = LinearInterp(pCalibV21->DehazeTuningPara.dehaze_setting.DehazeData.EnvLv, pCalibV21->DehazeTuningPara.dehaze_setting.DehazeData.air_min, variate, EnvLv_len);
+    float tmax_base = LinearInterp(pCalibV21->DehazeTuningPara.dehaze_setting.DehazeData.EnvLv, pCalibV21->DehazeTuningPara.dehaze_setting.DehazeData.tmax_base, variate, EnvLv_len);
+    float tmax_off = LinearInterp(pCalibV21->DehazeTuningPara.dehaze_setting.DehazeData.EnvLv, pCalibV21->DehazeTuningPara.dehaze_setting.DehazeData.tmax_off, variate, EnvLv_len);
+    float tmax_max = LinearInterp(pCalibV21->DehazeTuningPara.dehaze_setting.DehazeData.EnvLv, pCalibV21->DehazeTuningPara.dehaze_setting.DehazeData.tmax_max, variate, EnvLv_len);
 
     // dehaze_iir_control[5]
-    float stab_fnum = para->calib_v21[mode].dehaze_setting.IIR_setting.stab_fnum;
-    float sigma = para->calib_v21[mode].dehaze_setting.IIR_setting.sigma;
-    float wt_sigma = para->calib_v21[mode].dehaze_setting.IIR_setting.wt_sigma;
-    float air_sigma = para->calib_v21[mode].dehaze_setting.IIR_setting.air_sigma;
-    float tmax_sigma = para->calib_v21[mode].dehaze_setting.IIR_setting.tmax_sigma;
-    float pre_wet = para->calib_v21[mode].dehaze_setting.IIR_setting.pre_wet;
+    float stab_fnum = pCalibV21->DehazeTuningPara.dehaze_setting.stab_fnum;
+    float sigma = pCalibV21->DehazeTuningPara.dehaze_setting.sigma;
+    float wt_sigma = pCalibV21->DehazeTuningPara.dehaze_setting.wt_sigma;
+    float air_sigma = pCalibV21->DehazeTuningPara.dehaze_setting.air_sigma;
+    float tmax_sigma = pCalibV21->DehazeTuningPara.dehaze_setting.tmax_sigma;
+    float pre_wet = pCalibV21->DehazeTuningPara.dehaze_setting.pre_wet;
 
-    float cfg_wt = LinearInterp(para->calib_v21[mode].dehaze_setting.iso, para->calib_v21[mode].dehaze_setting.cfg_wt, iso, RK_DEHAZE_ISO_NUM);
-    float cfg_air = LinearInterp(para->calib_v21[mode].dehaze_setting.iso, para->calib_v21[mode].dehaze_setting.cfg_air, iso, RK_DEHAZE_ISO_NUM);
-    float cfg_tmax = LinearInterp(para->calib_v21[mode].dehaze_setting.iso, para->calib_v21[mode].dehaze_setting.cfg_tmax, iso, RK_DEHAZE_ISO_NUM);
+    float cfg_wt = LinearInterp(pCalibV21->DehazeTuningPara.dehaze_setting.DehazeData.EnvLv, pCalibV21->DehazeTuningPara.dehaze_setting.DehazeData.cfg_wt, variate, EnvLv_len);
+    float cfg_air = LinearInterp(pCalibV21->DehazeTuningPara.dehaze_setting.DehazeData.EnvLv, pCalibV21->DehazeTuningPara.dehaze_setting.DehazeData.cfg_air, variate, EnvLv_len);
+    float cfg_tmax = LinearInterp(pCalibV21->DehazeTuningPara.dehaze_setting.DehazeData.EnvLv, pCalibV21->DehazeTuningPara.dehaze_setting.DehazeData.cfg_tmax, variate, EnvLv_len);
 
-    float range_sigma = LinearInterp(para->calib_v21[mode].dehaze_setting.iso, para->calib_v21[mode].dehaze_setting.range_sigma, iso, RK_DEHAZE_ISO_NUM);
-    float space_sigma_cur = LinearInterp(para->calib_v21[mode].dehaze_setting.iso, para->calib_v21[mode].dehaze_setting.space_sigma_cur, iso, RK_DEHAZE_ISO_NUM);
-    float space_sigma_pre = LinearInterp(para->calib_v21[mode].dehaze_setting.iso, para->calib_v21[mode].dehaze_setting.space_sigma_pre, iso, RK_DEHAZE_ISO_NUM);
+    float range_sigma = LinearInterp(pCalibV21->DehazeTuningPara.dehaze_setting.DehazeData.EnvLv, pCalibV21->DehazeTuningPara.dehaze_setting.DehazeData.range_sigma, variate, EnvLv_len);
+    float space_sigma_cur = LinearInterp(pCalibV21->DehazeTuningPara.dehaze_setting.DehazeData.EnvLv, pCalibV21->DehazeTuningPara.dehaze_setting.DehazeData.space_sigma_cur, variate, EnvLv_len);
+    float space_sigma_pre = LinearInterp(pCalibV21->DehazeTuningPara.dehaze_setting.DehazeData.EnvLv, pCalibV21->DehazeTuningPara.dehaze_setting.DehazeData.space_sigma_pre, variate, EnvLv_len);
 
     // dehaze_bi_para[4]
-    float bf_weight = LinearInterp(para->calib_v21[mode].dehaze_setting.iso, para->calib_v21[mode].dehaze_setting.bf_weight, iso, RK_DEHAZE_ISO_NUM);
-    float dc_weitcur = LinearInterp(para->calib_v21[mode].dehaze_setting.iso, para->calib_v21[mode].dehaze_setting.dc_weitcur, iso, RK_DEHAZE_ISO_NUM);
+    float bf_weight = LinearInterp(pCalibV21->DehazeTuningPara.dehaze_setting.DehazeData.EnvLv, pCalibV21->DehazeTuningPara.dehaze_setting.DehazeData.bf_weight, variate, EnvLv_len);
+    float dc_weitcur = LinearInterp(pCalibV21->DehazeTuningPara.dehaze_setting.DehazeData.EnvLv, pCalibV21->DehazeTuningPara.dehaze_setting.DehazeData.dc_weitcur, variate, EnvLv_len);
 
     // dehaze_air_bf_h[9],dehaze_gaus_h[9]
     float gaus_h[9] = {2.0000, 4.0000, 2.0000,
@@ -315,7 +358,7 @@ void GetDehazeParamsV21(CalibDb_Dehaze_t* para, RkAiqAdehazeProcResult_t* ProcRe
 
     int rawWidth = 1920;
     int rawHeight = 1080;
-    ProcRes->ProcResV21.air_lc_en    = int(air_lc_en); // air_lc_en
+    ProcRes->ProcResV21.air_lc_en    = air_lc_en ? 1 : 0; // air_lc_en
     ProcRes->ProcResV21.dc_min_th    = int(dc_min_th); //0~255, (8bit) dc_min_th
     ProcRes->ProcResV21.dc_max_th    = int(dc_max_th);  //0~255, (8bit) dc_max_th
     ProcRes->ProcResV21.yhist_th    = int(yhist_th);  //0~255, (8bit) yhist_th
@@ -351,31 +394,32 @@ void GetDehazeParamsV21(CalibDb_Dehaze_t* para, RkAiqAdehazeProcResult_t* ProcRe
     LOG1_ADEHAZE("EIXT: %s \n", __func__);
 }
 
-void GetEnhanceParams(CalibDb_Dehaze_t* para, RkAiqAdehazeProcResult_t* ProcRes, int iso, int mode)
+void GetEnhanceParams(CalibDbV2_dehaze_V20_t* pCalib, RkAiqAdehazeProcResult_t* ProcRes, float variate)
 {
     LOG1_ADEHAZE("ENTER: %s \n", __func__);
 
-    float enhance_value = LinearInterp(para->calib_v20[mode].enhance_setting.iso, para->calib_v20[mode].enhance_setting.enhance_value, iso, RK_DEHAZE_ISO_NUM);
-    ProcRes->ProcResV21.enhance_value = int(enhance_value * 1024 + 0.5); //       (14bit),4bit + 10bit, enhance_value
+    int iso_len = pCalib->DehazeTuningPara.enhance_setting.EnhanceData.ISO_len;
+    float enhance_value = LinearInterp(pCalib->DehazeTuningPara.enhance_setting.EnhanceData.ISO, pCalib->DehazeTuningPara.enhance_setting.EnhanceData.enhance_value, variate, iso_len);
+    ProcRes->ProcResV20.enhance_value = int(enhance_value * 1024 + 0.5); //       (14bit),4bit + 10bit, enhance_value
 
-    LOGD_ADEHAZE("%s enhance_en:%d enhance_value:%f enhance_value:%d\n", __func__,
-                 ProcRes->ProcResV20.enhance_en, enhance_value, ProcRes->ProcResV21.enhance_value);
+    LOGD_ADEHAZE("%s enhance_value:%f enhance_value:%d\n", __func__, enhance_value, ProcRes->ProcResV20.enhance_value);
 
     LOG1_ADEHAZE("EIXT: %s \n", __func__);
 }
 
-void GetEnhanceParamsV21(CalibDb_Dehaze_t* para, RkAiqAdehazeProcResult_t* ProcRes, int iso, int mode)
+void GetEnhanceParamsV21(CalibDbV2_dehaze_V21_t* pCalibV21, RkAiqAdehazeProcResult_t* ProcRes, float variate)
 {
     LOG1_ADEHAZE("ENTER: %s \n", __func__);
 
-    float enhance_value = LinearInterp(para->calib_v21[mode].enhance_setting.iso, para->calib_v21[mode].enhance_setting.enhance_value, iso, RK_DEHAZE_ISO_NUM);
-    float enhance_chroma = LinearInterp(para->calib_v21[mode].enhance_setting.iso, para->calib_v21[mode].enhance_setting.enhance_chroma, iso, RK_DEHAZE_ISO_NUM);
+    int EnvLv_len = pCalibV21->DehazeTuningPara.enhance_setting.EnhanceData.EnvLv_len;
+    float enhance_value = LinearInterp(pCalibV21->DehazeTuningPara.enhance_setting.EnhanceData.EnvLv, pCalibV21->DehazeTuningPara.enhance_setting.EnhanceData.enhance_value, variate, EnvLv_len);
+    float enhance_chroma = LinearInterp(pCalibV21->DehazeTuningPara.enhance_setting.EnhanceData.EnvLv, pCalibV21->DehazeTuningPara.enhance_setting.EnhanceData.enhance_chroma, variate, EnvLv_len);
 
     ProcRes->ProcResV21.enhance_value = int(enhance_value * 1024 + 0.5); //       (14bit),4bit + 10bit, enhance_value
     ProcRes->ProcResV21.enhance_chroma = int(enhance_chroma * 1024 + 0.5); //       (14bit),4bit + 10bit, enhance_value
 
     for(int i = 0; i < 17; i++)
-        ProcRes->ProcResV21.enh_curve[i] = (int)(para->calib_v21[mode].enhance_setting.enhance_curve[i]);
+        ProcRes->ProcResV21.enh_curve[i] = (int)(pCalibV21->DehazeTuningPara.enhance_setting.enhance_curve[i]);
 
     LOGD_ADEHAZE("%s enhance_en:%d enhance_value:%f enhance_chroma:%f\n", __func__,
                  ProcRes->ProcResV21.enhance_en, enhance_value, enhance_chroma);
@@ -385,26 +429,27 @@ void GetEnhanceParamsV21(CalibDb_Dehaze_t* para, RkAiqAdehazeProcResult_t* ProcR
     LOG1_ADEHAZE("EIXT: %s \n", __func__);
 }
 
-void GetHistParams(CalibDb_Dehaze_t* para, RkAiqAdehazeProcResult_t* ProcRes, int iso, int mode)
+void GetHistParams(CalibDbV2_dehaze_V20_t* pCalib, RkAiqAdehazeProcResult_t* ProcRes, float variate)
 {
     LOG1_ADEHAZE("ENTER: %s \n", __func__);
 
-    float hist_channel = LinearInterpEnable(para->calib_v20[mode].hist_setting.iso, para->calib_v20[mode].hist_setting.hist_channel, iso, RK_DEHAZE_ISO_NUM);
-    float hist_para_en = LinearInterpEnable(para->calib_v20[mode].hist_setting.iso, para->calib_v20[mode].hist_setting.hist_para_en, iso, RK_DEHAZE_ISO_NUM);
-    float hist_gratio = LinearInterp(para->calib_v20[mode].hist_setting.iso, para->calib_v20[mode].hist_setting.hist_gratio, iso, RK_DEHAZE_ISO_NUM);
-    float hist_th_off = LinearInterp(para->calib_v20[mode].hist_setting.iso, para->calib_v20[mode].hist_setting.hist_th_off, iso, RK_DEHAZE_ISO_NUM);
-    float hist_k = LinearInterp(para->calib_v20[mode].hist_setting.iso, para->calib_v20[mode].hist_setting.hist_k, iso, RK_DEHAZE_ISO_NUM);
-    float hist_min = LinearInterp(para->calib_v20[mode].hist_setting.iso, para->calib_v20[mode].hist_setting.hist_min, iso, RK_DEHAZE_ISO_NUM);
-    float hist_scale = LinearInterp(para->calib_v20[mode].hist_setting.iso, para->calib_v20[mode].hist_setting.hist_scale, iso, RK_DEHAZE_ISO_NUM);
-    float cfg_gratio = LinearInterp(para->calib_v20[mode].hist_setting.iso, para->calib_v20[mode].hist_setting.cfg_gratio, iso, RK_DEHAZE_ISO_NUM);
+    int iso_len = pCalib->DehazeTuningPara.hist_setting.HistData.ISO_len;
+    bool hist_channel = pCalib->DehazeTuningPara.hist_setting.hist_channel;
+    bool hist_para_en = pCalib->DehazeTuningPara.hist_setting.hist_para_en;
+    float hist_gratio = LinearInterp(pCalib->DehazeTuningPara.hist_setting.HistData.ISO, pCalib->DehazeTuningPara.hist_setting.HistData.hist_gratio, variate, iso_len);
+    float hist_th_off = LinearInterp(pCalib->DehazeTuningPara.hist_setting.HistData.ISO, pCalib->DehazeTuningPara.hist_setting.HistData.hist_th_off, variate, iso_len);
+    float hist_k = LinearInterp(pCalib->DehazeTuningPara.hist_setting.HistData.ISO, pCalib->DehazeTuningPara.hist_setting.HistData.hist_k, variate, iso_len);
+    float hist_min = LinearInterp(pCalib->DehazeTuningPara.hist_setting.HistData.ISO, pCalib->DehazeTuningPara.hist_setting.HistData.hist_min, variate, iso_len);
+    float hist_scale = LinearInterp(pCalib->DehazeTuningPara.hist_setting.HistData.ISO, pCalib->DehazeTuningPara.hist_setting.HistData.hist_scale, variate, iso_len);
+    float cfg_gratio = LinearInterp(pCalib->DehazeTuningPara.hist_setting.HistData.ISO, pCalib->DehazeTuningPara.hist_setting.HistData.cfg_gratio, variate, iso_len);
 
     // dehaze_hist_t0[6],dehaze_hist_t1[6],dehaze_hist_t2[6]
     float hist_conv_t0[6] = {1.0000, 2.0000, 1.0000, -1.0000, -2.0000, -1.0000};
     float hist_conv_t1[6] = {1.0000, 0.0000, -1.0000, 2.0000, 0.0000, -2.0000};
     float hist_conv_t2[6] = {1.0000, -2.0000, 1.0000, 2.0000, -4.0000, 2.0000};
 
-    ProcRes->ProcResV20.hist_chn = int(hist_channel); //  hist_para_en
-    ProcRes->ProcResV20.hpara_en = int(hist_para_en); //  hist_para_en
+    ProcRes->ProcResV20.hist_chn = hist_channel ? 1 : 0; //  hist_para_en
+    ProcRes->ProcResV20.hpara_en = hist_para_en ? 1 : 0; //  hist_para_en
     ProcRes->ProcResV20.hist_gratio   = int(hist_gratio * 8); //       (8bit) hist_gratio
     ProcRes->ProcResV20.hist_th_off   = int(hist_th_off);  //       (8bit) hist_th_off
     ProcRes->ProcResV20.hist_k   = int(hist_k * 4 + 0.5); //0~7    (5bit),3bit+2bit, hist_k
@@ -428,25 +473,25 @@ void GetHistParams(CalibDb_Dehaze_t* para, RkAiqAdehazeProcResult_t* ProcRes, in
 
 }
 
-void GetHistParamsV21(CalibDb_Dehaze_t* para, RkAiqAdehazeProcResult_t* ProcRes, int iso, int mode)
+void GetHistParamsV21(CalibDbV2_dehaze_V21_t* pCalibV21, RkAiqAdehazeProcResult_t* ProcRes, float variate)
 {
     LOG1_ADEHAZE("ENTER: %s \n", __func__);
 
-
-    float hist_para_en = LinearInterpEnable(para->calib_v21[mode].hist_setting.iso, para->calib_v21[mode].hist_setting.hist_para_en, iso, RK_DEHAZE_ISO_NUM);
-    float hist_gratio = LinearInterp(para->calib_v21[mode].hist_setting.iso, para->calib_v21[mode].hist_setting.hist_gratio, iso, RK_DEHAZE_ISO_NUM);
-    float hist_th_off = LinearInterp(para->calib_v21[mode].hist_setting.iso, para->calib_v21[mode].hist_setting.hist_th_off, iso, RK_DEHAZE_ISO_NUM);
-    float hist_k = LinearInterp(para->calib_v21[mode].hist_setting.iso, para->calib_v21[mode].hist_setting.hist_k, iso, RK_DEHAZE_ISO_NUM);
-    float hist_min = LinearInterp(para->calib_v21[mode].hist_setting.iso, para->calib_v21[mode].hist_setting.hist_min, iso, RK_DEHAZE_ISO_NUM);
-    float hist_scale = LinearInterp(para->calib_v21[mode].hist_setting.iso, para->calib_v21[mode].hist_setting.hist_scale, iso, RK_DEHAZE_ISO_NUM);
-    float cfg_gratio = LinearInterp(para->calib_v21[mode].hist_setting.iso, para->calib_v21[mode].hist_setting.cfg_gratio, iso, RK_DEHAZE_ISO_NUM);
+    int EnvLv_len = pCalibV21->DehazeTuningPara.hist_setting.HistData.EnvLv_len;
+    bool hist_para_en = pCalibV21->DehazeTuningPara.hist_setting.hist_para_en;
+    float hist_gratio = LinearInterp(pCalibV21->DehazeTuningPara.hist_setting.HistData.EnvLv, pCalibV21->DehazeTuningPara.hist_setting.HistData.hist_gratio, variate, EnvLv_len);
+    float hist_th_off = LinearInterp(pCalibV21->DehazeTuningPara.hist_setting.HistData.EnvLv, pCalibV21->DehazeTuningPara.hist_setting.HistData.hist_th_off, variate, EnvLv_len);
+    float hist_k = LinearInterp(pCalibV21->DehazeTuningPara.hist_setting.HistData.EnvLv, pCalibV21->DehazeTuningPara.hist_setting.HistData.hist_k, variate, EnvLv_len);
+    float hist_min = LinearInterp(pCalibV21->DehazeTuningPara.hist_setting.HistData.EnvLv, pCalibV21->DehazeTuningPara.hist_setting.HistData.hist_min, variate, EnvLv_len);
+    float hist_scale = LinearInterp(pCalibV21->DehazeTuningPara.hist_setting.HistData.EnvLv, pCalibV21->DehazeTuningPara.hist_setting.HistData.hist_scale, variate, EnvLv_len);
+    float cfg_gratio = LinearInterp(pCalibV21->DehazeTuningPara.hist_setting.HistData.EnvLv, pCalibV21->DehazeTuningPara.hist_setting.HistData.cfg_gratio, variate, EnvLv_len);
 
     // dehaze_hist_t0[6],dehaze_hist_t1[6],dehaze_hist_t2[6]
     float hist_conv_t0[6] = {1.0000, 2.0000, 1.0000, -1.0000, -2.0000, -1.0000};
     float hist_conv_t1[6] = {1.0000, 0.0000, -1.0000, 2.0000, 0.0000, -2.0000};
     float hist_conv_t2[6] = {1.0000, -2.0000, 1.0000, 2.0000, -4.0000, 2.0000};
 
-    ProcRes->ProcResV21.hpara_en = int(hist_para_en); //  hist_para_en
+    ProcRes->ProcResV21.hpara_en = hist_para_en ? 1 : 0; //  hist_para_en
     ProcRes->ProcResV21.hist_gratio   = int(hist_gratio * 8); //       (8bit) hist_gratio
     ProcRes->ProcResV21.hist_th_off   = int(hist_th_off);  //       (8bit) hist_th_off
     ProcRes->ProcResV21.hist_k   = int(hist_k * 4 + 0.5); //0~7    (5bit),3bit+2bit, hist_k
@@ -464,194 +509,264 @@ void GetHistParamsV21(CalibDb_Dehaze_t* para, RkAiqAdehazeProcResult_t* ProcRes,
 
 }
 
-void AdehazeApiToolProcess(AdehazeHandle_t* para, int iso, int mode)
+void AdehazeApiToolProcess(CalibDbV2_dehaze_V20_t* pStool, RkAiqAdehazeProcResult_t* ProcRes, float variate)
 {
     LOG1_ADEHAZE("ENTER: %s \n", __func__);
+    LOGD_ADEHAZE("%s: Adehaze in api TOOL !!! \n", __func__);
 
     //cfg setting
-    para->ProcRes.ProcResV20.cfg_alpha = (int)LIMIT_VALUE((para->AdehazeAtrr.stTool.calib_v20[mode].cfg_alpha * 256.0), 255, 0);
-    LOGD_ADEHAZE("%s Config Alpha:%d\n", __func__, para->ProcRes.ProcResV20.cfg_alpha);
+    ProcRes->ProcResV20.cfg_alpha = (int)LIMIT_VALUE((pStool->DehazeTuningPara.cfg_alpha * 256.0), 255, 0);
+    LOGD_ADEHAZE("%s Config Alpha:%d\n", __func__, ProcRes->ProcResV20.cfg_alpha);
 
     //fuction enable
-    EnableSetting(&para->AdehazeAtrr.stTool, &para->ProcRes, iso, mode);
+    EnableSetting(pStool, ProcRes);
 
     //dehaze setting
-    GetDehazeParams(&para->AdehazeAtrr.stTool, &para->ProcRes, iso, mode);
+    GetDehazeParams(pStool, ProcRes, variate);
 
     //enhance setting
-    GetEnhanceParams(&para->AdehazeAtrr.stTool, &para->ProcRes, iso, mode);
+    GetEnhanceParams(pStool, ProcRes, variate);
 
     //hist setting
-    GetHistParams(&para->AdehazeAtrr.stTool, &para->ProcRes, iso, mode);
+    GetHistParams(pStool, ProcRes, variate);
 
     LOG1_ADEHAZE("EXIT: %s \n", __func__);
 
 }
 
-void AdehazeEnhanceApiOnProcess(AdehazeHandle_t* para, int iso, int mode)
+void AdehazeEnhanceApiBypassProcess(CalibDbV2_dehaze_V20_t* pCalib, RkAiqAdehazeProcResult_t* ProcRes, float variate)
 {
     LOG1_ADEHAZE("ENTER: %s \n", __func__);
-    LOGD_ADEHAZE(" %s: Adehaze Api on!!!, api mode:%d \n", __func__, para->AdehazeAtrr.mode);
+    LOGD_ADEHAZE(" %s: Adehaze Api off!!!\n", __func__);
 
-    if(para->AdehazeAtrr.mode == RK_AIQ_DEHAZE_MODE_OFF)
-    {
-        //cfg setting
-        para->ProcRes.ProcResV20.cfg_alpha = (int)LIMIT_VALUE((para->calib_dehaz.calib_v20[mode].cfg_alpha * 256.0), 255, 0);
-        LOGD_ADEHAZE("%s Config Alpha:%d\n", __func__, para->ProcRes.ProcResV20.cfg_alpha);
+    //cfg setting
+    ProcRes->ProcResV20.cfg_alpha = (int)LIMIT_VALUE((pCalib->DehazeTuningPara.cfg_alpha * 256.0), 255, 0);
+    LOGD_ADEHAZE("%s Config Alpha:%d\n", __func__, ProcRes->ProcResV20.cfg_alpha);
 
-        //enable setting
-        EnableSetting(&para->calib_dehaz, &para->ProcRes, iso, mode);
+    //enable setting
+    EnableSetting(pCalib, ProcRes);
 
-        //dehaze seting
-        GetDehazeParams(&para->calib_dehaz, &para->ProcRes, iso, mode);
+    //dehaze setting
+    GetDehazeParams(pCalib, ProcRes, variate);
 
-        //enhance setting
-        GetEnhanceParams(&para->calib_dehaz, &para->ProcRes, iso, mode);
+    //enhance setting
+    GetEnhanceParams(pCalib, ProcRes, variate);
 
-        //hist setting
-        GetHistParams(&para->calib_dehaz, &para->ProcRes, iso, mode);
+    //hist setting
+    GetHistParams(pCalib, ProcRes, variate);
 
+    LOG1_ADEHAZE("EXIT: %s \n", __func__);
+
+}
+
+void AdehazeEnhanceApiBypassV21Process(CalibDbV2_dehaze_V21_t* pCalibV21, RkAiqAdehazeProcResult_t* ProcRes, float variate)
+{
+    LOG1_ADEHAZE("ENTER: %s \n", __func__);
+    LOGD_ADEHAZE(" %s: Adehaze Api off!!!\n", __func__);
+
+    //cfg setting
+    ProcRes->ProcResV20.cfg_alpha = (int)LIMIT_VALUE((pCalibV21->DehazeTuningPara.cfg_alpha * 256.0), 255, 0);
+    LOGD_ADEHAZE("%s Config Alpha:%d\n", __func__, ProcRes->ProcResV20.cfg_alpha);
+
+    //enable setting
+    EnableSettingV21(pCalibV21, ProcRes);
+
+    //dehaze setting
+    GetDehazeParamsV21(pCalibV21, ProcRes, variate);
+
+    //enhance setting
+    GetEnhanceParamsV21(pCalibV21, ProcRes, variate);
+
+    //hist setting
+    GetHistParamsV21(pCalibV21, ProcRes, variate);
+
+    LOG1_ADEHAZE("EXIT: %s \n", __func__);
+
+}
+
+void AdehazeEnhanceApiOffProcess(CalibDbV2_dehaze_V20_t* pCalib, RkAiqAdehazeProcResult_t* ProcRes, float variate)
+{
+    LOG1_ADEHAZE("ENTER: %s \n", __func__);
+    LOGD_ADEHAZE(" %s: Adehaze Api off!!!\n", __func__);
+
+    //enable setting
+    ProcRes->ProcResV20.enable = true;
+    if(pCalib->DehazeTuningPara.enhance_setting.en) {
+        ProcRes->ProcResV20.dc_en = true;
+        ProcRes->ProcResV20.enhance_en = true;
     }
-    else if(para->AdehazeAtrr.mode > RK_AIQ_DEHAZE_MODE_INVALID && para->AdehazeAtrr.mode < RK_AIQ_DEHAZE_MODE_OFF)
-    {
-        para->ProcRes.ProcResV20.dc_en = 0x1;
-        para->ProcRes.ProcResV20.enhance_en = 0x1;
-        LOGD_ADEHAZE(" Dehaze fuction en:%d, Dehaze en:%d, Enhance en:%d,", 0x1, 0, 0x1 );
+    else {
+        ProcRes->ProcResV20.dc_en = false;
+        ProcRes->ProcResV20.enhance_en = false;
+    }
 
-        if(para->AdehazeAtrr.mode == RK_AIQ_DEHAZE_MODE_AUTO )
-            para->ProcRes.ProcResV20.cfg_alpha = (int)LIMIT_VALUE((para->calib_dehaz.calib_v20[mode].cfg_alpha * 256.0), 255, 0);
-        else if(para->AdehazeAtrr.mode == RK_AIQ_DEHAZE_MODE_MANUAL)
-            para->ProcRes.ProcResV20.cfg_alpha = 255;
-        LOGD_ADEHAZE("%s Config Alpha:%d\n", __func__, para->ProcRes.ProcResV20.cfg_alpha);
+    //cfg setting
+    ProcRes->ProcResV20.cfg_alpha = (int)LIMIT_VALUE((pCalib->DehazeTuningPara.cfg_alpha * 256.0), 255, 0);
+    LOGD_ADEHAZE("%s Config Alpha:%d\n", __func__, ProcRes->ProcResV20.cfg_alpha);
+
+    //dehaze setting
+    GetDehazeParams(pCalib, ProcRes, variate);
+
+    //enhance setting
+    GetEnhanceParams(pCalib, ProcRes, variate);
+
+    //hist setting
+    GetHistParams(pCalib, ProcRes, variate);
+
+    LOG1_ADEHAZE("EXIT: %s \n", __func__);
+
+}
+
+void AdehazeEnhanceApiOffProcessV21(CalibDbV2_dehaze_V21_t* pCalib, RkAiqAdehazeProcResult_t* ProcRes, float variate)
+{
+    LOG1_ADEHAZE("ENTER: %s \n", __func__);
+    LOGD_ADEHAZE(" %s: Adehaze Api off!!!\n", __func__);
+
+    //enable setting
+    ProcRes->ProcResV21.enable = true;
+    if(pCalib->DehazeTuningPara.enhance_setting.en) {
+        ProcRes->ProcResV21.dc_en = true;
+        ProcRes->ProcResV21.enhance_en = true;
+    }
+    else {
+        ProcRes->ProcResV21.dc_en = false;
+        ProcRes->ProcResV21.enhance_en = false;
+    }
+
+    //cfg setting
+    ProcRes->ProcResV21.cfg_alpha = (int)LIMIT_VALUE((pCalib->DehazeTuningPara.cfg_alpha * 256.0), 255, 0);
+    LOGD_ADEHAZE("%s Config Alpha:%d\n", __func__, ProcRes->ProcResV21.cfg_alpha);
+
+    //dehaze setting
+    GetDehazeParamsV21(pCalib, ProcRes, variate);
+
+    //enhance setting
+    GetEnhanceParamsV21(pCalib, ProcRes, variate);
+
+    //hist setting
+    GetHistParamsV21(pCalib, ProcRes, variate);
+
+    LOG1_ADEHAZE("EXIT: %s \n", __func__);
+
+}
+
+XCamReturn AdehazeProcessV21(AdehazeHandle_t* para, float variate)
+{
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    LOG1_ADEHAZE("ENTER: %s \n", __func__);
+
+    if(para->AdehazeAtrr.AdehazeAtrrV21.mode == DEHAZE_API_BYPASS)
+        AdehazeEnhanceApiBypassV21Process(&para->calib_dehazV21, &para->ProcRes, variate);
+    else if(para->AdehazeAtrr.AdehazeAtrrV21.mode > DEHAZE_API_BYPASS && para->AdehazeAtrr.AdehazeAtrrV21.mode < DEHAZE_API_OFF) {
+        para->ProcRes.ProcResV21.enable = true;
+        para->ProcRes.ProcResV21.dc_en = 0x1;
+        para->ProcRes.ProcResV21.enhance_en = 0x0;
+        LOGD_ADEHAZE(" Dehaze fuction en:%d, Dehaze en:%d, Enhance en:%d,", 1, 1, 0 );
+
+        if(para->AdehazeAtrr.AdehazeAtrrV21.mode == DEHAZE_API_AUTO )
+            para->ProcRes.ProcResV21.cfg_alpha = (int)LIMIT_VALUE((para->calib_dehazV21.DehazeTuningPara.cfg_alpha * 256.0), 255, 0);
+        else if(para->AdehazeAtrr.AdehazeAtrrV21.mode == DEHAZE_API_MANUAL)
+            para->ProcRes.ProcResV21.cfg_alpha = 255;
+        LOGD_ADEHAZE("%s Config Alpha:%d\n", __func__, para->ProcRes.ProcResV21.cfg_alpha);
 
         //hist en setting
-        if(para->calib_dehaz.calib_v20[mode].hist_setting.en != 0)
-            para->ProcRes.ProcResV20.hist_en = 0x1;
+        if(para->calib_dehazV21.DehazeTuningPara.hist_setting.en)
+            para->ProcRes.ProcResV21.hist_en = 0x1;
         else
-            para->ProcRes.ProcResV20.hist_en = 0;
+            para->ProcRes.ProcResV21.hist_en = 0;
 
-        LOGD_ADEHAZE(" Hist en:%d\n", para->ProcRes.ProcResV20.hist_en );
+        LOGD_ADEHAZE(" Hist en:%d\n", para->ProcRes.ProcResV21.hist_en );
 
-        GetDehazeParams(&para->calib_dehaz, &para->ProcRes, iso, mode);
+        GetDehazeParamsV21(&para->calib_dehazV21, &para->ProcRes, variate);
 
-        if(para->AdehazeAtrr.mode == RK_AIQ_DEHAZE_MODE_MANUAL)
+        if(para->AdehazeAtrr.AdehazeAtrrV21.mode == DEHAZE_API_MANUAL)
         {
-            float level = (float)(para->AdehazeAtrr.stManual.strength);
+            float level = (float)(para->AdehazeAtrr.AdehazeAtrrV21.stManual.strength);
             float level_default = 5;
             float level_diff = (float)(level - level_default);
 
             //sw_dhaz_cfg_wt
-            float sw_dhaz_cfg_wt = (float)para->ProcRes.ProcResV20.cfg_wt;
+            float sw_dhaz_cfg_wt = (float)para->ProcRes.ProcResV21.cfg_wt;
             sw_dhaz_cfg_wt += level_diff * 0.05;
             sw_dhaz_cfg_wt = LIMIT_VALUE(sw_dhaz_cfg_wt, 0.99, 0.01);
-            para->ProcRes.ProcResV20.cfg_wt = (int)sw_dhaz_cfg_wt;
+            para->ProcRes.ProcResV21.cfg_wt = (int)sw_dhaz_cfg_wt;
 
             //sw_dhaz_cfg_air
-            float sw_dhaz_cfg_air = (float)para->ProcRes.ProcResV20.cfg_air;
+            float sw_dhaz_cfg_air = (float)para->ProcRes.ProcResV21.cfg_air;
             sw_dhaz_cfg_air += level_diff * 5;
             sw_dhaz_cfg_air = LIMIT_VALUE(sw_dhaz_cfg_air, 255, 0.01);
-            para->ProcRes.ProcResV20.cfg_air = (int)sw_dhaz_cfg_air;
+            para->ProcRes.ProcResV21.cfg_air = (int)sw_dhaz_cfg_air;
 
             //sw_dhaz_cfg_tmax
-            float sw_dhaz_cfg_tmax = (float)para->ProcRes.ProcResV20.cfg_tmax;
+            float sw_dhaz_cfg_tmax = (float)para->ProcRes.ProcResV21.cfg_tmax;
             sw_dhaz_cfg_tmax += level_diff * 0.05;
             sw_dhaz_cfg_tmax = LIMIT_VALUE(sw_dhaz_cfg_tmax, 0.99, 0.01);
-            para->ProcRes.ProcResV20.cfg_tmax = (int)sw_dhaz_cfg_tmax;
+            para->ProcRes.ProcResV21.cfg_tmax = (int)sw_dhaz_cfg_tmax;
 
             LOGD_ADEHAZE(" %s: Adehaze munual level:%f level_diff:%f\n", __func__, level, level_diff);
             LOGD_ADEHAZE(" %s: After manual api sw_dhaz_cfg_wt:%f sw_dhaz_cfg_air:%f sw_dhaz_cfg_tmax:%f\n", __func__, sw_dhaz_cfg_wt,
                          sw_dhaz_cfg_air, sw_dhaz_cfg_tmax);
         }
         //hist setting
-        GetHistParams(&para->calib_dehaz, &para->ProcRes, iso, mode);
+        GetHistParamsV21(&para->calib_dehazV21, &para->ProcRes, variate);
 
     }
-    else if(para->AdehazeAtrr.mode == RK_AIQ_DEHAZE_MODE_TOOL)
-        AdehazeApiToolProcess(para, iso, mode);
+    else if(para->AdehazeAtrr.AdehazeAtrrV21.mode == DEHAZE_API_OFF)
+        AdehazeEnhanceApiOffProcessV21(&para->calib_dehazV21, &para->ProcRes, variate);
+    else if(para->AdehazeAtrr.AdehazeAtrrV21.mode == DEHAZE_API_TOOL)
+        AdehazeEnhanceApiBypassV21Process(&para->AdehazeAtrr.AdehazeAtrrV21.stTool, &para->ProcRes, variate);
+    else if(para->AdehazeAtrr.AdehazeAtrrV21.mode == DEHAZE_API_ENHANCE_MANUAL) {
+        para->ProcRes.ProcResV21.enable = true;
+        para->ProcRes.ProcResV21.dc_en = 0x1;
+        para->ProcRes.ProcResV21.enhance_en = 0x1;
+
+        //cfg setting
+        para->ProcRes.ProcResV21.cfg_alpha = (int)LIMIT_VALUE((para->calib_dehazV21.DehazeTuningPara.cfg_alpha * 256.0), 255, 0);
+        LOGD_ADEHAZE("%s Config Alpha:%d\n", __func__, para->ProcRes.ProcResV21.cfg_alpha);
+
+        //dehaze setting
+        GetDehazeParamsV21(&para->calib_dehazV21, &para->ProcRes, variate);
+
+        //enhance setting
+        GetEnhanceParamsV21(&para->calib_dehazV21, &para->ProcRes, variate);
+
+        float level = (float)(para->AdehazeAtrr.AdehazeAtrrV21.stEnhanceManual.level);
+        level -= 50;
+        float step = (float)(para->ProcRes.ProcResV21.enhance_value - 1024);
+        step = LIMIT_VALUE(step, 30.9, 0);
+        step /= 50;
+        para->ProcRes.ProcResV21.enhance_value =  para->ProcRes.ProcResV21.enhance_value + (int)(step * level);
+
+        LOGD_ADEHAZE("%s After enhance api enhance_value:%d\n", __func__, para->ProcRes.ProcResV21.enhance_value);
+
+        //hist setting
+        GetHistParamsV21(&para->calib_dehazV21, &para->ProcRes, variate);
+
+    }
+    else if(para->AdehazeAtrr.AdehazeAtrrV21.mode == DEHAZE_API_ENHANCE_AUTO) {
+        para->ProcRes.ProcResV21.enable = true;
+        para->ProcRes.ProcResV21.dc_en = 0x1;
+        para->ProcRes.ProcResV21.enhance_en = 0x1;
+
+        //cfg setting
+        para->ProcRes.ProcResV21.cfg_alpha = (int)LIMIT_VALUE((para->calib_dehazV21.DehazeTuningPara.cfg_alpha * 256.0), 255, 0);
+        LOGD_ADEHAZE("%s Config Alpha:%d\n", __func__, para->ProcRes.ProcResV21.cfg_alpha);
+
+        //dehaze setting
+        GetDehazeParamsV21(&para->calib_dehazV21, &para->ProcRes, variate);
+
+        //enhance setting
+        GetEnhanceParamsV21(&para->calib_dehazV21, &para->ProcRes, variate);
+
+        //hist en
+        para->ProcRes.ProcResV21.hist_en = para->calib_dehazV21.DehazeTuningPara.hist_setting.en ? 1 : 0;
+        //hist setting
+        GetHistParamsV21(&para->calib_dehazV21, &para->ProcRes, variate);
+    }
     else
         LOGE_ADEHAZE("%s:Wrong Adehaze API mode!!! \n", __func__);
 
 
-    LOG1_ADEHAZE("EXIT: %s \n", __func__);
-
-}
-
-void AdehazeEnhanceApiOnProcessV21(AdehazeHandle_t* para, int iso, int mode)
-{
-    LOG1_ADEHAZE("ENTER: %s \n", __func__);
-    LOGD_ADEHAZE(" %s: Adehaze Api on!!!, api mode:%d \n", __func__, para->AdehazeAtrr.mode);
-
-
-
-
-    LOG1_ADEHAZE("EXIT: %s \n", __func__);
-
-}
-
-void AdehazeEnhanceApiOffProcess(CalibDb_Dehaze_t* para, RkAiqAdehazeProcResult_t* ProcRes, int iso, int mode)
-{
-    LOG1_ADEHAZE("ENTER: %s \n", __func__);
-    LOGD_ADEHAZE(" %s: Adehaze Api off!!!\n", __func__);
-
-    //cfg setting
-    ProcRes->ProcResV20.cfg_alpha = (int)LIMIT_VALUE((para->calib_v20[mode].cfg_alpha * 256.0), 255, 0);
-    LOGD_ADEHAZE("%s Config Alpha:%d\n", __func__, ProcRes->ProcResV20.cfg_alpha);
-
-    //enable setting
-    EnableSetting(para, ProcRes, iso, mode);
-
-    //dehaze setting
-    GetDehazeParams(para, ProcRes, iso, mode);
-
-    //enhance setting
-    GetEnhanceParams(para, ProcRes, iso, mode);
-
-    //hist setting
-    GetHistParams(para, ProcRes, iso, mode);
-
-    LOG1_ADEHAZE("EXIT: %s \n", __func__);
-
-}
-
-void AdehazeEnhanceApiOffProcessV21(CalibDb_Dehaze_t* para, RkAiqAdehazeProcResult_t* ProcRes, int iso, int mode)
-{
-    LOG1_ADEHAZE("ENTER: %s \n", __func__);
-    LOGD_ADEHAZE(" %s: Adehaze Api off!!!\n", __func__);
-
-    //enable setting
-    EnableSettingV21(para, ProcRes, iso, mode);
-
-    //cfg setting
-    ProcRes->ProcResV21.cfg_alpha = (int)LIMIT_VALUE((para->calib_v21[mode].cfg_alpha * 256.0), 255, 0);
-
-    //dehaze setting
-    GetDehazeParamsV21(para, ProcRes, iso, mode);
-
-    //enhance setting
-    GetEnhanceParamsV21(para, ProcRes, iso, mode);
-
-    //hist setting
-    GetHistParamsV21(para, ProcRes, iso, mode);
-
-    LOG1_ADEHAZE("EXIT: %s \n", __func__);
-
-}
-
-XCamReturn AdehazeProcessV21(AdehazeHandle_t* para, int iso, int mode, int version)
-{
-    XCamReturn ret = XCAM_RETURN_NO_ERROR;
-    LOG1_ADEHAZE("ENTER: %s \n", __func__);
-
-    para->AdehazeAtrr.byPass = true;
-    if(!(para->AdehazeAtrr.byPass))
-        AdehazeEnhanceApiOnProcessV21(para, iso, mode);
-    else {
-        if(para->calib_dehaz.calib_v21[mode].en == 0)
-            memset(&para->ProcRes.ProcResV21, 0, sizeof(AdehazeV21ProcResult_t));
-        else
-            AdehazeEnhanceApiOffProcessV21(&para->calib_dehaz,
-                                           &para->ProcRes, iso, mode);
-    }
 
     LOG1_ADEHAZE("EXIT: %s \n", __func__);
     return ret;
@@ -661,10 +776,10 @@ void AdehazeGetStats
     AdehazeHandle_t*           pAdehazeCtx,
     rkisp_adehaze_stats_t*         ROData
 ) {
-    LOG1_AHDR( "%s:enter!\n", __FUNCTION__);
+    LOG1_ADEHAZE( "%s:enter!\n", __FUNCTION__);
     LOGV_ADEHAZE("%s:  Ahdr RO data from register:\n", __FUNCTION__);
 
-    if(pAdehazeCtx->HWversion == 0) {
+    if(pAdehazeCtx->HWversion == ADEHAZE_ISP20) {
         pAdehazeCtx->stats.dehaze_stats_v20.dhaz_adp_air_base = ROData->dehaze_stats_v20.dhaz_adp_air_base;
         pAdehazeCtx->stats.dehaze_stats_v20.dhaz_adp_wt = ROData->dehaze_stats_v20.dhaz_adp_wt;
         pAdehazeCtx->stats.dehaze_stats_v20.dhaz_adp_gratio = ROData->dehaze_stats_v20.dhaz_adp_gratio;
@@ -684,7 +799,7 @@ void AdehazeGetStats
             LOGV_ADEHAZE("%s:  h_r_iir[%d]:%d:\n", __FUNCTION__, i, pAdehazeCtx->stats.dehaze_stats_v20.h_r_iir[i]);
         }
     }
-    else if(pAdehazeCtx->HWversion == 1) {
+    else if(pAdehazeCtx->HWversion == ADEHAZE_ISP21) {
         pAdehazeCtx->stats.dehaze_stats_v21.dhaz_adp_air_base = ROData->dehaze_stats_v21.dhaz_adp_air_base;
         pAdehazeCtx->stats.dehaze_stats_v21.dhaz_adp_wt = ROData->dehaze_stats_v21.dhaz_adp_wt;
         pAdehazeCtx->stats.dehaze_stats_v21.dhaz_adp_gratio = ROData->dehaze_stats_v21.dhaz_adp_gratio;
@@ -713,10 +828,33 @@ void AdehazeGetStats
             pAdehazeCtx->stats.other_stats.middle_luma[i] = ROData->other_stats.middle_luma[i];
     }
 
-    LOG1_AHDR( "%s:exit!\n", __FUNCTION__);
+    LOG1_ADEHAZE( "%s:exit!\n", __FUNCTION__);
+}
+void AdehazeGetEnvLv
+(
+    AdehazeHandle_t*           pAdehazeCtx,
+    RkAiqAlgoPreResAeInt*         pAePreRes
+) {
+    LOG1_ADEHAZE( "%s:enter!\n", __FUNCTION__);
+
+    if(pAePreRes == NULL) {
+        LOGE_ADEHAZE( "%s:Ae Pre Res is NULL!\n", __FUNCTION__);
+        pAdehazeCtx->CurrData.V21.EnvLv = 0.0;
+        return;
+    }
+
+    pAdehazeCtx->CurrData.V21.EnvLv = pAePreRes->ae_pre_res_rk.GlobalEnvLv[pAePreRes->ae_pre_res_rk.NormalIndex];
+
+    //Normalize the current envLv for AEC
+    float maxEnvLuma = 65 / 10;
+    float minEnvLuma = 0;
+    pAdehazeCtx->CurrData.V21.EnvLv = (pAdehazeCtx->CurrData.V21.EnvLv  - minEnvLuma) / (maxEnvLuma - minEnvLuma);
+    pAdehazeCtx->CurrData.V21.EnvLv = LIMIT_VALUE(pAdehazeCtx->CurrData.V21.EnvLv, ENVLVMAX, ENVLVMIN);
+
+    LOG1_ADEHAZE( "%s:exit!\n", __FUNCTION__);
 }
 
-XCamReturn AdehazeInit(AdehazeHandle_t** para, CamCalibDbContext_t* calib)
+XCamReturn AdehazeInit(AdehazeHandle_t** para, CamCalibDbV2Context_t* calib)
 {
     LOG1_ADEHAZE("ENTER: %s \n", __func__);
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
@@ -724,11 +862,33 @@ XCamReturn AdehazeInit(AdehazeHandle_t** para, CamCalibDbContext_t* calib)
     if (NULL == handle)
         return XCAM_RETURN_ERROR_MEM;
     memset(handle, 0, sizeof(AdehazeHandle_t));
-    handle->pCalibDb = calib;
-    handle->calib_dehaz = calib->dehaze;
-    handle->AdehazeAtrr.stTool = calib->dehaze;
-    handle->AdehazeAtrr.byPass = true;
-    handle->AdehazeAtrr.mode = RK_AIQ_DEHAZE_MODE_AUTO;
+
+    if(CHECK_ISP_HW_V20())
+        handle->HWversion = ADEHAZE_ISP20;
+    else if(CHECK_ISP_HW_V21())
+        handle->HWversion = ADEHAZE_ISP21;
+
+    if(handle->HWversion == ADEHAZE_ISP20) {
+        //isp20
+        CalibDbV2_dehaze_V20_t* calibv2_adehaze_calib_V20 =
+            (CalibDbV2_dehaze_V20_t*)(CALIBDBV2_GET_MODULE_PTR(calib, adehaze_calib_v20));
+        memcpy(&handle->calib_dehazV20, calibv2_adehaze_calib_V20, sizeof(CalibDbV2_dehaze_V20_t));
+        memcpy(&handle->AdehazeAtrr.AdehazeAtrrV20.stTool, calibv2_adehaze_calib_V20, sizeof(CalibDbV2_dehaze_V20_t));
+        handle->AdehazeAtrr.AdehazeAtrrV20.mode = DEHAZE_API_BYPASS;
+        handle->PreData.V20.ISO = 50.0;
+        handle->PreData.V20.ApiMode = DEHAZE_API_BYPASS;
+    } else if(handle->HWversion == ADEHAZE_ISP21) {
+        //isp21
+        CalibDbV2_dehaze_V21_t* calibv2_adehaze_calib_V21 =
+            (CalibDbV2_dehaze_V21_t*)(CALIBDBV2_GET_MODULE_PTR(calib, adehaze_calib_v21));
+        memcpy(&handle->calib_dehazV21, calibv2_adehaze_calib_V21, sizeof(CalibDbV2_dehaze_V21_t));
+        memcpy(&handle->AdehazeAtrr.AdehazeAtrrV21.stTool, calibv2_adehaze_calib_V21, sizeof(CalibDbV2_dehaze_V21_t));
+        handle->AdehazeAtrr.AdehazeAtrrV21.mode = DEHAZE_API_BYPASS;
+        handle->PreData.V21.EnvLv = 0.0;
+        handle->PreData.V21.ApiMode = DEHAZE_API_BYPASS;
+    }
+    handle->FrameID = 0;
+
     *para = handle;
     LOG1_ADEHAZE("EXIT: %s \n", __func__);
     return(ret);
@@ -744,28 +904,202 @@ XCamReturn AdehazeRelease(AdehazeHandle_t* para)
     return(ret);
 }
 
-XCamReturn AdehazeProcess(AdehazeHandle_t* para, int iso, int mode, int version)
+XCamReturn AdehazeProcess(AdehazeHandle_t* para, AdehazeVersion_t version)
 {
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
     LOG1_ADEHAZE("ENTER: %s \n", __func__);
 
-    if(version == 0) {
+    float variate = 0.0;
+
+    if(version == ADEHAZE_ISP20) {
+        variate = para->CurrData.V20.ISO;
         //big mode
         para->ProcRes.ProcResV20.big_en = para->width > DEHAZEBIGMODE ? 1 : 0;
         para->ProcRes.ProcResV20.nobig_en = (int)(1 - para->ProcRes.ProcResV20.big_en);
 
-        LOGD_ADEHAZE("%s ISO:%d mode:%d\n", __func__, iso, mode);
+        if(para->AdehazeAtrr.AdehazeAtrrV20.mode == DEHAZE_API_BYPASS)
+            AdehazeEnhanceApiBypassProcess(&para->calib_dehazV20, &para->ProcRes, variate);
+        else if(para->AdehazeAtrr.AdehazeAtrrV20.mode > DEHAZE_API_BYPASS && para->AdehazeAtrr.AdehazeAtrrV20.mode < DEHAZE_API_OFF) {
+            para->ProcRes.ProcResV20.enable = true;
+            para->ProcRes.ProcResV20.dc_en = 0x1;
+            para->ProcRes.ProcResV20.enhance_en = 0x0;
+            LOGD_ADEHAZE(" Dehaze fuction en:%d, Dehaze en:%d, Enhance en:%d,", 1, 1, 0 );
 
-        if(!(para->AdehazeAtrr.byPass))
-            AdehazeEnhanceApiOnProcess(para, iso, mode);
+            if(para->AdehazeAtrr.AdehazeAtrrV20.mode == DEHAZE_API_AUTO )
+                para->ProcRes.ProcResV20.cfg_alpha = (int)LIMIT_VALUE((para->calib_dehazV20.DehazeTuningPara.cfg_alpha * 256.0), 255, 0);
+            else if(para->AdehazeAtrr.AdehazeAtrrV20.mode == DEHAZE_API_MANUAL)
+                para->ProcRes.ProcResV20.cfg_alpha = 255;
+            LOGD_ADEHAZE("%s Config Alpha:%d\n", __func__, para->ProcRes.ProcResV20.cfg_alpha);
+
+            //hist en setting
+            if(para->calib_dehazV20.DehazeTuningPara.hist_setting.en)
+                para->ProcRes.ProcResV20.hist_en = 0x1;
+            else
+                para->ProcRes.ProcResV20.hist_en = 0;
+
+            LOGD_ADEHAZE(" Hist en:%d\n", para->ProcRes.ProcResV20.hist_en );
+
+            GetDehazeParams(&para->calib_dehazV20, &para->ProcRes, variate);
+
+            if(para->AdehazeAtrr.AdehazeAtrrV20.mode == DEHAZE_API_MANUAL)
+            {
+                float level = (float)(para->AdehazeAtrr.AdehazeAtrrV20.stManual.strength);
+                float level_default = 5;
+                float level_diff = (float)(level - level_default);
+
+                //sw_dhaz_cfg_wt
+                float sw_dhaz_cfg_wt = (float)para->ProcRes.ProcResV20.cfg_wt;
+                sw_dhaz_cfg_wt += level_diff * 0.05;
+                sw_dhaz_cfg_wt = LIMIT_VALUE(sw_dhaz_cfg_wt, 0.99, 0.01);
+                para->ProcRes.ProcResV20.cfg_wt = (int)sw_dhaz_cfg_wt;
+
+                //sw_dhaz_cfg_air
+                float sw_dhaz_cfg_air = (float)para->ProcRes.ProcResV20.cfg_air;
+                sw_dhaz_cfg_air += level_diff * 5;
+                sw_dhaz_cfg_air = LIMIT_VALUE(sw_dhaz_cfg_air, 255, 0.01);
+                para->ProcRes.ProcResV20.cfg_air = (int)sw_dhaz_cfg_air;
+
+                //sw_dhaz_cfg_tmax
+                float sw_dhaz_cfg_tmax = (float)para->ProcRes.ProcResV20.cfg_tmax;
+                sw_dhaz_cfg_tmax += level_diff * 0.05;
+                sw_dhaz_cfg_tmax = LIMIT_VALUE(sw_dhaz_cfg_tmax, 0.99, 0.01);
+                para->ProcRes.ProcResV20.cfg_tmax = (int)sw_dhaz_cfg_tmax;
+
+                LOGD_ADEHAZE(" %s: Adehaze munual level:%f level_diff:%f\n", __func__, level, level_diff);
+                LOGD_ADEHAZE(" %s: After manual api sw_dhaz_cfg_wt:%f sw_dhaz_cfg_air:%f sw_dhaz_cfg_tmax:%f\n", __func__, sw_dhaz_cfg_wt,
+                             sw_dhaz_cfg_air, sw_dhaz_cfg_tmax);
+            }
+            //hist setting
+            GetHistParams(&para->calib_dehazV20, &para->ProcRes, variate);
+
+        }
+        else if(para->AdehazeAtrr.AdehazeAtrrV20.mode == DEHAZE_API_OFF)
+            AdehazeEnhanceApiOffProcess(&para->calib_dehazV20, &para->ProcRes, variate);
+        else if(para->AdehazeAtrr.AdehazeAtrrV20.mode == DEHAZE_API_TOOL)
+            AdehazeApiToolProcess(&para->AdehazeAtrr.AdehazeAtrrV20.stTool, &para->ProcRes, variate);
+        else if(para->AdehazeAtrr.AdehazeAtrrV20.mode == DEHAZE_API_ENHANCE_MANUAL) {
+            para->ProcRes.ProcResV20.enable = true;
+            para->ProcRes.ProcResV20.dc_en = 0x1;
+            para->ProcRes.ProcResV20.enhance_en = 0x1;
+
+            //cfg setting
+            para->ProcRes.ProcResV20.cfg_alpha = (int)LIMIT_VALUE((para->calib_dehazV20.DehazeTuningPara.cfg_alpha * 256.0), 255, 0);
+            LOGD_ADEHAZE("%s Config Alpha:%d\n", __func__, para->ProcRes.ProcResV20.cfg_alpha);
+
+            //dehaze setting
+            GetDehazeParams(&para->calib_dehazV20, &para->ProcRes, variate);
+
+            //enhance setting
+            GetEnhanceParams(&para->calib_dehazV20, &para->ProcRes, variate);
+
+            float level = (float)(para->AdehazeAtrr.AdehazeAtrrV20.stEnhanceManual.level);
+            level -= 50;
+            float step = (float)(para->ProcRes.ProcResV20.enhance_value - 1024);
+            step = LIMIT_VALUE(step, 30.9, 0);
+            step /= 50;
+            para->ProcRes.ProcResV20.enhance_value =  para->ProcRes.ProcResV20.enhance_value + (int)(step * level);
+
+            LOGD_ADEHAZE("%s After enhance api enhance_value:%d\n", __func__, para->ProcRes.ProcResV20.enhance_value);
+
+            //hist setting
+            GetHistParams(&para->calib_dehazV20, &para->ProcRes, variate);
+
+        }
+        else if(para->AdehazeAtrr.AdehazeAtrrV20.mode == DEHAZE_API_ENHANCE_AUTO) {
+            para->ProcRes.ProcResV20.enable = true;
+            para->ProcRes.ProcResV20.dc_en = 0x1;
+            para->ProcRes.ProcResV20.enhance_en = 0x1;
+
+            //cfg setting
+            para->ProcRes.ProcResV20.cfg_alpha = (int)LIMIT_VALUE((para->calib_dehazV20.DehazeTuningPara.cfg_alpha * 256.0), 255, 0);
+            LOGD_ADEHAZE("%s Config Alpha:%d\n", __func__, para->ProcRes.ProcResV20.cfg_alpha);
+
+            //dehaze setting
+            GetDehazeParams(&para->calib_dehazV20, &para->ProcRes, variate);
+
+            //enhance setting
+            GetEnhanceParams(&para->calib_dehazV20, &para->ProcRes, variate);
+
+            //hist en
+            para->ProcRes.ProcResV20.hist_en = para->calib_dehazV20.DehazeTuningPara.hist_setting.en ? 1 : 0;
+            //hist setting
+            GetHistParams(&para->calib_dehazV20, &para->ProcRes, variate);
+        }
         else
-            AdehazeEnhanceApiOffProcess(&para->calib_dehaz,
-                                        &para->ProcRes, iso, mode);
+            LOGE_ADEHAZE("%s:Wrong Adehaze API mode!!! \n", __func__);
+
     }
-    else if(version == 1)
-        AdehazeProcessV21(para, iso, mode, version);
+    else if(version == ADEHAZE_ISP21) {
+        variate = para->CurrData.V21.EnvLv;
+        AdehazeProcessV21(para, variate);
+    }
     else
         LOGE_ADEHAZE(" %s:Wrong hardware version!! \n", __func__);
+
+    //store pre data
+    if(version == ADEHAZE_ISP20)
+        para->PreData.V20.ISO = para->CurrData.V20.ISO;
+    else if(version == ADEHAZE_ISP21)
+        para->PreData.V21.EnvLv = para->CurrData.V21.EnvLv;
+
+    LOG1_ADEHAZE("EXIT: %s \n", __func__);
+    return ret;
+}
+
+bool AdehazeByPassProcessing(AdehazeHandle_t* pAdehazeCtx)
+{
+    LOG1_ADEHAZE("ENTER: %s \n", __func__);
+    bool ret = false;
+    float diff = 0.0;
+
+    if(pAdehazeCtx->FrameID <= 2)
+        pAdehazeCtx->byPassProc = false;
+    else if(pAdehazeCtx->HWversion == ADEHAZE_ISP20) {
+        if(pAdehazeCtx->AdehazeAtrr.AdehazeAtrrV20.mode > DEHAZE_API_BYPASS)
+            pAdehazeCtx->byPassProc = false;
+        else if(pAdehazeCtx->AdehazeAtrr.AdehazeAtrrV20.mode != pAdehazeCtx->PreData.V20.ApiMode)
+            pAdehazeCtx->byPassProc = false;
+        else {
+            diff = (pAdehazeCtx->PreData.V20.ISO - pAdehazeCtx->CurrData.V20.ISO) / pAdehazeCtx->PreData.V20.ISO;
+            if(diff > pAdehazeCtx->calib_dehazV20.DehazeTuningPara.ByPassThr || diff < (0 - pAdehazeCtx->calib_dehazV20.DehazeTuningPara.ByPassThr))
+                pAdehazeCtx->byPassProc = false;
+            else
+                pAdehazeCtx->byPassProc = true;
+        }
+    }
+    else if(pAdehazeCtx->HWversion == ADEHAZE_ISP21) {
+        if(pAdehazeCtx->AdehazeAtrr.AdehazeAtrrV21.mode > DEHAZE_API_BYPASS)
+            pAdehazeCtx->byPassProc = false;
+        else if(pAdehazeCtx->AdehazeAtrr.AdehazeAtrrV21.mode != pAdehazeCtx->PreData.V21.ApiMode)
+            pAdehazeCtx->byPassProc = false;
+        else {
+            diff = pAdehazeCtx->PreData.V21.EnvLv - pAdehazeCtx->CurrData.V21.EnvLv;
+            if(pAdehazeCtx->PreData.V21.EnvLv == 0.0) {
+                diff = pAdehazeCtx->CurrData.V21.EnvLv;
+                if(diff == 0.0)
+                    pAdehazeCtx->byPassProc = true;
+                else
+                    pAdehazeCtx->byPassProc = false;
+            }
+            else {
+                diff /= pAdehazeCtx->PreData.V21.EnvLv;
+                if(diff >= pAdehazeCtx->calib_dehazV21.DehazeTuningPara.ByPassThr || diff <= (0 - pAdehazeCtx->calib_dehazV21.DehazeTuningPara.ByPassThr))
+                    pAdehazeCtx->byPassProc = false;
+                else
+                    pAdehazeCtx->byPassProc = true;
+
+            }
+        }
+
+    }
+    else
+        LOGE_ADEHAZE(" %s:Wrong hardware version!! \n", __func__);
+
+    ret = pAdehazeCtx->byPassProc;
+
+    LOGD_ADEHAZE("%s:/*************************Adehaze start******************/ \n", __func__);
+    LOGD_ADEHAZE("%s:FrameCnt:%d byPassProc:%d \n", __func__, pAdehazeCtx->FrameNumber, ret);
+
 
     LOG1_ADEHAZE("EXIT: %s \n", __func__);
     return ret;

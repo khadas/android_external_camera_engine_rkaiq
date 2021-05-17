@@ -21,6 +21,381 @@
 
 namespace RkCam {
 
+uint32_t IspParamsAssembler::MAX_PENDING_PARAMS = 10;
+
+IspParamsAssembler::IspParamsAssembler (const char* name)
+    : mLatestReadyFrmId(-1)
+    , mReadyMask(0)
+    , mName(name)
+    , mReadyNums(0)
+    , mCondNum(0)
+    , started(false)
+{
+}
+
+IspParamsAssembler::~IspParamsAssembler ()
+{
+}
+
+void
+IspParamsAssembler::rmReadyCondition(uint32_t cond)
+{
+    SmartLock locker (mParamsMutex);
+    LOG1_CAMHW_SUBM(ISP20PARAM_SUBM, "%s:(%d) %s: enter \n",
+                    __FUNCTION__, __LINE__, mName.c_str());
+    if (mCondMaskMap.find(cond) != mCondMaskMap.end()) {
+        mReadyMask &= ~mCondMaskMap[cond];
+    }
+    LOG1_CAMHW_SUBM(ISP20PARAM_SUBM, "%s:(%d) %s: exit \n",
+                    __FUNCTION__, __LINE__, mName.c_str());
+}
+
+void
+IspParamsAssembler::addReadyCondition(uint32_t cond)
+{
+    SmartLock locker (mParamsMutex);
+    LOG1_CAMHW_SUBM(ISP20PARAM_SUBM, "%s:(%d) %s: enter \n",
+                    __FUNCTION__, __LINE__, mName.c_str());
+
+    if (mCondMaskMap.find(cond) == mCondMaskMap.end()) {
+        if (mCondNum > 63) {
+            LOGE_CAMHW_SUBM(ISP20PARAM_SUBM, "%s: max condintion num exceed 32",
+                            mName.c_str());
+            return;
+        }
+
+        mCondMaskMap[cond] = 1 << mCondNum;
+        mReadyMask |= mCondMaskMap[cond];
+        mCondNum++;
+        LOGI_CAMHW_SUBM(ISP20PARAM_SUBM, "%s: map cond %s 0x%x -> 0x%llx, mask: 0x%llx",
+                        mName.c_str(), Cam3aResultType2Str[cond], cond, mCondMaskMap[cond], mReadyMask);
+    } else {
+        LOGI_CAMHW_SUBM(ISP20PARAM_SUBM, "%s: map cond %s 0x%x -> 0x%llx already added",
+                        mName.c_str(), Cam3aResultType2Str[cond], cond, mCondMaskMap[cond]);
+    }
+
+    LOG1_CAMHW_SUBM(ISP20PARAM_SUBM, "%s:(%d) %s: exit \n",
+                    __FUNCTION__, __LINE__, mName.c_str());
+}
+
+XCamReturn
+IspParamsAssembler::queue(SmartPtr<cam3aResult>& result)
+{
+    SmartLock locker (mParamsMutex);
+    return queue_locked(result);
+}
+
+XCamReturn
+IspParamsAssembler::queue_locked(SmartPtr<cam3aResult>& result)
+{
+    LOG1_CAMHW_SUBM(ISP20PARAM_SUBM, "%s:(%d) %s: enter \n",
+                    __FUNCTION__, __LINE__, mName.c_str());
+
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+
+    if (!result.ptr()) {
+        LOGE_CAMHW_SUBM(ISP20PARAM_SUBM, "%s: null result", mName.c_str());
+        return ret;
+    }
+
+    sint32_t frame_id = result->getId();
+    int type = result->getType();
+
+    if (!started) {
+        LOGI_CAMHW_SUBM(ISP20PARAM_SUBM, "%s: intial params type %s , result_id[%d] !",
+                        mName.c_str(), Cam3aResultType2Str[type], frame_id);
+        if (frame_id != 0)
+            LOGE_CAMHW_SUBM(ISP20PARAM_SUBM, "%s: intial params type %s , result_id[%d] != 0",
+                            mName.c_str(), Cam3aResultType2Str[type], frame_id);
+        mInitParamsList.push_back(result);
+
+        return XCAM_RETURN_NO_ERROR;
+    }
+
+#if 0 // allow non-mandatory params
+    if (mCondMaskMap.find(type) == mCondMaskMap.end()) {
+        LOGI_CAMHW_SUBM(ISP20PARAM_SUBM, "%s: result type: 0x%x is not required, skip ",
+                        mName.c_str(), type);
+        for (auto cond_it : mCondMaskMap)
+            LOGI_CAMHW_SUBM(ISP20PARAM_SUBM, "%s: -->need type: 0x%x", mName.c_str(), cond_it.first);
+        return ret;
+    }
+#endif
+    // exception case 1 : wrong result frame_id
+    if (frame_id != -1 && (frame_id <= mLatestReadyFrmId)) {
+        // merged to the oldest one
+        bool found = false;
+        for (const auto& iter : mParamsMap) {
+            if (!(iter.second.flags & mCondMaskMap[type])) {
+                frame_id = iter.first;
+                found = true;
+                break;
+            }
+        }
+        if (!found) {
+            if (!mParamsMap.empty())
+                frame_id = (mParamsMap.rbegin())->first + 1;
+            else {
+                frame_id = mLatestReadyFrmId + 1;
+                LOGE_CAMHW_SUBM(ISP20PARAM_SUBM, "%s: type %s, mLatestReadyFrmId %d, "
+                                "can't find a proper unready params, impossible case",
+                                mName.c_str(), Cam3aResultType2Str[type], mLatestReadyFrmId);
+            }
+        }
+        LOGI_CAMHW_SUBM(ISP20PARAM_SUBM, "%s: type %s , delayed result_id[%d], merged to %d",
+                        mName.c_str(), Cam3aResultType2Str[type], result->getId(), frame_id);
+        result->setId(frame_id);
+    } else if (frame_id != 0 && mLatestReadyFrmId == -1) {
+        LOGW_CAMHW_SUBM(ISP20PARAM_SUBM,
+                        "Wrong initial id %d set to 0, last %d", frame_id,
+                        mLatestReadyFrmId);
+        frame_id = 0;
+        result->setId(0);
+    }
+
+    mParamsMap[frame_id].params.push_back(result);
+    mParamsMap[frame_id].flags |= mCondMaskMap[type];
+
+    LOG1_CAMHW_SUBM(ISP20PARAM_SUBM, "%s, new params: frame: %d, type:%s, flag: 0x%llx",
+                    mName.c_str(), frame_id, Cam3aResultType2Str[type], mCondMaskMap[type]);
+
+    bool ready =
+        (mReadyMask == mParamsMap[frame_id].flags) ? true : false;
+
+    LOG1_CAMHW_SUBM(ISP20PARAM_SUBM, "%s, frame: %d, flags: 0x%llx, mask: 0x%llx, ready status: %d !",
+                    mName.c_str(), frame_id, mParamsMap[frame_id].flags, mReadyMask, ready);
+
+    mParamsMap[frame_id].ready = ready;
+
+    if (ready) {
+        mReadyNums++;
+        if (frame_id > mLatestReadyFrmId)
+            mLatestReadyFrmId = frame_id;
+        else {
+            // impossible case
+            LOGE_CAMHW_SUBM(ISP20PARAM_SUBM, "%s, wrong ready params, latest %d <= new %d, drop it !",
+                            mName.c_str(), mLatestReadyFrmId, frame_id);
+            mParamsMap.erase(mParamsMap.find(frame_id));
+            return ret;
+        }
+        LOGD_CAMHW_SUBM(ISP20PARAM_SUBM, "%s, frame: %d params ready, mReadyNums: %d !",
+                        mName.c_str(), frame_id, mReadyNums);
+    }
+
+    bool overflow = false;
+    if (mParamsMap.size() > MAX_PENDING_PARAMS) {
+        LOGW_CAMHW_SUBM(ISP20PARAM_SUBM, "%s: pending params overflow, max is %d",
+                        mName.c_str(), MAX_PENDING_PARAMS);
+        overflow = true;
+    }
+    bool ready_disorder = false;
+    if (mReadyNums > 0 && !(mParamsMap.begin())->second.ready) {
+        ready_disorder = true;
+        LOGW_CAMHW_SUBM(ISP20PARAM_SUBM, "%s: ready params disordered",
+                        mName.c_str());
+    }
+    if (overflow || ready_disorder) {
+        // exception case 2 : current ready one is not the first one in
+        // mParamsMap, this means some conditions frame_id may be NOT
+        // continuous, should check the AIQCORE and isp driver,
+        // so far we merge all disordered to one.
+        std::map<int, params_t>::iterator it = mParamsMap.begin();
+        cam3aResultList merge_list;
+        sint32_t merge_id = 0;
+        for (it = mParamsMap.begin(); it != mParamsMap.end();) {
+            if (!(it->second.ready)) {
+                LOGW_CAMHW_SUBM(ISP20PARAM_SUBM, "%s: ready disorderd, NOT ready id(flags:0x%x) %d < ready %d !",
+                                mName.c_str(), it->second.flags, it->first, frame_id);
+                // print missing params
+                std::string missing_conds;
+                for (auto cond : mCondMaskMap) {
+                    if (!(cond.second & it->second.flags)) {
+                        missing_conds.append(Cam3aResultType2Str[cond.first]);
+                        missing_conds.append(",");
+                    }
+                }
+                if (!missing_conds.empty())
+                    LOGW_CAMHW_SUBM(ISP20PARAM_SUBM, "%s: [%d] missing conditions: %s !",
+                                    mName.c_str(), it->first, missing_conds.c_str());
+                // forced to ready
+                merge_list.insert(merge_list.end(), it->second.params.begin(), it->second.params.end());
+                merge_id = it->first;
+                it = mParamsMap.erase(it);
+            } else
+                break;
+        }
+
+        if (merge_list.size() > 0) {
+            mReadyNums++;
+            if (merge_id > mLatestReadyFrmId)
+                mLatestReadyFrmId = merge_id;
+            mParamsMap[merge_id].params.clear();
+            mParamsMap[merge_id].params.assign(merge_list.begin(), merge_list.end());
+            LOGW_CAMHW_SUBM(ISP20PARAM_SUBM, "%s: merge all pending disorderd to frame %d !",
+                            mName.c_str(), merge_id);
+            mParamsMap[merge_id].flags = mReadyMask;
+            mParamsMap[merge_id].ready = true;
+        }
+    }
+
+    LOG1_CAMHW_SUBM(ISP20PARAM_SUBM, "%s:(%d) %s: exit \n",
+                    __FUNCTION__, __LINE__, mName.c_str());
+
+    return ret;
+
+}
+
+XCamReturn
+IspParamsAssembler::queue(cam3aResultList& results)
+{
+    LOG1_CAMHW_SUBM(ISP20PARAM_SUBM, "%s:(%d) %s: enter \n", __FUNCTION__, __LINE__, mName.c_str());
+
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+
+    SmartLock locker (mParamsMutex);
+
+    for (auto result : results)
+        queue_locked(result);
+
+    LOG1_CAMHW_SUBM(ISP20PARAM_SUBM, "%s:(%d) %s: exit \n",
+                    __FUNCTION__, __LINE__, mName.c_str());
+
+    return ret;
+}
+
+void
+IspParamsAssembler::forceReady(sint32_t frame_id)
+{
+    SmartLock locker (mParamsMutex);
+
+    if (mParamsMap.find(frame_id) != mParamsMap.end()) {
+        if (!mParamsMap[frame_id].ready) {
+            // print missing params
+            std::string missing_conds;
+            for (auto cond : mCondMaskMap) {
+                if (!(cond.second & mParamsMap[frame_id].flags)) {
+                    missing_conds.append(Cam3aResultType2Str[cond.first]);
+                    missing_conds.append(",");
+                }
+            }
+            if (!missing_conds.empty())
+                LOGW_CAMHW_SUBM(ISP20PARAM_SUBM, "%s: %s: [%d] missing conditions: %s !",
+                                mName.c_str(), __func__, frame_id, missing_conds.c_str());
+            LOGW_CAMHW_SUBM(ISP20PARAM_SUBM, "%s:%s: [%d] params forced to ready",
+                            mName.c_str(), __func__, frame_id);
+            mReadyNums++;
+            if (frame_id > mLatestReadyFrmId)
+                mLatestReadyFrmId = frame_id;
+            mParamsMap[frame_id].flags = mReadyMask;
+            mParamsMap[frame_id].ready = true;
+        } else
+            LOGW_CAMHW_SUBM(ISP20PARAM_SUBM, "%s:%s: [%d] params is already ready",
+                            mName.c_str(), __func__, frame_id);
+    } else {
+        LOG1_CAMHW_SUBM(ISP20PARAM_SUBM, "%s: %s: [%d] params does not exist, the next is %d",
+                        mName.c_str(), __func__, frame_id,
+                        mParamsMap.empty() ? -1 :  (mParamsMap.begin())->first);
+    }
+}
+
+bool
+IspParamsAssembler::ready()
+{
+    LOG1_CAMHW_SUBM(ISP20PARAM_SUBM, "%s:(%d) %s: enter \n",
+                    __FUNCTION__, __LINE__, mName.c_str());
+    SmartLock locker (mParamsMutex);
+    LOG1_CAMHW_SUBM(ISP20PARAM_SUBM, "%s: ready params num %d", mName.c_str(), mReadyNums);
+    return mReadyNums > 0 ? true : false;
+}
+
+XCamReturn
+IspParamsAssembler::deQueOne(cam3aResultList& results, uint32_t& frame_id)
+{
+    LOG1_CAMHW_SUBM(ISP20PARAM_SUBM, "%s:(%d) %s: enter \n",
+                    __FUNCTION__, __LINE__, mName.c_str());
+
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+
+    SmartLock locker (mParamsMutex);
+    if (mReadyNums > 0) {
+        // get next params id, the first one in map
+        std::map<int, params_t>::iterator it = mParamsMap.begin();
+
+        if (it == mParamsMap.end()) {
+            LOGI_CAMHW_SUBM(ISP20PARAM_SUBM, "%s: mParamsMap is empty !", mName.c_str());
+            return XCAM_RETURN_ERROR_PARAM;
+        } else {
+            LOGD_CAMHW_SUBM(ISP20PARAM_SUBM, "%s: deque frame %d params, ready %d",
+                            mName.c_str(), it->first, it->second.ready);
+            results = it->second.params;
+            frame_id = it->first;
+            mParamsMap.erase(it);
+            mReadyNums--;
+        }
+    } else {
+        LOG1_CAMHW_SUBM(ISP20PARAM_SUBM, "%s: no ready params", mName.c_str());
+        return XCAM_RETURN_ERROR_PARAM;
+    }
+    LOG1_CAMHW_SUBM(ISP20PARAM_SUBM, "%s:(%d) %s: exit \n",
+                    __FUNCTION__, __LINE__, mName.c_str());
+
+    return ret;
+}
+
+void
+IspParamsAssembler::reset()
+{
+    LOGD_CAMHW_SUBM(ISP20PARAM_SUBM, "%s:(%d) %s: enter \n",
+                    __FUNCTION__, __LINE__, mName.c_str());
+    SmartLock locker (mParamsMutex);
+    reset_locked();
+    LOGD_CAMHW_SUBM(ISP20PARAM_SUBM, "%s:(%d) %s: exit \n",
+                    __FUNCTION__, __LINE__, mName.c_str());
+}
+
+void
+IspParamsAssembler::reset_locked()
+{
+    LOGD_CAMHW_SUBM(ISP20PARAM_SUBM, "%s:(%d) %s: enter \n",
+                    __FUNCTION__, __LINE__, mName.c_str());
+    mParamsMap.clear();
+    mLatestReadyFrmId = -1;
+    mReadyMask = 0;
+    mReadyNums = 0;
+    mCondNum = 0;
+    mCondMaskMap.clear();
+    mInitParamsList.clear();
+    started = false;
+    LOGD_CAMHW_SUBM(ISP20PARAM_SUBM, "%s:(%d) %s: exit \n",
+                    __FUNCTION__, __LINE__, mName.c_str());
+}
+
+XCamReturn
+IspParamsAssembler::start()
+{
+    SmartLock locker (mParamsMutex);
+    if (started)
+        return XCAM_RETURN_NO_ERROR;
+
+    started = true;
+
+    for (auto result : mInitParamsList)
+        queue_locked(result);
+
+    mInitParamsList.clear();
+
+    return XCAM_RETURN_NO_ERROR;
+}
+
+void
+IspParamsAssembler::stop() {
+    SmartLock locker (mParamsMutex);
+    if (!started)
+        return;
+    started = false;
+    reset_locked();
+}
+
 template<class T>
 void
 Isp20Params::convertAiqAeToIsp20Params
@@ -31,23 +406,23 @@ Isp20Params::convertAiqAeToIsp20Params
 {
     /* ae update */
     if(/*aec_meas.ae_meas_en*/1) {
-        isp_cfg.module_ens |= 1LL << RK_ISP2X_RAWAE_0_ID;
-        isp_cfg.module_ens |= 1LL << RK_ISP2X_RAWAE_1_ID;
-        isp_cfg.module_ens |= 1LL << RK_ISP2X_RAWAE_2_ID;
-        isp_cfg.module_ens |= 1LL << RK_ISP2X_RAWAE_3_ID;
+        isp_cfg.module_ens |= 1LL << RK_ISP2X_RAWAE_LITE_ID;
+        isp_cfg.module_ens |= 1LL << RK_ISP2X_RAWAE_BIG1_ID;
+        isp_cfg.module_ens |= 1LL << RK_ISP2X_RAWAE_BIG2_ID;
+        isp_cfg.module_ens |= 1LL << RK_ISP2X_RAWAE_BIG3_ID;
         isp_cfg.module_ens |= 1LL << RK_ISP2X_YUVAE_ID;
-        if(aec_meas.ae_meas_update) {
-            isp_cfg.module_en_update |= 1LL << RK_ISP2X_RAWAE_0_ID;
-            isp_cfg.module_cfg_update |= 1LL << RK_ISP2X_RAWAE_0_ID;
+        if(/*aec_meas.ae_meas_update*/1) {
+            isp_cfg.module_en_update |= 1LL << RK_ISP2X_RAWAE_LITE_ID;
+            isp_cfg.module_cfg_update |= 1LL << RK_ISP2X_RAWAE_LITE_ID;
 
-            isp_cfg.module_en_update |= 1LL << RK_ISP2X_RAWAE_1_ID;
-            isp_cfg.module_cfg_update |= 1LL << RK_ISP2X_RAWAE_1_ID;
+            isp_cfg.module_en_update |= 1LL << RK_ISP2X_RAWAE_BIG1_ID;
+            isp_cfg.module_cfg_update |= 1LL << RK_ISP2X_RAWAE_BIG1_ID;
 
-            isp_cfg.module_en_update |= 1LL << RK_ISP2X_RAWAE_2_ID;
-            isp_cfg.module_cfg_update |= 1LL << RK_ISP2X_RAWAE_2_ID;
+            isp_cfg.module_en_update |= 1LL << RK_ISP2X_RAWAE_BIG2_ID;
+            isp_cfg.module_cfg_update |= 1LL << RK_ISP2X_RAWAE_BIG2_ID;
 
-            isp_cfg.module_en_update |= 1LL << RK_ISP2X_RAWAE_3_ID;
-            isp_cfg.module_cfg_update |= 1LL << RK_ISP2X_RAWAE_3_ID;
+            isp_cfg.module_en_update |= 1LL << RK_ISP2X_RAWAE_BIG3_ID;
+            isp_cfg.module_cfg_update |= 1LL << RK_ISP2X_RAWAE_BIG3_ID;
 
             isp_cfg.module_en_update |= 1LL << RK_ISP2X_YUVAE_ID;
             isp_cfg.module_cfg_update |= 1LL << RK_ISP2X_YUVAE_ID;
@@ -58,21 +433,22 @@ Isp20Params::convertAiqAeToIsp20Params
         return;
     }
 
-    memcpy(&isp_cfg.meas.rawae0, &aec_meas.rawae0, sizeof(aec_meas.rawae0));
+    memcpy(&isp_cfg.meas.rawae3, &aec_meas.rawae3, sizeof(aec_meas.rawae3));
     memcpy(&isp_cfg.meas.rawae1, &aec_meas.rawae1, sizeof(aec_meas.rawae1));
     memcpy(&isp_cfg.meas.rawae2, &aec_meas.rawae2, sizeof(aec_meas.rawae2));
-    memcpy(&isp_cfg.meas.rawae3, &aec_meas.rawae3, sizeof(aec_meas.rawae3));
+    memcpy(&isp_cfg.meas.rawae0, &aec_meas.rawae0, sizeof(aec_meas.rawae0));
     memcpy(&isp_cfg.meas.yuvae, &aec_meas.yuvae, sizeof(aec_meas.yuvae));
+
     /*
      *     LOGD_CAMHW_SUBM(ISP20PARAM_SUBM,"xuhf-debug: hist_meas-isp_cfg size: [%dx%d]-[%dx%d]-[%dx%d]-[%dx%d]\n",
-     *                     sizeof(aec_meas.rawae0),
-     *                     sizeof(isp_cfg.meas.rawae0),
+     *                     sizeof(aec_meas.rawae3),
+     *                     sizeof(isp_cfg.meas.rawae3),
      *                     sizeof(aec_meas.rawae1),
      *                     sizeof(isp_cfg.meas.rawae1),
      *                     sizeof(aec_meas.rawae2),
      *                     sizeof(isp_cfg.meas.rawae2),
-     *                     sizeof(aec_meas.rawae3),
-     *                     sizeof(isp_cfg.meas.rawae3));
+     *                     sizeof(aec_meas.rawae0),
+     *                     sizeof(isp_cfg.meas.rawae0));
      *
      *     LOGD_CAMHW_SUBM(ISP20PARAM_SUBM,"xuhf-debug: aec_meas: win size: [%dx%d]-[%dx%d]-[%dx%d]-[%dx%d]\n",
      *            aec_meas.rawae0.win.h_size,
@@ -106,24 +482,24 @@ Isp20Params::convertAiqHistToIsp20Params
 {
     /* hist update */
     if(/*hist_meas.hist_meas_en*/1) {
-        isp_cfg.module_ens |= 1LL << RK_ISP2X_RAWHIST_0_ID;
-        isp_cfg.module_ens |= 1LL << RK_ISP2X_RAWHIST_1_ID;
-        isp_cfg.module_ens |= 1LL << RK_ISP2X_RAWHIST_2_ID;
-        isp_cfg.module_ens |= 1LL << RK_ISP2X_RAWHIST_3_ID;
+        isp_cfg.module_ens |= 1LL << RK_ISP2X_RAWHIST_LITE_ID;
+        isp_cfg.module_ens |= 1LL << RK_ISP2X_RAWHIST_BIG1_ID;
+        isp_cfg.module_ens |= 1LL << RK_ISP2X_RAWHIST_BIG2_ID;
+        isp_cfg.module_ens |= 1LL << RK_ISP2X_RAWHIST_BIG3_ID;
         isp_cfg.module_ens |= 1LL << RK_ISP2X_SIHST_ID;
 
-        if(hist_meas.hist_meas_update) {
-            isp_cfg.module_en_update |= 1LL << RK_ISP2X_RAWHIST_0_ID;
-            isp_cfg.module_cfg_update |= 1LL << RK_ISP2X_RAWHIST_0_ID;
+        if(/*hist_meas.hist_meas_update*/1) {
+            isp_cfg.module_en_update |= 1LL << RK_ISP2X_RAWHIST_LITE_ID;
+            isp_cfg.module_cfg_update |= 1LL << RK_ISP2X_RAWHIST_LITE_ID;
 
-            isp_cfg.module_en_update |= 1LL << RK_ISP2X_RAWHIST_1_ID;
-            isp_cfg.module_cfg_update |= 1LL << RK_ISP2X_RAWHIST_1_ID;
+            isp_cfg.module_en_update |= 1LL << RK_ISP2X_RAWHIST_BIG1_ID;
+            isp_cfg.module_cfg_update |= 1LL << RK_ISP2X_RAWHIST_BIG1_ID;
 
-            isp_cfg.module_en_update |= 1LL << RK_ISP2X_RAWHIST_2_ID;
-            isp_cfg.module_cfg_update |= 1LL << RK_ISP2X_RAWHIST_2_ID;
+            isp_cfg.module_en_update |= 1LL << RK_ISP2X_RAWHIST_BIG2_ID;
+            isp_cfg.module_cfg_update |= 1LL << RK_ISP2X_RAWHIST_BIG2_ID;
 
-            isp_cfg.module_en_update |= 1LL << RK_ISP2X_RAWHIST_3_ID;
-            isp_cfg.module_cfg_update |= 1LL << RK_ISP2X_RAWHIST_3_ID;
+            isp_cfg.module_en_update |= 1LL << RK_ISP2X_RAWHIST_BIG3_ID;
+            isp_cfg.module_cfg_update |= 1LL << RK_ISP2X_RAWHIST_BIG3_ID;
 
             isp_cfg.module_en_update |= 1LL << RK_ISP2X_SIHST_ID;
             isp_cfg.module_cfg_update |= 1LL << RK_ISP2X_SIHST_ID;
@@ -135,22 +511,22 @@ Isp20Params::convertAiqHistToIsp20Params
         return;
     }
 
-    memcpy(&isp_cfg.meas.rawhist0, &hist_meas.rawhist0, sizeof(hist_meas.rawhist0));
+    memcpy(&isp_cfg.meas.rawhist3, &hist_meas.rawhist3, sizeof(hist_meas.rawhist3));
     memcpy(&isp_cfg.meas.rawhist1, &hist_meas.rawhist1, sizeof(hist_meas.rawhist1));
     memcpy(&isp_cfg.meas.rawhist2, &hist_meas.rawhist2, sizeof(hist_meas.rawhist2));
-    memcpy(&isp_cfg.meas.rawhist3, &hist_meas.rawhist3, sizeof(hist_meas.rawhist3));
+    memcpy(&isp_cfg.meas.rawhist0, &hist_meas.rawhist0, sizeof(hist_meas.rawhist0));
     memcpy(&isp_cfg.meas.sihst, &hist_meas.sihist, sizeof(hist_meas.sihist));
 
     /*
      *     LOGD_CAMHW_SUBM(ISP20PARAM_SUBM,"xuhf-debug: hist_meas-isp_cfg size: [%dx%d]-[%dx%d]-[%dx%d]-[%dx%d]\n",
-     *                     sizeof(hist_meas.rawhist0),
-     *                     sizeof(isp_cfg.meas.rawhist0),
+     *                     sizeof(hist_meas.rawhist3),
+     *                     sizeof(isp_cfg.meas.rawhist3),
      *                     sizeof(hist_meas.rawhist1),
      *                     sizeof(isp_cfg.meas.rawhist1),
      *                     sizeof(hist_meas.rawhist2),
      *                     sizeof(isp_cfg.meas.rawhist2),
-     *                     sizeof(hist_meas.rawhist3),
-     *                     sizeof(isp_cfg.meas.rawhist3));
+     *                     sizeof(hist_meas.rawhist0),
+     *                     sizeof(isp_cfg.meas.rawhist0));
      *
      *     LOGD_CAMHW_SUBM(ISP20PARAM_SUBM,"xuhf-debug: hist_meas: hist win size: [%dx%d]-[%dx%d]-[%dx%d]-[%dx%d]\n",
      *                     hist_meas.rawhist0.win.h_size,
@@ -624,10 +1000,10 @@ Isp20Params::convertAiqAwbToIsp20Params(T& isp_cfg,
 
 template<class T>
 void Isp20Params::convertAiqMergeToIsp20Params(T& isp_cfg,
-        const rk_aiq_isp_hdr_t& ahdr_data)
+        const rk_aiq_isp_merge_t& amerge_data)
 {
     // TODO: could be always on ? isp driver would do the right thing
-    if(1/*ahdr_data.bTmoEn*/)
+    if(amerge_data.Res.sw_hdrmge_mode)
     {
         isp_cfg.module_en_update |= 1LL << RK_ISP2X_HDRMGE_ID;
         isp_cfg.module_ens |= 1LL << RK_ISP2X_HDRMGE_ID;
@@ -640,21 +1016,21 @@ void Isp20Params::convertAiqMergeToIsp20Params(T& isp_cfg,
         isp_cfg.module_cfg_update &= ~(1LL << RK_ISP2X_HDRMGE_ID);
     }
 
-    isp_cfg.others.hdrmge_cfg.mode         = ahdr_data.MgeProcRes.sw_hdrmge_mode;
-    isp_cfg.others.hdrmge_cfg.gain0_inv    = ahdr_data.MgeProcRes.sw_hdrmge_gain0_inv;
-    isp_cfg.others.hdrmge_cfg.gain0         = ahdr_data.MgeProcRes.sw_hdrmge_gain0;
-    isp_cfg.others.hdrmge_cfg.gain1_inv    = ahdr_data.MgeProcRes.sw_hdrmge_gain1_inv;
-    isp_cfg.others.hdrmge_cfg.gain1        = ahdr_data.MgeProcRes.sw_hdrmge_gain1;
-    isp_cfg.others.hdrmge_cfg.gain2        = ahdr_data.MgeProcRes.sw_hdrmge_gain2;
-    isp_cfg.others.hdrmge_cfg.lm_dif_0p15  = ahdr_data.MgeProcRes.sw_hdrmge_lm_dif_0p15;
-    isp_cfg.others.hdrmge_cfg.lm_dif_0p9   = ahdr_data.MgeProcRes.sw_hdrmge_lm_dif_0p9;
-    isp_cfg.others.hdrmge_cfg.ms_diff_0p15 = ahdr_data.MgeProcRes.sw_hdrmge_ms_dif_0p15;
-    isp_cfg.others.hdrmge_cfg.ms_dif_0p8   = ahdr_data.MgeProcRes.sw_hdrmge_ms_dif_0p8;
+    isp_cfg.others.hdrmge_cfg.mode         = amerge_data.Res.sw_hdrmge_mode;
+    isp_cfg.others.hdrmge_cfg.gain0_inv    = amerge_data.Res.sw_hdrmge_gain0_inv;
+    isp_cfg.others.hdrmge_cfg.gain0         = amerge_data.Res.sw_hdrmge_gain0;
+    isp_cfg.others.hdrmge_cfg.gain1_inv    = amerge_data.Res.sw_hdrmge_gain1_inv;
+    isp_cfg.others.hdrmge_cfg.gain1        = amerge_data.Res.sw_hdrmge_gain1;
+    isp_cfg.others.hdrmge_cfg.gain2        = amerge_data.Res.sw_hdrmge_gain2;
+    isp_cfg.others.hdrmge_cfg.lm_dif_0p15  = amerge_data.Res.sw_hdrmge_lm_dif_0p15;
+    isp_cfg.others.hdrmge_cfg.lm_dif_0p9   = amerge_data.Res.sw_hdrmge_lm_dif_0p9;
+    isp_cfg.others.hdrmge_cfg.ms_diff_0p15 = amerge_data.Res.sw_hdrmge_ms_dif_0p15;
+    isp_cfg.others.hdrmge_cfg.ms_dif_0p8   = amerge_data.Res.sw_hdrmge_ms_dif_0p8;
     for(int i = 0; i < 17; i++)
     {
-        isp_cfg.others.hdrmge_cfg.curve.curve_0[i] = ahdr_data.MgeProcRes.sw_hdrmge_l0_y[i];
-        isp_cfg.others.hdrmge_cfg.curve.curve_1[i] = ahdr_data.MgeProcRes.sw_hdrmge_l1_y[i];
-        isp_cfg.others.hdrmge_cfg.e_y[i]           = ahdr_data.MgeProcRes.sw_hdrmge_e_y[i];
+        isp_cfg.others.hdrmge_cfg.curve.curve_0[i] = amerge_data.Res.sw_hdrmge_l0_y[i];
+        isp_cfg.others.hdrmge_cfg.curve.curve_1[i] = amerge_data.Res.sw_hdrmge_l1_y[i];
+        isp_cfg.others.hdrmge_cfg.e_y[i]           = amerge_data.Res.sw_hdrmge_e_y[i];
     }
 
 #if 0
@@ -679,9 +1055,9 @@ void Isp20Params::convertAiqMergeToIsp20Params(T& isp_cfg,
 
 template<class T>
 void Isp20Params::convertAiqTmoToIsp20Params(T& isp_cfg,
-        const rk_aiq_isp_hdr_t& ahdr_data)
+        const rk_aiq_isp_tmo_t& atmo_data)
 {
-    if(ahdr_data.bTmoEn)
+    if(atmo_data.bTmoEn)
     {
         isp_cfg.module_en_update |= 1LL << RK_ISP2X_HDRTMO_ID;
         isp_cfg.module_ens |= 1LL << RK_ISP2X_HDRTMO_ID;
@@ -694,44 +1070,51 @@ void Isp20Params::convertAiqTmoToIsp20Params(T& isp_cfg,
         isp_cfg.module_cfg_update &= ~(1LL << RK_ISP2X_HDRTMO_ID);
     }
 
-    isp_cfg.others.hdrtmo_cfg.cnt_vsize     = ahdr_data.TmoProcRes.sw_hdrtmo_cnt_vsize;
-    isp_cfg.others.hdrtmo_cfg.gain_ld_off2  = ahdr_data.TmoProcRes.sw_hdrtmo_gain_ld_off2;
-    isp_cfg.others.hdrtmo_cfg.gain_ld_off1  = ahdr_data.TmoProcRes.sw_hdrtmo_gain_ld_off1;
-    isp_cfg.others.hdrtmo_cfg.big_en        = ahdr_data.TmoProcRes.sw_hdrtmo_big_en;
-    isp_cfg.others.hdrtmo_cfg.nobig_en      = ahdr_data.TmoProcRes.sw_hdrtmo_nobig_en;
-    isp_cfg.others.hdrtmo_cfg.newhst_en     = ahdr_data.TmoProcRes.sw_hdrtmo_newhist_en;
-    isp_cfg.others.hdrtmo_cfg.cnt_mode      = ahdr_data.TmoProcRes.sw_hdrtmo_cnt_mode;
-    isp_cfg.others.hdrtmo_cfg.expl_lgratio  = ahdr_data.TmoProcRes.sw_hdrtmo_expl_lgratio;
-    isp_cfg.others.hdrtmo_cfg.lgscl_ratio   = ahdr_data.TmoProcRes.sw_hdrtmo_lgscl_ratio;
-    isp_cfg.others.hdrtmo_cfg.cfg_alpha     = ahdr_data.TmoProcRes.sw_hdrtmo_cfg_alpha;
-    isp_cfg.others.hdrtmo_cfg.set_gainoff   = ahdr_data.TmoProcRes.sw_hdrtmo_set_gainoff;
-    isp_cfg.others.hdrtmo_cfg.set_palpha    = ahdr_data.TmoProcRes.sw_hdrtmo_set_palpha;
-    isp_cfg.others.hdrtmo_cfg.set_lgmax     = ahdr_data.TmoProcRes.sw_hdrtmo_set_lgmax;
-    isp_cfg.others.hdrtmo_cfg.set_lgmin     = ahdr_data.TmoProcRes.sw_hdrtmo_set_lgmin;
-    isp_cfg.others.hdrtmo_cfg.set_weightkey = ahdr_data.TmoProcRes.sw_hdrtmo_set_weightkey;
-    isp_cfg.others.hdrtmo_cfg.set_lgmean    = ahdr_data.TmoProcRes.sw_hdrtmo_set_lgmean;
-    isp_cfg.others.hdrtmo_cfg.set_lgrange1  = ahdr_data.TmoProcRes.sw_hdrtmo_set_lgrange1;
-    isp_cfg.others.hdrtmo_cfg.set_lgrange0  = ahdr_data.TmoProcRes.sw_hdrtmo_set_lgrange0;
-    isp_cfg.others.hdrtmo_cfg.set_lgavgmax  = ahdr_data.TmoProcRes.sw_hdrtmo_set_lgavgmax;
-    isp_cfg.others.hdrtmo_cfg.clipgap1_i    = ahdr_data.TmoProcRes.sw_hdrtmo_clipgap1;
-    isp_cfg.others.hdrtmo_cfg.clipgap0_i    = ahdr_data.TmoProcRes.sw_hdrtmo_clipgap0;
-    isp_cfg.others.hdrtmo_cfg.clipratio1    = ahdr_data.TmoProcRes.sw_hdrtmo_clipratio1;
-    isp_cfg.others.hdrtmo_cfg.clipratio0    = ahdr_data.TmoProcRes.sw_hdrtmo_clipratio0;
-    isp_cfg.others.hdrtmo_cfg.ratiol        = ahdr_data.TmoProcRes.sw_hdrtmo_ratiol;
-    isp_cfg.others.hdrtmo_cfg.lgscl_inv     = ahdr_data.TmoProcRes.sw_hdrtmo_lgscl_inv;
-    isp_cfg.others.hdrtmo_cfg.lgscl         = ahdr_data.TmoProcRes.sw_hdrtmo_lgscl;
-    isp_cfg.others.hdrtmo_cfg.lgmax         = ahdr_data.TmoProcRes.sw_hdrtmo_lgmax;
-    isp_cfg.others.hdrtmo_cfg.hist_low      = ahdr_data.TmoProcRes.sw_hdrtmo_hist_low;
-    isp_cfg.others.hdrtmo_cfg.hist_min      = ahdr_data.TmoProcRes.sw_hdrtmo_hist_min;
-    isp_cfg.others.hdrtmo_cfg.hist_shift    = ahdr_data.TmoProcRes.sw_hdrtmo_hist_shift;
-    isp_cfg.others.hdrtmo_cfg.hist_0p3      = ahdr_data.TmoProcRes.sw_hdrtmo_hist_0p3;
-    isp_cfg.others.hdrtmo_cfg.hist_high     = ahdr_data.TmoProcRes.sw_hdrtmo_hist_high;
-    isp_cfg.others.hdrtmo_cfg.palpha_lwscl  = ahdr_data.TmoProcRes.sw_hdrtmo_palpha_lwscl;
-    isp_cfg.others.hdrtmo_cfg.palpha_lw0p5  = ahdr_data.TmoProcRes.sw_hdrtmo_palpha_lw0p5;
-    isp_cfg.others.hdrtmo_cfg.palpha_0p18   = ahdr_data.TmoProcRes.sw_hdrtmo_palpha_0p18;
-    isp_cfg.others.hdrtmo_cfg.maxgain       = ahdr_data.TmoProcRes.sw_hdrtmo_maxgain;
-    isp_cfg.others.hdrtmo_cfg.maxpalpha     = ahdr_data.TmoProcRes.sw_hdrtmo_maxpalpha;
+    isp_cfg.others.hdrtmo_cfg.cnt_vsize     = atmo_data.Res.sw_hdrtmo_cnt_vsize;
+    isp_cfg.others.hdrtmo_cfg.gain_ld_off2  = atmo_data.Res.sw_hdrtmo_gain_ld_off2;
+    isp_cfg.others.hdrtmo_cfg.gain_ld_off1  = atmo_data.Res.sw_hdrtmo_gain_ld_off1;
+    isp_cfg.others.hdrtmo_cfg.big_en        = atmo_data.Res.sw_hdrtmo_big_en;
+    isp_cfg.others.hdrtmo_cfg.nobig_en      = atmo_data.Res.sw_hdrtmo_nobig_en;
+    isp_cfg.others.hdrtmo_cfg.newhst_en     = atmo_data.Res.sw_hdrtmo_newhist_en;
+    isp_cfg.others.hdrtmo_cfg.cnt_mode      = atmo_data.Res.sw_hdrtmo_cnt_mode;
+    isp_cfg.others.hdrtmo_cfg.expl_lgratio  = atmo_data.Res.sw_hdrtmo_expl_lgratio;
+    isp_cfg.others.hdrtmo_cfg.lgscl_ratio   = atmo_data.Res.sw_hdrtmo_lgscl_ratio;
+    isp_cfg.others.hdrtmo_cfg.cfg_alpha     = atmo_data.Res.sw_hdrtmo_cfg_alpha;
+    isp_cfg.others.hdrtmo_cfg.set_gainoff   = atmo_data.Res.sw_hdrtmo_set_gainoff;
+    isp_cfg.others.hdrtmo_cfg.set_palpha    = atmo_data.Res.sw_hdrtmo_set_palpha;
+    isp_cfg.others.hdrtmo_cfg.set_lgmax     = atmo_data.Res.sw_hdrtmo_set_lgmax;
+    isp_cfg.others.hdrtmo_cfg.set_lgmin     = atmo_data.Res.sw_hdrtmo_set_lgmin;
+    isp_cfg.others.hdrtmo_cfg.set_weightkey = atmo_data.Res.sw_hdrtmo_set_weightkey;
+    isp_cfg.others.hdrtmo_cfg.set_lgmean    = atmo_data.Res.sw_hdrtmo_set_lgmean;
+    isp_cfg.others.hdrtmo_cfg.set_lgrange1  = atmo_data.Res.sw_hdrtmo_set_lgrange1;
+    isp_cfg.others.hdrtmo_cfg.set_lgrange0  = atmo_data.Res.sw_hdrtmo_set_lgrange0;
+    isp_cfg.others.hdrtmo_cfg.set_lgavgmax  = atmo_data.Res.sw_hdrtmo_set_lgavgmax;
+    isp_cfg.others.hdrtmo_cfg.clipgap1_i    = atmo_data.Res.sw_hdrtmo_clipgap1;
+    isp_cfg.others.hdrtmo_cfg.clipgap0_i    = atmo_data.Res.sw_hdrtmo_clipgap0;
+    isp_cfg.others.hdrtmo_cfg.clipratio1    = atmo_data.Res.sw_hdrtmo_clipratio1;
+    isp_cfg.others.hdrtmo_cfg.clipratio0    = atmo_data.Res.sw_hdrtmo_clipratio0;
+    isp_cfg.others.hdrtmo_cfg.ratiol        = atmo_data.Res.sw_hdrtmo_ratiol;
+    isp_cfg.others.hdrtmo_cfg.lgscl_inv     = atmo_data.Res.sw_hdrtmo_lgscl_inv;
+    isp_cfg.others.hdrtmo_cfg.lgscl         = atmo_data.Res.sw_hdrtmo_lgscl;
+    isp_cfg.others.hdrtmo_cfg.lgmax         = atmo_data.Res.sw_hdrtmo_lgmax;
+    isp_cfg.others.hdrtmo_cfg.hist_low      = atmo_data.Res.sw_hdrtmo_hist_low;
+    isp_cfg.others.hdrtmo_cfg.hist_min      = atmo_data.Res.sw_hdrtmo_hist_min;
+    isp_cfg.others.hdrtmo_cfg.hist_shift    = atmo_data.Res.sw_hdrtmo_hist_shift;
+    isp_cfg.others.hdrtmo_cfg.hist_0p3      = atmo_data.Res.sw_hdrtmo_hist_0p3;
+    isp_cfg.others.hdrtmo_cfg.hist_high     = atmo_data.Res.sw_hdrtmo_hist_high;
+    isp_cfg.others.hdrtmo_cfg.palpha_lwscl  = atmo_data.Res.sw_hdrtmo_palpha_lwscl;
+    isp_cfg.others.hdrtmo_cfg.palpha_lw0p5  = atmo_data.Res.sw_hdrtmo_palpha_lw0p5;
+    isp_cfg.others.hdrtmo_cfg.palpha_0p18   = atmo_data.Res.sw_hdrtmo_palpha_0p18;
+    isp_cfg.others.hdrtmo_cfg.maxgain       = atmo_data.Res.sw_hdrtmo_maxgain;
+    isp_cfg.others.hdrtmo_cfg.maxpalpha     = atmo_data.Res.sw_hdrtmo_maxpalpha;
 
+    //tmo predict
+    isp_cfg.others.hdrtmo_cfg.predict.global_tmo = atmo_data.isHdrGlobalTmo;
+    isp_cfg.others.hdrtmo_cfg.predict.scene_stable = atmo_data.Predict.Scenestable;
+    isp_cfg.others.hdrtmo_cfg.predict.k_rolgmean = atmo_data.Predict.K_Rolgmean;
+    isp_cfg.others.hdrtmo_cfg.predict.iir = atmo_data.Predict.iir;
+    isp_cfg.others.hdrtmo_cfg.predict.iir_max = atmo_data.Predict.iir_max;
+    isp_cfg.others.hdrtmo_cfg.predict.global_tmo_strength = atmo_data.Predict.global_tmo_strength;
 #if 0
     LOGE_CAMHW_SUBM(ISP20PARAM_SUBM, "%d: cnt_vsize %d", __LINE__, isp_cfg.others.hdrtmo_cfg.cnt_vsize);
     LOGE_CAMHW_SUBM(ISP20PARAM_SUBM, "%d: gain_ld_off2 %d", __LINE__, isp_cfg.others.hdrtmo_cfg.gain_ld_off2);
@@ -835,12 +1218,25 @@ Isp20Params::convertAiqAwbGainToIsp20Params(T& isp_cfg,
     struct isp2x_awb_gain_cfg *  cfg = &isp_cfg.others.awb_gain_cfg;
     uint16_t max_wb_gain = (1 << (ISP2X_WBGAIN_FIXSCALE_BIT + 2)) - 1;
     rk_aiq_wb_gain_t awb_gain1 = awb_gain;
-    if(blc.stResult.enable) {
-        awb_gain1.bgain *= (float)((1 << ISP2X_BLC_BIT_MAX) - 1) / ((1 << ISP2X_BLC_BIT_MAX) - 1 - blc.stResult.blc_b);
-        awb_gain1.gbgain *= (float)((1 << ISP2X_BLC_BIT_MAX) - 1) / ((1 << ISP2X_BLC_BIT_MAX) - 1 - blc.stResult.blc_gb);
-        awb_gain1.rgain *= (float)((1 << ISP2X_BLC_BIT_MAX) - 1) / ((1 << ISP2X_BLC_BIT_MAX) - 1 - blc.stResult.blc_r);
-        awb_gain1.grgain *= (float)((1 << ISP2X_BLC_BIT_MAX) - 1) / ((1 << ISP2X_BLC_BIT_MAX) - 1 - blc.stResult.blc_gr);
+    if(blc.enable) {
+        awb_gain1.bgain *= (float)((1 << ISP2X_BLC_BIT_MAX) - 1) / ((1 << ISP2X_BLC_BIT_MAX) - 1 - blc.blc_b);
+        awb_gain1.gbgain *= (float)((1 << ISP2X_BLC_BIT_MAX) - 1) / ((1 << ISP2X_BLC_BIT_MAX) - 1 - blc.blc_gb);
+        awb_gain1.rgain *= (float)((1 << ISP2X_BLC_BIT_MAX) - 1) / ((1 << ISP2X_BLC_BIT_MAX) - 1 - blc.blc_r);
+        awb_gain1.grgain *= (float)((1 << ISP2X_BLC_BIT_MAX) - 1) / ((1 << ISP2X_BLC_BIT_MAX) - 1 - blc.blc_gr);
     }
+    // rescale
+    float max_value  = awb_gain1.bgain > awb_gain1.gbgain ? awb_gain1.bgain : awb_gain1.gbgain;
+    max_value = max_value > awb_gain1.rgain ? max_value : awb_gain1.rgain;
+    float max_wb_gain_f = (float)max_wb_gain / (1 << (ISP2X_WBGAIN_FIXSCALE_BIT));
+    if (max_value  > max_wb_gain_f ) {
+        float scale = max_value / max_wb_gain_f;
+        awb_gain1.bgain /= scale;
+        awb_gain1.gbgain /= scale;
+        awb_gain1.grgain /= scale;
+        awb_gain1.rgain /= scale;
+        LOGD_CAMHW("%s: scale %f, awbgain(r,g,g,b):[%f,%f,%f,%f]", __FUNCTION__, scale, awb_gain1.rgain, awb_gain1.grgain, awb_gain1.gbgain, awb_gain1.bgain);
+    }
+    //fix point
     //LOGE_CAMHW_SUBM(ISP20PARAM_SUBM,"max_wb_gain:%d\n",max_wb_gain);
     uint16_t R = (uint16_t)(0.5 + awb_gain1.rgain * (1 << ISP2X_WBGAIN_FIXSCALE_BIT));
     uint16_t B = (uint16_t)(0.5 + awb_gain1.bgain * (1 << ISP2X_WBGAIN_FIXSCALE_BIT));
@@ -874,6 +1270,41 @@ void Isp20Params::convertAiqAgammaToIsp20Params(T& isp_cfg,
     {
         cfg->gamma_y[i] = gamma_out_cfg.gamma_y[i];
     }
+}
+
+template<class T>
+void Isp20Params::convertAiqAdegammaToIsp20Params(T& isp_cfg,
+        const AdegammaProcRes_t& degamma_cfg)
+{
+    if(degamma_cfg.degamma_en) {
+        isp_cfg.module_ens |= ISP2X_MODULE_SDG;
+        isp_cfg.module_en_update |= ISP2X_MODULE_SDG;
+        isp_cfg.module_cfg_update |= ISP2X_MODULE_SDG;
+    } else {
+        isp_cfg.module_ens &= ~ISP2X_MODULE_SDG;
+        isp_cfg.module_en_update |= ISP2X_MODULE_SDG;
+        return;
+    }
+
+    struct isp2x_sdg_cfg* cfg = &isp_cfg.others.sdg_cfg;
+    cfg->xa_pnts.gamma_dx0 = degamma_cfg.degamma_X_d0;
+    cfg->xa_pnts.gamma_dx1 = degamma_cfg.degamma_X_d1;
+    for (int i = 0; i < 17; i++) {
+        cfg->curve_r.gamma_y[i] = degamma_cfg.degamma_tableR[i];
+        cfg->curve_g.gamma_y[i] = degamma_cfg.degamma_tableG[i];
+        cfg->curve_b.gamma_y[i] = degamma_cfg.degamma_tableB[i];
+    }
+
+#if 0
+    LOGE_CAMHW_SUBM(ISP20PARAM_SUBM, "%s:(%d) DEGAMMA_DX0:%d DEGAMMA_DX0:%d\n", __FUNCTION__, __LINE__, cfg->xa_pnts.gamma_dx0, cfg->xa_pnts.gamma_dx1);
+    LOGE_CAMHW_SUBM(ISP20PARAM_SUBM, "DEGAMMA_R_Y:%d %d %d %d %d %d %d %d\n", cfg->curve_r.gamma_y[0], cfg->curve_r.gamma_y[1],
+                    cfg->curve_r.gamma_y[2], cfg->curve_r.gamma_y[3], cfg->curve_r.gamma_y[4], cfg->curve_r.gamma_y[5], cfg->curve_r.gamma_y[6], cfg->curve_r.gamma_y[7]);
+    LOGE_CAMHW_SUBM(ISP20PARAM_SUBM, "DEGAMMA_G_Y:%d %d %d %d %d %d %d %d\n", cfg->curve_g.gamma_y[0], cfg->curve_g.gamma_y[1],
+                    cfg->curve_g.gamma_y[2], cfg->curve_g.gamma_y[3], cfg->curve_g.gamma_y[4], cfg->curve_g.gamma_y[5], cfg->curve_g.gamma_y[6], cfg->curve_g.gamma_y[7]);
+    LOGE_CAMHW_SUBM(ISP20PARAM_SUBM, "DEGAMMA_B_Y:%d %d %d %d %d %d %d %d\n", cfg->curve_b.gamma_y[0], cfg->curve_b.gamma_y[1],
+                    cfg->curve_b.gamma_y[2], cfg->curve_b.gamma_y[3], cfg->curve_b.gamma_y[4], cfg->curve_b.gamma_y[5], cfg->curve_b.gamma_y[6], cfg->curve_b.gamma_y[7]);
+#endif
+
 }
 
 template<class T>
@@ -1024,15 +1455,11 @@ void Isp20Params::convertAiqAdehazeToIsp20Params(T& isp_cfg,
 
 template<class T>
 void
-Isp20Params::convertAiqBlcToIsp20Params(T& isp_cfg,
-                                        SmartPtr<RkAiqIspParamsProxy> aiq_results)
+Isp20Params::convertAiqBlcToIsp20Params(T& isp_cfg, rk_aiq_isp_blc_t &blc)
 {
     LOGD_CAMHW_SUBM(ISP20PARAM_SUBM, "%s:(%d) enter \n", __FUNCTION__, __LINE__);
 
-    rk_aiq_isp_params_v20_t* isp20_result =
-        static_cast<rk_aiq_isp_params_v20_t*>(aiq_results->data().ptr());
-
-    if(isp20_result->blc.stResult.enable) {
+    if(blc.enable) {
         isp_cfg.module_ens |= ISP2X_MODULE_BLS;
     }
     isp_cfg.module_en_update |= ISP2X_MODULE_BLS;
@@ -1053,10 +1480,10 @@ Isp20Params::convertAiqBlcToIsp20Params(T& isp_cfg,
 
     isp_cfg.others.bls_cfg.bls_samples = 0;
 
-    isp_cfg.others.bls_cfg.fixed_val.r = isp20_result->blc.stResult.blc_gr;
-    isp_cfg.others.bls_cfg.fixed_val.gr = isp20_result->blc.stResult.blc_gr;
-    isp_cfg.others.bls_cfg.fixed_val.gb = isp20_result->blc.stResult.blc_gr;
-    isp_cfg.others.bls_cfg.fixed_val.b = isp20_result->blc.stResult.blc_gr;
+    isp_cfg.others.bls_cfg.fixed_val.r = blc.blc_gr;
+    isp_cfg.others.bls_cfg.fixed_val.gr = blc.blc_gr;
+    isp_cfg.others.bls_cfg.fixed_val.gb = blc.blc_gr;
+    isp_cfg.others.bls_cfg.fixed_val.b = blc.blc_gr;
 
     LOGD_CAMHW_SUBM(ISP20PARAM_SUBM, "%s:(%d) exit \n", __FUNCTION__, __LINE__);
 }
@@ -1064,15 +1491,12 @@ Isp20Params::convertAiqBlcToIsp20Params(T& isp_cfg,
 
 template<class T>
 void
-Isp20Params::convertAiqDpccToIsp20Params(T& isp_cfg,
-        SmartPtr<RkAiqIspParamsProxy> aiq_results)
+Isp20Params::convertAiqDpccToIsp20Params(T& isp_cfg, rk_aiq_isp_dpcc_t &dpcc)
 {
     LOGD_CAMHW_SUBM(ISP20PARAM_SUBM, "%s:(%d) enter \n", __FUNCTION__, __LINE__);
 
-    rk_aiq_isp_params_v20_t* isp20_result =
-        static_cast<rk_aiq_isp_params_v20_t*>(aiq_results->data().ptr());
     struct isp2x_dpcc_cfg * pDpccCfg = &isp_cfg.others.dpcc_cfg;
-    rk_aiq_isp_dpcc_t *pDpccRst = &isp20_result->dpcc;
+    rk_aiq_isp_dpcc_t *pDpccRst = &dpcc;
 
     if(pDpccRst->stBasic.enable) {
         isp_cfg.module_ens |= ISP2X_MODULE_DPCC;
@@ -1374,8 +1798,7 @@ void Isp20Params::convertAiqA3dlutToIsp20Params(T& isp_cfg,
 }
 
 template<class T>
-void
-Isp20Params::convertAiqRawnrToIsp20Params(T& isp_cfg,
+void Isp20Params::convertAiqRawnrToIsp20Params(T& isp_cfg,
         rk_aiq_isp_rawnr_t& rawnr)
 {
 
@@ -1456,9 +1879,9 @@ Isp20Params::convertAiqRawnrToIsp20Params(T& isp_cfg,
     LOGD_CAMHW_SUBM(ISP20PARAM_SUBM, "%s:(%d) exit \n", __FUNCTION__, __LINE__);
 }
 
-void
-Isp20Params::convertAiqTnrToIsp20Params(struct rkispp_params_cfg& pp_cfg,
-                                        rk_aiq_isp_tnr_t& tnr)
+template<typename T>
+void Isp20Params::convertAiqTnrToIsp20Params(T &pp_cfg,
+        rk_aiq_isp_tnr_t& tnr)
 {
     LOGD_CAMHW_SUBM(ISP20PARAM_SUBM, "%s:(%d) enter \n", __FUNCTION__, __LINE__);
     int i = 0;
@@ -1466,25 +1889,25 @@ Isp20Params::convertAiqTnrToIsp20Params(struct rkispp_params_cfg& pp_cfg,
     LOGD_CAMHW_SUBM(ISP20PARAM_SUBM, "tnr_en %d", tnr.tnr_en);
 
     if(tnr.tnr_en) {
-        pp_cfg.module_ens |= ISPP_MODULE_TNR;
+        pp_cfg.head.module_ens |= ISPP_MODULE_TNR;
     } else {
-        //pp_cfg.module_init_ens &= ~ISPP_MODULE_TNR_3TO1;
-        pp_cfg.module_ens &= ~ISPP_MODULE_TNR;
+        //pp_cfg.head.module_init_ens &= ~ISPP_MODULE_TNR_3TO1;
+        pp_cfg.head.module_ens &= ~ISPP_MODULE_TNR;
     }
 
-    pp_cfg.module_en_update |= ISPP_MODULE_TNR;
-    pp_cfg.module_cfg_update |= ISPP_MODULE_TNR;
+    pp_cfg.head.module_en_update |= ISPP_MODULE_TNR;
+    pp_cfg.head.module_cfg_update |= ISPP_MODULE_TNR;
 
     struct rkispp_tnr_config  * pTnrCfg = &pp_cfg.tnr_cfg;
 
     //0x0080
     if (tnr.mode > 0) {
-        pp_cfg.module_init_ens |= ISPP_MODULE_TNR_3TO1;
+        pp_cfg.head.module_ens |= ISPP_MODULE_TNR_3TO1;
     } else {
-        pp_cfg.module_init_ens |= ISPP_MODULE_TNR;
+        pp_cfg.head.module_ens |= ISPP_MODULE_TNR;
     }
 
-    LOGD_CAMHW_SUBM(ISP20PARAM_SUBM, "mode:%d  pp_cfg:0x%x\n", tnr.mode, pp_cfg.module_init_ens);
+    LOGD_CAMHW_SUBM(ISP20PARAM_SUBM, "mode:%d  pp_cfg:0x%x\n", tnr.mode, pp_cfg.head.module_ens);
 
     /* pTnrCfg->mode = tnr.mode; */
     pTnrCfg->opty_en = tnr.opty_en;
@@ -1509,6 +1932,8 @@ Isp20Params::convertAiqTnrToIsp20Params(struct rkispp_params_cfg& pp_cfg,
     for(i = 0; i < TNR_SIGMA_CURVE_SIZE - 1; i++) {
         pTnrCfg->sigma_x[i] = tnr.sigma_x[i];
     }
+
+
 
     //0x009c - 0x00bc
     for(i = 0; i < TNR_SIGMA_CURVE_SIZE; i++) {
@@ -1613,7 +2038,6 @@ Isp20Params::convertAiqTnrToIsp20Params(struct rkispp_params_cfg& pp_cfg,
     for(i = 0; i < TNR_SCALE_Y2CL_SIZE; i++) {
         pTnrCfg->scale_y2cl[i] = tnr.scale_y2cl[i];
     }
-
     //0x0158
     for(i = 0; i < TNR_WEIGHT_Y_SIZE; i++) {
         pTnrCfg->weight_y[i] = tnr.weight_y[i];
@@ -1622,9 +2046,8 @@ Isp20Params::convertAiqTnrToIsp20Params(struct rkispp_params_cfg& pp_cfg,
     LOGD_CAMHW_SUBM(ISP20PARAM_SUBM, "%s:(%d) exit \n", __FUNCTION__, __LINE__);
 }
 
-
-void
-Isp20Params::convertAiqUvnrToIsp20Params(struct rkispp_params_cfg& pp_cfg,
+template<typename T>
+void Isp20Params::convertAiqUvnrToIsp20Params(T &pp_cfg,
         rk_aiq_isp_uvnr_t& uvnr)
 {
     LOGD_CAMHW_SUBM(ISP20PARAM_SUBM, "%s:(%d) enter \n", __FUNCTION__, __LINE__);
@@ -1634,14 +2057,17 @@ Isp20Params::convertAiqUvnrToIsp20Params(struct rkispp_params_cfg& pp_cfg,
 
     LOGD_CAMHW_SUBM(ISP20PARAM_SUBM, "uvnr_en %d", uvnr.uvnr_en);
     if(uvnr.uvnr_en) {
-        pp_cfg.module_ens |= ISPP_MODULE_NR;
-        pp_cfg.module_init_ens |= ISPP_MODULE_NR;
+        pp_cfg.head.module_ens |= ISPP_MODULE_NR;
+        //pp_cfg.head.module_init_ens |= ISPP_MODULE_NR;
     } else {
-        pp_cfg.module_ens &=  ~ISPP_MODULE_NR;
+        // NR bit used by ynr and uvnr together, so couldn't be
+        // disabled if it was enabled
+        if (!(pp_cfg.head.module_ens & ISPP_MODULE_NR))
+            pp_cfg.head.module_ens &= ~ISPP_MODULE_NR;
     }
 
-    pp_cfg.module_en_update |= ISPP_MODULE_NR;
-    pp_cfg.module_cfg_update |= ISPP_MODULE_NR;
+    pp_cfg.head.module_en_update |= ISPP_MODULE_NR;
+    pp_cfg.head.module_cfg_update |= ISPP_MODULE_NR;
 
     //0x0080
     pNrCfg->uvnr_step1_en = uvnr.uvnr_step1_en;
@@ -1709,9 +2135,9 @@ Isp20Params::convertAiqUvnrToIsp20Params(struct rkispp_params_cfg& pp_cfg,
 }
 
 
-void
-Isp20Params::convertAiqYnrToIsp20Params(struct rkispp_params_cfg& pp_cfg,
-                                        rk_aiq_isp_ynr_t& ynr)
+template<typename T>
+void Isp20Params::convertAiqYnrToIsp20Params(T &pp_cfg,
+        rk_aiq_isp_ynr_t& ynr)
 {
     LOGD_CAMHW_SUBM(ISP20PARAM_SUBM, "%s:(%d) enter \n", __FUNCTION__, __LINE__);
 
@@ -1720,14 +2146,17 @@ Isp20Params::convertAiqYnrToIsp20Params(struct rkispp_params_cfg& pp_cfg,
 
     LOGD_CAMHW_SUBM(ISP20PARAM_SUBM, "ynr_en %d", ynr.ynr_en);
     if(ynr.ynr_en) {
-        pp_cfg.module_ens |= ISPP_MODULE_NR;
-        pp_cfg.module_init_ens |= ISPP_MODULE_NR;
+        pp_cfg.head.module_ens |= ISPP_MODULE_NR;
+        //pp_cfg.head.module_init_ens |= ISPP_MODULE_NR;
     } else {
-        pp_cfg.module_ens &= ~ISPP_MODULE_NR;
+        // NR bit used by ynr and uvnr together, so couldn't be
+        // disabled if it was enabled
+        if (!(pp_cfg.head.module_ens & ISPP_MODULE_NR))
+            pp_cfg.head.module_ens &= ~ISPP_MODULE_NR;
     }
 
-    pp_cfg.module_en_update |= ISPP_MODULE_NR;
-    pp_cfg.module_cfg_update |= ISPP_MODULE_NR;
+    pp_cfg.head.module_en_update |= ISPP_MODULE_NR;
+    pp_cfg.head.module_cfg_update |= ISPP_MODULE_NR;
 
     //0x0104 - 0x0108
     for(i = 0; i < NR_YNR_SGM_DX_SIZE; i++) {
@@ -1832,9 +2261,8 @@ Isp20Params::convertAiqYnrToIsp20Params(struct rkispp_params_cfg& pp_cfg,
 
 }
 
-
-void
-Isp20Params::convertAiqSharpenToIsp20Params(struct rkispp_params_cfg& pp_cfg,
+template<typename T>
+void Isp20Params::convertAiqSharpenToIsp20Params(T &pp_cfg,
         rk_aiq_isp_sharpen_t& sharp, rk_aiq_isp_edgeflt_t& edgeflt)
 {
     int i = 0;
@@ -1844,14 +2272,14 @@ Isp20Params::convertAiqSharpenToIsp20Params(struct rkispp_params_cfg& pp_cfg,
     LOGD_CAMHW_SUBM(ISP20PARAM_SUBM, "sharp_en %d edgeflt_en %d", pSharpV1->sharp_en, edgeflt.edgeflt_en);
 
     if(pSharpV1->sharp_en && edgeflt.edgeflt_en) {
-        pp_cfg.module_ens |= ISPP_MODULE_SHP;
-        pp_cfg.module_init_ens |= ISPP_MODULE_SHP;
+        pp_cfg.head.module_ens |= ISPP_MODULE_SHP;
+        //pp_cfg.head.module_init_ens |= ISPP_MODULE_SHP;
     } else {
-        pp_cfg.module_ens &=  ~ISPP_MODULE_SHP;
+        pp_cfg.head.module_ens &=  ~ISPP_MODULE_SHP;
     }
 
-    pp_cfg.module_en_update |= ISPP_MODULE_SHP;
-    pp_cfg.module_cfg_update |= ISPP_MODULE_SHP;
+    pp_cfg.head.module_en_update |= ISPP_MODULE_SHP;
+    pp_cfg.head.module_cfg_update |= ISPP_MODULE_SHP;
 #if 1
     //0x0080
     pSharpCfg->alpha_adp_en = edgeflt.alpha_adp_en;
@@ -2053,116 +2481,45 @@ Isp20Params::convertAiqGainToIsp20Params(T& isp_cfg,
 }
 
 
-XCamReturn
-Isp20Params::convertAiqResultsToIsp20Params(struct isp2x_isp_params_cfg& isp_cfg,
-        SmartPtr<RkAiqIspParamsProxy> aiq_results,
-        SmartPtr<RkAiqIspParamsProxy>& last_aiq_results)
-{
-    XCamReturn ret = XCAM_RETURN_NO_ERROR;
-    rk_aiq_isp_params_v20_t* isp20_result =
-        static_cast<rk_aiq_isp_params_v20_t*>(aiq_results->data().ptr());
-
-    convertAiqHistToIsp20Params<struct isp2x_isp_params_cfg>(isp_cfg, isp20_result->hist_meas);
-    convertAiqAeToIsp20Params<struct isp2x_isp_params_cfg>(isp_cfg, isp20_result->aec_meas);
-    convertAiqMergeToIsp20Params<struct isp2x_isp_params_cfg>(isp_cfg, isp20_result->ahdr_proc_res);
-    convertAiqTmoToIsp20Params<struct isp2x_isp_params_cfg>(isp_cfg, isp20_result->ahdr_proc_res);
-    convertAiqAwbGainToIsp20Params<struct isp2x_isp_params_cfg>(isp_cfg, isp20_result->awb_gain, isp20_result->blc,
-            isp20_result->awb_gain_update);
-    convertAiqAwbToIsp20Params<struct isp2x_isp_params_cfg>(isp_cfg, isp20_result->awb_cfg, isp20_result->awb_cfg_update);
-    convertAiqLscToIsp20Params<struct isp2x_isp_params_cfg>(isp_cfg, isp20_result->lsc);
-    convertAiqCcmToIsp20Params<struct isp2x_isp_params_cfg>(isp_cfg, isp20_result->ccm);
-    convertAiqAgammaToIsp20Params<struct isp2x_isp_params_cfg>(isp_cfg, isp20_result->agamma);
-    convertAiqBlcToIsp20Params<struct isp2x_isp_params_cfg>(isp_cfg, aiq_results);
-    convertAiqDpccToIsp20Params<struct isp2x_isp_params_cfg>(isp_cfg, aiq_results);
-    convertAiqRawnrToIsp20Params<struct isp2x_isp_params_cfg>(isp_cfg, isp20_result->rawnr);
-    convertAiqAfToIsp20Params<struct isp2x_isp_params_cfg>(isp_cfg, isp20_result->af_meas, isp20_result->af_cfg_update);
-    convertAiqAdehazeToIsp20Params<struct isp2x_isp_params_cfg>(isp_cfg, isp20_result->adhaz);
-    convertAiqA3dlutToIsp20Params<struct isp2x_isp_params_cfg>(isp_cfg, isp20_result->lut3d);
-    if(isp20_result->update_mask & RKAIQ_ISP_LDCH_ID)
-        convertAiqAldchToIsp20Params<struct isp2x_isp_params_cfg>(isp_cfg, isp20_result->ldch);
-
-    //must be at the end of isp module
-    convertAiqGainToIsp20Params<struct isp2x_isp_params_cfg>(isp_cfg, isp20_result->gain_config);
-    /*
-     * enable the modules that has been verified to work properly on the board
-     * TODO: enable all modules after validation in isp
-     */
-#if 0
-    convertAiqCpToIsp20Params(isp_cfg, isp20_result->cp);
-    convertAiqIeToIsp20Params(isp_cfg, isp20_result->ie);
-#endif
-    convertAiqGicToIsp20Params<struct isp2x_isp_params_cfg>(isp_cfg, isp20_result->gic);
-    convertAiqAdemosaicToIsp20Params<struct isp2x_isp_params_cfg>(isp_cfg, aiq_results);
-    convertAiqIeToIsp20Params<struct isp2x_isp_params_cfg>(isp_cfg, isp20_result->ie);
-    convertAiqCpToIsp20Params<struct isp2x_isp_params_cfg>(isp_cfg, isp20_result->cp);
-    last_aiq_results = aiq_results;
-
-    return ret;
-}
-
-void
-Isp20Params::convertAiqFecToIsp20Params(struct rkispp_params_cfg& pp_cfg,
-                                        rk_aiq_isp_fec_t& fec)
+template<typename T>
+void Isp20Params::convertAiqFecToIsp20Params(T &pp_cfg,
+        rk_aiq_isp_fec_t& fec)
 {
     /* FEC module can't be enable/disable dynamically, the mode should
      * be decided in init params. we'll check if the module_init_ens
      * changed in CamIsp20Hw.cpp
      */
 
-    LOGD_CAMHW_SUBM(ISP20PARAM_SUBM, "fec update params, enable %d ", fec.fec_en);
+    LOGD_CAMHW_SUBM(ISP20PARAM_SUBM, "fec update params, enable %d usage %d, config %d", fec.fec_en, fec.usage, fec.config);
     if(fec.fec_en) {
-        pp_cfg.module_ens |= ISPP_MODULE_FEC;
-        pp_cfg.module_en_update |= ISPP_MODULE_FEC;
-        pp_cfg.module_cfg_update |= ISPP_MODULE_FEC;
-        /* TODO: get init fec mode from iq */
-        if (0/*TODO*/) {
-            pp_cfg.module_init_ens |= ISPP_MODULE_FEC_ST;
-        } else {
-            pp_cfg.module_init_ens |= ISPP_MODULE_FEC;
+        if (fec.usage == ISPP_MODULE_FEC_ST) {
+            pp_cfg.head.module_ens |= ISPP_MODULE_FEC_ST;
+            pp_cfg.head.module_en_update |= ISPP_MODULE_FEC_ST;
+        } else if (fec.usage == ISPP_MODULE_FEC) {
+            pp_cfg.head.module_ens |= ISPP_MODULE_FEC;
+            pp_cfg.head.module_en_update |= ISPP_MODULE_FEC;
         }
-        struct rkispp_fec_config  *pFecCfg = &pp_cfg.fec_cfg;
 
-        pFecCfg->crop_en = fec.crop_en;
-        pFecCfg->crop_width = fec.crop_width;
-        pFecCfg->crop_height = fec.crop_height;
-        pFecCfg->mesh_density = fec.mesh_density;
-        pFecCfg->mesh_size = fec.mesh_size;
-        pFecCfg->buf_fd = fec.mesh_buf_fd;
+        if (!fec.config) {
+            pp_cfg.head.module_cfg_update &= ~ISPP_MODULE_FEC;
+        } else {
+            struct rkispp_fec_config  *pFecCfg = &pp_cfg.fec_cfg;
+
+            pFecCfg->crop_en = fec.crop_en;
+            pFecCfg->crop_width = fec.crop_width;
+            pFecCfg->crop_height = fec.crop_height;
+            pFecCfg->mesh_density = fec.mesh_density;
+            pFecCfg->mesh_size = fec.mesh_size;
+            pFecCfg->buf_fd = fec.mesh_buf_fd;
+            //pp_cfg.fec_output_buf_index = fec.img_buf_index;
+            //pp_cfg.fec_output_buf_size = fec.img_buf_size;
+
+            pp_cfg.head.module_cfg_update |= ISPP_MODULE_FEC;
+        }
     } else {
-        pp_cfg.module_init_ens &= ~(ISPP_MODULE_FEC_ST | ISPP_MODULE_FEC);
+        pp_cfg.head.module_ens &= ~(ISPP_MODULE_FEC_ST | ISPP_MODULE_FEC);
+        pp_cfg.head.module_en_update |= (ISPP_MODULE_FEC_ST | ISPP_MODULE_FEC);
     }
-}
-
-XCamReturn
-Isp20Params::convertAiqResultsToIsp20PpParams(struct rkispp_params_cfg& pp_cfg,
-        SmartPtr<RkAiqIsppParamsProxy> aiq_results)
-{
-    XCamReturn ret = XCAM_RETURN_NO_ERROR;
-    /* reinit, this may override by driver, enable nr & sharp default */
-    //pp_cfg.module_init_ens = ISPP_MODULE_NR | ISPP_MODULE_SHP;// | ISPP_MODULE_ORB;
-    pp_cfg.module_init_ens = _last_pp_module_init_ens;
-
-    if(aiq_results->data()->update_mask & ISPP_MODULE_TNR)
-        convertAiqTnrToIsp20Params(pp_cfg, aiq_results->data()->tnr);
-
-    if(aiq_results->data()->update_mask & ISPP_MODULE_NR) {
-        convertAiqUvnrToIsp20Params(pp_cfg, aiq_results->data()->uvnr);
-        convertAiqYnrToIsp20Params(pp_cfg, aiq_results->data()->ynr);
-    }
-
-    if(aiq_results->data()->update_mask & ISPP_MODULE_SHP)
-        convertAiqSharpenToIsp20Params(pp_cfg, aiq_results->data()->sharpen,
-                                       aiq_results->data()->edgeflt);
-
-    if(aiq_results->data()->update_mask & RKAIQ_ISPP_FEC_ID)
-        convertAiqFecToIsp20Params(pp_cfg, aiq_results->data()->fec);
-
-    if(aiq_results->data()->update_mask & RKAIQ_ISPP_ORB_ID)
-        convertAiqOrbToIsp20Params(pp_cfg, aiq_results->data()->orb);
-
-    _last_pp_module_init_ens = pp_cfg.module_init_ens;
-
-    return ret;
 }
 
 XCamReturn
@@ -2174,44 +2531,44 @@ Isp20Params::checkIsp20Params(struct isp2x_isp_params_cfg& isp_cfg)
 
 template<class T>
 void
-Isp20Params::convertAiqAdemosaicToIsp20Params(T& isp_cfg,
-        SmartPtr<RkAiqIspParamsProxy> aiq_results)
+Isp20Params::convertAiqAdemosaicToIsp20Params(T& isp_cfg, rk_aiq_isp_debayer_t &demosaic)
 {
-    rk_aiq_isp_params_v20_t* isp20_result =
-        static_cast<rk_aiq_isp_params_v20_t*>(aiq_results->data().ptr());
-
-    if (isp20_result->demosaic.enable) {
-        isp_cfg.module_ens |= ISP2X_MODULE_DEBAYER;
-        isp_cfg.module_en_update |= ISP2X_MODULE_DEBAYER;
-        isp_cfg.module_cfg_update |= ISP2X_MODULE_DEBAYER;
+    if (demosaic.updatecfg) {
+        if (demosaic.enable) {
+            isp_cfg.module_ens |= ISP2X_MODULE_DEBAYER;
+            isp_cfg.module_en_update |= ISP2X_MODULE_DEBAYER;
+            isp_cfg.module_cfg_update |= ISP2X_MODULE_DEBAYER;
+        } else {
+            isp_cfg.module_ens &= ~ISP2X_MODULE_DEBAYER;
+            isp_cfg.module_en_update |= ISP2X_MODULE_DEBAYER;
+        }
     } else {
-        isp_cfg.module_ens &= ~ISP2X_MODULE_DEBAYER;
-        isp_cfg.module_en_update |= ISP2X_MODULE_DEBAYER;
+        return;
     }
 
-    isp_cfg.others.debayer_cfg.clip_en = isp20_result->demosaic.clip_en;
-    isp_cfg.others.debayer_cfg.filter_c_en = isp20_result->demosaic.filter_c_en;
-    isp_cfg.others.debayer_cfg.filter_g_en = isp20_result->demosaic.filter_g_en;
-    isp_cfg.others.debayer_cfg.gain_offset = isp20_result->demosaic.gain_offset;
-    isp_cfg.others.debayer_cfg.offset = isp20_result->demosaic.offset;
-    isp_cfg.others.debayer_cfg.hf_offset = isp20_result->demosaic.hf_offset;
-    isp_cfg.others.debayer_cfg.thed0 = isp20_result->demosaic.thed0;
-    isp_cfg.others.debayer_cfg.thed1 = isp20_result->demosaic.thed1;
-    isp_cfg.others.debayer_cfg.dist_scale = isp20_result->demosaic.dist_scale;
-    isp_cfg.others.debayer_cfg.shift_num = isp20_result->demosaic.shift_num;
-    isp_cfg.others.debayer_cfg.filter1_coe1 = isp20_result->demosaic.filter1_coe[0];
-    isp_cfg.others.debayer_cfg.filter1_coe2 = isp20_result->demosaic.filter1_coe[1];
-    isp_cfg.others.debayer_cfg.filter1_coe3 = isp20_result->demosaic.filter1_coe[2];
-    isp_cfg.others.debayer_cfg.filter1_coe4 = isp20_result->demosaic.filter1_coe[3];
-    isp_cfg.others.debayer_cfg.filter1_coe5 = isp20_result->demosaic.filter1_coe[4];
-    isp_cfg.others.debayer_cfg.filter2_coe1 = isp20_result->demosaic.filter2_coe[0];
-    isp_cfg.others.debayer_cfg.filter2_coe2 = isp20_result->demosaic.filter2_coe[1];
-    isp_cfg.others.debayer_cfg.filter2_coe3 = isp20_result->demosaic.filter2_coe[2];
-    isp_cfg.others.debayer_cfg.filter2_coe4 = isp20_result->demosaic.filter2_coe[3];
-    isp_cfg.others.debayer_cfg.filter2_coe5 = isp20_result->demosaic.filter2_coe[4];
-    isp_cfg.others.debayer_cfg.max_ratio = isp20_result->demosaic.max_ratio;
-    isp_cfg.others.debayer_cfg.order_max = isp20_result->demosaic.order_max;
-    isp_cfg.others.debayer_cfg.order_min = isp20_result->demosaic.order_min;
+    isp_cfg.others.debayer_cfg.clip_en = demosaic.clip_en;
+    isp_cfg.others.debayer_cfg.filter_c_en = demosaic.filter_c_en;
+    isp_cfg.others.debayer_cfg.filter_g_en = demosaic.filter_g_en;
+    isp_cfg.others.debayer_cfg.gain_offset = demosaic.gain_offset;
+    isp_cfg.others.debayer_cfg.offset = demosaic.offset;
+    isp_cfg.others.debayer_cfg.hf_offset = demosaic.hf_offset;
+    isp_cfg.others.debayer_cfg.thed0 = demosaic.thed0;
+    isp_cfg.others.debayer_cfg.thed1 = demosaic.thed1;
+    isp_cfg.others.debayer_cfg.dist_scale = demosaic.dist_scale;
+    isp_cfg.others.debayer_cfg.shift_num = demosaic.shift_num;
+    isp_cfg.others.debayer_cfg.filter1_coe1 = demosaic.filter1_coe[0];
+    isp_cfg.others.debayer_cfg.filter1_coe2 = demosaic.filter1_coe[1];
+    isp_cfg.others.debayer_cfg.filter1_coe3 = demosaic.filter1_coe[2];
+    isp_cfg.others.debayer_cfg.filter1_coe4 = demosaic.filter1_coe[3];
+    isp_cfg.others.debayer_cfg.filter1_coe5 = demosaic.filter1_coe[4];
+    isp_cfg.others.debayer_cfg.filter2_coe1 = demosaic.filter2_coe[0];
+    isp_cfg.others.debayer_cfg.filter2_coe2 = demosaic.filter2_coe[1];
+    isp_cfg.others.debayer_cfg.filter2_coe3 = demosaic.filter2_coe[2];
+    isp_cfg.others.debayer_cfg.filter2_coe4 = demosaic.filter2_coe[3];
+    isp_cfg.others.debayer_cfg.filter2_coe5 = demosaic.filter2_coe[4];
+    isp_cfg.others.debayer_cfg.max_ratio = demosaic.max_ratio;
+    isp_cfg.others.debayer_cfg.order_max = demosaic.order_max;
+    isp_cfg.others.debayer_cfg.order_min = demosaic.order_min;
 }
 
 template<class T>
@@ -2226,9 +2583,14 @@ Isp20Params::convertAiqCpToIsp20Params(T& isp_cfg,
     /* cproc_cfg->y_out_range = 1; */
     /* cproc_cfg->c_out_range = 1; */
 
-    isp_cfg.module_ens |= ISP2X_MODULE_CPROC;
-    isp_cfg.module_en_update |= ISP2X_MODULE_CPROC;
-    isp_cfg.module_cfg_update |= ISP2X_MODULE_CPROC;
+    if (cp_cfg.enable) {
+        isp_cfg.module_ens |= ISP2X_MODULE_CPROC;
+        isp_cfg.module_en_update |= ISP2X_MODULE_CPROC;
+        isp_cfg.module_cfg_update |= ISP2X_MODULE_CPROC;
+    } else {
+        isp_cfg.module_ens &= ~ISP2X_MODULE_CPROC;
+        isp_cfg.module_en_update |= ISP2X_MODULE_CPROC;
+    }
 
     cproc_cfg->contrast = (uint8_t)(cp_cfg.contrast);
     cproc_cfg->sat = (uint8_t)(cp_cfg.saturation);
@@ -2407,22 +2769,22 @@ Isp20Params::set_working_mode(int mode)
     _working_mode = mode;
 }
 
-void
-Isp20Params::convertAiqOrbToIsp20Params(struct rkispp_params_cfg& pp_cfg,
-                                        rk_aiq_isp_orb_t& orb)
+template<typename T>
+void Isp20Params::convertAiqOrbToIsp20Params(T &pp_cfg,
+        rk_aiq_isp_orb_t& orb)
 {
     if(orb.orb_en) {
-        pp_cfg.module_ens |= ISPP_MODULE_ORB;
-        pp_cfg.module_en_update |= ISPP_MODULE_ORB;
-        pp_cfg.module_cfg_update |= ISPP_MODULE_ORB;
-        pp_cfg.module_init_ens |= ISPP_MODULE_ORB;
+        pp_cfg.head.module_ens |= ISPP_MODULE_ORB;
+        pp_cfg.head.module_en_update |= ISPP_MODULE_ORB;
+        pp_cfg.head.module_cfg_update |= ISPP_MODULE_ORB;
+        //pp_cfg.head.module_init_ens |= ISPP_MODULE_ORB;
 
         struct rkispp_orb_config  *pOrbCfg = &pp_cfg.orb_cfg;
 
         pOrbCfg->limit_value = orb.limit_value;
         pOrbCfg->max_feature = orb.max_feature;
     } else {
-        pp_cfg.module_init_ens &= ~ISPP_MODULE_ORB;
+        pp_cfg.head.module_ens &= ~ISPP_MODULE_ORB;
     }
 }
 
@@ -2554,7 +2916,7 @@ void Isp20Params::getModuleStatus(rk_aiq_module_id_t mId, bool& en)
         mod_id = RK_ISP2X_PP_TSHP_ID;
         break;
     case RK_MODULE_AE:
-        mod_id = RK_ISP2X_RAWAE_0_ID;
+        mod_id = RK_ISP2X_RAWAE_LITE_ID;
         break;
     case RK_MODULE_FEC:
         mod_id = RK_ISP2X_PP_TFEC_ID;
@@ -2563,6 +2925,7 @@ void Isp20Params::getModuleStatus(rk_aiq_module_id_t mId, bool& en)
         //    mod_id = RK_ISP2X_DHAZ_ID;
         break;
     }
+
     if (mod_id < 0)
         LOGE_CAMHW_SUBM(ISP20PARAM_SUBM, "input param: module ID is wrong!");
     else
@@ -2608,15 +2971,25 @@ void Isp20Params::updateIsppModuleForceEns(u32 module_ens)
     _force_ispp_module_ens = module_ens;
 }
 
+#if 0
 void
-Isp20Params::forceOverwriteAiqIsppCfg(struct rkispp_params_cfg& pp_cfg, SmartPtr<RkAiqIsppParamsProxy> aiq_results)
+Isp20Params::forceOverwriteAiqIsppCfg(struct rkispp_params_cfg& pp_cfg,
+                                      SmartPtr<RkAiqIspParamsProxy> aiq_meas_results,
+                                      SmartPtr<RkAiqIspParamsProxy> aiq_other_results)
 {
+    rk_aiq_ispp_meas_params_t* ispp_meas_param =
+        static_cast<rk_aiq_ispp_meas_params_t*>(aiq_meas_results->data().ptr());
+    rk_aiq_ispp_other_params_t* ispp_other_param =
+        static_cast<rk_aiq_ispp_other_params_t*>(aiq_other_results->data().ptr());
+
     for (int i = RK_ISP2X_PP_TNR_ID; i <= RK_ISP2X_PP_MAX_ID; i++) {
         if (getModuleForceFlag(i)) {
             switch (i) {
             case RK_ISP2X_PP_TNR_ID:
+                if (!ispp_other_param)
+                    break;
                 if (getModuleForceEn(RK_ISP2X_PP_TNR_ID)) {
-                    if(aiq_results->data()->tnr.tnr_en) {
+                    if(ispp_other_param->tnr.tnr_en) {
                         pp_cfg.module_ens |= ISPP_MODULE_TNR;
                         pp_cfg.module_en_update |= ISPP_MODULE_TNR;
                         pp_cfg.module_cfg_update |= ISPP_MODULE_TNR;
@@ -2631,8 +3004,10 @@ Isp20Params::forceOverwriteAiqIsppCfg(struct rkispp_params_cfg& pp_cfg, SmartPtr
                 }
                 break;
             case RK_ISP2X_PP_NR_ID:
+                if (!ispp_other_param)
+                    break;
                 if (getModuleForceEn(RK_ISP2X_PP_NR_ID)) {
-                    if(aiq_results->data()->tnr.tnr_en) {
+                    if( ispp_other_param->tnr.tnr_en) {
                         pp_cfg.module_ens |= ISPP_MODULE_NR;
                         pp_cfg.module_en_update |= ISPP_MODULE_NR;
                         pp_cfg.module_cfg_update |= ISPP_MODULE_NR;
@@ -2647,9 +3022,11 @@ Isp20Params::forceOverwriteAiqIsppCfg(struct rkispp_params_cfg& pp_cfg, SmartPtr
                 }
                 break;
             case RK_ISP2X_PP_TSHP_ID:
+                if (!ispp_other_param)
+                    break;
                 if (getModuleForceEn(RK_ISP2X_PP_TSHP_ID)) {
-                    if(aiq_results->data()->sharpen.stSharpFixV1.sharp_en ||
-                            aiq_results->data()->edgeflt.edgeflt_en) {
+                    if(ispp_other_param->sharpen.stSharpFixV1.sharp_en ||
+                            ispp_other_param->edgeflt.edgeflt_en) {
                         pp_cfg.module_ens |= ISPP_MODULE_SHP;
                         pp_cfg.module_en_update |= ISPP_MODULE_SHP;
                         pp_cfg.module_cfg_update |= ISPP_MODULE_SHP;
@@ -2671,16 +3048,19 @@ Isp20Params::forceOverwriteAiqIsppCfg(struct rkispp_params_cfg& pp_cfg, SmartPtr
 
 void
 Isp20Params::forceOverwriteAiqIspCfg(struct isp2x_isp_params_cfg& isp_cfg,
-                                     SmartPtr<RkAiqIspParamsProxy> aiq_results)
+                                     SmartPtr<RkAiqIspParamsProxy> aiq_results,
+                                     SmartPtr<RkAiqIspParamsProxy> aiq_other_results)
 {
-    rk_aiq_isp_params_v20_t* isp20_result =
-        static_cast<rk_aiq_isp_params_v20_t*>(aiq_results->data().ptr());
+    rk_aiq_isp_meas_params_v20_t* isp20_meas_result =
+        static_cast<rk_aiq_isp_meas_params_v20_t*>(aiq_results->data().ptr());
+    rk_aiq_isp_other_params_v20_t* isp20_other_result =
+        static_cast<rk_aiq_isp_other_params_v20_t*>(aiq_other_results->data().ptr());
     for (int i = 0; i <= RK_ISP2X_MAX_ID; i++) {
         if (getModuleForceFlag(i)) {
             switch (i) {
             case RK_ISP2X_DPCC_ID:
                 if (getModuleForceEn(RK_ISP2X_DPCC_ID)) {
-                    if(isp20_result->dpcc.stBasic.enable) {
+                    if(isp20_meas_result->dpcc.stBasic.enable) {
                         isp_cfg.module_ens |= ISP2X_MODULE_DPCC;
                         isp_cfg.module_en_update |= ISP2X_MODULE_DPCC;
                         isp_cfg.module_cfg_update |= ISP2X_MODULE_DPCC;
@@ -2696,7 +3076,7 @@ Isp20Params::forceOverwriteAiqIspCfg(struct isp2x_isp_params_cfg& isp_cfg,
                 break;
             case RK_ISP2X_BLS_ID:
                 if (getModuleForceEn(RK_ISP2X_BLS_ID)) {
-                    if(isp20_result->blc.stResult.enable) {
+                    if(isp20_other_result->blc.enable) {
                         isp_cfg.module_ens |= ISP2X_MODULE_BLS;
                         isp_cfg.module_en_update |= ISP2X_MODULE_BLS;
                         isp_cfg.module_cfg_update |= ISP2X_MODULE_BLS;
@@ -2712,7 +3092,7 @@ Isp20Params::forceOverwriteAiqIspCfg(struct isp2x_isp_params_cfg& isp_cfg,
                 break;
             case RK_ISP2X_LSC_ID:
                 if (getModuleForceEn(RK_ISP2X_LSC_ID)) {
-                    if(isp20_result->lsc.lsc_en) {
+                    if(isp20_meas_result->lsc.lsc_en) {
                         isp_cfg.module_ens |= ISP2X_MODULE_LSC;
                         isp_cfg.module_en_update |= ISP2X_MODULE_LSC;
                         isp_cfg.module_cfg_update |= ISP2X_MODULE_LSC;
@@ -2728,7 +3108,7 @@ Isp20Params::forceOverwriteAiqIspCfg(struct isp2x_isp_params_cfg& isp_cfg,
                 break;
             case RK_ISP2X_CTK_ID:
                 if (getModuleForceEn(RK_ISP2X_CTK_ID)) {
-                    if(isp20_result->lsc.lsc_en) {
+                    if(isp20_meas_result->lsc.lsc_en) {
                         isp_cfg.module_ens |= ISP2X_MODULE_CCM;
                         isp_cfg.module_en_update |= ISP2X_MODULE_CCM;
                         isp_cfg.module_cfg_update |= ISP2X_MODULE_CCM;
@@ -2744,7 +3124,7 @@ Isp20Params::forceOverwriteAiqIspCfg(struct isp2x_isp_params_cfg& isp_cfg,
                 break;
             case RK_ISP2X_RAWAWB_ID:
                 if (getModuleForceEn(RK_ISP2X_RAWAWB_ID)) {
-                    if(isp20_result->awb_cfg.awbEnable) {
+                    if(isp20_meas_result->awb_cfg.awbEnable) {
                         isp_cfg.module_ens |= ISP2X_MODULE_RAWAWB;
                         isp_cfg.module_en_update |= ISP2X_MODULE_RAWAWB;
                         isp_cfg.module_cfg_update |= ISP2X_MODULE_RAWAWB;
@@ -2760,7 +3140,7 @@ Isp20Params::forceOverwriteAiqIspCfg(struct isp2x_isp_params_cfg& isp_cfg,
                 break;
             case RK_ISP2X_GOC_ID:
                 if (getModuleForceEn(RK_ISP2X_GOC_ID)) {
-                    if(isp20_result->agamma.gamma_en) {
+                    if(isp20_other_result->agamma.gamma_en) {
                         isp_cfg.module_ens |= ISP2X_MODULE_GOC;
                         isp_cfg.module_en_update |= ISP2X_MODULE_GOC;
                         isp_cfg.module_cfg_update |= ISP2X_MODULE_GOC;
@@ -2776,7 +3156,7 @@ Isp20Params::forceOverwriteAiqIspCfg(struct isp2x_isp_params_cfg& isp_cfg,
                 break;
             case RK_ISP2X_RAWNR_ID:
                 if (getModuleForceEn(RK_ISP2X_RAWNR_ID)) {
-                    if(isp20_result->rawnr.rawnr_en) {
+                    if(isp20_other_result->rawnr.rawnr_en) {
                         isp_cfg.module_ens |= ISP2X_MODULE_RAWNR;
                         isp_cfg.module_en_update |= ISP2X_MODULE_RAWNR;
                         isp_cfg.module_cfg_update |= ISP2X_MODULE_RAWNR;
@@ -2792,7 +3172,7 @@ Isp20Params::forceOverwriteAiqIspCfg(struct isp2x_isp_params_cfg& isp_cfg,
                 break;
             case RK_ISP2X_3DLUT_ID:
                 if (getModuleForceEn(RK_ISP2X_3DLUT_ID)) {
-                    if(isp20_result->rawnr.rawnr_en) {
+                    if(isp20_other_result->rawnr.rawnr_en) {
                         isp_cfg.module_ens |= ISP2X_MODULE_3DLUT;
                         isp_cfg.module_en_update |= ISP2X_MODULE_3DLUT;
                         isp_cfg.module_cfg_update |= ISP2X_MODULE_3DLUT;
@@ -2808,7 +3188,7 @@ Isp20Params::forceOverwriteAiqIspCfg(struct isp2x_isp_params_cfg& isp_cfg,
                 break;
             case RK_ISP2X_LDCH_ID:
                 if (getModuleForceEn(RK_ISP2X_LDCH_ID)) {
-                    if(isp20_result->ldch.ldch_en) {
+                    if(isp20_other_result->ldch.ldch_en) {
                         isp_cfg.module_ens |= ISP2X_MODULE_LDCH;
                         isp_cfg.module_en_update |= ISP2X_MODULE_LDCH;
                         isp_cfg.module_cfg_update |= ISP2X_MODULE_LDCH;
@@ -2824,7 +3204,7 @@ Isp20Params::forceOverwriteAiqIspCfg(struct isp2x_isp_params_cfg& isp_cfg,
                 break;
             case RK_ISP2X_GIC_ID:
                 if (getModuleForceEn(RK_ISP2X_GIC_ID)) {
-                    if(isp20_result->gic.gic_en) {
+                    if(isp20_other_result->gic.gic_en) {
                         isp_cfg.module_ens |= ISP2X_MODULE_GIC;
                         isp_cfg.module_en_update |= ISP2X_MODULE_GIC;
                         isp_cfg.module_cfg_update |= ISP2X_MODULE_GIC;
@@ -2840,7 +3220,7 @@ Isp20Params::forceOverwriteAiqIspCfg(struct isp2x_isp_params_cfg& isp_cfg,
                 break;
             case RK_ISP2X_GAIN_ID:
                 if (getModuleForceEn(RK_ISP2X_GAIN_ID)) {
-                    if(isp20_result->gain_config.gain_table_en) {
+                    if(isp20_other_result->gain_config.gain_table_en) {
                         isp_cfg.module_ens |= ISP2X_MODULE_GAIN;
                         isp_cfg.module_en_update |= ISP2X_MODULE_GAIN;
                         isp_cfg.module_cfg_update |= ISP2X_MODULE_GAIN;
@@ -2856,7 +3236,7 @@ Isp20Params::forceOverwriteAiqIspCfg(struct isp2x_isp_params_cfg& isp_cfg,
                 break;
             case RK_ISP2X_DHAZ_ID:
                 if (getModuleForceEn(RK_ISP2X_DHAZ_ID)) {
-                    if(isp20_result->adhaz.enable) {
+                    if(isp20_other_result->adhaz.enable) {
                         isp_cfg.module_ens |= ISP2X_MODULE_DHAZ;
                         isp_cfg.module_en_update |= ISP2X_MODULE_DHAZ;
                         isp_cfg.module_cfg_update |= ISP2X_MODULE_DHAZ;
@@ -2875,9 +3255,790 @@ Isp20Params::forceOverwriteAiqIspCfg(struct isp2x_isp_params_cfg& isp_cfg,
     }
     updateIspModuleForceEns(isp_cfg.module_ens);
 }
+#endif
+
+void
+Isp20Params::hdrtmoGetLumaInfo(rk_aiq_luma_params_t * Next, rk_aiq_luma_params_t *Cur,
+                               s32 frameNum, int PixelNumBlock, float blc, float *luma)
+{
+    LOGD_CAMHW_SUBM(ISP20PARAM_SUBM, "PixelNumBlock:%d blc:%f\n", PixelNumBlock, blc);
+
+    float nextSLuma[16] ;
+    float curSLuma[16] ;
+    float nextMLuma[16] ;
+    float curMLuma[16] ;
+    float nextLLuma[16];
+    float curLLuma[16];
+
+    if (frameNum == 1)
+    {
+        for(int i = 0; i < ISP2X_MIPI_LUMA_MEAN_MAX; i++) {
+            nextLLuma[i] = 0;
+            curLLuma[i] = 0;
+            nextMLuma[i] = 0;
+            curMLuma[i] = 0;
+            nextSLuma[i] = (float)Next->luma[0][i];
+            nextSLuma[i] /= (float)PixelNumBlock;
+            nextSLuma[i] -= blc;
+            curSLuma[i] = (float)Cur->luma[0][i];
+            curSLuma[i] /= (float)PixelNumBlock;
+            curSLuma[i] -= blc;
+        }
+    } else if (frameNum == 2) {
+        for(int i = 0; i < ISP2X_MIPI_LUMA_MEAN_MAX; i++) {
+            nextSLuma[i] = (float)Next->luma[1][i];
+            nextSLuma[i] /= (float)PixelNumBlock;
+            nextSLuma[i] -= blc;
+            curSLuma[i] = (float)Cur->luma[1][i];
+            curSLuma[i] /= (float)PixelNumBlock;
+            curSLuma[i] -= blc;
+            nextMLuma[i] = 0;
+            curMLuma[i] = 0;
+            nextLLuma[i] = (float)Next->luma[0][i];
+            nextLLuma[i] /= (float)PixelNumBlock;
+            nextLLuma[i] -= blc;
+            curLLuma[i] = (float)Cur->luma[0][i];
+            curLLuma[i] /= (float)PixelNumBlock;
+            curLLuma[i] -= blc;
+        }
+    } else if (frameNum == 3) {
+
+        for(int i = 0; i < ISP2X_MIPI_LUMA_MEAN_MAX; i++) {
+            nextSLuma[i] = (float)Next->luma[2][i];
+            nextSLuma[i] /= (float)PixelNumBlock;
+            nextSLuma[i] -= blc;
+            curSLuma[i] = (float)Cur->luma[2][i];
+            curSLuma[i] /= (float)PixelNumBlock;
+            curSLuma[i] -= blc;
+            nextMLuma[i] = (float)Next->luma[1][i];
+            nextMLuma[i] /= (float)PixelNumBlock;
+            nextMLuma[i] -= blc;
+            curMLuma[i] = (float)Cur->luma[1][i];
+            curMLuma[i] /= (float)PixelNumBlock;
+            curMLuma[i] -= blc;
+            nextLLuma[i] = (float)Next->luma[0][i];
+            nextLLuma[i] /= (float)PixelNumBlock;
+            nextLLuma[i] -= blc;
+            curLLuma[i] = (float)Cur->luma[0][i];
+            curLLuma[i] /= (float)PixelNumBlock;
+            curLLuma[i] -= blc;
+        }
+    }
+
+    for(int i = 0; i < ISP2X_MIPI_LUMA_MEAN_MAX; i++) {
+        luma[i] = curSLuma[i];
+        luma[i + 16] = curMLuma[i];
+        luma[i + 32] = curLLuma[i];
+        luma[i + 48] = nextSLuma[i];
+        luma[i + 64] = nextMLuma[i];
+        luma[i + 80] = nextLLuma[i];
+    }
+}
+
+void
+Isp20Params::hdrtmoGetAeInfo(RKAiqAecExpInfo_t* Next, RKAiqAecExpInfo_t* Cur, s32 frameNum, float* expo)
+{
+    float nextLExpo = 0;
+    float curLExpo = 0;
+    float nextMExpo = 0;
+    float curMExpo = 0;
+    float nextSExpo = 0;
+    float curSExpo = 0;
+
+    if (frameNum == 1)
+    {
+        nextLExpo = 0;
+        curLExpo = 0;
+        nextMExpo = 0;
+        curMExpo = 0;
+        nextSExpo = Next->LinearExp.exp_real_params.analog_gain * \
+                    Next->LinearExp.exp_real_params.integration_time;
+        curSExpo = Cur->LinearExp.exp_real_params.analog_gain * \
+                   Cur->LinearExp.exp_real_params.integration_time;
+    } else if (frameNum == 2) {
+        nextLExpo = Next->HdrExp[1].exp_real_params.analog_gain * \
+                    Next->HdrExp[1].exp_real_params.integration_time;
+        curLExpo = Cur->HdrExp[1].exp_real_params.analog_gain * \
+                   Cur->HdrExp[1].exp_real_params.integration_time;
+        nextMExpo = nextLExpo;
+        curMExpo = curLExpo;
+        nextSExpo = Next->HdrExp[0].exp_real_params.analog_gain * \
+                    Next->HdrExp[0].exp_real_params.integration_time;
+        curSExpo = Cur->HdrExp[0].exp_real_params.analog_gain * \
+                   Cur->HdrExp[0].exp_real_params.integration_time;
+    } else if (frameNum == 3) {
+        nextLExpo = Next->HdrExp[2].exp_real_params.analog_gain * \
+                    Next->HdrExp[2].exp_real_params.integration_time;
+        curLExpo = Cur->HdrExp[2].exp_real_params.analog_gain * \
+                   Cur->HdrExp[2].exp_real_params.integration_time;
+        nextMExpo = Next->HdrExp[1].exp_real_params.analog_gain * \
+                    Next->HdrExp[1].exp_real_params.integration_time;
+        curMExpo = Cur->HdrExp[1].exp_real_params.analog_gain * \
+                   Cur->HdrExp[1].exp_real_params.integration_time;
+        nextSExpo = Next->HdrExp[0].exp_real_params.analog_gain * \
+                    Next->HdrExp[0].exp_real_params.integration_time;
+        curSExpo = Cur->HdrExp[0].exp_real_params.analog_gain * \
+                   Cur->HdrExp[0].exp_real_params.integration_time;
+    }
+
+    expo[0] = curSExpo;
+    expo[1] = curMExpo;
+    expo[2] = curLExpo;
+    expo[3] = nextSExpo;
+    expo[4] = nextMExpo;
+    expo[5] = nextLExpo;
+
+    LOGD_CAMHW_SUBM(ISP20PARAM_SUBM, "Cur Expo: S:%f M:%f L:%f\n", curSExpo, curMExpo, curLExpo);
+    LOGD_CAMHW_SUBM(ISP20PARAM_SUBM, "Next Expo: S:%f M:%f L:%f\n", nextSExpo, nextMExpo, nextLExpo);
+
+}
+
+bool
+Isp20Params::hdrtmoSceneStable(sint32_t frameId, int IIRMAX, int IIR, int SetWeight, s32 frameNum, float *LumaDeviation, float StableThr)
+{
+    bool SceneStable = true;
+    float LumaDeviationL = 0;
+    float LumaDeviationM = 0;
+    float LumaDeviationS = 0;
+    float LumaDeviationLinear = 0;
+    float LumaDeviationFinnal = 0;
+
+    //set default value when secne change or flow restart
+    if(AntiTmoFlicker.preFrameNum != frameNum || frameId == 0) {
+        AntiTmoFlicker.preFrameNum = 0;
+        AntiTmoFlicker.FirstChange = false;
+        AntiTmoFlicker.FirstChangeNum = 0;
+        AntiTmoFlicker.FirstChangeDone = false;
+        AntiTmoFlicker.FirstChangeDoneNum = 0;
+    }
+
+    //get LumaDeviationFinnal value
+    if(frameNum == 1) {
+        LumaDeviationLinear = LumaDeviation[0];
+        LumaDeviationFinnal = LumaDeviationLinear;
+    }
+    else if(frameNum == 2) {
+        LumaDeviationS = LumaDeviation[0];
+        LumaDeviationL = LumaDeviation[1];
+
+        if(LumaDeviationL > 0)
+            LumaDeviationFinnal = LumaDeviationL;
+        else if(LumaDeviationL == 0 && LumaDeviationS > 0)
+            LumaDeviationFinnal = LumaDeviationS;
+
+    }
+    else if(frameNum == 3) {
+        LumaDeviationS = LumaDeviation[0];
+        LumaDeviationM = LumaDeviation[1];
+        LumaDeviationL = LumaDeviation[2];
+
+        if(LumaDeviationM > 0)
+            LumaDeviationFinnal = LumaDeviationM;
+        else if(LumaDeviationM == 0 && LumaDeviationL > 0)
+            LumaDeviationFinnal = LumaDeviationL;
+        else if(LumaDeviationM == 0 && LumaDeviationL == 0 && LumaDeviationS == 0)
+            LumaDeviationFinnal = LumaDeviationS;
+
+    }
+    LOGD_CAMHW_SUBM(ISP20PARAM_SUBM, "frameId:%ld LumaDeviationLinear:%f LumaDeviationS:%f LumaDeviationM:%f LumaDeviationL:%f\n",
+                    frameId, LumaDeviationLinear, LumaDeviationS, LumaDeviationM, LumaDeviationL);
+
+    //skip first N frame for starting
+    if(AntiTmoFlicker.FirstChange == false) {
+        if(LumaDeviationFinnal) {
+            AntiTmoFlicker.FirstChange = true;
+            AntiTmoFlicker.FirstChangeNum = frameId;
+        }
+    }
+
+    if(AntiTmoFlicker.FirstChangeDone == false && AntiTmoFlicker.FirstChange == true) {
+        if(LumaDeviationFinnal == 0) {
+            AntiTmoFlicker.FirstChangeDone = true;
+            AntiTmoFlicker.FirstChangeDoneNum = frameId;
+        }
+    }
+
+    //detect stable
+    if(AntiTmoFlicker.FirstChangeDoneNum && AntiTmoFlicker.FirstChangeNum) {
+        if(LumaDeviationFinnal <= StableThr)
+            SceneStable = true;
+        else
+            SceneStable = false;
+    }
+    else
+        SceneStable = true;
+
+    LOGD_CAMHW_SUBM(ISP20PARAM_SUBM, "preFrameNum:%d frameNum:%d FirstChange:%d FirstChangeNum:%d FirstChangeDone:%d FirstChangeDoneNum:%d\n",
+                    AntiTmoFlicker.preFrameNum, frameNum, AntiTmoFlicker.FirstChange, AntiTmoFlicker.FirstChangeNum,
+                    AntiTmoFlicker.FirstChangeDone, AntiTmoFlicker.FirstChangeDoneNum);
+    LOGD_CAMHW_SUBM(ISP20PARAM_SUBM, "LumaDeviationFinnal:%f StableThr:%f SceneStable:%d \n", LumaDeviationFinnal, StableThr, SceneStable);
+
+    //store framrnum
+    AntiTmoFlicker.preFrameNum = frameNum;
+
+    return SceneStable;
+}
+
+s32
+Isp20Params::hdrtmoPredictK(float* luma, float* expo, s32 frameNum, PredictKPara_t *TmoPara)
+{
+    int PredictK = 0;
+    float PredictKfloat = 0;
+
+    float curSExpo = expo[0];
+    float curMExpo = expo[1];
+    float curLExpo = expo[2];
+    float nextSExpo = expo[3];
+    float nextMExpo = expo[4];
+    float nextLExpo = expo[5];
+
+    float nextLLuma[16];
+    float curLLuma[16];
+    float nextSLuma[16];
+    float curSLuma[16];
+    float nextMLuma[16];
+    float curMLuma[16];
+
+    for(int i = 0; i < ISP2X_MIPI_LUMA_MEAN_MAX; i++)
+    {
+        curSLuma[i] = luma[i];
+        curMLuma[i] = luma[i + 16];
+        curLLuma[i] = luma[i + 32];
+        nextSLuma[i] = luma[i + 48];
+        nextMLuma[i] = luma[i + 64];
+        nextLLuma[i] = luma[i + 80];
+    }
+
+    float correction_factor = TmoPara->correction_factor;
+    float ratio = 1;
+    float offset = TmoPara->correction_offset;
+    float LongExpoRatio = 1;
+    float ShortExpoRatio = 1;
+    float MiddleExpoRatio = 1;
+    float MiddleLumaChange = 1;
+    float LongLumaChange = 1;
+    float ShortLumaChange = 1;
+    float EnvLvChange = 0;
+
+    //get expo change
+    if(frameNum == 3 || frameNum == 2) {
+        if(nextLExpo != 0 && curLExpo != 0)
+            LongExpoRatio = nextLExpo / curLExpo;
+        else
+            LOGE_CAMHW_SUBM(ISP20PARAM_SUBM, "Wrong Long frame expo!!!");
+    }
+
+    if(frameNum == 3) {
+        if(nextMExpo != 0 && curMExpo != 0)
+            ShortExpoRatio = nextMExpo / curMExpo;
+        else
+            LOGE_CAMHW_SUBM(ISP20PARAM_SUBM, "Wrong Short frame expo!!!");
+    }
+
+    if(nextSExpo != 0 && curSExpo != 0)
+        ShortExpoRatio = nextSExpo / curSExpo;
+    else
+        LOGE_CAMHW_SUBM(ISP20PARAM_SUBM, "Wrong Short frame expo!!!");
+
+    float nextLMeanLuma = 0;
+    float curLMeanLuma = 0;
+    float curMMeanLuma = 0;
+    float nextMMeanLuma = 0;
+    float nextSMeanLuma = 0;
+    float curSMeanLuma = 0;
+    for(int i = 0; i < ISP2X_MIPI_LUMA_MEAN_MAX; i++)
+    {
+        nextLMeanLuma += nextLLuma[i];
+        curLMeanLuma += curLLuma[i];
+        nextMMeanLuma += nextMLuma[i];
+        curMMeanLuma += curMLuma[i];
+        nextSMeanLuma += nextSLuma[i];
+        curSMeanLuma += curSLuma[i];
+    }
+    nextLMeanLuma /= ISP2X_MIPI_LUMA_MEAN_MAX;
+    curLMeanLuma /= ISP2X_MIPI_LUMA_MEAN_MAX;
+    nextMMeanLuma /= ISP2X_MIPI_LUMA_MEAN_MAX;
+    curMMeanLuma /= ISP2X_MIPI_LUMA_MEAN_MAX;
+    nextSMeanLuma /= ISP2X_MIPI_LUMA_MEAN_MAX;
+    curSMeanLuma /= ISP2X_MIPI_LUMA_MEAN_MAX;
+
+    LOGD_CAMHW_SUBM(ISP20PARAM_SUBM, "nextLLuma:%f curLLuma:%f\n", nextLMeanLuma, curLMeanLuma);
+    LOGD_CAMHW_SUBM(ISP20PARAM_SUBM, "nextSLuma:%f curSLuma:%f\n", nextSMeanLuma, curSMeanLuma);
+
+    //get luma change
+    if(frameNum == 3 || frameNum == 2) {
+        if(nextLMeanLuma > 0 && curLMeanLuma > 0)
+            LongLumaChange = nextLMeanLuma / curLMeanLuma;
+        else if(nextLMeanLuma <= 0 && curLMeanLuma > 0)
+        {
+            nextLMeanLuma = 1;
+            LongLumaChange = nextLMeanLuma / curLMeanLuma;
+        }
+        else if(nextLMeanLuma > 0 && curLMeanLuma <= 0)
+        {
+            curLMeanLuma = 1;
+            LongLumaChange = nextLMeanLuma / curLMeanLuma;
+        }
+        else {
+            curLMeanLuma = 1;
+            nextLMeanLuma = 1;
+            LongLumaChange = nextLMeanLuma / curLMeanLuma;
+        }
+    }
+
+    if(frameNum == 3) {
+        if(nextMMeanLuma > 0 && curMMeanLuma > 0)
+            MiddleLumaChange = nextMMeanLuma / curMMeanLuma;
+        else if(nextMMeanLuma <= 0 && curMMeanLuma > 0)
+        {
+            nextMMeanLuma = 1;
+            MiddleLumaChange = nextMMeanLuma / curMMeanLuma;
+        }
+        else if(nextMMeanLuma > 0 && curMMeanLuma <= 0)
+        {
+            curMMeanLuma = 1;
+            MiddleLumaChange = nextMMeanLuma / curMMeanLuma;
+        }
+        else {
+            curMMeanLuma = 1;
+            nextMMeanLuma = 1;
+            MiddleLumaChange = nextMMeanLuma / curMMeanLuma;
+        }
+    }
+
+    if(nextSMeanLuma > 0 && curSMeanLuma > 0)
+        ShortLumaChange = nextSMeanLuma / curSMeanLuma;
+    else if(nextSMeanLuma <= 0 && curSMeanLuma > 0)
+    {
+        nextSMeanLuma = 1;
+        ShortLumaChange = nextSMeanLuma / curSMeanLuma;
+    }
+    else if(nextSMeanLuma > 0 && curSMeanLuma <= 0)
+    {
+        curSMeanLuma = 1;
+        ShortLumaChange = nextSMeanLuma / curSMeanLuma;
+    }
+    else {
+        curSMeanLuma = 1;
+        nextSMeanLuma = 1;
+        ShortLumaChange = nextSMeanLuma / curSMeanLuma;
+    }
+
+    //cal predictK
+    if (frameNum == 1)
+    {
+        LOGD_CAMHW_SUBM(ISP20PARAM_SUBM, "nextLuma:%f curLuma:%f LumaChange:%f\n", nextSMeanLuma, curSMeanLuma, ShortLumaChange);
+        ratio = ShortLumaChange;
+
+        EnvLvChange = nextSMeanLuma / nextSExpo - curSMeanLuma / curSExpo;
+        EnvLvChange = EnvLvChange >= 0 ? EnvLvChange : (-EnvLvChange);
+        EnvLvChange /= curSMeanLuma / curSExpo;
+        LOGD_CAMHW_SUBM(ISP20PARAM_SUBM, "nextEnvLv:%f curEnvLv:%f EnvLvChange:%f\n", nextSMeanLuma / nextSExpo,
+                        curSMeanLuma / curSExpo, EnvLvChange);
+    }
+    else if (frameNum == 2)
+    {
+        LOGD_CAMHW_SUBM(ISP20PARAM_SUBM, "nextLLuma:%f curLLuma:%f LongLumaChange:%f\n", nextLMeanLuma, curLMeanLuma, LongLumaChange);
+        LOGD_CAMHW_SUBM(ISP20PARAM_SUBM, "nextSLuma:%f curSLuma:%f ShortLumaChange:%f\n", nextSMeanLuma, curSMeanLuma, ShortLumaChange);
+        LOGD_CAMHW_SUBM(ISP20PARAM_SUBM, "LongPercent:%f UseLongLowTh:%f UseLongUpTh:%f\n", 1, TmoPara->UseLongLowTh, TmoPara->UseLongUpTh);
+
+        if(LongLumaChange > TmoPara->UseLongLowTh || LongLumaChange < TmoPara->UseLongUpTh)
+            ratio = LongLumaChange;
+        else
+            ratio = ShortLumaChange;
+
+        EnvLvChange = nextLMeanLuma / nextLExpo - curLMeanLuma / curLExpo;
+        EnvLvChange = EnvLvChange >= 0 ? EnvLvChange : (-EnvLvChange);
+        EnvLvChange /= curLMeanLuma / curLExpo;
+        LOGD_CAMHW_SUBM(ISP20PARAM_SUBM, "nextEnvLv:%f curEnvLv:%f EnvLvChange:%f\n", nextLMeanLuma / nextLExpo,
+                        curLMeanLuma / curLExpo, EnvLvChange);
+
+    }
+    else if (frameNum == 3)
+    {
+        LOGD_CAMHW_SUBM(ISP20PARAM_SUBM, "nextLLuma:%f curLLuma:%f LongLumaChange:%f\n", nextLMeanLuma, curLMeanLuma, LongLumaChange);
+        LOGD_CAMHW_SUBM(ISP20PARAM_SUBM, "nextMLuma:%f curMLuma:%f MiddleLumaChange:%f\n", nextMMeanLuma, curMMeanLuma, MiddleLumaChange);
+        LOGD_CAMHW_SUBM(ISP20PARAM_SUBM, "nextSLuma:%f curSLuma:%f ShortLumaChange:%f\n", nextSMeanLuma, curSMeanLuma, ShortLumaChange);
+        LOGD_CAMHW_SUBM(ISP20PARAM_SUBM, "LongPercent:%f UseLongLowTh:%f UseLongUpTh:%f\n", TmoPara->Hdr3xLongPercent,
+                        TmoPara->UseLongLowTh, TmoPara->UseLongUpTh);
+
+        float LongLumaChangeNew = TmoPara->Hdr3xLongPercent * LongLumaChange + (1 - TmoPara->Hdr3xLongPercent) * MiddleLumaChange;
+        if(LongLumaChangeNew > TmoPara->UseLongLowTh || LongLumaChangeNew < TmoPara->UseLongUpTh)
+            ratio = LongLumaChangeNew;
+        else
+            ratio = ShortLumaChange;
+
+        EnvLvChange = nextMMeanLuma / nextMExpo - curMMeanLuma / curMExpo;
+        EnvLvChange = EnvLvChange >= 0 ? EnvLvChange : (-EnvLvChange);
+        EnvLvChange /= curMMeanLuma / curMExpo;
+        LOGD_CAMHW_SUBM(ISP20PARAM_SUBM, "nextEnvLv:%f curEnvLv:%f EnvLvChange:%f\n", nextMMeanLuma / nextMExpo,
+                        curMMeanLuma / curMExpo, EnvLvChange);
+    }
+
+    if(ratio >= 1)
+        PredictKfloat = log(correction_factor * ratio + offset) / log(2);
+    else if(ratio < 1 && ratio > 0)
+    {
+        float tmp = ratio / correction_factor - offset;
+        tmp = tmp >= 1 ? 1 : tmp <= 0 ? 0.00001 : tmp;
+        PredictKfloat = log(tmp) / log(2);
+    }
+    else
+        LOGE_CAMHW_SUBM(ISP20PARAM_SUBM, "Wrong luma change!!!");
+
+    //add EnvLv judge
+    if(EnvLvChange > 0.005) {
+        float tmp = curLMeanLuma - nextLMeanLuma;
+        tmp = tmp >= 0 ? tmp : (-tmp);
+        if(tmp < 1)
+            PredictKfloat = 0;
+    }
+    else
+        PredictKfloat = 0;
+
+    PredictKfloat *= 2048;
+    PredictK = (int)PredictKfloat;
+
+    LOGD_CAMHW_SUBM(ISP20PARAM_SUBM, "ratio:%f EnvLvChange:%f PredictKfloat:%f PredictK:%d\n",
+                    ratio, EnvLvChange, PredictKfloat, PredictK);
+    return PredictK;
+}
+
+bool Isp20Params::convert3aResultsToIspCfg(SmartPtr<cam3aResult> &result,
+        void* isp_cfg_p)
+{
+    struct isp2x_isp_params_cfg& isp_cfg = *(struct isp2x_isp_params_cfg*)isp_cfg_p;
+
+    if (result.ptr() == NULL) {
+        LOGE_CAMHW_SUBM(ISP20PARAM_SUBM, "3A result empty");
+        return false;
+    }
+
+    int32_t type = result->getType();
+    // LOGE_CAMHW_SUBM(ISP20PARAM_SUBM, "%s, module (0x%x) convert params!\n", __FUNCTION__, type);
+    switch (type)
+    {
+    case RESULT_TYPE_AEC_PARAM:
+    {
+        SmartPtr<RkAiqIspAecParamsProxy> params = result.dynamic_cast_ptr<RkAiqIspAecParamsProxy>();
+        if (params.ptr()) {
+            convertAiqAeToIsp20Params(isp_cfg, params->data()->result);
+        }
+    }
+    break;
+    case RESULT_TYPE_HIST_PARAM:
+    {
+        SmartPtr<RkAiqIspHistParamsProxy> params = result.dynamic_cast_ptr<RkAiqIspHistParamsProxy>();
+        if (params.ptr())
+            convertAiqHistToIsp20Params(isp_cfg, params->data()->result);
+    }
+    break;
+    case RESULT_TYPE_AWB_PARAM:
+    {
+        SmartPtr<RkAiqIspAwbParamsProxy> params = result.dynamic_cast_ptr<RkAiqIspAwbParamsProxy>();
+        if (params.ptr())
+            convertAiqAwbToIsp20Params(isp_cfg, params->data()->result, true);
+    }
+    break;
+    case RESULT_TYPE_AWBGAIN_PARAM:
+    {
+        SmartPtr<RkAiqIspAwbGainParamsProxy> awb_gain = result.dynamic_cast_ptr<RkAiqIspAwbGainParamsProxy>();
+        if (awb_gain.ptr() && mBlcResult.ptr()) {
+            SmartPtr<RkAiqIspBlcParamsProxy> blc = mBlcResult.dynamic_cast_ptr<RkAiqIspBlcParamsProxy>();
+            convertAiqAwbGainToIsp20Params(isp_cfg,
+                                           awb_gain->data()->result, blc->data()->result, true);
+
+        } else
+            LOGE("don't get %s params, convert awbgain params failed!",
+                 awb_gain.ptr() ? "blc" : "awb_gain");
+    }
+    break;
+    case RESULT_TYPE_AF_PARAM:
+    {
+        SmartPtr<RkAiqIspAfParamsProxy> params = result.dynamic_cast_ptr<RkAiqIspAfParamsProxy>();
+        if (params.ptr())
+            convertAiqAfToIsp20Params(isp_cfg, params->data()->result, true);
+    }
+    break;
+    case RESULT_TYPE_DPCC_PARAM:
+    {
+        SmartPtr<RkAiqIspDpccParamsProxy> params = result.dynamic_cast_ptr<RkAiqIspDpccParamsProxy>();
+        if (params.ptr())
+            convertAiqDpccToIsp20Params(isp_cfg, params->data()->result);
+    }
+    break;
+    case RESULT_TYPE_MERGE_PARAM:
+    {
+        SmartPtr<RkAiqIspMergeParamsProxy> params = result.dynamic_cast_ptr<RkAiqIspMergeParamsProxy>();
+        if (params.ptr()) {
+            convertAiqMergeToIsp20Params(isp_cfg, params->data()->result);
+        }
+    }
+    break;
+    case RESULT_TYPE_TMO_PARAM:
+    {
+        SmartPtr<RkAiqIspTmoParamsProxy> params = result.dynamic_cast_ptr<RkAiqIspTmoParamsProxy>();
+        if (params.ptr()) {
+            convertAiqTmoToIsp20Params(isp_cfg, params->data()->result);
+        }
+    }
+    break;
+    case RESULT_TYPE_CCM_PARAM:
+    {
+        SmartPtr<RkAiqIspCcmParamsProxy> params = result.dynamic_cast_ptr<RkAiqIspCcmParamsProxy>();
+        if (params.ptr())
+            convertAiqCcmToIsp20Params(isp_cfg, params->data()->result);
+    }
+    break;
+    case RESULT_TYPE_LSC_PARAM:
+    {
+        SmartPtr<RkAiqIspLscParamsProxy> params = result.dynamic_cast_ptr<RkAiqIspLscParamsProxy>();
+        if (params.ptr())
+            convertAiqLscToIsp20Params(isp_cfg, params->data()->result);
+    }
+    break;
+    case RESULT_TYPE_BLC_PARAM:
+    {
+        SmartPtr<RkAiqIspBlcParamsProxy> params = result.dynamic_cast_ptr<RkAiqIspBlcParamsProxy>();
+        if (params.ptr())
+            convertAiqBlcToIsp20Params(isp_cfg, params->data()->result);
+    }
+    case RESULT_TYPE_RAWNR_PARAM:
+    {
+        SmartPtr<RkAiqIspRawnrParamsProxy> params = result.dynamic_cast_ptr<RkAiqIspRawnrParamsProxy>();
+        if (params.ptr())
+            convertAiqRawnrToIsp20Params(isp_cfg, params->data()->result);
+    }
+    break;
+    case RESULT_TYPE_GIC_PARAM:
+    {
+        SmartPtr<RkAiqIspGicParamsProxy> params = result.dynamic_cast_ptr<RkAiqIspGicParamsProxy>();
+        if (params.ptr())
+            convertAiqGicToIsp20Params(isp_cfg, params->data()->result);
+    }
+    break;
+    case RESULT_TYPE_DEBAYER_PARAM:
+    {
+        SmartPtr<RkAiqIspDebayerParamsProxy> params = result.dynamic_cast_ptr<RkAiqIspDebayerParamsProxy>();
+        if (params.ptr())
+            convertAiqAdemosaicToIsp20Params(isp_cfg, params->data()->result);
+    }
+    break;
+    case RESULT_TYPE_LDCH_PARAM:
+    {
+        SmartPtr<RkAiqIspLdchParamsProxy> params = result.dynamic_cast_ptr<RkAiqIspLdchParamsProxy>();
+        if (params.ptr())
+            convertAiqAldchToIsp20Params(isp_cfg, params->data()->result);
+    }
+    break;
+    case RESULT_TYPE_LUT3D_PARAM:
+    {
+        SmartPtr<RkAiqIspLut3dParamsProxy> params = result.dynamic_cast_ptr<RkAiqIspLut3dParamsProxy>();
+        if (params.ptr())
+            convertAiqA3dlutToIsp20Params(isp_cfg, params->data()->result);
+    }
+    break;
+    case RESULT_TYPE_DEHAZE_PARAM:
+    {
+        SmartPtr<RkAiqIspDehazeParamsProxy> params = result.dynamic_cast_ptr<RkAiqIspDehazeParamsProxy>();
+        if (params.ptr())
+            convertAiqAdehazeToIsp20Params(isp_cfg, params->data()->result);
+    }
+    break;
+    case RESULT_TYPE_AGAMMA_PARAM:
+    {
+        SmartPtr<RkAiqIspAgammaParamsProxy> params = result.dynamic_cast_ptr<RkAiqIspAgammaParamsProxy>();
+        if (params.ptr())
+            convertAiqAgammaToIsp20Params(isp_cfg, params->data()->result);
+    }
+    break;
+    case RESULT_TYPE_ADEGAMMA_PARAM:
+    {
+        SmartPtr<RkAiqIspAdegammaParamsProxy> params = result.dynamic_cast_ptr<RkAiqIspAdegammaParamsProxy>();
+        if (params.ptr())
+            convertAiqAdegammaToIsp20Params(isp_cfg, params->data()->result);
+    }
+    break;
+    case RESULT_TYPE_WDR_PARAM:
+#if 0
+    {
+        SmartPtr<RkAiqIspWdrParamsProxy> params = result.dynamic_cast_ptr<RkAiqIspWdrParamsProxy>();
+        if (params.ptr())
+            convertAiqWdrToIsp20Params(isp_cfg, params->data()->result);
+    }
+#endif
+    break;
+    case RESULT_TYPE_CSM_PARAM:
+#if 0
+    {
+        SmartPtr<RkAiqIspCsmParamsProxy> params = result.dynamic_cast_ptr<RkAiqIspCsmParamsProxy>();
+        if (params.ptr())
+            convertAiqToIsp20Params(isp_cfg, params->data()->result);
+    }
+#endif
+    break;
+    case RESULT_TYPE_CGC_PARAM:
+        break;
+    case RESULT_TYPE_CONV422_PARAM:
+        break;
+    case RESULT_TYPE_YUVCONV_PARAM:
+        break;
+    case RESULT_TYPE_GAIN_PARAM:
+    {
+        SmartPtr<RkAiqIspGainParamsProxy> params = result.dynamic_cast_ptr<RkAiqIspGainParamsProxy>();
+        if (params.ptr())
+            convertAiqGainToIsp20Params(isp_cfg, params->data()->result);
+    }
+    break;
+    case RESULT_TYPE_CP_PARAM:
+    {
+        SmartPtr<RkAiqIspCpParamsProxy> params = result.dynamic_cast_ptr<RkAiqIspCpParamsProxy>();
+        if (params.ptr())
+            convertAiqCpToIsp20Params(isp_cfg, params->data()->result);
+    }
+    break;
+    case RESULT_TYPE_IE_PARAM:
+    {
+        SmartPtr<RkAiqIspIeParamsProxy> params = result.dynamic_cast_ptr<RkAiqIspIeParamsProxy>();
+        if (params.ptr())
+            convertAiqIeToIsp20Params(isp_cfg, params->data()->result);
+    }
+    break;
+    default:
+        LOGE("unknown param type: 0x%x!", type);
+        return false;
+    }
+
+    /*
+     * cam3aResultList &list = _cam3aConfig[result->getFrameId()];
+     * list.push_back(result);
+     */
+
+    return true;
+}
+
+XCamReturn Isp20Params::merge_isp_results(cam3aResultList &results, void* isp_cfg)
+{
+    if (results.empty())
+        return XCAM_RETURN_ERROR_PARAM;
+
+    mBlcResult = get_3a_result(results, RESULT_TYPE_BLC_PARAM);
+    if (!mBlcResult.ptr())
+        LOGE_CAMHW_SUBM(ISP20PARAM_SUBM, "get blc params failed!\n");
+
+    LOGD_CAMHW_SUBM(ISP20PARAM_SUBM, "%s, isp cam3a results size: %d\n", __FUNCTION__, results.size());
+    for (cam3aResultList::iterator iter = results.begin ();
+            iter != results.end (); iter++)
+    {
+        SmartPtr<cam3aResult> &cam3a_result = *iter;
+
+        convert3aResultsToIspCfg(cam3a_result, isp_cfg);
+    }
+    results.clear();
+    mBlcResult.release();
+    return XCAM_RETURN_NO_ERROR;
+}
+
+template<>
+XCamReturn Isp20Params::merge_results<struct rkispp_params_nrcfg>(cam3aResultList &results, struct rkispp_params_nrcfg &pp_cfg)
+{
+    if (results.empty())
+        return XCAM_RETURN_ERROR_PARAM;
+
+    LOGE_CAMHW_SUBM(ISP20PARAM_SUBM, "%s, pp cam3a results size: %d\n", __FUNCTION__, results.size());
+
+    SmartPtr<RkAiqIspSharpenParamsProxy> sharpen = nullptr;
+    SmartPtr<RkAiqIspEdgefltParamsProxy> edgeflt = nullptr;
+
+    for (cam3aResultList::iterator iter = results.begin ();
+            iter != results.end ();)
+    {
+        SmartPtr<cam3aResult> &cam3a_result = *iter;
+
+        if (cam3a_result->getType() == RESULT_TYPE_SHARPEN_PARAM || \
+                cam3a_result->getType() == RESULT_TYPE_EDGEFLT_PARAM) {
+            if (cam3a_result->getType() == RESULT_TYPE_SHARPEN_PARAM)
+                sharpen = cam3a_result.dynamic_cast_ptr<RkAiqIspSharpenParamsProxy>();
+            else if (cam3a_result->getType() == RESULT_TYPE_EDGEFLT_PARAM)
+                edgeflt = cam3a_result.dynamic_cast_ptr<RkAiqIspEdgefltParamsProxy>();
+            if (sharpen.ptr() && edgeflt.ptr())
+                convertAiqSharpenToIsp20Params(pp_cfg, sharpen->data()->result, edgeflt->data()->result);
+
+            iter = results.erase (iter);
+            continue;
+        }
+        if (cam3a_result->getType() == RESULT_TYPE_UVNR_PARAM) {
+            SmartPtr<RkAiqIspUvnrParamsProxy> uvnr = cam3a_result.dynamic_cast_ptr<RkAiqIspUvnrParamsProxy>();
+            convertAiqUvnrToIsp20Params(pp_cfg, uvnr->data()->result);
+            iter = results.erase (iter);
+            continue;
+        }
+        if (cam3a_result->getType() == RESULT_TYPE_YNR_PARAM) {
+            SmartPtr<RkAiqIspYnrParamsProxy> ynr = cam3a_result.dynamic_cast_ptr<RkAiqIspYnrParamsProxy>();
+            convertAiqYnrToIsp20Params(pp_cfg, ynr->data()->result);
+            iter = results.erase (iter);
+            continue;
+        }
+        if (cam3a_result->getType() == RESULT_TYPE_ORB_PARAM) {
+            SmartPtr<RkAiqIspOrbParamsProxy> orb = cam3a_result.dynamic_cast_ptr<RkAiqIspOrbParamsProxy>();
+            convertAiqOrbToIsp20Params(pp_cfg, orb->data()->result);
+            iter = results.erase (iter);
+            continue;
+        }
+        ++iter;
+    }
+    return XCAM_RETURN_NO_ERROR;
+}
+
+XCamReturn Isp20Params::get_tnr_cfg_params(cam3aResultList &results, struct rkispp_params_tnrcfg &tnr_cfg)
+{
+    if (results.empty())
+        return XCAM_RETURN_ERROR_PARAM;
+
+    LOGE_CAMHW_SUBM(ISP20PARAM_SUBM, "%s, pp cam3a results size: %d\n", __FUNCTION__, results.size());
+    SmartPtr<cam3aResult> cam3a_result = get_3a_result(results, RESULT_TYPE_TNR_PARAM);
+    if (cam3a_result.ptr()) {
+        SmartPtr<RkAiqIspTnrParamsProxy> tnr = nullptr;
+        tnr = cam3a_result.dynamic_cast_ptr<RkAiqIspTnrParamsProxy>();
+        if (tnr.ptr())
+            convertAiqTnrToIsp20Params(tnr_cfg, tnr->data()->result);
+    }
+    return XCAM_RETURN_NO_ERROR;
+}
+
+XCamReturn Isp20Params::get_fec_cfg_params(cam3aResultList &results, struct rkispp_params_feccfg &fec_cfg)
+{
+    if (results.empty())
+        return XCAM_RETURN_ERROR_PARAM;
+
+    LOGE_CAMHW_SUBM(ISP20PARAM_SUBM, "%s, pp cam3a results size: %d\n", __FUNCTION__, results.size());
+    SmartPtr<cam3aResult> cam3a_result = get_3a_result(results, RESULT_TYPE_FEC_PARAM);
+    if (cam3a_result.ptr()) {
+        SmartPtr<RkAiqIspFecParamsProxy> fec = nullptr;
+        fec = cam3a_result.dynamic_cast_ptr<RkAiqIspFecParamsProxy>();
+        if (fec.ptr()) {
+            convertAiqFecToIsp20Params(fec_cfg, fec->data()->result);
+        }
+    }
+    return XCAM_RETURN_NO_ERROR;
+}
+
+SmartPtr<cam3aResult>
+Isp20Params::get_3a_result (cam3aResultList &results, int32_t type)
+{
+    cam3aResultList::iterator i_res = results.begin();
+    SmartPtr<cam3aResult> res;
+
+    for ( ; i_res !=  results.end(); ++i_res) {
+        if (type == (*i_res)->getType ()) {
+            res = (*i_res);
+            break;
+        }
+    }
+
+    return res;
+}
 
 }; //namspace RkCam
-
 //TODO: to solve template ld compile issue, add isp21 source file here now.
 #include "isp21/Isp21Params.cpp"
-

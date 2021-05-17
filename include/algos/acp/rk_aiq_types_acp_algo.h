@@ -21,6 +21,7 @@
 #define _RK_AIQ_TYPES_ACP_ALGO_H_
 
 typedef struct rk_aiq_acp_params_s {
+    uint8_t enable;
     uint8_t brightness;
     uint8_t contrast;
     uint8_t saturation;

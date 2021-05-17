@@ -52,6 +52,13 @@ struct rk_cam_motor_tim {
 #define RK_VIDIOC_SET_VCM_CFG \
     _IOW('V', BASE_VIDIOC_PRIVATE + 4, struct rk_cam_vcm_cfg)
 
+#define RK_VIDIOC_FOCUS_CORRECTION \
+    _IOR('V', BASE_VIDIOC_PRIVATE + 5, unsigned int)
+#define RK_VIDIOC_IRIS_CORRECTION \
+    _IOR('V', BASE_VIDIOC_PRIVATE + 6, unsigned int)
+#define RK_VIDIOC_ZOOM_CORRECTION \
+    _IOR('V', BASE_VIDIOC_PRIVATE + 7, unsigned int)
+
 #define LENSHW_RECORD_SOF_NUM   256
 
 using namespace XCam;
@@ -67,6 +74,7 @@ public:
 
     XCamReturn start();
     XCamReturn stop();
+    XCamReturn start_internal();
     XCamReturn getLensModeData(rk_aiq_lens_descriptor& lens_des);
     XCamReturn getLensVcmCfg(rk_aiq_lens_vcmcfg& lens_cfg);
     XCamReturn setLensVcmCfg(rk_aiq_lens_vcmcfg& lens_cfg);
@@ -77,6 +85,8 @@ public:
     XCamReturn getPIrisParams(int* step);
     XCamReturn getFocusParams(int* position);
     XCamReturn getZoomParams(int* position);
+    XCamReturn FocusCorrection();
+    XCamReturn ZoomCorrection();
     XCamReturn handle_sof(int64_t time, int frameid);
     XCamReturn getIrisInfoParams(SmartPtr<RkAiqIrisParamsProxy>& irisParams, int frame_id);
     XCamReturn getAfInfoParams(SmartPtr<RkAiqAfInfoProxy>& afInfo, int frame_id);

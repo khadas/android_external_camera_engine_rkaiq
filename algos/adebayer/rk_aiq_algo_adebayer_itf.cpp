@@ -31,13 +31,15 @@ create_context
 )
 {
     XCamReturn result = XCAM_RETURN_NO_ERROR;
+    AlgoCtxInstanceCfgInt* instanc_int = (AlgoCtxInstanceCfgInt*)cfg;
+
     RkAiqAlgoContext *ctx = new RkAiqAlgoContext();
     if (ctx == NULL) {
         LOGE_ADEBAYER( "%s: create adebayer context fail!\n", __FUNCTION__);
         return XCAM_RETURN_ERROR_MEM;
     }
     LOGI_ADEBAYER("%s: (enter)\n", __FUNCTION__ );
-    AdebayerInit(&ctx->adebayerCtx);
+    AdebayerInit(&ctx->adebayerCtx, instanc_int->calib, instanc_int->calibv2);
     *context = ctx;
     LOGI_ADEBAYER("%s: (exit)\n", __FUNCTION__ );
     return result;
@@ -70,7 +72,11 @@ prepare
     LOGI_ADEBAYER("%s: (enter)\n", __FUNCTION__ );
     AdebayerContext_t* pAdebayerCtx = (AdebayerContext_t *)&params->ctx->adebayerCtx;
     RkAiqAlgoConfigAdebayerInt* pCfgParam = (RkAiqAlgoConfigAdebayerInt*)params;
-    pAdebayerCtx->pCalibDb = pCfgParam->rk_com.u.prepare.calib;
+
+	if(!!(params->u.prepare.conf_type & RK_AIQ_ALGO_CONFTYPE_UPDATECALIB )){
+		AdebayerInit(pAdebayerCtx, pCfgParam->rk_com.u.prepare.calib, pCfgParam->rk_com.u.prepare.calibv2);
+    }
+
     AdebayerStart(pAdebayerCtx);
     LOGI_ADEBAYER("%s: (exit)\n", __FUNCTION__ );
     return result;
@@ -107,29 +113,40 @@ processing
 
     if (pAdebayerProcParams->rk_com.u.proc.is_bw_sensor) {
         pAdebayerCtx->config.enable = 0;
+        pAdebayerCtx->config.updatecfg = true;
     } else {
-        RkAiqAlgoPreResAeInt* pAEPreRes =
-            (RkAiqAlgoPreResAeInt*)(pAdebayerProcParams->rk_com.u.proc.pre_res_comb->ae_pre_res);
-
-        if(pAEPreRes != NULL) {
+        RKAiqAecExpInfo_t *curExp = pAdebayerProcParams->rk_com.u.proc.curExp;
+        if(curExp != NULL) {
             if(pAdebayerProcParams->hdr_mode == RK_AIQ_WORKING_MODE_NORMAL) {
-                iso = pAEPreRes->ae_pre_res_rk.LinearExp.exp_real_params.analog_gain * 50;
+                iso = curExp->LinearExp.exp_real_params.analog_gain * 50;
                 LOGD_ADEBAYER("%s:NORMAL:iso=%d,again=%f\n", __FUNCTION__, iso,
-                              pAEPreRes->ae_pre_res_rk.LinearExp.exp_real_params.analog_gain);
+                              curExp->LinearExp.exp_real_params.analog_gain);
             } else if(RK_AIQ_HDR_GET_WORKING_MODE(pAdebayerProcParams->hdr_mode) == RK_AIQ_WORKING_MODE_ISP_HDR2) {
-                iso = pAEPreRes->ae_pre_res_rk.HdrExp[1].exp_real_params.analog_gain * 50;
+                iso = curExp->HdrExp[1].exp_real_params.analog_gain * 50;
                 LOGD_ADEBAYER("%s:HDR2:iso=%d,again=%f\n", __FUNCTION__, iso,
-                              pAEPreRes->ae_pre_res_rk.HdrExp[1].exp_real_params.analog_gain);
+                              curExp->HdrExp[1].exp_real_params.analog_gain);
             } else if(RK_AIQ_HDR_GET_WORKING_MODE(pAdebayerProcParams->hdr_mode) == RK_AIQ_WORKING_MODE_ISP_HDR3) {
-                iso = pAEPreRes->ae_pre_res_rk.HdrExp[2].exp_real_params.analog_gain * 50;
+                iso = curExp->HdrExp[2].exp_real_params.analog_gain * 50;
                 LOGD_ADEBAYER("%s:HDR3:iso=%d,again=%f\n", __FUNCTION__, iso,
-                              pAEPreRes->ae_pre_res_rk.HdrExp[2].exp_real_params.analog_gain);
+                              curExp->HdrExp[2].exp_real_params.analog_gain);
             }
         } else {
-            LOGE_ADEBAYER("%s: pAEPreRes is NULL, so use default instead \n", __FUNCTION__);
+            LOGE_ADEBAYER("%s: curExp is NULL, so use default instead \n", __FUNCTION__);
         }
 
-        AdebayerProcess(pAdebayerCtx, iso);
+        if (iso != pAdebayerCtx->iso) {
+            pAdebayerCtx->iso = iso;
+            pAdebayerCtx->config.updatecfg = true;
+        }
+
+        if (pAdebayerCtx->full_param.updated) {
+            pAdebayerCtx->config.updatecfg = true;
+            pAdebayerCtx->full_param.updated = false;
+        }
+
+        if (pAdebayerCtx->config.updatecfg)
+            AdebayerProcess(pAdebayerCtx, iso);
+
     }
 
     AdebayerGetProcResult(pAdebayerCtx, &pAdebayerProcResParams->debayerRes);

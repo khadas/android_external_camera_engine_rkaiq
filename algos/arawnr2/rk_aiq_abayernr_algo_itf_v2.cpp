@@ -38,7 +38,11 @@ create_context(RkAiqAlgoContext **context, const AlgoCtxInstanceCfg* cfg)
 
 #if 1
     Abayernr_Context_V2_t* pAbayernrCtx = NULL;
+#if (ABAYERNR_USE_JSON_FILE_V2)
+    Abayernr_result_t ret = Abayernr_Init_V2(&pAbayernrCtx, cfgInt->calibv2);
+#else
     Abayernr_result_t ret = Abayernr_Init_V2(&pAbayernrCtx, cfgInt->calib);
+#endif
     if(ret != ABAYERNR_RET_SUCCESS) {
         result = XCAM_RETURN_ERROR_FAILED;
         LOGE_ANR("%s: Initializaion ANR failed (%d)\n", __FUNCTION__, ret);
@@ -80,6 +84,21 @@ prepare(RkAiqAlgoCom* params)
 
     Abayernr_Context_V2_t* pAbayernrCtx = (Abayernr_Context_V2_t *)params->ctx;
     RkAiqAlgoConfigArawnrV2Int* pCfgParam = (RkAiqAlgoConfigArawnrV2Int*)params;
+    pAbayernrCtx->prepare_type = params->u.prepare.conf_type;
+
+    if(!!(params->u.prepare.conf_type & RK_AIQ_ALGO_CONFTYPE_UPDATECALIB )) {
+#if ABAYERNR_USE_JSON_FILE_V2
+        void *pCalibDbV2 = (void*)(pCfgParam->rk_com.u.prepare.calibv2);
+        CalibDbV2_BayerNrV2_t *bayernr_v2 = (CalibDbV2_BayerNrV2_t*)(CALIBDBV2_GET_MODULE_PTR((void*)pCalibDbV2, bayernr_v2));
+        pAbayernrCtx->bayernr_v2 = *bayernr_v2;
+#else
+        void *pCalibDb = (void*)(pCfgParam->rk_com.u.prepare.calib);
+        pAbayernrCtx->list_bayernr_v2 =
+            (struct list_head*)(CALIBDB_GET_MODULE_PTR((void*)pCalibDb, list_bayernr_v2));
+#endif
+        pAbayernrCtx->isIQParaUpdate = true;
+        pAbayernrCtx->isReCalculate |= 1;
+    }
 
     Abayernr_result_t ret = Abayernr_Prepare_V2(pAbayernrCtx, &pCfgParam->stArawnrConfig);
     if(ret != ABAYERNR_RET_SUCCESS) {
@@ -95,16 +114,22 @@ static XCamReturn
 pre_process(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outparams)
 {
     XCamReturn result = XCAM_RETURN_NO_ERROR;
+    bool oldGrayMode = false;
 
     LOGI_ANR("%s: (enter)\n", __FUNCTION__ );
     Abayernr_Context_V2_t* pAbayernrCtx = (Abayernr_Context_V2_t *)inparams->ctx;
-	
+
     RkAiqAlgoPreArawnrV2Int* pAbayernrPreParams = (RkAiqAlgoPreArawnrV2Int*)inparams;
 
+    oldGrayMode = pAbayernrCtx->isGrayMode;
     if (pAbayernrPreParams->rk_com.u.proc.gray_mode) {
         pAbayernrCtx->isGrayMode = true;
-    }else {
+    } else {
         pAbayernrCtx->isGrayMode = false;
+    }
+
+    if(oldGrayMode != pAbayernrCtx->isGrayMode) {
+        pAbayernrCtx->isReCalculate |= 1;
     }
 
     Abayernr_result_t ret = Abayernr_PreProcess_V2(pAbayernrCtx);
@@ -121,6 +146,7 @@ static XCamReturn
 processing(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outparams)
 {
     XCamReturn result = XCAM_RETURN_NO_ERROR;
+    int delta_iso = 0;
 
     LOGI_ANR("%s: (enter)\n", __FUNCTION__ );
 
@@ -153,25 +179,36 @@ processing(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outparams)
               || pAbayernrProcParams->hdr_mode == RK_AIQ_ISP_HDR_MODE_3_LINE_HDR ) {
         stExpInfo.hdr_mode = 2;
     }
-	stExpInfo.snr_mode = 0;
+    stExpInfo.snr_mode = 0;
 
-#if 1
-    RkAiqAlgoPreResAeInt* pAEPreRes =
-        (RkAiqAlgoPreResAeInt*)(pAbayernrProcParams->rk_com.u.proc.pre_res_comb->ae_pre_res);
+#if 1// TODO Merge:
+    XCamVideoBuffer* xCamAePreRes = pAbayernrProcParams->rk_com.u.proc.res_comb->ae_pre_res;
+    RkAiqAlgoPreResAeInt* pAEPreRes = nullptr;
+    if (xCamAePreRes) {
+        // xCamAePreRes->ref(xCamAePreRes);
+        pAEPreRes = (RkAiqAlgoPreResAeInt*)xCamAePreRes->map(xCamAePreRes);
+        if (!pAEPreRes) {
+            LOGE_ANR("ae pre result is null");
+        } else {
 
-    if(pAEPreRes != NULL) {
-	stExpInfo.snr_mode = pAEPreRes->ae_pre_res_rk.CISFeature.SNR;
+        }
+    }
+#endif
+
+    RKAiqAecExpInfo_t *curExp = pAbayernrProcParams->rk_com.u.proc.curExp;
+    if(curExp != NULL) {
+        stExpInfo.snr_mode = curExp->CISFeature.SNR;
         if(pAbayernrProcParams->hdr_mode == RK_AIQ_WORKING_MODE_NORMAL) {
             stExpInfo.hdr_mode = 0;
-            stExpInfo.arAGain[0] = pAEPreRes->ae_pre_res_rk.LinearExp.exp_real_params.analog_gain;
-            stExpInfo.arDGain[0] = pAEPreRes->ae_pre_res_rk.LinearExp.exp_real_params.digital_gain;
-            stExpInfo.arTime[0] = pAEPreRes->ae_pre_res_rk.LinearExp.exp_real_params.integration_time;
+            stExpInfo.arAGain[0] = curExp->LinearExp.exp_real_params.analog_gain;
+            stExpInfo.arDGain[0] = curExp->LinearExp.exp_real_params.digital_gain;
+            stExpInfo.arTime[0] = curExp->LinearExp.exp_real_params.integration_time;
             stExpInfo.arIso[0] = stExpInfo.arAGain[0] * stExpInfo.arDGain[0] * 50;
         } else {
             for(int i = 0; i < 3; i++) {
-                stExpInfo.arAGain[i] = pAEPreRes->ae_pre_res_rk.HdrExp[i].exp_real_params.analog_gain;
-                stExpInfo.arDGain[i] = pAEPreRes->ae_pre_res_rk.HdrExp[i].exp_real_params.digital_gain;
-                stExpInfo.arTime[i] = pAEPreRes->ae_pre_res_rk.HdrExp[i].exp_real_params.integration_time;
+                stExpInfo.arAGain[i] = curExp->HdrExp[i].exp_real_params.analog_gain;
+                stExpInfo.arDGain[i] = curExp->HdrExp[i].exp_real_params.digital_gain;
+                stExpInfo.arTime[i] = curExp->HdrExp[i].exp_real_params.integration_time;
                 stExpInfo.arIso[i] = stExpInfo.arAGain[i] * stExpInfo.arDGain[i] * 50;
 
                 LOGD_ANR("%s:%d index:%d again:%f dgain:%f time:%f iso:%d hdr_mode:%d\n",
@@ -185,8 +222,9 @@ processing(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outparams)
             }
         }
     } else {
-        LOGE_ANR("%s:%d pAEPreRes is NULL, so use default instead \n", __FUNCTION__, __LINE__);
+        LOGE_ANR("%s:%d curExp is NULL, so use default instead \n", __FUNCTION__, __LINE__);
     }
+
 
 #if 0
     static int anr_cnt = 0;
@@ -194,28 +232,41 @@ processing(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outparams)
 
     if(anr_cnt % 50 == 0) {
         for(int i = 0; i < stExpInfo.hdr_mode + 1; i++) {
-            printf("%s:%d index:%d again:%f dgain:%f time:%f iso:%d hdr_mode:%d\n",
+            printf("%s:%d index:%d again:%f dgain:%f time:%f iso:%d hdr_mode:%d snr_mode:%d\n",
                    __FUNCTION__, __LINE__,
                    i,
                    stExpInfo.arAGain[i],
                    stExpInfo.arDGain[i],
                    stExpInfo.arTime[i],
                    stExpInfo.arIso[i],
-                   stExpInfo.hdr_mode);
+                   stExpInfo.hdr_mode,
+                   stExpInfo.snr_mode);
         }
     }
 #endif
-
-
-#endif
-
-    Abayernr_result_t ret = Abayernr_Process_V2(pAbayernrCtx, &stExpInfo);
-    if(ret != ABAYERNR_RET_SUCCESS) {
-        result = XCAM_RETURN_ERROR_FAILED;
-        LOGE_ANR("%s: processing ANR failed (%d)\n", __FUNCTION__, ret);
+    delta_iso = abs(stExpInfo.arIso[stExpInfo.hdr_mode] - pAbayernrCtx->stExpInfo.arIso[stExpInfo.hdr_mode]);
+    if(delta_iso > ABAYERNRV2_RECALCULATE_DELTA_ISO) {
+        pAbayernrCtx->isReCalculate |= 1;
     }
 
-    Abayernr_GetProcResult_V2(pAbayernrCtx, &pAbayernrProcResParams->stArawnrProcResult);
+    if(pAbayernrCtx->isReCalculate) {
+        Abayernr_result_t ret = Abayernr_Process_V2(pAbayernrCtx, &stExpInfo);
+        if(ret != ABAYERNR_RET_SUCCESS) {
+            result = XCAM_RETURN_ERROR_FAILED;
+            LOGE_ANR("%s: processing ANR failed (%d)\n", __FUNCTION__, ret);
+        }
+
+        Abayernr_GetProcResult_V2(pAbayernrCtx, &pAbayernrProcResParams->stArawnrProcResult);
+
+        LOGD_ANR("recalculate: %d delta_iso:%d \n ", pAbayernrCtx->isReCalculate, delta_iso);
+
+        pAbayernrProcResParams->stArawnrProcResult.isNeedUpdate = true;
+    } else {
+        pAbayernrProcResParams->stArawnrProcResult.isNeedUpdate = false;
+    }
+
+    pAbayernrCtx->isReCalculate = 0;
+
 #endif
 
     LOGI_ANR("%s: (exit)\n", __FUNCTION__ );

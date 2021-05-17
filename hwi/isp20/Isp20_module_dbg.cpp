@@ -53,7 +53,7 @@ int g_bypass_ispp_params = 0;
 /* just apply the init params, and bypass the latter params */
 int g_apply_init_params_only = 0;
 /* mask bit refer to RkAiqAlgoType_t in rk_aiq_algo_des.h */
-int g_disable_algo_user_api_mask = 0x0;
+uint64_t g_disable_algo_user_api_mask = 0x0ULL;
 
 int get_rkaiq_runtime_dbg()
 {
@@ -125,7 +125,7 @@ void get_dbg_force_disable_mods_env()
 
     if (g_disable_modules_cfg_update & (1ULL << ALL_ISP_MODULES)) {
         for (int i = 0; i < ALL_ISP_MODULES; i++)
-            g_disable_isp_modules_cfg_update |= 1 << i;
+            g_disable_isp_modules_cfg_update |= 1ULL << i;
     } else {
         for (int i = 0; i < ALL_ISP_MODULES; i++) {
             if (g_disable_modules_cfg_update & (1ULL << i))

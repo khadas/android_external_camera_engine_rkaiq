@@ -26,6 +26,12 @@ Acnr_result_t cnr_fix_transfer_V1(RK_CNR_Params_V1_Select_t *pSelect, RK_CNR_Fix
 
 Acnr_result_t cnr_fix_printf_V1(RK_CNR_Fix_V1_t  * pFix);
 
+Acnr_result_t cnr_get_setting_by_name_json_V1(CalibDbV2_CNR_t *pCalibdbV2, char *name, int *tuning_idx);
+
+Acnr_result_t cnr_init_params_json_V1(RK_CNR_Params_V1_t *pParams, CalibDbV2_CNR_t *pCalibdbV2, int tuning_idx);
+
+Acnr_result_t cnr_config_setting_param_json_V1(RK_CNR_Params_V1_t *pParams, CalibDbV2_CNR_t *pCalibdbV2, char* param_mode, char * snr_name);
+
 
 
 RKAIQ_END_DECLARE

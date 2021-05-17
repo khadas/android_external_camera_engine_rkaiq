@@ -22,6 +22,14 @@
 
 typedef struct rk_aiq_sys_ctx_s rk_aiq_sys_ctx_t;
 
+typedef struct rk_aiq_gamma_attrib_s {
+    rk_aiq_gamma_op_mode_t mode;
+    Agamma_api_manual_t stManual;
+    CalibDb_Gamma_t stTool;
+    int Scene_mode;
+}  rk_aiq_gamma_attrib_t;
+
+
 RKAIQ_BEGIN_DECLARE
 
 XCamReturn

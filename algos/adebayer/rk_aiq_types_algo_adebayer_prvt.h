@@ -4,7 +4,10 @@
 #include "base/xcam_common.h"
 #include "rk_aiq_types_algo_adebayer_int.h"
 #include "RkAiqCalibDbTypes.h"
+#include "RkAiqCalibDbTypesV2.h"
+#include "RkAiqCalibDbV2Helper.h"
 #include "xcam_log.h"
+
 typedef enum AdebayerState_e {
     ADEBAYER_STATE_INVALID           = 0,
     ADEBAYER_STATE_INITIALIZED       = 1,
@@ -31,20 +34,23 @@ typedef struct AdebayerFullParam_s{
     unsigned char dist_scale;
     unsigned char cnr_strength;
     unsigned char shift_num;
+             bool updated;
 }AdebayerFullParam_t;
 
 typedef struct AdebayerContext_s{
     AdebayerConfig_t config;
     AdebayerState_t state;
     CamCalibDbContext_t* pCalibDb;
+    CamCalibDbV2Context_t *pCalibDbV2;
     AdebayerFullParam_t full_param;
+    int iso;
 }AdebayerContext_t;
 
 typedef struct _RkAiqAlgoContext {
     AdebayerContext_t adebayerCtx;
 } RkAiqAlgoContext;
 
-XCamReturn AdebayerInit(AdebayerContext_t *ppAdebayerCtx);
+XCamReturn AdebayerInit(AdebayerContext_t *ppAdebayerCtx, CamCalibDbContext_t *pCalibDb, CamCalibDbV2Context_t *pCalibDbV2);
 
 XCamReturn AdebayerRelease(AdebayerContext_t *pAdebayerCtx);
 

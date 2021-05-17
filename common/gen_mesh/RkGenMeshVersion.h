@@ -78,10 +78,44 @@
   * v2.0.3
   *  - date: 2020-10-10
   *  - FEC&LDCH: fix some small bugs
-  */
+  
+  * v2.0.4
+  *  - date: 2020-10-15
+  *  - FEC: change mesh border from (srcW-3, srcH-3) to (srcW-1, srcH-1)
 
-#define RK_GENMESH_VERSION_REAL_V "v2.0.3"
-#define RK_GENMESH_RELEASE_DATE "2020-10-10"
+  * v2.0.5
+  *  - date: 2020-10-28
+  *  - FEC: consider the case when the width and height of the output image are different from the input,
+			the naming rules of mesh table are specified as(using "meshxi, level=0, input=3840x2160, output=1920x1080, both x and y direction are corrected" as an example):
+			level000_1920x1080from3840x2160_both_correct_meshxi.bin
+
+  * v3.0.0
+  *  - date: 2020-11-10
+  *  - FEC: add an option: saveMaxFovX--flag of retaining maximum FOV in X direction(horizontal direction)
+			so there are 6 options when combined with correctX and correctY flags:
+			correctX	correctY	saveMaxFovX
+			   1			0		 (0 or 1)
+			   0			1		 (0 or 1)
+			   1			1		 (0 or 1)
+  *  - LDCH: add an option: saveMaxFovX
+			 users can choose whether to retain the max FOV in X direction or not.
+			 when saveMaxFovX=1, users choose to save max FOV in X direction and tolerate slight compression distortion in middle part.
+
+  * v3.0.1
+  *  - date: 2020-11-12
+  *  - FEC & LDCH: add a Macro definition "INV_POLY_COEFF_NUM" to define the coefficients' number of polynomial fitting
+  *  - FEC: the code was test in the case when the horizontal FOV is close to 180 degrees and the result is OK.
+
+  * v3.0.2
+  *  - date: 2020-11-27
+  *  - FEC: add an option: isFecOld--flag for different versions of FEC hardware
+			isFecOld = 1: for old FEC
+			isFecOld = 0: for new FEC
+
+*/
+
+#define RK_GENMESH_VERSION_REAL_V "v3.0.2"
+#define RK_GENMESH_RELEASE_DATE "2020-11-27"
 
   /******* DO NOT EDIT THE FOLLOWINGS *******/
 

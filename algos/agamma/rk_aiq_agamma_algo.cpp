@@ -22,16 +22,22 @@
 
 RKAIQ_BEGIN_DECLARE
 
-XCamReturn AgammaInit(AgammaHandle_t** para, CamCalibDbContext_t* calib)
+XCamReturn AgammaInit(AgammaHandle_t** para, CamCalibDbV2Context_t* calib)
 {
     LOG1_AGAMMA("ENTER: %s \n", __func__);
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
-    AgammaHandle_t* handle = (AgammaHandle_t*)malloc(sizeof(AgammaHandle_t));
+    AgammaHandle_t* handle = (AgammaHandle_t*)calloc(sizeof(AgammaHandle_t), 1);
     if (NULL == handle)
         return XCAM_RETURN_ERROR_MEM;
-    memset(handle, 0, sizeof(AgammaHandle_t));
-    memcpy(&handle->agammaAttr.stTool, &calib->gamma, sizeof(CalibDb_Gamma_t));
-    handle->pCalibDb = &calib->gamma; //get agmma paras from iq
+
+    CalibDbV2_gamma_t* calibv2_agamma_calib =
+        (CalibDbV2_gamma_t*)(CALIBDBV2_GET_MODULE_PTR(calib, agamma_calib));
+    if (!calibv2_agamma_calib) {
+        free(handle);
+        return XCAM_RETURN_ERROR_MEM;
+    }
+    memcpy(&handle->agammaAttr.stTool, calibv2_agamma_calib, sizeof(CalibDbV2_gamma_t));
+    handle->pCalibDb = calibv2_agamma_calib;
     *para = handle;
     LOG1_AGAMMA("EXIT: %s \n", __func__);
     return(ret);
@@ -64,31 +70,14 @@ void AgammaAutoProc(AgammaHandle_t* para)
 {
     LOG1_AGAMMA("ENTER: %s \n", __func__);
 
-    para->agamma_config.gamma_out_segnum = para->pCalibDb->gamma_out_segnum;
-    para->agamma_config.gamma_out_offset = para->pCalibDb->gamma_out_offset;
-    if(para->Scene_mode == GAMMA_OUT_NORMAL)
-        for(int i = 0; i < 45; i++)
-        {
-            int tmp = (int)(para->pCalibDb->curve_normal[i] + 0.5);
-            para->agamma_config.gamma_table[i] = tmp;
-        }
-    else if(para->Scene_mode == GAMMA_OUT_HDR)
-        for(int i = 0; i < 45; i++)
-        {
-            int tmp = (int)(para->pCalibDb->curve_hdr[i] + 0.5);
-            para->agamma_config.gamma_table[i] = tmp;
-        }
-    else if(para->Scene_mode == GAMMA_OUT_NIGHT)
-        for(int i = 0; i < 45; i++)
-        {
-            int tmp = (int)(para->pCalibDb->curve_night[i] + 0.5);
-            para->agamma_config.gamma_table[i] = tmp;
-        }
-    else
-        LOGE_AGAMMA(" %s: Wrong gamma scene !!!\n", __func__);
+    para->agamma_config.gamma_out_segnum = para->pCalibDb->GammaTuningPara.Gamma_out_segnum;
+    para->agamma_config.gamma_out_offset = para->pCalibDb->GammaTuningPara.Gamma_out_offset;
 
-    LOGD_AGAMMA(" %s: gamma_en:%d gamma_out_segnum:%d gamma_out_offset:%d\n", __func__, para->agamma_config.gamma_en, para->agamma_config.gamma_out_segnum
-                , para->agamma_config.gamma_out_offset);
+    for(int i = 0; i < 45; i++)
+    {
+        int tmp = para->pCalibDb->GammaTuningPara.Gamma_curve[i];
+        para->agamma_config.gamma_table[i] = tmp;
+    }
 
     LOG1_AGAMMA("EXIT: %s \n", __func__);
 }
@@ -170,9 +159,6 @@ void AgammaApiManualProc(AgammaHandle_t* para)
     else
         LOGE_AGAMMA(" %s: Wrong gamma api manual CurveType!!!\n", __func__);
 
-    LOGD_AGAMMA(" %s: gamma_en:%d gamma_out_segnum:%d gamma_out_offset:%d\n", __func__, para->agamma_config.gamma_en, para->agamma_config.gamma_out_segnum
-                , para->agamma_config.gamma_out_offset);
-
     LOG1_AGAMMA("EXIT: %s \n", __func__);
 }
 
@@ -182,29 +168,13 @@ void AgammaApiToolProc(AgammaHandle_t* para)
 
     LOGD_AGAMMA(" %s: Agamma api tool !!!\n", __func__);
 
-    para->agamma_config.gamma_en = para->agammaAttr.stTool.gamma_en != 0 ? true : false;
-    para->agamma_config.gamma_out_segnum = para->agammaAttr.stTool.gamma_out_segnum;
-    para->agamma_config.gamma_out_offset = para->agammaAttr.stTool.gamma_out_offset;
-    if(para->Scene_mode == GAMMA_OUT_NORMAL)
-        for(int i = 0; i < 45; i++) {
-            int tmp = (int)(para->agammaAttr.stTool.curve_normal[i] + 0.5);
-            para->agamma_config.gamma_table[i] = tmp;
-        }
-    else if(para->Scene_mode == GAMMA_OUT_HDR)
-        for(int i = 0; i < 45; i++) {
-            int tmp = (int)(para->agammaAttr.stTool.curve_hdr[i] + 0.5);
-            para->agamma_config.gamma_table[i] = tmp;
-        }
-    else if(para->Scene_mode == GAMMA_OUT_NIGHT)
-        for(int i = 0; i < 45; i++) {
-            int tmp = (int)(para->agammaAttr.stTool.curve_night[i] + 0.5);
-            para->agamma_config.gamma_table[i] = tmp;
-        }
-    else
-        LOGE_AGAMMA(" %s: Wrong gamma scene !!!\n", __func__);
-
-    LOGD_AGAMMA(" %s: gamma_en:%d gamma_out_segnum:%d gamma_out_offset:%d\n", __func__, para->agamma_config.gamma_en, para->agamma_config.gamma_out_segnum
-                , para->agamma_config.gamma_out_offset);
+    para->agamma_config.gamma_en = para->agammaAttr.stTool.GammaTuningPara.Gamma_en;
+    para->agamma_config.gamma_out_segnum = para->agammaAttr.stTool.GammaTuningPara.Gamma_out_segnum;
+    para->agamma_config.gamma_out_offset = para->agammaAttr.stTool.GammaTuningPara.Gamma_out_offset;
+    for(int i = 0; i < 45; i++) {
+        int tmp = para->agammaAttr.stTool.GammaTuningPara.Gamma_curve[i];
+        para->agamma_config.gamma_table[i] = tmp;
+    }
 
     LOG1_AGAMMA("EXIT: %s \n", __func__);
 }
@@ -216,7 +186,7 @@ void AgammaProcessing(AgammaHandle_t* para)
     if(para->agammaAttr.mode == RK_AIQ_GAMMA_MODE_OFF)//run iq gamma
     {
         LOGD_AGAMMA(" %s: Agamma api off !!!\n", __func__);
-        para->agamma_config.gamma_en = para->pCalibDb->gamma_en != 0 ? true : false;
+        para->agamma_config.gamma_en = para->pCalibDb->GammaTuningPara.Gamma_en;
         AgammaAutoProc(para);
     }
     else if(para->agammaAttr.mode == RK_AIQ_GAMMA_MODE_MANUAL)//run manual gamma, for client api
@@ -226,7 +196,8 @@ void AgammaProcessing(AgammaHandle_t* para)
     else
         LOGE_AGAMMA(" %s: Wrong gamma mode !!!\n", __func__);
 
-    para->agammaAttr.Scene_mode = para->Scene_mode;
+    LOGD_AGAMMA(" %s: gamma_en:%d gamma_out_segnum:%d gamma_out_offset:%d\n", __func__, para->agamma_config.gamma_en, para->agamma_config.gamma_out_segnum
+                , para->agamma_config.gamma_out_offset);
 
     LOG1_AGAMMA("EXIT: %s \n", __func__);
 }

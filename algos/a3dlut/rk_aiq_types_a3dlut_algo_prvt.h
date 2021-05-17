@@ -24,17 +24,41 @@
 #include "a3dlut/rk_aiq_types_a3dlut_algo_int.h"
 #include "xcam_log.h"
 #include "xcam_common.h"
+#include "RkAiqCalibDbTypesV2.h"
+#include "list.h"
+
+
 
 RKAIQ_BEGIN_DECLARE
 
+typedef struct alut3d_rest_info_s {
+    float alpha;
+    List dominateIdxList;//to record domain lutIdx
+    int dominateIdx;
+    const CalibDbV2_Lut3D_LutPara_t *pLutProfile;
+    CalibDbV2_Lut3D_Table_Para_t undampedLut;
+    CalibDbV2_Lut3D_Table_Para_t dampedLut;
+} alut3d_rest_info_t;
+
+typedef struct idx_node_s {
+    void*        p_next;       /**< for adding to a list */
+    unsigned int value;
+} idx_node_t;
 
 typedef struct alut3d_context_s {
     const CalibDb_Lut3d_t *calib_lut3d;
+    const CalibDbV2_Lut3D_Para_V2_t  *calibV2_lut3d;
     rk_aiq_lut3d_cfg_t lut3d_hw_conf;
+    // info
+    alut3d_rest_info_t restinfo;
+    alut3d_sw_info_t swinfo;
     //ctrl & api
     rk_aiq_lut3d_attrib_t mCurAtt;
     rk_aiq_lut3d_attrib_t mNewAtt;
     bool updateAtt;
+    bool update;
+    bool calib_update;
+    int prepare_type;
 } alut3d_context_t ;
 
 typedef alut3d_context_t* alut3d_handle_t ;

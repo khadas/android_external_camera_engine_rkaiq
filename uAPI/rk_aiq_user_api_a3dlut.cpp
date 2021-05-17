@@ -27,7 +27,9 @@ RKAIQ_BEGIN_DECLARE
 XCamReturn
 rk_aiq_user_api_a3dlut_SetAttrib(const rk_aiq_sys_ctx_t* sys_ctx, rk_aiq_lut3d_attrib_t attr)
 {
+    CHECK_USER_API_ENABLE2(sys_ctx);
     CHECK_USER_API_ENABLE(RK_AIQ_ALGO_TYPE_A3DLUT);
+    RKAIQ_API_SMART_LOCK(sys_ctx);
     RkAiqA3dlutHandleInt* algo_handle =
         algoHandle<RkAiqA3dlutHandleInt>(sys_ctx, RK_AIQ_ALGO_TYPE_A3DLUT);
 
@@ -41,6 +43,7 @@ rk_aiq_user_api_a3dlut_SetAttrib(const rk_aiq_sys_ctx_t* sys_ctx, rk_aiq_lut3d_a
 XCamReturn
 rk_aiq_user_api_a3dlut_GetAttrib(const rk_aiq_sys_ctx_t* sys_ctx, rk_aiq_lut3d_attrib_t *attr)
 {
+    RKAIQ_API_SMART_LOCK(sys_ctx);
     RkAiqA3dlutHandleInt* algo_handle =
         algoHandle<RkAiqA3dlutHandleInt>(sys_ctx, RK_AIQ_ALGO_TYPE_A3DLUT);
 
@@ -54,6 +57,7 @@ rk_aiq_user_api_a3dlut_GetAttrib(const rk_aiq_sys_ctx_t* sys_ctx, rk_aiq_lut3d_a
 XCamReturn
 rk_aiq_user_api_a3dlut_Query3dlutInfo(const rk_aiq_sys_ctx_t* sys_ctx, rk_aiq_lut3d_querry_info_t *lut3d_querry_info)
 {
+    RKAIQ_API_SMART_LOCK(sys_ctx);
     RkAiqA3dlutHandleInt* algo_handle =
         algoHandle<RkAiqA3dlutHandleInt>(sys_ctx, RK_AIQ_ALGO_TYPE_A3DLUT);
 

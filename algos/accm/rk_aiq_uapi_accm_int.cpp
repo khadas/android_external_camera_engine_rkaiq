@@ -9,7 +9,6 @@ rk_aiq_uapi_accm_SetAttrib(RkAiqAlgoContext *ctx,
     accm_context_t* ccm_contex = (accm_context_t*)ctx->accm_para;
     ccm_contex->mNewAtt = attr;
     ccm_contex->updateAtt = true;
-
     return XCAM_RETURN_NO_ERROR;
 }
 
@@ -38,6 +37,14 @@ rk_aiq_uapi_accm_QueryCcmInfo(const RkAiqAlgoContext *ctx,
     ccm_querry_info->bound_bit = ccm_contex->ccmHwConf.bound_bit;
     ccm_querry_info->color_inhibition_level = ccm_contex->accmRest.color_inhibition_level;
     ccm_querry_info->color_saturation_level = ccm_contex->accmRest.color_saturation_level;
+    ccm_querry_info->finalSat = ccm_contex->accmRest.fSaturation;
+    strcpy(ccm_querry_info->illumination, ccm_contex->accmRest.pCcmProfile1->illumination);
+    strcpy(ccm_querry_info->ccmname1, ccm_contex->accmRest.pCcmProfile1->name);
+    if (ccm_contex->accmRest.pCcmProfile2)
+        strcpy(ccm_querry_info->ccmname2, ccm_contex->accmRest.pCcmProfile2->name);
+    else
+        strcpy(ccm_querry_info->ccmname2, ccm_contex->accmRest.pCcmProfile1->name);
+
     return XCAM_RETURN_NO_ERROR;
 }
 

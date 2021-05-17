@@ -21,11 +21,8 @@
 #define _RK_AIQ_TYPE_AGAMMA_ALGO_INT_H_
 #include "agamma/rk_aiq_types_agamma_algo.h"
 #include "RkAiqCalibDbTypes.h"
+#include "RkAiqCalibDbTypesV2.h"
 
-
-
-
-RKAIQ_BEGIN_DECLARE
 
 typedef enum rk_gamma_curve_type_s {
     RK_GAMMA_CURVE_TYPE_DEFUALT                     = 0,        /**< USE IQ GAMMA CURVE */
@@ -83,8 +80,7 @@ typedef struct rk_aiq_gamma_cfg_s {
 typedef struct rk_aiq_gamma_attr_s {
     rk_aiq_gamma_op_mode_t mode;
     Agamma_api_manual_t stManual;
-    CalibDb_Gamma_t stTool;
-    int Scene_mode;
+    CalibDbV2_gamma_t stTool;
 }  rk_aiq_gamma_attr_t;
 
 typedef struct AgammaProcRes_s {
@@ -93,9 +89,6 @@ typedef struct AgammaProcRes_s {
     int offset;
     int gamma_y[45];
 }  AgammaProcRes_t;
-
-
-RKAIQ_END_DECLARE
 
 #endif
 
