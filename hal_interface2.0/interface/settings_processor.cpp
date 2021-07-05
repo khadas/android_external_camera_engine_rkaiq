@@ -490,7 +490,9 @@ SettingsProcessor::fillAwbInputParams(const CameraMetadata *settings,
     }
 
     awbCfg->is_ccm_valid = false;
-    if (awbCtrl->awbMode == ANDROID_CONTROL_AWB_MODE_OFF) {
+    if (awbCtrl->awbMode == ANDROID_CONTROL_AWB_MODE_OFF &&
+        awbCtrl->colorCorrectionMode ==
+            ANDROID_COLOR_CORRECTION_MODE_TRANSFORM_MATRIX) {
         //# METADATA_Control colorCorrection.transform done
         entry = settings->find(ANDROID_COLOR_CORRECTION_TRANSFORM);
         if (entry.count == 9) {

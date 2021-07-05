@@ -726,10 +726,10 @@ AiqCameraHalAdapter::updateAwbMetaParams(XCamAwbParam *awbParams){
             }
 
             //Not used now, for it resume 60ms in this callback
-    //        ret = rk_aiq_user_api_accm_SetAttrib(_aiq_ctx, setCcm);
-    //        if (ret) {
-    //            LOGE("%s(%d) accm SetAttrib failed!\n", __FUNCTION__, __LINE__);
-    //        }
+            ret = rk_aiq_user_api_accm_SetAttrib(_aiq_ctx, setCcm);
+            if (ret) {
+                LOGE("%s(%d) accm SetAttrib failed!\n", __FUNCTION__, __LINE__);
+            }
             ret = rk_aiq_user_api_awb_SetAttrib(_aiq_ctx, stAwbttr);
             if (ret) {
                 LOGE("%s(%d) Awb SetAttrib failed!\n", __FUNCTION__, __LINE__);
@@ -876,7 +876,7 @@ AiqCameraHalAdapter::processResults(){
         rk_aiq_awb_results awb_results;
         ret = getAwbResults(awb_results);
         /*set awb converged with ae, for cts test */
-        awb_results.converged = ae_results.converged;
+        //awb_results.converged = ae_results.converged;
         if (ret) {
             LOGE("%s(%d) getAwbResults failed, awb meta is invalid!\n", __FUNCTION__, __LINE__);
         } else {
@@ -985,7 +985,7 @@ AiqCameraHalAdapter::getAeResults(rk_aiq_ae_results &ae_results)
     ae_results.sensor_exposure.line_length_pixels = gtExpResInfo.CurExpInfo.line_length_pixels;
     ae_results.converged = gtExpResInfo.IsConverged;
     ae_results.meanluma = gtExpResInfo.MeanLuma;
-    ae_results.converged = 1;
+    //ae_results.converged = 1;
 
     LOGD("@%s ae_results.converged:%d",__FUNCTION__, ae_results.converged);
     return ret;
@@ -1267,21 +1267,20 @@ AiqCameraHalAdapter::processAwbMetaResults(rk_aiq_awb_results &awb_result, Camer
     /*
      * store the results in row major order
      */
-    if (mAwbState->getState() != ANDROID_CONTROL_AWB_STATE_LOCKED) {
-        camera_metadata_rational_t transformMatrix[9];
+    if ((mAwbState->getState() != ANDROID_CONTROL_AWB_STATE_LOCKED &&
+         inputParams->awbInputParams.awbParams.mode == XCAM_AWB_MODE_AUTO) ||
+        inputParams->awbInputParams.awbParams.mode == XCAM_AWB_MODE_MANUAL) {
         const int32_t COLOR_TRANSFORM_PRECISION = 10000;
         for (int i = 0; i < 9; i++) {
-            transformMatrix[i].numerator =
+            _transformMatrix[i].numerator =
                 (int32_t)(awb_result.ctk_config.ctk_matrix.coeff[i] * COLOR_TRANSFORM_PRECISION);
-            transformMatrix[i].denominator = COLOR_TRANSFORM_PRECISION;
+            _transformMatrix[i].denominator = COLOR_TRANSFORM_PRECISION;
         }
         metadata->update(ANDROID_COLOR_CORRECTION_TRANSFORM,
-                         transformMatrix, 9);
+                         _transformMatrix, 9);
     } else {
-        entry = inputParams->settings.find(ANDROID_COLOR_CORRECTION_TRANSFORM);
-        if (entry.count == 9) {
-            metadata->update(ANDROID_COLOR_CORRECTION_TRANSFORM, entry.data.r, entry.count);
-        }
+        metadata->update(ANDROID_COLOR_CORRECTION_TRANSFORM,
+                         _transformMatrix, 9);
     }
     return ret;
 }

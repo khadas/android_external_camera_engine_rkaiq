@@ -192,6 +192,7 @@ public:
     rk_aiq_sys_ctx_t* _aiq_ctx;
     static CameraMetadata staticMeta;
     pthread_mutex_t _aiq_ctx_mutex;
+    camera_metadata_rational_t _transformMatrix[9];
 
 public:
     explicit AiqCameraHalAdapter(SmartPtr<RkAiqManager> _rkAiqManager,SmartPtr<RkAiqCore> _analyzer,SmartPtr<ICamHw> _camHw);
