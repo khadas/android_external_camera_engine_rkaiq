@@ -628,6 +628,7 @@ XCamReturn rk_aiq_uapi2_setDhzMode(const rk_aiq_sys_ctx_t* ctx, opMode_t mode)
 {
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
     adehaze_sw_V2_t attr;
+    memset(&attr, 0, sizeof(attr));
     IMGPROC_FUNC_ENTER
     if (ctx == NULL) {
         ret = XCAM_RETURN_ERROR_PARAM;
@@ -665,6 +666,7 @@ XCamReturn rk_aiq_uapi2_getDhzMode(const rk_aiq_sys_ctx_t* ctx, opMode_t *mode)
 {
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
     adehaze_sw_V2_t attr;
+    memset(&attr, 0, sizeof(attr));
     IMGPROC_FUNC_ENTER
     if (ctx == NULL) {
         ret = XCAM_RETURN_ERROR_PARAM;
@@ -708,6 +710,7 @@ XCamReturn rk_aiq_uapi2_setMDhzStrth(const rk_aiq_sys_ctx_t* ctx, unsigned int l
 {
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
     adehaze_sw_V2_t attr;
+    memset(&attr, 0, sizeof(attr));
     IMGPROC_FUNC_ENTER
 
     if (ctx == NULL) {
@@ -735,6 +738,7 @@ XCamReturn rk_aiq_uapi2_getMDhzStrth(const rk_aiq_sys_ctx_t* ctx, unsigned int *
 {
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
     adehaze_sw_V2_t attr;
+    memset(&attr, 0, sizeof(attr));
     IMGPROC_FUNC_ENTER
     if (ctx == NULL) {
         ret = XCAM_RETURN_ERROR_PARAM;
@@ -766,7 +770,7 @@ XCamReturn rk_aiq_uapi2_enableDhz(const rk_aiq_sys_ctx_t* ctx)
 {
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
     adehaze_sw_V2_t attr;
-
+    memset(&attr, 0, sizeof(attr));
     IMGPROC_FUNC_ENTER
     if (ctx == NULL) {
         ret = XCAM_RETURN_ERROR_PARAM;
@@ -782,7 +786,7 @@ XCamReturn rk_aiq_uapi2_disableDhz(const rk_aiq_sys_ctx_t* ctx)
 {
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
     adehaze_sw_V2_t attr;
-
+    memset(&attr, 0, sizeof(attr));
     IMGPROC_FUNC_ENTER
     if (ctx == NULL) {
         ret = XCAM_RETURN_ERROR_PARAM;
@@ -816,6 +820,7 @@ XCamReturn rk_aiq_uapi2_setDrcCompress(const rk_aiq_sys_ctx_t* ctx, mDrcCompress
     }
     else if(CHECK_ISP_HW_V21()) {
         drc_attrib_t attr;
+        memset(&attr, 0, sizeof(attr));
         IMGPROC_FUNC_ENTER
 
         if (ctx == NULL) {
@@ -1309,6 +1314,7 @@ XCamReturn rk_aiq_uapi2_getHDRMergeMode(const rk_aiq_sys_ctx_t* ctx, opMode_t *m
 
     if(CHECK_ISP_HW_V20()) {
         amerge_attrib_t attr;
+        memset(&attr, 0, sizeof(attr));
         IMGPROC_FUNC_ENTER
         if (ctx == NULL) {
             ret = XCAM_RETURN_ERROR_PARAM;
@@ -1341,6 +1347,7 @@ XCamReturn rk_aiq_uapi2_setHDRTmoMode(const rk_aiq_sys_ctx_t* ctx, opMode_t mode
 
     if(CHECK_ISP_HW_V20()) {
         atmo_attrib_t attr;
+        memset(&attr, 0, sizeof(attr));
         IMGPROC_FUNC_ENTER
         if (ctx == NULL) {
             ret = XCAM_RETURN_ERROR_PARAM;
@@ -1378,6 +1385,7 @@ XCamReturn rk_aiq_uapi2_getHDRTmoMode(const rk_aiq_sys_ctx_t* ctx, opMode_t *mod
 
     if(CHECK_ISP_HW_V20()) {
         atmo_attrib_t attr;
+        memset(&attr, 0, sizeof(attr));
         IMGPROC_FUNC_ENTER
         if (ctx == NULL) {
             ret = XCAM_RETURN_ERROR_PARAM;
@@ -1420,6 +1428,7 @@ XCamReturn rk_aiq_uapi2_setMHDRStrth(const rk_aiq_sys_ctx_t* ctx, bool on, unsig
 
     if(CHECK_ISP_HW_V20()) {
         atmo_attrib_t attr;
+        memset(&attr, 0, sizeof(attr));
         IMGPROC_FUNC_ENTER
         if (ctx == NULL) {
             ret = XCAM_RETURN_ERROR_PARAM;
@@ -1456,6 +1465,7 @@ XCamReturn rk_aiq_uapi2_getMHDRStrth(const rk_aiq_sys_ctx_t* ctx, bool * on, uns
 
     if(CHECK_ISP_HW_V20()) {
         atmo_attrib_t attr;
+        memset(&attr, 0, sizeof(attr));
         IMGPROC_FUNC_ENTER
         if (ctx == NULL) {
             ret = XCAM_RETURN_ERROR_PARAM;
@@ -1945,9 +1955,9 @@ XCamReturn rk_aiq_uapi2_getMWBScene(const rk_aiq_sys_ctx_t* ctx, rk_aiq_wb_scene
     //attr.mode = RK_AIQ_WB_MODE_MANUAL;
     ret = rk_aiq_user_api2_awb_GetMwbAttrib(ctx, &attr);
     RKAIQ_IMGPROC_CHECK_RET(ret, "getMWBScene failed!");
-    if(attr.mode == RK_AIQ_MWB_MODE_SCENE){
+    if(attr.mode == RK_AIQ_MWB_MODE_SCENE) {
         *scene = attr.para.scene;
-    }else{
+    } else {
         LOGE("get manual wb scene failed, since current manual mode is not RK_AIQ_MWB_MODE_SCENE ");
     }
     IMGPROC_FUNC_EXIT
@@ -2495,11 +2505,11 @@ XCamReturn rk_aiq_uapi2_setCCMMode(const rk_aiq_sys_ctx_t* ctx, opMode_t mode)
         ret = rk_aiq_user_api2_accm_QueryCcmInfo(ctx, &ccm_querry_info);
         RKAIQ_IMGPROC_CHECK_RET(ret, "setCCMMode failed in query info!");
         attr.mode = RK_AIQ_CCM_MODE_MANUAL;
-        for (int i =0; i<9; i++)
+        for (int i = 0; i < 9; i++)
             attr.stManual.matrix[i] = ccm_querry_info.matrix[i];
-        for (int i = 0; i<3; i++)
+        for (int i = 0; i < 3; i++)
             attr.stManual.offs[i] = ccm_querry_info.offs[i];
-        memcpy(attr.stManual.alp_y, ccm_querry_info.alp_y, sizeof(float)*17);
+        memcpy(attr.stManual.alp_y, ccm_querry_info.alp_y, sizeof(float) * 17);
         attr.stManual.bound_bit = ccm_querry_info.bound_bit;
     } else {
         ret = XCAM_RETURN_ERROR_PARAM;
@@ -2554,8 +2564,8 @@ XCamReturn rk_aiq_uapi2_setMCcCoef(const rk_aiq_sys_ctx_t* ctx,  rk_aiq_ccm_matr
     ret = rk_aiq_user_api2_accm_GetAttrib(ctx, &attr);
     RKAIQ_IMGPROC_CHECK_RET(ret, "get CCM Manual Matrix failed!");
     attr.mode = RK_AIQ_CCM_MODE_MANUAL;
-    memcpy(attr.stManual.matrix, mccm->matrix, sizeof(float)*9);
-    memcpy(attr.stManual.offs, mccm->offs, sizeof(float)*3);
+    memcpy(attr.stManual.matrix, mccm->matrix, sizeof(float) * 9);
+    memcpy(attr.stManual.offs, mccm->offs, sizeof(float) * 3);
     ret = rk_aiq_user_api2_accm_SetAttrib(ctx, attr);
     RKAIQ_IMGPROC_CHECK_RET(ret, "set CCM Manual Matrix failed!");
     IMGPROC_FUNC_EXIT
@@ -2574,9 +2584,9 @@ XCamReturn rk_aiq_uapi2_getMCcCoef(const rk_aiq_sys_ctx_t* ctx,  rk_aiq_ccm_matr
 
     ret = rk_aiq_user_api2_accm_QueryCcmInfo(ctx, &ccm_querry_info);
     RKAIQ_IMGPROC_CHECK_RET(ret, "get CCM Matrix failed!");
-    for (int i =0; i<9; i++)
+    for (int i = 0; i < 9; i++)
         mccm->matrix[i] = ccm_querry_info.matrix[i];
-    for (int i = 0; i<3; i++)
+    for (int i = 0; i < 3; i++)
         mccm->offs[i] = ccm_querry_info.offs[i];
     IMGPROC_FUNC_EXIT
     return ret;
@@ -2699,9 +2709,9 @@ XCamReturn rk_aiq_uapi2_setLut3dMode(const rk_aiq_sys_ctx_t* ctx, opMode_t mode)
         ret = rk_aiq_user_api2_a3dlut_Query3dlutInfo(ctx, &lut3d_querry_info);
         RKAIQ_IMGPROC_CHECK_RET(ret, "set 3DLUT Mode failed in query info!");
         attr.mode = RK_AIQ_LUT3D_MODE_MANUAL;
-        memcpy(attr.stManual.look_up_table_r, lut3d_querry_info.look_up_table_r, sizeof(unsigned short)*729);
-        memcpy(attr.stManual.look_up_table_g, lut3d_querry_info.look_up_table_g, sizeof(unsigned short)*729);
-        memcpy(attr.stManual.look_up_table_b, lut3d_querry_info.look_up_table_b, sizeof(unsigned short)*729);
+        memcpy(attr.stManual.look_up_table_r, lut3d_querry_info.look_up_table_r, sizeof(unsigned short) * 729);
+        memcpy(attr.stManual.look_up_table_g, lut3d_querry_info.look_up_table_g, sizeof(unsigned short) * 729);
+        memcpy(attr.stManual.look_up_table_b, lut3d_querry_info.look_up_table_b, sizeof(unsigned short) * 729);
     } else {
         ret = XCAM_RETURN_ERROR_PARAM;
         RKAIQ_IMGPROC_CHECK_RET(ret, "Not supported mode!");
@@ -2757,9 +2767,9 @@ XCamReturn rk_aiq_uapi2_setM3dLut(const rk_aiq_sys_ctx_t* ctx,  rk_aiq_lut3d_tab
     ret = rk_aiq_user_api2_a3dlut_GetAttrib(ctx, &attr);
     RKAIQ_IMGPROC_CHECK_RET(ret, "get manual 3d Look-up-table failed!");
     attr.mode = RK_AIQ_LUT3D_MODE_MANUAL;
-    memcpy(attr.stManual.look_up_table_r, mlut->look_up_table_r, sizeof(unsigned short)*729);
-    memcpy(attr.stManual.look_up_table_g, mlut->look_up_table_g, sizeof(unsigned short)*729);
-    memcpy(attr.stManual.look_up_table_b, mlut->look_up_table_b, sizeof(unsigned short)*729);
+    memcpy(attr.stManual.look_up_table_r, mlut->look_up_table_r, sizeof(unsigned short) * 729);
+    memcpy(attr.stManual.look_up_table_g, mlut->look_up_table_g, sizeof(unsigned short) * 729);
+    memcpy(attr.stManual.look_up_table_b, mlut->look_up_table_b, sizeof(unsigned short) * 729);
     ret = rk_aiq_user_api2_a3dlut_SetAttrib(ctx, attr);
     RKAIQ_IMGPROC_CHECK_RET(ret, "set manual 3d Look-up-table failed!");
     IMGPROC_FUNC_EXIT
@@ -2779,9 +2789,9 @@ XCamReturn rk_aiq_uapi2_getM3dLut(const rk_aiq_sys_ctx_t* ctx,  rk_aiq_lut3d_tab
     ret = rk_aiq_user_api2_a3dlut_Query3dlutInfo(ctx, &lut3d_querry_info);
     RKAIQ_IMGPROC_CHECK_RET(ret, "get 3d Look-up-table failed!");
 
-    memcpy(mlut->look_up_table_r, lut3d_querry_info.look_up_table_r, sizeof(unsigned short)*729);
-    memcpy(mlut->look_up_table_g, lut3d_querry_info.look_up_table_g, sizeof(unsigned short)*729);
-    memcpy(mlut->look_up_table_b, lut3d_querry_info.look_up_table_b, sizeof(unsigned short)*729);
+    memcpy(mlut->look_up_table_r, lut3d_querry_info.look_up_table_r, sizeof(unsigned short) * 729);
+    memcpy(mlut->look_up_table_g, lut3d_querry_info.look_up_table_g, sizeof(unsigned short) * 729);
+    memcpy(mlut->look_up_table_b, lut3d_querry_info.look_up_table_b, sizeof(unsigned short) * 729);
 
     IMGPROC_FUNC_EXIT
     return ret;

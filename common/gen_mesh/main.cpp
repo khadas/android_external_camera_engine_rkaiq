@@ -357,6 +357,7 @@ void test2()
 	/* 生成LDCH映射表相关的参数 */
 	LdchParams ldchParams;
 	ldchParams.saveMaxFovX = 1;						/* 保留水平x方向最大FOV: 1代表保留, 0代表不保留 */
+	ldchParams.isLdchOld = 1;						/* 是否旧版LDCH: 1代表是，0代表不是 */
 	ldchParams.saveMeshX = 0;						/* 是否保存MeshX.bin文件: 1代表保存, 0代表不保存 */
 	sprintf(ldchParams.meshPath, "../data_out/");	/* 保存MeshX.bin文件的路径 */
 

@@ -363,7 +363,7 @@ public:
     XCamReturn setCalib(const CamCalibDbV2Context_t* aiqCalib);
     XCamReturn events_analyze(const SmartPtr<ispHwEvt_t> &evts);
     XCamReturn calibTuning(const CamCalibDbV2Context_t* aiqCalib,
-                           AlgoList& change_list);
+                           ModuleNameList& change_list);
     XCamReturn setMemsSensorIntf(const rk_aiq_mems_sensor_intf_t* intf);
     const rk_aiq_mems_sensor_intf_t* getMemsSensorIntf();
     XCamReturn set_sp_resolution(int &width, int &height, int &aligned_w, int &aligned_h);

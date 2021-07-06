@@ -470,9 +470,11 @@ CamHwIsp21::setIspConfig()
     SmartPtr<V4l2Buffer> v4l2buf;
     uint32_t frameId = -1;
 
-    while (_effecting_ispparam_map.size() > 4)
-        _effecting_ispparam_map.erase(_effecting_ispparam_map.begin());
-
+    {
+        SmartLock locker (_isp_params_cfg_mutex);
+        while (_effecting_ispparam_map.size() > 4)
+            _effecting_ispparam_map.erase(_effecting_ispparam_map.begin());
+    }
     if (mIspParamsDev.ptr()) {
         ret = mIspParamsDev->get_buffer(v4l2buf);
         if (ret) {
@@ -525,9 +527,14 @@ CamHwIsp21::setIspConfig()
         SmartPtr<RkAiqIspAwbParamsProxyV21> awbParams;
         if (awb_res.ptr()) {
             awbParams = awb_res.dynamic_cast_ptr<RkAiqIspAwbParamsProxyV21>();
-            _effecting_ispparam_map[frameId].awb_cfg_v201 = awbParams->data()->result;
+            {
+                SmartLock locker (_isp_params_cfg_mutex);
+                _effecting_ispparam_map[frameId].awb_cfg_v201 = awbParams->data()->result;
+
+            }
         } else {
             /* use the latest */
+            SmartLock locker (_isp_params_cfg_mutex);
             if (!_effecting_ispparam_map.empty()) {
                 _effecting_ispparam_map[frameId].awb_cfg_v201 = (_effecting_ispparam_map.rbegin())->second.awb_cfg_v201;
                 LOGW_CAMHW_SUBM(ISP20HW_SUBM, "use frame %d awb params for frame %d !\n",
@@ -561,10 +568,13 @@ CamHwIsp21::setIspConfig()
     module_cfg_update_partial = _full_active_isp21_params.module_cfg_update;
 #endif
 
-    if (frameId < 0) {
-        _effecting_ispparam_map[0].isp_params_v21 = _full_active_isp21_params;
-    } else {
-        _effecting_ispparam_map[frameId].isp_params_v21 = _full_active_isp21_params;
+    {
+        SmartLock locker (_isp_params_cfg_mutex);
+        if (frameId < 0) {
+            _effecting_ispparam_map[0].isp_params_v21 = _full_active_isp21_params;
+        } else {
+            _effecting_ispparam_map[frameId].isp_params_v21 = _full_active_isp21_params;
+        }
     }
 
     if (v4l2buf.ptr()) {

@@ -1168,7 +1168,7 @@ CamCalibDbV2Context_t* RkAiqManager::getCurrentCalibDBV2()
 }
 
 XCamReturn RkAiqManager::calibTuning(const CamCalibDbV2Context_t* aiqCalib,
-                                     AlgoList& change_list)
+                                     ModuleNameList& change_list)
 {
   if (!aiqCalib) {
     return XCAM_RETURN_ERROR_PARAM;

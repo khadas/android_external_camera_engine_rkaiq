@@ -4611,10 +4611,11 @@ CamHwIsp20::setIspConfig()
 
     SmartPtr<V4l2Buffer> v4l2buf;
     uint32_t frameId = -1;
-
-    while (_effecting_ispparam_map.size() > 4)
-        _effecting_ispparam_map.erase(_effecting_ispparam_map.begin());
-
+    {
+        SmartLock locker (_isp_params_cfg_mutex);
+        while (_effecting_ispparam_map.size() > 4)
+            _effecting_ispparam_map.erase(_effecting_ispparam_map.begin());
+    }
     if (mIspParamsDev.ptr()) {
         ret = mIspParamsDev->get_buffer(v4l2buf);
         if (ret) {
@@ -4683,8 +4684,12 @@ CamHwIsp20::setIspConfig()
         SmartPtr<RkAiqIspAwbParamsProxy> awbParams;
         if (awb_res.ptr()) {
             awbParams = awb_res.dynamic_cast_ptr<RkAiqIspAwbParamsProxy>();
-            _effecting_ispparam_map[frameId].awb_cfg = awbParams->data()->result;
+            {
+                SmartLock locker (_isp_params_cfg_mutex);
+                _effecting_ispparam_map[frameId].awb_cfg = awbParams->data()->result;
+            }
         } else {
+            SmartLock locker (_isp_params_cfg_mutex);
             /* use the latest */
             if (!_effecting_ispparam_map.empty()) {
                 _effecting_ispparam_map[frameId].awb_cfg = (_effecting_ispparam_map.rbegin())->second.awb_cfg;
@@ -4719,12 +4724,14 @@ CamHwIsp20::setIspConfig()
 #endif
     // dump_isp_config(&_full_active_isp_params, aiqIspMeasResult, aiqIspOtherResult);
 
-    if (frameId < 0) {
-        _effecting_ispparam_map[0].isp_params = _full_active_isp_params;
-    } else {
-        _effecting_ispparam_map[frameId].isp_params = _full_active_isp_params;
+    {
+        SmartLock locker (_isp_params_cfg_mutex);
+        if (frameId < 0) {
+            _effecting_ispparam_map[0].isp_params = _full_active_isp_params;
+        } else {
+            _effecting_ispparam_map[frameId].isp_params = _full_active_isp_params;
+        }
     }
-
     if (v4l2buf.ptr()) {
         struct isp2x_isp_params_cfg* isp_params;
         int buf_index = v4l2buf->get_buf().index;

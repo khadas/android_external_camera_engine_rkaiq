@@ -32,6 +32,7 @@
 
 namespace RkCam {
 
+typedef std::shared_ptr<std::list<std::string>> ModuleNameList;
 typedef std::shared_ptr<std::list<RkAiqAlgoType_t>> AlgoList;
 
 class RkAiqCalibDbV2 {
@@ -42,7 +43,7 @@ public:
 public: class TuningCalib {
          public:
           CamCalibDbV2Context_t* calib;
-          AlgoList algos;
+          ModuleNameList ModuleNames;
         };
 
 public:
@@ -65,7 +66,7 @@ public:
   static int CalibV2Free(CamCalibDbV2Context_t *calibv2);
 
   static RkAiqAlgoType_t string2algostype(const char* str);
-  static AlgoList analyzChange(cJSON* patch);
+  static ModuleNameList analyzChange(cJSON* patch);
 
   static cJSON* readIQNode(const CamCalibDbV2Context_t *calib,
                            const char* node_path);

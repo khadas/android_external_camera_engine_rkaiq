@@ -565,8 +565,8 @@ RkAiqAlgoType_t RkAiqCalibDbV2::string2algostype(const char *str) {
     return RK_AIQ_ALGO_TYPE_NONE;
 }
 
-AlgoList RkAiqCalibDbV2::analyzChange(cJSON *patch) {
-    auto change_list = std::make_shared<std::list<RkAiqAlgoType_t>>();
+ModuleNameList RkAiqCalibDbV2::analyzChange(cJSON *patch) {
+    auto change_name_list = std::make_shared<std::list<std::string>>();
     cJSON *arr_item = NULL;
     int change_sum = 0;
 
@@ -589,16 +589,16 @@ AlgoList RkAiqCalibDbV2::analyzChange(cJSON *patch) {
                                             path_str.find_last_not_of("/"));
             auto calib_name = headless.substr(0, headless.find_first_of("/"));
             XCAM_LOG_INFO("[Tuning]: %s changed!\n", calib_name.c_str());
-            change_list->push_back(string2algostype(calib_name.c_str()));
+            change_name_list->push_back(calib_name);
         }
         arr_item = arr_item->next;
     }
 
     // Remove duplicated item
-    change_list->sort();
-    change_list->unique();
+    change_name_list->sort();
+    change_name_list->unique();
 
-    return change_list;
+    return change_name_list;
 }
 
 RkAiqCalibDbV2::TuningCalib
@@ -606,7 +606,7 @@ RkAiqCalibDbV2::analyzTuningCalib(const CamCalibDbV2Context_t *calib,
                                   cJSON *patch) {
     TuningCalib tuning_calib;
 
-    tuning_calib.algos = analyzChange(patch);
+    tuning_calib.ModuleNames = analyzChange(patch);
     tuning_calib.calib = applyPatch2(calib, patch);
 
     if (patch)

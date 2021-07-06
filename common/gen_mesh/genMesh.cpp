@@ -32,6 +32,8 @@ void genFecMeshInit(int srcW, int srcH, int dstW, int dstH, FecParams &fecParams
 	/* mesh表降采样的步长 */
 	fecParams.meshStepW = meshStepW;
 	fecParams.meshStepH = meshStepH;
+	//fecParams.meshStepW = double(dstW) / double(fecParams.meshSizeW);
+	//fecParams.meshStepH = double(dstH) / double(fecParams.meshSizeH);
 
 	/* MeshXY的大小 */
 	fecParams.meshSize1bin = fecParams.meshSizeW * fecParams.meshSizeH;
@@ -106,10 +108,10 @@ void genLdchMeshInit(int srcW, int srcH, int dstW, int dstH, LdchParams &ldchPar
 	ldchParams.meshSizeH = ((dstH + (1 << map_scale_bit_Y) - 1) >> map_scale_bit_Y) + 1;
 
 	/* mesh表降采样的步长 */
-	ldchParams.meshStepW = double(dstW) / double(ldchParams.meshSizeW);
-	ldchParams.meshStepH = double(dstH) / double(ldchParams.meshSizeH);
-	//ldchParams.meshStepW = 16;
-	//ldchParams.meshStepH = 8;
+	//ldchParams.meshStepW = double(dstW) / double(ldchParams.meshSizeW - 1);/* 这里减1需要硬件上验证一下 */
+	//ldchParams.meshStepH = double(dstH) / double(ldchParams.meshSizeH - 1);
+	ldchParams.meshStepW = 16;
+	ldchParams.meshStepH = 8;
 
 	/* 对齐后的宽 */
 	int mapWidAlign = ((ldchParams.meshSizeW + 1) >> 1) << 1;//例如, 分辨率2688*1520, 169->170
@@ -125,8 +127,14 @@ void genLdchMeshInit(int srcW, int srcH, int dstW, int dstH, LdchParams &ldchPar
 	genLdchPreCalcPart(ldchParams, camCoeff);
 
 	/* LDCH: 计算LDCH能够校正的最大程度 */
-	calcLdchMaxLevel(ldchParams, camCoeff);
-	//ldchParams.maxLevel = 251;
+	if (ldchParams.isLdchOld)
+	{
+		calcLdchMaxLevel(ldchParams, camCoeff);
+	}
+	else
+	{
+		ldchParams.maxLevel = 255;
+	}
 }
 
 /* LDCH: 反初始化 */

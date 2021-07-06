@@ -111,11 +111,44 @@
   *  - FEC: add an option: isFecOld--flag for different versions of FEC hardware
 			isFecOld = 1: for old FEC
 			isFecOld = 0: for new FEC
+ 
+ * v3.0.3
+  *  - date: 2020-12-22
+  *  - LDCH: add an option: isLdchOld--flag for different versions of LDCH hardware
+			isLdchOld = 1: for old LDCH
+			isLdchOld = 0: for new LDCH
 
+  * v4.0.0
+  *  - date: 2021-01-19
+  *  - genScaleMeshNLevel:
+			add a new function interface: LDCH mesh(for x direction) + FEC mesh(for y direction)
+			1) CameraCoeff of original resolution, e.g. 3840*2160 --> LDCH mesh --> LDCH
+			2) CameraCoeff of original resolution, e.g. 3840*2160 --> 1920*1080 FEC mesh + 1920*1080 image data --> FEC
+
+  * v4.0.1
+  *  - date: 2021-01-21
+  *  - genCropScaleMeshNLevel:
+			add a new function interface: LDCH mesh(for x direction) + FEC mesh(for y direction)
+			1) CameraCoeff of original resolution, e.g. 3840*2160 --> LDCH mesh --> LDCH
+			2) CameraCoeff of original resolution, e.g. 3840*2160 --> crop at any position(pW,pH) to get any size, e.g. 1600*900 --> scale to 1920*1080 FEC mesh + 1920*1080 image data --> FEC
+
+  * v4.0.2
+  *  - date: 2021-06-23
+  *  - LDCH: add genLdchMeshFixedZeroCorrect function
+  
+  * v4.0.3
+  *  - date: 2021-06-28
+  *  - LDCH: modify the last row of zero correct mesh for LDCH bug.
+
+  * v4.0.4
+  *  - date: 2021-07-05
+  *  - LDCH: modify the middle row of mesh(minus 6 pixels) when saveMaxFovX == 1 for old LDCH bug(avoid the last pixel in the row map to the interval of [last-5, last-3]).
+			 valid flag: need to set isLdchOld = 1.
+  
 */
 
-#define RK_GENMESH_VERSION_REAL_V "v3.0.2"
-#define RK_GENMESH_RELEASE_DATE "2020-11-27"
+#define RK_GENMESH_VERSION_REAL_V "v4.0.4"
+#define RK_GENMESH_RELEASE_DATE "2021-07-05"
 
   /******* DO NOT EDIT THE FOLLOWINGS *******/
 

@@ -51,7 +51,7 @@ typedef struct CalibDbV2_Cpsl_Param_s {
   uint32_t auto_sw_interval;
   // M4_BOOL_DESC("manual_on", "0")
   bool manual_on;
-  // M4_NUMBER_DESC("manual_strengh", "f32", M4_RANGE(0,0.2), "0.1", M4_DIGIT(0))
+  // M4_NUMBER_DESC("manual_strength", "f32", M4_RANGE(0.0,100.0), "100.0", M4_DIGIT(2))
   float manual_strength;
 
 } CalibDbV2_Cpsl_Param_t;

@@ -2,7 +2,7 @@
 #include <stdint.h>
 #include "j2s.h"
 
-#define J2S_MAGIC 528214709
+#define J2S_MAGIC 733685399
 #define J2S_NUM_OBJ 2062
 #define J2S_NUM_STRUCT 399
 #define J2S_NUM_ENUM 53
@@ -14849,7 +14849,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[970] = "alias='manual_strengh', type='f32', size='[1,1]', range='[0, 0.2]', default='0.1', digit='[0]', hide='0'";
+	ctx->descs[970] = "alias='manual_strength', type='f32', size='[1,1]', range='[0.0, 100.0]', default='100.0', digit='[2]', hide='0'";
 #endif
 
 	obj = &ctx->objs[971];

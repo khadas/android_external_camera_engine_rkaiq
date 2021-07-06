@@ -181,7 +181,7 @@ public:
     void setMulCamConc(bool cc);
     CamCalibDbV2Context_t* getCurrentCalibDBV2(void);
     XCamReturn calibTuning(const CamCalibDbV2Context_t* aiqCalib,
-                           AlgoList& change_list);
+                           ModuleNameList& change_list);
 protected:
     XCamReturn applyAnalyzerResult(SmartPtr<RkAiqFullParamsProxy>& results);
     XCamReturn swWorkingModeDyn(rk_aiq_working_mode_t mode);

@@ -997,7 +997,7 @@ rk_aiq_uapi_sysctl_tuning(const rk_aiq_sys_ctx_t* sys_ctx, char* param)
                             last_calib, json_str.c_str());
 
     ret = sys_ctx->_rkAiqManager->calibTuning(tuning_calib.calib,
-            tuning_calib.algos);
+            tuning_calib.ModuleNames);
 
     return ret;
 }
