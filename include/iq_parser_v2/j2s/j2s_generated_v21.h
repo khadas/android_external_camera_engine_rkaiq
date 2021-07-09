@@ -2,7 +2,7 @@
 #include <stdint.h>
 #include "j2s.h"
 
-#define J2S_MAGIC 733685399
+#define J2S_MAGIC 50853424
 #define J2S_NUM_OBJ 2062
 #define J2S_NUM_STRUCT 399
 #define J2S_NUM_ENUM 53

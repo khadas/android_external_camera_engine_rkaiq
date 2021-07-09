@@ -135,26 +135,6 @@
 								"RawStatsMode":	"CAM_RAWSTATSV2_MODE_Y",
 								"YRangeMode":	"CAM_YRANGEV2_MODE_FULL",
 								"AecGridWeight":	[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-								"AecWinScale":	{
-									"InRawWinScale":	{
-										"h_offs":	0,
-										"v_offs":	0,
-										"h_size":	1,
-										"v_size":	1
-									},
-									"TmoRawWinScale":	{
-										"h_offs":	0.1,
-										"v_offs":	0.1,
-										"h_size":	0.9,
-										"v_size":	0.9
-									},
-									"YuvWinScale":	{
-										"h_offs":	0,
-										"v_offs":	0,
-										"h_size":	1,
-										"v_size":	1
-									}
-								},
 								"AecManualCtrl":	{
 									"LinearAE":	{
 										"ManualTimeEn":	1,
@@ -195,6 +175,26 @@
 								"AecEnvLvCalib":	{
 									"CalibFNumber":	1.6,
 									"CurveCoeff":	[0.02859, 0.5972]
+								},
+								"AecWinScale":	{
+									"InRawWinScale":	{
+										"h_offs":	0,
+										"v_offs":	0,
+										"h_size":	1,
+										"v_size":	1
+									},
+									"TmoRawWinScale":	{
+										"h_offs":	0.1,
+										"v_offs":	0.1,
+										"h_size":	0.9,
+										"v_size":	0.9
+									},
+									"YuvWinScale":	{
+										"h_offs":	0,
+										"v_offs":	0,
+										"h_size":	1,
+										"v_size":	1
+									}
 								}
 							},
 							"LinearAeCtrl":	{
