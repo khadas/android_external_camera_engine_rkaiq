@@ -13,6 +13,7 @@
 #include <linux/videodev2.h>
 #include "rkisp_control_loop.h"
 #include <utils/Log.h>
+#include "rkisp_control_aiq.h"
 
 #define CLEAR(x) memset(&(x), 0, sizeof(x))
 #define DBG(...) do { if(!silent) printf("DBG: " __VA_ARGS__);} while(0)
@@ -62,6 +63,7 @@ static struct rkisp_media_info media_info;
 static void* rkisp_engine;
 static int sensor_index = -1;
 static int silent = 0;
+static const char *hdrmode = "NORMAL";
 static int width = 2688;
 static int height = 1520;
 static const char *mdev_path = NULL;
@@ -321,7 +323,8 @@ static void init_engine(void)
     params.staticMeta = NULL;
     params.width = width;
     params.height = height;
-    params.work_mode = "NORMAL";
+    params.work_mode = hdrmode;
+    DBG("%s--set workingmode(%s)\n", __FUNCTION__, params.work_mode);
 
     for (int i = 0; i < CAMS_NUM_MAX; i++) {
         if (!media_info.cams[i].link_enabled) {
@@ -345,6 +348,7 @@ static void init_engine(void)
             ERR("rkisp engine init failed !\n");
             exit(-1);
         }
+        setMulCamConc(rkisp_engine,true);
         if (rkisp_cl_prepare(rkisp_engine, &params)) {
             ERR("rkisp engine prepare failed !\n");
             exit(-1);
@@ -446,10 +450,11 @@ void parse_args(int argc, char **argv)
            {"mmedia",    optional_argument  , 0, 'm' },
            {"silent",    no_argument,       0, 's' },
            {"help",      no_argument,       0, 'h' },
+           {"hdrmode",   required_argument, 0, 'r' },
            {0,           0,                 0,  0  }
        };
 
-       c = getopt_long(argc, argv, "m::sh", long_options, &option_index);
+       c = getopt_long(argc, argv, "m::shr:", long_options, &option_index);
        if (c == -1)
            break;
 
@@ -469,10 +474,14 @@ void parse_args(int argc, char **argv)
            case 's':
                silent = 1;
                break;
+           case 'r':
+               hdrmode = optarg;
+               break;
            case '?':
                ERR("Usage: %s to start 3A engine\n"
                    "         --sensor_index,  optional, sendor index\n"
                    "         --silent,        optional, subpress debug log\n",
+                   "         --hdrmode,       required, NORMAL/HDR2/HDR3 \n",
                    argv[0]);
                exit(-1);
 
