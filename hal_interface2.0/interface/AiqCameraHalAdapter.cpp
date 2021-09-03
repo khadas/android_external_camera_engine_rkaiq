@@ -505,8 +505,32 @@ AiqCameraHalAdapter::updateAeMetaParams(XCamAeParam *aeParams){
             if (ret) {
                 LOGE("%s(%d) setExpWinAttr failed!\n", __FUNCTION__, __LINE__);
             }
+
+            int32_t exposureCompensation =
+                    round((aeParams->ev_shift) * 2) * 100;
+            if(_exposureCompensation != exposureCompensation){
+                ALOGD("exposureCompensation:%d",exposureCompensation );
+
+                Uapi_LinExpAttr_t linExpAttr;
+                rk_aiq_user_api_ae_getLinExpAttr(_aiq_ctx,&linExpAttr);
+                LOGD("linExpAttr.Evbias get: %d" ,linExpAttr.Evbias);
+                linExpAttr.Evbias = exposureCompensation;
+                rk_aiq_user_api_ae_setLinExpAttr(_aiq_ctx,linExpAttr);
+                LOGD("linExpAttr.Evbias set :%d" ,linExpAttr.Evbias);
+
+                Uapi_HdrExpAttr_t hdrExpAttr;
+                rk_aiq_user_api_ae_getHdrExpAttr(_aiq_ctx,&hdrExpAttr);
+                LOGD("hdrExpAttr.Evbias get: %d" ,hdrExpAttr.Evbias);
+                hdrExpAttr.Evbias = exposureCompensation ;
+                rk_aiq_user_api_ae_setHdrExpAttr(_aiq_ctx,hdrExpAttr);
+                LOGD("hdrExpAttr.Evbias set :%d" ,hdrExpAttr.Evbias);
+
+                _exposureCompensation = exposureCompensation;
+            }
         }
     }
+
+
     pthread_mutex_unlock(&_aiq_ctx_mutex);
 }
 

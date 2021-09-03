@@ -160,6 +160,7 @@ private:
     //TODO for Capture or Flash
     bool _delay_still_capture;
     rk_aiq_working_mode_t _work_mode;
+    int32_t _exposureCompensation;
 
 private:  /* Members */
     /**
