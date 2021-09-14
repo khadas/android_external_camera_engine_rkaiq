@@ -383,9 +383,16 @@ int rkisp_cl_prepare(void* cl_ctx,
         //default
         work_mode = RK_AIQ_WORKING_MODE_NORMAL;
     }
-    ret = rk_aiq_uapi_sysctl_prepare(aiq_ctx, prepare_params->width, prepare_params->height, work_mode);
+
     gAiqCameraHalAdapter->set_static_metadata (prepare_params->staticMeta);
     gAiqCameraHalAdapter->set_working_mode(work_mode);
+    camera_metadata_entry mode_3dnr = gAiqCameraHalAdapter->get_static_metadata().find(RK_NR_FEATURE_3DNR_MODE);
+    if(mode_3dnr.count == 1) {
+	    ALOGI("RK_MODULE_NR:%d",mode_3dnr.data.u8[0]);
+        rk_aiq_uapi_sysctl_setModuleCtl(aiq_ctx,RK_MODULE_NR, mode_3dnr.data.u8[0]);
+    }
+
+    ret = rk_aiq_uapi_sysctl_prepare(aiq_ctx, prepare_params->width, prepare_params->height, work_mode);
 
     CamHwIsp20::selectIqFile(aiq_ctx->_sensor_entity_name, iq_file_full_name);
     property_set(CAM_IQ_PROPERTY_KEY,iq_file_full_name);
