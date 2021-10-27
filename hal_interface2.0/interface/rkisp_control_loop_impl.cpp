@@ -26,7 +26,7 @@
 #include <mediactl.h>
 #include <v4l2_device.h>
 #include <base/xcam_log.h>
-#include <linux/rk-camera-module.h>
+#include <rk-camera-module.h>
 #include <RkAiqManager.h>
 #include <RkAiqCalibDb.h>
 #include <sys/ioctl.h>
