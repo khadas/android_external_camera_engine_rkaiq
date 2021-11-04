@@ -541,8 +541,13 @@ SensorHw::getEffectiveExpParams(SmartPtr<RkAiqExpParamsProxy>& expParams, int fr
         }
 
         if (rit == _effecting_exp_map.rend()) {
-            LOGE_CAMHW_SUBM(SENSOR_SUBM, "can't find the latest effecting exposure for id %d, impossible case !", search_id);
-            return  XCAM_RETURN_ERROR_PARAM;
+            if (--rit != _effecting_exp_map.rend()) {
+                LOGW_CAMHW_SUBM(SENSOR_SUBM, "use effecting exposure of %d for %d, may be something wrong !",
+                                rit->first, search_id);
+            } else {
+                LOGE_CAMHW_SUBM(SENSOR_SUBM, "can't find the latest effecting exposure for id %d, impossible case !", search_id);
+                return  XCAM_RETURN_ERROR_PARAM;
+            }
         }
 
         expParams = rit->second;
@@ -768,6 +773,64 @@ SensorHw::handle_sof(int64_t time, int frameid)
     return ret;
 }
 
+uint32_t
+BaseSensorHw::get_v4l2_pixelformat(uint32_t pixelcode)
+{
+    uint32_t pixelformat = -1;
+
+    switch (pixelcode) {
+    case MEDIA_BUS_FMT_SRGGB8_1X8:
+        pixelformat = V4L2_PIX_FMT_SRGGB8;
+        break;
+    case MEDIA_BUS_FMT_SBGGR8_1X8:
+        pixelformat = V4L2_PIX_FMT_SBGGR8;
+        break;
+    case MEDIA_BUS_FMT_SGBRG8_1X8:
+        pixelformat = V4L2_PIX_FMT_SGBRG8;
+        break;
+    case MEDIA_BUS_FMT_SGRBG8_1X8:
+        pixelformat = V4L2_PIX_FMT_SGRBG8;
+        break;
+    case MEDIA_BUS_FMT_SBGGR10_1X10:
+        pixelformat = V4L2_PIX_FMT_SBGGR10;
+        break;
+    case MEDIA_BUS_FMT_SRGGB10_1X10:
+        pixelformat = V4L2_PIX_FMT_SRGGB10;
+        break;
+    case MEDIA_BUS_FMT_SGBRG10_1X10:
+        pixelformat = V4L2_PIX_FMT_SGBRG10;
+        break;
+    case MEDIA_BUS_FMT_SGRBG10_1X10:
+        pixelformat = V4L2_PIX_FMT_SGRBG10;
+        break;
+    case MEDIA_BUS_FMT_SRGGB12_1X12:
+        pixelformat = V4L2_PIX_FMT_SRGGB12;
+        break;
+    case MEDIA_BUS_FMT_SBGGR12_1X12:
+        pixelformat = V4L2_PIX_FMT_SBGGR12;
+        break;
+    case MEDIA_BUS_FMT_SGBRG12_1X12:
+        pixelformat = V4L2_PIX_FMT_SGBRG12;
+        break;
+    case MEDIA_BUS_FMT_SGRBG12_1X12:
+        pixelformat = V4L2_PIX_FMT_SGRBG12;
+        break;
+    case MEDIA_BUS_FMT_Y8_1X8:
+        pixelformat = V4L2_PIX_FMT_GREY;
+        break;
+    case MEDIA_BUS_FMT_Y10_1X10:
+        pixelformat = V4L2_PIX_FMT_Y10;
+        break;
+    case MEDIA_BUS_FMT_Y12_1X12:
+        pixelformat = V4L2_PIX_FMT_Y12;
+        break;
+    default:
+        //TODO add other
+        LOGD_CAMHW_SUBM(SENSOR_SUBM, "%s no support pixelcode:0x%x\n",
+                        __func__, pixelcode);
+    }
+    return pixelformat;
+}
 
 XCamReturn
 SensorHw::set_working_mode(int mode)

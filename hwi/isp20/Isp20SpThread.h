@@ -109,6 +109,8 @@ public:
     void set_calibDb(const CamCalibDbV2Context_t* calib);
     void set_working_mode(int mode);
     void update_motion_detection_params(CalibDb_MFNR_Motion_t *motion);
+    void update_af_meas_params(rk_aiq_isp_af_meas_t *sp_meas);
+    int get_lowpass_fv(uint32_t sequence, SmartPtr<V4l2BufferProxy> buf_proxy);
 protected:
     void init                                  ();
     void deinit                                ();
@@ -130,6 +132,7 @@ private:
     SmartPtr<V4l2SubDevice>  _ispp_dev;
     SmartPtr<V4l2SubDevice>  _isp_dev;
     SmartPtr<V4l2SubDevice> _sensor_dev;
+    SmartPtr<V4l2SubDevice> _focus_dev;
     SmartPtr<Thread> mKgThread;
     SmartPtr<Thread> mWrThread;
     int _img_width;
@@ -144,6 +147,7 @@ private:
 	std::list<SmartPtr<V4l2BufferProxy>> _isp_buf_list;
     XCam::Mutex _buf_list_mutex;
     XCam::Mutex _motion_param_mutex;
+    XCam::Mutex _afmeas_param_mutex;
     int ispsp_stop_fds[2];
     int ispp_stop_fds[2];
     int sync_pipe_fd[2];
@@ -215,6 +219,14 @@ private:
 	uint8_t static_ratio_l_bit;
 	uint8_t static_ratio_r_bit;
 	int16_t *pTmpBuf;
+
+	uint8_t *pAfTmp;
+	uint32_t sub_shp4_4[RKAIQ_RAWAF_ROI_SUBWINS_NUM];
+	uint32_t sub_shp8_8[RKAIQ_RAWAF_ROI_SUBWINS_NUM];
+	uint32_t high_light[RKAIQ_RAWAF_ROI_SUBWINS_NUM];
+	uint32_t high_light2[RKAIQ_RAWAF_ROI_SUBWINS_NUM];
+	rk_aiq_isp_af_meas_t _af_meas_params;
+	rk_aiq_lens_descriptor _lens_des;
 };
 
 class KgProcThread

@@ -18,6 +18,8 @@
 #include "j2s_generated_v20.h"
 #elif defined(ISP_HW_V21)
 #include "j2s_generated_v21.h"
+#elif defined(ISP_HW_V30)
+#include "j2s_generated_v30.h"
 #else
 #error "Please define supported ISP version!!!, eg: -DISP_HW_V21"
 #endif
@@ -278,6 +280,18 @@ void j2s_init(j2s_ctx* ctx)
     if (cache_file)
         free(cache_file);
 #endif
+
+    ctx->manage_data = true;
+}
+
+void j2s_camgroup_init(j2s_ctx* ctx)
+{
+    DBG("J2S version: %s\n", J2S_VERSION);
+
+    _j2s_init(ctx);
+	// CamCalibDbProj_t always be followed by CamCalibDbGroup_t,
+	// this was decided by the definition sequence in RkAiqCalibDbTypesV2
+	ctx->root_index += 1;
 
     ctx->manage_data = true;
 }

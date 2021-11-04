@@ -185,7 +185,7 @@ if(EXISTS "${CMAKE_SOURCE_DIR}/algos/adrc/rk_aiq_algo_adrc_itf.cpp")
 	set_target_properties(rkaiq_adrc PROPERTIES C_VISIBILITY_PRESET default)
 	set_target_properties(rkaiq_adrc PROPERTIES CXX_VISIBILITY_PRESET default)
 else()
-	message(STATUS "Can NOT found
+	message(STATUS "Can NOT found 
 	${CMAKE_SOURCE_DIR}/algos/adrc/rk_aiq_algo_adrc_itf.cpp. Using lib")
 	add_library(rkaiq_adrc STATIC IMPORTED)
 	set_target_properties(rkaiq_adrc PROPERTIES IMPORTED_LOCATION
@@ -545,7 +545,7 @@ if(EXISTS "${CMAKE_SOURCE_DIR}/algos/adegamma/rk_aiq_algo_adegamma_itf.cpp")
 	set_target_properties(rkaiq_adegamma PROPERTIES C_VISIBILITY_PRESET default)
 	set_target_properties(rkaiq_adegamma PROPERTIES CXX_VISIBILITY_PRESET default)
 else()
-	message(STATUS "Can NOT found
+	message(STATUS "Can NOT found 
 	${CMAKE_SOURCE_DIR}/algos/adegamma/rk_aiq_algo_adegamma_itf.cpp. Using lib")
 	add_library(rkaiq_adegamma STATIC IMPORTED)
 	set_target_properties(rkaiq_adegamma PROPERTIES IMPORTED_LOCATION
@@ -1020,4 +1020,185 @@ else()
         "${PREFIX}rkaiq_again_v1.${SUFFIX}")
 	set_target_properties(rkaiq_again_v1 PROPERTIES IMPORTED_IMPLIB
         "${PREFIX}rkaiq_again_v1.${SUFFIX}")
+endif()
+
+# ----------------------------------------------------------------------------
+# add aynr3 implement
+# ----------------------------------------------------------------------------
+set (AYNR_V3_SRC
+	aynr3/rk_aiq_aynr_algo_itf_v3.cpp
+	aynr3/rk_aiq_aynr_algo_ynr_v3.cpp
+	aynr3/rk_aiq_aynr_algo_v3.cpp
+	aynr3/rk_aiq_uapi_aynr_int_v3.cpp
+    )
+
+if(EXISTS "${CMAKE_SOURCE_DIR}/algos/aynr3/rk_aiq_aynr_algo_itf_v3.cpp")
+	message(${LIBRARY_OUTPUT_PATH})
+	add_library(rkaiq_aynr_v3 STATIC ${AYNR_V3_SRC})
+	set_target_properties(rkaiq_aynr_v3 PROPERTIES FOLDER "algos/aynr3")
+	set_target_properties(rkaiq_aynr_v3 PROPERTIES CLEAN_DIRECT_OUTPUT 1)
+	set_target_properties(rkaiq_aynr_v3 PROPERTIES C_VISIBILITY_PRESET default)
+	set_target_properties(rkaiq_aynr_v3 PROPERTIES CXX_VISIBILITY_PRESET default)
+else()
+	message(STATUS "Can NOT found ${CMAKE_SOURCE_DIR}/algos/aynr3/rk_aiq_aynr_algo_itf_v3.cpp. Using lib")
+	add_library(rkaiq_aynr_v3 STATIC IMPORTED)
+	set_target_properties(rkaiq_aynr_v3 PROPERTIES IMPORTED_LOCATION
+        "${PREFIX}rkaiq_aynr_v3.${SUFFIX}")
+	set_target_properties(rkaiq_aynr_v3 PROPERTIES IMPORTED_IMPLIB
+        "${PREFIX}rkaiq_aynr_v3.${SUFFIX}")
+endif()
+
+# ----------------------------------------------------------------------------
+# add acnr implement
+# ----------------------------------------------------------------------------
+set (ACNR_V2_SRC
+	acnr2/rk_aiq_acnr_algo_itf_v2.cpp
+	acnr2/rk_aiq_acnr_algo_cnr_v2.cpp
+	acnr2/rk_aiq_acnr_algo_v2.cpp
+	acnr2/rk_aiq_uapi_acnr_int_v2.cpp
+    )
+
+if(EXISTS "${CMAKE_SOURCE_DIR}/algos/acnr2/rk_aiq_acnr_algo_itf_v2.cpp")
+	message(${LIBRARY_OUTPUT_PATH})
+	add_library(rkaiq_acnr_v2 STATIC ${ACNR_V2_SRC})
+	set_target_properties(rkaiq_acnr_v2 PROPERTIES FOLDER "algos/acnr2")
+	set_target_properties(rkaiq_acnr_v2 PROPERTIES CLEAN_DIRECT_OUTPUT 1)
+	set_target_properties(rkaiq_acnr_v2 PROPERTIES C_VISIBILITY_PRESET default)
+	set_target_properties(rkaiq_acnr_v2 PROPERTIES CXX_VISIBILITY_PRESET default)
+else()
+	message(STATUS "Can NOT found ${CMAKE_SOURCE_DIR}/algos/acnr2/rk_aiq_acnr_algo_itf_v2.cpp. Using lib")
+	add_library(rkaiq_acnr_v2 STATIC IMPORTED)
+	set_target_properties(rkaiq_acnr_v2 PROPERTIES IMPORTED_LOCATION
+        "${PREFIX}rkaiq_acnr_v2.${SUFFIX}")
+	set_target_properties(rkaiq_acnr_v2 PROPERTIES IMPORTED_IMPLIB
+        "${PREFIX}rkaiq_acnr_v2.${SUFFIX}")
+endif()
+
+
+# ----------------------------------------------------------------------------
+# add asharp4 implement
+# ----------------------------------------------------------------------------
+set (ASHARP_V4_SRC
+	asharp4/rk_aiq_asharp_algo_itf_v4.cpp
+	asharp4/rk_aiq_asharp_algo_sharp_v4.cpp
+	asharp4/rk_aiq_asharp_algo_v4.cpp
+	asharp4/rk_aiq_uapi_asharp_int_v4.cpp
+    )
+
+if(EXISTS "${CMAKE_SOURCE_DIR}/algos/asharp4/rk_aiq_asharp_algo_itf_v4.cpp")
+	message(${LIBRARY_OUTPUT_PATH})
+	add_library(rkaiq_asharp_v4 STATIC ${ASHARP_V4_SRC})
+	set_target_properties(rkaiq_asharp_v4 PROPERTIES FOLDER "algos/asharp4")
+	set_target_properties(rkaiq_asharp_v4 PROPERTIES CLEAN_DIRECT_OUTPUT 1)
+	set_target_properties(rkaiq_asharp_v4 PROPERTIES C_VISIBILITY_PRESET default)
+	set_target_properties(rkaiq_asharp_v4 PROPERTIES CXX_VISIBILITY_PRESET default)
+else()
+	message(STATUS "Can NOT found ${CMAKE_SOURCE_DIR}/algos/asharp4/rk_aiq_asharp_algo_itf_v4.cpp. Using lib")
+	add_library(rkaiq_asharp_v4 STATIC IMPORTED)
+	set_target_properties(rkaiq_asharp_v4 PROPERTIES IMPORTED_LOCATION
+        "${PREFIX}rkaiq_asharp_v4.${SUFFIX}")
+	set_target_properties(rkaiq_asharp_v4 PROPERTIES IMPORTED_IMPLIB
+        "${PREFIX}rkaiq_asharp_v4.${SUFFIX}")
+endif()
+
+# ----------------------------------------------------------------------------
+# add arawnr1 implement
+# ----------------------------------------------------------------------------
+set (ABAYER2DNR_V2_SRC
+	abayer2dnr2/rk_aiq_abayer2dnr_algo_itf_v2.cpp
+	abayer2dnr2/rk_aiq_abayer2dnr_algo_bayernr_v2.cpp
+	abayer2dnr2/rk_aiq_abayer2dnr_algo_v2.cpp
+	abayer2dnr2/rk_aiq_uapi_abayer2dnr_int_v2.cpp
+    )
+
+if(EXISTS "${CMAKE_SOURCE_DIR}/algos/abayer2dnr2/rk_aiq_abayer2dnr_algo_itf_v2.cpp")
+	message(${LIBRARY_OUTPUT_PATH})
+	add_library(rkaiq_abayer2dnr_v2 STATIC ${ABAYER2DNR_V2_SRC})
+	set_target_properties(rkaiq_abayer2dnr_v2 PROPERTIES FOLDER "algos/abayer2dnr2")
+	set_target_properties(rkaiq_abayer2dnr_v2 PROPERTIES CLEAN_DIRECT_OUTPUT 1)
+	set_target_properties(rkaiq_abayer2dnr_v2 PROPERTIES C_VISIBILITY_PRESET default)
+	set_target_properties(rkaiq_abayer2dnr_v2 PROPERTIES CXX_VISIBILITY_PRESET default)
+else()
+	message(STATUS "Can NOT found ${CMAKE_SOURCE_DIR}/algos/abayer2dnr2/rk_aiq_abayer2dnr_algo_itf_v2.cpp. Using lib")
+	add_library(rkaiq_abayer2dnr_v2 STATIC IMPORTED)
+	set_target_properties(rkaiq_abayer2dnr_v2 PROPERTIES IMPORTED_LOCATION
+        "${PREFIX}rkaiq_abayer2dnr_v2.${SUFFIX}")
+	set_target_properties(rkaiq_abayer2dnr_v2 PROPERTIES IMPORTED_IMPLIB
+        "${PREFIX}rkaiq_abayer2dnr_v2.${SUFFIX}")
+endif()
+
+# ----------------------------------------------------------------------------
+# add abayertnrv2 implement
+# ----------------------------------------------------------------------------
+set (ABAYERTNR_V2_SRC
+	abayertnr2/rk_aiq_abayertnr_algo_itf_v2.cpp
+	abayertnr2/rk_aiq_abayertnr_algo_bayertnr_v2.cpp
+	abayertnr2/rk_aiq_abayertnr_algo_v2.cpp
+	abayertnr2/rk_aiq_uapi_abayertnr_int_v2.cpp
+    )
+
+if(EXISTS "${CMAKE_SOURCE_DIR}/algos/abayertnr2/rk_aiq_abayertnr_algo_itf_v2.cpp")
+	message(${LIBRARY_OUTPUT_PATH})
+	add_library(rkaiq_abayertnr_v2 STATIC ${ABAYERTNR_V2_SRC})
+	set_target_properties(rkaiq_abayertnr_v2 PROPERTIES FOLDER "algos/abayertnr2")
+	set_target_properties(rkaiq_abayertnr_v2 PROPERTIES CLEAN_DIRECT_OUTPUT 1)
+	set_target_properties(rkaiq_abayertnr_v2 PROPERTIES C_VISIBILITY_PRESET default)
+	set_target_properties(rkaiq_abayertnr_v2 PROPERTIES CXX_VISIBILITY_PRESET default)
+else()
+	message(STATUS "Can NOT found ${CMAKE_SOURCE_DIR}/algos/abayertnr2/rk_aiq_abayertnr_algo_itf_v2.cpp. Using lib")
+	add_library(rkaiq_abayertnr_v2 STATIC IMPORTED)
+	set_target_properties(rkaiq_abayertnr_v2 PROPERTIES IMPORTED_LOCATION
+        "${PREFIX}rkaiq_abayertnr_v2.${SUFFIX}")
+	set_target_properties(rkaiq_abayertnr_v2 PROPERTIES IMPORTED_IMPLIB
+        "${PREFIX}rkaiq_abayertnr_v2.${SUFFIX}")
+endif()
+
+# ----------------------------------------------------------------------------
+# add again v2 implement
+# ----------------------------------------------------------------------------
+set (AGAIN_V2_SRC
+	again2/rk_aiq_again_algo_itf_v2.cpp
+	again2/rk_aiq_again_algo_gain_v2.cpp
+	again2/rk_aiq_again_algo_v2.cpp
+	again2/rk_aiq_uapi_again_int_v2.cpp
+    )
+
+if(EXISTS "${CMAKE_SOURCE_DIR}/algos/again2/rk_aiq_again_algo_itf_v2.cpp")
+	message(${LIBRARY_OUTPUT_PATH})
+	add_library(rkaiq_again_v2 STATIC ${AGAIN_V2_SRC})
+	set_target_properties(rkaiq_again_v2 PROPERTIES FOLDER "algos/again2")
+	set_target_properties(rkaiq_again_v2 PROPERTIES CLEAN_DIRECT_OUTPUT 1)
+	set_target_properties(rkaiq_again_v2 PROPERTIES C_VISIBILITY_PRESET default)
+	set_target_properties(rkaiq_again_v2 PROPERTIES CXX_VISIBILITY_PRESET default)
+else()
+	message(STATUS "Can NOT found ${CMAKE_SOURCE_DIR}/algos/again2/rk_aiq_again_algo_itf_v2.cpp. Using lib")
+	add_library(rkaiq_again_v2 STATIC IMPORTED)
+	set_target_properties(rkaiq_again_v2 PROPERTIES IMPORTED_LOCATION
+        "${PREFIX}rkaiq_again_v2.${SUFFIX}")
+	set_target_properties(rkaiq_again_v2 PROPERTIES IMPORTED_IMPLIB
+        "${PREFIX}rkaiq_again_v2.${SUFFIX}")
+endif()
+
+# add acac mplement
+# ----------------------------------------------------------------------------
+set (ACAC_SRC
+    acac/cac_adaptor.cpp
+    acac/rk_aiq_algo_acac_itf.cpp
+    acac/rk_aiq_uapi_acac_int.cpp 
+    )
+
+if(EXISTS "${CMAKE_SOURCE_DIR}/algos/acac/rk_aiq_algo_acac_itf.cpp")
+	message(${LIBRARY_OUTPUT_PATH})
+	add_library(rkaiq_acac STATIC ${ACAC_SRC})
+	set_target_properties(rkaiq_acac PROPERTIES FOLDER "algos/acac")
+	set_target_properties(rkaiq_acac PROPERTIES CLEAN_DIRECT_OUTPUT 1)
+	set_target_properties(rkaiq_acac PROPERTIES C_VISIBILITY_PRESET default)
+	set_target_properties(rkaiq_acac PROPERTIES CXX_VISIBILITY_PRESET default)
+else()
+	message(STATUS "Can NOT found ${CMAKE_SOURCE_DIR}/algos/acac/rk_aiq_algo_acac_itf.cpp. Using lib")
+	add_library(rkaiq_acac STATIC IMPORTED)
+	set_target_properties(rkaiq_acac PROPERTIES IMPORTED_LOCATION
+        "${PREFIX}rkaiq_acac.${SUFFIX}")
+	set_target_properties(rkaiq_acac PROPERTIES IMPORTED_IMPLIB
+        "${PREFIX}rkaiq_acac.${SUFFIX}")
 endif()

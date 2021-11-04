@@ -31,21 +31,16 @@ create_context(RkAiqAlgoContext **context, const AlgoCtxInstanceCfg* cfg)
 {
     LOG1_ATMO(" %s:Enter!\n", __FUNCTION__);
     XCamReturn result = XCAM_RETURN_NO_ERROR;
-    RkAiqAlgoContext *ctx = new RkAiqAlgoContext();
     AlgoCtxInstanceCfgInt* instanc_int = (AlgoCtxInstanceCfgInt*)cfg;
-    if (ctx == NULL) {
-        LOGE_ATMO( "%s: create adrc context fail!\n", __FUNCTION__);
-        return XCAM_RETURN_ERROR_MEM;
-    }
-    memset(&ctx->AdrcInstConfig, 0x00, sizeof(AdrcInstanceConfig_t));
-    result = AdrcInit(&ctx->AdrcInstConfig, instanc_int->calibv2);
+    AdrcContext_t* pAdrcCtx = NULL;
+
+    result = AdrcInit(&pAdrcCtx, (CamCalibDbV2Context_t*)(instanc_int->calibv2));
 
     if (result != XCAM_RETURN_NO_ERROR) {
         LOGE_ATMO("%s Adrc Init failed: %d", __FUNCTION__, result);
         return(XCAM_RETURN_ERROR_FAILED);
     }
-
-    *context = ctx;
+    *context = (RkAiqAlgoContext *)(pAdrcCtx);
 
     LOG1_ATMO(" %s:Exit!\n", __FUNCTION__);
     return result;
@@ -59,13 +54,12 @@ destroy_context(RkAiqAlgoContext *context)
 
     if(context != NULL) {
 
-        AdrcHandle_t pAdrcCtx = (AdrcHandle_t)context->AdrcInstConfig.hAdrc;
+        AdrcContext_t* pAdrcCtx = (AdrcContext_t*)context;
         result = AdrcRelease(pAdrcCtx);
         if (result != XCAM_RETURN_NO_ERROR) {
             LOGE_ATMO("%s Adrc Release failed: %d", __FUNCTION__, result);
             return(XCAM_RETURN_ERROR_FAILED);
         }
-        delete context;
         context = NULL;
     }
 
@@ -79,7 +73,7 @@ prepare(RkAiqAlgoCom* params)
     LOG1_ATMO("%s:Enter!\n", __FUNCTION__);
     XCamReturn result = XCAM_RETURN_NO_ERROR;
 
-    AdrcHandle_t pAdrcCtx = params->ctx->AdrcInstConfig.hAdrc;
+    AdrcContext_t* pAdrcCtx = (AdrcContext_t*)params->ctx;
     RkAiqAlgoConfigAdrcInt* AdrcCfgParam = (RkAiqAlgoConfigAdrcInt*)params; //come from params in html
     const CamCalibDbV2Context_t* pCalibDb = AdrcCfgParam->rk_com.u.prepare.calibv2;
     //pAdrcCtx->width = AdrcCfgParam->rawWidth;
@@ -95,14 +89,19 @@ prepare(RkAiqAlgoCom* params)
 
     if(!!(params->u.prepare.conf_type & RK_AIQ_ALGO_CONFTYPE_UPDATECALIB )) {
         LOGD_ATMO("%s: Adrc Reload Para!\n", __FUNCTION__);
-        CalibDbV2_drc_t* calibv2_adrc_calib =
-            (CalibDbV2_drc_t*)(CALIBDBV2_GET_MODULE_PTR((void*)pCalibDb, adrc_calib));
 
-        memcpy(&pAdrcCtx->pCalibDB, calibv2_adrc_calib, sizeof(CalibDbV2_drc_t)); //reload iq paras
+        if(CHECK_ISP_HW_V21()) {
+            CalibDbV2_drc_t* calibv2_adrc_calib =
+                (CalibDbV2_drc_t*)(CALIBDBV2_GET_MODULE_PTR((void*)pCalibDb, adrc_calib));
 
-        LOGE_ATMO("%s:Mode:%d \n", __FUNCTION__, calibv2_adrc_calib->DrcTuningPara.CompressSetting.Mode);
-        for(int i = 0; i < 17; i++)
-            LOGE_ATMO("%s:Manual_curve[%d]:%d \n", __FUNCTION__, i, calibv2_adrc_calib->DrcTuningPara.CompressSetting.Manual_curve[i]);
+            memcpy(&pAdrcCtx->pCalibDB.Drc_v20, calibv2_adrc_calib, sizeof(CalibDbV2_drc_t)); //reload iq paras
+        }
+        else if(CHECK_ISP_HW_V30()) {
+            CalibDbV2_drc_V2_t* calibv2_adrc_calib =
+                (CalibDbV2_drc_V2_t*)(CALIBDBV2_GET_MODULE_PTR((void*)pCalibDb, adrc_calib));
+
+            memcpy(&pAdrcCtx->pCalibDB.Drc_v21, calibv2_adrc_calib, sizeof(CalibDbV2_drc_t)); //reload iq paras
+        }
     }
 
     if(/* !params->u.prepare.reconfig*/true) {
@@ -113,6 +112,11 @@ prepare(RkAiqAlgoCom* params)
             return(XCAM_RETURN_ERROR_FAILED);
         }
     }
+
+    //update
+    DrcNewMalloc(&pAdrcCtx->Config, &pAdrcCtx->pCalibDB);
+    AdrcUpdateConfig(pAdrcCtx, &pAdrcCtx->pCalibDB);
+
     LOG1_ATMO("%s:Exit!\n", __FUNCTION__);
     return result;
 }
@@ -122,13 +126,6 @@ pre_process(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outparams)
 {
     LOG1_ATMO("%s:Enter!\n", __FUNCTION__);
     RESULT ret = XCAM_RETURN_NO_ERROR;
-
-    AdrcHandle_t pAdrcCtx = inparams->ctx->AdrcInstConfig.hAdrc;
-    RkAiqAlgoConfigAdrcInt* AdrcCfgParam = (RkAiqAlgoConfigAdrcInt*)inparams;
-
-    //update
-    DrcNewMalloc(&pAdrcCtx->Config, &pAdrcCtx->pCalibDB);
-    AdrcUpdateConfig(pAdrcCtx, &pAdrcCtx->pCalibDB);
 
 
     LOG1_ATMO("%s:Exit!\n", __FUNCTION__);
@@ -142,13 +139,15 @@ processing(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outparams)
     XCamReturn result = XCAM_RETURN_NO_ERROR;
     bool bypass = false;
 
-    AdrcHandle_t pAdrcCtx = (AdrcHandle_t)inparams->ctx->AdrcInstConfig.hAdrc;
-    RkAiqAlgoProcAdrcInt* AdrcParams = (RkAiqAlgoProcAdrcInt*)inparams;
-    RkAiqAlgoProcResAdrcInt* AdrcProcResParams = (RkAiqAlgoProcResAdrcInt*)outparams;
-    // pAdrcCtx->frameCnt = inparams->frame_id;
+    AdrcContext_t* pAdrcCtx = (AdrcContext_t*)inparams->ctx;
+    pAdrcCtx->frameCnt = inparams->frame_id;
+    RkAiqAlgoProcAdrcInt* pAdrcParams = (RkAiqAlgoProcAdrcInt*)inparams;
+    RkAiqAlgoProcResAdrcInt* pAdrcProcRes = (RkAiqAlgoProcResAdrcInt*)outparams;
+
+    LOGD_ATMO("%s://////////////////////////////////////ADRC Start////////////////////////////////////// \n", __func__);
 
     //get Sensor Info
-    XCamVideoBuffer* xCamAeProcRes = AdrcParams->rk_com.u.proc.res_comb->ae_proc_res;
+    XCamVideoBuffer* xCamAeProcRes = pAdrcParams->rk_com.u.proc.res_comb->ae_proc_res;
     RkAiqAlgoProcResAeInt* pAEProcRes = NULL;
     if (xCamAeProcRes) {
         pAEProcRes = (RkAiqAlgoProcResAeInt*)xCamAeProcRes->map(xCamAeProcRes);
@@ -157,12 +156,12 @@ processing(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outparams)
     else {
         AecProcResult_t AeProcResult;
         memset(&AeProcResult, 0x0, sizeof(AecProcResult_t));
-        LOGE_ATMO("%s: Ae Proc result is null!!!\n", __FUNCTION__);
+        LOGW_ATMO("%s: Ae Proc result is null!!!\n", __FUNCTION__);
         AdrcGetSensorInfo(pAdrcCtx, AeProcResult);
     }
 
     //get ae pre res and proc
-    XCamVideoBuffer* xCamAePreRes = AdrcParams->rk_com.u.proc.res_comb->ae_pre_res;
+    XCamVideoBuffer* xCamAePreRes = pAdrcParams->rk_com.u.proc.res_comb->ae_pre_res;
     RkAiqAlgoPreResAeInt* pAEPreRes = NULL;
     if (xCamAePreRes) {
         pAEPreRes = (RkAiqAlgoPreResAeInt*)xCamAePreRes->map(xCamAePreRes);
@@ -173,22 +172,23 @@ processing(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outparams)
         memset(&AecHdrPreResult, 0x0, sizeof(AecPreResult_t));
         bypass = AdrcByPassProcessing(pAdrcCtx, AecHdrPreResult);
         bypass = false;
-        LOGE_ATMO("%s: ae Pre result is null!!!\n", __FUNCTION__);
+        LOGW_ATMO("%s: ae Pre result is null!!!\n", __FUNCTION__);
     }
 
     if(!bypass)
         AdrcProcessing(pAdrcCtx);
 
-    pAdrcCtx->frameCnt++;
     pAdrcCtx->PrevData.ApiMode = pAdrcCtx->drcAttr.opMode;
     //output ProcRes
-    AdrcProcResParams->AdrcProcRes.update = !bypass ;
-    AdrcProcResParams->AdrcProcRes.CompressMode = pAdrcCtx->AdrcProcRes.CompressMode;
-    AdrcProcResParams->AdrcProcRes.LongFrameMode = pAdrcCtx->AdrcProcRes.LongFrameMode;
-    AdrcProcResParams->AdrcProcRes.isHdrGlobalTmo = pAdrcCtx->AdrcProcRes.isHdrGlobalTmo;
-    AdrcProcResParams->AdrcProcRes.bTmoEn = pAdrcCtx->AdrcProcRes.bTmoEn;
-    AdrcProcResParams->AdrcProcRes.isLinearTmo = pAdrcCtx->AdrcProcRes.isLinearTmo;
-    memcpy(&AdrcProcResParams->AdrcProcRes.DrcProcRes, &pAdrcCtx->AdrcProcRes.DrcProcRes, sizeof(DrcProcRes_t));
+    pAdrcProcRes->AdrcProcRes.update = false ;
+    pAdrcProcRes->AdrcProcRes.CompressMode = pAdrcCtx->AdrcProcRes.CompressMode;
+    pAdrcProcRes->AdrcProcRes.LongFrameMode = pAdrcCtx->AdrcProcRes.LongFrameMode;
+    pAdrcProcRes->AdrcProcRes.isHdrGlobalTmo = pAdrcCtx->AdrcProcRes.isHdrGlobalTmo;
+    pAdrcProcRes->AdrcProcRes.bTmoEn = pAdrcCtx->AdrcProcRes.bTmoEn;
+    pAdrcProcRes->AdrcProcRes.isLinearTmo = pAdrcCtx->AdrcProcRes.isLinearTmo;
+    memcpy(&pAdrcProcRes->AdrcProcRes.DrcProcRes, &pAdrcCtx->AdrcProcRes.DrcProcRes, sizeof(DrcProcRes_t));
+
+    LOGD_ATMO("%s://////////////////////////////////////ADRC Over////////////////////////////////////// \n", __func__);
 
     LOG1_ATMO("%s:Exit!\n", __FUNCTION__);
     return XCAM_RETURN_NO_ERROR;

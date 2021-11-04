@@ -47,7 +47,7 @@ add_custom_target(
     COMMAND ${CMAKE_SOURCE_DIR}/tools/iq_check/script/headerprocess.sh
     ${CMAKE_SOURCE_DIR}/include/iq_parser_v2/RkAiqCalibDbTypesV2.h
     ${CMAKE_SOURCE_DIR}/include/iq_parser_v2/j2s/j2s_generated.h
-    COMMAND ${CMAKE_SOURCE_DIR}/tools/iq_check/bin/parser RkAiqCalibDbTypesV2_M4.h >>
+    COMMAND ${CMAKE_SOURCE_DIR}/tools/iq_check/bin/parser RkAiqCalibDbTypesV2_M4.h CamCalibDbProj_t >>
     ${CMAKE_SOURCE_DIR}/include/iq_parser_v2/j2s/j2s_generated.h
     )
 add_dependencies(parser_tool j2s_preprocess)

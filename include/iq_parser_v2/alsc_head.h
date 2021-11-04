@@ -1,5 +1,5 @@
 /*
- * aie_head.h
+ * alsc_head.h
  *
  *  Copyright (c) 2021 Rockchip Corporation
  *
@@ -21,6 +21,7 @@
 #define __CALIBDBV2_ALSC_HEAD_H__
 
 #include "rk_aiq_comm.h"
+#include "alsc/rk_aiq_types_alsc_hw.h"
 
 RKAIQ_BEGIN_DECLARE
 
@@ -71,9 +72,9 @@ typedef struct CalibDbV2_Lsc_Resolution_s {
     // M4_STRING_DESC("name", M4_SIZE(1,1), M4_RANGE(0, 32), "default", M4_DYNAMIC(0))
     char        name[LSC_NAME];
     // M4_ARRAY_DESC("lsc_sect_size_x", "u16", M4_SIZE(1,8), M4_RANGE(0,10000), "0", M4_DIGIT(0), M4_DYNAMIC(0))
-    uint16_t    lsc_sect_size_x[CIFISP_LSC_SIZE_TBL_SIZE];
+    uint16_t    lsc_sect_size_x[LSC_SIZE_TBL_SIZE];
     // M4_ARRAY_DESC("lsc_sect_size_y", "u16", M4_SIZE(1,8), M4_RANGE(0,10000), "0", M4_DIGIT(0), M4_DYNAMIC(0))
-    uint16_t    lsc_sect_size_y[CIFISP_LSC_SIZE_TBL_SIZE];
+    uint16_t    lsc_sect_size_y[LSC_SIZE_TBL_SIZE];
 } CalibDbV2_Lsc_Resolution_t;
 
 typedef struct CalibDbV2_Lsc_Common_s {

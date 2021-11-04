@@ -30,10 +30,20 @@ rk_aiq_uapi_af_ManualTriger(const RkAiqAlgoContext *ctx);
 XCamReturn
 rk_aiq_uapi_af_Tracking(const RkAiqAlgoContext *ctx);
 XCamReturn
-rk_aiq_uapi_af_setZoomPos(const RkAiqAlgoContext *ctx, int zoom_pos);
+rk_aiq_uapi_af_setZoomIndex(const RkAiqAlgoContext *ctx, int index);
+XCamReturn
+rk_aiq_uapi_af_getZoomIndex(const RkAiqAlgoContext *ctx, int *index);
+XCamReturn
+rk_aiq_uapi_af_endZoomChg(const RkAiqAlgoContext *ctx);
+XCamReturn
+rk_aiq_uapi_af_startZoomCalib(const RkAiqAlgoContext *ctx);
 XCamReturn
 rk_aiq_uapi_af_getSearchPath(const RkAiqAlgoContext *ctx, rk_aiq_af_sec_path_t* path);
 XCamReturn
 rk_aiq_uapi_af_getSearchResult(const RkAiqAlgoContext *ctx, rk_aiq_af_result_t* result);
+XCamReturn
+rk_aiq_uapi_af_getFocusRange(const RkAiqAlgoContext *ctx, rk_aiq_af_focusrange* range);
+XCamReturn
+rk_aiq_uapi_af_resetZoom(const RkAiqAlgoContext *ctx);
 
 #endif

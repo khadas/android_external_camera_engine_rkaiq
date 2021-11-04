@@ -30,14 +30,15 @@ typedef struct RKAiqAecExpInfoWrapper_s : public SharedItemData {
     Sensor_dpcc_res_t SensorDpccInfo;
     int exp_tbl_size;
     int algo_id;
+    uint32_t frame_id;
     struct RKAiqAecExpInfoWrapper_s& operator=(const struct RKAiqAecExpInfoWrapper_s& set)
     {
-       this->aecExpInfo = set.aecExpInfo;
-       this->SensorDpccInfo = set.SensorDpccInfo;
-       this->exp_tbl_size = set.exp_tbl_size;
-       this->algo_id = set.algo_id;
-       memcpy(this->exp_tbl, set.exp_tbl, sizeof(set.exp_tbl));
-       return *this;
+        this->aecExpInfo = set.aecExpInfo;
+        this->SensorDpccInfo = set.SensorDpccInfo;
+        this->exp_tbl_size = set.exp_tbl_size;
+        this->algo_id = set.algo_id;
+        memcpy(this->exp_tbl, set.exp_tbl, sizeof(set.exp_tbl));
+        return *this;
     }
 } RKAiqAecExpInfoWrapper_t;
 
@@ -49,6 +50,14 @@ typedef struct RKAiqAfInfoWrapper_s : public SharedItemData {
     int64_t sofTime;
     int32_t focusCode;
     int32_t zoomCode;
+    float angleZ;
+    uint32_t lowPassId;
+    int32_t lowPassFv4_4[RKAIQ_RAWAF_SUMDATA_NUM];
+    int32_t lowPassFv8_8[RKAIQ_RAWAF_SUMDATA_NUM];
+    int32_t lowPassHighLht[RKAIQ_RAWAF_SUMDATA_NUM];
+    int32_t lowPassHighLht2[RKAIQ_RAWAF_SUMDATA_NUM];
+    bool zoomCorrection;
+    bool focusCorrection;
 } RKAiqAfInfoWrapper_t;
 
 typedef struct RkAiqPirisInfoWrapper_s : public SharedItemData {
@@ -61,7 +70,7 @@ typedef struct RkAiqPirisInfoWrapper_s : public SharedItemData {
 
 typedef struct RkAiqIrisInfoWrapper_s : public SharedItemData {
     //TODO Merge
-	//RkAiqIrisType_t           IrisType;
+    //RkAiqIrisType_t           IrisType;
     RkAiqPirisInfoWrapper_t   PIris;
     RkAiqDCIrisParam_t        DCIris;
     uint64_t                  sofTime;
@@ -73,6 +82,7 @@ typedef struct RKAiqCpslInfoWrapper_s : public SharedItemData {
     rk_aiq_ir_setting_t ir;
     rk_aiq_flash_setting_t fl_ir;
     bool update_ir;
+    uint32_t frame_id;
 } RKAiqCpslInfoWrapper_t;
 
 typedef enum RkAiqParamsType_e {
@@ -82,57 +92,59 @@ typedef enum RkAiqParamsType_e {
 } RkAiqParamsType_t;
 
 typedef enum _cam3aResultType {
-	RESULT_TYPE_INVALID = -1,
-	RESULT_TYPE_EXPOSURE,
-	RESULT_TYPE_AEC_PARAM,
-	RESULT_TYPE_HIST_PARAM,
-	RESULT_TYPE_AWB_PARAM,
-	RESULT_TYPE_AWBGAIN_PARAM,
-	RESULT_TYPE_AF_PARAM,
-	RESULT_TYPE_DPCC_PARAM,
+    RESULT_TYPE_INVALID = -1,
+    RESULT_TYPE_EXPOSURE_PARAM,
+    RESULT_TYPE_AEC_PARAM,
+    RESULT_TYPE_HIST_PARAM,
+    RESULT_TYPE_AWB_PARAM,
+    RESULT_TYPE_AWBGAIN_PARAM,
+    RESULT_TYPE_AF_PARAM,
+    RESULT_TYPE_DPCC_PARAM,
     RESULT_TYPE_MERGE_PARAM,
     RESULT_TYPE_TMO_PARAM,
-	RESULT_TYPE_CCM_PARAM,
-	RESULT_TYPE_LSC_PARAM,
-	RESULT_TYPE_BLC_PARAM,
-	RESULT_TYPE_RAWNR_PARAM,
-	RESULT_TYPE_GIC_PARAM,
-	RESULT_TYPE_DEBAYER_PARAM,
-	RESULT_TYPE_LDCH_PARAM,
-	RESULT_TYPE_LUT3D_PARAM = 0x10,
-	RESULT_TYPE_DEHAZE_PARAM,
-	RESULT_TYPE_AGAMMA_PARAM,
-	RESULT_TYPE_ADEGAMMA_PARAM,
-	RESULT_TYPE_WDR_PARAM,
-	RESULT_TYPE_CSM_PARAM,
-	RESULT_TYPE_CGC_PARAM,
-	RESULT_TYPE_CONV422_PARAM,
-	RESULT_TYPE_YUVCONV_PARAM,
-	RESULT_TYPE_GAIN_PARAM,
-	RESULT_TYPE_CP_PARAM,
-	RESULT_TYPE_IE_PARAM,
-	RESULT_TYPE_MOTION_PARAM,
-	RESULT_TYPE_IRIS_PARAM,
-	RESULT_TYPE_CPSL_PARAM,
-	RESULT_TYPE_FLASH_PARAM,
+    RESULT_TYPE_CCM_PARAM,
+    RESULT_TYPE_LSC_PARAM,
+    RESULT_TYPE_BLC_PARAM,
+    RESULT_TYPE_RAWNR_PARAM,
+    RESULT_TYPE_GIC_PARAM,
+    RESULT_TYPE_DEBAYER_PARAM,
+    RESULT_TYPE_LDCH_PARAM,
+    RESULT_TYPE_LUT3D_PARAM = 0x10,
+    RESULT_TYPE_DEHAZE_PARAM,
+    RESULT_TYPE_AGAMMA_PARAM,
+    RESULT_TYPE_ADEGAMMA_PARAM,
+    RESULT_TYPE_WDR_PARAM,
+    RESULT_TYPE_CSM_PARAM,
+    RESULT_TYPE_CGC_PARAM,
+    RESULT_TYPE_CONV422_PARAM,
+    RESULT_TYPE_YUVCONV_PARAM,
+    RESULT_TYPE_GAIN_PARAM,
+    RESULT_TYPE_CP_PARAM,
+    RESULT_TYPE_IE_PARAM,
+    RESULT_TYPE_MOTION_PARAM,
+    RESULT_TYPE_IRIS_PARAM,
+    RESULT_TYPE_CPSL_PARAM,
+    RESULT_TYPE_FLASH_PARAM,
 
-	RESULT_TYPE_TNR_PARAM = 0x20,
-	RESULT_TYPE_YNR_PARAM,
-	RESULT_TYPE_UVNR_PARAM,
-	RESULT_TYPE_SHARPEN_PARAM,
-	RESULT_TYPE_EDGEFLT_PARAM,
-	RESULT_TYPE_FEC_PARAM,
-	RESULT_TYPE_ORB_PARAM,
+    RESULT_TYPE_TNR_PARAM = 0x20,
+    RESULT_TYPE_YNR_PARAM,
+    RESULT_TYPE_UVNR_PARAM,
+    RESULT_TYPE_SHARPEN_PARAM,
+    RESULT_TYPE_EDGEFLT_PARAM,
+    RESULT_TYPE_FEC_PARAM,
+    RESULT_TYPE_ORB_PARAM,
 
-	RESULT_TYPE_FOCUS_PARAM,
+    RESULT_TYPE_FOCUS_PARAM,
 
     // isp21 result
-	RESULT_TYPE_DRC_PARAM = 0x28,
-	RESULT_TYPE_MAX_PARAM,
+    RESULT_TYPE_DRC_PARAM = 0x28,
+    // isp3x result
+    RESULT_TYPE_CAC_PARAM = 0x29,
+    RESULT_TYPE_MAX_PARAM,
 } cam3aResultType;
 
 static const char* Cam3aResultType2Str[RESULT_TYPE_MAX_PARAM] = {
-    [RESULT_TYPE_EXPOSURE]           = "EXPOSURE",
+    [RESULT_TYPE_EXPOSURE_PARAM]           = "EXPOSURE",
     [RESULT_TYPE_AEC_PARAM]          = "AEC",
     [RESULT_TYPE_HIST_PARAM]         = "HIST",
     [RESULT_TYPE_AWB_PARAM]          = "AWB",
@@ -173,6 +185,7 @@ static const char* Cam3aResultType2Str[RESULT_TYPE_MAX_PARAM] = {
     [RESULT_TYPE_ORB_PARAM]          = "ORB",
     [RESULT_TYPE_FOCUS_PARAM]        = "FOCUS",
     [RESULT_TYPE_DRC_PARAM]          = "DRC",
+    [RESULT_TYPE_CAC_PARAM]          = "CAC"
 };
 
 typedef SharedItemBase cam3aResult;
@@ -293,6 +306,37 @@ typedef SharedItemProxy<rk_aiq_isp_cnr_params_v21_t>        RkAiqIspCnrParamsPro
 typedef SharedItemPool<rk_aiq_isp_sharpen_params_v21_t>     RkAiqIspSharpenParamsPoolV21;
 typedef SharedItemProxy<rk_aiq_isp_sharpen_params_v21_t>    RkAiqIspSharpenParamsProxyV21;
 
+//v3x pools
+typedef SharedItemPool<rk_aiq_isp_awb_params_v3x_t>         RkAiqIspAwbParamsPoolV3x;
+typedef SharedItemProxy<rk_aiq_isp_awb_params_v3x_t>        RkAiqIspAwbParamsProxyV3x;
+typedef SharedItemPool<rk_aiq_isp_af_params_v3x_t>          RkAiqIspAfParamsPoolV3x;
+typedef SharedItemProxy<rk_aiq_isp_af_params_v3x_t>         RkAiqIspAfParamsProxyV3x;
+typedef SharedItemPool<rk_aiq_isp_agamma_params_v3x_t>      RkAiqIspAgammaParamsPoolV3x;
+typedef SharedItemProxy<rk_aiq_isp_agamma_params_v3x_t>     RkAiqIspAgammaParamsProxyV3x;
+typedef SharedItemPool<rk_aiq_isp_drc_params_v3x_t>         RkAiqIspDrcParamsPoolV3x;
+typedef SharedItemProxy<rk_aiq_isp_drc_params_v3x_t>        RkAiqIspDrcParamsProxyV3x;
+typedef SharedItemPool<rk_aiq_isp_merge_params_v3x_t>       RkAiqIspMergeParamsPoolV3x;
+typedef SharedItemProxy<rk_aiq_isp_merge_params_v3x_t>      RkAiqIspMergeParamsProxyV3x;
+typedef SharedItemPool<rk_aiq_isp_dehaze_params_v3x_t>      RkAiqIspDehazeParamsPoolV3x;
+typedef SharedItemProxy<rk_aiq_isp_dehaze_params_v3x_t>     RkAiqIspDehazeParamsProxyV3x;
+typedef SharedItemPool<rk_aiq_isp_baynr_params_v3x_t>       RkAiqIspBaynrParamsPoolV3x;
+typedef SharedItemProxy<rk_aiq_isp_baynr_params_v3x_t>      RkAiqIspBaynrParamsProxyV3x;
+typedef SharedItemPool<rk_aiq_isp_bay3d_params_v3x_t>       RkAiqIspBa3dParamsPoolV3x;
+typedef SharedItemProxy<rk_aiq_isp_bay3d_params_v3x_t>      RkAiqIspBa3dParamsProxyV3x;
+typedef SharedItemPool<rk_aiq_isp_ynr_params_v3x_t>         RkAiqIspYnrParamsPoolV3x;
+typedef SharedItemProxy<rk_aiq_isp_ynr_params_v3x_t>        RkAiqIspYnrParamsProxyV3x;
+typedef SharedItemPool<rk_aiq_isp_cnr_params_v3x_t>         RkAiqIspCnrParamsPoolV3x;
+typedef SharedItemProxy<rk_aiq_isp_cnr_params_v3x_t>        RkAiqIspCnrParamsProxyV3x;
+typedef SharedItemPool<rk_aiq_isp_sharpen_params_v3x_t>     RkAiqIspSharpenParamsPoolV3x;
+typedef SharedItemProxy<rk_aiq_isp_sharpen_params_v3x_t>    RkAiqIspSharpenParamsProxyV3x;
+typedef SharedItemPool<rk_aiq_isp_cac_params_v3x_t>         RkAiqIspCacParamsPoolV3x;
+typedef SharedItemProxy<rk_aiq_isp_cac_params_v3x_t>        RkAiqIspCacParamsProxyV3x;
+typedef SharedItemPool<rk_aiq_isp_gain_params_v3x_t>        RkAiqIspGainParamsPoolV3x;
+typedef SharedItemProxy<rk_aiq_isp_gain_params_v3x_t>       RkAiqIspGainParamsProxyV3x;
+typedef SharedItemPool<rk_aiq_isp_tnr_params_v3x_t>         RkAiqIspTnrParamsPoolV3x;
+typedef SharedItemProxy<rk_aiq_isp_tnr_params_v3x_t>        RkAiqIspTnrParamsProxyV3x;
+
+
 typedef class rk_aiq_isp_params_full_v20_s : public SharedItemData {
 public:
     SmartPtr<RkAiqIspAecParamsProxy>                        ae;
@@ -406,7 +450,7 @@ typedef struct : public SharedItemData {
     SmartPtr<RkAiqIspBa3dParamsProxyV21>                    ba3d;
     SmartPtr<RkAiqIspYnrParamsProxyV21>                     ynr;
     SmartPtr<RkAiqIspCnrParamsProxyV21>                     cnr;
-    SmartPtr<RkAiqIspSharpenParamsProxyV21>                   sharp;
+    SmartPtr<RkAiqIspSharpenParamsProxyV21>                 sharp;
     void reset () {
         ae.release();
         hist.release();
@@ -495,18 +539,31 @@ public:
         , mEdgefltParams(NULL)
         , mFecParams(NULL)
         , mOrbParams(NULL)
-        // TODO: change full params to list
-        // V21 differential modules
+          // TODO: change full params to list
+          // V21 differential modules
         , mAwbV21Params(NULL)
         , mDrcV21Params(NULL)
         , mBlcV21Params(NULL)
         , mGicV21Params(NULL)
         , mDehazeV21Params(NULL)
         , mBaynrV21Params(NULL)
-        // , mBa3dParams(NULL)
+          // , mBa3dParams(NULL)
         , mYnrV21Params(NULL)
         , mCnrV21Params(NULL)
-        , mSharpenV21Params(NULL) {
+        , mSharpenV21Params(NULL)
+        , mAwbV3xParams(NULL)
+        , mAfV3xParams(NULL)
+        , mAgammaV3xParams(NULL)
+        , mDrcV3xParams(NULL)
+        , mMergeV3xParams(NULL)
+        , mDehazeV3xParams(NULL)
+        , mBaynrV3xParams(NULL)
+        , mYnrV3xParams(NULL)
+        , mCnrV3xParams(NULL)
+        , mSharpenV3xParams(NULL)
+        , mCacV3xParams(NULL)
+        , mGainV3xParams(NULL)
+        , mTnrV3xParams(NULL) {
     };
     ~RkAiqFullParams() {};
 
@@ -566,6 +623,22 @@ public:
         mYnrV21Params.release();
         mCnrV21Params.release();
         mSharpenV21Params.release();
+
+        // TODO: change full params to list
+        // V3x differential modules
+        mAwbV3xParams.release();
+        mAfV3xParams.release();
+        mAgammaV3xParams.release();
+        mDrcV3xParams.release();
+        mMergeV3xParams.release();
+        mDehazeV3xParams.release();
+        mBaynrV3xParams.release();
+        mYnrV3xParams.release();
+        mCnrV3xParams.release();
+        mSharpenV3xParams.release();
+        mCacV3xParams.release();
+        mGainV3xParams.release();
+        mTnrV3xParams.release();
     };
     SmartPtr<RkAiqExpParamsProxy>           mExposureParams;
     SmartPtr<RkAiqFocusParamsProxy>         mFocusParams;
@@ -622,6 +695,20 @@ public:
     SmartPtr<RkAiqIspYnrParamsProxyV21>     mYnrV21Params;
     SmartPtr<RkAiqIspCnrParamsProxyV21>     mCnrV21Params;
     SmartPtr<RkAiqIspSharpenParamsProxyV21> mSharpenV21Params;
+    // V3x differential modules
+    SmartPtr<RkAiqIspAwbParamsProxyV3x>     mAwbV3xParams;
+    SmartPtr<RkAiqIspAfParamsProxyV3x>      mAfV3xParams;
+    SmartPtr<RkAiqIspAgammaParamsProxyV3x>  mAgammaV3xParams;
+    SmartPtr<RkAiqIspDrcParamsProxyV3x>     mDrcV3xParams;
+    SmartPtr<RkAiqIspMergeParamsProxyV3x>   mMergeV3xParams;
+    SmartPtr<RkAiqIspDehazeParamsProxyV3x>  mDehazeV3xParams;
+    SmartPtr<RkAiqIspBaynrParamsProxyV3x>   mBaynrV3xParams;
+    SmartPtr<RkAiqIspYnrParamsProxyV3x>     mYnrV3xParams;
+    SmartPtr<RkAiqIspCnrParamsProxyV3x>     mCnrV3xParams;
+    SmartPtr<RkAiqIspSharpenParamsProxyV3x> mSharpenV3xParams;
+    SmartPtr<RkAiqIspCacParamsProxyV3x>     mCacV3xParams;
+    SmartPtr<RkAiqIspGainParamsProxyV3x>    mGainV3xParams;
+    SmartPtr<RkAiqIspTnrParamsProxyV3x>     mTnrV3xParams;
 private:
     XCAM_DEAD_COPY (RkAiqFullParams);
 };

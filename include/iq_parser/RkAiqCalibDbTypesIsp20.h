@@ -1153,11 +1153,11 @@ typedef struct CalibDb_BayerNr_2_s {
 } CalibDb_BayerNr_2_t;
 
 
-#define CIFISP_LSC_DATA_TBL_SIZE           289
-#define CIFISP_LSC_GRAD_TBL_SIZE           8
-#define CIFISP_LSC_SIZE_TBL_SIZE           8
-#define LSC_GRAD_TBL_SIZE                  8
-#define LSC_ILLUMINATION_MAX               10
+#define CIFISP_LSC_DATA_TBL_SIZE_ISP20  289
+#define CIFISP_LSC_GRAD_TBL_SIZE_ISP20  8
+#define CIFISP_LSC_SIZE_TBL_SIZE_ISP20  8
+#define LSC_GRAD_TBL_SIZE_ISP20         8
+#define LSC_ILLUMINATION_MAX            10
 typedef enum  CalibDb_Used_For_Case_e {
     USED_FOR_CASE_NORMAL = 0,
     USED_FOR_CASE_FLASH,
@@ -1226,10 +1226,10 @@ typedef struct CalibDb_LscTableProfile_s {
     uint16_t                LscXo;
     uint16_t                LscYo;
 
-    uint16_t                LscXGradTbl[LSC_GRAD_TBL_SIZE];
-    uint16_t                LscYGradTbl[LSC_GRAD_TBL_SIZE];
-    uint16_t                LscXSizeTbl[CIFISP_LSC_SIZE_TBL_SIZE];
-    uint16_t                LscYSizeTbl[CIFISP_LSC_SIZE_TBL_SIZE];
+    uint16_t                LscXGradTbl[LSC_GRAD_TBL_SIZE_ISP20];
+    uint16_t                LscYGradTbl[LSC_GRAD_TBL_SIZE_ISP20];
+    uint16_t                LscXSizeTbl[CIFISP_LSC_SIZE_TBL_SIZE_ISP20];
+    uint16_t                LscYSizeTbl[CIFISP_LSC_SIZE_TBL_SIZE_ISP20];
 
     Cam17x17UShortMatrix_t  LscMatrix[CAM_4CH_COLOR_COMPONENT_MAX];     /**< matrix for different color channels */
 } CalibDb_LscTableProfile_t;

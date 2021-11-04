@@ -34,7 +34,7 @@ RkAiqResourceTranslator::translateIspStats (const SmartPtr<VideoBuffer> &from, S
     SmartPtr<RkAiqIspStats> statsInt = to->data();
 
     SmartPtr<RkAiqExpParamsProxy> expParams = nullptr;
-	rkisp_effect_params_v20 ispParams = {0};
+    rkisp_effect_params_v20 ispParams = {0};
 
     SmartPtr<RkAiqAfInfoProxy> afParams = buf->get_af_params();
     SmartPtr<RkAiqIrisParamsProxy> irisParams = buf->get_iris_params();
@@ -85,15 +85,20 @@ RkAiqResourceTranslator::translateIspStats (const SmartPtr<VideoBuffer> &from, S
     }
 
     //ae
-    statsInt->aec_stats_valid = (stats->meas_type >> 11) & (0x01) ? true : false;
 
     /*rawae stats*/
     uint8_t AeSwapMode, AeSelMode;
     AeSwapMode = ispParams.isp_params.meas.rawae0.rawae_sel;
     AeSelMode = ispParams.isp_params.meas.rawae3.rawae_sel;
 
+    unsigned int meas_type = 0;
+
     switch(AeSwapMode) {
     case AEC_RAWSWAP_MODE_S_LITE:
+
+        meas_type = ((stats->meas_type >> 7) & (0x01)) & ((stats->meas_type >> 11) & (0x01));
+        statsInt->aec_stats_valid = (meas_type & 0x01) ? true : false;
+
         for(int i = 0; i < ISP2X_RAWAEBIG_MEAN_NUM; i++) {
             if(i < ISP2X_RAWAELITE_MEAN_NUM) {
                 statsInt->aec_stats.ae_data.chn[0].rawae_lite.channelr_xy[i] = stats->params.rawae0.data[i].channelr_xy;
@@ -121,6 +126,10 @@ RkAiqResourceTranslator::translateIspStats (const SmartPtr<VideoBuffer> &from, S
         break;
 
     case AEC_RAWSWAP_MODE_M_LITE:
+
+        meas_type = ((stats->meas_type >> 8) & (0x01)) & ((stats->meas_type >> 12) & (0x01));
+        statsInt->aec_stats_valid = (meas_type & 0x01) ? true : false;
+
         for(int i = 0; i < ISP2X_RAWAEBIG_MEAN_NUM; i++) {
             if(i < ISP2X_RAWAELITE_MEAN_NUM) {
                 statsInt->aec_stats.ae_data.chn[1].rawae_lite.channelr_xy[i] = stats->params.rawae0.data[i].channelr_xy;
@@ -149,6 +158,10 @@ RkAiqResourceTranslator::translateIspStats (const SmartPtr<VideoBuffer> &from, S
         break;
 
     case AEC_RAWSWAP_MODE_L_LITE:
+
+        meas_type = ((stats->meas_type >> 9) & (0x01)) & ((stats->meas_type >> 13) & (0x01));
+        statsInt->aec_stats_valid = (meas_type & 0x01) ? true : false;
+
         for(int i = 0; i < ISP2X_RAWAEBIG_MEAN_NUM; i++) {
             if(i < ISP2X_RAWAELITE_MEAN_NUM) {
                 statsInt->aec_stats.ae_data.chn[2].rawae_lite.channelr_xy[i] = stats->params.rawae0.data[i].channelr_xy;
@@ -318,6 +331,7 @@ RkAiqResourceTranslator::translateIspStats (const SmartPtr<VideoBuffer> &from, S
             statsInt->af_stats.zoom_endtim = afParams->data()->zoomEndTim;
             statsInt->af_stats.zoom_starttim = afParams->data()->zoomStartTim;
             statsInt->af_stats.sof_tim = afParams->data()->sofTime;
+            statsInt->af_stats.angleZ = afParams->data()->angleZ;
         }
     }
 
@@ -356,15 +370,19 @@ RkAiqResourceTranslator::translateAecStats (const SmartPtr<VideoBuffer> &from, S
 
     statsInt->frame_id = stats->frame_id;
     //ae
-    statsInt->aec_stats_valid = (stats->meas_type >> 11) & (0x01) ? true : false;
 
     /*rawae stats*/
     uint8_t AeSwapMode, AeSelMode;
     AeSwapMode = ispParams.isp_params.meas.rawae0.rawae_sel;
     AeSelMode = ispParams.isp_params.meas.rawae3.rawae_sel;
+    unsigned int meas_type = 0;
 
     switch(AeSwapMode) {
     case AEC_RAWSWAP_MODE_S_LITE:
+
+        meas_type = ((stats->meas_type >> 7) & (0x01)) & ((stats->meas_type >> 11) & (0x01));
+        statsInt->aec_stats_valid = (meas_type & 0x01) ? true : false;
+
         for(int i = 0; i < ISP2X_RAWAEBIG_MEAN_NUM; i++) {
             if(i < ISP2X_RAWAELITE_MEAN_NUM) {
                 statsInt->aec_stats.ae_data.chn[0].rawae_lite.channelr_xy[i] = stats->params.rawae0.data[i].channelr_xy;
@@ -392,6 +410,10 @@ RkAiqResourceTranslator::translateAecStats (const SmartPtr<VideoBuffer> &from, S
         break;
 
     case AEC_RAWSWAP_MODE_M_LITE:
+
+        meas_type = ((stats->meas_type >> 8) & (0x01)) & ((stats->meas_type >> 12) & (0x01));
+        statsInt->aec_stats_valid = (meas_type & 0x01) ? true : false;
+
         for(int i = 0; i < ISP2X_RAWAEBIG_MEAN_NUM; i++) {
             if(i < ISP2X_RAWAELITE_MEAN_NUM) {
                 statsInt->aec_stats.ae_data.chn[1].rawae_lite.channelr_xy[i] = stats->params.rawae0.data[i].channelr_xy;
@@ -420,6 +442,10 @@ RkAiqResourceTranslator::translateAecStats (const SmartPtr<VideoBuffer> &from, S
         break;
 
     case AEC_RAWSWAP_MODE_L_LITE:
+
+        meas_type = ((stats->meas_type >> 9) & (0x01)) & ((stats->meas_type >> 13) & (0x01));
+        statsInt->aec_stats_valid = (meas_type & 0x01) ? true : false;
+
         for(int i = 0; i < ISP2X_RAWAEBIG_MEAN_NUM; i++) {
             if(i < ISP2X_RAWAELITE_MEAN_NUM) {
                 statsInt->aec_stats.ae_data.chn[2].rawae_lite.channelr_xy[i] = stats->params.rawae0.data[i].channelr_xy;
@@ -799,11 +825,26 @@ RkAiqResourceTranslator::translateAfStats (const SmartPtr<VideoBuffer> &from, Sm
             statsInt->af_stats.roia_sharpness += stats->params.rawaf.ramdata[i];
 
         if(afParams.ptr()) {
+            statsInt->af_stats.focusCode = afParams->data()->focusCode;
+            statsInt->af_stats.zoomCode = afParams->data()->zoomCode;
             statsInt->af_stats.focus_endtim = afParams->data()->focusEndTim;
             statsInt->af_stats.focus_starttim = afParams->data()->focusStartTim;
             statsInt->af_stats.zoom_endtim = afParams->data()->zoomEndTim;
             statsInt->af_stats.zoom_starttim = afParams->data()->zoomStartTim;
             statsInt->af_stats.sof_tim = afParams->data()->sofTime;
+            statsInt->af_stats.lowpass_id = afParams->data()->lowPassId;
+            statsInt->af_stats.focusCorrection = afParams->data()->focusCorrection;
+            statsInt->af_stats.zoomCorrection = afParams->data()->zoomCorrection;
+            memcpy(statsInt->af_stats.lowpass_fv4_4,
+                   afParams->data()->lowPassFv4_4, ISP2X_RAWAF_SUMDATA_NUM * sizeof(u32));
+            memcpy(statsInt->af_stats.lowpass_fv8_8,
+                   afParams->data()->lowPassFv8_8, ISP2X_RAWAF_SUMDATA_NUM * sizeof(u32));
+            memcpy(statsInt->af_stats.lowpass_highlht,
+                   afParams->data()->lowPassHighLht, ISP2X_RAWAF_SUMDATA_NUM * sizeof(u32));
+            memcpy(statsInt->af_stats.lowpass_highlht2,
+                   afParams->data()->lowPassHighLht2, ISP2X_RAWAF_SUMDATA_NUM * sizeof(u32));
+
+            statsInt->af_stats.angleZ = afParams->data()->angleZ;
         }
     }
 
@@ -828,7 +869,7 @@ RkAiqResourceTranslator::translateOrbStats (const SmartPtr<VideoBuffer> &from,
     statsInt->orb_stats.frame_id = stats->frame_id;
     statsInt->orb_stats.num_points = stats->total_num;
     if (stats->total_num > 0 && stats->total_num <= ORB_DATA_NUM)
-        memcpy(statsInt->orb_stats.points, stats->data, stats->total_num*sizeof(stats->data[0]));
+        memcpy(statsInt->orb_stats.points, stats->data, stats->total_num * sizeof(stats->data[0]));
 
     to->set_sequence(stats->frame_id);
 

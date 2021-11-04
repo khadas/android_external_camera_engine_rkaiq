@@ -19,8 +19,6 @@
 /* for rockchip v2.0.0*/
 
 #include "rk_aiq_algo_types_int.h"
-
-
 #include "rk_aiq_algo_adhaz_itf.h"
 #include "RkAiqCalibDbTypes.h"
 #include "adehaze/rk_aiq_adehaze_algo.h"
@@ -36,9 +34,13 @@ create_context(RkAiqAlgoContext **context, const AlgoCtxInstanceCfg* cfg)
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
     AdehazeHandle_t *AdehazeHandle = NULL;
     AlgoCtxInstanceCfgInt* instanc_int = (AlgoCtxInstanceCfgInt*)cfg;
-    CamCalibDbV2Context_t* calibv2 = instanc_int->calibv2;
 
-    ret = AdehazeInit(&AdehazeHandle, calibv2);
+    ret = AdehazeInit(&AdehazeHandle, (CamCalibDbV2Context_t*)(instanc_int->calibv2));
+
+    if (ret != XCAM_RETURN_NO_ERROR) {
+        LOGE_ADEHAZE("%s Adehaze Init failed: %d", __FUNCTION__, ret);
+        return(XCAM_RETURN_ERROR_FAILED);
+    }
 
     *context = (RkAiqAlgoContext *)(AdehazeHandle);
 
@@ -55,6 +57,7 @@ destroy_context(RkAiqAlgoContext *context)
 
     ret = AdehazeRelease(AdehazeHandle);
 
+    LOG1_ADEHAZE("EIXT: %s \n", __func__);
     return ret;
 }
 
@@ -70,6 +73,7 @@ prepare(RkAiqAlgoCom* params)
     const CamCalibDbV2Context_t* pCalibDb = config->rk_com.u.prepare.calibv2;
 
     AdehazeHandle->working_mode = config->adhaz_config_com.com.u.prepare.working_mode;
+    AdehazeHandle->is_multi_isp_mode = config->is_multi_isp_mode;
 
     if (AdehazeHandle->working_mode < RK_AIQ_WORKING_MODE_ISP_HDR2)
         AdehazeHandle->FrameNumber = 1;
@@ -82,31 +86,49 @@ prepare(RkAiqAlgoCom* params)
     if(!!(params->u.prepare.conf_type & RK_AIQ_ALGO_CONFTYPE_UPDATECALIB )) {
         LOGD_ADEHAZE("%s: Adehaze Reload Para!\n", __FUNCTION__);
 
-        CalibDbV2_dehaze_V20_t* calibv2_adehaze_calib_V20 =
-            (CalibDbV2_dehaze_V20_t*)(CALIBDBV2_GET_MODULE_PTR((void*)pCalibDb, adehaze_calib_v20));
-        if (calibv2_adehaze_calib_V20)
-            memcpy(&AdehazeHandle->calib_dehazV20, calibv2_adehaze_calib_V20, sizeof(CalibDbV2_dehaze_V20_t));
+        if(AdehazeHandle->HWversion == ADEHAZE_ISP21) {
+            CalibDbV2_dehaze_V20_t* calibv2_adehaze_calib_V20 =
+                (CalibDbV2_dehaze_V20_t*)(CALIBDBV2_GET_MODULE_PTR((void*)pCalibDb, adehaze_calib_v20));
+            if (calibv2_adehaze_calib_V20)
+                memcpy(&AdehazeHandle->Calib.Dehaze_v20, calibv2_adehaze_calib_V20, sizeof(CalibDbV2_dehaze_V20_t));
+        }
+        else if(AdehazeHandle->HWversion == ADEHAZE_ISP21) {
+            CalibDbV2_dehaze_V21_t* calibv2_adehaze_calib_V21 =
+                (CalibDbV2_dehaze_V21_t*)(CALIBDBV2_GET_MODULE_PTR((void*)pCalibDb, adehaze_calib_v21));
+            if (calibv2_adehaze_calib_V21)
+                memcpy(&AdehazeHandle->Calib.Dehaze_v21, calibv2_adehaze_calib_V21, sizeof(CalibDbV2_dehaze_V21_t));
+        }
+        else if(AdehazeHandle->HWversion == ADEHAZE_ISP30) {
+            CalibDbV2_dehaze_V30_t* calibv2_adehaze_calib_V30 =
+                (CalibDbV2_dehaze_V30_t*)(CALIBDBV2_GET_MODULE_PTR((void*)pCalibDb, adehaze_calib_v30));
+            if (calibv2_adehaze_calib_V30)
+                memcpy(&AdehazeHandle->Calib.Dehaze_v30, calibv2_adehaze_calib_V30, sizeof(CalibDbV2_dehaze_V30_t));
 
-        CalibDbV2_dehaze_V21_t* calibv2_adehaze_calib_V21 =
-            (CalibDbV2_dehaze_V21_t*)(CALIBDBV2_GET_MODULE_PTR((void*)pCalibDb, adehaze_calib_v21));
-        if (calibv2_adehaze_calib_V21)
-            memcpy(&AdehazeHandle->calib_dehazV21, calibv2_adehaze_calib_V21, sizeof(CalibDbV2_dehaze_V21_t));
+            //dehaze local gain
+            CalibDbV2_YnrV3_t*  calibv2_Ynr =
+                (CalibDbV2_YnrV3_t *)(CALIBDBV2_GET_MODULE_PTR((void*)pCalibDb, ynr_v3));
+            if (calibv2_Ynr)
+                memcpy(&AdehazeHandle->Calib.Dehaze_v30.YnrCalibPara, &calibv2_Ynr->CalibPara, sizeof(CalibDbV2_YnrV3_CalibPara_t));
+        }
     }
 
     LOG1_ADEHAZE("EIXT: %s \n", __func__);
     return ret;
-
 }
 
 static XCamReturn
 pre_process(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outparams)
 {
     LOG1_ADEHAZE("ENTER: %s \n", __func__);
-    RkAiqAlgoPreAdhazInt* config = (RkAiqAlgoPreAdhazInt*)inparams;
+
     AdehazeHandle_t * AdehazeHandle = (AdehazeHandle_t *)inparams->ctx;
+    AdehazeHandle->FrameID = inparams->frame_id;
+    RkAiqAlgoPreAdhazInt* config = (RkAiqAlgoPreAdhazInt*)inparams;
 
     AdehazeHandle->width = config->rawWidth;
     AdehazeHandle->height = config->rawHeight;
+
+    AdehazeGetStats(AdehazeHandle, &config->stats);
 
     LOG1_ADEHAZE("EIXT: %s \n", __func__);
     return XCAM_RETURN_NO_ERROR;
@@ -118,73 +140,22 @@ processing(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outparams)
     LOG1_ADEHAZE("ENTER: %s \n", __func__);
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
     AdehazeHandle_t * AdehazeHandle = (AdehazeHandle_t *)inparams->ctx;
-    RkAiqAlgoProcAdhazInt* procPara = (RkAiqAlgoProcAdhazInt*)inparams;
-    RkAiqAlgoProcResAdhaz* procResPara = (RkAiqAlgoProcResAdhaz*)outparams;
-    AdehazeGetStats(AdehazeHandle, &procPara->stats);
+    RkAiqAlgoProcAdhazInt* pProcPara = (RkAiqAlgoProcAdhazInt*)inparams;
+    RkAiqAlgoProcResAdhaz* pProcRes = (RkAiqAlgoProcResAdhaz*)outparams;
 
-    if(AdehazeHandle->HWversion == ADEHAZE_ISP20) {
-        int iso = 50;
-        AdehazeExpInfo_t stExpInfo;
-        memset(&stExpInfo, 0x00, sizeof(AdehazeExpInfo_t));
+    LOGD_ADEHAZE("/*************************Adehaze Start******************/ \n");
 
-        stExpInfo.hdr_mode = 0;
-        for(int i = 0; i < 3; i++) {
-            stExpInfo.arIso[i] = 50;
-            stExpInfo.arAGain[i] = 1.0;
-            stExpInfo.arDGain[i] = 1.0;
-            stExpInfo.arTime[i] = 0.01;
-        }
+    AdehazeGetCurrData(AdehazeHandle, pProcPara);
 
-        if(AdehazeHandle->working_mode == RK_AIQ_WORKING_MODE_NORMAL) {
-            stExpInfo.hdr_mode = 0;
-        } else if(RK_AIQ_HDR_GET_WORKING_MODE(AdehazeHandle->working_mode) == RK_AIQ_WORKING_MODE_ISP_HDR2) {
-            stExpInfo.hdr_mode = 1;
-        } else if(RK_AIQ_HDR_GET_WORKING_MODE(AdehazeHandle->working_mode) == RK_AIQ_WORKING_MODE_ISP_HDR3) {
-            stExpInfo.hdr_mode = 2;
-        }
-
-        RkAiqAlgoPreResAeInt* pAEPreRes =
-            (RkAiqAlgoPreResAeInt*)(procPara->rk_com.u.proc.pre_res_comb->ae_pre_res);
-
-        if(pAEPreRes != NULL) {
-            if(AdehazeHandle->working_mode == RK_AIQ_WORKING_MODE_NORMAL) {
-                stExpInfo.arAGain[0] = pAEPreRes->ae_pre_res_rk.LinearExp.exp_real_params.analog_gain;
-                stExpInfo.arDGain[0] = pAEPreRes->ae_pre_res_rk.LinearExp.exp_real_params.digital_gain;
-                stExpInfo.arTime[0] = pAEPreRes->ae_pre_res_rk.LinearExp.exp_real_params.integration_time;
-                stExpInfo.arIso[0] = stExpInfo.arAGain[0] * stExpInfo.arDGain[0] * 50;
-            } else {
-                for(int i = 0; i < 3; i++) {
-                    stExpInfo.arAGain[i] = pAEPreRes->ae_pre_res_rk.HdrExp[i].exp_real_params.analog_gain;
-                    stExpInfo.arDGain[i] = pAEPreRes->ae_pre_res_rk.HdrExp[i].exp_real_params.digital_gain;
-                    stExpInfo.arTime[i] = pAEPreRes->ae_pre_res_rk.HdrExp[i].exp_real_params.integration_time;
-                    stExpInfo.arIso[i] = stExpInfo.arAGain[i] * stExpInfo.arDGain[i] * 50;
-
-                    LOGD_ADEHAZE("index:%d again:%f dgain:%f time:%f iso:%d hdr_mode:%d\n",
-                                 i,
-                                 stExpInfo.arAGain[i],
-                                 stExpInfo.arDGain[i],
-                                 stExpInfo.arTime[i],
-                                 stExpInfo.arIso[i],
-                                 stExpInfo.hdr_mode);
-                }
-            }
-        } else {
-            LOGE_ADEHAZE("%s:%d pAEPreRes is NULL, so use default instead \n", __FUNCTION__, __LINE__);
-        }
-
-        iso = stExpInfo.arIso[stExpInfo.hdr_mode];
-        AdehazeHandle->CurrData.V20.ISO = (float)iso;
-    }
-    else if(AdehazeHandle->HWversion == ADEHAZE_ISP21) {
-        XCamVideoBuffer* xCamAePreRes = procPara->rk_com.u.proc.res_comb->ae_pre_res;
-        RkAiqAlgoPreResAeInt* pAEPreRes = NULL;
-        if (xCamAePreRes) {
-            pAEPreRes = (RkAiqAlgoPreResAeInt*)xCamAePreRes->map(xCamAePreRes);
-            AdehazeGetEnvLv(AdehazeHandle, pAEPreRes);
-        }
+    //get ynr snr mode
+    if(AdehazeHandle->HWversion == ADEHAZE_ISP30) {
+        if(pProcPara->rk_com.u.proc.curExp->CISFeature.SNR == 0)
+            AdehazeHandle->CurrData.V30.SnrMode = YNRSNRMODE_LSNR;
+        else if(pProcPara->rk_com.u.proc.curExp->CISFeature.SNR == 1)
+            AdehazeHandle->CurrData.V30.SnrMode = YNRSNRMODE_HSNR;
         else {
-            AdehazeHandle->CurrData.V21.EnvLv = 0.0;
-            LOGE_ADEHAZE( "%s:PreResBuf is NULL!\n", __FUNCTION__);
+            LOGI_ADEHAZE("%s(%d) Adehaze Get Wrong Snr Mode!!!, Using LSNR Params \n", __func__, __LINE__);
+            AdehazeHandle->CurrData.V30.SnrMode = YNRSNRMODE_LSNR;
         }
     }
 
@@ -193,12 +164,12 @@ processing(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outparams)
         ret = AdehazeProcess(AdehazeHandle, AdehazeHandle->HWversion);
 
     //store data
-    AdehazeHandle->FrameID++;
     if(AdehazeHandle->HWversion == ADEHAZE_ISP20)
         AdehazeHandle->PreData.V20.ApiMode = AdehazeHandle->AdehazeAtrr.AdehazeAtrrV20.mode;
     else if(AdehazeHandle->HWversion == ADEHAZE_ISP21)
         AdehazeHandle->PreData.V21.ApiMode = AdehazeHandle->AdehazeAtrr.AdehazeAtrrV21.mode;
-
+    else if(AdehazeHandle->HWversion == ADEHAZE_ISP30)
+        AdehazeHandle->PreData.V30.ApiMode = AdehazeHandle->AdehazeAtrr.AdehazeAtrrV30.mode;
 
     //proc res
     if(AdehazeHandle->HWversion == ADEHAZE_ISP20) {
@@ -209,9 +180,13 @@ processing(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outparams)
         AdehazeHandle->ProcRes.ProcResV21.enable = true;
         AdehazeHandle->ProcRes.ProcResV21.update = !(AdehazeHandle->byPassProc);
     }
-    memcpy(&procResPara->AdehzeProcRes, &AdehazeHandle->ProcRes, sizeof(RkAiqAdehazeProcResult_t));
+    else if(AdehazeHandle->HWversion == ADEHAZE_ISP30) {
+        AdehazeHandle->ProcRes.ProcResV30.enable = true;
+        AdehazeHandle->ProcRes.ProcResV30.update = !(AdehazeHandle->byPassProc);
+    }
+    memcpy(&pProcRes->AdehzeProcRes, &AdehazeHandle->ProcRes, sizeof(RkAiqAdehazeProcResult_t));
 
-    LOGD_ADEHAZE("%s:/*************************Adehaze over******************/ \n", __func__);
+    LOGD_ADEHAZE("/*************************Adehaze over******************/ \n");
 
     LOG1_ADEHAZE("EIXT: %s \n", __func__);
     return ret;

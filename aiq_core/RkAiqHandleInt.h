@@ -53,6 +53,7 @@
 #include "auvnr/rk_aiq_uapi_auvnr_int_v1.h"
 #include "amfnr/rk_aiq_uapi_amfnr_int_v1.h"
 #include "again/rk_aiq_uapi_again_int.h"
+#include "acac/rk_aiq_uapi_acac_int.h"
 
 #include "RkAiqSharedDataManager.h"
 #include "rk_aiq_api_private.h"
@@ -354,9 +355,14 @@ public:
     XCamReturn Oneshot();
     XCamReturn ManualTriger();
     XCamReturn Tracking();
-    XCamReturn setZoomPos(int zoom_pos);
+    XCamReturn setZoomIndex(int index);
+    XCamReturn getZoomIndex(int *index);
+    XCamReturn endZoomChg();
+    XCamReturn startZoomCalib();
+    XCamReturn resetZoom();
     XCamReturn GetSearchPath(rk_aiq_af_sec_path_t* path);
     XCamReturn GetSearchResult(rk_aiq_af_result_t* result);
+    XCamReturn GetFocusRange(rk_aiq_af_focusrange* range);
 
 protected:
     virtual void init();
@@ -364,10 +370,14 @@ protected:
         RkAiqAfHandle::deInit();
     };
 private:
+    bool getValueFromFile(const char* path, int *pos);
+
     // TODO
     rk_aiq_af_attrib_t mCurAtt;
     rk_aiq_af_attrib_t mNewAtt;
     bool isUpdateAttDone;
+    bool isUpdateZoomPosDone;
+    int mLastZoomIndex;
 
     SmartPtr<RkAiqAlgoProcResAfIntShared> mProcResShared;
 };
@@ -1337,6 +1347,41 @@ protected:
 private:
 
 
+};
+
+// acac
+class RkAiqAcacHandleInt:
+    virtual public RkAiqAcacHandle,
+    virtual public RkAiqHandleIntCom {
+public:
+    explicit RkAiqAcacHandleInt(RkAiqAlgoDesComm* des, RkAiqCore* aiqCore)
+        : RkAiqHandle(des, aiqCore)
+        , RkAiqAcacHandle(des, aiqCore)
+        , RkAiqHandleIntCom(des, aiqCore) {
+        memset(&mCurAtt, 0, sizeof(rk_aiq_cac_attrib_t));
+        memset(&mNewAtt, 0, sizeof(rk_aiq_cac_attrib_t));
+        mCurAtt.en = 0xff;
+    };
+    virtual ~RkAiqAcacHandleInt() {
+        RkAiqAcacHandle::deInit();
+    };
+    virtual XCamReturn updateConfig(bool needSync);
+    virtual XCamReturn prepare();
+    virtual XCamReturn preProcess();
+    virtual XCamReturn processing();
+    virtual XCamReturn postProcess();
+
+    XCamReturn setAttrib(rk_aiq_cac_attrib_t att);
+    XCamReturn getAttrib(rk_aiq_cac_attrib_t *att);
+
+protected:
+    virtual void init();
+    virtual void deInit() {
+        RkAiqAcacHandle::deInit();
+    };
+private:
+    rk_aiq_cac_attrib_t mCurAtt;
+    rk_aiq_cac_attrib_t mNewAtt;
 };
 
 }; //namespace RkCam

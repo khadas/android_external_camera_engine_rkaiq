@@ -120,6 +120,9 @@ public:
     virtual XCamReturn ZoomCorrection() {
         return  XCAM_RETURN_ERROR_FAILED;
     }
+    virtual XCamReturn setAngleZ(float angleZ) {
+        return  XCAM_RETURN_ERROR_FAILED;
+    }
     virtual void getShareMemOps(isp_drv_share_mem_ops_t** mem_ops) {};
     virtual XCamReturn getEffectiveIspParams(rkisp_effect_params_v20& ispParams, int frame_id) {
         return  XCAM_RETURN_ERROR_FAILED;
@@ -133,6 +136,10 @@ public:
     virtual rk_isp_stream_mode_t getIspStreamMode() {
         return RK_ISP_STREAM_MODE_INVALID;
     }
+    virtual void setCamPhyId(int phyId) {
+        mCamPhyId = phyId;
+    }
+    virtual int getCamPhyId() { return mCamPhyId;}
     HwResListener* mHwResLintener;
 protected:
     SmartPtr<V4l2Device> mIsppFecParamsDev;
@@ -152,6 +159,7 @@ protected:
     const CamCalibDbContext_t* mCalibDb;
     const CamCalibDbV2Context_t* mCalibDbV2;
     bool mKpHwSt;
+    int mCamPhyId;
 private:
     XCAM_DEAD_COPY (CamHwBase);
 };

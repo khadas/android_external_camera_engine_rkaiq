@@ -134,6 +134,7 @@ RKAIQHANDLE(AdrcV21);
 RKAIQHANDLE(Aeis);
 RKAIQHANDLE(Amd);
 RKAIQHANDLE(Again);
+RKAIQHANDLE(Acac);
 
 };  // namespace RkCam
 

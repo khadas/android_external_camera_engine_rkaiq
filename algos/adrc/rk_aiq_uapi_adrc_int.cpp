@@ -166,7 +166,7 @@ rk_aiq_uapi_adrc_SetAttrib(RkAiqAlgoContext *ctx,
                            bool need_sync)
 {
     LOG1_ATMO("ENTER: %s \n", __func__);
-    AdrcContext_t* pAdrcCtx = (AdrcContext_t*)(ctx->AdrcInstConfig.hAdrc);
+    AdrcContext_t* pAdrcCtx = (AdrcContext_t*)(ctx);
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
 
     pAdrcCtx->drcAttr.Enable = attr.Enable;
@@ -195,7 +195,7 @@ rk_aiq_uapi_adrc_GetAttrib(RkAiqAlgoContext *ctx,
     LOG1_ATMO("ENTER: %s \n", __func__);
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
 
-    AdrcContext_t* pAdrcCtx = (AdrcContext_t*)ctx->AdrcInstConfig.hAdrc;
+    AdrcContext_t* pAdrcCtx = (AdrcContext_t*)ctx;
 
     attr->Enable = pAdrcCtx->drcAttr.Enable;
     attr->opMode = pAdrcCtx->drcAttr.opMode;

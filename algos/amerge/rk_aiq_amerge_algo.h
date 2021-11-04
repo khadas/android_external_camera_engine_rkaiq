@@ -18,16 +18,16 @@
 #include "rk_aiq_uapi_amerge_int.h"
 #include "rk_aiq_types_amerge_algo_prvt.h"
 
-RESULT AmergeStart(AmergeHandle_t pAmergeCtx);
-RESULT AmergeStop(AmergeHandle_t pAmergeCtx);
-void AmergeIQUpdate(AmergeHandle_t pAmergeCtx);
-void AmergeGetSensorInfo( AmergeHandle_t pAmergeCtx, AecProcResult_t AecHdrProcResult);
-void MergeNewMalloc(AmergeConfig_t* pAmergeConfig, CalibDbV2_merge_t* pCalibDb);
-void AmergeUpdateConfig(AmergeHandle_t pAmergeCtx, CalibDbV2_merge_t* pCalibDb);
-void AmergeProcessing(AmergeHandle_t pAmergeCtx);
-bool AmergeByPassProcessing(AmergeHandle_t pAmergeCtx, AecPreResult_t AecHdrPreResult);
-RESULT AmergeInit(AmergeInstanceConfig_t* pInstConfig, CamCalibDbV2Context_t* pCalibV2) ;
-RESULT AmergeRelease(AmergeHandle_t pAmergeCtx) ;
+XCamReturn AmergeStart(AmergeContext_t* pAmergeCtx);
+XCamReturn AmergeStop(AmergeContext_t* pAmergeCtx);
+void AmergeIQUpdate(AmergeContext_t* pAmergeCtx);
+void AmergeGetSensorInfo( AmergeContext_t* pAmergeCtx, AecProcResult_t AecHdrProcResult);
+void MergeNewMalloc(AmergeConfig_t* pAmergeConfig, AmergeCalib_t* pCalibDb, AmergeVersion_t HWversion);
+void AmergeUpdateConfig(AmergeContext_t* pAmergeCtx, AmergeCalib_t* pCalibDb);
+void AmergeProcessing(AmergeContext_t* pAmergeCtx);
+bool AmergeByPassProcessing(AmergeContext_t* pAmergeCtx, AecPreResult_t AecHdrPreResult);
+XCamReturn AmergeInit(AmergeContext_t **ppAmergeCtx, CamCalibDbV2Context_t* pCalibV2) ;
+XCamReturn AmergeRelease(AmergeContext_t* pAmergeCtx) ;
 
 
 #endif

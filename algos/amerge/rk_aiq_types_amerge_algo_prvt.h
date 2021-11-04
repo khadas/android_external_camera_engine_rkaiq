@@ -31,23 +31,6 @@
 #define LIMIT_PARA(a,b,c,d,e)      (c+(a-e)*(b-c)/(d -e))
 
 
-#define AMERGE_RET_SUCCESS             0   //!< this has to be 0, if clauses rely on it
-#define AMERGE_RET_FAILURE             1   //!< general failure
-#define AMERGE_RET_NOTSUPP             2   //!< feature not supported
-#define AMERGE_RET_BUSY                3   //!< there's already something going on...
-#define AMERGE_RET_CANCELED            4   //!< operation canceled
-#define AMERGE_RET_OUTOFMEM            5   //!< out of memory
-#define AMERGE_RET_OUTOFRANGE          6   //!< parameter/value out of range
-#define AMERGE_RET_IDLE                7   //!< feature/subsystem is in idle state
-#define AMERGE_RET_WRONG_HANDLE        8   //!< handle is wrong
-#define AMERGE_RET_NULL_POINTER        9   //!< the/one/all parameter(s) is a(are) NULL pointer(s)
-#define AMERGE_RET_NOTAVAILABLE       10   //!< profile not available
-#define AMERGE_RET_DIVISION_BY_ZERO   11   //!< a divisor equals ZERO
-#define AMERGE_RET_WRONG_STATE        12   //!< state machine in wrong state
-#define AMERGE_RET_INVALID_PARM       13   //!< invalid parameter
-#define AMERGE_RET_PENDING            14   //!< command pending
-#define AMERGE_RET_WRONG_CONFIG       15   //!< given configuration is invalid
-
 #define MAXLUMAK     (1.5)
 #define MAXLUMAB     (30)
 #define ENVLVMAX     (1.0)
@@ -83,6 +66,7 @@ typedef enum AmergeState_e {
 typedef enum AmergeVersion_e {
     AMERGE_ISP20      = 0,
     AMERGE_ISP21      = 1,
+    AMERGE_ISP30      = 2,
     AMERGE_HW_MAX
 } AmergeVersion_t;
 
@@ -148,9 +132,32 @@ typedef struct MergeCurrData_s
 
 typedef struct AmergeProcResData_s
 {
-    MgeProcRes_t Res;
+    union {
+        MgeProcRes_t Merge_v20;
+        MgeProcResV2_t Merge_v30;
+    };
+    bool update;
     bool LongFrameMode;
 } AmergeProcResData_t;
+
+typedef struct AmergeConfig_s {
+    MergeBaseFrame_t BaseFrm;
+    int MergeMode;
+    int MaxEnvLvKnots;
+    int MaxMoveCoefKnots;
+    float* EnvLv; //0: dark 1:bright
+    float* MoveCoef;
+    float* OECurve_smooth;  //current over exposure curve slope
+    float* OECurve_offset; //current over exposure curve offset
+    float* MDCurveLM_smooth;  //Move Detect curve slope betwwen long frame and middle frame
+    float* MDCurveLM_offset;  //Move Detect curve offset betwwen long frame and middle frame
+    float* MDCurveMS_smooth;  //Move Detect curve slope betwwen middle frame and short frame
+    float* MDCurveMS_offset;  //Move Detect curve slope betwwen middle frame and short frame
+    float ByPassThr;
+    float OECurve_damp;
+    float MDCurveLM_damp;
+    float MDCurveMS_damp ;
+} AmergeConfig_t;
 
 typedef struct SensorInfo_s
 {
@@ -168,11 +175,18 @@ typedef struct SensorInfo_s
     float MinExpoS;
 } SensorInfo_t;
 
+typedef struct AmergeCalib_s {
+    union {
+        CalibDbV2_merge_t Merge_v20;
+        CalibDbV2_merge_V2_t Merge_v30;
+    };
+} AmergeCalib_t;
+
 typedef struct AmergeContext_s
 {
     //api
     mergeAttr_t mergeAttr;
-    CalibDbV2_merge_t pCalibDB;
+    AmergeCalib_t pCalibDB;
     AmergeState_t state;
     AmergeConfig_t Config;
     AmergePrevData_t PrevData ;
@@ -187,16 +201,5 @@ typedef struct AmergeContext_s
     int frameCnt;
     int FrameNumber;
 } AmergeContext_t;
-
-typedef AmergeContext_t* AmergeHandle_t;
-
-typedef struct AmergeInstanceConfig_s {
-    AmergeHandle_t              hAmerge;
-} AmergeInstanceConfig_t;
-
-typedef struct _RkAiqAlgoContext {
-    AmergeInstanceConfig_t AmergeInstConfig;
-    //void* place_holder[0];
-} RkAiqAlgoContext;
 
 #endif

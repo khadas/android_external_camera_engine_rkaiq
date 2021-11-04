@@ -5,7 +5,7 @@
 #include "CamHwIsp20.h"
 namespace RkCam {
 
-SPStreamProcUnit::SPStreamProcUnit (SmartPtr<V4l2Device> isp_sp_dev, int type)
+SPStreamProcUnit::SPStreamProcUnit (SmartPtr<V4l2Device> isp_sp_dev, int type, int isp_ver)
     : RKStream(isp_sp_dev, type)
     , _first(true)
 {
@@ -14,6 +14,7 @@ SPStreamProcUnit::SPStreamProcUnit (SmartPtr<V4l2Device> isp_sp_dev, int type)
     _ds_height = 0;
     _ds_width_align = 0;
     _ds_height_align = 0;
+    _isp_ver = isp_ver;
 }
 
 SPStreamProcUnit::~SPStreamProcUnit ()
@@ -22,10 +23,16 @@ SPStreamProcUnit::~SPStreamProcUnit ()
 
 void SPStreamProcUnit::start()
 {
-    struct rkispp_trigger_mode tnr_trigger;
-    tnr_trigger.module = ISPP_MODULE_TNR;
-    tnr_trigger.on = 1;
-    int ret = _ispp_dev->io_control(RKISPP_CMD_TRIGGER_MODE, &tnr_trigger);
+    if (_isp_ver == 0) {
+        struct rkispp_trigger_mode tnr_trigger;
+        tnr_trigger.module = ISPP_MODULE_TNR;
+        tnr_trigger.on = 1;
+        int ret = _ispp_dev->io_control(RKISPP_CMD_TRIGGER_MODE, &tnr_trigger);
+    }
+
+    if (ldg_enable) {
+        pAfTmp = (uint8_t*)malloc(_ds_width_align * _ds_height_align * sizeof(pAfTmp[0]) * 3 / 2);
+    }
 
     RKStream::start();
     return;
@@ -33,18 +40,29 @@ void SPStreamProcUnit::start()
 
 void SPStreamProcUnit::stop()
 {
-    struct rkispp_trigger_mode tnr_trigger;
-    tnr_trigger.module = ISPP_MODULE_TNR;
-    tnr_trigger.on = 0;
-    int ret = _ispp_dev->io_control(RKISPP_CMD_TRIGGER_MODE, &tnr_trigger);
+    if (_isp_ver == 0) {
+        struct rkispp_trigger_mode tnr_trigger;
+        tnr_trigger.module = ISPP_MODULE_TNR;
+        tnr_trigger.on = 0;
+        int ret = _ispp_dev->io_control(RKISPP_CMD_TRIGGER_MODE, &tnr_trigger);
+    }
+
     RKStream::stop();//stopDeviceOnly&stopThreadOnly
-    deinit_fbcbuf_fd();
+    if (_isp_ver == 0)
+        deinit_fbcbuf_fd();
+    if (pAfTmp) {
+        free(pAfTmp);
+        pAfTmp = NULL;
+    }
 }
 
 SmartPtr<VideoBuffer>
 SPStreamProcUnit::new_video_buffer(SmartPtr<V4l2Buffer> buf,
                                        SmartPtr<V4l2Device> dev)
-{ 
+{
+    if (_isp_ver != 0)
+        return NULL;
+
     if (_first) {
         init_fbcbuf_fd();
         _first = false;
@@ -70,11 +88,36 @@ SPStreamProcUnit::new_video_buffer(SmartPtr<V4l2Buffer> buf,
     return img_buf;
 }
 
+int SPStreamProcUnit::get_lowpass_fv(uint32_t sequence, SmartPtr<V4l2BufferProxy> buf_proxy)
+{
+    SmartPtr<LensHw> lensHw = _focus_dev.dynamic_cast_ptr<LensHw>();
+    uint8_t *image_buf = (uint8_t *)buf_proxy->get_v4l2_planar_userptr(0);
+    rk_aiq_af_algo_meas_t meas_param;
+
+    _afmeas_param_mutex.lock();
+    meas_param = _af_meas_params;
+    _afmeas_param_mutex.unlock();
+
+    if (meas_param.sp_meas.enable) {
+        get_lpfv(sequence, image_buf, _ds_width, _ds_height,
+            _ds_width_align, _ds_height_align, pAfTmp, sub_shp4_4,
+            sub_shp8_8, high_light, high_light2, &meas_param);
+
+        lensHw->setLowPassFv(sub_shp4_4, sub_shp8_8, high_light, high_light2, sequence);
+    }
+
+    return 0;
+}
 
 XCamReturn
 SPStreamProcUnit::poll_buffer_ready (SmartPtr<VideoBuffer> &buf)
 {
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
+
+    if (ldg_enable) {
+        SmartPtr<V4l2BufferProxy> buf_proxy = buf.dynamic_cast_ptr<V4l2BufferProxy>();
+        get_lowpass_fv(buf->get_sequence(), buf_proxy);
+    }
 
     if (_camHw->mHwResLintener) {
         _camHw->mHwResLintener->hwResCb(buf);
@@ -85,10 +128,19 @@ SPStreamProcUnit::poll_buffer_ready (SmartPtr<VideoBuffer> &buf)
     return ret;
 }
 
-
-XCamReturn SPStreamProcUnit::prepare(int width, int height, int stride)
+XCamReturn SPStreamProcUnit::prepare(CalibDbV2_Af_LdgParam_t *ldg_param, CalibDbV2_Af_HighLightParam_t *highlight, int width, int height, int stride)
 {
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    uint32_t pixelformat, plane_cnt;
+
+    if (_isp_ver == 0) {
+        pixelformat = V4L2_PIX_FMT_FBCG;
+        plane_cnt = 2;
+    } else {
+        pixelformat = V4L2_PIX_FMT_NV12;
+        plane_cnt = 1;
+    }
+
     if (!width && !height) {
         struct v4l2_subdev_format isp_src_fmt; 
         isp_src_fmt.which = V4L2_SUBDEV_FORMAT_ACTIVE;
@@ -107,14 +159,14 @@ XCamReturn SPStreamProcUnit::prepare(int width, int height, int stride)
         int _stride           = XCAM_ALIGN_UP(_ds_width_align, 32);
         LOGD( "set sp format: width %d %d height %d %d, stride %d\n",
                _ds_width, _ds_width_align, _ds_height, _ds_height_align, _stride);
-        ret = _dev->set_format(_ds_width_align, _ds_height_align, V4L2_PIX_FMT_FBCG, V4L2_FIELD_NONE, _stride);
+        ret = _dev->set_format(_ds_width_align, _ds_height_align, pixelformat, V4L2_FIELD_NONE, _stride);
         if (ret) {
             LOGE("set isp_sp_dev src fmt failed !\n");
             ret = XCAM_RETURN_ERROR_FAILED;
         }
     } else {
         LOGD( "set sp format: width %d height %d\n", width, height);
-        ret = _dev->set_format(width, height, V4L2_PIX_FMT_FBCG, V4L2_FIELD_NONE, stride);
+        ret = _dev->set_format(width, height, pixelformat, V4L2_FIELD_NONE, stride);
         if (ret) {
             LOGE("set isp_sp_dev src fmt failed !\n");
             ret = XCAM_RETURN_ERROR_FAILED;
@@ -123,15 +175,29 @@ XCamReturn SPStreamProcUnit::prepare(int width, int height, int stride)
     _dev->set_mem_type(V4L2_MEMORY_MMAP);
     _dev->set_buf_type(V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE);
     _dev->set_buffer_count(6);
-    _dev->set_mplanes_count(2);
+    _dev->set_mplanes_count(plane_cnt);
+
+    ldg_enable = ldg_param->enable;
+    if (ldg_enable) {
+        _af_meas_params.sp_meas.ldg_xl      = ldg_param->ldg_xl;
+        _af_meas_params.sp_meas.ldg_yl      = ldg_param->ldg_yl;
+        _af_meas_params.sp_meas.ldg_kl      = ldg_param->ldg_kl;
+        _af_meas_params.sp_meas.ldg_xh      = ldg_param->ldg_xh;
+        _af_meas_params.sp_meas.ldg_yh      = ldg_param->ldg_yh;
+        _af_meas_params.sp_meas.ldg_kh      = ldg_param->ldg_kh;
+        _af_meas_params.sp_meas.highlight_th  = highlight->ther0;
+        _af_meas_params.sp_meas.highlight2_th = highlight->ther1;
+    }
+
     return ret;
 }
 
-void SPStreamProcUnit::set_devices(CamHwIsp20* camHw, SmartPtr<V4l2SubDevice> isp_core_dev, SmartPtr<V4l2SubDevice> ispp_dev)
+void SPStreamProcUnit::set_devices(CamHwIsp20* camHw, SmartPtr<V4l2SubDevice> isp_core_dev, SmartPtr<V4l2SubDevice> ispp_dev, SmartPtr<V4l2SubDevice> lensdev)
 {
     _camHw = camHw;
     _isp_core_dev = isp_core_dev;
     _ispp_dev = ispp_dev;
+    _focus_dev = lensdev;
 }
 
 bool SPStreamProcUnit::init_fbcbuf_fd()
@@ -190,4 +256,13 @@ XCamReturn SPStreamProcUnit::get_sp_resolution(int &width, int &height, int &ali
     aligned_h = _ds_height_align;
     return XCAM_RETURN_NO_ERROR;
 }
+
+void SPStreamProcUnit::update_af_meas_params(rk_aiq_af_algo_meas_t *af_meas)
+{
+    SmartLock locker (_afmeas_param_mutex);
+    if (af_meas && (0 != memcmp(af_meas, &_af_meas_params, sizeof(rk_aiq_af_algo_meas_t)))) {
+        _af_meas_params = *af_meas;
+    }
+}
+
 }

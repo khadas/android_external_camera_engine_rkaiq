@@ -36,27 +36,34 @@ typedef enum _RKAIQ_AF_MODE
     RKAIQ_AF_MODE_ONESHOT_AFTER_ZOOM,
 } RKAIQ_AF_MODE;
 
+typedef enum _RKAIQ_AF_HWVER
+{
+    RKAIQ_AF_HW_V20 = 0,
+    RKAIQ_AF_HW_V30,
+    RKAIQ_AF_HW_VMAX
+} RKAIQ_AF_HWVER;
+
 typedef struct rk_aiq_af_attrib_s {
     RKAIQ_AF_MODE AfMode;
+    RKAIQ_AF_HWVER AfHwVer;
 
     bool contrast_af;
     bool laser_af;
     bool pdaf;
-    bool GammaEnable;
-    bool GausEnable;
 
     int h_offs;
     int v_offs;
     unsigned int h_size;
     unsigned int v_size;
 
-    unsigned short fixedModeDefCode;
-    unsigned short macroModeDefCode;
-    unsigned short infinityModeDefCode;
+    short fixedModeDefCode;
+    short macroModeDefCode;
+    short infinityModeDefCode;
 
-    rk_aiq_af_algo_meas_t manual_meascfg;
-
-    int zoom_zero_pos;
+    union {
+        rk_aiq_af_algo_meas_v20_t manual_meascfg;
+        rk_aiq_af_algo_meas_v30_t manual_meascfg_v30;
+    };
 } rk_aiq_af_attrib_t;
 
 #endif

@@ -602,8 +602,8 @@ XCamReturn rk_aiq_uapi2_getFocusMode(const rk_aiq_sys_ctx_t* ctx, opMode_t *mode
 *
 *****************************
 */
-XCamReturn rk_aiq_uapi2_setFixedModeCode(const rk_aiq_sys_ctx_t* ctx, unsigned short code);
-XCamReturn rk_aiq_uapi2_getFixedModeCode(const rk_aiq_sys_ctx_t* ctx, unsigned short *code);
+XCamReturn rk_aiq_uapi2_setFixedModeCode(const rk_aiq_sys_ctx_t* ctx, short code);
+XCamReturn rk_aiq_uapi2_getFixedModeCode(const rk_aiq_sys_ctx_t* ctx, short *code);
 
 /*
 *****************************
@@ -626,6 +626,8 @@ XCamReturn rk_aiq_uapi2_getFocusWin(const rk_aiq_sys_ctx_t* ctx, paRect_t *rect)
 */
 XCamReturn rk_aiq_uapi2_setFocusMeasCfg(const rk_aiq_sys_ctx_t* ctx, rk_aiq_af_algo_meas_t* meascfg);
 XCamReturn rk_aiq_uapi2_getFocusMeasCfg(const rk_aiq_sys_ctx_t* ctx, rk_aiq_af_algo_meas_t* meascfg);
+XCamReturn rk_aiq_uapi2_setFocusMeasV30Cfg(const rk_aiq_sys_ctx_t* ctx, rk_aiq_af_algo_meas_v30_t* meascfg);
+XCamReturn rk_aiq_uapi2_getFocusMeasV30Cfg(const rk_aiq_sys_ctx_t* ctx, rk_aiq_af_algo_meas_v30_t* meascfg);
 
 /*
 *****************************
@@ -717,6 +719,7 @@ XCamReturn rk_aiq_uapi2_getSearchResult(const rk_aiq_sys_ctx_t* ctx, rk_aiq_af_r
 */
 XCamReturn rk_aiq_uapi2_setOpZoomPosition(const rk_aiq_sys_ctx_t* ctx, int pos);
 XCamReturn rk_aiq_uapi2_getOpZoomPosition(const rk_aiq_sys_ctx_t* ctx, int *pos);
+XCamReturn rk_aiq_uapi2_endOpZoomChange(const rk_aiq_sys_ctx_t* ctx);
 
 /*
 *****************************
@@ -728,6 +731,30 @@ XCamReturn rk_aiq_uapi2_getOpZoomPosition(const rk_aiq_sys_ctx_t* ctx, int *pos)
 *****************************
 */
 XCamReturn rk_aiq_uapi2_getZoomRange(const rk_aiq_sys_ctx_t* ctx, rk_aiq_af_zoomrange* range);
+XCamReturn rk_aiq_uapi2_getFocusRange(const rk_aiq_sys_ctx_t* ctx, rk_aiq_af_focusrange* range);
+
+/*
+*****************************
+*
+* Desc: zoom calibration
+* Argument:
+*
+*
+*****************************
+*/
+XCamReturn rk_aiq_uapi2_startZoomCalib(const rk_aiq_sys_ctx_t* ctx);
+XCamReturn rk_aiq_uapi2_resetZoom(const rk_aiq_sys_ctx_t* ctx);
+
+/*
+*****************************
+*
+* Desc: set AngleZ
+* Argument:
+*
+*
+*****************************
+*/
+XCamReturn rk_aiq_uapi2_setAngleZ(const rk_aiq_sys_ctx_t* ctx, float angleZ);
 
 /*
 **********************************************************

@@ -93,26 +93,11 @@ processing(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outparams)
     RkAiqAlgoProcA3dlutInt *procAlut3d = (RkAiqAlgoProcA3dlutInt*)inparams;
     RkAiqAlgoProcResA3dlutInt *proResAlut3d = (RkAiqAlgoProcResA3dlutInt*)outparams;
     alut3d_handle_t hAlut3d = (alut3d_handle_t)(inparams->ctx->a3dlut_para);
-    // cal gain diff, whether Converge ?
-    float d_gain = 0;
-    d_gain = fabs(procAlut3d->sensorGain - hAlut3d->swinfo.sensorGain);
-    float d_wbgain = 0;
-    d_wbgain = fabs(procAlut3d->awbGain[0] - hAlut3d->swinfo.awbGain[0])+fabs(procAlut3d->awbGain[1] - hAlut3d->swinfo.awbGain[1]);
+
     hAlut3d->swinfo.sensorGain = procAlut3d->sensorGain;
     hAlut3d->swinfo.awbGain[0] = procAlut3d->awbGain[0];
     hAlut3d->swinfo.awbGain[1] = procAlut3d->awbGain[1];
     hAlut3d->swinfo.awbIIRDampCoef = procAlut3d->awbIIRDampCoef;
-    if (d_wbgain < hAlut3d->calibV2_lut3d->common.wbgain_tolerance)
-        hAlut3d->swinfo.awbConverged = true;
-    else
-        hAlut3d->swinfo.awbConverged = false;
-
-    if ((d_gain < hAlut3d->calibV2_lut3d->common.gain_tolerance) && hAlut3d->swinfo.awbConverged
-               && (!hAlut3d->calib_update))
-                   hAlut3d->update = false;
-    else
-        hAlut3d->update = true;
-    hAlut3d->calib_update = false;
 
     Alut3dConfig(hAlut3d);
     memcpy(&proResAlut3d->a3dlut_proc_res_com.lut3d_hw_conf, &hAlut3d->lut3d_hw_conf, sizeof(rk_aiq_lut3d_cfg_t));

@@ -78,7 +78,7 @@ prepare(RkAiqAlgoCom* params)
             CalibDbV2_Gic_V20_t* calibv2_agic_calib_V20 =
                 (CalibDbV2_Gic_V20_t*)(CALIBDBV2_GET_MODULE_PTR(calibv2, agic_calib_v20));
             memcpy(pAgicCtx->full_param.gic_v20, calibv2_agic_calib_V20, sizeof(CalibDbV2_Gic_V20_t));
-        } else if(CHECK_ISP_HW_V21()) {
+        } else if(CHECK_ISP_HW_V21() || CHECK_ISP_HW_V30()) {
             CalibDbV2_Gic_V21_t* calibv2_agic_calib_V21 =
                 (CalibDbV2_Gic_V21_t*)(CALIBDBV2_GET_MODULE_PTR(calibv2, agic_calib_v21));
             memcpy(pAgicCtx->full_param.gic_v21, calibv2_agic_calib_V21, sizeof(CalibDbV2_Gic_V21_t));

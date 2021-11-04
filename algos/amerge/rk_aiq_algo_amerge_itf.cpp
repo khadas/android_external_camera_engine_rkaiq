@@ -1,5 +1,5 @@
 /*
- * rk_aiq_algo_ae_itf.c
+ * rk_aiq_algo_amerge_itf.c
  *
  *  Copyright (c) 2019 Rockchip Corporation
  *
@@ -28,45 +28,38 @@
 RKAIQ_BEGIN_DECLARE
 
 
-
 static XCamReturn AmergeCreateCtx(RkAiqAlgoContext **context, const AlgoCtxInstanceCfg* cfg)
 {
 
     LOG1_AMERGE("%s:Enter!\n", __FUNCTION__);
-    RESULT ret = AMERGE_RET_SUCCESS;
-    RkAiqAlgoContext *ctx = new RkAiqAlgoContext();
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
     AlgoCtxInstanceCfgInt* instanc_int = (AlgoCtxInstanceCfgInt*)cfg;
-    if (ctx == NULL) {
-        LOGE_AMERGE( "%s: create amerge context fail!\n", __FUNCTION__);
-        return XCAM_RETURN_ERROR_MEM;
-    }
-    memset(&ctx->AmergeInstConfig, 0x00, sizeof(AmergeInstanceConfig_t));
-    ret = AmergeInit(&ctx->AmergeInstConfig, instanc_int->calibv2);
+    AmergeContext_t* pAmergeCtx = NULL;
 
-    if (ret != AMERGE_RET_SUCCESS) {
+    ret = AmergeInit(&pAmergeCtx, (CamCalibDbV2Context_t*)(instanc_int->calibv2));
+
+    if (ret != XCAM_RETURN_NO_ERROR) {
         LOGE_AMERGE("%s Amerge Init failed: %d", __FUNCTION__, ret);
         return(XCAM_RETURN_ERROR_FAILED);
     }
-
-    *context = ctx;
+    *context = (RkAiqAlgoContext *)(pAmergeCtx);
 
     LOG1_AMERGE("%s:Exit!\n", __FUNCTION__);
-    return(XCAM_RETURN_NO_ERROR);
+    return(ret);
 }
 
 static XCamReturn AmergeDestroyCtx(RkAiqAlgoContext *context)
 {
     LOG1_AMERGE("%s:Enter!\n", __FUNCTION__);
-    RESULT ret = AMERGE_RET_SUCCESS;
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
 
     if(context != NULL) {
-        AmergeHandle_t pAmergeCtx = (AmergeHandle_t)context->AmergeInstConfig.hAmerge;
+        AmergeContext_t* pAmergeCtx = (AmergeContext_t*)context;
         ret = AmergeRelease(pAmergeCtx);
-        if (ret != AMERGE_RET_SUCCESS) {
+        if (ret != XCAM_RETURN_NO_ERROR) {
             LOGE_AMERGE("%s Amerge Release failed: %d", __FUNCTION__, ret);
             return(XCAM_RETURN_ERROR_FAILED);
         }
-        delete context;
         context = NULL;
     }
 
@@ -77,9 +70,9 @@ static XCamReturn AmergeDestroyCtx(RkAiqAlgoContext *context)
 static XCamReturn AmergePrepare(RkAiqAlgoCom* params)
 {
     LOG1_AMERGE("%s:Enter!\n", __FUNCTION__);
-    RESULT ret = AMERGE_RET_SUCCESS;
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
 
-    AmergeHandle_t pAmergeCtx = params->ctx->AmergeInstConfig.hAmerge;
+    AmergeContext_t* pAmergeCtx = (AmergeContext_t*)params->ctx;
     RkAiqAlgoConfigAmergeInt* AhdrCfgParam = (RkAiqAlgoConfigAmergeInt*)params; //come from params in html
     const CamCalibDbV2Context_t* pCalibDb = AhdrCfgParam->rk_com.u.prepare.calibv2;
     pAmergeCtx->width = AhdrCfgParam->rawWidth;
@@ -93,21 +86,38 @@ static XCamReturn AmergePrepare(RkAiqAlgoCom* params)
     else
         pAmergeCtx->FrameNumber = 3;
 
-
-    CalibDbV2_merge_t* calibv2_amerge_calib =
-        (CalibDbV2_merge_t*)(CALIBDBV2_GET_MODULE_PTR((void*)pCalibDb, amerge_calib));
-
     if(!!(params->u.prepare.conf_type & RK_AIQ_ALGO_CONFTYPE_UPDATECALIB )) {
         LOGD_AMERGE("%s: Amerge Reload Para!\n", __FUNCTION__);
-        memcpy(&pAmergeCtx->pCalibDB, calibv2_amerge_calib, sizeof(CalibDbV2_merge_t));//load iq paras
+        if(pAmergeCtx->HWversion == AMERGE_ISP20 || pAmergeCtx->HWversion == AMERGE_ISP21) {
+            CalibDbV2_merge_t* calibv2_amerge_calib =
+                (CalibDbV2_merge_t*)(CALIBDBV2_GET_MODULE_PTR((void*)pCalibDb, amerge_calib));
+            memcpy(&pAmergeCtx->pCalibDB.Merge_v20, calibv2_amerge_calib, sizeof(CalibDbV2_merge_t));//load iq paras
+        }
+        else if(pAmergeCtx->HWversion == AMERGE_ISP30) {
+            CalibDbV2_merge_V2_t* calibv2_amerge_calib =
+                (CalibDbV2_merge_V2_t*)(CALIBDBV2_GET_MODULE_PTR((void*)pCalibDb, amerge_calib));
+            memcpy(&pAmergeCtx->pCalibDB.Merge_v30, calibv2_amerge_calib, sizeof(CalibDbV2_merge_V2_t));//load iq paras
+
+        }
     }
 
     if(/* !params->u.prepare.reconfig*/true) {
         AmergeStop(pAmergeCtx); // stop firstly for re-preapre
         ret = AmergeStart(pAmergeCtx);
-        if (ret != AMERGE_RET_SUCCESS) {
+        if (ret != XCAM_RETURN_NO_ERROR) {
             LOGE_AMERGE("%s Amerge Start failed: %d\n", __FUNCTION__, ret);
             return(XCAM_RETURN_ERROR_FAILED);
+        }
+    }
+
+    if(pAmergeCtx->FrameNumber == 2 || pAmergeCtx->FrameNumber == 3) {
+        if(pAmergeCtx->mergeAttr.opMode == MERGE_OPMODE_TOOL) {
+            //MergeNewMalloc(&pAmergeCtx->Config, &pAmergeCtx->mergeAttr.stTool, pAmergeCtx->HWversion);
+            //AmergeUpdateConfig(pAmergeCtx, &pAmergeCtx->mergeAttr.stTool);
+        }
+        else {
+            MergeNewMalloc(&pAmergeCtx->Config, &pAmergeCtx->pCalibDB, pAmergeCtx->HWversion);
+            AmergeUpdateConfig(pAmergeCtx, &pAmergeCtx->pCalibDB);
         }
     }
 
@@ -118,19 +128,14 @@ static XCamReturn AmergePrepare(RkAiqAlgoCom* params)
 static XCamReturn AmergePreProcess(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outparams)
 {
     LOG1_AMERGE("%s:Enter!\n", __FUNCTION__);
-    RESULT ret = AMERGE_RET_SUCCESS;
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
 
-    AmergeHandle_t pAmergeCtx = inparams->ctx->AmergeInstConfig.hAmerge;
+    AmergeContext_t* pAmergeCtx = (AmergeContext_t*)inparams->ctx;
+    pAmergeCtx->frameCnt = inparams->frame_id;
     RkAiqAlgoConfigAmergeInt* AhdrCfgParam = (RkAiqAlgoConfigAmergeInt*)inparams;
 
-    if(pAmergeCtx->mergeAttr.opMode == MERGE_OPMODE_TOOL) {
-        MergeNewMalloc(&pAmergeCtx->Config, &pAmergeCtx->mergeAttr.stTool);
-        AmergeUpdateConfig(pAmergeCtx, &pAmergeCtx->mergeAttr.stTool);
-    }
-    else {
-        MergeNewMalloc(&pAmergeCtx->Config, &pAmergeCtx->pCalibDB);
-        AmergeUpdateConfig(pAmergeCtx, &pAmergeCtx->pCalibDB);
-    }
+    if(pAmergeCtx->FrameNumber == 1)
+        LOGD_AMERGE("%s(%d) FrameID:%d, HDR FrameCnt is 1, Merge function bypass\n", __FUNCTION__, __LINE__, pAmergeCtx->frameCnt);
 
     LOG1_AMERGE("%s:Exit!\n", __FUNCTION__);
     return(XCAM_RETURN_NO_ERROR);
@@ -139,52 +144,59 @@ static XCamReturn AmergePreProcess(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom
 static XCamReturn AmergeProcess(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outparams)
 {
     LOG1_AMERGE("%s:Enter!\n", __FUNCTION__);
-    RESULT ret = AMERGE_RET_SUCCESS;
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
     bool bypass = false;
 
-    AmergeHandle_t pAmergeCtx = (AmergeHandle_t)inparams->ctx->AmergeInstConfig.hAmerge;
-    RkAiqAlgoProcAmergeInt* AmergeParams = (RkAiqAlgoProcAmergeInt*)inparams;
-    RkAiqAlgoProcResAmergeInt* AmergeProcResParams = (RkAiqAlgoProcResAmergeInt*)outparams;
-    // pAmergeCtx->frameCnt = inparams->frame_id;
+    AmergeContext_t* pAmergeCtx = (AmergeContext_t*)inparams->ctx;
+    RkAiqAlgoProcAmergeInt* pAmergeParams = (RkAiqAlgoProcAmergeInt*)inparams;
+    RkAiqAlgoProcResAmergeInt* pAmergeProcRes = (RkAiqAlgoProcResAmergeInt*)outparams;
 
-    //get Sensor Info
-    XCamVideoBuffer* xCamAeProcRes = AmergeParams->rk_com.u.proc.res_comb->ae_proc_res;
-    RkAiqAlgoProcResAeInt* pAEProcRes = NULL;
-    if (xCamAeProcRes) {
-        pAEProcRes = (RkAiqAlgoProcResAeInt*)xCamAeProcRes->map(xCamAeProcRes);
-        AmergeGetSensorInfo(pAmergeCtx, pAEProcRes->ae_proc_res_rk);
-    }
-    else {
-        AecProcResult_t AeProcResult;
-        memset(&AeProcResult, 0x0, sizeof(AecProcResult_t));
-        LOGE_AMERGE("%s: Ae Proc result is null!!!\n", __FUNCTION__);
-        AmergeGetSensorInfo(pAmergeCtx, AeProcResult);
-    }
+    if(pAmergeCtx->FrameNumber == 2 || pAmergeCtx->FrameNumber == 3) {
+        LOGD_AMERGE("%s:/#####################################Amerge Start#####################################/ \n", __func__);
+        //get Sensor Info
+        XCamVideoBuffer* xCamAeProcRes = pAmergeParams->rk_com.u.proc.res_comb->ae_proc_res;
+        RkAiqAlgoProcResAeInt* pAEProcRes = NULL;
+        if (xCamAeProcRes) {
+            pAEProcRes = (RkAiqAlgoProcResAeInt*)xCamAeProcRes->map(xCamAeProcRes);
+            AmergeGetSensorInfo(pAmergeCtx, pAEProcRes->ae_proc_res_rk);
+        }
+        else {
+            AecProcResult_t AeProcResult;
+            memset(&AeProcResult, 0x0, sizeof(AecProcResult_t));
+            LOGE_AMERGE("%s: Ae Proc result is null!!!\n", __FUNCTION__);
+            AmergeGetSensorInfo(pAmergeCtx, AeProcResult);
+        }
 
-    //get ae pre res and proc
-    XCamVideoBuffer* xCamAePreRes = AmergeParams->rk_com.u.proc.res_comb->ae_pre_res;
-    RkAiqAlgoPreResAeInt* pAEPreRes = NULL;
-    if (xCamAePreRes) {
-        pAEPreRes = (RkAiqAlgoPreResAeInt*)xCamAePreRes->map(xCamAePreRes);
-        bypass = AmergeByPassProcessing(pAmergeCtx, pAEPreRes->ae_pre_res_rk);
-    }
-    else {
-        AecPreResult_t AecHdrPreResult;
-        memset(&AecHdrPreResult, 0x0, sizeof(AecPreResult_t));
-        bypass = AmergeByPassProcessing(pAmergeCtx, AecHdrPreResult);
-        bypass = false;
-        LOGE_AMERGE("%s: ae Pre result is null!!!\n", __FUNCTION__);
-    }
+        //get ae pre res and proc
+        XCamVideoBuffer* xCamAePreRes = pAmergeParams->rk_com.u.proc.res_comb->ae_pre_res;
+        RkAiqAlgoPreResAeInt* pAEPreRes = NULL;
+        if (xCamAePreRes) {
+            pAEPreRes = (RkAiqAlgoPreResAeInt*)xCamAePreRes->map(xCamAePreRes);
+            bypass = AmergeByPassProcessing(pAmergeCtx, pAEPreRes->ae_pre_res_rk);
+        }
+        else {
+            AecPreResult_t AecHdrPreResult;
+            memset(&AecHdrPreResult, 0x0, sizeof(AecPreResult_t));
+            bypass = AmergeByPassProcessing(pAmergeCtx, AecHdrPreResult);
+            bypass = false;
+            LOGE_AMERGE("%s: ae Pre result is null!!!\n", __FUNCTION__);
+        }
 
-    if(!bypass)
-        AmergeProcessing(pAmergeCtx);
+        if(!bypass)
+            AmergeProcessing(pAmergeCtx);
 
-    pAmergeCtx->frameCnt++;
-    pAmergeCtx->PrevData.CtrlData.ApiMode = pAmergeCtx->mergeAttr.opMode;
-    pAmergeCtx->ProcRes.Res.update = !bypass;
-    pAmergeCtx->ProcRes.LongFrameMode = pAmergeCtx->SensorInfo.LongFrmMode;
-    AmergeProcResParams->AmergeProcRes.LongFrameMode = pAmergeCtx->ProcRes.LongFrameMode;
-    memcpy(&AmergeProcResParams->AmergeProcRes.Res, &pAmergeCtx->ProcRes.Res, sizeof(MgeProcRes_t));
+        pAmergeCtx->PrevData.CtrlData.ApiMode = pAmergeCtx->mergeAttr.opMode;
+        pAmergeCtx->ProcRes.update = !bypass;
+        pAmergeCtx->ProcRes.LongFrameMode = pAmergeCtx->SensorInfo.LongFrmMode;
+        pAmergeProcRes->AmergeProcRes.update = pAmergeCtx->ProcRes.update;
+        pAmergeProcRes->AmergeProcRes.LongFrameMode = pAmergeCtx->ProcRes.LongFrameMode;
+        if(pAmergeCtx->HWversion == AMERGE_ISP20 || pAmergeCtx->HWversion == AMERGE_ISP21)
+            memcpy(&pAmergeProcRes->AmergeProcRes.Merge_v20, &pAmergeCtx->ProcRes.Merge_v20, sizeof(MgeProcRes_t));
+        else if(pAmergeCtx->HWversion == AMERGE_ISP30)
+            memcpy(&pAmergeProcRes->AmergeProcRes.Merge_v30, &pAmergeCtx->ProcRes.Merge_v30, sizeof(MgeProcResV2_t));
+
+        LOGD_AMERGE("%s:/#####################################Amerge Over#####################################/ \n", __func__);
+    }
 
     LOG1_AMERGE("%s:Exit!\n", __FUNCTION__);
     return(XCAM_RETURN_NO_ERROR);
@@ -193,7 +205,7 @@ static XCamReturn AmergeProcess(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* o
 static XCamReturn AmergePostProcess(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outparams)
 {
     LOG1_AMERGE("%s:Enter!\n", __FUNCTION__);
-    RESULT ret = AMERGE_RET_SUCCESS;
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
 
     //TODO
 

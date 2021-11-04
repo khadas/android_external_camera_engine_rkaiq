@@ -91,27 +91,12 @@ processing(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outparams)
     RkAiqAlgoProcResAccmInt *proResAccm = (RkAiqAlgoProcResAccmInt*)outparams;
     accm_handle_t hAccm = (accm_handle_t)(inparams->ctx->accm_para);
     RkAiqAlgoProcAccmInt* procPara = (RkAiqAlgoProcAccmInt*)inparams;
-    // cal gain diff, whether converge?
-    float d_gain = 0;
-    d_gain = fabs(procAccm->accm_sw_info.sensorGain - hAccm->accmSwInfo.sensorGain);
-    float d_wbgain = 0;
-    d_wbgain =sqrt( (procAccm->accm_sw_info.awbGain[0]-hAccm->accmSwInfo.awbGain[0])*(procAccm->accm_sw_info.awbGain[0]-hAccm->accmSwInfo.awbGain[0])
-                                     + (procAccm->accm_sw_info.awbGain[1]-hAccm->accmSwInfo.awbGain[1])*(procAccm->accm_sw_info.awbGain[1]-hAccm->accmSwInfo.awbGain[1]));
-    if ((d_wbgain < hAccm->calibV2Ccm->control.wbgain_tolerance)&&(d_gain < hAccm->calibV2Ccm->control.gain_tolerance)
-                   && (!hAccm->calib_update))
-                   hAccm->update = false;
-    else
-        hAccm->update = true;
-    hAccm->calib_update = false;
 
     procAccm->accm_sw_info.grayMode = procPara->rk_com.u.proc.gray_mode;
     procAccm->accm_sw_info.ccmConverged = hAccm->accmSwInfo.ccmConverged;
     hAccm->accmSwInfo = procAccm->accm_sw_info;
     //LOGI_ACCM( "%s accm_proc_com.u.init:%d \n", __FUNCTION__, inparams->u.proc.init);
-    LOGD_ACCM( "%s: sensorGain:%f, awbGain:%f,%f,  awbIIRDampCoef:%f\n", __FUNCTION__,
-               hAccm->accmSwInfo.sensorGain,
-               hAccm->accmSwInfo.awbGain[0], hAccm->accmSwInfo.awbGain[1],
-               hAccm->accmSwInfo.awbIIRDampCoef);
+    LOGD_ACCM( "%s: awbIIRDampCoef:%f\n", __FUNCTION__, hAccm->accmSwInfo.awbIIRDampCoef);
 
     AccmConfig(hAccm);
     memcpy(&proResAccm->accm_proc_res_com.accm_hw_conf, &hAccm->ccmHwConf, sizeof(rk_aiq_ccm_cfg_t));

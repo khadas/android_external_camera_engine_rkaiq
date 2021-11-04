@@ -83,7 +83,7 @@ CamHwIsp21::dispatchResult(cam3aResultList& list)
         case RESULT_TYPE_CPSL_PARAM:
         case RESULT_TYPE_IRIS_PARAM:
         case RESULT_TYPE_FOCUS_PARAM:
-        case RESULT_TYPE_EXPOSURE:
+        case RESULT_TYPE_EXPOSURE_PARAM:
             CamHwIsp20::dispatchResult(result);
             break;
         default:
@@ -113,7 +113,7 @@ CamHwIsp21::dispatchResult(SmartPtr<cam3aResult> result)
     case RESULT_TYPE_CPSL_PARAM:
     case RESULT_TYPE_IRIS_PARAM:
     case RESULT_TYPE_FOCUS_PARAM:
-    case RESULT_TYPE_EXPOSURE:
+    case RESULT_TYPE_EXPOSURE_PARAM:
         return CamHwIsp20::dispatchResult(result);
     default:
         handleIsp3aReslut(result);
@@ -159,28 +159,28 @@ CamHwIsp21::gen_full_isp_params(const struct isp21_isp_params_cfg* update_params
 
             full_params->module_cfg_update |= 1LL << i;
             switch (i) {
-            case RK_ISP2X_RAWAE_BIG1_ID:
+            case RK_ISP2X_RAWAE0_ID:
                 CHECK_UPDATE_PARAMS(full_params->meas.rawae0, update_params->meas.rawae0);
                 break;
-            case RK_ISP2X_RAWAE_BIG2_ID:
+            case RK_ISP2X_RAWAE1_ID:
                 CHECK_UPDATE_PARAMS(full_params->meas.rawae1, update_params->meas.rawae1);
                 break;
-            case RK_ISP2X_RAWAE_BIG3_ID:
+            case RK_ISP2X_RAWAE2_ID:
                 CHECK_UPDATE_PARAMS(full_params->meas.rawae2, update_params->meas.rawae2);
                 break;
-            case RK_ISP2X_RAWAE_LITE_ID:
+            case RK_ISP2X_RAWAE3_ID:
                 CHECK_UPDATE_PARAMS(full_params->meas.rawae3, update_params->meas.rawae3);
                 break;
-            case RK_ISP2X_RAWHIST_BIG1_ID:
+            case RK_ISP2X_RAWHIST0_ID:
                 CHECK_UPDATE_PARAMS(full_params->meas.rawhist0, update_params->meas.rawhist0);
                 break;
-            case RK_ISP2X_RAWHIST_BIG2_ID:
+            case RK_ISP2X_RAWHIST1_ID:
                 CHECK_UPDATE_PARAMS(full_params->meas.rawhist1, update_params->meas.rawhist1);
                 break;
-            case RK_ISP2X_RAWHIST_BIG3_ID:
+            case RK_ISP2X_RAWHIST2_ID:
                 CHECK_UPDATE_PARAMS(full_params->meas.rawhist2, update_params->meas.rawhist2);
                 break;
-            case RK_ISP2X_RAWHIST_LITE_ID:
+            case RK_ISP2X_RAWHIST3_ID:
                 CHECK_UPDATE_PARAMS(full_params->meas.rawhist3, update_params->meas.rawhist3);
                 break;
             case RK_ISP2X_YUVAE_ID:
@@ -374,21 +374,21 @@ CamHwIsp21::overrideExpRatioToAiqResults(const sint32_t frameId,
 
         //get sw_drc_compres_scl
         float MFHDR_LOG_Q_BITS = 11;
-        float adrc_gain = drc.DrcProcRes.sw_drc_adrc_gain;
+        float adrc_gain = drc.DrcProcRes.Drc_v20.sw_drc_adrc_gain;
         float log_ratio2 = log(nextRatioLS * adrc_gain) / log(2.0f) + 12;
-        float offsetbits_int = (float)(drc.DrcProcRes.sw_drc_offset_pow2);
+        float offsetbits_int = (float)(drc.DrcProcRes.Drc_v20.sw_drc_offset_pow2);
         float offsetbits = offsetbits_int * pow(2, MFHDR_LOG_Q_BITS);
         float hdrbits = log_ratio2 * pow(2, MFHDR_LOG_Q_BITS);
         float hdrvalidbits = hdrbits - offsetbits;
         float compres_scl = (12 * pow(2, MFHDR_LOG_Q_BITS * 2)) / hdrvalidbits;
-        drc.DrcProcRes.sw_drc_compres_scl = (int)(compres_scl);
+        drc.DrcProcRes.Drc_v20.sw_drc_compres_scl = (int)(compres_scl);
 
         //get sw_drc_min_ogain
-        if(drc.DrcProcRes.sw_drc_min_ogain == 1)
-            drc.DrcProcRes.sw_drc_min_ogain = 1 << 15;
+        if(drc.DrcProcRes.Drc_v20.sw_drc_min_ogain == 1)
+            drc.DrcProcRes.Drc_v20.sw_drc_min_ogain = 1 << 15;
         else {
             float sw_drc_min_ogain = 1 / (nextRatioLS * adrc_gain);
-            drc.DrcProcRes.sw_drc_min_ogain = (int)(sw_drc_min_ogain * pow(2, 15) + 0.5);
+            drc.DrcProcRes.Drc_v20.sw_drc_min_ogain = (int)(sw_drc_min_ogain * pow(2, 15) + 0.5);
         }
 
         //get sw_drc_compres_y
@@ -406,15 +406,15 @@ CamHwIsp21::overrideExpRatioToAiqResults(const sint32_t frameId,
                 curveparam3 = hdrvalidbits * curveparam;
                 tmp = luma2[i] * hdrvalidbits / 24576;
                 curveTable[i] = (tmp * curveparam2 / (tmp + curveparam3));
-                drc.DrcProcRes.sw_drc_compres_y[i] = (int)(curveTable[i]) ;
+                drc.DrcProcRes.Drc_v20.sw_drc_compres_y[i] = (int)(curveTable[i]) ;
             }
         }
 
         LOGD_CAMHW_SUBM(ISP20HW_SUBM, "nextRatioLS:%f sw_drc_compres_scl:%d sw_drc_min_ogain:%d\n",
-                        nextRatioLS, drc.DrcProcRes.sw_drc_compres_scl, drc.DrcProcRes.sw_drc_min_ogain);
+                        nextRatioLS, drc.DrcProcRes.Drc_v20.sw_drc_compres_scl, drc.DrcProcRes.Drc_v20.sw_drc_min_ogain);
         LOGD_CAMHW_SUBM(ISP20HW_SUBM, "CompressMode:%d\n", drc.CompressMode);
         for(int i = 0; i < ISP21_DRC_Y_NUM; ++i)
-            LOGD_CAMHW_SUBM(ISP20HW_SUBM, "sw_drc_compres_y[%d]:%d\n", i, drc.DrcProcRes.sw_drc_compres_y[i]);
+            LOGD_CAMHW_SUBM(ISP20HW_SUBM, "sw_drc_compres_y[%d]:%d\n", i, drc.DrcProcRes.Drc_v20.sw_drc_compres_y[i]);
 
         break;
     }
@@ -431,25 +431,25 @@ CamHwIsp21::overrideExpRatioToAiqResults(const sint32_t frameId,
         }
         RkAiqAmergeProcResult_t& merge = mergeParamsProxy->data()->result;
 
-        if(merge.Res.sw_hdrmge_mode == 0)
+        if(merge.Merge_v20.sw_hdrmge_mode == 0)
             break;
 
         //get sw_hdrmge_gain0
-        merge.Res.sw_hdrmge_gain0 = (int)(64 * nextRatioLS);
+        merge.Merge_v20.sw_hdrmge_gain0 = (int)(64 * nextRatioLS);
         if(nextRatioLS == 1)
-            merge.Res.sw_hdrmge_gain0_inv = (int)(4096 * (1 / nextRatioLS) - 1);
+            merge.Merge_v20.sw_hdrmge_gain0_inv = (int)(4096 * (1 / nextRatioLS) - 1);
         else
-            merge.Res.sw_hdrmge_gain0_inv = (int)(4096 * (1 / nextRatioLS));
+            merge.Merge_v20.sw_hdrmge_gain0_inv = (int)(4096 * (1 / nextRatioLS));
 
         //get sw_hdrmge_gain1
-        merge.Res.sw_hdrmge_gain1 = 0x40;
-        merge.Res.sw_hdrmge_gain1_inv = 0xfff;
+        merge.Merge_v20.sw_hdrmge_gain1 = 0x40;
+        merge.Merge_v20.sw_hdrmge_gain1_inv = 0xfff;
 
         //get sw_hdrmge_gain2
-        merge.Res.sw_hdrmge_gain2 = 0x40;
+        merge.Merge_v20.sw_hdrmge_gain2 = 0x40;
 
         LOGD_CAMHW_SUBM(ISP20HW_SUBM, "sw_hdrmge_gain0:%d sw_hdrmge_gain0_inv:%d\n",
-                        merge.Res.sw_hdrmge_gain0, merge.Res.sw_hdrmge_gain0_inv);
+                        merge.Merge_v20.sw_hdrmge_gain0, merge.Merge_v20.sw_hdrmge_gain0_inv);
 
         break;
     }
@@ -546,6 +546,17 @@ CamHwIsp21::setIspConfig()
         }
     }
 
+    if (frameId >= 0) {
+        SmartPtr<cam3aResult> af_res = get_3a_module_result(ready_results, RESULT_TYPE_AF_PARAM);
+        SmartPtr<RkAiqIspAfParamsProxy> afParams;
+        if (af_res.ptr()) {
+            afParams = af_res.dynamic_cast_ptr<RkAiqIspAfParamsProxy>();
+            if (mSpStreamUnit.ptr()) {
+                mSpStreamUnit->update_af_meas_params(&afParams->data()->result);
+            }
+        }
+    }
+
     // TODO: merge_isp_results would cause the compile warning: reference to ‘merge_isp_results’ is ambiguous
     // now use Isp21Params::merge_isp_results instead
     if (Isp21Params::merge_isp_results(ready_results, &update_params) != XCAM_RETURN_NO_ERROR)
@@ -631,7 +642,8 @@ CamHwIsp21::setIspConfig()
         }
 
         ispModuleEns = _full_active_isp21_params.module_ens;
-        LOGD_CAMHW_SUBM(ISP20HW_SUBM, "ispparam ens 0x%llx, en_up 0x%llx, cfg_up 0x%llx",
+        LOGD_CAMHW_SUBM(ISP20HW_SUBM, "camId: %d ispparam ens 0x%llx, en_up 0x%llx, cfg_up 0x%llx",
+                        mCamPhyId,
                         _full_active_isp21_params.module_ens,
                         isp_params->module_en_update,
                         isp_params->module_cfg_update);
