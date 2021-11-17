@@ -68,6 +68,7 @@ int initDrmDsp() {
 #ifndef ARCH_FPGA
   rkRgaInit();
 #endif
+  return ret;
 }
 
 void deInitDrmDsp() {
@@ -340,4 +341,5 @@ int drmDspFrame(int srcWidth, int srcHeight, int dispWidth, int dispHeight,
   else
     pDrmDsp->nextbo = pDrmDsp->bo[0];
 #endif
+  return ret;
 }

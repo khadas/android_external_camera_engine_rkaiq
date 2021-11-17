@@ -24,7 +24,7 @@
 #include <utils/Errors.h>
 #include <base/xcam_log.h>
 #include <hwi/isp20/Isp20StatsBuffer.h>
-#include <hwi/isp20/rkisp2-config.h>
+#include <rkisp2-config.h>
 #include <aiq_core/RkAiqHandleInt.h>
 
 #include "common/rk_aiq_pool.h"

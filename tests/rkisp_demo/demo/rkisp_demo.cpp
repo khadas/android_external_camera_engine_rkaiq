@@ -21,11 +21,11 @@
 #include <linux/videodev2.h>
 #include <dirent.h>
 #include "drmDsp.h"
-#include "include/uAPI2/rk_aiq_user_api2_sysctl.h"
+#include "rk_aiq_user_api2_sysctl.h"
 #include "rk_aiq_user_api_imgproc.h"
-#include "include/uAPI2/rk_aiq_user_api2_imgproc.h"
+#include "rk_aiq_user_api2_imgproc.h"
 #include "rk_aiq_user_api_debug.h"
-#include "include/uAPI2/rk_aiq_user_api2_camgroup.h"
+#include "rk_aiq_user_api2_camgroup.h"
 #include <termios.h>
 
 #ifndef ARCH_FPGA
