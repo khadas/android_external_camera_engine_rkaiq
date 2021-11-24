@@ -650,6 +650,10 @@ RkAiqAynrV2HandleInt::prepare()
 
     RkAiqAlgoConfigAynrV2Int* aynr_config_int = (RkAiqAlgoConfigAynrV2Int*)mConfig;
 
+    RkAiqCore::RkAiqAlgosComShared_t* sharedCom = &mAiqCore->mAlogsComSharedParams;
+
+    aynr_config_int->stAynrConfig.rawWidth = sharedCom->snsDes.isp_acq_width;
+    aynr_config_int->stAynrConfig.rawHeight = sharedCom->snsDes.isp_acq_height;
     RkAiqAlgoDescription* des = (RkAiqAlgoDescription*)mDes;
     ret = des->prepare(mConfig);
     RKAIQCORE_CHECK_RET(ret, "aynr algo prepare failed");
@@ -1505,4 +1509,4 @@ RkAiqAwbV21HandleInt::getWbV21Attrib(rk_aiq_uapiV2_wbV21_attrib_t *att)
 }
 
 
-}; //namespace RkCam
+}

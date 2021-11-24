@@ -128,7 +128,7 @@ rk_aiq_uapi_amerge_SetAttrib
         LOGE_AMERGE("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
         return XCAM_RETURN_ERROR_PARAM;
     }
-    AmergeContext_t* pAmergeCtx = (AmergeContext_t*)(ctx->AmergeInstConfig.hAmerge);
+    AmergeContext_t* pAmergeCtx = (AmergeContext_t*)ctx;
 
     //Todo
     pAmergeCtx->mergeAttr.opMode = attr.opMode;
@@ -165,7 +165,7 @@ rk_aiq_uapi_amerge_GetAttrib
         return XCAM_RETURN_ERROR_PARAM;
     }
 
-    AmergeContext_t* pAmergeCtx = (AmergeContext_t*)ctx->AmergeInstConfig.hAmerge;
+    AmergeContext_t* pAmergeCtx = (AmergeContext_t*)ctx;
 
     attr->opMode = pAmergeCtx->mergeAttr.opMode;
 

@@ -2267,7 +2267,7 @@ XCamReturn rk_aiq_uapi2_getFocusMode(const rk_aiq_sys_ctx_t* ctx, opMode_t *mode
     return ret;
 }
 
-XCamReturn rk_aiq_uapi2_setFixedModeCode(const rk_aiq_sys_ctx_t* ctx, unsigned short code)
+XCamReturn rk_aiq_uapi2_setFixedModeCode(const rk_aiq_sys_ctx_t* ctx, short code)
 {
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
     rk_aiq_af_attrib_t attr;
@@ -2282,7 +2282,7 @@ XCamReturn rk_aiq_uapi2_setFixedModeCode(const rk_aiq_sys_ctx_t* ctx, unsigned s
     return ret;
 }
 
-XCamReturn rk_aiq_uapi2_getFixedModeCode(const rk_aiq_sys_ctx_t* ctx, unsigned short * code)
+XCamReturn rk_aiq_uapi2_getFixedModeCode(const rk_aiq_sys_ctx_t* ctx, short * code)
 {
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
     rk_aiq_af_attrib_t attr;
@@ -2333,7 +2333,7 @@ XCamReturn rk_aiq_uapi2_setFocusMeasCfg(const rk_aiq_sys_ctx_t* ctx, rk_aiq_af_a
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
 
     rk_aiq_af_attrib_t attr;
-    ret = rk_aiq_user_api_af_GetAttrib(ctx, &attr);
+    ret = rk_aiq_user_api2_af_GetAttrib(ctx, &attr);
     RKAIQ_IMGPROC_CHECK_RET(ret, "setFocusMeasCfg failed!");
     attr.manual_meascfg = *meascfg;
 
@@ -2350,6 +2350,32 @@ XCamReturn rk_aiq_uapi2_getFocusMeasCfg(const rk_aiq_sys_ctx_t* ctx, rk_aiq_af_a
     ret = rk_aiq_user_api2_af_GetAttrib(ctx, &attr);
     RKAIQ_IMGPROC_CHECK_RET(ret, "getFocusMeasCfg failed!");
     *meascfg = attr.manual_meascfg;
+
+    return ret;
+}
+
+XCamReturn rk_aiq_uapi2_setFocusMeasV30Cfg(const rk_aiq_sys_ctx_t* ctx, rk_aiq_af_algo_meas_v30_t* meascfg)
+{
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+
+    rk_aiq_af_attrib_t attr;
+    ret = rk_aiq_user_api2_af_GetAttrib(ctx, &attr);
+    RKAIQ_IMGPROC_CHECK_RET(ret, "setFocusMeasCfg failed!");
+    attr.manual_meascfg_v30 = *meascfg;
+
+    ret = rk_aiq_user_api2_af_SetAttrib(ctx, &attr);
+    RKAIQ_IMGPROC_CHECK_RET(ret, "setFocusMeasCfg failed!");
+    return ret;
+}
+
+XCamReturn rk_aiq_uapi2_getFocusMeasV30Cfg(const rk_aiq_sys_ctx_t* ctx, rk_aiq_af_algo_meas_v30_t* meascfg)
+{
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+
+    rk_aiq_af_attrib_t attr;
+    ret = rk_aiq_user_api2_af_GetAttrib(ctx, &attr);
+    RKAIQ_IMGPROC_CHECK_RET(ret, "getFocusMeasCfg failed!");
+    *meascfg = attr.manual_meascfg_v30;
 
     return ret;
 }
@@ -2444,7 +2470,7 @@ XCamReturn rk_aiq_uapi2_setOpZoomPosition(const rk_aiq_sys_ctx_t* ctx, int pos)
 {
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
     IMGPROC_FUNC_ENTER
-    ret = rk_aiq_user_api2_af_SetZoomPos(ctx, pos);
+    ret = rk_aiq_user_api2_af_SetZoomIndex(ctx, pos);
     IMGPROC_FUNC_EXIT
 
     return ret;
@@ -2454,7 +2480,18 @@ XCamReturn rk_aiq_uapi2_getOpZoomPosition(const rk_aiq_sys_ctx_t* ctx, int *pos)
 {
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
     IMGPROC_FUNC_ENTER
-    ret = rk_aiq_user_api2_af_GetZoomPos(ctx, pos);
+    ret = rk_aiq_user_api2_af_GetZoomIndex(ctx, pos);
+    IMGPROC_FUNC_EXIT
+
+    return ret;
+}
+
+XCamReturn rk_aiq_uapi2_endOpZoomChange(const rk_aiq_sys_ctx_t* ctx)
+{
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+
+    IMGPROC_FUNC_ENTER
+    ret = rk_aiq_user_api2_af_EndZoomChg(ctx);
     IMGPROC_FUNC_EXIT
 
     return ret;
@@ -2465,6 +2502,46 @@ XCamReturn rk_aiq_uapi2_getZoomRange(const rk_aiq_sys_ctx_t* ctx, rk_aiq_af_zoom
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
     IMGPROC_FUNC_ENTER
     ret = rk_aiq_user_api2_af_GetZoomRange(ctx, range);
+    IMGPROC_FUNC_EXIT
+
+    return ret;
+}
+
+XCamReturn rk_aiq_uapi2_getFocusRange(const rk_aiq_sys_ctx_t* ctx, rk_aiq_af_focusrange* range)
+{
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    IMGPROC_FUNC_ENTER
+    ret = rk_aiq_user_api2_af_GetFocusRange(ctx, range);
+    IMGPROC_FUNC_EXIT
+
+    return ret;
+}
+
+XCamReturn rk_aiq_uapi2_startZoomCalib(const rk_aiq_sys_ctx_t* ctx)
+{
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    IMGPROC_FUNC_ENTER
+    ret = rk_aiq_user_api2_af_StartZoomCalib(ctx);
+    IMGPROC_FUNC_EXIT
+
+    return ret;
+}
+
+XCamReturn rk_aiq_uapi2_resetZoom(const rk_aiq_sys_ctx_t* ctx)
+{
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    IMGPROC_FUNC_ENTER
+    ret = rk_aiq_user_api2_af_resetZoom(ctx);
+    IMGPROC_FUNC_EXIT
+
+    return ret;
+}
+
+XCamReturn rk_aiq_uapi2_setAngleZ(const rk_aiq_sys_ctx_t* ctx, float angleZ)
+{
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    IMGPROC_FUNC_ENTER
+    ret = rk_aiq_user_api2_af_setAngleZ(ctx, angleZ);
     IMGPROC_FUNC_EXIT
 
     return ret;

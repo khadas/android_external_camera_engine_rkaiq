@@ -149,6 +149,9 @@ XCamReturn RkAiqHandleIntCom::configInparamsCom(RkAiqAlgoCom* com, int type)
     case RK_AIQ_ALGO_TYPE_AGAIN:
         GET_RK_COM(Again);
         break;
+    case RK_AIQ_ALGO_TYPE_ACAC:
+        GET_RK_COM(Acac);
+        break;
     default:
         LOGE_ANALYZER("wrong algo type !");
     }
@@ -1576,6 +1579,7 @@ RkAiqAfHandleInt::init()
 #endif
     mPostInParam  = (RkAiqAlgoCom*)(new RkAiqAlgoPostAfInt());
     mPostOutParam = (RkAiqAlgoResCom*)(new RkAiqAlgoPostResAfInt());
+    mLastZoomIndex = 0;
 
     EXIT_ANALYZER_FUNCTION();
 }
@@ -1621,8 +1625,7 @@ RkAiqAfHandleInt::setAttrib(rk_aiq_af_attrib_t *att)
         // called by RkAiqCore
 
         // if something changed
-        if ((0 != memcmp(&mCurAtt, att, sizeof(rk_aiq_af_attrib_t))) ||
-            (mCurAtt.AfMode == RKAIQ_AF_MODE_AUTO)) {
+        if (0 != memcmp(&mCurAtt, att, sizeof(rk_aiq_af_attrib_t))) {
             mNewAtt = *att;
             updateAtt = true;
             isUpdateAttDone = false;
@@ -1725,15 +1728,94 @@ RkAiqAfHandleInt::Tracking()
 }
 
 XCamReturn
-RkAiqAfHandleInt::setZoomPos(int zoom_pos)
+RkAiqAfHandleInt::setZoomIndex(int index)
 {
     ENTER_ANALYZER_FUNCTION();
 
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
     RkAiqCore::RkAiqAlgosComShared_t* sharedCom = &mAiqCore->mAlogsComSharedParams;
 
-    if (sharedCom->snsDes.lens_des.focus_support)
-        rk_aiq_uapi_af_setZoomPos(mAlgoCtx, zoom_pos);
+    if (sharedCom->snsDes.lens_des.zoom_support) {
+        mCfgMutex.lock();
+        rk_aiq_uapi_af_setZoomIndex(mAlgoCtx, index);
+        isUpdateZoomPosDone = true;
+        waitSignal();
+        mCfgMutex.unlock();
+    }
+
+    EXIT_ANALYZER_FUNCTION();
+    return ret;
+}
+
+XCamReturn
+RkAiqAfHandleInt::getZoomIndex(int *index)
+{
+    ENTER_ANALYZER_FUNCTION();
+
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    RkAiqCore::RkAiqAlgosComShared_t* sharedCom = &mAiqCore->mAlogsComSharedParams;
+
+    if (sharedCom->snsDes.lens_des.zoom_support) {
+        rk_aiq_uapi_af_getZoomIndex(mAlgoCtx, index);
+    }
+
+    EXIT_ANALYZER_FUNCTION();
+    return ret;
+}
+
+XCamReturn
+RkAiqAfHandleInt::endZoomChg()
+{
+    ENTER_ANALYZER_FUNCTION();
+
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    RkAiqCore::RkAiqAlgosComShared_t* sharedCom = &mAiqCore->mAlogsComSharedParams;
+
+    if (sharedCom->snsDes.lens_des.zoom_support) {
+        mCfgMutex.lock();
+        rk_aiq_uapi_af_endZoomChg(mAlgoCtx);
+        mCfgMutex.unlock();
+    }
+
+    EXIT_ANALYZER_FUNCTION();
+    return ret;
+}
+
+XCamReturn
+RkAiqAfHandleInt::startZoomCalib()
+{
+    ENTER_ANALYZER_FUNCTION();
+
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    RkAiqCore::RkAiqAlgosComShared_t* sharedCom = &mAiqCore->mAlogsComSharedParams;
+
+    if (sharedCom->snsDes.lens_des.zoom_support) {
+        mCfgMutex.lock();
+        rk_aiq_uapi_af_startZoomCalib(mAlgoCtx);
+        isUpdateZoomPosDone = true;
+        waitSignal();
+        mCfgMutex.unlock();
+    }
+
+    EXIT_ANALYZER_FUNCTION();
+    return ret;
+}
+
+XCamReturn
+RkAiqAfHandleInt::resetZoom()
+{
+    ENTER_ANALYZER_FUNCTION();
+
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    RkAiqCore::RkAiqAlgosComShared_t* sharedCom = &mAiqCore->mAlogsComSharedParams;
+
+    if (sharedCom->snsDes.lens_des.zoom_support) {
+        mCfgMutex.lock();
+        rk_aiq_uapi_af_resetZoom(mAlgoCtx);
+        isUpdateZoomPosDone = true;
+        waitSignal();
+        mCfgMutex.unlock();
+    }
 
     EXIT_ANALYZER_FUNCTION();
     return ret;
@@ -1764,6 +1846,21 @@ RkAiqAfHandleInt::GetSearchResult(rk_aiq_af_result_t* result)
 
     if (sharedCom->snsDes.lens_des.focus_support)
         rk_aiq_uapi_af_getSearchResult(mAlgoCtx, result);
+
+    EXIT_ANALYZER_FUNCTION();
+    return ret;
+}
+
+XCamReturn
+RkAiqAfHandleInt::GetFocusRange(rk_aiq_af_focusrange* range)
+{
+    ENTER_ANALYZER_FUNCTION();
+
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    RkAiqCore::RkAiqAlgosComShared_t* sharedCom = &mAiqCore->mAlogsComSharedParams;
+
+    if (sharedCom->snsDes.lens_des.focus_support)
+        rk_aiq_uapi_af_getFocusRange(mAlgoCtx, range);
 
     EXIT_ANALYZER_FUNCTION();
     return ret;
@@ -1810,7 +1907,6 @@ RkAiqAfHandleInt::preProcess()
         (RkAiqCore::RkAiqAlgosGroupShared_t*)(getGroupShared());
     RkAiqPreResComb* comb = &shared->preResComb;
     RkAiqCore::RkAiqAlgosComShared_t* sharedCom = &mAiqCore->mAlogsComSharedParams;
-    RkAiqIspStats* ispStats = shared->ispStats;
 
     ret = RkAiqAfHandle::preProcess();
     if (ret) {
@@ -1819,8 +1915,6 @@ RkAiqAfHandleInt::preProcess()
     }
 
     comb->af_pre_res = NULL;
-    af_pre_int->af_stats = &ispStats->af_stats;
-    af_pre_int->aec_stats = &ispStats->aec_stats;
 
     af_pre_int->xcam_af_stats = shared->afStatsBuf;
     af_pre_int->xcam_aec_stats = shared->aecStatsBuf;
@@ -1833,6 +1927,33 @@ RkAiqAfHandleInt::preProcess()
 
     EXIT_ANALYZER_FUNCTION();
     return XCAM_RETURN_NO_ERROR;
+}
+
+bool RkAiqAfHandleInt::getValueFromFile(const char* path, int *pos)
+{
+    const char *delim = " ";
+    char buffer[16] = {0};
+    int fp;
+
+    fp = open(path, O_RDONLY | O_SYNC);
+    if (fp != -1) {
+        if (read(fp, buffer, sizeof(buffer)) <= 0) {
+            LOGE_AF("%s read %s failed!", __func__, path);
+            goto OUT;
+        } else {
+            char *p = nullptr;
+
+            p = strtok(buffer, delim);
+            if (p != nullptr) {
+                *pos = atoi(p);
+            }
+        }
+        close(fp);
+        return true;
+    }
+
+OUT:
+    return false;
 }
 
 XCamReturn
@@ -1860,6 +1981,19 @@ RkAiqAfHandleInt::processing()
     RkAiqProcResComb* comb = &shared->procResComb;
     RkAiqCore::RkAiqAlgosComShared_t* sharedCom = &mAiqCore->mAlogsComSharedParams;
     RkAiqIspStats* ispStats = shared->ispStats;
+
+#define ZOOM_MOVE_DEBUG
+#ifdef ZOOM_MOVE_DEBUG
+    int zoom_index = 0;
+
+    if (getValueFromFile("/tmp/.zoom_pos", &zoom_index) == true) {
+        if (mLastZoomIndex != zoom_index) {
+            setZoomIndex(zoom_index);
+            endZoomChg();
+            mLastZoomIndex = zoom_index;
+        }
+    }
+#endif
 
     ret = RkAiqAfHandle::processing();
     if (ret) {
@@ -2629,6 +2763,7 @@ RkAiqAdhazHandleInt::prepare()
     adhaz_config_int->calib = sharedCom->calib;
 
     adhaz_config_int->working_mode = sharedCom->working_mode;
+    adhaz_config_int->is_multi_isp_mode = sharedCom->is_multi_isp_mode;
     // adhaz_config_int->rawHeight = sharedCom->snsDes.isp_acq_height;
     // adhaz_config_int->rawWidth = sharedCom->snsDes.isp_acq_width;
     // adhaz_config_int->working_mode = sharedCom->working_mode;
@@ -2658,6 +2793,45 @@ RkAiqAdhazHandleInt::preProcess()
 
     adhaz_pre_int->rawHeight = sharedCom->snsDes.isp_acq_height;
     adhaz_pre_int->rawWidth = sharedCom->snsDes.isp_acq_width;
+
+    if(!shared->ispStats->adehaze_stats_valid && !sharedCom->init) {
+        LOG1("no adehaze stats, ignore!");
+        // TODO: keep last result ?
+        //
+        //
+        //return XCAM_RETURN_BYPASS;
+    } else {
+        //dehaze stats
+        if(CHECK_ISP_HW_V20())
+            memcpy(&adhaz_pre_int->stats.dehaze_stats_v20, &ispStats->adehaze_stats.dehaze_stats_v20, sizeof(dehaze_stats_v20_t));
+        else if(CHECK_ISP_HW_V21())
+            memcpy(&adhaz_pre_int->stats.dehaze_stats_v21, &ispStats->adehaze_stats.dehaze_stats_v21, sizeof(dehaze_stats_v21_t));
+        else if(CHECK_ISP_HW_V30())
+            memcpy(&adhaz_pre_int->stats.dehaze_stats_v30, &ispStats->adehaze_stats.dehaze_stats_v30, sizeof(dehaze_stats_v21_t));
+
+        //other stats
+        memcpy(adhaz_pre_int->stats.other_stats.tmo_luma,
+               ispStats->aec_stats.ae_data.extra.rawae_big.channelg_xy, sizeof(adhaz_pre_int->stats.other_stats.tmo_luma));
+
+        if(sharedCom->working_mode == RK_AIQ_ISP_HDR_MODE_3_FRAME_HDR || sharedCom->working_mode == RK_AIQ_ISP_HDR_MODE_3_LINE_HDR)
+        {
+            memcpy(adhaz_pre_int->stats.other_stats.short_luma,
+                   ispStats->aec_stats.ae_data.chn[0].rawae_big.channelg_xy, sizeof(adhaz_pre_int->stats.other_stats.short_luma));
+            memcpy(adhaz_pre_int->stats.other_stats.middle_luma,
+                   ispStats->aec_stats.ae_data.chn[1].rawae_lite.channelg_xy, sizeof(adhaz_pre_int->stats.other_stats.middle_luma));
+            memcpy(adhaz_pre_int->stats.other_stats.long_luma,
+                   ispStats->aec_stats.ae_data.chn[2].rawae_big.channelg_xy, sizeof(adhaz_pre_int->stats.other_stats.long_luma));
+        }
+        else if(sharedCom->working_mode == RK_AIQ_ISP_HDR_MODE_2_FRAME_HDR || sharedCom->working_mode == RK_AIQ_ISP_HDR_MODE_2_LINE_HDR)
+        {
+            memcpy(adhaz_pre_int->stats.other_stats.short_luma,
+                   ispStats->aec_stats.ae_data.chn[0].rawae_big.channelg_xy, sizeof(adhaz_pre_int->stats.other_stats.short_luma));
+            memcpy(adhaz_pre_int->stats.other_stats.long_luma,
+                   ispStats->aec_stats.ae_data.chn[1].rawae_big.channelg_xy, sizeof(adhaz_pre_int->stats.other_stats.long_luma));
+        }
+        else
+            LOGD("Wrong working mode!!!");
+    }
 
     ret = RkAiqAdhazHandle::preProcess();
     if (ret) {
@@ -2702,40 +2876,6 @@ RkAiqAdhazHandleInt::processing()
     if (ret) {
         comb->adhaz_proc_res = NULL;
         RKAIQCORE_CHECK_RET(ret, "adhaz handle processing failed");
-    }
-
-    if(!shared->ispStats->adehaze_stats_valid && !sharedCom->init) {
-        LOGD("no adehaze stats, ignore!");
-        // TODO: keep last result ?
-        //
-        //
-        return XCAM_RETURN_BYPASS;
-    } else {
-        if(sharedCom->ctxCfigs[RK_AIQ_ALGO_TYPE_ADHAZ].cfg_com.isp_hw_version == 0)
-            memcpy(&adhaz_proc_int->stats.dehaze_stats_v20, &ispStats->adehaze_stats.dehaze_stats_v20, sizeof(dehaze_stats_v20_t));
-        else if(sharedCom->ctxCfigs[RK_AIQ_ALGO_TYPE_ADHAZ].cfg_com.isp_hw_version == 1)
-            memcpy(&adhaz_proc_int->stats.dehaze_stats_v21, &ispStats->adehaze_stats.dehaze_stats_v21, sizeof(dehaze_stats_v21_t));
-        memcpy(adhaz_proc_int->stats.other_stats.tmo_luma,
-               ispStats->aec_stats.ae_data.extra.rawae_big.channelg_xy, sizeof(adhaz_proc_int->stats.other_stats.tmo_luma));
-
-        if(sharedCom->working_mode == RK_AIQ_ISP_HDR_MODE_3_FRAME_HDR || sharedCom->working_mode == RK_AIQ_ISP_HDR_MODE_3_LINE_HDR)
-        {
-            memcpy(adhaz_proc_int->stats.other_stats.short_luma,
-                   ispStats->aec_stats.ae_data.chn[0].rawae_big.channelg_xy, sizeof(adhaz_proc_int->stats.other_stats.short_luma));
-            memcpy(adhaz_proc_int->stats.other_stats.middle_luma,
-                   ispStats->aec_stats.ae_data.chn[1].rawae_lite.channelg_xy, sizeof(adhaz_proc_int->stats.other_stats.middle_luma));
-            memcpy(adhaz_proc_int->stats.other_stats.long_luma,
-                   ispStats->aec_stats.ae_data.chn[2].rawae_big.channelg_xy, sizeof(adhaz_proc_int->stats.other_stats.long_luma));
-        }
-        else if(sharedCom->working_mode == RK_AIQ_ISP_HDR_MODE_2_FRAME_HDR || sharedCom->working_mode == RK_AIQ_ISP_HDR_MODE_2_LINE_HDR)
-        {
-            memcpy(adhaz_proc_int->stats.other_stats.short_luma,
-                   ispStats->aec_stats.ae_data.chn[0].rawae_big.channelg_xy, sizeof(adhaz_proc_int->stats.other_stats.short_luma));
-            memcpy(adhaz_proc_int->stats.other_stats.long_luma,
-                   ispStats->aec_stats.ae_data.chn[1].rawae_big.channelg_xy, sizeof(adhaz_proc_int->stats.other_stats.long_luma));
-        }
-        else
-            LOGD("Wrong working mode!!!");
     }
 
     adhaz_proc_int->pCalibDehaze = sharedCom->calib;
@@ -3899,10 +4039,10 @@ RkAiqA3dlutHandleInt::processing()
             a3dlut_proc_int->awbIIRDampCoef =  awb_res_int->awb_smooth_factor;
             a3dlut_proc_int->awbConverged = awb_res_int->awbConverged;
         } else {
-            LOGE("fail to get awb gain form AWB module,use default value ");
+            LOGW("fail to get awb gain form AWB module,use default value ");
         }
     } else {
-        LOGE("fail to get awb gain form AWB module,use default value ");
+        LOGW("fail to get awb gain form AWB module,use default value ");
     }
     RKAiqAecExpInfo_t *pCurExp = &shared->curExp;
     if(pCurExp) {
@@ -4408,7 +4548,7 @@ RkAiqAccmHandleInt::processing()
         if(awb_res) {
             if(awb_res->awb_gain_algo.grgain < DIVMIN ||
                     awb_res->awb_gain_algo.gbgain < DIVMIN ) {
-                LOGE("get wrong awb gain from AWB module ,use default value ");
+                LOGW("get wrong awb gain from AWB module ,use default value ");
             } else {
                 accm_proc_int->accm_sw_info.awbGain[0] =
                     awb_res->awb_gain_algo.rgain / awb_res->awb_gain_algo.grgain;
@@ -4420,10 +4560,10 @@ RkAiqAccmHandleInt::processing()
             accm_proc_int->accm_sw_info.varianceLuma = awb_res_int->varianceLuma;
             accm_proc_int->accm_sw_info.awbConverged = awb_res_int->awbConverged;
         } else {
-            LOGE("fail to get awb gain form AWB module,use default value ");
+            LOGW("fail to get awb gain form AWB module,use default value ");
         }
     } else {
-        LOGE("fail to get awb gain form AWB module,use default value ");
+        LOGW("fail to get awb gain form AWB module,use default value ");
     }
     RKAiqAecExpInfo_t *pCurExp = &shared->curExp;
     if(pCurExp) {
@@ -6496,7 +6636,7 @@ RkAiqAlscHandleInt::processing()
         if(awb_res) {
             if(awb_res->awb_gain_algo.grgain < DIVMIN ||
                     awb_res->awb_gain_algo.gbgain < DIVMIN ) {
-                LOGE("get wrong awb gain from AWB module ,use default value ");
+                LOGW("get wrong awb gain from AWB module ,use default value ");
             } else {
                 alsc_proc_int->alsc_sw_info.awbGain[0] =
                     awb_res->awb_gain_algo.rgain / awb_res->awb_gain_algo.grgain;
@@ -6508,10 +6648,10 @@ RkAiqAlscHandleInt::processing()
             alsc_proc_int->alsc_sw_info.varianceLuma = awb_res_int->varianceLuma;
             alsc_proc_int->alsc_sw_info.awbConverged = awb_res_int->awbConverged;
         } else {
-            LOGE("fail to get awb gain form AWB module,use default value ");
+            LOGW("fail to get awb gain form AWB module,use default value ");
         }
     } else {
-        LOGE("fail to get awb gain form AWB module,use default value ");
+        LOGW("fail to get awb gain form AWB module,use default value ");
     }
 
     RKAiqAecExpInfo_t *pCurExp = &shared->curExp;
@@ -6533,11 +6673,11 @@ RkAiqAlscHandleInt::processing()
                     * pCurExp->HdrExp[2].exp_real_params.digital_gain
                     * pCurExp->HdrExp[2].exp_real_params.isp_dgain;
         } else {
-            LOGE("working_mode (%d) is invaild ,fail to get sensor gain form AE module,use default value ",
+            LOGW("working_mode (%d) is invaild ,fail to get sensor gain form AE module,use default value ",
                  sharedCom->working_mode);
         }
     } else {
-        LOGE("fail to get sensor gain form AE module,use default value ");
+        LOGW("fail to get sensor gain form AE module,use default value ");
     }
 #endif
 

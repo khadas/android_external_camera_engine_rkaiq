@@ -23,7 +23,6 @@
 #include <stdio.h>
 #include "rk_aiq_comm.h"
 #include "rk_aiq_mems_sensor.h"
-#include "rk-camera-module.h"
 #include "adebayer/rk_aiq_types_algo_adebayer.h"
 #include "ae/rk_aiq_types_ae_algo.h"
 #include "awb/rk_aiq_types_awb_algo.h"
@@ -76,6 +75,8 @@
 #include "af/rk_aiq_types_af_algo.h"
 
 #endif
+
+#include "rk_aiq_types_v3x.h" /*< v3x types */
 
 #define ANR_NO_SEPERATE_MARCO (0)
 
@@ -295,6 +296,7 @@ typedef struct {
     int32_t num;
     /* binded pp stream media index */
     int8_t binded_strm_media_idx;
+    int phyId;
 } rk_aiq_sensor_info_t;
 
 typedef struct {
@@ -310,6 +312,9 @@ typedef struct {
     bool fl_strth_adj_sup;
     bool has_irc; /*< has ircutter */
     bool fl_ir_strth_adj_sup;
+    uint8_t is_multi_isp_mode;
+    uint16_t multi_isp_extended_pixel;
+    uint8_t reserved[13];
     // supported Antibanding modes
     // supported lock modes
     // supported ae compensation range/step
@@ -330,6 +335,16 @@ typedef struct {
     bool focus_support;
     bool iris_support;
     bool zoom_support;
+    bool otp_valid;
+    float posture;
+    float hysteresis;
+    float startCurrent;
+    float endCurrent;
+
+    int32_t focus_minimum;
+    int32_t focus_maximum;
+    int32_t zoom_minimum;
+    int32_t zoom_maximum;
 } rk_aiq_lens_descriptor;
 
 typedef struct {
@@ -357,6 +372,11 @@ typedef struct {
     float max_fl;
 } rk_aiq_af_zoomrange;
 
+typedef struct {
+    int min_pos;
+    int max_pos;
+} rk_aiq_af_focusrange;
+
 // sensor
 typedef struct {
     unsigned short line_periods_vertical_blanking;
@@ -377,8 +397,6 @@ typedef struct {
     uint32_t isp_acq_height;
     rk_aiq_sensor_nr_switch_t nr_switch;
     rk_aiq_lens_descriptor lens_des;
-    struct rkmodule_awb_inf otp_awb;
-    struct rkmodule_lsc_inf *otp_lsc;
 } rk_aiq_exposure_sensor_descriptor;
 
 // exposure
@@ -390,10 +408,26 @@ typedef RKAiqAecExpInfo_t rk_aiq_exposure_params_t;
 // focus
 typedef struct
 {
+    bool vcm_config_valid;
+    bool zoomfocus_modifypos;
+    bool focus_correction;
+    bool zoom_correction;
     bool lens_pos_valid;
     bool zoom_pos_valid;
-    unsigned int next_lens_pos;
-    unsigned int next_zoom_pos;
+    bool send_zoom_reback;
+    bool send_focus_reback;
+    bool end_zoom_chg;
+    bool focus_noreback;
+    int next_pos_num;
+    int next_lens_pos[RKAIQ_RAWAF_NEXT_ZOOMFOCUS_NUM];
+    int next_zoom_pos[RKAIQ_RAWAF_NEXT_ZOOMFOCUS_NUM];
+    int use_manual;
+    int auto_focpos;
+    int auto_zoompos;
+    int manual_focpos;
+    int manual_zoompos;
+    int vcm_start_ma;
+    int vcm_end_ma;
 } rk_aiq_focus_params_t;
 
 // isp
@@ -410,16 +444,9 @@ struct rk_aiq_isp_window {
 
 typedef RKAiqAecStats_t rk_aiq_isp_aec_stats_t;
 
-
-#ifdef RK_SIMULATOR_HW
-typedef rawaf_isp_af_stat_t rk_aiq_isp_af_stats_t;
-typedef rawaf_isp_af_meas_t rk_aiq_isp_af_meas_t;
-typedef rawaf_focus_pos_meas_t rk_aiq_af_focus_pos_meas_t;
-#else
-typedef rk_aiq_af_algo_stat_t rk_aiq_isp_af_stats_t;
-typedef rk_aiq_af_algo_meas_t rk_aiq_isp_af_meas_t;
+typedef rk_aiq_af_algo_stat_v20_t rk_aiq_isp_af_stats_t;
+typedef rk_aiq_af_algo_meas_v20_t rk_aiq_isp_af_meas_t;
 typedef rk_aiq_af_algo_focus_pos_t rk_aiq_af_focus_pos_meas_t;
-#endif
 
 typedef rk_aiq_ae_meas_params_t rk_aiq_isp_aec_meas_t;
 typedef rk_aiq_hist_meas_params_t rk_aiq_isp_hist_meas_t;
@@ -503,8 +530,13 @@ typedef struct {
     union {
         rk_aiq_awb_stat_res_v200_t awb_stats_v200;
         rk_aiq_awb_stat_res_v201_t awb_stats_v21;
+        rk_aiq_isp_awb_stats_v3x_t awb_stats_v3x;
     };
-    rk_aiq_isp_af_stats_t  af_stats;
+    int af_hw_ver;
+    union {
+        rk_aiq_isp_af_stats_t  af_stats;
+        rk_aiq_isp_af_stats_v3x_t af_stats_v3x;
+    };
 } rk_aiq_isp_stats_t;
 
 typedef RkAiqAmergeProcResult_t rk_aiq_isp_merge_t;
@@ -677,6 +709,7 @@ typedef struct rk_aiq_isp_wb_gain_v21_s {
 } rk_aiq_isp_wb_gain_v21_t;
 
 typedef AgicProcResult_t rk_aiq_isp_gic_v21_t;
+typedef rk_aiq_isp_gic_v21_t rk_aiq_isp_gic_v3x_t;
 
 typedef struct rk_aiq_isp_ccm_v21_s {
     //TODO:
@@ -688,7 +721,7 @@ typedef struct rk_aiq_isp_dhaz_cfg_v21_s {
     void* place_holder;
 } rk_aiq_isp_dhaz_cfg_v21_t;*/
 
-typedef AdehazeV21ProcResult_t rk_aiq_isp_dehaze_v21_t;
+typedef RkAiqAdehazeProcResult_t rk_aiq_isp_dehaze_v21_t;
 
 typedef struct rk_aiq_isp_dhaz_stats_v21_s {
     //TODO:
@@ -774,5 +807,7 @@ typedef enum rk_isp_stream_mode_e {
     RK_ISP_STREAM_MODE_ONLNIE,
     RK_ISP_STREAM_MODE_OFFLNIE,
 } rk_isp_stream_mode_t;
+
+#define RK_AIQ_CAM_GROUP_MAX_CAMS (6)
 
 #endif

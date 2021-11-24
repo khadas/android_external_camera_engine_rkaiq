@@ -81,10 +81,10 @@ XCamReturn RkAiqAfHandle::preProcess() {
         xAfStats = (RkAiqAfStats*)shared->afStatsBuf->map(shared->afStatsBuf);
         if (!xAfStats) LOGE("af stats is null");
     } else {
-        LOGE("the xcamvideobuffer of af stats is null");
+        LOGW("the xcamvideobuffer of af stats is null");
     }
     if ((!xAfStats || !xAfStats->af_stats_valid) && !sharedCom->init) {
-        LOGE("no af stats, ignore!");
+        LOGW("no af stats, ignore!");
         return XCAM_RETURN_BYPASS;
     }
 
@@ -122,10 +122,10 @@ XCamReturn RkAiqAfHandle::processing() {
         xAfStats = (RkAiqAfStats*)shared->afStatsBuf->map(shared->afStatsBuf);
         if (!xAfStats) LOGE("af stats is null");
     } else {
-        LOGE("the xcamvideobuffer of af stats is null");
+        LOGW("the xcamvideobuffer of af stats is null");
     }
     if ((!xAfStats || !xAfStats->af_stats_valid) && !sharedCom->init) {
-        LOGE("no af stats, ignore!");
+        LOGW("no af stats, ignore!");
         return XCAM_RETURN_BYPASS;
     }
 
@@ -164,10 +164,10 @@ XCamReturn RkAiqAfHandle::postProcess() {
         xAfStats = (RkAiqAfStats*)shared->afStatsBuf->map(shared->afStatsBuf);
         if (!xAfStats) LOGE("af stats is null");
     } else {
-        LOGE("the xcamvideobuffer of af stats is null");
+        LOGW("the xcamvideobuffer of af stats is null");
     }
     if ((!xAfStats || !xAfStats->af_stats_valid) && !sharedCom->init) {
-        LOGE("no af stats, ignore!");
+        LOGW("no af stats, ignore!");
         return XCAM_RETURN_BYPASS;
     }
 

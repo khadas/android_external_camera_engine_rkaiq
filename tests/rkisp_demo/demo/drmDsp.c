@@ -13,8 +13,11 @@
 #include "./include/xf86drm.h"
 #include "./include/xf86drmMode.h"
 #include "drmDsp.h"
+
+#ifndef ARCH_FPGA
 #include "rkRgaApi.h"
 #include "rga.h"
+#endif
 
 struct drmDsp {
   struct fb_var_screeninfo vinfo;
@@ -62,8 +65,9 @@ int initDrmDsp() {
   if (!pDrmDsp->test_plane)
     return -1;
 
+#ifndef ARCH_FPGA
   rkRgaInit();
-  return 0;
+#endif
 }
 
 void deInitDrmDsp() {
@@ -220,7 +224,7 @@ int drmDspFrame(int srcWidth, int srcHeight, int dispWidth, int dispHeight,
   struct drmDsp* pDrmDsp = &gDrmDsp;
 
   int wAlign16 = ((dispWidth+ 15) & (~15));
-  int hAlign16 = dispHeight;
+  int hAlign16 = (dispHeight + 15) & (~15);
   int frameSize = wAlign16 * hAlign16 * 3 / 2;
   uint32_t handles[4], pitches[4], offsets[4];
 
@@ -261,9 +265,9 @@ int drmDspFrame(int srcWidth, int srcHeight, int dispWidth, int dispHeight,
   offsets[0] = 0;
   handles[1] = bo->handle;
   pitches[1] = wAlign16;
-  offsets[1] = wAlign16 * hAlign16;
+  offsets[1] = dispWidth * dispHeight; //wAlign16 * hAlign16;
 
-#if 1
+#ifndef ARCH_FPGA
   struct rkRgaCfg src_cfg, dst_cfg;
 
   src_cfg.addr = dmaFd;
@@ -279,10 +283,10 @@ int drmDspFrame(int srcWidth, int srcHeight, int dispWidth, int dispHeight,
   rkRgaBlit(&src_cfg, &dst_cfg);
 #else
   //copy src data to bo
-  if (ori_width == width)
+  if (srcWidth == dispWidth)
 	  memcpy(bo->map_addr, dmaFd, wAlign16 * hAlign16 * 3 / 2);
   else
-	  arm_camera_yuv420_scale_arm(dmaFd, bo->map_addr, ori_width, ori_height, width, height);
+	  arm_camera_yuv420_scale_arm(dmaFd, bo->map_addr, srcWidth, srcHeight, dispWidth, dispHeight);
 #endif
 
   ret = drmModeAddFB2(bo->dev->fd, bo->width, bo->height,
@@ -302,7 +306,7 @@ int drmDspFrame(int srcWidth, int srcHeight, int dispWidth, int dispHeight,
                         //pDrmDsp->test_crtc->crtc->mode.hdisplay,
 			wAlign16, hAlign16,
                         //pDrmDsp->test_crtc->crtc->mode.vdisplay,
-                        0, 0, wAlign16 << 16,  hAlign16 << 16);
+                        0, 0, dispWidth << 16,  dispHeight << 16);
   if (ret) {
     printf("failed to set plane to crtc ret=%d\n", ret);
     return ret;
@@ -336,5 +340,4 @@ int drmDspFrame(int srcWidth, int srcHeight, int dispWidth, int dispHeight,
   else
     pDrmDsp->nextbo = pDrmDsp->bo[0];
 #endif
-  return 0;
 }

@@ -24,9 +24,12 @@
 
 namespace RkCam {
 
+class FakeCamHwIsp21;
+
 class CamHwIsp21
     : virtual public CamHwIsp20
     , virtual public Isp21Params {
+    friend class FakeCamHwIsp21;
 public:
     explicit CamHwIsp21();
     virtual ~CamHwIsp21();

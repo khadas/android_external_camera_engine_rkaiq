@@ -21,7 +21,7 @@ AgicInit
         CalibDbV2_Gic_V20_t* calibv2_agic_calib_V20 =
             (CalibDbV2_Gic_V20_t*)(CALIBDBV2_GET_MODULE_PTR(calib, agic_calib_v20));
         pAgicCtx->full_param.gic_v20 = calibv2_agic_calib_V20;
-    } else if(CHECK_ISP_HW_V21()) {
+    } else if(CHECK_ISP_HW_V21() || CHECK_ISP_HW_V30()) {
         CalibDbV2_Gic_V21_t* calibv2_agic_calib_V21 =
             (CalibDbV2_Gic_V21_t*)(CALIBDBV2_GET_MODULE_PTR(calib, agic_calib_v21));
         pAgicCtx->full_param.gic_v21 = calibv2_agic_calib_V21;
@@ -569,7 +569,7 @@ AgicProcess
 
     if(CHECK_ISP_HW_V20())
         AgicProcessV20(pAgicCtx, ISO);
-    else if(CHECK_ISP_HW_V21())
+    else if(CHECK_ISP_HW_V21() || CHECK_ISP_HW_V30())
         AgicProcessV21(pAgicCtx, ISO);
     else
         LOGE_AGIC(" %s:Wrong hardware version!! \n", __func__);
@@ -594,7 +594,7 @@ AgicGetProcResult
 
     if(CHECK_ISP_HW_V20())
         AgicGetProcResultV20(pAgicCtx);
-    else if(CHECK_ISP_HW_V21())
+    else if(CHECK_ISP_HW_V21() || CHECK_ISP_HW_V30())
         AgicGetProcResultV21(pAgicCtx);
     else
         LOGE_AGIC(" %s:Wrong hardware version!! \n", __func__);

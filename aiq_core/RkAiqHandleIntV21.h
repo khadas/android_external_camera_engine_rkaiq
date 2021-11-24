@@ -28,7 +28,6 @@
 
 
 
-
 namespace RkCam {
 
 class RkAiqAdrcV1HandleInt:
@@ -260,13 +259,13 @@ private:
 
 // awb v21
 class RkAiqAwbV21HandleInt:
-     public RkAiqAwbHandleInt {
+    public RkAiqAwbHandleInt {
 public:
     explicit RkAiqAwbV21HandleInt(RkAiqAlgoDesComm* des, RkAiqCore* aiqCore)
         : RkAiqHandle(des, aiqCore)
         , RkAiqAwbHandle(des, aiqCore)
         , RkAiqHandleIntCom(des, aiqCore)
-        , RkAiqAwbHandleInt(des, aiqCore){
+        , RkAiqAwbHandleInt(des, aiqCore) {
         memset(&mCurWbV21Attr, 0, sizeof(rk_aiq_uapiV2_wbV21_attrib_t));
         memset(&mNewWbV21Attr, 0, sizeof(rk_aiq_uapiV2_wbV21_attrib_t));
         updateWbV21Attr = false;
@@ -285,7 +284,6 @@ private:
     rk_aiq_uapiV2_wbV21_attrib_t mNewWbV21Attr;
     bool updateWbV21Attr;
 };
-
 
 }
 #endif

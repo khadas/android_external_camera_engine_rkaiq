@@ -1,5 +1,6 @@
 #include "CamHwIsp20.h"
 #include "rk_aiq_comm.h"
+#include "fake_v4l2_device.h"
 
 namespace RkCam {
 RawStreamCapUnit::RawStreamCapUnit ()
@@ -140,6 +141,13 @@ RawStreamCapUnit::prepare_cif_mipi()
 {
     LOGD( "%s enter,working_mode=0x%x", __FUNCTION__, _working_mode);
 
+    FakeV4l2Device* fake_dev = dynamic_cast<FakeV4l2Device* >(_dev[0].ptr());
+
+    if (fake_dev) {
+        LOGD("ignore fake tx");
+        return;
+    }
+
     SmartPtr<V4l2Device> tx_devs_tmp[3] =
     {
         _dev_bakup[0],
@@ -215,6 +223,9 @@ RawStreamCapUnit::set_tx_devices(SmartPtr<V4l2Device> mipi_tx_devs[3])
 {
     for (int i = 0; i < 3; i++) {
         _dev[i] = mipi_tx_devs[i];
+        _stream[i].release();
+        _stream[i] =  new RKRawStream(_dev[i], i, ISP_POLL_TX);
+        _stream[i]->setPollCallback(this);
     }
 }
 

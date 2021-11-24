@@ -83,10 +83,10 @@ XCamReturn RkAiqAeHandle::preProcess() {
         xAecStats = (RkAiqAecStats*)shared->aecStatsBuf->map(shared->aecStatsBuf);
         if (!xAecStats) LOGE_AEC("aec stats is null");
     } else {
-        LOGE_AEC("the xcamvideobuffer of aec stats is null");
+        LOGW_AEC("the xcamvideobuffer of aec stats is null");
     }
     if ((!xAecStats || !xAecStats->aec_stats_valid) && !sharedCom->init) {
-        LOGE("no aec stats, ignore!");
+        LOGW("no aec stats, ignore!");
         return XCAM_RETURN_BYPASS;
     }
 
@@ -124,10 +124,10 @@ XCamReturn RkAiqAeHandle::processing() {
         xAecStats = (RkAiqAecStats*)shared->aecStatsBuf->map(shared->aecStatsBuf);
         if (!xAecStats) LOGE_AEC("aec stats is null");
     } else {
-        LOGE_AEC("the xcamvideobuffer of aec stats is null");
+        LOGW_AEC("the xcamvideobuffer of aec stats is null");
     }
     if ((!xAecStats || !xAecStats->aec_stats_valid) && !sharedCom->init) {
-        LOGE("no aec stats, ignore!");
+        LOGW("no aec stats, ignore!");
         return XCAM_RETURN_BYPASS;
     }
 

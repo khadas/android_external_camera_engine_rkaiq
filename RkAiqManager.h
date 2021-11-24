@@ -21,6 +21,7 @@
 #include "ICamHw.h"
 #include "RkAiqCore.h"
 #include "RkAiqCoreV21.h"
+#include "RkAiqCoreV3x.h"
 #include "RkAiqCalibDb.h"
 #include "RkAiqCalibDbV2.h"
 #include "RkLumaCore.h"
@@ -134,12 +135,15 @@ class RkAiqManager
     , public RkLumaAnalyzerCb {
     friend RkAiqRstApplyThread;
     friend RkAiqMngCmdThread;
+    friend class RkAiqCamGroupManager;
 public:
     explicit RkAiqManager(const char* sns_ent_name,
                           rk_aiq_error_cb err_cb,
                           rk_aiq_metas_cb metas_cb);
     virtual ~RkAiqManager();
     void setCamHw(SmartPtr<ICamHw>& camhw);
+    void setCamPhyId(int phyId) {mCamPhyId = phyId;}
+    int getCamPhyId() { return mCamPhyId;}
     void setAnalyzer(SmartPtr<RkAiqCore> analyzer);
     void setAiqCalibDb(const CamCalibDbContext_t* calibDb);
     void setAiqCalibDb(const CamCalibDbV2Context_t* calibDb);
@@ -161,6 +165,7 @@ public:
     XCamReturn ispEvtsCb(ispHwEvt_t* evt);
     #endif
     XCamReturn hwResCb(SmartPtr<VideoBuffer>& hwres);
+    XCamReturn syncSofEvt(SmartPtr<VideoBuffer>& hwres);
     // from RkAiqAnalyzerCb
     void rkAiqCalcDone(SmartPtr<RkAiqFullParamsProxy>& results);
     void rkAiqCalcFailed(const char* msg);
@@ -182,6 +187,9 @@ public:
     CamCalibDbV2Context_t* getCurrentCalibDBV2(void);
     XCamReturn calibTuning(const CamCalibDbV2Context_t* aiqCalib,
                            ModuleNameList& change_list);
+    void setCamGroupManager(RkAiqCamGroupManager* cam_group_manager) {
+        mCamGroupCoreManager = cam_group_manager;
+    }
 protected:
     XCamReturn applyAnalyzerResult(SmartPtr<RkAiqFullParamsProxy>& results);
     XCamReturn swWorkingModeDyn(rk_aiq_working_mode_t mode);
@@ -216,6 +224,8 @@ private:
     SmartPtr<RkAiqCpslParamsProxy> mDleayCpslParams;
     int mDelayCpslApplyFrmNum;
     int mIspHwVer;
+    int mCamPhyId;
+    RkAiqCamGroupManager* mCamGroupCoreManager;
 };
 
 }; //namespace RkCam

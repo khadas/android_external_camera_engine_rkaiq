@@ -263,6 +263,8 @@ struct RkAiqHwInfo {
     bool irc_supported;  // ir flash & ir cutter
     bool fl_ir_strth_adj;   // ir streng_adjust
     bool lens_supported;
+    bool is_multi_isp_mode;
+    uint16_t multi_isp_extended_pixel;
 };
 
 typedef struct RkAiqGrpCondition_s {
@@ -283,6 +285,7 @@ struct RkAiqAlgoDesCommExt {
     RkAiqGrpConditions_t grpConds;
 };
 
+class RkAiqCamGroupManager;
 class RkAiqCore
     : public rk_aiq_share_ptr_ops_t
 {
@@ -291,6 +294,7 @@ class RkAiqCore
     friend class MessageThread;
     friend class RkAiqAnalyzeGroup;
     friend class RkAiqAnalyzeGroupManager;
+    friend class RkAiqCamGroupManager;
 public:
     RkAiqCore();
     virtual ~RkAiqCore();
@@ -298,6 +302,10 @@ public:
     bool setAnalyzeResultCb(RkAiqAnalyzerCb* callback) {
         mCb = callback;
         return true;
+    }
+
+    void setCamGroupManager(RkAiqCamGroupManager* cam_group_manager) {
+        mCamGroupCoreManager = cam_group_manager;
     }
     // called only once
     XCamReturn init(const char* sns_ent_name, const CamCalibDbContext_t* aiqCalib,
@@ -309,7 +317,7 @@ public:
     // stop analyze thread
     XCamReturn stop();
     // called before start(), get initial settings
-    XCamReturn prepare(const rk_aiq_exposure_sensor_descriptor* sensor_des,
+    virtual XCamReturn prepare(const rk_aiq_exposure_sensor_descriptor* sensor_des,
                        int mode);
     // should called befor prepare
     void notifyIspStreamMode(rk_isp_stream_mode_t mode) {
@@ -367,6 +375,10 @@ public:
     XCamReturn setMemsSensorIntf(const rk_aiq_mems_sensor_intf_t* intf);
     const rk_aiq_mems_sensor_intf_t* getMemsSensorIntf();
     XCamReturn set_sp_resolution(int &width, int &height, int &aligned_w, int &aligned_h);
+
+    void setMulCamConc(bool cc) { mAlogsComSharedParams.is_multi_sensor = cc; };
+    void setCamPhyId(int phyId) { mAlogsComSharedParams.mCamPhyId = phyId;}
+    int getCamPhyId() { return mAlogsComSharedParams.mCamPhyId;}
 public:
     // following vars shared by all algo handlers
     typedef struct RkAiqAlgosComShared_s {
@@ -375,11 +387,14 @@ public:
         rk_aiq_exposure_sensor_descriptor snsDes;
         int64_t sof;
         int working_mode;
+        uint16_t multi_isp_extended_pixels;
+        bool is_multi_isp_mode;
         bool fill_light_on;
         bool gray_mode;
         bool init;
         bool reConfig;
         bool is_bw_sensor;
+        bool is_multi_sensor;
         uint32_t hardware_version;
         int iso;
         AlgoCtxInstanceCfgInt ctxCfigs[RK_AIQ_ALGO_TYPE_MAX];
@@ -392,6 +407,7 @@ public:
         int spHeight;
         int spAlignedWidth;
         int spAlignedHeight;
+        int mCamPhyId;
         void reset() {
             xcam_mem_clear(ctxCfigs);
             xcam_mem_clear(cpslCfg);
@@ -400,6 +416,7 @@ public:
             calibv2 = NULL;
             sof = -1;
             working_mode = 0;
+            is_multi_sensor = 0;
             init = false;
             reConfig = false;
             hardware_version = 0;
@@ -411,6 +428,7 @@ public:
             sns_mirror = false;
             sns_flip = false;
             conf_type = RK_AIQ_ALGO_CONFTYPE_INIT;
+            mCamPhyId = -1;
         }
     } RkAiqAlgosComShared_t;
 
@@ -701,10 +719,12 @@ protected:
         return grpId == RK_AIQ_CORE_ANALYZE_ALL ? grpId : 1 << grpId;
     }
 
+    virtual void setReqAlgoResMask(int algoType, bool req);
 
     SmartPtr<IRkAiqResourceTranslator> mTranslator;
     uint32_t mLastAnalyzedId;
-
+    RkAiqCamGroupManager* mCamGroupCoreManager;
+    uint64_t mAllReqAlgoResMask;
 private:
     SmartPtr<ThumbnailsService> mThumbnailsService;
     int mSpWidth;

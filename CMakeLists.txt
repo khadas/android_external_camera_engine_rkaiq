@@ -82,6 +82,7 @@ xcore
 xcore/base
 aiq_core
 algos
+algos_camgroup
 common
 common/linux
 hwi
@@ -150,6 +151,15 @@ include/algos/aynr
 include/algos/auvnr
 include/algos/amfnr
 include/algos/again
+include/algos/aynr3
+include/algos/acnr2
+include/algos/asharp4
+include/algos/abayer2dnr2
+include/algos/abayertnr2
+include/algos/again2
+include/algos/acac
+include/algos_camgroup/ae
+include/algos_camgroup/awb
 )
 #source directory
 #AUX_SOURCE_DIRECTORY(demo/src DIR_SRCS)
@@ -161,13 +171,16 @@ set (AIQ_CORE_SRC
 	aiq_core/RkAiqHandleIntV21.cpp
 	aiq_core/RkAiqCore.cpp
 	aiq_core/RkAiqCoreV21.cpp
+	aiq_core/RkAiqCoreV3x.cpp
     aiq_core/RkLumaCore.cpp
     aiq_core/RkAiqSharedDataManager.cpp
     aiq_core/MessageBus.cpp
     aiq_core/RkAiqAnalyzeGroupManager.cpp
     aiq_core/RkAiqResourceTranslator.cpp
     aiq_core/RkAiqResourceTranslatorV21.cpp
+    aiq_core/RkAiqResourceTranslatorV3x.cpp
     aiq_core/thumbnails.cpp
+	aiq_core/RkAiqHandleIntV3x.cpp
 	)
 set (ALGO_COMMON_SRC
 	algos/interpolation.cpp
@@ -209,11 +222,15 @@ set (HWI_SRC
 		hwi/isp20/TnrStreamProcUnit.cpp
 		hwi/isp20/CaptureRawData.cpp
         hwi/isp21/CamHwIsp21.cpp
+        hwi/isp3x/CamHwIsp3x.cpp
+        hwi/fakecamera/FakeCamHwIsp20.cpp
+        hwi/fakecamera/FakeSensorHw.cpp
         hwi/SensorHw.cpp
         hwi/LensHw.cpp
         hwi/FlashLight.cpp
         hwi/image_processor.cpp
         hwi/isp20/Isp20Evts.cpp
+        hwi/IspParamsSplitter.cpp
         )
 endif()
 set (IPC_SRC
@@ -287,6 +304,7 @@ set (RK_AIQ_SRC
 	${AIQ_CORE_SRC}
     ${IPC_SERVER_SRC}
 	RkAiqManager.cpp
+    RkAiqCamGroupManager.cpp
     )
 if(OPENCV_SUPPORT)
 set (OPENCV_LIBS
@@ -377,9 +395,10 @@ add_compile_options(-Wno-unused-variable
 					-fno-strict-aliasing
 					-Wno-address-of-packed-member
 					-Wno-psabi
-					-fstack-protector-strong
-					-D_FORTIFY_SOURCE=2
                     )
+if(NOT ARCH STREQUAL "fpga")
+	add_compile_options(-fstack-protector-strong -D_FORTIFY_SOURCE=2)
+endif()
 # add_compile_options(-v)
 add_definitions(-D_CRT_SECURE_NO_WARNINGS)
 
@@ -394,6 +413,31 @@ include_directories(include/iq_parser_v2/j2s)
 # add algos implement
 # ----------------------------------------------------------------------------
 add_subdirectory(algos)
+# ----------------------------------------------------------------------------
+# add algos_camgroup implement
+# ----------------------------------------------------------------------------
+add_subdirectory(algos_camgroup)
+
+# surpress link_directories warning
+cmake_policy(SET CMP0015 NEW)
+
+if(ARCH STREQUAL "aarch64")
+	file(COPY "algos/ae/linux/arm64/librkaiq_ae.a" DESTINATION all_lib/Release/)
+	file(COPY "algos/af/linux/arm64/librkaiq_af.a" DESTINATION all_lib/Release/)
+	file(COPY "algos/asd/linux/arm64/librkaiq_asd.a" DESTINATION all_lib/Release/)
+	file(COPY "algos/awb/linux/arm64/librkaiq_awb.a" DESTINATION all_lib/Release/)
+	file(COPY "algos_camgroup/awb/linux/arm64/librkaiq_camgroup_awb.a" DESTINATION all_lib/Release/)
+	file(COPY "algos_camgroup/ae/linux/arm64/librkaiq_camgroup_ae.a" DESTINATION all_lib/Release/)
+elseif(ARCH STREQUAL "arm")
+	file(COPY "algos/ae/linux/arm/librkaiq_ae.a" DESTINATION all_lib/Release/)
+	file(COPY "algos/af/linux/arm/librkaiq_af.a" DESTINATION all_lib/Release/)
+	file(COPY "algos/asd/linux/arm/librkaiq_asd.a" DESTINATION all_lib/Release/)
+	file(COPY "algos/awb/linux/arm/librkaiq_awb.a" DESTINATION all_lib/Release/)
+	file(COPY "algos_camgroup/awb/linux/arm/librkaiq_camgroup_awb.a" DESTINATION all_lib/Release/)
+	file(COPY "algos_camgroup/ae/linux/arm/librkaiq_camgroup_ae.a" DESTINATION all_lib/Release/)
+endif()
+
+add_subdirectory(rkaiq_3A_server)
 
 # surpress link_directories warning
 cmake_policy(SET CMP0015 NEW)
@@ -416,8 +460,11 @@ target_link_libraries(rkaiq rkaiq_ae rkaiq_awb rkaiq_af rkaiq_anr rkaiq_asd rkai
 	rkaiq_acp rkaiq_asharp rkaiq_adhaz rkaiq_a3dlut rkaiq_ablc rkaiq_accm rkaiq_acgc
 	rkaiq_adebayer rkaiq_adpcc rkaiq_afec rkaiq_agamma rkaiq_adegamma rkaiq_agic rkaiq_aie rkaiq_aldch
 	rkaiq_alsc rkaiq_aorb rkaiq_ar2y rkaiq_awdr rkaiq_adrc rkaiq_asharp_v3 rkaiq_aynr_v2 rkaiq_acnr_v1
-	rkaiq_arawnr_v2 rkaiq_aeis rkaiq_amd rkaiq_arawnr_v1 rkaiq_aynr_v1 rkaiq_auvnr_v1 rkaiq_amfnr_v1 rkaiq_again_v1 ${OPENCV_LIBS} ${OPENCV_3RDPARTY_LIBS} ${GENMESH_LIBS}
-	${LINK_ASAN} pthread ${MOTION_DETECT_LIBS})
+	rkaiq_arawnr_v2 rkaiq_aeis rkaiq_amd rkaiq_arawnr_v1 rkaiq_aynr_v1 rkaiq_auvnr_v1 rkaiq_amfnr_v1 rkaiq_again_v1 
+	rkaiq_aynr_v3 rkaiq_acnr_v2 rkaiq_asharp_v4 rkaiq_abayer2dnr_v2
+	rkaiq_abayertnr_v2 rkaiq_again_v2 rkaiq_acac rkaiq_camgroup_ae
+	rkaiq_camgroup_awb rkaiq_camgroup_misc 
+	${OPENCV_LIBS} ${OPENCV_3RDPARTY_LIBS} ${GENMESH_LIBS} ${LINK_ASAN} pthread ${MOTION_DETECT_LIBS})
 
 if (LIBDL_FOUND)
     target_link_libraries(rkaiq
@@ -447,6 +494,11 @@ execute_process(COMMAND sh
 	${VERSIONFILEPATH})
 
 #add_subdirectory(tests)
+install(TARGETS rkaiq
+        RUNTIME DESTINATION bin
+        LIBRARY DESTINATION lib
+        ARCHIVE DESTINATION lib
+       )
 
 install(DIRECTORY include/ DESTINATION include/rkaiq
 		FILES_MATCHING PATTERN "*.h")

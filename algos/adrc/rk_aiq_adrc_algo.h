@@ -20,18 +20,18 @@
 #include "rk_aiq_types_adrc_algo_prvt.h"
 
 
-XCamReturn AdrcStart(AdrcHandle_t pAdrcCtx);
-XCamReturn AdrcStop(AdrcHandle_t pAdrcCtx);
-void DrcNewMalloc(AdrcConfig_t* pConfig, CalibDbV2_drc_t* pCalibDb);
-void AdrcApiOffConfig(AdrcHandle_t pAdrcCtx);
-void AdrcIQUpdate(AdrcHandle_t pAdrcCtx, AecPreResult_t AecHdrPreResult, af_preprocess_result_t AfPreResult);
-void AdrcGetSensorInfo( AdrcHandle_t pAdrcCtx, AecProcResult_t AecHdrProcResult);
-void AdrcUpdateConfig(AdrcHandle_t pAdrcCtx, CalibDbV2_drc_t* pCalibDb);
-void AdrcProcessing(AdrcHandle_t pAdrcCtx);
-bool AdrcByPassProcessing(AdrcHandle_t pAdrcCtx, AecPreResult_t AecHdrPreResult);
-bool DrcSetGlobalTMO(AdrcHandle_t pAdrcCtx);
-XCamReturn AdrcInit(AdrcInstanceConfig_t* pInstConfig, CamCalibDbV2Context_t* calibv2) ;
-XCamReturn AdrcRelease(AdrcHandle_t pAdrcCtx) ;
+XCamReturn AdrcStart(AdrcContext_t* pAdrcCtx);
+XCamReturn AdrcStop(AdrcContext_t* pAdrcCtx);
+void DrcNewMalloc(AdrcConfig_t* pConfig, DrcCalibDB_t* pCalibDb);
+void AdrcApiOffConfig(AdrcContext_t* pAdrcCtx);
+void AdrcIQUpdate(AdrcContext_t* pAdrcCtx, AecPreResult_t AecHdrPreResult, af_preprocess_result_t AfPreResult);
+void AdrcGetSensorInfo( AdrcContext_t* pAdrcCtx, AecProcResult_t AecHdrProcResult);
+void AdrcUpdateConfig(AdrcContext_t* pAdrcCtx, DrcCalibDB_t* pCalibDb);
+void AdrcProcessing(AdrcContext_t* pAdrcCtx);
+bool AdrcByPassProcessing(AdrcContext_t* pAdrcCtx, AecPreResult_t AecHdrPreResult);
+bool DrcSetGlobalTMO(AdrcContext_t* pAdrcCtx);
+XCamReturn AdrcInit(AdrcContext_t **ppAdrcCtx, CamCalibDbV2Context_t *pCalibDb) ;
+XCamReturn AdrcRelease(AdrcContext_t* pAdrcCtx) ;
 
 
 #endif

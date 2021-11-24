@@ -33,6 +33,7 @@
 #define SHIFT11BIT(A)         (A*2048)
 #define SHIFT12BIT(A)         (A*4096)
 #define SHIFT13BIT(A)         (A*8191)
+#define SHIFT14BIT(A)         (A*16383)
 #define SHIFT15BIT(A)         (A*32767)
 
 #define LIMIT_PARA(a,b,c,d,e)      (c+(a-e)*(b-c)/(d -e))
@@ -46,6 +47,9 @@
 #define MINOGAINMIN     (0.0)
 #define ADRCNORMALIZEMAX     (1.0)
 #define ADRCNORMALIZEMIN     (0.0)
+#define ADRCNORMALIZEINTMAX     (1)
+#define ADRCNORMALIZEINTMIN     (0)
+
 #define SPACESGMMAX     (4095)
 #define SPACESGMMIN     (0)
 #define SCALEYMAX     (2048)
@@ -56,6 +60,9 @@
 #define IIRFRAMEMIN     (0)
 #define ISOMIN     (50)
 #define ISOMAX     (204800)
+
+#define INT8BITMAX     (255)
+#define INT14BITMAX     (16383)
 
 
 
@@ -98,6 +105,18 @@ typedef struct LocalDataConfig_s
     float*            LoLitContrast;
 } LocalDataConfig_t;
 
+typedef struct LocalDataConfigV2_s
+{
+    int len;
+    float*            EnvLv;
+    float*            LocalWeit;
+    int*            LocalAutoEnable;
+    float*            LocalAutoWeit;
+    float*            GlobalContrast;
+    float*            LoLitContrast;
+} LocalDataConfigV2_t;
+
+
 typedef struct DrcOhters_s
 {
     float curPixWeit;
@@ -121,7 +140,7 @@ typedef struct CompressConfig_s
     uint16_t       Manual_curve[ADRC_Y_NUM];
 } CompressConfig_t;
 
-typedef struct AdrcConfig_s
+typedef struct AdrcConfigV20_s
 {
     bool Enable;
     bool OutPutLongFrame;
@@ -130,9 +149,35 @@ typedef struct AdrcConfig_s
     LocalDataConfig_t Local;
     CompressConfig_t Compress;
     DrcOhters_t Others;
+} AdrcConfigV20_t;
+
+typedef struct MotionConfig_s
+{
+    int len;
+    float*            MotionCoef;
+    float*            MotionStr;
+} MotionConfig_t;
+
+typedef struct AdrcConfigV21_s
+{
+    bool Enable;
+    bool OutPutLongFrame;
+    AdrcGainConfig_t DrcGain;
+    HighLightConfig_t HiLit;
+    LocalDataConfigV2_t Local;
+    MotionConfig_t Motion;
+    CompressConfig_t Compress;
+    DrcOhters_t Others;
+} AdrcConfigV21_t;
+
+typedef struct AdrcConfig_s {
+    union {
+        AdrcConfigV20_t Drc_v20;
+        AdrcConfigV21_t Drc_v21;
+    };
 } AdrcConfig_t;
 
-typedef struct DrcHandleData_s
+typedef struct DrcHandleDataV20_s
 {
     float DrcGain;
     float Alpha;
@@ -143,12 +188,38 @@ typedef struct DrcHandleData_s
     float LoLitContrast;
     CompressMode_t Mode;
     uint16_t       Manual_curve[ADRC_Y_NUM];
+} DrcHandleDataV20_t;
+
+typedef struct DrcHandleDataV21_s
+{
+    float DrcGain;
+    float Alpha;
+    float Clip;
+    float Strength;
+    float LocalWeit;
+    int LocalAutoEnable;
+    float LocalAutoWeit;
+    float MotionStr;
+    float GlobalContrast;
+    float LoLitContrast;
+    CompressMode_t Mode;
+    uint16_t       Manual_curve[ADRC_Y_NUM];
+} DrcHandleDataV21_t;
+
+
+typedef struct DrcHandleData_s {
+    union {
+        DrcHandleDataV20_t Drc_v20;
+        DrcHandleDataV21_t Drc_v21;
+    };
 } DrcHandleData_t;
+
 
 typedef struct AdrcPrevData_s
 {
     float EnvLv;
     float ISO;
+    float MotionCoef;
     drc_OpMode_t ApiMode;
     int frameCnt;
     DrcHandleData_t HandleData;
@@ -177,6 +248,7 @@ typedef struct CurrData_s
     bool Enable;
     float Ratio;
     float EnvLv;
+    float MotionCoef;
     float ISO;
     float Damp;
     float LumaWeight[225];
@@ -209,10 +281,17 @@ typedef struct AdrcSensorInfo_s
     float MinExpoS;
 } AdrcSensorInfo_t;
 
+typedef struct DrcCalibDB_s {
+    union {
+        CalibDbV2_drc_t Drc_v20;
+        CalibDbV2_drc_V2_t Drc_v21;
+    };
+} DrcCalibDB_t;
+
 typedef struct AdrcContext_s
 {
     drcAttr_t drcAttr;
-    CalibDbV2_drc_t pCalibDB;
+    DrcCalibDB_t pCalibDB;
     AdrcState_t state;
     AdrcConfig_t Config;
     AdrcPrevData_t PrevData ;
@@ -221,21 +300,8 @@ typedef struct AdrcContext_s
     CurrData_t CurrData;
     rkisp_adrc_stats_t CurrStatsData;
     AdrcSensorInfo_t SensorInfo;
-    //uint32_t width;
-    //uint32_t height;
     int frameCnt;
     int FrameNumber;
 } AdrcContext_t;
-
-typedef AdrcContext_t* AdrcHandle_t;
-
-typedef struct AdrcInstanceConfig_s {
-    AdrcHandle_t              hAdrc;
-} AdrcInstanceConfig_t;
-
-typedef struct _RkAiqAlgoContext {
-    AdrcInstanceConfig_t AdrcInstConfig;
-    //void* place_holder[0];
-} RkAiqAlgoContext;
 
 #endif

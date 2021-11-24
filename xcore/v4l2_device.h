@@ -104,6 +104,7 @@ public:
     XCamReturn query_cap(struct v4l2_capability &cap);
     XCamReturn get_crop (struct v4l2_crop &crop);
     XCamReturn set_crop (struct v4l2_crop &crop);
+    XCamReturn set_selection (struct v4l2_selection &select);
     // set_format
     virtual XCamReturn get_format (struct v4l2_format &format);
     XCamReturn set_format (struct v4l2_format &format);

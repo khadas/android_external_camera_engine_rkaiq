@@ -16,9 +16,11 @@
  */
 
 #include "RkAiqManager.h"
+#include "RkAiqCamGroupManager.h"
 #include "isp20/Isp20_module_dbg.h"
 #include "isp20/CamHwIsp20.h"
 #include "isp21/CamHwIsp21.h"
+#include "isp3x/CamHwIsp3x.h"
 #include <fcntl.h>
 #include <unistd.h>
 
@@ -116,6 +118,7 @@ RkAiqManager::RkAiqManager(const char* sns_ent_name,
     , _state(AIQ_STATE_INVALID)
     , mCurMirror(false)
     , mCurFlip(false)
+    , mCamGroupCoreManager(NULL)
 {
     ENTER_XCORE_FUNCTION();
     EXIT_XCORE_FUNCTION();
@@ -197,6 +200,8 @@ RkAiqManager::init()
     hw_info.lens_supported = s_info->has_lens_vcm;
     hw_info.fl_strth_adj = s_info->fl_strth_adj_sup;
     hw_info.fl_ir_strth_adj = s_info->fl_ir_strth_adj_sup;
+    hw_info.is_multi_isp_mode = s_info->is_multi_isp_mode;
+    hw_info.multi_isp_extended_pixel = s_info->multi_isp_extended_pixel;
     mIspHwVer = s_info->isp_hw_ver;
 #endif
     mRkAiqAnalyzer->setHwInfos(hw_info);
@@ -206,9 +211,12 @@ RkAiqManager::init()
     mRkLumaAnalyzer->setAnalyzeResultCb(this);
     CalibDbV2_LUMA_DETECT_t *lumaDetect =
         (CalibDbV2_LUMA_DETECT_t*)(CALIBDBV2_GET_MODULE_PTR((void*)mCalibDbV2, lumaDetect));
-    ret = mRkLumaAnalyzer->init(lumaDetect);
-    RKAIQMNG_CHECK_RET(ret, "luma analyzer init error %d !", ret);
-
+    if (lumaDetect) {
+        ret = mRkLumaAnalyzer->init(lumaDetect);
+        RKAIQMNG_CHECK_RET(ret, "luma analyzer init error %d !", ret);
+    } else {
+        mRkLumaAnalyzer.release();
+    }
     mCamHw->setHwResListener(this);
     ret = mCamHw->init(mSnsEntName);
     RKAIQMNG_CHECK_RET(ret, "camHw init error %d !", ret);
@@ -282,7 +290,8 @@ RkAiqManager::prepare(uint32_t width, uint32_t height, rk_aiq_working_mode_t mod
     int w,h,aligned_w,aligned_h;
     ret = mCamHw->get_sp_resolution(w, h, aligned_w, aligned_h);
     ret = mRkAiqAnalyzer->set_sp_resolution(w, h, aligned_w, aligned_h);
-    ret = mRkLumaAnalyzer->prepare(working_mode_hw);
+    if (mRkLumaAnalyzer.ptr())
+        ret = mRkLumaAnalyzer->prepare(working_mode_hw);
 
     RKAIQMNG_CHECK_RET(ret, "getSensorModeData error %d", ret);
     mRkAiqAnalyzer->notifyIspStreamMode(mCamHw->getIspStreamMode());
@@ -291,8 +300,10 @@ RkAiqManager::prepare(uint32_t width, uint32_t height, rk_aiq_working_mode_t mod
 
     SmartPtr<RkAiqFullParamsProxy> initParams = mRkAiqAnalyzer->getAiqFullParams();
 
-    ret = applyAnalyzerResult(initParams);
-    RKAIQMNG_CHECK_RET(ret, "set initial params error %d", ret);
+    if (!mCamGroupCoreManager) {
+        ret = applyAnalyzerResult(initParams);
+        RKAIQMNG_CHECK_RET(ret, "set initial params error %d", ret);
+    }
 
     mWorkingMode = mode;
     mOldWkModeForGray = RK_AIQ_WORKING_MODE_NORMAL;
@@ -325,22 +336,33 @@ RkAiqManager::start()
         }
 #endif
         applyAnalyzerResult(initParams);
+    } else if (_state == AIQ_STATE_STARTED) {
+        return ret;
     }
+
+#if 0
+    mAiqRstAppTh->triger_start();
+
+    bool bret = mAiqRstAppTh->start();
+    ret = bret ? XCAM_RETURN_NO_ERROR : XCAM_RETURN_ERROR_FAILED;
+    RKAIQMNG_CHECK_RET(ret, "apply result thread start error");
+#endif
+    ret = mRkAiqAnalyzer->start();
+    RKAIQMNG_CHECK_RET(ret, "analyzer start error %d", ret);
+
+    if (mRkLumaAnalyzer.ptr()) {
+        ret = mRkLumaAnalyzer->start();
+        RKAIQMNG_CHECK_RET(ret, "luma analyzer start error %d", ret);
+    }
+
+    ret = mCamHw->start();
+    RKAIQMNG_CHECK_RET(ret, "camhw start error %d", ret);
 
     mAiqRstAppTh->triger_start();
 
     bool bret = mAiqRstAppTh->start();
     ret = bret ? XCAM_RETURN_NO_ERROR : XCAM_RETURN_ERROR_FAILED;
     RKAIQMNG_CHECK_RET(ret, "apply result thread start error");
-
-    ret = mRkAiqAnalyzer->start();
-    RKAIQMNG_CHECK_RET(ret, "analyzer start error %d", ret);
-
-    ret = mRkLumaAnalyzer->start();
-    RKAIQMNG_CHECK_RET(ret, "luma analyzer start error %d", ret);
-
-    ret = mCamHw->start();
-    RKAIQMNG_CHECK_RET(ret, "camhw start error %d", ret);
 
     _state = AIQ_STATE_STARTED;
 
@@ -368,8 +390,10 @@ RkAiqManager::stop(bool keep_ext_hw_st)
     ret = mRkAiqAnalyzer->stop();
     RKAIQMNG_CHECK_RET(ret, "analyzer stop error %d", ret);
 
-    ret = mRkLumaAnalyzer->stop();
-    RKAIQMNG_CHECK_RET(ret, "luma analyzer stop error %d", ret);
+    if (mRkLumaAnalyzer.ptr()) {
+        ret = mRkLumaAnalyzer->stop();
+        RKAIQMNG_CHECK_RET(ret, "luma analyzer stop error %d", ret);
+    }
 
     mCamHw->keepHwStAtStop(keep_ext_hw_st);
     ret = mCamHw->stop();
@@ -391,6 +415,11 @@ RkAiqManager::deInit()
 
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
 
+    // stop first in prepared status, some resources and process were
+    // done at prepare stage
+    if (_state == AIQ_STATE_PREPARED)
+        stop(false);
+
     mAiqMngCmdTh->triger_stop();
 
     bool bret = mAiqMngCmdTh->stop();
@@ -400,8 +429,10 @@ RkAiqManager::deInit()
     ret = mRkAiqAnalyzer->deInit();
     RKAIQMNG_CHECK_RET(ret, "analyzer deinit error %d", ret);
 
-    ret = mRkLumaAnalyzer->deInit();
-    RKAIQMNG_CHECK_RET(ret, "luma analyzer deinit error %d", ret);
+    if (mRkLumaAnalyzer.ptr()) {
+        ret = mRkLumaAnalyzer->deInit();
+        RKAIQMNG_CHECK_RET(ret, "luma analyzer deinit error %d", ret);
+    }
 
     ret = mCamHw->deInit();
     RKAIQMNG_CHECK_RET(ret, "camhw deinit error %d", ret);
@@ -435,19 +466,15 @@ RkAiqManager::updateCalibDb(const CamCalibDbV2Context_t* newCalibDb)
     ret = mRkAiqAnalyzer->stop();
     RKAIQMNG_CHECK_RET(ret, "analyzer stop error %d", ret);
 
-    //ret = mRkLumaAnalyzer->stop();
-    //RKAIQMNG_CHECK_RET(ret, "luma analyzer stop error %d", ret);
-
-    // ret = mRkAiqAnalyzer->deInit();
-    //ret = mRkLumaAnalyzer->deInit();
-
     *mCalibDbV2 = *newCalibDb;
 
-    CalibDbV2_LUMA_DETECT_t *lumaDetect =
-        (CalibDbV2_LUMA_DETECT_t*)(CALIBDBV2_GET_MODULE_PTR((void*)mCalibDbV2, lumaDetect));
+    if (mRkLumaAnalyzer.ptr()) {
+        CalibDbV2_LUMA_DETECT_t *lumaDetect =
+            (CalibDbV2_LUMA_DETECT_t*)(CALIBDBV2_GET_MODULE_PTR((void*)mCalibDbV2, lumaDetect));
+        ret = mRkLumaAnalyzer->init(lumaDetect);
+    }
 
     ret = mRkAiqAnalyzer->setCalib(mCalibDbV2);
-    //ret = mRkLumaAnalyzer->init(lumaDetect);
 
     // 3. re-prepare analyzer
     LOGI_ANALYZER("reprepare analyzer ...");
@@ -482,8 +509,32 @@ RkAiqManager::updateCalibDb(const CamCalibDbV2Context_t* newCalibDb)
     ret = mRkAiqAnalyzer->start();
     RKAIQMNG_CHECK_RET(ret, "analyzer start error %d", ret);
 
-    //ret = mRkLumaAnalyzer->start();
-    //RKAIQMNG_CHECK_RET(ret, "luma analyzer start error %d", ret);
+    EXIT_XCORE_FUNCTION();
+    return XCAM_RETURN_NO_ERROR;
+}
+
+XCamReturn
+RkAiqManager::syncSofEvt(SmartPtr<VideoBuffer>& hwres)
+{
+    ENTER_XCORE_FUNCTION();
+
+    if (hwres->_buf_type == ISP_POLL_SOF){
+        xcam_get_runtime_log_level();
+        SmartPtr<CamHwIsp20> mCamHwIsp20 = mCamHw.dynamic_cast_ptr<CamHwIsp20>();
+        mCamHwIsp20->notify_sof(hwres);
+
+        SmartPtr<SofEventBuffer> evtbuf = hwres.dynamic_cast_ptr<SofEventBuffer>();
+        SmartPtr<SofEventData> evtdata = evtbuf->get_data();
+        SmartPtr<ispHwEvt_t> hw_evt = mCamHwIsp20->make_ispHwEvt(evtdata->_frameid, V4L2_EVENT_FRAME_SYNC, evtdata->_timestamp);
+        mRkAiqAnalyzer->pushEvts(hw_evt);
+
+        // TODO: moved to aiq core ?
+        if (mMetasCb) {
+            rk_aiq_metas_t metas;
+            metas.frame_id = hwres->get_sequence();
+            (*mMetasCb)(&metas);
+        }
+    }
 
     EXIT_XCORE_FUNCTION();
     return XCAM_RETURN_NO_ERROR;
@@ -498,24 +549,30 @@ RkAiqManager::hwResCb(SmartPtr<VideoBuffer>& hwres)
     if (hwres->_buf_type == ISP_POLL_3A_STATS) {
         ret = mRkAiqAnalyzer->pushStats(hwres);
     } else if (hwres->_buf_type == ISP_POLL_LUMA) {
-        ret = mRkLumaAnalyzer->pushStats(hwres);
+        if (mRkLumaAnalyzer.ptr())
+            ret = mRkLumaAnalyzer->pushStats(hwres);
     } else if (hwres->_buf_type == ISP_POLL_PARAMS) {
     } else if (hwres->_buf_type == ISPP_POLL_NR_STATS) {
         ret = mRkAiqAnalyzer->pushStats(hwres);
     } else if (hwres->_buf_type == ISP_POLL_SOF){
         xcam_get_runtime_log_level();
-        SmartPtr<CamHwIsp20> mCamHwIsp20 = mCamHw.dynamic_cast_ptr<CamHwIsp20>();
-        mCamHwIsp20->notify_sof(hwres);
 
-        SmartPtr<SofEventBuffer> evtbuf = hwres.dynamic_cast_ptr<SofEventBuffer>();
-        SmartPtr<SofEventData> evtdata = evtbuf->get_data();
-        SmartPtr<ispHwEvt_t> hw_evt = mCamHwIsp20->make_ispHwEvt(evtdata->_frameid, V4L2_EVENT_FRAME_SYNC, evtdata->_timestamp);
-        mRkAiqAnalyzer->pushEvts(hw_evt);
-        // TODO: moved to aiq core ?
-        if (mMetasCb) {
-            rk_aiq_metas_t metas;
-            metas.frame_id = evtdata->_frameid;
-            (*mMetasCb)(&metas);
+        if (!mCamGroupCoreManager) {
+            SmartPtr<CamHwIsp20> mCamHwIsp20 = mCamHw.dynamic_cast_ptr<CamHwIsp20>();
+            mCamHwIsp20->notify_sof(hwres);
+
+            SmartPtr<SofEventBuffer> evtbuf = hwres.dynamic_cast_ptr<SofEventBuffer>();
+            SmartPtr<SofEventData> evtdata = evtbuf->get_data();
+            SmartPtr<ispHwEvt_t> hw_evt = mCamHwIsp20->make_ispHwEvt(evtdata->_frameid, V4L2_EVENT_FRAME_SYNC, evtdata->_timestamp);
+            mRkAiqAnalyzer->pushEvts(hw_evt);
+            // TODO: moved to aiq core ?
+            if (mMetasCb) {
+                rk_aiq_metas_t metas;
+                metas.frame_id = evtdata->_frameid;
+                (*mMetasCb)(&metas);
+            }
+        } else {
+            mCamGroupCoreManager->sofSync(this, hwres);
         }
     } else if (hwres->_buf_type == ISP_POLL_TX) {
 #if 0
@@ -826,7 +883,7 @@ RkAiqManager::applyAnalyzerResult(SmartPtr<RkAiqFullParamsProxy>& results)
     cam3aResultList results_list;
 
     if (aiqParams->mExposureParams.ptr()) {
-        aiqParams->mExposureParams->setType(RESULT_TYPE_EXPOSURE);
+        aiqParams->mExposureParams->setType(RESULT_TYPE_EXPOSURE_PARAM);
         results_list.push_back(aiqParams->mExposureParams);
     }
 
@@ -887,6 +944,20 @@ RkAiqManager::applyAnalyzerResult(SmartPtr<RkAiqFullParamsProxy>& results)
     APPLY_ANALYZER_RESULT(CnrV21, UVNR);
     APPLY_ANALYZER_RESULT(SharpenV21, SHARPEN);
     APPLY_ANALYZER_RESULT(BaynrV21, RAWNR);
+    // ispv3x
+    APPLY_ANALYZER_RESULT(AwbV3x, AWB);
+    APPLY_ANALYZER_RESULT(AfV3x, AF);
+    APPLY_ANALYZER_RESULT(AgammaV3x, AGAMMA);
+    APPLY_ANALYZER_RESULT(DrcV3x, DRC);
+    APPLY_ANALYZER_RESULT(MergeV3x, MERGE);
+    APPLY_ANALYZER_RESULT(DehazeV3x, DEHAZE);
+    APPLY_ANALYZER_RESULT(BaynrV3x, RAWNR);
+    APPLY_ANALYZER_RESULT(YnrV3x, YNR);
+    APPLY_ANALYZER_RESULT(CnrV3x, UVNR);
+    APPLY_ANALYZER_RESULT(SharpenV3x, SHARPEN);
+    APPLY_ANALYZER_RESULT(CacV3x, CAC);
+    APPLY_ANALYZER_RESULT(GainV3x, GAIN);
+	APPLY_ANALYZER_RESULT(TnrV3x, TNR);
 
     mCamHw->applyAnalyzerResult(results_list);
 
@@ -1089,9 +1160,10 @@ XCamReturn RkAiqManager::swWorkingModeDyn(rk_aiq_working_mode_t mode)
     ret = mRkAiqAnalyzer->stop();
     RKAIQMNG_CHECK_RET(ret, "analyzer stop error %d", ret);
 
-    ret = mRkLumaAnalyzer->stop();
-    RKAIQMNG_CHECK_RET(ret, "luma analyzer stop error %d", ret);
-
+    if (mRkLumaAnalyzer.ptr()) {
+        ret = mRkLumaAnalyzer->stop();
+        RKAIQMNG_CHECK_RET(ret, "luma analyzer stop error %d", ret);
+    }
     // 3. pause hwi
     LOGI_ANALYZER("pause hwi ...");
     ret = mCamHw->pause();
@@ -1139,9 +1211,10 @@ restart:
     ret = mRkAiqAnalyzer->start();
     RKAIQMNG_CHECK_RET(ret, "analyzer start error %d", ret);
 
-    ret = mRkLumaAnalyzer->start();
-    RKAIQMNG_CHECK_RET(ret, "luma analyzer start error %d", ret);
-
+    if (mRkLumaAnalyzer.ptr()) {
+        ret = mRkLumaAnalyzer->start();
+        RKAIQMNG_CHECK_RET(ret, "luma analyzer start error %d", ret);
+    }
     /* // 7. resume hwi */
     /* LOGI_ANALYZER("resume hwi"); */
     /* ret = mCamHw->resume(); */
@@ -1159,6 +1232,8 @@ void RkAiqManager::setMulCamConc(bool cc)
 
     if (camHwIsp20.ptr())
         camHwIsp20->setMulCamConc(cc);
+
+    mRkAiqAnalyzer->setMulCamConc(cc);
 #endif
 }
 

@@ -91,6 +91,7 @@ typedef enum RkAiqAlgoType_e {
     RK_AIQ_ALGO_TYPE_AFEC,
     RK_AIQ_ALGO_TYPE_AMD,
     RK_AIQ_ALGO_TYPE_AGAIN,
+    RK_AIQ_ALGO_TYPE_ACAC,
     RK_AIQ_ALGO_TYPE_MAX
 } RkAiqAlgoType_t;
 
@@ -119,6 +120,7 @@ typedef enum RkAiqAlgoConfType_e {
     RK_AIQ_ALGO_CONFTYPE_NEEDRESET   = 0x04,
     RK_AIQ_ALGO_CONFTYPE_CHANGERES   = 0x08,
     RK_AIQ_ALGO_CONFTYPE_KEEPSTATUS  = 0x10,
+    RK_AIQ_ALGO_CONFTYPE_CHANGECAMS  = 0x20,
     RK_AIQ_ALGO_CONFTYPE_MAX
 } RkAiqAlgoConfType_t;
 
@@ -141,7 +143,7 @@ typedef struct _RkAiqAlgoCom {
 } RkAiqAlgoCom;
 
 typedef struct _RkAiqAlgoResCom {
-    void* palce_holder[1];
+    void* place_holder[1];
 } RkAiqAlgoResCom;
 
 typedef struct _RkAiqAlgoDescription {

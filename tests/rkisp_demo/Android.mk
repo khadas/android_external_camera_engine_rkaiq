@@ -68,15 +68,6 @@ LOCAL_CPPFLAGS += \
 	-DUSING_METADATA_NAMESPACE=using\ ::android::hardware::camera::common::V1_0::helper::CameraMetadata
 ifeq (1,$(strip $(shell expr $(PLATFORM_SDK_VERSION) \>= 26)))
 endif
-
-ifeq (rk356x, $(strip $(TARGET_BOARD_PLATFORM)))
-LOCAL_CFLAGS += -DISP_HW_V21
-endif
-
-ifeq (rv1126, $(strip $(TARGET_BOARD_PLATFORM)))
-LOCAL_CFLAGS += -DISP_HW_V20
-endif
-
 LOCAL_32_BIT_ONLY := true
 LOCAL_MULTILIB := 32
 LOCAL_PROPRIETARY_MODULE := true

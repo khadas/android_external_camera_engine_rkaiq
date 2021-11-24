@@ -23,7 +23,7 @@
 #include <istream>
 #include "v4l2_device.h"
 #include "rk_aiq_pool.h"
-#include "rk-camera-module.h"
+#include "linux/rk-camera-module.h"
 #include "v4l2_buffer_proxy.h"
 
 /************ BELOW FROM kernel/include/uapi/linux/rk-preisp.h ************/
@@ -72,6 +72,9 @@ class BaseSensorHw : public V4l2SubDevice {
 public:
     explicit BaseSensorHw(const char* name): V4l2SubDevice (name) {}
     virtual ~BaseSensorHw() {}
+    virtual void setCamPhyId(int phyId) {
+        mCamPhyId = phyId;
+    }
      virtual XCamReturn setExposureParams(SmartPtr<RkAiqExpParamsProxy>& expPar) { return XCAM_RETURN_NO_ERROR;}
     virtual XCamReturn getSensorModeData(const char* sns_ent_name,
                                  rk_aiq_exposure_sensor_descriptor& sns_des) { return XCAM_RETURN_NO_ERROR;}
@@ -94,6 +97,8 @@ public:
     virtual bool is_virtual_sensor() { return false; }
 protected:
     XCAM_DEAD_COPY (BaseSensorHw);
+    uint32_t get_v4l2_pixelformat(uint32_t pixelcode);
+    int mCamPhyId;
 };
 
 class SensorHw : public BaseSensorHw {
@@ -120,14 +125,14 @@ public:
     virtual XCamReturn start(bool prepared = false);
     virtual XCamReturn stop();
 
-private:
     XCAM_DEAD_COPY (SensorHw);
+protected:
     Mutex _mutex;
     int _working_mode;
     std::list<std::pair<SmartPtr<RkAiqExpParamsProxy>, bool>> _exp_list;
     std::map<int, SmartPtr<RkAiqExpParamsProxy>> _effecting_exp_map;
     bool _first;
-    int _frame_sequence;
+    uint32_t _frame_sequence;
     rk_aiq_exposure_sensor_descriptor _sensor_desc;
     std::list<SmartPtr<RkAiqExpParamsProxy>> _delayed_gain_list;
     std::list<SmartPtr<RkAiqExpParamsProxy>> _delayed_dcg_gain_mode_list;

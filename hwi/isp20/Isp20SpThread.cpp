@@ -195,6 +195,8 @@ Isp20SpThread::set_calibDb(const CamCalibDbV2Context_t* calib) {
 void
 Isp20SpThread::start()
 {
+    SmartPtr<LensHw> lensHw = _focus_dev.dynamic_cast_ptr<LensHw>();
+
 	LOGI_CAMHW_SUBM(MOTIONDETECT_SUBM, "MotionDetection version: %s", RK_AIQ_MOTION_DETECTION_VERSION);
     init();
     subscrible_ispgain_event(true);
@@ -202,6 +204,11 @@ Isp20SpThread::start()
         LOGE_CAMHW_SUBM(MOTIONDETECT_SUBM,  "create ispsp stop fds failed !");
         return;
     }
+
+    xcam_mem_clear(_lens_des);
+    if (lensHw.ptr())
+        lensHw->getLensModeData(_lens_des);
+
     mKgThread->start();
     mWrThread->start();
     Thread::start();
@@ -504,6 +511,27 @@ Isp20SpThread::wr_proc_loop ()
     return false;
 }
 
+int Isp20SpThread::get_lowpass_fv(uint32_t sequence, SmartPtr<V4l2BufferProxy> buf_proxy)
+{
+    SmartPtr<LensHw> lensHw = _focus_dev.dynamic_cast_ptr<LensHw>();
+    uint8_t *image_buf = (uint8_t *)buf_proxy->get_v4l2_planar_userptr(0);
+    rk_aiq_isp_af_meas_t meas_param;
+
+    _afmeas_param_mutex.lock();
+    meas_param = _af_meas_params;
+    _afmeas_param_mutex.unlock();
+
+    if (meas_param.sp_meas.enable) {
+        get_lpfv(sequence, image_buf, _img_width, _img_height,
+            _img_width_align, _img_height_align, pAfTmp, sub_shp4_4,
+            sub_shp8_8, high_light, high_light2, &meas_param);
+
+        lensHw->setLowPassFv(sub_shp4_4, sub_shp8_8, high_light, high_light2, sequence);
+    }
+
+    return 0;
+}
+
 bool
 Isp20SpThread::loop () {
     SmartPtr<V4l2Buffer> buf;
@@ -558,6 +586,9 @@ Isp20SpThread::loop () {
             break;
         usleep(1000);
     }
+
+    if (_calibDb->af.ldg_param.enable)
+        get_lowpass_fv(ispgain->frame_id, buf_proxy);
 
     uint8_t *static_ratio_cur                   = static_ratio[static_ratio_idx_in];
     if(detect_flg)
@@ -763,12 +794,13 @@ Isp20SpThread::loop () {
 }
 
 void
-Isp20SpThread::set_sp_dev(SmartPtr<V4l2SubDevice> ispdev, SmartPtr<V4l2Device> ispspdev, SmartPtr<V4l2SubDevice> isppdev, SmartPtr<V4l2SubDevice> snsdev)
+Isp20SpThread::set_sp_dev(SmartPtr<V4l2SubDevice> ispdev, SmartPtr<V4l2Device> ispspdev, SmartPtr<V4l2SubDevice> isppdev, SmartPtr<V4l2SubDevice> snsdev, SmartPtr<V4l2SubDevice> lensdev)
 {
     _isp_dev = ispdev;
     _isp_sp_dev = ispspdev;
     _ispp_dev = isppdev;
     _sensor_dev = snsdev;
+    _focus_dev = lensdev;
 }
 
 void
@@ -779,7 +811,7 @@ Isp20SpThread::set_sp_img_size(int w, int h, int w_align, int h_align)
     _img_width_align    = w_align;
     _img_height_align   = h_align;
     LOGI_CAMHW_SUBM(MOTIONDETECT_SUBM, "_img_height %d %d _img_width %d %d\n", h, h_align, w, w_align);
-    assert(((w == (w_align - 1)) || (w == w_align)) && ((h == (h_align - 1)) || (h == h_align )));
+    //assert(((w == (w_align - 1)) || (w == w_align)) && ((h == (h_align - 1)) || (h == h_align )));
 }
 
 void
@@ -1833,6 +1865,16 @@ Isp20SpThread::init()
         frame_detect_flg[i]             = -1;
     }
 
+    pAfTmp                              = (uint8_t*)malloc(img_buf_size * sizeof(pAfTmp[0]) * 3 / 2);
+    _af_meas_params.sp_meas.ldg_xl      = _calibDb->af.ldg_param.ldg_xl;
+    _af_meas_params.sp_meas.ldg_yl      = _calibDb->af.ldg_param.ldg_yl;
+    _af_meas_params.sp_meas.ldg_kl      = _calibDb->af.ldg_param.ldg_kl;
+    _af_meas_params.sp_meas.ldg_xh      = _calibDb->af.ldg_param.ldg_xh;
+    _af_meas_params.sp_meas.ldg_yh      = _calibDb->af.ldg_param.ldg_yh;
+    _af_meas_params.sp_meas.ldg_kh      = _calibDb->af.ldg_param.ldg_kh;
+    _af_meas_params.sp_meas.highlight_th  = _calibDb->af.highlight.ther0;
+    _af_meas_params.sp_meas.highlight2_th = _calibDb->af.highlight.ther1;
+
     LOG1_CAMHW_SUBM(MOTIONDETECT_SUBM, "Isp20SpThread::%s exit w %d h %d\n", __FUNCTION__, gain_blk_isp_w, gain_blk_isp_h);
 }
 
@@ -1865,6 +1907,9 @@ Isp20SpThread::deinit()
         free(pTmpBuf);
 	if(pPreAlpha)
 		free(pPreAlpha);
+
+    if(pAfTmp)
+        free(pAfTmp);
 
     LOG1_CAMHW_SUBM(MOTIONDETECT_SUBM, "%s exit", __FUNCTION__);
 }
@@ -1994,6 +2039,14 @@ void Isp20SpThread::update_motion_detection_params(CalibDb_MFNR_Motion_t *motion
     SmartLock locker (_motion_param_mutex);
     if (motion && (0 != memcmp(motion, &_motion_params, sizeof(CalibDb_MFNR_Motion_t)))) {
         _motion_params = *motion;
+    }
+}
+
+void Isp20SpThread::update_af_meas_params(rk_aiq_isp_af_meas_t *af_meas)
+{
+    SmartLock locker (_afmeas_param_mutex);
+    if (af_meas && (0 != memcmp(af_meas, &_af_meas_params, sizeof(rk_aiq_af_algo_meas_t)))) {
+        _af_meas_params = *af_meas;
     }
 }
 

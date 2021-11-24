@@ -74,6 +74,33 @@ typedef struct CalibDbV2_merge_s {
     MergeV20_t MergeTuningPara;
 } CalibDbV2_merge_t;
 
+typedef enum MergeBaseFrame_e {
+    BASEFRAME_LONG        = 0,
+    BASEFRAME_SHORT         = 1,
+} MergeBaseFrame_t;
+
+typedef struct MergeV21_s {
+    // M4_ENUM_DESC("BaseFrm", "MergeBaseFrame_t", "BASEFRAME_LONG")
+    MergeBaseFrame_t BaseFrm;
+    // M4_ARRAY_TABLE_DESC("OECurve", "array_table_ui", "none")
+    MergeOECurveV20_t OECurve;
+    // M4_ARRAY_TABLE_DESC("MDCurve", "array_table_ui", "none")
+    MergeMDCurveV20_t MDCurve;
+    // M4_NUMBER_DESC("ByPassThr", "f32", M4_RANGE(0,1), "0", M4_DIGIT(4))
+    float ByPassThr;
+    // M4_NUMBER_DESC("OECurve_damp", "f32", M4_RANGE(0,1), "0.9", M4_DIGIT(4))
+    float OECurve_damp;
+    // M4_NUMBER_DESC("MDCurveLM_damp", "f32", M4_RANGE(0,1), "0.9", M4_DIGIT(4))
+    float MDCurveLM_damp;
+    // M4_NUMBER_DESC("MDCurveMS_damp", "f32", M4_RANGE(0,1), "0.9", M4_DIGIT(4))
+    float MDCurveMS_damp;
+} MergeV21_t;
+
+typedef struct CalibDbV2_merge_V2_s {
+    // M4_STRUCT_DESC("MergeTuningPara", "normal_ui_style")
+    MergeV21_t MergeTuningPara;
+} CalibDbV2_merge_V2_t;
+
 
 RKAIQ_END_DECLARE
 

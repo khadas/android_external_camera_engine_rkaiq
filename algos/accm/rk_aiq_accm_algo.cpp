@@ -939,6 +939,40 @@ XCamReturn AccmConfig
 
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
 
+    if (fabs(hAccm->accmRest.res3a_info.sensorGain - hAccm->accmSwInfo.sensorGain) > hAccm->calibV2Ccm->control.gain_tolerance) {
+        hAccm->accmRest.res3a_info.gain_stable = false;
+        LOGD_ACCM( "%s: update sensorGain:%f \n", __FUNCTION__, hAccm->accmSwInfo.sensorGain);
+        hAccm->accmRest.res3a_info.sensorGain = hAccm->accmSwInfo.sensorGain;
+    } else {
+        hAccm->accmRest.res3a_info.gain_stable = true;
+        LOGD_ACCM( "%s: not update sensorGain:%f \n", __FUNCTION__, hAccm->accmSwInfo.sensorGain);
+        hAccm->accmSwInfo.sensorGain = hAccm->accmRest.res3a_info.sensorGain;
+    }
+
+    if (sqrt( (hAccm->accmRest.res3a_info.awbGain[0]-hAccm->accmSwInfo.awbGain[0])*(hAccm->accmRest.res3a_info.awbGain[0]-hAccm->accmSwInfo.awbGain[0])
+         + (hAccm->accmRest.res3a_info.awbGain[1]-hAccm->accmSwInfo.awbGain[1])*(hAccm->accmRest.res3a_info.awbGain[1]-hAccm->accmSwInfo.awbGain[1])) > hAccm->calibV2Ccm->control.wbgain_tolerance) {
+        hAccm->accmRest.res3a_info.wbgain_stable = false;
+        LOGD_ACCM( "%s: update awbGain:(%f, %f) \n", __FUNCTION__,
+            hAccm->accmSwInfo.awbGain[0], hAccm->accmSwInfo.awbGain[1]);
+        hAccm->accmRest.res3a_info.awbGain[0] = hAccm->accmSwInfo.awbGain[0];
+        hAccm->accmRest.res3a_info.awbGain[1] = hAccm->accmSwInfo.awbGain[1];
+    } else {
+        hAccm->accmRest.res3a_info.wbgain_stable = true;
+        LOGD_ACCM( "%s: not update awbGain:(%f, %f) \n", __FUNCTION__,
+            hAccm->accmSwInfo.awbGain[0], hAccm->accmSwInfo.awbGain[1]);
+        hAccm->accmSwInfo.awbGain[0] = hAccm->accmRest.res3a_info.awbGain[0];
+        hAccm->accmSwInfo.awbGain[1] = hAccm->accmRest.res3a_info.awbGain[1];
+    }
+
+    if (hAccm->accmRest.res3a_info.wbgain_stable && hAccm->accmRest.res3a_info.gain_stable
+                   && (!hAccm->calib_update))
+        hAccm->update = false;
+    else
+        hAccm->update = true;
+    hAccm->calib_update = false;
+
+
+
     LOGD_ACCM("=========================================\n");
 
     LOGD_ACCM("%s: updateAtt: %d\n", __FUNCTION__, hAccm->updateAtt);
@@ -1149,6 +1183,13 @@ XCamReturn AccmInit(accm_handle_t *hAccm, const CamCalibDbV2Context_t* calibv2)
     accm_context->accmSwInfo.awbConverged = false;
     accm_context->accmSwInfo.awbGain[0] = 1;
     accm_context->accmSwInfo.awbGain[1] = 1;
+
+    accm_context->accmRest.res3a_info.sensorGain = 1.0;
+    accm_context->accmRest.res3a_info.awbGain[0] = 1.0;
+    accm_context->accmRest.res3a_info.awbGain[1] = 1.0;
+    accm_context->accmRest.res3a_info.wbgain_stable = false;
+    accm_context->accmRest.res3a_info.gain_stable = false;
+
     accm_context->count = 0;
 
     accm_context->accmSwInfo.prepare_type = RK_AIQ_ALGO_CONFTYPE_UPDATECALIB | RK_AIQ_ALGO_CONFTYPE_NEEDRESET;

@@ -25,9 +25,10 @@
 #include "simulator/CamHwSimulator.h"
 #else
 #include "isp20/CamHwIsp20.h"
-//#include "fakecamera/FakeCamHwIsp20.h"
+#include "fakecamera/FakeCamHwIsp20.h"
 #include "isp20/Isp20_module_dbg.h"
 #include "isp21/CamHwIsp21.h"
+#include "isp3x/CamHwIsp3x.h"
 #endif
 
 using namespace RkCam;
@@ -54,6 +55,8 @@ typedef struct rk_aiq_sys_ctx_s {
 
     rk_aiq_ctx_type_e ctx_type;
     rk_aiq_sys_ctx_t* next_ctx;
+    RkAiqCamGroupManager* _camGroupManager;
+    int _camPhyId;
 } rk_aiq_sys_ctx_t;
 
 #define RKAIQSYS_CHECK_RET(cond, ret, format, ...) \
@@ -158,22 +161,41 @@ rk_aiq_uapi_sysctl_init(const char* sns_ent_name,
                                           err_cb,
                                           metas_cb);
     rk_aiq_static_info_t* s_info = CamHwIsp20::getStaticCamHwInfo(sns_ent_name);
+    ctx->_rkAiqManager->setCamPhyId(s_info->sensor_info.phyId);
+
+    ctx->_camPhyId = s_info->sensor_info.phyId;
+
 #ifdef RK_SIMULATOR_HW
     ctx->_camHw = new CamHwSimulator();
 #else
-    if (0 == strcmp(sns_ent_name, "FakeCamera")) {
+    char* use_as_fake_cam_env = getenv("USE_AS_FAKE_CAM");
+    bool useAsFakeCam = false;
+    if (use_as_fake_cam_env)
+        useAsFakeCam = atoi(use_as_fake_cam_env) > 0 ? true : false;
+    if (strstr(sns_ent_name, "FakeCamera") || useAsFakeCam) {
         //ctx->_camHw = new FakeCamHwIsp20();
+        if (s_info->isp_hw_ver == 4)
+            ctx->_camHw = new FakeCamHwIsp20 ();
+        else if (s_info->isp_hw_ver == 5)
+            ctx->_camHw = new FakeCamHwIsp21 ();
+        else if (s_info->isp_hw_ver == 6)
+            ctx->_camHw = new FakeCamHwIsp3x ();
+        else {
+            LOGE("do not support this isp hw version %d !", s_info->isp_hw_ver);
+            goto error;
+        }
     } else {
         if (s_info->isp_hw_ver == 4)
             ctx->_camHw = new CamHwIsp20();
         else if (s_info->isp_hw_ver == 5)
             ctx->_camHw = new CamHwIsp21();
+        else if (s_info->isp_hw_ver == 6)
+            ctx->_camHw = new CamHwIsp3x();
         else {
             LOGE("do not support this isp hw version %d !", s_info->isp_hw_ver);
             goto error;
         }
     }
-
     // use user defined iq file
     {
         std::map<std::string, rk_aiq_sys_preinit_cfg_t>::iterator it =
@@ -233,11 +255,16 @@ rk_aiq_uapi_sysctl_init(const char* sns_ent_name,
         }
     }
 #endif
+    ctx->_camHw->setCamPhyId(s_info->sensor_info.phyId);
     ctx->_rkAiqManager->setCamHw(ctx->_camHw);
     if (s_info->isp_hw_ver == 4)
         ctx->_analyzer = new RkAiqCore();
     else if (s_info->isp_hw_ver == 5)
         ctx->_analyzer = new RkAiqCoreV21();
+    else if (s_info->isp_hw_ver == 6)
+        ctx->_analyzer = new RkAiqCoreV3x();
+
+    ctx->_analyzer->setCamPhyId(s_info->sensor_info.phyId);
 
     if (is_ent_name && config_file_dir) {
         ctx->_analyzer->setResrcPath(config_file_dir);
@@ -570,6 +597,7 @@ algoHandle(const rk_aiq_sys_ctx_t* ctx, const int algo_type)
 #include "uAPI2/rk_aiq_user_api2_a3dlut.cpp"
 #include "rk_aiq_user_api2_afec.cpp"
 #include "uAPI/rk_aiq_user_api_agic.cpp"
+#include "uAPI2/rk_aiq_user_api2_camgroup.cpp"
 #include "uAPI2/rk_aiq_user_api2_agic.cpp"
 
 
@@ -789,6 +817,8 @@ static void rk_aiq_init_lib(void)
             g_rkaiq_isp_hw_ver = 20;
         else if (s_info->isp_hw_ver == 5)
             g_rkaiq_isp_hw_ver = 21;
+        else if (s_info->isp_hw_ver == 6)
+            g_rkaiq_isp_hw_ver = 30;
         else
             LOGE("do not support isp hw ver %d now !", s_info->isp_hw_ver);
     }
@@ -797,6 +827,8 @@ static void rk_aiq_init_lib(void)
     assert(g_rkaiq_isp_hw_ver == 20);
 #elif defined(ISP_HW_V21)
     assert(g_rkaiq_isp_hw_ver == 21);
+#elif defined(ISP_HW_V30)
+    assert(g_rkaiq_isp_hw_ver == 30);
 #else
 #error "WRONG ISP_HW_VERSION, ONLY SUPPORT V20 AND V21 NOW !"
 #endif

@@ -35,6 +35,12 @@ typedef enum _AE_MODE {
     RAWAE_MODE_L_LITE    = 2
 } AE_MODE;
 
+typedef enum WinSplitMode_s {
+    LEFT_AND_RIGHT_MODE = 0,
+    LEFT_MODE,
+    RIGHT_MODE,
+} WinSplitMode;
+
 /*****************************************************************************/
 /**
  * @brief   ISP2.0 AEC HW-Meas Config Params
@@ -148,6 +154,8 @@ typedef struct rk_aiq_ae_meas_params_s {
 typedef struct rk_aiq_hist_meas_params_s {
     bool   hist_meas_en;
     bool   hist_meas_update;
+    unsigned char ae_swap; // used to choose LITE & BIG
+    unsigned char ae_sel; // used for rawae3 & rawhist3
     rawhistlite_cfg_t rawhist0;
     rawhistbig_cfg_t rawhist1;
     rawhistbig_cfg_t rawhist2;

@@ -72,7 +72,7 @@ prepare(RkAiqAlgoCom* params)
 {
     XCamReturn result = XCAM_RETURN_NO_ERROR;
 
-    LOGE_ADPCC("%s: (enter)\n", __FUNCTION__ );
+    LOGD_ADPCC("%s: (enter)\n", __FUNCTION__ );
 
     AdpccContext_t* pAdpccCtx = (AdpccContext_t *)params->ctx;
     RkAiqAlgoConfigAdpccInt* pCfgParam = (RkAiqAlgoConfigAdpccInt*)params;

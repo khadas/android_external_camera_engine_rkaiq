@@ -30,38 +30,41 @@ RKAIQ_BEGIN_DECLARE
 void
 GammaTransferSetData(rk_aiq_gamma_attrib_V2_t* DegammaV2, rk_aiq_gamma_attrib_t *DegammaV1)
 {
-    //op mode
-    DegammaV2->mode = DegammaV1->mode;
+    /*
+        //op mode
+        DegammaV2->mode = DegammaV1->mode;
 
-    //st manual
-    memcpy(&DegammaV2->stManual, &DegammaV1->stManual, sizeof(Adegamma_api_manual_t));
+        //st manual
+        memcpy(&DegammaV2->stManual, &DegammaV1->stManual, sizeof(Adegamma_api_manual_t));
 
-    //set tool
+        //set tool
 
-    DegammaV2->stTool.GammaTuningPara.Gamma_en = DegammaV1->stTool.gamma_en ? true : false;
-    DegammaV2->stTool.GammaTuningPara.Gamma_out_offset = DegammaV1->stTool.gamma_out_offset;
-    if(DegammaV1->stTool.gamma_out_segnum == 0)
-        DegammaV2->stTool.GammaTuningPara.Gamma_out_segnum = GAMMATYPE_LOG;
-    else
-        DegammaV2->stTool.GammaTuningPara.Gamma_out_segnum = GAMMATYPE_EQU;
-    int mode = DegammaV1->Scene_mode;
-    if(mode == 0)
-        for(int i = 0; i < 45; i++)
-            DegammaV2->stTool.GammaTuningPara.Gamma_curve[i] = (int)(DegammaV1->stTool.curve_normal[i] + 0.5);
-    else if(mode == 1)
-        for(int i = 0; i < 45; i++)
-            DegammaV2->stTool.GammaTuningPara.Gamma_curve[i] = (int)(DegammaV1->stTool.curve_hdr[i] + 0.5);
-    else if(mode == 3)
-        for(int i = 0; i < 45; i++)
-            DegammaV2->stTool.GammaTuningPara.Gamma_curve[i] = (int)(DegammaV1->stTool.curve_night[i] + 0.5);
-    else
-        for(int i = 0; i < 45; i++)
-            DegammaV2->stTool.GammaTuningPara.Gamma_curve[i] = (int)(DegammaV1->stTool.curve_normal[i] + 0.5);
+        DegammaV2->stTool.GammaTuningPara.Gamma_en = DegammaV1->stTool.gamma_en ? true : false;
+        DegammaV2->stTool.GammaTuningPara.Gamma_out_offset = DegammaV1->stTool.gamma_out_offset;
+        if(DegammaV1->stTool.gamma_out_segnum == 0)
+            DegammaV2->stTool.GammaTuningPara.Gamma_out_segnum = GAMMATYPE_LOG;
+        else
+            DegammaV2->stTool.GammaTuningPara.Gamma_out_segnum = GAMMATYPE_EQU;
+        int mode = DegammaV1->Scene_mode;
+        if(mode == 0)
+            for(int i = 0; i < 45; i++)
+                DegammaV2->stTool.GammaTuningPara.Gamma_curve[i] = (int)(DegammaV1->stTool.curve_normal[i] + 0.5);
+        else if(mode == 1)
+            for(int i = 0; i < 45; i++)
+                DegammaV2->stTool.GammaTuningPara.Gamma_curve[i] = (int)(DegammaV1->stTool.curve_hdr[i] + 0.5);
+        else if(mode == 3)
+            for(int i = 0; i < 45; i++)
+                DegammaV2->stTool.GammaTuningPara.Gamma_curve[i] = (int)(DegammaV1->stTool.curve_night[i] + 0.5);
+        else
+            for(int i = 0; i < 45; i++)
+                DegammaV2->stTool.GammaTuningPara.Gamma_curve[i] = (int)(DegammaV1->stTool.curve_normal[i] + 0.5);
+                */
 }
 
 void
 GammaTransferGetData(rk_aiq_gamma_attrib_V2_t* DegammaV2, rk_aiq_gamma_attrib_t *DegammaV1)
 {
+    /*
     //op mode
     DegammaV1->mode = DegammaV2->mode;
 
@@ -83,6 +86,7 @@ GammaTransferGetData(rk_aiq_gamma_attrib_V2_t* DegammaV2, rk_aiq_gamma_attrib_t 
         DegammaV1->stTool.curve_hdr[i] = (float)(DegammaV2->stTool.GammaTuningPara.Gamma_curve[i]);
         DegammaV1->stTool.curve_night[i] = (float)(DegammaV2->stTool.GammaTuningPara.Gamma_curve[i]);
     }
+    */
 }
 
 XCamReturn

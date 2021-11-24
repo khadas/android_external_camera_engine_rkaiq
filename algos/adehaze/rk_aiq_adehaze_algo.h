@@ -32,12 +32,12 @@
 RKAIQ_BEGIN_DECLARE
 
 void AdehazeGetStats(AdehazeHandle_t* pAdehazeCtx, rkisp_adehaze_stats_t* ROData);
+void AdehazeGetCurrData(AdehazeHandle_t* pAdehazeCtx, RkAiqAlgoProcAdhazInt* procPara);
+void AdehazeGetCurrDataGroup(AdehazeHandle_t* pAdehazeCtx, RKAiqAecExpInfo_t* pAeEffExpo, XCamVideoBuffer* pAePreRes);
 XCamReturn AdehazeInit(AdehazeHandle_t** para, CamCalibDbV2Context_t* calib);
 XCamReturn AdehazeRelease(AdehazeHandle_t* para);
 XCamReturn AdehazeProcess(AdehazeHandle_t* para, AdehazeVersion_t version);
 bool AdehazeByPassProcessing(AdehazeHandle_t* pAdehazeCtx);
-void AdehazeGetEnvLv(AdehazeHandle_t* pAdehazeCtx, RkAiqAlgoPreResAeInt* pAecPreRes);
-
 
 RKAIQ_END_DECLARE
 

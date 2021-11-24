@@ -36,7 +36,7 @@ static XCamReturn alloc_fec_buf(FECContext_t* fecCtx)
     share_mem_config.alloc_param.height = fecCtx->dst_height;
     share_mem_config.alloc_param.reserved[0] = fecCtx->mesh_density;
     share_mem_config.mem_type = MEM_TYPE_FEC;
-    fecCtx->share_mem_ops->alloc_mem(fecCtx->share_mem_ops,
+    fecCtx->share_mem_ops->alloc_mem(0, fecCtx->share_mem_ops,
                                      &share_mem_config,
                                      &fecCtx->share_mem_ctx);
     return XCAM_RETURN_NO_ERROR;
@@ -45,7 +45,7 @@ static XCamReturn alloc_fec_buf(FECContext_t* fecCtx)
 static XCamReturn release_fec_buf(FECContext_t* fecCtx)
 {
     if (fecCtx->share_mem_ctx)
-        fecCtx->share_mem_ops->release_mem(fecCtx->share_mem_ctx);
+        fecCtx->share_mem_ops->release_mem(0, fecCtx->share_mem_ctx);
 
     return XCAM_RETURN_NO_ERROR;
 }
@@ -53,7 +53,7 @@ static XCamReturn release_fec_buf(FECContext_t* fecCtx)
 static XCamReturn get_fec_buf(FECContext_t* fecCtx)
 {
     fecCtx->fec_mem_info = (rk_aiq_fec_share_mem_info_t *)
-            fecCtx->share_mem_ops->get_free_item(fecCtx->share_mem_ctx);
+            fecCtx->share_mem_ops->get_free_item(0, fecCtx->share_mem_ctx);
     if (fecCtx->fec_mem_info == NULL) {
         LOGE_AFEC( "%s(%d): no free fec buf", __FUNCTION__, __LINE__);
         return XCAM_RETURN_ERROR_MEM;

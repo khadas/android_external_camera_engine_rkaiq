@@ -37,6 +37,8 @@ struct media_device;
 
 namespace RkCam {
 
+class IspParamsSplitter;
+
 #define ISP20HW_SUBM (0x1)
 
 #define MAX_PARAMS_QUEUE_SIZE           5
@@ -78,6 +80,7 @@ public:
     XCamReturn setLensVcmCfg();
     XCamReturn FocusCorrection();
     XCamReturn ZoomCorrection();
+    XCamReturn setAngleZ(float angleZ);
     virtual void getShareMemOps(isp_drv_share_mem_ops_t** mem_ops);
     uint64_t getIspModuleEnState();
 
@@ -162,6 +165,8 @@ protected:
 
         struct {
             CalibDbV2_Af_VcmCfg_t vcmcfg;
+            CalibDbV2_Af_LdgParam_t ldg_param;
+            CalibDbV2_Af_HighLightParam_t highlight;
         } af;
 
         struct {
@@ -185,6 +190,8 @@ protected:
     static rk_aiq_isp_hw_info_t mIspHwInfos;
     static rk_aiq_cif_hw_info_t mCifHwInfos;
     static std::map<std::string, SmartPtr<rk_sensor_full_info_t>> mSensorHwInfos;
+    static bool mIsMultiIspMode;
+    static uint16_t mMultiIspExtendedPixel;
     void gen_full_isp_params(const struct isp2x_isp_params_cfg* update_params,
                              struct isp2x_isp_params_cfg* full_params,
                                 uint64_t* module_en_update_partial,
@@ -226,16 +233,17 @@ protected:
     XCamReturn hdr_mipi_start_mode(int mode);
     XCamReturn hdr_mipi_stop();
     XCamReturn hdr_mipi_prepare_mode(int mode);
-    static void allocMemResource(void *ops_ctx, void *config, void **mem_ctx);
-    static void releaseMemResource(void *mem_ctx);
-    static void* getFreeItem(void *mem_ctx);
+    static void allocMemResource(uint8_t id, void *ops_ctx, void *config, void **mem_ctx);
+    static void releaseMemResource(uint8_t id, void *mem_ctx);
+    static void* getFreeItem(uint8_t id, void *mem_ctx);
     uint32_t _isp_module_ens;
     bool mNoReadBack;
     uint64_t ispModuleEns;
     rk_aiq_rotation_t _sharp_fbc_rotation;
 
-    rk_aiq_ldch_share_mem_info_t ldch_mem_info_array[ISP2X_LDCH_BUF_NUM];
+    rk_aiq_ldch_share_mem_info_t ldch_mem_info_array[2*ISP2X_MESH_BUF_NUM];
     rk_aiq_fec_share_mem_info_t fec_mem_info_array[FEC_MESH_BUF_NUM];
+    rk_aiq_cac_share_mem_info_t cac_mem_info_array[2*ISP3X_MESH_BUF_NUM];
     typedef struct drv_share_mem_ctx_s {
         void* ops_ctx;
         void* mem_info;
@@ -243,6 +251,7 @@ protected:
     } drv_share_mem_ctx_t;
     drv_share_mem_ctx_t _ldch_drv_mem_ctx;
     drv_share_mem_ctx_t _fec_drv_mem_ctx;
+    drv_share_mem_ctx_t _cac_drv_mem_ctx;
     Mutex _mem_mutex;
     rk_aiq_rect_t _crop_rect;
     uint32_t _ds_width;
@@ -250,7 +259,7 @@ protected:
     uint32_t _ds_width_align;
     uint32_t _ds_heigth_align;
     uint32_t _exp_delay;
-
+    rk_aiq_lens_descriptor _lens_des;
     //ispp
     SmartPtr<FecParamStream>    mFecParamStream;
     SmartPtr<NrStreamProcUnit>  mNrStreamProcUnit;
@@ -276,6 +285,8 @@ protected:
     std::map<int, rkisp_effect_params_v20> _effecting_ispparam_map;
     SmartPtr<IspParamsAssembler> mParamsAssembler;
     uint32_t mPpModuleInitEns;
+    bool mVicapIspPhyLinkSupported; // if phsical link between vicap and isp, only isp3x support now
+    SmartPtr<IspParamsSplitter> mParamsSplitter;
 };
 
 };

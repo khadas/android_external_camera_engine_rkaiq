@@ -25,6 +25,7 @@ bootstrap_go_package {
 
 subdirs = [
     "algos",
+    "algos_camgroup",
     "iq_parser_v2",
 ]
 
@@ -60,6 +61,7 @@ cc_library_shared {
         "hwi",
         "hwi/isp20",
         "hwi/isp21",
+        "hwi/isp3x",
         "iq_parser",
         "iq_parser_v2",
         "uAPI",
@@ -95,8 +97,10 @@ cc_library_shared {
         "aiq_core/algo_handlers/*.cpp",
         "aiq_core/RkAiqHandleInt.cpp",
         "aiq_core/RkAiqHandleIntV21.cpp",
+        "aiq_core/RkAiqHandleIntV3x.cpp",
         "aiq_core/RkAiqCore.cpp",
         "aiq_core/RkAiqCoreV21.cpp",
+        "aiq_core/RkAiqCoreV3x.cpp",
         "aiq_core/RkLumaCore.cpp",
 
         "aiq_core/RkAiqSharedDataManager.cpp",
@@ -104,6 +108,7 @@ cc_library_shared {
         "aiq_core/RkAiqAnalyzeGroupManager.cpp",
         "aiq_core/RkAiqResourceTranslator.cpp",
         "aiq_core/RkAiqResourceTranslatorV21.cpp",
+        "aiq_core/RkAiqResourceTranslatorV3x.cpp",
         "aiq_core/thumbnails.cpp",
 
         // ALGO_COMMON_SRC
@@ -121,6 +126,7 @@ cc_library_shared {
         "hwi/CamHwBase.cpp",
         "hwi/isp20/CamHwIsp20.cpp",
         "hwi/isp21/CamHwIsp21.cpp",
+        "hwi/isp3x/CamHwIsp3x.cpp",
         "hwi/isp20/Isp20Params.cpp",
         "hwi/isp20/Isp20StatsBuffer.cpp",
         "hwi/isp20/Isp20_module_dbg.cpp",
@@ -139,6 +145,9 @@ cc_library_shared {
         "hwi/isp20/CaptureRawData.cpp",
         "hwi/image_processor.cpp",
         "hwi/isp20/Isp20Evts.cpp",
+        "hwi/fakecamera/FakeCamHwIsp20.cpp",
+        "hwi/fakecamera/FakeSensorHw.cpp",
+        "hwi/IspParamsSplitter.cpp",
 
         // IQ_PARSER_SRC
         "iq_parser/RkAiqCalibParser.cpp",
@@ -177,6 +186,7 @@ cc_library_shared {
         "xcore/buffer_pool.cpp",
         "xcore/poll_thread.cpp",
         "xcore/smart_buffer_priv.cpp",
+        "xcore/fake_v4l2_device.cpp",
 
         // IPC_SERVER_SRC
         "ipc_server/socket_server.cpp",
@@ -188,6 +198,7 @@ cc_library_shared {
         "ipc_server/command_process.cpp",
 
         "RkAiqManager.cpp",
+		"RkAiqCamGroupManager.cpp"
     ],
 
     static_libs: [
@@ -231,7 +242,17 @@ cc_library_shared {
         "librkaiq_mfnr_v1",
         "librkaiq_aeis",
         "libgenMeshLib",
-        "libiq_parser_v2"
+        "libiq_parser_v2",
+        "librkaiq_aynr_v3",
+        "librkaiq_acnr_v2",
+        "librkaiq_asharp_v4",
+        "librkaiq_abayer2dnr_v2",
+        "librkaiq_abayertnr_v2",
+        "librkaiq_again_v2",
+        "librkaiq_acac",
+        "librkaiq_camgroup_ae",
+        "librkaiq_camgroup_awb",
+        "librkaiq_camgroup_misc",
     ],
 
     cflags: [
@@ -290,6 +311,7 @@ cc_library_shared {
         "xcore/base",
         "aiq_core",
         "algos",
+        "algos_camgroup",
         "hwi",
         "iq_parser",
         "iq_parser_v2",

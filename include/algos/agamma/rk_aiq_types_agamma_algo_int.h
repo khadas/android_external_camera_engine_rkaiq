@@ -21,8 +21,7 @@
 #define _RK_AIQ_TYPE_AGAMMA_ALGO_INT_H_
 #include "agamma/rk_aiq_types_agamma_algo.h"
 #include "RkAiqCalibDbTypes.h"
-#include "RkAiqCalibDbTypesV2.h"
-
+#include "agamma_head.h"
 
 typedef enum rk_gamma_curve_type_s {
     RK_GAMMA_CURVE_TYPE_DEFUALT                     = 0,        /**< USE IQ GAMMA CURVE */
@@ -70,25 +69,35 @@ typedef struct Agamma_api_manual_s {
     rk_gamma_curve_usr_define2_para_t user2;
 }  Agamma_api_manual_t;
 
-typedef struct rk_aiq_gamma_cfg_s {
-    bool gamma_en;
-    int gamma_out_segnum;//0:log segment ; 1:equal segment ;
-    int gamma_out_offset;
-    int gamma_table[45];
-}  rk_aiq_gamma_cfg_t;
-
 typedef struct rk_aiq_gamma_attr_s {
     rk_aiq_gamma_op_mode_t mode;
     Agamma_api_manual_t stManual;
     CalibDbV2_gamma_t stTool;
 }  rk_aiq_gamma_attr_t;
 
-typedef struct AgammaProcRes_s {
+typedef struct AgammaProcResV20_s {
     bool gamma_en;
     int equ_segm;
     int offset;
     int gamma_y[45];
-}  AgammaProcRes_t;
+}  AgammaProcResV20_t;
+
+typedef struct AgammaProcResV21_s {
+    bool gamma_en;
+    int equ_segm;
+    bool EnableDot49;
+    int offset;
+    int gamma_y[49];
+}  AgammaProcResV21_t;
+
+
+typedef struct AgammaProcRes_s {
+    union {
+        AgammaProcResV20_t Gamma_v20;
+        AgammaProcResV21_t Gamma_v30;
+    };
+} AgammaProcRes_t;
+
 
 #endif
 

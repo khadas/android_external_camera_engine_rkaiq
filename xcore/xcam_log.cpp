@@ -41,17 +41,26 @@ static char log_file_name[XCAM_MAX_STR_SIZE] = {0};
 /* use a 64 bits value to represent all modules bug level, and the
  * module bit maps is as follow:
  *
- * bit:      11-4          3-0
- * meaning: [sub modules] [level]
+ * bit:      7-4                                       3-0
+ * meaning:  [sub modules]                             [level]
  *
- * bit:      21        20       19      18       17     16     15        14     13       12
- * meaning: [ADEBAYER][AGIC]   [ALSC]   [ANR]  [ATMO] [ADPCC]  [ABLC]    [AF]   [AWB]   [AEC]
+ * bit:      15          14       13          12       11-8
+ * meaning:  [ABLC]      [AF]     [AWB]       [AEC]    [sub modules]
  *
- * bit:      31        30       29      28       27     26     25        24     23       22
- * meaning: [ASHARP]  [AIE]    [ACP]    [AR2Y] [ALDCH][A3DLUT] [ADEHAZE] [AWDR] [AGAMMA][ACCM]
+ * bit:      23          22       21          20       19       18        17          16
+ * meaning:  [AGAMMA]    [ACCM]   [ADEBAYER]  [AGIC]   [ALSC]   [ANR]     [ATMO]      [ADPCC]
  *
- * bit:     [63-39]          40     39      38       37     36     35        34     33       32
- * meaning:  [U]              [AMERGE]  [ADEGAMMA ]   [CAMHW]  [ANALYZER][XCORE][ASD]  [AFEC] [ACGC]  [AORB]
+ * bit:      31          30       29          28       27       26        25          24
+ * meaning:  [ASHARP]    [AIE]    [ACP]       [AR2Y]   [ALDCH]  [A3DLUT]  [ADEHAZE]   [AWDR]
+ *
+ * bit:      39          38       37          36       35       34        33          32
+ * meaning:  [ADEGAMMA]  [CAMHW]  [ANALYZER]  [XCORE]  [ASD]    [AFEC]    [ACGC]      [AORB]
+ *
+ * bit:      47          46       45          44       43       42        41          40
+ * meaning:  [U]         [U]      [GROUPAEC] [AWBGROUP]  [CAMGROUP]   [ACAC]    [AMD]       [AMERGE]
+ *
+ * bit:     [63-48]
+ * meaning:  [U]
  *
  * [U] means unused now.
  * [level]: use 4 bits to define log levels.
@@ -91,36 +100,40 @@ typedef struct xcore_cam_log_module_info_s {
 #endif
 
 xcore_cam_log_module_info_t g_xcore_log_infos[XCORE_LOG_MODULE_MAX] = {
-    { "AEC", XCORE_LOG_LEVEL_ERR, 0xff}, // XCORE_LOG_MODULE_AEC
-    { "AWB", XCORE_LOG_LEVEL_ERR, 0xff}, // XCORE_LOG_MODULE_AWB
-    { "AF", XCORE_LOG_LEVEL_ERR, 0xff}, // XCORE_LOG_MODULE_AF
-    { "ABLC", XCORE_LOG_LEVEL_ERR, 0xff}, // XCORE_LOG_MODULE_ABLC
-    { "ADPCC", XCORE_LOG_LEVEL_ERR, 0xff}, // XCORE_LOG_MODULE_ADPCC
-    { "ATMO", XCORE_LOG_LEVEL_ERR, 0xff}, // XCORE_LOG_MODULE_ATMO
-    { "ANR", XCORE_LOG_LEVEL_ERR, 0xff}, // XCORE_LOG_MODULE_ANR
-    { "ALSC", XCORE_LOG_LEVEL_ERR, 0xff}, // XCORE_LOG_MODULE_ALSC
-    { "AGIC", XCORE_LOG_LEVEL_ERR, 0xff}, // XCORE_LOG_MODULE_AGIC
-    { "ADEBAYER", XCORE_LOG_LEVEL_ERR, 0xff}, // XCORE_LOG_MODULE_ADEBAYER
-    { "ACCM", XCORE_LOG_LEVEL_ERR, 0xff}, // XCORE_LOG_MODULE_ACCM
-    { "AGAMMA", XCORE_LOG_LEVEL_ERR, 0xff}, // XCORE_LOG_MODULE_AGAMMA
-    { "AWDR", XCORE_LOG_LEVEL_ERR, 0xff}, // XCORE_LOG_MODULE_AWDR
-    { "ADEHAZE", XCORE_LOG_LEVEL_ERR, 0xff}, // XCORE_LOG_MODULE_ADEHAZE
-    { "A3DLUT", XCORE_LOG_LEVEL_ERR, 0xff}, // XCORE_LOG_MODULE_A3DLUT
-    { "ALDCH", XCORE_LOG_LEVEL_ERR, 0xff}, // XCORE_LOG_MODULE_ALDCH
-    { "AR2Y", XCORE_LOG_LEVEL_ERR, 0xff}, // XCORE_LOG_MODULE_AR2Y
-    { "ACP", XCORE_LOG_LEVEL_ERR, 0xff}, // XCORE_LOG_MODULE_ACP
-    { "AIE", XCORE_LOG_LEVEL_ERR, 0xff}, // XCORE_LOG_MODULE_AIE
-    { "ASHARP", XCORE_LOG_LEVEL_ERR, 0xff}, // XCORE_LOG_MODULE_ASHARP
-    { "AORB", XCORE_LOG_LEVEL_ERR, 0xff}, // XCORE_LOG_MODULE_AORB
-    { "AFEC", XCORE_LOG_LEVEL_ERR, 0xff}, // XCORE_LOG_MODULE_AFEC
-    { "ACGC", XCORE_LOG_LEVEL_ERR, 0xff}, // XCORE_LOG_MODULE_ACGC
-    { "ASD", XCORE_LOG_LEVEL_ERR, 0xff}, // XCORE_LOG_MODULE_ASD
-    { "XCORE", XCORE_LOG_LEVEL_ERR, 0xff}, // XCORE_LOG_MODULE_XCORE
-    { "ANALYZER", XCORE_LOG_LEVEL_ERR, 0xff}, // XCORE_LOG_MODULE_ANALYZER
-    { "CAMHW", XCORE_LOG_LEVEL_ERR, 0xff}, // XCORE_LOG_MODULE_CAMHW
-    { "ADEGAMMA", XCORE_LOG_LEVEL_ERR, 0xff}, // XCORE_LOG_MODULE_ADEGAMMA
-    { "AMERGE", XCORE_LOG_LEVEL_ERR, 0xff}, // XCORE_LOG_MODULE_AMERGE
-    { "AMD", XCORE_LOG_LEVEL_ERR, 0xff}, // XCORE_LOG_MODULE_AMMD
+    {"AEC", XCORE_LOG_LEVEL_ERR, 0xff},       // XCORE_LOG_MODULE_AEC
+    {"AWB", XCORE_LOG_LEVEL_ERR, 0xff},       // XCORE_LOG_MODULE_AWB
+    {"AF", XCORE_LOG_LEVEL_ERR, 0xff},        // XCORE_LOG_MODULE_AF
+    {"ABLC", XCORE_LOG_LEVEL_ERR, 0xff},      // XCORE_LOG_MODULE_ABLC
+    {"ADPCC", XCORE_LOG_LEVEL_ERR, 0xff},     // XCORE_LOG_MODULE_ADPCC
+    {"ATMO", XCORE_LOG_LEVEL_ERR, 0xff},      // XCORE_LOG_MODULE_ATMO
+    {"ANR", XCORE_LOG_LEVEL_ERR, 0xff},       // XCORE_LOG_MODULE_ANR
+    {"ALSC", XCORE_LOG_LEVEL_ERR, 0xff},      // XCORE_LOG_MODULE_ALSC
+    {"AGIC", XCORE_LOG_LEVEL_ERR, 0xff},      // XCORE_LOG_MODULE_AGIC
+    {"ADEBAYER", XCORE_LOG_LEVEL_ERR, 0xff},  // XCORE_LOG_MODULE_ADEBAYER
+    {"ACCM", XCORE_LOG_LEVEL_ERR, 0xff},      // XCORE_LOG_MODULE_ACCM
+    {"AGAMMA", XCORE_LOG_LEVEL_ERR, 0xff},    // XCORE_LOG_MODULE_AGAMMA
+    {"AWDR", XCORE_LOG_LEVEL_ERR, 0xff},      // XCORE_LOG_MODULE_AWDR
+    {"ADEHAZE", XCORE_LOG_LEVEL_ERR, 0xff},   // XCORE_LOG_MODULE_ADEHAZE
+    {"A3DLUT", XCORE_LOG_LEVEL_ERR, 0xff},    // XCORE_LOG_MODULE_A3DLUT
+    {"ALDCH", XCORE_LOG_LEVEL_ERR, 0xff},     // XCORE_LOG_MODULE_ALDCH
+    {"AR2Y", XCORE_LOG_LEVEL_ERR, 0xff},      // XCORE_LOG_MODULE_AR2Y
+    {"ACP", XCORE_LOG_LEVEL_ERR, 0xff},       // XCORE_LOG_MODULE_ACP
+    {"AIE", XCORE_LOG_LEVEL_ERR, 0xff},       // XCORE_LOG_MODULE_AIE
+    {"ASHARP", XCORE_LOG_LEVEL_ERR, 0xff},    // XCORE_LOG_MODULE_ASHARP
+    {"AORB", XCORE_LOG_LEVEL_ERR, 0xff},      // XCORE_LOG_MODULE_AORB
+    {"AFEC", XCORE_LOG_LEVEL_ERR, 0xff},      // XCORE_LOG_MODULE_AFEC
+    {"ACGC", XCORE_LOG_LEVEL_ERR, 0xff},      // XCORE_LOG_MODULE_ACGC
+    {"ASD", XCORE_LOG_LEVEL_ERR, 0xff},       // XCORE_LOG_MODULE_ASD
+    {"XCORE", XCORE_LOG_LEVEL_ERR, 0xff},     // XCORE_LOG_MODULE_XCORE
+    {"ANALYZER", XCORE_LOG_LEVEL_ERR, 0xff},  // XCORE_LOG_MODULE_ANALYZER
+    {"CAMHW", XCORE_LOG_LEVEL_ERR, 0xff},     // XCORE_LOG_MODULE_CAMHW
+    {"ADEGAMMA", XCORE_LOG_LEVEL_ERR, 0xff},  // XCORE_LOG_MODULE_ADEGAMMA
+    {"AMERGE", XCORE_LOG_LEVEL_ERR, 0xff},    // XCORE_LOG_MODULE_AMERGE
+    {"AMD", XCORE_LOG_LEVEL_ERR, 0xff},       // XCORE_LOG_MODULE_AMMD
+    {"ACAC", XCORE_LOG_LEVEL_ERR, 0xff},      // XCORE_LOG_MODULE_AMMD
+    {"CAMGROUP", XCORE_LOG_LEVEL_ERR, 0xff},      // XCORE_LOG_MODULE_CAMGROUP
+    {"AWBGROUP", XCORE_LOG_LEVEL_ERR, 0xff},      // XCORE_LOG_MODULE_CAMGROUP
+    {"GROUPAEC", XCORE_LOG_LEVEL_ERR, 0xff},      // XCORE_LOG_MODULE_GROUPAEC
 };
 
 bool xcam_get_enviroment_value(const char* variable, unsigned long long* value)
@@ -183,7 +196,7 @@ int xcam_get_log_level() {
     unsigned long long module_mask = g_cam_engine_log_level >> 12;
 
     for (int i = 0; i < XCORE_LOG_MODULE_MAX; i++) {
-        if (module_mask & (1 << i)) {
+        if (module_mask & ((long long )1 << i)) {
             g_xcore_log_infos[i].log_level = g_cam_engine_log_level & 0xf;
             g_xcore_log_infos[i].sub_modules = (g_cam_engine_log_level >> 4) & 0xff;
         }

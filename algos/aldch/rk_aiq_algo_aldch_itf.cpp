@@ -34,7 +34,7 @@ static XCamReturn alloc_ldch_buf(LDCHContext_t* ldchCtx)
     share_mem_config.alloc_param.width =  ldchCtx->dst_width;
     share_mem_config.alloc_param.height = ldchCtx->dst_height;
     share_mem_config.mem_type = MEM_TYPE_LDCH;
-    ldchCtx->share_mem_ops->alloc_mem(ldchCtx->share_mem_ops,
+    ldchCtx->share_mem_ops->alloc_mem(0, ldchCtx->share_mem_ops,
                                       &share_mem_config,
                                       &ldchCtx->share_mem_ctx);
     return XCAM_RETURN_NO_ERROR;
@@ -43,7 +43,7 @@ static XCamReturn alloc_ldch_buf(LDCHContext_t* ldchCtx)
 static XCamReturn release_ldch_buf(LDCHContext_t* ldchCtx)
 {
     if (ldchCtx->share_mem_ctx)
-        ldchCtx->share_mem_ops->release_mem(ldchCtx->share_mem_ctx);
+        ldchCtx->share_mem_ops->release_mem(0, ldchCtx->share_mem_ctx);
 
     return XCAM_RETURN_NO_ERROR;
 }
@@ -51,7 +51,7 @@ static XCamReturn release_ldch_buf(LDCHContext_t* ldchCtx)
 static XCamReturn get_ldch_buf(LDCHContext_t* ldchCtx)
 {
     ldchCtx->ldch_mem_info = (rk_aiq_ldch_share_mem_info_t *)
-            ldchCtx->share_mem_ops->get_free_item(ldchCtx->share_mem_ctx);
+            ldchCtx->share_mem_ops->get_free_item(0, ldchCtx->share_mem_ctx);
     if (ldchCtx->ldch_mem_info == NULL) {
         LOGE_ALDCH( "%s(%d): no free ldch buf", __FUNCTION__, __LINE__);
         return XCAM_RETURN_ERROR_MEM;

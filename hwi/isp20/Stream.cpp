@@ -150,7 +150,7 @@ XCamReturn RkPollThread::stop ()
 bool
 RkPollThread::setPollCallback (PollCallback *callback)
 {
-    XCAM_ASSERT (!_poll_callback);
+    //XCAM_ASSERT (!_poll_callback);
     _poll_callback = callback;
     return true;
 }
@@ -498,6 +498,7 @@ RKSofEventStream::new_video_buffer(struct v4l2_event &event,
 
     video_buf = new SofEventBuffer(evtdata, dev);
     video_buf->_buf_type = _dev_type;
+    video_buf->set_sequence (exp_id);
     EXIT_CAMHW_FUNCTION();
 
     return video_buf;

@@ -69,7 +69,7 @@ prepare(RkAiqAlgoCom* params)
 
     if(!!(AdegammaHandle->prepare_type & RK_AIQ_ALGO_CONFTYPE_UPDATECALIB )) {
         CalibDbV2_Adegmma_t* adegamma_calib =
-                (CalibDbV2_Adegmma_t*)(CALIBDBV2_GET_MODULE_PTR(pCfgParam->rk_com.u.prepare.calibv2, adegamma_calib));
+            (CalibDbV2_Adegmma_t*)(CALIBDBV2_GET_MODULE_PTR(pCfgParam->rk_com.u.prepare.calibv2, adegamma_calib));
         AdegammaHandle->pCalibDb = adegamma_calib;//reload iq
         LOGD_ADEGAMMA("%s: Adegamma Reload Para!!!\n", __FUNCTION__);
     }
@@ -104,7 +104,7 @@ processing(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outparams)
 
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
     AdegammaHandle_t * AdegammaHandle = (AdegammaHandle_t *)inparams->ctx;
-    RkAiqAlgoProcResAdegamma* procResPara = (RkAiqAlgoProcResAdegamma*)outparams;
+    RkAiqAlgoProcResAdegammaInt* procResPara = (RkAiqAlgoProcResAdegammaInt*)outparams;
     AdegammaProcRes_t* AdegammaProcRes = (AdegammaProcRes_t*)&procResPara->adegamma_proc_res;
 
     AdegammaProcessing(AdegammaHandle);

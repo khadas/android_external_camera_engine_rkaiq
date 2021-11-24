@@ -17,7 +17,7 @@
 
 #include <cstring>
 #include "Isp20Params.h"
-#include "isp21/rkisp21-config.h"
+#include "common/rkisp21-config.h"
 
 namespace RkCam {
 
@@ -406,23 +406,55 @@ Isp20Params::convertAiqAeToIsp20Params
 {
     /* ae update */
     if(/*aec_meas.ae_meas_en*/1) {
-        isp_cfg.module_ens |= 1LL << RK_ISP2X_RAWAE_LITE_ID;
-        isp_cfg.module_ens |= 1LL << RK_ISP2X_RAWAE_BIG1_ID;
-        isp_cfg.module_ens |= 1LL << RK_ISP2X_RAWAE_BIG2_ID;
-        isp_cfg.module_ens |= 1LL << RK_ISP2X_RAWAE_BIG3_ID;
+        if(_working_mode == RK_AIQ_WORKING_MODE_NORMAL) { // normal
+            switch(aec_meas.rawae0.rawae_sel) {
+            case 0:
+                isp_cfg.module_ens |= 1LL << RK_ISP2X_RAWAE0_ID;
+                break;
+            case 1:
+                isp_cfg.module_ens |= 1LL << RK_ISP2X_RAWAE1_ID;
+                break;
+            case 2:
+                isp_cfg.module_ens |= 1LL << RK_ISP2X_RAWAE2_ID;
+                break;
+            }
+        } else if(_working_mode < RK_AIQ_WORKING_MODE_ISP_HDR3) { //hdr 2
+            switch(aec_meas.rawae0.rawae_sel) {
+            case 0:
+                isp_cfg.module_ens |= 1LL << RK_ISP2X_RAWAE0_ID;
+                isp_cfg.module_ens |= 1LL << RK_ISP2X_RAWAE1_ID;
+                break;
+            case 1:
+                isp_cfg.module_ens |= 1LL << RK_ISP2X_RAWAE0_ID;
+                isp_cfg.module_ens |= 1LL << RK_ISP2X_RAWAE1_ID;
+                break;
+            case 2:
+                isp_cfg.module_ens |= 1LL << RK_ISP2X_RAWAE1_ID;
+                isp_cfg.module_ens |= 1LL << RK_ISP2X_RAWAE2_ID;
+                break;
+            }
+        } else { // hdr 3
+            isp_cfg.module_ens |= 1LL << RK_ISP2X_RAWAE0_ID;
+            isp_cfg.module_ens |= 1LL << RK_ISP2X_RAWAE1_ID;
+            isp_cfg.module_ens |= 1LL << RK_ISP2X_RAWAE2_ID;
+        }
+
+        isp_cfg.module_ens |= 1LL << RK_ISP2X_RAWAE3_ID;
         isp_cfg.module_ens |= 1LL << RK_ISP2X_YUVAE_ID;
+
+
         if(/*aec_meas.ae_meas_update*/1) {
-            isp_cfg.module_en_update |= 1LL << RK_ISP2X_RAWAE_LITE_ID;
-            isp_cfg.module_cfg_update |= 1LL << RK_ISP2X_RAWAE_LITE_ID;
+            isp_cfg.module_en_update |= 1LL << RK_ISP2X_RAWAE0_ID;
+            isp_cfg.module_cfg_update |= 1LL << RK_ISP2X_RAWAE0_ID;
 
-            isp_cfg.module_en_update |= 1LL << RK_ISP2X_RAWAE_BIG1_ID;
-            isp_cfg.module_cfg_update |= 1LL << RK_ISP2X_RAWAE_BIG1_ID;
+            isp_cfg.module_en_update |= 1LL << RK_ISP2X_RAWAE1_ID;
+            isp_cfg.module_cfg_update |= 1LL << RK_ISP2X_RAWAE1_ID;
 
-            isp_cfg.module_en_update |= 1LL << RK_ISP2X_RAWAE_BIG2_ID;
-            isp_cfg.module_cfg_update |= 1LL << RK_ISP2X_RAWAE_BIG2_ID;
+            isp_cfg.module_en_update |= 1LL << RK_ISP2X_RAWAE2_ID;
+            isp_cfg.module_cfg_update |= 1LL << RK_ISP2X_RAWAE2_ID;
 
-            isp_cfg.module_en_update |= 1LL << RK_ISP2X_RAWAE_BIG3_ID;
-            isp_cfg.module_cfg_update |= 1LL << RK_ISP2X_RAWAE_BIG3_ID;
+            isp_cfg.module_en_update |= 1LL << RK_ISP2X_RAWAE3_ID;
+            isp_cfg.module_cfg_update |= 1LL << RK_ISP2X_RAWAE3_ID;
 
             isp_cfg.module_en_update |= 1LL << RK_ISP2X_YUVAE_ID;
             isp_cfg.module_cfg_update |= 1LL << RK_ISP2X_YUVAE_ID;
@@ -437,8 +469,9 @@ Isp20Params::convertAiqAeToIsp20Params
     memcpy(&isp_cfg.meas.rawae1, &aec_meas.rawae1, sizeof(aec_meas.rawae1));
     memcpy(&isp_cfg.meas.rawae2, &aec_meas.rawae2, sizeof(aec_meas.rawae2));
     memcpy(&isp_cfg.meas.rawae0, &aec_meas.rawae0, sizeof(aec_meas.rawae0));
+#if defined(ISP_HW_V20) || defined(ISP_HW_V21)
     memcpy(&isp_cfg.meas.yuvae, &aec_meas.yuvae, sizeof(aec_meas.yuvae));
-
+#endif
     /*
      *     LOGD_CAMHW_SUBM(ISP20PARAM_SUBM,"xuhf-debug: hist_meas-isp_cfg size: [%dx%d]-[%dx%d]-[%dx%d]-[%dx%d]\n",
      *                     sizeof(aec_meas.rawae3),
@@ -482,24 +515,55 @@ Isp20Params::convertAiqHistToIsp20Params
 {
     /* hist update */
     if(/*hist_meas.hist_meas_en*/1) {
-        isp_cfg.module_ens |= 1LL << RK_ISP2X_RAWHIST_LITE_ID;
-        isp_cfg.module_ens |= 1LL << RK_ISP2X_RAWHIST_BIG1_ID;
-        isp_cfg.module_ens |= 1LL << RK_ISP2X_RAWHIST_BIG2_ID;
-        isp_cfg.module_ens |= 1LL << RK_ISP2X_RAWHIST_BIG3_ID;
+        if(_working_mode == RK_AIQ_WORKING_MODE_NORMAL) { // normal
+            switch(hist_meas.ae_swap) {
+            case 0:
+                isp_cfg.module_ens |= 1LL << RK_ISP2X_RAWHIST0_ID;
+                break;
+            case 1:
+                isp_cfg.module_ens |= 1LL << RK_ISP2X_RAWHIST1_ID;
+                break;
+            case 2:
+                isp_cfg.module_ens |= 1LL << RK_ISP2X_RAWHIST2_ID;
+
+                break;
+            }
+        } else if(_working_mode < RK_AIQ_WORKING_MODE_ISP_HDR3) { //hdr 2
+            switch(hist_meas.ae_swap) {
+            case 0:
+                isp_cfg.module_ens |= 1LL << RK_ISP2X_RAWHIST0_ID;
+                isp_cfg.module_ens |= 1LL << RK_ISP2X_RAWHIST1_ID;
+                break;
+            case 1:
+                isp_cfg.module_ens |= 1LL << RK_ISP2X_RAWHIST0_ID;
+                isp_cfg.module_ens |= 1LL << RK_ISP2X_RAWHIST1_ID;
+                break;
+            case 2:
+                isp_cfg.module_ens |= 1LL << RK_ISP2X_RAWHIST1_ID;
+                isp_cfg.module_ens |= 1LL << RK_ISP2X_RAWHIST2_ID;
+                break;
+            }
+        } else { // hdr 3
+            isp_cfg.module_ens |= 1LL << RK_ISP2X_RAWHIST0_ID;
+            isp_cfg.module_ens |= 1LL << RK_ISP2X_RAWHIST1_ID;
+            isp_cfg.module_ens |= 1LL << RK_ISP2X_RAWHIST2_ID;
+        }
+
+        isp_cfg.module_ens |= 1LL << RK_ISP2X_RAWHIST3_ID;
         isp_cfg.module_ens |= 1LL << RK_ISP2X_SIHST_ID;
 
         if(/*hist_meas.hist_meas_update*/1) {
-            isp_cfg.module_en_update |= 1LL << RK_ISP2X_RAWHIST_LITE_ID;
-            isp_cfg.module_cfg_update |= 1LL << RK_ISP2X_RAWHIST_LITE_ID;
+            isp_cfg.module_en_update |= 1LL << RK_ISP2X_RAWHIST0_ID;
+            isp_cfg.module_cfg_update |= 1LL << RK_ISP2X_RAWHIST0_ID;
 
-            isp_cfg.module_en_update |= 1LL << RK_ISP2X_RAWHIST_BIG1_ID;
-            isp_cfg.module_cfg_update |= 1LL << RK_ISP2X_RAWHIST_BIG1_ID;
+            isp_cfg.module_en_update |= 1LL << RK_ISP2X_RAWHIST1_ID;
+            isp_cfg.module_cfg_update |= 1LL << RK_ISP2X_RAWHIST1_ID;
 
-            isp_cfg.module_en_update |= 1LL << RK_ISP2X_RAWHIST_BIG2_ID;
-            isp_cfg.module_cfg_update |= 1LL << RK_ISP2X_RAWHIST_BIG2_ID;
+            isp_cfg.module_en_update |= 1LL << RK_ISP2X_RAWHIST2_ID;
+            isp_cfg.module_cfg_update |= 1LL << RK_ISP2X_RAWHIST2_ID;
 
-            isp_cfg.module_en_update |= 1LL << RK_ISP2X_RAWHIST_BIG3_ID;
-            isp_cfg.module_cfg_update |= 1LL << RK_ISP2X_RAWHIST_BIG3_ID;
+            isp_cfg.module_en_update |= 1LL << RK_ISP2X_RAWHIST3_ID;
+            isp_cfg.module_cfg_update |= 1LL << RK_ISP2X_RAWHIST3_ID;
 
             isp_cfg.module_en_update |= 1LL << RK_ISP2X_SIHST_ID;
             isp_cfg.module_cfg_update |= 1LL << RK_ISP2X_SIHST_ID;
@@ -515,8 +579,9 @@ Isp20Params::convertAiqHistToIsp20Params
     memcpy(&isp_cfg.meas.rawhist1, &hist_meas.rawhist1, sizeof(hist_meas.rawhist1));
     memcpy(&isp_cfg.meas.rawhist2, &hist_meas.rawhist2, sizeof(hist_meas.rawhist2));
     memcpy(&isp_cfg.meas.rawhist0, &hist_meas.rawhist0, sizeof(hist_meas.rawhist0));
+#if defined(ISP_HW_V20) || defined(ISP_HW_V21)
     memcpy(&isp_cfg.meas.sihst, &hist_meas.sihist, sizeof(hist_meas.sihist));
-
+#endif
     /*
      *     LOGD_CAMHW_SUBM(ISP20PARAM_SUBM,"xuhf-debug: hist_meas-isp_cfg size: [%dx%d]-[%dx%d]-[%dx%d]-[%dx%d]\n",
      *                     sizeof(hist_meas.rawhist3),
@@ -1002,8 +1067,7 @@ template<class T>
 void Isp20Params::convertAiqMergeToIsp20Params(T& isp_cfg,
         const rk_aiq_isp_merge_t& amerge_data)
 {
-    // TODO: could be always on ? isp driver would do the right thing
-    if(amerge_data.Res.sw_hdrmge_mode)
+    if(amerge_data.update)
     {
         isp_cfg.module_en_update |= 1LL << RK_ISP2X_HDRMGE_ID;
         isp_cfg.module_ens |= 1LL << RK_ISP2X_HDRMGE_ID;
@@ -1016,21 +1080,21 @@ void Isp20Params::convertAiqMergeToIsp20Params(T& isp_cfg,
         isp_cfg.module_cfg_update &= ~(1LL << RK_ISP2X_HDRMGE_ID);
     }
 
-    isp_cfg.others.hdrmge_cfg.mode         = amerge_data.Res.sw_hdrmge_mode;
-    isp_cfg.others.hdrmge_cfg.gain0_inv    = amerge_data.Res.sw_hdrmge_gain0_inv;
-    isp_cfg.others.hdrmge_cfg.gain0         = amerge_data.Res.sw_hdrmge_gain0;
-    isp_cfg.others.hdrmge_cfg.gain1_inv    = amerge_data.Res.sw_hdrmge_gain1_inv;
-    isp_cfg.others.hdrmge_cfg.gain1        = amerge_data.Res.sw_hdrmge_gain1;
-    isp_cfg.others.hdrmge_cfg.gain2        = amerge_data.Res.sw_hdrmge_gain2;
-    isp_cfg.others.hdrmge_cfg.lm_dif_0p15  = amerge_data.Res.sw_hdrmge_lm_dif_0p15;
-    isp_cfg.others.hdrmge_cfg.lm_dif_0p9   = amerge_data.Res.sw_hdrmge_lm_dif_0p9;
-    isp_cfg.others.hdrmge_cfg.ms_diff_0p15 = amerge_data.Res.sw_hdrmge_ms_dif_0p15;
-    isp_cfg.others.hdrmge_cfg.ms_dif_0p8   = amerge_data.Res.sw_hdrmge_ms_dif_0p8;
+    isp_cfg.others.hdrmge_cfg.mode         = amerge_data.Merge_v20.sw_hdrmge_mode;
+    isp_cfg.others.hdrmge_cfg.gain0_inv    = amerge_data.Merge_v20.sw_hdrmge_gain0_inv;
+    isp_cfg.others.hdrmge_cfg.gain0         = amerge_data.Merge_v20.sw_hdrmge_gain0;
+    isp_cfg.others.hdrmge_cfg.gain1_inv    = amerge_data.Merge_v20.sw_hdrmge_gain1_inv;
+    isp_cfg.others.hdrmge_cfg.gain1        = amerge_data.Merge_v20.sw_hdrmge_gain1;
+    isp_cfg.others.hdrmge_cfg.gain2        = amerge_data.Merge_v20.sw_hdrmge_gain2;
+    isp_cfg.others.hdrmge_cfg.lm_dif_0p15  = amerge_data.Merge_v20.sw_hdrmge_lm_dif_0p15;
+    isp_cfg.others.hdrmge_cfg.lm_dif_0p9   = amerge_data.Merge_v20.sw_hdrmge_lm_dif_0p9;
+    isp_cfg.others.hdrmge_cfg.ms_diff_0p15 = amerge_data.Merge_v20.sw_hdrmge_ms_dif_0p15;
+    isp_cfg.others.hdrmge_cfg.ms_dif_0p8   = amerge_data.Merge_v20.sw_hdrmge_ms_dif_0p8;
     for(int i = 0; i < 17; i++)
     {
-        isp_cfg.others.hdrmge_cfg.curve.curve_0[i] = amerge_data.Res.sw_hdrmge_l0_y[i];
-        isp_cfg.others.hdrmge_cfg.curve.curve_1[i] = amerge_data.Res.sw_hdrmge_l1_y[i];
-        isp_cfg.others.hdrmge_cfg.e_y[i]           = amerge_data.Res.sw_hdrmge_e_y[i];
+        isp_cfg.others.hdrmge_cfg.curve.curve_0[i] = amerge_data.Merge_v20.sw_hdrmge_l0_y[i];
+        isp_cfg.others.hdrmge_cfg.curve.curve_1[i] = amerge_data.Merge_v20.sw_hdrmge_l1_y[i];
+        isp_cfg.others.hdrmge_cfg.e_y[i]           = amerge_data.Merge_v20.sw_hdrmge_e_y[i];
     }
 
 #if 0
@@ -1252,7 +1316,7 @@ template<class T>
 void Isp20Params::convertAiqAgammaToIsp20Params(T& isp_cfg,
         const AgammaProcRes_t& gamma_out_cfg)
 {
-    if(gamma_out_cfg.gamma_en) {
+    if(gamma_out_cfg.Gamma_v20.gamma_en) {
         isp_cfg.module_ens |= ISP2X_MODULE_GOC;
         isp_cfg.module_en_update |= ISP2X_MODULE_GOC;
         isp_cfg.module_cfg_update |= ISP2X_MODULE_GOC;
@@ -1264,12 +1328,17 @@ void Isp20Params::convertAiqAgammaToIsp20Params(T& isp_cfg,
 
 
     struct isp2x_gammaout_cfg* cfg = &isp_cfg.others.gammaout_cfg;
-    cfg->offset = gamma_out_cfg.offset;
-    cfg->equ_segm = gamma_out_cfg.equ_segm;
+    cfg->offset = gamma_out_cfg.Gamma_v20.offset;
+    cfg->equ_segm = gamma_out_cfg.Gamma_v20.equ_segm;
     for (int i = 0; i < 45; i++)
-    {
-        cfg->gamma_y[i] = gamma_out_cfg.gamma_y[i];
-    }
+        cfg->gamma_y[i] = gamma_out_cfg.Gamma_v20.gamma_y[i];
+
+#if 0
+    LOGE_CAMHW_SUBM(ISP20PARAM_SUBM, "%s:(%d) gamma en:%d, offset:%d, equ_segm:%d\n", __FUNCTION__, __LINE__, gamma_out_cfg.Gamma_v20.gamma_en, cfg->offset, cfg->equ_segm);
+    LOGE_CAMHW_SUBM(ISP20PARAM_SUBM, "Gamma_Y:%d %d %d %d %d %d %d %d\n", cfg->gamma_y[0], cfg->gamma_y[1],
+                    cfg->gamma_y[2], cfg->gamma_y[3], cfg->gamma_y[4], cfg->gamma_y[5], cfg->gamma_y[6], cfg->gamma_y[7]);
+#endif
+
 }
 
 template<class T>
@@ -1376,13 +1445,11 @@ void Isp20Params::convertAiqAdehazeToIsp20Params(T& isp_cfg,
     cfg->gaus_h1    = dhaze.gaus_h1;
     cfg->gaus_h2    = dhaze.gaus_h2;
 
-    for(int i = 0; i < 6; i++) {
+    for(int i = 0; i < ISP2X_DHAZ_CONV_COEFF_NUM; i++) {
         cfg->conv_t0[i]   = dhaze.conv_t0[i];
         cfg->conv_t1[i]   = dhaze.conv_t1[i];
         cfg->conv_t2[i]   = dhaze.conv_t2[i];
     }
-
-
 
 #if 0
     // cfg->dehaze_en      = int(dhaze.dehaze_en[0]);  //0~1  , (1bit) dehaze_en
@@ -1443,7 +1510,7 @@ void Isp20Params::convertAiqAdehazeToIsp20Params(T& isp_cfg,
     cfg->gaus_h1    = int(dhaze.dehaze_gaus_h[1]);
     cfg->gaus_h2    = int(dhaze.dehaze_gaus_h[0]);
 
-    for (int i = 0; i < 6; i++)
+    for (int i = 0; i < ISP2X_DHAZ_CONV_COEFF_NUM; i++)
     {
         cfg->conv_t0[i]     = int(dhaze.dehaze_hist_t0[i]);
         cfg->conv_t1[i]     = int(dhaze.dehaze_hist_t1[i]);
@@ -1726,7 +1793,11 @@ Isp20Params::convertAiqLscToIsp20Params(T& isp_cfg,
     isp_cfg.module_en_update |= ISP2X_MODULE_LSC;
     isp_cfg.module_cfg_update |= ISP2X_MODULE_LSC;
 
+#ifdef ISP_HW_V30
+    struct isp3x_lsc_cfg *  cfg = &isp_cfg.others.lsc_cfg;
+#else
     struct isp2x_lsc_cfg *  cfg = &isp_cfg.others.lsc_cfg;
+#endif
     memcpy(cfg->x_size_tbl, lsc.x_size_tbl, sizeof(lsc.x_size_tbl));
     memcpy(cfg->y_size_tbl, lsc.y_size_tbl, sizeof(lsc.y_size_tbl));
     memcpy(cfg->x_grad_tbl, lsc.x_grad_tbl, sizeof(lsc.x_grad_tbl));
@@ -1790,7 +1861,9 @@ void Isp20Params::convertAiqA3dlutToIsp20Params(T& isp_cfg,
     isp_cfg.module_cfg_update |= ISP2X_MODULE_3DLUT;
 
     struct isp2x_3dlut_cfg* cfg = &isp_cfg.others.isp3dlut_cfg;
+#ifndef ISP_HW_V30 // isp3x has no bypass_en
     cfg->bypass_en = lut3d_cfg.bypass_en;
+#endif
     cfg->actual_size = lut3d_cfg.lut3d_lut_wsize;
     memcpy(cfg->lut_r, lut3d_cfg.look_up_table_r, sizeof(cfg->lut_r));
     memcpy(cfg->lut_g, lut3d_cfg.look_up_table_g, sizeof(cfg->lut_g));
@@ -2916,7 +2989,7 @@ void Isp20Params::getModuleStatus(rk_aiq_module_id_t mId, bool& en)
         mod_id = RK_ISP2X_PP_TSHP_ID;
         break;
     case RK_MODULE_AE:
-        mod_id = RK_ISP2X_RAWAE_LITE_ID;
+        mod_id = RK_ISP2X_RAWAE0_ID;
         break;
     case RK_MODULE_FEC:
         mod_id = RK_ISP2X_PP_TFEC_ID;
@@ -3728,6 +3801,7 @@ bool Isp20Params::convert3aResultsToIspCfg(SmartPtr<cam3aResult> &result,
     break;
     case RESULT_TYPE_HIST_PARAM:
     {
+
         SmartPtr<RkAiqIspHistParamsProxy> params = result.dynamic_cast_ptr<RkAiqIspHistParamsProxy>();
         if (params.ptr())
             convertAiqHistToIsp20Params(isp_cfg, params->data()->result);
@@ -3792,9 +3866,11 @@ bool Isp20Params::convert3aResultsToIspCfg(SmartPtr<cam3aResult> &result,
     break;
     case RESULT_TYPE_LSC_PARAM:
     {
+#ifndef ISP_HW_V30
         SmartPtr<RkAiqIspLscParamsProxy> params = result.dynamic_cast_ptr<RkAiqIspLscParamsProxy>();
         if (params.ptr())
             convertAiqLscToIsp20Params(isp_cfg, params->data()->result);
+#endif
     }
     break;
     case RESULT_TYPE_BLC_PARAM:
@@ -4042,3 +4118,4 @@ Isp20Params::get_3a_result (cam3aResultList &results, int32_t type)
 }; //namspace RkCam
 //TODO: to solve template ld compile issue, add isp21 source file here now.
 #include "isp21/Isp21Params.cpp"
+#include "isp3x/Isp3xParams.cpp"

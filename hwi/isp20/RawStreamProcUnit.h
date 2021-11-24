@@ -58,6 +58,8 @@ public:
         ISP_MIPI_HDR_L,
         ISP_MIPI_HDR_MAX,
     };
+    // notify CamHwIsp one frame has been processed
+    void setPollCallback(PollCallback* cb) { _PollCallback = cb; }
     // from PollCallback
     virtual XCamReturn poll_buffer_ready (SmartPtr<VideoBuffer> &buf, int type) { return XCAM_RETURN_ERROR_FAILED; }
     virtual XCamReturn poll_buffer_failed (int64_t timestamp, const char *msg) { return XCAM_RETURN_ERROR_FAILED; }
@@ -94,6 +96,7 @@ protected:
     bool _first_trigger;
     Mutex _mipi_trigger_mutex;
     SafeList<EmptyClass> _msg_queue;
+    PollCallback* _PollCallback;
 };
 
 class RawProcThread

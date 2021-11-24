@@ -8,6 +8,7 @@ RawStreamProcUnit::RawStreamProcUnit ()
 , _is_multi_cam_conc(false)
 {
     _raw_proc_thread = new RawProcThread(this);
+    _PollCallback = NULL;
 }
 
 RawStreamProcUnit::RawStreamProcUnit (const rk_sensor_full_info_t *s_info, bool linked_to_isp)
@@ -15,6 +16,7 @@ RawStreamProcUnit::RawStreamProcUnit (const rk_sensor_full_info_t *s_info, bool 
     , _is_multi_cam_conc(false)
 {
     _raw_proc_thread = new RawProcThread(this);
+    _PollCallback = NULL;
     //short frame
     if (strlen(s_info->isp_info->rawrd2_s_path)) {
         _dev[0] = new V4l2Device (s_info->isp_info->rawrd2_s_path);//rkisp_rawrd2_s
@@ -136,6 +138,9 @@ RawStreamProcUnit::set_rx_devices(SmartPtr<V4l2Device> mipi_rx_devs[3])
 {
     for (int i = 0; i < 3; i++) {
         _dev[i] = mipi_rx_devs[i];
+        _stream[i].release();
+        _stream[i] =  new RKRawStream(_dev[i], i, ISP_POLL_RX);
+        _stream[i]->setPollCallback(this);
     }
 }
 
@@ -221,6 +226,9 @@ RawStreamProcUnit::poll_buffer_ready (SmartPtr<V4l2BufferProxy> &buf, int dev_in
         LOGD("%s dev_index:%d index:%d fd:%d\n",
                         __func__, dev_index, rx_buf->get_v4l2_buf_index(), rx_buf->get_expbuf_fd());
     }
+    if (_PollCallback)
+        _PollCallback->poll_buffer_ready (buf, dev_index);
+
     return XCAM_RETURN_NO_ERROR;
 }
 
@@ -301,7 +309,7 @@ RawStreamProcUnit::match_sof_timestamp_map(sint32_t sequence, uint64_t &timestam
     if (it != _sof_timestamp_map.end()) {
         timestamp = it->second;
     } else {
-        LOGE(  "can't find frameid(%d), get sof timestamp failed!\n",
+        LOGW(  "can't find frameid(%d), get sof timestamp failed!\n",
                 sequence);
         ret = XCAM_RETURN_ERROR_FAILED;
     }
@@ -421,6 +429,7 @@ RawStreamProcUnit::trigger_isp_readback()
                     goto out;
                 } else {
                     buf_proxy = cache_list[i].pop(-1);
+#if 0
                     if (_first_trigger) {
                         u8 *buf = (u8 *)buf_proxy->get_v4l2_userptr();
                         struct v4l2_format format = v4l2buf[i]->get_format();
@@ -430,6 +439,7 @@ RawStreamProcUnit::trigger_isp_readback()
                                 *buf++ += j % 16;
                         }
                     }
+#endif
                     buf_list[i].push(buf_proxy);
                     if (_dev[i]->get_mem_type() == V4L2_MEMORY_USERPTR)
                         v4l2buf[i]->set_expbuf_usrptr(buf_proxy->get_v4l2_userptr());
