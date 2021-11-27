@@ -1151,7 +1151,7 @@ media_unref:
 
                 LOGI_CAMHW_SUBM(ISP20HW_SUBM, "vicap %s, linked_vicap %s",
                                 s_full_info->cif_info->model_str, isp_info->linked_vicap);
-                if (strcmp(s_full_info->cif_info->model_str, isp_info->linked_vicap) == 0) {
+                if (strncmp(s_full_info->cif_info->model_str, isp_info->linked_vicap, strlen("rkcif_mipi_lvds")) == 0) {
                     s_full_info->isp_info = &CamHwIsp20::mIspHwInfos.isp_info[i];
                     CamHwIsp20::mCamHwInfos[s_full_info->sensor_name]->is_multi_isp_mode =
                         s_full_info->isp_info->is_multi_isp_mode;
