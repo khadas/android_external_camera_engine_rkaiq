@@ -52,7 +52,7 @@ handle_array_table() {
 }
 
 handle_string() {
-	echo -n @desc: alias=\"$1\", type=\"string\", size=\"$2\", range=\"$3\", default=\"$4\", dynamic=\"$5\"
+	echo -n @desc: alias=\"$1\", type=\"string\", size=\"$2\", range=\"$3\", default=\"$4\", dynamic=\"${5:-0}\", hide=\"${6:-0}\"
 }
 
 handle_enum() {

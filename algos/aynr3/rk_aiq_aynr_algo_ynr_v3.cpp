@@ -224,7 +224,7 @@ Aynr_result_V3_t ynr_fix_transfer_V3(RK_YNR_Params_V3_Select_t* pSelect, RK_YNR_
     pFix->ynr_gate_dis = 0;
     pFix->ynr_thumb_mix_cur_en = 0;
     tmp = (int)(pSelect->ynr_global_gain_alpha_V3 * (1 << 3));
-    pFix->ynr_global_gain_alpha = CLIP(tmp, 0, 15);
+    pFix->ynr_global_gain_alpha = CLIP(tmp, 0, 8);
     tmp = (int)(pSelect->ynr_global_gain_V3 * (1 << 4));
     pFix->ynr_global_gain  = CLIP(tmp, 0, 1023);
     pFix->ynr_flt1x1_bypass_sel = 0;
@@ -248,7 +248,9 @@ Aynr_result_V3_t ynr_fix_transfer_V3(RK_YNR_Params_V3_Select_t* pSelect, RK_YNR_
     MM = int(256 * tmp2 + 0.5);
     tmp = (MM << 5) + EE;
     pFix->ynr_rnr_max_r = CLIP(tmp, 0, 0x3fff);
-    pFix->ynr_local_gainscale = 0x80;
+    //local gain scale
+    tmp = ( sqrt(double(50) / pExpInfo->arIso[pExpInfo->hdr_mode])) * (1 << 7);
+    pFix->ynr_local_gainscale = CLIP(tmp, 0, 0x80);
 
     //// YNR_2700_CENTRE_COOR (0x0008)
     pFix->ynr_rnr_center_coorv = rows / 2;
@@ -308,6 +310,11 @@ Aynr_result_V3_t ynr_fix_transfer_V3(RK_YNR_Params_V3_Select_t* pSelect, RK_YNR_
     pFix->ynr_base_filter_weight[1] = CLIP(w1, 0, 0x1f);
     pFix->ynr_base_filter_weight[2] = CLIP(w2, 0, 0xf);
 
+    // YNR_2700_HIGHNR_BASE_FILTER_WEIGHT  (0x002c)
+    pFix->ynr_frame_full_size = 0x0000;
+    tmp = pSelect->ynr_low_bi2_weight_thresh_V3 * 1023;
+    pFix->ynr_lbf_weight_thres = CLIP(tmp, 0, 0x3ff);
+
     // YNR_2700_GAUSS1_COEFF  (0x0030)
     float filter1_sigma = pSelect->ynr_low_filt1_strength_V3;
     float filt1_coeff1 = exp(-1 / (2 * filter1_sigma * filter1_sigma));
@@ -351,6 +358,59 @@ Aynr_result_V3_t ynr_fix_transfer_V3(RK_YNR_Params_V3_Select_t* pSelect, RK_YNR_
         pFix->ynr_hsgm_y[i] = CLIP(tmp, 0, 0xfff);
     }
 
+    float loFreqLumaNrCurvePoint[6];
+    float loFreqLumaNrCurveRatio[6];
+    float hiFreqLumaNrCurvePoint[6];
+    float hiFreqLumaNrCurveRatio[6];
+    for (int i = 0; i < 6; i++) {
+        loFreqLumaNrCurvePoint[i] = pSelect->loFreqLumaNrCurvePoint[i];
+        loFreqLumaNrCurveRatio[i] = pSelect->loFreqLumaNrCurveRatio[i];
+        hiFreqLumaNrCurvePoint[i] = pSelect->hiFreqLumaNrCurvePoint[i];
+        hiFreqLumaNrCurveRatio[i] = pSelect->hiFreqLumaNrCurveRatio[i];
+    }
+
+    //update lo noise curve;
+    for (int i = 0; i < YNR_V3_ISO_CURVE_POINT_NUM; i++) {
+        float rate;
+        int j = 0;
+        for (j = 0; j < 6; j++) {
+            if (pFix->ynr_luma_points_x[i] <= loFreqLumaNrCurvePoint[j])
+                break;
+        }
+
+        if (j <= 0)
+            rate = loFreqLumaNrCurveRatio[0];
+        else if (j >= 6)
+            rate = loFreqLumaNrCurveRatio[5];
+        else {
+            rate = ((float)pFix->ynr_luma_points_x[i] - loFreqLumaNrCurvePoint[j - 1]) / (loFreqLumaNrCurvePoint[j] - loFreqLumaNrCurvePoint[j - 1]);
+            rate = loFreqLumaNrCurveRatio[j - 1] + rate * (loFreqLumaNrCurveRatio[j] - loFreqLumaNrCurveRatio[j - 1]);
+        }
+        tmp = (int)(rate * pFix->ynr_lsgm_y[i]);
+        pFix->ynr_lsgm_y[i] = CLIP(tmp, 0, 0xfff);
+    }
+
+    //update hi noise curve;
+    for (int i = 0; i < YNR_V3_ISO_CURVE_POINT_NUM; i++) {
+        float rate;
+        int j;
+        for (j = 0; j < 6; j++) {
+            if (pFix->ynr_luma_points_x[i] <= hiFreqLumaNrCurvePoint[j])
+                break;
+        }
+
+        if (j <= 0)
+            rate = hiFreqLumaNrCurveRatio[0];
+        else if (j >= 6)
+            rate = hiFreqLumaNrCurveRatio[5];
+        else {
+            rate = ((float)pFix->ynr_luma_points_x[i] - hiFreqLumaNrCurvePoint[j - 1]) / (hiFreqLumaNrCurvePoint[j] - hiFreqLumaNrCurvePoint[j - 1]);
+            rate = hiFreqLumaNrCurveRatio[j - 1] + rate * (hiFreqLumaNrCurveRatio[j] - hiFreqLumaNrCurveRatio[j - 1]);
+        }
+        tmp = (int)(rate * pFix->ynr_hsgm_y[i]);
+        pFix->ynr_hsgm_y[i] = CLIP(tmp, 0, 0xfff);
+    }
+
     // YNR_2700_RNR_STRENGTH03 (0x00d0- 0x00e0)
     for (int i = 0; i < 17; i++) {
         tmp = int(pSelect->ynr_rnr_strength_V3[i] * 16);
@@ -373,7 +433,7 @@ Aynr_result_V3_t ynr_fix_printf_V3(RK_YNR_Fix_V3_t * pFix)
     }
 
     // YNR_2700_GLOBAL_CTRL (0x0000)
-    LOGD_ANR("(0x0000) sw_ynr_thumb_mix_cur_en:0x%x sw_ynr_gate_dis:0x%x \n ynr_flt1x1_bypass_sel:0x%x	sw_ynr_rnr_en:0x%x \n ynr_flt1x1_bypass:0x%x  \n",
+    LOGD_ANR("(0x0000) sw_ynr_thumb_mix_cur_en:0x%x sw_ynr_gate_dis:0x%x sw_ynr_rnr_en:0x%x\n",
              pFix->ynr_thumb_mix_cur_en,
              pFix->ynr_gate_dis,
              pFix->ynr_rnr_en);
@@ -440,6 +500,11 @@ Aynr_result_V3_t ynr_fix_printf_V3(RK_YNR_Fix_V3_t * pFix)
         LOGD_ANR("(0x0028) ynr_base_filter_weight[%d]:0x%x \n",
                  i, pFix->ynr_base_filter_weight[i]);
     }
+
+    // YNR_2700_HIGHNR_CTRL1  (0x002c)
+    LOGD_ANR("(0x002c) ynr_frame_full_size:0x%x ynr_lbf_weight_thres:0x%x \n",
+             pFix->ynr_frame_full_size,
+             pFix->ynr_lbf_weight_thres);
 
     // YNR_2700_GAUSS1_COEFF  (0x0030)
     for(int i = 0; i < 3; i++) {

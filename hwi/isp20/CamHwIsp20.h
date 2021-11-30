@@ -19,6 +19,7 @@
 #ifndef _CAM_HW_ISP20_H_
 #define _CAM_HW_ISP20_H_
 
+#include <linux/rk-video-format.h>
 #include "CamHwBase.h"
 #include "Isp20Params.h"
 #include "SensorHw.h"
@@ -77,7 +78,7 @@ public:
     XCamReturn getZoomPosition(int& position);
     XCamReturn getLensVcmCfg(rk_aiq_lens_vcmcfg& lens_cfg);
     XCamReturn setLensVcmCfg(rk_aiq_lens_vcmcfg& lens_cfg);
-    XCamReturn setLensVcmCfg();
+    XCamReturn setLensVcmCfg(struct rkmodule_inf& mod_info);
     XCamReturn FocusCorrection();
     XCamReturn ZoomCorrection();
     XCamReturn setAngleZ(float angleZ);
@@ -106,6 +107,8 @@ public:
     //should be called after prepare
     XCamReturn get_stream_format(rkaiq_stream_type_t type, struct v4l2_format &format);
     XCamReturn get_sp_resolution(int &width, int &height, int &aligned_w, int &aligned_h);
+    XCamReturn showOtpPdafData(struct rkmodule_pdaf_inf *otp_pdaf);
+    XCamReturn showOtpAfData(struct rkmodule_af_inf *otp_af);
     virtual XCamReturn setIspStreamMode(rk_isp_stream_mode_t mode) {
         if (mode == RK_ISP_STREAM_MODE_ONLNIE) {
             mNoReadBack = true;
@@ -122,6 +125,7 @@ public:
         else
             return RK_ISP_STREAM_MODE_OFFLNIE;
     }
+    void notify_isp_stream_status(bool on);
 private:
     XCamReturn handlePpReslut(SmartPtr<cam3aResult> &result);
     XCamReturn setPpConfig(SmartPtr<cam3aResult> &result);
@@ -270,6 +274,7 @@ protected:
     SmartPtr<RKStream>          mIspParamStream;
     SmartPtr<RKSofEventStream>  mIspSofStream;
     SmartPtr<SPStreamProcUnit> mSpStreamUnit;
+    SmartPtr<RkStreamEventPollThread> mIspStremEvtTh;
 
     SmartPtr<RawStreamCapUnit> mRawCapUnit;
     SmartPtr<RawStreamProcUnit> mRawProcUnit;
@@ -287,6 +292,12 @@ protected:
     uint32_t mPpModuleInitEns;
     bool mVicapIspPhyLinkSupported; // if phsical link between vicap and isp, only isp3x support now
     SmartPtr<IspParamsSplitter> mParamsSplitter;
+    enum ISP_STREAM_STATUS_E {
+        ISP_STREAM_STATUS_INVALID,
+        ISP_STREAM_STATUS_STREAM_ON,
+        ISP_STREAM_STATUS_STREAM_OFF,
+    };
+    int _isp_stream_status;
 };
 
 };

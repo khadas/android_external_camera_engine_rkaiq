@@ -1625,7 +1625,8 @@ RkAiqAfHandleInt::setAttrib(rk_aiq_af_attrib_t *att)
         // called by RkAiqCore
 
         // if something changed
-        if (0 != memcmp(&mCurAtt, att, sizeof(rk_aiq_af_attrib_t))) {
+        if ((0 != memcmp(&mCurAtt, att, sizeof(rk_aiq_af_attrib_t))) ||
+            (mCurAtt.AfMode == RKAIQ_AF_MODE_AUTO)) {
             mNewAtt = *att;
             updateAtt = true;
             isUpdateAttDone = false;
@@ -5960,6 +5961,28 @@ RkAiqAgicHandleInt::processing()
 
     comb->agic_proc_res = NULL;
     agic_proc_int->hdr_mode = sharedCom->working_mode;
+    switch (sharedCom->snsDes.sensor_pixelformat) {
+    case V4L2_PIX_FMT_SBGGR14:
+    case V4L2_PIX_FMT_SGBRG14:
+    case V4L2_PIX_FMT_SGRBG14:
+    case V4L2_PIX_FMT_SRGGB14:
+        agic_proc_int->raw_bits = 14;
+        break;
+    case V4L2_PIX_FMT_SBGGR12:
+    case V4L2_PIX_FMT_SGBRG12:
+    case V4L2_PIX_FMT_SGRBG12:
+    case V4L2_PIX_FMT_SRGGB12:
+        agic_proc_int->raw_bits = 12;
+        break;
+    case V4L2_PIX_FMT_SBGGR10:
+    case V4L2_PIX_FMT_SGBRG10:
+    case V4L2_PIX_FMT_SGRBG10:
+    case V4L2_PIX_FMT_SRGGB10:
+        agic_proc_int->raw_bits = 10;
+        break;
+    default:
+        agic_proc_int->raw_bits = 8;
+    }
 
     RkAiqAlgoDescription* des = (RkAiqAlgoDescription*)mDes;
     ret = des->processing(mProcInParam, mProcOutParam);

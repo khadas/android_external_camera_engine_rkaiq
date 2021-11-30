@@ -1795,6 +1795,7 @@ Isp20Params::convertAiqLscToIsp20Params(T& isp_cfg,
 
 #ifdef ISP_HW_V30
     struct isp3x_lsc_cfg *  cfg = &isp_cfg.others.lsc_cfg;
+    cfg->sector_16x16 = true;
 #else
     struct isp2x_lsc_cfg *  cfg = &isp_cfg.others.lsc_cfg;
 #endif

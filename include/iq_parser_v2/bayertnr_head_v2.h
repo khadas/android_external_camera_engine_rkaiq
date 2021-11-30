@@ -68,7 +68,7 @@ typedef struct CalibDbV2_BayerTnr_V2_TuningPara_Setting_ISO_s {
     // M4_NUMBER_MARK_DESC("iso", "f32", M4_RANGE(50, 204800), "50", M4_DIGIT(1), "index2")
     float iso;
 
-    // M4_NUMBER_DESC("thumbds", "f32", M4_RANGE(0, 1), "0.5", M4_DIGIT(2))
+    // M4_NUMBER_DESC("thumbds", "f32", M4_RANGE(0, 8), "8", M4_DIGIT(2))
     float thumbds;
 
     // M4_BOOL_DESC("lo_enable", "1")

@@ -185,7 +185,7 @@ if(EXISTS "${CMAKE_SOURCE_DIR}/algos/adrc/rk_aiq_algo_adrc_itf.cpp")
 	set_target_properties(rkaiq_adrc PROPERTIES C_VISIBILITY_PRESET default)
 	set_target_properties(rkaiq_adrc PROPERTIES CXX_VISIBILITY_PRESET default)
 else()
-	message(STATUS "Can NOT found 
+	message(STATUS "Can NOT found
 	${CMAKE_SOURCE_DIR}/algos/adrc/rk_aiq_algo_adrc_itf.cpp. Using lib")
 	add_library(rkaiq_adrc STATIC IMPORTED)
 	set_target_properties(rkaiq_adrc PROPERTIES IMPORTED_LOCATION
@@ -306,9 +306,7 @@ endif()
 set (ADHAZ_SRC
 	adehaze/rk_aiq_algo_adhaz_itf.cpp
     adehaze/rk_aiq_adehaze_algo.cpp
-
     adehaze/rk_aiq_uapi_adehaze_int.cpp
-
     )
 
 if(EXISTS "${CMAKE_SOURCE_DIR}/algos/adehaze/rk_aiq_algo_adhaz_itf.cpp")
@@ -545,7 +543,7 @@ if(EXISTS "${CMAKE_SOURCE_DIR}/algos/adegamma/rk_aiq_algo_adegamma_itf.cpp")
 	set_target_properties(rkaiq_adegamma PROPERTIES C_VISIBILITY_PRESET default)
 	set_target_properties(rkaiq_adegamma PROPERTIES CXX_VISIBILITY_PRESET default)
 else()
-	message(STATUS "Can NOT found 
+	message(STATUS "Can NOT found
 	${CMAKE_SOURCE_DIR}/algos/adegamma/rk_aiq_algo_adegamma_itf.cpp. Using lib")
 	add_library(rkaiq_adegamma STATIC IMPORTED)
 	set_target_properties(rkaiq_adegamma PROPERTIES IMPORTED_LOCATION

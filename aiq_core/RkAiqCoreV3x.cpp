@@ -141,7 +141,7 @@ static struct RkAiqAlgoDesCommExt g_default_3a_des_v3x[] = {
     { &g_RkIspAlgoDescAcp.common, RK_AIQ_CORE_ANALYZE_OTHER, 0, 0, otherGrpCondsV3x },
     { &g_RkIspAlgoDescAie.common, RK_AIQ_CORE_ANALYZE_OTHER, 0, 0, otherGrpCondsV3x },
     { &g_RkIspAlgoDescAdpcc.common, RK_AIQ_CORE_ANALYZE_OTHER, 0, 0, otherGrpCondsV3x},
-    //{ &g_RkIspAlgoDescAldch.common, RK_AIQ_CORE_ANALYZE_OTHER, 0, 0, otherGrpCondsV3x },
+    { &g_RkIspAlgoDescAldch.common, RK_AIQ_CORE_ANALYZE_OTHER, 0, 0, otherGrpCondsV3x },
     { &g_RkIspAlgoDescAcgc.common, RK_AIQ_CORE_ANALYZE_OTHER, 0, 0, otherGrpCondsV3x },
     { &g_RkIspAlgoDescAr2y.common, RK_AIQ_CORE_ANALYZE_OTHER, 0, 0, otherGrpCondsV3x },
     { &g_RkIspAlgoDescAf.common, RK_AIQ_CORE_ANALYZE_AF, 0, 1, afGrpCondsV3x },
@@ -1290,23 +1290,6 @@ RkAiqCoreV3x::genIspAfResult(RkAiqFullParams* params)
         p_focus_param->vcm_end_ma = af_rk->af_proc_res_com.af_focus_param.vcm_end_ma;
         p_focus_param->vcm_config_valid = af_rk->af_proc_res_com.af_focus_param.vcm_config_valid;
 
-        {
-            SmartPtr<RkAiqHandle>* ae_handle = getCurAlgoTypeHandle(RK_AIQ_ALGO_TYPE_AE);
-            int algo_id = (*ae_handle)->getAlgoId();
-
-            if (ae_handle) {
-                if ((algo_id == 0) && (af_rk->af_proc_res_com.lockae_en)) {
-                    RkAiqAeHandleInt *ae_algo = dynamic_cast<RkAiqAeHandleInt*>(ae_handle->ptr());
-                    Uapi_ExpSwAttr_t expSwAttr;
-
-                    ae_algo->getExpSwAttr(&expSwAttr);
-                    if (expSwAttr.enable != !af_rk->af_proc_res_com.lockae) {
-                        expSwAttr.enable = !af_rk->af_proc_res_com.lockae;
-                        ae_algo->setExpSwAttr(expSwAttr);
-                    }
-                }
-            }
-        }
     }
 
     EXIT_ANALYZER_FUNCTION();

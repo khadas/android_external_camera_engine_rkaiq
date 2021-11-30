@@ -1084,6 +1084,7 @@ typedef struct _RkAiqAlgoProcAgicInt {
     RkAiqAlgoProcAgic agic_proc_com;
     RkAiqAlgoComInt rk_com;
     int hdr_mode;
+    uint8_t raw_bits;
 } RkAiqAlgoProcAgicInt;
 
 typedef struct _RkAiqAlgoProcResAgicInt {

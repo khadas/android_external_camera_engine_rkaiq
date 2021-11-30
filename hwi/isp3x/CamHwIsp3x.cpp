@@ -264,6 +264,7 @@ CamHwIsp3x::overrideExpRatioToAiqResults(const sint32_t frameId,
     float nextMExpo = 0;
     float nextSExpo = 0;
     float nextRatioLS = 1.0;
+    float nextRatioLM = 1.0;
     if(hdr_mode == RK_AIQ_WORKING_MODE_NORMAL) {
         nextLExpo = nextFrameExpParam->data()->aecExpInfo.LinearExp.exp_real_params.analog_gain * \
                     nextFrameExpParam->data()->aecExpInfo.LinearExp.exp_real_params.integration_time;
@@ -287,11 +288,32 @@ CamHwIsp3x::overrideExpRatioToAiqResults(const sint32_t frameId,
     }
     else {
         LOGE_CAMHW_SUBM(ISP20HW_SUBM, "get wrong hdr mode\n");
-        return ret;
+        return XCAM_RETURN_ERROR_PARAM;
     }
 
-    nextRatioLS = nextLExpo / nextSExpo;
-    nextRatioLS = nextRatioLS >= 1 ? nextRatioLS : 1;
+    if(nextMExpo > 0) {
+        nextRatioLM = nextLExpo / nextMExpo;
+        if(nextRatioLM < 1) {
+            LOGE_CAMHW_SUBM(ISP20HW_SUBM, "Middle frame expo is bigger than Long Frame!!!\n");
+            return XCAM_RETURN_ERROR_PARAM;
+        }
+    }
+    else {
+        LOGE_CAMHW_SUBM(ISP20HW_SUBM, "Middle frame expo is ERROR!!!\n");
+        return XCAM_RETURN_ERROR_PARAM;
+    }
+
+    if(nextSExpo > 0) {
+        nextRatioLS = nextLExpo / nextSExpo;
+        if(nextRatioLS < 1) {
+            LOGE_CAMHW_SUBM(ISP20HW_SUBM, "Short frame expo is bigger than Long Frame!!!\n");
+            return XCAM_RETURN_ERROR_PARAM;
+        }
+    }
+    else {
+        LOGE_CAMHW_SUBM(ISP20HW_SUBM, "Short frame expo is ERROR!!!\n");
+        return XCAM_RETURN_ERROR_PARAM;
+    }
 
     switch (module_id) {
     case Rk_ISP21_DRC_ID:
@@ -383,8 +405,11 @@ CamHwIsp3x::overrideExpRatioToAiqResults(const sint32_t frameId,
             merge.Merge_v30.sw_hdrmge_gain0_inv = (int)(4096 * (1 / nextRatioLS));
 
         //get sw_hdrmge_gain1
-        merge.Merge_v30.sw_hdrmge_gain1 = 0x40;
-        merge.Merge_v30.sw_hdrmge_gain1_inv = 0xfff;
+        merge.Merge_v30.sw_hdrmge_gain1 = (int)(64 * nextRatioLM);
+        if(nextRatioLM == 1)
+            merge.Merge_v30.sw_hdrmge_gain1_inv = (int)(4096 * (1 / nextRatioLM) - 1);
+        else
+            merge.Merge_v30.sw_hdrmge_gain1_inv = (int)(4096 * (1 / nextRatioLM));
 
         //get sw_hdrmge_gain2
         merge.Merge_v30.sw_hdrmge_gain2 = 0x40;
@@ -405,8 +430,9 @@ CamHwIsp3x::overrideExpRatioToAiqResults(const sint32_t frameId,
         merge.Merge_v30.sw_hdrmge_lm_scl = (int)(64 * sw_hdrmge_lm_scl);
 
 
-        LOGD_CAMHW_SUBM(ISP20HW_SUBM, "sw_hdrmge_gain0:%d sw_hdrmge_gain0_inv:%d\n",
-                        merge.Merge_v30.sw_hdrmge_gain0, merge.Merge_v30.sw_hdrmge_gain0_inv);
+        LOGD_CAMHW_SUBM(ISP20HW_SUBM, "sw_hdrmge_gain0:%d sw_hdrmge_gain0_inv:%d sw_hdrmge_gain1:%d sw_hdrmge_gain1_inv:%d sw_hdrmge_gain2:%d\n",
+                        merge.Merge_v30.sw_hdrmge_gain0, merge.Merge_v30.sw_hdrmge_gain0_inv,
+                        merge.Merge_v30.sw_hdrmge_gain1, merge.Merge_v30.sw_hdrmge_gain1_inv, merge.Merge_v30.sw_hdrmge_gain2);
         LOGD_CAMHW_SUBM(ISP20HW_SUBM, "sw_hdrmge_ms_thd0:%d sw_hdrmge_ms_thd1:%d sw_hdrmge_ms_scl:%d\n",
                         merge.Merge_v30.sw_hdrmge_ms_thd0, merge.Merge_v30.sw_hdrmge_ms_thd1, merge.Merge_v30.sw_hdrmge_ms_scl);
         LOGD_CAMHW_SUBM(ISP20HW_SUBM, "sw_hdrmge_lm_thd0:%d sw_hdrmge_lm_thd1:%d sw_hdrmge_lm_scl:%d\n",
@@ -511,7 +537,9 @@ CamHwIsp3x::setIspConfig()
     // now use Isp21Params::merge_isp_results instead
     if (Isp3xParams::merge_isp_results(ready_results, update_params) != XCAM_RETURN_NO_ERROR)
         LOGE_CAMHW_SUBM(ISP20HW_SUBM, "ISP parameter translation error\n");
-
+    if(mIsMultiIspMode == false) {
+        Isp3xParams::fixedAwbOveflowToIsp3xParams(update_params, mIsMultiIspMode);
+    }
     uint64_t module_en_update_partial = 0;
     uint64_t module_cfg_update_partial = 0;
     gen_full_isp_params(update_params, &_full_active_isp3x_params,
@@ -529,7 +557,6 @@ CamHwIsp3x::setIspConfig()
     module_en_update_partial = _full_active_isp3x_params.module_en_update;
     module_cfg_update_partial = _full_active_isp3x_params.module_cfg_update;
 #endif
-
 
 
     if (v4l2buf.ptr()) {
@@ -579,9 +606,10 @@ CamHwIsp3x::setIspConfig()
             }
         }
 #endif
+
         if (isMultiIsp) {
             mParamsSplitter->SplitIspParams(&_full_active_isp3x_params, isp_params);
-
+            Isp3xParams::fixedAwbOveflowToIsp3xParams((void*)isp_params, mIsMultiIspMode);
             memcpy(&((isp_params + 1)->others.cac_cfg), &update_params[1].others.cac_cfg,
                    sizeof(struct isp3x_cac_cfg));
         }
