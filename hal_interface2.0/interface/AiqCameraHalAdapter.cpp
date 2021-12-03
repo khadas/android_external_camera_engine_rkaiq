@@ -479,7 +479,12 @@ AiqCameraHalAdapter::updateAeMetaParams(XCamAeParam *aeParams){
         stExpWin.v_offs = aeParams->window.y_start;
         stExpWin.h_size = aeParams->window.x_end - aeParams->window.x_start;
         stExpWin.v_size = aeParams->window.y_end - aeParams->window.y_start;
-    }
+    }else {
+        stExpWin.h_offs = 0;
+        stExpWin.v_offs = 0;
+        stExpWin.h_size = _inputParams->sensorOutputWidth;
+        stExpWin.v_size = _inputParams->sensorOutputHeight;
+     }
 
     if (aeParams->exposure_time_max == aeParams->exposure_time_min) {
         stExpSwAttr.stAuto.stFrmRate.isFpsFix = true;
@@ -610,7 +615,12 @@ AiqCameraHalAdapter::updateAfMetaParams(XCamAfParam *afParams){
         stAfttr.v_offs = afParams->focus_rect[0].top_voff;
         stAfttr.h_size= afParams->focus_rect[0].right_width;
         stAfttr.v_size = afParams->focus_rect[0].bottom_height;
-    }
+    } else {
+        stAfttr.h_offs = 0;
+        stAfttr.v_offs = 0;
+        stAfttr.h_size = 0;
+        stAfttr.v_size = 0;
+     }
 
     pthread_mutex_lock(&_aiq_ctx_mutex);
     //when in Locked state, not run AF Algorithm
