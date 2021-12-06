@@ -21,7 +21,6 @@
 #include "xcam_log.h"
 #include "rk_aiq_types_adrc_algo_prvt.h"
 
-
 /******************************************************************************
  * AdrcStart()
  *****************************************************************************/
@@ -419,10 +418,8 @@ void AdrcGetAeResult
     }
 
     //Normalize the current envLv for AEC
-    float maxEnvLuma = 65 / 10;
-    float minEnvLuma = 0;
-    pAdrcCtx->CurrData.EnvLv = (pAdrcCtx->CurrAeResult.GlobalEnvLv  - minEnvLuma) / (maxEnvLuma - minEnvLuma);
-    pAdrcCtx->CurrData.EnvLv = LIMIT_VALUE(pAdrcCtx->CurrData.EnvLv, 1, 0);
+    pAdrcCtx->CurrData.EnvLv = (pAdrcCtx->CurrAeResult.GlobalEnvLv  - MIN_ENV_LV) / (MAX_ENV_LV - MIN_ENV_LV);
+    pAdrcCtx->CurrData.EnvLv = LIMIT_VALUE(pAdrcCtx->CurrData.EnvLv, ENVLVMAX, ENVLVMIN);
 
     LOGD_ATMO("%s:  Current Ratio:%f\n", __FUNCTION__, pAdrcCtx->CurrData.Ratio);
 

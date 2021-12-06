@@ -188,9 +188,7 @@ void AmergeGetAeResult
     }
 
     //Normalize the current envLv for AEC
-    float maxEnvLuma = 65 / 10;
-    float minEnvLuma = 0;
-    pAmergeCtx->CurrData.CtrlData.EnvLv = (pAmergeCtx->AeResult.GlobalEnvLv  - minEnvLuma) / (maxEnvLuma - minEnvLuma);
+    pAmergeCtx->CurrData.CtrlData.EnvLv = (pAmergeCtx->AeResult.GlobalEnvLv  - MIN_ENV_LV) / (MAX_ENV_LV - MIN_ENV_LV);
     pAmergeCtx->CurrData.CtrlData.EnvLv = LIMIT_VALUE(pAmergeCtx->CurrData.CtrlData.EnvLv, ENVLVMAX, ENVLVMIN);
 
     LOGV_AMERGE("%s:  Current CtrlData.L2S_Ratio:%f CtrlData.L2M_Ratio:%f CtrlData.L2L_Ratio:%f\n", __FUNCTION__, pAmergeCtx->CurrData.CtrlData.L2S_Ratio,

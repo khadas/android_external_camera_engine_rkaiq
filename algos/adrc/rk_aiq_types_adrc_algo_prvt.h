@@ -20,23 +20,7 @@
 #include "xcam_log.h"
 #include "rk_aiq_types_adrc_stat_v200.h"
 #include "RkAiqCalibDbV2Helper.h"
-
-
-
-
-#define LIMIT_VALUE(value,max_value,min_value)      (value > max_value? max_value : value < min_value ? min_value : value)
-#define SHIFT4BIT(A)         (A*16)
-#define SHIFT6BIT(A)         (A*64)
-#define SHIFT7BIT(A)         (A*128)
-#define SHIFT8BIT(A)         (A*256)
-#define SHIFT10BIT(A)         (A*1024)
-#define SHIFT11BIT(A)         (A*2048)
-#define SHIFT12BIT(A)         (A*4096)
-#define SHIFT13BIT(A)         (A*8191)
-#define SHIFT14BIT(A)         (A*16383)
-#define SHIFT15BIT(A)         (A*32767)
-
-#define LIMIT_PARA(a,b,c,d,e)      (c+(a-e)*(b-c)/(d -e))
+#include "amerge/rk_aiq_types_amerge_algo_prvt.h"
 
 
 #define DRCGAINMAX     (8)
@@ -49,7 +33,6 @@
 #define ADRCNORMALIZEMIN     (0.0)
 #define ADRCNORMALIZEINTMAX     (1)
 #define ADRCNORMALIZEINTMIN     (0)
-
 #define SPACESGMMAX     (4095)
 #define SPACESGMMIN     (0)
 #define SCALEYMAX     (2048)
@@ -58,20 +41,12 @@
 #define MANUALCURVEMIN     (0)
 #define IIRFRAMEMAX     (1000)
 #define IIRFRAMEMIN     (0)
-#define ISOMIN     (50)
-#define ISOMAX     (204800)
-
 #define INT8BITMAX     (255)
 #define INT14BITMAX     (16383)
-
-
-
 #define SW_DRC_OFFSET_POW2_FIX (8)
 #define SW_DRC_MOTION_SCL_FIX (0)
 #define SW_DRC_BILAT_WT_OFF_FIX (255)
 #define MAX_AE_DRC_GAIN (256)
-
-
 
 typedef enum AdrcState_e {
     ADRC_STATE_INVALID       = 0,
@@ -116,7 +91,6 @@ typedef struct LocalDataConfigV2_s
     float*            GlobalContrast;
     float*            LoLitContrast;
 } LocalDataConfigV2_t;
-
 
 typedef struct DrcOhters_s
 {
@@ -206,14 +180,12 @@ typedef struct DrcHandleDataV21_s
     uint16_t       Manual_curve[ADRC_Y_NUM];
 } DrcHandleDataV21_t;
 
-
 typedef struct DrcHandleData_s {
     union {
         DrcHandleDataV20_t Drc_v20;
         DrcHandleDataV21_t Drc_v21;
     };
 } DrcHandleData_t;
-
 
 typedef struct AdrcPrevData_s
 {

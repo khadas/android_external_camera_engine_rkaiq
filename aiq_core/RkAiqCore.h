@@ -306,6 +306,8 @@ public:
 
     void setCamGroupManager(RkAiqCamGroupManager* cam_group_manager) {
         mCamGroupCoreManager = cam_group_manager;
+        if (mTranslator.ptr() && cam_group_manager)
+            mTranslator->setGroupMode(true);
     }
     // called only once
     XCamReturn init(const char* sns_ent_name, const CamCalibDbContext_t* aiqCalib,

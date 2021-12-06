@@ -21,20 +21,35 @@
 #include "xcam_log.h"
 
 
-#define LIMIT_VALUE(value,max_value,min_value)      (value > max_value? max_value : value < min_value ? min_value : value)
+/********************also use for dehaze, tmo and drc*******************/
+//for noramlize EnvLv
+#define MAX_ENV_LUMA (65)
+#define MAX_ENV_EXPO (10.0*1.0)
+#define MIN_ENV_LUMA (0)
+#define MIN_ENV_EXPO (30.0*256.0)
+#define MAX_ENV_LV (MAX_ENV_LUMA / MAX_ENV_EXPO)
+#define MIN_ENV_LV (MIN_ENV_LUMA / MIN_ENV_EXPO)
+#define ENVLVMAX     (1.0)
+#define ENVLVMIN     (0.0)
+#define ISOMIN     (50)
+#define ISOMAX     (204800)
+#define BIGMODE     (2560)
+#define SHIFT4BIT(A)         (A*16)
 #define SHIFT6BIT(A)         (A*64)
 #define SHIFT7BIT(A)         (A*128)
+#define SHIFT8BIT(A)         (A*256)
 #define SHIFT10BIT(A)         (A*1024)
 #define SHIFT11BIT(A)         (A*2048)
 #define SHIFT12BIT(A)         (A*4096)
-
+#define SHIFT13BIT(A)         (A*8191)
+#define SHIFT14BIT(A)         (A*16383)
+#define SHIFT15BIT(A)         (A*32767)
+#define LIMIT_VALUE(value,max_value,min_value)      (value > max_value? max_value : value < min_value ? min_value : value)
 #define LIMIT_PARA(a,b,c,d,e)      (c+(a-e)*(b-c)/(d -e))
-
+/****************************************************************************/
 
 #define MAXLUMAK     (1.5)
 #define MAXLUMAB     (30)
-#define ENVLVMAX     (1.0)
-#define ENVLVMIN     (0.0)
 #define MOVECOEFMAX     (1.0)
 #define MOVECOEFMIN     (0.0)
 #define OECURVESMOOTHMAX     (200)
@@ -52,7 +67,6 @@
 #define IQPARAMAX     (1)
 #define IQPARAMIN     (0)
 #define AMERGE_MAX_IQ_DOTS (13)
-
 
 typedef enum AmergeState_e {
     AMERGE_STATE_INVALID       = 0,

@@ -433,7 +433,7 @@ void GetDehazeParamsV21(CalibDbDehazeV21_t* pCalibV21, RkAiqAdehazeProcResult_t*
     ProcRes->ProcResV21.range_sima = int(range_sigma * 512); //0~512,(9bit) range_sima
     ProcRes->ProcResV21.space_sigma_cur = int(space_sigma_cur * 256); //0~256,(8bit) space_sigma_cur
     ProcRes->ProcResV21.space_sigma_pre = int(space_sigma_pre * 256); //0~256,(8bit) space_sigma_pre
-    ProcRes->ProcResV21.bf_weight      = int(bf_weight * 512); //0~512, (9bit) dc_thed
+    ProcRes->ProcResV21.bf_weight      = int(bf_weight * 256); //0~512, (8bit) dc_thed
     ProcRes->ProcResV21.dc_weitcur       = int(dc_weitcur * 256 + 0.5); //0~256, (9bit) dc_weitcur
     ProcRes->ProcResV21.gaus_h0    = int(gaus_h[4]);//h0~h2  从大到小
     ProcRes->ProcResV21.gaus_h1    = int(gaus_h[1]);
@@ -534,7 +534,7 @@ void GetDehazeParamsV30(CalibDbDehazeV21_t* pCalibV21, RkAiqAdehazeProcResult_t*
     ProcRes->ProcResV30.range_sima = int(range_sigma * 512); //0~512,(9bit) range_sima
     ProcRes->ProcResV30.space_sigma_cur = int(space_sigma_cur * 256); //0~256,(8bit) space_sigma_cur
     ProcRes->ProcResV30.space_sigma_pre = int(space_sigma_pre * 256); //0~256,(8bit) space_sigma_pre
-    ProcRes->ProcResV30.bf_weight      = int(bf_weight * 512); //0~512, (9bit) dc_thed
+    ProcRes->ProcResV30.bf_weight      = int(bf_weight * 256); //0~512, (8bit) dc_thed
     ProcRes->ProcResV30.dc_weitcur       = int(dc_weitcur * 256 + 0.5); //0~256, (9bit) dc_weitcur
     ProcRes->ProcResV30.gaus_h0    = int(gaus_h[4]);//h0~h2  从大到小
     ProcRes->ProcResV30.gaus_h1    = int(gaus_h[1]);
@@ -1445,9 +1445,7 @@ void AdehazeGetEnvLvISO
     pAdehazeCtx->CurrData.V21.EnvLv = pAePreRes->ae_pre_res_rk.GlobalEnvLv[pAePreRes->ae_pre_res_rk.NormalIndex];
 
     //Normalize the current envLv for AEC
-    float maxEnvLuma = 65 / 10;
-    float minEnvLuma = 0;
-    pAdehazeCtx->CurrData.V21.EnvLv = (pAdehazeCtx->CurrData.V21.EnvLv  - minEnvLuma) / (maxEnvLuma - minEnvLuma);
+    pAdehazeCtx->CurrData.V21.EnvLv = (pAdehazeCtx->CurrData.V21.EnvLv  - MIN_ENV_LV) / (MAX_ENV_LV - MIN_ENV_LV);
     pAdehazeCtx->CurrData.V21.EnvLv = LIMIT_VALUE(pAdehazeCtx->CurrData.V21.EnvLv, ENVLVMAX, ENVLVMIN);
 
     //get iso
@@ -1709,7 +1707,7 @@ XCamReturn AdehazeProcess(AdehazeHandle_t* pAdehazeCtx, AdehazeVersion_t version
     if(version == ADEHAZE_ISP20) {
         CtrlValue = pAdehazeCtx->CurrData.V20.ISO;
         //big mode
-        pAdehazeCtx->ProcRes.ProcResV20.big_en = pAdehazeCtx->width > DEHAZEBIGMODE ? 1 : 0;
+        pAdehazeCtx->ProcRes.ProcResV20.big_en = pAdehazeCtx->width > BIGMODE ? 1 : 0;
         pAdehazeCtx->ProcRes.ProcResV20.nobig_en = (int)(1 - pAdehazeCtx->ProcRes.ProcResV20.big_en);
 
         if(pAdehazeCtx->AdehazeAtrr.AdehazeAtrrV20.mode == DEHAZE_API_BYPASS)

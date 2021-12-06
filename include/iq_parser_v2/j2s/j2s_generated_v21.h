@@ -2,8 +2,8 @@
 #include <stdint.h>
 #include "j2s.h"
 
-#define J2S_MAGIC 2143407252
-#define J2S_NUM_OBJ 2431
+#define J2S_MAGIC 550237284
+#define J2S_NUM_OBJ 2430
 #define J2S_NUM_STRUCT 457
 #define J2S_NUM_ENUM 55
 #define J2S_NUM_ENUM_VALUE 230
@@ -78,7 +78,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2] = "alias='Coeff', type='s32', size='[1, 3]', range='[-65535, 65535]', default='0', digit='[0]', dynamic='0', hide='0'";
+	ctx->descs[2] = "alias='Coeff', type='s32', size='[1, 3]', range='[-65535, 65535]', default='0', digit='[0]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[3];
@@ -224,7 +224,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[13] = "alias='fCoeff', type='f32', size='[1, 3]', range='[-65535, 65535]', default='0', digit='[6]', dynamic='0', hide='0'";
+	ctx->descs[13] = "alias='fCoeff', type='f32', size='[1, 3]', range='[-65535, 65535]', default='0', digit='[6]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[14];
@@ -240,7 +240,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[14] = "alias='fCoeff', type='f32', size='[1, 4]', range='[-65535, 65535]', default='0', digit='[6]', dynamic='0', hide='0'";
+	ctx->descs[14] = "alias='fCoeff', type='f32', size='[1, 4]', range='[-65535, 65535]', default='0', digit='[6]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[15];
@@ -321,7 +321,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[20] = "alias='fCoeff', type='f32', size='[1, 2]', range='[-65535, 65535]', default='0', digit='[6]', dynamic='0', hide='0'";
+	ctx->descs[20] = "alias='fCoeff', type='f32', size='[1, 2]', range='[-65535, 65535]', default='0', digit='[6]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[21];
@@ -415,7 +415,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[27] = "alias='fCoeff', type='s16', size='[1, 3]', range='[-65535, 65535]', default='0', digit='[0]', dynamic='0', hide='0'";
+	ctx->descs[27] = "alias='fCoeff', type='s16', size='[1, 3]', range='[-65535, 65535]', default='0', digit='[0]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[28];
@@ -457,7 +457,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[30] = "alias='uCoeff', type='u16', size='[17, 17]', range='[0, 10000]', default='1024', digit='[0]', dynamic='0', hide='0'";
+	ctx->descs[30] = "alias='uCoeff', type='u16', size='[17, 17]', range='[0, 10000]', default='1024', digit='[0]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[31];
@@ -473,7 +473,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[31] = "alias='BlackDelay', type='u8', size='[1,1]', range='[0, 255]', default='0', digit='[0]', hide='0'";
+	ctx->descs[31] = "alias='BlackDelay', type='u8', size='[1,1]', range='[0, 255]', default='0', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[32];
@@ -489,7 +489,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[32] = "alias='WhiteDelay', type='u8', size='[1,1]', range='[0, 255]', default='0', digit='[0]', hide='0'";
+	ctx->descs[32] = "alias='WhiteDelay', type='u8', size='[1,1]', range='[0, 255]', default='0', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[33];
@@ -505,7 +505,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[33] = "alias='DampOver', type='f32', size='[1,1]', range='[0, 1.00]', default='0.15', digit='[2]', hide='0'";
+	ctx->descs[33] = "alias='DampOver', type='f32', size='[1,1]', range='[0, 1.00]', default='0.15', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[34];
@@ -521,7 +521,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[34] = "alias='DampUnder', type='f32', size='[1,1]', range='[0, 1.00]', default='0.45', digit='[2]', hide='0'";
+	ctx->descs[34] = "alias='DampUnder', type='f32', size='[1,1]', range='[0, 1.00]', default='0.45', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[35];
@@ -537,7 +537,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[35] = "alias='DampDark2Bright', type='f32', size='[1,1]', range='[0, 1.00]', default='0.15', digit='[2]', hide='0'";
+	ctx->descs[35] = "alias='DampDark2Bright', type='f32', size='[1,1]', range='[0, 1.00]', default='0.15', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[36];
@@ -553,7 +553,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[36] = "alias='DampBright2Dark', type='f32', size='[1,1]', range='[0, 1.00]', default='0.45', digit='[2]', hide='0'";
+	ctx->descs[36] = "alias='DampBright2Dark', type='f32', size='[1,1]', range='[0, 1.00]', default='0.45', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[37];
@@ -569,7 +569,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[37] = "type='bool', alias='isFpsFix', default='1', hide='0'";
+	ctx->descs[37] = "type='bool', alias='isFpsFix', default='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[38];
@@ -585,7 +585,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[38] = "alias='FpsValue', type='f32', size='[1,1]', range='[0, 200]', default='0', digit='[1]', hide='0'";
+	ctx->descs[38] = "alias='FpsValue', type='f32', size='[1,1]', range='[0, 200]', default='0', digit='[1]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[39];
@@ -601,7 +601,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[39] = "type='bool', alias='enable', default='1', hide='0'";
+	ctx->descs[39] = "type='bool', alias='enable', default='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[40];
@@ -617,7 +617,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = 14;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[40] = "type='enum', alias='Frequency', enum_def='CalibDb_FlickerFreqV2_t', default='AECV2_FLICKER_FREQUENCY_50HZ'";
+	ctx->descs[40] = "type='enum', alias='Frequency', enum_def='CalibDb_FlickerFreqV2_t', default='AECV2_FLICKER_FREQUENCY_50HZ', ro='0'";
 #endif
 
 	obj = &ctx->objs[41];
@@ -633,7 +633,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = 15;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[41] = "type='enum', alias='Mode', enum_def='CalibDb_AntiFlickerModeV2_t', default='AECV2_ANTIFLICKER_AUTO_MODE'";
+	ctx->descs[41] = "type='enum', alias='Mode', enum_def='CalibDb_AntiFlickerModeV2_t', default='AECV2_ANTIFLICKER_AUTO_MODE', ro='0'";
 #endif
 
 	obj = &ctx->objs[42];
@@ -649,7 +649,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[42] = "type='bool', alias='ManualTimeEn', default='1', hide='0'";
+	ctx->descs[42] = "type='bool', alias='ManualTimeEn', default='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[43];
@@ -665,7 +665,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[43] = "type='bool', alias='ManualGainEn', default='1', hide='0'";
+	ctx->descs[43] = "type='bool', alias='ManualGainEn', default='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[44];
@@ -681,7 +681,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[44] = "type='bool', alias='ManualIspDgainEn', default='1', hide='0'";
+	ctx->descs[44] = "type='bool', alias='ManualIspDgainEn', default='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[45];
@@ -697,7 +697,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[45] = "alias='TimeValue', type='f32', size='[1,1]', range='[0, 1]', default='0.003', digit='[6]', hide='0'";
+	ctx->descs[45] = "alias='TimeValue', type='f32', size='[1,1]', range='[0, 1]', default='0.003', digit='[6]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[46];
@@ -713,7 +713,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[46] = "alias='GainValue', type='f32', size='[1,1]', range='[1, 4096]', default='1', digit='[3]', hide='0'";
+	ctx->descs[46] = "alias='GainValue', type='f32', size='[1,1]', range='[1, 4096]', default='1', digit='[3]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[47];
@@ -729,7 +729,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[47] = "alias='IspDGainValue', type='f32', size='[1,1]', range='[1, 4096]', default='1', digit='[3]', hide='0'";
+	ctx->descs[47] = "alias='IspDGainValue', type='f32', size='[1,1]', range='[1, 4096]', default='1', digit='[3]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[48];
@@ -745,7 +745,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[48] = "type='bool', alias='ManualTimeEn', default='1', hide='0'";
+	ctx->descs[48] = "type='bool', alias='ManualTimeEn', default='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[49];
@@ -761,7 +761,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[49] = "type='bool', alias='ManualGainEn', default='1', hide='0'";
+	ctx->descs[49] = "type='bool', alias='ManualGainEn', default='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[50];
@@ -777,7 +777,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[50] = "type='bool', alias='ManualIspDgainEn', default='1', hide='0'";
+	ctx->descs[50] = "type='bool', alias='ManualIspDgainEn', default='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[51];
@@ -793,7 +793,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[51] = "alias='TimeValue', type='f32', size='[1, 3]', range='[0, 1]', default='0.003', digit='[6]', dynamic='0', hide='0'";
+	ctx->descs[51] = "alias='TimeValue', type='f32', size='[1, 3]', range='[0, 1]', default='0.003', digit='[6]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[52];
@@ -809,7 +809,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[52] = "alias='GainValue', type='f32', size='[1, 3]', range='[1, 4096]', default='1.0', digit='[3]', dynamic='0', hide='0'";
+	ctx->descs[52] = "alias='GainValue', type='f32', size='[1, 3]', range='[1, 4096]', default='1.0', digit='[3]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[53];
@@ -825,7 +825,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[53] = "alias='IspDGainValue', type='f32', size='[1, 3]', range='[1, 4096]', default='1.0', digit='[3]', dynamic='0', hide='0'";
+	ctx->descs[53] = "alias='IspDGainValue', type='f32', size='[1, 3]', range='[1, 4096]', default='1.0', digit='[3]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[54];
@@ -841,7 +841,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 35;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[54] = "alias='LinearAE', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[54] = "alias='LinearAE', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[55];
@@ -857,7 +857,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 36;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[55] = "alias='HdrAE', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[55] = "alias='HdrAE', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[56];
@@ -873,7 +873,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[56] = "alias='h_offs', type='f32', size='[1,1]', range='[0, 1]', default='0', digit='[2]', hide='0'";
+	ctx->descs[56] = "alias='h_offs', type='f32', size='[1,1]', range='[0, 1]', default='0', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[57];
@@ -889,7 +889,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[57] = "alias='v_offs', type='f32', size='[1,1]', range='[0, 1]', default='0', digit='[2]', hide='0'";
+	ctx->descs[57] = "alias='v_offs', type='f32', size='[1,1]', range='[0, 1]', default='0', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[58];
@@ -905,7 +905,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[58] = "alias='h_size', type='f32', size='[1,1]', range='[0, 1]', default='1', digit='[2]', hide='0'";
+	ctx->descs[58] = "alias='h_size', type='f32', size='[1,1]', range='[0, 1]', default='1', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[59];
@@ -921,7 +921,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[59] = "alias='v_size', type='f32', size='[1,1]', range='[0, 1]', default='1', digit='[2]', hide='0'";
+	ctx->descs[59] = "alias='v_size', type='f32', size='[1,1]', range='[0, 1]', default='1', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[60];
@@ -937,7 +937,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 38;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[60] = "alias='InRawWinScale', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[60] = "alias='InRawWinScale', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[61];
@@ -953,7 +953,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 38;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[61] = "alias='TmoRawWinScale', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[61] = "alias='TmoRawWinScale', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[62];
@@ -969,7 +969,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 38;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[62] = "alias='YuvWinScale', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[62] = "alias='YuvWinScale', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[63];
@@ -985,7 +985,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[63] = "alias='CalibFNumber', type='f32', size='[1,1]', range='[0, 256]', default='1.6', digit='[2]', hide='0'";
+	ctx->descs[63] = "alias='CalibFNumber', type='f32', size='[1,1]', range='[0, 256]', default='1.6', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[64];
@@ -1001,7 +1001,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[64] = "alias='CurveCoeff', type='f32', size='[1, 2]', range='[-1024, 1024]', default='1.0', digit='[5]', dynamic='0', hide='0'";
+	ctx->descs[64] = "alias='CurveCoeff', type='f32', size='[1, 2]', range='[-1024, 1024]', default='1.0', digit='[5]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[65];
@@ -1017,7 +1017,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[65] = "type='bool', alias='Enable', default='1', hide='0'";
+	ctx->descs[65] = "type='bool', alias='Enable', default='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[66];
@@ -1033,7 +1033,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[66] = "alias='AecRunInterval', type='u8', size='[1,1]', range='[0, 255]', default='0', digit='[0]', hide='0'";
+	ctx->descs[66] = "alias='AecRunInterval', type='u8', size='[1,1]', range='[0, 255]', default='0', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[67];
@@ -1049,7 +1049,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = 3;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[67] = "type='enum', alias='AecOpType', enum_def='RKAiqOPMode_t', default='RK_AIQ_OP_MODE_AUTO'";
+	ctx->descs[67] = "type='enum', alias='AecOpType', enum_def='RKAiqOPMode_t', default='RK_AIQ_OP_MODE_AUTO', ro='0'";
 #endif
 
 	obj = &ctx->objs[68];
@@ -1065,7 +1065,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = 19;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[68] = "type='enum', alias='HistStatsMode', enum_def='CalibDb_CamHistStatsModeV2_t', default='CAM_HISTV2_MODE_G'";
+	ctx->descs[68] = "type='enum', alias='HistStatsMode', enum_def='CalibDb_CamHistStatsModeV2_t', default='CAM_HISTV2_MODE_G', ro='0'";
 #endif
 
 	obj = &ctx->objs[69];
@@ -1081,7 +1081,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = 18;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[69] = "type='enum', alias='RawStatsMode', enum_def='CalibDb_CamRawStatsModeV2_t', default='CAM_RAWSTATSV2_MODE_G'";
+	ctx->descs[69] = "type='enum', alias='RawStatsMode', enum_def='CalibDb_CamRawStatsModeV2_t', default='CAM_RAWSTATSV2_MODE_G', ro='0'";
 #endif
 
 	obj = &ctx->objs[70];
@@ -1097,7 +1097,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = 17;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[70] = "type='enum', alias='YRangeMode', enum_def='CalibDb_CamYRangeModeV2_t', default='CAM_YRANGEV2_MODE_FULL'";
+	ctx->descs[70] = "type='enum', alias='YRangeMode', enum_def='CalibDb_CamYRangeModeV2_t', default='CAM_YRANGEV2_MODE_FULL', ro='0'";
 #endif
 
 	obj = &ctx->objs[71];
@@ -1113,7 +1113,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[71] = "alias='AecGridWeight', type='u8', size='[15, 15]', range='[0, 32]', default='1', digit='[0]', dynamic='0', hide='0'";
+	ctx->descs[71] = "alias='AecGridWeight', type='u8', size='[15, 15]', range='[0, 32]', default='1', digit='[0]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[72];
@@ -1129,7 +1129,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 37;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[72] = "alias='AecManualCtrl', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[72] = "alias='AecManualCtrl', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[73];
@@ -1145,7 +1145,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 32;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[73] = "alias='AecSpeed', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[73] = "alias='AecSpeed', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[74];
@@ -1161,7 +1161,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 31;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[74] = "alias='AecDelayFrmNum', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[74] = "alias='AecDelayFrmNum', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[75];
@@ -1177,7 +1177,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 33;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[75] = "alias='AecFrameRateMode', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[75] = "alias='AecFrameRateMode', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[76];
@@ -1193,7 +1193,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 34;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[76] = "alias='AecAntiFlicker', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[76] = "alias='AecAntiFlicker', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[77];
@@ -1209,7 +1209,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 40;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[77] = "alias='AecEnvLvCalib', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[77] = "alias='AecEnvLvCalib', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[78];
@@ -1225,7 +1225,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 39;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[78] = "alias='AecWinScale', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[78] = "alias='AecWinScale', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[79];
@@ -1241,7 +1241,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[79] = "alias='InitTimeValue', type='f32', size='[1,1]', range='[0, 1]', default='0.003', digit='[6]', hide='0'";
+	ctx->descs[79] = "alias='InitTimeValue', type='f32', size='[1,1]', range='[0, 1]', default='0.003', digit='[6]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[80];
@@ -1257,7 +1257,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[80] = "alias='InitGainValue', type='f32', size='[1,1]', range='[1, 4096]', default='1', digit='[3]', hide='0'";
+	ctx->descs[80] = "alias='InitGainValue', type='f32', size='[1,1]', range='[1, 4096]', default='1', digit='[3]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[81];
@@ -1273,7 +1273,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[81] = "alias='InitIspDGainValue', type='f32', size='[1,1]', range='[1, 4096]', default='1', digit='[3]', hide='0'";
+	ctx->descs[81] = "alias='InitIspDGainValue', type='f32', size='[1,1]', range='[1, 4096]', default='1', digit='[3]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[82];
@@ -1289,7 +1289,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[82] = "alias='InitPIrisGainValue', type='s32', size='[1,1]', range='[1, 4096]', default='1024', digit='[0]', hide='0'";
+	ctx->descs[82] = "alias='InitPIrisGainValue', type='s32', size='[1,1]', range='[1, 4096]', default='1024', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[83];
@@ -1305,7 +1305,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[83] = "alias='InitDCIrisDutyValue', type='s32', size='[1,1]', range='[0, 100]', default='100', digit='[0]', hide='0'";
+	ctx->descs[83] = "alias='InitDCIrisDutyValue', type='s32', size='[1,1]', range='[0, 100]', default='100', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[84];
@@ -1321,7 +1321,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[84] = "alias='TimeDot', type='f32', size='[1, 6]', range='[0, 1]', default='0', digit='[6]', dynamic='1', hide='0'";
+	ctx->descs[84] = "alias='TimeDot', type='f32', size='[1, 6]', range='[0, 1]', default='0', digit='[6]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[85];
@@ -1350,7 +1350,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[86] = "alias='GainDot', type='f32', size='[1, 6]', range='[1, 4096]', default='1', digit='[3]', dynamic='1', hide='0'";
+	ctx->descs[86] = "alias='GainDot', type='f32', size='[1, 6]', range='[1, 4096]', default='1', digit='[3]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[87];
@@ -1379,7 +1379,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[88] = "alias='IspDGainDot', type='f32', size='[1, 6]', range='[1, 4096]', default='1', digit='[3]', dynamic='1', hide='0'";
+	ctx->descs[88] = "alias='IspDGainDot', type='f32', size='[1, 6]', range='[1, 4096]', default='1', digit='[3]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[89];
@@ -1408,7 +1408,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[90] = "alias='PIrisDot', type='s32', size='[1, 6]', range='[1, 4096]', default='1024', digit='[0]', dynamic='1', hide='0'";
+	ctx->descs[90] = "alias='PIrisDot', type='s32', size='[1, 6]', range='[1, 4096]', default='1024', digit='[0]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[91];
@@ -1437,7 +1437,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[92] = "alias='ExpLevel', type='f32', size='[1, 6]', range='[0, 4096]', default='0', digit='[5]', dynamic='1', hide='0'";
+	ctx->descs[92] = "alias='ExpLevel', type='f32', size='[1, 6]', range='[0, 4096]', default='0', digit='[5]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[93];
@@ -1466,7 +1466,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[94] = "alias='DySetpoint', type='f32', size='[1, 6]', range='[0, 255]', default='40', digit='[2]', dynamic='1', hide='0'";
+	ctx->descs[94] = "alias='DySetpoint', type='f32', size='[1, 6]', range='[0, 255]', default='40', digit='[2]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[95];
@@ -1495,7 +1495,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[96] = "alias='ExpLevel', type='f32', size='[1, 6]', range='[0, 4096]', default='0', digit='[5]', dynamic='1', hide='0'";
+	ctx->descs[96] = "alias='ExpLevel', type='f32', size='[1, 6]', range='[0, 4096]', default='0', digit='[5]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[97];
@@ -1524,7 +1524,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[98] = "alias='NonOEPdfTh', type='f32', size='[1, 6]', range='[0, 1]', default='0.4', digit='[2]', dynamic='1', hide='0'";
+	ctx->descs[98] = "alias='NonOEPdfTh', type='f32', size='[1, 6]', range='[0, 1]', default='0.4', digit='[2]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[99];
@@ -1553,7 +1553,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[100] = "alias='LowLightPdfTh', type='f32', size='[1, 6]', range='[0, 1]', default='0.2', digit='[2]', dynamic='1', hide='0'";
+	ctx->descs[100] = "alias='LowLightPdfTh', type='f32', size='[1, 6]', range='[0, 1]', default='0.2', digit='[2]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[101];
@@ -1582,7 +1582,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[102] = "alias='TargetLLLuma', type='f32', size='[1, 6]', range='[0, 255]', default='20', digit='[2]', dynamic='1', hide='0'";
+	ctx->descs[102] = "alias='TargetLLLuma', type='f32', size='[1, 6]', range='[0, 255]', default='20', digit='[2]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[103];
@@ -1611,7 +1611,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[104] = "type='bool', alias='Enable', default='0', hide='0'";
+	ctx->descs[104] = "type='bool', alias='Enable', default='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[105];
@@ -1627,7 +1627,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[105] = "alias='StrBias', type='f32', size='[1,1]', range='[-500, 500]', default='0', digit='[2]', hide='1'";
+	ctx->descs[105] = "alias='StrBias', type='f32', size='[1,1]', range='[-500, 500]', default='0', digit='[2]', hide='1', ro='0'";
 #endif
 
 	obj = &ctx->objs[106];
@@ -1643,7 +1643,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = 13;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[106] = "type='enum', alias='MeasArea', enum_def='CalibDb_AecMeasAreaModeV2_t', default='AECV2_MEASURE_AREA_AUTO'";
+	ctx->descs[106] = "type='enum', alias='MeasArea', enum_def='CalibDb_AecMeasAreaModeV2_t', default='AECV2_MEASURE_AREA_AUTO', ro='0'";
 #endif
 
 	obj = &ctx->objs[107];
@@ -1659,7 +1659,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[107] = "alias='OEROILowTh', type='f32', size='[1,1]', range='[0, 255]', default='150', digit='[2]', hide='0'";
+	ctx->descs[107] = "alias='OEROILowTh', type='f32', size='[1,1]', range='[0, 255]', default='150', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[108];
@@ -1675,7 +1675,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[108] = "alias='LumaDistTh', type='f32', size='[1,1]', range='[0, 100]', default='10', digit='[2]', hide='0'";
+	ctx->descs[108] = "alias='LumaDistTh', type='f32', size='[1,1]', range='[0, 100]', default='10', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[109];
@@ -1691,7 +1691,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[109] = "alias='LvLowTh', type='f32', size='[1,1]', range='[0, 100]', default='7.5', digit='[4]', hide='0'";
+	ctx->descs[109] = "alias='LvLowTh', type='f32', size='[1,1]', range='[0, 100]', default='7.5', digit='[4]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[110];
@@ -1707,7 +1707,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[110] = "alias='LvHighTh', type='f32', size='[1,1]', range='[0, 100]', default='0.3125', digit='[4]', hide='0'";
+	ctx->descs[110] = "alias='LvHighTh', type='f32', size='[1,1]', range='[0, 100]', default='0.3125', digit='[4]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[111];
@@ -1723,7 +1723,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 45;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[111] = "alias='BacklitSetPoint', type='struct', ui_module='array_table_ui', index='none', hide='0'";
+	ctx->descs[111] = "alias='BacklitSetPoint', type='struct', ui_module='array_table_ui', index='none', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[112];
@@ -1739,7 +1739,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[112] = "alias='OEpdf', type='f32', size='[1, 6]', range='[0, 1]', default='0', digit='[2]', dynamic='1', hide='0'";
+	ctx->descs[112] = "alias='OEpdf', type='f32', size='[1, 6]', range='[0, 1]', default='0', digit='[2]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[113];
@@ -1768,7 +1768,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[114] = "alias='LowLightWeight', type='f32', size='[1, 6]', range='[0, 20]', default='1', digit='[2]', dynamic='1', hide='0'";
+	ctx->descs[114] = "alias='LowLightWeight', type='f32', size='[1, 6]', range='[0, 20]', default='1', digit='[2]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[115];
@@ -1797,7 +1797,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[116] = "alias='HighLightWeight', type='f32', size='[1, 6]', range='[0, 20]', default='2', digit='[2]', dynamic='1', hide='0'";
+	ctx->descs[116] = "alias='HighLightWeight', type='f32', size='[1, 6]', range='[0, 20]', default='2', digit='[2]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[117];
@@ -1826,7 +1826,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[118] = "type='bool', alias='Enable', default='0', hide='0'";
+	ctx->descs[118] = "type='bool', alias='Enable', default='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[119];
@@ -1842,7 +1842,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[119] = "alias='StrBias', type='f32', size='[1,1]', range='[-500, 500]', default='0', digit='[2]', hide='1'";
+	ctx->descs[119] = "alias='StrBias', type='f32', size='[1,1]', range='[-500, 500]', default='0', digit='[2]', hide='1', ro='0'";
 #endif
 
 	obj = &ctx->objs[120];
@@ -1858,7 +1858,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[120] = "alias='MaxWeight', type='f32', size='[1,1]', range='[0, 20]', default='8', digit='[2]', hide='0'";
+	ctx->descs[120] = "alias='MaxWeight', type='f32', size='[1,1]', range='[0, 20]', default='8', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[121];
@@ -1874,7 +1874,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[121] = "alias='HighLightTh', type='f32', size='[1,1]', range='[0, 255]', default='150', digit='[2]', hide='0'";
+	ctx->descs[121] = "alias='HighLightTh', type='f32', size='[1,1]', range='[0, 255]', default='150', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[122];
@@ -1890,7 +1890,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[122] = "alias='LowLightTh', type='f32', size='[1,1]', range='[0, 255]', default='30', digit='[2]', hide='0'";
+	ctx->descs[122] = "alias='LowLightTh', type='f32', size='[1,1]', range='[0, 255]', default='30', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[123];
@@ -1906,7 +1906,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 47;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[123] = "alias='OverExpSetPoint', type='struct', ui_module='array_table_ui', index='none', hide='0'";
+	ctx->descs[123] = "alias='OverExpSetPoint', type='struct', ui_module='array_table_ui', index='none', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[124];
@@ -1922,7 +1922,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[124] = "type='bool', alias='RawStatsEn', default='1', hide='0'";
+	ctx->descs[124] = "type='bool', alias='RawStatsEn', default='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[125];
@@ -1938,7 +1938,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[125] = "alias='ToleranceIn', type='f32', size='[1,1]', range='[0, 100]', default='10', digit='[2]', hide='0'";
+	ctx->descs[125] = "alias='ToleranceIn', type='f32', size='[1,1]', range='[0, 100]', default='10', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[126];
@@ -1954,7 +1954,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[126] = "alias='ToleranceOut', type='f32', size='[1,1]', range='[0, 100]', default='15', digit='[2]', hide='0'";
+	ctx->descs[126] = "alias='ToleranceOut', type='f32', size='[1,1]', range='[0, 100]', default='15', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[127];
@@ -1970,7 +1970,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[127] = "alias='Evbias', type='f32', size='[1,1]', range='[-500, 500]', default='0', digit='[2]', hide='1'";
+	ctx->descs[127] = "alias='Evbias', type='f32', size='[1,1]', range='[-500, 500]', default='0', digit='[2]', hide='1', ro='0'";
 #endif
 
 	obj = &ctx->objs[128];
@@ -1986,7 +1986,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = 11;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[128] = "type='enum', alias='StrategyMode', enum_def='CalibDb_AeStrategyModeV2_t', default='AECV2_STRATEGY_MODE_LOWLIGHT_PRIOR'";
+	ctx->descs[128] = "type='enum', alias='StrategyMode', enum_def='CalibDb_AeStrategyModeV2_t', default='AECV2_STRATEGY_MODE_LOWLIGHT_PRIOR', ro='0'";
 #endif
 
 	obj = &ctx->objs[129];
@@ -2002,7 +2002,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 42;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[129] = "alias='InitExp', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[129] = "alias='InitExp', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[130];
@@ -2018,7 +2018,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 43;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[130] = "alias='Route', type='struct', ui_module='array_table_ui', index='none', hide='0'";
+	ctx->descs[130] = "alias='Route', type='struct', ui_module='array_table_ui', index='none', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[131];
@@ -2034,7 +2034,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 44;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[131] = "alias='DySetpoint', type='struct', ui_module='array_table_ui', index='none', hide='0'";
+	ctx->descs[131] = "alias='DySetpoint', type='struct', ui_module='array_table_ui', index='none', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[132];
@@ -2050,7 +2050,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 46;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[132] = "alias='BackLightCtrl', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[132] = "alias='BackLightCtrl', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[133];
@@ -2066,7 +2066,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 48;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[133] = "alias='OverExpCtrl', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[133] = "alias='OverExpCtrl', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[134];
@@ -2082,7 +2082,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[134] = "alias='InitTimeValue', type='f32', size='[1, 3]', range='[0, 1]', default='0.01', digit='[6]', dynamic='0', hide='0'";
+	ctx->descs[134] = "alias='InitTimeValue', type='f32', size='[1, 3]', range='[0, 1]', default='0.01', digit='[6]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[135];
@@ -2098,7 +2098,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[135] = "alias='InitGainValue', type='f32', size='[1, 3]', range='[1, 4096]', default='1.0', digit='[3]', dynamic='0', hide='0'";
+	ctx->descs[135] = "alias='InitGainValue', type='f32', size='[1, 3]', range='[1, 4096]', default='1.0', digit='[3]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[136];
@@ -2114,7 +2114,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[136] = "alias='InitIspDGainValue', type='f32', size='[1, 3]', range='[1, 4096]', default='1.0', digit='[3]', dynamic='0', hide='0'";
+	ctx->descs[136] = "alias='InitIspDGainValue', type='f32', size='[1, 3]', range='[1, 4096]', default='1.0', digit='[3]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[137];
@@ -2130,7 +2130,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[137] = "alias='InitPIrisGainValue', type='s32', size='[1,1]', range='[1, 4096]', default='1024', digit='[0]', hide='0'";
+	ctx->descs[137] = "alias='InitPIrisGainValue', type='s32', size='[1,1]', range='[1, 4096]', default='1024', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[138];
@@ -2146,7 +2146,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[138] = "alias='InitDCIrisDutyValue', type='s32', size='[1,1]', range='[0, 100]', default='100', digit='[0]', hide='0'";
+	ctx->descs[138] = "alias='InitDCIrisDutyValue', type='s32', size='[1,1]', range='[0, 100]', default='100', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[139];
@@ -2162,7 +2162,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[139] = "alias='RatioExpDot', type='f32', size='[1, 6]', range='[0, 1]', default='0', digit='[4]', dynamic='1', hide='0'";
+	ctx->descs[139] = "alias='RatioExpDot', type='f32', size='[1, 6]', range='[0, 1]', default='0', digit='[4]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[140];
@@ -2191,7 +2191,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[141] = "alias='M2SRatioFix', type='f32', size='[1, 6]', range='[1, 256]', default='8', digit='[2]', dynamic='1', hide='0'";
+	ctx->descs[141] = "alias='M2SRatioFix', type='f32', size='[1, 6]', range='[1, 256]', default='8', digit='[2]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[142];
@@ -2220,7 +2220,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[143] = "alias='L2MRatioFix', type='f32', size='[1, 6]', range='[1, 256]', default='8', digit='[2]', dynamic='1', hide='0'";
+	ctx->descs[143] = "alias='L2MRatioFix', type='f32', size='[1, 6]', range='[1, 256]', default='8', digit='[2]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[144];
@@ -2249,7 +2249,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[145] = "alias='M2SRatioMax', type='f32', size='[1, 6]', range='[1, 256]', default='64', digit='[2]', dynamic='1', hide='0'";
+	ctx->descs[145] = "alias='M2SRatioMax', type='f32', size='[1, 6]', range='[1, 256]', default='64', digit='[2]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[146];
@@ -2278,7 +2278,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[147] = "alias='L2MRatioMax', type='f32', size='[1, 6]', range='[1, 256]', default='64', digit='[2]', dynamic='1', hide='0'";
+	ctx->descs[147] = "alias='L2MRatioMax', type='f32', size='[1, 6]', range='[1, 256]', default='64', digit='[2]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[148];
@@ -2307,7 +2307,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = 10;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[149] = "type='enum', alias='ExpRatioType', enum_def='CalibDb_HdrAeRatioTypeV2_t', default='AECV2_HDR_RATIOTYPE_MODE_AUTO'";
+	ctx->descs[149] = "type='enum', alias='ExpRatioType', enum_def='CalibDb_HdrAeRatioTypeV2_t', default='AECV2_HDR_RATIOTYPE_MODE_AUTO', ro='0'";
 #endif
 
 	obj = &ctx->objs[150];
@@ -2323,7 +2323,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 51;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[150] = "alias='ExpRatio', type='struct', ui_module='array_table_ui', index='none', hide='0'";
+	ctx->descs[150] = "alias='ExpRatio', type='struct', ui_module='array_table_ui', index='none', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[151];
@@ -2339,7 +2339,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[151] = "alias='Frm0TimeDot', type='f32', size='[1, 6]', range='[0, 1]', default='0', digit='[6]', dynamic='1', hide='0'";
+	ctx->descs[151] = "alias='Frm0TimeDot', type='f32', size='[1, 6]', range='[0, 1]', default='0', digit='[6]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[152];
@@ -2368,7 +2368,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[153] = "alias='Frm0GainDot', type='f32', size='[1, 6]', range='[1, 4096]', default='1', digit='[3]', dynamic='1', hide='0'";
+	ctx->descs[153] = "alias='Frm0GainDot', type='f32', size='[1, 6]', range='[1, 4096]', default='1', digit='[3]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[154];
@@ -2397,7 +2397,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[155] = "alias='Frm0IspDGainDot', type='f32', size='[1, 6]', range='[1, 4096]', default='1', digit='[3]', dynamic='1', hide='0'";
+	ctx->descs[155] = "alias='Frm0IspDGainDot', type='f32', size='[1, 6]', range='[1, 4096]', default='1', digit='[3]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[156];
@@ -2426,7 +2426,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[157] = "alias='Frm1TimeDot', type='f32', size='[1, 6]', range='[0, 1]', default='0', digit='[6]', dynamic='1', hide='0'";
+	ctx->descs[157] = "alias='Frm1TimeDot', type='f32', size='[1, 6]', range='[0, 1]', default='0', digit='[6]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[158];
@@ -2455,7 +2455,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[159] = "alias='Frm1GainDot', type='f32', size='[1, 6]', range='[1, 4096]', default='1', digit='[3]', dynamic='1', hide='0'";
+	ctx->descs[159] = "alias='Frm1GainDot', type='f32', size='[1, 6]', range='[1, 4096]', default='1', digit='[3]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[160];
@@ -2484,7 +2484,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[161] = "alias='Frm1IspDGainDot', type='f32', size='[1, 6]', range='[1, 4096]', default='1', digit='[3]', dynamic='1', hide='0'";
+	ctx->descs[161] = "alias='Frm1IspDGainDot', type='f32', size='[1, 6]', range='[1, 4096]', default='1', digit='[3]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[162];
@@ -2513,7 +2513,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[163] = "alias='Frm2TimeDot', type='f32', size='[1, 6]', range='[0, 1]', default='0', digit='[6]', dynamic='1', hide='0'";
+	ctx->descs[163] = "alias='Frm2TimeDot', type='f32', size='[1, 6]', range='[0, 1]', default='0', digit='[6]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[164];
@@ -2542,7 +2542,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[165] = "alias='Frm2GainDot', type='f32', size='[1, 6]', range='[1, 4096]', default='1', digit='[3]', dynamic='1', hide='0'";
+	ctx->descs[165] = "alias='Frm2GainDot', type='f32', size='[1, 6]', range='[1, 4096]', default='1', digit='[3]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[166];
@@ -2571,7 +2571,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[167] = "alias='Frm2IspDGainDot', type='f32', size='[1, 6]', range='[1, 4096]', default='1', digit='[3]', dynamic='1', hide='0'";
+	ctx->descs[167] = "alias='Frm2IspDGainDot', type='f32', size='[1, 6]', range='[1, 4096]', default='1', digit='[3]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[168];
@@ -2600,7 +2600,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[169] = "alias='PIrisDot', type='s32', size='[1, 6]', range='[1, 4096]', default='1024', digit='[0]', dynamic='1', hide='0'";
+	ctx->descs[169] = "alias='PIrisDot', type='s32', size='[1, 6]', range='[1, 4096]', default='1024', digit='[0]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[170];
@@ -2629,7 +2629,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[171] = "alias='LExpLevel', type='f32', size='[1, 6]', range='[0, 4096]', default='0', digit='[5]', dynamic='1', hide='0'";
+	ctx->descs[171] = "alias='LExpLevel', type='f32', size='[1, 6]', range='[0, 4096]', default='0', digit='[5]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[172];
@@ -2658,7 +2658,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[173] = "alias='NonOEPdfTh', type='f32', size='[1, 6]', range='[0, 1]', default='0.4', digit='[2]', dynamic='1', hide='0'";
+	ctx->descs[173] = "alias='NonOEPdfTh', type='f32', size='[1, 6]', range='[0, 1]', default='0.4', digit='[2]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[174];
@@ -2687,7 +2687,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[175] = "alias='LowLightPdfTh', type='f32', size='[1, 6]', range='[0, 1]', default='0.2', digit='[2]', dynamic='1', hide='0'";
+	ctx->descs[175] = "alias='LowLightPdfTh', type='f32', size='[1, 6]', range='[0, 1]', default='0.2', digit='[2]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[176];
@@ -2716,7 +2716,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[177] = "alias='LSetPoint', type='f32', size='[1, 6]', range='[0, 255]', default='40', digit='[2]', dynamic='1', hide='0'";
+	ctx->descs[177] = "alias='LSetPoint', type='f32', size='[1, 6]', range='[0, 255]', default='40', digit='[2]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[178];
@@ -2745,7 +2745,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[179] = "alias='TargetLLLuma', type='f32', size='[1, 6]', range='[0, 255]', default='20', digit='[2]', dynamic='1', hide='0'";
+	ctx->descs[179] = "alias='TargetLLLuma', type='f32', size='[1, 6]', range='[0, 255]', default='20', digit='[2]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[180];
@@ -2774,7 +2774,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[181] = "alias='OEROILowTh', type='f32', size='[1,1]', range='[0, 255]', default='150', digit='[2]', hide='0'";
+	ctx->descs[181] = "alias='OEROILowTh', type='f32', size='[1,1]', range='[0, 255]', default='150', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[182];
@@ -2790,7 +2790,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[182] = "alias='LvLowTh', type='f32', size='[1,1]', range='[0, 100]', default='7.5', digit='[4]', hide='0'";
+	ctx->descs[182] = "alias='LvLowTh', type='f32', size='[1,1]', range='[0, 100]', default='7.5', digit='[4]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[183];
@@ -2806,7 +2806,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[183] = "alias='LvHighTh', type='f32', size='[1,1]', range='[0, 100]', default='0.3125', digit='[4]', hide='0'";
+	ctx->descs[183] = "alias='LvHighTh', type='f32', size='[1,1]', range='[0, 100]', default='0.3125', digit='[4]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[184];
@@ -2822,7 +2822,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 54;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[184] = "alias='LfrmSetPoint', type='struct', ui_module='array_table_ui', index='none', hide='0'";
+	ctx->descs[184] = "alias='LfrmSetPoint', type='struct', ui_module='array_table_ui', index='none', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[185];
@@ -2838,7 +2838,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[185] = "alias='MExpLevel', type='f32', size='[1, 6]', range='[0, 4096]', default='0', digit='[5]', dynamic='1', hide='0'";
+	ctx->descs[185] = "alias='MExpLevel', type='f32', size='[1, 6]', range='[0, 4096]', default='0', digit='[5]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[186];
@@ -2867,7 +2867,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[187] = "alias='MSetPoint', type='f32', size='[1, 6]', range='[0, 255]', default='40', digit='[2]', dynamic='1', hide='0'";
+	ctx->descs[187] = "alias='MSetPoint', type='f32', size='[1, 6]', range='[0, 255]', default='40', digit='[2]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[188];
@@ -2896,7 +2896,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[189] = "alias='SExpLevel', type='f32', size='[1, 6]', range='[0, 4096]', default='0', digit='[6]', dynamic='1', hide='0'";
+	ctx->descs[189] = "alias='SExpLevel', type='f32', size='[1, 6]', range='[0, 4096]', default='0', digit='[6]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[190];
@@ -2925,7 +2925,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[191] = "alias='SSetPoint', type='f32', size='[1, 6]', range='[0, 255]', default='20', digit='[2]', dynamic='1', hide='0'";
+	ctx->descs[191] = "alias='SSetPoint', type='f32', size='[1, 6]', range='[0, 255]', default='20', digit='[2]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[192];
@@ -2954,7 +2954,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[193] = "alias='TargetHLLuma', type='f32', size='[1, 6]', range='[0, 255]', default='150', digit='[2]', dynamic='1', hide='0'";
+	ctx->descs[193] = "alias='TargetHLLuma', type='f32', size='[1, 6]', range='[0, 255]', default='150', digit='[2]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[194];
@@ -2983,7 +2983,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[195] = "type='bool', alias='HLROIExpandEn', default='0', hide='0'";
+	ctx->descs[195] = "type='bool', alias='HLROIExpandEn', default='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[196];
@@ -2999,7 +2999,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[196] = "alias='HLLumaTolerance', type='f32', size='[1,1]', range='[0, 100]', default='12', digit='[2]', hide='0'";
+	ctx->descs[196] = "alias='HLLumaTolerance', type='f32', size='[1,1]', range='[0, 100]', default='12', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[197];
@@ -3015,7 +3015,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 57;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[197] = "alias='SfrmSetPoint', type='struct', ui_module='array_table_ui', index='none', hide='0'";
+	ctx->descs[197] = "alias='SfrmSetPoint', type='struct', ui_module='array_table_ui', index='none', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[198];
@@ -3031,7 +3031,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = 12;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[198] = "type='enum', alias='mode', enum_def='CalibDb_AeHdrLongFrmModeV2_t', default='AECV2_HDR_LONGFRMMODE_NORMAL'";
+	ctx->descs[198] = "type='enum', alias='mode', enum_def='CalibDb_AeHdrLongFrmModeV2_t', default='AECV2_HDR_LONGFRMMODE_NORMAL', ro='0'";
 #endif
 
 	obj = &ctx->objs[199];
@@ -3047,7 +3047,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[199] = "alias='SfrmMinLine', type='u16', size='[1,1]', range='[0, 1024]', default='2', digit='[0]', hide='0'";
+	ctx->descs[199] = "alias='SfrmMinLine', type='u16', size='[1,1]', range='[0, 1024]', default='2', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[200];
@@ -3063,7 +3063,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[200] = "alias='LfrmModeExpTh', type='f32', size='[1,1]', range='[0, 100]', default='0.62', digit='[4]', hide='0'";
+	ctx->descs[200] = "alias='LfrmModeExpTh', type='f32', size='[1,1]', range='[0, 100]', default='0.62', digit='[4]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[201];
@@ -3079,7 +3079,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[201] = "alias='ToleranceIn', type='f32', size='[1,1]', range='[0, 100]', default='10', digit='[2]', hide='0'";
+	ctx->descs[201] = "alias='ToleranceIn', type='f32', size='[1,1]', range='[0, 100]', default='10', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[202];
@@ -3095,7 +3095,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[202] = "alias='ToleranceOut', type='f32', size='[1,1]', range='[0, 100]', default='15', digit='[2]', hide='0'";
+	ctx->descs[202] = "alias='ToleranceOut', type='f32', size='[1,1]', range='[0, 100]', default='15', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[203];
@@ -3111,7 +3111,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[203] = "alias='Evbias', type='f32', size='[1,1]', range='[-500, 500]', default='0', digit='[0]', hide='1'";
+	ctx->descs[203] = "alias='Evbias', type='f32', size='[1,1]', range='[-500, 500]', default='0', digit='[0]', hide='1', ro='0'";
 #endif
 
 	obj = &ctx->objs[204];
@@ -3127,7 +3127,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = 11;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[204] = "type='enum', alias='StrategyMode', enum_def='CalibDb_AeStrategyModeV2_t', default='AECV2_STRATEGY_MODE_LOWLIGHT_PRIOR'";
+	ctx->descs[204] = "type='enum', alias='StrategyMode', enum_def='CalibDb_AeStrategyModeV2_t', default='AECV2_STRATEGY_MODE_LOWLIGHT_PRIOR', ro='0'";
 #endif
 
 	obj = &ctx->objs[205];
@@ -3143,7 +3143,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[205] = "alias='LumaDistTh', type='f32', size='[1,1]', range='[0, 100]', default='10', digit='[2]', hide='0'";
+	ctx->descs[205] = "alias='LumaDistTh', type='f32', size='[1,1]', range='[0, 100]', default='10', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[206];
@@ -3159,7 +3159,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 50;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[206] = "alias='InitExp', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[206] = "alias='InitExp', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[207];
@@ -3175,7 +3175,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 53;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[207] = "alias='Route', type='struct', ui_module='array_table_ui', index='none', hide='0'";
+	ctx->descs[207] = "alias='Route', type='struct', ui_module='array_table_ui', index='none', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[208];
@@ -3191,7 +3191,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 52;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[208] = "alias='ExpRatioCtrl', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[208] = "alias='ExpRatioCtrl', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[209];
@@ -3207,7 +3207,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 59;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[209] = "alias='LongFrmMode', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[209] = "alias='LongFrmMode', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[210];
@@ -3223,7 +3223,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 55;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[210] = "alias='LframeCtrl', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[210] = "alias='LframeCtrl', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[211];
@@ -3239,7 +3239,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 56;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[211] = "alias='MframeCtrl', type='struct', ui_module='array_table_ui', index='none', hide='0'";
+	ctx->descs[211] = "alias='MframeCtrl', type='struct', ui_module='array_table_ui', index='none', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[212];
@@ -3255,7 +3255,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 58;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[212] = "alias='SframeCtrl', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[212] = "alias='SframeCtrl', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[213];
@@ -3271,7 +3271,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[213] = "alias='TimeValue', type='f32', size='[1,1]', range='[0, 1]', default='0.01', digit='[6]', hide='0'";
+	ctx->descs[213] = "alias='TimeValue', type='f32', size='[1,1]', range='[0, 1]', default='0.01', digit='[6]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[214];
@@ -3287,7 +3287,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[214] = "alias='GainValue', type='f32', size='[1,1]', range='[1, 4096]', default='1', digit='[3]', hide='0'";
+	ctx->descs[214] = "alias='GainValue', type='f32', size='[1,1]', range='[1, 4096]', default='1', digit='[3]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[215];
@@ -3303,7 +3303,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[215] = "alias='IspDGainValue', type='f32', size='[1,1]', range='[1, 4096]', default='1', digit='[3]', hide='0'";
+	ctx->descs[215] = "alias='IspDGainValue', type='f32', size='[1,1]', range='[1, 4096]', default='1', digit='[3]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[216];
@@ -3319,7 +3319,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[216] = "alias='PIrisGainValue', type='s32', size='[1,1]', range='[1, 4096]', default='1024', digit='[0]', hide='0'";
+	ctx->descs[216] = "alias='PIrisGainValue', type='s32', size='[1,1]', range='[1, 4096]', default='1024', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[217];
@@ -3335,7 +3335,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[217] = "alias='DcgMode', type='s32', size='[1,1]', range='[-1, 1]', default='0', digit='[0]', hide='0'";
+	ctx->descs[217] = "alias='DcgMode', type='s32', size='[1,1]', range='[-1, 1]', default='0', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[218];
@@ -3351,7 +3351,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[218] = "alias='TimeValue', type='f32', size='[1, 3]', range='[0, 1]', default='0.01', digit='[6]', dynamic='0', hide='0'";
+	ctx->descs[218] = "alias='TimeValue', type='f32', size='[1, 3]', range='[0, 1]', default='0.01', digit='[6]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[219];
@@ -3367,7 +3367,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[219] = "alias='GainValue', type='f32', size='[1, 3]', range='[1, 4096]', default='1.0', digit='[3]', dynamic='0', hide='0'";
+	ctx->descs[219] = "alias='GainValue', type='f32', size='[1, 3]', range='[1, 4096]', default='1.0', digit='[3]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[220];
@@ -3383,7 +3383,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[220] = "alias='IspDGainValue', type='f32', size='[1, 3]', range='[1, 4096]', default='1.0', digit='[3]', dynamic='0', hide='0'";
+	ctx->descs[220] = "alias='IspDGainValue', type='f32', size='[1, 3]', range='[1, 4096]', default='1.0', digit='[3]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[221];
@@ -3399,7 +3399,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[221] = "alias='PIrisGainValues', type='s32', size='[1,1]', range='[1, 4096]', default='1024', digit='[0]', hide='0'";
+	ctx->descs[221] = "alias='PIrisGainValues', type='s32', size='[1,1]', range='[1, 4096]', default='1024', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[222];
@@ -3415,7 +3415,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[222] = "alias='DcgMode', type='s32', size='[1, 3]', range='[-1, 1]', default='0', digit='[0]', dynamic='0', hide='0'";
+	ctx->descs[222] = "alias='DcgMode', type='s32', size='[1, 3]', range='[-1, 1]', default='0', digit='[0]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[223];
@@ -3431,7 +3431,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 61;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[223] = "alias='LinearAE', type='struct_list', size='dynamic', ui_module='normal_ui_style'";
+	ctx->descs[223] = "alias='LinearAE', type='struct_list', size='dynamic', ui_module='normal_ui_style', ro='0'";
 #endif
 
 	obj = &ctx->objs[224];
@@ -3460,7 +3460,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 62;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[225] = "alias='HdrAE', type='struct_list', size='dynamic', ui_module='normal_ui_style'";
+	ctx->descs[225] = "alias='HdrAE', type='struct_list', size='dynamic', ui_module='normal_ui_style', ro='0'";
 #endif
 
 	obj = &ctx->objs[226];
@@ -3489,7 +3489,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[227] = "type='bool', alias='Enable', default='0', hide='0'";
+	ctx->descs[227] = "type='bool', alias='Enable', default='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[228];
@@ -3505,7 +3505,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[228] = "alias='IntervalFrm', type='s32', size='[1,1]', range='[0, 1024]', default='5', digit='[0]', hide='0'";
+	ctx->descs[228] = "alias='IntervalFrm', type='s32', size='[1,1]', range='[0, 1024]', default='5', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[229];
@@ -3521,7 +3521,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 63;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[229] = "alias='AlterExp', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[229] = "alias='AlterExp', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[230];
@@ -3537,7 +3537,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[230] = "alias='PIrisGainValue', type='s32', size='[1,1]', range='[1, 4096]', default='1024', digit='[0]', hide='0'";
+	ctx->descs[230] = "alias='PIrisGainValue', type='s32', size='[1,1]', range='[1, 4096]', default='1024', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[231];
@@ -3553,7 +3553,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[231] = "alias='DCIrisHoldValue', type='s32', size='[1,1]', range='[0, 100]', default='50', digit='[0]', hide='0'";
+	ctx->descs[231] = "alias='DCIrisHoldValue', type='s32', size='[1,1]', range='[0, 100]', default='50', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[232];
@@ -3569,7 +3569,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[232] = "alias='TotalStep', type='u16', size='[1,1]', range='[0, 1024]', default='81', digit='[0]', hide='0'";
+	ctx->descs[232] = "alias='TotalStep', type='u16', size='[1,1]', range='[0, 1024]', default='81', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[233];
@@ -3585,7 +3585,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[233] = "alias='EffcStep', type='u16', size='[1,1]', range='[0, 1024]', default='64', digit='[0]', hide='0'";
+	ctx->descs[233] = "alias='EffcStep', type='u16', size='[1,1]', range='[0, 1024]', default='64', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[234];
@@ -3601,7 +3601,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[234] = "type='bool', alias='ZeroIsMax', default='1', hide='0'";
+	ctx->descs[234] = "type='bool', alias='ZeroIsMax', default='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[235];
@@ -3617,7 +3617,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[235] = "alias='StepTable', type='u16', size='[1, 1024]', range='[1, 4096]', default='1024', digit='[0]', dynamic='0', hide='0'";
+	ctx->descs[235] = "alias='StepTable', type='u16', size='[1, 1024]', range='[1, 4096]', default='1024', digit='[0]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[236];
@@ -3633,7 +3633,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[236] = "alias='Kp', type='f32', size='[1,1]', range='[0, 10]', default='1', digit='[2]', hide='0'";
+	ctx->descs[236] = "alias='Kp', type='f32', size='[1,1]', range='[0, 10]', default='1', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[237];
@@ -3649,7 +3649,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[237] = "alias='Ki', type='f32', size='[1,1]', range='[0, 10]', default='0.2', digit='[2]', hide='0'";
+	ctx->descs[237] = "alias='Ki', type='f32', size='[1,1]', range='[0, 10]', default='0.2', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[238];
@@ -3665,7 +3665,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[238] = "alias='Kd', type='f32', size='[1,1]', range='[0, 10]', default='0.5', digit='[2]', hide='0'";
+	ctx->descs[238] = "alias='Kd', type='f32', size='[1,1]', range='[0, 10]', default='0.5', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[239];
@@ -3681,7 +3681,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[239] = "alias='MinPwmDuty', type='s32', size='[1,1]', range='[0, 100]', default='0', digit='[0]', hide='0'";
+	ctx->descs[239] = "alias='MinPwmDuty', type='s32', size='[1,1]', range='[0, 100]', default='0', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[240];
@@ -3697,7 +3697,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[240] = "alias='MaxPwmDuty', type='s32', size='[1,1]', range='[0, 100]', default='100', digit='[0]', hide='0'";
+	ctx->descs[240] = "alias='MaxPwmDuty', type='s32', size='[1,1]', range='[0, 100]', default='100', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[241];
@@ -3713,7 +3713,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[241] = "alias='OpenPwmDuty', type='s32', size='[1,1]', range='[0, 100]', default='50', digit='[0]', hide='0'";
+	ctx->descs[241] = "alias='OpenPwmDuty', type='s32', size='[1,1]', range='[0, 100]', default='50', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[242];
@@ -3729,7 +3729,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[242] = "alias='ClosePwmDuty', type='s32', size='[1,1]', range='[0, 100]', default='60', digit='[0]', hide='0'";
+	ctx->descs[242] = "alias='ClosePwmDuty', type='s32', size='[1,1]', range='[0, 100]', default='60', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[243];
@@ -3745,7 +3745,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[243] = "type='bool', alias='Enable', default='0', hide='0'";
+	ctx->descs[243] = "type='bool', alias='Enable', default='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[244];
@@ -3761,7 +3761,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = 16;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[244] = "type='enum', alias='IrisType', enum_def='CalibDb_IrisTypeV2_t', default='IRISV2_DC_TYPE'";
+	ctx->descs[244] = "type='enum', alias='IrisType', enum_def='CalibDb_IrisTypeV2_t', default='IRISV2_DC_TYPE', ro='0'";
 #endif
 
 	obj = &ctx->objs[245];
@@ -3777,7 +3777,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[245] = "type='bool', alias='ManualEn', default='0', hide='0'";
+	ctx->descs[245] = "type='bool', alias='ManualEn', default='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[246];
@@ -3793,7 +3793,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 65;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[246] = "alias='ManualAttr', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[246] = "alias='ManualAttr', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[247];
@@ -3809,7 +3809,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 65;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[247] = "alias='InitAttr', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[247] = "alias='InitAttr', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[248];
@@ -3825,7 +3825,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 66;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[248] = "alias='PIrisAttr', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[248] = "alias='PIrisAttr', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[249];
@@ -3841,7 +3841,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 67;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[249] = "alias='DCIrisAttr', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[249] = "alias='DCIrisAttr', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[250];
@@ -3857,7 +3857,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 41;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[250] = "alias='CommCtrl', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[250] = "alias='CommCtrl', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[251];
@@ -3873,7 +3873,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 49;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[251] = "alias='LinearAeCtrl', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[251] = "alias='LinearAeCtrl', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[252];
@@ -3889,7 +3889,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 60;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[252] = "alias='HdrAeCtrl', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[252] = "alias='HdrAeCtrl', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[253];
@@ -3905,7 +3905,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 68;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[253] = "alias='IrisCtrl', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[253] = "alias='IrisCtrl', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[254];
@@ -3921,7 +3921,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 64;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[254] = "alias='SyncTest', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[254] = "alias='SyncTest', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[255];
@@ -3937,7 +3937,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[255] = "type='bool', alias='Gamma_en', default='1', hide='0'";
+	ctx->descs[255] = "type='bool', alias='Gamma_en', default='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[256];
@@ -3953,7 +3953,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = 20;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[256] = "type='enum', alias='Gamma_out_segnum', enum_def='GammaType_t', default='GAMMATYPE_LOG'";
+	ctx->descs[256] = "type='enum', alias='Gamma_out_segnum', enum_def='GammaType_t', default='GAMMATYPE_LOG', ro='0'";
 #endif
 
 	obj = &ctx->objs[257];
@@ -3969,7 +3969,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[257] = "alias='Gamma_out_offset', type='u16', size='[1,1]', range='[0, 4095]', default='0', digit='[0]', hide='0'";
+	ctx->descs[257] = "alias='Gamma_out_offset', type='u16', size='[1,1]', range='[0, 4095]', default='0', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[258];
@@ -3985,7 +3985,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[258] = "alias='Gamma_curve', type='u16', size='[1, 45]', range='[0, 4095]', default='[0 6 11 17 22 28 33 39 44 55 66 77 88 109 130 150 170 210 248 286 323 393 460 525 586 702 809 909 1002 1172 1325 1462 1588 1811 2004 2174 2327 2590 2813 3006 3177 3467 3708 3915 4095.0000]', digit='[4]', dynamic='0', ui_module='curve_table'";
+	ctx->descs[258] = "alias='Gamma_curve', type='u16', size='[1, 45]', range='[0, 4095]', default='[0 6 11 17 22 28 33 39 44 55 66 77 88 109 130 150 170 210 248 286 323 393 460 525 586 702 809 909 1002 1172 1325 1462 1588 1811 2004 2174 2327 2590 2813 3006 3177 3467 3708 3915 4095.0000]', digit='[4]', dynamic='0', ui_module='curve_table', ro='0'";
 #endif
 
 	obj = &ctx->objs[259];
@@ -4001,7 +4001,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 70;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[259] = "alias='GammaTuningPara', type='struct', ui_module='curve_ui_type_A', hide='0'";
+	ctx->descs[259] = "alias='GammaTuningPara', type='struct', ui_module='curve_ui_type_A', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[260];
@@ -4017,7 +4017,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[260] = "type='bool', alias='Gamma_en', default='1', hide='0'";
+	ctx->descs[260] = "type='bool', alias='Gamma_en', default='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[261];
@@ -4033,7 +4033,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[261] = "alias='Gamma_out_offset', type='u16', size='[1,1]', range='[0, 4095]', default='0', digit='[0]', hide='0'";
+	ctx->descs[261] = "alias='Gamma_out_offset', type='u16', size='[1,1]', range='[0, 4095]', default='0', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[262];
@@ -4049,7 +4049,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[262] = "alias='Gamma_curve', type='u16', size='[1, 49]', range='[0, 4095]', default='[0 93 128 154 175 194 211 226 240 266 289 310 329 365 396 425 451 499 543 582 618 684 744 798 848 938 1019 1093 1161 1285 1396 1498 1592 1761 1914 2052 2181 2414 2622 2813 2989 3153 3308 3454 4593 3727 3854 3977 4095]', digit='[0]', dynamic='0', ui_module='curve_table'";
+	ctx->descs[262] = "alias='Gamma_curve', type='u16', size='[1, 49]', range='[0, 4095]', default='[0 93 128 154 175 194 211 226 240 266 289 310 329 365 396 425 451 499 543 582 618 684 744 798 848 938 1019 1093 1161 1285 1396 1498 1592 1761 1914 2052 2181 2414 2622 2813 2989 3153 3308 3454 4593 3727 3854 3977 4095]', digit='[0]', dynamic='0', ui_module='curve_table', ro='0'";
 #endif
 
 	obj = &ctx->objs[263];
@@ -4065,7 +4065,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 72;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[263] = "alias='GammaTuningPara', type='struct', ui_module='curve_ui_type_A', hide='0'";
+	ctx->descs[263] = "alias='GammaTuningPara', type='struct', ui_module='curve_ui_type_A', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[264];
@@ -4081,7 +4081,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[264] = "alias='ISO', type='f32', size='[1, 100]', range='[0, 10000000]', default='50', digit='[4]', dynamic='1', hide='0'";
+	ctx->descs[264] = "alias='ISO', type='f32', size='[1, 100]', range='[0, 10000000]', default='50', digit='[4]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[265];
@@ -4110,7 +4110,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[266] = "alias='R_Channel', type='f32', size='[1, 100]', range='[0, 4095]', default='0', digit='[4]', dynamic='1', hide='0'";
+	ctx->descs[266] = "alias='R_Channel', type='f32', size='[1, 100]', range='[0, 4095]', default='0', digit='[4]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[267];
@@ -4139,7 +4139,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[268] = "alias='Gr_Channel', type='f32', size='[1, 100]', range='[0, 4095]', default='0', digit='[4]', dynamic='1', hide='0'";
+	ctx->descs[268] = "alias='Gr_Channel', type='f32', size='[1, 100]', range='[0, 4095]', default='0', digit='[4]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[269];
@@ -4168,7 +4168,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[270] = "alias='Gb_Channel', type='f32', size='[1, 100]', range='[0, 4095]', default='0', digit='[4]', dynamic='1', hide='0'";
+	ctx->descs[270] = "alias='Gb_Channel', type='f32', size='[1, 100]', range='[0, 4095]', default='0', digit='[4]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[271];
@@ -4197,7 +4197,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[272] = "alias='B_Channel', type='f32', size='[1, 100]', range='[0, 4095]', default='0', digit='[4]', dynamic='1', hide='0'";
+	ctx->descs[272] = "alias='B_Channel', type='f32', size='[1, 100]', range='[0, 4095]', default='0', digit='[4]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[273];
@@ -4226,7 +4226,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[274] = "type='bool', alias='enable', default='1', hide='0'";
+	ctx->descs[274] = "type='bool', alias='enable', default='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[275];
@@ -4242,7 +4242,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 74;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[275] = "alias='BLC_Data', type='struct', ui_module='array_table_ui', index='none', hide='0'";
+	ctx->descs[275] = "alias='BLC_Data', type='struct', ui_module='array_table_ui', index='none', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[276];
@@ -4258,7 +4258,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 75;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[276] = "alias='BlcTuningPara', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[276] = "alias='BlcTuningPara', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[277];
@@ -4274,7 +4274,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[277] = "type='bool', alias='degamma_en', default='0', hide='0'";
+	ctx->descs[277] = "type='bool', alias='degamma_en', default='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[278];
@@ -4290,7 +4290,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[278] = "alias='X_axis', type='u16', size='[1, 17]', range='[0, 4095]', default='[0 256 512 768 1024 1280 1536 1792 2048 2304 2560 2816 3072 3328 3584 3840 4096]', digit='[0]', dynamic='0', hide='0'";
+	ctx->descs[278] = "alias='X_axis', type='u16', size='[1, 17]', range='[0, 4095]', default='[0 256 512 768 1024 1280 1536 1792 2048 2304 2560 2816 3072 3328 3584 3840 4096]', digit='[0]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[279];
@@ -4306,7 +4306,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[279] = "alias='curve_R', type='u16', size='[1, 17]', range='[0, 4095]', default='[0 256 512 768 1024 1280 1536 1792 2048 2304 2560 2816 3072 3328 3584 3840 4096]', digit='[0]', dynamic='0', hide='0'";
+	ctx->descs[279] = "alias='curve_R', type='u16', size='[1, 17]', range='[0, 4095]', default='[0 256 512 768 1024 1280 1536 1792 2048 2304 2560 2816 3072 3328 3584 3840 4096]', digit='[0]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[280];
@@ -4322,7 +4322,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[280] = "alias='curve_G', type='u16', size='[1, 17]', range='[0, 4095]', default='[0 256 512 768 1024 1280 1536 1792 2048 2304 2560 2816 3072 3328 3584 3840 4096]', digit='[0]', dynamic='0', hide='0'";
+	ctx->descs[280] = "alias='curve_G', type='u16', size='[1, 17]', range='[0, 4095]', default='[0 256 512 768 1024 1280 1536 1792 2048 2304 2560 2816 3072 3328 3584 3840 4096]', digit='[0]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[281];
@@ -4338,7 +4338,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[281] = "alias='curve_B', type='u16', size='[1, 17]', range='[0, 4095]', default='[0 256 512 768 1024 1280 1536 1792 2048 2304 2560 2816 3072 3328 3584 3840 4096]', digit='[0]', dynamic='0', hide='0'";
+	ctx->descs[281] = "alias='curve_B', type='u16', size='[1, 17]', range='[0, 4095]', default='[0 256 512 768 1024 1280 1536 1792 2048 2304 2560 2816 3072 3328 3584 3840 4096]', digit='[0]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[282];
@@ -4354,7 +4354,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 77;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[282] = "alias='DegammaTuningPara', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[282] = "alias='DegammaTuningPara', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[283];
@@ -4370,7 +4370,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[283] = "alias='ISO', type='f32', size='[1, 100]', range='[0, 10000000]', default='50', digit='[4]', dynamic='1', hide='0'";
+	ctx->descs[283] = "alias='ISO', type='f32', size='[1, 100]', range='[0, 10000000]', default='50', digit='[4]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[284];
@@ -4399,7 +4399,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[285] = "alias='min_busy_thre', type='f32', size='[1, 100]', range='[0, 1023]', default='160', digit='[4]', dynamic='1', hide='0'";
+	ctx->descs[285] = "alias='min_busy_thre', type='f32', size='[1, 100]', range='[0, 1023]', default='160', digit='[4]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[286];
@@ -4428,7 +4428,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[287] = "alias='min_grad_thr1', type='f32', size='[1, 100]', range='[0, 1023]', default='32', digit='[4]', dynamic='1', hide='0'";
+	ctx->descs[287] = "alias='min_grad_thr1', type='f32', size='[1, 100]', range='[0, 1023]', default='32', digit='[4]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[288];
@@ -4457,7 +4457,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[289] = "alias='min_grad_thr2', type='f32', size='[1, 100]', range='[0, 1023]', default='32', digit='[4]', dynamic='1', hide='0'";
+	ctx->descs[289] = "alias='min_grad_thr2', type='f32', size='[1, 100]', range='[0, 1023]', default='32', digit='[4]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[290];
@@ -4486,7 +4486,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[291] = "alias='k_grad1', type='f32', size='[1, 100]', range='[0, 15]', default='5', digit='[4]', dynamic='1', hide='0'";
+	ctx->descs[291] = "alias='k_grad1', type='f32', size='[1, 100]', range='[0, 15]', default='5', digit='[4]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[292];
@@ -4515,7 +4515,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[293] = "alias='k_grad1', type='f32', size='[1, 100]', range='[0, 15]', default='1', digit='[4]', dynamic='1', hide='0'";
+	ctx->descs[293] = "alias='k_grad1', type='f32', size='[1, 100]', range='[0, 15]', default='1', digit='[4]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[294];
@@ -4544,7 +4544,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[295] = "alias='gb_thre', type='f32', size='[1, 100]', range='[0, 15]', default='7', digit='[4]', dynamic='1', hide='0'";
+	ctx->descs[295] = "alias='gb_thre', type='f32', size='[1, 100]', range='[0, 15]', default='7', digit='[4]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[296];
@@ -4573,7 +4573,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[297] = "alias='maxCorV', type='f32', size='[1, 100]', range='[0, 1023]', default='40', digit='[4]', dynamic='1', hide='0'";
+	ctx->descs[297] = "alias='maxCorV', type='f32', size='[1, 100]', range='[0, 1023]', default='40', digit='[4]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[298];
@@ -4602,7 +4602,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[299] = "alias='maxCorVboth', type='f32', size='[1, 100]', range='[0, 1023]', default='8', digit='[4]', dynamic='1', hide='0'";
+	ctx->descs[299] = "alias='maxCorVboth', type='f32', size='[1, 100]', range='[0, 1023]', default='8', digit='[4]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[300];
@@ -4631,7 +4631,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[301] = "alias='dark_thre', type='f32', size='[1, 100]', range='[0, 2047]', default='120', digit='[4]', dynamic='1', hide='0'";
+	ctx->descs[301] = "alias='dark_thre', type='f32', size='[1, 100]', range='[0, 2047]', default='120', digit='[4]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[302];
@@ -4660,7 +4660,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[303] = "alias='dark_threHi', type='f32', size='[1, 100]', range='[0, 2047]', default='240', digit='[4]', dynamic='1', hide='0'";
+	ctx->descs[303] = "alias='dark_threHi', type='f32', size='[1, 100]', range='[0, 2047]', default='240', digit='[4]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[304];
@@ -4689,7 +4689,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[305] = "alias='k_grad1_dark', type='f32', size='[1, 100]', range='[0, 15]', default='6', digit='[4]', dynamic='1', hide='0'";
+	ctx->descs[305] = "alias='k_grad1_dark', type='f32', size='[1, 100]', range='[0, 15]', default='6', digit='[4]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[306];
@@ -4718,7 +4718,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[307] = "alias='k_grad2_dark', type='f32', size='[1, 100]', range='[0, 15]', default='1', digit='[4]', dynamic='1', hide='0'";
+	ctx->descs[307] = "alias='k_grad2_dark', type='f32', size='[1, 100]', range='[0, 15]', default='1', digit='[4]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[308];
@@ -4747,7 +4747,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[309] = "alias='min_grad_thr_dark1', type='f32', size='[1, 100]', range='[0, 1023]', default='64', digit='[4]', dynamic='1', hide='0'";
+	ctx->descs[309] = "alias='min_grad_thr_dark1', type='f32', size='[1, 100]', range='[0, 1023]', default='64', digit='[4]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[310];
@@ -4776,7 +4776,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[311] = "alias='min_grad_thr_dark2', type='f32', size='[1, 100]', range='[0, 1023]', default='32', digit='[4]', dynamic='1', hide='0'";
+	ctx->descs[311] = "alias='min_grad_thr_dark2', type='f32', size='[1, 100]', range='[0, 1023]', default='32', digit='[4]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[312];
@@ -4805,7 +4805,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[313] = "alias='noiseCurve_0', type='f32', size='[1, 100]', range='[0, 1023]', default='0', digit='[4]', dynamic='1', hide='0'";
+	ctx->descs[313] = "alias='noiseCurve_0', type='f32', size='[1, 100]', range='[0, 1023]', default='0', digit='[4]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[314];
@@ -4834,7 +4834,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[315] = "alias='noiseCurve_1', type='f32', size='[1, 100]', range='[0, 1023]', default='0', digit='[4]', dynamic='1', hide='0'";
+	ctx->descs[315] = "alias='noiseCurve_1', type='f32', size='[1, 100]', range='[0, 1023]', default='0', digit='[4]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[316];
@@ -4863,7 +4863,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[317] = "alias='GValueLimitLo', type='f32', size='[1, 100]', range='[0, 4095]', default='1280', digit='[4]', dynamic='1', hide='0'";
+	ctx->descs[317] = "alias='GValueLimitLo', type='f32', size='[1, 100]', range='[0, 4095]', default='1280', digit='[4]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[318];
@@ -4892,7 +4892,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[319] = "alias='GValueLimitHi', type='f32', size='[1, 100]', range='[0, 4095]', default='1760', digit='[4]', dynamic='1', hide='0'";
+	ctx->descs[319] = "alias='GValueLimitHi', type='f32', size='[1, 100]', range='[0, 4095]', default='1760', digit='[4]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[320];
@@ -4921,7 +4921,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[321] = "alias='textureStrength', type='f32', size='[1, 100]', range='[0, 2]', default='1', digit='[4]', dynamic='1', hide='0'";
+	ctx->descs[321] = "alias='textureStrength', type='f32', size='[1, 100]', range='[0, 2]', default='1', digit='[4]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[322];
@@ -4950,7 +4950,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[323] = "alias='ScaleLo', type='f32', size='[1, 100]', range='[0, 1023]', default='0', digit='[4]', dynamic='1', hide='0'";
+	ctx->descs[323] = "alias='ScaleLo', type='f32', size='[1, 100]', range='[0, 1023]', default='0', digit='[4]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[324];
@@ -4979,7 +4979,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[325] = "alias='ScaleHi', type='f32', size='[1, 100]', range='[0, 1023]', default='0', digit='[4]', dynamic='1', hide='0'";
+	ctx->descs[325] = "alias='ScaleHi', type='f32', size='[1, 100]', range='[0, 1023]', default='0', digit='[4]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[326];
@@ -5008,7 +5008,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[327] = "alias='globalStrength', type='f32', size='[1, 100]', range='[0, 2]', default='1', digit='[4]', dynamic='1', hide='0'";
+	ctx->descs[327] = "alias='globalStrength', type='f32', size='[1, 100]', range='[0, 2]', default='1', digit='[4]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[328];
@@ -5037,7 +5037,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[329] = "alias='noise_coea', type='f32', size='[1, 100]', range='[0, 1023]', default='0', digit='[4]', dynamic='1', hide='0'";
+	ctx->descs[329] = "alias='noise_coea', type='f32', size='[1, 100]', range='[0, 1023]', default='0', digit='[4]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[330];
@@ -5066,7 +5066,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[331] = "alias='noise_coeb', type='f32', size='[1, 100]', range='[0, 1023]', default='0', digit='[4]', dynamic='1', hide='0'";
+	ctx->descs[331] = "alias='noise_coeb', type='f32', size='[1, 100]', range='[0, 1023]', default='0', digit='[4]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[332];
@@ -5095,7 +5095,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[333] = "alias='diff_clip', type='f32', size='[1, 100]', range='[0, 1023]', default='0', digit='[4]', dynamic='1', hide='0'";
+	ctx->descs[333] = "alias='diff_clip', type='f32', size='[1, 100]', range='[0, 1023]', default='0', digit='[4]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[334];
@@ -5124,7 +5124,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[335] = "alias='ISO', type='f32', size='[1, 100]', range='[0, 10000000]', default='50', digit='[4]', dynamic='1', hide='0'";
+	ctx->descs[335] = "alias='ISO', type='f32', size='[1, 100]', range='[0, 10000000]', default='50', digit='[4]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[336];
@@ -5153,7 +5153,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[337] = "alias='min_busy_thre', type='f32', size='[1, 100]', range='[0, 1023]', default='160', digit='[4]', dynamic='1', hide='0'";
+	ctx->descs[337] = "alias='min_busy_thre', type='f32', size='[1, 100]', range='[0, 1023]', default='160', digit='[4]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[338];
@@ -5182,7 +5182,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[339] = "alias='min_grad_thr1', type='f32', size='[1, 100]', range='[0, 1023]', default='32', digit='[4]', dynamic='1', hide='0'";
+	ctx->descs[339] = "alias='min_grad_thr1', type='f32', size='[1, 100]', range='[0, 1023]', default='32', digit='[4]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[340];
@@ -5211,7 +5211,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[341] = "alias='min_grad_thr2', type='f32', size='[1, 100]', range='[0, 1023]', default='32', digit='[4]', dynamic='1', hide='0'";
+	ctx->descs[341] = "alias='min_grad_thr2', type='f32', size='[1, 100]', range='[0, 1023]', default='32', digit='[4]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[342];
@@ -5240,7 +5240,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[343] = "alias='k_grad1', type='f32', size='[1, 100]', range='[0, 15]', default='5', digit='[4]', dynamic='1', hide='0'";
+	ctx->descs[343] = "alias='k_grad1', type='f32', size='[1, 100]', range='[0, 15]', default='5', digit='[4]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[344];
@@ -5269,7 +5269,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[345] = "alias='k_grad1', type='f32', size='[1, 100]', range='[0, 15]', default='1', digit='[4]', dynamic='1', hide='0'";
+	ctx->descs[345] = "alias='k_grad1', type='f32', size='[1, 100]', range='[0, 15]', default='1', digit='[4]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[346];
@@ -5298,7 +5298,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[347] = "alias='gb_thre', type='f32', size='[1, 100]', range='[0, 15]', default='7', digit='[4]', dynamic='1', hide='0'";
+	ctx->descs[347] = "alias='gb_thre', type='f32', size='[1, 100]', range='[0, 15]', default='7', digit='[4]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[348];
@@ -5327,7 +5327,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[349] = "alias='maxCorV', type='f32', size='[1, 100]', range='[0, 1023]', default='40', digit='[4]', dynamic='1', hide='0'";
+	ctx->descs[349] = "alias='maxCorV', type='f32', size='[1, 100]', range='[0, 1023]', default='40', digit='[4]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[350];
@@ -5356,7 +5356,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[351] = "alias='maxCorVboth', type='f32', size='[1, 100]', range='[0, 1023]', default='8', digit='[4]', dynamic='1', hide='0'";
+	ctx->descs[351] = "alias='maxCorVboth', type='f32', size='[1, 100]', range='[0, 1023]', default='8', digit='[4]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[352];
@@ -5385,7 +5385,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[353] = "alias='dark_thre', type='f32', size='[1, 100]', range='[0, 2047]', default='120', digit='[4]', dynamic='1', hide='0'";
+	ctx->descs[353] = "alias='dark_thre', type='f32', size='[1, 100]', range='[0, 2047]', default='120', digit='[4]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[354];
@@ -5414,7 +5414,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[355] = "alias='dark_threHi', type='f32', size='[1, 100]', range='[0, 2047]', default='240', digit='[4]', dynamic='1', hide='0'";
+	ctx->descs[355] = "alias='dark_threHi', type='f32', size='[1, 100]', range='[0, 2047]', default='240', digit='[4]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[356];
@@ -5443,7 +5443,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[357] = "alias='k_grad1_dark', type='f32', size='[1, 100]', range='[0, 15]', default='6', digit='[4]', dynamic='1', hide='0'";
+	ctx->descs[357] = "alias='k_grad1_dark', type='f32', size='[1, 100]', range='[0, 15]', default='6', digit='[4]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[358];
@@ -5472,7 +5472,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[359] = "alias='k_grad2_dark', type='f32', size='[1, 100]', range='[0, 15]', default='1', digit='[4]', dynamic='1', hide='0'";
+	ctx->descs[359] = "alias='k_grad2_dark', type='f32', size='[1, 100]', range='[0, 15]', default='1', digit='[4]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[360];
@@ -5501,7 +5501,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[361] = "alias='min_grad_thr_dark1', type='f32', size='[1, 100]', range='[0, 1023]', default='64', digit='[4]', dynamic='1', hide='0'";
+	ctx->descs[361] = "alias='min_grad_thr_dark1', type='f32', size='[1, 100]', range='[0, 1023]', default='64', digit='[4]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[362];
@@ -5530,7 +5530,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[363] = "alias='min_grad_thr_dark2', type='f32', size='[1, 100]', range='[0, 1023]', default='32', digit='[4]', dynamic='1', hide='0'";
+	ctx->descs[363] = "alias='min_grad_thr_dark2', type='f32', size='[1, 100]', range='[0, 1023]', default='32', digit='[4]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[364];
@@ -5559,7 +5559,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[365] = "alias='noiseCurve_0', type='f32', size='[1, 100]', range='[0, 1023]', default='0', digit='[4]', dynamic='1', hide='0'";
+	ctx->descs[365] = "alias='noiseCurve_0', type='f32', size='[1, 100]', range='[0, 1023]', default='0', digit='[4]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[366];
@@ -5588,7 +5588,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[367] = "alias='noiseCurve_1', type='f32', size='[1, 100]', range='[0, 1023]', default='0', digit='[4]', dynamic='1', hide='0'";
+	ctx->descs[367] = "alias='noiseCurve_1', type='f32', size='[1, 100]', range='[0, 1023]', default='0', digit='[4]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[368];
@@ -5617,7 +5617,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[369] = "alias='NoiseScale', type='f32', size='[1, 100]', range='[0, 1023]', default='0', digit='[4]', dynamic='1', hide='0'";
+	ctx->descs[369] = "alias='NoiseScale', type='f32', size='[1, 100]', range='[0, 1023]', default='0', digit='[4]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[370];
@@ -5646,7 +5646,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[371] = "alias='NoiseBase', type='f32', size='[1, 100]', range='[0, 1023]', default='0', digit='[4]', dynamic='1', hide='0'";
+	ctx->descs[371] = "alias='NoiseBase', type='f32', size='[1, 100]', range='[0, 1023]', default='0', digit='[4]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[372];
@@ -5675,7 +5675,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[373] = "alias='globalStrength', type='f32', size='[1, 100]', range='[0, 2]', default='1', digit='[4]', dynamic='1', hide='0'";
+	ctx->descs[373] = "alias='globalStrength', type='f32', size='[1, 100]', range='[0, 2]', default='1', digit='[4]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[374];
@@ -5704,7 +5704,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[375] = "alias='diff_clip', type='f32', size='[1, 100]', range='[0, 1023]', default='0', digit='[4]', dynamic='1', hide='0'";
+	ctx->descs[375] = "alias='diff_clip', type='f32', size='[1, 100]', range='[0, 1023]', default='0', digit='[4]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[376];
@@ -5733,7 +5733,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[377] = "type='bool', alias='enable', default='0', hide='0'";
+	ctx->descs[377] = "type='bool', alias='enable', default='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[378];
@@ -5749,7 +5749,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[378] = "type='bool', alias='edge_en', default='0', hide='0'";
+	ctx->descs[378] = "type='bool', alias='edge_en', default='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[379];
@@ -5765,7 +5765,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[379] = "type='bool', alias='noise_cut_en', default='0', hide='0'";
+	ctx->descs[379] = "type='bool', alias='noise_cut_en', default='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[380];
@@ -5781,7 +5781,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[380] = "alias='gr_ration', type='u8', size='[1,1]', range='[0, 3]', default='0', digit='[0]', hide='0'";
+	ctx->descs[380] = "alias='gr_ration', type='u8', size='[1,1]', range='[0, 3]', default='0', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[381];
@@ -5797,7 +5797,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 79;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[381] = "alias='GicData', type='struct', ui_module='array_table_ui', index='none', hide='0'";
+	ctx->descs[381] = "alias='GicData', type='struct', ui_module='array_table_ui', index='none', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[382];
@@ -5813,7 +5813,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 81;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[382] = "alias='GicTuningPara', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[382] = "alias='GicTuningPara', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[383];
@@ -5829,7 +5829,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[383] = "type='bool', alias='enable', default='0', hide='0'";
+	ctx->descs[383] = "type='bool', alias='enable', default='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[384];
@@ -5845,7 +5845,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[384] = "alias='gr_ration', type='u8', size='[1,1]', range='[0, 3]', default='0', digit='[0]', hide='0'";
+	ctx->descs[384] = "alias='gr_ration', type='u8', size='[1,1]', range='[0, 3]', default='0', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[385];
@@ -5861,7 +5861,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 80;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[385] = "alias='GicData', type='struct', ui_module='array_table_ui', index='none', hide='0'";
+	ctx->descs[385] = "alias='GicData', type='struct', ui_module='array_table_ui', index='none', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[386];
@@ -5877,7 +5877,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 83;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[386] = "alias='GicTuningPara', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[386] = "alias='GicTuningPara', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[387];
@@ -5893,7 +5893,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[387] = "alias='ISO', type='f32', size='[1, 100]', range='[0, 10000000]', default='50', digit='[4]', dynamic='1', hide='0'";
+	ctx->descs[387] = "alias='ISO', type='f32', size='[1, 100]', range='[0, 10000000]', default='50', digit='[4]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[388];
@@ -5922,7 +5922,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[389] = "alias='dc_min_th', type='f32', size='[1, 100]', range='[0, 255]', default='64', digit='[4]', dynamic='1', hide='0'";
+	ctx->descs[389] = "alias='dc_min_th', type='f32', size='[1, 100]', range='[0, 255]', default='64', digit='[4]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[390];
@@ -5951,7 +5951,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[391] = "alias='dc_max_th', type='f32', size='[1, 100]', range='[0, 255]', default='192', digit='[4]', dynamic='1', hide='0'";
+	ctx->descs[391] = "alias='dc_max_th', type='f32', size='[1, 100]', range='[0, 255]', default='192', digit='[4]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[392];
@@ -5980,7 +5980,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[393] = "alias='yhist_th', type='f32', size='[1, 100]', range='[0, 255]', default='249', digit='[4]', dynamic='1', hide='0'";
+	ctx->descs[393] = "alias='yhist_th', type='f32', size='[1, 100]', range='[0, 255]', default='249', digit='[4]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[394];
@@ -6009,7 +6009,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[395] = "alias='yblk_th', type='f32', size='[1, 100]', range='[0, 512]', default='0.002', digit='[4]', dynamic='1', hide='0'";
+	ctx->descs[395] = "alias='yblk_th', type='f32', size='[1, 100]', range='[0, 512]', default='0.002', digit='[4]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[396];
@@ -6038,7 +6038,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[397] = "alias='dark_th', type='f32', size='[1, 100]', range='[0, 255]', default='250', digit='[4]', dynamic='1', hide='0'";
+	ctx->descs[397] = "alias='dark_th', type='f32', size='[1, 100]', range='[0, 255]', default='250', digit='[4]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[398];
@@ -6067,7 +6067,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[399] = "alias='bright_min', type='f32', size='[1, 100]', range='[0, 255]', default='180', digit='[4]', dynamic='1', hide='0'";
+	ctx->descs[399] = "alias='bright_min', type='f32', size='[1, 100]', range='[0, 255]', default='180', digit='[4]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[400];
@@ -6096,7 +6096,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[401] = "alias='bright_max', type='f32', size='[1, 100]', range='[0, 255]', default='240', digit='[4]', dynamic='1', hide='0'";
+	ctx->descs[401] = "alias='bright_max', type='f32', size='[1, 100]', range='[0, 255]', default='240', digit='[4]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[402];
@@ -6125,7 +6125,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[403] = "alias='wt_max', type='f32', size='[1, 100]', range='[0, 1]', default='0.9', digit='[4]', dynamic='1', hide='0'";
+	ctx->descs[403] = "alias='wt_max', type='f32', size='[1, 100]', range='[0, 1]', default='0.9', digit='[4]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[404];
@@ -6154,7 +6154,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[405] = "alias='air_min', type='f32', size='[1, 100]', range='[0, 255]', default='200', digit='[4]', dynamic='1', hide='0'";
+	ctx->descs[405] = "alias='air_min', type='f32', size='[1, 100]', range='[0, 255]', default='200', digit='[4]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[406];
@@ -6183,7 +6183,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[407] = "alias='air_max', type='f32', size='[1, 100]', range='[0, 255]', default='250', digit='[4]', dynamic='1', hide='0'";
+	ctx->descs[407] = "alias='air_max', type='f32', size='[1, 100]', range='[0, 255]', default='250', digit='[4]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[408];
@@ -6212,7 +6212,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[409] = "alias='tmax_base', type='f32', size='[1, 100]', range='[0, 255]', default='125', digit='[4]', dynamic='1', hide='0'";
+	ctx->descs[409] = "alias='tmax_base', type='f32', size='[1, 100]', range='[0, 255]', default='125', digit='[4]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[410];
@@ -6241,7 +6241,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[411] = "alias='tmax_off', type='f32', size='[1, 100]', range='[0, 1]', default='0.1', digit='[4]', dynamic='1', hide='0'";
+	ctx->descs[411] = "alias='tmax_off', type='f32', size='[1, 100]', range='[0, 1]', default='0.1', digit='[4]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[412];
@@ -6270,7 +6270,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[413] = "alias='tmax_max', type='f32', size='[1, 100]', range='[0, 1]', default='0.8', digit='[4]', dynamic='1', hide='0'";
+	ctx->descs[413] = "alias='tmax_max', type='f32', size='[1, 100]', range='[0, 1]', default='0.8', digit='[4]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[414];
@@ -6299,7 +6299,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[415] = "alias='cfg_wt', type='f32', size='[1, 100]', range='[0, 1]', default='0.8', digit='[4]', dynamic='1', hide='0'";
+	ctx->descs[415] = "alias='cfg_wt', type='f32', size='[1, 100]', range='[0, 1]', default='0.8', digit='[4]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[416];
@@ -6328,7 +6328,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[417] = "alias='cfg_air', type='f32', size='[1, 100]', range='[0, 255]', default='210', digit='[4]', dynamic='1', hide='0'";
+	ctx->descs[417] = "alias='cfg_air', type='f32', size='[1, 100]', range='[0, 255]', default='210', digit='[4]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[418];
@@ -6357,7 +6357,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[419] = "alias='cfg_tmax', type='f32', size='[1, 100]', range='[0, 1]', default='0.2', digit='[4]', dynamic='1', hide='0'";
+	ctx->descs[419] = "alias='cfg_tmax', type='f32', size='[1, 100]', range='[0, 1]', default='0.2', digit='[4]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[420];
@@ -6386,7 +6386,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[421] = "alias='dc_thed', type='f32', size='[1, 100]', range='[0, 255]', default='2', digit='[4]', dynamic='1', hide='0'";
+	ctx->descs[421] = "alias='dc_thed', type='f32', size='[1, 100]', range='[0, 255]', default='2', digit='[4]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[422];
@@ -6415,7 +6415,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[423] = "alias='dc_weitcur', type='f32', size='[1, 100]', range='[0, 1]', default='1', digit='[4]', dynamic='1', hide='0'";
+	ctx->descs[423] = "alias='dc_weitcur', type='f32', size='[1, 100]', range='[0, 1]', default='1', digit='[4]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[424];
@@ -6444,7 +6444,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[425] = "alias='air_thed', type='f32', size='[1, 100]', range='[0, 255]', default='2', digit='[4]', dynamic='1', hide='0'";
+	ctx->descs[425] = "alias='air_thed', type='f32', size='[1, 100]', range='[0, 255]', default='2', digit='[4]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[426];
@@ -6473,7 +6473,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[427] = "alias='air_weitcur', type='f32', size='[1, 100]', range='[0, 1]', default='0.14', digit='[4]', dynamic='1', hide='0'";
+	ctx->descs[427] = "alias='air_weitcur', type='f32', size='[1, 100]', range='[0, 1]', default='0.14', digit='[4]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[428];
@@ -6502,7 +6502,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[429] = "type='bool', alias='en', default='1', hide='0'";
+	ctx->descs[429] = "type='bool', alias='en', default='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[430];
@@ -6518,7 +6518,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[430] = "alias='stab_fnum', type='f32', size='[1,1]', range='[0, 31]', default='8.0', digit='[4]', hide='0'";
+	ctx->descs[430] = "alias='stab_fnum', type='f32', size='[1,1]', range='[0, 31]', default='8.0', digit='[4]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[431];
@@ -6534,7 +6534,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[431] = "alias='sigma', type='f32', size='[1,1]', range='[0, 255]', default='6.0', digit='[4]', hide='0'";
+	ctx->descs[431] = "alias='sigma', type='f32', size='[1,1]', range='[0, 255]', default='6.0', digit='[4]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[432];
@@ -6550,7 +6550,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[432] = "alias='wt_sigma', type='f32', size='[1,1]', range='[0, 256]', default='8.0', digit='[4]', hide='0'";
+	ctx->descs[432] = "alias='wt_sigma', type='f32', size='[1,1]', range='[0, 256]', default='8.0', digit='[4]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[433];
@@ -6566,7 +6566,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[433] = "alias='air_sigma', type='f32', size='[1,1]', range='[0, 255]', default='120.0', digit='[4]', hide='0'";
+	ctx->descs[433] = "alias='air_sigma', type='f32', size='[1,1]', range='[0, 255]', default='120.0', digit='[4]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[434];
@@ -6582,7 +6582,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[434] = "alias='tmax_sigma', type='f32', size='[1,1]', range='[0, 1]', default='0.0100', digit='[4]', hide='0'";
+	ctx->descs[434] = "alias='tmax_sigma', type='f32', size='[1,1]', range='[0, 1]', default='0.0100', digit='[4]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[435];
@@ -6598,7 +6598,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 85;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[435] = "alias='DehazeData', type='struct', ui_module='array_table_ui', index='none', hide='0'";
+	ctx->descs[435] = "alias='DehazeData', type='struct', ui_module='array_table_ui', index='none', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[436];
@@ -6614,7 +6614,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[436] = "alias='ISO', type='f32', size='[1, 100]', range='[0, 10000000]', default='50', digit='[4]', dynamic='1', hide='0'";
+	ctx->descs[436] = "alias='ISO', type='f32', size='[1, 100]', range='[0, 10000000]', default='50', digit='[4]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[437];
@@ -6643,7 +6643,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[438] = "alias='enhance_value', type='f32', size='[1, 100]', range='[0, 32]', default='1', digit='[4]', dynamic='1', hide='0'";
+	ctx->descs[438] = "alias='enhance_value', type='f32', size='[1, 100]', range='[0, 32]', default='1', digit='[4]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[439];
@@ -6672,7 +6672,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[440] = "type='bool', alias='en', default='1', hide='0'";
+	ctx->descs[440] = "type='bool', alias='en', default='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[441];
@@ -6688,7 +6688,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 87;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[441] = "alias='EnhanceData', type='struct', ui_module='array_table_ui', index='none', hide='0'";
+	ctx->descs[441] = "alias='EnhanceData', type='struct', ui_module='array_table_ui', index='none', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[442];
@@ -6704,7 +6704,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[442] = "alias='ISO', type='f32', size='[1, 100]', range='[0, 10000000]', default='50', digit='[4]', dynamic='1', hide='0'";
+	ctx->descs[442] = "alias='ISO', type='f32', size='[1, 100]', range='[0, 10000000]', default='50', digit='[4]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[443];
@@ -6733,7 +6733,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[444] = "alias='hist_gratio', type='f32', size='[1, 100]', range='[0, 32]', default='2', digit='[4]', dynamic='1', hide='0'";
+	ctx->descs[444] = "alias='hist_gratio', type='f32', size='[1, 100]', range='[0, 32]', default='2', digit='[4]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[445];
@@ -6762,7 +6762,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[446] = "alias='hist_th_off', type='f32', size='[1, 100]', range='[0, 255]', default='64', digit='[4]', dynamic='1', hide='0'";
+	ctx->descs[446] = "alias='hist_th_off', type='f32', size='[1, 100]', range='[0, 255]', default='64', digit='[4]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[447];
@@ -6791,7 +6791,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[448] = "alias='hist_k', type='f32', size='[1, 100]', range='[0, 8]', default='2', digit='[4]', dynamic='1', hide='0'";
+	ctx->descs[448] = "alias='hist_k', type='f32', size='[1, 100]', range='[0, 8]', default='2', digit='[4]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[449];
@@ -6820,7 +6820,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[450] = "alias='hist_min', type='f32', size='[1, 100]', range='[0, 2]', default='0.016', digit='[4]', dynamic='1', hide='0'";
+	ctx->descs[450] = "alias='hist_min', type='f32', size='[1, 100]', range='[0, 2]', default='0.016', digit='[4]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[451];
@@ -6849,7 +6849,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[452] = "alias='hist_scale', type='f32', size='[1, 100]', range='[0, 32]', default='0.09', digit='[4]', dynamic='1', hide='0'";
+	ctx->descs[452] = "alias='hist_scale', type='f32', size='[1, 100]', range='[0, 32]', default='0.09', digit='[4]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[453];
@@ -6878,7 +6878,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[454] = "alias='cfg_gratio', type='f32', size='[1, 100]', range='[0, 32]', default='2', digit='[4]', dynamic='1', hide='0'";
+	ctx->descs[454] = "alias='cfg_gratio', type='f32', size='[1, 100]', range='[0, 32]', default='2', digit='[4]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[455];
@@ -6907,7 +6907,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[456] = "type='bool', alias='en', default='1', hide='0'";
+	ctx->descs[456] = "type='bool', alias='en', default='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[457];
@@ -6923,7 +6923,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[457] = "type='bool', alias='hist_para_en', default='1', hide='0'";
+	ctx->descs[457] = "type='bool', alias='hist_para_en', default='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[458];
@@ -6939,7 +6939,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[458] = "type='bool', alias='hist_channel', default='1', hide='0'";
+	ctx->descs[458] = "type='bool', alias='hist_channel', default='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[459];
@@ -6955,7 +6955,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 89;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[459] = "alias='HistData', type='struct', ui_module='array_table_ui', index='none', hide='0'";
+	ctx->descs[459] = "alias='HistData', type='struct', ui_module='array_table_ui', index='none', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[460];
@@ -6971,7 +6971,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[460] = "type='bool', alias='Enable', default='1', hide='0'";
+	ctx->descs[460] = "type='bool', alias='Enable', default='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[461];
@@ -6987,7 +6987,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[461] = "alias='cfg_alpha', type='f32', size='[1,1]', range='[0, 1]', default='1', digit='[4]', hide='0'";
+	ctx->descs[461] = "alias='cfg_alpha', type='f32', size='[1,1]', range='[0, 1]', default='1', digit='[4]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[462];
@@ -7003,7 +7003,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[462] = "alias='ByPassThr', type='f32', size='[1,1]', range='[0, 1]', default='0', digit='[4]', hide='0'";
+	ctx->descs[462] = "alias='ByPassThr', type='f32', size='[1,1]', range='[0, 1]', default='0', digit='[4]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[463];
@@ -7019,7 +7019,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 86;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[463] = "alias='dehaze_setting', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[463] = "alias='dehaze_setting', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[464];
@@ -7035,7 +7035,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 88;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[464] = "alias='enhance_setting', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[464] = "alias='enhance_setting', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[465];
@@ -7051,7 +7051,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 90;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[465] = "alias='hist_setting', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[465] = "alias='hist_setting', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[466];
@@ -7067,7 +7067,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 91;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[466] = "alias='DehazeTuningPara', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[466] = "alias='DehazeTuningPara', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[467];
@@ -7083,7 +7083,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[467] = "alias='EnvLv', type='f32', size='[1, 100]', range='[0, 1]', default='0', digit='[4]', dynamic='1', hide='0'";
+	ctx->descs[467] = "alias='EnvLv', type='f32', size='[1, 100]', range='[0, 1]', default='0', digit='[4]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[468];
@@ -7112,7 +7112,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[469] = "alias='dc_min_th', type='f32', size='[1, 100]', range='[0, 255]', default='64', digit='[4]', dynamic='1', hide='0'";
+	ctx->descs[469] = "alias='dc_min_th', type='f32', size='[1, 100]', range='[0, 255]', default='64', digit='[4]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[470];
@@ -7141,7 +7141,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[471] = "alias='dc_max_th', type='f32', size='[1, 100]', range='[0, 255]', default='192', digit='[4]', dynamic='1', hide='0'";
+	ctx->descs[471] = "alias='dc_max_th', type='f32', size='[1, 100]', range='[0, 255]', default='192', digit='[4]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[472];
@@ -7170,7 +7170,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[473] = "alias='yhist_th', type='f32', size='[1, 100]', range='[0, 255]', default='249', digit='[4]', dynamic='1', hide='0'";
+	ctx->descs[473] = "alias='yhist_th', type='f32', size='[1, 100]', range='[0, 255]', default='249', digit='[4]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[474];
@@ -7199,7 +7199,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[475] = "alias='yblk_th', type='f32', size='[1, 100]', range='[0, 512]', default='0.002', digit='[4]', dynamic='1', hide='0'";
+	ctx->descs[475] = "alias='yblk_th', type='f32', size='[1, 100]', range='[0, 512]', default='0.002', digit='[4]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[476];
@@ -7228,7 +7228,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[477] = "alias='dark_th', type='f32', size='[1, 100]', range='[0, 255]', default='250', digit='[4]', dynamic='1', hide='0'";
+	ctx->descs[477] = "alias='dark_th', type='f32', size='[1, 100]', range='[0, 255]', default='250', digit='[4]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[478];
@@ -7257,7 +7257,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[479] = "alias='bright_min', type='f32', size='[1, 100]', range='[0, 255]', default='180', digit='[4]', dynamic='1', hide='0'";
+	ctx->descs[479] = "alias='bright_min', type='f32', size='[1, 100]', range='[0, 255]', default='180', digit='[4]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[480];
@@ -7286,7 +7286,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[481] = "alias='bright_max', type='f32', size='[1, 100]', range='[0, 255]', default='240', digit='[4]', dynamic='1', hide='0'";
+	ctx->descs[481] = "alias='bright_max', type='f32', size='[1, 100]', range='[0, 255]', default='240', digit='[4]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[482];
@@ -7315,7 +7315,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[483] = "alias='wt_max', type='f32', size='[1, 100]', range='[0, 1]', default='0.9', digit='[4]', dynamic='1', hide='0'";
+	ctx->descs[483] = "alias='wt_max', type='f32', size='[1, 100]', range='[0, 1]', default='0.9', digit='[4]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[484];
@@ -7344,7 +7344,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[485] = "alias='air_min', type='f32', size='[1, 100]', range='[0, 255]', default='200', digit='[4]', dynamic='1', hide='0'";
+	ctx->descs[485] = "alias='air_min', type='f32', size='[1, 100]', range='[0, 255]', default='200', digit='[4]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[486];
@@ -7373,7 +7373,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[487] = "alias='air_max', type='f32', size='[1, 100]', range='[0, 255]', default='250', digit='[4]', dynamic='1', hide='0'";
+	ctx->descs[487] = "alias='air_max', type='f32', size='[1, 100]', range='[0, 255]', default='250', digit='[4]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[488];
@@ -7402,7 +7402,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[489] = "alias='tmax_base', type='f32', size='[1, 100]', range='[0, 255]', default='125', digit='[4]', dynamic='1', hide='0'";
+	ctx->descs[489] = "alias='tmax_base', type='f32', size='[1, 100]', range='[0, 255]', default='125', digit='[4]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[490];
@@ -7431,7 +7431,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[491] = "alias='tmax_off', type='f32', size='[1, 100]', range='[0, 1]', default='0.1', digit='[4]', dynamic='1', hide='0'";
+	ctx->descs[491] = "alias='tmax_off', type='f32', size='[1, 100]', range='[0, 1]', default='0.1', digit='[4]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[492];
@@ -7460,7 +7460,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[493] = "alias='tmax_max', type='f32', size='[1, 100]', range='[0, 1]', default='0.8', digit='[4]', dynamic='1', hide='0'";
+	ctx->descs[493] = "alias='tmax_max', type='f32', size='[1, 100]', range='[0, 1]', default='0.8', digit='[4]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[494];
@@ -7489,7 +7489,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[495] = "alias='cfg_wt', type='f32', size='[1, 100]', range='[0, 1]', default='0.8', digit='[4]', dynamic='1', hide='0'";
+	ctx->descs[495] = "alias='cfg_wt', type='f32', size='[1, 100]', range='[0, 1]', default='0.8', digit='[4]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[496];
@@ -7518,7 +7518,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[497] = "alias='cfg_air', type='f32', size='[1, 100]', range='[0, 255]', default='210', digit='[4]', dynamic='1', hide='0'";
+	ctx->descs[497] = "alias='cfg_air', type='f32', size='[1, 100]', range='[0, 255]', default='210', digit='[4]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[498];
@@ -7547,7 +7547,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[499] = "alias='cfg_tmax', type='f32', size='[1, 100]', range='[0, 1]', default='0.2', digit='[4]', dynamic='1', hide='0'";
+	ctx->descs[499] = "alias='cfg_tmax', type='f32', size='[1, 100]', range='[0, 1]', default='0.2', digit='[4]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[500];
@@ -7576,7 +7576,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[501] = "alias='dc_weitcur', type='f32', size='[1, 100]', range='[0, 1]', default='1', digit='[4]', dynamic='1', hide='0'";
+	ctx->descs[501] = "alias='dc_weitcur', type='f32', size='[1, 100]', range='[0, 1]', default='1', digit='[4]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[502];
@@ -7605,7 +7605,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[503] = "alias='bf_weight', type='f32', size='[1, 100]', range='[0, 1]', default='0.5', digit='[4]', dynamic='1', hide='0'";
+	ctx->descs[503] = "alias='bf_weight', type='f32', size='[1, 100]', range='[0, 1]', default='0.5', digit='[4]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[504];
@@ -7634,7 +7634,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[505] = "alias='range_sigma', type='f32', size='[1, 100]', range='[0, 1]', default='0.04', digit='[4]', dynamic='1', hide='0'";
+	ctx->descs[505] = "alias='range_sigma', type='f32', size='[1, 100]', range='[0, 1]', default='0.04', digit='[4]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[506];
@@ -7663,7 +7663,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[507] = "alias='space_sigma_pre', type='f32', size='[1, 100]', range='[0, 1]', default='0.4', digit='[4]', dynamic='1', hide='0'";
+	ctx->descs[507] = "alias='space_sigma_pre', type='f32', size='[1, 100]', range='[0, 1]', default='0.4', digit='[4]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[508];
@@ -7692,7 +7692,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[509] = "alias='space_sigma_cur', type='f32', size='[1, 100]', range='[0, 1]', default='0.8', digit='[4]', dynamic='1', hide='0'";
+	ctx->descs[509] = "alias='space_sigma_cur', type='f32', size='[1, 100]', range='[0, 1]', default='0.8', digit='[4]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[510];
@@ -7721,7 +7721,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[511] = "type='bool', alias='en', default='1', hide='0'";
+	ctx->descs[511] = "type='bool', alias='en', default='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[512];
@@ -7737,7 +7737,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[512] = "type='bool', alias='air_lc_en', default='1', hide='0'";
+	ctx->descs[512] = "type='bool', alias='air_lc_en', default='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[513];
@@ -7753,7 +7753,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[513] = "alias='stab_fnum', type='f32', size='[1,1]', range='[0, 31]', default='8.0', digit='[4]', hide='0'";
+	ctx->descs[513] = "alias='stab_fnum', type='f32', size='[1,1]', range='[0, 31]', default='8.0', digit='[4]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[514];
@@ -7769,7 +7769,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[514] = "alias='sigma', type='f32', size='[1,1]', range='[0, 255]', default='6.0', digit='[4]', hide='0'";
+	ctx->descs[514] = "alias='sigma', type='f32', size='[1,1]', range='[0, 255]', default='6.0', digit='[4]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[515];
@@ -7785,7 +7785,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[515] = "alias='wt_sigma', type='f32', size='[1,1]', range='[0, 256]', default='8.0', digit='[4]', hide='0'";
+	ctx->descs[515] = "alias='wt_sigma', type='f32', size='[1,1]', range='[0, 256]', default='8.0', digit='[4]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[516];
@@ -7801,7 +7801,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[516] = "alias='air_sigma', type='f32', size='[1,1]', range='[0, 255]', default='120.0', digit='[4]', hide='0'";
+	ctx->descs[516] = "alias='air_sigma', type='f32', size='[1,1]', range='[0, 255]', default='120.0', digit='[4]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[517];
@@ -7817,7 +7817,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[517] = "alias='tmax_sigma', type='f32', size='[1,1]', range='[0, 1]', default='0.0100', digit='[4]', hide='0'";
+	ctx->descs[517] = "alias='tmax_sigma', type='f32', size='[1,1]', range='[0, 1]', default='0.0100', digit='[4]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[518];
@@ -7833,7 +7833,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[518] = "alias='pre_wet', type='f32', size='[1,1]', range='[0, 1]', default='0.0100', digit='[4]', hide='0'";
+	ctx->descs[518] = "alias='pre_wet', type='f32', size='[1,1]', range='[0, 1]', default='0.0100', digit='[4]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[519];
@@ -7849,7 +7849,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 93;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[519] = "alias='DehazeData', type='struct', ui_module='array_table_ui', index='none', hide='0'";
+	ctx->descs[519] = "alias='DehazeData', type='struct', ui_module='array_table_ui', index='none', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[520];
@@ -7865,7 +7865,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[520] = "alias='EnvLv', type='f32', size='[1, 100]', range='[0, 1]', default='0', digit='[4]', dynamic='1', hide='0'";
+	ctx->descs[520] = "alias='EnvLv', type='f32', size='[1, 100]', range='[0, 1]', default='0', digit='[4]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[521];
@@ -7894,7 +7894,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[522] = "alias='enhance_value', type='f32', size='[1, 100]', range='[0, 32]', default='1', digit='[4]', dynamic='1', hide='0'";
+	ctx->descs[522] = "alias='enhance_value', type='f32', size='[1, 100]', range='[0, 32]', default='1', digit='[4]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[523];
@@ -7923,7 +7923,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[524] = "alias='enhance_chroma', type='f32', size='[1, 100]', range='[0, 32]', default='1', digit='[4]', dynamic='1', hide='0'";
+	ctx->descs[524] = "alias='enhance_chroma', type='f32', size='[1, 100]', range='[0, 32]', default='1', digit='[4]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[525];
@@ -7952,7 +7952,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[526] = "type='bool', alias='en', default='1', hide='0'";
+	ctx->descs[526] = "type='bool', alias='en', default='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[527];
@@ -7968,7 +7968,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[527] = "alias='enhance_curve', type='f32', size='[1, 17]', range='[0, 1024]', default='[0 64 128 192 256 320 384 448 512 576 640 704 768 832 896 960 1023]', digit='[0]', dynamic='0', hide='0'";
+	ctx->descs[527] = "alias='enhance_curve', type='f32', size='[1, 17]', range='[0, 1024]', default='[0 64 128 192 256 320 384 448 512 576 640 704 768 832 896 960 1023]', digit='[0]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[528];
@@ -7984,7 +7984,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 95;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[528] = "alias='EnhanceData', type='struct', ui_module='array_table_ui', index='none', hide='0'";
+	ctx->descs[528] = "alias='EnhanceData', type='struct', ui_module='array_table_ui', index='none', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[529];
@@ -8000,7 +8000,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[529] = "alias='EnvLv', type='f32', size='[1, 100]', range='[0, 1]', default='0', digit='[4]', dynamic='1', hide='0'";
+	ctx->descs[529] = "alias='EnvLv', type='f32', size='[1, 100]', range='[0, 1]', default='0', digit='[4]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[530];
@@ -8029,7 +8029,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[531] = "alias='hist_gratio', type='f32', size='[1, 100]', range='[0, 32]', default='2', digit='[4]', dynamic='1', hide='0'";
+	ctx->descs[531] = "alias='hist_gratio', type='f32', size='[1, 100]', range='[0, 32]', default='2', digit='[4]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[532];
@@ -8058,7 +8058,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[533] = "alias='hist_th_off', type='f32', size='[1, 100]', range='[0, 255]', default='64', digit='[4]', dynamic='1', hide='0'";
+	ctx->descs[533] = "alias='hist_th_off', type='f32', size='[1, 100]', range='[0, 255]', default='64', digit='[4]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[534];
@@ -8087,7 +8087,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[535] = "alias='hist_k', type='f32', size='[1, 100]', range='[0, 8]', default='2', digit='[4]', dynamic='1', hide='0'";
+	ctx->descs[535] = "alias='hist_k', type='f32', size='[1, 100]', range='[0, 8]', default='2', digit='[4]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[536];
@@ -8116,7 +8116,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[537] = "alias='hist_min', type='f32', size='[1, 100]', range='[0, 2]', default='0.016', digit='[4]', dynamic='1', hide='0'";
+	ctx->descs[537] = "alias='hist_min', type='f32', size='[1, 100]', range='[0, 2]', default='0.016', digit='[4]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[538];
@@ -8145,7 +8145,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[539] = "alias='hist_scale', type='f32', size='[1, 100]', range='[0, 32]', default='0.09', digit='[4]', dynamic='1', hide='0'";
+	ctx->descs[539] = "alias='hist_scale', type='f32', size='[1, 100]', range='[0, 32]', default='0.09', digit='[4]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[540];
@@ -8174,7 +8174,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[541] = "alias='cfg_gratio', type='f32', size='[1, 100]', range='[0, 32]', default='2', digit='[4]', dynamic='1', hide='0'";
+	ctx->descs[541] = "alias='cfg_gratio', type='f32', size='[1, 100]', range='[0, 32]', default='2', digit='[4]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[542];
@@ -8203,7 +8203,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[543] = "type='bool', alias='en', default='1', hide='0'";
+	ctx->descs[543] = "type='bool', alias='en', default='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[544];
@@ -8219,7 +8219,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[544] = "type='bool', alias='hist_para_en', default='1', hide='0'";
+	ctx->descs[544] = "type='bool', alias='hist_para_en', default='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[545];
@@ -8235,7 +8235,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 97;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[545] = "alias='HistData', type='struct', ui_module='array_table_ui', index='none', hide='0'";
+	ctx->descs[545] = "alias='HistData', type='struct', ui_module='array_table_ui', index='none', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[546];
@@ -8251,7 +8251,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[546] = "type='bool', alias='en', default='1', hide='0'";
+	ctx->descs[546] = "type='bool', alias='en', default='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[547];
@@ -8267,7 +8267,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[547] = "alias='cfg_alpha', type='f32', size='[1,1]', range='[0, 1]', default='1', digit='[4]', hide='0'";
+	ctx->descs[547] = "alias='cfg_alpha', type='f32', size='[1,1]', range='[0, 1]', default='1', digit='[4]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[548];
@@ -8283,7 +8283,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[548] = "alias='ByPassThr', type='f32', size='[1,1]', range='[0, 1]', default='0', digit='[4]', hide='0'";
+	ctx->descs[548] = "alias='ByPassThr', type='f32', size='[1,1]', range='[0, 1]', default='0', digit='[4]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[549];
@@ -8299,7 +8299,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 94;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[549] = "alias='dehaze_setting', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[549] = "alias='dehaze_setting', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[550];
@@ -8315,7 +8315,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 96;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[550] = "alias='enhance_setting', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[550] = "alias='enhance_setting', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[551];
@@ -8331,7 +8331,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 98;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[551] = "alias='hist_setting', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[551] = "alias='hist_setting', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[552];
@@ -8347,7 +8347,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 99;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[552] = "alias='DehazeTuningPara', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[552] = "alias='DehazeTuningPara', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[553];
@@ -8363,7 +8363,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 99;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[553] = "alias='DehazeTuningPara', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[553] = "alias='DehazeTuningPara', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[554];
@@ -8379,7 +8379,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[554] = "alias='RK_enable', type='u8', size='[1, 13]', range='[0, 1]', default='[0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]', digit='[0]', dynamic='0', hide='0'";
+	ctx->descs[554] = "alias='RK_enable', type='u8', size='[1, 13]', range='[0, 1]', default='[0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]', digit='[0]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[555];
@@ -8395,7 +8395,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[555] = "alias='rb_sw_mindis', type='u8', size='[1, 13]', range='[0, 255]', default='[0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]', digit='[0]', dynamic='0', hide='0'";
+	ctx->descs[555] = "alias='rb_sw_mindis', type='u8', size='[1, 13]', range='[0, 255]', default='[0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]', digit='[0]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[556];
@@ -8411,7 +8411,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[556] = "alias='g_sw_mindis', type='u8', size='[1, 13]', range='[0, 255]', default='[0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]', digit='[0]', dynamic='0', hide='0'";
+	ctx->descs[556] = "alias='g_sw_mindis', type='u8', size='[1, 13]', range='[0, 255]', default='[0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]', digit='[0]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[557];
@@ -8427,7 +8427,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[557] = "alias='sw_dis_scale_min', type='u8', size='[1, 13]', range='[0, 63]', default='[0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]', digit='[0]', dynamic='0', hide='0'";
+	ctx->descs[557] = "alias='sw_dis_scale_min', type='u8', size='[1, 13]', range='[0, 63]', default='[0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]', digit='[0]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[558];
@@ -8443,7 +8443,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[558] = "alias='sw_dis_scale_max', type='u8', size='[1, 13]', range='[0, 63]', default='[0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]', digit='[0]', dynamic='0', hide='0'";
+	ctx->descs[558] = "alias='sw_dis_scale_max', type='u8', size='[1, 13]', range='[0, 63]', default='[0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]', digit='[0]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[559];
@@ -8459,7 +8459,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[559] = "alias='LC_enable', type='u8', size='[1, 13]', range='[0, 1]', default='[1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1]', digit='[0]', dynamic='0', hide='0'";
+	ctx->descs[559] = "alias='LC_enable', type='u8', size='[1, 13]', range='[0, 1]', default='[1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1]', digit='[0]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[560];
@@ -8475,7 +8475,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[560] = "alias='rb_line_thr', type='u8', size='[1, 13]', range='[0, 255]', default='[8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8]', digit='[0]', dynamic='0', hide='0'";
+	ctx->descs[560] = "alias='rb_line_thr', type='u8', size='[1, 13]', range='[0, 255]', default='[8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8]', digit='[0]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[561];
@@ -8491,7 +8491,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[561] = "alias='g_line_thr', type='u8', size='[1, 13]', range='[0, 255]', default='[8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8]', digit='[0]', dynamic='0', hide='0'";
+	ctx->descs[561] = "alias='g_line_thr', type='u8', size='[1, 13]', range='[0, 255]', default='[8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8]', digit='[0]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[562];
@@ -8507,7 +8507,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[562] = "alias='rb_line_mad_fac', type='u8', size='[1, 13]', range='[0, 63]', default='[4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4]', digit='[0]', dynamic='0', hide='0'";
+	ctx->descs[562] = "alias='rb_line_mad_fac', type='u8', size='[1, 13]', range='[0, 63]', default='[4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4]', digit='[0]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[563];
@@ -8523,7 +8523,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[563] = "alias='g_line_mad_fac', type='u8', size='[1, 13]', range='[0, 63]', default='[4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4]', digit='[0]', dynamic='0', hide='0'";
+	ctx->descs[563] = "alias='g_line_mad_fac', type='u8', size='[1, 13]', range='[0, 63]', default='[4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4]', digit='[0]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[564];
@@ -8539,7 +8539,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[564] = "alias='PG_enable', type='u8', size='[1, 13]', range='[0, 1]', default='[1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1]', digit='[0]', dynamic='0', hide='0'";
+	ctx->descs[564] = "alias='PG_enable', type='u8', size='[1, 13]', range='[0, 1]', default='[1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1]', digit='[0]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[565];
@@ -8555,7 +8555,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[565] = "alias='rb_pg_fac', type='u8', size='[1, 13]', range='[0, 63]', default='[4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4]', digit='[0]', dynamic='0', hide='0'";
+	ctx->descs[565] = "alias='rb_pg_fac', type='u8', size='[1, 13]', range='[0, 63]', default='[4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4]', digit='[0]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[566];
@@ -8571,7 +8571,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[566] = "alias='g_pg_fac', type='u8', size='[1, 13]', range='[0, 63]', default='[3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3]', digit='[0]', dynamic='0', hide='0'";
+	ctx->descs[566] = "alias='g_pg_fac', type='u8', size='[1, 13]', range='[0, 63]', default='[3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3]', digit='[0]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[567];
@@ -8587,7 +8587,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[567] = "alias='RND_enable', type='u8', size='[1, 13]', range='[0, 1]', default='[1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1]', digit='[0]', dynamic='0', hide='0'";
+	ctx->descs[567] = "alias='RND_enable', type='u8', size='[1, 13]', range='[0, 1]', default='[1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1]', digit='[0]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[568];
@@ -8603,7 +8603,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[568] = "alias='rb_rnd_thr', type='u8', size='[1, 13]', range='[0, 255]', default='[8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8]', digit='[0]', dynamic='0', hide='0'";
+	ctx->descs[568] = "alias='rb_rnd_thr', type='u8', size='[1, 13]', range='[0, 255]', default='[8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8]', digit='[0]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[569];
@@ -8619,7 +8619,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[569] = "alias='g_rnd_thr', type='u8', size='[1, 13]', range='[0, 255]', default='[8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8]', digit='[0]', dynamic='0', hide='0'";
+	ctx->descs[569] = "alias='g_rnd_thr', type='u8', size='[1, 13]', range='[0, 255]', default='[8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8]', digit='[0]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[570];
@@ -8635,7 +8635,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[570] = "alias='rb_rnd_offs', type='u8', size='[1, 13]', range='[0, 3]', default='[3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3]', digit='[0]', dynamic='0', hide='0'";
+	ctx->descs[570] = "alias='rb_rnd_offs', type='u8', size='[1, 13]', range='[0, 3]', default='[3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3]', digit='[0]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[571];
@@ -8651,7 +8651,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[571] = "alias='g_rnd_offs', type='u8', size='[1, 13]', range='[0, 3]', default='[3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3]', digit='[0]', dynamic='0', hide='0'";
+	ctx->descs[571] = "alias='g_rnd_offs', type='u8', size='[1, 13]', range='[0, 3]', default='[3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3]', digit='[0]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[572];
@@ -8667,7 +8667,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[572] = "alias='RG_enable', type='u8', size='[1, 13]', range='[0, 1]', default='[1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1]', digit='[0]', dynamic='0', hide='0'";
+	ctx->descs[572] = "alias='RG_enable', type='u8', size='[1, 13]', range='[0, 1]', default='[1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1]', digit='[0]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[573];
@@ -8683,7 +8683,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[573] = "alias='rb_rg_fac', type='u8', size='[1, 13]', range='[0, 63]', default='[8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8]', digit='[0]', dynamic='0', hide='0'";
+	ctx->descs[573] = "alias='rb_rg_fac', type='u8', size='[1, 13]', range='[0, 63]', default='[8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8]', digit='[0]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[574];
@@ -8699,7 +8699,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[574] = "alias='g_rg_fac', type='u8', size='[1, 13]', range='[0, 63]', default='[8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8]', digit='[0]', dynamic='0', hide='0'";
+	ctx->descs[574] = "alias='g_rg_fac', type='u8', size='[1, 13]', range='[0, 63]', default='[8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8]', digit='[0]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[575];
@@ -8715,7 +8715,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[575] = "alias='RO_enable', type='u8', size='[1, 13]', range='[0, 1]', default='[1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1]', digit='[0]', dynamic='0', hide='0'";
+	ctx->descs[575] = "alias='RO_enable', type='u8', size='[1, 13]', range='[0, 1]', default='[1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1]', digit='[0]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[576];
@@ -8731,7 +8731,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[576] = "alias='rb_ro_lim', type='u8', size='[1, 13]', range='[0, 3]', default='[1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1]', digit='[0]', dynamic='0', hide='0'";
+	ctx->descs[576] = "alias='rb_ro_lim', type='u8', size='[1, 13]', range='[0, 3]', default='[1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1]', digit='[0]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[577];
@@ -8747,7 +8747,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[577] = "alias='g_ro_lim', type='u8', size='[1, 13]', range='[0, 3]', default='[1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1]', digit='[0]', dynamic='0', hide='0'";
+	ctx->descs[577] = "alias='g_ro_lim', type='u8', size='[1, 13]', range='[0, 3]', default='[1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1]', digit='[0]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[578];
@@ -8763,7 +8763,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 102;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[578] = "alias='RK', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[578] = "alias='RK', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[579];
@@ -8779,7 +8779,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 103;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[579] = "alias='LC', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[579] = "alias='LC', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[580];
@@ -8795,7 +8795,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 104;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[580] = "alias='PG', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[580] = "alias='PG', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[581];
@@ -8811,7 +8811,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 105;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[581] = "alias='RND', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[581] = "alias='RND', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[582];
@@ -8827,7 +8827,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 106;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[582] = "alias='RG', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[582] = "alias='RG', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[583];
@@ -8843,7 +8843,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 107;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[583] = "alias='RO', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[583] = "alias='RO', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[584];
@@ -8859,7 +8859,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[584] = "alias='ISO', type='f32', size='[1, 100]', range='[50, 10000000]', default='50', digit='[2]', dynamic='1', hide='0'";
+	ctx->descs[584] = "alias='ISO', type='f32', size='[1, 100]', range='[50, 10000000]', default='50', digit='[2]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[585];
@@ -8888,7 +8888,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[586] = "alias='Single_level', type='u32', size='[1, 100]', range='[1, 10]', default='1', digit='[0]', dynamic='1', hide='0'";
+	ctx->descs[586] = "alias='Single_level', type='u32', size='[1, 100]', range='[1, 10]', default='1', digit='[0]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[587];
@@ -8917,7 +8917,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[588] = "alias='Double_level', type='u32', size='[1, 100]', range='[1, 10]', default='1', digit='[0]', dynamic='1', hide='0'";
+	ctx->descs[588] = "alias='Double_level', type='u32', size='[1, 100]', range='[1, 10]', default='1', digit='[0]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[589];
@@ -8946,7 +8946,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[590] = "alias='Triple_level', type='u32', size='[1, 100]', range='[1, 10]', default='1', digit='[0]', dynamic='1', hide='0'";
+	ctx->descs[590] = "alias='Triple_level', type='u32', size='[1, 100]', range='[1, 10]', default='1', digit='[0]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[591];
@@ -8975,7 +8975,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[592] = "type='bool', alias='Fast_mode_en', default='1', hide='0'";
+	ctx->descs[592] = "type='bool', alias='Fast_mode_en', default='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[593];
@@ -8991,7 +8991,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[593] = "type='bool', alias='Single_enable', default='1', hide='0'";
+	ctx->descs[593] = "type='bool', alias='Single_enable', default='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[594];
@@ -9007,7 +9007,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[594] = "type='bool', alias='Double_enable', default='1', hide='0'";
+	ctx->descs[594] = "type='bool', alias='Double_enable', default='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[595];
@@ -9023,7 +9023,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[595] = "type='bool', alias='Triple_enable', default='1', hide='0'";
+	ctx->descs[595] = "type='bool', alias='Triple_enable', default='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[596];
@@ -9039,7 +9039,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 109;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[596] = "alias='Fast_Data', type='struct', ui_module='array_table_ui', index='none', hide='0'";
+	ctx->descs[596] = "alias='Fast_Data', type='struct', ui_module='array_table_ui', index='none', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[597];
@@ -9055,7 +9055,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 102;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[597] = "alias='RK', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[597] = "alias='RK', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[598];
@@ -9071,7 +9071,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 103;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[598] = "alias='LC', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[598] = "alias='LC', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[599];
@@ -9087,7 +9087,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 104;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[599] = "alias='PG', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[599] = "alias='PG', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[600];
@@ -9103,7 +9103,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 105;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[600] = "alias='RND', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[600] = "alias='RND', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[601];
@@ -9119,7 +9119,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 106;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[601] = "alias='RG', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[601] = "alias='RG', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[602];
@@ -9135,7 +9135,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 107;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[602] = "alias='RO', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[602] = "alias='RO', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[603];
@@ -9151,7 +9151,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[603] = "alias='ISO', type='u32', size='[1, 13]', range='[50, 100000000]', default='[50 100 200 400 800 1600 3200 6400 12800 25600 51200 102400 204800]', digit='[4]', dynamic='0', hide='0'";
+	ctx->descs[603] = "alias='ISO', type='u32', size='[1, 13]', range='[50, 100000000]', default='[50 100 200 400 800 1600 3200 6400 12800 25600 51200 102400 204800]', digit='[4]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[604];
@@ -9167,7 +9167,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[604] = "alias='fix_set', type='u16', size='[1, 13]', range='[0, 1]', default='[0 0 0 0 0 0 0 0 0 0 0 0 0]', digit='[0]', dynamic='0', hide='0'";
+	ctx->descs[604] = "alias='fix_set', type='u16', size='[1, 13]', range='[0, 1]', default='[0 0 0 0 0 0 0 0 0 0 0 0 0]', digit='[0]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[605];
@@ -9183,7 +9183,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[605] = "alias='set1', type='u16', size='[1, 13]', range='[0, 1]', default='[0 0 0 0 0 0 0 0 0 0 0 0 0]', digit='[0]', dynamic='0', hide='0'";
+	ctx->descs[605] = "alias='set1', type='u16', size='[1, 13]', range='[0, 1]', default='[0 0 0 0 0 0 0 0 0 0 0 0 0]', digit='[0]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[606];
@@ -9199,7 +9199,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[606] = "alias='set2', type='u16', size='[1, 13]', range='[0, 1]', default='[0 0 0 0 0 0 0 0 0 0 0 0 0]', digit='[0]', dynamic='0', hide='0'";
+	ctx->descs[606] = "alias='set2', type='u16', size='[1, 13]', range='[0, 1]', default='[0 0 0 0 0 0 0 0 0 0 0 0 0]', digit='[0]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[607];
@@ -9215,7 +9215,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[607] = "alias='set3', type='u16', size='[1, 13]', range='[0, 1]', default='[0 0 0 0 0 0 0 0 0 0 0 0 0]', digit='[0]', dynamic='0', hide='0'";
+	ctx->descs[607] = "alias='set3', type='u16', size='[1, 13]', range='[0, 1]', default='[0 0 0 0 0 0 0 0 0 0 0 0 0]', digit='[0]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[608];
@@ -9231,7 +9231,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[608] = "type='bool', alias='stage1_Enable', default='1', hide='0'";
+	ctx->descs[608] = "type='bool', alias='stage1_Enable', default='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[609];
@@ -9247,7 +9247,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[609] = "type='bool', alias='grayscale_mode', default='0', hide='0'";
+	ctx->descs[609] = "type='bool', alias='grayscale_mode', default='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[610];
@@ -9263,7 +9263,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[610] = "type='bool', alias='dpcc_out_sel', default='1', hide='0'";
+	ctx->descs[610] = "type='bool', alias='dpcc_out_sel', default='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[611];
@@ -9279,7 +9279,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[611] = "type='bool', alias='stage1_g_3x3', default='0', hide='0'";
+	ctx->descs[611] = "type='bool', alias='stage1_g_3x3', default='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[612];
@@ -9295,7 +9295,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[612] = "type='bool', alias='stage1_rb_3x3', default='0', hide='0'";
+	ctx->descs[612] = "type='bool', alias='stage1_rb_3x3', default='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[613];
@@ -9311,7 +9311,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[613] = "type='bool', alias='stage1_inc_rb_center', default='1', hide='0'";
+	ctx->descs[613] = "type='bool', alias='stage1_inc_rb_center', default='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[614];
@@ -9327,7 +9327,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[614] = "type='bool', alias='stage1_inc_g_center', default='1', hide='0'";
+	ctx->descs[614] = "type='bool', alias='stage1_inc_g_center', default='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[615];
@@ -9343,7 +9343,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[615] = "alias='rk_out_sel', type='u8', size='[1,1]', range='[0, 2]', default='0', digit='[0]', hide='0'";
+	ctx->descs[615] = "alias='rk_out_sel', type='u8', size='[1,1]', range='[0, 2]', default='0', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[616];
@@ -9359,7 +9359,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 112;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[616] = "alias='SetEnable', type='struct', ui_module='array_table_ui', hide='0'";
+	ctx->descs[616] = "alias='SetEnable', type='struct', ui_module='array_table_ui', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[617];
@@ -9375,7 +9375,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 111;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[617] = "alias='set1', type='struct', ui_module='array_table_ui', index='none', hide='0'";
+	ctx->descs[617] = "alias='set1', type='struct', ui_module='array_table_ui', index='none', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[618];
@@ -9391,7 +9391,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 111;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[618] = "alias='set2', type='struct', ui_module='array_table_ui', index='none', hide='0'";
+	ctx->descs[618] = "alias='set2', type='struct', ui_module='array_table_ui', index='none', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[619];
@@ -9407,7 +9407,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 111;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[619] = "alias='set3', type='struct', ui_module='array_table_ui', index='none', hide='0'";
+	ctx->descs[619] = "alias='set3', type='struct', ui_module='array_table_ui', index='none', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[620];
@@ -9423,7 +9423,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[620] = "type='bool', alias='en', default='0', hide='0'";
+	ctx->descs[620] = "type='bool', alias='en', default='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[621];
@@ -9439,7 +9439,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[621] = "alias='point_en', type='u16', size='[1, 16]', range='[1, 10]', default='[0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]', digit='[0]', dynamic='0', hide='0'";
+	ctx->descs[621] = "alias='point_en', type='u16', size='[1, 16]', range='[1, 10]', default='[0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]', digit='[0]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[622];
@@ -9455,7 +9455,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[622] = "alias='offsetx', type='u8', size='[1,1]', range='[0, 100]', default='0', digit='[0]', hide='0'";
+	ctx->descs[622] = "alias='offsetx', type='u8', size='[1,1]', range='[0, 100]', default='0', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[623];
@@ -9471,7 +9471,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[623] = "alias='offsety', type='u8', size='[1,1]', range='[0, 100]', default='0', digit='[0]', hide='0'";
+	ctx->descs[623] = "alias='offsety', type='u8', size='[1,1]', range='[0, 100]', default='0', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[624];
@@ -9487,7 +9487,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[624] = "alias='wrapx', type='u8', size='[1,1]', range='[0, 255]', default='0', digit='[0]', hide='0'";
+	ctx->descs[624] = "alias='wrapx', type='u8', size='[1,1]', range='[0, 255]', default='0', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[625];
@@ -9503,7 +9503,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[625] = "alias='wrapy', type='u8', size='[1,1]', range='[0, 255]', default='0', digit='[0]', hide='0'";
+	ctx->descs[625] = "alias='wrapy', type='u8', size='[1,1]', range='[0, 255]', default='0', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[626];
@@ -9519,7 +9519,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[626] = "alias='wrapx_num', type='u8', size='[1,1]', range='[0, 1023]', default='0', digit='[0]', hide='0'";
+	ctx->descs[626] = "alias='wrapx_num', type='u8', size='[1,1]', range='[0, 1023]', default='0', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[627];
@@ -9535,7 +9535,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[627] = "alias='wrapy_num', type='u8', size='[1,1]', range='[0, 1023]', default='0', digit='[0]', hide='0'";
+	ctx->descs[627] = "alias='wrapy_num', type='u8', size='[1,1]', range='[0, 1023]', default='0', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[628];
@@ -9551,7 +9551,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[628] = "alias='point_x', type='u16', size='[1, 16]', range='[1, 255]', default='[0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]', digit='[0]', dynamic='0', ui_module='normal_ui_style'";
+	ctx->descs[628] = "alias='point_x', type='u16', size='[1, 16]', range='[1, 255]', default='[0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]', digit='[0]', dynamic='0', ui_module='normal_ui_style', ro='0'";
 #endif
 
 	obj = &ctx->objs[629];
@@ -9567,7 +9567,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[629] = "alias='point_y', type='u16', size='[1, 16]', range='[1, 255]', default='[0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]', digit='[0]', dynamic='0', ui_module='normal_ui_style'";
+	ctx->descs[629] = "alias='point_y', type='u16', size='[1, 16]', range='[1, 255]', default='[0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]', digit='[0]', dynamic='0', ui_module='normal_ui_style', ro='0'";
 #endif
 
 	obj = &ctx->objs[630];
@@ -9583,7 +9583,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[630] = "alias='forward_med', type='u8', size='[1,1]', range='[0, 1]', default='0', digit='[0]', hide='0'";
+	ctx->descs[630] = "alias='forward_med', type='u8', size='[1,1]', range='[0, 1]', default='0', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[631];
@@ -9599,7 +9599,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[631] = "alias='ISO', type='f32', size='[1, 100]', range='[50, 10000000]', default='50', digit='[4]', dynamic='1', hide='0'";
+	ctx->descs[631] = "alias='ISO', type='f32', size='[1, 100]', range='[50, 10000000]', default='50', digit='[4]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[632];
@@ -9628,7 +9628,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[633] = "alias='level_single', type='u32', size='[1, 100]', range='[1, 10000000]', default='1', digit='[0]', dynamic='1', hide='0'";
+	ctx->descs[633] = "alias='level_single', type='u32', size='[1, 100]', range='[1, 10000000]', default='1', digit='[0]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[634];
@@ -9657,7 +9657,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[635] = "alias='level_multiple', type='u32', size='[1, 100]', range='[1, 10000000]', default='1', digit='[0]', dynamic='1', hide='0'";
+	ctx->descs[635] = "alias='level_multiple', type='u32', size='[1, 100]', range='[1, 10000000]', default='1', digit='[0]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[636];
@@ -9686,7 +9686,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[637] = "type='bool', alias='sensor_dpcc_auto_en', default='1', hide='0'";
+	ctx->descs[637] = "type='bool', alias='sensor_dpcc_auto_en', default='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[638];
@@ -9702,7 +9702,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[638] = "alias='max_level', type='u8', size='[1,1]', range='[0, 100]', default='1', digit='[0]', hide='0'";
+	ctx->descs[638] = "alias='max_level', type='u8', size='[1,1]', range='[0, 100]', default='1', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[639];
@@ -9718,7 +9718,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 115;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[639] = "alias='SensorDpcc_Data', type='struct', ui_module='array_table_ui', index='none', hide='0'";
+	ctx->descs[639] = "alias='SensorDpcc_Data', type='struct', ui_module='array_table_ui', index='none', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[640];
@@ -9734,7 +9734,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[640] = "type='bool', alias='Enable', default='1', hide='0'";
+	ctx->descs[640] = "type='bool', alias='Enable', default='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[641];
@@ -9750,7 +9750,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 110;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[641] = "alias='Fast_Mode', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[641] = "alias='Fast_Mode', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[642];
@@ -9766,7 +9766,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 113;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[642] = "alias='Expert_Mode', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[642] = "alias='Expert_Mode', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[643];
@@ -9782,7 +9782,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 114;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[643] = "alias='CalibDb_Dpcc_Pdaf_V20_t', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[643] = "alias='CalibDb_Dpcc_Pdaf_V20_t', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[644];
@@ -9798,7 +9798,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 116;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[644] = "alias='Sensor_dpcc', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[644] = "alias='Sensor_dpcc', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[645];
@@ -9814,7 +9814,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 117;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[645] = "alias='DpccTuningPara', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[645] = "alias='DpccTuningPara', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[646];
@@ -9830,7 +9830,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[646] = "alias='EnvLv', type='f32', size='[1, 100]', range='[0, 1]', default='0', digit='[4]', dynamic='1', hide='0'";
+	ctx->descs[646] = "alias='EnvLv', type='f32', size='[1, 100]', range='[0, 1]', default='0', digit='[4]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[647];
@@ -9859,7 +9859,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[648] = "alias='Smooth', type='f32', size='[1, 100]', range='[0, 1]', default='0.4', digit='[4]', dynamic='1', hide='0'";
+	ctx->descs[648] = "alias='Smooth', type='f32', size='[1, 100]', range='[0, 1]', default='0.4', digit='[4]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[649];
@@ -9888,7 +9888,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[650] = "alias='Offset', type='f32', size='[1, 100]', range='[108, 300]', default='210', digit='[4]', dynamic='1', hide='0'";
+	ctx->descs[650] = "alias='Offset', type='f32', size='[1, 100]', range='[108, 300]', default='210', digit='[4]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[651];
@@ -9917,7 +9917,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[652] = "alias='MoveCoef', type='f32', size='[1, 100]', range='[0, 1]', default='0', digit='[4]', dynamic='1', hide='0'";
+	ctx->descs[652] = "alias='MoveCoef', type='f32', size='[1, 100]', range='[0, 1]', default='0', digit='[4]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[653];
@@ -9946,7 +9946,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[654] = "alias='LM_smooth', type='f32', size='[1, 100]', range='[0, 1]', default='0.4', digit='[4]', dynamic='1', hide='0'";
+	ctx->descs[654] = "alias='LM_smooth', type='f32', size='[1, 100]', range='[0, 1]', default='0.4', digit='[4]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[655];
@@ -9975,7 +9975,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[656] = "alias='LM_offset', type='f32', size='[1, 100]', range='[0, 1]', default='0.38', digit='[4]', dynamic='1', hide='0'";
+	ctx->descs[656] = "alias='LM_offset', type='f32', size='[1, 100]', range='[0, 1]', default='0.38', digit='[4]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[657];
@@ -10004,7 +10004,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[658] = "alias='MS_smooth', type='f32', size='[1, 100]', range='[0, 1]', default='0.4', digit='[4]', dynamic='1', hide='0'";
+	ctx->descs[658] = "alias='MS_smooth', type='f32', size='[1, 100]', range='[0, 1]', default='0.4', digit='[4]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[659];
@@ -10033,7 +10033,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[660] = "alias='MS_offset', type='f32', size='[1, 100]', range='[0, 1]', default='0.38', digit='[4]', dynamic='1', hide='0'";
+	ctx->descs[660] = "alias='MS_offset', type='f32', size='[1, 100]', range='[0, 1]', default='0.38', digit='[4]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[661];
@@ -10062,7 +10062,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 119;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[662] = "alias='OECurve', type='struct', ui_module='array_table_ui', index='none', hide='0'";
+	ctx->descs[662] = "alias='OECurve', type='struct', ui_module='array_table_ui', index='none', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[663];
@@ -10078,7 +10078,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 120;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[663] = "alias='MDCurve', type='struct', ui_module='array_table_ui', index='none', hide='0'";
+	ctx->descs[663] = "alias='MDCurve', type='struct', ui_module='array_table_ui', index='none', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[664];
@@ -10094,7 +10094,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[664] = "alias='ByPassThr', type='f32', size='[1,1]', range='[0, 1]', default='0', digit='[4]', hide='0'";
+	ctx->descs[664] = "alias='ByPassThr', type='f32', size='[1,1]', range='[0, 1]', default='0', digit='[4]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[665];
@@ -10110,7 +10110,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[665] = "alias='OECurve_damp', type='f32', size='[1,1]', range='[0, 1]', default='0.9', digit='[4]', hide='0'";
+	ctx->descs[665] = "alias='OECurve_damp', type='f32', size='[1,1]', range='[0, 1]', default='0.9', digit='[4]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[666];
@@ -10126,7 +10126,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[666] = "alias='MDCurveLM_damp', type='f32', size='[1,1]', range='[0, 1]', default='0.9', digit='[4]', hide='0'";
+	ctx->descs[666] = "alias='MDCurveLM_damp', type='f32', size='[1,1]', range='[0, 1]', default='0.9', digit='[4]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[667];
@@ -10142,7 +10142,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[667] = "alias='MDCurveMS_damp', type='f32', size='[1,1]', range='[0, 1]', default='0.9', digit='[4]', hide='0'";
+	ctx->descs[667] = "alias='MDCurveMS_damp', type='f32', size='[1,1]', range='[0, 1]', default='0.9', digit='[4]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[668];
@@ -10158,7 +10158,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 121;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[668] = "alias='MergeTuningPara', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[668] = "alias='MergeTuningPara', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[669];
@@ -10174,7 +10174,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = 21;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[669] = "type='enum', alias='BaseFrm', enum_def='MergeBaseFrame_t', default='BASEFRAME_LONG'";
+	ctx->descs[669] = "type='enum', alias='BaseFrm', enum_def='MergeBaseFrame_t', default='BASEFRAME_LONG', ro='0'";
 #endif
 
 	obj = &ctx->objs[670];
@@ -10190,7 +10190,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 119;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[670] = "alias='OECurve', type='struct', ui_module='array_table_ui', index='none', hide='0'";
+	ctx->descs[670] = "alias='OECurve', type='struct', ui_module='array_table_ui', index='none', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[671];
@@ -10206,7 +10206,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 120;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[671] = "alias='MDCurve', type='struct', ui_module='array_table_ui', index='none', hide='0'";
+	ctx->descs[671] = "alias='MDCurve', type='struct', ui_module='array_table_ui', index='none', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[672];
@@ -10222,7 +10222,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[672] = "alias='ByPassThr', type='f32', size='[1,1]', range='[0, 1]', default='0', digit='[4]', hide='0'";
+	ctx->descs[672] = "alias='ByPassThr', type='f32', size='[1,1]', range='[0, 1]', default='0', digit='[4]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[673];
@@ -10238,7 +10238,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[673] = "alias='OECurve_damp', type='f32', size='[1,1]', range='[0, 1]', default='0.9', digit='[4]', hide='0'";
+	ctx->descs[673] = "alias='OECurve_damp', type='f32', size='[1,1]', range='[0, 1]', default='0.9', digit='[4]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[674];
@@ -10254,7 +10254,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[674] = "alias='MDCurveLM_damp', type='f32', size='[1,1]', range='[0, 1]', default='0.9', digit='[4]', hide='0'";
+	ctx->descs[674] = "alias='MDCurveLM_damp', type='f32', size='[1,1]', range='[0, 1]', default='0.9', digit='[4]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[675];
@@ -10270,7 +10270,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[675] = "alias='MDCurveMS_damp', type='f32', size='[1,1]', range='[0, 1]', default='0.9', digit='[4]', hide='0'";
+	ctx->descs[675] = "alias='MDCurveMS_damp', type='f32', size='[1,1]', range='[0, 1]', default='0.9', digit='[4]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[676];
@@ -10286,7 +10286,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 123;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[676] = "alias='MergeTuningPara', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[676] = "alias='MergeTuningPara', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[677];
@@ -10302,7 +10302,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[677] = "alias='EnvLv', type='f32', size='[1, 100]', range='[0, 1]', default='0', digit='[4]', dynamic='1', hide='0'";
+	ctx->descs[677] = "alias='EnvLv', type='f32', size='[1, 100]', range='[0, 1]', default='0', digit='[4]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[678];
@@ -10331,7 +10331,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[679] = "alias='ISO', type='f32', size='[1, 100]', range='[0, 10000000]', default='50', digit='[4]', dynamic='1', hide='0'";
+	ctx->descs[679] = "alias='ISO', type='f32', size='[1, 100]', range='[0, 10000000]', default='50', digit='[4]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[680];
@@ -10360,7 +10360,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[681] = "alias='Strength', type='f32', size='[1, 100]', range='[0, 1]', default='0.25', digit='[4]', dynamic='1', hide='0'";
+	ctx->descs[681] = "alias='Strength', type='f32', size='[1, 100]', range='[0, 1]', default='0.25', digit='[4]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[682];
@@ -10389,7 +10389,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = 22;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[683] = "type='enum', alias='Mode', enum_def='GlobalLumaMode_t', default='GLOBALLUMAMODE_ENVLV'";
+	ctx->descs[683] = "type='enum', alias='Mode', enum_def='GlobalLumaMode_t', default='GLOBALLUMAMODE_ENVLV', ro='0'";
 #endif
 
 	obj = &ctx->objs[684];
@@ -10405,7 +10405,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 125;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[684] = "alias='GlobalLumaData', type='struct', ui_module='array_table_ui', index='none', hide='0'";
+	ctx->descs[684] = "alias='GlobalLumaData', type='struct', ui_module='array_table_ui', index='none', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[685];
@@ -10421,7 +10421,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[685] = "alias='Tolerance', type='f32', size='[1,1]', range='[0, 0.2]', default='0', digit='[4]', hide='0'";
+	ctx->descs[685] = "alias='Tolerance', type='f32', size='[1,1]', range='[0, 0.2]', default='0', digit='[4]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[686];
@@ -10437,7 +10437,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[686] = "alias='OEPdf', type='f32', size='[1, 100]', range='[0, 1]', default='0', digit='[4]', dynamic='1', hide='0'";
+	ctx->descs[686] = "alias='OEPdf', type='f32', size='[1, 100]', range='[0, 1]', default='0', digit='[4]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[687];
@@ -10466,7 +10466,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[688] = "alias='EnvLv', type='f32', size='[1, 100]', range='[0, 1]', default='0', digit='[4]', dynamic='1', hide='0'";
+	ctx->descs[688] = "alias='EnvLv', type='f32', size='[1, 100]', range='[0, 1]', default='0', digit='[4]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[689];
@@ -10495,7 +10495,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[690] = "alias='Strength', type='f32', size='[1, 100]', range='[0, 1]', default='0.5', digit='[4]', dynamic='1', hide='0'";
+	ctx->descs[690] = "alias='Strength', type='f32', size='[1, 100]', range='[0, 1]', default='0.5', digit='[4]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[691];
@@ -10524,7 +10524,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = 23;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[692] = "type='enum', alias='Mode', enum_def='DetailsHighLightMode_t', default='DETAILSHIGHLIGHTMODE_ENVLV'";
+	ctx->descs[692] = "type='enum', alias='Mode', enum_def='DetailsHighLightMode_t', default='DETAILSHIGHLIGHTMODE_ENVLV', ro='0'";
 #endif
 
 	obj = &ctx->objs[693];
@@ -10540,7 +10540,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 127;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[693] = "alias='HighLightData', type='struct', ui_module='array_table_ui', index='none', hide='0'";
+	ctx->descs[693] = "alias='HighLightData', type='struct', ui_module='array_table_ui', index='none', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[694];
@@ -10556,7 +10556,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[694] = "alias='Tolerance', type='f32', size='[1,1]', range='[0, 0.2]', default='0', digit='[4]', hide='0'";
+	ctx->descs[694] = "alias='Tolerance', type='f32', size='[1,1]', range='[0, 0.2]', default='0', digit='[4]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[695];
@@ -10572,7 +10572,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[695] = "alias='FocusLuma', type='f32', size='[1, 100]', range='[0, 100]', default='1', digit='[4]', dynamic='1', hide='0'";
+	ctx->descs[695] = "alias='FocusLuma', type='f32', size='[1, 100]', range='[0, 100]', default='1', digit='[4]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[696];
@@ -10601,7 +10601,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[697] = "alias='DarkPdf', type='f32', size='[1, 100]', range='[0, 1]', default='0', digit='[4]', dynamic='1', hide='0'";
+	ctx->descs[697] = "alias='DarkPdf', type='f32', size='[1, 100]', range='[0, 1]', default='0', digit='[4]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[698];
@@ -10630,7 +10630,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[699] = "alias='ISO', type='f32', size='[1, 100]', range='[0, 10000000]', default='50', digit='[4]', dynamic='1', hide='0'";
+	ctx->descs[699] = "alias='ISO', type='f32', size='[1, 100]', range='[0, 10000000]', default='50', digit='[4]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[700];
@@ -10659,7 +10659,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[701] = "alias='Strength', type='f32', size='[1, 100]', range='[1, 4]', default='1', digit='[4]', dynamic='1', hide='0'";
+	ctx->descs[701] = "alias='Strength', type='f32', size='[1, 100]', range='[1, 4]', default='1', digit='[4]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[702];
@@ -10688,7 +10688,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = 24;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[703] = "type='enum', alias='Mode', enum_def='DetailsLowLightMode_t', default='DETAILSLOWLIGHTMODE_ISO'";
+	ctx->descs[703] = "type='enum', alias='Mode', enum_def='DetailsLowLightMode_t', default='DETAILSLOWLIGHTMODE_ISO', ro='0'";
 #endif
 
 	obj = &ctx->objs[704];
@@ -10704,7 +10704,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 129;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[704] = "alias='LowLightData', type='struct', ui_module='array_table_ui', index='none', hide='0'";
+	ctx->descs[704] = "alias='LowLightData', type='struct', ui_module='array_table_ui', index='none', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[705];
@@ -10720,7 +10720,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[705] = "alias='Tolerance', type='f32', size='[1,1]', range='[0, 0.2]', default='0', digit='[4]', hide='0'";
+	ctx->descs[705] = "alias='Tolerance', type='f32', size='[1,1]', range='[0, 0.2]', default='0', digit='[4]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[706];
@@ -10736,7 +10736,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[706] = "alias='DynamicRange', type='f32', size='[1, 100]', range='[1, 84]', default='1', digit='[4]', dynamic='1', hide='0'";
+	ctx->descs[706] = "alias='DynamicRange', type='f32', size='[1, 100]', range='[1, 84]', default='1', digit='[4]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[707];
@@ -10765,7 +10765,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[708] = "alias='EnvLv', type='f32', size='[1, 100]', range='[0, 1]', default='0', digit='[4]', dynamic='1', hide='0'";
+	ctx->descs[708] = "alias='EnvLv', type='f32', size='[1, 100]', range='[0, 1]', default='0', digit='[4]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[709];
@@ -10794,7 +10794,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[710] = "alias='Strength', type='f32', size='[1, 100]', range='[0, 1]', default='0.5', digit='[4]', dynamic='1', hide='0'";
+	ctx->descs[710] = "alias='Strength', type='f32', size='[1, 100]', range='[0, 1]', default='0.5', digit='[4]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[711];
@@ -10823,7 +10823,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = 25;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[712] = "type='enum', alias='Mode', enum_def='TmoTypeMode_t', default='TMOTYPEMODE_DYNAMICRANGE'";
+	ctx->descs[712] = "type='enum', alias='Mode', enum_def='TmoTypeMode_t', default='TMOTYPEMODE_DYNAMICRANGE', ro='0'";
 #endif
 
 	obj = &ctx->objs[713];
@@ -10839,7 +10839,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 131;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[713] = "alias='LocalTmoData', type='struct', ui_module='array_table_ui', index='none', hide='0'";
+	ctx->descs[713] = "alias='LocalTmoData', type='struct', ui_module='array_table_ui', index='none', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[714];
@@ -10855,7 +10855,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[714] = "alias='Tolerance', type='f32', size='[1,1]', range='[0, 0.2]', default='0', digit='[4]', hide='0'";
+	ctx->descs[714] = "alias='Tolerance', type='f32', size='[1,1]', range='[0, 0.2]', default='0', digit='[4]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[715];
@@ -10871,7 +10871,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[715] = "type='bool', alias='Enable', default='1', hide='0'";
+	ctx->descs[715] = "type='bool', alias='Enable', default='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[716];
@@ -10887,7 +10887,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[716] = "alias='IIR', type='f32', size='[1,1]', range='[1, 1000]', default='64', digit='[0]', hide='0'";
+	ctx->descs[716] = "alias='IIR', type='f32', size='[1,1]', range='[1, 1000]', default='64', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[717];
@@ -10903,7 +10903,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = 25;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[717] = "type='enum', alias='Mode', enum_def='TmoTypeMode_t', default='TMOTYPEMODE_DYNAMICRANGE'";
+	ctx->descs[717] = "type='enum', alias='Mode', enum_def='TmoTypeMode_t', default='TMOTYPEMODE_DYNAMICRANGE', ro='0'";
 #endif
 
 	obj = &ctx->objs[718];
@@ -10919,7 +10919,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 131;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[718] = "alias='GlobalTmoData', type='struct', ui_module='array_table_ui', index='none', hide='0'";
+	ctx->descs[718] = "alias='GlobalTmoData', type='struct', ui_module='array_table_ui', index='none', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[719];
@@ -10935,7 +10935,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[719] = "alias='Tolerance', type='f32', size='[1,1]', range='[0, 0.2]', default='0', digit='[4]', hide='0'";
+	ctx->descs[719] = "alias='Tolerance', type='f32', size='[1,1]', range='[0, 0.2]', default='0', digit='[4]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[720];
@@ -10951,7 +10951,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[720] = "type='bool', alias='Enable', default='1', hide='0'";
+	ctx->descs[720] = "type='bool', alias='Enable', default='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[721];
@@ -10967,7 +10967,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 126;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[721] = "alias='GlobalLuma', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[721] = "alias='GlobalLuma', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[722];
@@ -10983,7 +10983,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 128;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[722] = "alias='DetailsHighLight', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[722] = "alias='DetailsHighLight', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[723];
@@ -10999,7 +10999,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 130;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[723] = "alias='DetailsLowLight', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[723] = "alias='DetailsLowLight', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[724];
@@ -11015,7 +11015,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 132;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[724] = "alias='LocalTMO', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[724] = "alias='LocalTMO', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[725];
@@ -11031,7 +11031,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 133;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[725] = "alias='GlobaTMO', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[725] = "alias='GlobaTMO', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[726];
@@ -11047,7 +11047,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[726] = "alias='damp', type='f32', size='[1,1]', range='[0, 1]', default='0.9', digit='[4]', hide='0'";
+	ctx->descs[726] = "alias='damp', type='f32', size='[1,1]', range='[0, 1]', default='0.9', digit='[4]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[727];
@@ -11063,7 +11063,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 134;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[727] = "alias='TmoTuningPara', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[727] = "alias='TmoTuningPara', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[728];
@@ -11079,7 +11079,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = 29;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[728] = "type='enum', alias='domain', enum_def='CalibDbV2_Awb_Ext_Range_Domain_t', default='CALIB_AWB_EXTRA_RANGE_DOMAIN_UV'";
+	ctx->descs[728] = "type='enum', alias='domain', enum_def='CalibDbV2_Awb_Ext_Range_Domain_t', default='CALIB_AWB_EXTRA_RANGE_DOMAIN_UV', ro='0'";
 #endif
 
 	obj = &ctx->objs[729];
@@ -11095,7 +11095,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = 30;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[729] = "type='enum', alias='mode', enum_def='CalibDbV2_Awb_Ext_Range_Mode_t', default='CALIB_AWB_EXCLUDE_WP_MODE'";
+	ctx->descs[729] = "type='enum', alias='mode', enum_def='CalibDbV2_Awb_Ext_Range_Mode_t', default='CALIB_AWB_EXCLUDE_WP_MODE', ro='0'";
 #endif
 
 	obj = &ctx->objs[730];
@@ -11111,7 +11111,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[730] = "alias='region', type='s32', size='[1, 4]', range='[-8192, 8191]', default='0', digit='[0]', dynamic='0', hide='0'";
+	ctx->descs[730] = "alias='region', type='s32', size='[1, 4]', range='[-8192, 8191]', default='0', digit='[0]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[731];
@@ -11127,7 +11127,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[731] = "alias='b_uv', type='s32', size='[1,1]', range='[-65536, 65535]', default='0', digit='[0]', hide='1'";
+	ctx->descs[731] = "alias='b_uv', type='s32', size='[1,1]', range='[-65536, 65535]', default='0', digit='[0]', hide='1', ro='0'";
 #endif
 
 	obj = &ctx->objs[732];
@@ -11143,7 +11143,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[732] = "alias='slope_inv_neg_uv', type='s32', size='[1,1]', range='[-262144, 262143]', default='0', digit='[0]', hide='0'";
+	ctx->descs[732] = "alias='slope_inv_neg_uv', type='s32', size='[1,1]', range='[-262144, 262143]', default='0', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[733];
@@ -11159,7 +11159,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[733] = "alias='slope_factor_uv', type='s32', size='[1,1]', range='[-16384, 16383]', default='0', digit='[0]', hide='1'";
+	ctx->descs[733] = "alias='slope_factor_uv', type='s32', size='[1,1]', range='[-16384, 16383]', default='0', digit='[0]', hide='1', ro='0'";
 #endif
 
 	obj = &ctx->objs[734];
@@ -11175,7 +11175,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[734] = "alias='slope_ydis', type='s32', size='[1,1]', range='[-262144, 262143]', default='0', digit='[0]', hide='1'";
+	ctx->descs[734] = "alias='slope_ydis', type='s32', size='[1,1]', range='[-262144, 262143]', default='0', digit='[0]', hide='1', ro='0'";
 #endif
 
 	obj = &ctx->objs[735];
@@ -11191,7 +11191,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[735] = "alias='b_ydis', type='s32', size='[1,1]', range='[-65536, 65535]', default='0', digit='[0]', hide='1'";
+	ctx->descs[735] = "alias='b_ydis', type='s32', size='[1,1]', range='[-65536, 65535]', default='0', digit='[0]', hide='1', ro='0'";
 #endif
 
 	obj = &ctx->objs[736];
@@ -11207,7 +11207,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[736] = "alias='ref_v', type='u8', size='[1,1]', range='[0, 255]', default='0', digit='[0]', hide='1'";
+	ctx->descs[736] = "alias='ref_v', type='u8', size='[1,1]', range='[0, 255]', default='0', digit='[0]', hide='1', ro='0'";
 #endif
 
 	obj = &ctx->objs[737];
@@ -11223,7 +11223,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[737] = "alias='dis', type='u16', size='[1, 6]', range='[0, 4095]', default='0', digit='[0]', dynamic='0', hide='0'";
+	ctx->descs[737] = "alias='dis', type='u16', size='[1, 6]', range='[0, 4095]', default='0', digit='[0]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[738];
@@ -11239,7 +11239,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[738] = "alias='th', type='u8', size='[1, 6]', range='[0, 255]', default='0', digit='[0]', dynamic='0', hide='0'";
+	ctx->descs[738] = "alias='th', type='u8', size='[1, 6]', range='[0, 255]', default='0', digit='[0]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[739];
@@ -11255,7 +11255,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[739] = "alias='thcurve_u', type='f32', size='[1, 6]', range='[0, 255]', default='0', digit='[0]', dynamic='0', hide='0'";
+	ctx->descs[739] = "alias='thcurve_u', type='f32', size='[1, 6]', range='[0, 255]', default='0', digit='[0]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[740];
@@ -11271,7 +11271,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[740] = "alias='thcure_th', type='f32', size='[1, 6]', range='[0, 8]', default='0', digit='[4]', dynamic='0', hide='0'";
+	ctx->descs[740] = "alias='thcure_th', type='f32', size='[1, 6]', range='[0, 8]', default='0', digit='[4]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[741];
@@ -11287,7 +11287,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[741] = "alias='lineVector', type='f32', size='[1, 6]', range='[0, 255]', default='0', digit='[4]', dynamic='0', hide='1'";
+	ctx->descs[741] = "alias='lineVector', type='f32', size='[1, 6]', range='[0, 255]', default='0', digit='[4]', dynamic='0', hide='1', ro='0'";
 #endif
 
 	obj = &ctx->objs[742];
@@ -11303,7 +11303,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[742] = "alias='disP1P2', type='u8', size='[1,1]', range='[0, 255]', default='0', digit='[0]', hide='1'";
+	ctx->descs[742] = "alias='disP1P2', type='u8', size='[1,1]', range='[0, 255]', default='0', digit='[0]', hide='1', ro='0'";
 #endif
 
 	obj = &ctx->objs[743];
@@ -11319,7 +11319,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[743] = "alias='normal', type='f32', size='[1, 4]', range='[-8, 8]', default='0', digit='[4]', dynamic='0', hide='0'";
+	ctx->descs[743] = "alias='normal', type='f32', size='[1, 4]', range='[-8, 8]', default='0', digit='[4]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[744];
@@ -11335,7 +11335,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[744] = "alias='big', type='f32', size='[1, 4]', range='[-8, 8]', default='0', digit='[4]', dynamic='0', hide='0'";
+	ctx->descs[744] = "alias='big', type='f32', size='[1, 4]', range='[-8, 8]', default='0', digit='[4]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[745];
@@ -11351,7 +11351,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[745] = "alias='small', type='f32', size='[1, 4]', range='[-8, 8]', default='0', digit='[4]', dynamic='0', hide='0'";
+	ctx->descs[745] = "alias='small', type='f32', size='[1, 4]', range='[-8, 8]', default='0', digit='[4]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[746];
@@ -11367,7 +11367,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[746] = "alias='normal', type='f32', size='[1, 4]', range='[-8, 8]', default='0', digit='[4]', dynamic='0', hide='0'";
+	ctx->descs[746] = "alias='normal', type='f32', size='[1, 4]', range='[-8, 8]', default='0', digit='[4]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[747];
@@ -11383,7 +11383,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[747] = "alias='big', type='f32', size='[1, 4]', range='[-8, 8]', default='0', digit='[4]', dynamic='0', hide='0'";
+	ctx->descs[747] = "alias='big', type='f32', size='[1, 4]', range='[-8, 8]', default='0', digit='[4]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[748];
@@ -11399,7 +11399,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[748] = "alias='u', type='f32', size='[1, 4]', range='[0, 255]', default='0', digit='[1]', dynamic='0', hide='0'";
+	ctx->descs[748] = "alias='u', type='f32', size='[1, 4]', range='[0, 255]', default='0', digit='[1]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[749];
@@ -11415,7 +11415,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[749] = "alias='v', type='f32', size='[1, 4]', range='[0, 255]', default='0', digit='[1]', dynamic='0', hide='0'";
+	ctx->descs[749] = "alias='v', type='f32', size='[1, 4]', range='[0, 255]', default='0', digit='[1]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[750];
@@ -11431,7 +11431,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[750] = "alias='name', type='string', size='[1, 1]', range='[0, 16]', default='default', dynamic='0', hide='0'";
+	ctx->descs[750] = "alias='name', type='string', size='[1, 1]', range='[0, 16]', default='default', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[751];
@@ -11447,7 +11447,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = 31;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[751] = "type='enum', alias='doorType', enum_def='CalibDbV2_Awb_DoorType_t', default='CALIB_AWB_DOOR_TYPE_AMBIGUITY'";
+	ctx->descs[751] = "type='enum', alias='doorType', enum_def='CalibDbV2_Awb_DoorType_t', default='CALIB_AWB_DOOR_TYPE_AMBIGUITY', ro='0'";
 #endif
 
 	obj = &ctx->objs[752];
@@ -11463,7 +11463,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[752] = "alias='standardGainValue', type='f32', size='[1, 4]', range='[0, 4]', default='1.0', digit='[4]', dynamic='0', hide='0'";
+	ctx->descs[752] = "alias='standardGainValue', type='f32', size='[1, 4]', range='[0, 4]', default='1.0', digit='[4]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[753];
@@ -11479,7 +11479,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 141;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[753] = "alias='uvRegion', type='struct', ui_module='array_table_ui', index='none', hide='0'";
+	ctx->descs[753] = "alias='uvRegion', type='struct', ui_module='array_table_ui', index='none', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[754];
@@ -11495,7 +11495,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 139;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[754] = "alias='xyRegion', type='struct', ui_module='array_table_ui', index='none', hide='0'";
+	ctx->descs[754] = "alias='xyRegion', type='struct', ui_module='array_table_ui', index='none', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[755];
@@ -11511,7 +11511,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 137;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[755] = "alias='yuvRegion', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[755] = "alias='yuvRegion', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[756];
@@ -11527,7 +11527,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[756] = "alias='staWeight', type='u8', size='[1, 16]', range='[0, 100]', default='0', digit='[0]', dynamic='0', hide='0'";
+	ctx->descs[756] = "alias='staWeight', type='u8', size='[1, 16]', range='[0, 100]', default='0', digit='[0]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[757];
@@ -11543,7 +11543,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[757] = "alias='dayGainLvThSet', type='u32', size='[1, 2]', range='[0, 255000]', default='0', digit='[0]', dynamic='0', hide='0'";
+	ctx->descs[757] = "alias='dayGainLvThSet', type='u32', size='[1, 2]', range='[0, 255000]', default='0', digit='[0]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[758];
@@ -11559,7 +11559,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[758] = "alias='defaultDayGainLow', type='f32', size='[1, 4]', range='[0, 8]', default='1', digit='[4]', dynamic='0', hide='0'";
+	ctx->descs[758] = "alias='defaultDayGainLow', type='f32', size='[1, 4]', range='[0, 8]', default='1', digit='[4]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[759];
@@ -11575,7 +11575,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[759] = "alias='defaultDayGainHigh', type='f32', size='[1, 4]', range='[0, 8]', default='1', digit='[4]', dynamic='0', hide='0'";
+	ctx->descs[759] = "alias='defaultDayGainHigh', type='f32', size='[1, 4]', range='[0, 8]', default='1', digit='[4]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[760];
@@ -11591,7 +11591,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[760] = "type='bool', alias='xyType2Enable', default='1', hide='1'";
+	ctx->descs[760] = "type='bool', alias='xyType2Enable', default='1', hide='1', ro='0'";
 #endif
 
 	obj = &ctx->objs[761];
@@ -11607,7 +11607,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = 32;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[761] = "type='enum', alias='mode', enum_def='CALIB_AWB_WINDOW_CFG_AUTO', default='CALIB_AWB_WINDOW_CFG_AUTO'";
+	ctx->descs[761] = "type='enum', alias='mode', enum_def='CALIB_AWB_WINDOW_CFG_AUTO', default='CALIB_AWB_WINDOW_CFG_AUTO', ro='0'";
 #endif
 
 	obj = &ctx->objs[762];
@@ -11623,7 +11623,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[762] = "alias='window', type='f32', size='[1, 4]', range='[0, 100]', default='[0 0 1 1]', digit='[2]', dynamic='0', hide='0'";
+	ctx->descs[762] = "alias='window', type='f32', size='[1, 4]', range='[0, 100]', default='[0 0 1 1]', digit='[2]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[763];
@@ -11639,7 +11639,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[763] = "type='bool', alias='enable', default='0', hide='0'";
+	ctx->descs[763] = "type='bool', alias='enable', default='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[764];
@@ -11655,7 +11655,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[764] = "alias='cct', type='f32', size='[1, 5]', range='[0, 10000]', default='0', digit='[0]', dynamic='1', hide='0'";
+	ctx->descs[764] = "alias='cct', type='f32', size='[1, 5]', range='[0, 10000]', default='0', digit='[0]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[765];
@@ -11684,7 +11684,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[766] = "alias='cri_bound_up', type='f32', size='[1, 5]', range='[0, 1]', default='0', digit='[4]', dynamic='1', hide='0'";
+	ctx->descs[766] = "alias='cri_bound_up', type='f32', size='[1, 5]', range='[0, 1]', default='0', digit='[4]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[767];
@@ -11713,7 +11713,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[768] = "alias='cri_bound_low', type='f32', size='[1, 5]', range='[0, 1]', default='0', digit='[4]', dynamic='1', hide='0'";
+	ctx->descs[768] = "alias='cri_bound_low', type='f32', size='[1, 5]', range='[0, 1]', default='0', digit='[4]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[769];
@@ -11742,7 +11742,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[770] = "type='bool', alias='enable', default='0', hide='0'";
+	ctx->descs[770] = "type='bool', alias='enable', default='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[771];
@@ -11758,7 +11758,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[771] = "alias='outdoor_cct_min', type='f32', size='[1,1]', range='[0, 10000]', default='5000', digit='[0]', hide='0'";
+	ctx->descs[771] = "alias='outdoor_cct_min', type='f32', size='[1,1]', range='[0, 10000]', default='5000', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[772];
@@ -11774,7 +11774,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[772] = "alias='lumaValue', type='f32', size='[1, 5]', range='[0, 255000]', default='0', digit='[1]', dynamic='1', hide='0'";
+	ctx->descs[772] = "alias='lumaValue', type='f32', size='[1, 5]', range='[0, 255000]', default='0', digit='[1]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[773];
@@ -11803,7 +11803,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[774] = "alias='maxR', type='u16', size='[1, 5]', range='[0, 255]', default='230', digit='[0]', dynamic='1', hide='0'";
+	ctx->descs[774] = "alias='maxR', type='u16', size='[1, 5]', range='[0, 255]', default='230', digit='[0]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[775];
@@ -11832,7 +11832,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[776] = "alias='minR', type='u16', size='[1, 5]', range='[0, 255]', default='3', digit='[0]', dynamic='1', hide='0'";
+	ctx->descs[776] = "alias='minR', type='u16', size='[1, 5]', range='[0, 255]', default='3', digit='[0]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[777];
@@ -11861,7 +11861,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[778] = "alias='maxG', type='u16', size='[1, 5]', range='[0, 255]', default='230', digit='[0]', dynamic='1', hide='0'";
+	ctx->descs[778] = "alias='maxG', type='u16', size='[1, 5]', range='[0, 255]', default='230', digit='[0]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[779];
@@ -11890,7 +11890,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[780] = "alias='minG', type='u16', size='[1, 5]', range='[0, 255]', default='3', digit='[0]', dynamic='1', hide='0'";
+	ctx->descs[780] = "alias='minG', type='u16', size='[1, 5]', range='[0, 255]', default='3', digit='[0]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[781];
@@ -11919,7 +11919,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[782] = "alias='maxB', type='u16', size='[1, 5]', range='[0, 255]', default='230', digit='[0]', dynamic='1', hide='0'";
+	ctx->descs[782] = "alias='maxB', type='u16', size='[1, 5]', range='[0, 255]', default='230', digit='[0]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[783];
@@ -11948,7 +11948,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[784] = "alias='minB', type='u16', size='[1, 5]', range='[0, 255]', default='3', digit='[0]', dynamic='1', hide='0'";
+	ctx->descs[784] = "alias='minB', type='u16', size='[1, 5]', range='[0, 255]', default='3', digit='[0]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[785];
@@ -11977,7 +11977,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[786] = "alias='maxY', type='u16', size='[1, 5]', range='[0, 255]', default='230', digit='[0]', dynamic='1', hide='0'";
+	ctx->descs[786] = "alias='maxY', type='u16', size='[1, 5]', range='[0, 255]', default='230', digit='[0]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[787];
@@ -12006,7 +12006,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[788] = "alias='minY', type='u16', size='[1, 5]', range='[0, 255]', default='3', digit='[0]', dynamic='1', hide='0'";
+	ctx->descs[788] = "alias='minY', type='u16', size='[1, 5]', range='[0, 255]', default='3', digit='[0]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[789];
@@ -12035,7 +12035,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[790] = "alias='pseudoLuminanceWeight', type='f32', size='[1, 3]', range='[0, 1]', default='0.3', digit='[6]', dynamic='0', hide='0'";
+	ctx->descs[790] = "alias='pseudoLuminanceWeight', type='f32', size='[1, 3]', range='[0, 1]', default='0.3', digit='[6]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[791];
@@ -12051,7 +12051,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[791] = "alias='rotationMat', type='f32', size='[3, 3]', range='[0, 1]', default='0.3', digit='[6]', dynamic='0', hide='0'";
+	ctx->descs[791] = "alias='rotationMat', type='f32', size='[3, 3]', range='[0, 1]', default='0.3', digit='[6]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[792];
@@ -12067,7 +12067,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[792] = "alias='index', type='u16', size='[1,1]', range='[1, 24]', default='1', digit='[0]', hide='0'";
+	ctx->descs[792] = "alias='index', type='u16', size='[1,1]', range='[1, 24]', default='1', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[793];
@@ -12083,7 +12083,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[793] = "alias='meanC', type='f32', size='[1,1]', range='[0, 255]', default='0', digit='[6]', hide='0'";
+	ctx->descs[793] = "alias='meanC', type='f32', size='[1,1]', range='[0, 255]', default='0', digit='[6]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[794];
@@ -12099,7 +12099,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[794] = "alias='meanH', type='f32', size='[1,1]', range='[-180, 180]', default='0', digit='[6]', hide='0'";
+	ctx->descs[794] = "alias='meanH', type='f32', size='[1,1]', range='[-180, 180]', default='0', digit='[6]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[795];
@@ -12115,7 +12115,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[795] = "alias='name', type='string', size='[1, 1]', range='[0, 16]', default='default', dynamic='0', hide='0'";
+	ctx->descs[795] = "alias='name', type='string', size='[1, 1]', range='[0, 16]', default='default', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[796];
@@ -12131,7 +12131,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[796] = "alias='RGain', type='f32', size='[1,1]', range='[0, 8]', default='1', digit='[6]', hide='0'";
+	ctx->descs[796] = "alias='RGain', type='f32', size='[1,1]', range='[0, 8]', default='1', digit='[6]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[797];
@@ -12147,7 +12147,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[797] = "alias='BGain', type='f32', size='[1,1]', range='[0, 8]', default='1', digit='[6]', hide='0'";
+	ctx->descs[797] = "alias='BGain', type='f32', size='[1,1]', range='[0, 8]', default='1', digit='[6]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[798];
@@ -12163,7 +12163,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[798] = "type='bool', alias='enable', default='0', hide='0'";
+	ctx->descs[798] = "type='bool', alias='enable', default='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[799];
@@ -12179,7 +12179,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 148;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[799] = "alias='colorBlock', type='struct_list', size='[1, 24]', ui_module='normal_ui_style'";
+	ctx->descs[799] = "alias='colorBlock', type='struct_list', size='[1, 24]', ui_module='normal_ui_style', ro='0'";
 #endif
 
 	obj = &ctx->objs[800];
@@ -12208,7 +12208,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 149;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[801] = "alias='lsUsedForEstimation', type='struct_list', size='[1, 7]', ui_module='normal_ui_style'";
+	ctx->descs[801] = "alias='lsUsedForEstimation', type='struct_list', size='[1, 7]', ui_module='normal_ui_style', ro='0'";
 #endif
 
 	obj = &ctx->objs[802];
@@ -12237,7 +12237,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[803] = "alias='alpha', type='f32', size='[1,1]', range='[0, 1]', default='1', digit='[4]', hide='0'";
+	ctx->descs[803] = "alias='alpha', type='f32', size='[1,1]', range='[0, 1]', default='1', digit='[4]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[804];
@@ -12253,7 +12253,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = 33;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[804] = "type='enum', alias='frameChooseMode', enum_def='CalibDbV2_Awb_Hdr_Fr_Ch_Mode_t', default='CALIB_AWB_HDR_FRAME_CHOOSE_MODE_AUTO'";
+	ctx->descs[804] = "type='enum', alias='frameChooseMode', enum_def='CalibDbV2_Awb_Hdr_Fr_Ch_Mode_t', default='CALIB_AWB_HDR_FRAME_CHOOSE_MODE_AUTO', ro='0'";
 #endif
 
 	obj = &ctx->objs[805];
@@ -12269,7 +12269,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[805] = "alias='frameChoose', type='u8', size='[1,1]', range='[0, 2]', default='1', digit='[0]', hide='0'";
+	ctx->descs[805] = "alias='frameChoose', type='u8', size='[1,1]', range='[0, 2]', default='1', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[806];
@@ -12285,7 +12285,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[806] = "type='bool', alias='enable', default='1', hide='0'";
+	ctx->descs[806] = "type='bool', alias='enable', default='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[807];
@@ -12301,7 +12301,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = 34;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[807] = "type='enum', alias='multiwindowMode', enum_def='CalibDbV2_Awb_Mul_Win_Mode_t', default='CALIB_AWB_WIN_USELESS'";
+	ctx->descs[807] = "type='enum', alias='multiwindowMode', enum_def='CalibDbV2_Awb_Mul_Win_Mode_t', default='CALIB_AWB_WIN_USELESS', ro='0'";
 #endif
 
 	obj = &ctx->objs[808];
@@ -12317,7 +12317,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[808] = "alias='window', type='u16', size='[8, 4]', range='[0, 8191]', default='0', digit='[0]', dynamic='0', hide='0'";
+	ctx->descs[808] = "alias='window', type='u16', size='[8, 4]', range='[0, 8191]', default='0', digit='[0]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[809];
@@ -12333,7 +12333,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[809] = "alias='weight', type='u16', size='[8, 4]', range='[0, 10]', default='0', digit='[4]', dynamic='0', hide='0'";
+	ctx->descs[809] = "alias='weight', type='u16', size='[8, 4]', range='[0, 10]', default='0', digit='[4]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[810];
@@ -12349,7 +12349,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[810] = "alias='lumaValue', type='f32', size='[1, 5]', range='[0, 255000]', default='0', digit='[1]', dynamic='1', hide='0'";
+	ctx->descs[810] = "alias='lumaValue', type='f32', size='[1, 5]', range='[0, 255000]', default='0', digit='[1]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[811];
@@ -12378,7 +12378,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[812] = "alias='low', type='f32', size='[1, 5]', range='[0, 100000]', default='0', digit='[0]', dynamic='1', hide='0'";
+	ctx->descs[812] = "alias='low', type='f32', size='[1, 5]', range='[0, 100000]', default='0', digit='[0]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[813];
@@ -12407,7 +12407,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[814] = "alias='high', type='f32', size='[1, 5]', range='[0, 100000]', default='0', digit='[0]', dynamic='1', hide='0'";
+	ctx->descs[814] = "alias='high', type='f32', size='[1, 5]', range='[0, 100000]', default='0', digit='[0]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[815];
@@ -12436,7 +12436,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[816] = "alias='lumaValThLow', type='u32', size='[1,1]', range='[0, 255000]', default='0', digit='[0]', hide='0'";
+	ctx->descs[816] = "alias='lumaValThLow', type='u32', size='[1,1]', range='[0, 255000]', default='0', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[817];
@@ -12452,7 +12452,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[817] = "alias='lumaValThLow2', type='u32', size='[1,1]', range='[0, 255000]', default='0', digit='[0]', hide='0'";
+	ctx->descs[817] = "alias='lumaValThLow2', type='u32', size='[1,1]', range='[0, 255000]', default='0', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[818];
@@ -12468,7 +12468,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[818] = "alias='lumaValThHigh', type='u32', size='[1,1]', range='[0, 255000]', default='0', digit='[0]', hide='0'";
+	ctx->descs[818] = "alias='lumaValThHigh', type='u32', size='[1,1]', range='[0, 255000]', default='0', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[819];
@@ -12484,7 +12484,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[819] = "alias='lumaValThHigh2', type='u32', size='[1,1]', range='[0, 255000]', default='0', digit='[0]', hide='0'";
+	ctx->descs[819] = "alias='lumaValThHigh2', type='u32', size='[1,1]', range='[0, 255000]', default='0', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[820];
@@ -12500,7 +12500,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 153;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[820] = "alias='wpNumTh', type='struct', ui_module='array_table_ui', index='none', hide='0'";
+	ctx->descs[820] = "alias='wpNumTh', type='struct', ui_module='array_table_ui', index='none', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[821];
@@ -12516,7 +12516,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[821] = "type='bool', alias='enable', default='1', hide='0'";
+	ctx->descs[821] = "type='bool', alias='enable', default='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[822];
@@ -12532,7 +12532,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[822] = "alias='targetGain', type='f32', size='[1, 4]', range='[0, 8]', default='1', digit='[4]', dynamic='0', hide='0'";
+	ctx->descs[822] = "alias='targetGain', type='f32', size='[1, 4]', range='[0, 8]', default='1', digit='[4]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[823];
@@ -12548,7 +12548,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[823] = "alias='laCalcFactor', type='f32', size='[1,1]', range='[0, 255]', default='0', digit='[4]', hide='0'";
+	ctx->descs[823] = "alias='laCalcFactor', type='f32', size='[1,1]', range='[0, 255]', default='0', digit='[4]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[824];
@@ -12564,7 +12564,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[824] = "alias='proDis_THH', type='f32', size='[1,1]', range='[0, 8]', default='0', digit='[4]', hide='0'";
+	ctx->descs[824] = "alias='proDis_THH', type='f32', size='[1,1]', range='[0, 8]', default='0', digit='[4]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[825];
@@ -12580,7 +12580,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[825] = "alias='proDis_THL', type='f32', size='[1,1]', range='[0, 8]', default='0', digit='[4]', hide='0'";
+	ctx->descs[825] = "alias='proDis_THL', type='f32', size='[1,1]', range='[0, 8]', default='0', digit='[4]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[826];
@@ -12596,7 +12596,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[826] = "alias='outdoorLumaValThLow', type='u32', size='[1,1]', range='[0, 255000]', default='0', digit='[0]', hide='0'";
+	ctx->descs[826] = "alias='outdoorLumaValThLow', type='u32', size='[1,1]', range='[0, 255000]', default='0', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[827];
@@ -12612,7 +12612,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[827] = "alias='outdoorLumaValThHigh', type='u32', size='[1,1]', range='[0, 255000]', default='0', digit='[0]', hide='0'";
+	ctx->descs[827] = "alias='outdoorLumaValThHigh', type='u32', size='[1,1]', range='[0, 255000]', default='0', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[828];
@@ -12628,7 +12628,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[828] = "alias='wpNumPercTh', type='f32', size='[1,1]', range='[0, 1]', default='0', digit='[6]', hide='0'";
+	ctx->descs[828] = "alias='wpNumPercTh', type='f32', size='[1,1]', range='[0, 1]', default='0', digit='[6]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[829];
@@ -12644,7 +12644,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[829] = "alias='wpNumPercTh2', type='f32', size='[1,1]', range='[0, 1]', default='0', digit='[6]', hide='0'";
+	ctx->descs[829] = "alias='wpNumPercTh2', type='f32', size='[1,1]', range='[0, 1]', default='0', digit='[6]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[830];
@@ -12660,7 +12660,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[830] = "alias='varThforUnDamp', type='f32', size='[1,1]', range='[0, 1]', default='0', digit='[4]', hide='0'";
+	ctx->descs[830] = "alias='varThforUnDamp', type='f32', size='[1,1]', range='[0, 1]', default='0', digit='[4]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[831];
@@ -12676,7 +12676,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[831] = "alias='varThforDamp', type='f32', size='[1,1]', range='[0, 1]', default='0', digit='[4]', hide='0'";
+	ctx->descs[831] = "alias='varThforDamp', type='f32', size='[1,1]', range='[0, 1]', default='0', digit='[4]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[832];
@@ -12692,7 +12692,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[832] = "alias='lumaValue', type='f32', size='[1, 4]', range='[0, 255000]', default='0', digit='[0]', dynamic='1', hide='0'";
+	ctx->descs[832] = "alias='lumaValue', type='f32', size='[1, 4]', range='[0, 255000]', default='0', digit='[0]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[833];
@@ -12721,7 +12721,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[834] = "alias='toleranceValue', type='f32', size='[1, 4]', range='[0, 1]', default='0', digit='[4]', dynamic='1', hide='0'";
+	ctx->descs[834] = "alias='toleranceValue', type='f32', size='[1, 4]', range='[0, 1]', default='0', digit='[4]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[835];
@@ -12750,7 +12750,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[836] = "alias='lumaValue', type='f32', size='[1, 4]', range='[0, 255000]', default='0', digit='[0]', dynamic='1', hide='0'";
+	ctx->descs[836] = "alias='lumaValue', type='f32', size='[1, 4]', range='[0, 255000]', default='0', digit='[0]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[837];
@@ -12779,7 +12779,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[838] = "alias='intervalValue', type='f32', size='[1, 4]', range='[0, 255]', default='0', digit='[0]', dynamic='1', hide='0'";
+	ctx->descs[838] = "alias='intervalValue', type='f32', size='[1, 4]', range='[0, 255]', default='0', digit='[0]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[839];
@@ -12808,7 +12808,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[840] = "alias='dFStep', type='f32', size='[1,1]', range='[0, 1]', default='0', digit='[4]', hide='0'";
+	ctx->descs[840] = "alias='dFStep', type='f32', size='[1,1]', range='[0, 1]', default='0', digit='[4]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[841];
@@ -12824,7 +12824,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[841] = "alias='dFMin', type='f32', size='[1,1]', range='[0, 1]', default='0', digit='[4]', hide='0'";
+	ctx->descs[841] = "alias='dFMin', type='f32', size='[1,1]', range='[0, 1]', default='0', digit='[4]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[842];
@@ -12840,7 +12840,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[842] = "alias='dFMax', type='f32', size='[1,1]', range='[0, 1]', default='0', digit='[4]', hide='0'";
+	ctx->descs[842] = "alias='dFMax', type='f32', size='[1,1]', range='[0, 1]', default='0', digit='[4]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[843];
@@ -12856,7 +12856,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[843] = "alias='lvIIRsize', type='u32', size='[1,1]', range='[0, 128]', default='0', digit='[0]', hide='0'";
+	ctx->descs[843] = "alias='lvIIRsize', type='u32', size='[1,1]', range='[0, 128]', default='0', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[844];
@@ -12872,7 +12872,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[844] = "alias='lvVarTh', type='f32', size='[1,1]', range='[0, 100]', default='0', digit='[4]', hide='0'";
+	ctx->descs[844] = "alias='lvVarTh', type='f32', size='[1,1]', range='[0, 100]', default='0', digit='[4]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[845];
@@ -12888,7 +12888,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[845] = "alias='lumaValue', type='f32', size='[1,1]', range='[0, 255000]', default='0', digit='[0]', hide='0'";
+	ctx->descs[845] = "alias='lumaValue', type='f32', size='[1,1]', range='[0, 255000]', default='0', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[846];
@@ -12904,7 +12904,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[846] = "alias='ct_grid_num', type='s32', size='[1,1]', range='[0, 32]', default='0', digit='[0]', hide='0'";
+	ctx->descs[846] = "alias='ct_grid_num', type='s32', size='[1,1]', range='[0, 32]', default='0', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[847];
@@ -12920,7 +12920,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[847] = "alias='cri_grid_num', type='s32', size='[1,1]', range='[0, 32]', default='0', digit='[0]', hide='0'";
+	ctx->descs[847] = "alias='cri_grid_num', type='s32', size='[1,1]', range='[0, 32]', default='0', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[848];
@@ -12936,7 +12936,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[848] = "alias='ct_in_range', type='f32', size='[1, 2]', range='[0, 10000]', default='0', digit='[0]', dynamic='0', hide='0'";
+	ctx->descs[848] = "alias='ct_in_range', type='f32', size='[1, 2]', range='[0, 10000]', default='0', digit='[0]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[849];
@@ -12952,7 +12952,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[849] = "alias='cri_in_range', type='f32', size='[1, 2]', range='[-2, 2]', default='0', digit='[4]', dynamic='0', hide='0'";
+	ctx->descs[849] = "alias='cri_in_range', type='f32', size='[1, 2]', range='[-2, 2]', default='0', digit='[4]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[850];
@@ -12968,7 +12968,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[850] = "alias='ct_lut_out', type='f32', size='[9, 7]', range='[0, 10000]', default='0', digit='[0]', dynamic='0', hide='0'";
+	ctx->descs[850] = "alias='ct_lut_out', type='f32', size='[9, 7]', range='[0, 10000]', default='0', digit='[0]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[851];
@@ -12997,7 +12997,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[852] = "alias='cri_lut_out', type='f32', size='[9, 7]', range='[-2, 2]', default='0', digit='[4]', dynamic='0', hide='0'";
+	ctx->descs[852] = "alias='cri_lut_out', type='f32', size='[9, 7]', range='[-2, 2]', default='0', digit='[4]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[853];
@@ -13026,7 +13026,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[854] = "type='bool', alias='enable', default='1', hide='0'";
+	ctx->descs[854] = "type='bool', alias='enable', default='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[855];
@@ -13042,7 +13042,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 163;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[855] = "alias='lutAll', type='struct_list', size='[1, 8]', ui_module='normal_ui_style'";
+	ctx->descs[855] = "alias='lutAll', type='struct_list', size='[1, 8]', ui_module='normal_ui_style', ro='0'";
 #endif
 
 	obj = &ctx->objs[856];
@@ -13071,7 +13071,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[857] = "type='bool', alias='enable', default='1', hide='0'";
+	ctx->descs[857] = "type='bool', alias='enable', default='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[858];
@@ -13087,7 +13087,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[858] = "type='bool', alias='applyInvWbGainEnable', default='1', hide='0'";
+	ctx->descs[858] = "type='bool', alias='applyInvWbGainEnable', default='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[859];
@@ -13103,7 +13103,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[859] = "alias='sensorWbGain', type='f32', size='[1, 4]', range='[0, 4]', default='1', digit='[4]', dynamic='0', hide='0'";
+	ctx->descs[859] = "alias='sensorWbGain', type='f32', size='[1, 4]', range='[0, 4]', default='1', digit='[4]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[860];
@@ -13119,7 +13119,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[860] = "alias='lumaValue', type='f32', size='[1, 5]', range='[0, 255000]', default='0', digit='[1]', dynamic='1', hide='0'";
+	ctx->descs[860] = "alias='lumaValue', type='f32', size='[1, 5]', range='[0, 255000]', default='0', digit='[1]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[861];
@@ -13148,7 +13148,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[862] = "alias='forBigType', type='f32', size='[1, 5]', range='[0, 100000]', default='0', digit='[0]', dynamic='1', hide='0'";
+	ctx->descs[862] = "alias='forBigType', type='f32', size='[1, 5]', range='[0, 100000]', default='0', digit='[0]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[863];
@@ -13177,7 +13177,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[864] = "alias='forExtraType', type='f32', size='[1, 5]', range='[0, 100000]', default='0', digit='[0]', dynamic='1', hide='0'";
+	ctx->descs[864] = "alias='forExtraType', type='f32', size='[1, 5]', range='[0, 100000]', default='0', digit='[0]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[865];
@@ -13206,7 +13206,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[866] = "type='bool', alias='enable', default='1', hide='0'";
+	ctx->descs[866] = "type='bool', alias='enable', default='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[867];
@@ -13222,7 +13222,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 166;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[867] = "alias='wpNumTh', type='struct', ui_module='array_table_ui', index='none', hide='0'";
+	ctx->descs[867] = "alias='wpNumTh', type='struct', ui_module='array_table_ui', index='none', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[868];
@@ -13238,7 +13238,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[868] = "alias='xyTypeListSize', type='s32', size='[1,1]', range='[0, 65535]', default='0', digit='[0]', hide='0'";
+	ctx->descs[868] = "alias='xyTypeListSize', type='s32', size='[1,1]', range='[0, 65535]', default='0', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[869];
@@ -13254,7 +13254,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[869] = "alias='varianceLumaTh', type='f32', size='[1,1]', range='[0, 100]', default='0', digit='[4]', hide='0'";
+	ctx->descs[869] = "alias='varianceLumaTh', type='f32', size='[1,1]', range='[0, 100]', default='0', digit='[4]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[870];
@@ -13270,7 +13270,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[870] = "type='bool', alias='enable', default='1', hide='0'";
+	ctx->descs[870] = "type='bool', alias='enable', default='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[871];
@@ -13286,7 +13286,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[871] = "alias='offset', type='f32', size='[1, 4]', range='[-8, 8]', default='0', digit='[4]', dynamic='0', hide='0'";
+	ctx->descs[871] = "alias='offset', type='f32', size='[1, 4]', range='[-8, 8]', default='0', digit='[4]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[872];
@@ -13302,7 +13302,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[872] = "alias='lightSourceForFirstFrame', type='string', size='[1, 1]', range='[-128, 127]', default='default', dynamic='0', hide='0'";
+	ctx->descs[872] = "alias='lightSourceForFirstFrame', type='string', size='[1, 1]', range='[-128, 127]', default='default', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[873];
@@ -13318,7 +13318,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 160;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[873] = "alias='tolerance', type='struct', ui_module='array_table_ui', index='none', hide='0'";
+	ctx->descs[873] = "alias='tolerance', type='struct', ui_module='array_table_ui', index='none', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[874];
@@ -13334,7 +13334,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 161;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[874] = "alias='runInterval', type='struct', ui_module='array_table_ui', index='none', hide='0'";
+	ctx->descs[874] = "alias='runInterval', type='struct', ui_module='array_table_ui', index='none', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[875];
@@ -13350,7 +13350,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 162;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[875] = "alias='dampFactor', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[875] = "alias='dampFactor', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[876];
@@ -13366,7 +13366,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 164;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[876] = "alias='wbGainAdjust', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[876] = "alias='wbGainAdjust', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[877];
@@ -13382,7 +13382,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 145;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[877] = "alias='wbGainDaylightClip', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[877] = "alias='wbGainDaylightClip', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[878];
@@ -13398,7 +13398,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 144;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[878] = "alias='wbGainClip', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[878] = "alias='wbGainClip', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[879];
@@ -13414,7 +13414,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 154;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[879] = "alias='division', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[879] = "alias='division', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[880];
@@ -13430,7 +13430,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[880] = "alias='defaultNightGain', type='f32', size='[1, 4]', range='[0, 8]', default='1', digit='[4]', dynamic='0', hide='0'";
+	ctx->descs[880] = "alias='defaultNightGain', type='f32', size='[1, 4]', range='[0, 8]', default='1', digit='[4]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[881];
@@ -13446,7 +13446,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[881] = "alias='lumaValueMatrix', type='u32', size='[1, 16]', range='[0, 255000]', default='1', digit='[0]', dynamic='0', hide='0'";
+	ctx->descs[881] = "alias='lumaValueMatrix', type='u32', size='[1, 16]', range='[0, 255000]', default='1', digit='[0]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[882];
@@ -13462,7 +13462,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[882] = "alias='defaultNightGainWeight', type='u8', size='[1, 16]', range='[0, 100]', default='1', digit='[0]', dynamic='0', hide='0'";
+	ctx->descs[882] = "alias='defaultNightGainWeight', type='u8', size='[1, 16]', range='[0, 100]', default='1', digit='[0]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[883];
@@ -13478,7 +13478,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 156;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[883] = "alias='probCalcDis', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[883] = "alias='probCalcDis', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[884];
@@ -13494,7 +13494,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 157;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[884] = "alias='probCalcLv', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[884] = "alias='probCalcLv', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[885];
@@ -13510,7 +13510,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 158;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[885] = "alias='probCalcWp', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[885] = "alias='probCalcWp', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[886];
@@ -13526,7 +13526,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 159;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[886] = "alias='converged', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[886] = "alias='converged', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[887];
@@ -13542,7 +13542,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 167;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[887] = "alias='xyRegionStableSelection', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[887] = "alias='xyRegionStableSelection', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[888];
@@ -13558,7 +13558,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[888] = "alias='weightForNightGainCalc', type='u8', size='[1, 16]', range='[0, 100]', default='1', digit='[0]', dynamic='1', hide='0'";
+	ctx->descs[888] = "alias='weightForNightGainCalc', type='u8', size='[1, 16]', range='[0, 100]', default='1', digit='[0]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[889];
@@ -13587,7 +13587,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 150;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[890] = "alias='singleColorProces', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[890] = "alias='singleColorProces', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[891];
@@ -13603,7 +13603,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[891] = "alias='lineRgBg', type='f32', size='[1, 3]', range='[-2147483648, 2147483647]', default='1', digit='[4]', dynamic='0', hide='1'";
+	ctx->descs[891] = "alias='lineRgBg', type='f32', size='[1, 3]', range='[-2147483648, 2147483647]', default='1', digit='[4]', dynamic='0', hide='1', ro='0'";
 #endif
 
 	obj = &ctx->objs[892];
@@ -13619,7 +13619,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[892] = "alias='lineRgProjCCT', type='f32', size='[1, 3]', range='[-2147483648, 2147483647]', default='1', digit='[4]', dynamic='0', hide='1'";
+	ctx->descs[892] = "alias='lineRgProjCCT', type='f32', size='[1, 3]', range='[-2147483648, 2147483647]', default='1', digit='[4]', dynamic='0', hide='1', ro='0'";
 #endif
 
 	obj = &ctx->objs[893];
@@ -13635,7 +13635,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 155;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[893] = "alias='chrAdpttAdj', type='struct', ui_module='normal_ui_style', hide='1'";
+	ctx->descs[893] = "alias='chrAdpttAdj', type='struct', ui_module='normal_ui_style', hide='1', ro='0'";
 #endif
 
 	obj = &ctx->objs[894];
@@ -13651,7 +13651,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 165;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[894] = "alias='remosaicCfg', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[894] = "alias='remosaicCfg', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[895];
@@ -13667,7 +13667,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 168;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[895] = "alias='wbGainOffset', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[895] = "alias='wbGainOffset', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[896];
@@ -13683,7 +13683,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 151;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[896] = "alias='hdrPara', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[896] = "alias='hdrPara', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[897];
@@ -13699,7 +13699,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[897] = "type='bool', alias='lscBypassEnable', default='0', hide='0'";
+	ctx->descs[897] = "type='bool', alias='lscBypassEnable', default='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[898];
@@ -13715,7 +13715,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[898] = "type='bool', alias='uvDetectionEnable', default='1', hide='0'";
+	ctx->descs[898] = "type='bool', alias='uvDetectionEnable', default='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[899];
@@ -13731,7 +13731,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[899] = "type='bool', alias='xyDetectionEnable', default='1', hide='0'";
+	ctx->descs[899] = "type='bool', alias='xyDetectionEnable', default='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[900];
@@ -13747,7 +13747,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[900] = "type='bool', alias='yuvDetectionEnable', default='1', hide='0'";
+	ctx->descs[900] = "type='bool', alias='yuvDetectionEnable', default='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[901];
@@ -13763,7 +13763,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[901] = "alias='lsUsedForYuvDet', type='string', size='[1, 7]', range='[-128, 127]', default='light', dynamic='1', hide='1'";
+	ctx->descs[901] = "alias='lsUsedForYuvDet', type='string', size='[1, 7]', range='[-128, 127]', default='light', dynamic='1', hide='1', ro='0'";
 #endif
 
 	obj = &ctx->objs[902];
@@ -13792,7 +13792,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[903] = "alias='yuvDetRef_u', type='u8', size='[1,1]', range='[0, 255]', default='0', digit='[0]', hide='1'";
+	ctx->descs[903] = "alias='yuvDetRef_u', type='u8', size='[1,1]', range='[0, 255]', default='0', digit='[0]', hide='1', ro='0'";
 #endif
 
 	obj = &ctx->objs[904];
@@ -13808,7 +13808,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = 26;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[904] = "type='enum', alias='downScaleMode', enum_def='CalibDbV2_Awb_Down_Scale_Mode_t', default='CALIB_AWB_DS_4X4'";
+	ctx->descs[904] = "type='enum', alias='downScaleMode', enum_def='CalibDbV2_Awb_Down_Scale_Mode_t', default='CALIB_AWB_DS_4X4', ro='0'";
 #endif
 
 	obj = &ctx->objs[905];
@@ -13824,7 +13824,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = 28;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[905] = "type='enum', alias='blkMeasureMode', enum_def='CalibDbV2_Awb_Blk_Stat_Mode_V20_t', default='CALIB_AWB_BLK_STAT_MODE_ALL_V200'";
+	ctx->descs[905] = "type='enum', alias='blkMeasureMode', enum_def='CalibDbV2_Awb_Blk_Stat_Mode_V20_t', default='CALIB_AWB_BLK_STAT_MODE_ALL_V200', ro='0'";
 #endif
 
 	obj = &ctx->objs[906];
@@ -13840,7 +13840,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 143;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[906] = "alias='mainWindow', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[906] = "alias='mainWindow', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[907];
@@ -13856,7 +13856,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 146;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[907] = "alias='limitRange', type='struct', ui_module='array_table_ui', index='none', hide='0'";
+	ctx->descs[907] = "alias='limitRange', type='struct', ui_module='array_table_ui', index='none', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[908];
@@ -13872,7 +13872,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 147;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[908] = "alias='rgb2TcsPara', type='struct', ui_module='normal_ui_style', hide='1'";
+	ctx->descs[908] = "alias='rgb2TcsPara', type='struct', ui_module='normal_ui_style', hide='1', ro='0'";
 #endif
 
 	obj = &ctx->objs[909];
@@ -13888,7 +13888,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 152;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[909] = "alias='multiWindow', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[909] = "alias='multiWindow', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[910];
@@ -13904,7 +13904,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 136;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[910] = "alias='extraWpRange', type='struct_list', size='[1, 7]', ui_module='normal_ui_style'";
+	ctx->descs[910] = "alias='extraWpRange', type='struct_list', size='[1, 7]', ui_module='normal_ui_style', ro='0'";
 #endif
 
 	obj = &ctx->objs[911];
@@ -13920,7 +13920,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 142;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[911] = "alias='lightSources', type='struct_list', size='[1, 7]', ui_module='normal_ui_style'";
+	ctx->descs[911] = "alias='lightSources', type='struct_list', size='[1, 7]', ui_module='normal_ui_style', ro='0'";
 #endif
 
 	obj = &ctx->objs[912];
@@ -13949,7 +13949,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[913] = "alias='wpDiffWeiNoTh', type='f32', size='[1,1]', range='[0, 1]', default='0', digit='[4]', hide='0'";
+	ctx->descs[913] = "alias='wpDiffWeiNoTh', type='f32', size='[1,1]', range='[0, 1]', default='0', digit='[4]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[914];
@@ -13965,7 +13965,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[914] = "alias='wpDiffWeiLvValueTh', type='u32', size='[1,1]', range='[0, 255000]', default='0', digit='[0]', hide='0'";
+	ctx->descs[914] = "alias='wpDiffWeiLvValueTh', type='u32', size='[1,1]', range='[0, 255000]', default='0', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[915];
@@ -13981,7 +13981,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[915] = "alias='ratioValue', type='f32', size='[1,1]', range='[0, 1]', default='0', digit='[4]', hide='0'";
+	ctx->descs[915] = "alias='ratioValue', type='f32', size='[1,1]', range='[0, 1]', default='0', digit='[4]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[916];
@@ -13997,7 +13997,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[916] = "alias='weight', type='f32', size='[1, 9]', range='[0, 1]', default='0', digit='[4]', dynamic='0', hide='0'";
+	ctx->descs[916] = "alias='weight', type='f32', size='[1, 9]', range='[0, 1]', default='0', digit='[4]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[917];
@@ -14013,7 +14013,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[917] = "alias='LvValue', type='f32', size='[1,1]', range='[0, 255000]', default='0', digit='[0]', hide='0'";
+	ctx->descs[917] = "alias='LvValue', type='f32', size='[1,1]', range='[0, 255000]', default='0', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[918];
@@ -14029,7 +14029,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 172;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[918] = "alias='ratioSet', type='struct_list', size='[1, 4]', ui_module='normal_ui_style'";
+	ctx->descs[918] = "alias='ratioSet', type='struct_list', size='[1, 4]', ui_module='normal_ui_style', ro='0'";
 #endif
 
 	obj = &ctx->objs[919];
@@ -14058,7 +14058,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[920] = "type='bool', alias='lscBypassEnable', default='0', hide='0'";
+	ctx->descs[920] = "type='bool', alias='lscBypassEnable', default='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[921];
@@ -14074,7 +14074,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 171;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[921] = "alias='wpDiffWeiEnableTh', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[921] = "alias='wpDiffWeiEnableTh', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[922];
@@ -14090,7 +14090,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[922] = "alias='wpDiffwei_y', type='u8', size='[1, 9]', range='[0, 255]', default='0', digit='[0]', dynamic='0', hide='0'";
+	ctx->descs[922] = "alias='wpDiffwei_y', type='u8', size='[1, 9]', range='[0, 255]', default='0', digit='[0]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[923];
@@ -14106,7 +14106,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[923] = "alias='perfectBin', type='u8', size='[1, 8]', range='[0, 1]', default='0', digit='[0]', dynamic='0', hide='0'";
+	ctx->descs[923] = "alias='perfectBin', type='u8', size='[1, 8]', range='[0, 1]', default='0', digit='[0]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[924];
@@ -14122,7 +14122,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 173;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[924] = "alias='wpDiffWeightLvSet', type='struct_list', size='[1, 4]', ui_module='normal_ui_style'";
+	ctx->descs[924] = "alias='wpDiffWeightLvSet', type='struct_list', size='[1, 4]', ui_module='normal_ui_style', ro='0'";
 #endif
 
 	obj = &ctx->objs[925];
@@ -14151,7 +14151,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[926] = "alias='name', type='string', size='[1, 1]', range='[0, 32]', default='default', dynamic='0', hide='0'";
+	ctx->descs[926] = "alias='name', type='string', size='[1, 1]', range='[0, 32]', default='default', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[927];
@@ -14167,7 +14167,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = 31;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[927] = "type='enum', alias='doorType', enum_def='CalibDbV2_Awb_DoorType_t', default='CALIB_AWB_DOOR_TYPE_AMBIGUITY'";
+	ctx->descs[927] = "type='enum', alias='doorType', enum_def='CalibDbV2_Awb_DoorType_t', default='CALIB_AWB_DOOR_TYPE_AMBIGUITY', ro='0'";
 #endif
 
 	obj = &ctx->objs[928];
@@ -14183,7 +14183,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[928] = "alias='standardGainValue', type='f32', size='[1, 4]', range='[0, 8]', default='0', digit='[4]', dynamic='0', hide='0'";
+	ctx->descs[928] = "alias='standardGainValue', type='f32', size='[1, 4]', range='[0, 8]', default='0', digit='[4]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[929];
@@ -14199,7 +14199,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 141;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[929] = "alias='uvRegion', type='struct', ui_module='array_table_ui', index='none', hide='0'";
+	ctx->descs[929] = "alias='uvRegion', type='struct', ui_module='array_table_ui', index='none', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[930];
@@ -14215,7 +14215,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 140;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[930] = "alias='xyRegion', type='struct', ui_module='array_table_ui', index='none', hide='0'";
+	ctx->descs[930] = "alias='xyRegion', type='struct', ui_module='array_table_ui', index='none', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[931];
@@ -14231,7 +14231,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 138;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[931] = "alias='rtYuvRegion', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[931] = "alias='rtYuvRegion', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[932];
@@ -14247,7 +14247,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[932] = "alias='staWeight', type='u8', size='[1, 16]', range='[0, 100]', default='0', digit='[0]', dynamic='0', hide='0'";
+	ctx->descs[932] = "alias='staWeight', type='u8', size='[1, 16]', range='[0, 100]', default='0', digit='[0]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[933];
@@ -14263,7 +14263,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[933] = "alias='dayGainLvThSet', type='u8', size='[1, 2]', range='[0, 255000]', default='0', digit='[0]', dynamic='0', hide='0'";
+	ctx->descs[933] = "alias='dayGainLvThSet', type='u8', size='[1, 2]', range='[0, 255000]', default='0', digit='[0]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[934];
@@ -14279,7 +14279,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[934] = "alias='defaultDayGainLow', type='f32', size='[1, 4]', range='[0, 8]', default='1', digit='[4]', dynamic='0', hide='0'";
+	ctx->descs[934] = "alias='defaultDayGainLow', type='f32', size='[1, 4]', range='[0, 8]', default='1', digit='[4]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[935];
@@ -14295,7 +14295,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[935] = "alias='defaultDayGainHigh', type='f32', size='[1, 4]', range='[0, 8]', default='1', digit='[4]', dynamic='0', hide='0'";
+	ctx->descs[935] = "alias='defaultDayGainHigh', type='f32', size='[1, 4]', range='[0, 8]', default='1', digit='[4]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[936];
@@ -14311,7 +14311,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[936] = "alias='xyType2Enable', type='u8', size='[1,1]', range='[0, 1]', default='1', digit='[0]', hide='1'";
+	ctx->descs[936] = "alias='xyType2Enable', type='u8', size='[1,1]', range='[0, 1]', default='1', digit='[0]', hide='1', ro='0'";
 #endif
 
 	obj = &ctx->objs[937];
@@ -14327,7 +14327,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 151;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[937] = "alias='hdrPara', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[937] = "alias='hdrPara', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[938];
@@ -14343,7 +14343,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[938] = "type='bool', alias='lscBypassEnable', default='0', hide='0'";
+	ctx->descs[938] = "type='bool', alias='lscBypassEnable', default='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[939];
@@ -14359,7 +14359,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[939] = "type='bool', alias='uvDetectionEnable', default='0', hide='0'";
+	ctx->descs[939] = "type='bool', alias='uvDetectionEnable', default='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[940];
@@ -14375,7 +14375,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[940] = "type='bool', alias='xyDetectionEnable', default='0', hide='0'";
+	ctx->descs[940] = "type='bool', alias='xyDetectionEnable', default='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[941];
@@ -14391,7 +14391,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[941] = "type='bool', alias='yuvDetectionEnable', default='0', hide='0'";
+	ctx->descs[941] = "type='bool', alias='yuvDetectionEnable', default='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[942];
@@ -14407,7 +14407,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[942] = "alias='lsUsedForYuvDet', type='string', size='[1, 7]', range='[0, 16]', default='default', dynamic='1', hide='1'";
+	ctx->descs[942] = "alias='lsUsedForYuvDet', type='string', size='[1, 7]', range='[0, 16]', default='default', dynamic='1', hide='1', ro='0'";
 #endif
 
 	obj = &ctx->objs[943];
@@ -14436,7 +14436,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[944] = "type='bool', alias='blkStatisticsEnable', default='0', hide='0'";
+	ctx->descs[944] = "type='bool', alias='blkStatisticsEnable', default='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[945];
@@ -14452,7 +14452,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = 26;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[945] = "type='enum', alias='downScaleMode', enum_def='CalibDbV2_Awb_Down_Scale_Mode_t', default='CALIB_AWB_DS_8X8'";
+	ctx->descs[945] = "type='enum', alias='downScaleMode', enum_def='CalibDbV2_Awb_Down_Scale_Mode_t', default='CALIB_AWB_DS_8X8', ro='0'";
 #endif
 
 	obj = &ctx->objs[946];
@@ -14468,7 +14468,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = 27;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[946] = "type='enum', alias='blkMeasureMode', enum_def='CalibDbV2_Awb_Blk_Stat_Mode_V21_t', default='CALIB_AWB_BLK_STAT_MODE_REALWP_V201'";
+	ctx->descs[946] = "type='enum', alias='blkMeasureMode', enum_def='CalibDbV2_Awb_Blk_Stat_Mode_V21_t', default='CALIB_AWB_BLK_STAT_MODE_REALWP_V201', ro='0'";
 #endif
 
 	obj = &ctx->objs[947];
@@ -14484,7 +14484,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 143;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[947] = "alias='mainWindow', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[947] = "alias='mainWindow', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[948];
@@ -14500,7 +14500,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 146;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[948] = "alias='limitRange', type='struct', ui_module='array_table_ui', index='none', hide='0'";
+	ctx->descs[948] = "alias='limitRange', type='struct', ui_module='array_table_ui', index='none', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[949];
@@ -14516,7 +14516,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 147;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[949] = "alias='rgb2TcsPara', type='struct', ui_module='normal_ui_style', hide='1'";
+	ctx->descs[949] = "alias='rgb2TcsPara', type='struct', ui_module='normal_ui_style', hide='1', ro='0'";
 #endif
 
 	obj = &ctx->objs[950];
@@ -14532,7 +14532,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[950] = "alias='rgb2RotationYuvMat', type='f32', size='[4, 4]', range='[-255, 255]', default='0', digit='[6]', dynamic='0', hide='1'";
+	ctx->descs[950] = "alias='rgb2RotationYuvMat', type='f32', size='[4, 4]', range='[-255, 255]', default='0', digit='[6]', dynamic='0', hide='1', ro='0'";
 #endif
 
 	obj = &ctx->objs[951];
@@ -14548,7 +14548,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 136;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[951] = "alias='extraWpRange', type='struct_list', size='[1, 7]', ui_module='normal_ui_style'";
+	ctx->descs[951] = "alias='extraWpRange', type='struct_list', size='[1, 7]', ui_module='normal_ui_style', ro='0'";
 #endif
 
 	obj = &ctx->objs[952];
@@ -14564,7 +14564,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 174;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[952] = "alias='wpDiffLumaWeight', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[952] = "alias='wpDiffLumaWeight', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[953];
@@ -14580,7 +14580,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[953] = "type='bool', alias='wpDiffBlkWeiEnable', default='0', hide='0'";
+	ctx->descs[953] = "type='bool', alias='wpDiffBlkWeiEnable', default='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[954];
@@ -14596,7 +14596,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[954] = "alias='wpDiffBlkWeight', type='u16', size='[15, 15]', range='[0, 63]', default='0', digit='[0]', dynamic='0', hide='0'";
+	ctx->descs[954] = "alias='wpDiffBlkWeight', type='u16', size='[15, 15]', range='[0, 63]', default='0', digit='[0]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[955];
@@ -14612,7 +14612,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 175;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[955] = "alias='lightSources', type='struct_list', size='[1, 7]', ui_module='normal_ui_style'";
+	ctx->descs[955] = "alias='lightSources', type='struct_list', size='[1, 7]', ui_module='normal_ui_style', ro='0'";
 #endif
 
 	obj = &ctx->objs[956];
@@ -14641,7 +14641,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[957] = "alias='CCT', type='f32', size='[1,1]', range='[0, 10000]', default='5000', digit='[0]', hide='0'";
+	ctx->descs[957] = "alias='CCT', type='f32', size='[1,1]', range='[0, 10000]', default='5000', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[958];
@@ -14657,7 +14657,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[958] = "alias='CCRI', type='f32', size='[1,1]', range='[-2, 2]', default='0', digit='[3]', hide='0'";
+	ctx->descs[958] = "alias='CCRI', type='f32', size='[1,1]', range='[-2, 2]', default='0', digit='[3]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[959];
@@ -14673,7 +14673,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[959] = "alias='mwbGain', type='f32', size='[1, 4]', range='[0, 8]', default='1.0', digit='[4]', dynamic='0', hide='0'";
+	ctx->descs[959] = "alias='mwbGain', type='f32', size='[1, 4]', range='[0, 8]', default='1.0', digit='[4]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[960];
@@ -14689,7 +14689,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = 36;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[960] = "type='enum', alias='scene', enum_def='CalibDbV2_Wb_Mwb_Scene_t', default='CALIB_WB_SCENE_DAYLIGHT'";
+	ctx->descs[960] = "type='enum', alias='scene', enum_def='CalibDbV2_Wb_Mwb_Scene_t', default='CALIB_WB_SCENE_DAYLIGHT', ro='0'";
 #endif
 
 	obj = &ctx->objs[961];
@@ -14705,7 +14705,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 177;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[961] = "alias='cct', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[961] = "alias='cct', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[962];
@@ -14721,7 +14721,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = 35;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[962] = "type='enum', alias='mode', enum_def='CalibDbV2_Wb_Mwb_Mode_t', default='CALIB_MWB_MODE_WBGAIN'";
+	ctx->descs[962] = "type='enum', alias='mode', enum_def='CalibDbV2_Wb_Mwb_Mode_t', default='CALIB_MWB_MODE_WBGAIN', ro='0'";
 #endif
 
 	obj = &ctx->objs[963];
@@ -14737,7 +14737,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 178;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[963] = "alias='cfg', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[963] = "alias='cfg', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[964];
@@ -14753,7 +14753,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[964] = "type='bool', alias='byPass', default='0', hide='0'";
+	ctx->descs[964] = "type='bool', alias='byPass', default='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[965];
@@ -14769,7 +14769,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = 37;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[965] = "type='enum', alias='mode', enum_def='CalibDbV2_Wb_Op_Mode_t', default='CALIB_WB_MODE_AUTO'";
+	ctx->descs[965] = "type='enum', alias='mode', enum_def='CalibDbV2_Wb_Op_Mode_t', default='CALIB_WB_MODE_AUTO', ro='0'";
 #endif
 
 	obj = &ctx->objs[966];
@@ -14785,7 +14785,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 180;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[966] = "alias='control', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[966] = "alias='control', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[967];
@@ -14801,7 +14801,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 179;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[967] = "alias='manualPara', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[967] = "alias='manualPara', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[968];
@@ -14817,7 +14817,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 170;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[968] = "alias='autoPara', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[968] = "alias='autoPara', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[969];
@@ -14833,7 +14833,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 169;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[969] = "alias='autoExtPara', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[969] = "alias='autoExtPara', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[970];
@@ -14849,7 +14849,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 180;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[970] = "alias='control', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[970] = "alias='control', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[971];
@@ -14865,7 +14865,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 179;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[971] = "alias='manualPara', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[971] = "alias='manualPara', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[972];
@@ -14881,7 +14881,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 176;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[972] = "alias='autoPara', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[972] = "alias='autoPara', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[973];
@@ -14897,7 +14897,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 169;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[973] = "alias='autoExtPara', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[973] = "alias='autoExtPara', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[974];
@@ -14913,7 +14913,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[974] = "type='bool', alias='enable', default='0', hide='0'";
+	ctx->descs[974] = "type='bool', alias='enable', default='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[975];
@@ -14929,7 +14929,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = 3;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[975] = "type='enum', alias='mode', enum_def='RKAiqOPMode_t', default='RK_AIQ_OP_MODE_AUTO'";
+	ctx->descs[975] = "type='enum', alias='mode', enum_def='RKAiqOPMode_t', default='RK_AIQ_OP_MODE_AUTO', ro='0'";
 #endif
 
 	obj = &ctx->objs[976];
@@ -14945,7 +14945,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[976] = "type='bool', alias='force_gray', default='0', hide='0'";
+	ctx->descs[976] = "type='bool', alias='force_gray', default='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[977];
@@ -14961,7 +14961,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = 38;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[977] = "type='enum', alias='light_src', enum_def='rk_aiq_cpsls_t', default='LED'";
+	ctx->descs[977] = "type='enum', alias='light_src', enum_def='rk_aiq_cpsls_t', default='LED', ro='0'";
 #endif
 
 	obj = &ctx->objs[978];
@@ -14977,7 +14977,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[978] = "alias='auto_adjust_sens', type='f32', size='[1,1]', range='[0.0, 100.0]', default='50.0', digit='[0]', hide='0'";
+	ctx->descs[978] = "alias='auto_adjust_sens', type='f32', size='[1,1]', range='[0.0, 100.0]', default='50.0', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[979];
@@ -14993,7 +14993,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[979] = "alias='auto_on2off_th', type='u32', size='[1,1]', range='[0, 65535]', default='3000', digit='0', hide='0'";
+	ctx->descs[979] = "alias='auto_on2off_th', type='u32', size='[1,1]', range='[0, 65535]', default='3000', digit='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[980];
@@ -15009,7 +15009,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[980] = "alias='auto_off2on_th', type='u32', size='[1,1]', range='[0, 65535]', default='100', digit='0', hide='0'";
+	ctx->descs[980] = "alias='auto_off2on_th', type='u32', size='[1,1]', range='[0, 65535]', default='100', digit='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[981];
@@ -15025,7 +15025,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[981] = "alias='auto_sw_interval', type='u32', size='[1,1]', range='[0, 255]', default='60', digit='0', hide='0'";
+	ctx->descs[981] = "alias='auto_sw_interval', type='u32', size='[1,1]', range='[0, 255]', default='60', digit='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[982];
@@ -15041,7 +15041,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[982] = "type='bool', alias='manual_on', default='0', hide='0'";
+	ctx->descs[982] = "type='bool', alias='manual_on', default='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[983];
@@ -15057,7 +15057,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[983] = "alias='manual_strength', type='f32', size='[1,1]', range='[0.0, 100.0]', default='100.0', digit='[2]', hide='0'";
+	ctx->descs[983] = "alias='manual_strength', type='f32', size='[1,1]', range='[0.0, 100.0]', default='100.0', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[984];
@@ -15073,7 +15073,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 183;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[984] = "alias='param', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[984] = "alias='param', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[985];
@@ -15089,7 +15089,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[985] = "type='bool', alias='enable', default='0', hide='0'";
+	ctx->descs[985] = "type='bool', alias='enable', default='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[986];
@@ -15105,7 +15105,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 185;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[986] = "alias='param', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[986] = "alias='param', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[987];
@@ -15121,7 +15121,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[987] = "alias='debayer_filter1', type='u32', size='[1, 9]', range='[08, 65536]', default='[50 100 200 400 800 1600 3200 6400 12800]', digit='[0]', dynamic='0', hide='0'";
+	ctx->descs[987] = "alias='debayer_filter1', type='u32', size='[1, 9]', range='[08, 65536]', default='[50 100 200 400 800 1600 3200 6400 12800]', digit='[0]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[988];
@@ -15137,7 +15137,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[988] = "alias='sharp_strength', type='u8', size='[1, 9]', range='[0, 255]', default='[4 4 4 4 4 4 4 4 4]', digit='[0]', dynamic='0', hide='0'";
+	ctx->descs[988] = "alias='sharp_strength', type='u8', size='[1, 9]', range='[0, 255]', default='[4 4 4 4 4 4 4 4 4]', digit='[0]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[989];
@@ -15153,7 +15153,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[989] = "alias='debayer_hf_offset', type='u8', size='[1, 9]', range='[0, 255]', default='[1 1 1 1 1 1 1 1 1]', digit='[0]', dynamic='0', hide='0'";
+	ctx->descs[989] = "alias='debayer_hf_offset', type='u8', size='[1, 9]', range='[0, 255]', default='[1 1 1 1 1 1 1 1 1]', digit='[0]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[990];
@@ -15169,7 +15169,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[990] = "type='bool', alias='debayer_en', default='1', hide='0'";
+	ctx->descs[990] = "type='bool', alias='debayer_en', default='1', hide='0', ro='1'";
 #endif
 
 	obj = &ctx->objs[991];
@@ -15185,7 +15185,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[991] = "alias='debayer_filter1', type='s8', size='[1, 5]', range='[-128, 128]', default='[2 -6 0 6 -2]', digit='[0]', dynamic='0', hide='0'";
+	ctx->descs[991] = "alias='debayer_filter1', type='s8', size='[1, 5]', range='[-128, 128]', default='[2 -6 0 6 -2]', digit='[0]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[992];
@@ -15201,7 +15201,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[992] = "alias='debayer_filter2', type='s8', size='[1, 5]', range='[-128, 128]', default='[2 -4 4 -4 2]', digit='[0]', dynamic='0', hide='0'";
+	ctx->descs[992] = "alias='debayer_filter2', type='s8', size='[1, 5]', range='[-128, 128]', default='[2 -4 4 -4 2]', digit='[0]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[993];
@@ -15217,7 +15217,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[993] = "alias='debayer_gain_offset', type='u8', size='[1,1]', range='[0, 128]', default='4', digit='[0]', hide='0'";
+	ctx->descs[993] = "alias='debayer_gain_offset', type='u8', size='[1,1]', range='[0, 128]', default='4', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[994];
@@ -15233,7 +15233,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[994] = "alias='debayer_offset', type='u8', size='[1,1]', range='[0, 128]', default='1', digit='[0]', hide='0'";
+	ctx->descs[994] = "alias='debayer_offset', type='u8', size='[1,1]', range='[0, 128]', default='1', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[995];
@@ -15249,7 +15249,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[995] = "type='bool', alias='debayer_clip_en', default='1', hide='0'";
+	ctx->descs[995] = "type='bool', alias='debayer_clip_en', default='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[996];
@@ -15265,7 +15265,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[996] = "type='bool', alias='debayer_filter_g_en', default='1', hide='0'";
+	ctx->descs[996] = "type='bool', alias='debayer_filter_g_en', default='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[997];
@@ -15281,7 +15281,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[997] = "type='bool', alias='debayer_filter_c_en', default='1', hide='0'";
+	ctx->descs[997] = "type='bool', alias='debayer_filter_c_en', default='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[998];
@@ -15297,7 +15297,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[998] = "alias='debayer_thed0', type='u8', size='[1,1]', range='[0, 128]', default='3', digit='[0]', hide='0'";
+	ctx->descs[998] = "alias='debayer_thed0', type='u8', size='[1,1]', range='[0, 128]', default='3', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[999];
@@ -15313,7 +15313,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[999] = "alias='debayer_thed1', type='u8', size='[1,1]', range='[0, 128]', default='6', digit='[0]', hide='0'";
+	ctx->descs[999] = "alias='debayer_thed1', type='u8', size='[1,1]', range='[0, 128]', default='6', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1000];
@@ -15329,7 +15329,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1000] = "alias='debayer_dist_scale', type='u8', size='[1,1]', range='[0, 128]', default='8', digit='[0]', hide='0'";
+	ctx->descs[1000] = "alias='debayer_dist_scale', type='u8', size='[1,1]', range='[0, 128]', default='8', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1001];
@@ -15345,7 +15345,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1001] = "alias='debayer_cnr_strength', type='u8', size='[1,1]', range='[0, 128]', default='5', digit='[0]', hide='0'";
+	ctx->descs[1001] = "alias='debayer_cnr_strength', type='u8', size='[1,1]', range='[0, 128]', default='5', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1002];
@@ -15361,7 +15361,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1002] = "alias='debayer_shift_num', type='u8', size='[1,1]', range='[0, 128]', default='2', digit='[0]', hide='0'";
+	ctx->descs[1002] = "alias='debayer_shift_num', type='u8', size='[1,1]', range='[0, 128]', default='2', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1003];
@@ -15377,7 +15377,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 187;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1003] = "alias='ISO_Params', type='struct', ui_module='array_table_ui', index='default', hide='0'";
+	ctx->descs[1003] = "alias='ISO_Params', type='struct', ui_module='array_table_ui', index='default', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1004];
@@ -15393,7 +15393,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 188;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1004] = "alias='DebayerTuningPara', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[1004] = "alias='DebayerTuningPara', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1005];
@@ -15409,7 +15409,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1005] = "alias='iso', type='f32', range='[50, 204800]', default='50', digit='[1]', ui_module_param='index2'";
+	ctx->descs[1005] = "alias='iso', type='f32', range='[50, 204800]', default='50', digit='[1]', ui_module_param='index2', ro='0'";
 #endif
 
 	obj = &ctx->objs[1006];
@@ -15425,7 +15425,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1006] = "alias='luLevelVal', type='f32', size='[1, 8]', range='[0, 255]', default='0.0', digit='[0]', dynamic='0', hide='0'";
+	ctx->descs[1006] = "alias='luLevelVal', type='f32', size='[1, 8]', range='[0, 255]', default='0.0', digit='[0]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1007];
@@ -15441,7 +15441,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1007] = "alias='luRatio', type='f32', size='[1, 8]', range='[0, 15.9]', default='0.0', digit='[1]', dynamic='0', hide='0'";
+	ctx->descs[1007] = "alias='luRatio', type='f32', size='[1, 8]', range='[0, 15.9]', default='0.0', digit='[1]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1008];
@@ -15457,7 +15457,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1008] = "alias='SNR_Mode', type='string', size='[1, 1]', range='[0, 64]', default='LSNR', dynamic='0', ui_module_param='index1'";
+	ctx->descs[1008] = "alias='SNR_Mode', type='string', size='[1, 1]', range='[0, 64]', default='LSNR', dynamic='0', ui_module_param='index1', ro='0'";
 #endif
 
 	obj = &ctx->objs[1009];
@@ -15473,7 +15473,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1009] = "alias='Sensor_Mode', type='string', size='[1, 1]', range='[0, 64]', default='lcg', dynamic='0', hide='0'";
+	ctx->descs[1009] = "alias='Sensor_Mode', type='string', size='[1, 1]', range='[0, 64]', default='lcg', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1010];
@@ -15489,7 +15489,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 190;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1010] = "alias='Calib_ISO', type='struct_list', size='dynamic', ui_module='double_index_list'";
+	ctx->descs[1010] = "alias='Calib_ISO', type='struct_list', size='dynamic', ui_module='double_index_list', ro='0'";
 #endif
 
 	obj = &ctx->objs[1011];
@@ -15518,7 +15518,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 191;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1012] = "alias='Setting', type='struct_list', size='dynamic', ui_module='double_index_list'";
+	ctx->descs[1012] = "alias='Setting', type='struct_list', size='dynamic', ui_module='double_index_list', ro='0'";
 #endif
 
 	obj = &ctx->objs[1013];
@@ -15547,7 +15547,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1014] = "alias='iso', type='f32', range='[50, 204800]', default='50', digit='[1]', ui_module_param='index2'";
+	ctx->descs[1014] = "alias='iso', type='f32', range='[50, 204800]', default='50', digit='[1]', ui_module_param='index2', ro='0'";
 #endif
 
 	obj = &ctx->objs[1015];
@@ -15563,7 +15563,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1015] = "type='bool', alias='gauss_en', default='1', hide='0'";
+	ctx->descs[1015] = "type='bool', alias='gauss_en', default='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1016];
@@ -15579,7 +15579,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1016] = "alias='filtPara', type='f32', size='[1,1]', range='[0, 15.9]', default='0.0', digit='[1]', hide='0'";
+	ctx->descs[1016] = "alias='filtPara', type='f32', size='[1,1]', range='[0, 15.9]', default='0.0', digit='[1]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1017];
@@ -15595,7 +15595,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1017] = "alias='lamda', type='f32', size='[1,1]', range='[0, 16383]', default='0.0', digit='[0]', hide='0'";
+	ctx->descs[1017] = "alias='lamda', type='f32', size='[1,1]', range='[0, 16383]', default='0.0', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1018];
@@ -15611,7 +15611,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1018] = "alias='fixW0', type='f32', size='[1,1]', range='[0, 1.0]', default='0.0', digit='[1]', hide='0'";
+	ctx->descs[1018] = "alias='fixW0', type='f32', size='[1,1]', range='[0, 1.0]', default='0.0', digit='[1]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1019];
@@ -15627,7 +15627,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1019] = "alias='fixW1', type='f32', size='[1,1]', range='[0, 1.0]', default='0.0', digit='[1]', hide='0'";
+	ctx->descs[1019] = "alias='fixW1', type='f32', size='[1,1]', range='[0, 1.0]', default='0.0', digit='[1]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1020];
@@ -15643,7 +15643,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1020] = "alias='fixW2', type='f32', size='[1,1]', range='[0, 1.0]', default='0.0', digit='[1]', hide='0'";
+	ctx->descs[1020] = "alias='fixW2', type='f32', size='[1,1]', range='[0, 1.0]', default='0.0', digit='[1]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1021];
@@ -15659,7 +15659,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1021] = "alias='fixW3', type='f32', size='[1,1]', range='[0, 1.0]', default='0.0', digit='[1]', hide='0'";
+	ctx->descs[1021] = "alias='fixW3', type='f32', size='[1,1]', range='[0, 1.0]', default='0.0', digit='[1]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1022];
@@ -15675,7 +15675,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1022] = "alias='RGainOff', type='f32', size='[1,1]', range='[0, 1.0]', default='0.0', digit='[1]', hide='1'";
+	ctx->descs[1022] = "alias='RGainOff', type='f32', size='[1,1]', range='[0, 1.0]', default='0.0', digit='[1]', hide='1', ro='0'";
 #endif
 
 	obj = &ctx->objs[1023];
@@ -15691,7 +15691,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1023] = "alias='RGainFilp', type='f32', size='[1,1]', range='[0, 1.0]', default='0.0', digit='[1]', hide='1'";
+	ctx->descs[1023] = "alias='RGainFilp', type='f32', size='[1,1]', range='[0, 1.0]', default='0.0', digit='[1]', hide='1', ro='0'";
 #endif
 
 	obj = &ctx->objs[1024];
@@ -15707,7 +15707,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1024] = "alias='BGainOff', type='f32', size='[1,1]', range='[0, 1.0]', default='0.0', digit='[1]', hide='1'";
+	ctx->descs[1024] = "alias='BGainOff', type='f32', size='[1,1]', range='[0, 1.0]', default='0.0', digit='[1]', hide='1', ro='0'";
 #endif
 
 	obj = &ctx->objs[1025];
@@ -15723,7 +15723,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1025] = "alias='BGainFilp', type='f32', size='[1,1]', range='[0, 1.0]', default='0.0', digit='[1]', hide='1'";
+	ctx->descs[1025] = "alias='BGainFilp', type='f32', size='[1,1]', range='[0, 1.0]', default='0.0', digit='[1]', hide='1', ro='0'";
 #endif
 
 	obj = &ctx->objs[1026];
@@ -15739,7 +15739,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1026] = "alias='SNR_Mode', type='string', size='[1, 1]', range='[0, 64]', default='LSNR', dynamic='0', ui_module_param='index1'";
+	ctx->descs[1026] = "alias='SNR_Mode', type='string', size='[1, 1]', range='[0, 64]', default='LSNR', dynamic='0', ui_module_param='index1', ro='0'";
 #endif
 
 	obj = &ctx->objs[1027];
@@ -15755,7 +15755,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1027] = "alias='Sensor_Mode', type='string', size='[1, 1]', range='[0, 64]', default='lcg', dynamic='0', hide='0'";
+	ctx->descs[1027] = "alias='Sensor_Mode', type='string', size='[1, 1]', range='[0, 64]', default='lcg', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1028];
@@ -15771,7 +15771,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 193;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1028] = "alias='Tuning_ISO', type='struct_list', size='dynamic', ui_module='double_index_list'";
+	ctx->descs[1028] = "alias='Tuning_ISO', type='struct_list', size='dynamic', ui_module='double_index_list', ro='0'";
 #endif
 
 	obj = &ctx->objs[1029];
@@ -15800,7 +15800,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1030] = "type='bool', alias='enable', default='1', hide='0'";
+	ctx->descs[1030] = "type='bool', alias='enable', default='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1031];
@@ -15816,7 +15816,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 194;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1031] = "alias='Setting', type='struct_list', size='dynamic', ui_module='double_index_list'";
+	ctx->descs[1031] = "alias='Setting', type='struct_list', size='dynamic', ui_module='double_index_list', ro='0'";
 #endif
 
 	obj = &ctx->objs[1032];
@@ -15845,7 +15845,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1033] = "alias='Version', type='string', size='[1, 1]', range='[0, 64]', default='V1', dynamic='0', hide='0'";
+	ctx->descs[1033] = "alias='Version', type='string', size='[1, 1]', range='[0, 64]', default='V1', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1034];
@@ -15861,7 +15861,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 192;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1034] = "alias='CalibPara', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[1034] = "alias='CalibPara', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1035];
@@ -15877,7 +15877,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 195;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1035] = "alias='TuningPara', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[1035] = "alias='TuningPara', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1036];
@@ -15893,7 +15893,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1036] = "alias='iso', type='f32', range='[50, 204800]', default='50', digit='[1]', ui_module_param='index2'";
+	ctx->descs[1036] = "alias='iso', type='f32', range='[50, 204800]', default='50', digit='[1]', ui_module_param='index2', ro='0'";
 #endif
 
 	obj = &ctx->objs[1037];
@@ -15909,7 +15909,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1037] = "alias='noise_curve', type='f32', size='[1, 5]', range='[-65535, 65535]', default='[-8.4303162971622996e-013 7.9640341802261105e-009 -2.6912484620871701e-005 3.3049135399760801e-002 1.8211244079810101e+001]', digit='[6]', dynamic='0', hide='0'";
+	ctx->descs[1037] = "alias='noise_curve', type='f32', size='[1, 5]', range='[-65535, 65535]', default='[-8.4303162971622996e-013 7.9640341802261105e-009 -2.6912484620871701e-005 3.3049135399760801e-002 1.8211244079810101e+001]', digit='[6]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1038];
@@ -15925,7 +15925,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1038] = "alias='noise_curve_x00', type='f32', size='[1,1]', range='[0.0, 4095]', default='3647', digit='[0]', hide='0'";
+	ctx->descs[1038] = "alias='noise_curve_x00', type='f32', size='[1,1]', range='[0.0, 4095]', default='3647', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1039];
@@ -15941,7 +15941,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1039] = "alias='y_lo_noiseprofile', type='f32', size='[1, 4]', range='[0, 1]', default='[1.00000 0.68993 0.41986 0.24798]', digit='[6]', dynamic='0', hide='0'";
+	ctx->descs[1039] = "alias='y_lo_noiseprofile', type='f32', size='[1, 4]', range='[0, 1]', default='[1.00000 0.68993 0.41986 0.24798]', digit='[6]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1040];
@@ -15957,7 +15957,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1040] = "alias='y_hi_noiseprofile', type='f32', size='[1, 4]', range='[0, 1]', default='[0.77114 0.62293 0.46145 0.00000]', digit='[6]', dynamic='0', hide='0'";
+	ctx->descs[1040] = "alias='y_hi_noiseprofile', type='f32', size='[1, 4]', range='[0, 1]', default='[0.77114 0.62293 0.46145 0.00000]', digit='[6]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1041];
@@ -15973,7 +15973,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1041] = "alias='uv_lo_noiseprofile', type='f32', size='[1, 3]', range='[0, 1]', default='[1.00000 0.68993 0.41986]', digit='[6]', dynamic='0', hide='0'";
+	ctx->descs[1041] = "alias='uv_lo_noiseprofile', type='f32', size='[1, 3]', range='[0, 1]', default='[1.00000 0.68993 0.41986]', digit='[6]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1042];
@@ -15989,7 +15989,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1042] = "alias='uv_hi_noiseprofile', type='f32', size='[1, 3]', range='[0, 1]', default='[0.77114 0.62293 0.35740]', digit='[6]', dynamic='0', hide='0'";
+	ctx->descs[1042] = "alias='uv_hi_noiseprofile', type='f32', size='[1, 3]', range='[0, 1]', default='[0.77114 0.62293 0.35740]', digit='[6]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1043];
@@ -16005,7 +16005,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1043] = "alias='SNR_Mode', type='string', size='[1, 1]', range='[0, 64]', default='LSNR', dynamic='0', ui_module_param='index1'";
+	ctx->descs[1043] = "alias='SNR_Mode', type='string', size='[1, 1]', range='[0, 64]', default='LSNR', dynamic='0', ui_module_param='index1', ro='0'";
 #endif
 
 	obj = &ctx->objs[1044];
@@ -16021,7 +16021,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1044] = "alias='Sensor_Mode', type='string', size='[1, 1]', range='[0, 64]', default='lcg', dynamic='0', hide='0'";
+	ctx->descs[1044] = "alias='Sensor_Mode', type='string', size='[1, 1]', range='[0, 64]', default='lcg', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1045];
@@ -16037,7 +16037,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 197;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1045] = "alias='Calib_ISO', type='struct_list', size='dynamic', ui_module='double_index_list'";
+	ctx->descs[1045] = "alias='Calib_ISO', type='struct_list', size='dynamic', ui_module='double_index_list', ro='0'";
 #endif
 
 	obj = &ctx->objs[1046];
@@ -16066,7 +16066,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 198;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1047] = "alias='Setting', type='struct_list', size='dynamic', ui_module='double_index_list'";
+	ctx->descs[1047] = "alias='Setting', type='struct_list', size='dynamic', ui_module='double_index_list', ro='0'";
 #endif
 
 	obj = &ctx->objs[1048];
@@ -16095,7 +16095,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1049] = "alias='y_lumanrpoint', type='f32', size='[1, 6]', range='[0, 256]', default='[0.0000 32.0000 64.0000 128.0000 192.0000 256.0000]', digit='[0]', dynamic='0', hide='0'";
+	ctx->descs[1049] = "alias='y_lumanrpoint', type='f32', size='[1, 6]', range='[0, 256]', default='[0.0000 32.0000 64.0000 128.0000 192.0000 256.0000]', digit='[0]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1050];
@@ -16111,7 +16111,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1050] = "alias='y_lumanrcurve', type='f32', size='[1, 6]', range='[0, 2.0]', default='[1.0 1.0 1.0 1.0 1.0 1.0]', digit='[2]', dynamic='0', hide='0'";
+	ctx->descs[1050] = "alias='y_lumanrcurve', type='f32', size='[1, 6]', range='[0, 2.0]', default='[1.0 1.0 1.0 1.0 1.0 1.0]', digit='[2]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1051];
@@ -16127,7 +16127,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1051] = "alias='uv_lumanrpoint', type='f32', size='[1, 6]', range='[0, 256]', default='[0.0000 32.0000 64.0000 128.0000 192.0000 256.0000]', digit='[0]', dynamic='0', hide='0'";
+	ctx->descs[1051] = "alias='uv_lumanrpoint', type='f32', size='[1, 6]', range='[0, 256]', default='[0.0000 32.0000 64.0000 128.0000 192.0000 256.0000]', digit='[0]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1052];
@@ -16143,7 +16143,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1052] = "alias='uv_lumanrcurve', type='f32', size='[1, 6]', range='[0, 2.0]', default='[1.0 1.0 1.0 1.0 1.0 1.0]', digit='[2]', dynamic='0', hide='0'";
+	ctx->descs[1052] = "alias='uv_lumanrcurve', type='f32', size='[1, 6]', range='[0, 2.0]', default='[1.0 1.0 1.0 1.0 1.0 1.0]', digit='[2]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1053];
@@ -16159,7 +16159,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1053] = "alias='y_lo_lvl0_gfdelta', type='f32', size='[1, 6]', range='[0, 1.0]', default='[0.06250 0.03906 0.03906 0.03906 0.03906 0.03906]', digit='[6]', dynamic='0', hide='0'";
+	ctx->descs[1053] = "alias='y_lo_lvl0_gfdelta', type='f32', size='[1, 6]', range='[0, 1.0]', default='[0.06250 0.03906 0.03906 0.03906 0.03906 0.03906]', digit='[6]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1054];
@@ -16175,7 +16175,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1054] = "alias='y_hi_lvl0_gfdelta', type='f32', size='[1, 6]', range='[0, 1.0]', default='[0.06250 0.03906 0.03906 0.03906 0.03906 0.03906]', digit='[6]', dynamic='0', hide='0'";
+	ctx->descs[1054] = "alias='y_hi_lvl0_gfdelta', type='f32', size='[1, 6]', range='[0, 1.0]', default='[0.06250 0.03906 0.03906 0.03906 0.03906 0.03906]', digit='[6]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1055];
@@ -16191,7 +16191,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1055] = "alias='y_lo_lvl1_gfdelta', type='f32', size='[1, 3]', range='[0, 1.0]', default='[0.12500 0.10938 0.10938]', digit='[6]', dynamic='0', hide='0'";
+	ctx->descs[1055] = "alias='y_lo_lvl1_gfdelta', type='f32', size='[1, 3]', range='[0, 1.0]', default='[0.12500 0.10938 0.10938]', digit='[6]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1056];
@@ -16207,7 +16207,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1056] = "alias='y_hi_lvl1_gfdelta', type='f32', size='[1, 3]', range='[0, 1.0]', default='[0.12500 0.10938 0.10938]', digit='[6]', dynamic='0', hide='0'";
+	ctx->descs[1056] = "alias='y_hi_lvl1_gfdelta', type='f32', size='[1, 3]', range='[0, 1.0]', default='[0.12500 0.10938 0.10938]', digit='[6]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1057];
@@ -16223,7 +16223,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1057] = "alias='y_lo_lvl2_gfdelta', type='f32', size='[1, 3]', range='[0, 1.0]', default='[0.12500 0.10938 0.10938]', digit='[6]', dynamic='0', hide='0'";
+	ctx->descs[1057] = "alias='y_lo_lvl2_gfdelta', type='f32', size='[1, 3]', range='[0, 1.0]', default='[0.12500 0.10938 0.10938]', digit='[6]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1058];
@@ -16239,7 +16239,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1058] = "alias='y_hi_lvl2_gfdelta', type='f32', size='[1, 3]', range='[0, 1.0]', default='[0.12500 0.10938 0.10938]', digit='[6]', dynamic='0', hide='0'";
+	ctx->descs[1058] = "alias='y_hi_lvl2_gfdelta', type='f32', size='[1, 3]', range='[0, 1.0]', default='[0.12500 0.10938 0.10938]', digit='[6]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1059];
@@ -16255,7 +16255,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1059] = "alias='y_lo_lvl3_gfdelta', type='f32', size='[1, 3]', range='[0, 1.0]', default='[0.12500 0.10938 0.10938]', digit='[6]', dynamic='0', hide='0'";
+	ctx->descs[1059] = "alias='y_lo_lvl3_gfdelta', type='f32', size='[1, 3]', range='[0, 1.0]', default='[0.12500 0.10938 0.10938]', digit='[6]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1060];
@@ -16271,7 +16271,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1060] = "alias='y_hi_lvl3_gfdelta', type='f32', size='[1, 3]', range='[0, 1.0]', default='[0.12500 0.10938 0.10938]', digit='[6]', dynamic='0', hide='0'";
+	ctx->descs[1060] = "alias='y_hi_lvl3_gfdelta', type='f32', size='[1, 3]', range='[0, 1.0]', default='[0.12500 0.10938 0.10938]', digit='[6]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1061];
@@ -16287,7 +16287,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1061] = "alias='uv_lo_lvl0_gfdelta', type='f32', size='[1, 6]', range='[0, 1.0]', default='[0.06250 0.03906 0.03906 0.03906 0.03906 0.03906]', digit='[6]', dynamic='0', hide='0'";
+	ctx->descs[1061] = "alias='uv_lo_lvl0_gfdelta', type='f32', size='[1, 6]', range='[0, 1.0]', default='[0.06250 0.03906 0.03906 0.03906 0.03906 0.03906]', digit='[6]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1062];
@@ -16303,7 +16303,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1062] = "alias='uv_hi_lvl0_gfdelta', type='f32', size='[1, 6]', range='[0, 1.0]', default='[0.06250 0.03906 0.03906 0.03906 0.03906 0.03906]', digit='[6]', dynamic='0', hide='0'";
+	ctx->descs[1062] = "alias='uv_hi_lvl0_gfdelta', type='f32', size='[1, 6]', range='[0, 1.0]', default='[0.06250 0.03906 0.03906 0.03906 0.03906 0.03906]', digit='[6]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1063];
@@ -16319,7 +16319,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1063] = "alias='uv_lo_lvl1_gfdelta', type='f32', size='[1, 3]', range='[0, 1.0]', default='[0.12500 0.10938 0.10938]', digit='[6]', dynamic='0', hide='0'";
+	ctx->descs[1063] = "alias='uv_lo_lvl1_gfdelta', type='f32', size='[1, 3]', range='[0, 1.0]', default='[0.12500 0.10938 0.10938]', digit='[6]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1064];
@@ -16335,7 +16335,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1064] = "alias='uv_hi_lvl1_gfdelta', type='f32', size='[1, 3]', range='[0, 1.0]', default='[0.12500 0.10938 0.10938]', digit='[6]', dynamic='0', hide='0'";
+	ctx->descs[1064] = "alias='uv_hi_lvl1_gfdelta', type='f32', size='[1, 3]', range='[0, 1.0]', default='[0.12500 0.10938 0.10938]', digit='[6]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1065];
@@ -16351,7 +16351,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1065] = "alias='uv_lo_lvl2_gfdelta', type='f32', size='[1, 3]', range='[0, 1.0]', default='[0.12500 0.10938 0.10938]', digit='[6]', dynamic='0', hide='0'";
+	ctx->descs[1065] = "alias='uv_lo_lvl2_gfdelta', type='f32', size='[1, 3]', range='[0, 1.0]', default='[0.12500 0.10938 0.10938]', digit='[6]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1066];
@@ -16367,7 +16367,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1066] = "alias='uv_hi_lvl2_gfdelta', type='f32', size='[1, 3]', range='[0, 1.0]', default='[0.12500 0.10938 0.10938]', digit='[6]', dynamic='0', hide='0'";
+	ctx->descs[1066] = "alias='uv_hi_lvl2_gfdelta', type='f32', size='[1, 3]', range='[0, 1.0]', default='[0.12500 0.10938 0.10938]', digit='[6]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1067];
@@ -16383,7 +16383,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1067] = "alias='lvl0_gfsigma', type='f32', size='[1, 6]', range='[0, 1.0]', default='[0.06250 0.03906 0.03906 0.03906 0.03906 0.03906]', digit='[6]', dynamic='0', hide='0'";
+	ctx->descs[1067] = "alias='lvl0_gfsigma', type='f32', size='[1, 6]', range='[0, 1.0]', default='[0.06250 0.03906 0.03906 0.03906 0.03906 0.03906]', digit='[6]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1068];
@@ -16399,7 +16399,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1068] = "alias='lvl1_gfsigma', type='f32', size='[1, 3]', range='[0, 1.0]', default='[0.12500 0.10938 0.10938]', digit='[6]', dynamic='0', hide='0'";
+	ctx->descs[1068] = "alias='lvl1_gfsigma', type='f32', size='[1, 3]', range='[0, 1.0]', default='[0.12500 0.10938 0.10938]', digit='[6]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1069];
@@ -16415,7 +16415,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1069] = "alias='lvl2_gfsigma', type='f32', size='[1, 3]', range='[0, 1.0]', default='[0.12500 0.10938 0.10938]', digit='[6]', dynamic='0', hide='0'";
+	ctx->descs[1069] = "alias='lvl2_gfsigma', type='f32', size='[1, 3]', range='[0, 1.0]', default='[0.12500 0.10938 0.10938]', digit='[6]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1070];
@@ -16431,7 +16431,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1070] = "alias='lvl3_gfsigma', type='f32', size='[1, 3]', range='[0, 1.0]', default='[0.12500 0.10938 0.10938]', digit='[6]', dynamic='0', hide='0'";
+	ctx->descs[1070] = "alias='lvl3_gfsigma', type='f32', size='[1, 3]', range='[0, 1.0]', default='[0.12500 0.10938 0.10938]', digit='[6]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1071];
@@ -16447,7 +16447,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1071] = "alias='iso', type='f32', range='[50, 204800]', default='50', digit='[1]', ui_module_param='index2'";
+	ctx->descs[1071] = "alias='iso', type='f32', range='[50, 204800]', default='50', digit='[1]', ui_module_param='index2', ro='0'";
 #endif
 
 	obj = &ctx->objs[1072];
@@ -16463,7 +16463,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1072] = "alias='weight_limit_y_0', type='f32', size='[1,1]', range='[0.0, 255]', default='64', digit='[0]', hide='0'";
+	ctx->descs[1072] = "alias='weight_limit_y_0', type='f32', size='[1,1]', range='[0.0, 255]', default='64', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1073];
@@ -16479,7 +16479,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1073] = "alias='weight_limit_y_1', type='f32', size='[1,1]', range='[0.0, 255]', default='64', digit='[0]', hide='0'";
+	ctx->descs[1073] = "alias='weight_limit_y_1', type='f32', size='[1,1]', range='[0.0, 255]', default='64', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1074];
@@ -16495,7 +16495,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1074] = "alias='weight_limit_y_2', type='f32', size='[1,1]', range='[0.0, 255]', default='64', digit='[0]', hide='0'";
+	ctx->descs[1074] = "alias='weight_limit_y_2', type='f32', size='[1,1]', range='[0.0, 255]', default='64', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1075];
@@ -16511,7 +16511,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1075] = "alias='weight_limit_y_3', type='f32', size='[1,1]', range='[0.0, 255]', default='64', digit='[0]', hide='0'";
+	ctx->descs[1075] = "alias='weight_limit_y_3', type='f32', size='[1,1]', range='[0.0, 255]', default='64', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1076];
@@ -16527,7 +16527,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1076] = "alias='weight_limit_uv_0', type='f32', size='[1,1]', range='[0.0, 255]', default='64', digit='[0]', hide='0'";
+	ctx->descs[1076] = "alias='weight_limit_uv_0', type='f32', size='[1,1]', range='[0.0, 255]', default='64', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1077];
@@ -16543,7 +16543,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1077] = "alias='weight_limit_uv_1', type='f32', size='[1,1]', range='[0.0, 255]', default='64', digit='[0]', hide='0'";
+	ctx->descs[1077] = "alias='weight_limit_uv_1', type='f32', size='[1,1]', range='[0.0, 255]', default='64', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1078];
@@ -16559,7 +16559,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1078] = "alias='weight_limit_uv_2', type='f32', size='[1,1]', range='[0.0, 255]', default='64', digit='[0]', hide='0'";
+	ctx->descs[1078] = "alias='weight_limit_uv_2', type='f32', size='[1,1]', range='[0.0, 255]', default='64', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1079];
@@ -16575,7 +16575,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1079] = "alias='ratio_frq_y_l', type='f32', size='[1,1]', range='[0.0, 7.9]', default='0.5', digit='[1]', hide='0'";
+	ctx->descs[1079] = "alias='ratio_frq_y_l', type='f32', size='[1,1]', range='[0.0, 7.9]', default='0.5', digit='[1]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1080];
@@ -16591,7 +16591,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1080] = "alias='ratio_frq_y_h', type='f32', size='[1,1]', range='[0.0, 7.9]', default='2.0', digit='[1]', hide='0'";
+	ctx->descs[1080] = "alias='ratio_frq_y_h', type='f32', size='[1,1]', range='[0.0, 7.9]', default='2.0', digit='[1]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1081];
@@ -16607,7 +16607,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1081] = "alias='ratio_frq_uv_l', type='f32', size='[1,1]', range='[0.0, 7.9]', default='0.5', digit='[1]', hide='0'";
+	ctx->descs[1081] = "alias='ratio_frq_uv_l', type='f32', size='[1,1]', range='[0.0, 7.9]', default='0.5', digit='[1]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1082];
@@ -16623,7 +16623,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1082] = "alias='ratio_frq_uv_h', type='f32', size='[1,1]', range='[0.0, 7.9]', default='2.0', digit='[1]', hide='0'";
+	ctx->descs[1082] = "alias='ratio_frq_uv_h', type='f32', size='[1,1]', range='[0.0, 7.9]', default='2.0', digit='[1]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1083];
@@ -16639,7 +16639,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1083] = "alias='luma_w_in_chroma_0', type='f32', size='[1,1]', range='[0.0, 1.0]', default='1.0', digit='[2]', hide='0'";
+	ctx->descs[1083] = "alias='luma_w_in_chroma_0', type='f32', size='[1,1]', range='[0.0, 1.0]', default='1.0', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1084];
@@ -16655,7 +16655,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1084] = "alias='luma_w_in_chroma_1', type='f32', size='[1,1]', range='[0.0, 1.0]', default='1.0', digit='[2]', hide='0'";
+	ctx->descs[1084] = "alias='luma_w_in_chroma_1', type='f32', size='[1,1]', range='[0.0, 1.0]', default='1.0', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1085];
@@ -16671,7 +16671,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1085] = "alias='luma_w_in_chroma_2', type='f32', size='[1,1]', range='[0.0, 1.0]', default='1.0', digit='[2]', hide='0'";
+	ctx->descs[1085] = "alias='luma_w_in_chroma_2', type='f32', size='[1,1]', range='[0.0, 1.0]', default='1.0', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1086];
@@ -16687,7 +16687,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1086] = "alias='y_lo_bfscale_0', type='f32', size='[1,1]', range='[0.0, 8.0]', default='0.5', digit='[2]', hide='0'";
+	ctx->descs[1086] = "alias='y_lo_bfscale_0', type='f32', size='[1,1]', range='[0.0, 8.0]', default='0.5', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1087];
@@ -16703,7 +16703,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1087] = "alias='y_lo_bfscale_1', type='f32', size='[1,1]', range='[0.0, 8.0]', default='0.5', digit='[2]', hide='0'";
+	ctx->descs[1087] = "alias='y_lo_bfscale_1', type='f32', size='[1,1]', range='[0.0, 8.0]', default='0.5', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1088];
@@ -16719,7 +16719,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1088] = "alias='y_lo_bfscale_2', type='f32', size='[1,1]', range='[0.0, 8.0]', default='0.5', digit='[2]', hide='0'";
+	ctx->descs[1088] = "alias='y_lo_bfscale_2', type='f32', size='[1,1]', range='[0.0, 8.0]', default='0.5', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1089];
@@ -16735,7 +16735,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1089] = "alias='y_lo_bfscale_3', type='f32', size='[1,1]', range='[0.0, 8.0]', default='0.5', digit='[2]', hide='0'";
+	ctx->descs[1089] = "alias='y_lo_bfscale_3', type='f32', size='[1,1]', range='[0.0, 8.0]', default='0.5', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1090];
@@ -16751,7 +16751,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1090] = "alias='y_hi_bfscale_0', type='f32', size='[1,1]', range='[0.0, 8.0]', default='0.5', digit='[2]', hide='0'";
+	ctx->descs[1090] = "alias='y_hi_bfscale_0', type='f32', size='[1,1]', range='[0.0, 8.0]', default='0.5', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1091];
@@ -16767,7 +16767,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1091] = "alias='y_hi_bfscale_1', type='f32', size='[1,1]', range='[0.0, 8.0]', default='0.5', digit='[2]', hide='0'";
+	ctx->descs[1091] = "alias='y_hi_bfscale_1', type='f32', size='[1,1]', range='[0.0, 8.0]', default='0.5', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1092];
@@ -16783,7 +16783,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1092] = "alias='y_hi_bfscale_2', type='f32', size='[1,1]', range='[0.0, 8.0]', default='0.5', digit='[2]', hide='0'";
+	ctx->descs[1092] = "alias='y_hi_bfscale_2', type='f32', size='[1,1]', range='[0.0, 8.0]', default='0.5', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1093];
@@ -16799,7 +16799,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1093] = "alias='y_hi_bfscale_3', type='f32', size='[1,1]', range='[0.0, 8.0]', default='0.5', digit='[2]', hide='0'";
+	ctx->descs[1093] = "alias='y_hi_bfscale_3', type='f32', size='[1,1]', range='[0.0, 8.0]', default='0.5', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1094];
@@ -16815,7 +16815,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1094] = "alias='y_denoisestrength', type='f32', size='[1,1]', range='[0.0, 4.0]', default='1.0', digit='[2]', hide='0'";
+	ctx->descs[1094] = "alias='y_denoisestrength', type='f32', size='[1,1]', range='[0.0, 4.0]', default='1.0', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1095];
@@ -16831,7 +16831,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1095] = "alias='uv_lo_bfscale_0', type='f32', size='[1,1]', range='[0.0, 8.0]', default='0.5', digit='[2]', hide='0'";
+	ctx->descs[1095] = "alias='uv_lo_bfscale_0', type='f32', size='[1,1]', range='[0.0, 8.0]', default='0.5', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1096];
@@ -16847,7 +16847,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1096] = "alias='uv_lo_bfscale_1', type='f32', size='[1,1]', range='[0.0, 8.0]', default='0.5', digit='[2]', hide='0'";
+	ctx->descs[1096] = "alias='uv_lo_bfscale_1', type='f32', size='[1,1]', range='[0.0, 8.0]', default='0.5', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1097];
@@ -16863,7 +16863,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1097] = "alias='uv_lo_bfscale_2', type='f32', size='[1,1]', range='[0.0, 8.0]', default='0.5', digit='[2]', hide='0'";
+	ctx->descs[1097] = "alias='uv_lo_bfscale_2', type='f32', size='[1,1]', range='[0.0, 8.0]', default='0.5', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1098];
@@ -16879,7 +16879,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1098] = "alias='uv_hi_bfscale_0', type='f32', size='[1,1]', range='[0.0, 8.0]', default='0.5', digit='[2]', hide='0'";
+	ctx->descs[1098] = "alias='uv_hi_bfscale_0', type='f32', size='[1,1]', range='[0.0, 8.0]', default='0.5', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1099];
@@ -16895,7 +16895,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1099] = "alias='uv_hi_bfscale_1', type='f32', size='[1,1]', range='[0.0, 8.0]', default='0.5', digit='[2]', hide='0'";
+	ctx->descs[1099] = "alias='uv_hi_bfscale_1', type='f32', size='[1,1]', range='[0.0, 8.0]', default='0.5', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1100];
@@ -16911,7 +16911,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1100] = "alias='uv_hi_bfscale_2', type='f32', size='[1,1]', range='[0.0, 8.0]', default='0.5', digit='[2]', hide='0'";
+	ctx->descs[1100] = "alias='uv_hi_bfscale_2', type='f32', size='[1,1]', range='[0.0, 8.0]', default='0.5', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1101];
@@ -16927,7 +16927,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1101] = "alias='uv_denoisestrength', type='f32', size='[1,1]', range='[0.0, 4.0]', default='1.0', digit='[2]', hide='0'";
+	ctx->descs[1101] = "alias='uv_denoisestrength', type='f32', size='[1,1]', range='[0.0, 4.0]', default='1.0', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1102];
@@ -16943,7 +16943,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 200;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1102] = "alias='luma_para', type='struct', ui_module='array_table_ui', index='none', hide='0'";
+	ctx->descs[1102] = "alias='luma_para', type='struct', ui_module='array_table_ui', index='none', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1103];
@@ -16959,7 +16959,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 201;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1103] = "alias='y_gfdelta_para', type='struct', ui_module='array_table_ui', index='none', hide='1'";
+	ctx->descs[1103] = "alias='y_gfdelta_para', type='struct', ui_module='array_table_ui', index='none', hide='1', ro='0'";
 #endif
 
 	obj = &ctx->objs[1104];
@@ -16975,7 +16975,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 202;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1104] = "alias='uv_gfdelta_para', type='struct', ui_module='array_table_ui', index='none', hide='1'";
+	ctx->descs[1104] = "alias='uv_gfdelta_para', type='struct', ui_module='array_table_ui', index='none', hide='1', ro='0'";
 #endif
 
 	obj = &ctx->objs[1105];
@@ -16991,7 +16991,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 203;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1105] = "alias='gfsigma_para', type='struct', ui_module='array_table_ui', index='none', hide='1'";
+	ctx->descs[1105] = "alias='gfsigma_para', type='struct', ui_module='array_table_ui', index='none', hide='1', ro='0'";
 #endif
 
 	obj = &ctx->objs[1106];
@@ -17007,7 +17007,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1106] = "alias='SNR_Mode', type='string', size='[1, 1]', range='[0, 64]', default='LSNR', dynamic='0', ui_module_param='index1'";
+	ctx->descs[1106] = "alias='SNR_Mode', type='string', size='[1, 1]', range='[0, 64]', default='LSNR', dynamic='0', ui_module_param='index1', ro='0'";
 #endif
 
 	obj = &ctx->objs[1107];
@@ -17023,7 +17023,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1107] = "alias='Sensor_Mode', type='string', size='[1, 1]', range='[0, 64]', default='lcg', dynamic='0', hide='0'";
+	ctx->descs[1107] = "alias='Sensor_Mode', type='string', size='[1, 1]', range='[0, 64]', default='lcg', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1108];
@@ -17039,7 +17039,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 204;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1108] = "alias='Tuning_ISO', type='struct_list', size='dynamic', ui_module='double_index_list'";
+	ctx->descs[1108] = "alias='Tuning_ISO', type='struct_list', size='dynamic', ui_module='double_index_list', ro='0'";
 #endif
 
 	obj = &ctx->objs[1109];
@@ -17068,7 +17068,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1110] = "type='bool', alias='Enable', default='1', hide='0'";
+	ctx->descs[1110] = "type='bool', alias='Enable', default='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1111];
@@ -17084,7 +17084,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1111] = "alias='LowTh_iso', type='f32', size='[1,1]', range='[0.0, 2.0]', default='1.0', digit='[2]', hide='0'";
+	ctx->descs[1111] = "alias='LowTh_iso', type='f32', size='[1,1]', range='[0.0, 2.0]', default='1.0', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1112];
@@ -17100,7 +17100,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1112] = "alias='LowTh_time', type='f32', size='[1,1]', range='[0.0, 2.0]', default='1.0', digit='[2]', hide='0'";
+	ctx->descs[1112] = "alias='LowTh_time', type='f32', size='[1,1]', range='[0.0, 2.0]', default='1.0', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1113];
@@ -17116,7 +17116,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1113] = "alias='HighTh_iso', type='f32', size='[1,1]', range='[0.0, 2.0]', default='1.0', digit='[2]', hide='0'";
+	ctx->descs[1113] = "alias='HighTh_iso', type='f32', size='[1,1]', range='[0.0, 2.0]', default='1.0', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1114];
@@ -17132,7 +17132,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1114] = "alias='HighTh_time', type='f32', size='[1,1]', range='[0.0, 2.0]', default='1.0', digit='[2]', hide='0'";
+	ctx->descs[1114] = "alias='HighTh_time', type='f32', size='[1,1]', range='[0.0, 2.0]', default='1.0', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1115];
@@ -17148,7 +17148,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1115] = "alias='iso', type='f32', size='[1,1]', range='[50, 204800]', default='50', digit='[1]', hide='0'";
+	ctx->descs[1115] = "alias='iso', type='f32', size='[1,1]', range='[50, 204800]', default='50', digit='[1]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1116];
@@ -17164,7 +17164,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1116] = "alias='sigmaHScale', type='f32', size='[1,1]', range='[0.0, 2.0]', default='1.0', digit='[2]', hide='0'";
+	ctx->descs[1116] = "alias='sigmaHScale', type='f32', size='[1,1]', range='[0.0, 2.0]', default='1.0', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1117];
@@ -17180,7 +17180,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1117] = "alias='sigmaLScale', type='f32', size='[1,1]', range='[0.0, 2.0]', default='0.5', digit='[2]', hide='0'";
+	ctx->descs[1117] = "alias='sigmaLScale', type='f32', size='[1,1]', range='[0.0, 2.0]', default='0.5', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1118];
@@ -17196,7 +17196,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1118] = "alias='lightClp', type='f32', size='[1,1]', range='[0.0, 64]', default='32', digit='[2]', hide='0'";
+	ctx->descs[1118] = "alias='lightClp', type='f32', size='[1,1]', range='[0.0, 64]', default='32', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1119];
@@ -17212,7 +17212,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1119] = "alias='uvWeight', type='f32', size='[1,1]', range='[0.0, 1.0]', default='1.0', digit='[2]', hide='0'";
+	ctx->descs[1119] = "alias='uvWeight', type='f32', size='[1,1]', range='[0.0, 1.0]', default='1.0', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1120];
@@ -17228,7 +17228,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1120] = "alias='mfnrSigmaScale', type='f32', size='[1,1]', range='[1.0, 2.0]', default='1.0', digit='[2]', hide='0'";
+	ctx->descs[1120] = "alias='mfnrSigmaScale', type='f32', size='[1,1]', range='[1.0, 2.0]', default='1.0', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1121];
@@ -17244,7 +17244,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1121] = "alias='yuvnrGainScale0', type='f32', size='[1,1]', range='[1.0, 2.0]', default='1.0', digit='[2]', hide='0'";
+	ctx->descs[1121] = "alias='yuvnrGainScale0', type='f32', size='[1,1]', range='[1.0, 2.0]', default='1.0', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1122];
@@ -17260,7 +17260,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1122] = "alias='yuvnrGainScale1', type='f32', size='[1,1]', range='[1.0, 2.0]', default='1.0', digit='[2]', hide='0'";
+	ctx->descs[1122] = "alias='yuvnrGainScale1', type='f32', size='[1,1]', range='[1.0, 2.0]', default='1.0', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1123];
@@ -17276,7 +17276,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1123] = "alias='yuvnrGainScale2', type='f32', size='[1,1]', range='[1.0, 2.0]', default='1.0', digit='[2]', hide='0'";
+	ctx->descs[1123] = "alias='yuvnrGainScale2', type='f32', size='[1,1]', range='[1.0, 2.0]', default='1.0', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1124];
@@ -17292,7 +17292,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1124] = "alias='frame_limit_y', type='f32', size='[1,1]', range='[1.0, 255.0]', default='32.0', digit='[2]', hide='0'";
+	ctx->descs[1124] = "alias='frame_limit_y', type='f32', size='[1,1]', range='[1.0, 255.0]', default='32.0', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1125];
@@ -17308,7 +17308,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1125] = "alias='frame_limit_uv', type='f32', size='[1,1]', range='[1.0, 255.0]', default='32.0', digit='[2]', hide='0'";
+	ctx->descs[1125] = "alias='frame_limit_uv', type='f32', size='[1,1]', range='[1.0, 255.0]', default='32.0', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1126];
@@ -17324,7 +17324,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 207;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1126] = "alias='Motion_ISO', type='struct_list', size='dynamic', ui_module='normal_ui_style'";
+	ctx->descs[1126] = "alias='Motion_ISO', type='struct_list', size='dynamic', ui_module='normal_ui_style', ro='0'";
 #endif
 
 	obj = &ctx->objs[1127];
@@ -17353,7 +17353,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1128] = "type='bool', alias='enable', default='1', hide='0'";
+	ctx->descs[1128] = "type='bool', alias='enable', default='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1129];
@@ -17369,7 +17369,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1129] = "type='bool', alias='mode_3to1', default='0', hide='0'";
+	ctx->descs[1129] = "type='bool', alias='mode_3to1', default='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1130];
@@ -17385,7 +17385,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1130] = "type='bool', alias='local_gain_en', default='1', hide='0'";
+	ctx->descs[1130] = "type='bool', alias='local_gain_en', default='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1131];
@@ -17401,7 +17401,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1131] = "type='bool', alias='motion_detect_en', default='0', hide='0'";
+	ctx->descs[1131] = "type='bool', alias='motion_detect_en', default='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1132];
@@ -17417,7 +17417,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 206;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1132] = "alias='Dynamic', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[1132] = "alias='Dynamic', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1133];
@@ -17433,7 +17433,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 208;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1133] = "alias='Motion', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[1133] = "alias='Motion', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1134];
@@ -17449,7 +17449,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 205;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1134] = "alias='Setting', type='struct_list', size='dynamic', ui_module='double_index_list'";
+	ctx->descs[1134] = "alias='Setting', type='struct_list', size='dynamic', ui_module='double_index_list', ro='0'";
 #endif
 
 	obj = &ctx->objs[1135];
@@ -17478,7 +17478,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1136] = "alias='Version', type='string', size='[1, 1]', range='[0, 64]', default='V1', dynamic='0', hide='0'";
+	ctx->descs[1136] = "alias='Version', type='string', size='[1, 1]', range='[0, 64]', default='V1', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1137];
@@ -17494,7 +17494,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 199;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1137] = "alias='CalibPara', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[1137] = "alias='CalibPara', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1138];
@@ -17510,7 +17510,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 209;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1138] = "alias='TuningPara', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[1138] = "alias='TuningPara', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1139];
@@ -17526,7 +17526,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1139] = "alias='iso', type='f32', range='[50, 204800]', default='50', digit='[1]', ui_module_param='index2'";
+	ctx->descs[1139] = "alias='iso', type='f32', range='[50, 204800]', default='50', digit='[1]', ui_module_param='index2', ro='0'";
 #endif
 
 	obj = &ctx->objs[1140];
@@ -17542,7 +17542,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1140] = "alias='sigma_curve', type='f32', size='[1, 5]', range='[-65535.0, 65535]', default='[2.0 2.0 1.2 1.2]', digit='[6]', dynamic='0', hide='0'";
+	ctx->descs[1140] = "alias='sigma_curve', type='f32', size='[1, 5]', range='[-65535.0, 65535]', default='[2.0 2.0 1.2 1.2]', digit='[6]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1141];
@@ -17558,7 +17558,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1141] = "alias='ynr_lci', type='f32', size='[1, 4]', range='[0.0, 16.0]', default='[0.9332 0.6865 0.4320 0.2739]', digit='[4]', dynamic='0', hide='0'";
+	ctx->descs[1141] = "alias='ynr_lci', type='f32', size='[1, 4]', range='[0.0, 16.0]', default='[0.9332 0.6865 0.4320 0.2739]', digit='[4]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1142];
@@ -17574,7 +17574,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1142] = "alias='ynr_lhci', type='f32', size='[1, 4]', range='[0.0, 16.0]', default='[0.8322 0.9514 0.7381 0.4824]', digit='[4]', dynamic='0', hide='0'";
+	ctx->descs[1142] = "alias='ynr_lhci', type='f32', size='[1, 4]', range='[0.0, 16.0]', default='[0.8322 0.9514 0.7381 0.4824]', digit='[4]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1143];
@@ -17590,7 +17590,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1143] = "alias='ynr_hlci', type='f32', size='[1, 4]', range='[0.0, 16.0]', default='[0.8451 0.9787 0.7649 0.5108]', digit='[4]', dynamic='0', hide='0'";
+	ctx->descs[1143] = "alias='ynr_hlci', type='f32', size='[1, 4]', range='[0.0, 16.0]', default='[0.8451 0.9787 0.7649 0.5108]', digit='[4]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1144];
@@ -17606,7 +17606,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1144] = "alias='ynr_hhci', type='f32', size='[1, 4]', range='[0.0, 16.0]', default='[0.6986 1.4097 1.2535 0.8366]', digit='[4]', dynamic='0', hide='0'";
+	ctx->descs[1144] = "alias='ynr_hhci', type='f32', size='[1, 4]', range='[0.0, 16.0]', default='[0.6986 1.4097 1.2535 0.8366]', digit='[4]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1145];
@@ -17622,7 +17622,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1145] = "alias='SNR_Mode', type='string', size='[1, 1]', range='[0, 64]', default='LSNR', dynamic='0', ui_module_param='index1'";
+	ctx->descs[1145] = "alias='SNR_Mode', type='string', size='[1, 1]', range='[0, 64]', default='LSNR', dynamic='0', ui_module_param='index1', ro='0'";
 #endif
 
 	obj = &ctx->objs[1146];
@@ -17638,7 +17638,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1146] = "alias='Sensor_Mode', type='string', size='[1, 1]', range='[0, 64]', default='lcg', dynamic='0', hide='0'";
+	ctx->descs[1146] = "alias='Sensor_Mode', type='string', size='[1, 1]', range='[0, 64]', default='lcg', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1147];
@@ -17654,7 +17654,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 211;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1147] = "alias='Calib_ISO', type='struct_list', size='dynamic', ui_module='double_index_list'";
+	ctx->descs[1147] = "alias='Calib_ISO', type='struct_list', size='dynamic', ui_module='double_index_list', ro='0'";
 #endif
 
 	obj = &ctx->objs[1148];
@@ -17683,7 +17683,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 212;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1149] = "alias='Setting', type='struct_list', size='dynamic', ui_module='double_index_list'";
+	ctx->descs[1149] = "alias='Setting', type='struct_list', size='dynamic', ui_module='double_index_list', ro='0'";
 #endif
 
 	obj = &ctx->objs[1150];
@@ -17712,7 +17712,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1151] = "alias='lo_lumaPoint', type='f32', size='[1, 6]', range='[0, 256]', default='[0.0000 32.0000 64.0000 128.0000 192.0000 256.0000]', digit='[0]', dynamic='0', hide='0'";
+	ctx->descs[1151] = "alias='lo_lumaPoint', type='f32', size='[1, 6]', range='[0, 256]', default='[0.0000 32.0000 64.0000 128.0000 192.0000 256.0000]', digit='[0]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1152];
@@ -17728,7 +17728,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1152] = "alias='lo_lumaRatio', type='f32', size='[1, 6]', range='[0, 2.0]', default='[1.0', digit='1.0', dynamic='1.0', hide='1.0'";
+	ctx->descs[1152] = "alias='lo_lumaRatio', type='f32', size='[1, 6]', range='[0, 2.0]', default='[1.0', digit='1.0', dynamic='1.0', hide='1.0', ro='1.0'";
 #endif
 
 	obj = &ctx->objs[1153];
@@ -17744,7 +17744,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1153] = "alias='hi_lumaPoint', type='f32', size='[1, 6]', range='[0, 256]', default='[0.0000 32.0000 64.0000 128.0000 192.0000 256.0000]', digit='[0]', dynamic='0', hide='0'";
+	ctx->descs[1153] = "alias='hi_lumaPoint', type='f32', size='[1, 6]', range='[0, 256]', default='[0.0000 32.0000 64.0000 128.0000 192.0000 256.0000]', digit='[0]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1154];
@@ -17760,7 +17760,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1154] = "alias='hi_lumaRatio', type='f32', size='[1, 6]', range='[0, 2.0]', default='[1.0', digit='1.0', dynamic='1.0', hide='1.0'";
+	ctx->descs[1154] = "alias='hi_lumaRatio', type='f32', size='[1, 6]', range='[0, 2.0]', default='[1.0', digit='1.0', dynamic='1.0', hide='1.0', ro='1.0'";
 #endif
 
 	obj = &ctx->objs[1155];
@@ -17776,7 +17776,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1155] = "alias='y_luma_point', type='f32', size='[1, 6]', range='[0, 512]', default='[64.0000 128.0000 192.0000 256.0000 384.0000 512.0000]', digit='[0]', dynamic='0', hide='0'";
+	ctx->descs[1155] = "alias='y_luma_point', type='f32', size='[1, 6]', range='[0, 512]', default='[64.0000 128.0000 192.0000 256.0000 384.0000 512.0000]', digit='[0]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1156];
@@ -17792,7 +17792,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1156] = "alias='hgrad_y_level1', type='f32', size='[1, 6]', range='[0, 1.0]', default='[1.0000 0.6700 0.6700 0.6700 0.6700 0.6700]', digit='[0]', dynamic='0', hide='0'";
+	ctx->descs[1156] = "alias='hgrad_y_level1', type='f32', size='[1, 6]', range='[0, 1.0]', default='[1.0000 0.6700 0.6700 0.6700 0.6700 0.6700]', digit='[0]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1157];
@@ -17808,7 +17808,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1157] = "alias='hgrad_y_level2', type='f32', size='[1, 6]', range='[0, 1.0]', default='[1.0000 0.6700 0.6700 0.6700 0.6700 0.6700]', digit='[0]', dynamic='0', hide='0'";
+	ctx->descs[1157] = "alias='hgrad_y_level2', type='f32', size='[1, 6]', range='[0, 1.0]', default='[1.0000 0.6700 0.6700 0.6700 0.6700 0.6700]', digit='[0]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1158];
@@ -17824,7 +17824,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1158] = "alias='hgrad_y_level3', type='f32', size='[1, 6]', range='[0, 1.0]', default='[1.0000 0.5700 0.5700 0.5700 0.5700 0.5700]', digit='[0]', dynamic='0', hide='0'";
+	ctx->descs[1158] = "alias='hgrad_y_level3', type='f32', size='[1, 6]', range='[0, 1.0]', default='[1.0000 0.5700 0.5700 0.5700 0.5700 0.5700]', digit='[0]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1159];
@@ -17840,7 +17840,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1159] = "alias='hgrad_y_level4', type='f32', size='[1, 6]', range='[0, 1.0]', default='[1.0000 0.5000 0.5000 0.4000 0.3000 0.2000]', digit='[0]', dynamic='0', hide='0'";
+	ctx->descs[1159] = "alias='hgrad_y_level4', type='f32', size='[1, 6]', range='[0, 1.0]', default='[1.0000 0.5000 0.5000 0.4000 0.3000 0.2000]', digit='[0]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1160];
@@ -17856,7 +17856,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1160] = "alias='iso', type='f32', range='[50, 204800]', default='50', digit='[1]', ui_module_param='index2'";
+	ctx->descs[1160] = "alias='iso', type='f32', range='[50, 204800]', default='50', digit='[1]', ui_module_param='index2', ro='0'";
 #endif
 
 	obj = &ctx->objs[1161];
@@ -17872,7 +17872,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1161] = "alias='lo_bfScale_1', type='f32', size='[1,1]', range='[0.0, 15.9]', default='1.0', digit='[2]', hide='0'";
+	ctx->descs[1161] = "alias='lo_bfScale_1', type='f32', size='[1,1]', range='[0.0, 15.9]', default='1.0', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1162];
@@ -17888,7 +17888,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1162] = "alias='lo_bfScale_2', type='f32', size='[1,1]', range='[0.0, 15.9]', default='1.0', digit='[2]', hide='0'";
+	ctx->descs[1162] = "alias='lo_bfScale_2', type='f32', size='[1,1]', range='[0.0, 15.9]', default='1.0', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1163];
@@ -17904,7 +17904,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1163] = "alias='lo_bfScale_3', type='f32', size='[1,1]', range='[0.0, 15.9]', default='1.0', digit='[2]', hide='0'";
+	ctx->descs[1163] = "alias='lo_bfScale_3', type='f32', size='[1,1]', range='[0.0, 15.9]', default='1.0', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1164];
@@ -17920,7 +17920,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1164] = "alias='lo_bfScale_4', type='f32', size='[1,1]', range='[0.0, 15.9]', default='1.0', digit='[2]', hide='0'";
+	ctx->descs[1164] = "alias='lo_bfScale_4', type='f32', size='[1,1]', range='[0.0, 15.9]', default='1.0', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1165];
@@ -17936,7 +17936,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1165] = "alias='denoise_weight_1', type='f32', size='[1,1]', range='[0.0, 1.0]', default='0.5', digit='[2]', hide='0'";
+	ctx->descs[1165] = "alias='denoise_weight_1', type='f32', size='[1,1]', range='[0.0, 1.0]', default='0.5', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1166];
@@ -17952,7 +17952,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1166] = "alias='denoise_weight_2', type='f32', size='[1,1]', range='[0.0, 1.0]', default='0.5', digit='[2]', hide='0'";
+	ctx->descs[1166] = "alias='denoise_weight_2', type='f32', size='[1,1]', range='[0.0, 1.0]', default='0.5', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1167];
@@ -17968,7 +17968,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1167] = "alias='denoise_weight_3', type='f32', size='[1,1]', range='[0.0, 1.0]', default='0.5', digit='[2]', hide='0'";
+	ctx->descs[1167] = "alias='denoise_weight_3', type='f32', size='[1,1]', range='[0.0, 1.0]', default='0.5', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1168];
@@ -17984,7 +17984,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1168] = "alias='denoise_weight_4', type='f32', size='[1,1]', range='[0.0, 1.0]', default='0.5', digit='[2]', hide='0'";
+	ctx->descs[1168] = "alias='denoise_weight_4', type='f32', size='[1,1]', range='[0.0, 1.0]', default='0.5', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1169];
@@ -18000,7 +18000,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1169] = "alias='imerge_ratio', type='f32', size='[1,1]', range='[0.0, 1.0]', default='0.4', digit='[2]', hide='0'";
+	ctx->descs[1169] = "alias='imerge_ratio', type='f32', size='[1,1]', range='[0.0, 1.0]', default='0.4', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1170];
@@ -18016,7 +18016,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1170] = "alias='imerge_bound', type='f32', size='[1,1]', range='[1.0, 16.0]', default='1.25', digit='[2]', hide='0'";
+	ctx->descs[1170] = "alias='imerge_bound', type='f32', size='[1,1]', range='[1.0, 16.0]', default='1.25', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1171];
@@ -18032,7 +18032,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1171] = "alias='lo_directionStrength', type='f32', size='[1,1]', range='[0.0, 16.0]', default='0.5', digit='[2]', hide='0'";
+	ctx->descs[1171] = "alias='lo_directionStrength', type='f32', size='[1,1]', range='[0.0, 16.0]', default='0.5', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1172];
@@ -18048,7 +18048,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1172] = "alias='hi_bfScale_1', type='f32', size='[1,1]', range='[0.0, 15.9]', default='1.0', digit='[2]', hide='0'";
+	ctx->descs[1172] = "alias='hi_bfScale_1', type='f32', size='[1,1]', range='[0.0, 15.9]', default='1.0', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1173];
@@ -18064,7 +18064,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1173] = "alias='hi_bfScale_2', type='f32', size='[1,1]', range='[0.0, 15.9]', default='1.0', digit='[2]', hide='0'";
+	ctx->descs[1173] = "alias='hi_bfScale_2', type='f32', size='[1,1]', range='[0.0, 15.9]', default='1.0', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1174];
@@ -18080,7 +18080,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1174] = "alias='hi_bfScale_3', type='f32', size='[1,1]', range='[0.0, 15.9]', default='1.0', digit='[2]', hide='0'";
+	ctx->descs[1174] = "alias='hi_bfScale_3', type='f32', size='[1,1]', range='[0.0, 15.9]', default='1.0', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1175];
@@ -18096,7 +18096,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1175] = "alias='hi_bfScale_4', type='f32', size='[1,1]', range='[0.0, 15.9]', default='1.0', digit='[2]', hide='0'";
+	ctx->descs[1175] = "alias='hi_bfScale_4', type='f32', size='[1,1]', range='[0.0, 15.9]', default='1.0', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1176];
@@ -18112,7 +18112,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1176] = "alias='hi_denoiseWeight_1', type='f32', size='[1,1]', range='[0.0, 1.0]', default='0.5', digit='[2]', hide='0'";
+	ctx->descs[1176] = "alias='hi_denoiseWeight_1', type='f32', size='[1,1]', range='[0.0, 1.0]', default='0.5', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1177];
@@ -18128,7 +18128,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1177] = "alias='hi_denoiseWeight_2', type='f32', size='[1,1]', range='[0.0, 1.0]', default='0.5', digit='[2]', hide='0'";
+	ctx->descs[1177] = "alias='hi_denoiseWeight_2', type='f32', size='[1,1]', range='[0.0, 1.0]', default='0.5', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1178];
@@ -18144,7 +18144,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1178] = "alias='hi_denoiseWeight_3', type='f32', size='[1,1]', range='[0.0, 1.0]', default='0.5', digit='[2]', hide='0'";
+	ctx->descs[1178] = "alias='hi_denoiseWeight_3', type='f32', size='[1,1]', range='[0.0, 1.0]', default='0.5', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1179];
@@ -18160,7 +18160,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1179] = "alias='hi_denoiseWeight_4', type='f32', size='[1,1]', range='[0.0, 1.0]', default='0.5', digit='[2]', hide='0'";
+	ctx->descs[1179] = "alias='hi_denoiseWeight_4', type='f32', size='[1,1]', range='[0.0, 1.0]', default='0.5', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1180];
@@ -18176,7 +18176,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1180] = "alias='hi_soft_thresh_scale_1', type='f32', size='[1,1]', range='[0.0, 1.0]', default='0.1', digit='[2]', hide='0'";
+	ctx->descs[1180] = "alias='hi_soft_thresh_scale_1', type='f32', size='[1,1]', range='[0.0, 1.0]', default='0.1', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1181];
@@ -18192,7 +18192,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1181] = "alias='hi_soft_thresh_scale_2', type='f32', size='[1,1]', range='[0.0, 1.0]', default='0.1', digit='[2]', hide='0'";
+	ctx->descs[1181] = "alias='hi_soft_thresh_scale_2', type='f32', size='[1,1]', range='[0.0, 1.0]', default='0.1', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1182];
@@ -18208,7 +18208,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1182] = "alias='hi_soft_thresh_scale_3', type='f32', size='[1,1]', range='[0.0, 1.0]', default='0.1', digit='[2]', hide='0'";
+	ctx->descs[1182] = "alias='hi_soft_thresh_scale_3', type='f32', size='[1,1]', range='[0.0, 1.0]', default='0.1', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1183];
@@ -18224,7 +18224,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1183] = "alias='hi_soft_thresh_scale_4', type='f32', size='[1,1]', range='[0.0, 1.0]', default='0.1', digit='[2]', hide='0'";
+	ctx->descs[1183] = "alias='hi_soft_thresh_scale_4', type='f32', size='[1,1]', range='[0.0, 1.0]', default='0.1', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1184];
@@ -18240,7 +18240,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1184] = "alias='hi_denoiseStrength', type='f32', size='[1,1]', range='[0.0, 63.0]', default='1.0', digit='[2]', hide='0'";
+	ctx->descs[1184] = "alias='hi_denoiseStrength', type='f32', size='[1,1]', range='[0.0, 63.0]', default='1.0', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1185];
@@ -18256,7 +18256,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1185] = "alias='hi_detailMinAdjDnW', type='f32', size='[1,1]', range='[0.0, 1.9]', default='0.2', digit='[2]', hide='0'";
+	ctx->descs[1185] = "alias='hi_detailMinAdjDnW', type='f32', size='[1,1]', range='[0.0, 1.9]', default='0.2', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1186];
@@ -18272,7 +18272,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1186] = "alias='hwith_d', type='f32', size='[1, 4]', range='[0, 15.9]', default='[2.0 2.0 1.2 1.2]', digit='[6]', dynamic='0', hide='1'";
+	ctx->descs[1186] = "alias='hwith_d', type='f32', size='[1, 4]', range='[0, 15.9]', default='[2.0 2.0 1.2 1.2]', digit='[6]', dynamic='0', hide='1', ro='0'";
 #endif
 
 	obj = &ctx->objs[1187];
@@ -18288,7 +18288,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 214;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1187] = "alias='luma_para', type='struct', ui_module='array_table_ui', index='none', hide='0'";
+	ctx->descs[1187] = "alias='luma_para', type='struct', ui_module='array_table_ui', index='none', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1188];
@@ -18304,7 +18304,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 215;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1188] = "alias='hgrad_para', type='struct', ui_module='array_table_ui', index='none', hide='1'";
+	ctx->descs[1188] = "alias='hgrad_para', type='struct', ui_module='array_table_ui', index='none', hide='1', ro='0'";
 #endif
 
 	obj = &ctx->objs[1189];
@@ -18320,7 +18320,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1189] = "alias='SNR_Mode', type='string', size='[1, 1]', range='[0, 64]', default='LSNR', dynamic='0', ui_module_param='index1'";
+	ctx->descs[1189] = "alias='SNR_Mode', type='string', size='[1, 1]', range='[0, 64]', default='LSNR', dynamic='0', ui_module_param='index1', ro='0'";
 #endif
 
 	obj = &ctx->objs[1190];
@@ -18336,7 +18336,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1190] = "alias='Sensor_Mode', type='string', size='[1, 1]', range='[0, 64]', default='lcg', dynamic='0', hide='0'";
+	ctx->descs[1190] = "alias='Sensor_Mode', type='string', size='[1, 1]', range='[0, 64]', default='lcg', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1191];
@@ -18352,7 +18352,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 216;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1191] = "alias='Tuning_ISO', type='struct_list', size='dynamic', ui_module='double_index_list'";
+	ctx->descs[1191] = "alias='Tuning_ISO', type='struct_list', size='dynamic', ui_module='double_index_list', ro='0'";
 #endif
 
 	obj = &ctx->objs[1192];
@@ -18381,7 +18381,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1193] = "type='bool', alias='enable', default='1', hide='0'";
+	ctx->descs[1193] = "type='bool', alias='enable', default='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1194];
@@ -18397,7 +18397,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 217;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1194] = "alias='Setting', type='struct_list', size='dynamic', ui_module='double_index_list'";
+	ctx->descs[1194] = "alias='Setting', type='struct_list', size='dynamic', ui_module='double_index_list', ro='0'";
 #endif
 
 	obj = &ctx->objs[1195];
@@ -18426,7 +18426,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1196] = "alias='Version', type='string', size='[1, 1]', range='[0, 64]', default='V1', dynamic='0', hide='0'";
+	ctx->descs[1196] = "alias='Version', type='string', size='[1, 1]', range='[0, 64]', default='V1', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1197];
@@ -18442,7 +18442,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 213;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1197] = "alias='CalibPara', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[1197] = "alias='CalibPara', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1198];
@@ -18458,7 +18458,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 218;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1198] = "alias='TuningPara', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[1198] = "alias='TuningPara', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1199];
@@ -18474,7 +18474,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1199] = "alias='iso', type='f32', range='[50, 204800]', default='50', digit='[1]', ui_module_param='index2'";
+	ctx->descs[1199] = "alias='iso', type='f32', range='[50, 204800]', default='50', digit='[1]', ui_module_param='index2', ro='0'";
 #endif
 
 	obj = &ctx->objs[1200];
@@ -18490,7 +18490,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1200] = "alias='step0_uvgrad_ratio', type='f32', size='[1,1]', range='[1.0, 63.0]', default='40', digit='[0]', hide='0'";
+	ctx->descs[1200] = "alias='step0_uvgrad_ratio', type='f32', size='[1,1]', range='[1.0, 63.0]', default='40', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1201];
@@ -18506,7 +18506,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1201] = "alias='step0_uvgrad_offset', type='f32', size='[1,1]', range='[0, 1.0]', default='0.8', digit='[2]', hide='0'";
+	ctx->descs[1201] = "alias='step0_uvgrad_offset', type='f32', size='[1,1]', range='[0, 1.0]', default='0.8', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1202];
@@ -18522,7 +18522,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1202] = "alias='step1_median_ratio', type='f32', size='[1,1]', range='[0, 1.0]', default='0.2', digit='[2]', hide='0'";
+	ctx->descs[1202] = "alias='step1_median_ratio', type='f32', size='[1,1]', range='[0, 1.0]', default='0.2', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1203];
@@ -18538,7 +18538,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1203] = "alias='step1_bf_sigmaR', type='f32', size='[1,1]', range='[2, 64.0]', default='10.0', digit='[2]', hide='0'";
+	ctx->descs[1203] = "alias='step1_bf_sigmaR', type='f32', size='[1,1]', range='[2, 64.0]', default='10.0', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1204];
@@ -18554,7 +18554,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1204] = "alias='step1_bf_uvgain', type='f32', size='[1,1]', range='[0.0, 7.9]', default='1.5', digit='[2]', hide='0'";
+	ctx->descs[1204] = "alias='step1_bf_uvgain', type='f32', size='[1,1]', range='[0.0, 7.9]', default='1.5', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1205];
@@ -18570,7 +18570,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1205] = "alias='step1_bf_ratio', type='f32', size='[1,1]', range='[0.0, 1.0]', default='0.0', digit='[2]', hide='0'";
+	ctx->descs[1205] = "alias='step1_bf_ratio', type='f32', size='[1,1]', range='[0.0, 1.0]', default='0.0', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1206];
@@ -18586,7 +18586,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1206] = "alias='step2_median_ratio', type='f32', size='[1,1]', range='[0, 1.0]', default='0.2', digit='[2]', hide='0'";
+	ctx->descs[1206] = "alias='step2_median_ratio', type='f32', size='[1,1]', range='[0, 1.0]', default='0.2', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1207];
@@ -18602,7 +18602,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1207] = "alias='step2_bf_sigmaR', type='f32', size='[1,1]', range='[2, 48.0]', default='5.0', digit='[2]', hide='0'";
+	ctx->descs[1207] = "alias='step2_bf_sigmaR', type='f32', size='[1,1]', range='[2, 48.0]', default='5.0', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1208];
@@ -18618,7 +18618,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1208] = "alias='step2_bf_uvgain', type='f32', size='[1,1]', range='[0.0, 7.9]', default='2.0', digit='[2]', hide='0'";
+	ctx->descs[1208] = "alias='step2_bf_uvgain', type='f32', size='[1,1]', range='[0.0, 7.9]', default='2.0', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1209];
@@ -18634,7 +18634,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1209] = "alias='step2_bf_ratio', type='f32', size='[1,1]', range='[0.0, 1.0]', default='0.0', digit='[2]', hide='1'";
+	ctx->descs[1209] = "alias='step2_bf_ratio', type='f32', size='[1,1]', range='[0.0, 1.0]', default='0.0', digit='[2]', hide='1', ro='0'";
 #endif
 
 	obj = &ctx->objs[1210];
@@ -18650,7 +18650,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1210] = "alias='step3_bf_sigmaR', type='f32', size='[1,1]', range='[2, 24.0]', default='5.0', digit='[2]', hide='0'";
+	ctx->descs[1210] = "alias='step3_bf_sigmaR', type='f32', size='[1,1]', range='[2, 24.0]', default='5.0', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1211];
@@ -18666,7 +18666,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1211] = "alias='step3_bf_uvgain', type='f32', size='[1,1]', range='[0.0, 7.9]', default='2.0', digit='[2]', hide='0'";
+	ctx->descs[1211] = "alias='step3_bf_uvgain', type='f32', size='[1,1]', range='[0.0, 7.9]', default='2.0', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1212];
@@ -18682,7 +18682,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1212] = "alias='step3_bf_ratio', type='f32', size='[1,1]', range='[0.0, 1.0]', default='1.0', digit='[2]', hide='0'";
+	ctx->descs[1212] = "alias='step3_bf_ratio', type='f32', size='[1,1]', range='[0.0, 1.0]', default='1.0', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1213];
@@ -18698,7 +18698,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1213] = "alias='SNR_Mode', type='string', size='[1, 1]', range='[0, 64]', default='LSNR', dynamic='0', ui_module_param='index1'";
+	ctx->descs[1213] = "alias='SNR_Mode', type='string', size='[1, 1]', range='[0, 64]', default='LSNR', dynamic='0', ui_module_param='index1', ro='0'";
 #endif
 
 	obj = &ctx->objs[1214];
@@ -18714,7 +18714,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1214] = "alias='Sensor_Mode', type='string', size='[1, 1]', range='[0, 64]', default='lcg', dynamic='0', hide='0'";
+	ctx->descs[1214] = "alias='Sensor_Mode', type='string', size='[1, 1]', range='[0, 64]', default='lcg', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1215];
@@ -18730,7 +18730,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 220;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1215] = "alias='Tuning_ISO', type='struct_list', size='dynamic', ui_module='double_index_list'";
+	ctx->descs[1215] = "alias='Tuning_ISO', type='struct_list', size='dynamic', ui_module='double_index_list', ro='0'";
 #endif
 
 	obj = &ctx->objs[1216];
@@ -18759,7 +18759,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1217] = "alias='kernel_3x3', type='f32', size='[1, 3]', range='[0, 1]', default='[1.0000 0.8825 0.7788]', digit='[6]', dynamic='0', hide='0'";
+	ctx->descs[1217] = "alias='kernel_3x3', type='f32', size='[1, 3]', range='[0, 1]', default='[1.0000 0.8825 0.7788]', digit='[6]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1218];
@@ -18775,7 +18775,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1218] = "alias='kernel_5x5', type='f32', size='[1, 5]', range='[0, 1]', default='[1.0000 0.8825 0.7788 0.6065 0.3679]', digit='[6]', dynamic='0', hide='0'";
+	ctx->descs[1218] = "alias='kernel_5x5', type='f32', size='[1, 5]', range='[0, 1]', default='[1.0000 0.8825 0.7788 0.6065 0.3679]', digit='[6]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1219];
@@ -18791,7 +18791,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1219] = "alias='kernel_9x9', type='f32', size='[1, 8]', range='[0, 1]', default='[1.0000 0.8825 0.7788 0.6065 0.3679 0.1969 0.1353 0.0439]', digit='[6]', dynamic='0', hide='0'";
+	ctx->descs[1219] = "alias='kernel_9x9', type='f32', size='[1, 8]', range='[0, 1]', default='[1.0000 0.8825 0.7788 0.6065 0.3679 0.1969 0.1353 0.0439]', digit='[6]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1220];
@@ -18807,7 +18807,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1220] = "alias='kernel_9x9_num', type='s32', size='[1,1]', range='[0, 3]', default='0', digit='[0]', hide='0'";
+	ctx->descs[1220] = "alias='kernel_9x9_num', type='s32', size='[1,1]', range='[0, 3]', default='0', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1221];
@@ -18823,7 +18823,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1221] = "type='bool', alias='enable', default='1', hide='0'";
+	ctx->descs[1221] = "type='bool', alias='enable', default='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1222];
@@ -18839,7 +18839,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 222;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1222] = "alias='Kernel_Coeff', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[1222] = "alias='Kernel_Coeff', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1223];
@@ -18855,7 +18855,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 221;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1223] = "alias='Setting', type='struct_list', size='dynamic', ui_module='double_index_list'";
+	ctx->descs[1223] = "alias='Setting', type='struct_list', size='dynamic', ui_module='double_index_list', ro='0'";
 #endif
 
 	obj = &ctx->objs[1224];
@@ -18884,7 +18884,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1225] = "alias='Version', type='string', size='[1, 1]', range='[0, 64]', default='V1', dynamic='0', hide='0'";
+	ctx->descs[1225] = "alias='Version', type='string', size='[1, 1]', range='[0, 64]', default='V1', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1226];
@@ -18900,7 +18900,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 223;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1226] = "alias='TuningPara', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[1226] = "alias='TuningPara', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1227];
@@ -18916,7 +18916,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1227] = "alias='luma_point', type='f32', size='[1, 8]', range='[0, 255]', default='[0 16 32 64 96 160 224 256]', digit='[1]', dynamic='0', hide='0'";
+	ctx->descs[1227] = "alias='luma_point', type='f32', size='[1, 8]', range='[0, 255]', default='[0 16 32 64 96 160 224 256]', digit='[1]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1228];
@@ -18932,7 +18932,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1228] = "alias='luma_sigma', type='f32', size='[1, 8]', range='[0, 255]', default='[8 10 10 12 14 12 12 10]', digit='[1]', dynamic='0', hide='0'";
+	ctx->descs[1228] = "alias='luma_sigma', type='f32', size='[1, 8]', range='[0, 255]', default='[8 10 10 12 14 12 12 10]', digit='[1]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1229];
@@ -18948,7 +18948,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1229] = "alias='mf_clip_pos', type='f32', size='[1, 8]', range='[0, 255]', default='[8 16 20 32.0000 46 46 46 40 ]', digit='[1]', dynamic='0', hide='0'";
+	ctx->descs[1229] = "alias='mf_clip_pos', type='f32', size='[1, 8]', range='[0, 255]', default='[8 16 20 32.0000 46 46 46 40 ]', digit='[1]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1230];
@@ -18964,7 +18964,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1230] = "alias='mf_clip_neg', type='f32', size='[1, 8]', range='[0, 255]', default='[-0.5 -0.6 -0.6 -0.8 -0.8 -0.8 -0.8 -0.5]', digit='[2]', dynamic='0', hide='0'";
+	ctx->descs[1230] = "alias='mf_clip_neg', type='f32', size='[1, 8]', range='[0, 255]', default='[-0.5 -0.6 -0.6 -0.8 -0.8 -0.8 -0.8 -0.5]', digit='[2]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1231];
@@ -18980,7 +18980,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1231] = "alias='hf_clip', type='f32', size='[1, 8]', range='[0, 255]', default='[10 20 30 56 56 56 56 30]', digit='[1]', dynamic='0', hide='0'";
+	ctx->descs[1231] = "alias='hf_clip', type='f32', size='[1, 8]', range='[0, 255]', default='[10 20 30 56 56 56 56 30]', digit='[1]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1232];
@@ -18996,7 +18996,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1232] = "alias='iso', type='f32', range='[50, 204800]', default='50', digit='[1]', ui_module_param='index2'";
+	ctx->descs[1232] = "alias='iso', type='f32', range='[50, 204800]', default='50', digit='[1]', ui_module_param='index2', ro='0'";
 #endif
 
 	obj = &ctx->objs[1233];
@@ -19012,7 +19012,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1233] = "alias='hratio', type='f32', size='[1,1]', range='[1.0, 2.0]', default='2.0', digit='[2]', hide='0'";
+	ctx->descs[1233] = "alias='hratio', type='f32', size='[1,1]', range='[1.0, 2.0]', default='2.0', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1234];
@@ -19028,7 +19028,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1234] = "alias='lratio', type='f32', size='[1,1]', range='[0.0, 1.0]', default='1.0', digit='[2]', hide='0'";
+	ctx->descs[1234] = "alias='lratio', type='f32', size='[1,1]', range='[0.0, 1.0]', default='1.0', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1235];
@@ -19044,7 +19044,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1235] = "alias='mf_sharp_ratio', type='f32', size='[1,1]', range='[0.0, 8.0]', default='3.0', digit='[2]', hide='0'";
+	ctx->descs[1235] = "alias='mf_sharp_ratio', type='f32', size='[1,1]', range='[0.0, 8.0]', default='3.0', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1236];
@@ -19060,7 +19060,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1236] = "alias='hf_sharp_ratio', type='f32', size='[1,1]', range='[0.0, 8.0]', default='5.0', digit='[2]', hide='0'";
+	ctx->descs[1236] = "alias='hf_sharp_ratio', type='f32', size='[1,1]', range='[0.0, 8.0]', default='5.0', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1237];
@@ -19076,7 +19076,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1237] = "alias='pbf_gain', type='f32', size='[1,1]', range='[0.0, 2.0]', default='0.5', digit='[2]', hide='0'";
+	ctx->descs[1237] = "alias='pbf_gain', type='f32', size='[1,1]', range='[0.0, 2.0]', default='0.5', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1238];
@@ -19092,7 +19092,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1238] = "alias='pbf_ratio', type='f32', size='[1,1]', range='[0.0, 1.0]', default='0.5', digit='[2]', hide='0'";
+	ctx->descs[1238] = "alias='pbf_ratio', type='f32', size='[1,1]', range='[0.0, 1.0]', default='0.5', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1239];
@@ -19108,7 +19108,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1239] = "alias='pbf_add', type='f32', size='[1,1]', range='[0.0, 255.0]', default='0.0', digit='[2]', hide='0'";
+	ctx->descs[1239] = "alias='pbf_add', type='f32', size='[1,1]', range='[0.0, 255.0]', default='0.0', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1240];
@@ -19124,7 +19124,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1240] = "alias='mbf_gain', type='f32', size='[1,1]', range='[0.0, 2.0]', default='0.5', digit='[2]', hide='0'";
+	ctx->descs[1240] = "alias='mbf_gain', type='f32', size='[1,1]', range='[0.0, 2.0]', default='0.5', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1241];
@@ -19140,7 +19140,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1241] = "alias='mbf_add', type='f32', size='[1,1]', range='[0.0, 255.0]', default='0.0', digit='[2]', hide='0'";
+	ctx->descs[1241] = "alias='mbf_add', type='f32', size='[1,1]', range='[0.0, 255.0]', default='0.0', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1242];
@@ -19156,7 +19156,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1242] = "alias='hbf_gain', type='f32', size='[1,1]', range='[0.0, 2.0]', default='0.5', digit='[2]', hide='0'";
+	ctx->descs[1242] = "alias='hbf_gain', type='f32', size='[1,1]', range='[0.0, 2.0]', default='0.5', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1243];
@@ -19172,7 +19172,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1243] = "alias='hbf_ratio', type='f32', size='[1,1]', range='[0.0, 1.0]', default='0.5', digit='[2]', hide='0'";
+	ctx->descs[1243] = "alias='hbf_ratio', type='f32', size='[1,1]', range='[0.0, 1.0]', default='0.5', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1244];
@@ -19188,7 +19188,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1244] = "alias='hbf_add', type='f32', size='[1,1]', range='[0.0, 255.0]', default='0.0', digit='[2]', hide='0'";
+	ctx->descs[1244] = "alias='hbf_add', type='f32', size='[1,1]', range='[0.0, 255.0]', default='0.0', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1245];
@@ -19204,7 +19204,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1245] = "alias='local_sharp_strength', type='f32', size='[1,1]', range='[0.0, 255.0]', default='0.5', digit='[2]', hide='0'";
+	ctx->descs[1245] = "alias='local_sharp_strength', type='f32', size='[1,1]', range='[0.0, 255.0]', default='0.5', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1246];
@@ -19220,7 +19220,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1246] = "alias='pbf_coeff_percent', type='f32', size='[1,1]', range='[0.0, 1.0]', default='0.5', digit='[2]', hide='0'";
+	ctx->descs[1246] = "alias='pbf_coeff_percent', type='f32', size='[1,1]', range='[0.0, 1.0]', default='0.5', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1247];
@@ -19236,7 +19236,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1247] = "alias='rf_m_coeff_percent', type='f32', size='[1,1]', range='[0.0, 1.0]', default='0.5', digit='[2]', hide='0'";
+	ctx->descs[1247] = "alias='rf_m_coeff_percent', type='f32', size='[1,1]', range='[0.0, 1.0]', default='0.5', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1248];
@@ -19252,7 +19252,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1248] = "alias='rf_h_coeff_percent', type='f32', size='[1,1]', range='[0.0, 1.0]', default='0.5', digit='[2]', hide='0'";
+	ctx->descs[1248] = "alias='rf_h_coeff_percent', type='f32', size='[1,1]', range='[0.0, 1.0]', default='0.5', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1249];
@@ -19268,7 +19268,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1249] = "alias='hbf_coeff_percent', type='f32', size='[1,1]', range='[0.0, 1.0]', default='0.5', digit='[2]', hide='0'";
+	ctx->descs[1249] = "alias='hbf_coeff_percent', type='f32', size='[1,1]', range='[0.0, 1.0]', default='0.5', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1250];
@@ -19284,7 +19284,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 225;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1250] = "alias='luma_para', type='struct', ui_module='array_table_ui', index='none', hide='0'";
+	ctx->descs[1250] = "alias='luma_para', type='struct', ui_module='array_table_ui', index='none', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1251];
@@ -19300,7 +19300,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1251] = "alias='SNR_Mode', type='string', size='[1, 1]', range='[0, 64]', default='LSNR', dynamic='0', ui_module_param='index1'";
+	ctx->descs[1251] = "alias='SNR_Mode', type='string', size='[1, 1]', range='[0, 64]', default='LSNR', dynamic='0', ui_module_param='index1', ro='0'";
 #endif
 
 	obj = &ctx->objs[1252];
@@ -19316,7 +19316,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1252] = "alias='Sensor_Mode', type='string', size='[1, 1]', range='[0, 64]', default='lcg', dynamic='0', hide='0'";
+	ctx->descs[1252] = "alias='Sensor_Mode', type='string', size='[1, 1]', range='[0, 64]', default='lcg', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1253];
@@ -19332,7 +19332,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 226;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1253] = "alias='Tuning_ISO', type='struct_list', size='dynamic', ui_module='double_index_list'";
+	ctx->descs[1253] = "alias='Tuning_ISO', type='struct_list', size='dynamic', ui_module='double_index_list', ro='0'";
 #endif
 
 	obj = &ctx->objs[1254];
@@ -19361,7 +19361,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1255] = "alias='gauss_luma_coeff', type='f32', size='[3, 3]', range='[0, 1]', default='[0.0625 0.125 0.0625 0.125 0.25 0.125 0.0625 0.125 0.0625]', digit='[6]', dynamic='0', hide='0'";
+	ctx->descs[1255] = "alias='gauss_luma_coeff', type='f32', size='[3, 3]', range='[0, 1]', default='[0.0625 0.125 0.0625 0.125 0.25 0.125 0.0625 0.125 0.0625]', digit='[6]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1256];
@@ -19377,7 +19377,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1256] = "alias='pbf_coeff_l', type='f32', size='[3, 3]', range='[0, 1]', default='[0.15625 0.25 0.15625 0.25 0.375 0.25 0.15625 0.25 0.15625]', digit='[6]', dynamic='0', hide='0'";
+	ctx->descs[1256] = "alias='pbf_coeff_l', type='f32', size='[3, 3]', range='[0, 1]', default='[0.15625 0.25 0.15625 0.25 0.375 0.25 0.15625 0.25 0.15625]', digit='[6]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1257];
@@ -19393,7 +19393,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1257] = "alias='pbf_coeff_h', type='f32', size='[3, 3]', range='[0, 1]', default='[0.15625 0.25 0.15625 0.25 0.375 0.25 0.15625 0.25 0.15625]', digit='[6]', dynamic='0', hide='0'";
+	ctx->descs[1257] = "alias='pbf_coeff_h', type='f32', size='[3, 3]', range='[0, 1]', default='[0.15625 0.25 0.15625 0.25 0.375 0.25 0.15625 0.25 0.15625]', digit='[6]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1258];
@@ -19409,7 +19409,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1258] = "alias='rf_m_coeff_l', type='f32', size='[5, 5]', range='[0, 1]', default='[0.023438 0.03125 0.039063 0.03125 0.023438 0.03125 0.046875 0.054688 0.046875 0.03125 0.039063 0.054688 0.09375 0.054688 0.039063 0.03125 0.046875 0.054688 0.046875 0.03125 0.023438 0.03125 0.039063 0.03125 0.023438]', digit='[6]', dynamic='0', hide='0'";
+	ctx->descs[1258] = "alias='rf_m_coeff_l', type='f32', size='[5, 5]', range='[0, 1]', default='[0.023438 0.03125 0.039063 0.03125 0.023438 0.03125 0.046875 0.054688 0.046875 0.03125 0.039063 0.054688 0.09375 0.054688 0.039063 0.03125 0.046875 0.054688 0.046875 0.03125 0.023438 0.03125 0.039063 0.03125 0.023438]', digit='[6]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1259];
@@ -19425,7 +19425,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1259] = "alias='rf_m_coeff_h', type='f32', size='[5, 5]', range='[0, 1]', default='[0.023438 0.03125 0.039063 0.03125 0.023438 0.03125 0.046875 0.054688 0.046875 0.03125 0.039063 0.054688 0.09375 0.054688 0.039063 0.03125 0.046875 0.054688 0.046875 0.03125 0.023438 0.03125 0.039063 0.03125 0.023438]', digit='[6]', dynamic='0', hide='0'";
+	ctx->descs[1259] = "alias='rf_m_coeff_h', type='f32', size='[5, 5]', range='[0, 1]', default='[0.023438 0.03125 0.039063 0.03125 0.023438 0.03125 0.046875 0.054688 0.046875 0.03125 0.039063 0.054688 0.09375 0.054688 0.039063 0.03125 0.046875 0.054688 0.046875 0.03125 0.023438 0.03125 0.039063 0.03125 0.023438]', digit='[6]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1260];
@@ -19441,7 +19441,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1260] = "alias='rf_m_coeff_h', type='f32', size='[17, 13]', range='[0, 1]', default='0.004', digit='[6]', dynamic='0', hide='1'";
+	ctx->descs[1260] = "alias='rf_m_coeff_h', type='f32', size='[17, 13]', range='[0, 1]', default='0.004', digit='[6]', dynamic='0', hide='1', ro='0'";
 #endif
 
 	obj = &ctx->objs[1261];
@@ -19457,7 +19457,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1261] = "alias='rf_h_coeff_l', type='f32', size='[5, 5]', range='[0, 1]', default='[0 0.015625 0.023438 0.015625 0 0.015625 0.0625 0.101563 0.0625 0.015625 0.023438 0.101563 0.125 0.101563 0.023438 0.015625 0.0625 0.101563 0.0625 0.015625 0 0.015625 0.023438 0.015625 0]', digit='[6]', dynamic='0', hide='0'";
+	ctx->descs[1261] = "alias='rf_h_coeff_l', type='f32', size='[5, 5]', range='[0, 1]', default='[0 0.015625 0.023438 0.015625 0 0.015625 0.0625 0.101563 0.0625 0.015625 0.023438 0.101563 0.125 0.101563 0.023438 0.015625 0.0625 0.101563 0.0625 0.015625 0 0.015625 0.023438 0.015625 0]', digit='[6]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1262];
@@ -19473,7 +19473,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1262] = "alias='rf_h_coeff_h', type='f32', size='[5, 5]', range='[0, 1]', default='[0 0.015625 0.023438 0.015625 0 0.015625 0.0625 0.101563 0.0625 0.015625 0.023438 0.101563 0.125 0.101563 0.023438 0.015625 0.0625 0.101563 0.0625 0.015625 0 0.015625 0.023438 0.015625 0]', digit='[6]', dynamic='0', hide='0'";
+	ctx->descs[1262] = "alias='rf_h_coeff_h', type='f32', size='[5, 5]', range='[0, 1]', default='[0 0.015625 0.023438 0.015625 0 0.015625 0.0625 0.101563 0.0625 0.015625 0.023438 0.101563 0.125 0.101563 0.023438 0.015625 0.0625 0.101563 0.0625 0.015625 0 0.015625 0.023438 0.015625 0]', digit='[6]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1263];
@@ -19489,7 +19489,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1263] = "alias='hbf_coeff_l', type='f32', size='[3, 3]', range='[0, 1]', default='[0.15625 0.25 0.15625 0.25 0.375 0.25 0.15625 0.25 0.15625]', digit='[6]', dynamic='0', hide='0'";
+	ctx->descs[1263] = "alias='hbf_coeff_l', type='f32', size='[3, 3]', range='[0, 1]', default='[0.15625 0.25 0.15625 0.25 0.375 0.25 0.15625 0.25 0.15625]', digit='[6]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1264];
@@ -19505,7 +19505,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1264] = "alias='hbf_coeff_h', type='f32', size='[3, 3]', range='[0, 1]', default='[0.15625 0.25 0.15625 0.25 0.375 0.25 0.15625 0.25 0.15625]', digit='[6]', dynamic='0', hide='0'";
+	ctx->descs[1264] = "alias='hbf_coeff_h', type='f32', size='[3, 3]', range='[0, 1]', default='[0.15625 0.25 0.15625 0.25 0.375 0.25 0.15625 0.25 0.15625]', digit='[6]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1265];
@@ -19521,7 +19521,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1265] = "type='bool', alias='enable', default='1', hide='0'";
+	ctx->descs[1265] = "type='bool', alias='enable', default='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1266];
@@ -19537,7 +19537,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 228;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1266] = "alias='kernel_coeff', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[1266] = "alias='kernel_coeff', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1267];
@@ -19553,7 +19553,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 227;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1267] = "alias='Setting', type='struct_list', size='dynamic', ui_module='double_index_list'";
+	ctx->descs[1267] = "alias='Setting', type='struct_list', size='dynamic', ui_module='double_index_list', ro='0'";
 #endif
 
 	obj = &ctx->objs[1268];
@@ -19582,7 +19582,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1269] = "alias='Version', type='string', size='[1, 1]', range='[0, 64]', default='V1', dynamic='0', hide='0'";
+	ctx->descs[1269] = "alias='Version', type='string', size='[1, 1]', range='[0, 64]', default='V1', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1270];
@@ -19598,7 +19598,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 229;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1270] = "alias='TuningPara', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[1270] = "alias='TuningPara', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1271];
@@ -19614,7 +19614,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1271] = "alias='luma_point', type='f32', size='[1, 8]', range='[0, 255]', default='[0 16 32 64 96 160 224 256]', digit='[2]', dynamic='0', hide='0'";
+	ctx->descs[1271] = "alias='luma_point', type='f32', size='[1, 8]', range='[0, 255]', default='[0 16 32 64 96 160 224 256]', digit='[2]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1272];
@@ -19630,7 +19630,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1272] = "alias='noise_clip', type='f32', size='[1, 8]', range='[0, 255]', default='[2.0000 6.0000 8.0000 10.0000 16.0000 16.0000 14.0000 10.0000]', digit='[2]', dynamic='0', hide='0'";
+	ctx->descs[1272] = "alias='noise_clip', type='f32', size='[1, 8]', range='[0, 255]', default='[2.0000 6.0000 8.0000 10.0000 16.0000 16.0000 14.0000 10.0000]', digit='[2]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1273];
@@ -19646,7 +19646,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1273] = "alias='dog_clip_pos', type='f32', size='[1, 8]', range='[0, 255]', default='[10.0000 12.0000 12.0000 16.0000 16.0000 12.0000 10.0000 10.0000]', digit='[2]', dynamic='0', hide='0'";
+	ctx->descs[1273] = "alias='dog_clip_pos', type='f32', size='[1, 8]', range='[0, 255]', default='[10.0000 12.0000 12.0000 16.0000 16.0000 12.0000 10.0000 10.0000]', digit='[2]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1274];
@@ -19662,7 +19662,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1274] = "alias='dog_clip_neg', type='f32', size='[1, 8]', range='[0, 255]', default='[10.0000 12.0000 12.0000 16.0000 16.0000 12.0000 10.0000 10.0000]', digit='[2]', dynamic='0', hide='0'";
+	ctx->descs[1274] = "alias='dog_clip_neg', type='f32', size='[1, 8]', range='[0, 255]', default='[10.0000 12.0000 12.0000 16.0000 16.0000 12.0000 10.0000 10.0000]', digit='[2]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1275];
@@ -19678,7 +19678,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1275] = "alias='dog_alpha', type='f32', size='[1, 8]', range='[0, 3]', default='[0.1000 0.2000 0.2000 0.2000 0.2000 0.2000 0.2000 0.1000]', digit='[2]', dynamic='0', hide='0'";
+	ctx->descs[1275] = "alias='dog_alpha', type='f32', size='[1, 8]', range='[0, 3]', default='[0.1000 0.2000 0.2000 0.2000 0.2000 0.2000 0.2000 0.1000]', digit='[2]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1276];
@@ -19694,7 +19694,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1276] = "alias='iso', type='f32', range='[50, 204800]', default='50', digit='[1]', ui_module_param='index2'";
+	ctx->descs[1276] = "alias='iso', type='f32', range='[50, 204800]', default='50', digit='[1]', ui_module_param='index2', ro='0'";
 #endif
 
 	obj = &ctx->objs[1277];
@@ -19710,7 +19710,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1277] = "alias='edge_thed', type='f32', size='[1,1]', range='[1.0, 255.0]', default='16.0', digit='[2]', hide='0'";
+	ctx->descs[1277] = "alias='edge_thed', type='f32', size='[1,1]', range='[1.0, 255.0]', default='16.0', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1278];
@@ -19726,7 +19726,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1278] = "alias='src_wgt', type='f32', size='[1,1]', range='[0, 1.0]', default='0.0', digit='[2]', hide='0'";
+	ctx->descs[1278] = "alias='src_wgt', type='f32', size='[1,1]', range='[0, 1.0]', default='0.0', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1279];
@@ -19742,7 +19742,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1279] = "type='bool', alias='alpha_adp_en', default='0', hide='0'";
+	ctx->descs[1279] = "type='bool', alias='alpha_adp_en', default='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1280];
@@ -19758,7 +19758,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1280] = "alias='local_alpha', type='f32', size='[1,1]', range='[0, 1.0]', default='0.5', digit='[2]', hide='0'";
+	ctx->descs[1280] = "alias='local_alpha', type='f32', size='[1,1]', range='[0, 1.0]', default='0.5', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1281];
@@ -19774,7 +19774,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1281] = "alias='global_alpha', type='f32', size='[1,1]', range='[0, 1.0]', default='0.5', digit='[2]', hide='0'";
+	ctx->descs[1281] = "alias='global_alpha', type='f32', size='[1,1]', range='[0, 1.0]', default='0.5', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1282];
@@ -19790,7 +19790,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1282] = "alias='dog_kernel_percent', type='f32', size='[1,1]', range='[0, 1.0]', default='0.5', digit='[2]', hide='0'";
+	ctx->descs[1282] = "alias='dog_kernel_percent', type='f32', size='[1,1]', range='[0, 1.0]', default='0.5', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1283];
@@ -19806,7 +19806,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1283] = "alias='direct_filter_coeff', type='f32', size='[1, 5]', range='[0, 1]', default='[0.1000 0.2000 0.4000 0.2000 0.1000]', digit='[6]', dynamic='0', hide='0'";
+	ctx->descs[1283] = "alias='direct_filter_coeff', type='f32', size='[1, 5]', range='[0, 1]', default='[0.1000 0.2000 0.4000 0.2000 0.1000]', digit='[6]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1284];
@@ -19822,7 +19822,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 231;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1284] = "alias='luma_para', type='struct', ui_module='array_table_ui', index='none', hide='0'";
+	ctx->descs[1284] = "alias='luma_para', type='struct', ui_module='array_table_ui', index='none', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1285];
@@ -19838,7 +19838,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1285] = "alias='SNR_Mode', type='string', size='[1, 1]', range='[0, 64]', default='LSNR', dynamic='0', ui_module_param='index1'";
+	ctx->descs[1285] = "alias='SNR_Mode', type='string', size='[1, 1]', range='[0, 64]', default='LSNR', dynamic='0', ui_module_param='index1', ro='0'";
 #endif
 
 	obj = &ctx->objs[1286];
@@ -19854,7 +19854,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1286] = "alias='Sensor_Mode', type='string', size='[1, 1]', range='[0, 64]', default='lcg', dynamic='0', hide='0'";
+	ctx->descs[1286] = "alias='Sensor_Mode', type='string', size='[1, 1]', range='[0, 64]', default='lcg', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1287];
@@ -19870,7 +19870,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 232;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1287] = "alias='Tuning_ISO', type='struct_list', size='dynamic', ui_module='double_index_list'";
+	ctx->descs[1287] = "alias='Tuning_ISO', type='struct_list', size='dynamic', ui_module='double_index_list', ro='0'";
 #endif
 
 	obj = &ctx->objs[1288];
@@ -19899,7 +19899,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1289] = "alias='dog_kernel_l', type='f32', size='[5, 5]', range='[0, 1]', default='[-0.0026 -0.1699 -0.6814 -0.1699 -0.0026 -0.1699 0.1134 0.4547 0.1134 -0.1699 -0.6814 0.4547 1.8234 0.4547 -0.6814 -0.1699 0.1134 0.4547 0.1134 -0.1699 -0.0026 -0.1699 -0.6814 -0.1699 -0.0026]', digit='[6]', dynamic='0', hide='0'";
+	ctx->descs[1289] = "alias='dog_kernel_l', type='f32', size='[5, 5]', range='[0, 1]', default='[-0.0026 -0.1699 -0.6814 -0.1699 -0.0026 -0.1699 0.1134 0.4547 0.1134 -0.1699 -0.6814 0.4547 1.8234 0.4547 -0.6814 -0.1699 0.1134 0.4547 0.1134 -0.1699 -0.0026 -0.1699 -0.6814 -0.1699 -0.0026]', digit='[6]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1290];
@@ -19915,7 +19915,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1290] = "alias='dog_kernel_h', type='f32', size='[5, 5]', range='[0, 1]', default='[-0.0026 -0.1699 -0.6814 -0.1699 -0.0026 -0.1699 0.1134 0.4547 0.1134 -0.1699 -0.6814 0.4547 1.8234 0.4547 -0.6814 -0.1699 0.1134 0.4547 0.1134 -0.1699 -0.0026 -0.1699 -0.6814 -0.1699 -0.0026]', digit='[6]', dynamic='0', hide='0'";
+	ctx->descs[1290] = "alias='dog_kernel_h', type='f32', size='[5, 5]', range='[0, 1]', default='[-0.0026 -0.1699 -0.6814 -0.1699 -0.0026 -0.1699 0.1134 0.4547 0.1134 -0.1699 -0.6814 0.4547 1.8234 0.4547 -0.6814 -0.1699 0.1134 0.4547 0.1134 -0.1699 -0.0026 -0.1699 -0.6814 -0.1699 -0.0026]', digit='[6]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1291];
@@ -19931,7 +19931,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1291] = "type='bool', alias='enable', default='1', hide='0'";
+	ctx->descs[1291] = "type='bool', alias='enable', default='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1292];
@@ -19947,7 +19947,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 234;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1292] = "alias='dog_kernel', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[1292] = "alias='dog_kernel', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1293];
@@ -19963,7 +19963,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 233;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1293] = "alias='Setting', type='struct_list', size='dynamic', ui_module='double_index_list'";
+	ctx->descs[1293] = "alias='Setting', type='struct_list', size='dynamic', ui_module='double_index_list', ro='0'";
 #endif
 
 	obj = &ctx->objs[1294];
@@ -19992,7 +19992,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1295] = "alias='Version', type='string', size='[1, 1]', range='[0, 64]', default='V1', dynamic='0', hide='0'";
+	ctx->descs[1295] = "alias='Version', type='string', size='[1, 1]', range='[0, 64]', default='V1', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1296];
@@ -20008,7 +20008,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 235;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1296] = "alias='TuningPara', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[1296] = "alias='TuningPara', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1297];
@@ -20024,7 +20024,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1297] = "type='bool', alias='enable', default='1', hide='0'";
+	ctx->descs[1297] = "type='bool', alias='enable', default='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1298];
@@ -20040,7 +20040,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1298] = "alias='brightness', type='u8', size='[1,1]', range='[0, 255]', default='128', digit='[0]', hide='0'";
+	ctx->descs[1298] = "alias='brightness', type='u8', size='[1,1]', range='[0, 255]', default='128', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1299];
@@ -20056,7 +20056,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1299] = "alias='contrast', type='u8', size='[1,1]', range='[0, 255]', default='128', digit='[0]', hide='0'";
+	ctx->descs[1299] = "alias='contrast', type='u8', size='[1,1]', range='[0, 255]', default='128', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1300];
@@ -20072,7 +20072,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1300] = "alias='saturation', type='u8', size='[1,1]', range='[0, 255]', default='128', digit='[0]', hide='0'";
+	ctx->descs[1300] = "alias='saturation', type='u8', size='[1,1]', range='[0, 255]', default='128', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1301];
@@ -20088,7 +20088,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1301] = "alias='hue', type='u8', size='[1,1]', range='[0, 255]', default='128', digit='[0]', hide='0'";
+	ctx->descs[1301] = "alias='hue', type='u8', size='[1,1]', range='[0, 255]', default='128', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1302];
@@ -20104,7 +20104,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 237;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1302] = "alias='CprocTuningPara', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[1302] = "alias='CprocTuningPara', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1303];
@@ -20120,7 +20120,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1303] = "type='bool', alias='enable', default='1', hide='0'";
+	ctx->descs[1303] = "type='bool', alias='enable', default='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1304];
@@ -20136,7 +20136,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1304] = "alias='mode', type='u8', size='[1,1]', range='[0, 6]', default='0', digit='[0]', hide='0'";
+	ctx->descs[1304] = "alias='mode', type='u8', size='[1,1]', range='[0, 6]', default='0', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1305];
@@ -20152,7 +20152,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 239;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1305] = "alias='IETuningPara', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[1305] = "alias='IETuningPara', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1306];
@@ -20168,7 +20168,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1306] = "type='bool', alias='enable', default='0', hide='0'";
+	ctx->descs[1306] = "type='bool', alias='enable', default='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1307];
@@ -20184,7 +20184,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = 39;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1307] = "type='enum', alias='mode', enum_def='eis_mode_t', default='EIS_MODE_IMU_ONLY'";
+	ctx->descs[1307] = "type='enum', alias='mode', enum_def='eis_mode_t', default='EIS_MODE_IMU_ONLY', ro='0'";
 #endif
 
 	obj = &ctx->objs[1308];
@@ -20213,7 +20213,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1309] = "alias='src_image_width', type='u32', size='[1,1]', range='2593', default='[0, 65535]', digit='0', hide='0'";
+	ctx->descs[1309] = "alias='src_image_width', type='u32', size='[1,1]', range='2593', default='[0, 65535]', digit='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1310];
@@ -20229,7 +20229,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1310] = "alias='src_image_height', type='u32', size='[1,1]', range='1944', default='[0, 65535]', digit='0', hide='0'";
+	ctx->descs[1310] = "alias='src_image_height', type='u32', size='[1,1]', range='1944', default='[0, 65535]', digit='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1311];
@@ -20245,7 +20245,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1311] = "alias='dst_image_width', type='u32', size='[1,1]', range='2592', default='[0, 65535]', digit='0', hide='0'";
+	ctx->descs[1311] = "alias='dst_image_width', type='u32', size='[1,1]', range='2592', default='[0, 65535]', digit='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1312];
@@ -20261,7 +20261,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1312] = "alias='dst_image_height', type='u32', size='[1,1]', range='1944', default='[0, 65535]', digit='0', hide='0'";
+	ctx->descs[1312] = "alias='dst_image_height', type='u32', size='[1,1]', range='1944', default='[0, 65535]', digit='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1313];
@@ -20277,7 +20277,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1313] = "alias='clip_ratio_x', type='f32', size='[1,1]', range='[0, 1]', default='0.1', digit='[2]', hide='0'";
+	ctx->descs[1313] = "alias='clip_ratio_x', type='f32', size='[1,1]', range='[0, 1]', default='0.1', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1314];
@@ -20293,7 +20293,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1314] = "alias='clip_ratio_y', type='f32', size='[1,1]', range='[0, 1]', default='0.1', digit='[2]', hide='0'";
+	ctx->descs[1314] = "alias='clip_ratio_y', type='f32', size='[1,1]', range='[0, 1]', default='0.1', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1315];
@@ -20309,7 +20309,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1315] = "alias='light_center', type='f64', size='[1, 2]', range='[0, 255]', default='[1.3511178239999999e+003 7.3948608000000002e+002]', digit='[32]', dynamic='0', hide='0'";
+	ctx->descs[1315] = "alias='light_center', type='f64', size='[1, 2]', range='[0, 255]', default='[1.3511178239999999e+003 7.3948608000000002e+002]', digit='[32]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1316];
@@ -20325,7 +20325,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1316] = "alias='distortion_coeff', type='f64', size='[1, 4]', range='[0, 255]', default='[-1.8302636074851755e+003 4.2379512840610002e-004 -2.5076748550000000e-007 1.2724700000000000e-010]', digit='[32]', dynamic='0', hide='0'";
+	ctx->descs[1316] = "alias='distortion_coeff', type='f64', size='[1, 4]', range='[0, 255]', default='[-1.8302636074851755e+003 4.2379512840610002e-004 -2.5076748550000000e-007 1.2724700000000000e-010]', digit='[32]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1317];
@@ -20341,7 +20341,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1317] = "alias='gains', type='f32', size='[1, 4]', range='[0, 256]', default='[4 8 16 32]', digit='[0]', dynamic='0', hide='0'";
+	ctx->descs[1317] = "alias='gains', type='f32', size='[1, 4]', range='[0, 256]', default='[4 8 16 32]', digit='[0]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1318];
@@ -20357,7 +20357,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1318] = "alias='sat', type='f32', size='[1, 4]', range='[0, 100]', default='[100 100 90 50]', digit='[1]', dynamic='0', hide='0'";
+	ctx->descs[1318] = "alias='sat', type='f32', size='[1, 4]', range='[0, 100]', default='[100 100 90 50]', digit='[1]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1319];
@@ -20373,7 +20373,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1319] = "alias='gain', type='f32', size='[1, 9]', range='[0, 256]', default='[1 2 4 8 16 32 64 128 256]', digit='[0]', dynamic='0', hide='0'";
+	ctx->descs[1319] = "alias='gain', type='f32', size='[1, 9]', range='[0, 256]', default='[1 2 4 8 16 32 64 128 256]', digit='[0]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1320];
@@ -20389,7 +20389,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1320] = "alias='scale', type='f32', size='[1, 9]', range='[0, 1]', default='[1.00 0.80 0.80 0.90 1.00 1.00 1.00 1.00 1.00]', digit='[2]', dynamic='0', hide='0'";
+	ctx->descs[1320] = "alias='scale', type='f32', size='[1, 9]', range='[0, 1]', default='[1.00 0.80 0.80 0.90 1.00 1.00 1.00 1.00 1.00]', digit='[2]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1321];
@@ -20405,7 +20405,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1321] = "alias='name', type='string', size='[1, 1]', range='[0, 25]', default='A_100', dynamic='0', hide='0'";
+	ctx->descs[1321] = "alias='name', type='string', size='[1, 1]', range='[0, 25]', default='A_100', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1322];
@@ -20421,7 +20421,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1322] = "alias='illumination', type='string', size='[1, 1]', range='[0, 20]', default='A', dynamic='0', hide='0'";
+	ctx->descs[1322] = "alias='illumination', type='string', size='[1, 1]', range='[0, 20]', default='A', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1323];
@@ -20437,7 +20437,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1323] = "alias='saturation', type='f32', size='[1,1]', range='[0.0, 100.0]', default='100.0', digit='[1]', hide='0'";
+	ctx->descs[1323] = "alias='saturation', type='f32', size='[1,1]', range='[0.0, 100.0]', default='100.0', digit='[1]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1324];
@@ -20453,7 +20453,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1324] = "alias='ccMatrix', type='f32', size='[3, 3]', range='[-8, 7.992]', default='[1.0000 0.0000 0.0000 0.0000 1.0000 0.0000 0.0000 0.0000 1.0000]', digit='[4]', dynamic='0', hide='0'";
+	ctx->descs[1324] = "alias='ccMatrix', type='f32', size='[3, 3]', range='[-8, 7.992]', default='[1.0000 0.0000 0.0000 0.0000 1.0000 0.0000 0.0000 0.0000 1.0000]', digit='[4]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1325];
@@ -20469,7 +20469,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1325] = "alias='ccOffsets', type='f32', size='[1, 3]', range='[-4095, 4095]', default='[0.0 0.0 0.0]', digit='[1]', dynamic='0', hide='0'";
+	ctx->descs[1325] = "alias='ccOffsets', type='f32', size='[1, 3]', range='[-4095, 4095]', default='[0.0 0.0 0.0]', digit='[1]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1326];
@@ -20485,7 +20485,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1326] = "alias='name', type='string', size='[1, 1]', range='[0, 20]', default='A', dynamic='0', hide='0'";
+	ctx->descs[1326] = "alias='name', type='string', size='[1, 1]', range='[0, 20]', default='A', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1327];
@@ -20501,7 +20501,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1327] = "alias='awbGain', type='f32', size='[1, 2]', range='[0, 5]', default='[1.0000 1.0000]', digit='[4]', dynamic='0', hide='0'";
+	ctx->descs[1327] = "alias='awbGain', type='f32', size='[1, 2]', range='[0, 5]', default='[1.0000 1.0000]', digit='[4]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1328];
@@ -20517,7 +20517,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1328] = "alias='minDist', type='f32', size='[1,1]', range='[0.0, 4]', default='0', digit='[4]', hide='0'";
+	ctx->descs[1328] = "alias='minDist', type='f32', size='[1,1]', range='[0.0, 4]', default='0', digit='[4]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1329];
@@ -20533,7 +20533,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1329] = "alias='matrixUsed', type='string', size='[1, 2]', range='[0, 25]', default='A_100', dynamic='1', hide='0'";
+	ctx->descs[1329] = "alias='matrixUsed', type='string', size='[1, 2]', range='[0, 25]', default='A_100', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1330];
@@ -20562,7 +20562,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 242;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1331] = "alias='gain sat curve', type='struct', ui_module='array_table_ui', index='none', hide='0'";
+	ctx->descs[1331] = "alias='gain sat curve', type='struct', ui_module='array_table_ui', index='none', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1332];
@@ -20578,7 +20578,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1332] = "alias='RGB2Y para', type='f32', size='[1, 3]', range='[0, 100]', default='[38 75 15]', digit='[0]', dynamic='0', hide='1'";
+	ctx->descs[1332] = "alias='RGB2Y para', type='f32', size='[1, 3]', range='[0, 100]', default='[38 75 15]', digit='[0]', dynamic='0', hide='1', ro='0'";
 #endif
 
 	obj = &ctx->objs[1333];
@@ -20594,7 +20594,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1333] = "alias='low bound pos bit', type='f32', size='[1,1]', range='[0.0, 10.0]', default='8.0', digit='[0]', hide='0'";
+	ctx->descs[1333] = "alias='low bound pos bit', type='f32', size='[1,1]', range='[0.0, 10.0]', default='8.0', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1334];
@@ -20610,7 +20610,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1334] = "alias='y alpha curve', type='f32', size='[1, 17]', range='[0, 1024]', default='[0 64 128 192 256 320 384 448 512 576 640 704 768 832 896 960 1024]', digit='[1]', dynamic='0', hide='0'";
+	ctx->descs[1334] = "alias='y alpha curve', type='f32', size='[1, 17]', range='[0, 1024]', default='[0 64 128 192 256 320 384 448 512 576 640 704 768 832 896 960 1024]', digit='[1]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1335];
@@ -20626,7 +20626,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 243;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1335] = "alias='gain alphaScale curve', type='struct', ui_module='array_table_ui', index='none', hide='0'";
+	ctx->descs[1335] = "alias='gain alphaScale curve', type='struct', ui_module='array_table_ui', index='none', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1336];
@@ -20642,7 +20642,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1336] = "type='bool', alias='interp enable', default='0', hide='0'";
+	ctx->descs[1336] = "type='bool', alias='interp enable', default='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1337];
@@ -20658,7 +20658,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1337] = "alias='default illu', type='string', size='[1, 1]', range='[0, 20]', default='D65', dynamic='0', hide='0'";
+	ctx->descs[1337] = "alias='default illu', type='string', size='[1, 1]', range='[0, 20]', default='D65', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1338];
@@ -20674,7 +20674,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1338] = "alias='weightRB', type='f32', size='[1, 2]', range='[0, 3]', default='[1 1]', digit='[4]', dynamic='0', hide='0'";
+	ctx->descs[1338] = "alias='weightRB', type='f32', size='[1, 2]', range='[0, 3]', default='[1 1]', digit='[4]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1339];
@@ -20690,7 +20690,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1339] = "alias='prob limit', type='f32', size='[1,1]', range='[0.0, 1]', default='0.2', digit='[6]', hide='0'";
+	ctx->descs[1339] = "alias='prob limit', type='f32', size='[1,1]', range='[0.0, 1]', default='0.2', digit='[6]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1340];
@@ -20706,7 +20706,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1340] = "alias='frame num', type='u8', size='[1,1]', range='[1, 128]', default='8', digit='[0]', hide='0'";
+	ctx->descs[1340] = "alias='frame num', type='u8', size='[1,1]', range='[1, 128]', default='8', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1341];
@@ -20722,7 +20722,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1341] = "type='bool', alias='damp enable', default='0', hide='0'";
+	ctx->descs[1341] = "type='bool', alias='damp enable', default='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1342];
@@ -20738,7 +20738,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 247;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1342] = "alias='illuminant estimation', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[1342] = "alias='illuminant estimation', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1343];
@@ -20754,7 +20754,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 245;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1343] = "alias='aCcmCof', type='struct_list', size='dynamic', ui_module='normal_ui_style'";
+	ctx->descs[1343] = "alias='aCcmCof', type='struct_list', size='dynamic', ui_module='normal_ui_style', ro='0'";
 #endif
 
 	obj = &ctx->objs[1344];
@@ -20783,7 +20783,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 244;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1345] = "alias='matrixAll', type='struct_list', size='dynamic', ui_module='normal_ui_style'";
+	ctx->descs[1345] = "alias='matrixAll', type='struct_list', size='dynamic', ui_module='normal_ui_style', ro='0'";
 #endif
 
 	obj = &ctx->objs[1346];
@@ -20812,7 +20812,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1347] = "alias='ccMatrix', type='f32', size='[3, 3]', range='[-8, 7.992]', default='[1.0000 0.0000 0.0000 0.0000 1.0000 0.0000 0.0000 0.0000 1.0000]', digit='[4]', dynamic='0', hide='0'";
+	ctx->descs[1347] = "alias='ccMatrix', type='f32', size='[3, 3]', range='[-8, 7.992]', default='[1.0000 0.0000 0.0000 0.0000 1.0000 0.0000 0.0000 0.0000 1.0000]', digit='[4]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1348];
@@ -20828,7 +20828,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1348] = "alias='ccOffsets', type='f32', size='[1, 3]', range='[-4095, 4095]', default='[0.0 0.0 0.0]', digit='[1]', dynamic='0', hide='0'";
+	ctx->descs[1348] = "alias='ccOffsets', type='f32', size='[1, 3]', range='[-4095, 4095]', default='[0.0 0.0 0.0]', digit='[1]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1349];
@@ -20844,7 +20844,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1349] = "type='bool', alias='enable', default='0', hide='0'";
+	ctx->descs[1349] = "type='bool', alias='enable', default='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1350];
@@ -20860,7 +20860,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = 40;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1350] = "type='enum', alias='mode', enum_def='CalibDbV2_Ccm_Op_Mode_t', default='CALIB_CCM_MODE_AUTO'";
+	ctx->descs[1350] = "type='enum', alias='mode', enum_def='CalibDbV2_Ccm_Op_Mode_t', default='CALIB_CCM_MODE_AUTO', ro='0'";
 #endif
 
 	obj = &ctx->objs[1351];
@@ -20876,7 +20876,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1351] = "alias='wbgain tolerance', type='f32', size='[1,1]', range='[0.0, 1]', default='0.1', digit='[4]', hide='0'";
+	ctx->descs[1351] = "alias='wbgain tolerance', type='f32', size='[1,1]', range='[0.0, 1]', default='0.1', digit='[4]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1352];
@@ -20892,7 +20892,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1352] = "alias='gain tolerance', type='f32', size='[1,1]', range='[0.0, 1]', default='0.2', digit='[4]', hide='0'";
+	ctx->descs[1352] = "alias='gain tolerance', type='f32', size='[1,1]', range='[0.0, 1]', default='0.2', digit='[4]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1353];
@@ -20908,7 +20908,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 250;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1353] = "alias='control', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[1353] = "alias='control', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1354];
@@ -20924,7 +20924,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 246;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1354] = "alias='lumaCCM', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[1354] = "alias='lumaCCM', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1355];
@@ -20940,7 +20940,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 249;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1355] = "alias='manualCCM', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[1355] = "alias='manualCCM', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1356];
@@ -20956,7 +20956,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 248;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1356] = "alias='autoCCM', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[1356] = "alias='autoCCM', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1357];
@@ -20972,7 +20972,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1357] = "alias='Lut R', type='u16', size='[81, 9]', range='[0, 4096]', default='0', digit='[0]', dynamic='0', hide='0'";
+	ctx->descs[1357] = "alias='Lut R', type='u16', size='[81, 9]', range='[0, 4096]', default='0', digit='[0]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1358];
@@ -20988,7 +20988,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1358] = "alias='Lut G', type='u16', size='[81, 9]', range='[0, 4096]', default='0', digit='[0]', dynamic='0', hide='0'";
+	ctx->descs[1358] = "alias='Lut G', type='u16', size='[81, 9]', range='[0, 4096]', default='0', digit='[0]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1359];
@@ -21004,7 +21004,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1359] = "alias='Lut B', type='u16', size='[81, 9]', range='[0, 4096]', default='0', digit='[0]', dynamic='0', hide='0'";
+	ctx->descs[1359] = "alias='Lut B', type='u16', size='[81, 9]', range='[0, 4096]', default='0', digit='[0]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1360];
@@ -21020,7 +21020,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1360] = "alias='gain', type='f32', size='[1, 9]', range='[0, 256]', default='[1 2 4 8 16 32 64 128 256]', digit='[0]', dynamic='0', hide='0'";
+	ctx->descs[1360] = "alias='gain', type='f32', size='[1, 9]', range='[0, 256]', default='[1 2 4 8 16 32 64 128 256]', digit='[0]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1361];
@@ -21036,7 +21036,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1361] = "alias='Alpha', type='f32', size='[1, 9]', range='[0, 1]', default='1.00', digit='[2]', dynamic='0', hide='0'";
+	ctx->descs[1361] = "alias='Alpha', type='f32', size='[1, 9]', range='[0, 1]', default='1.00', digit='[2]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1362];
@@ -21052,7 +21052,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1362] = "alias='name', type='string', size='[1, 1]', range='[0, 25]', default='Normal', dynamic='0', hide='0'";
+	ctx->descs[1362] = "alias='name', type='string', size='[1, 1]', range='[0, 25]', default='Normal', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1363];
@@ -21068,7 +21068,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1363] = "alias='awbGain', type='f32', size='[1, 2]', range='[0, 5]', default='[1.0000 1.0000]', digit='[4]', dynamic='0', hide='0'";
+	ctx->descs[1363] = "alias='awbGain', type='f32', size='[1, 2]', range='[0, 5]', default='[1.0000 1.0000]', digit='[4]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1364];
@@ -21084,7 +21084,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 253;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1364] = "alias='gain-alpha curve', type='struct', ui_module='array_table_ui', index='none', hide='0'";
+	ctx->descs[1364] = "alias='gain-alpha curve', type='struct', ui_module='array_table_ui', index='none', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1365];
@@ -21100,7 +21100,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 252;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1365] = "alias='Table', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[1365] = "alias='Table', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1366];
@@ -21116,7 +21116,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1366] = "type='bool', alias='damp enable', default='0', hide='0'";
+	ctx->descs[1366] = "type='bool', alias='damp enable', default='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1367];
@@ -21132,7 +21132,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 254;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1367] = "alias='lutAll', type='struct_list', size='dynamic', ui_module='normal_ui_style'";
+	ctx->descs[1367] = "alias='lutAll', type='struct_list', size='dynamic', ui_module='normal_ui_style', ro='0'";
 #endif
 
 	obj = &ctx->objs[1368];
@@ -21161,7 +21161,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 252;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1369] = "alias='Table', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[1369] = "alias='Table', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1370];
@@ -21177,7 +21177,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1370] = "type='bool', alias='enable', default='0', hide='0'";
+	ctx->descs[1370] = "type='bool', alias='enable', default='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1371];
@@ -21193,7 +21193,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = 41;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1371] = "type='enum', alias='mode', enum_def='CalibDbV2_Lut3D_Op_Mode_t', default='CALIB_Lut3D_MODE_AUTO'";
+	ctx->descs[1371] = "type='enum', alias='mode', enum_def='CalibDbV2_Lut3D_Op_Mode_t', default='CALIB_Lut3D_MODE_AUTO', ro='0'";
 #endif
 
 	obj = &ctx->objs[1372];
@@ -21209,7 +21209,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1372] = "alias='gain tolerance', type='f32', size='[1,1]', range='[0.0, 256]', default='0.2', digit='[4]', hide='0'";
+	ctx->descs[1372] = "alias='gain tolerance', type='f32', size='[1,1]', range='[0.0, 256]', default='0.2', digit='[4]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1373];
@@ -21225,7 +21225,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1373] = "alias='wbgain tolerance', type='f32', size='[1,1]', range='[0.0, 4]', default='0.5', digit='[4]', hide='0'";
+	ctx->descs[1373] = "alias='wbgain tolerance', type='f32', size='[1,1]', range='[0.0, 4]', default='0.5', digit='[4]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1374];
@@ -21241,7 +21241,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 257;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1374] = "alias='common', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[1374] = "alias='common', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1375];
@@ -21257,7 +21257,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 256;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1375] = "alias='manualLut3D', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[1375] = "alias='manualLut3D', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1376];
@@ -21273,7 +21273,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 255;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1376] = "alias='autoLut3D', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[1376] = "alias='autoLut3D', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1377];
@@ -21289,7 +21289,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = 42;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1377] = "type='enum', alias='GainMode', enum_def='CalibDb_ExpGainModeV2_t', default='EXPGAIN_MODE_LINEAR'";
+	ctx->descs[1377] = "type='enum', alias='GainMode', enum_def='CalibDb_ExpGainModeV2_t', default='EXPGAIN_MODE_LINEAR', ro='0'";
 #endif
 
 	obj = &ctx->objs[1378];
@@ -21305,7 +21305,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1378] = "alias='GainRange', type='f32', size='[1, 7]', range='[-65535, 65535]', default='0', digit='[4]', dynamic='2', hide='0'";
+	ctx->descs[1378] = "alias='GainRange', type='f32', size='[1, 7]', range='[-65535, 65535]', default='0', digit='[4]', dynamic='2', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1379];
@@ -21334,7 +21334,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1380] = "alias='TimeRegMin', type='u16', size='[1,1]', range='[1, 100]', default='1', digit='[0]', hide='0'";
+	ctx->descs[1380] = "alias='TimeRegMin', type='u16', size='[1,1]', range='[1, 100]', default='1', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1381];
@@ -21350,7 +21350,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 20;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1381] = "alias='TimeRegMaxFac', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[1381] = "alias='TimeRegMaxFac', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1382];
@@ -21366,7 +21366,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 20;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1382] = "alias='TimeRegOdevity', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[1382] = "alias='TimeRegOdevity', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1383];
@@ -21382,7 +21382,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = 43;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1383] = "type='enum', alias='name', enum_def='CalibDb_HdrFrmNumV2_t', default='HDR_TWO_FRAME'";
+	ctx->descs[1383] = "type='enum', alias='name', enum_def='CalibDb_HdrFrmNumV2_t', default='HDR_TWO_FRAME', ro='0'";
 #endif
 
 	obj = &ctx->objs[1384];
@@ -21398,7 +21398,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1384] = "type='bool', alias='CISTimeRegUnEqualEn', default='0', hide='0'";
+	ctx->descs[1384] = "type='bool', alias='CISTimeRegUnEqualEn', default='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1385];
@@ -21414,7 +21414,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1385] = "alias='CISTimeRegMin', type='u16', size='[1,1]', range='[1, 100]', default='1', digit='[0]', hide='0'";
+	ctx->descs[1385] = "alias='CISTimeRegMin', type='u16', size='[1,1]', range='[1, 100]', default='1', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1386];
@@ -21430,7 +21430,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 20;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1386] = "alias='CISHdrTimeRegSumFac', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[1386] = "alias='CISHdrTimeRegSumFac', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1387];
@@ -21446,7 +21446,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 27;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1387] = "alias='CISTimeRegMax', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[1387] = "alias='CISTimeRegMax', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1388];
@@ -21462,7 +21462,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 20;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1388] = "alias='CISTimeRegOdevity', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[1388] = "alias='CISTimeRegOdevity', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1389];
@@ -21478,7 +21478,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 260;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1389] = "alias='Linear', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[1389] = "alias='Linear', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1390];
@@ -21494,7 +21494,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 261;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1390] = "alias='Hdr', type='struct_list', size='[1, 2]', ui_module='normal_ui_style'";
+	ctx->descs[1390] = "alias='Hdr', type='struct_list', size='[1, 2]', ui_module='normal_ui_style', ro='0'";
 #endif
 
 	obj = &ctx->objs[1391];
@@ -21510,7 +21510,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1391] = "alias='Min', type='f32', size='[1,1]', range='[0, 65535]', default='0', digit='[3]', hide='0'";
+	ctx->descs[1391] = "alias='Min', type='f32', size='[1,1]', range='[0, 65535]', default='0', digit='[3]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1392];
@@ -21526,7 +21526,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1392] = "alias='Max', type='f32', size='[1,1]', range='[0, 65535]', default='0', digit='[3]', hide='0'";
+	ctx->descs[1392] = "alias='Max', type='f32', size='[1,1]', range='[0, 65535]', default='0', digit='[3]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1393];
@@ -21542,7 +21542,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 263;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1393] = "alias='CISAgainRange', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[1393] = "alias='CISAgainRange', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1394];
@@ -21558,7 +21558,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 263;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1394] = "alias='CISExtraAgainRange', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[1394] = "alias='CISExtraAgainRange', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1395];
@@ -21574,7 +21574,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 263;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1395] = "alias='CISDgainRange', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[1395] = "alias='CISDgainRange', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1396];
@@ -21590,7 +21590,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 263;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1396] = "alias='CISIspDgainRange', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[1396] = "alias='CISIspDgainRange', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1397];
@@ -21606,7 +21606,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1397] = "type='bool', alias='CISHdrGainIndSetEn', default='1', hide='0'";
+	ctx->descs[1397] = "type='bool', alias='CISHdrGainIndSetEn', default='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1398];
@@ -21622,7 +21622,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1398] = "type='bool', alias='hdr_en', default='0', hide='0'";
+	ctx->descs[1398] = "type='bool', alias='hdr_en', default='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1399];
@@ -21638,7 +21638,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = 5;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1399] = "type='enum', alias='hdr_mode', enum_def='rk_aiq_isp_hdr_mode_t', default='RK_AIQ_ISP_HDR_MODE_2_LINE_HDR'";
+	ctx->descs[1399] = "type='enum', alias='hdr_mode', enum_def='rk_aiq_isp_hdr_mode_t', default='RK_AIQ_ISP_HDR_MODE_2_LINE_HDR', ro='0'";
 #endif
 
 	obj = &ctx->objs[1400];
@@ -21654,7 +21654,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = 6;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1400] = "type='enum', alias='line_mode', enum_def='rk_aiq_sensor_hdr_line_mode_t', default='RK_AIQ_SENSOR_HDR_LINE_MODE_STAGGER'";
+	ctx->descs[1400] = "type='enum', alias='line_mode', enum_def='rk_aiq_sensor_hdr_line_mode_t', default='RK_AIQ_SENSOR_HDR_LINE_MODE_STAGGER', ro='0'";
 #endif
 
 	obj = &ctx->objs[1401];
@@ -21670,7 +21670,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1401] = "type='bool', alias='support_en', default='0', hide='0'";
+	ctx->descs[1401] = "type='bool', alias='support_en', default='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1402];
@@ -21686,7 +21686,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = 3;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1402] = "type='enum', alias='dcg_optype', enum_def='RKAiqOPMode_t', default='RK_AIQ_OP_MODE_AUTO'";
+	ctx->descs[1402] = "type='enum', alias='dcg_optype', enum_def='RKAiqOPMode_t', default='RK_AIQ_OP_MODE_AUTO', ro='0'";
 #endif
 
 	obj = &ctx->objs[1403];
@@ -21702,7 +21702,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 2;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1403] = "alias='dcg_mode', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[1403] = "alias='dcg_mode', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1404];
@@ -21718,7 +21718,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1404] = "alias='dcg_ratio', type='f32', size='[1,1]', range='[1, 100]', default='1', digit='[2]', hide='0'";
+	ctx->descs[1404] = "alias='dcg_ratio', type='f32', size='[1,1]', range='[1, 100]', default='1', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1405];
@@ -21734,7 +21734,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1405] = "type='bool', alias='sync_switch', default='1', hide='0'";
+	ctx->descs[1405] = "type='bool', alias='sync_switch', default='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1406];
@@ -21750,7 +21750,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1406] = "alias='lcg2hcg_gain_th', type='f32', size='[1,1]', range='[1, 4096]', default='32', digit='[2]', hide='0'";
+	ctx->descs[1406] = "alias='lcg2hcg_gain_th', type='f32', size='[1,1]', range='[1, 4096]', default='32', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1407];
@@ -21766,7 +21766,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1407] = "alias='hcg2lcg_gain_th', type='f32', size='[1,1]', range='[1, 4096]', default='16', digit='[2]', hide='0'";
+	ctx->descs[1407] = "alias='hcg2lcg_gain_th', type='f32', size='[1,1]', range='[1, 4096]', default='16', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1408];
@@ -21782,7 +21782,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 266;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1408] = "alias='Linear', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[1408] = "alias='Linear', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1409];
@@ -21798,7 +21798,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 266;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1409] = "alias='Hdr', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[1409] = "alias='Hdr', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1410];
@@ -21814,7 +21814,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1410] = "alias='time_update', type='s32', size='[1,1]', range='[0, 10]', default='2', digit='[0]', hide='0'";
+	ctx->descs[1410] = "alias='time_update', type='s32', size='[1,1]', range='[0, 10]', default='2', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1411];
@@ -21830,7 +21830,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1411] = "alias='gain_update', type='s32', size='[1,1]', range='[0, 10]', default='2', digit='[0]', hide='0'";
+	ctx->descs[1411] = "alias='gain_update', type='s32', size='[1,1]', range='[0, 10]', default='2', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1412];
@@ -21846,7 +21846,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1412] = "alias='dcg_update', type='s32', size='[1,1]', range='[0, 10]', default='2', digit='[0]', hide='0'";
+	ctx->descs[1412] = "alias='dcg_update', type='s32', size='[1,1]', range='[0, 10]', default='2', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1413];
@@ -21862,7 +21862,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 268;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1413] = "alias='Linear', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[1413] = "alias='Linear', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1414];
@@ -21878,7 +21878,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 268;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1414] = "alias='Hdr', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[1414] = "alias='Hdr', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1415];
@@ -21894,7 +21894,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1415] = "alias='width', type='u16', size='[1,1]', range='[0, 65535]', default='0', digit='[0]', hide='0'";
+	ctx->descs[1415] = "alias='width', type='u16', size='[1,1]', range='[0, 65535]', default='0', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1416];
@@ -21910,7 +21910,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1416] = "alias='height', type='u16', size='[1,1]', range='[0, 65535]', default='0', digit='[0]', hide='0'";
+	ctx->descs[1416] = "alias='height', type='u16', size='[1,1]', range='[0, 65535]', default='0', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1417];
@@ -21926,7 +21926,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 270;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1417] = "alias='Resolution', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[1417] = "alias='Resolution', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1418];
@@ -21942,7 +21942,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 259;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1418] = "alias='Gain2Reg', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[1418] = "alias='Gain2Reg', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1419];
@@ -21958,7 +21958,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 14;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1419] = "alias='Time2Reg', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[1419] = "alias='Time2Reg', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1420];
@@ -21974,7 +21974,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 264;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1420] = "alias='CISGainSet', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[1420] = "alias='CISGainSet', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1421];
@@ -21990,7 +21990,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 262;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1421] = "alias='CISTimeSet', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[1421] = "alias='CISTimeSet', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1422];
@@ -22006,7 +22006,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 265;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1422] = "alias='CISHdrSet', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[1422] = "alias='CISHdrSet', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1423];
@@ -22022,7 +22022,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 267;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1423] = "alias='CISDcgSet', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[1423] = "alias='CISDcgSet', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1424];
@@ -22038,7 +22038,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 269;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1424] = "alias='CISExpUpdate', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[1424] = "alias='CISExpUpdate', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1425];
@@ -22054,7 +22054,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1425] = "alias='CISMinFps', type='f32', size='[1,1]', range='[1, 100]', default='10', digit='[2]', hide='0'";
+	ctx->descs[1425] = "alias='CISMinFps', type='f32', size='[1,1]', range='[1, 100]', default='10', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1426];
@@ -22070,7 +22070,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1426] = "alias='CISFlip', type='u8', size='[1,1]', range='[0, 3]', default='0', digit='[0]', hide='0'";
+	ctx->descs[1426] = "alias='CISFlip', type='u8', size='[1,1]', range='[0, 3]', default='0', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1427];
@@ -22086,7 +22086,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1427] = "alias='FNumber', type='f32', size='[1,1]', range='[1, 100]', default='1.6', digit='[2]', hide='0'";
+	ctx->descs[1427] = "alias='FNumber', type='f32', size='[1,1]', range='[1, 100]', default='1.6', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1428];
@@ -22102,7 +22102,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1428] = "alias='EFL', type='f32', size='[1,1]', range='[0, 200]', default='3.5', digit='[2]', hide='0'";
+	ctx->descs[1428] = "alias='EFL', type='f32', size='[1,1]', range='[0, 200]', default='3.5', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1429];
@@ -22118,7 +22118,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1429] = "alias='LensT', type='f32', size='[1,1]', range='[0, 100]', default='90', digit='[2]', hide='0'";
+	ctx->descs[1429] = "alias='LensT', type='f32', size='[1,1]', range='[0, 100]', default='90', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1430];
@@ -22134,7 +22134,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1430] = "alias='IRCutT', type='f32', size='[1,1]', range='[0, 100]', default='90', digit='[2]', hide='0'";
+	ctx->descs[1430] = "alias='IRCutT', type='f32', size='[1,1]', range='[0, 100]', default='90', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1431];
@@ -22150,7 +22150,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 272;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1431] = "alias='SensorModule', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[1431] = "alias='SensorModule', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1432];
@@ -22283,7 +22283,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1441] = "alias='name', type='string', size='[1, 1]', range='[0, 32]', default='default', dynamic='0', hide='0'";
+	ctx->descs[1441] = "alias='name', type='string', size='[1, 1]', range='[0, 32]', default='default', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1442];
@@ -22338,7 +22338,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1445] = "alias='usedForCase', type='u32', size='[1,1]', range='[0, 100]', default='0', digit='[0]', hide='0'";
+	ctx->descs[1445] = "alias='usedForCase', type='u32', size='[1,1]', range='[0, 100]', default='0', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1446];
@@ -22354,7 +22354,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1446] = "alias='name', type='string', size='[1, 1]', range='[0, 32]', default='default', dynamic='0', hide='0'";
+	ctx->descs[1446] = "alias='name', type='string', size='[1, 1]', range='[0, 32]', default='default', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1447];
@@ -22370,7 +22370,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1447] = "alias='wbGain', type='f32', size='[1, 2]', range='[0, 10000]', default='0', digit='[4]', dynamic='0', hide='0'";
+	ctx->descs[1447] = "alias='wbGain', type='f32', size='[1, 2]', range='[0, 10000]', default='0', digit='[4]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1448];
@@ -22386,7 +22386,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 275;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1448] = "alias='tableUsed', type='struct_list', size='dynamic', ui_module='normal_ui_style'";
+	ctx->descs[1448] = "alias='tableUsed', type='struct_list', size='dynamic', ui_module='normal_ui_style', ro='0'";
 #endif
 
 	obj = &ctx->objs[1449];
@@ -22415,7 +22415,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1450] = "alias='gains', type='f32', size='[1, 100]', range='[0, 10000]', default='0', digit='[4]', dynamic='1', hide='0'";
+	ctx->descs[1450] = "alias='gains', type='f32', size='[1, 100]', range='[0, 10000]', default='0', digit='[4]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1451];
@@ -22444,7 +22444,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1452] = "alias='vig', type='f32', size='[1, 100]', range='[0, 100]', default='0', digit='[2]', dynamic='1', hide='0'";
+	ctx->descs[1452] = "alias='vig', type='f32', size='[1, 100]', range='[0, 100]', default='0', digit='[2]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1453];
@@ -22473,7 +22473,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1454] = "alias='name', type='string', size='[1, 1]', range='[0, 32]', default='default', dynamic='0', hide='0'";
+	ctx->descs[1454] = "alias='name', type='string', size='[1, 1]', range='[0, 32]', default='default', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1455];
@@ -22489,7 +22489,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1455] = "alias='lsc_sect_size_x', type='u16', size='[1, 8]', range='[0, 10000]', default='0', digit='[0]', dynamic='0', hide='0'";
+	ctx->descs[1455] = "alias='lsc_sect_size_x', type='u16', size='[1, 8]', range='[0, 10000]', default='0', digit='[0]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1456];
@@ -22505,7 +22505,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1456] = "alias='lsc_sect_size_y', type='u16', size='[1, 8]', range='[0, 10000]', default='0', digit='[0]', dynamic='0', hide='0'";
+	ctx->descs[1456] = "alias='lsc_sect_size_y', type='u16', size='[1, 8]', range='[0, 10000]', default='0', digit='[0]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1457];
@@ -22521,7 +22521,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1457] = "type='bool', alias='enable', default='1', hide='0'";
+	ctx->descs[1457] = "type='bool', alias='enable', default='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1458];
@@ -22537,7 +22537,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 278;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1458] = "alias='resolutionAll', type='struct_list', size='dynamic', ui_module='normal_ui_style'";
+	ctx->descs[1458] = "alias='resolutionAll', type='struct_list', size='dynamic', ui_module='normal_ui_style', ro='0'";
 #endif
 
 	obj = &ctx->objs[1459];
@@ -22566,7 +22566,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1460] = "type='bool', alias='damp_enable', default='1', hide='0'";
+	ctx->descs[1460] = "type='bool', alias='damp_enable', default='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1461];
@@ -22582,7 +22582,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 277;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1461] = "alias='illAll', type='struct_list', size='dynamic', ui_module='normal_ui_style'";
+	ctx->descs[1461] = "alias='illAll', type='struct_list', size='dynamic', ui_module='normal_ui_style', ro='0'";
 #endif
 
 	obj = &ctx->objs[1462];
@@ -22611,7 +22611,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1463] = "alias='name', type='string', size='[1, 1]', range='[0, 32]', default='default', dynamic='0', hide='0'";
+	ctx->descs[1463] = "alias='name', type='string', size='[1, 1]', range='[0, 32]', default='default', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1464];
@@ -22627,7 +22627,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1464] = "alias='resolution', type='string', size='[1, 1]', range='[0, 32]', default='default', dynamic='0', hide='0'";
+	ctx->descs[1464] = "alias='resolution', type='string', size='[1, 1]', range='[0, 32]', default='default', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1465];
@@ -22643,7 +22643,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1465] = "alias='illumination', type='string', size='[1, 1]', range='[0, 32]', default='default', dynamic='0', hide='0'";
+	ctx->descs[1465] = "alias='illumination', type='string', size='[1, 1]', range='[0, 32]', default='default', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1466];
@@ -22659,7 +22659,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1466] = "alias='vignetting', type='f32', size='[1,1]', range='[0, 100]', default='100', digit='[0]', hide='0'";
+	ctx->descs[1466] = "alias='vignetting', type='f32', size='[1,1]', range='[0, 100]', default='100', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1467];
@@ -22675,7 +22675,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 30;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1467] = "alias='lsc_samples_red', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[1467] = "alias='lsc_samples_red', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1468];
@@ -22691,7 +22691,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 30;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1468] = "alias='lsc_samples_greenR', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[1468] = "alias='lsc_samples_greenR', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1469];
@@ -22707,7 +22707,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 30;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1469] = "alias='lsc_samples_greenB', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[1469] = "alias='lsc_samples_greenB', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1470];
@@ -22723,7 +22723,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 30;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1470] = "alias='lsc_samples_blue', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[1470] = "alias='lsc_samples_blue', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1471];
@@ -22739,7 +22739,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 281;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1471] = "alias='tableAll', type='struct_list', size='dynamic', ui_module='normal_ui_style'";
+	ctx->descs[1471] = "alias='tableAll', type='struct_list', size='dynamic', ui_module='normal_ui_style', ro='0'";
 #endif
 
 	obj = &ctx->objs[1472];
@@ -22768,7 +22768,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 279;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1473] = "alias='common', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[1473] = "alias='common', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1474];
@@ -22784,7 +22784,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 280;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1474] = "alias='alscCoef', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[1474] = "alias='alscCoef', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1475];
@@ -22800,7 +22800,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 282;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1475] = "alias='table_list', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[1475] = "alias='table_list', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1476];
@@ -22816,7 +22816,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1476] = "alias='QuickFoundThersZoomIdx', type='u16', size='[1, 256]', range='[0, 65535]', default='0', digit='[0]', dynamic='1', hide='0'";
+	ctx->descs[1476] = "alias='QuickFoundThersZoomIdx', type='u16', size='[1, 256]', range='[0, 65535]', default='0', digit='[0]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1477];
@@ -22845,7 +22845,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1478] = "alias='QuickFoundThers', type='f32', size='[1, 256]', range='[0, 1]', default='0', digit='[3]', dynamic='1', hide='0'";
+	ctx->descs[1478] = "alias='QuickFoundThers', type='f32', size='[1, 256]', range='[0, 1]', default='0', digit='[3]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1479];
@@ -22874,7 +22874,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1480] = "alias='SearchStepZoomIdx', type='u16', size='[1, 256]', range='[0, 65535]', default='0', digit='[0]', dynamic='1', hide='0'";
+	ctx->descs[1480] = "alias='SearchStepZoomIdx', type='u16', size='[1, 256]', range='[0, 65535]', default='0', digit='[0]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1481];
@@ -22903,7 +22903,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1482] = "alias='SearchStep', type='u16', size='[1, 256]', range='[0, 65535]', default='0', digit='[0]', dynamic='1', hide='0'";
+	ctx->descs[1482] = "alias='SearchStep', type='u16', size='[1, 256]', range='[0, 65535]', default='0', digit='[0]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1483];
@@ -22932,7 +22932,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1484] = "alias='StopStepZoomIdx', type='u16', size='[1, 256]', range='[0, 65535]', default='0', digit='[0]', dynamic='1', hide='0'";
+	ctx->descs[1484] = "alias='StopStepZoomIdx', type='u16', size='[1, 256]', range='[0, 65535]', default='0', digit='[0]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1485];
@@ -22961,7 +22961,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1486] = "alias='StopStep', type='u16', size='[1, 256]', range='[0, 65535]', default='0', digit='[0]', dynamic='1', hide='0'";
+	ctx->descs[1486] = "alias='StopStep', type='u16', size='[1, 256]', range='[0, 65535]', default='0', digit='[0]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1487];
@@ -22990,7 +22990,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1488] = "alias='SkipHighPassZoomIdx', type='u16', size='[1,1]', range='[0, 65535]', default='0', digit='[0]', hide='0'";
+	ctx->descs[1488] = "alias='SkipHighPassZoomIdx', type='u16', size='[1,1]', range='[0, 65535]', default='0', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1489];
@@ -23006,7 +23006,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1489] = "alias='SkipHighPassGain', type='f32', size='[1,1]', range='[0, 1000]', default='0', digit='[3]', hide='0'";
+	ctx->descs[1489] = "alias='SkipHighPassGain', type='f32', size='[1,1]', range='[0, 1000]', default='0', digit='[3]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1490];
@@ -23022,7 +23022,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1490] = "alias='Enable', type='u8', size='[1,1]', range='[0, 1]', default='0', digit='[0]', hide='0'";
+	ctx->descs[1490] = "alias='Enable', type='u8', size='[1,1]', range='[0, 1]', default='0', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1491];
@@ -23038,7 +23038,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = 45;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1491] = "type='enum', alias='SearchStrategy', enum_def='CalibDbV2_Af_SS_t', default='CalibDbV2_CAM_AFM_FSS_ADAPTIVE_RANGE'";
+	ctx->descs[1491] = "type='enum', alias='SearchStrategy', enum_def='CalibDbV2_Af_SS_t', default='CalibDbV2_CAM_AFM_FSS_ADAPTIVE_RANGE', ro='0'";
 #endif
 
 	obj = &ctx->objs[1492];
@@ -23054,7 +23054,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = 44;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1492] = "type='enum', alias='FullDir', enum_def='CalibDbV2_Af_SearchDir_t', default='CalibDbV2_CAM_AFM_ADAPTIVE_SEARCH'";
+	ctx->descs[1492] = "type='enum', alias='FullDir', enum_def='CalibDbV2_Af_SearchDir_t', default='CalibDbV2_CAM_AFM_ADAPTIVE_SEARCH', ro='0'";
 #endif
 
 	obj = &ctx->objs[1493];
@@ -23070,7 +23070,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1493] = "alias='FullRangeTbl', type='u16', size='[1, 65]', range='[0, 64]', default='0', digit='[0]', dynamic='1', hide='0'";
+	ctx->descs[1493] = "alias='FullRangeTbl', type='u16', size='[1, 65]', range='[0, 64]', default='0', digit='[0]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1494];
@@ -23099,7 +23099,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = 44;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1495] = "type='enum', alias='AdaptiveDir', enum_def='CalibDbV2_Af_SearchDir_t', default='CalibDbV2_CAM_AFM_ADAPTIVE_SEARCH'";
+	ctx->descs[1495] = "type='enum', alias='AdaptiveDir', enum_def='CalibDbV2_Af_SearchDir_t', default='CalibDbV2_CAM_AFM_ADAPTIVE_SEARCH', ro='0'";
 #endif
 
 	obj = &ctx->objs[1496];
@@ -23115,7 +23115,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1496] = "alias='AdaptRangeTbl', type='u16', size='[1, 65]', range='[0, 64]', default='0', digit='[0]', dynamic='1', hide='0'";
+	ctx->descs[1496] = "alias='AdaptRangeTbl', type='u16', size='[1, 65]', range='[0, 64]', default='0', digit='[0]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1497];
@@ -23144,7 +23144,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1498] = "alias='TrigThers', type='f32', size='[1, 32]', range='[0, 1]', default='0', digit='[3]', dynamic='1', hide='0'";
+	ctx->descs[1498] = "alias='TrigThers', type='f32', size='[1, 32]', range='[0, 1]', default='0', digit='[3]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1499];
@@ -23173,7 +23173,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1500] = "alias='TrigThersFv', type='f32', size='[1, 32]', range='[0, 100000000000]', default='0', digit='[0]', dynamic='1', hide='0'";
+	ctx->descs[1500] = "alias='TrigThersFv', type='f32', size='[1, 32]', range='[0, 100000000000]', default='0', digit='[0]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1501];
@@ -23202,7 +23202,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1502] = "alias='LumaTrigThers', type='f32', size='[1,1]', range='[0, 1]', default='0', digit='[3]', hide='0'";
+	ctx->descs[1502] = "alias='LumaTrigThers', type='f32', size='[1,1]', range='[0, 1]', default='0', digit='[3]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1503];
@@ -23218,7 +23218,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1503] = "alias='ExpTrigThers', type='f32', size='[1,1]', range='[0, 1]', default='0', digit='[3]', hide='0'";
+	ctx->descs[1503] = "alias='ExpTrigThers', type='f32', size='[1,1]', range='[0, 1]', default='0', digit='[3]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1504];
@@ -23234,7 +23234,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1504] = "alias='StableThers', type='f32', size='[1,1]', range='[0, 1]', default='0', digit='[3]', hide='0'";
+	ctx->descs[1504] = "alias='StableThers', type='f32', size='[1,1]', range='[0, 1]', default='0', digit='[3]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1505];
@@ -23250,7 +23250,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1505] = "alias='StableFrames', type='u16', size='[1,1]', range='[0, 65535]', default='0', digit='[0]', hide='0'";
+	ctx->descs[1505] = "alias='StableFrames', type='u16', size='[1,1]', range='[0, 65535]', default='0', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1506];
@@ -23266,7 +23266,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1506] = "alias='StableTime', type='u16', size='[1,1]', range='[0, 65535]', default='0', digit='[3]', hide='0'";
+	ctx->descs[1506] = "alias='StableTime', type='u16', size='[1,1]', range='[0, 65535]', default='0', digit='[3]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1507];
@@ -23282,7 +23282,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1507] = "alias='SceneDiffEnable', type='u8', size='[1,1]', range='[0, 1]', default='0', digit='[0]', hide='0'";
+	ctx->descs[1507] = "alias='SceneDiffEnable', type='u8', size='[1,1]', range='[0, 1]', default='0', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1508];
@@ -23298,7 +23298,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1508] = "alias='SceneDiffThers', type='f32', size='[1,1]', range='[0, 1]', default='0', digit='[3]', hide='0'";
+	ctx->descs[1508] = "alias='SceneDiffThers', type='f32', size='[1,1]', range='[0, 1]', default='0', digit='[3]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1509];
@@ -23314,7 +23314,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1509] = "alias='SceneDiffBlkThers', type='u16', size='[1,1]', range='[0, 225]', default='0', digit='[0]', hide='0'";
+	ctx->descs[1509] = "alias='SceneDiffBlkThers', type='u16', size='[1,1]', range='[0, 225]', default='0', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1510];
@@ -23330,7 +23330,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1510] = "alias='CenterSceneDiffThers', type='f32', size='[1,1]', range='[0, 1]', default='0', digit='[3]', hide='0'";
+	ctx->descs[1510] = "alias='CenterSceneDiffThers', type='f32', size='[1,1]', range='[0, 1]', default='0', digit='[3]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1511];
@@ -23346,7 +23346,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1511] = "alias='ValidMaxMinRatio', type='f32', size='[1,1]', range='[0, 1]', default='0', digit='[3]', hide='0'";
+	ctx->descs[1511] = "alias='ValidMaxMinRatio', type='f32', size='[1,1]', range='[0, 1]', default='0', digit='[3]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1512];
@@ -23362,7 +23362,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1512] = "alias='ValidValueThers', type='f32', size='[1,1]', range='[0, 1]', default='0', digit='[3]', hide='0'";
+	ctx->descs[1512] = "alias='ValidValueThers', type='f32', size='[1,1]', range='[0, 1]', default='0', digit='[3]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1513];
@@ -23378,7 +23378,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1513] = "alias='OutFocusValue', type='f32', size='[1,1]', range='[0, 1000000]', default='0', digit='[3]', hide='0'";
+	ctx->descs[1513] = "alias='OutFocusValue', type='f32', size='[1,1]', range='[0, 1000000]', default='0', digit='[3]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1514];
@@ -23394,7 +23394,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1514] = "alias='OutFocusPos', type='u16', size='[1,1]', range='[0, 65]', default='0', digit='[0]', hide='0'";
+	ctx->descs[1514] = "alias='OutFocusPos', type='u16', size='[1,1]', range='[0, 65]', default='0', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1515];
@@ -23410,7 +23410,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1515] = "alias='WeightEnable', type='u8', size='[1,1]', range='[0, 1]', default='0', digit='[0]', hide='0'";
+	ctx->descs[1515] = "alias='WeightEnable', type='u8', size='[1,1]', range='[0, 1]', default='0', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1516];
@@ -23426,7 +23426,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1516] = "alias='Weight', type='u16', size='[15, 15]', range='[0, 65535]', default='0', digit='[0]', dynamic='0', hide='0'";
+	ctx->descs[1516] = "alias='Weight', type='u16', size='[15, 15]', range='[0, 65535]', default='0', digit='[0]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1517];
@@ -23442,7 +23442,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1517] = "alias='SearchPauseLumaEnable', type='u8', size='[1,1]', range='[0, 1]', default='0', digit='[0]', hide='0'";
+	ctx->descs[1517] = "alias='SearchPauseLumaEnable', type='u8', size='[1,1]', range='[0, 1]', default='0', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1518];
@@ -23458,7 +23458,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1518] = "alias='SearchPauseLumaThers', type='f32', size='[1,1]', range='[0, 1]', default='0', digit='[3]', hide='0'";
+	ctx->descs[1518] = "alias='SearchPauseLumaThers', type='f32', size='[1,1]', range='[0, 1]', default='0', digit='[3]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1519];
@@ -23474,7 +23474,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1519] = "alias='StableFrames', type='u16', size='[1,1]', range='[0, 65535]', default='0', digit='[3]', hide='0'";
+	ctx->descs[1519] = "alias='StableFrames', type='u16', size='[1,1]', range='[0, 65535]', default='0', digit='[3]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1520];
@@ -23490,7 +23490,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1520] = "alias='SearchLumaStableThers', type='f32', size='[1,1]', range='[0, 1]', default='0', digit='[3]', hide='0'";
+	ctx->descs[1520] = "alias='SearchLumaStableThers', type='f32', size='[1,1]', range='[0, 1]', default='0', digit='[3]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1521];
@@ -23506,7 +23506,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1521] = "alias='Stage1QuickFoundThers', type='f32', size='[1,1]', range='[0, 1]', default='0', digit='[3]', hide='0'";
+	ctx->descs[1521] = "alias='Stage1QuickFoundThers', type='f32', size='[1,1]', range='[0, 1]', default='0', digit='[3]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1522];
@@ -23522,7 +23522,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1522] = "alias='Stage2QuickFoundThers', type='f32', size='[1,1]', range='[0, 1]', default='0', digit='[3]', hide='0'";
+	ctx->descs[1522] = "alias='Stage2QuickFoundThers', type='f32', size='[1,1]', range='[0, 1]', default='0', digit='[3]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1523];
@@ -23538,7 +23538,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1523] = "alias='FlatValue', type='f32', size='[1,1]', range='[0, 65535]', default='0', digit='[3]', hide='0'";
+	ctx->descs[1523] = "alias='FlatValue', type='f32', size='[1,1]', range='[0, 65535]', default='0', digit='[3]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1524];
@@ -23554,7 +23554,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1524] = "alias='PointLightLumaTh', type='u16', size='[1,1]', range='[0, 65535]', default='0', digit='[0]', hide='0'";
+	ctx->descs[1524] = "alias='PointLightLumaTh', type='u16', size='[1,1]', range='[0, 65535]', default='0', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1525];
@@ -23570,7 +23570,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1525] = "alias='PointLightCntTh', type='u16', size='[1,1]', range='[0, 65535]', default='0', digit='[0]', hide='0'";
+	ctx->descs[1525] = "alias='PointLightCntTh', type='u16', size='[1,1]', range='[0, 65535]', default='0', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1526];
@@ -23586,7 +23586,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 284;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1526] = "alias='ZoomConfig', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[1526] = "alias='ZoomConfig', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1527];
@@ -23602,7 +23602,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1527] = "alias='enable', type='u8', size='[1,1]', range='[0, 1]', default='0', digit='[0]', hide='0'";
+	ctx->descs[1527] = "alias='enable', type='u8', size='[1,1]', range='[0, 1]', default='0', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1528];
@@ -23618,7 +23618,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1528] = "alias='vcmDot', type='f32', size='[1, 7]', range='[0, 64]', default='0', digit='[0]', dynamic='0', hide='0'";
+	ctx->descs[1528] = "alias='vcmDot', type='f32', size='[1, 7]', range='[0, 64]', default='0', digit='[0]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1529];
@@ -23634,7 +23634,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1529] = "alias='distanceDot', type='f32', size='[1, 7]', range='[0, 65535]', default='0', digit='[4]', dynamic='0', hide='0'";
+	ctx->descs[1529] = "alias='distanceDot', type='f32', size='[1, 7]', range='[0, 65535]', default='0', digit='[4]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1530];
@@ -23650,7 +23650,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1530] = "alias='enable', type='u8', size='[1,1]', range='[0, 1]', default='0', digit='[0]', hide='0'";
+	ctx->descs[1530] = "alias='enable', type='u8', size='[1,1]', range='[0, 1]', default='0', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1531];
@@ -23666,7 +23666,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1531] = "alias='start current', type='s32', size='[1,1]', range='[-1, 2048]', default='-1', digit='[0]', hide='0'";
+	ctx->descs[1531] = "alias='start current', type='s32', size='[1,1]', range='[-1, 2048]', default='-1', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1532];
@@ -23682,7 +23682,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1532] = "alias='rated current', type='s32', size='[1,1]', range='[-1, 2048]', default='-1', digit='[0]', hide='0'";
+	ctx->descs[1532] = "alias='rated current', type='s32', size='[1,1]', range='[-1, 2048]', default='-1', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1533];
@@ -23698,7 +23698,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1533] = "alias='step mode', type='s32', size='[1,1]', range='[-1, 1000]', default='-1', digit='[0]', hide='0'";
+	ctx->descs[1533] = "alias='step mode', type='s32', size='[1,1]', range='[-1, 1000]', default='-1', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1534];
@@ -23714,7 +23714,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1534] = "alias='extra delay', type='s32', size='[1,1]', range='[-10000, 10000]', default='0', digit='[0]', hide='0'";
+	ctx->descs[1534] = "alias='extra delay', type='s32', size='[1,1]', range='[-10000, 10000]', default='0', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1535];
@@ -23730,7 +23730,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1535] = "alias='posture diff', type='f32', size='[1,1]', range='[0, 1]', default='0', digit='[3]', hide='0'";
+	ctx->descs[1535] = "alias='posture diff', type='f32', size='[1,1]', range='[0, 1]', default='0', digit='[3]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1536];
@@ -23746,7 +23746,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1536] = "alias='iso', type='u32', size='[1,1]', range='[0, 1000000]', default='0', digit='[0]', hide='0'";
+	ctx->descs[1536] = "alias='iso', type='u32', size='[1,1]', range='[0, 1000000]', default='0', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1537];
@@ -23762,7 +23762,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1537] = "alias='afmThres', type='u16', size='[1,1]', range='[0, 255]', default='4', digit='[0]', hide='0'";
+	ctx->descs[1537] = "alias='afmThres', type='u16', size='[1,1]', range='[0, 255]', default='4', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1538];
@@ -23778,7 +23778,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1538] = "alias='Gamma_curve', type='u16', size='[1, 17]', range='[0, 1023]', default='[0 45 108 179 245 344 409 459 500 567 622 676 759 833 896 962 1023]', digit='[0]', dynamic='0', ui_module='curve_table'";
+	ctx->descs[1538] = "alias='Gamma_curve', type='u16', size='[1, 17]', range='[0, 1023]', default='[0 45 108 179 245 344 409 459 500 567 622 676 759 833 896 962 1023]', digit='[0]', dynamic='0', ui_module='curve_table', ro='0'";
 #endif
 
 	obj = &ctx->objs[1539];
@@ -23794,7 +23794,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1539] = "alias='gaussWeight', type='u8', size='[1, 3]', range='[0, 128]', default='[16 14 14]', digit='[0]', dynamic='0', hide='0'";
+	ctx->descs[1539] = "alias='gaussWeight', type='u8', size='[1, 3]', range='[0, 128]', default='[16 14 14]', digit='[0]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1540];
@@ -23810,7 +23810,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1540] = "alias='code', type='u8', size='[1,1]', range='[0, 64]', default='0', digit='[0]', hide='0'";
+	ctx->descs[1540] = "alias='code', type='u8', size='[1,1]', range='[0, 64]', default='0', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1541];
@@ -23826,7 +23826,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1541] = "alias='focus position', type='f32', size='[1,1]', range='[0, 1000000]', default='0', digit='[3]', hide='1'";
+	ctx->descs[1541] = "alias='focus position', type='f32', size='[1,1]', range='[0, 1000000]', default='0', digit='[3]', hide='1', ro='0'";
 #endif
 
 	obj = &ctx->objs[1542];
@@ -23842,7 +23842,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1542] = "alias='focus code', type='s16', size='[1, 5000]', range='[-32768, 32767]', default='0', digit='[0]', dynamic='1', hide='1'";
+	ctx->descs[1542] = "alias='focus code', type='s16', size='[1, 5000]', range='[-32768, 32767]', default='0', digit='[0]', dynamic='1', hide='1', ro='0'";
 #endif
 
 	obj = &ctx->objs[1543];
@@ -23871,7 +23871,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1544] = "alias='widemod deviate', type='u32', size='[1,1]', range='[0, 1000]', default='0', digit='[0]', hide='0'";
+	ctx->descs[1544] = "alias='widemod deviate', type='u32', size='[1,1]', range='[0, 1000]', default='0', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1545];
@@ -23887,7 +23887,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1545] = "alias='telemod deviate', type='u32', size='[1,1]', range='[0, 1000]', default='0', digit='[0]', hide='0'";
+	ctx->descs[1545] = "alias='telemod deviate', type='u32', size='[1,1]', range='[0, 1000]', default='0', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1546];
@@ -23903,7 +23903,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1546] = "alias='zoom move dot', type='u32', size='[1, 32]', range='[0, 1000000]', default='0', digit='[0]', dynamic='0', hide='0'";
+	ctx->descs[1546] = "alias='zoom move dot', type='u32', size='[1, 32]', range='[0, 1000000]', default='0', digit='[0]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1547];
@@ -23932,7 +23932,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1548] = "alias='zoom move step', type='u32', size='[1, 32]', range='[0, 1000000]', default='0', digit='[0]', dynamic='0', hide='0'";
+	ctx->descs[1548] = "alias='zoom move step', type='u32', size='[1, 32]', range='[0, 1000000]', default='0', digit='[0]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1549];
@@ -23961,7 +23961,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1550] = "alias='focal length', type='f32', size='[1, 5000]', range='[0, 10000]', default='0', digit='[3]', dynamic='1', hide='1'";
+	ctx->descs[1550] = "alias='focal length', type='f32', size='[1, 5000]', range='[0, 10000]', default='0', digit='[3]', dynamic='1', hide='1', ro='0'";
 #endif
 
 	obj = &ctx->objs[1551];
@@ -23990,7 +23990,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1552] = "alias='zoom code', type='s16', size='[1, 5000]', range='[-32768, 32767]', default='0', digit='[0]', dynamic='1', hide='1'";
+	ctx->descs[1552] = "alias='zoom code', type='s16', size='[1, 5000]', range='[-32768, 32767]', default='0', digit='[0]', dynamic='1', hide='1', ro='0'";
 #endif
 
 	obj = &ctx->objs[1553];
@@ -24019,7 +24019,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 291;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1554] = "alias='focus code', type='struct_list', size='dynamic', ui_module='normal_ui_style'";
+	ctx->descs[1554] = "alias='focus code', type='struct_list', size='dynamic', ui_module='normal_ui_style', ro='1'";
 #endif
 
 	obj = &ctx->objs[1555];
@@ -24048,7 +24048,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1556] = "alias='zoom search table', type='s32', size='[1, 100]', range='[-32768, 32767]', default='0', digit='[0]', dynamic='0', hide='0'";
+	ctx->descs[1556] = "alias='zoom search table', type='s32', size='[1, 100]', range='[-32768, 32767]', default='0', digit='[0]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1557];
@@ -24064,7 +24064,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1557] = "alias='zoom search table number', type='u32', size='[1,1]', range='[0, 100]', default='0', digit='[0]', hide='0'";
+	ctx->descs[1557] = "alias='zoom search table number', type='u32', size='[1,1]', range='[0, 100]', default='0', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1558];
@@ -24080,7 +24080,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1558] = "alias='zoom search reference curve', type='u32', size='[1,1]', range='[0, 32]', default='0', digit='[0]', hide='0'";
+	ctx->descs[1558] = "alias='zoom search reference curve', type='u32', size='[1,1]', range='[0, 32]', default='0', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1559];
@@ -24096,7 +24096,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1559] = "alias='zoom search margin', type='u32', size='[1,1]', range='[0, 100000]', default='0', digit='[0]', hide='0'";
+	ctx->descs[1559] = "alias='zoom search margin', type='u32', size='[1,1]', range='[0, 100000]', default='0', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1560];
@@ -24112,7 +24112,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1560] = "alias='zoom search plus range', type='u32', size='[1, 100]', range='[0, 32767]', default='0', digit='[0]', dynamic='0', hide='0'";
+	ctx->descs[1560] = "alias='zoom search plus range', type='u32', size='[1, 100]', range='[0, 32767]', default='0', digit='[0]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1561];
@@ -24141,7 +24141,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1562] = "alias='focus stage1 step', type='u32', size='[1,1]', range='[0, 100]', default='0', digit='[0]', hide='0'";
+	ctx->descs[1562] = "alias='focus stage1 step', type='u32', size='[1,1]', range='[0, 100]', default='0', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1563];
@@ -24157,7 +24157,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1563] = "alias='search zoom range', type='u32', size='[1,1]', range='[0, 100000]', default='0', digit='[0]', hide='0'";
+	ctx->descs[1563] = "alias='search zoom range', type='u32', size='[1,1]', range='[0, 100000]', default='0', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1564];
@@ -24173,7 +24173,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1564] = "alias='search focus range', type='u32', size='[1,1]', range='[0, 100000]', default='0', digit='[0]', hide='0'";
+	ctx->descs[1564] = "alias='search focus range', type='u32', size='[1,1]', range='[0, 100000]', default='0', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1565];
@@ -24189,7 +24189,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1565] = "alias='search emax', type='f32', size='[1,1]', range='[0, 100000]', default='0', digit='[3]', hide='0'";
+	ctx->descs[1565] = "alias='search emax', type='f32', size='[1,1]', range='[0, 100000]', default='0', digit='[3]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1566];
@@ -24205,7 +24205,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1566] = "alias='search eavg', type='f32', size='[1,1]', range='[0, 100000]', default='0', digit='[3]', hide='0'";
+	ctx->descs[1566] = "alias='search eavg', type='f32', size='[1,1]', range='[0, 100000]', default='0', digit='[3]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1567];
@@ -24221,7 +24221,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1567] = "alias='IsZoomFocusRec', type='u8', size='[1,1]', range='[0, 1]', default='0', digit='[0]', hide='0'";
+	ctx->descs[1567] = "alias='IsZoomFocusRec', type='u8', size='[1,1]', range='[0, 1]', default='0', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1568];
@@ -24237,7 +24237,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1568] = "alias='ZoomFocusRecDir', type='string', size='[1, 1]', range='[0, 256]', default='/data/', dynamic='0', hide='0'";
+	ctx->descs[1568] = "alias='ZoomFocusRecDir', type='string', size='[1, 1]', range='[0, 256]', default='/data/', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1569];
@@ -24253,7 +24253,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1569] = "alias='enable', type='u8', size='[1,1]', range='[0, 1]', default='0', digit='[0]', hide='0'";
+	ctx->descs[1569] = "alias='enable', type='u8', size='[1,1]', range='[0, 1]', default='0', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1570];
@@ -24269,7 +24269,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1570] = "alias='ldg xl', type='u32', size='[1,1]', range='[0, 255]', default='0', digit='[0]', hide='0'";
+	ctx->descs[1570] = "alias='ldg xl', type='u32', size='[1,1]', range='[0, 255]', default='0', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1571];
@@ -24285,7 +24285,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1571] = "alias='ldg yl', type='u32', size='[1,1]', range='[0, 255]', default='0', digit='[0]', hide='0'";
+	ctx->descs[1571] = "alias='ldg yl', type='u32', size='[1,1]', range='[0, 255]', default='0', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1572];
@@ -24301,7 +24301,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1572] = "alias='ldg kl', type='u32', size='[1,1]', range='[0, 2147483647]', default='0', digit='[0]', hide='0'";
+	ctx->descs[1572] = "alias='ldg kl', type='u32', size='[1,1]', range='[0, 2147483647]', default='0', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1573];
@@ -24317,7 +24317,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1573] = "alias='ldg xh', type='u32', size='[1,1]', range='[0, 255]', default='0', digit='[0]', hide='0'";
+	ctx->descs[1573] = "alias='ldg xh', type='u32', size='[1,1]', range='[0, 255]', default='0', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1574];
@@ -24333,7 +24333,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1574] = "alias='ldg yh', type='u32', size='[1,1]', range='[0, 255]', default='0', digit='[0]', hide='0'";
+	ctx->descs[1574] = "alias='ldg yh', type='u32', size='[1,1]', range='[0, 255]', default='0', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1575];
@@ -24349,7 +24349,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1575] = "alias='ldg kh', type='u32', size='[1,1]', range='[0, 2147483647]', default='0', digit='[0]', hide='0'";
+	ctx->descs[1575] = "alias='ldg kh', type='u32', size='[1,1]', range='[0, 2147483647]', default='0', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1576];
@@ -24365,7 +24365,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1576] = "alias='ther0', type='u32', size='[1,1]', range='[0, 255]', default='245', digit='[0]', hide='0'";
+	ctx->descs[1576] = "alias='ther0', type='u32', size='[1,1]', range='[0, 255]', default='245', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1577];
@@ -24381,7 +24381,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1577] = "alias='ther1', type='u32', size='[1,1]', range='[0, 255]', default='200', digit='[0]', hide='0'";
+	ctx->descs[1577] = "alias='ther1', type='u32', size='[1,1]', range='[0, 255]', default='200', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1578];
@@ -24397,7 +24397,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = 46;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1578] = "type='enum', alias='mode', enum_def='CalibDbV2_AF_MODE_t', default='CalibDbV2_AF_MODE_CONTINUOUS_PICTURE'";
+	ctx->descs[1578] = "type='enum', alias='mode', enum_def='CalibDbV2_AF_MODE_t', default='CalibDbV2_AF_MODE_CONTINUOUS_PICTURE', ro='0'";
 #endif
 
 	obj = &ctx->objs[1579];
@@ -24413,7 +24413,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1579] = "alias='win_h_offs', type='u16', size='[1,1]', range='[0, 2048]', default='0', digit='[0]', hide='0'";
+	ctx->descs[1579] = "alias='win_h_offs', type='u16', size='[1,1]', range='[0, 2048]', default='0', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1580];
@@ -24429,7 +24429,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1580] = "alias='win_v_offs', type='u16', size='[1,1]', range='[0, 2048]', default='0', digit='[0]', hide='0'";
+	ctx->descs[1580] = "alias='win_v_offs', type='u16', size='[1,1]', range='[0, 2048]', default='0', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1581];
@@ -24445,7 +24445,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1581] = "alias='win_h_size', type='u16', size='[1,1]', range='[0, 2048]', default='0', digit='[0]', hide='0'";
+	ctx->descs[1581] = "alias='win_h_size', type='u16', size='[1,1]', range='[0, 2048]', default='0', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1582];
@@ -24461,7 +24461,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1582] = "alias='win_v_size', type='u16', size='[1,1]', range='[0, 2048]', default='0', digit='[0]', hide='0'";
+	ctx->descs[1582] = "alias='win_v_size', type='u16', size='[1,1]', range='[0, 2048]', default='0', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1583];
@@ -24477,7 +24477,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 290;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1583] = "alias='fixed mode', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[1583] = "alias='fixed mode', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1584];
@@ -24493,7 +24493,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 290;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1584] = "alias='macro mode', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[1584] = "alias='macro mode', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1585];
@@ -24509,7 +24509,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 290;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1585] = "alias='infinity mode', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[1585] = "alias='infinity mode', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1586];
@@ -24525,7 +24525,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 293;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1586] = "alias='ldg param', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[1586] = "alias='ldg param', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1587];
@@ -24541,7 +24541,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 294;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1587] = "alias='high light', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[1587] = "alias='high light', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1588];
@@ -24557,7 +24557,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 285;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1588] = "alias='contrast af', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[1588] = "alias='contrast af', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1589];
@@ -24573,7 +24573,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 286;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1589] = "alias='laser af', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[1589] = "alias='laser af', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1590];
@@ -24589,7 +24589,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 287;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1590] = "alias='pdaf', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[1590] = "alias='pdaf', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1591];
@@ -24605,7 +24605,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 288;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1591] = "alias='vcmcfg', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[1591] = "alias='vcmcfg', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1592];
@@ -24621,7 +24621,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 292;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1592] = "alias='zoomfocus_tbl', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[1592] = "alias='zoomfocus_tbl', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1593];
@@ -24637,7 +24637,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 289;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1593] = "alias='meas iso config', type='struct_list', size='[1, 13]', ui_module='normal_ui_style'";
+	ctx->descs[1593] = "alias='meas iso config', type='struct_list', size='[1, 13]', ui_module='normal_ui_style', ro='0'";
 #endif
 
 	obj = &ctx->objs[1594];
@@ -24653,7 +24653,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 295;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1594] = "alias='TuningPara', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[1594] = "alias='TuningPara', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1595];
@@ -24669,7 +24669,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1595] = "alias='table index', type='u32', size='[1,1]', range='[0, 1000000]', default='0', digit='[0]', hide='0'";
+	ctx->descs[1595] = "alias='table index', type='u32', size='[1,1]', range='[0, 1000000]', default='0', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1596];
@@ -24685,7 +24685,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1596] = "alias='afmThres', type='u16', size='[1,1]', range='[0, 255]', default='4', digit='[0]', hide='0'";
+	ctx->descs[1596] = "alias='afmThres', type='u16', size='[1,1]', range='[0, 255]', default='4', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1597];
@@ -24701,7 +24701,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1597] = "alias='Gamma Curve', type='u16', size='[1, 17]', range='[0, 1023]', default='[0 45 108 179 245 344 409 459 500 567 622 676 759 833 896 962 1023]', digit='[0]', dynamic='0', ui_module='curve_table'";
+	ctx->descs[1597] = "alias='Gamma Curve', type='u16', size='[1, 17]', range='[0, 1023]', default='[0 45 108 179 245 344 409 459 500 567 622 676 759 833 896 962 1023]', digit='[0]', dynamic='0', ui_module='curve_table', ro='0'";
 #endif
 
 	obj = &ctx->objs[1598];
@@ -24717,7 +24717,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1598] = "alias='v1 fir sel', type='u8', size='[1,1]', range='[0, 1]', default='0', digit='[0]', hide='0'";
+	ctx->descs[1598] = "alias='v1 fir sel', type='u8', size='[1,1]', range='[0, 1]', default='0', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1599];
@@ -24733,7 +24733,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1599] = "alias='vertical first iir filter', type='s16', size='[1, 9]', range='[-255, 255]', default='0', digit='[0]', dynamic='0', hide='0'";
+	ctx->descs[1599] = "alias='vertical first iir filter', type='s16', size='[1, 9]', range='[-255, 255]', default='0', digit='[0]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1600];
@@ -24749,7 +24749,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1600] = "alias='vertical first fir filter', type='s16', size='[1, 3]', range='[-2047, 2047]', default='0', digit='[0]', dynamic='0', hide='0'";
+	ctx->descs[1600] = "alias='vertical first fir filter', type='s16', size='[1, 3]', range='[-2047, 2047]', default='0', digit='[0]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1601];
@@ -24765,7 +24765,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1601] = "alias='vertical second iir filter', type='s16', size='[1, 3]', range='[-2047, 2047]', default='0', digit='[0]', dynamic='0', hide='0'";
+	ctx->descs[1601] = "alias='vertical second iir filter', type='s16', size='[1, 3]', range='[-2047, 2047]', default='0', digit='[0]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1602];
@@ -24781,7 +24781,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1602] = "alias='vertical second fir filter', type='s16', size='[1, 3]', range='[-2047, 2047]', default='0', digit='[0]', dynamic='0', hide='0'";
+	ctx->descs[1602] = "alias='vertical second fir filter', type='s16', size='[1, 3]', range='[-2047, 2047]', default='0', digit='[0]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1603];
@@ -24797,7 +24797,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1603] = "alias='horizontal first iir1 filter', type='s16', size='[1, 6]', range='[-2047, 2047]', default='0', digit='[0]', dynamic='0', hide='0'";
+	ctx->descs[1603] = "alias='horizontal first iir1 filter', type='s16', size='[1, 6]', range='[-2047, 2047]', default='0', digit='[0]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1604];
@@ -24813,7 +24813,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1604] = "alias='horizontal first iir2 filter', type='s16', size='[1, 6]', range='[-2047, 2047]', default='0', digit='[0]', dynamic='0', hide='0'";
+	ctx->descs[1604] = "alias='horizontal first iir2 filter', type='s16', size='[1, 6]', range='[-2047, 2047]', default='0', digit='[0]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1605];
@@ -24829,7 +24829,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1605] = "alias='horizontal second iir1 filter', type='s16', size='[1, 6]', range='[-2047, 2047]', default='0', digit='[0]', dynamic='0', hide='0'";
+	ctx->descs[1605] = "alias='horizontal second iir1 filter', type='s16', size='[1, 6]', range='[-2047, 2047]', default='0', digit='[0]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1606];
@@ -24845,7 +24845,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1606] = "alias='horizontal second iir2 filter', type='s16', size='[1, 6]', range='[-2047, 2047]', default='0', digit='[0]', dynamic='0', hide='0'";
+	ctx->descs[1606] = "alias='horizontal second iir2 filter', type='s16', size='[1, 6]', range='[-2047, 2047]', default='0', digit='[0]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1607];
@@ -24861,7 +24861,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1607] = "alias='ldg enable', type='u8', size='[1,1]', range='[0, 1]', default='0', digit='[0]', hide='0'";
+	ctx->descs[1607] = "alias='ldg enable', type='u8', size='[1,1]', range='[0, 1]', default='0', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1608];
@@ -24877,7 +24877,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1608] = "alias='vertical minluma thresh', type='u8', size='[1,1]', range='[0, 255]', default='0', digit='[0]', hide='0'";
+	ctx->descs[1608] = "alias='vertical minluma thresh', type='u8', size='[1,1]', range='[0, 255]', default='0', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1609];
@@ -24893,7 +24893,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1609] = "alias='vertical gain for minluma', type='u8', size='[1,1]', range='[0, 255]', default='0', digit='[0]', hide='0'";
+	ctx->descs[1609] = "alias='vertical gain for minluma', type='u8', size='[1,1]', range='[0, 255]', default='0', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1610];
@@ -24909,7 +24909,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1610] = "alias='vertical slope low', type='u16', size='[1,1]', range='[0, 8191]', default='0', digit='[0]', hide='0'";
+	ctx->descs[1610] = "alias='vertical slope low', type='u16', size='[1,1]', range='[0, 8191]', default='0', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1611];
@@ -24925,7 +24925,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1611] = "alias='vertical maxluma thresh', type='u8', size='[1,1]', range='[0, 255]', default='0', digit='[0]', hide='0'";
+	ctx->descs[1611] = "alias='vertical maxluma thresh', type='u8', size='[1,1]', range='[0, 255]', default='0', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1612];
@@ -24941,7 +24941,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1612] = "alias='vertical gain for maxluma', type='u8', size='[1,1]', range='[0, 255]', default='0', digit='[0]', hide='0'";
+	ctx->descs[1612] = "alias='vertical gain for maxluma', type='u8', size='[1,1]', range='[0, 255]', default='0', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1613];
@@ -24957,7 +24957,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1613] = "alias='vertical slope high', type='u16', size='[1,1]', range='[0, 8191]', default='0', digit='[0]', hide='0'";
+	ctx->descs[1613] = "alias='vertical slope high', type='u16', size='[1,1]', range='[0, 8191]', default='0', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1614];
@@ -24973,7 +24973,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1614] = "alias='horizontal minluma thresh', type='u8', size='[1,1]', range='[0, 255]', default='0', digit='[0]', hide='0'";
+	ctx->descs[1614] = "alias='horizontal minluma thresh', type='u8', size='[1,1]', range='[0, 255]', default='0', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1615];
@@ -24989,7 +24989,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1615] = "alias='horizontal gain for minluma', type='u8', size='[1,1]', range='[0, 255]', default='0', digit='[0]', hide='0'";
+	ctx->descs[1615] = "alias='horizontal gain for minluma', type='u8', size='[1,1]', range='[0, 255]', default='0', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1616];
@@ -25005,7 +25005,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1616] = "alias='horizontal slope low', type='u16', size='[1,1]', range='[0, 8191]', default='0', digit='[0]', hide='0'";
+	ctx->descs[1616] = "alias='horizontal slope low', type='u16', size='[1,1]', range='[0, 8191]', default='0', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1617];
@@ -25021,7 +25021,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1617] = "alias='horizontal maxluma thresh', type='u8', size='[1,1]', range='[0, 255]', default='0', digit='[0]', hide='0'";
+	ctx->descs[1617] = "alias='horizontal maxluma thresh', type='u8', size='[1,1]', range='[0, 255]', default='0', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1618];
@@ -25037,7 +25037,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1618] = "alias='horizontal gain for maxluma', type='u8', size='[1,1]', range='[0, 255]', default='0', digit='[0]', hide='0'";
+	ctx->descs[1618] = "alias='horizontal gain for maxluma', type='u8', size='[1,1]', range='[0, 255]', default='0', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1619];
@@ -25053,7 +25053,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1619] = "alias='horizontal slope high', type='u16', size='[1,1]', range='[0, 8191]', default='0', digit='[0]', hide='0'";
+	ctx->descs[1619] = "alias='horizontal slope high', type='u16', size='[1,1]', range='[0, 8191]', default='0', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1620];
@@ -25069,7 +25069,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1620] = "alias='vertical fv thresh', type='u16', size='[1,1]', range='[0, 4095]', default='0', digit='[0]', hide='0'";
+	ctx->descs[1620] = "alias='vertical fv thresh', type='u16', size='[1,1]', range='[0, 4095]', default='0', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1621];
@@ -25085,7 +25085,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1621] = "alias='horizontal fv thresh', type='u16', size='[1,1]', range='[0, 4095]', default='0', digit='[0]', hide='0'";
+	ctx->descs[1621] = "alias='horizontal fv thresh', type='u16', size='[1,1]', range='[0, 4095]', default='0', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1622];
@@ -25101,7 +25101,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1622] = "alias='highlight thresh', type='u16', size='[1,1]', range='[0, 4095]', default='0', digit='[0]', hide='0'";
+	ctx->descs[1622] = "alias='highlight thresh', type='u16', size='[1,1]', range='[0, 4095]', default='0', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1623];
@@ -25117,7 +25117,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1623] = "alias='iso', type='f32', range='[50, 204800]', default='50', digit='[1]', ui_module_param='index2'";
+	ctx->descs[1623] = "alias='iso', type='f32', range='[50, 204800]', default='50', digit='[1]', ui_module_param='index2', ro='0'";
 #endif
 
 	obj = &ctx->objs[1624];
@@ -25133,7 +25133,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1624] = "alias='meas table index', type='u32', size='[1,1]', range='[0, 100]', default='0', digit='[0]', hide='0'";
+	ctx->descs[1624] = "alias='meas table index', type='u32', size='[1,1]', range='[0, 100]', default='0', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1625];
@@ -25149,7 +25149,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1625] = "alias='zoom index', type='u32', range='[0, 100000]', default='0', digit='[0]', ui_module_param='index1'";
+	ctx->descs[1625] = "alias='zoom index', type='u32', range='[0, 100000]', default='0', digit='[0]', ui_module_param='index1', ro='0'";
 #endif
 
 	obj = &ctx->objs[1626];
@@ -25165,7 +25165,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 298;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1626] = "alias='meas iso config', type='struct_list', size='[1, 13]', ui_module='double_index_list'";
+	ctx->descs[1626] = "alias='meas iso config', type='struct_list', size='[1, 13]', ui_module='double_index_list', ro='0'";
 #endif
 
 	obj = &ctx->objs[1627];
@@ -25181,7 +25181,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = 46;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1627] = "type='enum', alias='mode', enum_def='CalibDbV2_AF_MODE_t', default='CalibDbV2_AF_MODE_CONTINUOUS_PICTURE'";
+	ctx->descs[1627] = "type='enum', alias='mode', enum_def='CalibDbV2_AF_MODE_t', default='CalibDbV2_AF_MODE_CONTINUOUS_PICTURE', ro='0'";
 #endif
 
 	obj = &ctx->objs[1628];
@@ -25197,7 +25197,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1628] = "alias='win_h_offs', type='u16', size='[1,1]', range='[0, 2048]', default='0', digit='[0]', hide='0'";
+	ctx->descs[1628] = "alias='win_h_offs', type='u16', size='[1,1]', range='[0, 2048]', default='0', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1629];
@@ -25213,7 +25213,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1629] = "alias='win_v_offs', type='u16', size='[1,1]', range='[0, 2048]', default='0', digit='[0]', hide='0'";
+	ctx->descs[1629] = "alias='win_v_offs', type='u16', size='[1,1]', range='[0, 2048]', default='0', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1630];
@@ -25229,7 +25229,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1630] = "alias='win_h_size', type='u16', size='[1,1]', range='[0, 2048]', default='0', digit='[0]', hide='0'";
+	ctx->descs[1630] = "alias='win_h_size', type='u16', size='[1,1]', range='[0, 2048]', default='0', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1631];
@@ -25245,7 +25245,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1631] = "alias='win_v_size', type='u16', size='[1,1]', range='[0, 2048]', default='0', digit='[0]', hide='0'";
+	ctx->descs[1631] = "alias='win_v_size', type='u16', size='[1,1]', range='[0, 2048]', default='0', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1632];
@@ -25261,7 +25261,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 290;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1632] = "alias='fixed mode', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[1632] = "alias='fixed mode', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1633];
@@ -25277,7 +25277,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 290;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1633] = "alias='macro mode', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[1633] = "alias='macro mode', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1634];
@@ -25293,7 +25293,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 290;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1634] = "alias='infinity mode', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[1634] = "alias='infinity mode', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1635];
@@ -25309,7 +25309,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 285;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1635] = "alias='contrast af', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[1635] = "alias='contrast af', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1636];
@@ -25325,7 +25325,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 286;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1636] = "alias='laser af', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[1636] = "alias='laser af', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1637];
@@ -25341,7 +25341,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 287;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1637] = "alias='pdaf', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[1637] = "alias='pdaf', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1638];
@@ -25357,7 +25357,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 288;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1638] = "alias='vcmcfg', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[1638] = "alias='vcmcfg', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1639];
@@ -25373,7 +25373,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 292;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1639] = "alias='zoomfocus_tbl', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[1639] = "alias='zoomfocus_tbl', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1640];
@@ -25389,7 +25389,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 299;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1640] = "alias='zoom meas', type='struct_list', size='dynamic', ui_module='double_index_list'";
+	ctx->descs[1640] = "alias='zoom meas', type='struct_list', size='dynamic', ui_module='double_index_list', ro='0'";
 #endif
 
 	obj = &ctx->objs[1641];
@@ -25418,7 +25418,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 297;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1642] = "alias='meas config table', type='struct_list', size='dynamic', ui_module='normal_ui_style'";
+	ctx->descs[1642] = "alias='meas config table', type='struct_list', size='dynamic', ui_module='normal_ui_style', ro='0'";
 #endif
 
 	obj = &ctx->objs[1643];
@@ -25447,7 +25447,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 300;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1644] = "alias='TuningPara', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[1644] = "alias='TuningPara', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1645];
@@ -25463,7 +25463,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1645] = "type='bool', alias='ldch_en', default='0', hide='0'";
+	ctx->descs[1645] = "type='bool', alias='ldch_en', default='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1646];
@@ -25479,7 +25479,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1646] = "alias='meshfile', type='string', size='[1, 1]', range='[0, 256]', default='default_meshfile', dynamic='0', hide='0'";
+	ctx->descs[1646] = "alias='meshfile', type='string', size='[1, 1]', range='[0, 256]', default='default_meshfile', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1647];
@@ -25495,7 +25495,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1647] = "alias='correct_level', type='u32', size='[1,1]', range='[0, 255]', default='255', digit='[0]', hide='0'";
+	ctx->descs[1647] = "alias='correct_level', type='u32', size='[1,1]', range='[0, 255]', default='255', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1648];
@@ -25511,7 +25511,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1648] = "alias='correct_level_max', type='u32', size='[1,1]', range='[0, 255]', default='255', digit='[0]', hide='0'";
+	ctx->descs[1648] = "alias='correct_level_max', type='u32', size='[1,1]', range='[0, 255]', default='255', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1649];
@@ -25527,7 +25527,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1649] = "alias='light_center', type='f64', size='[1, 2]', range='[-10000000000000000, 10000000000000000]', default='0', digit='[8]', dynamic='0', hide='0'";
+	ctx->descs[1649] = "alias='light_center', type='f64', size='[1, 2]', range='[-10000000000000000, 10000000000000000]', default='0', digit='[8]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1650];
@@ -25543,7 +25543,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1650] = "alias='coefficient', type='f64', size='[1, 4]', range='[-10000000000000000, 10000000000000000]', default='0', digit='[8]', dynamic='0', hide='0'";
+	ctx->descs[1650] = "alias='coefficient', type='f64', size='[1, 4]', range='[-10000000000000000, 10000000000000000]', default='0', digit='[8]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1651];
@@ -25559,7 +25559,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 302;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1651] = "alias='param', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[1651] = "alias='param', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1652];
@@ -25640,7 +25640,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 304;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1657] = "alias='param', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[1657] = "alias='param', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1658];
@@ -25656,7 +25656,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1658] = "alias='owner_cookies', type='u32', size='[1,1]', range='[0, 65535]', default='1', digit='[0]', hide='0'";
+	ctx->descs[1658] = "alias='owner_cookies', type='u32', size='[1,1]', range='[0, 65535]', default='1', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1659];
@@ -25672,7 +25672,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1659] = "alias='stream_type', type='u32', size='[1,1]', range='[0, 65535]', default='1', digit='[0]', hide='0'";
+	ctx->descs[1659] = "alias='stream_type', type='u32', size='[1,1]', range='[0, 65535]', default='1', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1660];
@@ -25688,7 +25688,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1660] = "alias='after_nodes', type='u32', size='[1,1]', range='[0, 65535]', default='1', digit='[0]', hide='0'";
+	ctx->descs[1660] = "alias='after_nodes', type='u32', size='[1,1]', range='[0, 65535]', default='1', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1661];
@@ -25704,7 +25704,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1661] = "alias='after_nodes', type='u32', size='[1,1]', range='[0, 65535]', default='1', digit='[0]', hide='0'";
+	ctx->descs[1661] = "alias='after_nodes', type='u32', size='[1,1]', range='[0, 65535]', default='1', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1662];
@@ -25720,7 +25720,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1662] = "alias='format', type='u8', size='[1, 4]', range='[0, 100]', default='0', digit='[0]', dynamic='0', hide='0'";
+	ctx->descs[1662] = "alias='format', type='u8', size='[1, 4]', range='[0, 100]', default='0', digit='[0]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1663];
@@ -25736,7 +25736,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1663] = "alias='width_intfactor', type='u32', size='[1,1]', range='[0, 65535]', default='1', digit='[0]', hide='0'";
+	ctx->descs[1663] = "alias='width_intfactor', type='u32', size='[1,1]', range='[0, 65535]', default='1', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1664];
@@ -25752,7 +25752,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1664] = "alias='height_intfactor', type='u32', size='[1,1]', range='[0, 65535]', default='1', digit='[0]', hide='0'";
+	ctx->descs[1664] = "alias='height_intfactor', type='u32', size='[1,1]', range='[0, 65535]', default='1', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1665];
@@ -25768,7 +25768,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1665] = "alias='buffer_count', type='s32', size='[1,1]', range='[-65535, 65535]', default='1', digit='[0]', hide='0'";
+	ctx->descs[1665] = "alias='buffer_count', type='s32', size='[1,1]', range='[-65535, 65535]', default='1', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1666];
@@ -25784,7 +25784,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 306;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1666] = "alias='thumbnail_configs', type='struct_list', size='[1, 4]', ui_module='normal_ui_style'";
+	ctx->descs[1666] = "alias='thumbnail_configs', type='struct_list', size='[1, 4]', ui_module='normal_ui_style', ro='0'";
 #endif
 
 	obj = &ctx->objs[1667];
@@ -25813,7 +25813,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 307;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1668] = "alias='param', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[1668] = "alias='param', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1669];
@@ -25829,7 +25829,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1669] = "type='bool', alias='enable', default='0', hide='0'";
+	ctx->descs[1669] = "type='bool', alias='enable', default='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1670];
@@ -25845,7 +25845,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = 47;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1670] = "alias='EnableAlgos', type='string', size='[1, 1]', range='[0, 32]', default='ENABLE_AE', dynamic='1', hide='0'";
+	ctx->descs[1670] = "alias='EnableAlgos', type='string', size='[1, 1]', range='[0, 32]', default='ENABLE_AE', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1671];
@@ -25874,7 +25874,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 309;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1672] = "alias='AlgoSwitch', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[1672] = "alias='AlgoSwitch', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1673];
@@ -25890,7 +25890,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1673] = "type='bool', alias='enable', default='0', hide='0'";
+	ctx->descs[1673] = "type='bool', alias='enable', default='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1674];
@@ -25906,7 +25906,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 311;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1674] = "alias='param', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[1674] = "alias='param', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1675];
@@ -25974,7 +25974,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 69;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1679] = "alias='AEC', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[1679] = "alias='AEC', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1680];
@@ -25990,7 +25990,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 181;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1680] = "alias='wb_v20', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[1680] = "alias='wb_v20', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1681];
@@ -26006,7 +26006,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 71;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1681] = "alias='agamma_calib', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[1681] = "alias='agamma_calib', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1682];
@@ -26022,7 +26022,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 76;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1682] = "alias='ablc_calib', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[1682] = "alias='ablc_calib', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1683];
@@ -26038,7 +26038,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 78;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1683] = "alias='degamma', type='struct', ui_module='curve_ui_type_A', hide='0'";
+	ctx->descs[1683] = "alias='degamma', type='struct', ui_module='curve_ui_type_A', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1684];
@@ -26054,7 +26054,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 82;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1684] = "alias='agic_calib_v20', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[1684] = "alias='agic_calib_v20', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1685];
@@ -26070,7 +26070,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 92;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1685] = "alias='adehaze_calib_v20', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[1685] = "alias='adehaze_calib_v20', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1686];
@@ -26086,7 +26086,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 118;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1686] = "alias='adpcc_calib', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[1686] = "alias='adpcc_calib', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1687];
@@ -26102,7 +26102,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 122;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1687] = "alias='amerge_calib', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[1687] = "alias='amerge_calib', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1688];
@@ -26118,7 +26118,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 135;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1688] = "alias='atmo_calib', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[1688] = "alias='atmo_calib', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1689];
@@ -26134,7 +26134,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 184;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1689] = "alias='cpsl', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[1689] = "alias='cpsl', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1690];
@@ -26150,7 +26150,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 186;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1690] = "alias='orb', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[1690] = "alias='orb', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1691];
@@ -26166,7 +26166,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 196;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1691] = "alias='bayernr_v1', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[1691] = "alias='bayernr_v1', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1692];
@@ -26182,7 +26182,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 210;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1692] = "alias='mfnr_v1', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[1692] = "alias='mfnr_v1', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1693];
@@ -26198,7 +26198,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 224;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1693] = "alias='uvnr_v1', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[1693] = "alias='uvnr_v1', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1694];
@@ -26214,7 +26214,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 219;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1694] = "alias='ynr_v1', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[1694] = "alias='ynr_v1', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1695];
@@ -26230,7 +26230,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 230;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1695] = "alias='sharp_v1', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[1695] = "alias='sharp_v1', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1696];
@@ -26246,7 +26246,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 236;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1696] = "alias='edgefilter_v1', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[1696] = "alias='edgefilter_v1', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1697];
@@ -26262,7 +26262,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 189;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1697] = "alias='debayer_calib', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[1697] = "alias='debayer_calib', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1698];
@@ -26278,7 +26278,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 238;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1698] = "alias='cproc_calib', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[1698] = "alias='cproc_calib', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1699];
@@ -26294,7 +26294,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 240;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1699] = "alias='aie_calib', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[1699] = "alias='aie_calib', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1700];
@@ -26310,7 +26310,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 283;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1700] = "alias='lsc_v2', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[1700] = "alias='lsc_v2', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1701];
@@ -26326,7 +26326,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 241;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1701] = "alias='eis_calib', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[1701] = "alias='eis_calib', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1702];
@@ -26342,7 +26342,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 312;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1702] = "alias='colorAsGrey', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[1702] = "alias='colorAsGrey', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1703];
@@ -26358,7 +26358,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 313;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1703] = "alias='lumaDetect_calib', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[1703] = "alias='lumaDetect_calib', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1704];
@@ -26374,7 +26374,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 305;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1704] = "alias='afec_calib', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[1704] = "alias='afec_calib', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1705];
@@ -26390,7 +26390,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 303;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1705] = "alias='aldch', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[1705] = "alias='aldch', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1706];
@@ -26406,7 +26406,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 251;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1706] = "alias='ccm_calib', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[1706] = "alias='ccm_calib', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1707];
@@ -26422,7 +26422,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 258;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1707] = "alias='lut3d_calib', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[1707] = "alias='lut3d_calib', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1708];
@@ -26438,7 +26438,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 296;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1708] = "alias='af_calib', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[1708] = "alias='af_calib', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1709];
@@ -26467,7 +26467,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1710] = "alias='EnvLv', type='f32', size='[1, 100]', range='[0, 1]', default='0', digit='[3]', dynamic='1', hide='0'";
+	ctx->descs[1710] = "alias='EnvLv', type='f32', size='[1, 100]', range='[0, 1]', default='0', digit='[3]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1711];
@@ -26496,7 +26496,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1712] = "alias='DrcGain', type='f32', size='[1, 100]', range='[1, 8]', default='4', digit='[2]', dynamic='1', hide='0'";
+	ctx->descs[1712] = "alias='DrcGain', type='f32', size='[1, 100]', range='[1, 8]', default='4', digit='[2]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1713];
@@ -26525,7 +26525,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1714] = "alias='Alpha', type='f32', size='[1, 100]', range='[0, 1]', default='0.2', digit='[2]', dynamic='1', hide='0'";
+	ctx->descs[1714] = "alias='Alpha', type='f32', size='[1, 100]', range='[0, 1]', default='0.2', digit='[2]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1715];
@@ -26554,7 +26554,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1716] = "alias='Clip', type='f32', size='[1, 100]', range='[0, 64]', default='16', digit='[2]', dynamic='1', hide='0'";
+	ctx->descs[1716] = "alias='Clip', type='f32', size='[1, 100]', range='[0, 64]', default='16', digit='[2]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1717];
@@ -26583,7 +26583,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1718] = "alias='EnvLv', type='f32', size='[1, 100]', range='[0, 1]', default='0', digit='[3]', dynamic='1', hide='0'";
+	ctx->descs[1718] = "alias='EnvLv', type='f32', size='[1, 100]', range='[0, 1]', default='0', digit='[3]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1719];
@@ -26612,7 +26612,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1720] = "alias='Strength', type='f32', size='[1, 100]', range='[0, 1]', default='1', digit='[2]', dynamic='1', hide='0'";
+	ctx->descs[1720] = "alias='Strength', type='f32', size='[1, 100]', range='[0, 1]', default='1', digit='[2]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1721];
@@ -26641,7 +26641,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1722] = "alias='EnvLv', type='f32', size='[1, 100]', range='[0, 1]', default='0', digit='[2]', dynamic='1', hide='0'";
+	ctx->descs[1722] = "alias='EnvLv', type='f32', size='[1, 100]', range='[0, 1]', default='0', digit='[2]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1723];
@@ -26670,7 +26670,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1724] = "alias='LocalWeit', type='f32', size='[1, 100]', range='[0, 1]', default='1', digit='[2]', dynamic='1', hide='0'";
+	ctx->descs[1724] = "alias='LocalWeit', type='f32', size='[1, 100]', range='[0, 1]', default='1', digit='[2]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1725];
@@ -26699,7 +26699,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1726] = "alias='GlobalContrast', type='f32', size='[1, 100]', range='[0, 1]', default='0', digit='[3]', dynamic='1', hide='0'";
+	ctx->descs[1726] = "alias='GlobalContrast', type='f32', size='[1, 100]', range='[0, 1]', default='0', digit='[3]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1727];
@@ -26728,7 +26728,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1728] = "alias='LoLitContrast', type='f32', size='[1, 100]', range='[0, 1]', default='0', digit='[3]', dynamic='1', hide='0'";
+	ctx->descs[1728] = "alias='LoLitContrast', type='f32', size='[1, 100]', range='[0, 1]', default='0', digit='[3]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1729];
@@ -26757,7 +26757,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 317;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1730] = "alias='LocalTMOData', type='struct', ui_module='array_table_ui', index='none', hide='0'";
+	ctx->descs[1730] = "alias='LocalTMOData', type='struct', ui_module='array_table_ui', index='none', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1731];
@@ -26773,7 +26773,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1731] = "alias='curPixWeit', type='f32', size='[1,1]', range='[0, 1]', default='0.37', digit='[3]', hide='0'";
+	ctx->descs[1731] = "alias='curPixWeit', type='f32', size='[1,1]', range='[0, 1]', default='0.37', digit='[3]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1732];
@@ -26789,7 +26789,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1732] = "alias='preFrameWeit', type='f32', size='[1,1]', range='[0, 1]', default='1.0', digit='[3]', hide='0'";
+	ctx->descs[1732] = "alias='preFrameWeit', type='f32', size='[1,1]', range='[0, 1]', default='1.0', digit='[3]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1733];
@@ -26805,7 +26805,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1733] = "alias='Range_force_sgm', type='f32', size='[1,1]', range='[0, 1]', default='0.0', digit='[4]', hide='0'";
+	ctx->descs[1733] = "alias='Range_force_sgm', type='f32', size='[1,1]', range='[0, 1]', default='0.0', digit='[4]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1734];
@@ -26821,7 +26821,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1734] = "alias='Range_sgm_cur', type='f32', size='[1,1]', range='[0, 1]', default='0.125', digit='[4]', hide='0'";
+	ctx->descs[1734] = "alias='Range_sgm_cur', type='f32', size='[1,1]', range='[0, 1]', default='0.125', digit='[4]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1735];
@@ -26837,7 +26837,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1735] = "alias='Range_sgm_pre', type='f32', size='[1,1]', range='[0, 1]', default='0.125', digit='[4]', hide='0'";
+	ctx->descs[1735] = "alias='Range_sgm_pre', type='f32', size='[1,1]', range='[0, 1]', default='0.125', digit='[4]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1736];
@@ -26853,7 +26853,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1736] = "alias='Space_sgm_cur', type='u16', size='[1,1]', range='[0, 4095]', default='4068', digit='[0]', hide='0'";
+	ctx->descs[1736] = "alias='Space_sgm_cur', type='u16', size='[1,1]', range='[0, 4095]', default='4068', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1737];
@@ -26869,7 +26869,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1737] = "alias='Space_sgm_pre', type='u16', size='[1,1]', range='[0, 4095]', default='3968', digit='[0]', hide='0'";
+	ctx->descs[1737] = "alias='Space_sgm_pre', type='u16', size='[1,1]', range='[0, 4095]', default='3968', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1738];
@@ -26885,7 +26885,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = 48;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1738] = "type='enum', alias='Mode', enum_def='CompressMode_t', default='COMPRESS_AUTO'";
+	ctx->descs[1738] = "type='enum', alias='Mode', enum_def='CompressMode_t', default='COMPRESS_AUTO', ro='0'";
 #endif
 
 	obj = &ctx->objs[1739];
@@ -26901,7 +26901,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1739] = "alias='Manual_curve', type='u32', size='[1, 17]', range='[0, 8192]', default='[0 558 1087 1588 2063 2515 2944 3353 3744 4473 5139 5751 6316 6838 7322 7772 8192]', digit='[0]', dynamic='0', ui_module='curve_table'";
+	ctx->descs[1739] = "alias='Manual_curve', type='u32', size='[1, 17]', range='[0, 8192]', default='[0 558 1087 1588 2063 2515 2944 3353 3744 4473 5139 5751 6316 6838 7322 7772 8192]', digit='[0]', dynamic='0', ui_module='curve_table', ro='0'";
 #endif
 
 	obj = &ctx->objs[1740];
@@ -26917,7 +26917,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1740] = "type='bool', alias='Enable', default='1', hide='0'";
+	ctx->descs[1740] = "type='bool', alias='Enable', default='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1741];
@@ -26933,7 +26933,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 315;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1741] = "alias='DrcGain', type='struct', ui_module='array_table_ui', index='none', hide='0'";
+	ctx->descs[1741] = "alias='DrcGain', type='struct', ui_module='array_table_ui', index='none', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1742];
@@ -26949,7 +26949,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 316;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1742] = "alias='HiLight', type='struct', ui_module='array_table_ui', index='none', hide='0'";
+	ctx->descs[1742] = "alias='HiLight', type='struct', ui_module='array_table_ui', index='none', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1743];
@@ -26965,7 +26965,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 318;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1743] = "alias='LocalTMOSetting', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[1743] = "alias='LocalTMOSetting', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1744];
@@ -26981,7 +26981,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 319;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1744] = "alias='CompressSetting', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[1744] = "alias='CompressSetting', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1745];
@@ -26997,7 +26997,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1745] = "alias='Scale_y', type='u16', size='[1, 17]', range='[0, 2048]', default='[0 2 20 76 193 381 631 772 919 1066 1211 1479 1700 1863 1968 2024 2048]', digit='[0]', dynamic='0', hide='0'";
+	ctx->descs[1745] = "alias='Scale_y', type='u16', size='[1, 17]', range='[0, 2048]', default='[0 2 20 76 193 381 631 772 919 1066 1211 1479 1700 1863 1968 2024 2048]', digit='[0]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1746];
@@ -27013,7 +27013,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1746] = "alias='ByPassThr', type='f32', size='[1,1]', range='[0, 1]', default='0', digit='[4]', hide='0'";
+	ctx->descs[1746] = "alias='ByPassThr', type='f32', size='[1,1]', range='[0, 1]', default='0', digit='[4]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1747];
@@ -27029,7 +27029,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1747] = "alias='Edge_Weit', type='f32', size='[1,1]', range='[0, 1]', default='1', digit='[3]', hide='0'";
+	ctx->descs[1747] = "alias='Edge_Weit', type='f32', size='[1,1]', range='[0, 1]', default='1', digit='[3]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1748];
@@ -27045,7 +27045,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1748] = "type='bool', alias='OutPutLongFrame', default='0', hide='0'";
+	ctx->descs[1748] = "type='bool', alias='OutPutLongFrame', default='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1749];
@@ -27061,7 +27061,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1749] = "alias='IIR_frame', type='u8', size='[1,1]', range='[1, 1000]', default='16', digit='[0]', hide='0'";
+	ctx->descs[1749] = "alias='IIR_frame', type='u8', size='[1,1]', range='[1, 1000]', default='16', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1750];
@@ -27077,7 +27077,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1750] = "alias='Tolerance', type='f32', size='[1,1]', range='[0, 1]', default='0', digit='[3]', hide='0'";
+	ctx->descs[1750] = "alias='Tolerance', type='f32', size='[1,1]', range='[0, 1]', default='0', digit='[3]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1751];
@@ -27093,7 +27093,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1751] = "alias='damp', type='f32', size='[1,1]', range='[0, 1]', default='0.9', digit='[3]', hide='0'";
+	ctx->descs[1751] = "alias='damp', type='f32', size='[1,1]', range='[0, 1]', default='0.9', digit='[3]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1752];
@@ -27109,7 +27109,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 320;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1752] = "alias='DrcTuningPara', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[1752] = "alias='DrcTuningPara', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1753];
@@ -27125,7 +27125,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1753] = "alias='EnvLv', type='f32', size='[1, 100]', range='[0, 1]', default='0', digit='[2]', dynamic='1', hide='0'";
+	ctx->descs[1753] = "alias='EnvLv', type='f32', size='[1, 100]', range='[0, 1]', default='0', digit='[2]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1754];
@@ -27154,7 +27154,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1755] = "alias='LocalWeit', type='f32', size='[1, 100]', range='[0, 1]', default='1', digit='[2]', dynamic='1', hide='0'";
+	ctx->descs[1755] = "alias='LocalWeit', type='f32', size='[1, 100]', range='[0, 1]', default='1', digit='[2]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1756];
@@ -27183,7 +27183,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1757] = "alias='LocalAutoEnable', type='u8', size='[1, 100]', range='[0, 1]', default='1', digit='[0]', dynamic='1', hide='0'";
+	ctx->descs[1757] = "alias='LocalAutoEnable', type='u8', size='[1, 100]', range='[0, 1]', default='1', digit='[0]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1758];
@@ -27212,7 +27212,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1759] = "alias='LocalAutoWeit', type='f32', size='[1, 100]', range='[0, 1]', default='0.037477', digit='[5]', dynamic='1', hide='0'";
+	ctx->descs[1759] = "alias='LocalAutoWeit', type='f32', size='[1, 100]', range='[0, 1]', default='0.037477', digit='[5]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1760];
@@ -27241,7 +27241,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1761] = "alias='GlobalContrast', type='f32', size='[1, 100]', range='[0, 1]', default='0', digit='[3]', dynamic='1', hide='0'";
+	ctx->descs[1761] = "alias='GlobalContrast', type='f32', size='[1, 100]', range='[0, 1]', default='0', digit='[3]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1762];
@@ -27270,7 +27270,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1763] = "alias='LoLitContrast', type='f32', size='[1, 100]', range='[0, 1]', default='0', digit='[3]', dynamic='1', hide='0'";
+	ctx->descs[1763] = "alias='LoLitContrast', type='f32', size='[1, 100]', range='[0, 1]', default='0', digit='[3]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1764];
@@ -27299,7 +27299,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 322;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1765] = "alias='LocalData', type='struct', ui_module='array_table_ui', index='none', hide='0'";
+	ctx->descs[1765] = "alias='LocalData', type='struct', ui_module='array_table_ui', index='none', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1766];
@@ -27315,7 +27315,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1766] = "alias='curPixWeit', type='f32', size='[1,1]', range='[0, 1]', default='0.37', digit='[3]', hide='0'";
+	ctx->descs[1766] = "alias='curPixWeit', type='f32', size='[1,1]', range='[0, 1]', default='0.37', digit='[3]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1767];
@@ -27331,7 +27331,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1767] = "alias='preFrameWeit', type='f32', size='[1,1]', range='[0, 1]', default='1.0', digit='[3]', hide='0'";
+	ctx->descs[1767] = "alias='preFrameWeit', type='f32', size='[1,1]', range='[0, 1]', default='1.0', digit='[3]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1768];
@@ -27347,7 +27347,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1768] = "alias='Range_force_sgm', type='f32', size='[1,1]', range='[0, 1]', default='0.0', digit='[4]', hide='0'";
+	ctx->descs[1768] = "alias='Range_force_sgm', type='f32', size='[1,1]', range='[0, 1]', default='0.0', digit='[4]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1769];
@@ -27363,7 +27363,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1769] = "alias='Range_sgm_cur', type='f32', size='[1,1]', range='[0, 1]', default='0.125', digit='[4]', hide='0'";
+	ctx->descs[1769] = "alias='Range_sgm_cur', type='f32', size='[1,1]', range='[0, 1]', default='0.125', digit='[4]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1770];
@@ -27379,7 +27379,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1770] = "alias='Range_sgm_pre', type='f32', size='[1,1]', range='[0, 1]', default='0.125', digit='[4]', hide='0'";
+	ctx->descs[1770] = "alias='Range_sgm_pre', type='f32', size='[1,1]', range='[0, 1]', default='0.125', digit='[4]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1771];
@@ -27395,7 +27395,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1771] = "alias='Space_sgm_cur', type='u16', size='[1,1]', range='[0, 4095]', default='4068', digit='[0]', hide='0'";
+	ctx->descs[1771] = "alias='Space_sgm_cur', type='u16', size='[1,1]', range='[0, 4095]', default='4068', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1772];
@@ -27411,7 +27411,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1772] = "alias='Space_sgm_pre', type='u16', size='[1,1]', range='[0, 4095]', default='3968', digit='[0]', hide='0'";
+	ctx->descs[1772] = "alias='Space_sgm_pre', type='u16', size='[1,1]', range='[0, 4095]', default='3968', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1773];
@@ -27427,7 +27427,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1773] = "type='bool', alias='Enable', default='1', hide='0'";
+	ctx->descs[1773] = "type='bool', alias='Enable', default='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1774];
@@ -27443,7 +27443,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 315;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1774] = "alias='DrcGain', type='struct', ui_module='array_table_ui', index='none', hide='0'";
+	ctx->descs[1774] = "alias='DrcGain', type='struct', ui_module='array_table_ui', index='none', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1775];
@@ -27459,7 +27459,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 316;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1775] = "alias='HiLight', type='struct', ui_module='array_table_ui', index='none', hide='0'";
+	ctx->descs[1775] = "alias='HiLight', type='struct', ui_module='array_table_ui', index='none', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1776];
@@ -27475,7 +27475,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 323;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1776] = "alias='LocalSetting', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[1776] = "alias='LocalSetting', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1777];
@@ -27491,7 +27491,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 319;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1777] = "alias='CompressSetting', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[1777] = "alias='CompressSetting', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1778];
@@ -27507,7 +27507,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1778] = "alias='Scale_y', type='u16', size='[1, 17]', range='[0, 2048]', default='[0 2 20 76 193 381 631 772 919 1066 1211 1479 1700 1863 1968 2024 2048]', digit='[0]', dynamic='0', hide='0'";
+	ctx->descs[1778] = "alias='Scale_y', type='u16', size='[1, 17]', range='[0, 2048]', default='[0 2 20 76 193 381 631 772 919 1066 1211 1479 1700 1863 1968 2024 2048]', digit='[0]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1779];
@@ -27523,7 +27523,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1779] = "alias='ByPassThr', type='f32', size='[1,1]', range='[0, 1]', default='0', digit='[4]', hide='0'";
+	ctx->descs[1779] = "alias='ByPassThr', type='f32', size='[1,1]', range='[0, 1]', default='0', digit='[4]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1780];
@@ -27539,7 +27539,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1780] = "alias='Edge_Weit', type='f32', size='[1,1]', range='[0, 1]', default='1', digit='[3]', hide='0'";
+	ctx->descs[1780] = "alias='Edge_Weit', type='f32', size='[1,1]', range='[0, 1]', default='1', digit='[3]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1781];
@@ -27555,7 +27555,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1781] = "type='bool', alias='OutPutLongFrame', default='0', hide='0'";
+	ctx->descs[1781] = "type='bool', alias='OutPutLongFrame', default='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1782];
@@ -27571,7 +27571,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1782] = "alias='IIR_frame', type='u8', size='[1,1]', range='[1, 1000]', default='16', digit='[0]', hide='0'";
+	ctx->descs[1782] = "alias='IIR_frame', type='u8', size='[1,1]', range='[1, 1000]', default='16', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1783];
@@ -27587,7 +27587,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1783] = "alias='Tolerance', type='f32', size='[1,1]', range='[0, 1]', default='0', digit='[3]', hide='0'";
+	ctx->descs[1783] = "alias='Tolerance', type='f32', size='[1,1]', range='[0, 1]', default='0', digit='[3]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1784];
@@ -27603,7 +27603,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1784] = "alias='damp', type='f32', size='[1,1]', range='[0, 1]', default='0.9', digit='[3]', hide='0'";
+	ctx->descs[1784] = "alias='damp', type='f32', size='[1,1]', range='[0, 1]', default='0.9', digit='[3]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1785];
@@ -27619,7 +27619,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 324;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1785] = "alias='DrcTuningPara', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[1785] = "alias='DrcTuningPara', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1786];
@@ -27635,7 +27635,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1786] = "alias='iso', type='f32', range='[50, 204800]', default='50', digit='[1]', ui_module_param='index2'";
+	ctx->descs[1786] = "alias='iso', type='f32', range='[50, 204800]', default='50', digit='[1]', ui_module_param='index2', ro='0'";
 #endif
 
 	obj = &ctx->objs[1787];
@@ -27651,7 +27651,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1787] = "alias='lumapoint', type='s32', size='[1, 16]', range='[0, 65535]', default='0.0', digit='[0]', dynamic='0', hide='0'";
+	ctx->descs[1787] = "alias='lumapoint', type='s32', size='[1, 16]', range='[0, 65535]', default='0.0', digit='[0]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1788];
@@ -27667,7 +27667,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1788] = "alias='sigma', type='s32', size='[1, 16]', range='[0, 65535]', default='0.0', digit='[0]', dynamic='0', hide='0'";
+	ctx->descs[1788] = "alias='sigma', type='s32', size='[1, 16]', range='[0, 65535]', default='0.0', digit='[0]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1789];
@@ -27683,7 +27683,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1789] = "alias='SNR_Mode', type='string', size='[1, 1]', range='[0, 64]', default='LSNR', dynamic='0', ui_module_param='index1'";
+	ctx->descs[1789] = "alias='SNR_Mode', type='string', size='[1, 1]', range='[0, 64]', default='LSNR', dynamic='0', ui_module_param='index1', ro='0'";
 #endif
 
 	obj = &ctx->objs[1790];
@@ -27699,7 +27699,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1790] = "alias='Sensor_Mode', type='string', size='[1, 1]', range='[0, 64]', default='lcg', dynamic='0', hide='0'";
+	ctx->descs[1790] = "alias='Sensor_Mode', type='string', size='[1, 1]', range='[0, 64]', default='lcg', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1791];
@@ -27715,7 +27715,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 326;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1791] = "alias='Calib_ISO', type='struct_list', size='dynamic', ui_module='double_index_list'";
+	ctx->descs[1791] = "alias='Calib_ISO', type='struct_list', size='dynamic', ui_module='double_index_list', ro='0'";
 #endif
 
 	obj = &ctx->objs[1792];
@@ -27744,7 +27744,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 327;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1793] = "alias='Setting', type='struct_list', size='dynamic', ui_module='double_index_list'";
+	ctx->descs[1793] = "alias='Setting', type='struct_list', size='dynamic', ui_module='double_index_list', ro='0'";
 #endif
 
 	obj = &ctx->objs[1794];
@@ -27773,7 +27773,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1795] = "alias='iso', type='f32', range='[50, 204800]', default='50', digit='[1]', ui_module_param='index2'";
+	ctx->descs[1795] = "alias='iso', type='f32', range='[50, 204800]', default='50', digit='[1]', ui_module_param='index2', ro='0'";
 #endif
 
 	obj = &ctx->objs[1796];
@@ -27789,7 +27789,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1796] = "type='bool', alias='gauss_guide', default='1', hide='0'";
+	ctx->descs[1796] = "type='bool', alias='gauss_guide', default='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1797];
@@ -27805,7 +27805,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1797] = "alias='filter_strength', type='f32', size='[1,1]', range='[0, 16]', default='0.5', digit='[2]', hide='0'";
+	ctx->descs[1797] = "alias='filter_strength', type='f32', size='[1,1]', range='[0, 16]', default='0.5', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1798];
@@ -27821,7 +27821,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1798] = "alias='edgesofts', type='f32', size='[1,1]', range='[0, 1.0]', default='1.0', digit='[2]', hide='0'";
+	ctx->descs[1798] = "alias='edgesofts', type='f32', size='[1,1]', range='[0, 1.0]', default='1.0', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1799];
@@ -27837,7 +27837,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1799] = "alias='ratio', type='f32', size='[1,1]', range='[0, 1.0]', default='0.2', digit='[2]', hide='0'";
+	ctx->descs[1799] = "alias='ratio', type='f32', size='[1,1]', range='[0, 1.0]', default='0.2', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1800];
@@ -27853,7 +27853,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1800] = "alias='weight', type='f32', size='[1,1]', range='[0, 1.0]', default='1.0', digit='[2]', hide='0'";
+	ctx->descs[1800] = "alias='weight', type='f32', size='[1,1]', range='[0, 1.0]', default='1.0', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1801];
@@ -27869,7 +27869,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1801] = "alias='SNR_Mode', type='string', size='[1, 1]', range='[0, 64]', default='LSNR', dynamic='0', ui_module_param='index1'";
+	ctx->descs[1801] = "alias='SNR_Mode', type='string', size='[1, 1]', range='[0, 64]', default='LSNR', dynamic='0', ui_module_param='index1', ro='0'";
 #endif
 
 	obj = &ctx->objs[1802];
@@ -27885,7 +27885,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1802] = "alias='Sensor_Mode', type='string', size='[1, 1]', range='[0, 64]', default='lcg', dynamic='0', hide='0'";
+	ctx->descs[1802] = "alias='Sensor_Mode', type='string', size='[1, 1]', range='[0, 64]', default='lcg', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1803];
@@ -27901,7 +27901,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 329;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1803] = "alias='Tuning_ISO', type='struct_list', size='dynamic', ui_module='double_index_list'";
+	ctx->descs[1803] = "alias='Tuning_ISO', type='struct_list', size='dynamic', ui_module='double_index_list', ro='0'";
 #endif
 
 	obj = &ctx->objs[1804];
@@ -27930,7 +27930,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1805] = "type='bool', alias='enable', default='1', hide='0'";
+	ctx->descs[1805] = "type='bool', alias='enable', default='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1806];
@@ -27946,7 +27946,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 330;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1806] = "alias='Setting', type='struct_list', size='dynamic', ui_module='double_index_list'";
+	ctx->descs[1806] = "alias='Setting', type='struct_list', size='dynamic', ui_module='double_index_list', ro='0'";
 #endif
 
 	obj = &ctx->objs[1807];
@@ -27975,7 +27975,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1808] = "alias='iso', type='f32', range='[50, 204800]', default='50', digit='[1]', ui_module_param='index2'";
+	ctx->descs[1808] = "alias='iso', type='f32', range='[50, 204800]', default='50', digit='[1]', ui_module_param='index2', ro='0'";
 #endif
 
 	obj = &ctx->objs[1809];
@@ -27991,7 +27991,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1809] = "alias='filter_strength', type='f32', size='[1,1]', range='[0, 1]', default='0.5', digit='[2]', hide='0'";
+	ctx->descs[1809] = "alias='filter_strength', type='f32', size='[1,1]', range='[0, 1]', default='0.5', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1810];
@@ -28007,7 +28007,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1810] = "alias='sp_filter_strength', type='f32', size='[1,1]', range='[0, 1]', default='0.5', digit='[2]', hide='1'";
+	ctx->descs[1810] = "alias='sp_filter_strength', type='f32', size='[1,1]', range='[0, 1]', default='0.5', digit='[2]', hide='1', ro='0'";
 #endif
 
 	obj = &ctx->objs[1811];
@@ -28023,7 +28023,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1811] = "alias='lo_clipwgt', type='f32', size='[1,1]', range='[0, 1.0]', default='0.01', digit='[3]', hide='0'";
+	ctx->descs[1811] = "alias='lo_clipwgt', type='f32', size='[1,1]', range='[0, 1.0]', default='0.01', digit='[3]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1812];
@@ -28039,7 +28039,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1812] = "alias='hi_clipwgt', type='f32', size='[1,1]', range='[0, 1.0]', default='0.01', digit='[3]', hide='0'";
+	ctx->descs[1812] = "alias='hi_clipwgt', type='f32', size='[1,1]', range='[0, 1.0]', default='0.01', digit='[3]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1813];
@@ -28055,7 +28055,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1813] = "alias='softwgt', type='f32', size='[1,1]', range='[0, 1]', default='0.0', digit='[2]', hide='0'";
+	ctx->descs[1813] = "alias='softwgt', type='f32', size='[1,1]', range='[0, 1]', default='0.0', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1814];
@@ -28071,7 +28071,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1814] = "alias='SNR_Mode', type='string', size='[1, 1]', range='[0, 64]', default='LSNR', dynamic='0', ui_module_param='index1'";
+	ctx->descs[1814] = "alias='SNR_Mode', type='string', size='[1, 1]', range='[0, 64]', default='LSNR', dynamic='0', ui_module_param='index1', ro='0'";
 #endif
 
 	obj = &ctx->objs[1815];
@@ -28087,7 +28087,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1815] = "alias='Sensor_Mode', type='string', size='[1, 1]', range='[0, 64]', default='lcg', dynamic='0', hide='0'";
+	ctx->descs[1815] = "alias='Sensor_Mode', type='string', size='[1, 1]', range='[0, 64]', default='lcg', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1816];
@@ -28103,7 +28103,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 332;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1816] = "alias='Tuning_ISO', type='struct_list', size='dynamic', ui_module='double_index_list'";
+	ctx->descs[1816] = "alias='Tuning_ISO', type='struct_list', size='dynamic', ui_module='double_index_list', ro='0'";
 #endif
 
 	obj = &ctx->objs[1817];
@@ -28132,7 +28132,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1818] = "type='bool', alias='enable', default='1', hide='0'";
+	ctx->descs[1818] = "type='bool', alias='enable', default='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1819];
@@ -28148,7 +28148,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 333;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1819] = "alias='Setting', type='struct_list', size='dynamic', ui_module='double_index_list'";
+	ctx->descs[1819] = "alias='Setting', type='struct_list', size='dynamic', ui_module='double_index_list', ro='0'";
 #endif
 
 	obj = &ctx->objs[1820];
@@ -28177,7 +28177,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1821] = "alias='Version', type='string', size='[1, 1]', range='[0, 64]', default='V2', dynamic='0', hide='0'";
+	ctx->descs[1821] = "alias='Version', type='string', size='[1, 1]', range='[0, 64]', default='V2', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1822];
@@ -28193,7 +28193,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 328;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1822] = "alias='CalibPara', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[1822] = "alias='CalibPara', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1823];
@@ -28209,7 +28209,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 331;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1823] = "alias='Bayernr2D', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[1823] = "alias='Bayernr2D', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1824];
@@ -28225,7 +28225,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 334;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1824] = "alias='Bayernr3D', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[1824] = "alias='Bayernr3D', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1825];
@@ -28241,7 +28241,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1825] = "alias='iso', type='f32', range='[50, 204800]', default='50', digit='[1]', ui_module_param='index2'";
+	ctx->descs[1825] = "alias='iso', type='f32', range='[50, 204800]', default='50', digit='[1]', ui_module_param='index2', ro='0'";
 #endif
 
 	obj = &ctx->objs[1826];
@@ -28257,7 +28257,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1826] = "type='bool', alias='hf_bypass', default='0', hide='0'";
+	ctx->descs[1826] = "type='bool', alias='hf_bypass', default='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1827];
@@ -28273,7 +28273,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1827] = "type='bool', alias='lf_bypass', default='0', hide='0'";
+	ctx->descs[1827] = "type='bool', alias='lf_bypass', default='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1828];
@@ -28289,7 +28289,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1828] = "alias='cnr_exgain', type='f32', size='[1,1]', range='[0, 1.0]', default='1.0', digit='[2]', hide='1'";
+	ctx->descs[1828] = "alias='cnr_exgain', type='f32', size='[1,1]', range='[0, 1.0]', default='1.0', digit='[2]', hide='1', ro='0'";
 #endif
 
 	obj = &ctx->objs[1829];
@@ -28305,7 +28305,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1829] = "alias='cnr_g_gain', type='f32', size='[1,1]', range='[0, 1.0]', default='1.0', digit='[2]', hide='1'";
+	ctx->descs[1829] = "alias='cnr_g_gain', type='f32', size='[1,1]', range='[0, 1.0]', default='1.0', digit='[2]', hide='1', ro='0'";
 #endif
 
 	obj = &ctx->objs[1830];
@@ -28321,7 +28321,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1830] = "alias='color_sat_adj', type='f32', size='[1,1]', range='[1, 255.0]', default='40.0', digit='[2]', hide='0'";
+	ctx->descs[1830] = "alias='color_sat_adj', type='f32', size='[1,1]', range='[1, 255.0]', default='40.0', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1831];
@@ -28337,7 +28337,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1831] = "alias='color_sat_adj_alpha', type='f32', size='[1,1]', range='[0.0, 1.0]', default='0.8', digit='[2]', hide='0'";
+	ctx->descs[1831] = "alias='color_sat_adj_alpha', type='f32', size='[1,1]', range='[0.0, 1.0]', default='0.8', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1832];
@@ -28353,7 +28353,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1832] = "alias='hf_spikes_reducion_strength', type='f32', size='[1,1]', range='[0.0, 1.0]', default='0.5', digit='[2]', hide='0'";
+	ctx->descs[1832] = "alias='hf_spikes_reducion_strength', type='f32', size='[1,1]', range='[0.0, 1.0]', default='0.5', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1833];
@@ -28369,7 +28369,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1833] = "alias='hf_denoise_strength', type='f32', size='[1,1]', range='[1, 1023.0]', default='10', digit='[2]', hide='0'";
+	ctx->descs[1833] = "alias='hf_denoise_strength', type='f32', size='[1,1]', range='[1, 1023.0]', default='10', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1834];
@@ -28385,7 +28385,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1834] = "alias='hf_color_sat', type='f32', size='[1,1]', range='[0.0, 8.0]', default='1.5', digit='[2]', hide='0'";
+	ctx->descs[1834] = "alias='hf_color_sat', type='f32', size='[1,1]', range='[0.0, 8.0]', default='1.5', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1835];
@@ -28401,7 +28401,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1835] = "alias='hf_denoise_alpha', type='f32', size='[1,1]', range='[0.0, 1.0]', default='0.0', digit='[2]', hide='0'";
+	ctx->descs[1835] = "alias='hf_denoise_alpha', type='f32', size='[1,1]', range='[0.0, 1.0]', default='0.0', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1836];
@@ -28417,7 +28417,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1836] = "alias='hf_bf_wgt_clip', type='u32', size='[1,1]', range='[0, 255]', default='0', digit='[0]', hide='0'";
+	ctx->descs[1836] = "alias='hf_bf_wgt_clip', type='u32', size='[1,1]', range='[0, 255]', default='0', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1837];
@@ -28433,7 +28433,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1837] = "alias='thumb_spikes_reducion_strength', type='f32', size='[1,1]', range='[0.0, 1.0]', default='0.2', digit='[2]', hide='0'";
+	ctx->descs[1837] = "alias='thumb_spikes_reducion_strength', type='f32', size='[1,1]', range='[0.0, 1.0]', default='0.2', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1838];
@@ -28449,7 +28449,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1838] = "alias='thumb_denoise_strength', type='f32', size='[1,1]', range='[1, 1023]', default='4.0', digit='[2]', hide='0'";
+	ctx->descs[1838] = "alias='thumb_denoise_strength', type='f32', size='[1,1]', range='[1, 1023]', default='4.0', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1839];
@@ -28465,7 +28465,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1839] = "alias='thumb_color_sat', type='f32', size='[1,1]', range='[0.0, 8.0]', default='4.0', digit='[2]', hide='0'";
+	ctx->descs[1839] = "alias='thumb_color_sat', type='f32', size='[1,1]', range='[0.0, 8.0]', default='4.0', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1840];
@@ -28481,7 +28481,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1840] = "alias='lf_denoise_strength', type='f32', size='[1,1]', range='[1, 1023.0]', default='4.0', digit='[2]', hide='0'";
+	ctx->descs[1840] = "alias='lf_denoise_strength', type='f32', size='[1,1]', range='[1, 1023.0]', default='4.0', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1841];
@@ -28497,7 +28497,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1841] = "alias='lf_color_sat', type='f32', size='[1,1]', range='[0.0, 8.0]', default='2.0', digit='[2]', hide='0'";
+	ctx->descs[1841] = "alias='lf_color_sat', type='f32', size='[1,1]', range='[0.0, 8.0]', default='2.0', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1842];
@@ -28513,7 +28513,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1842] = "alias='lf_denoise_alpha', type='f32', size='[1,1]', range='[0.0, 1.0]', default='1.0', digit='[2]', hide='0'";
+	ctx->descs[1842] = "alias='lf_denoise_alpha', type='f32', size='[1,1]', range='[0.0, 1.0]', default='1.0', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1843];
@@ -28529,7 +28529,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1843] = "alias='SNR_Mode', type='string', size='[1, 1]', range='[0, 64]', default='LSNR', dynamic='0', ui_module_param='index1'";
+	ctx->descs[1843] = "alias='SNR_Mode', type='string', size='[1, 1]', range='[0, 64]', default='LSNR', dynamic='0', ui_module_param='index1', ro='0'";
 #endif
 
 	obj = &ctx->objs[1844];
@@ -28545,7 +28545,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1844] = "alias='Sensor_Mode', type='string', size='[1, 1]', range='[0, 64]', default='lcg', dynamic='0', hide='0'";
+	ctx->descs[1844] = "alias='Sensor_Mode', type='string', size='[1, 1]', range='[0, 64]', default='lcg', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1845];
@@ -28561,7 +28561,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 336;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1845] = "alias='Tuning_ISO', type='struct_list', size='dynamic', ui_module='double_index_list'";
+	ctx->descs[1845] = "alias='Tuning_ISO', type='struct_list', size='dynamic', ui_module='double_index_list', ro='0'";
 #endif
 
 	obj = &ctx->objs[1846];
@@ -28590,7 +28590,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1847] = "alias='kernel_5x5', type='f32', size='[1, 5]', range='[0, 1]', default='[1.0000 0.8825 0.7788 0.6065 0.3679]', digit='[6]', dynamic='0', hide='0'";
+	ctx->descs[1847] = "alias='kernel_5x5', type='f32', size='[1, 5]', range='[0, 1]', default='[1.0000 0.8825 0.7788 0.6065 0.3679]', digit='[6]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1848];
@@ -28606,7 +28606,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1848] = "type='bool', alias='enable', default='1', hide='0'";
+	ctx->descs[1848] = "type='bool', alias='enable', default='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1849];
@@ -28622,7 +28622,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 338;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1849] = "alias='Kernel_Coeff', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[1849] = "alias='Kernel_Coeff', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1850];
@@ -28638,7 +28638,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 337;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1850] = "alias='Setting', type='struct_list', size='dynamic', ui_module='double_index_list'";
+	ctx->descs[1850] = "alias='Setting', type='struct_list', size='dynamic', ui_module='double_index_list', ro='0'";
 #endif
 
 	obj = &ctx->objs[1851];
@@ -28667,7 +28667,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1852] = "alias='Version', type='string', size='[1, 1]', range='[0, 64]', default='V1', dynamic='0', hide='0'";
+	ctx->descs[1852] = "alias='Version', type='string', size='[1, 1]', range='[0, 64]', default='V1', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1853];
@@ -28683,7 +28683,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 339;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1853] = "alias='TuningPara', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[1853] = "alias='TuningPara', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1854];
@@ -28699,7 +28699,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1854] = "alias='iso', type='f32', range='[50, 204800]', default='50', digit='[1]', ui_module_param='index2'";
+	ctx->descs[1854] = "alias='iso', type='f32', range='[50, 204800]', default='50', digit='[1]', ui_module_param='index2', ro='0'";
 #endif
 
 	obj = &ctx->objs[1855];
@@ -28715,7 +28715,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1855] = "alias='sigma_curve', type='f32', size='[1, 5]', range='[-65535.0, 65535]', default='0.0', digit='[6]', dynamic='0', hide='0'";
+	ctx->descs[1855] = "alias='sigma_curve', type='f32', size='[1, 5]', range='[-65535.0, 65535]', default='0.0', digit='[6]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1856];
@@ -28731,7 +28731,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1856] = "alias='ynr_ci_l', type='f32', size='[1,1]', range='[0.0, 2.0]', default='0.5', digit='[3]', hide='0'";
+	ctx->descs[1856] = "alias='ynr_ci_l', type='f32', size='[1,1]', range='[0.0, 2.0]', default='0.5', digit='[3]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1857];
@@ -28747,7 +28747,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1857] = "alias='ynr_ci_h', type='f32', size='[1,1]', range='[0.0, 2.0]', default='0.5', digit='[3]', hide='0'";
+	ctx->descs[1857] = "alias='ynr_ci_h', type='f32', size='[1,1]', range='[0.0, 2.0]', default='0.5', digit='[3]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1858];
@@ -28763,7 +28763,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1858] = "alias='SNR_Mode', type='string', size='[1, 1]', range='[0, 64]', default='LSNR', dynamic='0', ui_module_param='index1'";
+	ctx->descs[1858] = "alias='SNR_Mode', type='string', size='[1, 1]', range='[0, 64]', default='LSNR', dynamic='0', ui_module_param='index1', ro='0'";
 #endif
 
 	obj = &ctx->objs[1859];
@@ -28779,7 +28779,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1859] = "alias='Sensor_Mode', type='string', size='[1, 1]', range='[0, 64]', default='lcg', dynamic='0', hide='0'";
+	ctx->descs[1859] = "alias='Sensor_Mode', type='string', size='[1, 1]', range='[0, 64]', default='lcg', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1860];
@@ -28795,7 +28795,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 341;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1860] = "alias='Calib_ISO', type='struct_list', size='dynamic', ui_module='double_index_list'";
+	ctx->descs[1860] = "alias='Calib_ISO', type='struct_list', size='dynamic', ui_module='double_index_list', ro='0'";
 #endif
 
 	obj = &ctx->objs[1861];
@@ -28824,7 +28824,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 342;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1862] = "alias='Setting', type='struct_list', size='dynamic', ui_module='double_index_list'";
+	ctx->descs[1862] = "alias='Setting', type='struct_list', size='dynamic', ui_module='double_index_list', ro='0'";
 #endif
 
 	obj = &ctx->objs[1863];
@@ -28853,7 +28853,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1864] = "alias='iso', type='f32', range='[50, 204800]', default='50', digit='[1]', ui_module_param='index2'";
+	ctx->descs[1864] = "alias='iso', type='f32', range='[50, 204800]', default='50', digit='[1]', ui_module_param='index2', ro='0'";
 #endif
 
 	obj = &ctx->objs[1865];
@@ -28869,7 +28869,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1865] = "type='bool', alias='ynr_bft3x3_bypass', default='0', hide='0'";
+	ctx->descs[1865] = "type='bool', alias='ynr_bft3x3_bypass', default='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1866];
@@ -28885,7 +28885,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1866] = "type='bool', alias='ynr_lbft5x5_bypass', default='0', hide='0'";
+	ctx->descs[1866] = "type='bool', alias='ynr_lbft5x5_bypass', default='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1867];
@@ -28901,7 +28901,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1867] = "type='bool', alias='ynr_lgft3x3_bypass', default='0', hide='0'";
+	ctx->descs[1867] = "type='bool', alias='ynr_lgft3x3_bypass', default='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1868];
@@ -28917,7 +28917,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1868] = "type='bool', alias='ynr_flt1x1_bypass', default='0', hide='0'";
+	ctx->descs[1868] = "type='bool', alias='ynr_flt1x1_bypass', default='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1869];
@@ -28933,7 +28933,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1869] = "type='bool', alias='ynr_sft5x5_bypass', default='0', hide='0'";
+	ctx->descs[1869] = "type='bool', alias='ynr_sft5x5_bypass', default='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1870];
@@ -28949,7 +28949,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1870] = "alias='low_bf_0', type='f32', size='[1,1]', range='[0.1, 512]', default='0.5', digit='[2]', hide='0'";
+	ctx->descs[1870] = "alias='low_bf_0', type='f32', size='[1,1]', range='[0.1, 512]', default='0.5', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1871];
@@ -28965,7 +28965,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1871] = "alias='low_bf_1', type='f32', size='[1,1]', range='[0.1, 512]', default='0.5', digit='[2]', hide='0'";
+	ctx->descs[1871] = "alias='low_bf_1', type='f32', size='[1,1]', range='[0.1, 512]', default='0.5', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1872];
@@ -28981,7 +28981,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1872] = "alias='low_thred_adj', type='f32', size='[1,1]', range='[0.0, 31.0]', default='0.25', digit='[2]', hide='0'";
+	ctx->descs[1872] = "alias='low_thred_adj', type='f32', size='[1,1]', range='[0.0, 31.0]', default='0.25', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1873];
@@ -28997,7 +28997,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1873] = "alias='low_peak_supress', type='f32', size='[1,1]', range='[0.0, 1.0]', default='0.5', digit='[2]', hide='0'";
+	ctx->descs[1873] = "alias='low_peak_supress', type='f32', size='[1,1]', range='[0.0, 1.0]', default='0.5', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1874];
@@ -29013,7 +29013,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1874] = "alias='low_edge_adj_thresh', type='f32', size='[1,1]', range='[0, 1023]', default='7', digit='[2]', hide='0'";
+	ctx->descs[1874] = "alias='low_edge_adj_thresh', type='f32', size='[1,1]', range='[0, 1023]', default='7', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1875];
@@ -29029,7 +29029,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1875] = "alias='low_center_weight', type='f32', size='[1,1]', range='[0.0, 1.0]', default='0.5', digit='[2]', hide='0'";
+	ctx->descs[1875] = "alias='low_center_weight', type='f32', size='[1,1]', range='[0.0, 1.0]', default='0.5', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1876];
@@ -29045,7 +29045,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1876] = "alias='low_dist_adj', type='f32', size='[1,1]', range='[0.0, 63.0]', default='8.0', digit='[2]', hide='0'";
+	ctx->descs[1876] = "alias='low_dist_adj', type='f32', size='[1,1]', range='[0.0, 63.0]', default='8.0', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1877];
@@ -29061,7 +29061,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1877] = "alias='low_weight', type='f32', size='[1,1]', range='[0.0, 1.0]', default='0.5', digit='[2]', hide='0'";
+	ctx->descs[1877] = "alias='low_weight', type='f32', size='[1,1]', range='[0.0, 1.0]', default='0.5', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1878];
@@ -29077,7 +29077,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1878] = "alias='low_filt_strength_0', type='f32', size='[1,1]', range='[0.0, 1.0]', default='0.7', digit='[2]', hide='0'";
+	ctx->descs[1878] = "alias='low_filt_strength_0', type='f32', size='[1,1]', range='[0.0, 1.0]', default='0.7', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1879];
@@ -29093,7 +29093,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1879] = "alias='low_filt_strength_1', type='f32', size='[1,1]', range='[0.0, 1.0]', default='0.85', digit='[2]', hide='0'";
+	ctx->descs[1879] = "alias='low_filt_strength_1', type='f32', size='[1,1]', range='[0.0, 1.0]', default='0.85', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1880];
@@ -29109,7 +29109,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1880] = "alias='low_bi_weight', type='f32', size='[1,1]', range='[0.0, 1.0]', default='0.2', digit='[2]', hide='0'";
+	ctx->descs[1880] = "alias='low_bi_weight', type='f32', size='[1,1]', range='[0.0, 1.0]', default='0.2', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1881];
@@ -29125,7 +29125,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1881] = "alias='base_filter_weight_0', type='f32', size='[1,1]', range='[0.0, 1.0]', default='0.28', digit='[2]', hide='0'";
+	ctx->descs[1881] = "alias='base_filter_weight_0', type='f32', size='[1,1]', range='[0.0, 1.0]', default='0.28', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1882];
@@ -29141,7 +29141,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1882] = "alias='base_filter_weight_1', type='f32', size='[1,1]', range='[0.0, 1.0]', default='0.46', digit='[2]', hide='0'";
+	ctx->descs[1882] = "alias='base_filter_weight_1', type='f32', size='[1,1]', range='[0.0, 1.0]', default='0.46', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1883];
@@ -29157,7 +29157,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1883] = "alias='base_filter_weight_2', type='f32', size='[1,1]', range='[0.0, 1.0]', default='0.26', digit='[2]', hide='0'";
+	ctx->descs[1883] = "alias='base_filter_weight_2', type='f32', size='[1,1]', range='[0.0, 1.0]', default='0.26', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1884];
@@ -29173,7 +29173,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1884] = "alias='high_thred_adj', type='f32', size='[1,1]', range='[0.0, 31.0]', default='0.5', digit='[2]', hide='0'";
+	ctx->descs[1884] = "alias='high_thred_adj', type='f32', size='[1,1]', range='[0.0, 31.0]', default='0.5', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1885];
@@ -29189,7 +29189,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1885] = "alias='high_weight', type='f32', size='[1,1]', range='[0.0, 1.0]', default='0.5', digit='[2]', hide='0'";
+	ctx->descs[1885] = "alias='high_weight', type='f32', size='[1,1]', range='[0.0, 1.0]', default='0.5', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1886];
@@ -29205,7 +29205,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1886] = "alias='hi_min_adj', type='f32', size='[1,1]', range='[0.0, 1]', default='0.9', digit='[2]', hide='0'";
+	ctx->descs[1886] = "alias='hi_min_adj', type='f32', size='[1,1]', range='[0.0, 1]', default='0.9', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1887];
@@ -29221,7 +29221,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1887] = "alias='hi_edge_thed', type='f32', size='[1,1]', range='[0.0, 255.0]', default='100.0', digit='[2]', hide='0'";
+	ctx->descs[1887] = "alias='hi_edge_thed', type='f32', size='[1,1]', range='[0.0, 255.0]', default='100.0', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1888];
@@ -29237,7 +29237,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1888] = "alias='high_direction_weight', type='f32', size='[1, 8]', range='[0, 1.0]', default='[1 1 1 1 0.5 0.5 0.5 0.5]', digit='[2]', dynamic='0', hide='0'";
+	ctx->descs[1888] = "alias='high_direction_weight', type='f32', size='[1, 8]', range='[0, 1.0]', default='[1 1 1 1 0.5 0.5 0.5 0.5]', digit='[2]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1889];
@@ -29253,7 +29253,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1889] = "alias='rnr_strength', type='f32', size='[1, 17]', range='[0, 16]', default='1.0', digit='[3]', dynamic='0', hide='0'";
+	ctx->descs[1889] = "alias='rnr_strength', type='f32', size='[1, 17]', range='[0, 16]', default='1.0', digit='[3]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1890];
@@ -29269,7 +29269,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1890] = "alias='SNR_Mode', type='string', size='[1, 1]', range='[0, 64]', default='LSNR', dynamic='0', ui_module_param='index1'";
+	ctx->descs[1890] = "alias='SNR_Mode', type='string', size='[1, 1]', range='[0, 64]', default='LSNR', dynamic='0', ui_module_param='index1', ro='0'";
 #endif
 
 	obj = &ctx->objs[1891];
@@ -29285,7 +29285,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1891] = "alias='Sensor_Mode', type='string', size='[1, 1]', range='[0, 64]', default='lcg', dynamic='0', hide='0'";
+	ctx->descs[1891] = "alias='Sensor_Mode', type='string', size='[1, 1]', range='[0, 64]', default='lcg', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1892];
@@ -29301,7 +29301,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 344;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1892] = "alias='Tuning_ISO', type='struct_list', size='dynamic', ui_module='double_index_list'";
+	ctx->descs[1892] = "alias='Tuning_ISO', type='struct_list', size='dynamic', ui_module='double_index_list', ro='0'";
 #endif
 
 	obj = &ctx->objs[1893];
@@ -29330,7 +29330,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1894] = "type='bool', alias='enable', default='1', hide='0'";
+	ctx->descs[1894] = "type='bool', alias='enable', default='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1895];
@@ -29346,7 +29346,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 345;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1895] = "alias='Setting', type='struct_list', size='dynamic', ui_module='double_index_list'";
+	ctx->descs[1895] = "alias='Setting', type='struct_list', size='dynamic', ui_module='double_index_list', ro='0'";
 #endif
 
 	obj = &ctx->objs[1896];
@@ -29375,7 +29375,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1897] = "alias='Version', type='string', size='[1, 1]', range='[0, 64]', default='V2', dynamic='0', hide='0'";
+	ctx->descs[1897] = "alias='Version', type='string', size='[1, 1]', range='[0, 64]', default='V2', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1898];
@@ -29391,7 +29391,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 343;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1898] = "alias='CalibPara', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[1898] = "alias='CalibPara', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1899];
@@ -29407,7 +29407,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 346;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1899] = "alias='TuningPara', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[1899] = "alias='TuningPara', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1900];
@@ -29423,7 +29423,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1900] = "alias='luma_point', type='f32', size='[1, 8]', range='[0, 1024]', default='[0 64 128 256 384 640 896 1024]', digit='[1]', dynamic='0', hide='0'";
+	ctx->descs[1900] = "alias='luma_point', type='f32', size='[1, 8]', range='[0, 1024]', default='[0 64 128 256 384 640 896 1024]', digit='[1]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1901];
@@ -29439,7 +29439,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1901] = "alias='luma_sigma', type='f32', size='[1, 8]', range='[0, 1023]', default='[8 10 10 12 14 12 12 10]', digit='[1]', dynamic='0', hide='0'";
+	ctx->descs[1901] = "alias='luma_sigma', type='f32', size='[1, 8]', range='[0, 1023]', default='[8 10 10 12 14 12 12 10]', digit='[1]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1902];
@@ -29455,7 +29455,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1902] = "alias='hf_clip', type='f32', size='[1, 8]', range='[0, 1023]', default='[10 20 30 56 56 56 56 30]', digit='[1]', dynamic='0', hide='0'";
+	ctx->descs[1902] = "alias='hf_clip', type='f32', size='[1, 8]', range='[0, 1023]', default='[10 20 30 56 56 56 56 30]', digit='[1]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1903];
@@ -29471,7 +29471,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1903] = "alias='local_sharp_strength', type='f32', size='[1, 8]', range='[0, 1023]', default='[1023 1023 1023 1023 1023 1023 1023 1023]', digit='[1]', dynamic='0', hide='0'";
+	ctx->descs[1903] = "alias='local_sharp_strength', type='f32', size='[1, 8]', range='[0, 1023]', default='[1023 1023 1023 1023 1023 1023 1023 1023]', digit='[1]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1904];
@@ -29487,7 +29487,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1904] = "alias='prefilter_coeff', type='f32', size='[1, 3]', range='[0, 1]', default='[0.2042 0.1238 0.0751]', digit='[4]', dynamic='0', hide='0'";
+	ctx->descs[1904] = "alias='prefilter_coeff', type='f32', size='[1, 3]', range='[0, 1]', default='[0.2042 0.1238 0.0751]', digit='[4]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1905];
@@ -29503,7 +29503,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1905] = "alias='GaussianFilter_coeff', type='f32', size='[1, 3]', range='[0, 1]', default='[0.2042 0.1238 0.0751]', digit='[4]', dynamic='0', hide='0'";
+	ctx->descs[1905] = "alias='GaussianFilter_coeff', type='f32', size='[1, 3]', range='[0, 1]', default='[0.2042 0.1238 0.0751]', digit='[4]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1906];
@@ -29519,7 +29519,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1906] = "alias='hfBilateralFilter_coeff', type='f32', size='[1, 3]', range='[0, 1]', default='[0.2042 0.1238 0.0751]', digit='[4]', dynamic='0', hide='0'";
+	ctx->descs[1906] = "alias='hfBilateralFilter_coeff', type='f32', size='[1, 3]', range='[0, 1]', default='[0.2042 0.1238 0.0751]', digit='[4]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1907];
@@ -29535,7 +29535,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1907] = "alias='iso', type='f32', range='[50, 204800]', default='50', digit='[1]', ui_module_param='index2'";
+	ctx->descs[1907] = "alias='iso', type='f32', range='[50, 204800]', default='50', digit='[1]', ui_module_param='index2', ro='0'";
 #endif
 
 	obj = &ctx->objs[1908];
@@ -29551,7 +29551,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1908] = "alias='pbf_gain', type='f32', size='[1,1]', range='[0.0, 2.0]', default='0.5', digit='[2]', hide='0'";
+	ctx->descs[1908] = "alias='pbf_gain', type='f32', size='[1,1]', range='[0.0, 2.0]', default='0.5', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1909];
@@ -29567,7 +29567,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1909] = "alias='pbf_ratio', type='f32', size='[1,1]', range='[0.0, 1.0]', default='0.5', digit='[2]', hide='0'";
+	ctx->descs[1909] = "alias='pbf_ratio', type='f32', size='[1,1]', range='[0.0, 1.0]', default='0.5', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1910];
@@ -29583,7 +29583,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1910] = "alias='pbf_add', type='f32', size='[1,1]', range='[0.0, 1023.0]', default='0.0', digit='[2]', hide='0'";
+	ctx->descs[1910] = "alias='pbf_add', type='f32', size='[1,1]', range='[0.0, 1023.0]', default='0.0', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1911];
@@ -29599,7 +29599,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1911] = "alias='gaus_ratio', type='f32', size='[1,1]', range='[0.0, 1.0]', default='0.0', digit='[2]', hide='0'";
+	ctx->descs[1911] = "alias='gaus_ratio', type='f32', size='[1,1]', range='[0.0, 1.0]', default='0.0', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1912];
@@ -29615,7 +29615,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1912] = "alias='sharp_ratio', type='f32', size='[1,1]', range='[0.0, 16.0]', default='0.5', digit='[2]', hide='0'";
+	ctx->descs[1912] = "alias='sharp_ratio', type='f32', size='[1,1]', range='[0.0, 16.0]', default='0.5', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1913];
@@ -29631,7 +29631,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1913] = "alias='bf_gain', type='f32', size='[1,1]', range='[0.0, 2.0]', default='0.5', digit='[2]', hide='0'";
+	ctx->descs[1913] = "alias='bf_gain', type='f32', size='[1,1]', range='[0.0, 2.0]', default='0.5', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1914];
@@ -29647,7 +29647,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1914] = "alias='bf_ratio', type='f32', size='[1,1]', range='[0.0, 1.0]', default='0.5', digit='[2]', hide='0'";
+	ctx->descs[1914] = "alias='bf_ratio', type='f32', size='[1,1]', range='[0.0, 1.0]', default='0.5', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1915];
@@ -29663,7 +29663,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1915] = "alias='bf_add', type='f32', size='[1,1]', range='[0.0, 1023.0]', default='0.0', digit='[2]', hide='0'";
+	ctx->descs[1915] = "alias='bf_add', type='f32', size='[1,1]', range='[0.0, 1023.0]', default='0.0', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1916];
@@ -29679,7 +29679,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 348;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1916] = "alias='luma_para', type='struct', ui_module='array_table_ui', index='none', hide='0'";
+	ctx->descs[1916] = "alias='luma_para', type='struct', ui_module='array_table_ui', index='none', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1917];
@@ -29695,7 +29695,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 349;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1917] = "alias='kernel_para', type='struct', ui_module='array_table_ui', index='none', hide='0'";
+	ctx->descs[1917] = "alias='kernel_para', type='struct', ui_module='array_table_ui', index='none', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1918];
@@ -29711,7 +29711,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1918] = "alias='SNR_Mode', type='string', size='[1, 1]', range='[0, 64]', default='LSNR', dynamic='0', ui_module_param='index1'";
+	ctx->descs[1918] = "alias='SNR_Mode', type='string', size='[1, 1]', range='[0, 64]', default='LSNR', dynamic='0', ui_module_param='index1', ro='0'";
 #endif
 
 	obj = &ctx->objs[1919];
@@ -29727,7 +29727,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1919] = "alias='Sensor_Mode', type='string', size='[1, 1]', range='[0, 64]', default='lcg', dynamic='0', hide='0'";
+	ctx->descs[1919] = "alias='Sensor_Mode', type='string', size='[1, 1]', range='[0, 64]', default='lcg', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1920];
@@ -29743,7 +29743,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 350;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1920] = "alias='Tuning_ISO', type='struct_list', size='dynamic', ui_module='double_index_list'";
+	ctx->descs[1920] = "alias='Tuning_ISO', type='struct_list', size='dynamic', ui_module='double_index_list', ro='0'";
 #endif
 
 	obj = &ctx->objs[1921];
@@ -29772,7 +29772,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1922] = "type='bool', alias='enable', default='1', hide='0'";
+	ctx->descs[1922] = "type='bool', alias='enable', default='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1923];
@@ -29788,7 +29788,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 351;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1923] = "alias='Setting', type='struct_list', size='dynamic', ui_module='double_index_list'";
+	ctx->descs[1923] = "alias='Setting', type='struct_list', size='dynamic', ui_module='double_index_list', ro='0'";
 #endif
 
 	obj = &ctx->objs[1924];
@@ -29817,7 +29817,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1925] = "alias='Version', type='string', size='[1, 1]', range='[0, 64]', default='V3', dynamic='0', hide='0'";
+	ctx->descs[1925] = "alias='Version', type='string', size='[1, 1]', range='[0, 64]', default='V3', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1926];
@@ -29833,7 +29833,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 352;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1926] = "alias='TuningPara', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[1926] = "alias='TuningPara', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1927];
@@ -29849,7 +29849,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 69;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1927] = "alias='AEC', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[1927] = "alias='AEC', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1928];
@@ -29865,7 +29865,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 182;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1928] = "alias='wb_v21', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[1928] = "alias='wb_v21', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1929];
@@ -29881,7 +29881,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 71;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1929] = "alias='agamma_calib', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[1929] = "alias='agamma_calib', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1930];
@@ -29897,7 +29897,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 76;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1930] = "alias='ablc_calib', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[1930] = "alias='ablc_calib', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1931];
@@ -29913,7 +29913,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 78;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1931] = "alias='degamma', type='struct', ui_module='curve_ui_type_A', hide='0'";
+	ctx->descs[1931] = "alias='degamma', type='struct', ui_module='curve_ui_type_A', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1932];
@@ -29929,7 +29929,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 84;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1932] = "alias='agic_calib_v21', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[1932] = "alias='agic_calib_v21', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1933];
@@ -29945,7 +29945,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 100;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1933] = "alias='adehaze_calib_v21', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[1933] = "alias='adehaze_calib_v21', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1934];
@@ -29961,7 +29961,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 118;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1934] = "alias='adpcc_calib', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[1934] = "alias='adpcc_calib', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1935];
@@ -29977,7 +29977,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 122;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1935] = "alias='amerge_calib', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[1935] = "alias='amerge_calib', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1936];
@@ -29993,7 +29993,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 321;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1936] = "alias='adrc_calib', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[1936] = "alias='adrc_calib', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1937];
@@ -30009,7 +30009,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 184;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1937] = "alias='cpsl', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[1937] = "alias='cpsl', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1938];
@@ -30025,7 +30025,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 186;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1938] = "alias='orb', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[1938] = "alias='orb', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1939];
@@ -30041,7 +30041,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 189;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1939] = "alias='debayer_calib', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[1939] = "alias='debayer_calib', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1940];
@@ -30057,7 +30057,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 238;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1940] = "alias='cproc_calib', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[1940] = "alias='cproc_calib', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1941];
@@ -30073,7 +30073,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 240;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1941] = "alias='aie_calib', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[1941] = "alias='aie_calib', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1942];
@@ -30089,7 +30089,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 283;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1942] = "alias='lsc_v2', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[1942] = "alias='lsc_v2', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1943];
@@ -30105,7 +30105,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 312;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1943] = "alias='colorAsGrey', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[1943] = "alias='colorAsGrey', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1944];
@@ -30134,7 +30134,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 303;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1945] = "alias='aldch', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[1945] = "alias='aldch', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1946];
@@ -30150,7 +30150,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 251;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1946] = "alias='ccm_calib', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[1946] = "alias='ccm_calib', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1947];
@@ -30166,7 +30166,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 258;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1947] = "alias='lut3d_calib', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[1947] = "alias='lut3d_calib', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1948];
@@ -30182,7 +30182,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 296;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1948] = "alias='af_calib', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[1948] = "alias='af_calib', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1949];
@@ -30198,7 +30198,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 308;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1949] = "alias='thumbnails', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[1949] = "alias='thumbnails', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1950];
@@ -30214,7 +30214,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 335;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1950] = "alias='bayernr_v2', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[1950] = "alias='bayernr_v2', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1951];
@@ -30230,7 +30230,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 340;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1951] = "alias='cnr_v1', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[1951] = "alias='cnr_v1', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1952];
@@ -30246,7 +30246,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 347;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1952] = "alias='ynr_v2', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[1952] = "alias='ynr_v2', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1953];
@@ -30262,7 +30262,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 353;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1953] = "alias='sharp_v3', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[1953] = "alias='sharp_v3', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1954];
@@ -30278,7 +30278,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1954] = "alias='iso', type='f32', range='[50, 204800]', default='50', digit='[1]', ui_module_param='index2'";
+	ctx->descs[1954] = "alias='iso', type='f32', range='[50, 204800]', default='50', digit='[1]', ui_module_param='index2', ro='0'";
 #endif
 
 	obj = &ctx->objs[1955];
@@ -30294,7 +30294,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1955] = "alias='sigma_curve', type='f32', size='[1, 5]', range='[-65535.0, 65535]', default='0.0', digit='[6]', dynamic='0', hide='0'";
+	ctx->descs[1955] = "alias='sigma_curve', type='f32', size='[1, 5]', range='[-65535.0, 65535]', default='0.0', digit='[6]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1956];
@@ -30310,7 +30310,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1956] = "alias='ynr_lci', type='f32', size='[1,1]', range='[0.0, 2.0]', default='0.5', digit='[3]', hide='0'";
+	ctx->descs[1956] = "alias='ynr_lci', type='f32', size='[1,1]', range='[0.0, 2.0]', default='0.5', digit='[3]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1957];
@@ -30326,7 +30326,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1957] = "alias='ynr_hci', type='f32', size='[1,1]', range='[0.0, 2.0]', default='0.5', digit='[3]', hide='0'";
+	ctx->descs[1957] = "alias='ynr_hci', type='f32', size='[1,1]', range='[0.0, 2.0]', default='0.5', digit='[3]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1958];
@@ -30342,7 +30342,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1958] = "alias='SNR_Mode', type='string', size='[1, 1]', range='[0, 64]', default='LSNR', dynamic='0', ui_module_param='index1'";
+	ctx->descs[1958] = "alias='SNR_Mode', type='string', size='[1, 1]', range='[0, 64]', default='LSNR', dynamic='0', ui_module_param='index1', ro='0'";
 #endif
 
 	obj = &ctx->objs[1959];
@@ -30358,7 +30358,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1959] = "alias='Sensor_Mode', type='string', size='[1, 1]', range='[0, 64]', default='lcg', dynamic='0', hide='0'";
+	ctx->descs[1959] = "alias='Sensor_Mode', type='string', size='[1, 1]', range='[0, 64]', default='lcg', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1960];
@@ -30374,7 +30374,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 355;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1960] = "alias='Calib_ISO', type='struct_list', size='dynamic', ui_module='double_index_list'";
+	ctx->descs[1960] = "alias='Calib_ISO', type='struct_list', size='dynamic', ui_module='double_index_list', ro='0'";
 #endif
 
 	obj = &ctx->objs[1961];
@@ -30403,7 +30403,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 356;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1962] = "alias='Setting', type='struct_list', size='dynamic', ui_module='double_index_list'";
+	ctx->descs[1962] = "alias='Setting', type='struct_list', size='dynamic', ui_module='double_index_list', ro='0'";
 #endif
 
 	obj = &ctx->objs[1963];
@@ -30432,7 +30432,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1964] = "alias='lo_lumaPoint', type='f32', size='[1, 6]', range='[0, 256]', default='[0 32 64 128 192 256]', digit='[0]', dynamic='0', hide='0'";
+	ctx->descs[1964] = "alias='lo_lumaPoint', type='f32', size='[1, 6]', range='[0, 256]', default='[0 32 64 128 192 256]', digit='[0]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1965];
@@ -30448,7 +30448,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1965] = "alias='lo_ratio', type='f32', size='[1, 6]', range='[0, 2]', default='[1 1 1 1 1 1]', digit='[2]', dynamic='0', hide='0'";
+	ctx->descs[1965] = "alias='lo_ratio', type='f32', size='[1, 6]', range='[0, 2]', default='[1 1 1 1 1 1]', digit='[2]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1966];
@@ -30464,7 +30464,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1966] = "alias='hi_lumaPoint', type='f32', size='[1, 6]', range='[0, 256]', default='[0 32 64 128 192 256]', digit='[0]', dynamic='0', hide='0'";
+	ctx->descs[1966] = "alias='hi_lumaPoint', type='f32', size='[1, 6]', range='[0, 256]', default='[0 32 64 128 192 256]', digit='[0]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1967];
@@ -30480,7 +30480,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1967] = "alias='hi_ratio', type='f32', size='[1, 6]', range='[0, 2]', default='[1 1 1 1 1 1]', digit='[2]', dynamic='0', hide='0'";
+	ctx->descs[1967] = "alias='hi_ratio', type='f32', size='[1, 6]', range='[0, 2]', default='[1 1 1 1 1 1]', digit='[2]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1968];
@@ -30496,7 +30496,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1968] = "alias='iso', type='f32', range='[50, 204800]', default='50', digit='[1]', ui_module_param='index2'";
+	ctx->descs[1968] = "alias='iso', type='f32', range='[50, 204800]', default='50', digit='[1]', ui_module_param='index2', ro='0'";
 #endif
 
 	obj = &ctx->objs[1969];
@@ -30512,7 +30512,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1969] = "type='bool', alias='ynr_bft3x3_bypass', default='0', hide='0'";
+	ctx->descs[1969] = "type='bool', alias='ynr_bft3x3_bypass', default='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1970];
@@ -30528,7 +30528,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1970] = "type='bool', alias='ynr_lbft5x5_bypass', default='0', hide='0'";
+	ctx->descs[1970] = "type='bool', alias='ynr_lbft5x5_bypass', default='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1971];
@@ -30544,7 +30544,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1971] = "type='bool', alias='ynr_lgft3x3_bypass', default='0', hide='0'";
+	ctx->descs[1971] = "type='bool', alias='ynr_lgft3x3_bypass', default='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1972];
@@ -30560,7 +30560,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1972] = "type='bool', alias='ynr_flt1x1_bypass', default='0', hide='0'";
+	ctx->descs[1972] = "type='bool', alias='ynr_flt1x1_bypass', default='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1973];
@@ -30576,7 +30576,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1973] = "type='bool', alias='ynr_sft5x5_bypass', default='0', hide='0'";
+	ctx->descs[1973] = "type='bool', alias='ynr_sft5x5_bypass', default='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1974];
@@ -30592,7 +30592,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1974] = "alias='ynr_global_gain_alpha', type='f32', size='[1,1]', range='[0, 1.0]', default='0', digit='[2]', hide='0'";
+	ctx->descs[1974] = "alias='ynr_global_gain_alpha', type='f32', size='[1,1]', range='[0, 1.0]', default='0', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1975];
@@ -30608,7 +30608,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1975] = "alias='ynr_global_gain', type='f32', size='[1,1]', range='[0, 64]', default='1', digit='[2]', hide='0'";
+	ctx->descs[1975] = "alias='ynr_global_gain', type='f32', size='[1,1]', range='[0, 64]', default='1', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1976];
@@ -30624,7 +30624,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1976] = "alias='ynr_adjust_thresh', type='f32', size='[1,1]', range='[0, 1.0]', default='1', digit='[2]', hide='0'";
+	ctx->descs[1976] = "alias='ynr_adjust_thresh', type='f32', size='[1,1]', range='[0, 1.0]', default='1', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1977];
@@ -30640,7 +30640,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1977] = "alias='ynr_adjust_scale', type='f32', size='[1,1]', range='[0, 16]', default='1', digit='[2]', hide='0'";
+	ctx->descs[1977] = "alias='ynr_adjust_scale', type='f32', size='[1,1]', range='[0, 16]', default='1', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1978];
@@ -30656,7 +30656,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 358;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1978] = "alias='lumaPara', type='struct', ui_module='array_table_ui', index='none', hide='0'";
+	ctx->descs[1978] = "alias='lumaPara', type='struct', ui_module='array_table_ui', index='none', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1979];
@@ -30672,7 +30672,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1979] = "alias='low_bf1', type='f32', size='[1,1]', range='[0.1, 32]', default='0.5', digit='[2]', hide='0'";
+	ctx->descs[1979] = "alias='low_bf1', type='f32', size='[1,1]', range='[0.1, 32]', default='0.5', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1980];
@@ -30688,7 +30688,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1980] = "alias='low_bf2', type='f32', size='[1,1]', range='[0.1, 32]', default='0.5', digit='[2]', hide='0'";
+	ctx->descs[1980] = "alias='low_bf2', type='f32', size='[1,1]', range='[0.1, 32]', default='0.5', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1981];
@@ -30704,7 +30704,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1981] = "alias='low_thred_adj', type='f32', size='[1,1]', range='[0.0, 31.0]', default='0.25', digit='[2]', hide='0'";
+	ctx->descs[1981] = "alias='low_thred_adj', type='f32', size='[1,1]', range='[0.0, 31.0]', default='0.25', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1982];
@@ -30720,7 +30720,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1982] = "alias='low_peak_supress', type='f32', size='[1,1]', range='[0.0, 1.0]', default='0.5', digit='[2]', hide='0'";
+	ctx->descs[1982] = "alias='low_peak_supress', type='f32', size='[1,1]', range='[0.0, 1.0]', default='0.5', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1983];
@@ -30736,7 +30736,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1983] = "alias='low_edge_adj_thresh', type='f32', size='[1,1]', range='[0, 1023]', default='7', digit='[2]', hide='0'";
+	ctx->descs[1983] = "alias='low_edge_adj_thresh', type='f32', size='[1,1]', range='[0, 1023]', default='7', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1984];
@@ -30752,7 +30752,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1984] = "alias='low_lbf_weight_thresh', type='f32', size='[1,1]', range='[0.0, 1.0]', default='0.25', digit='[2]', hide='0'";
+	ctx->descs[1984] = "alias='low_lbf_weight_thresh', type='f32', size='[1,1]', range='[0.0, 1.0]', default='0.25', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1985];
@@ -30768,7 +30768,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1985] = "alias='low_center_weight', type='f32', size='[1,1]', range='[0.0, 1.0]', default='0.5', digit='[2]', hide='0'";
+	ctx->descs[1985] = "alias='low_center_weight', type='f32', size='[1,1]', range='[0.0, 1.0]', default='0.5', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1986];
@@ -30784,7 +30784,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1986] = "alias='low_dist_adj', type='f32', size='[1,1]', range='[0.0, 127.0]', default='8.0', digit='[2]', hide='0'";
+	ctx->descs[1986] = "alias='low_dist_adj', type='f32', size='[1,1]', range='[0.0, 127.0]', default='8.0', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1987];
@@ -30800,7 +30800,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1987] = "alias='low_weight', type='f32', size='[1,1]', range='[0.0, 1.0]', default='0.5', digit='[2]', hide='0'";
+	ctx->descs[1987] = "alias='low_weight', type='f32', size='[1,1]', range='[0.0, 1.0]', default='0.5', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1988];
@@ -30816,7 +30816,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1988] = "alias='low_filt1_strength', type='f32', size='[1,1]', range='[0.0, 1.0]', default='0.7', digit='[2]', hide='0'";
+	ctx->descs[1988] = "alias='low_filt1_strength', type='f32', size='[1,1]', range='[0.0, 1.0]', default='0.7', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1989];
@@ -30832,7 +30832,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1989] = "alias='low_filt2_strength', type='f32', size='[1,1]', range='[0.0, 1.0]', default='0.85', digit='[2]', hide='0'";
+	ctx->descs[1989] = "alias='low_filt2_strength', type='f32', size='[1,1]', range='[0.0, 1.0]', default='0.85', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1990];
@@ -30848,7 +30848,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1990] = "alias='low_bi_weight', type='f32', size='[1,1]', range='[0.0, 1.0]', default='0.2', digit='[2]', hide='0'";
+	ctx->descs[1990] = "alias='low_bi_weight', type='f32', size='[1,1]', range='[0.0, 1.0]', default='0.2', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1991];
@@ -30864,7 +30864,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1991] = "alias='base_filter_weight1', type='f32', size='[1,1]', range='[0.0, 1.0]', default='0.28', digit='[2]', hide='0'";
+	ctx->descs[1991] = "alias='base_filter_weight1', type='f32', size='[1,1]', range='[0.0, 1.0]', default='0.28', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1992];
@@ -30880,7 +30880,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1992] = "alias='base_filter_weight2', type='f32', size='[1,1]', range='[0.0, 1.0]', default='0.46', digit='[2]', hide='0'";
+	ctx->descs[1992] = "alias='base_filter_weight2', type='f32', size='[1,1]', range='[0.0, 1.0]', default='0.46', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1993];
@@ -30896,7 +30896,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1993] = "alias='base_filter_weight3', type='f32', size='[1,1]', range='[0.0, 1.0]', default='0.26', digit='[2]', hide='0'";
+	ctx->descs[1993] = "alias='base_filter_weight3', type='f32', size='[1,1]', range='[0.0, 1.0]', default='0.26', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1994];
@@ -30912,7 +30912,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1994] = "alias='high_thred_adj', type='f32', size='[1,1]', range='[0.0, 31.0]', default='0.5', digit='[2]', hide='0'";
+	ctx->descs[1994] = "alias='high_thred_adj', type='f32', size='[1,1]', range='[0.0, 31.0]', default='0.5', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1995];
@@ -30928,7 +30928,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1995] = "alias='high_weight', type='f32', size='[1,1]', range='[0.0, 1.0]', default='0.5', digit='[2]', hide='0'";
+	ctx->descs[1995] = "alias='high_weight', type='f32', size='[1,1]', range='[0.0, 1.0]', default='0.5', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1996];
@@ -30944,7 +30944,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1996] = "alias='hi_min_adj', type='f32', size='[1,1]', range='[0.0, 1]', default='0.9', digit='[2]', hide='0'";
+	ctx->descs[1996] = "alias='hi_min_adj', type='f32', size='[1,1]', range='[0.0, 1]', default='0.9', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1997];
@@ -30960,7 +30960,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1997] = "alias='hi_edge_thed', type='f32', size='[1,1]', range='[0.0, 255.0]', default='100.0', digit='[2]', hide='0'";
+	ctx->descs[1997] = "alias='hi_edge_thed', type='f32', size='[1,1]', range='[0.0, 255.0]', default='100.0', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1998];
@@ -30976,7 +30976,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1998] = "alias='high_direction_weight', type='f32', size='[1, 8]', range='[0, 1.0]', default='[1 1 1 1 0.5 0.5 0.5 0.5]', digit='[2]', dynamic='0', hide='0'";
+	ctx->descs[1998] = "alias='high_direction_weight', type='f32', size='[1, 8]', range='[0, 1.0]', default='[1 1 1 1 0.5 0.5 0.5 0.5]', digit='[2]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1999];
@@ -30992,7 +30992,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1999] = "alias='rnr_strength', type='f32', size='[1, 17]', range='[0, 16]', default='1.0', digit='[3]', dynamic='0', hide='0'";
+	ctx->descs[1999] = "alias='rnr_strength', type='f32', size='[1, 17]', range='[0, 16]', default='1.0', digit='[3]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[2000];
@@ -31008,7 +31008,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2000] = "alias='SNR_Mode', type='string', size='[1, 1]', range='[0, 64]', default='LSNR', dynamic='0', ui_module_param='index1'";
+	ctx->descs[2000] = "alias='SNR_Mode', type='string', size='[1, 1]', range='[0, 64]', default='LSNR', dynamic='0', ui_module_param='index1', ro='0'";
 #endif
 
 	obj = &ctx->objs[2001];
@@ -31024,7 +31024,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2001] = "alias='Sensor_Mode', type='string', size='[1, 1]', range='[0, 64]', default='lcg', dynamic='0', hide='0'";
+	ctx->descs[2001] = "alias='Sensor_Mode', type='string', size='[1, 1]', range='[0, 64]', default='lcg', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[2002];
@@ -31040,7 +31040,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 359;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2002] = "alias='Tuning_ISO', type='struct_list', size='dynamic', ui_module='double_index_list'";
+	ctx->descs[2002] = "alias='Tuning_ISO', type='struct_list', size='dynamic', ui_module='double_index_list', ro='0'";
 #endif
 
 	obj = &ctx->objs[2003];
@@ -31069,7 +31069,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2004] = "type='bool', alias='enable', default='1', hide='0'";
+	ctx->descs[2004] = "type='bool', alias='enable', default='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[2005];
@@ -31085,7 +31085,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 360;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2005] = "alias='Setting', type='struct_list', size='dynamic', ui_module='double_index_list'";
+	ctx->descs[2005] = "alias='Setting', type='struct_list', size='dynamic', ui_module='double_index_list', ro='0'";
 #endif
 
 	obj = &ctx->objs[2006];
@@ -31114,7 +31114,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2007] = "alias='Version', type='string', size='[1, 1]', range='[0, 64]', default='V2', dynamic='0', hide='0'";
+	ctx->descs[2007] = "alias='Version', type='string', size='[1, 1]', range='[0, 64]', default='V2', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[2008];
@@ -31130,7 +31130,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 357;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2008] = "alias='CalibPara', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[2008] = "alias='CalibPara', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[2009];
@@ -31146,7 +31146,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 361;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2009] = "alias='TuningPara', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[2009] = "alias='TuningPara', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[2010];
@@ -31162,7 +31162,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2010] = "alias='iso', type='f32', range='[50, 204800]', default='50', digit='[1]', ui_module_param='index2'";
+	ctx->descs[2010] = "alias='iso', type='f32', range='[50, 204800]', default='50', digit='[1]', ui_module_param='index2', ro='0'";
 #endif
 
 	obj = &ctx->objs[2011];
@@ -31178,7 +31178,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2011] = "type='bool', alias='hf_bypass', default='0', hide='0'";
+	ctx->descs[2011] = "type='bool', alias='hf_bypass', default='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[2012];
@@ -31194,7 +31194,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2012] = "type='bool', alias='lf_bypass', default='0', hide='0'";
+	ctx->descs[2012] = "type='bool', alias='lf_bypass', default='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[2013];
@@ -31210,7 +31210,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2013] = "alias='global_gain', type='f32', size='[1,1]', range='[0, 64.0]', default='1.0', digit='[2]', hide='0'";
+	ctx->descs[2013] = "alias='global_gain', type='f32', size='[1,1]', range='[0, 64.0]', default='1.0', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[2014];
@@ -31226,7 +31226,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2014] = "alias='global_gain_alpha', type='f32', size='[1,1]', range='[0, 1.0]', default='0.0', digit='[2]', hide='0'";
+	ctx->descs[2014] = "alias='global_gain_alpha', type='f32', size='[1,1]', range='[0, 1.0]', default='0.0', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[2015];
@@ -31242,7 +31242,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2015] = "alias='local_gain_scale', type='f32', size='[1,1]', range='[0, 128.0]', default='1.0', digit='[2]', hide='0'";
+	ctx->descs[2015] = "alias='local_gain_scale', type='f32', size='[1,1]', range='[0, 128.0]', default='1.0', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[2016];
@@ -31258,7 +31258,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2016] = "alias='gain_adj_strength_ratio', type='f32', size='[1, 13]', range='[0, 255]', default='1.0', digit='[2]', dynamic='0', hide='0'";
+	ctx->descs[2016] = "alias='gain_adj_strength_ratio', type='f32', size='[1, 13]', range='[0, 255]', default='1.0', digit='[2]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[2017];
@@ -31274,7 +31274,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2017] = "alias='color_sat_adj', type='f32', size='[1,1]', range='[1, 255.0]', default='40.0', digit='[2]', hide='0'";
+	ctx->descs[2017] = "alias='color_sat_adj', type='f32', size='[1,1]', range='[1, 255.0]', default='40.0', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[2018];
@@ -31290,7 +31290,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2018] = "alias='color_sat_adj_alpha', type='f32', size='[1,1]', range='[0.0, 1.0]', default='0.8', digit='[2]', hide='0'";
+	ctx->descs[2018] = "alias='color_sat_adj_alpha', type='f32', size='[1,1]', range='[0.0, 1.0]', default='0.8', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[2019];
@@ -31306,7 +31306,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2019] = "alias='hf_spikes_reducion_strength', type='f32', size='[1,1]', range='[0.0, 1.0]', default='0.5', digit='[2]', hide='0'";
+	ctx->descs[2019] = "alias='hf_spikes_reducion_strength', type='f32', size='[1,1]', range='[0.0, 1.0]', default='0.5', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[2020];
@@ -31322,7 +31322,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2020] = "alias='hf_denoise_strength', type='f32', size='[1,1]', range='[1, 1023.0]', default='10', digit='[2]', hide='0'";
+	ctx->descs[2020] = "alias='hf_denoise_strength', type='f32', size='[1,1]', range='[1, 1023.0]', default='10', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[2021];
@@ -31338,7 +31338,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2021] = "alias='hf_color_sat', type='f32', size='[1,1]', range='[0.0, 8.0]', default='1.5', digit='[2]', hide='0'";
+	ctx->descs[2021] = "alias='hf_color_sat', type='f32', size='[1,1]', range='[0.0, 8.0]', default='1.5', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[2022];
@@ -31354,7 +31354,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2022] = "alias='hf_denoise_alpha', type='f32', size='[1,1]', range='[0.0, 1.0]', default='0.0', digit='[2]', hide='0'";
+	ctx->descs[2022] = "alias='hf_denoise_alpha', type='f32', size='[1,1]', range='[0.0, 1.0]', default='0.0', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[2023];
@@ -31370,7 +31370,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2023] = "alias='hf_bf_wgt_clip', type='u32', size='[1,1]', range='[0, 255]', default='0', digit='[0]', hide='0'";
+	ctx->descs[2023] = "alias='hf_bf_wgt_clip', type='u32', size='[1,1]', range='[0, 255]', default='0', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[2024];
@@ -31386,7 +31386,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2024] = "alias='thumb_spikes_reducion_strength', type='f32', size='[1,1]', range='[0.0, 1.0]', default='0.2', digit='[2]', hide='0'";
+	ctx->descs[2024] = "alias='thumb_spikes_reducion_strength', type='f32', size='[1,1]', range='[0.0, 1.0]', default='0.2', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[2025];
@@ -31402,7 +31402,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2025] = "alias='thumb_denoise_strength', type='f32', size='[1,1]', range='[1, 1023]', default='4.0', digit='[2]', hide='0'";
+	ctx->descs[2025] = "alias='thumb_denoise_strength', type='f32', size='[1,1]', range='[1, 1023]', default='4.0', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[2026];
@@ -31418,7 +31418,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2026] = "alias='thumb_color_sat', type='f32', size='[1,1]', range='[0.0, 8.0]', default='4.0', digit='[2]', hide='0'";
+	ctx->descs[2026] = "alias='thumb_color_sat', type='f32', size='[1,1]', range='[0.0, 8.0]', default='4.0', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[2027];
@@ -31434,7 +31434,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2027] = "alias='lf_denoise_strength', type='f32', size='[1,1]', range='[1, 1023.0]', default='4.0', digit='[2]', hide='0'";
+	ctx->descs[2027] = "alias='lf_denoise_strength', type='f32', size='[1,1]', range='[1, 1023.0]', default='4.0', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[2028];
@@ -31450,7 +31450,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2028] = "alias='lf_color_sat', type='f32', size='[1,1]', range='[0.0, 8.0]', default='2.0', digit='[2]', hide='0'";
+	ctx->descs[2028] = "alias='lf_color_sat', type='f32', size='[1,1]', range='[0.0, 8.0]', default='2.0', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[2029];
@@ -31466,7 +31466,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2029] = "alias='lf_denoise_alpha', type='f32', size='[1,1]', range='[0.0, 1.0]', default='1.0', digit='[2]', hide='0'";
+	ctx->descs[2029] = "alias='lf_denoise_alpha', type='f32', size='[1,1]', range='[0.0, 1.0]', default='1.0', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[2030];
@@ -31482,7 +31482,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2030] = "alias='SNR_Mode', type='string', size='[1, 1]', range='[0, 64]', default='LSNR', dynamic='0', ui_module_param='index1'";
+	ctx->descs[2030] = "alias='SNR_Mode', type='string', size='[1, 1]', range='[0, 64]', default='LSNR', dynamic='0', ui_module_param='index1', ro='0'";
 #endif
 
 	obj = &ctx->objs[2031];
@@ -31498,7 +31498,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2031] = "alias='Sensor_Mode', type='string', size='[1, 1]', range='[0, 64]', default='lcg', dynamic='0', hide='0'";
+	ctx->descs[2031] = "alias='Sensor_Mode', type='string', size='[1, 1]', range='[0, 64]', default='lcg', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[2032];
@@ -31514,7 +31514,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 363;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2032] = "alias='Tuning_ISO', type='struct_list', size='dynamic', ui_module='double_index_list'";
+	ctx->descs[2032] = "alias='Tuning_ISO', type='struct_list', size='dynamic', ui_module='double_index_list', ro='0'";
 #endif
 
 	obj = &ctx->objs[2033];
@@ -31543,7 +31543,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2034] = "alias='kernel_5x5', type='f32', size='[1, 5]', range='[0, 1]', default='[1.0000 0.8825 0.7788 0.6065 0.3679]', digit='[6]', dynamic='0', hide='0'";
+	ctx->descs[2034] = "alias='kernel_5x5', type='f32', size='[1, 5]', range='[0, 1]', default='[1.0000 0.8825 0.7788 0.6065 0.3679]', digit='[6]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[2035];
@@ -31559,7 +31559,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2035] = "type='bool', alias='enable', default='1', hide='0'";
+	ctx->descs[2035] = "type='bool', alias='enable', default='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[2036];
@@ -31575,7 +31575,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 365;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2036] = "alias='Kernel_Coeff', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[2036] = "alias='Kernel_Coeff', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[2037];
@@ -31591,7 +31591,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 364;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2037] = "alias='Setting', type='struct_list', size='dynamic', ui_module='double_index_list'";
+	ctx->descs[2037] = "alias='Setting', type='struct_list', size='dynamic', ui_module='double_index_list', ro='0'";
 #endif
 
 	obj = &ctx->objs[2038];
@@ -31620,7 +31620,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2039] = "alias='Version', type='string', size='[1, 1]', range='[0, 64]', default='V1', dynamic='0', hide='0'";
+	ctx->descs[2039] = "alias='Version', type='string', size='[1, 1]', range='[0, 64]', default='V1', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[2040];
@@ -31636,7 +31636,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 366;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2040] = "alias='TuningPara', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[2040] = "alias='TuningPara', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[2041];
@@ -31652,7 +31652,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2041] = "alias='luma_point', type='f32', size='[1, 8]', range='[0, 1024]', default='[0 64 128 256 384 640 896 1024]', digit='[1]', dynamic='0', hide='0'";
+	ctx->descs[2041] = "alias='luma_point', type='f32', size='[1, 8]', range='[0, 1024]', default='[0 64 128 256 384 640 896 1024]', digit='[1]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[2042];
@@ -31668,7 +31668,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2042] = "alias='luma_sigma', type='f32', size='[1, 8]', range='[0, 1023]', default='[8 10 10 12 14 12 12 10]', digit='[1]', dynamic='0', hide='0'";
+	ctx->descs[2042] = "alias='luma_sigma', type='f32', size='[1, 8]', range='[0, 1023]', default='[8 10 10 12 14 12 12 10]', digit='[1]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[2043];
@@ -31684,7 +31684,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2043] = "alias='hf_clip', type='f32', size='[1, 8]', range='[0, 1023]', default='[10 20 30 56 56 56 56 30]', digit='[1]', dynamic='0', hide='0'";
+	ctx->descs[2043] = "alias='hf_clip', type='f32', size='[1, 8]', range='[0, 1023]', default='[10 20 30 56 56 56 56 30]', digit='[1]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[2044];
@@ -31700,7 +31700,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2044] = "alias='local_sharp_strength', type='f32', size='[1, 8]', range='[0, 1023]', default='[1023 1023 1023 1023 1023 1023 1023 1023]', digit='[1]', dynamic='0', hide='0'";
+	ctx->descs[2044] = "alias='local_sharp_strength', type='f32', size='[1, 8]', range='[0, 1023]', default='[1023 1023 1023 1023 1023 1023 1023 1023]', digit='[1]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[2045];
@@ -31716,7 +31716,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2045] = "alias='prefilter_coeff', type='f32', size='[1, 3]', range='[0, 1]', default='[0.2042 0.1238 0.0751]', digit='[4]', dynamic='0', hide='0'";
+	ctx->descs[2045] = "alias='prefilter_coeff', type='f32', size='[1, 3]', range='[0, 1]', default='[0.2042 0.1238 0.0751]', digit='[4]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[2046];
@@ -31732,7 +31732,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2046] = "alias='GaussianFilter_coeff', type='f32', size='[1, 6]', range='[0, 1]', default='[0.2042 0.1238 0.0751]', digit='[4]', dynamic='0', hide='0'";
+	ctx->descs[2046] = "alias='GaussianFilter_coeff', type='f32', size='[1, 6]', range='[0, 1]', default='[0.2042 0.1238 0.0751]', digit='[4]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[2047];
@@ -31748,7 +31748,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2047] = "alias='hfBilateralFilter_coeff', type='f32', size='[1, 3]', range='[0, 1]', default='[0.2042 0.1238 0.0751]', digit='[4]', dynamic='0', hide='0'";
+	ctx->descs[2047] = "alias='hfBilateralFilter_coeff', type='f32', size='[1, 3]', range='[0, 1]', default='[0.2042 0.1238 0.0751]', digit='[4]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[2048];
@@ -31764,7 +31764,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2048] = "alias='iso', type='f32', range='[50, 204800]', default='50', digit='[1]', ui_module_param='index2'";
+	ctx->descs[2048] = "alias='iso', type='f32', range='[50, 204800]', default='50', digit='[1]', ui_module_param='index2', ro='0'";
 #endif
 
 	obj = &ctx->objs[2049];
@@ -31780,7 +31780,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2049] = "alias='pbf_gain', type='f32', size='[1,1]', range='[0.0, 2.0]', default='0.5', digit='[2]', hide='0'";
+	ctx->descs[2049] = "alias='pbf_gain', type='f32', size='[1,1]', range='[0.0, 2.0]', default='0.5', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[2050];
@@ -31796,7 +31796,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2050] = "alias='pbf_ratio', type='f32', size='[1,1]', range='[0.0, 1.0]', default='0.5', digit='[2]', hide='0'";
+	ctx->descs[2050] = "alias='pbf_ratio', type='f32', size='[1,1]', range='[0.0, 1.0]', default='0.5', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[2051];
@@ -31812,7 +31812,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2051] = "alias='pbf_add', type='f32', size='[1,1]', range='[0.0, 1023.0]', default='0.0', digit='[2]', hide='0'";
+	ctx->descs[2051] = "alias='pbf_add', type='f32', size='[1,1]', range='[0.0, 1023.0]', default='0.0', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[2052];
@@ -31828,7 +31828,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2052] = "alias='gaus_ratio', type='f32', size='[1,1]', range='[0.0, 1.0]', default='0.0', digit='[2]', hide='0'";
+	ctx->descs[2052] = "alias='gaus_ratio', type='f32', size='[1,1]', range='[0.0, 1.0]', default='0.0', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[2053];
@@ -31844,7 +31844,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2053] = "alias='sharp_ratio', type='f32', size='[1,1]', range='[0.0, 16.0]', default='0.5', digit='[2]', hide='0'";
+	ctx->descs[2053] = "alias='sharp_ratio', type='f32', size='[1,1]', range='[0.0, 16.0]', default='0.5', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[2054];
@@ -31860,7 +31860,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2054] = "alias='bf_gain', type='f32', size='[1,1]', range='[0.0, 2.0]', default='0.5', digit='[2]', hide='0'";
+	ctx->descs[2054] = "alias='bf_gain', type='f32', size='[1,1]', range='[0.0, 2.0]', default='0.5', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[2055];
@@ -31876,7 +31876,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2055] = "alias='bf_ratio', type='f32', size='[1,1]', range='[0.0, 1.0]', default='0.5', digit='[2]', hide='0'";
+	ctx->descs[2055] = "alias='bf_ratio', type='f32', size='[1,1]', range='[0.0, 1.0]', default='0.5', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[2056];
@@ -31892,7 +31892,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2056] = "alias='bf_add', type='f32', size='[1,1]', range='[0.0, 1023.0]', default='0.0', digit='[2]', hide='0'";
+	ctx->descs[2056] = "alias='bf_add', type='f32', size='[1,1]', range='[0.0, 1023.0]', default='0.0', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[2057];
@@ -31908,7 +31908,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 368;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2057] = "alias='luma_para', type='struct', ui_module='array_table_ui', index='none', hide='0'";
+	ctx->descs[2057] = "alias='luma_para', type='struct', ui_module='array_table_ui', index='none', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[2058];
@@ -31924,7 +31924,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 369;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2058] = "alias='kernel_para', type='struct', ui_module='array_table_ui', index='none', hide='0'";
+	ctx->descs[2058] = "alias='kernel_para', type='struct', ui_module='array_table_ui', index='none', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[2059];
@@ -31940,7 +31940,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2059] = "alias='SNR_Mode', type='string', size='[1, 1]', range='[0, 64]', default='LSNR', dynamic='0', ui_module_param='index1'";
+	ctx->descs[2059] = "alias='SNR_Mode', type='string', size='[1, 1]', range='[0, 64]', default='LSNR', dynamic='0', ui_module_param='index1', ro='0'";
 #endif
 
 	obj = &ctx->objs[2060];
@@ -31956,7 +31956,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2060] = "alias='Sensor_Mode', type='string', size='[1, 1]', range='[0, 64]', default='lcg', dynamic='0', hide='0'";
+	ctx->descs[2060] = "alias='Sensor_Mode', type='string', size='[1, 1]', range='[0, 64]', default='lcg', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[2061];
@@ -31972,7 +31972,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 370;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2061] = "alias='Tuning_ISO', type='struct_list', size='dynamic', ui_module='double_index_list'";
+	ctx->descs[2061] = "alias='Tuning_ISO', type='struct_list', size='dynamic', ui_module='double_index_list', ro='0'";
 #endif
 
 	obj = &ctx->objs[2062];
@@ -32001,7 +32001,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2063] = "type='bool', alias='enable', default='1', hide='0'";
+	ctx->descs[2063] = "type='bool', alias='enable', default='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[2064];
@@ -32017,7 +32017,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 371;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2064] = "alias='Setting', type='struct_list', size='dynamic', ui_module='double_index_list'";
+	ctx->descs[2064] = "alias='Setting', type='struct_list', size='dynamic', ui_module='double_index_list', ro='0'";
 #endif
 
 	obj = &ctx->objs[2065];
@@ -32046,7 +32046,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2066] = "alias='Version', type='string', size='[1, 1]', range='[0, 64]', default='V3', dynamic='0', hide='0'";
+	ctx->descs[2066] = "alias='Version', type='string', size='[1, 1]', range='[0, 64]', default='V3', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[2067];
@@ -32062,7 +32062,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 372;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2067] = "alias='TuningPara', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[2067] = "alias='TuningPara', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[2068];
@@ -32078,7 +32078,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2068] = "alias='iso', type='f32', range='[50, 204800]', default='50', digit='[1]', ui_module_param='index2'";
+	ctx->descs[2068] = "alias='iso', type='f32', range='[50, 204800]', default='50', digit='[1]', ui_module_param='index2', ro='0'";
 #endif
 
 	obj = &ctx->objs[2069];
@@ -32094,7 +32094,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2069] = "alias='lumapoint', type='s32', size='[1, 16]', range='[0, 65535]', default='0.0', digit='[0]', dynamic='0', hide='0'";
+	ctx->descs[2069] = "alias='lumapoint', type='s32', size='[1, 16]', range='[0, 65535]', default='0.0', digit='[0]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[2070];
@@ -32110,7 +32110,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2070] = "alias='sigma', type='s32', size='[1, 16]', range='[0, 65535]', default='0.0', digit='[0]', dynamic='0', hide='0'";
+	ctx->descs[2070] = "alias='sigma', type='s32', size='[1, 16]', range='[0, 65535]', default='0.0', digit='[0]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[2071];
@@ -32126,7 +32126,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2071] = "alias='SNR_Mode', type='string', size='[1, 1]', range='[0, 64]', default='LSNR', dynamic='0', ui_module_param='index1'";
+	ctx->descs[2071] = "alias='SNR_Mode', type='string', size='[1, 1]', range='[0, 64]', default='LSNR', dynamic='0', ui_module_param='index1', ro='0'";
 #endif
 
 	obj = &ctx->objs[2072];
@@ -32142,7 +32142,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2072] = "alias='Sensor_Mode', type='string', size='[1, 1]', range='[0, 64]', default='lcg', dynamic='0', hide='0'";
+	ctx->descs[2072] = "alias='Sensor_Mode', type='string', size='[1, 1]', range='[0, 64]', default='lcg', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[2073];
@@ -32158,7 +32158,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 374;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2073] = "alias='Calib_ISO', type='struct_list', size='dynamic', ui_module='double_index_list'";
+	ctx->descs[2073] = "alias='Calib_ISO', type='struct_list', size='dynamic', ui_module='double_index_list', ro='0'";
 #endif
 
 	obj = &ctx->objs[2074];
@@ -32187,7 +32187,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 375;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2075] = "alias='Setting', type='struct_list', size='dynamic', ui_module='double_index_list'";
+	ctx->descs[2075] = "alias='Setting', type='struct_list', size='dynamic', ui_module='double_index_list', ro='0'";
 #endif
 
 	obj = &ctx->objs[2076];
@@ -32216,7 +32216,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2077] = "alias='iso', type='f32', range='[50, 204800]', default='50', digit='[1]', ui_module_param='index2'";
+	ctx->descs[2077] = "alias='iso', type='f32', range='[50, 204800]', default='50', digit='[1]', ui_module_param='index2', ro='0'";
 #endif
 
 	obj = &ctx->objs[2078];
@@ -32232,7 +32232,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2078] = "type='bool', alias='gauss_guide', default='1', hide='0'";
+	ctx->descs[2078] = "type='bool', alias='gauss_guide', default='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[2079];
@@ -32248,7 +32248,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2079] = "alias='filter_strength', type='f32', size='[1,1]', range='[0, 16]', default='0.5', digit='[2]', hide='0'";
+	ctx->descs[2079] = "alias='filter_strength', type='f32', size='[1,1]', range='[0, 16]', default='0.5', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[2080];
@@ -32264,7 +32264,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2080] = "alias='edgesofts', type='f32', size='[1,1]', range='[0, 1.0]', default='1.0', digit='[2]', hide='0'";
+	ctx->descs[2080] = "alias='edgesofts', type='f32', size='[1,1]', range='[0, 16.0]', default='1.0', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[2081];
@@ -32280,7 +32280,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2081] = "alias='ratio', type='f32', size='[1,1]', range='[0, 1.0]', default='0.2', digit='[2]', hide='0'";
+	ctx->descs[2081] = "alias='ratio', type='f32', size='[1,1]', range='[0, 1.0]', default='0.2', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[2082];
@@ -32296,7 +32296,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2082] = "alias='weight', type='f32', size='[1,1]', range='[0, 1.0]', default='1.0', digit='[2]', hide='0'";
+	ctx->descs[2082] = "alias='weight', type='f32', size='[1,1]', range='[0, 1.0]', default='1.0', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[2083];
@@ -32312,7 +32312,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2083] = "alias='SNR_Mode', type='string', size='[1, 1]', range='[0, 64]', default='LSNR', dynamic='0', ui_module_param='index1'";
+	ctx->descs[2083] = "alias='SNR_Mode', type='string', size='[1, 1]', range='[0, 64]', default='LSNR', dynamic='0', ui_module_param='index1', ro='0'";
 #endif
 
 	obj = &ctx->objs[2084];
@@ -32328,7 +32328,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2084] = "alias='Sensor_Mode', type='string', size='[1, 1]', range='[0, 64]', default='lcg', dynamic='0', hide='0'";
+	ctx->descs[2084] = "alias='Sensor_Mode', type='string', size='[1, 1]', range='[0, 64]', default='lcg', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[2085];
@@ -32344,7 +32344,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 377;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2085] = "alias='Tuning_ISO', type='struct_list', size='dynamic', ui_module='double_index_list'";
+	ctx->descs[2085] = "alias='Tuning_ISO', type='struct_list', size='dynamic', ui_module='double_index_list', ro='0'";
 #endif
 
 	obj = &ctx->objs[2086];
@@ -32373,7 +32373,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2087] = "type='bool', alias='enable', default='1', hide='0'";
+	ctx->descs[2087] = "type='bool', alias='enable', default='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[2088];
@@ -32389,7 +32389,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 378;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2088] = "alias='Setting', type='struct_list', size='dynamic', ui_module='double_index_list'";
+	ctx->descs[2088] = "alias='Setting', type='struct_list', size='dynamic', ui_module='double_index_list', ro='0'";
 #endif
 
 	obj = &ctx->objs[2089];
@@ -32418,7 +32418,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2090] = "alias='Version', type='string', size='[1, 1]', range='[0, 64]', default='V2', dynamic='0', hide='0'";
+	ctx->descs[2090] = "alias='Version', type='string', size='[1, 1]', range='[0, 64]', default='V2', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[2091];
@@ -32434,7 +32434,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 376;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2091] = "alias='CalibPara', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[2091] = "alias='CalibPara', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[2092];
@@ -32450,7 +32450,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 379;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2092] = "alias='Bayernr2D', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[2092] = "alias='Bayernr2D', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[2093];
@@ -32466,7 +32466,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2093] = "alias='iso', type='f32', range='[50, 204800]', default='50', digit='[1]', ui_module_param='index2'";
+	ctx->descs[2093] = "alias='iso', type='f32', range='[50, 204800]', default='50', digit='[1]', ui_module_param='index2', ro='0'";
 #endif
 
 	obj = &ctx->objs[2094];
@@ -32482,7 +32482,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2094] = "alias='lumapoint', type='s32', size='[1, 16]', range='[0, 65535]', default='0.0', digit='[0]', dynamic='0', hide='0'";
+	ctx->descs[2094] = "alias='lumapoint', type='s32', size='[1, 16]', range='[0, 65535]', default='0.0', digit='[0]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[2095];
@@ -32498,7 +32498,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2095] = "alias='sigma', type='s32', size='[1, 16]', range='[0, 65535]', default='0.0', digit='[0]', dynamic='0', hide='0'";
+	ctx->descs[2095] = "alias='sigma', type='s32', size='[1, 16]', range='[0, 65535]', default='0.0', digit='[0]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[2096];
@@ -32514,7 +32514,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2096] = "alias='lumapoint2', type='s32', size='[1, 16]', range='[0, 65535]', default='0.0', digit='[0]', dynamic='0', hide='0'";
+	ctx->descs[2096] = "alias='lumapoint2', type='s32', size='[1, 16]', range='[0, 65535]', default='0.0', digit='[0]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[2097];
@@ -32530,7 +32530,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2097] = "alias='lo_sigma', type='s32', size='[1, 16]', range='[0, 65535]', default='0.0', digit='[0]', dynamic='0', hide='0'";
+	ctx->descs[2097] = "alias='lo_sigma', type='s32', size='[1, 16]', range='[0, 65535]', default='0.0', digit='[0]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[2098];
@@ -32546,7 +32546,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2098] = "alias='hi_sigma', type='s32', size='[1, 16]', range='[0, 65535]', default='0.0', digit='[0]', dynamic='0', hide='0'";
+	ctx->descs[2098] = "alias='hi_sigma', type='s32', size='[1, 16]', range='[0, 65535]', default='0.0', digit='[0]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[2099];
@@ -32562,7 +32562,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2099] = "alias='SNR_Mode', type='string', size='[1, 1]', range='[0, 64]', default='LSNR', dynamic='0', ui_module_param='index1'";
+	ctx->descs[2099] = "alias='SNR_Mode', type='string', size='[1, 1]', range='[0, 64]', default='LSNR', dynamic='0', ui_module_param='index1', ro='0'";
 #endif
 
 	obj = &ctx->objs[2100];
@@ -32578,7 +32578,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2100] = "alias='Sensor_Mode', type='string', size='[1, 1]', range='[0, 64]', default='lcg', dynamic='0', hide='0'";
+	ctx->descs[2100] = "alias='Sensor_Mode', type='string', size='[1, 1]', range='[0, 64]', default='lcg', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[2101];
@@ -32594,7 +32594,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 381;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2101] = "alias='Calib_ISO', type='struct_list', size='dynamic', ui_module='double_index_list'";
+	ctx->descs[2101] = "alias='Calib_ISO', type='struct_list', size='dynamic', ui_module='double_index_list', ro='0'";
 #endif
 
 	obj = &ctx->objs[2102];
@@ -32623,7 +32623,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 382;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2103] = "alias='Setting', type='struct_list', size='dynamic', ui_module='double_index_list'";
+	ctx->descs[2103] = "alias='Setting', type='struct_list', size='dynamic', ui_module='double_index_list', ro='0'";
 #endif
 
 	obj = &ctx->objs[2104];
@@ -32652,7 +32652,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2105] = "alias='iso', type='f32', range='[50, 204800]', default='50', digit='[1]', ui_module_param='index2'";
+	ctx->descs[2105] = "alias='iso', type='f32', range='[50, 204800]', default='50', digit='[1]', ui_module_param='index2', ro='0'";
 #endif
 
 	obj = &ctx->objs[2106];
@@ -32668,7 +32668,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2106] = "alias='thumbds', type='f32', size='[1,1]', range='[0, 8]', default='8', digit='[2]', hide='0'";
+	ctx->descs[2106] = "alias='thumbds', type='f32', size='[1,1]', range='[0, 8]', default='8', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[2107];
@@ -32684,7 +32684,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2107] = "type='bool', alias='lo_enable', default='1', hide='0'";
+	ctx->descs[2107] = "type='bool', alias='lo_enable', default='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[2108];
@@ -32700,7 +32700,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2108] = "type='bool', alias='hi_enable', default='1', hide='0'";
+	ctx->descs[2108] = "type='bool', alias='hi_enable', default='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[2109];
@@ -32716,7 +32716,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2109] = "alias='lo_filter_strength', type='f32', size='[1,1]', range='[0, 16]', default='1.0', digit='[2]', hide='0'";
+	ctx->descs[2109] = "alias='lo_filter_strength', type='f32', size='[1,1]', range='[0, 16]', default='1.0', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[2110];
@@ -32732,7 +32732,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2110] = "alias='hi_filter_strength', type='f32', size='[1,1]', range='[0, 16]', default='1.0', digit='[2]', hide='0'";
+	ctx->descs[2110] = "alias='hi_filter_strength', type='f32', size='[1,1]', range='[0, 16]', default='1.0', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[2111];
@@ -32748,7 +32748,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2111] = "alias='soft_threshold_ratio', type='f32', size='[1,1]', range='[0, 1.0]', default='0.0', digit='[2]', hide='0'";
+	ctx->descs[2111] = "alias='soft_threshold_ratio', type='f32', size='[1,1]', range='[0, 1.0]', default='0.0', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[2112];
@@ -32764,7 +32764,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2112] = "alias='SNR_Mode', type='string', size='[1, 1]', range='[0, 64]', default='LSNR', dynamic='0', ui_module_param='index1'";
+	ctx->descs[2112] = "alias='SNR_Mode', type='string', size='[1, 1]', range='[0, 64]', default='LSNR', dynamic='0', ui_module_param='index1', ro='0'";
 #endif
 
 	obj = &ctx->objs[2113];
@@ -32780,7 +32780,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2113] = "alias='Sensor_Mode', type='string', size='[1, 1]', range='[0, 64]', default='lcg', dynamic='0', hide='0'";
+	ctx->descs[2113] = "alias='Sensor_Mode', type='string', size='[1, 1]', range='[0, 64]', default='lcg', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[2114];
@@ -32796,7 +32796,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 384;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2114] = "alias='Tuning_ISO', type='struct_list', size='dynamic', ui_module='double_index_list'";
+	ctx->descs[2114] = "alias='Tuning_ISO', type='struct_list', size='dynamic', ui_module='double_index_list', ro='0'";
 #endif
 
 	obj = &ctx->objs[2115];
@@ -32825,7 +32825,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2116] = "type='bool', alias='enable', default='1', hide='0'";
+	ctx->descs[2116] = "type='bool', alias='enable', default='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[2117];
@@ -32841,7 +32841,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 385;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2117] = "alias='Setting', type='struct_list', size='dynamic', ui_module='double_index_list'";
+	ctx->descs[2117] = "alias='Setting', type='struct_list', size='dynamic', ui_module='double_index_list', ro='0'";
 #endif
 
 	obj = &ctx->objs[2118];
@@ -32870,7 +32870,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2119] = "alias='Version', type='string', size='[1, 1]', range='[0, 64]', default='V2', dynamic='0', hide='0'";
+	ctx->descs[2119] = "alias='Version', type='string', size='[1, 1]', range='[0, 64]', default='V2', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[2120];
@@ -32886,7 +32886,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 383;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2120] = "alias='CalibPara', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[2120] = "alias='CalibPara', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[2121];
@@ -32902,7 +32902,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 386;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2121] = "alias='Bayernr3D', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[2121] = "alias='Bayernr3D', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[2122];
@@ -32918,7 +32918,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2122] = "alias='iso', type='u32', size='[1,1]', range='[0, 4294967295]', default='0', digit='[0]', hide='0'";
+	ctx->descs[2122] = "alias='iso', type='u32', size='[1,1]', range='[0, 4294967295]', default='0', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[2123];
@@ -32934,7 +32934,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2123] = "alias='bypass', type='u8', size='[1,1]', range='[0, 1]', default='0', digit='[0]', hide='0'";
+	ctx->descs[2123] = "alias='bypass', type='u8', size='[1,1]', range='[0, 1]', default='0', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[2124];
@@ -32950,7 +32950,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2124] = "alias='strength_table', type='f32', size='[0, 22]', range='[0, 1]', default='1.0', digit='[1]', dynamic='0', hide='0'";
+	ctx->descs[2124] = "alias='strength_table', type='f32', size='[0, 22]', range='[0, 1]', default='1.0', digit='[1]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[2125];
@@ -32966,7 +32966,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 388;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2125] = "alias='SettingByIso', type='struct_list', size='dynamic', ui_module='double_index_list'";
+	ctx->descs[2125] = "alias='SettingByIso', type='struct_list', size='dynamic', ui_module='double_index_list', ro='0'";
 #endif
 
 	obj = &ctx->objs[2126];
@@ -32995,7 +32995,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2127] = "alias='enable', type='u8', size='[1,1]', range='[0, 1]', default='0', digit='[0]', hide='0'";
+	ctx->descs[2127] = "alias='enable', type='u8', size='[1,1]', range='[0, 1]', default='0', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[2128];
@@ -33011,7 +33011,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2128] = "alias='psf_path', type='string', size='[1, 1]', range='[0, 255]', default='/etc/iqfiles/cac', dynamic='0', hide='0'";
+	ctx->descs[2128] = "alias='psf_path', type='string', size='[1, 1]', range='[0, 255]', default='/etc/iqfiles/cac', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[2129];
@@ -33027,7 +33027,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2129] = "alias='psf_shift_bits', type='u8', size='[1,1]', range='[0, 10]', default='2', digit='[0]', hide='0'";
+	ctx->descs[2129] = "alias='psf_shift_bits', type='u8', size='[1,1]', range='[0, 10]', default='2', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[2130];
@@ -33043,7 +33043,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2130] = "alias='center_en', type='u8', size='[1,1]', range='[0, 1]', default='0', digit='[0]', hide='0'";
+	ctx->descs[2130] = "alias='center_en', type='u8', size='[1,1]', range='[0, 1]', default='0', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[2131];
@@ -33059,7 +33059,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2131] = "alias='center_x', type='u16', size='[1,1]', range='[0, 65535]', default='0', digit='[0]', hide='0'";
+	ctx->descs[2131] = "alias='center_x', type='u16', size='[1,1]', range='[0, 65535]', default='0', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[2132];
@@ -33075,7 +33075,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2132] = "alias='center_y', type='u16', size='[1,1]', range='[0, 65535]', default='0', digit='[0]', hide='0'";
+	ctx->descs[2132] = "alias='center_y', type='u16', size='[1,1]', range='[0, 65535]', default='0', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[2133];
@@ -33091,7 +33091,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 390;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2133] = "alias='SettingPara', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[2133] = "alias='SettingPara', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[2134];
@@ -33107,7 +33107,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 389;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2134] = "alias='TuningPara', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[2134] = "alias='TuningPara', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[2135];
@@ -33123,7 +33123,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 69;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2135] = "alias='AEC', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[2135] = "alias='AEC', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[2136];
@@ -33139,7 +33139,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 182;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2136] = "alias='wb_v21', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[2136] = "alias='wb_v21', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[2137];
@@ -33155,7 +33155,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 76;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2137] = "alias='ablc_calib', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[2137] = "alias='ablc_calib', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[2138];
@@ -33171,7 +33171,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 251;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2138] = "alias='ccm_calib', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[2138] = "alias='ccm_calib', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[2139];
@@ -33187,7 +33187,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 258;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2139] = "alias='lut3d_calib', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[2139] = "alias='lut3d_calib', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[2140];
@@ -33203,7 +33203,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 78;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2140] = "alias='degamma', type='struct', ui_module='curve_ui_type_A', hide='0'";
+	ctx->descs[2140] = "alias='degamma', type='struct', ui_module='curve_ui_type_A', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[2141];
@@ -33219,7 +33219,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 84;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2141] = "alias='agic_calib_v21', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[2141] = "alias='agic_calib_v21', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[2142];
@@ -33235,7 +33235,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 189;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2142] = "alias='debayer_calib', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[2142] = "alias='debayer_calib', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[2143];
@@ -33251,7 +33251,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 124;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2143] = "alias='Amerge_calib', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[2143] = "alias='Amerge_calib', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[2144];
@@ -33267,7 +33267,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 325;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2144] = "alias='Adrc_calib', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[2144] = "alias='Adrc_calib', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[2145];
@@ -33283,7 +33283,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 73;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2145] = "alias='agamma_calib', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[2145] = "alias='agamma_calib', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[2146];
@@ -33299,7 +33299,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 101;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2146] = "alias='adehaze_calib', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[2146] = "alias='adehaze_calib', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[2147];
@@ -33315,7 +33315,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 118;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2147] = "alias='adpcc_calib', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[2147] = "alias='adpcc_calib', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[2148];
@@ -33331,7 +33331,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 303;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2148] = "alias='aldch', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[2148] = "alias='aldch', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[2149];
@@ -33347,7 +33347,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 184;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2149] = "alias='cpsl', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[2149] = "alias='cpsl', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[2150];
@@ -33363,7 +33363,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 238;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2150] = "alias='cproc_calib', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[2150] = "alias='cproc_calib', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[2151];
@@ -33379,7 +33379,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 240;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2151] = "alias='aie_calib', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[2151] = "alias='aie_calib', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[2152];
@@ -33395,7 +33395,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 312;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2152] = "alias='colorAsGrey', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[2152] = "alias='colorAsGrey', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[2153];
@@ -33411,7 +33411,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 283;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2153] = "alias='lsc_v2', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[2153] = "alias='lsc_v2', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[2154];
@@ -33427,7 +33427,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 380;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2154] = "alias='bayer2dnr_v2', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[2154] = "alias='bayer2dnr_v2', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[2155];
@@ -33443,7 +33443,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 387;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2155] = "alias='bayertnr_v2', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[2155] = "alias='bayertnr_v2', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[2156];
@@ -33459,7 +33459,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 362;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2156] = "alias='ynr_v3', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[2156] = "alias='ynr_v3', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[2157];
@@ -33475,7 +33475,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 367;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2157] = "alias='cnr_v2', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[2157] = "alias='cnr_v2', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[2158];
@@ -33491,7 +33491,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 373;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2158] = "alias='sharp_v4', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[2158] = "alias='sharp_v4', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[2159];
@@ -33507,7 +33507,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 391;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2159] = "alias='cac_calib', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[2159] = "alias='cac_calib', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[2160];
@@ -33523,7 +33523,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 301;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2160] = "alias='af_calib', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[2160] = "alias='af_calib', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[2161];
@@ -34761,7 +34761,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2255] = "alias='SNR', type='u8', size='[1,1]', range='[0, 1]', default='0', digit='[0]', hide='1'";
+	ctx->descs[2255] = "alias='SNR', type='u8', size='[1,1]', range='[0, 1]', default='0', digit='[0]', hide='1', ro='0'";
 #endif
 
 	obj = &ctx->objs[2256];
@@ -34777,7 +34777,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2256] = "alias='DR', type='u8', size='[1,1]', range='[0, 1]', default='0', digit='[0]', hide='1'";
+	ctx->descs[2256] = "alias='DR', type='u8', size='[1,1]', range='[0, 1]', default='0', digit='[0]', hide='1', ro='0'";
 #endif
 
 	obj = &ctx->objs[2257];
@@ -34793,7 +34793,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2257] = "alias='Sat', type='u8', size='[1,1]', range='[0, 1]', default='0', digit='[0]', hide='1'";
+	ctx->descs[2257] = "alias='Sat', type='u8', size='[1,1]', range='[0, 1]', default='0', digit='[0]', hide='1', ro='0'";
 #endif
 
 	obj = &ctx->objs[2258];
@@ -34809,7 +34809,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2258] = "alias='SEN', type='u8', size='[1,1]', range='[0, 1]', default='0', digit='[0]', hide='1'";
+	ctx->descs[2258] = "alias='SEN', type='u8', size='[1,1]', range='[0, 1]', default='0', digit='[0]', hide='1', ro='0'";
 #endif
 
 	obj = &ctx->objs[2259];
@@ -34825,7 +34825,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2259] = "alias='CISTime', type='f32', size='[1,1]', range='[0, 1]', default='0', digit='[6]', hide='0'";
+	ctx->descs[2259] = "alias='CISTime', type='f32', size='[1,1]', range='[0, 1]', default='0', digit='[6]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[2260];
@@ -34841,7 +34841,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2260] = "alias='CISGain', type='f32', size='[1,1]', range='[0, 4096]', default='0', digit='[3]', hide='0'";
+	ctx->descs[2260] = "alias='CISGain', type='f32', size='[1,1]', range='[0, 4096]', default='0', digit='[3]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[2261];
@@ -34857,7 +34857,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2261] = "alias='digital_gain', type='f32', size='[1,1]', range='[0, 4096]', default='0', digit='[3]', hide='1'";
+	ctx->descs[2261] = "alias='digital_gain', type='f32', size='[1,1]', range='[0, 4096]', default='0', digit='[3]', hide='1', ro='0'";
 #endif
 
 	obj = &ctx->objs[2262];
@@ -34873,7 +34873,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2262] = "alias='isp_dgain', type='f32', size='[1,1]', range='[0, 256]', default='0', digit='[3]', hide='1'";
+	ctx->descs[2262] = "alias='isp_dgain', type='f32', size='[1,1]', range='[0, 256]', default='0', digit='[3]', hide='1', ro='0'";
 #endif
 
 	obj = &ctx->objs[2263];
@@ -34889,7 +34889,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2263] = "alias='iso', type='s32', size='[1,1]', range='[0, 524288]', default='0', digit='[0]', hide='1'";
+	ctx->descs[2263] = "alias='iso', type='s32', size='[1,1]', range='[0, 524288]', default='0', digit='[0]', hide='1', ro='0'";
 #endif
 
 	obj = &ctx->objs[2264];
@@ -34905,7 +34905,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2264] = "alias='DcgMode', type='s32', size='[1,1]', range='[-1, 1]', default='0', digit='[0]', hide='0'";
+	ctx->descs[2264] = "alias='DcgMode', type='s32', size='[1,1]', range='[-1, 1]', default='0', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[2265];
@@ -34921,7 +34921,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2265] = "alias='longfrm_mode', type='s32', size='[1,1]', range='[0, 1]', default='0', digit='[0]', hide='1'";
+	ctx->descs[2265] = "alias='longfrm_mode', type='s32', size='[1,1]', range='[0, 1]', default='0', digit='[0]', hide='1', ro='0'";
 #endif
 
 	obj = &ctx->objs[2266];
@@ -34937,7 +34937,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2266] = "alias='fine_integration_time', type='u32', size='[1,1]', range='[0, 65535]', default='0', digit='[0]', hide='1'";
+	ctx->descs[2266] = "alias='fine_integration_time', type='u32', size='[1,1]', range='[0, 65535]', default='0', digit='[0]', hide='1', ro='0'";
 #endif
 
 	obj = &ctx->objs[2267];
@@ -34953,7 +34953,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2267] = "alias='coarse_integration_time', type='u32', size='[1,1]', range='[0, 65535]', default='0', digit='[0]', hide='1'";
+	ctx->descs[2267] = "alias='coarse_integration_time', type='u32', size='[1,1]', range='[0, 65535]', default='0', digit='[0]', hide='1', ro='0'";
 #endif
 
 	obj = &ctx->objs[2268];
@@ -34969,7 +34969,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2268] = "alias='analog_gain_code_global', type='u32', size='[1,1]', range='[0, 524288]', default='0', digit='[0]', hide='1'";
+	ctx->descs[2268] = "alias='analog_gain_code_global', type='u32', size='[1,1]', range='[0, 524288]', default='0', digit='[0]', hide='1', ro='0'";
 #endif
 
 	obj = &ctx->objs[2269];
@@ -34985,7 +34985,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2269] = "alias='digital_gain_global', type='u32', size='[1,1]', range='[0, 65535]', default='0', digit='[0]', hide='1'";
+	ctx->descs[2269] = "alias='digital_gain_global', type='u32', size='[1,1]', range='[0, 65535]', default='0', digit='[0]', hide='1', ro='0'";
 #endif
 
 	obj = &ctx->objs[2270];
@@ -35001,7 +35001,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2270] = "alias='isp_digital_gain', type='u32', size='[1,1]', range='[0, 65535]', default='0', digit='[0]', hide='1'";
+	ctx->descs[2270] = "alias='isp_digital_gain', type='u32', size='[1,1]', range='[0, 65535]', default='0', digit='[0]', hide='1', ro='0'";
 #endif
 
 	obj = &ctx->objs[2271];
@@ -35017,7 +35017,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 412;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2271] = "alias='RealPara', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[2271] = "alias='RealPara', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[2272];
@@ -35033,7 +35033,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 413;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2272] = "alias='RegPara', type='struct', ui_module='normal_ui_style', hide='1'";
+	ctx->descs[2272] = "alias='RegPara', type='struct', ui_module='normal_ui_style', hide='1', ro='0'";
 #endif
 
 	obj = &ctx->objs[2273];
@@ -35049,7 +35049,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2273] = "alias='step', type='s32', size='[1,1]', range='[0, 65535]', default='0', digit='[0]', hide='1'";
+	ctx->descs[2273] = "alias='step', type='s32', size='[1,1]', range='[0, 65535]', default='0', digit='[0]', hide='1', ro='0'";
 #endif
 
 	obj = &ctx->objs[2274];
@@ -35065,7 +35065,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2274] = "alias='gain', type='s32', size='[1,1]', range='[0, 65535]', default='0', digit='[0]', hide='1'";
+	ctx->descs[2274] = "alias='gain', type='s32', size='[1,1]', range='[0, 65535]', default='0', digit='[0]', hide='1', ro='0'";
 #endif
 
 	obj = &ctx->objs[2275];
@@ -35081,7 +35081,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2275] = "type='bool', alias='update', default='0', hide='1'";
+	ctx->descs[2275] = "type='bool', alias='update', default='0', hide='1', ro='0'";
 #endif
 
 	obj = &ctx->objs[2276];
@@ -35097,7 +35097,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2276] = "alias='pwmDuty', type='s32', size='[1,1]', range='[0, 100]', default='0', digit='[0]', hide='1'";
+	ctx->descs[2276] = "alias='pwmDuty', type='s32', size='[1,1]', range='[0, 100]', default='0', digit='[0]', hide='1', ro='0'";
 #endif
 
 	obj = &ctx->objs[2277];
@@ -35113,7 +35113,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2277] = "type='bool', alias='update', default='0', hide='1'";
+	ctx->descs[2277] = "type='bool', alias='update', default='0', hide='1', ro='0'";
 #endif
 
 	obj = &ctx->objs[2278];
@@ -35129,7 +35129,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 415;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2278] = "alias='PIris', type='struct', ui_module='normal_ui_style', hide='1'";
+	ctx->descs[2278] = "alias='PIris', type='struct', ui_module='normal_ui_style', hide='1', ro='0'";
 #endif
 
 	obj = &ctx->objs[2279];
@@ -35145,7 +35145,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 416;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2279] = "alias='DCIris', type='struct', ui_module='normal_ui_style', hide='1'";
+	ctx->descs[2279] = "alias='DCIris', type='struct', ui_module='normal_ui_style', hide='1', ro='0'";
 #endif
 
 	obj = &ctx->objs[2280];
@@ -35161,7 +35161,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 414;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2280] = "alias='LinearExp', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[2280] = "alias='LinearExp', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[2281];
@@ -35177,7 +35177,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 414;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2281] = "alias='HdrExp', type='struct_list', size='[1, 3]', ui_module='normal_ui_style'";
+	ctx->descs[2281] = "alias='HdrExp', type='struct_list', size='[1, 3]', ui_module='normal_ui_style', ro='0'";
 #endif
 
 	obj = &ctx->objs[2282];
@@ -35193,7 +35193,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 417;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2282] = "alias='Iris', type='struct', ui_module='normal_ui_style', hide='1'";
+	ctx->descs[2282] = "alias='Iris', type='struct', ui_module='normal_ui_style', hide='1', ro='0'";
 #endif
 
 	obj = &ctx->objs[2283];
@@ -35209,7 +35209,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2283] = "alias='LineLengthPixels(hts)', type='u16', size='[1,1]', range='[0, 65535]', default='0', digit='[0]', hide='0'";
+	ctx->descs[2283] = "alias='LineLengthPixels(hts)', type='u16', size='[1,1]', range='[0, 65535]', default='0', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[2284];
@@ -35225,7 +35225,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2284] = "alias='FrameLengthLines(vts)', type='u16', size='[1,1]', range='[0, 65535]', default='0', digit='[0]', hide='0'";
+	ctx->descs[2284] = "alias='FrameLengthLines(vts)', type='u16', size='[1,1]', range='[0, 65535]', default='0', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[2285];
@@ -35241,7 +35241,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2285] = "alias='PixelClockFreqMhz', type='f32', size='[1,1]', range='[0, 65535]', default='0', digit='[2]', hide='0'";
+	ctx->descs[2285] = "alias='PixelClockFreqMhz', type='f32', size='[1,1]', range='[0, 65535]', default='0', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[2286];
@@ -35257,7 +35257,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 411;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2286] = "alias='CISFeature_t', type='struct', ui_module='normal_ui_style', hide='1'";
+	ctx->descs[2286] = "alias='CISFeature_t', type='struct', ui_module='normal_ui_style', hide='1', ro='0'";
 #endif
 
 	obj = &ctx->objs[2287];
@@ -35520,7 +35520,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2306] = "type='bool', alias='ManualTimeEn', default='1', hide='0'";
+	ctx->descs[2306] = "type='bool', alias='ManualTimeEn', default='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[2307];
@@ -35536,7 +35536,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2307] = "type='bool', alias='ManualGainEn', default='1', hide='0'";
+	ctx->descs[2307] = "type='bool', alias='ManualGainEn', default='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[2308];
@@ -35552,7 +35552,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2308] = "type='bool', alias='ManualIspDgainEn', default='1', hide='0'";
+	ctx->descs[2308] = "type='bool', alias='ManualIspDgainEn', default='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[2309];
@@ -35568,7 +35568,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2309] = "alias='TimeValue', type='f32', size='[1,1]', range='[0, 1]', default='0.003', digit='[6]', hide='0'";
+	ctx->descs[2309] = "alias='TimeValue', type='f32', size='[1,1]', range='[0, 1]', default='0.003', digit='[6]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[2310];
@@ -35584,7 +35584,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2310] = "alias='GainValue', type='f32', size='[1,1]', range='[1, 4096]', default='1', digit='[3]', hide='0'";
+	ctx->descs[2310] = "alias='GainValue', type='f32', size='[1,1]', range='[1, 4096]', default='1', digit='[3]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[2311];
@@ -35600,7 +35600,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2311] = "alias='IspDGainValue', type='f32', size='[1,1]', range='[1, 4096]', default='1', digit='[3]', hide='0'";
+	ctx->descs[2311] = "alias='IspDGainValue', type='f32', size='[1,1]', range='[1, 4096]', default='1', digit='[3]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[2312];
@@ -35616,7 +35616,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2312] = "type='bool', alias='ManualTimeEn', default='1', hide='0'";
+	ctx->descs[2312] = "type='bool', alias='ManualTimeEn', default='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[2313];
@@ -35632,7 +35632,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2313] = "type='bool', alias='ManualGainEn', default='1', hide='0'";
+	ctx->descs[2313] = "type='bool', alias='ManualGainEn', default='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[2314];
@@ -35648,7 +35648,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2314] = "type='bool', alias='ManualIspDgainEn', default='1', hide='0'";
+	ctx->descs[2314] = "type='bool', alias='ManualIspDgainEn', default='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[2315];
@@ -35664,7 +35664,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2315] = "alias='TimeValue', type='f32', size='[1, 3]', range='[0, 1]', default='0.003', digit='[6]', dynamic='0', hide='0'";
+	ctx->descs[2315] = "alias='TimeValue', type='f32', size='[1, 3]', range='[0, 1]', default='0.003', digit='[6]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[2316];
@@ -35680,7 +35680,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2316] = "alias='GainValue', type='f32', size='[1, 3]', range='[1, 4096]', default='1.0', digit='[3]', dynamic='0', hide='0'";
+	ctx->descs[2316] = "alias='GainValue', type='f32', size='[1, 3]', range='[1, 4096]', default='1.0', digit='[3]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[2317];
@@ -35696,7 +35696,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2317] = "alias='IspDGainValue', type='f32', size='[1, 3]', range='[1, 4096]', default='1.0', digit='[3]', dynamic='0', hide='0'";
+	ctx->descs[2317] = "alias='IspDGainValue', type='f32', size='[1, 3]', range='[1, 4096]', default='1.0', digit='[3]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[2318];
@@ -35712,7 +35712,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 424;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2318] = "alias='LinearAE', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[2318] = "alias='LinearAE', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[2319];
@@ -35728,7 +35728,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 425;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2319] = "alias='HdrAE', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[2319] = "alias='HdrAE', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[2320];
@@ -35900,7 +35900,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = 3;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2332] = "type='enum', alias='OPMode', enum_def='RKAiqOPMode_uapi_t', default='RK_AIQ_OP_MODE_AUTO'";
+	ctx->descs[2332] = "type='enum', alias='OPMode', enum_def='RKAiqOPMode_uapi_t', default='RK_AIQ_OP_MODE_AUTO', ro='0'";
 #endif
 
 	obj = &ctx->objs[2333];
@@ -35942,7 +35942,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 426;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2335] = "alias='ManualCtrl', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[2335] = "alias='ManualCtrl', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[2336];
@@ -35971,7 +35971,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2337] = "type='bool', alias='IsConverged', default='0', hide='1'";
+	ctx->descs[2337] = "type='bool', alias='IsConverged', default='0', hide='1', ro='0'";
 #endif
 
 	obj = &ctx->objs[2338];
@@ -35987,7 +35987,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2338] = "type='bool', alias='IsExpMax', default='0', hide='1'";
+	ctx->descs[2338] = "type='bool', alias='IsExpMax', default='0', hide='1', ro='0'";
 #endif
 
 	obj = &ctx->objs[2339];
@@ -36003,7 +36003,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2339] = "alias='LumaDeviation', type='f32', size='[1,1]', range='[-256, 256]', default='0.0', digit='[3]', hide='1'";
+	ctx->descs[2339] = "alias='LumaDeviation', type='f32', size='[1,1]', range='[-256, 256]', default='0.0', digit='[3]', hide='1', ro='0'";
 #endif
 
 	obj = &ctx->objs[2340];
@@ -36019,7 +36019,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2340] = "alias='HdrLumaDeviation', type='f32', size='[1, 3]', range='[-256, 256]', default='0.0', digit='[3]', dynamic='0', hide='1'";
+	ctx->descs[2340] = "alias='HdrLumaDeviation', type='f32', size='[1, 3]', range='[-256, 256]', default='0.0', digit='[3]', dynamic='0', hide='1', ro='0'";
 #endif
 
 	obj = &ctx->objs[2341];
@@ -36035,7 +36035,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2341] = "alias='MeanLuma', type='f32', size='[1,1]', range='[0, 256]', default='0.0', digit='[2]', hide='0'";
+	ctx->descs[2341] = "alias='MeanLuma', type='f32', size='[1,1]', range='[0, 256]', default='0.0', digit='[2]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[2342];
@@ -36051,7 +36051,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2342] = "alias='HdrMeanLuma', type='f32', size='[1, 3]', range='[0, 256]', default='0.0', digit='[2]', dynamic='0', hide='0'";
+	ctx->descs[2342] = "alias='HdrMeanLuma', type='f32', size='[1, 3]', range='[0, 256]', default='0.0', digit='[2]', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[2343];
@@ -36067,7 +36067,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2343] = "alias='GlobalEnvLux', type='f32', size='[1,1]', range='[0, 65535]', default='0.0', digit='[2]', hide='1'";
+	ctx->descs[2343] = "alias='GlobalEnvLux', type='f32', size='[1,1]', range='[0, 65535]', default='0.0', digit='[2]', hide='1', ro='0'";
 #endif
 
 	obj = &ctx->objs[2344];
@@ -36083,7 +36083,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2344] = "alias='BlockEnvLux', type='f32', size='[15, 15]', range='[0, 65535]', default='0.0', digit='[2]', dynamic='0', hide='1'";
+	ctx->descs[2344] = "alias='BlockEnvLux', type='f32', size='[15, 15]', range='[0, 65535]', default='0.0', digit='[2]', dynamic='0', hide='1', ro='0'";
 #endif
 
 	obj = &ctx->objs[2345];
@@ -36099,7 +36099,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 418;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2345] = "alias='CurExpInfo', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[2345] = "alias='CurExpInfo', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[2346];
@@ -36115,7 +36115,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2346] = "alias='Piris', type='u16', size='[1,1]', range='[0, 1024]', default='0', digit='[0]', hide='1'";
+	ctx->descs[2346] = "alias='Piris', type='u16', size='[1,1]', range='[0, 1024]', default='0', digit='[0]', hide='1', ro='0'";
 #endif
 
 	obj = &ctx->objs[2347];
@@ -36131,7 +36131,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2347] = "alias='LinePeriodsPerField', type='f32', size='[1,1]', range='[0, 65535]', default='0', digit='[2]', hide='1'";
+	ctx->descs[2347] = "alias='LinePeriodsPerField', type='f32', size='[1,1]', range='[0, 65535]', default='0', digit='[2]', hide='1', ro='0'";
 #endif
 
 	obj = &ctx->objs[2348];
@@ -36147,7 +36147,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2348] = "alias='PixelPeriodsPerLine', type='f32', size='[1,1]', range='[0, 65535]', default='0', digit='[2]', hide='1'";
+	ctx->descs[2348] = "alias='PixelPeriodsPerLine', type='f32', size='[1,1]', range='[0, 65535]', default='0', digit='[2]', hide='1', ro='0'";
 #endif
 
 	obj = &ctx->objs[2349];
@@ -36163,7 +36163,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2349] = "alias='PixelClockFreqMHZ', type='f32', size='[1,1]', range='[0, 4096]', default='0', digit='[2]', hide='1'";
+	ctx->descs[2349] = "alias='PixelClockFreqMHZ', type='f32', size='[1,1]', range='[0, 4096]', default='0', digit='[2]', hide='1', ro='0'";
 #endif
 
 	obj = &ctx->objs[2350];
@@ -36179,7 +36179,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = 49;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2350] = "type='enum', alias='mode', enum_def='opMode_t', default='OP_AUTO'";
+	ctx->descs[2350] = "type='enum', alias='mode', enum_def='opMode_t', default='OP_AUTO', ro='0'";
 #endif
 
 	obj = &ctx->objs[2351];
@@ -36195,7 +36195,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2351] = "alias='rgain', type='f32', size='[1,1]', range='[0, 8]', default='0', digit='[6]', hide='0'";
+	ctx->descs[2351] = "alias='rgain', type='f32', size='[1,1]', range='[0, 8]', default='0', digit='[6]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[2352];
@@ -36211,7 +36211,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2352] = "alias='grgain', type='f32', size='[1,1]', range='[0, 8]', default='0', digit='[6]', hide='0'";
+	ctx->descs[2352] = "alias='grgain', type='f32', size='[1,1]', range='[0, 8]', default='0', digit='[6]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[2353];
@@ -36227,7 +36227,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2353] = "alias='gbgain', type='f32', size='[1,1]', range='[0, 8]', default='0', digit='[6]', hide='0'";
+	ctx->descs[2353] = "alias='gbgain', type='f32', size='[1,1]', range='[0, 8]', default='0', digit='[6]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[2354];
@@ -36243,7 +36243,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2354] = "alias='bgain', type='f32', size='[1,1]', range='[0, 8]', default='0', digit='[6]', hide='0'";
+	ctx->descs[2354] = "alias='bgain', type='f32', size='[1,1]', range='[0, 8]', default='0', digit='[6]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[2355];
@@ -36259,7 +36259,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2355] = "alias='Envlv', type='f32', size='[1,1]', range='[0, 8]', default='0', digit='[6]', hide='0'";
+	ctx->descs[2355] = "alias='Envlv', type='f32', size='[1,1]', range='[0, 8]', default='0', digit='[6]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[2356];
@@ -36275,7 +36275,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2356] = "alias='MoveCoef', type='f32', size='[1,1]', range='[0, 8]', default='0', digit='[6]', hide='0'";
+	ctx->descs[2356] = "alias='MoveCoef', type='f32', size='[1,1]', range='[0, 8]', default='0', digit='[6]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[2357];
@@ -36291,7 +36291,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = 22;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2357] = "type='enum', alias='GlobalLumaMode', enum_def='GlobalLumaMode_t', default='GLOBALLUMAMODE_ENVLV'";
+	ctx->descs[2357] = "type='enum', alias='GlobalLumaMode', enum_def='GlobalLumaMode_t', default='GLOBALLUMAMODE_ENVLV', ro='0'";
 #endif
 
 	obj = &ctx->objs[2358];
@@ -36307,7 +36307,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = 23;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2358] = "type='enum', alias='Mode', enum_def='DetailsHighLightMode_t', default='DETAILSHIGHLIGHTMODE_ENVLV'";
+	ctx->descs[2358] = "type='enum', alias='Mode', enum_def='DetailsHighLightMode_t', default='DETAILSHIGHLIGHTMODE_ENVLV', ro='0'";
 #endif
 
 	obj = &ctx->objs[2359];
@@ -36323,7 +36323,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = 24;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2359] = "type='enum', alias='DetailsLowLightMode', enum_def='DetailsLowLightMode_t', default='DETAILSLOWLIGHTMODE_ISO'";
+	ctx->descs[2359] = "type='enum', alias='DetailsLowLightMode', enum_def='DetailsLowLightMode_t', default='DETAILSLOWLIGHTMODE_ISO', ro='0'";
 #endif
 
 	obj = &ctx->objs[2360];
@@ -36339,7 +36339,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = 25;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2360] = "type='enum', alias='GlobalTmoMode', enum_def='TmoTypeMode_t', default='TMOTYPEMODE_DYNAMICRANGE'";
+	ctx->descs[2360] = "type='enum', alias='GlobalTmoMode', enum_def='TmoTypeMode_t', default='TMOTYPEMODE_DYNAMICRANGE', ro='0'";
 #endif
 
 	obj = &ctx->objs[2361];
@@ -36355,7 +36355,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = 25;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2361] = "type='enum', alias='LocalTMOMode', enum_def='TmoTypeMode_t', default='TMOTYPEMODE_DYNAMICRANGE'";
+	ctx->descs[2361] = "type='enum', alias='LocalTMOMode', enum_def='TmoTypeMode_t', default='TMOTYPEMODE_DYNAMICRANGE', ro='0'";
 #endif
 
 	obj = &ctx->objs[2362];
@@ -36618,7 +36618,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2381] = "alias='EnvLv', type='f32', size='[1,1]', range='[0, 1]', default='0', digit='[6]', hide='0'";
+	ctx->descs[2381] = "alias='EnvLv', type='f32', size='[1,1]', range='[0, 1]', default='0', digit='[6]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[2382];
@@ -36673,7 +36673,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 439;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2385] = "alias='Info', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[2385] = "alias='Info', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[2386];
@@ -36689,7 +36689,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 428;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2386] = "alias='expsw_attr', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[2386] = "alias='expsw_attr', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[2387];
@@ -36705,7 +36705,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 429;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2387] = "alias='QueryExpInfo', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[2387] = "alias='QueryExpInfo', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[2388];
@@ -36721,7 +36721,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 430;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2388] = "alias='mode', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[2388] = "alias='mode', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[2389];
@@ -36737,7 +36737,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 431;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2389] = "alias='wbgain', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[2389] = "alias='wbgain', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[2390];
@@ -36753,7 +36753,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 432;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2390] = "alias='ctldata', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[2390] = "alias='ctldata', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[2391];
@@ -36769,7 +36769,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 433;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2391] = "alias='ctldata', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[2391] = "alias='ctldata', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[2392];
@@ -36785,7 +36785,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 440;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2392] = "alias='drc', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[2392] = "alias='drc', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[2393];
@@ -36801,7 +36801,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2393] = "alias='main_scene', type='string', size='[1, 1]', range='[0, 32]', default='normal', dynamic='0', hide='0'";
+	ctx->descs[2393] = "alias='main_scene', type='string', size='[1, 1]', range='[0, 32]', default='normal', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[2394];
@@ -36817,7 +36817,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2394] = "alias='sub_scene', type='string', size='[1, 1]', range='[0, 32]', default='day', dynamic='0', hide='0'";
+	ctx->descs[2394] = "alias='sub_scene', type='string', size='[1, 1]', range='[0, 32]', default='day', dynamic='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[2395];
@@ -36833,7 +36833,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = 4;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2395] = "type='enum', alias='mode', enum_def='rk_aiq_working_mode_t', default='RK_AIQ_WORKING_MODE_NORMAL'";
+	ctx->descs[2395] = "type='enum', alias='mode', enum_def='rk_aiq_working_mode_t', default='RK_AIQ_WORKING_MODE_NORMAL', ro='0'";
 #endif
 
 	obj = &ctx->objs[2396];
@@ -36849,7 +36849,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 446;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2396] = "alias='scene', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[2396] = "alias='scene', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[2397];
@@ -36865,7 +36865,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 447;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2397] = "alias='work_mode', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[2397] = "alias='work_mode', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[2398];
@@ -36881,7 +36881,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 441;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2398] = "alias='ae_uapi', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[2398] = "alias='ae_uapi', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[2399];
@@ -36897,7 +36897,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 442;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2399] = "alias='awb_uapi', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[2399] = "alias='awb_uapi', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[2400];
@@ -36913,26 +36913,10 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 443;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2400] = "alias='amerge_uapi', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[2400] = "alias='amerge_uapi', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[2401];
-	strcpy(obj->name, "atmo_uapi");
-	obj->type = J2S_TYPE_STRUCT;
-	obj->flags = 0 ;
-	obj->offset = (uintptr_t)&((RkaiqUapi_t*)0)->atmo_uapi;
-	obj->elem_size = sizeof(((RkaiqUapi_t*)0)->atmo_uapi);
-	obj->base_elem_size = obj->elem_size;
-	obj->num_elem = 1;
-	obj->len_index = -1;
-	obj->next_index = 2402;
-	obj->struct_index = 444;
-	obj->enum_index = -1;
-#ifdef J2S_ENABLE_DESC
-	ctx->descs[2401] = "alias='atmo_uapi', type='struct', ui_module='normal_ui_style', hide='0'";
-#endif
-
-	obj = &ctx->objs[2402];
 	strcpy(obj->name, "adrc_uapi");
 	obj->type = J2S_TYPE_STRUCT;
 	obj->flags = 0 ;
@@ -36941,14 +36925,14 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->base_elem_size = obj->elem_size;
 	obj->num_elem = 1;
 	obj->len_index = -1;
-	obj->next_index = 2403;
+	obj->next_index = 2402;
 	obj->struct_index = 445;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2402] = "alias='adrc_uapi', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[2401] = "alias='adrc_uapi', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
-	obj = &ctx->objs[2403];
+	obj = &ctx->objs[2402];
 	strcpy(obj->name, "system");
 	obj->type = J2S_TYPE_STRUCT;
 	obj->flags = 0 ;
@@ -36961,10 +36945,10 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 448;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2403] = "alias='SystemCtl', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[2402] = "alias='SystemCtl', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
-	obj = &ctx->objs[2404];
+	obj = &ctx->objs[2403];
 	strcpy(obj->name, "name");
 	obj->type = J2S_TYPE_STRING;
 	obj->flags = 0 | J2S_FLAG_POINTER;
@@ -36973,11 +36957,11 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->base_elem_size = obj->elem_size;
 	obj->num_elem = 1;
 	obj->len_index = -1;
-	obj->next_index = 2405;
+	obj->next_index = 2404;
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 
-	obj = &ctx->objs[2405];
+	obj = &ctx->objs[2404];
 	strcpy(obj->name, "hw_ver");
 	obj->type = J2S_TYPE_INT_32;
 	obj->flags = 0 ;
@@ -36986,11 +36970,11 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->base_elem_size = obj->elem_size;
 	obj->num_elem = 1;
 	obj->len_index = -1;
-	obj->next_index = 2406;
+	obj->next_index = 2405;
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 
-	obj = &ctx->objs[2406];
+	obj = &ctx->objs[2405];
 	strcpy(obj->name, "sw_ver");
 	obj->type = J2S_TYPE_STRING;
 	obj->flags = 0 | J2S_FLAG_POINTER;
@@ -37003,7 +36987,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 
-	obj = &ctx->objs[2407];
+	obj = &ctx->objs[2406];
 	strcpy(obj->name, "sensor_info");
 	obj->type = J2S_TYPE_STRUCT;
 	obj->flags = 0 | J2S_FLAG_POINTER;
@@ -37011,12 +36995,12 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->elem_size = sizeof(((CamCalibDbV2Context_t*)0)->sensor_info[0]);
 	obj->base_elem_size = obj->elem_size;
 	obj->num_elem = 1;
-	obj->len_index = 2408;
-	obj->next_index = 2408;
+	obj->len_index = 2407;
+	obj->next_index = 2407;
 	obj->struct_index = 271;
 	obj->enum_index = -1;
 
-	obj = &ctx->objs[2408];
+	obj = &ctx->objs[2407];
 	strcpy(obj->name, "sensor_info_len");
 	obj->type = J2S_TYPE_INT_32;
 	obj->flags = 0 ;
@@ -37025,11 +37009,11 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->base_elem_size = obj->elem_size;
 	obj->num_elem = 1;
 	obj->len_index = -1;
-	obj->next_index = 2409;
+	obj->next_index = 2408;
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 
-	obj = &ctx->objs[2409];
+	obj = &ctx->objs[2408];
 	strcpy(obj->name, "module_info");
 	obj->type = J2S_TYPE_STRUCT;
 	obj->flags = 0 | J2S_FLAG_POINTER;
@@ -37037,12 +37021,12 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->elem_size = sizeof(((CamCalibDbV2Context_t*)0)->module_info[0]);
 	obj->base_elem_size = obj->elem_size;
 	obj->num_elem = 1;
-	obj->len_index = 2410;
-	obj->next_index = 2410;
+	obj->len_index = 2409;
+	obj->next_index = 2409;
 	obj->struct_index = 273;
 	obj->enum_index = -1;
 
-	obj = &ctx->objs[2410];
+	obj = &ctx->objs[2409];
 	strcpy(obj->name, "module_info_len");
 	obj->type = J2S_TYPE_INT_32;
 	obj->flags = 0 ;
@@ -37051,11 +37035,11 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->base_elem_size = obj->elem_size;
 	obj->num_elem = 1;
 	obj->len_index = -1;
-	obj->next_index = 2411;
+	obj->next_index = 2410;
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 
-	obj = &ctx->objs[2411];
+	obj = &ctx->objs[2410];
 	strcpy(obj->name, "sys_cfg");
 	obj->type = J2S_TYPE_STRUCT;
 	obj->flags = 0 | J2S_FLAG_POINTER;
@@ -37063,12 +37047,12 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->elem_size = sizeof(((CamCalibDbV2Context_t*)0)->sys_cfg[0]);
 	obj->base_elem_size = obj->elem_size;
 	obj->num_elem = 1;
-	obj->len_index = 2412;
-	obj->next_index = 2412;
+	obj->len_index = 2411;
+	obj->next_index = 2411;
 	obj->struct_index = 310;
 	obj->enum_index = -1;
 
-	obj = &ctx->objs[2412];
+	obj = &ctx->objs[2411];
 	strcpy(obj->name, "sys_cfg_len");
 	obj->type = J2S_TYPE_INT_32;
 	obj->flags = 0 ;
@@ -37077,11 +37061,11 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->base_elem_size = obj->elem_size;
 	obj->num_elem = 1;
 	obj->len_index = -1;
-	obj->next_index = 2413;
+	obj->next_index = 2412;
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 
-	obj = &ctx->objs[2413];
+	obj = &ctx->objs[2412];
 	strcpy(obj->name, "calib_scene");
 	obj->type = J2S_TYPE_STRING;
 	obj->flags = 0 | J2S_FLAG_POINTER;
@@ -37094,7 +37078,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 
-	obj = &ctx->objs[2414];
+	obj = &ctx->objs[2413];
 	strcpy(obj->name, "sensor_calib");
 	obj->type = J2S_TYPE_STRUCT;
 	obj->flags = 0 ;
@@ -37103,11 +37087,11 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->base_elem_size = obj->elem_size;
 	obj->num_elem = 1;
 	obj->len_index = -1;
-	obj->next_index = 2415;
+	obj->next_index = 2414;
 	obj->struct_index = 271;
 	obj->enum_index = -1;
 
-	obj = &ctx->objs[2415];
+	obj = &ctx->objs[2414];
 	strcpy(obj->name, "module_calib");
 	obj->type = J2S_TYPE_STRUCT;
 	obj->flags = 0 ;
@@ -37116,11 +37100,11 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->base_elem_size = obj->elem_size;
 	obj->num_elem = 1;
 	obj->len_index = -1;
-	obj->next_index = 2416;
+	obj->next_index = 2415;
 	obj->struct_index = 273;
 	obj->enum_index = -1;
 
-	obj = &ctx->objs[2416];
+	obj = &ctx->objs[2415];
 	strcpy(obj->name, "sys_static_cfg");
 	obj->type = J2S_TYPE_STRUCT;
 	obj->flags = 0 ;
@@ -37129,11 +37113,11 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->base_elem_size = obj->elem_size;
 	obj->num_elem = 1;
 	obj->len_index = -1;
-	obj->next_index = 2417;
+	obj->next_index = 2416;
 	obj->struct_index = 310;
 	obj->enum_index = -1;
 
-	obj = &ctx->objs[2417];
+	obj = &ctx->objs[2416];
 	strcpy(obj->name, "calib_scene");
 	obj->type = J2S_TYPE_STRUCT;
 	obj->flags = 0 ;
@@ -37146,7 +37130,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 354;
 	obj->enum_index = -1;
 
-	obj = &ctx->objs[2418];
+	obj = &ctx->objs[2417];
 	strcpy(obj->name, "name");
 	obj->type = J2S_TYPE_STRING;
 	obj->flags = 0 | J2S_FLAG_POINTER;
@@ -37155,11 +37139,11 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->base_elem_size = obj->elem_size;
 	obj->num_elem = 1;
 	obj->len_index = -1;
-	obj->next_index = 2419;
+	obj->next_index = 2418;
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 
-	obj = &ctx->objs[2419];
+	obj = &ctx->objs[2418];
 	strcpy(obj->name, "scene_isp21");
 	obj->type = J2S_TYPE_STRUCT;
 	obj->flags = 0 ;
@@ -37172,7 +37156,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 354;
 	obj->enum_index = -1;
 
-	obj = &ctx->objs[2420];
+	obj = &ctx->objs[2419];
 	strcpy(obj->name, "name");
 	obj->type = J2S_TYPE_STRING;
 	obj->flags = 0 | J2S_FLAG_POINTER;
@@ -37181,11 +37165,11 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->base_elem_size = obj->elem_size;
 	obj->num_elem = 1;
 	obj->len_index = -1;
-	obj->next_index = 2421;
+	obj->next_index = 2420;
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 
-	obj = &ctx->objs[2421];
+	obj = &ctx->objs[2420];
 	strcpy(obj->name, "sub_scene");
 	obj->type = J2S_TYPE_STRUCT;
 	obj->flags = 0 | J2S_FLAG_POINTER;
@@ -37193,12 +37177,12 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->elem_size = sizeof(((CamCalibMainSceneList_t*)0)->sub_scene[0]);
 	obj->base_elem_size = obj->elem_size;
 	obj->num_elem = 1;
-	obj->len_index = 2422;
-	obj->next_index = 2422;
+	obj->len_index = 2421;
+	obj->next_index = 2421;
 	obj->struct_index = 453;
 	obj->enum_index = -1;
 
-	obj = &ctx->objs[2422];
+	obj = &ctx->objs[2421];
 	strcpy(obj->name, "sub_scene_len");
 	obj->type = J2S_TYPE_INT_32;
 	obj->flags = 0 ;
@@ -37211,7 +37195,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 
-	obj = &ctx->objs[2423];
+	obj = &ctx->objs[2422];
 	strcpy(obj->name, "sensor_calib");
 	obj->type = J2S_TYPE_STRUCT;
 	obj->flags = 0 ;
@@ -37220,14 +37204,14 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->base_elem_size = obj->elem_size;
 	obj->num_elem = 1;
 	obj->len_index = -1;
-	obj->next_index = 2424;
+	obj->next_index = 2423;
 	obj->struct_index = 271;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2423] = "alias='SensorInfo', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[2422] = "alias='SensorInfo', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
-	obj = &ctx->objs[2424];
+	obj = &ctx->objs[2423];
 	strcpy(obj->name, "module_calib");
 	obj->type = J2S_TYPE_STRUCT;
 	obj->flags = 0 ;
@@ -37236,14 +37220,14 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->base_elem_size = obj->elem_size;
 	obj->num_elem = 1;
 	obj->len_index = -1;
-	obj->next_index = 2425;
+	obj->next_index = 2424;
 	obj->struct_index = 273;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2424] = "alias='MoudleInfo', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[2423] = "alias='MoudleInfo', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
-	obj = &ctx->objs[2425];
+	obj = &ctx->objs[2424];
 	strcpy(obj->name, "main_scene");
 	obj->type = J2S_TYPE_STRUCT;
 	obj->flags = 0 | J2S_FLAG_POINTER;
@@ -37251,12 +37235,12 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->elem_size = sizeof(((CamCalibDbProj_t*)0)->main_scene[0]);
 	obj->base_elem_size = obj->elem_size;
 	obj->num_elem = 1;
-	obj->len_index = 2426;
-	obj->next_index = 2426;
+	obj->len_index = 2425;
+	obj->next_index = 2425;
 	obj->struct_index = 454;
 	obj->enum_index = -1;
 
-	obj = &ctx->objs[2426];
+	obj = &ctx->objs[2425];
 	strcpy(obj->name, "main_scene_len");
 	obj->type = J2S_TYPE_INT_32;
 	obj->flags = 0 ;
@@ -37265,11 +37249,11 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->base_elem_size = obj->elem_size;
 	obj->num_elem = 1;
 	obj->len_index = -1;
-	obj->next_index = 2427;
+	obj->next_index = 2426;
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 
-	obj = &ctx->objs[2427];
+	obj = &ctx->objs[2426];
 	strcpy(obj->name, "uapi");
 	obj->type = J2S_TYPE_STRUCT;
 	obj->flags = 0 | J2S_FLAG_POINTER;
@@ -37277,12 +37261,12 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->elem_size = sizeof(((CamCalibDbProj_t*)0)->uapi[0]);
 	obj->base_elem_size = obj->elem_size;
 	obj->num_elem = 1;
-	obj->len_index = 2428;
-	obj->next_index = 2428;
+	obj->len_index = 2427;
+	obj->next_index = 2427;
 	obj->struct_index = 449;
 	obj->enum_index = -1;
 
-	obj = &ctx->objs[2428];
+	obj = &ctx->objs[2427];
 	strcpy(obj->name, "uapi_len");
 	obj->type = J2S_TYPE_INT_32;
 	obj->flags = 0 ;
@@ -37291,11 +37275,11 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->base_elem_size = obj->elem_size;
 	obj->num_elem = 1;
 	obj->len_index = -1;
-	obj->next_index = 2429;
+	obj->next_index = 2428;
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 
-	obj = &ctx->objs[2429];
+	obj = &ctx->objs[2428];
 	strcpy(obj->name, "sys_static_cfg");
 	obj->type = J2S_TYPE_STRUCT;
 	obj->flags = 0 ;
@@ -37308,10 +37292,10 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = 310;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[2429] = "alias='SysStaticCfg', type='struct', ui_module='normal_ui_style', hide='0'";
+	ctx->descs[2428] = "alias='SysStaticCfg', type='struct', ui_module='normal_ui_style', hide='0', ro='0'";
 #endif
 
-	obj = &ctx->objs[2430];
+	obj = &ctx->objs[2429];
 	strcpy(obj->name, "group_awb");
 	obj->type = J2S_TYPE_INT_32;
 	obj->flags = 0 ;
@@ -38225,19 +38209,19 @@ static void _j2s_init(j2s_ctx *ctx) {
 	strcpy(ctx->structs[449].name, "RkaiqUapi_t");
 	ctx->structs[449].child_index = 2398;
 	strcpy(ctx->structs[450].name, "CamCalibDbModuleDes_t");
-	ctx->structs[450].child_index = 2404;
+	ctx->structs[450].child_index = 2403;
 	strcpy(ctx->structs[451].name, "CamCalibDbV2Context_t");
-	ctx->structs[451].child_index = 2407;
+	ctx->structs[451].child_index = 2406;
 	strcpy(ctx->structs[452].name, "CamCalibDbV2Tuning_t");
-	ctx->structs[452].child_index = 2414;
+	ctx->structs[452].child_index = 2413;
 	strcpy(ctx->structs[453].name, "CamCalibSubSceneList_t");
-	ctx->structs[453].child_index = 2418;
+	ctx->structs[453].child_index = 2417;
 	strcpy(ctx->structs[454].name, "CamCalibMainSceneList_t");
-	ctx->structs[454].child_index = 2420;
+	ctx->structs[454].child_index = 2419;
 	strcpy(ctx->structs[455].name, "CamCalibDbProj_t");
-	ctx->structs[455].child_index = 2423;
+	ctx->structs[455].child_index = 2422;
 	strcpy(ctx->structs[456].name, "CamCalibDbCamgroup_t");
-	ctx->structs[456].child_index = 2430;
+	ctx->structs[456].child_index = 2429;
 
 	strcpy(ctx->enums[0].name, "bool_t");
 	ctx->enums[0].value_index = 0;

@@ -249,7 +249,8 @@ Aynr_result_V3_t ynr_fix_transfer_V3(RK_YNR_Params_V3_Select_t* pSelect, RK_YNR_
     tmp = (MM << 5) + EE;
     pFix->ynr_rnr_max_r = CLIP(tmp, 0, 0x3fff);
     //local gain scale
-    tmp = ( sqrt(double(50) / pExpInfo->arIso[pExpInfo->hdr_mode])) * (1 << 7);
+    //tmp = ( sqrt(double(50) / pExpInfo->arIso[pExpInfo->hdr_mode])) * (1 << 7);  //old
+    tmp = (1.0) * (1 << 7);
     pFix->ynr_local_gainscale = CLIP(tmp, 0, 0x80);
 
     //// YNR_2700_CENTRE_COOR (0x0008)
@@ -259,7 +260,8 @@ Aynr_result_V3_t ynr_fix_transfer_V3(RK_YNR_Params_V3_Select_t* pSelect, RK_YNR_
     //// YNR_2700_CENTRE_COOR (0x000c)
     tmp = pSelect->ynr_gain_adjust_scale_V3 * (1 << 4);
     pFix->ynr_localgain_adj = CLIP(tmp, 0, 0xff);
-    tmp = pSelect->ynr_gain_adjust_thresh_V3 * 1023;
+    //tmp = pSelect->ynr_gain_adjust_thresh_V3 * 1023;  //old
+    tmp = pSelect->ynr_gain_adjust_thresh_V3 * 16;
     pFix->ynr_localgain_adj_thresh = CLIP(tmp, 0, 0x3ff);;
 
     // YNR_2700_LOWNR_CTRL0 (0x0010)
@@ -677,7 +679,7 @@ Aynr_result_V3_t ynr_init_params_json_V3(RK_YNR_Params_V3_t *pYnrParams, CalibDb
             pYnrParams->arYnrParamsISO[j].loFreqLumaNrCurvePoint[k] = pISO->lumaPara.lo_lumaPoint[k];
             pYnrParams->arYnrParamsISO[j].loFreqLumaNrCurveRatio[k] = pISO->lumaPara.lo_ratio[k];
             pYnrParams->arYnrParamsISO[j].hiFreqLumaNrCurvePoint[k] = pISO->lumaPara.hi_lumaPoint[k];
-            pYnrParams->arYnrParamsISO[j].hiFreqLumaNrCurvePoint[k] = pISO->lumaPara.hi_ratio[k];
+            pYnrParams->arYnrParamsISO[j].hiFreqLumaNrCurveRatio[k] = pISO->lumaPara.hi_ratio[k];
         }
 
         pYnrParams->arYnrParamsISO[j].ynr_bft3x3_bypass_V3 = pISO->ynr_bft3x3_bypass;
