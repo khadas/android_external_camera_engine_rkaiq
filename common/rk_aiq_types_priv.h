@@ -20,7 +20,7 @@
 #include <string>
 #include <vector>
 #include "rk_aiq_types.h"
-#include "linux/rk-camera-module.h"
+#include "common/rk-camera-module.h"
 #include "MessageBus.h"
 #include "common/rkisp2-config.h"
 #include "common/rkisp21-config.h"

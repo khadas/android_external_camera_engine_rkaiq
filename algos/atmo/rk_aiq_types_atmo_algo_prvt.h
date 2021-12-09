@@ -214,7 +214,7 @@ typedef struct AtmoContext_s
     uint32_t width;
     uint32_t height;
     int frameCnt;
-    int FrameNumber;
+    FrameNumber_t FrameNumber;
 } AtmoContext_t;
 
 typedef AtmoContext_t* AtmoHandle_t;

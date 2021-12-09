@@ -344,14 +344,14 @@
  *   - HWI can produce SOF, STATS, RAW/YUV image
  *   - aiq core support algo running in group threads
  * - THIS VERSION ONLY SUPPORT rk356x NOW
- * v3.0x00.4
+ * v3.0x00.5
  * - initial version for isp3x(rk3588)
  * - support 8k
  * - support camgroup
  */
 
-#define RK_AIQ_VERSION_REAL_V "v3.0x00.4"
-#define RK_AIQ_RELEASE_DATE "2021-12-06"
+#define RK_AIQ_VERSION_REAL_V "v3.0x00.5"
+#define RK_AIQ_RELEASE_DATE "2021-12-10"
 
 /******* DO NOT EDIT THE FOLLOWINGS ***********/
 

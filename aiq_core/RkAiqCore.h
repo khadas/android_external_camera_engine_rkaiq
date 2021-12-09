@@ -445,6 +445,7 @@ public:
         RkAiqIspStats* ispStats;
         RKAiqAecExpInfo_t preExp;
         RKAiqAecExpInfo_t curExp;
+        RKAiqAecExpInfo_t nxtExp;
         rk_aiq_amd_params_t amdResParams;
         XCamVideoBuffer* aecStatsBuf;
         XCamVideoBuffer* awbStatsBuf;
@@ -468,6 +469,9 @@ public:
             xcam_mem_clear(procResComb);
             xcam_mem_clear(postResComb);
             xcam_mem_clear(amdResParams);
+            xcam_mem_clear(preExp);
+            xcam_mem_clear(curExp);
+            xcam_mem_clear(nxtExp);
             sp = nullptr;
             ispGain = nullptr;
             kgGain = nullptr;

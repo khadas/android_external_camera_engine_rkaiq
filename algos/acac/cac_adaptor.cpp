@@ -36,7 +36,7 @@ namespace RkCam {
 #define BYTES_PER_WORD 4
 #define BITS_PER_WORD  (BITS_PER_BYTE * BYTES_PER_WORD)
 
-#define INTERP_CAC(x0, x1, ratio) static_cast<int>((ratio) * ((x1) - (x0)) + (x0))
+#define INTERP_CAC(x0, x1, ratio) ((ratio) * ((x1) - (x0)) + (x0))
 
 #define DIV_ROUND_UP(n, d) (((n) + (d)-1) / (d))
 

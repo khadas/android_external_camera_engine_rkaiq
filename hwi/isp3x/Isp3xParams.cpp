@@ -1011,12 +1011,13 @@ void Isp3xParams::convertAiqMergeToIsp3xParams(struct isp3x_isp_params_cfg& isp_
     isp_cfg.others.hdrmge_cfg.lm_dif_0p9   = amerge_data.Merge_v30.sw_hdrmge_lm_dif_0p9;
     isp_cfg.others.hdrmge_cfg.ms_diff_0p15 = amerge_data.Merge_v30.sw_hdrmge_ms_dif_0p15;
     isp_cfg.others.hdrmge_cfg.ms_dif_0p8   = amerge_data.Merge_v30.sw_hdrmge_ms_dif_0p8;
-    for(int i = 0; i < 17; i++)
+    for(int i = 0; i < ISP3X_HDRMGE_L_CURVE_NUM; i++)
     {
         isp_cfg.others.hdrmge_cfg.curve.curve_0[i] = amerge_data.Merge_v30.sw_hdrmge_l0_y[i];
         isp_cfg.others.hdrmge_cfg.curve.curve_1[i] = amerge_data.Merge_v30.sw_hdrmge_l1_y[i];
-        isp_cfg.others.hdrmge_cfg.e_y[i]           = amerge_data.Merge_v30.sw_hdrmge_e_y[i];
     }
+    for(int i = 0; i < ISP3X_HDRMGE_E_CURVE_NUM; i++)
+        isp_cfg.others.hdrmge_cfg.e_y[i]           = amerge_data.Merge_v30.sw_hdrmge_e_y[i];
 
     //isp30 add
     isp_cfg.others.hdrmge_cfg.s_base = amerge_data.Merge_v30.sw_hdrmge_s_base;

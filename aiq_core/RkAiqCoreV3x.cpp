@@ -1129,15 +1129,15 @@ RkAiqCoreV3x::genIspAmergeResult(RkAiqFullParams* params)
             amerge_rk->AmergeProcRes.Merge_v30.sw_hdrmge_gain1_inv;
         merge_param->result.Merge_v30.sw_hdrmge_gain2 =
             amerge_rk->AmergeProcRes.Merge_v30.sw_hdrmge_gain2;
-        for(int i = 0; i < 17; i++)
-        {
-            merge_param->result.Merge_v30.sw_hdrmge_e_y[i] =
-                amerge_rk->AmergeProcRes.Merge_v30.sw_hdrmge_e_y[i];
+        for(int i = 0; i < ISP3X_HDRMGE_MD_CURVE_NUM; i++) {
             merge_param->result.Merge_v30.sw_hdrmge_l1_y[i] =
                 amerge_rk->AmergeProcRes.Merge_v30.sw_hdrmge_l1_y[i];
             merge_param->result.Merge_v30.sw_hdrmge_l0_y[i] =
                 amerge_rk->AmergeProcRes.Merge_v30.sw_hdrmge_l0_y[i];
         }
+        for(int i = 0; i < ISP3X_HDRMGE_OE_CURVE_NUM; i++)
+            merge_param->result.Merge_v30.sw_hdrmge_e_y[i] =
+                amerge_rk->AmergeProcRes.Merge_v30.sw_hdrmge_e_y[i];
 
         merge_param->result.LongFrameMode =
             amerge_rk->AmergeProcRes.LongFrameMode;

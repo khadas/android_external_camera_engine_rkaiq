@@ -48,6 +48,15 @@
 #define SW_DRC_BILAT_WT_OFF_FIX (255)
 #define MAX_AE_DRC_GAIN (256)
 
+#define ISP_RAW_BIT (12)
+#define MFHDR_LOG_Q_BITS (11)
+#define DSTBITS (ISP_RAW_BIT << MFHDR_LOG_Q_BITS)
+#define OFFSETBITS_INT (SW_DRC_OFFSET_POW2_FIX)
+#define OFFSETBITS (OFFSETBITS_INT << MFHDR_LOG_Q_BITS)
+#define VALIDBITS (DSTBITS - OFFSETBITS)
+#define DELTA_SCALEIN_FIX ((256 << MFHDR_LOG_Q_BITS) / VALIDBITS)
+
+
 typedef enum AdrcState_e {
     ADRC_STATE_INVALID       = 0,
     ADRC_STATE_INITIALIZED   = 1,
@@ -56,6 +65,14 @@ typedef enum AdrcState_e {
     ADRC_STATE_LOCKED        = 4,
     ADRC_STATE_MAX
 } AdrcState_t;
+
+typedef struct DrcExpoData_s {
+    float nextLExpo;
+    float nextMExpo;
+    float nextSExpo;
+    float nextRatioLS;
+    float nextRatioLM;
+} DrcExpoData_t;
 
 typedef struct AdrcGainConfig_s {
     int len;
@@ -273,7 +290,7 @@ typedef struct AdrcContext_s
     rkisp_adrc_stats_t CurrStatsData;
     AdrcSensorInfo_t SensorInfo;
     int frameCnt;
-    int FrameNumber;
+    FrameNumber_t FrameNumber;
 } AdrcContext_t;
 
 #endif

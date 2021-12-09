@@ -174,6 +174,7 @@ XCamReturn RkAiqHandleIntCom::configInparamsCom(RkAiqAlgoCom* com, int type)
         rk_com->u.proc.is_bw_sensor = sharedCom->is_bw_sensor;
         rk_com->u.proc.preExp = &shared->preExp;
         rk_com->u.proc.curExp = &shared->curExp;
+        rk_com->u.proc.nxtExp = &shared->nxtExp;
         rk_com->u.proc.res_comb = &shared->res_comb;
     }
 

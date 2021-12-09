@@ -82,6 +82,7 @@ CamHwIsp20::CamHwIsp20()
     mIspStremEvtTh = NULL;
     mIsGroupMode = false;
     mIsMain = false;
+    _isp_stream_status = ISP_STREAM_STATUS_INVALID;
 }
 
 CamHwIsp20::~CamHwIsp20()
@@ -2250,6 +2251,7 @@ CamHwIsp20::prepare(uint32_t width, uint32_t height, int mode, int t_delay, int 
         mIspSofStream->setPollCallback (this);
     }
 
+    _isp_stream_status = ISP_STREAM_STATUS_INVALID;
     if (mIsGroupMode) {
         mIspStremEvtTh = new RkStreamEventPollThread("StreamEvt",
                                 new V4l2Device (s_info->isp_info->input_params_path),
@@ -2493,8 +2495,6 @@ XCamReturn CamHwIsp20::stop()
         mLumaStream->stop();
     if (mIspSofStream.ptr())
         mIspSofStream->stop();
-    if (mIspParamStream.ptr())
-        mIspParamStream->stop();
 
     if ((_cur_calib_infos.mfnr.enable && _cur_calib_infos.mfnr.motion_detect_en) || _cur_calib_infos.af.ldg_param.enable) {
         mSpStreamUnit->stop();
@@ -2517,16 +2517,12 @@ XCamReturn CamHwIsp20::stop()
     }
 
     if (mIspStremEvtTh.ptr()) {
-        int try_times = 0;
-        while (_isp_stream_status == ISP_STREAM_STATUS_STREAM_ON &&
-              try_times < 5) {
-            usleep(30);
-            try_times++;
-            LOGI_CAMHW_SUBM(ISP20HW_SUBM, "camId:%d, wait isp stream stop evt times %d", mCamPhyId, try_times);
-        }
-
-        if (_isp_stream_status == ISP_STREAM_STATUS_STREAM_ON) {
-            LOGI_CAMHW_SUBM(ISP20HW_SUBM, "wait isp stream stop failed");
+        if (_isp_stream_status != ISP_STREAM_STATUS_STREAM_OFF) {
+            LOGW_CAMHW_SUBM(ISP20HW_SUBM, "wait isp stream stop failed");
+            if (mIspParamStream.ptr())
+                mIspParamStream->stop();
+            hdr_mipi_stop();
+            _isp_stream_status = ISP_STREAM_STATUS_INVALID;
         }
 
         mIspStremEvtTh->stop();
@@ -2550,6 +2546,9 @@ XCamReturn CamHwIsp20::stop()
 
     if (mParamsAssembler.ptr())
         mParamsAssembler->stop();
+
+    if (mIspParamStream.ptr())
+        mIspParamStream->stop();
 
     if (mFlashLight.ptr()) {
         ret = mFlashLight->stop();

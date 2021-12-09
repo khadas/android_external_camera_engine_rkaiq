@@ -316,6 +316,7 @@ typedef struct _RkAiqAlgoComInt {
             bool is_bw_sensor;
             RKAiqAecExpInfo_t *preExp;
             RKAiqAecExpInfo_t *curExp;
+            RKAiqAecExpInfo_t *nxtExp;
             RkAiqResComb* res_comb;
         } proc;
     } u;

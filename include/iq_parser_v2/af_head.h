@@ -293,14 +293,22 @@ typedef struct CalibDb_Af_HighLightParam_s {
 typedef struct CalibDbV2_AF_Tuning_Para_s {
     // M4_ENUM_DESC("mode", "CalibDbV2_AF_MODE_t", "CalibDbV2_AF_MODE_CONTINUOUS_PICTURE")
     CalibDbV2_AF_MODE_t af_mode;
-    // M4_NUMBER_DESC("win_h_offs", "u16", M4_RANGE(0,2048), "0", M4_DIGIT(0),M4_HIDE(0))
+    // M4_NUMBER_DESC("win_h_offs", "u16", M4_RANGE(0,2000), "0", M4_DIGIT(0),M4_HIDE(0))
     unsigned short win_h_offs;
-    // M4_NUMBER_DESC("win_v_offs", "u16", M4_RANGE(0,2048), "0", M4_DIGIT(0),M4_HIDE(0))
+    // M4_NUMBER_DESC("win_v_offs", "u16", M4_RANGE(0,2000), "0", M4_DIGIT(0),M4_HIDE(0))
     unsigned short win_v_offs;
-    // M4_NUMBER_DESC("win_h_size", "u16", M4_RANGE(0,2048), "0", M4_DIGIT(0),M4_HIDE(0))
+    // M4_NUMBER_DESC("win_h_size", "u16", M4_RANGE(0,2000), "0", M4_DIGIT(0),M4_HIDE(0))
     unsigned short win_h_size;
-    // M4_NUMBER_DESC("win_v_size", "u16", M4_RANGE(0,2048), "0", M4_DIGIT(0),M4_HIDE(0))
+    // M4_NUMBER_DESC("win_v_size", "u16", M4_RANGE(0,2000), "0", M4_DIGIT(0),M4_HIDE(0))
     unsigned short win_v_size;
+    // M4_NUMBER_DESC("win_h_offs in video", "u16", M4_RANGE(0,2000), "0", M4_DIGIT(0),M4_HIDE(0))
+    unsigned short video_win_h_offs;
+    // M4_NUMBER_DESC("win_v_offs in video", "u16", M4_RANGE(0,2000), "0", M4_DIGIT(0),M4_HIDE(0))
+    unsigned short video_win_v_offs;
+    // M4_NUMBER_DESC("win_h_size in video", "u16", M4_RANGE(0,2000), "0", M4_DIGIT(0),M4_HIDE(0))
+    unsigned short video_win_h_size;
+    // M4_NUMBER_DESC("win_v_size in video", "u16", M4_RANGE(0,2000), "0", M4_DIGIT(0),M4_HIDE(0))
+    unsigned short video_win_v_size;
     // M4_STRUCT_DESC("fixed mode", "normal_ui_style")
     CalibDbV2_Af_DefCode_t fixed_mode;
     // M4_STRUCT_DESC("macro mode", "normal_ui_style")
@@ -313,6 +321,8 @@ typedef struct CalibDbV2_AF_Tuning_Para_s {
     CalibDbV2_Af_HighLightParam_t highlight;
     // M4_STRUCT_DESC("contrast af", "normal_ui_style")
     CalibDbV2_Af_Contrast_t contrast_af;
+    // M4_STRUCT_DESC("video contrast af", "normal_ui_style")
+    CalibDbV2_Af_Contrast_t video_contrast_af;
     // M4_STRUCT_DESC("laser af", "normal_ui_style")
     CalibDbV2_Af_Laser_t laser_af;
     // M4_STRUCT_DESC("pdaf", "normal_ui_style")
@@ -387,6 +397,8 @@ typedef struct CalibDbV2_AfV30_MeasCfg_s {
     unsigned short h_fv_thresh;
     // M4_NUMBER_DESC("highlight thresh", "u16", M4_RANGE(0, 4095), "0", M4_DIGIT(0))
     unsigned short highlit_thresh;
+    // M4_NUMBER_DESC("vertical fv ratio", "f32", M4_RANGE(0, 1), "0.5", M4_DIGIT(3))
+    float v_fv_ratio;
 } CalibDbV2_AfV30_MeasCfg_t;
 
 typedef struct CalibDbV2_AfV30_IsoMeasCfg_s {
@@ -406,14 +418,22 @@ typedef struct CalibDbV2_AfV30_ZoomMeas_s {
 typedef struct CalibDbV2_AFV30_Tuning_Para_s {
     // M4_ENUM_DESC("mode", "CalibDbV2_AF_MODE_t", "CalibDbV2_AF_MODE_CONTINUOUS_PICTURE")
     CalibDbV2_AF_MODE_t af_mode;
-    // M4_NUMBER_DESC("win_h_offs", "u16", M4_RANGE(0,2048), "0", M4_DIGIT(0),M4_HIDE(0))
+    // M4_NUMBER_DESC("win_h_offs", "u16", M4_RANGE(0,2000), "0", M4_DIGIT(0),M4_HIDE(0))
     unsigned short win_h_offs;
-    // M4_NUMBER_DESC("win_v_offs", "u16", M4_RANGE(0,2048), "0", M4_DIGIT(0),M4_HIDE(0))
+    // M4_NUMBER_DESC("win_v_offs", "u16", M4_RANGE(0,2000), "0", M4_DIGIT(0),M4_HIDE(0))
     unsigned short win_v_offs;
-    // M4_NUMBER_DESC("win_h_size", "u16", M4_RANGE(0,2048), "0", M4_DIGIT(0),M4_HIDE(0))
+    // M4_NUMBER_DESC("win_h_size", "u16", M4_RANGE(0,2000), "0", M4_DIGIT(0),M4_HIDE(0))
     unsigned short win_h_size;
-    // M4_NUMBER_DESC("win_v_size", "u16", M4_RANGE(0,2048), "0", M4_DIGIT(0),M4_HIDE(0))
+    // M4_NUMBER_DESC("win_v_size", "u16", M4_RANGE(0,2000), "0", M4_DIGIT(0),M4_HIDE(0))
     unsigned short win_v_size;
+    // M4_NUMBER_DESC("win_h_offs in video", "u16", M4_RANGE(0,2000), "0", M4_DIGIT(0),M4_HIDE(0))
+    unsigned short video_win_h_offs;
+    // M4_NUMBER_DESC("win_v_offs in video", "u16", M4_RANGE(0,2000), "0", M4_DIGIT(0),M4_HIDE(0))
+    unsigned short video_win_v_offs;
+    // M4_NUMBER_DESC("win_h_size in video", "u16", M4_RANGE(0,2000), "0", M4_DIGIT(0),M4_HIDE(0))
+    unsigned short video_win_h_size;
+    // M4_NUMBER_DESC("win_v_size in video", "u16", M4_RANGE(0,2000), "0", M4_DIGIT(0),M4_HIDE(0))
+    unsigned short video_win_v_size;
     // M4_STRUCT_DESC("fixed mode", "normal_ui_style")
     CalibDbV2_Af_DefCode_t fixed_mode;
     // M4_STRUCT_DESC("macro mode", "normal_ui_style")
@@ -422,6 +442,8 @@ typedef struct CalibDbV2_AFV30_Tuning_Para_s {
     CalibDbV2_Af_DefCode_t infinity_mode;
     // M4_STRUCT_DESC("contrast af", "normal_ui_style")
     CalibDbV2_Af_Contrast_t contrast_af;
+    // M4_STRUCT_DESC("video contrast af", "normal_ui_style")
+    CalibDbV2_Af_Contrast_t video_contrast_af;
     // M4_STRUCT_DESC("laser af", "normal_ui_style")
     CalibDbV2_Af_Laser_t laser_af;
     // M4_STRUCT_DESC("pdaf", "normal_ui_style")
