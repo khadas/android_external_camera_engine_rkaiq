@@ -473,18 +473,41 @@ AiqCameraHalAdapter::updateAeMetaParams(XCamAeParam *aeParams){
     stExpSwAttr.stManual.stHdrMe.GainValue.fCoeff[0] = (float)aeParams->manual_analog_gain;
 
     /* AE region */
-    //stExpSwAttr.metering_mode =  aeParams->metering_mode
+    uint8_t GridWeights[225];
+    memset(GridWeights, 0x01, 225 * sizeof(uint8_t));
+
+    uint16_t win_step_w = _inputParams->sensorOutputWidth / 15;
+    uint16_t win_step_h = _inputParams->sensorOutputHeight / 15;
+
+    uint8_t w_x = MAX(0, aeParams->window.x_start / win_step_w - 1);
+    uint8_t w_y = MAX(0, aeParams->window.y_start / win_step_h - 1);
+    uint8_t w_x_end =
+        MIN(14, (aeParams->window.x_end + win_step_w - 1) / win_step_w + 1);
+    uint8_t w_y_end =
+        MIN(14, (aeParams->window.y_end + win_step_h - 1) / win_step_h + 1);
+    uint16_t w_sum = (w_x_end - w_x + 1) * (w_y_end - w_y + 1);
+
+    // stExpSwAttr.metering_mode =  aeParams->metering_mode
     if (aeParams->window.x_end - aeParams->window.x_start > 0) {
-        stExpWin.h_offs = aeParams->window.x_start;
-        stExpWin.v_offs = aeParams->window.y_start;
-        stExpWin.h_size = aeParams->window.x_end - aeParams->window.x_start;
-        stExpWin.v_size = aeParams->window.y_end - aeParams->window.y_start;
-    }else {
-        stExpWin.h_offs = 0;
-        stExpWin.v_offs = 0;
-        stExpWin.h_size = _inputParams->sensorOutputWidth;
-        stExpWin.v_size = _inputParams->sensorOutputHeight;
-     }
+        LOGD(
+            "@%s: Update AE ROI weight = %d WinIndex: x:%d, y:%d, x end:%d, y "
+            "end:%d,win_sum:%d\n",
+            __FUNCTION__, aeParams->window.weight, w_x, w_y, w_x_end, w_y_end,
+            w_sum);
+        for (int i = w_x; i <= w_x_end; i++) {
+            for (int j = w_y; j <= w_y_end; j++) {
+                GridWeights[j * 15 + i] = MAX(0, (225 - w_sum) / w_sum);
+                GridWeights[j * 15 + i] = MIN(32, GridWeights[j * 15 + i]);
+            }
+        }
+        memcpy(stExpSwAttr.stAdvanced.DayGridWeights, GridWeights,
+               sizeof(stExpSwAttr.stAdvanced.DayGridWeights));
+        // Touch AE
+        stExpSwAttr.stAdvanced.enable = true;
+    } else {
+        // Touch AE release
+        stExpSwAttr.stAdvanced.enable = false;
+    }
 
     if (aeParams->exposure_time_max == aeParams->exposure_time_min) {
         stExpSwAttr.stAuto.stFrmRate.isFpsFix = true;
