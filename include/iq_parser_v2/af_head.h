@@ -59,28 +59,30 @@ typedef enum CalibDbV2_AF_MODE_s
 } CalibDbV2_AF_MODE_t;
 
 typedef struct CalibDbV2_Af_ContrastZoom_s {
-    // M4_ARRAY_DESC("QuickFoundThersZoomIdx", "u16", M4_SIZE(1,256), M4_RANGE(0,65535), "0", M4_DIGIT(0), M4_DYNAMIC(1))
+    // M4_ARRAY_DESC("QuickFoundThersZoomIdx", "u16", M4_SIZE(1,32), M4_RANGE(0,65535), "0", M4_DIGIT(0), M4_DYNAMIC(1))
     unsigned short          *QuickFoundThersZoomIdx;
     int                     QuickFoundThersZoomIdx_len;
-    // M4_ARRAY_DESC("QuickFoundThers", "f32", M4_SIZE(1,256), M4_RANGE(0,1), "0", M4_DIGIT(3), M4_DYNAMIC(1))
+    // M4_ARRAY_DESC("QuickFoundThers", "f32", M4_SIZE(1,32), M4_RANGE(0,1), "0", M4_DIGIT(3), M4_DYNAMIC(1))
     float                   *QuickFoundThers;
     int                     QuickFoundThers_len;
-    // M4_ARRAY_DESC("SearchStepZoomIdx", "u16", M4_SIZE(1,256), M4_RANGE(0,65535), "0", M4_DIGIT(0), M4_DYNAMIC(1))
+    // M4_ARRAY_DESC("SearchStepZoomIdx", "u16", M4_SIZE(1,32), M4_RANGE(0,65535), "0", M4_DIGIT(0), M4_DYNAMIC(1))
     unsigned short          *SearchStepZoomIdx;
     int                     SearchStepZoomIdx_len;
-    // M4_ARRAY_DESC("SearchStep", "u16", M4_SIZE(1,256), M4_RANGE(0,65535), "0", M4_DIGIT(0), M4_DYNAMIC(1))
+    // M4_ARRAY_DESC("SearchStep", "u16", M4_SIZE(1,32), M4_RANGE(0,65535), "0", M4_DIGIT(0), M4_DYNAMIC(1))
     unsigned short          *SearchStep;
     int                     SearchStep_len;
-    // M4_ARRAY_DESC("StopStepZoomIdx", "u16", M4_SIZE(1,256), M4_RANGE(0,65535), "0", M4_DIGIT(0), M4_DYNAMIC(1))
+    // M4_ARRAY_DESC("StopStepZoomIdx", "u16", M4_SIZE(1,32), M4_RANGE(0,65535), "0", M4_DIGIT(0), M4_DYNAMIC(1))
     unsigned short          *StopStepZoomIdx;
     int                     StopStepZoomIdx_len;
-    // M4_ARRAY_DESC("StopStep", "u16", M4_SIZE(1,256), M4_RANGE(0,65535), "0", M4_DIGIT(0), M4_DYNAMIC(1))
+    // M4_ARRAY_DESC("StopStep", "u16", M4_SIZE(1,32), M4_RANGE(0,65535), "0", M4_DIGIT(0), M4_DYNAMIC(1))
     unsigned short          *StopStep;
     int                     StopStep_len;
     // M4_NUMBER_DESC("SkipHighPassZoomIdx", "u16", M4_RANGE(0, 65535), "0", M4_DIGIT(0))
     unsigned short          SkipHighPassZoomIdx;
     // M4_NUMBER_DESC("SkipHighPassGain", "f32", M4_RANGE(0, 1000), "0", M4_DIGIT(3))
     float                   SkipHighPassGain;
+    // M4_NUMBER_DESC("SwitchDirZoomIdx", "u16", M4_RANGE(0, 65535), "0", M4_DIGIT(0))
+    unsigned short          SwitchDirZoomIdx;
 } CalibDbV2_Af_ContrastZoom_t;
 
 typedef struct CalibDbV2_Af_Contrast_s {
@@ -251,6 +253,10 @@ typedef struct CalibDbV2_Af_ZoomFocusTbl_s {
     int FocusSearchPlusRange_len;
     // M4_NUMBER_DESC("focus stage1 step", "u32", M4_RANGE(0, 100), "0", M4_DIGIT(0))
     int FocusStage1Step;
+    // M4_NUMBER_DESC("quickFndRate", "f32", M4_RANGE(0,1), "0", M4_DIGIT(3),M4_HIDE(0))
+    float QuickFndRate;
+    // M4_NUMBER_DESC("quickFndMinFv", "f32", M4_RANGE(0,2147483647), "0", M4_DIGIT(0),M4_HIDE(0))
+    float QuickFndMinFv;
     // M4_NUMBER_DESC("search zoom range", "u32", M4_RANGE(0, 100000), "0", M4_DIGIT(0))
     int searchZoomRange;
     // M4_NUMBER_DESC("search focus range", "u32", M4_RANGE(0, 100000), "0", M4_DIGIT(0))
@@ -262,8 +268,8 @@ typedef struct CalibDbV2_Af_ZoomFocusTbl_s {
 
     // M4_NUMBER_DESC("IsZoomFocusRec", "u8", M4_RANGE(0, 1), "0", M4_DIGIT(0))
     unsigned char IsZoomFocusRec;
-    // M4_STRING_DESC("ZoomFocusRecDir", M4_SIZE(1,1), M4_RANGE(0, 256), "/data/", M4_DYNAMIC(0))
-    char *ZoomFocusRecDir;
+    // M4_STRING_DESC("ZoomInfoDir", M4_SIZE(1,1), M4_RANGE(0, 64), "/data/", M4_DYNAMIC(0))
+    char *ZoomInfoDir;
 } CalibDbV2_Af_ZoomFocusTbl_t;
 
 typedef struct CalibDb_Af_LdgParam_s {

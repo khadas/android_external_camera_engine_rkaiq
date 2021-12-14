@@ -348,10 +348,23 @@
  * - initial version for isp3x(rk3588)
  * - support 8k
  * - support camgroup
+ * v3.0x00.6
+ * - AF: update af api demo code
+ *       set lockae_en to false when disable af
+ *       fix blur after enable record position and reset motor when poweroff in moving
+ *       lock aec in aec algos
+ *       bring up optical zoom function
+ *       fix focus failure in low light env
+ *       add config for video mode
+ * - AE: support manual dcg mode
+ *       fix mem leak of uapi2 & add lock/unlock uapi2
+ * - uapi: sysctl: add rk_aiq_uapi_sysctl_set_scene interface
+ *       sysctl: fix switch scene
+ * - ADRC: fix reload json bug
  */
 
-#define RK_AIQ_VERSION_REAL_V "v3.0x00.5"
-#define RK_AIQ_RELEASE_DATE "2021-12-10"
+#define RK_AIQ_VERSION_REAL_V "v3.0x00.6"
+#define RK_AIQ_RELEASE_DATE "2021-12-14"
 
 /******* DO NOT EDIT THE FOLLOWINGS ***********/
 

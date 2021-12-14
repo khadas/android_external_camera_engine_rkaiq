@@ -143,6 +143,8 @@ public:
     virtual XCamReturn preProcess();
     virtual XCamReturn processing();
     virtual XCamReturn postProcess();
+    XCamReturn lock();
+    XCamReturn unlock();
 
     // TODO: calibv1
     XCamReturn setExpSwAttr(Uapi_ExpSwAttr_t ExpSwAttr);
@@ -170,6 +172,7 @@ public:
     XCamReturn setSyncTestAttr(Uapi_AecSyncTest_t SyncTestAttr);
     XCamReturn getSyncTestAttr (Uapi_AecSyncTest_t* pSyncTestAttr);
     XCamReturn queryExpInfo(Uapi_ExpQueryInfo_t* pExpQueryInfo);
+    XCamReturn setLockAeForAf(bool lock_ae);
     XCamReturn setExpWinAttr(Uapi_ExpWin_t ExpWinAttr);
     XCamReturn getExpWinAttr(Uapi_ExpWin_t* pExpWinAttr);
 
@@ -225,6 +228,8 @@ private:
 
     SmartPtr<RkAiqAlgoPreResAeIntShared> mPreResShared;
     SmartPtr<RkAiqAlgoProcResAeIntShared> mProcResShared;
+    XCam::Mutex mLockAebyAfMutex;
+    bool lockaebyaf = false;
 };
 
 // awb
