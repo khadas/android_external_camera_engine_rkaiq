@@ -2234,7 +2234,7 @@
 									"searchEmax":	100,
 									"searchEavg":	100,
 									"IsZoomFocusRec":	0,
-									"ZoomFocusRecDir":	"/userdata",
+									"ZoomInfoDir":	"/userdata",
 									"focuscode":	[{
 											"pos":	0,
 											"code":	[0],

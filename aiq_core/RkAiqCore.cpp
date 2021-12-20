@@ -1256,23 +1256,6 @@ RkAiqCore::genIspAfResult(RkAiqFullParams* params)
         p_focus_param->vcm_end_ma = af_rk->af_proc_res_com.af_focus_param.vcm_end_ma;
         p_focus_param->vcm_config_valid = af_rk->af_proc_res_com.af_focus_param.vcm_config_valid;
 
-        {
-            SmartPtr<RkAiqHandle>* ae_handle = getCurAlgoTypeHandle(RK_AIQ_ALGO_TYPE_AE);
-            int algo_id = (*ae_handle)->getAlgoId();
-
-            if (ae_handle) {
-                if ((algo_id == 0) && (af_rk->af_proc_res_com.lockae_en)) {
-                    RkAiqAeHandleInt *ae_algo = dynamic_cast<RkAiqAeHandleInt*>(ae_handle->ptr());
-                    Uapi_ExpSwAttr_t expSwAttr;
-
-                    ae_algo->getExpSwAttr(&expSwAttr);
-                    if (expSwAttr.enable != !af_rk->af_proc_res_com.lockae) {
-                        expSwAttr.enable = !af_rk->af_proc_res_com.lockae;
-                        ae_algo->setExpSwAttr(expSwAttr);
-                    }
-                }
-            }
-        }
     }
 
     EXIT_ANALYZER_FUNCTION();

@@ -434,6 +434,19 @@ int rk_aiq_uapi_sysctl_switch_scene(const rk_aiq_sys_ctx_t* sys_ctx,
                                     const char* main_scene,
                                     const char* sub_scene);
 
+/**
+ * @brief switch calibDB for different scene
+ *
+ * @param sns_ent_name sensor name
+ * @param main_scene  main scene name
+ * @param sub_scene   sub scenen name
+ *
+ * @return 0 if no error
+ */
+XCamReturn
+rk_aiq_uapi_sysctl_set_scene(const char* sns_ent_name, const char *main_scene,
+                             const char *sub_scene);
+
 RKAIQ_END_DECLARE
 
 #endif
