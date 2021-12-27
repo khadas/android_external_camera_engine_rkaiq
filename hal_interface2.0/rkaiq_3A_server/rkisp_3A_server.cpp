@@ -164,7 +164,7 @@ rkisp_enumrate_modules (struct media_device *device)
                 media_info.cams[module_idx].link_enabled = true;
                 active_sensor = module_idx;
                 strcpy(media_info.cams[module_idx].sensor_entity_name, ef->name);
-                DBG("%s(%d) sensor_entity_name(%s)", __FUNCTION__, __LINE__, media_info.cams[module_idx].sensor_entity_name);
+                DBG("%s(%d) sensor_entity_name(%s) \n", __FUNCTION__, __LINE__, media_info.cams[module_idx].sensor_entity_name);
             }
             break;
         case MEDIA_ENT_T_V4L2_SUBDEV_FLASH:
@@ -314,6 +314,30 @@ static int rkisp_get_media_info(const char *mdev_path) {
 
 static void init_engine(void)
 {
+    int ret = 0;
+
+    for (int i = 0; i < CAMS_NUM_MAX; i++) {
+        if (!media_info.cams[i].link_enabled) {
+            DBG("Link disabled, skipped\n");
+            continue;
+        }
+        if (sensor_index >= 0 && i != sensor_index)
+            continue;
+
+        ret = rkisp_cl_rkaiq_init(&rkisp_engine, NULL, NULL, media_info.cams[i].sensor_entity_name);
+        if (ret) {
+            ERR("rkisp engine init failed !\n");
+            exit(-1);
+        }
+        setMulCamConc(rkisp_engine,true);
+
+        break;
+    }
+
+}
+
+static void prepare_engine(void)
+{
     struct rkisp_cl_prepare_params_s params = {0};
     int ret = 0;
 
@@ -343,12 +367,7 @@ static void init_engine(void)
             params.lens_sd_node_path = media_info.cams[i].sd_lens_path;
         if (strlen(media_info.cams[i].sd_flash_path[0]))
             params.flashlight_sd_node_path[0] = media_info.cams[i].sd_flash_path[0];
-        ret = rkisp_cl_rkaiq_init(&rkisp_engine, NULL, NULL, media_info.cams[i].sensor_entity_name);
-        if (ret) {
-            ERR("rkisp engine init failed !\n");
-            exit(-1);
-        }
-        setMulCamConc(rkisp_engine,true);
+
         if (rkisp_cl_prepare(rkisp_engine, &params)) {
             ERR("rkisp engine prepare failed !\n");
             exit(-1);
@@ -504,48 +523,47 @@ int main(int argc, char **argv)
 
     parse_args(argc, argv);
 
-    for (;;) {
-        /* Refresh media info so that sensor link status updated */
-        //if (rkisp_get_media_info(mdev_path)) //not used now
-        if (rkaiq_get_media_info())
-            errno_exit("Bad media topology\n");
+    /* Refresh media info so that sensor link status updated */
+    //if (rkisp_get_media_info(mdev_path)) //not used now
+    if (rkaiq_get_media_info())
+        errno_exit("Bad media topology\n");
 
-        if(find_ispp) {
-            strncpy(cur_dev_path, media_info.sd_ispp_path, FILE_PATH_LEN);
-            isp_fd = open(cur_dev_path, O_RDWR);
-        }
-        else {
-            strncpy(cur_dev_path, media_info.vd_params_path, FILE_PATH_LEN);
-            isp_fd = open(cur_dev_path, O_RDWR);
-        }
-        if (isp_fd < 0) {
-            ERR("open %s failed %s\n", cur_dev_path,
-                strerror(errno));
-            exit(-1);
-        }
-        subscrible_stream_event(isp_fd, true);
-        init_engine();
-
-        {
-            DBG("wait stream start event...\n");
-            wait_stream_event(isp_fd, CIFISP_V4L2_EVENT_STREAM_START, -1);
-            DBG("wait stream start event success ...\n");
-
-            start_engine();
-
-            DBG("wait stream stop event...\n");
-            wait_stream_event(isp_fd, CIFISP_V4L2_EVENT_STREAM_STOP, -1);
-            DBG("wait stream stop event success ...\n");
-
-            stop_engine();
-        }
-
-        deinit_engine();
-        subscrible_stream_event(isp_fd, false);
-        close(isp_fd);
-
-        DBG("----------------------------------------------\n\n");
+    if(find_ispp) {
+        strncpy(cur_dev_path, media_info.sd_ispp_path, FILE_PATH_LEN);
+        isp_fd = open(cur_dev_path, O_RDWR);
     }
+    else {
+        strncpy(cur_dev_path, media_info.vd_params_path, FILE_PATH_LEN);
+        isp_fd = open(cur_dev_path, O_RDWR);
+    }
+    if (isp_fd < 0) {
+        ERR("open %s failed %s\n", cur_dev_path,
+            strerror(errno));
+        exit(-1);
+    }
+    subscrible_stream_event(isp_fd, true);
+    init_engine();
+    prepare_engine();
+
+    for (;;) {
+        DBG("wait stream start event...\n");
+        wait_stream_event(isp_fd, CIFISP_V4L2_EVENT_STREAM_START, -1);
+        DBG("wait stream start event success ...\n");
+
+        start_engine();
+
+        DBG("wait stream stop event...\n");
+        wait_stream_event(isp_fd, CIFISP_V4L2_EVENT_STREAM_STOP, -1);
+        DBG("wait stream stop event success ...\n");
+
+        stop_engine();
+    }
+    deinit_engine();
+    subscrible_stream_event(isp_fd, false);
+    close(isp_fd);
+
+    DBG("----------------------------------------------\n\n");
+
 
     return 0;
 }
