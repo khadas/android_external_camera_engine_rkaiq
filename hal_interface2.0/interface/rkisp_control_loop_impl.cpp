@@ -345,15 +345,21 @@ int rkisp_cl_rkaiq_init(void** cl_ctx, const char* tuning_file_path,
     xcam_get_log_level();
     LOGD("--------------------------rk_aiq_uapi_sysctl_init");
     rk_aiq_sys_ctx_t* aiq_ctx = NULL;
-    aiq_ctx = rk_aiq_uapi_sysctl_init(sns_entity_name, RK_3A_TUNING_FILE_PATH, NULL, NULL);
+    AiqCameraHalAdapter *gAiqCameraHalAdapter = new AiqCameraHalAdapter();
+    rk_aiq_metas_cb sMetas_cb = [=] (rk_aiq_metas_t* metas) ->XCamReturn{
+        LOGD("----------rkisp_aiq_metas_cb---metas.frame_id:%d-----------",metas->frame_id);
+        if((gAiqCameraHalAdapter)!=NULL){
+            gAiqCameraHalAdapter->metaCallback();
+        }
+        return XCAM_RETURN_NO_ERROR;
+    };
+    aiq_ctx = rk_aiq_uapi_sysctl_init(sns_entity_name, RK_3A_TUNING_FILE_PATH, NULL,sMetas_cb);
     RkCamera3VendorTags::get_vendor_tag_ops(&rkcamera_vendor_tag_ops_instance);
     set_camera_metadata_vendor_ops(&rkcamera_vendor_tag_ops_instance);
 
     LOGD("@%s(%d)aiq_ctx pointer(%p)",__FUNCTION__, __LINE__, aiq_ctx);
 
-    AiqCameraHalAdapter *gAiqCameraHalAdapter = NULL;
     if(aiq_ctx){
-        gAiqCameraHalAdapter = new AiqCameraHalAdapter(aiq_ctx->_rkAiqManager,aiq_ctx->_analyzer,aiq_ctx->_camHw);
         gAiqCameraHalAdapter->init(callbacks_ops);
         gAiqCameraHalAdapter->set_aiq_ctx(aiq_ctx);
     }

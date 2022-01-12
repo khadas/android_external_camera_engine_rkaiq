@@ -532,10 +532,10 @@ RkAiqManager::syncSofEvt(SmartPtr<VideoBuffer>& hwres)
         mRkAiqAnalyzer->pushEvts(hw_evt);
 
         // TODO: moved to aiq core ?
-        if (mMetasCb) {
+        if (mMetasCb != NULL) {
             rk_aiq_metas_t metas;
             metas.frame_id = hwres->get_sequence();
-            (*mMetasCb)(&metas);
+            mMetasCb(&metas);
         }
     }
 
@@ -569,10 +569,10 @@ RkAiqManager::hwResCb(SmartPtr<VideoBuffer>& hwres)
             SmartPtr<ispHwEvt_t> hw_evt = mCamHwIsp20->make_ispHwEvt(evtdata->_frameid, V4L2_EVENT_FRAME_SYNC, evtdata->_timestamp);
             mRkAiqAnalyzer->pushEvts(hw_evt);
             // TODO: moved to aiq core ?
-            if (mMetasCb) {
+            if (mMetasCb != NULL ) {
                 rk_aiq_metas_t metas;
                 metas.frame_id = evtdata->_frameid;
-                (*mMetasCb)(&metas);
+                mMetasCb(&metas);
             }
         } else {
             mCamGroupCoreManager->sofSync(this, hwres);

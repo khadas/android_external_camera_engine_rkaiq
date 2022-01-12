@@ -58,18 +58,15 @@ static char rkAiqAdapterVersion[PROPERTY_VALUE_MAX] = CONFIG_AIQ_ADAPTER_LIB_VER
 
 using namespace android::camera2;
 
-AiqCameraHalAdapter::AiqCameraHalAdapter(SmartPtr<RkAiqManager> rkAiqManager,SmartPtr<RkAiqCore> analyzer,SmartPtr<ICamHw> camHw)
-: _rkAiqManager(rkAiqManager),
-  _analyzer(analyzer),
-  _camHw(camHw),
+AiqCameraHalAdapter::AiqCameraHalAdapter()
+:
   _delay_still_capture(false),
   _aiq_ctx(NULL),
   _meta (NULL),
   _metadata (NULL),
   mThreadRunning(false),
   mMessageQueue("AiqAdatperThread", static_cast<int>(MESSAGE_ID_MAX)),
-  mMessageThread(nullptr),
-  _hwResListener(nullptr)
+  mMessageThread(nullptr)
 {
     int32_t status = OK;
     LOGD("@%s %d:", __FUNCTION__, __LINE__);
@@ -143,10 +140,6 @@ AiqCameraHalAdapter::start(){
         while (mThreadRunning.load(std::memory_order_acquire) == false)
             std::this_thread::sleep_for(10us);
     }
-    if(_rkAiqManager.ptr() && mCallbackOps){
-        this->_hwResListener = _rkAiqManager;
-        this->_camHw->setHwResListener(this);
-    }
 }
 
 void
@@ -155,8 +148,6 @@ AiqCameraHalAdapter::stop(){
     LOGD("@%s %d:", __FUNCTION__, __LINE__);
     pthread_mutex_lock(&_aiq_ctx_mutex);
     _state = AIQ_ADAPTER_STATE_STOPED;
-    //this->_rkAiqManager = nullptr;
-    //this->_hwResListener = nullptr;
     pthread_mutex_unlock(&_aiq_ctx_mutex);
 }
 
@@ -164,12 +155,7 @@ void
 AiqCameraHalAdapter::deInit(){
     status_t status = OK;
     LOGD("@%s %d:", __FUNCTION__, __LINE__);
-    this->_analyzer = nullptr;
-    this->_camHw = nullptr;
 #if 1
-    this->_rkAiqManager = nullptr;
-    this->_analyzer = nullptr;
-    this->_camHw = nullptr;
     requestExitAndWait();
     if (mMessageThread != nullptr) {
         mMessageThread.reset();
@@ -195,23 +181,16 @@ SmartPtr<AiqInputParams> AiqCameraHalAdapter:: getAiqInputParams()
 }
 
 XCamReturn
-AiqCameraHalAdapter::hwResCb(SmartPtr<VideoBuffer>& hwres) {
+AiqCameraHalAdapter::metaCallback() {
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
 
     if (!mThreadRunning.load(std::memory_order_relaxed)) {
         return ret;
     }
 
-    if (hwres->_buf_type == ISP_POLL_SOF) {
-        Message msg;
-        msg.id = MESSAGE_ID_ISP_SOF_DONE;
-        mMessageQueue.send(&msg, MessageId(-1));
-    }
-
-    if(this->_hwResListener.ptr()){
-        return this->_hwResListener->hwResCb(hwres);
-    }
-
+    Message msg;
+    msg.id = MESSAGE_ID_ISP_SOF_DONE;
+    mMessageQueue.send(&msg, MessageId(-1));
     return ret;
 }
 
@@ -1417,14 +1396,8 @@ AiqCameraHalAdapter::messageThreadLoop()
         case MESSAGE_ID_EXIT:
             status = handleMessageExit(msg);
             break;
-        case MESSAGE_ID_ISP_STAT_DONE:
-            status = handleIspStatCb(msg);
-            break;
         case MESSAGE_ID_ISP_SOF_DONE:
             status = handleIspSofCb(msg);
-            break;
-        case MESSAGE_ID_RKAIQ_CAL_DONE:
-            status = handleRkAiqCalcDone(msg);
             break;
         case MESSAGE_ID_FLUSH:
             status = handleMessageFlush(msg);
@@ -1465,20 +1438,6 @@ AiqCameraHalAdapter::handleMessageExit(Message &msg)
 }
 
 status_t
-AiqCameraHalAdapter::handleIspStatCb(Message &msg)
-{
-    status_t status = OK;
-
-    this->processResults();
-    setAiqInputParams(this->getAiqInputParams());
-    LOGD("@%s : reqId %d", __FUNCTION__, _inputParams.ptr() ? _inputParams->reqId : -1);
-    // update 3A states
-    pre_process_3A_states(_inputParams);
-    updateMetaParams();
-    return status;
-}
-
-status_t
 AiqCameraHalAdapter::handleIspSofCb(Message &msg)
 {
     status_t status = OK;
@@ -1494,23 +1453,12 @@ AiqCameraHalAdapter::handleIspSofCb(Message &msg)
 }
 
 status_t
-AiqCameraHalAdapter::handleRkAiqCalcDone(Message &msg)
-{
-    status_t status = OK;
-
-    LOGD("@%s %d:", __FUNCTION__, __LINE__);
-    return status;
-}
-
-status_t
 AiqCameraHalAdapter::handleMessageFlush(Message &msg)
 {
     status_t status = OK;
 
     LOGD("@%s %d:", __FUNCTION__, __LINE__);
-    mMessageQueue.remove(MESSAGE_ID_ISP_STAT_DONE);
     mMessageQueue.remove(MESSAGE_ID_ISP_SOF_DONE);
-    mMessageQueue.remove(MESSAGE_ID_RKAIQ_CAL_DONE);
     return status;
 }
 
