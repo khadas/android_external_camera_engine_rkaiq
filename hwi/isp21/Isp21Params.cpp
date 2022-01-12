@@ -976,6 +976,28 @@ void Isp21Params::convertAiqAgicToIsp21Params(T& isp_cfg,
     }
 }
 
+template<class T>
+void
+Isp21Params::convertAiqCsmToIsp21Params(T& isp_cfg,
+                                       const rk_aiq_acsm_params_t& csm_param)
+{
+    struct isp21_csm_cfg* csm_cfg = &isp_cfg.others.csm_cfg;
+    if (csm_param.op_mode == RK_AIQ_OP_MODE_MANUAL ||
+        csm_param.op_mode == RK_AIQ_OP_MODE_AUTO) {
+        isp_cfg.module_ens |= ISP2X_MODULE_CSM;
+        isp_cfg.module_en_update |= ISP2X_MODULE_CSM;
+        isp_cfg.module_cfg_update |= ISP2X_MODULE_CSM;
+        csm_cfg->csm_full_range = csm_param.full_range ? 1 : 0;
+        csm_cfg->csm_y_offset = csm_param.y_offset;
+        csm_cfg->csm_c_offset = csm_param.c_offset;
+        csm_cfg->csm_coeff[ISP21_CSM_COEFF_NUM];
+        memcpy(csm_cfg->csm_coeff, csm_param.coeff, sizeof(csm_cfg->csm_coeff));
+    } else {
+        isp_cfg.module_ens &= ~ISP2X_MODULE_CSM;
+        isp_cfg.module_en_update |= ISP2X_MODULE_CSM;
+    }
+}
+
 bool Isp21Params::convert3aResultsToIspCfg(SmartPtr<cam3aResult> &result,
         void* isp_cfg_p)
 {
@@ -1169,13 +1191,11 @@ bool Isp21Params::convert3aResultsToIspCfg(SmartPtr<cam3aResult> &result,
 #endif
     break;
     case RESULT_TYPE_CSM_PARAM:
-#if 0
     {
         SmartPtr<RkAiqIspCsmParamsProxy> params = result.dynamic_cast_ptr<RkAiqIspCsmParamsProxy>();
         if (params.ptr())
-            convertAiqToIsp20Params(isp_cfg, params->data()->result);
+            convertAiqCsmToIsp21Params(isp_cfg, params->data()->result);
     }
-#endif
     break;
     case RESULT_TYPE_CGC_PARAM:
         break;

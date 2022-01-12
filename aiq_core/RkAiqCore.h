@@ -541,7 +541,7 @@ protected:
     virtual XCamReturn genIspAldchResult(RkAiqFullParams* params);
     virtual XCamReturn genIspAlscResult(RkAiqFullParams* params);
     virtual XCamReturn genIspAorbResult(RkAiqFullParams* params);
-    virtual XCamReturn genIspAr2yResult(RkAiqFullParams* params);
+    virtual XCamReturn genIspAcsmResult(RkAiqFullParams* params);
     virtual XCamReturn genIspAwdrResult(RkAiqFullParams* params);
     virtual XCamReturn genCpslResult(RkAiqFullParams* params);
     virtual XCamReturn genIspArawnrResult(RkAiqFullParams* params);

@@ -564,7 +564,7 @@ RkAiqAlgoType_t RkAiqCalibDbV2::string2algostype(const char *str) {
         {"adehaze_calib_v30", RK_AIQ_ALGO_TYPE_ADHAZ},
         {"lut3d_calib", RK_AIQ_ALGO_TYPE_A3DLUT},
         {"aldch", RK_AIQ_ALGO_TYPE_ALDCH},
-        {"ar2y_calib", RK_AIQ_ALGO_TYPE_AR2Y},
+        {"acsm_calib", RK_AIQ_ALGO_TYPE_ACSM},
         {"cproc", RK_AIQ_ALGO_TYPE_ACP},
         {"ie", RK_AIQ_ALGO_TYPE_AIE},
         {"sharp_v1", RK_AIQ_ALGO_TYPE_ASHARP},

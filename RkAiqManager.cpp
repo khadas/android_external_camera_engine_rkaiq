@@ -947,6 +947,7 @@ RkAiqManager::applyAnalyzerResult(SmartPtr<RkAiqFullParamsProxy>& results)
     APPLY_ANALYZER_RESULT(CnrV21, UVNR);
     APPLY_ANALYZER_RESULT(SharpenV21, SHARPEN);
     APPLY_ANALYZER_RESULT(BaynrV21, RAWNR);
+    APPLY_ANALYZER_RESULT(Csm, CSM);
     // ispv3x
     APPLY_ANALYZER_RESULT(AwbV3x, AWB);
     APPLY_ANALYZER_RESULT(AfV3x, AF);

@@ -199,6 +199,9 @@ CamHwIsp3x::gen_full_isp_params(const struct isp3x_isp_params_cfg* update_params
             case Rk_ISP3x_CAC_ID:
                 CHECK_UPDATE_PARAMS(full_params->others.cac_cfg, update_params->others.cac_cfg);
                 break;
+            case Rk_ISP2x_CSM_ID:
+                CHECK_UPDATE_PARAMS(full_params->others.csm_cfg, update_params->others.csm_cfg);
+                break;
             default:
                 break;
             }

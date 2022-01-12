@@ -64,10 +64,7 @@
 #include "aynr/rk_aiq_types_aynr_algo_v1.h"
 #include "auvnr/rk_aiq_types_auvnr_algo_v1.h"
 #include "again/rk_aiq_types_again_algo.h"
-
-
-
-
+#include "acsm/rk_aiq_types_acsm_algo.h"
 
 #ifdef RK_SIMULATOR_HW
 #include "simulator/isp20_hw_simulator.h"
@@ -489,9 +486,7 @@ typedef struct {
     int UNKNOWN;
 } rk_aiq_isp_wdr_t;
 
-typedef struct {
-    int UNKNOWN;
-} rk_aiq_isp_csm_t;
+typedef rk_aiq_acsm_params_t rk_aiq_isp_csm_t;
 
 typedef struct {
     int UNKNOWN;

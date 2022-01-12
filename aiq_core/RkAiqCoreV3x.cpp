@@ -41,7 +41,7 @@
 #include "awdr/rk_aiq_algo_awdr_itf.h"
 #include "a3dlut/rk_aiq_algo_a3dlut_itf.h"
 #include "aldch/rk_aiq_algo_aldch_itf.h"
-#include "ar2y/rk_aiq_algo_ar2y_itf.h"
+#include "acsm/rk_aiq_algo_acsm_itf.h"
 #include "aie/rk_aiq_algo_aie_itf.h"
 #include "aorb/rk_aiq_algo_aorb_itf.h"
 #include "afec/rk_aiq_algo_afec_itf.h"
@@ -143,7 +143,7 @@ static struct RkAiqAlgoDesCommExt g_default_3a_des_v3x[] = {
     { &g_RkIspAlgoDescAdpcc.common, RK_AIQ_CORE_ANALYZE_OTHER, 0, 0, otherGrpCondsV3x},
     { &g_RkIspAlgoDescAldch.common, RK_AIQ_CORE_ANALYZE_OTHER, 0, 0, otherGrpCondsV3x },
     { &g_RkIspAlgoDescAcgc.common, RK_AIQ_CORE_ANALYZE_OTHER, 0, 0, otherGrpCondsV3x },
-    { &g_RkIspAlgoDescAr2y.common, RK_AIQ_CORE_ANALYZE_OTHER, 0, 0, otherGrpCondsV3x },
+    { &g_RkIspAlgoDescAcsm.common, RK_AIQ_CORE_ANALYZE_OTHER, 0, 0, otherGrpCondsV3x },
     { &g_RkIspAlgoDescAf.common, RK_AIQ_CORE_ANALYZE_AF, 0, 1, afGrpCondsV3x },
     { &g_RkIspAlgoDescAblc.common, RK_AIQ_CORE_ANALYZE_OTHER, 0, 0, otherGrpCondsV3x },
     { &g_RkIspAlgoDescAgic.common, RK_AIQ_CORE_ANALYZE_OTHER, 0, 1, otherGrpCondsV3x },
@@ -270,7 +270,7 @@ RkAiqCoreV3x::newAiqParamsPool()
             case RK_AIQ_ALGO_TYPE_AWDR:
                 mAiqIspWdrParamsPool        = new RkAiqIspWdrParamsPool("RkAiqIspWdrParams", RkAiqCore::DEFAULT_POOL_SIZE);
                 break;
-            case RK_AIQ_ALGO_TYPE_AR2Y:
+            case RK_AIQ_ALGO_TYPE_ACSM:
                 mAiqIspCsmParamsPool        = new RkAiqIspCsmParamsPool("RkAiqIspCsmParams", RkAiqCore::DEFAULT_POOL_SIZE);
                 break;
             case RK_AIQ_ALGO_TYPE_ACGC:
@@ -408,7 +408,8 @@ RkAiqCoreV3x::getAiqParamsBuffer(RkAiqFullParams* aiqParams, enum rk_aiq_core_an
         case RK_AIQ_ALGO_TYPE_ALDCH:
             NEW_PARAMS_BUFFER(Ldch, ldch);
             break;
-        case RK_AIQ_ALGO_TYPE_AR2Y:
+        case RK_AIQ_ALGO_TYPE_ACSM:
+            NEW_PARAMS_BUFFER(Csm, csm);
             break;
         case RK_AIQ_ALGO_TYPE_ACP:
             NEW_PARAMS_BUFFER(Cp, cp);
@@ -529,8 +530,8 @@ RkAiqCoreV3x::genIspParamsResult(RkAiqFullParams *aiqParams, enum rk_aiq_core_an
                 genIspAldchResult(aiqParams);
                 curParams->mLdchParams = aiqParams->mLdchParams;
                 break;
-            case RK_AIQ_ALGO_TYPE_AR2Y:
-                genIspAr2yResult(aiqParams);
+            case RK_AIQ_ALGO_TYPE_ACSM:
+                genIspAcsmResult(aiqParams);
                 break;
             case RK_AIQ_ALGO_TYPE_ACP:
                 genIspAcpResult(aiqParams);

@@ -1,5 +1,5 @@
 /*
- * rk_aiq_algo_ar2y_itf.h
+ * rk_aiq_algo_ACSM_itf.h
  *
  *  Copyright (c) 2019 Rockchip Corporation
  *
@@ -17,19 +17,19 @@
  *
  */
 
-#ifndef _RK_AIQ_ALGO_AR2Y_ITF_H_
-#define _RK_AIQ_ALGO_AR2Y_ITF_H_
+#ifndef _RK_AIQ_ALGO_ACSM_ITF_H_
+#define _RK_AIQ_ALGO_ACSM_ITF_H_
 
 #include "rk_aiq_algo_des.h"
 
-#define RKISP_ALGO_AR2Y_VERSION     "v0.0.9"
-#define RKISP_ALGO_AR2Y_VENDOR      "Rockchip"
-#define RKISP_ALGO_AR2Y_DESCRIPTION "Rockchip Ar2y algo for ISP2.0"
+#define RKISP_ALGO_ACSM_VERSION     "v0.0.9"
+#define RKISP_ALGO_ACSM_VENDOR      "Rockchip"
+#define RKISP_ALGO_ACSM_DESCRIPTION "Rockchip ACSM algo for ISP2.0"
 
 XCAM_BEGIN_DECLARE
 
-extern RkAiqAlgoDescription g_RkIspAlgoDescAr2y;
+extern RkAiqAlgoDescription g_RkIspAlgoDescAcsm;
 
 XCAM_END_DECLARE
 
-#endif //_RK_AIQ_ALGO_AR2Y_ITF_H_ 
+#endif //_RK_AIQ_ALGO_ACSM_ITF_H_ 

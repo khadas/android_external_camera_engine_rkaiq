@@ -45,7 +45,7 @@
 #include "awdr/rk_aiq_algo_awdr_itf.h"
 #include "a3dlut/rk_aiq_algo_a3dlut_itf.h"
 #include "aldch/rk_aiq_algo_aldch_itf.h"
-#include "ar2y/rk_aiq_algo_ar2y_itf.h"
+#include "acsm/rk_aiq_algo_acsm_itf.h"
 #include "aie/rk_aiq_algo_aie_itf.h"
 #include "aorb/rk_aiq_algo_aorb_itf.h"
 #include "afec/rk_aiq_algo_afec_itf.h"
@@ -188,7 +188,7 @@ const static struct RkAiqAlgoDesCommExt g_default_3a_des[] = {
     { &g_RkIspAlgoDescAdhaz.common, RK_AIQ_CORE_ANALYZE_OTHER, 0, 0, otherGrpConds },
     { &g_RkIspAlgoDescA3dlut.common, RK_AIQ_CORE_ANALYZE_OTHER, 0, 0, otherGrpConds },
     { &g_RkIspAlgoDescAldch.common, RK_AIQ_CORE_ANALYZE_OTHER, 0, 0, otherGrpConds },
-    { &g_RkIspAlgoDescAr2y.common, RK_AIQ_CORE_ANALYZE_OTHER, 0, 0, otherGrpConds },
+    { &g_RkIspAlgoDescAcsm.common, RK_AIQ_CORE_ANALYZE_OTHER, 0, 0, otherGrpConds },
     { &g_RkIspAlgoDescAcp.common, RK_AIQ_CORE_ANALYZE_OTHER, 0, 0, otherGrpConds },
     { &g_RkIspAlgoDescAie.common, RK_AIQ_CORE_ANALYZE_OTHER, 0, 0, otherGrpConds },
     { &g_RkIspAlgoDescAsharp.common, RK_AIQ_CORE_ANALYZE_OTHER, 0, 0, otherGrpConds },
@@ -810,7 +810,8 @@ RkAiqCore::getAiqParamsBuffer(RkAiqFullParams* aiqParams, enum rk_aiq_core_analy
         case RK_AIQ_ALGO_TYPE_ALDCH:
             NEW_PARAMS_BUFFER(Ldch, ldch);
             break;
-        case RK_AIQ_ALGO_TYPE_AR2Y:
+        case RK_AIQ_ALGO_TYPE_ACSM:
+            NEW_PARAMS_BUFFER(Csm, csm);
             break;
         case RK_AIQ_ALGO_TYPE_ACP:
             NEW_PARAMS_BUFFER(Cp, cp);
@@ -969,7 +970,7 @@ RkAiqCore::genIspParamsResult(RkAiqFullParams *aiqParams, enum rk_aiq_core_analy
                 genIspAldchResult(aiqParams);
                 curParams->mLdchParams = aiqParams->mLdchParams;
                 break;
-            case RK_AIQ_ALGO_TYPE_AR2Y:
+            case RK_AIQ_ALGO_TYPE_ACSM:
                 break;
             case RK_AIQ_ALGO_TYPE_ACP:
                 genIspAcpResult(aiqParams);
@@ -2691,19 +2692,19 @@ RkAiqCore::genIspAeisResult(RkAiqFullParams* params)
 }
 
 XCamReturn
-RkAiqCore::genIspAr2yResult(RkAiqFullParams* params)
+RkAiqCore::genIspAcsmResult(RkAiqFullParams* params)
 {
     ENTER_ANALYZER_FUNCTION();
 
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
-    SmartPtr<RkAiqHandle>* handle = getCurAlgoTypeHandle(RK_AIQ_ALGO_TYPE_AR2Y);
+    SmartPtr<RkAiqHandle>* handle = getCurAlgoTypeHandle(RK_AIQ_ALGO_TYPE_ACSM);
     if (handle == nullptr) {
         return XCAM_RETURN_BYPASS;
     }
     RkAiqCore::RkAiqAlgosGroupShared_t* shared =
         (RkAiqCore::RkAiqAlgosGroupShared_t*)((*handle)->getGroupShared());
-    RkAiqAlgoProcResAr2y* ar2y_com =
-        shared->procResComb.ar2y_proc_res;
+    RkAiqAlgoProcResAcsm* acsm_com =
+        shared->procResComb.acsm_proc_res;
 #ifdef RK_SIMULATOR_HW
     rk_aiq_isp_meas_params_v20_t* isp_param = params->mIspMeasParams->data().ptr();
 
@@ -2716,18 +2717,18 @@ RkAiqCore::genIspAr2yResult(RkAiqFullParams* params)
 #endif
 
 
-    if (!ar2y_com) {
-        LOGD_ANALYZER("no ar2y result");
+    if (!acsm_com) {
+        LOGD_ANALYZER("no acsm result");
         return XCAM_RETURN_NO_ERROR;
     }
 
-    // TODO: gen ar2y common result
+    // TODO: gen acsm common result
 
     int algo_id = (*handle)->getAlgoId();
 
-    // gen rk ar2y result
+    // gen rk acsm result
     if (algo_id == 0) {
-        RkAiqAlgoProcResAr2yInt* ar2y_rk = (RkAiqAlgoProcResAr2yInt*)ar2y_com;
+        RkAiqAlgoProcResAcsmInt* acsm_rk = (RkAiqAlgoProcResAcsmInt*)acsm_com;
 
 #ifdef RK_SIMULATOR_HW
 #else
@@ -3367,7 +3368,7 @@ RkAiqCore::newAlgoHandle(RkAiqAlgoDesComm* algo, bool generic, int version)
     NEW_ALGO_HANDLE(Aldch, ALDCH);
     NEW_ALGO_HANDLE(Alsc, ALSC);
     NEW_ALGO_HANDLE(Aorb, AORB);
-    NEW_ALGO_HANDLE(Ar2y, AR2Y);
+    NEW_ALGO_HANDLE(Acsm, ACSM);
     NEW_ALGO_HANDLE(Awdr, AWDR);
     NEW_ALGO_HANDLE(Arawnr, ARAWNR);
     NEW_ALGO_HANDLE(Amfnr, AMFNR);
@@ -3487,6 +3488,9 @@ RkAiqCore::setReqAlgoResMask(int algoType, bool req)
         break;
     case RK_AIQ_ALGO_TYPE_ACP:
         tmp |= (uint64_t)1 << RESULT_TYPE_CP_PARAM;
+        break;
+    case RK_AIQ_ALGO_TYPE_ACSM:
+        tmp |= (uint64_t)1 << RESULT_TYPE_CSM_PARAM;
         break;
     case RK_AIQ_ALGO_TYPE_AIE:
         tmp |= (uint64_t)1 << RESULT_TYPE_IE_PARAM;
@@ -4866,7 +4870,7 @@ void RkAiqCore::newAiqParamsPool()
             case RK_AIQ_ALGO_TYPE_AWDR:
                 mAiqIspWdrParamsPool        = new RkAiqIspWdrParamsPool("RkAiqIspWdrParams", RkAiqCore::DEFAULT_POOL_SIZE);
                 break;
-            case RK_AIQ_ALGO_TYPE_AR2Y:
+            case RK_AIQ_ALGO_TYPE_ACSM:
                 mAiqIspCsmParamsPool        = new RkAiqIspCsmParamsPool("RkAiqIspCsmParams", RkAiqCore::DEFAULT_POOL_SIZE);
                 break;
             case RK_AIQ_ALGO_TYPE_ACGC:

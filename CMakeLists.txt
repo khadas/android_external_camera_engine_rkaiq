@@ -134,7 +134,7 @@ include/algos/alsc
 include/algos/anr
 include/algos/anr/tnr_md
 include/algos/aorb
-include/algos/ar2y
+include/algos/acsm
 include/algos/asd
 include/algos/asharp
 include/algos/awb
@@ -438,7 +438,7 @@ add_dependencies(rkaiq j2s_parser)
 target_link_libraries(rkaiq rkaiq_ae rkaiq_awb rkaiq_af rkaiq_anr rkaiq_asd rkaiq_amerge rkaiq_atmo
 	rkaiq_acp rkaiq_asharp rkaiq_adhaz rkaiq_a3dlut rkaiq_ablc rkaiq_accm rkaiq_acgc
 	rkaiq_adebayer rkaiq_adpcc rkaiq_afec rkaiq_agamma rkaiq_adegamma rkaiq_agic rkaiq_aie rkaiq_aldch
-	rkaiq_alsc rkaiq_aorb rkaiq_ar2y rkaiq_awdr rkaiq_adrc rkaiq_asharp_v3 rkaiq_aynr_v2 rkaiq_acnr_v1
+	rkaiq_alsc rkaiq_aorb rkaiq_acsm rkaiq_awdr rkaiq_adrc rkaiq_asharp_v3 rkaiq_aynr_v2 rkaiq_acnr_v1
 	rkaiq_arawnr_v2 rkaiq_aeis rkaiq_amd rkaiq_arawnr_v1 rkaiq_aynr_v1 rkaiq_auvnr_v1 rkaiq_amfnr_v1 rkaiq_again_v1 
 	rkaiq_aynr_v3 rkaiq_acnr_v2 rkaiq_asharp_v4 rkaiq_abayer2dnr_v2
 	rkaiq_abayertnr_v2 rkaiq_again_v2 rkaiq_acac rkaiq_camgroup_ae

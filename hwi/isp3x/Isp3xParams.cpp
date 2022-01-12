@@ -1430,13 +1430,11 @@ bool Isp3xParams::convert3aResultsToIspCfg(SmartPtr<cam3aResult> &result,
 #endif
     break;
     case RESULT_TYPE_CSM_PARAM:
-#if 0
     {
         SmartPtr<RkAiqIspCsmParamsProxy> params = result.dynamic_cast_ptr<RkAiqIspCsmParamsProxy>();
         if (params.ptr())
-            convertAiqToIsp20Params(isp_cfg, params->data()->result);
+            convertAiqCsmToIsp21Params(isp_cfg, params->data()->result);
     }
-#endif
     break;
     case RESULT_TYPE_CGC_PARAM:
         break;

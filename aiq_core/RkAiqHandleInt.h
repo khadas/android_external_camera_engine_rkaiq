@@ -54,6 +54,7 @@
 #include "amfnr/rk_aiq_uapi_amfnr_int_v1.h"
 #include "again/rk_aiq_uapi_again_int.h"
 #include "acac/rk_aiq_uapi_acac_int.h"
+#include "acsm/rk_aiq_uapi_acsm.h"
 
 #include "RkAiqSharedDataManager.h"
 #include "rk_aiq_api_private.h"
@@ -120,7 +121,7 @@ RKAIQHANDLEINT(Acgc);
 //RKAIQHANDLEINT(Agic);
 //RKAIQHANDLEINT(Aie);
 // RKAIQHANDLEINT(Aldch);
-RKAIQHANDLEINT(Ar2y);
+RKAIQHANDLEINT(Acsm);
 RKAIQHANDLEINT(Awdr);
 RKAIQHANDLEINT(Aorb);
 //RKAIQHANDLEINT(Aeis);

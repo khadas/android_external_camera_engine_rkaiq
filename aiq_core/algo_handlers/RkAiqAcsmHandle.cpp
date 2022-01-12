@@ -1,5 +1,5 @@
 /*
- * RkAiqAr2yHandle.h
+ * RkAiqAcsmHandle.h
  *
  *  Copyright (c) 2019-2021 Rockchip Eletronics Co., Ltd.
  *
@@ -22,98 +22,98 @@
 
 namespace RkCam {
 
-void RkAiqAr2yHandle::init() {
+void RkAiqAcsmHandle::init() {
     ENTER_ANALYZER_FUNCTION();
 
     deInit();
-    mConfig       = (RkAiqAlgoCom*)(new RkAiqAlgoConfigAr2y());
-    mPreInParam   = (RkAiqAlgoCom*)(new RkAiqAlgoPreAr2y());
-    mPreOutParam  = (RkAiqAlgoResCom*)(new RkAiqAlgoPreResAr2y());
-    mProcInParam  = (RkAiqAlgoCom*)(new RkAiqAlgoProcAr2y());
-    mProcOutParam = (RkAiqAlgoResCom*)(new RkAiqAlgoProcResAr2y());
-    mPostInParam  = (RkAiqAlgoCom*)(new RkAiqAlgoPostAr2y());
-    mPostOutParam = (RkAiqAlgoResCom*)(new RkAiqAlgoPostResAr2y());
+    mConfig       = (RkAiqAlgoCom*)(new RkAiqAlgoConfigAcsm());
+    mPreInParam   = (RkAiqAlgoCom*)(new RkAiqAlgoPreAcsm());
+    mPreOutParam  = (RkAiqAlgoResCom*)(new RkAiqAlgoPreResAcsm());
+    mProcInParam  = (RkAiqAlgoCom*)(new RkAiqAlgoProcAcsm());
+    mProcOutParam = (RkAiqAlgoResCom*)(new RkAiqAlgoProcResAcsm());
+    mPostInParam  = (RkAiqAlgoCom*)(new RkAiqAlgoPostAcsm());
+    mPostOutParam = (RkAiqAlgoResCom*)(new RkAiqAlgoPostResAcsm());
 
     EXIT_ANALYZER_FUNCTION();
 }
 
-XCamReturn RkAiqAr2yHandle::prepare() {
+XCamReturn RkAiqAcsmHandle::prepare() {
     ENTER_ANALYZER_FUNCTION();
     XCamReturn ret            = XCAM_RETURN_NO_ERROR;
     RkAiqAlgoDescription* des = (RkAiqAlgoDescription*)mDes;
 
     ret = RkAiqHandle::prepare();
-    RKAIQCORE_CHECK_RET(ret, "ar2y handle prepare failed");
+    RKAIQCORE_CHECK_RET(ret, "acsm handle prepare failed");
 
-    // TODO config ar2y common params
-    RkAiqAlgoConfigAr2y* ar2y_config = (RkAiqAlgoConfigAr2y*)mConfig;
+    // TODO config acsm common params
+    RkAiqAlgoConfigAcsm* acsm_config = (RkAiqAlgoConfigAcsm*)mConfig;
 
     // id != 0 means the thirdparty's algo
     if (mDes->id != 0) {
         ret = des->prepare(mConfig);
-        RKAIQCORE_CHECK_RET(ret, "ar2y algo prepare failed");
+        RKAIQCORE_CHECK_RET(ret, "acsm algo prepare failed");
     }
 
     EXIT_ANALYZER_FUNCTION();
     return ret;
 }
 
-XCamReturn RkAiqAr2yHandle::preProcess() {
+XCamReturn RkAiqAcsmHandle::preProcess() {
     ENTER_ANALYZER_FUNCTION();
     XCamReturn ret             = XCAM_RETURN_NO_ERROR;
     RkAiqAlgoDescription* des  = (RkAiqAlgoDescription*)mDes;
-    RkAiqAlgoPreAr2y* ar2y_pre = (RkAiqAlgoPreAr2y*)mPreInParam;
+    RkAiqAlgoPreAcsm* acsm_pre = (RkAiqAlgoPreAcsm*)mPreInParam;
 
     ret = RkAiqHandle::preProcess();
-    RKAIQCORE_CHECK_RET(ret, "ar2y handle preProcess failed");
+    RKAIQCORE_CHECK_RET(ret, "acsm handle preProcess failed");
 
-    // TODO config common ar2y preprocess params
+    // TODO config common acsm preprocess params
 
     // id != 0 means the thirdparty's algo
     if (mDes->id != 0) {
         ret = des->pre_process(mPreInParam, mPreOutParam);
-        RKAIQCORE_CHECK_RET(ret, "ar2y handle pre_process failed");
+        RKAIQCORE_CHECK_RET(ret, "acsm handle pre_process failed");
     }
 
     EXIT_ANALYZER_FUNCTION();
     return ret;
 }
 
-XCamReturn RkAiqAr2yHandle::processing() {
+XCamReturn RkAiqAcsmHandle::processing() {
     XCamReturn ret              = XCAM_RETURN_NO_ERROR;
     RkAiqAlgoDescription* des   = (RkAiqAlgoDescription*)mDes;
-    RkAiqAlgoProcAr2y* ar2y_pre = (RkAiqAlgoProcAr2y*)mProcInParam;
+    RkAiqAlgoProcAcsm* acsm_pre = (RkAiqAlgoProcAcsm*)mProcInParam;
 
     ret = RkAiqHandle::processing();
-    RKAIQCORE_CHECK_RET(ret, "ar2y handle processing failed");
+    RKAIQCORE_CHECK_RET(ret, "acsm handle processing failed");
 
-    // TODO config common ar2y processing params
+    // TODO config common acsm processing params
 
     // id != 0 means the thirdparty's algo
     if (mDes->id != 0) {
         ret = des->processing(mProcInParam, mProcOutParam);
-        RKAIQCORE_CHECK_RET(ret, "ar2y algo processing failed");
+        RKAIQCORE_CHECK_RET(ret, "acsm algo processing failed");
     }
 
     EXIT_ANALYZER_FUNCTION();
     return ret;
 }
 
-XCamReturn RkAiqAr2yHandle::postProcess() {
+XCamReturn RkAiqAcsmHandle::postProcess() {
     ENTER_ANALYZER_FUNCTION();
     XCamReturn ret              = XCAM_RETURN_NO_ERROR;
     RkAiqAlgoDescription* des   = (RkAiqAlgoDescription*)mDes;
-    RkAiqAlgoPostAr2y* ar2y_pre = (RkAiqAlgoPostAr2y*)mPostInParam;
+    RkAiqAlgoPostAcsm* acsm_pre = (RkAiqAlgoPostAcsm*)mPostInParam;
 
     ret = RkAiqHandle::postProcess();
-    RKAIQCORE_CHECK_RET(ret, "ar2y handle postProcess failed");
+    RKAIQCORE_CHECK_RET(ret, "acsm handle postProcess failed");
 
-    // TODO config common ar2y postProcess params
+    // TODO config common acsm postProcess params
 
     // id != 0 means the thirdparty's algo
     if (mDes->id != 0) {
         ret = des->post_process(mPostInParam, mPostOutParam);
-        RKAIQCORE_CHECK_RET(ret, "ar2y algo postProcess failed");
+        RKAIQCORE_CHECK_RET(ret, "acsm algo postProcess failed");
     }
 
     EXIT_ANALYZER_FUNCTION();

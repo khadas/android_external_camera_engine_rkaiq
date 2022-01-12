@@ -227,7 +227,7 @@ cc_library_shared {
         "librkaiq_aldch",
         "librkaiq_alsc",
         "librkaiq_aorb",
-        "librkaiq_ar2y",
+        "librkaiq_acsm",
         "librkaiq_awdr",
         "librkaiq_adrc",
         "librkaiq_asharp_v3",

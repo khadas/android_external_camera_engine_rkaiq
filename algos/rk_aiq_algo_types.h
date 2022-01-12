@@ -772,34 +772,35 @@ typedef struct _RkAiqAlgoPostResAorb {
     RkAiqAlgoResCom post_res_com;
 } RkAiqAlgoPostResAorb;
 
-// ar2y
-typedef struct _RkAiqAlgoConfigAr2y {
+// acsm
+typedef struct _RkAiqAlgoConfigAcsm {
     RkAiqAlgoCom com;
-} RkAiqAlgoConfigAr2y;
+} RkAiqAlgoConfigAcsm;
 
-typedef struct _RkAiqAlgoPreAr2y {
+typedef struct _RkAiqAlgoPreAcsm {
     RkAiqAlgoCom com;
-} RkAiqAlgoPreAr2y;
+} RkAiqAlgoPreAcsm;
 
-typedef struct _RkAiqAlgoPreResAr2y {
+typedef struct _RkAiqAlgoPreResAcsm {
     RkAiqAlgoResCom pre_res_com;
-} RkAiqAlgoPreResAr2y;
+} RkAiqAlgoPreResAcsm;
 
-typedef struct _RkAiqAlgoProcAr2y {
+typedef struct _RkAiqAlgoProcAcsm {
     RkAiqAlgoCom com;
-} RkAiqAlgoProcAr2y;
+} RkAiqAlgoProcAcsm;
 
-typedef struct _RkAiqAlgoProcResAr2y {
+typedef struct _RkAiqAlgoProcResAcsm {
     RkAiqAlgoResCom proc_res_com;
-} RkAiqAlgoProcResAr2y;
+    rk_aiq_acsm_params_t acsm_res;
+} RkAiqAlgoProcResAcsm;
 
-typedef struct _RkAiqAlgoPostAr2y {
+typedef struct _RkAiqAlgoPostAcsm {
     RkAiqAlgoCom com;
-} RkAiqAlgoPostAr2y;
+} RkAiqAlgoPostAcsm;
 
-typedef struct _RkAiqAlgoPostResAr2y {
+typedef struct _RkAiqAlgoPostResAcsm {
     RkAiqAlgoResCom post_res_com;
-} RkAiqAlgoPostResAr2y;
+} RkAiqAlgoPostResAcsm;
 
 // awdr
 typedef struct _RkAiqAlgoConfigAwdr {

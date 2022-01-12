@@ -607,6 +607,7 @@ algoHandle(const rk_aiq_sys_ctx_t* ctx, const int algo_type)
 #include "uAPI/rk_aiq_user_api_agic.cpp"
 #include "uAPI2/rk_aiq_user_api2_camgroup.cpp"
 #include "uAPI2/rk_aiq_user_api2_agic.cpp"
+#include "uAPI2/rk_aiq_user_api2_acsm.cpp"
 
 
 
@@ -703,7 +704,7 @@ extern RkAiqAlgoDescription g_RkIspAlgoDescAldch;
 extern RkAiqAlgoDescription g_RkIspAlgoDescAlsc;
 extern RkAiqAlgoDescription g_RkIspAlgoDescAnr;
 extern RkAiqAlgoDescription g_RkIspAlgoDescAorb;
-extern RkAiqAlgoDescription g_RkIspAlgoDescAr2y;
+extern RkAiqAlgoDescription g_RkIspAlgoDescAcsm;
 extern RkAiqAlgoDescription g_RkIspAlgoDescAsd;
 extern RkAiqAlgoDescription g_RkIspAlgoDescAsharp;
 extern RkAiqAlgoDescription g_RkIspAlgoDescAwb;
@@ -738,7 +739,7 @@ static void _print_versions()
          "       ALDCH:       %s\n"
          "        ALSC:       %s\n"
          "        AORB:       %s\n"
-         "        AR2Y:       %s\n"
+         "        ACSM:       %s\n"
          "         ASD:       %s\n"
          "        AWDR:       %s\n"
          "        AEIS:       %s\n"
@@ -768,7 +769,7 @@ static void _print_versions()
          , g_RkIspAlgoDescAldch.common.version
          , g_RkIspAlgoDescAlsc.common.version
          , g_RkIspAlgoDescAorb.common.version
-         , g_RkIspAlgoDescAr2y.common.version
+         , g_RkIspAlgoDescAcsm.common.version
          , g_RkIspAlgoDescAsd.common.version
          , g_RkIspAlgoDescAwdr.common.version
          , g_RkIspAlgoDescAeis.common.version
