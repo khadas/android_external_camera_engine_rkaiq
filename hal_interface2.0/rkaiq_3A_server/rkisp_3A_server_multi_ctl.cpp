@@ -752,7 +752,7 @@ static int loadFromCfg(const char* cfgPath) {
 
     errorID = configXml.LoadFile(cfgPath);
     if (errorID != XML_SUCCESS) {
-        ERR("%s: Unable to load aiq camera config file: %s. ErrorID: %s\n",
+        ERR("%s: Unable to load aiq camera config file: %s. ErrorID: %d\n",
                 __FUNCTION__, cfgPath, errorID);
         return errorID;
     } else {
