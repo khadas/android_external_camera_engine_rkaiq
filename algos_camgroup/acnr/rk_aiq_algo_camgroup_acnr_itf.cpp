@@ -20,7 +20,6 @@
 #include "rk_aiq_algo_camgroup_acnr_itf.h"
 #include "rk_aiq_algo_camgroup_types.h"
 #include "rk_aiq_types_camgroup_acnr_prvt.h"
-#include "rk_aiq_algo_types_int.h"
 #include "acnr2/rk_aiq_acnr_algo_itf_v2.h"
 #include "acnr2/rk_aiq_acnr_algo_v2.h"
 #include "acnr/rk_aiq_acnr_algo_itf_v1.h"
@@ -246,9 +245,11 @@ static XCamReturn groupAcnrProcessing(const RkAiqAlgoCom* inparams, RkAiqAlgoRes
             stExpInfoV2.arIso[0] = stExpInfoV2.arAGain[0] * stExpInfoV2.arDGain[0] * 50;
 
         } else {
-            if((rk_aiq_working_mode_t)procParaGroup->working_mode == RK_AIQ_WORKING_MODE_ISP_HDR2)
+            if(procParaGroup->working_mode == RK_AIQ_ISP_HDR_MODE_2_FRAME_HDR
+                    || procParaGroup->working_mode == RK_AIQ_ISP_HDR_MODE_2_LINE_HDR)
                 stExpInfoV2.hdr_mode = 1;
-            else if ((rk_aiq_working_mode_t)procParaGroup->working_mode == RK_AIQ_WORKING_MODE_ISP_HDR3)
+            else if (procParaGroup->working_mode == RK_AIQ_ISP_HDR_MODE_3_FRAME_HDR
+                     || procParaGroup->working_mode == RK_AIQ_ISP_HDR_MODE_3_LINE_HDR)
                 stExpInfoV2.hdr_mode = 2;
             else {
                 stExpInfoV2.hdr_mode = 0;
@@ -283,12 +284,14 @@ static XCamReturn groupAcnrProcessing(const RkAiqAlgoCom* inparams, RkAiqAlgoRes
                 ret = XCAM_RETURN_ERROR_FAILED;
                 LOGE_ANR("%s: processing ANR failed (%d)\n", __FUNCTION__, ret);
             }
+            Acnr_GetProcResult_V2(acnr_contex_v2, &stAcnrResultV2);
             stAcnrResultV2.isNeedUpdate = true;
             LOGD_ANR("recalculate: %d delta_iso:%d \n ", acnr_contex_v2->isReCalculate, deltaIso);
         } else {
+            stAcnrResultV2 = acnr_contex_v2->stProcResult;
             stAcnrResultV2.isNeedUpdate = true;
         }
-        Acnr_GetProcResult_V2(acnr_contex_v2, &stAcnrResultV2);
+
         for (int i = 0; i < procResParaGroup->arraySize; i++) {
             *(procResParaGroup->camgroupParmasArray[i]->acnr._acnr_procRes_v2) = stAcnrResultV2.stFix;
         }

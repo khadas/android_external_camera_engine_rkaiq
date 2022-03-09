@@ -691,13 +691,9 @@ XCamReturn AccmAutoConfig
     const CalibDbV2_Ccm_Para_V2_t * pCcm = NULL;
     float sensorGain =  hAccm->accmSwInfo.sensorGain;
     float fSaturation;
-    if (hAccm->mCurAtt.mode == RK_AIQ_CCM_MODE_TOOL){
-        pCcm = &hAccm->mCurAtt.stTool;
-        ret = pCcmMatrixAll_init(hAccm, &hAccm->mCurAtt.stTool.TuningPara);
-        RETURN_RESULT_IF_DIFFERENT(ret, XCAM_RETURN_NO_ERROR);
-    } else {
-        pCcm = hAccm->calibV2Ccm;
-    }
+
+    pCcm = hAccm->calibV2Ccm;
+
     if (hAccm->update || hAccm->updateAtt) {
     LOGD_ACCM("Illu Probability Estimation Enable: %d \n", pCcm->TuningPara.illu_estim.interp_enable);
     if (pCcm->TuningPara.illu_estim.interp_enable) {
@@ -823,11 +819,11 @@ XCamReturn AccmAutoConfig
 
     //4) calc scale for y_alpha_curve
     float fScale = 1.0;
-#if 0
+#if 1
     //real use
-    interpolation(hAccm->calibCcm->luma_ccm.alpha_gain,
-                  hAccm->calibCcm->luma_ccm.alpha_scale,
-                  hAccm->calibCcm->luma_ccm.gain_scale_cure_size,
+    interpolation(pCcm->lumaCCM.gain_alphaScale_curve.gain,
+                  pCcm->lumaCCM.gain_alphaScale_curve.scale,
+                  9,
                   sensorGain, &fScale);
 #else
     //for test, to be same with demo
@@ -922,10 +918,10 @@ XCamReturn AccmManualConfig
 
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
 
-    memcpy(hAccm->ccmHwConf.matrix, hAccm->mCurAtt.stManual.matrix, sizeof(hAccm->mCurAtt.stManual.matrix));
-    memcpy(hAccm->ccmHwConf.offs, hAccm->mCurAtt.stManual.offs, sizeof(hAccm->mCurAtt.stManual.offs));
-    memcpy(hAccm->ccmHwConf.alp_y, hAccm->mCurAtt.stManual.alp_y, sizeof(hAccm->mCurAtt.stManual.alp_y));
-    hAccm->ccmHwConf.bound_bit = hAccm->mCurAtt.stManual.bound_bit;
+    memcpy(hAccm->ccmHwConf.matrix, hAccm->mCurAtt.stManual.ccMatrix, sizeof(hAccm->mCurAtt.stManual.ccMatrix));
+    memcpy(hAccm->ccmHwConf.offs, hAccm->mCurAtt.stManual.ccOffsets, sizeof(hAccm->mCurAtt.stManual.ccOffsets));
+    memcpy(hAccm->ccmHwConf.alp_y, hAccm->mCurAtt.stManual.y_alpha_curve, sizeof(hAccm->mCurAtt.stManual.y_alpha_curve));
+    hAccm->ccmHwConf.bound_bit = hAccm->mCurAtt.stManual.low_bound_pos_bit;
     LOG1_ACCM("%s: (exit)\n", __FUNCTION__);
     return ret;
 
@@ -980,12 +976,7 @@ XCamReturn AccmConfig
         hAccm->mCurAtt.mode = hAccm->mNewAtt.mode;
         hAccm->mCurAtt.byPass = hAccm->mNewAtt.byPass;
 
-        if (hAccm->mCurAtt.mode == RK_AIQ_CCM_MODE_TOOL)
-        {
-            hAccm->mCurAtt.byPass = !(hAccm->mNewAtt.stTool.control.enable);
-            hAccm->mCurAtt.stTool = hAccm->mNewAtt.stTool;
-            }
-        else if (hAccm->mCurAtt.mode == RK_AIQ_CCM_MODE_AUTO)
+        if (hAccm->mCurAtt.mode == RK_AIQ_CCM_MODE_AUTO)
             hAccm->mCurAtt.stAuto = hAccm->mNewAtt.stAuto;
         else
             hAccm->mCurAtt.stManual = hAccm->mNewAtt.stManual;
@@ -1001,7 +992,7 @@ XCamReturn AccmConfig
     if(hAccm->mCurAtt.byPass != true && hAccm->accmSwInfo.grayMode != true) {
         hAccm->ccmHwConf.ccmEnable = true;
 
-        if((hAccm->mCurAtt.mode == RK_AIQ_CCM_MODE_AUTO)|| (hAccm->mCurAtt.mode == RK_AIQ_CCM_MODE_TOOL)){
+        if(hAccm->mCurAtt.mode == RK_AIQ_CCM_MODE_AUTO){
             if (hAccm->updateAtt || hAccm->update ||(!hAccm->accmSwInfo.ccmConverged))
                 AccmAutoConfig(hAccm);
         } else if(hAccm->mCurAtt.mode == RK_AIQ_CCM_MODE_MANUAL) {
@@ -1011,13 +1002,14 @@ XCamReturn AccmConfig
         else {
             LOGE_ACCM("%s: hAccm->mCurAtt.mode(%d) is invalid \n", __FUNCTION__, hAccm->mCurAtt.mode);
         }
-        memcpy(hAccm->mCurAtt.stManual.matrix, hAccm->ccmHwConf.matrix, sizeof(hAccm->ccmHwConf.matrix));
-        memcpy(hAccm->mCurAtt.stManual.offs, hAccm->ccmHwConf.offs, sizeof(hAccm->ccmHwConf.offs));
-        memcpy(hAccm->mCurAtt.stManual.alp_y, hAccm->ccmHwConf.alp_y, sizeof(hAccm->ccmHwConf.alp_y));
+        memcpy(hAccm->mCurAtt.stManual.ccMatrix, hAccm->ccmHwConf.matrix, sizeof(hAccm->ccmHwConf.matrix));
+        memcpy(hAccm->mCurAtt.stManual.ccOffsets, hAccm->ccmHwConf.offs, sizeof(hAccm->ccmHwConf.offs));
+        memcpy(hAccm->mCurAtt.stManual.y_alpha_curve, hAccm->ccmHwConf.alp_y, sizeof(hAccm->ccmHwConf.alp_y));
 
     } else {
         hAccm->ccmHwConf.ccmEnable = false;
     }
+    hAccm->updateAtt = false;
 
     LOGV_ACCM( " set to ic ccmEnable :%d  bound_bit:%f\n", hAccm->ccmHwConf.ccmEnable, hAccm->ccmHwConf.bound_bit);
 
@@ -1143,10 +1135,10 @@ static XCamReturn UpdateCcmCalibV2Para(accm_handle_t hAccm)
     memcpy( hAccm->ccmHwConf.alp_y, calib_ccm->lumaCCM.y_alpha_curve, sizeof(hAccm->ccmHwConf.alp_y));
 
     // config manual ccm
-    memcpy(hAccm->mCurAtt.stManual.matrix, calib_ccm->manualPara.ccMatrix, sizeof(calib_ccm->manualPara.ccMatrix));
-    memcpy(hAccm->mCurAtt.stManual.offs, calib_ccm->manualPara.ccOffsets, sizeof(calib_ccm->manualPara.ccOffsets));
-    memcpy(hAccm->mCurAtt.stManual.alp_y,  hAccm->ccmHwConf.alp_y, sizeof( hAccm->ccmHwConf.alp_y));
-    hAccm->mCurAtt.stManual.bound_bit = hAccm->ccmHwConf.bound_bit;
+    memcpy(hAccm->mCurAtt.stManual.ccMatrix, calib_ccm->manualPara.ccMatrix, sizeof(calib_ccm->manualPara.ccMatrix));
+    memcpy(hAccm->mCurAtt.stManual.ccOffsets, calib_ccm->manualPara.ccOffsets, sizeof(calib_ccm->manualPara.ccOffsets));
+    memcpy(hAccm->mCurAtt.stManual.y_alpha_curve,  hAccm->ccmHwConf.alp_y, sizeof( hAccm->ccmHwConf.alp_y));
+    hAccm->mCurAtt.stManual.low_bound_pos_bit = hAccm->ccmHwConf.bound_bit;
     hAccm->accmSwInfo.ccmConverged = false;
     hAccm->calib_update = true;
 

@@ -27,6 +27,8 @@
 #include "RkAiqCalibDbTypes.h"
 #include "abayer2dnr2/rk_aiq_types_abayer2dnr_algo_v2.h"
 #include "bayer2dnr_head_v2.h"
+#include "bayer2dnr_uapi_head_v2.h"
+
 
 //RKAIQ_BEGIN_DECLARE
 
@@ -60,6 +62,7 @@ typedef enum Abayer2dnr_OPMode_V2_e {
     ABAYER2DNR_OP_MODE_INVALID           = 0,                   /**< initialization value */
     ABAYER2DNR_OP_MODE_AUTO              = 1,                   /**< instance is created, but not initialized */
     ABAYER2DNR_OP_MODE_MANUAL            = 2,                   /**< instance is confiured (ready to start) or stopped */
+    ABAYER2DNR_OP_MODE_REG_MANUAL        = 3,                   /**< instance is confiured (ready to start) or stopped */
     ABAYER2DNR_OP_MODE_MAX                                      /**< max */
 } Abayer2dnr_OPMode_V2_t;
 
@@ -86,59 +89,66 @@ typedef struct Abayer2dnr_ExpInfo_V2_s {
 typedef struct RK_Bayer2dnr_Params_V2_s
 {
     // bayernr version
-    int bayernrv2_2dnr_enable;
+    int enable;
+
+    bool hdrdgain_ctrl_en;
 
     // v2 parse
     float iso[RK_BAYER2DNR_V2_MAX_ISO_NUM];
-    float bayernrv2_edge_filter_lumapoint_r[8];
-    float bayernrv2_edge_filter_wgt_r[RK_BAYER2DNR_V2_MAX_ISO_NUM][8];
-    float bayernrv2_filter_strength_r[RK_BAYER2DNR_V2_MAX_ISO_NUM];
-    int   bayernrv2_filter_lumapoint_r[16];
-    int   bayernrv2_filter_sigma_r[RK_BAYER2DNR_V2_MAX_ISO_NUM][16];
-    float bayernrv2_filter_edgesofts_r[RK_BAYER2DNR_V2_MAX_ISO_NUM];
-    float bayernrv2_filter_soft_threshold_ratio_r[RK_BAYER2DNR_V2_MAX_ISO_NUM];
-    float bayernrv2_filter_out_wgt_r[RK_BAYER2DNR_V2_MAX_ISO_NUM];
-    int   bayernrv2_gauss_guide_r[RK_BAYER2DNR_V2_MAX_ISO_NUM];
+
+    int   lumapoint[16];
+    int   sigma[RK_BAYER2DNR_V2_MAX_ISO_NUM][16];
+
+    float filter_strength[RK_BAYER2DNR_V2_MAX_ISO_NUM];
+    float edgesofts[RK_BAYER2DNR_V2_MAX_ISO_NUM];
+    float ratio[RK_BAYER2DNR_V2_MAX_ISO_NUM];
+    float weight[RK_BAYER2DNR_V2_MAX_ISO_NUM];
+    int   gauss_guide[RK_BAYER2DNR_V2_MAX_ISO_NUM];
+
+    int pix_diff[RK_BAYER2DNR_V2_MAX_ISO_NUM];
+    int diff_thld[RK_BAYER2DNR_V2_MAX_ISO_NUM];
+
+    float hdr_dgain_scale_s[RK_BAYER2DNR_V2_MAX_ISO_NUM];
+    float hdr_dgain_scale_m[RK_BAYER2DNR_V2_MAX_ISO_NUM];
 
 } RK_Bayer2dnr_Params_V2_t;
 
+#if 0
 typedef struct RK_Bayer2dnr_Params_V2_Select_s
 {
     // v2 version register // edge filter params
-    int bayernrv2_2dnr_enable;
+    int enable;
+    bool hdrdgain_ctrl_en;
 
-    float bayernrv2_filter_strength;
-    float bayernrv2_filter_soft_threshold_ratio;
-    float bayernrv2_filter_out_wgt;
-    float bayernrv2_filter_edgesofts;
+    int lumapoint[16];
+    int sigma[16];
 
-    int bayernrv2_edge_filter_en;
-    int bayernrv2_edge_filter_lumapoint[8];
-    int bayernrv2_edge_filter_wgt[8];
-    int bayernrv2_gauss_guide;
-    int bayernrv2_filter_lumapoint[16];
-    int bayernrv2_filter_sigma[16];
-    int bayernrv2_bil_gauss_weight[16];
-    int bayernrv2_gray_mode;
-    int bayernrv2_dgains[3];
-    int bayernrv2_thld_diff;
-    int bayernrv2_pix_diff;
+    float filter_strength;
+    float edgesofts;
+    float ratio;
+    float weight;
+    int gauss_guide;
+
+    int pix_diff;
+    int diff_thld;
+
+    float hdr_dgain_scale_s;
+    float hdr_dgain_scale_m;
+
 
 } RK_Bayer2dnr_Params_V2_Select_t;
-
+#endif
 
 typedef struct Abayer2dnr_Manual_Attr_V2_s
 {
-    int bayernr2DEn;
-    int bayernr3DEn;
     RK_Bayer2dnr_Params_V2_Select_t st2DSelect;
+    RK_Bayer2dnr_Fix_V2_t st2Dfix;
 
 } Abayer2dnr_Manual_Attr_V2_t;
 
 typedef struct Abayer2dnr_Auto_Attr_V2_s
 {
     //all ISO params and select param
-    int bayernr2DEn;
 
     RK_Bayer2dnr_Params_V2_t st2DParams;
     RK_Bayer2dnr_Params_V2_Select_t st2DSelect;
@@ -146,7 +156,6 @@ typedef struct Abayer2dnr_Auto_Attr_V2_s
 } Abayer2dnr_Auto_Attr_V2_t;
 
 typedef struct Abayer2dnr_ProcResult_V2_s {
-    int bayernr2DEn;
 
     //for sw simultaion
     RK_Bayer2dnr_Params_V2_Select_t st2DSelect;
@@ -166,20 +175,20 @@ typedef struct Abayer2dnr_Config_V2_s {
 
 
 typedef struct rk_aiq_bayer2dnr_attrib_v2_s {
+    rk_aiq_uapi_sync_t sync;
+
     Abayer2dnr_OPMode_V2_t eMode;
     Abayer2dnr_Auto_Attr_V2_t stAuto;
     Abayer2dnr_Manual_Attr_V2_t stManual;
 } rk_aiq_bayer2dnr_attrib_v2_t;
 
 
-typedef struct rk_aiq_bayer2dnr_IQPara_V2_s {
-    struct list_head listHead_mode;
-} rk_aiq_bayer2dnr_IQPara_V2_t;
+typedef struct rk_aiq_bayer2dnr_strength_v2_s {
+    rk_aiq_uapi_sync_t sync;
+    float percent;
+    bool strength_enable;
+} rk_aiq_bayer2dnr_strength_v2_t;
 
-
-typedef struct rk_aiq_bayer2dnr_JsonPara_V2_s {
-    CalibDbV2_Bayer2dnr_V2_t bayer2dnr_v2;
-} rk_aiq_bayer2dnr_JsonPara_V2_t;
 
 
 //RKAIQ_END_DECLARE

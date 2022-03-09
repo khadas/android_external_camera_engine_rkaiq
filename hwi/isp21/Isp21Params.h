@@ -38,10 +38,10 @@ protected:
                                     rk_aiq_isp_blc_v21_t &blc);
     template<class T>
     void convertAiqAgicToIsp21Params(T& isp_cfg,
-                                    const rk_aiq_isp_gic_v21_t& gic_cfg);
+                                     const rk_aiq_isp_gic_v21_t& gic_cfg);
     template<class T>
     void convertAiqAwbGainToIsp21Params(T& isp_cfg,
-                                        const rk_aiq_wb_gain_t& awb_gain, const rk_aiq_isp_blc_v21_t &blc,
+                                        const rk_aiq_wb_gain_t& awb_gain, const rk_aiq_isp_blc_v21_t *blc,
                                         bool awb_gain_update);
     template<class T>
     void convertAiqCsmToIsp21Params(T& isp_cfg,

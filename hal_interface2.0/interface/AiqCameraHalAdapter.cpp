@@ -30,6 +30,7 @@
 #include "common/rk_aiq_pool.h"
 #include "common/rk_aiq_types_priv.h"
 #include "rkaiq.h"
+#include "rk_aiq_api_private.h"
 
 #include "rk_aiq_user_api_imgproc.h"
 #include "rk_aiq_user_api_sysctl.h"
@@ -745,7 +746,7 @@ AiqCameraHalAdapter::updateAwbMetaParams(XCamAwbParam *awbParams){
         if (awbParams->is_ccm_valid) {
             setCcm.mode = RK_AIQ_CCM_MODE_MANUAL;
             setCcm.byPass = false;
-            memcpy(setCcm.stManual.matrix,  awbParams->ccm_matrix, sizeof(float)*9);
+            memcpy(setCcm.stManual.ccMatrix,  awbParams->ccm_matrix, sizeof(float)*9);
         } else {
             setCcm.mode = RK_AIQ_CCM_MODE_AUTO;
         }
@@ -1108,7 +1109,7 @@ AiqCameraHalAdapter::getAwbResults(rk_aiq_awb_results &awb_results)
         }
     }
     pthread_mutex_unlock(&_aiq_ctx_mutex);
-    memcpy(awb_results.ctk_config.ctk_matrix.coeff, ccm_querry_info.matrix, sizeof(float)*9);
+    memcpy(awb_results.ctk_config.ctk_matrix.coeff, ccm_querry_info.ccMatrix, sizeof(float)*9);
     LOGD("@%s ccm_en:%s", __FUNCTION__, ccm_querry_info.ccm_en ? "true":"false");
 
     return ret;

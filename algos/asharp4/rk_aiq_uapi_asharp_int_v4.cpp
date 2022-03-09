@@ -1,7 +1,8 @@
 #include "asharp4/rk_aiq_uapi_asharp_int_v4.h"
 #include "asharp4/rk_aiq_types_asharp_algo_prvt_v4.h"
 
-#define ASHSRPV4_STRENGTH_MAX_PERCENT (100.0)
+#define ASHSRPV4_STRENGTH_SLOPE_FACTOR (4.0)
+
 
 XCamReturn
 rk_aiq_uapi_asharpV4_SetAttrib(RkAiqAlgoContext *ctx,
@@ -12,8 +13,15 @@ rk_aiq_uapi_asharpV4_SetAttrib(RkAiqAlgoContext *ctx,
     Asharp_Context_V4_t* pAsharpCtx = (Asharp_Context_V4_t*)ctx;
 
     pAsharpCtx->eMode = attr->eMode;
-    pAsharpCtx->stAuto = attr->stAuto;
-    pAsharpCtx->stManual = attr->stManual;
+
+    if(pAsharpCtx->eMode == ASHARP4_OP_MODE_AUTO) {
+        pAsharpCtx->stAuto = attr->stAuto;
+    } else if(pAsharpCtx->eMode == ASHARP4_OP_MODE_MANUAL) {
+        pAsharpCtx->stManual.stSelect = attr->stManual.stSelect;
+    } else if(pAsharpCtx->eMode == ASHARP4_OP_MODE_REG_MANUAL) {
+        pAsharpCtx->stManual.stFix = attr->stManual.stFix;
+    }
+
     pAsharpCtx->isReCalculate |= 1;
 
     return XCAM_RETURN_NO_ERROR;
@@ -35,46 +43,64 @@ rk_aiq_uapi_asharpV4_GetAttrib(const RkAiqAlgoContext *ctx,
 
 XCamReturn
 rk_aiq_uapi_asharpV4_SetStrength(const RkAiqAlgoContext *ctx,
-                                 float fPercent)
+                                 rk_aiq_sharp_strength_v4_t *pStrength)
 {
 
     Asharp_Context_V4_t* pAsharpCtx = (Asharp_Context_V4_t*)ctx;
-    float fMax = ASHSRPV4_STRENGTH_MAX_PERCENT;
+    float fslope = ASHSRPV4_STRENGTH_SLOPE_FACTOR;
     float fStrength = 1.0;
+    float fPercent = 0.5;
 
+    fPercent = pStrength->percent;
 
     if(fPercent <= 0.5) {
         fStrength =  fPercent / 0.5;
     } else {
-        fStrength = (fPercent - 0.5) * (fMax - 1) * 2 + 1;
+        if(fPercent >= 0.999999)
+            fPercent = 0.999999;
+        fStrength = 0.5 * fslope / (1.0 - fPercent) - fslope + 1;
     }
 
-    pAsharpCtx->fSharp_Strength = fStrength;
+    pAsharpCtx->stStrength = *pStrength;
+    pAsharpCtx->stStrength.percent = fStrength;
     pAsharpCtx->isReCalculate |= 1;
 
-    printf("percent:%f fStrength:%f \n", fStrength, fPercent);
+    LOGD_ASHARP("%s:%d percent:%f fStrength:%f \n",
+                __FUNCTION__, __LINE__,
+                fStrength, fPercent);
 
     return XCAM_RETURN_NO_ERROR;
 }
 
 XCamReturn
 rk_aiq_uapi_asharpV4_GetStrength(const RkAiqAlgoContext *ctx,
-                                 float *pPercent)
+                                 rk_aiq_sharp_strength_v4_t *pStrength)
 {
 
     Asharp_Context_V4_t* pAsharpCtx = (Asharp_Context_V4_t*)ctx;
-    float fMax = ASHSRPV4_STRENGTH_MAX_PERCENT;
+    float fslope = ASHSRPV4_STRENGTH_SLOPE_FACTOR;
     float fStrength = 1.0;
+    float fPercent = 0.5;
 
-    fStrength = pAsharpCtx->fSharp_Strength;
+    fStrength = pAsharpCtx->stStrength.percent;
 
     if(fStrength <= 1) {
-        *pPercent = fStrength * 0.5;
+        fPercent = fStrength * 0.5;
     } else {
-        *pPercent = (fStrength - 1) / ((fMax - 1) * 2) + 0.5;
+        float tmp = 1.0;
+        tmp = 1 - 0.5 * fslope / (fStrength + fslope - 1);
+        if(abs(tmp - 0.999999) < 0.000001) {
+            tmp = 1.0;
+        }
+        fPercent = tmp;
     }
 
-    printf("fStrength:%f percent:%f\n", fStrength, *pPercent);
+    *pStrength = pAsharpCtx->stStrength;
+    pStrength->percent = fPercent;
+
+    LOGD_ASHARP("%s:%d fStrength:%f percent:%f\n",
+                __FUNCTION__, __LINE__,
+                fStrength, fPercent);
 
     return XCAM_RETURN_NO_ERROR;
 }

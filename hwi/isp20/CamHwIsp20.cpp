@@ -26,6 +26,7 @@
 #include <cutils/properties.h>
 #endif
 #include "SPStreamProcUnit.h"
+#include "PdafStreamProcUnit.h"
 #include "CaptureRawData.h"
 #include "code_to_pixel_format.h"
 #include "RkAiqCalibDbV2.h"
@@ -658,13 +659,13 @@ get_cif_subdevs(struct media_device *device, const char *devpath, rk_aiq_cif_inf
 
     cif_info[index].model_idx = index;
 
-    strncpy(cif_info[index].media_dev_path, devpath, sizeof(cif_info[index].media_dev_path));
+    strncpy(cif_info[index].media_dev_path, devpath, sizeof(cif_info[index].media_dev_path) - 1);
 
     entity = media_get_entity_by_name(device, "stream_cif_mipi_id0", strlen("stream_cif_mipi_id0"));
     if(entity) {
         entity_name = media_entity_get_devname (entity);
         if(entity_name) {
-            strncpy(cif_info[index].mipi_id0, entity_name, sizeof(cif_info[index].mipi_id0));
+            strncpy(cif_info[index].mipi_id0, entity_name, sizeof(cif_info[index].mipi_id0) - 1);
         }
     }
 
@@ -672,7 +673,7 @@ get_cif_subdevs(struct media_device *device, const char *devpath, rk_aiq_cif_inf
     if(entity) {
         entity_name = media_entity_get_devname (entity);
         if(entity_name) {
-            strncpy(cif_info[index].mipi_id1, entity_name, sizeof(cif_info[index].mipi_id1));
+            strncpy(cif_info[index].mipi_id1, entity_name, sizeof(cif_info[index].mipi_id1) - 1);
         }
     }
 
@@ -680,7 +681,7 @@ get_cif_subdevs(struct media_device *device, const char *devpath, rk_aiq_cif_inf
     if(entity) {
         entity_name = media_entity_get_devname (entity);
         if(entity_name) {
-            strncpy(cif_info[index].mipi_id2, entity_name, sizeof(cif_info[index].mipi_id2));
+            strncpy(cif_info[index].mipi_id2, entity_name, sizeof(cif_info[index].mipi_id2) - 1);
         }
     }
 
@@ -688,7 +689,7 @@ get_cif_subdevs(struct media_device *device, const char *devpath, rk_aiq_cif_inf
     if(entity) {
         entity_name = media_entity_get_devname (entity);
         if(entity_name) {
-            strncpy(cif_info[index].mipi_id3, entity_name, sizeof(cif_info[index].mipi_id3));
+            strncpy(cif_info[index].mipi_id3, entity_name, sizeof(cif_info[index].mipi_id3) - 1);
         }
     }
 
@@ -696,7 +697,7 @@ get_cif_subdevs(struct media_device *device, const char *devpath, rk_aiq_cif_inf
     if(entity) {
         entity_name = media_entity_get_devname (entity);
         if(entity_name) {
-            strncpy(cif_info[index].mipi_scl0, entity_name, sizeof(cif_info[index].mipi_scl0));
+            strncpy(cif_info[index].mipi_scl0, entity_name, sizeof(cif_info[index].mipi_scl0) - 1);
         }
     }
 
@@ -704,7 +705,7 @@ get_cif_subdevs(struct media_device *device, const char *devpath, rk_aiq_cif_inf
     if(entity) {
         entity_name = media_entity_get_devname (entity);
         if(entity_name) {
-            strncpy(cif_info[index].mipi_scl1, entity_name, sizeof(cif_info[index].mipi_scl1));
+            strncpy(cif_info[index].mipi_scl1, entity_name, sizeof(cif_info[index].mipi_scl1) - 1);
         }
     }
 
@@ -712,7 +713,7 @@ get_cif_subdevs(struct media_device *device, const char *devpath, rk_aiq_cif_inf
     if(entity) {
         entity_name = media_entity_get_devname (entity);
         if(entity_name) {
-            strncpy(cif_info[index].mipi_scl2, entity_name, sizeof(cif_info[index].mipi_scl2));
+            strncpy(cif_info[index].mipi_scl2, entity_name, sizeof(cif_info[index].mipi_scl2) - 1);
         }
     }
 
@@ -720,7 +721,7 @@ get_cif_subdevs(struct media_device *device, const char *devpath, rk_aiq_cif_inf
     if(entity) {
         entity_name = media_entity_get_devname (entity);
         if(entity_name) {
-            strncpy(cif_info[index].mipi_scl3, entity_name, sizeof(cif_info[index].mipi_scl3));
+            strncpy(cif_info[index].mipi_scl3, entity_name, sizeof(cif_info[index].mipi_scl3) - 1);
         }
     }
 
@@ -728,7 +729,7 @@ get_cif_subdevs(struct media_device *device, const char *devpath, rk_aiq_cif_inf
     if(entity) {
         entity_name = media_entity_get_devname (entity);
         if(entity_name) {
-            strncpy(cif_info[index].dvp_id0, entity_name, sizeof(cif_info[index].dvp_id0));
+            strncpy(cif_info[index].dvp_id0, entity_name, sizeof(cif_info[index].dvp_id0) - 1);
         }
     }
 
@@ -736,7 +737,7 @@ get_cif_subdevs(struct media_device *device, const char *devpath, rk_aiq_cif_inf
     if(entity) {
         entity_name = media_entity_get_devname (entity);
         if(entity_name) {
-            strncpy(cif_info[index].dvp_id1, entity_name, sizeof(cif_info[index].dvp_id1));
+            strncpy(cif_info[index].dvp_id1, entity_name, sizeof(cif_info[index].dvp_id1) - 1);
         }
     }
 
@@ -744,7 +745,7 @@ get_cif_subdevs(struct media_device *device, const char *devpath, rk_aiq_cif_inf
     if(entity) {
         entity_name = media_entity_get_devname (entity);
         if(entity_name) {
-            strncpy(cif_info[index].dvp_id2, entity_name, sizeof(cif_info[index].dvp_id2));
+            strncpy(cif_info[index].dvp_id2, entity_name, sizeof(cif_info[index].dvp_id2) - 1);
         }
     }
 
@@ -752,7 +753,7 @@ get_cif_subdevs(struct media_device *device, const char *devpath, rk_aiq_cif_inf
     if(entity) {
         entity_name = media_entity_get_devname (entity);
         if(entity_name) {
-            strncpy(cif_info[index].dvp_id3, entity_name, sizeof(cif_info[index].dvp_id3));
+            strncpy(cif_info[index].dvp_id3, entity_name, sizeof(cif_info[index].dvp_id3) - 1);
         }
     }
 
@@ -760,7 +761,7 @@ get_cif_subdevs(struct media_device *device, const char *devpath, rk_aiq_cif_inf
     if(entity) {
         entity_name = media_entity_get_devname (entity);
         if(entity_name) {
-            strncpy(cif_info[index].mipi_luma_path, entity_name, sizeof(cif_info[index].mipi_luma_path));
+            strncpy(cif_info[index].mipi_luma_path, entity_name, sizeof(cif_info[index].mipi_luma_path) - 1);
         }
     }
 
@@ -768,7 +769,7 @@ get_cif_subdevs(struct media_device *device, const char *devpath, rk_aiq_cif_inf
     if(entity) {
         entity_name = media_entity_get_devname (entity);
         if(entity_name) {
-            strncpy(cif_info[index].mipi_csi2_sd_path, entity_name, sizeof(cif_info[index].mipi_csi2_sd_path));
+            strncpy(cif_info[index].mipi_csi2_sd_path, entity_name, sizeof(cif_info[index].mipi_csi2_sd_path) - 1);
         }
     }
 
@@ -776,7 +777,7 @@ get_cif_subdevs(struct media_device *device, const char *devpath, rk_aiq_cif_inf
     if(entity) {
         entity_name = media_entity_get_devname (entity);
         if(entity_name) {
-            strncpy(cif_info[index].lvds_sd_path, entity_name, sizeof(cif_info[index].lvds_sd_path));
+            strncpy(cif_info[index].lvds_sd_path, entity_name, sizeof(cif_info[index].lvds_sd_path) - 1);
         }
     }
 
@@ -784,7 +785,7 @@ get_cif_subdevs(struct media_device *device, const char *devpath, rk_aiq_cif_inf
     if(entity) {
         entity_name = media_entity_get_devname (entity);
         if(entity_name) {
-            strncpy(cif_info[index].lvds_sd_path, entity_name, sizeof(cif_info[index].lvds_sd_path));
+            strncpy(cif_info[index].lvds_sd_path, entity_name, sizeof(cif_info[index].lvds_sd_path) - 1);
         }
     }
 
@@ -792,14 +793,14 @@ get_cif_subdevs(struct media_device *device, const char *devpath, rk_aiq_cif_inf
     if(entity) {
         entity_name = media_entity_get_devname (entity);
         if(entity_name) {
-            strncpy(cif_info[index].mipi_dphy_rx_path, entity_name, sizeof(cif_info[index].mipi_dphy_rx_path));
+            strncpy(cif_info[index].mipi_dphy_rx_path, entity_name, sizeof(cif_info[index].mipi_dphy_rx_path) - 1);
         }
     } else {
         entity = media_get_entity_by_name(device, "rockchip-csi2-dphy0", strlen("rockchip-csi2-dphy0"));
         if(entity) {
             entity_name = media_entity_get_devname (entity);
             if(entity_name) {
-                strncpy(cif_info[index].mipi_dphy_rx_path, entity_name, sizeof(cif_info[index].mipi_dphy_rx_path));
+                strncpy(cif_info[index].mipi_dphy_rx_path, entity_name, sizeof(cif_info[index].mipi_dphy_rx_path) - 1);
             }
         }
     }
@@ -808,7 +809,7 @@ get_cif_subdevs(struct media_device *device, const char *devpath, rk_aiq_cif_inf
     if(entity) {
         entity_name = media_entity_get_devname (entity);
         if(entity_name) {
-            strncpy(cif_info[index].stream_cif_path, entity_name, sizeof(cif_info[index].stream_cif_path));
+            strncpy(cif_info[index].stream_cif_path, entity_name, sizeof(cif_info[index].stream_cif_path) - 1);
         }
     }
 
@@ -816,7 +817,7 @@ get_cif_subdevs(struct media_device *device, const char *devpath, rk_aiq_cif_inf
     if(entity) {
         entity_name = media_entity_get_devname (entity);
         if(entity_name) {
-            strncpy(cif_info[index].dvp_sof_sd_path, entity_name, sizeof(cif_info[index].dvp_sof_sd_path));
+            strncpy(cif_info[index].dvp_sof_sd_path, entity_name, sizeof(cif_info[index].dvp_sof_sd_path) - 1);
         }
     }
 
@@ -1007,6 +1008,9 @@ CamHwIsp20::initCamHwInfos()
             continue;
         fclose (fp);
         device = media_device_new (sys_path);
+        if (!device) {
+            continue;
+        }
 
         /* Enumerate entities, pads and links. */
         media_device_enumerate (device);
@@ -1164,7 +1168,7 @@ media_unref:
                         CamHwIsp20::mCamHwInfos[s_full_info->sensor_name]->is_multi_isp_mode =
                             s_full_info->isp_info->is_multi_isp_mode;
                         CamHwIsp20::mCamHwInfos[s_full_info->sensor_name]
-                            ->multi_isp_extended_pixel = mMultiIspExtendedPixel;
+                        ->multi_isp_extended_pixel = mMultiIspExtendedPixel;
                         if (CamHwIsp20::mIspHwInfos.ispp_info[i].valid)
                             s_full_info->ispp_info = &CamHwIsp20::mIspHwInfos.ispp_info[i];
                         LOGI_CAMHW_SUBM(ISP20HW_SUBM, "vicap link to isp(%d) to ispp(%d)\n",
@@ -1260,9 +1264,9 @@ CamHwIsp20::getBindedSnsEntNmByVd(const char* vd)
         bool stream_vd = false;
         if (s_full_info->ispp_info) {
             if (strstr(s_full_info->ispp_info->pp_m_bypass_path, vd) ||
-                strstr(s_full_info->ispp_info->pp_scale0_path, vd) ||
-                strstr(s_full_info->ispp_info->pp_scale1_path, vd) ||
-                strstr(s_full_info->ispp_info->pp_scale2_path, vd))
+                    strstr(s_full_info->ispp_info->pp_scale0_path, vd) ||
+                    strstr(s_full_info->ispp_info->pp_scale1_path, vd) ||
+                    strstr(s_full_info->ispp_info->pp_scale2_path, vd))
                 stream_vd = true;
         } else {
             if (strstr(s_full_info->isp_info->main_path, vd) ||
@@ -1282,11 +1286,12 @@ CamHwIsp20::getBindedSnsEntNmByVd(const char* vd)
                 char sys_path[64], devpath[32];
 
                 snprintf (sys_path, 64, "/dev/media%d", s_full_info->media_node_index);
-                fp = fopen (sys_path, "r");
-                if (!fp)
+                if (0 != access(sys_path, F_OK))
                     continue;
-                fclose (fp);
+
                 device = media_device_new (sys_path);
+                if (!device)
+                    return nullptr;
 
                 /* Enumerate entities, pads and links. */
                 media_device_enumerate (device);
@@ -1411,6 +1416,9 @@ CamHwIsp20::init(const char* sns_ent_name)
     mSpStreamUnit = new SPStreamProcUnit(mIspSpDev, ISP_POLL_SP, mIspHwInfos.hw_ver_info.isp_ver);
     mSpStreamUnit->set_devices(this, mIspCoreDev, _ispp_sd, mLensDev);
 
+    mPdafStreamUnit = new PdafStreamProcUnit(ISP_POLL_PDAF_STATS);
+    mPdafStreamUnit->set_devices(this);
+
     mRawCapUnit = new RawStreamCapUnit(s_info, _linked_to_isp);
     mRawProcUnit = new RawStreamProcUnit(s_info, _linked_to_isp);
     mRawProcUnit->set_devices(mIspCoreDev, this);
@@ -1460,8 +1468,8 @@ CamHwIsp20::deInit()
         mFlashLightIr->deinit();
 
     std::map<std::string, SmartPtr<rk_sensor_full_info_t>>::iterator it;
-    if ((it = mSensorHwInfos.find(sns_name)) == mSensorHwInfos.end()) {
-        LOGE_CAMHW_SUBM(ISP20HW_SUBM, "can't find sensor %s", sns_name);
+    if (strlen(sns_name) == 0 || (it = mSensorHwInfos.find(sns_name)) == mSensorHwInfos.end()) {
+        LOGE_CAMHW_SUBM(ISP20HW_SUBM, "can't find sensor %s", strlen(sns_name) ? sns_name : "");
         return XCAM_RETURN_ERROR_SENSOR;
     }
 
@@ -1563,6 +1571,7 @@ CamHwIsp20::setupPipelineFmtCif(struct v4l2_subdev_selection& sns_sd_sel,
     // set isp rkisp-isp-subdev src pad fmt
     struct v4l2_subdev_format isp_src_fmt;
 
+    memset(&isp_src_fmt, 0, sizeof(isp_src_fmt));
     isp_src_fmt.which = V4L2_SUBDEV_FORMAT_ACTIVE;
     isp_src_fmt.pad = 2;
     ret = mIspCoreDev->getFormat(isp_src_fmt);
@@ -1703,6 +1712,7 @@ CamHwIsp20::setupPipelineFmt()
     struct v4l2_subdev_format sns_sd_fmt;
 
     // get sensor real outupt size
+    memset(&sns_sd_fmt, 0, sizeof(sns_sd_fmt));
     sns_sd_fmt.pad = 0;
     sns_sd_fmt.which = V4L2_SUBDEV_FORMAT_ACTIVE;
     ret = mSensorDev->getFormat(sns_sd_fmt);
@@ -1822,9 +1832,9 @@ CamHwIsp20::setupPipelineFmt()
         }
         if (V4L2_PIX_FMT_FBCG == fmt.fmt.pix.pixelformat) {
             mIspSpDev->set_format(/*isp_src_fmt.format.width*/1920,
-                                  /*isp_src_fmt.format.height*/1080,
-                                  V4L2_PIX_FMT_NV12,
-                                  V4L2_FIELD_NONE, 0);
+                    /*isp_src_fmt.format.height*/1080,
+                    V4L2_PIX_FMT_NV12,
+                    V4L2_FIELD_NONE, 0);
         }
     }
     LOGD_CAMHW_SUBM(ISP20HW_SUBM, "ispp sd fmt info: %dx%d",
@@ -1973,6 +1983,8 @@ CamHwIsp20::setupHdrLink(int hdr_mode, int isp_index, bool enable)
     media_pad *src_pad_s = NULL, *src_pad_m = NULL, *src_pad_l = NULL, *sink_pad = NULL;
 
     device = media_device_new (mIspHwInfos.isp_info[isp_index].media_dev_path);
+    if (!device)
+        return XCAM_RETURN_ERROR_FAILED;
 
     /* Enumerate entities, pads and links. */
     media_device_enumerate (device);
@@ -2124,7 +2136,7 @@ CamHwIsp20::setLensVcmCfg(struct rkmodule_inf& mod_info)
                     new_cfg.rated_ma = rated_ma + (int)(range * posture_diff);
 
                     LOGD_AF("posture_diff %f, start_ma %d -> %d, rated_ma %d -> %d",
-                        posture_diff, start_ma, new_cfg.start_ma, rated_ma, new_cfg.rated_ma);
+                            posture_diff, start_ma, new_cfg.start_ma, rated_ma, new_cfg.rated_ma);
                 }
             }
         }
@@ -2134,6 +2146,86 @@ CamHwIsp20::setLensVcmCfg(struct rkmodule_inf& mod_info)
         }
     }
     EXIT_CAMHW_FUNCTION();
+    return ret;
+}
+
+XCamReturn
+CamHwIsp20::get_sensor_pdafinfo(rk_sensor_full_info_t *sensor_info,
+                                rk_sensor_pdaf_info_t *pdaf_info) {
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    struct rkmodule_channel_info channel;
+    memset(&channel, 0, sizeof(struct rkmodule_channel_info));
+
+    V4l2SubDevice vdev(sensor_info->device_name.c_str());
+    ret = vdev.open();
+    if (ret != XCAM_RETURN_NO_ERROR) {
+        LOGE_CAMHW_SUBM(ISP20HW_SUBM, "failed to open dev (%s)", sensor_info->device_name.c_str());
+        return XCAM_RETURN_ERROR_FAILED;
+    }
+
+    pdaf_info->pdaf_support = false;
+    for (int i = 0; i < 4; i++) {
+        channel.index = i;
+        if (vdev.io_control(RKMODULE_GET_CHANNEL_INFO, &channel) == 0) {
+            if (channel.bus_fmt == MEDIA_BUS_FMT_SPD_2X8) {
+                pdaf_info->pdaf_support = true;
+                pdaf_info->pdaf_vc = i;
+                pdaf_info->pdaf_code = channel.bus_fmt;
+                pdaf_info->pdaf_width = channel.width;
+                pdaf_info->pdaf_height = channel.height;
+                if (channel.data_bit == 10)
+                    pdaf_info->pdaf_pixelformat = V4L2_PIX_FMT_SRGGB10;
+                else if (channel.data_bit == 12)
+                    pdaf_info->pdaf_pixelformat = V4L2_PIX_FMT_SRGGB12;
+                else if (channel.data_bit == 8)
+                    pdaf_info->pdaf_pixelformat = V4L2_PIX_FMT_SRGGB8;
+                else
+                    pdaf_info->pdaf_pixelformat = V4L2_PIX_FMT_SRGGB16;
+                LOGI_CAMHW_SUBM(ISP20HW_SUBM, "channel.bus_fmt 0x%x, pdaf_width %d, pdaf_height %d",
+                    channel.bus_fmt, pdaf_info->pdaf_width, pdaf_info->pdaf_height);
+                break;
+            }
+        }
+    }
+
+    if (pdaf_info->pdaf_support) {
+        if (sensor_info->linked_to_isp) {
+            switch (pdaf_info->pdaf_vc) {
+            case 0:
+            strcpy(pdaf_info->pdaf_vdev, sensor_info->isp_info->rawwr0_path);
+            break;
+            case 1:
+            strcpy(pdaf_info->pdaf_vdev, sensor_info->isp_info->rawwr1_path);
+            break;
+            case 2:
+            strcpy(pdaf_info->pdaf_vdev, sensor_info->isp_info->rawwr2_path);
+            break;
+            case 3:
+            default:
+            strcpy(pdaf_info->pdaf_vdev, sensor_info->isp_info->rawwr3_path);
+            break;
+            }
+        } else {
+            switch (pdaf_info->pdaf_vc) {
+            case 0:
+            strcpy(pdaf_info->pdaf_vdev, sensor_info->cif_info->mipi_id0);
+            break;
+            case 1:
+            strcpy(pdaf_info->pdaf_vdev, sensor_info->cif_info->mipi_id1);
+            break;
+            case 2:
+            strcpy(pdaf_info->pdaf_vdev, sensor_info->cif_info->mipi_id2);
+            break;
+            case 3:
+            default:
+            strcpy(pdaf_info->pdaf_vdev, sensor_info->cif_info->mipi_id3);
+            break;
+            }
+        }
+    }
+    LOGI_CAMHW_SUBM(ISP20HW_SUBM, "%s: pdaf_vdev %s", __func__, pdaf_info->pdaf_vdev);
+
+    vdev.close();
     return ret;
 }
 
@@ -2252,10 +2344,10 @@ CamHwIsp20::prepare(uint32_t width, uint32_t height, int mode, int t_delay, int 
     }
 
     _isp_stream_status = ISP_STREAM_STATUS_INVALID;
-    if (mIsGroupMode) {
+    if (/*mIsGroupMode*/true) {
         mIspStremEvtTh = new RkStreamEventPollThread("StreamEvt",
-                                new V4l2Device (s_info->isp_info->input_params_path),
-                                this);
+                new V4l2Device (s_info->isp_info->input_params_path),
+                this);
     }
 
     if (!mNoReadBack) {
@@ -2299,6 +2391,7 @@ CamHwIsp20::prepare(uint32_t width, uint32_t height, int mode, int t_delay, int 
     }
 
     struct v4l2_subdev_format isp_src_fmt;
+    memset(&isp_src_fmt, 0, sizeof(isp_src_fmt));
     isp_src_fmt.which = V4L2_SUBDEV_FORMAT_ACTIVE;
     isp_src_fmt.pad = 2;
     ret = mIspCoreDev->getFormat(isp_src_fmt);
@@ -2308,8 +2401,8 @@ CamHwIsp20::prepare(uint32_t width, uint32_t height, int mode, int t_delay, int 
         uint32_t height = isp_src_fmt.format.height;
         mParamsSplitter        = new IspParamsSplitter();
         mParamsSplitter->SetPicInfo({0, 0, width, height})
-            .SetLeftIspRect({0, 0, width / 2 + extended_pixel, height})
-            .SetRightIspRect({width / 2 - extended_pixel, 0, width / 2 + extended_pixel, height});
+        .SetLeftIspRect({0, 0, width / 2 + extended_pixel, height})
+        .SetRightIspRect({width / 2 - extended_pixel, 0, width / 2 + extended_pixel, height});
         IspParamsSplitter::Rectangle f = mParamsSplitter->GetPicInfo();
         IspParamsSplitter::Rectangle l = mParamsSplitter->GetLeftIspRect();
         IspParamsSplitter::Rectangle r = mParamsSplitter->GetRightIspRect();
@@ -2331,6 +2424,24 @@ CamHwIsp20::prepare(uint32_t width, uint32_t height, int mode, int t_delay, int 
 
     if ((_cur_calib_infos.mfnr.enable && _cur_calib_infos.mfnr.motion_detect_en) || _cur_calib_infos.af.ldg_param.enable) {
         mSpStreamUnit->prepare(&_cur_calib_infos.af.ldg_param, &_cur_calib_infos.af.highlight);
+    }
+
+    CalibDbV2_Af_Pdaf_t *pdaf;
+    if (CHECK_ISP_HW_V30()) {
+        CalibDbV2_AFV30_t *af_v30 =
+            (CalibDbV2_AFV30_t*)(CALIBDBV2_GET_MODULE_PTR((void*)mCalibDbV2, af_v30));
+        pdaf = &af_v30->TuningPara.pdaf;
+    } else {
+        CalibDbV2_AF_t *af =
+            (CalibDbV2_AF_t*)CALIBDBV2_GET_MODULE_PTR((void*)mCalibDbV2, af);
+        pdaf = &af->TuningPara.pdaf;
+    }
+
+    get_sensor_pdafinfo(s_info, &mPdafInfo);
+    if (mPdafInfo.pdaf_support && pdaf->enable) {
+        mPdafStreamUnit->prepare(pdaf, &mPdafInfo);
+    } else {
+        mPdafInfo.pdaf_support = false;
     }
 
     _state = CAM_HW_STATE_PREPARED;
@@ -2382,7 +2493,7 @@ CamHwIsp20::start()
         if (ret < 0) {
             LOGE_CAMHW_SUBM(ISP20HW_SUBM, "hdr mipi start err: %d\n", ret);
         }
-     }
+    }
 
     ret = mIspCoreDev->start();
     if (ret < 0) {
@@ -2405,6 +2516,10 @@ CamHwIsp20::start()
     }
     if ((_cur_calib_infos.mfnr.enable && _cur_calib_infos.mfnr.motion_detect_en) || _cur_calib_infos.af.ldg_param.enable) {
         mSpStreamUnit->start();
+    }
+
+    if (mPdafInfo.pdaf_support) {
+        mPdafStreamUnit->start();
     }
 
     if (mIspParamStream.ptr())
@@ -2498,6 +2613,10 @@ XCamReturn CamHwIsp20::stop()
 
     if ((_cur_calib_infos.mfnr.enable && _cur_calib_infos.mfnr.motion_detect_en) || _cur_calib_infos.af.ldg_param.enable) {
         mSpStreamUnit->stop();
+    }
+
+    if (mPdafInfo.pdaf_support) {
+        mPdafStreamUnit->stop();
     }
 
     // stop after pollthread, ensure that no new events
@@ -2608,6 +2727,9 @@ XCamReturn CamHwIsp20::pause()
 
     if (mParamsAssembler.ptr())
         mParamsAssembler->stop();
+
+    if (mPdafStreamUnit.ptr())
+        mPdafStreamUnit->stop();
 
     {
         SmartLock locker (_isp_params_cfg_mutex);
@@ -2731,6 +2853,9 @@ XCamReturn CamHwIsp20::resume()
 
     if (mFecParamStream.ptr())
         mFecParamStream->start();
+
+    if (mPdafStreamUnit.ptr())
+        mPdafStreamUnit->start();
 
     _state = CAM_HW_STATE_STARTED;
     return ret;
@@ -3722,9 +3847,6 @@ CamHwIsp20::setHdrProcessCount(rk_aiq_luma_params_t luma_params)
     ENTER_CAMHW_FUNCTION();
     mRawProcUnit->set_hdr_frame_readback_infos(luma_params.frame_id, luma_params.hdrProcessCnt);
 
-    //isp20Pollthread = mPollthread.dynamic_cast_ptr<Isp20PollThread>();
-    //isp20Pollthread->set_hdr_frame_readback_infos(luma_params);
-
     EXIT_CAMHW_FUNCTION();
     return ret;
 }
@@ -4467,23 +4589,21 @@ CamHwIsp20::getModuleCtl(rk_aiq_module_id_t moduleId, bool &en)
 
 XCamReturn CamHwIsp20::notify_capture_raw()
 {
-//    SmartPtr<Isp20PollThread> isp20Pollthread = mPollthread.dynamic_cast_ptr<Isp20PollThread>();
-//    if (isp20Pollthread.ptr())
-    return CaptureRawData::getInstance().notify_capture_raw();
-
-    return XCAM_RETURN_ERROR_FAILED;
+    if (mRawProcUnit.ptr())
+        return mRawProcUnit->notify_capture_raw();
+    else
+        return XCAM_RETURN_ERROR_FAILED;
 }
 
 XCamReturn CamHwIsp20::capture_raw_ctl(capture_raw_t type, int count, const char* capture_dir, char* output_dir)
 {
-    //  SmartPtr<Isp20PollThread> isp20Pollthread = mPollthread.dynamic_cast_ptr<Isp20PollThread>();
-    //  if (isp20Pollthread.ptr()) {
-    if (type == CAPTURE_RAW_AND_YUV_SYNC)
-        return CaptureRawData::getInstance().capture_raw_ctl(type);
-    else if (type == CAPTURE_RAW_SYNC)
-        return CaptureRawData::getInstance().capture_raw_ctl(type, count, capture_dir, output_dir);
-    //  }
+    if (!mRawProcUnit.ptr())
+        return XCAM_RETURN_ERROR_FAILED;
 
+    if (type == CAPTURE_RAW_AND_YUV_SYNC)
+        return mRawProcUnit->capture_raw_ctl(type);
+    else if (type == CAPTURE_RAW_SYNC)
+        return mRawProcUnit->capture_raw_ctl(type, count, capture_dir, output_dir);
     return XCAM_RETURN_ERROR_FAILED;
 }
 
@@ -4725,7 +4845,7 @@ void CamHwIsp20::allocMemResource(uint8_t id, void *ops_ctx, void *config, void 
             struct isp2x_mesh_head* head = (struct isp2x_mesh_head*)mem_info_array[offset + i].map_addr;
             mem_info_array[offset + i].addr = (void*)((char*)mem_info_array[offset + i].map_addr + head->data_oft);
             mem_info_array[offset + i].state = (char*)&head->stat;
-            LOGE(">>>>>>> Got CAC LUT fd %d for ISP %d",mem_info_array[offset + i].fd, id);
+            LOGE(">>>>>>> Got CAC LUT fd %d for ISP %d", mem_info_array[offset + i].fd, id);
         }
         *mem_ctx = (void*)(&isp20->_cac_drv_mem_ctx);
     }
@@ -5479,6 +5599,16 @@ XCamReturn CamHwIsp20::get_sp_resolution(int &width, int &height, int &aligned_w
     return mSpStreamUnit->get_sp_resolution(width, height, aligned_w, aligned_h);
 }
 
+bool CamHwIsp20::get_pdaf_support()
+{
+    bool pdaf_support = false;
+
+    if (mPdafStreamUnit.ptr())
+        pdaf_support = mPdafInfo.pdaf_support;
+
+    return pdaf_support;
+}
+
 void CamHwIsp20::notify_isp_stream_status(bool on)
 {
     if (on) {
@@ -5488,6 +5618,20 @@ void CamHwIsp20::notify_isp_stream_status(bool on)
             LOGE_CAMHW_SUBM(ISP20HW_SUBM, "hdr mipi start err: %d\n", ret);
         }
         _isp_stream_status = ISP_STREAM_STATUS_STREAM_ON;
+
+        if (mHwResLintener) {
+            SmartPtr<Isp20Evt> ispEvt =
+                new Isp20Evt(this, mSensorDev.dynamic_cast_ptr<SensorHw>());
+
+            SmartPtr<V4l2Device> dev(NULL);
+            SmartPtr<Isp20EvtBuffer> ispEvtbuf =
+                new Isp20EvtBuffer(ispEvt, dev);
+
+            ispEvtbuf->_buf_type = VICAP_STREAM_ON_EVT;
+            SmartPtr<VideoBuffer> vbuf = ispEvtbuf.dynamic_cast_ptr<VideoBuffer>();
+
+            mHwResLintener->hwResCb(vbuf);
+        }
     } else {
         LOGI_CAMHW_SUBM(ISP20HW_SUBM, "camId:%d, %s off", mCamPhyId, __func__);
         _isp_stream_status = ISP_STREAM_STATUS_STREAM_OFF;

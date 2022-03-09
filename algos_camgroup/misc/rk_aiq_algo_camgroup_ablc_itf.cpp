@@ -19,7 +19,6 @@
 
 #include "rk_aiq_algo_camgroup_types.h"
 #include "misc/rk_aiq_algo_camgroup_misc_itf.h"
-#include "rk_aiq_algo_types_int.h"
 #include "ablc/rk_aiq_algo_ablc_itf.h"
 #include "ablc/rk_aiq_ablc_algo.h"
 #include "ablc/rk_aiq_types_ablc_algo_prvt.h"
@@ -97,7 +96,7 @@ processing(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outparams)
 {
     XCamReturn result = XCAM_RETURN_NO_ERROR;
     int iso;
-
+    int delta_iso = 0;
     LOGI_ABLC("%s: (enter)\n", __FUNCTION__ );
 
 #if 1
@@ -160,16 +159,27 @@ processing(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outparams)
         LOGE_ABLC("%s:%d pAERes is NULL, so use default instead \n", __FUNCTION__, __LINE__);
     }
 
-    AblcResult_t ret = AblcProcess(pAblcCtx, &stExpInfo);
-    if(ret != ABLC_RET_SUCCESS) {
-        result = XCAM_RETURN_ERROR_FAILED;
-        LOGE_ABLC("%s: processing Ablc failed (%d)\n", __FUNCTION__, ret);
+    delta_iso = abs(stExpInfo.arIso[stExpInfo.hdr_mode] - pAblcCtx->stExpInfo.arIso[pAblcCtx->stExpInfo.hdr_mode]);
+    if(delta_iso > ABLC_RECALCULATE_DELTE_ISO) {
+        pAblcCtx->isReCalculate |= 1;
+    }
+
+
+    if(pAblcCtx->isReCalculate ) {
+        AblcResult_t ret = AblcProcess(pAblcCtx, &stExpInfo);
+        if(ret != ABLC_RET_SUCCESS) {
+            result = XCAM_RETURN_ERROR_FAILED;
+            LOGE_ABLC("%s: processing Ablc failed (%d)\n", __FUNCTION__, ret);
+        }
+        LOGD_ABLC("%s:%d processing ABLC recalculate delta_iso:%d \n", __FUNCTION__, __LINE__, delta_iso);
     }
 
 
     for (int i = 0; i < procResParaGroup->arraySize; i++) {
         procResParaGroup->camgroupParmasArray[i]->_blcConfig->v0 = pAblcCtx->ProcRes;
     }
+
+    pAblcCtx->isReCalculate = 0;
 #if 0 //TODO: Is this necessary for group algo ?
     //sensor blc setting
     pAblcProcResParams->ablc_proc_res_com.SenDpccRes.enable = pAblcCtx->SenDpccRes.enable;

@@ -42,7 +42,7 @@ cc_defaults {
         "external/camera_engine_rkaiq/include/iq_parser_v2",
         "external/camera_engine_rkaiq/include/iq_parser_v2/j2s",
         "external/camera_engine_rkaiq/include/common",
-        "external/camera_engine_rkaiq/include/uAPI",
+        "external/camera_engine_rkaiq/uAPI/include",
         "external/camera_engine_rkaiq/include/uAPI2",
         "external/camera_engine_rkaiq/common",
         "external/camera_engine_rkaiq/xcore/base",

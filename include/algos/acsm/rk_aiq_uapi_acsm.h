@@ -14,6 +14,7 @@
 
 // same as type Csm_Param_t defined in csm_head.h
 typedef struct rk_aiq_uapi_acsm_attrib_s {
+    rk_aiq_uapi_sync_t sync;
     rk_aiq_acsm_params_t param;
 } rk_aiq_uapi_acsm_attrib_t;
 

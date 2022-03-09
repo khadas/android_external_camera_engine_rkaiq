@@ -344,27 +344,42 @@
  *   - HWI can produce SOF, STATS, RAW/YUV image
  *   - aiq core support algo running in group threads
  * - THIS VERSION ONLY SUPPORT rk356x NOW
- * v3.0x00.5
+ * v3.0x00.1
  * - initial version for isp3x(rk3588)
  * - support 8k
  * - support camgroup
- * v3.0x00.6
- * - AF: update af api demo code
- *       set lockae_en to false when disable af
- *       fix blur after enable record position and reset motor when poweroff in moving
- *       lock aec in aec algos
- *       bring up optical zoom function
- *       fix focus failure in low light env
- *       add config for video mode
- * - AE: support manual dcg mode
- *       fix mem leak of uapi2 & add lock/unlock uapi2
- * - uapi: sysctl: add rk_aiq_uapi_sysctl_set_scene interface
- *       sysctl: fix switch scene
- * - ADRC: fix reload json bug
+ * v3.0x8.1
+ * - support custom AE/AWB
+ * - expose UAPI2, hide old UAPI
+ * - complete rk3588 module API
+ * - add API sample code
+ * - Along with ISP drv v1.0x8.0
+ * v3.0x8.3
+ * - complete rk3588 module camgroup API
+ * - add API sample code for lsc/dpcc/ldch...
+ * v3.0x8.5
+ * - fix potential race condition in setSingleCamStatusReady
+ * - fix some bugs in Group-Hdr mode
+ * - compare with mNewAtt when setting attrib asynchronously
+ * - always listen streaming on/off event in rkaiq
+ * - Add configuration file rules for build
+ * - add more log info for awb analysis tool
+ * - add hw event callback
+ * - add group module API of CP/IE/CSM
+ * - notify all vicaps ready to app
+ * v3.0x8.7
+ * - fix compille error with gcc-4.4.7
+ * - add parameters of uapi for some algos
+ * - RkAiqxxxHandle: fix wrong 3a result caused by no 3a stats
+ * - CamGroup: skip incomplete expoure params
+ * - common: fix the compile error of 'defined but not used' with GUNC
+ * - camgroup: add refCnt for shared resources
+ * - reduce error log for RKAIQ running on serial port using 11520 baudrate
+ * - add the function of reading/writing uapi parameters in real time for iq tools
  */
 
-#define RK_AIQ_VERSION_REAL_V "v3.0x00.6"
-#define RK_AIQ_RELEASE_DATE "2021-12-14"
+#define RK_AIQ_VERSION_REAL_V "v3.0x8.7"
+#define RK_AIQ_RELEASE_DATE "2022-03-18"
 
 /******* DO NOT EDIT THE FOLLOWINGS ***********/
 

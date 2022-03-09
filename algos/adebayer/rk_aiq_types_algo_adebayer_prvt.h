@@ -1,12 +1,14 @@
 #ifndef __RKAIQ_TYPES_ALGO_ADEBAYER_PRVT_H__
 #define __RKAIQ_TYPES_ALGO_ADEBAYER_PRVT_H__
 
+#include <atomic>
 #include "base/xcam_common.h"
 #include "rk_aiq_types_algo_adebayer_int.h"
 #include "RkAiqCalibDbTypes.h"
 #include "RkAiqCalibDbTypesV2.h"
 #include "RkAiqCalibDbV2Helper.h"
 #include "xcam_log.h"
+#include "rk_aiq_uapi_adebayer_int.h"
 
 typedef enum AdebayerState_e {
     ADEBAYER_STATE_INVALID           = 0,
@@ -34,17 +36,19 @@ typedef struct AdebayerFullParam_s{
     unsigned char dist_scale;
     unsigned char cnr_strength;
     unsigned char shift_num;
-             bool updated;
+    std::atomic<bool> updated;
 }AdebayerFullParam_t;
 
-typedef struct AdebayerContext_s{
+typedef struct AdebayerContext_s {
     AdebayerConfig_t config;
     AdebayerState_t state;
     CamCalibDbContext_t* pCalibDb;
     CamCalibDbV2Context_t *pCalibDbV2;
     AdebayerFullParam_t full_param;
+    adebayer_attrib_manual_t manualAttrib;
+    rk_aiq_debayer_op_mode_t mode;
     int iso;
-}AdebayerContext_t;
+} AdebayerContext_t;
 
 typedef struct _RkAiqAlgoContext {
     AdebayerContext_t adebayerCtx;

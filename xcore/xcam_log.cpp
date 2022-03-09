@@ -171,7 +171,7 @@ void xcam_get_runtime_log_level() {
             g_cam_engine_log_level = strtoull(level, nullptr, 16);
             unsigned long long module_mask = g_cam_engine_log_level >> 12;
             for (int i = 0; i < XCORE_LOG_MODULE_MAX; i++) {
-                if (module_mask & (1 << i)) {
+                if (module_mask & (1ULL << i)) {
                     g_xcore_log_infos[i].log_level = g_cam_engine_log_level & 0xf;
                     g_xcore_log_infos[i].sub_modules = (g_cam_engine_log_level >> 4) & 0xff;
                 }
@@ -196,7 +196,7 @@ int xcam_get_log_level() {
     unsigned long long module_mask = g_cam_engine_log_level >> 12;
 
     for (int i = 0; i < XCORE_LOG_MODULE_MAX; i++) {
-        if (module_mask & ((long long )1 << i)) {
+        if (module_mask & (1ULL << i)) {
             g_xcore_log_infos[i].log_level = g_cam_engine_log_level & 0xf;
             g_xcore_log_infos[i].sub_modules = (g_cam_engine_log_level >> 4) & 0xff;
         }

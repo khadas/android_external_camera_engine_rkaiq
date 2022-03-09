@@ -26,18 +26,17 @@ XCamReturn rk_aiq_tool_api_setWBMode
     return rk_aiq_uapi2_setWBMode(tool_ctx, mode);
 }
 
-int rk_aiq_tool_api_amerge_SetAttrib2
-    (const rk_aiq_sys_ctx_t* sys_ctx, uapiMergeCurrCtlData_t* ctldata)
-{
-    const rk_aiq_sys_ctx_t* tool_ctx = get_next_ctx(sys_ctx);
-    return rk_aiq_user_api2_amerge_SetAttrib2(tool_ctx, ctldata);
-}
-
 XCamReturn rk_aiq_tool_api_adrc_SetAttrib
     (const rk_aiq_sys_ctx_t* sys_ctx, drc_attrib_t attr)
 {
     const rk_aiq_sys_ctx_t* tool_ctx = get_next_ctx(sys_ctx);
     return rk_aiq_user_api2_adrc_SetAttrib(tool_ctx, attr);
+}
+
+XCamReturn rk_aiq_tool_api_agamma_SetAttrib(const rk_aiq_sys_ctx_t* sys_ctx,
+                                            rk_aiq_gamma_attrib_V2_t attr) {
+    const rk_aiq_sys_ctx_t* tool_ctx = get_next_ctx(sys_ctx);
+    return rk_aiq_user_api2_agamma_SetAttrib(tool_ctx, attr);
 }
 
 XCamReturn rk_aiq_tool_api_sysctl_swWorkingModeDyn

@@ -25,6 +25,8 @@
 #include "xcore/safe_list.h"
 #include "common/rk_aiq_pool.h"
 #include "aiq_core/MessageBus.h"
+#include "aiq_core/RkAiqCamgroupHandle.h"
+#include "rk_aiq.h"
 
 using namespace XCam;
 namespace RkCam {
@@ -82,10 +84,12 @@ typedef struct rk_aiq_groupcam_result_s {
     uint8_t _validCamResBits;
     uint32_t _frameId;
     bool _ready;
+    uint32_t _refCnt;
     void reset() {
         _validCamResBits = 0;
         _ready = false;
         _frameId = -1;
+        _refCnt = 0;
         for (int i = 0; i < RK_AIQ_CAM_GROUP_MAX_CAMS; i++)
             _singleCamResultsStatus[i].reset();
     }
@@ -97,8 +101,10 @@ typedef struct rk_aiq_groupcam_sofsync_s {
     rk_aiq_groupcam_sofsync_s() {
         _validCamSofSyncBits = 0;
     }
+    uint32_t _refCnt;
     void reset() {
         _validCamSofSyncBits = 0;
+        _refCnt = 0;
         for (int i = 0; i < RK_AIQ_CAM_GROUP_MAX_CAMS; i++)
             _singleCamSofEvt[i] = NULL;
     }
@@ -127,11 +133,8 @@ public:
             :_gc_result(gc_result){};
         rk_aiq_groupcam_result_t* _gc_result;
     } rk_aiq_groupcam_result_wrapper_t;
+    bool sendFrame(rk_aiq_groupcam_result_t* gc_result);
 
-    bool sendFrame(rk_aiq_groupcam_result_t* gc_result) {
-        mMsgQueue.push(new rk_aiq_groupcam_result_wrapper_t(gc_result));
-        return true;
-    };
 protected:
     //virtual bool started ();
     virtual void stopped () {
@@ -143,9 +146,11 @@ private:
     SafeList<rk_aiq_groupcam_result_wrapper_t>  mMsgQueue;
 };
 
+class RkAiqCamgroupHandle;
 class RkAiqCamGroupManager
 {
     friend class RkAiqCamGroupReprocTh;
+    friend class RkAiqCamgroupHandle;
     /* normal processing */
     // add cam's AIQ ctx to cam group
     // receive group cam's awb,ae stats
@@ -165,6 +170,13 @@ public:
     XCamReturn sofSync(RkAiqManager* aiqManager, SmartPtr<VideoBuffer>& sof_evt);
 
     XCamReturn setCamgroupCalib(CamCalibDbCamgroup_t* camgroup_calib);
+    // rk_aiq_camgroup_ctx_t
+    void setContainerCtx(void* group_ctx) {
+        mGroupCtx = group_ctx;
+    };
+    void* getContainerCtx() {
+        return mGroupCtx;
+    };
     // called after single cam aiq init
     XCamReturn init();
     // called only once
@@ -178,6 +190,19 @@ public:
     // if called, prepare should be re-called
     XCamReturn bind(RkAiqManager* ctx);
     XCamReturn unbind(int camId);
+    bool isRunningState() {
+        return mState == CAMGROUP_MANAGER_STARTED;
+    }
+    XCamReturn addAlgo(RkAiqAlgoDesComm& algo);
+    XCamReturn enableAlgo(int algoType, int id, bool enable);
+    XCamReturn rmAlgo(int algoType, int id);
+    bool getAxlibStatus(int algoType, int id);
+    RkAiqAlgoContext* getEnabledAxlibCtx(const int algo_type);
+    RkAiqAlgoContext* getAxlibCtx(const int algo_type, const int lib_id);
+    RkAiqCamgroupHandle* getAiqCamgroupHandle(const int algo_type, const int lib_id);
+
+    void setVicapReady(rk_aiq_hwevt_t* hwevt);
+    bool isAllVicapReady();
 protected:
     const struct RkAiqAlgoDesCommExt* mGroupAlgosDesArray;
     /* key: camId*/
@@ -190,11 +215,24 @@ protected:
     SmartPtr<RkAiqCamGroupReprocTh> mCamGroupReprocTh;
     /* */
     Mutex mCamGroupApiSyncMutex;
+    Mutex mSofMutex;
     uint64_t mRequiredMsgsMask;
     uint64_t mRequiredAlgoResMask;
     uint8_t mRequiredCamsResMask;
+    uint8_t mVicapReadyMask;
     AlgoCtxInstanceCfgCamGroup mGroupAlgoCtxCfg;
-    RkAiqAlgoContext* mGroupAlgoCtxArray[RK_AIQ_ALGO_TYPE_MAX];
+    // mDefAlgoHandleList and mDefAlgoHandleMap only contain default handlers(id == 0),
+    // default handlers will be treated as root handler, and custom handlers as children.
+    // Custom handlers located in mAlgoHandleMaps and nexthdl of default handlers.
+    // ordered algo list
+    std::list<SmartPtr<RkAiqCamgroupHandle>> mDefAlgoHandleList;
+    // key: algo type
+    // for fast access
+    std::map<int, SmartPtr<RkAiqCamgroupHandle>> mDefAlgoHandleMap;
+
+    // key1: algo type
+    // key2: algo id
+    std::map<int, std::map<int, SmartPtr<RkAiqCamgroupHandle>>> mAlgoHandleMaps;
     // status transition
     /*   Typical transitions:
      *        CURRENT_STATE              NEXT_STATE                  OPERATION
@@ -222,15 +260,26 @@ protected:
     int mState;
     bool mInit;
     CamCalibDbCamgroup_t* mCamgroupCalib;
+    uint32_t mClearedSofId;
+    uint32_t mClearedResultId;
+
 protected:
     XCamReturn reProcess(rk_aiq_groupcam_result_t* gc_res);
-    rk_aiq_groupcam_result_t* getGroupCamResult(uint32_t frameId, bool alloc = true);
-    rk_aiq_groupcam_sofsync_t* getGroupCamSofsync(uint32_t frameId, bool alloc = true);
+    rk_aiq_groupcam_result_t* getGroupCamResult(uint32_t frameId, bool query_ready = true);
+    rk_aiq_groupcam_sofsync_t* getGroupCamSofsync(uint32_t frameId, bool query_ready = true);
     void setSingleCamStatusReady(rk_aiq_singlecam_result_status_t* status, rk_aiq_groupcam_result_t* gc_result);
     void relayToHwi(rk_aiq_groupcam_result_t* gc_res);
     void clearGroupCamResult(uint32_t frameId);
+    void clearGroupCamResult_Locked(uint32_t frameId);
+    void putGroupCamResult(rk_aiq_groupcam_result_t* gc_res);
     void clearGroupCamSofsync(uint32_t frameId);
+    void clearGroupCamSofsync_Locked(uint32_t frameId);
+    void putGroupCamSofsync(rk_aiq_groupcam_sofsync_t* syncSof);
     void addDefaultAlgos(const struct RkAiqAlgoDesCommExt* algoDes);
+    virtual SmartPtr<RkAiqCamgroupHandle> newAlgoHandle(RkAiqAlgoDesComm* algo, int hw_ver);
+    SmartPtr<RkAiqCamgroupHandle> getDefAlgoTypeHandle(int algo_type);
+    std::map<int, SmartPtr<RkAiqCamgroupHandle>>* getAlgoTypeHandleMap(int algo_type);
+    void* mGroupCtx;
 };
 
 }; //namespace

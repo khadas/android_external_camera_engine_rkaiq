@@ -17,11 +17,11 @@
  *
  */
 
-#include "rk_aiq_algo_types_int.h"
 #include "rk_aiq_algo_camgroup_types.h"
 #include "xcam_log.h"
 #include "algos/amerge/rk_aiq_amerge_algo.h"
 #include "algos/amerge/rk_aiq_types_amerge_algo_prvt.h"
+#include "algos/amerge/rk_aiq_algo_amerge_itf.h"
 
 
 
@@ -56,7 +56,7 @@ static XCamReturn AmergeDestroyCtx(RkAiqAlgoContext *context)
     if(context != NULL) {
         AmergeContext_t* pAmergeGrpCtx = (AmergeContext_t*)context;
         ret = AmergeRelease(pAmergeGrpCtx);
-        if (ret != AMERGE_RET_SUCCESS) {
+        if (ret != XCAM_RETURN_NO_ERROR) {
             LOGE_AMERGE("%s Amerge Release failed: %d", __FUNCTION__, ret);
             return(XCAM_RETURN_ERROR_FAILED);
         }
@@ -86,12 +86,12 @@ static XCamReturn AmergePrepare(RkAiqAlgoCom* params)
 
     if(!!(params->u.prepare.conf_type & RK_AIQ_ALGO_CONFTYPE_UPDATECALIB )) {
         LOGD_AMERGE("%s: Amerge Reload Para!\n", __FUNCTION__);
-        if(pAmergeGrpCtx->HWversion == AMERGE_ISP20 || pAmergeGrpCtx->HWversion == AMERGE_ISP21) {
+        if(CHECK_ISP_HW_V21()) {
             CalibDbV2_merge_t* calibv2_amerge_calib =
                 (CalibDbV2_merge_t*)(CALIBDBV2_GET_MODULE_PTR((void*)pCalibDb, amerge_calib));
             memcpy(&pAmergeGrpCtx->pCalibDB.Merge_v20, calibv2_amerge_calib, sizeof(CalibDbV2_merge_t));//load iq paras
         }
-        else if(pAmergeGrpCtx->HWversion == AMERGE_ISP30) {
+        else if(CHECK_ISP_HW_V30()) {
             CalibDbV2_merge_V2_t* calibv2_amerge_calib =
                 (CalibDbV2_merge_V2_t*)(CALIBDBV2_GET_MODULE_PTR((void*)pCalibDb, amerge_calib));
             memcpy(&pAmergeGrpCtx->pCalibDB.Merge_v30, calibv2_amerge_calib, sizeof(CalibDbV2_merge_V2_t));//load iq paras
@@ -102,21 +102,15 @@ static XCamReturn AmergePrepare(RkAiqAlgoCom* params)
     if(/* !params->u.prepare.reconfig*/true) {
         AmergeStop(pAmergeGrpCtx); // stop firstly for re-preapre
         ret = AmergeStart(pAmergeGrpCtx);
-        if (ret != AMERGE_RET_SUCCESS) {
+        if (ret != XCAM_RETURN_NO_ERROR) {
             LOGE_AMERGE("%s Amerge Start failed: %d\n", __FUNCTION__, ret);
             return(XCAM_RETURN_ERROR_FAILED);
         }
     }
 
     if(pAmergeGrpCtx->FrameNumber == HDR_2X_NUM || pAmergeGrpCtx->FrameNumber == HDR_3X_NUM) {
-        if(pAmergeGrpCtx->mergeAttr.opMode == MERGE_OPMODE_TOOL) {
-            //MergeNewMalloc(&pAmergeGrpCtx->Config, &pAmergeGrpCtx->mergeAttr.stTool, pAmergeGrpCtx->HWversion);
-            //AmergeUpdateConfig(pAmergeGrpCtx, &pAmergeGrpCtx->mergeAttr.stTool);
-        }
-        else {
-            MergeNewMalloc(&pAmergeGrpCtx->Config, &pAmergeGrpCtx->pCalibDB, pAmergeGrpCtx->HWversion);
-            AmergeUpdateConfig(pAmergeGrpCtx, &pAmergeGrpCtx->pCalibDB);
-        }
+        MergePrepareJsonMalloc(&pAmergeGrpCtx->Config, &pAmergeGrpCtx->pCalibDB);
+        AmergePrepareJsonUpdateConfig(pAmergeGrpCtx, &pAmergeGrpCtx->pCalibDB);
     }
 
     LOG1_AMERGE("%s:Exit!\n", __FUNCTION__);
@@ -137,11 +131,22 @@ static XCamReturn AmergeProcess(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* o
     if(pAmergeGrpCtx->FrameNumber == HDR_2X_NUM || pAmergeGrpCtx->FrameNumber == HDR_3X_NUM || pAmergeGrpCtx->SensorInfo.LongFrmMode) {
         LOGD_AMERGE("/#####################################Amerge Group Start#####################################/ \n");
 
+        //update config
+        merge_OpModeV21_t mode = MERGE_OPMODE_API_OFF;
+        if(CHECK_ISP_HW_V21())
+            mode = pAmergeGrpCtx->mergeAttr.attrV21.opMode;
+        else if(CHECK_ISP_HW_V30())
+            mode = pAmergeGrpCtx->mergeAttr.attrV30.opMode;
+        if(mode == MERGE_OPMODE_MANU) {
+            MergeProcApiMalloc(&pAmergeGrpCtx->Config, &pAmergeGrpCtx->mergeAttr);
+            AmergeProcApiUpdateConfig(pAmergeGrpCtx);
+        }
+
         //get Sensor Info
         XCamVideoBuffer* xCamAeProcRes = pAmergeGrpParams->camgroupParmasArray[0]->aec._aeProcRes;
-        RkAiqAlgoProcResAeInt* pAEProcRes = NULL;
+        RkAiqAlgoProcResAe* pAEProcRes = NULL;
         if (xCamAeProcRes) {
-            pAEProcRes = (RkAiqAlgoProcResAeInt*)xCamAeProcRes->map(xCamAeProcRes);
+            pAEProcRes = (RkAiqAlgoProcResAe*)xCamAeProcRes->map(xCamAeProcRes);
             AmergeGetSensorInfo(pAmergeGrpCtx, pAEProcRes->ae_proc_res_rk);
         }
         else {
@@ -153,9 +158,9 @@ static XCamReturn AmergeProcess(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* o
 
         //get ae pre res and proc
         XCamVideoBuffer* xCamAePreRes = pAmergeGrpParams->camgroupParmasArray[0]->aec._aePreRes;
-        RkAiqAlgoPreResAeInt* pAEPreRes = NULL;
+        RkAiqAlgoPreResAe* pAEPreRes = NULL;
         if (xCamAePreRes) {
-            pAEPreRes = (RkAiqAlgoPreResAeInt*)xCamAePreRes->map(xCamAePreRes);
+            pAEPreRes = (RkAiqAlgoPreResAe*)xCamAePreRes->map(xCamAePreRes);
             bypass = AmergeByPassProcessing(pAmergeGrpCtx, pAEPreRes->ae_pre_res_rk);
         }
         else {
@@ -225,7 +230,7 @@ static XCamReturn AmergeProcess(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* o
         }
 
         //clip for Longframe mode
-        if(pAmergeGrpParams->SensorInfo.LongFrmMode) {
+        if(pAmergeGrpCtx->SensorInfo.LongFrmMode) {
             ExpoData.nextRatioLS = 1;
             ExpoData.nextRatioLM = 1;
         }
@@ -235,15 +240,18 @@ static XCamReturn AmergeProcess(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* o
         else
             LOGE_AMERGE("%s: AE ratio for merge expo sync is under one!!!\n", __FUNCTION__);
 
-        pAmergeGrpCtx->PrevData.CtrlData.ApiMode = pAmergeGrpCtx->mergeAttr.opMode;
+        if(CHECK_ISP_HW_V21())
+            pAmergeGrpCtx->PrevData.CtrlData.ApiMode = pAmergeGrpCtx->mergeAttr.attrV21.opMode;
+        else if(CHECK_ISP_HW_V30())
+            pAmergeGrpCtx->PrevData.CtrlData.ApiMode = pAmergeGrpCtx->mergeAttr.attrV30.opMode;
         pAmergeGrpCtx->ProcRes.update = !bypass;
         pAmergeGrpCtx->ProcRes.LongFrameMode = pAmergeGrpCtx->SensorInfo.LongFrmMode;
         for(int i = 0; i < pAmergeGrpProcRes->arraySize; i++) {
             pAmergeGrpProcRes->camgroupParmasArray[i]->_amergeConfig->update = pAmergeGrpCtx->ProcRes.update;
             pAmergeGrpProcRes->camgroupParmasArray[i]->_amergeConfig->LongFrameMode = pAmergeGrpCtx->ProcRes.LongFrameMode;
-            if(pAmergeGrpCtx->HWversion == AMERGE_ISP20 || pAmergeGrpCtx->HWversion == AMERGE_ISP21)
+            if(CHECK_ISP_HW_V21())
                 memcpy(&pAmergeGrpProcRes->camgroupParmasArray[i]->_amergeConfig->Merge_v20, &pAmergeGrpCtx->ProcRes.Merge_v20, sizeof(MgeProcRes_t));
-            else if(pAmergeGrpCtx->HWversion == AMERGE_ISP30)
+            else if(CHECK_ISP_HW_V30())
                 memcpy(&pAmergeGrpProcRes->camgroupParmasArray[i]->_amergeConfig->Merge_v30, &pAmergeGrpCtx->ProcRes.Merge_v30, sizeof(MgeProcResV2_t));
         }
 

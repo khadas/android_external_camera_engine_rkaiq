@@ -55,12 +55,14 @@ int initDrmDsp() {
     return -1;
   }
 
-  pDrmDsp->test_crtc = &pDrmDsp->dev->crtcs[0];
+  pDrmDsp->test_crtc = &pDrmDsp->dev->crtcs[3];
   pDrmDsp->num_test_planes = pDrmDsp->test_crtc->num_planes;
   for (i = 0; i < pDrmDsp->test_crtc->num_planes; i++) {
     pDrmDsp->plane[i] = get_sp_plane(pDrmDsp->dev, pDrmDsp->test_crtc);
-    if (is_supported_format(pDrmDsp->plane[i], DRM_FORMAT_NV12))
+    if (is_supported_format(pDrmDsp->plane[i], DRM_FORMAT_NV12)) {
       pDrmDsp->test_plane = pDrmDsp->plane[i];
+	  break;
+	}
   }
   if (!pDrmDsp->test_plane)
     return -1;
@@ -217,7 +219,7 @@ static int arm_camera_yuv420_scale_arm(char *srcbuf, char *dstbuf,int src_w, int
 }	
 
 int drmDspFrame(int srcWidth, int srcHeight, int dispWidth, int dispHeight,
-		void* dmaFd, int fmt)
+		int dmaFd, int fmt)
 {
   int ret;
   struct drm_mode_create_dumb cd;
@@ -271,12 +273,14 @@ int drmDspFrame(int srcWidth, int srcHeight, int dispWidth, int dispHeight,
 #ifndef ARCH_FPGA
   struct rkRgaCfg src_cfg, dst_cfg;
 
-  src_cfg.addr = dmaFd;
+  src_cfg.fd = dmaFd;
+  src_cfg.addr = 0;
   src_cfg.fmt = RK_FORMAT_YCrCb_420_SP;
   src_cfg.width = srcWidth;
   src_cfg.height = srcHeight;
 
-  dst_cfg.addr = bo->map_addr;
+  dst_cfg.fd = bo->fd;
+  dst_cfg.addr = 0;
   dst_cfg.fmt = RK_FORMAT_YCrCb_420_SP;
   dst_cfg.width = dispWidth;
   dst_cfg.height = dispHeight;

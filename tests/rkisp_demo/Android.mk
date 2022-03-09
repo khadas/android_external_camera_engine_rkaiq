@@ -17,6 +17,8 @@ LOCAL_SRC_FILES :=\
 	demo/drmDsp/modeset.c \
 	demo/rkisp_demo.cpp \
 	demo/rkRgaApi.cpp \
+    demo/ae_algo_demo/third_party_ae_algo.cpp \
+    demo/awb_algo_demo/third_party_awb_algo.cpp \
 
 #TODO: have compile issue on Android now
 	#demo/rga_control.c \
@@ -34,6 +36,7 @@ LOCAL_C_INCLUDES := \
 	$(LOCAL_PATH)/demo/include/rga \
 	$(LOCAL_PATH)/demo/include/libdrm \
 	$(LOCAL_PATH)/demo/drmDsp \
+	$(LOCAL_PATH)/demo/sample \
 	$(LOCAL_PATH)/../../include/uAPI \
 	$(LOCAL_PATH)/../../include/uAPI2 \
 	$(LOCAL_PATH)/../../include/xcore \

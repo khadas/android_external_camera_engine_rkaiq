@@ -43,6 +43,7 @@
 #include "rk_aiq_user_api_imgproc.h"
 
 #include "rkaiq.h"
+#include "rk_aiq_api_private.h"
 #include "AiqCameraHalAdapter.h"
 
 #include "isp20/CamHwIsp20.h"

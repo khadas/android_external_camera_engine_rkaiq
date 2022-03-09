@@ -64,14 +64,7 @@ using namespace RkCam;
 using namespace XCam;
 using namespace android::camera2;
 
-typedef struct rk_aiq_sys_ctx_s {
-    const char* _sensor_entity_name;
-    SmartPtr<RkCam::RkAiqManager> _rkAiqManager;
-    SmartPtr<RkCam::ICamHw> _camHw;
-    SmartPtr<RkCam::RkAiqCore> _analyzer;
-    SmartPtr<RkCam::RkLumaCore> _lumaAnalyzer;
-    CamCalibDbContext_t *_calibDb;
-} rk_aiq_sys_ctx_t;
+typedef struct rk_aiq_sys_ctx_s rk_aiq_sys_ctx_t;
 
 struct rkisp_cl_frame_rkaiq_s {
     //frame id

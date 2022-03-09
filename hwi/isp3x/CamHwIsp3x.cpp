@@ -245,6 +245,7 @@ CamHwIsp3x::setIspConfig()
     LOGD_ANALYZER("----------%s, start config id(%d)'s isp params", __FUNCTION__, frameId);
 
     struct isp3x_isp_params_cfg update_params[2];
+    memset(update_params, 0, sizeof(struct isp3x_isp_params_cfg)*2);
 
     update_params[0].module_en_update = 0;
     update_params[0].module_ens = 0;
@@ -283,9 +284,31 @@ CamHwIsp3x::setIspConfig()
                 LOGW_CAMHW_SUBM(ISP20HW_SUBM, "get awb params from 3a result failed for frame %d !\n", frameId);
             }
         }
+
+        SmartPtr<cam3aResult> blc_res = get_3a_module_result(ready_results, RESULT_TYPE_BLC_PARAM);
+        SmartPtr<RkAiqIspBlcParamsProxyV21> blcParams;
+        if (blc_res.ptr()) {
+            blcParams = blc_res.dynamic_cast_ptr<RkAiqIspBlcParamsProxyV21>();
+            {
+                SmartLock locker (_isp_params_cfg_mutex);
+                _effecting_ispparam_map[frameId].blc_cfg = blcParams->data()->result;
+
+            }
+        } else {
+            /* use the latest */
+            SmartLock locker (_isp_params_cfg_mutex);
+            if (!_effecting_ispparam_map.empty()) {
+                _effecting_ispparam_map[frameId].blc_cfg = (_effecting_ispparam_map.rbegin())->second.blc_cfg;
+                LOGW_CAMHW_SUBM(ISP20HW_SUBM, "use frame %d blc params for frame %d !\n",
+                                frameId, (_effecting_ispparam_map.rbegin())->first);
+            } else {
+                LOGW_CAMHW_SUBM(ISP20HW_SUBM, "get blc params from 3a result failed for frame %d !\n", frameId);
+            }
+        }
+
     }
 
-    // TODO: merge_isp_results would cause the compile warning: reference to â€˜merge_isp_resultsâ€?is ambiguous
+    // TODO: merge_isp_results would cause the compile warning: reference to merge_isp_results is ambiguous
     // now use Isp21Params::merge_isp_results instead
     if (Isp3xParams::merge_isp_results(ready_results, update_params) != XCAM_RETURN_NO_ERROR)
         LOGE_CAMHW_SUBM(ISP20HW_SUBM, "ISP parameter translation error\n");

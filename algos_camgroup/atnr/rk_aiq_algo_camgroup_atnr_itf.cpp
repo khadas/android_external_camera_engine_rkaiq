@@ -20,7 +20,6 @@
 #include "rk_aiq_algo_camgroup_atnr_itf.h"
 #include "rk_aiq_algo_camgroup_types.h"
 #include "rk_aiq_types_camgroup_atnr_prvt.h"
-#include "rk_aiq_algo_types_int.h"
 #include "abayertnr2/rk_aiq_abayertnr_algo_itf_v2.h"
 #include "abayertnr2/rk_aiq_abayertnr_algo_v2.h"
 #include "arawnr2/rk_aiq_abayernr_algo_itf_v2.h"
@@ -203,9 +202,11 @@ static XCamReturn groupAbayertnrProcessing(const RkAiqAlgoCom* inparams, RkAiqAl
             stExpInfoV2.arIso[0] = stExpInfoV2.arAGain[0] * stExpInfoV2.arDGain[0] * 50;
 
         } else {
-            if((rk_aiq_working_mode_t)procParaGroup->working_mode == RK_AIQ_WORKING_MODE_ISP_HDR2)
+            if(procParaGroup->working_mode == RK_AIQ_ISP_HDR_MODE_2_FRAME_HDR
+                    || procParaGroup->working_mode == RK_AIQ_ISP_HDR_MODE_2_LINE_HDR)
                 stExpInfoV2.hdr_mode = 1;
-            else if ((rk_aiq_working_mode_t)procParaGroup->working_mode == RK_AIQ_WORKING_MODE_ISP_HDR3)
+            else if (procParaGroup->working_mode == RK_AIQ_ISP_HDR_MODE_3_FRAME_HDR
+                     || procParaGroup->working_mode == RK_AIQ_ISP_HDR_MODE_3_LINE_HDR)
                 stExpInfoV2.hdr_mode = 2;
             else {
                 stExpInfoV2.hdr_mode = 0;
@@ -240,12 +241,14 @@ static XCamReturn groupAbayertnrProcessing(const RkAiqAlgoCom* inparams, RkAiqAl
                 ret = XCAM_RETURN_ERROR_FAILED;
                 LOGE_ANR("%s: processing ANR failed (%d)\n", __FUNCTION__, ret);
             }
+            Abayertnr_GetProcResult_V2(abayertnr_contex_v2, &stAbayertnrResultV2);
             stAbayertnrResultV2.isNeedUpdate = true;
             LOGD_ANR("recalculate: %d delta_iso:%d \n ", abayertnr_contex_v2->isReCalculate, deltaIso);
         } else {
+            stAbayertnrResultV2 = abayertnr_contex_v2->stProcResult;
             stAbayertnrResultV2.isNeedUpdate = true;
         }
-        Abayertnr_GetProcResult_V2(abayertnr_contex_v2, &stAbayertnrResultV2);
+
         for (int i = 0; i < procResParaGroup->arraySize; i++) {
             *(procResParaGroup->camgroupParmasArray[i]->abayertnr._abayertnr_procRes_v2) = stAbayertnrResultV2.st3DFix;
         }

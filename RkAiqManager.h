@@ -20,8 +20,6 @@
 
 #include "ICamHw.h"
 #include "RkAiqCore.h"
-#include "RkAiqCoreV21.h"
-#include "RkAiqCoreV3x.h"
 #include "RkAiqCalibDb.h"
 #include "RkAiqCalibDbV2.h"
 #include "RkLumaCore.h"
@@ -135,17 +133,25 @@ class RkAiqManager
     , public RkLumaAnalyzerCb {
     friend RkAiqRstApplyThread;
     friend RkAiqMngCmdThread;
+#ifdef RKAIQ_ENABLE_CAMGROUP
     friend class RkAiqCamGroupManager;
+#endif
 public:
     explicit RkAiqManager(const char* sns_ent_name,
                           rk_aiq_error_cb err_cb,
                           rk_aiq_metas_cb metas_cb);
     virtual ~RkAiqManager();
+    void setHwEvtCb(rk_aiq_hwevt_cb hwevt_cb, void* evt_cb_ctx) {
+        mHwEvtCbCtx = evt_cb_ctx;
+        mHwEvtCb = hwevt_cb;
+    };
     void setCamHw(SmartPtr<ICamHw>& camhw);
     void setCamPhyId(int phyId) {mCamPhyId = phyId;}
     int getCamPhyId() { return mCamPhyId;}
     void setAnalyzer(SmartPtr<RkAiqCore> analyzer);
+#ifdef RKAIQ_ENABLE_PARSER_V1
     void setAiqCalibDb(const CamCalibDbContext_t* calibDb);
+#endif
     void setAiqCalibDb(const CamCalibDbV2Context_t* calibDb);
     void setLumaAnalyzer(SmartPtr<RkLumaCore> analyzer);
     XCamReturn init();
@@ -187,9 +193,14 @@ public:
     CamCalibDbV2Context_t* getCurrentCalibDBV2(void);
     XCamReturn calibTuning(const CamCalibDbV2Context_t* aiqCalib,
                            ModuleNameList& change_list);
+#ifdef RKAIQ_ENABLE_CAMGROUP
     void setCamGroupManager(RkAiqCamGroupManager* cam_group_manager, bool isMain) {
         mCamGroupCoreManager = cam_group_manager;
         mIsMain = isMain;
+    }
+#endif
+    rk_aiq_working_mode_t getWorkingMode() {
+        return mWorkingMode;
     }
 protected:
     XCamReturn applyAnalyzerResult(SmartPtr<RkAiqFullParamsProxy>& results);
@@ -211,8 +222,12 @@ private:
     SmartPtr<RkLumaCore> mRkLumaAnalyzer;
     rk_aiq_error_cb mErrCb;
     rk_aiq_metas_cb mMetasCb;
+    rk_aiq_hwevt_cb mHwEvtCb;
+    void* mHwEvtCbCtx;
     const char* mSnsEntName;
+#ifdef RKAIQ_ENABLE_PARSER_V1
     const CamCalibDbContext_t* mCalibDb;
+#endif
     CamCalibDbV2Context_t* mCalibDbV2;
     rk_aiq_working_mode_t mWorkingMode;
     rk_aiq_working_mode_t mOldWkModeForGray;
@@ -224,9 +239,10 @@ private:
     bool mCurFlip;
     SmartPtr<RkAiqCpslParamsProxy> mDleayCpslParams;
     int mDelayCpslApplyFrmNum;
-    int mIspHwVer;
     int mCamPhyId;
+#ifdef RKAIQ_ENABLE_CAMGROUP
     RkAiqCamGroupManager* mCamGroupCoreManager;
+#endif
     bool mIsMain;
 };
 

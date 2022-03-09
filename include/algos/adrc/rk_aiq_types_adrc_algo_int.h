@@ -13,12 +13,13 @@
 
 #include "RkAiqCalibDbTypes.h"
 #include "adrc_head.h"
+#include "adrc_uapi_head.h"
 #include "rk_aiq_types_adrc_stat_v200.h"
 
 #define AIQ_ISP3X_DRC_Y_NUM 17
 
 
-typedef struct DrcProcResV20_s
+typedef struct DrcProcResV21_s
 {
     int sw_drc_offset_pow2;
     int sw_drc_compres_scl;
@@ -43,10 +44,9 @@ typedef struct DrcProcResV20_s
     float sw_drc_adrc_gain;
     int sw_drc_iir_weight;
     int sw_drc_min_ogain;
+} DrcProcResV21_t;
 
-} DrcProcResV20_t;
-
-typedef struct DrcProcResV21_s {
+typedef struct DrcProcResV30_s {
     int bypass_en;
     int offset_pow2;
     int compres_scl;
@@ -75,12 +75,12 @@ typedef struct DrcProcResV21_s {
     int wr_cycle;
     int iir_weight;
     int min_ogain;
-} DrcProcResV21_t;
+} DrcProcResV30_t;
 
 typedef struct DrcProcRes_s {
     union {
-        DrcProcResV20_t Drc_v20;
         DrcProcResV21_t Drc_v21;
+        DrcProcResV30_t Drc_v30;
     };
 } DrcProcRes_t;
 
@@ -94,6 +94,35 @@ typedef struct RkAiqAdrcProcResult_s
     bool bTmoEn;
     bool isLinearTmo;
 } RkAiqAdrcProcResult_t;
+
+
+typedef enum AdrcVersion_e {
+    ADRC_VERSION_356X = 0,
+    ADRC_VERSION_3588 = 1,
+    ADRC_VERSION_MAX
+} AdrcVersion_t;
+
+typedef enum drc_OpMode_s {
+    DRC_OPMODE_API_OFF = 0, // run IQ ahdr
+    DRC_OPMODE_MANU = 1,    // run api manual ahdr
+    DRC_OPMODE_DRC_GAIN = 2,
+    DRC_OPMODE_HILIT = 3,
+    DRC_OPMODE_LOCAL_TMO = 4,
+} drc_OpMode_t;
+
+typedef struct drcAttr_s {
+    rk_aiq_uapi_sync_t sync;
+
+    AdrcVersion_t Version;
+    drc_OpMode_t opMode;
+    mdrcAttr_V21_t stManualV21;
+    mdrcAttr_V30_t stManualV30;
+    mDrcGain_t stDrcGain;
+    mDrcHiLit_t stHiLit;
+    mLocalDataV21_t stLocalDataV21;
+    mLocalDataV30_t stLocalDataV30;
+    DrcInfo_t Info;
+} drcAttr_t;
 
 
 #endif

@@ -20,8 +20,9 @@
 #ifndef _RK_AIQ_TYPE_ADEHAZE_ALGO_INT_H_
 #define _RK_AIQ_TYPE_ADEHAZE_ALGO_INT_H_
 #include "RkAiqCalibDbTypes.h"
-#include "adehaze_head.h"
 #include "adehaze/rk_aiq_types_adehaze_algo.h"
+#include "adehaze_head.h"
+#include "adehaze_uapi_head.h"
 
 typedef enum AdehazeVersion_e {
     ADEHAZE_ISP20      = 0,
@@ -30,60 +31,32 @@ typedef enum AdehazeVersion_e {
     ADEHAZE_VERSION_MAX
 } AdehazeVersion_t;
 
-
-typedef struct rk_aiq_dehaze_M_attrib_s {
-    int strength;
-} rk_aiq_dehaze_M_attrib_t;
-
-typedef struct rk_aiq_dehaze_A_attrib_s {
-    //rk_aiq_wb_awb_alg_method_t algMethod;
-    int sw_dhaz_en ;//1
-    int cfg_alpha ; //0
-    int enhance_en ;//0
-} rk_aiq_dehaze_A_attrib_t;
-
-typedef struct rk_aiq_dehaze_enhance_s {
-    float level;//0~100
-} rk_aiq_dehaze_enhance_t;
-
 typedef enum dehaze_api_mode_s {
-    DEHAZE_API_BYPASS                     = 0,        /**< api bypass */
-    DEHAZE_API_MANUAL                      = 1,        /**< run manual dehaze */
-    DEHAZE_API_AUTO                        = 2,        /**< run auto dehaze */
-    DEHAZE_API_OFF                         = 3,        /**< dehaze off, enhance follow IQ setting*/
-    DEHAZE_API_TOOL                        = 4,        /**< dehaze tool, use data stAuto*/
-    DEHAZE_API_ENHANCE_MANUAL             = 5,        /**< dehaze enhance Manual*/
-    DEHAZE_API_ENHANCE_AUTO               = 6,        /**< dehaze enhance follow IQ setting*/
+    DEHAZE_API_BYPASS                  = 0,        /**< api bypass */
+    DEHAZE_API_MANUAL                  = 1,        /**< run manual mode*/
+    DEHAZE_API_DEHAZE_AUTO             = 2,        /**< run auto dehaze */
+    DEHAZE_API_DEHAZE_MANUAL           = 3,        /**< run manual dehaze */
+    DEHAZE_API_DEHAZE_OFF              = 4,        /**< dehaze off, enhance follow IQ setting*/
+    DEHAZE_API_ENHANCE_MANUAL          = 5,        /**< dehaze enhance Manual*/
+    DEHAZE_API_ENHANCE_AUTO            = 6,        /**< dehaze enhance follow IQ setting*/
+    DEHAZE_API_ENHANCE_OFF             = 7,        /**< dehaze enhance off, dehaze enable fellow IQ setting*/
 } dehaze_api_mode_t;
 
-typedef struct adehaze_sw_V21_s {
-    dehaze_api_mode_t mode;
-    rk_aiq_dehaze_M_attrib_t stManual;
-    CalibDbV2_dehaze_V21_t stTool;
-    rk_aiq_dehaze_enhance_t stEnhanceManual;
-} adehaze_sw_V21_t;
+typedef struct DehazeManuAttr_s {
+    int level;//0~100
+} DehazeManuAttr_t;
 
-typedef struct adehaze_sw_V20_s {
-    dehaze_api_mode_t mode;
-    rk_aiq_dehaze_M_attrib_t stManual;
-    CalibDbV2_dehaze_V20_t stTool;
-    rk_aiq_dehaze_enhance_t stEnhanceManual;
-} adehaze_sw_V20_t;
+typedef struct EnhanceManuAttr_s {
+    int level;//0~100
+} EnhanceManuAttr_t;
 
-typedef struct adehaze_sw_V30_s {
-    dehaze_api_mode_t mode;
-    rk_aiq_dehaze_M_attrib_t stManual;
-    rk_aiq_dehaze_enhance_t stEnhanceManual;
-} adehaze_sw_V30_t;
+typedef struct adehaze_sw_V2_s {
+    rk_aiq_uapi_sync_t sync;
 
-typedef struct adehaze_sw_s
-{
-    union {
-        adehaze_sw_V20_t AdehazeAtrrV20;
-        adehaze_sw_V21_t AdehazeAtrrV21;
-        adehaze_sw_V30_t AdehazeAtrrV30;
-    };
-    AdehazeVersion_t HWversion;
+    dehaze_api_mode_t mode;
+    mDehazeAttr_t stManual;
+    DehazeManuAttr_t stDehazeManu;
+    EnhanceManuAttr_t stEnhanceManu;
 } adehaze_sw_V2_t;
 
 typedef struct AdehazeExpInfo_s {

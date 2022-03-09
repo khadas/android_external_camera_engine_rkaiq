@@ -1,7 +1,5 @@
 /*
- * RkAiqAcacHandle.h
- *
- *  Copyright (c) 2019-2021 Rockchip Eletronics Co., Ltd.
+ * Copyright (c) 2019-2022 Rockchip Eletronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,24 +12,24 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
  */
+#include "RkAiqAcacHandle.h"
 
 #include "RkAiqCore.h"
-#include "RkAiqHandle.h"
-#include "RkAiqHandleInt.h"
 
 namespace RkCam {
+
+DEFINE_HANDLE_REGISTER_TYPE(RkAiqAcacHandleInt);
 
 XCamReturn RkAiqAcacHandleInt::prepare() {
     ENTER_ANALYZER_FUNCTION();
 
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
 
-    ret = RkAiqAcacHandle::prepare();
+    ret = RkAiqHandle::prepare();
     RKAIQCORE_CHECK_RET(ret, "acac handle prepare failed");
 
-    RkAiqAlgoConfigAcacInt* acac_config_int = (RkAiqAlgoConfigAcacInt*)mConfig;
+    RkAiqAlgoConfigAcac* acac_config_int = (RkAiqAlgoConfigAcac*)mConfig;
     RkAiqAlgoDescription* des               = (RkAiqAlgoDescription*)mDes;
     RkAiqCore::RkAiqAlgosComShared_t* sharedCom = &mAiqCore->mAlogsComSharedParams;
     RkAiqCore::RkAiqAlgosGroupShared_t* shared = nullptr;
@@ -41,7 +39,6 @@ XCamReturn RkAiqAcacHandleInt::prepare() {
             return XCAM_RETURN_BYPASS;
     } else
         return XCAM_RETURN_BYPASS;
-    RkAiqPreResComb* comb = &shared->preResComb;
 
     acac_config_int->mem_ops = mAiqCore->mShareMemOps;
     acac_config_int->width = sharedCom->snsDes.isp_acq_width;
@@ -60,14 +57,14 @@ XCamReturn RkAiqAcacHandleInt::prepare() {
 void RkAiqAcacHandleInt::init() {
     ENTER_ANALYZER_FUNCTION();
 
-    RkAiqAcacHandle::deInit();
-    mConfig       = (RkAiqAlgoCom*)(new RkAiqAlgoConfigAcacInt());
-    mPreInParam   = (RkAiqAlgoCom*)(new RkAiqAlgoPreAcacInt());
-    mPreOutParam  = (RkAiqAlgoResCom*)(new RkAiqAlgoPreResAcacInt());
-    mProcInParam  = (RkAiqAlgoCom*)(new RkAiqAlgoProcAcacInt());
-    mProcOutParam = (RkAiqAlgoResCom*)(new RkAiqAlgoProcResAcacInt());
-    mPostInParam  = (RkAiqAlgoCom*)(new RkAiqAlgoPostAcacInt());
-    mPostOutParam = (RkAiqAlgoResCom*)(new RkAiqAlgoPostResAcacInt());
+    RkAiqHandle::deInit();
+    mConfig       = (RkAiqAlgoCom*)(new RkAiqAlgoConfigAcac());
+    mPreInParam   = (RkAiqAlgoCom*)(new RkAiqAlgoPreAcac());
+    mPreOutParam  = (RkAiqAlgoResCom*)(new RkAiqAlgoPreResAcac());
+    mProcInParam  = (RkAiqAlgoCom*)(new RkAiqAlgoProcAcac());
+    mProcOutParam = (RkAiqAlgoResCom*)(new RkAiqAlgoProcResAcac());
+    mPostInParam  = (RkAiqAlgoCom*)(new RkAiqAlgoPostAcac());
+    mPostOutParam = (RkAiqAlgoResCom*)(new RkAiqAlgoPostResAcac());
 
     EXIT_ANALYZER_FUNCTION();
 }
@@ -77,8 +74,8 @@ XCamReturn RkAiqAcacHandleInt::preProcess() {
 
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
 
-    RkAiqAlgoPreAcacInt* acac_pre_int          = (RkAiqAlgoPreAcacInt*)mPreInParam;
-    RkAiqAlgoPreResAcacInt* acac_pre_res_int   = (RkAiqAlgoPreResAcacInt*)mPreOutParam;
+    RkAiqAlgoPreAcac* acac_pre_int          = (RkAiqAlgoPreAcac*)mPreInParam;
+    RkAiqAlgoPreResAcac* acac_pre_res_int   = (RkAiqAlgoPreResAcac*)mPreOutParam;
     RkAiqCore::RkAiqAlgosGroupShared_t* shared = nullptr;
     int groupId                                = mAiqCore->getGroupId(RK_AIQ_ALGO_TYPE_ACAC);
     if (groupId >= 0) {
@@ -86,20 +83,16 @@ XCamReturn RkAiqAcacHandleInt::preProcess() {
             return XCAM_RETURN_BYPASS;
     } else
         return XCAM_RETURN_BYPASS;
-    RkAiqPreResComb* comb = &shared->preResComb;
 
-    ret = RkAiqAcacHandle::preProcess();
+    ret = RkAiqHandle::preProcess();
     if (ret) {
-        comb->acac_pre_res = NULL;
         RKAIQCORE_CHECK_RET(ret, "acac handle preProcess failed");
     }
 
-    comb->acac_pre_res        = NULL;
     RkAiqAlgoDescription* des = (RkAiqAlgoDescription*)mDes;
 
     ret = des->pre_process(mPreInParam, mPreOutParam);
     RKAIQCORE_CHECK_RET(ret, "acac algo pre_process failed");
-    comb->acac_pre_res = (RkAiqAlgoPreResAcac*)acac_pre_res_int;
 
     EXIT_ANALYZER_FUNCTION();
     return XCAM_RETURN_NO_ERROR;
@@ -110,8 +103,8 @@ XCamReturn RkAiqAcacHandleInt::processing() {
 
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
 
-    RkAiqAlgoProcAcacInt* acac_proc_int        = (RkAiqAlgoProcAcacInt*)mProcInParam;
-    RkAiqAlgoProcResAcacInt* acac_proc_res_int = (RkAiqAlgoProcResAcacInt*)mProcOutParam;
+    RkAiqAlgoProcAcac* acac_proc_int        = (RkAiqAlgoProcAcac*)mProcInParam;
+    RkAiqAlgoProcResAcac* acac_proc_res_int = (RkAiqAlgoProcResAcac*)mProcOutParam;
     RkAiqCore::RkAiqAlgosGroupShared_t* shared = nullptr;
     RkAiqCore::RkAiqAlgosComShared_t* sharedCom = &mAiqCore->mAlogsComSharedParams;
 
@@ -121,8 +114,6 @@ XCamReturn RkAiqAcacHandleInt::processing() {
             return XCAM_RETURN_BYPASS;
     } else
         return XCAM_RETURN_BYPASS;
-
-    RkAiqProcResComb* comb = &shared->procResComb;
 
     RKAiqAecExpInfo_t* aeCurExp = &shared->curExp;
     if (aeCurExp != NULL) {
@@ -146,18 +137,15 @@ XCamReturn RkAiqAcacHandleInt::processing() {
 
 
 
-    ret = RkAiqAcacHandle::processing();
+    ret = RkAiqHandle::processing();
     if (ret) {
-        comb->acac_proc_res = NULL;
         RKAIQCORE_CHECK_RET(ret, "acac handle processing failed");
     }
 
-    comb->acac_proc_res       = NULL;
     RkAiqAlgoDescription* des = (RkAiqAlgoDescription*)mDes;
 
     ret = des->processing(mProcInParam, mProcOutParam);
     RKAIQCORE_CHECK_RET(ret, "acac algo processing failed");
-    comb->acac_proc_res = (RkAiqAlgoProcResAcac*)acac_proc_res_int;
 
     EXIT_ANALYZER_FUNCTION();
     return ret;
@@ -168,8 +156,8 @@ XCamReturn RkAiqAcacHandleInt::postProcess() {
 
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
 
-    RkAiqAlgoPostAcacInt* acac_post_int        = (RkAiqAlgoPostAcacInt*)mPostInParam;
-    RkAiqAlgoPostResAcacInt* acac_post_res_int = (RkAiqAlgoPostResAcacInt*)mPostOutParam;
+    RkAiqAlgoPostAcac* acac_post_int        = (RkAiqAlgoPostAcac*)mPostInParam;
+    RkAiqAlgoPostResAcac* acac_post_res_int = (RkAiqAlgoPostResAcac*)mPostOutParam;
     RkAiqCore::RkAiqAlgosGroupShared_t* shared = nullptr;
 
     int groupId = mAiqCore->getGroupId(RK_AIQ_ALGO_TYPE_ACAC);
@@ -179,21 +167,16 @@ XCamReturn RkAiqAcacHandleInt::postProcess() {
     } else
         return XCAM_RETURN_BYPASS;
 
-    RkAiqPostResComb* comb = &shared->postResComb;
-
-    ret = RkAiqAcacHandle::postProcess();
+    ret = RkAiqHandle::postProcess();
     if (ret) {
-        comb->acac_post_res = NULL;
         RKAIQCORE_CHECK_RET(ret, "acac handle postProcess failed");
         return ret;
     }
 
-    comb->acac_post_res       = NULL;
     RkAiqAlgoDescription* des = (RkAiqAlgoDescription*)mDes;
 
     ret = des->post_process(mPostInParam, mPostOutParam);
     RKAIQCORE_CHECK_RET(ret, "acac algo post_process failed");
-    comb->acac_post_res = (RkAiqAlgoPostResAcac*)acac_post_res_int;
 
     EXIT_ANALYZER_FUNCTION();
     return ret;
@@ -244,111 +227,29 @@ XCamReturn RkAiqAcacHandleInt::getAttrib(rk_aiq_cac_attrib_t* att) {
     return ret;
 }
 
-void RkAiqAcacHandle::init() {
+XCamReturn RkAiqAcacHandleInt::genIspResult(RkAiqFullParams* params, RkAiqFullParams* cur_params) {
     ENTER_ANALYZER_FUNCTION();
 
-    deInit();
-    mConfig       = (RkAiqAlgoCom*)(new RkAiqAlgoConfigAcac());
-    mPreInParam   = (RkAiqAlgoCom*)(new RkAiqAlgoPreAcac());
-    mPreOutParam  = (RkAiqAlgoResCom*)(new RkAiqAlgoPreResAcac());
-    mProcInParam  = (RkAiqAlgoCom*)(new RkAiqAlgoProcAcac());
-    mProcOutParam = (RkAiqAlgoResCom*)(new RkAiqAlgoProcResAcac());
-    mPostInParam  = (RkAiqAlgoCom*)(new RkAiqAlgoPostAcac());
-    mPostOutParam = (RkAiqAlgoResCom*)(new RkAiqAlgoPostResAcac());
-
-    EXIT_ANALYZER_FUNCTION();
-}
-
-XCamReturn RkAiqAcacHandle::prepare() {
-    ENTER_ANALYZER_FUNCTION();
-    XCamReturn ret            = XCAM_RETURN_NO_ERROR;
-    RkAiqAlgoDescription* des = (RkAiqAlgoDescription*)mDes;
-
-    ret = RkAiqHandle::prepare();
-    RKAIQCORE_CHECK_RET(ret, "acac handle prepare failed");
-
-    if (mDes->id != 0) {
-        ret = des->prepare(mConfig);
-        RKAIQCORE_CHECK_RET(ret, "acac algo prepare failed");
-    }
-
-    EXIT_ANALYZER_FUNCTION();
-    return ret;
-}
-
-XCamReturn RkAiqAcacHandle::preProcess() {
-    ENTER_ANALYZER_FUNCTION();
-    XCamReturn ret                              = XCAM_RETURN_NO_ERROR;
-    RkAiqAlgoDescription* des                   = (RkAiqAlgoDescription*)mDes;
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    RkAiqCore::RkAiqAlgosGroupShared_t* shared =
+        (RkAiqCore::RkAiqAlgosGroupShared_t*)(getGroupShared());
     RkAiqCore::RkAiqAlgosComShared_t* sharedCom = &mAiqCore->mAlogsComSharedParams;
-    RkAiqCore::RkAiqAlgosGroupShared_t* shared  = nullptr;
+    RkAiqAlgoProcResAcac* cac_com               = (RkAiqAlgoProcResAcac*)mProcOutParam;
 
-    int groupId = mAiqCore->getGroupId(RK_AIQ_ALGO_TYPE_ACAC);
-    if (groupId >= 0) {
-        if (mAiqCore->getGroupSharedParams(groupId, shared) != XCAM_RETURN_NO_ERROR)
-            return XCAM_RETURN_BYPASS;
-    } else
-        return XCAM_RETURN_BYPASS;
+    rk_aiq_isp_cac_params_v3x_t* cac_param = params->mCacV3xParams->data().ptr();
 
-    ret = RkAiqHandle::preProcess();
-    RKAIQCORE_CHECK_RET(ret, "acac handle preProcess failed");
-
-    if (mDes->id != 0) {
-        ret = des->pre_process(mPreInParam, mPreOutParam);
-        RKAIQCORE_CHECK_RET(ret, "acac handle pre_process failed");
+    if (!this->getAlgoId()) {
+        RkAiqAlgoProcResAcac* cac_rk = (RkAiqAlgoProcResAcac*)cac_com;
+        if (sharedCom->init) {
+            cac_param->frame_id = 0;
+        } else {
+            cac_param->frame_id = shared->frameId;
+        }
+        memcpy(&cac_param->result.cfg[0], &cac_rk->config[0], sizeof(cac_rk->config[0]));
+        memcpy(&cac_param->result.cfg[1], &cac_rk->config[1], sizeof(cac_rk->config[1]));
     }
 
-    EXIT_ANALYZER_FUNCTION();
-    return ret;
-}
-
-XCamReturn RkAiqAcacHandle::processing() {
-    XCamReturn ret                              = XCAM_RETURN_NO_ERROR;
-    RkAiqAlgoDescription* des                   = (RkAiqAlgoDescription*)mDes;
-    RkAiqCore::RkAiqAlgosComShared_t* sharedCom = &mAiqCore->mAlogsComSharedParams;
-    RkAiqCore::RkAiqAlgosGroupShared_t* shared  = nullptr;
-
-    int groupId = mAiqCore->getGroupId(RK_AIQ_ALGO_TYPE_ACAC);
-    if (groupId >= 0) {
-        if (mAiqCore->getGroupSharedParams(groupId, shared) != XCAM_RETURN_NO_ERROR)
-            return XCAM_RETURN_BYPASS;
-    } else
-        return XCAM_RETURN_BYPASS;
-    RkAiqIspStats* ispStats = shared->ispStats;
-
-    ret = RkAiqHandle::processing();
-    RKAIQCORE_CHECK_RET(ret, "acac handle processing failed");
-
-    if (mDes->id != 0) {
-        ret = des->processing(mProcInParam, mProcOutParam);
-        RKAIQCORE_CHECK_RET(ret, "acac algo processing failed");
-    }
-
-    EXIT_ANALYZER_FUNCTION();
-    return ret;
-}
-
-XCamReturn RkAiqAcacHandle::postProcess() {
-    ENTER_ANALYZER_FUNCTION();
-    XCamReturn ret                              = XCAM_RETURN_NO_ERROR;
-    RkAiqAlgoDescription* des                   = (RkAiqAlgoDescription*)mDes;
-    RkAiqCore::RkAiqAlgosComShared_t* sharedCom = &mAiqCore->mAlogsComSharedParams;
-    RkAiqCore::RkAiqAlgosGroupShared_t* shared  = nullptr;
-
-    int groupId = mAiqCore->getGroupId(RK_AIQ_ALGO_TYPE_ACAC);
-    if (groupId >= 0) {
-        if (mAiqCore->getGroupSharedParams(groupId, shared) != XCAM_RETURN_NO_ERROR)
-            return XCAM_RETURN_BYPASS;
-    } else
-        return XCAM_RETURN_BYPASS;
-
-    ret = RkAiqHandle::postProcess();
-    RKAIQCORE_CHECK_RET(ret, "acac handle postProcess failed");
-
-    if (mDes->id != 0) {
-        ret = des->post_process(mPostInParam, mPostOutParam);
-        RKAIQCORE_CHECK_RET(ret, "acac algo postProcess failed");
-    }
+    cur_params->mCacV3xParams = params->mCacV3xParams;
 
     EXIT_ANALYZER_FUNCTION();
     return ret;

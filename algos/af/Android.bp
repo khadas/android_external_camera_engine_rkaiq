@@ -3,3 +3,9 @@ cc_rockchip_prebuilt_library_static {
     vendor: true,
     aiq: true,
 }
+
+cc_rockchip_prebuilt_library_static {
+    name: "librkaiq_pdaf",
+    vendor: true,
+    aiq: true,
+}

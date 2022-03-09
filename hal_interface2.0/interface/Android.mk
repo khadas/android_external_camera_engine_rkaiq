@@ -77,8 +77,6 @@ LOCAL_SHARED_LIBRARIES += \
 #external/camera_engine_rkaiq
 LOCAL_C_INCLUDES += \
 	external/camera_engine_rkaiq \
-	external/camera_engine_rkaiq/include/uAPI \
-	external/camera_engine_rkaiq/include/uAPI \
 	external/camera_engine_rkaiq/xcore \
 	external/camera_engine_rkaiq/xcore/base \
 	external/camera_engine_rkaiq/aiq_core \
@@ -90,7 +88,7 @@ LOCAL_C_INCLUDES += \
 	external/camera_engine_rkaiq/common \
 	external/camera_engine_rkaiq/common/linux \
 	external/camera_engine_rkaiq/include \
-	external/camera_engine_rkaiq/include/iq_parser \
+	external/camera_engine_rkaiq/include/uAPI2 \
 	external/camera_engine_rkaiq/include/uAPI \
 	external/camera_engine_rkaiq/include/xcore \
 	external/camera_engine_rkaiq/include/common \

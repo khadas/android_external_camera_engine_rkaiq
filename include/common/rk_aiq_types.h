@@ -454,6 +454,9 @@ typedef rk_aiq_af_algo_stat_v20_t rk_aiq_isp_af_stats_t;
 typedef rk_aiq_af_algo_meas_v20_t rk_aiq_isp_af_meas_t;
 typedef rk_aiq_af_algo_focus_pos_t rk_aiq_af_focus_pos_meas_t;
 
+typedef rk_aiq_pdaf_algo_stat_t rk_aiq_isp_pdaf_stats_t;
+typedef rk_aiq_pdaf_algo_meas_t rk_aiq_isp_pdaf_meas_t;
+
 typedef rk_aiq_ae_meas_params_t rk_aiq_isp_aec_meas_t;
 typedef rk_aiq_hist_meas_params_t rk_aiq_isp_hist_meas_t;
 
@@ -533,8 +536,8 @@ typedef struct {
     int awb_hw_ver;
     union {
         rk_aiq_awb_stat_res_v200_t awb_stats_v200;
-        rk_aiq_awb_stat_res_v201_t awb_stats_v21;
-        rk_aiq_isp_awb_stats_v3x_t awb_stats_v3x;
+        rk_aiq_awb_stat_res2_v201_t awb_stats_v21;
+        rk_aiq_isp_awb_stats2_v3x_t awb_stats_v3x;
     };
     int af_hw_ver;
     union {
@@ -548,7 +551,7 @@ typedef RkAiqAtmoProcResult_t rk_aiq_isp_tmo_t;
 
 typedef RkAiqAdrcProcResult_t rk_aiq_isp_drc_t;
 
-typedef AdehazeV20ProcResult_t rk_aiq_isp_dehaze_t;
+typedef RkAiqAdehazeProcResult_t rk_aiq_isp_dehaze_t;
 
 
 #if ANR_NO_SEPERATE_MARCO
@@ -694,12 +697,6 @@ typedef struct rk_aiq_cpsl_cap_s {
 
 // v21 types
 
-// drc , alias name of TMO
-/*typedef struct rk_aiq_isp_drc_v21_s {
-    //TODO:
-    void* place_holder;
-} rk_aiq_isp_drc_v21_t;*/
-
 typedef RkAiqAdrcProcResult_t rk_aiq_isp_drc_v21_t;
 
 typedef struct rk_aiq_isp_blc_v21_s {
@@ -812,6 +809,6 @@ typedef enum rk_isp_stream_mode_e {
     RK_ISP_STREAM_MODE_OFFLNIE,
 } rk_isp_stream_mode_t;
 
-#define RK_AIQ_CAM_GROUP_MAX_CAMS (6)
+#define RK_AIQ_CAM_GROUP_MAX_CAMS (8)
 
 #endif

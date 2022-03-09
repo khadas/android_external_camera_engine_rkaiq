@@ -1,5 +1,5 @@
 /*
- * rk_aiq_algo_acsm_itf.c
+ * rk_aiq_algo_ACSM_itf.c
  *
  *  Copyright (c) 2019 Rockchip Corporation
  *
@@ -17,10 +17,11 @@
  *
  */
 
-#include "rk_aiq_algo_types_int.h"
 #include "acsm/rk_aiq_algo_acsm_itf.h"
+#include "rk_aiq_algo_types.h"
 #include "rk_aiq_types_algo_acsm_prvt.h"
 #include "xcam_log.h"
+
 RKAIQ_BEGIN_DECLARE
 
 static rk_aiq_acsm_params_t g_csm_def = {
@@ -29,9 +30,9 @@ static rk_aiq_acsm_params_t g_csm_def = {
     .y_offset = 0,
     .c_offset = 0,
     .coeff = {
-            0x021, 0x040, 0x00d,
-            0x1ed, 0x1db, 0x038,
-            0x038, 0x1d1, 0x1f7
+            0.299, 0.587, 0.114,
+            -0.169, -0.331, 0.5,
+            0.5, -0.419, -0.081
     }
 };
 
@@ -40,16 +41,22 @@ create_context(RkAiqAlgoContext **context, const AlgoCtxInstanceCfg* cfg)
 {
     RkAiqAlgoContext *ctx = new RkAiqAlgoContext();
     if (ctx == NULL) {
-        LOGE_ACSM( "%s: create acsm context fail!\n", __FUNCTION__);
+        LOGE_ACSM( "%s: create ACSM context fail!\n", __FUNCTION__);
         return XCAM_RETURN_ERROR_MEM;
     }
 
+    ctx->acsmCtx.calibv2 = cfg->calibv2;
     rk_aiq_acsm_params_t* params = &ctx->acsmCtx.params;
     memset(params, 0, sizeof(*params));
     if (ctx->acsmCtx.calibv2) {
-        Csm_Param_t* csm =
+        Csm_Param_t *csm =
             (Csm_Param_t*)(CALIBDBV2_GET_MODULE_PTR(ctx->acsmCtx.calibv2, csm));
-        if (csm) *params = *csm;
+        if (csm) {
+            *params = *csm;
+        } else {
+            *params = g_csm_def;
+        }
+
     } else {
         // auto means using chip reset valuse
         *params = g_csm_def;
@@ -73,6 +80,14 @@ prepare(RkAiqAlgoCom* params)
     rk_aiq_acsm_params_t* acsm_params = &params->ctx->acsmCtx.params;
     RkAiqAlgoConfigAcsm* pCfgParam = (RkAiqAlgoConfigAcsm*)params;
 
+	if(!!(params->u.prepare.conf_type & RK_AIQ_ALGO_CONFTYPE_UPDATECALIB )){
+        if (pCfgParam->com.u.prepare.calibv2) {
+            Csm_Param_t *csm =
+                (Csm_Param_t*)(CALIBDBV2_GET_MODULE_PTR(pCfgParam->com.u.prepare.calibv2, csm));
+            if (csm)
+                *acsm_params = *csm;
+        }
+    }
     return XCAM_RETURN_NO_ERROR;
 }
 
