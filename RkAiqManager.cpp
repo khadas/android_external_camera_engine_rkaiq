@@ -283,6 +283,8 @@ RkAiqManager::prepare(uint32_t width, uint32_t height, rk_aiq_working_mode_t mod
 
     xcam_mem_clear(sensor_des);
     ret = mCamHw->getSensorModeData(mSnsEntName, sensor_des);
+    sensor_output_width = sensor_des.sensor_output_width;
+    sensor_output_height = sensor_des.sensor_output_height;
     int w,h,aligned_w,aligned_h;
     ret = mCamHw->get_sp_resolution(w, h, aligned_w, aligned_h);
     ret = mRkAiqAnalyzer->set_sp_resolution(w, h, aligned_w, aligned_h);

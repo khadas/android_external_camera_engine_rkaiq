@@ -233,10 +233,8 @@ AiqCameraHalAdapter::set_control_params(const int request_frame_id,
     inputParams->staticMeta = &AiqCameraHalAdapter::staticMeta;
     if(_settingsProcessor) {
         SmartPtr<RkCam::RkAiqManager> rk_aiq_manager = _aiq_ctx->_rkAiqManager; //current not use
-        rk_aiq_exposure_sensor_descriptor sns_des;
-        ret = _aiq_ctx->_camHw->getSensorModeData(_aiq_ctx->_sensor_entity_name, sns_des);
-        inputParams->sensorOutputWidth = sns_des.sensor_output_width;
-        inputParams->sensorOutputHeight = sns_des.sensor_output_height;
+        inputParams->sensorOutputWidth = rk_aiq_manager->sensor_output_width;
+        inputParams->sensorOutputHeight = rk_aiq_manager->sensor_output_height;
         _settingsProcessor->processRequestSettings(inputParams->settings, *inputParams.ptr());
     } else {
         LOGE("@%s %d: _settingsProcessor is null , is a bug, fix me", __FUNCTION__, __LINE__);

@@ -202,6 +202,8 @@ public:
     rk_aiq_working_mode_t getWorkingMode() {
         return mWorkingMode;
     }
+    uint32_t sensor_output_width;
+    uint32_t sensor_output_height;
 protected:
     XCamReturn applyAnalyzerResult(SmartPtr<RkAiqFullParamsProxy>& results);
     XCamReturn swWorkingModeDyn(rk_aiq_working_mode_t mode);
