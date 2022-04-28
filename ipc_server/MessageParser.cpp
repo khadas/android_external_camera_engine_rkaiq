@@ -30,7 +30,8 @@
 
 namespace RkMSG {
 
-MessageParser::MessageParser() : is_running(false) {}
+MessageParser::MessageParser(void* ptr) : pri(ptr), is_running(false) {
+}
 
 int MessageParser::stop() {
   is_running = false;
