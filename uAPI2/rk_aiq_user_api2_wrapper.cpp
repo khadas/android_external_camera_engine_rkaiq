@@ -488,6 +488,28 @@ XCamReturn rk_aiq_get_adehaze_manual_attr(const rk_aiq_sys_ctx_t *sys_ctx,
   return XCAM_RETURN_NO_ERROR;
 }
 
+XCamReturn rk_aiq_set_adebayer_attr(const rk_aiq_sys_ctx_t *sys_ctx,
+                                    adebayer_attrib_t *adebayer_attr) {
+  adebayer_attrib_t attr;
+
+  memset(&attr, 0, sizeof(attr));
+  rk_aiq_user_api2_adebayer_GetAttrib(sys_ctx, &attr);
+  memcpy(&attr, adebayer_attr, sizeof(attr));
+
+  return rk_aiq_user_api2_adebayer_SetAttrib(sys_ctx, attr);
+}
+
+XCamReturn rk_aiq_get_adebayer_attr(const rk_aiq_sys_ctx_t *sys_ctx,
+                                    adebayer_attrib_t *adebayer_attr) {
+  adebayer_attrib_t attr;
+
+  memset(&attr, 0, sizeof(attr));
+  rk_aiq_user_api2_adebayer_GetAttrib(sys_ctx, &attr);
+  memcpy(adebayer_attr, &attr, sizeof(attr));
+
+  return XCAM_RETURN_NO_ERROR;
+}
+
 XCamReturn rk_aiq_set_alsc_manual_attr(const rk_aiq_sys_ctx_t *sys_ctx,
                                        rk_aiq_lsc_table_t *manual) {
   rk_aiq_lsc_attrib_t alsc_attr;

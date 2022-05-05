@@ -2,13 +2,11 @@
 #define __RKAIQ_TYPES_ALGO_ADEBAYER_PRVT_H__
 
 #include <atomic>
-#include "base/xcam_common.h"
 #include "rk_aiq_types_algo_adebayer_int.h"
 #include "RkAiqCalibDbTypes.h"
 #include "RkAiqCalibDbTypesV2.h"
 #include "RkAiqCalibDbV2Helper.h"
 #include "xcam_log.h"
-#include "rk_aiq_uapi_adebayer_int.h"
 
 typedef enum AdebayerState_e {
     ADEBAYER_STATE_INVALID           = 0,
@@ -19,7 +17,7 @@ typedef enum AdebayerState_e {
     ADEBAYER_STATE_MAX
 } AdebayerState_t;
 
-typedef struct AdebayerFullParam_s{
+typedef struct AdebayerFullParam_s {
     unsigned char enable;
     int iso[9];
     signed char filter1[5];
@@ -37,7 +35,7 @@ typedef struct AdebayerFullParam_s{
     unsigned char cnr_strength;
     unsigned char shift_num;
     std::atomic<bool> updated;
-}AdebayerFullParam_t;
+} AdebayerFullParam_t;
 
 typedef struct AdebayerContext_s {
     AdebayerConfig_t config;
@@ -53,23 +51,5 @@ typedef struct AdebayerContext_s {
 typedef struct _RkAiqAlgoContext {
     AdebayerContext_t adebayerCtx;
 } RkAiqAlgoContext;
-
-XCamReturn AdebayerInit(AdebayerContext_t *ppAdebayerCtx, CamCalibDbContext_t *pCalibDb, CamCalibDbV2Context_t *pCalibDbV2);
-
-XCamReturn AdebayerRelease(AdebayerContext_t *pAdebayerCtx);
-
-XCamReturn AdebayerStart(AdebayerContext_t *pAdebayerCtx);
-
-XCamReturn AdebayerStop(AdebayerContext_t *pAdebayerCtx);
-
-XCamReturn AdebayerConfig(AdebayerContext_t *pAdebayerCtx, AdebayerConfig_t* pAdebayerConfig);
-
-XCamReturn AdebayerReConfig(AdebayerContext_t *pAdebayerCtx, AdebayerConfig_t* pAdebayerConfig);
-
-XCamReturn AdebayerPreProcess(AdebayerContext_t *pAdebayerCtx);
-
-XCamReturn AdebayerProcess(AdebayerContext_t *pAdebayerCtx, int ISO);
-
-XCamReturn AdebayerGetProcResult(AdebayerContext_t *pAdebayerCtx, AdebayerProcResult_t* pAdebayerResult);
 
 #endif//__RKAIQ_TYPES_ALGO_ADEBAYER_PRVT_H__

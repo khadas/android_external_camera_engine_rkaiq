@@ -163,4 +163,10 @@ XCamReturn rk_aiq_get_current_camindex(const rk_aiq_sys_ctx_t *sys_ctx,
 
 rk_aiq_sys_ctx_t* rk_aiq_get_last_sysctx(rk_aiq_sys_ctx_t *sys_ctx);
 
+XCamReturn rk_aiq_set_adebayer_attr(const rk_aiq_sys_ctx_t *sys_ctx,
+                                    adebayer_attrib_t *adebayer_attr);
+
+XCamReturn rk_aiq_get_adebayer_attr(const rk_aiq_sys_ctx_t *sys_ctx,
+                                    adebayer_attrib_t *adebayer_attr);
+
 #endif /*__RK_AIQ_USER_API2_WRAPPER_H__*/

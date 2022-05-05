@@ -1342,9 +1342,9 @@ XCamReturn AmergeInit
         pAmergeCtx->mergeAttr.attrV21.stManual.OECurve.Smooth = 0.4;
         pAmergeCtx->mergeAttr.attrV21.stManual.OECurve.Offset = 210;
         pAmergeCtx->mergeAttr.attrV21.stManual.MDCurve.LM_smooth = 0.4;
-        pAmergeCtx->mergeAttr.attrV21.stManual.MDCurve.LM_offset = 38;
+        pAmergeCtx->mergeAttr.attrV21.stManual.MDCurve.LM_offset = 0.38;
         pAmergeCtx->mergeAttr.attrV21.stManual.MDCurve.MS_smooth = 0.4;
-        pAmergeCtx->mergeAttr.attrV21.stManual.MDCurve.MS_offset = 38;
+        pAmergeCtx->mergeAttr.attrV21.stManual.MDCurve.MS_offset = 0.38;
     }
     else if(CHECK_ISP_HW_V30()) {
         CalibDbV2_merge_V2_t* calibv2_amerge_calib =
@@ -1400,9 +1400,9 @@ XCamReturn AmergeInit
         pAmergeCtx->mergeAttr.attrV30.stManual.LongFrmModeData.OECurve.Smooth = 0.4;
         pAmergeCtx->mergeAttr.attrV30.stManual.LongFrmModeData.OECurve.Offset = 210;
         pAmergeCtx->mergeAttr.attrV30.stManual.LongFrmModeData.MDCurve.LM_smooth = 0.4;
-        pAmergeCtx->mergeAttr.attrV30.stManual.LongFrmModeData.MDCurve.LM_offset = 38;
+        pAmergeCtx->mergeAttr.attrV30.stManual.LongFrmModeData.MDCurve.LM_offset = 0.38;
         pAmergeCtx->mergeAttr.attrV30.stManual.LongFrmModeData.MDCurve.MS_smooth = 0.4;
-        pAmergeCtx->mergeAttr.attrV30.stManual.LongFrmModeData.MDCurve.MS_offset = 38;
+        pAmergeCtx->mergeAttr.attrV30.stManual.LongFrmModeData.MDCurve.MS_offset = 0.38;
 
         pAmergeCtx->mergeAttr.attrV30.stManual.ShortFrmModeData.OECurve.Smooth = 0.4;
         pAmergeCtx->mergeAttr.attrV30.stManual.ShortFrmModeData.OECurve.Offset = 210;

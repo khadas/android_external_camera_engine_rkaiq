@@ -281,23 +281,6 @@ processing(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outparams)
                 LOGE_ATMO("%s: AE ratio for drc expo sync is under one!!!\n", __FUNCTION__);
 
             pAdrcGrpCtx->PrevData.ApiMode = pAdrcGrpCtx->drcAttr.opMode;
-            // output ProcRes
-            for (int i = 0; i < pAdrcGrpProcRes->arraySize; i++) {
-                pAdrcGrpProcRes->camgroupParmasArray[i]->_adrcConfig->update =
-                    !bypass;  // not use in isp3xparams for now
-                pAdrcGrpProcRes->camgroupParmasArray[i]->_adrcConfig->CompressMode =
-                    pAdrcGrpCtx->AdrcProcRes.CompressMode;
-                pAdrcGrpProcRes->camgroupParmasArray[i]->_adrcConfig->LongFrameMode =
-                    pAdrcGrpCtx->AdrcProcRes.LongFrameMode;
-                pAdrcGrpProcRes->camgroupParmasArray[i]->_adrcConfig->isHdrGlobalTmo =
-                    pAdrcGrpCtx->AdrcProcRes.isHdrGlobalTmo;
-                pAdrcGrpProcRes->camgroupParmasArray[i]->_adrcConfig->bTmoEn =
-                    pAdrcGrpCtx->AdrcProcRes.bTmoEn;
-                pAdrcGrpProcRes->camgroupParmasArray[i]->_adrcConfig->isLinearTmo =
-                    pAdrcGrpCtx->AdrcProcRes.isLinearTmo;
-                memcpy(&pAdrcGrpProcRes->camgroupParmasArray[i]->_adrcConfig->DrcProcRes,
-                       &pAdrcGrpCtx->AdrcProcRes.DrcProcRes, sizeof(DrcProcRes_t));
-            }
 
             LOGD_ATMO(
                 "%s://////////////////////////////////////ADRC Group "
@@ -305,6 +288,23 @@ processing(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outparams)
                 __func__);
         } else
             LOGD_ATMO("%s: Group Drc Enable if OFF, Bypass Drc !!! \n", __func__);
+
+        // output ProcRes
+        for (int i = 0; i < pAdrcGrpProcRes->arraySize; i++) {
+            pAdrcGrpProcRes->camgroupParmasArray[i]->_adrcConfig->update =
+                !bypass;  // not use in isp3xparams for now
+            pAdrcGrpProcRes->camgroupParmasArray[i]->_adrcConfig->CompressMode =
+                pAdrcGrpCtx->AdrcProcRes.CompressMode;
+            pAdrcGrpProcRes->camgroupParmasArray[i]->_adrcConfig->LongFrameMode =
+                pAdrcGrpCtx->AdrcProcRes.LongFrameMode;
+            pAdrcGrpProcRes->camgroupParmasArray[i]->_adrcConfig->isHdrGlobalTmo =
+                pAdrcGrpCtx->AdrcProcRes.isHdrGlobalTmo;
+            pAdrcGrpProcRes->camgroupParmasArray[i]->_adrcConfig->bTmoEn = Enable;
+            pAdrcGrpProcRes->camgroupParmasArray[i]->_adrcConfig->isLinearTmo =
+                pAdrcGrpCtx->AdrcProcRes.isLinearTmo;
+            memcpy(&pAdrcGrpProcRes->camgroupParmasArray[i]->_adrcConfig->DrcProcRes,
+                   &pAdrcGrpCtx->AdrcProcRes.DrcProcRes, sizeof(DrcProcRes_t));
+            }
 
         LOG1_ATMO("%s:Exit!\n", __FUNCTION__);
         return XCAM_RETURN_NO_ERROR;

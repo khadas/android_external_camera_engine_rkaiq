@@ -89,13 +89,14 @@ __RKAIQUAPI_CALLER(aie_attrib_t);
 __RKAIQUAPI_CALLER(acp_attrib_t);
 __RKAIQUAPI_CALLER(rk_aiq_lsc_table_t);
 __RKAIQUAPI_CALLER(camgroup_uapi_t);
+__RKAIQUAPI_CALLER(adebayer_attrib_t);
 
 RkAiqUapiDesc_t rkaiq_uapidesc_list[] = {
     __RKAIQUAPI_DESC_DEF("/uapi/0/ae_uapi/expsw_attr", uapi_expsw_attr_t,
                          __RKAIQUAPI_SET_WRAPPER_NAME(rk_aiq_tool_api_ae_setExpSwAttr),
                          rk_aiq_user_api2_ae_getExpSwAttr),
     __RKAIQUAPI_DESC_DEF("/uapi/0/ae_uapi/expinfo", uapi_expinfo_t, NULL,
-                         rk_aiq_user_api_ae_queryExpResInfo),
+                         rk_aiq_user_api2_ae_queryExpResInfo),
     __RKAIQUAPI_DESC_DEF("/uapi/0/awb_uapi/wbgain", uapi_wb_gain_t, rk_aiq_tool_api_setMWBGain,
                          rk_aiq_uapi2_getWBGain),
     __RKAIQUAPI_DESC_DEF("/uapi/0/awb_uapi/mode", uapi_wb_mode_t, rk_aiq_tool_api_setWBMode,
@@ -172,6 +173,10 @@ RkAiqUapiDesc_t rkaiq_uapidesc_list[] = {
                          camgroup_uapi_t,
                          rk_aiq_set_current_camindex,
                          rk_aiq_get_current_camindex),
+    __RKAIQUAPI_DESC_DEF("/uapi/0/adebayer_uapi/adebayer_attr",
+                         adebayer_attrib_t,
+                         rk_aiq_set_adebayer_attr,
+                         rk_aiq_get_adebayer_attr),
 };
 /***********************END OF CUSTOM AREA**************************/
 

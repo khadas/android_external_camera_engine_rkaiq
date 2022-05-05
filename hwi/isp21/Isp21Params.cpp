@@ -68,7 +68,7 @@ void
 Isp21Params::convertAiqBlcToIsp21Params(T& isp_cfg,
                                         rk_aiq_isp_blc_v21_t &blc)
 {
-    LOGD_CAMHW_SUBM(ISP20PARAM_SUBM, "%s:(%d) enter \n", __FUNCTION__, __LINE__);
+    LOG1_CAMHW_SUBM(ISP20PARAM_SUBM, "%s:(%d) enter \n", __FUNCTION__, __LINE__);
     int tmp = 0;
 
     if(blc.v0.enable) {
@@ -134,7 +134,7 @@ Isp21Params::convertAiqBlcToIsp21Params(T& isp_cfg,
     isp_cfg.others.bls_cfg.bls1_val.b = tmp;
 #endif
 
-    LOGD_CAMHW_SUBM(ISP20PARAM_SUBM, "%s:(%d) exit \n", __FUNCTION__, __LINE__);
+    LOG1_CAMHW_SUBM(ISP20PARAM_SUBM, "%s:(%d) exit \n", __FUNCTION__, __LINE__);
 
 }
 

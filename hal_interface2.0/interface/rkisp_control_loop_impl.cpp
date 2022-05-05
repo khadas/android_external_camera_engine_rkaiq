@@ -347,7 +347,7 @@ int rkisp_cl_rkaiq_init(void** cl_ctx, const char* tuning_file_path,
     LOGD("--------------------------rk_aiq_uapi_sysctl_init");
     rk_aiq_sys_ctx_t* aiq_ctx = NULL;
     AiqCameraHalAdapter *gAiqCameraHalAdapter = new AiqCameraHalAdapter();
-    rk_aiq_metas_cb sMetas_cb = [=] (rk_aiq_metas_t* metas) ->XCamReturn{
+    rk_aiq_metas_cb sMetas_cb = [=] (rk_aiq_metas_t* metas) -> XCamReturn {
         LOGD("----------rkisp_aiq_metas_cb---metas.frame_id:%d-----------",metas->frame_id);
         if((gAiqCameraHalAdapter)!=NULL){
             gAiqCameraHalAdapter->metaCallback();

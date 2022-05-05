@@ -1,5 +1,5 @@
 #include "rk_aiq_uapi_adebayer_int.h"
-#include "rk_aiq_types_algo_adebayer_prvt.h"
+#include "rk_aiq_algo_adebayer.h"
 
 XCamReturn
 rk_aiq_uapi_adebayer_SetAttrib
@@ -10,7 +10,7 @@ rk_aiq_uapi_adebayer_SetAttrib
 )
 {
     if(ctx == NULL) {
-        LOGE_ADEBAYER("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
+        LOGE("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
         return XCAM_RETURN_ERROR_PARAM;
     }
 
@@ -25,7 +25,7 @@ rk_aiq_uapi_adebayer_SetAttrib
     } else if (attr.mode == RK_AIQ_DEBAYER_MODE_MANUAL) {
         memcpy(&pAdebayerCtx->manualAttrib, &attr.stManual, sizeof(attr.stManual));
     } else {
-        LOGE_ADEBAYER("Invalid mode: %s\n", attr.mode == RK_AIQ_DEBAYER_MODE_AUTO ? "auto" : "manual");
+        LOGE("Invalid mode: %s\n", attr.mode == RK_AIQ_DEBAYER_MODE_AUTO ? "auto" : "manual");
         return XCAM_RETURN_ERROR_PARAM;
     }
 
@@ -42,7 +42,7 @@ rk_aiq_uapi_adebayer_GetAttrib
 )
 {
     if(ctx == NULL || attr == NULL) {
-        LOGE_ADEBAYER("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
+        LOGE("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
         return XCAM_RETURN_ERROR_PARAM;
     }
 

@@ -182,7 +182,7 @@ RkAiqCamGroupManager::clearGroupCamResult_Locked(uint32_t frameId)
                 camGroupRes = iter->second;
                 if (camGroupRes->_refCnt > 0) {
                     if (iter->first < mClearedResultId) {
-                        LOGE("impossible, id:%u < mClearedResultId:%u, refCnt: %u",
+                        LOGW("impossible, id:%u < mClearedResultId:%u, refCnt: %u",
                              iter->first, mClearedResultId, camGroupRes->_refCnt);
                     }
                     iter++;
@@ -628,6 +628,7 @@ RkAiqCamGroupManager::newAlgoHandle(RkAiqAlgoDesComm* algo, int hw_ver)
     NEW_ALGO_HANDLE(AbayertnrV2, AMFNR);
     NEW_ALGO_HANDLE(Alsc, ALSC);
     NEW_ALGO_HANDLE(Adpcc, ADPCC);
+    NEW_ALGO_HANDLE(AgainV2, AGAIN);
     /* TODO: new the handle of other algo modules */
 
     return new RkAiqCamgroupHandle(algo, this);
@@ -971,119 +972,119 @@ RkAiqCamGroupManager::reProcess(rk_aiq_groupcam_result_t* gc_res)
                 LOGW_CAMGROUP("camId:%d, framId:%u, exp is null", i, gc_res->_frameId);
                 // frame 1,2 exp may be null now
                 //if (gc_res->_frameId == 1)
-                return XCAM_RETURN_NO_ERROR;
+                return XCAM_RETURN_ERROR_PARAM;
             }
 
             if (!aiqParams->mAecParams.ptr())
-                return XCAM_RETURN_NO_ERROR;
+                return XCAM_RETURN_ERROR_PARAM;
             scam_3a_res->aec._aeMeasParams = &aiqParams->mAecParams->data()->result;
 
             if (!aiqParams->mHistParams.ptr())
-                return XCAM_RETURN_NO_ERROR;
+                return XCAM_RETURN_ERROR_PARAM;
             scam_3a_res->aec._aeHistMeasParams = &aiqParams->mHistParams->data()->result;
 
             if (CHECK_ISP_HW_V21()) {
                 if (!aiqParams->mAwbV21Params.ptr())
-                    return XCAM_RETURN_NO_ERROR;
+                    return XCAM_RETURN_ERROR_PARAM;
                 scam_3a_res->awb._awbCfgV201 = &aiqParams->mAwbV21Params->data()->result;
             } else {
                 if (!aiqParams->mAwbV3xParams.ptr())
-                    return XCAM_RETURN_NO_ERROR;
+                    return XCAM_RETURN_ERROR_PARAM;
                 scam_3a_res->awb._awbCfgV3x = &aiqParams->mAwbV3xParams->data()->result;
             }
 
             if (!aiqParams->mDehazeParams.ptr())
-                return XCAM_RETURN_NO_ERROR;
+                return XCAM_RETURN_ERROR_PARAM;
 
             scam_3a_res->_adehazeConfig = &aiqParams->mDehazeParams->data()->result;
 
             if (!aiqParams->mMergeParams.ptr())
-                return XCAM_RETURN_NO_ERROR;
+                return XCAM_RETURN_ERROR_PARAM;
             scam_3a_res->_amergeConfig = &aiqParams->mMergeParams->data()->result;
 
             if (!aiqParams->mAgammaParams.ptr())
-                return XCAM_RETURN_NO_ERROR;
+                return XCAM_RETURN_ERROR_PARAM;
             scam_3a_res->_agammaConfig = &aiqParams->mAgammaParams->data()->result;
 
             if (!aiqParams->mDrcParams.ptr())
-                return XCAM_RETURN_NO_ERROR;
+                return XCAM_RETURN_ERROR_PARAM;
             scam_3a_res->_adrcConfig = &aiqParams->mDrcParams->data()->result;
 
             if (!aiqParams->mAwbGainParams.ptr())
-                return XCAM_RETURN_NO_ERROR;
+                return XCAM_RETURN_ERROR_PARAM;
             scam_3a_res->awb._awbGainParams = &aiqParams->mAwbGainParams->data()->result;
 
             if (!aiqParams->mLscParams.ptr())
-                return XCAM_RETURN_NO_ERROR;
+                return XCAM_RETURN_ERROR_PARAM;
             scam_3a_res->_lscConfig = &aiqParams->mLscParams->data()->result;
 
             if (!aiqParams->mDpccParams.ptr())
-                return XCAM_RETURN_NO_ERROR;
+                return XCAM_RETURN_ERROR_PARAM;
             scam_3a_res->_dpccConfig = &aiqParams->mDpccParams->data()->result;
 
             if (!aiqParams->mCcmParams.ptr())
-                return XCAM_RETURN_NO_ERROR;
+                return XCAM_RETURN_ERROR_PARAM;
             scam_3a_res->_ccmCfg = &aiqParams->mCcmParams->data()->result;
 
             if (!aiqParams->mLut3dParams.ptr())
-                return XCAM_RETURN_NO_ERROR;
+                return XCAM_RETURN_ERROR_PARAM;
             scam_3a_res->_lut3dCfg = &aiqParams->mLut3dParams->data()->result;
 
             if (!aiqParams->mBlcV21Params.ptr())
-                return XCAM_RETURN_NO_ERROR;
+                return XCAM_RETURN_ERROR_PARAM;
             scam_3a_res->_blcConfig = &aiqParams->mBlcV21Params->data()->result;
 
 
             if (CHECK_ISP_HW_V21()) {
                 if (!aiqParams->mYnrV21Params.ptr())
-                    return XCAM_RETURN_NO_ERROR;
+                    return XCAM_RETURN_ERROR_PARAM;
                 scam_3a_res->aynr._aynr_procRes_v2 = &aiqParams->mYnrV21Params->data()->result;
             } else {
                 if (!aiqParams->mYnrV3xParams.ptr())
-                    return XCAM_RETURN_NO_ERROR;
+                    return XCAM_RETURN_ERROR_PARAM;
                 scam_3a_res->aynr._aynr_procRes_v3 = &aiqParams->mYnrV3xParams->data()->result;
             }
 
             if (CHECK_ISP_HW_V21()) {
                 if (!aiqParams->mCnrV21Params.ptr())
-                    return XCAM_RETURN_NO_ERROR;
+                    return XCAM_RETURN_ERROR_PARAM;
                 scam_3a_res->acnr._acnr_procRes_v1 = &aiqParams->mCnrV21Params->data()->result;
             } else {
                 if (!aiqParams->mCnrV3xParams.ptr())
-                    return XCAM_RETURN_NO_ERROR;
+                    return XCAM_RETURN_ERROR_PARAM;
                 scam_3a_res->acnr._acnr_procRes_v2 = &aiqParams->mCnrV3xParams->data()->result;
             }
 
             if (CHECK_ISP_HW_V21()) {
                 if (!aiqParams->mSharpenV21Params.ptr())
-                    return XCAM_RETURN_NO_ERROR;
+                    return XCAM_RETURN_ERROR_PARAM;
                 scam_3a_res->asharp._asharp_procRes_v3 = &aiqParams->mSharpenV21Params->data()->result;
             } else {
                 if (!aiqParams->mSharpenV3xParams.ptr())
-                    return XCAM_RETURN_NO_ERROR;
+                    return XCAM_RETURN_ERROR_PARAM;
                 scam_3a_res->asharp._asharp_procRes_v4 = &aiqParams->mSharpenV3xParams->data()->result;
             }
 
 
             if (CHECK_ISP_HW_V21()) {
                 if (!aiqParams->mBaynrV21Params.ptr())
-                    return XCAM_RETURN_NO_ERROR;
+                    return XCAM_RETURN_ERROR_PARAM;
                 scam_3a_res->abayernr._abayernr_procRes_v1 = &aiqParams->mBaynrV21Params->data()->result;
             } else {
                 if (!aiqParams->mBaynrV3xParams.ptr())
-                    return XCAM_RETURN_NO_ERROR;
+                    return XCAM_RETURN_ERROR_PARAM;
                 scam_3a_res->abayernr._abayer2dnr_procRes_v2 = &aiqParams->mBaynrV3xParams->data()->result;
             }
 
             if (CHECK_ISP_HW_V30()) {
                 if (!aiqParams->mTnrV3xParams.ptr())
-                    return XCAM_RETURN_NO_ERROR;
+                    return XCAM_RETURN_ERROR_PARAM;
                 scam_3a_res->abayertnr._abayertnr_procRes_v2 = &aiqParams->mTnrV3xParams->data()->result;
             }
 
             if (CHECK_ISP_HW_V30()) {
                 if (!aiqParams->mGainV3xParams.ptr())
-                    return XCAM_RETURN_NO_ERROR;
+                    return XCAM_RETURN_ERROR_PARAM;
                 scam_3a_res->again._again_procRes_v2 = &aiqParams->mGainV3xParams->data()->result;
             }
             camgroupParmasArray[vaild_cam_ind++] = scam_3a_res;

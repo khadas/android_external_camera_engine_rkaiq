@@ -210,14 +210,16 @@ typedef struct CalibDbV2_Af_PdafIsoPara_s {
     float pdConfdRatio1;
     // M4_NUMBER_DESC("pdConfdRatio2", "f32", M4_RANGE(0,1), "0", M4_DIGIT(3),M4_HIDE(0))
     float pdConfdRatio2;
+    // M4_NUMBER_DESC("pdNoiseBias", "f32", M4_RANGE(0,100), "0", M4_DIGIT(3),M4_HIDE(0))
+    float pdNoiseBias;
     // M4_NUMBER_DESC("pdConfdRhresh", "f32", M4_RANGE(0,1), "0", M4_DIGIT(3),M4_HIDE(0))
     float pdConfdThresh;
-    // M4_NUMBER_DESC("defocusPdThresh", "f32", M4_RANGE(0,1), "0", M4_DIGIT(3),M4_HIDE(0))
-    float defocusPdThresh;
+    // M4_NUMBER_DESC("defocusPdThresh", "u16", M4_RANGE(0,1023), "0", M4_DIGIT(0),M4_HIDE(0))
+    unsigned short defocusPdThresh;
     // M4_NUMBER_DESC("stablePdRatio", "f32", M4_RANGE(0,255), "0", M4_DIGIT(3),M4_HIDE(0))
     float stablePdRatio;
-    // M4_NUMBER_DESC("stablePdOffset", "f32", M4_RANGE(0,255), "0", M4_DIGIT(3),M4_HIDE(0))
-    float stablePdOffset;
+    // M4_NUMBER_DESC("stablePdOffset", "u16", M4_RANGE(0,1023), "0", M4_DIGIT(3),M4_HIDE(0))
+    unsigned short stablePdOffset;
     // M4_NUMBER_DESC("stableCntRatio", "f32", M4_RANGE(0,1), "0", M4_DIGIT(3),M4_HIDE(0))
     float stableCntRatio;
     // M4_NUMBER_DESC("noconfCntThresh", "u16", M4_RANGE(0,255), "0", M4_DIGIT(0),M4_HIDE(0))
@@ -232,6 +234,8 @@ typedef struct CalibDbV2_Af_Pdaf_s {
     bool enable;
     // M4_NUMBER_DESC("pdVsCdDebug", "u8", M4_RANGE(0, 1), "0", M4_DIGIT(0))
     unsigned char pdVsCdDebug;
+    // M4_NUMBER_DESC("pdDumpDebug", "u8", M4_RANGE(0, 1), "0", M4_DIGIT(0))
+    unsigned char pdDumpDebug;
     // M4_NUMBER_DESC("pdDataBit", "u16", M4_RANGE(1,16), "0", M4_DIGIT(0),M4_HIDE(0))
     unsigned short pdDataBit;
     // M4_NUMBER_DESC("pdBlkLevel", "u16", M4_RANGE(1,1023), "0", M4_DIGIT(0),M4_HIDE(0))
@@ -240,10 +244,18 @@ typedef struct CalibDbV2_Af_Pdaf_s {
     unsigned short pdSearchRadius;
     // M4_NUMBER_DESC("pdMirrorInCalib", "u8", M4_RANGE(0, 1), "0", M4_DIGIT(0))
     unsigned char pdMirrorInCalib;
+    // M4_NUMBER_DESC("pdVsImgoutMirror", "u8", M4_RANGE(0, 1), "0", M4_DIGIT(0))
+    unsigned char pdVsImgoutMirror;
     // M4_NUMBER_DESC("pdWidth", "u16", M4_RANGE(0, 65535), "0", M4_DIGIT(0))
     unsigned short pdWidth;
     // M4_NUMBER_DESC("pdHeight", "u16", M4_RANGE(0, 65535), "0", M4_DIGIT(0))
     unsigned short pdHeight;
+    // M4_NUMBER_DESC("pdConfdMwinFactor", "u16", M4_RANGE(0,225), "0", M4_DIGIT(0),M4_HIDE(0))
+    unsigned short pdConfdMwinFactor;
+    // M4_ARRAY_DESC("pdStepRatio", "f32", M4_SIZE(1,7), M4_RANGE(0,1), "0.5", M4_DIGIT(3), M4_DYNAMIC(0))
+    float pdStepRatio[7];
+    // M4_ARRAY_DESC("pdStepDefocus", "u16", M4_SIZE(1,7), M4_RANGE(0,1023), "0", M4_DIGIT(0), M4_DYNAMIC(0))
+    unsigned short pdStepDefocus[7];
     // M4_STRUCT_LIST_DESC("pdIsoPara", M4_SIZE(1,16), "normal_ui_style")
     CalibDbV2_Af_PdafIsoPara_t* pdIsoPara;
     int pdIsoPara_len;

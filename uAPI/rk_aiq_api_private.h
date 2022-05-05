@@ -82,6 +82,8 @@ void rk_aiq_ctx_set_tool_mode(const rk_aiq_sys_ctx_t* ctx, bool status);
 #define CHECK_USER_API_ENABLE2(ctx) \
     if (is_ctx_need_bypass(ctx)) { return XCAM_RETURN_NO_ERROR; }
 
+#define RKAIQ_NO_API_LOCK
+#ifndef RKAIQ_NO_API_LOCK
 #ifdef RKAIQ_ENABLE_CAMGROUP
 #define RKAIQ_API_SMART_LOCK(ctx) \
     const rk_aiq_camgroup_ctx_t* lock_group_ctx = NULL; \
@@ -91,6 +93,9 @@ void rk_aiq_ctx_set_tool_mode(const rk_aiq_sys_ctx_t* ctx, bool status);
 #else
 #define RKAIQ_API_SMART_LOCK(ctx) \
     SmartLock lock (*ctx->_apiMutex.ptr());
+#endif
+#else
+#define RKAIQ_API_SMART_LOCK(ctx)
 #endif
 
 }

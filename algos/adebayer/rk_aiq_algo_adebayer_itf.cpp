@@ -18,7 +18,7 @@
  */
 
 #include "adebayer/rk_aiq_algo_adebayer_itf.h"
-#include "adebayer/rk_aiq_types_algo_adebayer_prvt.h"
+#include "adebayer/rk_aiq_algo_adebayer.h"
 #include "rk_aiq_algo_types.h"
 
 RKAIQ_BEGIN_DECLARE
@@ -72,8 +72,8 @@ prepare
     AdebayerContext_t* pAdebayerCtx = (AdebayerContext_t *)&params->ctx->adebayerCtx;
     RkAiqAlgoConfigAdebayer* pCfgParam = (RkAiqAlgoConfigAdebayer*)params;
 
-	if(!!(params->u.prepare.conf_type & RK_AIQ_ALGO_CONFTYPE_UPDATECALIB )){
-		AdebayerInit(pAdebayerCtx, pCfgParam->com.u.prepare.calib, pCfgParam->com.u.prepare.calibv2);
+    if(!!(params->u.prepare.conf_type & RK_AIQ_ALGO_CONFTYPE_UPDATECALIB )) {
+        AdebayerInit(pAdebayerCtx, pCfgParam->com.u.prepare.calib, pCfgParam->com.u.prepare.calibv2);
     }
 
     AdebayerStart(pAdebayerCtx);

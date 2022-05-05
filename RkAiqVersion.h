@@ -376,10 +376,18 @@
  * - camgroup: add refCnt for shared resources
  * - reduce error log for RKAIQ running on serial port using 11520 baudrate
  * - add the function of reading/writing uapi parameters in real time for iq tools
+ * v3.0x8.8
+ * - hwi: optimize log printing for HWI
+ * - camgroup: return error when the params of algos is incorrect
+ * - PDAF: fix touchaf is abnormal
+ * - AF: support optical zoom on android
+ * - AF: adapt more type zoom-focus curve
+ * - AE: delete extra Semicolon & add pointer release in GrpAE
+ * - hwi: fix segment fault in setIspConfig when stopping AIQ
  */
 
-#define RK_AIQ_VERSION_REAL_V "v3.0x8.7"
-#define RK_AIQ_RELEASE_DATE "2022-03-18"
+#define RK_AIQ_VERSION_REAL_V "v3.0x8.8"
+#define RK_AIQ_RELEASE_DATE "2022-05-05"
 
 /******* DO NOT EDIT THE FOLLOWINGS ***********/
 

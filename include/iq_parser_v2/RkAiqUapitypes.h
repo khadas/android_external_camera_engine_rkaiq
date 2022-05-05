@@ -44,6 +44,8 @@
 #include "aie_uapi_head.h"
 #include "acp_uapi_head.h"
 #include "alsc_uapi_head.h"
+#include "adebayer/rk_aiq_types_adebayer_ext.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -158,6 +160,10 @@ typedef struct __custom_af_uapi {
     // M4_STRUCT_DESC("custom_af_res", "normal_ui_style")
     rk_tool_customAf_res_t custom_af_res;
 } custom_af_uapi_t;
+typedef struct __adebayer_uapi {
+    // M4_STRUCT_DESC("adebayer_attr", "normal_ui_style")
+    adebayer_attrib_t   adebayer_attr;
+} adebayer_uapi_t;
 
 typedef struct __accm_uapi_v30 {
     // M4_STRUCT_DESC("manual", "normal_ui_style")
@@ -252,6 +258,8 @@ typedef struct __aiq_uapi_t {
     // M4_STRUCT_DESC("camgroup_uapi", "normal_ui_style", M4_HIDE(1))
     camgroup_uapi_t camgroup_uapi;
 #endif
+    // M4_STRUCT_DESC("adebayer_uapi", "normal_ui_style")
+    adebayer_uapi_t   adebayer_uapi;
 } RkaiqUapi_t;
 
 #ifdef __cplusplus

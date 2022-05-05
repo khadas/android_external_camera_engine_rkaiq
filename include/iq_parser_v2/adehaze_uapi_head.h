@@ -137,6 +137,8 @@ typedef struct mDehazeAttr_s {
     mEnhance_Setting_V21_t enhance_setting;
     // M4_STRUCT_DESC("hist_setting", "normal_ui_style")
     mHist_setting_V21_t hist_setting;
+    // M4_ARRAY_DESC("sigma_curve", "f32", M4_SIZE(1,5), M4_RANGE(-65535.0, 65535), "0.0", M4_DIGIT(6), M4_DYNAMIC(0))
+    double sigma_curve[5];
 } mDehazeAttr_t;
 
 #endif /*__ADEHAZE_UAPI_HEAD_H__*/

@@ -250,15 +250,6 @@ processing(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outparams)
                 LOGE_ATMO("%s: AE ratio for drc expo sync is under one!!!\n", __FUNCTION__);
 
             pAdrcCtx->PrevData.ApiMode = pAdrcCtx->drcAttr.opMode;
-            // output ProcRes
-            pAdrcProcRes->AdrcProcRes.update         = !bypass;  // not use in isp3xparams for now
-            pAdrcProcRes->AdrcProcRes.CompressMode   = pAdrcCtx->AdrcProcRes.CompressMode;
-            pAdrcProcRes->AdrcProcRes.LongFrameMode  = pAdrcCtx->AdrcProcRes.LongFrameMode;
-            pAdrcProcRes->AdrcProcRes.isHdrGlobalTmo = pAdrcCtx->AdrcProcRes.isHdrGlobalTmo;
-            pAdrcProcRes->AdrcProcRes.bTmoEn         = pAdrcCtx->AdrcProcRes.bTmoEn;
-            pAdrcProcRes->AdrcProcRes.isLinearTmo    = pAdrcCtx->AdrcProcRes.isLinearTmo;
-            memcpy(&pAdrcProcRes->AdrcProcRes.DrcProcRes, &pAdrcCtx->AdrcProcRes.DrcProcRes,
-                   sizeof(DrcProcRes_t));
 
             LOGD_ATMO(
                 "%s://////////////////////////////////////ADRC "
@@ -266,6 +257,16 @@ processing(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outparams)
                 __func__);
         } else
             LOGD_ATMO("%s: Drc Enable if OFF, Bypass Drc !!! \n", __func__);
+
+        // output ProcRes
+        pAdrcProcRes->AdrcProcRes.update         = !bypass;  // not use in isp3xparams for now
+        pAdrcProcRes->AdrcProcRes.CompressMode   = pAdrcCtx->AdrcProcRes.CompressMode;
+        pAdrcProcRes->AdrcProcRes.LongFrameMode  = pAdrcCtx->AdrcProcRes.LongFrameMode;
+        pAdrcProcRes->AdrcProcRes.isHdrGlobalTmo = pAdrcCtx->AdrcProcRes.isHdrGlobalTmo;
+        pAdrcProcRes->AdrcProcRes.bTmoEn         = Enable;
+        pAdrcProcRes->AdrcProcRes.isLinearTmo    = pAdrcCtx->AdrcProcRes.isLinearTmo;
+        memcpy(&pAdrcProcRes->AdrcProcRes.DrcProcRes, &pAdrcCtx->AdrcProcRes.DrcProcRes,
+               sizeof(DrcProcRes_t));
 
         LOG1_ATMO("%s:Exit!\n", __FUNCTION__);
         return XCAM_RETURN_NO_ERROR;

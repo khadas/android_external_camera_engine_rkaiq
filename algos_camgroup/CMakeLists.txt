@@ -43,7 +43,9 @@ if(EXISTS "${CMAKE_SOURCE_DIR}/algos_camgroup/ae/rk_aiq_algo_camgroup_ae_itf.cpp
 	set_target_properties(rkaiq_camgroup_ae PROPERTIES CXX_VISIBILITY_PRESET default)
 else()
 	message(STATUS "Can NOT found ${CMAKE_SOURCE_DIR}/algos_camgroup/ae/rk_aiq_algo_camgroup_ae_itf.cpp. Using lib")
-	add_library(rkaiq_camgroup_ae STATIC IMPORTED)
+    string(TOLOWER ${CMAKE_SYSTEM_NAME} OS)
+    set(PREFIX "${CMAKE_CURRENT_LIST_DIR}/ae/${OS}/${ARCH}/lib")
+    add_library(rkaiq_camgroup_ae STATIC IMPORTED GLOBAL)
 	set_target_properties(rkaiq_camgroup_ae PROPERTIES IMPORTED_LOCATION
         "${PREFIX}rkaiq_camgroup_ae.${SUFFIX}")
 	set_target_properties(rkaiq_camgroup_ae PROPERTIES IMPORTED_IMPLIB
@@ -56,6 +58,8 @@ endif()
 set (AWB_SRC
     awb/rk_aiq_algo_camgroup_awb_itf.cpp
     awb/rk_aiq_awb_algo_surround_view_v201.cpp
+	# uapi
+	awb/rk_aiq_uapiv2_camgroup_awb_int.cpp
 )
 
 if(EXISTS "${CMAKE_SOURCE_DIR}/algos_camgroup/awb/rk_aiq_algo_camgroup_awb_itf.cpp")
@@ -67,7 +71,9 @@ if(EXISTS "${CMAKE_SOURCE_DIR}/algos_camgroup/awb/rk_aiq_algo_camgroup_awb_itf.c
 	set_target_properties(rkaiq_camgroup_awb PROPERTIES CXX_VISIBILITY_PRESET default)
 else()
 	message(STATUS "Can NOT found ${CMAKE_SOURCE_DIR}/algos_camgroup/awb/rk_aiq_algo_camgroup_awb_itf.cpp. Using lib")
-	add_library(rkaiq_camgroup_awb STATIC IMPORTED)
+    string(TOLOWER ${CMAKE_SYSTEM_NAME} OS)
+    set(PREFIX "${CMAKE_CURRENT_LIST_DIR}/awb/${OS}/${ARCH}/lib")
+    add_library(rkaiq_camgroup_awb STATIC IMPORTED GLOBAL)
 	set_target_properties(rkaiq_camgroup_awb PROPERTIES IMPORTED_LOCATION
         "${PREFIX}rkaiq_camgroup_awb.${SUFFIX}")
 	set_target_properties(rkaiq_camgroup_awb PROPERTIES IMPORTED_IMPLIB
@@ -84,6 +90,7 @@ set (MISC_SRC
 	misc/rk_aiq_algo_camgroup_a3dlut_itf.cpp
 	misc/rk_aiq_algo_camgroup_adhaz_itf.cpp
 	misc/rk_aiq_algo_camgroup_agamma_itf.cpp
+	misc/rk_aiq_algo_camgroup_amerge_itf.cpp
 	misc/rk_aiq_algo_camgroup_adrc_itf.cpp
 	misc/rk_aiq_algo_camgroup_ablc_itf.cpp
 	aynr/rk_aiq_algo_camgroup_aynr_itf.cpp
@@ -92,6 +99,12 @@ set (MISC_SRC
 	abayernr/rk_aiq_algo_camgroup_abayernr_itf.cpp
 	atnr/rk_aiq_algo_camgroup_atnr_itf.cpp
 	again/rk_aiq_algo_camgroup_again_itf.cpp
+	aynr/rk_aiq_uapi_camgroup_aynr_int_v3.cpp
+	acnr/rk_aiq_uapi_camgroup_acnr_int_v2.cpp
+	abayernr/rk_aiq_uapi_camgroup_abayer2dnr_int_v2.cpp
+	asharp/rk_aiq_uapi_camgroup_asharp_int_v4.cpp
+	atnr/rk_aiq_uapi_camgroup_atnr_int_v2.cpp
+	again/rk_aiq_uapi_camgroup_again_int_v2.cpp
 )
 add_library(rkaiq_camgroup_misc STATIC ${MISC_SRC})
 set_target_properties(rkaiq_camgroup_misc PROPERTIES FOLDER "algos_camgroup/misc")

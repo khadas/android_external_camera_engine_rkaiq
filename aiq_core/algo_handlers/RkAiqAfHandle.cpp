@@ -507,7 +507,7 @@ XCamReturn RkAiqAfHandleInt::processing() {
 #ifdef ZOOM_MOVE_DEBUG
     int zoom_index = 0;
 
-    if (getValueFromFile("/tmp/.zoom_pos", &zoom_index) == true) {
+    if (getValueFromFile("/data/.zoom_pos", &zoom_index) == true) {
         if (mLastZoomIndex != zoom_index) {
             setZoomIndex(zoom_index);
             endZoomChg();
@@ -691,7 +691,7 @@ XCamReturn RkAiqAfHandleInt::genIspResult(RkAiqFullParams* params, RkAiqFullPara
         p_focus_param->vcm_end_ma       = af_rk->af_focus_param.vcm_end_ma;
         p_focus_param->vcm_config_valid = af_rk->af_focus_param.vcm_config_valid;
 
-#if defined(ISP_HW_V30)
+#if defined(ISP_HW_V30) || defined(ISP_HW_V21)
         SmartPtr<RkAiqHandle>* ae_handle = mAiqCore->getCurAlgoTypeHandle(RK_AIQ_ALGO_TYPE_AE);
         int algo_id                      = (*ae_handle)->getAlgoId();
 
