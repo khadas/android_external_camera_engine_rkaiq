@@ -1,15 +1,18 @@
 #include "CamHwIsp20.h"
 #include "rk_aiq_comm.h"
 #include "fake_v4l2_device.h"
+#include "rkcif-config.h"
 
 namespace RkCam {
 RawStreamCapUnit::RawStreamCapUnit ()
-    :_skip_num(0)
-    ,_state(RAW_CAP_STATE_INVALID)
+    : _skip_num(0)
+    , _state(RAW_CAP_STATE_INVALID)
+    , is_multi_isp_mode(false)
+    , mNoReadBack(false)
 {
 }
 
-RawStreamCapUnit::RawStreamCapUnit (const rk_sensor_full_info_t *s_info, bool linked_to_isp)
+RawStreamCapUnit::RawStreamCapUnit (const rk_sensor_full_info_t *s_info, bool linked_to_isp, bool noReadBack)
     :_skip_num(0)
     ,_state(RAW_CAP_STATE_INVALID)
 {
@@ -78,6 +81,10 @@ RawStreamCapUnit::RawStreamCapUnit (const rk_sensor_full_info_t *s_info, bool li
         _stream[i] =  new RKRawStream(_dev[i], i, ISP_POLL_TX);
         _stream[i]->setPollCallback(this);
     }
+
+    is_multi_isp_mode = s_info->isp_info->is_multi_isp_mode;
+    mNoReadBack = noReadBack;
+
     _state = RAW_CAP_STATE_INITED;
 }
 
@@ -240,7 +247,8 @@ RawStreamCapUnit::get_tx_device(int index)
 }
 
 void
-RawStreamCapUnit::set_tx_format(const struct v4l2_subdev_format& sns_sd_fmt, uint32_t sns_v4l_pix_fmt)
+RawStreamCapUnit::set_tx_format(const struct v4l2_subdev_format& sns_sd_fmt,
+                                uint32_t sns_v4l_pix_fmt, int8_t sns_bpp)
 {
     // set mipi tx,rx fmt
     // for cif: same as sensor fmt
@@ -251,9 +259,29 @@ RawStreamCapUnit::set_tx_format(const struct v4l2_subdev_format& sns_sd_fmt, uin
     for (int i = 0; i < 3; i++) {
         if (_dev[i].ptr())
             _dev[i]->get_format (format);
+
+        LOGD_CAMHW_SUBM(ISP20HW_SUBM,"tx fmt info: 0x%x, %dx%d, multi_isp_mode: %d, mNoReadBack: %d, sns_bpp: %d",
+                sns_v4l_pix_fmt, sns_sd_fmt.format.width, sns_sd_fmt.format.height,
+                is_multi_isp_mode, mNoReadBack, sns_bpp);
+
+        bool csi_mem_word_high_align = false;
+        if (is_multi_isp_mode && !mNoReadBack) {
+            if (((sns_sd_fmt.format.width / 2 - RKMOUDLE_UNITE_EXTEND_PIXEL) *  sns_bpp / 8) & 0xf) {
+                int mem_mode = CSI_LVDS_MEM_WORD_HIGH_ALIGN;
+                int ret1 = _dev[i]->io_control (RKCIF_CMD_SET_CSI_MEMORY_MODE,
+                        &mem_mode);
+                if (ret1)
+                    LOGE_CAMHW_SUBM(ISP20HW_SUBM, "set CSI_LVDS_MEM_WORD_HIGH_ALIGN failed !\n");
+                else
+                    csi_mem_word_high_align = true;
+
+            }
+        }
+
         if (format.fmt.pix.width != sns_sd_fmt.format.width ||
-                format.fmt.pix.height != sns_sd_fmt.format.height ||
-                format.fmt.pix.pixelformat != sns_v4l_pix_fmt) {
+            format.fmt.pix.height != sns_sd_fmt.format.height ||
+            format.fmt.pix.pixelformat != sns_v4l_pix_fmt ||
+            csi_mem_word_high_align) {
             if (_dev[i].ptr())
                 _dev[i]->set_format(sns_sd_fmt.format.width,
                                     sns_sd_fmt.format.height,
@@ -268,7 +296,8 @@ RawStreamCapUnit::set_tx_format(const struct v4l2_subdev_format& sns_sd_fmt, uin
 }
 
 void
-RawStreamCapUnit::set_tx_format(const struct v4l2_subdev_selection& sns_sd_sel, uint32_t sns_v4l_pix_fmt)
+RawStreamCapUnit::set_tx_format(const struct v4l2_subdev_selection& sns_sd_sel,
+                                uint32_t sns_v4l_pix_fmt, int8_t sns_bpp)
 {
     // set mipi tx,rx fmt
     // for cif: same as sensor fmt
@@ -279,9 +308,28 @@ RawStreamCapUnit::set_tx_format(const struct v4l2_subdev_selection& sns_sd_sel, 
     for (int i = 0; i < 3; i++) {
         if (_dev[i].ptr())
             _dev[i]->get_format (format);
+
+        LOGD_CAMHW_SUBM(ISP20HW_SUBM,"tx fmt info: 0x%x, %dx%d, multi_isp_mode: %d, mNoReadBack: %d, sns_bpp: %d",
+                sns_v4l_pix_fmt, sns_sd_sel.r.width, sns_sd_sel.r.height,
+                is_multi_isp_mode, mNoReadBack, sns_bpp);
+
+        bool csi_mem_word_high_align = false;
+        if (is_multi_isp_mode && !mNoReadBack) {
+            if (((sns_sd_sel.r.width / 2 - RKMOUDLE_UNITE_EXTEND_PIXEL) *  sns_bpp / 8) & 0xf) {
+                int mem_mode = CSI_LVDS_MEM_WORD_HIGH_ALIGN;
+                int ret1 = _dev[i]->io_control (RKCIF_CMD_SET_CSI_MEMORY_MODE,
+                        &mem_mode);
+                if (ret1)
+                    LOGE_CAMHW_SUBM(ISP20HW_SUBM, "set CSI_LVDS_MEM_WORD_HIGH_ALIGN failed !\n");
+                else
+                    csi_mem_word_high_align = true;
+            }
+        }
+
         if (format.fmt.pix.width != sns_sd_sel.r.width ||
-                format.fmt.pix.height != sns_sd_sel.r.height ||
-                format.fmt.pix.pixelformat != sns_v4l_pix_fmt) {
+            format.fmt.pix.height != sns_sd_sel.r.height ||
+            format.fmt.pix.pixelformat != sns_v4l_pix_fmt ||
+            csi_mem_word_high_align) {
             if (_dev[i].ptr())
                 _dev[i]->set_format(sns_sd_sel.r.width,
                                     sns_sd_sel.r.height,

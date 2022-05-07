@@ -4,8 +4,10 @@
 #include "CamHwIsp20.h"
 namespace RkCam {
 RawStreamProcUnit::RawStreamProcUnit ()
-: _first_trigger(true)
-, _is_multi_cam_conc(false)
+    : _first_trigger(true)
+    , _is_multi_cam_conc(false)
+    , is_multi_isp_mode(false)
+    , mNoReadBack(false)
 {
     _raw_proc_thread = new RawProcThread(this);
     _PollCallback = NULL;
@@ -13,7 +15,7 @@ RawStreamProcUnit::RawStreamProcUnit ()
     _rawCap = NULL;
 }
 
-RawStreamProcUnit::RawStreamProcUnit (const rk_sensor_full_info_t *s_info, bool linked_to_isp)
+RawStreamProcUnit::RawStreamProcUnit (const rk_sensor_full_info_t *s_info, bool linked_to_isp, bool noReadBack)
     : _first_trigger(true)
     , _is_multi_cam_conc(false)
 {
@@ -53,6 +55,9 @@ RawStreamProcUnit::RawStreamProcUnit (const rk_sensor_full_info_t *s_info, bool 
         _stream[i] =  new RKRawStream(_dev[i], i, ISP_POLL_RX);
         _stream[i]->setPollCallback(this);
     }
+
+    is_multi_isp_mode = s_info->isp_info->is_multi_isp_mode;
+    mNoReadBack = noReadBack;
 }
 
 RawStreamProcUnit::~RawStreamProcUnit ()
@@ -164,7 +169,8 @@ RawStreamProcUnit::get_rx_device(int index)
 }
 
 void
-RawStreamProcUnit::set_rx_format(const struct v4l2_subdev_format& sns_sd_fmt, uint32_t sns_v4l_pix_fmt)
+RawStreamProcUnit::set_rx_format(const struct v4l2_subdev_format& sns_sd_fmt,
+                                 uint32_t sns_v4l_pix_fmt, int8_t sns_bpp)
 {
     // set mipi tx,rx fmt
     // for cif: same as sensor fmt
@@ -175,9 +181,24 @@ RawStreamProcUnit::set_rx_format(const struct v4l2_subdev_format& sns_sd_fmt, ui
     for (int i = 0; i < 3; i++) {
         if (_dev[i].ptr())
             _dev[i]->get_format (format);
+
+        bool csi_mem_word_big_align = false;
+        if (is_multi_isp_mode && !mNoReadBack) {
+            if (((sns_sd_fmt.format.width / 2 - RKMOUDLE_UNITE_EXTEND_PIXEL) *  sns_bpp / 8) & 0xf) {
+                int mem_mode = CSI_MEM_WORD_BIG_ALIGN;
+                int ret1 = _dev[i]->io_control (RKISP_CMD_SET_CSI_MEMORY_MODE,
+                        &mem_mode);
+                if (ret1)
+                    LOGE_CAMHW_SUBM(ISP20HW_SUBM, "set CSI_MEM_WORD_BIG_ALIGN failed !\n");
+                else
+                    csi_mem_word_big_align = true;
+            }
+        }
+
         if (format.fmt.pix.width != sns_sd_fmt.format.width ||
-                format.fmt.pix.height != sns_sd_fmt.format.height ||
-                format.fmt.pix.pixelformat != sns_v4l_pix_fmt) {
+            format.fmt.pix.height != sns_sd_fmt.format.height ||
+            format.fmt.pix.pixelformat != sns_v4l_pix_fmt ||
+            csi_mem_word_big_align) {
             if (_dev[i].ptr())
                 _dev[i]->set_format(sns_sd_fmt.format.width,
                                     sns_sd_fmt.format.height,
@@ -192,7 +213,8 @@ RawStreamProcUnit::set_rx_format(const struct v4l2_subdev_format& sns_sd_fmt, ui
 }
 
 void
-RawStreamProcUnit::set_rx_format(const struct v4l2_subdev_selection& sns_sd_sel, uint32_t sns_v4l_pix_fmt)
+RawStreamProcUnit::set_rx_format(const struct v4l2_subdev_selection& sns_sd_sel,
+                                 uint32_t sns_v4l_pix_fmt, int8_t sns_bpp)
 {
     // set mipi tx,rx fmt
     // for cif: same as sensor fmt
@@ -203,9 +225,24 @@ RawStreamProcUnit::set_rx_format(const struct v4l2_subdev_selection& sns_sd_sel,
     for (int i = 0; i < 3; i++) {
         if (_dev[i].ptr())
             _dev[i]->get_format (format);
+
+        bool csi_mem_word_big_align = false;
+        if (is_multi_isp_mode && !mNoReadBack) {
+            if (((sns_sd_sel.r.width / 2 - RKMOUDLE_UNITE_EXTEND_PIXEL) *  sns_bpp / 8) & 0xf) {
+                int mem_mode = CSI_MEM_WORD_BIG_ALIGN;
+                int ret1 = _dev[i]->io_control (RKISP_CMD_SET_CSI_MEMORY_MODE,
+                        &mem_mode);
+                if (ret1)
+                    LOGE_CAMHW_SUBM(ISP20HW_SUBM, "set CSI_MEM_WORD_BIG_ALIGN failed !\n");
+                else
+                    csi_mem_word_big_align = true;
+            }
+        }
+
         if (format.fmt.pix.width != sns_sd_sel.r.width ||
-                format.fmt.pix.height != sns_sd_sel.r.height ||
-                format.fmt.pix.pixelformat != sns_v4l_pix_fmt) {
+            format.fmt.pix.height != sns_sd_sel.r.height ||
+            format.fmt.pix.pixelformat != sns_v4l_pix_fmt ||
+            csi_mem_word_big_align) {
             if (_dev[i].ptr())
                 _dev[i]->set_format(sns_sd_sel.r.width,
                                     sns_sd_sel.r.height,
