@@ -221,7 +221,7 @@ char* timeString() {
 void xcam_print_log (int module, int sub_modules, int level, const char* format, ...) {
     char buffer[XCAM_MAX_STR_SIZE] = {0};
     va_list va_list;
-    if ((g_cam_engine_log_level & 0xf) == 0) return;
+    if (((g_cam_engine_log_level & 0xf) == 0) && (level < XCORE_LOG_LEVEL_ERR) ) return;
     va_start (va_list, format);
     vsnprintf (buffer, XCAM_MAX_STR_SIZE, format, va_list);
     va_end (va_list);
