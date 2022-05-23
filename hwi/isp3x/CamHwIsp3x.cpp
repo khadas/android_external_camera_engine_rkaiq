@@ -405,6 +405,9 @@ CamHwIsp3x::setIspConfig()
                     _effecting_ispparam_map[frameId].isp_params_v3x[2] = isp_params[1];
                 }
             }
+            // update the lost params by ISP driver again
+            isp_params->module_cfg_update |= _module_cfg_update_frome_drv;
+            _module_cfg_update_frome_drv = 0;
         }
         if (mIspParamsDev->queue_buffer (v4l2buf) != 0) {
             LOGE_CAMHW_SUBM(ISP20HW_SUBM, "RKISP1: failed to ioctl VIDIOC_QBUF for index %d, %d %s.\n",
