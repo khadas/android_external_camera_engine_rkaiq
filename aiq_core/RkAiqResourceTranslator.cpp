@@ -16,7 +16,7 @@
  * limitations under the License.
  *
  */
-//#define PDAF_RAW_DUMP
+#define PDAF_RAW_DUMP
 
 #include "isp20/Isp20Evts.h"
 #include "isp20/Isp20StatsBuffer.h"
@@ -30,13 +30,13 @@
 #endif
 
 #ifdef ANDROID_OS
-#define DEFAULT_PD_RAW_PATH "/data/pdaf/pdaf_raw_%d.raw"
-#define DEFAULT_PD_LRAW_PATH "/data/pdaf/pdaf_L_%d.raw"
-#define DEFAULT_PD_RRAW_PATH "/data/pdaf/pdaf_R_%d.raw"
+#define DEFAULT_PD_RAW_PATH "/data/pdaf/pdaf_raw_%dx%d_%d.raw"
+#define DEFAULT_PD_LRAW_PATH "/data/pdaf/pdaf_L_%dx%d_%d.raw"
+#define DEFAULT_PD_RRAW_PATH "/data/pdaf/pdaf_R_%dx%d_%d.raw"
 #else
-#define DEFAULT_PD_RAW_PATH "/tmp/pdaf_raw_%d.raw"
-#define DEFAULT_PD_LRAW_PATH "/tmp/pdaf_raw_%d.raw"
-#define DEFAULT_PD_RRAW_PATH "/tmp/pdaf_raw_%d.raw"
+#define DEFAULT_PD_RAW_PATH "/tmp/pdaf_raw_%dx%d_%d.raw"
+#define DEFAULT_PD_LRAW_PATH "/tmp/pdaf_L_%dx%d_%d.raw"
+#define DEFAULT_PD_RRAW_PATH "/tmp/pdaf_R_%sx%d_%d.raw"
 #endif
 
 namespace RkCam {
@@ -633,15 +633,15 @@ RkAiqResourceTranslator::translatePdafStats (const SmartPtr<VideoBuffer> &from, 
 #ifdef PDAF_RAW_DUMP
     {
         FILE* fp;
-        char name[64];
+        char name[128];
         int frame_id = buf->get_sequence() % 10;
 
         ALOGD("@%s: pdWidthxpdHeight: %dx%d !\n", __FUNCTION__, 2 * pdaf->pdWidth, pdaf->pdHeight);
         memset(name, 0, sizeof(name));
         if (frame_id < 3) {
-            sprintf(name, DEFAULT_PD_RAW_PATH, frame_id);
+            sprintf(name, DEFAULT_PD_RAW_PATH, pdaf->pdWidth * 2, pdaf->pdHeight, frame_id);
             fp = fopen(name, "wb");
-            fwrite(pdData, 2 * pdaf->pdWidth * pdaf->pdHeight, 2, fp);
+            fwrite(pdData, 2 * pdaf->pdWidth * 2 * pdaf->pdHeight, 2, fp);
             fflush(fp);
             fclose(fp);
         }
@@ -679,14 +679,14 @@ RkAiqResourceTranslator::translatePdafStats (const SmartPtr<VideoBuffer> &from, 
 
         if (frame_id < 3) {
             memset(name, 0, sizeof(name));
-            sprintf(name, DEFAULT_PD_LRAW_PATH, frame_id);
+            sprintf(name, DEFAULT_PD_LRAW_PATH, pdaf->pdWidth, pdaf->pdHeight, frame_id);
             fp = fopen(name, "wb");
             fwrite(statsInt->pdaf_stats.pdLData, pdaf->pdWidth * pdaf->pdHeight, 2, fp);
             fflush(fp);
             fclose(fp);
 
             memset(name, 0, sizeof(name));
-            sprintf(name, DEFAULT_PD_RRAW_PATH, frame_id);
+            sprintf(name, DEFAULT_PD_RRAW_PATH, pdaf->pdWidth, pdaf->pdHeight, frame_id);
             fp = fopen(name, "wb");
             fwrite(statsInt->pdaf_stats.pdRData, pdaf->pdWidth * pdaf->pdHeight, 2, fp);
             fflush(fp);
