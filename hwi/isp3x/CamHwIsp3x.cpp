@@ -222,7 +222,7 @@ CamHwIsp3x::setIspConfig()
 
     {
         SmartLock locker (_isp_params_cfg_mutex);
-        while (_effecting_ispparam_map.size() > 4)
+        while (_effecting_ispparam_map.size() > 8)
             _effecting_ispparam_map.erase(_effecting_ispparam_map.begin());
     }
     if (mIspParamsDev.ptr()) {
@@ -414,7 +414,7 @@ CamHwIsp3x::setIspConfig()
         }
 
         ispModuleEns = _full_active_isp3x_params.module_ens;
-        LOGD_CAMHW_SUBM(ISP20HW_SUBM, "camId:%d, frameId:%d, ispparam ens 0x%llx, en_up 0x%llx, cfg_up 0x%llx",
+        LOGD_CAMHW_SUBM(ISP20HW_SUBM, "camId: %d, frameId:%d, ispparam ens 0x%llx, en_up 0x%llx, cfg_up 0x%llx",
                          mCamPhyId, frameId,
                         _full_active_isp3x_params.module_ens,
                         isp_params->module_en_update,

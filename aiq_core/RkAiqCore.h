@@ -44,7 +44,7 @@ namespace RkCam {
             LOGE_ANALYZER(format, ##__VA_ARGS__); \
             return ret; \
         } else if (ret == XCAM_RETURN_BYPASS) { \
-            LOGW_ANALYZER("bypass !", __FUNCTION__, __LINE__); \
+            LOGW_ANALYZER(format, ##__VA_ARGS__); \
             return ret; \
         } \
     } while (0)
@@ -55,7 +55,7 @@ namespace RkCam {
             LOGE_ANALYZER(format, ##__VA_ARGS__); \
             return NULL; \
         } else if (ret == XCAM_RETURN_BYPASS) { \
-            LOGW_ANALYZER("bypass !", __FUNCTION__, __LINE__); \
+            LOGW_ANALYZER(format, ##__VA_ARGS__); \
             return NULL; \
         } \
     } while (0)
@@ -66,7 +66,7 @@ namespace RkCam {
             LOGE_ANALYZER(format, ##__VA_ARGS__); \
             return ret; \
         } else if (ret == XCAM_RETURN_BYPASS) { \
-            LOGW_ANALYZER("bypass !", __FUNCTION__, __LINE__); \
+            LOGW_ANALYZER(format, ##__VA_ARGS__); \
             ret = XCAM_RETURN_NO_ERROR; \
         } \
     } while (0)

@@ -1193,7 +1193,7 @@ RkAiqResourceTranslatorV3x::translateAecStats (const SmartPtr<VideoBuffer> &from
         LOGE("fail to get stats ,ignore\n");
         return XCAM_RETURN_BYPASS;
     }
-    LOGI_ANALYZER("camId: %d, stats: frame_id: %d,  meas_type; 0x%x",
+    LOGI_ANALYZER("camId: %d, aec stats: frame_id: %d,  meas_type; 0x%x",
                   mCamPhyId, stats->frame_id, stats->meas_type);
 
     SmartPtr<RkAiqIrisParamsProxy> irisParams = buf->get_iris_params();
@@ -1775,7 +1775,7 @@ RkAiqResourceTranslatorV3x::translateAwbStats (const SmartPtr<VideoBuffer> &from
         LOGE("fail to get stats ,ignore\n");
         return XCAM_RETURN_BYPASS;
     }
-    LOGI_ANALYZER("awb stats: camId:%d, frame_id: %d,  meas_type; 0x%x",
+    LOGI_ANALYZER("camId: %d, awb stats: frame_id: %d,  meas_type; 0x%x",
                   mCamPhyId, stats->frame_id, stats->meas_type);
 
     statsInt->awb_stats_valid = stats->meas_type >> 5 & 1;
@@ -2315,8 +2315,8 @@ RkAiqResourceTranslatorV3x::translateAfStats (const SmartPtr<VideoBuffer> &from,
         LOGE("fail to get stats ,ignore\n");
         return XCAM_RETURN_BYPASS;
     }
-    LOGI_ANALYZER("stats: frame_id: %d,  meas_type; 0x%x",
-                  stats->frame_id, stats->meas_type);
+    LOGI_ANALYZER("camId: %d, af stats: frame_id: %d,  meas_type; 0x%x",
+                  mCamPhyId, stats->frame_id, stats->meas_type);
 
     SmartPtr<RkAiqAfInfoProxy> afParams = buf->get_af_params();
 
@@ -2386,8 +2386,8 @@ RkAiqResourceTranslatorV3x::translateAdehazeStats (const SmartPtr<VideoBuffer> &
         LOGE("fail to get stats ,ignore\n");
         return XCAM_RETURN_BYPASS;
     }
-    LOGI_ANALYZER("stats: frame_id: %d,  meas_type; 0x%x",
-                  stats->frame_id, stats->meas_type);
+    LOGI_ANALYZER("camId: %d, dehaze stats: frame_id: %d,  meas_type; 0x%x",
+                  mCamPhyId, stats->frame_id, stats->meas_type);
     //dehaze
     statsInt->adehaze_stats_valid = stats->meas_type >> 17 & 1;
     statsInt->adehaze_stats.dehaze_stats_v30.dhaz_adp_air_base = stats->params.dhaz.dhaz_adp_air_base;
