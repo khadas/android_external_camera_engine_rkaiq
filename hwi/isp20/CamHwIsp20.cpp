@@ -3894,8 +3894,8 @@ CamHwIsp20::getEffectiveIspParams(rkisp_effect_params_v20& ispParams, int frame_
     SmartLock locker (_isp_params_cfg_mutex);
 
     if (_effecting_ispparam_map.size() == 0) {
-        LOGE_CAMHW_SUBM(ISP20HW_SUBM, "can't search id %d,  _effecting_exp_mapsize is %d\n",
-                        frame_id, _effecting_ispparam_map.size());
+        LOGE_CAMHW_SUBM(ISP20HW_SUBM, "camId: %d, can't search id %d,  _effecting_exp_mapsize is %d\n",
+                         mCamPhyId, frame_id, _effecting_ispparam_map.size());
         return  XCAM_RETURN_ERROR_PARAM;
     }
 
@@ -3907,17 +3907,19 @@ CamHwIsp20::getEffectiveIspParams(rkisp_effect_params_v20& ispParams, int frame_
 
         rit = _effecting_ispparam_map.rbegin();
         do {
-            LOGD_CAMHW_SUBM(ISP20HW_SUBM, "traverse _effecting_ispparam_map to find id %d, current id is [%d]\n",
-                            search_id, rit->first);
+            LOGV_CAMHW_SUBM(ISP20HW_SUBM, "camId: %d, traverse _effecting_ispparam_map to find id %d, current id is [%d]\n",
+                            mCamPhyId, search_id, rit->first);
             if (search_id >= rit->first ) {
-                LOGD_CAMHW_SUBM(ISP20HW_SUBM, "exp-sync: can't find id %d, get latest id %d in _effecting_ispparam_map\n",
-                                search_id, rit->first);
+                LOGD_CAMHW_SUBM(ISP20HW_SUBM, "camId: %d, can't find id %d, get latest id %d in _effecting_ispparam_map\n",
+                                mCamPhyId, search_id, rit->first);
                 break;
             }
         } while (++rit != _effecting_ispparam_map.rend());
 
         if (rit == _effecting_ispparam_map.rend()) {
-            LOGE_CAMHW_SUBM(ISP20HW_SUBM, "can't find the latest effecting exposure for id %d, impossible case !", frame_id);
+            LOGE_CAMHW_SUBM(ISP20HW_SUBM,
+                            "camId: %d, can't find the latest effecting exposure for id %d, impossible case !",
+                            mCamPhyId, frame_id);
             return XCAM_RETURN_ERROR_PARAM;
         }
 

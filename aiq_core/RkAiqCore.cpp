@@ -1869,7 +1869,7 @@ RkAiqCore::events_analyze(const SmartPtr<ispHwEvt_t> &evts)
         id = mLastAnalyzedId + 1 > sequence ? mLastAnalyzedId + 1 : sequence;
     maxId = sequence + isp20Evts->expDelay - 1;
 
-    LOGD_ANALYZER("camId:%d, sequence(%d), expDelay(%d), id(%d), maxId(%d)",
+    LOGD_ANALYZER("camId: %d, sequence(%d), expDelay(%d), id(%d), maxId(%d)",
                   mAlogsComSharedParams.mCamPhyId,
                   isp20Evts->sequence, isp20Evts->expDelay,
                   id, maxId);
@@ -1917,14 +1917,14 @@ RkAiqCore::events_analyze(const SmartPtr<ispHwEvt_t> &evts)
         mLastAnalyzedId = id;
         id++;
 
-        LOGD_ANALYZER(">>> Framenum=%d, id=%d, Cur sgain=%f,stime=%f,mgain=%f,mtime=%f,lgain=%f,ltime=%f",
+        LOGV_ANALYZER(">>> Framenum=%d, id=%d, Cur sgain=%f,stime=%f,mgain=%f,mtime=%f,lgain=%f,ltime=%f",
                       isp20Evts->sequence, id, curExpParams->data()->aecExpInfo.HdrExp[0].exp_real_params.analog_gain,
                       curExpParams->data()->aecExpInfo.HdrExp[0].exp_real_params.integration_time,
                       curExpParams->data()->aecExpInfo.HdrExp[1].exp_real_params.analog_gain,
                       curExpParams->data()->aecExpInfo.HdrExp[1].exp_real_params.integration_time,
                       curExpParams->data()->aecExpInfo.HdrExp[2].exp_real_params.analog_gain,
                       curExpParams->data()->aecExpInfo.HdrExp[2].exp_real_params.integration_time);
-        LOGD_ANALYZER(">>> Framenum=%d, id=%d, nxt sgain=%f,stime=%f,mgain=%f,mtime=%f,lgain=%f,ltime=%f",
+        LOGV_ANALYZER(">>> Framenum=%d, id=%d, nxt sgain=%f,stime=%f,mgain=%f,mtime=%f,lgain=%f,ltime=%f",
                       isp20Evts->sequence, id, nxtExpParams->data()->aecExpInfo.HdrExp[0].exp_real_params.analog_gain,
                       nxtExpParams->data()->aecExpInfo.HdrExp[0].exp_real_params.integration_time,
                       nxtExpParams->data()->aecExpInfo.HdrExp[1].exp_real_params.analog_gain,
@@ -1932,7 +1932,7 @@ RkAiqCore::events_analyze(const SmartPtr<ispHwEvt_t> &evts)
                       nxtExpParams->data()->aecExpInfo.HdrExp[2].exp_real_params.analog_gain,
                       nxtExpParams->data()->aecExpInfo.HdrExp[2].exp_real_params.integration_time);
 
-        LOGD_ANALYZER("analyze the id(%d), sequence(%d), mLastAnalyzedId(%d)",
+        LOGV_ANALYZER("analyze the id(%d), sequence(%d), mLastAnalyzedId(%d)",
                       id, sequence, mLastAnalyzedId);
     }
 
