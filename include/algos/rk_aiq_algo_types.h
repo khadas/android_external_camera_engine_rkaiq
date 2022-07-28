@@ -953,6 +953,7 @@ typedef struct _RkAiqAlgoPostResAldch {
 // alsc
 typedef struct _RkAiqAlgoConfigAlsc {
     RkAiqAlgoCom com;
+    alsc_sw_info_t alsc_sw_info;
 } RkAiqAlgoConfigAlsc;
 
 typedef struct _RkAiqAlgoPreAlsc {

@@ -23,6 +23,8 @@
 
 RKAIQ_BEGIN_DECLARE
 
+XCamReturn alscGetOtpInfo(RkAiqAlgoCom* params);
+XCamReturn convertSensorLscOTP(alsc_handle_t hAlsc);
 XCamReturn AlscInit(alsc_handle_t *hAlsc, const CamCalibDbV2Context_t* calib2);
 XCamReturn AlscRelease(alsc_handle_t hAlsc);
 XCamReturn AlscPrepare(alsc_handle_t hAlsc);
