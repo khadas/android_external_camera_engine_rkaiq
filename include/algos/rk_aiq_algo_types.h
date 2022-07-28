@@ -151,6 +151,7 @@ typedef struct _RkAiqAlgoProcAwb {
     XCamVideoBuffer* awbStatsBuf;
     AblcProc_t ablcProcRes;
     bool ablcProcResVaid;
+    struct rkmodule_awb_inf *awb_otp;
 } RkAiqAlgoProcAwb;
 
 typedef struct _RkAiqAlgoProcResAwb {
