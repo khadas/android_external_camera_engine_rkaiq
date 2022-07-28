@@ -26,6 +26,19 @@
 RKAIQ_BEGIN_DECLARE
 
 /** @brief LSC will use these data from other module*/
+typedef struct {
+    uint32_t flag;
+
+    uint16_t width;
+    uint16_t height;
+    uint16_t table_size;
+
+    uint16_t *lsc_r;
+    uint16_t *lsc_b;
+    uint16_t *lsc_gr;
+    uint16_t *lsc_gb;
+} AlscOtpInfo_t;
+
 typedef struct alsc_sw_info_s {
     float sensorGain;
     float awbGain[2];
@@ -34,6 +47,10 @@ typedef struct alsc_sw_info_s {
     bool grayMode;
     bool awbConverged;
     int prepare_type;
+    RkAiqBayerPattern_t bayerPattern;
+    uint32_t ispAcqWidth;
+    uint32_t ispAcqHeight;
+    AlscOtpInfo_t otpInfo;
 } alsc_sw_info_t;
 
 /**
