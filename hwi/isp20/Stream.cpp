@@ -144,7 +144,7 @@ XCamReturn RkPollThread::start ()
 XCamReturn RkPollThread::stop ()
 {
     LOGI_CAMHW_SUBM(ISP20HW_SUBM, "RkPollThread %s:%s stop", get_name(),
-                   _dev.ptr() ? _dev->get_device_name() : _subdev->get_device_name());
+                   _dev.ptr() ? _dev->get_device_name() : _subdev.ptr() ? _subdev->get_device_name():"none");
     if (_poll_stop_fd[1] != -1) {
         char buf = 0xf;  // random value to write to flush fd.
         unsigned int size = write(_poll_stop_fd[1], &buf, sizeof(char));

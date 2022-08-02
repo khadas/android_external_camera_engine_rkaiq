@@ -24,7 +24,21 @@
 #include <chrono>
 #include <condition_variable> 
 #include<sys/time.h>
+#include "rk_aiq_user_api_sysctl.h"
+#include "rk_aiq_user_api_imgproc.h"
+//#include "rk_aiq_user_api_debug.h"
+#include "AiqCameraHalAdapter.h"
+//local
+#include "rkisp_control_aiq.h"
+#include "rkisp_control_loop.h"
+#include "rk_aiq_user_api_sysctl.h"
+#include "rkcamera_vendor_tags.h"
 
+
+#include "rkaiq.h"
+#include "AiqCameraHalAdapter.h"
+
+#include "isp20/CamHwIsp20.h"
 
 #define CLEAR(x) memset(&(x), 0, sizeof(x))
 #define DBG(...) do { if(!silent) printf("DBG: " __VA_ARGS__);} while(0)
@@ -72,6 +86,8 @@ struct SensorDriverDescriptor {
     bool link_enabled;
     bool sensorLinkedToCIF;
     char linkedModelName[32];
+    bool isSupportHdr;
+    char iq_file_full_name[256];
 
     std::string mSensorName;
     std::string mDeviceName;
@@ -83,6 +99,8 @@ struct SensorDriverDescriptor {
 
 std::vector<struct SensorDriverDescriptor> mSensorInfos;
 std::map<uint32_t, const char*> mHdrModeConfigs;
+static int threadId = 0;
+static bool aiq_state = false;
 
 /* The media topology instance that describes video device and
  * sub-device informations.
@@ -103,12 +121,13 @@ struct rkisp_media_info {
     char vd_stats_path[FILE_PATH_LEN];
     SensorDriverDescriptor sensorInfo;
     const char *hdrmode;
+    rk_aiq_working_mode_t work_mode;
 
     char mdev_path[32];
     int available;
-    void* aiq_ctx;
+    void* cl_ctx;
     pthread_t pid;
-    pthread_mutex_t _aiq_ctx_mutex;
+    pthread_mutex_t _cl_ctx_mutex;
 };
 
 static struct rkisp_media_info media_infos[CAMS_NUM_MAX];
@@ -308,7 +327,6 @@ rkisp_enumrate_modules (struct media_device *device)
         }
     }
 
-
     if (drvInfo.mSensorName != "none" && drvInfo.link_enabled) {
         info = media_get_info(device);
         if (info && !strncmp(info->driver, "rkcif", strlen("rkcif"))) {
@@ -331,6 +349,96 @@ rkisp_enumrate_modules (struct media_device *device)
 
 static const bool compareFuncForSensorInfo(struct SensorDriverDescriptor  s1, struct SensorDriverDescriptor s2) {
     return (s1.mModuleIndexStr < s2.mModuleIndexStr);
+}
+
+#undef RK_3A_TUNING_FILE_PATH
+#define RK_3A_TUNING_FILE_PATH "/vendor/etc/camera/rkisp2/"
+
+static int rkisp_select_iqfile(const struct rkmodule_inf* mod_info, char* iq_file_full_name)
+{
+
+    char iq_file_name[128];
+
+    if (!mod_info || !iq_file_full_name)
+        return -1;
+
+    CLEAR(iq_file_name);
+
+    const struct rkmodule_base_inf* base_inf = &mod_info->base;
+    const char *sensor_name, *module_name, *lens_name;
+    char sensor_name_full[32];
+
+    if (!strlen(base_inf->module) || !strlen(base_inf->sensor) ||
+        !strlen(base_inf->lens)) {
+        LOGE("no camera module fac info, check the drv !");
+        return -1;
+    }
+
+    sensor_name = base_inf->sensor;
+    strncpy(sensor_name_full, sensor_name, 32);
+    module_name = base_inf->module;
+    lens_name = base_inf->lens;
+
+    sprintf(iq_file_name, "%s_%s_%s.xml",
+            sensor_name_full, module_name, lens_name);
+    strcpy(iq_file_full_name, RK_3A_TUNING_FILE_PATH);
+    strcat(iq_file_full_name, iq_file_name);
+
+    return 0;
+}
+
+static int querySensorInfo(SensorDriverDescriptor &drvInfo)
+{
+    int pad = 0;
+    int sensorFd;
+    struct v4l2_subdev_mbus_code_enum code_enum;
+    struct v4l2_subdev_frame_interval_enum fintval_enum;
+    struct rkmodule_inf mod_info;
+
+    DBG("@%s: sensor_entity_name(%s)\n",
+        __FUNCTION__, drvInfo.sensor_entity_name);
+
+    CLEAR(mod_info);
+    CLEAR(drvInfo.iq_file_full_name);
+    CLEAR(code_enum);
+    code_enum.pad = pad;
+    code_enum.index = 0;
+
+    drvInfo.isSupportHdr = false;
+    sensorFd = open(drvInfo.sd_sensor_path, O_RDWR);
+    if (sensorFd < 0) {
+        ERR("open %s failed %s\n", drvInfo.sd_sensor_path, strerror(errno));
+        return NULL;
+    }
+
+	code_enum.index = 0;
+	if (xioctl(sensorFd, VIDIOC_SUBDEV_ENUM_MBUS_CODE, &code_enum) < 0){
+		ERR("enum mbus code failed!");
+		return -1;
+	}
+
+	memset(&fintval_enum, 0, sizeof(fintval_enum));
+	fintval_enum.pad = 0;
+	fintval_enum.index = 0;
+	fintval_enum.code = code_enum.code;
+
+    while (xioctl(sensorFd, VIDIOC_SUBDEV_ENUM_FRAME_INTERVAL, &fintval_enum) == 0) {
+        DBG("@%s device: %s, fintval_enum.reserved[0](%u). \n", __FUNCTION__, drvInfo.sensor_entity_name, fintval_enum.reserved[0]);
+        if (fintval_enum.reserved[0] != NO_HDR)
+            drvInfo.isSupportHdr = true;
+        fintval_enum.index++;
+    };
+    //drvInfo.isSupportHdr = false;
+    if (xioctl(sensorFd, RKMODULE_GET_MODULE_INFO, &mod_info) < 0){
+        ERR("failed to get camera module info!");
+        return -1;
+    }
+    rkisp_select_iqfile(&mod_info, drvInfo.iq_file_full_name);
+    DBG("@%s iq_file_full_name: %s.\n", __FUNCTION__, drvInfo.iq_file_full_name);
+
+    close(sensorFd);
+    DBG("@%s device: %s, isSupportHdr?(%s). \n", __FUNCTION__, drvInfo.sensor_entity_name, drvInfo.isSupportHdr?"true":"false");
+    return NO_ERROR;
 }
 
 /*get sensor media info*/
@@ -379,9 +487,11 @@ int rkisp_get_sensor_info() {
 
     DBG("%s:%d, find available camera num:%d!\n", __FUNCTION__, __LINE__, mSensorInfos.size());
     for (size_t i = 0; i < mSensorInfos.size(); i++) {
+        querySensorInfo(mSensorInfos[i]);
         media_infos[i].sensorInfo = mSensorInfos[i];
         DBG("media_infos: module_idx(%d) sensor_entity_name(%s)\n",
              media_infos[i].sensorInfo.module_idx, media_infos[i].sensorInfo.sensor_entity_name);
+        DBG("media_infos: sd_sensor_path(%s)\n", media_infos[i].sensorInfo.sd_sensor_path);
     }
 
     return ret;
@@ -485,20 +595,16 @@ static void init_engine(struct rkisp_media_info *media_info)
 {
     int ret = 0;
 
-    for (int i = 0; i < CAMS_NUM_MAX; i++) {
-        if (!media_info->sensorInfo.link_enabled) {
-            DBG("Link disabled, skipped\n");
-            continue;
-        }
-
-        ret = rkisp_cl_rkaiq_init(&(media_info->aiq_ctx), NULL, NULL, media_info->sensorInfo.sensor_entity_name);
-        if (ret) {
-            ERR("rkisp engine init failed !\n");
-            exit(-1);
-        }
-        setMulCamConc(media_info->aiq_ctx,true);
-        break;
+    if (!media_info->sensorInfo.link_enabled) {
+        DBG("Link disabled, skipped\n");
     }
+
+    ret = rkisp_cl_rkaiq_init(&(media_info->cl_ctx), NULL, NULL, media_info->sensorInfo.sensor_entity_name);
+    if (ret) {
+        ERR("rkisp engine init failed !\n");
+        exit(-1);
+    }
+    setMulCamConc(media_info->cl_ctx,true);
 
 }
 
@@ -516,28 +622,23 @@ static void prepare_engine(struct rkisp_media_info *media_info)
     params.work_mode = media_info->hdrmode;
     DBG("%s--set workingmode(%s)\n", __FUNCTION__, params.work_mode);
 
-    for (int i = 0; i < CAMS_NUM_MAX; i++) {
-        if (!media_info->sensorInfo.link_enabled) {
-            DBG("Link disabled, skipped\n");
-            continue;
-        }
+    if (!media_info->sensorInfo.link_enabled) {
+        DBG("Link disabled, skipped\n");
+    }
 
-        DBG("%s - %s: link enabled : %d\n", media_info->sensorInfo.sd_sensor_path,
-            media_info->sensorInfo.sensor_entity_name,
-            media_info->sensorInfo.link_enabled);
-        if (strlen(media_info->sensorInfo.sd_lens_path))
-            params.lens_sd_node_path = media_info->sensorInfo.sd_lens_path;
-        if (strlen(media_info->sensorInfo.sd_flash_path[0]))
-            params.flashlight_sd_node_path[0] = media_info->sensorInfo.sd_flash_path[0];
+    DBG("%s - %s: link enabled : %d\n", media_info->sensorInfo.sd_sensor_path,
+        media_info->sensorInfo.sensor_entity_name,
+        media_info->sensorInfo.link_enabled);
+    if (strlen(media_info->sensorInfo.sd_lens_path))
+        params.lens_sd_node_path = media_info->sensorInfo.sd_lens_path;
+    if (strlen(media_info->sensorInfo.sd_flash_path[0]))
+        params.flashlight_sd_node_path[0] = media_info->sensorInfo.sd_flash_path[0];
 
-        params.sensor_sd_node_path = media_info->sensorInfo.sd_sensor_path;
+    params.sensor_sd_node_path = media_info->sensorInfo.sd_sensor_path;
 
-        if (rkisp_cl_prepare(media_info->aiq_ctx, &params)) {
-            ERR("rkisp engine prepare failed !\n");
-            exit(-1);
-        }
-
-        break;
+    if (rkisp_cl_prepare(media_info->cl_ctx, &params)) {
+        ERR("rkisp engine prepare failed !\n");
+        exit(-1);
     }
 
 }
@@ -545,8 +646,8 @@ static void prepare_engine(struct rkisp_media_info *media_info)
 static void start_engine(struct rkisp_media_info *media_info)
 {
     DBG("rkaiq start\n");
-    rkisp_cl_start(media_info->aiq_ctx);
-    if (media_info->aiq_ctx == NULL) {
+    rkisp_cl_start(media_info->cl_ctx);
+    if (media_info->cl_ctx == NULL) {
         ERR("rkaiq_start engine failed\n");
         exit(-1);
     } else {
@@ -556,12 +657,12 @@ static void start_engine(struct rkisp_media_info *media_info)
 
 static void stop_engine(struct rkisp_media_info *media_info)
 {
-    rkisp_cl_stop(media_info->aiq_ctx);
+    rkisp_cl_stop(media_info->cl_ctx);
 }
 
 static void deinit_engine(struct rkisp_media_info *media_info)
 {
-    rkisp_cl_deinit(media_info->aiq_ctx);
+    rkisp_cl_deinit(media_info->cl_ctx);
 }
 
 // blocked func
@@ -671,6 +772,230 @@ void parse_args(int argc, char **argv)
    }
 }
 
+#define AIQ_CONTEXT_CAST(context)  ((AiqCameraHalAdapter*)(context))
+
+static void set_af_manual_meascfg(const rk_aiq_sys_ctx_t* ctx)
+{
+    rk_aiq_af_attrib_t attr;
+    uint16_t gamma_y[RKAIQ_RAWAF_GAMMA_NUM] =
+             {0, 45, 108, 179, 245, 344, 409, 459, 500, 567, 622, 676, 759, 833, 896, 962, 1023};
+
+    rk_aiq_user_api_af_GetAttrib(ctx, &attr);
+    attr.AfMode = RKAIQ_AF_MODE_FIXED;
+
+    attr.manual_meascfg.contrast_af_en = 1;
+    attr.manual_meascfg.rawaf_sel = 0; // normal = 0; hdr = 1
+
+    attr.manual_meascfg.window_num = 2;
+    attr.manual_meascfg.wina_h_offs = 2;
+    attr.manual_meascfg.wina_v_offs = 2;
+    attr.manual_meascfg.wina_h_size = 1920;
+    attr.manual_meascfg.wina_v_size = 1080;
+
+    attr.manual_meascfg.winb_h_offs = 500;
+    attr.manual_meascfg.winb_v_offs = 600;
+    attr.manual_meascfg.winb_h_size = 300;
+    attr.manual_meascfg.winb_v_size = 300;
+
+    attr.manual_meascfg.gamma_flt_en = 1;
+    attr.manual_meascfg.gamma_y[RKAIQ_RAWAF_GAMMA_NUM];
+    memcpy(attr.manual_meascfg.gamma_y, gamma_y, RKAIQ_RAWAF_GAMMA_NUM * sizeof(uint16_t));
+
+    attr.manual_meascfg.gaus_flt_en = 1;
+    attr.manual_meascfg.gaus_h0 = 0x20;
+    attr.manual_meascfg.gaus_h1 = 0x10;
+    attr.manual_meascfg.gaus_h2 = 0x08;
+
+    attr.manual_meascfg.afm_thres = 4;
+
+    attr.manual_meascfg.lum_var_shift[0] = 0;
+    attr.manual_meascfg.afm_var_shift[0] = 0;
+    attr.manual_meascfg.lum_var_shift[1] = 4;
+    attr.manual_meascfg.afm_var_shift[1] = 4;
+    rk_aiq_user_api_af_SetAttrib(ctx, &attr);
+}
+
+static void print_af_stats(rk_aiq_isp_stats_t *stats_ref)
+{
+    unsigned long sof_time;
+
+    sof_time = stats_ref->af_stats.sof_tim / 1000000LL;
+    printf("sof_tim %ld, sharpness roia: 0x%llx-0x%08x roib: 0x%x-0x%08x\n",
+           sof_time,
+           stats_ref->af_stats.roia_sharpness,
+           stats_ref->af_stats.roia_luminance,
+           stats_ref->af_stats.roib_sharpness,
+           stats_ref->af_stats.roib_luminance);
+#if 0
+    for (int i = 0; i < 15; i++) {
+        for (int j = 0; j < 15; j++) {
+            printf("0x%08x, ", stats_ref->af_stats.global_sharpness[15 * i + j]);
+        }
+        printf("\n");
+    }
+#endif
+}
+
+static void print_ae_stats(rk_aiq_isp_stats_t *stats_ref)
+{
+
+	RkAiqAecHwStatsRes_t *aec_hw_stats = &(stats_ref->aec_stats.ae_data);
+	rawaebig_stat_t *ae_chan_stat = &(aec_hw_stats->chn[0].rawae_big);
+	unsigned int i = 0;
+	unsigned long long sum_r = 0;
+	unsigned long long sum_g = 0;
+	unsigned long long sum_b = 0;
+	unsigned long long sum_y = 0;
+	unsigned long long sum_all = 0;
+
+	for(i = 0; i < RAWAEBIG_WIN_NUM ; i++) {
+	sum_r += ae_chan_stat->channelr_xy[i];
+	sum_g += ae_chan_stat->channelg_xy[i];
+	sum_b += ae_chan_stat->channelb_xy[i];
+	sum_y += ae_chan_stat->channely_xy[i];
+	}
+
+	printf("ae [%llu %llu %llu %llu ] \n", sum_r / RAWAEBIG_WIN_NUM, sum_g / RAWAEBIG_WIN_NUM,
+	sum_b / RAWAEBIG_WIN_NUM, sum_y / RAWAEBIG_WIN_NUM);
+}
+
+static const float exp_table[] = {
+	0.001,
+#if 0
+	0.005,
+	0.010,
+	0.015,
+	0.020,
+	0.025,
+	0.030,
+	0.033,
+	0.030,
+	0.025,
+	0.020,
+	0.015,
+	0.010,
+	0.005,
+#endif
+	0.033,
+};
+
+static XCamReturn set_ae_manual_meascfg(const rk_aiq_sys_ctx_t* ctx)
+{
+	XCamReturn ret;
+	int i;
+	static bool test = false;
+
+	if (test) {
+		ret = rk_aiq_uapi_setManualExp(ctx, 2.0, 0.001);
+		printf("set manual exposure param: gain:2.0, exposure time: 0.001ms.\n");
+	}
+	else {
+		ret = rk_aiq_uapi_setManualExp(ctx, 2.0, 0.033);
+		printf("set manual exposure param: gain:2.0, exposure time: 0.033ms.\n");
+	}
+	test = !test;
+	sleep(3);
+	return ret;
+}
+
+/* stats thread */
+static void* stats_thread(void* args) {
+    struct rkisp_media_info *media_info;
+    XCamReturn ret;
+    char name[128] = {0};
+
+    pthread_detach (pthread_self());
+    printf("begin stats thread\n");
+    media_info = (struct rkisp_media_info *) args;
+    sprintf(name, "stats_thread%d", threadId);
+    pthread_setname_np(pthread_self(), name);
+    threadId++;
+
+    AiqCameraHalAdapter * gAiqCameraHalAdapter = AIQ_CONTEXT_CAST (media_info->cl_ctx);
+    rk_aiq_sys_ctx_t *aiq_ctx = gAiqCameraHalAdapter->get_aiq_ctx();
+
+#if 1
+    //set_af_manual_meascfg(aiq_ctx);
+    while(1) {
+        rk_aiq_isp_stats_t *stats_ref = NULL;
+
+        ret = rk_aiq_uapi_sysctl_get3AStatsBlk(aiq_ctx, &stats_ref, -1);
+        if (ret == XCAM_RETURN_NO_ERROR && stats_ref != NULL) {
+            printf("get one stats frame id %d \n", stats_ref->frame_id);
+            //printf("aec pixel_clock_freq_mhz %f.\n", stats_ref->aec_stats.ae_exp.pixel_clock_freq_mhz);
+            //print_af_stats(stats_ref);
+            print_ae_stats(stats_ref);
+            rk_aiq_uapi_sysctl_release3AStatsRef(aiq_ctx, stats_ref);
+			aiq_state = true;
+
+        } else {
+            if (ret == XCAM_RETURN_NO_ERROR) {
+                printf("aiq has stopped !\n");
+                break;
+            } else if (ret == XCAM_RETURN_ERROR_TIMEOUT) {
+                printf("aiq timeout!\n");
+                continue;
+            } else if (ret == XCAM_RETURN_ERROR_FAILED) {
+                printf("aiq failed!\n");
+                break;
+            }
+			aiq_state = false;
+        }
+    }
+#endif
+    printf("end stats thread\n");
+    return 0;
+}
+
+
+/* munual ae thread */
+static void* manualAe_thread(void* args) {
+    struct rkisp_media_info *media_info;
+    XCamReturn ret;
+    char name[128] = {0};
+
+    pthread_detach (pthread_self());
+    printf("begin munual ae thread\n");
+    media_info = (struct rkisp_media_info *) args;
+    sprintf(name, "manualAe_thread%d", threadId);
+    pthread_setname_np(pthread_self(), name);
+    threadId++;
+
+    AiqCameraHalAdapter * gAiqCameraHalAdapter = AIQ_CONTEXT_CAST (media_info->cl_ctx);
+    rk_aiq_sys_ctx_t *aiq_ctx = gAiqCameraHalAdapter->get_aiq_ctx();
+
+    //set_af_manual_meascfg(aiq_ctx);
+    while(1) {
+        rk_aiq_isp_stats_t *stats_ref = NULL;
+
+        if (aiq_state) {
+            ret = set_ae_manual_meascfg(aiq_ctx);
+            if (ret == XCAM_RETURN_NO_ERROR) {
+                printf("set gain & exposure.\n");
+            }
+        }
+    }
+    printf("end manual thread\n");
+    return 0;
+}
+
+//#define TEST_BLOCKED_STATS_FUNC
+//#define TEST_BLOCKED_MUNUAL_AE
+
+static void getSensorCurMode(struct rkisp_media_info *media_info)
+{
+    if (strcmp(media_info->hdrmode, "NORMAL") == 0) {
+        media_info->work_mode = RK_AIQ_WORKING_MODE_NORMAL;
+    } else if (strcmp(media_info->hdrmode, "HDR2") == 0) {
+        media_info->work_mode = RK_AIQ_WORKING_MODE_ISP_HDR2;
+    } else if (strcmp(media_info->hdrmode, "HDR3") == 0) {
+        media_info->work_mode = RK_AIQ_WORKING_MODE_ISP_HDR3;
+    } else {
+        //default
+        media_info->work_mode = RK_AIQ_WORKING_MODE_NORMAL;
+    }
+}
+
 /* engine thread */
 static void *engine_thread(void *arg)
 {
@@ -680,46 +1005,72 @@ static void *engine_thread(void *arg)
     struct rkisp_media_info *media_info;
     pthread_t tid;
     std::unique_lock<std::mutex> lk(mThreadListLock);
+    char name[128] = {0};
 
     DBG("%s current thread id:%lu \n", __FUNCTION__, pthread_self());
+    sprintf(name, "engine_thread%d", threadId);
+    pthread_setname_np(pthread_self(), name);
+    threadId++;
 
     media_info = (struct rkisp_media_info *) arg;
 
-    pthread_mutex_lock(&(media_info->_aiq_ctx_mutex));
-    for (;;) {
+    pthread_mutex_lock(&(media_info->_cl_ctx_mutex));
 
+    for (;;) {
         isp_fd = open(media_info->vd_params_path, O_RDWR);
         if (isp_fd < 0) {
             ERR("open %s failed %s\n", media_info->vd_params_path, strerror(errno));
             return NULL;
         }
         subscrible_stream_event(media_info, isp_fd, true);
+        //getSensorCurMode(media_info);
         init_engine(media_info);
         /* notify init ok*/
         lk.unlock();
         mThreadCond.notify_one();
         DBG("%s: init engine success...\n", media_info->mdev_path);
-        prepare_engine(media_info);
 
+        prepare_engine(media_info);
+        DBG("%s: prepare engine success...\n", media_info->mdev_path);
 
         DBG("%s: wait stream start event...\n", media_info->mdev_path);
-
         wait_stream_event(isp_fd, CIFISP_V4L2_EVENT_STREAM_START, -1);
         DBG("%s: wait stream start event success ...\n", media_info->mdev_path);
         start_engine(media_info);
 
         DBG("%s: wait stream stop event...\n", media_info->mdev_path);
+
+#ifdef TEST_BLOCKED_STATS_FUNC
+        pthread_t stats_tid;
+        pthread_create(&stats_tid, NULL, stats_thread, media_info);
+#endif
+
+#ifdef TEST_BLOCKED_MUNUAL_AE
+		pthread_t manual_ae;
+		pthread_create(&manual_ae, NULL, manualAe_thread, media_info);
+#endif
+
         wait_stream_event(isp_fd, CIFISP_V4L2_EVENT_STREAM_STOP, -1);
         DBG("%s: wait stream stop event success ...\n", media_info->mdev_path);
         stop_engine(media_info);
-
+        if (!strncmp(media_info->hdrmode, "NORMAL", sizeof("NORMAL"))) {
+            if (media_info->sensorInfo.isSupportHdr) {
+                DBG("current mode is normal, switch to hdr.\n");
+                media_info->hdrmode = "HDR2";
+            } else {
+                DBG("sensor not support hdr mode, keep normal.\n");
+            }
+        } else {
+            DBG("current mode is hdr, switch to normal.\n");
+            media_info->hdrmode = "NORMAL";
+        }
         lk.lock();
         deinit_engine(media_info);
         subscrible_stream_event(media_info, isp_fd, false);
         close(isp_fd);
     }
 
-    pthread_mutex_unlock(&(media_info->_aiq_ctx_mutex));
+    pthread_mutex_unlock(&(media_info->_cl_ctx_mutex));
     return NULL;
 }
 
@@ -793,18 +1144,16 @@ static int waitForNextInit()
 
     auto st = mThreadCond.wait_for(lk, timeout);
     if (st == std::cv_status::timeout) {
-        DBG("---------wati aiq init timeout-------\n\n");
+        DBG("---------wait aiq init timeout-------\n\n");
         ret = -1;
     }
 
     nowlt =time(NULL);  //sec
     gettimeofday(&now, NULL);
-    DBG("wait for aiq init time: %ld sec, %ld ms\n", nowlt - oldLt,
-         now.tv_usec / 1000 - old.tv_usec / 1000);
+    DBG("wait for aiq init time: %ld ms\n", (nowlt - oldLt) * 1000 + (now.tv_usec / 1000 - old.tv_usec / 1000));
     return ret;
 
 }
-
 
 int main(int argc, char **argv)
 {
@@ -835,14 +1184,14 @@ int main(int argc, char **argv)
     /* sensor mode config & mutex init*/
     loadFromCfg(kDefaultCfgPath);
     if (mHdrModeConfigs.empty()) {
-        ERR("Using default hdr configs!\n", media_infos[i].mdev_path);
+        ERR("Using default hdr configs!\n");
         for (i = 0; i < mSensorInfos.size(); i++) {
-            media_infos[i]._aiq_ctx_mutex = PTHREAD_MUTEX_INITIALIZER;
+            media_infos[i]._cl_ctx_mutex = PTHREAD_MUTEX_INITIALIZER;
             media_infos[i].hdrmode = hdrmode;
         }
     } else {
         for (i = 0; i < mSensorInfos.size(); i++) {
-            media_infos[i]._aiq_ctx_mutex = PTHREAD_MUTEX_INITIALIZER;
+            media_infos[i]._cl_ctx_mutex = PTHREAD_MUTEX_INITIALIZER;
             media_infos[i].hdrmode = mHdrModeConfigs[i];
             DBG("camera:%d, hdrmode: %s.\n", i, media_infos[i].hdrmode);
         }
@@ -860,15 +1209,12 @@ int main(int argc, char **argv)
         DBG("-------------pthread_create success------------------\n\n");
     }
 
-    for (i = 0; i < mSensorInfos.size(); i++) {
-        DBG("-------------pthread_join start------------------\n\n");
-        if (media_infos[i].pid == 0)
-            continue;
-        pthread_join(media_infos[i].pid, NULL);
-        DBG("-------------pthread_join success------------------\n\n");
-    }
+    DBG("-------------pthread_join start------------------\n\n");
+    if (media_infos[mSensorInfos.size() -1].pid == 0)
+        DBG("-----media_infos[mSensorInfos.size() -1].pid--is 0---\n\n");
+    pthread_join(media_infos[mSensorInfos.size()-1].pid, NULL);
+    DBG("-------------pthread_join success------------------\n\n");
 
-    DBG("----------------------------------------------\n\n");
-
+    DBG("----------------------exit----------------------\n\n");
     return 0;
 }
