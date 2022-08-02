@@ -686,20 +686,22 @@ static void *engine_thread(void *arg)
     media_info = (struct rkisp_media_info *) arg;
 
     pthread_mutex_lock(&(media_info->_aiq_ctx_mutex));
-    isp_fd = open(media_info->vd_params_path, O_RDWR);
-    if (isp_fd < 0) {
-        ERR("open %s failed %s\n", media_info->vd_params_path, strerror(errno));
-        return NULL;
-    }
-    subscrible_stream_event(media_info, isp_fd, true);
-    init_engine(media_info);
-    /* notify init ok*/
-    lk.unlock();
-    mThreadCond.notify_one();
-    DBG("%s: init engine success...\n", media_info->mdev_path);
-    prepare_engine(media_info);
-
     for (;;) {
+
+        isp_fd = open(media_info->vd_params_path, O_RDWR);
+        if (isp_fd < 0) {
+            ERR("open %s failed %s\n", media_info->vd_params_path, strerror(errno));
+            return NULL;
+        }
+        subscrible_stream_event(media_info, isp_fd, true);
+        init_engine(media_info);
+        /* notify init ok*/
+        lk.unlock();
+        mThreadCond.notify_one();
+        DBG("%s: init engine success...\n", media_info->mdev_path);
+        prepare_engine(media_info);
+
+
         DBG("%s: wait stream start event...\n", media_info->mdev_path);
 
         wait_stream_event(isp_fd, CIFISP_V4L2_EVENT_STREAM_START, -1);
@@ -711,10 +713,11 @@ static void *engine_thread(void *arg)
         DBG("%s: wait stream stop event success ...\n", media_info->mdev_path);
         stop_engine(media_info);
 
+        lk.lock();
+        deinit_engine(media_info);
+        subscrible_stream_event(media_info, isp_fd, false);
+        close(isp_fd);
     }
-    deinit_engine(media_info);
-    subscrible_stream_event(media_info, isp_fd, false);
-    close(isp_fd);
 
     pthread_mutex_unlock(&(media_info->_aiq_ctx_mutex));
     return NULL;
