@@ -85,6 +85,10 @@ ifeq (rv1126, $(strip $(TARGET_BOARD_PLATFORM)))
 LOCAL_CFLAGS += -DISP_HW_V20
 endif
 
+ifeq (rk3588, $(strip $(TARGET_BOARD_PLATFORM)))
+LOCAL_CFLAGS += -DISP_HW_V30
+endif
+
 LOCAL_32_BIT_ONLY := true
 LOCAL_MULTILIB := 32
 LOCAL_PROPRIETARY_MODULE := true
@@ -176,6 +180,10 @@ endif
 
 ifeq (rv1126, $(strip $(TARGET_BOARD_PLATFORM)))
 LOCAL_CFLAGS += -DISP_HW_V20
+endif
+
+ifeq (rk3588, $(strip $(TARGET_BOARD_PLATFORM)))
+LOCAL_CFLAGS += -DISP_HW_V30
 endif
 
 LOCAL_32_BIT_ONLY := true
@@ -278,6 +286,10 @@ endif
 
 ifeq (rv1126, $(strip $(TARGET_BOARD_PLATFORM)))
 LOCAL_CFLAGS += -DISP_HW_V20
+endif
+
+ifeq (rk3588, $(strip $(TARGET_BOARD_PLATFORM)))
+LOCAL_CFLAGS += -DISP_HW_V30
 endif
 
 LOCAL_32_BIT_ONLY := true
