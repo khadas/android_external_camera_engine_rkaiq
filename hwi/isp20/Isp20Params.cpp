@@ -406,6 +406,7 @@ Isp20Params::convertAiqAeToIsp20Params
 {
     /* ae update */
     if(/*aec_meas.ae_meas_en*/1) {
+#if 0
         if(_working_mode == RK_AIQ_WORKING_MODE_NORMAL) { // normal
             switch(aec_meas.rawae0.rawae_sel) {
             case 0:
@@ -438,6 +439,11 @@ Isp20Params::convertAiqAeToIsp20Params
             isp_cfg.module_ens |= 1LL << RK_ISP2X_RAWAE1_ID;
             isp_cfg.module_ens |= 1LL << RK_ISP2X_RAWAE2_ID;
         }
+#else
+        isp_cfg.module_ens |= 1LL << RK_ISP2X_RAWAE0_ID;
+        isp_cfg.module_ens |= 1LL << RK_ISP2X_RAWAE1_ID;
+        isp_cfg.module_ens |= 1LL << RK_ISP2X_RAWAE2_ID;
+#endif
 
         isp_cfg.module_ens |= 1LL << RK_ISP2X_RAWAE3_ID;
         isp_cfg.module_ens |= 1LL << RK_ISP2X_YUVAE_ID;
@@ -515,6 +521,7 @@ Isp20Params::convertAiqHistToIsp20Params
 {
     /* hist update */
     if(/*hist_meas.hist_meas_en*/1) {
+#if 0
         if(_working_mode == RK_AIQ_WORKING_MODE_NORMAL) { // normal
             switch(hist_meas.ae_swap) {
             case 0:
@@ -548,7 +555,11 @@ Isp20Params::convertAiqHistToIsp20Params
             isp_cfg.module_ens |= 1LL << RK_ISP2X_RAWHIST1_ID;
             isp_cfg.module_ens |= 1LL << RK_ISP2X_RAWHIST2_ID;
         }
-
+#else
+        isp_cfg.module_ens |= 1LL << RK_ISP2X_RAWHIST0_ID;
+        isp_cfg.module_ens |= 1LL << RK_ISP2X_RAWHIST1_ID;
+        isp_cfg.module_ens |= 1LL << RK_ISP2X_RAWHIST2_ID;
+#endif
         isp_cfg.module_ens |= 1LL << RK_ISP2X_RAWHIST3_ID;
         isp_cfg.module_ens |= 1LL << RK_ISP2X_SIHST_ID;
 
