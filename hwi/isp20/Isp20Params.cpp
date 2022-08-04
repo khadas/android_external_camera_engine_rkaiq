@@ -151,6 +151,10 @@ IspParamsAssembler::queue_locked(SmartPtr<cam3aResult>& result)
                         mLatestReadyFrmId);
         frame_id = 0;
         result->setId(0);
+    } else if (frame_id == -1) {
+        LOGE_CAMHW_SUBM(ISP20PARAM_SUBM, "type:%s, frame_id == -1 &&  mLatestReadyFrmId == %d ",
+                        Cam3aResultType2Str[type], mLatestReadyFrmId);
+        return ret;
     }
 
     mParamsMap[frame_id].params.push_back(result);
