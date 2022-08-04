@@ -634,16 +634,21 @@ RkAiqResourceTranslator::translatePdafStats (const SmartPtr<VideoBuffer> &from, 
     {
         FILE* fp;
         char name[128];
-        int frame_id = buf->get_sequence() % 10;
+        int frame_id = buf->get_sequence() % 30;
 
         ALOGD("@%s: pdWidthxpdHeight: %dx%d !\n", __FUNCTION__, 2 * pdaf->pdWidth, pdaf->pdHeight);
         memset(name, 0, sizeof(name));
-        if (frame_id < 3) {
+        if ((frame_id < 1) && (buf->get_sequence() < 100)) {
             sprintf(name, DEFAULT_PD_RAW_PATH, pdaf->pdWidth * 2, pdaf->pdHeight, frame_id);
             fp = fopen(name, "wb");
-            fwrite(pdData, 2 * pdaf->pdWidth * 2 * pdaf->pdHeight, 2, fp);
-            fflush(fp);
-            fclose(fp);
+            if (fp != NULL) {
+                fwrite(pdData, 2 * pdaf->pdWidth * 2 * pdaf->pdHeight, 2, fp);
+                fflush(fp);
+                fclose(fp);
+                ALOGI("Write success pdaf data to %s",name);
+            } else {
+                ALOGE("Create %s failed(%d, %s)",name, fp, strerror(errno));
+            }
         }
     }
 #endif
@@ -675,22 +680,32 @@ RkAiqResourceTranslator::translatePdafStats (const SmartPtr<VideoBuffer> &from, 
     {
         FILE* fp;
         char name[64];
-        int frame_id = buf->get_sequence() % 10;
+        int frame_id = buf->get_sequence() % 30;
 
-        if (frame_id < 3) {
+        if ((frame_id < 1) && (buf->get_sequence() < 100)) {
             memset(name, 0, sizeof(name));
             sprintf(name, DEFAULT_PD_LRAW_PATH, pdaf->pdWidth, pdaf->pdHeight, frame_id);
             fp = fopen(name, "wb");
-            fwrite(statsInt->pdaf_stats.pdLData, pdaf->pdWidth * pdaf->pdHeight, 2, fp);
-            fflush(fp);
-            fclose(fp);
+            if (fp != NULL) {
+                fwrite(statsInt->pdaf_stats.pdLData, pdaf->pdWidth * pdaf->pdHeight, 2, fp);
+                fflush(fp);
+                fclose(fp);
+                ALOGI("Write success Lpdaf data to %s!\n",name);
+            } else {
+                ALOGE("Create %s failed(%d, %s)", name, fp, strerror(errno));
+            }
 
             memset(name, 0, sizeof(name));
             sprintf(name, DEFAULT_PD_RRAW_PATH, pdaf->pdWidth, pdaf->pdHeight, frame_id);
             fp = fopen(name, "wb");
-            fwrite(statsInt->pdaf_stats.pdRData, pdaf->pdWidth * pdaf->pdHeight, 2, fp);
-            fflush(fp);
-            fclose(fp);
+            if (fp != NULL) {
+                fwrite(statsInt->pdaf_stats.pdRData, pdaf->pdWidth * pdaf->pdHeight, 2, fp);
+                fflush(fp);
+                fclose(fp);
+                ALOGI("Write success Lpdaf data to %s!\n",name);
+            } else {
+                ALOGE("Create %s failed(%d, %s)", name, fp, strerror(errno));
+            }
         }
     }
 #endif
