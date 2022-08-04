@@ -1140,6 +1140,7 @@ V4l2Device::get_buffer (SmartPtr<V4l2Buffer> &buf, int index) const
 
     if (index != -1 && !(_buf_pool[index]->get_queued())) {
         buf = _buf_pool[index];
+        buf->set_queued(true);
         return XCAM_RETURN_NO_ERROR;
     }
 
@@ -1148,6 +1149,7 @@ V4l2Device::get_buffer (SmartPtr<V4l2Buffer> &buf, int index) const
     for (i = 0; i < _buf_pool.size(); i++) {
         if (!(_buf_pool[i]->get_queued())) {
             buf = _buf_pool[i];
+            buf->set_queued(true);
             break;
         }
     }
