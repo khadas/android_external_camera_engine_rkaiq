@@ -1023,9 +1023,11 @@ CamHwIsp20::initCamHwInfos()
                 strcmp(device->info.model, "rkispp2") == 0 ||
                 strcmp(device->info.model, "rkispp3") == 0 ||
                 strcmp(device->info.model, "rkispp") == 0) {
+#if defined(ISP_HW_V20)
             rk_aiq_ispp_t* ispp_info = get_ispp_subdevs(device, sys_path, CamHwIsp20::mIspHwInfos.ispp_info);
             if (ispp_info)
                 ispp_info->valid = true;
+#endif
             goto media_unref;
         } else if (strcmp(device->info.model, "rkisp0") == 0 ||
                    strcmp(device->info.model, "rkisp1") == 0 ||
