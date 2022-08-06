@@ -29,7 +29,7 @@
 				"Min":	1,
 				"Max":	1
 			},
-			"CISHdrGainIndSetEn":	1
+			"CISHdrGainIndSetEn":	0
 		},
 		"CISTimeSet":	{
 			"Linear":	{
