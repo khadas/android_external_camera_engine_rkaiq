@@ -51,8 +51,8 @@
                     (V4L2_EVENT_PRIVATE_START + 2)
 
 #define FILE_PATH_LEN                       64
-#define CAMS_NUM_MAX                        2
-#define FLASH_NUM_MAX                       2
+#define CAMS_NUM_MAX                        8
+#define FLASH_NUM_MAX                       8
 
 
 #define MAX_MEDIA_DEV_NUM  10
