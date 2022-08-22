@@ -1116,7 +1116,8 @@ V4l2Device::dequeue_buffer(SmartPtr<V4l2Buffer> &buf)
     buf->set_timestamp (v4l2_buf.timestamp);
     buf->set_timecode (v4l2_buf.timecode);
     buf->set_sequence (v4l2_buf.sequence);
-    if (!V4L2_TYPE_IS_OUTPUT(buf->get_buf ().type))
+    if (!V4L2_TYPE_IS_OUTPUT(_buf_type) &&
+            (_buf_type != V4L2_BUF_TYPE_META_OUTPUT))
         buf->set_queued(false);
     if (V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE == _buf_type ||
             V4L2_BUF_TYPE_VIDEO_OUTPUT_MPLANE == _buf_type) {
