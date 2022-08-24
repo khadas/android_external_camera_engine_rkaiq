@@ -17,10 +17,10 @@ void convertLscTableParameter(AlscOtpInfo_t *otpInfo, int32_t bayer_pattern, int
 
     uint32_t maxSize        = srcLscWidth > srcLscHeight ? srcLscWidth : srcLscHeight;
     uint32_t ratio          = maxSize > 3200 ? 8 : (maxSize > 1600 ? 4 : (maxSize > 800 ? 2 : 1));
-    srcLscWidth             /= ratio;
-    srcLscHeight            /= ratio;
-    dstWidth                /= ratio;
-    dstHeight               /= ratio;
+    srcLscWidth = 2 * (int32_t)(srcLscWidth / (ratio * 2));
+    srcLscHeight = 2 * (int32_t)(srcLscHeight / (ratio * 2));
+    dstWidth = 2 * (int32_t)(dstWidth / (ratio * 2));
+    dstHeight = 2 * (int32_t)(dstHeight / (ratio * 2));
 
     uint16_t *rTable = new uint16_t[srcLscWidth * srcLscHeight];
     uint16_t *grTable = new uint16_t[srcLscWidth * srcLscHeight];

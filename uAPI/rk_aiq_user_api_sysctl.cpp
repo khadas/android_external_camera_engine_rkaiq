@@ -466,6 +466,9 @@ rk_aiq_uapi_sysctl_deinit_locked(rk_aiq_sys_ctx_t* ctx)
     ctx->_camHw.release();
     if (ctx->_calibDbProj) {
         // TODO:public common resource release
+        if (ctx->cam_type == RK_AIQ_CAM_TYPE_SINGLE) {
+            RkAiqCalibDbV2::releaseCalibDbProj();
+        }
     }
 
     if (ctx->next_ctx) {
