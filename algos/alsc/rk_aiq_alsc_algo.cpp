@@ -512,6 +512,15 @@ XCamReturn alscGetOtpInfo(RkAiqAlgoCom* params)
         hAlsc->alscSwInfo.otpInfo.flag = 0;
     }
 
+    LOGD_ALSC("BAYER: %d, ispAcq: %dx%d, otp flag: %d, WxH: %dx%d, table_size: %d\n",
+            hAlsc->alscSwInfo.bayerPattern,
+            hAlsc->alscSwInfo.ispAcqWidth,
+            hAlsc->alscSwInfo.ispAcqHeight,
+            hAlsc->alscSwInfo.otpInfo.flag,
+            hAlsc->alscSwInfo.otpInfo.width,
+            hAlsc->alscSwInfo.otpInfo.height,
+            hAlsc->alscSwInfo.otpInfo.table_size);
+
     return XCAM_RETURN_NO_ERROR;
 }
 
