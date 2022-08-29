@@ -334,7 +334,19 @@ IspParamsAssembler::deQueOne(cam3aResultList& results, uint32_t& frame_id)
         }
     } else {
         LOG1_CAMHW_SUBM(ISP20PARAM_SUBM, "%s: no ready params", mName.c_str());
-        return XCAM_RETURN_ERROR_PARAM;
+
+        if (mParamsMap.size() > 0) {
+            std::map<int, params_t>::reverse_iterator rit = mParamsMap.rbegin();
+
+            if (rit->first - mLatestReadyFrmId > 5) {
+                std::map<int, params_t>::iterator it = mParamsMap.begin();
+                LOGE_CAMHW_SUBM(ISP20PARAM_SUBM, "not ready params num over 5, force ready: %d", it->first);
+
+                mLatestReadyFrmId = it->first;
+                results = it->second.params;
+                mParamsMap.erase(it);
+            }
+        }
     }
     LOG1_CAMHW_SUBM(ISP20PARAM_SUBM, "%s:(%d) %s: exit \n",
                     __FUNCTION__, __LINE__, mName.c_str());
