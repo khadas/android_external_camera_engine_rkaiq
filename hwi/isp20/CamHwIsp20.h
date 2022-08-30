@@ -329,6 +329,8 @@ protected:
 
     rk_sensor_pdaf_info_t mPdafInfo;
     Mutex     _stop_cond_mutex;
+
+    XCamReturn pixFmt2Bpp(uint32_t pixFmt, int8_t& bpp);
 };
 
 };

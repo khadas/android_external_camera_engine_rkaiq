@@ -1033,7 +1033,7 @@ CamHwIsp20::initCamHwInfos()
                    strcmp(device->info.model, "rkisp3") == 0 ||
                    strcmp(device->info.model, "rkisp") == 0) {
             isp_info = get_isp_subdevs(device, sys_path, CamHwIsp20::mIspHwInfos.isp_info);
-            if (strcmp(device->info.driver, "rkisp-unite") == 0) {
+            if (strstr(device->info.driver, "rkisp-unite")) {
                 isp_info->is_multi_isp_mode = true;
                 mIsMultiIspMode = true;
                 mMultiIspExtendedPixel = RKMOUDLE_UNITE_EXTEND_PIXEL;
@@ -1419,8 +1419,8 @@ CamHwIsp20::init(const char* sns_ent_name)
     mPdafStreamUnit = new PdafStreamProcUnit(ISP_POLL_PDAF_STATS);
     mPdafStreamUnit->set_devices(this);
 
-    mRawCapUnit = new RawStreamCapUnit(s_info, _linked_to_isp);
-    mRawProcUnit = new RawStreamProcUnit(s_info, _linked_to_isp);
+    mRawCapUnit = new RawStreamCapUnit(s_info, _linked_to_isp, mNoReadBack);
+    mRawProcUnit = new RawStreamProcUnit(s_info, _linked_to_isp, mNoReadBack);
     mRawProcUnit->set_devices(mIspCoreDev, this);
     mRawCapUnit->set_devices(mIspCoreDev, this, mRawProcUnit.ptr());
     mRawProcUnit->setCamPhyId(mCamPhyId);
@@ -1508,9 +1508,10 @@ CamHwIsp20::setupPipelineFmtCif(struct v4l2_subdev_selection& sns_sd_sel,
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
 
     // TODO: set cif crop according to sensor crop bounds
-
-    mRawCapUnit->set_tx_format(sns_sd_sel, sns_v4l_pix_fmt);
-    mRawProcUnit->set_rx_format(sns_sd_sel, sns_v4l_pix_fmt);
+    int8_t bpp = 0;
+    pixFmt2Bpp(sns_v4l_pix_fmt, bpp);
+    mRawCapUnit->set_tx_format(sns_sd_sel, sns_v4l_pix_fmt, bpp);
+    mRawProcUnit->set_rx_format(sns_sd_sel, sns_v4l_pix_fmt, bpp);
 
     // set isp sink fmt, same as sensor bounds - crop
     struct v4l2_subdev_format isp_sink_fmt;
@@ -1605,8 +1606,10 @@ CamHwIsp20::setupPipelineFmtIsp(struct v4l2_subdev_selection& sns_sd_sel,
 {
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
 
-    mRawCapUnit->set_tx_format(sns_sd_fmt, sns_v4l_pix_fmt);
-    mRawProcUnit->set_rx_format(sns_sd_fmt, sns_v4l_pix_fmt);
+    int8_t bpp = 0;
+    pixFmt2Bpp(sns_v4l_pix_fmt, bpp);
+    mRawCapUnit->set_tx_format(sns_sd_fmt, sns_v4l_pix_fmt, bpp);
+    mRawProcUnit->set_rx_format(sns_sd_fmt, sns_v4l_pix_fmt, bpp);
 #ifndef ANDROID_OS // Android camera hal will set pipeline itself
     // set isp sink fmt, same as sensor fmt
     struct v4l2_subdev_format isp_sink_fmt;
@@ -5660,6 +5663,48 @@ void CamHwIsp20::notify_isp_stream_status(bool on)
         hdr_mipi_stop();
         LOGI_CAMHW_SUBM(ISP20HW_SUBM, "camId:%d, %s off done", mCamPhyId, __func__);
     }
+}
+
+XCamReturn
+CamHwIsp20::pixFmt2Bpp(uint32_t pixFmt, int8_t& bpp)
+{
+	switch (pixFmt) {
+	case V4L2_PIX_FMT_SBGGR8:
+	case V4L2_PIX_FMT_SGBRG8:
+	case V4L2_PIX_FMT_SGRBG8:
+	case V4L2_PIX_FMT_SRGGB8:
+		bpp = 8;
+		break;
+	case V4L2_PIX_FMT_SBGGR10:
+	case V4L2_PIX_FMT_SGBRG10:
+	case V4L2_PIX_FMT_SGRBG10:
+	case V4L2_PIX_FMT_SRGGB10:
+		bpp = 10;
+		break;
+	case V4L2_PIX_FMT_SBGGR12:
+	case V4L2_PIX_FMT_SGBRG12:
+	case V4L2_PIX_FMT_SGRBG12:
+	case V4L2_PIX_FMT_SRGGB12:
+		bpp = 12;
+		break;
+    case V4L2_PIX_FMT_SBGGR14:
+    case V4L2_PIX_FMT_SGBRG14:
+    case V4L2_PIX_FMT_SGRBG14:
+    case V4L2_PIX_FMT_SRGGB14:
+		bpp = 14;
+		break;
+    case V4L2_PIX_FMT_SBGGR16:
+    case V4L2_PIX_FMT_SGBRG16:
+    case V4L2_PIX_FMT_SGRBG16:
+    case V4L2_PIX_FMT_SRGGB16:
+		bpp = 16;
+		break;
+	default:
+        LOGE_CAMHW_SUBM(ISP20HW_SUBM, "unknown format");
+		return XCAM_RETURN_ERROR_PARAM;
+	}
+
+    return XCAM_RETURN_NO_ERROR;
 }
 
 }; //namspace RkCam
