@@ -657,7 +657,15 @@ private:
     int mSpAlignedWidth;
     int mSpAlignedHeight;
     uint64_t mCustomEnAlgosMask;
+
     bool mPdafSupport;
+    int64_t mFrmInterval = 30000LL;
+    int64_t mSofTime = 0LL;
+    int64_t mAfStatsTime;
+    int64_t mPdafStatsTime;
+    uint32_t mAfStatsFrmId;
+    SmartPtr<RkAiqAfStatsProxy> mAfStats;
+    SmartPtr<RkAiqPdafStatsProxy> mPdafStats;
 };
 
 };

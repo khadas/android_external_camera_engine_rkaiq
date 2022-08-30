@@ -345,12 +345,8 @@ static RkAiqGrpCondition_t aeGrpCondV3x[]       = {
 static RkAiqGrpConditions_t aeGrpCondsV3x       = { grp_conds_array_info(aeGrpCondV3x) };
 
 static RkAiqGrpCondition_t afGrpCondV3x[]     = {
-    [0] = { XCAM_MESSAGE_SOF_INFO_OK,       0 },
-    [1] = { XCAM_MESSAGE_AE_PRE_RES_OK,     0 },
-    [2] = { XCAM_MESSAGE_AE_PROC_RES_OK,    0 },
-    [3] = { XCAM_MESSAGE_AF_STATS_OK,       ISP_PARAMS_EFFECT_DELAY_CNT },
-    [4] = { XCAM_MESSAGE_AEC_STATS_OK,      ISP_PARAMS_EFFECT_DELAY_CNT },
-    [5] = { XCAM_MESSAGE_PDAF_STATS_OK,     ISP_PARAMS_EFFECT_DELAY_CNT },
+    [0] = { XCAM_MESSAGE_AF_STATS_OK,       ISP_PARAMS_EFFECT_DELAY_CNT },
+    [1] = { XCAM_MESSAGE_PDAF_STATS_OK,     ISP_PARAMS_EFFECT_DELAY_CNT },
 };
 static RkAiqGrpConditions_t  afGrpCondsV3x    = { grp_conds_array_info(afGrpCondV3x) };
 
@@ -1910,6 +1906,11 @@ RkAiqCore::events_analyze(const SmartPtr<ispHwEvt_t> &evts)
         sofInfo->setId(id);
         sofInfo->setType(RK_AIQ_SHARED_TYPE_SOF_INFO);
 
+        int64_t sofTime = isp20Evts->getSofTimeStamp() / 1000LL;
+        if (mSofTime != 0LL)
+            mFrmInterval = sofTime - mSofTime;
+        mSofTime = sofTime;
+
         SmartPtr<XCamMessage> msg = new RkAiqCoreVdBufMsg(XCAM_MESSAGE_SOF_INFO_OK, id, sofInfo);
         post_message(msg);
 
@@ -2892,11 +2893,26 @@ RkAiqCore::handleAfStats(const SmartPtr<VideoBuffer> &buffer, SmartPtr<RkAiqAfSt
     }
 
     afStat_ret = afStats;
-
-    uint32_t id = buffer->get_sequence();
-    SmartPtr<XCamMessage> msg = new RkAiqCoreVdBufMsg(XCAM_MESSAGE_AF_STATS_OK,
-            id, afStats);
-    post_message(msg);
+    if (mPdafSupport) {
+        mAfStats = afStats;
+        mAfStatsFrmId = buffer->get_sequence();
+        mAfStatsTime = buffer->get_timestamp();
+        if (ABS(mAfStatsTime - mPdafStatsTime) < mFrmInterval / 2LL) {
+            SmartPtr<XCamMessage> afStatsMsg =
+                new RkAiqCoreVdBufMsg(XCAM_MESSAGE_AF_STATS_OK, mAfStatsFrmId, mAfStats);
+            SmartPtr<XCamMessage> pdafStatsMsg =
+                new RkAiqCoreVdBufMsg(XCAM_MESSAGE_PDAF_STATS_OK, mAfStatsFrmId, mPdafStats);
+            post_message(afStatsMsg);
+            post_message(pdafStatsMsg);
+            mAfStats = NULL;
+            mPdafStats = NULL;
+        }
+    } else {
+        uint32_t id = buffer->get_sequence();
+        SmartPtr<XCamMessage> msg =
+            new RkAiqCoreVdBufMsg(XCAM_MESSAGE_AF_STATS_OK, id, afStats);
+        post_message(msg);
+    }
 
     return XCAM_RETURN_NO_ERROR;
 }
@@ -2918,9 +2934,19 @@ XCamReturn RkAiqCore::handlePdafStats(const SmartPtr<VideoBuffer>& buffer) {
         return XCAM_RETURN_BYPASS;
     }
 
-    uint32_t id               = buffer->get_sequence();
-    SmartPtr<XCamMessage> msg = new RkAiqCoreVdBufMsg(XCAM_MESSAGE_PDAF_STATS_OK, id, pdafStats);
-    post_message(msg);
+    mPdafStats = pdafStats;
+    mPdafStatsTime = buffer->get_timestamp();
+    if (ABS(mAfStatsTime - mPdafStatsTime) < mFrmInterval / 2LL) {
+        SmartPtr<XCamMessage> afStatsMsg =
+            new RkAiqCoreVdBufMsg(XCAM_MESSAGE_AF_STATS_OK, mAfStatsFrmId, mAfStats);
+        SmartPtr<XCamMessage> pdafStatsMsg =
+            new RkAiqCoreVdBufMsg(XCAM_MESSAGE_PDAF_STATS_OK, mAfStatsFrmId, mPdafStats);
+
+        post_message(afStatsMsg);
+        post_message(pdafStatsMsg);
+        mAfStats = NULL;
+        mPdafStats = NULL;
+    }
 
     return XCAM_RETURN_NO_ERROR;
 }

@@ -1391,6 +1391,13 @@ CamHwIsp20::init(const char* sns_ent_name)
         mLensDev = lensHw;
         mLensDev->open();
     }
+#if defined(ISP_HW_V20) || defined(ISP_HW_V21)
+    else {
+        // af soft stats need this device on 356x 1126
+        lensHw = new LensHw(NULL);
+        mLensDev = lensHw;
+    }
+#endif
 
     if(!s_info->module_ircut_dev_name.empty()) {
         mIrcutDev = new V4l2SubDevice(s_info->module_ircut_dev_name.c_str());
@@ -2107,10 +2114,14 @@ CamHwIsp20::setLensVcmCfg(struct rkmodule_inf& mod_info)
     ENTER_CAMHW_FUNCTION();
     SmartPtr<LensHw> lensHw = mLensDev.dynamic_cast_ptr<LensHw>();
     rk_aiq_lens_vcmcfg old_cfg, new_cfg;
+    int old_maxpos, new_maxpos;
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
 
     if (lensHw.ptr()) {
         ret = lensHw->getLensVcmCfg(old_cfg);
+        if (ret != XCAM_RETURN_NO_ERROR)
+            return ret;
+        ret = lensHw->getLensVcmMaxlogpos(old_maxpos);
         if (ret != XCAM_RETURN_NO_ERROR)
             return ret;
 
@@ -2147,8 +2158,18 @@ CamHwIsp20::setLensVcmCfg(struct rkmodule_inf& mod_info)
             }
         }
 
-        if (memcmp(&new_cfg, &old_cfg, sizeof(new_cfg)) != 0) {
+        if ((new_cfg.start_ma != old_cfg.start_ma) ||
+            (new_cfg.rated_ma != old_cfg.rated_ma) ||
+            (new_cfg.step_mode != old_cfg.step_mode)) {
             ret = lensHw->setLensVcmCfg(new_cfg);
+        }
+
+        new_maxpos = old_maxpos;
+        if (vcmcfg->max_logical_pos > 0) {
+            new_maxpos = vcmcfg->max_logical_pos;
+        }
+        if (old_maxpos != new_maxpos) {
+            ret = lensHw->setLensVcmMaxlogpos(new_maxpos);
         }
     }
     EXIT_CAMHW_FUNCTION();
@@ -2445,7 +2466,8 @@ CamHwIsp20::prepare(uint32_t width, uint32_t height, int mode, int t_delay, int 
 
     get_sensor_pdafinfo(s_info, &mPdafInfo);
     if (mPdafInfo.pdaf_support && pdaf->enable) {
-        mPdafStreamUnit->prepare(pdaf, &mPdafInfo);
+        mPdafInfo.pdaf_lrdiffline = pdaf->pdLRInDiffLine;
+        mPdafStreamUnit->prepare(&mPdafInfo);
     } else {
         mPdafInfo.pdaf_support = false;
     }
