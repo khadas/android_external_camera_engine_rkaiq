@@ -16,7 +16,7 @@
  * limitations under the License.
  *
  */
-#define PDAF_RAW_DUMP
+//#define PDAF_RAW_DUMP
 
 #include "isp20/Isp20Evts.h"
 #include "isp20/Isp20StatsBuffer.h"
@@ -28,16 +28,14 @@
 #include <unistd.h>
 #include <arpa/inet.h>
 #endif
-
-#ifdef ANDROID_OS
-#define DEFAULT_PD_RAW_PATH "/data/pdaf/pdaf_raw_%dx%d_%d.raw"
-#define DEFAULT_PD_LRAW_PATH "/data/pdaf/pdaf_L_%dx%d_%d.raw"
-#define DEFAULT_PD_RRAW_PATH "/data/pdaf/pdaf_R_%dx%d_%d.raw"
-#else
-#define DEFAULT_PD_RAW_PATH "/tmp/pdaf_raw_%dx%d_%d.raw"
-#define DEFAULT_PD_LRAW_PATH "/tmp/pdaf_L_%dx%d_%d.raw"
-#define DEFAULT_PD_RRAW_PATH "/tmp/pdaf_R_%sx%d_%d.raw"
+#define NEON_OPT
+#ifdef NEON_OPT
+#include <arm_neon.h>
 #endif
+
+#define DEFAULT_PD_RAW_PATH "/data/pdaf/frm%04d_pdAll.raw"
+#define DEFAULT_PD_LRAW_PATH "/data/pdaf/frm%04d_pdLeft.raw"
+#define DEFAULT_PD_RRAW_PATH "/data/pdaf/frm%04d_pdRight.raw"
 
 namespace RkCam {
 
@@ -622,100 +620,115 @@ RkAiqResourceTranslator::translatePdafStats (const SmartPtr<VideoBuffer> &from, 
 
     rk_aiq_isp_pdaf_meas_t* pdaf = &buf->pdaf_meas;
     uint16_t *pdLData, *pdRData, *pdData;
-    bool pdMirrorInCalib = pdaf->pdMirrorInCalib;
     uint32_t i, j, pixelperline;
-    uint64_t pdMean;
+    unsigned short pdWidth;
+    unsigned short pdHeight;
 
     pdLData = statsInt->pdaf_stats.pdLData;
     pdRData = statsInt->pdaf_stats.pdRData;
     pdData = (uint16_t *)pdafstats;
 
-#ifdef PDAF_RAW_DUMP
-    {
-        FILE* fp;
-        char name[128];
-        int frame_id = buf->get_sequence() % 30;
-
-        ALOGD("@%s: pdWidthxpdHeight: %dx%d !\n", __FUNCTION__, 2 * pdaf->pdWidth, pdaf->pdHeight);
-        memset(name, 0, sizeof(name));
-        if ((frame_id < 1) && (buf->get_sequence() < 100)) {
-            sprintf(name, DEFAULT_PD_RAW_PATH, pdaf->pdWidth * 2, pdaf->pdHeight, frame_id);
-            fp = fopen(name, "wb");
-            if (fp != NULL) {
-                fwrite(pdData, 2 * pdaf->pdWidth * 2 * pdaf->pdHeight, 2, fp);
-                fflush(fp);
-                fclose(fp);
-                ALOGI("Write success pdaf data to %s",name);
-            } else {
-                ALOGE("Create %s failed(%d, %s)",name, fp, strerror(errno));
-            }
-        }
-    }
-#endif
-
-    pdMean = 0;
-    pixelperline = 2 * pdaf->pdWidth;
-    if (pdMirrorInCalib) {
-        for (j = 0; j < pdaf->pdHeight; j++) {
-            for (i = 0; i < pixelperline; i+=2) {
-                pdMean += pdData[j * pixelperline + (pixelperline - 1 - i)];
-                *pdRData++ = pdData[j * pixelperline + (pixelperline - 1 - i)];
-                pdMean += pdData[j * pixelperline + (pixelperline - 1 - (i+1))];
-                *pdLData++ = pdData[j * pixelperline + (pixelperline - 1 - (i+1))];
-            }
-        }
-    } else {
-        for (j = 0; j < pdaf->pdHeight; j++) {
-            for (i = 0; i < pixelperline; i+=2) {
-                pdMean += pdData[j * pixelperline + i];
-                *pdLData++ = pdData[j * pixelperline + i];
-                pdMean += pdData[j * pixelperline + (i+1)];
-                *pdRData++ = pdData[j * pixelperline + (i+1)];
-            }
-        }
-    }
-    pdMean /= pixelperline * pdaf->pdHeight;
+    //LOGD_AF("%s: frame_id %d, timestamp %lld, pdLData %p, pdRData %p, pdData %p",
+    //    __func__, buf->get_sequence(), buf->get_timestamp(), pdLData, pdRData, pdData);
 
 #ifdef PDAF_RAW_DUMP
     {
         FILE* fp;
         char name[64];
-        int frame_id = buf->get_sequence() % 30;
+        int frame_id = buf->get_sequence() % 10;
 
-        if ((frame_id < 1) && (buf->get_sequence() < 100)) {
-            memset(name, 0, sizeof(name));
-            sprintf(name, DEFAULT_PD_LRAW_PATH, pdaf->pdWidth, pdaf->pdHeight, frame_id);
+        ALOGD("@%s: pdWidthxpdHeight: %dx%d !\n", __FUNCTION__, pdaf->pdWidth, pdaf->pdHeight);
+        memset(name, 0, sizeof(name));
+        if (frame_id < 3) {
+            sprintf(name, DEFAULT_PD_RAW_PATH, frame_id);
             fp = fopen(name, "wb");
-            if (fp != NULL) {
-                fwrite(statsInt->pdaf_stats.pdLData, pdaf->pdWidth * pdaf->pdHeight, 2, fp);
-                fflush(fp);
-                fclose(fp);
-                ALOGI("Write success Lpdaf data to %s!\n",name);
-            } else {
-                ALOGE("Create %s failed(%d, %s)", name, fp, strerror(errno));
+            fwrite(pdData, pdaf->pdWidth * pdaf->pdHeight, 2, fp);
+            fflush(fp);
+            fclose(fp);
+        }
+    }
+#endif
+
+    if (pdaf->pdLRInDiffLine == 0) {
+        pdWidth = pdaf->pdWidth >> 1;
+        pdHeight = pdaf->pdHeight;
+
+#ifdef NEON_OPT
+        uint16x8x2_t vld2_data;
+        uint16x8_t vrev_data;
+        pixelperline = 2 * pdWidth;
+        for (j = 0; j < pdHeight; j++) {
+            pdData = (uint16_t *)pdafstats + j * pixelperline;
+            for (i = 0; i < pixelperline / 16 * 16; i+=16) {
+                vld2_data = vld2q_u16(pdData);
+                vst1q_u16(pdLData, vld2_data.val[0]);
+                vst1q_u16(pdRData, vld2_data.val[1]);
+                pdLData += 8;
+                pdRData += 8;
+                pdData += 16;
             }
 
-            memset(name, 0, sizeof(name));
-            sprintf(name, DEFAULT_PD_RRAW_PATH, pdaf->pdWidth, pdaf->pdHeight, frame_id);
-            fp = fopen(name, "wb");
-            if (fp != NULL) {
-                fwrite(statsInt->pdaf_stats.pdRData, pdaf->pdWidth * pdaf->pdHeight, 2, fp);
-                fflush(fp);
-                fclose(fp);
-                ALOGI("Write success Lpdaf data to %s!\n",name);
-            } else {
-                ALOGE("Create %s failed(%d, %s)", name, fp, strerror(errno));
+            if (pixelperline % 16) {
+                for (i = 0; i < pixelperline % 16; i+=2) {
+                    *pdLData++ = pdData[i];
+                    *pdRData++ = pdData[i+1];
+                }
             }
+        }
+#else
+        pixelperline = 2 * pdWidth;
+        for (j = 0; j < pdHeight; j++) {
+            pdData = (uint16_t *)pdafstats + j * pixelperline;
+            for (i = 0; i < pixelperline; i+=2) {
+                *pdLData++ = pdData[i];
+                *pdRData++ = pdData[i+1];
+            }
+        }
+#endif
+    } else {
+        pdWidth = pdaf->pdWidth;
+        pdHeight = pdaf->pdHeight >> 1;
+        pixelperline = pdaf->pdWidth;
+        for (j = 0; j < 2 * pdHeight; j+=2) {
+            memcpy(pdRData, pdData, pixelperline * sizeof(uint16_t));
+            pdData += pixelperline;
+            memcpy(pdLData, pdData, pixelperline * sizeof(uint16_t));
+            pdData += pixelperline;
+            pdLData += pixelperline;
+            pdRData += pixelperline;
+        }
+    }
+
+#ifdef PDAF_RAW_DUMP
+    {
+        FILE* fp;
+        char name[64];
+        int frame_id = buf->get_sequence() % 10;
+
+        if (frame_id < 3) {
+            memset(name, 0, sizeof(name));
+            sprintf(name, DEFAULT_PD_LRAW_PATH, frame_id);
+            fp = fopen(name, "wb");
+            fwrite(statsInt->pdaf_stats.pdLData, pdWidth * pdHeight, 2, fp);
+            fflush(fp);
+            fclose(fp);
+
+            memset(name, 0, sizeof(name));
+            sprintf(name, DEFAULT_PD_RRAW_PATH, frame_id);
+            fp = fopen(name, "wb");
+            fwrite(statsInt->pdaf_stats.pdRData, pdWidth * pdHeight, 2, fp);
+            fflush(fp);
+            fclose(fp);
         }
     }
 #endif
 
     statsInt->pdaf_stats_valid = true;
     statsInt->frame_id = buf->get_sequence();
-    statsInt->pdaf_stats.pdWidth = pdaf->pdWidth;
-    statsInt->pdaf_stats.pdHeight = pdaf->pdHeight;
+    statsInt->pdaf_stats.pdWidth = pdWidth;
+    statsInt->pdaf_stats.pdHeight = pdHeight;
     statsInt->pdaf_stats.pdMirror = sns_mirror;
-    statsInt->pdaf_stats.pdMean = (uint32_t)pdMean;
+    statsInt->pdaf_stats.pdMean = 0;
 
     return ret;
 }
