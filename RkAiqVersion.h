@@ -384,10 +384,13 @@
  * - AF: adapt more type zoom-focus curve
  * - AE: delete extra Semicolon & add pointer release in GrpAE
  * - hwi: fix segment fault in setIspConfig when stopping AIQ
+ * v3.0x8.8-p1
+ * - PDAF: update to v0.1.5
+ * - AF: support max logical position
  */
 
-#define RK_AIQ_VERSION_REAL_V "v3.0x8.8"
-#define RK_AIQ_RELEASE_DATE "2022-05-05"
+#define RK_AIQ_VERSION_REAL_V "v3.0x8.8-p1"
+#define RK_AIQ_RELEASE_DATE "2022-08-31"
 
 /******* DO NOT EDIT THE FOLLOWINGS ***********/
 
