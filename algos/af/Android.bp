@@ -1,0 +1,11 @@
+cc_rockchip_prebuilt_library_static {
+    name: "librkaiq_af",
+    vendor: true,
+    aiq: true,
+}
+
+cc_rockchip_prebuilt_library_static {
+    name: "librkaiq_pdaf",
+    vendor: true,
+    aiq: true,
+}
