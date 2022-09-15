@@ -55,6 +55,11 @@ void convertLscTableParameter(AlscOtpInfo_t *otpInfo, int32_t bayer_pattern, int
     int cropoffsetx = srcLscWidth / 2 - dstWidth / 2;
     int cropoffsety = srcLscHeight / 2 - dstHeight / 2;
 
+    if (cropoffsetx % 2 != 0)
+        cropoffsetx = cropoffsetx - 1;
+    if (cropoffsety % 2 != 0)
+        cropoffsety = cropoffsety -1;
+
     for (int i = 0; i < dstHeight; i++)
     {
 
