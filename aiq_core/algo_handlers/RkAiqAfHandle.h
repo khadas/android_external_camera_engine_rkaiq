@@ -76,6 +76,7 @@ class RkAiqAfHandleInt : virtual public RkAiqHandle {
     int mLastZoomIndex;
 
     SmartPtr<RkAiqAlgoProcResAfIntShared> mProcResShared;
+    RkAiqAlgoProcResAf mLastAfResult;
 
     XCam::Mutex mAeStableMutex;
     bool mAeStable = false;
