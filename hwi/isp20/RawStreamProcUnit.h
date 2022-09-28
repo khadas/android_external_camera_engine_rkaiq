@@ -34,11 +34,11 @@ class RawStreamProcUnit : public PollCallback
 {
 public:
     explicit RawStreamProcUnit      ();
-    explicit RawStreamProcUnit (const rk_sensor_full_info_t *s_info, bool linked_to_isp, bool noReadBack);
+    explicit RawStreamProcUnit (const rk_sensor_full_info_t *s_info, bool linked_to_isp);
     virtual ~RawStreamProcUnit ();
     virtual XCamReturn start        (int mode);
     virtual XCamReturn stop         ();
-    void set_working_mode           (int mode);
+    void set_working_mode           (int mode, bool noReadBack);
     XCamReturn prepare(int idx);
     void set_rx_devices             (SmartPtr<V4l2Device> mipi_rx_devs[3]);
     SmartPtr<V4l2Device> get_rx_device (int index);

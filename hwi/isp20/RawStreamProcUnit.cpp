@@ -15,7 +15,7 @@ RawStreamProcUnit::RawStreamProcUnit ()
     _rawCap = NULL;
 }
 
-RawStreamProcUnit::RawStreamProcUnit (const rk_sensor_full_info_t *s_info, bool linked_to_isp, bool noReadBack)
+RawStreamProcUnit::RawStreamProcUnit (const rk_sensor_full_info_t *s_info, bool linked_to_isp)
     : _first_trigger(true)
     , _is_multi_cam_conc(false)
 {
@@ -57,7 +57,6 @@ RawStreamProcUnit::RawStreamProcUnit (const rk_sensor_full_info_t *s_info, bool 
     }
 
     is_multi_isp_mode = s_info->isp_info->is_multi_isp_mode;
-    mNoReadBack = noReadBack;
 }
 
 RawStreamProcUnit::~RawStreamProcUnit ()
@@ -129,7 +128,7 @@ RawStreamProcUnit::prepare(int idx)
 }
 
 void
-RawStreamProcUnit::set_working_mode(int mode)
+RawStreamProcUnit::set_working_mode(int mode, bool noReadBack)
 {
     _working_mode = mode;
 
@@ -145,6 +144,9 @@ RawStreamProcUnit::set_working_mode(int mode)
     default:
         _mipi_dev_max = 1;
     }
+
+    mNoReadBack = noReadBack;
+
     LOGD_CAMHW_SUBM(ISP20HW_SUBM,"working_mode:0x%x, _mipi_dev_max=%d\n", _working_mode, _mipi_dev_max);
 }
 

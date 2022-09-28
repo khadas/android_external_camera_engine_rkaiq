@@ -1426,8 +1426,8 @@ CamHwIsp20::init(const char* sns_ent_name)
     mPdafStreamUnit = new PdafStreamProcUnit(ISP_POLL_PDAF_STATS);
     mPdafStreamUnit->set_devices(this);
 
-    mRawCapUnit = new RawStreamCapUnit(s_info, _linked_to_isp, mNoReadBack);
-    mRawProcUnit = new RawStreamProcUnit(s_info, _linked_to_isp, mNoReadBack);
+    mRawCapUnit = new RawStreamCapUnit(s_info, _linked_to_isp);
+    mRawProcUnit = new RawStreamProcUnit(s_info, _linked_to_isp);
     mRawProcUnit->set_devices(mIspCoreDev, this);
     mRawCapUnit->set_devices(mIspCoreDev, this, mRawProcUnit.ptr());
     mRawProcUnit->setCamPhyId(mCamPhyId);
@@ -2402,8 +2402,8 @@ CamHwIsp20::prepare(uint32_t width, uint32_t height, int mode, int t_delay, int 
         sensorHw->set_sync_mode(NO_SYNC_MODE);
     }
 
-    mRawCapUnit->set_working_mode(mode);
-    mRawProcUnit->set_working_mode(mode);
+    mRawCapUnit->set_working_mode(mode, mNoReadBack);
+    mRawProcUnit->set_working_mode(mode, mNoReadBack);
     setExpDelayInfo(mode);
     setLensVcmCfg(s_info->mod_info);
     xcam_mem_clear(_lens_des);
@@ -2841,8 +2841,8 @@ XCamReturn CamHwIsp20::swWorkingModeDyn(int mode)
     }
 #endif
     _hdr_mode = mode;
-    mRawCapUnit->set_working_mode(mode);
-    mRawProcUnit->set_working_mode(mode);
+    mRawCapUnit->set_working_mode(mode, mNoReadBack);
+    mRawProcUnit->set_working_mode(mode, mNoReadBack);
     // remap _mipi_tx_devs for cif
     if (!_linked_to_isp && !mNoReadBack)
         mRawCapUnit->prepare_cif_mipi();

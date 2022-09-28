@@ -12,7 +12,7 @@ RawStreamCapUnit::RawStreamCapUnit ()
 {
 }
 
-RawStreamCapUnit::RawStreamCapUnit (const rk_sensor_full_info_t *s_info, bool linked_to_isp, bool noReadBack)
+RawStreamCapUnit::RawStreamCapUnit (const rk_sensor_full_info_t *s_info, bool linked_to_isp)
     :_skip_num(0)
     ,_state(RAW_CAP_STATE_INVALID)
 {
@@ -83,7 +83,6 @@ RawStreamCapUnit::RawStreamCapUnit (const rk_sensor_full_info_t *s_info, bool li
     }
 
     is_multi_isp_mode = s_info->isp_info->is_multi_isp_mode;
-    mNoReadBack = noReadBack;
 
     _state = RAW_CAP_STATE_INITED;
 }
@@ -206,7 +205,7 @@ RawStreamCapUnit::prepare_cif_mipi()
 }
 
 void
-RawStreamCapUnit::set_working_mode(int mode)
+RawStreamCapUnit::set_working_mode(int mode, bool noReadBack)
 {
     LOGD_CAMHW_SUBM(ISP20HW_SUBM, "%s enter,mode=0x%x", __FUNCTION__, mode);
     _working_mode = mode;
@@ -223,6 +222,9 @@ RawStreamCapUnit::set_working_mode(int mode)
     default:
         _mipi_dev_max = 1;
     }
+
+    mNoReadBack = noReadBack;
+
     LOGD_CAMHW_SUBM(ISP20HW_SUBM, "%s exit", __FUNCTION__);
 }
 
