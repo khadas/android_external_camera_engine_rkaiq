@@ -31,11 +31,11 @@ class RawStreamCapUnit : public PollCallback
 {
 public:
     explicit RawStreamCapUnit ();
-    explicit RawStreamCapUnit (const rk_sensor_full_info_t *s_info, bool linked_to_isp, bool noReadBack);
+    explicit RawStreamCapUnit (const rk_sensor_full_info_t *s_info, bool linked_to_isp);
     virtual ~RawStreamCapUnit ();
     virtual XCamReturn start(int mode);
     virtual XCamReturn stop ();
-    void set_working_mode(int mode);
+    void set_working_mode(int mode, bool noReadBack);
     void set_devices(SmartPtr<V4l2SubDevice> ispdev, CamHwIsp20* handle, RawStreamProcUnit *proc);
     void set_tx_devices(SmartPtr<V4l2Device> mipi_tx_devs[3]);
     SmartPtr<V4l2Device> get_tx_device (int index);
