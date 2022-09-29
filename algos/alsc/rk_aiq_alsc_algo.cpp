@@ -476,13 +476,16 @@ XCamReturn convertSensorLscOTP(alsc_handle_t hAlsc)
 
     if (!hAlsc->alscSwInfo.otpInfo.flag || \
         !hAlsc->alscSwInfo.otpInfo.lsc_r || !hAlsc->alscSwInfo.otpInfo.lsc_b || \
-        !hAlsc->alscSwInfo.otpInfo.lsc_gr || !hAlsc->alscSwInfo.otpInfo.lsc_gb || \
-        (hAlsc->alscSwInfo.ispAcqWidth == hAlsc->alscSwInfo.otpInfo.width && \
-         hAlsc->alscSwInfo.ispAcqHeight == hAlsc->alscSwInfo.otpInfo.height))
+        !hAlsc->alscSwInfo.otpInfo.lsc_gr || !hAlsc->alscSwInfo.otpInfo.lsc_gb)
         return XCAM_RETURN_BYPASS;
 
-    convertLscTableParameter(&hAlsc->alscSwInfo.otpInfo, hAlsc->alscSwInfo.bayerPattern,
-            hAlsc->alscSwInfo.ispAcqWidth, hAlsc->alscSwInfo.ispAcqHeight);
+    if ((hAlsc->alscSwInfo.ispAcqWidth > hAlsc->alscSwInfo.otpInfo.width && \
+         hAlsc->alscSwInfo.ispAcqHeight > hAlsc->alscSwInfo.otpInfo.height) || \
+         (hAlsc->alscSwInfo.ispAcqWidth < hAlsc->alscSwInfo.otpInfo.width && \
+         hAlsc->alscSwInfo.ispAcqHeight < hAlsc->alscSwInfo.otpInfo.height)) {
+        convertLscTableParameter(&hAlsc->alscSwInfo.otpInfo, hAlsc->alscSwInfo.bayerPattern,
+                hAlsc->alscSwInfo.ispAcqWidth, hAlsc->alscSwInfo.ispAcqHeight);
+    }
 
     return ret;
 }
@@ -497,8 +500,8 @@ XCamReturn alscGetOtpInfo(RkAiqAlgoCom* params)
 
     alsc_sw_info_t *alscSwInfo = &para->alsc_sw_info;
     hAlsc->alscSwInfo.bayerPattern = alscSwInfo->bayerPattern;
-    hAlsc->alscSwInfo.ispAcqWidth = alscSwInfo->ispAcqWidth;
-    hAlsc->alscSwInfo.ispAcqHeight = alscSwInfo->ispAcqHeight;
+    hAlsc->alscSwInfo.ispAcqWidth = para->com.u.prepare.sns_op_width;
+    hAlsc->alscSwInfo.ispAcqHeight = para->com.u.prepare.sns_op_height;
     if (alscSwInfo->otpInfo.flag) {
         hAlsc->alscSwInfo.otpInfo.flag = alscSwInfo->otpInfo.flag;
         hAlsc->alscSwInfo.otpInfo.width = alscSwInfo->otpInfo.width;

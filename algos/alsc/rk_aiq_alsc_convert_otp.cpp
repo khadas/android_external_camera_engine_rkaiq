@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <xcam_std.h>
+#include "xcam_log.h"
 #include "rk_aiq_alsc_convert_otp.h"
 
 // #define WRITE_OTP_TABLE 1
@@ -14,6 +15,23 @@ void convertLscTableParameter(AlscOtpInfo_t *otpInfo, int32_t bayer_pattern, int
     int32_t bayer = bayer_pattern;
     uint32_t srcLscWidth    = otpInfo->width;
     uint32_t srcLscHeight   = otpInfo->height;
+
+    LOGD_ALSC("input params: src %dx%d, dst %dx%d, bayer: %d\n",
+            srcLscWidth, srcLscHeight, dstWidth,
+            dstHeight, bayer_pattern);
+
+    if ((dstWidth > srcLscWidth)&&(dstHeight > srcLscHeight))
+    {
+        if (((dstWidth / 2) < srcLscWidth) && ((dstHeight / 2) < srcLscHeight))
+        {
+            dstWidth = dstWidth / 2;
+            dstHeight = dstHeight / 2;
+        } else {
+            LOGE_ALSC("Failed to handle: src %dx%d, dst %dx%x, return!\n",
+                    srcLscWidth, srcLscHeight, dstWidth, dstHeight);
+            return;
+        }
+    }
 
     uint32_t maxSize        = srcLscWidth > srcLscHeight ? srcLscWidth : srcLscHeight;
     uint32_t ratio          = maxSize > 3200 ? 8 : (maxSize > 1600 ? 4 : (maxSize > 800 ? 2 : 1));
