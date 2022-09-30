@@ -168,6 +168,7 @@ static int rk_aiq_offline_init(rk_aiq_sys_ctx_t* ctx)
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
     char* use_as_fake_cam_env = getenv("USE_AS_FAKE_CAM");
     ini_t* aiq_ini = rkaiq_ini_load(OFFLINE_INI_FILE);
+    LOGE("xuhf----aiq_ini: %s", aiq_ini);
 
     ENTER_XCORE_FUNCTION();
 
@@ -180,6 +181,9 @@ static int rk_aiq_offline_init(rk_aiq_sys_ctx_t* ctx)
         bool offline = atoi(raw_offline_str) > 0 ? true : false;
         int raw_w = atoi(raw_w_str);
         int raw_h = atoi(raw_h_str);
+
+        LOGE("xuhf----offline: %d, raw: %dx%d, raw_fmt_str: %s",
+             offline, raw_w, raw_h, raw_fmt_str);
 
         // valid offline mode
         if (offline && raw_w && raw_h && raw_fmt_str) {
@@ -221,6 +225,8 @@ static int rk_aiq_offline_init(rk_aiq_sys_ctx_t* ctx)
 
     if (use_as_fake_cam_env)
         ctx->_use_fakecam = atoi(use_as_fake_cam_env) > 0 ? true : false;
+
+    LOGE("xuhf----_use_fakecam: %d", ctx->_use_fakecam);
 
     EXIT_XCORE_FUNCTION();
 
@@ -728,7 +734,8 @@ void
 rk_aiq_uapi_sysctl_release3AStatsRef(const rk_aiq_sys_ctx_t* ctx,
                                      rk_aiq_isp_stats_t *stats)
 {
-    RKAIQ_API_SMART_LOCK(ctx);
+    // blocked API, add lock ?
+    // RKAIQ_API_SMART_LOCK(ctx);
     ctx->_analyzer->release3AStatsRef(stats);
 }
 
