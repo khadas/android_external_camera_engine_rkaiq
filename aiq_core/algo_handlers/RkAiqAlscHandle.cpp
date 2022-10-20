@@ -171,8 +171,8 @@ XCamReturn RkAiqAlscHandleInt::prepare() {
     RkAiqCore::RkAiqAlgosComShared_t* sharedCom = &mAiqCore->mAlogsComSharedParams;
 
     alsc_config_int->alsc_sw_info.bayerPattern= getBayerPattern(sharedCom->snsDes.sensor_pixelformat);
-    alsc_config_int->alsc_sw_info.ispAcqWidth = sharedCom->snsDes.isp_acq_width;
-    alsc_config_int->alsc_sw_info.ispAcqHeight = sharedCom->snsDes.isp_acq_height;
+    alsc_config_int->alsc_sw_info.ispAcqWidth = alsc_config_int->com.u.prepare.sns_op_width;
+    alsc_config_int->alsc_sw_info.ispAcqHeight = alsc_config_int->com.u.prepare.sns_op_height;
     if (sharedCom->snsDes.otp_lsc && sharedCom->snsDes.otp_lsc->flag) {
         alsc_config_int->alsc_sw_info.otpInfo.flag = sharedCom->snsDes.otp_lsc->flag;
         alsc_config_int->alsc_sw_info.otpInfo.width = sharedCom->snsDes.otp_lsc->width;

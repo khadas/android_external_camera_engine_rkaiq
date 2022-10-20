@@ -720,7 +720,8 @@ RkAiqCore::prepare(const rk_aiq_exposure_sensor_descriptor* sensor_des,
     if (res_changed) {
         mAlogsComSharedParams.conf_type |= RK_AIQ_ALGO_CONFTYPE_CHANGERES;
         LOGD_ANALYZER("resolution changed !");
-    }
+    } else
+        mAlogsComSharedParams.conf_type &= ~RK_AIQ_ALGO_CONFTYPE_CHANGERES;
 
     if ((mState == RK_AIQ_CORE_STATE_STOPED) ||
             (mState == RK_AIQ_CORE_STATE_PREPARED)) {
@@ -840,6 +841,13 @@ RkAiqCore::analyzeInternal(enum rk_aiq_core_analyze_type_e type)
         auto mapIter = mAlogsGroupSharedParamsMap.begin();
         while (mapIter != mAlogsGroupSharedParamsMap.end()) {
             RkAiqAlgosGroupShared_t* &shared = mapIter->second;
+            if (mAlogsComSharedParams.conf_type & RK_AIQ_ALGO_CONFTYPE_CHANGERES) {
+                shared->frameId = 0;
+                shared->sof     = 0;
+                shared->ispStats = 0;
+                mapIter++;
+                continue;
+            }
             shared->reset();
             shared->frameId = 0;
 

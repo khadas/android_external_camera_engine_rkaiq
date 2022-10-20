@@ -95,6 +95,7 @@ prepare(RkAiqAlgoCom* params)
         pAcnrCtx->isReCalculate |= 1;
 
     }
+    pAcnrCtx->width = params->u.prepare.sns_op_width;
     AcnrV2_result_t ret = Acnr_Prepare_V2(pAcnrCtx, &pCfgParam->stAcnrConfig);
     if(ret != ACNRV2_RET_SUCCESS) {
         result = XCAM_RETURN_ERROR_FAILED;
@@ -264,6 +265,10 @@ processing(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outparams)
         pAcnrCtx->isReCalculate |= 1;
     }
 
+    // TODO: temp for 8k picture
+    stExpInfo.snr_mode = pAcnrCtx->width > 4096 ? 1 : 0;
+    if (stExpInfo.snr_mode != pAcnrCtx->stExpInfo.snr_mode)
+        pAcnrCtx->isReCalculate |= 1;
     if(pAcnrCtx->isReCalculate) {
         AcnrV2_result_t ret = Acnr_Process_V2(pAcnrCtx, &stExpInfo);
         if(ret != ACNRV2_RET_SUCCESS) {

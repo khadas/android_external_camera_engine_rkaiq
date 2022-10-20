@@ -22,6 +22,7 @@
 
 #include "stdint.h"
 #include "alsc/rk_aiq_types_alsc_algo_int.h"
+#include "alsc/rk_aiq_types_alsc_algo_prvt.h"
 
 #define c_lsc_ram_ad_bw    9                  // bit width for the RAM address
 #define c_lsc_ram_d_bw     26                 // double correction factor, must be even numbers
@@ -72,7 +73,7 @@ typedef enum
     B_INDEX = 3,
 } BayerIndex;
 
-void convertLscTableParameter(AlscOtpInfo_t *otpInfo, int32_t bayer_pattern, int32_t dstWidth, int32_t dstHeight);
+void convertLscTableParameter(alsc_handle_t hAlsc);
 void computeSamplingPoint(int size, int *pos);
 void computeSamplingInterval(int width, int height, int *xInterval, int *yInterval);
 void getLscParameter(uint16_t *r, uint16_t *gr, uint16_t *gb, uint16_t *b, uint16_t *table, int width, int height, int bayer);

@@ -281,7 +281,7 @@ typedef struct CalibDbV2_Af_Pdaf_s {
     unsigned short pdWidth;
     // M4_NUMBER_DESC("pdHeight", "u16", M4_RANGE(0, 65535), "760", M4_DIGIT(0))
     unsigned short pdHeight;
-    // M4_NUMBER_DESC("pdVerBinning", "u8", M4_RANGE(0, 1), "0", M4_DIGIT(0))
+    // M4_NUMBER_DESC("pdVerBinning", "u8", M4_RANGE(0, 255), "0", M4_DIGIT(0))
     unsigned char pdVerBinning;
     // M4_NUMBER_DESC("pdFrmInValid", "u8", M4_RANGE(0, 4), "1", M4_DIGIT(0))
     unsigned char pdFrmInValid;
