@@ -66,13 +66,13 @@ prepare(RkAiqAlgoCom* params)
     sprintf(hAlsc->cur_res.name, "%dx%d", para->com.u.prepare.sns_op_width,
             para->com.u.prepare.sns_op_height );
     hAlsc->alscSwInfo.prepare_type = params->u.prepare.conf_type;
-    if(!!(params->u.prepare.conf_type & RK_AIQ_ALGO_CONFTYPE_UPDATECALIB )){
-        hAlsc->calibLscV2 =
+   if(!!(params->u.prepare.conf_type & RK_AIQ_ALGO_CONFTYPE_UPDATECALIB )){
+       hAlsc->calibLscV2 =
             (CalibDbV2_LSC_t*)(CALIBDBV2_GET_MODULE_PTR(para->com.u.prepare.calibv2, lsc_v2));
-    }
+   }
     if (hAlsc->eState == ALSC_STATE_INITIALIZED) {
-        alscGetOtpInfo(params);
-        convertSensorLscOTP(hAlsc);
+       alscGetOtpInfo(params);
+       convertSensorLscOTP(hAlsc);
     }
     AlscPrepare((alsc_handle_t)(params->ctx->alsc_para));
 

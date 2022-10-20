@@ -27,6 +27,7 @@
 #include "xcam_common.h"
 #include "list.h"
 #include "RkAiqCalibDbV2Helper.h"
+#include "rk_aiq_alsc_convert_otp.h"
 
 RKAIQ_BEGIN_DECLARE
 
@@ -96,20 +97,6 @@ typedef struct alsc_grad_s
     uint16_t        LscYGradTbl[LSC_GRAD_TBL_SIZE];
 } alsc_grad_t;
 
-typedef struct alsc_otp_grad_s
-{
-    uint32_t flag;
-
-    uint16_t width;
-    uint16_t height;
-    uint16_t table_size;
-
-    uint16_t lsc_r[LSC_DATA_TBL_SIZE];
-    uint16_t lsc_b[LSC_DATA_TBL_SIZE];
-    uint16_t lsc_gr[LSC_DATA_TBL_SIZE];
-    uint16_t lsc_gb[LSC_DATA_TBL_SIZE];
-} alsc_otp_grad_t;
-
 typedef struct alsc_context_s {
     const CalibDbV2_LSC_t   *calibLscV2;
 
@@ -135,12 +122,6 @@ typedef struct alsc_context_s {
     //in some cases, the scene does not change, so it doesn't need to calculate in every frame;
     bool auto_mode_need_run_algo;
     AlscState_t eState;
-
-    // otp grad
-    RkAiqBayerPattern_t bayerPattern;
-    uint32_t ispAcqWidth;
-    uint32_t ispAcqHeight;
-    alsc_otp_grad_t otpGrad;
 } alsc_context_t ;
 
 typedef alsc_context_t* alsc_handle_t ;

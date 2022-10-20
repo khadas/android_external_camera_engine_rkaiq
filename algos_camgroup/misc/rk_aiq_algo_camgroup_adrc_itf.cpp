@@ -100,8 +100,6 @@ prepare(RkAiqAlgoCom* params)
 
             memcpy(&pAdrcGrpCtx->pCalibDB.Drc_v30, calibv2_adrc_calib, sizeof(CalibDbV2_drc_V2_t)); //reload iq paras
         }
-    } else if (params->u.prepare.conf_type & RK_AIQ_ALGO_CONFTYPE_CHANGERES) {
-        pAdrcGrpCtx->isCapture = true;
     }
 
     if(/* !params->u.prepare.reconfig*/true) {
@@ -113,7 +111,7 @@ prepare(RkAiqAlgoCom* params)
         }
     }
 
-    // update
+    //update
     DrcPrepareJsonMalloc(&pAdrcGrpCtx->Config, &pAdrcGrpCtx->pCalibDB);
     AdrcPrePareJsonUpdateConfig(pAdrcGrpCtx, &pAdrcGrpCtx->pCalibDB);
 
@@ -133,29 +131,25 @@ processing(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outparams)
     RkAiqAlgoCamGroupProcIn* pAdrcGrpParams = (RkAiqAlgoCamGroupProcIn*)inparams;
     RkAiqAlgoCamGroupProcOut* pAdrcGrpProcRes = (RkAiqAlgoCamGroupProcOut*)outparams;
 
-    if (pAdrcGrpCtx->isCapture) {
-        LOGD_ATMO("%s: It's capturing, using pre frame params\n", __func__);
-        pAdrcGrpCtx->isCapture = false;
-    } else {
-        // update config
-        if (pAdrcGrpCtx->drcAttr.opMode > DRC_OPMODE_API_OFF) {
-            DrcProcApiMalloc(&pAdrcGrpCtx->Config, &pAdrcGrpCtx->drcAttr, &pAdrcGrpCtx->pCalibDB);
-            AdrcProcUpdateConfig(pAdrcGrpCtx, &pAdrcGrpCtx->pCalibDB, &pAdrcGrpCtx->drcAttr);
-        }
-        DrcEnableSetting(pAdrcGrpCtx);
+    //update config
+    if(pAdrcGrpCtx->drcAttr.opMode > DRC_OPMODE_API_OFF) {
+        DrcProcApiMalloc(&pAdrcGrpCtx->Config, &pAdrcGrpCtx->drcAttr, &pAdrcGrpCtx->pCalibDB);
+        AdrcProcUpdateConfig(pAdrcGrpCtx, &pAdrcGrpCtx->pCalibDB, &pAdrcGrpCtx->drcAttr);
+    }
+    DrcEnableSetting(pAdrcGrpCtx);
 
-        // get Sensor Info
-        XCamVideoBuffer* xCamAeProcRes = pAdrcGrpParams->camgroupParmasArray[0]->aec._aeProcRes;
-        RkAiqAlgoProcResAe* pAEProcRes = NULL;
-        if (xCamAeProcRes) {
-            pAEProcRes = (RkAiqAlgoProcResAe*)xCamAeProcRes->map(xCamAeProcRes);
-            AdrcGetSensorInfo(pAdrcGrpCtx, pAEProcRes->ae_proc_res_rk);
-        } else {
-            AecProcResult_t AeProcResult;
-            memset(&AeProcResult, 0x0, sizeof(AecProcResult_t));
-            LOGW_ATMO("%s: Ae Proc result is null!!!\n", __FUNCTION__);
-            AdrcGetSensorInfo(pAdrcGrpCtx, AeProcResult);
-        }
+    // get Sensor Info
+    XCamVideoBuffer* xCamAeProcRes = pAdrcGrpParams->camgroupParmasArray[0]->aec._aeProcRes;
+    RkAiqAlgoProcResAe* pAEProcRes = NULL;
+    if (xCamAeProcRes) {
+        pAEProcRes = (RkAiqAlgoProcResAe*)xCamAeProcRes->map(xCamAeProcRes);
+        AdrcGetSensorInfo(pAdrcGrpCtx, pAEProcRes->ae_proc_res_rk);
+    } else {
+        AecProcResult_t AeProcResult;
+        memset(&AeProcResult, 0x0, sizeof(AecProcResult_t));
+        LOGW_ATMO("%s: Ae Proc result is null!!!\n", __FUNCTION__);
+        AdrcGetSensorInfo(pAdrcGrpCtx, AeProcResult);
+    }
 
         //get ae pre res and proc
         XCamVideoBuffer* xCamAePreRes = pAdrcGrpParams->camgroupParmasArray[0]->aec._aePreRes;
@@ -294,20 +288,18 @@ processing(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outparams)
                 __func__);
         } else
             LOGD_ATMO("%s: Group Drc Enable if OFF, Bypass Drc !!! \n", __func__);
-    }
 
         // output ProcRes
         for (int i = 0; i < pAdrcGrpProcRes->arraySize; i++) {
             pAdrcGrpProcRes->camgroupParmasArray[i]->_adrcConfig->update =
-                true;  // not use in isp3xparams for now
+                !bypass;  // not use in isp3xparams for now
             pAdrcGrpProcRes->camgroupParmasArray[i]->_adrcConfig->CompressMode =
                 pAdrcGrpCtx->AdrcProcRes.CompressMode;
             pAdrcGrpProcRes->camgroupParmasArray[i]->_adrcConfig->LongFrameMode =
                 pAdrcGrpCtx->AdrcProcRes.LongFrameMode;
             pAdrcGrpProcRes->camgroupParmasArray[i]->_adrcConfig->isHdrGlobalTmo =
                 pAdrcGrpCtx->AdrcProcRes.isHdrGlobalTmo;
-            pAdrcGrpProcRes->camgroupParmasArray[i]->_adrcConfig->bTmoEn =
-                pAdrcGrpCtx->Config.Drc_v30.Enable;
+            pAdrcGrpProcRes->camgroupParmasArray[i]->_adrcConfig->bTmoEn = Enable;
             pAdrcGrpProcRes->camgroupParmasArray[i]->_adrcConfig->isLinearTmo =
                 pAdrcGrpCtx->AdrcProcRes.isLinearTmo;
             memcpy(&pAdrcGrpProcRes->camgroupParmasArray[i]->_adrcConfig->DrcProcRes,

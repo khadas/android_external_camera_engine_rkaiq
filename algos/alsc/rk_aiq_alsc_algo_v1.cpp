@@ -450,7 +450,6 @@ XCamReturn AlscAutoConfig
 
     // 6 set to ic
 
-#if 0
     memcpy(hAlsc->lscHwConf.r_data_tbl, &hAlsc->alscRest.dampedLscMatrixTable.LscMatrix[CAM_4CH_COLOR_COMPONENT_RED].uCoeff,
            sizeof(hAlsc->alscRest.dampedLscMatrixTable.LscMatrix[CAM_4CH_COLOR_COMPONENT_RED].uCoeff));
     memcpy(hAlsc->lscHwConf.gr_data_tbl, &hAlsc->alscRest.dampedLscMatrixTable.LscMatrix[CAM_4CH_COLOR_COMPONENT_GREENR].uCoeff,
@@ -459,9 +458,6 @@ XCamReturn AlscAutoConfig
            sizeof(hAlsc->alscRest.dampedLscMatrixTable.LscMatrix[CAM_4CH_COLOR_COMPONENT_GREENB].uCoeff));
     memcpy(hAlsc->lscHwConf.b_data_tbl, &hAlsc->alscRest.dampedLscMatrixTable.LscMatrix[CAM_4CH_COLOR_COMPONENT_BLUE].uCoeff,
            sizeof(hAlsc->alscRest.dampedLscMatrixTable.LscMatrix[CAM_4CH_COLOR_COMPONENT_BLUE].uCoeff));
-#else
-    genLscMatrixToHwConf(hAlsc);
-#endif
 
     LOG1_ALSC("%s: (exit)\n", __FUNCTION__);
 
@@ -561,14 +557,17 @@ XCamReturn convertSensorLscOTP(alsc_handle_t hAlsc)
 {
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
 
-    if (!hAlsc->otpGrad.flag)
+    if (!hAlsc->alscSwInfo.otpInfo.flag || \
+        !hAlsc->alscSwInfo.otpInfo.lsc_r || !hAlsc->alscSwInfo.otpInfo.lsc_b || \
+        !hAlsc->alscSwInfo.otpInfo.lsc_gr || !hAlsc->alscSwInfo.otpInfo.lsc_gb)
         return XCAM_RETURN_BYPASS;
 
-    if ((hAlsc->ispAcqWidth > hAlsc->otpGrad.width && \
-         hAlsc->ispAcqHeight > hAlsc->otpGrad.height) || \
-         (hAlsc->ispAcqWidth < hAlsc->otpGrad.width && \
-         hAlsc->ispAcqHeight < hAlsc->otpGrad.height)) {
-        convertLscTableParameter(hAlsc);
+    if ((hAlsc->alscSwInfo.ispAcqWidth > hAlsc->alscSwInfo.otpInfo.width && \
+         hAlsc->alscSwInfo.ispAcqHeight > hAlsc->alscSwInfo.otpInfo.height) || \
+         (hAlsc->alscSwInfo.ispAcqWidth < hAlsc->alscSwInfo.otpInfo.width && \
+         hAlsc->alscSwInfo.ispAcqHeight < hAlsc->alscSwInfo.otpInfo.height)) {
+        convertLscTableParameter(&hAlsc->alscSwInfo.otpInfo, hAlsc->alscSwInfo.bayerPattern,
+                hAlsc->alscSwInfo.ispAcqWidth, hAlsc->alscSwInfo.ispAcqHeight);
     }
 
     return ret;
@@ -583,81 +582,48 @@ XCamReturn alscGetOtpInfo(RkAiqAlgoCom* params)
     RkAiqAlgoConfigAlsc *para = (RkAiqAlgoConfigAlsc *)params;
 
     alsc_sw_info_t *alscSwInfo = &para->alsc_sw_info;
-    hAlsc->bayerPattern = alscSwInfo->bayerPattern;
-    hAlsc->ispAcqWidth = alscSwInfo->ispAcqWidth;
-    hAlsc->ispAcqHeight = alscSwInfo->ispAcqHeight;
+    hAlsc->alscSwInfo.bayerPattern = alscSwInfo->bayerPattern;
+    hAlsc->alscSwInfo.ispAcqWidth = para->com.u.prepare.sns_op_width;
+    hAlsc->alscSwInfo.ispAcqHeight = para->com.u.prepare.sns_op_height;
     if (alscSwInfo->otpInfo.flag) {
-        hAlsc->otpGrad.flag = alscSwInfo->otpInfo.flag;
-        hAlsc->otpGrad.width = alscSwInfo->otpInfo.width;
-        hAlsc->otpGrad.height = alscSwInfo->otpInfo.height;
-        hAlsc->otpGrad.table_size = alscSwInfo->otpInfo.table_size;
-        memcpy(hAlsc->otpGrad.lsc_r, alscSwInfo->otpInfo.lsc_r, sizeof(hAlsc->otpGrad.lsc_r));
-        memcpy(hAlsc->otpGrad.lsc_gr, alscSwInfo->otpInfo.lsc_gr, sizeof(hAlsc->otpGrad.lsc_gr));
-        memcpy(hAlsc->otpGrad.lsc_gb, alscSwInfo->otpInfo.lsc_gb, sizeof(hAlsc->otpGrad.lsc_gb));
-        memcpy(hAlsc->otpGrad.lsc_b, alscSwInfo->otpInfo.lsc_b, sizeof(hAlsc->otpGrad.lsc_b));
+        hAlsc->alscSwInfo.otpInfo.flag = alscSwInfo->otpInfo.flag;
+        hAlsc->alscSwInfo.otpInfo.width = alscSwInfo->otpInfo.width;
+        hAlsc->alscSwInfo.otpInfo.height = alscSwInfo->otpInfo.height;
+        hAlsc->alscSwInfo.otpInfo.table_size = alscSwInfo->otpInfo.table_size;
+        hAlsc->alscSwInfo.otpInfo.lsc_r = alscSwInfo->otpInfo.lsc_r;
+        hAlsc->alscSwInfo.otpInfo.lsc_b = alscSwInfo->otpInfo.lsc_b;
+        hAlsc->alscSwInfo.otpInfo.lsc_gr = alscSwInfo->otpInfo.lsc_gr;
+        hAlsc->alscSwInfo.otpInfo.lsc_gb = alscSwInfo->otpInfo.lsc_gb;
     } else {
         hAlsc->alscSwInfo.otpInfo.flag = 0;
     }
 
-    LOGD_ALSC("BAYER: %d, ispAcq: %dx%d, otp: flag %d, WxH: %dx%d, table_size: %d\n",
-            hAlsc->bayerPattern,
-            hAlsc->ispAcqWidth,
-            hAlsc->ispAcqHeight,
-            hAlsc->otpGrad.flag,
-            hAlsc->otpGrad.width,
-            hAlsc->otpGrad.height,
-            hAlsc->otpGrad.table_size);
-
-    LOGD_ALSC( "otp LscMatrix r[0:3]:%d,%d,%d,%d, gr[0:3]:%d,%d,%d,%d, gb[0:3]:%d,%d,%d,%d, b[0:3]:%d,%d,%d,%d\n",
-            hAlsc->otpGrad.lsc_r[0],
-            hAlsc->otpGrad.lsc_r[1],
-            hAlsc->otpGrad.lsc_r[2],
-            hAlsc->otpGrad.lsc_r[3],
-            hAlsc->otpGrad.lsc_gr[0],
-            hAlsc->otpGrad.lsc_gr[1],
-            hAlsc->otpGrad.lsc_gr[2],
-            hAlsc->otpGrad.lsc_gr[3],
-            hAlsc->otpGrad.lsc_gb[0],
-            hAlsc->otpGrad.lsc_gb[1],
-            hAlsc->otpGrad.lsc_gb[2],
-            hAlsc->otpGrad.lsc_gb[3],
-            hAlsc->otpGrad.lsc_b[0],
-            hAlsc->otpGrad.lsc_b[1],
-            hAlsc->otpGrad.lsc_b[2],
-            hAlsc->otpGrad.lsc_b[3]);
-
     return XCAM_RETURN_NO_ERROR;
 }
 
-static XCamReturn genLscMatrixToHwConf(alsc_handle_t hAlsc)
+static XCamReturn applySensorLscOTP(pLscTableProfile_t pLscTableProfile, AlscOtpInfo_t *otpInfo)
 {
-    alsc_otp_grad_t *otpGrad = &hAlsc->otpGrad;
-    lsc_matrix_t *dampedLscMatrixTable = &hAlsc->alscRest.dampedLscMatrixTable;
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
 
-    if (otpGrad->flag && otpGrad->table_size > 0) {
-        // apply sensor lsc otp
-        for (int32_t i = 0; i < LSC_DATA_TBL_SIZE; i++) {
-            hAlsc->lscHwConf.r_data_tbl[i]    = dampedLscMatrixTable->LscMatrix[CAM_4CH_COLOR_COMPONENT_RED].uCoeff[i] * \
-                                                (float(otpGrad->lsc_r[i]) / 1024) + 0.5;
-            hAlsc->lscHwConf.gr_data_tbl[i]   = dampedLscMatrixTable->LscMatrix[CAM_4CH_COLOR_COMPONENT_GREENR].uCoeff[i] * \
-                                                (float(otpGrad->lsc_gr[i]) / 1024) + 0.5;
-            hAlsc->lscHwConf.gb_data_tbl[i]   = dampedLscMatrixTable->LscMatrix[CAM_4CH_COLOR_COMPONENT_GREENB].uCoeff[i] * \
-                                                (float(otpGrad->lsc_gb[i]) / 1024) + 0.5;
-            hAlsc->lscHwConf.b_data_tbl[i]    = dampedLscMatrixTable->LscMatrix[CAM_4CH_COLOR_COMPONENT_BLUE].uCoeff[i] * \
-                                                (float(otpGrad->lsc_b[i]) / 1024) + 0.5;
-        }
-    } else {
-        memcpy(hAlsc->lscHwConf.r_data_tbl, dampedLscMatrixTable->LscMatrix[CAM_4CH_COLOR_COMPONENT_RED].uCoeff,
-                sizeof(dampedLscMatrixTable->LscMatrix[CAM_4CH_COLOR_COMPONENT_RED].uCoeff));
-        memcpy(hAlsc->lscHwConf.gr_data_tbl, dampedLscMatrixTable->LscMatrix[CAM_4CH_COLOR_COMPONENT_GREENR].uCoeff,
-                sizeof(dampedLscMatrixTable->LscMatrix[CAM_4CH_COLOR_COMPONENT_GREENR].uCoeff));
-        memcpy(hAlsc->lscHwConf.gb_data_tbl, dampedLscMatrixTable->LscMatrix[CAM_4CH_COLOR_COMPONENT_GREENB].uCoeff,
-                sizeof(dampedLscMatrixTable->LscMatrix[CAM_4CH_COLOR_COMPONENT_GREENB].uCoeff));
-        memcpy(hAlsc->lscHwConf.b_data_tbl, dampedLscMatrixTable->LscMatrix[CAM_4CH_COLOR_COMPONENT_BLUE].uCoeff,
-                sizeof(dampedLscMatrixTable->LscMatrix[CAM_4CH_COLOR_COMPONENT_BLUE].uCoeff));
+    if (!pLscTableProfile || !otpInfo || !otpInfo->flag || \
+        !otpInfo->lsc_r || !otpInfo->lsc_b || \
+        !otpInfo->lsc_gr || !otpInfo->lsc_gb)
+        return XCAM_RETURN_BYPASS;
+
+    Cam17x17UShortMatrix_t *pMatrix = const_cast<Cam17x17UShortMatrix_t*>(&pLscTableProfile->lsc_samples_red);
+
+    for (int32_t i = 0; i < LSC_DATA_TBL_SIZE; i++) {
+        pMatrix[CAM_4CH_COLOR_COMPONENT_RED].uCoeff[i]       = pMatrix[CAM_4CH_COLOR_COMPONENT_RED].uCoeff[i] * \
+                                                               (float(otpInfo->lsc_r[i]) / 1024) + 0.5;
+        pMatrix[CAM_4CH_COLOR_COMPONENT_BLUE].uCoeff[i]      = pMatrix[CAM_4CH_COLOR_COMPONENT_BLUE].uCoeff[i] * \
+                                                               (float(otpInfo->lsc_b[i]) / 1024) + 0.5;
+        pMatrix[CAM_4CH_COLOR_COMPONENT_GREENR].uCoeff[i]    = pMatrix[CAM_4CH_COLOR_COMPONENT_GREENR].uCoeff[i] * \
+                                                               (float(otpInfo->lsc_gr[i]) / 1024) + 0.5;
+        pMatrix[CAM_4CH_COLOR_COMPONENT_GREENB].uCoeff[i]    = pMatrix[CAM_4CH_COLOR_COMPONENT_GREENB].uCoeff[i] * \
+                                                               (float(otpInfo->lsc_gb[i]) / 1024) + 0.5;
     }
 
-    return XCAM_RETURN_NO_ERROR;
+    return ret;
 }
 
 static XCamReturn UpdateLscCalibPara(alsc_handle_t  hAlsc)
@@ -799,7 +765,6 @@ XCamReturn AlscInit(alsc_handle_t *hAlsc, const CamCalibDbContext_t* calib)
     alsc_context->mCurAtt.mode = RK_AIQ_LSC_MODE_AUTO;
     //alsc_context->alscSwInfo.prepare_type = RK_AIQ_ALGO_CONFTYPE_UPDATECALIB | RK_AIQ_ALGO_CONFTYPE_NEEDRESET;
     //ret = UpdateLscCalibPara(alsc_context);
-    memset(&alsc_context->otpGrad, 0, sizeof(alsc_context->otpGrad));
     LOGI_ALSC("%s: (exit)\n", __FUNCTION__);
     return(ret);
 }

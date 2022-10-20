@@ -2,7 +2,7 @@
 #include <stdint.h>
 #include "j2s.h"
 
-#define J2S_MAGIC 522213841
+#define J2S_MAGIC 373063054
 #define J2S_NUM_OBJ 3461
 #define J2S_NUM_STRUCT 578
 #define J2S_NUM_ENUM 70
@@ -24637,7 +24637,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1593] = "alias='pdVerBinning', type='u8', size='[1,1]', range='[0, 255]', default='0', digit='[0]', hide='0', ro='0'";
+	ctx->descs[1593] = "alias='pdVerBinning', type='u8', size='[1,1]', range='[0, 1]', default='0', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1594];
