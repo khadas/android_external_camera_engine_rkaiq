@@ -6,22 +6,19 @@
 #include "rk_aiq_alsc_convert_otp.h"
 
 // #define WRITE_OTP_TABLE 1
-// #define LOGI printf
+#define LOGI printf
 
-void convertLscTableParameter(alsc_handle_t hAlsc)
+void convertLscTableParameter(AlscOtpInfo_t *otpInfo, int32_t bayer_pattern, int32_t dstWidth, int32_t dstHeight)
 {
     XCAM_STATIC_PROFILING_START(convertLscTable);
 
-    alsc_otp_grad_t *otpGrad = &hAlsc->otpGrad;
-    int32_t bayer 			= hAlsc->bayerPattern;
-    uint32_t srcLscWidth    = otpGrad->width;
-    uint32_t srcLscHeight   = otpGrad->height;
-    int32_t dstWidth 		= hAlsc->ispAcqWidth;
-    int32_t dstHeight 		= hAlsc->ispAcqHeight;
+    int32_t bayer = bayer_pattern;
+    uint32_t srcLscWidth    = otpInfo->width;
+    uint32_t srcLscHeight   = otpInfo->height;
 
     LOGD_ALSC("input params: src %dx%d, dst %dx%d, bayer: %d\n",
             srcLscWidth, srcLscHeight, dstWidth,
-            dstHeight, bayer);
+            dstHeight, bayer_pattern);
 
     if ((dstWidth > srcLscWidth)&&(dstHeight > srcLscHeight))
     {
@@ -53,23 +50,23 @@ void convertLscTableParameter(alsc_handle_t hAlsc)
 #if WRITE_OTP_TABLE
     char fileName[32] = {0};
     snprintf(fileName, sizeof(fileName) - 1, "/tmp/otp_lsc_r.bin");
-    writeFile(fileName, otpGrad->lsc_r);
+    writeFile(fileName, otpInfo->lsc_r);
     snprintf(fileName, sizeof(fileName) - 1, "/tmp/otp_lsc_b.bin");
-    writeFile(fileName, otpGrad->lsc_b);
+    writeFile(fileName, otpInfo->lsc_b);
     snprintf(fileName, sizeof(fileName) - 1, "/tmp/otp_lsc_gr.bin");
-    writeFile(fileName, otpGrad->lsc_gr);
+    writeFile(fileName, otpInfo->lsc_gr);
     snprintf(fileName, sizeof(fileName) - 1, "/tmp/otp_lsc_gb.bin");
-    writeFile(fileName, otpGrad->lsc_gb);
+    writeFile(fileName, otpInfo->lsc_gb);
 #endif
 
     // Interpolate gain table back to full size
     int sizeX[16];
     int sizeY[16];
     computeSamplingInterval(srcLscWidth, srcLscHeight, sizeX, sizeY);
-    calculateCorrectFactor(otpGrad->lsc_r, rTable, srcLscWidth, srcLscHeight, sizeX, sizeY);
-    calculateCorrectFactor(otpGrad->lsc_gr, grTable, srcLscWidth, srcLscHeight, sizeX, sizeY);
-    calculateCorrectFactor(otpGrad->lsc_gb, gbTable, srcLscWidth, srcLscHeight, sizeX, sizeY);
-    calculateCorrectFactor(otpGrad->lsc_b, bTable, srcLscWidth, srcLscHeight, sizeX, sizeY);
+    calculateCorrectFactor(otpInfo->lsc_r, rTable, srcLscWidth, srcLscHeight, sizeX, sizeY);
+    calculateCorrectFactor(otpInfo->lsc_gr, grTable, srcLscWidth, srcLscHeight, sizeX, sizeY);
+    calculateCorrectFactor(otpInfo->lsc_gb, gbTable, srcLscWidth, srcLscHeight, sizeX, sizeY);
+    calculateCorrectFactor(otpInfo->lsc_b, bTable, srcLscWidth, srcLscHeight, sizeX, sizeY);
     getLscParameter(rTable, grTable, gbTable, bTable, corTable, srcLscWidth, srcLscHeight, bayer);
 
     // Clipping a Gain table is centered by default
@@ -121,22 +118,22 @@ void convertLscTableParameter(alsc_handle_t hAlsc)
             r = rPos[i];
             c = cPos[j];
 
-            *(otpGrad->lsc_r + i * 17 + j) = plscdataR[r * dstWidth / 2 + c];
-            *(otpGrad->lsc_gr + i * 17 + j) = plscdataGr[r * dstWidth / 2 + c];
-            *(otpGrad->lsc_gb + i * 17 + j) = plscdataGb[r * dstWidth / 2 + c];
-            *(otpGrad->lsc_b + i * 17 + j) = plscdataB[r * dstWidth / 2 + c];
+            *(otpInfo->lsc_r + i * 17 + j) = plscdataR[r * dstWidth / 2 + c];
+            *(otpInfo->lsc_gr + i * 17 + j) = plscdataGr[r * dstWidth / 2 + c];
+            *(otpInfo->lsc_gb + i * 17 + j) = plscdataGb[r * dstWidth / 2 + c];
+            *(otpInfo->lsc_b + i * 17 + j) = plscdataB[r * dstWidth / 2 + c];
         }
     }
 
 #if WRITE_OTP_TABLE
     snprintf(fileName, sizeof(fileName) - 1, "/tmp/converted_otp_lsc_r.bin");
-    writeFile(fileName, otpGrad->lsc_r);
+    writeFile(fileName, otpInfo->lsc_r);
     snprintf(fileName, sizeof(fileName) - 1, "/tmp/converted_otp_lsc_b.bin");
-    writeFile(fileName, otpGrad->lsc_b);
+    writeFile(fileName, otpInfo->lsc_b);
     snprintf(fileName, sizeof(fileName) - 1, "/tmp/converted_otp_lsc_gr.bin");
-    writeFile(fileName, otpGrad->lsc_gr);
+    writeFile(fileName, otpInfo->lsc_gr);
     snprintf(fileName, sizeof(fileName) - 1, "/tmp/converted_otp_lsc_gb.bin");
-    writeFile(fileName, otpGrad->lsc_gb);
+    writeFile(fileName, otpInfo->lsc_gb);
 #endif
 
     delete[] plscdataR;
@@ -144,24 +141,6 @@ void convertLscTableParameter(alsc_handle_t hAlsc)
     delete[] plscdataGb;
     delete[] plscdataB;
     delete[] corTable_crop;
-
-    LOGD_ALSC("crop otp LscMatrix r[0:3]:%d,%d,%d,%d, gr[0:3]:%d,%d,%d,%d, gb[0:3]:%d,%d,%d,%d, b[0:3]:%d,%d,%d,%d\n",
-            otpGrad->lsc_r[0],
-            otpGrad->lsc_r[1],
-            otpGrad->lsc_r[2],
-            otpGrad->lsc_r[3],
-            otpGrad->lsc_gr[0],
-            otpGrad->lsc_gr[1],
-            otpGrad->lsc_gr[2],
-            otpGrad->lsc_gr[3],
-            otpGrad->lsc_gb[0],
-            otpGrad->lsc_gb[1],
-            otpGrad->lsc_gb[2],
-            otpGrad->lsc_gb[3],
-            otpGrad->lsc_b[0],
-            otpGrad->lsc_b[1],
-            otpGrad->lsc_b[2],
-            otpGrad->lsc_b[3]);
 
     XCAM_STATIC_PROFILING_END(convertLscTable, 0);
 }

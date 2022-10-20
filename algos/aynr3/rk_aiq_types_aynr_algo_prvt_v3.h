@@ -52,7 +52,6 @@ typedef struct Aynr_Context_V3_s {
 
     CalibDbV2_YnrV3_t ynr_v3;
     int isReCalculate;
-    int width;
 } Aynr_Context_V3_t;
 
 

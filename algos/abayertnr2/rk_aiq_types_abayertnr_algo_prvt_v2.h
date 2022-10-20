@@ -88,7 +88,6 @@ typedef struct Abayertnr_Context_V2_s {
     CalibDbV2_BayerTnr_V2_t bayertnr_v2;
 
     int isReCalculate;
-    int width;
 } Abayertnr_Context_V2_t;
 
 

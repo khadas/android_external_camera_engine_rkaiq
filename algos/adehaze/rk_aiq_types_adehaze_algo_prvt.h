@@ -79,7 +79,6 @@ typedef struct CalibDbDehazePrvt_s {
 } CalibDbDehazePrvt_t;
 
 typedef struct AdehazeHandle_s {
-    bool isCapture;
     adehaze_sw_V2_t AdehazeAtrr;
     CalibDbDehazePrvt_t Calib;
     RkAiqAdehazeProcResult_t ProcRes;

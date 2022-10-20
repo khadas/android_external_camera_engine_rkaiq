@@ -278,7 +278,7 @@ typedef struct AmergeCalib_s {
 
 typedef struct AmergeContext_s
 {
-    bool isCapture;
+    //api
     mergeAttr_t mergeAttr;
     AmergeCalib_t pCalibDB;
     AmergeState_t state;
