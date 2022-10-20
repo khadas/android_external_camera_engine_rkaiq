@@ -54,6 +54,7 @@ typedef struct Acnr_Context_V2_s {
     CalibDbV2_CNRV2_t cnr_v2;
 
     int isReCalculate;
+    int width;
 } Acnr_Context_V2_t;
 
 

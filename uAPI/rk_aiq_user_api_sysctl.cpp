@@ -168,7 +168,6 @@ static int rk_aiq_offline_init(rk_aiq_sys_ctx_t* ctx)
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
     char* use_as_fake_cam_env = getenv("USE_AS_FAKE_CAM");
     ini_t* aiq_ini = rkaiq_ini_load(OFFLINE_INI_FILE);
-    LOGE("xuhf----aiq_ini: %s", aiq_ini);
 
     ENTER_XCORE_FUNCTION();
 
@@ -181,9 +180,6 @@ static int rk_aiq_offline_init(rk_aiq_sys_ctx_t* ctx)
         bool offline = atoi(raw_offline_str) > 0 ? true : false;
         int raw_w = atoi(raw_w_str);
         int raw_h = atoi(raw_h_str);
-
-        LOGE("xuhf----offline: %d, raw: %dx%d, raw_fmt_str: %s",
-             offline, raw_w, raw_h, raw_fmt_str);
 
         // valid offline mode
         if (offline && raw_w && raw_h && raw_fmt_str) {
@@ -225,8 +221,6 @@ static int rk_aiq_offline_init(rk_aiq_sys_ctx_t* ctx)
 
     if (use_as_fake_cam_env)
         ctx->_use_fakecam = atoi(use_as_fake_cam_env) > 0 ? true : false;
-
-    LOGE("xuhf----_use_fakecam: %d", ctx->_use_fakecam);
 
     EXIT_XCORE_FUNCTION();
 
@@ -472,9 +466,6 @@ rk_aiq_uapi_sysctl_deinit_locked(rk_aiq_sys_ctx_t* ctx)
     ctx->_camHw.release();
     if (ctx->_calibDbProj) {
         // TODO:public common resource release
-        if (ctx->cam_type == RK_AIQ_CAM_TYPE_SINGLE) {
-            RkAiqCalibDbV2::releaseCalibDbProj();
-        }
     }
 
     if (ctx->next_ctx) {

@@ -87,6 +87,7 @@ typedef struct Abayer2dnr_Context_V2_s {
     CalibDbV2_Bayer2dnr_V2_t bayernr_v2;
 
     int isReCalculate;
+    int width;
 } Abayer2dnr_Context_V2_t;
 
 

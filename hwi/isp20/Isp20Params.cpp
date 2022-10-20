@@ -1854,6 +1854,8 @@ Isp20Params::convertAiqLscToIsp20Params(T& isp_cfg,
             }
         }else{
             isp_cfg.module_ens |= ISP2X_MODULE_LSC; //force open lsc
+            isp_cfg.module_en_update |= ISP2X_MODULE_LSC;
+            isp_cfg.module_cfg_update |= ISP2X_MODULE_LSC;
             for(int i=0;i<ISP3X_LSC_DATA_TBL_SIZE;i++){
                 cfg->b_data_tbl[i] = 1024*((1 << ISP2X_BLC_BIT_MAX) - 1) / ((1 << ISP2X_BLC_BIT_MAX) - 1 - bls_cfg.bls1_val.b);
                 cfg->b_data_tbl[i] = MIN(cfg->b_data_tbl[i],MAX_LSC_VALUE);

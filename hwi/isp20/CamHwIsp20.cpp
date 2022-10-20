@@ -1426,12 +1426,12 @@ CamHwIsp20::init(const char* sns_ent_name)
     mPdafStreamUnit = new PdafStreamProcUnit(ISP_POLL_PDAF_STATS);
     mPdafStreamUnit->set_devices(this);
 
-    mRawCapUnit = new RawStreamCapUnit(s_info, _linked_to_isp);
-    mRawProcUnit = new RawStreamProcUnit(s_info, _linked_to_isp);
-    mRawProcUnit->set_devices(mIspCoreDev, this);
-    mRawCapUnit->set_devices(mIspCoreDev, this, mRawProcUnit.ptr());
-    mRawProcUnit->setCamPhyId(mCamPhyId);
-    mRawCapUnit->setCamPhyId(mCamPhyId);
+    // mRawCapUnit = new RawStreamCapUnit(s_info, _linked_to_isp);
+    // mRawProcUnit = new RawStreamProcUnit(s_info, _linked_to_isp);
+    // mRawProcUnit->set_devices(mIspCoreDev, this);
+    // mRawCapUnit->set_devices(mIspCoreDev, this, mRawProcUnit.ptr());
+    // mRawProcUnit->setCamPhyId(mCamPhyId);
+    // mRawCapUnit->setCamPhyId(mCamPhyId);
     //isp stats
     mIspStatsStream = new RKStatsStream(mIspStatsDev, ISP_POLL_3A_STATS);
     mIspStatsStream->setPollCallback (this);
@@ -1517,8 +1517,8 @@ CamHwIsp20::setupPipelineFmtCif(struct v4l2_subdev_selection& sns_sd_sel,
     // TODO: set cif crop according to sensor crop bounds
     int8_t bpp = 0;
     pixFmt2Bpp(sns_v4l_pix_fmt, bpp);
-    mRawCapUnit->set_tx_format(sns_sd_sel, sns_v4l_pix_fmt, bpp);
-    mRawProcUnit->set_rx_format(sns_sd_sel, sns_v4l_pix_fmt, bpp);
+    // mRawCapUnit->set_tx_format(sns_sd_sel, sns_v4l_pix_fmt, bpp);
+    // mRawProcUnit->set_rx_format(sns_sd_sel, sns_v4l_pix_fmt, bpp);
 
     // set isp sink fmt, same as sensor bounds - crop
     struct v4l2_subdev_format isp_sink_fmt;
@@ -1615,8 +1615,8 @@ CamHwIsp20::setupPipelineFmtIsp(struct v4l2_subdev_selection& sns_sd_sel,
 
     int8_t bpp = 0;
     pixFmt2Bpp(sns_v4l_pix_fmt, bpp);
-    mRawCapUnit->set_tx_format(sns_sd_fmt, sns_v4l_pix_fmt, bpp);
-    mRawProcUnit->set_rx_format(sns_sd_fmt, sns_v4l_pix_fmt, bpp);
+    // mRawCapUnit->set_tx_format(sns_sd_fmt, sns_v4l_pix_fmt, bpp);
+    // mRawProcUnit->set_rx_format(sns_sd_fmt, sns_v4l_pix_fmt, bpp);
 #ifndef ANDROID_OS // Android camera hal will set pipeline itself
     // set isp sink fmt, same as sensor fmt
     struct v4l2_subdev_format isp_sink_fmt;
@@ -1748,21 +1748,21 @@ CamHwIsp20::setupPipelineFmt()
         ret = XCAM_RETURN_NO_ERROR;
     }
 
-    if (!_linked_to_isp && _crop_rect.width && _crop_rect.height) {
-        struct v4l2_format mipi_tx_fmt;
-        memset(&mipi_tx_fmt, 0, sizeof(mipi_tx_fmt));
-        LOGD_CAMHW_SUBM(ISP20HW_SUBM, "vicap get_crop %dx%d@%d,%d\n",
-                        _crop_rect.width, _crop_rect.height, _crop_rect.left, _crop_rect.top);
-        ret = mRawCapUnit->get_tx_device(0)->get_format(mipi_tx_fmt);
-        mipi_tx_fmt.fmt.pix.width = _crop_rect.width;
-        mipi_tx_fmt.fmt.pix.height = _crop_rect.height;
-        ret = mRawCapUnit->get_tx_device(0)->set_format(mipi_tx_fmt);
-        sns_sd_sel.r.width = _crop_rect.width;
-        sns_sd_sel.r.height = _crop_rect.height;
-        sns_sd_fmt.format.width = _crop_rect.width;
-        sns_sd_fmt.format.height = _crop_rect.height;
-        ret = XCAM_RETURN_NO_ERROR;
-    }
+    // if (!_linked_to_isp && _crop_rect.width && _crop_rect.height) {
+        // struct v4l2_format mipi_tx_fmt;
+        // memset(&mipi_tx_fmt, 0, sizeof(mipi_tx_fmt));
+        // LOGD_CAMHW_SUBM(ISP20HW_SUBM, "vicap get_crop %dx%d@%d,%d\n",
+                        // _crop_rect.width, _crop_rect.height, _crop_rect.left, _crop_rect.top);
+        // ret = mRawCapUnit->get_tx_device(0)->get_format(mipi_tx_fmt);
+        // mipi_tx_fmt.fmt.pix.width = _crop_rect.width;
+        // mipi_tx_fmt.fmt.pix.height = _crop_rect.height;
+        // ret = mRawCapUnit->get_tx_device(0)->set_format(mipi_tx_fmt);
+        // sns_sd_sel.r.width = _crop_rect.width;
+        // sns_sd_sel.r.height = _crop_rect.height;
+        // sns_sd_fmt.format.width = _crop_rect.width;
+        // sns_sd_fmt.format.height = _crop_rect.height;
+        // ret = XCAM_RETURN_NO_ERROR;
+    // }
 
     LOGD_CAMHW_SUBM(ISP20HW_SUBM, "sensor fmt info: bounds %dx%d, crop %dx%d@%d,%d !",
                     sns_sd_sel.r.width, sns_sd_sel.r.height,
@@ -2402,8 +2402,8 @@ CamHwIsp20::prepare(uint32_t width, uint32_t height, int mode, int t_delay, int 
         sensorHw->set_sync_mode(NO_SYNC_MODE);
     }
 
-    mRawCapUnit->set_working_mode(mode, mNoReadBack);
-    mRawProcUnit->set_working_mode(mode, mNoReadBack);
+    // mRawCapUnit->set_working_mode(mode, mNoReadBack);
+    // mRawProcUnit->set_working_mode(mode, mNoReadBack);
     setExpDelayInfo(mode);
     setLensVcmCfg(s_info->mod_info);
     xcam_mem_clear(_lens_des);
@@ -2446,8 +2446,8 @@ CamHwIsp20::prepare(uint32_t width, uint32_t height, int mode, int t_delay, int 
     }
 
 
-    if (!_linked_to_isp && !mNoReadBack)
-        mRawCapUnit->prepare_cif_mipi();
+    // if (!_linked_to_isp && !mNoReadBack)
+        // mRawCapUnit->prepare_cif_mipi();
 
     if ((_cur_calib_infos.mfnr.enable && _cur_calib_infos.mfnr.motion_detect_en) || _cur_calib_infos.af.ldg_param.enable) {
         mSpStreamUnit->prepare(&_cur_calib_infos.af.ldg_param, &_cur_calib_infos.af.highlight);
@@ -2584,21 +2584,21 @@ CamHwIsp20::hdr_mipi_prepare_mode(int mode)
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
     int new_mode = RK_AIQ_HDR_GET_WORKING_MODE(mode);
 
-    if (!mNoReadBack) {
-        if (new_mode == RK_AIQ_WORKING_MODE_NORMAL) {
-            ret = mRawCapUnit->prepare(MIPI_STREAM_IDX_0);
-            ret = mRawProcUnit->prepare(MIPI_STREAM_IDX_0);
-        } else if (new_mode == RK_AIQ_WORKING_MODE_ISP_HDR2) {
-            ret = mRawCapUnit->prepare(MIPI_STREAM_IDX_0 | MIPI_STREAM_IDX_1);
-            ret = mRawProcUnit->prepare(MIPI_STREAM_IDX_0 | MIPI_STREAM_IDX_1);
-        } else {
-            ret = mRawCapUnit->prepare(MIPI_STREAM_IDX_ALL);
-            ret = mRawProcUnit->prepare(MIPI_STREAM_IDX_ALL);
-        }
-        if (ret < 0) {
-            LOGE_CAMHW_SUBM(ISP20HW_SUBM, "hdr mipi start err: %d\n", ret);
-        }
-    }
+    // if (!mNoReadBack) {
+        // if (new_mode == RK_AIQ_WORKING_MODE_NORMAL) {
+            // ret = mRawCapUnit->prepare(MIPI_STREAM_IDX_0);
+            // ret = mRawProcUnit->prepare(MIPI_STREAM_IDX_0);
+        // } else if (new_mode == RK_AIQ_WORKING_MODE_ISP_HDR2) {
+            // ret = mRawCapUnit->prepare(MIPI_STREAM_IDX_0 | MIPI_STREAM_IDX_1);
+            // ret = mRawProcUnit->prepare(MIPI_STREAM_IDX_0 | MIPI_STREAM_IDX_1);
+        // } else {
+            // ret = mRawCapUnit->prepare(MIPI_STREAM_IDX_ALL);
+            // ret = mRawProcUnit->prepare(MIPI_STREAM_IDX_ALL);
+        // }
+        // if (ret < 0) {
+            // LOGE_CAMHW_SUBM(ISP20HW_SUBM, "hdr mipi start err: %d\n", ret);
+        // }
+    // }
 
     return ret;
 }
@@ -2608,10 +2608,10 @@ CamHwIsp20::hdr_mipi_start_mode(int mode)
 {
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
     LOGD_CAMHW_SUBM(ISP20HW_SUBM, "%s enter", __FUNCTION__);
-    if (!mNoReadBack) {
-        mRawCapUnit->start(mode);
-        mRawProcUnit->start(mode);
-    }
+    // if (!mNoReadBack) {
+        // mRawCapUnit->start(mode);
+        // mRawProcUnit->start(mode);
+    // }
     LOGD_CAMHW_SUBM(ISP20HW_SUBM, "%s exit", __FUNCTION__);
     return ret;
 }
@@ -2621,8 +2621,8 @@ CamHwIsp20::hdr_mipi_stop()
 {
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
 
-    mRawProcUnit->stop();
-    mRawCapUnit->stop();
+    // mRawProcUnit->stop();
+    // mRawCapUnit->stop();
     return ret;
 }
 
@@ -2841,11 +2841,11 @@ XCamReturn CamHwIsp20::swWorkingModeDyn(int mode)
     }
 #endif
     _hdr_mode = mode;
-    mRawCapUnit->set_working_mode(mode, mNoReadBack);
-    mRawProcUnit->set_working_mode(mode, mNoReadBack);
-    // remap _mipi_tx_devs for cif
-    if (!_linked_to_isp && !mNoReadBack)
-        mRawCapUnit->prepare_cif_mipi();
+    // mRawCapUnit->set_working_mode(mode, mNoReadBack);
+    // mRawProcUnit->set_working_mode(mode, mNoReadBack);
+    // // remap _mipi_tx_devs for cif
+    // if (!_linked_to_isp && !mNoReadBack)
+        // mRawCapUnit->prepare_cif_mipi();
 
     return ret;
 }
@@ -3879,7 +3879,7 @@ CamHwIsp20::setHdrProcessCount(rk_aiq_luma_params_t luma_params)
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
 
     ENTER_CAMHW_FUNCTION();
-    mRawProcUnit->set_hdr_frame_readback_infos(luma_params.frame_id, luma_params.hdrProcessCnt);
+    // mRawProcUnit->set_hdr_frame_readback_infos(luma_params.frame_id, luma_params.hdrProcessCnt);
 
     EXIT_CAMHW_FUNCTION();
     return ret;
@@ -4686,8 +4686,8 @@ XCamReturn CamHwIsp20::setSensorFlip(bool mirror, bool flip, int skip_frm_cnt)
     /* clock_gettime(CLOCK_MONOTONIC, &tp); */
     /* int64_t skip_ts = (int64_t)(tp.tv_sec) * 1000 * 1000 * 1000 + (int64_t)(tp.tv_nsec); */
 
-    if (_state == CAM_HW_STATE_STARTED && skip_frame_sequence != -1)
-        mRawCapUnit->skip_frames(skip_frm_cnt, skip_frame_sequence);
+    // if (_state == CAM_HW_STATE_STARTED && skip_frame_sequence != -1)
+        // mRawCapUnit->skip_frames(skip_frm_cnt, skip_frame_sequence);
 
     return ret;
 }
@@ -4721,14 +4721,14 @@ XCamReturn CamHwIsp20::setSensorCrop(rk_aiq_rect_t& rect)
 XCamReturn CamHwIsp20::getSensorCrop(rk_aiq_rect_t& rect)
 {
     XCamReturn ret;
-    struct v4l2_crop crop;
-    SmartPtr<V4l2Device> mipi_tx = mRawCapUnit->get_tx_device(0).dynamic_cast_ptr<V4l2Device>();
-    memset(&crop, 0, sizeof(crop));
-    ret = mipi_tx->get_crop(crop);
-    rect.left = crop.c.left;
-    rect.top = crop.c.top;
-    rect.width = crop.c.width;
-    rect.height = crop.c.height;
+    // struct v4l2_crop crop;
+    // SmartPtr<V4l2Device> mipi_tx = mRawCapUnit->get_tx_device(0).dynamic_cast_ptr<V4l2Device>();
+    // memset(&crop, 0, sizeof(crop));
+    // ret = mipi_tx->get_crop(crop);
+    // rect.left = crop.c.left;
+    // rect.top = crop.c.top;
+    // rect.width = crop.c.width;
+    // rect.height = crop.c.height;
     return ret;
 }
 
@@ -4737,14 +4737,14 @@ void CamHwIsp20::setHdrGlobalTmoMode(int frame_id, bool mode)
     if (mNoReadBack)
         return;
 
-    mRawProcUnit->set_hdr_global_tmo_mode(frame_id, mode);
+    // mRawProcUnit->set_hdr_global_tmo_mode(frame_id, mode);
 }
 
 void CamHwIsp20::setMulCamConc(bool cc)
 {
-    mRawProcUnit->setMulCamConc(cc);
-    if (cc)
-        mNoReadBack = false;
+    // mRawProcUnit->setMulCamConc(cc);
+    // if (cc)
+        // mNoReadBack = false;
 }
 
 void CamHwIsp20::getShareMemOps(isp_drv_share_mem_ops_t** mem_ops)
@@ -5239,7 +5239,7 @@ XCamReturn CamHwIsp20::notify_sof(SmartPtr<VideoBuffer>& buf)
     SmartPtr<BaseSensorHw> mSensorSubdev = mSensorDev.dynamic_cast_ptr<BaseSensorHw>();
     SmartPtr<LensHw> mLensSubdev = mLensDev.dynamic_cast_ptr<LensHw>();
     mSensorSubdev->handle_sof(evtdata->_timestamp, evtdata->_frameid);
-    mRawProcUnit->notify_sof(evtdata->_timestamp, evtdata->_frameid);
+    // mRawProcUnit->notify_sof(evtdata->_timestamp, evtdata->_frameid);
     if (mLensSubdev.ptr())
         mLensSubdev->handle_sof(evtdata->_timestamp, evtdata->_frameid);
     return XCAM_RETURN_NO_ERROR;
@@ -5610,7 +5610,7 @@ XCamReturn CamHwIsp20::get_stream_format(rkaiq_stream_type_t type, struct v4l2_f
     case RKISP20_STREAM_MIPITX_L:
     {
         memset(&format, 0, sizeof(format));
-        ret = mRawCapUnit->get_tx_device(0)->get_format(format);
+        // ret = mRawCapUnit->get_tx_device(0)->get_format(format);
         break;
     }
     case RKISP20_STREAM_SP:

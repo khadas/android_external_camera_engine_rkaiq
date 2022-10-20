@@ -109,6 +109,8 @@ prepare(RkAiqAlgoCom* params)
             if (calibv2_Ynr)
                 memcpy(&pAdehazeHandle->Calib.Dehaze_v30.YnrCalibPara, &calibv2_Ynr->CalibPara, sizeof(CalibDbV2_YnrV3_CalibPara_t));
         }
+    } else if (params->u.prepare.conf_type & RK_AIQ_ALGO_CONFTYPE_CHANGERES) {
+        pAdehazeHandle->isCapture = true;
     }
 
     LOG1_ADEHAZE("EIXT: %s \n", __func__);
@@ -144,44 +146,48 @@ processing(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outparams)
 
     LOGD_ADEHAZE("/*************************Adehaze Start******************/ \n");
 
-    AdehazeGetCurrData(pAdehazeHandle, pProcPara);
+    if (pAdehazeHandle->isCapture) {
+        LOGD_ADEHAZE("%s: It's capturing, using pre frame params\n", __func__);
+        pAdehazeHandle->isCapture = false;
+    } else {
+        AdehazeGetCurrData(pAdehazeHandle, pProcPara);
 
-    //get ynr snr mode
-    if(pAdehazeHandle->HWversion == ADEHAZE_ISP30) {
-        if(pProcPara->com.u.proc.curExp->CISFeature.SNR == 0)
-            pAdehazeHandle->CurrData.V30.SnrMode = YNRSNRMODE_LSNR;
-        else if(pProcPara->com.u.proc.curExp->CISFeature.SNR == 1)
-            pAdehazeHandle->CurrData.V30.SnrMode = YNRSNRMODE_HSNR;
-        else {
-            LOGI_ADEHAZE("%s(%d) Adehaze Get Wrong Snr Mode!!!, Using LSNR Params \n", __func__, __LINE__);
-            pAdehazeHandle->CurrData.V30.SnrMode = YNRSNRMODE_LSNR;
+        // get ynr snr mode
+        if (pAdehazeHandle->HWversion == ADEHAZE_ISP30) {
+            if (pProcPara->com.u.proc.curExp->CISFeature.SNR == 0)
+                pAdehazeHandle->CurrData.V30.SnrMode = YNRSNRMODE_LSNR;
+            else if (pProcPara->com.u.proc.curExp->CISFeature.SNR == 1)
+                pAdehazeHandle->CurrData.V30.SnrMode = YNRSNRMODE_HSNR;
+            else {
+                LOGI_ADEHAZE("%s(%d) Adehaze Get Wrong Snr Mode!!!, Using LSNR Params \n", __func__,
+                             __LINE__);
+                pAdehazeHandle->CurrData.V30.SnrMode = YNRSNRMODE_LSNR;
+            }
         }
-    }
 
-    //process
-    if(!(AdehazeByPassProcessing(pAdehazeHandle)))
-        ret = AdehazeProcess(pAdehazeHandle, pAdehazeHandle->HWversion);
+        // process
+        if (!(AdehazeByPassProcessing(pAdehazeHandle)))
+            ret = AdehazeProcess(pAdehazeHandle, pAdehazeHandle->HWversion);
 
-    //store data
-    if(pAdehazeHandle->HWversion == ADEHAZE_ISP20)
-        pAdehazeHandle->PreData.V20.ApiMode = pAdehazeHandle->AdehazeAtrr.mode;
-    else if(pAdehazeHandle->HWversion == ADEHAZE_ISP21)
-        pAdehazeHandle->PreData.V21.ApiMode = pAdehazeHandle->AdehazeAtrr.mode;
-    else if(pAdehazeHandle->HWversion == ADEHAZE_ISP30)
-        pAdehazeHandle->PreData.V30.ApiMode = pAdehazeHandle->AdehazeAtrr.mode;
+        // store data
+        if (pAdehazeHandle->HWversion == ADEHAZE_ISP20)
+            pAdehazeHandle->PreData.V20.ApiMode = pAdehazeHandle->AdehazeAtrr.mode;
+        else if (pAdehazeHandle->HWversion == ADEHAZE_ISP21)
+            pAdehazeHandle->PreData.V21.ApiMode = pAdehazeHandle->AdehazeAtrr.mode;
+        else if (pAdehazeHandle->HWversion == ADEHAZE_ISP30)
+            pAdehazeHandle->PreData.V30.ApiMode = pAdehazeHandle->AdehazeAtrr.mode;
 
-    //proc res
-    if(pAdehazeHandle->HWversion == ADEHAZE_ISP20) {
-        pAdehazeHandle->ProcRes.ProcResV20.enable = true;
-        pAdehazeHandle->ProcRes.ProcResV20.update = !(pAdehazeHandle->byPassProc) ;
-    }
-    else if(pAdehazeHandle->HWversion == ADEHAZE_ISP21) {
-        pAdehazeHandle->ProcRes.ProcResV21.enable = pAdehazeHandle->ProcRes.ProcResV21.enable;
-        pAdehazeHandle->ProcRes.ProcResV21.update = !(pAdehazeHandle->byPassProc);
-    }
-    else if(pAdehazeHandle->HWversion == ADEHAZE_ISP30) {
-        pAdehazeHandle->ProcRes.ProcResV30.enable = pAdehazeHandle->ProcRes.ProcResV30.enable;
-        pAdehazeHandle->ProcRes.ProcResV30.update = !(pAdehazeHandle->byPassProc);
+        // proc res
+        if (pAdehazeHandle->HWversion == ADEHAZE_ISP20) {
+            pAdehazeHandle->ProcRes.ProcResV20.enable = true;
+            pAdehazeHandle->ProcRes.ProcResV20.update = !(pAdehazeHandle->byPassProc);
+        } else if (pAdehazeHandle->HWversion == ADEHAZE_ISP21) {
+            pAdehazeHandle->ProcRes.ProcResV21.enable = pAdehazeHandle->ProcRes.ProcResV21.enable;
+            pAdehazeHandle->ProcRes.ProcResV21.update = !(pAdehazeHandle->byPassProc);
+        } else if (pAdehazeHandle->HWversion == ADEHAZE_ISP30) {
+            pAdehazeHandle->ProcRes.ProcResV30.enable = pAdehazeHandle->ProcRes.ProcResV30.enable;
+            pAdehazeHandle->ProcRes.ProcResV30.update = !(pAdehazeHandle->byPassProc);
+        }
     }
     memcpy(&pProcRes->AdehzeProcRes, &pAdehazeHandle->ProcRes, sizeof(RkAiqAdehazeProcResult_t));
 
