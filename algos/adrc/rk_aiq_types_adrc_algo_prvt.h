@@ -272,6 +272,7 @@ typedef struct DrcCalibDB_s {
 
 typedef struct AdrcContext_s
 {
+    bool isCapture;
     drcAttr_t drcAttr;
     DrcCalibDB_t pCalibDB;
     AdrcState_t state;

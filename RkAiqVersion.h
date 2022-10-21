@@ -387,10 +387,21 @@
  * v3.0x8.8-p1
  * - PDAF: update to v0.1.5
  * - AF: support max logical position
+ * v3.0x8.8-p3
+ * - aiq_core: keep same iso for Android picture taken when resolution changed
+ * - AE: fix reg2float accuracy problem
+ * - sysctl: should not release all sensor's calibs when deinit
+ * - update the file of j2s_generated_v*.h
+ * - Adrc, amerge and adehaze: use RK_AIQ_ALGO_CONFTYPE_CHANGERES for capture
+ * - algos: alsc: apply lsc otp in processing
+ * - awb otp : apply otp in awb stat
+ * - awb: translator awb stat based on pre_wbgain_inv_r and bls1
+ * - tuning: fix double free.
+
  */
 
-#define RK_AIQ_VERSION_REAL_V "v3.0x8.8-p1"
-#define RK_AIQ_RELEASE_DATE "2022-08-31"
+#define RK_AIQ_VERSION_REAL_V "v3.0x8.8-p3"
+#define RK_AIQ_RELEASE_DATE "2022-10-21"
 
 /******* DO NOT EDIT THE FOLLOWINGS ***********/
 
