@@ -29,6 +29,7 @@ RkAEStateMachine::RkAEStateMachine():
     mCurrentAeMode = &mAutoMode;
     memset(&mLastAeControls, 0, sizeof(mLastAeControls));
     mLastAeControls.aeMode = ANDROID_CONTROL_AE_MODE_ON;
+    mStilPreCapreqId = -3;
 }
 
 RkAEStateMachine::~RkAEStateMachine()
@@ -45,31 +46,34 @@ RkAEStateMachine::~RkAEStateMachine()
  */
 XCamReturn
 RkAEStateMachine::processState(const uint8_t &controlMode,
-                                  const AeControls &aeControls)
+                                  const AeControls &aeControls,
+                                  int reqId)
 {
     XCamReturn ret;
 
     if (controlMode == ANDROID_CONTROL_MODE_OFF) {
-        LOGD("%s: Set AE offMode: controlMode = %s, aeMode = %s", __FUNCTION__,
-                        META_CONTROL2STR(mode, controlMode),
-                        META_CONTROL2STR(aeMode, aeControls.aeMode));
         mCurrentAeMode = &mOffMode;
     } else {
         if (aeControls.aeMode == ANDROID_CONTROL_AE_MODE_OFF) {
             mCurrentAeMode = &mOffMode;
-            LOGD("%s: Set AE offMode: controlMode = %s, aeMode = %s",
-                 __FUNCTION__,
-                 META_CONTROL2STR(mode, controlMode),
-                 META_CONTROL2STR(aeMode, aeControls.aeMode));
         } else {
-            LOGD("%s: Set AE AutoMode: controlMode = %s, aeMode = %s",
-                 __FUNCTION__,
-                 META_CONTROL2STR(mode, controlMode),
-                 META_CONTROL2STR(aeMode, aeControls.aeMode));
             mCurrentAeMode = &mAutoMode;
         }
     }
 
+    LOGD("%s: Set AE %s: controlMode = %s, aeMode = %s, aePreCaptureTrigger(%d), reqId(%d)",
+         __FUNCTION__,
+         ((controlMode == ANDROID_CONTROL_MODE_OFF) || (aeControls.aeMode == ANDROID_CONTROL_AE_MODE_OFF))?"offMode":"Automode",
+         META_CONTROL2STR(mode, controlMode),
+         META_CONTROL2STR(aeMode, aeControls.aeMode),
+         aeControls.aePreCaptureTrigger,
+         reqId);
+
+    if (aeControls.aePreCaptureTrigger == ANDROID_CONTROL_AE_PRECAPTURE_TRIGGER_START) {
+        mStilPreCapreqId = reqId;
+        mCurrentAeMode->updateStillPreCapreqId(mStilPreCapreqId);
+        LOGD("%s: aePreCaptureTrigger reqId(%d)", __FUNCTION__, mStilPreCapreqId);
+    }
     mLastAeControls = aeControls;
     mLastControlMode = controlMode;
     ret = mCurrentAeMode->processState(controlMode, aeControls);
@@ -86,7 +90,7 @@ RkAEStateMachine::processState(const uint8_t &controlMode,
 XCamReturn
 RkAEStateMachine::processResult(const rk_aiq_ae_results &aeResults,
                                    CameraMetadata &result,
-                                   uint32_t reqId)
+                                   int reqId)
 {
     XCamReturn ret;
 
@@ -111,13 +115,14 @@ RkAEModeBase::RkAEModeBase():
     mCurrentAeState(ANDROID_CONTROL_AE_STATE_INACTIVE)
 {
     memset(&mLastAeControls, 0, sizeof(mLastAeControls));
+    mCurrentAeLockState = ANDROID_CONTROL_AE_STATE_INACTIVE;
+    mStilPreCapreqId = -3;
 }
 
 void
-RkAEModeBase::updateResult(CameraMetadata &results)
+RkAEModeBase::updateResult(int reqId, CameraMetadata &results)
 {
-
-    LOGD("%s: current AE state is: %s", __FUNCTION__,
+    LOGD("%s: reqId(%d) current AE state is: %s", __FUNCTION__, reqId,
          META_CONTROL2STR(aeState, mCurrentAeState));
 
     //# METADATA_Dynamic control.aeMode done
@@ -134,7 +139,13 @@ RkAEModeBase::updateResult(CameraMetadata &results)
     results.update(ANDROID_CONTROL_AE_TARGET_FPS_RANGE,
                    &mLastAeControls.aeTargetFpsRange[0], 2);
     //# METADATA_Dynamic control.aeState done
-    results.update(ANDROID_CONTROL_AE_STATE, &mCurrentAeState, 1);
+    /* reqId > mStilPreCapreqId + 2 for flash frame state effect */
+    if (reqId > mStilPreCapreqId + 2) {
+        results.update(ANDROID_CONTROL_AE_STATE, &mCurrentAeState, 1);
+    } else {
+        mCurrentAeState = ANDROID_CONTROL_AE_STATE_PRECAPTURE;
+        results.update(ANDROID_CONTROL_AE_STATE, &mCurrentAeState, 1);
+    }
 }
 
 void
@@ -177,13 +188,13 @@ RkAEModeOff::processState(const uint8_t &controlMode,
 XCamReturn
 RkAEModeOff::processResult(const rk_aiq_ae_results &aeResults,
                               CameraMetadata &result,
-                              uint32_t reqId)
+                              int reqId)
 {
     /* UNUSED(aeResults); */
     /* UNUSED(reqId); */
 
     mCurrentAeState = ANDROID_CONTROL_AE_STATE_INACTIVE;
-    updateResult(result);
+    updateResult(reqId, result);
 
     return XCAM_RETURN_NO_ERROR;
 }
@@ -245,13 +256,14 @@ RkAEModeAuto::processState(const uint8_t &controlMode,
     }
     mLastAeControls = aeControls;
     mLastControlMode = controlMode;
+
     return XCAM_RETURN_NO_ERROR;
 }
 
 XCamReturn
 RkAEModeAuto::processResult(const rk_aiq_ae_results &aeResults,
                                CameraMetadata &result,
-                               uint32_t reqId)
+                               int reqId)
 {
     switch (mCurrentAeState) {
     case ANDROID_CONTROL_AE_STATE_LOCKED:
@@ -264,6 +276,7 @@ RkAEModeAuto::processResult(const rk_aiq_ae_results &aeResults,
          if (aeResults.converged) {
             mEvChanged = false; // converged -> reset
             if (mLastAeControls.aeLock) {
+                LOGD("@%s(%d) reqId(%d) ANDROID_CONTROL_AE_STATE_LOCKED", __FUNCTION__, __LINE__, reqId);
                 mCurrentAeState = ANDROID_CONTROL_AE_STATE_LOCKED;
             } else {
                 /* TODO */
@@ -283,6 +296,7 @@ RkAEModeAuto::processResult(const rk_aiq_ae_results &aeResults,
          if (aeResults.converged) {
             mEvChanged = false; // converged -> reset
             if (mLastAeControls.aeLock) {
+                LOGD("@%s(%d) reqId(%d) ANDROID_CONTROL_AE_STATE_LOCKED", __FUNCTION__, __LINE__, reqId);
                 mCurrentAeState = ANDROID_CONTROL_AE_STATE_LOCKED;
             } else {
                 /* TODO */
@@ -293,6 +307,10 @@ RkAEModeAuto::processResult(const rk_aiq_ae_results &aeResults,
                 /* else */
                 /*     mCurrentAeState = ANDROID_CONTROL_AE_STATE_CONVERGED; */
                 mCurrentAeState = ANDROID_CONTROL_AE_STATE_CONVERGED;
+                if (reqId > mStilPreCapreqId + 2) {
+                    mCurrentAeLockState = ANDROID_CONTROL_AE_STATE_LOCKED;
+                    LOGD("@%s(%d) reqId(%d) ANDROID_CONTROL_AE_STATE_LOCKED", __FUNCTION__, __LINE__, reqId);
+                }
             }
         } // here the else is staying at the same state.
         break;
@@ -315,19 +333,19 @@ RkAEModeAuto::processResult(const rk_aiq_ae_results &aeResults,
         }
     } else {
         if (mLastAeConvergedFlag == true) {
-            LOGD("%s: AE Converged -> converging (reqId: %d)",
+            LOGD("%s: AE Converged -> converging (reqId: %d).",
                         __FUNCTION__, reqId);
             mAeRunCount = 1;
             mAeConvergedCount = 0;
         } else {
             mAeRunCount++;
-            LOGD("%s: AE converging for %d frames, (reqId: %d.",
+            LOGD("%s: AE converging for %d frames, (reqId: %d).",
                         __FUNCTION__, mAeRunCount, reqId);
         }
     }
     mLastAeConvergedFlag = aeResults.converged;
 
-    updateResult(result);
+    updateResult(reqId, result);
 
     return XCAM_RETURN_NO_ERROR;
 }

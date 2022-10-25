@@ -46,12 +46,15 @@ public:
 
     virtual XCamReturn processResult(const rk_aiq_ae_results &aeResults,
                                    CameraMetadata &results,
-                                   uint32_t reqId) = 0;
+                                   int reqId) = 0;
 
     void resetState(void);
     uint8_t getState() const { return mCurrentAeState; }
+    uint8_t getLockState() const { return mCurrentAeLockState; }
+    uint8_t setLockState(uint8_t state)    {mCurrentAeLockState = state; return 0;}
+    uint8_t updateStillPreCapreqId(int reqId) { mStilPreCapreqId = reqId; return 0; }
 protected:
-    void updateResult(CameraMetadata &results);
+    void updateResult(int reqId, CameraMetadata &results);
 protected:
     AeControls  mLastAeControls;
     uint8_t     mLastControlMode;
@@ -62,6 +65,8 @@ protected:
     uint8_t     mAeRunCount;
     uint8_t     mAeConvergedCount;
     uint8_t     mCurrentAeState;
+    uint8_t     mCurrentAeLockState;
+    int mStilPreCapreqId;
 };
 
 /**
@@ -76,7 +81,7 @@ public:
                                   const AeControls &aeControls);
     virtual XCamReturn processResult(const rk_aiq_ae_results & aeResults,
                                   CameraMetadata& result,
-                                  uint32_t reqId);
+                                  int reqId);
 };
 
 /**
@@ -91,7 +96,7 @@ public:
                                   const AeControls &aeControls);
     virtual XCamReturn processResult(const rk_aiq_ae_results & aeResults,
                                   CameraMetadata& result,
-                                  uint32_t reqId);
+                                  int reqId);
 };
 
 /**
@@ -109,13 +114,17 @@ public:
     virtual ~RkAEStateMachine();
 
     virtual XCamReturn processState(const uint8_t &controlMode,
-                                  const AeControls &aeControls);
+                                  const AeControls &aeControls,
+                                  int reqId);
 
     virtual XCamReturn processResult(const rk_aiq_ae_results &aeResults,
                                    CameraMetadata &results,
-                                   uint32_t reqId);
+                                   int reqId);
 
     uint8_t getState() const { return mCurrentAeMode->getState(); }
+    uint8_t getLockState() const { return mCurrentAeMode->getLockState(); }
+    uint8_t setLockState(uint8_t state)    { return mCurrentAeMode->setLockState(state); }
+
 private:
     // prevent copy constructor and assignment operator
     RkAEStateMachine(const RkAEStateMachine &other);
@@ -129,6 +138,7 @@ private: /* members*/
 
     RkAEModeOff mOffMode;
     RkAEModeAuto mAutoMode;
+    int mStilPreCapreqId;
 };
 
 }

@@ -1239,6 +1239,7 @@ SettingsProcessor::processRequestSettings(const CameraMetadata &settings,
 
     entry = settings.find(RKCAMERA3_PRIVATEDATA_STILLCAP_SYNC_CMD);
     if (entry.count == 1) {
+        LOGI("STILLCAP_SYNC_CMD:%d",entry.data.u8[0]);
         switch (entry.data.u8[0]) {
             case RKCAMERA3_PRIVATEDATA_STILLCAP_SYNC_CMD_SYNCSTART:
                 aiqparams.stillCapSyncCmd = RKCAMERA3_PRIVATEDATA_STILLCAP_SYNC_CMD_SYNCSTART;

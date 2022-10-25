@@ -50,13 +50,14 @@ public:
     virtual XCamReturn processTriggers(const uint8_t &afTrigger,
                                      const uint8_t &afMode,
                                      int preCaptureId,
-                                     XCamAfParam& afInputParams);
+                                     XCamAfParam& afInputParams,
+                                     int reqId);
     virtual XCamReturn processResult(rk_aiq_af_results& afResults,
-                                   CameraMetadata& result) = 0;
+                                   CameraMetadata& result, int reqId) = 0;
     void resetState(void);
     void resetTrigger(usecs_t triggerTime);
     int getState() { return mCurrentAfState; }
-    void updateResult(CameraMetadata& results);
+    void updateResult(int reqId ,CameraMetadata& results);
 protected:
     void checkIfFocusTimeout();
 protected:
@@ -78,9 +79,11 @@ public:
     virtual XCamReturn processTriggers(const uint8_t &afTrigger,
                                      const uint8_t &afMode,
                                      int preCaptureId,
-                                     XCamAfParam& afInputParams);
+                                     XCamAfParam& afInputParams,
+                                     int reqId);
     virtual XCamReturn processResult(rk_aiq_af_results& afResults,
-                                  CameraMetadata& result);
+                                  CameraMetadata& result,
+                                  int reqId);
 };
 
 /**
@@ -94,9 +97,11 @@ public:
     virtual XCamReturn processTriggers(const uint8_t &afTrigger,
                                      const uint8_t &afMode,
                                      int preCaptureId,
-                                     XCamAfParam& afInputParams);
+                                     XCamAfParam& afInputParams,
+                                     int reqId);
     virtual XCamReturn processResult(rk_aiq_af_results& afResults,
-                                  CameraMetadata& result);
+                                  CameraMetadata& result,
+                                  int reqId);
 };
 
 /**
@@ -110,9 +115,11 @@ public:
     virtual XCamReturn processTriggers(const uint8_t &afTrigger,
                                      const uint8_t &afMode,
                                      int preCaptureId,
-                                     XCamAfParam& afInputParams);
+                                     XCamAfParam& afInputParams,
+                                     int reqId);
     virtual XCamReturn processResult(rk_aiq_af_results& afResults,
-                                  CameraMetadata& result);
+                                  CameraMetadata& result,
+                                  int reqId);
 };
 
 /**
@@ -132,11 +139,13 @@ public:
     virtual XCamReturn processTriggers(const uint8_t &afTrigger,
                                      const uint8_t &afMode,
                                      int preCaptureId,
-                                     XCamAfParam &afInputParams);
+                                     XCamAfParam &afInputParams,
+                                     int reqId);
 
     virtual XCamReturn processResult(rk_aiq_af_results &afResults,
                                    XCamAfParam &afInputParams,
-                                   CameraMetadata& result);
+                                   CameraMetadata& result,
+                                   int reqId);
 
     virtual XCamReturn updateDefaults(const rk_aiq_af_results &afResults,
                                     const XCamAfParam &afInputParams,

@@ -37,7 +37,8 @@ RkAWBStateMachine::~RkAWBStateMachine()
 
 XCamReturn
 RkAWBStateMachine::processState(const uint8_t &controlMode,
-                                   const AwbControls &awbControls)
+                                   const AwbControls &awbControls,
+                                   int reqId)
 {
     XCamReturn ret;
 
@@ -45,37 +46,41 @@ RkAWBStateMachine::processState(const uint8_t &controlMode,
         mCurrentAwbMode = &mOffMode;
 
         if (controlMode != mLastControlMode)
-            LOGI("%s: Set AWB offMode: controlMode = %s, awbMode = %s",
+            LOGI("%s: Set AWB offMode: controlMode = %s, awbMode = %s, (reqId: %d)",
                         __FUNCTION__,
                         META_CONTROL2STR(mode, controlMode),
-                        META_CONTROL2STR(awbMode, awbControls.awbMode));
+                        META_CONTROL2STR(awbMode, awbControls.awbMode),
+                        reqId);
     } else {
         if (awbControls.awbMode == ANDROID_CONTROL_AWB_MODE_OFF) {
             mCurrentAwbMode = &mOffMode;
             if (awbControls.awbMode != mLastAwbControls.awbMode)
-                LOGI("%s: Set AWB offMode: controlMode = %s, awbMode = %s",
+                LOGI("%s: Set AWB offMode: controlMode = %s, awbMode = %s, (reqId: %d)",
                                 __FUNCTION__,
                                 META_CONTROL2STR(mode, controlMode),
-                                META_CONTROL2STR(awbMode, awbControls.awbMode));
+                                META_CONTROL2STR(awbMode, awbControls.awbMode),
+                                reqId);
         } else {
             mCurrentAwbMode = &mAutoMode;
             if (awbControls.awbMode != mLastAwbControls.awbMode)
-                LOGI("%s: Set AWB offMode: controlMode = %s, awbMode = %s",
+                LOGI("%s: Set AWB AutoMode: controlMode = %s, awbMode = %s, (reqId: %d)",
                                 __FUNCTION__,
                                 META_CONTROL2STR(mode, controlMode),
-                                META_CONTROL2STR(awbMode, awbControls.awbMode));
+                                META_CONTROL2STR(awbMode, awbControls.awbMode),
+                                reqId);
         }
     }
 
     mLastAwbControls = awbControls;
     mLastControlMode = controlMode;
-    ret = mCurrentAwbMode->processState(controlMode, awbControls);
+    ret = mCurrentAwbMode->processState(controlMode, awbControls, reqId);
     return ret;
 }
 
 XCamReturn
 RkAWBStateMachine::processResult(const rk_aiq_awb_results &awbResults,
-                                    CameraMetadata &result)
+                                    CameraMetadata &result,
+                                    int reqId)
 {
     XCamReturn ret;
 
@@ -84,7 +89,7 @@ RkAWBStateMachine::processResult(const rk_aiq_awb_results &awbResults,
         return XCAM_RETURN_ERROR_UNKNOWN;
     }
 
-    ret =  mCurrentAwbMode->processResult(awbResults, result);
+    ret =  mCurrentAwbMode->processResult(awbResults, result, reqId);
     return ret;
 }
 
@@ -99,10 +104,10 @@ RkAWBModeBase::RkAWBModeBase():
 }
 
 void
-RkAWBModeBase::updateResult(CameraMetadata& results)
+RkAWBModeBase::updateResult(int reqId, CameraMetadata& results)
 {
 
-    LOGI("%s: current AWB state is: %s", __FUNCTION__,
+    LOGI("%s: reqId(%d) current AWB state is: %s", __FUNCTION__, reqId,
          META_CONTROL2STR(awbState, mCurrentAwbState));
 
     //# METADATA_Dynamic control.awbMode done
@@ -130,7 +135,8 @@ RkAWBModeOff::RkAWBModeOff():RkAWBModeBase()
 
 XCamReturn
 RkAWBModeOff::processState(const uint8_t &controlMode,
-                              const AwbControls &awbControls)
+                              const AwbControls &awbControls,
+                              int reqId)
 {
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
 
@@ -150,12 +156,13 @@ RkAWBModeOff::processState(const uint8_t &controlMode,
 
 XCamReturn
 RkAWBModeOff::processResult(const rk_aiq_awb_results& awbResults,
-                               CameraMetadata& result)
+                               CameraMetadata& result,
+                               int reqId)
 {
     /* UNUSED(awbResults); */
 
     mCurrentAwbState = ANDROID_CONTROL_AWB_STATE_INACTIVE;
-    updateResult(result);
+    updateResult(reqId, result);
 
     return XCAM_RETURN_NO_ERROR;
 }
@@ -170,7 +177,8 @@ RkAWBModeAuto::RkAWBModeAuto():RkAWBModeBase()
 
 XCamReturn
 RkAWBModeAuto::processState(const uint8_t &controlMode,
-                               const AwbControls &awbControls)
+                               const AwbControls &awbControls,
+                               int reqId)
 {
     if (controlMode != mLastControlMode) {
         LOGI("%s: control mode has changed %s -> %s, reset AWB State", __FUNCTION__,
@@ -198,6 +206,14 @@ RkAWBModeAuto::processState(const uint8_t &controlMode,
                 mCurrentAwbState = ANDROID_CONTROL_AWB_STATE_INACTIVE;
         }
     }
+
+    LOGI("@%s awbControls.awbMode(%d) AWB state(%d) awbLock(%s), (reqId: %d)",
+                                            __FUNCTION__,
+                                            awbControls.awbMode,
+                                            mCurrentAwbState,
+                                            awbControls.awbLock?"TRUE":"FALSE",
+                                            reqId);
+
     mLastAwbControls = awbControls;
     mLastControlMode = controlMode;
     return XCAM_RETURN_NO_ERROR;
@@ -205,7 +221,8 @@ RkAWBModeAuto::processState(const uint8_t &controlMode,
 
 XCamReturn
 RkAWBModeAuto::processResult(const rk_aiq_awb_results &awbResults,
-                                CameraMetadata& result)
+                                CameraMetadata& result,
+                                int reqId)
 {
     switch (mCurrentAwbState) {
         case ANDROID_CONTROL_AWB_STATE_LOCKED:
@@ -224,7 +241,7 @@ RkAWBModeAuto::processResult(const rk_aiq_awb_results &awbResults,
             mCurrentAwbState = ANDROID_CONTROL_AWB_STATE_INACTIVE;
     }
 
-    updateResult(result);
+    updateResult(reqId, result);
 
     return XCAM_RETURN_NO_ERROR;
 }

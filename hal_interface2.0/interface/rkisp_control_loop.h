@@ -100,6 +100,8 @@ struct rkisp_cl_frame_metadata_s {
     int id;
     // TODO: use camera_metadata from Android directly ?
     const camera_metadata_t *metas;
+    //sof sync frame id
+    int sof_frameId;
 };
 
 typedef struct frame_interval_s {

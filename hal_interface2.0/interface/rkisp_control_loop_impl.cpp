@@ -350,7 +350,7 @@ int rkisp_cl_rkaiq_init(void** cl_ctx, const char* tuning_file_path,
     rk_aiq_metas_cb sMetas_cb = [=] (rk_aiq_metas_t* metas) -> XCamReturn {
         LOGD("----------rkisp_aiq_metas_cb---metas.frame_id:%d-----------",metas->frame_id);
         if((gAiqCameraHalAdapter)!=NULL){
-            gAiqCameraHalAdapter->metaCallback();
+            gAiqCameraHalAdapter->metaCallback(metas);
         }
         return XCAM_RETURN_NO_ERROR;
     };

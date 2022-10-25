@@ -83,7 +83,8 @@ XCamReturn
 RkAFStateMachine::processTriggers(const uint8_t &afTrigger,
                                      const uint8_t &afMode,
                                      int preCaptureId,
-                                     XCamAfParam &afInputParams)
+                                     XCamAfParam &afInputParams,
+                                     int reqId)
 {
     if (afMode != mLastAfControls.afMode) {
         LOGI("Change of AF mode from %s to %s",
@@ -111,14 +112,15 @@ RkAFStateMachine::processTriggers(const uint8_t &afTrigger,
     mLastAfControls.afTrigger = afTrigger;
     mLastAfControls.afMode = afMode;
 
-    LOGI("%s: afMode %d, afTrigger %d", __FUNCTION__, mLastAfControls.afMode, afTrigger);
-    return mCurrentAfMode->processTriggers(afTrigger, afMode, preCaptureId, afInputParams);
+    LOGI("%s: afMode %d, afTrigger %d, reqId(%d)", __FUNCTION__, mLastAfControls.afMode, afTrigger, reqId);
+    return mCurrentAfMode->processTriggers(afTrigger, afMode, preCaptureId, afInputParams, reqId);
 }
 
 XCamReturn
 RkAFStateMachine::processResult(rk_aiq_af_results &afResults,
                                    XCamAfParam &afInputParams,
-                                   CameraMetadata &result)
+                                   CameraMetadata &result,
+                                   int reqId)
 {
     if (CC_UNLIKELY(mCurrentAfMode == nullptr)) {
         LOGE("Invalid AF mode - this could not happen - BUG!");
@@ -127,7 +129,7 @@ RkAFStateMachine::processResult(rk_aiq_af_results &afResults,
 
     focusDistanceResult(afResults, afInputParams, result);
 
-    return mCurrentAfMode->processResult(afResults, result);
+    return mCurrentAfMode->processResult(afResults, result, reqId);
 }
 
 /**
@@ -142,7 +144,7 @@ RkAFStateMachine::updateDefaults(const rk_aiq_af_results& afResults,
                                     CameraMetadata& result,
                                     bool fixedFocus) const
 {
-    mCurrentAfMode->updateResult(result);
+    mCurrentAfMode->updateResult(-1, result);
     uint8_t defaultState = ANDROID_CONTROL_AF_STATE_INACTIVE;
     if (fixedFocus)
         defaultState = ANDROID_CONTROL_AF_STATE_FOCUSED_LOCKED;
@@ -221,7 +223,8 @@ XCamReturn
 RkAfModeBase::processTriggers(const uint8_t &afTrigger,
                                  const uint8_t &afMode,
                                  int preCaptureId,
-                                 XCamAfParam& afInputParams)
+                                 XCamAfParam& afInputParams,
+                                 int reqId)
 {
     /* UNUSED(afInputParams); */
     /* UNUSED(preCaptureId); */
@@ -229,9 +232,9 @@ RkAfModeBase::processTriggers(const uint8_t &afTrigger,
 
     if (afTrigger == ANDROID_CONTROL_AF_TRIGGER_START) {
         resetTrigger(systemTime() / 1000);
-        LOGI("AF TRIGGER START");
+        LOGI("AF TRIGGER START, reqId(%d)", reqId);
     } else if (afTrigger == ANDROID_CONTROL_AF_TRIGGER_CANCEL) {
-        LOGI("AF TRIGGER CANCEL");
+        LOGI("AF TRIGGER CANCEL, reqId(%d)", reqId);
         resetTrigger(0);
     }
     mLastAfControls.afTrigger = afTrigger;
@@ -240,11 +243,12 @@ RkAfModeBase::processTriggers(const uint8_t &afTrigger,
 }
 
 void
-RkAfModeBase::updateResult(CameraMetadata& results)
+RkAfModeBase::updateResult(int reqId, CameraMetadata& results)
 {
 
     //# METADATA_Dynamic control.afMode done
-    LOGI("%s afMode = %s state = %s trigger:%d", __FUNCTION__,
+    LOGI("%s reqId(%d), afMode = %s state = %s trigger:%d", __FUNCTION__,
+            reqId,
             META_CONTROL2STR(afMode, mLastAfControls.afMode),
             META_CONTROL2STR(afState, mCurrentAfState),
             mLastAfControls.afTrigger);
@@ -308,7 +312,8 @@ XCamReturn
 RkAFModeOff::processTriggers(const uint8_t &afTrigger,
                                 const uint8_t &afMode,
                                 int preCaptureId,
-                                XCamAfParam& afInputParams)
+                                XCamAfParam& afInputParams,
+                                int reqId)
 {
     /* UNUSED(afInputParams); */
     /* UNUSED(preCaptureId); */
@@ -320,7 +325,8 @@ RkAFModeOff::processTriggers(const uint8_t &afTrigger,
 
 XCamReturn
 RkAFModeOff::processResult(rk_aiq_af_results& afResults,
-                              CameraMetadata& result)
+                              CameraMetadata& result,
+                              int reqId)
 {
     /**
      * IN MANUAL and EDOF AF state never changes
@@ -329,7 +335,7 @@ RkAFModeOff::processResult(rk_aiq_af_results& afResults,
 
     mCurrentAfState = ANDROID_CONTROL_AF_STATE_INACTIVE;
     mLensState = ANDROID_LENS_STATE_STATIONARY;
-    updateResult(result);
+    updateResult(reqId, result);
 
     return XCAM_RETURN_NO_ERROR;
 }
@@ -346,12 +352,14 @@ XCamReturn
 RkAFModeAuto::processTriggers(const uint8_t &afTrigger,
                                  const uint8_t &afMode,
                                  int preCaptureId,
-                                 XCamAfParam& afInputParams)
+                                 XCamAfParam& afInputParams,
+                                 int reqId)
 {
     RkAfModeBase::processTriggers(afTrigger,
                                      afMode,
                                      preCaptureId,
-                                     afInputParams);
+                                     afInputParams,
+                                     reqId);
 
     // Set the AIQ AF operation mode based on current AF state.
     // Current state = previous request's results, see processResult().
@@ -404,11 +412,11 @@ RkAFModeAuto::processTriggers(const uint8_t &afTrigger,
     if (mLastAfControls.afTrigger == ANDROID_CONTROL_AF_TRIGGER_START) {
         afInputParams.focus_lock = false;
         mCurrentAfState = ANDROID_CONTROL_AF_STATE_ACTIVE_SCAN;
-        LOGI("@%s AF state ACTIVE_SCAN (trigger start)", __PRETTY_FUNCTION__);
+        LOGI("@%s AF state ACTIVE_SCAN (trigger start) (reqId: %d)", __PRETTY_FUNCTION__, reqId);
     } else if (mLastAfControls.afTrigger == ANDROID_CONTROL_AF_TRIGGER_CANCEL) {
         afInputParams.focus_lock = true;
         mCurrentAfState = ANDROID_CONTROL_AF_STATE_INACTIVE;
-        LOGI("@%s AF state INACTIVE (trigger cancel)", __PRETTY_FUNCTION__);
+        LOGI("@%s AF state INACTIVE (trigger cancel) (reqId: %d)", __PRETTY_FUNCTION__, reqId);
     }
 
     return XCAM_RETURN_NO_ERROR;
@@ -416,7 +424,8 @@ RkAFModeAuto::processTriggers(const uint8_t &afTrigger,
 
 XCamReturn
 RkAFModeAuto::processResult(rk_aiq_af_results& afResult,
-                               CameraMetadata& result)
+                               CameraMetadata& result,
+                               int reqId)
 {
     mLensState = ANDROID_LENS_STATE_STATIONARY;
 
@@ -431,23 +440,23 @@ RkAFModeAuto::processResult(rk_aiq_af_results& afResult,
         case rk_aiq_af_status_success:
             mCurrentAfState = ANDROID_CONTROL_AF_STATE_FOCUSED_LOCKED;
             resetTrigger(0);
-            LOGI("@%s AF state FOCUSED_LOCKED", __PRETTY_FUNCTION__);
+            LOGI("@%s AF state FOCUSED_LOCKED (reqId: %d)", __PRETTY_FUNCTION__, reqId);
             break;
         case rk_aiq_af_status_fail:
             mCurrentAfState = ANDROID_CONTROL_AF_STATE_NOT_FOCUSED_LOCKED;
             resetTrigger(0);
-            LOGI("@%s AF state NOT_FOCUSED_LOCKED", __PRETTY_FUNCTION__);
+            LOGI("@%s AF state NOT_FOCUSED_LOCKED (reqId: %d)", __PRETTY_FUNCTION__, reqId);
             break;
         default:
         case rk_aiq_af_status_idle:
-            LOGI("@%s AF state INACTIVE", __PRETTY_FUNCTION__);
+            LOGI("@%s AF state INACTIVE (reqId: %d)", __PRETTY_FUNCTION__, reqId);
             break;
         }
     }
 
     checkIfFocusTimeout();
 
-    updateResult(result);
+    updateResult(reqId, result);
 
     return XCAM_RETURN_NO_ERROR;
 }
@@ -465,12 +474,14 @@ XCamReturn
 RkAFModeContinuousPicture::processTriggers(const uint8_t &afTrigger,
                                               const uint8_t &afMode,
                                               int preCaptureId,
-                                              XCamAfParam& afInputParams)
+                                              XCamAfParam& afInputParams,
+                                              int reqId)
 {
     RkAfModeBase::processTriggers(afTrigger,
                                      afMode,
                                      preCaptureId,
-                                     afInputParams);
+                                     afInputParams,
+                                     reqId);
 
     // If we are locked then set trigger_new_search to false to keep the lens
     // locked
@@ -532,12 +543,20 @@ RkAFModeContinuousPicture::processTriggers(const uint8_t &afTrigger,
         }
     }
 
+    LOGI("@%s mLastAfControls.afTrigger(%d) AF state(%d) focus_lock(%s), (reqId: %d)",
+                                            __FUNCTION__,
+                                            mLastAfControls.afTrigger,
+                                            mCurrentAfState,
+                                            afInputParams.focus_lock?"TRUE":"FALSE",
+                                            reqId);
+
     return XCAM_RETURN_NO_ERROR;
 }
 
 XCamReturn
 RkAFModeContinuousPicture::processResult(rk_aiq_af_results& afResult,
-                                           CameraMetadata& result)
+                                           CameraMetadata& result,
+                                           int reqId)
 {
     mLensState = ANDROID_LENS_STATE_STATIONARY;
 
@@ -548,7 +567,7 @@ RkAFModeContinuousPicture::processResult(rk_aiq_af_results& afResult,
         switch (afResult.status) {
         case rk_aiq_af_status_local_search:
         case rk_aiq_af_status_extended_search:
-            LOGI("@%s AF state SCANNING", __PRETTY_FUNCTION__);
+            LOGI("@%s AF state SCANNING (reqId: %d)", __PRETTY_FUNCTION__, reqId);
             mCurrentAfState = ANDROID_CONTROL_AF_STATE_PASSIVE_SCAN;
             if (afResult.final_lens_position_reached == false)
                 mLensState = ANDROID_LENS_STATE_MOVING;
@@ -556,28 +575,28 @@ RkAFModeContinuousPicture::processResult(rk_aiq_af_results& afResult,
         case rk_aiq_af_status_success:
             if (mLastActiveTriggerTime == 0) {
                 mCurrentAfState = ANDROID_CONTROL_AF_STATE_PASSIVE_FOCUSED;
-                LOGI("@%s AF state PASSIVE_FOCUSED", __PRETTY_FUNCTION__);
+                LOGI("@%s AF state PASSIVE_FOCUSED (reqId: %d)", __PRETTY_FUNCTION__, reqId);
             } else {
                 resetTrigger(0);
                 mCurrentAfState = ANDROID_CONTROL_AF_STATE_FOCUSED_LOCKED;
-                LOGI("@%s AF state FOCUSED_LOCKED", __PRETTY_FUNCTION__);
+                LOGI("@%s AF state FOCUSED_LOCKED (reqId: %d)", __PRETTY_FUNCTION__, reqId);
             }
             break;
         case rk_aiq_af_status_fail:
             if (mLastActiveTriggerTime == 0) {
                 mCurrentAfState = ANDROID_CONTROL_AF_STATE_PASSIVE_UNFOCUSED;
-                LOGI("@%s AF state PASSIVE_UNFOCUSED", __PRETTY_FUNCTION__);
+                LOGI("@%s AF state PASSIVE_UNFOCUSED (reqId: %d)", __PRETTY_FUNCTION__, reqId);
             } else {
                 resetTrigger(0);
                 mCurrentAfState = ANDROID_CONTROL_AF_STATE_NOT_FOCUSED_LOCKED;
-                LOGI("@%s AF state NOT_FOCUSED_LOCKED", __PRETTY_FUNCTION__);
+                LOGI("@%s AF state NOT_FOCUSED_LOCKED (reqId: %d)", __PRETTY_FUNCTION__, reqId);
             }
             break;
         default:
         case rk_aiq_af_status_idle:
             if (mCurrentAfState == ANDROID_CONTROL_AF_STATE_INACTIVE) {
                 mCurrentAfState = ANDROID_CONTROL_AF_STATE_PASSIVE_UNFOCUSED;
-                LOGI("@%s AF state PASSIVE_UNFOCUSED (idle)", __PRETTY_FUNCTION__);
+                LOGI("@%s AF state PASSIVE_UNFOCUSED (idle) (reqId: %d)", __PRETTY_FUNCTION__, reqId);
             }
             break;
         }
@@ -585,7 +604,7 @@ RkAFModeContinuousPicture::processResult(rk_aiq_af_results& afResult,
 
     checkIfFocusTimeout();
 
-    updateResult(result);
+    updateResult(reqId, result);
     return XCAM_RETURN_NO_ERROR;
 }
 }
