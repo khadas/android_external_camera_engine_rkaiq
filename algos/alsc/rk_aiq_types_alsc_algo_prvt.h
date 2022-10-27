@@ -137,9 +137,6 @@ typedef struct alsc_context_s {
     AlscState_t eState;
 
     // otp grad
-    RkAiqBayerPattern_t bayerPattern;
-    uint32_t ispAcqWidth;
-    uint32_t ispAcqHeight;
     alsc_otp_grad_t otpGrad;
 } alsc_context_t ;
 

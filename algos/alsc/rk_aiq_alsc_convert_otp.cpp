@@ -8,16 +8,16 @@
 // #define WRITE_OTP_TABLE 1
 // #define LOGI printf
 
-void convertLscTableParameter(alsc_handle_t hAlsc)
+void convertLscTableParameter(resolution_t *cur_res, alsc_otp_grad_t *otpGrad,
+                              RkAiqBayerPattern_t bayerPattern)
 {
     XCAM_STATIC_PROFILING_START(convertLscTable);
 
-    alsc_otp_grad_t *otpGrad = &hAlsc->otpGrad;
-    int32_t bayer 			= hAlsc->bayerPattern;
+    int32_t bayer 			= bayerPattern;
     uint32_t srcLscWidth    = otpGrad->width;
     uint32_t srcLscHeight   = otpGrad->height;
-    int32_t dstWidth 		= hAlsc->ispAcqWidth;
-    int32_t dstHeight 		= hAlsc->ispAcqHeight;
+    int32_t dstWidth 		= cur_res->width;
+    int32_t dstHeight 		= cur_res->height;
 
     LOGD_ALSC("input params: src %dx%d, dst %dx%d, bayer: %d\n",
             srcLscWidth, srcLscHeight, dstWidth,

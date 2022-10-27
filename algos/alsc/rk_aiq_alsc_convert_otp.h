@@ -73,7 +73,7 @@ typedef enum
     B_INDEX = 3,
 } BayerIndex;
 
-void convertLscTableParameter(alsc_handle_t hAlsc);
+void convertLscTableParameter(resolution_t *cur_res, alsc_otp_grad_t *otpGrad, RkAiqBayerPattern_t bayerPattern);
 void computeSamplingPoint(int size, int *pos);
 void computeSamplingInterval(int width, int height, int *xInterval, int *yInterval);
 void getLscParameter(uint16_t *r, uint16_t *gr, uint16_t *gb, uint16_t *b, uint16_t *table, int width, int height, int bayer);

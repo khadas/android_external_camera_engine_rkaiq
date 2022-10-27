@@ -470,18 +470,22 @@ static void ClearContext(alsc_handle_t hAlsc)
 
 }
 
-XCamReturn convertSensorLscOTP(alsc_handle_t hAlsc)
+XCamReturn convertSensorLscOTP(resolution_t *cur_res, alsc_otp_grad_t *otpGrad,
+                               RkAiqBayerPattern_t bayerPattern)
 {
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
 
-    if (!hAlsc->otpGrad.flag)
+    if (!cur_res || !otpGrad)
         return XCAM_RETURN_BYPASS;
 
-    if ((hAlsc->ispAcqWidth > hAlsc->otpGrad.width && \
-         hAlsc->ispAcqHeight > hAlsc->otpGrad.height) || \
-         (hAlsc->ispAcqWidth < hAlsc->otpGrad.width && \
-         hAlsc->ispAcqHeight < hAlsc->otpGrad.height)) {
-        convertLscTableParameter(hAlsc);
+    if (!otpGrad->flag)
+        return XCAM_RETURN_BYPASS;
+
+    if ((cur_res->width > otpGrad->width && \
+         cur_res->height > otpGrad->height) || \
+        (cur_res->width < otpGrad->width && \
+         cur_res->height < otpGrad->height)) {
+        convertLscTableParameter(cur_res, otpGrad, bayerPattern);
     }
 
     return ret;
@@ -496,9 +500,6 @@ XCamReturn alscGetOtpInfo(RkAiqAlgoCom* params)
     RkAiqAlgoConfigAlsc *para = (RkAiqAlgoConfigAlsc *)params;
 
     alsc_sw_info_t *alscSwInfo = &para->alsc_sw_info;
-    hAlsc->bayerPattern = alscSwInfo->bayerPattern;
-    hAlsc->ispAcqWidth = alscSwInfo->ispAcqWidth;
-    hAlsc->ispAcqHeight = alscSwInfo->ispAcqHeight;
     if (alscSwInfo->otpInfo.flag) {
         hAlsc->otpGrad.flag = alscSwInfo->otpInfo.flag;
         hAlsc->otpGrad.width = alscSwInfo->otpInfo.width;
@@ -512,10 +513,7 @@ XCamReturn alscGetOtpInfo(RkAiqAlgoCom* params)
         hAlsc->alscSwInfo.otpInfo.flag = 0;
     }
 
-    LOGD_ALSC("BAYER: %d, ispAcq: %dx%d, otp: flag %d, WxH: %dx%d, table_size: %d\n",
-            hAlsc->bayerPattern,
-            hAlsc->ispAcqWidth,
-            hAlsc->ispAcqHeight,
+    LOGD_ALSC("otp: flag %d, WxH: %dx%d, table_size: %d\n",
             hAlsc->otpGrad.flag,
             hAlsc->otpGrad.width,
             hAlsc->otpGrad.height,

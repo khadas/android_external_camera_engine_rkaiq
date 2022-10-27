@@ -48,8 +48,6 @@ typedef struct alsc_sw_info_s {
     bool awbConverged;
     int prepare_type;
     RkAiqBayerPattern_t bayerPattern;
-    uint32_t ispAcqWidth;
-    uint32_t ispAcqHeight;
     AlscOtpInfo_t otpInfo;
 } alsc_sw_info_t;
 
