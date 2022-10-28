@@ -4,6 +4,7 @@
 #include "PdafStreamProcUnit.h"
 #include "CamHwIsp20.h"
 #include "code_to_pixel_format.h"
+#include "rkcif-config.h"
 
 namespace RkCam {
 
@@ -47,7 +48,15 @@ PdafStreamProcUnit::prepare(rk_sensor_pdaf_info_t *pdaf_inf)
 
 void PdafStreamProcUnit::start()
 {
+    int mem_mode;
+
     if (mPdafStream.ptr() && !mStartFlag) {
+        mPdafDev->io_control (RKCIF_CMD_GET_CSI_MEMORY_MODE, &mem_mode);
+        if (mem_mode != CSI_LVDS_MEM_WORD_LOW_ALIGN) {
+            mem_mode = CSI_LVDS_MEM_WORD_LOW_ALIGN;
+            mPdafDev->io_control (RKCIF_CMD_SET_CSI_MEMORY_MODE, &mem_mode);
+            LOGI_AF("memory mode of pdaf video need low align, mem_mode %d", mem_mode);
+        }
         mPdafStream->start();
         mStartFlag = true;
     }
