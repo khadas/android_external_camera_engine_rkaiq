@@ -2728,11 +2728,12 @@ void RkAiqCore::newPdafStatsPool() {
 void RkAiqCore::delPdafStatsPool() {
     SmartPtr<RkAiqPdafStatsProxy> pdafStats = NULL;
     uint32_t max_cnt                        = mAiqPdafStatsPool->get_free_buffer_size();
+    rk_aiq_isp_pdaf_stats_t* pdaf_stats;
 
     for (uint32_t i = 0; i < max_cnt; i++) {
         pdafStats = mAiqPdafStatsPool->get_item();
+        pdaf_stats = &pdafStats->data().ptr()->pdaf_stats;
 
-        rk_aiq_isp_pdaf_stats_t* pdaf_stats = &pdafStats->data().ptr()->pdaf_stats;
         if (pdaf_stats->pdLData) {
             free(pdaf_stats->pdLData);
             pdaf_stats->pdLData = NULL;
@@ -2740,6 +2741,20 @@ void RkAiqCore::delPdafStatsPool() {
         if (pdaf_stats->pdRData) {
             free(pdaf_stats->pdRData);
             pdaf_stats->pdRData = NULL;
+        }
+    }
+
+    if (mPdafStats.ptr()) {
+        if (mPdafStats->data().ptr()) {
+            pdaf_stats = &mPdafStats->data().ptr()->pdaf_stats;
+            if (pdaf_stats->pdLData) {
+                free(pdaf_stats->pdLData);
+                pdaf_stats->pdLData = NULL;
+            }
+            if (pdaf_stats->pdRData) {
+                free(pdaf_stats->pdRData);
+                pdaf_stats->pdRData = NULL;
+            }
         }
     }
 }
