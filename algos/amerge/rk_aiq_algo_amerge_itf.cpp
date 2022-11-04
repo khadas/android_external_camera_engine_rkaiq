@@ -197,39 +197,90 @@ static XCamReturn AmergeProcess(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* o
                     pAmergeParams->com.u.proc.nxtExp->HdrExp[0].exp_real_params.analog_gain *
                     pAmergeParams->com.u.proc.nxtExp->HdrExp[0].exp_real_params.digital_gain *
                     pAmergeParams->com.u.proc.nxtExp->HdrExp[0].exp_real_params.integration_time;
+                if (ExpoData.nextSExpo < FLT_EPSILON)
+                    ExpoData.nextSExpo =
+                        pAmergeParams->com.u.proc.curExp->HdrExp[0].exp_real_params.analog_gain *
+                        pAmergeParams->com.u.proc.curExp->HdrExp[0].exp_real_params.digital_gain *
+                        pAmergeParams->com.u.proc.curExp->HdrExp[0]
+                            .exp_real_params.integration_time;
+
                 ExpoData.nextMExpo =
                     pAmergeParams->com.u.proc.nxtExp->HdrExp[1].exp_real_params.analog_gain *
                     pAmergeParams->com.u.proc.nxtExp->HdrExp[1].exp_real_params.digital_gain *
                     pAmergeParams->com.u.proc.nxtExp->HdrExp[1].exp_real_params.integration_time;
+                if (ExpoData.nextMExpo < FLT_EPSILON)
+                    ExpoData.nextMExpo =
+                        pAmergeParams->com.u.proc.curExp->HdrExp[1].exp_real_params.analog_gain *
+                        pAmergeParams->com.u.proc.curExp->HdrExp[1].exp_real_params.digital_gain *
+                        pAmergeParams->com.u.proc.curExp->HdrExp[1]
+                            .exp_real_params.integration_time;
+
                 ExpoData.nextLExpo = ExpoData.nextMExpo;
 
                 ExpoData.nextSGain =
                     pAmergeParams->com.u.proc.nxtExp->HdrExp[0].exp_real_params.analog_gain *
                     pAmergeParams->com.u.proc.nxtExp->HdrExp[0].exp_real_params.digital_gain;
+                if (ExpoData.nextSGain < FLT_EPSILON)
+                    ExpoData.nextSGain =
+                        pAmergeParams->com.u.proc.curExp->HdrExp[0].exp_real_params.analog_gain *
+                        pAmergeParams->com.u.proc.curExp->HdrExp[0].exp_real_params.digital_gain;
+
                 ExpoData.nextMGain =
                     pAmergeParams->com.u.proc.nxtExp->HdrExp[1].exp_real_params.analog_gain *
                     pAmergeParams->com.u.proc.nxtExp->HdrExp[1].exp_real_params.digital_gain;
-
+                if (ExpoData.nextMGain < FLT_EPSILON)
+                    ExpoData.nextMGain =
+                        pAmergeParams->com.u.proc.curExp->HdrExp[1].exp_real_params.analog_gain *
+                        pAmergeParams->com.u.proc.curExp->HdrExp[1].exp_real_params.digital_gain;
             } else if (pAmergeCtx->FrameNumber == HDR_3X_NUM) {
                 ExpoData.nextSExpo =
                     pAmergeParams->com.u.proc.nxtExp->HdrExp[0].exp_real_params.analog_gain *
                     pAmergeParams->com.u.proc.nxtExp->HdrExp[0].exp_real_params.digital_gain *
                     pAmergeParams->com.u.proc.nxtExp->HdrExp[0].exp_real_params.integration_time;
+                if (ExpoData.nextSExpo < FLT_EPSILON)
+                    ExpoData.nextSExpo =
+                        pAmergeParams->com.u.proc.curExp->HdrExp[0].exp_real_params.analog_gain *
+                        pAmergeParams->com.u.proc.curExp->HdrExp[0].exp_real_params.digital_gain *
+                        pAmergeParams->com.u.proc.curExp->HdrExp[0]
+                            .exp_real_params.integration_time;
+
                 ExpoData.nextMExpo =
                     pAmergeParams->com.u.proc.nxtExp->HdrExp[1].exp_real_params.analog_gain *
                     pAmergeParams->com.u.proc.nxtExp->HdrExp[1].exp_real_params.digital_gain *
                     pAmergeParams->com.u.proc.nxtExp->HdrExp[1].exp_real_params.integration_time;
+                if (ExpoData.nextMExpo < FLT_EPSILON)
+                    ExpoData.nextMExpo =
+                        pAmergeParams->com.u.proc.curExp->HdrExp[1].exp_real_params.analog_gain *
+                        pAmergeParams->com.u.proc.curExp->HdrExp[1].exp_real_params.digital_gain *
+                        pAmergeParams->com.u.proc.curExp->HdrExp[1]
+                            .exp_real_params.integration_time;
+
                 ExpoData.nextLExpo =
                     pAmergeParams->com.u.proc.nxtExp->HdrExp[2].exp_real_params.analog_gain *
                     pAmergeParams->com.u.proc.nxtExp->HdrExp[2].exp_real_params.digital_gain *
                     pAmergeParams->com.u.proc.nxtExp->HdrExp[2].exp_real_params.integration_time;
+                if (ExpoData.nextLExpo < FLT_EPSILON)
+                    ExpoData.nextLExpo =
+                        pAmergeParams->com.u.proc.curExp->HdrExp[2].exp_real_params.analog_gain *
+                        pAmergeParams->com.u.proc.curExp->HdrExp[2].exp_real_params.digital_gain *
+                        pAmergeParams->com.u.proc.curExp->HdrExp[2]
+                            .exp_real_params.integration_time;
 
                 ExpoData.nextSGain =
                     pAmergeParams->com.u.proc.nxtExp->HdrExp[0].exp_real_params.analog_gain *
                     pAmergeParams->com.u.proc.nxtExp->HdrExp[0].exp_real_params.digital_gain;
+                if (ExpoData.nextSGain < FLT_EPSILON)
+                    ExpoData.nextSGain =
+                        pAmergeParams->com.u.proc.curExp->HdrExp[0].exp_real_params.analog_gain *
+                        pAmergeParams->com.u.proc.curExp->HdrExp[0].exp_real_params.digital_gain;
+
                 ExpoData.nextMGain =
                     pAmergeParams->com.u.proc.nxtExp->HdrExp[1].exp_real_params.analog_gain *
                     pAmergeParams->com.u.proc.nxtExp->HdrExp[1].exp_real_params.digital_gain;
+                if (ExpoData.nextMGain < FLT_EPSILON)
+                    ExpoData.nextMGain =
+                        pAmergeParams->com.u.proc.curExp->HdrExp[1].exp_real_params.analog_gain *
+                        pAmergeParams->com.u.proc.curExp->HdrExp[1].exp_real_params.digital_gain;
             }
             LOGV_AMERGE(
                 "%s: nextFrame: sexp: %f-%f, mexp: %f-%f, lexp: %f-%f\n", __FUNCTION__,
@@ -239,21 +290,21 @@ static XCamReturn AmergeProcess(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* o
                 pAmergeParams->com.u.proc.nxtExp->HdrExp[1].exp_real_params.integration_time,
                 pAmergeParams->com.u.proc.nxtExp->HdrExp[2].exp_real_params.analog_gain,
                 pAmergeParams->com.u.proc.nxtExp->HdrExp[2].exp_real_params.integration_time);
-            if (ExpoData.nextSExpo > 0)
+            if (ExpoData.nextSExpo > FLT_EPSILON)
                 ExpoData.nextRatioLS = ExpoData.nextLExpo / ExpoData.nextSExpo;
             else
                 LOGE_AMERGE("%s: Short frame for merge expo sync is ERROR!!!\n", __FUNCTION__);
-            if (ExpoData.nextMExpo > 0)
+            if (ExpoData.nextMExpo > FLT_EPSILON)
                 ExpoData.nextRatioLM = ExpoData.nextLExpo / ExpoData.nextMExpo;
             else
                 LOGE_AMERGE("%s: Middle frame for merge expo sync is ERROR!!!\n", __FUNCTION__);
             // clip for long frame mode
             if (pAmergeCtx->SensorInfo.LongFrmMode) {
-                ExpoData.nextRatioLS = 1.0;
-                ExpoData.nextRatioLM = 1.0;
+                ExpoData.nextRatioLS = 1.0f;
+                ExpoData.nextRatioLM = 1.0f;
             }
 
-            if (ExpoData.nextRatioLS >= 1 && ExpoData.nextRatioLM >= 1)
+            if (ExpoData.nextRatioLS >= 1.0f && ExpoData.nextRatioLM >= 1.0f)
                 AmergeExpoProcessing(pAmergeCtx, &ExpoData);
             else
                 LOGE_AMERGE("%s: AE ratio for merge expo sync is under one!!!\n", __FUNCTION__);
