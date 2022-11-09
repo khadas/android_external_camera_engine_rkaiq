@@ -23,7 +23,7 @@
 #include "rk_aiq_types.h"
 #include "rk_aiq_pool.h"
 #include "RkAiqCalibDbV2Helper.h"
-
+#include "rk_aiq_offline_raw.h"
 namespace RkCam {
 
 using namespace XCam;
@@ -134,6 +134,9 @@ public:
     virtual int getCamPhyId() = 0;
     virtual void setGroupMode(bool bGroup, bool bMain) = 0;
     virtual bool get_pdaf_support() = 0;
+    virtual XCamReturn reset_hardware() = 0;
+    virtual XCamReturn rawReproc_genIspParams (uint32_t sequence, rk_aiq_frame_info_t *offline_finfo, int mode) = 0;
+    virtual XCamReturn rawReProc_prepare (uint32_t sequence, rk_aiq_frame_info_t *offline_finfo) = 0;
 private:
     XCAM_DEAD_COPY (ICamHw);
 };

@@ -449,19 +449,7 @@ XCamReturn AlscAutoConfig
     hAlsc->alscRest.pLscProfile2 = pLscProfile2;
 
     // 6 set to ic
-
-#if 0
-    memcpy(hAlsc->lscHwConf.r_data_tbl, &hAlsc->alscRest.dampedLscMatrixTable.LscMatrix[CAM_4CH_COLOR_COMPONENT_RED].uCoeff,
-           sizeof(hAlsc->alscRest.dampedLscMatrixTable.LscMatrix[CAM_4CH_COLOR_COMPONENT_RED].uCoeff));
-    memcpy(hAlsc->lscHwConf.gr_data_tbl, &hAlsc->alscRest.dampedLscMatrixTable.LscMatrix[CAM_4CH_COLOR_COMPONENT_GREENR].uCoeff,
-           sizeof(hAlsc->alscRest.dampedLscMatrixTable.LscMatrix[CAM_4CH_COLOR_COMPONENT_GREENR].uCoeff));
-    memcpy(hAlsc->lscHwConf.gb_data_tbl, &hAlsc->alscRest.dampedLscMatrixTable.LscMatrix[CAM_4CH_COLOR_COMPONENT_GREENB].uCoeff,
-           sizeof(hAlsc->alscRest.dampedLscMatrixTable.LscMatrix[CAM_4CH_COLOR_COMPONENT_GREENB].uCoeff));
-    memcpy(hAlsc->lscHwConf.b_data_tbl, &hAlsc->alscRest.dampedLscMatrixTable.LscMatrix[CAM_4CH_COLOR_COMPONENT_BLUE].uCoeff,
-           sizeof(hAlsc->alscRest.dampedLscMatrixTable.LscMatrix[CAM_4CH_COLOR_COMPONENT_BLUE].uCoeff));
-#else
-    genLscMatrixToHwConf(hAlsc);
-#endif
+    genLscMatrixToHwConf(&hAlsc->alscRest.dampedLscMatrixTable, &hAlsc->lscHwConf, &hAlsc->otpGrad);
 
     LOG1_ALSC("%s: (exit)\n", __FUNCTION__);
 
@@ -627,35 +615,35 @@ XCamReturn alscGetOtpInfo(RkAiqAlgoCom* params)
     return XCAM_RETURN_NO_ERROR;
 }
 
-static XCamReturn genLscMatrixToHwConf(alsc_handle_t hAlsc)
+static void genLscMatrixToHwConf(lsc_matrix_t *dampedLscMatrixTable, rk_aiq_lsc_cfg_t *lscHwConf, alsc_otp_grad_t *otpGrad)
 {
-    alsc_otp_grad_t *otpGrad = &hAlsc->otpGrad;
-    lsc_matrix_t *dampedLscMatrixTable = &hAlsc->alscRest.dampedLscMatrixTable;
-
-    if (otpGrad->flag && otpGrad->table_size > 0) {
-        // apply sensor lsc otp
-        for (int32_t i = 0; i < LSC_DATA_TBL_SIZE; i++) {
-            hAlsc->lscHwConf.r_data_tbl[i]    = dampedLscMatrixTable->LscMatrix[CAM_4CH_COLOR_COMPONENT_RED].uCoeff[i] * \
-                                                (float(otpGrad->lsc_r[i]) / 1024) + 0.5;
-            hAlsc->lscHwConf.gr_data_tbl[i]   = dampedLscMatrixTable->LscMatrix[CAM_4CH_COLOR_COMPONENT_GREENR].uCoeff[i] * \
-                                                (float(otpGrad->lsc_gr[i]) / 1024) + 0.5;
-            hAlsc->lscHwConf.gb_data_tbl[i]   = dampedLscMatrixTable->LscMatrix[CAM_4CH_COLOR_COMPONENT_GREENB].uCoeff[i] * \
-                                                (float(otpGrad->lsc_gb[i]) / 1024) + 0.5;
-            hAlsc->lscHwConf.b_data_tbl[i]    = dampedLscMatrixTable->LscMatrix[CAM_4CH_COLOR_COMPONENT_BLUE].uCoeff[i] * \
-                                                (float(otpGrad->lsc_b[i]) / 1024) + 0.5;
-        }
-    } else {
-        memcpy(hAlsc->lscHwConf.r_data_tbl, dampedLscMatrixTable->LscMatrix[CAM_4CH_COLOR_COMPONENT_RED].uCoeff,
-                sizeof(dampedLscMatrixTable->LscMatrix[CAM_4CH_COLOR_COMPONENT_RED].uCoeff));
-        memcpy(hAlsc->lscHwConf.gr_data_tbl, dampedLscMatrixTable->LscMatrix[CAM_4CH_COLOR_COMPONENT_GREENR].uCoeff,
-                sizeof(dampedLscMatrixTable->LscMatrix[CAM_4CH_COLOR_COMPONENT_GREENR].uCoeff));
-        memcpy(hAlsc->lscHwConf.gb_data_tbl, dampedLscMatrixTable->LscMatrix[CAM_4CH_COLOR_COMPONENT_GREENB].uCoeff,
-                sizeof(dampedLscMatrixTable->LscMatrix[CAM_4CH_COLOR_COMPONENT_GREENB].uCoeff));
-        memcpy(hAlsc->lscHwConf.b_data_tbl, dampedLscMatrixTable->LscMatrix[CAM_4CH_COLOR_COMPONENT_BLUE].uCoeff,
-                sizeof(dampedLscMatrixTable->LscMatrix[CAM_4CH_COLOR_COMPONENT_BLUE].uCoeff));
+    if (!dampedLscMatrixTable || !lscHwConf) {
+        LOGE_ALSC("%s: input params is error!\n", __func__);
+        return;
     }
 
-    return XCAM_RETURN_NO_ERROR;
+    if (otpGrad && otpGrad->flag && otpGrad->table_size > 0) {
+        // apply sensor lsc otp
+        for (int32_t i = 0; i < LSC_DATA_TBL_SIZE; i++) {
+            lscHwConf->r_data_tbl[i]    = dampedLscMatrixTable->LscMatrix[CAM_4CH_COLOR_COMPONENT_RED].uCoeff[i] * \
+                                          (float(otpGrad->lsc_r[i]) / 1024) + 0.5;
+            lscHwConf->gr_data_tbl[i]   = dampedLscMatrixTable->LscMatrix[CAM_4CH_COLOR_COMPONENT_GREENR].uCoeff[i] * \
+                                          (float(otpGrad->lsc_gr[i]) / 1024) + 0.5;
+            lscHwConf->gb_data_tbl[i]   = dampedLscMatrixTable->LscMatrix[CAM_4CH_COLOR_COMPONENT_GREENB].uCoeff[i] * \
+                                          (float(otpGrad->lsc_gb[i]) / 1024) + 0.5;
+            lscHwConf->b_data_tbl[i]    = dampedLscMatrixTable->LscMatrix[CAM_4CH_COLOR_COMPONENT_BLUE].uCoeff[i] * \
+                                          (float(otpGrad->lsc_b[i]) / 1024) + 0.5;
+        }
+    } else {
+        memcpy(lscHwConf->r_data_tbl, dampedLscMatrixTable->LscMatrix[CAM_4CH_COLOR_COMPONENT_RED].uCoeff,
+                sizeof(dampedLscMatrixTable->LscMatrix[CAM_4CH_COLOR_COMPONENT_RED].uCoeff));
+        memcpy(lscHwConf->gr_data_tbl, dampedLscMatrixTable->LscMatrix[CAM_4CH_COLOR_COMPONENT_GREENR].uCoeff,
+                sizeof(dampedLscMatrixTable->LscMatrix[CAM_4CH_COLOR_COMPONENT_GREENR].uCoeff));
+        memcpy(lscHwConf->gb_data_tbl, dampedLscMatrixTable->LscMatrix[CAM_4CH_COLOR_COMPONENT_GREENB].uCoeff,
+                sizeof(dampedLscMatrixTable->LscMatrix[CAM_4CH_COLOR_COMPONENT_GREENB].uCoeff));
+        memcpy(lscHwConf->b_data_tbl, dampedLscMatrixTable->LscMatrix[CAM_4CH_COLOR_COMPONENT_BLUE].uCoeff,
+                sizeof(dampedLscMatrixTable->LscMatrix[CAM_4CH_COLOR_COMPONENT_BLUE].uCoeff));
+    }
 }
 
 static XCamReturn UpdateLscCalibPara(alsc_handle_t  hAlsc)

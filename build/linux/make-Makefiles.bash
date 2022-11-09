@@ -12,12 +12,15 @@ pushd $OUTPUT
 cmake -G "Ninja" \
     -DCMAKE_BUILD_TYPE=debug \
     -DARCH="arm" \
+    -DRKAIQ_TARGET_SOC=${RKAIQ_TARGET_SOC} \
     -DRKPLATFORM=OFF \
     -DCMAKE_TOOLCHAIN_FILE=$TOOLCHAIN_FILE \
     -DCMAKE_SKIP_RPATH=TRUE \
     -DCMAKE_EXPORT_COMPILE_COMMANDS=YES \
 	-DISP_HW_VERSION=${ISP_HW_VERSION} \
+    -DRKAIQ_USE_RAWSTREAM_LIB=OFF \
     $SOURCE_PATH \
-&& ninja -j$(nproc)
+&& ninja -j$(nproc) \
+&& ninja install
 
 popd

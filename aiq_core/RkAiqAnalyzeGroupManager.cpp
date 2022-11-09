@@ -169,6 +169,10 @@ bool RkAiqAnalyzeGroupMsgHdlThread::loop() {
         return false;
     }
 
+     for (auto& grp : mHandlerGroups) {
+        handleCalibUpdate(grp);
+    }
+
     for (auto& grp : mHandlerGroups) {
         XCamReturn ret = grp->msgHandle(msg);
         if (ret == XCAM_RETURN_NO_ERROR || ret == XCAM_RETURN_ERROR_TIMEOUT ||
@@ -179,6 +183,19 @@ bool RkAiqAnalyzeGroupMsgHdlThread::loop() {
     EXIT_ANALYZER_FUNCTION();
 
     return res;
+}
+
+XCamReturn RkAiqAnalyzeGroupMsgHdlThread::handleCalibUpdate(RkAiqAnalyzerGroup* grp)
+{
+  ENTER_ANALYZER_FUNCTION();
+  XCamReturn ret = XCAM_RETURN_NO_ERROR;
+
+  if (grp && grp->getAiqCore()) {
+    grp->getAiqCore()->updateCalib(grp->getType());
+  }
+
+  EXIT_ANALYZER_FUNCTION();
+  return ret;
 }
 
 RkAiqAnalyzeGroupManager::RkAiqAnalyzeGroupManager(RkAiqCore* aiqCore, bool single_thread)
@@ -456,12 +473,14 @@ void RkAiqAnalyzeGroupManager::parseAlgoGroup(const struct RkAiqAlgoDesCommExt* 
         int algo_type = algoDes[i].des->type;
         if (!((1ULL << algo_type) & enAlgosMask))
             continue;
-        int deps_flag = 0;
+        int64_t deps_flag = 0;
         for (size_t j = 0; j < algoDes[i].grpConds.size; j++)
             deps_flag |= 1ULL << algoDes[i].grpConds.conds[j].cond;
         rk_aiq_core_analyze_type_e group = algoDes[i].group;
-        mGroupAlgoListMap[group].push_back(*mAiqCore->getCurAlgoTypeHandle(algo_type));
-        mGroupAlgoListMap[RK_AIQ_CORE_ANALYZE_ALL].push_back(*mAiqCore->getCurAlgoTypeHandle(algo_type));
+        if (mAiqCore->getCurAlgoTypeHandle(algo_type)) {
+            mGroupAlgoListMap[group].push_back(*mAiqCore->getCurAlgoTypeHandle(algo_type));
+            mGroupAlgoListMap[RK_AIQ_CORE_ANALYZE_ALL].push_back(*mAiqCore->getCurAlgoTypeHandle(algo_type));
+        }
         if (mGroupMap.count(deps_flag)) {
             continue;
         }

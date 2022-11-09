@@ -391,9 +391,13 @@ cc_library_static {
     name: "librkaiq_acgc",
     vendor: true,
     defaults: ["algo_defaults"],
+    include_dirs: [
+        "external/camera_engine_rkaiq/include/algos/acgc",
+    ],
 
     srcs: [
         "acgc/rk_aiq_algo_acgc_itf.cpp",
+        "acgc/rk_aiq_uapi_acgc_int.cpp",
     ],
 }
 

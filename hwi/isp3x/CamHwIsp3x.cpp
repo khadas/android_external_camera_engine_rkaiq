@@ -202,6 +202,9 @@ CamHwIsp3x::gen_full_isp_params(const struct isp3x_isp_params_cfg* update_params
             case Rk_ISP2x_CSM_ID:
                 CHECK_UPDATE_PARAMS(full_params->others.csm_cfg, update_params->others.csm_cfg);
                 break;
+            case Rk_ISP2x_CGC_ID:
+                CHECK_UPDATE_PARAMS(full_params->others.cgc_cfg, update_params->others.cgc_cfg);
+                break;
             default:
                 break;
             }
@@ -308,6 +311,19 @@ CamHwIsp3x::setIspConfig()
 
     }
 
+    // add isp dgain results to ready results
+    SmartPtr<SensorHw> mSensorSubdev = mSensorDev.dynamic_cast_ptr<SensorHw>();
+    if (mSensorSubdev.ptr()) {
+        SmartPtr<RkAiqExpParamsProxy> expParam;
+
+        if (mSensorSubdev->getEffectiveExpParams(expParam, frameId) < 0) {
+            LOGE_CAMHW_SUBM(ISP20HW_SUBM, "frame_id(%d), get exposure failed!!!\n", frameId);
+        } else {
+            expParam->setType(RESULT_TYPE_EXPOSURE_PARAM);
+            ready_results.push_back(expParam);
+        }
+    }
+
     // TODO: merge_isp_results would cause the compile warning: reference to merge_isp_results is ambiguous
     // now use Isp21Params::merge_isp_results instead
     if (Isp3xParams::merge_isp_results(ready_results, update_params) != XCAM_RETURN_NO_ERROR)
@@ -317,6 +333,7 @@ CamHwIsp3x::setIspConfig()
     }
     uint64_t module_en_update_partial = 0;
     uint64_t module_cfg_update_partial = 0;
+    update_params->frame_id = frameId;
     gen_full_isp_params(update_params, &_full_active_isp3x_params,
                         &module_en_update_partial, &module_cfg_update_partial);
 
@@ -332,7 +349,6 @@ CamHwIsp3x::setIspConfig()
     module_en_update_partial = _full_active_isp3x_params.module_en_update;
     module_cfg_update_partial = _full_active_isp3x_params.module_cfg_update;
 #endif
-
 
     if (v4l2buf.ptr()) {
         struct isp3x_isp_params_cfg* isp_params;
@@ -409,6 +425,7 @@ CamHwIsp3x::setIspConfig()
             isp_params->module_cfg_update |= _module_cfg_update_frome_drv;
             _module_cfg_update_frome_drv = 0;
         }
+
         if (mIspParamsDev->queue_buffer (v4l2buf) != 0) {
             LOGE_CAMHW_SUBM(ISP20HW_SUBM, "RKISP1: failed to ioctl VIDIOC_QBUF for index %d, %d %s.\n",
                             buf_index, errno, strerror(errno));

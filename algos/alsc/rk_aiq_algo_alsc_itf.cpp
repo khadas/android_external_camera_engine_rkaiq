@@ -74,13 +74,10 @@ prepare(RkAiqAlgoCom* params)
             (CalibDbV2_LSC_t*)(CALIBDBV2_GET_MODULE_PTR(para->com.u.prepare.calibv2, lsc_v2));
     }
 
-    if (hAlsc->eState == ALSC_STATE_INITIALIZED) {
-        alscGetOtpInfo(params);
-    }
-
-    if(hAlsc->eState == ALSC_STATE_INITIALIZED || \
+    if((para->alsc_sw_info.otpInfo.flag && !hAlsc->otpGrad.flag) || \
        !!(params->u.prepare.conf_type & RK_AIQ_ALGO_CONFTYPE_CHANGERES) || \
        !!(params->u.prepare.conf_type & RK_AIQ_ALGO_CONFTYPE_CHANGECAMS)) {
+        alscGetOtpInfo(params);
         convertSensorLscOTP(&hAlsc->cur_res, &hAlsc->otpGrad, para->alsc_sw_info.bayerPattern);
     }
 

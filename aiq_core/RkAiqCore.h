@@ -452,10 +452,14 @@ public:
     SmartPtr<RkAiqHandle>* getCurAlgoTypeHandle(int algo_type);
     virtual XCamReturn genCpslResult(RkAiqFullParams* params, RkAiqAlgoPreResAsd* asd_pre_rk);
 
+    XCamReturn updateCalib(enum rk_aiq_core_analyze_type_e type);
+    XCamReturn updateCalibDbBrutal(CamCalibDbV2Context_t* aiqCalib);
+
 protected:
     // in analyzer thread
     XCamReturn analyze(const SmartPtr<VideoBuffer> &buffer);
     SmartPtr<RkAiqFullParamsProxy> analyzeInternal(enum rk_aiq_core_analyze_type_e type);
+    XCamReturn prepare(enum rk_aiq_core_analyze_type_e type);
     XCamReturn preProcess(enum rk_aiq_core_analyze_type_e type);
     XCamReturn processing(enum rk_aiq_core_analyze_type_e type);
     XCamReturn postProcess(enum rk_aiq_core_analyze_type_e type);
@@ -657,6 +661,12 @@ private:
     int mSpAlignedWidth;
     int mSpAlignedHeight;
     uint64_t mCustomEnAlgosMask;
+    // update calib for each group
+    XCam::Mutex _update_mutex;
+    XCam::Cond _update_done_cond;
+    XCamReturn notifyUpdate(uint64_t mask);
+    XCamReturn waitUpdateDone();
+    uint64_t groupUpdateMask;
 
     bool mPdafSupport;
     int64_t mFrmInterval = 30000LL;

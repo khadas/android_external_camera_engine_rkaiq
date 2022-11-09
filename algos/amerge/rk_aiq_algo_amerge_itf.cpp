@@ -95,6 +95,11 @@ static XCamReturn AmergePrepare(RkAiqAlgoCom* params)
             memcpy(&pAmergeCtx->pCalibDB.Merge_v30, calibv2_amerge_calib, sizeof(CalibDbV2_merge_V2_t));//load iq paras
 
         }
+
+        if (pAmergeCtx->FrameNumber == HDR_2X_NUM || pAmergeCtx->FrameNumber == HDR_3X_NUM) {
+            MergePrepareJsonMalloc(&pAmergeCtx->Config, &pAmergeCtx->pCalibDB);
+            AmergePrepareJsonUpdateConfig(pAmergeCtx, &pAmergeCtx->pCalibDB);
+        }
     } else if (params->u.prepare.conf_type & RK_AIQ_ALGO_CONFTYPE_CHANGERES) {
         pAmergeCtx->isCapture = true;
     }
@@ -106,11 +111,6 @@ static XCamReturn AmergePrepare(RkAiqAlgoCom* params)
             LOGE_AMERGE("%s Amerge Start failed: %d\n", __FUNCTION__, ret);
             return(XCAM_RETURN_ERROR_FAILED);
         }
-    }
-
-    if (pAmergeCtx->FrameNumber == HDR_2X_NUM || pAmergeCtx->FrameNumber == HDR_3X_NUM) {
-        MergePrepareJsonMalloc(&pAmergeCtx->Config, &pAmergeCtx->pCalibDB);
-        AmergePrepareJsonUpdateConfig(pAmergeCtx, &pAmergeCtx->pCalibDB);
     }
 
     LOG1_AMERGE("%s:Exit!\n", __FUNCTION__);
@@ -137,7 +137,7 @@ static XCamReturn AmergeProcess(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* o
     bool bypass = false;
 
     AmergeContext_t* pAmergeCtx = (AmergeContext_t*)inparams->ctx;
-    pAmergeCtx->frameCnt = inparams->frame_id > 2 ? (inparams->frame_id - 2) : 0;
+    pAmergeCtx->frameCnt                   = inparams->frame_id;
     RkAiqAlgoProcAmerge* pAmergeParams = (RkAiqAlgoProcAmerge*)inparams;
     RkAiqAlgoProcResAmerge* pAmergeProcRes = (RkAiqAlgoProcResAmerge*)outparams;
 
@@ -172,23 +172,6 @@ static XCamReturn AmergeProcess(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* o
                 AmergeGetSensorInfo(pAmergeCtx, AeProcResult);
             }
 
-            // get ae pre res and proc
-            XCamVideoBuffer* xCamAePreRes = pAmergeParams->com.u.proc.res_comb->ae_pre_res;
-            RkAiqAlgoPreResAe* pAEPreRes  = NULL;
-            if (xCamAePreRes) {
-                pAEPreRes = (RkAiqAlgoPreResAe*)xCamAePreRes->map(xCamAePreRes);
-                bypass    = AmergeByPassProcessing(pAmergeCtx, pAEPreRes->ae_pre_res_rk);
-            } else {
-                AecPreResult_t AecHdrPreResult;
-                memset(&AecHdrPreResult, 0x0, sizeof(AecPreResult_t));
-                bypass = AmergeByPassProcessing(pAmergeCtx, AecHdrPreResult);
-                bypass = false;
-                LOGE_AMERGE("%s: ae Pre result is null!!!\n", __FUNCTION__);
-            }
-
-            // merge tuning para process
-            if (!bypass) AmergeTuningProcessing(pAmergeCtx);
-
             // expo para process
             MergeExpoData_t ExpoData;
             memset(&ExpoData, 0, sizeof(MergeExpoData_t));
@@ -196,91 +179,129 @@ static XCamReturn AmergeProcess(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* o
                 ExpoData.nextSExpo =
                     pAmergeParams->com.u.proc.nxtExp->HdrExp[0].exp_real_params.analog_gain *
                     pAmergeParams->com.u.proc.nxtExp->HdrExp[0].exp_real_params.digital_gain *
+                    pAmergeParams->com.u.proc.nxtExp->HdrExp[0].exp_real_params.isp_dgain *
                     pAmergeParams->com.u.proc.nxtExp->HdrExp[0].exp_real_params.integration_time;
                 if (ExpoData.nextSExpo < FLT_EPSILON)
                     ExpoData.nextSExpo =
                         pAmergeParams->com.u.proc.curExp->HdrExp[0].exp_real_params.analog_gain *
                         pAmergeParams->com.u.proc.curExp->HdrExp[0].exp_real_params.digital_gain *
+                        pAmergeParams->com.u.proc.curExp->HdrExp[0].exp_real_params.isp_dgain *
                         pAmergeParams->com.u.proc.curExp->HdrExp[0]
                             .exp_real_params.integration_time;
 
                 ExpoData.nextMExpo =
                     pAmergeParams->com.u.proc.nxtExp->HdrExp[1].exp_real_params.analog_gain *
                     pAmergeParams->com.u.proc.nxtExp->HdrExp[1].exp_real_params.digital_gain *
+                    pAmergeParams->com.u.proc.nxtExp->HdrExp[1].exp_real_params.isp_dgain *
                     pAmergeParams->com.u.proc.nxtExp->HdrExp[1].exp_real_params.integration_time;
                 if (ExpoData.nextMExpo < FLT_EPSILON)
                     ExpoData.nextMExpo =
                         pAmergeParams->com.u.proc.curExp->HdrExp[1].exp_real_params.analog_gain *
                         pAmergeParams->com.u.proc.curExp->HdrExp[1].exp_real_params.digital_gain *
+                        pAmergeParams->com.u.proc.curExp->HdrExp[1].exp_real_params.isp_dgain *
                         pAmergeParams->com.u.proc.curExp->HdrExp[1]
                             .exp_real_params.integration_time;
-
                 ExpoData.nextLExpo = ExpoData.nextMExpo;
 
                 ExpoData.nextSGain =
                     pAmergeParams->com.u.proc.nxtExp->HdrExp[0].exp_real_params.analog_gain *
-                    pAmergeParams->com.u.proc.nxtExp->HdrExp[0].exp_real_params.digital_gain;
+                    pAmergeParams->com.u.proc.nxtExp->HdrExp[0].exp_real_params.digital_gain *
+                    pAmergeParams->com.u.proc.nxtExp->HdrExp[0].exp_real_params.isp_dgain;
                 if (ExpoData.nextSGain < FLT_EPSILON)
                     ExpoData.nextSGain =
                         pAmergeParams->com.u.proc.curExp->HdrExp[0].exp_real_params.analog_gain *
-                        pAmergeParams->com.u.proc.curExp->HdrExp[0].exp_real_params.digital_gain;
+                        pAmergeParams->com.u.proc.curExp->HdrExp[0].exp_real_params.digital_gain *
+                        pAmergeParams->com.u.proc.curExp->HdrExp[0].exp_real_params.isp_dgain;
 
                 ExpoData.nextMGain =
                     pAmergeParams->com.u.proc.nxtExp->HdrExp[1].exp_real_params.analog_gain *
-                    pAmergeParams->com.u.proc.nxtExp->HdrExp[1].exp_real_params.digital_gain;
+                    pAmergeParams->com.u.proc.nxtExp->HdrExp[1].exp_real_params.digital_gain *
+                    pAmergeParams->com.u.proc.nxtExp->HdrExp[1].exp_real_params.isp_dgain;
                 if (ExpoData.nextMGain < FLT_EPSILON)
                     ExpoData.nextMGain =
                         pAmergeParams->com.u.proc.curExp->HdrExp[1].exp_real_params.analog_gain *
-                        pAmergeParams->com.u.proc.curExp->HdrExp[1].exp_real_params.digital_gain;
+                        pAmergeParams->com.u.proc.curExp->HdrExp[1].exp_real_params.digital_gain *
+                        pAmergeParams->com.u.proc.curExp->HdrExp[1].exp_real_params.isp_dgain;
+
+                pAmergeCtx->CurrData.CtrlData.ISO =
+                    pAmergeParams->com.u.proc.nxtExp->HdrExp[1].exp_real_params.analog_gain *
+                    pAmergeParams->com.u.proc.nxtExp->HdrExp[1].exp_real_params.digital_gain *
+                    pAmergeParams->com.u.proc.nxtExp->HdrExp[1].exp_real_params.isp_dgain * 50.0f;
+                if (pAmergeCtx->CurrData.CtrlData.ISO < FLT_EPSILON)
+                    pAmergeCtx->CurrData.CtrlData.ISO =
+                        pAmergeParams->com.u.proc.curExp->HdrExp[1].exp_real_params.analog_gain *
+                        pAmergeParams->com.u.proc.curExp->HdrExp[1].exp_real_params.digital_gain *
+                        pAmergeParams->com.u.proc.curExp->HdrExp[1].exp_real_params.isp_dgain *
+                        50.0f;
             } else if (pAmergeCtx->FrameNumber == HDR_3X_NUM) {
                 ExpoData.nextSExpo =
                     pAmergeParams->com.u.proc.nxtExp->HdrExp[0].exp_real_params.analog_gain *
                     pAmergeParams->com.u.proc.nxtExp->HdrExp[0].exp_real_params.digital_gain *
+                    pAmergeParams->com.u.proc.nxtExp->HdrExp[0].exp_real_params.isp_dgain *
                     pAmergeParams->com.u.proc.nxtExp->HdrExp[0].exp_real_params.integration_time;
                 if (ExpoData.nextSExpo < FLT_EPSILON)
                     ExpoData.nextSExpo =
                         pAmergeParams->com.u.proc.curExp->HdrExp[0].exp_real_params.analog_gain *
                         pAmergeParams->com.u.proc.curExp->HdrExp[0].exp_real_params.digital_gain *
+                        pAmergeParams->com.u.proc.curExp->HdrExp[0].exp_real_params.isp_dgain *
                         pAmergeParams->com.u.proc.curExp->HdrExp[0]
                             .exp_real_params.integration_time;
 
                 ExpoData.nextMExpo =
                     pAmergeParams->com.u.proc.nxtExp->HdrExp[1].exp_real_params.analog_gain *
                     pAmergeParams->com.u.proc.nxtExp->HdrExp[1].exp_real_params.digital_gain *
+                    pAmergeParams->com.u.proc.nxtExp->HdrExp[1].exp_real_params.isp_dgain *
                     pAmergeParams->com.u.proc.nxtExp->HdrExp[1].exp_real_params.integration_time;
                 if (ExpoData.nextMExpo < FLT_EPSILON)
                     ExpoData.nextMExpo =
                         pAmergeParams->com.u.proc.curExp->HdrExp[1].exp_real_params.analog_gain *
                         pAmergeParams->com.u.proc.curExp->HdrExp[1].exp_real_params.digital_gain *
+                        pAmergeParams->com.u.proc.curExp->HdrExp[1].exp_real_params.isp_dgain *
                         pAmergeParams->com.u.proc.curExp->HdrExp[1]
                             .exp_real_params.integration_time;
-
                 ExpoData.nextLExpo =
                     pAmergeParams->com.u.proc.nxtExp->HdrExp[2].exp_real_params.analog_gain *
                     pAmergeParams->com.u.proc.nxtExp->HdrExp[2].exp_real_params.digital_gain *
+                    pAmergeParams->com.u.proc.nxtExp->HdrExp[2].exp_real_params.isp_dgain *
                     pAmergeParams->com.u.proc.nxtExp->HdrExp[2].exp_real_params.integration_time;
                 if (ExpoData.nextLExpo < FLT_EPSILON)
                     ExpoData.nextLExpo =
                         pAmergeParams->com.u.proc.curExp->HdrExp[2].exp_real_params.analog_gain *
                         pAmergeParams->com.u.proc.curExp->HdrExp[2].exp_real_params.digital_gain *
+                        pAmergeParams->com.u.proc.curExp->HdrExp[2].exp_real_params.isp_dgain *
                         pAmergeParams->com.u.proc.curExp->HdrExp[2]
                             .exp_real_params.integration_time;
 
                 ExpoData.nextSGain =
                     pAmergeParams->com.u.proc.nxtExp->HdrExp[0].exp_real_params.analog_gain *
-                    pAmergeParams->com.u.proc.nxtExp->HdrExp[0].exp_real_params.digital_gain;
+                    pAmergeParams->com.u.proc.nxtExp->HdrExp[0].exp_real_params.digital_gain *
+                    pAmergeParams->com.u.proc.nxtExp->HdrExp[0].exp_real_params.isp_dgain;
                 if (ExpoData.nextSGain < FLT_EPSILON)
                     ExpoData.nextSGain =
                         pAmergeParams->com.u.proc.curExp->HdrExp[0].exp_real_params.analog_gain *
-                        pAmergeParams->com.u.proc.curExp->HdrExp[0].exp_real_params.digital_gain;
+                        pAmergeParams->com.u.proc.curExp->HdrExp[0].exp_real_params.digital_gain *
+                        pAmergeParams->com.u.proc.curExp->HdrExp[0].exp_real_params.isp_dgain;
 
                 ExpoData.nextMGain =
                     pAmergeParams->com.u.proc.nxtExp->HdrExp[1].exp_real_params.analog_gain *
-                    pAmergeParams->com.u.proc.nxtExp->HdrExp[1].exp_real_params.digital_gain;
+                    pAmergeParams->com.u.proc.nxtExp->HdrExp[1].exp_real_params.digital_gain *
+                    pAmergeParams->com.u.proc.nxtExp->HdrExp[1].exp_real_params.isp_dgain;
                 if (ExpoData.nextMGain < FLT_EPSILON)
                     ExpoData.nextMGain =
                         pAmergeParams->com.u.proc.curExp->HdrExp[1].exp_real_params.analog_gain *
-                        pAmergeParams->com.u.proc.curExp->HdrExp[1].exp_real_params.digital_gain;
+                        pAmergeParams->com.u.proc.curExp->HdrExp[1].exp_real_params.digital_gain *
+                        pAmergeParams->com.u.proc.curExp->HdrExp[1].exp_real_params.isp_dgain;
+
+                pAmergeCtx->CurrData.CtrlData.ISO =
+                    pAmergeParams->com.u.proc.nxtExp->HdrExp[1].exp_real_params.analog_gain *
+                    pAmergeParams->com.u.proc.nxtExp->HdrExp[1].exp_real_params.digital_gain *
+                    pAmergeParams->com.u.proc.nxtExp->HdrExp[1].exp_real_params.isp_dgain * 50.0f;
+                if (pAmergeCtx->CurrData.CtrlData.ISO < FLT_EPSILON)
+                    pAmergeCtx->CurrData.CtrlData.ISO =
+                        pAmergeParams->com.u.proc.curExp->HdrExp[1].exp_real_params.analog_gain *
+                        pAmergeParams->com.u.proc.curExp->HdrExp[1].exp_real_params.digital_gain *
+                        pAmergeParams->com.u.proc.curExp->HdrExp[1].exp_real_params.isp_dgain *
+                        50.0f;
             }
             LOGV_AMERGE(
                 "%s: nextFrame: sexp: %f-%f, mexp: %f-%f, lexp: %f-%f\n", __FUNCTION__,
@@ -304,6 +325,23 @@ static XCamReturn AmergeProcess(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* o
                 ExpoData.nextRatioLM = 1.0f;
             }
 
+            // get ae pre res and proc
+            XCamVideoBuffer* xCamAePreRes = pAmergeParams->com.u.proc.res_comb->ae_pre_res;
+            RkAiqAlgoPreResAe* pAEPreRes  = NULL;
+            if (xCamAePreRes) {
+                pAEPreRes = (RkAiqAlgoPreResAe*)xCamAePreRes->map(xCamAePreRes);
+                bypass    = AmergeByPassProcessing(pAmergeCtx, pAEPreRes->ae_pre_res_rk);
+            } else {
+                AecPreResult_t AecHdrPreResult;
+                memset(&AecHdrPreResult, 0x0, sizeof(AecPreResult_t));
+                bypass = AmergeByPassProcessing(pAmergeCtx, AecHdrPreResult);
+                bypass = false;
+                LOGE_AMERGE("%s: ae Pre result is null!!!\n", __FUNCTION__);
+            }
+
+            // merge tuning para process
+            if (!bypass) AmergeTuningProcessing(pAmergeCtx);
+
             if (ExpoData.nextRatioLS >= 1.0f && ExpoData.nextRatioLM >= 1.0f)
                 AmergeExpoProcessing(pAmergeCtx, &ExpoData);
             else
@@ -317,6 +355,7 @@ static XCamReturn AmergeProcess(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* o
             pAmergeCtx->ProcRes.update        = !bypass;
             pAmergeCtx->ProcRes.LongFrameMode = pAmergeCtx->SensorInfo.LongFrmMode;
         }
+
         pAmergeProcRes->AmergeProcRes.update = pAmergeCtx->ProcRes.update;
         pAmergeProcRes->AmergeProcRes.LongFrameMode = pAmergeCtx->ProcRes.LongFrameMode;
         if(CHECK_ISP_HW_V21())

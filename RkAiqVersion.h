@@ -384,24 +384,109 @@
  * - AF: adapt more type zoom-focus curve
  * - AE: delete extra Semicolon & add pointer release in GrpAE
  * - hwi: fix segment fault in setIspConfig when stopping AIQ
- * v3.0x8.8-p1
- * - PDAF: update to v0.1.5
- * - AF: support max logical position
- * v3.0x8.8-p3
- * - aiq_core: keep same iso for Android picture taken when resolution changed
- * - AE: fix reg2float accuracy problem
- * - sysctl: should not release all sensor's calibs when deinit
- * - update the file of j2s_generated_v*.h
- * - Adrc, amerge and adehaze: use RK_AIQ_ALGO_CONFTYPE_CHANGERES for capture
- * - algos: alsc: apply lsc otp in processing
+ * v3.0x8.11
+ * - sysctl: remove atrib constructor of rk_aiq_init_lib
+ * - support compile aiq as static lib
+ * - hwi: optimize the bug of vicap drop frame
+ * - xcore: support setting the policy/priority of scheduling before creating thread
+ * - uAPI: print the verison of RKAIQ as default
+ * - fix the bug that ISP params are asynchronous in group cam
+ * - 8_camera_aiq_stable_ver1.0
+ * - dpcc: fix params init
+ * - Adehaze: update api struct and fuctional api
+ * - A3DLUT: some optimization
+ * - ACCM: some optimization
+ * - ASD: fix some bugs
+ * - fix bugs of colorasgray and calibtuning
+ * - tuning: won't free calib witch from iqfiles.
+ * - use json format iqfile in default.
+ * - tuning: update calib async instead stop/start.
+ * - custom AE: adapt for isp2x
+ * - AF: fix can not get soft stats on 356x
+ * - Fix compile bug in android
+ * - Tuning: fix memory leak.
+ * - uAPI: support for updating calib in cam group mode
+ * - compile: use ccache to speed up rebuiding.
+ * - tuning: fix wrong CMD size checking.
+ * - csm: unsupport limit range
+ * - Tuning: add CMD for get 3Astats.
+ * - support acgc
+ * v3.0x9.1
+ * - force using FakeCamera0.json at offline mode
  * - awb otp : apply otp in awb stat
  * - awb: translator awb stat based on pre_wbgain_inv_r and bls1
- * - tuning: fix double free.
-
+ * - AF: skip the same motor position in ipc search
+ * - AF: update calulation of shift value
+ * - iqfiles: isp21: change default af value
+ * - fix memleak for some modules
+ * - IspParamsAssembler: protect from "no free xxx buf" of core
+ * - v4l2_device: fix wrong dequeued flag of params buf
+ * - xcore: set buffer QUEUED flag when get buffer.
+ * - Update the lost isp params by driver again
+ * - iqfiles: af: change for fullsweep and pdaf
+ * - update 356x json files to 3.9.1
+ * - PDAF: update to v0.1.5
+ * - kernel headers: Sync with driver
+ * - CamHwIsp20: set memory mode to word align
+ * - 1: ynr support sigma fomula and subsample point in auto
+ * - HWI: modify AE/HIST HW setting
+ * - support otp for awb/alsc
+ * - Hwi: open all AE hw modules
+ * - CCM/3DLUT: del mode & manual cfg in json
+ * - support the function that reset VICAP
+ * - add uapi for turn on/off socket server.
+ * - PDAF: update to v0.1.1
+ * - hwi: update lsc only when status change.
+ * - CAC/LDCH: Support mesh buffer count
+ * - Debayer:params change with ISO
+ * - tuning: create socket for each camera.
+ * - AF: optimize optical zoom
+ * - PDAF: update to v0.1.0
+ * - PDAF: optimize pdaf
+ * - support for loading iq from buffer address.
+ * - tuning: support for group camera.
+ * - Amerge/drc/dehaze: support iso as ctrldata
+ * - HWI: support the funciton of setting isp dgain
+ * - algo: alsc: adjust the position of crop for lsc otp
+ * - merge rk3588 with rk356x base on release v3.0x8.8
+ * v3.0x9.3
+ * iqfiles: add the json of gc8034/ov02b10/s5kjn1
+ * aiq_core: transfer initial exposure to algos
+ * AF: support change resolution
+ * aiq_core: restore the flag of conf_type after switching scene
+ * ipc_server: use 0 be camid when no physical camera.
+ * camgroupManager: multichannel camera write i2C in parallel
+ * aiq offline base on remove rkstream
+ * remove stream code.
+ * aiq_core: keep same iso for Android picture taken when resolution changed
+ * hwi: remove configuring isp params from trigger_isp_readback
+ * def variable(RKAIQ_INSTALL_ALGOS_LIB) to intall lib
+ * Adrc, amerge: fix init expo bug
+ * alsc: fix can't turn on when disabled by IQ.
+ * aiq_core: add initial params of ispDgain/dgain in init
+ * Adrc, amerge and adehaze: use RK_AIQ_ALGO_CONFTYPE_CHANGERES for capture
+ * AE: fix reg2float accuracy problem
+ * AF: Fix custom af build error on Android
+ * AF: fix "Can't release AF (3)" in camera monkey test
+ * AF: fix can not change statics setting when first enter
+ * PDAF: fix memleak when enable pdaf
+ * PDAF: add set memory mode for pdaf video device
+ * PDAF: fix no fine search in low light env when first enter
+ * PDAF: add pdaf.a for 356x
+ * AF: fix crash in af search
+ * PDAF: support fine search extended mode
+ * PDAF: support reshape mode
+ * AF: fix lens pos is changed when no af stats
+ * PDAF: lock ae in fine search to speed up
+ * algos: alsc: apply lsc otp in processing
+ * algo: alsc: lsc otp compatible with isp-unite mode
+ * fix force config LSC when enable blc1
+ * Fix compile error on Android
+ * sysctl: should not release all sensor's calibs when deinit
  */
 
-#define RK_AIQ_VERSION_REAL_V "v3.0x8.8-p3"
-#define RK_AIQ_RELEASE_DATE "2022-10-21"
+#define RK_AIQ_VERSION_REAL_V "v3.0x9.3"
+#define RK_AIQ_RELEASE_DATE "2022-11-16"
 
 /******* DO NOT EDIT THE FOLLOWINGS ***********/
 

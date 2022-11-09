@@ -303,6 +303,8 @@ cc_library_shared {
         "-std=c++11",
         "-DANDROID_OS",
         "-DRKAIQ_ENABLE_CAMGROUP",
+        //if want to build aiq with raw stream lib, cancel the comment of the flowing line
+        //"-DUSE_RAWSTREAM_LIB"
     ],
 
     export_include_dirs: [

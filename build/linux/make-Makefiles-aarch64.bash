@@ -9,15 +9,18 @@ OUTPUT=$(pwd)/output/aarch64
 
 mkdir -p $OUTPUT
 pushd $OUTPUT
-
+#if make aiq with raw stream lib, modify -DUSE_RAWSTREAM_LIB value to ON, default value OFF 
 cmake -G "Ninja" \
     -DCMAKE_BUILD_TYPE=RelWithDebInfo\
     -DARCH="aarch64" \
+    -DRKAIQ_TARGET_SOC=${RKAIQ_TARGET_SOC} \
     -DCMAKE_TOOLCHAIN_FILE=$TOOLCHAIN_FILE \
     -DCMAKE_SKIP_RPATH=TRUE \
     -DCMAKE_EXPORT_COMPILE_COMMANDS=YES \
 	-DISP_HW_VERSION=${ISP_HW_VERSION} \
+    -DCMAKE_INSTALL_PREFIX="installed" \
+    -DRKAIQ_USE_RAWSTREAM_LIB=OFF \
     $SOURCE_PATH \
-&& ninja -j$(nproc)
-
+&& ninja -j$(nproc) \
+&& ninja install
 popd

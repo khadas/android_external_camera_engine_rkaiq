@@ -63,10 +63,15 @@
 // forward declare
 typedef struct isp_drv_share_mem_ops_s isp_drv_share_mem_ops_t;
 
+typedef struct _RkAiqYnrV3Res {
+    float sigma[YNR_V3_ISO_CURVE_POINT_NUM];
+} RkAiqYnrV3Res;
+
 typedef struct _RkAiqResComb {
     XCamVideoBuffer* ae_pre_res;
     XCamVideoBuffer* ae_proc_res;
     XCamVideoBuffer* awb_proc_res;
+    RkAiqYnrV3Res    ynrV3_proc_res;
 } RkAiqResComb;
 
 // Ae
@@ -536,6 +541,7 @@ typedef struct _RkAiqAlgoProcAdhaz {
 #endif
     int iso;
     int hdr_mode;
+    RkAiqYnrV3Res ynrV3_proc_res;
 } RkAiqAlgoProcAdhaz;
 
 typedef struct _RkAiqAlgoProcResAdhaz {
@@ -670,6 +676,7 @@ typedef struct _RkAiqAlgoProcAcgc {
 
 typedef struct _RkAiqAlgoProcResAcgc {
     RkAiqAlgoResCom res_com;
+    rk_aiq_acgc_params_t acgc_res;
 } RkAiqAlgoProcResAcgc;
 
 typedef struct _RkAiqAlgoPostAcgc {

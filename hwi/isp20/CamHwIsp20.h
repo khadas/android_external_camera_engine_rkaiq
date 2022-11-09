@@ -67,6 +67,23 @@ class IspParamsSplitter;
 
 #define MAX_PARAMS_QUEUE_SIZE           5
 #define ISP_PARAMS_EFFECT_DELAY_CNT     2
+#define CAM_INDEX_FOR_1608              8
+
+// FIXME: share 1608 data ptr(aiq/rawdata)
+typedef struct sensor_info_share_s {
+    RawStreamProcUnit*          raw_proc_unit[CAM_INDEX_FOR_1608];  // bind rx by camId
+    SmartPtr<RawStreamCapUnit>  raw_cap_unit;                       // save 1st tx obj addr
+    char                        reference_name[64];                 // save vicap name(for 1608)
+    rk_aiq_cif_info_t*          reference_mipi_cif;                 // vicap inf (for 1608)
+    // us: union_stream
+    int                         us_open_cnt;                        // for hwi open(1608)
+    int                         us_prepare_cnt;                     // for rawCap buffer manage(1608).
+    int                         us_stream_cnt;                      // mark cnt. on: ++, off: --
+    int                         us_stop_cnt;                        // last sensor stop
+    // tracking opened sensor num
+    int                         en_sns_num;                         // Record the number of open sensors
+    int                         first_en[CAM_INDEX_FOR_1608];       // set/get fmt for 1608 sensor
+} sensor_info_share_t;
 
 class CamHwIsp20
     : public CamHwBase, virtual public Isp20Params, public V4l2Device
@@ -118,6 +135,11 @@ public:
     // from PollCallback
     virtual XCamReturn poll_event_ready (uint32_t sequence, int type);
     virtual XCamReturn poll_event_failed (int64_t timestamp, const char *msg);
+    XCamReturn rawReproc_genIspParams (uint32_t sequence, rk_aiq_frame_info_t *offline_finfo, int mode);
+    XCamReturn rawReProc_prepare (uint32_t sequence, rk_aiq_frame_info_t *offline_finfo);
+    //fake sensor
+    static const char* rawReproc_preInit(const char* isp_driver, const char* offline_sns_ent_name);
+    XCamReturn rawReproc_deInit (const char* fakeSensor);
 
     XCamReturn getEffectiveIspParams(rkisp_effect_params_v20& ispParams, int frame_id);
     void setHdrGlobalTmoMode(int frame_id, bool mode);
@@ -151,6 +173,11 @@ public:
             return RK_ISP_STREAM_MODE_OFFLNIE;
     }
     void notify_isp_stream_status(bool on);
+    XCamReturn reset_hardware();
+
+    // FIXME: Set struct to static.
+    static sensor_info_share_t rk1608_share_inf;
+
 private:
     XCamReturn handlePpReslut(SmartPtr<cam3aResult> &result);
     XCamReturn setPpConfig(SmartPtr<cam3aResult> &result);
@@ -210,6 +237,7 @@ protected:
     int _state;
     volatile bool _is_exit;
     bool _linked_to_isp;
+    bool _linked_to_1608;
     struct isp2x_isp_params_cfg _full_active_isp_params;
     struct rkispp_params_cfg _full_active_ispp_params;
     uint32_t _ispp_module_init_ens;
@@ -221,8 +249,12 @@ protected:
     static rk_aiq_isp_hw_info_t mIspHwInfos;
     static rk_aiq_cif_hw_info_t mCifHwInfos;
     static std::map<std::string, SmartPtr<rk_sensor_full_info_t>> mSensorHwInfos;
+    static std::map<std::string, std::string> mFakeCameraName;
     static bool mIsMultiIspMode;
     static uint16_t mMultiIspExtendedPixel;
+    // TODO: Sync 1608 sensor start streaming
+    static XCam::Mutex  _sync_1608_mutex;
+    static bool         _sync_1608_done;
     void gen_full_isp_params(const struct isp2x_isp_params_cfg* update_params,
                              struct isp2x_isp_params_cfg* full_params,
                                 uint64_t* module_en_update_partial,
@@ -303,7 +335,7 @@ protected:
     SmartPtr<SPStreamProcUnit> mSpStreamUnit;
     SmartPtr<RkStreamEventPollThread> mIspStremEvtTh;
 
-    SmartPtr<RawStreamCapUnit> mRawCapUnit;
+    SmartPtr<RawStreamCapUnit>  mRawCapUnit;
     SmartPtr<RawStreamProcUnit> mRawProcUnit;
 
     SmartPtr<PdafStreamProcUnit> mPdafStreamUnit;
@@ -331,6 +363,9 @@ protected:
     rk_sensor_pdaf_info_t mPdafInfo;
     Mutex     _stop_cond_mutex;
 
+    // TODO: Sync(1608 sensor) sdk hwEvt cb
+    XCam::Cond      _sync_done_cond;
+    XCamReturn      waitLastSensorDone();
     XCamReturn pixFmt2Bpp(uint32_t pixFmt, int8_t& bpp);
 };
 

@@ -6,7 +6,6 @@
 #include "rk_aiq_alsc_convert_otp.h"
 
 // #define WRITE_OTP_TABLE 1
-// #define LOGI printf
 
 void convertLscTableParameter(resolution_t *cur_res, alsc_otp_grad_t *otpGrad,
                               RkAiqBayerPattern_t bayerPattern)
@@ -14,8 +13,8 @@ void convertLscTableParameter(resolution_t *cur_res, alsc_otp_grad_t *otpGrad,
     XCAM_STATIC_PROFILING_START(convertLscTable);
 
     int32_t bayer 			= bayerPattern;
-    uint32_t srcLscWidth    = otpGrad->width;
-    uint32_t srcLscHeight   = otpGrad->height;
+    int32_t srcLscWidth     = otpGrad->width;
+    int32_t srcLscHeight    = otpGrad->height;
     int32_t dstWidth 		= cur_res->width;
     int32_t dstHeight 		= cur_res->height;
 
@@ -38,10 +37,10 @@ void convertLscTableParameter(resolution_t *cur_res, alsc_otp_grad_t *otpGrad,
 
     uint32_t maxSize        = srcLscWidth > srcLscHeight ? srcLscWidth : srcLscHeight;
     uint32_t ratio          = maxSize > 3200 ? 8 : (maxSize > 1600 ? 4 : (maxSize > 800 ? 2 : 1));
-    srcLscWidth = 2 * (int32_t)(srcLscWidth / (ratio * 2));
-    srcLscHeight = 2 * (int32_t)(srcLscHeight / (ratio * 2));
-    dstWidth = 2 * (int32_t)(dstWidth / (ratio * 2));
-    dstHeight = 2 * (int32_t)(dstHeight / (ratio * 2));
+    srcLscWidth             = 2 * (int32_t)(srcLscWidth / (ratio * 2));
+    srcLscHeight            = 2 * (int32_t)(srcLscHeight / (ratio * 2));
+    dstWidth                = 2 * (int32_t)(dstWidth / (ratio * 2));
+    dstHeight               = 2 * (int32_t)(dstHeight / (ratio * 2));
 
     uint16_t *rTable = new uint16_t[srcLscWidth * srcLscHeight];
     uint16_t *grTable = new uint16_t[srcLscWidth * srcLscHeight];

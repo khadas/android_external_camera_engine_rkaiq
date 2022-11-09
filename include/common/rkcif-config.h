@@ -11,11 +11,28 @@
 
 #define RKCIF_API_VERSION		KERNEL_VERSION(0, 1, 0xa)
 
+#define V4L2_EVENT_RESET_DEV            0X1001
+
 #define RKCIF_CMD_GET_CSI_MEMORY_MODE \
 	_IOR('V', BASE_VIDIOC_PRIVATE + 0, int)
 
 #define RKCIF_CMD_SET_CSI_MEMORY_MODE \
 	_IOW('V', BASE_VIDIOC_PRIVATE + 1, int)
+
+#define RKCIF_CMD_GET_SCALE_BLC \
+	_IOR('V', BASE_VIDIOC_PRIVATE + 2, struct bayer_blc)
+
+#define RKCIF_CMD_SET_SCALE_BLC \
+	_IOW('V', BASE_VIDIOC_PRIVATE + 3, struct bayer_blc)
+
+#define RKCIF_CMD_SET_FPS \
+	_IOW('V', BASE_VIDIOC_PRIVATE + 4, struct rkcif_fps)
+
+#define RKCIF_CMD_SET_RESET \
+	_IOW('V', BASE_VIDIOC_PRIVATE + 6, int)
+
+#define RKCIF_CMD_SET_CSI_IDX \
+	_IOW('V', BASE_VIDIOC_PRIVATE + 7, unsigned int)
 
 /* cif memory mode
  * 0: raw12/raw10/raw8 8bit memory compact
@@ -36,6 +53,22 @@ enum cif_csi_lvds_memory {
 	CSI_LVDS_MEM_COMPACT = 0,
 	CSI_LVDS_MEM_WORD_LOW_ALIGN = 1,
 	CSI_LVDS_MEM_WORD_HIGH_ALIGN = 2,
+};
+
+/* black level for scale image
+ * The sequence of pattern00~03 is the same as the output of sensor bayer
+ */
+
+struct bayer_blc {
+	u8 pattern00;
+	u8 pattern01;
+	u8 pattern02;
+	u8 pattern03;
+};
+
+struct rkcif_fps {
+	int ch_num;
+	int fps;
 };
 
 #endif

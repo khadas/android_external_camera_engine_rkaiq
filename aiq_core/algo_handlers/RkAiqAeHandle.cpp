@@ -957,7 +957,7 @@ XCamReturn RkAiqAeHandleInt::genIspResult(RkAiqFullParams* params, RkAiqFullPara
     RkAiqAlgoProcResAe* ae_rk = (RkAiqAlgoProcResAe*)ae_proc;
     memcpy(exp_param->exp_tbl, ae_rk->ae_proc_res_rk.exp_set_tbl, sizeof(exp_param->exp_tbl));
     exp_param->exp_tbl_size = ae_rk->ae_proc_res_rk.exp_set_cnt;
-    exp_param->algo_id      = algo_id;
+    exp_param->algo_id      = 0;//algo_id;
 
     if (algo_id == 0) {
         RkAiqAlgoPostResAe* ae_post_rk = (RkAiqAlgoPostResAe*)ae_post;

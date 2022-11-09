@@ -266,6 +266,9 @@ CamHwIsp21::gen_full_isp_params(const struct isp21_isp_params_cfg* update_params
             case Rk_ISP2x_CSM_ID:
                 CHECK_UPDATE_PARAMS(full_params->others.csm_cfg, update_params->others.csm_cfg);
                 break;
+            case Rk_ISP2x_CGC_ID:
+                CHECK_UPDATE_PARAMS(full_params->others.cgc_cfg, update_params->others.cgc_cfg);
+                break;
             default:
                 break;
             }
@@ -357,6 +360,19 @@ CamHwIsp21::setIspConfig()
             if (mSpStreamUnit.ptr()) {
                 mSpStreamUnit->update_af_meas_params(&afParams->data()->result);
             }
+        }
+    }
+
+    // add isp dgain results to ready results
+    SmartPtr<SensorHw> mSensorSubdev = mSensorDev.dynamic_cast_ptr<SensorHw>();
+    if (mSensorSubdev.ptr()) {
+        SmartPtr<RkAiqExpParamsProxy> expParam;
+
+        if (mSensorSubdev->getEffectiveExpParams(expParam, frameId) < 0) {
+            LOGE_CAMHW_SUBM(ISP20HW_SUBM, "frame_id(%d), get exposure failed!!!\n", frameId);
+        } else {
+            expParam->setType(RESULT_TYPE_EXPOSURE_PARAM);
+            ready_results.push_back(expParam);
         }
     }
 

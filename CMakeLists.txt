@@ -14,6 +14,7 @@ PROJECT(rk_aiq)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
+set(C_LIBRARY_NAME "glibc" CACHE INTERNAL "")
 include(BuildOptions)
 include(CompileOptions)
 include(GNUInstallDirs)
@@ -21,6 +22,11 @@ include(GNUInstallDirs)
 find_package(libdl QUIET)
 if (LIBDL_FOUND)
     add_compile_options(${LIBDL_CFLAGS})
+endif()
+
+if (RKAIQ_USE_RAWSTREAM_LIB)
+    message("USE_RAWSTREAM_LIB")
+    add_compile_options(-DUSE_RAWSTREAM_LIB)
 endif()
 
 find_package(librga QUIET)
@@ -123,6 +129,7 @@ include_directories(
     include/algos/acac
     include/algos_camgroup/ae
     include/algos_camgroup/awb
+    ${PROJECT_BINARY_DIR}
     )
 
 aux_source_directory(aiq_core/algo_handlers ALGO_HANDLE_SRC)
@@ -323,6 +330,10 @@ if(OPENCV_SUPPORT)
     add_compile_options(-DOPENCV_SUPPORT)
 endif()
 
+set(RK_AIQ_STATIC_LIB_ARS)
+set(STATIC_LIB_PREFIX $<TARGET_FILE:)
+set(STATIC_LIB_SUFFIX >)
+
 if(GENMESH_ONLINE)
     set(GENMESH_LIBS genMeshLib)
     if(ARCH STREQUAL "aarch64")
@@ -334,6 +345,7 @@ if(GENMESH_ONLINE)
             ${PROJECT_SOURCE_DIR}/common/gen_mesh/linux/genMesh_static_32bit/
             )
     endif()
+    list(APPEND RK_AIQ_STATIC_LIB_ARS ${GENMESH_LIBS_DIR}/libgenMeshLib.a)
     add_compile_options(-DGENMESH_ONLINE)
 endif()
 
@@ -344,6 +356,8 @@ endif()
 set(PDAF_SUPPORT true)
 if(PDAF_SUPPORT)
     set (PDAF_LIBS rkaiq_pdaf)
+	list(APPEND RK_AIQ_STATIC_LIB_ARS
+		${STATIC_LIB_PREFIX}rkaiq_pdaf${STATIC_LIB_SUFFIX})
 endif()
 
 # set output binary path
@@ -376,6 +390,15 @@ cmake_policy(SET CMP0015 NEW)
 
 link_directories("${LIBRARY_OUTPUT_PATH}" "${OPENCV_LIBS_DIR}" "${GENMESH_LIBS_DIR}")
 
+add_library(rkaiq_tmp STATIC ${RK_AIQ_SRC})
+set_target_properties(rkaiq_tmp PROPERTIES FOLDER "rk_aiq")
+set_target_properties(rkaiq_tmp PROPERTIES CLEAN_DIRECT_OUTPUT 1)
+add_dependencies(rkaiq_tmp j2s_parser)
+
+if (RKAIQ_BUILD_BINARY_IQ)
+    add_dependencies(rkaiq_tmp j2s4b)
+endif()
+
 add_library(rkaiq SHARED ${RK_AIQ_SRC})
 set_target_properties(rkaiq PROPERTIES FOLDER "rk_aiq")
 set_target_properties(rkaiq PROPERTIES CLEAN_DIRECT_OUTPUT 1)
@@ -385,6 +408,7 @@ add_dependencies(rkaiq j2s_parser)
 
 target_link_libraries(rkaiq
     PRIVATE
+    rkaiq_tmp
     rkaiq_ae
     rkaiq_awb
     rkaiq_af
@@ -437,12 +461,66 @@ target_link_libraries(rkaiq
     ${PDAF_LIBS}
     pthread)
 
+list(APPEND RK_AIQ_STATIC_LIB_ARS
+    ${STATIC_LIB_PREFIX}rkaiq_tmp${STATIC_LIB_SUFFIX}
+	${STATIC_LIB_PREFIX}rkaiq_ae${STATIC_LIB_SUFFIX}
+	${STATIC_LIB_PREFIX}rkaiq_awb${STATIC_LIB_SUFFIX}
+	${STATIC_LIB_PREFIX}rkaiq_af${STATIC_LIB_SUFFIX}
+	${STATIC_LIB_PREFIX}rkaiq_anr${STATIC_LIB_SUFFIX}
+	${STATIC_LIB_PREFIX}rkaiq_asd${STATIC_LIB_SUFFIX}
+	${STATIC_LIB_PREFIX}rkaiq_amerge${STATIC_LIB_SUFFIX}
+	${STATIC_LIB_PREFIX}rkaiq_atmo${STATIC_LIB_SUFFIX}
+	${STATIC_LIB_PREFIX}rkaiq_acp${STATIC_LIB_SUFFIX}
+	${STATIC_LIB_PREFIX}rkaiq_asharp${STATIC_LIB_SUFFIX}
+	${STATIC_LIB_PREFIX}rkaiq_adehaze${STATIC_LIB_SUFFIX}
+	${STATIC_LIB_PREFIX}rkaiq_a3dlut${STATIC_LIB_SUFFIX}
+	${STATIC_LIB_PREFIX}rkaiq_ablc${STATIC_LIB_SUFFIX}
+	${STATIC_LIB_PREFIX}rkaiq_accm${STATIC_LIB_SUFFIX}
+	${STATIC_LIB_PREFIX}rkaiq_acgc${STATIC_LIB_SUFFIX}
+	${STATIC_LIB_PREFIX}rkaiq_adebayer${STATIC_LIB_SUFFIX}
+	${STATIC_LIB_PREFIX}rkaiq_adpcc${STATIC_LIB_SUFFIX}
+	${STATIC_LIB_PREFIX}rkaiq_afec${STATIC_LIB_SUFFIX}
+	${STATIC_LIB_PREFIX}rkaiq_agamma${STATIC_LIB_SUFFIX}
+	${STATIC_LIB_PREFIX}rkaiq_adegamma${STATIC_LIB_SUFFIX}
+	${STATIC_LIB_PREFIX}rkaiq_agic${STATIC_LIB_SUFFIX}
+	${STATIC_LIB_PREFIX}rkaiq_aie${STATIC_LIB_SUFFIX}
+	${STATIC_LIB_PREFIX}rkaiq_aldch${STATIC_LIB_SUFFIX}
+	${STATIC_LIB_PREFIX}rkaiq_alsc${STATIC_LIB_SUFFIX}
+	${STATIC_LIB_PREFIX}rkaiq_aorb${STATIC_LIB_SUFFIX}
+	${STATIC_LIB_PREFIX}rkaiq_acsm${STATIC_LIB_SUFFIX}
+	${STATIC_LIB_PREFIX}rkaiq_awdr${STATIC_LIB_SUFFIX}
+	${STATIC_LIB_PREFIX}rkaiq_adrc${STATIC_LIB_SUFFIX}
+	${STATIC_LIB_PREFIX}rkaiq_asharp_v3${STATIC_LIB_SUFFIX}
+	${STATIC_LIB_PREFIX}rkaiq_aynr_v2${STATIC_LIB_SUFFIX}
+	${STATIC_LIB_PREFIX}rkaiq_acnr_v1${STATIC_LIB_SUFFIX}
+	${STATIC_LIB_PREFIX}rkaiq_arawnr_v2${STATIC_LIB_SUFFIX}
+	${STATIC_LIB_PREFIX}rkaiq_aeis${STATIC_LIB_SUFFIX}
+	${STATIC_LIB_PREFIX}rkaiq_amd${STATIC_LIB_SUFFIX}
+	${STATIC_LIB_PREFIX}rkaiq_arawnr_v1${STATIC_LIB_SUFFIX}
+	${STATIC_LIB_PREFIX}rkaiq_aynr_v1${STATIC_LIB_SUFFIX}
+	${STATIC_LIB_PREFIX}rkaiq_auvnr_v1${STATIC_LIB_SUFFIX}
+	${STATIC_LIB_PREFIX}rkaiq_amfnr_v1${STATIC_LIB_SUFFIX}
+	${STATIC_LIB_PREFIX}rkaiq_again_v1${STATIC_LIB_SUFFIX}
+	${STATIC_LIB_PREFIX}rkaiq_aynr_v3${STATIC_LIB_SUFFIX}
+	${STATIC_LIB_PREFIX}rkaiq_acnr_v2${STATIC_LIB_SUFFIX}
+	${STATIC_LIB_PREFIX}rkaiq_asharp_v4${STATIC_LIB_SUFFIX}
+	${STATIC_LIB_PREFIX}rkaiq_abayer2dnr_v2${STATIC_LIB_SUFFIX}
+	${STATIC_LIB_PREFIX}rkaiq_abayertnr_v2${STATIC_LIB_SUFFIX}
+	${STATIC_LIB_PREFIX}rkaiq_again_v2${STATIC_LIB_SUFFIX}
+	${STATIC_LIB_PREFIX}rkaiq_acac${STATIC_LIB_SUFFIX}
+    )
+
 if (RKAIQ_ENABLE_CAMGROUP)
 target_link_libraries(rkaiq
     PRIVATE
     rkaiq_camgroup_ae
     rkaiq_camgroup_awb
     rkaiq_camgroup_misc
+    )
+list(APPEND RK_AIQ_STATIC_LIB_ARS
+	${STATIC_LIB_PREFIX}rkaiq_camgroup_ae${STATIC_LIB_SUFFIX}
+	${STATIC_LIB_PREFIX}rkaiq_camgroup_awb${STATIC_LIB_SUFFIX}
+	${STATIC_LIB_PREFIX}rkaiq_camgroup_misc${STATIC_LIB_SUFFIX}
     )
 endif()
 
@@ -460,6 +538,20 @@ if (LIBDRM_FOUND)
         )
 endif()
 
+#build static librkaiq.a
+
+foreach(STATIC_LIB_AR ${RK_AIQ_STATIC_LIB_ARS})
+	add_custom_command (TARGET rkaiq_tmp POST_BUILD
+	COMMAND ${CMAKE_AR} x ${STATIC_LIB_AR}
+	)
+endforeach()
+
+add_custom_command (TARGET rkaiq_tmp POST_BUILD
+	COMMAND ${CMAKE_AR} rcs ${CMAKE_LIBRARY_PATH}/librkaiq.a *.o
+	COMMAND ${CMAKE_STRIP} --strip-debug ${CMAKE_LIBRARY_PATH}/librkaiq.a
+	COMMAND rm *.o
+	)
+
 set (VERSIONFILEPATH ${PROJECT_SOURCE_DIR}/)
 execute_process(COMMAND sh
     ${PROJECT_SOURCE_DIR}/tools/check-version-with-tuningtools.sh
@@ -471,3 +563,4 @@ install(DIRECTORY common/ DESTINATION include/rkaiq/common
     FILES_MATCHING PATTERN "*.h")
 install(TARGETS rkaiq
     LIBRARY DESTINATION lib)
+install(FILES ${CMAKE_LIBRARY_PATH}/librkaiq.a DESTINATION lib)

@@ -97,6 +97,11 @@ static XCamReturn AmergePrepare(RkAiqAlgoCom* params)
             memcpy(&pAmergeGrpCtx->pCalibDB.Merge_v30, calibv2_amerge_calib, sizeof(CalibDbV2_merge_V2_t));//load iq paras
 
         }
+
+        if (pAmergeGrpCtx->FrameNumber == HDR_2X_NUM || pAmergeGrpCtx->FrameNumber == HDR_3X_NUM) {
+            MergePrepareJsonMalloc(&pAmergeGrpCtx->Config, &pAmergeGrpCtx->pCalibDB);
+            AmergePrepareJsonUpdateConfig(pAmergeGrpCtx, &pAmergeGrpCtx->pCalibDB);
+        }
     } else if (params->u.prepare.conf_type & RK_AIQ_ALGO_CONFTYPE_CHANGERES) {
         pAmergeGrpCtx->isCapture = true;
     }
@@ -110,11 +115,6 @@ static XCamReturn AmergePrepare(RkAiqAlgoCom* params)
         }
     }
 
-    if (pAmergeGrpCtx->FrameNumber == HDR_2X_NUM || pAmergeGrpCtx->FrameNumber == HDR_3X_NUM) {
-        MergePrepareJsonMalloc(&pAmergeGrpCtx->Config, &pAmergeGrpCtx->pCalibDB);
-        AmergePrepareJsonUpdateConfig(pAmergeGrpCtx, &pAmergeGrpCtx->pCalibDB);
-    }
-
     LOG1_AMERGE("%s:Exit!\n", __FUNCTION__);
     return(ret);
 }
@@ -126,7 +126,7 @@ static XCamReturn AmergeProcess(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* o
     bool bypass = false;
 
     AmergeContext_t* pAmergeGrpCtx = (AmergeContext_t*)inparams->ctx;
-    pAmergeGrpCtx->frameCnt = inparams->frame_id > 2 ? (inparams->frame_id - 2) : 0;
+    pAmergeGrpCtx->frameCnt                     = inparams->frame_id;
     RkAiqAlgoCamGroupProcIn* pAmergeGrpParams = (RkAiqAlgoCamGroupProcIn*)inparams;
     RkAiqAlgoCamGroupProcOut* pAmergeGrpProcRes = (RkAiqAlgoCamGroupProcOut*)outparams;
 
@@ -162,23 +162,6 @@ static XCamReturn AmergeProcess(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* o
                 AmergeGetSensorInfo(pAmergeGrpCtx, AeProcResult);
             }
 
-            // get ae pre res and proc
-            XCamVideoBuffer* xCamAePreRes = pAmergeGrpParams->camgroupParmasArray[0]->aec._aePreRes;
-            RkAiqAlgoPreResAe* pAEPreRes  = NULL;
-            if (xCamAePreRes) {
-                pAEPreRes = (RkAiqAlgoPreResAe*)xCamAePreRes->map(xCamAePreRes);
-                bypass    = AmergeByPassProcessing(pAmergeGrpCtx, pAEPreRes->ae_pre_res_rk);
-            } else {
-                AecPreResult_t AecHdrPreResult;
-                memset(&AecHdrPreResult, 0x0, sizeof(AecPreResult_t));
-                bypass = AmergeByPassProcessing(pAmergeGrpCtx, AecHdrPreResult);
-                bypass = false;
-                LOGE_AMERGE("%s: ae Pre result is null!!!\n", __FUNCTION__);
-            }
-
-            // merge tuning para process
-            if (!bypass) AmergeTuningProcessing(pAmergeGrpCtx);
-
             // expo para process
             MergeExpoData_t ExpoData;
             memset(&ExpoData, 0, sizeof(MergeExpoData_t));
@@ -191,6 +174,9 @@ static XCamReturn AmergeProcess(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* o
                                          .exp_real_params.digital_gain *
                                      pAmergeGrpParams->camgroupParmasArray[0]
                                          ->aec._effAecExpInfo.HdrExp[0]
+                                         .exp_real_params.isp_dgain *
+                                     pAmergeGrpParams->camgroupParmasArray[0]
+                                         ->aec._effAecExpInfo.HdrExp[0]
                                          .exp_real_params.integration_time;
                 ExpoData.nextMExpo = pAmergeGrpParams->camgroupParmasArray[0]
                                          ->aec._effAecExpInfo.HdrExp[1]
@@ -198,6 +184,9 @@ static XCamReturn AmergeProcess(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* o
                                      pAmergeGrpParams->camgroupParmasArray[0]
                                          ->aec._effAecExpInfo.HdrExp[1]
                                          .exp_real_params.digital_gain *
+                                     pAmergeGrpParams->camgroupParmasArray[0]
+                                         ->aec._effAecExpInfo.HdrExp[1]
+                                         .exp_real_params.isp_dgain *
                                      pAmergeGrpParams->camgroupParmasArray[0]
                                          ->aec._effAecExpInfo.HdrExp[1]
                                          .exp_real_params.integration_time;
@@ -208,13 +197,30 @@ static XCamReturn AmergeProcess(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* o
                                          .exp_real_params.analog_gain *
                                      pAmergeGrpParams->camgroupParmasArray[0]
                                          ->aec._effAecExpInfo.HdrExp[0]
+                                         .exp_real_params.isp_dgain *
+                                     pAmergeGrpParams->camgroupParmasArray[0]
+                                         ->aec._effAecExpInfo.HdrExp[0]
                                          .exp_real_params.digital_gain;
                 ExpoData.nextMGain = pAmergeGrpParams->camgroupParmasArray[0]
                                          ->aec._effAecExpInfo.HdrExp[1]
                                          .exp_real_params.analog_gain *
                                      pAmergeGrpParams->camgroupParmasArray[0]
                                          ->aec._effAecExpInfo.HdrExp[1]
+                                         .exp_real_params.isp_dgain *
+                                     pAmergeGrpParams->camgroupParmasArray[0]
+                                         ->aec._effAecExpInfo.HdrExp[1]
                                          .exp_real_params.digital_gain;
+
+                pAmergeGrpCtx->CurrData.CtrlData.ISO = pAmergeGrpParams->camgroupParmasArray[0]
+                                                           ->aec._effAecExpInfo.HdrExp[1]
+                                                           .exp_real_params.analog_gain *
+                                                       pAmergeGrpParams->camgroupParmasArray[0]
+                                                           ->aec._effAecExpInfo.HdrExp[1]
+                                                           .exp_real_params.digital_gain *
+                                                       pAmergeGrpParams->camgroupParmasArray[0]
+                                                           ->aec._effAecExpInfo.HdrExp[1]
+                                                           .exp_real_params.isp_dgain *
+                                                       50.0f;
             } else if (pAmergeGrpCtx->FrameNumber == HDR_3X_NUM) {
                 ExpoData.nextSExpo = pAmergeGrpParams->camgroupParmasArray[0]
                                          ->aec._effAecExpInfo.HdrExp[0]
@@ -224,6 +230,9 @@ static XCamReturn AmergeProcess(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* o
                                          .exp_real_params.digital_gain *
                                      pAmergeGrpParams->camgroupParmasArray[0]
                                          ->aec._effAecExpInfo.HdrExp[0]
+                                         .exp_real_params.isp_dgain *
+                                     pAmergeGrpParams->camgroupParmasArray[0]
+                                         ->aec._effAecExpInfo.HdrExp[0]
                                          .exp_real_params.integration_time;
                 ExpoData.nextMExpo = pAmergeGrpParams->camgroupParmasArray[0]
                                          ->aec._effAecExpInfo.HdrExp[1]
@@ -231,6 +240,9 @@ static XCamReturn AmergeProcess(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* o
                                      pAmergeGrpParams->camgroupParmasArray[0]
                                          ->aec._effAecExpInfo.HdrExp[1]
                                          .exp_real_params.digital_gain *
+                                     pAmergeGrpParams->camgroupParmasArray[0]
+                                         ->aec._effAecExpInfo.HdrExp[1]
+                                         .exp_real_params.isp_dgain *
                                      pAmergeGrpParams->camgroupParmasArray[0]
                                          ->aec._effAecExpInfo.HdrExp[1]
                                          .exp_real_params.integration_time;
@@ -242,11 +254,17 @@ static XCamReturn AmergeProcess(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* o
                                          .exp_real_params.digital_gain *
                                      pAmergeGrpParams->camgroupParmasArray[0]
                                          ->aec._effAecExpInfo.HdrExp[2]
+                                         .exp_real_params.isp_dgain *
+                                     pAmergeGrpParams->camgroupParmasArray[0]
+                                         ->aec._effAecExpInfo.HdrExp[2]
                                          .exp_real_params.integration_time;
 
                 ExpoData.nextSGain = pAmergeGrpParams->camgroupParmasArray[0]
                                          ->aec._effAecExpInfo.HdrExp[0]
                                          .exp_real_params.analog_gain *
+                                     pAmergeGrpParams->camgroupParmasArray[0]
+                                         ->aec._effAecExpInfo.HdrExp[0]
+                                         .exp_real_params.isp_dgain *
                                      pAmergeGrpParams->camgroupParmasArray[0]
                                          ->aec._effAecExpInfo.HdrExp[0]
                                          .exp_real_params.digital_gain;
@@ -255,7 +273,20 @@ static XCamReturn AmergeProcess(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* o
                                          .exp_real_params.analog_gain *
                                      pAmergeGrpParams->camgroupParmasArray[0]
                                          ->aec._effAecExpInfo.HdrExp[1]
+                                         .exp_real_params.isp_dgain *
+                                     pAmergeGrpParams->camgroupParmasArray[0]
+                                         ->aec._effAecExpInfo.HdrExp[1]
                                          .exp_real_params.digital_gain;
+                pAmergeGrpCtx->CurrData.CtrlData.ISO = pAmergeGrpParams->camgroupParmasArray[0]
+                                                           ->aec._effAecExpInfo.HdrExp[1]
+                                                           .exp_real_params.analog_gain *
+                                                       pAmergeGrpParams->camgroupParmasArray[0]
+                                                           ->aec._effAecExpInfo.HdrExp[1]
+                                                           .exp_real_params.digital_gain *
+                                                       pAmergeGrpParams->camgroupParmasArray[0]
+                                                           ->aec._effAecExpInfo.HdrExp[1]
+                                                           .exp_real_params.isp_dgain *
+                                                       50.0f;
             }
             LOGV_AMERGE("%s: nextFrame: sexp: %f-%f, mexp: %f-%f, lexp: %f-%f\n", __FUNCTION__,
                         pAmergeGrpParams->camgroupParmasArray[0]
@@ -276,27 +307,38 @@ static XCamReturn AmergeProcess(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* o
                         pAmergeGrpParams->camgroupParmasArray[0]
                             ->aec._effAecExpInfo.HdrExp[2]
                             .exp_real_params.integration_time);
-            if (ExpoData.nextSExpo > 0)
+            if (ExpoData.nextSExpo > FLT_EPSILON)
                 ExpoData.nextRatioLS = ExpoData.nextLExpo / ExpoData.nextSExpo;
             else
                 LOGE_AMERGE("%s: Short frame for merge expo sync is ERROR!!!\n", __FUNCTION__);
-            if (ExpoData.nextMExpo > 0)
+            if (ExpoData.nextMExpo > FLT_EPSILON)
                 ExpoData.nextRatioLM = ExpoData.nextLExpo / ExpoData.nextMExpo;
             else
                 LOGE_AMERGE("%s: Middle frame for merge expo sync is ERROR!!!\n", __FUNCTION__);
             // clip for long frame mode
             if (pAmergeGrpCtx->SensorInfo.LongFrmMode) {
-                ExpoData.nextRatioLS = 1.0;
-                ExpoData.nextRatioLM = 1.0;
+                ExpoData.nextRatioLS = 1.0f;
+                ExpoData.nextRatioLM = 1.0f;
             }
 
-            // clip for Longframe mode
-            if (pAmergeGrpCtx->SensorInfo.LongFrmMode) {
-                ExpoData.nextRatioLS = 1;
-                ExpoData.nextRatioLM = 1;
+            // get ae pre res and proc
+            XCamVideoBuffer* xCamAePreRes = pAmergeGrpParams->camgroupParmasArray[0]->aec._aePreRes;
+            RkAiqAlgoPreResAe* pAEPreRes  = NULL;
+            if (xCamAePreRes) {
+                pAEPreRes = (RkAiqAlgoPreResAe*)xCamAePreRes->map(xCamAePreRes);
+                bypass    = AmergeByPassProcessing(pAmergeGrpCtx, pAEPreRes->ae_pre_res_rk);
+            } else {
+                AecPreResult_t AecHdrPreResult;
+                memset(&AecHdrPreResult, 0x0, sizeof(AecPreResult_t));
+                bypass = AmergeByPassProcessing(pAmergeGrpCtx, AecHdrPreResult);
+                bypass = false;
+                LOGE_AMERGE("%s: ae Pre result is null!!!\n", __FUNCTION__);
             }
 
-            if (ExpoData.nextRatioLS >= 1 && ExpoData.nextRatioLM >= 1)
+            // merge tuning para process
+            if (!bypass) AmergeTuningProcessing(pAmergeGrpCtx);
+
+            if (ExpoData.nextRatioLS >= 1.0f && ExpoData.nextRatioLM >= 1.0f)
                 AmergeExpoProcessing(pAmergeGrpCtx, &ExpoData);
             else
                 LOGE_AMERGE("%s: AE ratio for merge expo sync is under one!!!\n", __FUNCTION__);
@@ -305,9 +347,11 @@ static XCamReturn AmergeProcess(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* o
                 pAmergeGrpCtx->PrevData.CtrlData.ApiMode = pAmergeGrpCtx->mergeAttr.attrV21.opMode;
             else if (CHECK_ISP_HW_V30())
                 pAmergeGrpCtx->PrevData.CtrlData.ApiMode = pAmergeGrpCtx->mergeAttr.attrV30.opMode;
+
             pAmergeGrpCtx->ProcRes.update        = !bypass;
             pAmergeGrpCtx->ProcRes.LongFrameMode = pAmergeGrpCtx->SensorInfo.LongFrmMode;
         }
+
         for(int i = 0; i < pAmergeGrpProcRes->arraySize; i++) {
             pAmergeGrpProcRes->camgroupParmasArray[i]->_amergeConfig->update = pAmergeGrpCtx->ProcRes.update;
             pAmergeGrpProcRes->camgroupParmasArray[i]->_amergeConfig->LongFrameMode = pAmergeGrpCtx->ProcRes.LongFrameMode;

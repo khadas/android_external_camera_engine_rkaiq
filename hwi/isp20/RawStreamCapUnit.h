@@ -31,11 +31,11 @@ class RawStreamCapUnit : public PollCallback
 {
 public:
     explicit RawStreamCapUnit ();
-    explicit RawStreamCapUnit (const rk_sensor_full_info_t *s_info, bool linked_to_isp);
+    explicit RawStreamCapUnit (const rk_sensor_full_info_t *s_info, bool linked_to_isp, bool noReadBack);
     virtual ~RawStreamCapUnit ();
     virtual XCamReturn start(int mode);
     virtual XCamReturn stop ();
-    void set_working_mode(int mode, bool noReadBack);
+    void set_working_mode(int mode);
     void set_devices(SmartPtr<V4l2SubDevice> ispdev, CamHwIsp20* handle, RawStreamProcUnit *proc);
     void set_tx_devices(SmartPtr<V4l2Device> mipi_tx_devs[3]);
     SmartPtr<V4l2Device> get_tx_device (int index);
@@ -54,6 +54,10 @@ public:
     void setCamPhyId(int phyId) {
         mCamPhyId = phyId;
     }
+    void setSensorCategory(bool sensorState) {
+        _is_1608_stream = sensorState;
+    }
+    XCamReturn reset_hardware();
     enum {
         ISP_MIPI_HDR_S = 0,
         ISP_MIPI_HDR_M,
@@ -67,11 +71,13 @@ public:
         RAW_CAP_STATE_STARTED,
         RAW_CAP_STATE_STOPPED,
     };
+
 protected:
     XCAM_DEAD_COPY (RawStreamCapUnit);
     XCamReturn sync_raw_buf(SmartPtr<V4l2BufferProxy> &buf_s, SmartPtr<V4l2BufferProxy> &buf_m, SmartPtr<V4l2BufferProxy> &buf_l);
     bool check_skip_frame(int32_t buf_seq);
     int mCamPhyId;
+    bool _is_1608_stream;
 protected:
     SmartPtr<V4l2Device> _dev[3];
     SmartPtr<V4l2Device> _dev_bakup[3];

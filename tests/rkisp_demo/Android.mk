@@ -19,6 +19,7 @@ LOCAL_SRC_FILES :=\
 	demo/rkRgaApi.cpp \
     demo/ae_algo_demo/third_party_ae_algo.cpp \
     demo/awb_algo_demo/third_party_awb_algo.cpp \
+    demo/af_algo_demo/third_party_af_algo.cpp \
 
 #TODO: have compile issue on Android now
 	#demo/rga_control.c \

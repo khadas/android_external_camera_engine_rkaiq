@@ -20,6 +20,7 @@
 
 #include "rk_aiq.h"
 #include "rk_aiq_algo_des.h"
+#include "rk_aiq_offline_raw.h"
 // #include "rk_aiq_user_api_sysctl.h"
 
 RKAIQ_BEGIN_DECLARE
@@ -314,6 +315,18 @@ XCamReturn
 rk_aiq_uapi2_sysctl_preInit_scene(const char* sns_ent_name, const char *main_scene,
                                   const char *sub_scene);
 
+/**
+ * @brief preInit the addr of IQ
+ *
+ * @param sns_ent_name
+ * @param addr
+ * @param len
+ *
+ * @return 0 if no error
+ */
+XCamReturn
+rk_aiq_uapi2_sysctl_preInit_iq_addr(const char* sns_ent_name, void *addr, size_t len);
+
 typedef struct rk_aiq_ctx_camInfo_s {
     const char* sns_ent_nm;
     int sns_camPhyId;
@@ -421,6 +434,47 @@ rk_aiq_uapi2_sysctl_registRkRawCb(const rk_aiq_sys_ctx_t* ctx, void (*callback)(
  */
 XCamReturn
 rk_aiq_uapi2_sysctl_getWorkingMode(const rk_aiq_sys_ctx_t* ctx, rk_aiq_working_mode_t *mode);
+
+/**
+ * @brief turn on/off socket server
+ *
+ * @param sys_ctx
+ * @param enable
+ *
+ * @return 0 if no error
+ */
+int rk_aiq_uapi2_sysctl_tuning_enable(rk_aiq_sys_ctx_t* sys_ctx, bool enable);
+
+XCamReturn
+rk_aiq_uapi2_sysctl_resetCam(const rk_aiq_sys_ctx_t* sys_ctx, int camId);
+
+/**
+ * @brief generated isp params for offline raw
+ *
+ * @param sys_ctx
+ * @param sequence            frame number
+ * @param next_frm_info       next frame exp info, if mode=0, set null
+ * @param mode                mode=1 working mode is all offline, mode=0 working mode is semi-offline
+ */
+void rk_aiq_uapi2_sysctl_rawReproc_genIspParams (rk_aiq_sys_ctx_t* sys_ctx,
+                                                 uint32_t sequence,
+                                                 rk_aiq_frame_info_t *next_frm_info,
+                                                 int mode);
+
+/**
+ * @brief set isp driver work mode to all offline
+ *
+ * @param isp_driver          isp driver module name(such as rkisp0-vir0)
+ * use media-clt to print rkisp driver media info and get isp driver module name from the info printed
+ * @param offline_sns_name    new sensor name
+ * @param two_frm_exp_info[2] an array which include first frame and seond frame exp info
+ * @return sns_ent_name
+ */
+const char*
+rk_aiq_uapi2_sysctl_rawReproc_preInit(const char* isp_driver,
+                                      const char* offline_sns_name,
+                                      rk_aiq_frame_info_t two_frm_exp_info[2]);
+
 
 RKAIQ_END_DECLARE
 

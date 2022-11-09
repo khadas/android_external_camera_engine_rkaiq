@@ -80,14 +80,17 @@ FakeCamHwIsp20::prepare(uint32_t width, uint32_t height, int mode, int t_delay, 
 
     rk_sensor_full_info_t *s_info = it->second.ptr();
     isp_index = s_info->isp_info->logic_id;
+#ifndef USE_RAWSTREAM_LIB
     setupOffLineLink(isp_index, true);
+#endif
     init_mipi_devices(s_info);
     fakeSensorHw->set_mipi_tx_devs(_mipi_tx_devs);
 
+#ifndef USE_RAWSTREAM_LIB
     mRawCapUnit->set_tx_devices(_mipi_tx_devs);
     mRawProcUnit->set_rx_devices(_mipi_rx_devs);
     mRawProcUnit->setPollCallback(this);
-
+#endif
     ret = CamHwIsp20::prepare(width, height, mode, t_delay, g_delay);
     if (ret)
         return ret;
@@ -329,7 +332,7 @@ FakeCamHwIsp20::parse_rk_rawdata(void *rawdata, struct rk_aiq_vbuf *vbuf)
         	}
         	case STATS_TAG:
         	{
-            	_finfo = *((struct _frame_info *)p);
+            	_finfo = *((rk_aiq_frame_info_t *)p);
             	p = p + sizeof(struct _block_header) + _finfo.size;
             	break;
         	}
@@ -861,7 +864,7 @@ XCamReturn FakeCamHwIsp20::setupOffLineLink(int isp_index, bool enable)
     media_entity* entity  = NULL;
     media_pad* src_pad    = NULL;
     media_pad* sink_pad   = NULL;
-    int lvds_max_entities = 4;
+    int lvds_max_entities = 6;
     int lvds_entity       = 0;
 
     device = media_device_new(mIspHwInfos.isp_info[isp_index].media_dev_path);
@@ -883,7 +886,11 @@ XCamReturn FakeCamHwIsp20::setupOffLineLink(int isp_index, bool enable)
     for (lvds_entity = 0; lvds_entity < lvds_max_entities; lvds_entity++) {
         char entity_name[128] = {0};
         src_pad               = NULL;
-        snprintf(entity_name, 128, "rkcif-mipi-lvds%d", lvds_entity);
+        if (!lvds_entity) {
+          snprintf(entity_name, 128, "rkcif-mipi-lvds");
+        } else {
+          snprintf(entity_name, 128, "rkcif-mipi-lvds%d", lvds_entity - 1);
+        }
         entity = media_get_entity_by_name(device, entity_name, strlen(entity_name));
         if (entity) {
             src_pad = (media_pad*)media_entity_get_pad(entity, 0);

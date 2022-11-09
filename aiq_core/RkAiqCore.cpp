@@ -365,13 +365,13 @@ static struct RkAiqAlgoDesCommExt g_default_3a_des_v3x[] = {
     { &g_RkIspAlgoDescAdegamma.common,      RK_AIQ_CORE_ANALYZE_GRP0,   0, 0, 0,    grp0Conds          },
     { &g_RkIspAlgoDescAmerge.common,        RK_AIQ_CORE_ANALYZE_GRP0,   0, 0, 0,    grp0Conds          },
     { &g_RkIspAlgoDescAcac.common,          RK_AIQ_CORE_ANALYZE_GRP0,   0, 0, 0,    grp0Conds          },
-    { &g_RkIspAlgoDescAdhaz.common,         RK_AIQ_CORE_ANALYZE_GRP0,   0, 1, 0,    grp0Conds          },
     { &g_RkIspAlgoDescAbayer2dnrV2.common,  RK_AIQ_CORE_ANALYZE_GRP0,   2, 2, 2,    grp0Conds          },
     { &g_RkIspAlgoDescAbayertnrV2.common,   RK_AIQ_CORE_ANALYZE_GRP0,   2, 2, 2,    grp0Conds          },
     { &g_RkIspAlgoDescAynrV3.common,        RK_AIQ_CORE_ANALYZE_GRP0,   3, 3, 3,    grp0Conds          },
     { &g_RkIspAlgoDescAcnrV2.common,        RK_AIQ_CORE_ANALYZE_GRP0,   2, 2, 2,    grp0Conds          },
     { &g_RkIspAlgoDescAsharpV4.common,      RK_AIQ_CORE_ANALYZE_GRP0,   4, 4, 4,    grp0Conds          },
     { &g_RkIspAlgoDescAdrc.common,          RK_AIQ_CORE_ANALYZE_GRP0,   0, 0, 0,    grp0Conds          },
+    { &g_RkIspAlgoDescAdhaz.common,         RK_AIQ_CORE_ANALYZE_GRP0,   0, 1, 0,    grp0Conds          },
     { &g_RkIspAlgoDescA3dlut.common,        RK_AIQ_CORE_ANALYZE_GRP1,   0, 0, 0,    grp1Conds          },
     { &g_RkIspAlgoDescAlsc.common,          RK_AIQ_CORE_ANALYZE_GRP1,   0, 0, 0,    grp1Conds          },
     { &g_RkIspAlgoDescAccm.common,          RK_AIQ_CORE_ANALYZE_GRP1,   0, 0, 0,    grp1Conds          },
@@ -384,7 +384,7 @@ static struct RkAiqAlgoDesCommExt g_default_3a_des_v3x[] = {
     { &g_RkIspAlgoDescAf.common,            RK_AIQ_CORE_ANALYZE_AF,     0, 1, 0,    afGrpCondsV3x      },
     { &g_RkIspAlgoDescAgic.common,          RK_AIQ_CORE_ANALYZE_OTHER,  0, 1, 0,    otherGrpCondsV3x   },
     { &g_RkIspAlgoDescAwdr.common,          RK_AIQ_CORE_ANALYZE_OTHER,  0, 0, 0,    otherGrpCondsV3x   },
-    { &g_RkIspAlgoDescAsd.common,           RK_AIQ_CORE_ANALYZE_OTHER,  0, 0, 0,    otherGrpCondsV3x   },
+    { &g_RkIspAlgoDescAsd.common,           RK_AIQ_CORE_ANALYZE_GRP0,   0, 0, 0,    grp0Conds          },
     { &g_RkIspAlgoDescAgainV2.common,       RK_AIQ_CORE_ANALYZE_GRP0,   2, 2, 2,    grp0Conds          },
     { NULL,                                 RK_AIQ_CORE_ANALYZE_ALL,    0, 0, 0,    {0}                },
     // clang-format on
@@ -464,6 +464,7 @@ RkAiqCore::RkAiqCore(int isp_hw_ver)
     , mAiqOrbStatsIntPool(nullptr)
     , mAiqPdafStatsPool(nullptr)
     , mCustomEnAlgosMask(0xffffffffffffffff)
+    , groupUpdateMask(0x00)
 {
     ENTER_ANALYZER_FUNCTION();
     // mAlogsSharedParams.reset();
@@ -523,19 +524,19 @@ void RkAiqCore::initCpsl()
     CalibDbV2_Cpsl_Param_t* calibv2_cpsl_calib = &calibv2_cpsl_db->param;
     // TODO: something from calib
     if (mCpslCap.modes_num > 0 && calibv2_cpsl_calib->enable) {
-        if (calibv2_cpsl_calib->mode == 0) {
+        if (calibv2_cpsl_calib->mode == 1) {
             cfg->mode = RK_AIQ_OP_MODE_AUTO;
-        } else if (calibv2_cpsl_calib->mode == 1) {
+        } else if (calibv2_cpsl_calib->mode == 2) {
             cfg->mode = RK_AIQ_OP_MODE_MANUAL;
         } else {
             cfg->mode = RK_AIQ_OP_MODE_INVALID;
         }
 
-        if (calibv2_cpsl_calib->light_src == 0) {
+        if (calibv2_cpsl_calib->light_src == 1) {
             cfg->lght_src = RK_AIQ_CPSLS_LED;
-        } else if (calibv2_cpsl_calib->light_src == 1) {
-            cfg->lght_src = RK_AIQ_CPSLS_IR;
         } else if (calibv2_cpsl_calib->light_src == 2) {
+            cfg->lght_src = RK_AIQ_CPSLS_IR;
+        } else if (calibv2_cpsl_calib->light_src == 3) {
             cfg->lght_src = RK_AIQ_CPSLS_MIX;
         } else {
             cfg->lght_src = RK_AIQ_CPSLS_INVALID;
@@ -815,6 +816,7 @@ RkAiqCore::prepare(const rk_aiq_exposure_sensor_descriptor* sensor_des,
 
 
     mAlogsComSharedParams.init = true;
+    analyzeInternal(RK_AIQ_CORE_ANALYZE_AE);
     analyzeInternal(RK_AIQ_CORE_ANALYZE_ALL);
     mAlogsComSharedParams.init = false;
 
@@ -845,9 +847,15 @@ RkAiqCore::analyzeInternal(enum rk_aiq_core_analyze_type_e type)
                 shared->frameId = 0;
                 shared->sof     = 0;
                 shared->ispStats = 0;
+                SmartPtr<RkAiqFullParams> curParams = mAiqCurParams->data();
+                if (curParams.ptr() && curParams->mExposureParams.ptr()) {
+                    shared->curExp =
+                        curParams->mExposureParams->data()->exp_tbl[0];
+                }
                 mapIter++;
                 continue;
             }
+
             shared->reset();
             shared->frameId = 0;
 
@@ -1454,6 +1462,9 @@ RkAiqCore::setReqAlgoResMask(int algoType, bool req)
     case RK_AIQ_ALGO_TYPE_ACAC:
         tmp |= (uint64_t)1 << RESULT_TYPE_CAC_PARAM ;
         break;
+    case RK_AIQ_ALGO_TYPE_ACGC:
+        tmp |= (uint64_t)1 << RESULT_TYPE_CGC_PARAM;
+        break;
     default:
         break;
     }
@@ -1954,6 +1965,34 @@ RkAiqCore::events_analyze(const SmartPtr<ispHwEvt_t> &evts)
 }
 
 XCamReturn
+RkAiqCore::prepare(enum rk_aiq_core_analyze_type_e type)
+{
+    ENTER_ANALYZER_FUNCTION();
+
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+
+    std::vector<SmartPtr<RkAiqHandle>>& algo_list =
+                                        mRkAiqCoreGroupManager->getGroupAlgoList(type);
+
+    for (auto& algoHdl : algo_list) {
+        RkAiqHandle* curHdl = algoHdl.ptr();
+        while (curHdl) {
+            if (curHdl->getEnable()) {
+                ret = curHdl->updateConfig(true);
+                RKAIQCORE_CHECK_BYPASS(ret, "algoHdl %d updateConfig failed", curHdl->getAlgoType());
+                ret = curHdl->prepare();
+                RKAIQCORE_CHECK_BYPASS(ret, "algoHdl %d processing failed", curHdl->getAlgoType());
+            }
+            curHdl = curHdl->getNextHdl();
+        }
+    }
+
+    EXIT_ANALYZER_FUNCTION();
+
+    return XCAM_RETURN_NO_ERROR;
+}
+
+XCamReturn
 RkAiqCore::preProcess(enum rk_aiq_core_analyze_type_e type)
 {
     ENTER_ANALYZER_FUNCTION();
@@ -2394,7 +2433,6 @@ XCamReturn RkAiqCore::calibTuning(const CamCalibDbV2Context_t* aiqCalib,
     }
 
     // Fill new calib to the AlogsSharedParams
-    /* TODO: xuhf WARNING */
     mAlogsComSharedParams.calibv2 = aiqCalib;
     mAlogsComSharedParams.conf_type = RK_AIQ_ALGO_CONFTYPE_UPDATECALIB;
 
@@ -2403,29 +2441,32 @@ XCamReturn RkAiqCore::calibTuning(const CamCalibDbV2Context_t* aiqCalib,
         if (!name.compare(0, 4, "cpsl", 0, 4)) {
             initCpsl();
         } else if (!name.compare(0, 11, "colorAsGrey", 0, 11)) {
+            CalibDbV2_ColorAsGrey_t* colorAsGrey =
+                (CalibDbV2_ColorAsGrey_t*)CALIBDBV2_GET_MODULE_PTR(
+                    (void*)(mAlogsComSharedParams.calibv2), colorAsGrey);
+            if (colorAsGrey->param.enable) {
+                mGrayMode                       = RK_AIQ_GRAY_MODE_ON;
+                mAlogsComSharedParams.gray_mode = true;
+            } else {
+                mGrayMode                       = RK_AIQ_GRAY_MODE_OFF;
+                mAlogsComSharedParams.gray_mode = false;
+            }
             setGrayMode(mGrayMode);
         }
     });
 
-    AlgoList change_list = std::make_shared<std::list<RkAiqAlgoType_t>>();
-    std::transform(
-        change_name_list->begin(), change_name_list->end(), std::back_inserter(*change_list),
-    [](const std::string name) {
-        return RkAiqCalibDbV2::string2algostype(name.c_str());
-    });
-
-    change_list->sort();
-    change_list->unique();
-
-    // Call prepare of the Alog handle annd notify update param
-    list<RkAiqAlgoType_t>::iterator it;
-    for(it = change_list->begin(); it != change_list->end(); it++) {
-        auto algo_handle = getCurAlgoTypeHandle(*it);
-        if (algo_handle) {
-            (*algo_handle)->updateConfig(true);
-            (*algo_handle)->prepare();
+    uint64_t grpMask = 0;
+    auto algoGroupMap = mRkAiqCoreGroupManager->getGroupAlgoListMap();
+    for (const auto& group : algoGroupMap) {
+        if (group.first != RK_AIQ_CORE_ANALYZE_ALL) {
+            grpMask |= grpId2GrpMask(group.first);
         }
     }
+
+    notifyUpdate(grpMask);
+    waitUpdateDone();
+
+    mAlogsComSharedParams.conf_type &= ~RK_AIQ_ALGO_CONFTYPE_UPDATECALIB;
 
     EXIT_ANALYZER_FUNCTION();
 
@@ -2694,6 +2735,8 @@ void RkAiqCore::newAiqParamsPool()
 }
 
 void RkAiqCore::newPdafStatsPool() {
+    if (!mAiqPdafStatsPool.ptr())
+        return;
     const CamCalibDbContext_t* aiqCalib     = mAlogsComSharedParams.calibv2;
     uint32_t max_cnt                        = mAiqPdafStatsPool->get_free_buffer_size();
     SmartPtr<RkAiqPdafStatsProxy> pdafStats = NULL;
@@ -2732,6 +2775,8 @@ void RkAiqCore::newPdafStatsPool() {
 }
 
 void RkAiqCore::delPdafStatsPool() {
+    if (!mAiqPdafStatsPool.ptr())
+        return;
     SmartPtr<RkAiqPdafStatsProxy> pdafStats = NULL;
     uint32_t max_cnt                        = mAiqPdafStatsPool->get_free_buffer_size();
     rk_aiq_isp_pdaf_stats_t* pdaf_stats;
@@ -3083,6 +3128,85 @@ RkAiqCore::newAiqGroupAnayzer()
     mRkAiqCoreGroupManager = new RkAiqAnalyzeGroupManager(this, mIsSingleThread);
     mRkAiqCoreGroupManager->parseAlgoGroup(mAlgosDesArray);
     return XCAM_RETURN_NO_ERROR;
+}
+
+XCamReturn RkAiqCore::updateCalibDbBrutal(CamCalibDbV2Context_t* aiqCalib)
+{
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+
+    // Fill new calib to the AlogsSharedParams
+    mAlogsComSharedParams.calibv2 = aiqCalib;
+    mAlogsComSharedParams.conf_type = RK_AIQ_ALGO_CONFTYPE_UPDATECALIB;
+
+    initCpsl();
+    CalibDbV2_ColorAsGrey_t* colorAsGrey =
+        (CalibDbV2_ColorAsGrey_t*)CALIBDBV2_GET_MODULE_PTR(
+            (void*)(mAlogsComSharedParams.calibv2), colorAsGrey);
+    if (colorAsGrey->param.enable) {
+        mGrayMode                       = RK_AIQ_GRAY_MODE_ON;
+        mAlogsComSharedParams.gray_mode = true;
+    } else {
+        mGrayMode                       = RK_AIQ_GRAY_MODE_OFF;
+        mAlogsComSharedParams.gray_mode = false;
+    }
+    setGrayMode(mGrayMode);
+
+    for (auto& algoHdl : mCurIspAlgoHandleList) {
+        RkAiqHandle* curHdl = algoHdl.ptr();
+        while (curHdl) {
+            if (curHdl->getEnable()) {
+                /* update user initial params */
+                ret = curHdl->updateConfig(true);
+                RKAIQCORE_CHECK_BYPASS(ret, "algoHdl %d update initial user params failed", curHdl->getAlgoType());
+                algoHdl->setReConfig(true);
+                ret = curHdl->prepare();
+                RKAIQCORE_CHECK_BYPASS(ret, "algoHdl %d prepare failed", curHdl->getAlgoType());
+            }
+            curHdl = curHdl->getNextHdl();
+        }
+    }
+
+    mAlogsComSharedParams.conf_type &= ~RK_AIQ_ALGO_CONFTYPE_UPDATECALIB;
+
+    return XCAM_RETURN_NO_ERROR;
+}
+
+XCamReturn RkAiqCore::updateCalib(enum rk_aiq_core_analyze_type_e type)
+{
+    SmartLock lock (_update_mutex);
+    // check if group bit still set
+    uint64_t need_update = groupUpdateMask & grpId2GrpMask(type);
+    if (!need_update) {
+        return XCAM_RETURN_NO_ERROR;
+    }
+
+    prepare(type);
+    // clear group bit after update
+    groupUpdateMask &= (~need_update);
+    // notify update done
+    _update_done_cond.broadcast();
+
+    return XCAM_RETURN_NO_ERROR;
+}
+
+XCamReturn RkAiqCore::notifyUpdate(uint64_t mask)
+{
+    SmartLock lock (_update_mutex);
+
+    groupUpdateMask |= mask;
+
+    return XCamReturn();
+}
+
+XCamReturn RkAiqCore::waitUpdateDone()
+{
+    SmartLock lock (_update_mutex);
+
+    while (groupUpdateMask != 0) {
+        _update_done_cond.timedwait(_update_mutex, 100000ULL);
+    }
+
+    return XCamReturn();
 }
 
 } //namespace RkCam

@@ -13,11 +13,17 @@ PdafStreamProcUnit::PdafStreamProcUnit (int type)
     mPdafDev = NULL;
     mPdafStream = NULL;
     mStartFlag = false;
+    mStartStreamFlag = false;
     mBufType = type;
+    mHelperThd = new PdafStreamHelperThd(this);
+    mHelperThd->triger_start();
+    mHelperThd->start();
 }
 
 PdafStreamProcUnit::~PdafStreamProcUnit ()
 {
+    mHelperThd->triger_stop();
+    mHelperThd->stop();
 }
 
 void PdafStreamProcUnit::set_devices(CamHwIsp20* camHw)
@@ -57,7 +63,14 @@ void PdafStreamProcUnit::start()
             mPdafDev->io_control (RKCIF_CMD_SET_CSI_MEMORY_MODE, &mem_mode);
             LOGI_AF("memory mode of pdaf video need low align, mem_mode %d", mem_mode);
         }
-        mPdafStream->start();
+
+        XCam::SmartPtr<PdafStreamParam> attrPtr = new PdafStreamParam;
+
+        attrPtr->valid = true;
+        attrPtr->stream_flag = true;
+        mHelperThd->clear_attr();
+        mHelperThd->push_attr(attrPtr);
+
         mStartFlag = true;
     }
 }
@@ -65,7 +78,13 @@ void PdafStreamProcUnit::start()
 void PdafStreamProcUnit::stop()
 {
     if (mPdafStream.ptr() && mStartFlag) {
-        mPdafStream->stop();
+        XCam::SmartPtr<PdafStreamParam> attrPtr = new PdafStreamParam;
+
+        attrPtr->valid = true;
+        attrPtr->stream_flag = false;
+        mHelperThd->clear_attr();
+        mHelperThd->push_attr(attrPtr);
+
         mStartFlag = false;
     }
 }
@@ -84,6 +103,75 @@ PdafStreamProcUnit::poll_buffer_ready (SmartPtr<V4l2BufferProxy> &buf, int dev_i
     }
 
     return ret;
+}
+
+XCamReturn
+PdafStreamProcUnit::deinit()
+{
+    int wait_cnt = 0;
+
+    while (mStartStreamFlag && wait_cnt++ < 3) {
+        LOGD_AF("mStartStreamFlag %d, wait_cnt %d", mStartStreamFlag, wait_cnt);
+        usleep(50000);
+        if (!mStartStreamFlag)
+            break;
+        stop_stream();
+    }
+
+    mHelperThd->triger_stop();
+    mHelperThd->stop();
+
+    return XCAM_RETURN_NO_ERROR;
+}
+
+XCamReturn PdafStreamProcUnit::start_stream()
+{
+    if (mPdafStream.ptr() && !mStartStreamFlag) {
+        mPdafStream->start();
+        mStartStreamFlag = true;
+        LOGD_AF("start pdaf stream device");
+    }
+
+    return XCAM_RETURN_NO_ERROR;
+}
+
+XCamReturn PdafStreamProcUnit::stop_stream()
+{
+    if (mPdafStream.ptr() && mStartStreamFlag) {
+        mPdafStream->stop();
+        mStartStreamFlag = false;
+        LOGD_AF("stop pdaf stream device");
+    }
+
+    return XCAM_RETURN_NO_ERROR;
+}
+
+bool PdafStreamHelperThd::loop()
+{
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+
+    const static int32_t timeout = -1;
+    XCam::SmartPtr<PdafStreamParam> attrib = mAttrQueue.pop (timeout);
+
+    if (!attrib.ptr()) {
+        LOGI_AF("PdafStreamHelperThd got empty attrib, stop thread");
+        return false;
+    }
+
+    if (attrib->valid) {
+        if (attrib->stream_flag) {
+            ret = mPdafStreamProc->start_stream();
+        } else {
+            ret = mPdafStreamProc->stop_stream();
+        }
+    }
+
+    if (ret == XCAM_RETURN_NO_ERROR)
+        return true;
+
+    LOGI_AF("PdafStreamHelperThd stop");
+
+    return false;
 }
 
 }
