@@ -189,6 +189,7 @@ public:
     void stop();
     void deInit();
     void processResults();
+    void syncSofToHal(rk_aiq_metas_t* metas);
     void processResultsDebug(SmartPtr<RkAiqFullParamsProxy> &results);
     XCamReturn getAeResults(rk_aiq_ae_results &ae_results);
     void getAeResultsDebug(rk_aiq_ae_results &ae_results, SmartPtr<rk_aiq_exposure_params_wrapper_t> exp_param);
@@ -202,7 +203,7 @@ public:
     void updateAfParams(XCamAfParam *afParams);
     void setFrameParams(const struct rkisp_cl_frame_rkaiq_s* frame_params);
 
-    virtual XCamReturn metaCallback();
+    virtual XCamReturn metaCallback(rk_aiq_metas_t* metas);
 
     SmartPtr<AiqInputParams> getAiqInputParams();
     void set_aiq_ctx(rk_aiq_sys_ctx_t* aiq_ctx) { _aiq_ctx = aiq_ctx; };
@@ -214,10 +215,10 @@ public:
     void setAiqInputParams(SmartPtr<AiqInputParams> inputParams) { _inputParams  = inputParams; };
     SmartPtr<AiqInputParams> getAiqInputParams_simple() { return _inputParams; };
 
-    void updateMetaParams(void);
-    void updateAeMetaParams(XCamAeParam *aeParams);
-    void updateAfMetaParams(XCamAfParam *afParams);
-    void updateAwbMetaParams(XCamAwbParam *awbParams);
+    void updateMetaParams(SmartPtr<AiqInputParams> inputParams);
+    void updateAeMetaParams(XCamAeParam *aeParams, int reqId);
+    void updateAfMetaParams(XCamAfParam *afParams, int reqId);
+    void updateAwbMetaParams(XCamAwbParam *awbParams, int reqId);
     void updateOtherMetaParams();
 
     void pre_process_3A_states(SmartPtr<AiqInputParams> inputParams);

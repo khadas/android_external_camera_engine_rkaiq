@@ -41,16 +41,18 @@ public:
     virtual ~RkAWBModeBase() {};
 
     virtual XCamReturn processState(const uint8_t &controlMode,
-                                  const AwbControls &awbControls) = 0;
+                                  const AwbControls &awbControls,
+                                  int reqId) = 0;
 
 
     virtual XCamReturn processResult(const rk_aiq_awb_results &awbResults,
-                                   CameraMetadata &results) = 0;
+                                   CameraMetadata &results,
+                                   int reqId) = 0;
 
     void resetState(void);
     uint8_t getState() const { return mCurrentAwbState; }
 protected:
-    void updateResult(CameraMetadata& results);
+    void updateResult(int reqId, CameraMetadata& results);
 protected:
     AwbControls  mLastAwbControls;
     uint8_t     mLastControlMode;
@@ -66,9 +68,11 @@ class RkAWBModeAuto: public RkAWBModeBase {
 public:
     RkAWBModeAuto();
     virtual XCamReturn processState(const uint8_t &controlMode,
-                                  const AwbControls &awbControls);
+                                  const AwbControls &awbControls,
+                                  int reqId);
     virtual XCamReturn processResult(const rk_aiq_awb_results &awbResults,
-                                  CameraMetadata& result);
+                                  CameraMetadata& result,
+                                  int reqId);
 };
 
 /**
@@ -80,9 +84,11 @@ class RkAWBModeOff: public RkAWBModeBase {
 public:
     RkAWBModeOff();
     virtual XCamReturn processState(const uint8_t &controlMode,
-                                  const AwbControls &awbControls);
+                                  const AwbControls &awbControls,
+                                  int reqId);
     virtual XCamReturn processResult(const rk_aiq_awb_results &awbResults,
-                                  CameraMetadata& result);
+                                  CameraMetadata& result,
+                                  int reqId);
 };
 
 /**
@@ -100,10 +106,12 @@ public:
     virtual ~RkAWBStateMachine();
 
     virtual XCamReturn processState(const uint8_t &controlMode,
-                                  const AwbControls &awbControls);
+                                  const AwbControls &awbControls,
+                                  int reqId);
 
     virtual XCamReturn processResult(const rk_aiq_awb_results &awbResults,
-                                   CameraMetadata &results);
+                                   CameraMetadata &results,
+                                   int reqId);
 
     uint8_t getState() const { return mCurrentAwbMode->getState(); }
 private:
