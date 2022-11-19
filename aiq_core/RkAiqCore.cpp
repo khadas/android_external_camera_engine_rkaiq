@@ -855,11 +855,17 @@ RkAiqCore::analyzeInternal(enum rk_aiq_core_analyze_type_e type)
                     calibv2_ae_calib->LinearAeCtrl.InitExp.InitGainValue;
             shared->curExp.LinearExp.exp_real_params.integration_time = \
                     calibv2_ae_calib->LinearAeCtrl.InitExp.InitTimeValue;
+            shared->curExp.LinearExp.exp_real_params.digital_gain = 1;
+            shared->curExp.LinearExp.exp_real_params.isp_dgain = \
+                    calibv2_ae_calib->LinearAeCtrl.InitExp.InitIspDGainValue;
             for (int32_t i = 0; i < 3; i++) {
                 shared->curExp.HdrExp[i].exp_real_params.analog_gain = \
                         calibv2_ae_calib->HdrAeCtrl.InitExp.InitGainValue[i];
                 shared->curExp.HdrExp[i].exp_real_params.integration_time = \
                         calibv2_ae_calib->HdrAeCtrl.InitExp.InitTimeValue[i];
+                shared->curExp.HdrExp[i].exp_real_params.digital_gain = 1;
+                shared->curExp.HdrExp[i].exp_real_params.isp_dgain = \
+                        calibv2_ae_calib->HdrAeCtrl.InitExp.InitIspDGainValue[i];
             }
 
             mapIter++;
