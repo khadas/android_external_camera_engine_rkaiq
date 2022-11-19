@@ -225,7 +225,7 @@
 								"DySetpoint":	{
 									"ExpLevel":	[0, 0.1, 0.3, 0.5, 1, 2],
 									"ExpLevel_len":	6,
-									"DySetpoint":	[24, 24, 23, 22, 22, 22],
+									"DySetpoint":	[25, 24, 23, 22, 22, 22],
 									"DySetpoint_len":	6
 								},
 								"BackLightCtrl":	{
@@ -893,13 +893,13 @@
 								"BLC_Data":	{
 									"ISO":	[50, 100, 200, 400, 800, 1600, 3200, 10000, 12800, 25600, 51200, 102400, 204800],
 									"ISO_len":	13,
-									"R_Channel":	[255.5, 255.5, 255.5, 255.3125, 255.8125, 256.25, 245.125, 257.125, 257.125, 257.125, 257.125, 257.125, 257.125],
+									"R_Channel":	[255.5, 255.5, 255.5, 255.3125, 255.8125, 256.25, 256, 257.125, 257.125, 257.125, 257.125, 257.125, 257.125],
 									"R_Channel_len":	13,
-									"Gr_Channel":	[255.6875, 255.6875, 255.6875, 255.4375, 256, 256.5, 245.375, 257.375, 257.375, 257.375, 257.375, 257.375, 257.375],
+									"Gr_Channel":	[255.6875, 255.6875, 255.6875, 255.4375, 256, 256.5, 256, 257.375, 257.375, 257.375, 257.375, 257.375, 257.375],
 									"Gr_Channel_len":	13,
-									"Gb_Channel":	[255.75, 255.625, 255.6875, 255.6875, 255.8125, 256.25, 244.75, 256.75, 256.75, 256.75, 256.75, 256.75, 256.75],
+									"Gb_Channel":	[255.75, 255.625, 255.6875, 255.6875, 255.8125, 256.25, 256, 256.75, 256.75, 256.75, 256.75, 256.75, 256.75],
 									"Gb_Channel_len":	13,
-									"B_Channel":	[255.5625, 255.5, 255.5, 255.4375, 255.5625, 256, 244.375, 256.375, 256.375, 256.375, 256.375, 256.375, 256.375],
+									"B_Channel":	[255.5625, 255.5, 255.5, 255.4375, 255.5625, 256, 256, 256.375, 256.375, 256.375, 256.375, 256.375, 256.375],
 									"B_Channel_len":	13
 								}
 							},
@@ -908,13 +908,13 @@
 								"BLC_Data":	{
 									"ISO":	[50, 100, 200, 400, 800, 1600, 3200, 6400, 12800, 25600, 51200, 102400, 204800],
 									"ISO_len":	13,
-									"R_Channel":	[0, 0, 0, 0, 0, 0, 12, 0, 0, 0, 0, 0, 0],
+									"R_Channel":	[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
 									"R_Channel_len":	13,
-									"Gr_Channel":	[0, 0, 0, 0, 0, 0, 12, 0, 0, 0, 0, 0, 0],
+									"Gr_Channel":	[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
 									"Gr_Channel_len":	13,
-									"Gb_Channel":	[0, 0, 0, 0, 0, 0, 12, 0, 0, 0, 0, 0, 0],
+									"Gb_Channel":	[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
 									"Gb_Channel_len":	13,
-									"B_Channel":	[0, 0, 0, 0, 0, 0, 12, 0, 0, 0, 0, 0, 0],
+									"B_Channel":	[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
 									"B_Channel_len":	13
 								}
 							}
@@ -1320,9 +1320,9 @@
 							"DrcTuningPara":	{
 								"Enable":	1,
 								"DrcGain":	{
-									"EnvLv":	[0, 0.001, 0.002, 0.003, 0.006, 0.01, 0.1, 0.3, 0.4, 0.5, 0.6, 0.8, 1],
+									"EnvLv":	[0, 0.001, 0.002, 0.005, 0.01, 0.05, 0.1, 0.3, 0.4, 0.5, 0.6, 0.8, 1],
 									"EnvLv_len":	13,
-									"DrcGain":	[5, 3, 2, 1.8, 1.8, 1.7, 1.4, 1.4, 1.4, 1.4, 1.5, 1.5, 1.6],
+									"DrcGain":	[3, 3, 2.2, 1.8, 1.8, 1.8, 1.8, 1.8, 1.8, 1.8, 1.8, 1.8, 1.8],
 									"DrcGain_len":	13,
 									"Alpha":	[0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2],
 									"Alpha_len":	13,
@@ -2309,7 +2309,7 @@
 												"gauss_guide":	0,
 												"filter_strength":	0.7,
 												"edgesofts":	1,
-												"ratio":	0.25,
+												"ratio":	0.15,
 												"weight":	0.5,
 												"hdr_dgain_scale_s":	0,
 												"hdr_dgain_scale_m":	0
@@ -2318,8 +2318,8 @@
 												"gauss_guide":	0,
 												"filter_strength":	0.7,
 												"edgesofts":	1,
-												"ratio":	0.25,
-												"weight":	0.5,
+												"ratio":	0.15,
+												"weight":	0.55,
 												"hdr_dgain_scale_s":	0,
 												"hdr_dgain_scale_m":	0
 											}, {
@@ -2327,8 +2327,8 @@
 												"gauss_guide":	0,
 												"filter_strength":	0.7,
 												"edgesofts":	1,
-												"ratio":	0.25,
-												"weight":	0.5,
+												"ratio":	0.15,
+												"weight":	0.6,
 												"hdr_dgain_scale_s":	0,
 												"hdr_dgain_scale_m":	0
 											}, {
@@ -2336,7 +2336,7 @@
 												"gauss_guide":	0,
 												"filter_strength":	1,
 												"edgesofts":	1.2,
-												"ratio":	0.2,
+												"ratio":	0.13,
 												"weight":	0.6,
 												"hdr_dgain_scale_s":	0,
 												"hdr_dgain_scale_m":	0
@@ -2345,16 +2345,16 @@
 												"gauss_guide":	0.5,
 												"filter_strength":	1,
 												"edgesofts":	1.2,
-												"ratio":	0.2,
-												"weight":	0.65,
+												"ratio":	0.1,
+												"weight":	0.7,
 												"hdr_dgain_scale_s":	0,
 												"hdr_dgain_scale_m":	0
 											}, {
 												"iso":	1600,
 												"gauss_guide":	1,
-												"filter_strength":	1.2,
+												"filter_strength":	1.3,
 												"edgesofts":	1.5,
-												"ratio":	0.2,
+												"ratio":	0.8,
 												"weight":	0.85,
 												"hdr_dgain_scale_s":	0,
 												"hdr_dgain_scale_m":	0
@@ -2363,7 +2363,7 @@
 												"gauss_guide":	1,
 												"filter_strength":	1.5,
 												"edgesofts":	2,
-												"ratio":	0.18,
+												"ratio":	0.05,
 												"weight":	0.9,
 												"hdr_dgain_scale_s":	0,
 												"hdr_dgain_scale_m":	0
@@ -2804,7 +2804,7 @@
 												"global_pksq":	1024,
 												"hidif_th":	32767,
 												"lo_filter_strength":	0.6,
-												"hi_filter_strength":	0.8,
+												"hi_filter_strength":	0.9,
 												"soft_threshold_ratio":	0
 											}, {
 												"iso":	400,
@@ -2822,7 +2822,7 @@
 												"global_pksq":	1024,
 												"hidif_th":	32767,
 												"lo_filter_strength":	0.8,
-												"hi_filter_strength":	1.1,
+												"hi_filter_strength":	1.2,
 												"soft_threshold_ratio":	0
 											}, {
 												"iso":	800,
@@ -2858,7 +2858,7 @@
 												"global_pksq":	1024,
 												"hidif_th":	32767,
 												"lo_filter_strength":	0.85,
-												"hi_filter_strength":	1.2,
+												"hi_filter_strength":	1.3,
 												"soft_threshold_ratio":	0
 											}, {
 												"iso":	3200,
@@ -3415,7 +3415,7 @@
 												"base_filter_weight2":	0.46,
 												"base_filter_weight3":	0.26,
 												"high_thred_adj":	0.5,
-												"high_weight":	0.3,
+												"high_weight":	0.35,
 												"hi_min_adj":	0.9,
 												"hi_edge_thed":	100,
 												"high_direction_weight":	[1, 1, 1, 1, 0.5, 0.5, 0.5, 0.5],
@@ -3453,7 +3453,7 @@
 												"base_filter_weight2":	0.46,
 												"base_filter_weight3":	0.26,
 												"high_thred_adj":	0.6,
-												"high_weight":	0.3,
+												"high_weight":	0.35,
 												"hi_min_adj":	0.9,
 												"hi_edge_thed":	100,
 												"high_direction_weight":	[1, 1, 1, 1, 0.5, 0.5, 0.5, 0.5],
@@ -3476,8 +3476,8 @@
 													"hi_ratio":	[0.8, 0.9, 1, 1, 1, 1]
 												},
 												"low_bf1":	0.3,
-												"low_bf2":	0.35,
-												"low_thred_adj":	0.35,
+												"low_bf2":	0.4,
+												"low_thred_adj":	0.4,
 												"low_peak_supress":	0.5,
 												"low_edge_adj_thresh":	7,
 												"low_lbf_weight_thresh":	0.25,
@@ -3491,11 +3491,11 @@
 												"base_filter_weight2":	0.46,
 												"base_filter_weight3":	0.26,
 												"high_thred_adj":	0.5,
-												"high_weight":	0.33,
-												"hi_min_adj":	0.9,
+												"high_weight":	0.35,
+												"hi_min_adj":	0.85,
 												"hi_edge_thed":	100,
 												"high_direction_weight":	[1, 1, 1, 1, 0.5, 0.5, 0.5, 0.5],
-												"rnr_strength":	[1, 1, 1, 1, 1, 1, 1, 1, 1, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8]
+												"rnr_strength":	[1, 1, 1, 1, 1, 1, 1, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8, 1.9, 2]
 											}, {
 												"iso":	400,
 												"ynr_bft3x3_bypass":	0,
@@ -3529,11 +3529,11 @@
 												"base_filter_weight2":	0.46,
 												"base_filter_weight3":	0.26,
 												"high_thred_adj":	0.5,
-												"high_weight":	0.3,
+												"high_weight":	0.45,
 												"hi_min_adj":	0.8,
 												"hi_edge_thed":	100,
 												"high_direction_weight":	[1, 1, 1, 1, 0.5, 0.5, 0.5, 0.5],
-												"rnr_strength":	[1, 1, 1, 1, 1, 1, 1, 1, 1, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8]
+												"rnr_strength":	[1, 1, 1, 1, 1, 1, 1, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8, 1.9, 2]
 											}, {
 												"iso":	800,
 												"ynr_bft3x3_bypass":	0,
@@ -3567,11 +3567,11 @@
 												"base_filter_weight2":	0.46,
 												"base_filter_weight3":	0.26,
 												"high_thred_adj":	0.6,
-												"high_weight":	0.35,
+												"high_weight":	0.43,
 												"hi_min_adj":	0.8,
 												"hi_edge_thed":	100,
 												"high_direction_weight":	[1, 1, 1, 1, 0.5, 0.5, 0.5, 0.5],
-												"rnr_strength":	[1, 1, 1, 1, 1, 1, 1, 1, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8, 1.9]
+												"rnr_strength":	[1, 1, 1, 1, 1, 1, 1, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8, 1.9, 2]
 											}, {
 												"iso":	1600,
 												"ynr_bft3x3_bypass":	0,
@@ -3605,11 +3605,11 @@
 												"base_filter_weight2":	0.46,
 												"base_filter_weight3":	0.26,
 												"high_thred_adj":	0.5,
-												"high_weight":	0.3,
+												"high_weight":	0.5,
 												"hi_min_adj":	0.8,
 												"hi_edge_thed":	100,
 												"high_direction_weight":	[1, 1, 1, 1, 0.5, 0.5, 0.5, 0.5],
-												"rnr_strength":	[1, 1, 1, 1, 1, 1, 1, 1, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8, 1.9]
+												"rnr_strength":	[1, 1, 1, 1, 1, 1, 1, 1.1, 1.2, 1.4, 1.6, 1.7, 1.8, 1.9, 2.0, 2.1, 2.2]
 											}, {
 												"iso":	3200,
 												"ynr_bft3x3_bypass":	0,
@@ -3643,11 +3643,11 @@
 												"base_filter_weight2":	0.46,
 												"base_filter_weight3":	0.26,
 												"high_thred_adj":	0.6,
-												"high_weight":	0.55,
+												"high_weight":	0.6,
 												"hi_min_adj":	0.7,
 												"hi_edge_thed":	80,
 												"high_direction_weight":	[1, 1, 1, 1, 0.5, 0.5, 0.5, 0.5],
-												"rnr_strength":	[1, 1, 1, 1, 1, 1, 1, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8, 1.9, 2]
+												"rnr_strength":	[1, 1, 1, 1, 1, 1, 1, 1.1, 1.2, 1.4, 1.6, 1.7, 1.8, 1.9, 2.0, 2.1, 2.2]
 											}, {
 												"iso":	6400,
 												"ynr_bft3x3_bypass":	0,
@@ -4440,7 +4440,7 @@
 												"global_gain":	1,
 												"global_gain_alpha":	0,
 												"local_gain_scale":	1,
-												"gain_adj_strength_ratio":	[64, 64, 64, 64, 64, 60, 52, 48, 48, 48, 32, 32, 32],
+												"gain_adj_strength_ratio":	[64, 64, 64, 64, 64, 52, 48, 48, 48, 48, 32, 32, 32],
 												"color_sat_adj":	40,
 												"color_sat_adj_alpha":	0.8,
 												"hf_spikes_reducion_strength":	0.5,
@@ -4461,7 +4461,7 @@
 												"global_gain":	1,
 												"global_gain_alpha":	0,
 												"local_gain_scale":	1,
-												"gain_adj_strength_ratio":	[64, 64, 64, 64, 64, 60, 52, 48, 48, 48, 32, 32, 32],
+												"gain_adj_strength_ratio":	[64, 64, 64, 64, 54, 48, 48, 48, 48, 48, 32, 32, 32],
 												"color_sat_adj":	29.96,
 												"color_sat_adj_alpha":	0.48,
 												"hf_spikes_reducion_strength":	0.5,
@@ -4482,7 +4482,7 @@
 												"global_gain":	1,
 												"global_gain_alpha":	0,
 												"local_gain_scale":	1,
-												"gain_adj_strength_ratio":	[64, 64, 64, 64, 58, 56, 52, 48, 48, 32, 32, 32, 32],
+												"gain_adj_strength_ratio":	[64, 64, 64, 52, 48, 32, 32, 32, 32, 32, 32, 32, 32],
 												"color_sat_adj":	40,
 												"color_sat_adj_alpha":	0.8,
 												"hf_spikes_reducion_strength":	0.5,
@@ -4503,7 +4503,7 @@
 												"global_gain":	1,
 												"global_gain_alpha":	0,
 												"local_gain_scale":	1,
-												"gain_adj_strength_ratio":	[64, 64, 64, 64, 58, 56, 52, 48, 48, 32, 32, 32, 32],
+												"gain_adj_strength_ratio":	[64, 64, 64, 52, 48, 32, 32, 32, 32, 32, 32, 32, 32],
 												"color_sat_adj":	40,
 												"color_sat_adj_alpha":	0.8,
 												"hf_spikes_reducion_strength":	0.66,
@@ -4524,7 +4524,7 @@
 												"global_gain":	1,
 												"global_gain_alpha":	0,
 												"local_gain_scale":	1,
-												"gain_adj_strength_ratio":	[64, 64, 64, 64, 52, 36, 32, 28, 20, 16, 12, 8, 8],
+												"gain_adj_strength_ratio":	[64, 64, 64, 52, 48, 32, 32, 32, 32, 32, 32, 32, 32],
 												"color_sat_adj":	40,
 												"color_sat_adj_alpha":	0.8,
 												"hf_spikes_reducion_strength":	0.5,
@@ -4978,9 +4978,9 @@
 													"hfBilateralFilter_coeff":	[0.2042, 0.1238, 0.0751]
 												},
 												"kernel_sigma":	{
-													"prefilter_sigma":	1,
-													"hfBilateralFilter_sigma":	1,
-													"GaussianFilter_sigma":	2.5,
+													"prefilter_sigma":	0.7,
+													"hfBilateralFilter_sigma":	0.7,
+													"GaussianFilter_sigma":	1.3,
 													"GaussianFilter_radius":	2
 												}
 											}, {
@@ -5005,53 +5005,26 @@
 													"hfBilateralFilter_coeff":	[0.2042, 0.1238, 0.0751]
 												},
 												"kernel_sigma":	{
-													"prefilter_sigma":	1,
-													"hfBilateralFilter_sigma":	1,
-													"GaussianFilter_sigma":	2.5,
+													"prefilter_sigma":	0.7,
+													"hfBilateralFilter_sigma":	0.7,
+													"GaussianFilter_sigma":	1.3,
 													"GaussianFilter_radius":	2
 												}
 											}, {
 												"iso":	200,
 												"pbf_gain":	0.5,
-												"pbf_ratio":	0.3,
+												"pbf_ratio":	0.35,
 												"pbf_add":	0,
-												"gaus_ratio":	0.1,
+												"gaus_ratio":	0.35,
 												"sharp_ratio":	4,
 												"bf_gain":	0.5,
-												"bf_ratio":	0.3,
+												"bf_ratio":	0.35,
 												"bf_add":	0,
 												"luma_para":	{
 													"luma_point":	[0, 64, 128, 256, 384, 640, 896, 1024],
 													"luma_sigma":	[24, 32, 40, 48, 56, 48, 48, 40],
-													"hf_clip":	[25, 64, 88, 100, 100, 100, 70, 60],
-													"local_sharp_strength":	[32, 64, 120, 160, 200, 200, 150, 120]
-												},
-												"kernel_para":	{
-													"prefilter_coeff":	[0.2042, 0.1238, 0.0751],
-													"GaussianFilter_coeff":	[0.0632, 0.0558, 0.0492, 0.0383, 0.0338, 0.0232],
-													"hfBilateralFilter_coeff":	[0.2042, 0.1238, 0.0751]
-												},
-												"kernel_sigma":	{
-													"prefilter_sigma":	0.8,
-													"hfBilateralFilter_sigma":	0.8,
-													"GaussianFilter_sigma":	1.3,
-													"GaussianFilter_radius":	2
-												}
-											}, {
-												"iso":	400,
-												"pbf_gain":	0.5,
-												"pbf_ratio":	0.3,
-												"pbf_add":	0,
-												"gaus_ratio":	0,
-												"sharp_ratio":	4,
-												"bf_gain":	0.5,
-												"bf_ratio":	0.3,
-												"bf_add":	0,
-												"luma_para":	{
-													"luma_point":	[0, 64, 128, 256, 384, 640, 896, 1024],
-													"luma_sigma":	[32, 40, 48, 56, 56, 48, 32, 32],
-													"hf_clip":	[32, 64, 88, 100, 100, 100, 70, 64],
-													"local_sharp_strength":	[28, 64, 100, 160, 160, 160, 130, 120]
+													"hf_clip":	[0, 24, 42, 64, 90, 100, 85, 75],
+													"local_sharp_strength":	[16, 32, 64, 100, 120, 160, 160, 160]
 												},
 												"kernel_para":	{
 													"prefilter_coeff":	[0.2042, 0.1238, 0.0751],
@@ -5061,24 +5034,51 @@
 												"kernel_sigma":	{
 													"prefilter_sigma":	0.7,
 													"hfBilateralFilter_sigma":	0.7,
-													"GaussianFilter_sigma":	1.5,
+													"GaussianFilter_sigma":	1.3,
+													"GaussianFilter_radius":	2
+												}
+											}, {
+												"iso":	400,
+												"pbf_gain":	0.5,
+												"pbf_ratio":	0.35,
+												"pbf_add":	0,
+												"gaus_ratio":	0.35,
+												"sharp_ratio":	4,
+												"bf_gain":	0.5,
+												"bf_ratio":	0.4,
+												"bf_add":	0,
+												"luma_para":	{
+													"luma_point":	[0, 64, 128, 256, 384, 640, 896, 1024],
+													"luma_sigma":	[32, 40, 48, 56, 56, 48, 32, 32],
+													"hf_clip":	[0, 16, 32, 64, 80, 100, 80, 70],
+													"local_sharp_strength":	[24, 32, 32, 64, 80, 100, 100, 100]
+												},
+												"kernel_para":	{
+													"prefilter_coeff":	[0.2042, 0.1238, 0.0751],
+													"GaussianFilter_coeff":	[0.0632, 0.0558, 0.0492, 0.0383, 0.0338, 0.0232],
+													"hfBilateralFilter_coeff":	[0.2042, 0.1238, 0.0751]
+												},
+												"kernel_sigma":	{
+													"prefilter_sigma":	0.7,
+													"hfBilateralFilter_sigma":	0.7,
+													"GaussianFilter_sigma":	1.4,
 													"GaussianFilter_radius":	2
 												}
 											}, {
 												"iso":	800,
 												"pbf_gain":	0.5,
-												"pbf_ratio":	0.3,
+												"pbf_ratio":	0.35,
 												"pbf_add":	0,
-												"gaus_ratio":	0.35,
+												"gaus_ratio":	0.4,
 												"sharp_ratio":	4,
 												"bf_gain":	0.5,
-												"bf_ratio":	0.35,
+												"bf_ratio":	0.4,
 												"bf_add":	0,
 												"luma_para":	{
 													"luma_point":	[0, 64, 128, 256, 384, 640, 896, 1024],
-													"luma_sigma":	[40, 48, 56, 56, 48, 40, 32, 32],
-													"hf_clip":	[16, 45, 85, 100, 100, 100, 80, 60],
-													"local_sharp_strength":	[32, 64, 100, 140, 140, 140, 120, 100]
+													"luma_sigma":	[40, 48, 56, 56, 48, 42, 36, 32],
+													"hf_clip":	[0, 12, 24, 50, 70, 100, 80, 75],
+													"local_sharp_strength":	[0, 24, 32, 64, 80, 120, 120, 120]
 												},
 												"kernel_para":	{
 													"prefilter_coeff":	[0.2042, 0.1238, 0.0751],
@@ -5094,18 +5094,18 @@
 											}, {
 												"iso":	1600,
 												"pbf_gain":	0.5,
-												"pbf_ratio":	0.35,
+												"pbf_ratio":	0.4,
 												"pbf_add":	0,
 												"gaus_ratio":	0.5,
 												"sharp_ratio":	3,
 												"bf_gain":	0.5,
-												"bf_ratio":	0.35,
+												"bf_ratio":	0.4,
 												"bf_add":	0,
 												"luma_para":	{
 													"luma_point":	[0, 64, 128, 256, 384, 640, 896, 1024],
 													"luma_sigma":	[40, 48, 56, 56, 48, 40, 36, 32],
-													"hf_clip":	[8, 32, 50, 80, 80, 80, 60, 50],
-													"local_sharp_strength":	[0, 32, 64, 100, 150, 150, 100, 100]
+													"hf_clip":	[0, 12, 24, 50, 80, 80, 60, 50],
+													"local_sharp_strength":	[0, 16, 48, 100, 150, 150, 100, 100]
 												},
 												"kernel_para":	{
 													"prefilter_coeff":	[0.2042, 0.1238, 0.0751],
@@ -5121,18 +5121,18 @@
 											}, {
 												"iso":	3200,
 												"pbf_gain":	0.5,
-												"pbf_ratio":	0.5,
+												"pbf_ratio":	0.55,
 												"pbf_add":	0,
 												"gaus_ratio":	0.5,
-												"sharp_ratio":	2.5,
+												"sharp_ratio":	2,
 												"bf_gain":	0.6,
-												"bf_ratio":	0.6,
+												"bf_ratio":	0.65,
 												"bf_add":	0,
 												"luma_para":	{
 													"luma_point":	[0, 64, 128, 256, 384, 640, 896, 1024],
 													"luma_sigma":	[40, 48, 56, 56, 48, 40, 32, 32],
-													"hf_clip":	[8, 28, 55, 64, 64, 64, 60, 50],
-													"local_sharp_strength":	[0, 24, 64, 80, 80, 80, 80, 80]
+													"hf_clip":	[0, 8, 20, 48, 58, 64, 60, 50],
+													"local_sharp_strength":	[0, 16, 24, 48, 64, 80, 80, 80]
 												},
 												"kernel_para":	{
 													"prefilter_coeff":	[0.2042, 0.1238, 0.0751],
@@ -5794,8 +5794,8 @@
 									"SearchPauseLumaThers":	0.04,
 									"SearchLumaStableFrames":	3,
 									"SearchLumaStableThers":	0.02,
-									"Stage1QuickFoundThers":	0.04,
-									"Stage2QuickFoundThers":	0.2,
+									"Stage1QuickFoundThers":	0.01,
+									"Stage2QuickFoundThers":	0.08,
 									"FlatValue":	0,
 									"PointLightLumaTh":	912,
 									"PointLightCntTh":	20,
@@ -5814,10 +5814,10 @@
 										"StopStep_len":	1,
 										"SkipHighPassZoomIdx":	0,
 										"SkipHighPassGain":	0,
-										"SwitchDirZoomIdx":	0,
+										"SpotlightBlkCnt":	[0.2, 0.5, 0.25],
 										"SpotlightHighlightRatio":	0,
 										"SpotlightLumaRatio":	[0.3, 0.5, 0.8],
-										"SpotlightBlkCnt":	[0.2, 0.5, 0.25]
+										"SwitchDirZoomIdx":	0
 									}
 								},
 								"video_contrast_af":	{
@@ -5828,7 +5828,7 @@
 									"AdaptiveDir":	"CalibDbV2_CAM_AFM_ADAPTIVE_SEARCH",
 									"AdaptRangeTbl":	[0, 16, 32, 48, 64, 80, 96, 112, 128],
 									"AdaptRangeTbl_len":	9,
-									"FineSearchStep":	[8, 8, 8, 8, 8, 8, 8, 8, 8],
+									"FineSearchStep":	[128, 128, 128, 128, 128, 128, 128, 128, 128],
 									"FineSearchStep_len":	9,
 									"SkipCurveFitGain":	1,
 									"TrigThers":	[0.12],
@@ -5856,7 +5856,7 @@
 									"SearchLumaStableFrames":	3,
 									"SearchLumaStableThers":	0.02,
 									"Stage1QuickFoundThers":	0.04,
-									"Stage2QuickFoundThers":	0.2,
+									"Stage2QuickFoundThers":	0.08,
 									"FlatValue":	0,
 									"PointLightLumaTh":	912,
 									"PointLightCntTh":	20,
@@ -5875,10 +5875,10 @@
 										"StopStep_len":	1,
 										"SkipHighPassZoomIdx":	0,
 										"SkipHighPassGain":	0,
-										"SwitchDirZoomIdx":	0,
+										"SpotlightBlkCnt":	[0.2, 0.5, 0.25],
 										"SpotlightHighlightRatio":	0,
 										"SpotlightLumaRatio":	[0.3, 0.5, 0.8],
-										"SpotlightBlkCnt":	[0.2, 0.5, 0.25]
+										"SwitchDirZoomIdx":	0
 									}
 								},
 								"laser_af":	{
@@ -5899,7 +5899,7 @@
 									"pdLRInDiffLine":	1,
 									"pdWidth":	508,
 									"pdHeight":	1528,
-									"pdVerBinning":	1,
+									"pdVerBinning":	17,
 									"pdFrmInValid":	0,
 									"pdDgainValid":	0,
 									"pdGainMapNormEn":	0,
@@ -5911,7 +5911,7 @@
 									"pdSatCntRatio":	0.06,
 									"pdDiscardRegionEn":	0,
 									"pdLessTextureRatio":	0.25,
-									"pdCalibInf":	{
+									"pdCalibInf": {
 										"pdGainMapW":	32,
 										"pdGainMapH":	64,
 										"pdDccMapW":	64,
@@ -5921,13 +5921,15 @@
 									"pdCenterMinFv":	0,
 									"pdCenterMinRatio":	0,
 									"pdHighlightRatio":	0.5,
-									"pdStepRatio":	[1, 1, 1, 0.9, 0.8, 0.7, 0.7],
-									"pdStepDefocus":	[32, 64, 96, 128, 160, 192, 224],
-									"pdIsoPara":	[{
-											"iso":	1600,
-											"pdConfdRatio0":	5,
+									"pdStepRatio":	[1.0, 0.8, 0.8, 0.8, 0.8, 0.7, 0.7],
+									"pdStepDefocus":	[16, 32, 64, 96, 128, 160, 192],
+									"pdIsoPara":
+									[
+										{
+											"iso": 1600,
+											"pdConfdRatio0":	15,
 											"pdConfdRatio1":	1,
-											"pdConfdRatio2":	1,
+											"pdConfdRatio2":	3,
 											"pdConfdRatio3":	0,
 											"pdConfdThresh":	0.4,
 											"convergedInfPdThresh":	6,
@@ -5937,24 +5939,25 @@
 											"stablePdRatio":	0.125,
 											"stablePdOffset":	8,
 											"stableCntRatio":	1.5,
-											"noconfCntThresh":	15,
-											"roiBlkCntW":	3,
-											"roiBlkCntH":	3,
+											"noconfCntThresh":	5,
+											"roiBlkCntW":		3,
+											"roiBlkCntH":		3,
 											"fineSearchTbl":	[{
-													"confidence":	0.5,
-													"range":	0,
-													"stepPos":	8
-												}, {
-													"confidence":	0,
-													"range":	24,
-													"stepPos":	8
-												}],
+												"confidence":	0.5,
+												"range":	24,
+												"stepPos":	8
+											}, {
+												"confidence":	0,
+												"range":	24,
+												"stepPos":	8
+											}],
 											"fineSearchTbl_len":	2
-										}, {
-											"iso":	3200,
-											"pdConfdRatio0":	5,
+										},
+										{
+											"iso": 3200,
+											"pdConfdRatio0":	15,
 											"pdConfdRatio1":	1,
-											"pdConfdRatio2":	1,
+											"pdConfdRatio2":	3,
 											"pdConfdRatio3":	0,
 											"pdConfdThresh":	0.4,
 											"convergedInfPdThresh":	6,
@@ -5964,24 +5967,25 @@
 											"stablePdRatio":	0.125,
 											"stablePdOffset":	8,
 											"stableCntRatio":	1.5,
-											"noconfCntThresh":	15,
-											"roiBlkCntW":	3,
-											"roiBlkCntH":	3,
+											"noconfCntThresh":	5,
+											"roiBlkCntW":		3,
+											"roiBlkCntH":		3,
 											"fineSearchTbl":	[{
-													"confidence":	0.5,
-													"range":	24,
-													"stepPos":	8
-												}, {
-													"confidence":	0,
-													"range":	24,
-													"stepPos":	8
-												}],
+												"confidence":	0.5,
+												"range":	24,
+												"stepPos":	8
+											}, {
+												"confidence":	0,
+												"range":	24,
+												"stepPos":	8
+											}],
 											"fineSearchTbl_len":	2
-										}, {
-											"iso":	204800,
-											"pdConfdRatio0":	1,
+										},
+										{
+											"iso": 204800,
+											"pdConfdRatio0":	15,
 											"pdConfdRatio1":	1,
-											"pdConfdRatio2":	1,
+											"pdConfdRatio2":	3,
 											"pdConfdRatio3":	0,
 											"pdConfdThresh":	0.4,
 											"convergedInfPdThresh":	12,
@@ -5991,20 +5995,21 @@
 											"stablePdRatio":	0.125,
 											"stablePdOffset":	8,
 											"stableCntRatio":	1.5,
-											"noconfCntThresh":	15,
-											"roiBlkCntW":	1,
-											"roiBlkCntH":	1,
+											"noconfCntThresh":	5,
+											"roiBlkCntW":		1,
+											"roiBlkCntH":		1,
 											"fineSearchTbl":	[{
-													"confidence":	0.5,
-													"range":	24,
-													"stepPos":	8
-												}, {
-													"confidence":	0,
-													"range":	24,
-													"stepPos":	8
-												}],
+												"confidence":	0.5,
+												"range":	24,
+												"stepPos":	8
+											}, {
+												"confidence":	0,
+												"range":	24,
+												"stepPos":	8
+											}],
 											"fineSearchTbl_len":	2
-										}],
+										}
+									],
 									"pdIsoPara_len":	3
 								},
 								"vcmcfg":	{
@@ -6013,7 +6018,7 @@
 									"rated_current":	-1,
 									"step_mode":	-1,
 									"extra_delay":	-25,
-									"posture_diff":	0.1
+									"posture_diff":	0.2
 								},
 								"zoomfocus_tbl":	{
 									"widemod_deviate":	10,
@@ -6115,8 +6120,6 @@
 										"tbl_idx":	0,
 										"afmThres":	4,
 										"gammaY":	[0, 45, 108, 179, 245, 344, 409, 459, 500, 567, 622, 676, 759, 833, 896, 962, 1023],
-										"v1fv_reliable":	0,
-										"v2fv_reliable":	0,
 										"v1_fir_sel":	1,
 										"v1_band":	[0.1, 0.175],
 										"v1_iir_coe":	[0, 45, 0, 0, 63, 0, 0, 64, 0],
@@ -6146,26 +6149,26 @@
 										"v_fv_thresh":	4,
 										"h_fv_thresh":	4,
 										"highlit_thresh":	912,
+										"v1fv_reliable":	0,
+										"v2fv_reliable":	0,
 										"v_fv_ratio":	0.5
 									}, {
 										"tbl_idx":	1,
 										"afmThres":	4,
 										"gammaY":	[0, 45, 108, 179, 245, 344, 409, 459, 500, 567, 622, 676, 759, 833, 896, 962, 1023],
-										"v1fv_reliable":	0,
-										"v2fv_reliable":	0,
 										"v1_fir_sel":	1,
-										"v1_band":	[0.042, 0.14],
-										"v1_iir_coe":	[0, 483, 0, 0, 28, 0, 0, 28, 0],
-										"v1_fir_coe":	[-1186, 0, 1186],
-										"v2_band":	[0.042, 0.14],
-										"v2_iir_coe":	[483, 28, 28],
-										"v2_fir_coe":	[-1186, 0, 1186],
-										"h1_band":	[0.042, 0.14],
-										"h1_iir1_coe":	[512, 557, -276, 460, 0, -460],
-										"h1_iir2_coe":	[100, 870, -399, 191, 0, -191],
-										"h2_band":	[0.042, 0.14],
-										"h2_iir1_coe":	[512, 557, -276, 460, 0, -460],
-										"h2_iir2_coe":	[100, 870, -399, 191, 0, -191],
+										"v1_band":	[0.04, 0.1],
+										"v1_iir_coe":	[0, 495, 0, 0, 16, 0, 0, 17, 0],
+										"v1_fir_coe":	[-1990,     0,  1990],
+										"v2_band":	[0.04, 0.1],
+										"v2_iir_coe":	[  495,    16,    17],
+										"v2_fir_coe":	[-1990,     0,  1990],
+										"h1_band":	[0.04, 0.1],
+										"h1_iir1_coe":	[   304,   737,  -360,   498,     0,  -498 ],
+										"h1_iir2_coe":	[    61,   902,  -427,   209,     0,  -209 ],
+										"h2_band":	[0.04, 0.1],
+										"h2_iir1_coe":	[   304,   737,  -360,   498,     0,  -498 ],
+										"h2_iir2_coe":	[    61,   902,  -427,   209,     0,  -209 ],
 										"ldg_en":	0,
 										"ve_ldg_lumth_l":	64,
 										"ve_ldg_gain_l":	28,
@@ -6182,6 +6185,8 @@
 										"v_fv_thresh":	4,
 										"h_fv_thresh":	4,
 										"highlit_thresh":	912,
+										"v1fv_reliable":	0,
+										"v2fv_reliable":	0,
 										"v_fv_ratio":	0.5
 									}],
 								"meascfg_tbl_len":	2
