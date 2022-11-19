@@ -214,6 +214,7 @@ protected:
     struct rkispp_params_cfg _full_active_ispp_params;
     uint32_t _ispp_module_init_ens;
     SmartPtr<V4l2SubDevice> _ispp_sd;
+    uint64_t _module_cfg_update_frome_drv;
     SmartPtr<V4l2SubDevice> _cif_csi2_sd;
     char sns_name[32];
     static std::map<std::string, SmartPtr<rk_aiq_static_info_t>> mCamHwInfos;
