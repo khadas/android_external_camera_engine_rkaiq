@@ -98,13 +98,13 @@ prepare(RkAiqAlgoCom* params)
         pAbayernrCtx->isIQParaUpdate = true;
         pAbayernrCtx->isReCalculate |= 1;
     }
-    pAbayernrCtx->width = params->u.prepare.sns_op_width;
+
     Abayer2dnr_result_V2_t ret = Abayer2dnr_Prepare_V2(pAbayernrCtx, &pCfgParam->stArawnrConfig);
     if(ret != ABAYER2DNR_RET_SUCCESS) {
         result = XCAM_RETURN_ERROR_FAILED;
         LOGE_ANR("%s: config ANR failed (%d)\n", __FUNCTION__, ret);
     }
-    
+
     LOGI_ANR("%s: (exit)\n", __FUNCTION__ );
     return result;
 }
@@ -268,10 +268,7 @@ processing(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outparams)
     if(delta_iso > ABAYER2DNRV2_RECALCULATE_DELTA_ISO) {
         pAbayernrCtx->isReCalculate |= 1;
     }
-    // TODO: temp for 8k picture
-    stExpInfo.snr_mode = pAbayernrCtx->width > 4096 ? 1 : 0;
-    if (stExpInfo.snr_mode != pAbayernrCtx->stExpInfo.snr_mode)
-        pAbayernrCtx->isReCalculate |= 1;
+
     if(pAbayernrCtx->isReCalculate) {
         Abayer2dnr_result_V2_t ret = Abayer2dnr_Process_V2(pAbayernrCtx, &stExpInfo);
         if(ret != ABAYER2DNR_RET_SUCCESS) {

@@ -54,7 +54,6 @@ typedef struct Asharp_Context_V4_s {
     CalibDbV2_SharpV4_t sharp_v4;
 
     int isReCalculate;
-    int width;
 } Asharp_Context_V4_t;
 
 

@@ -94,7 +94,6 @@ prepare(RkAiqAlgoCom* params)
         pAsharpCtx->isReCalculate |= 1;
     }
 
-    pAsharpCtx->width = params->u.prepare.sns_op_width;
     Asharp4_result_t ret = Asharp_Prepare_V4(pAsharpCtx, &pCfgParam->stAsharpConfig);
     if(ret != ASHARP4_RET_SUCCESS) {
         result = XCAM_RETURN_ERROR_FAILED;
@@ -265,10 +264,6 @@ processing(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outparams)
         pAsharpCtx->isReCalculate |= 1;
     }
 
-    // TODO: temp for 8k picture
-    stExpInfo.snr_mode = pAsharpCtx->width > 4096 ? 1 : 0;
-    if (stExpInfo.snr_mode != pAsharpCtx->stExpInfo.snr_mode)
-        pAsharpCtx->isReCalculate |= 1;
     if(pAsharpCtx->isReCalculate) {
         Asharp4_result_t ret = Asharp_Process_V4(pAsharpCtx, &stExpInfo);
         if(ret != ASHARP4_RET_SUCCESS) {
