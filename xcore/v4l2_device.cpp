@@ -526,8 +526,13 @@ V4l2Device::prepare ()
     XCAM_FAIL_RETURN (
         ERROR, ret == XCAM_RETURN_NO_ERROR, ret,
         "device(%s) start failed", XCAM_STR (_name));
+#ifndef USE_RAWSTREAM_LIB
     if (!V4L2_TYPE_IS_OUTPUT(_buf_type) &&
             (_buf_type != V4L2_BUF_TYPE_META_OUTPUT)) {
+#else
+    if (!V4L2_TYPE_IS_OUTPUT(_buf_type) && (_memory_type != V4L2_MEMORY_DMABUF) &&
+            (_buf_type != V4L2_BUF_TYPE_META_OUTPUT)) {
+#endif
         //queue all buffers
         for (uint32_t i = 0; i < _buf_count; ++i) {
             SmartPtr<V4l2Buffer> &buf = _buf_pool [i];
