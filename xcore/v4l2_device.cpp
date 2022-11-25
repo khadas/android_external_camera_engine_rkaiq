@@ -709,6 +709,31 @@ V4l2Device::start (bool prepared)
 }
 
 XCamReturn
+V4l2Device::stop_streamoff ()
+{
+    SmartLock auto_lock(_buf_mutex);
+    XCAM_LOG_INFO ("device(%s) stop stream off", XCAM_STR (_name));
+    // stream off
+    if (_active) {
+        if (io_control (VIDIOC_STREAMOFF, &_buf_type) < 0) {
+            XCAM_LOG_WARNING ("device(%s) steamoff failed", XCAM_STR (_name));
+        }
+        _active = false;
+    }
+    return XCAM_RETURN_NO_ERROR;
+}
+
+XCamReturn
+V4l2Device::stop_freebuffer ()
+{
+    SmartLock auto_lock(_buf_mutex);
+    XCAM_LOG_INFO ("device(%s) stop free buffer", XCAM_STR (_name));
+    if (_buf_pool.size() > 0)
+        fini_buffer_pool ();
+    return XCAM_RETURN_NO_ERROR;
+}
+
+XCamReturn
 V4l2Device::stop ()
 {
     SmartLock auto_lock(_buf_mutex);
