@@ -434,6 +434,7 @@ CamHwIsp3x::setIspConfig()
         }
 
         ispModuleEns = _full_active_isp3x_params.module_ens;
+        _curIspParamsSeq = frameId;
         LOGD_CAMHW_SUBM(ISP20HW_SUBM, "camId: %d, frameId:%d, ispparam ens 0x%llx, en_up 0x%llx, cfg_up 0x%llx",
                          mCamPhyId, frameId,
                         _full_active_isp3x_params.module_ens,

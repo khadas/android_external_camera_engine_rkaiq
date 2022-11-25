@@ -112,6 +112,7 @@ CamHwIsp20::CamHwIsp20()
     mIsMain = false;
     _isp_stream_status = ISP_STREAM_STATUS_INVALID;
     _module_cfg_update_frome_drv = 0;
+    _curIspParamsSeq = 0;
 }
 
 CamHwIsp20::~CamHwIsp20()
@@ -5855,6 +5856,7 @@ CamHwIsp20::setIspConfig()
         }
 
         ispModuleEns = _full_active_isp_params.module_ens;
+        _curIspParamsSeq = frameId;
         LOGD_CAMHW_SUBM(ISP20HW_SUBM, "ispparam ens 0x%llx, en_up 0x%llx, cfg_up 0x%llx",
                         _full_active_isp_params.module_ens,
                         isp_params->module_en_update,
@@ -6090,6 +6092,17 @@ CamHwIsp20::rawReproc_genIspParams (uint32_t sequence, rk_aiq_frame_info_t *offl
             mIspSofStream->new_video_buffer(event, NULL);
 
         CamHwBase::poll_buffer_ready(buf);
+    } else {
+       // wait until params of frame index 'sequence' have been done
+        int8_t wait_times = 100;
+        while ((sequence > _curIspParamsSeq) && (wait_times-- > 0)) {
+            usleep(10 * 1000);
+        }
+        if (wait_times == 0) {
+            LOGE_CAMHW_SUBM(ISP20HW_SUBM, "wait params %d(cur:%d) done over 1 seconds !", sequence, _curIspParamsSeq);
+        } else {
+            LOGI_CAMHW_SUBM(ISP20HW_SUBM, "wait params %d(cur:%d) success !", sequence, _curIspParamsSeq);
+        }
     }
 
     return XCAM_RETURN_NO_ERROR;

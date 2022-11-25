@@ -367,6 +367,7 @@ protected:
     XCam::Cond      _sync_done_cond;
     XCamReturn      waitLastSensorDone();
     XCamReturn pixFmt2Bpp(uint32_t pixFmt, int8_t& bpp);
+    uint32_t _curIspParamsSeq;
 };
 
 };
