@@ -373,3 +373,10 @@ rk_aiq_uapi2_sysctl_rawReproc_preInit(const char* isp_driver,
     }
     return sns_name;
 }
+
+void rk_aiq_uapi2_sysctl_setIspParamsDelayCnts(const rk_aiq_sys_ctx_t* sys_ctx, int8_t delay_cnts) {
+#ifdef RKAIQ_ENABLE_CAMGROUP
+    // TODO
+#endif
+    sys_ctx->_analyzer->setDelayCnts(delay_cnts);
+}

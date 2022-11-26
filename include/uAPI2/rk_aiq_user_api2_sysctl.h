@@ -474,7 +474,15 @@ const char*
 rk_aiq_uapi2_sysctl_rawReproc_preInit(const char* isp_driver,
                                       const char* offline_sns_name,
                                       rk_aiq_frame_info_t two_frm_exp_info[2]);
+/**
+ * @brief set user delay counts of params related to stats 
+ *
+ * \param[in] sys_ctx             the context returned by \ref rk_aiq_uapi2_sysctl_init
+ * \param[in] delay_cnts          params calculated from stats n will be applyed to frame n+delay_cnts.
+ *                                Can set INT8_MAX to restore the old delay counts.
+ */
 
+void rk_aiq_uapi2_sysctl_setIspParamsDelayCnts(const rk_aiq_sys_ctx_t* sys_ctx, int8_t delay_cnts);
 
 RKAIQ_END_DECLARE
 
