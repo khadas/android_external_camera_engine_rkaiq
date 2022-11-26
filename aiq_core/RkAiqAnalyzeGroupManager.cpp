@@ -29,6 +29,7 @@ RkAiqAnalyzerGroup::RkAiqAnalyzerGroup(RkAiqCore* aiqCore, enum rk_aiq_core_anal
                                        const uint64_t flag, const RkAiqGrpConditions_t* grpConds,
                                        const bool singleThrd)
     : mAiqCore(aiqCore), mGroupType(type), mDepsFlag(flag) {
+    mUserSetDelayCnts = INT8_MAX;
     if (grpConds)
         mGrpConds = *grpConds;
     if (!singleThrd) {
@@ -91,16 +92,25 @@ bool RkAiqAnalyzerGroup::pushMsg(const SmartPtr<XCamMessage>& msg) {
 }
 
 int8_t RkAiqAnalyzerGroup::getMsgDelayCnt(XCamMessageType &msg_id) {
-    uint32_t i = 0, delayCnt = 0;
+    uint32_t i = 0;
+    int8_t delayCnt = 0;
     for (i = 0; i < mGrpConds.size; i++) {
-        if (mGrpConds.conds[i].cond == msg_id)
-           return mGrpConds.conds[i].delay;
+        if (mGrpConds.conds[i].cond == msg_id) {
+            delayCnt = mGrpConds.conds[i].delay;
+            if (delayCnt != 0 && mUserSetDelayCnts != INT8_MAX)
+                delayCnt = mUserSetDelayCnts;
+           return delayCnt;
+        }
     }
 
     if (i == mGrpConds.size)
         LOGE_ANALYZER_SUBM(ANALYZER_SUBM, "don't match msgId(0x%x) in mGrpConds", msg_id);
 
     return 0;
+}
+
+void RkAiqAnalyzerGroup::setDelayCnts(int8_t delayCnts) {
+    mUserSetDelayCnts = delayCnts;
 }
 
 XCamReturn RkAiqAnalyzerGroup::msgHandle(const SmartPtr<XCamMessage>& msg) {
@@ -522,6 +532,12 @@ XCamReturn RkAiqAnalyzeGroupManager::handleMessage(const SmartPtr<XCamMessage> &
         }
     }
     return XCAM_RETURN_NO_ERROR;
+}
+
+void RkAiqAnalyzeGroupManager::setDelayCnts(int delayCnts) {
+    for (auto& it : mGroupMap) {
+        it.second->setDelayCnts(delayCnts);
+    }
 }
 
 };  // namespace RkCam

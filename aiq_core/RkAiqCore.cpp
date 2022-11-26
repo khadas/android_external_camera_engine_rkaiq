@@ -3209,4 +3209,8 @@ XCamReturn RkAiqCore::waitUpdateDone()
     return XCamReturn();
 }
 
+void RkAiqCore::setDelayCnts(int8_t delayCnts) {
+    mRkAiqCoreGroupManager->setDelayCnts(delayCnts);
+}
+
 } //namespace RkCam

@@ -454,6 +454,7 @@ public:
 
     XCamReturn updateCalib(enum rk_aiq_core_analyze_type_e type);
     XCamReturn updateCalibDbBrutal(CamCalibDbV2Context_t* aiqCalib);
+    void setDelayCnts(int8_t delayCnts);
 
 protected:
     // in analyzer thread
