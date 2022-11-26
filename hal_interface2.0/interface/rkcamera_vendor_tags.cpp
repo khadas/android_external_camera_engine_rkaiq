@@ -159,16 +159,16 @@ void RkCamera3VendorTags::get_all_tags(
                 uint32_t *g_array)
 {
     int section;
-    unsigned int start, end, tag;
+    uint32_t start, end, tag;
 
     if (ops != Ops || g_array == NULL) return;
     for (section = 0; section < RKCAMERA3_EXT_SECTION_COUNT; section++) {
         start = rkcamera3_ext3_section_bounds[section][0];
         end = rkcamera3_ext3_section_bounds[section][1];
-        LOGD("section:%d,start:%d,end:%d",section,start,end);
+        LOGD("section:%d,start:%u,end:%u",section,start,end);
         for (tag = start; tag < end; tag++) {
             *g_array++ = tag;
-            LOGD("g_array[%d] is %d",tag, g_array[tag]);
+            LOGD("g_array[%u] is %u",tag - start, g_array[tag - start]);
         }
     }
 }
@@ -203,7 +203,7 @@ const char* RkCamera3VendorTags::get_section_name(
         ret = rkcamera3_ext_section_names[tag_section];
 
     if (ret)
-        LOGD("section_name[%d] is %s", tag, ret);
+        LOGD("section_name[%u] is %s", tag, ret);
     LOGD("X");
     return ret;
 }
@@ -240,7 +240,7 @@ const char* RkCamera3VendorTags::get_tag_name(
         ret = rkcamera3_tag_info[tag_section][tag_index].tag_name;
 
     if (ret)
-        LOGD("tag name for tag %d is %s", tag, ret);
+        LOGD("tag name for tag %u is %s", tag, ret);
 
 done:
     LOGD("X");
