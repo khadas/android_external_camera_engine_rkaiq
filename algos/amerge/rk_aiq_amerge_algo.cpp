@@ -1218,102 +1218,109 @@ bool AmergeByPassProcessing
 )
 {
     LOG1_AMERGE("%s:enter!\n", __FUNCTION__);
-
     bool bypass = false;
-    float diff = 0.0;
 
-    // get envlv from AecPreRes
-    AmergeGetEnvLv(pAmergeCtx, AecHdrPreResult);
-    pAmergeCtx->CurrData.CtrlData.EnvLv =
-        LIMIT_VALUE(pAmergeCtx->CurrData.CtrlData.EnvLv, ENVLVMAX, ENVLVMIN);
+    if (!pAmergeCtx->isCapture) {
+        float diff = 0.0;
 
-    pAmergeCtx->CurrData.CtrlData.MoveCoef = MOVE_COEF_DEFAULT;
-    pAmergeCtx->CurrData.CtrlData.MoveCoef =
-        LIMIT_VALUE(pAmergeCtx->CurrData.CtrlData.MoveCoef, MOVECOEFMAX, MOVECOEFMIN);
+        // get envlv from AecPreRes
+        AmergeGetEnvLv(pAmergeCtx, AecHdrPreResult);
+        pAmergeCtx->CurrData.CtrlData.EnvLv =
+            LIMIT_VALUE(pAmergeCtx->CurrData.CtrlData.EnvLv, ENVLVMAX, ENVLVMIN);
 
-    merge_OpModeV21_t ApiMode = MERGE_OPMODE_API_OFF;
-    if(CHECK_ISP_HW_V21())
-        ApiMode = pAmergeCtx->mergeAttr.attrV21.opMode;
-    else if(CHECK_ISP_HW_V30())
-        ApiMode = pAmergeCtx->mergeAttr.attrV30.opMode;
+        pAmergeCtx->CurrData.CtrlData.MoveCoef = MOVE_COEF_DEFAULT;
+        pAmergeCtx->CurrData.CtrlData.MoveCoef =
+            LIMIT_VALUE(pAmergeCtx->CurrData.CtrlData.MoveCoef, MOVECOEFMAX, MOVECOEFMIN);
 
-    if(pAmergeCtx->frameCnt <= 2) //start frame
-        bypass = false;
-    else if(ApiMode > MERGE_OPMODE_API_OFF)//api
-        bypass = false;
-    else if(ApiMode != pAmergeCtx->PrevData.CtrlData.ApiMode)//api change
-        bypass = false;
-    else {
-        float ByPassThr = 0.0;
-        if(CHECK_ISP_HW_V21()) {
-            pAmergeCtx->CurrData.HandleData.Merge_v20.MergeMode = pAmergeCtx->FrameNumber - 1;
-            LOG1_AMERGE("%s:  Current MergeMode: %d \n", __FUNCTION__, pAmergeCtx->CurrData.HandleData.Merge_v20.MergeMode);
-            ByPassThr = pAmergeCtx->Config.Merge_v20.ByPassThr;
-            if (pAmergeCtx->Config.Merge_v20.CtrlDataType == CTRLDATATYPE_ENVLV) {
-                diff = pAmergeCtx->PrevData.CtrlData.EnvLv - pAmergeCtx->CurrData.CtrlData.EnvLv;
-                if (pAmergeCtx->PrevData.CtrlData.EnvLv == 0.0) {
-                    diff = pAmergeCtx->CurrData.CtrlData.EnvLv;
-                    if (diff == 0.0)
-                        bypass = true;
-                    else
-                        bypass = false;
-                } else {
-                    diff /= pAmergeCtx->PrevData.CtrlData.EnvLv;
+        merge_OpModeV21_t ApiMode = MERGE_OPMODE_API_OFF;
+        if (CHECK_ISP_HW_V21())
+            ApiMode = pAmergeCtx->mergeAttr.attrV21.opMode;
+        else if (CHECK_ISP_HW_V30())
+            ApiMode = pAmergeCtx->mergeAttr.attrV30.opMode;
+
+        if (pAmergeCtx->frameCnt <= 2)  // start frame
+            bypass = false;
+        else if (ApiMode > MERGE_OPMODE_API_OFF)  // api
+            bypass = false;
+        else if (ApiMode != pAmergeCtx->PrevData.CtrlData.ApiMode)  // api change
+            bypass = false;
+        else {
+            float ByPassThr = 0.0;
+            if (CHECK_ISP_HW_V21()) {
+                pAmergeCtx->CurrData.HandleData.Merge_v20.MergeMode = pAmergeCtx->FrameNumber - 1;
+                LOG1_AMERGE("%s:  Current MergeMode: %d \n", __FUNCTION__,
+                            pAmergeCtx->CurrData.HandleData.Merge_v20.MergeMode);
+                ByPassThr = pAmergeCtx->Config.Merge_v20.ByPassThr;
+                if (pAmergeCtx->Config.Merge_v20.CtrlDataType == CTRLDATATYPE_ENVLV) {
+                    diff =
+                        pAmergeCtx->PrevData.CtrlData.EnvLv - pAmergeCtx->CurrData.CtrlData.EnvLv;
+                    if (pAmergeCtx->PrevData.CtrlData.EnvLv == 0.0) {
+                        diff = pAmergeCtx->CurrData.CtrlData.EnvLv;
+                        if (diff == 0.0)
+                            bypass = true;
+                        else
+                            bypass = false;
+                    } else {
+                        diff /= pAmergeCtx->PrevData.CtrlData.EnvLv;
+                        if (diff >= ByPassThr || diff <= (0 - ByPassThr))
+                            bypass = false;
+                        else
+                            bypass = true;
+                    }
+                } else if (pAmergeCtx->Config.Merge_v20.CtrlDataType == CTRLDATATYPE_ISO) {
+                    diff = pAmergeCtx->PrevData.CtrlData.ISO - pAmergeCtx->CurrData.CtrlData.ISO;
+                    diff /= pAmergeCtx->PrevData.CtrlData.ISO;
                     if (diff >= ByPassThr || diff <= (0 - ByPassThr))
                         bypass = false;
                     else
                         bypass = true;
                 }
-            } else if (pAmergeCtx->Config.Merge_v20.CtrlDataType == CTRLDATATYPE_ISO) {
-                diff = pAmergeCtx->PrevData.CtrlData.ISO - pAmergeCtx->CurrData.CtrlData.ISO;
-                diff /= pAmergeCtx->PrevData.CtrlData.ISO;
-                if (diff >= ByPassThr || diff <= (0 - ByPassThr))
-                    bypass = false;
-                else
-                    bypass = true;
-            }
-            LOGD_AMERGE(
-                "%s: FrameID:%d HDRFrameNum:%d LongFrmMode:%d MergeApiMode:%d CtrlDataType:%d "
-                "EnvLv:%f ISO:%f MoveCoef:%f bypass:%d\n",
-                __FUNCTION__, pAmergeCtx->frameCnt, pAmergeCtx->FrameNumber,
-                pAmergeCtx->SensorInfo.LongFrmMode, ApiMode,
-                pAmergeCtx->Config.Merge_v20.CtrlDataType, pAmergeCtx->CurrData.CtrlData.EnvLv,
-                pAmergeCtx->CurrData.CtrlData.ISO, pAmergeCtx->CurrData.CtrlData.MoveCoef, bypass);
-        }
-        else if(CHECK_ISP_HW_V30()) {
-            pAmergeCtx->CurrData.HandleData.Merge_v30.MergeMode = pAmergeCtx->FrameNumber - 1;
-            LOG1_AMERGE("%s:  Current MergeMode: %d \n", __FUNCTION__, pAmergeCtx->CurrData.HandleData.Merge_v30.MergeMode);
-            ByPassThr = pAmergeCtx->Config.Merge_v30.ByPassThr;
-            if (pAmergeCtx->Config.Merge_v30.CtrlDataType == CTRLDATATYPE_ENVLV) {
-                diff = pAmergeCtx->PrevData.CtrlData.EnvLv - pAmergeCtx->CurrData.CtrlData.EnvLv;
-                if (pAmergeCtx->PrevData.CtrlData.EnvLv == 0.0) {
-                    diff = pAmergeCtx->CurrData.CtrlData.EnvLv;
-                    if (diff == 0.0)
-                        bypass = true;
-                    else
-                        bypass = false;
-                } else {
-                    diff /= pAmergeCtx->PrevData.CtrlData.EnvLv;
+                LOGD_AMERGE(
+                    "%s: FrameID:%d HDRFrameNum:%d LongFrmMode:%d MergeApiMode:%d CtrlDataType:%d "
+                    "EnvLv:%f ISO:%f MoveCoef:%f bypass:%d\n",
+                    __FUNCTION__, pAmergeCtx->frameCnt, pAmergeCtx->FrameNumber,
+                    pAmergeCtx->SensorInfo.LongFrmMode, ApiMode,
+                    pAmergeCtx->Config.Merge_v20.CtrlDataType, pAmergeCtx->CurrData.CtrlData.EnvLv,
+                    pAmergeCtx->CurrData.CtrlData.ISO, pAmergeCtx->CurrData.CtrlData.MoveCoef,
+                    bypass);
+            } else if (CHECK_ISP_HW_V30()) {
+                pAmergeCtx->CurrData.HandleData.Merge_v30.MergeMode = pAmergeCtx->FrameNumber - 1;
+                LOG1_AMERGE("%s:  Current MergeMode: %d \n", __FUNCTION__,
+                            pAmergeCtx->CurrData.HandleData.Merge_v30.MergeMode);
+                ByPassThr = pAmergeCtx->Config.Merge_v30.ByPassThr;
+                if (pAmergeCtx->Config.Merge_v30.CtrlDataType == CTRLDATATYPE_ENVLV) {
+                    diff =
+                        pAmergeCtx->PrevData.CtrlData.EnvLv - pAmergeCtx->CurrData.CtrlData.EnvLv;
+                    if (pAmergeCtx->PrevData.CtrlData.EnvLv == 0.0) {
+                        diff = pAmergeCtx->CurrData.CtrlData.EnvLv;
+                        if (diff == 0.0)
+                            bypass = true;
+                        else
+                            bypass = false;
+                    } else {
+                        diff /= pAmergeCtx->PrevData.CtrlData.EnvLv;
+                        if (diff >= ByPassThr || diff <= (0 - ByPassThr))
+                            bypass = false;
+                        else
+                            bypass = true;
+                    }
+                } else if (pAmergeCtx->Config.Merge_v30.CtrlDataType == CTRLDATATYPE_ISO) {
+                    diff = pAmergeCtx->PrevData.CtrlData.ISO - pAmergeCtx->CurrData.CtrlData.ISO;
+                    diff /= pAmergeCtx->PrevData.CtrlData.ISO;
                     if (diff >= ByPassThr || diff <= (0 - ByPassThr))
                         bypass = false;
                     else
                         bypass = true;
                 }
-            } else if (pAmergeCtx->Config.Merge_v30.CtrlDataType == CTRLDATATYPE_ISO) {
-                diff = pAmergeCtx->PrevData.CtrlData.ISO - pAmergeCtx->CurrData.CtrlData.ISO;
-                diff /= pAmergeCtx->PrevData.CtrlData.ISO;
-                if (diff >= ByPassThr || diff <= (0 - ByPassThr))
-                    bypass = false;
-                else
-                    bypass = true;
+                LOGD_AMERGE(
+                    "%s: FrameID:%d HDRFrameNum:%d LongFrmMode:%d MergeApiMode:%d CtrlDataType:%d "
+                    "EnvLv:%f ISO:%f MoveCoef:%f bypass:%d\n",
+                    __FUNCTION__, pAmergeCtx->frameCnt, pAmergeCtx->FrameNumber,
+                    pAmergeCtx->SensorInfo.LongFrmMode, ApiMode,
+                    pAmergeCtx->Config.Merge_v30.CtrlDataType, pAmergeCtx->CurrData.CtrlData.EnvLv,
+                    pAmergeCtx->CurrData.CtrlData.ISO, pAmergeCtx->CurrData.CtrlData.MoveCoef,
+                    bypass);
             }
-            LOGD_AMERGE(
-                "%s: FrameID:%d HDRFrameNum:%d LongFrmMode:%d MergeApiMode:%d CtrlDataType:%d "
-                "EnvLv:%f ISO:%f MoveCoef:%f bypass:%d\n",
-                __FUNCTION__, pAmergeCtx->frameCnt, pAmergeCtx->FrameNumber,
-                pAmergeCtx->SensorInfo.LongFrmMode, ApiMode,
-                pAmergeCtx->Config.Merge_v30.CtrlDataType, pAmergeCtx->CurrData.CtrlData.EnvLv,
-                pAmergeCtx->CurrData.CtrlData.ISO, pAmergeCtx->CurrData.CtrlData.MoveCoef, bypass);
         }
     }
 
