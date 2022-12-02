@@ -521,13 +521,12 @@ typedef struct _RkAiqAlgoConfigAdhaz {
 #endif
     int working_mode;
     bool is_multi_isp_mode;
+    int rawHeight;
+    int rawWidth;
 } RkAiqAlgoConfigAdhaz;
 
 typedef struct _RkAiqAlgoPreAdhaz {
     RkAiqAlgoCom com;
-    rkisp_adehaze_stats_t stats;
-    int rawHeight;
-    int rawWidth;
 } RkAiqAlgoPreAdhaz;
 
 typedef struct _RkAiqAlgoPreResAdhaz {
@@ -541,6 +540,7 @@ typedef struct _RkAiqAlgoProcAdhaz {
 #endif
     int iso;
     int hdr_mode;
+    rkisp_adehaze_stats_t stats;
     RkAiqYnrV3Res ynrV3_proc_res;
 } RkAiqAlgoProcAdhaz;
 

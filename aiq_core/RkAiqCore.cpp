@@ -300,6 +300,14 @@ static RkAiqGrpCondition_t grp0Cond[]           = {
 };
 static RkAiqGrpConditions_t  grp0Conds          = { grp_conds_array_info(grp0Cond) };
 
+static RkAiqGrpCondition_t grpDhazCond[] = {
+    [0] = {XCAM_MESSAGE_SOF_INFO_OK, 0},
+    [1] = {XCAM_MESSAGE_AE_PRE_RES_OK, 0},
+    [2] = {XCAM_MESSAGE_AE_PROC_RES_OK, 0},
+    [3] = {XCAM_MESSAGE_ADEHAZE_STATS_OK, ISP_PARAMS_EFFECT_DELAY_CNT},
+};
+static RkAiqGrpConditions_t grpDhazConds = {grp_conds_array_info(grpDhazCond)};
+
 static RkAiqGrpCondition_t grp1Cond[]           = {
     [0] = { XCAM_MESSAGE_SOF_INFO_OK,       0 },
     [1] = { XCAM_MESSAGE_AWB_PROC_RES_OK,   0 },
@@ -371,7 +379,7 @@ static struct RkAiqAlgoDesCommExt g_default_3a_des_v3x[] = {
     { &g_RkIspAlgoDescAcnrV2.common,        RK_AIQ_CORE_ANALYZE_GRP0,   2, 2, 2,    grp0Conds          },
     { &g_RkIspAlgoDescAsharpV4.common,      RK_AIQ_CORE_ANALYZE_GRP0,   4, 4, 4,    grp0Conds          },
     { &g_RkIspAlgoDescAdrc.common,          RK_AIQ_CORE_ANALYZE_GRP0,   0, 0, 0,    grp0Conds          },
-    { &g_RkIspAlgoDescAdhaz.common,         RK_AIQ_CORE_ANALYZE_GRP0,   0, 1, 0,    grp0Conds          },
+    { &g_RkIspAlgoDescAdhaz.common,         RK_AIQ_CORE_ANALYZE_DHAZ,   0, 1, 0,    grpDhazConds       },
     { &g_RkIspAlgoDescA3dlut.common,        RK_AIQ_CORE_ANALYZE_GRP1,   0, 0, 0,    grp1Conds          },
     { &g_RkIspAlgoDescAlsc.common,          RK_AIQ_CORE_ANALYZE_GRP1,   0, 0, 0,    grp1Conds          },
     { &g_RkIspAlgoDescAccm.common,          RK_AIQ_CORE_ANALYZE_GRP1,   0, 0, 0,    grp1Conds          },
@@ -389,8 +397,6 @@ static struct RkAiqAlgoDesCommExt g_default_3a_des_v3x[] = {
     { NULL,                                 RK_AIQ_CORE_ANALYZE_ALL,    0, 0, 0,    {0}                },
     // clang-format on
 };
-
-
 
 bool
 RkAiqCoreThread::loop()

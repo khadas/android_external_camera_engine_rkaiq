@@ -53,9 +53,8 @@ XCamReturn RkAiqAdhazHandleInt::prepare() {
 
     adhaz_config_int->working_mode      = sharedCom->working_mode;
     adhaz_config_int->is_multi_isp_mode = sharedCom->is_multi_isp_mode;
-    // adhaz_config_int->rawHeight = sharedCom->snsDes.isp_acq_height;
-    // adhaz_config_int->rawWidth = sharedCom->snsDes.isp_acq_width;
-    // adhaz_config_int->working_mode = sharedCom->working_mode;
+    adhaz_config_int->rawHeight         = sharedCom->snsDes.isp_acq_height;
+    adhaz_config_int->rawWidth          = sharedCom->snsDes.isp_acq_width;
 
     RkAiqAlgoDescription* des = (RkAiqAlgoDescription*)mDes;
     ret                       = des->prepare(mConfig);
@@ -75,67 +74,6 @@ XCamReturn RkAiqAdhazHandleInt::preProcess() {
     RkAiqCore::RkAiqAlgosComShared_t* sharedCom = &mAiqCore->mAlogsComSharedParams;
     RkAiqCore::RkAiqAlgosGroupShared_t* shared =
         (RkAiqCore::RkAiqAlgosGroupShared_t*)(getGroupShared());
-
-    adhaz_pre_int->rawHeight = sharedCom->snsDes.isp_acq_height;
-    adhaz_pre_int->rawWidth  = sharedCom->snsDes.isp_acq_width;
-
-    RkAiqIspStats* xIspStats = nullptr;
-    if (shared->ispStats) {
-        xIspStats = (RkAiqIspStats*)shared->ispStats->map(shared->ispStats);
-        if (!xIspStats) LOGE_ADEHAZE("isp stats is null");
-    } else {
-        LOGW_ADEHAZE("the xcamvideobuffer of isp stats is null");
-    }
-
-    if (!xIspStats || !xIspStats->adehaze_stats_valid || !sharedCom->init) {
-        LOG1("no adehaze stats, ignore!");
-        // TODO: keep last result ?
-        //
-        //
-        // return XCAM_RETURN_BYPASS;
-    } else {
-        // dehaze stats
-        if (CHECK_ISP_HW_V20())
-            memcpy(&adhaz_pre_int->stats.dehaze_stats_v20,
-                   &xIspStats->AdehazeStatsProxy->data()->adehaze_stats.dehaze_stats_v20,
-                   sizeof(dehaze_stats_v20_t));
-        else if (CHECK_ISP_HW_V21())
-            memcpy(&adhaz_pre_int->stats.dehaze_stats_v21,
-                   &xIspStats->AdehazeStatsProxy->data()->adehaze_stats.dehaze_stats_v21,
-                   sizeof(dehaze_stats_v21_t));
-        else if (CHECK_ISP_HW_V30())
-            memcpy(&adhaz_pre_int->stats.dehaze_stats_v30,
-                   &xIspStats->AdehazeStatsProxy->data()->adehaze_stats.dehaze_stats_v30,
-                   sizeof(dehaze_stats_v21_t));
-
-        // other stats
-        memcpy(adhaz_pre_int->stats.other_stats.tmo_luma,
-               xIspStats->AecStatsProxy->data()->aec_stats.ae_data.extra.rawae_big.channelg_xy,
-               sizeof(adhaz_pre_int->stats.other_stats.tmo_luma));
-
-        if (sharedCom->working_mode == RK_AIQ_ISP_HDR_MODE_3_FRAME_HDR ||
-                sharedCom->working_mode == RK_AIQ_ISP_HDR_MODE_3_LINE_HDR) {
-            memcpy(adhaz_pre_int->stats.other_stats.short_luma,
-                   xIspStats->AecStatsProxy->data()->aec_stats.ae_data.chn[0].rawae_big.channelg_xy,
-                   sizeof(adhaz_pre_int->stats.other_stats.short_luma));
-            memcpy(
-                adhaz_pre_int->stats.other_stats.middle_luma,
-                xIspStats->AecStatsProxy->data()->aec_stats.ae_data.chn[1].rawae_lite.channelg_xy,
-                sizeof(adhaz_pre_int->stats.other_stats.middle_luma));
-            memcpy(adhaz_pre_int->stats.other_stats.long_luma,
-                   xIspStats->AecStatsProxy->data()->aec_stats.ae_data.chn[2].rawae_big.channelg_xy,
-                   sizeof(adhaz_pre_int->stats.other_stats.long_luma));
-        } else if (sharedCom->working_mode == RK_AIQ_ISP_HDR_MODE_2_FRAME_HDR ||
-                   sharedCom->working_mode == RK_AIQ_ISP_HDR_MODE_2_LINE_HDR) {
-            memcpy(adhaz_pre_int->stats.other_stats.short_luma,
-                   xIspStats->AecStatsProxy->data()->aec_stats.ae_data.chn[0].rawae_big.channelg_xy,
-                   sizeof(adhaz_pre_int->stats.other_stats.short_luma));
-            memcpy(adhaz_pre_int->stats.other_stats.long_luma,
-                   xIspStats->AecStatsProxy->data()->aec_stats.ae_data.chn[1].rawae_big.channelg_xy,
-                   sizeof(adhaz_pre_int->stats.other_stats.long_luma));
-        } else
-            LOGD("Wrong working mode!!!");
-    }
 
     ret = RkAiqHandle::preProcess();
     if (ret) {
@@ -166,6 +104,33 @@ XCamReturn RkAiqAdhazHandleInt::processing() {
 
     adhaz_proc_int->hdr_mode = sharedCom->working_mode;
     adhaz_proc_int->ynrV3_proc_res = shared->res_comb.ynrV3_proc_res;
+
+    RkAiqAdehazeStats* xDehazeStats = nullptr;
+    if (shared->adehazeStatsBuf) {
+        xDehazeStats = (RkAiqAdehazeStats*)shared->adehazeStatsBuf->map(shared->adehazeStatsBuf);
+        if (!xDehazeStats) LOGE_ADEHAZE("isp stats is null");
+    } else {
+        LOGW_ADEHAZE("%s: the xcamvideobuffer of isp stats is null", __FUNCTION__);
+    }
+
+    if (!xDehazeStats || !xDehazeStats->adehaze_stats_valid) {
+        LOGE_ADEHAZE("no adehaze stats, ignore!");
+        adhaz_proc_int->stats.stats_true = false;
+    } else {
+        adhaz_proc_int->stats.stats_true = true;
+        adhaz_proc_int->stats.frame_id   = xDehazeStats->adehaze_stats.frame_id;
+        if (CHECK_ISP_HW_V20())
+            memcpy(&adhaz_proc_int->stats.dehaze_stats_v20,
+                   &xDehazeStats->adehaze_stats.dehaze_stats_v20, sizeof(dehaze_stats_v20_t));
+        else if (CHECK_ISP_HW_V21())
+            memcpy(&adhaz_proc_int->stats.dehaze_stats_v21,
+                   &xDehazeStats->adehaze_stats.dehaze_stats_v21, sizeof(dehaze_stats_v21_t));
+        else if (CHECK_ISP_HW_V30())
+            memcpy(&adhaz_proc_int->stats.dehaze_stats_v30,
+                   &xDehazeStats->adehaze_stats.dehaze_stats_v30, sizeof(dehaze_stats_v30_t));
+        else
+            LOGE_ADEHAZE("Wrong isp version!!!");
+    }
 
     ret = RkAiqHandle::processing();
     if (ret) {

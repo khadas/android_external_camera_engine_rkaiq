@@ -1164,8 +1164,8 @@ void GetHistParamsV30(aDehazeAttrData_t* pCalibV21, RkAiqAdehazeProcResult_t* Pr
     LOG1_ADEHAZE("EIXT: %s \n", __func__);
 }
 
-void GetDehazeHistDuoISPSettingV30(RkAiqAdehazeProcResult_t* ProcRes, rkisp_adehaze_stats_t* pStats, bool DuoCamera, int FrameID)
-{
+void GetDehazeHistDuoISPSettingV30(RkAiqAdehazeProcResult_t* ProcRes, rkisp_adehaze_stats_t* pStats,
+                                   bool DuoCamera, int FrameID, bool isCapture) {
     LOG1_ADEHAZE("ENTER: %s \n", __func__);
 
     //round_en
@@ -1173,47 +1173,100 @@ void GetDehazeHistDuoISPSettingV30(RkAiqAdehazeProcResult_t* ProcRes, rkisp_adeh
 
     //deahze duo setting
     if(DuoCamera) {
-        ProcRes->ProcResV30.soft_wr_en = FUNCTION_ENABLE;
-#if 1
-        //support default value for kernel calc
-        for(int i = 0; i < ISP3X_DHAZ_HIST_WR_NUM; i++) {
-            ProcRes->ProcResV30.hist_wr[i] = 16 * (i + 1);
-            ProcRes->ProcResV30.hist_wr[i] = ProcRes->ProcResV30.hist_wr[i] > 1023 ? 1023 : ProcRes->ProcResV30.hist_wr[i];
-        }
-#else
-        ProcRes->ProcResV30.adp_air_wr = pStats->dehaze_stats_v30.dhaz_adp_air_base;
-        ProcRes->ProcResV30.adp_gratio_wr = pStats->dehaze_stats_v30.dhaz_adp_gratio;
-        ProcRes->ProcResV30.adp_tmax_wr = pStats->dehaze_stats_v30.dhaz_adp_tmax;
-        ProcRes->ProcResV30.adp_wt_wr = pStats->dehaze_stats_v30.dhaz_adp_wt;
+        if (!isCapture) {
+            ProcRes->ProcResV30.soft_wr_en = FUNCTION_ENABLE;
 
-        static int hist_wr[64];
-        if(!FrameID)
-            for(int i = 0; i < 64; i++) {
-                hist_wr[i] = 16 * (i + 1);
-                hist_wr[i] = hist_wr[i] > 1023 ? 1023 : hist_wr[i];
-                ProcRes->ProcResV30.hist_wr[i] = hist_wr[i];
+            LOGD_ADEHAZE("%s(%d) DuoCamera:%d soft_wr_en:%d\n", __func__, __LINE__, DuoCamera,
+                         ProcRes->ProcResV30.soft_wr_en);
+
+            if (ProcRes->ProcResV30.enable && ProcRes->ProcResV30.dc_en &&
+                !ProcRes->ProcResV30.enhance_en) {
+                if (!FrameID || !pStats->stats_true) {
+                    ProcRes->ProcResV30.adp_wt_wr   = 0x1;
+                    ProcRes->ProcResV30.adp_tmax_wr = 0x1;
+                    ProcRes->ProcResV30.adp_air_wr  = 0x1;
+                } else {
+                    ProcRes->ProcResV30.adp_wt_wr   = pStats->dehaze_stats_v30.dhaz_adp_wt;
+                    ProcRes->ProcResV30.adp_tmax_wr = pStats->dehaze_stats_v30.dhaz_adp_tmax;
+                    ProcRes->ProcResV30.adp_air_wr  = pStats->dehaze_stats_v30.dhaz_adp_air_base;
+                }
+                LOGD_ADEHAZE("%s adp_wt_wr:%d adp_air_wr:%d adp_tmax_wr:%d\n", __func__,
+                             ProcRes->ProcResV30.adp_wt_wr, ProcRes->ProcResV30.adp_air_wr,
+                             ProcRes->ProcResV30.adp_tmax_wr);
             }
-        else {
-            int num = MIN(FrameID + 1, ProcRes->ProcResV30.stab_fnum);
-            int tmp = 0;
-            for(int i = 0; i < 64; i++) {
-                tmp = (hist_wr[i] * (num - 1) + pStats->dehaze_stats_v30.h_rgb_iir[i]) / num;
-                ProcRes->ProcResV30.hist_wr[i] = tmp;
-                hist_wr[i] = tmp;
+
+            if (ProcRes->ProcResV30.enable && ProcRes->ProcResV30.hist_en) {
+                static unsigned int hist_wr[ISP3X_DHAZ_HIST_WR_NUM];
+                if (!FrameID || !pStats->stats_true) {
+                    for (int i = 0; i < ISP3X_DHAZ_HIST_WR_NUM; i++) {
+                        hist_wr[i]                     = 16 * (i + 1);
+                        hist_wr[i]                     = hist_wr[i] > 1023 ? 1023 : hist_wr[i];
+                        ProcRes->ProcResV30.hist_wr[i] = hist_wr[i];
+                    }
+                    ProcRes->ProcResV30.adp_gratio_wr = 0x1;
+                } else {
+                    unsigned int num       = MIN(FrameID + 1, ProcRes->ProcResV30.stab_fnum);
+                    unsigned long long tmp = 0;
+                    for (int i = 0; i < 64; i++) {
+                        tmp = pStats->dehaze_stats_v30.h_rgb_iir_left[i] *
+                              pStats->dehaze_stats_v30.dhaz_pic_sumh_left;
+                        tmp += pStats->dehaze_stats_v30.h_rgb_iir_right[i] *
+                               pStats->dehaze_stats_v30.dhaz_pic_sumh_right;
+                        tmp /= pStats->dehaze_stats_v30.dhaz_pic_sumh_left +
+                               pStats->dehaze_stats_v30.dhaz_pic_sumh_right;
+                        tmp                            = (hist_wr[i] * (num - 1) + tmp) / num;
+                        tmp                            = tmp > 1023 ? 1023 : tmp;
+                        ProcRes->ProcResV30.hist_wr[i] = tmp;
+                        hist_wr[i]                     = tmp;
+                    }
+                    ProcRes->ProcResV30.adp_gratio_wr = pStats->dehaze_stats_v30.dhaz_adp_gratio;
+                }
+                LOGD_ADEHAZE(
+                    "%s adp_gratio_wr:%d h_rgb_iir[0~15]:%d %d %d %d %d %d %d %d %d %d %d %d %d %d "
+                    "%d "
+                    "%d\n",
+                    __func__, ProcRes->ProcResV30.adp_gratio_wr, ProcRes->ProcResV30.hist_wr[0],
+                    ProcRes->ProcResV30.hist_wr[1], ProcRes->ProcResV30.hist_wr[2],
+                    ProcRes->ProcResV30.hist_wr[3], ProcRes->ProcResV30.hist_wr[4],
+                    ProcRes->ProcResV30.hist_wr[5], ProcRes->ProcResV30.hist_wr[6],
+                    ProcRes->ProcResV30.hist_wr[7], ProcRes->ProcResV30.hist_wr[8],
+                    ProcRes->ProcResV30.hist_wr[9], ProcRes->ProcResV30.hist_wr[10],
+                    ProcRes->ProcResV30.hist_wr[11], ProcRes->ProcResV30.hist_wr[12],
+                    ProcRes->ProcResV30.hist_wr[13], ProcRes->ProcResV30.hist_wr[14],
+                    ProcRes->ProcResV30.hist_wr[15]);
+                LOGD_ADEHAZE(
+                    "%s h_rgb_iir[16~31]:%d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d\n",
+                    __func__, ProcRes->ProcResV30.hist_wr[16], ProcRes->ProcResV30.hist_wr[17],
+                    ProcRes->ProcResV30.hist_wr[18], ProcRes->ProcResV30.hist_wr[19],
+                    ProcRes->ProcResV30.hist_wr[20], ProcRes->ProcResV30.hist_wr[21],
+                    ProcRes->ProcResV30.hist_wr[22], ProcRes->ProcResV30.hist_wr[23],
+                    ProcRes->ProcResV30.hist_wr[24], ProcRes->ProcResV30.hist_wr[25],
+                    ProcRes->ProcResV30.hist_wr[26], ProcRes->ProcResV30.hist_wr[27],
+                    ProcRes->ProcResV30.hist_wr[28], ProcRes->ProcResV30.hist_wr[29],
+                    ProcRes->ProcResV30.hist_wr[30], ProcRes->ProcResV30.hist_wr[31]);
+                LOGD_ADEHAZE(
+                    "%s h_rgb_iir[32~47]:%d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d\n",
+                    __func__, ProcRes->ProcResV30.hist_wr[32], ProcRes->ProcResV30.hist_wr[33],
+                    ProcRes->ProcResV30.hist_wr[34], ProcRes->ProcResV30.hist_wr[35],
+                    ProcRes->ProcResV30.hist_wr[36], ProcRes->ProcResV30.hist_wr[37],
+                    ProcRes->ProcResV30.hist_wr[38], ProcRes->ProcResV30.hist_wr[39],
+                    ProcRes->ProcResV30.hist_wr[40], ProcRes->ProcResV30.hist_wr[41],
+                    ProcRes->ProcResV30.hist_wr[42], ProcRes->ProcResV30.hist_wr[43],
+                    ProcRes->ProcResV30.hist_wr[44], ProcRes->ProcResV30.hist_wr[45],
+                    ProcRes->ProcResV30.hist_wr[46], ProcRes->ProcResV30.hist_wr[47]);
+                LOGD_ADEHAZE(
+                    "%s h_rgb_iir[48~63]:%d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d\n",
+                    __func__, ProcRes->ProcResV30.hist_wr[48], ProcRes->ProcResV30.hist_wr[49],
+                    ProcRes->ProcResV30.hist_wr[50], ProcRes->ProcResV30.hist_wr[51],
+                    ProcRes->ProcResV30.hist_wr[52], ProcRes->ProcResV30.hist_wr[53],
+                    ProcRes->ProcResV30.hist_wr[54], ProcRes->ProcResV30.hist_wr[55],
+                    ProcRes->ProcResV30.hist_wr[56], ProcRes->ProcResV30.hist_wr[57],
+                    ProcRes->ProcResV30.hist_wr[58], ProcRes->ProcResV30.hist_wr[59],
+                    ProcRes->ProcResV30.hist_wr[60], ProcRes->ProcResV30.hist_wr[61],
+                    ProcRes->ProcResV30.hist_wr[62], ProcRes->ProcResV30.hist_wr[63]);
             }
         }
-
-        LOGD_ADEHAZE("%s adp_air_wr:0x%x adp_gratio_wr:0x%x adp_tmax_wr:0x%x adp_wt_wr:0x%x\n", __func__, ProcRes->ProcResV30.adp_air_wr, ProcRes->ProcResV30.adp_gratio_wr,
-                     ProcRes->ProcResV30.adp_tmax_wr, ProcRes->ProcResV30.adp_wt_wr);
-
-        LOGV_ADEHAZE("%s hist_wr:0x%x", __func__, ProcRes->ProcResV30.hist_wr[0]);
-        for(int i = 1; i < 63; i++)
-            LOGV_ADEHAZE(" 0x%x", ProcRes->ProcResV30.hist_wr[i]);
-        LOGV_ADEHAZE(" 0x%x\n", ProcRes->ProcResV30.hist_wr[63]);
-#endif
-        LOGD_ADEHAZE("%s DuoCamera:%d soft_wr_en:%d\n", __func__, DuoCamera, ProcRes->ProcResV30.soft_wr_en);
-    }
-    else
+    } else
         ProcRes->ProcResV30.soft_wr_en = FUNCTION_DISABLE;
 
     LOG1_ADEHAZE("EIXT: %s \n", __func__);
@@ -1241,83 +1294,6 @@ void GetDehazeLocalGainSettingV30(RkAiqAdehazeProcResult_t* pProcRes, RkAiqYnrV3
 #endif
 
     LOG1_ADEHAZE("EIXT: %s \n", __func__);
-}
-
-void AdehazeGetStats
-(
-    AdehazeHandle_t*           pAdehazeCtx,
-    rkisp_adehaze_stats_t*         ROData
-) {
-    LOG1_ADEHAZE( "%s:enter!\n", __FUNCTION__);
-    LOGV_ADEHAZE("%s: Adehaze RO data from register:\n", __FUNCTION__);
-
-    if(CHECK_ISP_HW_V20()) {
-        pAdehazeCtx->stats.dehaze_stats_v20.dhaz_adp_air_base = ROData->dehaze_stats_v20.dhaz_adp_air_base;
-        pAdehazeCtx->stats.dehaze_stats_v20.dhaz_adp_wt = ROData->dehaze_stats_v20.dhaz_adp_wt;
-        pAdehazeCtx->stats.dehaze_stats_v20.dhaz_adp_gratio = ROData->dehaze_stats_v20.dhaz_adp_gratio;
-        pAdehazeCtx->stats.dehaze_stats_v20.dhaz_adp_tmax = ROData->dehaze_stats_v20.dhaz_adp_tmax;
-        for(int i = 0; i < ISP2X_DHAZ_HIST_IIR_NUM; i++) {
-            pAdehazeCtx->stats.dehaze_stats_v20.h_b_iir[i] = ROData->dehaze_stats_v20.h_b_iir[i];
-            pAdehazeCtx->stats.dehaze_stats_v20.h_g_iir[i] = ROData->dehaze_stats_v20.h_g_iir[i];
-            pAdehazeCtx->stats.dehaze_stats_v20.h_r_iir[i] = ROData->dehaze_stats_v20.h_r_iir[i];
-        }
-
-        LOGV_ADEHAZE("%s:  dhaz_adp_air_base:%d dhaz_adp_wt:%d dhaz_adp_gratio:%d dhaz_adp_tmax:%d\n", __FUNCTION__,
-                     pAdehazeCtx->stats.dehaze_stats_v20.dhaz_adp_air_base, pAdehazeCtx->stats.dehaze_stats_v20.dhaz_adp_wt,
-                     pAdehazeCtx->stats.dehaze_stats_v20.dhaz_adp_gratio, pAdehazeCtx->stats.dehaze_stats_v20.dhaz_adp_tmax);
-        for(int i = 0; i < ISP2X_DHAZ_HIST_IIR_NUM; i++) {
-            LOGV_ADEHAZE("%s:  h_b_iir[%d]:%d:\n", __FUNCTION__, i, pAdehazeCtx->stats.dehaze_stats_v20.h_b_iir[i]);
-            LOGV_ADEHAZE("%s:  h_g_iir[%d]:%d:\n", __FUNCTION__, i, pAdehazeCtx->stats.dehaze_stats_v20.h_g_iir[i]);
-            LOGV_ADEHAZE("%s:  h_r_iir[%d]:%d:\n", __FUNCTION__, i, pAdehazeCtx->stats.dehaze_stats_v20.h_r_iir[i]);
-        }
-    }
-    else if(CHECK_ISP_HW_V21()) {
-        pAdehazeCtx->stats.dehaze_stats_v21.dhaz_adp_air_base = ROData->dehaze_stats_v21.dhaz_adp_air_base;
-        pAdehazeCtx->stats.dehaze_stats_v21.dhaz_adp_wt = ROData->dehaze_stats_v21.dhaz_adp_wt;
-        pAdehazeCtx->stats.dehaze_stats_v21.dhaz_adp_gratio = ROData->dehaze_stats_v21.dhaz_adp_gratio;
-        pAdehazeCtx->stats.dehaze_stats_v21.dhaz_adp_tmax = ROData->dehaze_stats_v21.dhaz_adp_tmax;
-        for(int i = 0; i < ISP21_DHAZ_HIST_IIR_NUM; i++)
-            pAdehazeCtx->stats.dehaze_stats_v21.h_rgb_iir[i] = ROData->dehaze_stats_v21.h_rgb_iir[i];
-
-        LOGV_ADEHAZE("%s:  dhaz_adp_air_base:%d dhaz_adp_wt:%d dhaz_adp_gratio:%d dhaz_adp_tmax:%d\n", __FUNCTION__,
-                     pAdehazeCtx->stats.dehaze_stats_v21.dhaz_adp_air_base, pAdehazeCtx->stats.dehaze_stats_v21.dhaz_adp_wt,
-                     pAdehazeCtx->stats.dehaze_stats_v21.dhaz_adp_gratio, pAdehazeCtx->stats.dehaze_stats_v21.dhaz_adp_tmax);
-        for(int i = 0; i < ISP21_DHAZ_HIST_IIR_NUM; i++)
-            LOGV_ADEHAZE("%s:  h_rgb_iir[%d]:%d:\n", __FUNCTION__, i, pAdehazeCtx->stats.dehaze_stats_v21.h_rgb_iir[i]);
-    }
-    else if(CHECK_ISP_HW_V30()) {
-        pAdehazeCtx->stats.dehaze_stats_v30.dhaz_adp_air_base = ROData->dehaze_stats_v30.dhaz_adp_air_base;
-        pAdehazeCtx->stats.dehaze_stats_v30.dhaz_adp_wt = ROData->dehaze_stats_v30.dhaz_adp_wt;
-        pAdehazeCtx->stats.dehaze_stats_v30.dhaz_adp_gratio = ROData->dehaze_stats_v30.dhaz_adp_gratio;
-        pAdehazeCtx->stats.dehaze_stats_v30.dhaz_adp_tmax = ROData->dehaze_stats_v30.dhaz_adp_tmax;
-        pAdehazeCtx->stats.dehaze_stats_v30.dhaz_pic_sumh_left = ROData->dehaze_stats_v30.dhaz_pic_sumh_left;
-        pAdehazeCtx->stats.dehaze_stats_v30.dhaz_pic_sumh_right = ROData->dehaze_stats_v30.dhaz_pic_sumh_right;
-        for(int i = 0; i < ISP3X_DHAZ_HIST_IIR_NUM; i++)
-            pAdehazeCtx->stats.dehaze_stats_v30.h_rgb_iir[i] = ROData->dehaze_stats_v30.h_rgb_iir[i];
-
-        LOGV_ADEHAZE("%s:  dhaz_adp_air_base:%d dhaz_adp_wt:%d dhaz_adp_gratio:%d dhaz_adp_tmax:%d dhaz_pic_sumh_left:%d dhaz_pic_sumh_right:%d\n", __FUNCTION__,
-                     pAdehazeCtx->stats.dehaze_stats_v30.dhaz_adp_air_base, pAdehazeCtx->stats.dehaze_stats_v30.dhaz_adp_wt,
-                     pAdehazeCtx->stats.dehaze_stats_v30.dhaz_adp_gratio, pAdehazeCtx->stats.dehaze_stats_v30.dhaz_adp_tmax,
-                     pAdehazeCtx->stats.dehaze_stats_v30.dhaz_pic_sumh_left, pAdehazeCtx->stats.dehaze_stats_v30.dhaz_pic_sumh_right);
-        for(int i = 0; i < ISP3X_DHAZ_HIST_IIR_NUM; i++)
-            LOGV_ADEHAZE("%s:  h_rgb_iir[%d]:%d:\n", __FUNCTION__, i, pAdehazeCtx->stats.dehaze_stats_v30.h_rgb_iir[i]);
-    }
-
-    //get other stats from stats
-    for(int i = 0; i < 225; i++)
-    {
-        pAdehazeCtx->stats.other_stats.short_luma[i] = ROData->other_stats.short_luma[i];
-        pAdehazeCtx->stats.other_stats.long_luma[i] = ROData->other_stats.long_luma[i];
-        pAdehazeCtx->stats.other_stats.tmo_luma[i] = ROData->other_stats.tmo_luma[i];
-    }
-
-    if(pAdehazeCtx->FrameNumber == HDR_3X_NUM)
-    {
-        for(int i = 0; i < 25; i++)
-            pAdehazeCtx->stats.other_stats.middle_luma[i] = ROData->other_stats.middle_luma[i];
-    }
-
-    LOG1_ADEHAZE( "%s:exit!\n", __FUNCTION__);
 }
 
 void AdehazeGetEnvLvISO
@@ -1377,81 +1353,81 @@ void AdehazeGetCurrDataGroup(AdehazeHandle_t* pAdehazeCtx, RKAiqAecExpInfo_t* pA
                              XCamVideoBuffer* pAePreRes, float* simga) {
     LOG1_ADEHAZE( "%s:enter!\n", __FUNCTION__);
 
-    if(CHECK_ISP_HW_V20()) {
-        int iso = 50;
-        AdehazeExpInfo_t stExpInfo;
-        memset(&stExpInfo, 0x00, sizeof(AdehazeExpInfo_t));
+    if (pAdehazeCtx->isCapture) {
+        return;
+    } else {
+        if (CHECK_ISP_HW_V20()) {
+            int iso = 50;
+            AdehazeExpInfo_t stExpInfo;
+            memset(&stExpInfo, 0x00, sizeof(AdehazeExpInfo_t));
 
-        stExpInfo.hdr_mode = 0;
-        for(int i = 0; i < 3; i++) {
-            stExpInfo.arIso[i] = 50;
-            stExpInfo.arAGain[i] = 1.0;
-            stExpInfo.arDGain[i] = 1.0;
-            stExpInfo.arTime[i] = 0.01;
-        }
-
-        if(pAdehazeCtx->working_mode == RK_AIQ_WORKING_MODE_NORMAL) {
             stExpInfo.hdr_mode = 0;
-        } else if(RK_AIQ_HDR_GET_WORKING_MODE(pAdehazeCtx->working_mode) == RK_AIQ_WORKING_MODE_ISP_HDR2) {
-            stExpInfo.hdr_mode = 1;
-        } else if(RK_AIQ_HDR_GET_WORKING_MODE(pAdehazeCtx->working_mode) == RK_AIQ_WORKING_MODE_ISP_HDR3) {
-            stExpInfo.hdr_mode = 2;
-        }
-
-        if(pAeEffExpo != NULL) {
-            if(pAdehazeCtx->working_mode == RK_AIQ_WORKING_MODE_NORMAL) {
-                stExpInfo.arAGain[0] = pAeEffExpo->LinearExp.exp_real_params.analog_gain;
-                stExpInfo.arDGain[0] = pAeEffExpo->LinearExp.exp_real_params.digital_gain;
-                stExpInfo.arTime[0] = pAeEffExpo->LinearExp.exp_real_params.integration_time;
-                stExpInfo.arIso[0] = stExpInfo.arAGain[0] * stExpInfo.arDGain[0] * 50;
-            } else {
-                for(int i = 0; i < 3; i++) {
-                    stExpInfo.arAGain[i] = pAeEffExpo->HdrExp[i].exp_real_params.analog_gain;
-                    stExpInfo.arDGain[i] = pAeEffExpo->HdrExp[i].exp_real_params.digital_gain;
-                    stExpInfo.arTime[i] = pAeEffExpo->HdrExp[i].exp_real_params.integration_time;
-                    stExpInfo.arIso[i] = stExpInfo.arAGain[i] * stExpInfo.arDGain[i] * 50;
-
-                    LOGD_ADEHAZE("index:%d again:%f dgain:%f time:%f iso:%d hdr_mode:%d\n",
-                                 i,
-                                 stExpInfo.arAGain[i],
-                                 stExpInfo.arDGain[i],
-                                 stExpInfo.arTime[i],
-                                 stExpInfo.arIso[i],
-                                 stExpInfo.hdr_mode);
-                }
+            for (int i = 0; i < 3; i++) {
+                stExpInfo.arIso[i]   = 50;
+                stExpInfo.arAGain[i] = 1.0;
+                stExpInfo.arDGain[i] = 1.0;
+                stExpInfo.arTime[i]  = 0.01;
             }
-        } else {
-            LOGE_ADEHAZE("%s:%d pAEPreRes is NULL, so use default instead \n", __FUNCTION__, __LINE__);
-        }
 
-        iso = stExpInfo.arIso[stExpInfo.hdr_mode];
-        pAdehazeCtx->CurrData.V20.ISO = (float)iso;
-    }
-    else if(CHECK_ISP_HW_V21()) {
-        RkAiqAlgoPreResAe* pAEPreRes = NULL;
-        if (pAePreRes) {
-            pAEPreRes = (RkAiqAlgoPreResAe*)pAePreRes->map(pAePreRes);
-            AdehazeGetEnvLvISO(pAdehazeCtx, pAEPreRes);
-        }
-        else {
-            pAdehazeCtx->CurrData.V21.EnvLv = 0.0;
-            LOGW_ADEHAZE( "%s:PreResBuf is NULL!\n", __FUNCTION__);
-        }
-    }
-    else if(CHECK_ISP_HW_V30()) {
-        // get ynr sigma
-        for (int i = 0; i < YNR_V3_ISO_CURVE_POINT_NUM; i++)
-            pAdehazeCtx->YnrPorcRes.sigma[i] = simga[i];
+            if (pAdehazeCtx->working_mode == RK_AIQ_WORKING_MODE_NORMAL) {
+                stExpInfo.hdr_mode = 0;
+            } else if (RK_AIQ_HDR_GET_WORKING_MODE(pAdehazeCtx->working_mode) ==
+                       RK_AIQ_WORKING_MODE_ISP_HDR2) {
+                stExpInfo.hdr_mode = 1;
+            } else if (RK_AIQ_HDR_GET_WORKING_MODE(pAdehazeCtx->working_mode) ==
+                       RK_AIQ_WORKING_MODE_ISP_HDR3) {
+                stExpInfo.hdr_mode = 2;
+            }
 
-        // get ae data
-        RkAiqAlgoPreResAe* pAEPreRes = NULL;
-        if (pAePreRes) {
-            pAEPreRes = (RkAiqAlgoPreResAe*)pAePreRes->map(pAePreRes);
-            AdehazeGetEnvLvISO(pAdehazeCtx, pAEPreRes);
-        }
-        else {
-            pAdehazeCtx->CurrData.V30.EnvLv = 0.0;
-            LOGE_ADEHAZE( "%s:PreResBuf is NULL!\n", __FUNCTION__);
+            if (pAeEffExpo != NULL) {
+                if (pAdehazeCtx->working_mode == RK_AIQ_WORKING_MODE_NORMAL) {
+                    stExpInfo.arAGain[0] = pAeEffExpo->LinearExp.exp_real_params.analog_gain;
+                    stExpInfo.arDGain[0] = pAeEffExpo->LinearExp.exp_real_params.digital_gain;
+                    stExpInfo.arTime[0]  = pAeEffExpo->LinearExp.exp_real_params.integration_time;
+                    stExpInfo.arIso[0]   = stExpInfo.arAGain[0] * stExpInfo.arDGain[0] * 50;
+                } else {
+                    for (int i = 0; i < 3; i++) {
+                        stExpInfo.arAGain[i] = pAeEffExpo->HdrExp[i].exp_real_params.analog_gain;
+                        stExpInfo.arDGain[i] = pAeEffExpo->HdrExp[i].exp_real_params.digital_gain;
+                        stExpInfo.arTime[i] =
+                            pAeEffExpo->HdrExp[i].exp_real_params.integration_time;
+                        stExpInfo.arIso[i] = stExpInfo.arAGain[i] * stExpInfo.arDGain[i] * 50;
+
+                        LOGD_ADEHAZE("index:%d again:%f dgain:%f time:%f iso:%d hdr_mode:%d\n", i,
+                                     stExpInfo.arAGain[i], stExpInfo.arDGain[i],
+                                     stExpInfo.arTime[i], stExpInfo.arIso[i], stExpInfo.hdr_mode);
+                    }
+                }
+            } else {
+                LOGE_ADEHAZE("%s:%d pAEPreRes is NULL, so use default instead \n", __FUNCTION__,
+                             __LINE__);
+            }
+
+            iso                           = stExpInfo.arIso[stExpInfo.hdr_mode];
+            pAdehazeCtx->CurrData.V20.ISO = (float)iso;
+        } else if (CHECK_ISP_HW_V21()) {
+            RkAiqAlgoPreResAe* pAEPreRes = NULL;
+            if (pAePreRes) {
+                pAEPreRes = (RkAiqAlgoPreResAe*)pAePreRes->map(pAePreRes);
+                AdehazeGetEnvLvISO(pAdehazeCtx, pAEPreRes);
+            } else {
+                pAdehazeCtx->CurrData.V21.EnvLv = 0.0;
+                LOGW_ADEHAZE("%s:PreResBuf is NULL!\n", __FUNCTION__);
+            }
+        } else if (CHECK_ISP_HW_V30()) {
+            // get ynr sigma
+            for (int i = 0; i < YNR_V3_ISO_CURVE_POINT_NUM; i++)
+                pAdehazeCtx->YnrPorcRes.sigma[i] = simga[i];
+
+            // get ae data
+            RkAiqAlgoPreResAe* pAEPreRes = NULL;
+            if (pAePreRes) {
+                pAEPreRes = (RkAiqAlgoPreResAe*)pAePreRes->map(pAePreRes);
+                AdehazeGetEnvLvISO(pAdehazeCtx, pAEPreRes);
+            } else {
+                pAdehazeCtx->CurrData.V30.EnvLv = 0.0;
+                LOGE_ADEHAZE("%s:PreResBuf is NULL!\n", __FUNCTION__);
+            }
         }
     }
 
@@ -1465,87 +1441,92 @@ void AdehazeGetCurrData
 ) {
     LOG1_ADEHAZE( "%s:enter!\n", __FUNCTION__);
 
-    if(CHECK_ISP_HW_V20()) {
-        int iso = 50;
-        AdehazeExpInfo_t stExpInfo;
-        memset(&stExpInfo, 0x00, sizeof(AdehazeExpInfo_t));
+    if (pAdehazeCtx->isCapture) {
+        return;
+    } else {
+        if (CHECK_ISP_HW_V20()) {
+            int iso = 50;
+            AdehazeExpInfo_t stExpInfo;
+            memset(&stExpInfo, 0x00, sizeof(AdehazeExpInfo_t));
 
-        stExpInfo.hdr_mode = 0;
-        for(int i = 0; i < 3; i++) {
-            stExpInfo.arIso[i] = 50;
-            stExpInfo.arAGain[i] = 1.0;
-            stExpInfo.arDGain[i] = 1.0;
-            stExpInfo.arTime[i] = 0.01;
-        }
-
-        if(pAdehazeCtx->working_mode == RK_AIQ_WORKING_MODE_NORMAL) {
             stExpInfo.hdr_mode = 0;
-        } else if(RK_AIQ_HDR_GET_WORKING_MODE(pAdehazeCtx->working_mode) == RK_AIQ_WORKING_MODE_ISP_HDR2) {
-            stExpInfo.hdr_mode = 1;
-        } else if(RK_AIQ_HDR_GET_WORKING_MODE(pAdehazeCtx->working_mode) == RK_AIQ_WORKING_MODE_ISP_HDR3) {
-            stExpInfo.hdr_mode = 2;
-        }
-
-        XCamVideoBuffer* xCamAePreRes = pProcPara->com.u.proc.res_comb->ae_pre_res;
-        RkAiqAlgoPreResAe* pAEPreRes = NULL;
-        if (xCamAePreRes) {
-            pAEPreRes = (RkAiqAlgoPreResAe*)xCamAePreRes->map(xCamAePreRes);
-            if(pAdehazeCtx->working_mode == RK_AIQ_WORKING_MODE_NORMAL) {
-                stExpInfo.arAGain[0] = pAEPreRes->ae_pre_res_rk.LinearExp.exp_real_params.analog_gain;
-                stExpInfo.arDGain[0] = pAEPreRes->ae_pre_res_rk.LinearExp.exp_real_params.digital_gain;
-                stExpInfo.arTime[0] = pAEPreRes->ae_pre_res_rk.LinearExp.exp_real_params.integration_time;
-                stExpInfo.arIso[0] = stExpInfo.arAGain[0] * stExpInfo.arDGain[0] * 50;
-            } else {
-                for(int i = 0; i < 3; i++) {
-                    stExpInfo.arAGain[i] = pAEPreRes->ae_pre_res_rk.HdrExp[i].exp_real_params.analog_gain;
-                    stExpInfo.arDGain[i] = pAEPreRes->ae_pre_res_rk.HdrExp[i].exp_real_params.digital_gain;
-                    stExpInfo.arTime[i] = pAEPreRes->ae_pre_res_rk.HdrExp[i].exp_real_params.integration_time;
-                    stExpInfo.arIso[i] = stExpInfo.arAGain[i] * stExpInfo.arDGain[i] * 50;
-
-                    LOGD_ADEHAZE("index:%d again:%f dgain:%f time:%f iso:%d hdr_mode:%d\n",
-                                 i,
-                                 stExpInfo.arAGain[i],
-                                 stExpInfo.arDGain[i],
-                                 stExpInfo.arTime[i],
-                                 stExpInfo.arIso[i],
-                                 stExpInfo.hdr_mode);
-                }
+            for (int i = 0; i < 3; i++) {
+                stExpInfo.arIso[i]   = 50;
+                stExpInfo.arAGain[i] = 1.0;
+                stExpInfo.arDGain[i] = 1.0;
+                stExpInfo.arTime[i]  = 0.01;
             }
-        } else {
-            LOGE_ADEHAZE("%s:%d pAEPreRes is NULL, so use default instead \n", __FUNCTION__, __LINE__);
-        }
 
-        iso = stExpInfo.arIso[stExpInfo.hdr_mode];
-        pAdehazeCtx->CurrData.V20.ISO = (float)iso;
-    }
-    else if(CHECK_ISP_HW_V21()) {
-        XCamVideoBuffer* xCamAePreRes = pProcPara->com.u.proc.res_comb->ae_pre_res;
-        RkAiqAlgoPreResAe* pAEPreRes = NULL;
-        if (xCamAePreRes) {
-            pAEPreRes = (RkAiqAlgoPreResAe*)xCamAePreRes->map(xCamAePreRes);
-            AdehazeGetEnvLvISO(pAdehazeCtx, pAEPreRes);
-        }
-        else {
-            pAdehazeCtx->CurrData.V21.EnvLv = 0.0;
-            pAdehazeCtx->CurrData.V30.ISO = 50.0;
-            LOGW_ADEHAZE( "%s:PreResBuf is NULL!\n", __FUNCTION__);
-        }
-    }
-    else if(CHECK_ISP_HW_V30()) {
-        for (int i = 0; i < YNR_V3_ISO_CURVE_POINT_NUM; i++)
-            pAdehazeCtx->YnrPorcRes.sigma[i] = pProcPara->ynrV3_proc_res.sigma[i];
+            if (pAdehazeCtx->working_mode == RK_AIQ_WORKING_MODE_NORMAL) {
+                stExpInfo.hdr_mode = 0;
+            } else if (RK_AIQ_HDR_GET_WORKING_MODE(pAdehazeCtx->working_mode) ==
+                       RK_AIQ_WORKING_MODE_ISP_HDR2) {
+                stExpInfo.hdr_mode = 1;
+            } else if (RK_AIQ_HDR_GET_WORKING_MODE(pAdehazeCtx->working_mode) ==
+                       RK_AIQ_WORKING_MODE_ISP_HDR3) {
+                stExpInfo.hdr_mode = 2;
+            }
 
-        // get ae data
-        XCamVideoBuffer* xCamAePreRes = pProcPara->com.u.proc.res_comb->ae_pre_res;
-        RkAiqAlgoPreResAe* pAEPreRes = NULL;
-        if (xCamAePreRes) {
-            pAEPreRes = (RkAiqAlgoPreResAe*)xCamAePreRes->map(xCamAePreRes);
-            AdehazeGetEnvLvISO(pAdehazeCtx, pAEPreRes);
-        }
-        else {
-            pAdehazeCtx->CurrData.V30.EnvLv = 0.0;
-            pAdehazeCtx->CurrData.V30.ISO = 50.0;
-            LOGE_ADEHAZE( "%s:PreResBuf is NULL!\n", __FUNCTION__);
+            XCamVideoBuffer* xCamAePreRes = pProcPara->com.u.proc.res_comb->ae_pre_res;
+            RkAiqAlgoPreResAe* pAEPreRes  = NULL;
+            if (xCamAePreRes) {
+                pAEPreRes = (RkAiqAlgoPreResAe*)xCamAePreRes->map(xCamAePreRes);
+                if (pAdehazeCtx->working_mode == RK_AIQ_WORKING_MODE_NORMAL) {
+                    stExpInfo.arAGain[0] =
+                        pAEPreRes->ae_pre_res_rk.LinearExp.exp_real_params.analog_gain;
+                    stExpInfo.arDGain[0] =
+                        pAEPreRes->ae_pre_res_rk.LinearExp.exp_real_params.digital_gain;
+                    stExpInfo.arTime[0] =
+                        pAEPreRes->ae_pre_res_rk.LinearExp.exp_real_params.integration_time;
+                    stExpInfo.arIso[0] = stExpInfo.arAGain[0] * stExpInfo.arDGain[0] * 50;
+                } else {
+                    for (int i = 0; i < 3; i++) {
+                        stExpInfo.arAGain[i] =
+                            pAEPreRes->ae_pre_res_rk.HdrExp[i].exp_real_params.analog_gain;
+                        stExpInfo.arDGain[i] =
+                            pAEPreRes->ae_pre_res_rk.HdrExp[i].exp_real_params.digital_gain;
+                        stExpInfo.arTime[i] =
+                            pAEPreRes->ae_pre_res_rk.HdrExp[i].exp_real_params.integration_time;
+                        stExpInfo.arIso[i] = stExpInfo.arAGain[i] * stExpInfo.arDGain[i] * 50;
+
+                        LOGD_ADEHAZE("index:%d again:%f dgain:%f time:%f iso:%d hdr_mode:%d\n", i,
+                                     stExpInfo.arAGain[i], stExpInfo.arDGain[i],
+                                     stExpInfo.arTime[i], stExpInfo.arIso[i], stExpInfo.hdr_mode);
+                    }
+                }
+            } else {
+                LOGE_ADEHAZE("%s:%d pAEPreRes is NULL, so use default instead \n", __FUNCTION__,
+                             __LINE__);
+            }
+
+            iso                           = stExpInfo.arIso[stExpInfo.hdr_mode];
+            pAdehazeCtx->CurrData.V20.ISO = (float)iso;
+        } else if (CHECK_ISP_HW_V21()) {
+            XCamVideoBuffer* xCamAePreRes = pProcPara->com.u.proc.res_comb->ae_pre_res;
+            RkAiqAlgoPreResAe* pAEPreRes  = NULL;
+            if (xCamAePreRes) {
+                pAEPreRes = (RkAiqAlgoPreResAe*)xCamAePreRes->map(xCamAePreRes);
+                AdehazeGetEnvLvISO(pAdehazeCtx, pAEPreRes);
+            } else {
+                pAdehazeCtx->CurrData.V21.EnvLv = 0.0;
+                pAdehazeCtx->CurrData.V30.ISO   = 50.0;
+                LOGW_ADEHAZE("%s:PreResBuf is NULL!\n", __FUNCTION__);
+            }
+        } else if (CHECK_ISP_HW_V30()) {
+            for (int i = 0; i < YNR_V3_ISO_CURVE_POINT_NUM; i++)
+                pAdehazeCtx->YnrPorcRes.sigma[i] = pProcPara->ynrV3_proc_res.sigma[i];
+
+            // get ae data
+            XCamVideoBuffer* xCamAePreRes = pProcPara->com.u.proc.res_comb->ae_pre_res;
+            RkAiqAlgoPreResAe* pAEPreRes  = NULL;
+            if (xCamAePreRes) {
+                pAEPreRes = (RkAiqAlgoPreResAe*)xCamAePreRes->map(xCamAePreRes);
+                AdehazeGetEnvLvISO(pAdehazeCtx, pAEPreRes);
+            } else {
+                pAdehazeCtx->CurrData.V30.EnvLv = 0.0;
+                pAdehazeCtx->CurrData.V30.ISO   = 50.0;
+                LOGE_ADEHAZE("%s:PreResBuf is NULL!\n", __FUNCTION__);
+            }
         }
     }
 
@@ -2521,7 +2502,8 @@ XCamReturn AdehazeProcess(AdehazeHandle_t* pAdehazeCtx, AdehazeVersion_t version
 
         // get Duo cam setting
         GetDehazeHistDuoISPSettingV30(&pAdehazeCtx->ProcRes, &pAdehazeCtx->stats,
-                                      pAdehazeCtx->is_multi_isp_mode, pAdehazeCtx->FrameID);
+                                      pAdehazeCtx->is_multi_isp_mode, pAdehazeCtx->FrameID,
+                                      pAdehazeCtx->isCapture);
     }
     else
         LOGE_ADEHAZE(" %s:Wrong hardware version!! \n", __func__);
@@ -2547,93 +2529,95 @@ bool AdehazeByPassProcessing(AdehazeHandle_t* pAdehazeCtx)
 {
     LOG1_ADEHAZE("ENTER: %s \n", __func__);
     bool ret = false;
-    float diff = 0.0;
 
-    if(pAdehazeCtx->FrameID <= 2)
-        pAdehazeCtx->byPassProc = false;
-    else if(CHECK_ISP_HW_V20()) {
-        // todo
-    }
-    else if(CHECK_ISP_HW_V21()) {
-        if (pAdehazeCtx->AdehazeAtrr.mode > DEHAZE_API_AUTO)
+    if (!pAdehazeCtx->isCapture) {
+        float diff = 0.0;
+
+        if (pAdehazeCtx->FrameID <= 2)
             pAdehazeCtx->byPassProc = false;
-        else if(pAdehazeCtx->AdehazeAtrr.mode != pAdehazeCtx->PreData.V21.ApiMode)
-            pAdehazeCtx->byPassProc = false;
-        else {
-            if (pAdehazeCtx->AdehazeAtrr.stAuto.DehazeTuningPara.CtrlDataType ==
-                CTRLDATATYPE_ENVLV) {
-                diff = pAdehazeCtx->PreData.V21.EnvLv - pAdehazeCtx->CurrData.V21.EnvLv;
-                if (pAdehazeCtx->PreData.V21.EnvLv == 0.0) {
-                    diff = pAdehazeCtx->CurrData.V21.EnvLv;
-                    if (diff == 0.0)
-                        pAdehazeCtx->byPassProc = true;
-                    else
-                        pAdehazeCtx->byPassProc = false;
-                } else {
-                    diff /= pAdehazeCtx->PreData.V21.EnvLv;
+        else if (CHECK_ISP_HW_V20()) {
+            // todo
+        } else if (CHECK_ISP_HW_V21()) {
+            if (pAdehazeCtx->AdehazeAtrr.mode > DEHAZE_API_AUTO)
+                pAdehazeCtx->byPassProc = false;
+            else if (pAdehazeCtx->AdehazeAtrr.mode != pAdehazeCtx->PreData.V21.ApiMode)
+                pAdehazeCtx->byPassProc = false;
+            else {
+                if (pAdehazeCtx->AdehazeAtrr.stAuto.DehazeTuningPara.CtrlDataType ==
+                    CTRLDATATYPE_ENVLV) {
+                    diff = pAdehazeCtx->PreData.V21.EnvLv - pAdehazeCtx->CurrData.V21.EnvLv;
+                    if (pAdehazeCtx->PreData.V21.EnvLv == 0.0) {
+                        diff = pAdehazeCtx->CurrData.V21.EnvLv;
+                        if (diff == 0.0)
+                            pAdehazeCtx->byPassProc = true;
+                        else
+                            pAdehazeCtx->byPassProc = false;
+                    } else {
+                        diff /= pAdehazeCtx->PreData.V21.EnvLv;
+                        if (diff >= pAdehazeCtx->AdehazeAtrr.stAuto.DehazeTuningPara.ByPassThr ||
+                            diff <=
+                                (0 - pAdehazeCtx->AdehazeAtrr.stAuto.DehazeTuningPara.ByPassThr))
+                            pAdehazeCtx->byPassProc = false;
+                        else
+                            pAdehazeCtx->byPassProc = true;
+                    }
+                } else if (pAdehazeCtx->AdehazeAtrr.stAuto.DehazeTuningPara.CtrlDataType ==
+                           CTRLDATATYPE_ISO) {
+                    diff = pAdehazeCtx->PreData.V21.ISO - pAdehazeCtx->CurrData.V21.ISO;
+                    diff /= pAdehazeCtx->PreData.V21.ISO;
                     if (diff >= pAdehazeCtx->AdehazeAtrr.stAuto.DehazeTuningPara.ByPassThr ||
                         diff <= (0 - pAdehazeCtx->AdehazeAtrr.stAuto.DehazeTuningPara.ByPassThr))
                         pAdehazeCtx->byPassProc = false;
                     else
                         pAdehazeCtx->byPassProc = true;
                 }
-            } else if (pAdehazeCtx->AdehazeAtrr.stAuto.DehazeTuningPara.CtrlDataType ==
-                       CTRLDATATYPE_ISO) {
-                diff = pAdehazeCtx->PreData.V21.ISO - pAdehazeCtx->CurrData.V21.ISO;
-                diff /= pAdehazeCtx->PreData.V21.ISO;
-                if (diff >= pAdehazeCtx->AdehazeAtrr.stAuto.DehazeTuningPara.ByPassThr ||
-                    diff <= (0 - pAdehazeCtx->AdehazeAtrr.stAuto.DehazeTuningPara.ByPassThr))
-                    pAdehazeCtx->byPassProc = false;
-                else
-                    pAdehazeCtx->byPassProc = true;
             }
-        }
-    }
-    else if(CHECK_ISP_HW_V30()) {
-        if (pAdehazeCtx->AdehazeAtrr.mode > DEHAZE_API_AUTO)
-            pAdehazeCtx->byPassProc = false;
-        else if(pAdehazeCtx->AdehazeAtrr.mode != pAdehazeCtx->PreData.V30.ApiMode)
-            pAdehazeCtx->byPassProc = false;
-        else {
-            if (pAdehazeCtx->AdehazeAtrr.stAuto.DehazeTuningPara.CtrlDataType ==
-                CTRLDATATYPE_ENVLV) {
-                diff = pAdehazeCtx->PreData.V30.EnvLv - pAdehazeCtx->CurrData.V30.EnvLv;
-                if (pAdehazeCtx->PreData.V30.EnvLv == 0.0) {
-                    diff = pAdehazeCtx->CurrData.V30.EnvLv;
-                    if (diff == 0.0)
-                        pAdehazeCtx->byPassProc = true;
-                    else
-                        pAdehazeCtx->byPassProc = false;
-                } else {
-                    diff /= pAdehazeCtx->PreData.V30.EnvLv;
+        } else if (CHECK_ISP_HW_V30()) {
+            if (pAdehazeCtx->AdehazeAtrr.mode > DEHAZE_API_AUTO)
+                pAdehazeCtx->byPassProc = false;
+            else if (pAdehazeCtx->AdehazeAtrr.mode != pAdehazeCtx->PreData.V30.ApiMode)
+                pAdehazeCtx->byPassProc = false;
+            else {
+                if (pAdehazeCtx->AdehazeAtrr.stAuto.DehazeTuningPara.CtrlDataType ==
+                    CTRLDATATYPE_ENVLV) {
+                    diff = pAdehazeCtx->PreData.V30.EnvLv - pAdehazeCtx->CurrData.V30.EnvLv;
+                    if (pAdehazeCtx->PreData.V30.EnvLv == 0.0) {
+                        diff = pAdehazeCtx->CurrData.V30.EnvLv;
+                        if (diff == 0.0)
+                            pAdehazeCtx->byPassProc = true;
+                        else
+                            pAdehazeCtx->byPassProc = false;
+                    } else {
+                        diff /= pAdehazeCtx->PreData.V30.EnvLv;
+                        if (diff >= pAdehazeCtx->AdehazeAtrr.stAuto.DehazeTuningPara.ByPassThr ||
+                            diff <=
+                                (0 - pAdehazeCtx->AdehazeAtrr.stAuto.DehazeTuningPara.ByPassThr))
+                            pAdehazeCtx->byPassProc = false;
+                        else
+                            pAdehazeCtx->byPassProc = true;
+                    }
+                } else if (pAdehazeCtx->AdehazeAtrr.stAuto.DehazeTuningPara.CtrlDataType ==
+                           CTRLDATATYPE_ISO) {
+                    diff = pAdehazeCtx->PreData.V30.ISO - pAdehazeCtx->CurrData.V30.ISO;
+                    diff /= pAdehazeCtx->PreData.V30.ISO;
                     if (diff >= pAdehazeCtx->AdehazeAtrr.stAuto.DehazeTuningPara.ByPassThr ||
                         diff <= (0 - pAdehazeCtx->AdehazeAtrr.stAuto.DehazeTuningPara.ByPassThr))
                         pAdehazeCtx->byPassProc = false;
                     else
                         pAdehazeCtx->byPassProc = true;
                 }
-            } else if (pAdehazeCtx->AdehazeAtrr.stAuto.DehazeTuningPara.CtrlDataType ==
-                       CTRLDATATYPE_ISO) {
-                diff = pAdehazeCtx->PreData.V30.ISO - pAdehazeCtx->CurrData.V30.ISO;
-                diff /= pAdehazeCtx->PreData.V30.ISO;
-                if (diff >= pAdehazeCtx->AdehazeAtrr.stAuto.DehazeTuningPara.ByPassThr ||
-                    diff <= (0 - pAdehazeCtx->AdehazeAtrr.stAuto.DehazeTuningPara.ByPassThr))
-                    pAdehazeCtx->byPassProc = false;
-                else
-                    pAdehazeCtx->byPassProc = true;
             }
-        }
+        } else
+            LOGE_ADEHAZE(" %s:Wrong hardware version!! \n", __func__);
+
+        ret = pAdehazeCtx->byPassProc;
+
+        LOGD_ADEHAZE("%s:FrameID:%d CtrlDataType:%d EnvLv:%f ISO:%f diff:%f byPassProc:%d \n",
+                     __func__, pAdehazeCtx->FrameID,
+                     pAdehazeCtx->AdehazeAtrr.stAuto.DehazeTuningPara.CtrlDataType,
+                     pAdehazeCtx->CurrData.V30.EnvLv, pAdehazeCtx->CurrData.V30.ISO, diff,
+                     pAdehazeCtx->byPassProc);
     }
-    else
-        LOGE_ADEHAZE(" %s:Wrong hardware version!! \n", __func__);
-
-    ret = pAdehazeCtx->byPassProc;
-
-    LOGD_ADEHAZE("%s:FrameID:%d CtrlDataType:%d EnvLv:%f ISO:%f diff:%f byPassProc:%d \n", __func__,
-                 pAdehazeCtx->FrameID,
-                 pAdehazeCtx->AdehazeAtrr.stAuto.DehazeTuningPara.CtrlDataType,
-                 pAdehazeCtx->CurrData.V30.EnvLv, pAdehazeCtx->CurrData.V30.ISO, diff,
-                 pAdehazeCtx->byPassProc);
 
     LOG1_ADEHAZE("EXIT: %s \n", __func__);
     return ret;

@@ -371,6 +371,11 @@ XCamReturn RkAiqAnalyzeGroupManager::groupMessageHandler(std::vector<SmartPtr<XC
                 // vdBufMsg = msg.dynamic_cast_ptr<RkAiqCoreVdBufMsg>();
                 // if (vdBufMsg.ptr()) xCamAmdProcRes = convert_to_XCamVideoBuffer(vdBufMsg->msg);
                 break;
+            case XCAM_MESSAGE_ADEHAZE_STATS_OK:
+                vdBufMsg = msg.dynamic_cast_ptr<RkAiqCoreVdBufMsg>();
+                if (vdBufMsg.ptr())
+                    shared->adehazeStatsBuf = convert_to_XCamVideoBuffer(vdBufMsg->msg);
+                break;
             default:
                 break;
         }
@@ -438,6 +443,10 @@ XCamReturn RkAiqAnalyzeGroupManager::groupMessageHandler(std::vector<SmartPtr<XC
     if (shared->res_comb.awb_proc_res) {
         shared->res_comb.awb_proc_res->unref(shared->res_comb.awb_proc_res);
         shared->res_comb.awb_proc_res = nullptr;
+    }
+    if (shared->adehazeStatsBuf) {
+        shared->adehazeStatsBuf->unref(shared->adehazeStatsBuf);
+        shared->adehazeStatsBuf = nullptr;
     }
 
     return XCAM_RETURN_NO_ERROR;

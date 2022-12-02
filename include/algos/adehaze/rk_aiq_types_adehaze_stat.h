@@ -21,11 +21,12 @@ typedef struct others_t {
 typedef struct dehaze_stats_v30_s {
     unsigned int dhaz_pic_sumh_left;
     unsigned int dhaz_pic_sumh_right;
-    int dhaz_adp_air_base;
-    int dhaz_adp_wt;
-    int dhaz_adp_gratio;
-    int dhaz_adp_tmax;
-    int h_rgb_iir[64];
+    unsigned short dhaz_adp_air_base;
+    unsigned short dhaz_adp_wt;
+    unsigned short dhaz_adp_gratio;
+    unsigned short dhaz_adp_tmax;
+    unsigned short h_rgb_iir_left[64];
+    unsigned short h_rgb_iir_right[64];
 } dehaze_stats_v30_t;
 
 typedef struct dehaze_stats_v21_s {
@@ -47,12 +48,14 @@ typedef struct dehaze_stats_v20_s {
 } dehaze_stats_v20_t;
 
 typedef struct rkisp_adehaze_stats_s {
+    bool stats_true;
+    uint32_t frame_id;
     union {
         dehaze_stats_v20_t dehaze_stats_v20;
         dehaze_stats_v21_t dehaze_stats_v21;
         dehaze_stats_v30_t dehaze_stats_v30;
     };
-    others_t other_stats;
+    // others_t other_stats;
 } rkisp_adehaze_stats_t;
 
 

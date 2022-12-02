@@ -73,6 +73,8 @@ prepare(RkAiqAlgoCom* params)
     const CamCalibDbV2Context_t* pCalibDb = config->s_calibv2;
 
     pAdehazeGrpHandle->working_mode = config->gcom.com.u.prepare.working_mode;
+    pAdehazeGrpHandle->height       = config->gcom.com.u.prepare.sns_op_height;
+    pAdehazeGrpHandle->width        = config->gcom.com.u.prepare.sns_op_width;
 
     if (pAdehazeGrpHandle->working_mode < RK_AIQ_WORKING_MODE_ISP_HDR2)
         pAdehazeGrpHandle->FrameNumber = LINEAR_NUM;
@@ -122,44 +124,39 @@ processing(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outparams)
 
     LOGD_ADEHAZE("/*************************Adehaze Group Start******************/ \n");
 
-    if (pAdehazeGrpHandle->isCapture) {
-        LOGD_ADEHAZE("%s: It's capturing, using pre frame params\n", __func__);
-        pAdehazeGrpHandle->isCapture = false;
-    } else {
-        AdehazeGetCurrDataGroup(pAdehazeGrpHandle,
-                                &pGrpProcPara->camgroupParmasArray[0]->aec._effAecExpInfo,
-                                pGrpProcPara->camgroupParmasArray[0]->aec._aePreRes,
-                                pGrpProcPara->camgroupParmasArray[0]->aynr._aynr_procRes_v3._sigma);
+    AdehazeGetCurrDataGroup(pAdehazeGrpHandle,
+                            &pGrpProcPara->camgroupParmasArray[0]->aec._effAecExpInfo,
+                            pGrpProcPara->camgroupParmasArray[0]->aec._aePreRes,
+                            pGrpProcPara->camgroupParmasArray[0]->aynr._aynr_procRes_v3._sigma);
 
-        // process
-        if (!(AdehazeByPassProcessing(pAdehazeGrpHandle)))
-            ret = AdehazeProcess(pAdehazeGrpHandle, pAdehazeGrpHandle->HWversion);
+    // process
+    if (!(AdehazeByPassProcessing(pAdehazeGrpHandle)))
+        ret = AdehazeProcess(pAdehazeGrpHandle, pAdehazeGrpHandle->HWversion);
 
-        // store data
-        if (pAdehazeGrpHandle->HWversion == ADEHAZE_ISP20)
-            pAdehazeGrpHandle->PreData.V20.ApiMode = pAdehazeGrpHandle->AdehazeAtrr.mode;
-        else if (pAdehazeGrpHandle->HWversion == ADEHAZE_ISP21)
-            pAdehazeGrpHandle->PreData.V21.ApiMode = pAdehazeGrpHandle->AdehazeAtrr.mode;
-        else if (pAdehazeGrpHandle->HWversion == ADEHAZE_ISP30)
-            pAdehazeGrpHandle->PreData.V30.ApiMode = pAdehazeGrpHandle->AdehazeAtrr.mode;
+    // store data
+    if (pAdehazeGrpHandle->HWversion == ADEHAZE_ISP20)
+        pAdehazeGrpHandle->PreData.V20.ApiMode = pAdehazeGrpHandle->AdehazeAtrr.mode;
+    else if (pAdehazeGrpHandle->HWversion == ADEHAZE_ISP21)
+        pAdehazeGrpHandle->PreData.V21.ApiMode = pAdehazeGrpHandle->AdehazeAtrr.mode;
+    else if (pAdehazeGrpHandle->HWversion == ADEHAZE_ISP30)
+        pAdehazeGrpHandle->PreData.V30.ApiMode = pAdehazeGrpHandle->AdehazeAtrr.mode;
 
-        // proc res
-        if (pAdehazeGrpHandle->HWversion == ADEHAZE_ISP20) {
-            pAdehazeGrpHandle->ProcRes.ProcResV20.enable = true;
-            pAdehazeGrpHandle->ProcRes.ProcResV20.update = !(pAdehazeGrpHandle->byPassProc);
-        } else if (pAdehazeGrpHandle->HWversion == ADEHAZE_ISP21) {
-            pAdehazeGrpHandle->ProcRes.ProcResV21.enable =
-                pAdehazeGrpHandle->ProcRes.ProcResV21.enable;
-            pAdehazeGrpHandle->ProcRes.ProcResV21.update = !(pAdehazeGrpHandle->byPassProc);
-        } else if (pAdehazeGrpHandle->HWversion == ADEHAZE_ISP30) {
-            pAdehazeGrpHandle->ProcRes.ProcResV30.enable =
-                pAdehazeGrpHandle->ProcRes.ProcResV30.enable;
-            pAdehazeGrpHandle->ProcRes.ProcResV30.update = !(pAdehazeGrpHandle->byPassProc);
-        }
+    // proc res
+    if (pAdehazeGrpHandle->HWversion == ADEHAZE_ISP20) {
+        pAdehazeGrpHandle->ProcRes.ProcResV20.enable = true;
+        pAdehazeGrpHandle->ProcRes.ProcResV20.update = !(pAdehazeGrpHandle->byPassProc);
+    } else if (pAdehazeGrpHandle->HWversion == ADEHAZE_ISP21) {
+        pAdehazeGrpHandle->ProcRes.ProcResV21.enable = pAdehazeGrpHandle->ProcRes.ProcResV21.enable;
+        pAdehazeGrpHandle->ProcRes.ProcResV21.update = !(pAdehazeGrpHandle->byPassProc);
+    } else if (pAdehazeGrpHandle->HWversion == ADEHAZE_ISP30) {
+        pAdehazeGrpHandle->ProcRes.ProcResV30.enable = pAdehazeGrpHandle->ProcRes.ProcResV30.enable;
+        pAdehazeGrpHandle->ProcRes.ProcResV30.update = !(pAdehazeGrpHandle->byPassProc);
     }
 
     for (int i = 0; i < pGrpProcResPara->arraySize; i++)
         memcpy(pGrpProcResPara->camgroupParmasArray[i]->_adehazeConfig, &pAdehazeGrpHandle->ProcRes, sizeof(RkAiqAdehazeProcResult_t));
+
+    if (pAdehazeGrpHandle->isCapture) pAdehazeGrpHandle->isCapture = false;
 
     LOGD_ADEHAZE("/*************************Adehaze Group Over******************/ \n");
 

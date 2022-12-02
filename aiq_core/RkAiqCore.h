@@ -400,6 +400,7 @@ public:
         XCamVideoBuffer* aecStatsBuf;
         XCamVideoBuffer* awbStatsBuf;
         XCamVideoBuffer* afStatsBuf;
+        XCamVideoBuffer* adehazeStatsBuf;
         XCamVideoBuffer* sp;
         XCamVideoBuffer* ispGain;
         XCamVideoBuffer* kgGain;
@@ -426,6 +427,7 @@ public:
             aecStatsBuf = nullptr;
             awbStatsBuf = nullptr;
             afStatsBuf = nullptr;
+            adehazeStatsBuf = nullptr;
             orbStats = nullptr;
             nrImg       = nullptr;
             pdafStatsBuf = nullptr;

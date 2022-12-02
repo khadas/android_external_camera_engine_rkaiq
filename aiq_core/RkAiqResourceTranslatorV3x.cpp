@@ -1127,7 +1127,6 @@ RkAiqResourceTranslatorV3x::translateMultiAdehazeStats(const SmartPtr<VideoBuffe
 
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
 
-#if 0
     const SmartPtr<Isp20StatsBuffer> buf =
         from.dynamic_cast_ptr<Isp20StatsBuffer>();
 
@@ -1155,6 +1154,97 @@ RkAiqResourceTranslatorV3x::translateMultiAdehazeStats(const SmartPtr<VideoBuffe
     else
         LOGI_ANALYZER("stats: frame_id: %d,  meas_type; 0x%x", left_stats->frame_id, left_stats->meas_type);
 
+    LOGV_ADEHAZE(
+        " %s left frame_id:%d dhaz_adp_air_base:%d dhaz_adp_wt:%d dhaz_adp_tmax:%d "
+        "dhaz_adp_gratio:%d dhaz_pic_sumh:%d\n",
+        __func__, left_stats->frame_id, left_stats->params.dhaz.dhaz_adp_air_base,
+        left_stats->params.dhaz.dhaz_adp_wt, left_stats->params.dhaz.dhaz_adp_tmax,
+        left_stats->params.dhaz.dhaz_adp_gratio, left_stats->params.dhaz.dhaz_pic_sumh);
+    LOGV_ADEHAZE(" %s left h_rgb_iir[0~5]:%d %d %d %d %d %d\n", __func__,
+                 left_stats->params.dhaz.h_rgb_iir[0], left_stats->params.dhaz.h_rgb_iir[1],
+                 left_stats->params.dhaz.h_rgb_iir[2], left_stats->params.dhaz.h_rgb_iir[3],
+                 left_stats->params.dhaz.h_rgb_iir[4], left_stats->params.dhaz.h_rgb_iir[5]);
+    LOGV_ADEHAZE("%s left h_rgb_iir[0~15]:%d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d\n",
+                 __func__, left_stats->params.dhaz.h_rgb_iir[0],
+                 left_stats->params.dhaz.h_rgb_iir[1], left_stats->params.dhaz.h_rgb_iir[2],
+                 left_stats->params.dhaz.h_rgb_iir[3], left_stats->params.dhaz.h_rgb_iir[4],
+                 left_stats->params.dhaz.h_rgb_iir[5], left_stats->params.dhaz.h_rgb_iir[6],
+                 left_stats->params.dhaz.h_rgb_iir[7], left_stats->params.dhaz.h_rgb_iir[8],
+                 left_stats->params.dhaz.h_rgb_iir[9], left_stats->params.dhaz.h_rgb_iir[10],
+                 left_stats->params.dhaz.h_rgb_iir[11], left_stats->params.dhaz.h_rgb_iir[12],
+                 left_stats->params.dhaz.h_rgb_iir[13], left_stats->params.dhaz.h_rgb_iir[14],
+                 left_stats->params.dhaz.h_rgb_iir[15]);
+    LOGV_ADEHAZE("%s h_rgb_iir[16~31]:%d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d\n", __func__,
+                 left_stats->params.dhaz.h_rgb_iir[16], left_stats->params.dhaz.h_rgb_iir[17],
+                 left_stats->params.dhaz.h_rgb_iir[18], left_stats->params.dhaz.h_rgb_iir[19],
+                 left_stats->params.dhaz.h_rgb_iir[20], left_stats->params.dhaz.h_rgb_iir[21],
+                 left_stats->params.dhaz.h_rgb_iir[22], left_stats->params.dhaz.h_rgb_iir[23],
+                 left_stats->params.dhaz.h_rgb_iir[24], left_stats->params.dhaz.h_rgb_iir[25],
+                 left_stats->params.dhaz.h_rgb_iir[26], left_stats->params.dhaz.h_rgb_iir[27],
+                 left_stats->params.dhaz.h_rgb_iir[28], left_stats->params.dhaz.h_rgb_iir[29],
+                 left_stats->params.dhaz.h_rgb_iir[30], left_stats->params.dhaz.h_rgb_iir[31]);
+    LOGV_ADEHAZE("%s h_rgb_iir[32~47]:%d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d\n", __func__,
+                 left_stats->params.dhaz.h_rgb_iir[32], left_stats->params.dhaz.h_rgb_iir[33],
+                 left_stats->params.dhaz.h_rgb_iir[34], left_stats->params.dhaz.h_rgb_iir[35],
+                 left_stats->params.dhaz.h_rgb_iir[36], left_stats->params.dhaz.h_rgb_iir[37],
+                 left_stats->params.dhaz.h_rgb_iir[38], left_stats->params.dhaz.h_rgb_iir[39],
+                 left_stats->params.dhaz.h_rgb_iir[40], left_stats->params.dhaz.h_rgb_iir[41],
+                 left_stats->params.dhaz.h_rgb_iir[42], left_stats->params.dhaz.h_rgb_iir[43],
+                 left_stats->params.dhaz.h_rgb_iir[44], left_stats->params.dhaz.h_rgb_iir[45],
+                 left_stats->params.dhaz.h_rgb_iir[46], left_stats->params.dhaz.h_rgb_iir[47]);
+    LOGV_ADEHAZE("%s h_rgb_iir[48~63]:%d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d\n", __func__,
+                 left_stats->params.dhaz.h_rgb_iir[48], left_stats->params.dhaz.h_rgb_iir[49],
+                 left_stats->params.dhaz.h_rgb_iir[50], left_stats->params.dhaz.h_rgb_iir[51],
+                 left_stats->params.dhaz.h_rgb_iir[52], left_stats->params.dhaz.h_rgb_iir[53],
+                 left_stats->params.dhaz.h_rgb_iir[54], left_stats->params.dhaz.h_rgb_iir[55],
+                 left_stats->params.dhaz.h_rgb_iir[56], left_stats->params.dhaz.h_rgb_iir[57],
+                 left_stats->params.dhaz.h_rgb_iir[58], left_stats->params.dhaz.h_rgb_iir[59],
+                 left_stats->params.dhaz.h_rgb_iir[60], left_stats->params.dhaz.h_rgb_iir[61],
+                 left_stats->params.dhaz.h_rgb_iir[62], left_stats->params.dhaz.h_rgb_iir[63]);
+    LOGV_ADEHAZE(
+        " %s right frame_id:%d dhaz_adp_air_base:%d dhaz_adp_wt:%d dhaz_adp_tmax:%d "
+        "dhaz_adp_gratio:%d dhaz_pic_sumh:%d\n",
+        __func__, right_stats->frame_id, right_stats->params.dhaz.dhaz_adp_air_base,
+        right_stats->params.dhaz.dhaz_adp_wt, right_stats->params.dhaz.dhaz_adp_tmax,
+        right_stats->params.dhaz.dhaz_adp_gratio, right_stats->params.dhaz.dhaz_pic_sumh);
+    LOGV_ADEHAZE("%s right h_rgb_iir[0~15]:%d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d\n",
+                 __func__, right_stats->params.dhaz.h_rgb_iir[0],
+                 right_stats->params.dhaz.h_rgb_iir[1], right_stats->params.dhaz.h_rgb_iir[2],
+                 right_stats->params.dhaz.h_rgb_iir[3], right_stats->params.dhaz.h_rgb_iir[4],
+                 right_stats->params.dhaz.h_rgb_iir[5], right_stats->params.dhaz.h_rgb_iir[6],
+                 right_stats->params.dhaz.h_rgb_iir[7], right_stats->params.dhaz.h_rgb_iir[8],
+                 right_stats->params.dhaz.h_rgb_iir[9], right_stats->params.dhaz.h_rgb_iir[10],
+                 right_stats->params.dhaz.h_rgb_iir[11], right_stats->params.dhaz.h_rgb_iir[12],
+                 right_stats->params.dhaz.h_rgb_iir[13], right_stats->params.dhaz.h_rgb_iir[14],
+                 right_stats->params.dhaz.h_rgb_iir[15]);
+    LOGV_ADEHAZE("%s h_rgb_iir[16~31]:%d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d\n", __func__,
+                 right_stats->params.dhaz.h_rgb_iir[16], right_stats->params.dhaz.h_rgb_iir[17],
+                 right_stats->params.dhaz.h_rgb_iir[18], right_stats->params.dhaz.h_rgb_iir[19],
+                 right_stats->params.dhaz.h_rgb_iir[20], right_stats->params.dhaz.h_rgb_iir[21],
+                 right_stats->params.dhaz.h_rgb_iir[22], right_stats->params.dhaz.h_rgb_iir[23],
+                 right_stats->params.dhaz.h_rgb_iir[24], right_stats->params.dhaz.h_rgb_iir[25],
+                 right_stats->params.dhaz.h_rgb_iir[26], right_stats->params.dhaz.h_rgb_iir[27],
+                 right_stats->params.dhaz.h_rgb_iir[28], right_stats->params.dhaz.h_rgb_iir[29],
+                 right_stats->params.dhaz.h_rgb_iir[30], right_stats->params.dhaz.h_rgb_iir[31]);
+    LOGV_ADEHAZE("%s h_rgb_iir[32~47]:%d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d\n", __func__,
+                 right_stats->params.dhaz.h_rgb_iir[32], right_stats->params.dhaz.h_rgb_iir[33],
+                 right_stats->params.dhaz.h_rgb_iir[34], right_stats->params.dhaz.h_rgb_iir[35],
+                 right_stats->params.dhaz.h_rgb_iir[36], right_stats->params.dhaz.h_rgb_iir[37],
+                 right_stats->params.dhaz.h_rgb_iir[38], right_stats->params.dhaz.h_rgb_iir[39],
+                 right_stats->params.dhaz.h_rgb_iir[40], right_stats->params.dhaz.h_rgb_iir[41],
+                 right_stats->params.dhaz.h_rgb_iir[42], right_stats->params.dhaz.h_rgb_iir[43],
+                 right_stats->params.dhaz.h_rgb_iir[44], right_stats->params.dhaz.h_rgb_iir[45],
+                 right_stats->params.dhaz.h_rgb_iir[46], right_stats->params.dhaz.h_rgb_iir[47]);
+    LOGV_ADEHAZE("%s h_rgb_iir[48~63]:%d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d\n", __func__,
+                 right_stats->params.dhaz.h_rgb_iir[48], right_stats->params.dhaz.h_rgb_iir[49],
+                 right_stats->params.dhaz.h_rgb_iir[50], right_stats->params.dhaz.h_rgb_iir[51],
+                 right_stats->params.dhaz.h_rgb_iir[52], right_stats->params.dhaz.h_rgb_iir[53],
+                 right_stats->params.dhaz.h_rgb_iir[54], right_stats->params.dhaz.h_rgb_iir[55],
+                 right_stats->params.dhaz.h_rgb_iir[56], right_stats->params.dhaz.h_rgb_iir[57],
+                 right_stats->params.dhaz.h_rgb_iir[58], right_stats->params.dhaz.h_rgb_iir[59],
+                 right_stats->params.dhaz.h_rgb_iir[60], right_stats->params.dhaz.h_rgb_iir[61],
+                 right_stats->params.dhaz.h_rgb_iir[62], right_stats->params.dhaz.h_rgb_iir[63]);
+
     //adehaze stats v3.x
     statsInt->adehaze_stats_valid = left_stats->meas_type >> 17 & 1;
     statsInt->frame_id = left_stats->frame_id;
@@ -1163,18 +1253,17 @@ RkAiqResourceTranslatorV3x::translateMultiAdehazeStats(const SmartPtr<VideoBuffe
     statsInt->adehaze_stats.dehaze_stats_v30.dhaz_adp_wt = (left_stats->params.dhaz.dhaz_adp_wt + right_stats->params.dhaz.dhaz_adp_wt) / 2;
     statsInt->adehaze_stats.dehaze_stats_v30.dhaz_adp_gratio = (left_stats->params.dhaz.dhaz_adp_gratio + right_stats->params.dhaz.dhaz_adp_gratio) / 2;
     statsInt->adehaze_stats.dehaze_stats_v30.dhaz_adp_tmax = (left_stats->params.dhaz.dhaz_adp_tmax + right_stats->params.dhaz.dhaz_adp_tmax) / 2;
-    statsInt->adehaze_stats.dehaze_stats_v30.dhaz_pic_sumh_left = left_stats->params.dhaz.dhaz_adp_tmax;
-    statsInt->adehaze_stats.dehaze_stats_v30.dhaz_pic_sumh_right = right_stats->params.dhaz.dhaz_adp_tmax;
+    statsInt->adehaze_stats.dehaze_stats_v30.dhaz_pic_sumh_left =
+        left_stats->params.dhaz.dhaz_pic_sumh;
+    statsInt->adehaze_stats.dehaze_stats_v30.dhaz_pic_sumh_right =
+        right_stats->params.dhaz.dhaz_pic_sumh;
 
-    unsigned int ro_pic_sumh_left = left_stats->params.dhaz.dhaz_pic_sumh;
-    unsigned int ro_pic_sumh_right = right_stats->params.dhaz.dhaz_pic_sumh;
-    unsigned int tmp = 0;
     for (int i = 0; i < ISP3X_DHAZ_HIST_IIR_NUM; i++) {
-        tmp = (left_stats->params.dhaz.h_rgb_iir[i] * ro_pic_sumh_left + right_stats->params.dhaz.h_rgb_iir[i] * ro_pic_sumh_right)
-              / (ro_pic_sumh_left + ro_pic_sumh_right);
-        statsInt->adehaze_stats.dehaze_stats_v30.h_rgb_iir[i] = tmp > ISP3X_DHAZ_HIST_IIR_MAX ? ISP3X_DHAZ_HIST_IIR_MAX : tmp;
+        statsInt->adehaze_stats.dehaze_stats_v30.h_rgb_iir_left[i] =
+            left_stats->params.dhaz.h_rgb_iir[i];
+        statsInt->adehaze_stats.dehaze_stats_v30.h_rgb_iir_right[i] =
+            right_stats->params.dhaz.h_rgb_iir[i];
     }
-#endif
 
     return ret;
 }
@@ -2402,13 +2491,19 @@ RkAiqResourceTranslatorV3x::translateAdehazeStats (const SmartPtr<VideoBuffer> &
                   mCamPhyId, stats->frame_id, stats->meas_type);
     //dehaze
     statsInt->adehaze_stats_valid = stats->meas_type >> 17 & 1;
+    statsInt->adehaze_stats.frame_id                           = stats->frame_id;
     statsInt->adehaze_stats.dehaze_stats_v30.dhaz_adp_air_base = stats->params.dhaz.dhaz_adp_air_base;
     statsInt->adehaze_stats.dehaze_stats_v30.dhaz_adp_wt = stats->params.dhaz.dhaz_adp_wt;
-    statsInt->adehaze_stats.dehaze_stats_v30.dhaz_adp_gratio = stats->params.dhaz.dhaz_adp_gratio;
-    statsInt->adehaze_stats.dehaze_stats_v30.dhaz_adp_wt = stats->params.dhaz.dhaz_adp_wt;
+    statsInt->adehaze_stats.dehaze_stats_v30.dhaz_adp_tmax     = stats->params.dhaz.dhaz_adp_tmax;
+    statsInt->adehaze_stats.dehaze_stats_v30.dhaz_pic_sumh_right = stats->params.dhaz.dhaz_pic_sumh;
     statsInt->adehaze_stats.dehaze_stats_v30.dhaz_pic_sumh_left = stats->params.dhaz.dhaz_pic_sumh;
-    for(int i = 0; i < ISP3X_DHAZ_HIST_IIR_NUM; i++)
-        statsInt->adehaze_stats.dehaze_stats_v30.h_rgb_iir[i] = stats->params.dhaz.h_rgb_iir[i];
+    statsInt->adehaze_stats.dehaze_stats_v30.dhaz_adp_gratio = stats->params.dhaz.dhaz_adp_gratio;
+    for (int i = 0; i < ISP3X_DHAZ_HIST_IIR_NUM; i++) {
+        statsInt->adehaze_stats.dehaze_stats_v30.h_rgb_iir_left[i] =
+            stats->params.dhaz.h_rgb_iir[i];
+        statsInt->adehaze_stats.dehaze_stats_v30.h_rgb_iir_right[i] =
+            stats->params.dhaz.h_rgb_iir[i];
+    }
 
     to->set_sequence(stats->frame_id);
 
