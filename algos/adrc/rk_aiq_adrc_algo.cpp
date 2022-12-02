@@ -1883,100 +1883,105 @@ bool AdrcByPassProcessing
 )
 {
     LOG1_ATMO("%s:enter!\n", __FUNCTION__);
-
     bool bypass = false;
-    float diff = 0.0;
-    float ByPassThr = 0.0f;
 
-    // get current EnvLv from AecPreRes
-    AdrcGetEnvLv(pAdrcCtx, AecHdrPreResult);
+    if (!pAdrcCtx->isCapture) {
+        float diff      = 0.0;
+        float ByPassThr = 0.0f;
 
-    // motion coef
-    pAdrcCtx->CurrData.MotionCoef = MOVE_COEF_DEFAULT;
+        // get current EnvLv from AecPreRes
+        AdrcGetEnvLv(pAdrcCtx, AecHdrPreResult);
 
-    // transfer ae data to CurrHandle
-    pAdrcCtx->CurrData.EnvLv =
-        LIMIT_VALUE(pAdrcCtx->CurrData.EnvLv, ADRCNORMALIZEMAX, ADRCNORMALIZEMIN);
+        // motion coef
+        pAdrcCtx->CurrData.MotionCoef = MOVE_COEF_DEFAULT;
 
-    pAdrcCtx->CurrData.ISO = pAdrcCtx->CurrAeResult.ISO;
-    pAdrcCtx->CurrData.ISO = LIMIT_VALUE(pAdrcCtx->CurrData.ISO, ISOMAX, ISOMIN);
+        // transfer ae data to CurrHandle
+        pAdrcCtx->CurrData.EnvLv =
+            LIMIT_VALUE(pAdrcCtx->CurrData.EnvLv, ADRCNORMALIZEMAX, ADRCNORMALIZEMIN);
 
-    if (pAdrcCtx->frameCnt <= 2)  // start frame
-        bypass = false;
-    else if (pAdrcCtx->drcAttr.opMode == DRC_OPMODE_MANU)  // api
-        bypass = false;
-    else if (pAdrcCtx->drcAttr.opMode != pAdrcCtx->PrevData.ApiMode)  // api change
-        bypass = false;
-    else {  // EnvLv change
-        if (CHECK_ISP_HW_V21()) {
-            ByPassThr = pAdrcCtx->drcAttr.stAutoV21.DrcTuningPara.ByPassThr;
-            if (pAdrcCtx->drcAttr.stAutoV21.DrcTuningPara.CtrlDataType == CTRLDATATYPE_ENVLV) {
-                diff = pAdrcCtx->PrevData.EnvLv - pAdrcCtx->CurrData.EnvLv;
-                if (pAdrcCtx->PrevData.EnvLv == 0.0) {
-                    diff = pAdrcCtx->CurrData.EnvLv;
-                    if (diff == 0.0)
-                        bypass = true;
-                    else
-                        bypass = false;
-                } else {
-                    diff /= pAdrcCtx->PrevData.EnvLv;
+        pAdrcCtx->CurrData.ISO = pAdrcCtx->CurrAeResult.ISO;
+        pAdrcCtx->CurrData.ISO = LIMIT_VALUE(pAdrcCtx->CurrData.ISO, ISOMAX, ISOMIN);
+
+        if (pAdrcCtx->frameCnt <= 2)  // start frame
+            bypass = false;
+        else if (pAdrcCtx->drcAttr.opMode == DRC_OPMODE_MANU)  // api
+            bypass = false;
+        else if (pAdrcCtx->drcAttr.opMode != pAdrcCtx->PrevData.ApiMode)  // api change
+            bypass = false;
+        else {  // EnvLv change
+            if (CHECK_ISP_HW_V21()) {
+                ByPassThr = pAdrcCtx->drcAttr.stAutoV21.DrcTuningPara.ByPassThr;
+                if (pAdrcCtx->drcAttr.stAutoV21.DrcTuningPara.CtrlDataType == CTRLDATATYPE_ENVLV) {
+                    diff = pAdrcCtx->PrevData.EnvLv - pAdrcCtx->CurrData.EnvLv;
+                    if (pAdrcCtx->PrevData.EnvLv == 0.0) {
+                        diff = pAdrcCtx->CurrData.EnvLv;
+                        if (diff == 0.0)
+                            bypass = true;
+                        else
+                            bypass = false;
+                    } else {
+                        diff /= pAdrcCtx->PrevData.EnvLv;
+                        if (diff >= ByPassThr || diff <= (0 - ByPassThr))
+                            bypass = false;
+                        else
+                            bypass = true;
+                    }
+                } else if (pAdrcCtx->drcAttr.stAutoV21.DrcTuningPara.CtrlDataType ==
+                           CTRLDATATYPE_ISO) {
+                    diff = pAdrcCtx->PrevData.ISO - pAdrcCtx->CurrData.ISO;
+                    diff /= pAdrcCtx->PrevData.ISO;
                     if (diff >= ByPassThr || diff <= (0 - ByPassThr))
                         bypass = false;
                     else
                         bypass = true;
                 }
-            } else if (pAdrcCtx->drcAttr.stAutoV21.DrcTuningPara.CtrlDataType == CTRLDATATYPE_ISO) {
-                diff = pAdrcCtx->PrevData.ISO - pAdrcCtx->CurrData.ISO;
-                diff /= pAdrcCtx->PrevData.ISO;
-                if (diff >= ByPassThr || diff <= (0 - ByPassThr))
-                    bypass = false;
-                else
-                    bypass = true;
-            }
-            LOGD_ATMO(
-                "%s: FrameID:%d HDRFrameNum:%d LongFrmMode:%d DRCApiMode:%d CtrlDataType:%d "
-                "EnvLv:%f ISO:%f bypass:%d\n",
-                __FUNCTION__, pAdrcCtx->frameCnt, pAdrcCtx->FrameNumber,
-                pAdrcCtx->SensorInfo.LongFrmMode, pAdrcCtx->drcAttr.opMode,
-                pAdrcCtx->drcAttr.stAutoV21.DrcTuningPara.CtrlDataType, pAdrcCtx->CurrData.EnvLv,
-                pAdrcCtx->CurrData.ISO, bypass);
-        } else if (CHECK_ISP_HW_V30()) {
-            ByPassThr = pAdrcCtx->drcAttr.stAutoV30.DrcTuningPara.ByPassThr;
-            if (pAdrcCtx->drcAttr.stAutoV30.DrcTuningPara.CtrlDataType == CTRLDATATYPE_ENVLV) {
-                diff = pAdrcCtx->PrevData.EnvLv - pAdrcCtx->CurrData.EnvLv;
-                if (pAdrcCtx->PrevData.EnvLv == 0.0) {
-                    diff = pAdrcCtx->CurrData.EnvLv;
-                    if (diff == 0.0)
-                        bypass = true;
-                    else
-                        bypass = false;
-                } else {
-                    diff /= pAdrcCtx->PrevData.EnvLv;
+                LOGD_ATMO(
+                    "%s: FrameID:%d HDRFrameNum:%d LongFrmMode:%d DRCApiMode:%d CtrlDataType:%d "
+                    "EnvLv:%f ISO:%f bypass:%d\n",
+                    __FUNCTION__, pAdrcCtx->frameCnt, pAdrcCtx->FrameNumber,
+                    pAdrcCtx->SensorInfo.LongFrmMode, pAdrcCtx->drcAttr.opMode,
+                    pAdrcCtx->drcAttr.stAutoV21.DrcTuningPara.CtrlDataType,
+                    pAdrcCtx->CurrData.EnvLv, pAdrcCtx->CurrData.ISO, bypass);
+            } else if (CHECK_ISP_HW_V30()) {
+                ByPassThr = pAdrcCtx->drcAttr.stAutoV30.DrcTuningPara.ByPassThr;
+                if (pAdrcCtx->drcAttr.stAutoV30.DrcTuningPara.CtrlDataType == CTRLDATATYPE_ENVLV) {
+                    diff = pAdrcCtx->PrevData.EnvLv - pAdrcCtx->CurrData.EnvLv;
+                    if (pAdrcCtx->PrevData.EnvLv == 0.0) {
+                        diff = pAdrcCtx->CurrData.EnvLv;
+                        if (diff == 0.0)
+                            bypass = true;
+                        else
+                            bypass = false;
+                    } else {
+                        diff /= pAdrcCtx->PrevData.EnvLv;
+                        if (diff >= ByPassThr || diff <= (0 - ByPassThr))
+                            bypass = false;
+                        else
+                            bypass = true;
+                    }
+                } else if (pAdrcCtx->drcAttr.stAutoV30.DrcTuningPara.CtrlDataType ==
+                           CTRLDATATYPE_ISO) {
+                    diff = pAdrcCtx->PrevData.ISO - pAdrcCtx->CurrData.ISO;
+                    diff /= pAdrcCtx->PrevData.ISO;
                     if (diff >= ByPassThr || diff <= (0 - ByPassThr))
                         bypass = false;
                     else
                         bypass = true;
                 }
-            } else if (pAdrcCtx->drcAttr.stAutoV30.DrcTuningPara.CtrlDataType == CTRLDATATYPE_ISO) {
-                diff = pAdrcCtx->PrevData.ISO - pAdrcCtx->CurrData.ISO;
-                diff /= pAdrcCtx->PrevData.ISO;
-                if (diff >= ByPassThr || diff <= (0 - ByPassThr))
-                    bypass = false;
-                else
-                    bypass = true;
+                LOGD_ATMO(
+                    "%s: FrameID:%d HDRFrameNum:%d LongFrmMode:%d DRCApiMode:%d CtrlDataType:%d "
+                    "EnvLv:%f ISO:%f bypass:%d\n",
+                    __FUNCTION__, pAdrcCtx->frameCnt, pAdrcCtx->FrameNumber,
+                    pAdrcCtx->SensorInfo.LongFrmMode, pAdrcCtx->drcAttr.opMode,
+                    pAdrcCtx->drcAttr.stAutoV30.DrcTuningPara.CtrlDataType,
+                    pAdrcCtx->CurrData.EnvLv, pAdrcCtx->CurrData.ISO, bypass);
             }
-            LOGD_ATMO(
-                "%s: FrameID:%d HDRFrameNum:%d LongFrmMode:%d DRCApiMode:%d CtrlDataType:%d "
-                "EnvLv:%f ISO:%f bypass:%d\n",
-                __FUNCTION__, pAdrcCtx->frameCnt, pAdrcCtx->FrameNumber,
-                pAdrcCtx->SensorInfo.LongFrmMode, pAdrcCtx->drcAttr.opMode,
-                pAdrcCtx->drcAttr.stAutoV30.DrcTuningPara.CtrlDataType, pAdrcCtx->CurrData.EnvLv,
-                pAdrcCtx->CurrData.ISO, bypass);
         }
-    }
 
-    LOG1_ATMO( "%s: CtrlEnvLv:%f PrevEnvLv:%f diff:%f ByPassThr:%f opMode:%d bypass:%d!\n", __FUNCTION__, pAdrcCtx->CurrData.EnvLv,
-               pAdrcCtx->PrevData.EnvLv, diff, ByPassThr, pAdrcCtx->drcAttr.opMode, bypass);
+        LOG1_ATMO("%s: CtrlEnvLv:%f PrevEnvLv:%f diff:%f ByPassThr:%f opMode:%d bypass:%d!\n",
+                  __FUNCTION__, pAdrcCtx->CurrData.EnvLv, pAdrcCtx->PrevData.EnvLv, diff, ByPassThr,
+                  pAdrcCtx->drcAttr.opMode, bypass);
+    }
 
     LOG1_ATMO( "%s:exit!\n", __FUNCTION__);
     return bypass;
