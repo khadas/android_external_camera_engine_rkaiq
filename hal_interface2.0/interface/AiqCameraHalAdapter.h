@@ -122,6 +122,11 @@ struct Message {
     MessageData data;
 };
 
+typedef enum StillLockState {
+    STILL_CAP_3A_UNLOCK = 0,
+    STILL_CAP_3A_LOCK
+} StillLockState_t ;
+
 //namespace RkCam {
 class AiqCameraHalAdapter:
     public IMessageHandler
@@ -149,6 +154,9 @@ private:
     bool _delay_still_capture;
     rk_aiq_working_mode_t _work_mode;
     int32_t _exposureCompensation;
+    StillLockState_t mAelockstate;
+    StillLockState_t mAflockstate;
+    StillLockState_t mAwblockstate;
 
 private:  /* Members */
     /**

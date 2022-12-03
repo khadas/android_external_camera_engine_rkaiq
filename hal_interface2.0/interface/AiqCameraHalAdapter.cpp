@@ -76,7 +76,9 @@ AiqCameraHalAdapter::AiqCameraHalAdapter()
     _settingsProcessor = new SettingsProcessor();
     _settings.clear();
     _fly_settings.clear();
-
+    mAelockstate = STILL_CAP_3A_UNLOCK;
+    mAflockstate = STILL_CAP_3A_UNLOCK;
+    mAwblockstate = STILL_CAP_3A_UNLOCK;
     mAeState = new RkAEStateMachine();
     mAfState = new RkAFStateMachine();
     mAwbState = new RkAWBStateMachine();
@@ -515,11 +517,17 @@ AiqCameraHalAdapter::updateAeMetaParams(XCamAeParam *aeParams, int reqId){
     //TODO: Need lock/unlock set api
     if (_state == AIQ_ADAPTER_STATE_STARTED) {
         if (mAeState->getLockState() != ANDROID_CONTROL_AE_STATE_LOCKED) {
-            LOGD("@%s reqId(%d) set RKAIQ_AE_UNLOCKED!\n", __FUNCTION__, reqId);
-            ret = rk_aiq_uapi2_setAeLock(_aiq_ctx, false);
-            if (ret) {
-                LOGE("%s(%d) Ae set unlock failed!\n", __FUNCTION__, __LINE__);
+            if (mAelockstate) {
+                LOGD("@%s reqId(%d) set RKAIQ_AE_UNLOCKED!\n", __FUNCTION__, reqId);
+                ret = rk_aiq_uapi2_setAeLock(_aiq_ctx, false);
+                if (ret) {
+                    LOGE("%s(%d) Ae set unlock failed!\n", __FUNCTION__, __LINE__);
+                } else {
+                    mAelockstate = STILL_CAP_3A_UNLOCK;
+                    stExpSwAttr.enable = 1;
+                }
             }
+            LOGD("@%s(%d) reqId(%d) mAelockstate(%d)!\n", __FUNCTION__, __LINE__, reqId, mAelockstate);
             ret = rk_aiq_user_api_ae_setExpSwAttr(_aiq_ctx, stExpSwAttr);
             if (ret) {
                 LOGE("%s(%d) setExpSwAttr failed!\n", __FUNCTION__, __LINE__);
@@ -551,11 +559,16 @@ AiqCameraHalAdapter::updateAeMetaParams(XCamAeParam *aeParams, int reqId){
                 _exposureCompensation = exposureCompensation;
             }
         } else {
-            LOGD("@%s reqId(%d) set AE_LOCKED!\n", __FUNCTION__, reqId);
-            ret = rk_aiq_uapi2_setAeLock(_aiq_ctx, true);
-            if (ret) {
-                LOGE("%s(%d) Ae set lock failed!\n", __FUNCTION__, __LINE__);
+            if (mAelockstate == STILL_CAP_3A_UNLOCK) {
+                LOGD("@%s reqId(%d) set RKAIQ_AE_LOCKED!\n", __FUNCTION__, reqId);
+                ret = rk_aiq_uapi2_setAeLock(_aiq_ctx, true);
+                if (ret) {
+                    LOGE("%s(%d) Ae set lock failed!\n", __FUNCTION__, __LINE__);
+                } else {
+                    mAelockstate = STILL_CAP_3A_LOCK;
+                }
             }
+            LOGD("@%s(%d) reqId(%d) mAelockstate(%d)!\n", __FUNCTION__, __LINE__, reqId, mAelockstate);
         }
     }
 
@@ -650,22 +663,31 @@ AiqCameraHalAdapter::updateAfMetaParams(XCamAfParam *afParams, int reqId){
 
     if (_state == AIQ_ADAPTER_STATE_STARTED) {
         if (mAfState->getState() != ANDROID_CONTROL_AF_STATE_FOCUSED_LOCKED) {
-            LOGD("@%s reqId(%d) set RKAIQ_AF_UNLOCKED!\n", __FUNCTION__, reqId);
-            ret = rk_aiq_uapi2_unlockFocus(_aiq_ctx);
-            if (ret) {
-                LOGE("%s(%d) Af set unlock failed!\n", __FUNCTION__, __LINE__);
+            if (mAflockstate) {
+                LOGD("@%s reqId(%d) set RKAIQ_AF_UNLOCKED!\n", __FUNCTION__, reqId);
+                ret = rk_aiq_uapi2_unlockFocus(_aiq_ctx);
+                if (ret) {
+                    LOGE("%s(%d) Af set unlock failed!\n", __FUNCTION__, __LINE__);
+                } else {
+                    mAflockstate = STILL_CAP_3A_UNLOCK;
+                }
             }
-
+            LOGD("@%s(%d) reqId(%d) mAflockstate(%d)!\n", __FUNCTION__, __LINE__, reqId, mAflockstate);
             ret = rk_aiq_user_api2_af_SetAttrib(_aiq_ctx, &stAfttr);
             if (ret) {
                 LOGE("%s(%d) Af SetAttrib failed!\n", __FUNCTION__, __LINE__);
             }
         } else {
-            LOGD("@%s reqId(%d) set RKAIQ_AF_LOCKED!\n", __FUNCTION__, reqId);
-            ret = rk_aiq_uapi2_lockFocus(_aiq_ctx);
-            if (ret) {
-                LOGE("%s(%d) Af set lock failed!\n", __FUNCTION__, __LINE__);
+            if (mAflockstate == STILL_CAP_3A_UNLOCK) {
+                LOGD("@%s reqId(%d) set RKAIQ_AF_LOCKED!\n", __FUNCTION__, reqId);
+                ret = rk_aiq_uapi2_lockFocus(_aiq_ctx);
+                if (ret) {
+                    LOGE("%s(%d) Af set lock failed!\n", __FUNCTION__, __LINE__);
+                } else {
+                    mAflockstate = STILL_CAP_3A_LOCK;
+                }
             }
+            LOGD("@%s(%d) reqId(%d) mAflockstate(%d)!\n", __FUNCTION__, __LINE__, reqId, mAflockstate);
         }
     }
     pthread_mutex_unlock(&_aiq_ctx_mutex);
@@ -776,12 +798,29 @@ AiqCameraHalAdapter::updateAwbMetaParams(XCamAwbParam *awbParams, int reqId){
     pthread_mutex_lock(&_aiq_ctx_mutex);
     //when in Locked state, not run AWB Algorithm
     if (_state == AIQ_ADAPTER_STATE_STARTED) {
-        if (mAwbState->getState() != ANDROID_CONTROL_AWB_STATE_LOCKED) {
-            LOGD("@%s reqId(%d) set RKAIQ_AWB_LOCKED!\n", __FUNCTION__, reqId);
-            ret = rk_aiq_uapi_unlockAWB(_aiq_ctx);
-            if (ret) {
-                LOGE("%s(%d) Awb Set unlock failed!\n", __FUNCTION__, __LINE__);
+        if ((mAwbState->getState() == ANDROID_CONTROL_AWB_STATE_LOCKED) ||
+            (mAeState->getLockState() == ANDROID_CONTROL_AE_STATE_LOCKED)) {
+            if (mAwblockstate == STILL_CAP_3A_UNLOCK) {
+                LOGD("@%s reqId(%d) set RKAIQ_AWB_LOCKED!\n", __FUNCTION__, reqId);
+                ret = rk_aiq_uapi2_lockAWB(_aiq_ctx);
+                if (ret) {
+                    LOGE("%s(%d) Awb Set lock failed!\n", __FUNCTION__, __LINE__);
+                } else {
+                    mAwblockstate = STILL_CAP_3A_LOCK;
+                }
             }
+            LOGD("@%s(%d) reqId(%d) mAwblockstate(%d)!\n", __FUNCTION__, __LINE__, reqId, mAwblockstate);
+        } else {
+            if (mAwblockstate == STILL_CAP_3A_LOCK) {
+                LOGD("@%s reqId(%d) set RKAIQ_AWB_UNLOCKED!\n", __FUNCTION__, reqId);
+                ret = rk_aiq_uapi2_unlockAWB(_aiq_ctx);
+                if (ret) {
+                    LOGE("%s(%d) Awb Set unlock failed!\n", __FUNCTION__, __LINE__);
+                } else {
+                    mAwblockstate = STILL_CAP_3A_UNLOCK;
+                }
+            }
+            LOGD("@%s(%d) reqId(%d) mAwblockstate(%d)!\n", __FUNCTION__, __LINE__, reqId, mAwblockstate);
 
             //Not used now, for it resume 60ms in this callback
             ret = rk_aiq_user_api_accm_SetAttrib(_aiq_ctx, setCcm);
@@ -791,12 +830,6 @@ AiqCameraHalAdapter::updateAwbMetaParams(XCamAwbParam *awbParams, int reqId){
             ret = rk_aiq_user_api_awb_SetAttrib(_aiq_ctx, stAwbttr);
             if (ret) {
                 LOGE("%s(%d) Awb SetAttrib failed!\n", __FUNCTION__, __LINE__);
-            }
-        } else {
-            LOGD("@%s reqId(%d) set RKAIQ_AWB_UNLOCKED!\n", __FUNCTION__, reqId);
-            ret = rk_aiq_uapi_lockAWB(_aiq_ctx);
-            if (ret) {
-                LOGE("%s(%d) Awb Set lock failed!\n", __FUNCTION__, __LINE__);
             }
         }
     }
