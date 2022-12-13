@@ -64,6 +64,7 @@ protected:
     bool        mLastAeConvergedFlag;
     uint8_t     mAeRunCount;
     uint8_t     mAeConvergedCount;
+    uint8_t     mAePreCapCount;
     uint8_t     mCurrentAeState;
     uint8_t     mCurrentAeLockState;
     int mStilPreCapreqId;

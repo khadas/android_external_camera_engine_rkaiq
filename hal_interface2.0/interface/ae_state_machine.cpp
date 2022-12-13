@@ -242,8 +242,11 @@ RkAEModeAuto::processState(const uint8_t &controlMode,
             case ANDROID_CONTROL_AE_STATE_PRECAPTURE:
             case ANDROID_CONTROL_AE_STATE_FLASH_REQUIRED:
                 if (aeControls.aePreCaptureTrigger ==
-                        ANDROID_CONTROL_AE_PRECAPTURE_TRIGGER_START)
+                        ANDROID_CONTROL_AE_PRECAPTURE_TRIGGER_START) {
                     mCurrentAeState = ANDROID_CONTROL_AE_STATE_PRECAPTURE;
+                    ALOGD("@%s: set mAePreCapCount to 0", __FUNCTION__);
+                    mAePreCapCount = 0;
+                }
                 if (aeControls.aePreCaptureTrigger ==
                         ANDROID_CONTROL_AE_PRECAPTURE_TRIGGER_CANCEL)
                     mCurrentAeState = ANDROID_CONTROL_AE_STATE_INACTIVE;
@@ -293,7 +296,12 @@ RkAEModeAuto::processResult(const rk_aiq_ae_results &aeResults,
         }
         break;
     case ANDROID_CONTROL_AE_STATE_PRECAPTURE:
-         if (aeResults.converged) {
+         mAePreCapCount++;
+         if (aeResults.converged || mAePreCapCount >= 60) {
+            if (mAePreCapCount >= 60) {
+                ALOGE("@%s: warning: waiting ae converged preCap over too long, force converaged!!!", __FUNCTION__);
+            }
+            mAePreCapCount = 0;
             mEvChanged = false; // converged -> reset
             if (mLastAeControls.aeLock) {
                 LOGD("@%s(%d) reqId(%d) ANDROID_CONTROL_AE_STATE_LOCKED", __FUNCTION__, __LINE__, reqId);
