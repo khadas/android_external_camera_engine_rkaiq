@@ -1280,18 +1280,31 @@ void GetDehazeLocalGainSettingV30(RkAiqAdehazeProcResult_t* pProcRes, RkAiqYnrV3
         pProcRes->ProcResV30.sigma_idx[i] = (i + 1) * YNR_CURVE_STEP;
 
     // get sigma_lut
-    int tmp = 0;
-    for (int i = 0; i < ISP3X_DHAZ_SIGMA_LUT_NUM; i++) {
-        tmp = LIMIT_VALUE(8.0f * pYnrRes->sigma[i], ADHZ10BITMAX, ADHZ10BITMIN);
-        pProcRes->ProcResV30.sigma_lut[i] = tmp;
+    float sigam_total = 0.0f;
+    for (int i = 0; i < YNR_V3_ISO_CURVE_POINT_NUM; i++) sigam_total += pYnrRes->sigma[i];
+
+    if (sigam_total < FLT_EPSILON) {
+        for (int i = 0; i < YNR_V3_ISO_CURVE_POINT_NUM; i++)
+            pProcRes->ProcResV30.sigma_lut[i] = 0x200;
+    } else {
+        int tmp = 0;
+        for (int i = 0; i < ISP3X_DHAZ_SIGMA_LUT_NUM; i++) {
+            tmp = LIMIT_VALUE(8.0f * pYnrRes->sigma[i], ADHZ10BITMAX, ADHZ10BITMIN);
+            pProcRes->ProcResV30.sigma_lut[i] = tmp;
+        }
     }
 
-#if 0
-            LOGE_ADEHAZE("%s(%d) dehaze local gain IDX(0~5): 0x%x 0x%x 0x%x 0x%x 0x%x 0x%x\n", __func__, __LINE__, pProcRes->ProcResV30.sigma_idx[0], pProcRes->ProcResV30.sigma_idx[1],
-                         pProcRes->ProcResV30.sigma_idx[2], pProcRes->ProcResV30.sigma_idx[3], pProcRes->ProcResV30.sigma_idx[4], pProcRes->ProcResV30.sigma_idx[5]);
-            LOGE_ADEHAZE("%s(%d) dehaze local gain LUT(0~5): 0x%x 0x%x 0x%x 0x%x 0x%x 0x%x\n", __func__, __LINE__, pProcRes->ProcResV30.sigma_lut[0], pProcRes->ProcResV30.sigma_lut[1],
-                         pProcRes->ProcResV30.sigma_lut[2], pProcRes->ProcResV30.sigma_lut[3], pProcRes->ProcResV30.sigma_lut[4], pProcRes->ProcResV30.sigma_lut[5]);
-#endif
+    LOGV_ADEHAZE("%s(%d) ynr sigma(0~5): %f %f %f %f %f %f\n", __func__, __LINE__,
+                 pYnrRes->sigma[0], pYnrRes->sigma[1], pYnrRes->sigma[2], pYnrRes->sigma[3],
+                 pYnrRes->sigma[4], pYnrRes->sigma[5]);
+    LOGV_ADEHAZE("%s(%d) dehaze local gain IDX(0~5): 0x%x 0x%x 0x%x 0x%x 0x%x 0x%x\n", __func__,
+                 __LINE__, pProcRes->ProcResV30.sigma_idx[0], pProcRes->ProcResV30.sigma_idx[1],
+                 pProcRes->ProcResV30.sigma_idx[2], pProcRes->ProcResV30.sigma_idx[3],
+                 pProcRes->ProcResV30.sigma_idx[4], pProcRes->ProcResV30.sigma_idx[5]);
+    LOGV_ADEHAZE("%s(%d) dehaze local gain LUT(0~5): 0x%x 0x%x 0x%x 0x%x 0x%x 0x%x\n", __func__,
+                 __LINE__, pProcRes->ProcResV30.sigma_lut[0], pProcRes->ProcResV30.sigma_lut[1],
+                 pProcRes->ProcResV30.sigma_lut[2], pProcRes->ProcResV30.sigma_lut[3],
+                 pProcRes->ProcResV30.sigma_lut[4], pProcRes->ProcResV30.sigma_lut[5]);
 
     LOG1_ADEHAZE("EIXT: %s \n", __func__);
 }
@@ -2528,11 +2541,10 @@ XCamReturn AdehazeProcess(AdehazeHandle_t* pAdehazeCtx, AdehazeVersion_t version
 bool AdehazeByPassProcessing(AdehazeHandle_t* pAdehazeCtx)
 {
     LOG1_ADEHAZE("ENTER: %s \n", __func__);
+    float diff = 0.0;
     bool ret = false;
 
     if (!pAdehazeCtx->isCapture) {
-        float diff = 0.0;
-
         if (pAdehazeCtx->FrameID <= 2)
             pAdehazeCtx->byPassProc = false;
         else if (CHECK_ISP_HW_V20()) {
@@ -2611,13 +2623,13 @@ bool AdehazeByPassProcessing(AdehazeHandle_t* pAdehazeCtx)
             LOGE_ADEHAZE(" %s:Wrong hardware version!! \n", __func__);
 
         ret = pAdehazeCtx->byPassProc;
-
-        LOGD_ADEHAZE("%s:FrameID:%d CtrlDataType:%d EnvLv:%f ISO:%f diff:%f byPassProc:%d \n",
-                     __func__, pAdehazeCtx->FrameID,
-                     pAdehazeCtx->AdehazeAtrr.stAuto.DehazeTuningPara.CtrlDataType,
-                     pAdehazeCtx->CurrData.V30.EnvLv, pAdehazeCtx->CurrData.V30.ISO, diff,
-                     pAdehazeCtx->byPassProc);
     }
+
+    LOGD_ADEHAZE("%s:FrameID:%d CtrlDataType:%d EnvLv:%f ISO:%f diff:%f byPassProc:%d \n", __func__,
+                 pAdehazeCtx->FrameID,
+                 pAdehazeCtx->AdehazeAtrr.stAuto.DehazeTuningPara.CtrlDataType,
+                 pAdehazeCtx->CurrData.V30.EnvLv, pAdehazeCtx->CurrData.V30.ISO, diff,
+                 pAdehazeCtx->byPassProc);
 
     LOG1_ADEHAZE("EXIT: %s \n", __func__);
     return ret;

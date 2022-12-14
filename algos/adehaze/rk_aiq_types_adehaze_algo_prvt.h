@@ -41,11 +41,6 @@
 #define YNR_ISO_CURVE_SECT_VALUE1   (1 << YNR_BIT_CALIB)
 #define YNR_CURVE_STEP             (16)
 
-typedef enum YnrSnrMode_e {
-    YNRSNRMODE_LSNR     = 0,
-    YNRSNRMODE_HSNR     = 1,
-} YnrSnrMode_t;
-
 typedef struct AdehazeAePreResV20_s {
     float ISO;
     dehaze_api_mode_t ApiMode;
@@ -54,7 +49,6 @@ typedef struct AdehazeAePreResV20_s {
 typedef struct AdehazeAePreResV21_s {
     float EnvLv;
     float ISO;
-    YnrSnrMode_t SnrMode;
     dehaze_api_mode_t ApiMode;
 } AdehazeAePreResV21_t;
 

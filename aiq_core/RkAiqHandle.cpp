@@ -181,7 +181,7 @@ RkAiqHandle::sendSignal(rk_aiq_uapi_mode_sync_e sync_mode)
     if (mAiqCore->isRunningState())
         mUpdateCond.signal();
 }
-
+/*
 XCamReturn
 RkAiqHandle::SharingAlgosResult(const void *result)
 {
@@ -218,6 +218,7 @@ RkAiqHandle::SharingAlgosResult(const void *result)
 
     return ret;
 }
+*/
 
 };  // namespace RkCam
 

@@ -135,19 +135,6 @@ processing(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outparams)
     AdehazeGetCurrData(pAdehazeHandle, pProcPara);
     pAdehazeHandle->stats = pProcPara->stats;
 
-    // get ynr snr mode
-    if (pAdehazeHandle->HWversion == ADEHAZE_ISP30) {
-        if (pProcPara->com.u.proc.curExp->CISFeature.SNR == 0)
-            pAdehazeHandle->CurrData.V30.SnrMode = YNRSNRMODE_LSNR;
-        else if (pProcPara->com.u.proc.curExp->CISFeature.SNR == 1)
-            pAdehazeHandle->CurrData.V30.SnrMode = YNRSNRMODE_HSNR;
-        else {
-            LOGI_ADEHAZE("%s(%d) Adehaze Get Wrong Snr Mode!!!, Using LSNR Params \n", __func__,
-                         __LINE__);
-            pAdehazeHandle->CurrData.V30.SnrMode = YNRSNRMODE_LSNR;
-        }
-    }
-
     // process
     if (!(AdehazeByPassProcessing(pAdehazeHandle)))
         ret = AdehazeProcess(pAdehazeHandle, pAdehazeHandle->HWversion);

@@ -279,7 +279,6 @@ processing(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outparams)
             LOGE_ANR("%s: processing ANR failed (%d)\n", __FUNCTION__, ret);
         }
 
-        Aynr_GetProcResult_V3(pAynrCtx, &pAynrProcResParams->stAynrProcResult);
         pAynrProcResParams->stAynrProcResult.isNeedUpdate = true;
         LOGD_ANR("recalculate: %d delta_iso:%d \n ", pAynrCtx->isReCalculate, deltaIso);
     } else {
@@ -287,6 +286,7 @@ processing(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outparams)
     }
 #endif
 
+    Aynr_GetProcResult_V3(pAynrCtx, &pAynrProcResParams->stAynrProcResult);
     pAynrCtx->isReCalculate = 0;
 
     LOGI_ANR("%s: (exit)\n", __FUNCTION__ );

@@ -71,7 +71,7 @@ typedef struct _RkAiqResComb {
     XCamVideoBuffer* ae_pre_res;
     XCamVideoBuffer* ae_proc_res;
     XCamVideoBuffer* awb_proc_res;
-    RkAiqYnrV3Res    ynrV3_proc_res;
+    Aynr_ProcResult_V3_t aynrV3_proc_res;
 } RkAiqResComb;
 
 // Ae

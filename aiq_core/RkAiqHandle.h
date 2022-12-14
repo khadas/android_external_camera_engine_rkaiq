@@ -119,7 +119,7 @@ class RkAiqHandle {
     inline uint64_t grpId2GrpMask(uint32_t grpId) {
         return grpId == RK_AIQ_CORE_ANALYZE_ALL ? (uint64_t)grpId : (1ULL << grpId);
     }
-    XCamReturn SharingAlgosResult(const void *result);
+    // XCamReturn SharingAlgosResult(const void *result);
     RkAiqAlgoCom* mConfig;
     RkAiqAlgoCom* mPreInParam;
     RkAiqAlgoResCom* mPreOutParam;

@@ -418,6 +418,7 @@ public:
             xcam_mem_clear(preExp);
             xcam_mem_clear(curExp);
             xcam_mem_clear(nxtExp);
+            xcam_mem_clear(res_comb.aynrV3_proc_res);
             ispStats = nullptr;
             sp = nullptr;
             ispGain = nullptr;

@@ -103,7 +103,11 @@ XCamReturn RkAiqAdhazHandleInt::processing() {
     RkAiqCore::RkAiqAlgosComShared_t* sharedCom = &mAiqCore->mAlogsComSharedParams;
 
     adhaz_proc_int->hdr_mode = sharedCom->working_mode;
-    adhaz_proc_int->ynrV3_proc_res = shared->res_comb.ynrV3_proc_res;
+    if (CHECK_ISP_HW_V30()) {
+        for (int i = 0; i < YNR_V3_ISO_CURVE_POINT_NUM; i++)
+            adhaz_proc_int->ynrV3_proc_res.sigma[i] =
+                shared->res_comb.aynrV3_proc_res.stSelect.sigma[i];
+    }
 
     RkAiqAdehazeStats* xDehazeStats = nullptr;
     if (shared->adehazeStatsBuf) {
