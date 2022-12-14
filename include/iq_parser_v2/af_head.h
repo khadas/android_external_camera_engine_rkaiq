@@ -305,6 +305,8 @@ typedef struct CalibDbV2_Af_Pdaf_s {
     unsigned char pdDiscardRegionEn;
     // M4_NUMBER_DESC("pdLessTextureRatio", "f32", M4_RANGE(0,5), "0.25", M4_DIGIT(3),M4_HIDE(0))
     float pdLessTextureRatio;
+    // M4_NUMBER_DESC("pdTargetOffset", "s16", M4_RANGE(-4096,4096), "0", M4_DIGIT(0),M4_HIDE(0))
+    short pdTargetOffset;
     // M4_STRUCT_DESC("pdCalibInf", "normal_ui_style")
     CalibDbV2_Af_PdafCalibInf_t pdCalibInf;
     // M4_NUMBER_DESC("pdConfdMwinFactor", "u16", M4_RANGE(0,225), "3", M4_DIGIT(0),M4_HIDE(0))

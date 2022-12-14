@@ -477,9 +477,9 @@ typedef struct CalibDbV2_Wb_Awb_Ext_Com_Para_t{
   int weightForNightGainCalc_len;
   // M4_STRUCT_DESC("singleColorProces", "normal_ui_style")
   CalibDbV2_Awb_Sgc_t singleColorProces;
-  // M4_ARRAY_DESC("lineRgBg", "f32", M4_SIZE(1,3), M4_RANGE(-2147483648,2147483647), "1", M4_DIGIT(4), M4_DYNAMIC(0), M4_HIDE(1))
+  // M4_ARRAY_DESC("lineRgBg", "f32", M4_SIZE(1,3), M4_RANGE(-2147483648,2147483647), "1", M4_DIGIT(6), M4_DYNAMIC(0), M4_HIDE(1))
   float lineRgBg[3];
-  // M4_ARRAY_DESC("lineRgProjCCT", "f32", M4_SIZE(1,3), M4_RANGE(-2147483648,2147483647), "1", M4_DIGIT(4), M4_DYNAMIC(0), M4_HIDE(1))
+  // M4_ARRAY_DESC("lineRgProjCCT", "f32", M4_SIZE(1,3), M4_RANGE(-2147483648,2147483647), "1", M4_DIGIT(6), M4_DYNAMIC(0), M4_HIDE(1))
   float lineRgProjCCT[3];
   // M4_STRUCT_DESC("chrAdpttAdj", "normal_ui_style", M4_HIDE(1))
   CalibDbV2_Wb_Awb_Caga_t chrAdpttAdj;

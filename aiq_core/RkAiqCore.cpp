@@ -2958,7 +2958,8 @@ RkAiqCore::handleAfStats(const SmartPtr<VideoBuffer> &buffer, SmartPtr<RkAiqAfSt
         mAfStats = afStats;
         mAfStatsFrmId = buffer->get_sequence();
         mAfStatsTime = buffer->get_timestamp();
-        if (ABS(mAfStatsTime - mPdafStatsTime) < mFrmInterval / 2LL) {
+        if (((ABS(mAfStatsTime - mPdafStatsTime) < mFrmInterval / 2LL) && mIspOnline) ||
+            ((mAfStatsTime - mPdafStatsTime < mFrmInterval) && (mAfStatsTime >= mPdafStatsTime) && !mIspOnline)) {
             SmartPtr<XCamMessage> afStatsMsg =
                 new RkAiqCoreVdBufMsg(XCAM_MESSAGE_AF_STATS_OK, mAfStatsFrmId, mAfStats);
             SmartPtr<XCamMessage> pdafStatsMsg =
@@ -2997,7 +2998,8 @@ XCamReturn RkAiqCore::handlePdafStats(const SmartPtr<VideoBuffer>& buffer) {
 
     mPdafStats = pdafStats;
     mPdafStatsTime = buffer->get_timestamp();
-    if (ABS(mAfStatsTime - mPdafStatsTime) < mFrmInterval / 2LL) {
+    if (((ABS(mAfStatsTime - mPdafStatsTime) < mFrmInterval / 2LL) && mIspOnline) ||
+        ((mAfStatsTime - mPdafStatsTime < mFrmInterval) && (mAfStatsTime >= mPdafStatsTime) && !mIspOnline)) {
         SmartPtr<XCamMessage> afStatsMsg =
             new RkAiqCoreVdBufMsg(XCAM_MESSAGE_AF_STATS_OK, mAfStatsFrmId, mAfStats);
         SmartPtr<XCamMessage> pdafStatsMsg =

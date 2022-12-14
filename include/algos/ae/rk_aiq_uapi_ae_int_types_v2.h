@@ -179,6 +179,8 @@ typedef struct Uapi_ExpWin_s {
 typedef struct Uapi_ExpQueryInfo_s {
     // M4_BOOL_DESC("IsConverged", "0",M4_HIDE(1))
     bool              IsConverged;
+    // M4_BOOL_DESC("EnvChange", "0",M4_HIDE(1))
+    bool              EnvChange;
     // M4_BOOL_DESC("IsExpMax", "0",M4_HIDE(1))
     bool              IsExpMax;
     // M4_NUMBER_DESC("LumaDeviation", "f32", M4_RANGE(-256,256), "0.0", M4_DIGIT(3),M4_HIDE(1))

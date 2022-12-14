@@ -188,7 +188,9 @@ RkPollThread::poll_buffer_loop ()
         LOGW_RKSTREAM ("dequeue buffer failed");
         return ret;
     }
-
+    if (_dev_type == ISP_POLL_TX){
+         LOGI_RKSTREAM ("dequeue buffer ok, seq %d", buf->get_buf().sequence);
+    }
     XCAM_ASSERT (buf.ptr());
 
     if (_dev_type == ISP_POLL_TX || _dev_type == ISP_POLL_RX) {

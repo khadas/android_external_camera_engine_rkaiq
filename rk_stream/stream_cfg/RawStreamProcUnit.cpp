@@ -153,6 +153,7 @@ int _parse_rk_rawdata(void *rawdata, rkrawstream_rkraw2_t *rkraw2)
         rkraw2->plane[0].addr = uptr;
         rkraw2->plane[0].fd = _st_addr[0].fd;
         rkraw2->plane[0].idx = _st_addr[0].idx;
+        rkraw2->plane[0].timestamp = _st_addr[0].timestamp;
     }
     if(userptr[0]){
         //sbuf_s->_userptr = _rawbuffer[0];
@@ -171,6 +172,7 @@ int _parse_rk_rawdata(void *rawdata, rkrawstream_rkraw2_t *rkraw2)
         rkraw2->plane[1].addr = uptr;
         rkraw2->plane[1].fd = _st_addr[1].fd;
         rkraw2->plane[1].idx = _st_addr[1].idx;
+        rkraw2->plane[1].timestamp = _st_addr[1].timestamp;
     }
     if(userptr[1]){
         //sbuf_m->_userptr = _rawbuffer[1];
@@ -190,6 +192,7 @@ int _parse_rk_rawdata(void *rawdata, rkrawstream_rkraw2_t *rkraw2)
         rkraw2->plane[2].addr = uptr;
         rkraw2->plane[2].fd = _st_addr[2].fd;
         rkraw2->plane[2].idx = _st_addr[2].idx;
+        rkraw2->plane[2].timestamp = _st_addr[2].timestamp;
     }
     if(userptr[2]){
         //sbuf_l->_userptr = _rawbuffer[2];
@@ -266,6 +269,7 @@ RawStreamProcUnit::RawStreamProcUnit (const rk_sensor_full_info_t *s_info, uint8
     _is_offline_mode = is_offline;
     _memory_type = (enum v4l2_memory)buf_memory_type;
 
+    strncpy(_sns_name, s_info->sensor_name.c_str(), 32);
     //short frame
     if (strlen(s_info->isp_info->rawrd2_s_path)) {
         _dev[0] = new V4l2Device (s_info->isp_info->rawrd2_s_path);//rkisp_rawrd2_s
@@ -653,6 +657,7 @@ RawStreamProcUnit::send_sync_buf2(uint8_t *rkraw_data)
         sbuf_s->_fd = rkraw2.plane[0].fd;
         sbuf_s->_index = rkraw2.plane[0].idx;
         sbuf_s->_seq = rkraw2._rawfmt.frame_id;
+        sbuf_s->_ts = rkraw2.plane[0].timestamp;
     } else {
         memcpy(_rawbuffer[0], (uint8_t *)rkraw2.plane[0].addr, rkraw2.plane[0].size);
         sbuf_s->_userptr = _rawbuffer[0];
@@ -710,7 +715,7 @@ RawStreamProcUnit::trigger_isp_readback()
     SmartLock locker (_buf_mutex);
 
     if (_isp_hdr_fid2ready_map.size() == 0) {
-        LOGE( "%s buf not ready !", __func__);
+        LOGE_RKSTREAM( "%s buf not ready !", __func__);
         return;
     }
 
@@ -769,13 +774,13 @@ RawStreamProcUnit::trigger_isp_readback()
                 ret = _dev[i]->get_buffer(v4l2buf[i],
                         cache_list2[i].front()->_index);
                 if (ret != XCAM_RETURN_NO_ERROR) {
-                    LOGE( "Rx[%d] can not get buffer\n", i);
+                    LOGE_RKSTREAM( "Rx[%d] can not get buffer\n", i);
                     goto out;
                 } else {
                     simple_buf = cache_list2[i].pop(-1);
 
                     if (_memory_type == V4L2_MEMORY_USERPTR){
-                        LOGD("use V4L2_MEMORY_USERPTR\n");
+                        LOGD_RKSTREAM("use V4L2_MEMORY_USERPTR\n");
                         v4l2buf[i]->set_expbuf_usrptr((uint64_t)simple_buf->_userptr);
                     }
                     else if (_memory_type == V4L2_MEMORY_DMABUF){
@@ -807,7 +812,7 @@ RawStreamProcUnit::trigger_isp_readback()
             for (int i = 0; i < _mipi_dev_max; i++) {
                 ret = _dev[i]->queue_buffer(v4l2buf[i]);
                 if (ret != XCAM_RETURN_NO_ERROR) {
-                    LOGE( "Rx[%d] queue buffer failed\n", i);
+                    LOGE_RKSTREAM( "Rx[%d] queue buffer failed\n", i);
                     break;
                 }
             }
@@ -825,12 +830,10 @@ RawStreamProcUnit::trigger_isp_readback()
             if (_is_multi_cam_conc && (tg.times < 1))
                 tg.times = 1;
 
-
-            //match_sof_timestamp_map(tg.frame_id, sof_timestamp);
-            tg.sof_timestamp = sof_timestamp;
-            //tg.frame_timestamp = buf_proxy->get_timestamp () * 1000;
+            tg.frame_timestamp = simple_buf->_ts * 1000;
+            tg.sof_timestamp = tg.frame_timestamp;
             // tg.times = 1;//fixed to three times readback
-            LOGD(
+            LOGI_RKSTREAM(
                             "camId:%d frame[%d]: sof_ts %" PRId64 "ms, frame_ts %" PRId64 "ms, globalTmo(%d), readback(%d)\n",
                             mCamPhyId,
                             sequence,
@@ -842,7 +845,7 @@ RawStreamProcUnit::trigger_isp_readback()
             if (ret == XCAM_RETURN_NO_ERROR)
                 _isp_core_dev->io_control(RKISP_CMD_TRIGGER_READ_BACK, &tg);
             else
-                LOGE( "%s frame[%d] queue  failed, don't read back!\n",
+                LOGE_RKSTREAM( "%s frame[%d] queue  failed, don't read back!\n",
                                 __func__, sequence);
             //if (_rawCap)
             //    _rawCap->update_capture_raw_status(_first_trigger);

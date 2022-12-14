@@ -1,6 +1,7 @@
 #include "RawStreamCapUnit.h"
 #include "rkcif-config.h"
 #include "MediaInfo.h"
+#include "xcam_defs.h"
 
 namespace RkRawStream {
 RawStreamCapUnit::RawStreamCapUnit (char *dev0, char *dev1, char *dev2, int buf_memory_type)
@@ -45,6 +46,7 @@ RawStreamCapUnit::RawStreamCapUnit (char *dev0, char *dev1, char *dev2, int buf_
         _stream[i] =  new RKRawStream(_dev[i], i, ISP_POLL_TX);
         _stream[i]->setPollCallback(this);
     }
+    _sensor_dev = NULL;
     _state = RAW_CAP_STATE_INITED;
 }
 
@@ -271,38 +273,38 @@ RawStreamCapUnit::set_tx_format(uint32_t width, uint32_t height, uint32_t pix_fm
 
             int bpp = pixFmt2Bpp(format.fmt.pix.pixelformat);
             //printf("tx fmt info: fmt 0x%x is_multi_isp_mode %d bpp%d\n", format.fmt.pix.pixelformat, is_multi_isp_mode, bpp);
-            printf("width %d, %d\n", width, ((width / 2 - RKMOUDLE_UNITE_EXTEND_PIXEL) *  bpp / 8));
+            //printf("width %d, %d\n", width, ((width / 2 - RKMOUDLE_UNITE_EXTEND_PIXEL) *  bpp / 8));
 
             int mem_mode = mode;
             int ret1 = _dev[i]->io_control (RKCIF_CMD_SET_CSI_MEMORY_MODE, &mem_mode);
             if (ret1)
                 printf("set RKCIF_CMD_SET_CSI_MEMORY_MODE failed !\n");
 
-                _dev[i]->set_format(width,
-                                    height,
-                                    format.fmt.pix.pixelformat,
-                                    V4L2_FIELD_NONE,
-                                    0);
+            _dev[i]->set_format(width,
+                                height,
+                                format.fmt.pix.pixelformat,
+                                V4L2_FIELD_NONE,
+                                0);
         }
     }
-
 }
 
 void
 RawStreamCapUnit::set_sensor_format(uint32_t width, uint32_t height, uint32_t fps)
 {
-    struct v4l2_subdev_format format;
-    memset(&format, 0, sizeof(format));
-    _sensor_dev->getFormat(format);
+    if(_sensor_dev.ptr()){
+        struct v4l2_subdev_format format;
+        memset(&format, 0, sizeof(format));
+        _sensor_dev->getFormat(format);
 
 
-    format.pad = 0;
-    format.which = V4L2_SUBDEV_FORMAT_ACTIVE;
-    format.format.width = width;
-    format.format.height = height;
-    printf("try format: %dx%d 0x%x\n", width, format.format.height, format.format.code);
-    _sensor_dev->setFormat(format);
-
+        format.pad = 0;
+        format.which = V4L2_SUBDEV_FORMAT_ACTIVE;
+        format.format.width = width;
+        format.format.height = height;
+        printf("try format: %dx%d 0x%x\n", width, format.format.height, format.format.code);
+        _sensor_dev->setFormat(format);
+    }
 }
 
 void
@@ -310,23 +312,25 @@ RawStreamCapUnit::set_sensor_mode(uint32_t mode)
 {
     rkmodule_hdr_cfg hdr_cfg;
     __u32 hdr_mode = NO_HDR;
-    switch (mode) {
-    case RK_AIQ_ISP_HDR_MODE_3_FRAME_HDR:
-    case RK_AIQ_ISP_HDR_MODE_3_LINE_HDR:
-        hdr_mode = HDR_X3;
-        break;
-    case RK_AIQ_ISP_HDR_MODE_2_FRAME_HDR:
-    case RK_AIQ_ISP_HDR_MODE_2_LINE_HDR:
-        hdr_mode = HDR_X2;
-        break;
-    default:
-        hdr_mode = NO_HDR;
-    }
+    if(_sensor_dev.ptr()){
+        switch (mode) {
+        case RK_AIQ_ISP_HDR_MODE_3_FRAME_HDR:
+        case RK_AIQ_ISP_HDR_MODE_3_LINE_HDR:
+            hdr_mode = HDR_X3;
+            break;
+        case RK_AIQ_ISP_HDR_MODE_2_FRAME_HDR:
+        case RK_AIQ_ISP_HDR_MODE_2_LINE_HDR:
+            hdr_mode = HDR_X2;
+            break;
+        default:
+            hdr_mode = NO_HDR;
+        }
 
-    hdr_cfg.hdr_mode = hdr_mode;
-    if (_sensor_dev->io_control(RKMODULE_SET_HDR_CFG, &hdr_cfg) < 0) {
-        printf("set_sensor_mode failed to set hdr mode %d\n", hdr_mode);
-        //return XCAM_RETURN_ERROR_IOCTL;
+        hdr_cfg.hdr_mode = hdr_mode;
+        if (_sensor_dev->io_control(RKMODULE_SET_HDR_CFG, &hdr_cfg) < 0) {
+            printf("set_sensor_mode failed to set hdr mode %d\n", hdr_mode);
+            //return XCAM_RETURN_ERROR_IOCTL;
+        }
     }
 }
 
@@ -399,6 +403,7 @@ RawStreamCapUnit::poll_buffer_ready (SmartPtr<V4l2BufferProxy> &buf, int dev_ind
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
     SmartPtr<V4l2BufferProxy> buf_s, buf_m, buf_l;
     LOGD_RKSTREAM( "%s enter,dev_index=0x%x", __FUNCTION__, dev_index);
+
     _buf_mutex.lock();
     buf_list[dev_index].push(buf);
     ret = sync_raw_buf(buf_s, buf_m, buf_l);
@@ -410,9 +415,15 @@ RawStreamCapUnit::poll_buffer_ready (SmartPtr<V4l2BufferProxy> &buf, int dev_ind
         //    _proc_stream->send_sync_buf(buf_s, buf_m, buf_l);
 
         if (user_on_frame_capture_cb){
+            struct timespec tx_timestamp;
+            int tx_timems;
             user_takes_buf = false;
 
             do_capture_callback(buf_s, buf_m, buf_l);
+
+            clock_gettime(CLOCK_MONOTONIC, &tx_timestamp);
+            tx_timems = XCAM_TIMESPEC_2_USEC(tx_timestamp) / 1000;
+            LOGI_RKSTREAM("BUFDEBUG vicapdq [%s] index %d  seq %d tx_time %d", _sns_name, buf_s->get_v4l2_buf_index(), buf_s->get_sequence(),tx_timems);
             if(user_takes_buf){
                 switch (_working_mode) {
                 case RK_AIQ_ISP_HDR_MODE_3_FRAME_HDR:
@@ -524,6 +535,7 @@ void rkraw_append_buf(uint8_t *p, uint16_t tag, SmartPtr<V4l2BufferProxy> &buf)
     b->_addr.idx = buf->get_v4l2_buf_index();
     b->_addr.fd = buf->get_expbuf_fd();
     b->_addr.size = buf->get_v4l2_buf_planar_length(0);
+    b->_addr.timestamp = buf->get_timestamp();
     b->_addr.haddr = uptr >> 32;
     b->_addr.laddr = uptr & 0xFFFFFFFF;
 }
@@ -542,9 +554,8 @@ RawStreamCapUnit::do_capture_callback
     int state = -1;
 
     int index = buf_s->get_v4l2_buf_index();
-    if(index > 3){
-        LOGE_RKSTREAM("do_capture_callback: bad index %d!",index);
-        return XCAM_RETURN_ERROR_FAILED;
+    if(index > STREAM_VIPCAP_BUF_NUM-1){
+        LOGW_RKSTREAM("do_capture_callback: bad index %d!",index);
     }
 
     uint8_t *p = (uint8_t *)&_rkraw_data[index];
@@ -649,14 +660,14 @@ RawStreamCapUnit::do_capture_callback
 void RawStreamCapUnit::release_user_taked_buf(int dev_index)
 {
     _buf_mutex.lock();
-    //for (int i = 0; i < _mipi_dev_max; i++) {
-
-        if (!user_used_buf_list[dev_index].is_empty()) {
-            SmartPtr<V4l2BufferProxy> rx_buf = user_used_buf_list[dev_index].pop(-1);
-            LOGD_RKSTREAM("%s dev_index:%d index:%d fd:%d\n",
-                            __func__, dev_index, rx_buf->get_v4l2_buf_index(), rx_buf->get_expbuf_fd());
-        }
-    //}
+    if (!user_used_buf_list[dev_index].is_empty()) {
+        SmartPtr<V4l2BufferProxy> rx_buf = user_used_buf_list[dev_index].pop(-1);
+        struct timespec rx_timestamp;
+        clock_gettime(CLOCK_MONOTONIC, &rx_timestamp);
+        int64_t rx_timems = XCAM_TIMESPEC_2_USEC(rx_timestamp)  / 1000;
+        LOGI_RKSTREAM("BUFDEBUG vicapq [%s] index %d  seq %d  rx_timems %ld \n", _sns_name,
+            rx_buf->get_v4l2_buf_index(), rx_buf->get_sequence(),rx_timems);
+    }
     _buf_mutex.unlock();
 }
 

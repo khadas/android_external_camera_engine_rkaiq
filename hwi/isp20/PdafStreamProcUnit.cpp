@@ -126,22 +126,26 @@ PdafStreamProcUnit::deinit()
 
 XCamReturn PdafStreamProcUnit::start_stream()
 {
+    mStreamMutex.lock();
     if (mPdafStream.ptr() && !mStartStreamFlag) {
         mPdafStream->start();
         mStartStreamFlag = true;
         LOGD_AF("start pdaf stream device");
     }
+    mStreamMutex.unlock();
 
     return XCAM_RETURN_NO_ERROR;
 }
 
 XCamReturn PdafStreamProcUnit::stop_stream()
 {
+    mStreamMutex.lock();
     if (mPdafStream.ptr() && mStartStreamFlag) {
         mPdafStream->stop();
         mStartStreamFlag = false;
         LOGD_AF("stop pdaf stream device");
     }
+    mStreamMutex.unlock();
 
     return XCAM_RETURN_NO_ERROR;
 }

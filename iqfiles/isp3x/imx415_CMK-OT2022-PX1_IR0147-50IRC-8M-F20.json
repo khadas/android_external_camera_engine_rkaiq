@@ -5740,6 +5740,7 @@
 									"pdSatCntRatio":	0.06,
 									"pdDiscardRegionEn":	0,
 									"pdLessTextureRatio":	0.25,
+									"pdTargetOffset":	0,
 									"pdCalibInf": {
 										"pdGainMapW":	32,
 										"pdGainMapH":	32,
@@ -11244,6 +11245,7 @@
 									"pdSatCntRatio":	0.06,
 									"pdDiscardRegionEn":	0,
 									"pdLessTextureRatio":	0.25,
+									"pdTargetOffset":	0,
 									"pdCalibInf": {
 										"pdGainMapW":	32,
 										"pdGainMapH":	32,

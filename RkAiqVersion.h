@@ -483,10 +483,55 @@
  * fix force config LSC when enable blc1
  * Fix compile error on Android
  * sysctl: should not release all sensor's calibs when deinit
+ * v3.0x9.4
+ * bbbeacb Revert "hwi: add the interface of set_csi_mem_word_big_align"
+ * ecb78ae Revert "AIE: fix bug that param not taking effect"
+ * 8e3551d Revert "API: add enum static info by physical id"
+ * 75ea4d3 Revert "Adehaze: add XCAM_MESSAGE_YNR_V3_PROC_RES_OK in grpDhazConds, and use ynr proc res"
+ * b5acf48 AF: change some log from LOGE_AEC to LOGE_AF
+ * f257548 PDAF: add librkaiq_pdaf.a for 356x linux
+ * 1ac8977 algos: alsc: adjust Vignetting for lsc OTP
+ * 15d5011 AE: add envChange for android
+ * 65c1304 iqfiles: update xunfei s5kjin1 iq
+ * e2caf1c Adehaze: add XCAM_MESSAGE_YNR_V3_PROC_RES_OK in grpDhazConds, and use ynr proc res
+ * 3e81d4e AF: set lockae to false in pdaf search
+ * 22e30f9 AF: support AF_MODE_EDOF mode
+ * 2d8d0dc PDAF: fix stop_stream is called twice sometimes
+ * 8a8a8e5 fix touchae/touchaf failure
+ * 35ebba0 AF: fix af is stopped after do touchaf/capture
+ * 0d2a231 iqfiles: add pdTargetOffset
+ * f987eaa PDAF: update pdaflib to v0.1.8
+ * 00b23e9 AF: reset/start search when user change af win config
+ * ed914df AF: fix fps is dropped in dual camera case on android platform
+ * 5b2c616 PDAF: fix cannot do pdaf search when enter camera first time
+ * c7c53b9 PDAF: fix lost af/pdaf stats in readback mode sometimes
+ * bf96150 API: add enum static info by physical id
+ * dc9e59b Amerge: update isCapture function
+ * 338519c Adrc: update isCapture function
+ * 95bb11e Adehaze: fix dehaze and hist capturing bug in 8k mode
+ * fda5a8c awb : Increase the decimal digits for lineRgProjCCT
+ * 39cf59a AIE: fix bug that param not taking effect
+ * 50d3dbf rkrawstream: add api mutex.
+ * 24f446c rkrawstream: add rkrawstream Android build script.
+ * 8d09ff3 xcore: fix buf cache flag.
+ * 4239d10 hwi: add the interface of set_csi_mem_word_big_align
+ * a80bc53 iqfiles: update gc8034/ov02b10 json
+ * 07a180a iqfiles: update xunfei s5kjin1 iq
+ * ebd231d AF: fix motor is moved after capture
+ * ccf8ba2 uApi2: add interface rk_aiq_uapi2_sysctl_setIspParamsDelayCnts
+ * 9290261 aiq_core: add setDelayCnt interface
+ * 3677cb2 uApi: rawReproc_genIspParams support params sync for semi mode
+ * 54de8ac xcore: add log module rkrawstream.
+ * d611e50 do not qbuf at prepare when use dmabuf.
+ * 58351eb split v4l2 device stop to streamoff and release buffer. for iflytek project.
+ * 2fa7642 add rkrawstream and rkvi_demo.
+ * 439b562 RkAiqManager: compatible with the calling method of mMetasCb on android hal
+ * 754c3c2 awb: update s5kjn1_default_default.json
+ * 66d1bcf awb : Accelerated convergence speed when wbgain is approaching to target value
  */
 
-#define RK_AIQ_VERSION_REAL_V "v3.0x9.3"
-#define RK_AIQ_RELEASE_DATE "2022-11-16"
+#define RK_AIQ_VERSION_REAL_V "v3.0x9.4"
+#define RK_AIQ_RELEASE_DATE "2022-12-14"
 
 /******* DO NOT EDIT THE FOLLOWINGS ***********/
 

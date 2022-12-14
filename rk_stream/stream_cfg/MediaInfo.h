@@ -24,6 +24,8 @@
 #include "xcam_thread.h"
 #include "xcam_log.h"
 #include "Stream.h"
+#include <time.h>
+#include <unistd.h>
 
 using namespace XCam;
 

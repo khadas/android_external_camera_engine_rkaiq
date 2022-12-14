@@ -7,6 +7,8 @@
 #include "MediaInfo.h"
 #include "rk_aiq_types.h"
 #include "uAPI2/rk_aiq_user_api2_sysctl.h"
+#include "xcam_mutex.h"
+
 using namespace XCam;
 using namespace RkRawStream;
 
@@ -18,6 +20,7 @@ enum mipi_stream_idx {
 };
 
 struct rkraw_vi_ctx_s {
+    Mutex _api_mutex;
 	class MediaInfo *_mMediaInfo;
     rk_sensor_full_info_t *s_full_info;
 	class RawStreamCapUnit *_mRawCapUnit;
@@ -49,6 +52,7 @@ rkraw_vi_ctx_t *rkrawstream_uapi_init()
 
 void rkrawstream_uapi_deinit(rkraw_vi_ctx_t *ctx)
 {
+    SmartLock locker (ctx->_api_mutex);
     if(ctx->_mRawCapUnit)
         ctx->_mRawCapUnit->stop();
     if(ctx->_mRawProcUnit)
@@ -81,8 +85,10 @@ int rkrawstream_uapi_parase_rkraw2(uint8_t *rawdata, rkrawstream_rkraw2_t *rkraw
 
 int rkrawstream_vicap_init(rkraw_vi_ctx_t* ctx, rkraw_vi_init_params_t *p)
 {
+    SmartLock locker (ctx->_api_mutex);
 	int ret = 0;
     if(p->sns_ent_name){
+        LOGI_RKSTREAM("%s:use %s", __func__, p->sns_ent_name);
         ctx->s_full_info = ctx->_mMediaInfo->getSensorFullInfo(p->sns_ent_name, 0);
         if(ctx->s_full_info == NULL){
             LOGE_RKSTREAM("can't find sensor %s", p->sns_ent_name);
@@ -90,7 +96,7 @@ int rkrawstream_vicap_init(rkraw_vi_ctx_t* ctx, rkraw_vi_init_params_t *p)
         }
         ctx->_mRawCapUnit = new RawStreamCapUnit(ctx->s_full_info, p->buf_memory_type);
     }else{
-
+        LOGI_RKSTREAM("%s:use %s", __func__, p->dev0_name);
         ctx->_mRawCapUnit = new RawStreamCapUnit(p->dev0_name, p->dev1_name, p->dev2_name, p->buf_memory_type);
     }
 	return ret;
@@ -98,6 +104,7 @@ int rkrawstream_vicap_init(rkraw_vi_ctx_t* ctx, rkraw_vi_init_params_t *p)
 
 int rkrawstream_vicap_prepare(rkraw_vi_ctx_t* ctx, rkraw_vi_prepare_params_t *p)
 {
+    SmartLock locker (ctx->_api_mutex);
 	int ret = 0;
     ctx->_mRawCapUnit->set_sensor_format(p->width, p->height, 0);
     ctx->_mRawCapUnit->set_tx_format(p->width, p->height, p->pix_fmt, p->mem_mode);
@@ -116,6 +123,7 @@ int rkrawstream_vicap_prepare(rkraw_vi_ctx_t* ctx, rkraw_vi_prepare_params_t *p)
 
 int rkrawstream_vicap_start(rkraw_vi_ctx_t* ctx, rkraw_vi_on_frame_capture_callback cb)
 {
+    SmartLock locker (ctx->_api_mutex);
 	int ret = 0;
     ctx->_mRawCapUnit->user_on_frame_capture_cb = cb;
 	ctx->_mRawCapUnit->start();
@@ -124,6 +132,7 @@ int rkrawstream_vicap_start(rkraw_vi_ctx_t* ctx, rkraw_vi_on_frame_capture_callb
 
 int rkrawstream_vicap_stop(rkraw_vi_ctx_t* ctx)
 {
+    SmartLock locker (ctx->_api_mutex);
 	int ret = 0;
 	ctx->_mRawCapUnit->stop();
 	return ret;
@@ -131,12 +140,14 @@ int rkrawstream_vicap_stop(rkraw_vi_ctx_t* ctx)
 
 int rkrawstream_vicap_streamoff(rkraw_vi_ctx_t* ctx)
 {
+    SmartLock locker (ctx->_api_mutex);
     ctx->_mRawCapUnit->stop_device();
     return 0;
 }
 
 int rkrawstream_vicap_release_buffer(rkraw_vi_ctx_t* ctx)
 {
+    SmartLock locker (ctx->_api_mutex);
     ctx->_mRawCapUnit->release_buffer();
     return 0;
 }
@@ -158,7 +169,7 @@ void rkrawstream_vicap_setdmabuf(rkraw_vi_ctx_t* ctx, int dev_index, int buf_ind
 
 int rkrawstream_readback_init(rkraw_vi_ctx_t* ctx, rkraw_vi_init_params_t *p)
 {
-
+    SmartLock locker (ctx->_api_mutex);
 	int ret = 0;
     if(p->sns_ent_name){
         ctx->s_full_info = ctx->_mMediaInfo->getSensorFullInfo(p->sns_ent_name, 0);
@@ -174,6 +185,7 @@ int rkrawstream_readback_init(rkraw_vi_ctx_t* ctx, rkraw_vi_init_params_t *p)
 
 int rkrawstream_readback_prepare(rkraw_vi_ctx_t* ctx, rkraw_vi_prepare_params_t *p)
 {
+    SmartLock locker (ctx->_api_mutex);
 	int ret = 0;
     ctx->_mRawProcUnit->set_rx_format(p->width, p->height, p->pix_fmt, p->mem_mode);
     if(p->hdr_mode == RK_AIQ_WORKING_MODE_NORMAL){
@@ -188,6 +200,7 @@ int rkrawstream_readback_prepare(rkraw_vi_ctx_t* ctx, rkraw_vi_prepare_params_t 
 
 int rkrawstream_readback_start(rkraw_vi_ctx_t* ctx, rkraw_vi_on_isp_process_done_callback cb)
 {
+    SmartLock locker (ctx->_api_mutex);
 	int ret = 0;
     ctx->_mRawProcUnit->user_isp_process_done_cb = cb;
 	ctx->_mRawProcUnit->start();
@@ -196,6 +209,7 @@ int rkrawstream_readback_start(rkraw_vi_ctx_t* ctx, rkraw_vi_on_isp_process_done
 
 int rkrawstream_readback_stop(rkraw_vi_ctx_t* ctx)
 {
+    SmartLock locker (ctx->_api_mutex);
 	int ret = 0;
 	ctx->_mRawProcUnit->stop();
 	return ret;

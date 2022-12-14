@@ -547,7 +547,7 @@
 								"lightSources":	[{
 										"name":	"A",
 										"doorType":	"CALIB_AWB_DOOR_TYPE_INDOOR",
-										"standardGainValue":	[0.9938, 1, 1, 2.2001],
+										"standardGainValue":	[0.9853, 1, 1, 2.2291],
 										"uvRegion":	{
 											"u":	[124.6, 34.1, 44.4, 125.4],
 											"v":	[130.5, 153.5, 116.2, 127.9]
@@ -564,13 +564,13 @@
 										},
 										"staWeight":	[100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 90, 75],
 										"dayGainLvThSet":	[1024, 4096],
-										"defaultDayGainLow":	[1.261, 1, 1, 1.3731],
-										"defaultDayGainHigh":	[1.5254, 1, 1, 1.3229],
+										"defaultDayGainLow":	[1.3773, 1, 1, 1.5666],
+										"defaultDayGainHigh":	[1.7093, 1, 1, 1.3983],
 										"xyType2Enable":	1
 									}, {
 										"name":	"CWF",
 										"doorType":	"CALIB_AWB_DOOR_TYPE_INDOOR",
-										"standardGainValue":	[1.3451, 1, 1, 1.9889],
+										"standardGainValue":	[1.4182, 1, 1, 2.1618],
 										"uvRegion":	{
 											"u":	[125.9, 71.8, 45.9, 124.9],
 											"v":	[126.2, 83.2, 117.7, 128.5]
@@ -587,13 +587,13 @@
 										},
 										"staWeight":	[100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 90, 75],
 										"dayGainLvThSet":	[1024, 4096],
-										"defaultDayGainLow":	[1.261, 1, 1, 1.3731],
-										"defaultDayGainHigh":	[1.5254, 1, 1, 1.3229],
+										"defaultDayGainLow":	[1.3773, 1, 1, 1.5666],
+										"defaultDayGainHigh":	[1.7093, 1, 1, 1.3983],
 										"xyType2Enable":	1
 									}, {
 										"name":	"D50",
 										"doorType":	"CALIB_AWB_DOOR_TYPE_AMBIGUITY",
-										"standardGainValue":	[1.261, 1, 1, 1.3731],
+										"standardGainValue":	[1.3773, 1, 1, 1.5666],
 										"uvRegion":	{
 											"u":	[127.6, 108.5, 70.1, 124.4],
 											"v":	[126.6, 73, 85, 128]
@@ -610,13 +610,13 @@
 										},
 										"staWeight":	[100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 90, 75],
 										"dayGainLvThSet":	[1024, 4096],
-										"defaultDayGainLow":	[1.261, 1, 1, 1.3731],
-										"defaultDayGainHigh":	[1.5254, 1, 1, 1.3229],
+										"defaultDayGainLow":	[1.3773, 1, 1, 1.5666],
+										"defaultDayGainHigh":	[1.7093, 1, 1, 1.3983],
 										"xyType2Enable":	1
 									}, {
 										"name":	"D65",
 										"doorType":	"CALIB_AWB_DOOR_TYPE_OUTDOOR",
-										"standardGainValue":	[1.5254, 1, 1, 1.3229],
+										"standardGainValue":	[1.7093, 1, 1, 1.3983],
 										"uvRegion":	{
 											"u":	[127.9, 122.4, 97.4, 125.3],
 											"v":	[126.4, 77.3, 76.5, 126.5]
@@ -633,13 +633,13 @@
 										},
 										"staWeight":	[100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 90, 75],
 										"dayGainLvThSet":	[1024, 4096],
-										"defaultDayGainLow":	[1.261, 1, 1, 1.3731],
-										"defaultDayGainHigh":	[1.5254, 1, 1, 1.3229],
+										"defaultDayGainLow":	[1.3773, 1, 1, 1.5666],
+										"defaultDayGainHigh":	[1.7093, 1, 1, 1.3983],
 										"xyType2Enable":	1
 									}, {
 										"name":	"D75",
 										"doorType":	"CALIB_AWB_DOOR_TYPE_OUTDOOR",
-										"standardGainValue":	[1.5236, 1, 1, 1.1843],
+										"standardGainValue":	[1.6466, 1, 1, 1.2814],
 										"uvRegion":	{
 											"u":	[134.6, 138.7, 112.8, 126.6],
 											"v":	[126.7, 80.7, 78.8, 126.2]
@@ -656,13 +656,13 @@
 										},
 										"staWeight":	[100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 90, 75],
 										"dayGainLvThSet":	[1024, 4096],
-										"defaultDayGainLow":	[1.261, 1, 1, 1.3731],
-										"defaultDayGainHigh":	[1.5254, 1, 1, 1.3229],
+										"defaultDayGainLow":	[1.3773, 1, 1, 1.5666],
+										"defaultDayGainHigh":	[1.7093, 1, 1, 1.3983],
 										"xyType2Enable":	1
 									}, {
 										"name":	"HZ",
 										"doorType":	"CALIB_AWB_DOOR_TYPE_INDOOR",
-										"standardGainValue":	[0.8456, 1, 1, 2.4063],
+										"standardGainValue":	[0.8157, 1, 1, 2.4421],
 										"uvRegion":	{
 											"u":	[124.9, 40, 43.3, 125.2],
 											"v":	[133, 175.8, 135.1, 128.9]
@@ -679,13 +679,13 @@
 										},
 										"staWeight":	[100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 90, 75],
 										"dayGainLvThSet":	[1024, 4096],
-										"defaultDayGainLow":	[1.261, 1, 1, 1.3731],
-										"defaultDayGainHigh":	[1.5254, 1, 1, 1.3229],
+										"defaultDayGainLow":	[1.3773, 1, 1, 1.5666],
+										"defaultDayGainHigh":	[1.7093, 1, 1, 1.3983],
 										"xyType2Enable":	1
 									}, {
 										"name":	"TL84",
 										"doorType":	"CALIB_AWB_DOOR_TYPE_INDOOR",
-										"standardGainValue":	[1.2494, 1, 1, 1.9133],
+										"standardGainValue":	[1.3336, 1, 1, 1.9502],
 										"uvRegion":	{
 											"u":	[126.1, 53.5, 36.3, 125.4],
 											"v":	[127.5, 90.9, 145.2, 130]
@@ -702,8 +702,8 @@
 										},
 										"staWeight":	[100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 90, 75],
 										"dayGainLvThSet":	[1024, 4096],
-										"defaultDayGainLow":	[1.261, 1, 1, 1.3731],
-										"defaultDayGainHigh":	[1.5254, 1, 1, 1.3229],
+										"defaultDayGainLow":	[1.3773, 1, 1, 1.5666],
+										"defaultDayGainHigh":	[1.7093, 1, 1, 1.3983],
 										"xyType2Enable":	1
 									}],
 								"lightSources_len":	7
@@ -725,7 +725,7 @@
 								"dampFactor":	{
 									"dFStep":	0.1,
 									"dFMin":	0.5,
-									"dFMax":	0.9,
+									"dFMax":	0.8,
 									"lvIIRsize":	4,
 									"lvVarTh":	0.04
 								},
@@ -791,9 +791,9 @@
 										"high_len":	1
 									}
 								},
-								"defaultNightGain":	[1.261, 1, 1, 1.3731],
-								"lumaValueMatrix":	[0, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096, 4096, 16384, 32768, 65536, 131072, 262144],
-								"defaultNightGainWeight":	[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+								"defaultNightGain":	[1.463305, 1.000000, 1.000000, 1.888040],
+								"lumaValueMatrix":	[0, 4, 8, 64, 128, 256, 512, 1024, 2048, 4096, 4096, 16384, 32768, 65536, 131072, 262144],
+								"defaultNightGainWeight":	[100, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
 								"probCalcDis":	{
 									"proDis_THH":	6.6124,
 									"proDis_THL":	0.0269
@@ -873,7 +873,7 @@
 								"lineRgProjCCT":	[1, -0.000146, 0.577157],
 								"chrAdpttAdj":	{
 									"enable":	0,
-									"targetGain":	[1.5254, 1, 1, 1.3229],
+									"targetGain":	[1.7093, 1, 1, 1.3983],
 									"laCalcFactor":	40
 								},
 								"remosaicCfg":	{
@@ -5774,6 +5774,7 @@
 									"pdSatCntRatio":	0.06,
 									"pdDiscardRegionEn":	0,
 									"pdLessTextureRatio":	0.25,
+									"pdTargetOffset":	8,
 									"pdCalibInf":	{
 										"pdGainMapW":	32,
 										"pdGainMapH":	64,
@@ -6508,7 +6509,7 @@
 								"lightSources":	[{
 										"name":	"A",
 										"doorType":	"CALIB_AWB_DOOR_TYPE_INDOOR",
-										"standardGainValue":	[0.9938, 1, 1, 2.2001],
+										"standardGainValue":	[0.9853, 1, 1, 2.2291],
 										"uvRegion":	{
 											"u":	[124.6, 34.1, 44.4, 125.4],
 											"v":	[130.5, 153.5, 116.2, 127.9]
@@ -6525,13 +6526,13 @@
 										},
 										"staWeight":	[100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 90, 75],
 										"dayGainLvThSet":	[1024, 4096],
-										"defaultDayGainLow":	[1.261, 1, 1, 1.3731],
-										"defaultDayGainHigh":	[1.5254, 1, 1, 1.3229],
+										"defaultDayGainLow":	[1.3773, 1, 1, 1.5666],
+										"defaultDayGainHigh":	[1.7093, 1, 1, 1.3983],
 										"xyType2Enable":	1
 									}, {
 										"name":	"CWF",
 										"doorType":	"CALIB_AWB_DOOR_TYPE_INDOOR",
-										"standardGainValue":	[1.3451, 1, 1, 1.9889],
+										"standardGainValue":	[1.4182, 1, 1, 2.1618],
 										"uvRegion":	{
 											"u":	[125.9, 71.8, 45.9, 124.9],
 											"v":	[126.2, 83.2, 117.7, 128.5]
@@ -6548,13 +6549,13 @@
 										},
 										"staWeight":	[100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 90, 75],
 										"dayGainLvThSet":	[1024, 4096],
-										"defaultDayGainLow":	[1.261, 1, 1, 1.3731],
-										"defaultDayGainHigh":	[1.5254, 1, 1, 1.3229],
+										"defaultDayGainLow":	[1.3773, 1, 1, 1.5666],
+										"defaultDayGainHigh":	[1.7093, 1, 1, 1.3983],
 										"xyType2Enable":	1
 									}, {
 										"name":	"D50",
 										"doorType":	"CALIB_AWB_DOOR_TYPE_AMBIGUITY",
-										"standardGainValue":	[1.261, 1, 1, 1.3731],
+										"standardGainValue":	[1.3773, 1, 1, 1.5666],
 										"uvRegion":	{
 											"u":	[127.6, 108.5, 70.1, 124.4],
 											"v":	[126.6, 73, 85, 128]
@@ -6571,13 +6572,13 @@
 										},
 										"staWeight":	[100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 90, 75],
 										"dayGainLvThSet":	[1024, 4096],
-										"defaultDayGainLow":	[1.261, 1, 1, 1.3731],
-										"defaultDayGainHigh":	[1.5254, 1, 1, 1.3229],
+										"defaultDayGainLow":	[1.3773, 1, 1, 1.5666],
+										"defaultDayGainHigh":	[1.7093, 1, 1, 1.3983],
 										"xyType2Enable":	1
 									}, {
 										"name":	"D65",
 										"doorType":	"CALIB_AWB_DOOR_TYPE_OUTDOOR",
-										"standardGainValue":	[1.5254, 1, 1, 1.3229],
+										"standardGainValue":	[1.7093, 1, 1, 1.3983],
 										"uvRegion":	{
 											"u":	[127.9, 122.4, 97.4, 125.3],
 											"v":	[126.4, 77.3, 76.5, 126.5]
@@ -6594,13 +6595,13 @@
 										},
 										"staWeight":	[100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 90, 75],
 										"dayGainLvThSet":	[1024, 4096],
-										"defaultDayGainLow":	[1.261, 1, 1, 1.3731],
-										"defaultDayGainHigh":	[1.5254, 1, 1, 1.3229],
+										"defaultDayGainLow":	[1.3773, 1, 1, 1.5666],
+										"defaultDayGainHigh":	[1.7093, 1, 1, 1.3983],
 										"xyType2Enable":	1
 									}, {
 										"name":	"D75",
 										"doorType":	"CALIB_AWB_DOOR_TYPE_OUTDOOR",
-										"standardGainValue":	[1.5236, 1, 1, 1.1843],
+										"standardGainValue":	[1.6466, 1, 1, 1.2814],
 										"uvRegion":	{
 											"u":	[134.6, 138.7, 112.8, 126.6],
 											"v":	[126.7, 80.7, 78.8, 126.2]
@@ -6617,13 +6618,13 @@
 										},
 										"staWeight":	[100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 90, 75],
 										"dayGainLvThSet":	[1024, 4096],
-										"defaultDayGainLow":	[1.261, 1, 1, 1.3731],
-										"defaultDayGainHigh":	[1.5254, 1, 1, 1.3229],
+										"defaultDayGainLow":	[1.3773, 1, 1, 1.5666],
+										"defaultDayGainHigh":	[1.7093, 1, 1, 1.3983],
 										"xyType2Enable":	1
 									}, {
 										"name":	"HZ",
 										"doorType":	"CALIB_AWB_DOOR_TYPE_INDOOR",
-										"standardGainValue":	[0.8456, 1, 1, 2.4063],
+										"standardGainValue":	[0.8157, 1, 1, 2.4421],
 										"uvRegion":	{
 											"u":	[124.9, 40, 43.3, 125.2],
 											"v":	[133, 175.8, 135.1, 128.9]
@@ -6640,13 +6641,13 @@
 										},
 										"staWeight":	[100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 90, 75],
 										"dayGainLvThSet":	[1024, 4096],
-										"defaultDayGainLow":	[1.261, 1, 1, 1.3731],
-										"defaultDayGainHigh":	[1.5254, 1, 1, 1.3229],
+										"defaultDayGainLow":	[1.3773, 1, 1, 1.5666],
+										"defaultDayGainHigh":	[1.7093, 1, 1, 1.3983],
 										"xyType2Enable":	1
 									}, {
 										"name":	"TL84",
 										"doorType":	"CALIB_AWB_DOOR_TYPE_INDOOR",
-										"standardGainValue":	[1.2494, 1, 1, 1.9133],
+										"standardGainValue":	[1.3336, 1, 1, 1.9502],
 										"uvRegion":	{
 											"u":	[126.1, 53.5, 36.3, 125.4],
 											"v":	[127.5, 90.9, 145.2, 130]
@@ -6663,8 +6664,8 @@
 										},
 										"staWeight":	[100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 90, 75],
 										"dayGainLvThSet":	[1024, 4096],
-										"defaultDayGainLow":	[1.261, 1, 1, 1.3731],
-										"defaultDayGainHigh":	[1.5254, 1, 1, 1.3229],
+										"defaultDayGainLow":	[1.3773, 1, 1, 1.5666],
+										"defaultDayGainHigh":	[1.7093, 1, 1, 1.3983],
 										"xyType2Enable":	1
 									}],
 								"lightSources_len":	7
@@ -6752,9 +6753,9 @@
 										"high_len":	1
 									}
 								},
-								"defaultNightGain":	[1.261, 1, 1, 1.3731],
-								"lumaValueMatrix":	[0, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096, 4096, 16384, 32768, 65536, 131072, 262144],
-								"defaultNightGainWeight":	[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+								"defaultNightGain":	[1.463305, 1.000000, 1.000000, 1.888040],
+								"lumaValueMatrix":	[0, 4, 8, 64, 128, 256, 512, 1024, 2048, 4096, 4096, 16384, 32768, 65536, 131072, 262144],
+								"defaultNightGainWeight":	[100, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
 								"probCalcDis":	{
 									"proDis_THH":	6.6124,
 									"proDis_THL":	0.0269
@@ -6834,7 +6835,7 @@
 								"lineRgProjCCT":	[1, -0.000146, 0.577157],
 								"chrAdpttAdj":	{
 									"enable":	0,
-									"targetGain":	[1.5254, 1, 1, 1.3229],
+									"targetGain":	[1.7093, 1, 1, 1.3983],
 									"laCalcFactor":	40
 								},
 								"remosaicCfg":	{
@@ -11630,6 +11631,7 @@
 									"pdSatCntRatio":	0.06,
 									"pdDiscardRegionEn":	0,
 									"pdLessTextureRatio":	0.25,
+									"pdTargetOffset":	0,
 									"pdCalibInf":	{
 										"pdGainMapW":	32,
 										"pdGainMapH":	64,

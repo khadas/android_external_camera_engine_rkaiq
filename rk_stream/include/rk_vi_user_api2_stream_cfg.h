@@ -56,6 +56,7 @@ struct _st_addrinfo_stream
     unsigned int haddr;
     unsigned int laddr;
     unsigned int size;
+    uint64_t     timestamp;
 }__attribute__ ((packed));
 
 struct rkraw2_plane
@@ -65,6 +66,7 @@ struct rkraw2_plane
     uint32_t fd;
     uint32_t size;
     uint64_t addr;
+    uint64_t timestamp;
 };
 
 typedef struct {

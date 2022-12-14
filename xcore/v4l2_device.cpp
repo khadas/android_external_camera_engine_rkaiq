@@ -1114,6 +1114,9 @@ V4l2Device::dequeue_buffer(SmartPtr<V4l2Buffer> &buf)
         v4l2_buf.length = _mplanes_count;
     }
 
+    if (_buf_sync)
+        v4l2_buf.flags = V4L2_BUF_FLAG_NO_CACHE_INVALIDATE | V4L2_BUF_FLAG_NO_CACHE_CLEAN;
+
     if (this->io_control (VIDIOC_DQBUF, &v4l2_buf) < 0) {
         XCAM_LOG_ERROR ("device(%s) fail to dequeue buffer.", XCAM_STR (_name));
         return XCAM_RETURN_ERROR_IOCTL;
@@ -1262,6 +1265,9 @@ V4l2Device::queue_buffer (SmartPtr<V4l2Buffer> &buf, bool locked)
     buf->set_queued(true);
     if (!locked)
         _buf_mutex.unlock();
+
+    if (_buf_sync)
+        v4l2_buf.flags = V4L2_BUF_FLAG_NO_CACHE_INVALIDATE | V4L2_BUF_FLAG_NO_CACHE_CLEAN;
 
     if (io_control (VIDIOC_QBUF, &v4l2_buf) < 0) {
         XCAM_LOG_ERROR("%s fail to enqueue buffer index:%d.",

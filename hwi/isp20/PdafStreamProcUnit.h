@@ -75,6 +75,7 @@ protected:
     rk_aiq_isp_pdaf_meas_t mPdafMeas;
     int mBufType;
     PdafStreamHelperThd *mHelperThd;
+    XCam::Mutex mStreamMutex;
 };
 
 typedef struct _PdafStreamParam {

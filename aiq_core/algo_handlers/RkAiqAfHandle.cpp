@@ -80,7 +80,7 @@ XCamReturn RkAiqAfHandleInt::setAttrib(rk_aiq_af_attrib_t* att) {
         isChanged = true;
 
     // if something changed
-    if (isChanged || (mCurAtt.AfMode == RKAIQ_AF_MODE_AUTO)) {
+    if (isChanged || (mCurAtt.AfMode == RKAIQ_AF_MODE_AUTO && sharedCom->snsDes.lens_des.focus_support)) {
         mNewAtt         = *att;
         updateAtt       = true;
         isUpdateAttDone = false;

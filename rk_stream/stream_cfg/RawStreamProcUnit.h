@@ -22,7 +22,6 @@
 #include "Stream.h"
 #include "rk_aiq_offline_raw.h"
 #include "rk_vi_user_api2_stream_cfg.h"
-#include "uAPI2/rk_aiq_user_api2_sysctl.h"
 #include <map>
 
 using namespace XCam;
@@ -49,6 +48,7 @@ class SimpleFdBuf
     int _fd;
     int _index;
     int _seq;
+    uint64_t _ts;
     uint8_t *_userptr;
 	    SimpleFdBuf(int fd, int index) {_fd = fd; _index = index;}
         SimpleFdBuf() {_fd = 0; _userptr = NULL;}
@@ -125,9 +125,6 @@ public:
 	//	isp_trigger_readback_cb = cb;
     //}
 	//SmartPtr<V4l2Device> _return_dev[3];
-    void set_aiq_ctx(rk_aiq_sys_ctx_t* _aiq_ctx) {
-        aiq_ctx = _aiq_ctx;
-    }
 protected:
     XCAM_DEAD_COPY (RawStreamProcUnit);
 
@@ -136,7 +133,7 @@ protected:
     void match_globaltmostate_map(uint32_t sequence, bool &isHdrGlobalTmo);
     XCamReturn match_sof_timestamp_map(sint32_t sequence, uint64_t &timestamp);
     int mCamPhyId;
-    rk_aiq_sys_ctx_t* aiq_ctx;
+    char _sns_name[32];
 protected:
     SmartPtr<V4l2Device> _dev[3];
     int _dev_index[3];
