@@ -850,39 +850,19 @@ RkAiqCore::analyzeInternal(enum rk_aiq_core_analyze_type_e type)
         auto mapIter = mAlogsGroupSharedParamsMap.begin();
         while (mapIter != mAlogsGroupSharedParamsMap.end()) {
             RkAiqAlgosGroupShared_t* &shared = mapIter->second;
-            if (mAlogsComSharedParams.conf_type & RK_AIQ_ALGO_CONFTYPE_CHANGERES) {
+            if (!(mAlogsComSharedParams.conf_type & RK_AIQ_ALGO_CONFTYPE_CHANGERES)) {
+                shared->reset();
+            } else {
+                // do not reset all for case of resolution changed
                 shared->frameId = 0;
                 shared->sof     = 0;
                 shared->ispStats = 0;
-                SmartPtr<RkAiqFullParams> curParams = mAiqCurParams->data();
-                if (curParams.ptr() && curParams->mExposureParams.ptr()) {
-                    shared->curExp =
-                        curParams->mExposureParams->data()->exp_tbl[0];
-                }
-                mapIter++;
-                continue;
             }
-
-            shared->reset();
-            shared->frameId = 0;
-
-            shared->curExp.LinearExp.exp_real_params.analog_gain = \
-                    calibv2_ae_calib->LinearAeCtrl.InitExp.InitGainValue;
-            shared->curExp.LinearExp.exp_real_params.integration_time = \
-                    calibv2_ae_calib->LinearAeCtrl.InitExp.InitTimeValue;
-            shared->curExp.LinearExp.exp_real_params.digital_gain = 1;
-            shared->curExp.LinearExp.exp_real_params.isp_dgain = \
-                    calibv2_ae_calib->LinearAeCtrl.InitExp.InitIspDGainValue;
-            for (int32_t i = 0; i < 3; i++) {
-                shared->curExp.HdrExp[i].exp_real_params.analog_gain = \
-                        calibv2_ae_calib->HdrAeCtrl.InitExp.InitGainValue[i];
-                shared->curExp.HdrExp[i].exp_real_params.integration_time = \
-                        calibv2_ae_calib->HdrAeCtrl.InitExp.InitTimeValue[i];
-                shared->curExp.HdrExp[i].exp_real_params.digital_gain = 1;
-                shared->curExp.HdrExp[i].exp_real_params.isp_dgain = \
-                        calibv2_ae_calib->HdrAeCtrl.InitExp.InitIspDGainValue[i];
+            SmartPtr<RkAiqFullParams> curParams = mAiqCurParams->data();
+            if (curParams.ptr() && curParams->mExposureParams.ptr()) {
+                shared->curExp =
+                    curParams->mExposureParams->data()->exp_tbl[0];
             }
-
             mapIter++;
         }
     }
