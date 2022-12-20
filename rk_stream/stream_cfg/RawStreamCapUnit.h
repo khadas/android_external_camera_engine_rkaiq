@@ -28,6 +28,7 @@
 #include "RawStreamProcUnit.h"
 #include "rk_aiq_offline_raw.h"
 #include "rk_vi_user_api2_stream_cfg.h"
+#include "MediaInfo.h"
 
 using namespace XCam;
 
@@ -118,7 +119,7 @@ protected:
 	SafeList<V4l2BufferProxy> buf_list[3];
 	SafeList<V4l2BufferProxy> user_used_buf_list[3];
 	RawStreamProcUnit *_proc_stream;
-    struct _live_rkraw_data _rkraw_data[4];
+    struct _live_rkraw_data _rkraw_data[STREAM_VIPCAP_BUF_NUM];
     char _sns_name[32];
     bool is_multi_isp_mode;
     enum v4l2_memory    _memory_type;

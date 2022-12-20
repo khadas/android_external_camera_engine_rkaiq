@@ -52,14 +52,16 @@ rkraw_vi_ctx_t *rkrawstream_uapi_init()
 
 void rkrawstream_uapi_deinit(rkraw_vi_ctx_t *ctx)
 {
-    SmartLock locker (ctx->_api_mutex);
-    if(ctx->_mRawCapUnit)
-        ctx->_mRawCapUnit->stop();
-    if(ctx->_mRawProcUnit)
-        ctx->_mRawProcUnit->stop();
-    delete ctx->_mRawCapUnit;
-    delete ctx->_mRawProcUnit;
-    delete ctx->_mMediaInfo;
+    {
+        SmartLock locker (ctx->_api_mutex);
+        if(ctx->_mRawCapUnit)
+            ctx->_mRawCapUnit->stop();
+        if(ctx->_mRawProcUnit)
+            ctx->_mRawProcUnit->stop();
+        delete ctx->_mRawCapUnit;
+        delete ctx->_mRawProcUnit;
+        delete ctx->_mMediaInfo;
+    }
     delete ctx;
 }
 
