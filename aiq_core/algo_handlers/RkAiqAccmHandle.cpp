@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 #include "RkAiqAccmHandle.h"
+#include "RkAiqAwbHandle.h"
 
 #include "RkAiqCore.h"
 
@@ -185,28 +186,40 @@ XCamReturn RkAiqAccmHandleInt::processing() {
 
     // TODO should check if the rk awb algo used
     XCamVideoBuffer* xCamAwbProcRes = shared->res_comb.awb_proc_res;
+    RkAiqAlgoProcResAwb* awb_res = NULL;
     if (xCamAwbProcRes) {
-        RkAiqAlgoProcResAwb* awb_res =
-            (RkAiqAlgoProcResAwb*)xCamAwbProcRes->map(xCamAwbProcRes);
-        if (awb_res) {
-            if (awb_res->awb_gain_algo.grgain < DIVMIN || awb_res->awb_gain_algo.gbgain < DIVMIN) {
-                LOGW("get wrong awb gain from AWB module ,use default value ");
-            } else {
-                accm_proc_int->accm_sw_info.awbGain[0] =
-                    awb_res->awb_gain_algo.rgain / awb_res->awb_gain_algo.grgain;
+        awb_res = (RkAiqAlgoProcResAwb*)xCamAwbProcRes->map(xCamAwbProcRes);
+    } else {
+        if (sharedCom->init) {
+            SmartPtr<RkAiqHandle>* awb_handle = mAiqCore->getCurAlgoTypeHandle(RK_AIQ_ALGO_TYPE_AWB);
+            int algo_id                      = (*awb_handle)->getAlgoId();
 
-                accm_proc_int->accm_sw_info.awbGain[1] =
-                    awb_res->awb_gain_algo.bgain / awb_res->awb_gain_algo.gbgain;
+            if (awb_handle) {
+                if (algo_id == 0) {
+                    RkAiqAwbHandleInt* awb_algo = dynamic_cast<RkAiqAwbHandleInt*>(awb_handle->ptr());
+                    awb_res = awb_algo->getAwbProcRes();
+                }
             }
-            accm_proc_int->accm_sw_info.awbIIRDampCoef = awb_res->awb_smooth_factor;
-            accm_proc_int->accm_sw_info.varianceLuma   = awb_res->varianceLuma;
-            accm_proc_int->accm_sw_info.awbConverged   = awb_res->awbConverged;
-        } else {
-            LOGW("fail to get awb gain form AWB module,use default value ");
         }
+    }
+
+    if (awb_res) {
+        if (awb_res->awb_gain_algo.grgain < DIVMIN || awb_res->awb_gain_algo.gbgain < DIVMIN) {
+            LOGW("get wrong awb gain from AWB module ,use default value ");
+        } else {
+            accm_proc_int->accm_sw_info.awbGain[0] =
+                awb_res->awb_gain_algo.rgain / awb_res->awb_gain_algo.grgain;
+
+            accm_proc_int->accm_sw_info.awbGain[1] =
+                awb_res->awb_gain_algo.bgain / awb_res->awb_gain_algo.gbgain;
+        }
+        accm_proc_int->accm_sw_info.awbIIRDampCoef = awb_res->awb_smooth_factor;
+        accm_proc_int->accm_sw_info.varianceLuma   = awb_res->varianceLuma;
+        accm_proc_int->accm_sw_info.awbConverged   = awb_res->awbConverged;
     } else {
         LOGW("fail to get awb gain form AWB module,use default value ");
     }
+
     RKAiqAecExpInfo_t* pCurExp = &shared->curExp;
     if (pCurExp) {
         if ((rk_aiq_working_mode_t)sharedCom->working_mode == RK_AIQ_WORKING_MODE_NORMAL) {

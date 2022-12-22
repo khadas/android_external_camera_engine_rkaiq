@@ -86,7 +86,8 @@ class RkAiqAwbHandleInt : public RkAiqHandle {
     XCamReturn getWbAwbMultiWindowAttrib(rk_aiq_uapiV2_wb_awb_mulWindow_t* att);
     XCamReturn getAlgoStat(rk_tool_awb_stat_res_full_t *awb_stat_algo);
     XCamReturn getStrategyResult(rk_tool_awb_strategy_result_t *awb_strategy_result);
-
+    RkAiqAlgoProcResAwb* getAwbProcRes() {
+        return mProcResShared.ptr() ? &mProcResShared->result : NULL; }
  protected:
     virtual void init();
     virtual void deInit() { RkAiqHandle::deInit(); };
