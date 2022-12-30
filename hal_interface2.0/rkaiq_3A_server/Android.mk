@@ -81,6 +81,10 @@ ifeq (rk356x, $(strip $(TARGET_BOARD_PLATFORM)))
 LOCAL_CFLAGS += -DISP_HW_V21
 endif
 
+ifeq (rk3562, $(strip $(TARGET_BOARD_PLATFORM)))
+	LOCAL_CFLAGS += -DISP_HW_V32_LITE
+endif
+
 ifeq (rv1126, $(strip $(TARGET_BOARD_PLATFORM)))
 LOCAL_CFLAGS += -DISP_HW_V20
 endif
@@ -177,6 +181,10 @@ endif
 
 ifeq (rk356x, $(strip $(TARGET_BOARD_PLATFORM)))
 LOCAL_CFLAGS += -DISP_HW_V21
+endif
+
+ifeq (rk3562, $(strip $(TARGET_BOARD_PLATFORM)))
+	LOCAL_CFLAGS += -DISP_HW_V32_LITE
 endif
 
 ifeq (rv1126, $(strip $(TARGET_BOARD_PLATFORM)))
@@ -283,6 +291,10 @@ endif
 
 ifeq (rk356x, $(strip $(TARGET_BOARD_PLATFORM)))
 LOCAL_CFLAGS += -DISP_HW_V21
+endif
+
+ifeq (rk3562, $(strip $(TARGET_BOARD_PLATFORM)))
+	LOCAL_CFLAGS += -DISP_HW_V32_LITE
 endif
 
 ifeq (rv1126, $(strip $(TARGET_BOARD_PLATFORM)))

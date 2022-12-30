@@ -215,7 +215,7 @@ static int __rkisp_get_iq_exp_infos(SmartPtr<V4l2SubDevice> subDev, rkisp_metada
 	__rkisp_auto_select_iqfile(&camera_mod_info, metadata_info->entity_name, iq_file_name);
 	strcat(iq_file_full_name, iq_file_name);
 	if (access(iq_file_full_name, F_OK) == 0) {
-		calibdb_p = RkAiqCalibDb::createCalibDb(iq_file_full_name);
+		// calibdb_p = RkAiqCalibDb::createCalibDb(iq_file_full_name);
 		// if (calibdb_p) {
 		// 	CalibDb_AecGainRange_t* GainRange;
 		// 	GainRange = &(calibdb_p->sensor.GainRange);
@@ -230,7 +230,7 @@ static int __rkisp_get_iq_exp_infos(SmartPtr<V4l2SubDevice> subDev, rkisp_metada
 		LOGW("calib file %s not found! Ignore it if not raw sensor.", iq_file_full_name);
 	}
 	subDev->close ();
-	RkAiqCalibDb::releaseCalibDb();
+	// RkAiqCalibDb::releaseCalibDb();
 	return 0;
 }
 

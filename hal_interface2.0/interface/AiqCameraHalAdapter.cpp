@@ -700,8 +700,16 @@ AiqCameraHalAdapter::updateAwbMetaParams(XCamAwbParam *awbParams, int reqId){
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
 
     LOGI("@%s %d: enter", __FUNCTION__, __LINE__);
-    rk_aiq_wb_attrib_t stAwbttr;
+#if defined(ISP_HW_V32) || defined(ISP_HW_V32_LITE)
+        rk_aiq_uapiV2_wbV32_attrib_t stAwbttr;
+#else
+        rk_aiq_wb_attrib_t stAwbttr;
+#endif
+#if defined(ISP_HW_V32) || defined(ISP_HW_V32_LITE)
+		rk_aiq_ccm_v2_attrib_t setCcm;
+#else
     rk_aiq_ccm_attrib_t setCcm;
+#endif
 
     if (_aiq_ctx == NULL){
         LOGE("@%s %d: _aiq_ctx is NULL!\n", __FUNCTION__, __LINE__);
@@ -710,12 +718,19 @@ AiqCameraHalAdapter::updateAwbMetaParams(XCamAwbParam *awbParams, int reqId){
 
     pthread_mutex_lock(&_aiq_ctx_mutex);
     if (_state == AIQ_ADAPTER_STATE_STARTED) {
+#if defined(ISP_HW_V32) || defined(ISP_HW_V32_LITE)
+		ret = rk_aiq_user_api2_accm_v2_GetAttrib(_aiq_ctx, &setCcm);
+#else
         ret = rk_aiq_user_api_accm_GetAttrib(_aiq_ctx, &setCcm);
+#endif
         if (ret) {
-            LOGE("%s(%d) Awb GetAttrib failed!\n", __FUNCTION__, __LINE__);
+            LOGE("%s(%d) Ccm GetAttrib failed!\n", __FUNCTION__, __LINE__);
         }
-
+#if defined(ISP_HW_V32) || defined(ISP_HW_V32_LITE)
+        ret = rk_aiq_user_api2_awbV32_GetAllAttrib(_aiq_ctx, &stAwbttr);
+#else
         ret = rk_aiq_user_api_awb_GetAttrib(_aiq_ctx, &stAwbttr);
+#endif
         if (ret) {
             LOGE("%s(%d) Awb GetAttrib failed!\n", __FUNCTION__, __LINE__);
         }
@@ -823,11 +838,19 @@ AiqCameraHalAdapter::updateAwbMetaParams(XCamAwbParam *awbParams, int reqId){
             LOGD("@%s(%d) reqId(%d) mAwblockstate(%d)!\n", __FUNCTION__, __LINE__, reqId, mAwblockstate);
 
             //Not used now, for it resume 60ms in this callback
-            ret = rk_aiq_user_api_accm_SetAttrib(_aiq_ctx, setCcm);
+#if defined(ISP_HW_V32) || defined(ISP_HW_V32_LITE)
+			ret = rk_aiq_user_api2_accm_v2_SetAttrib(_aiq_ctx, &setCcm);
+#else
+			ret = rk_aiq_user_api_accm_SetAttrib(_aiq_ctx, &setCcm);
+#endif
             if (ret) {
                 LOGE("%s(%d) accm SetAttrib failed!\n", __FUNCTION__, __LINE__);
             }
+#if defined(ISP_HW_V32) || defined(ISP_HW_V32_LITE)
+            ret = rk_aiq_user_api2_awbV32_SetAllAttrib(_aiq_ctx, stAwbttr);
+#else
             ret = rk_aiq_user_api_awb_SetAttrib(_aiq_ctx, stAwbttr);
+#endif
             if (ret) {
                 LOGE("%s(%d) Awb SetAttrib failed!\n", __FUNCTION__, __LINE__);
             }
@@ -1047,36 +1070,56 @@ AiqCameraHalAdapter::getAeResults(rk_aiq_ae_results &ae_results)
         }
     }
     pthread_mutex_unlock(&_aiq_ctx_mutex);
+
     if(_work_mode == RK_AIQ_WORKING_MODE_NORMAL /*linear*/) {
-        ae_results.exposure.exposure_time_us = gtExpResInfo.CurExpInfo.LinearExp.exp_real_params.integration_time * 1000 * 1000; //us or ns?
-        ae_results.exposure.analog_gain = gtExpResInfo.CurExpInfo.LinearExp.exp_real_params.analog_gain;
-        ae_results.exposure.iso = gtExpResInfo.CurExpInfo.LinearExp.exp_real_params.iso;
+        ae_results.exposure.exposure_time_us = gtExpResInfo.LinAeInfo.LinearExp.integration_time * 1000 * 1000; //us or ns?
+        ae_results.exposure.analog_gain = gtExpResInfo.LinAeInfo.LinearExp.analog_gain;
+        ae_results.exposure.iso = gtExpResInfo.LinAeInfo.LinearExp.analog_gain * gtExpResInfo.LinAeInfo.LinearExp.digital_gain *
+                                    gtExpResInfo.LinAeInfo.LinearExp.isp_dgain * 100;
 
         //current useless, for future use
-        ae_results.exposure.digital_gain = gtExpResInfo.CurExpInfo.LinearExp.exp_real_params.digital_gain;
+        ae_results.exposure.digital_gain = gtExpResInfo.LinAeInfo.LinearExp.digital_gain;
         //sensor exposure params
-        ae_results.sensor_exposure.coarse_integration_time = gtExpResInfo.CurExpInfo.LinearExp.exp_sensor_params.coarse_integration_time;
-        ae_results.sensor_exposure.analog_gain_code_global = gtExpResInfo.CurExpInfo.LinearExp.exp_sensor_params.analog_gain_code_global;
-        ae_results.sensor_exposure.fine_integration_time =  gtExpResInfo.CurExpInfo.LinearExp.exp_sensor_params.fine_integration_time;
-        ae_results.sensor_exposure.digital_gain_global =  gtExpResInfo.CurExpInfo.LinearExp.exp_sensor_params.digital_gain_global;
-    } else {
+        // ae_results.sensor_exposure.coarse_integration_time = gtExpResInfo.CurExpInfo.LinearExp.exp_sensor_params.coarse_integration_time;
+        // ae_results.sensor_exposure.analog_gain_code_global = gtExpResInfo.CurExpInfo.LinearExp.exp_sensor_params.analog_gain_code_global;
+        // ae_results.sensor_exposure.fine_integration_time =  gtExpResInfo.CurExpInfo.LinearExp.exp_sensor_params.fine_integration_time;
+        // ae_results.sensor_exposure.digital_gain_global =  gtExpResInfo.CurExpInfo.LinearExp.exp_sensor_params.digital_gain_global;
+        ae_results.meanluma = gtExpResInfo.LinAeInfo.MeanLuma;
+    } else if (_work_mode == RK_AIQ_WORKING_MODE_ISP_HDR2) {
         /* Hdr need zyc TODO */
-        ae_results.exposure.exposure_time_us = gtExpResInfo.CurExpInfo.HdrExp[0].exp_real_params.integration_time * 1000 * 1000; //us or ns?
-        ae_results.exposure.analog_gain = gtExpResInfo.CurExpInfo.HdrExp[0].exp_real_params.analog_gain;
-        ae_results.exposure.iso = gtExpResInfo.CurExpInfo.HdrExp[0].exp_real_params.iso;
+        ae_results.exposure.exposure_time_us = gtExpResInfo.HdrAeInfo.HdrExp[1].integration_time * 1000 * 1000; //us or ns?
+        ae_results.exposure.analog_gain = gtExpResInfo.HdrAeInfo.HdrExp[1].analog_gain;
+        ae_results.exposure.iso = gtExpResInfo.HdrAeInfo.HdrExp[1].analog_gain * gtExpResInfo.HdrAeInfo.HdrExp[1].digital_gain *
+                                    gtExpResInfo.HdrAeInfo.HdrExp[1].isp_dgain * 100;
 
         //current useless, for future use
-        ae_results.exposure.digital_gain =gtExpResInfo.CurExpInfo.HdrExp[0].exp_real_params.digital_gain;
+        ae_results.exposure.digital_gain =gtExpResInfo.HdrAeInfo.HdrExp[1].digital_gain;
         //sensor exposure params
-        ae_results.sensor_exposure.coarse_integration_time = gtExpResInfo.CurExpInfo.HdrExp[0].exp_sensor_params.coarse_integration_time;
-        ae_results.sensor_exposure.analog_gain_code_global = gtExpResInfo.CurExpInfo.HdrExp[0].exp_sensor_params.analog_gain_code_global;
-        ae_results.sensor_exposure.fine_integration_time = gtExpResInfo.CurExpInfo.HdrExp[0].exp_sensor_params.fine_integration_time;
-        ae_results.sensor_exposure.digital_gain_global = gtExpResInfo.CurExpInfo.HdrExp[0].exp_sensor_params.digital_gain_global;
+        // ae_results.sensor_exposure.coarse_integration_time = gtExpResInfo.CurExpInfo.HdrExp[0].exp_sensor_params.coarse_integration_time;
+        // ae_results.sensor_exposure.analog_gain_code_global = gtExpResInfo.CurExpInfo.HdrExp[0].exp_sensor_params.analog_gain_code_global;
+        // ae_results.sensor_exposure.fine_integration_time = gtExpResInfo.CurExpInfo.HdrExp[0].exp_sensor_params.fine_integration_time;
+        // ae_results.sensor_exposure.digital_gain_global = gtExpResInfo.CurExpInfo.HdrExp[0].exp_sensor_params.digital_gain_global;
+        ae_results.meanluma = gtExpResInfo.HdrAeInfo.Frm1Luma;
+    } else { //RK_AIQ_WORKING_MODE_ISP_HDR3
+        ae_results.exposure.exposure_time_us = gtExpResInfo.HdrAeInfo.HdrExp[2].integration_time * 1000 * 1000; //us or ns?
+        ae_results.exposure.analog_gain = gtExpResInfo.HdrAeInfo.HdrExp[2].analog_gain;
+        ae_results.exposure.iso = gtExpResInfo.HdrAeInfo.HdrExp[2].analog_gain * gtExpResInfo.HdrAeInfo.HdrExp[1].digital_gain *
+                                    gtExpResInfo.HdrAeInfo.HdrExp[2].isp_dgain * 100;
+
+        //current useless, for future use
+        ae_results.exposure.digital_gain =gtExpResInfo.HdrAeInfo.HdrExp[2].digital_gain;
+        //sensor exposure params
+        // ae_results.sensor_exposure.coarse_integration_time = gtExpResInfo.CurExpInfo.HdrExp[0].exp_sensor_params.coarse_integration_time;
+        // ae_results.sensor_exposure.analog_gain_code_global = gtExpResInfo.CurExpInfo.HdrExp[0].exp_sensor_params.analog_gain_code_global;
+        // ae_results.sensor_exposure.fine_integration_time = gtExpResInfo.CurExpInfo.HdrExp[0].exp_sensor_params.fine_integration_time;
+        // ae_results.sensor_exposure.digital_gain_global = gtExpResInfo.CurExpInfo.HdrExp[0].exp_sensor_params.digital_gain_global;
+        ae_results.meanluma = gtExpResInfo.HdrAeInfo.Frm2Luma;
     }
-    ae_results.sensor_exposure.frame_length_lines = gtExpResInfo.CurExpInfo.frame_length_lines;
-    ae_results.sensor_exposure.line_length_pixels = gtExpResInfo.CurExpInfo.line_length_pixels;
+    ae_results.sensor_exposure.frame_length_lines = gtExpResInfo.LinePeriodsPerField;
+    ae_results.sensor_exposure.line_length_pixels = gtExpResInfo.PixelPeriodsPerLine;
     ae_results.converged = gtExpResInfo.IsConverged;
-    ae_results.meanluma = gtExpResInfo.MeanLuma;
+    // ae_results.meanluma = gtExpResInfo.LinAeInfo.MeanLuma;
+
     //ae_results.converged = 1;
 
     LOGD("@%s ae_results.converged:%d",__FUNCTION__, ae_results.converged);
@@ -1134,7 +1177,11 @@ AiqCameraHalAdapter::getAwbResults(rk_aiq_awb_results &awb_results)
 
     pthread_mutex_lock(&_aiq_ctx_mutex);
     if (_state == AIQ_ADAPTER_STATE_STARTED) {
+#if defined(ISP_HW_V32_LITE)
+        ret = rk_aiq_user_api2_awb_QueryWBInfo(_aiq_ctx, &query_info);
+#else
         ret = rk_aiq_user_api_awb_QueryWBInfo(_aiq_ctx, &query_info);
+#endif
         if (ret) {
             LOGE("%s(%d) QueryWBInfo failed!\n", __FUNCTION__, __LINE__);
             pthread_mutex_unlock(&_aiq_ctx_mutex);
