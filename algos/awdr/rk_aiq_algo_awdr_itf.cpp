@@ -24,7 +24,7 @@
 RKAIQ_BEGIN_DECLARE
 
 typedef struct _RkAiqAlgoContext {
-    void* place_holder[0];
+    void* place_holder;
 } RkAiqAlgoContext;
 
 
@@ -83,9 +83,9 @@ RkAiqAlgoDescription g_RkIspAlgoDescAwdr = {
         .destroy_context = destroy_context,
     },
     .prepare = prepare,
-    .pre_process = pre_process,
+    .pre_process = NULL,
     .processing = processing,
-    .post_process = post_process,
+    .post_process = NULL,
 };
 
 RKAIQ_END_DECLARE

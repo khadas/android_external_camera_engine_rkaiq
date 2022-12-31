@@ -24,7 +24,7 @@
 RKAIQ_BEGIN_DECLARE
 
 typedef struct _RkAiqAlgoContext {
-    void* place_holder[0];
+    Again_Context_V2_t pAgainCtx;
 } RkAiqAlgoContext;
 
 
@@ -109,7 +109,7 @@ prepare(RkAiqAlgoCom* params)
     LOGI_ANR("%s: (exit)\n", __FUNCTION__ );
     return result;
 }
-
+#if 0
 static XCamReturn
 pre_process(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outparams)
 {
@@ -135,7 +135,7 @@ pre_process(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outparams)
     LOGI_ANR("%s: (exit)\n", __FUNCTION__ );
     return result;
 }
-
+#endif
 static XCamReturn
 processing(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outparams)
 {
@@ -155,6 +155,18 @@ processing(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outparams)
              __FUNCTION__, __LINE__,
              inparams->u.proc.init,
              pAgainProcParams->hdr_mode);
+
+    if (inparams->u.proc.gray_mode) {
+        pAgainCtx->isGrayMode = true;
+    } else {
+        pAgainCtx->isGrayMode = false;
+    }
+
+    Again_result_V2_t ret = Again_PreProcess_V2(pAgainCtx);
+    if(ret != AGAINV2_RET_SUCCESS) {
+        result = XCAM_RETURN_ERROR_FAILED;
+        LOGE_ANR("%s: ANRPreProcess failed (%d)\n", __FUNCTION__, ret);
+    }
 
     stExpInfo.hdr_mode = 0; //pAnrProcParams->hdr_mode;
     for(int i = 0; i < 3; i++) {
@@ -178,7 +190,7 @@ processing(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outparams)
 #if 1// TODO Merge
     RKAiqAecExpInfo_t *curExp = pAgainProcParams->com.u.proc.curExp;
 
-    if( curExp != NULL) {
+    if(curExp != NULL) {
         stExpInfo.snr_mode = curExp->CISFeature.SNR;
         if(pAgainProcParams->hdr_mode == RK_AIQ_WORKING_MODE_NORMAL) {
             stExpInfo.hdr_mode = 0;
@@ -195,19 +207,20 @@ processing(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outparams)
                 stExpInfo.arDGain[0] = curExp->LinearExp.exp_real_params.digital_gain;
             }
             if(curExp->LinearExp.exp_real_params.isp_dgain < 1.0) {
-                stExpInfo.arDGain[0] *= 1.0;
-                LOGW_ANR("leanr mode dgain is wrong, use 1.0 instead\n");
+                stExpInfo.isp_dgain[0] = 1.0;
+                LOGW_ANR("leanr mode isp_dgain is wrong, use 1.0 instead\n");
             } else {
-                stExpInfo.arDGain[0] *= curExp->LinearExp.exp_real_params.isp_dgain;
+                stExpInfo.isp_dgain[0] = curExp->LinearExp.exp_real_params.isp_dgain;
             }
+            // stExpInfo.arAGain[0] = 64.0;
             stExpInfo.arTime[0] = curExp->LinearExp.exp_real_params.integration_time;
-            stExpInfo.arIso[0] = stExpInfo.arAGain[0] * stExpInfo.arDGain[0] * 50;
-
-            LOGD_ANR("anr: %s-%d, curExp(%f, %f, %f, %d, %d)\n",
+            stExpInfo.arIso[0] = stExpInfo.arAGain[0] * stExpInfo.arDGain[0] * 50 * stExpInfo.isp_dgain[0];
+            LOGD_ANR("anr: %s-%d curExp(%f, %f, %f, %f %d, %d)\n",
                      __FUNCTION__, __LINE__,
                      curExp->LinearExp.exp_real_params.analog_gain,
                      curExp->LinearExp.exp_real_params.integration_time,
                      curExp->LinearExp.exp_real_params.digital_gain,
+                     curExp->LinearExp.exp_real_params.isp_dgain,
                      curExp->LinearExp.exp_real_params.dcg_mode,
                      curExp->CISFeature.SNR);
         } else {
@@ -220,26 +233,33 @@ processing(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outparams)
                 }
                 if(curExp->HdrExp[i].exp_real_params.digital_gain < 1.0) {
                     stExpInfo.arDGain[i] = 1.0;
-                } else {
                     LOGW_ANR("hdr mode dgain is wrong, use 1.0 instead\n");
+                } else {
                     stExpInfo.arDGain[i] = curExp->HdrExp[i].exp_real_params.digital_gain;
                 }
+                if(curExp->HdrExp[i].exp_real_params.isp_dgain < 1.0) {
+                    stExpInfo.isp_dgain[i] = 1.0;
+                    LOGW_ANR("hdr mode isp_dgain is wrong, use 1.0 instead\n");
+                } else {
+                    stExpInfo.isp_dgain[i] = curExp->HdrExp[i].exp_real_params.isp_dgain;
+                }
                 stExpInfo.arTime[i] = curExp->HdrExp[i].exp_real_params.integration_time;
-                stExpInfo.arIso[i] = stExpInfo.arAGain[i] * stExpInfo.arDGain[i] * 50;
+                stExpInfo.arIso[i] = stExpInfo.arAGain[i] * stExpInfo.arDGain[i] * 50 * stExpInfo.isp_dgain[i];
 
-                LOGD_ANR("%s:%d index:%d again:%f  dgain:%f  time:%f iso:%d hdr_mode:%d  \n",
+                LOGD_ANR("%s:%d index:%d again:%f dgain:%f isp_dgain:%f time:%f  iso:%d  hdr_mode:%d  \n",
                          __FUNCTION__, __LINE__,
                          i,
                          stExpInfo.arAGain[i],
                          stExpInfo.arDGain[i],
+                         stExpInfo.isp_dgain[i],
                          stExpInfo.arTime[i],
                          stExpInfo.arIso[i],
                          stExpInfo.hdr_mode);
             }
         }
     } else {
-        LOGE_ANR("%s:%d curExp(%p) is NULL, so use default instead \n",
-                 __FUNCTION__, __LINE__, curExp);
+        LOGE_ANR("%s:%d  curExp(%p) is NULL, so use default instead \n",
+                 __FUNCTION__, __LINE__,  curExp);
     }
 
 
@@ -313,9 +333,9 @@ RkAiqAlgoDescription g_RkIspAlgoDescAgainV2 = {
         .destroy_context = destroy_context,
     },
     .prepare = prepare,
-    .pre_process = pre_process,
+    .pre_process = NULL,
     .processing = processing,
-    .post_process = post_process,
+    .post_process = NULL,
 };
 
 RKAIQ_END_DECLARE

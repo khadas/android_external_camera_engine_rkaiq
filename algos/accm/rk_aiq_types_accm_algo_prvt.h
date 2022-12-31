@@ -32,8 +32,6 @@ RKAIQ_BEGIN_DECLARE
 typedef struct ccm_3ares_info_s{
     float sensorGain;
     float awbGain[2];
-    bool wbgain_stable;
-    bool gain_stable;
 } ccm_3ares_info_t;
 
 
@@ -44,8 +42,8 @@ typedef struct accm_rest_s {
 #endif
     List problist;
     int dominateIlluProfileIdx;
-    const CalibDbV2_Ccm_Ccm_Matrix_Para_t *pCcmProfile1;
-    const CalibDbV2_Ccm_Ccm_Matrix_Para_t *pCcmProfile2;
+    const CalibDbV2_Ccm_Matrix_Para_t *pCcmProfile1;
+    const CalibDbV2_Ccm_Matrix_Para_t *pCcmProfile2;
     float undampedCcmMatrix[9];
     float dampedCcmMatrix[9];
     float undampedCcOffset[3];
@@ -68,16 +66,24 @@ typedef struct prob_node_s {
 
 
 typedef struct accm_context_s {
-    const CalibDbV2_Ccm_Para_V2_t *calibV2Ccm; // json para
-    const CalibDbV2_Ccm_Ccm_Matrix_Para_t *pCcmMatrixAll[CCM_ILLUMINATION_MAX][CCM_PROFILES_NUM_MAX];// reorder para //to do, change to pointer
+#if RKAIQ_HAVE_CCM_V1
+    const CalibDbV2_Ccm_Para_V2_t* ccm_v1;
+    rk_aiq_ccm_cfg_t ccmHwConf;
+    rk_aiq_ccm_attrib_t mCurAtt;
+    rk_aiq_ccm_attrib_t mNewAtt;
+#endif
+#if RKAIQ_HAVE_CCM_V2
+    const CalibDbV2_Ccm_Para_V32_t* ccm_v2;
+    rk_aiq_ccm_cfg_v2_t ccmHwConf_v2;
+    rk_aiq_ccm_v2_attrib_t mCurAttV2;
+    rk_aiq_ccm_v2_attrib_t mNewAttV2;
+#endif
+    const CalibDbV2_Ccm_Matrix_Para_t *pCcmMatrixAll[CCM_ILLUMINATION_MAX][CCM_PROFILES_NUM_MAX];// reorder para //to do, change to pointer
     accm_sw_info_t accmSwInfo;
     accm_rest_t accmRest;
-    rk_aiq_ccm_cfg_t ccmHwConf; //hw para
     unsigned int count;
     CalibDbV2_Ccm_Tuning_Para_t ccm_tune;
     //ctrl & api
-    rk_aiq_ccm_attrib_t mCurAtt;
-    rk_aiq_ccm_attrib_t mNewAtt;
     bool updateAtt;
     bool update;
     bool calib_update;

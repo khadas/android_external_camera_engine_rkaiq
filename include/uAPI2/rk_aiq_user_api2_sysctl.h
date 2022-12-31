@@ -205,6 +205,8 @@ rk_aiq_uapi2_sysctl_getEnabledAxlibCtx(const rk_aiq_sys_ctx_t* ctx, const int al
 XCamReturn
 rk_aiq_uapi2_sysctl_getStaticMetas(const char* sns_ent_name, rk_aiq_static_info_t* static_info);
 
+XCamReturn
+rk_aiq_uapi2_sysctl_enumStaticMetasByPhyId(int index, rk_aiq_static_info_t* static_info);
 /*!
  * \brief enum static camera infos
  *
@@ -314,6 +316,29 @@ char* rk_aiq_uapi2_sysctl_readiq(const rk_aiq_sys_ctx_t* sys_ctx, char* param);
 XCamReturn
 rk_aiq_uapi2_sysctl_preInit_scene(const char* sns_ent_name, const char *main_scene,
                                   const char *sub_scene);
+/**
+ * @brief set thunder boot info to aiq
+ *
+ * @param sns_ent_name sensor name
+ * @param is_pre_aiq is pre-customer aiq
+ *
+ * @return 0 if no error
+ */
+XCamReturn
+rk_aiq_uapi2_sysctl_preInit_tb_info(const char* sns_ent_name,
+                           const rk_aiq_tb_info_t* info);
+
+/**
+ * @brief preInit the addr of IQ
+ *
+ * @param sns_ent_name
+ * @param addr
+ * @param len
+ *
+ * @return 0 if no error
+ */
+XCamReturn
+rk_aiq_uapi2_sysctl_preInit_iq_addr(const char* sns_ent_name, void *addr, size_t len);
 
 /**
  * @brief preInit the addr of IQ
@@ -331,6 +356,31 @@ typedef struct rk_aiq_ctx_camInfo_s {
     const char* sns_ent_nm;
     int sns_camPhyId;
 } rk_aiq_ctx_camInfo_t;
+
+/**
+ * @brief preInit the addr of CamCalibProj
+ *
+ * @param sns_ent_name
+ * @param addr
+ *
+ * @return 0 if no error
+ */
+XCamReturn
+rk_aiq_uapi2_sysctl_preInit_calibproj(const char* sns_ent_name, void *addr);
+
+
+/**
+ * @brief set device buffer count, currently only for raw tx/rx device
+ *
+ * @param sns_ent_name: Sensor entity name, can get from #rk_aiq_uapi2_sysctl_getBindedSnsEntNmByVd
+ * @param dev_ent: Device entity string, if equals "rkraw_tx" or "rkraw_rx", will set for all tx/rx devices
+ * @param buf_cnt: V4l2 buffer count for video device of entity #dev_ent
+ *
+ * @return XCAM_RETURN_NO_ERROR if no error, otherwise return values < 0
+ */
+XCamReturn
+rk_aiq_uapi2_sysctl_preInit_devBufCnt(const char* sns_ent_name, const char* dev_ent,
+                                      int buf_cnt);
 
 XCamReturn
 rk_aiq_uapi2_sysctl_getCamInfos(const rk_aiq_sys_ctx_t* sys_ctx, rk_aiq_ctx_camInfo_t* camInfo);

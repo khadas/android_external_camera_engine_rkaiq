@@ -1,10 +1,16 @@
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 2.8...3.22)
+
+if (ARCH STREQUAL "arm")
+    set(J2S_HOST_CFLAGS -m32 -std=gnu99 -malign-double)
+elseif (ARCH STREQUAL "aarch64")
+    set(J2S_HOST_CFLAGS -m64 -std=gnu99 -malign-double)
+endif()
 
 set(J2S_SRC
-    ${CMAKE_CURRENT_SOURCE_DIR}/j2s/cJSON.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/j2s/cJSON_Utils.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/j2s/j2s.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/j2s/j2s_utils.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/j2s/cJSON.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/j2s/cJSON_Utils.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/j2s/j2s.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/j2s/j2s_utils.cpp
     )
 
 #########################################################
@@ -40,7 +46,7 @@ add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/RkAiqCalibDbTypesV2_M4.h
 #########################################################
 add_custom_command(
     OUTPUT ${CMAKE_BINARY_DIR}/.j2s_generated.h
-    COMMAND gcc -std=gnu99 -DJ2S_ENABLE_DESC ${CMAKE_SOURCE_DIR}/tools/iq_check/src/parser.c -o parser ${ISP_HW_VERSION}
+    COMMAND gcc ${J2S_HOST_CFLAGS} -DJ2S_ENABLE_DESC ${CMAKE_SOURCE_DIR}/tools/iq_check/src/parser.c -o parser ${ISP_HW_VERSION}
     -I${CMAKE_SOURCE_DIR}/include/common
     -I${CMAKE_SOURCE_DIR}/
     -I${CMAKE_SOURCE_DIR}/include/uAPI2
@@ -56,17 +62,12 @@ add_custom_command(
     DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/RkAiqCalibDbTypesV2_M4.h
     )
 
-if(ARCH STREQUAL "aarch64")
-	set(HOST_GCC_FLAG "-m64")
-else()
-	set(HOST_GCC_FLAG "-m32")
-endif()
 #########################################################
 #                    BUILD HOST CODE2BIN tool               #
 #########################################################
 add_custom_target(
     j2s_code2bin
-    COMMAND gcc ${HOST_GCC_FLAG} -malign-double -std=gnu99 ${CMAKE_SOURCE_DIR}/tools/iq_check/src/tobin.c -o tobin ${ISP_HW_VERSION} -DRKAIQ_HAVE_LSC_V3
+    COMMAND gcc ${J2S_HOST_CFLAGS} ${CMAKE_SOURCE_DIR}/tools/iq_check/src/tobin.c -o tobin ${ISP_HW_VERSION} -DRKAIQ_HAVE_LSC_V3
 	-I${CMAKE_BINARY_DIR}
     -I${CMAKE_SOURCE_DIR}/include/common
     -I${CMAKE_SOURCE_DIR}/
@@ -76,7 +77,7 @@ add_custom_target(
     -I${CMAKE_SOURCE_DIR}/include/iq_parser_v2/j2s
 
 	COMMAND ./tobin ${CMAKE_BINARY_DIR}/j2s_code2bin.bin
-    COMMAND cd ${CMAKE_BINARY_DIR}/ && xxd -i j2s_code2bin.bin j2s_code2bin.h
+	COMMAND cd ${CMAKE_BINARY_DIR}/ && xxd -i j2s_code2bin.bin j2s_code2bin.h
     DEPENDS ${CMAKE_BINARY_DIR}/.j2s_generated.h
     )
 
@@ -85,7 +86,7 @@ add_custom_target(
 #########################################################
 add_custom_target(
     j2s_generated_optim
-    COMMAND gcc ${HOST_GCC_FLAG} -malign-double -std=gnu99 ${CMAKE_SOURCE_DIR}/tools/iq_check/src/j2s_generated_optim.c -o j2s_generated_optim ${ISP_HW_VERSION}
+    COMMAND gcc ${J2S_HOST_CFLAGS} ${CMAKE_SOURCE_DIR}/tools/iq_check/src/j2s_generated_optim.c -o j2s_generated_optim ${ISP_HW_VERSION}
 	-I${CMAKE_BINARY_DIR}
     -I${CMAKE_SOURCE_DIR}/include/common
     -I${CMAKE_SOURCE_DIR}/
@@ -103,15 +104,15 @@ add_custom_target(
 #########################################################
 add_custom_target(
     j2s_parser
-    COMMAND gcc -std=gnu99 -DJ2S_ENABLE_DESC -DCOMPILE_TEMPLATE -o dump ${J2S_SRC} ${ISP_HW_VERSION}
-    ${CMAKE_SOURCE_DIR}/tools/iq_check/src/dump.c
+	COMMAND g++ -std=c++11 -DJ2S_ENABLE_DESC -DCOMPILE_TEMPLATE -o dump ${J2S_SRC} ${ISP_HW_VERSION}
+    ${CMAKE_SOURCE_DIR}/tools/iq_check/src/dump.cpp
     -I${CMAKE_SOURCE_DIR}/include/common
     -I${CMAKE_SOURCE_DIR}/
     -I${CMAKE_SOURCE_DIR}/include/uAPI2
     -I${CMAKE_SOURCE_DIR}/include/algos
     -I${CMAKE_SOURCE_DIR}/include/iq_parser_v2
     -I${CMAKE_SOURCE_DIR}/include/iq_parser_v2/j2s
-    -I${PROJECT_BINARY_DIR}
+    -I${CMAKE_BINARY_DIR}/
 
     COMMAND ./dump --template > .j2s_template.json
     COMMAND cp ${CMAKE_SOURCE_DIR}/tools/iq_check/script/dump_template.sh ./
@@ -124,25 +125,36 @@ add_custom_target(
 #########################################################
 #                    BUILD BINARY IQ FILES              #
 #########################################################
+if (${ISP_HW_VERSION} STREQUAL "-DISP_HW_V21")
+    set(IQFILES_DIR_INTERNAL "${CMAKE_SOURCE_DIR}/iqfiles/isp21")
+endif ()
+if (${ISP_HW_VERSION} STREQUAL "-DISP_HW_V30")
+    set(IQFILES_DIR_INTERNAL "${CMAKE_SOURCE_DIR}/iqfiles/isp3x")
+endif ()
+if (${ISP_HW_VERSION} STREQUAL "-DISP_HW_V32")
+    set(IQFILES_DIR_INTERNAL "${CMAKE_SOURCE_DIR}/iqfiles/isp32")
+endif ()
+
 add_custom_target(
     j2s4b
     COMMAND ${CMAKE_COMMAND}
     -DROOT_PROJ_BIN_DIR:STRING=${CMAKE_BINARY_DIR}
-    -DRKAIQ_IQFILES_DIR:STRING="${CMAKE_SOURCE_DIR}/iqfiles/isp3x"
+    -DRKAIQ_IQFILES_DIR:STRING="${IQFILES_DIR_INTERNAL}"
     -DCMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE:PATH="${CMAKE_BINARY_DIR}/bin"
-    -DCMAKE_INSTALL_PREFIX=${CMAKE_BINARY_DIR}/install
+    -DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}
+    -DRKAIQ_TARGET_ARCH=${ARCH}
     -B"host_tool"
     -H"${CMAKE_SOURCE_DIR}/tools/j2s4b"
     COMMAND ${CMAKE_COMMAND} --build host_tool
-    COMMAND ${CMAKE_COMMAND} --install host_tool
+    COMMAND make -C host_tool install
 	DEPENDS j2s_parser
     )
 
 SET(IQ_PARSERV2_SRC
-    ${CMAKE_CURRENT_SOURCE_DIR}/j2s/cJSON.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/j2s/cJSON_Utils.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/j2s/j2s.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/j2s/j2s_utils.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/j2s/cJSON.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/j2s/cJSON_Utils.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/j2s/j2s.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/j2s/j2s_utils.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/RkAiqCalibDbV2.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/scene/scene_manager.cpp
     )

@@ -19,7 +19,15 @@
 
 #include "adrc/rk_aiq_algo_adrc_itf.h"
 #include "xcam_log.h"
-#include "adrc/rk_aiq_adrc_algo.h"
+#if RKAIQ_HAVE_DRC_V10
+#include "adrc/rk_aiq_adrc_algo_v10.h"
+#endif
+#if RKAIQ_HAVE_DRC_V11
+#include "adrc/rk_aiq_adrc_algo_v11.h"
+#endif
+#if RKAIQ_HAVE_DRC_V12
+#include "adrc/rk_aiq_adrc_algo_v12.h"
+#endif
 #include "adrc/rk_aiq_types_adrc_algo_prvt.h"
 
 RKAIQ_BEGIN_DECLARE
@@ -85,21 +93,25 @@ prepare(RkAiqAlgoCom* params)
 
     if(!!(params->u.prepare.conf_type & RK_AIQ_ALGO_CONFTYPE_UPDATECALIB )) {
         LOGI_ATMO("%s: Adrc Reload Para!\n", __FUNCTION__);
-
-        if(CHECK_ISP_HW_V21()) {
-            CalibDbV2_drc_t* calibv2_adrc_calib =
-                (CalibDbV2_drc_t*)(CALIBDBV2_GET_MODULE_PTR((void*)pCalibDb, adrc_calib));
-
-            pAdrcCtx->Calib.pCalibV21 = calibv2_adrc_calib;  // reload iq paras
-            Calib2stAutoV21(pAdrcCtx);
-        }
-        else if(CHECK_ISP_HW_V30()) {
-            CalibDbV2_drc_V2_t* calibv2_adrc_calib =
-                (CalibDbV2_drc_V2_t*)(CALIBDBV2_GET_MODULE_PTR((void*)pCalibDb, adrc_calib));
-
-            pAdrcCtx->Calib.pCalibV30 = calibv2_adrc_calib;  // reload iq paras
-            Calib2stAutoV30(pAdrcCtx);
-        }
+#if RKAIQ_HAVE_DRC_V10
+        CalibDbV2_drc_V10_t* calibv2_adrc_calib =
+            (CalibDbV2_drc_V10_t*)(CALIBDBV2_GET_MODULE_PTR((void*)pCalibDb, adrc_calib));
+        memcpy(&pAdrcCtx->drcAttrV10.stAuto, calibv2_adrc_calib,
+               sizeof(CalibDbV2_drc_V10_t));  // reload stAuto
+#endif
+#if RKAIQ_HAVE_DRC_V11
+        CalibDbV2_drc_V11_t* calibv2_adrc_calib =
+            (CalibDbV2_drc_V11_t*)(CALIBDBV2_GET_MODULE_PTR((void*)pCalibDb, adrc_calib));
+        memcpy(&pAdrcCtx->drcAttrV11.stAuto, calibv2_adrc_calib,
+               sizeof(CalibDbV2_drc_V11_t));  // reload stAuto
+#endif
+#if RKAIQ_HAVE_DRC_V12
+        CalibDbV2_drc_V12_t* calibv2_adrc_calib =
+            (CalibDbV2_drc_V12_t*)(CALIBDBV2_GET_MODULE_PTR((void*)pCalibDb, adrc_calib));
+        memcpy(&pAdrcCtx->drcAttrV12.stAuto, calibv2_adrc_calib,
+               sizeof(CalibDbV2_drc_V12_t));  // reload stAuto
+#endif
+        pAdrcCtx->ifReCalcStAuto = true;
     } else if (params->u.prepare.conf_type & RK_AIQ_ALGO_CONFTYPE_CHANGERES) {
         pAdrcCtx->isCapture = true;
     }
@@ -118,241 +130,281 @@ prepare(RkAiqAlgoCom* params)
 }
 
 static XCamReturn
-pre_process(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outparams)
-{
-    LOG1_ATMO("%s:Enter!\n", __FUNCTION__);
-    RESULT ret = XCAM_RETURN_NO_ERROR;
-
-
-    LOG1_ATMO("%s:Exit!\n", __FUNCTION__);
-    return XCAM_RETURN_NO_ERROR;
-}
-
-static XCamReturn
 processing(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outparams)
 {
     LOG1_ATMO("%s:Enter!\n", __FUNCTION__);
     XCamReturn result = XCAM_RETURN_NO_ERROR;
-    bool bypass = false;
-
+    bool bypass_tuning_params          = true;
+    bool bypass_expo_params            = true;
     AdrcContext_t* pAdrcCtx = (AdrcContext_t*)inparams->ctx;
-    pAdrcCtx->frameCnt                 = inparams->frame_id;
     RkAiqAlgoProcAdrc* pAdrcParams = (RkAiqAlgoProcAdrc*)inparams;
     RkAiqAlgoProcResAdrc* pAdrcProcRes = (RkAiqAlgoProcResAdrc*)outparams;
+    pAdrcCtx->FrameID                  = inparams->frame_id;
 
     LOGD_ATMO(
-        "%s:////////////////////////////////////////////////ADRC "
-        "Start//////////////////////////////////////////////// \n",
+        "%s:////////////////////////////////////////////ADRC "
+        "Start//////////////////////////////////////////// \n",
         __func__);
 
-    DrcEnableSetting(pAdrcCtx);
-
-    // get Sensor Info
-    XCamVideoBuffer* xCamAeProcRes = pAdrcParams->com.u.proc.res_comb->ae_proc_res;
-    RkAiqAlgoProcResAe* pAEProcRes = NULL;
-    if (xCamAeProcRes) {
-        pAEProcRes                       = (RkAiqAlgoProcResAe*)xCamAeProcRes->map(xCamAeProcRes);
-        pAdrcCtx->SensorInfo.LongFrmMode = pAEProcRes->ae_proc_res_rk.LongFrmMode;
+    if (pAdrcCtx->isCapture) {
+        LOGD_ATMO("%s: It's capturing, using pre frame params\n", __func__);
+        pAdrcCtx->isCapture = false;
     } else {
-        LOGW_ATMO("%s: Ae Proc result is null!!!\n", __FUNCTION__);
-        pAdrcCtx->SensorInfo.LongFrmMode = false;
-    }
+        bool Enable = DrcEnableSetting(pAdrcCtx);
 
-    // expo para process
-    DrcExpoData_t ExpoData;
-    memset(&ExpoData, 0, sizeof(DrcExpoData_t));
-    if (pAdrcCtx->FrameNumber == LINEAR_NUM) {
-        ExpoData.nextSExpo =
-            pAdrcParams->com.u.proc.nxtExp->LinearExp.exp_real_params.analog_gain *
-            pAdrcParams->com.u.proc.nxtExp->LinearExp.exp_real_params.digital_gain *
-            pAdrcParams->com.u.proc.nxtExp->LinearExp.exp_real_params.isp_dgain *
-            pAdrcParams->com.u.proc.nxtExp->LinearExp.exp_real_params.integration_time;
-        if (ExpoData.nextSExpo < FLT_EPSILON)
-            ExpoData.nextSExpo =
-                pAdrcParams->com.u.proc.curExp->LinearExp.exp_real_params.analog_gain *
-                pAdrcParams->com.u.proc.curExp->LinearExp.exp_real_params.digital_gain *
-                pAdrcParams->com.u.proc.curExp->LinearExp.exp_real_params.isp_dgain *
-                pAdrcParams->com.u.proc.curExp->LinearExp.exp_real_params.integration_time;
+        if (Enable) {
+            // get Sensor Info
+            XCamVideoBuffer* xCamAeProcRes = pAdrcParams->com.u.proc.res_comb->ae_proc_res;
+            RkAiqAlgoProcResAe* pAEProcRes = NULL;
+            if (xCamAeProcRes) {
+                pAEProcRes = (RkAiqAlgoProcResAe*)xCamAeProcRes->map(xCamAeProcRes);
+                pAdrcCtx->NextData.AEData.LongFrmMode = pAEProcRes->ae_proc_res_rk.LongFrmMode;
+            } else {
+                pAdrcCtx->NextData.AEData.LongFrmMode = false;
+                LOGW_ATMO("%s: Ae Proc result is null!!!\n", __FUNCTION__);
+            }
 
-        ExpoData.nextMExpo             = ExpoData.nextSExpo;
-        ExpoData.nextLExpo             = ExpoData.nextSExpo;
-        pAdrcCtx->CurrAeResult.AERatio = 1.0f;
+        // get eff expo data
+        if(pAdrcCtx->FrameNumber == LINEAR_NUM) {
+            pAdrcCtx->NextData.AEData.SExpo =
+                pAdrcParams->com.u.proc.nxtExp->LinearExp.exp_real_params.analog_gain *
+                pAdrcParams->com.u.proc.nxtExp->LinearExp.exp_real_params.digital_gain *
+                pAdrcParams->com.u.proc.nxtExp->LinearExp.exp_real_params.isp_dgain *
+                pAdrcParams->com.u.proc.nxtExp->LinearExp.exp_real_params.integration_time;
+            pAdrcCtx->NextData.AEData.ISO =
+                pAdrcParams->com.u.proc.nxtExp->LinearExp.exp_real_params.analog_gain *
+                pAdrcParams->com.u.proc.nxtExp->LinearExp.exp_real_params.digital_gain *
+                pAdrcParams->com.u.proc.nxtExp->LinearExp.exp_real_params.isp_dgain * ISOMIN;
+            if (pAdrcCtx->NextData.AEData.SExpo < FLT_EPSILON) {
+                pAdrcCtx->NextData.AEData.SExpo =
+                    pAdrcParams->com.u.proc.curExp->LinearExp.exp_real_params.analog_gain *
+                    pAdrcParams->com.u.proc.curExp->LinearExp.exp_real_params.digital_gain *
+                    pAdrcParams->com.u.proc.curExp->LinearExp.exp_real_params.isp_dgain *
+                    pAdrcParams->com.u.proc.curExp->LinearExp.exp_real_params.integration_time;
+                pAdrcCtx->NextData.AEData.ISO =
+                    pAdrcParams->com.u.proc.curExp->LinearExp.exp_real_params.analog_gain *
+                    pAdrcParams->com.u.proc.curExp->LinearExp.exp_real_params.digital_gain *
+                    pAdrcParams->com.u.proc.curExp->LinearExp.exp_real_params.isp_dgain * ISOMIN;
+            }
+            pAdrcCtx->NextData.AEData.MExpo = pAdrcCtx->NextData.AEData.SExpo;
+            pAdrcCtx->NextData.AEData.LExpo = pAdrcCtx->NextData.AEData.SExpo;
 
-        pAdrcCtx->CurrAeResult.ISO =
-            pAdrcParams->com.u.proc.nxtExp->LinearExp.exp_real_params.analog_gain *
-            pAdrcParams->com.u.proc.nxtExp->LinearExp.exp_real_params.isp_dgain *
-            pAdrcParams->com.u.proc.nxtExp->LinearExp.exp_real_params.digital_gain * 50.0f;
-        if (pAdrcCtx->CurrAeResult.ISO < FLT_EPSILON)
-            pAdrcCtx->CurrAeResult.ISO =
-                pAdrcParams->com.u.proc.curExp->LinearExp.exp_real_params.analog_gain *
-                pAdrcParams->com.u.proc.curExp->LinearExp.exp_real_params.isp_dgain *
-                pAdrcParams->com.u.proc.curExp->LinearExp.exp_real_params.digital_gain * 50.0f;
-    } else if (pAdrcCtx->FrameNumber == HDR_2X_NUM) {
-        ExpoData.nextSExpo =
-            pAdrcParams->com.u.proc.nxtExp->HdrExp[0].exp_real_params.analog_gain *
-            pAdrcParams->com.u.proc.nxtExp->HdrExp[0].exp_real_params.digital_gain *
-            pAdrcParams->com.u.proc.nxtExp->HdrExp[0].exp_real_params.isp_dgain *
-            pAdrcParams->com.u.proc.nxtExp->HdrExp[0].exp_real_params.integration_time;
-        if (ExpoData.nextSExpo < FLT_EPSILON)
-            ExpoData.nextSExpo =
-                pAdrcParams->com.u.proc.curExp->HdrExp[0].exp_real_params.analog_gain *
-                pAdrcParams->com.u.proc.curExp->HdrExp[0].exp_real_params.digital_gain *
-                pAdrcParams->com.u.proc.curExp->HdrExp[0].exp_real_params.isp_dgain *
-                pAdrcParams->com.u.proc.curExp->HdrExp[0].exp_real_params.integration_time;
+#if RKAIQ_HAVE_DRC_V12
+            pAdrcCtx->ablcV32_proc_res.blc_ob_enable = pAdrcParams->ablcV32_proc_res.blc_ob_enable;
+            pAdrcCtx->ablcV32_proc_res.isp_ob_predgain =
+                pAdrcParams->ablcV32_proc_res.isp_ob_predgain;
+            if (pAdrcCtx->ablcV32_proc_res.blc_ob_enable &&
+                pAdrcCtx->ablcV32_proc_res.isp_ob_predgain < ISP_PREDGAIN_DEFAULT) {
+                LOGE_ATMO("%s: ob_enable ON, and ob_predgain[%f] < 1.0f, clip to 1.0!!!\n",
+                          __FUNCTION__, pAdrcCtx->ablcV32_proc_res.isp_ob_predgain);
+                pAdrcCtx->ablcV32_proc_res.isp_ob_predgain = ISP_PREDGAIN_DEFAULT;
+            }
 
-        ExpoData.nextMExpo =
-            pAdrcParams->com.u.proc.nxtExp->HdrExp[1].exp_real_params.analog_gain *
-            pAdrcParams->com.u.proc.nxtExp->HdrExp[1].exp_real_params.digital_gain *
-            pAdrcParams->com.u.proc.nxtExp->HdrExp[1].exp_real_params.isp_dgain *
-            pAdrcParams->com.u.proc.nxtExp->HdrExp[1].exp_real_params.integration_time;
-        if (ExpoData.nextMExpo < FLT_EPSILON)
-            ExpoData.nextMExpo =
-                pAdrcParams->com.u.proc.curExp->HdrExp[1].exp_real_params.analog_gain *
-                pAdrcParams->com.u.proc.curExp->HdrExp[1].exp_real_params.digital_gain *
-                pAdrcParams->com.u.proc.curExp->HdrExp[1].exp_real_params.isp_dgain *
-                pAdrcParams->com.u.proc.curExp->HdrExp[1].exp_real_params.integration_time;
-
-        ExpoData.nextLExpo             = ExpoData.nextMExpo;
-        pAdrcCtx->CurrAeResult.AERatio = ExpoData.nextMExpo / ExpoData.nextSExpo;
-
-        pAdrcCtx->CurrAeResult.ISO =
-            pAdrcParams->com.u.proc.nxtExp->HdrExp[1].exp_real_params.analog_gain *
-            pAdrcParams->com.u.proc.nxtExp->HdrExp[1].exp_real_params.digital_gain *
-            pAdrcParams->com.u.proc.nxtExp->HdrExp[1].exp_real_params.isp_dgain * 50.0f;
-        if (pAdrcCtx->CurrAeResult.ISO < FLT_EPSILON)
-            pAdrcCtx->CurrAeResult.ISO =
-                pAdrcParams->com.u.proc.curExp->HdrExp[1].exp_real_params.analog_gain *
-                pAdrcParams->com.u.proc.curExp->HdrExp[1].exp_real_params.digital_gain *
-                pAdrcParams->com.u.proc.curExp->HdrExp[1].exp_real_params.isp_dgain * 50.0f;
-    } else if (pAdrcCtx->FrameNumber == HDR_3X_NUM) {
-        ExpoData.nextSExpo =
-            pAdrcParams->com.u.proc.nxtExp->HdrExp[0].exp_real_params.analog_gain *
-            pAdrcParams->com.u.proc.nxtExp->HdrExp[0].exp_real_params.digital_gain *
-            pAdrcParams->com.u.proc.nxtExp->HdrExp[0].exp_real_params.isp_dgain *
-            pAdrcParams->com.u.proc.nxtExp->HdrExp[0].exp_real_params.integration_time;
-        if (ExpoData.nextSExpo < FLT_EPSILON)
-            ExpoData.nextSExpo =
-                pAdrcParams->com.u.proc.curExp->HdrExp[0].exp_real_params.analog_gain *
-                pAdrcParams->com.u.proc.curExp->HdrExp[0].exp_real_params.digital_gain *
-                pAdrcParams->com.u.proc.curExp->HdrExp[0].exp_real_params.isp_dgain *
-                pAdrcParams->com.u.proc.curExp->HdrExp[0].exp_real_params.integration_time;
-
-        ExpoData.nextMExpo =
-            pAdrcParams->com.u.proc.nxtExp->HdrExp[1].exp_real_params.analog_gain *
-            pAdrcParams->com.u.proc.nxtExp->HdrExp[1].exp_real_params.digital_gain *
-            pAdrcParams->com.u.proc.nxtExp->HdrExp[1].exp_real_params.isp_dgain *
-            pAdrcParams->com.u.proc.nxtExp->HdrExp[1].exp_real_params.integration_time;
-        if (ExpoData.nextMExpo < FLT_EPSILON)
-            ExpoData.nextMExpo =
-                pAdrcParams->com.u.proc.curExp->HdrExp[1].exp_real_params.analog_gain *
-                pAdrcParams->com.u.proc.curExp->HdrExp[1].exp_real_params.digital_gain *
-                pAdrcParams->com.u.proc.curExp->HdrExp[1].exp_real_params.isp_dgain *
-                pAdrcParams->com.u.proc.curExp->HdrExp[1].exp_real_params.integration_time;
-
-        ExpoData.nextLExpo =
-            pAdrcParams->com.u.proc.nxtExp->HdrExp[2].exp_real_params.analog_gain *
-            pAdrcParams->com.u.proc.nxtExp->HdrExp[2].exp_real_params.digital_gain *
-            pAdrcParams->com.u.proc.nxtExp->HdrExp[2].exp_real_params.isp_dgain *
-            pAdrcParams->com.u.proc.nxtExp->HdrExp[2].exp_real_params.integration_time;
-        if (ExpoData.nextLExpo < FLT_EPSILON)
-            ExpoData.nextLExpo =
-                pAdrcParams->com.u.proc.curExp->HdrExp[2].exp_real_params.analog_gain *
-                pAdrcParams->com.u.proc.curExp->HdrExp[2].exp_real_params.digital_gain *
-                pAdrcParams->com.u.proc.curExp->HdrExp[2].exp_real_params.isp_dgain *
-                pAdrcParams->com.u.proc.curExp->HdrExp[2].exp_real_params.integration_time;
-
-        pAdrcCtx->CurrAeResult.AERatio = ExpoData.nextLExpo / ExpoData.nextSExpo;
-
-        pAdrcCtx->CurrAeResult.ISO =
-            pAdrcParams->com.u.proc.nxtExp->HdrExp[1].exp_real_params.analog_gain *
-            pAdrcParams->com.u.proc.nxtExp->HdrExp[1].exp_real_params.digital_gain *
-            pAdrcParams->com.u.proc.nxtExp->HdrExp[1].exp_real_params.isp_dgain * 50.0f;
-        if (pAdrcCtx->CurrAeResult.ISO < FLT_EPSILON)
-            pAdrcCtx->CurrAeResult.ISO =
-                pAdrcParams->com.u.proc.curExp->HdrExp[1].exp_real_params.analog_gain *
-                pAdrcParams->com.u.proc.curExp->HdrExp[1].exp_real_params.digital_gain *
-                pAdrcParams->com.u.proc.curExp->HdrExp[1].exp_real_params.isp_dgain * 50.0f;
-    }
-    if (pAdrcCtx->FrameNumber == LINEAR_NUM) {
-        LOGV_ATMO("%s: currFrame: %f-%f, nextFrame:\n", __FUNCTION__,
-                  pAdrcParams->com.u.proc.curExp->LinearExp.exp_real_params.analog_gain *
-                      pAdrcParams->com.u.proc.curExp->LinearExp.exp_real_params.digital_gain *
-                      pAdrcParams->com.u.proc.curExp->LinearExp.exp_real_params.isp_dgain,
-                  pAdrcParams->com.u.proc.curExp->LinearExp.exp_real_params.integration_time,
-                  pAdrcParams->com.u.proc.nxtExp->LinearExp.exp_real_params.analog_gain *
-                      pAdrcParams->com.u.proc.nxtExp->LinearExp.exp_real_params.digital_gain *
-                      pAdrcParams->com.u.proc.nxtExp->LinearExp.exp_real_params.isp_dgain,
-                  pAdrcParams->com.u.proc.nxtExp->LinearExp.exp_real_params.integration_time);
-    } else {
-        LOGV_ATMO("%s: nextFrame: sexp: %f-%f, mexp: %f-%f, lexp: %f-%f\n", __FUNCTION__,
-                  pAdrcParams->com.u.proc.nxtExp->HdrExp[0].exp_real_params.analog_gain,
-                  pAdrcParams->com.u.proc.nxtExp->HdrExp[0].exp_real_params.integration_time,
-                  pAdrcParams->com.u.proc.nxtExp->HdrExp[1].exp_real_params.analog_gain,
-                  pAdrcParams->com.u.proc.nxtExp->HdrExp[1].exp_real_params.integration_time,
-                  pAdrcParams->com.u.proc.nxtExp->HdrExp[2].exp_real_params.analog_gain,
-                  pAdrcParams->com.u.proc.nxtExp->HdrExp[2].exp_real_params.integration_time);
-    }
-
-    if (ExpoData.nextSExpo > FLT_EPSILON)
-        ExpoData.nextRatioLS = ExpoData.nextLExpo / ExpoData.nextSExpo;
-    else
-        LOGE_ATMO("%s: Short frame for drc expo sync is ERROR!!!\n", __FUNCTION__);
-    if (ExpoData.nextMExpo > FLT_EPSILON)
-        ExpoData.nextRatioLM = ExpoData.nextLExpo / ExpoData.nextMExpo;
-    else
-        LOGE_ATMO("%s: Midlle frame for drc expo sync is ERROR!!!\n", __FUNCTION__);
-    // clip for long frame mode
-    if (pAdrcCtx->SensorInfo.LongFrmMode) {
-        ExpoData.nextRatioLS = 1.0f;
-        ExpoData.nextRatioLM = 1.0f;
-    }
-
-    // get ae pre res and proc
-    XCamVideoBuffer* xCamAePreRes = pAdrcParams->com.u.proc.res_comb->ae_pre_res;
-    RkAiqAlgoPreResAe* pAEPreRes  = NULL;
-    if (xCamAePreRes) {
-        pAEPreRes = (RkAiqAlgoPreResAe*)xCamAePreRes->map(xCamAePreRes);
-        bypass    = AdrcByPassProcessing(pAdrcCtx, pAEPreRes->ae_pre_res_rk);
-    } else {
-        AecPreResult_t AecHdrPreResult;
-        memset(&AecHdrPreResult, 0x0, sizeof(AecPreResult_t));
-        bypass = AdrcByPassProcessing(pAdrcCtx, AecHdrPreResult);
-        bypass = false;
-        LOGW_ATMO("%s: ae Pre result is null!!!\n", __FUNCTION__);
-    }
-
-    if (pAdrcCtx->AdrcProcRes.bDrcEn) {
-        if (!bypass) AdrcTuningParaProcessing(pAdrcCtx);
-
-        if (ExpoData.nextRatioLS >= 1.0f && ExpoData.nextRatioLM >= 1.0f)
-            AdrcExpoParaProcessing(pAdrcCtx, &ExpoData);
+            if (pAdrcCtx->ablcV32_proc_res.blc_ob_enable)
+                pAdrcCtx->NextData.AEData.ISO *= pAdrcCtx->ablcV32_proc_res.isp_ob_predgain;
+#endif
+        }
+        else if(pAdrcCtx->FrameNumber == HDR_2X_NUM) {
+            pAdrcCtx->NextData.AEData.SExpo =
+                pAdrcParams->com.u.proc.nxtExp->HdrExp[0].exp_real_params.analog_gain *
+                pAdrcParams->com.u.proc.nxtExp->HdrExp[0].exp_real_params.digital_gain *
+                pAdrcParams->com.u.proc.nxtExp->HdrExp[0].exp_real_params.isp_dgain *
+                pAdrcParams->com.u.proc.nxtExp->HdrExp[0].exp_real_params.integration_time;
+            pAdrcCtx->NextData.AEData.MExpo =
+                pAdrcParams->com.u.proc.nxtExp->HdrExp[1].exp_real_params.analog_gain *
+                pAdrcParams->com.u.proc.nxtExp->HdrExp[1].exp_real_params.digital_gain *
+                pAdrcParams->com.u.proc.nxtExp->HdrExp[1].exp_real_params.isp_dgain *
+                pAdrcParams->com.u.proc.nxtExp->HdrExp[1].exp_real_params.integration_time;
+            pAdrcCtx->NextData.AEData.ISO =
+                pAdrcParams->com.u.proc.nxtExp->HdrExp[1].exp_real_params.analog_gain *
+                pAdrcParams->com.u.proc.nxtExp->HdrExp[1].exp_real_params.digital_gain *
+                pAdrcParams->com.u.proc.nxtExp->HdrExp[1].exp_real_params.isp_dgain * ISOMIN;
+            if (pAdrcCtx->NextData.AEData.SExpo < FLT_EPSILON) {
+                pAdrcCtx->NextData.AEData.SExpo =
+                    pAdrcParams->com.u.proc.curExp->HdrExp[0].exp_real_params.analog_gain *
+                    pAdrcParams->com.u.proc.curExp->HdrExp[0].exp_real_params.digital_gain *
+                    pAdrcParams->com.u.proc.curExp->HdrExp[0].exp_real_params.isp_dgain *
+                    pAdrcParams->com.u.proc.curExp->HdrExp[0].exp_real_params.integration_time;
+                pAdrcCtx->NextData.AEData.MExpo =
+                    pAdrcParams->com.u.proc.curExp->HdrExp[1].exp_real_params.analog_gain *
+                    pAdrcParams->com.u.proc.curExp->HdrExp[1].exp_real_params.digital_gain *
+                    pAdrcParams->com.u.proc.curExp->HdrExp[1].exp_real_params.isp_dgain *
+                    pAdrcParams->com.u.proc.curExp->HdrExp[1].exp_real_params.integration_time;
+                pAdrcCtx->NextData.AEData.ISO =
+                    pAdrcParams->com.u.proc.curExp->HdrExp[1].exp_real_params.analog_gain *
+                    pAdrcParams->com.u.proc.curExp->HdrExp[1].exp_real_params.digital_gain *
+                    pAdrcParams->com.u.proc.curExp->HdrExp[1].exp_real_params.isp_dgain * ISOMIN;
+            }
+            pAdrcCtx->NextData.AEData.LExpo = pAdrcCtx->NextData.AEData.MExpo;
+        }
+        else if(pAdrcCtx->FrameNumber == HDR_3X_NUM) {
+            pAdrcCtx->NextData.AEData.SExpo =
+                pAdrcParams->com.u.proc.nxtExp->HdrExp[0].exp_real_params.analog_gain *
+                pAdrcParams->com.u.proc.nxtExp->HdrExp[0].exp_real_params.digital_gain *
+                pAdrcParams->com.u.proc.nxtExp->HdrExp[0].exp_real_params.isp_dgain *
+                pAdrcParams->com.u.proc.nxtExp->HdrExp[0].exp_real_params.integration_time;
+            pAdrcCtx->NextData.AEData.MExpo =
+                pAdrcParams->com.u.proc.nxtExp->HdrExp[1].exp_real_params.analog_gain *
+                pAdrcParams->com.u.proc.nxtExp->HdrExp[1].exp_real_params.digital_gain *
+                pAdrcParams->com.u.proc.nxtExp->HdrExp[1].exp_real_params.isp_dgain *
+                pAdrcParams->com.u.proc.nxtExp->HdrExp[1].exp_real_params.integration_time;
+            pAdrcCtx->NextData.AEData.LExpo =
+                pAdrcParams->com.u.proc.nxtExp->HdrExp[2].exp_real_params.analog_gain *
+                pAdrcParams->com.u.proc.nxtExp->HdrExp[2].exp_real_params.digital_gain *
+                pAdrcParams->com.u.proc.nxtExp->HdrExp[2].exp_real_params.isp_dgain *
+                pAdrcParams->com.u.proc.nxtExp->HdrExp[2].exp_real_params.integration_time;
+            pAdrcCtx->NextData.AEData.ISO =
+                pAdrcParams->com.u.proc.nxtExp->HdrExp[1].exp_real_params.analog_gain *
+                pAdrcParams->com.u.proc.nxtExp->HdrExp[1].exp_real_params.digital_gain *
+                pAdrcParams->com.u.proc.nxtExp->HdrExp[1].exp_real_params.isp_dgain * ISOMIN;
+            if (pAdrcCtx->NextData.AEData.SExpo < FLT_EPSILON) {
+                pAdrcCtx->NextData.AEData.SExpo =
+                    pAdrcParams->com.u.proc.curExp->HdrExp[0].exp_real_params.analog_gain *
+                    pAdrcParams->com.u.proc.curExp->HdrExp[0].exp_real_params.digital_gain *
+                    pAdrcParams->com.u.proc.curExp->HdrExp[0].exp_real_params.isp_dgain *
+                    pAdrcParams->com.u.proc.curExp->HdrExp[0].exp_real_params.integration_time;
+                pAdrcCtx->NextData.AEData.MExpo =
+                    pAdrcParams->com.u.proc.curExp->HdrExp[1].exp_real_params.analog_gain *
+                    pAdrcParams->com.u.proc.curExp->HdrExp[1].exp_real_params.digital_gain *
+                    pAdrcParams->com.u.proc.curExp->HdrExp[1].exp_real_params.isp_dgain *
+                    pAdrcParams->com.u.proc.curExp->HdrExp[1].exp_real_params.integration_time;
+                pAdrcCtx->NextData.AEData.LExpo =
+                    pAdrcParams->com.u.proc.curExp->HdrExp[2].exp_real_params.analog_gain *
+                    pAdrcParams->com.u.proc.curExp->HdrExp[2].exp_real_params.digital_gain *
+                    pAdrcParams->com.u.proc.curExp->HdrExp[2].exp_real_params.isp_dgain *
+                    pAdrcParams->com.u.proc.curExp->HdrExp[2].exp_real_params.integration_time;
+                pAdrcCtx->NextData.AEData.ISO =
+                    pAdrcParams->com.u.proc.curExp->HdrExp[1].exp_real_params.analog_gain *
+                    pAdrcParams->com.u.proc.curExp->HdrExp[1].exp_real_params.digital_gain *
+                    pAdrcParams->com.u.proc.curExp->HdrExp[1].exp_real_params.isp_dgain * ISOMIN;
+            }
+        }
+        pAdrcCtx->NextData.AEData.ISO = LIMIT_VALUE(pAdrcCtx->NextData.AEData.ISO, ISOMAX, ISOMIN);
+        if (pAdrcCtx->FrameNumber == HDR_2X_NUM || pAdrcCtx->FrameNumber == HDR_2X_NUM) {
+            LOGV_ATMO("%s: nextFrame: sexp: %f-%f, mexp: %f-%f, lexp: %f-%f\n", __FUNCTION__,
+                      pAdrcParams->com.u.proc.nxtExp->HdrExp[0].exp_real_params.analog_gain *
+                          pAdrcParams->com.u.proc.nxtExp->HdrExp[0].exp_real_params.digital_gain *
+                          pAdrcParams->com.u.proc.nxtExp->HdrExp[0].exp_real_params.isp_dgain,
+                      pAdrcParams->com.u.proc.nxtExp->HdrExp[0].exp_real_params.integration_time,
+                      pAdrcParams->com.u.proc.nxtExp->HdrExp[1].exp_real_params.analog_gain *
+                          pAdrcParams->com.u.proc.nxtExp->HdrExp[1].exp_real_params.digital_gain *
+                          pAdrcParams->com.u.proc.nxtExp->HdrExp[1].exp_real_params.isp_dgain,
+                      pAdrcParams->com.u.proc.nxtExp->HdrExp[1].exp_real_params.integration_time,
+                      pAdrcParams->com.u.proc.nxtExp->HdrExp[2].exp_real_params.analog_gain *
+                          pAdrcParams->com.u.proc.nxtExp->HdrExp[2].exp_real_params.digital_gain *
+                          pAdrcParams->com.u.proc.nxtExp->HdrExp[2].exp_real_params.isp_dgain,
+                      pAdrcParams->com.u.proc.nxtExp->HdrExp[2].exp_real_params.integration_time);
+            LOGV_ATMO("%s: CurrFrame: sexp: %f-%f, mexp: %f-%f, lexp: %f-%f\n", __FUNCTION__,
+                      pAdrcParams->com.u.proc.curExp->HdrExp[0].exp_real_params.analog_gain *
+                          pAdrcParams->com.u.proc.curExp->HdrExp[0].exp_real_params.digital_gain *
+                          pAdrcParams->com.u.proc.curExp->HdrExp[0].exp_real_params.isp_dgain,
+                      pAdrcParams->com.u.proc.curExp->HdrExp[0].exp_real_params.integration_time,
+                      pAdrcParams->com.u.proc.curExp->HdrExp[1].exp_real_params.analog_gain *
+                          pAdrcParams->com.u.proc.curExp->HdrExp[1].exp_real_params.digital_gain *
+                          pAdrcParams->com.u.proc.curExp->HdrExp[1].exp_real_params.isp_dgain,
+                      pAdrcParams->com.u.proc.curExp->HdrExp[1].exp_real_params.integration_time,
+                      pAdrcParams->com.u.proc.curExp->HdrExp[2].exp_real_params.analog_gain *
+                          pAdrcParams->com.u.proc.curExp->HdrExp[2].exp_real_params.digital_gain *
+                          pAdrcParams->com.u.proc.curExp->HdrExp[2].exp_real_params.isp_dgain,
+                      pAdrcParams->com.u.proc.curExp->HdrExp[2].exp_real_params.integration_time);
+        } else if (pAdrcCtx->FrameNumber == LINEAR_NUM) {
+            LOGV_ATMO("%s: nextFrame: exp: %f-%f CurrFrame: exp: %f-%f\n", __FUNCTION__,
+                      pAdrcParams->com.u.proc.nxtExp->LinearExp.exp_real_params.analog_gain *
+                          pAdrcParams->com.u.proc.nxtExp->LinearExp.exp_real_params.digital_gain *
+                          pAdrcParams->com.u.proc.nxtExp->LinearExp.exp_real_params.isp_dgain,
+                      pAdrcParams->com.u.proc.nxtExp->LinearExp.exp_real_params.integration_time,
+                      pAdrcParams->com.u.proc.curExp->LinearExp.exp_real_params.analog_gain *
+                          pAdrcParams->com.u.proc.curExp->LinearExp.exp_real_params.digital_gain *
+                          pAdrcParams->com.u.proc.curExp->LinearExp.exp_real_params.isp_dgain,
+                      pAdrcParams->com.u.proc.curExp->LinearExp.exp_real_params.integration_time);
+        }
+        if (pAdrcCtx->NextData.AEData.SExpo > FLT_EPSILON) {
+            pAdrcCtx->NextData.AEData.L2S_Ratio =
+                pAdrcCtx->NextData.AEData.LExpo / pAdrcCtx->NextData.AEData.SExpo;
+            pAdrcCtx->NextData.AEData.M2S_Ratio =
+                pAdrcCtx->NextData.AEData.MExpo / pAdrcCtx->NextData.AEData.SExpo;
+        } else
+            LOGE_ATMO("%s: Next Short frame for drc expo sync is %f!!!\n", __FUNCTION__,
+                      pAdrcCtx->NextData.AEData.SExpo);
+        if (pAdrcCtx->NextData.AEData.MExpo > FLT_EPSILON)
+            pAdrcCtx->NextData.AEData.L2M_Ratio =
+                pAdrcCtx->NextData.AEData.LExpo / pAdrcCtx->NextData.AEData.MExpo;
         else
-            LOGE_ATMO("%s: AE ratio for drc expo sync is under one!!!\n", __FUNCTION__);
+            LOGE_ATMO("%s: Next Midlle frame for drc expo sync is %f!!!\n", __FUNCTION__,
+                      pAdrcCtx->NextData.AEData.MExpo);
+        //clip for long frame mode
+        if (pAdrcCtx->NextData.AEData.LongFrmMode) {
+            pAdrcCtx->NextData.AEData.L2S_Ratio = LONG_FRAME_MODE_RATIO;
+            pAdrcCtx->NextData.AEData.M2S_Ratio = LONG_FRAME_MODE_RATIO;
+            pAdrcCtx->NextData.AEData.L2M_Ratio = LONG_FRAME_MODE_RATIO;
+        }
 
-        pAdrcCtx->PrevData.ApiMode = pAdrcCtx->drcAttr.opMode;
+        // get ae pre res and bypass_tuning_params
+        XCamVideoBuffer* xCamAePreRes = pAdrcParams->com.u.proc.res_comb->ae_pre_res;
+        RkAiqAlgoPreResAe* pAEPreRes  = NULL;
+        if (xCamAePreRes) {
+            pAEPreRes            = (RkAiqAlgoPreResAe*)xCamAePreRes->map(xCamAePreRes);
+            bypass_tuning_params = AdrcByPassTuningProcessing(pAdrcCtx, pAEPreRes->ae_pre_res_rk);
+        } else {
+                AecPreResult_t AecHdrPreResult;
+                memset(&AecHdrPreResult, 0x0, sizeof(AecPreResult_t));
+                bypass_tuning_params = AdrcByPassTuningProcessing(pAdrcCtx, AecHdrPreResult);
+                bypass_tuning_params = false;
+                LOGW_ATMO("%s: ae Pre result is null!!!\n", __FUNCTION__);
+        }
+
+        // get bypass_expo_params
+        if (pAdrcCtx->NextData.AEData.L2S_Ratio >= RATIO_DEFAULT &&
+            pAdrcCtx->NextData.AEData.L2M_Ratio >= RATIO_DEFAULT) {
+            if (pAdrcCtx->FrameID <= 2)
+                bypass_expo_params = false;
+            else if (pAdrcCtx->ifReCalcStAuto || pAdrcCtx->ifReCalcStManual)
+                bypass_expo_params = false;
+            else if (!pAdrcCtx->CurrData.AEData.LongFrmMode !=
+                     !pAdrcCtx->NextData.AEData.LongFrmMode)
+                bypass_expo_params = false;
+            else if (pAdrcCtx->CurrData.AEData.L2M_Ratio != pAdrcCtx->NextData.AEData.L2M_Ratio ||
+                     pAdrcCtx->CurrData.AEData.M2S_Ratio != pAdrcCtx->NextData.AEData.M2S_Ratio ||
+                     pAdrcCtx->CurrData.AEData.L2S_Ratio != pAdrcCtx->NextData.AEData.L2S_Ratio)
+                bypass_expo_params = false;
+            else
+                bypass_expo_params = true;
+        } else {
+            LOGE_ATMO("%s: AE L2S_Ratio:%f L2M_Ratio:%f for drc expo sync is under one!!!\n",
+                      __FUNCTION__, __LINE__, pAdrcCtx->NextData.AEData.L2S_Ratio,
+                      pAdrcCtx->NextData.AEData.L2M_Ratio);
+            bypass_expo_params = true;
+        }
+
+        // get tuning paras
+        if (!bypass_tuning_params || !pAdrcCtx->isDampStable) AdrcTuningParaProcessing(pAdrcCtx);
+
+        // get expo related paras
+        if (!bypass_expo_params || !pAdrcCtx->isDampStable) AdrcExpoParaProcessing(pAdrcCtx);
+
+        } else {
+            LOGD_ATMO("%s: Drc Enable is OFF, Bypass Drc !!! \n", __func__);
+        }
     }
-
     LOGD_ATMO(
-        "%s:////////////////////////////////////////////////ADRC "
-        "Over//////////////////////////////////////////////// \n",
+        "%s:////////////////////////////////////////////ADRC "
+        "Over//////////////////////////////////////////// \n",
         __func__);
 
     // output ProcRes
-    pAdrcProcRes->AdrcProcRes.update = !bypass;  // not use in isp3xparams for now
-    pAdrcProcRes->AdrcProcRes.bDrcEn = pAdrcCtx->AdrcProcRes.bDrcEn;
-    memcpy(&pAdrcProcRes->AdrcProcRes.DrcProcRes, &pAdrcCtx->AdrcProcRes.DrcProcRes,
-           sizeof(DrcProcRes_t));
+    pAdrcProcRes->AdrcProcRes.update = !bypass_tuning_params || !bypass_expo_params ||
+                                       pAdrcCtx->ifReCalcStAuto || pAdrcCtx->ifReCalcStManual ||
+                                       !pAdrcCtx->isDampStable;
+    if (pAdrcProcRes->AdrcProcRes.update) {
+        pAdrcProcRes->AdrcProcRes.bDrcEn = pAdrcCtx->NextData.Enable;
+        memcpy(&pAdrcProcRes->AdrcProcRes.DrcProcRes, &pAdrcCtx->AdrcProcRes.DrcProcRes,
+               sizeof(DrcProcRes_t));
+    }
 
-    if (pAdrcCtx->isCapture) pAdrcCtx->isCapture = false;
+    pAdrcCtx->CurrData.Enable  = pAdrcCtx->NextData.Enable;
+    pAdrcCtx->ifReCalcStAuto   = false;
+    pAdrcCtx->ifReCalcStManual = false;
 
-    LOG1_ATMO("%s:Exit!\n", __FUNCTION__);
-    return XCAM_RETURN_NO_ERROR;
-}
-
-static XCamReturn
-post_process(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outparams)
-{
-    LOG1_ATMO("%s:Enter!\n", __FUNCTION__);
     LOG1_ATMO("%s:Exit!\n", __FUNCTION__);
     return XCAM_RETURN_NO_ERROR;
 }
@@ -368,9 +420,9 @@ RkAiqAlgoDescription g_RkIspAlgoDescAdrc = {
         .destroy_context = destroy_context,
     },
     .prepare = prepare,
-    .pre_process = pre_process,
+    .pre_process = NULL,
     .processing = processing,
-    .post_process = post_process,
+    .post_process = NULL,
 };
 
 RKAIQ_END_DECLARE

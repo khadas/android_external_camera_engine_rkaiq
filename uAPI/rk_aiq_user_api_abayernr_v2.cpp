@@ -23,6 +23,8 @@ RKAIQ_BEGIN_DECLARE
 #define CHECK_USER_API_ENABLE
 #endif
 
+#if RKAIQ_HAVE_BAYERNR_V2
+
 XCamReturn
 rk_aiq_user_api_abayernrV2_SetAttrib(const rk_aiq_sys_ctx_t* sys_ctx, rk_aiq_bayernr_attrib_v2_t* attr)
 {
@@ -117,5 +119,44 @@ rk_aiq_user_api_abayernrV2_GetTFStrength(const rk_aiq_sys_ctx_t* sys_ctx, float 
 
     return ret;
 }
+#else
 
+XCamReturn
+rk_aiq_user_api_abayernrV2_SetAttrib(const rk_aiq_sys_ctx_t* sys_ctx, rk_aiq_bayernr_attrib_v2_t* attr)
+{
+    return XCAM_RETURN_ERROR_UNKNOWN;
+}
+
+XCamReturn
+rk_aiq_user_api_abayernrV2_GetAttrib(const rk_aiq_sys_ctx_t* sys_ctx, rk_aiq_bayernr_attrib_v2_t* attr)
+{
+    return XCAM_RETURN_ERROR_UNKNOWN;
+}
+
+XCamReturn
+rk_aiq_user_api_abayernrV2_SetSFStrength(const rk_aiq_sys_ctx_t* sys_ctx, float fPercnt)
+{
+    return XCAM_RETURN_ERROR_UNKNOWN;
+}
+
+XCamReturn
+rk_aiq_user_api_abayernrV2_SetTFStrength(const rk_aiq_sys_ctx_t* sys_ctx, float fPercnt)
+{
+    return XCAM_RETURN_ERROR_UNKNOWN;
+}
+
+XCamReturn
+rk_aiq_user_api_abayernrV2_GetSFStrength(const rk_aiq_sys_ctx_t* sys_ctx, float *pPercnt)
+{
+    return XCAM_RETURN_ERROR_UNKNOWN;
+}
+
+XCamReturn
+rk_aiq_user_api_abayernrV2_GetTFStrength(const rk_aiq_sys_ctx_t* sys_ctx, float *pPercnt)
+{
+    return XCAM_RETURN_ERROR_UNKNOWN;
+}
+
+
+#endif
 RKAIQ_END_DECLARE

@@ -18,6 +18,7 @@
 #include "acnr2/rk_aiq_uapi_camgroup_acnr_int_v2.h"
 
 namespace RkCam {
+#if RKAIQ_HAVE_CNR_V2
 
 XCamReturn RkAiqCamGroupAcnrV2HandleInt::updateConfig(bool needSync) {
     ENTER_ANALYZER_FUNCTION();
@@ -182,4 +183,5 @@ XCamReturn RkAiqCamGroupAcnrV2HandleInt::getInfo(rk_aiq_cnr_info_v2_t *pInfo) {
 
 #endif
 
-};  // namespace RkCam
+#endif
+}  // namespace RkCam

@@ -48,10 +48,10 @@ public:
     RkAiqResourceTranslatorV3x& SetPicInfo(RkAiqResourceTranslatorV3x::Rectangle&& pic_rect);
     RkAiqResourceTranslatorV3x& SetLeftIspRect(RkAiqResourceTranslatorV3x::Rectangle&& left_isp_rect);
     RkAiqResourceTranslatorV3x& SetRightIspRect(RkAiqResourceTranslatorV3x::Rectangle&& right_isp_rect);
-    const bool IsMultiIspMode() const;
-    const RkAiqResourceTranslatorV3x::Rectangle& GetPicInfo() const;
-    const RkAiqResourceTranslatorV3x::Rectangle& GetLeftIspRect() const;
-    const RkAiqResourceTranslatorV3x::Rectangle& GetRightIspRect() const;
+    bool IsMultiIspMode() const;
+    RkAiqResourceTranslatorV3x::Rectangle GetPicInfo();
+    RkAiqResourceTranslatorV3x::Rectangle GetLeftIspRect();
+    RkAiqResourceTranslatorV3x::Rectangle GetRightIspRect();
 
     virtual XCamReturn translateAecStats (const SmartPtr<VideoBuffer> &from,
                                           SmartPtr<RkAiqAecStatsProxy> &to);
@@ -59,9 +59,12 @@ public:
                                           SmartPtr<RkAiqAwbStatsProxy> &to);
     virtual XCamReturn translateAfStats (const SmartPtr<VideoBuffer> &from,
                                          SmartPtr<RkAiqAfStatsProxy> &to);
+#if RKAIQ_HAVE_DEHAZE_V11_DUO
     virtual XCamReturn translateAdehazeStats (const SmartPtr<VideoBuffer> &from,
             SmartPtr<RkAiqAdehazeStatsProxy> &to);
+#endif
 
+#if defined(RKAIQ_HAVE_MULTIISP)
     XCamReturn translateMultiIspStats(const SmartPtr<VideoBuffer>& from,
                                       SmartPtr<RkAiqIspStatsIntProxy>& to) {
         return XCAM_RETURN_NO_ERROR;
@@ -74,6 +77,7 @@ public:
                                      SmartPtr<RkAiqAfStatsProxy>& to);
     XCamReturn translateMultiAdehazeStats(const SmartPtr<VideoBuffer>& from,
                                           SmartPtr<RkAiqAdehazeStatsProxy>& to);
+#endif
 
 private:
     XCAM_DEAD_COPY (RkAiqResourceTranslatorV3x);

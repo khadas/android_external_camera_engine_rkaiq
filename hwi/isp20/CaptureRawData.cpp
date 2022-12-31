@@ -257,8 +257,9 @@ CaptureRawData::set_value_to_file(const char* path, int value, uint32_t sequence
         ftruncate(fp, 0);
         lseek(fp, 0, SEEK_SET);
         snprintf(buffer, sizeof(buffer), "%3d %8d\n", _capture_raw_num, sequence);
-        if (write(fp, buffer, sizeof(buffer)) <= 0)
+        if (write(fp, buffer, sizeof(buffer)) <= 0) {
             LOGW_CAMHW_SUBM(CAPTURERAW_SUBM, "%s write %s failed!\n", __func__, path);
+        }
         close(fp);
         return true;
     }
@@ -428,7 +429,8 @@ CaptureRawData::write_metadata_to_file(const char* dir_path,
     if (fp != nullptr) {
         if (working_mode == RK_AIQ_ISP_HDR_MODE_3_FRAME_HDR || \
                 working_mode == RK_AIQ_ISP_HDR_MODE_3_LINE_HDR) {
-            if (CHECK_ISP_HW_V20())
+            if (CHECK_ISP_HW_V20()) {
+#ifdef ISP_HW_V20
                 snprintf(buffer,
                          sizeof(buffer),
                          "frame%08d-l_m_s-gain[%08.5f_%08.5f_%08.5f]-time[%08.5f_%08.5f_%08.5f]-"
@@ -447,7 +449,9 @@ CaptureRawData::write_metadata_to_file(const char* dir_path,
                          1,
                          focusCode,
                          zoomCode);
-            else if (CHECK_ISP_HW_V21())
+#endif
+            } else if (CHECK_ISP_HW_V21()) {
+#ifdef ISP_HW_V21
                 snprintf(buffer,
                          sizeof(buffer),
                          "frame%08d-l_m_s-gain[%08.5f_%08.5f_%08.5f]-time[%08.5f_%08.5f_%08.5f]-"
@@ -466,9 +470,53 @@ CaptureRawData::write_metadata_to_file(const char* dir_path,
                          1,
                          focusCode,
                          zoomCode);
+#endif
+            } else if (CHECK_ISP_HW_V30()) {
+#ifdef ISP_HW_V30
+                snprintf(buffer,
+                         sizeof(buffer),
+                         "frame%08d-l_m_s-gain[%08.5f_%08.5f_%08.5f]-time[%08.5f_%08.5f_%08.5f]-"
+                         "awbGain[%08d_%08d_%08d_%08d]-dgain[%08d]-afcode[%08d_%08d]\n",
+                         frame_id,
+                         expParams->data()->aecExpInfo.HdrExp[2].exp_real_params.analog_gain,
+                         expParams->data()->aecExpInfo.HdrExp[1].exp_real_params.analog_gain,
+                         expParams->data()->aecExpInfo.HdrExp[0].exp_real_params.analog_gain,
+                         expParams->data()->aecExpInfo.HdrExp[2].exp_real_params.integration_time,
+                         expParams->data()->aecExpInfo.HdrExp[1].exp_real_params.integration_time,
+                         expParams->data()->aecExpInfo.HdrExp[0].exp_real_params.integration_time,
+                         ispParams.isp_params_v3x[0].others.awb_gain_cfg.gain0_red,
+                         ispParams.isp_params_v3x[0].others.awb_gain_cfg.gain0_green_r,
+                         ispParams.isp_params_v3x[0].others.awb_gain_cfg.gain0_green_b,
+                         ispParams.isp_params_v3x[0].others.awb_gain_cfg.gain0_blue,
+                         1,
+                         focusCode,
+                         zoomCode);
+#endif
+            } else if (CHECK_ISP_HW_V32()) {
+#ifdef ISP_HW_V32
+                snprintf(buffer,
+                         sizeof(buffer),
+                         "frame%08d-l_m_s-gain[%08.5f_%08.5f_%08.5f]-time[%08.5f_%08.5f_%08.5f]-"
+                         "awbGain0[%08d_%08d_%08d_%08d]-dgain[%08d]-afcode[%08d_%08d]\n",
+                         frame_id,
+                         expParams->data()->aecExpInfo.HdrExp[2].exp_real_params.analog_gain,
+                         expParams->data()->aecExpInfo.HdrExp[1].exp_real_params.analog_gain,
+                         expParams->data()->aecExpInfo.HdrExp[0].exp_real_params.analog_gain,
+                         expParams->data()->aecExpInfo.HdrExp[2].exp_real_params.integration_time,
+                         expParams->data()->aecExpInfo.HdrExp[1].exp_real_params.integration_time,
+                         expParams->data()->aecExpInfo.HdrExp[0].exp_real_params.integration_time,
+                         ispParams.awb_gain_cfg.gain0_red,
+                         ispParams.awb_gain_cfg.gain0_green_r,
+                         ispParams.awb_gain_cfg.gain0_green_b,
+                         ispParams.awb_gain_cfg.gain0_blue,
+                         1,
+                         focusCode,
+                         zoomCode);
+#endif
         } else if (working_mode == RK_AIQ_ISP_HDR_MODE_2_FRAME_HDR || \
                    working_mode == RK_AIQ_ISP_HDR_MODE_2_LINE_HDR) {
-            if (CHECK_ISP_HW_V20())
+            if (CHECK_ISP_HW_V20()) {
+#ifdef ISP_HW_V20
                 snprintf(buffer,
                          sizeof(buffer),
                          "frame%08d-l_s-gain[%08.5f_%08.5f]-time[%08.5f_%08.5f]-"
@@ -485,7 +533,9 @@ CaptureRawData::write_metadata_to_file(const char* dir_path,
                          1,
                          focusCode,
                          zoomCode);
-            else if (CHECK_ISP_HW_V21())
+#endif
+            } else if (CHECK_ISP_HW_V21()) {
+#ifdef ISP_HW_V21
                 snprintf(buffer,
                          sizeof(buffer),
                          "frame%08d-l_s-gain[%08.5f_%08.5f]-time[%08.5f_%08.5f]-"
@@ -502,7 +552,9 @@ CaptureRawData::write_metadata_to_file(const char* dir_path,
                          1,
                          focusCode,
                          zoomCode);
-            else if (CHECK_ISP_HW_V30())
+#endif
+            } else if (CHECK_ISP_HW_V30()) {
+#ifdef ISP_HW_V30
                 snprintf(buffer,
                          sizeof(buffer),
                          "frame%08d-l_s-gain[%08.5f_%08.5f]-time[%08.5f_%08.5f]-"
@@ -519,8 +571,29 @@ CaptureRawData::write_metadata_to_file(const char* dir_path,
                          1,
                          focusCode,
                          zoomCode);
+#endif
+            } else if (CHECK_ISP_HW_V32()) {
+#ifdef ISP_HW_V32
+                snprintf(buffer,
+                         sizeof(buffer),
+                         "frame%08d-l_s-gain[%08.5f_%08.5f]-time[%08.5f_%08.5f]-"
+                         "awbGain0[%08d_%08d_%08d_%08d]-dgain[%08d]-afcode[%08d_%08d]\n",
+                         frame_id,
+                         expParams->data()->aecExpInfo.HdrExp[1].exp_real_params.analog_gain,
+                         expParams->data()->aecExpInfo.HdrExp[0].exp_real_params.analog_gain,
+                         expParams->data()->aecExpInfo.HdrExp[1].exp_real_params.integration_time,
+                         expParams->data()->aecExpInfo.HdrExp[0].exp_real_params.integration_time,
+                         ispParams.awb_gain_cfg.gain0_red,
+                         ispParams.awb_gain_cfg.gain0_green_r,
+                         ispParams.awb_gain_cfg.gain0_green_b,
+                         ispParams.awb_gain_cfg.gain0_blue,
+                         1,
+                         focusCode,
+                         zoomCode);
+#endif
         } else {
-            if (CHECK_ISP_HW_V20())
+            if (CHECK_ISP_HW_V20()) {
+#ifdef ISP_HW_V20
                 snprintf(buffer,
                          sizeof(buffer),
                          "frame%08d-gain[%08.5f]-time[%08.5f]-"
@@ -535,7 +608,9 @@ CaptureRawData::write_metadata_to_file(const char* dir_path,
                          1,
                          focusCode,
                          zoomCode);
-            else if (CHECK_ISP_HW_V21())
+#endif
+            } else if (CHECK_ISP_HW_V21()) {
+#ifdef ISP_HW_V21
                 snprintf(buffer,
                          sizeof(buffer),
                          "frame%08d-gain[%08.5f]-time[%08.5f]-"
@@ -550,7 +625,9 @@ CaptureRawData::write_metadata_to_file(const char* dir_path,
                          1,
                          focusCode,
                          zoomCode);
-            else if (CHECK_ISP_HW_V30())
+#endif
+            } else if (CHECK_ISP_HW_V30()) {
+#ifdef ISP_HW_V30
                 snprintf(buffer,
                          sizeof(buffer),
                          "frame%08d-gain[%08.5f]-time[%08.5f]-"
@@ -565,6 +642,28 @@ CaptureRawData::write_metadata_to_file(const char* dir_path,
                          1,
                          focusCode,
                          zoomCode);
+#endif
+            } else if (CHECK_ISP_HW_V32()) {
+#ifdef ISP_HW_V32
+                snprintf(buffer,
+                         sizeof(buffer),
+                         "frame%08d-gain[%08.5f]-time[%08.5f]-"
+                         "awbGain1[%08d_%08d_%08d_%08d]-dgain[%08d]-afcode[%08d_%08d]\n",
+                         frame_id,
+                         expParams->data()->aecExpInfo.LinearExp.exp_real_params.analog_gain,
+                         expParams->data()->aecExpInfo.LinearExp.exp_real_params.integration_time,
+                         ispParams.awb_gain_cfg.awb1_gain_r,
+                         ispParams.awb_gain_cfg.awb1_gain_gr,
+                         ispParams.awb_gain_cfg.awb1_gain_gb,
+                         ispParams.awb_gain_cfg.awb1_gain_b,
+                         1,
+                         focusCode,
+                         zoomCode);
+
+#endif
+                }
+            }
+        }
         }
 
         fwrite((void *)buffer, strlen(buffer), 1, fp);
@@ -772,8 +871,10 @@ CaptureRawData::capture_raw_ctl(capture_raw_t type, int count, const char* captu
         _capture_image_mutex.lock();
         if (_capture_image_cond.timedwait(_capture_image_mutex, 30000000) != 0)
             ret = XCAM_RETURN_ERROR_TIMEOUT;
-        else
-            strncpy(output_dir, raw_dir_path, strlen(raw_dir_path));
+        else {
+            // TODO(FIX ME): mistaken use of strncpy.
+            strcpy(output_dir, raw_dir_path);
+        }
         _capture_image_mutex.unlock();
     } else if (_capture_raw_type == CAPTURE_RAW_AND_YUV_SYNC) {
         LOGD_CAMHW_SUBM(CAPTURERAW_SUBM, "capture raw and yuv images simultaneously!");
@@ -832,4 +933,4 @@ void CaptureRawData::save_metadata_and_register
     }
 }
 
-}; //namspace RkCam
+} //namspace RkCam

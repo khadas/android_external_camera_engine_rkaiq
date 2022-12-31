@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 #include "RkAiqAlscHandle.h"
-#include "RkAiqAwbHandle.h"
 
 #include "RkAiqCore.h"
 
@@ -27,12 +26,8 @@ void RkAiqAlscHandleInt::init() {
 
     RkAiqHandle::deInit();
     mConfig       = (RkAiqAlgoCom*)(new RkAiqAlgoConfigAlsc());
-    mPreInParam   = (RkAiqAlgoCom*)(new RkAiqAlgoPreAlsc());
-    mPreOutParam  = (RkAiqAlgoResCom*)(new RkAiqAlgoPreResAlsc());
     mProcInParam  = (RkAiqAlgoCom*)(new RkAiqAlgoProcAlsc());
     mProcOutParam = (RkAiqAlgoResCom*)(new RkAiqAlgoProcResAlsc());
-    mPostInParam  = (RkAiqAlgoCom*)(new RkAiqAlgoPostAlsc());
-    mPostOutParam = (RkAiqAlgoResCom*)(new RkAiqAlgoPostResAlsc());
 
     EXIT_ANALYZER_FUNCTION();
 }
@@ -197,7 +192,7 @@ XCamReturn RkAiqAlscHandleInt::preProcess() {
     ENTER_ANALYZER_FUNCTION();
 
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
-
+#if 0
     RkAiqAlgoPreAlsc* alsc_pre_int        = (RkAiqAlgoPreAlsc*)mPreInParam;
     RkAiqAlgoPreResAlsc* alsc_pre_res_int = (RkAiqAlgoPreResAlsc*)mPreOutParam;
     RkAiqCore::RkAiqAlgosGroupShared_t* shared =
@@ -214,6 +209,7 @@ XCamReturn RkAiqAlscHandleInt::preProcess() {
     RKAIQCORE_CHECK_RET(ret, "alsc algo pre_process failed");
 
     EXIT_ANALYZER_FUNCTION();
+#endif
     return XCAM_RETURN_NO_ERROR;
 }
 
@@ -235,36 +231,25 @@ XCamReturn RkAiqAlscHandleInt::processing() {
 
     alsc_proc_int->tx             = shared->tx;
     XCamVideoBuffer* awb_proc_res = shared->res_comb.awb_proc_res;
-    RkAiqAlgoProcResAwb* awb_res = NULL;
     if (awb_proc_res) {
-        awb_res = (RkAiqAlgoProcResAwb*)awb_proc_res->map(awb_proc_res);
-    } else {
-        if (sharedCom->init) {
-            SmartPtr<RkAiqHandle>* awb_handle = mAiqCore->getCurAlgoTypeHandle(RK_AIQ_ALGO_TYPE_AWB);
-            int algo_id                      = (*awb_handle)->getAlgoId();
+        RkAiqAlgoProcResAwb* awb_res =
+            (RkAiqAlgoProcResAwb*)awb_proc_res->map(awb_proc_res);
+        if (awb_res) {
+            if (awb_res->awb_gain_algo.grgain < DIVMIN || awb_res->awb_gain_algo.gbgain < DIVMIN) {
+                LOGW("get wrong awb gain from AWB module ,use default value ");
+            } else {
+                alsc_proc_int->alsc_sw_info.awbGain[0] =
+                    awb_res->awb_gain_algo.rgain / awb_res->awb_gain_algo.grgain;
 
-            if (awb_handle) {
-                if (algo_id == 0) {
-                    RkAiqAwbHandleInt* awb_algo = dynamic_cast<RkAiqAwbHandleInt*>(awb_handle->ptr());
-                    awb_res = awb_algo->getAwbProcRes();
-                }
+                alsc_proc_int->alsc_sw_info.awbGain[1] =
+                    awb_res->awb_gain_algo.bgain / awb_res->awb_gain_algo.gbgain;
             }
-        }
-    }
-
-    if (awb_res) {
-        if (awb_res->awb_gain_algo.grgain < DIVMIN || awb_res->awb_gain_algo.gbgain < DIVMIN) {
-            LOGW("get wrong awb gain from AWB module ,use default value ");
+            alsc_proc_int->alsc_sw_info.awbIIRDampCoef = awb_res->awb_smooth_factor;
+            alsc_proc_int->alsc_sw_info.varianceLuma   = awb_res->varianceLuma;
+            alsc_proc_int->alsc_sw_info.awbConverged   = awb_res->awbConverged;
         } else {
-            alsc_proc_int->alsc_sw_info.awbGain[0] =
-                awb_res->awb_gain_algo.rgain / awb_res->awb_gain_algo.grgain;
-
-            alsc_proc_int->alsc_sw_info.awbGain[1] =
-                awb_res->awb_gain_algo.bgain / awb_res->awb_gain_algo.gbgain;
+            LOGW("fail to get awb gain form AWB module,use default value ");
         }
-        alsc_proc_int->alsc_sw_info.awbIIRDampCoef = awb_res->awb_smooth_factor;
-        alsc_proc_int->alsc_sw_info.varianceLuma   = awb_res->varianceLuma;
-        alsc_proc_int->alsc_sw_info.awbConverged   = awb_res->awbConverged;
     } else {
         LOGW("fail to get awb gain form AWB module,use default value ");
     }
@@ -312,7 +297,7 @@ XCamReturn RkAiqAlscHandleInt::postProcess() {
     ENTER_ANALYZER_FUNCTION();
 
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
-
+#if 0
     RkAiqAlgoPostAlsc* alsc_post_int        = (RkAiqAlgoPostAlsc*)mPostInParam;
     RkAiqAlgoPostResAlsc* alsc_post_res_int = (RkAiqAlgoPostResAlsc*)mPostOutParam;
     RkAiqCore::RkAiqAlgosGroupShared_t* shared =
@@ -330,6 +315,7 @@ XCamReturn RkAiqAlscHandleInt::postProcess() {
     RKAIQCORE_CHECK_RET(ret, "alsc algo post_process failed");
 
     EXIT_ANALYZER_FUNCTION();
+#endif
     return ret;
 }
 
@@ -409,4 +395,4 @@ XCamReturn RkAiqAlscHandleInt::genIspResult(RkAiqFullParams* params, RkAiqFullPa
     return ret;
 }
 
-};  // namespace RkCam
+}  // namespace RkCam

@@ -51,7 +51,6 @@ typedef struct Again_Context_V2_s {
     Again_Manual_Attr_V2_t stManual;
 
     Again_ProcResult_V2_t stProcResult;
-
     bool isIQParaUpdate;
     bool isGrayMode;
     Again_ParamMode_V2_t eParamMode;

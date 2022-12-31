@@ -24,227 +24,46 @@
 #include "adehaze_head.h"
 #include "adehaze_uapi_head.h"
 
-typedef enum AdehazeVersion_e {
-    ADEHAZE_ISP20      = 0,
-    ADEHAZE_ISP21      = 1,
-    ADEHAZE_ISP30      = 2,
-    ADEHAZE_VERSION_MAX
-} AdehazeVersion_t;
+#define DEHAZE_DEFAULT_LEVEL         (50)
+#define DEHAZE_DEFAULT_CFG_WT_STEP   (1)
+#define DEHAZE_DEFAULT_CFG_AIR_STEP  (1)
+#define DEHAZE_DEFAULT_CFG_TMAX_STEP (5)
+#define ENHANCE_DEFAULT_LEVEL        (50)
+#define ENHANCE_VALUE_DEFAULT_STEP   (80)
+#define ENH_LUMA_DEFAULT_STEP        (5)
+
+typedef struct AdehazeOBResV12_s {
+    bool blc_ob_enable;
+    float isp_ob_predgain;
+} AdehazeOBResV12_t;
 
 typedef enum dehaze_api_mode_s {
-    DEHAZE_API_AUTO   = 0, /**< run auto mode */
+    DEHAZE_API_AUTO   = 0, /**< run atuo mode */
     DEHAZE_API_MANUAL = 1, /**< run manual mode*/
 } dehaze_api_mode_t;
 
-typedef struct DehazeManuAttr_s {
-    bool update;
-    int level;//0~100
-} DehazeManuAttr_t;
+// dehaze v10
+typedef struct adehaze_sw_v10_s {
+} adehaze_sw_v10_t;
 
-typedef struct EnhanceManuAttr_s {
-    bool update;
-    int level;//0~100
-} EnhanceManuAttr_t;
-
-typedef struct adehaze_sw_V2_s {
+// dehaze v11
+typedef struct adehaze_sw_v11_s {
     rk_aiq_uapi_sync_t sync;
 
     dehaze_api_mode_t mode;
-    aDehazeAttr_t stAuto;
-    mDehazeAttr_t stManual;
-    DehazeManuAttr_t stDehazeManu;
-    EnhanceManuAttr_t stEnhanceManu;
-} adehaze_sw_V2_t;
+    CalibDbV2_dehaze_v11_t stAuto;
+    mDehazeAttrV11_t stManual;
+    mDehazeAttrInfoV11_t Info;
+} adehaze_sw_v11_t;
 
-typedef struct AdehazeExpInfo_s {
-    int hdr_mode;
-    float arTime[3];
-    float arAGain[3];
-    float arDGain[3];
-    int   arIso[3];
-} AdehazeExpInfo_t;
+// dehaze v12
+typedef struct adehaze_sw_v12_s {
+    rk_aiq_uapi_sync_t sync;
 
-typedef struct AdehazeV20ProcResult_s
-{
-    bool enable;
-    bool update;
-    int enhance_en;
-    int hist_chn;
-    int hpara_en;
-    int hist_en;
-    int dc_en;
-    int big_en;
-    int nobig_en;
-    int yblk_th;
-    int yhist_th;
-    int dc_max_th;
-    int dc_min_th;
-    int wt_max;
-    int bright_max;
-    int bright_min;
-    int tmax_base;
-    int dark_th;
-    int air_max;
-    int air_min;
-    int tmax_max;
-    int tmax_off;
-    int hist_th_off;
-    int hist_gratio;
-    int hist_min;
-    int hist_k;
-    int enhance_value;
-    int hist_scale;
-    int iir_wt_sigma;
-    int iir_sigma;
-    int stab_fnum;
-    int iir_tmax_sigma;
-    int iir_air_sigma;
-    int cfg_wt;
-    int cfg_air;
-    int cfg_alpha;
-    int cfg_gratio;
-    int cfg_tmax;
-    int dc_weitcur;
-    int dc_thed;
-    int sw_dhaz_dc_bf_h3;
-    int sw_dhaz_dc_bf_h2;
-    int sw_dhaz_dc_bf_h1;
-    int sw_dhaz_dc_bf_h0;
-    int sw_dhaz_dc_bf_h5;
-    int sw_dhaz_dc_bf_h4;
-    int air_weitcur;
-    int air_thed;
-    int air_bf_h2;
-    int air_bf_h1;
-    int air_bf_h0;
-    int gaus_h2;
-    int gaus_h1;
-    int gaus_h0;
-    int conv_t0[6];
-    int conv_t1[6];
-    int conv_t2[6];
-} AdehazeV20ProcResult_t;
-
-typedef struct AdehazeV21ProcResult_s
-{
-    bool enable;
-    bool update;
-    int enhance_en;
-    int air_lc_en;
-    int hpara_en;
-    int hist_en;
-    int dc_en;
-    int yblk_th;
-    int yhist_th;
-    int dc_max_th;
-    int dc_min_th;
-    int wt_max;
-    int bright_max;
-    int bright_min;
-    int tmax_base;
-    int dark_th;
-    int air_max;
-    int air_min;
-    int tmax_max;
-    int tmax_off;
-    int hist_k;
-    int hist_th_off;
-    int hist_min;
-    int hist_gratio;
-    int hist_scale;
-    int enhance_value;
-    int enhance_chroma;
-    int iir_wt_sigma;
-    int iir_sigma;
-    int stab_fnum;
-    int iir_tmax_sigma;
-    int iir_air_sigma;
-    int iir_pre_wet;
-    int cfg_wt;
-    int cfg_air;
-    int cfg_alpha;
-    int cfg_gratio;
-    int cfg_tmax;
-    int range_sima;
-    int space_sigma_pre;
-    int space_sigma_cur;
-    int dc_weitcur;
-    int bf_weight;
-    int enh_curve[17];
-    int gaus_h2;
-    int gaus_h1;
-    int gaus_h0;
-} AdehazeV21ProcResult_t;
-
-typedef struct AdehazeV30ProcResult_s
-{
-    bool enable;
-    bool update;
-    int round_en;
-    int soft_wr_en;
-    int enhance_en;
-    int air_lc_en;
-    int hpara_en;
-    int hist_en;
-    int dc_en;
-    int yblk_th;
-    int yhist_th;
-    int dc_max_th;
-    int dc_min_th;
-    int wt_max;
-    int bright_max;
-    int bright_min;
-    int tmax_base;
-    int dark_th;
-    int air_max;
-    int air_min;
-    int tmax_max;
-    int tmax_off;
-    int hist_k;
-    int hist_th_off;
-    int hist_min;
-    int hist_gratio;
-    int hist_scale;
-    int enhance_value;
-    int enhance_chroma;
-    int iir_wt_sigma;
-    int iir_sigma;
-    int stab_fnum;
-    int iir_tmax_sigma;
-    int iir_air_sigma;
-    int iir_pre_wet;
-    int cfg_wt;
-    int cfg_air;
-    int cfg_alpha;
-    int cfg_gratio;
-    int cfg_tmax;
-    int range_sima;
-    int space_sigma_pre;
-    int space_sigma_cur;
-    int dc_weitcur;
-    int bf_weight;
-    int enh_curve[17];
-    int gaus_h2;
-    int gaus_h1;
-    int gaus_h0;
-    int sigma_idx[ISP3X_DHAZ_SIGMA_IDX_NUM];
-    int sigma_lut[ISP3X_DHAZ_SIGMA_LUT_NUM];
-    int adp_wt_wr;//calc in kernel
-    int adp_air_wr;//calc in kernel
-    int adp_tmax_wr;//calc in kernel
-    int adp_gratio_wr;//calc in kernel
-    int hist_wr[64];//calc in kernel
-} AdehazeV30ProcResult_t;
-
-typedef struct RkAiqAdehazeProcResult_s
-{
-    union {
-        AdehazeV20ProcResult_t ProcResV20;
-        AdehazeV21ProcResult_t ProcResV21;
-        AdehazeV30ProcResult_t ProcResV30;
-    };
-
-} RkAiqAdehazeProcResult_t;
+    dehaze_api_mode_t mode;
+    CalibDbV2_dehaze_v12_t stAuto;
+    mDehazeAttrV12_t stManual;
+    mDehazeAttrInfoV11_t Info;
+} adehaze_sw_v12_t;
 
 #endif
-

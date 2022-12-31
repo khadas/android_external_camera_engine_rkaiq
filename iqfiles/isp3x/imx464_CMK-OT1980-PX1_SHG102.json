@@ -27,7 +27,7 @@
 			},
 			"CISIspDgainRange":	{
 				"Min":	1,
-				"Max":	1
+				"Max":	32
 			},
 			"CISHdrGainIndSetEn":	1
 		},
@@ -72,7 +72,7 @@
 		"CISHdrSet":	{
 			"hdr_en":	1,
 			"hdr_mode":	"RK_AIQ_ISP_HDR_MODE_2_LINE_HDR",
-			"line_mode":	"RK_AIQ_SENSOR_HDR_LINE_MODE_STAGGER"
+			"line_mode":	"RKAIQ_SENSOR_HDR_MODE_STAGGER"
 		},
 		"CISDcgSet":	{
 			"Linear":	{
@@ -155,13 +155,19 @@
 								},
 								"AecSpeed":	{
 									"SmoothEn":	1,
-									"DyDampEn":	1,
 									"DampOver":	0.15,
 									"DampUnder":	0.45,
 									"DampDark2Bright":	0.15,
-									"DampBright2Dark":	0.45
+									"DampBright2Dark":	0.45,
+									"DyDamp":	{
+										"DyDampEn":	1,
+										"SlowOPType":	"RK_AIQ_OP_MODE_AUTO",
+										"SlowRange":	10,
+										"SlowDamp":	0.95
+									}
 								},
-								"AecDelayFrmNum":	{
+								"AecDelay":	{
+									"DelayType":	"DELAY_TYPE_FRAME",
 									"BlackDelay":	2,
 									"WhiteDelay":	2
 								},
@@ -204,7 +210,7 @@
 								"ToleranceIn":	10,
 								"ToleranceOut":	15,
 								"Evbias":	0,
-								"StrategyMode":	"AECV2_STRATEGY_MODE_LOWLIGHT_PRIOR",
+								"StrategyMode":	"AECV2_STRATEGY_MODE_LOWLIGHT",
 								"InitExp":	{
 									"InitTimeValue":	0.003,
 									"InitGainValue":	1,
@@ -267,7 +273,7 @@
 								"ToleranceIn":	10,
 								"ToleranceOut":	15,
 								"Evbias":	0,
-								"StrategyMode":	"AECV2_STRATEGY_MODE_LOWLIGHT_PRIOR",
+								"StrategyMode":	"AECV2_STRATEGY_MODE_LOWLIGHT",
 								"LumaDistTh":	10,
 								"InitExp":	{
 									"InitTimeValue":	[0.0005, 0.003, 0.003],
@@ -314,7 +320,7 @@
 									}
 								},
 								"LongFrmMode":	{
-									"mode":	"AECV2_HDR_LONGFRMMODE_NORMAL",
+									"mode":	"AECV2_HDR_LONGFRMMODE_DISABLE",
 									"SfrmMinLine":	2,
 									"LfrmModeExpTh":	0.62
 								},
@@ -435,7 +441,7 @@
 							},
 							"autoPara":	{
 								"hdrPara":	{
-									"frameChooseMode":	"CALIB_AWB_HDR_FRAME_CHOOSE_MODE_AUTO",
+									"frameChooseMode":	"CALIB_AWB_HDR_FR_CH_AUTO",
 									"frameChoose":	1
 								},
 								"lscBypassEnable":	0,
@@ -446,7 +452,7 @@
 								"lsUsedForYuvDet_len":	7,
 								"blkStatisticsEnable":	1,
 								"downScaleMode":	"CALIB_AWB_DS_8X8",
-								"blkMeasureMode":	"CALIB_AWB_BLK_STAT_MODE_ALL_V201",
+								"blkMeasureMode":	"CALIB_AWB_BLK_STAT_MODE_AL_V201",
 								"mainWindow":	{
 									"mode":	"CALIB_AWB_WINDOW_CFG_AUTO",
 									"window":	[0, 0, 1, 1]
@@ -566,7 +572,13 @@
 										"dayGainLvThSet":	[1024, 8192],
 										"defaultDayGainLow":	[1.53373, 1, 1, 1.58341],
 										"defaultDayGainHigh":	[1.81003, 1, 1, 1.40293],
-										"xyType2Enable":	1
+										"xyType2Enable":	1,
+										"weight":	{
+											"lumaValue":	[0, 2, 4, 8, 32, 128, 1024, 8192, 65536, 262144],
+											"lumaValue_len":	10,
+											"weight":	[1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+											"weight_len":	10
+										}
 									}, {
 										"name":	"CWF",
 										"doorType":	"CALIB_AWB_DOOR_TYPE_INDOOR",
@@ -589,7 +601,13 @@
 										"dayGainLvThSet":	[1024, 8192],
 										"defaultDayGainLow":	[1.53373, 1, 1, 1.58341],
 										"defaultDayGainHigh":	[1.81003, 1, 1, 1.40293],
-										"xyType2Enable":	1
+										"xyType2Enable":	1,
+										"weight":	{
+											"lumaValue":	[0, 2, 4, 8, 32, 128, 1024, 8192, 65536, 262144],
+											"lumaValue_len":	10,
+											"weight":	[1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+											"weight_len":	10
+										}
 									}, {
 										"name":	"D50",
 										"doorType":	"CALIB_AWB_DOOR_TYPE_AMBIGUITY",
@@ -612,7 +630,13 @@
 										"dayGainLvThSet":	[1024, 8192],
 										"defaultDayGainLow":	[1.53373, 1, 1, 1.58341],
 										"defaultDayGainHigh":	[1.81003, 1, 1, 1.40293],
-										"xyType2Enable":	1
+										"xyType2Enable":	1,
+										"weight":	{
+											"lumaValue":	[0, 2, 4, 8, 32, 128, 1024, 8192, 65536, 262144],
+											"lumaValue_len":	10,
+											"weight":	[1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+											"weight_len":	10
+										}
 									}, {
 										"name":	"D65",
 										"doorType":	"CALIB_AWB_DOOR_TYPE_OUTDOOR",
@@ -635,7 +659,13 @@
 										"dayGainLvThSet":	[1024, 8192],
 										"defaultDayGainLow":	[1.53373, 1, 1, 1.58341],
 										"defaultDayGainHigh":	[1.81003, 1, 1, 1.40293],
-										"xyType2Enable":	1
+										"xyType2Enable":	1,
+										"weight":	{
+											"lumaValue":	[0, 2, 4, 8, 32, 128, 1024, 8192, 65536, 262144],
+											"lumaValue_len":	10,
+											"weight":	[1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+											"weight_len":	10
+										}
 									}, {
 										"name":	"D75",
 										"doorType":	"CALIB_AWB_DOOR_TYPE_OUTDOOR",
@@ -658,7 +688,13 @@
 										"dayGainLvThSet":	[1024, 8192],
 										"defaultDayGainLow":	[1.53373, 1, 1, 1.58341],
 										"defaultDayGainHigh":	[1.81003, 1, 1, 1.40293],
-										"xyType2Enable":	1
+										"xyType2Enable":	1,
+										"weight":	{
+											"lumaValue":	[0, 2, 4, 8, 32, 128, 1024, 8192, 65536, 262144],
+											"lumaValue_len":	10,
+											"weight":	[1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+											"weight_len":	10
+										}
 									}, {
 										"name":	"HZ",
 										"doorType":	"CALIB_AWB_DOOR_TYPE_INDOOR",
@@ -681,7 +717,13 @@
 										"dayGainLvThSet":	[1024, 8192],
 										"defaultDayGainLow":	[1.53373, 1, 1, 1.58341],
 										"defaultDayGainHigh":	[1.81003, 1, 1, 1.40293],
-										"xyType2Enable":	1
+										"xyType2Enable":	1,
+										"weight":	{
+											"lumaValue":	[0, 2, 4, 8, 32, 128, 1024, 8192, 65536, 262144],
+											"lumaValue_len":	10,
+											"weight":	[1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+											"weight_len":	10
+										}
 									}, {
 										"name":	"TL84",
 										"doorType":	"CALIB_AWB_DOOR_TYPE_INDOOR",
@@ -704,12 +746,31 @@
 										"dayGainLvThSet":	[1024, 8192],
 										"defaultDayGainLow":	[1.53373, 1, 1, 1.58341],
 										"defaultDayGainHigh":	[1.81003, 1, 1, 1.40293],
-										"xyType2Enable":	1
+										"xyType2Enable":	1,
+										"weight":	{
+											"lumaValue":	[0, 2, 4, 8, 32, 128, 1024, 8192, 65536, 262144],
+											"lumaValue_len":	10,
+											"weight":	[1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+											"weight_len":	10
+										}
 									}],
 								"lightSources_len":	7
 							},
 							"autoExtPara":	{
 								"lightSourceForFirstFrame":	"D50",
+								"smartRun":	{
+									"enable":	1,
+									"cfg":	{
+										"lumaValue":	[0],
+										"lumaValue_len":	1,
+										"lvVarTh":	[0.001],
+										"lvVarTh_len":	1,
+										"wbgainAlgDiffTh":	[0.005],
+										"wbgainAlgDiffTh_len":	1,
+										"wbgainHwDiffTh":	[0.05],
+										"wbgainHwDiffTh_len":	1
+									}
+								},
 								"tolerance":	{
 									"lumaValue":	[256, 512, 32768, 131072],
 									"lumaValue_len":	4,
@@ -887,7 +948,7 @@
 								}
 							}
 						},
-						"agamma_calib_V30":	{
+						"agamma_calib_v11":	{
 							"GammaTuningPara":	{
 								"Gamma_en":	1,
 								"Gamma_out_offset":	0,
@@ -1181,20 +1242,20 @@
 								"debayer_en":	1,
 								"debayer_filter1":	[2, -6, 0, 6, -2],
 								"debayer_filter2":	[2, -4, 4, -4, 2],
-								"debayer_auto":	{
-									"ISO":	[50, 100, 200, 400, 800, 1600, 3200, 6400, 12800, 25600, 51200, 102400, 204800],
-									"debayer_gain_offset":	[4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4],
-									"debayer_offset":	[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-									"debayer_clip_en":	[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-									"debayer_filter_g_en":	[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-									"debayer_filter_c_en":	[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-									"debayer_thed0":	[3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3],
-									"debayer_thed1":	[6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6],
-									"debayer_dist_scale":	[8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8],
-									"debayer_cnr_strength":	[5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5],
-									"debayer_shift_num":	[2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2],
-									"debayer_sharp_strength":	[4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4],
-									"debayer_hf_offset":	[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+								"debayer_gain_offset":	4,
+								"debayer_offset":	1,
+								"debayer_clip_en":	1,
+								"debayer_filter_g_en":	1,
+								"debayer_filter_c_en":	1,
+								"debayer_thed0":	3,
+								"debayer_thed1":	6,
+								"debayer_dist_scale":	8,
+								"debayer_cnr_strength":	5,
+								"debayer_shift_num":	2,
+								"array":	{
+									"ISO":	[50, 100, 200, 400, 800, 1600, 3200, 6400, 12800],
+									"sharp_strength":	[4, 4, 4, 4, 4, 4, 4, 4, 4],
+									"debayer_hf_offset":	[1, 1, 1, 1, 1, 1, 1, 1, 1]
 								}
 							}
 						},
@@ -1695,7 +1756,8 @@
 						},
 						"colorAsGrey":	{
 							"param":	{
-								"enable":	0
+								"enable":	0,
+								"skip_frame":	10
 							}
 						},
 						"aldch":	{
@@ -1711,6 +1773,7 @@
 						"ccm_calib":	{
 							"control":	{
 								"enable":	1,
+								"mode":	"CALIB_CCM_MODE_AUTO",
 								"wbgain_tolerance":	0,
 								"gain_tolerance":	0.2
 							},
@@ -1722,6 +1785,10 @@
 									"gain":	[1, 2, 4, 8, 16, 32, 64, 128, 256],
 									"scale":	[1, 1, 1, 1, 1, 1, 0.9, 0.8, 0.7]
 								}
+							},
+							"manualPara":	{
+								"ccMatrix":	[1, 0, 0, 0, 1, 0, 0, 0, 1],
+								"ccOffsets":	[0, 0, 0]
 							},
 							"TuningPara":	{
 								"damp_enable":	1,
@@ -1904,8 +1971,15 @@
 						"lut3d_calib":	{
 							"common":	{
 								"enable":	0,
-								"gain_tolerance":	0.1,
-								"wbgain_tolerance":	1
+								"mode":	"CALIB_Lut3D_MODE_AUTO",
+								"gain_tolerance":	0.1
+							},
+							"MLut3D":	{
+								"Table":	{
+									"look_up_table_r":	[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+									"look_up_table_g":	[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+									"look_up_table_b":	[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+								}
 							},
 							"ALut3D":	{
 								"damp_en":	1,
@@ -1925,136 +1999,92 @@
 								"lutAll_len":	1
 							}
 						},
-						"adehaze_calib_v30":	{
+						"adehaze_calib_v11":	{
 							"DehazeTuningPara":	{
 								"Enable":	1,
-								"CtrlDataType": "CTRLDATATYPE_ENVLV",
+								"CtrlDataType":	"CTRLDATATYPE_ENVLV",
 								"cfg_alpha":	0,
 								"ByPassThr":	0,
 								"dehaze_setting":	{
 									"en":	0,
 									"air_lc_en":	1,
 									"stab_fnum":	8,
-									"sigma":	6,
+									"sigma":	255,
 									"wt_sigma":	8,
 									"air_sigma":	120,
 									"tmax_sigma":	0.01,
-									"pre_wet":	0.01,
+									"pre_wet":	8,
 									"DehazeData":	{
-										"CtrlData":	[0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.7, 0.9, 1],
-										"CtrlData_len":	9,
-										"dc_min_th":	[64, 64, 64, 64, 64, 64, 64, 64, 64],
-										"dc_min_th_len":	9,
-										"dc_max_th":	[192, 192, 192, 192, 192, 192, 192, 192, 192],
-										"dc_max_th_len":	9,
-										"yhist_th":	[249, 249, 249, 249, 249, 249, 249, 249, 249],
-										"yhist_th_len":	9,
-										"yblk_th":	[0.002, 0.002, 0.002, 0.002, 0.002, 0.002, 0.002, 0.002, 0.002],
-										"yblk_th_len":	9,
-										"dark_th":	[250, 250, 250, 250, 250, 250, 250, 250, 250],
-										"dark_th_len":	9,
-										"bright_min":	[180, 180, 180, 180, 180, 180, 180, 180, 180],
-										"bright_min_len":	9,
-										"bright_max":	[240, 240, 240, 240, 240, 240, 240, 240, 240],
-										"bright_max_len":	9,
-										"wt_max":	[0.9, 0.9, 0.9, 0.9, 0.9, 0.9, 0.9, 0.9, 0.9],
-										"wt_max_len":	9,
-										"air_min":	[200, 200, 200, 200, 200, 200, 200, 200, 200],
-										"air_min_len":	9,
-										"air_max":	[250, 250, 250, 250, 250, 250, 250, 250, 250],
-										"air_max_len":	9,
-										"tmax_base":	[125, 125, 125, 125, 125, 125, 125, 125, 125],
-										"tmax_base_len":	9,
-										"tmax_off":	[0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1],
-										"tmax_off_len":	9,
-										"tmax_max":	[0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8],
-										"tmax_max_len":	9,
-										"cfg_wt":	[0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8],
-										"cfg_wt_len":	9,
-										"cfg_air":	[210, 210, 210, 210, 210, 210, 210, 210, 210],
-										"cfg_air_len":	9,
-										"cfg_tmax":	[0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2],
-										"cfg_tmax_len":	9,
-										"dc_weitcur":	[1, 1, 1, 1, 1, 1, 1, 1, 1],
-										"dc_weitcur_len":	9,
-										"bf_weight":	[0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5],
-										"bf_weight_len":	9,
-										"range_sigma":	[0.14, 0.14, 0.14, 0.14, 0.14, 0.14, 0.14, 0.14, 0.14],
-										"range_sigma_len":	9,
-										"space_sigma_pre":	[0.14, 0.14, 0.14, 0.14, 0.14, 0.14, 0.14, 0.14, 0.14],
-										"space_sigma_pre_len":	9,
-										"space_sigma_cur":	[0.14, 0.14, 0.14, 0.14, 0.14, 0.14, 0.14, 0.14, 0.14],
-										"space_sigma_cur_len":	9
+										"CtrlData":	[0, 0.005, 0.01, 0.05, 0.1, 0.15, 0.2, 0.3, 0.4, 0.5, 0.6, 0.8, 1],
+										"dc_min_th":	[64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64],
+										"dc_max_th":	[192, 192, 192, 192, 192, 192, 192, 192, 192, 192, 192, 192, 192],
+										"yhist_th":	[249, 249, 249, 249, 249, 249, 249, 249, 249, 249, 249, 249, 249],
+										"yblk_th":	[0.002, 0.002, 0.002, 0.002, 0.002, 0.002, 0.002, 0.002, 0.002, 0.002, 0.002, 0.002, 0.002],
+										"dark_th":	[250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250],
+										"bright_min":	[180, 180, 180, 180, 180, 180, 180, 180, 180, 180, 180, 180, 180],
+										"bright_max":	[240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240],
+										"wt_max":	[0.9, 0.9, 0.9, 0.9, 0.9, 0.9, 0.9, 0.9, 0.9, 0.9, 0.9, 0.9, 0.9],
+										"air_min":	[200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200],
+										"air_max":	[250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250],
+										"tmax_base":	[125, 125, 125, 125, 125, 125, 125, 125, 125, 125, 125, 125, 125],
+										"tmax_off":	[0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1],
+										"tmax_max":	[0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8],
+										"cfg_wt":	[0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8],
+										"cfg_air":	[210, 210, 210, 210, 210, 210, 210, 210, 210, 210, 210, 210, 210],
+										"cfg_tmax":	[0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2],
+										"dc_weitcur":	[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+										"bf_weight":	[0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5],
+										"range_sigma":	[0.14, 0.14, 0.14, 0.14, 0.14, 0.14, 0.14, 0.14, 0.14, 0.14, 0.14, 0.14, 0.14],
+										"space_sigma_pre":	[0.14, 0.14, 0.14, 0.14, 0.14, 0.14, 0.14, 0.14, 0.14, 0.14, 0.14, 0.14, 0.14],
+										"space_sigma_cur":	[0.14, 0.14, 0.14, 0.14, 0.14, 0.14, 0.14, 0.14, 0.14, 0.14, 0.14, 0.14, 0.14]
 									}
 								},
 								"enhance_setting":	{
 									"en":	1,
-									"enhance_curve":	[0, 64, 128, 192, 256, 320, 384, 448, 512, 576, 640, 704, 768, 832, 896, 960, 1023],
+									"enhance_curve":	[256, 256, 256, 256, 256, 320, 352, 544, 640, 736, 832, 928, 1023, 1023, 1023, 1023, 1023],
 									"EnhanceData":	{
-										"CtrlData":	[0, 0.002, 0.005, 0.01, 0.05, 0.1, 0.3, 0.5, 1],
-										"CtrlData_len":	9,
-										"enhance_value":	[1.25, 1.25, 1.25, 1.2, 1.2, 1.2, 1.1, 1.1, 1],
-										"enhance_value_len":	9,
-										"enhance_chroma":	[1, 1, 1, 1, 1, 1, 1, 1, 1],
-										"enhance_chroma_len":	9
+										"CtrlData":	[0, 0.002, 0.005, 0.01, 0.05, 0.1, 0.3, 0.5, 0.6, 0.7, 0.8, 0.9, 1],
+										"enhance_value":	[1.4, 1.4, 1.3, 1.3, 1.3, 1.3, 1.3, 1.3, 1.3, 1.3, 1.3, 1.3, 1.3],
+										"enhance_chroma":	[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
 									}
 								},
 								"hist_setting":	{
 									"en":	0,
 									"hist_para_en":	1,
 									"HistData":	{
-										"CtrlData":	[0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.7, 0.9, 1],
-										"CtrlData_len":	9,
-										"hist_gratio":	[2, 2, 2, 2, 2, 2, 2, 2, 2],
-										"hist_gratio_len":	9,
-										"hist_th_off":	[64, 64, 64, 64, 64, 64, 64, 64, 64],
-										"hist_th_off_len":	9,
-										"hist_k":	[2, 2, 2, 2, 2, 2, 2, 2, 2],
-										"hist_k_len":	9,
-										"hist_min":	[0.015, 0.015, 0.015, 0.015, 0.015, 0.015, 0.015, 0.015, 0.015],
-										"hist_min_len":	9,
-										"hist_scale":	[0.09, 0.09, 0.09, 0.09, 0.09, 0.09, 0.09, 0.09, 0.09],
-										"hist_scale_len":	9,
-										"cfg_gratio":	[2, 2, 2, 2, 2, 2, 2, 2, 2],
-										"cfg_gratio_len":	9
+										"CtrlData":	[0, 0.005, 0.01, 0.05, 0.1, 0.15, 0.2, 0.3, 0.4, 0.5, 0.6, 0.8, 1],
+										"hist_gratio":	[2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2],
+										"hist_th_off":	[64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64],
+										"hist_k":	[2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2],
+										"hist_min":	[0.015, 0.015, 0.015, 0.015, 0.015, 0.015, 0.015, 0.015, 0.015, 0.015, 0.015, 0.015, 0.015],
+										"hist_scale":	[0.09, 0.09, 0.09, 0.09, 0.09, 0.09, 0.09, 0.09, 0.09, 0.09, 0.09, 0.09, 0.09],
+										"cfg_gratio":	[2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2]
 									}
 								}
 							}
 						},
-						"adrc_calib_V2":	{
+						"adrc_calib_v11":	{
 							"DrcTuningPara":	{
 								"Enable":	0,
-								"CtrlDataType": "CTRLDATATYPE_ENVLV",
+								"CtrlDataType":	"CTRLDATATYPE_ENVLV",
 								"DrcGain":	{
 									"CtrlData":	[0, 0.005, 0.01, 0.05, 0.1, 0.15, 0.2, 0.3, 0.4, 0.5, 0.6, 0.8, 1],
-									"CtrlData_len":	13,
 									"DrcGain":	[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-									"DrcGain_len":	13,
 									"Alpha":	[0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2],
-									"Alpha_len":	13,
-									"Clip":	[16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16],
-									"Clip_len":	13
+									"Clip":	[16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16]
 								},
 								"HiLight":	{
 									"CtrlData":	[0, 0.005, 0.01, 0.05, 0.1, 0.15, 0.2, 0.3, 0.4, 0.5, 0.6, 0.8, 1],
-									"CtrlData_len":	13,
-									"Strength":	[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-									"Strength_len":	13
+									"Strength":	[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 								},
 								"LocalSetting":	{
 									"LocalData":	{
 										"CtrlData":	[0, 0.005, 0.01, 0.05, 0.1, 0.15, 0.2, 0.3, 0.4, 0.5, 0.6, 0.8, 1],
-										"CtrlData_len":	13,
 										"LocalWeit":	[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-										"LocalWeit_len":	13,
 										"LocalAutoEnable":	[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-										"LocalAutoEnable_len":	13,
 										"LocalAutoWeit":	[0.037477, 0.037477, 0.037477, 0.037477, 0.037477, 0.037477, 0.037477, 0.037477, 0.037477, 0.037477, 0.037477, 0.037477, 0.037477],
-										"LocalAutoWeit_len":	13,
 										"GlobalContrast":	[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-										"GlobalContrast_len":	13,
-										"LoLitContrast":	[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-										"LoLitContrast_len":	13
+										"LoLitContrast":	[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 									},
 									"curPixWeit":	0.376471,
 									"preFrameWeit":	0.8,
@@ -2073,13 +2103,12 @@
 								"Edge_Weit":	0.02,
 								"OutPutLongFrame":	0,
 								"IIR_frame":	2,
-								"Tolerance":	0,
 								"damp":	0.9
 							}
 						},
-"af_v30":	{
+						"af_v30":	{
 							"TuningPara":	{
-								"af_mode":	"CalibDbV2_AF_MODE_CONTINUOUS_PICTURE",
+								"af_mode":	"CalibDbV2_AFMODE_CONT_PICTURE",
 								"win_h_offs":	0,
 								"win_v_offs":	0,
 								"win_h_size":	0,
@@ -2099,10 +2128,10 @@
 								},
 								"contrast_af":	{
 									"enable":	1,
-									"Afss":	"CalibDbV2_CAM_AFM_FSS_ADAPTIVE_RANGE",
-									"FullDir":	"CalibDbV2_CAM_AFM_ADAPTIVE_SEARCH",
+									"Afss":	"CalibDbV2_AFSS_ADAPTIVE_RANGE",
+									"FullDir":	"CalibDbV2_AF_ADAPTIVE_SEARCH",
 									"FullRangeTbl":	[0, 4, 64],
-									"AdaptiveDir":	"CalibDbV2_CAM_AFM_ADAPTIVE_SEARCH",
+									"AdaptiveDir":	"CalibDbV2_AF_ADAPTIVE_SEARCH",
 									"AdaptRangeTbl":	[0, 8, 16, 24, 32, 40, 48, 56, 64],
 									"AdaptRangeTbl_len":	9,
 									"FineSearchStep":	[4, 4, 4, 4, 4, 4, 4, 4, 4],
@@ -2112,9 +2141,9 @@
 									"TrigThers_len":	1,
 									"TrigThersFv":	[0],
 									"TrigThersFv_len":	1,
-									"LumaTrigThers":	1,
-									"ExpTrigThers":	1,
-									"ChangedFrames":	0,
+									"LumaTrigThers":	0.05,
+									"ExpTrigThers":	0.03,
+									"ChangedFrames":	10,
 									"StableThers":	0.02,
 									"StableFrames":	3,
 									"StableTime":	200,
@@ -2126,19 +2155,17 @@
 									"ValidValueThers":	0,
 									"OutFocusValue":	200,
 									"OutFocusPos":	64,
-									"LowLumaValue":	0,
-									"LowLumaPos":	64,
 									"WeightEnable":	0,
 									"Weight":	[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-									"SearchPauseLumaEnable":	0,
-									"SearchPauseLumaThers":	0,
-									"SearchLumaStableFrames":	0,
-									"SearchLumaStableThers":	0,
+									"SearchPauseLumaEnable":	1,
+									"SearchPauseLumaThers":	0.05,
+									"SearchLumaStableFrames":	3,
+									"SearchLumaStableThers":	0.02,
 									"Stage1QuickFoundThers":	0.04,
 									"Stage2QuickFoundThers":	0.2,
 									"FlatValue":	0,
-									"PointLightLumaTh":	3000,
-									"PointLightCntTh":	300,
+									"PointLightLumaTh":	912,
+									"PointLightCntTh":	20,
 									"ZoomCfg":	{
 										"QuickFoundThersZoomIdx":	[0],
 										"QuickFoundThersZoomIdx_len":	1,
@@ -2153,15 +2180,19 @@
 										"StopStep":	[0],
 										"StopStep_len":	1,
 										"SkipHighPassZoomIdx":	0,
-										"SkipHighPassGain":	0
+										"SkipHighPassGain":	0,
+										"SpotlightBlkCnt":	[0.2, 0.5, 0.25],
+										"SpotlightHighlightRatio":	0.014,
+										"SpotlightLumaRatio":	[0.3, 0.5, 0.8],
+										"SwitchDirZoomIdx":	0
 									}
 								},
 								"video_contrast_af":	{
 									"enable":	1,
-									"Afss":	"CalibDbV2_CAM_AFM_FSS_ADAPTIVE_RANGE",
-									"FullDir":	"CalibDbV2_CAM_AFM_ADAPTIVE_SEARCH",
+									"Afss":	"CalibDbV2_AFSS_ADAPTIVE_RANGE",
+									"FullDir":	"CalibDbV2_AF_ADAPTIVE_SEARCH",
 									"FullRangeTbl":	[0, 4, 64],
-									"AdaptiveDir":	"CalibDbV2_CAM_AFM_ADAPTIVE_SEARCH",
+									"AdaptiveDir":	"CalibDbV2_AF_ADAPTIVE_SEARCH",
 									"AdaptRangeTbl":	[0, 8, 16, 24, 32, 40, 48, 56, 64],
 									"AdaptRangeTbl_len":	9,
 									"FineSearchStep":	[4, 4, 4, 4, 4, 4, 4, 4, 4],
@@ -2171,9 +2202,9 @@
 									"TrigThers_len":	1,
 									"TrigThersFv":	[0],
 									"TrigThersFv_len":	1,
-									"LumaTrigThers":	1,
-									"ExpTrigThers":	1,
-									"ChangedFrames":	0,
+									"LumaTrigThers":	0.05,
+									"ExpTrigThers":	0.03,
+									"ChangedFrames":	10,
 									"StableThers":	0.02,
 									"StableFrames":	20,
 									"StableTime":	200,
@@ -2185,19 +2216,17 @@
 									"ValidValueThers":	0,
 									"OutFocusValue":	200,
 									"OutFocusPos":	64,
-									"LowLumaValue":	0,
-									"LowLumaPos":	64,
 									"WeightEnable":	0,
 									"Weight":	[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-									"SearchPauseLumaEnable":	0,
-									"SearchPauseLumaThers":	0,
-									"SearchLumaStableFrames":	0,
-									"SearchLumaStableThers":	0,
+									"SearchPauseLumaEnable":	1,
+									"SearchPauseLumaThers":	0.05,
+									"SearchLumaStableFrames":	3,
+									"SearchLumaStableThers":	0.02,
 									"Stage1QuickFoundThers":	0.04,
 									"Stage2QuickFoundThers":	0.2,
 									"FlatValue":	0,
-									"PointLightLumaTh":	3000,
-									"PointLightCntTh":	300,
+									"PointLightLumaTh":	912,
+									"PointLightCntTh":	20,
 									"ZoomCfg":	{
 										"QuickFoundThersZoomIdx":	[0],
 										"QuickFoundThersZoomIdx_len":	1,
@@ -2212,7 +2241,11 @@
 										"StopStep":	[0],
 										"StopStep_len":	1,
 										"SkipHighPassZoomIdx":	0,
-										"SkipHighPassGain":	0
+										"SkipHighPassGain":	0,
+										"SpotlightBlkCnt":	[0.2, 0.5, 0.25],
+										"SpotlightHighlightRatio":	0.014,
+										"SpotlightLumaRatio":	[0.3, 0.5, 0.8],
+										"SwitchDirZoomIdx":	0
 									}
 								},
 								"laser_af":	{
@@ -2230,6 +2263,7 @@
 									"pdSearchRadius":	3,
 									"pdMirrorInCalib":	1,
 									"pdVsImgoutMirror":	0,
+									"pdLRInDiffLine":	0,
 									"pdWidth":	508,
 									"pdHeight":	760,
 									"pdVerBinning":	0,
@@ -2245,7 +2279,7 @@
 									"pdDiscardRegionEn":	0,
 									"pdLessTextureRatio":	0.25,
 									"pdTargetOffset":	0,
-									"pdCalibInf": {
+									"pdCalibInf":	{
 										"pdGainMapW":	32,
 										"pdGainMapH":	32,
 										"pdDccMapW":	64,
@@ -2254,17 +2288,15 @@
 									"pdConfdMwinFactor":	3,
 									"pdCenterMinFv":	0,
 									"pdCenterMinRatio":	0,
-									"pdHighlightRatio":	0.2,
-									"pdStepRatio":	[1.0, 1.0, 1.0, 0.9, 0.8, 0.7, 0.7],
+									"pdHighlightRatio":	0.5,
+									"pdStepRatio":	[1, 1, 1, 0.9, 0.8, 0.7, 0.7],
 									"pdStepDefocus":	[32, 64, 96, 128, 160, 192, 224],
-									"pdIsoPara":
-									[
-										{
-											"iso": 6400,
+									"pdIsoPara":	[{
+											"iso":	6400,
 											"pdConfdRatio0":	1,
 											"pdConfdRatio1":	1,
 											"pdConfdRatio2":	1,
-											"pdConfdRatio3":	1,
+											"pdConfdRatio3":	0,
 											"pdConfdThresh":	0.4,
 											"convergedInfPdThresh":	12,
 											"convergedMacPdThresh":	12,
@@ -2274,25 +2306,24 @@
 											"stablePdOffset":	8,
 											"stableCntRatio":	1.5,
 											"noconfCntThresh":	4,
-											"roiBlkCntW":		3,
-											"roiBlkCntH":		3,
+											"roiBlkCntW":	3,
+											"roiBlkCntH":	3,
 											"fineSearchTbl":	[{
-												"confidence":	0.5,
-												"range":	0,
-												"stepPos":	1
-											}, {
-												"confidence":	0,
-												"range":	4,
-												"stepPos":	1
-											}],
+													"confidence":	0.5,
+													"range":	0,
+													"stepPos":	1
+												}, {
+													"confidence":	0,
+													"range":	4,
+													"stepPos":	1
+												}],
 											"fineSearchTbl_len":	2
-										},
-										{
-											"iso": 204800,
+										}, {
+											"iso":	204800,
 											"pdConfdRatio0":	1,
 											"pdConfdRatio1":	1,
 											"pdConfdRatio2":	1,
-											"pdConfdRatio3":	1,
+											"pdConfdRatio3":	0,
 											"pdConfdThresh":	0.4,
 											"convergedInfPdThresh":	12,
 											"convergedMacPdThresh":	12,
@@ -2302,20 +2333,19 @@
 											"stablePdOffset":	8,
 											"stableCntRatio":	1.5,
 											"noconfCntThresh":	4,
-											"roiBlkCntW":		1,
-											"roiBlkCntH":		1,
+											"roiBlkCntW":	1,
+											"roiBlkCntH":	1,
 											"fineSearchTbl":	[{
-												"confidence":	0.5,
-												"range":	8,
-												"stepPos":	2
-											}, {
-												"confidence":	0,
-												"range":	16,
-												"stepPos":	4
-											}],
+													"confidence":	0.5,
+													"range":	8,
+													"stepPos":	2
+												}, {
+													"confidence":	0,
+													"range":	16,
+													"stepPos":	4
+												}],
 											"fineSearchTbl_len":	2
-										}
-									],
+										}],
 									"pdIsoPara_len":	2
 								},
 								"vcmcfg":	{
@@ -2323,12 +2353,13 @@
 									"start_current":	-1,
 									"rated_current":	-1,
 									"step_mode":	-1,
-									"extra_delay":	0,
-									"posture_diff":	0.1
+									"extra_delay":	-20,
+									"posture_diff":	0.2
 								},
 								"zoomfocus_tbl":	{
 									"widemod_deviate":	10,
 									"telemod_deviate":	10,
+									"focus_backval":	0,
 									"zoom_move_dot":	[0],
 									"zoom_move_dot_len":	1,
 									"zoom_move_step":	[16],
@@ -2354,84 +2385,93 @@
 									"FocusSearchPlusRange":	[0],
 									"FocusSearchPlusRange_len":	1,
 									"FocusStage1Step":	1,
+									"QuickFndRate":	0.3,
+									"QuickFndMinFv":	200,
 									"searchZoomRange":	100,
 									"searchFocusRange":	100,
 									"searchEmax":	100,
 									"searchEavg":	100,
 									"IsZoomFocusRec":	0,
-									"ZoomFocusRecDir":	"/userdata",
+									"ZoomInfoDir":	"/userdata",
 									"ZoomInitIndex":	1
 								},
 								"zoom_meas":	[{
 										"zoom_idx":	0,
 										"measiso":	[{
 												"iso":	50,
-												"idx":	0,
-												"spotlt_scene_idx":	0
+												"idx":	1,
+												"spotlt_scene_idx":	1
 											}, {
 												"iso":	100,
-												"idx":	0,
-												"spotlt_scene_idx":	0
+												"idx":	1,
+												"spotlt_scene_idx":	1
 											}, {
 												"iso":	200,
-												"idx":	0,
-												"spotlt_scene_idx":	0
+												"idx":	1,
+												"spotlt_scene_idx":	1
 											}, {
 												"iso":	400,
-												"idx":	0,
-												"spotlt_scene_idx":	0
+												"idx":	1,
+												"spotlt_scene_idx":	1
 											}, {
 												"iso":	800,
-												"idx":	0,
-												"spotlt_scene_idx":	0
+												"idx":	1,
+												"spotlt_scene_idx":	1
 											}, {
 												"iso":	1600,
-												"idx":	1,
+												"idx":	2,
 												"spotlt_scene_idx":	1
 											}, {
 												"iso":	3200,
-												"idx":	1,
+												"idx":	2,
 												"spotlt_scene_idx":	1
 											}, {
 												"iso":	6400,
-												"idx":	1,
+												"idx":	2,
 												"spotlt_scene_idx":	1
 											}, {
 												"iso":	12800,
-												"idx":	1,
+												"idx":	2,
 												"spotlt_scene_idx":	1
 											}, {
 												"iso":	25600,
-												"idx":	1,
+												"idx":	2,
 												"spotlt_scene_idx":	1
 											}, {
 												"iso":	51200,
-												"idx":	1,
+												"idx":	2,
 												"spotlt_scene_idx":	1
 											}, {
 												"iso":	102400,
-												"idx":	1,
+												"idx":	2,
 												"spotlt_scene_idx":	1
 											}, {
 												"iso":	204800,
-												"idx":	1,
+												"idx":	2,
 												"spotlt_scene_idx":	1
-											}]
+											}],
+										"measiso_len":	13
 									}],
 								"zoom_meas_len":	1,
 								"meascfg_tbl":	[{
 										"tbl_idx":	0,
 										"afmThres":	4,
 										"gammaY":	[0, 45, 108, 179, 245, 344, 409, 459, 500, 567, 622, 676, 759, 833, 896, 962, 1023],
+										"v1fv_reliable":	0.2,
+										"v2fv_reliable":	0.2,
 										"v1_fir_sel":	1,
-										"v1_iir_coe":	[0, 503, 0, 0, 8, 0, 0, 9, 0],
-										"v1_fir_coe":	[-1997, 0, 1997],
-										"v2_iir_coe":	[476, 33, 34],
-										"v2_fir_coe":	[-985, 0, 985],
+										"v1_band":	[0.042, 0.14],
+										"v1_iir_coe":	[0, 483, 0, 0, 28, 0, 0, 28, 0],
+										"v1_fir_coe":	[-1186, 0, 1186],
+										"v2_band":	[0.042, 0.14],
+										"v2_iir_coe":	[483, 28, 28],
+										"v2_fir_coe":	[-1186, 0, 1186],
+										"h1_band":	[0.042, 0.14],
 										"h1_iir1_coe":	[512, 557, -276, 460, 0, -460],
-										"h1_iir2_coe":	[512, 870, -399, 37, 0, -37],
+										"h1_iir2_coe":	[100, 870, -399, 191, 0, -191],
+										"h2_band":	[0.042, 0.14],
 										"h2_iir1_coe":	[512, 557, -276, 460, 0, -460],
-										"h2_iir2_coe":	[512, 870, -399, 37, 0, -37],
+										"h2_iir2_coe":	[100, 870, -399, 191, 0, -191],
 										"ldg_en":	0,
 										"ve_ldg_lumth_l":	64,
 										"ve_ldg_gain_l":	28,
@@ -2447,22 +2487,28 @@
 										"ho_ldg_gslp_h":	1400,
 										"v_fv_thresh":	4,
 										"h_fv_thresh":	4,
-										"highlit_thresh":	912
-									},
-									{
+										"highlit_thresh":	912,
+										"v_fv_ratio":	0.5
+									}, {
 										"tbl_idx":	1,
 										"afmThres":	4,
 										"gammaY":	[0, 45, 108, 179, 245, 344, 409, 459, 500, 567, 622, 676, 759, 833, 896, 962, 1023],
+										"v1fv_reliable":	0.2,
+										"v2fv_reliable":	0.2,
 										"v1_fir_sel":	1,
-										"v1_iir_coe":	[0, 503, 0, 0, 8, 0, 0, 9, 0],
-										"v1_fir_coe":	[-1997, 0, 1997],
-										"v2_iir_coe":	[476, 33, 34],
-										"v2_fir_coe":	[-985, 0, 985],
-										"h1_iir1_coe":	[512, 811, -375, 266, 0, -266],
-										"h1_iir2_coe":	[250, 945, -448, 41, 0, -41],
-										"h2_iir1_coe":	[512, 557, -276, 460, 0, -460],
-										"h2_iir2_coe":	[512, 870, -399, 37, 0, -37],
-										"ldg_en":	0,
+										"v1_band":	[0.06, 0.15],
+										"v1_iir_coe":	[0, 473, 0, 0, 37, 0, 0, 37, 0],
+										"v1_fir_coe":	[-896, 0, 896],
+										"v2_band":	[0.06, 0.15],
+										"v2_iir_coe":	[473, 37, 37],
+										"v2_fir_coe":	[-896, 0, 896],
+										"h1_band":	[0.06, 0.15],
+										"h1_iir1_coe":	[512, 538, -305, 404, 0, -404],
+										"h1_iir2_coe":	[133, 821, -388, 141, 0, -141],
+										"h2_band":	[0.06, 0.15],
+										"h2_iir1_coe":	[512, 538, -305, 404, 0, -404],
+										"h2_iir2_coe":	[133, 821, -388, 141, 0, -141],
+										"ldg_en":	1,
 										"ve_ldg_lumth_l":	64,
 										"ve_ldg_gain_l":	28,
 										"ve_ldg_gslp_l":	1286,
@@ -2477,77 +2523,111 @@
 										"ho_ldg_gslp_h":	1400,
 										"v_fv_thresh":	4,
 										"h_fv_thresh":	4,
-										"highlit_thresh":	912
+										"highlit_thresh":	912,
+										"v_fv_ratio":	0.5
+									}, {
+										"tbl_idx":	2,
+										"afmThres":	4,
+										"gammaY":	[0, 45, 108, 179, 245, 344, 409, 459, 500, 567, 622, 676, 759, 833, 896, 962, 1023],
+										"v1fv_reliable":	0.2,
+										"v2fv_reliable":	0.2,
+										"v1_fir_sel":	1,
+										"v1_band":	[0.01, 0.04],
+										"v1_iir_coe":	[0, 503, 0, 0, 8, 0, 0, 9, 0],
+										"v1_fir_coe":	[-1997, 0, 1997],
+										"v2_band":	[0.01, 0.04],
+										"v2_iir_coe":	[503, 8, 9],
+										"v2_fir_coe":	[-1997, 0, 1997],
+										"h1_band":	[0.01, 0.04],
+										"h1_iir1_coe":	[71, 908, -419, 511, 0, -511],
+										"h1_iir2_coe":	[19, 989, -480, 779, 0, -779],
+										"h2_band":	[0.01, 0.04],
+										"h2_iir1_coe":	[71, 908, -419, 511, 0, -511],
+										"h2_iir2_coe":	[19, 989, -480, 779, 0, -779],
+										"ldg_en":	1,
+										"ve_ldg_lumth_l":	64,
+										"ve_ldg_gain_l":	28,
+										"ve_ldg_gslp_l":	1286,
+										"ve_ldg_lumth_h":	185,
+										"ve_ldg_gain_h":	8,
+										"ve_ldg_gslp_h":	1400,
+										"ho_ldg_lumth_l":	64,
+										"ho_ldg_gain_l":	28,
+										"ho_ldg_gslp_l":	1286,
+										"ho_ldg_lumth_h":	185,
+										"ho_ldg_gain_h":	8,
+										"ho_ldg_gslp_h":	1400,
+										"v_fv_thresh":	4,
+										"h_fv_thresh":	4,
+										"highlit_thresh":	912,
+										"v_fv_ratio":	0.5
 									}],
-								"meascfg_tbl_len":	2
+								"meascfg_tbl_len":	3
 							}
 						},
-						"amerge_calib_V2":
-						{
-							"MergeTuningPara":
-							{
-								"BaseFrm": "BASEFRAME_LONG",
-								"CtrlDataType": "CTRLDATATYPE_ENVLV",
-								"ByPassThr": 0,
-								"LongFrmModeData":
-								{
-									"OECurve":
-									{
+						"amerge_calib_v11":	{
+							"MergeTuningPara":	{
+								"BaseFrm":	"BASEFRAME_LONG",
+								"CtrlDataType":	"CTRLDATATYPE_ENVLV",
+								"ByPassThr":	0,
+								"LongFrmModeData":	{
+									"OECurve":	{
 										"CtrlData":	[0, 0.005, 0.01, 0.05, 0.1, 0.15, 0.2, 0.3, 0.4, 0.5, 0.6, 0.8, 1],
-										"CtrlData_len": 13,
 										"Smooth":	[0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4],
-										"Smooth_len": 13,
-										"Offset":	[210, 210, 210, 210, 210, 210, 210, 210, 210, 210, 210, 210, 210],
-										"Offset_len": 13
+										"Offset":	[210, 210, 210, 210, 210, 210, 210, 210, 210, 210, 210, 210, 210]
 									},
-									"MDCurve":
-									{
+									"MDCurve":	{
 										"MoveCoef":	[0, 0.005, 0.01, 0.05, 0.1, 0.15, 0.2, 0.3, 0.4, 0.5, 0.6, 0.8, 1],
-										"MoveCoef_len": 13,
 										"LM_smooth":	[0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4],
-										"LM_smooth_len": 13,
 										"LM_offset":	[0.38, 0.38, 0.38, 0.38, 0.38, 0.38, 0.38, 0.38, 0.38, 0.38, 0.38, 0.38, 0.38],
-										"LM_offset_len": 13,
 										"MS_smooth":	[0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4],
-										"MS_smooth_len": 13,
-										"MS_offset":	[0.38, 0.38, 0.38, 0.38, 0.38, 0.38, 0.38, 0.38, 0.38, 0.38, 0.38, 0.38, 0.38],
-										"MS_offset_len": 13
+										"MS_offset":	[0.38, 0.38, 0.38, 0.38, 0.38, 0.38, 0.38, 0.38, 0.38, 0.38, 0.38, 0.38, 0.38]
 									},
-									"OECurve_damp": 0.3,
-									"MDCurveLM_damp": 0.3,
-									"MDCurveMS_damp": 0.3
+									"OECurve_damp":	0.3,
+									"MDCurveLM_damp":	0.3,
+									"MDCurveMS_damp":	0.3
 								},
-								"ShortFrmModeData":
-								{
-									"OECurve":
-									{
+								"ShortFrmModeData":	{
+									"OECurve":	{
 										"CtrlData":	[0, 0.005, 0.01, 0.05, 0.1, 0.15, 0.2, 0.3, 0.4, 0.5, 0.6, 0.8, 1],
-										"CtrlData_len": 13,
 										"Smooth":	[0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4],
-										"Smooth_len": 13,
-										"Offset":	[210, 210, 210, 210, 210, 210, 210, 210, 210, 210, 210, 210, 210],
-										"Offset_len": 13
+										"Offset":	[210, 210, 210, 210, 210, 210, 210, 210, 210, 210, 210, 210, 210]
 									},
-									"MDCurve":
-									{
+									"MDCurve":	{
 										"MoveCoef":	[0, 0.005, 0.01, 0.05, 0.1, 0.15, 0.2, 0.3, 0.4, 0.5, 0.6, 0.8, 1],
-										"MoveCoef_len": 13,
 										"Coef":	[0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05],
-										"Coef_len": 13,
-										"ms_thd0":	[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
-										"ms_thd0_len": 13,
-										"lm_thd0":	[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
-										"lm_thd0_len": 13
+										"ms_thd0":	[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+										"lm_thd0":	[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 									},
-									"OECurve_damp": 0.3,
-									"MDCurve_damp": 0.3
+									"OECurve_damp":	0.3,
+									"MDCurve_damp":	0.3
 								}
 							}
 						},
-						"cac_calib":	{
+						"cac_v03":	{
+							"SettingPara":	{
+								"enable":	0
+							},
+							"TuningPara":	{
+								"SettingByIso":	[{
+										"iso":	0,
+										"bypass":	0,
+										"AutoHighLightDetect":	0,
+										"AutoHighLightOffset":	0,
+										"FixHighLightBase":	0,
+										"YCompensate":	0,
+										"AutoStrengthU":	0,
+										"AutoStrengthV":	0,
+										"GrayStrengthU":	0,
+										"GrayStrengthV":	0
+									}],
+								"SettingByIso_len":	1
+							}
+						},
+						"cac_v10":	{
 							"SettingPara":	{
 								"enable":	0,
-								"psf_path":	"/etc/iqfiles/cac_map.imx464.0.755781.bin",
+								"psf_path":	"/etc/iqfiles/cac_map_42x24x34.bin",
 								"psf_shift_bits":	2,
 								"center_en":	0,
 								"center_x":	0,
@@ -2557,58 +2637,72 @@
 								"SettingByIso":	[{
 										"iso":	50,
 										"bypass":	0,
+										"global_strength":	0,
 										"strength_table":	[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
 									}, {
 										"iso":	100,
 										"bypass":	0,
+										"global_strength":	0,
 										"strength_table":	[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
 									}, {
 										"iso":	200,
 										"bypass":	0,
+										"global_strength":	0,
 										"strength_table":	[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
 									}, {
 										"iso":	400,
 										"bypass":	0,
+										"global_strength":	0,
 										"strength_table":	[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
 									}, {
 										"iso":	800,
 										"bypass":	0,
+										"global_strength":	0,
 										"strength_table":	[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
 									}, {
 										"iso":	1600,
 										"bypass":	0,
+										"global_strength":	0,
 										"strength_table":	[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
 									}, {
 										"iso":	3200,
 										"bypass":	0,
+										"global_strength":	0,
 										"strength_table":	[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
 									}, {
 										"iso":	6400,
 										"bypass":	0,
+										"global_strength":	0,
 										"strength_table":	[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
 									}, {
 										"iso":	12800,
 										"bypass":	0,
+										"global_strength":	0,
 										"strength_table":	[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
 									}, {
 										"iso":	25600,
 										"bypass":	0,
+										"global_strength":	0,
 										"strength_table":	[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
 									}, {
 										"iso":	51200,
 										"bypass":	0,
+										"global_strength":	0,
 										"strength_table":	[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
 									}, {
 										"iso":	102400,
 										"bypass":	0,
+										"global_strength":	0,
 										"strength_table":	[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
 									}, {
 										"iso":	204800,
 										"bypass":	0,
+										"global_strength":	0,
 										"strength_table":	[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
 									}, {
 										"iso":	409600,
 										"bypass":	0,
+										"global_strength":	0,
 										"strength_table":	[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
 									}],
 								"SettingByIso_len":	14
@@ -5335,7 +5429,7 @@
 							"Version":	"V4",
 							"TuningPara":	{
 								"enable":	1,
-								"kernel_sigma_enable": 0,
+								"kernel_sigma_enable":	0,
 								"Setting":	[{
 										"SNR_Mode":	"LSNR",
 										"Sensor_Mode":	"lcg",
@@ -5361,10 +5455,10 @@
 													"hfBilateralFilter_coeff":	[0.2042, 0.1238, 0.0751]
 												},
 												"kernel_sigma":	{
-													"prefilter_sigma":	1.0,
-													"GaussianFilter_sigma":	2.0,
-													"GaussianFilter_radius":	2.0,
-													"hfBilateralFilter_sigma":	1.0
+													"prefilter_sigma":	1,
+													"GaussianFilter_sigma":	2,
+													"GaussianFilter_radius":	2,
+													"hfBilateralFilter_sigma":	1
 												}
 											}, {
 												"iso":	100,
@@ -5388,10 +5482,10 @@
 													"hfBilateralFilter_coeff":	[0.2042, 0.1238, 0.0751]
 												},
 												"kernel_sigma":	{
-													"prefilter_sigma":	1.0,
-													"GaussianFilter_sigma":	2.0,
-													"GaussianFilter_radius":	2.0,
-													"hfBilateralFilter_sigma":	1.0
+													"prefilter_sigma":	1,
+													"GaussianFilter_sigma":	2,
+													"GaussianFilter_radius":	2,
+													"hfBilateralFilter_sigma":	1
 												}
 											}, {
 												"iso":	200,
@@ -5415,10 +5509,10 @@
 													"hfBilateralFilter_coeff":	[0.2042, 0.1238, 0.0751]
 												},
 												"kernel_sigma":	{
-													"prefilter_sigma":	1.0,
-													"GaussianFilter_sigma":	2.0,
-													"GaussianFilter_radius":	2.0,
-													"hfBilateralFilter_sigma":	1.0
+													"prefilter_sigma":	1,
+													"GaussianFilter_sigma":	2,
+													"GaussianFilter_radius":	2,
+													"hfBilateralFilter_sigma":	1
 												}
 											}, {
 												"iso":	400,
@@ -5442,10 +5536,10 @@
 													"hfBilateralFilter_coeff":	[0.2042, 0.1238, 0.0751]
 												},
 												"kernel_sigma":	{
-													"prefilter_sigma":	1.0,
-													"GaussianFilter_sigma":	2.0,
-													"GaussianFilter_radius":	2.0,
-													"hfBilateralFilter_sigma":	1.0
+													"prefilter_sigma":	1,
+													"GaussianFilter_sigma":	2,
+													"GaussianFilter_radius":	2,
+													"hfBilateralFilter_sigma":	1
 												}
 											}, {
 												"iso":	800,
@@ -5469,10 +5563,10 @@
 													"hfBilateralFilter_coeff":	[0.2042, 0.1238, 0.0751]
 												},
 												"kernel_sigma":	{
-													"prefilter_sigma":	1.0,
-													"GaussianFilter_sigma":	2.0,
-													"GaussianFilter_radius":	2.0,
-													"hfBilateralFilter_sigma":	1.0
+													"prefilter_sigma":	1,
+													"GaussianFilter_sigma":	2,
+													"GaussianFilter_radius":	2,
+													"hfBilateralFilter_sigma":	1
 												}
 											}, {
 												"iso":	1600,
@@ -5496,10 +5590,10 @@
 													"hfBilateralFilter_coeff":	[0.2042, 0.1238, 0.0751]
 												},
 												"kernel_sigma":	{
-													"prefilter_sigma":	1.0,
-													"GaussianFilter_sigma":	2.0,
-													"GaussianFilter_radius":	2.0,
-													"hfBilateralFilter_sigma":	1.0
+													"prefilter_sigma":	1,
+													"GaussianFilter_sigma":	2,
+													"GaussianFilter_radius":	2,
+													"hfBilateralFilter_sigma":	1
 												}
 											}, {
 												"iso":	3200,
@@ -5523,10 +5617,10 @@
 													"hfBilateralFilter_coeff":	[0.2042, 0.1238, 0.0751]
 												},
 												"kernel_sigma":	{
-													"prefilter_sigma":	1.0,
-													"GaussianFilter_sigma":	2.0,
-													"GaussianFilter_radius":	2.0,
-													"hfBilateralFilter_sigma":	1.0
+													"prefilter_sigma":	1,
+													"GaussianFilter_sigma":	2,
+													"GaussianFilter_radius":	2,
+													"hfBilateralFilter_sigma":	1
 												}
 											}, {
 												"iso":	6400,
@@ -5550,10 +5644,10 @@
 													"hfBilateralFilter_coeff":	[0.2042, 0.1238, 0.0751]
 												},
 												"kernel_sigma":	{
-													"prefilter_sigma":	1.0,
-													"GaussianFilter_sigma":	2.0,
-													"GaussianFilter_radius":	2.0,
-													"hfBilateralFilter_sigma":	1.0
+													"prefilter_sigma":	1,
+													"GaussianFilter_sigma":	2,
+													"GaussianFilter_radius":	2,
+													"hfBilateralFilter_sigma":	1
 												}
 											}, {
 												"iso":	12800,
@@ -5577,10 +5671,10 @@
 													"hfBilateralFilter_coeff":	[0.2042, 0.1238, 0.0751]
 												},
 												"kernel_sigma":	{
-													"prefilter_sigma":	1.0,
-													"GaussianFilter_sigma":	2.0,
-													"GaussianFilter_radius":	2.0,
-													"hfBilateralFilter_sigma":	1.0
+													"prefilter_sigma":	1,
+													"GaussianFilter_sigma":	2,
+													"GaussianFilter_radius":	2,
+													"hfBilateralFilter_sigma":	1
 												}
 											}, {
 												"iso":	25600,
@@ -5604,10 +5698,10 @@
 													"hfBilateralFilter_coeff":	[0.2042, 0.1238, 0.0751]
 												},
 												"kernel_sigma":	{
-													"prefilter_sigma":	1.0,
-													"GaussianFilter_sigma":	2.0,
-													"GaussianFilter_radius":	2.0,
-													"hfBilateralFilter_sigma":	1.0
+													"prefilter_sigma":	1,
+													"GaussianFilter_sigma":	2,
+													"GaussianFilter_radius":	2,
+													"hfBilateralFilter_sigma":	1
 												}
 											}, {
 												"iso":	51200,
@@ -5631,10 +5725,10 @@
 													"hfBilateralFilter_coeff":	[0.2042, 0.1238, 0.0751]
 												},
 												"kernel_sigma":	{
-													"prefilter_sigma":	1.0,
-													"GaussianFilter_sigma":	2.0,
-													"GaussianFilter_radius":	2.0,
-													"hfBilateralFilter_sigma":	1.0
+													"prefilter_sigma":	1,
+													"GaussianFilter_sigma":	2,
+													"GaussianFilter_radius":	2,
+													"hfBilateralFilter_sigma":	1
 												}
 											}, {
 												"iso":	102400,
@@ -5658,10 +5752,10 @@
 													"hfBilateralFilter_coeff":	[0.2042, 0.1238, 0.0751]
 												},
 												"kernel_sigma":	{
-													"prefilter_sigma":	1.0,
-													"GaussianFilter_sigma":	2.0,
-													"GaussianFilter_radius":	2.0,
-													"hfBilateralFilter_sigma":	1.0
+													"prefilter_sigma":	1,
+													"GaussianFilter_sigma":	2,
+													"GaussianFilter_radius":	2,
+													"hfBilateralFilter_sigma":	1
 												}
 											}, {
 												"iso":	204800,
@@ -5685,10 +5779,10 @@
 													"hfBilateralFilter_coeff":	[0.2042, 0.1238, 0.0751]
 												},
 												"kernel_sigma":	{
-													"prefilter_sigma":	1.0,
-													"GaussianFilter_sigma":	2.0,
-													"GaussianFilter_radius":	2.0,
-													"hfBilateralFilter_sigma":	1.0
+													"prefilter_sigma":	1,
+													"GaussianFilter_sigma":	2,
+													"GaussianFilter_radius":	2,
+													"hfBilateralFilter_sigma":	1
 												}
 											}],
 										"Tuning_ISO_len":	13
@@ -5717,10 +5811,10 @@
 													"hfBilateralFilter_coeff":	[0.2042, 0.1238, 0.0751]
 												},
 												"kernel_sigma":	{
-													"prefilter_sigma":	1.0,
-													"GaussianFilter_sigma":	2.0,
-													"GaussianFilter_radius":	2.0,
-													"hfBilateralFilter_sigma":	1.0
+													"prefilter_sigma":	1,
+													"GaussianFilter_sigma":	2,
+													"GaussianFilter_radius":	2,
+													"hfBilateralFilter_sigma":	1
 												}
 											}, {
 												"iso":	100,
@@ -5744,10 +5838,10 @@
 													"hfBilateralFilter_coeff":	[0.2042, 0.1238, 0.0751]
 												},
 												"kernel_sigma":	{
-													"prefilter_sigma":	1.0,
-													"GaussianFilter_sigma":	2.0,
-													"GaussianFilter_radius":	2.0,
-													"hfBilateralFilter_sigma":	1.0
+													"prefilter_sigma":	1,
+													"GaussianFilter_sigma":	2,
+													"GaussianFilter_radius":	2,
+													"hfBilateralFilter_sigma":	1
 												}
 											}, {
 												"iso":	200,
@@ -5771,10 +5865,10 @@
 													"hfBilateralFilter_coeff":	[0.2042, 0.1238, 0.0751]
 												},
 												"kernel_sigma":	{
-													"prefilter_sigma":	1.0,
-													"GaussianFilter_sigma":	2.0,
-													"GaussianFilter_radius":	2.0,
-													"hfBilateralFilter_sigma":	1.0
+													"prefilter_sigma":	1,
+													"GaussianFilter_sigma":	2,
+													"GaussianFilter_radius":	2,
+													"hfBilateralFilter_sigma":	1
 												}
 											}, {
 												"iso":	400,
@@ -5798,10 +5892,10 @@
 													"hfBilateralFilter_coeff":	[0.2042, 0.1238, 0.0751]
 												},
 												"kernel_sigma":	{
-													"prefilter_sigma":	1.0,
-													"GaussianFilter_sigma":	2.0,
-													"GaussianFilter_radius":	2.0,
-													"hfBilateralFilter_sigma":	1.0
+													"prefilter_sigma":	1,
+													"GaussianFilter_sigma":	2,
+													"GaussianFilter_radius":	2,
+													"hfBilateralFilter_sigma":	1
 												}
 											}, {
 												"iso":	800,
@@ -5825,10 +5919,10 @@
 													"hfBilateralFilter_coeff":	[0.2042, 0.1238, 0.0751]
 												},
 												"kernel_sigma":	{
-													"prefilter_sigma":	1.0,
-													"GaussianFilter_sigma":	2.0,
-													"GaussianFilter_radius":	2.0,
-													"hfBilateralFilter_sigma":	1.0
+													"prefilter_sigma":	1,
+													"GaussianFilter_sigma":	2,
+													"GaussianFilter_radius":	2,
+													"hfBilateralFilter_sigma":	1
 												}
 											}, {
 												"iso":	1600,
@@ -5852,10 +5946,10 @@
 													"hfBilateralFilter_coeff":	[0.2042, 0.1238, 0.0751]
 												},
 												"kernel_sigma":	{
-													"prefilter_sigma":	1.0,
-													"GaussianFilter_sigma":	2.0,
-													"GaussianFilter_radius":	2.0,
-													"hfBilateralFilter_sigma":	1.0
+													"prefilter_sigma":	1,
+													"GaussianFilter_sigma":	2,
+													"GaussianFilter_radius":	2,
+													"hfBilateralFilter_sigma":	1
 												}
 											}, {
 												"iso":	3200,
@@ -5879,10 +5973,10 @@
 													"hfBilateralFilter_coeff":	[0.2042, 0.1238, 0.0751]
 												},
 												"kernel_sigma":	{
-													"prefilter_sigma":	1.0,
-													"GaussianFilter_sigma":	2.0,
-													"GaussianFilter_radius":	2.0,
-													"hfBilateralFilter_sigma":	1.0
+													"prefilter_sigma":	1,
+													"GaussianFilter_sigma":	2,
+													"GaussianFilter_radius":	2,
+													"hfBilateralFilter_sigma":	1
 												}
 											}, {
 												"iso":	6400,
@@ -5906,10 +6000,10 @@
 													"hfBilateralFilter_coeff":	[0.2042, 0.1238, 0.0751]
 												},
 												"kernel_sigma":	{
-													"prefilter_sigma":	1.0,
-													"GaussianFilter_sigma":	2.0,
-													"GaussianFilter_radius":	2.0,
-													"hfBilateralFilter_sigma":	1.0
+													"prefilter_sigma":	1,
+													"GaussianFilter_sigma":	2,
+													"GaussianFilter_radius":	2,
+													"hfBilateralFilter_sigma":	1
 												}
 											}, {
 												"iso":	12800,
@@ -5933,10 +6027,10 @@
 													"hfBilateralFilter_coeff":	[0.2042, 0.1238, 0.0751]
 												},
 												"kernel_sigma":	{
-													"prefilter_sigma":	1.0,
-													"GaussianFilter_sigma":	2.0,
-													"GaussianFilter_radius":	2.0,
-													"hfBilateralFilter_sigma":	1.0
+													"prefilter_sigma":	1,
+													"GaussianFilter_sigma":	2,
+													"GaussianFilter_radius":	2,
+													"hfBilateralFilter_sigma":	1
 												}
 											}, {
 												"iso":	25600,
@@ -5960,10 +6054,10 @@
 													"hfBilateralFilter_coeff":	[0.2042, 0.1238, 0.0751]
 												},
 												"kernel_sigma":	{
-													"prefilter_sigma":	1.0,
-													"GaussianFilter_sigma":	2.0,
-													"GaussianFilter_radius":	2.0,
-													"hfBilateralFilter_sigma":	1.0
+													"prefilter_sigma":	1,
+													"GaussianFilter_sigma":	2,
+													"GaussianFilter_radius":	2,
+													"hfBilateralFilter_sigma":	1
 												}
 											}, {
 												"iso":	51200,
@@ -5987,10 +6081,10 @@
 													"hfBilateralFilter_coeff":	[0.2042, 0.1238, 0.0751]
 												},
 												"kernel_sigma":	{
-													"prefilter_sigma":	1.0,
-													"GaussianFilter_sigma":	2.0,
-													"GaussianFilter_radius":	2.0,
-													"hfBilateralFilter_sigma":	1.0
+													"prefilter_sigma":	1,
+													"GaussianFilter_sigma":	2,
+													"GaussianFilter_radius":	2,
+													"hfBilateralFilter_sigma":	1
 												}
 											}, {
 												"iso":	102400,
@@ -6014,10 +6108,10 @@
 													"hfBilateralFilter_coeff":	[0.2042, 0.1238, 0.0751]
 												},
 												"kernel_sigma":	{
-													"prefilter_sigma":	1.0,
-													"GaussianFilter_sigma":	2.0,
-													"GaussianFilter_radius":	2.0,
-													"hfBilateralFilter_sigma":	1.0
+													"prefilter_sigma":	1,
+													"GaussianFilter_sigma":	2,
+													"GaussianFilter_radius":	2,
+													"hfBilateralFilter_sigma":	1
 												}
 											}, {
 												"iso":	204800,
@@ -6041,10 +6135,10 @@
 													"hfBilateralFilter_coeff":	[0.2042, 0.1238, 0.0751]
 												},
 												"kernel_sigma":	{
-													"prefilter_sigma":	1.0,
-													"GaussianFilter_sigma":	2.0,
-													"GaussianFilter_radius":	2.0,
-													"hfBilateralFilter_sigma":	1.0
+													"prefilter_sigma":	1,
+													"GaussianFilter_sigma":	2,
+													"GaussianFilter_radius":	2,
+													"hfBilateralFilter_sigma":	1
 												}
 											}],
 										"Tuning_ISO_len":	13
@@ -6105,13 +6199,19 @@
 								},
 								"AecSpeed":	{
 									"SmoothEn":	1,
-									"DyDampEn":	1,
 									"DampOver":	0.15,
 									"DampUnder":	0.45,
 									"DampDark2Bright":	0.15,
-									"DampBright2Dark":	0.45
+									"DampBright2Dark":	0.45,
+									"DyDamp":	{
+										"DyDampEn":	1,
+										"SlowOPType":	"RK_AIQ_OP_MODE_AUTO",
+										"SlowRange":	10,
+										"SlowDamp":	0.95
+									}
 								},
-								"AecDelayFrmNum":	{
+								"AecDelay":	{
+									"DelayType":	"DELAY_TYPE_FRAME",
 									"BlackDelay":	2,
 									"WhiteDelay":	2
 								},
@@ -6154,7 +6254,7 @@
 								"ToleranceIn":	10,
 								"ToleranceOut":	15,
 								"Evbias":	0,
-								"StrategyMode":	"AECV2_STRATEGY_MODE_LOWLIGHT_PRIOR",
+								"StrategyMode":	"AECV2_STRATEGY_MODE_LOWLIGHT",
 								"InitExp":	{
 									"InitTimeValue":	0.003,
 									"InitGainValue":	1,
@@ -6217,7 +6317,7 @@
 								"ToleranceIn":	10,
 								"ToleranceOut":	15,
 								"Evbias":	0,
-								"StrategyMode":	"AECV2_STRATEGY_MODE_LOWLIGHT_PRIOR",
+								"StrategyMode":	"AECV2_STRATEGY_MODE_LOWLIGHT",
 								"LumaDistTh":	10,
 								"InitExp":	{
 									"InitTimeValue":	[0.0005, 0.003, 0.003],
@@ -6264,7 +6364,7 @@
 									}
 								},
 								"LongFrmMode":	{
-									"mode":	"AECV2_HDR_LONGFRMMODE_NORMAL",
+									"mode":	"AECV2_HDR_LONGFRMMODE_DISABLE",
 									"SfrmMinLine":	2,
 									"LfrmModeExpTh":	0.62
 								},
@@ -6385,7 +6485,7 @@
 							},
 							"autoPara":	{
 								"hdrPara":	{
-									"frameChooseMode":	"CALIB_AWB_HDR_FRAME_CHOOSE_MODE_AUTO",
+									"frameChooseMode":	"CALIB_AWB_HDR_FR_CH_AUTO",
 									"frameChoose":	1
 								},
 								"lscBypassEnable":	0,
@@ -6396,7 +6496,7 @@
 								"lsUsedForYuvDet_len":	7,
 								"blkStatisticsEnable":	1,
 								"downScaleMode":	"CALIB_AWB_DS_8X8",
-								"blkMeasureMode":	"CALIB_AWB_BLK_STAT_MODE_ALL_V201",
+								"blkMeasureMode":	"CALIB_AWB_BLK_STAT_MODE_AL_V201",
 								"mainWindow":	{
 									"mode":	"CALIB_AWB_WINDOW_CFG_AUTO",
 									"window":	[0, 0, 1, 1]
@@ -6516,7 +6616,13 @@
 										"dayGainLvThSet":	[1024, 8192],
 										"defaultDayGainLow":	[1.53373, 1, 1, 1.58341],
 										"defaultDayGainHigh":	[1.81003, 1, 1, 1.40293],
-										"xyType2Enable":	1
+										"xyType2Enable":	1,
+										"weight":	{
+											"lumaValue":	[0, 2, 4, 8, 32, 128, 1024, 8192, 65536, 262144],
+											"lumaValue_len":	10,
+											"weight":	[1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+											"weight_len":	10
+										}
 									}, {
 										"name":	"CWF",
 										"doorType":	"CALIB_AWB_DOOR_TYPE_INDOOR",
@@ -6539,7 +6645,13 @@
 										"dayGainLvThSet":	[1024, 8192],
 										"defaultDayGainLow":	[1.53373, 1, 1, 1.58341],
 										"defaultDayGainHigh":	[1.81003, 1, 1, 1.40293],
-										"xyType2Enable":	1
+										"xyType2Enable":	1,
+										"weight":	{
+											"lumaValue":	[0, 2, 4, 8, 32, 128, 1024, 8192, 65536, 262144],
+											"lumaValue_len":	10,
+											"weight":	[1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+											"weight_len":	10
+										}
 									}, {
 										"name":	"D50",
 										"doorType":	"CALIB_AWB_DOOR_TYPE_AMBIGUITY",
@@ -6562,7 +6674,13 @@
 										"dayGainLvThSet":	[1024, 8192],
 										"defaultDayGainLow":	[1.53373, 1, 1, 1.58341],
 										"defaultDayGainHigh":	[1.81003, 1, 1, 1.40293],
-										"xyType2Enable":	1
+										"xyType2Enable":	1,
+										"weight":	{
+											"lumaValue":	[0, 2, 4, 8, 32, 128, 1024, 8192, 65536, 262144],
+											"lumaValue_len":	10,
+											"weight":	[1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+											"weight_len":	10
+										}
 									}, {
 										"name":	"D65",
 										"doorType":	"CALIB_AWB_DOOR_TYPE_OUTDOOR",
@@ -6585,7 +6703,13 @@
 										"dayGainLvThSet":	[1024, 8192],
 										"defaultDayGainLow":	[1.53373, 1, 1, 1.58341],
 										"defaultDayGainHigh":	[1.81003, 1, 1, 1.40293],
-										"xyType2Enable":	1
+										"xyType2Enable":	1,
+										"weight":	{
+											"lumaValue":	[0, 2, 4, 8, 32, 128, 1024, 8192, 65536, 262144],
+											"lumaValue_len":	10,
+											"weight":	[1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+											"weight_len":	10
+										}
 									}, {
 										"name":	"D75",
 										"doorType":	"CALIB_AWB_DOOR_TYPE_OUTDOOR",
@@ -6608,7 +6732,13 @@
 										"dayGainLvThSet":	[1024, 8192],
 										"defaultDayGainLow":	[1.53373, 1, 1, 1.58341],
 										"defaultDayGainHigh":	[1.81003, 1, 1, 1.40293],
-										"xyType2Enable":	1
+										"xyType2Enable":	1,
+										"weight":	{
+											"lumaValue":	[0, 2, 4, 8, 32, 128, 1024, 8192, 65536, 262144],
+											"lumaValue_len":	10,
+											"weight":	[1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+											"weight_len":	10
+										}
 									}, {
 										"name":	"HZ",
 										"doorType":	"CALIB_AWB_DOOR_TYPE_INDOOR",
@@ -6631,7 +6761,13 @@
 										"dayGainLvThSet":	[1024, 8192],
 										"defaultDayGainLow":	[1.53373, 1, 1, 1.58341],
 										"defaultDayGainHigh":	[1.81003, 1, 1, 1.40293],
-										"xyType2Enable":	1
+										"xyType2Enable":	1,
+										"weight":	{
+											"lumaValue":	[0, 2, 4, 8, 32, 128, 1024, 8192, 65536, 262144],
+											"lumaValue_len":	10,
+											"weight":	[1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+											"weight_len":	10
+										}
 									}, {
 										"name":	"TL84",
 										"doorType":	"CALIB_AWB_DOOR_TYPE_INDOOR",
@@ -6654,12 +6790,31 @@
 										"dayGainLvThSet":	[1024, 8192],
 										"defaultDayGainLow":	[1.53373, 1, 1, 1.58341],
 										"defaultDayGainHigh":	[1.81003, 1, 1, 1.40293],
-										"xyType2Enable":	1
+										"xyType2Enable":	1,
+										"weight":	{
+											"lumaValue":	[0, 2, 4, 8, 32, 128, 1024, 8192, 65536, 262144],
+											"lumaValue_len":	10,
+											"weight":	[1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+											"weight_len":	10
+										}
 									}],
 								"lightSources_len":	7
 							},
 							"autoExtPara":	{
 								"lightSourceForFirstFrame":	"D50",
+								"smartRun":	{
+									"enable":	1,
+									"cfg":	{
+										"lumaValue":	[0],
+										"lumaValue_len":	1,
+										"lvVarTh":	[0.001],
+										"lvVarTh_len":	1,
+										"wbgainAlgDiffTh":	[0.005],
+										"wbgainAlgDiffTh_len":	1,
+										"wbgainHwDiffTh":	[0.05],
+										"wbgainHwDiffTh_len":	1
+									}
+								},
 								"tolerance":	{
 									"lumaValue":	[256, 512, 32768, 131072],
 									"lumaValue_len":	4,
@@ -6837,7 +6992,7 @@
 								}
 							}
 						},
-						"agamma_calib_V30":	{
+						"agamma_calib_v11":	{
 							"GammaTuningPara":	{
 								"Gamma_en":	1,
 								"Gamma_out_offset":	0,
@@ -7131,20 +7286,20 @@
 								"debayer_en":	1,
 								"debayer_filter1":	[2, -6, 0, 6, -2],
 								"debayer_filter2":	[2, -4, 4, -4, 2],
-								"debayer_auto":	{
-									"ISO":	[50, 100, 200, 400, 800, 1600, 3200, 6400, 12800, 25600, 51200, 102400, 204800],
-									"debayer_gain_offset":	[4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4],
-									"debayer_offset":	[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-									"debayer_clip_en":	[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-									"debayer_filter_g_en":	[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-									"debayer_filter_c_en":	[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-									"debayer_thed0":	[3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3],
-									"debayer_thed1":	[6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6],
-									"debayer_dist_scale":	[8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8],
-									"debayer_cnr_strength":	[5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5],
-									"debayer_shift_num":	[2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2],
-									"debayer_sharp_strength":	[4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4],
-									"debayer_hf_offset":	[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+								"debayer_gain_offset":	4,
+								"debayer_offset":	1,
+								"debayer_clip_en":	1,
+								"debayer_filter_g_en":	1,
+								"debayer_filter_c_en":	1,
+								"debayer_thed0":	3,
+								"debayer_thed1":	6,
+								"debayer_dist_scale":	8,
+								"debayer_cnr_strength":	5,
+								"debayer_shift_num":	2,
+								"array":	{
+									"ISO":	[50, 100, 200, 400, 800, 1600, 3200, 6400, 12800],
+									"sharp_strength":	[4, 4, 4, 4, 4, 4, 4, 4, 4],
+									"debayer_hf_offset":	[1, 1, 1, 1, 1, 1, 1, 1, 1]
 								}
 							}
 						},
@@ -7692,7 +7847,8 @@
 						},
 						"colorAsGrey":	{
 							"param":	{
-								"enable":	0
+								"enable":	0,
+								"skip_frame":	10
 							}
 						},
 						"aldch":	{
@@ -7708,6 +7864,7 @@
 						"ccm_calib":	{
 							"control":	{
 								"enable":	1,
+								"mode":	"CALIB_CCM_MODE_AUTO",
 								"wbgain_tolerance":	0,
 								"gain_tolerance":	0.2
 							},
@@ -7719,6 +7876,10 @@
 									"gain":	[1, 2, 4, 8, 16, 32, 64, 128, 256],
 									"scale":	[1, 1, 1, 1, 1, 1, 0.9, 0.8, 0.7]
 								}
+							},
+							"manualPara":	{
+								"ccMatrix":	[1, 0, 0, 0, 1, 0, 0, 0, 1],
+								"ccOffsets":	[0, 0, 0]
 							},
 							"TuningPara":	{
 								"damp_enable":	1,
@@ -7892,8 +8053,15 @@
 						"lut3d_calib":	{
 							"common":	{
 								"enable":	0,
-								"gain_tolerance":	0.1,
-								"wbgain_tolerance":	1
+								"mode":	"CALIB_Lut3D_MODE_AUTO",
+								"gain_tolerance":	0.1
+							},
+							"MLut3D":	{
+								"Table":	{
+									"look_up_table_r":	[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+									"look_up_table_g":	[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+									"look_up_table_b":	[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+								}
 							},
 							"ALut3D":	{
 								"damp_en":	1,
@@ -7913,136 +8081,92 @@
 								"lutAll_len":	1
 							}
 						},
-						"adehaze_calib_v30":	{
+						"adehaze_calib_v11":	{
 							"DehazeTuningPara":	{
 								"Enable":	1,
-								"CtrlDataType": "CTRLDATATYPE_ENVLV",
+								"CtrlDataType":	"CTRLDATATYPE_ENVLV",
 								"cfg_alpha":	0,
 								"ByPassThr":	0,
 								"dehaze_setting":	{
 									"en":	0,
 									"air_lc_en":	1,
 									"stab_fnum":	8,
-									"sigma":	6,
+									"sigma":	255,
 									"wt_sigma":	8,
 									"air_sigma":	120,
 									"tmax_sigma":	0.01,
-									"pre_wet":	0.01,
+									"pre_wet":	8,
 									"DehazeData":	{
-										"CtrlData":	[0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.7, 0.9, 1],
-										"CtrlData_len":	9,
-										"dc_min_th":	[64, 64, 64, 64, 64, 64, 64, 64, 64],
-										"dc_min_th_len":	9,
-										"dc_max_th":	[192, 192, 192, 192, 192, 192, 192, 192, 192],
-										"dc_max_th_len":	9,
-										"yhist_th":	[249, 249, 249, 249, 249, 249, 249, 249, 249],
-										"yhist_th_len":	9,
-										"yblk_th":	[0.002, 0.002, 0.002, 0.002, 0.002, 0.002, 0.002, 0.002, 0.002],
-										"yblk_th_len":	9,
-										"dark_th":	[250, 250, 250, 250, 250, 250, 250, 250, 250],
-										"dark_th_len":	9,
-										"bright_min":	[180, 180, 180, 180, 180, 180, 180, 180, 180],
-										"bright_min_len":	9,
-										"bright_max":	[240, 240, 240, 240, 240, 240, 240, 240, 240],
-										"bright_max_len":	9,
-										"wt_max":	[0.9, 0.9, 0.9, 0.9, 0.9, 0.9, 0.9, 0.9, 0.9],
-										"wt_max_len":	9,
-										"air_min":	[200, 200, 200, 200, 200, 200, 200, 200, 200],
-										"air_min_len":	9,
-										"air_max":	[250, 250, 250, 250, 250, 250, 250, 250, 250],
-										"air_max_len":	9,
-										"tmax_base":	[125, 125, 125, 125, 125, 125, 125, 125, 125],
-										"tmax_base_len":	9,
-										"tmax_off":	[0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1],
-										"tmax_off_len":	9,
-										"tmax_max":	[0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8],
-										"tmax_max_len":	9,
-										"cfg_wt":	[0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8],
-										"cfg_wt_len":	9,
-										"cfg_air":	[210, 210, 210, 210, 210, 210, 210, 210, 210],
-										"cfg_air_len":	9,
-										"cfg_tmax":	[0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2],
-										"cfg_tmax_len":	9,
-										"dc_weitcur":	[1, 1, 1, 1, 1, 1, 1, 1, 1],
-										"dc_weitcur_len":	9,
-										"bf_weight":	[0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5],
-										"bf_weight_len":	9,
-										"range_sigma":	[0.14, 0.14, 0.14, 0.14, 0.14, 0.14, 0.14, 0.14, 0.14],
-										"range_sigma_len":	9,
-										"space_sigma_pre":	[0.14, 0.14, 0.14, 0.14, 0.14, 0.14, 0.14, 0.14, 0.14],
-										"space_sigma_pre_len":	9,
-										"space_sigma_cur":	[0.14, 0.14, 0.14, 0.14, 0.14, 0.14, 0.14, 0.14, 0.14],
-										"space_sigma_cur_len":	9
+										"CtrlData":	[0, 0.005, 0.01, 0.05, 0.1, 0.15, 0.2, 0.3, 0.4, 0.5, 0.6, 0.8, 1],
+										"dc_min_th":	[64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64],
+										"dc_max_th":	[192, 192, 192, 192, 192, 192, 192, 192, 192, 192, 192, 192, 192],
+										"yhist_th":	[249, 249, 249, 249, 249, 249, 249, 249, 249, 249, 249, 249, 249],
+										"yblk_th":	[0.002, 0.002, 0.002, 0.002, 0.002, 0.002, 0.002, 0.002, 0.002, 0.002, 0.002, 0.002, 0.002],
+										"dark_th":	[250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250],
+										"bright_min":	[180, 180, 180, 180, 180, 180, 180, 180, 180, 180, 180, 180, 180],
+										"bright_max":	[240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240],
+										"wt_max":	[0.9, 0.9, 0.9, 0.9, 0.9, 0.9, 0.9, 0.9, 0.9, 0.9, 0.9, 0.9, 0.9],
+										"air_min":	[200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200],
+										"air_max":	[250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250],
+										"tmax_base":	[125, 125, 125, 125, 125, 125, 125, 125, 125, 125, 125, 125, 125],
+										"tmax_off":	[0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1],
+										"tmax_max":	[0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8],
+										"cfg_wt":	[0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8],
+										"cfg_air":	[210, 210, 210, 210, 210, 210, 210, 210, 210, 210, 210, 210, 210],
+										"cfg_tmax":	[0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2],
+										"dc_weitcur":	[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+										"bf_weight":	[0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5],
+										"range_sigma":	[0.14, 0.14, 0.14, 0.14, 0.14, 0.14, 0.14, 0.14, 0.14, 0.14, 0.14, 0.14, 0.14],
+										"space_sigma_pre":	[0.14, 0.14, 0.14, 0.14, 0.14, 0.14, 0.14, 0.14, 0.14, 0.14, 0.14, 0.14, 0.14],
+										"space_sigma_cur":	[0.14, 0.14, 0.14, 0.14, 0.14, 0.14, 0.14, 0.14, 0.14, 0.14, 0.14, 0.14, 0.14]
 									}
 								},
 								"enhance_setting":	{
 									"en":	1,
 									"enhance_curve":	[256, 256, 256, 256, 256, 320, 352, 544, 640, 736, 832, 928, 1023, 1023, 1023, 1023, 1023],
 									"EnhanceData":	{
-										"CtrlData":	[0, 0.002, 0.005, 0.01, 0.05, 0.1, 0.3, 0.5, 1],
-										"CtrlData_len":	9,
-										"enhance_value":	[1.4, 1.4, 1.3, 1.3, 1.3, 1.3, 1.3, 1.3, 1.3],
-										"enhance_value_len":	9,
-										"enhance_chroma":	[1, 1, 1, 1, 1, 1, 1, 1, 1],
-										"enhance_chroma_len":	9
+										"CtrlData":	[0, 0.002, 0.005, 0.01, 0.05, 0.15, 0.3, 0.5, 0.6, 0.7, 0.8, 0.9, 1],
+										"enhance_value":	[1.4, 1.4, 1.3, 1.3, 1.3, 1.3, 1.3, 1.3, 1.3, 1.3, 1.3, 1.3, 1.3],
+										"enhance_chroma":	[1.1, 1.1, 1.2, 1.2, 1.2, 1.2, 1.2, 1.2, 1.2, 1.2, 1.2, 1.2, 1.2]
 									}
 								},
 								"hist_setting":	{
 									"en":	0,
 									"hist_para_en":	1,
 									"HistData":	{
-										"CtrlData":	[0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.7, 0.9, 1],
-										"CtrlData_len":	9,
-										"hist_gratio":	[2, 2, 2, 2, 2, 2, 2, 2, 2],
-										"hist_gratio_len":	9,
-										"hist_th_off":	[64, 64, 64, 64, 64, 64, 64, 64, 64],
-										"hist_th_off_len":	9,
-										"hist_k":	[2, 2, 2, 2, 2, 2, 2, 2, 2],
-										"hist_k_len":	9,
-										"hist_min":	[0.015, 0.015, 0.015, 0.015, 0.015, 0.015, 0.015, 0.015, 0.015],
-										"hist_min_len":	9,
-										"hist_scale":	[0.09, 0.09, 0.09, 0.09, 0.09, 0.09, 0.09, 0.09, 0.09],
-										"hist_scale_len":	9,
-										"cfg_gratio":	[2, 2, 2, 2, 2, 2, 2, 2, 2],
-										"cfg_gratio_len":	9
+										"CtrlData":	[0, 0.005, 0.01, 0.05, 0.1, 0.15, 0.2, 0.3, 0.4, 0.5, 0.6, 0.8, 1],
+										"hist_gratio":	[2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2],
+										"hist_th_off":	[64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64],
+										"hist_k":	[2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2],
+										"hist_min":	[0.015, 0.015, 0.015, 0.015, 0.015, 0.015, 0.015, 0.015, 0.015, 0.015, 0.015, 0.015, 0.015],
+										"hist_scale":	[0.09, 0.09, 0.09, 0.09, 0.09, 0.09, 0.09, 0.09, 0.09, 0.09, 0.09, 0.09, 0.09],
+										"cfg_gratio":	[2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2]
 									}
 								}
 							}
 						},
-						"adrc_calib_V2":	{
+						"adrc_calib_v11":	{
 							"DrcTuningPara":	{
 								"Enable":	0,
-								"CtrlDataType": "CTRLDATATYPE_ENVLV",
+								"CtrlDataType":	"CTRLDATATYPE_ENVLV",
 								"DrcGain":	{
 									"CtrlData":	[0, 0.005, 0.01, 0.05, 0.1, 0.15, 0.2, 0.3, 0.4, 0.5, 0.6, 0.8, 1],
-									"CtrlData_len":	13,
 									"DrcGain":	[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-									"DrcGain_len":	13,
 									"Alpha":	[0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2],
-									"Alpha_len":	13,
-									"Clip":	[16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16],
-									"Clip_len":	13
+									"Clip":	[16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16]
 								},
 								"HiLight":	{
 									"CtrlData":	[0, 0.005, 0.01, 0.05, 0.1, 0.15, 0.2, 0.3, 0.4, 0.5, 0.6, 0.8, 1],
-									"CtrlData_len":	13,
-									"Strength":	[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-									"Strength_len":	13
+									"Strength":	[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 								},
 								"LocalSetting":	{
 									"LocalData":	{
 										"CtrlData":	[0, 0.005, 0.01, 0.05, 0.1, 0.15, 0.2, 0.3, 0.4, 0.5, 0.6, 0.8, 1],
-										"CtrlData_len":	13,
 										"LocalWeit":	[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-										"LocalWeit_len":	13,
 										"LocalAutoEnable":	[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-										"LocalAutoEnable_len":	13,
 										"LocalAutoWeit":	[0.037477, 0.037477, 0.037477, 0.037477, 0.037477, 0.037477, 0.037477, 0.037477, 0.037477, 0.037477, 0.037477, 0.037477, 0.037477],
-										"LocalAutoWeit_len":	13,
 										"GlobalContrast":	[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-										"GlobalContrast_len":	13,
-										"LoLitContrast":	[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-										"LoLitContrast_len":	13
+										"LoLitContrast":	[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 									},
 									"curPixWeit":	0.376471,
 									"preFrameWeit":	0.8,
@@ -8061,13 +8185,12 @@
 								"Edge_Weit":	0.02,
 								"OutPutLongFrame":	0,
 								"IIR_frame":	2,
-								"Tolerance":	0,
 								"damp":	0.9
 							}
 						},
-"af_v30":	{
+						"af_v30":	{
 							"TuningPara":	{
-								"af_mode":	"CalibDbV2_AF_MODE_CONTINUOUS_PICTURE",
+								"af_mode":	"CalibDbV2_AFMODE_CONT_PICTURE",
 								"win_h_offs":	0,
 								"win_v_offs":	0,
 								"win_h_size":	0,
@@ -8087,10 +8210,10 @@
 								},
 								"contrast_af":	{
 									"enable":	1,
-									"Afss":	"CalibDbV2_CAM_AFM_FSS_ADAPTIVE_RANGE",
-									"FullDir":	"CalibDbV2_CAM_AFM_ADAPTIVE_SEARCH",
+									"Afss":	"CalibDbV2_AFSS_ADAPTIVE_RANGE",
+									"FullDir":	"CalibDbV2_AF_ADAPTIVE_SEARCH",
 									"FullRangeTbl":	[0, 4, 64],
-									"AdaptiveDir":	"CalibDbV2_CAM_AFM_ADAPTIVE_SEARCH",
+									"AdaptiveDir":	"CalibDbV2_AF_ADAPTIVE_SEARCH",
 									"AdaptRangeTbl":	[0, 8, 16, 24, 32, 40, 48, 56, 64],
 									"AdaptRangeTbl_len":	9,
 									"FineSearchStep":	[4, 4, 4, 4, 4, 4, 4, 4, 4],
@@ -8100,9 +8223,9 @@
 									"TrigThers_len":	1,
 									"TrigThersFv":	[0],
 									"TrigThersFv_len":	1,
-									"LumaTrigThers":	1,
-									"ExpTrigThers":	1,
-									"ChangedFrames":	0,
+									"LumaTrigThers":	0.05,
+									"ExpTrigThers":	0.03,
+									"ChangedFrames":	10,
 									"StableThers":	0.02,
 									"StableFrames":	3,
 									"StableTime":	200,
@@ -8114,19 +8237,17 @@
 									"ValidValueThers":	0,
 									"OutFocusValue":	200,
 									"OutFocusPos":	64,
-									"LowLumaValue":	0,
-									"LowLumaPos":	64,
 									"WeightEnable":	0,
 									"Weight":	[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-									"SearchPauseLumaEnable":	0,
-									"SearchPauseLumaThers":	0,
-									"SearchLumaStableFrames":	0,
-									"SearchLumaStableThers":	0,
+									"SearchPauseLumaEnable":	1,
+									"SearchPauseLumaThers":	0.05,
+									"SearchLumaStableFrames":	3,
+									"SearchLumaStableThers":	0.02,
 									"Stage1QuickFoundThers":	0.04,
 									"Stage2QuickFoundThers":	0.2,
 									"FlatValue":	0,
-									"PointLightLumaTh":	3000,
-									"PointLightCntTh":	300,
+									"PointLightLumaTh":	912,
+									"PointLightCntTh":	20,
 									"ZoomCfg":	{
 										"QuickFoundThersZoomIdx":	[0],
 										"QuickFoundThersZoomIdx_len":	1,
@@ -8141,15 +8262,19 @@
 										"StopStep":	[0],
 										"StopStep_len":	1,
 										"SkipHighPassZoomIdx":	0,
-										"SkipHighPassGain":	0
+										"SkipHighPassGain":	0,
+										"SpotlightBlkCnt":	[0.2, 0.5, 0.25],
+										"SpotlightHighlightRatio":	0.014,
+										"SpotlightLumaRatio":	[0.3, 0.5, 0.8],
+										"SwitchDirZoomIdx":	0
 									}
 								},
 								"video_contrast_af":	{
 									"enable":	1,
-									"Afss":	"CalibDbV2_CAM_AFM_FSS_ADAPTIVE_RANGE",
-									"FullDir":	"CalibDbV2_CAM_AFM_ADAPTIVE_SEARCH",
+									"Afss":	"CalibDbV2_AFSS_ADAPTIVE_RANGE",
+									"FullDir":	"CalibDbV2_AF_ADAPTIVE_SEARCH",
 									"FullRangeTbl":	[0, 4, 64],
-									"AdaptiveDir":	"CalibDbV2_CAM_AFM_ADAPTIVE_SEARCH",
+									"AdaptiveDir":	"CalibDbV2_AF_ADAPTIVE_SEARCH",
 									"AdaptRangeTbl":	[0, 8, 16, 24, 32, 40, 48, 56, 64],
 									"AdaptRangeTbl_len":	9,
 									"FineSearchStep":	[4, 4, 4, 4, 4, 4, 4, 4, 4],
@@ -8159,9 +8284,9 @@
 									"TrigThers_len":	1,
 									"TrigThersFv":	[0],
 									"TrigThersFv_len":	1,
-									"LumaTrigThers":	1,
-									"ExpTrigThers":	1,
-									"ChangedFrames":	0,
+									"LumaTrigThers":	0.05,
+									"ExpTrigThers":	0.03,
+									"ChangedFrames":	10,
 									"StableThers":	0.02,
 									"StableFrames":	20,
 									"StableTime":	200,
@@ -8173,19 +8298,17 @@
 									"ValidValueThers":	0,
 									"OutFocusValue":	200,
 									"OutFocusPos":	64,
-									"LowLumaValue":	0,
-									"LowLumaPos":	64,
 									"WeightEnable":	0,
 									"Weight":	[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-									"SearchPauseLumaEnable":	0,
-									"SearchPauseLumaThers":	0,
-									"SearchLumaStableFrames":	0,
-									"SearchLumaStableThers":	0,
+									"SearchPauseLumaEnable":	1,
+									"SearchPauseLumaThers":	0.05,
+									"SearchLumaStableFrames":	3,
+									"SearchLumaStableThers":	0.02,
 									"Stage1QuickFoundThers":	0.04,
 									"Stage2QuickFoundThers":	0.2,
 									"FlatValue":	0,
-									"PointLightLumaTh":	3000,
-									"PointLightCntTh":	300,
+									"PointLightLumaTh":	912,
+									"PointLightCntTh":	20,
 									"ZoomCfg":	{
 										"QuickFoundThersZoomIdx":	[0],
 										"QuickFoundThersZoomIdx_len":	1,
@@ -8200,7 +8323,11 @@
 										"StopStep":	[0],
 										"StopStep_len":	1,
 										"SkipHighPassZoomIdx":	0,
-										"SkipHighPassGain":	0
+										"SkipHighPassGain":	0,
+										"SpotlightBlkCnt":	[0.2, 0.5, 0.25],
+										"SpotlightHighlightRatio":	0.014,
+										"SpotlightLumaRatio":	[0.3, 0.5, 0.8],
+										"SwitchDirZoomIdx":	0
 									}
 								},
 								"laser_af":	{
@@ -8218,6 +8345,7 @@
 									"pdSearchRadius":	3,
 									"pdMirrorInCalib":	1,
 									"pdVsImgoutMirror":	0,
+									"pdLRInDiffLine":	0,
 									"pdWidth":	508,
 									"pdHeight":	760,
 									"pdVerBinning":	0,
@@ -8233,7 +8361,7 @@
 									"pdDiscardRegionEn":	0,
 									"pdLessTextureRatio":	0.25,
 									"pdTargetOffset":	0,
-									"pdCalibInf": {
+									"pdCalibInf":	{
 										"pdGainMapW":	32,
 										"pdGainMapH":	32,
 										"pdDccMapW":	64,
@@ -8242,17 +8370,15 @@
 									"pdConfdMwinFactor":	3,
 									"pdCenterMinFv":	0,
 									"pdCenterMinRatio":	0,
-									"pdHighlightRatio":	0.2,
-									"pdStepRatio":	[1.0, 1.0, 1.0, 0.9, 0.8, 0.7, 0.7],
+									"pdHighlightRatio":	0.5,
+									"pdStepRatio":	[1, 1, 1, 0.9, 0.8, 0.7, 0.7],
 									"pdStepDefocus":	[32, 64, 96, 128, 160, 192, 224],
-									"pdIsoPara":
-									[
-										{
-											"iso": 6400,
+									"pdIsoPara":	[{
+											"iso":	6400,
 											"pdConfdRatio0":	1,
 											"pdConfdRatio1":	1,
 											"pdConfdRatio2":	1,
-											"pdConfdRatio3":	1,
+											"pdConfdRatio3":	0,
 											"pdConfdThresh":	0.4,
 											"convergedInfPdThresh":	12,
 											"convergedMacPdThresh":	12,
@@ -8262,25 +8388,24 @@
 											"stablePdOffset":	8,
 											"stableCntRatio":	1.5,
 											"noconfCntThresh":	4,
-											"roiBlkCntW":		3,
-											"roiBlkCntH":		3,
+											"roiBlkCntW":	3,
+											"roiBlkCntH":	3,
 											"fineSearchTbl":	[{
-												"confidence":	0.5,
-												"range":	0,
-												"stepPos":	1
-											}, {
-												"confidence":	0,
-												"range":	4,
-												"stepPos":	1
-											}],
+													"confidence":	0.5,
+													"range":	0,
+													"stepPos":	1
+												}, {
+													"confidence":	0,
+													"range":	4,
+													"stepPos":	1
+												}],
 											"fineSearchTbl_len":	2
-										},
-										{
-											"iso": 204800,
+										}, {
+											"iso":	204800,
 											"pdConfdRatio0":	1,
 											"pdConfdRatio1":	1,
 											"pdConfdRatio2":	1,
-											"pdConfdRatio3":	1,
+											"pdConfdRatio3":	0,
 											"pdConfdThresh":	0.4,
 											"convergedInfPdThresh":	12,
 											"convergedMacPdThresh":	12,
@@ -8290,20 +8415,19 @@
 											"stablePdOffset":	8,
 											"stableCntRatio":	1.5,
 											"noconfCntThresh":	4,
-											"roiBlkCntW":		1,
-											"roiBlkCntH":		1,
+											"roiBlkCntW":	1,
+											"roiBlkCntH":	1,
 											"fineSearchTbl":	[{
-												"confidence":	0.5,
-												"range":	8,
-												"stepPos":	2
-											}, {
-												"confidence":	0,
-												"range":	16,
-												"stepPos":	4
-											}],
+													"confidence":	0.5,
+													"range":	8,
+													"stepPos":	2
+												}, {
+													"confidence":	0,
+													"range":	16,
+													"stepPos":	4
+												}],
 											"fineSearchTbl_len":	2
-										}
-									],
+										}],
 									"pdIsoPara_len":	2
 								},
 								"vcmcfg":	{
@@ -8311,12 +8435,13 @@
 									"start_current":	-1,
 									"rated_current":	-1,
 									"step_mode":	-1,
-									"extra_delay":	0,
-									"posture_diff":	0.1
+									"extra_delay":	-20,
+									"posture_diff":	0.2
 								},
 								"zoomfocus_tbl":	{
 									"widemod_deviate":	10,
 									"telemod_deviate":	10,
+									"focus_backval":	0,
 									"zoom_move_dot":	[0],
 									"zoom_move_dot_len":	1,
 									"zoom_move_step":	[16],
@@ -8342,84 +8467,93 @@
 									"FocusSearchPlusRange":	[0],
 									"FocusSearchPlusRange_len":	1,
 									"FocusStage1Step":	1,
+									"QuickFndRate":	0.3,
+									"QuickFndMinFv":	200,
 									"searchZoomRange":	100,
 									"searchFocusRange":	100,
 									"searchEmax":	100,
 									"searchEavg":	100,
 									"IsZoomFocusRec":	0,
-									"ZoomFocusRecDir":	"/userdata",
+									"ZoomInfoDir":	"/userdata",
 									"ZoomInitIndex":	1
 								},
 								"zoom_meas":	[{
 										"zoom_idx":	0,
 										"measiso":	[{
 												"iso":	50,
-												"idx":	0,
-												"spotlt_scene_idx":	0
+												"idx":	1,
+												"spotlt_scene_idx":	1
 											}, {
 												"iso":	100,
-												"idx":	0,
-												"spotlt_scene_idx":	0
+												"idx":	1,
+												"spotlt_scene_idx":	1
 											}, {
 												"iso":	200,
-												"idx":	0,
-												"spotlt_scene_idx":	0
+												"idx":	1,
+												"spotlt_scene_idx":	1
 											}, {
 												"iso":	400,
-												"idx":	0,
-												"spotlt_scene_idx":	0
+												"idx":	1,
+												"spotlt_scene_idx":	1
 											}, {
 												"iso":	800,
-												"idx":	0,
-												"spotlt_scene_idx":	0
+												"idx":	1,
+												"spotlt_scene_idx":	1
 											}, {
 												"iso":	1600,
-												"idx":	1,
+												"idx":	2,
 												"spotlt_scene_idx":	1
 											}, {
 												"iso":	3200,
-												"idx":	1,
+												"idx":	2,
 												"spotlt_scene_idx":	1
 											}, {
 												"iso":	6400,
-												"idx":	1,
+												"idx":	2,
 												"spotlt_scene_idx":	1
 											}, {
 												"iso":	12800,
-												"idx":	1,
+												"idx":	2,
 												"spotlt_scene_idx":	1
 											}, {
 												"iso":	25600,
-												"idx":	1,
+												"idx":	2,
 												"spotlt_scene_idx":	1
 											}, {
 												"iso":	51200,
-												"idx":	1,
+												"idx":	2,
 												"spotlt_scene_idx":	1
 											}, {
 												"iso":	102400,
-												"idx":	1,
+												"idx":	2,
 												"spotlt_scene_idx":	1
 											}, {
 												"iso":	204800,
-												"idx":	1,
+												"idx":	2,
 												"spotlt_scene_idx":	1
-											}]
+											}],
+										"measiso_len":	13
 									}],
 								"zoom_meas_len":	1,
 								"meascfg_tbl":	[{
 										"tbl_idx":	0,
 										"afmThres":	4,
 										"gammaY":	[0, 45, 108, 179, 245, 344, 409, 459, 500, 567, 622, 676, 759, 833, 896, 962, 1023],
+										"v1fv_reliable":	0.2,
+										"v2fv_reliable":	0.2,
 										"v1_fir_sel":	1,
-										"v1_iir_coe":	[0, 503, 0, 0, 8, 0, 0, 9, 0],
-										"v1_fir_coe":	[-1997, 0, 1997],
-										"v2_iir_coe":	[476, 33, 34],
-										"v2_fir_coe":	[-985, 0, 985],
+										"v1_band":	[0.042, 0.14],
+										"v1_iir_coe":	[0, 483, 0, 0, 28, 0, 0, 28, 0],
+										"v1_fir_coe":	[-1186, 0, 1186],
+										"v2_band":	[0.042, 0.14],
+										"v2_iir_coe":	[483, 28, 28],
+										"v2_fir_coe":	[-1186, 0, 1186],
+										"h1_band":	[0.042, 0.14],
 										"h1_iir1_coe":	[512, 557, -276, 460, 0, -460],
-										"h1_iir2_coe":	[512, 870, -399, 37, 0, -37],
+										"h1_iir2_coe":	[100, 870, -399, 191, 0, -191],
+										"h2_band":	[0.042, 0.14],
 										"h2_iir1_coe":	[512, 557, -276, 460, 0, -460],
-										"h2_iir2_coe":	[512, 870, -399, 37, 0, -37],
+										"h2_iir2_coe":	[100, 870, -399, 191, 0, -191],
 										"ldg_en":	0,
 										"ve_ldg_lumth_l":	64,
 										"ve_ldg_gain_l":	28,
@@ -8435,22 +8569,28 @@
 										"ho_ldg_gslp_h":	1400,
 										"v_fv_thresh":	4,
 										"h_fv_thresh":	4,
-										"highlit_thresh":	912
-									},
-									{
+										"highlit_thresh":	912,
+										"v_fv_ratio":	0.5
+									}, {
 										"tbl_idx":	1,
 										"afmThres":	4,
 										"gammaY":	[0, 45, 108, 179, 245, 344, 409, 459, 500, 567, 622, 676, 759, 833, 896, 962, 1023],
+										"v1fv_reliable":	0.2,
+										"v2fv_reliable":	0.2,
 										"v1_fir_sel":	1,
-										"v1_iir_coe":	[0, 503, 0, 0, 8, 0, 0, 9, 0],
-										"v1_fir_coe":	[-1997, 0, 1997],
-										"v2_iir_coe":	[476, 33, 34],
-										"v2_fir_coe":	[-985, 0, 985],
-										"h1_iir1_coe":	[512, 811, -375, 266, 0, -266],
-										"h1_iir2_coe":	[250, 945, -448, 41, 0, -41],
-										"h2_iir1_coe":	[512, 557, -276, 460, 0, -460],
-										"h2_iir2_coe":	[512, 870, -399, 37, 0, -37],
-										"ldg_en":	0,
+										"v1_band":	[0.06, 0.15],
+										"v1_iir_coe":	[0, 473, 0, 0, 37, 0, 0, 37, 0],
+										"v1_fir_coe":	[-896, 0, 896],
+										"v2_band":	[0.06, 0.15],
+										"v2_iir_coe":	[473, 37, 37],
+										"v2_fir_coe":	[-896, 0, 896],
+										"h1_band":	[0.06, 0.15],
+										"h1_iir1_coe":	[512, 538, -305, 404, 0, -404],
+										"h1_iir2_coe":	[133, 821, -388, 141, 0, -141],
+										"h2_band":	[0.06, 0.15],
+										"h2_iir1_coe":	[512, 538, -305, 404, 0, -404],
+										"h2_iir2_coe":	[133, 821, -388, 141, 0, -141],
+										"ldg_en":	1,
 										"ve_ldg_lumth_l":	64,
 										"ve_ldg_gain_l":	28,
 										"ve_ldg_gslp_l":	1286,
@@ -8465,70 +8605,84 @@
 										"ho_ldg_gslp_h":	1400,
 										"v_fv_thresh":	4,
 										"h_fv_thresh":	4,
-										"highlit_thresh":	912
+										"highlit_thresh":	912,
+										"v_fv_ratio":	0.5
+									}, {
+										"tbl_idx":	2,
+										"afmThres":	4,
+										"gammaY":	[0, 45, 108, 179, 245, 344, 409, 459, 500, 567, 622, 676, 759, 833, 896, 962, 1023],
+										"v1fv_reliable":	0.2,
+										"v2fv_reliable":	0.2,
+										"v1_fir_sel":	1,
+										"v1_band":	[0.01, 0.04],
+										"v1_iir_coe":	[0, 503, 0, 0, 8, 0, 0, 9, 0],
+										"v1_fir_coe":	[-1997, 0, 1997],
+										"v2_band":	[0.01, 0.04],
+										"v2_iir_coe":	[503, 8, 9],
+										"v2_fir_coe":	[-1997, 0, 1997],
+										"h1_band":	[0.01, 0.04],
+										"h1_iir1_coe":	[71, 908, -419, 511, 0, -511],
+										"h1_iir2_coe":	[19, 989, -480, 779, 0, -779],
+										"h2_band":	[0.01, 0.04],
+										"h2_iir1_coe":	[71, 908, -419, 511, 0, -511],
+										"h2_iir2_coe":	[19, 989, -480, 779, 0, -779],
+										"ldg_en":	1,
+										"ve_ldg_lumth_l":	64,
+										"ve_ldg_gain_l":	28,
+										"ve_ldg_gslp_l":	1286,
+										"ve_ldg_lumth_h":	185,
+										"ve_ldg_gain_h":	8,
+										"ve_ldg_gslp_h":	1400,
+										"ho_ldg_lumth_l":	64,
+										"ho_ldg_gain_l":	28,
+										"ho_ldg_gslp_l":	1286,
+										"ho_ldg_lumth_h":	185,
+										"ho_ldg_gain_h":	8,
+										"ho_ldg_gslp_h":	1400,
+										"v_fv_thresh":	4,
+										"h_fv_thresh":	4,
+										"highlit_thresh":	912,
+										"v_fv_ratio":	0.5
 									}],
-								"meascfg_tbl_len":	2
+								"meascfg_tbl_len":	3
 							}
 						},
-						"amerge_calib_V2":
-						{
-							"MergeTuningPara":
-							{
-								"BaseFrm": "BASEFRAME_LONG",
-								"CtrlDataType": "CTRLDATATYPE_ENVLV",
-								"ByPassThr": 0,
-								"LongFrmModeData":
-								{
-									"OECurve":
-									{
+						"amerge_calib_v11":	{
+							"MergeTuningPara":	{
+								"BaseFrm":	"BASEFRAME_LONG",
+								"CtrlDataType":	"CTRLDATATYPE_ENVLV",
+								"ByPassThr":	0,
+								"LongFrmModeData":	{
+									"OECurve":	{
 										"CtrlData":	[0, 0.002, 0.005, 0.01, 0.05, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.8, 1],
-										"CtrlData_len": 13,
 										"Smooth":	[0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4],
-										"Smooth_len": 13,
-										"Offset":	[280, 240, 240, 240, 240, 240, 240, 230, 230, 230, 230, 230, 230],
-										"Offset_len": 13
+										"Offset":	[280, 240, 240, 240, 240, 240, 240, 230, 230, 230, 230, 230, 230]
 									},
-									"MDCurve":
-									{
+									"MDCurve":	{
 										"MoveCoef":	[0, 0.005, 0.01, 0.05, 0.1, 0.15, 0.2, 0.3, 0.4, 0.5, 0.6, 0.8, 1],
-										"MoveCoef_len": 13,
 										"LM_smooth":	[0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4],
-										"LM_smooth_len": 13,
 										"LM_offset":	[0.38, 0.38, 0.38, 0.38, 0.38, 0.38, 0.38, 0.38, 0.38, 0.38, 0.38, 0.38, 0.38],
-										"LM_offset_len": 13,
 										"MS_smooth":	[0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4],
-										"MS_smooth_len": 13,
-										"MS_offset":	[0.38, 0.38, 0.38, 0.38, 0.38, 0.38, 0.38, 0.38, 0.38, 0.38, 0.38, 0.38, 0.38],
-										"MS_offset_len": 13
+										"MS_offset":	[0.38, 0.38, 0.38, 0.38, 0.38, 0.38, 0.38, 0.38, 0.38, 0.38, 0.38, 0.38, 0.38]
 									},
-									"OECurve_damp": 0.3,
-									"MDCurveLM_damp": 0.3,
-									"MDCurveMS_damp": 0.3
+									"OECurve_damp":	0.3,
+									"MDCurveLM_damp":	0.3,
+									"MDCurveMS_damp":	0.3
 								},
-								"ShortFrmModeData":
-								{
-									"OECurve":
-									{
+								"ShortFrmModeData":	{
+									"OECurve":	{
 										"CtrlData":	[0, 0.002, 0.005, 0.01, 0.05, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.8, 1],
-										"CtrlData_len": 13,
 										"Smooth":	[0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4],
-										"Smooth_len": 13,
-										"Offset":	[280, 240, 240, 240, 240, 240, 240, 230, 230, 230, 230, 230, 230],
-										"Offset_len": 13
+										"Offset":	[280, 240, 240, 240, 240, 240, 240, 230, 230, 230, 230, 230, 230]
 									},
-									"MDCurve":
-									{
+									"MDCurve":	{
 										"MoveCoef":	[0, 0.005, 0.01, 0.05, 0.1, 0.15, 0.2, 0.3, 0.4, 0.5, 0.6, 0.8, 1],
-										"MoveCoef_len": 13,
 										"Coef":	[0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05],
-										"Coef_len": 13,
-										"ms_thd0":	[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
-										"ms_thd0_len": 13,
-										"lm_thd0":	[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
-										"lm_thd0_len": 13
+										"ms_thd0":	[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+										"lm_thd0":	[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 									},
-									"OECurve_damp": 0.3,
-									"MDCurve_damp": 0.3
+									"OECurve_damp":	0.3,
+									"MDCurve_damp":	0.3
 								}
 							}
 						},
@@ -11323,7 +11477,7 @@
 							"Version":	"V4",
 							"TuningPara":	{
 								"enable":	1,
-								"kernel_sigma_enable": 0,
+								"kernel_sigma_enable":	0,
 								"Setting":	[{
 										"SNR_Mode":	"LSNR",
 										"Sensor_Mode":	"lcg",
@@ -11349,10 +11503,10 @@
 													"hfBilateralFilter_coeff":	[0.2042, 0.1238, 0.0751]
 												},
 												"kernel_sigma":	{
-													"prefilter_sigma":	1.0,
-													"GaussianFilter_sigma":	2.0,
-													"GaussianFilter_radius":	2.0,
-													"hfBilateralFilter_sigma":	1.0
+													"prefilter_sigma":	1,
+													"GaussianFilter_sigma":	2,
+													"GaussianFilter_radius":	2,
+													"hfBilateralFilter_sigma":	1
 												}
 											}, {
 												"iso":	100,
@@ -11376,10 +11530,10 @@
 													"hfBilateralFilter_coeff":	[0.2042, 0.1238, 0.0751]
 												},
 												"kernel_sigma":	{
-													"prefilter_sigma":	1.0,
-													"GaussianFilter_sigma":	2.0,
-													"GaussianFilter_radius":	2.0,
-													"hfBilateralFilter_sigma":	1.0
+													"prefilter_sigma":	1,
+													"GaussianFilter_sigma":	2,
+													"GaussianFilter_radius":	2,
+													"hfBilateralFilter_sigma":	1
 												}
 											}, {
 												"iso":	200,
@@ -11403,10 +11557,10 @@
 													"hfBilateralFilter_coeff":	[0.2042, 0.1238, 0.0751]
 												},
 												"kernel_sigma":	{
-													"prefilter_sigma":	1.0,
-													"GaussianFilter_sigma":	2.0,
-													"GaussianFilter_radius":	2.0,
-													"hfBilateralFilter_sigma":	1.0
+													"prefilter_sigma":	1,
+													"GaussianFilter_sigma":	2,
+													"GaussianFilter_radius":	2,
+													"hfBilateralFilter_sigma":	1
 												}
 											}, {
 												"iso":	400,
@@ -11430,10 +11584,10 @@
 													"hfBilateralFilter_coeff":	[0.2042, 0.1238, 0.0751]
 												},
 												"kernel_sigma":	{
-													"prefilter_sigma":	1.0,
-													"GaussianFilter_sigma":	2.0,
-													"GaussianFilter_radius":	2.0,
-													"hfBilateralFilter_sigma":	1.0
+													"prefilter_sigma":	1,
+													"GaussianFilter_sigma":	2,
+													"GaussianFilter_radius":	2,
+													"hfBilateralFilter_sigma":	1
 												}
 											}, {
 												"iso":	800,
@@ -11457,10 +11611,10 @@
 													"hfBilateralFilter_coeff":	[0.2042, 0.1238, 0.0751]
 												},
 												"kernel_sigma":	{
-													"prefilter_sigma":	1.0,
-													"GaussianFilter_sigma":	2.0,
-													"GaussianFilter_radius":	2.0,
-													"hfBilateralFilter_sigma":	1.0
+													"prefilter_sigma":	1,
+													"GaussianFilter_sigma":	2,
+													"GaussianFilter_radius":	2,
+													"hfBilateralFilter_sigma":	1
 												}
 											}, {
 												"iso":	1600,
@@ -11484,10 +11638,10 @@
 													"hfBilateralFilter_coeff":	[0.2042, 0.1238, 0.0751]
 												},
 												"kernel_sigma":	{
-													"prefilter_sigma":	1.0,
-													"GaussianFilter_sigma":	2.0,
-													"GaussianFilter_radius":	2.0,
-													"hfBilateralFilter_sigma":	1.0
+													"prefilter_sigma":	1,
+													"GaussianFilter_sigma":	2,
+													"GaussianFilter_radius":	2,
+													"hfBilateralFilter_sigma":	1
 												}
 											}, {
 												"iso":	3200,
@@ -11511,10 +11665,10 @@
 													"hfBilateralFilter_coeff":	[0.2042, 0.1238, 0.0751]
 												},
 												"kernel_sigma":	{
-													"prefilter_sigma":	1.0,
-													"GaussianFilter_sigma":	2.0,
-													"GaussianFilter_radius":	2.0,
-													"hfBilateralFilter_sigma":	1.0
+													"prefilter_sigma":	1,
+													"GaussianFilter_sigma":	2,
+													"GaussianFilter_radius":	2,
+													"hfBilateralFilter_sigma":	1
 												}
 											}, {
 												"iso":	6400,
@@ -11538,10 +11692,10 @@
 													"hfBilateralFilter_coeff":	[0.2042, 0.1238, 0.0751]
 												},
 												"kernel_sigma":	{
-													"prefilter_sigma":	1.0,
-													"GaussianFilter_sigma":	2.0,
-													"GaussianFilter_radius":	2.0,
-													"hfBilateralFilter_sigma":	1.0
+													"prefilter_sigma":	1,
+													"GaussianFilter_sigma":	2,
+													"GaussianFilter_radius":	2,
+													"hfBilateralFilter_sigma":	1
 												}
 											}, {
 												"iso":	12800,
@@ -11565,10 +11719,10 @@
 													"hfBilateralFilter_coeff":	[0.2042, 0.1238, 0.0751]
 												},
 												"kernel_sigma":	{
-													"prefilter_sigma":	1.0,
-													"GaussianFilter_sigma":	2.0,
-													"GaussianFilter_radius":	2.0,
-													"hfBilateralFilter_sigma":	1.0
+													"prefilter_sigma":	1,
+													"GaussianFilter_sigma":	2,
+													"GaussianFilter_radius":	2,
+													"hfBilateralFilter_sigma":	1
 												}
 											}, {
 												"iso":	25600,
@@ -11592,10 +11746,10 @@
 													"hfBilateralFilter_coeff":	[0.2042, 0.1238, 0.0751]
 												},
 												"kernel_sigma":	{
-													"prefilter_sigma":	1.0,
-													"GaussianFilter_sigma":	2.0,
-													"GaussianFilter_radius":	2.0,
-													"hfBilateralFilter_sigma":	1.0
+													"prefilter_sigma":	1,
+													"GaussianFilter_sigma":	2,
+													"GaussianFilter_radius":	2,
+													"hfBilateralFilter_sigma":	1
 												}
 											}, {
 												"iso":	51200,
@@ -11619,10 +11773,10 @@
 													"hfBilateralFilter_coeff":	[0.2042, 0.1238, 0.0751]
 												},
 												"kernel_sigma":	{
-													"prefilter_sigma":	1.0,
-													"GaussianFilter_sigma":	2.0,
-													"GaussianFilter_radius":	2.0,
-													"hfBilateralFilter_sigma":	1.0
+													"prefilter_sigma":	1,
+													"GaussianFilter_sigma":	2,
+													"GaussianFilter_radius":	2,
+													"hfBilateralFilter_sigma":	1
 												}
 											}, {
 												"iso":	102400,
@@ -11646,10 +11800,10 @@
 													"hfBilateralFilter_coeff":	[0.2042, 0.1238, 0.0751]
 												},
 												"kernel_sigma":	{
-													"prefilter_sigma":	1.0,
-													"GaussianFilter_sigma":	2.0,
-													"GaussianFilter_radius":	2.0,
-													"hfBilateralFilter_sigma":	1.0
+													"prefilter_sigma":	1,
+													"GaussianFilter_sigma":	2,
+													"GaussianFilter_radius":	2,
+													"hfBilateralFilter_sigma":	1
 												}
 											}, {
 												"iso":	204800,
@@ -11673,10 +11827,10 @@
 													"hfBilateralFilter_coeff":	[0.2042, 0.1238, 0.0751]
 												},
 												"kernel_sigma":	{
-													"prefilter_sigma":	1.0,
-													"GaussianFilter_sigma":	2.0,
-													"GaussianFilter_radius":	2.0,
-													"hfBilateralFilter_sigma":	1.0
+													"prefilter_sigma":	1,
+													"GaussianFilter_sigma":	2,
+													"GaussianFilter_radius":	2,
+													"hfBilateralFilter_sigma":	1
 												}
 											}],
 										"Tuning_ISO_len":	13
@@ -11705,10 +11859,10 @@
 													"hfBilateralFilter_coeff":	[0.2042, 0.1238, 0.0751]
 												},
 												"kernel_sigma":	{
-													"prefilter_sigma":	1.0,
-													"GaussianFilter_sigma":	2.0,
-													"GaussianFilter_radius":	2.0,
-													"hfBilateralFilter_sigma":	1.0
+													"prefilter_sigma":	1,
+													"GaussianFilter_sigma":	2,
+													"GaussianFilter_radius":	2,
+													"hfBilateralFilter_sigma":	1
 												}
 											}, {
 												"iso":	100,
@@ -11732,10 +11886,10 @@
 													"hfBilateralFilter_coeff":	[0.2042, 0.1238, 0.0751]
 												},
 												"kernel_sigma":	{
-													"prefilter_sigma":	1.0,
-													"GaussianFilter_sigma":	2.0,
-													"GaussianFilter_radius":	2.0,
-													"hfBilateralFilter_sigma":	1.0
+													"prefilter_sigma":	1,
+													"GaussianFilter_sigma":	2,
+													"GaussianFilter_radius":	2,
+													"hfBilateralFilter_sigma":	1
 												}
 											}, {
 												"iso":	200,
@@ -11759,10 +11913,10 @@
 													"hfBilateralFilter_coeff":	[0.2042, 0.1238, 0.0751]
 												},
 												"kernel_sigma":	{
-													"prefilter_sigma":	1.0,
-													"GaussianFilter_sigma":	2.0,
-													"GaussianFilter_radius":	2.0,
-													"hfBilateralFilter_sigma":	1.0
+													"prefilter_sigma":	1,
+													"GaussianFilter_sigma":	2,
+													"GaussianFilter_radius":	2,
+													"hfBilateralFilter_sigma":	1
 												}
 											}, {
 												"iso":	400,
@@ -11786,10 +11940,10 @@
 													"hfBilateralFilter_coeff":	[0.2042, 0.1238, 0.0751]
 												},
 												"kernel_sigma":	{
-													"prefilter_sigma":	1.0,
-													"GaussianFilter_sigma":	2.0,
-													"GaussianFilter_radius":	2.0,
-													"hfBilateralFilter_sigma":	1.0
+													"prefilter_sigma":	1,
+													"GaussianFilter_sigma":	2,
+													"GaussianFilter_radius":	2,
+													"hfBilateralFilter_sigma":	1
 												}
 											}, {
 												"iso":	800,
@@ -11813,10 +11967,10 @@
 													"hfBilateralFilter_coeff":	[0.2042, 0.1238, 0.0751]
 												},
 												"kernel_sigma":	{
-													"prefilter_sigma":	1.0,
-													"GaussianFilter_sigma":	2.0,
-													"GaussianFilter_radius":	2.0,
-													"hfBilateralFilter_sigma":	1.0
+													"prefilter_sigma":	1,
+													"GaussianFilter_sigma":	2,
+													"GaussianFilter_radius":	2,
+													"hfBilateralFilter_sigma":	1
 												}
 											}, {
 												"iso":	1600,
@@ -11840,10 +11994,10 @@
 													"hfBilateralFilter_coeff":	[0.2042, 0.1238, 0.0751]
 												},
 												"kernel_sigma":	{
-													"prefilter_sigma":	1.0,
-													"GaussianFilter_sigma":	2.0,
-													"GaussianFilter_radius":	2.0,
-													"hfBilateralFilter_sigma":	1.0
+													"prefilter_sigma":	1,
+													"GaussianFilter_sigma":	2,
+													"GaussianFilter_radius":	2,
+													"hfBilateralFilter_sigma":	1
 												}
 											}, {
 												"iso":	3200,
@@ -11867,10 +12021,10 @@
 													"hfBilateralFilter_coeff":	[0.2042, 0.1238, 0.0751]
 												},
 												"kernel_sigma":	{
-													"prefilter_sigma":	1.0,
-													"GaussianFilter_sigma":	2.0,
-													"GaussianFilter_radius":	2.0,
-													"hfBilateralFilter_sigma":	1.0
+													"prefilter_sigma":	1,
+													"GaussianFilter_sigma":	2,
+													"GaussianFilter_radius":	2,
+													"hfBilateralFilter_sigma":	1
 												}
 											}, {
 												"iso":	6400,
@@ -11894,10 +12048,10 @@
 													"hfBilateralFilter_coeff":	[0.2042, 0.1238, 0.0751]
 												},
 												"kernel_sigma":	{
-													"prefilter_sigma":	1.0,
-													"GaussianFilter_sigma":	2.0,
-													"GaussianFilter_radius":	2.0,
-													"hfBilateralFilter_sigma":	1.0
+													"prefilter_sigma":	1,
+													"GaussianFilter_sigma":	2,
+													"GaussianFilter_radius":	2,
+													"hfBilateralFilter_sigma":	1
 												}
 											}, {
 												"iso":	12800,
@@ -11921,10 +12075,10 @@
 													"hfBilateralFilter_coeff":	[0.2042, 0.1238, 0.0751]
 												},
 												"kernel_sigma":	{
-													"prefilter_sigma":	1.0,
-													"GaussianFilter_sigma":	2.0,
-													"GaussianFilter_radius":	2.0,
-													"hfBilateralFilter_sigma":	1.0
+													"prefilter_sigma":	1,
+													"GaussianFilter_sigma":	2,
+													"GaussianFilter_radius":	2,
+													"hfBilateralFilter_sigma":	1
 												}
 											}, {
 												"iso":	25600,
@@ -11948,10 +12102,10 @@
 													"hfBilateralFilter_coeff":	[0.2042, 0.1238, 0.0751]
 												},
 												"kernel_sigma":	{
-													"prefilter_sigma":	1.0,
-													"GaussianFilter_sigma":	2.0,
-													"GaussianFilter_radius":	2.0,
-													"hfBilateralFilter_sigma":	1.0
+													"prefilter_sigma":	1,
+													"GaussianFilter_sigma":	2,
+													"GaussianFilter_radius":	2,
+													"hfBilateralFilter_sigma":	1
 												}
 											}, {
 												"iso":	51200,
@@ -11975,10 +12129,10 @@
 													"hfBilateralFilter_coeff":	[0.2042, 0.1238, 0.0751]
 												},
 												"kernel_sigma":	{
-													"prefilter_sigma":	1.0,
-													"GaussianFilter_sigma":	2.0,
-													"GaussianFilter_radius":	2.0,
-													"hfBilateralFilter_sigma":	1.0
+													"prefilter_sigma":	1,
+													"GaussianFilter_sigma":	2,
+													"GaussianFilter_radius":	2,
+													"hfBilateralFilter_sigma":	1
 												}
 											}, {
 												"iso":	102400,
@@ -12002,10 +12156,10 @@
 													"hfBilateralFilter_coeff":	[0.2042, 0.1238, 0.0751]
 												},
 												"kernel_sigma":	{
-													"prefilter_sigma":	1.0,
-													"GaussianFilter_sigma":	2.0,
-													"GaussianFilter_radius":	2.0,
-													"hfBilateralFilter_sigma":	1.0
+													"prefilter_sigma":	1,
+													"GaussianFilter_sigma":	2,
+													"GaussianFilter_radius":	2,
+													"hfBilateralFilter_sigma":	1
 												}
 											}, {
 												"iso":	204800,
@@ -12029,10 +12183,10 @@
 													"hfBilateralFilter_coeff":	[0.2042, 0.1238, 0.0751]
 												},
 												"kernel_sigma":	{
-													"prefilter_sigma":	1.0,
-													"GaussianFilter_sigma":	2.0,
-													"GaussianFilter_radius":	2.0,
-													"hfBilateralFilter_sigma":	1.0
+													"prefilter_sigma":	1,
+													"GaussianFilter_sigma":	2,
+													"GaussianFilter_radius":	2,
+													"hfBilateralFilter_sigma":	1
 												}
 											}],
 										"Tuning_ISO_len":	13

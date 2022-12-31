@@ -14,6 +14,8 @@
 
 #include "j2s.h"
 
+using namespace RkCam;
+
 static bool j2s_template_dumping = false;
 
 #if 1
@@ -219,7 +221,7 @@ static inline int j2s_enum_get_value(j2s_ctx *ctx, int enum_index,
       return enum_value->value;
   }
 
-  WARN("unknown enum name: %s for %s\n", name, enum_obj->name);
+  ERR("unknown enum name: %s for %s\n", name, enum_obj->name);
   return -1;
 }
 
@@ -240,7 +242,7 @@ static inline const char *j2s_enum_get_name(j2s_ctx *ctx, int enum_index,
       return enum_value->name;
   }
 
-  WARN("unknown enum value: %d for %s\n", value, enum_obj->name);
+  ERR("unknown enum value: %d for %s\n", value, enum_obj->name);
 out:
   return "INVALID";
 }
@@ -254,15 +256,15 @@ static cJSON *_j2s_enum_to_json(j2s_ctx *ctx, int enum_index) {
 
   enum_obj = &ctx->enums[enum_index];
 
-  root = cJSON_CreateObject();
+  root = RkCam::cJSON_CreateObject();
   DASSERT(root, return NULL);
 
   for (int i = 0; i < enum_obj->num_value; i++) {
     j2s_enum_value *enum_value = &ctx->enum_values[enum_obj->value_index + i];
 
-    item = cJSON_CreateNumber(enum_value->value);
+    item = RkCam::cJSON_CreateNumber(enum_value->value);
     if (item)
-      cJSON_AddItemToObject(root, enum_value->name, item);
+      RkCam::cJSON_AddItemToObject(root, enum_value->name, item);
   }
 
   return root;
@@ -1034,12 +1036,13 @@ static int _j2s_json_to_obj(j2s_ctx *ctx, cJSON *json, cJSON *parent,
         if (*buf)
           free(*buf);
         int str_len = str ? strlen(str) : strlen("");
-        *buf = (char *)j2s_alloc_data(ctx, str_len + 1);
-        j2s_alloc_map_record(ctx, buf, *buf);
+        size_t real_size = 0;
+        *buf = (char *)j2s_alloc_data(ctx, str_len + 1, &real_size);
+        j2s_alloc_map_record(ctx, buf, *buf, real_size);
         if (*buf) {
           memcpy(*buf, str, strlen(str));
           (*buf)[str_len] = '\0';
-          DBG("----->self ptr offset[%d]-[%d]-[%s]\n",
+          DBG("----->self ptr offset[%zu]-[%zu]-[%s]\n",
               ((uint8_t *)buf - ((j2s_pool_t *)ctx->priv)->data),
               (uint8_t *)*buf - ((j2s_pool_t *)ctx->priv)->data, *buf);
         }
@@ -1059,7 +1062,7 @@ static int _j2s_json_to_obj(j2s_ctx *ctx, cJSON *json, cJSON *parent,
         obj->flags != J2S_FLAG_ARRAY) {
       cJSON_DetachItemViaPointer(parent, index_json);
       index_json = NULL;
-      WARN("ignoring index for dep types %s\n", obj->name);
+      ERR("ignoring index for dep types %s\n", obj->name);
     }
 
     if (index_json)
@@ -1103,7 +1106,7 @@ static int _j2s_json_to_obj(j2s_ctx *ctx, cJSON *json, cJSON *parent,
 
     len_json = cJSON_GetObjectItemCaseSensitive(parent, len_name);
     if (!len_json && !query)
-      WARN("missing len in json for dynamic array '%s'\n", obj->name);
+      ERR("missing len in json for dynamic array '%s'\n", obj->name);
 
     index_json = j2s_get_index_json(ctx, parent, obj_index);
 
@@ -1148,9 +1151,10 @@ static int _j2s_json_to_obj(j2s_ctx *ctx, cJSON *json, cJSON *parent,
       if (old_len && *buf)
         j2s_release_data(ctx, *buf);
 
-      *buf = j2s_alloc_data(ctx, len * obj->elem_size);
-      j2s_alloc_map_record(ctx, buf, *buf);
-      DBG("----->self ptr offset[%d]-[%d]\n",
+      size_t real_size = 0;
+      *buf = j2s_alloc_data(ctx, len * obj->elem_size, &real_size);
+      j2s_alloc_map_record(ctx, buf, *buf, real_size);
+      DBG("----->self ptr offset[%zu]-[%zu]\n",
           ((uint8_t *)buf - ((j2s_pool_t *)ctx->priv)->data),
           (uint8_t *)*buf - ((j2s_pool_t *)ctx->priv)->data);
 
@@ -1315,27 +1319,39 @@ static void j2s_store_obj(j2s_obj *obj, int fd, void *ptr_) {
 
 int j2s_json_to_bin(j2s_ctx *ctx, cJSON *json, const char *name, void **ptr,
                     size_t struct_size, const char *ofname) {
-  FILE *ofp = NULL;
+  size_t real_size = 0;
+  size_t bin_size = 0;
   j2s_pool_t *j2s_pool = NULL;
-  *ptr = j2s_alloc_data(ctx, struct_size);
+  *ptr = j2s_alloc_data(ctx, struct_size, &real_size);
   j2s_json_to_struct(ctx, json, name, *ptr);
 
-  ofp = fopen(ofname, "wb+");
-  if (!ofp) {
+  void* bin_buffer = malloc(MAX_IQBIN_SIZE);
+  if (!bin_buffer) {
+    printf("%s %d [J2S4B] oom!\n", __func__, __LINE__);
     return -1;
   }
 
+  uint8_t *current_index = (uint8_t*) bin_buffer;
+
   j2s_pool = (j2s_pool_t *)ctx->priv;
 
-  size_t map_start = fwrite(j2s_pool->data, 1, j2s_pool->used, ofp);
-  fwrite(j2s_pool->maps_list, sizeof(map_index_t), j2s_pool->map_len, ofp);
-  // write map start address
-  fwrite(&map_start, 1, sizeof(size_t), ofp);
-  // write map len
-  fwrite(&j2s_pool->map_len, 1, sizeof(size_t), ofp);
-  DBG("maps [%d][%d][%d]\n", sizeof(map_index_t), j2s_pool->map_len, map_start);
+  size_t map_start = j2s_pool->used;
+  memcpy(current_index, j2s_pool->data, j2s_pool->used);
+  current_index += j2s_pool->used;
+  memcpy(current_index, j2s_pool->maps_list, sizeof(map_index_t) * j2s_pool->map_len);
+  current_index += sizeof(map_index_t) * j2s_pool->map_len;
+  memcpy(current_index, &map_start, sizeof(size_t));
+  current_index += sizeof(size_t);
+  memcpy(current_index, &j2s_pool->map_len, sizeof(size_t));
+  current_index += sizeof(size_t);
 
-  fclose(ofp);
+  bin_size = j2s_pool->used + sizeof(map_index_t) * j2s_pool->map_len + sizeof(size_t) * 2;
+
+  BinMapLoader::suqeezBinMap(ofname, (uint8_t*)bin_buffer, bin_size);
+
+  free(bin_buffer);
+
+  DBG("maps [%zu][%zu][%zu]\n", sizeof(map_index_t), j2s_pool->map_len, map_start);
 
   return 0;
 }

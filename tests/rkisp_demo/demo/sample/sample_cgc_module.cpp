@@ -51,7 +51,7 @@ static int sample_set_cgc_manual(const rk_aiq_sys_ctx_t* ctx)
     attrib.param.cgc_ratio_en  = false;
     attrib.param.cgc_yuv_limit = true;
 
-    ret = rk_aiq_user_api2_acgc_SetAttrib(ctx, attrib);
+    ret = rk_aiq_user_api2_acgc_SetAttrib(ctx, &attrib);
     RKAIQ_SAMPLE_CHECK_RET(ret, "set CGC Attr failed!");
     return 0;
 }
@@ -65,7 +65,7 @@ static int sample_set_cgc_auto(const rk_aiq_sys_ctx_t* ctx)
     /* NOTE: RK_AIQ_OP_MODE_AUTO means default value now */
     attrib.param.op_mode = RK_AIQ_OP_MODE_AUTO;
 
-    rk_aiq_user_api2_acgc_SetAttrib(ctx, attrib);
+    rk_aiq_user_api2_acgc_SetAttrib(ctx, &attrib);
 
     return 0;
 }

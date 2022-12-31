@@ -42,6 +42,8 @@
 #include "mediactl-priv.h"
 #include "tools.h"
 
+#include "xcam_log.h"
+
 /* -----------------------------------------------------------------------------
  * Graph access
  */
@@ -86,6 +88,7 @@ struct media_entity *media_get_entity_by_name(struct media_device *media,
         }
 	}
 
+    LOGW("media get entity by name: %s is null\n", name);
 	return NULL;
 }
 
@@ -144,8 +147,9 @@ const struct media_link *media_entity_get_link(struct media_entity *entity, unsi
 
 const char *media_entity_get_devname(struct media_entity *entity)
 {
-    if (entity == NULL)
+    if (entity == NULL) {
         return NULL;
+    }
 
 	return entity->devname[0] ? entity->devname : NULL;
 }
@@ -741,7 +745,7 @@ int media_device_add_entity(struct media_device *media,
 
 	entity->fd = -1;
 	entity->media = media;
-	strncpy(entity->devname, devnode, sizeof entity->devname);
+	strncpy(entity->devname, devnode, sizeof(entity->devname) - 1);
 	entity->devname[sizeof entity->devname - 1] = '\0';
 
 	entity->info.id = 0;
@@ -935,7 +939,7 @@ void media_print_streampos(struct media_device *media, const char *p,
 
 	pos = end - p + 1;
 
-	if (pos < 0)
+	if ((ssize_t)pos < 0)
 		pos = 0;
 	if (pos > strlen(p))
 		pos = strlen(p);

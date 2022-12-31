@@ -76,9 +76,11 @@ prepare(RkAiqAlgoCom* params)
 
     if (!!(params->u.prepare.conf_type & RK_AIQ_ALGO_CONFTYPE_UPDATECALIB)) {
         if (pCfgParam->com.u.prepare.calibv2) {
+#if RKAIQ_HAVE_CGC_V1
             Cgc_Param_t* cgc =
                 (Cgc_Param_t*)(CALIBDBV2_GET_MODULE_PTR(pCfgParam->com.u.prepare.calibv2, cgc));
             if (cgc) *acgc_params = *cgc;
+#endif
         }
     }
     return XCAM_RETURN_NO_ERROR;
@@ -120,9 +122,9 @@ RkAiqAlgoDescription g_RkIspAlgoDescAcgc = {
         .destroy_context = destroy_context,
     },
     .prepare = prepare,
-    .pre_process = pre_process,
+    .pre_process = NULL,
     .processing = processing,
-    .post_process = post_process,
+    .post_process = NULL,
 };
 
 RKAIQ_END_DECLARE

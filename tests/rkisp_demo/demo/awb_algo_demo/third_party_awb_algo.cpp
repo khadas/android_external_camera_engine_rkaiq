@@ -2,8 +2,6 @@
 #include "uAPI2/rk_aiq_user_api2_camgroup.h"
 #include "uAPI2/rk_aiq_user_api2_sysctl.h"
 
-static rk_aiq_customeAwb_single_results_t g_s_res;
-
 int32_t custom_awb_init(void* ctx)
 {
     //TO DO
@@ -27,10 +25,10 @@ int32_t custom_awb_init(void* ctx)
 
 
 
-int32_t custom_awb_run(void* ctx, const rk_aiq_customAwb_stats_t* pstAwbInfo,
-                      rk_aiq_customeAwb_results_t* pstAwbResult)
+int32_t custom_awb_run(void* ctx, const void* vpstAwbInfo,  void* vpstAwbResult)
 {
-
+    const rk_aiq_customAwb_stats_t* pstAwbInfo = (rk_aiq_customAwb_stats_t*) vpstAwbInfo;
+    rk_aiq_customeAwb_results_t* pstAwbResult = (rk_aiq_customeAwb_results_t*) vpstAwbResult;
     rk_aiq_sys_ctx_t* sys_ctx = NULL;
     rk_aiq_camgroup_ctx_t* group_ctx = NULL;
 
@@ -96,16 +94,13 @@ int32_t custom_awb_run(void* ctx, const rk_aiq_customAwb_stats_t* pstAwbInfo,
 
     if (cam_type == RK_AIQ_CAM_TYPE_GROUP){
         if(1/* for other cameras are different with camera0*/){
-            rk_aiq_customeAwb_single_results_t s_res;
             if(pstAwbResult->next ==nullptr){//for camera1
-                //pstAwbResult->next = (rk_aiq_customeAwb_single_results_t*)malloc(sizeof(rk_aiq_customeAwb_single_results_t));//don't forget to release
-                pstAwbResult->next = &g_s_res;
+                pstAwbResult->next = (rk_aiq_customeAwb_single_results_t*)malloc(sizeof(rk_aiq_customeAwb_single_results_t));//don't forget to release
                 pstAwbResult->next->awb_gain_algo={1.8,1.0,1.0,1.6};
                 //to do more paras
             }
             if(pstAwbResult->next->next ==nullptr){//for camera2
-                //pstAwbResult->next->next = (rk_aiq_customeAwb_single_results_t*)malloc(sizeof(rk_aiq_customeAwb_single_results_t));//don't forget to release
-                pstAwbResult->next->next = &g_s_res;
+                pstAwbResult->next->next = (rk_aiq_customeAwb_single_results_t*)malloc(sizeof(rk_aiq_customeAwb_single_results_t));//don't forget to release
                 pstAwbResult->next->next->awb_gain_algo={1.9,1.0,1.0,1.6};
                 //to do more paras
             }

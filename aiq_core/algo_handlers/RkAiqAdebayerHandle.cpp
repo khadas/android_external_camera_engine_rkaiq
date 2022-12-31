@@ -27,12 +27,8 @@ void RkAiqAdebayerHandleInt::init() {
 
     RkAiqHandle::deInit();
     mConfig       = (RkAiqAlgoCom*)(new RkAiqAlgoConfigAdebayer());
-    mPreInParam   = (RkAiqAlgoCom*)(new RkAiqAlgoPreAdebayer());
-    mPreOutParam  = (RkAiqAlgoResCom*)(new RkAiqAlgoPreResAdebayer());
     mProcInParam  = (RkAiqAlgoCom*)(new RkAiqAlgoProcAdebayer());
     mProcOutParam = (RkAiqAlgoResCom*)(new RkAiqAlgoProcResAdebayer());
-    mPostInParam  = (RkAiqAlgoCom*)(new RkAiqAlgoPostAdebayer());
-    mPostOutParam = (RkAiqAlgoResCom*)(new RkAiqAlgoPostResAdebayer());
 
     EXIT_ANALYZER_FUNCTION();
 }
@@ -44,17 +40,27 @@ XCamReturn RkAiqAdebayerHandleInt::updateConfig(bool needSync) {
     if (needSync) mCfgMutex.lock();
     // if something changed
     if (updateAtt) {
+#if RKAIQ_HAVE_DEBAYER_V1
         mCurAtt   = mNewAtt;
         rk_aiq_uapi_adebayer_SetAttrib(mAlgoCtx, mCurAtt, false);
         sendSignal(mCurAtt.sync.sync_mode);
         updateAtt = false;
+#endif
+
+#if RKAIQ_HAVE_DEBAYER_V2
+        mCurAttV2 = mNewAttV2;
+        rk_aiq_uapi_adebayer_v2_SetAttrib(mAlgoCtx, mCurAttV2, false);
+        sendSignal(mCurAttV2.sync.sync_mode);
+        updateAtt = false;
+#endif
     }
+
     if (needSync) mCfgMutex.unlock();
 
     EXIT_ANALYZER_FUNCTION();
     return ret;
 }
-
+#if RKAIQ_HAVE_DEBAYER_V1
 XCamReturn RkAiqAdebayerHandleInt::setAttrib(adebayer_attrib_t att) {
     ENTER_ANALYZER_FUNCTION();
 
@@ -67,7 +73,7 @@ XCamReturn RkAiqAdebayerHandleInt::setAttrib(adebayer_attrib_t att) {
     // called by RkAiqCore
     bool isChanged = false;
     if (att.sync.sync_mode == RK_AIQ_UAPI_MODE_ASYNC && \
-        memcmp(&mNewAtt, &att, sizeof(att)))
+            memcmp(&mNewAtt, &att, sizeof(att)))
         isChanged = true;
     else if (att.sync.sync_mode != RK_AIQ_UAPI_MODE_ASYNC && \
              memcmp(&mCurAtt, &att, sizeof(att)))
@@ -110,6 +116,65 @@ XCamReturn RkAiqAdebayerHandleInt::getAttrib(adebayer_attrib_t* att) {
     EXIT_ANALYZER_FUNCTION();
     return ret;
 }
+#endif
+
+#if RKAIQ_HAVE_DEBAYER_V2
+XCamReturn RkAiqAdebayerHandleInt::setAttribV2(adebayer_v2_attrib_t att) {
+    ENTER_ANALYZER_FUNCTION();
+
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    mCfgMutex.lock();
+
+    // check if there is different between att & mCurAtt(sync)/mNewAtt(async)
+    // if something changed, set att to mNewAtt, and
+    // the new params will be effective later when updateConfig
+    // called by RkAiqCore
+    bool isChanged = false;
+    if (att.sync.sync_mode == RK_AIQ_UAPI_MODE_ASYNC && \
+            memcmp(&mNewAttV2, &att, sizeof(att)))
+        isChanged = true;
+    else if (att.sync.sync_mode != RK_AIQ_UAPI_MODE_ASYNC && \
+             memcmp(&mCurAttV2, &att, sizeof(att)))
+        isChanged = true;
+
+    // if something changed
+    if (isChanged) {
+        mNewAttV2   = att;
+        updateAtt = true;
+        waitSignal(att.sync.sync_mode);
+    }
+
+    mCfgMutex.unlock();
+
+    EXIT_ANALYZER_FUNCTION();
+    return ret;
+}
+
+XCamReturn RkAiqAdebayerHandleInt::getAttribV2(adebayer_v2_attrib_t* att) {
+    ENTER_ANALYZER_FUNCTION();
+
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+
+    if (att->sync.sync_mode == RK_AIQ_UAPI_MODE_SYNC) {
+        mCfgMutex.lock();
+        rk_aiq_uapi_adebayer_v2_GetAttrib(mAlgoCtx, att);
+        att->sync.done = true;
+        mCfgMutex.unlock();
+    } else {
+        if (updateAtt) {
+            memcpy(att, &mNewAttV2, sizeof(mNewAttV2));
+            att->sync.done = false;
+        } else {
+            rk_aiq_uapi_adebayer_v2_GetAttrib(mAlgoCtx, att);
+            att->sync.sync_mode = mNewAttV2.sync.sync_mode;
+            att->sync.done      = true;
+        }
+    }
+
+    EXIT_ANALYZER_FUNCTION();
+    return ret;
+}
+#endif
 
 XCamReturn RkAiqAdebayerHandleInt::prepare() {
     ENTER_ANALYZER_FUNCTION();
@@ -135,7 +200,7 @@ XCamReturn RkAiqAdebayerHandleInt::preProcess() {
     ENTER_ANALYZER_FUNCTION();
 
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
-
+#if 0
     RkAiqAlgoPreAdebayer* adebayer_pre_int        = (RkAiqAlgoPreAdebayer*)mPreInParam;
     RkAiqAlgoPreResAdebayer* adebayer_pre_res_int = (RkAiqAlgoPreResAdebayer*)mPreOutParam;
     RkAiqCore::RkAiqAlgosGroupShared_t* shared =
@@ -152,6 +217,7 @@ XCamReturn RkAiqAdebayerHandleInt::preProcess() {
     RKAIQCORE_CHECK_RET(ret, "adebayer algo pre_process failed");
 
     EXIT_ANALYZER_FUNCTION();
+#endif
     return XCAM_RETURN_NO_ERROR;
 }
 
@@ -187,7 +253,7 @@ XCamReturn RkAiqAdebayerHandleInt::postProcess() {
     ENTER_ANALYZER_FUNCTION();
 
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
-
+#if 0
     RkAiqAlgoPostAdebayer* adebayer_post_int = (RkAiqAlgoPostAdebayer*)mPostInParam;
     RkAiqAlgoPostResAdebayer* adebayer_post_res_int =
         (RkAiqAlgoPostResAdebayer*)mPostOutParam;
@@ -206,20 +272,25 @@ XCamReturn RkAiqAdebayerHandleInt::postProcess() {
     RKAIQCORE_CHECK_RET(ret, "adebayer algo post_process failed");
 
     EXIT_ANALYZER_FUNCTION();
+#endif
     return ret;
 }
 
 XCamReturn RkAiqAdebayerHandleInt::genIspResult(RkAiqFullParams* params,
-                                                RkAiqFullParams* cur_params) {
+        RkAiqFullParams* cur_params) {
     ENTER_ANALYZER_FUNCTION();
-
     XCamReturn ret                = XCAM_RETURN_NO_ERROR;
     RkAiqCore::RkAiqAlgosGroupShared_t* shared =
         (RkAiqCore::RkAiqAlgosGroupShared_t*)(getGroupShared());
     RkAiqCore::RkAiqAlgosComShared_t* sharedCom = &mAiqCore->mAlogsComSharedParams;
     RkAiqAlgoProcResAdebayer* adebayer_com = (RkAiqAlgoProcResAdebayer*)mProcOutParam;
-    rk_aiq_isp_debayer_params_v20_t* debayer_param = params->mDebayerParams->data().ptr();
 
+#if RKAIQ_HAVE_DEBAYER_V1
+    rk_aiq_isp_debayer_params_v20_t* debayer_param = params->mDebayerParams->data().ptr();
+#endif
+#if RKAIQ_HAVE_DEBAYER_V2
+    rk_aiq_isp_debayer_params_v32_t* debayer_param = params->mDebayerV32Params->data().ptr();
+#endif
     if (!adebayer_com) {
         LOGD_ANALYZER("no adebayer result");
         return XCAM_RETURN_NO_ERROR;
@@ -232,14 +303,26 @@ XCamReturn RkAiqAdebayerHandleInt::genIspResult(RkAiqFullParams* params,
         } else {
             debayer_param->frame_id = shared->frameId;
         }
-        memcpy(&debayer_param->result, &adebayer_rk->debayerRes.config, sizeof(AdebayerConfig_t));
+#if RKAIQ_HAVE_DEBAYER_V1
+        memcpy(&debayer_param->result, &adebayer_rk->debayerResV1.config, sizeof(AdebayerHwConfigV1_t));
+#endif
+#if RKAIQ_HAVE_DEBAYER_V2
+        memcpy(&debayer_param->result, &adebayer_rk->debayerResV2.config, sizeof(AdebayerHwConfigV2_t));
+#endif
+
     }
 
+#if RKAIQ_HAVE_DEBAYER_V1
     cur_params->mDebayerParams = params->mDebayerParams;
+#endif
+#if RKAIQ_HAVE_DEBAYER_V2
+    cur_params->mDebayerV32Params = params->mDebayerV32Params;
+#endif
+
 
     EXIT_ANALYZER_FUNCTION();
 
     return ret;
 }
 
-};  // namespace RkCam
+}  // namespace RkCam

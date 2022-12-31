@@ -145,6 +145,9 @@ public:
         mHwEvtCbCtx = evt_cb_ctx;
         mHwEvtCb = hwevt_cb;
     };
+    void setTbInfo(rk_aiq_tb_info_t& info) {
+        mTbInfo = info;
+    }
     void setCamHw(SmartPtr<ICamHw>& camhw);
     void setCamPhyId(int phyId) {mCamPhyId = phyId;}
     int getCamPhyId() { return mCamPhyId;}
@@ -154,7 +157,9 @@ public:
 #endif
     void setAiqCalibDb(const CamCalibDbV2Context_t* calibDb);
     void unsetTuningCalibDb();
+#if defined(ISP_HW_V20)
     void setLumaAnalyzer(SmartPtr<RkLumaCore> analyzer);
+#endif
     XCamReturn init();
     XCamReturn prepare(uint32_t width, uint32_t height, rk_aiq_working_mode_t mode);
     XCamReturn start();
@@ -222,12 +227,15 @@ private:
     SmartPtr<RkAiqCore> mRkAiqAnalyzer;
     SmartPtr<RkAiqRstApplyThread> mAiqRstAppTh;
     SmartPtr<RkAiqMngCmdThread> mAiqMngCmdTh;
+#if defined(ISP_HW_V20)
     SmartPtr<RkLumaCore> mRkLumaAnalyzer;
+#endif
     rk_aiq_error_cb mErrCb;
     rk_aiq_metas_cb mMetasCb;
     rk_aiq_hwevt_cb mHwEvtCb;
     void* mHwEvtCbCtx;
     const char* mSnsEntName;
+    rk_aiq_tb_info_t mTbInfo;
 #ifdef RKAIQ_ENABLE_PARSER_V1
     const CamCalibDbContext_t* mCalibDb;
 #endif
@@ -250,6 +258,6 @@ private:
     bool mIsMain;
 };
 
-}; //namespace RkCam
+} //namespace RkCam
 
 #endif //_RK_AIQ_MANAGER_H_

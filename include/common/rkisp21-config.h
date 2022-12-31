@@ -4,12 +4,13 @@
  * Copyright (C) 2020 Rockchip Electronics Co., Ltd.
  */
 
-#ifndef _RKISP21_CONFIG_H
-#define _RKISP21_CONFIG_H
+#ifndef _UAPI_RKISP21_CONFIG_H
+#define _UAPI_RKISP21_CONFIG_H
 
 #include <linux/types.h>
 #include <linux/v4l2-controls.h>
-//#include <linux/rkisp2-config.h>
+
+#include "common/rkisp2-config.h"
 
 #define ISP2X_MODULE_BAYNR			BIT_ULL(36)
 #define ISP2X_MODULE_BAY3D			BIT_ULL(37)
@@ -30,7 +31,7 @@
 #define ISP21_BAY3D_XY_NUM			16
 #define ISP21_SHARP_X_NUM			7
 #define ISP21_SHARP_Y_NUM			8
-#define ISP21_CSM_COEFF_NUM         9
+#define ISP21_CSM_COEFF_NUM			9
 
 struct isp21_cgc_cfg {
 	u8 yuv_limit;
@@ -38,10 +39,11 @@ struct isp21_cgc_cfg {
 } __attribute__ ((packed));
 
 struct isp21_csm_cfg {
-    u8 csm_full_range;
-    u16 csm_y_offset;
-    u16 csm_c_offset;
-    u32 csm_coeff[ISP21_CSM_COEFF_NUM];
+	u8 csm_full_range;
+	u16 csm_y_offset;
+	u16 csm_c_offset;
+
+	u32 csm_coeff[ISP21_CSM_COEFF_NUM];
 } __attribute__ ((packed));
 
 struct isp21_bls_cfg {
@@ -804,6 +806,7 @@ struct isp21_stat {
 struct rkisp_isp21_stat_buffer {
 	unsigned int meas_type;
 	unsigned int frame_id;
+	unsigned int params_id;
 	struct isp21_stat params;
 } __attribute__ ((packed));
 

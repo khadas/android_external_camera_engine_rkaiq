@@ -64,8 +64,10 @@ prepare(RkAiqAlgoCom* params)
     RkAiqAlgoConfigA3dlut *para = (RkAiqAlgoConfigA3dlut*)params;
     hAlut3d->prepare_type = params->u.prepare.conf_type;
     if(!!(params->u.prepare.conf_type & RK_AIQ_ALGO_CONFTYPE_UPDATECALIB )){
+#if RKAIQ_HAVE_3DLUT_V1
         hAlut3d->calibV2_lut3d =
                 (CalibDbV2_Lut3D_Para_V2_t*)(CALIBDBV2_GET_MODULE_PTR((void*)(para->com.u.prepare.calibv2), lut3d_calib));
+#endif
     }
            Alut3dPrepare((alut3d_handle_t)(params->ctx->a3dlut_para));
 
@@ -100,7 +102,7 @@ processing(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outparams)
 
     Alut3dConfig(hAlut3d);
     memcpy(&proResAlut3d->lut3d_hw_conf, &hAlut3d->lut3d_hw_conf, sizeof(rk_aiq_lut3d_cfg_t));
-    proResAlut3d->lut3d_update = hAlut3d->update ||hAlut3d->updateAtt || (!hAlut3d->swinfo.lut3dConverged);
+    proResAlut3d->lut3d_update = hAlut3d->update || hAlut3d->updateAtt || (!hAlut3d->swinfo.lut3dConverged);
 
     LOG1_A3DLUT( "%s: (exit)\n", __FUNCTION__);
     return XCAM_RETURN_NO_ERROR;
@@ -127,9 +129,9 @@ RkAiqAlgoDescription g_RkIspAlgoDescA3dlut = {
         .destroy_context = destroy_context,
     },
     .prepare = prepare,
-    .pre_process = pre_process,
+    .pre_process = NULL,
     .processing = processing,
-    .post_process = post_process,
+    .post_process = NULL,
 };
 
 RKAIQ_END_DECLARE

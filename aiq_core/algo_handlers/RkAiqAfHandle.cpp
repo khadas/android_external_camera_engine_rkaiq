@@ -15,8 +15,10 @@
  */
 #include "RkAiqAfHandle.h"
 
-#include "RkAiqCore.h"
+#include <fcntl.h>
+
 #include "RkAiqAeHandle.h"
+#include "RkAiqCore.h"
 
 namespace RkCam {
 
@@ -27,16 +29,9 @@ void RkAiqAfHandleInt::init() {
 
     RkAiqHandle::deInit();
     mConfig      = (RkAiqAlgoCom*)(new RkAiqAlgoConfigAf());
-    mPreInParam  = (RkAiqAlgoCom*)(new RkAiqAlgoPreAf());
-    mPreOutParam = (RkAiqAlgoResCom*)(new RkAiqAlgoPreResAf());
     mProcInParam = (RkAiqAlgoCom*)(new RkAiqAlgoProcAf());
-#if 0
-    mProcOutParam = (RkAiqAlgoResCom*)(new RkAiqAlgoProcResAf());
-#endif
-    mPostInParam   = (RkAiqAlgoCom*)(new RkAiqAlgoPostAf());
-    mPostOutParam  = (RkAiqAlgoResCom*)(new RkAiqAlgoPostResAf());
+
     mLastZoomIndex = 0;
-    memset(&mLastAfResult, 0, sizeof(mLastAfResult));
 
     EXIT_ANALYZER_FUNCTION();
 }
@@ -47,13 +42,15 @@ XCamReturn RkAiqAfHandleInt::updateConfig(bool needSync) {
     XCamReturn ret                              = XCAM_RETURN_NO_ERROR;
     RkAiqCore::RkAiqAlgosComShared_t* sharedCom = &mAiqCore->mAlogsComSharedParams;
 
-    if (needSync) mCfgMutex.lock();
-    // if something changed
-    if (updateAtt) {
-        rk_aiq_uapi_af_SetAttrib(mAlgoCtx, mNewAtt, false);
-        isUpdateAttDone = true;
+    {
+        if (needSync) mCfgMutex.lock();
+        // if something changed
+        if (updateAtt) {
+            rk_aiq_uapi_af_SetAttrib(mAlgoCtx, mNewAtt, false);
+            isUpdateAttDone = true;
+        }
+        if (needSync) mCfgMutex.unlock();
     }
-    if (needSync) mCfgMutex.unlock();
 
     EXIT_ANALYZER_FUNCTION();
     return ret;
@@ -426,42 +423,6 @@ XCamReturn RkAiqAfHandleInt::prepare() {
 }
 
 XCamReturn RkAiqAfHandleInt::preProcess() {
-    ENTER_ANALYZER_FUNCTION();
-
-    XCamReturn ret = XCAM_RETURN_NO_ERROR;
-
-    RkAiqAlgoPreAf* af_pre_int        = (RkAiqAlgoPreAf*)mPreInParam;
-    RkAiqAlgoPreResAf* af_pre_res_int = (RkAiqAlgoPreResAf*)mPreOutParam;
-    RkAiqCore::RkAiqAlgosGroupShared_t* shared =
-        (RkAiqCore::RkAiqAlgosGroupShared_t*)(getGroupShared());
-    RkAiqCore::RkAiqAlgosComShared_t* sharedCom = &mAiqCore->mAlogsComSharedParams;
-
-    ret = RkAiqHandle::preProcess();
-    if (ret) {
-        RKAIQCORE_CHECK_RET(ret, "af handle preProcess failed");
-    }
-
-    RkAiqAfStats* xAfStats = nullptr;
-    if (shared->afStatsBuf) {
-        xAfStats = (RkAiqAfStats*)shared->afStatsBuf->map(shared->afStatsBuf);
-        if (!xAfStats) LOGE("af stats is null");
-    } else {
-        LOGW("the xcamvideobuffer of af stats is null");
-    }
-
-    if ((!xAfStats || !xAfStats->af_stats_valid) && !sharedCom->init) {
-        LOGW("no af stats, ignore!");
-        return XCAM_RETURN_BYPASS;
-    }
-
-    af_pre_int->xcam_af_stats  = shared->afStatsBuf;
-    af_pre_int->xcam_aec_stats = shared->aecStatsBuf;
-
-    RkAiqAlgoDescription* des = (RkAiqAlgoDescription*)mDes;
-    ret                       = des->pre_process(mPreInParam, mPreOutParam);
-    RKAIQCORE_CHECK_RET(ret, "af algo pre_process failed");
-
-    EXIT_ANALYZER_FUNCTION();
     return XCAM_RETURN_NO_ERROR;
 }
 
@@ -522,8 +483,14 @@ XCamReturn RkAiqAfHandleInt::processing() {
 #endif
 
     ret = RkAiqHandle::processing();
-    if (ret) {
-        RKAIQCORE_CHECK_RET(ret, "af handle processing failed");
+    if (ret < 0) {
+        LOGE_ANALYZER("af handle processing failed ret %d", ret);
+        mProcResShared = NULL;
+        return ret;
+    } else if (ret == XCAM_RETURN_BYPASS) {
+        LOGW_ANALYZER("%s:%d bypass !", __func__, __LINE__);
+        mProcResShared = NULL;
+        return ret;
     }
 
     RkAiqAfStats* xAfStats = nullptr;
@@ -534,6 +501,7 @@ XCamReturn RkAiqAfHandleInt::processing() {
         LOGW("the xcamvideobuffer of af stats is null");
     }
 
+#if RKAIQ_HAVE_AF_V20 || RKAIQ_HAVE_AF_V30 || RKAIQ_HAVE_AF_V31
     if ((!xAfStats || !xAfStats->af_stats_valid) && !sharedCom->init) {
         LOGW("no af stats, ignore!");
         mProcResShared.release();
@@ -546,13 +514,19 @@ XCamReturn RkAiqAfHandleInt::processing() {
     mAeStableMutex.lock();
     af_proc_int->ae_stable = mAeStable;
     mAeStableMutex.unlock();
+#endif
 
     RkAiqAlgoDescription* des = (RkAiqAlgoDescription*)mDes;
     ret = des->processing(mProcInParam, (RkAiqAlgoResCom*)af_proc_res_int);
-    if (ret)
-        LOGE_AF("af handle Process failed");
-    else
-        mLastAfResult = *af_proc_res_int;
+    if (ret < 0) {
+        LOGE_ANALYZER("af algo processing failed ret %d", ret);
+        mProcResShared = NULL;
+        return ret;
+    } else if (ret == XCAM_RETURN_BYPASS) {
+        LOGW_ANALYZER("%s:%d bypass !", __func__, __LINE__);
+        mProcResShared = NULL;
+        return ret;
+    }
 
 #if 1
     af_proc_res_int->id = shared->frameId;
@@ -562,44 +536,6 @@ XCamReturn RkAiqAfHandleInt::processing() {
         new RkAiqCoreVdBufMsg(XCAM_MESSAGE_AF_PROC_RES_OK, af_proc_res_int->id, msg_data);
     mAiqCore->post_message(msg);
 #endif
-
-    EXIT_ANALYZER_FUNCTION();
-    return ret;
-}
-
-XCamReturn RkAiqAfHandleInt::postProcess() {
-    ENTER_ANALYZER_FUNCTION();
-
-    XCamReturn ret = XCAM_RETURN_NO_ERROR;
-
-    RkAiqAlgoPostAf* af_post_int        = (RkAiqAlgoPostAf*)mPostInParam;
-    RkAiqAlgoPostResAf* af_post_res_int = (RkAiqAlgoPostResAf*)mPostOutParam;
-    RkAiqCore::RkAiqAlgosGroupShared_t* shared =
-        (RkAiqCore::RkAiqAlgosGroupShared_t*)(getGroupShared());
-    RkAiqCore::RkAiqAlgosComShared_t* sharedCom = &mAiqCore->mAlogsComSharedParams;
-
-    ret = RkAiqHandle::postProcess();
-    if (ret) {
-        RKAIQCORE_CHECK_RET(ret, "af handle postProcess failed");
-        return ret;
-    }
-
-    RkAiqAfStats* xAfStats = nullptr;
-    if (shared->afStatsBuf) {
-        xAfStats = (RkAiqAfStats*)shared->afStatsBuf->map(shared->afStatsBuf);
-        if (!xAfStats) LOGE("af stats is null");
-    } else {
-        LOGW("the xcamvideobuffer of af stats is null");
-    }
-
-    if ((!xAfStats || !xAfStats->af_stats_valid) && !sharedCom->init) {
-        LOGW("no af stats, ignore!");
-        return XCAM_RETURN_BYPASS;
-    }
-
-    RkAiqAlgoDescription* des = (RkAiqAlgoDescription*)mDes;
-    ret                       = des->post_process(mPostInParam, mPostOutParam);
-    RKAIQCORE_CHECK_RET(ret, "af algo post_process failed");
 
     if (updateAtt && isUpdateAttDone) {
         mCurAtt         = mNewAtt;
@@ -617,6 +553,10 @@ XCamReturn RkAiqAfHandleInt::postProcess() {
     return ret;
 }
 
+XCamReturn RkAiqAfHandleInt::postProcess() {
+    return XCAM_RETURN_NO_ERROR;
+}
+
 XCamReturn RkAiqAfHandleInt::genIspResult(RkAiqFullParams* params, RkAiqFullParams* cur_params) {
     ENTER_ANALYZER_FUNCTION();
 
@@ -624,26 +564,57 @@ XCamReturn RkAiqAfHandleInt::genIspResult(RkAiqFullParams* params, RkAiqFullPara
     RkAiqCore::RkAiqAlgosGroupShared_t* shared =
         (RkAiqCore::RkAiqAlgosGroupShared_t*)(getGroupShared());
     RkAiqCore::RkAiqAlgosComShared_t* sharedCom = &mAiqCore->mAlogsComSharedParams;
-#if defined(ISP_HW_V30)
+
+    if (!mProcResShared.ptr()) {
+        params->mFocusParams = NULL;
+#if RKAIQ_HAVE_AF_V31 || RKAIQ_ONLY_AF_STATS_V31
+        params->mAfV32Params = cur_params->mAfV32Params;
+        params->mAfV32Params->data()->frame_id = shared->frameId;
+#endif
+#if RKAIQ_HAVE_AF_V30 || RKAIQ_ONLY_AF_STATS_V30
+        params->mAfV3xParams = cur_params->mAfV3xParams;
+        params->mAfV3xParams->data()->frame_id = shared->frameId;
+#endif
+#if RKAIQ_HAVE_AF_V20 || RKAIQ_ONLY_AF_STATS_V20
+        params->mAfParams = cur_params->mAfParams;
+        params->mAfParams->data()->frame_id = shared->frameId;
+#endif
+        return XCAM_RETURN_BYPASS;
+    }
+
+    RkAiqAlgoProcResAf* af_com                  = &mProcResShared->result;
+
+#if RKAIQ_HAVE_AF_V31 || RKAIQ_ONLY_AF_STATS_V31
+    rk_aiq_isp_af_params_v32_t* af_param = params->mAfV32Params->data().ptr();
+#endif
+#if RKAIQ_HAVE_AF_V30 || RKAIQ_ONLY_AF_STATS_V30
     rk_aiq_isp_af_params_v3x_t* af_param = params->mAfV3xParams->data().ptr();
-#else
+#endif
+#if RKAIQ_HAVE_AF_V20 || RKAIQ_ONLY_AF_STATS_V20
     rk_aiq_isp_af_params_v20_t* af_param = params->mAfParams->data().ptr();
 #endif
 
     SmartPtr<rk_aiq_focus_params_wrapper_t> focus_param = params->mFocusParams->data();
     rk_aiq_focus_params_t* p_focus_param                = &focus_param->result;
-    RkAiqAlgoProcResAf* af_com = &mLastAfResult;
 
     memset(p_focus_param, 0, sizeof(rk_aiq_focus_params_t));
-    if (!mProcResShared.ptr()) {
-        LOGE_ANALYZER("mProcResShared is NULL");
-        af_com = &mLastAfResult;
-    } else {
-        af_com = &mProcResShared->result;
-        if (!af_com) {
-            LOGE_ANALYZER("no af result");
-            af_com = &mLastAfResult;
-        }
+    if (!af_com) {
+        LOGD_ANALYZER("no af result");
+        mProcResShared = NULL;
+        params->mFocusParams = NULL;
+#if RKAIQ_HAVE_AF_V31 || RKAIQ_ONLY_AF_STATS_V31
+        params->mAfV32Params = cur_params->mAfV32Params;
+        params->mAfV32Params->data()->frame_id = shared->frameId;
+#endif
+#if RKAIQ_HAVE_AF_V30 || RKAIQ_ONLY_AF_STATS_V30
+        params->mAfV3xParams = cur_params->mAfV3xParams;
+        params->mAfV3xParams->data()->frame_id = shared->frameId;
+#endif
+#if RKAIQ_HAVE_AF_V20 || RKAIQ_ONLY_AF_STATS_V20
+        params->mAfParams = cur_params->mAfParams;
+        params->mAfParams->data()->frame_id = shared->frameId;
+#endif
+        return XCAM_RETURN_BYPASS;
     }
 
     if (!this->getAlgoId()) {
@@ -656,9 +627,14 @@ XCamReturn RkAiqAfHandleInt::genIspResult(RkAiqFullParams* params, RkAiqFullPara
             af_param->frame_id    = shared->frameId;
             focus_param->frame_id = shared->frameId;
         }
-#if defined(ISP_HW_V30)
+
+#if RKAIQ_HAVE_AF_V31 || RKAIQ_ONLY_AF_STATS_V31
+        af_param->result = af_rk->af_isp_param_v31;
+#endif
+#if RKAIQ_HAVE_AF_V30 || RKAIQ_ONLY_AF_STATS_V30
         af_param->result = af_rk->af_isp_param_v3x;
-#else
+#endif
+#if RKAIQ_HAVE_AF_V20 || RKAIQ_ONLY_AF_STATS_V20
         af_param->result = af_rk->af_isp_param;
 #endif
 
@@ -689,7 +665,6 @@ XCamReturn RkAiqAfHandleInt::genIspResult(RkAiqFullParams* params, RkAiqFullPara
         p_focus_param->vcm_end_ma       = af_rk->af_focus_param.vcm_end_ma;
         p_focus_param->vcm_config_valid = af_rk->af_focus_param.vcm_config_valid;
 
-#if defined(ISP_HW_V30) || defined(ISP_HW_V21)
         SmartPtr<RkAiqHandle>* ae_handle = mAiqCore->getCurAlgoTypeHandle(RK_AIQ_ALGO_TYPE_AE);
         int algo_id                      = (*ae_handle)->getAlgoId();
 
@@ -703,19 +678,24 @@ XCamReturn RkAiqAfHandleInt::genIspResult(RkAiqFullParams* params, RkAiqFullPara
                     ae_algo->setLockAeForAf(false);
             }
         }
-#endif
     }
 
-#if defined(ISP_HW_V30)
-    cur_params->mAfV3xParams = params->mAfV3xParams;
-#else
-    cur_params->mAfParams    = params->mAfParams;
-#endif
     cur_params->mFocusParams = params->mFocusParams;
+#if RKAIQ_HAVE_AF_V31 || RKAIQ_ONLY_AF_STATS_V31
+    cur_params->mAfV32Params = params->mAfV32Params;
+#endif
+#if RKAIQ_HAVE_AF_V30 || RKAIQ_ONLY_AF_STATS_V30
+    cur_params->mAfV3xParams = params->mAfV3xParams;
+#endif
+#if RKAIQ_HAVE_AF_V20 || RKAIQ_ONLY_AF_STATS_V20
+    cur_params->mAfParams = params->mAfParams;
+#endif
+
+    mProcResShared = NULL;
 
     EXIT_ANALYZER_FUNCTION();
 
     return ret;
 }
 
-};  // namespace RkCam
+}  // namespace RkCam

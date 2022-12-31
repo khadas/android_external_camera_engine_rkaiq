@@ -1,23 +1,26 @@
 #!/bin/bash
 # Run this from within a bash shell
 # x86_64 is for simulation do not enable RK platform
-export AIQ_BUILD_HOST_DIR=/home/camera/camera/rv1109_sdk/buildroot/output/rockchip_rv1126_rv1109/host
-TOOLCHAIN_FILE=$(pwd)/../../cmake/toolchains/arm_linux_buildroot.cmake
-OUTPUT=$(pwd)/output/arm
+export AIQ_BUILD_HOST_DIR=/data/project_codes/gcc-arm-8.3-2019.03-x86_64-arm-linux-gnueabihf
+export AIQ_BUILD_TOOLCHAIN_TRIPLE=arm-linux-gnueabihf
+export AIQ_BUILD_SYSROOT=libc
+export AIQ_BUILD_ARCH=arm
+TOOLCHAIN_FILE=$(pwd)/../../cmake/toolchains/gcc.cmake
+OUTPUT=$(pwd)/output/${AIQ_BUILD_ARCH}
 SOURCE_PATH=$OUTPUT/../../../../
 
 mkdir -p $OUTPUT
 pushd $OUTPUT
 
 cmake -G "Ninja" \
-    -DCMAKE_BUILD_TYPE=debug \
-    -DARCH="arm" \
+    -DCMAKE_BUILD_TYPE=MinSizeRel \
     -DRKAIQ_TARGET_SOC=${RKAIQ_TARGET_SOC} \
-    -DRKPLATFORM=OFF \
+    -DARCH=${AIQ_BUILD_ARCH} \
     -DCMAKE_TOOLCHAIN_FILE=$TOOLCHAIN_FILE \
     -DCMAKE_SKIP_RPATH=TRUE \
     -DCMAKE_EXPORT_COMPILE_COMMANDS=YES \
-	-DISP_HW_VERSION=${ISP_HW_VERSION} \
+    -DISP_HW_VERSION=${ISP_HW_VERSION} \
+    -DCMAKE_INSTALL_PREFIX="installed" \
     -DRKAIQ_USE_RAWSTREAM_LIB=OFF \
     $SOURCE_PATH \
 && ninja -j$(nproc) \

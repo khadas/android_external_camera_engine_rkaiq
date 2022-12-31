@@ -1,10 +1,14 @@
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 2.8...3.22)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g")
-set(CMAKE_C_FLAGS -m64)
-set(CMAKE_CXX_FLAGS -m64)
-set(CMAKE_EXE_LINKER_FLAGS "-static")
+if (RKAIQ_TARGET_ARCH STREQUAL "arm")
+    set(CMAKE_C_FLAGS -m32)
+    set(CMAKE_CXX_FLAGS -m32)
+    set(CMAKE_EXE_LINKER_FLAGS -m32)
+endif()
+set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static")
 
+add_compile_options(-std=c++11)
 add_compile_options(-fPIC -Wall -Wno-error -O0 -g)
 add_compile_options(-Wno-unused-variable
     -Wno-unused-but-set-variable
@@ -40,13 +44,13 @@ include_directories(
     src/j2s4b
     include
     ${ROOT_PROJ_DIR}/include/iq_parser_v2/j2s/
-    ${ROOT_PROJ_DIR}/include/iq_parser_v2
-    ${ROOT_PROJ_DIR}/build/linux/output/aarch64
     )
 
 set(CXX_SRCS
-    ${ROOT_PROJ_DIR}/iq_parser_v2/j2s/cJSON.c
-    ${ROOT_PROJ_DIR}/iq_parser_v2/j2s/cJSON_Utils.c
+    ${ROOT_PROJ_DIR}/iq_parser_v2/j2s/cJSON.cpp
+    ${ROOT_PROJ_DIR}/iq_parser_v2/j2s/cJSON_Utils.cpp
+    src/j2s4b/BinRecord.cpp
+    src/j2s4b/RkAiqsceneManager.cpp
     src/j2s4b/j2s.cpp
     src/j2s4b/j2s4b_utils.cpp
     src/main.cpp)
@@ -54,7 +58,9 @@ set(CXX_SRCS
 add_definitions(-DGIT_VERSION="${GIT_VERSION}")
 
 ADD_EXECUTABLE(j2s4b ${CXX_SRCS})
-set_target_properties(j2s4b PROPERTIES COMPILE_FLAGS "-m64" LINK_FLAGS "-m64")
+if (RKAIQ_TARGET_ARCH STREQUAL "arm")
+set_target_properties(j2s4b PROPERTIES COMPILE_FLAGS "-m32" LINK_FLAGS "-m32")
+endif()
 
 foreach(IQPATH ${RKAIQ_IQFILES})
     string(REGEX MATCH "${RKAIQ_IQFILES_DIR}/.*" SHORT_NAME ${IQPATH})
@@ -70,4 +76,5 @@ foreach(IQPATH ${RKAIQ_IQFILES})
         )
     install(PROGRAMS "${CMAKE_BINARY_DIR}/${TAGT_NAME}" DESTINATION usr/share/iqfiles)
 endforeach()
+install(TARGETS j2s4b RUNTIME DESTINATION host)
 

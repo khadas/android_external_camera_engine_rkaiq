@@ -25,6 +25,8 @@ RKAIQ_BEGIN_DECLARE
 #define CHECK_USER_API_ENABLE
 #endif
 
+#if RKAIQ_HAVE_AF
+
 XCamReturn
 rk_aiq_user_api2_af_SetAttrib(const rk_aiq_sys_ctx_t* sys_ctx, rk_aiq_af_attrib_t *attr)
 {
@@ -54,6 +56,24 @@ rk_aiq_user_api2_af_GetAttrib(const rk_aiq_sys_ctx_t* sys_ctx, rk_aiq_af_attrib_
 
     return XCAM_RETURN_NO_ERROR;
 }
+
+#else
+
+XCamReturn
+rk_aiq_user_api2_af_SetAttrib(const rk_aiq_sys_ctx_t* sys_ctx, rk_aiq_af_attrib_t *attr)
+{
+    return XCAM_RETURN_ERROR_UNKNOWN;
+}
+
+XCamReturn
+rk_aiq_user_api2_af_GetAttrib(const rk_aiq_sys_ctx_t* sys_ctx, rk_aiq_af_attrib_t *attr)
+{
+    return XCAM_RETURN_ERROR_UNKNOWN;
+}
+
+#endif
+
+#if RKAIQ_HAVE_AF_V20 || RKAIQ_HAVE_AF_V30 || RKAIQ_HAVE_AF_V31
 
 XCamReturn
 rk_aiq_user_api2_af_Lock(const rk_aiq_sys_ctx_t* sys_ctx)
@@ -136,7 +156,11 @@ rk_aiq_user_api2_af_SetZoomIndex(const rk_aiq_sys_ctx_t* sys_ctx, int index)
     RkAiqAfHandleInt* algo_handle =
         algoHandle<RkAiqAfHandleInt>(sys_ctx, RK_AIQ_ALGO_TYPE_AF);
 
-    if (CHECK_ISP_HW_V30()) {
+    if (CHECK_ISP_HW_V32()) {
+        CalibDbV2_AFV31_t *af_v31 =
+            (CalibDbV2_AFV31_t*)(CALIBDBV2_GET_MODULE_PTR((&calibdbv2_ctx), af_v31));
+        zoomfocus_tbl = (CalibDbV2_Af_ZoomFocusTbl_t*)(&af_v31->TuningPara.zoomfocus_tbl);
+    } else if (CHECK_ISP_HW_V30()) {
         CalibDbV2_AFV30_t *af_v30 =
             (CalibDbV2_AFV30_t*)(CALIBDBV2_GET_MODULE_PTR((&calibdbv2_ctx), af_v30));
         zoomfocus_tbl = (CalibDbV2_Af_ZoomFocusTbl_t*)(&af_v30->TuningPara.zoomfocus_tbl);
@@ -272,7 +296,11 @@ rk_aiq_user_api2_af_GetZoomRange(const rk_aiq_sys_ctx_t* sys_ctx, rk_aiq_af_zoom
     CalibDbV2_Af_ZoomFocusTbl_t *zoomfocus_tbl;
     int focal_length_len;
 
-    if (CHECK_ISP_HW_V30()) {
+    if (CHECK_ISP_HW_V32()) {
+        CalibDbV2_AFV31_t *af_v31 =
+            (CalibDbV2_AFV31_t*)(CALIBDBV2_GET_MODULE_PTR((&calibdbv2_ctx), af_v31));
+        zoomfocus_tbl = (CalibDbV2_Af_ZoomFocusTbl_t*)(&af_v31->TuningPara.zoomfocus_tbl);
+    } else if (CHECK_ISP_HW_V30()) {
         CalibDbV2_AFV30_t *af_v30 =
             (CalibDbV2_AFV30_t*)(CALIBDBV2_GET_MODULE_PTR((&calibdbv2_ctx), af_v30));
         zoomfocus_tbl = (CalibDbV2_Af_ZoomFocusTbl_t*)(&af_v30->TuningPara.zoomfocus_tbl);
@@ -441,5 +469,135 @@ rk_aiq_user_api2_af_setCustomAfRes(const rk_aiq_sys_ctx_t* sys_ctx, rk_tool_cust
         return XCAM_RETURN_ERROR_FAILED;
     }
 }
+
+#else
+
+XCamReturn
+rk_aiq_user_api2_af_Lock(const rk_aiq_sys_ctx_t* sys_ctx)
+{
+    return XCAM_RETURN_ERROR_UNKNOWN;
+}
+
+XCamReturn
+rk_aiq_user_api2_af_Unlock(const rk_aiq_sys_ctx_t* sys_ctx)
+{
+    return XCAM_RETURN_ERROR_UNKNOWN;
+}
+
+XCamReturn
+rk_aiq_user_api2_af_Oneshot(const rk_aiq_sys_ctx_t* sys_ctx)
+{
+    return XCAM_RETURN_ERROR_UNKNOWN;
+}
+
+XCamReturn
+rk_aiq_user_api2_af_ManualTriger(const rk_aiq_sys_ctx_t* sys_ctx)
+{
+    return XCAM_RETURN_ERROR_UNKNOWN;
+}
+
+XCamReturn
+rk_aiq_user_api2_af_Tracking(const rk_aiq_sys_ctx_t* sys_ctx)
+{
+    return XCAM_RETURN_ERROR_UNKNOWN;
+}
+
+XCamReturn
+rk_aiq_user_api2_af_SetZoomIndex(const rk_aiq_sys_ctx_t* sys_ctx, int index)
+{
+    return XCAM_RETURN_ERROR_UNKNOWN;
+}
+
+XCamReturn
+rk_aiq_user_api2_af_EndZoomChg(const rk_aiq_sys_ctx_t* sys_ctx)
+{
+    return XCAM_RETURN_ERROR_UNKNOWN;
+}
+
+XCamReturn
+rk_aiq_user_api2_af_GetZoomIndex(const rk_aiq_sys_ctx_t* sys_ctx, int *index)
+{
+    return XCAM_RETURN_ERROR_UNKNOWN;
+}
+
+XCamReturn
+rk_aiq_user_api2_af_StartZoomCalib(const rk_aiq_sys_ctx_t* sys_ctx)
+{
+    return XCAM_RETURN_ERROR_UNKNOWN;
+}
+
+XCamReturn
+rk_aiq_user_api2_af_resetZoom(const rk_aiq_sys_ctx_t* sys_ctx)
+{
+    return XCAM_RETURN_ERROR_UNKNOWN;
+}
+
+XCamReturn
+rk_aiq_user_api2_af_SetVcmCfg(const rk_aiq_sys_ctx_t* sys_ctx, rk_aiq_lens_vcmcfg* cfg)
+{
+    return XCAM_RETURN_ERROR_UNKNOWN;
+}
+
+XCamReturn
+rk_aiq_user_api2_af_GetVcmCfg(const rk_aiq_sys_ctx_t* sys_ctx, rk_aiq_lens_vcmcfg* cfg)
+{
+    return XCAM_RETURN_ERROR_UNKNOWN;
+}
+
+XCamReturn
+rk_aiq_user_api2_af_GetSearchPath(const rk_aiq_sys_ctx_t* sys_ctx, rk_aiq_af_sec_path_t* path)
+{
+    return XCAM_RETURN_ERROR_UNKNOWN;
+}
+
+XCamReturn
+rk_aiq_user_api2_af_GetSearchResult(const rk_aiq_sys_ctx_t* sys_ctx, rk_aiq_af_result_t* result)
+{
+    return XCAM_RETURN_ERROR_UNKNOWN;
+}
+
+XCamReturn
+rk_aiq_user_api2_af_GetZoomRange(const rk_aiq_sys_ctx_t* sys_ctx, rk_aiq_af_zoomrange* range)
+{
+    return XCAM_RETURN_ERROR_UNKNOWN;
+}
+
+XCamReturn
+rk_aiq_user_api2_af_GetFocusRange(const rk_aiq_sys_ctx_t* sys_ctx, rk_aiq_af_focusrange* range)
+{
+    return XCAM_RETURN_ERROR_UNKNOWN;
+}
+
+XCamReturn
+rk_aiq_user_api2_af_FocusCorrection(const rk_aiq_sys_ctx_t* sys_ctx)
+{
+    return XCAM_RETURN_ERROR_UNKNOWN;
+}
+
+XCamReturn
+rk_aiq_user_api2_af_ZoomCorrection(const rk_aiq_sys_ctx_t* sys_ctx)
+{
+    return XCAM_RETURN_ERROR_UNKNOWN;
+}
+
+XCamReturn
+rk_aiq_user_api2_af_setAngleZ(const rk_aiq_sys_ctx_t* sys_ctx, float angleZ)
+{
+    return XCAM_RETURN_ERROR_UNKNOWN;
+}
+
+XCamReturn
+rk_aiq_user_api2_af_getCustomAfRes(const rk_aiq_sys_ctx_t* sys_ctx, rk_tool_customAf_res_t *attr)
+{
+    return XCAM_RETURN_ERROR_UNKNOWN;
+}
+
+XCamReturn
+rk_aiq_user_api2_af_setCustomAfRes(const rk_aiq_sys_ctx_t* sys_ctx, rk_tool_customAf_res_t *attr)
+{
+    return XCAM_RETURN_ERROR_UNKNOWN;
+}
+
+#endif
 
 RKAIQ_END_DECLARE

@@ -51,7 +51,7 @@ RKStream::poll_type_to_str[ISP_POLL_POST_MAX] =
     "isp_nr_img",
     "ispp_gain_kg",
     "ispp_gain_wr",
-    "ISP_STREAM_SYNC_POLL",
+    "isp_stream_sync_poll",
     "vicap_stream_on_evt",
     "vicap_reset_evt",
     "vicap_with_rk1608_reset_evt",
@@ -59,10 +59,11 @@ RKStream::poll_type_to_str[ISP_POLL_POST_MAX] =
 
 RkPollThread::RkPollThread (const char* thName, int type, SmartPtr<V4l2Device> dev, RKStream *stream)
     :Thread(thName)
-    ,_poll_callback (NULL)
-    ,frameid (0)
     ,_dev(dev)
+    ,_subdev(NULL)
+    ,_poll_callback (NULL)
     ,_stream(stream)
+    ,frameid (0)
     ,_dev_type(type)
 {
     _poll_stop_fd[0] =  -1;
@@ -73,11 +74,11 @@ RkPollThread::RkPollThread (const char* thName, int type, SmartPtr<V4l2Device> d
 
 RkPollThread::RkPollThread (const char* thName, int type, SmartPtr<V4l2SubDevice> dev, RKStream *stream)
     :Thread(thName)
-    ,_poll_callback (NULL)
-    ,frameid (0)
-    ,_subdev(dev)
     ,_dev(dev)
+    ,_subdev(dev)
+    ,_poll_callback (NULL)
     ,_stream(stream)
+    ,frameid (0)
     ,_dev_type(type)
 {
     _poll_stop_fd[0] =  -1;
@@ -152,8 +153,9 @@ XCamReturn RkPollThread::stop ()
     if (_poll_stop_fd[1] != -1) {
         char buf = 0xf;  // random value to write to flush fd.
         unsigned int size = write(_poll_stop_fd[1], &buf, sizeof(char));
-        if (size != sizeof(char))
+        if (size != sizeof(char)) {
             XCAM_LOG_WARNING("Flush write not completed");
+        }
     }
     Thread::stop();
     destroy_stop_fds ();
@@ -311,11 +313,6 @@ RkStreamEventPollThread::poll_event_loop () {
         }
     }
 
-    if (ret == XCAM_RETURN_ERROR_IOCTL) {
-        // ignored for nonblock mode
-        return XCAM_RETURN_ERROR_TIMEOUT;
-    }
-
     return ret;
 }
 
@@ -324,7 +321,7 @@ RkStreamEventPollThread::start()
 {
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
 
-    ret = _dev->open(true);
+    ret = _dev->open(false);
     if (ret) {
        return ret;
     }
@@ -339,9 +336,11 @@ RkStreamEventPollThread::stop ()
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
 
     ret = RkEventPollThread::stop();
-    _dev->unsubscribe_event(CIFISP_V4L2_EVENT_STREAM_START);
-    _dev->unsubscribe_event(CIFISP_V4L2_EVENT_STREAM_STOP);
-    ret = _dev->close();
+    if (_dev->is_opened()) {
+        _dev->unsubscribe_event(CIFISP_V4L2_EVENT_STREAM_START);
+        _dev->unsubscribe_event(CIFISP_V4L2_EVENT_STREAM_STOP);
+        ret = _dev->close();
+    }
     return ret;
 }
 
@@ -523,9 +522,6 @@ RKStatsStream::new_video_buffer(SmartPtr<V4l2Buffer> buf,
     //SmartPtr<VideoBuffer> video_buf = nullptr;
     SmartPtr<Isp20StatsBuffer> isp20stats_buf = nullptr;
 
-    // SmartPtr<RkAiqIspParamsProxy> ispParams = nullptr;
-    rkisp_effect_params_v20 ispParams = {0};
-    SmartPtr<RkAiqExpParamsProxy> expParams = nullptr;
     SmartPtr<RkAiqIrisParamsProxy> irisParams = nullptr;
     SmartPtr<RkAiqAfInfoProxy> afParams = nullptr;
 
@@ -536,9 +532,6 @@ RKStatsStream::new_video_buffer(SmartPtr<V4l2Buffer> buf,
 
     isp20stats_buf = new Isp20StatsBuffer(buf, dev, _event_handle_dev, _rx_handle_dev, afParams, irisParams);
     isp20stats_buf->_buf_type = _dev_type;
-    isp20stats_buf->getEffectiveIspParams(buf->get_buf().sequence, ispParams);
-    isp20stats_buf->getEffectiveExpParams(buf->get_buf().sequence, expParams);
-    //CaptureRawData::getInstance().save_metadata_and_register(buf->get_buf().sequence, ispParams, expParams, afParams, _rx_handle_dev->get_workingg_mode());
 
     EXIT_CAMHW_FUNCTION();
 
@@ -676,4 +669,4 @@ RKPdafStream::new_v4l2proxy_buffer(SmartPtr<V4l2Buffer> buf,
     return buf_proxy;
 }
 
-}; //namspace RkCam
+}  //namspace RkCam

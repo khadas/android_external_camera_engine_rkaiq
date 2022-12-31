@@ -27,7 +27,7 @@
 			},
 			"CISIspDgainRange":	{
 				"Min":	1,
-				"Max":	1
+				"Max":	32
 			},
 			"CISHdrGainIndSetEn":	1
 		},
@@ -72,7 +72,7 @@
 		"CISHdrSet":	{
 			"hdr_en":	0,
 			"hdr_mode":	"RK_AIQ_ISP_HDR_MODE_2_LINE_HDR",
-			"line_mode":	"RK_AIQ_SENSOR_HDR_LINE_MODE_STAGGER"
+			"line_mode":	"RKAIQ_SENSOR_HDR_MODE_STAGGER"
 		},
 		"CISDcgSet":	{
 			"Linear":	{
@@ -204,7 +204,7 @@
 								"ToleranceIn":	8,
 								"ToleranceOut":	12,
 								"Evbias":	0,
-								"StrategyMode":	"AECV2_STRATEGY_MODE_LOWLIGHT_PRIOR",
+								"StrategyMode":	"AECV2_STRATEGY_MODE_LOWLIGHT",
 								"InitExp":	{
 									"InitTimeValue":	0.03,
 									"InitGainValue":	20,
@@ -217,7 +217,7 @@
 									"TimeDot_len":	6,
 									"GainDot":	[1, 1, 8, 16, 32, 48],
 									"GainDot_len":	6,
-									"IspDGainDot":	[1, 1, 1, 1, 1, 2],
+									"IspDGainDot":	[1, 1, 1, 1, 1, 1],
 									"IspDGainDot_len":	6,
 									"PIrisDot":	[512, 512, 512, 512, 512, 512],
 									"PIrisDot_len":	6
@@ -267,7 +267,7 @@
 								"ToleranceIn":	10,
 								"ToleranceOut":	15,
 								"Evbias":	0,
-								"StrategyMode":	"AECV2_STRATEGY_MODE_LOWLIGHT_PRIOR",
+								"StrategyMode":	"AECV2_STRATEGY_MODE_LOWLIGHT",
 								"LumaDistTh":	10,
 								"InitExp":	{
 									"InitTimeValue":	[0.0005, 0.003, 0.003],
@@ -314,7 +314,7 @@
 									}
 								},
 								"LongFrmMode":	{
-									"mode":	"AECV2_HDR_LONGFRMMODE_NORMAL",
+									"mode":	"AECV2_HDR_LONGFRMMODE_DISABLE",
 									"SfrmMinLine":	2,
 									"LfrmModeExpTh":	0.62
 								},
@@ -435,7 +435,7 @@
 							},
 							"autoPara":	{
 								"hdrPara":	{
-									"frameChooseMode":	"CALIB_AWB_HDR_FRAME_CHOOSE_MODE_AUTO",
+									"frameChooseMode":	"CALIB_AWB_HDR_FR_CH_AUTO",
 									"frameChoose":	1
 								},
 								"lscBypassEnable":	0,
@@ -446,7 +446,7 @@
 								"lsUsedForYuvDet_len":	7,
 								"blkStatisticsEnable":	1,
 								"downScaleMode":	"CALIB_AWB_DS_8X8",
-								"blkMeasureMode":	"CALIB_AWB_BLK_STAT_MODE_ALL_V201",
+								"blkMeasureMode":	"CALIB_AWB_BLK_STAT_MODE_AL_V201",
 								"mainWindow":	{
 									"mode":	"CALIB_AWB_WINDOW_CFG_AUTO",
 									"window":	[0, 0, 1, 1]
@@ -566,7 +566,13 @@
 										"dayGainLvThSet":	[1024, 4096],
 										"defaultDayGainLow":	[1.3773, 1, 1, 1.5666],
 										"defaultDayGainHigh":	[1.7093, 1, 1, 1.3983],
-										"xyType2Enable":	1
+										"xyType2Enable":	1,
+										"weight":	{
+											"lumaValue":	[0, 2, 4, 8, 32, 128, 1024, 8192, 65536, 262144],
+											"lumaValue_len":	10,
+											"weight":	[1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+											"weight_len":	10
+										}
 									}, {
 										"name":	"CWF",
 										"doorType":	"CALIB_AWB_DOOR_TYPE_INDOOR",
@@ -589,7 +595,13 @@
 										"dayGainLvThSet":	[1024, 4096],
 										"defaultDayGainLow":	[1.3773, 1, 1, 1.5666],
 										"defaultDayGainHigh":	[1.7093, 1, 1, 1.3983],
-										"xyType2Enable":	1
+										"xyType2Enable":	1,
+										"weight":	{
+											"lumaValue":	[0, 2, 4, 8, 32, 128, 1024, 8192, 65536, 262144],
+											"lumaValue_len":	10,
+											"weight":	[1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+											"weight_len":	10
+										}
 									}, {
 										"name":	"D50",
 										"doorType":	"CALIB_AWB_DOOR_TYPE_AMBIGUITY",
@@ -612,7 +624,13 @@
 										"dayGainLvThSet":	[1024, 4096],
 										"defaultDayGainLow":	[1.3773, 1, 1, 1.5666],
 										"defaultDayGainHigh":	[1.7093, 1, 1, 1.3983],
-										"xyType2Enable":	1
+										"xyType2Enable":	1,
+										"weight":	{
+											"lumaValue":	[0, 2, 4, 8, 32, 128, 1024, 8192, 65536, 262144],
+											"lumaValue_len":	10,
+											"weight":	[1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+											"weight_len":	10
+										}
 									}, {
 										"name":	"D65",
 										"doorType":	"CALIB_AWB_DOOR_TYPE_OUTDOOR",
@@ -635,7 +653,13 @@
 										"dayGainLvThSet":	[1024, 4096],
 										"defaultDayGainLow":	[1.3773, 1, 1, 1.5666],
 										"defaultDayGainHigh":	[1.7093, 1, 1, 1.3983],
-										"xyType2Enable":	1
+										"xyType2Enable":	1,
+										"weight":	{
+											"lumaValue":	[0, 2, 4, 8, 32, 128, 1024, 8192, 65536, 262144],
+											"lumaValue_len":	10,
+											"weight":	[1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+											"weight_len":	10
+										}
 									}, {
 										"name":	"D75",
 										"doorType":	"CALIB_AWB_DOOR_TYPE_OUTDOOR",
@@ -658,7 +682,13 @@
 										"dayGainLvThSet":	[1024, 4096],
 										"defaultDayGainLow":	[1.3773, 1, 1, 1.5666],
 										"defaultDayGainHigh":	[1.7093, 1, 1, 1.3983],
-										"xyType2Enable":	1
+										"xyType2Enable":	1,
+										"weight":	{
+											"lumaValue":	[0, 2, 4, 8, 32, 128, 1024, 8192, 65536, 262144],
+											"lumaValue_len":	10,
+											"weight":	[1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+											"weight_len":	10
+										}
 									}, {
 										"name":	"HZ",
 										"doorType":	"CALIB_AWB_DOOR_TYPE_INDOOR",
@@ -681,7 +711,13 @@
 										"dayGainLvThSet":	[1024, 4096],
 										"defaultDayGainLow":	[1.3773, 1, 1, 1.5666],
 										"defaultDayGainHigh":	[1.7093, 1, 1, 1.3983],
-										"xyType2Enable":	1
+										"xyType2Enable":	1,
+										"weight":	{
+											"lumaValue":	[0, 2, 4, 8, 32, 128, 1024, 8192, 65536, 262144],
+											"lumaValue_len":	10,
+											"weight":	[1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+											"weight_len":	10
+										}
 									}, {
 										"name":	"TL84",
 										"doorType":	"CALIB_AWB_DOOR_TYPE_INDOOR",
@@ -704,12 +740,31 @@
 										"dayGainLvThSet":	[1024, 4096],
 										"defaultDayGainLow":	[1.3773, 1, 1, 1.5666],
 										"defaultDayGainHigh":	[1.7093, 1, 1, 1.3983],
-										"xyType2Enable":	1
+										"xyType2Enable":	1,
+										"weight":	{
+											"lumaValue":	[0, 2, 4, 8, 32, 128, 1024, 8192, 65536, 262144],
+											"lumaValue_len":	10,
+											"weight":	[1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+											"weight_len":	10
+										}
 									}],
 								"lightSources_len":	7
 							},
 							"autoExtPara":	{
 								"lightSourceForFirstFrame":	"D50",
+								"smartRun":	{
+									"enable":	1,
+									"cfg":	{
+										"lumaValue":	[0],
+										"lumaValue_len":	1,
+										"lvVarTh":	[0.001],
+										"lvVarTh_len":	1,
+										"wbgainAlgDiffTh":	[0.005],
+										"wbgainAlgDiffTh_len":	1,
+										"wbgainHwDiffTh":	[0.05],
+										"wbgainHwDiffTh_len":	1
+									}
+								},
 								"tolerance":	{
 									"lumaValue":	[256, 512, 32768, 131072],
 									"lumaValue_len":	4,
@@ -791,7 +846,7 @@
 										"high_len":	1
 									}
 								},
-								"defaultNightGain":	[1.463305, 1.000000, 1.000000, 1.888040],
+								"defaultNightGain":	[1.463305, 1, 1, 1.88804],
 								"lumaValueMatrix":	[0, 4, 8, 64, 128, 256, 512, 1024, 2048, 4096, 4096, 16384, 32768, 65536, 131072, 262144],
 								"defaultNightGainWeight":	[100, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
 								"probCalcDis":	{
@@ -5604,7 +5659,7 @@
 						},
 						"af_v30":	{
 							"TuningPara":	{
-								"af_mode":	"CalibDbV2_AF_MODE_CONTINUOUS_PICTURE",
+								"af_mode":	"CalibDbV2_AFMODE_CONT_PICTURE",
 								"win_h_offs":	750,
 								"win_v_offs":	750,
 								"win_h_size":	500,
@@ -5624,10 +5679,10 @@
 								},
 								"contrast_af":	{
 									"enable":	1,
-									"Afss":	"CalibDbV2_CAM_AFM_FSS_ADAPTIVE_RANGE",
-									"FullDir":	"CalibDbV2_CAM_AFM_ADAPTIVE_SEARCH",
+									"Afss":	"CalibDbV2_AFSS_ADAPTIVE_RANGE",
+									"FullDir":	"CalibDbV2_AF_ADAPTIVE_SEARCH",
 									"FullRangeTbl":	[0, 4, 128],
-									"AdaptiveDir":	"CalibDbV2_CAM_AFM_ADAPTIVE_SEARCH",
+									"AdaptiveDir":	"CalibDbV2_AF_ADAPTIVE_SEARCH",
 									"AdaptRangeTbl":	[0, 16, 32, 48, 64, 80, 96, 112, 128],
 									"AdaptRangeTbl_len":	9,
 									"FineSearchStep":	[8, 8, 8, 8, 8, 8, 8, 8, 8],
@@ -5651,8 +5706,6 @@
 									"ValidValueThers":	0,
 									"OutFocusValue":	200,
 									"OutFocusPos":	64,
-									"LowLumaValue":	40,
-									"LowLumaPos":	128,
 									"WeightEnable":	0,
 									"Weight":	[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
 									"SearchPauseLumaEnable":	0,
@@ -5687,10 +5740,10 @@
 								},
 								"video_contrast_af":	{
 									"enable":	1,
-									"Afss":	"CalibDbV2_CAM_AFM_FSS_ADAPTIVE_RANGE",
-									"FullDir":	"CalibDbV2_CAM_AFM_ADAPTIVE_SEARCH",
+									"Afss":	"CalibDbV2_AFSS_ADAPTIVE_RANGE",
+									"FullDir":	"CalibDbV2_AF_ADAPTIVE_SEARCH",
 									"FullRangeTbl":	[0, 4, 128],
-									"AdaptiveDir":	"CalibDbV2_CAM_AFM_ADAPTIVE_SEARCH",
+									"AdaptiveDir":	"CalibDbV2_AF_ADAPTIVE_SEARCH",
 									"AdaptRangeTbl":	[0, 16, 32, 48, 64, 80, 96, 112, 128],
 									"AdaptRangeTbl_len":	9,
 									"FineSearchStep":	[128, 128, 128, 128, 128, 128, 128, 128, 128],
@@ -5714,8 +5767,6 @@
 									"ValidValueThers":	0,
 									"OutFocusValue":	200,
 									"OutFocusPos":	64,
-									"LowLumaValue":	40,
-									"LowLumaPos":	128,
 									"WeightEnable":	0,
 									"Weight":	[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
 									"SearchPauseLumaEnable":	0,
@@ -5976,7 +6027,8 @@
 												"iso":	204800,
 												"idx":	0,
 												"spotlt_scene_idx":	0
-											}]
+											}],
+										"measiso_len":	13
 									}],
 								"zoom_meas_len":	1,
 								"meascfg_tbl":	[{
@@ -6170,7 +6222,7 @@
 								"ToleranceIn":	8,
 								"ToleranceOut":	12,
 								"Evbias":	0,
-								"StrategyMode":	"AECV2_STRATEGY_MODE_LOWLIGHT_PRIOR",
+								"StrategyMode":	"AECV2_STRATEGY_MODE_LOWLIGHT",
 								"InitExp":	{
 									"InitTimeValue":	0.03,
 									"InitGainValue":	20,
@@ -6183,7 +6235,7 @@
 									"TimeDot_len":	6,
 									"GainDot":	[1, 1, 4, 8, 15.5, 21],
 									"GainDot_len":	6,
-									"IspDGainDot":	[1, 1, 1, 1, 1, 2],
+									"IspDGainDot":	[1, 1, 1, 1, 1, 1],
 									"IspDGainDot_len":	6,
 									"PIrisDot":	[512, 512, 512, 512, 512, 512],
 									"PIrisDot_len":	6
@@ -6233,7 +6285,7 @@
 								"ToleranceIn":	10,
 								"ToleranceOut":	15,
 								"Evbias":	0,
-								"StrategyMode":	"AECV2_STRATEGY_MODE_LOWLIGHT_PRIOR",
+								"StrategyMode":	"AECV2_STRATEGY_MODE_LOWLIGHT",
 								"LumaDistTh":	10,
 								"InitExp":	{
 									"InitTimeValue":	[0.0005, 0.003, 0.003],
@@ -6280,7 +6332,7 @@
 									}
 								},
 								"LongFrmMode":	{
-									"mode":	"AECV2_HDR_LONGFRMMODE_NORMAL",
+									"mode":	"AECV2_HDR_LONGFRMMODE_DISABLE",
 									"SfrmMinLine":	2,
 									"LfrmModeExpTh":	0.62
 								},
@@ -6401,7 +6453,7 @@
 							},
 							"autoPara":	{
 								"hdrPara":	{
-									"frameChooseMode":	"CALIB_AWB_HDR_FRAME_CHOOSE_MODE_AUTO",
+									"frameChooseMode":	"CALIB_AWB_HDR_FR_CH_AUTO",
 									"frameChoose":	1
 								},
 								"lscBypassEnable":	0,
@@ -6412,7 +6464,7 @@
 								"lsUsedForYuvDet_len":	7,
 								"blkStatisticsEnable":	1,
 								"downScaleMode":	"CALIB_AWB_DS_8X8",
-								"blkMeasureMode":	"CALIB_AWB_BLK_STAT_MODE_ALL_V201",
+								"blkMeasureMode":	"CALIB_AWB_BLK_STAT_MODE_AL_V201",
 								"mainWindow":	{
 									"mode":	"CALIB_AWB_WINDOW_CFG_AUTO",
 									"window":	[0, 0, 1, 1]
@@ -6532,7 +6584,13 @@
 										"dayGainLvThSet":	[1024, 4096],
 										"defaultDayGainLow":	[1.3773, 1, 1, 1.5666],
 										"defaultDayGainHigh":	[1.7093, 1, 1, 1.3983],
-										"xyType2Enable":	1
+										"xyType2Enable":	1,
+										"weight":	{
+											"lumaValue":	[0, 2, 4, 8, 32, 128, 1024, 8192, 65536, 262144],
+											"lumaValue_len":	10,
+											"weight":	[1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+											"weight_len":	10
+										}
 									}, {
 										"name":	"CWF",
 										"doorType":	"CALIB_AWB_DOOR_TYPE_INDOOR",
@@ -6555,7 +6613,13 @@
 										"dayGainLvThSet":	[1024, 4096],
 										"defaultDayGainLow":	[1.3773, 1, 1, 1.5666],
 										"defaultDayGainHigh":	[1.7093, 1, 1, 1.3983],
-										"xyType2Enable":	1
+										"xyType2Enable":	1,
+										"weight":	{
+											"lumaValue":	[0, 2, 4, 8, 32, 128, 1024, 8192, 65536, 262144],
+											"lumaValue_len":	10,
+											"weight":	[1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+											"weight_len":	10
+										}
 									}, {
 										"name":	"D50",
 										"doorType":	"CALIB_AWB_DOOR_TYPE_AMBIGUITY",
@@ -6578,7 +6642,13 @@
 										"dayGainLvThSet":	[1024, 4096],
 										"defaultDayGainLow":	[1.3773, 1, 1, 1.5666],
 										"defaultDayGainHigh":	[1.7093, 1, 1, 1.3983],
-										"xyType2Enable":	1
+										"xyType2Enable":	1,
+										"weight":	{
+											"lumaValue":	[0, 2, 4, 8, 32, 128, 1024, 8192, 65536, 262144],
+											"lumaValue_len":	10,
+											"weight":	[1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+											"weight_len":	10
+										}
 									}, {
 										"name":	"D65",
 										"doorType":	"CALIB_AWB_DOOR_TYPE_OUTDOOR",
@@ -6601,7 +6671,13 @@
 										"dayGainLvThSet":	[1024, 4096],
 										"defaultDayGainLow":	[1.3773, 1, 1, 1.5666],
 										"defaultDayGainHigh":	[1.7093, 1, 1, 1.3983],
-										"xyType2Enable":	1
+										"xyType2Enable":	1,
+										"weight":	{
+											"lumaValue":	[0, 2, 4, 8, 32, 128, 1024, 8192, 65536, 262144],
+											"lumaValue_len":	10,
+											"weight":	[1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+											"weight_len":	10
+										}
 									}, {
 										"name":	"D75",
 										"doorType":	"CALIB_AWB_DOOR_TYPE_OUTDOOR",
@@ -6624,7 +6700,13 @@
 										"dayGainLvThSet":	[1024, 4096],
 										"defaultDayGainLow":	[1.3773, 1, 1, 1.5666],
 										"defaultDayGainHigh":	[1.7093, 1, 1, 1.3983],
-										"xyType2Enable":	1
+										"xyType2Enable":	1,
+										"weight":	{
+											"lumaValue":	[0, 2, 4, 8, 32, 128, 1024, 8192, 65536, 262144],
+											"lumaValue_len":	10,
+											"weight":	[1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+											"weight_len":	10
+										}
 									}, {
 										"name":	"HZ",
 										"doorType":	"CALIB_AWB_DOOR_TYPE_INDOOR",
@@ -6647,7 +6729,13 @@
 										"dayGainLvThSet":	[1024, 4096],
 										"defaultDayGainLow":	[1.3773, 1, 1, 1.5666],
 										"defaultDayGainHigh":	[1.7093, 1, 1, 1.3983],
-										"xyType2Enable":	1
+										"xyType2Enable":	1,
+										"weight":	{
+											"lumaValue":	[0, 2, 4, 8, 32, 128, 1024, 8192, 65536, 262144],
+											"lumaValue_len":	10,
+											"weight":	[1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+											"weight_len":	10
+										}
 									}, {
 										"name":	"TL84",
 										"doorType":	"CALIB_AWB_DOOR_TYPE_INDOOR",
@@ -6670,12 +6758,31 @@
 										"dayGainLvThSet":	[1024, 4096],
 										"defaultDayGainLow":	[1.3773, 1, 1, 1.5666],
 										"defaultDayGainHigh":	[1.7093, 1, 1, 1.3983],
-										"xyType2Enable":	1
+										"xyType2Enable":	1,
+										"weight":	{
+											"lumaValue":	[0, 2, 4, 8, 32, 128, 1024, 8192, 65536, 262144],
+											"lumaValue_len":	10,
+											"weight":	[1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+											"weight_len":	10
+										}
 									}],
 								"lightSources_len":	7
 							},
 							"autoExtPara":	{
 								"lightSourceForFirstFrame":	"D50",
+								"smartRun":	{
+									"enable":	1,
+									"cfg":	{
+										"lumaValue":	[0],
+										"lumaValue_len":	1,
+										"lvVarTh":	[0.001],
+										"lvVarTh_len":	1,
+										"wbgainAlgDiffTh":	[0.005],
+										"wbgainAlgDiffTh_len":	1,
+										"wbgainHwDiffTh":	[0.05],
+										"wbgainHwDiffTh_len":	1
+									}
+								},
 								"tolerance":	{
 									"lumaValue":	[256, 512, 32768, 131072],
 									"lumaValue_len":	4,
@@ -6757,7 +6864,7 @@
 										"high_len":	1
 									}
 								},
-								"defaultNightGain":	[1.463305, 1.000000, 1.000000, 1.888040],
+								"defaultNightGain":	[1.463305, 1, 1, 1.88804],
 								"lumaValueMatrix":	[0, 4, 8, 64, 128, 256, 512, 1024, 2048, 4096, 4096, 16384, 32768, 65536, 131072, 262144],
 								"defaultNightGainWeight":	[100, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
 								"probCalcDis":	{
@@ -11465,7 +11572,7 @@
 						},
 						"af_v30":	{
 							"TuningPara":	{
-								"af_mode":	"CalibDbV2_AF_MODE_CONTINUOUS_PICTURE",
+								"af_mode":	"CalibDbV2_AFMODE_CONT_PICTURE",
 								"win_h_offs":	750,
 								"win_v_offs":	750,
 								"win_h_size":	500,
@@ -11485,10 +11592,10 @@
 								},
 								"contrast_af":	{
 									"enable":	1,
-									"Afss":	"CalibDbV2_CAM_AFM_FSS_ADAPTIVE_RANGE",
-									"FullDir":	"CalibDbV2_CAM_AFM_ADAPTIVE_SEARCH",
+									"Afss":	"CalibDbV2_AFSS_ADAPTIVE_RANGE",
+									"FullDir":	"CalibDbV2_AF_ADAPTIVE_SEARCH",
 									"FullRangeTbl":	[0, 4, 128],
-									"AdaptiveDir":	"CalibDbV2_CAM_AFM_ADAPTIVE_SEARCH",
+									"AdaptiveDir":	"CalibDbV2_AF_ADAPTIVE_SEARCH",
 									"AdaptRangeTbl":	[0, 16, 32, 48, 64, 80, 96, 112, 128],
 									"AdaptRangeTbl_len":	9,
 									"FineSearchStep":	[8, 8, 8, 8, 8, 8, 8, 8, 8],
@@ -11512,8 +11619,6 @@
 									"ValidValueThers":	0,
 									"OutFocusValue":	200,
 									"OutFocusPos":	64,
-									"LowLumaValue":	40,
-									"LowLumaPos":	128,
 									"WeightEnable":	0,
 									"Weight":	[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
 									"SearchPauseLumaEnable":	0,
@@ -11548,10 +11653,10 @@
 								},
 								"video_contrast_af":	{
 									"enable":	1,
-									"Afss":	"CalibDbV2_CAM_AFM_FSS_ADAPTIVE_RANGE",
-									"FullDir":	"CalibDbV2_CAM_AFM_ADAPTIVE_SEARCH",
+									"Afss":	"CalibDbV2_AFSS_ADAPTIVE_RANGE",
+									"FullDir":	"CalibDbV2_AF_ADAPTIVE_SEARCH",
 									"FullRangeTbl":	[0, 4, 128],
-									"AdaptiveDir":	"CalibDbV2_CAM_AFM_ADAPTIVE_SEARCH",
+									"AdaptiveDir":	"CalibDbV2_AF_ADAPTIVE_SEARCH",
 									"AdaptRangeTbl":	[0, 16, 32, 48, 64, 80, 96, 112, 128],
 									"AdaptRangeTbl_len":	9,
 									"FineSearchStep":	[128, 128, 128, 128, 128, 128, 128, 128, 128],
@@ -11575,8 +11680,6 @@
 									"ValidValueThers":	0,
 									"OutFocusValue":	200,
 									"OutFocusPos":	64,
-									"LowLumaValue":	40,
-									"LowLumaPos":	128,
 									"WeightEnable":	0,
 									"Weight":	[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
 									"SearchPauseLumaEnable":	0,
@@ -11837,7 +11940,8 @@
 												"iso":	204800,
 												"idx":	0,
 												"spotlt_scene_idx":	0
-											}]
+											}],
+										"measiso_len":	13
 									}],
 								"zoom_meas_len":	1,
 								"meascfg_tbl":	[{

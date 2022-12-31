@@ -22,15 +22,16 @@ RKAIQ_BEGIN_DECLARE
 #ifdef RK_SIMULATOR_HW
 #define CHECK_USER_API_ENABLE
 #endif
-
-XCamReturn  rk_aiq_user_api2_acsm_SetAttrib(const rk_aiq_sys_ctx_t* sys_ctx, rk_aiq_uapi_acsm_attrib_t attr)
+#if RKAIQ_HAVE_CSM_V1
+XCamReturn  rk_aiq_user_api2_acsm_SetAttrib(const rk_aiq_sys_ctx_t* sys_ctx,
+                                            const rk_aiq_uapi_acsm_attrib_t* attr)
 {
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
     CHECK_USER_API_ENABLE2(sys_ctx);
     CHECK_USER_API_ENABLE(RK_AIQ_ALGO_TYPE_ACSM);
     RKAIQ_API_SMART_LOCK(sys_ctx);
 
-    if (!attr.param.full_range) {
+    if (!attr->param.full_range) {
         LOGE_ACSM("Limit range is not supported!\n");
         return XCAM_RETURN_ERROR_PARAM;
     }
@@ -61,7 +62,8 @@ XCamReturn  rk_aiq_user_api2_acsm_SetAttrib(const rk_aiq_sys_ctx_t* sys_ctx, rk_
     return (ret);
 }
 
-XCamReturn  rk_aiq_user_api2_acsm_GetAttrib(const rk_aiq_sys_ctx_t* sys_ctx, rk_aiq_uapi_acsm_attrib_t* attr)
+XCamReturn  rk_aiq_user_api2_acsm_GetAttrib(const rk_aiq_sys_ctx_t* sys_ctx,
+                                            rk_aiq_uapi_acsm_attrib_t* attr)
 {
     RKAIQ_API_SMART_LOCK(sys_ctx);
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
@@ -90,7 +92,19 @@ XCamReturn  rk_aiq_user_api2_acsm_GetAttrib(const rk_aiq_sys_ctx_t* sys_ctx, rk_
 
     return (ret);
 }
+#else
+XCamReturn  rk_aiq_user_api2_acsm_SetAttrib(const rk_aiq_sys_ctx_t* sys_ctx,
+                                            const rk_aiq_uapi_acsm_attrib_t* attr)
+{
+    return XCAM_RETURN_ERROR_UNKNOWN;
+}
 
+XCamReturn  rk_aiq_user_api2_acsm_GetAttrib(const rk_aiq_sys_ctx_t* sys_ctx,
+                                            rk_aiq_uapi_acsm_attrib_t* attr)
+{
+    return XCAM_RETURN_ERROR_UNKNOWN;
+}
+#endif
 RKAIQ_END_DECLARE
 
 

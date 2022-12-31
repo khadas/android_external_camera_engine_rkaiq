@@ -18,13 +18,18 @@
  */
 
 #include "agamma/rk_aiq_algo_agamma_itf.h"
-#include "agamma/rk_aiq_agamma_algo.h"
+#if RKAIQ_HAVE_GAMMA_V10
+#include "agamma/rk_aiq_agamma_algo_v10.h"
+#endif
+#if RKAIQ_HAVE_GAMMA_V11
+#include "agamma/rk_aiq_agamma_algo_v11.h"
+#endif
 #include "rk_aiq_algo_types.h"
 
 RKAIQ_BEGIN_DECLARE
 
 typedef struct _RkAiqAlgoContext {
-    void* place_holder[0];
+    AgammaHandle_t AgammaHandle;
 } RkAiqAlgoContext;
 
 
@@ -64,40 +69,28 @@ prepare(RkAiqAlgoCom* params)
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
     AgammaHandle_t * pAgammaHandle = (AgammaHandle_t *)params->ctx;
     RkAiqAlgoConfigAgamma* pCfgParam = (RkAiqAlgoConfigAgamma*)params;
-    rk_aiq_gamma_cfg_t *agamma_config = &pAgammaHandle->agamma_config;
-    pAgammaHandle->working_mode = pCfgParam->com.u.prepare.working_mode;
-    pAgammaHandle->prepare_type = pCfgParam->com.u.prepare.conf_type;
 
-    if(!!(pAgammaHandle->prepare_type & RK_AIQ_ALGO_CONFTYPE_UPDATECALIB )) {
-
-        if(CHECK_ISP_HW_V21()) {
-            CalibDbV2_gamma_t* calibv2_agamma_calib =
-                (CalibDbV2_gamma_t*)(CALIBDBV2_GET_MODULE_PTR((void*)(pCfgParam->com.u.prepare.calibv2), agamma_calib));
-            memcpy(&pAgammaHandle->CalibDb.Gamma_v20, calibv2_agamma_calib, sizeof(CalibDbV2_gamma_t));//reload iq
-        }
-        else if(CHECK_ISP_HW_V30()) {
-            CalibDbV2_gamma_V30_t* calibv2_agamma_calib =
-                (CalibDbV2_gamma_V30_t*)(CALIBDBV2_GET_MODULE_PTR((void*)(pCfgParam->com.u.prepare.calibv2), agamma_calib));
-            memcpy(&pAgammaHandle->CalibDb.Gamma_v30, calibv2_agamma_calib, sizeof(CalibDbV2_gamma_V30_t));//reload iq
-        }
+    if (!!(pCfgParam->com.u.prepare.conf_type & RK_AIQ_ALGO_CONFTYPE_UPDATECALIB)) {
         LOGI_AGAMMA("%s: Agamma Reload Para!!!\n", __FUNCTION__);
+#if RKAIQ_HAVE_GAMMA_V10
+        CalibDbV2_gamma_v10_t* calibv2_agamma_calib =
+            (CalibDbV2_gamma_v10_t*)(CALIBDBV2_GET_MODULE_PTR(
+                (void*)(pCfgParam->com.u.prepare.calibv2), agamma_calib));
+        memcpy(&pAgammaHandle->agammaAttrV10.stAuto, calibv2_agamma_calib,
+               sizeof(CalibDbV2_gamma_v10_t));  // reload iq
+#endif
+#if RKAIQ_HAVE_GAMMA_V11
+        CalibDbV2_gamma_v11_t* calibv2_agamma_calib =
+            (CalibDbV2_gamma_v11_t*)(CALIBDBV2_GET_MODULE_PTR(
+                (void*)(pCfgParam->com.u.prepare.calibv2), agamma_calib));
+        memcpy(&pAgammaHandle->agammaAttrV11.stAuto, calibv2_agamma_calib,
+               sizeof(CalibDbV2_gamma_v11_t));  // reload iq
+#endif
     }
+    pAgammaHandle->ifReCalcStAuto = true;
 
     LOG1_AGAMMA("EXIT: %s \n", __func__);
     return ret;
-}
-
-static XCamReturn
-pre_process(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outparams)
-{
-    LOG1_AGAMMA("ENTER: %s \n", __func__);
-    RkAiqAlgoPreAgamma* pAgammaPreParams = (RkAiqAlgoPreAgamma*)inparams;
-    AgammaHandle_t* pAgammaHandle = (AgammaHandle_t *)inparams->ctx;
-    rk_aiq_gamma_cfg_t *agamma_config = &pAgammaHandle->agamma_config;
-
-
-    LOG1_AGAMMA("EXIT: %s \n", __func__);
-    return XCAM_RETURN_NO_ERROR;
 }
 
 static XCamReturn
@@ -106,21 +99,43 @@ processing(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outparams)
     LOG1_AGAMMA("ENTER: %s \n", __func__);
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
     AgammaHandle_t* pAgammaHandle = (AgammaHandle_t *)inparams->ctx;
+    pAgammaHandle->FrameID                 = inparams->frame_id;
     RkAiqAlgoProcResAgamma* pAgammaProcRes = (RkAiqAlgoProcResAgamma*)outparams;
     AgammaProcRes_t* pProcRes = (AgammaProcRes_t*)&pAgammaProcRes->GammaProcRes;
+    bool bypass                            = true;
 
-    AgammaProcessing(pAgammaHandle);
+#if RKAIQ_HAVE_GAMMA_V10
+    if (pAgammaHandle->FrameID <= 2)
+        bypass = false;
+    else if (pAgammaHandle->agammaAttrV10.mode != pAgammaHandle->CurrApiMode)
+        bypass = false;
+    else if (pAgammaHandle->agammaAttrV10.mode == RK_AIQ_GAMMA_MODE_MANUAL)
+        bypass = !pAgammaHandle->ifReCalcStManual;
+    else if (pAgammaHandle->agammaAttrV10.mode == RK_AIQ_GAMMA_MODE_AUTO)
+        bypass = !pAgammaHandle->ifReCalcStAuto;
+#endif
+#if RKAIQ_HAVE_GAMMA_V11
+    if (pAgammaHandle->FrameID <= 2)
+        bypass = false;
+    else if (pAgammaHandle->agammaAttrV11.mode != pAgammaHandle->CurrApiMode)
+        bypass = false;
+    else if (pAgammaHandle->agammaAttrV11.mode == RK_AIQ_GAMMA_MODE_MANUAL)
+        bypass = !pAgammaHandle->ifReCalcStManual;
+    else if (pAgammaHandle->agammaAttrV11.mode == RK_AIQ_GAMMA_MODE_AUTO)
+        bypass = !pAgammaHandle->ifReCalcStAuto;
+#endif
+    pAgammaHandle->ifReCalcStAuto   = false;
+    pAgammaHandle->ifReCalcStManual = false;
 
-    //set proc res
-    AgammaSetProcRes(pProcRes, &pAgammaHandle->agamma_config);
+    if (!bypass) {
+        AgammaProcessing(pAgammaHandle);
+    }
+
+    // set proc res
+    AgammaSetProcRes(pProcRes, pAgammaHandle, bypass);
+
     LOG1_AGAMMA("EXIT: %s \n", __func__);
     return ret;
-}
-
-static XCamReturn
-post_process(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outparams)
-{
-    return XCAM_RETURN_NO_ERROR;
 }
 
 RkAiqAlgoDescription g_RkIspAlgoDescAgamma = {
@@ -134,9 +149,9 @@ RkAiqAlgoDescription g_RkIspAlgoDescAgamma = {
         .destroy_context = destroy_context,
     },
     .prepare = prepare,
-    .pre_process = pre_process,
+    .pre_process = NULL,
     .processing = processing,
-    .post_process = post_process,
+    .post_process = NULL,
 };
 
 RKAIQ_END_DECLARE

@@ -24,9 +24,9 @@
 
 #include "rk_aiq_algo_des.h"
 
-#define RKISP_ALGO_AWB_VERSION     "v0.0.1"
-#define RKISP_ALGO_AWB_VENDOR      "Rockchip"
-#define RKISP_ALGO_AWB_DESCRIPTION "Rockchip AWB camgroup algo for ISP2.0"
+#define RKISP_ALGO_CAMGROUP_AWB_VERSION     "v0.0.1"
+#define RKISP_ALGO_CAMGROUP_AWB_VENDOR      "Rockchip"
+#define RKISP_ALGO_CAMGROUP_AWB_DESCRIPTION "Rockchip AWB camgroup algo for ISP2.0"
 
 XCAM_BEGIN_DECLARE
 

@@ -33,10 +33,14 @@ template <>
 img_buffer_t convert(std::shared_ptr<DmaVideoBuffer>& dma) {
     auto info        = dma->get_video_info();
     img_buffer_t buf = {
+        .vir_addr = nullptr,
+        .phy_addr = nullptr,
+        .fd      = -1,
         .width   = (int)info.width,
         .height  = (int)info.height,
         .wstride = (int)info.aligned_width,
         .hstride = (int)info.aligned_height,
+        .format  = RK_PIX_FMT_NV12,
     };
 
     buf.fd     = dma->get_fd();
@@ -61,4 +65,4 @@ TaskResult ScalerTask::operator()(ServiceParam<scaler_param>& p) {
     return TaskResult::kSuccess;
 }
 
-};  // namespace RkCam
+}  // namespace RkCam

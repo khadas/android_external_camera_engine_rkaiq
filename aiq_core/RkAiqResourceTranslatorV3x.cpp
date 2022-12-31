@@ -71,19 +71,19 @@ RkAiqResourceTranslatorV3x& RkAiqResourceTranslatorV3x::SetRightIspRect(
     return *this;
 }
 
-const bool RkAiqResourceTranslatorV3x::IsMultiIspMode() const {
+bool RkAiqResourceTranslatorV3x::IsMultiIspMode() const {
     return mIsMultiIsp;
 }
 
-const RkAiqResourceTranslatorV3x::Rectangle& RkAiqResourceTranslatorV3x::GetPicInfo() const {
+RkAiqResourceTranslatorV3x::Rectangle RkAiqResourceTranslatorV3x::GetPicInfo() {
     return pic_rect_;
 }
 
-const RkAiqResourceTranslatorV3x::Rectangle& RkAiqResourceTranslatorV3x::GetLeftIspRect() const {
+RkAiqResourceTranslatorV3x::Rectangle RkAiqResourceTranslatorV3x::GetLeftIspRect() {
     return left_isp_rect_;
 }
 
-const RkAiqResourceTranslatorV3x::Rectangle& RkAiqResourceTranslatorV3x::GetRightIspRect() const {
+RkAiqResourceTranslatorV3x::Rectangle RkAiqResourceTranslatorV3x::GetRightIspRect() {
     return right_isp_rect_;
 }
 
@@ -128,6 +128,8 @@ void JudgeWinLocation(
         }
     }
 }
+
+#if defined(RKAIQ_HAVE_MULTIISP)
 
 void MergeAecWinLiteStats(
     rawaelite_stat_t *merge_stats,
@@ -346,6 +348,7 @@ void MergeAwbWinStats(
         break;
     }
 }
+#endif
 
 void AwbStatOverflowCheckandFixed(struct isp2x_window* win, rk_aiq_awb_blk_stat_mode_v201_t blkMeasureMode, bool blkStatisticsWithLumaWeightEn, rk_aiq_awb_xy_type_v201_t xyRangeTypeForWpHist,
                                   int lightNum, struct isp3x_rawawb_meas_stat *stats)
@@ -382,6 +385,8 @@ void AwbStatOverflowCheckandFixed(struct isp2x_window* win, rk_aiq_awb_blk_stat_
         }
     }
 }
+
+#if defined(RKAIQ_HAVE_MULTIISP)
 
 void MergeAwbBlkStats(
     struct isp2x_window* ori_win,
@@ -573,10 +578,11 @@ RkAiqResourceTranslatorV3x::translateMultiAecStats(const SmartPtr<VideoBuffer>& 
         return XCAM_RETURN_BYPASS;
     }
 
-    if(left_stats->frame_id != right_stats->frame_id || left_stats->meas_type != right_stats->meas_type)
+    if (left_stats->frame_id != right_stats->frame_id || left_stats->meas_type != right_stats->meas_type) {
         LOGE_ANALYZER("status params(frmid or meas_type) of left isp and right isp are different");
-    else
+    } else {
         LOGD_ANALYZER("camId: %d, stats: frame_id: %d,  meas_type; 0x%x", mCamPhyId, left_stats->frame_id, left_stats->meas_type);
+    }
 
     SmartPtr<RkAiqIrisParamsProxy> irisParams = buf->get_iris_params();
     SmartPtr<RkAiqExpParamsProxy> expParams = nullptr;
@@ -1011,10 +1017,11 @@ XCamReturn RkAiqResourceTranslatorV3x::translateMultiAwbStats(const SmartPtr<Vid
         return XCAM_RETURN_BYPASS;
     }
 
-    if(left_stats->frame_id != right_stats->frame_id || left_stats->meas_type != right_stats->meas_type)
+    if (left_stats->frame_id != right_stats->frame_id || left_stats->meas_type != right_stats->meas_type) {
         LOGE_ANALYZER("status params(frmid or meas_type) of left isp and right isp are different");
-    else
+    } else {
         LOGI_ANALYZER("stats: frame_id: %d,  meas_type; 0x%x", left_stats->frame_id, left_stats->meas_type);
+    }
 
 
     statsInt->awb_stats_valid = left_stats->meas_type >> 5 & 1;
@@ -1160,134 +1167,46 @@ RkAiqResourceTranslatorV3x::translateMultiAdehazeStats(const SmartPtr<VideoBuffe
     else
         LOGI_ANALYZER("stats: frame_id: %d,  meas_type; 0x%x", left_stats->frame_id, left_stats->meas_type);
 
-    LOGV_ADEHAZE(
-        " %s left frame_id:%d dhaz_adp_air_base:%d dhaz_adp_wt:%d dhaz_adp_tmax:%d "
-        "dhaz_adp_gratio:%d dhaz_pic_sumh:%d\n",
-        __func__, left_stats->frame_id, left_stats->params.dhaz.dhaz_adp_air_base,
-        left_stats->params.dhaz.dhaz_adp_wt, left_stats->params.dhaz.dhaz_adp_tmax,
-        left_stats->params.dhaz.dhaz_adp_gratio, left_stats->params.dhaz.dhaz_pic_sumh);
-    LOGV_ADEHAZE(" %s left h_rgb_iir[0~5]:%d %d %d %d %d %d\n", __func__,
-                 left_stats->params.dhaz.h_rgb_iir[0], left_stats->params.dhaz.h_rgb_iir[1],
-                 left_stats->params.dhaz.h_rgb_iir[2], left_stats->params.dhaz.h_rgb_iir[3],
-                 left_stats->params.dhaz.h_rgb_iir[4], left_stats->params.dhaz.h_rgb_iir[5]);
-    LOGV_ADEHAZE("%s left h_rgb_iir[0~15]:%d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d\n",
-                 __func__, left_stats->params.dhaz.h_rgb_iir[0],
-                 left_stats->params.dhaz.h_rgb_iir[1], left_stats->params.dhaz.h_rgb_iir[2],
-                 left_stats->params.dhaz.h_rgb_iir[3], left_stats->params.dhaz.h_rgb_iir[4],
-                 left_stats->params.dhaz.h_rgb_iir[5], left_stats->params.dhaz.h_rgb_iir[6],
-                 left_stats->params.dhaz.h_rgb_iir[7], left_stats->params.dhaz.h_rgb_iir[8],
-                 left_stats->params.dhaz.h_rgb_iir[9], left_stats->params.dhaz.h_rgb_iir[10],
-                 left_stats->params.dhaz.h_rgb_iir[11], left_stats->params.dhaz.h_rgb_iir[12],
-                 left_stats->params.dhaz.h_rgb_iir[13], left_stats->params.dhaz.h_rgb_iir[14],
-                 left_stats->params.dhaz.h_rgb_iir[15]);
-    LOGV_ADEHAZE("%s h_rgb_iir[16~31]:%d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d\n", __func__,
-                 left_stats->params.dhaz.h_rgb_iir[16], left_stats->params.dhaz.h_rgb_iir[17],
-                 left_stats->params.dhaz.h_rgb_iir[18], left_stats->params.dhaz.h_rgb_iir[19],
-                 left_stats->params.dhaz.h_rgb_iir[20], left_stats->params.dhaz.h_rgb_iir[21],
-                 left_stats->params.dhaz.h_rgb_iir[22], left_stats->params.dhaz.h_rgb_iir[23],
-                 left_stats->params.dhaz.h_rgb_iir[24], left_stats->params.dhaz.h_rgb_iir[25],
-                 left_stats->params.dhaz.h_rgb_iir[26], left_stats->params.dhaz.h_rgb_iir[27],
-                 left_stats->params.dhaz.h_rgb_iir[28], left_stats->params.dhaz.h_rgb_iir[29],
-                 left_stats->params.dhaz.h_rgb_iir[30], left_stats->params.dhaz.h_rgb_iir[31]);
-    LOGV_ADEHAZE("%s h_rgb_iir[32~47]:%d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d\n", __func__,
-                 left_stats->params.dhaz.h_rgb_iir[32], left_stats->params.dhaz.h_rgb_iir[33],
-                 left_stats->params.dhaz.h_rgb_iir[34], left_stats->params.dhaz.h_rgb_iir[35],
-                 left_stats->params.dhaz.h_rgb_iir[36], left_stats->params.dhaz.h_rgb_iir[37],
-                 left_stats->params.dhaz.h_rgb_iir[38], left_stats->params.dhaz.h_rgb_iir[39],
-                 left_stats->params.dhaz.h_rgb_iir[40], left_stats->params.dhaz.h_rgb_iir[41],
-                 left_stats->params.dhaz.h_rgb_iir[42], left_stats->params.dhaz.h_rgb_iir[43],
-                 left_stats->params.dhaz.h_rgb_iir[44], left_stats->params.dhaz.h_rgb_iir[45],
-                 left_stats->params.dhaz.h_rgb_iir[46], left_stats->params.dhaz.h_rgb_iir[47]);
-    LOGV_ADEHAZE("%s h_rgb_iir[48~63]:%d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d\n", __func__,
-                 left_stats->params.dhaz.h_rgb_iir[48], left_stats->params.dhaz.h_rgb_iir[49],
-                 left_stats->params.dhaz.h_rgb_iir[50], left_stats->params.dhaz.h_rgb_iir[51],
-                 left_stats->params.dhaz.h_rgb_iir[52], left_stats->params.dhaz.h_rgb_iir[53],
-                 left_stats->params.dhaz.h_rgb_iir[54], left_stats->params.dhaz.h_rgb_iir[55],
-                 left_stats->params.dhaz.h_rgb_iir[56], left_stats->params.dhaz.h_rgb_iir[57],
-                 left_stats->params.dhaz.h_rgb_iir[58], left_stats->params.dhaz.h_rgb_iir[59],
-                 left_stats->params.dhaz.h_rgb_iir[60], left_stats->params.dhaz.h_rgb_iir[61],
-                 left_stats->params.dhaz.h_rgb_iir[62], left_stats->params.dhaz.h_rgb_iir[63]);
-    LOGV_ADEHAZE(
-        " %s right frame_id:%d dhaz_adp_air_base:%d dhaz_adp_wt:%d dhaz_adp_tmax:%d "
-        "dhaz_adp_gratio:%d dhaz_pic_sumh:%d\n",
-        __func__, right_stats->frame_id, right_stats->params.dhaz.dhaz_adp_air_base,
-        right_stats->params.dhaz.dhaz_adp_wt, right_stats->params.dhaz.dhaz_adp_tmax,
-        right_stats->params.dhaz.dhaz_adp_gratio, right_stats->params.dhaz.dhaz_pic_sumh);
-    LOGV_ADEHAZE("%s right h_rgb_iir[0~15]:%d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d\n",
-                 __func__, right_stats->params.dhaz.h_rgb_iir[0],
-                 right_stats->params.dhaz.h_rgb_iir[1], right_stats->params.dhaz.h_rgb_iir[2],
-                 right_stats->params.dhaz.h_rgb_iir[3], right_stats->params.dhaz.h_rgb_iir[4],
-                 right_stats->params.dhaz.h_rgb_iir[5], right_stats->params.dhaz.h_rgb_iir[6],
-                 right_stats->params.dhaz.h_rgb_iir[7], right_stats->params.dhaz.h_rgb_iir[8],
-                 right_stats->params.dhaz.h_rgb_iir[9], right_stats->params.dhaz.h_rgb_iir[10],
-                 right_stats->params.dhaz.h_rgb_iir[11], right_stats->params.dhaz.h_rgb_iir[12],
-                 right_stats->params.dhaz.h_rgb_iir[13], right_stats->params.dhaz.h_rgb_iir[14],
-                 right_stats->params.dhaz.h_rgb_iir[15]);
-    LOGV_ADEHAZE("%s h_rgb_iir[16~31]:%d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d\n", __func__,
-                 right_stats->params.dhaz.h_rgb_iir[16], right_stats->params.dhaz.h_rgb_iir[17],
-                 right_stats->params.dhaz.h_rgb_iir[18], right_stats->params.dhaz.h_rgb_iir[19],
-                 right_stats->params.dhaz.h_rgb_iir[20], right_stats->params.dhaz.h_rgb_iir[21],
-                 right_stats->params.dhaz.h_rgb_iir[22], right_stats->params.dhaz.h_rgb_iir[23],
-                 right_stats->params.dhaz.h_rgb_iir[24], right_stats->params.dhaz.h_rgb_iir[25],
-                 right_stats->params.dhaz.h_rgb_iir[26], right_stats->params.dhaz.h_rgb_iir[27],
-                 right_stats->params.dhaz.h_rgb_iir[28], right_stats->params.dhaz.h_rgb_iir[29],
-                 right_stats->params.dhaz.h_rgb_iir[30], right_stats->params.dhaz.h_rgb_iir[31]);
-    LOGV_ADEHAZE("%s h_rgb_iir[32~47]:%d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d\n", __func__,
-                 right_stats->params.dhaz.h_rgb_iir[32], right_stats->params.dhaz.h_rgb_iir[33],
-                 right_stats->params.dhaz.h_rgb_iir[34], right_stats->params.dhaz.h_rgb_iir[35],
-                 right_stats->params.dhaz.h_rgb_iir[36], right_stats->params.dhaz.h_rgb_iir[37],
-                 right_stats->params.dhaz.h_rgb_iir[38], right_stats->params.dhaz.h_rgb_iir[39],
-                 right_stats->params.dhaz.h_rgb_iir[40], right_stats->params.dhaz.h_rgb_iir[41],
-                 right_stats->params.dhaz.h_rgb_iir[42], right_stats->params.dhaz.h_rgb_iir[43],
-                 right_stats->params.dhaz.h_rgb_iir[44], right_stats->params.dhaz.h_rgb_iir[45],
-                 right_stats->params.dhaz.h_rgb_iir[46], right_stats->params.dhaz.h_rgb_iir[47]);
-    LOGV_ADEHAZE("%s h_rgb_iir[48~63]:%d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d\n", __func__,
-                 right_stats->params.dhaz.h_rgb_iir[48], right_stats->params.dhaz.h_rgb_iir[49],
-                 right_stats->params.dhaz.h_rgb_iir[50], right_stats->params.dhaz.h_rgb_iir[51],
-                 right_stats->params.dhaz.h_rgb_iir[52], right_stats->params.dhaz.h_rgb_iir[53],
-                 right_stats->params.dhaz.h_rgb_iir[54], right_stats->params.dhaz.h_rgb_iir[55],
-                 right_stats->params.dhaz.h_rgb_iir[56], right_stats->params.dhaz.h_rgb_iir[57],
-                 right_stats->params.dhaz.h_rgb_iir[58], right_stats->params.dhaz.h_rgb_iir[59],
-                 right_stats->params.dhaz.h_rgb_iir[60], right_stats->params.dhaz.h_rgb_iir[61],
-                 right_stats->params.dhaz.h_rgb_iir[62], right_stats->params.dhaz.h_rgb_iir[63]);
-
     //adehaze stats v3.x
     statsInt->adehaze_stats_valid = left_stats->meas_type >> 17 & 1;
     statsInt->frame_id = left_stats->frame_id;
 
-    statsInt->adehaze_stats.dehaze_stats_v30.dhaz_adp_air_base = (left_stats->params.dhaz.dhaz_adp_air_base + right_stats->params.dhaz.dhaz_adp_air_base) / 2;
-    statsInt->adehaze_stats.dehaze_stats_v30.dhaz_adp_wt = (left_stats->params.dhaz.dhaz_adp_wt + right_stats->params.dhaz.dhaz_adp_wt) / 2;
-    statsInt->adehaze_stats.dehaze_stats_v30.dhaz_adp_gratio = (left_stats->params.dhaz.dhaz_adp_gratio + right_stats->params.dhaz.dhaz_adp_gratio) / 2;
-    statsInt->adehaze_stats.dehaze_stats_v30.dhaz_adp_tmax = (left_stats->params.dhaz.dhaz_adp_tmax + right_stats->params.dhaz.dhaz_adp_tmax) / 2;
-    statsInt->adehaze_stats.dehaze_stats_v30.dhaz_pic_sumh_left =
-        left_stats->params.dhaz.dhaz_pic_sumh;
-    statsInt->adehaze_stats.dehaze_stats_v30.dhaz_pic_sumh_right =
-        right_stats->params.dhaz.dhaz_pic_sumh;
+    statsInt->adehaze_stats.dehaze_stats_v11_duo.dhaz_adp_air_base = (left_stats->params.dhaz.dhaz_adp_air_base + right_stats->params.dhaz.dhaz_adp_air_base) / 2;
+    statsInt->adehaze_stats.dehaze_stats_v11_duo.dhaz_adp_wt = (left_stats->params.dhaz.dhaz_adp_wt + right_stats->params.dhaz.dhaz_adp_wt) / 2;
+    statsInt->adehaze_stats.dehaze_stats_v11_duo.dhaz_adp_gratio = (left_stats->params.dhaz.dhaz_adp_gratio + right_stats->params.dhaz.dhaz_adp_gratio) / 2;
+    statsInt->adehaze_stats.dehaze_stats_v11_duo.dhaz_adp_tmax = (left_stats->params.dhaz.dhaz_adp_tmax + right_stats->params.dhaz.dhaz_adp_tmax) / 2;
+    statsInt->adehaze_stats.dehaze_stats_v11_duo.dhaz_pic_sumh_left = left_stats->params.dhaz.dhaz_adp_tmax;
+    statsInt->adehaze_stats.dehaze_stats_v11_duo.dhaz_pic_sumh_right = right_stats->params.dhaz.dhaz_adp_tmax;
 
+    unsigned int ro_pic_sumh_left = left_stats->params.dhaz.dhaz_pic_sumh;
+    unsigned int ro_pic_sumh_right = right_stats->params.dhaz.dhaz_pic_sumh;
+    unsigned int tmp = 0;
     for (int i = 0; i < ISP3X_DHAZ_HIST_IIR_NUM; i++) {
-        statsInt->adehaze_stats.dehaze_stats_v30.h_rgb_iir_left[i] =
-            left_stats->params.dhaz.h_rgb_iir[i];
-        statsInt->adehaze_stats.dehaze_stats_v30.h_rgb_iir_right[i] =
-            right_stats->params.dhaz.h_rgb_iir[i];
+        tmp = (left_stats->params.dhaz.h_rgb_iir[i] * ro_pic_sumh_left + right_stats->params.dhaz.h_rgb_iir[i] * ro_pic_sumh_right)
+              / (ro_pic_sumh_left + ro_pic_sumh_right);
+        statsInt->adehaze_stats.dehaze_stats_v11_duo.h_rgb_iir[i] = tmp > ISP3X_DHAZ_HIST_IIR_MAX ? ISP3X_DHAZ_HIST_IIR_MAX : tmp;
     }
 
     return ret;
 }
+#endif
 
 XCamReturn
 RkAiqResourceTranslatorV3x::translateAecStats (const SmartPtr<VideoBuffer> &from, SmartPtr<RkAiqAecStatsProxy> &to)
 {
-
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
+#if defined(ISP_HW_V30)
 
     const SmartPtr<Isp20StatsBuffer> buf =
         from.dynamic_cast_ptr<Isp20StatsBuffer>();
     struct rkisp3x_isp_stat_buffer *stats;
     SmartPtr<RkAiqAecStats> statsInt = to->data();
 
+#if defined(RKAIQ_HAVE_MULTIISP)
     if (mIsMultiIsp) {
         return translateMultiAecStats(from, to);
     }
+#endif
 
     stats = (struct rkisp3x_isp_stat_buffer*)(buf->get_v4l2_userptr());
     if(stats == NULL) {
@@ -1830,7 +1749,7 @@ RkAiqResourceTranslatorV3x::translateAecStats (const SmartPtr<VideoBuffer> &from
     }
 
     to->set_sequence(stats->frame_id);
-
+#endif
     return ret;
 }
 
@@ -1863,14 +1782,17 @@ XCamReturn
 RkAiqResourceTranslatorV3x::translateAwbStats (const SmartPtr<VideoBuffer> &from, SmartPtr<RkAiqAwbStatsProxy> &to)
 {
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
+#if defined(ISP_HW_V30)
     const SmartPtr<Isp20StatsBuffer> buf =
         from.dynamic_cast_ptr<Isp20StatsBuffer>();
     struct rkisp3x_isp_stat_buffer *stats;
     SmartPtr<RkAiqAwbStats> statsInt = to->data();
 
+#if defined(RKAIQ_HAVE_MULTIISP)
     if (mIsMultiIsp) {
         return translateMultiAwbStats(from, to);
     }
+#endif
 
     stats = (struct rkisp3x_isp_stat_buffer*)(buf->get_v4l2_userptr());
     if(stats == NULL) {
@@ -1886,7 +1808,8 @@ RkAiqResourceTranslatorV3x::translateAwbStats (const SmartPtr<VideoBuffer> &from
         return XCAM_RETURN_BYPASS;
     }
 
-    rkisp_effect_params_v20 ispParams = {0};
+    rkisp_effect_params_v20 ispParams;
+    memset(&ispParams, 0, sizeof(ispParams));
     if (buf->getEffectiveIspParams(stats->frame_id, ispParams) < 0) {
         LOGE("fail to get ispParams ,ignore\n");
         return XCAM_RETURN_BYPASS;
@@ -2005,7 +1928,7 @@ RkAiqResourceTranslatorV3x::translateAwbStats (const SmartPtr<VideoBuffer> &from
                statsInt->awb_stats_v3x.awb_cfg_effect_v201.pre_wbgain_inv_g+ 4096) >> 13 ;
             statsInt->awb_stats_v3x.blockResult[i].Bvalue -=
                (long long)(statsInt->awb_stats_v3x.blockResult[i].WpNo * bls_cfg->blc1_b  *
-               statsInt->awb_stats_v3x.awb_cfg_effect_v201.pre_wbgain_inv_b + 2048)>> 12 ; ;
+               statsInt->awb_stats_v3x.awb_cfg_effect_v201.pre_wbgain_inv_b + 2048)>> 12 ;
         }
     }
     LOGV_AWBGROUP("mIsGroupMode %d, mCamPhyId %d,mModuleRotation %d", mIsGroupMode, mCamPhyId, mModuleRotation);
@@ -2015,10 +1938,11 @@ RkAiqResourceTranslatorV3x::translateAwbStats (const SmartPtr<VideoBuffer> &from
     //statsInt->awb_stats_valid = ISP2X_STAT_RAWAWB(stats->meas_type)? true:false;
     statsInt->awb_stats_valid = stats->meas_type >> 5 & 1;
     to->set_sequence(stats->frame_id);
-
+#endif
     return ret;
 }
 
+#if defined(RKAIQ_HAVE_MULTIISP)
 XCamReturn
 RkAiqResourceTranslatorV3x::translateMultiAfStats (const SmartPtr<VideoBuffer> &from, SmartPtr<RkAiqAfStatsProxy> &to)
 {
@@ -2060,10 +1984,11 @@ RkAiqResourceTranslatorV3x::translateMultiAfStats (const SmartPtr<VideoBuffer> &
         return XCAM_RETURN_BYPASS;
     }
 
-    if (left_stats->frame_id != right_stats->frame_id || left_stats->meas_type != right_stats->meas_type)
+    if (left_stats->frame_id != right_stats->frame_id || left_stats->meas_type != right_stats->meas_type) {
         LOGE_ANALYZER("status params(frmid or meas_type) of left isp and right isp are different");
-    else
+    } else {
         LOGI_ANALYZER("stats: frame_id: %d,  meas_type; 0x%x", left_stats->frame_id, left_stats->meas_type);
+    }
 
     rkisp_effect_params_v20 ispParams;
     memset(&ispParams, 0, sizeof(ispParams));
@@ -2235,7 +2160,6 @@ RkAiqResourceTranslatorV3x::translateMultiAfStats (const SmartPtr<VideoBuffer> &
         else
             statsInt->af_stats_valid = false;
 
-        statsInt->af_stats_v3x.int_state = left_stats->params.rawaf.int_state | right_stats->params.rawaf.int_state;
         if (af_split_info.winb_side_info == LEFT_AND_RIGHT_MODE) {
             statsInt->af_stats_v3x.wndb_luma = left_stats->params.rawaf.afm_lum_b * af_split_info.winb_l_ratio +
                                                right_stats->params.rawaf.afm_lum_b * af_split_info.winb_r_ratio;
@@ -2404,6 +2328,7 @@ RkAiqResourceTranslatorV3x::translateMultiAfStats (const SmartPtr<VideoBuffer> &
 
     return ret;
 }
+#endif
 
 
 XCamReturn
@@ -2415,9 +2340,11 @@ RkAiqResourceTranslatorV3x::translateAfStats (const SmartPtr<VideoBuffer> &from,
     struct rkisp3x_isp_stat_buffer *stats;
     SmartPtr<RkAiqAfStats> statsInt = to->data();
 
+#if defined(RKAIQ_HAVE_MULTIISP)
     if (mIsMultiIsp) {
         return translateMultiAfStats(from, to);
     }
+#endif
 
     stats = (struct rkisp3x_isp_stat_buffer*)(buf->get_v4l2_userptr());
     if(stats == NULL) {
@@ -2443,7 +2370,6 @@ RkAiqResourceTranslatorV3x::translateAfStats (const SmartPtr<VideoBuffer> &from,
         statsInt->af_stats_valid =
             (stats->meas_type >> 6) & (0x01) ? true : false;
 
-        statsInt->af_stats_v3x.int_state = stats->params.rawaf.int_state;
         statsInt->af_stats_v3x.wndb_luma = stats->params.rawaf.afm_lum_b;
         statsInt->af_stats_v3x.wndb_sharpness = stats->params.rawaf.afm_sum_b;
         statsInt->af_stats_v3x.winb_highlit_cnt = stats->params.rawaf.highlit_cnt_winb;
@@ -2475,6 +2401,7 @@ RkAiqResourceTranslatorV3x::translateAfStats (const SmartPtr<VideoBuffer> &from,
     return ret;
 }
 
+#if RKAIQ_HAVE_DEHAZE_V11_DUO
 XCamReturn
 RkAiqResourceTranslatorV3x::translateAdehazeStats (const SmartPtr<VideoBuffer> &from, SmartPtr<RkAiqAdehazeStatsProxy> &to)
 {
@@ -2486,9 +2413,11 @@ RkAiqResourceTranslatorV3x::translateAdehazeStats (const SmartPtr<VideoBuffer> &
     struct rkisp3x_isp_stat_buffer *stats;
     SmartPtr<RkAiqAdehazeStats> statsInt = to->data();
 
+#if defined(RKAIQ_HAVE_MULTIISP)
     if (mIsMultiIsp) {
         return translateMultiAdehazeStats(from, to);
     }
+#endif
 
     stats = (struct rkisp3x_isp_stat_buffer*)(buf->get_v4l2_userptr());
     if(stats == NULL) {
@@ -2499,23 +2428,21 @@ RkAiqResourceTranslatorV3x::translateAdehazeStats (const SmartPtr<VideoBuffer> &
                   mCamPhyId, stats->frame_id, stats->meas_type);
     //dehaze
     statsInt->adehaze_stats_valid = stats->meas_type >> 17 & 1;
-    statsInt->adehaze_stats.frame_id                           = stats->frame_id;
-    statsInt->adehaze_stats.dehaze_stats_v30.dhaz_adp_air_base = stats->params.dhaz.dhaz_adp_air_base;
-    statsInt->adehaze_stats.dehaze_stats_v30.dhaz_adp_wt = stats->params.dhaz.dhaz_adp_wt;
-    statsInt->adehaze_stats.dehaze_stats_v30.dhaz_adp_tmax     = stats->params.dhaz.dhaz_adp_tmax;
-    statsInt->adehaze_stats.dehaze_stats_v30.dhaz_pic_sumh_right = stats->params.dhaz.dhaz_pic_sumh;
-    statsInt->adehaze_stats.dehaze_stats_v30.dhaz_pic_sumh_left = stats->params.dhaz.dhaz_pic_sumh;
-    statsInt->adehaze_stats.dehaze_stats_v30.dhaz_adp_gratio = stats->params.dhaz.dhaz_adp_gratio;
-    for (int i = 0; i < ISP3X_DHAZ_HIST_IIR_NUM; i++) {
-        statsInt->adehaze_stats.dehaze_stats_v30.h_rgb_iir_left[i] =
-            stats->params.dhaz.h_rgb_iir[i];
-        statsInt->adehaze_stats.dehaze_stats_v30.h_rgb_iir_right[i] =
-            stats->params.dhaz.h_rgb_iir[i];
-    }
+    statsInt->adehaze_stats.dehaze_stats_v11_duo.dhaz_adp_air_base =
+        stats->params.dhaz.dhaz_adp_air_base;
+    statsInt->adehaze_stats.dehaze_stats_v11_duo.dhaz_adp_wt = stats->params.dhaz.dhaz_adp_wt;
+    statsInt->adehaze_stats.dehaze_stats_v11_duo.dhaz_adp_gratio =
+        stats->params.dhaz.dhaz_adp_gratio;
+    statsInt->adehaze_stats.dehaze_stats_v11_duo.dhaz_adp_wt = stats->params.dhaz.dhaz_adp_wt;
+    statsInt->adehaze_stats.dehaze_stats_v11_duo.dhaz_pic_sumh_left =
+        stats->params.dhaz.dhaz_pic_sumh;
+    for(int i = 0; i < ISP3X_DHAZ_HIST_IIR_NUM; i++)
+        statsInt->adehaze_stats.dehaze_stats_v11_duo.h_rgb_iir[i] = stats->params.dhaz.h_rgb_iir[i];
 
     to->set_sequence(stats->frame_id);
 
     return ret;
 }
+#endif
 
 } //namespace RkCam

@@ -7,8 +7,12 @@
 int g_rkaiq_isp_hw_ver = 20;
 #elif defined(ISP_HW_V21)
 int g_rkaiq_isp_hw_ver = 21;
+#elif defined(ISP_HW_V30)
+int g_rkaiq_isp_hw_ver = 30;
+#elif defined(ISP_HW_V32)
+int g_rkaiq_isp_hw_ver = 32;
 #else
-#error "WRONG ISP_HW_VERSION, ONLY SUPPORT V20 AND V21 NOW !"
+#error "WRONG ISP_HW_VERSION, ONLY SUPPORT V20/V21/V30/V32 NOW !"
 #endif
 
 namespace RkCam {
@@ -71,7 +75,7 @@ void CalibConverterAE::convert(CamCalibDbV2Context_t *calibv2,
         (CalibDb_Sensor_ParaV2_t*)(CALIBDBV2_GET_MODULE_PTR(calibv2, sensor_calib));
     convertSensorinfoCalibV1ToCalibV2(calibv1, calibv2_sensor_calib);
 
-    CalibDb_Module_ParaV2_t* calibv2_module_calib = 
+    CalibDb_Module_ParaV2_t* calibv2_module_calib =
         (CalibDb_Module_ParaV2_t*)(CALIBDBV2_GET_MODULE_PTR(calibv2, module_calib));
     convertModuleinfoCalibV1ToCalibV2(calibv1, calibv2_module_calib);
 #endif
@@ -517,32 +521,10 @@ void CalibConverterAmerge::convert(CamCalibDbV2Context_t *calibv2,
     if (!calibv1_amerge)
         return;
 
-    CalibDbV2_merge_t* calibv2_amerge_calib =
-        (CalibDbV2_merge_t*)(CALIBDBV2_GET_MODULE_PTR(calibv2, amerge_calib));
+    CalibDbV2_merge_v10_t* calibv2_amerge_calib =
+        (CalibDbV2_merge_v10_t*)(CALIBDBV2_GET_MODULE_PTR(calibv2, amerge_calib));
     if (!calibv2_amerge_calib)
         return;
-
-    //len
-    calibv2_amerge_calib->MergeTuningPara.OECurve.EnvLv_len = 13;
-    calibv2_amerge_calib->MergeTuningPara.OECurve.Smooth_len = calibv2_amerge_calib->MergeTuningPara.OECurve.EnvLv_len;
-    calibv2_amerge_calib->MergeTuningPara.OECurve.Offset_len = calibv2_amerge_calib->MergeTuningPara.OECurve.EnvLv_len;
-
-    calibv2_amerge_calib->MergeTuningPara.MDCurve.MoveCoef_len = 13;
-    calibv2_amerge_calib->MergeTuningPara.MDCurve.LM_smooth_len = calibv2_amerge_calib->MergeTuningPara.MDCurve.MoveCoef_len;
-    calibv2_amerge_calib->MergeTuningPara.MDCurve.LM_offset_len = calibv2_amerge_calib->MergeTuningPara.MDCurve.MoveCoef_len;
-    calibv2_amerge_calib->MergeTuningPara.MDCurve.MS_smooth_len = calibv2_amerge_calib->MergeTuningPara.MDCurve.MoveCoef_len;
-    calibv2_amerge_calib->MergeTuningPara.MDCurve.MS_offset_len = calibv2_amerge_calib->MergeTuningPara.MDCurve.MoveCoef_len;
-
-    //malloc
-    calibv2_amerge_calib->MergeTuningPara.OECurve.EnvLv = (float *) malloc(sizeof(float) * 13);
-    calibv2_amerge_calib->MergeTuningPara.OECurve.Smooth = (float *) malloc(sizeof(float) * 13);
-    calibv2_amerge_calib->MergeTuningPara.OECurve.Offset = (float *) malloc(sizeof(float) * 13);
-
-    calibv2_amerge_calib->MergeTuningPara.MDCurve.MoveCoef = (float *) malloc(sizeof(float) * 13);
-    calibv2_amerge_calib->MergeTuningPara.MDCurve.LM_smooth = (float *) malloc(sizeof(float) * 13);
-    calibv2_amerge_calib->MergeTuningPara.MDCurve.LM_offset = (float *) malloc(sizeof(float) * 13);
-    calibv2_amerge_calib->MergeTuningPara.MDCurve.MS_smooth = (float *) malloc(sizeof(float) * 13);
-    calibv2_amerge_calib->MergeTuningPara.MDCurve.MS_offset = (float *) malloc(sizeof(float) * 13);
 
     for(int i = 0; i < 13; i++) {
         calibv2_amerge_calib->MergeTuningPara.OECurve.EnvLv[i] = calibv1_amerge->envLevel[i];
@@ -711,8 +693,8 @@ void CalibConverterAgamma::convert(CamCalibDbV2Context_t *calibv2,
     if (!calibv1_gamma)
         return;
 
-    CalibDbV2_gamma_t* calibv2_agamma_calib =
-        (CalibDbV2_gamma_t*)(CALIBDBV2_GET_MODULE_PTR(calibv2, agamma_calib));
+    CalibDbV2_gamma_v10_t* calibv2_agamma_calib =
+        (CalibDbV2_gamma_v10_t*)(CALIBDBV2_GET_MODULE_PTR(calibv2, agamma_calib));
     if (!calibv2_agamma_calib)
         return;
 

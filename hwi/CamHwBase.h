@@ -29,6 +29,8 @@
 #include "FlashLight.h"
 #endif
 
+#include "rk_aiq.h"
+
 using namespace XCam;
 
 namespace RkCam {
@@ -126,7 +128,7 @@ public:
         return  XCAM_RETURN_ERROR_FAILED;
     }
     virtual void getShareMemOps(isp_drv_share_mem_ops_t** mem_ops) {};
-    virtual XCamReturn getEffectiveIspParams(rkisp_effect_params_v20& ispParams, int frame_id) {
+    virtual XCamReturn getEffectiveIspParams(rkisp_effect_params_v20& ispParams, uint32_t frame_id) {
         return  XCAM_RETURN_ERROR_FAILED;
     };
     uint64_t getIspModuleEnState() {
@@ -143,6 +145,12 @@ public:
     }
     virtual int getCamPhyId() { return mCamPhyId;}
     virtual void setGroupMode(bool bGroup, bool bMain) { mIsGroupMode = bGroup; mIsMain = bMain;}
+    virtual void setTbInfo(rk_aiq_tb_info_t& info) {
+        mTbInfo = info;
+    }
+    virtual void setDevBufCnt(const std::map<std::string, int>& dev_buf_cnt_map) {
+        mDevBufCntMap = dev_buf_cnt_map;
+    }
     virtual XCamReturn reset_hardware() {
         return XCAM_RETURN_ERROR_FAILED;
     };
@@ -174,10 +182,13 @@ protected:
     int mCamPhyId;
     bool mIsGroupMode;
     bool mIsMain;
-private:
+    rk_aiq_tb_info_t mTbInfo;
+    std::map<std::string, int> mDevBufCntMap;
+
+ private:
     XCAM_DEAD_COPY (CamHwBase);
 };
 
-}; //namespace RkCam
+} //namespace RkCam
 
 #endif

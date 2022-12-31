@@ -315,8 +315,6 @@ AblcResult_t AblcProcess(AblcContext_t *pAblcCtx, AblcExpInfo_t *pExpInfo)
                 pAblcCtx->ProcRes.blc1_gb = 0;
                 pAblcCtx->ProcRes.blc1_b = 0;
             }
-
-
         }
     } else if(pAblcCtx->eMode == ABLC_OP_MODE_MANUAL) {
         LOGD_ABLC("%s:(%d) Ablc manual !!! \n", __FUNCTION__, __LINE__);

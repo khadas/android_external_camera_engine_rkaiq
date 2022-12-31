@@ -45,7 +45,7 @@ class RkAiqCamgroupHandle {
     void setParentHdl(RkAiqCamgroupHandle* parent) { mParentHdl = parent; }
     RkAiqCamgroupHandle* getNextHdl() { return mNextHdl; }
     RkAiqCamgroupHandle* getParent() { return mParentHdl; }
-    virtual XCamReturn updateConfig(bool needSync) { return XCAM_RETURN_NO_ERROR; };
+    virtual XCamReturn updateConfig(bool /* needSync */) { return XCAM_RETURN_NO_ERROR; };
  protected:
     virtual void init();
     virtual void deInit();
@@ -70,6 +70,6 @@ class RkAiqCamgroupHandle {
     RkAiqCamgroupHandle* mParentHdl;
 };
 
-};  // namespace RkCam
+}  // namespace RkCam
 
 #endif

@@ -23,6 +23,8 @@ RKAIQ_BEGIN_DECLARE
 #define CHECK_USER_API_ENABLE
 #endif
 
+#if RKAIQ_HAVE_CNR_V1
+
 XCamReturn
 rk_aiq_user_api2_acnrV1_SetAttrib(const rk_aiq_sys_ctx_t* sys_ctx, rk_aiq_cnr_attrib_v1_t* attr)
 {
@@ -85,5 +87,33 @@ rk_aiq_user_api2_acnrV1_GetStrength(const rk_aiq_sys_ctx_t* sys_ctx, float *pPer
 
     return ret;
 }
+#else
+XCamReturn
+rk_aiq_user_api2_acnrV1_SetAttrib(const rk_aiq_sys_ctx_t* sys_ctx, rk_aiq_cnr_attrib_v1_t* attr)
+{
+    return XCAM_RETURN_ERROR_UNKNOWN;
+}
 
+XCamReturn
+rk_aiq_user_api2_acnrV1_GetAttrib(const rk_aiq_sys_ctx_t* sys_ctx, rk_aiq_cnr_attrib_v1_t* attr)
+{
+    return XCAM_RETURN_ERROR_UNKNOWN;
+}
+
+
+XCamReturn
+rk_aiq_user_api2_acnrV1_SetStrength(const rk_aiq_sys_ctx_t* sys_ctx, float fPercnt)
+{
+    return XCAM_RETURN_ERROR_UNKNOWN;
+}
+
+
+XCamReturn
+rk_aiq_user_api2_acnrV1_GetStrength(const rk_aiq_sys_ctx_t* sys_ctx, float *pPercnt)
+{
+    return XCAM_RETURN_ERROR_UNKNOWN;
+}
+
+
+#endif
 RKAIQ_END_DECLARE

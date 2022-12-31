@@ -109,15 +109,16 @@ typedef struct xcore_cam_log_module_info_s {
 extern xcore_cam_log_module_info_t g_xcore_log_infos[XCORE_LOG_MODULE_MAX];
 
 // module debug
-#define XCAM_MODULE_LOG_ERROR(module, submodules, format, ...)    \
-    do { \
+#define XCAM_MODULE_LOG_ERROR(module, submodules, format, ...)                                    \
+    do {                                                                                          \
         xcam_print_log(module, submodules, XCORE_LOG_LEVEL_ERR, "E:" format "\n", ##__VA_ARGS__); \
     } while (0)
 
-#define XCAM_MODULE_LOG_WARNING(module, submodules, format, ...)   \
-    do { \
-        if (XCORE_LOG_LEVEL_WARNING <= g_xcore_log_infos[module].log_level && \
-                (submodules & g_xcore_log_infos[module].sub_modules)) \
+#ifndef NDEBUG
+#define XCAM_MODULE_LOG_WARNING(module, submodules, format, ...)                          \
+    do {                                                                                  \
+        if (XCORE_LOG_LEVEL_WARNING <= g_xcore_log_infos[module].log_level &&             \
+            (submodules & g_xcore_log_infos[module].sub_modules))                         \
             xcam_print_log(module, submodules, XCORE_LOG_LEVEL_WARNING, "W:" format "\n", \
                            ##__VA_ARGS__);                                                \
     } while (0)
@@ -129,13 +130,20 @@ extern xcore_cam_log_module_info_t g_xcore_log_infos[XCORE_LOG_MODULE_MAX];
             xcam_print_log (module, submodules, XCORE_LOG_LEVEL_INFO, "I:" format "\n",  ## __VA_ARGS__); \
     } while(0)
 
-#define XCAM_MODULE_LOG_DEBUG(module, submodules, format, ...)   \
-    do { \
-        if (XCORE_LOG_LEVEL_DEBUG <= g_xcore_log_infos[module].log_level && \
+#define XCAM_MODULE_LOG_DEBUG(module, submodules, format, ...)                          \
+    do {                                                                                \
+        if (XCORE_LOG_LEVEL_DEBUG <= g_xcore_log_infos[module].log_level &&             \
             (submodules & g_xcore_log_infos[module].sub_modules))                       \
             xcam_print_log(module, submodules, XCORE_LOG_LEVEL_DEBUG, "D:" format "\n", \
                            ##__VA_ARGS__);                                              \
-    } while(0)
+    } while (0)
+
+#else
+//#define XCAM_MODULE_LOG_ERROR(module, submodules, format, ...)
+#define XCAM_MODULE_LOG_WARNING(module, submodules, format, ...)
+#define XCAM_MODULE_LOG_INFO(module, submodules, format, ...)
+#define XCAM_MODULE_LOG_DEBUG(module, submodules, format, ...)
+#endif
 
 #ifdef NDEBUG
 

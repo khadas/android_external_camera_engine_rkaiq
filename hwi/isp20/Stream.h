@@ -45,7 +45,7 @@ protected:
     virtual bool loop () {
         XCamReturn ret = poll_buffer_loop ();
         if (ret == XCAM_RETURN_NO_ERROR || ret == XCAM_RETURN_ERROR_TIMEOUT ||
-                ret == XCAM_RETURN_BYPASS)
+            ret == XCAM_RETURN_BYPASS)
             return true;
         return false;
     }
@@ -59,7 +59,7 @@ protected:
     PollCallback *_poll_callback;
     RKStream *_stream;
     //frame syncronization
-    int frameid;
+    uint32_t frameid;
     int _dev_type;
     int _poll_stop_fd[2];
 };
@@ -74,9 +74,9 @@ protected:
     XCAM_DEAD_COPY (RkEventPollThread);
     virtual XCamReturn poll_event_loop ();
     virtual bool loop () {
-        XCamReturn ret = poll_event_loop ();
+        XCamReturn ret = poll_event_loop();
         if (ret == XCAM_RETURN_NO_ERROR || ret == XCAM_RETURN_ERROR_TIMEOUT ||
-                XCAM_RETURN_BYPASS)
+            ret == XCAM_RETURN_BYPASS)
             return true;
         return false;
     }

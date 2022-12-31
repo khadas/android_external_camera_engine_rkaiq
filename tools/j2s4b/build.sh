@@ -56,8 +56,8 @@ if [ "$BUILD_CROSS" = true ] ; then
     cmake -DCMAKE_TOOLCHAIN_FILE=toolchainfile.cmake \
         -DCMAKE_INSTALL_PREFIX=./release ../
 else
-    cmake -DCMAKE_INSTALL_PREFIX=./release -DROOT_PROJ_BIN_DIR:STRING="../../build/linux/output/aarch64" \
-        -DRKAIQ_IQFILES_DIR:STRING="../../iqfiles/isp3x"  ../
+    cmake -DCMAKE_INSTALL_PREFIX=./release -DROOT_PROJ_BIN_DIR:STRING="../../build/linux/output/arm" \
+        -DRKAIQ_IQFILES_DIR:STRING="../../iqfiles/isp32"  ../
 fi
 
 make -j8

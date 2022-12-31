@@ -17,14 +17,15 @@
 
 #include <sys/stat.h>
 
+using namespace RkCam;
+
 #define J2S_POOL_SIZE (1024 * 1024)
 
-static int aligned_size(int ori_size, int alig)
-{
-  return (ori_size + (alig - 1)) & ~(alig-1);
+static int aligned_size(int ori_size, int alig) {
+  return (ori_size + (alig - 1)) & ~(alig - 1);
 }
 
-int j2s_alloc_map_record(j2s_ctx *ctx, void *dst, void *ptr) {
+int j2s_alloc_map_record(j2s_ctx *ctx, void *dst, void *ptr, size_t len) {
   if (!ctx || !ctx->priv) {
     return -1;
   }
@@ -46,12 +47,12 @@ int j2s_alloc_map_record(j2s_ctx *ctx, void *dst, void *ptr) {
   j2s_pool->maps_list[j2s_pool->map_len - 1].ptr_offset =
       (void *)((uint8_t *)ptr - j2s_pool->data);
 
-  j2s_pool->maps_list[j2s_pool->map_len - 1].len = 0;
+  j2s_pool->maps_list[j2s_pool->map_len - 1].len = len;
 
   return 0;
 }
 
-void *j2s_alloc_data(j2s_ctx *ctx, size_t size) {
+void *j2s_alloc_data(j2s_ctx *ctx, size_t size, size_t* real_size) {
   void *ptr = NULL;
   j2s_pool_t *j2s_pool = (j2s_pool_t *)ctx->priv;
 
@@ -72,12 +73,13 @@ void *j2s_alloc_data(j2s_ctx *ctx, size_t size) {
     ptr = ((uint8_t *)j2s_pool->data + j2s_pool->used);
   }
 
-  DBG("%palloc [%d]/[%d]@[%p]-offset[%d]\n", ctx, size, j2s_pool->used, ptr,
+  DBG("%palloc [%zu]/[%zu]@[%p]-offset[%zu]\n", ctx, size, j2s_pool->used, ptr,
       (uint8_t *)ptr - j2s_pool->data);
 
   // 32bit 16 64bit 32
-  size_t offset = aligned_size(size, sizeof(void*)*4);
+  size_t offset = aligned_size(size, sizeof(void *) * 4);
   j2s_pool->used += offset;
+  *real_size = offset;
 
   if (!ptr)
     return NULL;

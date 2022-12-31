@@ -23,15 +23,18 @@
 #include "xcam_mutex.h"
 
 namespace RkCam {
+#if RKAIQ_HAVE_SHARP_V1
 
 class RkAiqAsharpHandleInt : virtual public RkAiqHandle {
- public:
+public:
     explicit RkAiqAsharpHandleInt(RkAiqAlgoDesComm* des, RkAiqCore* aiqCore)
         : RkAiqHandle(des, aiqCore) {
         memset(&mCurAtt, 0, sizeof(rk_aiq_sharp_attrib_t));
         memset(&mNewAtt, 0, sizeof(rk_aiq_sharp_attrib_t));
     };
-    virtual ~RkAiqAsharpHandleInt() { RkAiqHandle::deInit(); };
+    virtual ~RkAiqAsharpHandleInt() {
+        RkAiqHandle::deInit();
+    };
     virtual XCamReturn updateConfig(bool needSync);
     virtual XCamReturn prepare();
     virtual XCamReturn preProcess();
@@ -46,11 +49,13 @@ class RkAiqAsharpHandleInt : virtual public RkAiqHandle {
     XCamReturn setIQPara(rk_aiq_sharp_IQpara_t* para);
     XCamReturn getIQPara(rk_aiq_sharp_IQpara_t* para);
 
- protected:
+protected:
     virtual void init();
-    virtual void deInit() { RkAiqHandle::deInit(); };
+    virtual void deInit() {
+        RkAiqHandle::deInit();
+    };
 
- private:
+private:
     // TODO
     rk_aiq_sharp_attrib_t mCurAtt;
     rk_aiq_sharp_attrib_t mNewAtt;
@@ -58,10 +63,10 @@ class RkAiqAsharpHandleInt : virtual public RkAiqHandle {
     rk_aiq_sharp_IQpara_t mNewIQPara;
     bool updateIQpara = false;
 
- private:
+private:
     DECLARE_HANDLE_REGISTER_TYPE(RkAiqAsharpHandleInt);
 };
-
-};  // namespace RkCam
+#endif
+}  // namespace RkCam
 
 #endif

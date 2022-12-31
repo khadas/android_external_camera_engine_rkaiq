@@ -18,7 +18,12 @@
  */
 
 #include "adebayer/rk_aiq_algo_adebayer_itf.h"
-#include "adebayer/rk_aiq_algo_adebayer.h"
+#if RKAIQ_HAVE_DEBAYER_V1
+#include "adebayer/rk_aiq_adebayer_algo_v1.h"
+#endif
+#if RKAIQ_HAVE_DEBAYER_V2
+#include "adebayer/rk_aiq_adebayer_algo_v2.h"
+#endif
 #include "rk_aiq_algo_types.h"
 
 RKAIQ_BEGIN_DECLARE
@@ -37,9 +42,24 @@ create_context
         LOGE_ADEBAYER( "%s: create adebayer context fail!\n", __FUNCTION__);
         return XCAM_RETURN_ERROR_MEM;
     }
+
     LOGV_ADEBAYER("%s: (enter)\n", __FUNCTION__ );
+
+    //hw version check
+
+#if RKAIQ_HAVE_DEBAYER_V1
+    if(cfg->module_hw_version != ADEBAYER_HARDWARE_V1)
+        LOGE_ADEBAYER("%s: wrong HW version(%d)", __FUNCTION__, cfg->module_hw_version);
+#endif
+
+#if RKAIQ_HAVE_DEBAYER_V2
+    if(cfg->module_hw_version != ADEBAYER_HARDWARE_V2)
+        LOGE_ADEBAYER("%s: wrong HW version(%d)", __FUNCTION__, cfg->module_hw_version);
+#endif
+
+    //copy params from calib
     AdebayerInit(&ctx->adebayerCtx, cfg->calib, cfg->calibv2);
-    ctx->adebayerCtx.full_param.updated = false;
+
     *context = ctx;
     LOGV_ADEBAYER("%s: (exit)\n", __FUNCTION__ );
     return result;
@@ -54,8 +74,10 @@ destroy_context
     XCamReturn result = XCAM_RETURN_NO_ERROR;
 
     LOGV_ADEBAYER("%s: (enter)\n", __FUNCTION__ );
+
     AdebayerContext_t* pAdebayerCtx = (AdebayerContext_t*)&context->adebayerCtx;
     AdebayerRelease(pAdebayerCtx);
+
     delete context;
     LOGV_ADEBAYER("%s: (exit)\n", __FUNCTION__ );
     return result;
@@ -73,9 +95,18 @@ prepare
     AdebayerContext_t* pAdebayerCtx = (AdebayerContext_t *)&params->ctx->adebayerCtx;
     RkAiqAlgoConfigAdebayer* pCfgParam = (RkAiqAlgoConfigAdebayer*)params;
 
+    //reconfig
     if(!!(params->u.prepare.conf_type & RK_AIQ_ALGO_CONFTYPE_UPDATECALIB )) {
-        AdebayerInit(pAdebayerCtx, pCfgParam->com.u.prepare.calib, pCfgParam->com.u.prepare.calibv2);
-        pAdebayerCtx->full_param.updated = true;
+
+#if RKAIQ_HAVE_DEBAYER_V1
+        result = AdebayerFullParamsInit(pAdebayerCtx, pCfgParam->com.u.prepare.calib, pCfgParam->com.u.prepare.calibv2);
+#endif
+
+#if RKAIQ_HAVE_DEBAYER_V2
+        result = AdebayerCalibConfig(pAdebayerCtx, pCfgParam->com.u.prepare.calibv2);
+#endif
+
+        pAdebayerCtx->config.updatecfg = true;
     }
 
     AdebayerStart(pAdebayerCtx);
@@ -116,6 +147,7 @@ processing
         pAdebayerCtx->config.enable = 0;
         pAdebayerCtx->config.updatecfg = true;
     } else {
+        //get ISO from curExp
         RKAiqAecExpInfo_t *curExp = pAdebayerProcParams->com.u.proc.curExp;
         if(curExp != NULL) {
             if(pAdebayerProcParams->hdr_mode == RK_AIQ_WORKING_MODE_NORMAL) {
@@ -128,10 +160,14 @@ processing
                 iso = curExp->HdrExp[1].exp_real_params.analog_gain *
                       curExp->HdrExp[1].exp_real_params.digital_gain *
                       curExp->HdrExp[1].exp_real_params.isp_dgain * 50;
+                LOGD_ADEBAYER("%s:HDR2:iso=%d,again=%f\n", __FUNCTION__, iso,
+                              curExp->HdrExp[1].exp_real_params.analog_gain);
             } else if(RK_AIQ_HDR_GET_WORKING_MODE(pAdebayerProcParams->hdr_mode) == RK_AIQ_WORKING_MODE_ISP_HDR3) {
                 iso = curExp->HdrExp[2].exp_real_params.analog_gain *
                       curExp->HdrExp[2].exp_real_params.digital_gain *
                       curExp->HdrExp[2].exp_real_params.isp_dgain * 50;
+                LOGD_ADEBAYER("%s:HDR3:iso=%d,again=%f\n", __FUNCTION__, iso,
+                              curExp->HdrExp[2].exp_real_params.analog_gain);
             }
         } else {
             LOGE_ADEBAYER("%s: curExp is NULL, so use default instead \n", __FUNCTION__);
@@ -140,12 +176,12 @@ processing
         if (iso != pAdebayerCtx->iso) {
             pAdebayerCtx->iso = iso;
             pAdebayerCtx->config.updatecfg = true;
-            LOGD_ADEBAYER("%s:iso=%d\n", __FUNCTION__, iso);
         }
 
-        if (pAdebayerCtx->full_param.updated) {
+        if (pAdebayerCtx->is_reconfig) {
+            LOGD_ADEBAYER("%s: is_reconfig = true \n", __FUNCTION__);
             pAdebayerCtx->config.updatecfg = true;
-            pAdebayerCtx->full_param.updated = false;
+            pAdebayerCtx->is_reconfig = false;
         }
 
         if (pAdebayerCtx->config.updatecfg)
@@ -153,7 +189,13 @@ processing
 
     }
 
-    AdebayerGetProcResult(pAdebayerCtx, &pAdebayerProcResParams->debayerRes);
+#if RKAIQ_HAVE_DEBAYER_V1
+    AdebayerGetProcResult(pAdebayerCtx, &pAdebayerProcResParams->debayerResV1);
+#endif
+
+#if RKAIQ_HAVE_DEBAYER_V2
+    AdebayerGetProcResult(pAdebayerCtx, &pAdebayerProcResParams->debayerResV2);
+#endif
 
     LOGV_ADEBAYER("%s: (exit)\n", __FUNCTION__ );
     return XCAM_RETURN_NO_ERROR;
@@ -183,9 +225,9 @@ RkAiqAlgoDescription g_RkIspAlgoDescAdebayer = {
         .destroy_context = destroy_context,
     },
     .prepare = prepare,
-    .pre_process = pre_process,
+    .pre_process = NULL,
     .processing = processing,
-    .post_process = post_process,
+    .post_process = NULL,
 };
 
 RKAIQ_END_DECLARE

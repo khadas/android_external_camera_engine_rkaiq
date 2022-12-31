@@ -23,7 +23,7 @@
 #include "xcam_mutex.h"
 
 namespace RkCam {
-
+#if RKAIQ_HAVE_3DLUT_V1
 class RkAiqA3dlutHandleInt : virtual public RkAiqHandle {
  public:
     explicit RkAiqA3dlutHandleInt(RkAiqAlgoDesComm* des, RkAiqCore* aiqCore)
@@ -39,7 +39,7 @@ class RkAiqA3dlutHandleInt : virtual public RkAiqHandle {
     virtual XCamReturn postProcess();
     virtual XCamReturn genIspResult(RkAiqFullParams* params, RkAiqFullParams* cur_params);
     // TODO add algo specific methords, this is a sample
-    XCamReturn setAttrib(rk_aiq_lut3d_attrib_t att);
+    XCamReturn setAttrib(const rk_aiq_lut3d_attrib_t* att);
     XCamReturn getAttrib(rk_aiq_lut3d_attrib_t* att);
     XCamReturn query3dlutInfo(rk_aiq_lut3d_querry_info_t* lut3d_querry_info);
 
@@ -56,6 +56,7 @@ class RkAiqA3dlutHandleInt : virtual public RkAiqHandle {
     DECLARE_HANDLE_REGISTER_TYPE(RkAiqA3dlutHandleInt);
 };
 
-};  // namespace RkCam
+#endif
+}  // namespace RkCam
 
 #endif

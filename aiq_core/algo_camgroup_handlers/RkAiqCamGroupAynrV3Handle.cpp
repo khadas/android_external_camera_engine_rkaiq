@@ -18,6 +18,7 @@
 #include "aynr3/rk_aiq_uapi_camgroup_aynr_int_v3.h"
 
 namespace RkCam {
+#if RKAIQ_HAVE_YNR_V3
 
 XCamReturn RkAiqCamGroupAynrV3HandleInt::updateConfig(bool needSync) {
     ENTER_ANALYZER_FUNCTION();
@@ -181,4 +182,5 @@ XCamReturn RkAiqCamGroupAynrV3HandleInt::getInfo(rk_aiq_ynr_info_v3_t *pInfo) {
 
 #endif
 
-};  // namespace RkCam
+#endif
+}  // namespace RkCam

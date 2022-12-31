@@ -18,7 +18,7 @@
 #include "RkAiqAblcHandle.h"
 #include "RkAiqCore.h"
 #include "awb/rk_aiq_uapiv2_awb_int.h"
-
+#include "smart_buffer_priv.h"
 
 namespace RkCam {
 
@@ -29,12 +29,8 @@ void RkAiqAwbHandleInt::init() {
 
     RkAiqHandle::deInit();
     mConfig      = (RkAiqAlgoCom*)(new RkAiqAlgoConfigAwb());
-    mPreInParam  = (RkAiqAlgoCom*)(new RkAiqAlgoPreAwb());
-    mPreOutParam = (RkAiqAlgoResCom*)(new RkAiqAlgoPreResAwb());
     mProcInParam = (RkAiqAlgoCom*)(new RkAiqAlgoProcAwb());
     // mProcOutParam = (RkAiqAlgoResCom*)(new RkAiqAlgoProcResAwb());
-    mPostInParam  = (RkAiqAlgoCom*)(new RkAiqAlgoPostAwb());
-    mPostOutParam = (RkAiqAlgoResCom*)(new RkAiqAlgoPostResAwb());
 
     EXIT_ANALYZER_FUNCTION();
 }
@@ -52,7 +48,10 @@ XCamReturn RkAiqAwbHandleInt::updateConfig(bool needSync) {
         sendSignal();
     }
     if (updateWbV20Attr) {
+        rk_aiq_uapiV2_wb_awb_wbGainAdjust_t wbGainAdjustBK = mCurWbV20Attr.stAuto.wbGainAdjust;
         mCurWbV20Attr   = mNewWbV20Attr;
+        mCurWbV20Attr.stAuto.wbGainAdjust = wbGainAdjustBK;
+        mallocAndCopyWbGainAdjustAttrib(&mCurWbV20Attr.stAuto.wbGainAdjust,&mNewWbV20Attr.stAuto.wbGainAdjust);
         rk_aiq_uapiV2_awbV20_SetAttrib(mAlgoCtx, mCurWbV20Attr, false);
         updateWbV20Attr = false;
         sendSignal();
@@ -70,13 +69,16 @@ XCamReturn RkAiqAwbHandleInt::updateConfig(bool needSync) {
         sendSignal(mCurWbMwbAttr.sync.sync_mode);
     }
     if (updateWbAwbAttr) {
+        rk_aiq_uapiV2_wb_awb_wbGainAdjust_t wbGainAdjustBK = mCurWbAwbAttr.wbGainAdjust;
         mCurWbAwbAttr   = mNewWbAwbAttr;
+        mCurWbAwbAttr.wbGainAdjust = wbGainAdjustBK;
+        mallocAndCopyWbGainAdjustAttrib(&mCurWbAwbAttr.wbGainAdjust,&mNewWbAwbAttr.wbGainAdjust);
         rk_aiq_uapiV2_awbV20_SetAwbAttrib(mAlgoCtx, mCurWbAwbAttr, false);
         updateWbAwbAttr = false;
         sendSignal();
     }
     if (updateWbAwbWbGainAdjustAttr) {
-        mCurWbAwbWbGainAdjustAttr   = mNewWbAwbWbGainAdjustAttr;
+        mallocAndCopyWbGainAdjustAttrib(&mCurWbAwbWbGainAdjustAttr,&mNewWbAwbWbGainAdjustAttr);
         rk_aiq_uapiV2_awb_SetAwbGainAdjust(mAlgoCtx, mCurWbAwbWbGainAdjustAttr, false);
         updateWbAwbWbGainAdjustAttr = false;
         sendSignal(mCurWbAwbWbGainAdjustAttr.sync.sync_mode);
@@ -92,6 +94,12 @@ XCamReturn RkAiqAwbHandleInt::updateConfig(bool needSync) {
         rk_aiq_uapiV2_awb_SetAwbMultiwindow(mAlgoCtx, mCurWbAwbMultiWindowAttr.multiWindw, false);
         updateWbAwbMultiWindowAttr = false;
         sendSignal(mCurWbAwbMultiWindowAttr.sync.sync_mode);
+    }
+    if (updateFFWbgainAttr) {
+        mCurFFWbgainAttr   = mNewFFWbgainAttr;
+        rk_aiq_uapiV2_awb_SetFstFrWbgain(mAlgoCtx, mCurFFWbgainAttr.wggain, false);
+        updateFFWbgainAttr = false;
+        sendSignal(mCurFFWbgainAttr.sync.sync_mode);
     }
     if (needSync) mCfgMutex.unlock();
 
@@ -212,7 +220,10 @@ XCamReturn RkAiqAwbHandleInt::setWbV20Attrib(rk_aiq_uapiV2_wbV20_attrib_t att) {
 
     // if something changed
     if (0 != memcmp(&mCurWbV20Attr, &att, sizeof(rk_aiq_uapiV2_wbV20_attrib_t))) {
+        rk_aiq_uapiV2_wb_awb_wbGainAdjust_t wbGainAdjustBK = mNewWbV20Attr.stAuto.wbGainAdjust;
         mNewWbV20Attr   = att;
+        mNewWbV20Attr.stAuto.wbGainAdjust = wbGainAdjustBK;
+        mallocAndCopyWbGainAdjustAttrib(&mNewWbV20Attr.stAuto.wbGainAdjust,&att.stAuto.wbGainAdjust);
         updateWbV20Attr = true;
         waitSignal();
     }
@@ -359,7 +370,10 @@ XCamReturn RkAiqAwbHandleInt::setAwbV20Attrib(rk_aiq_uapiV2_wbV20_awb_attrib_t a
 
     // if something changed
     if (0 != memcmp(&mCurWbAwbAttr, &att, sizeof(rk_aiq_uapiV2_wbV20_awb_attrib_t))) {
+        rk_aiq_uapiV2_wb_awb_wbGainAdjust_t wbGainAdjustBK = mNewWbAwbAttr.wbGainAdjust;
         mNewWbAwbAttr   = att;
+        mNewWbAwbAttr.wbGainAdjust = wbGainAdjustBK;
+        mallocAndCopyWbGainAdjustAttrib(&mNewWbAwbAttr.wbGainAdjust,&att.wbGainAdjust);
         updateWbAwbAttr = true;
         waitSignal();
     }
@@ -381,6 +395,100 @@ XCamReturn RkAiqAwbHandleInt::getAwbV20Attrib(rk_aiq_uapiV2_wbV20_awb_attrib_t* 
     return ret;
 }
 
+XCamReturn RkAiqAwbHandleInt::mallocAndCopyWbGainAdjustAttrib(rk_aiq_uapiV2_wb_awb_wbGainAdjust_t* dst,
+    const rk_aiq_uapiV2_wb_awb_wbGainAdjust_t *src)
+{
+    ENTER_ANALYZER_FUNCTION();
+
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+
+    //free
+    for(int i = 0; i < dst->lutAll_len; i++) {
+        int srcNum2 = src->lutAll[i].ct_grid_num * src->lutAll[i].cri_grid_num;
+        int dstNum2 = dst->lutAll[i].ct_grid_num * dst->lutAll[i].cri_grid_num;
+        if(dst->lutAll[i].cri_lut_out && dstNum2 < srcNum2){
+            //LOGE_AWB("free dst->lutAll[%d].cri_lut_out= %p",i,dst->lutAll[i].cri_lut_out);
+            free(dst->lutAll[i].cri_lut_out);
+            dst->lutAll[i].cri_lut_out = NULL;
+        }
+        if(dst->lutAll[i].ct_lut_out && dstNum2 < srcNum2){
+            free(dst->lutAll[i].ct_lut_out);
+            dst->lutAll[i].ct_lut_out = NULL;
+        }
+    }
+    if (dst->lutAll && dst->lutAll_len < src->lutAll_len) {
+        //LOGE_AWB(" free dst->lutAll= %p",dst->lutAll);
+        free(dst->lutAll);
+        dst->lutAll = NULL;
+    }
+    //malloc
+    if (!dst->lutAll){
+        dst->lutAll = (rk_aiq_uapiV2_wb_awb_wbGainAdjustLut_t*)malloc(sizeof(rk_aiq_uapiV2_wb_awb_wbGainAdjustLut_t)*src->lutAll_len);
+        //LOGE_AWB("malloc dst->lutAll= %p",dst->lutAll);
+        memset(dst->lutAll,0,sizeof(rk_aiq_uapiV2_wb_awb_wbGainAdjustLut_t)*src->lutAll_len);
+        for(int i = 0; i < src->lutAll_len; i++) {
+            int num2 = src->lutAll[i].ct_grid_num * src->lutAll[i].cri_grid_num;
+            if (!dst->lutAll[i].cri_lut_out){
+                dst->lutAll[i].cri_lut_out = (float*)malloc(sizeof(float) * num2);
+                memset(dst->lutAll[i].cri_lut_out,0,sizeof(float) * num2);
+
+            }
+            if (!dst->lutAll[i].ct_lut_out){
+                dst->lutAll[i].ct_lut_out = (float*)malloc(sizeof(float) * num2);
+                memset( dst->lutAll[i].ct_lut_out,0,sizeof(float) * num2);
+            }
+            //LOGE_AWB("malloc  dst->lutAll[%d].cri_lut_out= %p",i,dst->lutAll[i].cri_lut_out);
+        }
+    }
+    //copy
+    dst->enable = src->enable;
+    dst->lutAll_len = src->lutAll_len;
+    dst->sync = src->sync;
+    for(int i = 0; i < src->lutAll_len; i++) {
+        dst->lutAll[i].ct_grid_num = src->lutAll[i].ct_grid_num;
+        dst->lutAll[i].cri_grid_num = src->lutAll[i].cri_grid_num;
+        dst->lutAll[i].ct_in_range[0] = src->lutAll[i].ct_in_range[0];
+        dst->lutAll[i].ct_in_range[1] = src->lutAll[i].ct_in_range[1];
+        dst->lutAll[i].cri_in_range[0] = src->lutAll[i].cri_in_range[0];
+        dst->lutAll[i].cri_in_range[1] = src->lutAll[i].cri_in_range[1];
+        dst->lutAll[i].lumaValue = src->lutAll[i].lumaValue;
+        int num2 = dst->lutAll[i].ct_grid_num * dst->lutAll[i].cri_grid_num;
+        memcpy(dst->lutAll[i].cri_lut_out, src->lutAll[i].cri_lut_out,
+               sizeof(dst->lutAll[i].cri_lut_out[0])*num2);
+        memcpy(dst->lutAll[i].ct_lut_out, src->lutAll[i].ct_lut_out,
+               sizeof(dst->lutAll[i].ct_lut_out[0])*num2);
+    }
+    EXIT_ANALYZER_FUNCTION();
+    return ret;
+}
+
+XCamReturn RkAiqAwbHandleInt::freeWbGainAdjustAttrib(rk_aiq_uapiV2_wb_awb_wbGainAdjust_t* dst)
+{
+    ENTER_ANALYZER_FUNCTION();
+
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    //free
+    for(int i = 0; i < dst->lutAll_len; i++) {
+        //LOGE_AWB("free dst->lutAll[%d].cri_lut_out= %p",i,dst->lutAll[i].cri_lut_out);
+        if(dst->lutAll[i].cri_lut_out ){
+            free(dst->lutAll[i].cri_lut_out);
+            dst->lutAll[i].cri_lut_out = NULL;
+        }
+        if(dst->lutAll[i].ct_lut_out){
+            free(dst->lutAll[i].ct_lut_out);
+            dst->lutAll[i].ct_lut_out = NULL;
+        }
+    }
+    if (dst->lutAll) {
+        //LOGE_AWB(" free dst->lutAll= %p",dst->lutAll);
+        free(dst->lutAll);
+        dst->lutAll = NULL;
+    }
+    EXIT_ANALYZER_FUNCTION();
+    return ret;
+}
+
+
 XCamReturn RkAiqAwbHandleInt::setWbAwbWbGainAdjustAttrib(rk_aiq_uapiV2_wb_awb_wbGainAdjust_t att) {
     ENTER_ANALYZER_FUNCTION();
 
@@ -401,7 +509,7 @@ XCamReturn RkAiqAwbHandleInt::setWbAwbWbGainAdjustAttrib(rk_aiq_uapiV2_wb_awb_wb
 
     // if something changed
     if (isChanged) {
-        mNewWbAwbWbGainAdjustAttr   = att;
+        mallocAndCopyWbGainAdjustAttrib(&mNewWbAwbWbGainAdjustAttr,&att);
         updateWbAwbWbGainAdjustAttr = true;
         waitSignal(att.sync.sync_mode);
     }
@@ -424,14 +532,16 @@ XCamReturn RkAiqAwbHandleInt::getWbAwbWbGainAdjustAttrib(rk_aiq_uapiV2_wb_awb_wb
         mCfgMutex.unlock();
     } else {
         if (updateWbAwbWbGainAdjustAttr) {
-            memcpy(att, &mNewWbAwbWbGainAdjustAttr, sizeof(mNewWbAwbWbGainAdjustAttr));
+            mallocAndCopyWbGainAdjustAttrib(att,&mNewWbAwbWbGainAdjustAttr);
             att->sync.done = false;
         } else {
             rk_aiq_uapiV2_awb_GetAwbGainAdjust(mAlgoCtx, att);
             att->sync.sync_mode = mNewWbAwbWbGainAdjustAttr.sync.sync_mode;
             att->sync.done      = true;
         }
+
     }
+
 
     EXIT_ANALYZER_FUNCTION();
     return ret;
@@ -549,6 +659,37 @@ XCamReturn RkAiqAwbHandleInt::getWbAwbMultiWindowAttrib(rk_aiq_uapiV2_wb_awb_mul
     return ret;
 }
 
+XCamReturn RkAiqAwbHandleInt::setFFWbgainAttrib(rk_aiq_uapiV2_awb_ffwbgain_attr_t att) {
+    ENTER_ANALYZER_FUNCTION();
+
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    mCfgMutex.lock();
+
+    // check if there is different between att & mCurAtt(sync)/mNewAtt(async)
+    // if something changed, set att to mNewAtt, and
+    // the new params will be effective later when updateConfig
+    // called by RkAiqCore
+    bool isChanged = false;
+    if (att.sync.sync_mode == RK_AIQ_UAPI_MODE_ASYNC && \
+        memcmp(&mNewFFWbgainAttr, &att, sizeof(att)))
+        isChanged = true;
+    else if (att.sync.sync_mode != RK_AIQ_UAPI_MODE_ASYNC && \
+             memcmp(&mCurFFWbgainAttr, &att, sizeof(att)))
+        isChanged = true;
+
+    // if something changed
+    if (isChanged) {
+        mNewFFWbgainAttr   = att;
+        updateFFWbgainAttr = true;
+        waitSignal(att.sync.sync_mode);
+    }
+
+    mCfgMutex.unlock();
+
+    EXIT_ANALYZER_FUNCTION();
+    return ret;
+}
+
 XCamReturn RkAiqAwbHandleInt::prepare() {
     ENTER_ANALYZER_FUNCTION();
 
@@ -562,7 +703,7 @@ XCamReturn RkAiqAwbHandleInt::prepare() {
         (RkAiqCore::RkAiqAlgosGroupShared_t*)(getGroupShared());
     // TODO
     // awb_config_int->rawBit;
-
+    awb_config_int->mem_ops_ptr   = mAiqCore->mShareMemOps;
     RkAiqAlgoDescription* des = (RkAiqAlgoDescription*)mDes;
     ret                       = des->prepare(mConfig);
     RKAIQCORE_CHECK_RET(ret, "awb algo prepare failed");
@@ -575,7 +716,7 @@ XCamReturn RkAiqAwbHandleInt::preProcess() {
     ENTER_ANALYZER_FUNCTION();
 
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
-
+#if 0
     RkAiqAlgoPreAwb* awb_pre_int        = (RkAiqAlgoPreAwb*)mPreInParam;
     RkAiqAlgoPreResAwb* awb_pre_res_int = (RkAiqAlgoPreResAwb*)mPreOutParam;
     RkAiqCore::RkAiqAlgosGroupShared_t* shared =
@@ -600,6 +741,7 @@ XCamReturn RkAiqAwbHandleInt::preProcess() {
     RKAIQCORE_CHECK_RET(ret, "awb algo pre_process failed");
 
     EXIT_ANALYZER_FUNCTION();
+#endif
     return ret;
 }
 
@@ -628,7 +770,8 @@ XCamReturn RkAiqAwbHandleInt::processing() {
     awb_proc_int->awbStatsBuf = shared->awbStatsBuf;
     awb_proc_int->ablcProcResVaid = false;
 #if defined(ISP_HW_V30)
-    SmartPtr<RkAiqHandle>* ablc_handle = mAiqCore->getCurAlgoTypeHandle(RK_AIQ_ALGO_TYPE_ABLC);
+#if RKAIQ_HAVE_BLC_V1
+    /*SmartPtr<RkAiqHandle>* ablc_handle = mAiqCore->getCurAlgoTypeHandle(RK_AIQ_ALGO_TYPE_ABLC);
     int algo_id                      = (*ablc_handle)->getAlgoId();
 
     if (ablc_handle) {
@@ -637,15 +780,27 @@ XCamReturn RkAiqAwbHandleInt::processing() {
             ablc_algo->getProcRes(&awb_proc_int->ablcProcRes);
             awb_proc_int->ablcProcResVaid = true;
         }
-    }
+    }*/
+    awb_proc_int->ablcProcRes= shared->res_comb.ablc_proc_res;
+    awb_proc_int->ablcProcResVaid = true;
 #endif
-
+#endif
+#if RKAIQ_HAVE_BLC_V32
+        awb_proc_int->ablcProcResV32= shared->res_comb.ablcV32_proc_res;
+        awb_proc_int->ablcProcResVaid = true;
+#endif
     // for otp awb
     awb_proc_int->awb_otp = &sharedCom->snsDes.otp_awb;
 
     ret = RkAiqHandle::processing();
-    if (ret) {
-        RKAIQCORE_CHECK_RET(ret, "awb handle processing failed");
+    if (ret < 0) {
+        LOGE_ANALYZER("awb handle processing failed ret %d", ret);
+        mProcResShared = NULL;
+        return ret;
+    } else if (ret == XCAM_RETURN_BYPASS) {
+        LOGW_ANALYZER("%s:%d bypass !", __func__, __LINE__);
+        mProcResShared = NULL;
+        return ret;
     }
 
     if (!sharedCom->init) {
@@ -662,9 +817,31 @@ XCamReturn RkAiqAwbHandleInt::processing() {
 #else
     ret = des->processing(mProcInParam, (RkAiqAlgoResCom*)awb_proc_res_int);
 #endif
-    RKAIQCORE_CHECK_BYPASS(ret, "awb algo processing failed");
+    if (ret < 0) {
+        LOGE_ANALYZER("awb algo processing failed ret %d", ret);
+        mProcResShared = NULL;
+        return ret;
+    } else if (ret == XCAM_RETURN_BYPASS) {
+        LOGW_ANALYZER("%s:%d bypass !", __func__, __LINE__);
+        ret = XCAM_RETURN_NO_ERROR;
+        mProcResShared = NULL;
+    }
 
-    if (mPostShared) {
+    if (mAiqCore->mAlogsComSharedParams.init) {
+        RkAiqCore::RkAiqAlgosGroupShared_t* grpShared = nullptr;
+        uint64_t grpMask = grpId2GrpMask(RK_AIQ_CORE_ANALYZE_GRP1);
+        if (!mAiqCore->getGroupSharedParams(grpMask, grpShared)) {
+            if (grpShared) {
+                SmartPtr<BufferProxy> procResProxy = new BufferProxy(mProcResShared);
+                procResProxy->set_sequence(0);
+
+                if (procResProxy.ptr()) {
+                    XCamVideoBuffer* xCamAwbProcRes = convert_to_XCamVideoBuffer(procResProxy);
+                    grpShared->res_comb.awb_proc_res = xCamAwbProcRes;
+                }
+            }
+        }
+    } else if (mPostShared) {
         SmartPtr<BufferProxy> msg_data = new BufferProxy(mProcResShared);
         msg_data->set_sequence(shared->frameId);
         SmartPtr<XCamMessage> msg =
@@ -680,7 +857,7 @@ XCamReturn RkAiqAwbHandleInt::postProcess() {
     ENTER_ANALYZER_FUNCTION();
 
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
-
+#if 0
     RkAiqAlgoPostAwb* awb_post_int        = (RkAiqAlgoPostAwb*)mPostInParam;
     RkAiqAlgoPostResAwb* awb_post_res_int = (RkAiqAlgoPostResAwb*)mPostOutParam;
     RkAiqCore::RkAiqAlgosGroupShared_t* shared =
@@ -705,6 +882,7 @@ XCamReturn RkAiqAwbHandleInt::postProcess() {
     RKAIQCORE_CHECK_RET(ret, "awb algo post_process failed");
 
     EXIT_ANALYZER_FUNCTION();
+#endif
     return ret;
 }
 
@@ -716,24 +894,72 @@ XCamReturn RkAiqAwbHandleInt::genIspResult(RkAiqFullParams* params, RkAiqFullPar
         (RkAiqCore::RkAiqAlgosGroupShared_t*)(getGroupShared());
     RkAiqCore::RkAiqAlgosComShared_t* sharedCom = &mAiqCore->mAlogsComSharedParams;
 
-    if (!mProcResShared.ptr())
-        return XCAM_RETURN_NO_ERROR;
+    if (!mProcResShared.ptr()) {
+#if defined(ISP_HW_V30)
+        params->mAwbV3xParams = cur_params->mAwbV3xParams;
+        params->mAwbV3xParams->data()->frame_id = shared->frameId;
+#elif defined(ISP_HW_V21)
+        params->mAwbV21Params = cur_params->mAwbV21Params;
+        params->mAwbV21Params->data()->frame_id = shared->frameId;
+#elif defined(ISP_HW_V32)
+        params->mAwbV32Params = cur_params->mAwbV32Params;
+        params->mAwbV32Params->data()->frame_id = shared->frameId;
+#else
+        params->mAwbParams = cur_params->mAwbParams;
+        params->mAwbParams->data()->frame_id = shared->frameId;
+#endif
+#if defined(ISP_HW_V32)
+        params->mAwbGainV32Params = cur_params->mAwbGainV32Params;
+        params->mAwbGainV32Params->data()->frame_id = shared->frameId;
+#else
+        params->mAwbGainParams = cur_params->mAwbGainParams;
+        params->mAwbGainParams->data()->frame_id = shared->frameId;
+#endif
+        return XCAM_RETURN_BYPASS;
+    }
 
     RkAiqAlgoProcResAwb* awb_com                = &mProcResShared->result;
 
     if (!awb_com) {
         LOGD_ANALYZER("no awb result");
-        return XCAM_RETURN_NO_ERROR;
+#if defined(ISP_HW_V30)
+        params->mAwbV3xParams = cur_params->mAwbV3xParams;
+        params->mAwbV3xParams->data()->frame_id = shared->frameId;
+#elif defined(ISP_HW_V21)
+        params->mAwbV21Params = cur_params->mAwbV21Params;
+        params->mAwbV21Params->data()->frame_id = shared->frameId;
+#elif defined(ISP_HW_V32)
+        params->mAwbV32Params = cur_params->mAwbV32Params;
+        params->mAwbV32Params->data()->frame_id = shared->frameId;
+#else
+        params->mAwbParams = cur_params->mAwbParams;
+        params->mAwbParams->data()->frame_id = shared->frameId;
+#endif
+#if defined(ISP_HW_V32)
+        params->mAwbGainV32Params = cur_params->mAwbGainV32Params;
+        params->mAwbGainV32Params->data()->frame_id = shared->frameId;
+#else
+        params->mAwbGainParams = cur_params->mAwbGainParams;
+        params->mAwbGainParams->data()->frame_id = shared->frameId;
+#endif
+        mProcResShared = NULL;
+        return XCAM_RETURN_BYPASS;
     }
 
 #if defined(ISP_HW_V30)
     rk_aiq_isp_awb_params_v3x_t* awb_param = params->mAwbV3xParams->data().ptr();
 #elif defined(ISP_HW_V21)
     rk_aiq_isp_awb_params_v21_t* awb_param = params->mAwbV21Params->data().ptr();
+#elif defined(ISP_HW_V32)
+    rk_aiq_isp_awb_params_v32_t* awb_param = params->mAwbV32Params->data().ptr();
 #else
     rk_aiq_isp_awb_params_v20_t* awb_param = params->mAwbParams->data().ptr();
 #endif
+#if defined(ISP_HW_V32)
+    rk_aiq_isp_awb_gain_params_v32_t* awb_gain_param = params->mAwbGainV32Params->data().ptr();
+#else
     rk_aiq_isp_awb_gain_params_v20_t* awb_gain_param = params->mAwbGainParams->data().ptr();
+#endif
     RkAiqAlgoProcResAwb* awb_rk                      = (RkAiqAlgoProcResAwb*)awb_com;
 
 #if 0
@@ -753,10 +979,20 @@ XCamReturn RkAiqAwbHandleInt::genIspResult(RkAiqFullParams* params, RkAiqFullPar
         awb_gain_param->frame_id = shared->frameId;
         awb_param->frame_id      = shared->frameId;
     }
-
+#if defined(ISP_HW_V32)
+    rk_aiq_wb_gain_v32_t *awb_gain_v32 = &awb_gain_param->result;
+    awb_gain_v32->rgain = awb_rk->awb_gain_algo.rgain;
+    awb_gain_v32->grgain = awb_rk->awb_gain_algo.grgain;
+    awb_gain_v32->gbgain = awb_rk->awb_gain_algo.gbgain;
+    awb_gain_v32->bgain = awb_rk->awb_gain_algo.bgain;
+    awb_gain_v32->applyPosition = awb_rk->wbgainApplyPosition;
+#else
     awb_gain_param->result     = awb_rk->awb_gain_algo;
+#endif
 #if defined(ISP_HW_V30) || defined(ISP_HW_V21)
     awb_param->result = awb_rk->awb_hw1_para;
+#elif defined(ISP_HW_V32)
+    awb_param->result = awb_rk->awb_hw32_para;
 #else
     awb_param->result = awb_rk->awb_hw0_para;
 #endif
@@ -771,14 +1007,22 @@ XCamReturn RkAiqAwbHandleInt::genIspResult(RkAiqFullParams* params, RkAiqFullPar
     cur_params->mAwbV3xParams  = params->mAwbV3xParams;
 #elif defined(ISP_HW_V21)
     cur_params->mAwbV21Params  = params->mAwbV21Params;
+#elif defined(ISP_HW_V32)
+    cur_params->mAwbV32Params  = params->mAwbV32Params;
 #else
     cur_params->mAwbParams     = params->mAwbParams;
 #endif
+#if defined(ISP_HW_V32)
+    cur_params->mAwbGainV32Params = params->mAwbGainV32Params;
+#else
     cur_params->mAwbGainParams = params->mAwbGainParams;
+#endif
+
+    mProcResShared = NULL;
 
     EXIT_ANALYZER_FUNCTION();
 
     return ret;
 }
 
-};  // namespace RkCam
+}  // namespace RkCam

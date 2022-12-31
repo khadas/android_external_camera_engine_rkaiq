@@ -87,8 +87,6 @@ Again_result_V2_t Again_Init_V2(Again_Context_V2_t **ppAgainCtx, CamCalibDbV2Con
     pAgainCtx->stExpInfo.snr_mode = 1;
     pAgainCtx->eParamMode = AGAINV2_PARAM_MODE_NORMAL;
     Again_ConfigSettingParam_V2(pAgainCtx, pAgainCtx->eParamMode, pAgainCtx->stExpInfo.snr_mode);
-
-
 #endif
 
 
@@ -307,7 +305,6 @@ Again_result_V2_t Again_Process_V2(Again_Context_V2_t *pAgainCtx, Again_ExpInfo_
 
         //select param
         gain_select_params_by_ISO_V2(&pAgainCtx->stAuto.stParams, &pAgainCtx->stAuto.stSelect, pExpInfo);
-
 
     } else if(pAgainCtx->eMode == AGAINV2_OP_MODE_MANUAL) {
         //TODO

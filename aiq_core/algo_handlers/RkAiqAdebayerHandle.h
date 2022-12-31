@@ -25,10 +25,12 @@
 namespace RkCam {
 
 class RkAiqAdebayerHandleInt : virtual public RkAiqHandle {
- public:
+public:
     explicit RkAiqAdebayerHandleInt(RkAiqAlgoDesComm* des, RkAiqCore* aiqCore)
         : RkAiqHandle(des, aiqCore) {}
-    virtual ~RkAiqAdebayerHandleInt() { RkAiqHandle::deInit(); };
+    virtual ~RkAiqAdebayerHandleInt() {
+        RkAiqHandle::deInit();
+    };
     virtual XCamReturn updateConfig(bool needSync);
     virtual XCamReturn prepare();
     virtual XCamReturn preProcess();
@@ -36,21 +38,39 @@ class RkAiqAdebayerHandleInt : virtual public RkAiqHandle {
     virtual XCamReturn postProcess();
     virtual XCamReturn genIspResult(RkAiqFullParams* params, RkAiqFullParams* cur_params);
     // TODO add algo specific methords, this is a sample
+#if RKAIQ_HAVE_DEBAYER_V1
     XCamReturn setAttrib(adebayer_attrib_t att);
     XCamReturn getAttrib(adebayer_attrib_t* att);
+#endif
 
- protected:
+#if RKAIQ_HAVE_DEBAYER_V2
+    XCamReturn setAttribV2(adebayer_v2_attrib_t att);
+    XCamReturn getAttribV2(adebayer_v2_attrib_t* att);
+#endif
+
+protected:
     virtual void init();
-    virtual void deInit() { RkAiqHandle::deInit(); };
+    virtual void deInit() {
+        RkAiqHandle::deInit();
+    };
 
- private:
+private:
+
+#if RKAIQ_HAVE_DEBAYER_V1
     adebayer_attrib_t mCurAtt;
     adebayer_attrib_t mNewAtt;
+#endif
 
- private:
+#if RKAIQ_HAVE_DEBAYER_V2
+    adebayer_v2_attrib_t mCurAttV2;
+    adebayer_v2_attrib_t mNewAttV2;
+#endif
+
+
+private:
     DECLARE_HANDLE_REGISTER_TYPE(RkAiqAdebayerHandleInt);
 };
 
-};  // namespace RkCam
+}  // namespace RkCam
 
 #endif

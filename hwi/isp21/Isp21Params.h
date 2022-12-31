@@ -29,7 +29,7 @@ public:
     explicit Isp21Params() : Isp20Params() {};
     virtual ~Isp21Params() {};
 protected:
-    virtual bool convert3aResultsToIspCfg(SmartPtr<cam3aResult> &result, void* isp_cfg_p);
+    virtual bool convert3aResultsToIspCfg(SmartPtr<cam3aResult> &result, void* isp_cfg_p, bool is_multi_isp) override;
     template<class T>
     void convertAiqCcmToIsp21Params(T& isp_cfg,
                                     const rk_aiq_ccm_cfg_t& ccm);
@@ -45,30 +45,46 @@ protected:
                                         bool awb_gain_update);
     template<class T>
     void convertAiqCsmToIsp21Params(T& isp_cfg,
-                                   const rk_aiq_acsm_params_t& csm_cfg);
+                                    const rk_aiq_acsm_params_t& csm_cfg);
     template<class T>
     void convertAiqCgcToIsp21Params(T& isp_cfg,
                                     const rk_aiq_acgc_params_t& cgc_param);
+
 private:
     XCAM_DEAD_COPY(Isp21Params);
+#if RKAIQ_HAVE_DEHAZE_V11
     void convertAiqAdehazeToIsp21Params(struct isp21_isp_params_cfg& isp_cfg,
                                         const rk_aiq_isp_dehaze_v21_t& dhaze);
+#endif
+
+#if RKAIQ_HAVE_AWB_V21
     void convertAiqAwbToIsp21Params(struct isp21_isp_params_cfg& isp_cfg,
                                     const rk_aiq_awb_stat_cfg_v201_t& awb_meas,
                                     bool awb_cfg_udpate);
+#endif
+#if RKAIQ_HAVE_BAYERNR_V2
     void convertAiqRawnrToIsp21Params(struct isp21_isp_params_cfg& isp_cfg,
                                       rk_aiq_isp_baynr_v21_t& rawnr);
+#endif
     void convertAiqTnrToIsp21Params(struct isp21_isp_params_cfg& isp_cfg,
                                     rk_aiq_isp_bay3d_v21_t& tnr);
+#if RKAIQ_HAVE_CNR_V1
     void convertAiqUvnrToIsp21Params(struct isp21_isp_params_cfg& isp_cfg,
                                      rk_aiq_isp_cnr_v21_t& uvnr);
+#endif
+#if RKAIQ_HAVE_YNR_V2
     void convertAiqYnrToIsp21Params(struct isp21_isp_params_cfg& isp_cfg,
                                     rk_aiq_isp_ynr_v21_t& ynr);
+#endif
+#if RKAIQ_HAVE_SHARP_V3
     void convertAiqSharpenToIsp21Params(struct isp21_isp_params_cfg& isp_cfg,
                                         rk_aiq_isp_sharp_v21_t& sharp);
+#endif
+#if RKAIQ_HAVE_DRC_V10
     void convertAiqDrcToIsp21Params(struct isp21_isp_params_cfg& isp_cfg,
                                     rk_aiq_isp_drc_v21_t& adrc_data);
-    void convertAiqExpIspDgainToIsp21Params(struct isp21_isp_params_cfg& isp_cfg, RKAiqAecExpInfo_t& ae_exp);
+#endif
+    void convertAiqExpIspDgainToIsp21Params(struct isp21_isp_params_cfg& isp_cfg, RKAiqAecExpInfo_t ae_exp);
 };
 
 };

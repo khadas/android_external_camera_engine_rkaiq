@@ -202,7 +202,7 @@ static XCamReturn AeReal2RegConv
 
 
     //gain convertion
-    float ag = SplitGain / (pDcgMode >= 1 ? dcg_ratio : 1.0f);
+    float ag = SplitGain / ((pDcgMode >= 1) ? dcg_ratio : 1.0f);
 
     if(pConfig->stSensorInfo.Gain2Reg.GainMode == EXPGAIN_MODE_LINEAR) {
 
@@ -499,8 +499,8 @@ static XCamReturn initAecHwConfig(rk_aiq_rkAe_config_t* pConfig)
     /*      rawae0-2.rawae_sel should be the same, defining BIG/LITE mode of chn[0-2]    */
     /*    rawae3.rawae_sel is different from rawae0-2, defining BIG/LITE mode of debayer  */
     /*****************************************************************/
-#if defined(ISP_HW_V30)
 
+#if defined(ISP_HW_V30)
     if(pConfig->HdrFrmNum < 3) {
         pConfig->aeHwConfig.ae_meas.rawae0.rawae_sel = 2;
         pConfig->aeHwConfig.ae_meas.rawae1.rawae_sel = 2;
@@ -528,6 +528,26 @@ static XCamReturn initAecHwConfig(rk_aiq_rkAe_config_t* pConfig)
         pConfig->aeHwConfig.ae_meas.rawae3.rawae_sel = 3;
     }
 #endif
+
+#if defined(ISP_HW_V32)
+
+    if(pConfig->IsHdr) {
+
+        pConfig->aeHwConfig.ae_meas.rawae0.rawae_sel = 0;
+        pConfig->aeHwConfig.ae_meas.rawae1.rawae_sel = 0;
+        pConfig->aeHwConfig.ae_meas.rawae2.rawae_sel = 0; //rawae2 no effective
+        pConfig->aeHwConfig.ae_meas.rawae3.rawae_sel = 0; //raw.chn[0] = BIG, make all channel = BIG
+
+    } else {
+        pConfig->aeHwConfig.ae_meas.rawae0.rawae_sel = 1;
+        pConfig->aeHwConfig.ae_meas.rawae1.rawae_sel = 1;
+        pConfig->aeHwConfig.ae_meas.rawae2.rawae_sel = 1; //rawae2 no effective
+        pConfig->aeHwConfig.ae_meas.rawae3.rawae_sel = 3; //raw.chn[0] = BIG, make all channel = BIG
+    }
+
+#endif
+
+
 
     pConfig->aeHwConfig.hist_meas.ae_swap = pConfig->aeHwConfig.ae_meas.rawae1.rawae_sel;
     pConfig->aeHwConfig.hist_meas.ae_sel = pConfig->aeHwConfig.ae_meas.rawae3.rawae_sel;
@@ -978,17 +998,17 @@ void _customAeRes2rkAeRes(rk_aiq_rkAe_config_t* pConfig, RkAiqAlgoProcResAe* rkA
         rkAeProcRes->new_ae_exp.LinearExp = customAeProcRes->linear_exp;
     }
 
-    rkAeProcRes->new_ae_exp.exp_i2c_params.bValid = customAeProcRes->exp_i2c_params.bValid;
-    rkAeProcRes->new_ae_exp.exp_i2c_params.nNumRegs = customAeProcRes->exp_i2c_params.nNumRegs;
+    rkAeProcRes->exp_i2c_params.bValid = customAeProcRes->exp_i2c_params.bValid;
+    rkAeProcRes->exp_i2c_params.nNumRegs = customAeProcRes->exp_i2c_params.nNumRegs;
 
     if(customAeProcRes->exp_i2c_params.bValid) {
         if(customAeProcRes->exp_i2c_params.nNumRegs <= MAX_I2CDATA_LEN) {
             for(uint32_t i = 0; i < customAeProcRes->exp_i2c_params.nNumRegs; i++) {
-                rkAeProcRes->new_ae_exp.exp_i2c_params.DelayFrames[i] = customAeProcRes->exp_i2c_params.pDelayFrames[i];
-                rkAeProcRes->new_ae_exp.exp_i2c_params.RegAddr[i] = customAeProcRes->exp_i2c_params.pRegAddr[i];
-                rkAeProcRes->new_ae_exp.exp_i2c_params.AddrByteNum[i] = customAeProcRes->exp_i2c_params.pAddrByteNum[i];
-                rkAeProcRes->new_ae_exp.exp_i2c_params.RegValue[i] = customAeProcRes->exp_i2c_params.pRegValue[i];
-                rkAeProcRes->new_ae_exp.exp_i2c_params.ValueByteNum[i] = customAeProcRes->exp_i2c_params.pValueByteNum[i];
+                rkAeProcRes->exp_i2c_params.DelayFrames[i] = customAeProcRes->exp_i2c_params.pDelayFrames[i];
+                rkAeProcRes->exp_i2c_params.RegAddr[i] = customAeProcRes->exp_i2c_params.pRegAddr[i];
+                rkAeProcRes->exp_i2c_params.AddrByteNum[i] = customAeProcRes->exp_i2c_params.pAddrByteNum[i];
+                rkAeProcRes->exp_i2c_params.RegValue[i] = customAeProcRes->exp_i2c_params.pRegValue[i];
+                rkAeProcRes->exp_i2c_params.ValueByteNum[i] = customAeProcRes->exp_i2c_params.pValueByteNum[i];
             }
         } else {
             LOGE("too many i2c data to set!!");
@@ -1066,18 +1086,18 @@ void _customGrpAeSingleResSet(rk_aiq_rkAe_config_t* pConfig, rk_aiq_singlecam_3a
         rk_aiq_singlecam_3a_result->aec.exp_tbl[0].LinearExp = customAeRes.linear_exp;
     }
 
-    rk_aiq_singlecam_3a_result->aec.exp_tbl[0].exp_i2c_params.bValid = customAeRes.exp_i2c_params.bValid;
-    rk_aiq_singlecam_3a_result->aec.exp_tbl[0].exp_i2c_params.nNumRegs = customAeRes.exp_i2c_params.nNumRegs;
+    rk_aiq_singlecam_3a_result->aec.exp_i2c_params->bValid = customAeRes.exp_i2c_params.bValid;
+    rk_aiq_singlecam_3a_result->aec.exp_i2c_params->nNumRegs = customAeRes.exp_i2c_params.nNumRegs;
 
     if(customAeRes.exp_i2c_params.bValid) {
         if(customAeRes.exp_i2c_params.nNumRegs <= MAX_I2CDATA_LEN) {
 
             for(uint32_t i = 0; i < customAeRes.exp_i2c_params.nNumRegs; i++) {
-                rk_aiq_singlecam_3a_result->aec.exp_tbl[0].exp_i2c_params.DelayFrames[i] = customAeRes.exp_i2c_params.pDelayFrames[i];
-                rk_aiq_singlecam_3a_result->aec.exp_tbl[0].exp_i2c_params.RegAddr[i] = customAeRes.exp_i2c_params.pRegAddr[i];
-                rk_aiq_singlecam_3a_result->aec.exp_tbl[0].exp_i2c_params.AddrByteNum[i] = customAeRes.exp_i2c_params.pAddrByteNum[i];
-                rk_aiq_singlecam_3a_result->aec.exp_tbl[0].exp_i2c_params.RegValue[i] = customAeRes.exp_i2c_params.pRegValue[i];
-                rk_aiq_singlecam_3a_result->aec.exp_tbl[0].exp_i2c_params.ValueByteNum[i] = customAeRes.exp_i2c_params.pValueByteNum[i];
+                rk_aiq_singlecam_3a_result->aec.exp_i2c_params->DelayFrames[i] = customAeRes.exp_i2c_params.pDelayFrames[i];
+                rk_aiq_singlecam_3a_result->aec.exp_i2c_params->RegAddr[i] = customAeRes.exp_i2c_params.pRegAddr[i];
+                rk_aiq_singlecam_3a_result->aec.exp_i2c_params->AddrByteNum[i] = customAeRes.exp_i2c_params.pAddrByteNum[i];
+                rk_aiq_singlecam_3a_result->aec.exp_i2c_params->RegValue[i] = customAeRes.exp_i2c_params.pRegValue[i];
+                rk_aiq_singlecam_3a_result->aec.exp_i2c_params->ValueByteNum[i] = customAeRes.exp_i2c_params.pValueByteNum[i];
             }
         } else {
             LOGE("too many i2c data to set!!");
@@ -1150,10 +1170,11 @@ void _customGrpAeRes2rkGrpAeRes(rk_aiq_rkAe_config_t* pConfig, rk_aiq_singlecam_
         RkAiqAlgoProcResAe* aeProcRes = nullptr;
         if(XaeProcRes) {
             aeProcRes = (RkAiqAlgoProcResAe*)XaeProcRes->map(XaeProcRes);
-            if(aeProcRes)
+            if (aeProcRes) {
                 aeProcRes->ae_proc_res_rk.LongFrmMode = customAeProcRes->is_longfrm_mode;
-            else
+            } else {
                 LOGW_GAEC("aeProcRes[%d] = nullptr", i);
+            }
         } else {
             LOGW_GAEC("XCamVideoBuffer of aeProcRes[%d] = nullptr", i);
         }

@@ -1,7 +1,7 @@
 /*
  * thumbnails.h - A service to produce thumbnails for algorithms
  *
- *  Copyright (c) 2021 Rockchip Electronics Co., Ltd.
+ *  Copyright (c) 2021-2022 Rockchip Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,7 +25,7 @@
 #include <map>
 #include <memory>
 
-#include "iq_parser_v2/RkAiqCalibDbV2TypesIsp20.h"
+#include "iq_parser_v2/RkAiqCalibDbTypesV2.h"
 #include "xcore/base/xcam_defs.h"
 #include "xcore/task_service.h"
 #include "xcore/task_traits.h"
@@ -121,7 +121,7 @@ class ThumbnailsConfig;
 class ThumbnailsBufferManager;
 struct ScalerParam;
 using ScalerService = XCam::TaskService<ScalerParam>;
-};  // namespace thumbnails
+}  // namespace thumbnails
 
 class ThumbnailsService {
  public:
@@ -147,6 +147,6 @@ class ThumbnailsService {
     std::atomic_bool stopped_;
 };
 
-};  // namespace RkCam
+}  // namespace RkCam
 
 #endif  // AIQ_CORE_THUMBNAILS_H

@@ -34,14 +34,14 @@ int onPacketHandle(void *pri, void *packet, MessageType type);
 
 SocketServer::SocketServer()
     : tool_mode_on(false), sockfd(-1), client_socket(-1), quit_(0),
-      serverAddress({0}), clientAddress({0}), aiq_ctx(nullptr),
+      serverAddress{AF_UNIX, ""}, clientAddress{AF_UNIX, ""}, aiq_ctx(nullptr),
       accept_threads_(nullptr), tunning_thread(nullptr),
       callback_(nullptr), _stop_fds{-1, -1} {
   msg_parser =
       std::unique_ptr<RkMSG::MessageParser>(new RkMSG::MessageParser(this));
   msg_parser->setMsgCallBack(onPacketHandle);
   msg_parser->start();
-};
+}
 
 SocketServer::~SocketServer() {
 }
@@ -52,8 +52,9 @@ void SocketServer::SaveEixt() {
   if (_stop_fds[1] != -1) {
     char buf = 0xf; // random value to write to flush fd.
     unsigned int size = write(_stop_fds[1], &buf, sizeof(char));
-    if (size != sizeof(char))
+    if (size != sizeof(char)) {
       LOGW("Flush write not completed");
+    }
   }
 }
 

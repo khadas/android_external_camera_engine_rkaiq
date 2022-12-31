@@ -146,8 +146,9 @@ LensHw::start_internal()
 }
 
 XCamReturn
-LensHw::start()
+LensHw::start(bool prepared)
 {
+    (void)prepared;
     ENTER_CAMHW_FUNCTION();
     SmartLock locker (_mutex);
 
@@ -1111,7 +1112,7 @@ LensHw::ZoomFocusModifyPosition(SmartPtr<RkAiqFocusParamsProxy>& focus_params)
 }
 
 XCamReturn
-LensHw::handle_sof(int64_t time, int frameid)
+LensHw::handle_sof(int64_t time, uint32_t frameid)
 {
     ENTER_CAMHW_FUNCTION();
     //SmartLock locker (_mutex);
@@ -1124,7 +1125,7 @@ LensHw::handle_sof(int64_t time, int frameid)
     _frame_time[idx] = time;
     _rec_sof_idx = idx;
 
-    LOGD_CAMHW_SUBM(LENS_SUBM, "%s: frm_id %d, time %lld\n", __func__, frameid, time);
+    LOGD_CAMHW_SUBM(LENS_SUBM, "%s: frm_id %u, time %lld\n", __func__, frameid, time);
 
     EXIT_CAMHW_FUNCTION();
     return ret;
@@ -1200,11 +1201,11 @@ LensHw::getIrisInfoParams(SmartPtr<RkAiqIrisParamsProxy>& irisParams, uint32_t f
     if (i < LENSHW_RECORD_SOF_NUM) {
         irisParams->data()->sofTime = _frame_time[i];
     } else {
-        LOGE_CAMHW_SUBM(LENS_SUBM, "%s: frame_id %d, can not find sof time!\n", __FUNCTION__, frame_id);
+        LOGE_CAMHW_SUBM(LENS_SUBM, "%s: frame_id %u, can not find sof time!\n", __FUNCTION__, frame_id);
         return  XCAM_RETURN_ERROR_PARAM;
     }
 
-    LOGD_CAMHW_SUBM(LENS_SUBM, "%s: frm_id %d, time %lld\n", __func__, frame_id, irisParams->data()->sofTime);
+    LOGD_CAMHW_SUBM(LENS_SUBM, "%s: frm_id %u, time %lld\n", __func__, frame_id, irisParams->data()->sofTime);
 
     EXIT_CAMHW_FUNCTION();
 
@@ -1271,11 +1272,11 @@ LensHw::getAfInfoParams(SmartPtr<RkAiqAfInfoProxy>& afInfo, uint32_t frame_id)
         memset(afInfo->data()->lowPassHighLht2, 0, RKAIQ_RAWAF_SUMDATA_NUM * sizeof(int32_t));
     }
 
-    LOGD_CAMHW_SUBM(LENS_SUBM, "%s: frm_id %d, time %lld, lowPassFv4_4[0] %d, lowPassId %d\n",
+    LOGD_CAMHW_SUBM(LENS_SUBM, "%s: frm_id %u, time %lld, lowPassFv4_4[0] %d, lowPassId %d\n",
         __func__, frame_id, afInfo->data()->sofTime, afInfo->data()->lowPassFv4_4[0], afInfo->data()->lowPassId);
 
 
-    LOGD_CAMHW_SUBM(LENS_SUBM, "%s: frm_id %d, time %lld\n", __func__, frame_id, afInfo->data()->sofTime);
+    LOGD_CAMHW_SUBM(LENS_SUBM, "%s: frm_id %u, time %lld\n", __func__, frame_id, afInfo->data()->sofTime);
 
     EXIT_CAMHW_FUNCTION();
 
@@ -1340,4 +1341,4 @@ bool LensHwHelperThd::loop()
     return false;
 }
 
-}; //namespace RkCam
+} //namespace RkCam

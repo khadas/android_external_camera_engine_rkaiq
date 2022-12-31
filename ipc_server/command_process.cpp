@@ -287,15 +287,35 @@ int ProcessCommand(rk_aiq_sys_ctx_t* ctx, RkAiqSocketPacket *dataRecv, RkAiqSock
         break;
 
     case ENUM_ID_AMERGE_SETATTRIB: {
-        dataReply->commandResult = setMergeAttrib(ctx, dataRecv->data);
+#if RKAIQ_HAVE_MERGE_V10
+        dataReply->commandResult = setMergeAttribV10(ctx, dataRecv->data);
+#endif
+#if RKAIQ_HAVE_MERGE_V11
+        dataReply->commandResult = setMergeAttribV11(ctx, dataRecv->data);
+#endif
+#if RKAIQ_HAVE_MERGE_V12
+        dataReply->commandResult = setMergeAttribV12(ctx, dataRecv->data);
+#endif
         dataReply->data = NULL;
         dataReply->dataSize = 0;
         break;
     }
     case ENUM_ID_AMERGE_GETATTRIB: {
-        dataReply->dataSize = sizeof(amerge_attrib_t);
+#if RKAIQ_HAVE_MERGE_V10
+        dataReply->dataSize      = sizeof(mergeAttrV10_t);
         dataReply->data = (char*)malloc(dataReply->dataSize);
-        dataReply->commandResult =  getMergeAttrib(ctx, dataReply->data);
+        dataReply->commandResult = getMergeAttribV10(ctx, dataReply->data);
+#endif
+#if RKAIQ_HAVE_MERGE_V11
+        dataReply->dataSize      = sizeof(mergeAttrV11_t);
+        dataReply->data          = (char*)malloc(dataReply->dataSize);
+        dataReply->commandResult = getMergeAttribV11(ctx, dataReply->data);
+#endif
+#if RKAIQ_HAVE_MERGE_V12
+        dataReply->dataSize      = sizeof(mergeAttrV12_t);
+        dataReply->data          = (char*)malloc(dataReply->dataSize);
+        dataReply->commandResult = getMergeAttribV12(ctx, dataReply->data);
+#endif
         break;
     }
     case ENUM_ID_ATMO_SETATTRIB: {
@@ -342,9 +362,16 @@ int ProcessCommand(rk_aiq_sys_ctx_t* ctx, RkAiqSocketPacket *dataRecv, RkAiqSock
     }
     case ENUM_ID_ACCM_GETATTRIB:
     {
+#if RKAIQ_HAVE_CCM_V1
         dataReply->dataSize = sizeof(rk_aiq_ccm_attrib_t);
         dataReply->data = (char*)malloc(dataReply->dataSize);
         dataReply->commandResult =  getCcmAttrib(ctx, dataReply->data);
+#endif
+#if RKAIQ_HAVE_CCM_V2
+        dataReply->dataSize = sizeof(rk_aiq_ccm_v2_attrib_t);
+        dataReply->data = (char*)malloc(dataReply->dataSize);
+        dataReply->commandResult =  getCcmAttrib(ctx, dataReply->data);
+#endif
         break;
     }
     case ENUM_ID_ACCM_QUERYCCMINFO:
@@ -408,6 +435,13 @@ int ProcessCommand(rk_aiq_sys_ctx_t* ctx, RkAiqSocketPacket *dataRecv, RkAiqSock
         dataReply->dataSize = sizeof(rk_aiq_isp_stats_t);
         dataReply->data = (char*)malloc(dataReply->dataSize);
         dataReply->commandResult = get3AStatsBlk(ctx, dataReply->data);
+        break;
+    }
+    case ENUM_ID_AIQ_UAPI2_AWB_WRITEAWBIN:
+    {
+        dataReply->commandResult = writeAwbIn(ctx, dataRecv->data);
+        dataReply->data = NULL;
+        dataReply->dataSize = 0;
         break;
     }
     default:

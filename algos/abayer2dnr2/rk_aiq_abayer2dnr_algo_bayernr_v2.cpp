@@ -330,7 +330,7 @@ Abayer2dnr_result_V2_t bayer2dnr_fix_transfer_V2(RK_Bayer2dnr_Params_V2_Select_t
     pFix->weit_d[2] = 0x31d;
 #else
     edgesofts = pSelect->edgesofts * fStrength;
-    if(edgesofts > 16.0) {
+    if (edgesofts > 16.0) {
         edgesofts = 16.0;
     }
     for(i = 0; i < 8; i++)
@@ -433,7 +433,7 @@ Abayer2dnr_result_V2_t bayer2dnr_fix_printf_V2(RK_Bayer2dnr_Fix_V2_t * pFix)
 }
 
 
-Abayer2dnr_result_V2_t bayer2dnr_get_setting_by_name_json_V2(CalibDbV2_Bayer2dnr_V2_t* pCalibdb, char *name, int *calib_idx, int *tuning_idx)
+Abayer2dnr_result_V2_t bayer2dnr_get_setting_by_name_json_V2(CalibDbV2_Bayer2dnrV2_t* pCalibdb, char *name, int *calib_idx, int *tuning_idx)
 {
 
     int i = 0;
@@ -477,11 +477,11 @@ Abayer2dnr_result_V2_t bayer2dnr_get_setting_by_name_json_V2(CalibDbV2_Bayer2dnr
 
 
 
-Abayer2dnr_result_V2_t bayer2dnr_init_params_json_V2(RK_Bayer2dnr_Params_V2_t *pParams, CalibDbV2_Bayer2dnr_V2_t* pCalibdb, int calib_idx, int tuning_idx)
+Abayer2dnr_result_V2_t bayer2dnr_init_params_json_V2(RK_Bayer2dnr_Params_V2_t *pParams, CalibDbV2_Bayer2dnrV2_t* pCalibdb, int calib_idx, int tuning_idx)
 {
     Abayer2dnr_result_V2_t res = ABAYER2DNR_RET_SUCCESS;
-    CalibDbV2_Bayer2dnr_V2_CalibPara_Setting_ISO_t *pCalibIso = NULL;
-    CalibDbV2_Bayer2dnr_V2_TuningPara_Setting_ISO_t *pTuningISO = NULL;
+    CalibDbV2_Bayer2dnrV2_C_ISO_t *pCalibIso = NULL;
+    CalibDbV2_Bayer2dnrV2_T_ISO_t *pTuningISO = NULL;
     int i = 0;
     int j = 0;
 
@@ -528,13 +528,12 @@ Abayer2dnr_result_V2_t bayer2dnr_init_params_json_V2(RK_Bayer2dnr_Params_V2_t *p
                  pTuningISO->hdr_dgain_scale_s, pTuningISO->hdr_dgain_scale_m);
     }
 
-
     LOGI_ANR("%s:(%d) oyyf bayerner xml config end!   \n", __FUNCTION__, __LINE__);
 
     return res;
 }
 
-Abayer2dnr_result_V2_t bayer2dnr_config_setting_param_json_V2(RK_Bayer2dnr_Params_V2_t *pParams, CalibDbV2_Bayer2dnr_V2_t* pCalibdbV2, char* param_mode, char * snr_name)
+Abayer2dnr_result_V2_t bayer2dnr_config_setting_param_json_V2(RK_Bayer2dnr_Params_V2_t *pParams, CalibDbV2_Bayer2dnrV2_t* pCalibdbV2, char* param_mode, char * snr_name)
 {
     Abayer2dnr_result_V2_t res = ABAYER2DNR_RET_SUCCESS;
     int calib_idx = 0;

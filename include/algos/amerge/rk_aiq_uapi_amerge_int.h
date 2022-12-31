@@ -6,13 +6,6 @@
 #include "rk_aiq_types_amerge_algo_int.h"
 
 
-// TODO: move the structs define to a separate file,
-//TODO: move the structs define to a separate file,
-// eg. rk_aiq_uapi_awb_types.h ?
-
-typedef mergeAttr_t amerge_attrib_t;
-
-
 // need_sync means the implementation should consider
 // the thread synchronization
 // if called by RkAiqAwbHandleInt, the sync has been done
@@ -20,15 +13,14 @@ typedef mergeAttr_t amerge_attrib_t;
 // sync should be done in inner. now we just need implement
 // the case of need_sync == false; need_sync is for future usage.
 
-XCamReturn
-rk_aiq_uapi_amerge_SetAttrib(RkAiqAlgoContext *ctx,
-                             amerge_attrib_t attr,
-                             bool need_sync);
-
-
-XCamReturn
-rk_aiq_uapi_amerge_GetAttrib(RkAiqAlgoContext *ctx,
-                             amerge_attrib_t *attr);
-
+XCamReturn rk_aiq_uapi_amerge_v10_SetAttrib(RkAiqAlgoContext* ctx, const mergeAttrV10_t* attr,
+                                            bool need_sync);
+XCamReturn rk_aiq_uapi_amerge_v10_GetAttrib(RkAiqAlgoContext* ctx, mergeAttrV10_t* attr);
+XCamReturn rk_aiq_uapi_amerge_v11_SetAttrib(RkAiqAlgoContext* ctx, const mergeAttrV11_t* attr,
+                                            bool need_sync);
+XCamReturn rk_aiq_uapi_amerge_v11_GetAttrib(RkAiqAlgoContext* ctx, mergeAttrV11_t* attr);
+XCamReturn rk_aiq_uapi_amerge_v12_SetAttrib(RkAiqAlgoContext* ctx, const mergeAttrV12_t* attr,
+                                            bool need_sync);
+XCamReturn rk_aiq_uapi_amerge_v12_GetAttrib(RkAiqAlgoContext* ctx, mergeAttrV12_t* attr);
 
 #endif

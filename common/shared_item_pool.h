@@ -49,35 +49,82 @@ class RkAiqFullParams;
 class RkAiqIspStats;
 typedef struct RkAiqSofInfoWrapper_s RkAiqSofInfoWrapper_t;
 
+/**
+ * Two SFINAE helpers to check if class has typedef or has member function
+ * Reference: https://tinyurl.com/v4f2f5m
+ */
+/**
+ * @class      : HAS_TYPEDEF
+ * @brief      : This macro will be used to check if a class has a particular
+ * typedef or not.
+ * @param typedef_name : Name of Typedef
+ * @param name  : Name of struct which is going to be run the test for
+ * the given particular typedef specified in typedef_name
+ */
+#define HAS_TYPEDEF(typedef_name, name)                             \
+    template <typename T>                                           \
+    struct name {                                                   \
+        typedef char yes[1];                                        \
+        typedef char no[2];                                         \
+        template <typename U>                                       \
+        struct type_check;                                          \
+        template <typename _1>                                      \
+        static yes& chk(type_check<typename _1::typedef_name>*);    \
+        template <typename>                                         \
+        static no& chk(...);                                        \
+        static bool const value = sizeof(chk<T>(0)) == sizeof(yes); \
+    }
+
+/**
+ * @class      : HAS_MEM_FUNC
+ * @brief      : This macro will be used to check if a class has a particular
+ * member function implemented in the public section or not.
+ * @param func : Name of Member Function
+ * @param name : Name of struct which is going to be run the test for
+ * the given particular member function name specified in func
+ * @param return_type: Return type of the member function
+ * @param ellipsis(...) : Since this is macro should provide test case for every
+ * possible member function we use variadic macros to cover all possibilities
+ */
+#define HAS_MEM_FUNC(func, name, return_type, ...)                  \
+    template <typename T>                                           \
+    struct name {                                                   \
+        typedef return_type (T::*Sign)(__VA_ARGS__);                \
+        typedef char yes[1];                                        \
+        typedef char no[2];                                         \
+        template <typename U, U>                                    \
+        struct type_check;                                          \
+        template <typename _1>                                      \
+        static yes& chk(type_check<Sign, &_1::func>*);              \
+        template <typename>                                         \
+        static no& chk(...);                                        \
+        static bool const value = sizeof(chk<T>(0)) == sizeof(yes); \
+    }
+
+HAS_MEM_FUNC(reset, has_reset, void, void);
+
 template<typename T>
 class SharedItemProxy : public SharedItemBase
 {
 public:
     explicit SharedItemProxy(const SmartPtr<T> &data) : SharedItemBase(data), _data(data) {};
     virtual ~SharedItemProxy() {
-        check();
+        reset();
         _data.release();
         LOG1_ANALYZER("Release item : %s", typeid(T).name());
     };
 
-    template <class U = T>
-    typename std::enable_if<(std::is_same<U, RkAiqFullParams>::value ||
-                             std::is_same<U, RkAiqIspStats>::value ||
-                             std::is_same<U, RkAiqSofInfoWrapper_t>::value),
-                            bool>::type
-    check() {
+    template <typename U = T>
+    typename std::enable_if<has_reset<U>::value, bool>::type reset() {
         _data->reset();
-        return true;
+		return true;
     }
 
-    template <class U = T>
-    typename std::enable_if<!(std::is_same<U, RkAiqFullParams>::value ||
-                              std::is_same<U, RkAiqIspStats>::value ||
-                              std::is_same<U, RkAiqSofInfoWrapper_t>::value),
-                            bool>::type
-    check() {
-        return false;
+    template <typename U = T>
+    typename std::enable_if<!has_reset<U>::value, bool>::type reset() {
+		return false;
     }
+
 
     SmartPtr<T> &data() {
         return _data;
@@ -116,7 +163,7 @@ protected:
     virtual SmartPtr<BufferProxy> create_buffer_from_data (SmartPtr<BufferData> &data);
 };
 
-};
+}
 
 #include "shared_item_pool.cpp"
 

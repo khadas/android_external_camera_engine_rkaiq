@@ -148,9 +148,9 @@ typedef struct RK_SHARP_Params_V4_Select_s
     float bf_ratio      ;
     short local_sharp_strength        [RK_SHARP_V4_LUMA_POINT_NUM];
 
-    float prefilter_coeff[3];
-    float GaussianFilter_coeff   [6];
-    float hfBilateralFilter_coeff    [3];
+    float prefilter_coeff[RK_SHARPV4_PBF_DIAM * RK_SHARPV4_PBF_DIAM];
+    float GaussianFilter_coeff   [RK_SHARPV4_RF_DIAM * RK_SHARPV4_RF_DIAM];
+    float hfBilateralFilter_coeff    [RK_SHARPV4_BF_DIAM * RK_SHARPV4_BF_DIAM];
 
     float prefilter_sigma;
     float GaussianFilter_sigma;

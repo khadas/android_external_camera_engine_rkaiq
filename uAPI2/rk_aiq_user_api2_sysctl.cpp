@@ -51,12 +51,33 @@ rk_aiq_uapi2_sysctl_preInit_scene(const char* sns_ent_name, const char *main_sce
 }
 
 XCamReturn
+rk_aiq_uapi2_sysctl_preInit_tb_info(const char* sns_ent_name,
+                           const rk_aiq_tb_info_t* info)
+{
+    return rk_aiq_uapi_sysctl_preInit_tb_info(sns_ent_name, info);
+}
+
+XCamReturn
 rk_aiq_uapi2_sysctl_preInit_iq_addr(const char* sns_ent_name, void *addr, size_t len)
 {
     g_rk_aiq_sys_preinit_cfg_map[sns_ent_name].iq_buffer.addr = addr;
     g_rk_aiq_sys_preinit_cfg_map[sns_ent_name].iq_buffer.len = len;
 
     return XCAM_RETURN_NO_ERROR;
+}
+
+XCamReturn
+rk_aiq_uapi2_sysctl_preInit_calibproj(const char* sns_ent_name, void *addr)
+{
+    g_rk_aiq_sys_preinit_cfg_map[sns_ent_name].calib_proj = addr;
+
+    return XCAM_RETURN_NO_ERROR;
+}
+
+XCamReturn rk_aiq_uapi2_sysctl_preInit_devBufCnt(const char* sns_ent_name, const char* dev_ent,
+                                                 int buf_cnt) {
+
+    return rk_aiq_uapi_sysctl_preInit_devBufCnt(sns_ent_name, dev_ent, buf_cnt);
 }
 
 rk_aiq_sys_ctx_t*
@@ -144,6 +165,13 @@ XCamReturn
 rk_aiq_uapi2_sysctl_getStaticMetas(const char* sns_ent_name, rk_aiq_static_info_t* static_info)
 {
     return rk_aiq_uapi_sysctl_getStaticMetas(sns_ent_name, static_info);
+}
+
+
+XCamReturn
+rk_aiq_uapi2_sysctl_enumStaticMetasByPhyId(int index, rk_aiq_static_info_t* static_info)
+{
+    return rk_aiq_uapi_sysctl_enumStaticMetasByPhyId(index, static_info);
 }
 
 XCamReturn
@@ -368,9 +396,9 @@ rk_aiq_uapi2_sysctl_rawReproc_preInit(const char* isp_driver,
         std::string sns_ent_name = std::string(sns_name);
         rk_aiq_sys_preinit_cfg_t cfg;
         memcpy(cfg.frame_exp_info, two_frm_exp_info, sizeof(cfg.frame_exp_info));
-        g_rk_aiq_offline_raw_exp_map[sns_ent_name] = cfg;
-        return sns_ent_name.c_str();
+        g_rk_aiq_offline_raw_exp_map[sns_name] = cfg;
     }
+
     return sns_name;
 }
 

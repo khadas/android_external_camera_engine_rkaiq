@@ -25,7 +25,7 @@
 RKAIQ_BEGIN_DECLARE
 
 typedef struct _RkAiqAlgoContext {
-    void* place_holder[0];
+    Acnr_Context_V1_t AcnrCtx;
 } RkAiqAlgoContext;
 
 
@@ -183,7 +183,7 @@ processing(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outparams)
     }
     stExpInfo.snr_mode = 0;
 
-#if 1// TODO Merge:
+#if 0// TODO Merge:
     XCamVideoBuffer* xCamAePreRes = pAcnrProcParams->com.u.proc.res_comb->ae_pre_res;
     RkAiqAlgoPreResAe* pAEPreRes = nullptr;
     if (xCamAePreRes) {

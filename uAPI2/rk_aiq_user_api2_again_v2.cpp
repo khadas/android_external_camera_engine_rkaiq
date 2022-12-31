@@ -23,8 +23,10 @@ RKAIQ_BEGIN_DECLARE
 #define CHECK_USER_API_ENABLE
 #endif
 
+#if RKAIQ_HAVE_GAIN_V2
+
 XCamReturn
-rk_aiq_user_api2_againV2_SetAttrib(const rk_aiq_sys_ctx_t* sys_ctx, rk_aiq_gain_attrib_v2_t* attr)
+rk_aiq_user_api2_againV2_SetAttrib(const rk_aiq_sys_ctx_t* sys_ctx, const rk_aiq_gain_attrib_v2_t* attr)
 {
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
     CHECK_USER_API_ENABLE2(sys_ctx);
@@ -110,6 +112,7 @@ rk_aiq_user_api2_againV2_GetAttrib(const rk_aiq_sys_ctx_t* sys_ctx, rk_aiq_gain_
     return ret;
 }
 
+
 XCamReturn
 rk_aiq_user_api2_againV2_GetInfo(const rk_aiq_sys_ctx_t* sys_ctx, rk_aiq_gain_info_v2_t* pInfo)
 {
@@ -152,6 +155,26 @@ rk_aiq_user_api2_againV2_GetInfo(const rk_aiq_sys_ctx_t* sys_ctx, rk_aiq_gain_in
 
     return ret;
 }
+
+#else
+XCamReturn
+rk_aiq_user_api2_againV2_SetAttrib(const rk_aiq_sys_ctx_t* sys_ctx, const rk_aiq_gain_attrib_v2_t* attr)
+{
+    return XCAM_RETURN_ERROR_UNKNOWN;
+}
+
+XCamReturn
+rk_aiq_user_api2_againV2_GetAttrib(const rk_aiq_sys_ctx_t* sys_ctx,  rk_aiq_gain_attrib_v2_t* attr)
+{
+    return XCAM_RETURN_ERROR_UNKNOWN;
+}
+
+XCamReturn
+rk_aiq_user_api2_againV2_GetInfo(const rk_aiq_sys_ctx_t* sys_ctx, rk_aiq_gain_info_v2_t* pInfo)
+{
+    return XCAM_RETURN_ERROR_UNKNOWN;
+}
+#endif
 
 
 RKAIQ_END_DECLARE

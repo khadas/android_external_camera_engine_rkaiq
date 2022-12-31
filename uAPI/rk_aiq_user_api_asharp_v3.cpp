@@ -23,6 +23,8 @@ RKAIQ_BEGIN_DECLARE
 #define CHECK_USER_API_ENABLE
 #endif
 
+#if RKAIQ_HAVE_SHARP_V3
+
 XCamReturn
 rk_aiq_user_api_asharpV3_SetAttrib(const rk_aiq_sys_ctx_t* sys_ctx, rk_aiq_sharp_attrib_v3_t* attr)
 {
@@ -84,7 +86,32 @@ rk_aiq_user_api_asharpV3_GetStrength(const rk_aiq_sys_ctx_t* sys_ctx, float *pPe
 
     return ret;
 }
+#else
+XCamReturn
+rk_aiq_user_api_asharpV3_SetAttrib(const rk_aiq_sys_ctx_t* sys_ctx, rk_aiq_sharp_attrib_v3_t* attr)
+{
+    return XCAM_RETURN_ERROR_UNKNOWN;
+}
 
+XCamReturn
+rk_aiq_user_api_asharpV3_GetAttrib(const rk_aiq_sys_ctx_t* sys_ctx, rk_aiq_sharp_attrib_v3_t* attr)
+{
+    return XCAM_RETURN_ERROR_UNKNOWN;
+}
+
+XCamReturn
+rk_aiq_user_api_asharpV3_SetStrength(const rk_aiq_sys_ctx_t* sys_ctx, float fPercnt)
+{
+    return XCAM_RETURN_ERROR_UNKNOWN;
+}
+
+XCamReturn
+rk_aiq_user_api_asharpV3_GetStrength(const rk_aiq_sys_ctx_t* sys_ctx, float *pPercnt)
+{
+    return XCAM_RETURN_ERROR_UNKNOWN;
+}
+
+#endif
 
 
 RKAIQ_END_DECLARE

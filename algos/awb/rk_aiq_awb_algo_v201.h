@@ -30,7 +30,7 @@
 * -add pre_wbgain cfg & sync to cmodel v2.49 for awbV201
 * -fix the bug cause by time share
 */
-XCamReturn AwbInitV201(awb_contex_t** para, const CamCalibDbV2Context_t* calib);
+XCamReturn AwbInitV201(awb_contex_t** para, const CalibDbV2_Wb_Para_V21_t* calib);
 XCamReturn AwbPrepareV201(awb_contex_t *par);
 XCamReturn AwbReconfigV201(awb_contex_t *para);
 XCamReturn AwbPreProcV201(rk_aiq_awb_stat_res_v201_t awb_measure_result, awb_contex_t* para);

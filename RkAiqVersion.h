@@ -528,10 +528,152 @@
  * 439b562 RkAiqManager: compatible with the calling method of mMetasCb on android hal
  * 754c3c2 awb: update s5kjn1_default_default.json
  * 66d1bcf awb : Accelerated convergence speed when wbgain is approaching to target value
+ *
+ *
+ * v4.0x8.3
+ * - initial version for isp32(rv1106)
+ * v4.0x8.5
+ * - Merge isp3x branch v3.0x8.5
+ * v4.0x8.6
+ * - Add support blcv32 and predgain
+ * - Add support isp32 api for merge/drc/dehaze
+ * - Fix blc sychronization issue
+ * - Fix a few build error
+ * v4.0x8.7
+ * - Fix some bug during ip verify
+ * v4.0x8.8
+ * - Support nr/sharp/cpsl/cp/ie module APIs
+ * - Fix dehaze/drc/merge/drc api bugs
+ * - Fix ae/debayer/nr/sharp params
+ * - Optimized heap buffer usage a bit
+ * v4.0x9.8-rc0
+ * - Support write AWB debug buffer to file
+ *   driver version should match with kernel
+ * - Support switch sub-scene
+ * - Support cutomer ae/awb
+ * - Optimized code size
+ * - Optimized memory usages
+ * - Optimized cpu ultilization
+ * - Fix params bug for 3dlut/ccm/gic..
+ * v4.0x9.8-rc1
+ * - Fix a few IQ tunning stable issues
+ * - Support static link library
+ * - AWB ：Fix smart run judging scheme
+ * - AE : Fix stats translate error
+ * - IE : Fix BW not working for one frame during tunning
+ * - CAC : Fix buffer not freed when using ctrl-c to exit app
+ * - CAC : Limit expo_thed/adj value ranges
+ * - CAC : Support related path for psf map binary
+ * - GAMMA/MERGE/DRC: Rename and Optimize cpu usage
+ * - DEHAZE: Support hist wr
+ * - Update os04a10/sc4336/sc500ai IQ json
+ * v4.0x9.8-rc2
+ * - rkisp_demo: Support build without drm and rga
+ * - 3DLUT: Fix memory leak
+ * - DRC/MERGE/DEHAZE: Fix a few issue in uAPI and tool API
+ * - AF: Fix a few functional issues
+ * - AWB: Fix memory not initilized
+ * v4.0x9.8-rc3
+ * - DRC/DEHAZE/MERGE/NR/SHARP: Consider PreDGain and OB offset
+ * - Optimize switch scene for switching between night and day
+ * - Optimize CPU usage of CSM and 3DLUT
+ * - IQ: Add and Update sc4336, sc230ai, gc4653 and jx_k17
+ * v4.0x9.8
+ * - Fix aiq crashed on IQTool read/write
+ * - CAC: correct HDR ratio value
+ * - 3DLUT: Fix a few issues
+ * - NR/SHARP: Support tools ui controls
+ * v4.0x9.9-rc1
+ * - Fix CPU stalled when LSC dynamic on and off
+ * - Fix ISP Stream stopped if switching CAC of to on
+ * - FIx 3DLUT damp issue
+ * - Correct DRC value range
+ * - Correct CAC HDR ratio
+ * - Optimize CAC tuning UX
+ * - Add check BLC0 calibration value
+ * - Support IQ json2bin feature
+ * - Support new IQ gc2093
+ * - Support get 3A stats when tuning
+ * v4.0x9.9-rc2
+ * - Support fast ae/awb
+ * - Support convert iq from json to bin
+ * - CCM/3DLUT use pre-dgain
+ * - AWB fixes two issues about wbgain
+ * - IQ update SC500AI for isp32
+ * - Optimze SmartIR
+ * - Fix crashed in GrpMsgHdl thread
+ * - Dehaze support hist semiauto mode
+ * v4.0x9.9-rc3
+ * - Dehaze fix stats effect delay
+ * - AWB add new strategy to optimzie fast awb
+ * - CAC reduce buffer count
+ * - j2s4b fix compile error on old system
+ * v4.0x9.9-rc4
+ * - AWB: update a few tool struct
+ * - DRC/DEHAZE: fix a few API issues
+ * - ThunderBoot(TB): support trigger first frame twice
+ * - TB: Use flock to make aiq run as a single instance
+ * - IQ: add sc3338, gc4023, update sc230ai, os04a10
+ * - API: add set IQ bin by buffer, add set TB info
+ * - API: update AWB struct, users need to rebuild APP
+ * - HWI: Fix a few issues
+ * v4.0x9.9-rc5
+ * - DRC/DEHAZE/AE: Fix a few issues
+ * - TB: Fix offline AWB issues
+ * - Multi-Cam: Fix AE stats lost in mutli-cam case
+ * - FakeSensor: Fix 8bit raw simualtion
+ * - IQ: Update sc230ai/sc3338/gc2093/sc031gs
+ * - IQ Bin: Reduce binary size
+ * v4.0x9.9
+ * - AEC: Fix params wrong if stats invalid
+ * - j2s4b: Fix installation step on low version cmake
+ * - IQ: jx_k17: Fix wrong enum value for hdr line mode
+ * - DRC: fix some issues, and modify IIR frame value
+ * v4.0x9.a-rc1
+ * - hwi: Export device buf count for user to config
+ * - Adrc, Amerge, adehaze: fix init expo bug
+ * - Adehaze: update functional api
+ * - Adehaze: use ynr proc res for dehaze local gain
+ * - aiq_core: transmit the proc result of YNR V22 and V3 to algos
+ * - aiq: support thunder boot for product doorlock
+ * - cac: Fix getting none lut buffers for thunder boot product
+ * - Use initial awb cfg for server of thunder boot product
+ * - iqfiles: Fix warning reported by jsonlint -s -W xxx.json
+ * - Revert "fakesensor: Open used tx/rx devs only"
+ * - hwi: Use unordered_map instead of map for  static infos
+ * - AF: merge isp3x modification
+ * v4.0x9.a
+ * - iq_parser: increase the range of distortion params
+ * - algos: ldchV21: support for dynamic switching
+ * - rkisp_demo: update CompileOptions.cmake from rkaiq
+ * - iqfiles: update sc200ai json for Tonly
+ * - build: Enable build iq binrary remove unused RKPLATFORM
+ * - cmake: Change to compatible with cmake's future version
+ * - rkisp_demo: Fix build error on IPC sdk if drm enabled
+ * v4.0x9.b-rc1
+ * - AWB/LSC: Support OTP feature
+ * - TB/IQ: Modify CAC path for sc200ai
+ * - TB/IQ: Fix greenish of first frame for gc2093
+ * - DEHAZE: Fix null stats issue
+ * - DEHAZE: Deal with no ynr sigma case which causes maze artifact
+ * - HWI: Handle exceptions caused by no stats
+
+ * v5.0x1.0
+ * - merge with isp3x, contains v3.0x8.7 - v3.0x9.4
+ *
+ * v5.0x1.1
+ * - Support ISP d-gain for rv1106
+ * - Support Android build system
+ * - Support rkstream and media_enquiry for rv1106
+ * - Support compact API for rk3588
+ * - Fix init param match issues for thunder boot product
+ * - Fix libc check for buildroot build system
+ * - Fix effected param match for all products
+ * - Fix issues caused by branch merge
  */
 
-#define RK_AIQ_VERSION_REAL_V "v3.0x9.4"
-#define RK_AIQ_RELEASE_DATE "2022-12-14"
+#define RK_AIQ_VERSION_REAL_V "v5.0x1.1"
+#define RK_AIQ_RELEASE_DATE "2023-02-09"
 
 /******* DO NOT EDIT THE FOLLOWINGS ***********/
 

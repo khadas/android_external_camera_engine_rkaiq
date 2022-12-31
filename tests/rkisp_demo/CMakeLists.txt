@@ -4,7 +4,7 @@ if(NOT CMAKE_BUILD_TYPE)
         FORCE)
 endif()
 
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 2.8...3.22)
 
 PROJECT(rkisp_demo)
 
@@ -13,6 +13,20 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 include(BuildOptions)
 include(CompileOptions)
 include(GNUInstallDirs)
+
+find_package(librga QUIET)
+if (librga_FOUND)
+    add_compile_options(${LIBRGA_CFLAGS})
+    add_compile_options(-DISPDEMO_ENABLE_RGA=1)
+endif()
+
+if (RKAIQ_ENABLE_LIBDRM)
+find_package(libdrm QUIET)
+endif()
+if (libdrm_FOUND)
+    add_compile_options(${LIBDRM_CFLAGS})
+    add_compile_options(-DISPDEMO_ENABLE_DRM=1)
+endif()
 
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 set_property(GLOBAL PROPERTY PREDEFINED_TARGETS_FOLDER "CMakeTargets")
@@ -26,38 +40,21 @@ message("rkaiq src path" ${RK_AIQ_SOURCE_DIR})
 if(ADD_RK_AIQ)
     add_compile_options(-Os)
     add_compile_options(-DADD_RK_AIQ)
-    if(NOT ARCH STREQUAL "fpga")
-        add_compile_options(-fstack-protector-strong -D_FORTIFY_SOURCE=2)
-    else ()
-        add_compile_options(-DARCH_FPGA)
-    endif()
-    set(RK_AIQ_LIB_DIR ${RK_AIQ_SOURCE_DIR}/build/linux/output/${ARCH}/all_lib/${CMAKE_BUILD_TYPE})
+    add_compile_options(-fstack-protector-strong -D_FORTIFY_SOURCE=2)
+    set(RK_AIQ_INSTALLED_DIR "${RK_AIQ_SOURCE_DIR}/build/linux/output/${ARCH}/installed" CACHE STRING "AIQ library installed dir")
+    set(RK_AIQ_LIB_DIR ${RK_AIQ_INSTALLED_DIR}/lib)
     message("rkaiq lib path" ${RK_AIQ_LIB_DIR})
     set(RK_AIQ_INCLUDE_DIR
-		#${RK_AIQ_SOURCE_DIR}
-        ${RK_AIQ_SOURCE_DIR}/include/
-        ${RK_AIQ_SOURCE_DIR}/include/uAPI2
-        ${RK_AIQ_SOURCE_DIR}/include/xcore/
-        ${RK_AIQ_SOURCE_DIR}/include/algos/
-        ${RK_AIQ_SOURCE_DIR}/include/common/
-        ${RK_AIQ_SOURCE_DIR}/include/iq_parser/
-        ${RK_AIQ_SOURCE_DIR}/include/iq_parser_v2/
-        #${FPGA_RGA_INCLUDE_PATH}/include/
+        ${RK_AIQ_INSTALLED_DIR}/include/
+        ${RK_AIQ_INSTALLED_DIR}/include/rkaiq/
+        ${RK_AIQ_INSTALLED_DIR}/include/rkaiq/uAPI2
+        ${RK_AIQ_INSTALLED_DIR}/include/rkaiq/xcore/
+        ${RK_AIQ_INSTALLED_DIR}/include/rkaiq/algos/
+        ${RK_AIQ_INSTALLED_DIR}/include/rkaiq/common/
+        ${RK_AIQ_INSTALLED_DIR}/include/rkaiq/iq_parser/
+        ${RK_AIQ_INSTALLED_DIR}/include/rkaiq/iq_parser_v2/
         )
     set(RK_AIQ_LIB rkaiq)
-endif()
-
-if (ARCH STREQUAL "aarch64")
-    set(RK_DRM_LIB_DIR ${PROJECT_SOURCE_DIR}/demo/libs/arm64/)
-elseif (ARCH STREQUAL "arm")
-    set(RK_DRM_LIB_DIR
-        ${PROJECT_SOURCE_DIR}/demo/libs/arm32/
-        )
-endif()
-
-SET(RK_DRM_LIB drm)
-if(NOT ARCH STREQUAL "fpga")
-    set(RK_RGA_LIB rga)
 endif()
 
 if (ENABLE_IIO_API)
@@ -65,7 +62,17 @@ if (ENABLE_IIO_API)
     set(IIO_LIBS easyiio iio serialport xml2 )
 endif()
 
+#set (ENABLE_SMARTIR_API true)
+if (ENABLE_SMARTIR_API)
+	set(SMARTIR_DIR ${PROJECT_SOURCE_DIR}/../smart_ir)
+	set(SMARTIR_INCLUDE_DIR ${SMARTIR_DIR}/include)
+	set(SMARTIR_INSTALLED_LIB_DIR ${SMARTIR_DIR}/build/linux/output/${ARCH}/installed/lib)
+	set(SMARTIR_LIB smartIr)
+    add_compile_options(-DSAMPLE_SMART_IR)
+endif()
+
 include_directories(
+    deps/include
     demo
     demo/include
     demo/include/rga
@@ -74,20 +81,18 @@ include_directories(
     demo/iio/include
     ${RK_AIQ_INCLUDE_DIR}
     demo/sample/
+	${SMARTIR_INCLUDE_DIR}
     )
 
-if (NOT ARCH STREQUAL "fpga")
+if (libdrm_FOUND)
     aux_source_directory(demo DIR_SRCS)
     aux_source_directory(demo/drmDsp DRMDSP_DIR_SRCS)
     aux_source_directory(demo/sample SAMPLE_DIR_SRCS)
-else ()
+else()
     set (DIR_SRCS
         demo/rkisp_demo.cpp
-        demo/drmDsp.c
-        demo/drmDsp/bo.c
-        demo/drmDsp/dev.c
-        demo/drmDsp/modeset.c
         )
+    aux_source_directory(demo/sample SAMPLE_DIR_SRCS)
 endif()
 
 if (ENABLE_IIO_API)
@@ -98,8 +103,15 @@ list(APPEND DIR_SRCS ${DRMDSP_DIR_SRCS} ${IIO_DIR_SRCS} ${SAMPLE_DIR_SRCS})
 AUX_SOURCE_DIRECTORY(demo/ae_algo_demo AEDEMO_DIR_SRCS)
 list(APPEND DIR_SRCS ${AEDEMO_DIR_SRCS})
 
-AUX_SOURCE_DIRECTORY(demo/awb_algo_demo AWBDEMO_DIR_SRCS)
+#AUX_SOURCE_DIRECTORY(demo/awb_algo_demo AWBDEMO_DIR_SRCS)
+#list(APPEND DIR_SRCS ${AWBDEMO_DIR_SRCS})
+if (${ISP_HW_VERSION} STREQUAL "-DISP_HW_V32")
+    set(AWBDEMO_DIR_SRCS demo/awb_algo_demo/third_party_awbV32_algo.cpp)
+else()
+    set(AWBDEMO_DIR_SRCS demo/awb_algo_demo/third_party_awb_algo.cpp)
+endif()
 list(APPEND DIR_SRCS ${AWBDEMO_DIR_SRCS})
+
 
 AUX_SOURCE_DIRECTORY(demo/af_algo_demo AFDEMO_DIR_SRCS)
 list(APPEND DIR_SRCS ${AFDEMO_DIR_SRCS})
@@ -121,7 +133,29 @@ message(${LIBRARY_OUTPUT_PATH})
 
 add_definitions(-D_CRT_SECURE_NO_WARNINGS)
 
-link_directories("${LIBRARY_OUTPUT_PATH}" "${RK_AIQ_LIB_DIR}" "${RK_DRM_LIB_DIR}" "${IIO_LIB_DIR}")
+if (libdrm_FOUND)
+link_directories("${LIBRARY_OUTPUT_PATH}" "${RK_AIQ_LIB_DIR}" "${IIO_LIB_DIR}"
+	"${PROJECT_SOURCE_DIR}/deps/lib" "${SMARTIR_INSTALLED_LIB_DIR}")
+else()
+link_directories("${LIBRARY_OUTPUT_PATH}" "${RK_AIQ_LIB_DIR}" "${IIO_LIB_DIR}"
+	"${SMARTIR_INSTALLED_LIB_DIR}")
+endif()
 add_executable(rkisp_demo ${DIR_SRCS})
-target_link_libraries(rkisp_demo ${RK_AIQ_LIB} ${RK_DRM_LIB} ${RK_RGA_LIB}
-	${IIO_LIBS} pthread dl)
+if (libdrm_FOUND)
+target_link_libraries(rkisp_demo rga drm ${RK_AIQ_LIB} ${IIO_LIBS}
+	${SMARTIR_LIB} pthread)
+else()
+target_link_libraries(rkisp_demo ${RK_AIQ_LIB} ${IIO_LIBS} ${SMARTIR_LIB} pthread)
+endif()
+
+if (libdrm_FOUND)
+    target_link_libraries(rkisp_demo
+        libdrm::libdrm
+        )
+endif()
+
+if (librga_FOUND)
+    target_link_libraries(rkisp_demo
+        librga::librga
+        )
+endif()

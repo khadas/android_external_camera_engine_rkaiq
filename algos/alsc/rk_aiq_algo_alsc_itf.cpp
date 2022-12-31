@@ -21,6 +21,7 @@
 #include "alsc/rk_aiq_alsc_algo.h"
 #include "rk_aiq_algo_types.h"
 #include "xcam_log.h"
+#include "rk_aiq_alsc_convert_otp.h"
 
 RKAIQ_BEGIN_DECLARE
 
@@ -78,6 +79,31 @@ prepare(RkAiqAlgoCom* params)
        !!(params->u.prepare.conf_type & RK_AIQ_ALGO_CONFTYPE_CHANGERES) || \
        !!(params->u.prepare.conf_type & RK_AIQ_ALGO_CONFTYPE_CHANGECAMS)) {
         alscGetOtpInfo(params);
+        adjustVignettingForLscOTP(hAlsc->otpGrad.lsc_b, hAlsc->otpGrad.lsc_gb, \
+                hAlsc->otpGrad.lsc_gr, hAlsc->otpGrad.lsc_r, \
+                20, hAlsc->cur_res.width, hAlsc->cur_res.height);
+
+        LOGD_ALSC( "adjustVignettingForLscOTP r[0:4]:%d,%d,%d,%d,%d, gr[0:4]:%d,%d,%d,%d,%d, gb[0:4]:%d,%d,%d,%d,%d, b[0:4]:%d,%d,%d,%d,%d\n",
+                hAlsc->otpGrad.lsc_r[0],
+                hAlsc->otpGrad.lsc_r[1],
+                hAlsc->otpGrad.lsc_r[2],
+                hAlsc->otpGrad.lsc_r[3],
+                hAlsc->otpGrad.lsc_r[4],
+                hAlsc->otpGrad.lsc_gr[0],
+                hAlsc->otpGrad.lsc_gr[1],
+                hAlsc->otpGrad.lsc_gr[2],
+                hAlsc->otpGrad.lsc_gr[3],
+                hAlsc->otpGrad.lsc_gr[4],
+                hAlsc->otpGrad.lsc_gb[0],
+                hAlsc->otpGrad.lsc_gb[1],
+                hAlsc->otpGrad.lsc_gb[2],
+                hAlsc->otpGrad.lsc_gb[3],
+                hAlsc->otpGrad.lsc_gb[4],
+                hAlsc->otpGrad.lsc_b[0],
+                hAlsc->otpGrad.lsc_b[1],
+                hAlsc->otpGrad.lsc_b[2],
+                hAlsc->otpGrad.lsc_b[3],
+                hAlsc->otpGrad.lsc_b[4]);
         convertSensorLscOTP(&hAlsc->cur_res, &hAlsc->otpGrad, para->alsc_sw_info.bayerPattern);
     }
 
@@ -159,9 +185,9 @@ RkAiqAlgoDescription g_RkIspAlgoDescAlsc = {
         .destroy_context = destroy_context,
     },
     .prepare = prepare,
-    .pre_process = pre_process,
+    .pre_process = NULL,
     .processing = processing,
-    .post_process = post_process,
+    .post_process = NULL,
 };
 
 RKAIQ_END_DECLARE

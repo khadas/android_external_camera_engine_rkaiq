@@ -24,6 +24,8 @@ RKAIQ_BEGIN_DECLARE
 #define CHECK_USER_API_ENABLE
 #endif
 
+#if RKAIQ_HAVE_CNR_V2
+
 XCamReturn
 rk_aiq_user_api2_acnrV2_SetAttrib(const rk_aiq_sys_ctx_t* sys_ctx, rk_aiq_cnr_attrib_v2_t* attr)
 {
@@ -246,5 +248,40 @@ rk_aiq_user_api2_acnrV2_GetInfo(const rk_aiq_sys_ctx_t* sys_ctx, rk_aiq_cnr_info
 
 }
 
+#else
+XCamReturn
+rk_aiq_user_api2_acnrV2_SetAttrib(const rk_aiq_sys_ctx_t* sys_ctx, rk_aiq_cnr_attrib_v2_t* attr)
+{
+    return XCAM_RETURN_ERROR_UNKNOWN;
+}
+
+
+XCamReturn
+rk_aiq_user_api2_acnrV2_GetAttrib(const rk_aiq_sys_ctx_t* sys_ctx, rk_aiq_cnr_attrib_v2_t* attr)
+{
+    return XCAM_RETURN_ERROR_UNKNOWN;
+}
+
+
+XCamReturn
+rk_aiq_user_api2_acnrV2_SetStrength(const rk_aiq_sys_ctx_t* sys_ctx, rk_aiq_cnr_strength_v2_t *pStrength)
+{
+    return XCAM_RETURN_ERROR_UNKNOWN;
+}
+
+
+XCamReturn
+rk_aiq_user_api2_acnrV2_GetStrength(const rk_aiq_sys_ctx_t* sys_ctx, rk_aiq_cnr_strength_v2_t *pStrength)
+{
+    return XCAM_RETURN_ERROR_UNKNOWN;
+}
+
+XCamReturn
+rk_aiq_user_api2_acnrV2_GetInfo(const rk_aiq_sys_ctx_t* sys_ctx, rk_aiq_cnr_info_v2_t *pInfo)
+{
+    return XCAM_RETURN_ERROR_UNKNOWN;
+}
+
+#endif
 
 RKAIQ_END_DECLARE

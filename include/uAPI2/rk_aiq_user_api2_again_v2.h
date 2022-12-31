@@ -28,7 +28,7 @@ typedef struct rk_aiq_sys_ctx_s rk_aiq_sys_ctx_t;
 RKAIQ_BEGIN_DECLARE
 
 XCamReturn
-rk_aiq_user_api2_againV2_SetAttrib(const rk_aiq_sys_ctx_t* sys_ctx, rk_aiq_gain_attrib_v2_t* attr);
+rk_aiq_user_api2_againV2_SetAttrib(const rk_aiq_sys_ctx_t* sys_ctx, const rk_aiq_gain_attrib_v2_t* attr);
 
 XCamReturn
 rk_aiq_user_api2_againV2_GetAttrib(const rk_aiq_sys_ctx_t* sys_ctx, rk_aiq_gain_attrib_v2_t* attr);

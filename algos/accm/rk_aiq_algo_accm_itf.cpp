@@ -18,6 +18,7 @@
  */
 
 #include "accm/rk_aiq_algo_accm_itf.h"
+
 #include "accm/rk_aiq_accm_algo.h"
 #include "rk_aiq_algo_types.h"
 #include "xcam_log.h"
@@ -62,9 +63,15 @@ prepare(RkAiqAlgoCom* params)
     hAccm->accmSwInfo.prepare_type = params->u.prepare.conf_type;
     if(!!(params->u.prepare.conf_type & RK_AIQ_ALGO_CONFTYPE_UPDATECALIB)){
         RkAiqAlgoConfigAccm* confPara = (RkAiqAlgoConfigAccm*)params;
+#if RKAIQ_HAVE_CCM_V1
+        hAccm->ccm_v1 = (CalibDbV2_Ccm_Para_V2_t*)(CALIBDBV2_GET_MODULE_PTR(
+            confPara->com.u.prepare.calibv2, ccm_calib));
+#endif
 
-        hAccm->calibV2Ccm =
-                (CalibDbV2_Ccm_Para_V2_t*)(CALIBDBV2_GET_MODULE_PTR(confPara->com.u.prepare.calibv2, ccm_calib));
+#if RKAIQ_HAVE_CCM_V2
+        hAccm->ccm_v2 = (CalibDbV2_Ccm_Para_V32_t*)(CALIBDBV2_GET_MODULE_PTR(
+            confPara->com.u.prepare.calibv2, ccm_calib_v2));
+#endif
     }
     AccmPrepare((accm_handle_t)(params->ctx->accm_para));
 
@@ -98,7 +105,11 @@ processing(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outparams)
     LOGD_ACCM( "%s: awbIIRDampCoef:%f\n", __FUNCTION__, hAccm->accmSwInfo.awbIIRDampCoef);
 
     AccmConfig(hAccm);
+#ifdef ISP_HW_V32
+    memcpy(&proResAccm->accm_hw_conf_v2, &hAccm->ccmHwConf_v2, sizeof(rk_aiq_ccm_cfg_v2_t));
+#else
     memcpy(&proResAccm->accm_hw_conf, &hAccm->ccmHwConf, sizeof(rk_aiq_ccm_cfg_t));
+#endif
     proResAccm->ccm_update = hAccm->update ||hAccm->updateAtt || (!hAccm->accmSwInfo.ccmConverged);
     LOG1_ACCM( "%s: (exit)\n", __FUNCTION__);
     return XCAM_RETURN_NO_ERROR;
@@ -125,9 +136,9 @@ RkAiqAlgoDescription g_RkIspAlgoDescAccm = {
         .destroy_context = destroy_context,
     },
     .prepare = prepare,
-    .pre_process = pre_process,
+    .pre_process = NULL,
     .processing = processing,
-    .post_process = post_process,
+    .post_process = NULL,
 };
 
 RKAIQ_END_DECLARE

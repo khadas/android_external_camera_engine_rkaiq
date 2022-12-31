@@ -145,10 +145,10 @@
 	_IOW('V', BASE_VIDIOC_PRIVATE + 27, struct rkmodule_reg)
 
 #define RKMODULE_SYNC_I2CDEV       \
-        _IOW('V', BASE_VIDIOC_PRIVATE + 28, __u8)
+	_IOW('V', BASE_VIDIOC_PRIVATE + 28, __u8)
 
 #define RKMODULE_SYNC_I2CDEV_COMPLETE       \
-        _IOW('V', BASE_VIDIOC_PRIVATE + 29, __u8)
+	_IOW('V', BASE_VIDIOC_PRIVATE + 29, __u8)
 
 #define RKMODULE_SET_DEV_INFO       \
 	_IOW('V', BASE_VIDIOC_PRIVATE + 30, struct rkmodule_dev_info)
@@ -192,7 +192,7 @@ enum rkmodule_phy_mode {
 struct rkmodule_mipi_lvds_bus {
 	__u32 bus_type;
 	__u32 lanes;
-	__u32 phy_mode;
+	__u32 phy_mode; /* data type enum rkmodule_phy_mode */
 };
 
 struct rkmodule_bus_config {
@@ -203,11 +203,11 @@ struct rkmodule_bus_config {
 } __attribute__ ((packed));
 
 struct rkmodule_reg {
-    __u64 num_regs;
-    __u64 preg_addr;
-    __u64 preg_value;
-    __u64 preg_addr_bytes;
-    __u64 preg_value_bytes;
+	__u64 num_regs;
+	__u64 preg_addr;
+	__u64 preg_value;
+	__u64 preg_addr_bytes;
+	__u64 preg_value_bytes;
 } __attribute__ ((packed));
 
 /**

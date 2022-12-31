@@ -32,6 +32,7 @@ typedef struct rk_aiq_singlecam_3a_result_s {
     struct {
         RKAiqAecExpInfo_t* exp_tbl;
         int* exp_tbl_size;
+        RKAiqExpI2cParam_t* exp_i2c_params;
         rk_aiq_ae_meas_params_t* _aeMeasParams;
         rk_aiq_hist_meas_params_t* _aeHistMeasParams;
         XCamVideoBuffer* _aecStats;
@@ -42,10 +43,14 @@ typedef struct rk_aiq_singlecam_3a_result_s {
     } aec;
     // awb params
     struct {
-        rk_aiq_wb_gain_t* _awbGainParams;
+        union{
+            rk_aiq_wb_gain_t* _awbGainParams;
+            rk_aiq_wb_gain_v32_t* _awbGainV32Params;
+        };
         union {
             rk_aiq_awb_stat_cfg_v200_t*  _awbCfg;
             rk_aiq_awb_stat_cfg_v201_t*  _awbCfgV201;
+            rk_aiq_awb_stat_cfg_v32_t*  _awbCfgV32;
             rk_aiq_isp_awb_meas_cfg_v3x_t* _awbCfgV3x;
         };
         XCamVideoBuffer* _awbStats;
@@ -53,13 +58,24 @@ typedef struct rk_aiq_singlecam_3a_result_s {
     } awb;
     rk_aiq_lsc_cfg_t* _lscConfig;
     AdpccProcResult_t* _dpccConfig;
-    rk_aiq_ccm_cfg_t* _ccmCfg;
+    struct {
+        union {
+            rk_aiq_ccm_cfg_t*  _ccmCfg;
+            rk_aiq_ccm_cfg_v2_t*  _ccmCfg_v2;
+        };
+    } accm;
     rk_aiq_lut3d_cfg_t* _lut3dCfg;
     RkAiqAdehazeProcResult_t* _adehazeConfig;
     AgammaProcRes_t* _agammaConfig;
-	RkAiqAdrcProcResult_t* _adrcConfig;
-	RkAiqAmergeProcResult_t* _amergeConfig;
-    rk_aiq_isp_blc_v21_t * _blcConfig;
+    RkAiqAdrcProcResult_t* _adrcConfig;
+    RkAiqAmergeProcResult_t* _amergeConfig;
+
+    struct {
+        union {
+            rk_aiq_isp_blc_v21_t * _blcConfig;
+            rk_aiq_isp_blc_v32_t * _blcConfig_v32;
+        };
+    } ablc;
 
     struct aynr_procRes_V3_t {
         RK_YNR_Fix_V3_t*  _stFix;
@@ -68,13 +84,22 @@ typedef struct rk_aiq_singlecam_3a_result_s {
 
     struct {
         union {
-            struct aynr_procRes_V3_t  _aynr_procRes_v3;
+            RK_YNR_Fix_V22_t*  _aynr_procRes_v22;
+            aynr_procRes_V3_t  _aynr_procRes_v3;
             RK_YNR_Fix_V2_t*  _aynr_procRes_v2;
         };
     } aynr;
 
     struct {
         union {
+            float _aynr_sigma_v22[YNR_V22_ISO_CURVE_POINT_NUM];
+            float _aynr_sigma_v3[YNR_V3_ISO_CURVE_POINT_NUM];
+        };
+    } aynr_sigma;
+
+    struct {
+        union {
+            RK_CNR_Fix_V30_t*  _acnr_procRes_v30;
             RK_CNR_Fix_V2_t*  _acnr_procRes_v2;
             RK_CNR_Fix_V1_t*  _acnr_procRes_v1;
         };
@@ -84,12 +109,14 @@ typedef struct rk_aiq_singlecam_3a_result_s {
         union {
             RK_Bayernr_Fix_V2_t*  _abayernr_procRes_v1;
             RK_Bayer2dnr_Fix_V2_t*  _abayer2dnr_procRes_v2;
+            RK_Bayer2dnr_Fix_V23_t*  _abayer2dnr_procRes_v23;
         };
     } abayernr;
 
     struct {
         union {
             RK_Bayertnr_Fix_V2_t*  _abayertnr_procRes_v2;
+            RK_Bayertnr_Fix_V23_t*  _abayertnr_procRes_v23;
         };
     } abayertnr;
 
@@ -97,6 +124,7 @@ typedef struct rk_aiq_singlecam_3a_result_s {
         union {
             RK_SHARP_Fix_V3_t*  _asharp_procRes_v3;
             RK_SHARP_Fix_V4_t*  _asharp_procRes_v4;
+            RK_SHARP_Fix_V33_t*  _asharp_procRes_v33;
         };
     } asharp;
 
@@ -149,6 +177,7 @@ typedef struct _RkAiqAlgoCamGroupProcOut {
 typedef struct _RkAiqAlgoCamGroupProcIn {
     RkAiqAlgoComCamGroup gcom;
     rk_aiq_singlecam_3a_result_t** camgroupParmasArray;
+    AblcProc_V32_t stAblcV32_proc_res;
     int arraySize;
     bool _gray_mode;
     int working_mode;

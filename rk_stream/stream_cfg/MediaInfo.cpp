@@ -213,6 +213,7 @@ parse_module_info(rk_sensor_full_info_t *sensor_info)
     return XCAM_RETURN_NO_ERROR;
 }
 
+#if defined(ISP_HW_V20)
 static rk_aiq_ispp_t*
 get_ispp_subdevs(struct media_device *device, const char *devpath, rk_aiq_ispp_t* ispp_info)
 {
@@ -353,6 +354,7 @@ get_ispp_subdevs(struct media_device *device, const char *devpath, rk_aiq_ispp_t
 
     return &ispp_info[index];
 }
+#endif
 
 static rk_aiq_isp_t*
 get_isp_subdevs(struct media_device *device, const char *devpath, rk_aiq_isp_t* isp_info)
@@ -958,9 +960,11 @@ MediaInfo::initCamHwInfos()
                 strcmp(device->info.model, "rkispp2") == 0 ||
                 strcmp(device->info.model, "rkispp3") == 0 ||
                 strcmp(device->info.model, "rkispp") == 0) {
+#if defined(ISP_HW_V20)
             rk_aiq_ispp_t* ispp_info = get_ispp_subdevs(device, sys_path, mIspHwInfos.ispp_info);
             if (ispp_info)
                 ispp_info->valid = true;
+#endif
             goto media_unref;
         } else if (strcmp(device->info.model, "rkisp0") == 0 ||
                    strcmp(device->info.model, "rkisp1") == 0 ||

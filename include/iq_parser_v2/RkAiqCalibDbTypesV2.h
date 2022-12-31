@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2021 Rockchip Corporation
+ * Copyright (c) 2019-2022 Rockchip Eletronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -12,15 +12,26 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
  */
-
 #ifndef ___RK_AIQ_CALIB_DB_TYPES_V2_H__
 #define ___RK_AIQ_CALIB_DB_TYPES_V2_H__
 
+#include "moduleinfo_head.h"
+#include "sensorinfo_head.h"
+#include "sys_static_cfg_head.h"
+
+#ifdef ISP_HW_V20
 #include "RkAiqCalibDbV2TypesIsp20.h"
+#endif
+#ifdef ISP_HW_V21
 #include "RkAiqCalibDbV2TypesIsp21.h"
+#endif
+#ifdef ISP_HW_V30
 #include "RkAiqCalibDbV2TypesIsp3x.h"
+#endif
+#ifdef ISP_HW_V32
+#include "RkAiqCalibDbV2TypesIsp32.h"
+#endif
 #include "RkAiqUapitypes.h"
 
 RKAIQ_BEGIN_DECLARE
@@ -138,6 +149,8 @@ typedef struct CamCalibDbV2Tuning_s {
     CamCalibDbV2ContextIsp21_t calib_scene;
 #elif defined(ISP_HW_V30)
     CamCalibDbV2ContextIsp30_t calib_scene;
+#elif defined(ISP_HW_V32)
+    CamCalibDbV2ContextIsp32_t calib_scene;
 #else
 #error "WRONG ISP_HW_VERSION, ONLY SUPPORT V20 AND V21 AND V30 NOW !"
 #endif
@@ -158,6 +171,8 @@ typedef struct CamCalibSubSceneList_s {
     CamCalibDbV2ContextIsp21_t scene_isp21;
 #elif defined(ISP_HW_V30)
     CamCalibDbV2ContextIsp30_t scene_isp30;
+#elif defined(ISP_HW_V32)
+    CamCalibDbV2ContextIsp32_t scene_isp32;
 #else
 #error "WRONG ISP_HW_VERSION, ONLY SUPPORT V20 AND V21 AND V30 NOW !"
 #endif

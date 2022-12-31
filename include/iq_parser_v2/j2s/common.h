@@ -38,7 +38,7 @@ extern "C" {
 #ifndef MSG
 #define MSG(level, fmt, args...)                                      \
     fprintf(stderr, #level ": %s(%d) [%s]: " fmt, __FILE__, __LINE__, \
-        __FUNCTION__, ##args)
+        __func__, ##args)
 #endif
 
 #ifndef DBG
@@ -86,7 +86,7 @@ extern "C" {
 #endif
 
 #define MAX_LINE 8192
-#define MAX_NAME 64
+#define MAX_NAME 32 
 
 #define J2S_DESC_MAGIC "@desc:"
 

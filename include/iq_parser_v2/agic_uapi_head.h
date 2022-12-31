@@ -111,10 +111,10 @@ typedef struct rkaiq_gic_v2_param_selected_s {
     uint16_t min_grad_thr_dark1;
     // M4_NUMBER_DESC("min_grad_thr_dark2", "u16", M4_RANGE(0, 1023), "32", M4_DIGIT(0))
     uint16_t min_grad_thr_dark2;
-    // M4_NUMBER_DESC("NoiseScale", "f32", M4_RANGE(0.0, 1023.0), "0.0", M4_DIGIT(4))
-    float NoiseScale;
-    // M4_NUMBER_DESC("NoiseBase", "f32", M4_RANGE(0.0, 1023.0), "0.0", M4_DIGIT(4))
-    float NoiseBase;
+    // M4_NUMBER_DESC("NoiseScale", "s32", M4_RANGE(0, 1023), "0", M4_DIGIT(0))
+    int NoiseScale;
+    // M4_NUMBER_DESC("NoiseBase", "s32", M4_RANGE(0, 1023), "0", M4_DIGIT(0))
+    int NoiseBase;
     // M4_NUMBER_DESC("noiseCurve_0", "f32", M4_RANGE(0.0, 1023.0), "0.0", M4_DIGIT(4))
     float noiseCurve_0;
     // M4_NUMBER_DESC("noiseCurve_1", "f32", M4_RANGE(0.0, 1023.0), "0.0", M4_DIGIT(4))

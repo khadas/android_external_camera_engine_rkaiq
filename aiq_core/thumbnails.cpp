@@ -128,7 +128,7 @@ bool ConfigEqual(const rkaiq_thumbnails_config_t& lhs, const rkaiq_thumbnails_co
             lhs.after_nodes == rhs.after_nodes);
 }
 
-struct RefCountedVideoBuffer : public std::enable_shared_from_this<RefCountedVideoBuffer> {
+struct RefCountedVideoBuffer {
     RefCountedVideoBuffer() = delete;
 
     explicit RefCountedVideoBuffer(XCamVideoBuffer* buffer, bool takeRef = true) {
@@ -144,11 +144,8 @@ struct RefCountedVideoBuffer : public std::enable_shared_from_this<RefCountedVid
     }
 
     RefCountedVideoBuffer(const RefCountedVideoBuffer& other) {
-        if (this->buffer != other.buffer) {
-            this->buffer->unref(this->buffer);
-            this->buffer = other.buffer;
-            this->buffer->ref(this->buffer);
-        }
+        this->buffer = other.buffer;
+        this->buffer->ref(this->buffer);
     }
 
     RefCountedVideoBuffer& operator=(const RefCountedVideoBuffer& other) {
@@ -162,13 +159,8 @@ struct RefCountedVideoBuffer : public std::enable_shared_from_this<RefCountedVid
     }
 
     RefCountedVideoBuffer(RefCountedVideoBuffer&& other) {
-        if (this->buffer != other.buffer) {
-            this->buffer->unref(this->buffer);
-            this->buffer = other.buffer;
-            // this->buffer->ref(this->buffer);
-            // other.buffer->unref(other.buffer);
-            other.buffer = nullptr;
-        }
+        this->buffer = other.buffer;
+        other.buffer = nullptr;
     }
 
     RefCountedVideoBuffer& operator=(RefCountedVideoBuffer&& other) {
@@ -472,14 +464,14 @@ template <>
 img_buffer_t convert(std::shared_ptr<RefCountedVideoBuffer>& dma) {
     auto& info       = dma->buffer->info;
     img_buffer_t buf = {
-        .width   = (int)info.width,
-        .height  = (int)info.height,
-        .wstride = (int)info.aligned_width,
-        .hstride = (int)info.aligned_height,
+        NULL, NULL,
+        dma->buffer->get_fd(dma->buffer),
+        (int)info.width,
+        (int)info.height,
+        (int)info.aligned_width,
+        (int)info.aligned_height,
+        static_cast<rk_aiq_format_t>(info.format)
     };
-
-    buf.fd     = dma->buffer->get_fd(dma->buffer);
-    buf.format = static_cast<rk_aiq_format_t>(info.format);
 
     return buf;
 }
@@ -500,7 +492,7 @@ TaskResult ScalerTask::operator()(ServiceParam<ScalerParam>& p) {
     return ret == XCAM_RETURN_NO_ERROR ? TaskResult::kSuccess : TaskResult::kFailed;
 }
 
-};  // namespace thumbnails
+}  // namespace thumbnails
 
 ThumbnailsService::ThumbnailsService() : config_(new ThumbnailsConfig()), stopped_(true) {}
 
@@ -539,12 +531,7 @@ XCamReturn ThumbnailsService::Start() {
     }
     for (auto t : config_->GetEnabledStream()) {
         XCamVideoBufferInfo fullImageInfo = {
-            .format         = RK_PIX_FMT_NV12,
-            .width          = 2688,
-            .height         = 1520,
-            .aligned_width  = 2688,
-            .aligned_height = 1520,
-        };
+            RK_PIX_FMT_NV12, 16, 2688, 1520, 2688, 1520, XCAM_ALIGN_UP(int(2688*1520*3/2), 8), 2, {0}, {0}};
         bufferManager_->InitializeBufferPools(t, fullImageInfo);
         LOGD_ANALYZER("Initialize buffer for type %d", t);
     }
@@ -656,4 +643,4 @@ void ThumbnailsService::OnFrameEvent(const rkaiq_image_source_t& source) {
     }
 }
 
-};  // namespace RkCam
+}  // namespace RkCam

@@ -5,11 +5,9 @@
 
 namespace RkCam {
 RawStreamProcUnit::RawStreamProcUnit ()
-    : _first_trigger(true)
-    , _is_multi_cam_conc(false)
+    : _is_multi_cam_conc(false)
+    , _first_trigger(true)
     , _is_1608_sensor(false)
-    , is_multi_isp_mode(false)
-    , mNoReadBack(false)
 {
     _raw_proc_thread = new RawProcThread(this);
     _PollCallback = NULL;
@@ -17,9 +15,9 @@ RawStreamProcUnit::RawStreamProcUnit ()
     _rawCap = NULL;
 }
 
-RawStreamProcUnit::RawStreamProcUnit (const rk_sensor_full_info_t *s_info, bool linked_to_isp, bool noReadBack)
-    : _first_trigger(true)
-    , _is_multi_cam_conc(false)
+RawStreamProcUnit::RawStreamProcUnit (const rk_sensor_full_info_t *s_info, bool linked_to_isp, int tx_buf_cnt)
+    : _is_multi_cam_conc(false)
+    , _first_trigger(true)
     , _is_1608_sensor(false)
 {
     _raw_proc_thread = new RawProcThread(this);
@@ -43,29 +41,26 @@ RawStreamProcUnit::RawStreamProcUnit (const rk_sensor_full_info_t *s_info, bool 
         _dev[2]->open();
         _dev[2]->set_mem_type(V4L2_MEMORY_DMABUF);
     }
+    int buf_cnt = 0;
+    if (tx_buf_cnt > 0) {
+        buf_cnt = tx_buf_cnt;
+    } else if (linked_to_isp) {
+        buf_cnt = ISP_TX_BUF_NUM;
+    } else if (s_info->linked_to_1608) {
+        buf_cnt = VIPCAP_TX_BUF_NUM_1608;
+    } else {
+        buf_cnt = VIPCAP_TX_BUF_NUM;
+    }
     for (int i = 0; i < 3; i++) {
-        if (linked_to_isp) {
-            if (_dev[i].ptr())
-                _dev[i]->set_buffer_count(ISP_TX_BUF_NUM);
-        } else {
-            if (_dev[i].ptr()) {
-                if (s_info->linked_to_1608) {
-                    _dev[i]->set_buffer_count(VIPCAP_TX_BUF_NUM_1608);
-                } else {
-                    _dev[i]->set_buffer_count(VIPCAP_TX_BUF_NUM);
-                }
-            }
-        }
-        if (_dev[i].ptr())
+        if (_dev[i].ptr()) {
+            _dev[i]->set_buffer_count(buf_cnt);
             _dev[i]->set_buf_sync (true);
+        }
 
         _dev_index[i] = i;
         _stream[i] =  new RKRawStream(_dev[i], i, ISP_POLL_RX);
         _stream[i]->setPollCallback(this);
     }
-
-    is_multi_isp_mode = s_info->isp_info->is_multi_isp_mode;
-    mNoReadBack = noReadBack;
 }
 
 RawStreamProcUnit::~RawStreamProcUnit ()
@@ -79,7 +74,6 @@ XCamReturn RawStreamProcUnit::start(int mode)
         _stream[i]->setCamPhyId(mCamPhyId);
         _stream[i]->start();
     }
-    _msg_queue.resume_pop();
     _msg_queue.clear();
 
     // TODO: [baron] for rk1608, vi will capture data before start
@@ -99,8 +93,9 @@ XCamReturn RawStreamProcUnit::start(int mode)
 
 XCamReturn RawStreamProcUnit::stop ()
 {
-    _msg_queue.pause_pop();
+    _msg_queue.push(0);
     _raw_proc_thread->stop();
+    _msg_queue.clear();
 
     for (int i = 0; i < _mipi_dev_max; i++) {
         _stream[i]->stopThreadOnly();
@@ -166,6 +161,7 @@ RawStreamProcUnit::set_working_mode(int mode)
     default:
         _mipi_dev_max = 1;
     }
+
     LOGD_CAMHW_SUBM(ISP20HW_SUBM,"working_mode:0x%x, _mipi_dev_max=%d\n", _working_mode, _mipi_dev_max);
 }
 
@@ -189,121 +185,62 @@ RawStreamProcUnit::get_rx_device(int index)
         return _dev[index];
 }
 
-void
+XCamReturn
 RawStreamProcUnit::set_rx_format(const struct v4l2_subdev_format& sns_sd_fmt,
-                                 uint32_t sns_v4l_pix_fmt, int8_t sns_bpp)
+                                 uint32_t sns_v4l_pix_fmt)
 {
-    // set mipi tx,rx fmt
-    // for cif: same as sensor fmt
-
-    struct v4l2_format format;
-    memset(&format, 0, sizeof(format));
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
 
     for (int i = 0; i < 3; i++) {
-        if (_dev[i].ptr())
-            _dev[i]->get_format (format);
-
-        LOGD_CAMHW_SUBM(ISP20HW_SUBM,"tx fmt info: 0x%x, %dx%d, multi_isp_mode: %d, mNoReadBack: %d, sns_bpp: %d",
-                sns_v4l_pix_fmt, sns_sd_fmt.format.width, sns_sd_fmt.format.height,
-                is_multi_isp_mode, mNoReadBack, sns_bpp);
-
-        bool csi_mem_word_big_align = false;
-        if (is_multi_isp_mode && mNoReadBack) {
-            if (((sns_sd_fmt.format.width / 2 - RKMOUDLE_UNITE_EXTEND_PIXEL) *  sns_bpp / 8) & 0xf) {
-                int mem_mode = CSI_MEM_WORD_BIG_ALIGN;
-                int ret1 = _dev[i]->io_control (RKISP_CMD_SET_CSI_MEMORY_MODE, &mem_mode);
-                if (ret1)
-                    LOGE_CAMHW_SUBM(ISP20HW_SUBM, "set CSI_MEM_WORD_BIG_ALIGN failed !\n");
-                else
-                    csi_mem_word_big_align = true;
-            }
+        if (!_dev[i].ptr()) {
+            ret = XCAM_RETURN_ERROR_PARAM;
+            break;
         }
 
-        if (_is_1608_sensor) {
-            // because of isp & 1608 timing issues.
-            if (_dev[i].ptr()) {
-                _dev[i]->set_format(sns_sd_fmt.format.width,
-                                    sns_sd_fmt.format.height,
-                                    sns_v4l_pix_fmt,
-                                    V4L2_FIELD_NONE,
-                                    0);
-            }
+        ret = _dev[i]->set_format(sns_sd_fmt.format.width,
+                                  sns_sd_fmt.format.height,
+                                  sns_v4l_pix_fmt,
+                                  V4L2_FIELD_NONE,
+                                  0);
+        if (ret < 0) {
+            LOGE_CAMHW_SUBM(ISP20HW_SUBM, "device(%s) set format failed", _dev[i]->get_device_name());
         } else {
-            if (format.fmt.pix.width != sns_sd_fmt.format.width ||
-                format.fmt.pix.height != sns_sd_fmt.format.height ||
-                format.fmt.pix.pixelformat != sns_v4l_pix_fmt ||
-                csi_mem_word_big_align) {
-                if (_dev[i].ptr()) {
-                    _dev[i]->set_format(sns_sd_fmt.format.width,
-                                        sns_sd_fmt.format.height,
-                                        sns_v4l_pix_fmt,
-                                        V4L2_FIELD_NONE,
-                                        0);
-                }
-            }
+            LOGD_CAMHW_SUBM(ISP20HW_SUBM, "device(%s) set fmt info: fmt 0x%x, %dx%d !",
+                            _dev[i]->get_device_name(), sns_v4l_pix_fmt,
+                            sns_sd_fmt.format.width, sns_sd_fmt.format.height);
         }
     }
 
-    LOGD_CAMHW_SUBM(ISP20HW_SUBM,"set rx fmt info: fmt 0x%x, %dx%d !",
-                    sns_v4l_pix_fmt, sns_sd_fmt.format.width, sns_sd_fmt.format.height);
+    return ret;
 }
 
-void
+XCamReturn
 RawStreamProcUnit::set_rx_format(const struct v4l2_subdev_selection& sns_sd_sel,
-                                 uint32_t sns_v4l_pix_fmt, int8_t sns_bpp)
+                                 uint32_t sns_v4l_pix_fmt)
 {
-    // set mipi tx,rx fmt
-    // for cif: same as sensor fmt
-
-    struct v4l2_format format;
-    memset(&format, 0, sizeof(format));
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
 
     for (int i = 0; i < 3; i++) {
-        if (_dev[i].ptr())
-            _dev[i]->get_format (format);
-
-        LOGD_CAMHW_SUBM(ISP20HW_SUBM,"tx fmt info: 0x%x, %dx%d, multi_isp_mode: %d, mNoReadBack: %d, sns_bpp: %d",
-                sns_v4l_pix_fmt, sns_sd_sel.r.width, sns_sd_sel.r.height,
-                is_multi_isp_mode, mNoReadBack, sns_bpp);
-
-        bool csi_mem_word_big_align = false;
-        if (is_multi_isp_mode && mNoReadBack) {
-            if (((sns_sd_sel.r.width / 2 - RKMOUDLE_UNITE_EXTEND_PIXEL) *  sns_bpp / 8) & 0xf) {
-                int mem_mode = CSI_MEM_WORD_BIG_ALIGN;
-                int ret1 = _dev[i]->io_control (RKISP_CMD_SET_CSI_MEMORY_MODE, &mem_mode);
-                if (ret1)
-                    LOGE_CAMHW_SUBM(ISP20HW_SUBM, "set CSI_LVDS_MEM_WORD_HIGH_ALIGN failed !\n");
-                else
-                    csi_mem_word_big_align = true;
-            }
+        if (!_dev[i].ptr()) {
+            ret = XCAM_RETURN_ERROR_PARAM;
+            break;
         }
 
-        if (_is_1608_sensor) {
-            // timing issue.
-            if (_dev[i].ptr()) {
-                _dev[i]->set_format(sns_sd_sel.r.width,
-                                    sns_sd_sel.r.height,
-                                    sns_v4l_pix_fmt,
-                                    V4L2_FIELD_NONE,
-                                    0);
-            }
+        ret = _dev[i]->set_format(sns_sd_sel.r.width,
+                                  sns_sd_sel.r.height,
+                                  sns_v4l_pix_fmt,
+                                  V4L2_FIELD_NONE,
+                                  0);
+        if (ret < 0) {
+            LOGE_CAMHW_SUBM(ISP20HW_SUBM, "device(%s) set format failed", _dev[i]->get_device_name());
         } else {
-            if (format.fmt.pix.width != sns_sd_sel.r.width ||
-                format.fmt.pix.height != sns_sd_sel.r.height ||
-                format.fmt.pix.pixelformat != sns_v4l_pix_fmt ||
-                csi_mem_word_big_align) {
-                if (_dev[i].ptr())
-                    _dev[i]->set_format(sns_sd_sel.r.width,
-                                        sns_sd_sel.r.height,
-                                        sns_v4l_pix_fmt,
-                                        V4L2_FIELD_NONE,
-                                        0);
-            }
+            LOGD_CAMHW_SUBM(ISP20HW_SUBM, "device(%s) set rx fmt info: fmt 0x%x, %dx%d !",
+                            _dev[i]->get_device_name(), sns_v4l_pix_fmt,
+                            sns_sd_sel.r.width, sns_sd_sel.r.height);
         }
     }
 
-    LOGD_CAMHW_SUBM(ISP20HW_SUBM,"set rx fmt info: fmt 0x%x, %dx%d !",
-                    sns_v4l_pix_fmt, sns_sd_sel.r.width, sns_sd_sel.r.height);
+    return ret;
 }
 
 void
@@ -330,7 +267,7 @@ RawStreamProcUnit::poll_buffer_ready (SmartPtr<V4l2BufferProxy> &buf, int dev_in
 }
 
 void
-RawStreamProcUnit::set_hdr_frame_readback_infos(int frame_id, int times)
+RawStreamProcUnit::set_hdr_frame_readback_infos(uint32_t frame_id, int times)
 {
     if (_working_mode == RK_AIQ_WORKING_MODE_NORMAL)
         return;
@@ -415,7 +352,7 @@ RawStreamProcUnit::match_sof_timestamp_map(sint32_t sequence, uint64_t &timestam
 }
 
 void
-RawStreamProcUnit::set_hdr_global_tmo_mode(int frame_id, bool mode)
+RawStreamProcUnit::set_hdr_global_tmo_mode(uint32_t frame_id, bool mode)
 {
     _mipi_trigger_mutex.lock();
     _hdr_global_tmo_state_map[frame_id] = mode;
@@ -423,7 +360,7 @@ RawStreamProcUnit::set_hdr_global_tmo_mode(int frame_id, bool mode)
 }
 
 void
-RawStreamProcUnit::notify_sof(uint64_t time, int frameid)
+RawStreamProcUnit::notify_sof(uint64_t time, uint32_t frameid)
 {
     _mipi_trigger_mutex.lock();
     while (_sof_timestamp_map.size() > 8) {
@@ -433,14 +370,18 @@ RawStreamProcUnit::notify_sof(uint64_t time, int frameid)
     _mipi_trigger_mutex.unlock();
 }
 
-bool
-RawStreamProcUnit::raw_buffer_proc ()
+bool RawStreamProcUnit::raw_buffer_proc()
 {
-    LOG1_CAMHW_SUBM(ISP20HW_SUBM,"%s enter", __FUNCTION__);
-    if (_msg_queue.pop(-1).ptr())
+    LOGD("%s enter", __FUNCTION__);
+    int ret = true;
+    auto v  = _msg_queue.front();
+    if (v)
         trigger_isp_readback();
-    LOG1_CAMHW_SUBM(ISP20HW_SUBM,"%s exit", __FUNCTION__);
-    return true;
+    else
+        ret = false;
+    _msg_queue.pop();
+    LOGD("%s exit", __FUNCTION__);
+    return ret;
 }
 
 void
@@ -462,8 +403,7 @@ RawStreamProcUnit::send_sync_buf
      }
      _isp_hdr_fid2ready_map[buf_s->get_sequence()] = true;
      _buf_mutex.unlock();
-	 SmartPtr<EmptyClass> ec = new EmptyClass();
-     _msg_queue.push(ec);
+     _msg_queue.push(1);
 }
 
 void
@@ -626,5 +566,36 @@ RawStreamProcUnit::trigger_isp_readback()
 out:
     return;
 }
+
+XCamReturn
+RawStreamProcUnit::set_csi_mem_word_big_align(uint32_t width, uint32_t height,
+        uint32_t sns_v4l_pix_fmt, int8_t sns_bpp)
+{
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+
+    LOGD_CAMHW_SUBM(ISP20HW_SUBM,"sensor fmt 0x%x, %dx%d, sns_bpp: %d",
+                    sns_v4l_pix_fmt, width, height, sns_bpp);
+
+    for (int i = 0; i < 3; i++) {
+        if (!_dev[i].ptr()) {
+            ret = XCAM_RETURN_ERROR_PARAM;
+            break;
+        }
+
+        if (((width / 2 - RKMOUDLE_UNITE_EXTEND_PIXEL) *  sns_bpp / 8) & 0xf) {
+            int mem_mode = CSI_MEM_WORD_BIG_ALIGN;
+            int ret1 = _dev[i]->io_control (RKISP_CMD_SET_CSI_MEMORY_MODE, &mem_mode);
+            if (ret1) {
+                LOGE_CAMHW_SUBM(ISP20HW_SUBM, "set CSI_MEM_WORD_BIG_ALIGN failed !\n");
+                ret = XCAM_RETURN_ERROR_IOCTL;
+            } else {
+                LOGD_CAMHW_SUBM(ISP20HW_SUBM,"set the memory mode of isp rx to big align");
+            }
+        }
+    }
+
+    return ret;
+}
+
 }
 

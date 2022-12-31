@@ -47,12 +47,8 @@ void RkAiqAeisHandleInt::init() {
 
     RkAiqHandle::deInit();
     mConfig       = (RkAiqAlgoCom*)(new RkAiqAlgoConfigAeis());
-    mPreInParam   = (RkAiqAlgoCom*)(new RkAiqAlgoPreAeis());
-    mPreOutParam  = (RkAiqAlgoResCom*)(new RkAiqAlgoPreResAeis());
     mProcInParam  = (RkAiqAlgoCom*)(new RkAiqAlgoProcAeis());
     mProcOutParam = (RkAiqAlgoResCom*)(new RkAiqAlgoProcResAeis());
-    mPostInParam  = (RkAiqAlgoCom*)(new RkAiqAlgoPostAeis());
-    mPostOutParam = (RkAiqAlgoResCom*)(new RkAiqAlgoPostResAeis());
 
     EXIT_ANALYZER_FUNCTION();
 }
@@ -61,17 +57,12 @@ XCamReturn RkAiqAeisHandleInt::preProcess() {
     ENTER_ANALYZER_FUNCTION();
 
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
-
+#if 0
     RkAiqAlgoPreAeis* aeis_pre_int          = (RkAiqAlgoPreAeis*)mPreInParam;
     RkAiqAlgoPreResAeis* aeis_pre_res_int   = (RkAiqAlgoPreResAeis*)mPreOutParam;
-    RkAiqCore::RkAiqAlgosGroupShared_t* shared = nullptr;
-    int groupId                                = mAiqCore->getGroupId(RK_AIQ_ALGO_TYPE_ADRC);
-    if (groupId >= 0) {
-        if (mAiqCore->getGroupSharedParams(groupId, shared) != XCAM_RETURN_NO_ERROR)
-            return XCAM_RETURN_BYPASS;
-    } else
-        return XCAM_RETURN_BYPASS;
     RkAiqCore::RkAiqAlgosComShared_t* sharedCom = &mAiqCore->mAlogsComSharedParams;
+    auto* shared = (RkAiqCore::RkAiqAlgosGroupShared_t*)getGroupShared();
+    if (!shared) return XCAM_RETURN_BYPASS;
 
     ret = RkAiqHandle::preProcess();
     if (ret) {
@@ -88,6 +79,7 @@ XCamReturn RkAiqAeisHandleInt::preProcess() {
     RKAIQCORE_CHECK_RET(ret, "aeis algo pre_process failed");
 
     EXIT_ANALYZER_FUNCTION();
+#endif
     return XCAM_RETURN_NO_ERROR;
 }
 
@@ -100,13 +92,8 @@ XCamReturn RkAiqAeisHandleInt::processing() {
     RkAiqAlgoProcResAeis* aeis_proc_res_int  = (RkAiqAlgoProcResAeis*)mProcOutParam;
     RkAiqCore::RkAiqAlgosComShared_t* sharedCom = &mAiqCore->mAlogsComSharedParams;
 
-    RkAiqCore::RkAiqAlgosGroupShared_t* shared = nullptr;
-    int groupId                                = mAiqCore->getGroupId(RK_AIQ_ALGO_TYPE_AEIS);
-    if (groupId >= 0) {
-        if (mAiqCore->getGroupSharedParams(groupId, shared) != XCAM_RETURN_NO_ERROR)
-            return XCAM_RETURN_BYPASS;
-    } else
-        return XCAM_RETURN_BYPASS;
+    auto* shared = (RkAiqCore::RkAiqAlgosGroupShared_t*)getGroupShared();
+    if (!shared) return XCAM_RETURN_BYPASS;
 
     aeis_proc_int->orb_stats_buf = shared->orbStats;
     aeis_proc_int->nr_img_buf    = shared->nrImg;
@@ -174,17 +161,12 @@ XCamReturn RkAiqAeisHandleInt::postProcess() {
     ENTER_ANALYZER_FUNCTION();
 
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
-
+#if 0
     RkAiqAlgoPostAeis* aeis_post_int        = (RkAiqAlgoPostAeis*)mPostInParam;
     RkAiqAlgoPostResAeis* aeis_post_res_int = (RkAiqAlgoPostResAeis*)mPostOutParam;
-    RkAiqCore::RkAiqAlgosGroupShared_t* shared = nullptr;
-    int groupId                                = mAiqCore->getGroupId(RK_AIQ_ALGO_TYPE_AEIS);
-    if (groupId >= 0) {
-        if (mAiqCore->getGroupSharedParams(groupId, shared) != XCAM_RETURN_NO_ERROR)
-            return XCAM_RETURN_BYPASS;
-    } else
-        return XCAM_RETURN_BYPASS;
     RkAiqCore::RkAiqAlgosComShared_t* sharedCom = &mAiqCore->mAlogsComSharedParams;
+    auto* shared = (RkAiqCore::RkAiqAlgosGroupShared_t*)getGroupShared();
+    if (!shared) return XCAM_RETURN_BYPASS;
 
     ret = RkAiqHandle::postProcess();
     if (ret) {
@@ -202,6 +184,7 @@ XCamReturn RkAiqAeisHandleInt::postProcess() {
     RKAIQCORE_CHECK_RET(ret, "aeis algo post_process failed");
 
     EXIT_ANALYZER_FUNCTION();
+#endif
     return ret;
 }
 
@@ -320,4 +303,4 @@ XCamReturn RkAiqAeisHandleInt::genIspResult(RkAiqFullParams* params, RkAiqFullPa
     return ret;
 }
 
-};  // namespace RkCam
+}  // namespace RkCam

@@ -31,7 +31,7 @@ class RawStreamCapUnit : public PollCallback
 {
 public:
     explicit RawStreamCapUnit ();
-    explicit RawStreamCapUnit (const rk_sensor_full_info_t *s_info, bool linked_to_isp, bool noReadBack);
+    explicit RawStreamCapUnit (const rk_sensor_full_info_t *s_info, bool linked_to_isp, int tx_buf_cnt);
     virtual ~RawStreamCapUnit ();
     virtual XCamReturn start(int mode);
     virtual XCamReturn stop ();
@@ -39,8 +39,8 @@ public:
     void set_devices(SmartPtr<V4l2SubDevice> ispdev, CamHwIsp20* handle, RawStreamProcUnit *proc);
     void set_tx_devices(SmartPtr<V4l2Device> mipi_tx_devs[3]);
     SmartPtr<V4l2Device> get_tx_device (int index);
-    void set_tx_format(const struct v4l2_subdev_format& sns_sd_fmt, uint32_t sns_v4l_pix_fmt, int8_t sns_bpp);
-    void set_tx_format(const struct v4l2_subdev_selection& sns_sd_sel, uint32_t sns_v4l_pix_fmt, int8_t sns_bpp);
+    XCamReturn set_tx_format(const struct v4l2_subdev_format& sns_sd_fmt, uint32_t sns_v4l_pix_fmt);
+    XCamReturn set_tx_format(const struct v4l2_subdev_selection& sns_sd_sel, uint32_t sns_v4l_pix_fmt);
     XCamReturn prepare(int idx);
     void prepare_cif_mipi();
     void skip_frames(int skip_num, int32_t skip_seq);
@@ -58,6 +58,8 @@ public:
         _is_1608_stream = sensorState;
     }
     XCamReturn reset_hardware();
+    XCamReturn set_csi_mem_word_big_align(uint32_t width, uint32_t height, uint32_t sns_v4l_pix_fmt, int8_t sns_bpp);
+
     enum {
         ISP_MIPI_HDR_S = 0,
         ISP_MIPI_HDR_M,
@@ -98,8 +100,6 @@ protected:
     struct v4l2_format _format;
     //
     SafeList<V4l2BufferProxy> _NrImg_ready_list;
-    bool is_multi_isp_mode; // isp-unit mode, 2 isp to 1
-    bool mNoReadBack;
 };
 
 }

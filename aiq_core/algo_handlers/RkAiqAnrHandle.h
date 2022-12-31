@@ -23,15 +23,18 @@
 #include "xcam_mutex.h"
 
 namespace RkCam {
+#if RKAIQ_HAVE_ANR_V1
 
 class RkAiqAnrHandleInt : virtual public RkAiqHandle {
- public:
+public:
     explicit RkAiqAnrHandleInt(RkAiqAlgoDesComm* des, RkAiqCore* aiqCore)
         : RkAiqHandle(des, aiqCore) {
         memset(&mCurAtt, 0, sizeof(rk_aiq_nr_attrib_t));
         memset(&mNewAtt, 0, sizeof(rk_aiq_nr_attrib_t));
     };
-    virtual ~RkAiqAnrHandleInt() { RkAiqHandle::deInit(); };
+    virtual ~RkAiqAnrHandleInt() {
+        RkAiqHandle::deInit();
+    };
     virtual XCamReturn updateConfig(bool needSync);
     virtual XCamReturn prepare();
     virtual XCamReturn preProcess();
@@ -54,11 +57,13 @@ class RkAiqAnrHandleInt : virtual public RkAiqHandle {
     XCamReturn setIQPara(rk_aiq_nr_IQPara_t* pPara);
     XCamReturn getIQPara(rk_aiq_nr_IQPara_t* pPara);
 
- protected:
+protected:
     virtual void init();
-    virtual void deInit() { RkAiqHandle::deInit(); };
+    virtual void deInit() {
+        RkAiqHandle::deInit();
+    };
 
- private:
+private:
     // TODO
     rk_aiq_nr_attrib_t mCurAtt;
     rk_aiq_nr_attrib_t mNewAtt;
@@ -66,10 +71,10 @@ class RkAiqAnrHandleInt : virtual public RkAiqHandle {
     rk_aiq_nr_IQPara_t mNewIQpara;
     bool UpdateIQpara = false;
 
- private:
+private:
     DECLARE_HANDLE_REGISTER_TYPE(RkAiqAnrHandleInt);
 };
-
-};  // namespace RkCam
+#endif
+}  // namespace RkCam
 
 #endif

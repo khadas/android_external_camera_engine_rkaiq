@@ -322,4 +322,4 @@ XCamReturn RkAiqAcnrV2HandleInt::genIspResult(RkAiqFullParams* params,
     return ret;
 }
 
-};  // namespace RkCam
+}  // namespace RkCam

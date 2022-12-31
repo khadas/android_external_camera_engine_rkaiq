@@ -19,6 +19,7 @@
 #define _RK_AIQ_USER_API2_AMERGE_H_
 
 #include "amerge/rk_aiq_uapi_amerge_int.h"
+#include "amerge_uapi_compact.h"
 
 #ifndef RK_AIQ_SYS_CTX_T
 #define RK_AIQ_SYS_CTX_T
@@ -27,11 +28,22 @@ typedef struct rk_aiq_sys_ctx_s rk_aiq_sys_ctx_t;
 
 RKAIQ_BEGIN_DECLARE
 
-XCamReturn
-rk_aiq_user_api2_amerge_SetAttrib(const rk_aiq_sys_ctx_t* sys_ctx, amerge_attrib_t attr);
-XCamReturn
-rk_aiq_user_api2_amerge_GetAttrib(const rk_aiq_sys_ctx_t* sys_ctx, amerge_attrib_t* attr);
+XCamReturn rk_aiq_user_api2_amerge_SetAttrib(const rk_aiq_sys_ctx_t* sys_ctx, amerge_attrib_t attr);
+XCamReturn rk_aiq_user_api2_amerge_GetAttrib(const rk_aiq_sys_ctx_t* sys_ctx,
+                                             amerge_attrib_t* attr);
 
+XCamReturn rk_aiq_user_api2_amerge_v10_SetAttrib(const rk_aiq_sys_ctx_t* sys_ctx,
+                                                 const mergeAttrV10_t* attr);
+XCamReturn rk_aiq_user_api2_amerge_v10_GetAttrib(const rk_aiq_sys_ctx_t* sys_ctx,
+                                                 mergeAttrV10_t* attr);
+XCamReturn rk_aiq_user_api2_amerge_v11_SetAttrib(const rk_aiq_sys_ctx_t* sys_ctx,
+                                                 const mergeAttrV11_t* attr);
+XCamReturn rk_aiq_user_api2_amerge_v11_GetAttrib(const rk_aiq_sys_ctx_t* sys_ctx,
+                                                 mergeAttrV11_t* attr);
+XCamReturn rk_aiq_user_api2_amerge_v12_SetAttrib(const rk_aiq_sys_ctx_t* sys_ctx,
+                                                 const mergeAttrV12_t* attr);
+XCamReturn rk_aiq_user_api2_amerge_v12_GetAttrib(const rk_aiq_sys_ctx_t* sys_ctx,
+                                                 mergeAttrV12_t* attr);
 
 RKAIQ_END_DECLARE
 

@@ -21,6 +21,7 @@
 #define CHECK_USER_API_ENABLE
 #endif
 
+#if RKAIQ_HAVE_GIC_V1
 XCamReturn rk_aiq_user_api_agic_v1_SetAttrib(rk_aiq_sys_ctx_t* sys_ctx,
                                              const rkaiq_gic_v1_api_attr_t* attr) {
     CHECK_USER_API_ENABLE2(sys_ctx);
@@ -48,7 +49,21 @@ XCamReturn rk_aiq_user_api_agic_v1_GetAttrib(rk_aiq_sys_ctx_t* sys_ctx,
 
     return XCAM_RETURN_NO_ERROR;
 }
+#else
 
+XCamReturn rk_aiq_user_api_agic_v1_SetAttrib(rk_aiq_sys_ctx_t* sys_ctx,
+                                             rkaiq_gic_v1_api_attr_t attr) {
+    return XCAM_RETURN_ERROR_UNKNOWN;
+}
+
+XCamReturn rk_aiq_user_api_agic_v1_GetAttrib(rk_aiq_sys_ctx_t* sys_ctx,
+                                             rkaiq_gic_v1_api_attr_t* attr) {
+    return XCAM_RETURN_ERROR_UNKNOWN;
+}
+
+#endif
+
+#if RKAIQ_HAVE_GIC_V2
 XCamReturn rk_aiq_user_api_agic_v2_SetAttrib(rk_aiq_sys_ctx_t* sys_ctx,
                                              const rkaiq_gic_v2_api_attr_t* attr) {
     CHECK_USER_API_ENABLE2(sys_ctx);
@@ -76,4 +91,17 @@ XCamReturn rk_aiq_user_api_agic_v2_GetAttrib(rk_aiq_sys_ctx_t* sys_ctx,
 
     return XCAM_RETURN_NO_ERROR;
 }
+#else
+
+XCamReturn rk_aiq_user_api_agic_v2_SetAttrib(rk_aiq_sys_ctx_t* sys_ctx,
+                                             rkaiq_gic_v2_api_attr_t attr) {
+    return XCAM_RETURN_ERROR_UNKNOWN;
+}
+
+XCamReturn rk_aiq_user_api_agic_v2_GetAttrib(rk_aiq_sys_ctx_t* sys_ctx,
+                                             rkaiq_gic_v2_api_attr_t* attr) {
+    return XCAM_RETURN_ERROR_UNKNOWN;
+}
+
+#endif
 

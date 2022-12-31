@@ -24,6 +24,7 @@
 
 namespace RkCam {
 
+#if RKAIQ_HAVE_EIS_V1
 class RkAiqAeisHandleInt : virtual public RkAiqHandle {
  public:
     explicit RkAiqAeisHandleInt(RkAiqAlgoDesComm* des, RkAiqCore* aiqCore)
@@ -55,6 +56,8 @@ class RkAiqAeisHandleInt : virtual public RkAiqHandle {
     DECLARE_HANDLE_REGISTER_TYPE(RkAiqAeisHandleInt);
 };
 
-};  // namespace RkCam
+#endif
+
+}  // namespace RkCam
 
 #endif

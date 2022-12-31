@@ -90,7 +90,7 @@ void *MessageParser::clonePacket(void *from, MessageType type) {
     }
 
     memcpy(opkt, temp, sizeof(RkAiqSocketPacket_t));
-    opkt->data = (uint8_t *)malloc(temp->payload_size);
+    opkt->data = (uint8_t *)malloc(temp->payload_size + 1);
 
     if (!opkt->data) {
       free(opkt);
@@ -98,6 +98,7 @@ void *MessageParser::clonePacket(void *from, MessageType type) {
     }
 
     memcpy(opkt->data, (uint8_t *)&(temp->data), temp->payload_size);
+    opkt->data[temp->payload_size] = '\0';
 
     return opkt;
   } else if (type == RKAIQ_MESSAGE_OLD) {
@@ -109,7 +110,7 @@ void *MessageParser::clonePacket(void *from, MessageType type) {
     }
 
     memcpy(opkt, temp, sizeof(RkAiqSocketPacket));
-    opkt->data = (char *)malloc(temp->dataSize);
+    opkt->data = (char *)malloc(temp->dataSize + 1);
 
     if (!opkt->data) {
       free(opkt);
@@ -117,6 +118,7 @@ void *MessageParser::clonePacket(void *from, MessageType type) {
     }
 
     memcpy(opkt->data, temp->data, temp->dataSize);
+    opkt->data[temp->dataSize] = '\0';
 
     return opkt;
   }
@@ -153,7 +155,7 @@ void MessageParser::process() {
       mCallBackFunc(pri, new_pkt, RKAIQ_MESSAGE_NEW);
     }
 
-    if ((start_index >= 0) && (end_index > 0)) {
+    if (((ssize_t)start_index >= 0) && (end_index > 0)) {
       raw_stream.erase(raw_stream.begin(), raw_stream.begin() + end_index);
     }
 
@@ -169,7 +171,7 @@ void MessageParser::process() {
       freePacket(old_pkt, RKAIQ_MESSAGE_OLD);
     }
 
-    if ((start_index >= 0) && (end_index > 0)) {
+    if (((ssize_t)start_index >= 0) && (end_index > 0)) {
       raw_stream.erase(raw_stream.begin(), raw_stream.begin() + end_index);
     }
 
@@ -405,6 +407,10 @@ unsigned int MessageParser::MurMurHash(const void *key, int len) {
     data += 4;
     len -= 4;
   }
+#if defined(__GNUC__) && !defined(__clang__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wimplicit-fallthrough"
+#endif
   // Handle the last few bytes of the input array
   switch (len) {
   case 3:
@@ -415,6 +421,9 @@ unsigned int MessageParser::MurMurHash(const void *key, int len) {
     h ^= data[0];
     h *= m;
   };
+#if defined(__GNUC__) && !defined(__clang__)
+#pragma GCC diagnostic pop
+#endif
   // Do a few final mixes of the hash to ensure the last few
   // bytes are well-incorporated.
   h ^= h >> 13;

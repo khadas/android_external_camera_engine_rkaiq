@@ -18,6 +18,7 @@
 #include "asharp4/rk_aiq_uapi_camgroup_asharp_int_v4.h"
 
 namespace RkCam {
+#if RKAIQ_HAVE_SHARP_V4
 
 XCamReturn RkAiqCamGroupAsharpV4HandleInt::updateConfig(bool needSync) {
     ENTER_ANALYZER_FUNCTION();
@@ -180,5 +181,5 @@ XCamReturn RkAiqCamGroupAsharpV4HandleInt::getInfo(rk_aiq_sharp_info_v4_t *pInfo
 
 #endif
 
-
-};  // namespace RkCam
+#endif
+}  // namespace RkCam

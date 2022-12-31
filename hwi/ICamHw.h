@@ -23,6 +23,7 @@
 #include "rk_aiq_types.h"
 #include "rk_aiq_pool.h"
 #include "RkAiqCalibDbV2Helper.h"
+#include "rk_aiq.h"
 #include "rk_aiq_offline_raw.h"
 namespace RkCam {
 
@@ -127,13 +128,17 @@ public:
     virtual XCamReturn ZoomCorrection() = 0;
     virtual XCamReturn setAngleZ(float angleZ) = 0;
     virtual void getShareMemOps(isp_drv_share_mem_ops_t** mem_ops) = 0;
-    virtual XCamReturn getEffectiveIspParams(rkisp_effect_params_v20& ispParams, int frame_id) = 0;
+    virtual XCamReturn getEffectiveIspParams(rkisp_effect_params_v20& ispParams, uint32_t frame_id) = 0;
     virtual uint64_t getIspModuleEnState() = 0;
     virtual XCamReturn get_sp_resolution(int &width, int &height, int &aligned_w, int &aligned_h) = 0;
     virtual void setCamPhyId(int phyId) = 0;
     virtual int getCamPhyId() = 0;
     virtual void setGroupMode(bool bGroup, bool bMain) = 0;
+#if RKAIQ_HAVE_PDAF
     virtual bool get_pdaf_support() = 0;
+#endif
+    virtual void setTbInfo(rk_aiq_tb_info_t& info) = 0;
+    virtual void setDevBufCnt(const std::map<std::string, int>& dev_buf_cnt_map) = 0;
     virtual XCamReturn reset_hardware() = 0;
     virtual XCamReturn rawReproc_genIspParams (uint32_t sequence, rk_aiq_frame_info_t *offline_finfo, int mode) = 0;
     virtual XCamReturn rawReProc_prepare (uint32_t sequence, rk_aiq_frame_info_t *offline_finfo) = 0;
@@ -141,6 +146,6 @@ private:
     XCAM_DEAD_COPY (ICamHw);
 };
 
-}; //namespace RkCam
+} //namespace RkCam
 
 #endif

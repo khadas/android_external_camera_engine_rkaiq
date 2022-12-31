@@ -18,17 +18,32 @@
 
 namespace RkCam {
 
-XCamReturn RkAiqCamGroupAdhazHandleInt::updateConfig(bool needSync) {
+XCamReturn RkAiqCamGroupAdehazeHandleInt::updateConfig(bool needSync) {
     ENTER_ANALYZER_FUNCTION();
 
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
     if (needSync) mCfgMutex.lock();
     // if something changed
+
     if (updateAtt) {
-        mCurAtt   = mNewAtt;
-        rk_aiq_uapi_adehaze_SetAttrib(mAlgoCtx, mCurAtt, false);
+#if RKAIQ_HAVE_DEHAZE_V10
+        mCurAttV10 = mNewAttV10;
+        rk_aiq_uapi_adehaze_v10_SetAttrib(mAlgoCtx, &mCurAttV10, false);
         updateAtt = false;
-        sendSignal(mCurAtt.sync.sync_mode);
+        sendSignal(mCurAttV10.sync.sync_mode);
+#endif
+#if RKAIQ_HAVE_DEHAZE_V11 || RKAIQ_HAVE_DEHAZE_V11_DUO
+        mCurAttV11 = mNewAttV11;
+        rk_aiq_uapi_adehaze_v11_SetAttrib(mAlgoCtx, &mCurAttV11, false);
+        updateAtt = false;
+        sendSignal(mCurAttV11.sync.sync_mode);
+#endif
+#if RKAIQ_HAVE_DEHAZE_V12
+        mCurAttV12 = mNewAttV12;
+        rk_aiq_uapi_adehaze_v12_SetAttrib(mAlgoCtx, &mCurAttV12, false);
+        updateAtt = false;
+        sendSignal(mCurAttV12.sync.sync_mode);
+#endif
     }
 
     if (needSync) mCfgMutex.unlock();
@@ -36,8 +51,8 @@ XCamReturn RkAiqCamGroupAdhazHandleInt::updateConfig(bool needSync) {
     EXIT_ANALYZER_FUNCTION();
     return ret;
 }
-
-XCamReturn RkAiqCamGroupAdhazHandleInt::setAttrib(adehaze_sw_V2_t att) {
+#if RKAIQ_HAVE_DEHAZE_V10
+XCamReturn RkAiqCamGroupAdehazeHandleInt::setAttribV10(const adehaze_sw_v10_t* att) {
     ENTER_ANALYZER_FUNCTION();
 
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
@@ -49,10 +64,10 @@ XCamReturn RkAiqCamGroupAdhazHandleInt::setAttrib(adehaze_sw_V2_t att) {
     // called by RkAiqCore
 
     // if something changed
-    if (0 != memcmp(&mCurAtt, &att, sizeof(adehaze_sw_V2_t))) {
-        mNewAtt   = att;
-        updateAtt = true;
-        waitSignal(att.sync.sync_mode);
+    if (0 != memcmp(&mCurAttV10, att, sizeof(adehaze_sw_v10_t))) {
+        mNewAttV10 = *att;
+        updateAtt  = true;
+        waitSignal(att->sync.sync_mode);
     }
 
     mCfgMutex.unlock();
@@ -61,23 +76,23 @@ XCamReturn RkAiqCamGroupAdhazHandleInt::setAttrib(adehaze_sw_V2_t att) {
     return ret;
 }
 
-XCamReturn RkAiqCamGroupAdhazHandleInt::getAttrib(adehaze_sw_V2_t* att) {
+XCamReturn RkAiqCamGroupAdehazeHandleInt::getAttribV10(adehaze_sw_v10_t* att) {
     ENTER_ANALYZER_FUNCTION();
 
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
 
     if (att->sync.sync_mode == RK_AIQ_UAPI_MODE_SYNC) {
         mCfgMutex.lock();
-        rk_aiq_uapi_adehaze_GetAttrib(mAlgoCtx, att);
+        rk_aiq_uapi_adehaze_v10_GetAttrib(mAlgoCtx, att);
         att->sync.done = true;
         mCfgMutex.unlock();
     } else {
         if (updateAtt) {
-            memcpy(att, &mNewAtt, sizeof(adehaze_sw_V2_t));
+            memcpy(att, &mNewAttV10, sizeof(adehaze_sw_v10_t));
             att->sync.done = false;
         } else {
-            rk_aiq_uapi_adehaze_GetAttrib(mAlgoCtx, att);
-            att->sync.sync_mode = mNewAtt.sync.sync_mode;
+            rk_aiq_uapi_adehaze_v10_GetAttrib(mAlgoCtx, att);
+            att->sync.sync_mode = mNewAttV10.sync.sync_mode;
             att->sync.done      = true;
         }
     }
@@ -85,5 +100,106 @@ XCamReturn RkAiqCamGroupAdhazHandleInt::getAttrib(adehaze_sw_V2_t* att) {
     EXIT_ANALYZER_FUNCTION();
     return ret;
 }
+#endif
+#if RKAIQ_HAVE_DEHAZE_V11 || RKAIQ_HAVE_DEHAZE_V11_DUO
+XCamReturn RkAiqCamGroupAdehazeHandleInt::setAttribV11(const adehaze_sw_v11_t* att) {
+    ENTER_ANALYZER_FUNCTION();
 
-};  // namespace RkCam
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    mCfgMutex.lock();
+    // TODO
+    // check if there is different between att & mCurAtt
+    // if something changed, set att to mNewAtt, and
+    // the new params will be effective later when updateConfig
+    // called by RkAiqCore
+
+    // if something changed
+    if (0 != memcmp(&mCurAttV11, att, sizeof(adehaze_sw_v11_t))) {
+        mNewAttV11 = *att;
+        updateAtt  = true;
+        waitSignal(att->sync.sync_mode);
+    }
+
+    mCfgMutex.unlock();
+
+    EXIT_ANALYZER_FUNCTION();
+    return ret;
+}
+
+XCamReturn RkAiqCamGroupAdehazeHandleInt::getAttribV11(adehaze_sw_v11_t* att) {
+    ENTER_ANALYZER_FUNCTION();
+
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+
+    if (att->sync.sync_mode == RK_AIQ_UAPI_MODE_SYNC) {
+        mCfgMutex.lock();
+        rk_aiq_uapi_adehaze_v11_GetAttrib(mAlgoCtx, att);
+        att->sync.done = true;
+        mCfgMutex.unlock();
+    } else {
+        if (updateAtt) {
+            memcpy(att, &mNewAttV11, sizeof(adehaze_sw_v11_t));
+            att->sync.done = false;
+        } else {
+            rk_aiq_uapi_adehaze_v11_GetAttrib(mAlgoCtx, att);
+            att->sync.sync_mode = mNewAttV11.sync.sync_mode;
+            att->sync.done      = true;
+        }
+    }
+
+    EXIT_ANALYZER_FUNCTION();
+    return ret;
+}
+#endif
+#if RKAIQ_HAVE_DEHAZE_V12
+XCamReturn RkAiqCamGroupAdehazeHandleInt::setAttribV12(const adehaze_sw_v12_t* att) {
+    ENTER_ANALYZER_FUNCTION();
+
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    mCfgMutex.lock();
+    // TODO
+    // check if there is different between att & mCurAtt
+    // if something changed, set att to mNewAtt, and
+    // the new params will be effective later when updateConfig
+    // called by RkAiqCore
+
+    // if something changed
+    if (0 != memcmp(&mCurAttV12, att, sizeof(mCurAttV12))) {
+        mNewAttV12 = *att;
+        updateAtt = true;
+        waitSignal(att->sync.sync_mode);
+    }
+
+    mCfgMutex.unlock();
+
+    EXIT_ANALYZER_FUNCTION();
+    return ret;
+}
+
+XCamReturn RkAiqCamGroupAdehazeHandleInt::getAttribV12(adehaze_sw_v12_t* att) {
+    ENTER_ANALYZER_FUNCTION();
+
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+
+    if (att->sync.sync_mode == RK_AIQ_UAPI_MODE_SYNC) {
+        mCfgMutex.lock();
+        rk_aiq_uapi_adehaze_v12_GetAttrib(mAlgoCtx, att);
+        att->sync.done = true;
+        mCfgMutex.unlock();
+    } else {
+        if (updateAtt) {
+            memcpy(att, &mNewAttV12, sizeof(adehaze_sw_v12_t));
+            att->sync.done = false;
+        } else {
+            rk_aiq_uapi_adehaze_v12_GetAttrib(mAlgoCtx, att);
+            att->sync.sync_mode = mNewAttV12.sync.sync_mode;
+            att->sync.done      = true;
+        }
+    }
+
+    EXIT_ANALYZER_FUNCTION();
+    return ret;
+}
+#endif
+
+}  // namespace RkCam

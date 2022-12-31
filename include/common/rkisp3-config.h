@@ -137,7 +137,8 @@
 #define ISP3X_SHARP_GAUS_COEF_NUM	6
 
 #define ISP3X_CAC_STRENGTH_NUM		22
-#define ISP3X_CSM_COEFF_NUM     ISP21_CSM_COEFF_NUM
+
+#define ISP3X_CSM_COEFF_NUM		ISP21_CSM_COEFF_NUM
 
 enum isp3x_unite_id {
 	ISP3_LEFT = 0,
@@ -154,6 +155,7 @@ struct isp3x_gammaout_cfg {
 
 struct isp3x_lsc_cfg {
 	u8 sector_16x16;
+
 	u16 r_data_tbl[ISP3X_LSC_DATA_TBL_SIZE];
 	u16 gr_data_tbl[ISP3X_LSC_DATA_TBL_SIZE];
 	u16 gb_data_tbl[ISP3X_LSC_DATA_TBL_SIZE];
@@ -1068,6 +1070,7 @@ struct isp3x_stat {
 struct rkisp3x_isp_stat_buffer {
 	u32 meas_type;
 	u32 frame_id;
+	u32 params_id;
 	struct isp3x_stat params;
 } __attribute__ ((packed));
 

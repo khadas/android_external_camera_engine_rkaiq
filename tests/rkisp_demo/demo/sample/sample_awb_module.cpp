@@ -17,68 +17,18 @@
 
 #include "sample_comm.h"
 
-typedef enum {
-    AWB_CHANNEL_R = 0,
-    AWB_CHANNEL_GR,
-    AWB_CHANNEL_GB,
-    AWB_CHANNEL_B,
-    AWB_CHANNEL_MAX
-} awb_channel_t;
-
 #define safe_free(x) if(NULL!=(x))\
                            free(x); x=NULL;
-static void sample_awb_usage()
-{
-    printf("Usage : \n");
-    printf("  ImgProc API: \n");
-    printf("\t 0) AWB: setWBMode-OP_MANUAL.\n");
-    printf("\t 1) AWB: setWBMode-OP_AUTO.\n");
-    printf("\t 2) AWB: getWBMode.\n");
-    printf("\t 3) AWB: lockAWB.\n");
-    printf("\t 4) AWB: unlockAWB.\n");
-    printf("\t 5) AWB: setMWBScene.\n");
-    printf("\t 6) AWB: getMWBScene.\n");
-    printf("\t 7) AWB: setMWBGain.\n");
-    printf("\t 8) AWB: getWBGain.\n");
-    printf("\t 9) AWB: setMWBCT.\n");
-    printf("\t a) AWB: getWBCT.\n");
-    printf("\t b) AWB: setWbGainOffset.\n");
-    printf("\t c) AWB: getWbGainOffset.\n");
-    printf("\t d) AWB: setAwbGainAdjust.\n");
-    printf("\t e) AWB: getAwbGainAdjust.\n");
-    printf("\t f) AWB: setAllAttrib.\n");
-    printf("\n");
-    printf("  Module API: \n");
-    printf("\t A) AWB: set Awbv21 AllAttr & Sync.\n");
-    printf("\t B) AWB: set Awbv21 AllAttr & Async.\n");
-    printf("\t C) AWB: set Awbv30 AllAttr & Sync.\n");
-    printf("\t D) AWB: set Awbv30 AllAttr & Async.\n");
-	printf("\t E) AWB: get CCT.\n");
-    printf("\t F) AWB: Query Awb Info.\n");
-    printf("\t G) AWB: Lock.\n");
-    printf("\t I) AWB: Unlock.\n");
-    printf("\t J) AWB: set Mode Manual & Sync.\n");
-    printf("\t K) AWB: set Mode Manual & Async.\n");
-    printf("\t L) AWB: set Mode Auto & Sync.\n");
-    printf("\t M) AWB: set Mode Auto & Async.\n");
-    printf("\t N) AWB: set Manual attr & Sync.\n");
-    printf("\t O) AWB: set Manual attr & Async.\n");
-    printf("\t P) AWB: set AwbGainAdjust & Sync.\n");
-    printf("\t R) AWB: set AwbGainAdjust & Async.\n");
-    printf("\t S) AWB: set WbGainOffset & Sync.\n");
-    printf("\t T) AWB: set WbGainOffset & Async.\n");
-    printf("\n");
-    printf("\t h) AWB: help.\n");
-    printf("\t q) AWB: return to main sample screen.\n");
-
-    return;
-}
 
 void sample_print_awb_info(const void *arg)
 {
     printf ("enter AWB modult test!\n");
 }
 
+void sample_print_awb32_info(const void *arg)
+{
+    printf ("enter AWBV32 modult test!\n");
+}
 /*
 ******************************
 *
@@ -321,7 +271,7 @@ static int sample_awb_awbv21_getAllAttr(const rk_aiq_sys_ctx_t* ctx)
 static int sample_awb_awbv30_setAllAttr(const rk_aiq_sys_ctx_t* ctx, rk_aiq_uapi_mode_sync_e sync)
 {
     rk_aiq_uapiV2_wbV30_attrib_t attr;
-    memset(&attr,0,sizeof(rk_aiq_uapiV2_wbV21_attrib_t));
+    memset(&attr,0,sizeof(rk_aiq_uapiV2_wbV30_attrib_t));
     //get
     rk_aiq_user_api2_awbV30_GetAllAttrib(ctx, &attr);
     //modify
@@ -596,7 +546,14 @@ static int sample_awb_setWbGainAdjust(const rk_aiq_sys_ctx_t* ctx, rk_aiq_uapi_m
     //set
     rk_aiq_user_api2_awb_SetWbGainAdjustAttrib(ctx, attr);
     printf("set AWbGainAdjust\n\n");
-
+    //free
+    for(int i = 0; i < attr.lutAll_len; i++) {
+        //printf("free attr->lutAll[%d].cri_lut_out= %p\n",i,attr.lutAll[i].cri_lut_out);
+        safe_free(attr.lutAll[i].cri_lut_out);
+        safe_free(attr.lutAll[i].ct_lut_out);
+    }
+    //printf(" free attr->lutAll= %p\n",attr.lutAll);
+    safe_free(attr.lutAll);
     return 0;
 }
 
@@ -609,6 +566,14 @@ static int sample_awb_getWbGainAdjust(const rk_aiq_sys_ctx_t* ctx)
     printf("get AWbGainAdjust:\n\n");
     printf("\t sync = %d, done = %d\n", attr.sync.sync_mode, attr.sync.done);
     printf("\t enable = %s\n", (attr.enable ? "true" : "false"));
+    //free
+    for(int i = 0; i < attr.lutAll_len; i++) {
+        //printf("free attr->lutAll[%d].cri_lut_out= %p\n",i,attr.lutAll[i].cri_lut_out);
+        safe_free(attr.lutAll[i].cri_lut_out);
+        safe_free(attr.lutAll[i].ct_lut_out);
+    }
+    //printf(" free attr->lutAll= %p\n",attr.lutAll);
+    safe_free(attr.lutAll);
     return 0;
 }
 
@@ -679,6 +644,7 @@ static int sample_awb_getWbAwbMultiWindow(const rk_aiq_sys_ctx_t* ctx)
     printf("\t enable = %s\n\n", (attr.multiWindw.enable ? "true" : "false"));
     return 0;
 }
+
 #if 0
 static int sample_awb_printflog(const rk_aiq_sys_ctx_t* ctx)
 {
@@ -688,9 +654,9 @@ static int sample_awb_printflog(const rk_aiq_sys_ctx_t* ctx)
     //for(int i=0;i<100;i++)
     {
         memset(&awb_measure_result,0,sizeof(awb_measure_result));
-        rk_aiq_user_api2_awbV30_getAlgoSta(ctx, &awb_measure_result);
+        rk_aiq_user_api2_awb_getAlgoSta(ctx, &awb_measure_result);
         memset(&strategy_result,0,sizeof(strategy_result));
-        rk_aiq_user_api2_awbV30_getStrategyResult(ctx, &strategy_result);
+        rk_aiq_user_api2_awb_getStrategyResult(ctx, &strategy_result);
         printf("------------%d---------------\n",strategy_result.count);
         printf("Global CCT:%f,CCRI:%f,valid:%d\n",strategy_result.cctGloabl.CCT,strategy_result.cctGloabl.CCRI,
             strategy_result.cctGloabl.valid);
@@ -826,11 +792,178 @@ static int sample_awb_getStrategyResult(const rk_aiq_sys_ctx_t* ctx)
 {
     rk_tool_awb_strategy_result_t attr;
     memset(&attr,0,sizeof(attr));
-    rk_aiq_user_api2_awbV30_getStrategyResult(ctx, &attr);
+    rk_aiq_user_api2_awb_getStrategyResult(ctx, &attr);
+    return 0;
+}
+
+static int sample_awb_setWbV32AwbMultiWindow(const rk_aiq_sys_ctx_t* ctx, rk_aiq_uapi_mode_sync_e sync)
+{
+    rk_aiq_uapiV2_wbV32_awb_mulWindow_t attr;
+    memset(&attr,0,sizeof(rk_aiq_uapiV2_wbV32_awb_mulWindow_t));
+    //get
+    rk_aiq_user_api2_awbV32_GetMultiWindowAttrib(ctx, &attr);
+    //modify
+    attr.sync.sync_mode = sync;
+    attr.enable = !attr.enable;
+    attr.window[0][0]= 0;
+    attr.window[0][1]= 0;
+    attr.window[0][2]= 0.25;
+    attr.window[0][3]= 0;
+    //set
+    rk_aiq_user_api2_awbV32_SetMultiWindowAttrib(ctx, attr);
+    printf("set Awb MultiWindow\n\n");
+
+    return 0;
+}
+
+static int sample_awb_getWbV32AwbMultiWindow(const rk_aiq_sys_ctx_t* ctx)
+{
+    rk_aiq_uapiV2_wbV32_awb_mulWindow_t attr;
+    memset(&attr,0,sizeof(rk_aiq_uapiV2_wbV32_awb_mulWindow_t));
+    //get
+    rk_aiq_user_api2_awbV32_GetMultiWindowAttrib(ctx, &attr);
+    printf("get Awb MultiWindow:\n\n");
+    printf("\t sync = %d, done = %d\n", attr.sync.sync_mode, attr.sync.done);
+    printf("\t enable = %s\n\n", (attr.enable ? "true" : "false"));
     return 0;
 }
 
 
+static int sample_awb_awbv32_setAllAttr(const rk_aiq_sys_ctx_t* ctx, rk_aiq_uapi_mode_sync_e sync)
+{
+    rk_aiq_uapiV2_wbV32_attrib_t attr;
+    memset(&attr,0,sizeof(rk_aiq_uapiV2_wbV32_attrib_t));
+    //get
+    rk_aiq_user_api2_awbV32_GetAllAttrib(ctx, &attr);
+    //modify
+    attr.sync.sync_mode = sync;
+    attr.stAuto.wbGainOffset.enable = !attr.stAuto.wbGainOffset.enable;
+    //set
+    rk_aiq_user_api2_awbV32_SetAllAttrib(ctx, attr);
+    printf("set Awbv32 AllAttr\n\n");
+    return 0;
+}
+
+static int sample_awb_awbv32_getAllAttr(const rk_aiq_sys_ctx_t* ctx)
+{
+    rk_aiq_uapiV2_wbV32_attrib_t attr ;
+    memset(&attr,0,sizeof(rk_aiq_uapiV2_wbV32_attrib_t));
+    //get
+    rk_aiq_user_api2_awbV32_GetAllAttrib(ctx, &attr);
+    printf("get Awbv32 AllAttr:\n");
+    printf("\t sync = %d, done = %d\n", attr.sync.sync_mode, attr.sync.done);
+    printf("\t bypass = %d\n", attr.byPass);
+    printf("\t mode = %s\n", (attr.mode > 0 ? "auto" : "manual"));
+    if (attr.mode > 0) {
+        printf("\t wbGainOffset = {%s,[%f,%f,%f,%f]}\n\n",
+                            (attr.stAuto.wbGainOffset.enable > 0 ? "true" : "false"),
+                            attr.stAuto.wbGainOffset.offset[0],
+                            attr.stAuto.wbGainOffset.offset[1],
+                            attr.stAuto.wbGainOffset.offset[2],
+                            attr.stAuto.wbGainOffset.offset[3]);
+    } else {
+        switch (attr.stManual.mode)
+        {
+            case RK_AIQ_MWB_MODE_CCT:
+                printf("\t manual mode = RK_AIQ_MWB_MODE_CCT\n");
+                printf("\t manual cct = %f, ccri = %f\n",
+                                attr.stManual.para.cct.CCT,
+                                attr.stManual.para.cct.CCRI);
+                break;
+            case RK_AIQ_MWB_MODE_WBGAIN:
+                printf("\t manual mode = RK_AIQ_MWB_MODE_WBGAIN\n");
+                printf("\t manual wbgain = [%f, %f, %f, %f]\n",
+                                attr.stManual.para.gain.rgain,
+                                attr.stManual.para.gain.grgain,
+                                attr.stManual.para.gain.gbgain,
+                                attr.stManual.para.gain.bgain);
+                break;
+            case RK_AIQ_MWB_MODE_SCENE:
+                printf("\t manual mode = RK_AIQ_MWB_MODE_SCENE\n");
+                printf("\t manual scene = %d\n",
+                                attr.stManual.para.scene);
+                break;
+            default:
+                printf("\t manual mode is invalid!\n");
+                break;
+        }
+    }
+    return 0;
+}
+
+static int sample_awb_WriteAwbIn(const rk_aiq_sys_ctx_t* ctx, rk_aiq_uapi_mode_sync_e sync)
+{
+    static int call_cnt =0;
+    rk_aiq_uapiV2_awb_wrtIn_attr_t attr;
+    memset(&attr,0,sizeof(rk_aiq_uapiV2_awb_wrtIn_attr_t));
+    attr.en = true;
+    attr.mode = 1; // 1 means rgb ,0 means raw
+    attr.call_cnt = call_cnt++;
+    sprintf(attr.path,"/tmp");
+    rk_aiq_user_api2_awb_WriteAwbIn(ctx, attr);
+    printf("Write awb input \n\n");
+
+    return 0;
+}
+static int sample_awb_setFFWbgain(const rk_aiq_sys_ctx_t* ctx, rk_aiq_uapi_mode_sync_e sync)
+{
+    rk_aiq_uapiV2_awb_ffwbgain_attr_t attr;
+    memset(&attr,0,sizeof(rk_aiq_uapiV2_awb_ffwbgain_attr_t));
+    attr.wggain={1.0,1.0,1.0,1.0};
+    rk_aiq_user_api2_awb_SetFFWbgainAttrib(ctx, attr);
+    printf("setFFWbgain \n\n");
+
+    return 0;
+}
+
+//#if rk356x || rk3588
+static void sample_awb1_usage()
+{
+    printf("Usage : \n");
+    printf("  ImgProc API: \n");
+    printf("\t 0) AWB: setWBMode-OP_MANUAL.\n");
+    printf("\t 1) AWB: setWBMode-OP_AUTO.\n");
+    printf("\t 2) AWB: getWBMode.\n");
+    printf("\t 3) AWB: lockAWB.\n");
+    printf("\t 4) AWB: unlockAWB.\n");
+    printf("\t 5) AWB: setMWBScene.\n");
+    printf("\t 6) AWB: getMWBScene.\n");
+    printf("\t 7) AWB: setMWBGain.\n");
+    printf("\t 8) AWB: getWBGain.\n");
+    printf("\t 9) AWB: setMWBCT.\n");
+    printf("\t a) AWB: getWBCT.\n");
+    printf("\t b) AWB: setWbGainOffset.\n");
+    printf("\t c) AWB: getWbGainOffset.\n");
+    printf("\t d) AWB: setAwbGainAdjust.\n");
+    printf("\t e) AWB: getAwbGainAdjust.\n");
+    printf("\t f) AWB: setAllAttrib.\n");
+    printf("\n");
+    printf("  Module API: \n");
+    printf("\t A) AWB: set Awbv21 AllAttr & Sync.\n");
+    printf("\t B) AWB: set Awbv21 AllAttr & Async.\n");
+    printf("\t C) AWB: set Awbv30 AllAttr & Sync.\n");
+    printf("\t D) AWB: set Awbv30 AllAttr & Async.\n");
+    printf("\t E) AWB: get CCT.\n");
+    printf("\t F) AWB: Query Awb Info.\n");
+    printf("\t G) AWB: Lock.\n");
+    printf("\t I) AWB: Unlock.\n");
+    printf("\t J) AWB: set Mode Manual & Sync.\n");
+    printf("\t K) AWB: set Mode Manual & Async.\n");
+    printf("\t L) AWB: set Mode Auto & Sync.\n");
+    printf("\t M) AWB: set Mode Auto & Async.\n");
+    printf("\t N) AWB: set Manual attr & Sync.\n");
+    printf("\t O) AWB: set Manual attr & Async.\n");
+    printf("\t P) AWB: set AwbGainAdjust & Sync.\n");
+    printf("\t R) AWB: set AwbGainAdjust & Async.\n");
+    printf("\t S) AWB: set WbGainOffset & Sync.\n");
+    printf("\t T) AWB: set WbGainOffset & Async.\n");
+    printf("\n");
+    printf("\t h) AWB: help.\n");
+    printf("\t q) AWB: return to main sample screen.\n");
+
+}
+
+//for rk356x ,rk3588
 XCamReturn sample_awb_module(const void *arg)
 {
     int key = -1;
@@ -852,7 +985,7 @@ XCamReturn sample_awb_module(const void *arg)
     }
     unsigned int cct;
 
-    sample_awb_usage ();
+    sample_awb1_usage ();
     do {
         printf("\t please press the key: ");
         key = getchar ();
@@ -864,7 +997,7 @@ XCamReturn sample_awb_module(const void *arg)
         {
             case 'h':
                 CLEAR();
-                sample_awb_usage ();
+                sample_awb1_usage ();
                 break;
             case '0':
                 sample_set_wbmode_manual(ctx);
@@ -1032,6 +1165,245 @@ XCamReturn sample_awb_module(const void *arg)
                 break;
         }
     } while (key != 'q' && key != 'Q');
+    return XCAM_RETURN_NO_ERROR;
 
+}
+//#elseif rv1106
+static void sample_awb32_usage()
+{
+    printf("Usage : \n");
+    printf("  ImgProc API: \n");
+    printf("\t 0) AWB: setWBMode-OP_MANUAL.\n");
+    printf("\t 1) AWB: setWBMode-OP_AUTO.\n");
+    printf("\t 2) AWB: getWBMode.\n");
+    printf("\t 3) AWB: lockAWB.\n");
+    printf("\t 4) AWB: unlockAWB.\n");
+    printf("\t 5) AWB: setMWBScene.\n");
+    printf("\t 6) AWB: getMWBScene.\n");
+    printf("\t 7) AWB: setMWBGain.\n");
+    printf("\t 8) AWB: getWBGain.\n");
+    printf("\t 9) AWB: setMWBCT.\n");
+    printf("\t a) AWB: getWBCT.\n");
+    printf("\t b) AWB: setWbGainOffset.\n");
+    printf("\t c) AWB: getWbGainOffset.\n");
+    printf("\t d) AWB: setAwbGainAdjust.\n");
+    printf("\t e) AWB: getAwbGainAdjust.\n");
+    printf("\t f) AWB: setAllAttrib.\n");
+    printf("\n");
+    printf("  Module API: \n");
+    printf("\t A) AWB: set Awbv32 AllAttr & Sync.\n");
+    printf("\t B) AWB: set Awbv32 AllAttr & Async.\n");
+    printf("\t E) AWB: get CCT.\n");
+    printf("\t F) AWB: Query Awb Info.\n");
+    printf("\t G) AWB: Lock.\n");
+    printf("\t I) AWB: Unlock.\n");
+    printf("\t J) AWB: set Mode Manual & Sync.\n");
+    printf("\t K) AWB: set Mode Manual & Async.\n");
+    printf("\t L) AWB: set Mode Auto & Sync.\n");
+    printf("\t M) AWB: set Mode Auto & Async.\n");
+    printf("\t N) AWB: set Manual attr & Sync.\n");
+    printf("\t O) AWB: set Manual attr & Async.\n");
+    printf("\t P) AWB: set AwbGainAdjust & Sync.\n");
+    printf("\t R) AWB: set AwbGainAdjust & Async.\n");
+    printf("\t S) AWB: set WbGainOffset & Sync.\n");
+    printf("\t T) AWB: set WbGainOffset & Async.\n");
+    printf("\t U) AWB: set MultiWindow & Sync.\n");
+    printf("\t V) AWB: set MultiWindow & Async.\n");
+    printf("\n");
+    printf("\t h) AWB: help.\n");
+    printf("\t q) AWB: return to main sample screen.\n");
+
+}
+//for rv1106
+XCamReturn sample_awb32_module(const void *arg)
+{
+    int key = -1;
+    CLEAR();
+    rk_aiq_wb_scene_t scene;
+    rk_aiq_wb_gain_t gain;
+    rk_aiq_wb_cct_t ct;
+    opMode_t mode;
+    const demo_context_t *demo_ctx = (demo_context_t *)arg;
+    const rk_aiq_sys_ctx_t* ctx;
+    if (demo_ctx->camGroup){
+        ctx = (rk_aiq_sys_ctx_t*)(demo_ctx->camgroup_ctx);
+    } else {
+        ctx = (rk_aiq_sys_ctx_t*)(demo_ctx->aiq_ctx);
+    }
+    if (ctx == nullptr) {
+        ERR ("%s, ctx is nullptr\n", __FUNCTION__);
+        return XCAM_RETURN_ERROR_PARAM;
+    }
+    unsigned int cct;
+
+    sample_awb32_usage ();
+    do {
+        printf("\t please press the key: ");
+        key = getchar ();
+        while (key == '\n' || key == '\r')
+            key = getchar();
+        printf ("\n");
+
+        switch (key)
+        {
+            case 'h':
+                CLEAR();
+                sample_awb32_usage ();
+                break;
+            case '0':
+                sample_set_wbmode_manual(ctx);
+                printf("setWBMode manual\n\n");
+                break;
+            case '1':
+                sample_set_wbmode_auto(ctx);
+                printf("setWBMode auto\n\n");
+                break;
+            case '2':
+                sample_get_wbmode(ctx);
+                break;
+            case '3':
+                sample_lock_awb(ctx);
+                printf("lockAWB\n\n");
+                break;
+            case '4':
+                sample_unlock_awb(ctx);
+                printf("unlockAWB\n\n");
+                break;
+            case '5':
+                sample_set_mwb_scene(ctx);
+                printf("setMWBScene\n\n");
+                break;
+            case '6':
+                sample_get_mwb_scene(ctx);
+                break;
+            case '7':
+                sample_set_mwb_gain(ctx);
+                printf("setMWBGain\n\n");
+                break;
+            case '8':
+                sample_get_mwb_gain(ctx);
+                break;
+            case '9':
+                sample_set_mwb_ct(ctx);
+                break;
+            case 'a':
+                sample_get_mwb_ct(ctx);
+                break;
+            case 'b':
+                sample_set_awb_gainoffset(ctx);
+                printf("setAWBGainOffset\n\n");
+                break;
+            case 'c':
+                sample_get_awb_gainoffset(ctx);
+                break;
+            case 'd':
+                sample_set_awb_gain_adjust(ctx);
+                break;
+            case 'e':
+                sample_get_awb_gain_adjust(ctx);
+                break;
+            case 'A':
+                sample_awb_awbv32_setAllAttr(ctx, RK_AIQ_UAPI_MODE_DEFAULT);
+                sample_awb_awbv32_getAllAttr(ctx);
+                break;
+            case 'B':
+                sample_awb_awbv32_setAllAttr(ctx, RK_AIQ_UAPI_MODE_ASYNC);
+                sample_awb_awbv32_getAllAttr(ctx);
+                usleep(40 * 1000);
+                sample_awb_awbv32_getAllAttr(ctx);
+                break;
+            case 'E':
+                sample_awb_getCct(ctx);
+                break;
+            case 'F':
+                sample_query_wb_info(ctx);
+                break;
+            case 'G':
+                sample_awb_lock(ctx);
+                break;
+            case 'I':
+                sample_awb_unlock(ctx);
+                break;
+            case 'J':
+                sample_awb_setModeManual(ctx, RK_AIQ_UAPI_MODE_DEFAULT);
+                sample_awb_getMode(ctx);
+                break;
+            case 'K':
+                sample_awb_setModeManual(ctx, RK_AIQ_UAPI_MODE_ASYNC);
+                sample_awb_getMode(ctx);
+                usleep(40 * 1000);
+                sample_awb_getMode(ctx);
+                break;
+            case 'L':
+                sample_awb_setModeAuto(ctx, RK_AIQ_UAPI_MODE_DEFAULT);
+                sample_awb_getMode(ctx);
+                break;
+            case 'M':
+                sample_awb_setModeAuto(ctx, RK_AIQ_UAPI_MODE_ASYNC);
+                sample_awb_getMode(ctx);
+                usleep(40 * 1000);
+                sample_awb_getMode(ctx);
+                break;
+            case 'N':
+                sample_awb_setMwb(ctx, RK_AIQ_UAPI_MODE_DEFAULT);
+                sample_awb_getMwbAttr(ctx);
+                break;
+            case 'O':
+                sample_awb_setMwb(ctx, RK_AIQ_UAPI_MODE_ASYNC);
+                sample_awb_getMwbAttr(ctx);
+                usleep(40 * 1000);
+                sample_awb_getMwbAttr(ctx);
+                break;
+            case 'P':
+                sample_awb_setWbGainAdjust(ctx, RK_AIQ_UAPI_MODE_DEFAULT);
+                sample_awb_getWbGainAdjust(ctx);
+                break;
+            case 'R':
+                sample_awb_setWbGainAdjust(ctx, RK_AIQ_UAPI_MODE_ASYNC);
+                sample_awb_getWbGainAdjust(ctx);
+                usleep(40 * 1000);
+                sample_awb_getWbGainAdjust(ctx);
+                break;
+            case 'S':
+                sample_awb_setWbGainOffset(ctx, RK_AIQ_UAPI_MODE_DEFAULT);
+                sample_awb_getWbGainOffset(ctx);
+                break;
+            case 'T':
+                sample_awb_setWbGainOffset(ctx, RK_AIQ_UAPI_MODE_ASYNC);
+                sample_awb_getWbGainOffset(ctx);
+                usleep(40 * 1000);
+                sample_awb_getWbGainOffset(ctx);
+                break;
+            case 'U':
+                sample_awb_setWbV32AwbMultiWindow(ctx, RK_AIQ_UAPI_MODE_DEFAULT);
+                sample_awb_getWbV32AwbMultiWindow(ctx);
+                break;
+            case 'V':
+                sample_awb_setWbV32AwbMultiWindow(ctx, RK_AIQ_UAPI_MODE_ASYNC);
+                sample_awb_getWbV32AwbMultiWindow(ctx);
+                usleep(40 * 1000);
+                sample_awb_getWbV32AwbMultiWindow(ctx);
+                break;
+            case 'X':
+                sample_awb_setMwb1(ctx, RK_AIQ_UAPI_MODE_ASYNC);
+                sample_awb_getMwbAttr(ctx);
+                sample_awb_setMwb2(ctx, RK_AIQ_UAPI_MODE_ASYNC);
+                sample_awb_getMwbAttr(ctx);
+                usleep(40 * 1000);
+                sample_awb_getMwbAttr(ctx);
+                break;
+            case 'Y':
+                sample_awb_WriteAwbIn(ctx, RK_AIQ_UAPI_MODE_ASYNC);
+                break;
+            case 'Z':
+                sample_awb_setFFWbgain(ctx, RK_AIQ_UAPI_MODE_DEFAULT);
+                break;
+            default:
+                break;
+        }
+    } while (key != 'q' && key != 'Q');
     return XCAM_RETURN_NO_ERROR;
 }
+//#endif
+
+

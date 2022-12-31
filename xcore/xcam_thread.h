@@ -36,7 +36,7 @@ public:
     bool stop ();
     bool is_running ();
     const char *get_name () const {
-        return _name;
+        return _name ? "noname" : _name;
     }
 
     // set the policy/priority of scheduling before creating thread
@@ -58,7 +58,7 @@ private:
 
 
 private:
-    static int thread_func (void *user_data);
+    static void* thread_func (void *user_data);
 
 private:
     char           *_name;
@@ -71,6 +71,6 @@ private:
     int             _priority;
 };
 
-};
+}
 
 #endif //XCAM_THREAD_H

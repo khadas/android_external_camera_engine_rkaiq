@@ -18,7 +18,6 @@ LOCAL_SRC_FILES :=\
 	demo/rkisp_demo.cpp \
 	demo/rkRgaApi.cpp \
     demo/ae_algo_demo/third_party_ae_algo.cpp \
-    demo/awb_algo_demo/third_party_awb_algo.cpp \
     demo/af_algo_demo/third_party_af_algo.cpp \
 
 #TODO: have compile issue on Android now
@@ -26,11 +25,20 @@ LOCAL_SRC_FILES :=\
 	#demo/rkdrm_display.c \
 	#demo/display.c
 
+ifneq ($(filter rk356x rk3588, $(strip $(TARGET_BOARD_PLATFORM))), )
+LOCAL_SRC_FILES += demo/awb_algo_demo/third_party_awb_algo.cpp
+endif
+ifneq ($(filter rv1106, $(strip $(TARGET_BOARD_PLATFORM))), )
+LOCAL_SRC_FILES += demo/awb_algo_demo/third_party_awbV32_algo.cpp
+endif
+
 LOCAL_CPPFLAGS += -std=c++11 -Wno-error -DAndroid
 #LOCAL_CPPFLAGS += -std=c++11 -Wno-error
 LOCAL_CFLAGS += -Wno-error -Wno-return-type
 #LOCAL_CPPFLAGS += -DLINUX
 #LOCAL_CPPFLAGS += $(PRJ_CPPFLAGS)
+LOCAL_CFLAGS += -DANDROID_OS
+LOCAL_CFLAGS += -DISPDEMO_ENABLE_RGA=1
 LOCAL_C_INCLUDES := \
 	$(LOCAL_PATH)/demo/ \
 	$(LOCAL_PATH)/demo/include \
@@ -44,6 +52,11 @@ LOCAL_C_INCLUDES := \
 	$(LOCAL_PATH)/../../include/algos \
 	$(LOCAL_PATH)/../../include/common \
 	$(LOCAL_PATH)/../../include/iq_parser \
+	$(LOCAL_PATH)/deps \
+	$(LOCAL_PATH)/deps/include \
+	$(LOCAL_PATH)/deps/include/rga \
+	$(LOCAL_PATH)/deps/include/libdrm \
+	$(LOCAL_PATH)/deps/include/libkms \
 LOCAL_C_INCLUDES += \
 	system/media/camera/include \
 	frameworks/av/include \

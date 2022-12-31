@@ -18,6 +18,7 @@
 #include "abayer2dnr2/rk_aiq_uapi_camgroup_abayer2dnr_int_v2.h"
 
 namespace RkCam {
+#if RKAIQ_HAVE_BAYER2DNR_V2
 
 XCamReturn RkAiqCamGroupAbayer2dnrV2HandleInt::updateConfig(bool needSync) {
     ENTER_ANALYZER_FUNCTION();
@@ -173,4 +174,5 @@ XCamReturn RkAiqCamGroupAbayer2dnrV2HandleInt::getInfo(rk_aiq_bayer2dnr_info_v2_
 
 #endif
 
-};  // namespace RkCam
+#endif
+}  // namespace RkCam

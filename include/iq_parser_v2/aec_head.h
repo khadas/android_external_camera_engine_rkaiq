@@ -46,14 +46,14 @@ typedef enum _CalibDb_HdrAeRatioTypeV2_e {
 } CalibDb_HdrAeRatioTypeV2_t;
 
 typedef enum _CalibDb_AeStrategyModeV2_e {
-    AECV2_STRATEGY_MODE_LOWLIGHT_PRIOR,
-    AECV2_STRATEGY_MODE_HIGHLIGHT_PRIOR,
+    AECV2_STRATEGY_MODE_LOWLIGHT,
+    AECV2_STRATEGY_MODE_HIGHLIGHT,
 } CalibDb_AeStrategyModeV2_t;
 
 typedef enum _CalibDb_AeHdrLongFrmModeV2_e {
-    AECV2_HDR_LONGFRMMODE_NORMAL             = 0,
-    AECV2_HDR_LONGFRMMODE_AUTO_LONG_FRAME    = 1,
-    AECV2_HDR_LONGFRMMODE_LONG_FRAME         = 2,
+    AECV2_HDR_LONGFRMMODE_DISABLE             = 0,
+    AECV2_HDR_LONGFRMMODE_AUTO                = 1,
+    AECV2_HDR_LONGFRMMODE_ENABLE              = 2,
 } CalibDb_AeHdrLongFrmModeV2_t;
 
 typedef enum _CalibDb_AecMeasAreaModeV2_e {
@@ -80,6 +80,11 @@ typedef enum _CalibDb_IrisTypeV2_e {
     IRISV2_DC_TYPE = 0,
     IRISV2_P_TYPE = 1,
 } CalibDb_IrisTypeV2_t;
+
+typedef enum _CalibDb_DelayTypeV2_e {
+    DELAY_TYPE_FRAME = 0,
+    DELAY_TYPE_TIME = 1,
+} CalibDb_DelayTypeV2_t;
 
 typedef enum _CalibDb_CamYRangeModeV2_e {
     CAM_YRANGEV2_MODE_INVALID    = 0,    /**< invalid y range mode   */
@@ -113,18 +118,37 @@ typedef enum _CalibDb_CamHistStatsModeV2_e {
  */
 /*****************************************************************************/
 typedef struct CalibDb_AeDelayFrmNumV2_s {
+    // M4_ENUM_DESC("DelayType", "CalibDb_DelayTypeV2_t","DELAY_TYPE_FRAME")
+    CalibDb_DelayTypeV2_t   DelayType;
+
     // M4_NUMBER_DESC("BlackDelay", "u8", M4_RANGE(0,255), "0", M4_DIGIT(0),M4_HIDE(0))
     uint8_t                 BlackDelay;
 
     // M4_NUMBER_DESC("WhiteDelay", "u8", M4_RANGE(0,255), "0", M4_DIGIT(0),M4_HIDE(0))
     uint8_t                 WhiteDelay;
+
 } CalibDb_AeDelayFrmNumV2_t;
+
+typedef struct CalibDb_AeDyDamp_s {
+    // M4_BOOL_DESC("DyDampEn", "1")
+    bool                    DyDampEn;
+
+    // M4_ENUM_DESC("SlowOPType", "RKAiqOPMode_t","RK_AIQ_OP_MODE_AUTO")
+    RKAiqOPMode_t           SlowOPType;
+
+    // M4_NUMBER_DESC("SlowRange", "f32", M4_RANGE(0,100), "15", M4_DIGIT(2),M4_HIDE(0))
+    float                   SlowRange;
+
+    // M4_NUMBER_DESC("SlowDamp", "f32", M4_RANGE(0,1), "0.95", M4_DIGIT(2),M4_HIDE(0))
+    float                   SlowDamp;
+
+} CalibDb_AeDyDamp_t;
+
 
 typedef struct CalibDb_AeSpeedV2_s {
     // M4_BOOL_DESC("SmoothEn", "1")
     bool                    SmoothEn;
-    // M4_BOOL_DESC("DyDampEn", "1")
-    bool                    DyDampEn;
+
     // M4_NUMBER_DESC("DampOver", "f32", M4_RANGE(0,1.00), "0.15", M4_DIGIT(2),M4_HIDE(0))
     float                   DampOver;
 
@@ -136,14 +160,18 @@ typedef struct CalibDb_AeSpeedV2_s {
 
     // M4_NUMBER_DESC("DampBright2Dark", "f32", M4_RANGE(0,1.00), "0.45", M4_DIGIT(2),M4_HIDE(0))
     float                   DampBright2Dark;
+
+    // M4_STRUCT_DESC("DyDamp", "normal_ui_style")
+    CalibDb_AeDyDamp_t      DyDamp;
 } CalibDb_AeSpeedV2_t;
 
 typedef struct CalibDb_AeFrmRateAttrV2_s {
     // M4_BOOL_DESC("isFpsFix", "1")
     bool                    isFpsFix;
 
-    // M4_NUMBER_DESC("FpsValue", "f32", M4_RANGE(0,200), "0", M4_DIGIT(1),M4_HIDE(0))
+    // M4_NUMBER_DESC("FpsValue", "f32", M4_RANGE(0,1024), "0", M4_DIGIT(1),M4_HIDE(0))
     float                   FpsValue;
+
 } CalibDb_AeFrmRateAttrV2_t;
 
 typedef struct CalibDb_AntiFlickerAttrV2_s {
@@ -234,6 +262,9 @@ typedef struct CalibDb_Aec_WinScaleV2_t {
 } CalibDb_Aec_WinScaleV2_t;
 
 typedef struct CalibDb_AeEnvLvCalibV2_s {
+    // M4_BOOL_DESC("Enable", "0")
+    bool         Enable;
+
     // M4_NUMBER_DESC("CalibFNumber", "f32", M4_RANGE(0,256), "1.6", M4_DIGIT(2),M4_HIDE(0))
     float        CalibFNumber;
 
@@ -269,8 +300,8 @@ typedef struct CalibDb_AecCommon_AttrV2_s {
     // M4_STRUCT_DESC("AecSpeed", "normal_ui_style")
     CalibDb_AeSpeedV2_t               AecSpeed;
 
-    // M4_STRUCT_DESC("AecDelayFrmNum", "normal_ui_style")
-    CalibDb_AeDelayFrmNumV2_t         AecDelayFrmNum;
+    // M4_STRUCT_DESC("AecDelay", "normal_ui_style")
+    CalibDb_AeDelayFrmNumV2_t         AecDelay;
 
     // M4_STRUCT_DESC("AecFrameRateMode", "normal_ui_style")
     CalibDb_AeFrmRateAttrV2_t         AecFrameRateMode;
@@ -362,10 +393,10 @@ typedef struct CalibDb_AecBacklightV2_s {
     // M4_NUMBER_DESC("LumaDistTh", "f32", M4_RANGE(0,100), "10", M4_DIGIT(2),M4_HIDE(0))
     float                       LumaDistTh;//uint: %
 
-    // M4_NUMBER_DESC("LvLowTh", "f32", M4_RANGE(0,100), "7.5", M4_DIGIT(4),M4_HIDE(0))
+    // M4_NUMBER_DESC("LvLowTh", "f32", M4_RANGE(0,100), "0.3125", M4_DIGIT(4),M4_HIDE(0))
     float                       LvLowTh;
 
-    // M4_NUMBER_DESC("LvHighTh", "f32", M4_RANGE(0,100), "0.3125", M4_DIGIT(4),M4_HIDE(0))
+    // M4_NUMBER_DESC("LvHighTh", "f32", M4_RANGE(0,100), "7.5", M4_DIGIT(4),M4_HIDE(0))
     float                       LvHighTh;
 
     // M4_ARRAY_TABLE_DESC("BacklitSetPoint", "array_table_ui", M4_INDEX_DEFAULT)
@@ -417,7 +448,7 @@ typedef struct CalibDb_LinearAE_AttrV2_s {
     // M4_NUMBER_DESC("Evbias", "f32", M4_RANGE(-500,500), "0", M4_DIGIT(2),M4_HIDE(1))
     float                           Evbias; //uint: %
 
-    // M4_ENUM_DESC("StrategyMode", "CalibDb_AeStrategyModeV2_t","AECV2_STRATEGY_MODE_LOWLIGHT_PRIOR")
+    // M4_ENUM_DESC("StrategyMode", "CalibDb_AeStrategyModeV2_t","AECV2_STRATEGY_MODE_LOWLIGHT")
     CalibDb_AeStrategyModeV2_t      StrategyMode;
 
     // M4_STRUCT_DESC("InitExp", "normal_ui_style")
@@ -541,10 +572,10 @@ typedef struct CalibDb_LfrmCtrlV2_s
     // M4_NUMBER_DESC("OEROILowTh", "f32", M4_RANGE(0,255), "150", M4_DIGIT(2),M4_HIDE(0))
     float                       OEROILowTh;
 
-    // M4_NUMBER_DESC("LvLowTh", "f32", M4_RANGE(0,100), "7.5", M4_DIGIT(4),M4_HIDE(0))
+    // M4_NUMBER_DESC("LvLowTh", "f32", M4_RANGE(0,100), "0.3125", M4_DIGIT(4),M4_HIDE(0))
     float                       LvLowTh;
 
-    // M4_NUMBER_DESC("LvHighTh", "f32", M4_RANGE(0,100), "0.3125", M4_DIGIT(4),M4_HIDE(0))
+    // M4_NUMBER_DESC("LvHighTh", "f32", M4_RANGE(0,100), "7.5", M4_DIGIT(4),M4_HIDE(0))
     float                       LvHighTh;
 
     // M4_ARRAY_TABLE_DESC("LfrmSetPoint", "array_table_ui", M4_INDEX_DEFAULT)
@@ -587,7 +618,7 @@ typedef struct CalibDb_SfrmCtrlV2_s
 } CalibDb_SfrmCtrlV2_t;
 
 typedef struct CalibDb_LongFrmCtrlV2_s {
-    // M4_ENUM_DESC("mode", "CalibDb_AeHdrLongFrmModeV2_t","AECV2_HDR_LONGFRMMODE_NORMAL")
+    // M4_ENUM_DESC("mode", "CalibDb_AeHdrLongFrmModeV2_t","AECV2_HDR_LONGFRMMODE_DISABLE")
     CalibDb_AeHdrLongFrmModeV2_t    mode;
 
     // M4_NUMBER_DESC("SfrmMinLine", "u16", M4_RANGE(0,1024), "2", M4_DIGIT(0),M4_HIDE(0))
@@ -607,7 +638,7 @@ typedef struct CalibDb_HdrAE_AttrV2_s {
     // M4_NUMBER_DESC("Evbias", "f32", M4_RANGE(-500,500), "0", M4_DIGIT(0),M4_HIDE(1))
     float                           Evbias;
 
-    // M4_ENUM_DESC("StrategyMode", "CalibDb_AeStrategyModeV2_t","AECV2_STRATEGY_MODE_LOWLIGHT_PRIOR")
+    // M4_ENUM_DESC("StrategyMode", "CalibDb_AeStrategyModeV2_t","AECV2_STRATEGY_MODE_LOWLIGHT")
     CalibDb_AeStrategyModeV2_t      StrategyMode;
 
     // M4_NUMBER_DESC("LumaDistTh", "f32", M4_RANGE(0,100), "10", M4_DIGIT(2),M4_HIDE(0))

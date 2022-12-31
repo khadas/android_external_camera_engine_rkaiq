@@ -74,6 +74,7 @@ XCamReturn
 RkAiqResourceTranslator::translateAecStats (const SmartPtr<VideoBuffer> &from, SmartPtr<RkAiqAecStatsProxy> &to)
 {
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
+#if defined(ISP_HW_V20) || defined(ISP_HW_V21)
     const SmartPtr<Isp20StatsBuffer> buf =
         from.dynamic_cast_ptr<Isp20StatsBuffer>();
 #if defined(ISP_HW_V21)
@@ -82,6 +83,10 @@ RkAiqResourceTranslator::translateAecStats (const SmartPtr<VideoBuffer> &from, S
     struct rkisp_isp2x_stat_buffer *stats;
 #endif
     SmartPtr<RkAiqAecStats> statsInt = to->data();
+
+    if (getWorkingMode() == RK_AIQ_WORKING_MODE_ISP_HDR2) {
+        // Do something;
+    }
 
 #if defined(ISP_HW_V21)
     stats = (struct rkisp_isp21_stat_buffer *)(buf->get_v4l2_userptr());
@@ -93,12 +98,13 @@ RkAiqResourceTranslator::translateAecStats (const SmartPtr<VideoBuffer> &from, S
         return XCAM_RETURN_BYPASS;
     }
 
-    LOGD_ANALYZER("stats frame_id(%d), meas_type; 0x%x, buf sequence(%d)",
-                  stats->frame_id, stats->meas_type, buf->get_sequence());
+    LOGD_ANALYZER("stats frame_id(%u), meas_type; 0x%x, buf sequence(%d)", stats->frame_id,
+                  stats->meas_type, buf->get_sequence());
 
     SmartPtr<RkAiqIrisParamsProxy> irisParams = buf->get_iris_params();
     SmartPtr<RkAiqExpParamsProxy> expParams = nullptr;
-    rkisp_effect_params_v20 ispParams = {0};
+    rkisp_effect_params_v20 ispParams;
+    memset(&ispParams, 0, sizeof(ispParams));
     if (buf->getEffectiveExpParams(stats->frame_id, expParams) < 0)
         LOGE("fail to get expParams");
     if (buf->getEffectiveIspParams(stats->frame_id, ispParams) < 0) {
@@ -336,7 +342,7 @@ RkAiqResourceTranslator::translateAecStats (const SmartPtr<VideoBuffer> &from, S
     }
 
     to->set_sequence(stats->frame_id);
-
+#endif
     return ret;
 }
 
@@ -344,6 +350,7 @@ XCamReturn
 RkAiqResourceTranslator::translateAwbStats (const SmartPtr<VideoBuffer> &from, SmartPtr<RkAiqAwbStatsProxy> &to)
 {
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
+#if defined(ISP_HW_V20)
     const SmartPtr<Isp20StatsBuffer> buf =
         from.dynamic_cast_ptr<Isp20StatsBuffer>();
     struct rkisp_isp2x_stat_buffer *stats;
@@ -363,7 +370,8 @@ RkAiqResourceTranslator::translateAwbStats (const SmartPtr<VideoBuffer> &from, S
         return XCAM_RETURN_BYPASS;
     }
 
-    rkisp_effect_params_v20 ispParams = {0};
+    rkisp_effect_params_v20 ispParams;
+    memset(&ispParams, 0, sizeof(ispParams));
     if (buf->getEffectiveIspParams(stats->frame_id, ispParams) < 0) {
         LOGE("fail to get ispParams ,ignore\n");
         return XCAM_RETURN_BYPASS;
@@ -446,7 +454,7 @@ RkAiqResourceTranslator::translateAwbStats (const SmartPtr<VideoBuffer> &from, S
     statsInt->awb_stats_valid = stats->meas_type >> 5 & 1;
 
     to->set_sequence(stats->frame_id);
-
+#endif
     return ret;
 }
 
@@ -491,6 +499,7 @@ RkAiqResourceTranslator::translateAtmoStats (const SmartPtr<VideoBuffer> &from, 
     return ret;
 }
 
+#if RKAIQ_HAVE_DEHAZE_V10
 XCamReturn
 RkAiqResourceTranslator::translateAdehazeStats (const SmartPtr<VideoBuffer> &from, SmartPtr<RkAiqAdehazeStatsProxy> &to)
 {
@@ -513,20 +522,22 @@ RkAiqResourceTranslator::translateAdehazeStats (const SmartPtr<VideoBuffer> &fro
 
     //dehaze
     statsInt->adehaze_stats_valid = stats->meas_type >> 17 & 1;
-    statsInt->adehaze_stats.dehaze_stats_v20.dhaz_adp_air_base = stats->params.dhaz.dhaz_adp_air_base;
-    statsInt->adehaze_stats.dehaze_stats_v20.dhaz_adp_wt = stats->params.dhaz.dhaz_adp_wt;
-    statsInt->adehaze_stats.dehaze_stats_v20.dhaz_adp_gratio = stats->params.dhaz.dhaz_adp_gratio;
-    statsInt->adehaze_stats.dehaze_stats_v20.dhaz_adp_wt = stats->params.dhaz.dhaz_adp_wt;
+    statsInt->adehaze_stats.dehaze_stats_v10.dhaz_adp_air_base =
+        stats->params.dhaz.dhaz_adp_air_base;
+    statsInt->adehaze_stats.dehaze_stats_v10.dhaz_adp_wt     = stats->params.dhaz.dhaz_adp_wt;
+    statsInt->adehaze_stats.dehaze_stats_v10.dhaz_adp_gratio = stats->params.dhaz.dhaz_adp_gratio;
+    statsInt->adehaze_stats.dehaze_stats_v10.dhaz_adp_wt     = stats->params.dhaz.dhaz_adp_wt;
     for(int i = 0; i < 64; i++) {
-        statsInt->adehaze_stats.dehaze_stats_v20.h_b_iir[i] = stats->params.dhaz.h_b_iir[i];
-        statsInt->adehaze_stats.dehaze_stats_v20.h_g_iir[i] = stats->params.dhaz.h_g_iir[i];
-        statsInt->adehaze_stats.dehaze_stats_v20.h_r_iir[i] = stats->params.dhaz.h_r_iir[i];
+        statsInt->adehaze_stats.dehaze_stats_v10.h_b_iir[i] = stats->params.dhaz.h_b_iir[i];
+        statsInt->adehaze_stats.dehaze_stats_v10.h_g_iir[i] = stats->params.dhaz.h_g_iir[i];
+        statsInt->adehaze_stats.dehaze_stats_v10.h_r_iir[i] = stats->params.dhaz.h_r_iir[i];
     }
 
     to->set_sequence(stats->frame_id);
 
     return ret;
 }
+#endif
 
 XCamReturn
 RkAiqResourceTranslator::translateAfStats (const SmartPtr<VideoBuffer> &from, SmartPtr<RkAiqAfStatsProxy> &to)
@@ -604,6 +615,7 @@ RkAiqResourceTranslator::translateAfStats (const SmartPtr<VideoBuffer> &from, Sm
     return ret;
 }
 
+#if RKAIQ_HAVE_PDAF
 XCamReturn
 RkAiqResourceTranslator::translatePdafStats (const SmartPtr<VideoBuffer> &from, SmartPtr<RkAiqPdafStatsProxy> &to, bool sns_mirror)
 {
@@ -635,7 +647,7 @@ RkAiqResourceTranslator::translatePdafStats (const SmartPtr<VideoBuffer> &from, 
     {
         FILE* fp;
         char name[64];
-        int frame_id = buf->get_sequence() % 10;
+        uint32_t frame_id = buf->get_sequence() % 10;
 
         ALOGD("@%s: pdWidthxpdHeight: %dx%d !\n", __FUNCTION__, pdaf->pdWidth, pdaf->pdHeight);
         memset(name, 0, sizeof(name));
@@ -732,6 +744,7 @@ RkAiqResourceTranslator::translatePdafStats (const SmartPtr<VideoBuffer> &from, 
 
     return ret;
 }
+#endif
 
 XCamReturn
 RkAiqResourceTranslator::translateOrbStats (const SmartPtr<VideoBuffer> &from,
@@ -754,6 +767,43 @@ RkAiqResourceTranslator::translateOrbStats (const SmartPtr<VideoBuffer> &from,
     to->set_sequence(stats->frame_id);
 
     return ret;
+}
+
+XCamReturn
+RkAiqResourceTranslator::getParams(const SmartPtr<VideoBuffer>& from)
+{
+    const SmartPtr<Isp20StatsBuffer> buf = from.dynamic_cast_ptr<Isp20StatsBuffer>();
+#ifdef ISP_HW_V32
+    auto stats = (struct rkisp32_isp_stat_buffer*)(buf->get_v4l2_userptr());
+#elif defined(ISP_HW_V30)
+    auto stats = (struct rkisp3x_isp_stat_buffer*)(buf->get_v4l2_userptr());
+#elif defined(ISP_HW_V21)
+    auto stats = (struct rkisp_isp21_stat_buffer*)(buf->get_v4l2_userptr());
+#elif defined(ISP_HW_V20)
+    auto stats = (struct rkisp_isp2x_stat_buffer*)(buf->get_v4l2_userptr());
+#endif
+
+    //TODO: check if needed
+    //memset(&ispParams, 0, sizeof(_expParams));
+
+    if (buf->getEffectiveExpParams(stats->frame_id, _expParams) < 0)
+        LOGE("fail to get expParams");
+#ifdef ISP_HW_V20
+    if (buf->getEffectiveIspParams(stats->frame_id, _ispParams) < 0) {
+#else
+    if (buf->getEffectiveIspParams(stats->params_id, _ispParams) < 0) {
+#endif
+        LOGE("fail to get ispParams ,ignore\n");
+        return XCAM_RETURN_BYPASS;
+    }
+
+    return XCAM_RETURN_NO_ERROR;
+}
+
+void
+RkAiqResourceTranslator::releaseParams()
+{
+    _expParams.release();
 }
 
 } //namespace RkCam

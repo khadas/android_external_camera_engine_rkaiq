@@ -26,12 +26,8 @@ void RkAiqA3dlutHandleInt::init() {
 
     RkAiqHandle::deInit();
     mConfig       = (RkAiqAlgoCom*)(new RkAiqAlgoConfigA3dlut());
-    mPreInParam   = (RkAiqAlgoCom*)(new RkAiqAlgoPreA3dlut());
-    mPreOutParam  = (RkAiqAlgoResCom*)(new RkAiqAlgoPreResA3dlut());
     mProcInParam  = (RkAiqAlgoCom*)(new RkAiqAlgoProcA3dlut());
     mProcOutParam = (RkAiqAlgoResCom*)(new RkAiqAlgoProcResA3dlut());
-    mPostInParam  = (RkAiqAlgoCom*)(new RkAiqAlgoPostA3dlut());
-    mPostOutParam = (RkAiqAlgoResCom*)(new RkAiqAlgoPostResA3dlut());
 
     EXIT_ANALYZER_FUNCTION();
 }
@@ -45,7 +41,7 @@ XCamReturn RkAiqA3dlutHandleInt::updateConfig(bool needSync) {
     if (updateAtt) {
         mCurAtt = mNewAtt;
         // TODO
-        rk_aiq_uapi_a3dlut_SetAttrib(mAlgoCtx, mCurAtt, false);
+        rk_aiq_uapi_a3dlut_SetAttrib(mAlgoCtx, &mCurAtt, false);
         updateAtt = false;
         sendSignal(mCurAtt.sync.sync_mode);
     }
@@ -56,8 +52,10 @@ XCamReturn RkAiqA3dlutHandleInt::updateConfig(bool needSync) {
     return ret;
 }
 
-XCamReturn RkAiqA3dlutHandleInt::setAttrib(rk_aiq_lut3d_attrib_t att) {
+XCamReturn RkAiqA3dlutHandleInt::setAttrib(const rk_aiq_lut3d_attrib_t* att) {
     ENTER_ANALYZER_FUNCTION();
+
+    XCAM_ASSERT(att != nullptr);
 
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
     mCfgMutex.lock();
@@ -67,18 +65,18 @@ XCamReturn RkAiqA3dlutHandleInt::setAttrib(rk_aiq_lut3d_attrib_t att) {
     // the new params will be effective later when updateConfig
     // called by RkAiqCore
     bool isChanged = false;
-    if (att.sync.sync_mode == RK_AIQ_UAPI_MODE_ASYNC && \
-        memcmp(&mNewAtt, &att, sizeof(att)))
+    if (att->sync.sync_mode == RK_AIQ_UAPI_MODE_ASYNC && \
+        memcmp(&mNewAtt, att, sizeof(*att)))
         isChanged = true;
-    else if (att.sync.sync_mode != RK_AIQ_UAPI_MODE_ASYNC && \
-             memcmp(&mCurAtt, &att, sizeof(att)))
+    else if (att->sync.sync_mode != RK_AIQ_UAPI_MODE_ASYNC && \
+             memcmp(&mCurAtt, att, sizeof(*att)))
         isChanged = true;
 
     // if something changed
     if (isChanged) {
-        mNewAtt   = att;
+        mNewAtt   = *att;
         updateAtt = true;
-        waitSignal(att.sync.sync_mode);
+        waitSignal(att->sync.sync_mode);
     }
 
     mCfgMutex.unlock();
@@ -89,6 +87,8 @@ XCamReturn RkAiqA3dlutHandleInt::setAttrib(rk_aiq_lut3d_attrib_t att) {
 
 XCamReturn RkAiqA3dlutHandleInt::getAttrib(rk_aiq_lut3d_attrib_t* att) {
     ENTER_ANALYZER_FUNCTION();
+
+    XCAM_ASSERT(att != nullptr);
 
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
 
@@ -114,6 +114,8 @@ XCamReturn RkAiqA3dlutHandleInt::getAttrib(rk_aiq_lut3d_attrib_t* att) {
 
 XCamReturn RkAiqA3dlutHandleInt::query3dlutInfo(rk_aiq_lut3d_querry_info_t* lut3d_querry_info) {
     ENTER_ANALYZER_FUNCTION();
+
+    XCAM_ASSERT(lut3d_querry_info != nullptr);
 
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
 
@@ -143,7 +145,7 @@ XCamReturn RkAiqA3dlutHandleInt::preProcess() {
     ENTER_ANALYZER_FUNCTION();
 
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
-
+#if 0
     ret = RkAiqHandle::preProcess();
     if (ret) {
         RKAIQCORE_CHECK_RET(ret, "a3dlut handle preProcess failed");
@@ -154,6 +156,7 @@ XCamReturn RkAiqA3dlutHandleInt::preProcess() {
     RKAIQCORE_CHECK_RET(ret, "a3dlut algo pre_process failed");
 
     EXIT_ANALYZER_FUNCTION();
+#endif
     return XCAM_RETURN_NO_ERROR;
 }
 
@@ -223,6 +226,14 @@ XCamReturn RkAiqA3dlutHandleInt::processing() {
         LOGE("fail to get sensor gain form AE module,use default value ");
     }
 
+#if RKAIQ_HAVE_BLC_V32
+    if (shared->res_comb.ablcV32_proc_res.blc_ob_enable) {
+        if (shared->res_comb.ablcV32_proc_res.isp_ob_predgain >= 1.0f) {
+            a3dlut_proc_int->sensorGain *=  shared->res_comb.ablcV32_proc_res.isp_ob_predgain;
+        }
+    }
+#endif
+
     RkAiqAlgoDescription* des = (RkAiqAlgoDescription*)mDes;
     ret                       = des->processing(mProcInParam, mProcOutParam);
     RKAIQCORE_CHECK_RET(ret, "a3dlut algo processing failed");
@@ -236,6 +247,7 @@ XCamReturn RkAiqA3dlutHandleInt::postProcess() {
 
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
 
+#if 0
     RkAiqAlgoPostA3dlut* a3dlut_post_int        = (RkAiqAlgoPostA3dlut*)mPostInParam;
     RkAiqAlgoPostResA3dlut* a3dlut_post_res_int = (RkAiqAlgoPostResA3dlut*)mPostOutParam;
     RkAiqCore::RkAiqAlgosGroupShared_t* shared =
@@ -252,6 +264,7 @@ XCamReturn RkAiqA3dlutHandleInt::postProcess() {
     RKAIQCORE_CHECK_RET(ret, "a3dlut algo post_process failed");
 
     EXIT_ANALYZER_FUNCTION();
+#endif
     return ret;
 }
 
@@ -295,4 +308,4 @@ XCamReturn RkAiqA3dlutHandleInt::genIspResult(RkAiqFullParams* params,
     return ret;
 }
 
-};  // namespace RkCam
+}  // namespace RkCam

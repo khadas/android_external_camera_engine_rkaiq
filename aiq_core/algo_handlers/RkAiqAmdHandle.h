@@ -22,12 +22,15 @@
 #include "xcam_mutex.h"
 
 namespace RkCam {
+#if RKAIQ_HAVE_AMD_V1
 
 class RkAiqAmdHandleInt : virtual public RkAiqHandle {
- public:
+public:
     explicit RkAiqAmdHandleInt(RkAiqAlgoDesComm* des, RkAiqCore* aiqCore)
-        : RkAiqHandle(des, aiqCore), mProcResShared(nullptr){};
-    virtual ~RkAiqAmdHandleInt() { RkAiqHandle::deInit(); };
+        : RkAiqHandle(des, aiqCore), mProcResShared(nullptr) {};
+    virtual ~RkAiqAmdHandleInt() {
+        RkAiqHandle::deInit();
+    };
     virtual XCamReturn updateConfig(bool needSync);
     virtual XCamReturn prepare();
     virtual XCamReturn preProcess();
@@ -35,17 +38,19 @@ class RkAiqAmdHandleInt : virtual public RkAiqHandle {
     virtual XCamReturn postProcess();
     virtual XCamReturn genIspResult(RkAiqFullParams* params, RkAiqFullParams* cur_params);
 
- protected:
+protected:
     virtual void init();
-    virtual void deInit() { RkAiqHandle::deInit(); };
+    virtual void deInit() {
+        RkAiqHandle::deInit();
+    };
 
- private:
+private:
     SmartPtr<RkAiqAlgoProcResAmdIntShared> mProcResShared;
 
- private:
+private:
     DECLARE_HANDLE_REGISTER_TYPE(RkAiqAmdHandleInt);
 };
-
-};  // namespace RkCam
+#endif
+}  // namespace RkCam
 
 #endif

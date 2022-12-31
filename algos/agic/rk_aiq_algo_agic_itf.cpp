@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "agic/rk_aiq_algo_agic_itf.h"
+#include "algos/agic/rk_aiq_algo_agic_itf.h"
 
-#include "agic/rk_aiq_types_algo_agic_prvt.h"
-#include "rk_aiq_algo_types.h"
+#include "algos/agic/rk_aiq_types_algo_agic_prvt.h"
+#include "algos/rk_aiq_algo_types.h"
 
 RKAIQ_BEGIN_DECLARE
 
@@ -57,15 +57,18 @@ static XCamReturn prepare(RkAiqAlgoCom* params) {
     if (!!(params->u.prepare.conf_type & RK_AIQ_ALGO_CONFTYPE_UPDATECALIB)) {
         LOGD_AGIC("%s: Agic Reload Para!\n", __FUNCTION__);
 
-        if (CHECK_ISP_HW_V20()) {
+#if RKAIQ_HAVE_GIC_V1
             CalibDbV2_Gic_V20_t* calibv2_agic_calib_V20 =
                 (CalibDbV2_Gic_V20_t*)(CALIBDBV2_GET_MODULE_PTR(calibv2, agic_calib_v20));
             pAgicCtx->full_param.gic_v20 = calibv2_agic_calib_V20;
-        } else if (CHECK_ISP_HW_V21() || CHECK_ISP_HW_V30()) {
+            GicV1CalibToAttr(calibv2_agic_calib_V20, &pAgicCtx->attr.v1);
+#endif
+#if RKAIQ_HAVE_GIC_V2
             CalibDbV2_Gic_V21_t* calibv2_agic_calib_V21 =
                 (CalibDbV2_Gic_V21_t*)(CALIBDBV2_GET_MODULE_PTR(calibv2, agic_calib_v21));
             pAgicCtx->full_param.gic_v21 = calibv2_agic_calib_V21;
-        }
+            GicV2CalibToAttr(calibv2_agic_calib_V21, &pAgicCtx->attr.v2);
+#endif
 
         pAgicCtx->calib_changed = true;
     }
@@ -75,7 +78,7 @@ static XCamReturn prepare(RkAiqAlgoCom* params) {
     LOG1_AGIC("exit!");
     return XCAM_RETURN_NO_ERROR;
 }
-
+#if 0
 static XCamReturn pre_process(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outparams) {
     LOG1_AGIC("enter!");
 
@@ -93,13 +96,20 @@ static XCamReturn pre_process(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* out
     LOG1_AGIC("exit!");
     return XCAM_RETURN_NO_ERROR;
 }
-
+#endif
 static XCamReturn processing(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outparams) {
     LOG1_AGIC("enter!");
     RkAiqAlgoProcAgic* pAgicProcParams       = (RkAiqAlgoProcAgic*)inparams;
     RkAiqAlgoProcResAgic* pAgicProcResParams = (RkAiqAlgoProcResAgic*)outparams;
     AgicContext_t* pAgicCtx                  = (AgicContext_t*)&inparams->ctx->agicCtx;
     int iso                                  = pAgicProcParams->iso;
+
+    if (inparams->u.proc.gray_mode)
+        pAgicCtx->Gic_Scene_mode = GIC_NIGHT;
+    else if (GIC_NORMAL == pAgicCtx->working_mode)
+        pAgicCtx->Gic_Scene_mode = GIC_NORMAL;
+    else
+        pAgicCtx->Gic_Scene_mode = GIC_HDR;
 
     pAgicCtx->raw_bits       = pAgicProcParams->raw_bits;
     pAgicCtx->Gic_Scene_mode = 0;
@@ -119,6 +129,9 @@ static XCamReturn processing(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outp
 }
 
 static XCamReturn post_process(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outparams) {
+    (void)(inparams);
+    (void)(outparams);
+
     return XCAM_RETURN_NO_ERROR;
 }
 
@@ -134,9 +147,9 @@ RkAiqAlgoDescription g_RkIspAlgoDescAgic = {
             .destroy_context = destroy_context,
         },
     .prepare      = prepare,
-    .pre_process  = pre_process,
+    .pre_process  = NULL,
     .processing   = processing,
-    .post_process = post_process,
+    .post_process = NULL,
 };
 
 RKAIQ_END_DECLARE

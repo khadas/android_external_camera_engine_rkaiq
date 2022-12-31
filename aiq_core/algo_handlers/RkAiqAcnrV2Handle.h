@@ -23,6 +23,7 @@
 #include "xcam_mutex.h"
 
 namespace RkCam {
+#if RKAIQ_HAVE_CNR_V2
 
 class RkAiqAcnrV2HandleInt : virtual public RkAiqHandle {
 public:
@@ -70,6 +71,7 @@ private:
 private:
     DECLARE_HANDLE_REGISTER_TYPE(RkAiqAcnrV2HandleInt);
 };
-};  // namespace RkCam
+#endif
+}  // namespace RkCam
 
 #endif

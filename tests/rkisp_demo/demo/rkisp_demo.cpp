@@ -19,7 +19,9 @@
 #include <dlfcn.h>
 #include <signal.h>
 #include <dirent.h>
+#if ISPDEMO_ENABLE_DRM
 #include "drmDsp.h"
+#endif
 #include "uAPI2/rk_aiq_user_api2_sysctl.h"
 #include "rk_aiq_user_api2_debug.h"
 #include "sample_image_process.h"
@@ -28,14 +30,13 @@
 
 
 #include "ae_algo_demo/third_party_ae_algo.h"
-#include "awb_algo_demo/third_party_awb_algo.h"
+//#include "awb_algo_demo/third_party_awb_algo.h"  //for rk3588
+#include "awb_algo_demo/third_party_awbV32_algo.h" //for rv1106
 #include "af_algo_demo/third_party_af_algo.h"
 
-#ifndef ARCH_FPGA
+#if ISPDEMO_ENABLE_RGA && ISPDEMO_ENABLE_DRM
 #include "display.h"
 #include "rga.h"
-#else
-#define NO_RGA_DISPLAY
 #endif
 #include <list>
 #include <vector>
@@ -45,7 +46,7 @@
 #define CLEAR(x) memset(&(x), 0, sizeof(x))
 #define FMT_NUM_PLANES 1
 
-#define BUFFER_COUNT 6
+#define BUFFER_COUNT 3
 
 #ifdef ANDROID
 #define CAPTURE_RAW_PATH "/data"
@@ -55,11 +56,11 @@
 #define DEFAULT_CAPTURE_RAW_PATH "/tmp/capture_image"
 #endif
 #define CAPTURE_CNT_FILENAME ".capture_cnt"
-// #define ENABLE_UAPI_TEST
+//#define ENABLE_UAPI_TEST
 #define IQFILE_PATH_MAX_LEN 256
 // #define CUSTOM_AE_DEMO_TEST
 // #define CUSTOM_GROUP_AE_DEMO_TEST
-// #define CUSTOM_AWB_DEMO_TEST
+//#define CUSTOM_AWB_DEMO_TEST
 // #define TEST_MEMS_SENSOR_INTF
 // #define CUSTOM_AF_DEMO_TEST
 // #define CUSTOM_GROUP_AWB_DEMO_TEST
@@ -966,6 +967,10 @@ static void process_image(const void *p, int sequence, int size, demo_context_t 
         printf(">\n");
         fwrite(p, size, 1, ctx->fp);
         fflush(ctx->fp);
+        fsync(fileno(ctx->fp));
+    } else if (ctx->fp && sequence >= ctx->skipCnt && ctx->outputCnt-- == 0) {
+        fclose(ctx->fp);
+        ctx->fp = NULL;
     } else if (ctx->writeFileSync) {
         int ret = 0;
         if (!ctx->is_capture_yuv) {
@@ -1032,6 +1037,7 @@ static int read_frame(demo_context_t *ctx)
     else
         bytesused = buf.bytesused;
 
+#if ISPDEMO_ENABLE_DRM
     if (ctx->vop) {
         int dispWidth, dispHeight;
 
@@ -1044,25 +1050,21 @@ static int read_frame(demo_context_t *ctx)
             dispHeight = 1088;
         else
             dispHeight = ctx->height;
-#ifndef Android
-#ifndef NO_RGA_DISPLAY
+
+#if ISPDEMO_ENABLE_RGA
         if (strlen(ctx->dev_name) && strlen(ctx->dev_name2)) {
             if (ctx->dev_using == 1)
                 display_win1(ctx->buffers[i].start, ctx->buffers[i].export_fd,  RK_FORMAT_YCbCr_420_SP, dispWidth, dispHeight, 0);
             else
                 display_win2(ctx->buffers[i].start, ctx->buffers[i].export_fd,  RK_FORMAT_YCbCr_420_SP, dispWidth, dispHeight, 0);
         } else {
-            drmDspFrame(ctx->width, ctx->height, dispWidth, dispHeight, ctx->buffers[i].export_fd, DRM_FORMAT_NV12);
-        }
 #else
         {
-            drmDspFrame(ctx->width, ctx->height, dispWidth, dispHeight, ctx->buffers[i].start, DRM_FORMAT_NV12);
+#endif
+            drmDspFrame(ctx->width, ctx->height, dispWidth, dispHeight, ctx->buffers[i].export_fd, DRM_FORMAT_NV12);
         }
-#endif
-#else
-        drmDspFrame(ctx->width, ctx->height, dispWidth, dispHeight, ctx->buffers[i].export_fd, DRM_FORMAT_NV12);
-#endif
     }
+#endif
 
     process_image(ctx->buffers[i].start,  buf.sequence, bytesused, ctx);
 
@@ -2063,6 +2065,10 @@ static void rkisp_routine(demo_context_t *ctx)
 
     if (ctx->rkaiq) {
         XCamReturn ret = XCAM_RETURN_NO_ERROR;
+        rk_aiq_tb_info_t tb_info;
+        tb_info.magic = sizeof(rk_aiq_tb_info_t) - 2;
+        tb_info.is_pre_aiq = false;
+        ret = rk_aiq_uapi2_sysctl_preInit_tb_info(sns_entity_name, &tb_info);
         if (work_mode == RK_AIQ_WORKING_MODE_NORMAL)
             ret = rk_aiq_uapi2_sysctl_preInit_scene(sns_entity_name, "normal", "day");
         else
@@ -2172,7 +2178,15 @@ static void rkisp_routine(demo_context_t *ctx)
 #endif
             if (ctx->isOrp) {
                 rk_aiq_raw_prop_t prop;
-                if (strcmp(ctx->orpRawFmt, "BG10") == 0)
+                if (strcmp(ctx->orpRawFmt, "BA81") == 0)
+                    prop.format = RK_PIX_FMT_SBGGR8;
+                else if (strcmp(ctx->orpRawFmt, "GBRG") == 0)
+                    prop.format = RK_PIX_FMT_SGBRG8;
+                else if (strcmp(ctx->orpRawFmt, "RGGB") == 0)
+                    prop.format = RK_PIX_FMT_SRGGB8;
+                else if (strcmp(ctx->orpRawFmt, "GRBG") == 0)
+                    prop.format = RK_PIX_FMT_SGRBG8;
+                else if (strcmp(ctx->orpRawFmt, "BG10") == 0)
                     prop.format = RK_PIX_FMT_SBGGR10;
                 else if (strcmp(ctx->orpRawFmt, "GB10") == 0)
                     prop.format = RK_PIX_FMT_SGBRG10;
@@ -2217,6 +2231,9 @@ static void rkisp_routine(demo_context_t *ctx)
             if (ret != XCAM_RETURN_NO_ERROR)
                 ERR("%s:rk_aiq_uapi2_sysctl_prepare failed: %d\n", get_sensor_name(ctx), ret);
             else {
+                ret = rk_aiq_uapi2_setMirrorFlip(ctx->aiq_ctx, false, false, 3);
+                // Ignore failure
+
                 if (ctx->isOrp) {
                     rk_aiq_uapi2_sysctl_registRkRawCb(ctx->aiq_ctx, release_buffer);
                 }
@@ -2225,7 +2242,9 @@ static void rkisp_routine(demo_context_t *ctx)
                 init_device(ctx);
                 if (ctx->pponeframe)
                     init_device_pp_oneframe(ctx);
-                start_capturing(ctx);
+                if (ctx->ctl_type == TEST_CTL_TYPE_DEFAULT) {
+                    start_capturing(ctx);
+                }
                 if (ctx->pponeframe)
                     start_capturing_pp_oneframe(ctx);
                 printf("%s:-------- stream on mipi tx/rx -------------\n", get_sensor_name(ctx));
@@ -2234,8 +2253,10 @@ static void rkisp_routine(demo_context_t *ctx)
 restart:
                     static int test_ctl_cnts = 0;
                     ctx->frame_count = 60;
+                    start_capturing(ctx);
                     while ((ctx->frame_count-- > 0))
                         read_frame(ctx);
+                    stop_capturing(ctx);
                     printf("+++++++ TEST SYSCTL COUNTS %d ++++++++++++ \n", test_ctl_cnts++);
                     printf("aiq stop .....\n");
                     rk_aiq_uapi2_sysctl_stop(ctx->aiq_ctx, false);
@@ -2243,6 +2264,20 @@ restart:
                         printf("aiq deinit .....\n");
                         rk_aiq_uapi2_sysctl_deinit(ctx->aiq_ctx);
                         printf("aiq init .....\n");
+                        if (work_mode == RK_AIQ_WORKING_MODE_NORMAL) {
+                            ret = rk_aiq_uapi2_sysctl_preInit_scene(sns_entity_name, "normal", "day");
+                            if (ctx->hdrmode == 2)
+                                work_mode = RK_AIQ_WORKING_MODE_ISP_HDR2;
+                            else if (ctx->hdrmode == 3)
+                                work_mode = RK_AIQ_WORKING_MODE_ISP_HDR3;
+                        } else {
+                            ret = rk_aiq_uapi2_sysctl_preInit_scene(sns_entity_name, "hdr", "day");
+                            work_mode = RK_AIQ_WORKING_MODE_NORMAL;
+                        }
+                        if (ret < 0)
+                            ERR("%s: failed to set %s scene\n",
+                                get_sensor_name(ctx),
+                                work_mode == RK_AIQ_WORKING_MODE_NORMAL ? "normal" : "hdr");
                         ctx->aiq_ctx = rk_aiq_uapi2_sysctl_init(sns_entity_name, ctx->iqpath, NULL, NULL);
                         printf("aiq prepare .....\n");
                         XCamReturn ret = rk_aiq_uapi2_sysctl_prepare(ctx->aiq_ctx, ctx->width, ctx->height, work_mode);
@@ -2254,6 +2289,7 @@ restart:
                     }
                     printf("aiq start .....\n");
                     ret = rk_aiq_uapi2_sysctl_start(ctx->aiq_ctx );
+                    printf("aiq restart .....\n");
                     goto restart;
                 }
             }
@@ -2375,32 +2411,24 @@ int main(int argc, char **argv)
 
     parse_args(argc, argv, &main_ctx);
 
+#if ISPDEMO_ENABLE_DRM
     if (main_ctx.vop) {
-        // FIXME: run multi-sensor(>=3), stop using vop.
-#ifndef Android
-#ifndef NO_RGA_DISPLAY
+
+#if ISPDEMO_ENABLE_RGA
         if (strlen(main_ctx.dev_name) && strlen(main_ctx.dev_name2)) {
             if (display_init(720, 1280) < 0) {
                 printf("display_init failed\n");
             }
         } else {
-            if (initDrmDsp() < 0) {
-                printf("initDrmDsp failed\n");
-            }
-        }
 #else
         {
+#endif
             if (initDrmDsp() < 0) {
                 printf("initDrmDsp failed\n");
             }
         }
-#endif
-#else
-        if (initDrmDsp() < 0) {
-            printf("initDrmDsp failed\n");
-        }
-#endif
     }
+#endif
 
     rkisp_routine(&main_ctx);
     g_main_ctx = &main_ctx;
@@ -2460,14 +2488,11 @@ int main(int argc, char **argv)
     }
     deinit(&main_ctx);
 
-#ifndef Android
-#ifndef NO_RGA_DISPLAY
+#if ISPDEMO_ENABLE_DRM
     if (strlen(main_ctx.dev_name) && strlen(main_ctx.dev_name2)) {
         display_exit();
     }
-#else
     deInitDrmDsp();
-#endif
 #endif
     return 0;
 }

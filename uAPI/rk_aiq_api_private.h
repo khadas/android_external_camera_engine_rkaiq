@@ -23,13 +23,15 @@ typedef enum {
     CTX_TYPE_NULL           = -255,
 } rk_aiq_ctx_type_e;
 
-struct rk_aiq_sys_ctx_s {
+typedef struct rk_aiq_sys_ctx_s {
     rk_aiq_cam_type_t cam_type;
     const char* _sensor_entity_name;
     SmartPtr<RkAiqManager> _rkAiqManager;
     SmartPtr<ICamHw> _camHw;
     SmartPtr<RkAiqCore> _analyzer;
+#ifdef ISP_HW_V20
     SmartPtr<RkLumaCore> _lumaAnalyzer;
+#endif
 #ifdef RKAIQ_ENABLE_PARSER_V1
     CamCalibDbContext_t *_calibDb;
 #endif
@@ -49,7 +51,8 @@ struct rk_aiq_sys_ctx_s {
     struct RkAiqHwInfo _hw_info;
     int _use_fakecam;
     rk_aiq_raw_prop_t _raw_prop;
-};
+    FILE* _lock_file;
+} rk_aiq_sys_ctx_t;
 
 /**
  * gcc-4.4.7 disallow typedef redefinition
@@ -71,6 +74,8 @@ typedef struct rk_aiq_camgroup_ctx_s {
     SmartPtr<Mutex> _apiMutex;
     CamCalibDbCamgroup_t* _camgroup_calib;
     RK_PS_SrcOverlapMap* _srcOverlapMap_s;
+#else
+    void* place_holder;
 #endif
 } rk_aiq_camgroup_ctx_t;
 
@@ -81,8 +86,7 @@ rk_aiq_camgroup_ctx_t* get_binded_group_ctx(const rk_aiq_sys_ctx_t* ctx);
 bool is_ctx_need_bypass(const rk_aiq_sys_ctx_t* ctx);
 void rk_aiq_ctx_set_tool_mode(const rk_aiq_sys_ctx_t* ctx, bool status);
 
-#define CHECK_USER_API_ENABLE2(ctx) \
-    if (is_ctx_need_bypass(ctx)) { return XCAM_RETURN_NO_ERROR; }
+#define CHECK_USER_API_ENABLE2(ctx)
 
 #define RKAIQ_NO_API_LOCK
 #ifndef RKAIQ_NO_API_LOCK

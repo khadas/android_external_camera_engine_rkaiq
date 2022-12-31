@@ -26,6 +26,18 @@ static uint32_t rk_format_to_media_format(rk_aiq_format_t format)
 {
     uint32_t pixelformat = -1;
     switch (format) {
+    case RK_PIX_FMT_SBGGR8:
+        pixelformat = MEDIA_BUS_FMT_SBGGR8_1X8;
+        break;
+    case RK_PIX_FMT_SRGGB8:
+        pixelformat = MEDIA_BUS_FMT_SRGGB8_1X8;
+        break;
+    case RK_PIX_FMT_SGBRG8:
+        pixelformat = MEDIA_BUS_FMT_SGBRG8_1X8;
+        break;
+    case RK_PIX_FMT_SGRBG8:
+        pixelformat = MEDIA_BUS_FMT_SGRBG8_1X8;
+        break;
     case RK_PIX_FMT_SBGGR10:
         pixelformat = MEDIA_BUS_FMT_SBGGR10_1X10;
         break;
@@ -71,8 +83,8 @@ static uint32_t rk_format_to_media_format(rk_aiq_format_t format)
 
 FakeSensorHw::FakeSensorHw()
     : SensorHw ("/dev/null")
-    ,_sync_cond(false)
-    ,_need_sync(false)
+    , _sync_cond(false)
+    , _need_sync(false)
 {
     ENTER_CAMHW_FUNCTION();
     _timer = new CTimer(this);
@@ -111,7 +123,7 @@ FakeSensorHw::get_sensor_fps(float& fps)
 }
 
 int
-FakeSensorHw::get_format(rk_aiq_exposure_sensor_descriptor* sns_des)
+FakeSensorHw::get_sensor_desc(rk_aiq_exposure_sensor_descriptor* sns_des)
 {
     sns_des->sensor_output_width = _width;
     sns_des->sensor_output_height = _height;
@@ -145,7 +157,7 @@ FakeSensorHw::get_sensor_descriptor(rk_aiq_exposure_sensor_descriptor *sns_des)
 {
     memset(sns_des, 0, sizeof(rk_aiq_exposure_sensor_descriptor));
 
-    if (get_format(sns_des))
+    if (get_sensor_desc(sns_des))
         return XCAM_RETURN_ERROR_IOCTL;
 
     if (get_blank(sns_des))
@@ -193,7 +205,7 @@ FakeSensorHw::setExposureParams(SmartPtr<RkAiqExpParamsProxy>& expPar)
         _first = false;
 
         LOGD_CAMHW_SUBM(FAKECAM_SUBM, "exp-sync: first set exp, add id[0] to the effected exp map");
-    } 
+    }
 
     EXIT_CAMHW_FUNCTION();
     return XCAM_RETURN_NO_ERROR;
@@ -201,7 +213,7 @@ FakeSensorHw::setExposureParams(SmartPtr<RkAiqExpParamsProxy>& expPar)
 
 XCamReturn
 FakeSensorHw::getSensorModeData(const char* sns_ent_name,
-                            rk_aiq_exposure_sensor_descriptor& sns_des)
+                                rk_aiq_exposure_sensor_descriptor& sns_des)
 {
     rk_aiq_exposure_sensor_descriptor sensor_desc;
     get_sensor_descriptor (&sensor_desc);
@@ -240,7 +252,7 @@ FakeSensorHw::getSensorModeData(const char* sns_ent_name,
 }
 
 XCamReturn
-FakeSensorHw::handle_sof(int64_t time, int frameid)
+FakeSensorHw::handle_sof(int64_t time, uint32_t frameid)
 {
     ENTER_CAMHW_FUNCTION();
     EXIT_CAMHW_FUNCTION();
@@ -337,14 +349,14 @@ FakeSensorHw::getFormat(struct v4l2_subdev_format &aFormat)
     aFormat.format.field = V4L2_FIELD_NONE;
     aFormat.format.colorspace = V4L2_COLORSPACE_470_SYSTEM_M;
     LOGD_CAMHW_SUBM(FAKECAM_SUBM, "pad: %d, which: %d, width: %d, "
-         "height: %d, format: 0x%x, field: %d, color space: %d",
-         aFormat.pad,
-         aFormat.which,
-         aFormat.format.width,
-         aFormat.format.height,
-         aFormat.format.code,
-         aFormat.format.field,
-         aFormat.format.colorspace);
+                    "height: %d, format: 0x%x, field: %d, color space: %d",
+                    aFormat.pad,
+                    aFormat.which,
+                    aFormat.format.width,
+                    aFormat.format.height,
+                    aFormat.format.code,
+                    aFormat.format.field,
+                    aFormat.format.colorspace);
     EXIT_CAMHW_FUNCTION();
     return XCAM_RETURN_NO_ERROR;
 }
@@ -377,7 +389,8 @@ FakeSensorHw::enqueue_rawbuffer(struct rk_aiq_vbuf *vbuf, bool sync)
         max_count = 3;
     }
     if (vbuf->buf_info[0].frame_id <= _frame_sequence) {
-        LOGW_CAMHW_SUBM(FAKECAM_SUBM, "frameId %d <= cur_id %d, modify the id", _frame_sequence);
+        LOGW_CAMHW_SUBM(FAKECAM_SUBM, "frameId %u <= cur_id %u, modify the id",
+                        vbuf->buf_info[0].frame_id, _frame_sequence);
         vbuf->buf_info[0].frame_id = ++_frame_sequence;
     } else
         _frame_sequence = vbuf->buf_info[0].frame_id;
@@ -385,7 +398,7 @@ FakeSensorHw::enqueue_rawbuffer(struct rk_aiq_vbuf *vbuf, bool sync)
     vbuf->buf_info[1].frame_id = vbuf->buf_info[0].frame_id;
     vbuf->buf_info[2].frame_id = vbuf->buf_info[0].frame_id;
 
-    for (int i=0; i<max_count; i++) {
+    for (int i = 0; i < max_count; i++) {
         fake_v4l2_dev = _mipi_tx_dev[i].dynamic_cast_ptr<FakeV4l2Device>();
         fake_v4l2_dev->enqueue_rawbuffer(&vbuf->buf_info[i]);
     }
@@ -399,18 +412,35 @@ FakeSensorHw::enqueue_rawbuffer(struct rk_aiq_vbuf *vbuf, bool sync)
     // check valid firstly
     bool exp_val_valid = true;
 
-    if ((vbuf->buf_info[0].exp_gain_reg)  == 0)
+#if 1
+    //check float exposure, not reg value
+    if (fabs(vbuf->buf_info[0].exp_time - 0.0f) < FLT_EPSILON || fabs(vbuf->buf_info[0].exp_gain - 0.0f) < FLT_EPSILON)
         exp_val_valid = false;
 
     if (exp_val_valid && (RK_AIQ_HDR_GET_WORKING_MODE(_working_mode) == RK_AIQ_WORKING_MODE_ISP_HDR2)) {
-       if (vbuf->buf_info[1].exp_gain_reg == 0)
+        if (fabs(vbuf->buf_info[1].exp_time - 0.0f) < FLT_EPSILON || fabs(vbuf->buf_info[1].exp_gain - 0.0f) < FLT_EPSILON)
             exp_val_valid = false;
     }
 
     if (exp_val_valid && (RK_AIQ_HDR_GET_WORKING_MODE(_working_mode) == RK_AIQ_WORKING_MODE_ISP_HDR3)) {
-       if (vbuf->buf_info[2].exp_gain_reg == 0)
+        if (fabs(vbuf->buf_info[2].exp_time - 0.0f) < FLT_EPSILON || fabs(vbuf->buf_info[2].exp_gain - 0.0f) < FLT_EPSILON)
             exp_val_valid = false;
     }
+
+#else
+    if ((vbuf->buf_info[0].exp_gain_reg)  == 0)
+        exp_val_valid = false;
+
+    if (exp_val_valid && (RK_AIQ_HDR_GET_WORKING_MODE(_working_mode) == RK_AIQ_WORKING_MODE_ISP_HDR2)) {
+        if (vbuf->buf_info[1].exp_gain_reg == 0)
+            exp_val_valid = false;
+    }
+
+    if (exp_val_valid && (RK_AIQ_HDR_GET_WORKING_MODE(_working_mode) == RK_AIQ_WORKING_MODE_ISP_HDR3)) {
+        if (vbuf->buf_info[2].exp_gain_reg == 0)
+            exp_val_valid = false;
+    }
+#endif
 
     if (exp_val_valid) {
         SmartPtr<RkAiqExpParamsProxy> exp_param_prx = _expParamsPool->get_item();
@@ -461,8 +491,8 @@ FakeSensorHw::enqueue_rawbuffer(struct rk_aiq_vbuf *vbuf, bool sync)
     if (sync) {
         _need_sync = sync;
         if (_sync_cond.timedwait(_sync_mutex, 5000000) != 0) {
-           LOGE_CAMHW_SUBM(FAKECAM_SUBM, "wait raw buffer process done timeout");
-           return XCAM_RETURN_ERROR_TIMEOUT;
+            LOGE_CAMHW_SUBM(FAKECAM_SUBM, "wait raw buffer process done timeout");
+            return XCAM_RETURN_ERROR_TIMEOUT;
         }
     }
     EXIT_CAMHW_FUNCTION();

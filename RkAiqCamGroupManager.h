@@ -293,6 +293,6 @@ private:
     std::atomic<bool> _sync_sof_running;
 };
 
-}; //namespace
+} //namespace
 
 #endif

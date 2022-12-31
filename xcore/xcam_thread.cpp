@@ -47,7 +47,7 @@ Thread::~Thread ()
         xcam_free (_name);
 }
 
-int
+void *
 Thread::thread_func (void *user_data)
 {
     Thread *thread = (Thread *)user_data;
@@ -91,7 +91,7 @@ Thread::thread_func (void *user_data)
     }
     thread->_exit_cond.broadcast ();
 
-    return 0;
+    return NULL;
 }
 
 bool
@@ -121,24 +121,27 @@ bool Thread::start ()
 
         if (_policy != -1) {
             ret = pthread_attr_setschedpolicy(&attr, _policy);
-            if (ret)
+            if (ret) {
                 XCAM_LOG_WARNING ("Thread(%s) set sched policy failed.(%d, %s)",
                         XCAM_STR(_name), ret, strerror(ret));
+            }
         }
 
         if (_policy != -1 && _policy != SCHED_OTHER && _priority != -1) {
             struct sched_param param;
             param.sched_priority = _priority;
             ret = pthread_attr_setschedparam(&attr, &param);
-            if (ret)
+            if (ret) {
                 XCAM_LOG_WARNING ("Thread(%s) set sched priority failed.(%d, %s)",
                         XCAM_STR(_name), ret, strerror(ret));
+            }
         }
 
         ret = pthread_attr_setinheritsched(&attr, PTHREAD_EXPLICIT_SCHED);
-        if (ret)
+        if (ret) {
             XCAM_LOG_WARNING ("Thread(%s) set sched inherit failed.(%d, %s)",
                     XCAM_STR(_name), ret, strerror(ret));
+        }
 
         if (pthread_create (&_thread_id, &attr, (void * (*)(void*))thread_func, this) != 0) {
             pthread_attr_destroy(&attr);
@@ -147,8 +150,9 @@ bool Thread::start ()
 
         pthread_attr_destroy(&attr);
     } else {
-        if (pthread_create (&_thread_id, NULL, (void * (*)(void*))thread_func, this) != 0)
+        if (pthread_create (&_thread_id, NULL, (void * (*)(void*))thread_func, this) != 0) {
             return false;
+        }
     }
 
     _started = true;
@@ -199,4 +203,4 @@ bool Thread::is_running ()
     return _started;
 }
 
-};
+}

@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2019 Rockchip Corporation
+ *  Copyright (c) 2022 Rockchip Corporation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,10 +24,10 @@ typedef struct rk_aiq_sys_ctx_s rk_aiq_sys_ctx_t;
 
 RKAIQ_BEGIN_DECLARE
 
-XCamReturn rk_aiq_user_api2_acgc_SetAttrib(const rk_aiq_sys_ctx_t* sys_ctx,
-                                           rk_aiq_uapi_acgc_attrib_t attr);
-XCamReturn rk_aiq_user_api2_acgc_GetAttrib(const rk_aiq_sys_ctx_t* sys_ctx,
-                                           rk_aiq_uapi_acgc_attrib_t* attr);
+XCamReturn
+rk_aiq_user_api2_acgc_SetAttrib(const rk_aiq_sys_ctx_t* sys_ctx, const rk_aiq_uapi_acgc_attrib_t* attr);
+XCamReturn
+rk_aiq_user_api2_acgc_GetAttrib(const rk_aiq_sys_ctx_t* sys_ctx, rk_aiq_uapi_acgc_attrib_t* attr);
 RKAIQ_END_DECLARE
 
 #endif

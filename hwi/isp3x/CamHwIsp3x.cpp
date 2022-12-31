@@ -59,6 +59,7 @@ CamHwIsp3x::gen_full_isp_params(const struct isp3x_isp_params_cfg* update_params
                                 uint64_t* module_en_update_partial,
                                 uint64_t* module_cfg_update_partial)
 {
+#ifdef ISP_HW_V30
     XCAM_ASSERT (update_params);
     XCAM_ASSERT (full_params);
     int i = 0;
@@ -205,12 +206,16 @@ CamHwIsp3x::gen_full_isp_params(const struct isp3x_isp_params_cfg* update_params
             case Rk_ISP2x_CGC_ID:
                 CHECK_UPDATE_PARAMS(full_params->others.cgc_cfg, update_params->others.cgc_cfg);
                 break;
+            case RK_ISP2X_IE_ID:
+                CHECK_UPDATE_PARAMS(full_params->others.ie_cfg, update_params->others.ie_cfg);
+                break;
             default:
                 break;
             }
         }
     }
     EXIT_CAMHW_FUNCTION();
+#endif
 }
 
 XCamReturn
@@ -218,10 +223,11 @@ CamHwIsp3x::setIspConfig()
 {
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
 
+#ifdef ISP_HW_V30
     ENTER_CAMHW_FUNCTION();
 
     SmartPtr<V4l2Buffer> v4l2buf;
-    uint32_t frameId = -1;
+    uint32_t frameId = (uint32_t)(-1);
 
     {
         SmartLock locker (_isp_params_cfg_mutex);
@@ -245,7 +251,7 @@ CamHwIsp3x::setIspConfig()
         return XCAM_RETURN_ERROR_PARAM;
     }
 
-    LOGD_ANALYZER("----------%s, start config id(%d)'s isp params", __FUNCTION__, frameId);
+    LOGD_ANALYZER("----------%s, start config id(%u)'s isp params", __FUNCTION__, frameId);
 
     struct isp3x_isp_params_cfg update_params[2];
     memset(update_params, 0, sizeof(struct isp3x_isp_params_cfg)*2);
@@ -266,23 +272,27 @@ CamHwIsp3x::setIspConfig()
         _full_active_isp3x_params.module_cfg_update = 0;
     }
 
-    if (frameId >= 0) {
+    if (frameId != (uint32_t)(-1)) {
         SmartPtr<cam3aResult> awb_res = get_3a_module_result(ready_results, RESULT_TYPE_AWB_PARAM);
         SmartPtr<RkAiqIspAwbParamsProxyV3x> awbParams;
         if (awb_res.ptr()) {
             awbParams = awb_res.dynamic_cast_ptr<RkAiqIspAwbParamsProxyV3x>();
             {
                 SmartLock locker (_isp_params_cfg_mutex);
-                _effecting_ispparam_map[frameId].awb_cfg_v3x = awbParams->data()->result;
+                if (getParamsForEffMap(frameId))
+                    _effecting_ispparam_map[frameId]->data()->result.awb_cfg_v3x = awbParams->data()->result;
 
             }
         } else {
             /* use the latest */
             SmartLock locker (_isp_params_cfg_mutex);
             if (!_effecting_ispparam_map.empty()) {
-                _effecting_ispparam_map[frameId].awb_cfg_v3x = (_effecting_ispparam_map.rbegin())->second.awb_cfg_v3x;
-                LOGW_CAMHW_SUBM(ISP20HW_SUBM, "use frame %d awb params for frame %d !\n",
-                                frameId, (_effecting_ispparam_map.rbegin())->first);
+                SmartPtr<RkAiqIspEffParamsProxy>& last_param = _effecting_ispparam_map.rbegin()->second;
+                LOGW_CAMHW_SUBM(ISP20HW_SUBM, "use frame %u awb params for frame %u !\n", frameId,
+                                (_effecting_ispparam_map.rbegin())->first);
+                if (getParamsForEffMap(frameId))
+                    _effecting_ispparam_map[frameId]->data()->result.awb_cfg_v3x =
+                        last_param->data()->result.awb_cfg_v3x;
             } else {
                 LOGW_CAMHW_SUBM(ISP20HW_SUBM, "get awb params from 3a result failed for frame %d !\n", frameId);
             }
@@ -294,14 +304,17 @@ CamHwIsp3x::setIspConfig()
             blcParams = blc_res.dynamic_cast_ptr<RkAiqIspBlcParamsProxyV21>();
             {
                 SmartLock locker (_isp_params_cfg_mutex);
-                _effecting_ispparam_map[frameId].blc_cfg = blcParams->data()->result;
+                if (getParamsForEffMap(frameId))
+                    _effecting_ispparam_map[frameId]->data()->result.blc_cfg = blcParams->data()->result;
 
             }
         } else {
             /* use the latest */
             SmartLock locker (_isp_params_cfg_mutex);
             if (!_effecting_ispparam_map.empty()) {
-                _effecting_ispparam_map[frameId].blc_cfg = (_effecting_ispparam_map.rbegin())->second.blc_cfg;
+                if (getParamsForEffMap(frameId))
+                    _effecting_ispparam_map[frameId]->data()->result.blc_cfg =
+                        (_effecting_ispparam_map.rbegin())->second->data()->result.blc_cfg;
                 LOGW_CAMHW_SUBM(ISP20HW_SUBM, "use frame %d blc params for frame %d !\n",
                                 frameId, (_effecting_ispparam_map.rbegin())->first);
             } else {
@@ -326,7 +339,7 @@ CamHwIsp3x::setIspConfig()
 
     // TODO: merge_isp_results would cause the compile warning: reference to merge_isp_results is ambiguous
     // now use Isp21Params::merge_isp_results instead
-    if (Isp3xParams::merge_isp_results(ready_results, update_params) != XCAM_RETURN_NO_ERROR)
+    if (Isp3xParams::merge_isp_results(ready_results, update_params, mIsMultiIspMode) != XCAM_RETURN_NO_ERROR)
         LOGE_CAMHW_SUBM(ISP20HW_SUBM, "ISP parameter translation error\n");
     if(mIsMultiIspMode == false) {
         Isp3xParams::fixedAwbOveflowToIsp3xParams(update_params, mIsMultiIspMode);
@@ -337,11 +350,12 @@ CamHwIsp3x::setIspConfig()
     gen_full_isp_params(update_params, &_full_active_isp3x_params,
                         &module_en_update_partial, &module_cfg_update_partial);
 
-    if (_state == CAM_HW_STATE_STOPPED)
+    if (_state == CAM_HW_STATE_STOPPED) {
         LOGD_CAMHW_SUBM(ISP20HW_SUBM, "ispparam ens 0x%llx, en_up 0x%llx, cfg_up 0x%llx",
                         _full_active_isp3x_params.module_ens,
                         _full_active_isp3x_params.module_en_update,
                         _full_active_isp3x_params.module_cfg_update);
+    }
 #ifdef RUNTIME_MODULE_DEBUG
     _full_active_isp3x_params.module_en_update &= ~g_disable_isp_modules_en;
     _full_active_isp3x_params.module_ens |= g_disable_isp_modules_en;
@@ -398,27 +412,35 @@ CamHwIsp3x::setIspConfig()
         }
 #endif
 
+#if defined(RKAIQ_HAVE_MULTIISP)
         if (isMultiIsp) {
             mParamsSplitter->SplitIspParams(&_full_active_isp3x_params, isp_params);
             Isp3xParams::fixedAwbOveflowToIsp3xParams((void*)isp_params, mIsMultiIspMode);
             memcpy(&((isp_params + 1)->others.cac_cfg), &update_params[1].others.cac_cfg,
                    sizeof(struct isp3x_cac_cfg));
         }
+#endif
 
         {
             SmartLock locker(_isp_params_cfg_mutex);
-            if (frameId < 0) {
-                _effecting_ispparam_map[0].isp_params_v3x[0] = _full_active_isp3x_params;
+            if (frameId == (uint32_t)(-1)) {
+                if (getParamsForEffMap(frameId))
+                    _effecting_ispparam_map[0]->data()->result.isp_params_v3x[0] = _full_active_isp3x_params;
             } else {
-                _effecting_ispparam_map[frameId].isp_params_v3x[0] = _full_active_isp3x_params;
+                if (getParamsForEffMap(frameId))
+                    _effecting_ispparam_map[frameId]->data()->result.isp_params_v3x[0] = _full_active_isp3x_params;
             }
             if (isMultiIsp) {
-                if (frameId < 0) {
-                    _effecting_ispparam_map[0].isp_params_v3x[1] = isp_params[0];
-                    _effecting_ispparam_map[0].isp_params_v3x[2] = isp_params[1];
+                if (frameId == (uint32_t)(-1)) {
+                    if (getParamsForEffMap(frameId)) {
+                        _effecting_ispparam_map[0]->data()->result.isp_params_v3x[1] = isp_params[0];
+                        _effecting_ispparam_map[0]->data()->result.isp_params_v3x[2] = isp_params[1];
+                    }
                 } else {
-                    _effecting_ispparam_map[frameId].isp_params_v3x[1] = isp_params[0];
-                    _effecting_ispparam_map[frameId].isp_params_v3x[2] = isp_params[1];
+                    if (getParamsForEffMap(frameId)) {
+                        _effecting_ispparam_map[frameId]->data()->result.isp_params_v3x[1] = isp_params[0];
+                        _effecting_ispparam_map[frameId]->data()->result.isp_params_v3x[2] = isp_params[1];
+                    }
                 }
             }
             // update the lost params by ISP driver again
@@ -450,7 +472,8 @@ CamHwIsp3x::setIspConfig()
         return XCAM_RETURN_BYPASS;
 
     EXIT_CAMHW_FUNCTION();
+#endif
     return ret;
 }
 
-};
+}

@@ -1,5 +1,5 @@
 /*
- * rk_aiq_uapi_acgc_int.cpp
+ *rk_aiq_uapi_acgc_int.cpp
  *
  *  Copyright (c) 2022 Rockchip Corporation
  *
@@ -20,9 +20,10 @@
 
 #include "rk_aiq_types_algo_acgc_prvt.h"
 
-XCamReturn rk_aiq_uapi_acgc_SetAttrib(RkAiqAlgoContext* ctx,
-                                      rk_aiq_uapi_acgc_attrib_t attr,
-                                      bool need_sync)
+XCamReturn
+rk_aiq_uapi_acgc_SetAttrib(RkAiqAlgoContext* ctx,
+                           const rk_aiq_uapi_acgc_attrib_t* attr,
+                           bool need_sync)
 {
     if (ctx == NULL) {
         LOGE_ACGC("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
@@ -30,12 +31,13 @@ XCamReturn rk_aiq_uapi_acgc_SetAttrib(RkAiqAlgoContext* ctx,
     }
 
     AcgcContext_t* pAcgcCtx = &ctx->acgcCtx;
-    pAcgcCtx->params        = attr.param;
+    pAcgcCtx->params        = attr->param;
     return XCAM_RETURN_NO_ERROR;
 }
 
-XCamReturn rk_aiq_uapi_acgc_GetAttrib(const RkAiqAlgoContext* ctx,
-                                      rk_aiq_uapi_acgc_attrib_t* attr)
+XCamReturn
+rk_aiq_uapi_acgc_GetAttrib(const RkAiqAlgoContext* ctx,
+                           rk_aiq_uapi_acgc_attrib_t* attr)
 {
     if (ctx == NULL || attr == NULL) {
         LOGE_ACGC("%s(%d): null pointer\n", __FUNCTION__, __LINE__);

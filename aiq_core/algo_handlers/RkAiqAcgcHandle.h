@@ -23,6 +23,7 @@
 #include "xcam_mutex.h"
 
 namespace RkCam {
+#if RKAIQ_HAVE_CGC_V1
 class RkAiqAcgcHandleInt : virtual public RkAiqHandle {
  public:
     explicit RkAiqAcgcHandleInt(RkAiqAlgoDesComm* des, RkAiqCore* aiqCore)
@@ -33,7 +34,7 @@ class RkAiqAcgcHandleInt : virtual public RkAiqHandle {
     virtual XCamReturn processing();
     virtual XCamReturn postProcess();
     virtual XCamReturn updateConfig(bool needSync);
-    XCamReturn setAttrib(rk_aiq_uapi_acgc_attrib_t att);
+    XCamReturn setAttrib(const rk_aiq_uapi_acgc_attrib_t* att);
     XCamReturn getAttrib(rk_aiq_uapi_acgc_attrib_t* att);
     virtual XCamReturn genIspResult(RkAiqFullParams* params, RkAiqFullParams* cur_params);
 
@@ -47,7 +48,8 @@ class RkAiqAcgcHandleInt : virtual public RkAiqHandle {
     rk_aiq_uapi_acgc_attrib_t mCurAtt;
     rk_aiq_uapi_acgc_attrib_t mNewAtt;
 };
+#endif
 
-};  // namespace RkCam
+}  // namespace RkCam
 
 #endif

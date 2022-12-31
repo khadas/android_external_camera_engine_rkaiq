@@ -26,7 +26,7 @@ namespace RkCam {
 
 class RkAiqAwbHandleInt : public RkAiqHandle {
     friend class RkAiqAwbV21HandleInt;
-
+    friend class RkAiqCustomAwbHandle;
  public:
     explicit RkAiqAwbHandleInt(RkAiqAlgoDesComm* des, RkAiqCore* aiqCore)
         : RkAiqHandle(des, aiqCore), mProcResShared(nullptr) {
@@ -48,6 +48,8 @@ class RkAiqAwbHandleInt : public RkAiqHandle {
         memset(&mNewWbAwbWbGainAdjustAttr, 0, sizeof(mNewWbAwbWbGainAdjustAttr));
         memset(&mNewWbAwbWbGainOffsetAttr, 0, sizeof(mNewWbAwbWbGainOffsetAttr));
         memset(&mNewWbAwbMultiWindowAttr, 0, sizeof(mNewWbAwbMultiWindowAttr));
+        memset(&mCurFFWbgainAttr, 0, sizeof(mCurFFWbgainAttr));
+        memset(&mNewFFWbgainAttr, 0, sizeof(mNewFFWbgainAttr));
         updateWbV20Attr             = false;
         updateWbOpModeAttr          = false;
         updateWbMwbAttr             = false;
@@ -55,8 +57,17 @@ class RkAiqAwbHandleInt : public RkAiqHandle {
         updateWbAwbWbGainAdjustAttr = false;
         updateWbAwbWbGainOffsetAttr = false;
         updateWbAwbMultiWindowAttr  = false;
+        updateFFWbgainAttr = false;
     };
-    virtual ~RkAiqAwbHandleInt() { RkAiqHandle::deInit(); };
+    virtual ~RkAiqAwbHandleInt() {
+            freeWbGainAdjustAttrib(&mNewWbAwbWbGainAdjustAttr);
+            freeWbGainAdjustAttrib(&mCurWbAwbWbGainAdjustAttr);
+            freeWbGainAdjustAttrib(&mCurWbV20Attr.stAuto.wbGainAdjust);
+            freeWbGainAdjustAttrib(&mNewWbV20Attr.stAuto.wbGainAdjust);
+            freeWbGainAdjustAttrib(&mCurWbAwbAttr.wbGainAdjust);
+            freeWbGainAdjustAttrib(&mNewWbAwbAttr.wbGainAdjust);
+            RkAiqHandle::deInit();
+        };
     virtual XCamReturn updateConfig(bool needSync);
     virtual XCamReturn prepare();
     virtual XCamReturn preProcess();
@@ -84,21 +95,20 @@ class RkAiqAwbHandleInt : public RkAiqHandle {
     XCamReturn getWbAwbWbGainOffsetAttrib(rk_aiq_uapiV2_wb_awb_wbGainOffset_t* att);
     XCamReturn setWbAwbMultiWindowAttrib(rk_aiq_uapiV2_wb_awb_mulWindow_t att);
     XCamReturn getWbAwbMultiWindowAttrib(rk_aiq_uapiV2_wb_awb_mulWindow_t* att);
+    XCamReturn setFFWbgainAttrib(rk_aiq_uapiV2_awb_ffwbgain_attr_t att);
     XCamReturn getAlgoStat(rk_tool_awb_stat_res_full_t *awb_stat_algo);
     XCamReturn getStrategyResult(rk_tool_awb_strategy_result_t *awb_strategy_result);
-    RkAiqAlgoProcResAwb* getAwbProcRes() {
-        return mProcResShared.ptr() ? &mProcResShared->result : NULL; }
+    XCamReturn mallocAndCopyWbGainAdjustAttrib(rk_aiq_uapiV2_wb_awb_wbGainAdjust_t* dst,const rk_aiq_uapiV2_wb_awb_wbGainAdjust_t *src);
+    XCamReturn freeWbGainAdjustAttrib(rk_aiq_uapiV2_wb_awb_wbGainAdjust_t* dst);
  protected:
     virtual void init();
     virtual void deInit() { RkAiqHandle::deInit(); };
     SmartPtr<RkAiqAlgoProcResAwbIntShared> mProcResShared;
 
- private:
-    // TODO
+ protected:
     rk_aiq_wb_attrib_t mCurAtt;
     rk_aiq_wb_attrib_t mNewAtt;
-    // v2
-    rk_aiq_uapiV2_wbV20_attrib_t mCurWbV20Attr;  // v21 todo
+    rk_aiq_uapiV2_wbV20_attrib_t mCurWbV20Attr;
     rk_aiq_uapiV2_wbV20_attrib_t mNewWbV20Attr;
     rk_aiq_uapiV2_wb_opMode_t mCurWbOpModeAttr;
     rk_aiq_uapiV2_wb_opMode_t mNewWbOpModeAttr;
@@ -112,6 +122,8 @@ class RkAiqAwbHandleInt : public RkAiqHandle {
     rk_aiq_uapiV2_wb_awb_wbGainOffset_t mNewWbAwbWbGainOffsetAttr;
     rk_aiq_uapiV2_wb_awb_mulWindow_t mCurWbAwbMultiWindowAttr;
     rk_aiq_uapiV2_wb_awb_mulWindow_t mNewWbAwbMultiWindowAttr;
+    rk_aiq_uapiV2_awb_ffwbgain_attr_t mCurFFWbgainAttr;
+    rk_aiq_uapiV2_awb_ffwbgain_attr_t mNewFFWbgainAttr;
     mutable std::atomic<bool> updateWbV20Attr;
     mutable std::atomic<bool> updateWbOpModeAttr;
     mutable std::atomic<bool> updateWbMwbAttr;
@@ -119,11 +131,12 @@ class RkAiqAwbHandleInt : public RkAiqHandle {
     mutable std::atomic<bool> updateWbAwbWbGainAdjustAttr;
     mutable std::atomic<bool> updateWbAwbWbGainOffsetAttr;
     mutable std::atomic<bool> updateWbAwbMultiWindowAttr;
+    mutable std::atomic<bool> updateFFWbgainAttr;
 
  private:
     DECLARE_HANDLE_REGISTER_TYPE(RkAiqAwbHandleInt);
 };
 
-};  // namespace RkCam
+}  // namespace RkCam
 
 #endif

@@ -17,6 +17,8 @@
 
 #include "sample_comm.h"
 
+#include "uAPI2/rk_aiq_user_api2_alsc.h"
+
 /*
  ******************************
  *

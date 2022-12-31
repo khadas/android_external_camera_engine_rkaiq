@@ -27,8 +27,8 @@ RKAIQ_BEGIN_DECLARE
 static rk_aiq_acsm_params_t g_csm_def = {
     .op_mode = RK_AIQ_OP_MODE_AUTO,
     .full_range = true,
-    .y_offset = 0,
-    .c_offset = 0,
+    .y_offset = 0, // 0:Y = f(coe_x) + 0/16 else Y = f(coe_x) + y_offset
+    .c_offset = 0, // 0:Cb/r = f(coe_x) + 128 else Cb/r = f(coe_x) + c_offset
     .coeff = {
             0.299, 0.587, 0.114,
             -0.169, -0.331, 0.5,
@@ -54,6 +54,7 @@ create_context(RkAiqAlgoContext **context, const AlgoCtxInstanceCfg* cfg)
         if (csm && (csm->full_range)) {
             *params = *csm;
         } else {
+            // auto means using chip reset valuse
             *params = g_csm_def;
         }
 
@@ -82,11 +83,13 @@ prepare(RkAiqAlgoCom* params)
 
 	if(!!(params->u.prepare.conf_type & RK_AIQ_ALGO_CONFTYPE_UPDATECALIB )){
         if (pCfgParam->com.u.prepare.calibv2) {
+#if RKAIQ_HAVE_CSM_V1
             Csm_Param_t *csm =
                 (Csm_Param_t*)(CALIBDBV2_GET_MODULE_PTR(pCfgParam->com.u.prepare.calibv2, csm));
             if (csm && (csm->full_range)) {
                 *acsm_params = *csm;
             }
+#endif
         }
     }
     return XCAM_RETURN_NO_ERROR;
@@ -129,9 +132,9 @@ RkAiqAlgoDescription g_RkIspAlgoDescAcsm = {
         .destroy_context = destroy_context,
     },
     .prepare = prepare,
-    .pre_process = pre_process,
+    .pre_process = NULL,
     .processing = processing,
-    .post_process = post_process,
+    .post_process = NULL,
 };
 
 RKAIQ_END_DECLARE

@@ -50,7 +50,6 @@ void convertLut3DCalib2CalibV2(const CamCalibDbContext_t *calib,CamCalibDbV2Cont
     //coppy value
     lut3d_v2->common.enable = lut3d->enable;
     lut3d_v2->common.gain_tolerance = 0.1;
-    lut3d_v2->common.wbgain_tolerance = 1;
 
     lut3d_v2->ALut3D.damp_en = 1;
     sprintf(lut3d_v2->ALut3D.lutAll[0].name, "%s", "Normal");

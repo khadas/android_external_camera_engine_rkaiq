@@ -23,6 +23,7 @@
 
 namespace RkCam {
 
+#if RKAIQ_HAVE_ORB_V1
 class RkAiqAorbHandleInt : virtual public RkAiqHandle {
  public:
     explicit RkAiqAorbHandleInt(RkAiqAlgoDesComm* des, RkAiqCore* aiqCore)
@@ -41,7 +42,8 @@ class RkAiqAorbHandleInt : virtual public RkAiqHandle {
  private:
     DECLARE_HANDLE_REGISTER_TYPE(RkAiqAorbHandleInt);
 };
+#endif
 
-};  // namespace RkCam
+}  // namespace RkCam
 
 #endif

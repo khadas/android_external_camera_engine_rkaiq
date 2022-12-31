@@ -25,6 +25,7 @@
 #include <map>
 
 #include "MessageBus.h"
+#include "RkAiqCoreConfig.h"
 #include "RkAiqCore.h"
 #include "rk_aiq_comm.h"
 #include "rk_aiq_pool.h"
@@ -41,13 +42,13 @@ class RkAiqAnalyzeGroupMsgHdlThread;
 
 // TODO(Cody): This is just workaround for current implementation
 //using MessageHandleWrapper = std::function<XCamReturn(const std::list<SmartPtr<XCamMessage>>&)>;
-typedef std::function<XCamReturn(std::vector<SmartPtr<XCamMessage>>&, uint32_t, uint64_t)>
+typedef std::function<XCamReturn(std::list<SmartPtr<XCamMessage>>&, uint32_t, uint64_t)>
     MessageHandleWrapper;
 
 class RkAiqAnalyzerGroup {
  public:
     struct GroupMessage {
-        std::vector<SmartPtr<XCamMessage>> msgList;
+        std::list<SmartPtr<XCamMessage>> msgList;
         uint64_t msg_flags;
     };
 
@@ -59,12 +60,13 @@ class RkAiqAnalyzerGroup {
     void setConcreteHandler(const MessageHandleWrapper handler) { mHandler = handler; }
     XCamReturn start();
     bool pushMsg(const SmartPtr<XCamMessage>& msg);
-    XCamReturn msgHandle(const SmartPtr<XCamMessage>& msg);
+    bool msgHandle(const SmartPtr<XCamMessage>& msg);
     XCamReturn stop();
 
-    const rk_aiq_core_analyze_type_e getType() const { return mGroupType; }
-    const uint64_t getDepsFlag() const { return mDepsFlag; }
+    rk_aiq_core_analyze_type_e getType() const { return mGroupType; }
+    uint64_t getDepsFlag() const { return mDepsFlag; }
     void setDepsFlag(uint64_t new_deps) { mDepsFlag = new_deps; }
+
     RkAiqCore* getAiqCore() { return mAiqCore; }
     void setDelayCnts(int8_t delayCnts);
  private:
@@ -143,12 +145,17 @@ class RkAiqAnalyzeGroupManager {
         return mGroupAlgoListMap;
     }
 
- protected:
-    XCamReturn groupMessageHandler(std::vector<SmartPtr<XCamMessage>>& msgs, uint32_t id,
-                                   uint64_t grpId);
-    XCamReturn thumbnailsGroupMessageHandler(std::vector<SmartPtr<XCamMessage>>& msgs, uint32_t id,
-                                             uint64_t grpId);
+    std::map<uint64_t, SmartPtr<RkAiqAnalyzerGroup>>& getGroups() {
+        return mGroupMap;
+    }
 
+ protected:
+    XCamReturn groupMessageHandler(std::list<SmartPtr<XCamMessage>>& msgs, uint32_t id,
+                                   uint64_t grpId);
+#if defined(RKAIQ_HAVE_THUMBNAILS)
+    XCamReturn thumbnailsGroupMessageHandler(std::list<SmartPtr<XCamMessage>>& msgs, uint32_t id,
+                                             uint64_t grpId);
+#endif
  private:
     RkAiqCore* mAiqCore;
     const bool mSingleThreadMode;

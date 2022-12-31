@@ -155,8 +155,8 @@ typedef struct AgicConfigV21_s {
     unsigned short regmingradthr2;
     unsigned short regmingradthr1;
     unsigned char gr_ratio;
-    float noise_scale;
-    float noise_base;
+    uint8_t noise_scale;
+    uint16_t noise_base;
     float noiseCurve_0;
     float noiseCurve_1;
     float sigma_y[15];

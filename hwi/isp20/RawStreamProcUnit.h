@@ -16,11 +16,15 @@
  */
 #ifndef _RAW_STREAM_PROC_UNIT_H_
 #define _RAW_STREAM_PROC_UNIT_H_
+
 #include <v4l2_device.h>
+
+#include <map>
+
 #include "poll_thread.h"
+#include "safe_queue.h"
 #include "xcam_mutex.h"
 #include "Stream.h"
-#include <map>
 #include "CaptureRawData.h"
 
 using namespace XCam;
@@ -34,7 +38,8 @@ class RawStreamProcUnit : public PollCallback
 {
 public:
     explicit RawStreamProcUnit      ();
-    explicit RawStreamProcUnit (const rk_sensor_full_info_t *s_info, bool linked_to_isp, bool noReadBack);
+    explicit RawStreamProcUnit(const rk_sensor_full_info_t* s_info, bool linked_to_isp,
+                               int tx_buf_cnt);
     virtual ~RawStreamProcUnit ();
     virtual XCamReturn start        (int mode);
     virtual XCamReturn stop         ();
@@ -42,12 +47,12 @@ public:
     XCamReturn prepare(int idx);
     void set_rx_devices             (SmartPtr<V4l2Device> mipi_rx_devs[3]);
     SmartPtr<V4l2Device> get_rx_device (int index);
-    void set_rx_format              (const struct v4l2_subdev_format& sns_sd_fmt, uint32_t sns_v4l_pix_fmt, int8_t sns_bpp);
-    void set_rx_format              (const struct v4l2_subdev_selection& sns_sd_sel, uint32_t sns_v4l_pix_fmt, int8_t sns_bpp);
+    XCamReturn set_rx_format              (const struct v4l2_subdev_format& sns_sd_fmt, uint32_t sns_v4l_pix_fmt);
+    XCamReturn set_rx_format              (const struct v4l2_subdev_selection& sns_sd_sel, uint32_t sns_v4l_pix_fmt);
     void set_devices                (SmartPtr<V4l2SubDevice> ispdev, CamHwIsp20* handle);
-    void set_hdr_frame_readback_infos(int frame_id, int times);
-    void set_hdr_global_tmo_mode(int frame_id, bool mode);
-    void notify_sof(uint64_t time, int frameid);
+    void set_hdr_frame_readback_infos(uint32_t frame_id, int times);
+    void set_hdr_global_tmo_mode(uint32_t frame_id, bool mode);
+    void notify_sof(uint64_t time, uint32_t frameid);
     void send_sync_buf(SmartPtr<V4l2BufferProxy> &buf_s, SmartPtr<V4l2BufferProxy> &buf_m, SmartPtr<V4l2BufferProxy> &buf_l);
     bool raw_buffer_proc();
     void setMulCamConc(bool cc) {
@@ -85,6 +90,8 @@ public:
             return XCAM_RETURN_ERROR_FAILED;
         return _rawCap->notify_capture_raw();
     }
+    XCamReturn set_csi_mem_word_big_align(uint32_t width, uint32_t height, uint32_t sns_v4l_pix_fmt, int8_t sns_bpp);
+
 protected:
     XCAM_DEAD_COPY (RawStreamProcUnit);
 
@@ -114,12 +121,10 @@ protected:
     SmartPtr<V4l2SubDevice> _isp_core_dev;
     bool _first_trigger;
     Mutex _mipi_trigger_mutex;
-    SafeList<EmptyClass> _msg_queue;
+    SafeQueue<int> _msg_queue;
     PollCallback* _PollCallback;
     CaptureRawData* _rawCap;
     bool     _is_1608_sensor;
-    bool is_multi_isp_mode; // isp-unit mode, 2 isp to 1
-    bool mNoReadBack;
 };
 
 class RawProcThread
@@ -138,13 +143,6 @@ protected:
 
 private:
     RawStreamProcUnit *_handle;
-};
-
-class EmptyClass
-{
-    public:
-	    EmptyClass() {}
-	    ~EmptyClass() {}
 };
 
 }

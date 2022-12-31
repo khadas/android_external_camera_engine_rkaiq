@@ -19,7 +19,15 @@
 
 #include "rk_aiq_algo_camgroup_types.h"
 #include "xcam_log.h"
-#include "algos/amerge/rk_aiq_amerge_algo.h"
+#if RKAIQ_HAVE_MERGE_V10
+#include "amerge/rk_aiq_amerge_algo_v10.h"
+#endif
+#if RKAIQ_HAVE_MERGE_V11
+#include "amerge/rk_aiq_amerge_algo_v11.h"
+#endif
+#if RKAIQ_HAVE_MERGE_V12
+#include "amerge/rk_aiq_amerge_algo_v12.h"
+#endif
 #include "algos/amerge/rk_aiq_types_amerge_algo_prvt.h"
 #include "algos/amerge/rk_aiq_algo_amerge_itf.h"
 
@@ -39,7 +47,7 @@ static XCamReturn AmergeCreateCtx(RkAiqAlgoContext **context, const AlgoCtxInsta
     ret = AmergeInit(&pAmergeGrpCtx, (CamCalibDbV2Context_t*)(instanc_int->s_calibv2));
 
     if (ret != XCAM_RETURN_NO_ERROR) {
-        LOGE_AMERGE("%s Amerge Init failed: %d", __FUNCTION__, ret);
+        LOGE_AMERGE("%s(%d) Amerge Init failed: %d", __FUNCTION__, __LINE__, ret);
         return(XCAM_RETURN_ERROR_FAILED);
     }
     *context = (RkAiqAlgoContext *)(pAmergeGrpCtx);
@@ -57,7 +65,7 @@ static XCamReturn AmergeDestroyCtx(RkAiqAlgoContext *context)
         AmergeContext_t* pAmergeGrpCtx = (AmergeContext_t*)context;
         ret = AmergeRelease(pAmergeGrpCtx);
         if (ret != XCAM_RETURN_NO_ERROR) {
-            LOGE_AMERGE("%s Amerge Release failed: %d", __FUNCTION__, ret);
+            LOGE_AMERGE("%s(%d) Amerge Release failed: %d", __FUNCTION__, __LINE__, ret);
             return(XCAM_RETURN_ERROR_FAILED);
         }
         context = NULL;
@@ -73,7 +81,7 @@ static XCamReturn AmergePrepare(RkAiqAlgoCom* params)
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
 
     AmergeContext_t* pAmergeGrpCtx = (AmergeContext_t*)params->ctx;
-    RkAiqAlgoCamGroupPrepare* pAmergePrepParams = (RkAiqAlgoCamGroupPrepare*)params; //come from params in html
+    RkAiqAlgoCamGroupPrepare* pAmergePrepParams = (RkAiqAlgoCamGroupPrepare*)params;
     const CamCalibDbV2Context_t* pCalibDb = pAmergePrepParams->s_calibv2;
 
     if (pAmergePrepParams->gcom.com.u.prepare.working_mode < RK_AIQ_WORKING_MODE_ISP_HDR2)
@@ -84,34 +92,39 @@ static XCamReturn AmergePrepare(RkAiqAlgoCom* params)
     else
         pAmergeGrpCtx->FrameNumber = HDR_3X_NUM;
 
-    if(!!(params->u.prepare.conf_type & RK_AIQ_ALGO_CONFTYPE_UPDATECALIB )) {
-        LOGD_AMERGE("%s: Amerge Reload Para!\n", __FUNCTION__);
-        if(CHECK_ISP_HW_V21()) {
-            CalibDbV2_merge_t* calibv2_amerge_calib =
-                (CalibDbV2_merge_t*)(CALIBDBV2_GET_MODULE_PTR((void*)pCalibDb, amerge_calib));
-            memcpy(&pAmergeGrpCtx->pCalibDB.Merge_v20, calibv2_amerge_calib, sizeof(CalibDbV2_merge_t));//load iq paras
+    if (pAmergeGrpCtx->FrameNumber == HDR_2X_NUM || pAmergeGrpCtx->FrameNumber == HDR_3X_NUM) {
+        if (!!(params->u.prepare.conf_type & RK_AIQ_ALGO_CONFTYPE_UPDATECALIB)) {
+            LOGI_AMERGE("%s: Amerge Reload Para!\n", __FUNCTION__);
+#if RKAIQ_HAVE_MERGE_V10
+            CalibDbV2_merge_v10_t* calibv2_amerge_calib =
+                (CalibDbV2_merge_v10_t*)(CALIBDBV2_GET_MODULE_PTR((void*)pCalibDb, amerge_calib));
+            memcpy(&pAmergeGrpCtx->mergeAttrV10.stAuto, calibv2_amerge_calib,
+                   sizeof(CalibDbV2_merge_v10_t));
+#endif
+#if RKAIQ_HAVE_MERGE_V11
+            CalibDbV2_merge_v11_t* calibv2_amerge_calib =
+                (CalibDbV2_merge_v11_t*)(CALIBDBV2_GET_MODULE_PTR((void*)pCalibDb, amerge_calib));
+            memcpy(&pAmergeGrpCtx->mergeAttrV11.stAuto, calibv2_amerge_calib,
+                   sizeof(CalibDbV2_merge_v11_t));
+#endif
+#if RKAIQ_HAVE_MERGE_V12
+            CalibDbV2_merge_v12_t* calibv2_amerge_calib =
+                (CalibDbV2_merge_v12_t*)(CALIBDBV2_GET_MODULE_PTR((void*)pCalibDb, amerge_calib));
+            memcpy(&pAmergeGrpCtx->mergeAttrV12.stAuto, calibv2_amerge_calib,
+                   sizeof(CalibDbV2_merge_v12_t));
+#endif
+            pAmergeGrpCtx->ifReCalcStAuto = true;
+        } else if (params->u.prepare.conf_type & RK_AIQ_ALGO_CONFTYPE_CHANGERES) {
+            pAmergeGrpCtx->isCapture = true;
         }
-        else if(CHECK_ISP_HW_V30()) {
-            CalibDbV2_merge_V2_t* calibv2_amerge_calib =
-                (CalibDbV2_merge_V2_t*)(CALIBDBV2_GET_MODULE_PTR((void*)pCalibDb, amerge_calib));
-            memcpy(&pAmergeGrpCtx->pCalibDB.Merge_v30, calibv2_amerge_calib, sizeof(CalibDbV2_merge_V2_t));//load iq paras
 
-        }
-
-        if (pAmergeGrpCtx->FrameNumber == HDR_2X_NUM || pAmergeGrpCtx->FrameNumber == HDR_3X_NUM) {
-            MergePrepareJsonMalloc(&pAmergeGrpCtx->Config, &pAmergeGrpCtx->pCalibDB);
-            AmergePrepareJsonUpdateConfig(pAmergeGrpCtx, &pAmergeGrpCtx->pCalibDB);
-        }
-    } else if (params->u.prepare.conf_type & RK_AIQ_ALGO_CONFTYPE_CHANGERES) {
-        pAmergeGrpCtx->isCapture = true;
-    }
-
-    if(/* !params->u.prepare.reconfig*/true) {
-        AmergeStop(pAmergeGrpCtx); // stop firstly for re-preapre
-        ret = AmergeStart(pAmergeGrpCtx);
-        if (ret != XCAM_RETURN_NO_ERROR) {
-            LOGE_AMERGE("%s Amerge Start failed: %d\n", __FUNCTION__, ret);
-            return(XCAM_RETURN_ERROR_FAILED);
+        if (/* !params->u.prepare.reconfig*/ true) {
+            AmergeStop(pAmergeGrpCtx);  // stop firstly for re-preapre
+            ret = AmergeStart(pAmergeGrpCtx);
+            if (ret != XCAM_RETURN_NO_ERROR) {
+                LOGE_AMERGE("%s(%d) Amerge Start failed: %d\n", __FUNCTION__, __LINE__, ret);
+                return (XCAM_RETURN_ERROR_FAILED);
+            }
         }
     }
 
@@ -123,248 +136,218 @@ static XCamReturn AmergeProcess(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* o
 {
     LOG1_AMERGE("%s:Enter!\n", __FUNCTION__);
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
-    bool bypass = false;
+    bool bypass_tuning_process = true;
+    bool bypass_expo_process   = true;
 
     AmergeContext_t* pAmergeGrpCtx = (AmergeContext_t*)inparams->ctx;
-    pAmergeGrpCtx->frameCnt                     = inparams->frame_id;
+    pAmergeGrpCtx->FrameID                      = inparams->frame_id;
     RkAiqAlgoCamGroupProcIn* pAmergeGrpParams = (RkAiqAlgoCamGroupProcIn*)inparams;
     RkAiqAlgoCamGroupProcOut* pAmergeGrpProcRes = (RkAiqAlgoCamGroupProcOut*)outparams;
 
-    if(pAmergeGrpCtx->FrameNumber == HDR_2X_NUM || pAmergeGrpCtx->FrameNumber == HDR_3X_NUM || pAmergeGrpCtx->SensorInfo.LongFrmMode) {
+    if (pAmergeGrpCtx->FrameNumber == HDR_2X_NUM || pAmergeGrpCtx->FrameNumber == HDR_3X_NUM) {
         LOGD_AMERGE("/#####################################Amerge Group Start#####################################/ \n");
 
-        // update config
-        merge_OpModeV21_t mode = MERGE_OPMODE_API_OFF;
-        if (CHECK_ISP_HW_V21())
-            mode = pAmergeGrpCtx->mergeAttr.attrV21.opMode;
-        else if (CHECK_ISP_HW_V30())
-            mode = pAmergeGrpCtx->mergeAttr.attrV30.opMode;
-        if (mode == MERGE_OPMODE_MANU) {
-            MergeProcApiMalloc(&pAmergeGrpCtx->Config, &pAmergeGrpCtx->mergeAttr);
-            AmergeProcApiUpdateConfig(pAmergeGrpCtx);
-        }
-
-        // get Sensor Info
-        XCamVideoBuffer* xCamAeProcRes = pAmergeGrpParams->camgroupParmasArray[0]->aec._aeProcRes;
-        RkAiqAlgoProcResAe* pAEProcRes = NULL;
-        if (xCamAeProcRes) {
-            pAEProcRes = (RkAiqAlgoProcResAe*)xCamAeProcRes->map(xCamAeProcRes);
-            AmergeGetSensorInfo(pAmergeGrpCtx, pAEProcRes->ae_proc_res_rk);
+        if (pAmergeGrpCtx->isCapture) {
+            LOGD_AMERGE("%s: It's capturing, using pre frame params\n", __func__);
+            pAmergeGrpCtx->isCapture = false;
         } else {
-            AecProcResult_t AeProcResult;
-            memset(&AeProcResult, 0x0, sizeof(AecProcResult_t));
-            LOGE_AMERGE("%s: Ae Proc result is null!!!\n", __FUNCTION__);
-            AmergeGetSensorInfo(pAmergeGrpCtx, AeProcResult);
+            // get LongFrmMode
+            XCamVideoBuffer* xCamAeProcRes =
+                pAmergeGrpParams->camgroupParmasArray[0]->aec._aeProcRes;
+            RkAiqAlgoProcResAe* pAEProcRes = NULL;
+            if (xCamAeProcRes) {
+                pAEProcRes = (RkAiqAlgoProcResAe*)xCamAeProcRes->map(xCamAeProcRes);
+                pAmergeGrpCtx->NextData.CtrlData.ExpoData.LongFrmMode =
+                    pAEProcRes->ae_proc_res_rk.LongFrmMode &&
+                    (pAmergeGrpCtx->FrameNumber != LINEAR_NUM);
+            } else {
+                AecProcResult_t AeProcResult;
+                memset(&AeProcResult, 0x0, sizeof(AecProcResult_t));
+                LOGW_AMERGE("%s: Ae Proc result is null!!!\n", __FUNCTION__);
+                pAmergeGrpCtx->NextData.CtrlData.ExpoData.LongFrmMode = false;
+            }
+
+        //get ae pre res and proc
+        XCamVideoBuffer* xCamAePreRes = pAmergeGrpParams->camgroupParmasArray[0]->aec._aePreRes;
+        RkAiqAlgoPreResAe* pAEPreRes = NULL;
+        if (xCamAePreRes) {
+            pAEPreRes = (RkAiqAlgoPreResAe*)xCamAePreRes->map(xCamAePreRes);
+            bypass_tuning_process = AmergeByPassProcessing(pAmergeGrpCtx, pAEPreRes->ae_pre_res_rk);
+        }
+        else {
+                AecPreResult_t AecHdrPreResult;
+                memset(&AecHdrPreResult, 0x0, sizeof(AecPreResult_t));
+                bypass_tuning_process = AmergeByPassProcessing(pAmergeGrpCtx, AecHdrPreResult);
+                bypass_tuning_process = false;
+                LOGW_AMERGE("%s: ae Pre result is null!!!\n", __FUNCTION__);
         }
 
-        // expo para process
-        MergeExpoData_t ExpoData;
-        memset(&ExpoData, 0, sizeof(MergeExpoData_t));
+        //expo para process
+        pAmergeGrpCtx->NextData.CtrlData.ExpoData.SGain = pAmergeGrpParams->camgroupParmasArray[0]
+                                                              ->aec._effAecExpInfo.HdrExp[0]
+                                                              .exp_real_params.analog_gain *
+                                                          pAmergeGrpParams->camgroupParmasArray[0]
+                                                              ->aec._effAecExpInfo.HdrExp[0]
+                                                              .exp_real_params.digital_gain *
+                                                          pAmergeGrpParams->camgroupParmasArray[0]
+                                                              ->aec._effAecExpInfo.HdrExp[0]
+                                                              .exp_real_params.isp_dgain;
+        pAmergeGrpCtx->NextData.CtrlData.ExpoData.MGain = pAmergeGrpParams->camgroupParmasArray[0]
+                                                              ->aec._effAecExpInfo.HdrExp[1]
+                                                              .exp_real_params.analog_gain *
+                                                          pAmergeGrpParams->camgroupParmasArray[0]
+                                                              ->aec._effAecExpInfo.HdrExp[1]
+                                                              .exp_real_params.digital_gain *
+                                                          pAmergeGrpParams->camgroupParmasArray[0]
+                                                              ->aec._effAecExpInfo.HdrExp[1]
+                                                              .exp_real_params.isp_dgain;
+
+        pAmergeGrpCtx->NextData.CtrlData.ExpoData.SExpo =
+            pAmergeGrpCtx->NextData.CtrlData.ExpoData.SGain *
+            pAmergeGrpParams->camgroupParmasArray[0]
+                ->aec._effAecExpInfo.HdrExp[0]
+                .exp_real_params.integration_time;
+        pAmergeGrpCtx->NextData.CtrlData.ExpoData.MExpo =
+            pAmergeGrpCtx->NextData.CtrlData.ExpoData.MGain *
+            pAmergeGrpParams->camgroupParmasArray[0]
+                ->aec._effAecExpInfo.HdrExp[1]
+                .exp_real_params.integration_time;
         if (pAmergeGrpCtx->FrameNumber == HDR_2X_NUM) {
-            ExpoData.nextSExpo = pAmergeGrpParams->camgroupParmasArray[0]
-                                     ->aec._effAecExpInfo.HdrExp[0]
-                                     .exp_real_params.analog_gain *
-                                 pAmergeGrpParams->camgroupParmasArray[0]
-                                     ->aec._effAecExpInfo.HdrExp[0]
-                                     .exp_real_params.digital_gain *
-                                 pAmergeGrpParams->camgroupParmasArray[0]
-                                     ->aec._effAecExpInfo.HdrExp[0]
-                                     .exp_real_params.isp_dgain *
-                                 pAmergeGrpParams->camgroupParmasArray[0]
-                                     ->aec._effAecExpInfo.HdrExp[0]
-                                     .exp_real_params.integration_time;
-            ExpoData.nextMExpo = pAmergeGrpParams->camgroupParmasArray[0]
-                                     ->aec._effAecExpInfo.HdrExp[1]
-                                     .exp_real_params.analog_gain *
-                                 pAmergeGrpParams->camgroupParmasArray[0]
-                                     ->aec._effAecExpInfo.HdrExp[1]
-                                     .exp_real_params.digital_gain *
-                                 pAmergeGrpParams->camgroupParmasArray[0]
-                                     ->aec._effAecExpInfo.HdrExp[1]
-                                     .exp_real_params.isp_dgain *
-                                 pAmergeGrpParams->camgroupParmasArray[0]
-                                     ->aec._effAecExpInfo.HdrExp[1]
-                                     .exp_real_params.integration_time;
-            ExpoData.nextLExpo = ExpoData.nextMExpo;
-
-            ExpoData.nextSGain = pAmergeGrpParams->camgroupParmasArray[0]
-                                     ->aec._effAecExpInfo.HdrExp[0]
-                                     .exp_real_params.analog_gain *
-                                 pAmergeGrpParams->camgroupParmasArray[0]
-                                     ->aec._effAecExpInfo.HdrExp[0]
-                                     .exp_real_params.isp_dgain *
-                                 pAmergeGrpParams->camgroupParmasArray[0]
-                                     ->aec._effAecExpInfo.HdrExp[0]
-                                     .exp_real_params.digital_gain;
-            ExpoData.nextMGain = pAmergeGrpParams->camgroupParmasArray[0]
-                                     ->aec._effAecExpInfo.HdrExp[1]
-                                     .exp_real_params.analog_gain *
-                                 pAmergeGrpParams->camgroupParmasArray[0]
-                                     ->aec._effAecExpInfo.HdrExp[1]
-                                     .exp_real_params.isp_dgain *
-                                 pAmergeGrpParams->camgroupParmasArray[0]
-                                     ->aec._effAecExpInfo.HdrExp[1]
-                                     .exp_real_params.digital_gain;
-
-            pAmergeGrpCtx->CurrData.CtrlData.ISO = pAmergeGrpParams->camgroupParmasArray[0]
-                                                       ->aec._effAecExpInfo.HdrExp[1]
-                                                       .exp_real_params.analog_gain *
-                                                   pAmergeGrpParams->camgroupParmasArray[0]
-                                                       ->aec._effAecExpInfo.HdrExp[1]
-                                                       .exp_real_params.digital_gain *
-                                                   pAmergeGrpParams->camgroupParmasArray[0]
-                                                       ->aec._effAecExpInfo.HdrExp[1]
-                                                       .exp_real_params.isp_dgain *
-                                                   50.0f;
+            pAmergeGrpCtx->NextData.CtrlData.ExpoData.LExpo =
+                pAmergeGrpCtx->NextData.CtrlData.ExpoData.MExpo;
         } else if (pAmergeGrpCtx->FrameNumber == HDR_3X_NUM) {
-            ExpoData.nextSExpo = pAmergeGrpParams->camgroupParmasArray[0]
-                                     ->aec._effAecExpInfo.HdrExp[0]
-                                     .exp_real_params.analog_gain *
-                                 pAmergeGrpParams->camgroupParmasArray[0]
-                                     ->aec._effAecExpInfo.HdrExp[0]
-                                     .exp_real_params.digital_gain *
-                                 pAmergeGrpParams->camgroupParmasArray[0]
-                                     ->aec._effAecExpInfo.HdrExp[0]
-                                     .exp_real_params.isp_dgain *
-                                 pAmergeGrpParams->camgroupParmasArray[0]
-                                     ->aec._effAecExpInfo.HdrExp[0]
-                                     .exp_real_params.integration_time;
-            ExpoData.nextMExpo = pAmergeGrpParams->camgroupParmasArray[0]
-                                     ->aec._effAecExpInfo.HdrExp[1]
-                                     .exp_real_params.analog_gain *
-                                 pAmergeGrpParams->camgroupParmasArray[0]
-                                     ->aec._effAecExpInfo.HdrExp[1]
-                                     .exp_real_params.digital_gain *
-                                 pAmergeGrpParams->camgroupParmasArray[0]
-                                     ->aec._effAecExpInfo.HdrExp[1]
-                                     .exp_real_params.isp_dgain *
-                                 pAmergeGrpParams->camgroupParmasArray[0]
-                                     ->aec._effAecExpInfo.HdrExp[1]
-                                     .exp_real_params.integration_time;
-            ExpoData.nextLExpo = pAmergeGrpParams->camgroupParmasArray[0]
-                                     ->aec._effAecExpInfo.HdrExp[2]
-                                     .exp_real_params.analog_gain *
-                                 pAmergeGrpParams->camgroupParmasArray[0]
-                                     ->aec._effAecExpInfo.HdrExp[2]
-                                     .exp_real_params.digital_gain *
-                                 pAmergeGrpParams->camgroupParmasArray[0]
-                                     ->aec._effAecExpInfo.HdrExp[2]
-                                     .exp_real_params.isp_dgain *
-                                 pAmergeGrpParams->camgroupParmasArray[0]
-                                     ->aec._effAecExpInfo.HdrExp[2]
-                                     .exp_real_params.integration_time;
-
-            ExpoData.nextSGain = pAmergeGrpParams->camgroupParmasArray[0]
-                                     ->aec._effAecExpInfo.HdrExp[0]
-                                     .exp_real_params.analog_gain *
-                                 pAmergeGrpParams->camgroupParmasArray[0]
-                                     ->aec._effAecExpInfo.HdrExp[0]
-                                     .exp_real_params.isp_dgain *
-                                 pAmergeGrpParams->camgroupParmasArray[0]
-                                     ->aec._effAecExpInfo.HdrExp[0]
-                                     .exp_real_params.digital_gain;
-            ExpoData.nextMGain = pAmergeGrpParams->camgroupParmasArray[0]
-                                     ->aec._effAecExpInfo.HdrExp[1]
-                                     .exp_real_params.analog_gain *
-                                 pAmergeGrpParams->camgroupParmasArray[0]
-                                     ->aec._effAecExpInfo.HdrExp[1]
-                                     .exp_real_params.isp_dgain *
-                                 pAmergeGrpParams->camgroupParmasArray[0]
-                                     ->aec._effAecExpInfo.HdrExp[1]
-                                     .exp_real_params.digital_gain;
-            pAmergeGrpCtx->CurrData.CtrlData.ISO = pAmergeGrpParams->camgroupParmasArray[0]
-                                                       ->aec._effAecExpInfo.HdrExp[1]
-                                                       .exp_real_params.analog_gain *
-                                                   pAmergeGrpParams->camgroupParmasArray[0]
-                                                       ->aec._effAecExpInfo.HdrExp[1]
-                                                       .exp_real_params.digital_gain *
-                                                   pAmergeGrpParams->camgroupParmasArray[0]
-                                                       ->aec._effAecExpInfo.HdrExp[1]
-                                                       .exp_real_params.isp_dgain *
-                                                   50.0f;
+            pAmergeGrpCtx->NextData.CtrlData.ExpoData.LExpo =
+                pAmergeGrpParams->camgroupParmasArray[0]
+                    ->aec._effAecExpInfo.HdrExp[2]
+                    .exp_real_params.analog_gain *
+                pAmergeGrpParams->camgroupParmasArray[0]
+                    ->aec._effAecExpInfo.HdrExp[2]
+                    .exp_real_params.digital_gain *
+                pAmergeGrpParams->camgroupParmasArray[0]
+                    ->aec._effAecExpInfo.HdrExp[2]
+                    .exp_real_params.isp_dgain *
+                pAmergeGrpParams->camgroupParmasArray[0]
+                    ->aec._effAecExpInfo.HdrExp[2]
+                    .exp_real_params.integration_time;
         }
+        pAmergeGrpCtx->NextData.CtrlData.ExpoData.ISO =
+            pAmergeGrpCtx->NextData.CtrlData.ExpoData.MGain * ISOMIN;
+        pAmergeGrpCtx->NextData.CtrlData.ExpoData.ISO =
+            LIMIT_VALUE(pAmergeGrpCtx->NextData.CtrlData.ExpoData.ISO, ISOMAX, ISOMIN);
         LOGV_AMERGE("%s: nextFrame: sexp: %f-%f, mexp: %f-%f, lexp: %f-%f\n", __FUNCTION__,
-                    pAmergeGrpParams->camgroupParmasArray[0]
-                        ->aec._effAecExpInfo.HdrExp[0]
-                        .exp_real_params.analog_gain,
+                    pAmergeGrpCtx->NextData.CtrlData.ExpoData.SGain,
                     pAmergeGrpParams->camgroupParmasArray[0]
                         ->aec._effAecExpInfo.HdrExp[0]
                         .exp_real_params.integration_time,
-                    pAmergeGrpParams->camgroupParmasArray[0]
-                        ->aec._effAecExpInfo.HdrExp[1]
-                        .exp_real_params.analog_gain,
+                    pAmergeGrpCtx->NextData.CtrlData.ExpoData.MGain,
                     pAmergeGrpParams->camgroupParmasArray[0]
                         ->aec._effAecExpInfo.HdrExp[1]
                         .exp_real_params.integration_time,
                     pAmergeGrpParams->camgroupParmasArray[0]
-                        ->aec._effAecExpInfo.HdrExp[2]
-                        .exp_real_params.analog_gain,
+                            ->aec._effAecExpInfo.HdrExp[2]
+                            .exp_real_params.analog_gain *
+                        pAmergeGrpParams->camgroupParmasArray[0]
+                            ->aec._effAecExpInfo.HdrExp[2]
+                            .exp_real_params.digital_gain *
+                        pAmergeGrpParams->camgroupParmasArray[0]
+                            ->aec._effAecExpInfo.HdrExp[2]
+                            .exp_real_params.isp_dgain,
                     pAmergeGrpParams->camgroupParmasArray[0]
                         ->aec._effAecExpInfo.HdrExp[2]
                         .exp_real_params.integration_time);
-        if (ExpoData.nextSExpo > FLT_EPSILON)
-            ExpoData.nextRatioLS = ExpoData.nextLExpo / ExpoData.nextSExpo;
+        if (pAmergeGrpCtx->NextData.CtrlData.ExpoData.SExpo > FLT_EPSILON)
+            pAmergeGrpCtx->NextData.CtrlData.ExpoData.RatioLS =
+                pAmergeGrpCtx->NextData.CtrlData.ExpoData.LExpo /
+                pAmergeGrpCtx->NextData.CtrlData.ExpoData.SExpo;
         else
-            LOGE_AMERGE("%s: Short frame for merge expo sync is ERROR!!!\n", __FUNCTION__);
-        if (ExpoData.nextMExpo > FLT_EPSILON)
-            ExpoData.nextRatioLM = ExpoData.nextLExpo / ExpoData.nextMExpo;
+            LOGE_AMERGE("%s(%d): Short frame for merge expo sync is ERROR!!!\n", __FUNCTION__,
+                        __LINE__);
+        if (pAmergeGrpCtx->NextData.CtrlData.ExpoData.MExpo > FLT_EPSILON)
+            pAmergeGrpCtx->NextData.CtrlData.ExpoData.RatioLM =
+                pAmergeGrpCtx->NextData.CtrlData.ExpoData.LExpo /
+                pAmergeGrpCtx->NextData.CtrlData.ExpoData.MExpo;
         else
-            LOGE_AMERGE("%s: Middle frame for merge expo sync is ERROR!!!\n", __FUNCTION__);
-        // clip for long frame mode
-        if (pAmergeGrpCtx->SensorInfo.LongFrmMode) {
-            ExpoData.nextRatioLS = 1.0f;
-            ExpoData.nextRatioLM = 1.0f;
+            LOGE_AMERGE("%s(%d): Middle frame for merge expo sync is ERROR!!!\n", __FUNCTION__,
+                        __LINE__);
+        //clip for long frame mode
+        if (pAmergeGrpCtx->NextData.CtrlData.ExpoData.LongFrmMode) {
+            pAmergeGrpCtx->NextData.CtrlData.ExpoData.RatioLS = LONG_FRAME_MODE_RATIO;
+            pAmergeGrpCtx->NextData.CtrlData.ExpoData.RatioLM = LONG_FRAME_MODE_RATIO;
         }
 
-        // get ae pre res and proc
-        XCamVideoBuffer* xCamAePreRes = pAmergeGrpParams->camgroupParmasArray[0]->aec._aePreRes;
-        RkAiqAlgoPreResAe* pAEPreRes  = NULL;
-        if (xCamAePreRes) {
-            pAEPreRes = (RkAiqAlgoPreResAe*)xCamAePreRes->map(xCamAePreRes);
-            bypass    = AmergeByPassProcessing(pAmergeGrpCtx, pAEPreRes->ae_pre_res_rk);
+        if (pAmergeGrpCtx->NextData.CtrlData.ExpoData.RatioLS >= RATIO_DEFAULT &&
+            pAmergeGrpCtx->NextData.CtrlData.ExpoData.RatioLM >= RATIO_DEFAULT) {
+            if (pAmergeGrpCtx->FrameID <= 2)
+                bypass_expo_process = false;
+            else if (pAmergeGrpCtx->ifReCalcStAuto || pAmergeGrpCtx->ifReCalcStManual)
+                bypass_expo_process = false;
+            else if (!pAmergeGrpCtx->CurrData.CtrlData.ExpoData.LongFrmMode !=
+                     !pAmergeGrpCtx->NextData.CtrlData.ExpoData.LongFrmMode)
+                bypass_expo_process = false;
+#if RKAIQ_HAVE_MERGE_V10
+            else if (pAmergeGrpCtx->CurrData.CtrlData.ExpoData.RatioLS !=
+                         pAmergeGrpCtx->NextData.CtrlData.ExpoData.RatioLS ||
+                     pAmergeGrpCtx->CurrData.CtrlData.ExpoData.RatioLM !=
+                         pAmergeGrpCtx->NextData.CtrlData.ExpoData.RatioLM)
+                bypass_expo_process = false;
+#endif
+#if RKAIQ_HAVE_MERGE_V11 || RKAIQ_HAVE_MERGE_V12
+            else if (pAmergeGrpCtx->CurrData.CtrlData.ExpoData.RatioLS !=
+                         pAmergeGrpCtx->NextData.CtrlData.ExpoData.RatioLS ||
+                     pAmergeGrpCtx->CurrData.CtrlData.ExpoData.RatioLM !=
+                         pAmergeGrpCtx->NextData.CtrlData.ExpoData.RatioLM ||
+                     pAmergeGrpCtx->CurrData.CtrlData.ExpoData.SGain !=
+                         pAmergeGrpCtx->NextData.CtrlData.ExpoData.SGain ||
+                     pAmergeGrpCtx->CurrData.CtrlData.ExpoData.MGain !=
+                         pAmergeGrpCtx->NextData.CtrlData.ExpoData.MGain)
+                bypass_expo_process = false;
+#endif
+            else
+                bypass_expo_process = true;
         } else {
-            AecPreResult_t AecHdrPreResult;
-            memset(&AecHdrPreResult, 0x0, sizeof(AecPreResult_t));
-            bypass = AmergeByPassProcessing(pAmergeGrpCtx, AecHdrPreResult);
-            bypass = false;
-            LOGE_AMERGE("%s: ae Pre result is null!!!\n", __FUNCTION__);
+            LOGE_AMERGE("%s(%d): AE RatioLS:%f RatioLM:%f for drc expo sync is under one!!!\n",
+                        __FUNCTION__, __LINE__, pAmergeGrpCtx->NextData.CtrlData.ExpoData.RatioLS,
+                        pAmergeGrpCtx->NextData.CtrlData.ExpoData.RatioLM);
+            bypass_expo_process = true;
         }
 
-        // merge tuning para process
-        if (!bypass) AmergeTuningProcessing(pAmergeGrpCtx);
+        // get tuning para process
+        if (!bypass_tuning_process) AmergeTuningProcessing(pAmergeGrpCtx);
+        // get expo para process
+        if (!bypass_expo_process)
+            AmergeExpoProcessing(pAmergeGrpCtx, &pAmergeGrpCtx->NextData.CtrlData.ExpoData);
 
-        if (ExpoData.nextRatioLS >= 1.0f && ExpoData.nextRatioLM >= 1.0f)
-            AmergeExpoProcessing(pAmergeGrpCtx, &ExpoData);
-        else
-            LOGE_AMERGE("%s: AE ratio for merge expo sync is under one!!!\n", __FUNCTION__);
-
-        if (CHECK_ISP_HW_V21())
-            pAmergeGrpCtx->PrevData.CtrlData.ApiMode = pAmergeGrpCtx->mergeAttr.attrV21.opMode;
-        else if (CHECK_ISP_HW_V30())
-            pAmergeGrpCtx->PrevData.CtrlData.ApiMode = pAmergeGrpCtx->mergeAttr.attrV30.opMode;
-
-        pAmergeGrpCtx->ProcRes.update        = !bypass;
-        pAmergeGrpCtx->ProcRes.LongFrameMode = pAmergeGrpCtx->SensorInfo.LongFrmMode;
-
-        for (int i = 0; i < pAmergeGrpProcRes->arraySize; i++) {
-            pAmergeGrpProcRes->camgroupParmasArray[i]->_amergeConfig->update =
-                pAmergeGrpCtx->ProcRes.update;
-            pAmergeGrpProcRes->camgroupParmasArray[i]->_amergeConfig->LongFrameMode =
-                pAmergeGrpCtx->ProcRes.LongFrameMode;
-            if (CHECK_ISP_HW_V21())
-                memcpy(&pAmergeGrpProcRes->camgroupParmasArray[i]->_amergeConfig->Merge_v20,
-                       &pAmergeGrpCtx->ProcRes.Merge_v20, sizeof(MgeProcRes_t));
-            else if (CHECK_ISP_HW_V30())
-                memcpy(&pAmergeGrpProcRes->camgroupParmasArray[i]->_amergeConfig->Merge_v30,
-                       &pAmergeGrpCtx->ProcRes.Merge_v30, sizeof(MgeProcResV2_t));
+        pAmergeGrpCtx->ifReCalcStAuto   = false;
+        pAmergeGrpCtx->ifReCalcStManual = false;
+        pAmergeGrpCtx->ProcRes.update   = !bypass_tuning_process || !bypass_expo_process;
         }
 
-        if (pAmergeGrpCtx->isCapture) pAmergeGrpCtx->isCapture = false;
-
-        LOGD_AMERGE("/#####################################Amerge Group Over#####################################/ \n");
+        LOGD_AMERGE(
+            "/#####################################Amerge Group "
+            "Over#####################################/ \n");
+    } else {
+        LOGD_AMERGE("%s FrameID:%d, It's in Linear Mode, Merge function bypass_tuning_process\n",
+                    __FUNCTION__, pAmergeGrpCtx->FrameID);
     }
-    else
-        LOGD_AMERGE("%s FrameID:%d, It's in Linear Mode, Merge function bypass\n", __FUNCTION__, pAmergeGrpCtx->frameCnt);
+
+    for (int i = 0; i < pAmergeGrpProcRes->arraySize; i++) {
+        pAmergeGrpProcRes->camgroupParmasArray[i]->_amergeConfig->update =
+            pAmergeGrpCtx->ProcRes.update;
+        if (pAmergeGrpProcRes->camgroupParmasArray[i]->_amergeConfig->update) {
+#if RKAIQ_HAVE_MERGE_V10
+            memcpy(&pAmergeGrpProcRes->camgroupParmasArray[i]->_amergeConfig->Merge_v10,
+                   &pAmergeGrpCtx->ProcRes.Merge_v10, sizeof(MgeProcResV10_t));
+#endif
+#if RKAIQ_HAVE_MERGE_V11
+            memcpy(&pAmergeGrpProcRes->camgroupParmasArray[i]->_amergeConfig->Merge_v11,
+                   &pAmergeGrpCtx->ProcRes.Merge_v11, sizeof(MgeProcResV11_t));
+#endif
+#if RKAIQ_HAVE_MERGE_V12
+            memcpy(&pAmergeGrpProcRes->camgroupParmasArray[i]->_amergeConfig->Merge_v12,
+                   &pAmergeGrpCtx->ProcRes.Merge_v12, sizeof(MgeProcResV12_t));
+#endif
+        }
+    }
 
     LOG1_AMERGE("%s:Exit!\n", __FUNCTION__);
     return(ret);

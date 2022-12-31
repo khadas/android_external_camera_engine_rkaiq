@@ -17,6 +17,7 @@
 #include "RkAiqCamGroupHandleInt.h"
 
 namespace RkCam {
+#if RKAIQ_HAVE_BLC_V1
 
 XCamReturn RkAiqCamGroupAblcHandleInt::updateConfig(bool needsync) {
     ENTER_ANALYZER_FUNCTION();
@@ -41,7 +42,7 @@ XCamReturn RkAiqCamGroupAblcHandleInt::updateConfig(bool needsync) {
     return ret;
 }
 
-XCamReturn RkAiqCamGroupAblcHandleInt::setAttrib(rk_aiq_blc_attrib_t* att) {
+XCamReturn RkAiqCamGroupAblcHandleInt::setAttrib(const rk_aiq_blc_attrib_t* att) {
     ENTER_ANALYZER_FUNCTION();
     LOGD_ABLC("%s:%d\n", __FUNCTION__, __LINE__);
 
@@ -129,5 +130,5 @@ XCamReturn RkAiqCamGroupAblcHandleInt::getInfo(rk_aiq_ablc_info_t *pInfo) {
     return ret;
 }
 
-
+#endif
 }

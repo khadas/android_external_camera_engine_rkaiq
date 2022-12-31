@@ -47,7 +47,6 @@
 
 
 #define MAX_HDR_FRAMENUM  (3)
-#define AEC_AFPS_MASK (1 << 0)
 /*****************************************************************************/
 /**
  * @brief   The number of mean and hist.
@@ -394,7 +393,8 @@ typedef enum AecHwVersion_e
 {
     AEC_HARDWARE_V0 = 0,  //at most support Hdr 3_frame, 2 AEBIG & 1 AELITE for input raw, support yuv luma e.g. rk1126/1109
     AEC_HARDWARE_V1 = 1,  //at most support Hdr 2_frame, 1 AEBIG & 1 AELITE for input raw, not support yuv luma  e.g. rk356X
-    AEC_HARDWARE_V2 = 2,  //at most support Hdr 3_frame, 2 AEBIG & 1 AELITE for input raw, not support yuv luma e.g. rk3588
+    AEC_HARDWARE_V2 = 2,  //at most support Hdr 3_frame, 2 AEBIG & 1 AELITE for input raw, not support yuv luma, share AEBIG3 with AF e.g. rk3588
+    AEC_HARDWARE_V3 = 3,  //at most support Hdr 2_frame, 1 AEBIG & 1 AELITE for input raw, not support yuv luma, share AEBIG3 with AF e.g. rk1106
     AEC_HARDWARE_MAX,
 } AecHwVersion_t;
 
@@ -428,7 +428,6 @@ typedef struct AecConfig_s {
 
     /*continue to use some old params to keep the same with AecConfig_t*/
     AecDampingMode_t              DampingMode;              /**< damping mode */
-    AecEcmFlickerPeriod_t         EcmFlickerSelect;        /**< flicker period selection */
 
     int                           RawWidth;
     int                           RawHeight;
@@ -463,29 +462,15 @@ typedef struct AeInstanceConfig_s {
  */
 /*****************************************************************************/
 typedef struct AecPreResult_s {
-    float MeanLuma[MAX_HDR_FRAMENUM];
-    float LowLightLuma[MAX_HDR_FRAMENUM];
     float LowLightROIPdf[MAX_HDR_FRAMENUM];
-    float HighLightLuma[MAX_HDR_FRAMENUM];
     float HighLightROIPdf[MAX_HDR_FRAMENUM];
+    float HighLightLuma[MAX_HDR_FRAMENUM];
     float OverExpROIPdf[MAX_HDR_FRAMENUM];
-    float NonOverExpLuma[MAX_HDR_FRAMENUM];
-    float NonOverExpPdf[MAX_HDR_FRAMENUM];
-
     float GlobalEnvLv[MAX_HDR_FRAMENUM];
-    float BlockEnvLv[ISP2_RAWAE_WINNUM_MAX];
-    float GlobalEnvLux;
-    float BlockEnvLux[ISP2_RAWAE_WINNUM_MAX];
+    float MeanLuma[MAX_HDR_FRAMENUM];
     float DynamicRange;
-
-    float L2M_ExpRatio;
-    float M2S_ExpRatio;
-
-    unsigned char NormalIndex;
-
     RkAiqExpParamComb_t LinearExp;
     RkAiqExpParamComb_t HdrExp[MAX_HDR_FRAMENUM];
-
     CamerIcHistBins_t AeRawHistBin[3];
 } AecPreResult_t;
 
@@ -497,51 +482,12 @@ typedef struct AecPreResult_s {
 */
 /*****************************************************************************/
 typedef struct AecProcResult_s {
-    /***Common results****/
-    int                           FramdId;
-    RKAiqAecExpInfo_t             cur_ae_exp;
-    RKAiqAecExpInfo_t             new_ae_exp;
-    rk_aiq_ae_meas_params_t       ae_meas;
-    rk_aiq_hist_meas_params_t     hist_meas;
-
-    bool                          IsHdr;
     bool                          IsConverged;
-    unsigned int                  actives;
-    bool                          auto_adjust_fps;
-
-    RKAiqAecExpInfo_t             InterpExp[MAX_AEC_EFFECT_FNUM];
-
-    RKAiqAecExpInfo_t             exp_set_tbl[MAX_AEC_EFFECT_FNUM + 1];
-    int                           exp_set_cnt;
-
-    /***LinearAe results****/
-    float                         InputExposure;
-    float                         Exposure;
-
-    float                         MinGain;
-    float                         MaxGain;
-    float                         MaxGainRange;
-    float                         MinIntegrationTime;
-    float                         MaxIntegrationTime;
-
-    uint8_t                       GridWeights[ISP2_RAWAE_WINNUM_MAX];//used for histogram calculation
-
-    float                         MeanLuma;
-    float                         LumaDeviation;
-
-    /***Hdr results****/
     bool                          LongFrmMode;
-    float                         HdrMeanLuma[3];
+    float                         LumaDeviation;
     float                         HdrLumaDeviation[MAX_HDR_FRAMENUM];
-
-    float                         HdrInputExposure[MAX_HDR_FRAMENUM];
-    float                         HdrExposure[MAX_HDR_FRAMENUM];
-    float                         HdrMinGain[MAX_HDR_FRAMENUM];
-    float                         HdrMaxGain[MAX_HDR_FRAMENUM];
-    float                         HdrMinIntegrationTime[MAX_HDR_FRAMENUM];
-    float                         HdrMaxIntegrationTime[MAX_HDR_FRAMENUM];
-
-    uint8_t                       HdrGridWeights[3][ISP2_RAWAE_WINNUM_MAX];//used for histogram calculation
+    int                           exp_set_cnt;
+    RKAiqAecExpInfo_t             exp_set_tbl[MAX_AEC_EFFECT_FNUM + 1];
 } AecProcResult_t;
 
 typedef struct AecPostResult_s {

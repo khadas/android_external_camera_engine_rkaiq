@@ -6,10 +6,12 @@ if(NOT CMAKE_BUILD_TYPE)
         FORCE)
 endif()
 
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 2.8...3.22)
 
 # surpress CXX_VISIBILITY_PRESET warning
-cmake_policy(SET CMP0063 NEW)
+if (POLICY CMP0063) # Visibility
+    cmake_policy(SET CMP0063 NEW)
+endif (POLICY CMP0063)
 
 include_directories(
 	../xcore
@@ -66,10 +68,19 @@ endif()
 # ----------------------------------------------------------------------------
 set (AWB_SRC
     awb/rk_aiq_algo_camgroup_awb_itf.cpp
-    awb/rk_aiq_awb_algo_surround_view_v201.cpp
 	# uapi
 	awb/rk_aiq_uapiv2_camgroup_awb_int.cpp
 )
+
+if (RKAIQ_HAVE_AWB_V21)
+    add_compile_options(-DRKAIQ_HAVE_AWB_V21=1)
+    list(APPEND AWB_SRC awb/rk_aiq_awb_algo_surround_view_v201.cpp)
+endif()
+
+if (RKAIQ_HAVE_AWB_V32)
+    add_compile_options(-DRKAIQ_HAVE_AWB_V32=1)
+    list(APPEND AWB_SRC awb/rk_aiq_awb_algo_surround_view_v32.cpp)
+endif()
 
 if(EXISTS "${CMAKE_SOURCE_DIR}/algos_camgroup/awb/rk_aiq_algo_camgroup_awb_itf.cpp")
 	message(${LIBRARY_OUTPUT_PATH})
@@ -97,23 +108,38 @@ set (MISC_SRC
 	misc/rk_aiq_algo_camgroup_adpcc_itf.cpp
 	misc/rk_aiq_algo_camgroup_accm_itf.cpp
 	misc/rk_aiq_algo_camgroup_a3dlut_itf.cpp
-	misc/rk_aiq_algo_camgroup_adhaz_itf.cpp
+	misc/rk_aiq_algo_camgroup_adehaze_itf.cpp
 	misc/rk_aiq_algo_camgroup_agamma_itf.cpp
 	misc/rk_aiq_algo_camgroup_amerge_itf.cpp
 	misc/rk_aiq_algo_camgroup_adrc_itf.cpp
 	misc/rk_aiq_algo_camgroup_ablc_itf.cpp
-	aynr/rk_aiq_algo_camgroup_aynr_itf.cpp
+	misc/rk_aiq_algo_camgroup_ablc_itf_v32.cpp
+	aynr2/rk_aiq_algo_camgroup_aynr_itf_v2.cpp
+	aynr3/rk_aiq_algo_camgroup_aynr_itf_v3.cpp
+	aynr3/rk_aiq_uapi_camgroup_aynr_int_v3.cpp
+	aynrV22/rk_aiq_algo_camgroup_aynr_itf_v22.cpp
+	aynrV22/rk_aiq_uapi_camgroup_aynr_int_v22.cpp
 	acnr/rk_aiq_algo_camgroup_acnr_itf.cpp
-	asharp/rk_aiq_algo_camgroup_asharp_itf.cpp
-	abayernr/rk_aiq_algo_camgroup_abayernr_itf.cpp
-	atnr/rk_aiq_algo_camgroup_atnr_itf.cpp
-	again/rk_aiq_algo_camgroup_again_itf.cpp
-	aynr/rk_aiq_uapi_camgroup_aynr_int_v3.cpp
-	acnr/rk_aiq_uapi_camgroup_acnr_int_v2.cpp
-	abayernr/rk_aiq_uapi_camgroup_abayer2dnr_int_v2.cpp
-	asharp/rk_aiq_uapi_camgroup_asharp_int_v4.cpp
-	atnr/rk_aiq_uapi_camgroup_atnr_int_v2.cpp
-	again/rk_aiq_uapi_camgroup_again_int_v2.cpp
+	acnr2/rk_aiq_algo_camgroup_acnr_itf_v2.cpp
+	acnr2/rk_aiq_uapi_camgroup_acnr_int_v2.cpp
+	acnrV30/rk_aiq_algo_camgroup_acnr_itf_v30.cpp
+	acnrV30/rk_aiq_uapi_camgroup_acnr_int_v30.cpp
+	asharp3/rk_aiq_algo_camgroup_asharp_itf_v3.cpp
+	asharp4/rk_aiq_algo_camgroup_asharp_itf_v4.cpp
+	asharp4/rk_aiq_uapi_camgroup_asharp_int_v4.cpp
+	asharpV33/rk_aiq_uapi_camgroup_asharp_int_v33.cpp
+	asharpV33/rk_aiq_algo_camgroup_asharp_itf_v33.cpp
+	abayernr2/rk_aiq_algo_camgroup_abayernr_itf_v2.cpp
+	abayer2dnr2/rk_aiq_algo_camgroup_abayer2dnr_itf_v2.cpp
+	abayer2dnr2/rk_aiq_uapi_camgroup_abayer2dnr_int_v2.cpp
+	abayer2dnrV23/rk_aiq_uapi_camgroup_abayer2dnr_int_v23.cpp
+	abayer2dnrV23/rk_aiq_algo_camgroup_abayer2dnr_itf_v23.cpp
+	abayertnr2/rk_aiq_algo_camgroup_abayertnr_itf_v2.cpp
+	abayertnr2/rk_aiq_uapi_camgroup_abayertnr_int_v2.cpp
+	abayertnrV23/rk_aiq_uapi_camgroup_abayertnr_int_v23.cpp
+	abayertnrV23/rk_aiq_algo_camgroup_abayertnr_itf_v23.cpp
+	again2/rk_aiq_algo_camgroup_again_itf_v2.cpp
+	again2/rk_aiq_uapi_camgroup_again_int_v2.cpp
 )
 add_library(rkaiq_camgroup_misc STATIC ${MISC_SRC})
 set_target_properties(rkaiq_camgroup_misc PROPERTIES FOLDER "algos_camgroup/misc")

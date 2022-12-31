@@ -23,9 +23,10 @@
 #include "xcam_mutex.h"
 
 namespace RkCam {
+#if RKAIQ_HAVE_MFNR_V1
 
 class RkAiqAmfnrHandleInt : virtual public RkAiqHandle {
- public:
+public:
     explicit RkAiqAmfnrHandleInt(RkAiqAlgoDesComm* des, RkAiqCore* aiqCore)
         : RkAiqHandle(des, aiqCore) {
         memset(&mCurAtt, 0, sizeof(rk_aiq_mfnr_attrib_v1_t));
@@ -35,7 +36,9 @@ class RkAiqAmfnrHandleInt : virtual public RkAiqHandle {
         memset(&mCurJsonPara, 0, sizeof(rk_aiq_mfnr_JsonPara_V1_t));
         memset(&mNewJsonPara, 0, sizeof(rk_aiq_mfnr_JsonPara_V1_t));
     };
-    virtual ~RkAiqAmfnrHandleInt() { RkAiqHandle::deInit(); };
+    virtual ~RkAiqAmfnrHandleInt() {
+        RkAiqHandle::deInit();
+    };
     virtual XCamReturn updateConfig(bool needSync);
     virtual XCamReturn prepare();
     virtual XCamReturn preProcess();
@@ -53,11 +56,13 @@ class RkAiqAmfnrHandleInt : virtual public RkAiqHandle {
     XCamReturn setJsonPara(rk_aiq_mfnr_JsonPara_V1_t* para);
     XCamReturn getJsonPara(rk_aiq_mfnr_JsonPara_V1_t* para);
 
- protected:
+protected:
     virtual void init();
-    virtual void deInit() { RkAiqHandle::deInit(); };
+    virtual void deInit() {
+        RkAiqHandle::deInit();
+    };
 
- private:
+private:
     rk_aiq_mfnr_attrib_v1_t mCurAtt;
     rk_aiq_mfnr_attrib_v1_t mNewAtt;
     rk_aiq_mfnr_IQPara_V1_t mCurIQPara;
@@ -67,10 +72,10 @@ class RkAiqAmfnrHandleInt : virtual public RkAiqHandle {
     bool updateIQpara   = false;
     bool updateJsonpara = false;
 
- private:
+private:
     DECLARE_HANDLE_REGISTER_TYPE(RkAiqAmfnrHandleInt);
 };
-
-};  // namespace RkCam
+#endif
+}  // namespace RkCam
 
 #endif

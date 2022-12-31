@@ -43,6 +43,7 @@ namespace RkCam {
 */
 
 class RkAiqCore;
+struct RkAiqAlgosGroupShared_s;
 
 class RkAiqHandle {
  public:
@@ -57,8 +58,8 @@ class RkAiqHandle {
     virtual XCamReturn postProcess();
     virtual XCamReturn genIspResult(RkAiqFullParams* params, RkAiqFullParams* cur_params) { return XCAM_RETURN_NO_ERROR; };
     RkAiqAlgoContext* getAlgoCtx() { return mAlgoCtx; }
-    const int getAlgoId() const { return mDes->id; }
-    const int getAlgoType() const { return mDes->type; }
+    int getAlgoId() const { return mDes->id; }
+    int getAlgoType() const { return mDes->type; }
     void setGroupId(int32_t gId) {
         mGroupId = gId;
     }
@@ -119,7 +120,6 @@ class RkAiqHandle {
     inline uint64_t grpId2GrpMask(uint32_t grpId) {
         return grpId == RK_AIQ_CORE_ANALYZE_ALL ? (uint64_t)grpId : (1ULL << grpId);
     }
-    // XCamReturn SharingAlgosResult(const void *result);
     RkAiqAlgoCom* mConfig;
     RkAiqAlgoCom* mPreInParam;
     RkAiqAlgoResCom* mPreOutParam;
@@ -193,6 +193,6 @@ private:
 
 #define DEFINE_HANDLE_REGISTER_TYPE(NAME) RkAiqHandleRegister<NAME> NAME::reg(#NAME)
 
-};  // namespace RkCam
+}  // namespace RkCam
 
 #endif

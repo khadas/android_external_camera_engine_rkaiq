@@ -25,14 +25,29 @@
 #include "adehaze/rk_aiq_types_adehaze_algo_int.h"
 #include "amerge/rk_aiq_types_amerge_algo_prvt.h"
 #include "rk_aiq_algo_types.h"
+#include "rk_aiq_types_adehaze_hw.h"
 #include "rk_aiq_types_adehaze_stat.h"
 #include "xcam_log.h"
-#include "ynr_uapi_head_v3.h"
 
-#define ADHZ10BITMAX     (1023)
-#define ADHZ10BITMIN     (0)
-#define DEHAZE_API_MANUAL_DEFAULT_LEVEL     (50)
-#define DEHAZE_API_ENHANCE_MANUAL_DEFAULT_LEVEL     (50)
+#define DEHAZE_GAUS_H0                              (2)
+#define DEHAZE_GAUS_H1                              (4)
+#define DEHAZE_GAUS_H2                              (2)
+#define DEHAZE_GAUS_H3                              (4)
+#define DEHAZE_GAUS_H4                              (8)
+#define DEHAZE_GAUS_H5                              (4)
+#define DEHAZE_GAUS_H6                              (2)
+#define DEHAZE_GAUS_H7                              (4)
+#define DEHAZE_GAUS_H8                              (2)
+#define CFG_ALPHA_MAX                               (255)
+#define CFG_ALPHA_MIN                               (NORMALIZE_MIN)
+#define CFG_AIR_MAX                                 (255)
+#define CFG_AIR_MIN                                 (NORMALIZE_MIN)
+#define ENHANCE_VALUE_MAX                           (16.0)
+#define ENHANCE_VALUE_MIN                           (1.0)
+#define ENHANCE_CHROME_MAX                          (16.0)
+#define ENHANCE_CHROME_MIN                          (1.0)
+#define HSIT_WR_MIN_STEP                            (16)
+#define HSIT_WR_X_MAX                               (1023)
 
 //define for dehaze local gain
 #define YNR_BIT_CALIB (12)
@@ -41,37 +56,57 @@
 #define YNR_ISO_CURVE_SECT_VALUE1   (1 << YNR_BIT_CALIB)
 #define YNR_CURVE_STEP             (16)
 
-typedef struct AdehazeAePreResV20_s {
-    float ISO;
-    dehaze_api_mode_t ApiMode;
-} AdehazeAePreResV20_t;
+typedef struct AdehazeExpInfo_s {
+    int hdr_mode;
+    float arTime[3];
+    float arAGain[3];
+    float arDGain[3];
+    int arIso[3];
+} AdehazeExpInfo_t;
 
-typedef struct AdehazeAePreResV21_s {
+typedef struct AdehazeAePreResV10_s {
+    float ISO;
+    CtrlDataType_t CtrlDataType;
+    dehaze_api_mode_t ApiMode;
+} AdehazeAePreResV10_t;
+
+typedef struct AdehazeAePreResV11_s {
     float EnvLv;
     float ISO;
+    CtrlDataType_t CtrlDataType;
     dehaze_api_mode_t ApiMode;
-} AdehazeAePreResV21_t;
-
-typedef struct AdehazeAePreRes_s {
-    union {
-        AdehazeAePreResV20_t V20;
-        AdehazeAePreResV21_t V21;
-        AdehazeAePreResV21_t V30;
-    };
-} AdehazeAePreRes_t;
+} AdehazeAePreResV11_t;
 
 typedef struct AdehazeHandle_s {
     bool isCapture;
-    adehaze_sw_V2_t AdehazeAtrr;
-    CalibDbV2_dehaze_V21_t* pCalib;
-    RkAiqYnrV3Res YnrPorcRes;
-    RkAiqAdehazeProcResult_t ProcRes;
-    rkisp_adehaze_stats_t stats;
-    AdehazeVersion_t HWversion;
-    AdehazeAePreRes_t CurrData;
-    AdehazeAePreRes_t PreData;
+    bool ifReCalcStAuto;
+    bool ifReCalcStManual;
     bool byPassProc;
     bool is_multi_isp_mode;
+#if RKAIQ_HAVE_DEHAZE_V10
+    adehaze_sw_v10_t AdehazeAtrrV10;
+    AdehazeAePreResV10_t CurrDataV10;
+    AdehazeAePreResV10_t PreDataV10;
+#endif
+#if RKAIQ_HAVE_DEHAZE_V11
+    adehaze_sw_v11_t AdehazeAtrrV11;
+    AdehazeAePreResV11_t CurrDataV11;
+    AdehazeAePreResV11_t PreDataV11;
+#endif
+#if RKAIQ_HAVE_DEHAZE_V11_DUO
+    adehaze_sw_v11_t AdehazeAtrrV11duo;
+    float YnrProcResV3_sigma[YNR_V3_ISO_CURVE_POINT_NUM];
+    AdehazeAePreResV11_t CurrDataV11duo;
+    AdehazeAePreResV11_t PreDataV11duo;
+#endif
+#if RKAIQ_HAVE_DEHAZE_V12
+    adehaze_sw_v12_t AdehazeAtrrV12;
+    float YnrProcResV22_sigma[YNR_V22_ISO_CURVE_POINT_NUM];
+    AdehazeAePreResV11_t CurrDataV12;
+    AdehazeAePreResV11_t PreDataV12;
+#endif
+    RkAiqAdehazeProcResult_t ProcRes;
+    rkisp_adehaze_stats_t stats;
     int width;
     int height;
     int strength;

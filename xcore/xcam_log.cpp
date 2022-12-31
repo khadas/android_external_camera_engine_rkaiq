@@ -227,6 +227,7 @@ void xcam_print_log (int module, int sub_modules, int level, const char* format,
     vsnprintf (buffer, XCAM_MAX_STR_SIZE, format, va_list);
     va_end (va_list);
 
+#ifdef NDEBUG
     if (strlen (log_file_name) > 0) {
         FILE* p_file = fopen (log_file_name, "ab+");
         if (NULL != p_file) {
@@ -237,6 +238,7 @@ void xcam_print_log (int module, int sub_modules, int level, const char* format,
         }
         return ;
     }
+#endif
 #ifdef ANDROID_OS
     switch(level) {
     case XCORE_LOG_LEVEL_ERR:

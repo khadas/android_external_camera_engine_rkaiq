@@ -31,11 +31,6 @@
 
 RKAIQ_BEGIN_DECLARE
 
-typedef enum {
-    BOOL_FALSE = 0,
-    BOOL_TRUE = (!BOOL_FALSE)
-} bool_t;
-
 typedef int RESULT;
 
 typedef enum RKAiqResult_e {
@@ -84,6 +79,8 @@ typedef enum RKAiqOPMode_e {
 #define SWAP(_T_,A,B)                   { _T_ tmp = (A); (A) = (B); (B) = tmp; }
 #define MIN2(a, b) ((a) > (b) ? (b) : (a))
 #define CLIP(a, min_v, max_v)               (((a) < (min_v)) ? (min_v) : (((a) > (max_v)) ? (max_v) : (a)))
+#define ROUND_INT(x, shf_bit)               (int)((((x) > 0) ? 1 : -1) * ((ABS(x) + (1<<((shf_bit)-1)))>>(shf_bit)))
+#define LOG2(x)                             (log((double)x)                 / log((double)2))
 
 
 #define RETURN_RESULT_IF_DIFFERENT( cur_res, exp_res ) if ( exp_res != cur_res ) { return ( cur_res ); }
@@ -446,21 +443,21 @@ typedef enum {
 } rk_aiq_isp_hdr_mode_t;
 
 typedef enum {
-    RK_AIQ_SENSOR_HDR_LINE_MODE_DCG, // 2frame: share the same exptime, use dual conversion gain; 3frame: DCG+VS, VS frame use individual gain & time
-    RK_AIQ_SENSOR_HDR_LINE_MODE_STAGGER, // 2frame or 3frame
+    RKAIQ_SENSOR_HDR_MODE_DCG, // 2frame: share the same exptime, use dual conversion gain; 3frame: DCG+VS, VS frame use individual gain & time
+    RKAIQ_SENSOR_HDR_MODE_STAGGER, // 2frame or 3frame
 } rk_aiq_sensor_hdr_line_mode_t;
 
 #define RK_AIQ_HDR_GET_WORKING_MODE(mode) (mode & 0xF0)
 
 typedef enum {
-    RK_AIQ_ISPP_STATIC_TNR_WORKING_MODE_2TO1,
-    RK_AIQ_ISPP_STATIC_TNR_WORKING_MODE_3TO1,
-} rk_aiq_ispp_static_tnr_working_mode_t;
+    RKAIQ_ISPP_TNR_MODE_2TO1,
+    RKAIQ_ISPP_TNR_MODE_3TO1,
+} rkaiq_ispp_tnr_mode_t;
 
 typedef enum {
-    RK_AIQ_ISPP_STATIC_FEC_WORKING_MODE_STABLIZATION,
-    RK_AIQ_ISPP_STATIC_FEC_WORKING_MODE_FISHEYE,
-} rk_aiq_ispp_static_fec_working_mode_t;
+    RKAIQ_ISPP_FEC_MODE_STABLE,
+    RKAIQ_ISPP_FEC_MODE_FISHEYE,
+} rkaiq_ispp_fec_mode_t;
 
 typedef enum {
     RK_MODULE_INVAL = 0,
@@ -530,6 +527,9 @@ extern int g_rkaiq_isp_hw_ver;
 
 #define CHECK_ISP_HW_V30() \
     (g_rkaiq_isp_hw_ver == 30 ? true : false)
+
+#define CHECK_ISP_HW_V32() \
+    (g_rkaiq_isp_hw_ver == 32 ? true : false)
 
 #define CHECK_ISP_HW_V3X() \
     (g_rkaiq_isp_hw_ver == 30 ? true : \

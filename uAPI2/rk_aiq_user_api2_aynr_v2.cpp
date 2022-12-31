@@ -15,7 +15,9 @@
  */
 #include "uAPI2/rk_aiq_user_api2_aynr_v2.h"
 
+#if RKAIQ_HAVE_YNR_V2
 #include "algo_handlers/RkAiqAynrV2Handle.h"
+#endif
 
 RKAIQ_BEGIN_DECLARE
 
@@ -23,6 +25,7 @@ RKAIQ_BEGIN_DECLARE
 #define CHECK_USER_API_ENABLE
 #endif
 
+#if RKAIQ_HAVE_YNR_V2
 XCamReturn
 rk_aiq_user_api2_aynrV2_SetAttrib(const rk_aiq_sys_ctx_t* sys_ctx, rk_aiq_ynr_attrib_v2_t* attr)
 {
@@ -81,6 +84,28 @@ rk_aiq_user_api2_aynrV2_GetStrength(const rk_aiq_sys_ctx_t* sys_ctx, float *pPer
 
     return ret;
 }
+#else
+XCamReturn
+rk_aiq_user_api2_aynrV2_SetAttrib(const rk_aiq_sys_ctx_t* sys_ctx, rk_aiq_ynr_attrib_v2_t* attr) {
+    return XCAM_RETURN_ERROR_UNKNOWN;
+}
+
+XCamReturn
+rk_aiq_user_api2_aynrV2_GetAttrib(const rk_aiq_sys_ctx_t* sys_ctx, rk_aiq_ynr_attrib_v2_t* attr) {
+    return XCAM_RETURN_ERROR_UNKNOWN;
+}
+
+XCamReturn
+rk_aiq_user_api2_aynrV2_SetStrength(const rk_aiq_sys_ctx_t* sys_ctx, float fPercnt) {
+    return XCAM_RETURN_ERROR_UNKNOWN;
+}
+
+XCamReturn
+rk_aiq_user_api2_aynrV2_GetStrength(const rk_aiq_sys_ctx_t* sys_ctx, float *pPercnt) {
+    return XCAM_RETURN_ERROR_UNKNOWN;
+}
+
+#endif
 
 
 RKAIQ_END_DECLARE

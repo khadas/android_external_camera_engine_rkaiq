@@ -4,6 +4,7 @@
 
 #include "rk_aiq_user_api2_imgproc.h"
 #include "rk_aiq_api_private.h"
+#include "uAPI2/rk_aiq_user_api2_wrapper.h"
 
 XCamReturn rk_aiq_tool_api_ae_setExpSwAttr
     (const rk_aiq_sys_ctx_t* sys_ctx, const Uapi_ExpSwAttrV2_t expSwAttr)
@@ -21,17 +22,6 @@ XCamReturn rk_aiq_tool_api_setWBMode
     (const rk_aiq_sys_ctx_t* sys_ctx, opMode_t mode)
 {
     return rk_aiq_uapi2_setWBMode(sys_ctx, mode);
-}
-
-XCamReturn rk_aiq_tool_api_adrc_SetAttrib
-    (const rk_aiq_sys_ctx_t* sys_ctx, drc_attrib_t attr)
-{
-    return rk_aiq_user_api2_adrc_SetAttrib(sys_ctx, attr);
-}
-
-XCamReturn rk_aiq_tool_api_agamma_SetAttrib(const rk_aiq_sys_ctx_t* sys_ctx,
-                                            rk_aiq_gamma_attrib_V2_t attr) {
-    return rk_aiq_user_api2_agamma_SetAttrib(sys_ctx, attr);
 }
 
 XCamReturn rk_aiq_tool_api_sysctl_swWorkingModeDyn

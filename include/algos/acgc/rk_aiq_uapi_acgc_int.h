@@ -1,5 +1,5 @@
 /*
- *rk_aiq_uapi_acgc_int.h
+ * rk_aiq_algo_acgc_int.h
  *
  *  Copyright (c) 2022 Rockchip Corporation
  *
@@ -16,6 +16,7 @@
  * limitations under the License.
  *
  */
+
 #ifndef _RK_AIQ_UAPI_ACGC_INT_H_
 #define _RK_AIQ_UAPI_ACGC_INT_H_
 
@@ -38,11 +39,11 @@ typedef struct rk_aiq_uapi_acgc_attrib_s {
 
 XCamReturn
 rk_aiq_uapi_acgc_SetAttrib(RkAiqAlgoContext* ctx,
-                           rk_aiq_uapi_acgc_attrib_t attr,
+                           const rk_aiq_uapi_acgc_attrib_t* attr,
                            bool need_sync);
 
 XCamReturn
 rk_aiq_uapi_acgc_GetAttrib(const RkAiqAlgoContext* ctx,
                            rk_aiq_uapi_acgc_attrib_t* attr);
 
-#endif //_RK_AIQ_UAPI_ACGC_INT_H_
+#endif  //_RK_AIQ_UAPI_ACGC_INT_H_

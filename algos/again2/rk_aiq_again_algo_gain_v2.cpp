@@ -1,3 +1,19 @@
+/*
+ * Copyright (c) 2019-2022 Rockchip Eletronics Co., Ltd.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 #include "rk_aiq_again_algo_gain_v2.h"
 
 
@@ -33,7 +49,7 @@ Again_result_V2_t gain_get_setting_by_name_json_V2(CalibDbV2_GainV2_t* pCalibdb,
 Again_result_V2_t gain_init_params_json_V2(RK_GAIN_Params_V2_t *pParams, CalibDbV2_GainV2_t* pCalibdb,  int tuning_idx)
 {
     Again_result_V2_t res = AGAINV2_RET_SUCCESS;
-    CalibDbV2_GainV2_TuningPara_Setting_ISO_t *pTuningIso = NULL;
+    CalibDbV2_GainV2_T_ISO_t *pTuningIso = NULL;
 
     LOGI_ANR("%s:(%d) oyyf bayerner xml config start\n", __FUNCTION__, __LINE__);
     if(pParams == NULL || pCalibdb == NULL) {
@@ -132,7 +148,6 @@ Again_result_V2_t gain_select_params_by_ISO_V2(RK_GAIN_Params_V2_t *pParams, RK_
     }
 #endif
 
-
     for (i = 0; i < RK_GAIN_V2_MAX_ISO_NUM - 1; i++)
     {
         if (isoGain >= isoGainStd[i] && isoGain <= isoGainStd[i + 1])
@@ -146,9 +161,22 @@ Again_result_V2_t gain_select_params_by_ISO_V2(RK_GAIN_Params_V2_t *pParams, RK_
         }
     }
 
-    pExpInfo->isoHigh = pParams->iso[isoLevelHig];
-    pExpInfo->isoLow = pParams->iso[isoLevelLow];
+    if(isoGain > isoGainStd[RK_GAIN_V2_MAX_ISO_NUM - 1]) {
+        isoGainLow = isoGainStd[RK_GAIN_V2_MAX_ISO_NUM - 2];
+        isoGainHig = isoGainStd[RK_GAIN_V2_MAX_ISO_NUM - 1];
+        isoLevelLow = RK_GAIN_V2_MAX_ISO_NUM - 2;
+        isoLevelHig = RK_GAIN_V2_MAX_ISO_NUM - 1;
+    }
 
+    if(isoGain < isoGainStd[1]) {
+        isoGainLow = isoGainStd[0];
+        isoGainHig = isoGainStd[1];
+        isoLevelLow = 0;
+        isoLevelHig = 1;
+    }
+
+    pExpInfo->isoLevelLow = isoLevelLow;
+    pExpInfo->isoLevelHig = isoLevelHig;
     pSelect->hdrgain_ctrl_enable = pParams->hdrgain_ctrl_enable;
 
     pSelect->hdr_gain_scale_s = float(isoGainHig - isoGain) / float(isoGainHig - isoGainLow) * pParams->iso_params[isoLevelLow].hdr_gain_scale_s
@@ -168,7 +196,8 @@ Again_result_V2_t gain_select_params_by_ISO_V2(RK_GAIN_Params_V2_t *pParams, RK_
 
 uint32_t gain_float_lim2_int(float In, int bit_deci_dst, int type)
 {
-    int exp_val = (((uint32_t*)(&In))[0] >> 23) & 0xff;
+    uint8_t *in_u8 = reinterpret_cast<uint8_t *>(&In);
+    int exp_val = ((in_u8[3] << 1) & (in_u8[2] >> 7) & 0xff);
     uint32_t dst;
     int shf_bit;
     if (exp_val - 127 <= bit_deci_dst || type == 1)
@@ -206,8 +235,6 @@ Again_result_V2_t gain_fix_transfer_v2( RK_GAIN_Select_V2_t *pSelect, RK_GAIN_Fi
         LOGE_ANR("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
         return AGAINV2_RET_NULL_POINTER;
     }
-
-
 
 
 #if 1

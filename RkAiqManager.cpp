@@ -106,22 +106,24 @@ RkAiqManager::RkAiqManager(const char* sns_ent_name,
                            rk_aiq_metas_cb metas_cb)
     : mCamHw(NULL)
     , mRkAiqAnalyzer(NULL)
-    , mRkLumaAnalyzer(NULL)
     , mAiqRstAppTh(new RkAiqRstApplyThread(this))
     , mAiqMngCmdTh(new RkAiqMngCmdThread(this))
+#ifdef ISP_HW_V20
+    , mRkLumaAnalyzer(NULL)
+#endif
     , mErrCb(err_cb)
     , mMetasCb(metas_cb)
     , mHwEvtCb(NULL)
     , mHwEvtCbCtx(NULL)
     , mSnsEntName(sns_ent_name)
-    , mWorkingMode(RK_AIQ_WORKING_MODE_NORMAL)
-    , mOldWkModeForGray(RK_AIQ_WORKING_MODE_NORMAL)
-    , mWkSwitching(false)
 #ifdef RKAIQ_ENABLE_PARSER_V1
     , mCalibDb(NULL)
 #endif
     , mCalibDbV2(NULL)
     , tuningCalib(NULL)
+    , mWorkingMode(RK_AIQ_WORKING_MODE_NORMAL)
+    , mOldWkModeForGray(RK_AIQ_WORKING_MODE_NORMAL)
+    , mWkSwitching(false)
     , _state(AIQ_STATE_INVALID)
     , mCurMirror(false)
     , mCurFlip(false)
@@ -158,6 +160,7 @@ RkAiqManager::setAnalyzer(SmartPtr<RkAiqCore> analyzer)
     EXIT_XCORE_FUNCTION();
 }
 
+#ifdef ISP_HW_V20
 void
 RkAiqManager::setLumaAnalyzer(SmartPtr<RkLumaCore> analyzer)
 {
@@ -166,6 +169,7 @@ RkAiqManager::setLumaAnalyzer(SmartPtr<RkLumaCore> analyzer)
     mRkLumaAnalyzer = analyzer;
     EXIT_XCORE_FUNCTION();
 }
+#endif
 
 #ifdef RKAIQ_ENABLE_PARSER_V1
 void
@@ -208,6 +212,7 @@ RkAiqManager::init()
 #endif
     RKAIQMNG_CHECK_RET(ret, "analyzer init error %d !", ret);
 
+#ifdef ISP_HW_V20
     mRkLumaAnalyzer->setAnalyzeResultCb(this);
     CalibDbV2_LUMA_DETECT_t *lumaDetect =
         (CalibDbV2_LUMA_DETECT_t*)(CALIBDBV2_GET_MODULE_PTR((void*)mCalibDbV2, lumaDetect));
@@ -217,6 +222,7 @@ RkAiqManager::init()
     } else {
         mRkLumaAnalyzer.release();
     }
+#endif
     mCamHw->setHwResListener(this);
     ret = mCamHw->init(mSnsEntName);
     RKAIQMNG_CHECK_RET(ret, "camHw init error %d !", ret);
@@ -284,14 +290,23 @@ RkAiqManager::prepare(uint32_t width, uint32_t height, rk_aiq_working_mode_t mod
 
     xcam_mem_clear(sensor_des);
     ret = mCamHw->getSensorModeData(mSnsEntName, sensor_des);
+#ifdef USE_RAWSTREAM_LIB
+    //force user defined resolution
+    sensor_des.sensor_output_width = width;
+    sensor_des.sensor_output_height = height;
+#endif
     sensor_output_width = sensor_des.sensor_output_width;
     sensor_output_height = sensor_des.sensor_output_height;
-    int w,h,aligned_w,aligned_h;
+    int w, h, aligned_w, aligned_h;
     ret = mCamHw->get_sp_resolution(w, h, aligned_w, aligned_h);
     ret = mRkAiqAnalyzer->set_sp_resolution(w, h, aligned_w, aligned_h);
+#ifdef ISP_HW_V20
     if (mRkLumaAnalyzer.ptr())
         ret = mRkLumaAnalyzer->prepare(working_mode_hw);
+#endif
+#if RKAIQ_HAVE_PDAF
     ret = mRkAiqAnalyzer->set_pdaf_support(mCamHw->get_pdaf_support());
+#endif
 
     RKAIQMNG_CHECK_RET(ret, "getSensorModeData error %d", ret);
     mRkAiqAnalyzer->notifyIspStreamMode(mCamHw->getIspStreamMode());
@@ -354,11 +369,12 @@ RkAiqManager::start()
     ret = mRkAiqAnalyzer->start();
     RKAIQMNG_CHECK_RET(ret, "analyzer start error %d", ret);
 
+#ifdef ISP_HW_V20
     if (mRkLumaAnalyzer.ptr()) {
         ret = mRkLumaAnalyzer->start();
         RKAIQMNG_CHECK_RET(ret, "luma analyzer start error %d", ret);
     }
-
+#endif
     ret = mCamHw->start();
     RKAIQMNG_CHECK_RET(ret, "camhw start error %d", ret);
 
@@ -394,11 +410,12 @@ RkAiqManager::stop(bool keep_ext_hw_st)
     ret = mRkAiqAnalyzer->stop();
     RKAIQMNG_CHECK_RET(ret, "analyzer stop error %d", ret);
 
+#ifdef ISP_HW_V20
     if (mRkLumaAnalyzer.ptr()) {
         ret = mRkLumaAnalyzer->stop();
         RKAIQMNG_CHECK_RET(ret, "luma analyzer stop error %d", ret);
     }
-
+#endif
     mCamHw->keepHwStAtStop(keep_ext_hw_st);
     ret = mCamHw->stop();
     RKAIQMNG_CHECK_RET(ret, "camhw stop error %d", ret);
@@ -433,11 +450,12 @@ RkAiqManager::deInit()
     ret = mRkAiqAnalyzer->deInit();
     RKAIQMNG_CHECK_RET(ret, "analyzer deinit error %d", ret);
 
+#ifdef ISP_HW_V20
     if (mRkLumaAnalyzer.ptr()) {
         ret = mRkLumaAnalyzer->deInit();
         RKAIQMNG_CHECK_RET(ret, "luma analyzer deinit error %d", ret);
     }
-
+#endif
     ret = mCamHw->deInit();
     RKAIQMNG_CHECK_RET(ret, "camhw deinit error %d", ret);
     if (mCalibDbV2) {
@@ -483,7 +501,7 @@ RkAiqManager::syncSofEvt(SmartPtr<VideoBuffer>& hwres)
 {
     ENTER_XCORE_FUNCTION();
 
-    if (hwres->_buf_type == ISP_POLL_SOF){
+    if (hwres->_buf_type == ISP_POLL_SOF) {
         xcam_get_runtime_log_level();
         SmartPtr<CamHwIsp20> mCamHwIsp20 = mCamHw.dynamic_cast_ptr<CamHwIsp20>();
         mCamHwIsp20->notify_sof(hwres);
@@ -516,14 +534,43 @@ RkAiqManager::hwResCb(SmartPtr<VideoBuffer>& hwres)
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
 
     if (hwres->_buf_type == ISP_POLL_3A_STATS) {
-        ret = mRkAiqAnalyzer->pushStats(hwres);
+        if (mTbInfo.is_pre_aiq) {
+            static int cnt = 0;
+            uint32_t seq = -1;
+            seq = hwres.dynamic_cast_ptr<VideoBuffer>()->get_sequence();
+            if (seq == 0 && cnt == 0) {
+                LOGE("<TB> tb hwResCb stats %d\n", seq);
+                struct timespec tp;
+                clock_gettime(CLOCK_MONOTONIC_RAW, &tp);
+
+                SmartPtr<CamHwIsp20> mCamHwIsp20 =
+                    mCamHw.dynamic_cast_ptr<CamHwIsp20>();
+                SmartPtr<ispHwEvt_t> hw_evt = mCamHwIsp20->make_ispHwEvt(
+                    0, V4L2_EVENT_FRAME_SYNC,
+                    tp.tv_sec * 1000 * 1000 * 1000 + tp.tv_nsec);
+                LOGE("<TB> push sof %d\n", seq);
+                mRkAiqAnalyzer->pushEvts(hw_evt);
+            }
+
+            if (cnt == 0) ret = mRkAiqAnalyzer->pushStats(hwres);
+
+            cnt++;
+        } else {
+            ret = mRkAiqAnalyzer->pushStats(hwres);
+        }
+#ifdef ISP_HW_V20
     } else if (hwres->_buf_type == ISP_POLL_LUMA) {
         if (mRkLumaAnalyzer.ptr())
             ret = mRkLumaAnalyzer->pushStats(hwres);
+#endif
     } else if (hwres->_buf_type == ISP_POLL_PARAMS) {
+        rk_aiq_err_msg_t msg;
+        msg.err_code = XCAM_RETURN_BYPASS;
+        if (mTbInfo.is_pre_aiq && mErrCb)
+            (*mErrCb)(&msg);
     } else if (hwres->_buf_type == ISPP_POLL_NR_STATS) {
         ret = mRkAiqAnalyzer->pushStats(hwres);
-    } else if (hwres->_buf_type == ISP_POLL_SOF){
+    } else if (hwres->_buf_type == ISP_POLL_SOF) {
         xcam_get_runtime_log_level();
 
         SmartPtr<CamHwIsp20> mCamHwIsp20 = mCamHw.dynamic_cast_ptr<CamHwIsp20>();
@@ -545,12 +592,12 @@ RkAiqManager::hwResCb(SmartPtr<VideoBuffer>& hwres)
         }
     } else if (hwres->_buf_type == ISP_POLL_TX) {
 #if 0
-       XCamVideoBuffer* camVBuf = convert_to_XCamVideoBuffer(hwres);
+        XCamVideoBuffer* camVBuf = convert_to_XCamVideoBuffer(hwres);
         LOGD_ANALYZER("raw: \n format: 0x%x\n color_bits: %d\n width: %d\n height: %d\n aligned_width: %d\naligned_height: %d\n"
-                "size: %d\n components: %d\n strides[0]: %d\n strides[1]: %d\n offset[0]: %d\n offset[1]: %d\n",
-                camVBuf->info.format, camVBuf->info.color_bits, camVBuf->info.width, camVBuf->info.height,
-                camVBuf->info.aligned_width, camVBuf->info.aligned_height, camVBuf->info.size, camVBuf->info.components,
-                camVBuf->info.strides[0], camVBuf->info.strides[1], camVBuf->info.offsets[0], camVBuf->info.offsets[1]);
+                      "size: %d\n components: %d\n strides[0]: %d\n strides[1]: %d\n offset[0]: %d\n offset[1]: %d\n",
+                      camVBuf->info.format, camVBuf->info.color_bits, camVBuf->info.width, camVBuf->info.height,
+                      camVBuf->info.aligned_width, camVBuf->info.aligned_height, camVBuf->info.size, camVBuf->info.components,
+                      camVBuf->info.strides[0], camVBuf->info.strides[1], camVBuf->info.offsets[0], camVBuf->info.offsets[1]);
 
         camVBuf->unref(camVBuf);
 #endif
@@ -559,10 +606,10 @@ RkAiqManager::hwResCb(SmartPtr<VideoBuffer>& hwres)
 #if 0
         XCamVideoBuffer* camVBuf = convert_to_XCamVideoBuffer(hwres);
         LOGD_ANALYZER("spimg: frameid:%d \n format: 0x%x\n color_bits: %d\n width: %d\n height: %d\n aligned_width: %d\naligned_height: %d\n"
-                "size: %d\n components: %d\n strides[0]: %d\n strides[1]: %d\n offset[0]: %d\n offset[1]: %d\n",hwres->get_sequence(),
-                camVBuf->info.format, camVBuf->info.color_bits, camVBuf->info.width, camVBuf->info.height,
-                camVBuf->info.aligned_width, camVBuf->info.aligned_height, camVBuf->info.size, camVBuf->info.components,
-                camVBuf->info.strides[0], camVBuf->info.strides[1], camVBuf->info.offsets[0], camVBuf->info.offsets[1]);
+                      "size: %d\n components: %d\n strides[0]: %d\n strides[1]: %d\n offset[0]: %d\n offset[1]: %d\n", hwres->get_sequence(),
+                      camVBuf->info.format, camVBuf->info.color_bits, camVBuf->info.width, camVBuf->info.height,
+                      camVBuf->info.aligned_width, camVBuf->info.aligned_height, camVBuf->info.size, camVBuf->info.components,
+                      camVBuf->info.strides[0], camVBuf->info.strides[1], camVBuf->info.offsets[0], camVBuf->info.offsets[1]);
         camVBuf->unref(camVBuf);
 #endif
         LOGD_ANALYZER("ISP_IMG");
@@ -571,10 +618,10 @@ RkAiqManager::hwResCb(SmartPtr<VideoBuffer>& hwres)
 #if 0
         XCamVideoBuffer* camVBuf = convert_to_XCamVideoBuffer(hwres);
         LOGD_ANALYZER("nrimg: \n format: 0x%x\n color_bits: %d\n width: %d\n height: %d\n aligned_width: %d\naligned_height: %d\n"
-                "size: %d\n components: %d\n strides[0]: %d\n strides[1]: %d\n offset[0]: %d\n offset[1]: %d\n",
-                camVBuf->info.format, camVBuf->info.color_bits, camVBuf->info.width, camVBuf->info.height,
-                camVBuf->info.aligned_width, camVBuf->info.aligned_height, camVBuf->info.size, camVBuf->info.components,
-                camVBuf->info.strides[0], camVBuf->info.strides[1], camVBuf->info.offsets[0], camVBuf->info.offsets[1]);
+                      "size: %d\n components: %d\n strides[0]: %d\n strides[1]: %d\n offset[0]: %d\n offset[1]: %d\n",
+                      camVBuf->info.format, camVBuf->info.color_bits, camVBuf->info.width, camVBuf->info.height,
+                      camVBuf->info.aligned_width, camVBuf->info.aligned_height, camVBuf->info.size, camVBuf->info.components,
+                      camVBuf->info.strides[0], camVBuf->info.strides[1], camVBuf->info.offsets[0], camVBuf->info.offsets[1]);
         camVBuf->unref(camVBuf);
 #endif
         ret = mRkAiqAnalyzer->pushStats(hwres);
@@ -587,9 +634,11 @@ RkAiqManager::hwResCb(SmartPtr<VideoBuffer>& hwres)
     } else if (hwres->_buf_type == ISPP_GAIN_KG) {
         LOGD_ANALYZER("ISPP_GAIN_KG");
         ret = mRkAiqAnalyzer->pushStats(hwres);
+#if RKAIQ_HAVE_PDAF
     } else if (hwres->_buf_type == ISP_POLL_PDAF_STATS) {
         LOGD_ANALYZER("ISP_POLL_PDAF_STATS");
         ret = mRkAiqAnalyzer->pushStats(hwres);
+#endif
     } else if (hwres->_buf_type == VICAP_STREAM_ON_EVT) {
         LOGD_ANALYZER("VICAP_STREAM_ON_EVT ... ");
         if (mHwEvtCb) {
@@ -683,6 +732,7 @@ RkAiqManager::applyAnalyzerResult(SmartPtr<RkAiqFullParamsProxy>& results)
         aiqParams->mFocusParams->setType(RESULT_TYPE_FOCUS_PARAM);
         results_list.push_back(aiqParams->mFocusParams);
     }
+
 #define APPLY_ANALYZER_RESULT(lc, BC) \
     if (aiqParams->m##lc##Params.ptr()) { \
         aiqParams->m##lc##Params->setType(RESULT_TYPE_##BC##_PARAM); \
@@ -690,62 +740,193 @@ RkAiqManager::applyAnalyzerResult(SmartPtr<RkAiqFullParamsProxy>& results)
         results_list.push_back(aiqParams->m##lc##Params); \
     } \
 
+#if RKAIQ_HAVE_ASD_V10
+    APPLY_ANALYZER_RESULT(Cpsl, CPSL);
+#endif
+
+#if RKAIQ_HAVE_AE_V1
     APPLY_ANALYZER_RESULT(Aec, AEC);
     APPLY_ANALYZER_RESULT(Hist, HIST);
+#endif
+#if RKAIQ_HAVE_AWB_V20
     APPLY_ANALYZER_RESULT(Awb, AWB);
+#endif
     APPLY_ANALYZER_RESULT(AwbGain, AWBGAIN);
+#if RKAIQ_HAVE_AF_V20 || RKAIQ_ONLY_AF_STATS_V20
     APPLY_ANALYZER_RESULT(Af, AF);
+#endif
+#if RKAIQ_HAVE_DPCC_V1
     APPLY_ANALYZER_RESULT(Dpcc, DPCC);
+#endif
+#if (RKAIQ_HAVE_MERGE_V10 | RKAIQ_HAVE_MERGE_V11 | RKAIQ_HAVE_MERGE_V12)
     APPLY_ANALYZER_RESULT(Merge, MERGE);
+#endif
+#if RKAIQ_HAVE_TMO_V1
     APPLY_ANALYZER_RESULT(Tmo, TMO);
+#endif
+#if RKAIQ_HAVE_CCM_V1
     APPLY_ANALYZER_RESULT(Ccm, CCM);
+#endif
+#if RKAIQ_HAVE_BLC_V1
     APPLY_ANALYZER_RESULT(Blc, BLC);
+#endif
+#if RKAIQ_HAVE_ANR_V1
     APPLY_ANALYZER_RESULT(Rawnr, RAWNR);
+#endif
+#if (RKAIQ_HAVE_GIC_V1  || RKAIQ_HAVE_GIC_V2)
     APPLY_ANALYZER_RESULT(Gic, GIC);
+#endif
+#if RKAIQ_HAVE_DEBAYER_V1
     APPLY_ANALYZER_RESULT(Debayer, DEBAYER);
+#endif
+#if RKAIQ_HAVE_LDCH_V10
     APPLY_ANALYZER_RESULT(Ldch, LDCH);
+#endif
+#if RKAIQ_HAVE_3DLUT_V1
     APPLY_ANALYZER_RESULT(Lut3d, LUT3D);
+#endif
+#if (RKAIQ_HAVE_DEHAZE_V10 | RKAIQ_HAVE_DEHAZE_V11 | RKAIQ_HAVE_DEHAZE_V11_DUO | RKAIQ_HAVE_DEHAZE_V12)
     APPLY_ANALYZER_RESULT(Dehaze, DEHAZE);
+#endif
+#if (RKAIQ_HAVE_GAMMA_V10 | RKAIQ_HAVE_GAMMA_V11)
     APPLY_ANALYZER_RESULT(Agamma, AGAMMA);
+#endif
+#if RKAIQ_HAVE_DEGAMMA_V1
     APPLY_ANALYZER_RESULT(Adegamma, ADEGAMMA);
+#endif
+#if RKAIQ_HAVE_WDR_V1
     APPLY_ANALYZER_RESULT(Wdr, WDR);
+#endif
+#if RKAIQ_HAVE_CSM_V1
     APPLY_ANALYZER_RESULT(Csm, CSM);
+#endif
+#if RKAIQ_HAVE_CGC_V1
     APPLY_ANALYZER_RESULT(Cgc, CGC);
+#endif
     APPLY_ANALYZER_RESULT(Conv422, CONV422);
     APPLY_ANALYZER_RESULT(Yuvconv, YUVCONV);
+#if RKAIQ_HAVE_GAIN_V1
     APPLY_ANALYZER_RESULT(Gain, GAIN);
+#endif
+#if RKAIQ_HAVE_ACP_V10
     APPLY_ANALYZER_RESULT(Cp, CP);
+#endif
+#if RKAIQ_HAVE_AIE_V10
     APPLY_ANALYZER_RESULT(Ie, IE);
+#endif
+#if RKAIQ_HAVE_AMD_V1
     APPLY_ANALYZER_RESULT(Motion, MOTION);
-
+#endif
+#if RKAIQ_HAVE_ANR_V1
     APPLY_ANALYZER_RESULT(Tnr, TNR);
     APPLY_ANALYZER_RESULT(Ynr, YNR);
     APPLY_ANALYZER_RESULT(Uvnr, UVNR);
     APPLY_ANALYZER_RESULT(Sharpen, SHARPEN);
     APPLY_ANALYZER_RESULT(Edgeflt, EDGEFLT);
+#endif
+#if RKAIQ_HAVE_FEC_V10
     APPLY_ANALYZER_RESULT(Fec, FEC);
+#endif
+#if RKAIQ_HAVE_ORB_V1
     APPLY_ANALYZER_RESULT(Orb, ORB);
+#endif
+#if RKAIQ_HAVE_TMO_V1
+    APPLY_ANALYZER_RESULT(Tmo, TMO);
+#endif
     // ispv21
+#if (RKAIQ_HAVE_DRC_V10 || RKAIQ_HAVE_DRC_V11 || RKAIQ_HAVE_DRC_V12)
     APPLY_ANALYZER_RESULT(Drc, DRC);
+#endif
+#if RKAIQ_HAVE_AWB_V21
     APPLY_ANALYZER_RESULT(AwbV21, AWB);
+#endif
+#if RKAIQ_HAVE_YNR_V2
     APPLY_ANALYZER_RESULT(YnrV21, YNR);
+#endif
+#if RKAIQ_HAVE_CNR_V1
     APPLY_ANALYZER_RESULT(CnrV21, UVNR);
+#endif
+#if RKAIQ_HAVE_SHARP_V3
     APPLY_ANALYZER_RESULT(SharpenV21, SHARPEN);
+#endif
+#if RKAIQ_HAVE_BAYERNR_V2
     APPLY_ANALYZER_RESULT(BaynrV21, RAWNR);
-    APPLY_ANALYZER_RESULT(Csm, CSM);
+#endif
     // ispv3x
+#if RKAIQ_HAVE_AWB_V21
     APPLY_ANALYZER_RESULT(AwbV3x, AWB);
+#endif
+#if RKAIQ_HAVE_BLC_V1
     APPLY_ANALYZER_RESULT(BlcV21, BLC);
+#endif
+#if (RKAIQ_HAVE_LSC_V1 | RKAIQ_HAVE_LSC_V2 | RKAIQ_HAVE_LSC_V3)
     APPLY_ANALYZER_RESULT(Lsc, LSC);
+#endif
+#if RKAIQ_HAVE_AF_V30 || RKAIQ_ONLY_AF_STATS_V30
     APPLY_ANALYZER_RESULT(AfV3x, AF);
+#endif
+#if RKAIQ_HAVE_BAYER2DNR_V2
     APPLY_ANALYZER_RESULT(BaynrV3x, RAWNR);
+#endif
+#if RKAIQ_HAVE_YNR_V3
     APPLY_ANALYZER_RESULT(YnrV3x, YNR);
+#endif
+#if RKAIQ_HAVE_CNR_V2
     APPLY_ANALYZER_RESULT(CnrV3x, UVNR);
+#endif
+#if RKAIQ_HAVE_SHARP_V4
     APPLY_ANALYZER_RESULT(SharpenV3x, SHARPEN);
+#endif
+#if RKAIQ_HAVE_CAC_V03
     APPLY_ANALYZER_RESULT(CacV3x, CAC);
+#endif
+#if RKAIQ_HAVE_GAIN_V2
     APPLY_ANALYZER_RESULT(GainV3x, GAIN);
-	APPLY_ANALYZER_RESULT(TnrV3x, TNR);
-
+#endif
+#if RKAIQ_HAVE_BAYERTNR_V2
+    APPLY_ANALYZER_RESULT(TnrV3x, TNR);
+#endif
+    // ispv32
+#if RKAIQ_HAVE_BLC_V32
+    APPLY_ANALYZER_RESULT(BlcV32, BLC);
+#endif
+#if RKAIQ_HAVE_BAYERTNR_V23
+    APPLY_ANALYZER_RESULT(TnrV32, TNR);
+#endif
+#if RKAIQ_HAVE_BAYER2DNR_V23
+    APPLY_ANALYZER_RESULT(BaynrV32, RAWNR);
+#endif
+#if RKAIQ_HAVE_CAC_V11
+    APPLY_ANALYZER_RESULT(CacV32, CAC);
+#endif
+#if RKAIQ_HAVE_DEBAYER_V2
+    APPLY_ANALYZER_RESULT(DebayerV32, DEBAYER);
+#endif
+#if RKAIQ_HAVE_CCM_V2
+    APPLY_ANALYZER_RESULT(CcmV32, CCM);
+#endif
+    // APPLY_ANALYZER_RESULT(DehazeV32, DEHAZE);
+#if RKAIQ_HAVE_LDCH_V21
+    APPLY_ANALYZER_RESULT(LdchV32, LDCH);
+#endif
+#if RKAIQ_HAVE_YNR_V22
+    APPLY_ANALYZER_RESULT(YnrV32, YNR);
+#endif
+#if RKAIQ_HAVE_CNR_V30
+    APPLY_ANALYZER_RESULT(CnrV32, UVNR);
+#endif
+#if RKAIQ_HAVE_SHARP_V33
+    APPLY_ANALYZER_RESULT(SharpV32, SHARPEN);
+#endif
+#if RKAIQ_HAVE_AWB_V32
+    APPLY_ANALYZER_RESULT(AwbV32, AWB);
+#endif
+#if RKAIQ_HAVE_AF_V31 || RKAIQ_ONLY_AF_STATS_V31
+    APPLY_ANALYZER_RESULT(AfV32, AF);
+#endif
+#if RKAIQ_HAVE_AWB_V32
+    APPLY_ANALYZER_RESULT(AwbGainV32, AWBGAIN);
+#endif
     mCamHw->applyAnalyzerResult(results_list);
 
     EXIT_XCORE_FUNCTION();
@@ -945,10 +1126,12 @@ XCamReturn RkAiqManager::swWorkingModeDyn(rk_aiq_working_mode_t mode)
     ret = mRkAiqAnalyzer->stop();
     RKAIQMNG_CHECK_RET(ret, "analyzer stop error %d", ret);
 
+#ifdef ISP_HW_V20
     if (mRkLumaAnalyzer.ptr()) {
         ret = mRkLumaAnalyzer->stop();
         RKAIQMNG_CHECK_RET(ret, "luma analyzer stop error %d", ret);
     }
+#endif
     // 3. pause hwi
     LOGI_ANALYZER("pause hwi ...");
     ret = mCamHw->pause();
@@ -996,10 +1179,12 @@ restart:
     ret = mRkAiqAnalyzer->start();
     RKAIQMNG_CHECK_RET(ret, "analyzer start error %d", ret);
 
+#ifdef ISP_HW_V20
     if (mRkLumaAnalyzer.ptr()) {
         ret = mRkLumaAnalyzer->start();
         RKAIQMNG_CHECK_RET(ret, "luma analyzer start error %d", ret);
     }
+#endif
     /* // 7. resume hwi */
     /* LOGI_ANALYZER("resume hwi"); */
     /* ret = mCamHw->resume(); */
@@ -1024,7 +1209,7 @@ void RkAiqManager::setMulCamConc(bool cc)
 
 CamCalibDbV2Context_t* RkAiqManager::getCurrentCalibDBV2()
 {
-  return mCalibDbV2;
+    return mCalibDbV2;
 }
 
 XCamReturn RkAiqManager::calibTuning(CamCalibDbV2Context_t* aiqCalib,
@@ -1035,6 +1220,10 @@ XCamReturn RkAiqManager::calibTuning(CamCalibDbV2Context_t* aiqCalib,
     mCamHw->setCalib(aiqCalib);
     ret = mRkAiqAnalyzer->setCalib(aiqCalib);
 
+    if (change_list != nullptr)
+        std::for_each(
+            std::begin(*change_list), std::end(*change_list),
+            [](const std::string& name) { std::cout << "tuning : " << name << std::endl; });
     mRkAiqAnalyzer->calibTuning(aiqCalib, change_list);
 
     // Won't free calib witch from iqfiles
@@ -1054,6 +1243,5 @@ void RkAiqManager::unsetTuningCalibDb()
   tuningCalib = NULL;
 }
 
-}; //namespace RkCam
-
+} //namespace RkCam
 

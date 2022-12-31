@@ -1,9 +1,9 @@
 #!/bin/bash
 
-choices=(rk3588 rk356x)
+choices=(rv1106 rk3588 rk356x rv1109)
 
 function usage() {
-  echo "Usage: source envsetup.sh"
+	echo "Usage: source envsetup.sh"
 }
 
 function print_soc_menu() {
@@ -21,9 +21,9 @@ function print_soc_menu() {
 }
 
 function set_isp_hw() {
-  unset ISP_HW_VERSION
-  export ISP_HW_VERSION=-DISP_HW_V${1}
-  env | grep -q ISP_HW_VERSION && echo "Success !" || echo "Failed !"
+	unset ISP_HW_VERSION
+	export ISP_HW_VERSION=-DISP_HW_V${1}
+	env | grep -q ISP_HW_VERSION && echo "Success !" || echo "Failed !"
 }
 
 function lunch() {
@@ -33,36 +33,42 @@ function lunch() {
     answer=$1
   else
     print_soc_menu
-    echo -n "Which would you like? [rk3588] "
+    echo -n "Which would you like? [rv1106] "
     read answer
   fi
 
   local selection
   if [ -z "$answer" ]
   then
-    selection="rk3588"
-  elif (echo -n $answer | grep -q -e "^[0-9][0-9]*$")
-  then
-    if [ $answer -le ${#choices[@]} ]
-      then
-        # array in zsh starts from 1 instead of 0.
-        if [ -n "$ZSH_VERSION" ]
-          then
-            selection=${choices[$(($answer))]}
-        else
-            selection=${choices[$(($answer-1))]}
-          fi
-      fi
+    selection="rv1106"
+	elif (echo -n $answer | grep -q -e "^[0-9][0-9]*$")
+	then
+		if [ $answer -le ${#choices[@]} ]
+		then
+			# array in zsh starts from 1 instead of 0.
+			if [ -n "$ZSH_VERSION" ]
+			then
+				selection=${choices[$(($answer))]}
+			else
+				selection=${choices[$(($answer-1))]}
+			fi
+		fi
   else
     selection=$answer
   fi
 
   case $selection in
+    rv1106)
+      set_isp_hw 32
+      ;;
     rk3588)
       set_isp_hw 30
       ;;
     rk356x)
       set_isp_hw 21
+      ;;
+    rv1109)
+      set_isp_hw 20
       ;;
     *)
       echo "Not supported SoC yet!"

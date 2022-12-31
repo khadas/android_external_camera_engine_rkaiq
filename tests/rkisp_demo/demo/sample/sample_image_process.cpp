@@ -40,13 +40,16 @@
 #include "sample_ablc_module.h"
 #include "sample_agic_module.h"
 #include "sample_aldch_module.h"
+#include "sample_aldch_v21_module.h"
 #include "sample_adebayer_module.h"
 #include "sample_alsc_module.h"
 #include "sample_acp_module.h"
 #include "sample_aie_module.h"
 #include "sample_adpcc_module.h"
-#include "sample_again_module.h"
 #include "sample_cgc_module.h"
+#include "sample_cac_module.h"
+#include "sample_again_module.h"
+#include "sample_smartIr.h"
 
 struct module_sample_info {
     const char * const name;
@@ -64,6 +67,7 @@ struct module_sample_info {
 static struct module_sample_info module_samples[] = {
     MODULE_INFO(RK_ISP_AE, sample_ae_module, sample_print_ae_info),
     MODULE_INFO(RK_ISP_AWB, sample_awb_module, sample_print_awb_info),
+    MODULE_INFO(RK_ISP_AWB32, sample_awb32_module, sample_print_awb32_info),
     MODULE_INFO(RK_ISP_AF, sample_af_module, sample_print_af_info),
     MODULE_INFO(RK_ISP_ACCM, sample_accm_module, sample_print_accm_info),
     MODULE_INFO(RK_ISP_A3DLUT, sample_a3dlut_module, sample_print_a3dlut_info),
@@ -83,8 +87,12 @@ static struct module_sample_info module_samples[] = {
     MODULE_INFO(RK_ISP_ADEBAYER, sample_adebayer_module, sample_print_adebayer_info),
     MODULE_INFO(RK_ISP_ACP, sample_acp_module, sample_print_acp_info),
     MODULE_INFO(RK_ISP_AIE, sample_aie_module, sample_print_aie_info),
-    MODULE_INFO(RK_ISP_AGAIN, sample_again_module, sample_print_again_info),
     MODULE_INFO(RK_ISP_CGC, sample_cgc_module, sample_print_cgc_info),
+    MODULE_INFO(RK_ISP_CAC, sample_cac_module, sample_print_cac_info),
+    MODULE_INFO(RK_ISP_AGAIN, sample_again_module, sample_print_again_info),
+    MODULE_INFO(RK_ISP_ACCM_V2, sample_accm_v2_module, sample_print_accm_v2_info),
+    MODULE_INFO(RK_ISP_ALDCH_V21, sample_aldch_v21_module, sample_print_aldch_v21_info),
+    MODULE_INFO(RK_SMARTIR, sample_smartIr_module, sample_print_smartIr_info),
 };
 
 static void sample_usage()
@@ -114,9 +122,14 @@ static void sample_usage()
     printf("\t j) ALSC:       module test sample.\n");
     printf("\t k) ACP:        module test sample.\n");
     printf("\t l) AIE:        module test sample.\n");
-    printf("\t m) DPCC:       module test sample.\n");
-    printf("\t n) AGAIN:      module test sample.\n");
-    printf("\t o) CGC:        module test sample.\n");
+    printf("\t m) CGC:        module test sample.\n");
+    printf("\t n) CAC:        module test sample.\n");
+    printf("\t o) AGAIN:      module test sample.\n");
+    printf("\t p) AWBV32:     module test sample.\n");
+    printf("\t r) CCMV2:      module test sample.\n");
+    printf("\t s) ALDCHV32:  module test sample.\n");
+    printf("\t t) SMARTIR:    module test sample.\n");
+    printf("\t u) DPCC:       module test sample.\n");
     printf("\n");
     printf("\t please press the key: ");
 
@@ -279,20 +292,52 @@ XCamReturn sample_main (const void *arg)
         break;
     }
     case 'm': {
-        printf("enter DPCC module test\n");
-        sample_adpcc_module(arg);
-        break;
-    }
-    case 'n': {
-        printf("enter GAIN module test\n");
-        sample_again_module(arg);
-        break;
-    }
-    case 'o': {
         printf("enter CGC module test\n");
         struct module_sample_info *info = &module_samples[RK_ISP_CGC];
         info->debug (nullptr);
         info->func (arg);
+        break;
+    }
+    case 'n': {
+        struct module_sample_info *info = &module_samples[RK_ISP_CAC];
+        info->debug (nullptr);
+        info->func (arg);
+        break;
+    }
+    case 'o': {
+        printf("enter GAIN module test\n");
+        struct module_sample_info *info = &module_samples[RK_ISP_AGAIN];
+        info->debug (nullptr);
+        info->func (arg);
+        break;
+    }
+    case 'p': {
+        struct module_sample_info *info = &module_samples[RK_ISP_AWB32];
+        info->debug (nullptr);
+        info->func (arg);
+        break;
+    }
+    case 'r': {
+        struct module_sample_info *info = &module_samples[RK_ISP_ACCM_V2];
+        info->debug (nullptr);
+        info->func (arg);
+        break;
+    }
+    case 's': {
+        struct module_sample_info *info = &module_samples[RK_ISP_ALDCH_V21];
+        info->debug (nullptr);
+        info->func (arg);
+        break;
+    }
+    case 't': {
+        struct module_sample_info *info = &module_samples[RK_SMARTIR];
+        info->debug (nullptr);
+        info->func (arg);
+        break;
+    }
+    case 'u': {
+        printf("enter DPCC module test\n");
+        sample_adpcc_module(arg);
         break;
     }
     default:

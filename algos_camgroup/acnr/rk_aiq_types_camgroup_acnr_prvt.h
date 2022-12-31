@@ -38,20 +38,9 @@ typedef struct CalibDbV2_CamGroup_Acnr_s {
     // add more para for surround view
 } CalibDbV2_CamGroup_Acnr_t;
 
-typedef enum acnr_hardware_version_e
-{
-    ACNR_HARDWARE_MIN = 0,
-    ACNR_HARDWARE_V1,
-    ACNR_HARDWARE_V2,
-    ACNR_HARDWARE_MAX
-} acnr_hardware_version_t;
-
 
 typedef struct CamGroup_Acnr_Contex_s {
-    union {
-        Acnr_Context_V2_t* acnr_contex_v2;
-        Acnr_Context_V1_t* acnr_contex_v1;
-    };
+    Acnr_Context_V1_t* acnr_contex_v1;
     CalibDbV2_CamGroup_Acnr_t group_CalibV2;
     int camera_Num;
 
