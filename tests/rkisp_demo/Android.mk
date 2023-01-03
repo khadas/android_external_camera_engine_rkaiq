@@ -19,6 +19,37 @@ LOCAL_SRC_FILES :=\
 	demo/rkRgaApi.cpp \
     demo/ae_algo_demo/third_party_ae_algo.cpp \
     demo/af_algo_demo/third_party_af_algo.cpp \
+    demo/sample/sample_a3dlut_module.cpp \
+    demo/sample/sample_abayer2dnr_module.cpp \
+    demo/sample/sample_abayertnr_module.cpp \
+    demo/sample/sample_ablc_module.cpp \
+    demo/sample/sample_accm_module.cpp \
+    demo/sample/sample_acnr_module.cpp \
+    demo/sample/sample_acp_module.cpp \
+    demo/sample/sample_adebayer_module.cpp \
+    demo/sample/sample_adehaze_module.cpp \
+    demo/sample/sample_adpcc_module.cpp \
+    demo/sample/sample_adrc_module.cpp \
+    demo/sample/sample_ae_module.cpp \
+    demo/sample/sample_af_module.cpp \
+    demo/sample/sample_again_module.cpp \
+    demo/sample/sample_agamma_module.cpp \
+    demo/sample/sample_agic_module.cpp \
+    demo/sample/sample_aie_module.cpp \
+    demo/sample/sample_aldch_module.cpp \
+    demo/sample/sample_aldch_v21_module.cpp \
+    demo/sample/sample_alsc_module.cpp \
+    demo/sample/sample_amerge_module.cpp \
+    demo/sample/sample_asharp_module.cpp \
+    demo/sample/sample_awb_module.cpp \
+    demo/sample/sample_aynr_module.cpp \
+    demo/sample/sample_cac_module.cpp \
+    demo/sample/sample_cgc_module.cpp \
+    demo/sample/sample_comm.cpp \
+    demo/sample/sample_csm_module.cpp \
+    demo/sample/sample_image_process.cpp \
+    demo/sample/sample_misc_modules.cpp \
+    demo/sample/sample_smartIr.cpp \
 
 #TODO: have compile issue on Android now
 	#demo/rga_control.c \
