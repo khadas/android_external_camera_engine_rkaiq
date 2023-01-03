@@ -38223,6 +38223,8 @@
 									"ValidValueThers": 0,
 									"OutFocusValue": 50,
 									"OutFocusPos": 30,
+									"LowLumaValue":	0,
+									"LowLumaPos":	64,
 									"WeightEnable": 0,
 									"Weight":
 									[
@@ -39135,6 +39137,8 @@
 									"ValidValueThers": 0,
 									"OutFocusValue": 0,
 									"OutFocusPos": 0,
+									"LowLumaValue":	0,
+									"LowLumaPos":	64,
 									"WeightEnable": 0,
 									"Weight":
 									[
@@ -78127,6 +78131,8 @@
 									"ValidValueThers": 0,
 									"OutFocusValue": 50,
 									"OutFocusPos": 30,
+									"LowLumaValue":	0,
+									"LowLumaPos":	64,
 									"WeightEnable": 0,
 									"Weight":
 									[
@@ -79039,6 +79045,8 @@
 									"ValidValueThers": 0,
 									"OutFocusValue": 0,
 									"OutFocusPos": 0,
+									"LowLumaValue":	0,
+									"LowLumaPos":	64,
 									"WeightEnable": 0,
 									"Weight":
 									[
