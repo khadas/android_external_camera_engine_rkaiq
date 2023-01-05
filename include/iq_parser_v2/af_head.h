@@ -158,6 +158,11 @@ typedef struct CalibDbV2_Af_Contrast_s {
     // M4_NUMBER_DESC("OutFocusPos", "u16", M4_RANGE(0,65), "32", M4_DIGIT(0),M4_HIDE(0))
     unsigned short          OutFocusPos;                  /**< out of focus position*/
 
+    // M4_NUMBER_DESC("LowLumaValue", "f32", M4_RANGE(0,4095), "0", M4_DIGIT(3),M4_HIDE(0))
+    float                   LowLumaValue;                /**< low luma thr vlaue*/
+    // M4_NUMBER_DESC("LowLumaPos", "u16", M4_RANGE(0,1023), "64", M4_DIGIT(0),M4_HIDE(0))
+    unsigned short          LowLumaPos;                  /**< low luma focus position*/
+
     // M4_NUMBER_DESC("WeightEnable", "u8", M4_RANGE(0, 1), "0", M4_DIGIT(0),M4_HIDE(0))
     unsigned char           WeightEnable;
     // M4_ARRAY_DESC("Weight", "u16", M4_SIZE(15,15), M4_RANGE(0,65535), "0", M4_DIGIT(0), M4_DYNAMIC(0))
