@@ -74,7 +74,7 @@ protected:
     bool mStartStreamFlag;
     rk_aiq_isp_pdaf_meas_t mPdafMeas;
     int mBufType;
-    PdafStreamHelperThd *mHelperThd;
+    SmartPtr<PdafStreamHelperThd> mHelperThd;
     XCam::Mutex mStreamMutex;
 };
 
