@@ -56,6 +56,7 @@ void PdafStreamProcUnit::start()
 {
     int mem_mode;
 
+    mStreamMutex.lock();
     if (mPdafStream.ptr() && !mStartFlag) {
         mPdafDev->io_control (RKCIF_CMD_GET_CSI_MEMORY_MODE, &mem_mode);
         if (mem_mode != CSI_LVDS_MEM_WORD_LOW_ALIGN) {
@@ -73,10 +74,12 @@ void PdafStreamProcUnit::start()
 
         mStartFlag = true;
     }
+    mStreamMutex.unlock();
 }
 
 void PdafStreamProcUnit::stop()
 {
+    mStreamMutex.lock();
     if (mPdafStream.ptr() && mStartFlag) {
         XCam::SmartPtr<PdafStreamParam> attrPtr = new PdafStreamParam;
 
@@ -87,6 +90,7 @@ void PdafStreamProcUnit::stop()
 
         mStartFlag = false;
     }
+    mStreamMutex.unlock();
 }
 
 XCamReturn
@@ -108,18 +112,9 @@ PdafStreamProcUnit::poll_buffer_ready (SmartPtr<V4l2BufferProxy> &buf, int dev_i
 XCamReturn
 PdafStreamProcUnit::deinit()
 {
-    int wait_cnt = 0;
-
-    while (mStartStreamFlag && wait_cnt++ < 3) {
-        LOGD_AF("mStartStreamFlag %d, wait_cnt %d", mStartStreamFlag, wait_cnt);
-        usleep(50000);
-        if (!mStartStreamFlag)
-            break;
-        stop_stream();
-    }
-
     mHelperThd->triger_stop();
     mHelperThd->stop();
+    stop_stream();
 
     return XCAM_RETURN_NO_ERROR;
 }
