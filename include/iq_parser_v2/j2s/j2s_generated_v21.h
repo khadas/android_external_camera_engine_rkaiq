@@ -2,7 +2,7 @@
 #include <stdint.h>
 #include "j2s.h"
 
-#define J2S_MAGIC 1583717040
+#define J2S_MAGIC 1396301282
 #define J2S_NUM_OBJ 3271
 #define J2S_NUM_STRUCT 576
 #define J2S_NUM_ENUM 73
@@ -11522,7 +11522,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[739] = "alias='FineSearchStep', type='u16', size='[1, 65]', range='[0, 1023]', default='[4]', digit='[0]', dynamic='1', hide='0', ro='0'";
+	ctx->descs[739] = "alias='FineSearchStep', type='u16', size='[1, 65]', range='[0, 1023]', default='[4 4 4 4 4 4 4 4 4]', digit='[0]', dynamic='1', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[740];
@@ -30664,7 +30664,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 
 	obj = &ctx->objs[1967];
 	strcpy(obj->name, "fec_en");
-	obj->type = J2S_TYPE_UINT_8;
+	obj->type = J2S_TYPE_INT_8;
 	obj->flags = 0 ;
 	obj->offset = (uintptr_t)&((CalibDbV2_Fec_Param_t*)0)->fec_en;
 	obj->elem_size = sizeof(((CalibDbV2_Fec_Param_t*)0)->fec_en);
@@ -30675,7 +30675,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1967] = "alias='fec_en', type='u8', size='[1,1]', range='[0, 1]', default='0', digit='[0]', hide='0', ro='0'";
+	ctx->descs[1967] = "type='bool', alias='enable', default='0', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1968];
@@ -30691,7 +30691,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1968] = "alias='meshfile', type='string', size='[1, 256]', range='[0, 256]', default='default_meshfile', dynamic='0', hide='0', ro='0'";
+	ctx->descs[1968] = "alias='meshfile', type='string', size='[1, 255]', range='[0, 255]', default='default_meshfile', dynamic='0', hide='0', ro='1'";
 #endif
 
 	obj = &ctx->objs[1969];
@@ -30707,7 +30707,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1969] = "alias='correct_level', type='s8', size='[1,1]', range='[0, 255]', default='255', digit='[0]', hide='0', ro='0'";
+	ctx->descs[1969] = "alias='correct_level', type='u8', size='[1,1]', range='[0, 255]', default='255', digit='[0]', hide='0', ro='0'";
 #endif
 
 	obj = &ctx->objs[1970];
@@ -30723,7 +30723,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1970] = "alias='light_center', type='f64', size='[1, 2]', range='[-10000000000000000, 10000000000000000]', default='0', digit='[20]', dynamic='0', hide='0', ro='0'";
+	ctx->descs[1970] = "alias='light_center', type='f64', size='[1, 2]', range='[-10000000000000000, 10000000000000000]', default='0', digit='[16]', dynamic='0', hide='0', ro='1'";
 #endif
 
 	obj = &ctx->objs[1971];
@@ -30739,7 +30739,7 @@ static void _j2s_init(j2s_ctx *ctx) {
 	obj->struct_index = -1;
 	obj->enum_index = -1;
 #ifdef J2S_ENABLE_DESC
-	ctx->descs[1971] = "alias='coefficient', type='f64', size='[1, 4]', range='[-10000000000000000, 10000000000000000]', default='0', digit='[20]', dynamic='0', hide='0', ro='0'";
+	ctx->descs[1971] = "alias='coefficient', type='f64', size='[1, 4]', range='[-10000000000000000, 10000000000000000]', default='0', digit='[16]', dynamic='0', hide='0', ro='1'";
 #endif
 
 	obj = &ctx->objs[1972];

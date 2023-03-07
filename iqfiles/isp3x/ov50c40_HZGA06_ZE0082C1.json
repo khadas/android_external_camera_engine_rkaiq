@@ -111,7 +111,7 @@
 			}
 		},
 		"CISMinFps":	10,
-		"CISFlip":	0
+		"CISFlip":	1
 	},
 	"module_calib":	{
 		"sensor_module":	{

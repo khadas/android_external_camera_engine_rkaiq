@@ -168,8 +168,8 @@
 								},
 								"AecDelay":	{
 									"DelayType":	"DELAY_TYPE_FRAME",
-									"BlackDelay":	0,
-									"WhiteDelay":	0
+									"BlackDelay":	2,
+									"WhiteDelay":	2
 								},
 								"AecFrameRateMode":	{
 									"isFpsFix":	1,
