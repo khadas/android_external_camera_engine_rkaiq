@@ -688,6 +688,13 @@ void RKAiqProtocol::HandlerReceiveFile(int sockfd, char* buffer, int size)
     std::string dstFileName = (char*)receivedData.targetFileName;
     std::string dstFilePath = dstDir + "/" + dstFileName;
 
+#ifdef __ANDROID__
+    if (dstFileName == "aiq_offline.ini") {
+        dstDir = "/data/local/tmp";
+        dstFilePath = "/data/local/tmp/aiq_offline.ini";
+    }
+#endif
+
     DIR* dirPtr = opendir(dstDir.c_str());
     if (dirPtr == NULL) {
         LOG_DEBUG("FILETRANS target dir %s not exist, return \n", dstDir.c_str());
@@ -893,7 +900,11 @@ void RKAiqProtocol::HandlerOfflineRawProcess(int sockfd, char* buffer, int size)
     } else if (receivedData.offlineRawModeControl == 2) // remove ini file
     {
         LOG_DEBUG("#### remove offline RAW config file. ####\n");
+#ifdef __ANDROID__
+        system("rm -f /data/local/tmp/aiq_offline.ini && sync");
+#else
         system("rm -f /tmp/aiq_offline.ini && sync");
+#endif
     } else if (receivedData.offlineRawModeControl == 3) // one frame
     {
         LOG_DEBUG("#### offline RAW one frame. ####\n");

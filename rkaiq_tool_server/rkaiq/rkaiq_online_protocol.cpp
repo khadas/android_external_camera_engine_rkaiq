@@ -467,6 +467,7 @@ static int DoCaptureYuv(int sockfd)
         return -1;
     }
 
+#ifdef RKISP_CMD_SET_IQTOOL_CONN_ID
     if (g_stream_dev_index == 0) {
         int tmpVal = 0;
         if (xioctl(fd, RKISP_CMD_SET_IQTOOL_CONN_ID, &tmpVal) < 0) // 0:mp 1:sp
@@ -484,6 +485,7 @@ static int DoCaptureYuv(int sockfd)
             return -1;
         }
     }
+#endif
     //
     CLEAR(capCapability);
     if (xioctl(fd, VIDIOC_QUERYCAP, &capCapability) < 0) {
@@ -2742,9 +2744,13 @@ void RKAiqOLProtocol::HandlerOnLineMessage(int sockfd, char* buffer, int size)
             // DoCaptureYuv(sockfd);
             char* datBuf = (char*)(common_cmd->dat);
             switch (datBuf[0]) {
-                case DATA_ID_CAPTURE_YUV_STATUS:
+                case DATA_ID_CAPTURE_YUV_STATUS: {
+                    if (capture_status == BUSY) {
+                        LOG_DEBUG("Capture in process.\n");
+                        return;
+                    }
                     LOG_DEBUG("ProcID DATA_ID_CAPTURE_YUV_STATUS in\n");
-                    if (access("/tmp/aiq_offline.ini", F_OK) == 0) {
+                    if (access("/tmp/aiq_offline.ini", F_OK) == 0 || access("/data/local/tmp/aiq_offline.ini", F_OK) == 0) {
                         while (g_startOfflineRawFlag == 0) {
                             usleep(1 * 1000);
                         }
@@ -2753,6 +2759,7 @@ void RKAiqOLProtocol::HandlerOnLineMessage(int sockfd, char* buffer, int size)
                     ReplyStatus(sockfd, &send_cmd, READY);
                     LOG_DEBUG("ProcID DATA_ID_CAPTURE_YUV_STATUS out\n");
                     break;
+                }
                 case DATA_ID_CAPTURE_YUV_GET_PARAM:
                     LOG_DEBUG("ProcID DATA_ID_CAPTURE_YUV_GET_PARAM in\n");
                     ReplySensorPara(sockfd, &send_cmd);
@@ -2798,7 +2805,7 @@ void RKAiqOLProtocol::HandlerOnLineMessage(int sockfd, char* buffer, int size)
                         std::regex re2(pattern2);
                         std::smatch results;
                         char temp[50] = {0};
-                        snprintf(temp, 50, "cat %s", tmpStr.c_str());
+                        snprintf(temp, 50, "cat %s 2>/dev/null", tmpStr.c_str());
                         ExecuteCMD(temp, result);
                         std::string srcStr = result;
                         if (std::regex_search(srcStr, results, re)) // finded

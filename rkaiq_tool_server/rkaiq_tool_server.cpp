@@ -179,7 +179,7 @@ static int parse_args(int argc, char** argv)
 int main(int argc, char** argv)
 {
     int ret = -1;
-    LOG_ERROR("#### AIQ tool server 2023-2-9 14:49:37####\n");
+    LOG_ERROR("#### AIQ tool server 2023-3-3 14:30:56####\n");
 
 #ifdef _WIN32
     signal(SIGINT, signal_handle);
