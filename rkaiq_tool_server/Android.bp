@@ -1,7 +1,23 @@
-cc_defaults {
-    name: "rkaiq_tool_server_default_flags",
+bootstrap_go_package {
+    name: "rkaiq_tool_server_soong-operator",
+    pkgPath: "android/soong/external/camera_engine_rkaiq/rkaiq_tool_server",
+    deps: [
+            "blueprint",
+            "blueprint-pathtools",
+            "soong",
+            "soong-android",
+            "soong-cc",
+            "soong-genrule",
+        ],
+    srcs: [
+            "rkaiq_tool_server.go",
+        ],
+    pluginFor: ["soong_build"],
+}
 
-	vendor: true,
+cc_defaults {
+    name: "rkaiq_tool_server_defaults",
+    vendor: true,
     proprietary: true,
 
     defaults: [ "rkaiq-defaults", "rkaiq-defaults-flags", ],
@@ -62,19 +78,6 @@ cc_defaults {
         "rtspserver/include/BasicUsageEnvironment/include",
         "rtspserver/include/groupsock/include",
     ],
-
-    //clang: true,
-
-    //tidy: true,
-    //tidy_checks: [
-    //    "-*",
-    //    "cert-*",
-    //    "clang-analyzer-security*",
-    //    "android-*",
-    //],
-    //tidy_flags: [
-    //    "-warnings-as-errors=clang-analyzer-security*,cert-*",
-    //],
 }
 
 cc_defaults {
@@ -97,11 +100,11 @@ cc_defaults {
     ],
 }
 
-cc_binary {
+cc_rkaiq_tool_server_binary {
     name: "rkaiq_tool_server",
     compile_multilib: "32",
     defaults: [
-        "rkaiq_tool_server_default_flags",
+        "rkaiq_tool_server_defaults",
         "rkaiq_tool_server_default_libs",
     ],
 
