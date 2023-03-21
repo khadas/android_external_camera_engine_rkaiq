@@ -197,6 +197,19 @@ static void RawCaptureinit(CommandData_t* cmd)
         } else {
             g_sensorHdrMode = hdrCfg.hdr_mode;
             LOG_INFO("Get sensor hdr mode:%u\n", g_sensorHdrMode);
+            hdrCfg.hdr_mode = 0;
+            ret = ioctl(fd, RKMODULE_SET_HDR_CFG, &hdrCfg);
+            LOG_INFO("Set sensor to no hdr mode, ret=%d\n", ret);
+
+            ret = ioctl(fd, RKMODULE_GET_HDR_CFG, &hdrCfg);
+            if (ret > 0) {
+                g_sensorHdrMode = NO_HDR;
+                LOG_ERROR("Get sensor hdr mode again failed, use default, No HDR\n");
+            } else {
+                g_sensorHdrMode = hdrCfg.hdr_mode;
+                LOG_INFO("Get sensor hdr mode again:%u\n", g_sensorHdrMode);
+            }
+            LOG_INFO("Set sensor to no hdr mode finish\n");
         }
     }
     close(fd);

@@ -179,7 +179,7 @@ static int parse_args(int argc, char** argv)
 int main(int argc, char** argv)
 {
     int ret = -1;
-    LOG_ERROR("#### AIQ tool server 2023-3-3 14:30:56####\n");
+    LOG_ERROR("#### AIQ tool server 2023-3-21 18:01:44 ####\n");
 
 #ifdef _WIN32
     signal(SIGINT, signal_handle);
@@ -273,7 +273,53 @@ int main(int argc, char** argv)
     // }
 
 #ifdef __ANDROID__
-    if (g_tcpClient.Setup(LOCAL_SOCKET_PATH) == false) {
+    DIR* dir = opendir("/dev/socket");
+    struct dirent* dir_ent = NULL;
+    std::vector<std::string> domainSocketNodes;
+    if (dir) {
+        while ((dir_ent = readdir(dir))) {
+            if (dir_ent->d_type == DT_SOCK) {
+                if (strstr(dir_ent->d_name, "camera_tool") != NULL) {
+                    domainSocketNodes.push_back(dir_ent->d_name);
+                }
+            }
+        }
+        closedir(dir);
+    }
+    std::sort(domainSocketNodes.begin(), domainSocketNodes.end());
+    // for (string socketNode : domainSocketNodes)
+    // {
+    //     LOG_INFO("socketNode:%s\n", socketNode.c_str());
+    // }
+
+    if (domainSocketNodes.size() > 1) {
+        LOG_INFO("################ Please input camera index to connect\n");
+        for (int i = 0; i < domainSocketNodes.size(); i++) {
+            string tmpStr = domainSocketNodes[i];
+            tmpStr = tmpStr.replace(tmpStr.find("camera_tool"), strlen("camera_tool"), "");
+            LOG_INFO("camera %d ,please input %s\n", i, tmpStr.c_str());
+        }
+        LOG_INFO("----\n");
+        LOG_INFO("PLEASE INPUT CAMERA INDEX:");
+
+        int camIndexInput = getchar() - '0';
+        LOG_INFO("camera index %d:\n", camIndexInput);
+        sprintf((char*)g_linuxSocketDomainPath.c_str(), "/dev/socket/camera_tool%d", camIndexInput);
+        while (access(g_linuxSocketDomainPath.c_str(), F_OK) == -1) {
+            camIndexInput = getchar() - '0';
+            LOG_INFO("camera index %d:\n", camIndexInput);
+            sprintf((char*)g_linuxSocketDomainPath.c_str(), "/dev/socket/camera_tool%d", camIndexInput);
+        }
+        LOG_INFO("camera socket node %s selected\n", g_linuxSocketDomainPath.c_str());
+    }
+
+    if (access("/dev/socket/camera_tool", F_OK) == 0) // Compatible with nodes of older versions
+    {
+        LOG_INFO("ToolServer using old socket node\n");
+        g_linuxSocketDomainPath = "/dev/socket/camera_tool";
+    }
+
+    if (g_tcpClient.Setup(g_linuxSocketDomainPath) == false) {
         LOG_INFO("#### ToolServer connect AIQ failed ####\n");
     } else {
         LOG_INFO("#### ToolServer connect AIQ success ####\n");
