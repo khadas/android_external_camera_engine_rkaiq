@@ -2750,7 +2750,7 @@ void RKAiqOLProtocol::HandlerOnLineMessage(int sockfd, char* buffer, int size)
                         return;
                     }
                     LOG_DEBUG("ProcID DATA_ID_CAPTURE_YUV_STATUS in\n");
-                    if (access("/tmp/aiq_offline.ini", F_OK) == 0 || access("/data/local/tmp/aiq_offline.ini", F_OK) == 0) {
+                    if (access("/tmp/aiq_offline.ini", F_OK) == 0 || access("/mnt/vendor/aiq_offline.ini", F_OK) == 0) {
                         while (g_startOfflineRawFlag == 0) {
                             usleep(1 * 1000);
                         }

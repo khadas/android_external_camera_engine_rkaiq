@@ -690,8 +690,9 @@ void RKAiqProtocol::HandlerReceiveFile(int sockfd, char* buffer, int size)
 
 #ifdef __ANDROID__
     if (dstFileName == "aiq_offline.ini") {
-        dstDir = "/data/local/tmp";
-        dstFilePath = "/data/local/tmp/aiq_offline.ini";
+        dstDir = "/mnt";
+        dstFilePath = "/mnt/vendor/aiq_offline.ini";
+        property_set("persist.vendor.camera.polltime.debug", "300");
     }
 #endif
 
@@ -901,7 +902,8 @@ void RKAiqProtocol::HandlerOfflineRawProcess(int sockfd, char* buffer, int size)
     {
         LOG_DEBUG("#### remove offline RAW config file. ####\n");
 #ifdef __ANDROID__
-        system("rm -f /data/local/tmp/aiq_offline.ini && sync");
+        system("rm -f /mnt/vendor/aiq_offline.ini && sync");
+        property_set("persist.vendor.camera.polltime.debug", "0");
 #else
         system("rm -f /tmp/aiq_offline.ini && sync");
 #endif
