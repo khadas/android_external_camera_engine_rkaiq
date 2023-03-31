@@ -287,19 +287,6 @@ int init_device(struct capture_info* cap_info)
     int ret;
 
     cap_info->dev_fd = device_open(cap_info->dev_name);
-    if (ioctl(cap_info->dev_fd, RKCIF_CMD_GET_CSI_MEMORY_MODE, &g_sensorMemoryMode) > 0) // get original memory mode
-    {
-        LOG_ERROR("get cif node %s memory mode failed.\n", cap_info->dev_name);
-    } else {
-        LOG_INFO("get cif node memory mode:%d .\n", g_sensorMemoryMode);
-    }
-
-    if (g_sensorHdrMode == NO_HDR) {
-        int value = CSI_LVDS_MEM_WORD_LOW_ALIGN;
-        ioctl(cap_info->dev_fd, RKCIF_CMD_SET_CSI_MEMORY_MODE, &value); // set to no compact
-        LOG_INFO("cif node %s set to no compact mode.\n", cap_info->dev_name);
-    }
-
     if (-1 != device_querycap(cap_info->dev_fd, &cap)) {
         if (!(cap.capabilities & V4L2_CAP_VIDEO_CAPTURE) && !(cap.capabilities & V4L2_CAP_VIDEO_CAPTURE_MPLANE)) {
             LOG_ERROR("%s is no video capture device\n", cap_info->dev_name);

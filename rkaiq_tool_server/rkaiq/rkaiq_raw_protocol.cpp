@@ -819,7 +819,6 @@ static void RawCaputure(CommandData_t* cmd, int socket)
         }
     }
     close(fd);
-
     LOG_DEBUG("exit\n");
 }
 
