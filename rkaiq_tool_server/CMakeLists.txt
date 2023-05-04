@@ -43,8 +43,7 @@ if(BUILD_SANITIZER_STATIC)
         add_definitions(-g -ggdb -gdwarf -funwind-tables -rdynamic -O0 )
 endif()
 
-SET(RKAIQ_PROJECT_DIR "../")
-#SET(RKAIQ_PROJECT_DIR "/home/lili/hdd/projects/RKAiq/rk1109_isp_simulator-1106/rk_aiq")
+SET(RKAIQ_PROJECT_DIR "../rkaiq")
 include_directories(${RKAIQ_PROJECT_DIR}/include/iq_parser_v2/j2s)
 include_directories(${RKAIQ_PROJECT_DIR}/xcore)
 include_directories(${RKAIQ_PROJECT_DIR}/xcore/base)
@@ -134,9 +133,9 @@ include_directories(${RKAIQ_PROJECT_DIR}/build/linux/output/arm)
 #include_directories(${RKAIQ_PROJECT_DIR}/build/linux/output/arm/installed/include/rkaiq)
 #link_directories(${RKAIQ_PROJECT_DIR}/build/linux/output/arm/all_lib/MinSizeRel)
 
-include_directories(${RKAIQ_PROJECT_DIR}/build/linux/output/aarch64)
-link_directories(${RKAIQ_PROJECT_DIR}/build/linux/output/aarch64/all_lib/MinSizeRel)
-link_directories(${RKAIQ_PROJECT_DIR}/build/linux/output/aarch64/all_lib/RelWithDebInfo)
+# include_directories(${RKAIQ_PROJECT_DIR}/build/linux/output/aarch64)
+# link_directories(${RKAIQ_PROJECT_DIR}/build/linux/output/aarch64/all_lib/MinSizeRel)
+# link_directories(${RKAIQ_PROJECT_DIR}/build/linux/output/aarch64/all_lib/RelWithDebInfo)
 
 include_directories(${PROJECT_SOURCE_DIR}/rkaiq/rkaiq_api)
 

@@ -1434,7 +1434,7 @@ static int DoCaptureOnlineRaw(int sockfd)
     LOG_DEBUG("DoCapture entry!!!!!\n");
     AutoDuration ad;
 
-    int skip_frame = 2;
+    int skip_frame = 0;
     if (capture_frames_index == 0) {
         for (int i = 0; i < skip_frame; i++) {
             if (g_sensorHdrMode == NO_HDR) {
@@ -1468,6 +1468,7 @@ static int DoCaptureOnlineRaw(int sockfd)
                 LOG_DEBUG("get 3a lock fail 2\n");
                 assert(NULL);
             }
+
             cap_info.ispStatsList.clear();
             cap_info_hdr2_1.ispStatsList.clear();
             cap_info_hdr2_2.ispStatsList.clear();
@@ -1488,6 +1489,10 @@ static int DoCaptureOnlineRaw(int sockfd)
                                                  sizeof(rk_aiq_isp_stats_t));
                     // HexDump((unsigned char*)&attr, sizeof(rk_aiq_isp_stats_t));
                     // HexDump((unsigned char*)&attr, 100);
+                    if (attr.frame_id == 0) {
+                        usleep(1000 * 10);
+                        continue;
+                    }
 
                     if (!get3AStatsMtx.try_lock_for(std::chrono::milliseconds(2000))) {
                         LOG_DEBUG("get 3a lock fail 4\n");
@@ -1554,20 +1559,22 @@ static int DoCaptureOnlineRaw(int sockfd)
                             LOG_DEBUG("get 3a lock fail 3\n");
                             assert(NULL);
                         }
-                        if (g_sensorHdrMode == NO_HDR) {
-                            while (g_lastCapturedSequense > cap_info.ispStatsList.front().frame_id) {
-                                cap_info.ispStatsList.erase(cap_info.ispStatsList.begin());
-                            }
-                        } else if (g_sensorHdrMode == HDR_X2) {
-                            while (g_lastCapturedSequense > cap_info_hdr2_1.ispStatsList.front().frame_id) {
-                                cap_info_hdr2_1.ispStatsList.erase(cap_info_hdr2_1.ispStatsList.begin());
-                            }
-                            while (g_lastCapturedSequense > cap_info_hdr2_2.ispStatsList.front().frame_id) {
-                                cap_info_hdr2_2.ispStatsList.erase(cap_info_hdr2_2.ispStatsList.begin());
-                            }
-                        } else if (g_sensorHdrMode == HDR_X3) {
-                            while (g_lastCapturedSequense > cap_info_hdr3_1.ispStatsList.front().frame_id) {
-                                cap_info_hdr3_1.ispStatsList.erase(cap_info_hdr3_1.ispStatsList.begin());
+                        if (cap_info.ispStatsList.size() >= 1) {
+                            if (g_sensorHdrMode == NO_HDR) {
+                                while (g_lastCapturedSequense > cap_info.ispStatsList.front().frame_id) {
+                                    cap_info.ispStatsList.erase(cap_info.ispStatsList.begin());
+                                }
+                            } else if (g_sensorHdrMode == HDR_X2) {
+                                while (g_lastCapturedSequense > cap_info_hdr2_1.ispStatsList.front().frame_id) {
+                                    cap_info_hdr2_1.ispStatsList.erase(cap_info_hdr2_1.ispStatsList.begin());
+                                }
+                                while (g_lastCapturedSequense > cap_info_hdr2_2.ispStatsList.front().frame_id) {
+                                    cap_info_hdr2_2.ispStatsList.erase(cap_info_hdr2_2.ispStatsList.begin());
+                                }
+                            } else if (g_sensorHdrMode == HDR_X3) {
+                                while (g_lastCapturedSequense > cap_info_hdr3_1.ispStatsList.front().frame_id) {
+                                    cap_info_hdr3_1.ispStatsList.erase(cap_info_hdr3_1.ispStatsList.begin());
+                                }
                             }
                         }
                         get3AStatsMtx.unlock();
@@ -2405,6 +2412,36 @@ static void ReplyOnlineRawSensorPara(int sockfd, CommandData_t* cmd)
         // SendMessageToPC(sockfd, "Video capture device node not found");
         LOG_ERROR("Video capture device node not found.\n");
         return;
+    }
+
+    if (g_capture_dev_name.length() == 0) {
+        int fd = open(cap_info.dev_name, O_RDWR, 0);
+        LOG_INFO("fd: %d\n", fd);
+        if (fd < 0) {
+            LOG_ERROR("Open dev %s failed.\n", cap_info.dev_name);
+        } else {
+            int value = CSI_LVDS_MEM_WORD_LOW_ALIGN;
+            int ret = ioctl(fd, RKCIF_CMD_SET_CSI_MEMORY_MODE, &value); // set to no compact
+            if (ret > 0) {
+                LOG_ERROR("set cif node %s compact mode failed.\n", cap_info.dev_name);
+            } else {
+                LOG_INFO("cif node %s set to no compact mode.\n", cap_info.dev_name);
+            }
+        }
+    } else {
+        int fd = open(cap_info.dev_name, O_RDWR, 0);
+        LOG_INFO("fd: %d\n", fd);
+        if (fd < 0) {
+            LOG_ERROR("Open dev %s failed.\n", cap_info.dev_name);
+        } else {
+            int value = CSI_LVDS_MEM_COMPACT;
+            int ret = ioctl(fd, RKCIF_CMD_SET_CSI_MEMORY_MODE, &value); // set to compact
+            if (ret > 0) {
+                LOG_ERROR("set cif node %s compact mode failed.\n", cap_info.dev_name);
+            } else {
+                LOG_INFO("cif node %s set to no compact mode.\n", cap_info.dev_name);
+            }
+        }
     }
 
     //

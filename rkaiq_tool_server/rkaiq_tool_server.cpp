@@ -179,7 +179,7 @@ static int parse_args(int argc, char** argv)
 int main(int argc, char** argv)
 {
     int ret = -1;
-    LOG_ERROR("#### 2023-3-31 10:28:33 ####\n");
+    LOG_ERROR("#### 2023-4-25 15:10:51 ####\n");
     signal(SIGPIPE, SIG_IGN);
 
 #ifdef _WIN32
