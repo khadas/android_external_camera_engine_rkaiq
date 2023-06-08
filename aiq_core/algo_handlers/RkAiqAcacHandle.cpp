@@ -69,8 +69,6 @@ XCamReturn RkAiqAcacHandleInt::preProcess() {
 
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
 
-    RkAiqAlgoPreAcac* acac_pre_int          = (RkAiqAlgoPreAcac*)mPreInParam;
-    RkAiqAlgoPreResAcac* acac_pre_res_int   = (RkAiqAlgoPreResAcac*)mPreOutParam;
     auto* shared = (RkAiqCore::RkAiqAlgosGroupShared_t*)getGroupShared();
     if (!shared) return XCAM_RETURN_BYPASS;
 
@@ -98,6 +96,8 @@ XCamReturn RkAiqAcacHandleInt::processing() {
     RkAiqCore::RkAiqAlgosComShared_t* sharedCom = &mAiqCore->mAlogsComSharedParams;
     auto* shared = (RkAiqCore::RkAiqAlgosGroupShared_t*)getGroupShared();
     if (!shared) return XCAM_RETURN_BYPASS;
+
+    acac_proc_res_int->config = shared->fullParams->mCacV3xParams->data()->result.cfg;
 
     RKAiqAecExpInfo_t* aeCurExp = &shared->curExp;
     if (aeCurExp != NULL) {
@@ -157,9 +157,14 @@ XCamReturn RkAiqAcacHandleInt::processing() {
         RKAIQCORE_CHECK_RET(ret, "acac handle processing failed");
     }
 
+#ifdef DISABLE_HANDLE_ATTRIB
+    mCfgMutex.lock();
+#endif
     RkAiqAlgoDescription* des = (RkAiqAlgoDescription*)mDes;
-
     ret = des->processing(mProcInParam, mProcOutParam);
+#ifdef DISABLE_HANDLE_ATTRIB
+    mCfgMutex.unlock();
+#endif
     RKAIQCORE_CHECK_RET(ret, "acac algo processing failed");
 
     EXIT_ANALYZER_FUNCTION();
@@ -171,8 +176,6 @@ XCamReturn RkAiqAcacHandleInt::postProcess() {
 
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
 
-    RkAiqAlgoPostAcac* acac_post_int        = (RkAiqAlgoPostAcac*)mPostInParam;
-    RkAiqAlgoPostResAcac* acac_post_res_int = (RkAiqAlgoPostResAcac*)mPostOutParam;
     auto* shared = (RkAiqCore::RkAiqAlgosGroupShared_t*)getGroupShared();
     if (!shared) return XCAM_RETURN_BYPASS;
 
@@ -195,6 +198,7 @@ XCamReturn RkAiqAcacHandleInt::updateConfig(bool needSync) {
     ENTER_ANALYZER_FUNCTION();
 
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
+#ifndef DISABLE_HANDLE_ATTRIB
     if (needSync) mCfgMutex.lock();
     if (updateAtt) {
         mCurAtt   = mNewAtt;
@@ -204,6 +208,7 @@ XCamReturn RkAiqAcacHandleInt::updateConfig(bool needSync) {
     }
 
     if (needSync) mCfgMutex.unlock();
+#endif
 
     EXIT_ANALYZER_FUNCTION();
     return ret;
@@ -221,6 +226,9 @@ XCamReturn RkAiqAcacHandleInt::setAttrib(const rkaiq_cac_v10_api_attr_t* att) {
     // if something changed, set att to mNewAtt, and
     // the new params will be effective later when updateConfig
     // called by RkAiqCore
+#ifdef DISABLE_HANDLE_ATTRIB
+    ret = rk_aiq_uapi_acac_v10_SetAttrib(mAlgoCtx, att, false);
+#else
     bool isChanged = false;
     if (att->sync.sync_mode == RK_AIQ_UAPI_MODE_ASYNC && \
         memcmp(&mNewAtt, att, sizeof(*att)))
@@ -235,6 +243,7 @@ XCamReturn RkAiqAcacHandleInt::setAttrib(const rkaiq_cac_v10_api_attr_t* att) {
         updateAtt = true;
         waitSignal(att->sync.sync_mode);
     }
+#endif
 
     mCfgMutex.unlock();
 
@@ -248,6 +257,11 @@ XCamReturn RkAiqAcacHandleInt::getAttrib(rkaiq_cac_v10_api_attr_t* att) {
     if (att == nullptr) return XCAM_RETURN_ERROR_PARAM;
 
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
+#ifdef DISABLE_HANDLE_ATTRIB
+    mCfgMutex.lock();
+    rk_aiq_uapi_acac_v10_GetAttrib(mAlgoCtx, att);
+    mCfgMutex.unlock();
+#else
 
     if (att->sync.sync_mode == RK_AIQ_UAPI_MODE_SYNC) {
         mCfgMutex.lock();
@@ -264,6 +278,7 @@ XCamReturn RkAiqAcacHandleInt::getAttrib(rkaiq_cac_v10_api_attr_t* att) {
             att->sync.done      = true;
         }
     }
+#endif
 
     EXIT_ANALYZER_FUNCTION();
     return ret;
@@ -288,11 +303,32 @@ XCamReturn RkAiqAcacHandleInt::genIspResult(RkAiqFullParams* params, RkAiqFullPa
             cac_param->frame_id = shared->frameId;
         }
         cac_param->result.enable = cac_rk->enable;
-        memcpy(&cac_param->result.cfg[0], &cac_rk->config[0], sizeof(cac_rk->config[0]));
-        memcpy(&cac_param->result.cfg[1], &cac_rk->config[1], sizeof(cac_rk->config[1]));
-    }
 
-    cur_params->mCacV3xParams = params->mCacV3xParams;
+        if (cac_com->res_com.cfg_update) {
+            mSyncFlag = shared->frameId;
+            cac_param->sync_flag = mSyncFlag;
+            // copy from algo result
+            // set as the latest result
+            cur_params->mCacV3xParams = params->mCacV3xParams;
+            cac_param->is_update = true;
+            LOGD_ACAC("[%d] params from algo", mSyncFlag);
+        } else if (mSyncFlag != cac_param->sync_flag) {
+            cac_param->sync_flag = mSyncFlag;
+            // copy from latest result
+            if (cur_params->mCacV3xParams.ptr()) {
+                cac_param->result = cur_params->mCacV3xParams->data()->result;
+                cac_param->is_update = true;
+            } else {
+                LOGE_ACAC("no latest params !");
+                cac_param->is_update = false;
+            }
+            LOGD_ACAC("[%d] params from latest [%d]", shared->frameId, mSyncFlag);
+        } else {
+            // do nothing, result in buf needn't update
+            cac_param->is_update = false;
+            LOGD_ACAC("[%d] params needn't update", shared->frameId);
+        }
+    }
 
     EXIT_ANALYZER_FUNCTION();
     return ret;

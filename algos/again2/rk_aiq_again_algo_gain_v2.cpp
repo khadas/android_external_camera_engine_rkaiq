@@ -82,7 +82,6 @@ Again_result_V2_t gain_init_params_json_V2(RK_GAIN_Params_V2_t *pParams, CalibDb
 Again_result_V2_t gain_config_setting_param_json_V2(RK_GAIN_Params_V2_t *pParams, CalibDbV2_GainV2_t* pCalibdbV2, char* param_mode, char * snr_name)
 {
     Again_result_V2_t res = AGAINV2_RET_SUCCESS;
-    int calib_idx = 0;
     int tuning_idx = 0;
 
     if(pParams == NULL || pCalibdbV2 == NULL
@@ -131,19 +130,16 @@ Again_result_V2_t gain_select_params_by_ISO_V2(RK_GAIN_Params_V2_t *pParams, RK_
     int isoGain = MAX(int(iso / 50), 1);
     int isoGainLow = 0;
     int isoGainHig = 0;
-    int isoGainCorrect = 1;
     int isoLevelLow = 0;
     int isoLevelHig = 0;
-    int isoLevelCorrect = 0;
-    int i, j;
-    float tmpf;
+    int i;
 
 #ifndef RK_SIMULATOR_HW
-    for(int i = 0; i < RK_GAIN_V2_MAX_ISO_NUM; i++) {
+    for(i = 0; i < RK_GAIN_V2_MAX_ISO_NUM; i++) {
         isoGainStd[i] = pParams->iso[i] / 50;
     }
 #else
-    for(int i = 0; i < RK_GAIN_V2_MAX_ISO_NUM; i++) {
+    for(i = 0; i < RK_GAIN_V2_MAX_ISO_NUM; i++) {
         isoGainStd[i] = 1 * (1 << i);
     }
 #endif
@@ -156,8 +152,6 @@ Again_result_V2_t gain_select_params_by_ISO_V2(RK_GAIN_Params_V2_t *pParams, RK_
             isoGainHig = isoGainStd[i + 1];
             isoLevelLow = i;
             isoLevelHig = i + 1;
-            isoGainCorrect = ((isoGain - isoGainStd[i]) <= (isoGainStd[i + 1] - isoGain)) ? isoGainStd[i] : isoGainStd[i + 1];
-            isoLevelCorrect = ((isoGain - isoGainStd[i]) <= (isoGainStd[i + 1] - isoGain)) ? i : (i + 1);
         }
     }
 
@@ -179,12 +173,15 @@ Again_result_V2_t gain_select_params_by_ISO_V2(RK_GAIN_Params_V2_t *pParams, RK_
     pExpInfo->isoLevelHig = isoLevelHig;
     pSelect->hdrgain_ctrl_enable = pParams->hdrgain_ctrl_enable;
 
-    pSelect->hdr_gain_scale_s = float(isoGainHig - isoGain) / float(isoGainHig - isoGainLow) * pParams->iso_params[isoLevelLow].hdr_gain_scale_s
-                                + float(isoGain - isoGainLow) / float(isoGainHig - isoGainLow) * pParams->iso_params[isoLevelHig].hdr_gain_scale_s;
+    float ratio = 0;
+    ratio = float(isoGain - isoGainLow) / float(isoGainHig - isoGainLow) ;
+
+    pSelect->hdr_gain_scale_s = ratio * ( pParams->iso_params[isoLevelHig].hdr_gain_scale_s - pParams->iso_params[isoLevelLow].hdr_gain_scale_s)
+                                + pParams->iso_params[isoLevelLow].hdr_gain_scale_s;
 
 
-    pSelect->hdr_gain_scale_m = float(isoGainHig - isoGain) / float(isoGainHig - isoGainLow) * pParams->iso_params[isoLevelLow].hdr_gain_scale_m
-                                + float(isoGain - isoGainLow) / float(isoGainHig - isoGainLow) * pParams->iso_params[isoLevelHig].hdr_gain_scale_m;
+    pSelect->hdr_gain_scale_m = ratio * ( pParams->iso_params[isoLevelHig].hdr_gain_scale_m - pParams->iso_params[isoLevelLow].hdr_gain_scale_m)
+                                + pParams->iso_params[isoLevelLow].hdr_gain_scale_m;
 
     LOGD_ANR("%s:%d iso:%d high:%d low:%d hdr_gain_scale:%f %f\n",
              __FUNCTION__, __LINE__,
@@ -215,10 +212,6 @@ uint32_t gain_float_lim2_int(float In, int bit_deci_dst, int type)
 
 Again_result_V2_t gain_fix_transfer_v2( RK_GAIN_Select_V2_t *pSelect, RK_GAIN_Fix_V2_t* pGainFix,  Again_ExpInfo_V2_t *pExpInfo, float gain_ratio)
 {
-    int i;
-    double max_val = 0;
-
-
     LOGI_ANR("%s:(%d) enter\n", __FUNCTION__, __LINE__);
 
     if(pSelect == NULL) {
@@ -254,7 +247,6 @@ Again_result_V2_t gain_fix_transfer_v2( RK_GAIN_Select_V2_t *pSelect, RK_GAIN_Fi
 #endif
 
 
-    float exp_time[3];
     float exp_gain[3];
     float dGain[3];
     float frameiso[3];

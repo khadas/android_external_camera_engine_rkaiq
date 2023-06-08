@@ -24,10 +24,12 @@
 #include "rk_aiq_algo_types.h"
 #include "RkAiqCalibDbV2Helper.h"
 
+#define IS_UPDATE_MEM(result_ptr, result_offset) \
+    *((bool*)((char*)(result_ptr) - (result_offset)))
+
 typedef struct rk_aiq_singlecam_3a_result_s {
     uint8_t _camId;
     uint32_t _frameId;
-
     // ae params
     struct {
         RKAiqAecExpInfo_t* exp_tbl;
@@ -36,14 +38,16 @@ typedef struct rk_aiq_singlecam_3a_result_s {
         rk_aiq_ae_meas_params_t* _aeMeasParams;
         rk_aiq_hist_meas_params_t* _aeHistMeasParams;
         XCamVideoBuffer* _aecStats;
-        XCamVideoBuffer* _aeProcRes;
+        RkAiqAlgoProcResAeShared_t _aeProcRes;
         XCamVideoBuffer* _aePreRes;
         RKAiqAecExpInfo_t _effAecExpInfo;
         bool _bEffAecExpValid;
+        RkAiqSetStatsCfg stats_cfg_to_trans;
+        bool aec_run_flag;
     } aec;
     // awb params
     struct {
-        union{
+        union {
             rk_aiq_wb_gain_t* _awbGainParams;
             rk_aiq_wb_gain_v32_t* _awbGainV32Params;
         };
@@ -54,7 +58,7 @@ typedef struct rk_aiq_singlecam_3a_result_s {
             rk_aiq_isp_awb_meas_cfg_v3x_t* _awbCfgV3x;
         };
         XCamVideoBuffer* _awbStats;
-        XCamVideoBuffer* _awbProcRes;
+        RkAiqAlgoProcResAwbShared_t _awbProcRes;
     } awb;
     rk_aiq_lsc_cfg_t* _lscConfig;
     AdpccProcResult_t* _dpccConfig;
@@ -182,6 +186,7 @@ typedef struct _RkAiqAlgoCamGroupProcIn {
     bool _gray_mode;
     int working_mode;
     bool _is_bw_sensor;
+    size_t _offset_is_update;
 } RkAiqAlgoCamGroupProcIn;
 
 #endif

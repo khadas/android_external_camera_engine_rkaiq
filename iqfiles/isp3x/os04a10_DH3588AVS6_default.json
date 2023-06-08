@@ -217,7 +217,8 @@
 									"InitGainValue":	1,
 									"InitIspDGainValue":	1,
 									"InitPIrisGainValue":	512,
-									"InitDCIrisDutyValue":	100
+									"InitDCIrisDutyValue":	100,
+									"InitHDCIrisTargetValue": 0
 								},
 								"Route":	{
 									"TimeDot":	[0, 0.01, 0.02, 0.04, 0.04, 0.04],
@@ -281,7 +282,8 @@
 									"InitGainValue":	[1, 1, 1],
 									"InitIspDGainValue":	[1, 1, 1],
 									"InitPIrisGainValue":	512,
-									"InitDCIrisDutyValue":	100
+									"InitDCIrisDutyValue":	100,
+									"InitHDCIrisTargetValue": 0
 								},
 								"Route":	{
 									"Frm0TimeDot":	[0, 0.003, 0.003, 0.003, 0.003, 0.003],
@@ -367,11 +369,13 @@
 								"ManualEn":	0,
 								"ManualAttr":	{
 									"PIrisGainValue":	1,
-									"DCIrisHoldValue":	30
+									"DCIrisHoldValue":	30,
+									"HDCIrisTargetValue": 0
 								},
 								"InitAttr":	{
 									"PIrisGainValue":	512,
-									"DCIrisHoldValue":	100
+									"DCIrisHoldValue":	100,
+									"HDCIrisTargetValue": 0
 								},
 								"PIrisAttr":	{
 									"TotalStep":	81,
@@ -387,6 +391,19 @@
 									"MaxPwmDuty":	100,
 									"OpenPwmDuty":	40,
 									"ClosePwmDuty":	22
+								},
+								"HDCIrisAttr":	{
+									"DampOver":	0.35,
+									"DampUnder":	0.15,
+									"ZeroIsMax":	1,
+									"MinTarget":	0,
+									"MaxTarget":	500,
+									"ZoomTargetDot":	[0, 33, 75, 91, 95, 97, 98, 100, 101, 102, 103, 104],
+									"ZoomDot":		[1709, 975, 653, 464, 334, 239, 165, 102, 57, 15, -28, -70],
+									"IrisTargetDot":	[0, 5, 10, 15, 20, 25, 30, 35, 40, 45],
+									"GainDot":		[512, 409, 402, 394, 384, 376, 370, 362, 354, 347],
+									"ZoomTargetDot_len":	12,
+									"IrisTargetDot_len":	10
 								}
 							},
 							"SyncTest":	{
@@ -1195,7 +1212,7 @@
 							"MergeTuningPara":	{
 								"BaseFrm":	"BASEFRAME_LONG",
 								"CtrlDataType":	"CTRLDATATYPE_ENVLV",
-								"ByPassThr":	0,
+								"ByPassThr":	0.01,
 								"LongFrmModeData":	{
 									"OECurve":	{
 										"CtrlData":	[0, 0.005, 0.01, 0.05, 0.1, 0.15, 0.2, 0.3, 0.4, 0.5, 0.6, 0.8, 1],
@@ -1266,7 +1283,7 @@
 									"Manual_curve":	[0, 558, 1087, 1588, 2063, 2515, 2944, 3353, 3744, 4473, 5139, 5751, 6316, 6838, 7322, 7772, 8192]
 								},
 								"Scale_y":	[0, 2, 20, 76, 193, 381, 631, 772, 919, 1066, 1211, 1479, 1700, 1863, 1968, 2024, 2048],
-								"ByPassThr":	0,
+								"ByPassThr":	0.01,
 								"Edge_Weit":	0.02,
 								"OutPutLongFrame":	0,
 								"IIR_frame":	2,
@@ -1285,7 +1302,7 @@
 								"Enable":	1,
 								"CtrlDataType":	"CTRLDATATYPE_ENVLV",
 								"cfg_alpha":	0,
-								"ByPassThr":	0,
+								"ByPassThr":	0.01,
 								"dehaze_setting":	{
 									"en":	1,
 									"air_lc_en":	1,
@@ -1313,7 +1330,7 @@
 										"cfg_wt":	[0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8],
 										"cfg_air":	[210, 210, 210, 210, 210, 210, 210, 210, 210, 210, 210, 210, 210],
 										"cfg_tmax":	[0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2],
-										"dc_weitcur":	[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+										"dc_weitcur":	[0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05],
 										"bf_weight":	[0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5],
 										"range_sigma":	[0.14, 0.14, 0.14, 0.14, 0.14, 0.14, 0.14, 0.14, 0.14, 0.14, 0.14, 0.14, 0.14],
 										"space_sigma_pre":	[0.14, 0.14, 0.14, 0.14, 0.14, 0.14, 0.14, 0.14, 0.14, 0.14, 0.14, 0.14, 0.14],
@@ -5782,10 +5799,13 @@
 									"pdBlkLevel":	64,
 									"pdSearchRadius":	3,
 									"pdMirrorInCalib":	1,
+									"pdChangeLeftRight":	0,
 									"pdVsImgoutMirror":	0,
 									"pdLRInDiffLine":	0,
 									"pdWidth":	508,
 									"pdHeight":	760,
+									"pdMaxWidth":	508,
+									"pdMaxHeight":	760,
 									"pdVerBinning":	0,
 									"pdFrmInValid":	1,
 									"pdDgainValid":	0,
@@ -5866,7 +5886,18 @@
 												}],
 											"fineSearchTbl_len":	2
 										}],
-									"pdIsoPara_len":	2
+									"pdIsoPara_len":	2,
+									"pdResoInf":	[{
+											"imageWidth":	0,
+											"imageHeight":	0,
+											"pdOutWidth":	0,
+											"pdOutHeight":	0,
+											"pdCropX":	0,
+											"pdCropY":	0,
+											"pdBaseWidth":	0,
+											"pdBaseHeight":	0
+										}],
+									"pdResoInf_len":	1
 								},
 								"vcmcfg":	{
 									"max_logical_pos":	64,
@@ -6226,7 +6257,8 @@
 									"InitGainValue":	1,
 									"InitIspDGainValue":	1,
 									"InitPIrisGainValue":	512,
-									"InitDCIrisDutyValue":	100
+									"InitDCIrisDutyValue":	100,
+									"InitHDCIrisTargetValue": 0
 								},
 								"Route":	{
 									"TimeDot":	[0, 0.01, 0.03, 0.03, 0.03, 0.03],
@@ -6290,7 +6322,8 @@
 									"InitGainValue":	[1, 1, 1],
 									"InitIspDGainValue":	[1, 1, 1],
 									"InitPIrisGainValue":	512,
-									"InitDCIrisDutyValue":	100
+									"InitDCIrisDutyValue":	100,
+									"InitHDCIrisTargetValue": 0
 								},
 								"Route":	{
 									"Frm0TimeDot":	[0, 0.003, 0.003, 0.003, 0.003, 0.003],
@@ -6376,11 +6409,13 @@
 								"ManualEn":	0,
 								"ManualAttr":	{
 									"PIrisGainValue":	1,
-									"DCIrisHoldValue":	30
+									"DCIrisHoldValue":	30,
+									"HDCIrisTargetValue": 0
 								},
 								"InitAttr":	{
 									"PIrisGainValue":	512,
-									"DCIrisHoldValue":	100
+									"DCIrisHoldValue":	100,
+									"HDCIrisTargetValue": 0
 								},
 								"PIrisAttr":	{
 									"TotalStep":	81,
@@ -6396,6 +6431,19 @@
 									"MaxPwmDuty":	100,
 									"OpenPwmDuty":	40,
 									"ClosePwmDuty":	22
+								},
+								"HDCIrisAttr":	{
+									"DampOver":	0.35,
+									"DampUnder":	0.15,
+									"ZeroIsMax":	1,
+									"MinTarget":	0,
+									"MaxTarget":	500,
+									"ZoomTargetDot":	[0, 33, 75, 91, 95, 97, 98, 100, 101, 102, 103, 104],
+									"ZoomDot":		[1709, 975, 653, 464, 334, 239, 165, 102, 57, 15, -28, -70],
+									"IrisTargetDot":	[0, 5, 10, 15, 20, 25, 30, 35, 40, 45],
+									"GainDot":		[512, 409, 402, 394, 384, 376, 370, 362, 354, 347],
+									"ZoomTargetDot_len":	12,
+									"IrisTargetDot_len":	10
 								}
 							},
 							"SyncTest":	{
@@ -7204,7 +7252,7 @@
 							"MergeTuningPara":	{
 								"BaseFrm":	"BASEFRAME_LONG",
 								"CtrlDataType":	"CTRLDATATYPE_ENVLV",
-								"ByPassThr":	0,
+								"ByPassThr":	0.01,
 								"LongFrmModeData":	{
 									"OECurve":	{
 										"CtrlData":	[0, 0.005, 0.01, 0.05, 0.1, 0.15, 0.2, 0.3, 0.4, 0.5, 0.6, 0.8, 1],
@@ -7275,7 +7323,7 @@
 									"Manual_curve":	[0, 558, 1087, 1588, 2063, 2515, 2944, 3353, 3744, 4473, 5139, 5751, 6316, 6838, 7322, 7772, 8192]
 								},
 								"Scale_y":	[0, 2, 20, 76, 193, 381, 631, 772, 919, 1066, 1211, 1479, 1700, 1863, 1968, 2024, 2048],
-								"ByPassThr":	0,
+								"ByPassThr":	0.01,
 								"Edge_Weit":	0,
 								"OutPutLongFrame":	0,
 								"IIR_frame":	2,
@@ -7294,7 +7342,7 @@
 								"Enable":	1,
 								"CtrlDataType":	"CTRLDATATYPE_ENVLV",
 								"cfg_alpha":	0,
-								"ByPassThr":	0,
+								"ByPassThr":	0.01,
 								"dehaze_setting":	{
 									"en":	0,
 									"air_lc_en":	1,
@@ -7322,7 +7370,7 @@
 										"cfg_wt":	[0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8],
 										"cfg_air":	[210, 210, 210, 210, 210, 210, 210, 210, 210, 210, 210, 210, 210],
 										"cfg_tmax":	[0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2],
-										"dc_weitcur":	[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+										"dc_weitcur":	[0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05],
 										"bf_weight":	[0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5],
 										"range_sigma":	[0.14, 0.14, 0.14, 0.14, 0.14, 0.14, 0.14, 0.14, 0.14, 0.14, 0.14, 0.14, 0.14],
 										"space_sigma_pre":	[0.14, 0.14, 0.14, 0.14, 0.14, 0.14, 0.14, 0.14, 0.14, 0.14, 0.14, 0.14, 0.14],
@@ -11791,10 +11839,13 @@
 									"pdBlkLevel":	64,
 									"pdSearchRadius":	3,
 									"pdMirrorInCalib":	1,
+									"pdChangeLeftRight":	0,
 									"pdVsImgoutMirror":	0,
 									"pdLRInDiffLine":	0,
 									"pdWidth":	508,
 									"pdHeight":	760,
+									"pdMaxWidth":	508,
+									"pdMaxHeight":	760,
 									"pdVerBinning":	0,
 									"pdFrmInValid":	1,
 									"pdDgainValid":	0,
@@ -11875,7 +11926,18 @@
 												}],
 											"fineSearchTbl_len":	2
 										}],
-									"pdIsoPara_len":	2
+									"pdIsoPara_len":	2,
+									"pdResoInf":	[{
+											"imageWidth":	0,
+											"imageHeight":	0,
+											"pdOutWidth":	0,
+											"pdOutHeight":	0,
+											"pdCropX":	0,
+											"pdCropY":	0,
+											"pdBaseWidth":	0,
+											"pdBaseHeight":	0
+										}],
+									"pdResoInf_len":	1
 								},
 								"vcmcfg":	{
 									"max_logical_pos":	64,
@@ -12146,8 +12208,8 @@
 	"sys_static_cfg":	{
 		"algoSwitch":	{
 			"enable":	0,
-			"enable_algos":	["ENABLE_AE"],
-			"enable_algos_len":	1
+			"disable_algos":	["DISABLE_AF"],
+			"disable_algos_len":	1
 		}
 	}
 }

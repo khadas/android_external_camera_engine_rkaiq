@@ -25,7 +25,7 @@
 #include "alsc_head.h"
 #include "xcam_log.h"
 #include "xcam_common.h"
-#include "list.h"
+#include "common/list.h"
 #include "RkAiqCalibDbV2Helper.h"
 
 RKAIQ_BEGIN_DECLARE
@@ -49,8 +49,8 @@ typedef struct lsc_matrix
 typedef struct alsc_rest_s {
     uint32_t caseIndex;
     float fVignetting;
-    List dominateIlluList;//to record domain illuminant
-    int estimateIlluCaseIdx;
+    struct list_head dominateIlluList;//to record domain illuminant
+    uint32_t estimateIlluCaseIdx;
     uint32_t resIdx;
     pLscTableProfile_t pLscProfile1;
     pLscTableProfile_t pLscProfile2;
@@ -59,7 +59,7 @@ typedef struct alsc_rest_s {
 } alsc_rest_t;
 
 typedef struct illu_node_s {
-    void*        p_next;       /**< for adding to a list */
+    list_head node;       /**< for adding to a list */
     unsigned int value;
 } illu_node_t;
 
@@ -110,6 +110,20 @@ typedef struct alsc_otp_grad_s
     uint16_t lsc_gb[LSC_DATA_TBL_SIZE];
 } alsc_otp_grad_t;
 
+typedef struct smart_lsc_run_cfg_s {
+    bool  enable;
+    float gain_th;
+    float wbgain_th;
+} smart_lsc_cfg_run_t;
+
+typedef struct smart_lsc_run_res_s {
+    bool forceRunFlag;//update by api or prepare;
+    float last_gain;
+    float last_awbGain[2];
+    bool res3aChg;
+    bool lscTableConverge;
+} smart_lsc_run_res_t;
+
 typedef struct alsc_context_s {
     const CalibDbV2_LSC_t   *calibLscV2;
     CalibDbV2_LSC_t   fixed_calib;
@@ -130,15 +144,18 @@ typedef struct alsc_context_s {
 
     //ctrl & api
     rk_aiq_lsc_attrib_t mCurAtt;
-    rk_aiq_lsc_attrib_t mNewAtt;
+    //rk_aiq_lsc_attrib_t mNewAtt;
     bool updateAtt;
 
-    //in some cases, the scene does not change, so it doesn't need to calculate in every frame;
-    bool auto_mode_need_run_algo;
     AlscState_t eState;
 
     // otp grad
     alsc_otp_grad_t otpGrad;
+
+    //smart run
+    smart_lsc_cfg_run_t smartRunCfg;
+    smart_lsc_run_res_t smartRunRes;
+    bool isReCal_;
 } alsc_context_t ;
 
 typedef alsc_context_t* alsc_handle_t ;

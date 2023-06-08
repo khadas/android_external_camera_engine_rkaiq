@@ -70,17 +70,17 @@ static RkAiqGrpCondition_t awbGrpCond[] = {
     [0] = {XCAM_MESSAGE_SOF_INFO_OK, 0},
     [1] = {XCAM_MESSAGE_AE_PRE_RES_OK, 0},
     [2] = {XCAM_MESSAGE_AWB_STATS_OK, ISP_PARAMS_EFFECT_DELAY_CNT},
+    [3] = {XCAM_MESSAGE_AEC_STATS_OK, ISP_PARAMS_EFFECT_DELAY_CNT},
 };
 static RkAiqGrpConditions_t awbGrpConds = {grp_conds_array_info(awbGrpCond)};
 
 static RkAiqGrpCondition_t afGrpCondV21[] = {
     [0] = {XCAM_MESSAGE_SOF_INFO_OK, 0},
     [1] = {XCAM_MESSAGE_AE_PRE_RES_OK, 0},
-    [2] = {XCAM_MESSAGE_AE_PROC_RES_OK, 0},
-    [3] = {XCAM_MESSAGE_AF_STATS_OK, ISP_PARAMS_EFFECT_DELAY_CNT},
-    [4] = {XCAM_MESSAGE_AEC_STATS_OK, ISP_PARAMS_EFFECT_DELAY_CNT},
+    [2] = {XCAM_MESSAGE_AF_STATS_OK, ISP_PARAMS_EFFECT_DELAY_CNT},
+    [3] = {XCAM_MESSAGE_AEC_STATS_OK, ISP_PARAMS_EFFECT_DELAY_CNT},
 #if RKAIQ_HAVE_PDAF
-    [5] = {XCAM_MESSAGE_PDAF_STATS_OK, ISP_PARAMS_EFFECT_DELAY_CNT},
+    [4] = {XCAM_MESSAGE_PDAF_STATS_OK, ISP_PARAMS_EFFECT_DELAY_CNT},
 #endif
 };
 static RkAiqGrpConditions_t afGrpCondsV21 = {grp_conds_array_info(afGrpCondV21)};
@@ -93,17 +93,15 @@ static RkAiqGrpConditions_t otherGrpCondsV21 = {grp_conds_array_info(otherGrpCon
 static RkAiqGrpCondition_t grp0Cond[] = {
     [0] = {XCAM_MESSAGE_SOF_INFO_OK, 0},
     [1] = {XCAM_MESSAGE_AE_PRE_RES_OK, 0},
-    [2] = {XCAM_MESSAGE_AE_PROC_RES_OK, 0},
-    [3] = {XCAM_MESSAGE_AEC_STATS_OK, ISP_PARAMS_EFFECT_DELAY_CNT},
-    [4] = {XCAM_MESSAGE_AWB_STATS_OK, ISP_PARAMS_EFFECT_DELAY_CNT},
+    [2] = {XCAM_MESSAGE_AEC_STATS_OK, ISP_PARAMS_EFFECT_DELAY_CNT},
+    [3] = {XCAM_MESSAGE_AWB_STATS_OK, ISP_PARAMS_EFFECT_DELAY_CNT},
 };
 static RkAiqGrpConditions_t grp0Conds = {grp_conds_array_info(grp0Cond)};
 
 static RkAiqGrpCondition_t grpDhazCond[] = {
     [0] = {XCAM_MESSAGE_SOF_INFO_OK, 0},
     [1] = {XCAM_MESSAGE_AE_PRE_RES_OK, 0},
-    [2] = {XCAM_MESSAGE_AE_PROC_RES_OK, 0},
-    [3] = {XCAM_MESSAGE_ADEHAZE_STATS_OK, ISP_PARAMS_EFFECT_DELAY_CNT},
+    [2] = {XCAM_MESSAGE_ADEHAZE_STATS_OK, ISP_PARAMS_EFFECT_DELAY_CNT},
 };
 static RkAiqGrpConditions_t grpDhazConds = {grp_conds_array_info(grpDhazCond)};
 
@@ -198,7 +196,7 @@ static struct RkAiqAlgoDesCommExt g_default_3a_des[] = {
 #if RKAIQ_ENABLE_CAMGROUP
 const static struct RkAiqAlgoDesCommExt g_camgroup_algos[] = {
     // clang-format off
-    { &g_RkIspAlgoDescCamgroupAe.common,            RK_AIQ_CORE_ANALYZE_AE,     0,  3,  0, {0, 0} },
+    { &g_RkIspAlgoDescCamgroupAe.common,            RK_AIQ_CORE_ANALYZE_AE,     0,  1,  0, {0, 0} },
     { &g_RkIspAlgoDescCamgroupAblc.common,          RK_AIQ_CORE_ANALYZE_AWB,    0,  0,  0, {0, 0} },
     { &g_RkIspAlgoDescCamgroupAwb.common,           RK_AIQ_CORE_ANALYZE_AWB,    1,  2, 32, {0, 0} },
     { &g_RkIspAlgoDescCamgroupAlsc.common,          RK_AIQ_CORE_ANALYZE_AWB,    0,  0,  0, {0, 0} },
@@ -208,7 +206,7 @@ const static struct RkAiqAlgoDesCommExt g_camgroup_algos[] = {
     { &g_RkIspAlgoDescCamgroupAdhaz.common,         RK_AIQ_CORE_ANALYZE_DHAZ,   0,  1,  0, {0, 0} },
     // { &g_RkIspAlgoDescamgroupAgamma.common,      RK_AIQ_CORE_ANALYZE_GRP0,   0,  0,  0, {0, 0} },
     { &g_RkIspAlgoDescCamgroupAdrc.common,          RK_AIQ_CORE_ANALYZE_GRP0,   0,  1,  0, {0, 0} },
-    // { &g_RkIspAlgoDescCamgroupAmerge.common,     RK_AIQ_CORE_ANALYZE_GRP0,   0,  0,  0, {0, 0} },
+    { &g_RkIspAlgoDescCamgroupAmerge.common,        RK_AIQ_CORE_ANALYZE_GRP0,   0,  0,  0, {0, 0} },
     { &g_RkIspAlgoDescCamgroupAynrV2.common,        RK_AIQ_CORE_ANALYZE_OTHER,  2,  2,  2, {0, 0} },
     { &g_RkIspAlgoDescCamgroupAcnr.common,          RK_AIQ_CORE_ANALYZE_OTHER,  1,  1,  1, {0, 0} },
     { &g_RkIspAlgoDescCamgroupAbayernrV2.common,    RK_AIQ_CORE_ANALYZE_OTHER,  2,  2,  2, {0, 0} },

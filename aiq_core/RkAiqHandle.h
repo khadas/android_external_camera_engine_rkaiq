@@ -42,6 +42,8 @@ namespace RkCam {
  --------------------------------
 */
 
+#define DISABLE_HANDLE_ATTRIB
+
 class RkAiqCore;
 struct RkAiqAlgosGroupShared_s;
 
@@ -141,6 +143,7 @@ class RkAiqHandle {
     RkAiqHandle* mParentHdl;
     bool mIsMulRun;
     bool mPostShared;
+    uint32_t mSyncFlag{(uint32_t)(-1)};
 };
 
 template <typename T>

@@ -73,6 +73,10 @@ prepare(RkAiqAlgoCom* params)
             confPara->com.u.prepare.calibv2, ccm_calib_v2));
 #endif
     }
+    // just update calib ptr
+    if (params->u.prepare.conf_type & RK_AIQ_ALGO_CONFTYPE_UPDATECALIB_PTR)
+        return XCAM_RETURN_NO_ERROR;
+
     AccmPrepare((accm_handle_t)(params->ctx->accm_para));
 
     LOG1_ACCM( "%s: (exit)\n", __FUNCTION__);
@@ -98,6 +102,8 @@ processing(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outparams)
     RkAiqAlgoProcResAccm *proResAccm = (RkAiqAlgoProcResAccm*)outparams;
     accm_handle_t hAccm = (accm_handle_t)(inparams->ctx->accm_para);
 
+    hAccm->isReCal_ = hAccm->isReCal_ ||
+                    (procAccm->accm_sw_info.grayMode != procAccm->com.u.proc.gray_mode);
     procAccm->accm_sw_info.grayMode = procAccm->com.u.proc.gray_mode;
     procAccm->accm_sw_info.ccmConverged = hAccm->accmSwInfo.ccmConverged;
     hAccm->accmSwInfo = procAccm->accm_sw_info;
@@ -105,12 +111,15 @@ processing(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outparams)
     LOGD_ACCM( "%s: awbIIRDampCoef:%f\n", __FUNCTION__, hAccm->accmSwInfo.awbIIRDampCoef);
 
     AccmConfig(hAccm);
+    proResAccm->res_com.cfg_update = hAccm->isReCal_;
 #if defined(ISP_HW_V32) || defined(ISP_HW_V32_LITE)
-    memcpy(&proResAccm->accm_hw_conf_v2, &hAccm->ccmHwConf_v2, sizeof(rk_aiq_ccm_cfg_v2_t));
+    if (proResAccm->res_com.cfg_update)
+        memcpy(proResAccm->accm_hw_conf_v2, &hAccm->ccmHwConf_v2, sizeof(rk_aiq_ccm_cfg_v2_t));
 #else
-    memcpy(&proResAccm->accm_hw_conf, &hAccm->ccmHwConf, sizeof(rk_aiq_ccm_cfg_t));
+    if (proResAccm->res_com.cfg_update)
+        memcpy(proResAccm->accm_hw_conf, &hAccm->ccmHwConf, sizeof(rk_aiq_ccm_cfg_t));
 #endif
-    proResAccm->ccm_update = hAccm->update ||hAccm->updateAtt || (!hAccm->accmSwInfo.ccmConverged);
+    hAccm->isReCal_ = false;
     LOG1_ACCM( "%s: (exit)\n", __FUNCTION__);
     return XCAM_RETURN_NO_ERROR;
 }

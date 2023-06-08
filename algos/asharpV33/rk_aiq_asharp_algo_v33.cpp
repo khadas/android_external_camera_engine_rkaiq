@@ -108,6 +108,8 @@ Asharp_result_V33_t Asharp_Init_V33(Asharp_Context_V33_t** ppAsharpCtx, void* pC
     pAsharpCtx->eParamMode         = ASHARP_V33_PARAM_MODE_NORMAL;
     Asharp_ConfigSettingParam_V33(pAsharpCtx, pAsharpCtx->eParamMode,
                                   pAsharpCtx->stExpInfo.snr_mode);
+    // init manual params
+    pAsharpCtx->stManual.stSelect = pAsharpCtx->stAuto.stParams.sharpParamsISO[0];
 #endif
 
     LOGD_ASHARP("%s(%d):", __FUNCTION__, __LINE__);
@@ -273,16 +275,21 @@ Asharp_result_V33_t Asharp_GetProcResult_V33(Asharp_Context_V33_t* pAsharpCtx,
         return ASHARP_V33_RET_INVALID_PARM;
     }
 
+#if RKAIQ_HAVE_SHARP_V33
+    RK_SHARP_Params_V33_Select_t* stSelect = NULL;
+#else
+    RK_SHARP_Params_V33LT_Select_t* stSelect = NULL;
+#endif
     if (pAsharpCtx->eMode == ASHARP_V33_OP_MODE_AUTO) {
-        pAsharpResult->stSelect = pAsharpCtx->stAuto.stSelect;
+        stSelect = &pAsharpCtx->stAuto.stSelect;
     } else if (pAsharpCtx->eMode == ASHARP_V33_OP_MODE_MANUAL) {
-        pAsharpResult->stSelect     = pAsharpCtx->stManual.stSelect;
+        stSelect     = &pAsharpCtx->stManual.stSelect;
     }
 
     // transfer to reg value
-    sharp_fix_transfer_V33(&pAsharpResult->stSelect, &pAsharpResult->stFix, &pAsharpCtx->stStrength, &pAsharpCtx->stExpInfo);
+    sharp_fix_transfer_V33(stSelect, pAsharpResult->stFix, &pAsharpCtx->stStrength, &pAsharpCtx->stExpInfo);
     if (pAsharpCtx->eMode == ASHARP_V33_OP_MODE_REG_MANUAL) {
-        pAsharpResult->stFix        = pAsharpCtx->stManual.stFix;
+        *pAsharpResult->stFix        = pAsharpCtx->stManual.stFix;
         pAsharpCtx->stStrength.percent = 1.0;
     }
 
@@ -336,12 +343,13 @@ Asharp_result_V33_t Asharp_ParamModeProcess_V33(Asharp_Context_V33_t* pAsharpCtx
         Asharp_ExpInfo_V33_t* pExpInfo,
         Asharp_ParamMode_V33_t* mode) {
     Asharp_result_V33_t res = ASHARP_V33_RET_SUCCESS;
-    *mode                   = pAsharpCtx->eParamMode;
 
     if (pAsharpCtx == NULL) {
         LOGE_ASHARP("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
         return ASHARP_V33_RET_INVALID_PARM;
     }
+
+    *mode = pAsharpCtx->eParamMode;
 
     if (pAsharpCtx->isGrayMode) {
         *mode = ASHARP_V33_PARAM_MODE_GRAY;

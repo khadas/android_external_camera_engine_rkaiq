@@ -247,26 +247,32 @@ Abayertnr_result_V23_t Abayertnr_GetProcResult_V23(Abayertnr_Context_V23_t *pAba
         return ABAYERTNRV23_RET_INVALID_PARM;
     }
 
+
+#if (RKAIQ_HAVE_BAYERTNR_V23)
+    RK_Bayertnr_Params_V23_Select_t* st3DSelect = NULL;
+#else
+    RK_Bayertnr_Param_V23L_Select_t* st3DSelect = NULL;
+#endif
     if(pAbayertnrCtx->eMode == ABAYERTNRV23_OP_MODE_AUTO) {
-        pAbayertnrResult->st3DSelect = pAbayertnrCtx->stAuto.st3DSelect;
+        st3DSelect = &pAbayertnrCtx->stAuto.st3DSelect;
 
     } else if(pAbayertnrCtx->eMode == ABAYERTNRV23_OP_MODE_MANUAL) {
         //TODO
-        pAbayertnrResult->st3DSelect = pAbayertnrCtx->stManual.st3DSelect;
+        st3DSelect = &pAbayertnrCtx->stManual.st3DSelect;
     }
 
     //transfer to reg value
-    bayertnr_fix_transfer_V23(&pAbayertnrResult->st3DSelect, &pAbayertnrResult->st3DFix, &pAbayertnrCtx->stStrength, &pAbayertnrCtx->stExpInfo);
+    bayertnr_fix_transfer_V23(st3DSelect, pAbayertnrResult->st3DFix, &pAbayertnrCtx->stStrength, &pAbayertnrCtx->stExpInfo);
 
     if(pAbayertnrCtx->eMode == ABAYERTNRV23_OP_MODE_REG_MANUAL) {
-        pAbayertnrResult->st3DFix = pAbayertnrCtx->stManual.st3DFix;
+        *pAbayertnrResult->st3DFix = pAbayertnrCtx->stManual.st3DFix;
         pAbayertnrCtx->stStrength.percent = 1.0;
     }
 
     LOGD_ANR("%s:%d abayertnr eMode:%d bypass:%d iso:%d fstrength:%f\n",
              __FUNCTION__, __LINE__,
              pAbayertnrCtx->eMode,
-             pAbayertnrResult->st3DFix.bypass_en,
+             pAbayertnrResult->st3DFix->bypass_en,
              pAbayertnrCtx->stExpInfo.arIso[pAbayertnrCtx->stExpInfo.hdr_mode],
              pAbayertnrCtx->stStrength.percent);
 
@@ -311,6 +317,8 @@ Abayertnr_result_V23_t Abayertnr_ConfigSettingParam_V23(Abayertnr_Context_V23_t 
 
 #if (ABAYERTNR_USE_JSON_FILE_V23)
     bayertnr_config_setting_param_json_V23(&pAbayertnrCtx->stAuto.st3DParams, &pAbayertnrCtx->bayertnr_v23, param_mode_name, snr_name);
+    // init tnr manual params
+    pAbayertnrCtx->stManual.st3DSelect = pAbayertnrCtx->stAuto.st3DParams.bayertnrParamISO[0];
 #endif
     LOGI_ANR("%s(%d): exit!\n", __FUNCTION__, __LINE__);
     return ABAYERTNRV23_RET_SUCCESS;
@@ -318,12 +326,13 @@ Abayertnr_result_V23_t Abayertnr_ConfigSettingParam_V23(Abayertnr_Context_V23_t 
 
 Abayertnr_result_V23_t Abayertnr_ParamModeProcess_V23(Abayertnr_Context_V23_t *pAbayertnrCtx, Abayertnr_ExpInfo_V23_t *pExpInfo, Abayertnr_ParamMode_V23_t *mode) {
     Abayertnr_result_V23_t res  = ABAYERTNRV23_RET_SUCCESS;
-    *mode = pAbayertnrCtx->eParamMode;
 
     if(pAbayertnrCtx == NULL) {
         LOGE_ANR("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
         return ABAYERTNRV23_RET_INVALID_PARM;
     }
+
+    *mode = pAbayertnrCtx->eParamMode;
 
     if(pAbayertnrCtx->isGrayMode) {
         *mode = ABAYERTNRV23_PARAM_MODE_GRAY;

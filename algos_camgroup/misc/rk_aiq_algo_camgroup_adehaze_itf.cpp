@@ -90,7 +90,7 @@ static XCamReturn prepare(RkAiqAlgoCom* params) {
         pAdehazeGrpHandle->FrameNumber = HDR_3X_NUM;
 
     if (!!(params->u.prepare.conf_type & RK_AIQ_ALGO_CONFTYPE_UPDATECALIB)) {
-        LOGD_ADEHAZE("%s: Adehaze Reload Para!\n", __FUNCTION__);
+        LOGI_ADEHAZE("%s: Adehaze Reload Para!\n", __FUNCTION__);
 #if RKAIQ_HAVE_DEHAZE_V10
         CalibDbV2_dehaze_v10_t* calibv2_adehaze_calib_V10 =
             (CalibDbV2_dehaze_v10_t*)(CALIBDBV2_GET_MODULE_PTR((void*)pCalibDb, adehaze_calib));
@@ -131,6 +131,7 @@ static XCamReturn prepare(RkAiqAlgoCom* params) {
 static XCamReturn processing(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outparams) {
     LOG1_ADEHAZE("ENTER: %s \n", __func__);
     XCamReturn ret                            = XCAM_RETURN_NO_ERROR;
+    bool dehaze_bypass_processing             = true;
     AdehazeHandle_t* pAdehazeGrpHandle        = (AdehazeHandle_t*)inparams->ctx;
     RkAiqAlgoCamGroupProcIn* pGrpProcPara     = (RkAiqAlgoCamGroupProcIn*)inparams;
     RkAiqAlgoCamGroupProcOut* pGrpProcResPara = (RkAiqAlgoCamGroupProcOut*)outparams;
@@ -139,72 +140,58 @@ static XCamReturn processing(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outp
     LOGD_ADEHAZE("/*************************Adehaze Group Start******************/ \n");
 
     AdehazeGetCurrDataGroup(pAdehazeGrpHandle, pGrpProcPara->camgroupParmasArray[0]);
-    AdehazeByPassProcessing(pAdehazeGrpHandle);
+    dehaze_bypass_processing = AdehazeByPassProcessing(pAdehazeGrpHandle);
 
-    bool Enable = DehazeEnableSetting(pAdehazeGrpHandle);
-
-    if (Enable) {
-    // process
-    if (!(pAdehazeGrpHandle->byPassProc)) ret = AdehazeProcess(pAdehazeGrpHandle);
+    if (DehazeEnableSetting(pAdehazeGrpHandle,
+                            pGrpProcResPara->camgroupParmasArray[0]->_adehazeConfig)) {
+#if RKAIQ_HAVE_DEHAZE_V10
+        // dehaze group dehaze not ready for now
+        dehaze_stats_v10_t dehazeStats;
+#endif
+#if RKAIQ_HAVE_DEHAZE_V11
+        // dehaze group dehaze not ready for now
+        dehaze_stats_v11_t dehazeStats;
+#endif
+#if RKAIQ_HAVE_DEHAZE_V11_DUO
+        // dehaze group dehaze not ready for now
+        dehaze_stats_v11_duo_t dehazeStats;
+#endif
+#if RKAIQ_HAVE_DEHAZE_V12
+        // dehaze group dehaze not ready for now
+        dehaze_stats_v12_t dehazeStats;
+#endif
+        memset(&dehazeStats, 0x0, sizeof(dehazeStats));
+        // process
+        if (!dehaze_bypass_processing) {
+#if RKAIQ_HAVE_DEHAZE_V12
+            ret = AdehazeProcess(pAdehazeGrpHandle, &dehazeStats, false,
+                                 pGrpProcResPara->camgroupParmasArray[0]->_adehazeConfig);
+#else
+            ret = AdehazeProcess(pAdehazeGrpHandle, &dehazeStats,
+                                 pGrpProcResPara->camgroupParmasArray[0]->_adehazeConfig);
+#endif
+        }
     } else {
         LOGD_ADEHAZE("Group Dehaze Enable is OFF, Bypass Dehaze !!! \n");
     }
 
     LOGD_ADEHAZE("/*************************Adehaze Group Over******************/ \n");
 
+    outparams->cfg_update = !dehaze_bypass_processing || inparams->u.proc.init;
+    IS_UPDATE_MEM((pGrpProcResPara->camgroupParmasArray[0]->_adehazeConfig), pGrpProcPara->_offset_is_update) =
+            outparams->cfg_update;
     // proc res
-    pAdehazeGrpHandle->ProcRes.enable = pAdehazeGrpHandle->ProcRes.enable;
-    pAdehazeGrpHandle->ProcRes.update = !(pAdehazeGrpHandle->byPassProc);
-#if RKAIQ_HAVE_DEHAZE_V10
-    pAdehazeGrpHandle->ProcRes.enable = true;
-    pAdehazeGrpHandle->ProcRes.update = !(pAdehazeGrpHandle->byPassProc);
-    if (pAdehazeGrpHandle->ProcRes.update) {
-        for (int i = 0; i < pGrpProcResPara->arraySize; i++) {
-            pGrpProcResPara->camgroupParmasArray[i]->_adehazeConfig->enable =
-                pAdehazeGrpHandle->ProcRes.enable;
-            pGrpProcResPara->camgroupParmasArray[i]->_adehazeConfig->update =
-                pAdehazeGrpHandle->ProcRes.update;
-            memcpy(&pGrpProcResPara->camgroupParmasArray[i]->_adehazeConfig->ProcResV10,
-                   &pAdehazeGrpHandle->ProcRes.ProcResV10, sizeof(AdehazeV10ProcResult_t));
+    for (int i = 1; i < pGrpProcResPara->arraySize; i++) {
+        if (outparams->cfg_update) {
+            memcpy(pGrpProcResPara->camgroupParmasArray[i]->_adehazeConfig,
+                   pGrpProcResPara->camgroupParmasArray[0]->_adehazeConfig,
+                   sizeof(RkAiqAdehazeProcResult_t));
         }
+        IS_UPDATE_MEM((pGrpProcResPara->camgroupParmasArray[i]->_adehazeConfig), pGrpProcPara->_offset_is_update) =
+            outparams->cfg_update;
     }
-#endif
-#if RKAIQ_HAVE_DEHAZE_V11
-    if (pAdehazeGrpHandle->ProcRes.update) {
-        for (int i = 0; i < pGrpProcResPara->arraySize; i++) {
-            pGrpProcResPara->camgroupParmasArray[i]->_adehazeConfig->enable =
-                pAdehazeGrpHandle->ProcRes.enable;
-            pGrpProcResPara->camgroupParmasArray[i]->_adehazeConfig->update =
-                pAdehazeGrpHandle->ProcRes.update;
-            memcpy(&pGrpProcResPara->camgroupParmasArray[i]->_adehazeConfig->ProcResV11,
-                   &pAdehazeGrpHandle->ProcRes.ProcResV11, sizeof(AdehazeV11ProcResult_t));
-        }
-    }
-#endif
-#if RKAIQ_HAVE_DEHAZE_V11_DUO
-    if (pAdehazeGrpHandle->ProcRes.update) {
-        for (int i = 0; i < pGrpProcResPara->arraySize; i++) {
-            pGrpProcResPara->camgroupParmasArray[i]->_adehazeConfig->enable =
-                pAdehazeGrpHandle->ProcRes.enable;
-            pGrpProcResPara->camgroupParmasArray[i]->_adehazeConfig->update =
-                pAdehazeGrpHandle->ProcRes.update;
-            memcpy(&pGrpProcResPara->camgroupParmasArray[i]->_adehazeConfig->ProcResV11duo,
-                   &pAdehazeGrpHandle->ProcRes.ProcResV11duo, sizeof(AdehazeV11duoProcResult_t));
-        }
-    }
-#endif
-#if RKAIQ_HAVE_DEHAZE_V12
-    if (pAdehazeGrpHandle->ProcRes.update) {
-        for (int i = 0; i < pGrpProcResPara->arraySize; i++) {
-            pGrpProcResPara->camgroupParmasArray[i]->_adehazeConfig->enable =
-                pAdehazeGrpHandle->ProcRes.enable;
-            pGrpProcResPara->camgroupParmasArray[i]->_adehazeConfig->update =
-                pAdehazeGrpHandle->ProcRes.update;
-            memcpy(&pGrpProcResPara->camgroupParmasArray[i]->_adehazeConfig->ProcResV12,
-                   &pAdehazeGrpHandle->ProcRes.ProcResV12, sizeof(AdehazeV12ProcResult_t));
-        }
-    }
-#endif
+    if (pAdehazeGrpHandle->ifReCalcStManual) pAdehazeGrpHandle->ifReCalcStManual = false;
+    if (pAdehazeGrpHandle->ifReCalcStAuto) pAdehazeGrpHandle->ifReCalcStAuto = false;
 
     LOG1_ADEHAZE("EIXT: %s \n", __func__);
     return ret;

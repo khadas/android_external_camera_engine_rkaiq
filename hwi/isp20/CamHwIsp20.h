@@ -30,10 +30,13 @@
 #include "RawStreamProcUnit.h"
 #include "SPStreamProcUnit.h"
 #include "PdafStreamProcUnit.h"
+#ifdef ISP_HW_V20
 #include "TnrStreamProcUnit.h"
 #include "NrStreamProcUnit.h"
 #include "FecParamStream.h"
+#endif
 #include "thumbnails.h"
+#include "CifScaleStream.h"
 
 #include <unordered_map>
 
@@ -71,6 +74,7 @@ class IspParamsSplitter;
 #define ISP_PARAMS_EFFECT_DELAY_CNT     2
 #define CAM_INDEX_FOR_1608              8
 
+#define DISABLE_PARAMS_POLL_THREAD
 // FIXME: share 1608 data ptr(aiq/rawdata)
 typedef struct sensor_info_share_s {
     RawStreamProcUnit*          raw_proc_unit[CAM_INDEX_FOR_1608];  // bind rx by camId
@@ -119,12 +123,14 @@ public:
     XCamReturn getSensorFlip(bool& mirror, bool& flip) override;
     void setMulCamConc(bool cc);
     XCamReturn getZoomPosition(int& position) override;
+    XCamReturn getIrisParams(SmartPtr<RkAiqIrisParamsProxy>& irisPar, CalibDb_IrisTypeV2_t irisType);
     XCamReturn getLensVcmCfg(rk_aiq_lens_vcmcfg& lens_cfg) override;
     XCamReturn setLensVcmCfg(rk_aiq_lens_vcmcfg& lens_cfg) override;
     XCamReturn setLensVcmCfg(struct rkmodule_inf& mod_info);
     XCamReturn FocusCorrection() override;
     XCamReturn ZoomCorrection() override;
     XCamReturn setAngleZ(float angleZ) override;
+    XCamReturn getFocusPosition(int& position) override;
     virtual void getShareMemOps(isp_drv_share_mem_ops_t** mem_ops) override;
     uint64_t getIspModuleEnState()  override;
 
@@ -152,7 +158,9 @@ public:
     }
     XCamReturn notify_sof(SmartPtr<VideoBuffer>& buf);
     SmartPtr<ispHwEvt_t> make_ispHwEvt (uint32_t sequence, int type, int64_t timestamp);
-    int get_workingg_mode() { return _hdr_mode; }
+    int get_workingg_mode() {
+        return _hdr_mode;
+    }
     //should be called after prepare
     XCamReturn get_stream_format(rkaiq_stream_type_t type, struct v4l2_format &format);
     XCamReturn get_sp_resolution(int &width, int &height, int &aligned_w, int &aligned_h) override;
@@ -184,11 +192,14 @@ public:
     // FIXME: Set struct to static.
     static sensor_info_share_t rk1608_share_inf;
 
-    void setUserSensorFormat(uint16_t width, uint16_t height, uint16_t code) {
+    virtual void setUserSensorFormat(uint16_t width, uint16_t height, uint16_t code) override {
         userSensorWidth = width;
         userSensorHeight = height;
         userSensorFmtCode = code;
     }
+
+    // cif scale flag
+    XCamReturn setCifSclStartFlag(int ratio, bool mode);
 
 private:
     using V4l2Device::start;
@@ -209,7 +220,9 @@ private:
     XCamReturn get_sensor_pdafinfo(rk_sensor_full_info_t *sensor_info, rk_sensor_pdaf_info_t *pdaf_info);
 protected:
     XCAM_DEAD_COPY(CamHwIsp20);
-    virtual XCamReturn setIspConfig();
+    virtual XCamReturn setIspConfig(cam3aResultList* result_list = NULL);
+    virtual void updateEffParams(void* params, void* ori_params = NULL) { return; }
+    virtual bool processTb(void* params) { return false; }
     virtual XCamReturn poll_buffer_ready (SmartPtr<VideoBuffer> &buf) override;
     enum cam_hw_state_e {
         CAM_HW_STATE_INVALID,
@@ -254,13 +267,11 @@ protected:
     volatile bool _is_exit;
     bool _linked_to_isp;
     bool _linked_to_1608;
-    struct isp2x_isp_params_cfg _full_active_isp_params;
 #if defined(ISP_HW_V20)
     struct rkispp_params_cfg _full_active_ispp_params;
     uint32_t _ispp_module_init_ens;
     SmartPtr<V4l2SubDevice> _ispp_sd;
 #endif
-    uint64_t _module_cfg_update_frome_drv;
     SmartPtr<V4l2SubDevice> _cif_csi2_sd;
     char sns_name[32];
 public:
@@ -275,18 +286,10 @@ protected:
     // TODO: Sync 1608 sensor start streaming
     static XCam::Mutex  _sync_1608_mutex;
     static bool         _sync_1608_done;
-    void gen_full_isp_params(const struct isp2x_isp_params_cfg* update_params,
-                             struct isp2x_isp_params_cfg* full_params,
-                                uint64_t* module_en_update_partial,
-                                uint64_t* module_cfg_update_partial);
 #if defined(ISP_HW_V20)
     void gen_full_ispp_params(const struct rkispp_params_cfg* update_params,
                               struct rkispp_params_cfg* full_params);
 #endif
-    XCamReturn overrideExpRatioToAiqResults(const uint32_t frameId,
-                int module_id,
-                cam3aResultList &results,
-                int hdr_mode);
 #if 0
     void dump_isp_config(struct isp2x_isp_params_cfg* isp_params,
                          SmartPtr<RkAiqIspParamsProxy> aiq_results,
@@ -323,15 +326,14 @@ protected:
     static void allocMemResource(uint8_t id, void *ops_ctx, void *config, void **mem_ctx);
     static void releaseMemResource(uint8_t id, void *mem_ctx);
     static void* getFreeItem(uint8_t id, void *mem_ctx);
-    uint32_t _isp_module_ens;
+    uint64_t _isp_module_ens{0};
     bool mNoReadBack;
-    uint64_t ispModuleEns;
     rk_aiq_rotation_t _sharp_fbc_rotation;
 
-    rk_aiq_ldch_share_mem_info_t ldch_mem_info_array[2*ISP2X_MESH_BUF_NUM];
+    rk_aiq_ldch_share_mem_info_t ldch_mem_info_array[2 * ISP2X_MESH_BUF_NUM];
     rk_aiq_fec_share_mem_info_t fec_mem_info_array[FEC_MESH_BUF_NUM];
-    rk_aiq_cac_share_mem_info_t cac_mem_info_array[2*ISP3X_MESH_BUF_NUM];
-    rk_aiq_dbg_share_mem_info_t dbg_mem_info_array[2*RKISP_INFO2DDR_BUF_MAX];
+    rk_aiq_cac_share_mem_info_t cac_mem_info_array[2 * ISP3X_MESH_BUF_NUM];
+    rk_aiq_dbg_share_mem_info_t dbg_mem_info_array[2 * RKISP_INFO2DDR_BUF_MAX];
     typedef struct drv_share_mem_ctx_s {
         void* ops_ctx;
         void* mem_info;
@@ -368,6 +370,8 @@ protected:
     SmartPtr<RawStreamCapUnit> mRawCapUnit;
     SmartPtr<RawStreamProcUnit> mRawProcUnit;
 
+    SmartPtr<CifSclStream> mCifScaleStream;
+
     SmartPtr<PdafStreamProcUnit> mPdafStreamUnit;
 
     SmartPtr<cam3aResult> get_3a_module_result (cam3aResultList &results, int32_t type);
@@ -380,7 +384,9 @@ protected:
 
     std::map<uint32_t, SmartPtr<RkAiqIspEffParamsProxy>> _effecting_ispparam_map;
     SmartPtr<RkAiqIspEffParamsPool> mEffectIspParamsPool;
+#ifndef DISABLE_PARAMS_ASSEMBLER
     SmartPtr<IspParamsAssembler> mParamsAssembler;
+#endif
     uint32_t mPpModuleInitEns;
     bool mVicapIspPhyLinkSupported; // if phsical link between vicap and isp, only isp3x support now
     SmartPtr<IspParamsSplitter> mParamsSplitter;

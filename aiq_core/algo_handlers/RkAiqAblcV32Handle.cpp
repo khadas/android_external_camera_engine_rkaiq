@@ -36,6 +36,7 @@ XCamReturn RkAiqAblcV32HandleInt::updateConfig(bool needSync) {
     ENTER_ANALYZER_FUNCTION();
 
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
+#ifndef DISABLE_HANDLE_ATTRIB
     if (needSync) mCfgMutex.lock();
     // if something changed
     if (updateAtt) {
@@ -46,6 +47,7 @@ XCamReturn RkAiqAblcV32HandleInt::updateConfig(bool needSync) {
     }
 
     if (needSync) mCfgMutex.unlock();
+#endif
 
     EXIT_ANALYZER_FUNCTION();
     return ret;
@@ -60,6 +62,9 @@ XCamReturn RkAiqAblcV32HandleInt::setAttrib(const rk_aiq_blc_attrib_V32_t* att) 
     // if something changed, set att to mNewAtt, and
     // the new params will be effective later when updateConfig
     // called by RkAiqCore
+#ifdef DISABLE_HANDLE_ATTRIB
+    ret = rk_aiq_uapi_ablc_V32_SetAttrib(mAlgoCtx, const_cast<rk_aiq_blc_attrib_V32_t*>(att), false);
+#else
     bool isChanged = false;
     if (att->sync.sync_mode == RK_AIQ_UAPI_MODE_ASYNC && memcmp(&mNewAtt, att, sizeof(*att)))
         isChanged = true;
@@ -72,6 +77,7 @@ XCamReturn RkAiqAblcV32HandleInt::setAttrib(const rk_aiq_blc_attrib_V32_t* att) 
         updateAtt = true;
         waitSignal(att->sync.sync_mode);
     }
+#endif
 
     mCfgMutex.unlock();
 
@@ -84,6 +90,11 @@ XCamReturn RkAiqAblcV32HandleInt::getAttrib(rk_aiq_blc_attrib_V32_t* att) {
 
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
 
+#ifdef DISABLE_HANDLE_ATTRIB
+    mCfgMutex.lock();
+    rk_aiq_uapi_ablc_V32_GetAttrib(mAlgoCtx, att);
+    mCfgMutex.unlock();
+#else
     if (att->sync.sync_mode == RK_AIQ_UAPI_MODE_SYNC) {
         mCfgMutex.lock();
         rk_aiq_uapi_ablc_V32_GetAttrib(mAlgoCtx, att);
@@ -98,6 +109,7 @@ XCamReturn RkAiqAblcV32HandleInt::getAttrib(rk_aiq_blc_attrib_V32_t* att) {
             att->sync.done = true;
         }
     }
+#endif
 
     EXIT_ANALYZER_FUNCTION();
     return ret;
@@ -132,10 +144,6 @@ XCamReturn RkAiqAblcV32HandleInt::prepare() {
 
     ret = RkAiqHandle::prepare();
     RKAIQCORE_CHECK_RET(ret, "ablcV32 handle prepare failed");
-
-    RkAiqAlgoConfigAblcV32* ablc_config_int = (RkAiqAlgoConfigAblcV32*)mConfig;
-    RkAiqCore::RkAiqAlgosGroupShared_t* shared =
-        (RkAiqCore::RkAiqAlgosGroupShared_t*)(getGroupShared());
 
     RkAiqAlgoDescription* des = (RkAiqAlgoDescription*)mDes;
     ret                       = des->prepare(mConfig);
@@ -189,6 +197,8 @@ XCamReturn RkAiqAblcV32HandleInt::processing() {
         (RkAiqCore::RkAiqAlgosGroupShared_t*)(getGroupShared());
     RkAiqCore::RkAiqAlgosComShared_t* sharedCom = &mAiqCore->mAlogsComSharedParams;
 
+    mProcResShared->result.ablcV32_proc_res = &shared->fullParams->mBlcV32Params->data()->result;
+
     ret = RkAiqHandle::processing();
     if (ret < 0) {
         LOGE_ANALYZER("ablcV32 handle processing failed ret %d", ret);
@@ -203,8 +213,14 @@ XCamReturn RkAiqAblcV32HandleInt::processing() {
     ablc_proc_int->iso      = sharedCom->iso;
     ablc_proc_int->hdr_mode = sharedCom->working_mode;
 
+#ifdef DISABLE_HANDLE_ATTRIB
+    mCfgMutex.lock();
+#endif
     RkAiqAlgoDescription* des = (RkAiqAlgoDescription*)mDes;
     ret                       = des->processing(mProcInParam, (RkAiqAlgoResCom*)(&mProcResShared->result));
+#ifdef DISABLE_HANDLE_ATTRIB
+    mCfgMutex.unlock();
+#endif
     if (ret < 0) {
         LOGE_ANALYZER("ablcV32 algo processing failed ret %d", ret);
         mProcResShared = NULL;
@@ -215,25 +231,36 @@ XCamReturn RkAiqAblcV32HandleInt::processing() {
         return ret;
     }
 
+    if (!mProcResShared->result.res_com.cfg_update) {
+        mProcResShared->result.ablcV32_proc_res = mLatestparam;
+        LOGD_ABLC("[%d] copy results from latest !", shared->frameId);
+    }
+
     if (mAiqCore->mAlogsComSharedParams.init) {
         RkAiqCore::RkAiqAlgosGroupShared_t* grpShared = nullptr;
         uint64_t grpMask = grpId2GrpMask(RK_AIQ_CORE_ANALYZE_AWB);
         if (!mAiqCore->getGroupSharedParams(grpMask, grpShared)) {
             if (grpShared)
-                memcpy(&grpShared->res_comb.ablcV32_proc_res, &mProcResShared->result.ablcV32_proc_res,
-                       sizeof(mProcResShared->result.ablcV32_proc_res));
+                grpShared->res_comb.ablcV32_proc_res = mProcResShared->result.ablcV32_proc_res;
         }
         grpMask = grpId2GrpMask(RK_AIQ_CORE_ANALYZE_GRP0);
         if (!mAiqCore->getGroupSharedParams(grpMask, grpShared)) {
             if (grpShared)
-                memcpy(&grpShared->res_comb.ablcV32_proc_res, &mProcResShared->result.ablcV32_proc_res,
-                       sizeof(mProcResShared->result.ablcV32_proc_res));
+                grpShared->res_comb.ablcV32_proc_res = mProcResShared->result.ablcV32_proc_res;
+        }
+        grpMask = grpId2GrpMask(RK_AIQ_CORE_ANALYZE_GRP1);
+        if (!mAiqCore->getGroupSharedParams(grpMask, grpShared)) {
+            if (grpShared)
+                grpShared->res_comb.ablcV32_proc_res = mProcResShared->result.ablcV32_proc_res;
+        }
+        grpMask = grpId2GrpMask(RK_AIQ_CORE_ANALYZE_DHAZ);
+        if (!mAiqCore->getGroupSharedParams(grpMask, grpShared)) {
+            if (grpShared)
+                grpShared->res_comb.ablcV32_proc_res = mProcResShared->result.ablcV32_proc_res;
         }
     } else if (mPostShared) {
-        SmartPtr<BufferProxy> msg_data = new BufferProxy(mProcResShared);
-        msg_data->set_sequence(shared->frameId);
-        SmartPtr<XCamMessage> msg =
-            new RkAiqCoreVdBufMsg(XCAM_MESSAGE_BLC_V32_PROC_RES_OK, shared->frameId, msg_data);
+        mProcResShared->set_sequence(shared->frameId);
+        RkAiqCoreVdBufMsg msg(XCAM_MESSAGE_BLC_V32_PROC_RES_OK, shared->frameId, mProcResShared);
         mAiqCore->post_message(msg);
     }
 
@@ -297,15 +324,37 @@ XCamReturn RkAiqAblcV32HandleInt::genIspResult(RkAiqFullParams* params,
             blc_param->frame_id = shared->frameId;
         }
 
-        memcpy(&blc_param->result, &ablc_com->ablcV32_proc_res, sizeof(ablc_com->ablcV32_proc_res));
+        if (ablc_com->res_com.cfg_update) {
+            mSyncFlag = shared->frameId;
+            blc_param->sync_flag = mSyncFlag;
+            // copy from algo result
+            // set as the latest result
+            cur_params->mBlcV32Params = params->mBlcV32Params;
+            mLatestparam = &cur_params->mBlcV32Params->data()->result;
+            blc_param->is_update = true;
+            LOGD_ABLC("[%d] params from algo", mSyncFlag);
+        } else if (mSyncFlag != blc_param->sync_flag) {
+            blc_param->sync_flag = mSyncFlag;
+            // copy from latest result
+            if (cur_params->mBlcV32Params.ptr()) {
+                blc_param->result = cur_params->mBlcV32Params->data()->result;
+                blc_param->is_update = true;
+            } else {
+                LOGE_ABLC("no latest params !");
+                blc_param->is_update = false;
+            }
+            LOGD_ABLC("[%d] params from latest [%d]", shared->frameId, mSyncFlag);
+        } else {
+            blc_param->is_update = false;
+            // do nothing, result in buf needn't update
+            LOGD_ABLC("[%d] params needn't update", shared->frameId);
+        }
 
         // printf("!!!!!!handle get proc result : offset:0x%x gain:0x%x max:0x%x \n",
         // ablc_com->ablcV32_proc_res.isp_ob_offset,
         // ablc_com->ablcV32_proc_res.isp_ob_predgain,ablc_com->ablcV32_proc_res.isp_ob_max);
         LOGD_ABLC("yys: %s:%d output isp param end \n", __FUNCTION__, __LINE__);
     }
-
-    cur_params->mBlcV32Params = params->mBlcV32Params;
 
     mProcResShared = NULL;
 

@@ -45,11 +45,11 @@ class RawProcThread;
 class SimpleFdBuf
 {
     public:
-    int _fd;
-    int _index;
-    int _seq;
-    uint64_t _ts;
-    uint8_t *_userptr;
+    int _fd{-1};
+    int _index{-1};
+    int _seq{-1};
+    uint64_t _ts{0};
+    uint8_t *_userptr{NULL};
 	    SimpleFdBuf(int fd, int index) {_fd = fd; _index = index;}
         SimpleFdBuf() {_fd = 0; _userptr = NULL;}
 	//    ~EmptyClass() {}
@@ -59,13 +59,14 @@ class RawStreamProcUnit : public PollCallback
 {
 public:
     //explicit RawStreamProcUnit (char *ispdev, char *dev0, char *dev1, char *dev2, bool linked_to_isp);
-    explicit RawStreamProcUnit (const rk_sensor_full_info_t *s_info, uint8_t is_offline, uint8_t buf_memory_type);
+    explicit RawStreamProcUnit (const rk_sensor_full_info_t *s_info, uint8_t is_offline);
     virtual ~RawStreamProcUnit ();
     virtual XCamReturn start        ();
     virtual XCamReturn stop         ();
-	XCamReturn prepare(int idx);
+	XCamReturn prepare(int idx, uint8_t buf_memory_type, uint8_t buf_cnt);
 	void set_working_mode           (int mode);
     void set_rx_format(uint32_t width, uint32_t height, uint32_t pix_fmt, int mode);
+    void setup_pipeline_fmt(uint32_t width, uint32_t height);
     void set_rx_devices();
     SmartPtr<V4l2Device> _mipi_rx_devs[3];
 	/*
@@ -82,7 +83,7 @@ public:
 	*/
     void send_sync_buf(SmartPtr<V4l2BufferProxy> &buf_s, SmartPtr<V4l2BufferProxy> &buf_m, SmartPtr<V4l2BufferProxy> &buf_l);
 	void send_sync_buf2(uint8_t *rkraw_data);
-
+    void _send_sync_buf(rkrawstream_rkraw2_t *rkraw2);
     bool raw_buffer_proc();
     void setMulCamConc(bool cc) {
         _is_multi_cam_conc = cc;

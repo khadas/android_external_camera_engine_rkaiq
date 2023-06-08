@@ -52,11 +52,16 @@ class RkAiqAdrcHandleInt : virtual public RkAiqHandle {
     XCamReturn getAttribV12Lite(drcAttrV12Lite_t* att);
 #endif
 
+    void setAeProcRes(RkAiqAlgoProcResAeShared_t* aeProcRes) {
+        mAeProcRes = *aeProcRes;
+    }
+
  protected:
     virtual void init();
     virtual void deInit() { RkAiqHandle::deInit(); };
 
  private:
+#ifndef DISABLE_HANDLE_ATTRIB
 #if RKAIQ_HAVE_DRC_V10
     drcAttrV10_t mCurAttV10;
     drcAttrV10_t mNewAttV10;
@@ -73,6 +78,8 @@ class RkAiqAdrcHandleInt : virtual public RkAiqHandle {
     drcAttrV12Lite_t mCurAttV12Lite;
     drcAttrV12Lite_t mNewAttV12Lite;
 #endif
+#endif
+    RkAiqAlgoProcResAeShared_t mAeProcRes;
 
  private:
     DECLARE_HANDLE_REGISTER_TYPE(RkAiqAdrcHandleInt);

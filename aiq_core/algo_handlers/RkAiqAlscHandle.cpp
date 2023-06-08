@@ -36,6 +36,8 @@ XCamReturn RkAiqAlscHandleInt::updateConfig(bool needSync) {
     ENTER_ANALYZER_FUNCTION();
 
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
+
+#ifndef DISABLE_HANDLE_ATTRIB
     if (needSync) mCfgMutex.lock();
     // if something changed
     if (updateAtt) {
@@ -46,6 +48,7 @@ XCamReturn RkAiqAlscHandleInt::updateConfig(bool needSync) {
     }
 
     if (needSync) mCfgMutex.unlock();
+#endif
 
     EXIT_ANALYZER_FUNCTION();
     return ret;
@@ -61,6 +64,9 @@ XCamReturn RkAiqAlscHandleInt::setAttrib(rk_aiq_lsc_attrib_t att) {
     // if something changed, set att to mNewAtt, and
     // the new params will be effective later when updateConfig
     // called by RkAiqCore
+#ifdef DISABLE_HANDLE_ATTRIB
+    ret = rk_aiq_uapi_alsc_SetAttrib(mAlgoCtx, att, false);
+#else
     bool isChanged = false;
     if (att.sync.sync_mode == RK_AIQ_UAPI_MODE_ASYNC && \
         memcmp(&mNewAtt, &att, sizeof(att)))
@@ -75,7 +81,7 @@ XCamReturn RkAiqAlscHandleInt::setAttrib(rk_aiq_lsc_attrib_t att) {
         updateAtt = true;
         waitSignal(att.sync.sync_mode);
     }
-
+#endif
     mCfgMutex.unlock();
 
     EXIT_ANALYZER_FUNCTION();
@@ -87,6 +93,12 @@ XCamReturn RkAiqAlscHandleInt::getAttrib(rk_aiq_lsc_attrib_t* att) {
 
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
 
+#ifdef DISABLE_HANDLE_ATTRIB
+      mCfgMutex.lock();
+      ret = rk_aiq_uapi_alsc_GetAttrib(mAlgoCtx, att);
+      mCfgMutex.unlock();
+      return ret;
+#else
     if (att->sync.sync_mode == RK_AIQ_UAPI_MODE_SYNC) {
       mCfgMutex.lock();
       rk_aiq_uapi_alsc_GetAttrib(mAlgoCtx, att);
@@ -102,6 +114,7 @@ XCamReturn RkAiqAlscHandleInt::getAttrib(rk_aiq_lsc_attrib_t* att) {
         att->sync.done      = true;
       }
     }
+#endif
 
     EXIT_ANALYZER_FUNCTION();
     return ret;
@@ -162,8 +175,6 @@ XCamReturn RkAiqAlscHandleInt::prepare() {
     RKAIQCORE_CHECK_RET(ret, "alsc handle prepare failed");
 
     RkAiqAlgoConfigAlsc* alsc_config_int = (RkAiqAlgoConfigAlsc*)mConfig;
-    RkAiqCore::RkAiqAlgosGroupShared_t* shared =
-        (RkAiqCore::RkAiqAlgosGroupShared_t*)(getGroupShared());
     RkAiqCore::RkAiqAlgosComShared_t* sharedCom = &mAiqCore->mAlogsComSharedParams;
 
     alsc_config_int->alsc_sw_info.bayerPattern= getBayerPattern(sharedCom->snsDes.sensor_pixelformat);
@@ -224,6 +235,13 @@ XCamReturn RkAiqAlscHandleInt::processing() {
         (RkAiqCore::RkAiqAlgosGroupShared_t*)(getGroupShared());
     RkAiqCore::RkAiqAlgosComShared_t* sharedCom = &mAiqCore->mAlogsComSharedParams;
 
+    if (!shared->fullParams || !shared->fullParams->mLscParams.ptr()) {
+        LOGE_ALSC("[%d]: no lsc buf !", shared->frameId);
+        return XCAM_RETURN_BYPASS;
+    }
+
+    alsc_proc_res_int->alsc_hw_conf = &shared->fullParams->mLscParams->data()->result;
+
     ret = RkAiqHandle::processing();
     if (ret) {
         RKAIQCORE_CHECK_RET(ret, "alsc handle processing failed");
@@ -232,8 +250,8 @@ XCamReturn RkAiqAlscHandleInt::processing() {
     alsc_proc_int->tx             = shared->tx;
     XCamVideoBuffer* awb_proc_res = shared->res_comb.awb_proc_res;
     if (awb_proc_res) {
-        RkAiqAlgoProcResAwb* awb_res =
-            (RkAiqAlgoProcResAwb*)awb_proc_res->map(awb_proc_res);
+        RkAiqAlgoProcResAwbShared_t* awb_res =
+            (RkAiqAlgoProcResAwbShared_t*)awb_proc_res->map(awb_proc_res);
         if (awb_res) {
             if (awb_res->awb_gain_algo.grgain < DIVMIN || awb_res->awb_gain_algo.gbgain < DIVMIN) {
                 LOGW("get wrong awb gain from AWB module ,use default value ");
@@ -285,8 +303,14 @@ XCamReturn RkAiqAlscHandleInt::processing() {
         LOGW("fail to get sensor gain form AE module,use default value ");
     }
 
+#ifdef DISABLE_HANDLE_ATTRIB
+    mCfgMutex.lock();
+#endif
     RkAiqAlgoDescription* des = (RkAiqAlgoDescription*)mDes;
     ret                       = des->processing(mProcInParam, mProcOutParam);
+#ifdef DISABLE_HANDLE_ATTRIB
+    mCfgMutex.unlock();
+#endif
     RKAIQCORE_CHECK_RET(ret, "alsc algo processing failed");
 
     EXIT_ANALYZER_FUNCTION();
@@ -340,8 +364,36 @@ XCamReturn RkAiqAlscHandleInt::genIspResult(RkAiqFullParams* params, RkAiqFullPa
     } else {
         lsc_param->frame_id = shared->frameId;
     }
+#if 0//moved to processing out params
     lsc_param->result = alsc_rk->alsc_hw_conf;
-    if (sharedCom->sns_mirror) {
+#endif
+
+    if (alsc_com->res_com.cfg_update) {
+        mSyncFlag = shared->frameId;
+        lsc_param->sync_flag = mSyncFlag;
+        // copy from algo result
+        // set as the latest result
+        cur_params->mLscParams = params->mLscParams;
+        lsc_param->is_update = true;
+        LOGD_ALSC("[%d] params from algo", mSyncFlag);
+    } else if (mSyncFlag != lsc_param->sync_flag) {
+        lsc_param->sync_flag = mSyncFlag;
+        // copy from latest result
+        if (cur_params->mLscParams.ptr()) {
+            lsc_param->result = cur_params->mLscParams->data()->result;
+            lsc_param->is_update = true;
+        } else {
+            LOGE_ALSC("no latest params !");
+            lsc_param->is_update = false;
+        }
+        LOGD_ALSC("[%d] params from latest [%d]", shared->frameId, mSyncFlag);
+    } else {
+        // do nothing, result in buf needn't update
+        lsc_param->is_update = false;
+        LOGD_ALSC("[%d] params needn't update", shared->frameId);
+    }
+
+    if (sharedCom->sns_mirror && lsc_param->is_update) {
         for (int i = 0; i < LSC_DATA_TBL_V_SIZE; i++) {
             for (int j = 0; j < LSC_DATA_TBL_H_SIZE; j++) {
                 SWAP(unsigned short, lsc_param->result.r_data_tbl[i * LSC_DATA_TBL_H_SIZE + j],
@@ -359,7 +411,7 @@ XCamReturn RkAiqAlscHandleInt::genIspResult(RkAiqFullParams* params, RkAiqFullPa
             }
         }
     }
-    if (sharedCom->sns_flip) {
+    if (sharedCom->sns_flip && lsc_param->is_update) {
         for (int i = 0; i < LSC_DATA_TBL_V_SIZE; i++) {
             for (int j = 0; j < LSC_DATA_TBL_H_SIZE; j++) {
                 SWAP(unsigned short, lsc_param->result.r_data_tbl[i * LSC_DATA_TBL_H_SIZE + j],
@@ -377,18 +429,6 @@ XCamReturn RkAiqAlscHandleInt::genIspResult(RkAiqFullParams* params, RkAiqFullPa
             }
         }
     }
-
-    if (!this->getAlgoId()) {
-        RkAiqAlgoProcResAlsc* alsc_rk_int = (RkAiqAlgoProcResAlsc*)alsc_com;
-
-        if (sharedCom->init) {
-            lsc_param->frame_id = 0;
-        } else {
-            lsc_param->frame_id = shared->frameId;
-        }
-    }
-
-    cur_params->mLscParams = params->mLscParams;
 
     EXIT_ANALYZER_FUNCTION();
 

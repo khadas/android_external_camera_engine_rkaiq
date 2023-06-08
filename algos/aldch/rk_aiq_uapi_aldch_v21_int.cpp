@@ -21,6 +21,8 @@
 #include "aldch/rk_aiq_uapi_aldch_v21_int.h"
 #include "aldch/rk_aiq_types_aldch_algo_prvt.h"
 
+#define DISABLE_HANDLE_ATTRIB
+
 XCamReturn
 rk_aiq_uapi_aldch_v21_SetAttrib(RkAiqAlgoContext *ctx,
                            rk_aiq_ldch_v21_attrib_t attr,
@@ -58,11 +60,12 @@ rk_aiq_uapi_aldch_v21_SetAttrib(RkAiqAlgoContext *ctx,
     }
 
     if (!ldch_contex->ldch_en && !attr.en) {
-        LOGE_ALDCH("failed, ldch is disalbed!");
-        return XCAM_RETURN_ERROR_FAILED;
+        LOGE_ALDCH("uapi want to disalbe ldch, but ldch has been disalbed!");
+        return XCAM_RETURN_NO_ERROR;
     }
 
     if (0 != memcmp(&ldch_contex->user_config, &attr, sizeof(rk_aiq_ldch_v21_attrib_t))) {
+#ifdef DISABLE_HANDLE_ATTRIB
         if (attr.update_lut_mode == RK_AIQ_LDCH_UPDATE_LUT_FROM_EXTERNAL_BUFFER && \
             attr.lut.update_flag) {
             if (!ldch_contex->_lutCache.ptr()) {
@@ -81,6 +84,7 @@ rk_aiq_uapi_aldch_v21_SetAttrib(RkAiqAlgoContext *ctx,
                 return XCAM_RETURN_ERROR_MEM;
             }
         }
+#endif
 
         memcpy(&ldch_contex->user_config, &attr, sizeof(attr));
         ldch_contex->isAttribUpdated = true;

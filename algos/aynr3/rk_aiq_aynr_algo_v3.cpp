@@ -258,22 +258,21 @@ Aynr_result_V3_t Aynr_GetProcResult_V3(Aynr_Context_V3_t *pAynrCtx, Aynr_ProcRes
     }
 
     if(pAynrCtx->eMode == AYNRV3_OP_MODE_AUTO) {
-        pAynrResult->stSelect = pAynrCtx->stAuto.stSelect;
+        pAynrResult->stSelect = &pAynrCtx->stAuto.stSelect;
     } else if(pAynrCtx->eMode == AYNRV3_OP_MODE_MANUAL) {
         //TODO
-        pAynrResult->stSelect = pAynrCtx->stManual.stSelect;
+        pAynrResult->stSelect = &pAynrCtx->stManual.stSelect;
     }
 
     //transfer to reg value
-    ynr_fix_transfer_V3(&pAynrResult->stSelect, &pAynrResult->stFix, &pAynrCtx->stStrength, &pAynrCtx->stExpInfo);
+    ynr_fix_transfer_V3(pAynrResult->stSelect, pAynrResult->stFix, &pAynrCtx->stStrength, &pAynrCtx->stExpInfo);
 
     if(pAynrCtx->eMode == AYNRV3_OP_MODE_REG_MANUAL) {
-        pAynrResult->stFix = pAynrCtx->stManual.stFix;
+        *pAynrResult->stFix = pAynrCtx->stManual.stFix;
         pAynrCtx->stStrength.strength_enable = false;
         pAynrCtx->stStrength.percent = 1.0;
     }
 
-    pAynrCtx->stProcResult = *pAynrResult;
     LOGI_ANR("%s(%d): exit!\n", __FUNCTION__, __LINE__);
     return AYNRV3_RET_SUCCESS;
 }
@@ -321,13 +320,14 @@ Aynr_result_V3_t Aynr_ConfigSettingParam_V3(Aynr_Context_V3_t *pAynrCtx, Aynr_Pa
 }
 
 Aynr_result_V3_t Aynr_ParamModeProcess_V3(Aynr_Context_V3_t *pAynrCtx, Aynr_ExpInfo_V3_t *pExpInfo, Aynr_ParamMode_V3_t *mode) {
-    Aynr_result_V3_t res  = AYNRV3_RET_SUCCESS;
-    *mode = pAynrCtx->eParamMode;
 
     if(pAynrCtx == NULL) {
         LOGE_ANR("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
         return AYNRV3_RET_INVALID_PARM;
     }
+
+    Aynr_result_V3_t res  = AYNRV3_RET_SUCCESS;
+    *mode = pAynrCtx->eParamMode;
 
     if(pAynrCtx->isGrayMode) {
         *mode = AYNRV3_PARAM_MODE_GRAY;

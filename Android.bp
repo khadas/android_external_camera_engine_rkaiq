@@ -47,6 +47,12 @@ cc_prebuilt_library_static {
     },
 }
 
+cc_library_headers {
+	name: "librkaiq_headers",
+	export_include_dirs: ["include"],
+	vendor_available: true,
+}
+
 cc_rkaiq_library_shared {
     name: "librkaiq",
     vendor: true,
@@ -141,6 +147,7 @@ cc_rkaiq_library_shared {
         "hwi/isp20/CaptureRawData.cpp",
         "hwi/image_processor.cpp",
         "hwi/isp20/Isp20Evts.cpp",
+        "hwi/isp20/CifScaleStream.cpp",
 
         // // IQ_PARSER_SRC
         // "iq_parser/RkAiqCalibParser.cpp",

@@ -90,6 +90,8 @@ AcnrV30_result_t Acnr_Init_V30(Acnr_Context_V30_t **ppAcnrCtx, void *pCalibDb)
     pAcnrCtx->stExpInfo.snr_mode = 1;
     pAcnrCtx->eParamMode = ACNRV30_PARAM_MODE_NORMAL;
     Acnr_ConfigSettingParam_V30(pAcnrCtx, pAcnrCtx->eParamMode, pAcnrCtx->stExpInfo.snr_mode);
+    // init manual params
+    pAcnrCtx->stManual.stSelect = pAcnrCtx->stAuto.stParams.CnrParamsISO[0];
 #endif
 
     LOGD_ANR("%s(%d):", __FUNCTION__, __LINE__);
@@ -257,17 +259,18 @@ AcnrV30_result_t Acnr_GetProcResult_V30(Acnr_Context_V30_t *pAcnrCtx, Acnr_ProcR
         return ACNRV30_RET_INVALID_PARM;
     }
 
+    RK_CNR_Params_V30_Select_t* stSelect = NULL;
     if(pAcnrCtx->eMode == ACNRV30_OP_MODE_AUTO) {
-        pAcnrResult->stSelect = pAcnrCtx->stAuto.stSelect;
+        stSelect = &pAcnrCtx->stAuto.stSelect;
     } else if(pAcnrCtx->eMode == ACNRV30_OP_MODE_MANUAL) {
-        pAcnrResult->stSelect = pAcnrCtx->stManual.stSelect;
+        stSelect = &pAcnrCtx->stManual.stSelect;
     }
 
     //transfer to reg value
-    cnr_fix_transfer_V30(&pAcnrResult->stSelect, &pAcnrResult->stFix,  &pAcnrCtx->stExpInfo, &pAcnrCtx->stStrength);
+    cnr_fix_transfer_V30(stSelect, pAcnrResult->stFix,  &pAcnrCtx->stExpInfo, &pAcnrCtx->stStrength);
 
     if(pAcnrCtx->eMode == ACNRV30_OP_MODE_REG_MANUAL) {
-        pAcnrResult->stFix = pAcnrCtx->stManual.stFix;
+        *pAcnrResult->stFix = pAcnrCtx->stManual.stFix;
         pAcnrCtx->stStrength.percent = 1.0;
     }
 
@@ -319,12 +322,13 @@ AcnrV30_result_t Acnr_ConfigSettingParam_V30(Acnr_Context_V30_t *pAcnrCtx, AcnrV
 
 AcnrV30_result_t Acnr_ParamModeProcess_V30(Acnr_Context_V30_t *pAcnrCtx, AcnrV30_ExpInfo_t *pExpInfo, AcnrV30_ParamMode_t *mode) {
     AcnrV30_result_t res  = ACNRV30_RET_SUCCESS;
-    *mode = pAcnrCtx->eParamMode;
 
     if(pAcnrCtx == NULL) {
         LOGE_ANR("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
         return ACNRV30_RET_INVALID_PARM;
     }
+
+    *mode = pAcnrCtx->eParamMode;
 
     if(pAcnrCtx->isGrayMode) {
         *mode = ACNRV30_PARAM_MODE_GRAY;

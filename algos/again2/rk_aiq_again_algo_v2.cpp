@@ -87,6 +87,8 @@ Again_result_V2_t Again_Init_V2(Again_Context_V2_t **ppAgainCtx, CamCalibDbV2Con
     pAgainCtx->stExpInfo.snr_mode = 1;
     pAgainCtx->eParamMode = AGAINV2_PARAM_MODE_NORMAL;
     Again_ConfigSettingParam_V2(pAgainCtx, pAgainCtx->eParamMode, pAgainCtx->stExpInfo.snr_mode);
+    // init manual params
+    pAgainCtx->stManual.stSelect = pAgainCtx->stAuto.stParams.iso_params[0];
 #endif
 
 
@@ -298,6 +300,15 @@ Again_result_V2_t Again_Process_V2(Again_Context_V2_t *pAgainCtx, Again_ExpInfo_
 #if AGAIN_USE_JSON_FILE_V2
         if(pExpInfo->snr_mode != pAgainCtx->stExpInfo.snr_mode || pAgainCtx->eParamMode != mode) {
             LOGD_ANR("param mode:%d snr_mode:%d\n", mode, pExpInfo->snr_mode);
+            if (pAgainCtx->isGrayMode) {
+                mode = AGAINV2_PARAM_MODE_GRAY;
+            } else if (pExpInfo->hdr_mode == 0) {
+                mode = AGAINV2_PARAM_MODE_NORMAL;
+            } else if (pExpInfo->hdr_mode >= 1) {
+                mode = AGAINV2_PARAM_MODE_HDR;
+            } else {
+                mode = AGAINV2_PARAM_MODE_NORMAL;
+            }
             pAgainCtx->eParamMode = mode;
             Again_ConfigSettingParam_V2(pAgainCtx, pAgainCtx->eParamMode, pExpInfo->snr_mode);
         }
@@ -333,14 +344,15 @@ Again_result_V2_t Again_GetProcResult_V2(Again_Context_V2_t *pAgainCtx, Again_Pr
         return AGAINV2_RET_INVALID_PARM;
     }
 
+    RK_GAIN_Select_V2_t* stSelect = NULL;
     if(pAgainCtx->eMode == AGAINV2_OP_MODE_AUTO) {
-        pAgainResult->stSelect = pAgainCtx->stAuto.stSelect;
+        stSelect = &pAgainCtx->stAuto.stSelect;
     } else if(pAgainCtx->eMode == AGAINV2_OP_MODE_MANUAL) {
-        pAgainResult->stSelect = pAgainCtx->stManual.stSelect;
+        stSelect = &pAgainCtx->stManual.stSelect;
     }
 
     //transfer to reg value
-    gain_fix_transfer_v2(&pAgainResult->stSelect, &pAgainResult->stFix, &pAgainCtx->stExpInfo, pAgainCtx->stGainState.ratio);
+    gain_fix_transfer_v2(stSelect, pAgainResult->stFix, &pAgainCtx->stExpInfo, pAgainCtx->stGainState.ratio);
 
     LOGI_ANR("%s(%d): exit!\n", __FUNCTION__, __LINE__);
     return AGAINV2_RET_SUCCESS;
@@ -393,12 +405,13 @@ Again_result_V2_t Again_ConfigSettingParam_V2(Again_Context_V2_t *pAgainCtx, Aga
 Again_result_V2_t Again_ParamModeProcess_V2(Again_Context_V2_t *pAgainCtx, Again_ExpInfo_V2_t *pExpInfo, Again_ParamMode_V2_t *mode)
 {
     Again_result_V2_t res  = AGAINV2_RET_SUCCESS;
-    *mode = pAgainCtx->eParamMode;
 
     if(pAgainCtx == NULL) {
         LOGE_ANR("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
         return AGAINV2_RET_INVALID_PARM;
     }
+
+    *mode = pAgainCtx->eParamMode;
 
     if(pAgainCtx->isGrayMode) {
         *mode = AGAINV2_PARAM_MODE_GRAY;

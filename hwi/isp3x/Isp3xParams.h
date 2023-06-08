@@ -28,9 +28,9 @@ class Isp3xParams : virtual public Isp21Params {
 public:
     explicit Isp3xParams() : Isp21Params() {};
     virtual ~Isp3xParams() {};
+    void fixedAwbOveflowToIsp3xParams(void* isp_cfg_p, bool is_dual_isp);
 protected:
     virtual bool convert3aResultsToIspCfg(SmartPtr<cam3aResult> &result, void* isp_cfg_p, bool is_multi_isp) override;
-    void fixedAwbOveflowToIsp3xParams(void* isp_cfg_p, bool is_dual_isp);
     template <class T>
     void convertAiqGainToIsp3xParams(T& isp_cfg, rk_aiq_isp_gain_v3x_t& gain);
 #if RKAIQ_HAVE_GAMMA_V11
@@ -85,7 +85,11 @@ private:
     void convertAiqAdehazeToIsp3xParams(struct isp3x_isp_params_cfg& isp_cfg,
                                         const rk_aiq_isp_dehaze_v3x_t& dhaze);
 #endif
-    void convertAiqExpIspDgainToIsp3xParams(struct isp3x_isp_params_cfg& isp_cfg, RKAiqAecExpInfo_t ae_exp);
+#if defined(ISP_HW_V30)
+void convertAiqLdchToIsp3xParams(struct isp3x_isp_params_cfg& isp_cfg,
+        struct isp3x_isp_params_cfg& isp_cfg_right,
+        const rk_aiq_isp_ldch_t& ldch_cfg, bool is_multi_isp);
+#endif
 };
 
 }

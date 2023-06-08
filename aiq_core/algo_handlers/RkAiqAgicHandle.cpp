@@ -36,6 +36,7 @@ XCamReturn RkAiqAgicHandleInt::updateConfig(bool needSync) {
     ENTER_ANALYZER_FUNCTION();
 
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
+#ifndef DISABLE_HANDLE_ATTRIB
     if (needSync) mCfgMutex.lock();
     // if something changed
     if (updateAttV1) {
@@ -51,7 +52,7 @@ XCamReturn RkAiqAgicHandleInt::updateConfig(bool needSync) {
         sendSignal(mCurAttV2.sync.sync_mode);
     }
     if (needSync) mCfgMutex.unlock();
-
+#endif
     EXIT_ANALYZER_FUNCTION();
     return ret;
 }
@@ -62,6 +63,9 @@ XCamReturn RkAiqAgicHandleInt::setAttribV1(const rkaiq_gic_v1_api_attr_t* att) {
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
     mCfgMutex.lock();
 
+#ifdef DISABLE_HANDLE_ATTRIB
+    ret = rk_aiq_uapi_agic_v1_SetAttrib(mAlgoCtx, att, false);
+#else
     // check if there is different between att & mCurAtt(sync)/mNewAtt(async)
     // if something changed, set att to mNewAtt, and
     // the new params will be effective later when updateConfig
@@ -80,6 +84,7 @@ XCamReturn RkAiqAgicHandleInt::setAttribV1(const rkaiq_gic_v1_api_attr_t* att) {
         updateAttV1 = true;
         waitSignal(att->sync.sync_mode);
     }
+#endif
 
     mCfgMutex.unlock();
 
@@ -92,6 +97,12 @@ XCamReturn RkAiqAgicHandleInt::getAttribV1(rkaiq_gic_v1_api_attr_t* att) {
 
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
 
+#ifdef DISABLE_HANDLE_ATTRIB
+    mCfgMutex.lock();
+    rk_aiq_uapi_agic_v1_GetAttrib(mAlgoCtx, att);
+    att->sync.done = true;
+    mCfgMutex.unlock();
+#else
     if (att->sync.sync_mode == RK_AIQ_UAPI_MODE_SYNC) {
         mCfgMutex.lock();
         rk_aiq_uapi_agic_v1_GetAttrib(mAlgoCtx, att);
@@ -107,6 +118,7 @@ XCamReturn RkAiqAgicHandleInt::getAttribV1(rkaiq_gic_v1_api_attr_t* att) {
             att->sync.done = true;
         }
     }
+#endif
 
     EXIT_ANALYZER_FUNCTION();
     return ret;
@@ -118,6 +130,9 @@ XCamReturn RkAiqAgicHandleInt::setAttribV2(const rkaiq_gic_v2_api_attr_t* att) {
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
     mCfgMutex.lock();
 
+#ifdef DISABLE_HANDLE_ATTRIB
+    ret = rk_aiq_uapi_agic_v2_SetAttrib(mAlgoCtx, att, false);
+#else
     // check if there is different between att & mCurAtt(sync)/mNewAtt(async)
     // if something changed, set att to mNewAtt, and
     // the new params will be effective later when updateConfig
@@ -136,6 +151,7 @@ XCamReturn RkAiqAgicHandleInt::setAttribV2(const rkaiq_gic_v2_api_attr_t* att) {
         updateAttV2 = true;
         waitSignal(att->sync.sync_mode);
     }
+#endif
 
     mCfgMutex.unlock();
 
@@ -148,6 +164,12 @@ XCamReturn RkAiqAgicHandleInt::getAttribV2(rkaiq_gic_v2_api_attr_t* att) {
 
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
 
+#ifdef DISABLE_HANDLE_ATTRIB
+    mCfgMutex.lock();
+    rk_aiq_uapi_agic_v2_GetAttrib(mAlgoCtx, att);
+    att->sync.done = true;
+    mCfgMutex.unlock();
+#else
     if (att->sync.sync_mode == RK_AIQ_UAPI_MODE_SYNC) {
         mCfgMutex.lock();
         rk_aiq_uapi_agic_v2_GetAttrib(mAlgoCtx, att);
@@ -163,6 +185,7 @@ XCamReturn RkAiqAgicHandleInt::getAttribV2(rkaiq_gic_v2_api_attr_t* att) {
             att->sync.done = true;
         }
     }
+#endif
 
     EXIT_ANALYZER_FUNCTION();
     return ret;
@@ -175,10 +198,6 @@ XCamReturn RkAiqAgicHandleInt::prepare() {
 
     ret = RkAiqHandle::prepare();
     RKAIQCORE_CHECK_RET(ret, "agic handle prepare failed");
-
-    RkAiqAlgoConfigAgic* agic_config_int = (RkAiqAlgoConfigAgic*)mConfig;
-    RkAiqCore::RkAiqAlgosGroupShared_t* shared =
-        (RkAiqCore::RkAiqAlgosGroupShared_t*)(getGroupShared());
 
     RkAiqAlgoDescription* des = (RkAiqAlgoDescription*)mDes;
     ret                       = des->prepare(mConfig);
@@ -223,6 +242,13 @@ XCamReturn RkAiqAgicHandleInt::processing() {
     RkAiqCore::RkAiqAlgosGroupShared_t* shared =
         (RkAiqCore::RkAiqAlgosGroupShared_t*)(getGroupShared());
     RkAiqCore::RkAiqAlgosComShared_t* sharedCom = &mAiqCore->mAlogsComSharedParams;
+
+    if (!shared->fullParams || !shared->fullParams->mGicParams.ptr()) {
+        LOGE_ALSC("[%d]: no gic buf !", shared->frameId);
+        return XCAM_RETURN_BYPASS;
+    }
+
+    agic_proc_res_int->gicRes = &shared->fullParams->mGicParams->data()->result;
 
     ret = RkAiqHandle::processing();
     if (ret) {
@@ -273,8 +299,14 @@ XCamReturn RkAiqAgicHandleInt::processing() {
         LOGE_AGIC("%s: pAEPreRes is NULL, so use default instead \n", __FUNCTION__);
     }
 
+#ifdef DISABLE_HANDLE_ATTRIB
+    mCfgMutex.lock();
+#endif
     RkAiqAlgoDescription* des = (RkAiqAlgoDescription*)mDes;
     ret                       = des->processing(mProcInParam, mProcOutParam);
+#ifdef DISABLE_HANDLE_ATTRIB
+    mCfgMutex.unlock();
+#endif
     RKAIQCORE_CHECK_RET(ret, "agic algo processing failed");
 
     EXIT_ANALYZER_FUNCTION();
@@ -329,10 +361,35 @@ XCamReturn RkAiqAgicHandleInt::genIspResult(RkAiqFullParams* params, RkAiqFullPa
         } else {
             gic_param->frame_id = shared->frameId;
         }
-        memcpy(&gic_param->result, &agic_rk->gicRes, sizeof(AgicProcResult_t));
-    }
 
-    cur_params->mGicParams = params->mGicParams;
+        if (agic_com->res_com.cfg_update) {
+            mSyncFlag = shared->frameId;
+            gic_param->sync_flag = mSyncFlag;
+            // copy from algo result
+            // set as the latest result
+            cur_params->mGicParams = params->mGicParams;
+            gic_param->is_update = true;
+            LOGD_AGIC("[%d] params from algo", mSyncFlag);
+        } else if (mSyncFlag != gic_param->sync_flag) {
+            gic_param->sync_flag = mSyncFlag;
+            // copy from latest result
+            if (cur_params->mGicParams.ptr()) {
+                gic_param->result = cur_params->mGicParams->data()->result;
+                gic_param->is_update = true;
+            } else {
+                LOGE_AGIC("no latest params !");
+                gic_param->is_update = false;
+            }
+            LOGD_AGIC("[%d] params from latest [%d]", shared->frameId, mSyncFlag);
+        } else {
+            // do nothing, result in buf needn't update
+            gic_param->is_update = false;
+            LOGD_AGIC("[%d] params needn't update", shared->frameId);
+        }
+#if 0//moved to processing out params
+        memcpy(&gic_param->result, &agic_rk->gicRes, sizeof(AgicProcResult_t));
+#endif
+    }
 
     EXIT_ANALYZER_FUNCTION();
 

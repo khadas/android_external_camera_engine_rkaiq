@@ -58,7 +58,7 @@ public:
     void save_metadata_and_register(
         uint32_t frameId,
         rkisp_effect_params_v20& ispParams,
-        SmartPtr<RkAiqExpParamsProxy>& expParams,
+        SmartPtr<RkAiqSensorExpParamsProxy>& expParams,
         SmartPtr<RkAiqAfInfoProxy>& afParams,
         int working_mode
     );
@@ -79,7 +79,7 @@ private:
                            int len, int sequence);
     void write_metadata_to_file(const char* dir_path, uint32_t frame_id,
                                 rkisp_effect_params_v20& ispParams,
-                                SmartPtr<RkAiqExpParamsProxy>& expParams,
+                                SmartPtr<RkAiqSensorExpParamsProxy>& expParams,
                                 SmartPtr<RkAiqAfInfoProxy>& afParams,
                                 int working_mode);
     bool get_value_from_file(const char* path, int& value, uint32_t& frameId);
@@ -90,8 +90,8 @@ private:
     uint32_t sns_height;
     uint32_t pixelformat;
     uint32_t _stride_perline;
-    char raw_dir_path[64];
-    char user_set_raw_dir[64];
+    char raw_dir_path[64]{0};
+    char user_set_raw_dir[64]{0};
     bool _is_raw_dir_exist;
     bool _is_capture_raw;
     sint32_t _capture_raw_num;

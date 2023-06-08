@@ -81,7 +81,6 @@ typedef struct AdehazeHandle_s {
     bool isCapture;
     bool ifReCalcStAuto;
     bool ifReCalcStManual;
-    bool byPassProc;
     bool is_multi_isp_mode;
 #if RKAIQ_HAVE_DEHAZE_V10
     adehaze_sw_v10_t AdehazeAtrrV10;
@@ -105,14 +104,12 @@ typedef struct AdehazeHandle_s {
     AdehazeAePreResV11_t CurrDataV12;
     AdehazeAePreResV11_t PreDataV12;
 #endif
-    RkAiqAdehazeProcResult_t ProcRes;
-    rkisp_adehaze_stats_t stats;
     int width;
     int height;
     int strength;
     int working_mode;
     FrameNumber_t FrameNumber;
-    int FrameID;
+    uint32_t FrameID;
 } AdehazeHandle_t;
 
 #endif

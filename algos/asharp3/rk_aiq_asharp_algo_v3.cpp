@@ -267,16 +267,17 @@ Asharp3_result_t Asharp_GetProcResult_V3(Asharp_Context_V3_t *pAsharpCtx, Asharp
         return ASHARP3_RET_INVALID_PARM;
     }
 
+    RK_SHARP_Params_V3_Select_t* stSelect = NULL;
     if(pAsharpCtx->eMode == ASHARP3_OP_MODE_AUTO) {
-        pAsharpResult->stSelect = pAsharpCtx->stAuto.stSelect;
+        stSelect = &pAsharpCtx->stAuto.stSelect;
     } else if(pAsharpCtx->eMode == ASHARP3_OP_MODE_MANUAL) {
         //TODO
-        pAsharpResult->stSelect = pAsharpCtx->stManual.stSelect;
+        stSelect = &pAsharpCtx->stManual.stSelect;
         pAsharpCtx->fSharp_Strength = 1.0;
     }
 
     //transfer to reg value
-    sharp_fix_transfer_V3(&pAsharpResult->stSelect, &pAsharpResult->stFix, pAsharpCtx->fSharp_Strength);
+    sharp_fix_transfer_V3(stSelect, pAsharpResult->stFix, pAsharpCtx->fSharp_Strength);
 
     LOGD_ASHARP("%s:%d xml:local:%d mode:%d  reg: local gain:%d  mfnr gain:%d mode:%d\n",
                 __FUNCTION__, __LINE__);
@@ -331,12 +332,13 @@ Asharp3_result_t Asharp_ConfigSettingParam_V3(Asharp_Context_V3_t *pAsharpCtx, A
 
 Asharp3_result_t Asharp_ParamModeProcess_V3(Asharp_Context_V3_t *pAsharpCtx, Asharp3_ExpInfo_t *pExpInfo, Asharp3_ParamMode_t *mode) {
     Asharp3_result_t res  = ASHARP3_RET_SUCCESS;
-    *mode = pAsharpCtx->eParamMode;
 
     if(pAsharpCtx == NULL) {
         LOGE_ASHARP("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
         return ASHARP3_RET_INVALID_PARM;
     }
+
+    *mode = pAsharpCtx->eParamMode;
 
     if(pAsharpCtx->isGrayMode) {
         *mode = ASHARP3_PARAM_MODE_GRAY;

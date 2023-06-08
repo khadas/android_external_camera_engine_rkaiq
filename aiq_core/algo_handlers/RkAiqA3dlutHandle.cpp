@@ -36,6 +36,7 @@ XCamReturn RkAiqA3dlutHandleInt::updateConfig(bool needSync) {
     ENTER_ANALYZER_FUNCTION();
 
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
+#ifndef DISABLE_HANDLE_ATTRIB
     if (needSync) mCfgMutex.lock();
     // if something changed
     if (updateAtt) {
@@ -47,7 +48,7 @@ XCamReturn RkAiqA3dlutHandleInt::updateConfig(bool needSync) {
     }
 
     if (needSync) mCfgMutex.unlock();
-
+#endif
     EXIT_ANALYZER_FUNCTION();
     return ret;
 }
@@ -64,6 +65,9 @@ XCamReturn RkAiqA3dlutHandleInt::setAttrib(const rk_aiq_lut3d_attrib_t* att) {
     // if something changed, set att to mNewAtt, and
     // the new params will be effective later when updateConfig
     // called by RkAiqCore
+#ifdef DISABLE_HANDLE_ATTRIB
+    ret = rk_aiq_uapi_a3dlut_SetAttrib(mAlgoCtx, att, false);
+#else
     bool isChanged = false;
     if (att->sync.sync_mode == RK_AIQ_UAPI_MODE_ASYNC && \
         memcmp(&mNewAtt, att, sizeof(*att)))
@@ -78,6 +82,7 @@ XCamReturn RkAiqA3dlutHandleInt::setAttrib(const rk_aiq_lut3d_attrib_t* att) {
         updateAtt = true;
         waitSignal(att->sync.sync_mode);
     }
+#endif
 
     mCfgMutex.unlock();
 
@@ -91,6 +96,12 @@ XCamReturn RkAiqA3dlutHandleInt::getAttrib(rk_aiq_lut3d_attrib_t* att) {
     XCAM_ASSERT(att != nullptr);
 
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
+#ifdef DISABLE_HANDLE_ATTRIB
+      mCfgMutex.lock();
+      ret = rk_aiq_uapi_a3dlut_GetAttrib(mAlgoCtx, att);
+      mCfgMutex.unlock();
+      return ret;
+#else
 
     if (att->sync.sync_mode == RK_AIQ_UAPI_MODE_SYNC) {
         mCfgMutex.lock();
@@ -107,6 +118,7 @@ XCamReturn RkAiqA3dlutHandleInt::getAttrib(rk_aiq_lut3d_attrib_t* att) {
             att->sync.done      = true;
         }
     }
+#endif
 
     EXIT_ANALYZER_FUNCTION();
     return ret;
@@ -171,6 +183,13 @@ XCamReturn RkAiqA3dlutHandleInt::processing() {
         (RkAiqCore::RkAiqAlgosGroupShared_t*)(getGroupShared());
     RkAiqCore::RkAiqAlgosComShared_t* sharedCom = &mAiqCore->mAlogsComSharedParams;
 
+    if (!shared->fullParams || !shared->fullParams->mLut3dParams.ptr()) {
+        LOGE_A3DLUT("[%d]: no 3dlut buf !", shared->frameId);
+        return XCAM_RETURN_BYPASS;
+    }
+
+    a3dlut_proc_res_int->lut3d_hw_conf = &shared->fullParams->mLut3dParams->data()->result;
+
     ret = RkAiqHandle::processing();
     if (ret) {
         RKAIQCORE_CHECK_RET(ret, "a3dlut handle processing failed");
@@ -178,8 +197,8 @@ XCamReturn RkAiqA3dlutHandleInt::processing() {
 
     XCamVideoBuffer* xCamAwbProcRes = shared->res_comb.awb_proc_res;
     if (xCamAwbProcRes) {
-        RkAiqAlgoProcResAwb* awb_res =
-            (RkAiqAlgoProcResAwb*)xCamAwbProcRes->map(xCamAwbProcRes);
+        RkAiqAlgoProcResAwbShared_t* awb_res =
+            (RkAiqAlgoProcResAwbShared_t*)xCamAwbProcRes->map(xCamAwbProcRes);
         if (awb_res) {
             if (awb_res->awb_gain_algo.grgain < DIVMIN || awb_res->awb_gain_algo.gbgain < DIVMIN) {
                 LOGE("get wrong awb gain from AWB module ,use default value ");
@@ -227,15 +246,21 @@ XCamReturn RkAiqA3dlutHandleInt::processing() {
     }
 
 #if RKAIQ_HAVE_BLC_V32
-    if (shared->res_comb.ablcV32_proc_res.blc_ob_enable) {
-        if (shared->res_comb.ablcV32_proc_res.isp_ob_predgain >= 1.0f) {
-            a3dlut_proc_int->sensorGain *=  shared->res_comb.ablcV32_proc_res.isp_ob_predgain;
+    if (shared->res_comb.ablcV32_proc_res->blc_ob_enable) {
+        if (shared->res_comb.ablcV32_proc_res->isp_ob_predgain >= 1.0f) {
+            a3dlut_proc_int->sensorGain *=  shared->res_comb.ablcV32_proc_res->isp_ob_predgain;
         }
     }
 #endif
 
+#ifdef DISABLE_HANDLE_ATTRIB
+    mCfgMutex.lock();
+#endif
     RkAiqAlgoDescription* des = (RkAiqAlgoDescription*)mDes;
     ret                       = des->processing(mProcInParam, mProcOutParam);
+#ifdef DISABLE_HANDLE_ATTRIB
+    mCfgMutex.unlock();
+#endif
     RKAIQCORE_CHECK_RET(ret, "a3dlut algo processing failed");
 
     EXIT_ANALYZER_FUNCTION();
@@ -290,18 +315,38 @@ XCamReturn RkAiqA3dlutHandleInt::genIspResult(RkAiqFullParams* params,
         return XCAM_RETURN_NO_ERROR;
     }
 
+#if 0//moved to processing out params
     RkAiqAlgoProcResA3dlut* a3dlut_rk = (RkAiqAlgoProcResA3dlut*)a3dlut_com;
     if (!a3dlut_rk->lut3d_hw_conf.enable || a3dlut_rk->lut3d_hw_conf.bypass_en) {
         lut3d_param->result.enable = a3dlut_rk->lut3d_hw_conf.enable;
         lut3d_param->result.bypass_en = a3dlut_rk->lut3d_hw_conf.bypass_en;
     } else
         lut3d_param->result               = a3dlut_rk->lut3d_hw_conf;
-
-    if (!this->getAlgoId()) {
-        RkAiqAlgoProcResA3dlut* a3dlut_rk_int = (RkAiqAlgoProcResA3dlut*)a3dlut_com;
+#endif
+    if (a3dlut_com->res_com.cfg_update) {
+        mSyncFlag = shared->frameId;
+        lut3d_param->sync_flag = mSyncFlag;
+        // copy from algo result
+        // set as the latest result
+        cur_params->mLut3dParams = params->mLut3dParams;
+        lut3d_param->is_update = true;
+        LOGD_A3DLUT("[%d] params from algo", mSyncFlag);
+    } else if (mSyncFlag != lut3d_param->sync_flag) {
+        lut3d_param->sync_flag = mSyncFlag;
+        // copy from latest result
+        if (cur_params->mLut3dParams.ptr()) {
+            lut3d_param->result = cur_params->mLut3dParams->data()->result;
+            lut3d_param->is_update = true;
+        } else {
+            LOGE_A3DLUT("no latest params !");
+            lut3d_param->is_update = false;
+        }
+        LOGD_A3DLUT("[%d] params from latest [%d]", shared->frameId, mSyncFlag);
+   } else {
+        // do nothing, result in buf needn't update
+        lut3d_param->is_update = false;
+        LOGD_A3DLUT("[%d] params needn't update", shared->frameId);
     }
-
-    cur_params->mLut3dParams = params->mLut3dParams;
 
     EXIT_ANALYZER_FUNCTION();
 

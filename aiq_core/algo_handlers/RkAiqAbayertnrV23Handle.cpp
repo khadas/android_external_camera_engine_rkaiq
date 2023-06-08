@@ -36,6 +36,7 @@ XCamReturn RkAiqAbayertnrV23HandleInt::updateConfig(bool needSync) {
     ENTER_ANALYZER_FUNCTION();
 
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
+#ifndef DISABLE_HANDLE_ATTRIB
     if (needSync) mCfgMutex.lock();
     // if something changed
     if (updateAtt) {
@@ -60,6 +61,7 @@ XCamReturn RkAiqAbayertnrV23HandleInt::updateConfig(bool needSync) {
     }
 
     if (needSync) mCfgMutex.unlock();
+#endif
 
     EXIT_ANALYZER_FUNCTION();
     return ret;
@@ -76,12 +78,16 @@ XCamReturn RkAiqAbayertnrV23HandleInt::setAttrib(const rk_aiq_bayertnr_attrib_v2
     // the new params will be effective later when updateConfig
     // called by RkAiqCore
 
+#ifdef DISABLE_HANDLE_ATTRIB
+    ret = rk_aiq_uapi_abayertnrV23_SetAttrib(mAlgoCtx, att, false);
+#else
     // if something changed
     if (0 != memcmp(&mCurAtt, att, sizeof(rk_aiq_bayertnr_attrib_v23_t))) {
         mNewAtt   = *att;
         updateAtt = true;
         waitSignal(att->sync.sync_mode);
     }
+#endif
 
     mCfgMutex.unlock();
 
@@ -93,7 +99,11 @@ XCamReturn RkAiqAbayertnrV23HandleInt::getAttrib(rk_aiq_bayertnr_attrib_v23_t* a
     ENTER_ANALYZER_FUNCTION();
 
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
-
+#ifdef DISABLE_HANDLE_ATTRIB
+      mCfgMutex.lock();
+      ret = rk_aiq_uapi_abayertnrV23_GetAttrib(mAlgoCtx, att);
+      mCfgMutex.unlock();
+#else
     if(att->sync.sync_mode == RK_AIQ_UAPI_MODE_SYNC) {
         mCfgMutex.lock();
         rk_aiq_uapi_abayertnrV23_GetAttrib(mAlgoCtx, att);
@@ -110,6 +120,7 @@ XCamReturn RkAiqAbayertnrV23HandleInt::getAttrib(rk_aiq_bayertnr_attrib_v23_t* a
             att->sync.done = true;
         }
     }
+#endif
 
     EXIT_ANALYZER_FUNCTION();
     return ret;
@@ -126,13 +137,16 @@ XCamReturn RkAiqAbayertnrV23HandleInt::setAttribLite(const rk_aiq_bayertnr_attri
     // the new params will be effective later when updateConfig
     // called by RkAiqCore
 
+#ifdef DISABLE_HANDLE_ATTRIB
+    ret = rk_aiq_uapi_abayertnrV23Lite_SetAttrib(mAlgoCtx, att, false);
+#else
     // if something changed
     if (0 != memcmp(&mCurAttLite, att, sizeof(rk_aiq_bayertnr_attrib_v23L_t))) {
         mNewAttLite   = *att;
         updateAttLite = true;
         waitSignal(att->sync.sync_mode);
     }
-
+#endif
     mCfgMutex.unlock();
 
     EXIT_ANALYZER_FUNCTION();
@@ -143,7 +157,11 @@ XCamReturn RkAiqAbayertnrV23HandleInt::getAttribLite(rk_aiq_bayertnr_attrib_v23L
     ENTER_ANALYZER_FUNCTION();
 
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
-
+#ifdef DISABLE_HANDLE_ATTRIB
+      mCfgMutex.lock();
+      ret = rk_aiq_uapi_abayertnrV23Lite_GetAttrib(mAlgoCtx, att);
+      mCfgMutex.unlock();
+#else
     if (att->sync.sync_mode == RK_AIQ_UAPI_MODE_SYNC) {
         mCfgMutex.lock();
         rk_aiq_uapi_abayertnrV23Lite_GetAttrib(mAlgoCtx, att);
@@ -160,6 +178,7 @@ XCamReturn RkAiqAbayertnrV23HandleInt::getAttribLite(rk_aiq_bayertnr_attrib_v23L
             att->sync.done = true;
         }
     }
+#endif
 
     EXIT_ANALYZER_FUNCTION();
     return ret;
@@ -170,12 +189,16 @@ XCamReturn RkAiqAbayertnrV23HandleInt::setStrength(const rk_aiq_bayertnr_strengt
 
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
     mCfgMutex.lock();
+#ifdef DISABLE_HANDLE_ATTRIB
+    ret = rk_aiq_uapi_abayertnrV23_SetStrength(mAlgoCtx, pStrength);
+#else
 
     if (0 != memcmp(&mCurStrength, pStrength, sizeof(mCurStrength))) {
         mNewStrength   = *pStrength;
         updateStrength = true;
         waitSignal(pStrength->sync.sync_mode);
     }
+#endif
 
 
     mCfgMutex.unlock();
@@ -188,6 +211,11 @@ XCamReturn RkAiqAbayertnrV23HandleInt::getStrength(rk_aiq_bayertnr_strength_v23_
 
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
 
+#ifdef DISABLE_HANDLE_ATTRIB
+        mCfgMutex.lock();
+        ret = rk_aiq_uapi_abayertnrV23_GetStrength(mAlgoCtx, pStrength);
+        mCfgMutex.unlock();
+#else
     if(pStrength->sync.sync_mode == RK_AIQ_UAPI_MODE_SYNC) {
         mCfgMutex.lock();
         rk_aiq_uapi_abayertnrV23_GetStrength(mAlgoCtx, pStrength);
@@ -202,6 +230,7 @@ XCamReturn RkAiqAbayertnrV23HandleInt::getStrength(rk_aiq_bayertnr_strength_v23_
             pStrength->sync.done = true;
         }
     }
+#endif
 
     EXIT_ANALYZER_FUNCTION();
     return ret;
@@ -234,8 +263,6 @@ XCamReturn RkAiqAbayertnrV23HandleInt::prepare() {
 
     ret = RkAiqHandle::prepare();
     RKAIQCORE_CHECK_RET(ret, "arawnr handle prepare failed");
-
-    RkAiqAlgoConfigAbayertnrV23* abayertnr_config_int = (RkAiqAlgoConfigAbayertnrV23*)mConfig;
 
     RkAiqAlgoDescription* des = (RkAiqAlgoDescription*)mDes;
     ret                       = des->prepare(mConfig);
@@ -284,6 +311,8 @@ XCamReturn RkAiqAbayertnrV23HandleInt::processing() {
         (RkAiqCore::RkAiqAlgosGroupShared_t*)(getGroupShared());
     RkAiqCore::RkAiqAlgosComShared_t* sharedCom = &mAiqCore->mAlogsComSharedParams;
 
+    abayertnr_proc_res_int->stAbayertnrProcResult.st3DFix = &shared->fullParams->mTnrV32Params->data()->result;
+
     ret = RkAiqHandle::processing();
     if (ret) {
         RKAIQCORE_CHECK_RET(ret, "aynr handle processing failed");
@@ -295,13 +324,22 @@ XCamReturn RkAiqAbayertnrV23HandleInt::processing() {
 
 
 
+#ifdef DISABLE_HANDLE_ATTRIB
+    mCfgMutex.lock();
+#endif
     abayertnr_proc_int->stAblcV32_proc_res = shared->res_comb.ablcV32_proc_res;
     RkAiqAlgoDescription* des = (RkAiqAlgoDescription*)mDes;
     ret                       = des->processing(mProcInParam, mProcOutParam);
+#ifdef DISABLE_HANDLE_ATTRIB
+    mCfgMutex.unlock();
+#endif
     RKAIQCORE_CHECK_RET(ret, "aynr algo processing failed");
 
-    shared->res_comb.bayernr3d_en = !abayertnr_proc_res_int->stAbayertnrProcResult.st3DFix.bay3d_en ? false : true;
-
+    if (!abayertnr_proc_res_int->res_com.cfg_update) {
+        shared->res_comb.bayernr3d_en = mLatestEn;
+    } else {
+        shared->res_comb.bayernr3d_en = mLatestEn = !abayertnr_proc_res_int->stAbayertnrProcResult.st3DFix->bay3d_en ? false : true;
+    }
     EXIT_ANALYZER_FUNCTION();
     return ret;
 }
@@ -357,12 +395,33 @@ XCamReturn RkAiqAbayertnrV23HandleInt::genIspResult(RkAiqFullParams* params,
         } else {
             tnr_param->frame_id = shared->frameId;
         }
-        memcpy(&tnr_param->result, &atnr_rk->stAbayertnrProcResult.st3DFix,
-               sizeof(RK_Bayertnr_Fix_V23_t));
+
+        if (atnr_rk->res_com.cfg_update) {
+            mSyncFlag = shared->frameId;
+            tnr_param->sync_flag = mSyncFlag;
+            // copy from algo result
+            // set as the latest result
+            cur_params->mTnrV32Params = params->mTnrV32Params;
+            tnr_param->is_update = true;
+            LOGD_ANR("3d [%d] params from algo", mSyncFlag);
+        } else if (mSyncFlag != tnr_param->sync_flag) {
+            tnr_param->sync_flag = mSyncFlag;
+            // copy from latest result
+            if (cur_params->mTnrV32Params.ptr()) {
+                tnr_param->result = cur_params->mTnrV32Params->data()->result;
+                tnr_param->is_update = true;
+            } else {
+                LOGE_ANR("no latest params !");
+                tnr_param->is_update = false;
+            }
+            LOGD_ANR("3d [%d] params from latest [%d]", shared->frameId, mSyncFlag);
+        } else {
+            // do nothing, result in buf needn't update
+            tnr_param->is_update = false;
+            LOGD_ANR("3d [%d] params needn't update", shared->frameId);
+        }
         LOGD_ANR("oyyf: %s:%d output isp param end \n", __FUNCTION__, __LINE__);
     }
-
-    cur_params->mTnrV32Params = params->mTnrV32Params;
 
     EXIT_ANALYZER_FUNCTION();
 

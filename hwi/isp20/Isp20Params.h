@@ -26,6 +26,8 @@ namespace RkCam {
 
 #define ISP20PARAM_SUBM (0x2)
 
+#define DISABLE_PARAMS_ASSEMBLER
+
 typedef struct AntiTmoFlicker_s {
     int preFrameNum;
     bool FirstChange;
@@ -40,6 +42,7 @@ enum params_type {
     ISPP_PARAMS,
 };
 
+#ifndef DISABLE_PARAMS_ASSEMBLER
 class IspParamsAssembler {
 public:
     explicit IspParamsAssembler(const char* name);
@@ -82,6 +85,7 @@ private:
     cam3aResultList mInitParamsList;
     bool started;
 };
+#endif
 
 class Isp20Params {
 public:
@@ -95,6 +99,8 @@ public:
         AntiTmoFlicker.FirstChangeDone = false;
         AntiTmoFlicker.FirstChangeDoneNum = 0;
         _working_mode = RK_AIQ_WORKING_MODE_ISP_HDR3;
+        _CamPhyId = -1;
+        _lsc_en = false;
     };
     virtual ~Isp20Params() {};
     virtual void setCamPhyId(int phyId) {
@@ -250,8 +256,15 @@ protected:
     virtual bool convert3aResultsToIspCfg(SmartPtr<cam3aResult> &result, void* isp_cfg_p, bool is_multi_isp = false);
     SmartPtr<cam3aResult> get_3a_result (cam3aResultList &results, int32_t type);
     // std::map<int, std::list<SmartPtr<cam3aResult>>> _cam3aConfig;
-    SmartPtr<cam3aResult> mBlcResult = NULL;
-    bool _lsc_en;
+    cam3aResult* mBlcResult{NULL};
+    cam3aResult* mAwbParams{NULL};
+    cam3aResult* mAfParams{NULL};
+    bool _lsc_en{false};
+#if defined(ISP_HW_V32) || defined(ISP_HW_V32_LITE)
+	struct isp32_isp_meas_cfg mLatestMeasCfg;
+	struct isp32_bls_cfg mLatestBlsCfg;
+	struct isp32_awb_gain_cfg mLatestWbGainCfg;
+#endif
 };
 }
 #endif

@@ -29,11 +29,14 @@ namespace RkCam {
 class RkAiqAfHandleInt : virtual public RkAiqHandle {
  public:
     explicit RkAiqAfHandleInt(RkAiqAlgoDesComm* des, RkAiqCore* aiqCore)
-        : RkAiqHandle(des, aiqCore), mProcResShared(nullptr) {
+        : RkAiqHandle(des, aiqCore) {
+#ifndef DISABLE_HANDLE_ATTRIB
         memset(&mCurAtt, 0, sizeof(rk_aiq_af_attrib_t));
         memset(&mNewAtt, 0, sizeof(rk_aiq_af_attrib_t));
         isUpdateAttDone     = false;
+#endif
         isUpdateZoomPosDone = false;
+        mLastZoomIndex      = 0;
     };
     virtual ~RkAiqAfHandleInt() { RkAiqHandle::deInit(); };
     virtual XCamReturn updateConfig(bool needSync);
@@ -58,7 +61,6 @@ class RkAiqAfHandleInt : virtual public RkAiqHandle {
     XCamReturn GetSearchPath(rk_aiq_af_sec_path_t* path);
     XCamReturn GetSearchResult(rk_aiq_af_result_t* result);
     XCamReturn GetFocusRange(rk_aiq_af_focusrange* range);
-    XCamReturn GetCustomAfRes(rk_tool_customAf_res_t* att);
     XCamReturn setAeStable(bool ae_stable);
 
  protected:
@@ -68,19 +70,21 @@ class RkAiqAfHandleInt : virtual public RkAiqHandle {
  private:
     bool getValueFromFile(const char* path, int* pos);
 
+#ifndef DISABLE_HANDLE_ATTRIB
     // TODO
     rk_aiq_af_attrib_t mCurAtt;
     rk_aiq_af_attrib_t mNewAtt;
     mutable std::atomic<bool> isUpdateAttDone;
+#endif
     mutable std::atomic<bool> isUpdateZoomPosDone;
     int mLastZoomIndex;
 
-    SmartPtr<RkAiqAlgoProcResAfIntShared> mProcResShared;
     RkAiqAlgoProcResAf mLastAfResult;
 
     XCam::Mutex mAeStableMutex;
     bool mAeStable = false;
-
+    uint32_t mAfMeasResSyncFalg{(uint32_t)(-1)};
+    uint32_t mAfFocusResSyncFalg{(uint32_t)(-1)};
  private:
     DECLARE_HANDLE_REGISTER_TYPE(RkAiqAfHandleInt);
 };

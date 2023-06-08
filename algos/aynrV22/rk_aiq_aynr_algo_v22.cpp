@@ -85,6 +85,8 @@ Aynr_result_V22_t Aynr_Init_V22(Aynr_Context_V22_t **ppAynrCtx, void *pCalibDb)
     pAynrCtx->stExpInfo.snr_mode = 1;
     pAynrCtx->eParamMode = AYNRV22_PARAM_MODE_NORMAL;
     Aynr_ConfigSettingParam_V22(pAynrCtx, pAynrCtx->eParamMode, pAynrCtx->stExpInfo.snr_mode);
+    // init manual params
+    pAynrCtx->stManual.stSelect = pAynrCtx->stAuto.stParams.arYnrParamsISO[0];
 #endif
 
     LOGD_ANR("%s(%d):", __FUNCTION__, __LINE__);
@@ -258,16 +260,16 @@ Aynr_result_V22_t Aynr_GetProcResult_V22(Aynr_Context_V22_t *pAynrCtx, Aynr_Proc
     }
 
     if(pAynrCtx->eMode == AYNRV22_OP_MODE_AUTO) {
-        pAynrResult->stSelect = pAynrCtx->stAuto.stSelect;
+        pAynrResult->stSelect = &pAynrCtx->stAuto.stSelect;
     } else if(pAynrCtx->eMode == AYNRV22_OP_MODE_MANUAL) {
-        pAynrResult->stSelect = pAynrCtx->stManual.stSelect;
+        pAynrResult->stSelect = &pAynrCtx->stManual.stSelect;
     }
 
     //transfer to reg value
-    ynr_fix_transfer_V22(&pAynrResult->stSelect, &pAynrResult->stFix, &pAynrCtx->stStrength, &pAynrCtx->stExpInfo);
+    ynr_fix_transfer_V22(pAynrResult->stSelect, pAynrResult->stFix, &pAynrCtx->stStrength, &pAynrCtx->stExpInfo);
 
     if(pAynrCtx->eMode == AYNRV22_OP_MODE_REG_MANUAL) {
-        pAynrResult->stFix = pAynrCtx->stManual.stFix;
+        *pAynrResult->stFix = pAynrCtx->stManual.stFix;
         pAynrCtx->stStrength.percent = 1.0;
     }
 
@@ -318,13 +320,14 @@ Aynr_result_V22_t Aynr_ConfigSettingParam_V22(Aynr_Context_V22_t *pAynrCtx, Aynr
 }
 
 Aynr_result_V22_t Aynr_ParamModeProcess_V22(Aynr_Context_V22_t *pAynrCtx, Aynr_ExpInfo_V22_t *pExpInfo, Aynr_ParamMode_V22_t *mode) {
-    Aynr_result_V22_t res  = AYNRV22_RET_SUCCESS;
-    *mode = pAynrCtx->eParamMode;
 
     if(pAynrCtx == NULL) {
         LOGE_ANR("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
         return AYNRV22_RET_INVALID_PARM;
     }
+
+    Aynr_result_V22_t res  = AYNRV22_RET_SUCCESS;
+    *mode = pAynrCtx->eParamMode;
 
     if(pAynrCtx->isGrayMode) {
         *mode = AYNRV22_PARAM_MODE_GRAY;

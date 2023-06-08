@@ -36,6 +36,7 @@ XCamReturn RkAiqAcpHandleInt::updateConfig(bool needSync) {
     ENTER_ANALYZER_FUNCTION();
 
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
+#ifndef DISABLE_HANDLE_ATTRIB
     if (needSync) mCfgMutex.lock();
     // if something changed
     if (updateAtt) {
@@ -45,6 +46,7 @@ XCamReturn RkAiqAcpHandleInt::updateConfig(bool needSync) {
         updateAtt = false;
     }
     if (needSync) mCfgMutex.unlock();
+#endif
 
     EXIT_ANALYZER_FUNCTION();
     return ret;
@@ -55,6 +57,9 @@ XCamReturn RkAiqAcpHandleInt::setAttrib(const acp_attrib_t* att) {
 
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
     mCfgMutex.lock();
+#ifdef DISABLE_HANDLE_ATTRIB
+    ret = rk_aiq_uapi_acp_SetAttrib(mAlgoCtx, att, false);
+#else
     // check if there is different between att & mCurAtt
     // if something changed, set att to mNewAtt, and
     // the new params will be effective later when updateConfig
@@ -72,6 +77,7 @@ XCamReturn RkAiqAcpHandleInt::setAttrib(const acp_attrib_t* att) {
         updateAtt = true;
         waitSignal(att->sync.sync_mode);
     }
+#endif
 
     mCfgMutex.unlock();
 
@@ -83,6 +89,11 @@ XCamReturn RkAiqAcpHandleInt::getAttrib(acp_attrib_t* att) {
     ENTER_ANALYZER_FUNCTION();
 
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
+#ifdef DISABLE_HANDLE_ATTRIB
+    mCfgMutex.lock();
+    rk_aiq_uapi_acp_GetAttrib(mAlgoCtx, att);
+    mCfgMutex.unlock();
+#else
 
     if (att->sync.sync_mode == RK_AIQ_UAPI_MODE_SYNC) {
         mCfgMutex.lock();
@@ -99,6 +110,7 @@ XCamReturn RkAiqAcpHandleInt::getAttrib(acp_attrib_t* att) {
             att->sync.done      = true;
         }
     }
+#endif
 
     EXIT_ANALYZER_FUNCTION();
     return ret;
@@ -111,10 +123,6 @@ XCamReturn RkAiqAcpHandleInt::prepare() {
 
     ret = RkAiqHandle::prepare();
     RKAIQCORE_CHECK_RET(ret, "acp handle prepare failed");
-
-    RkAiqAlgoConfigAcp* acp_config_int = (RkAiqAlgoConfigAcp*)mConfig;
-    RkAiqCore::RkAiqAlgosGroupShared_t* shared =
-        (RkAiqCore::RkAiqAlgosGroupShared_t*)(getGroupShared());
 
     RkAiqAlgoDescription* des = (RkAiqAlgoDescription*)mDes;
     ret                       = des->prepare(mConfig);
@@ -160,13 +168,21 @@ XCamReturn RkAiqAcpHandleInt::processing() {
         (RkAiqCore::RkAiqAlgosGroupShared_t*)(getGroupShared());
     RkAiqCore::RkAiqAlgosComShared_t* sharedCom = &mAiqCore->mAlogsComSharedParams;
 
+    acp_proc_res_int->acp_res = &shared->fullParams->mCpParams->data()->result;
+
     ret = RkAiqHandle::processing();
     if (ret) {
         RKAIQCORE_CHECK_RET(ret, "acp handle processing failed");
     }
 
+#ifdef DISABLE_HANDLE_ATTRIB
+    mCfgMutex.lock();
+#endif
     RkAiqAlgoDescription* des = (RkAiqAlgoDescription*)mDes;
     ret                       = des->processing(mProcInParam, mProcOutParam);
+#ifdef DISABLE_HANDLE_ATTRIB
+    mCfgMutex.unlock();
+#endif
     RKAIQCORE_CHECK_RET(ret, "acp algo processing failed");
 
     EXIT_ANALYZER_FUNCTION();
@@ -220,15 +236,30 @@ XCamReturn RkAiqAcpHandleInt::genIspResult(RkAiqFullParams* params, RkAiqFullPar
         return XCAM_RETURN_NO_ERROR;
     }
 
-    rk_aiq_acp_params_t* isp_cp = &cp_param->result;
-
-    *isp_cp = acp_com->acp_res;
-
-    if (!this->getAlgoId()) {
-        RkAiqAlgoProcResAcp* acp_rk = (RkAiqAlgoProcResAcp*)acp_com;
+    if (acp_com->res_com.cfg_update) {
+        mSyncFlag = shared->frameId;
+        cp_param->sync_flag = mSyncFlag;
+        // copy from algo result
+        // set as the latest result
+        cur_params->mCpParams = params->mCpParams;
+        cp_param->is_update = true;
+        LOGD_ACP("[%d] params from algo", mSyncFlag);
+    } else if (mSyncFlag != cp_param->sync_flag) {
+        cp_param->sync_flag = mSyncFlag;
+        // copy from latest result
+        if (cur_params->mCpParams.ptr()) {
+            cp_param->result = cur_params->mCpParams->data()->result;
+            cp_param->is_update = true;
+        } else {
+            LOGE_ACP("no latest params !");
+            cp_param->is_update = false;
+        }
+        LOGD_ACP("[%d] params from latest [%d]", shared->frameId, mSyncFlag);
+    } else {
+        // do nothing, result in buf needn't update
+        cp_param->is_update = false;
+        LOGD_ACP("[%d] params needn't update", shared->frameId);
     }
-
-    cur_params->mCpParams = params->mCpParams;
 
     EXIT_ANALYZER_FUNCTION();
 

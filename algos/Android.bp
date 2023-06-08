@@ -57,6 +57,7 @@ subdirs = [
     "algos/awb",
     "algos/af",
     "algos/asd",
+    "algos/afd",
 ]
 
 cc_rkaiq_library_static {

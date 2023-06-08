@@ -27,7 +27,10 @@ public:
     explicit RkAiqCustomAeHandle(RkAiqAlgoDesComm* des, RkAiqCore* aiqCore)
         : RkAiqAeHandleInt (des, aiqCore) {};
     virtual ~RkAiqCustomAeHandle() {
+        deInit();
     };
+    virtual void init();
+    virtual void deInit();
     virtual XCamReturn updateConfig(bool needSync);
     virtual XCamReturn preProcess();
     virtual XCamReturn processing();
@@ -64,6 +67,8 @@ public:
     virtual XCamReturn setLockAeForAf(bool lock_ae);
     virtual XCamReturn setExpWinAttr(Uapi_ExpWin_t ExpWinAttr);
     virtual XCamReturn getExpWinAttr(Uapi_ExpWin_t* pExpWinAttr);
+    virtual XCamReturn setAecStatsCfg(Uapi_AecStatsCfg_t AecStatsCfg);
+    virtual XCamReturn getAecStatsCfg(Uapi_AecStatsCfg_t* pAecStatsCfg);
     virtual XCamReturn genIspResult(RkAiqFullParams* params, RkAiqFullParams* cur_params);
 };
 

@@ -1,0 +1,5 @@
+cc_rockchip_prebuilt_library_static {
+    name: "librkaiq_afd",
+    vendor: true,
+    aiq: true,
+}

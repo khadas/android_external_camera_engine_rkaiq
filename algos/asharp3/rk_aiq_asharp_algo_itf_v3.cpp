@@ -89,12 +89,20 @@ prepare(RkAiqAlgoCom* params)
 
     if(!!(params->u.prepare.conf_type & RK_AIQ_ALGO_CONFTYPE_UPDATECALIB )) {
 #if(ASHARP_USE_JSON_FILE_V3)
+        // just update calib ptr
+        if (params->u.prepare.conf_type & RK_AIQ_ALGO_CONFTYPE_UPDATECALIB_PTR) {
+            return XCAM_RETURN_NO_ERROR;
+        }
         CalibDbV2_SharpV3_t *calibv2_sharp =
             (CalibDbV2_SharpV3_t *)(CALIBDBV2_GET_MODULE_PTR(pCfgParam->com.u.prepare.calibv2, sharp_v3));
         pAsharpCtx->sharp_v3 = *calibv2_sharp;
 #else
         pAsharpCtx->list_sharp_v3 =
             (struct list_head*)(CALIBDB_GET_MODULE_PTR(pCfgParam->com.u.prepare.calib, list_sharp_v3));
+        // just update calib ptr
+        if (params->u.prepare.conf_type & RK_AIQ_ALGO_CONFTYPE_UPDATECALIB_PTR) {
+            return XCAM_RETURN_NO_ERROR;
+        }
 #endif
         pAsharpCtx->isIQParaUpdate = true;
         pAsharpCtx->isReCalculate |= 1;
@@ -258,11 +266,11 @@ processing(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outparams)
         }
 
         Asharp_GetProcResult_V3(pAsharpCtx, &pAsharpProcResParams->stAsharpProcResult);
-        pAsharpProcResParams->stAsharpProcResult.isNeedUpdate = true;
+        outparams->cfg_update = true;
 
         LOGD_ANR("recalculate: %d delta_iso:%d \n ", pAsharpCtx->isReCalculate, DeltaIso);
     } else {
-        pAsharpProcResParams->stAsharpProcResult.isNeedUpdate = false;
+        outparams->cfg_update = false;
     }
 
     pAsharpCtx->isReCalculate = 0;

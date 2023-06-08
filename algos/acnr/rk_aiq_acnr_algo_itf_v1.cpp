@@ -92,11 +92,17 @@ prepare(RkAiqAlgoCom* params)
         void *pCalibDbV2 = (void*)(pCfgParam->com.u.prepare.calibv2);
         CalibDbV2_CNR_t *cnr_v1 =
             (CalibDbV2_CNR_t*)(CALIBDBV2_GET_MODULE_PTR((void*)pCalibDbV2, cnr_v1));
+        // just update calib ptr
+        if (params->u.prepare.conf_type & RK_AIQ_ALGO_CONFTYPE_UPDATECALIB_PTR)
+            return XCAM_RETURN_NO_ERROR;
         pAcnrCtx->cnr_v1 = *cnr_v1;
 #else
         void *pCalibDb = (void*)(pCfgParam->com.u.prepare.calib);
         pAcnrCtx->list_cnr_v1 =
             (struct list_head*)(CALIBDB_GET_MODULE_PTR((void*)pCalibDb, uvnr));
+        // just update calib ptr
+        if (params->u.prepare.conf_type & RK_AIQ_ALGO_CONFTYPE_UPDATECALIB_PTR)
+            return XCAM_RETURN_NO_ERROR;
 
 #endif
         pAcnrCtx->isIQParaUpdate = true;
@@ -260,10 +266,10 @@ processing(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outparams)
         }
 
         Acnr_GetProcResult_V1(pAcnrCtx, &pAcnrProcResParams->stAcnrProcResult);
-        pAcnrProcResParams->stAcnrProcResult.isNeedUpdate = true;
+        outparams->cfg_update = true;
         LOGD_ANR("recalculate: %d delta_iso:%d \n ", pAcnrCtx->isReCalculate, DeltaISO);
     } else {
-        pAcnrProcResParams->stAcnrProcResult.isNeedUpdate = false;
+        outparams->cfg_update = false;
     }
 #endif
 

@@ -22,9 +22,13 @@ void convertLscTableParameter(resolution_t *cur_res, alsc_otp_grad_t *otpGrad,
             srcLscWidth, srcLscHeight, dstWidth,
             dstHeight, bayer);
 
-    if ((dstWidth > srcLscWidth)&&(dstHeight > srcLscHeight))
+    if (dstWidth == srcLscWidth && dstHeight == srcLscHeight) {
+        return;
+    }
+
+    if (dstWidth > srcLscWidth && dstHeight > srcLscHeight)
     {
-        if (((dstWidth / 2) < srcLscWidth) && ((dstHeight / 2) < srcLscHeight))
+        if ((dstWidth / 2 <= srcLscWidth) && (dstHeight / 2 <= srcLscHeight))
         {
             dstWidth = dstWidth / 2;
             dstHeight = dstHeight / 2;
@@ -32,6 +36,12 @@ void convertLscTableParameter(resolution_t *cur_res, alsc_otp_grad_t *otpGrad,
             LOGE_ALSC("Failed to handle: src %dx%d, dst %dx%x, return!\n",
                     srcLscWidth, srcLscHeight, dstWidth, dstHeight);
             return;
+        }
+    } else if (dstWidth < srcLscWidth && dstHeight < srcLscHeight) {
+        if ((dstWidth <= srcLscWidth / 2) && (dstHeight <= srcLscHeight / 2))
+        {
+            srcLscWidth = srcLscWidth / 2;
+            srcLscHeight = srcLscHeight / 2;
         }
     }
 
@@ -458,9 +468,9 @@ void writeFile(char *fileName, uint16_t *buf)
 
 void lightFallOff(uint16_t *table, float *percenttable, float percent, int width, int height)
 {
-    float ratio = (float)width / (float)height;
-    float rMax = sqrt(pow((float)(16 / 2 * ratio), 2) + pow((float)(16 / 2), 2));
-    float r = 0.0, alpha = 0.0, falloff = 0.0, halfPi = 3.1415926 / 2;
+    // float ratio = (float)width / (float)height;
+    // float rMax = sqrt(pow((float)(16 / 2 * ratio), 2) + pow((float)(16 / 2), 2));
+    // float r = 0.0, alpha = 0.0, falloff = 0.0, halfPi = 3.1415926 / 2;
 
     percent = percent / 100.0;
 

@@ -129,6 +129,7 @@ XCamReturn CacAlgoAdaptor::SetApiAttr(const rkaiq_cac_v03_api_attr_t* attr) {
         memcpy(&attr_->manual_param, &attr->manual_param, sizeof(attr->manual_param));
     }
     enable_ = attr_->enable = attr->enable;
+    isReCal_ = true;
 
     return XCAM_RETURN_NO_ERROR;
 }
@@ -147,6 +148,7 @@ XCamReturn CacAlgoAdaptor::SetApiAttr(const rkaiq_cac_v10_api_attr_t* attr) {
     }
     attr_->op_mode = attr->op_mode;
     enable_ = attr_->enable = attr->enable;
+    isReCal_ = true;
 
     return XCAM_RETURN_NO_ERROR;
 }
@@ -168,6 +170,7 @@ XCamReturn CacAlgoAdaptor::SetApiAttr(const rkaiq_cac_v11_api_attr_t* attr) {
         memcpy(&attr_->manual_param, &attr->manual_param, sizeof(attr->manual_param));
     }
     enable_ = attr_->enable = attr->enable;
+    isReCal_ = true;
 
     return XCAM_RETURN_NO_ERROR;
 }
@@ -202,6 +205,7 @@ XCamReturn CacAlgoAdaptor::GetApiAttr(rkaiq_cac_v11_api_attr_t* attr) {
 }
 #endif
 
+#if RKAIQ_HAVE_CAC_V03 || RKAIQ_HAVE_CAC_V10 || RKAIQ_HAVE_CAC_V11
 #if RKAIQ_HAVE_CAC_V03
 XCamReturn CacAlgoAdaptor::Config(const AlgoCtxInstanceCfg* config,
                                   const CalibDbV2_Cac_V03_t* calib) {
@@ -234,9 +238,12 @@ XCamReturn CacAlgoAdaptor::Config(const AlgoCtxInstanceCfg* config,
     XCAM_ASSERT(attr_->iso_cnt <= RKAIQ_CAC_MAX_ISO_CNT);
     memcpy(attr_->auto_params, calib_->TuningPara.SettingByIso,
            sizeof(calib_->TuningPara.SettingByIso[0]) * attr_->iso_cnt);
+    memcpy(&attr_->manual_param, calib_->TuningPara.SettingByIso,
+           sizeof(calib_->TuningPara.SettingByIso[0]));
 #if !RKAIQ_HAVE_CAC_V03
     memcpy(&attr_->persist_params, &calib->SettingPara, sizeof(calib->SettingPara));
     attr_->enable = attr_->persist_params.enable;
+
 #else
     attr_->enable = enable_;
 #endif
@@ -249,6 +256,7 @@ XCamReturn CacAlgoAdaptor::Config(const AlgoCtxInstanceCfg* config,
     valid_ = true;
     return XCAM_RETURN_NO_ERROR;
 }
+#endif
 
 XCamReturn CacAlgoAdaptor::Prepare(const RkAiqAlgoConfigAcac* config) {
     LutBufferConfig lut_config{};
@@ -260,6 +268,7 @@ XCamReturn CacAlgoAdaptor::Prepare(const RkAiqAlgoConfigAcac* config) {
 
     LOGD_ACAC("%s : en %d valid: %d Enter", __func__, enable_, valid_);
 
+    isReCal_ = true;
 
     if (!enable_ || !valid_) {
         return XCAM_RETURN_BYPASS;
@@ -267,7 +276,7 @@ XCamReturn CacAlgoAdaptor::Prepare(const RkAiqAlgoConfigAcac* config) {
 
     config_ = config;
     if (config->is_multi_isp) {
-#if (RKAIQ_HAVE_CAC_V03 || RKAIQ_HAVE_CAC_V10) && defined(ISP_HW_V30)
+#if (RKAIQ_HAVE_CAC_V03 || RKAIQ_HAVE_CAC_V10) && defined(ISP_HW_V30) || RKAIQ_HAVE_CAC_V11
         CalcCacLutConfig(width, height, is_big_mode, full_lut_config);
         width = width / 2 + config->multi_isp_extended_pixel;
         CalcCacLutConfig(width, height, is_big_mode, lut_config);
@@ -294,7 +303,7 @@ XCamReturn CacAlgoAdaptor::Prepare(const RkAiqAlgoConfigAcac* config) {
         LOGW_ACAC("Buffer in use, will not update lut!");
         return XCAM_RETURN_NO_ERROR;
     }
-#if (RKAIQ_HAVE_CAC_V03 || RKAIQ_HAVE_CAC_V10) && defined(ISP_HW_V30)
+#if (RKAIQ_HAVE_CAC_V03 || RKAIQ_HAVE_CAC_V10) && defined(ISP_HW_V30) || RKAIQ_HAVE_CAC_V11
     if (config->is_multi_isp) {
         auto* buf = lut_manger_->GetFreeHwBuffer(1);
         if (buf == nullptr) {
@@ -329,7 +338,7 @@ XCamReturn CacAlgoAdaptor::Prepare(const RkAiqAlgoConfigAcac* config) {
             ifs.read(addr0, size);
         }
     } else {
-#if RKAIQ_HAVE_CAC_V10 && defined(ISP_HW_V30)
+#if RKAIQ_HAVE_CAC_V10 && defined(ISP_HW_V30) || RKAIQ_HAVE_CAC_V11
         XCAM_ASSERT(current_lut_.size() > 1);
         // Read and Split Memory
         //   a == line_size - line_offset
@@ -341,7 +350,7 @@ XCamReturn CacAlgoAdaptor::Prepare(const RkAiqAlgoConfigAcac* config) {
         //   read a' to right
         // - +---------------------------+
         // | |<---a---->|  |  |<---a'--->|
-        // | |          |<-c->|          |
+        // | |                 |<-c->|          |
         // v |<---b---------->|          |
         // | |          |  |  |          |
         // - +---------------------------+
@@ -387,9 +396,23 @@ void CacAlgoAdaptor::OnFrameEvent(const RkAiqAlgoProcAcac* input, RkAiqAlgoProcR
         valid_ = true;
     }
 
+    if (attr_->op_mode == RKAIQ_CAC_API_OPMODE_AUTO &&
+        lastIso_ != input->iso)
+        isReCal_ = true;
+
+    lastIso_ = input->iso;
+    if (!isReCal_) {
+        output->res_com.cfg_update = false;
+        LOGD_ACAC("skip cac reCalc");
+        return ;
+    }
+
+    output->res_com.cfg_update = true;
+    isReCal_ = false;
+
     if (!enable_ || !valid_) {
         output->config[0].bypass_en = 1;
-#if (RKAIQ_HAVE_CAC_V03 || RKAIQ_HAVE_CAC_V10) && defined(ISP_HW_V30)
+#if (RKAIQ_HAVE_CAC_V03 || RKAIQ_HAVE_CAC_V10) && defined(ISP_HW_V30)|| RKAIQ_HAVE_CAC_V11
         output->config[1].bypass_en = 1;
 #endif
         output->enable = false;
@@ -437,7 +460,7 @@ void CacAlgoAdaptor::OnFrameEvent(const RkAiqAlgoProcAcac* input, RkAiqAlgoProcR
             output->config[1].buf_fd = current_lut_[1]->Fd;
         }
     }
-#else
+#else //not  RKAIQ_HAVE_CAC_V03
 
 #if 0
     output->config[0].strength[0] = 128;
@@ -471,18 +494,6 @@ void CacAlgoAdaptor::OnFrameEvent(const RkAiqAlgoProcAcac* input, RkAiqAlgoProcR
     output->config[0].buf_fd        = current_lut_[0]->Fd;
     output->config[0].hsize = current_lut_[0]->Config.LutHCount * CacPsfKernelWordSizeInMemory;
     output->config[0].vsize = current_lut_[0]->Config.LutVCount * CacChannelCount;
-#if (RKAIQ_HAVE_CAC_V10) && defined(ISP_HW_V30)
-    memcpy(&output->config[1], &output->config[0], sizeof(output->config[0]));
-    if (current_lut_.size() > 1) {
-        output->config[1].buf_fd = current_lut_[1]->Fd;
-        if (output->config[0].center_en) {
-            uint16_t w                     = config_->width / 4;
-            uint16_t e                     = config_->multi_isp_extended_pixel / 4;
-            uint16_t x                     = attr_->persist_params.center_x;
-            output->config[1].center_width = x - (w / 2 - e);
-        }
-    }
-#endif
 
     if (attr_->op_mode == RKAIQ_CAC_API_OPMODE_MANUAL) {
         for (i = 0; i < RKCAC_STRENGTH_TABLE_LEN; i++) {
@@ -583,6 +594,22 @@ void CacAlgoAdaptor::OnFrameEvent(const RkAiqAlgoProcAcac* input, RkAiqAlgoProcR
         output->config[0].expo_adj_b = CacClamp<uint32_t>(expo_adj_b, 0, 0xfffff);
         output->config[0].expo_adj_r = CacClamp<uint32_t>(expo_adj_r, 0, 0xfffff);
 #endif
+
+#if (RKAIQ_HAVE_CAC_V10) && defined(ISP_HW_V30) || RKAIQ_HAVE_CAC_V11
+        memcpy(&output->config[1], &output->config[0], sizeof(output->config[0]));
+        if (current_lut_.size() > 1) {
+            output->config[1].buf_fd = current_lut_[1]->Fd;
+            if (output->config[0].center_en) {
+                uint16_t w                     = config_->width / 4;
+                uint16_t e                     = config_->multi_isp_extended_pixel / 4;
+                uint16_t x                     = attr_->persist_params.center_x;
+                output->config[1].center_width = x - (w / 2 - e);
+            }
+        }
+#endif
+
+
+
     }
 #endif
     output->enable = attr_->enable;

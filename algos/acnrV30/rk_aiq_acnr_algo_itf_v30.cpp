@@ -85,6 +85,9 @@ prepare(RkAiqAlgoCom* params)
     pAcnrCtx->prepare_type = params->u.prepare.conf_type;
 
     if(!!(params->u.prepare.conf_type & RK_AIQ_ALGO_CONFTYPE_UPDATECALIB )) {
+        // just update calib ptr
+        if (params->u.prepare.conf_type & RK_AIQ_ALGO_CONFTYPE_UPDATECALIB_PTR)
+            return XCAM_RETURN_NO_ERROR;
 #if ACNR_USE_JSON_FILE_V30
         void *pCalibDbV2 = (void*)(pCfgParam->com.u.prepare.calibv2);
         CalibDbV2_CNRV30_t *cnr_v30 =
@@ -95,6 +98,7 @@ prepare(RkAiqAlgoCom* params)
         pAcnrCtx->isReCalculate |= 1;
 
     }
+
     AcnrV30_result_t ret = Acnr_Prepare_V30(pAcnrCtx, &pCfgParam->stAcnrConfig);
     if(ret != ACNRV30_RET_SUCCESS) {
         result = XCAM_RETURN_ERROR_FAILED;
@@ -169,6 +173,11 @@ processing(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outparams)
         LOGE_ANR("%s: ANRPreProcess failed (%d)\n", __FUNCTION__, ret);
     }
 
+    if (pAcnrProcParams == NULL) {
+        LOGD_ANR("%s:%d pointer pAcnrProcParams is NULL, return bypass", __FUNCTION__, __LINE__);
+        return XCAM_RETURN_BYPASS;
+    }
+
     LOGD_ANR("%s:%d init:%d hdr mode:%d  \n",
              __FUNCTION__, __LINE__,
              inparams->u.proc.init,
@@ -195,7 +204,7 @@ processing(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outparams)
 
     stExpInfo.blc_ob_predgain = 1.0;
     if(pAcnrProcParams != NULL) {
-        stExpInfo.blc_ob_predgain = pAcnrProcParams->stAblcV32_proc_res.isp_ob_predgain;
+        stExpInfo.blc_ob_predgain = pAcnrProcParams->stAblcV32_proc_res->isp_ob_predgain;
         if(stExpInfo.blc_ob_predgain != pAcnrCtx->stExpInfo.blc_ob_predgain) {
             pAcnrCtx->isReCalculate |= 1;
         }
@@ -316,10 +325,10 @@ processing(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outparams)
         }
 
         Acnr_GetProcResult_V30(pAcnrCtx, &pAcnrProcResParams->stAcnrProcResult);
-        pAcnrProcResParams->stAcnrProcResult.isNeedUpdate = true;
+        outparams->cfg_update = true;
         LOGD_ANR("recalculate: %d delta_iso:%d \n ", pAcnrCtx->isReCalculate, DeltaISO);
     } else {
-        pAcnrProcResParams->stAcnrProcResult.isNeedUpdate = false;
+        outparams->cfg_update = false;
     }
 #endif
 

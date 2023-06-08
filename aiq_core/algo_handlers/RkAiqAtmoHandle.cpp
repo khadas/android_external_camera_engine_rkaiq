@@ -35,6 +35,7 @@ XCamReturn RkAiqAtmoHandleInt::updateConfig(bool needSync) {
     ENTER_ANALYZER_FUNCTION();
 
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
+#ifndef DISABLE_HANDLE_ATTRIB
     if (needSync) mCfgMutex.lock();
     // if something changed
     if (updateAtt) {
@@ -44,6 +45,7 @@ XCamReturn RkAiqAtmoHandleInt::updateConfig(bool needSync) {
         sendSignal();
     }
     if (needSync) mCfgMutex.unlock();
+#endif
 
     EXIT_ANALYZER_FUNCTION();
     return ret;
@@ -54,6 +56,9 @@ XCamReturn RkAiqAtmoHandleInt::setAttrib(atmo_attrib_t att) {
 
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
     mCfgMutex.lock();
+#ifdef DISABLE_HANDLE_ATTRIB
+    ret = rk_aiq_uapi_atmo_SetAttrib(mAlgoCtx, att, false);
+#else
     // TODO
     // check if there is different between att & mCurAtt
     // if something changed, set att to mNewAtt, and
@@ -67,6 +72,7 @@ XCamReturn RkAiqAtmoHandleInt::setAttrib(atmo_attrib_t att) {
         waitSignal();
     }
     mCfgMutex.unlock();
+#endif
 
     EXIT_ANALYZER_FUNCTION();
     return ret;
@@ -91,8 +97,6 @@ XCamReturn RkAiqAtmoHandleInt::prepare() {
     RKAIQCORE_CHECK_RET(ret, "atmo handle prepare failed");
 
     RkAiqAlgoConfigAtmo* atmo_config_int = (RkAiqAlgoConfigAtmo*)mConfig;
-    RkAiqCore::RkAiqAlgosGroupShared_t* shared =
-        (RkAiqCore::RkAiqAlgosGroupShared_t*)(getGroupShared());
     RkAiqCore::RkAiqAlgosComShared_t* sharedCom = &mAiqCore->mAlogsComSharedParams;
 
     // TODO
@@ -113,8 +117,6 @@ XCamReturn RkAiqAtmoHandleInt::preProcess() {
 
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
 
-    RkAiqAlgoPreAtmo* atmo_pre_int        = (RkAiqAlgoPreAtmo*)mPreInParam;
-    RkAiqAlgoPreResAtmo* atmo_pre_res_int = (RkAiqAlgoPreResAtmo*)mPreOutParam;
     RkAiqCore::RkAiqAlgosGroupShared_t* shared =
         (RkAiqCore::RkAiqAlgosGroupShared_t*)(getGroupShared());
     RkAiqCore::RkAiqAlgosComShared_t* sharedCom = &mAiqCore->mAlogsComSharedParams;
@@ -153,7 +155,6 @@ XCamReturn RkAiqAtmoHandleInt::processing() {
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
 
     RkAiqAlgoProcAtmo* atmo_proc_int        = (RkAiqAlgoProcAtmo*)mProcInParam;
-    RkAiqAlgoProcResAtmo* atmo_proc_res_int = (RkAiqAlgoProcResAtmo*)mProcOutParam;
     RkAiqCore::RkAiqAlgosGroupShared_t* shared =
         (RkAiqCore::RkAiqAlgosGroupShared_t*)(getGroupShared());
     RkAiqCore::RkAiqAlgosComShared_t* sharedCom = &mAiqCore->mAlogsComSharedParams;
@@ -207,8 +208,14 @@ XCamReturn RkAiqAtmoHandleInt::processing() {
             LOGD("Wrong working mode!!!");
     }
 
+#ifdef DISABLE_HANDLE_ATTRIB
+    mCfgMutex.lock();
+#endif
     RkAiqAlgoDescription* des = (RkAiqAlgoDescription*)mDes;
     ret                       = des->processing(mProcInParam, mProcOutParam);
+#ifdef DISABLE_HANDLE_ATTRIB
+    mCfgMutex.unlock();
+#endif
     RKAIQCORE_CHECK_RET(ret, "atmo algo processing failed");
 
     EXIT_ANALYZER_FUNCTION();
@@ -220,8 +227,6 @@ XCamReturn RkAiqAtmoHandleInt::postProcess() {
 
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
 
-    RkAiqAlgoPostAtmo* atmo_post_int        = (RkAiqAlgoPostAtmo*)mPostInParam;
-    RkAiqAlgoPostResAtmo* atmo_post_res_int = (RkAiqAlgoPostResAtmo*)mPostOutParam;
     RkAiqCore::RkAiqAlgosGroupShared_t* shared =
         (RkAiqCore::RkAiqAlgosGroupShared_t*)(getGroupShared());
     RkAiqCore::RkAiqAlgosComShared_t* sharedCom = &mAiqCore->mAlogsComSharedParams;

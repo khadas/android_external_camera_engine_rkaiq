@@ -25,6 +25,10 @@
 #include <functional>
 #endif
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define RKVI_MAX_SENSORS  12
 
 
@@ -34,7 +38,6 @@ typedef struct {
     char* dev1_name;
     char* dev2_name;
     uint8_t use_offline;
-    uint8_t buf_memory_type;
 } rkraw_vi_init_params_t;
 
 typedef struct {
@@ -43,6 +46,8 @@ typedef struct {
     uint32_t pix_fmt;
     int hdr_mode;
     int mem_mode;
+    uint8_t buf_memory_type;
+    uint8_t buf_cnt;
 } rkraw_vi_prepare_params_t;
 
 typedef struct {
@@ -109,7 +114,7 @@ rkraw_vi_ctx_t *rkrawstream_uapi_init();
  * \param[in] sensor name     used for offline frames.
  * \return return rkrawstream context if success, or NULL if failure.
  */
-rkraw_vi_ctx_t *rkrawstream_uapi_init(const char *isp_vir, const char *real_sns);
+rkraw_vi_ctx_t *rkrawstream_uapi_init_offline(const char *isp_vir, const char *real_sns);
 
 /*!
  * \brief deinitialze rkrawstream context
@@ -247,5 +252,19 @@ int rkrawstream_readback_stop(rkraw_vi_ctx_t* ctx);
  * \param[in] rkraw_data     a buffer contain rkraw2 data.
  */
 int rkrawstream_readback_set_buffer(rkraw_vi_ctx_t* ctx, uint8_t *rkraw_data);
+
+/*!
+ * \brief send a raw frame to isp.
+ *
+ * \param[in] ctx            the context returned by rkrawstream_uapi_init.
+ * \param[in] rkraw2         a pointer to rkraw_vi_init_params_t.
+ */
+int rkrawstream_readback_set_rkraw2(rkraw_vi_ctx_t* ctx, rkrawstream_rkraw2_t *rkraw2);
+
+int rkrawstream_setup_pipline_fmt(rkraw_vi_ctx_t* ctx, int width, int height);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

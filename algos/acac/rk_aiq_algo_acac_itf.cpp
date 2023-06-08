@@ -84,6 +84,9 @@ static XCamReturn prepare(RkAiqAlgoCom* params) {
     if (!!(params->u.prepare.conf_type & RK_AIQ_ALGO_CONFTYPE_UPDATECALIB)) {
         auto* cfg = adaptor->GetConfig();
         const_cast<AlgoCtxInstanceCfg*>(cfg)->calibv2 = calibv2;
+        // just update calib ptr
+        if (params->u.prepare.conf_type & RK_AIQ_ALGO_CONFTYPE_UPDATECALIB_PTR)
+            return XCAM_RETURN_NO_ERROR;
         LOGD_ACAC("Re-config");
 #if RKAIQ_HAVE_CAC_V03
         auto* calib_cac =
@@ -104,7 +107,12 @@ static XCamReturn prepare(RkAiqAlgoCom* params) {
 #endif
     }
 
-    return adaptor->Prepare(config);
+    // prepare maybe called before hw prepared, may just intend to
+    // update calib params before real prepare.
+    if (config->width != 0 && config->height != 0)
+        return adaptor->Prepare(config);
+    else
+        return XCAM_RETURN_NO_ERROR;
 }
 
 static XCamReturn pre_process(const RkAiqAlgoCom* /* inparams */, RkAiqAlgoResCom* /* outparams */) {

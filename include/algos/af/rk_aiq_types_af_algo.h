@@ -1,6 +1,8 @@
 #ifndef __RK_AIQ_TYPES_AF_ALGO_H__
 #define __RK_AIQ_TYPES_AF_ALGO_H__
 
+#include <sys/time.h>
+
 #include "rk_aiq_comm.h"
 
 RKAIQ_BEGIN_DECLARE
@@ -19,6 +21,7 @@ RKAIQ_BEGIN_DECLARE
 #define RKAIQ_PDAF_FINE_SEARCH_RANGE_MAX   10
 #define RKAIQ_PDAF_ISOPARA_NUM             16
 #define RKAIQ_PDAF_STEPRATIO_NUM           7
+#define RKAIQ_PDAF_RESOLUTION_NUM          10
 
 typedef enum {
     PDAF_DATA_INVAL = 0,
@@ -432,6 +435,7 @@ typedef struct {
 
 typedef struct {
     unsigned char pdMirrorInCalib;
+    unsigned char pdChangeLeftRight;
     unsigned char pdLRInDiffLine;
     unsigned short pdWidth;
     unsigned short pdHeight;
@@ -461,6 +465,15 @@ typedef struct {
     int fineSearchStepPos[RKAIQ_PDAF_FINE_SEARCH_RANGE_MAX];
     int fineSearchTblCnt;
 } rk_aiq_pdaf_algo_isopara_t;
+
+typedef struct rk_aiq_pdaf_resolution_s {
+    unsigned short pdOutWidth;
+    unsigned short pdOutHeight;
+    unsigned short pdCropX;
+    unsigned short pdCropY;
+    unsigned short pdBaseWidth;
+    unsigned short pdBaseHeight;
+} rk_aiq_pdaf_resolution_t;
 
 typedef struct {
     unsigned char pdVsImgoutMirror;
@@ -495,6 +508,7 @@ typedef struct {
     float pdSatCntRatio;
     float pdLessTextureRatio;
     short pdTargetOffset;
+    rk_aiq_pdaf_resolution_t pdResoInf;
 } rk_aiq_pdaf_algo_config_t;
 
 int get_lpfv(uint32_t sequence, uint8_t *image_buf, int32_t _img_width, int32_t _img_height,

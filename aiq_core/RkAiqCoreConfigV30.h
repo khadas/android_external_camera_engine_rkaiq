@@ -47,6 +47,7 @@
 #include "awb/rk_aiq_algo_awb_itf.h"
 #include "awdr/rk_aiq_algo_awdr_itf.h"
 #include "aynr3/rk_aiq_aynr_algo_itf_v3.h"
+#include "afd/rk_aiq_algo_afd_itf.h"
 
 #if RKAIQ_ENABLE_CAMGROUP
 #include "algos_camgroup/abayer2dnr2/rk_aiq_algo_camgroup_abayer2dnr_itf_v2.h"
@@ -77,6 +78,7 @@ static RkAiqGrpCondition_t awbGrpCond[] = {
     [0] = {XCAM_MESSAGE_SOF_INFO_OK, 0},
     [1] = {XCAM_MESSAGE_AE_PRE_RES_OK, 0},
     [2] = {XCAM_MESSAGE_AWB_STATS_OK, ISP_PARAMS_EFFECT_DELAY_CNT},
+    [3] = {XCAM_MESSAGE_AEC_STATS_OK, ISP_PARAMS_EFFECT_DELAY_CNT},
 };
 static RkAiqGrpConditions_t awbGrpConds = {grp_conds_array_info(awbGrpCond)};
 
@@ -96,18 +98,16 @@ static RkAiqGrpConditions_t otherGrpCondsV21 = {grp_conds_array_info(otherGrpCon
 static RkAiqGrpCondition_t grp0Cond[] = {
     [0] = {XCAM_MESSAGE_SOF_INFO_OK, 0},
     [1] = {XCAM_MESSAGE_AE_PRE_RES_OK, 0},
-    [2] = {XCAM_MESSAGE_AE_PROC_RES_OK, 0},
-    [3] = {XCAM_MESSAGE_AEC_STATS_OK, ISP_PARAMS_EFFECT_DELAY_CNT},
-    [4] = {XCAM_MESSAGE_AWB_STATS_OK, ISP_PARAMS_EFFECT_DELAY_CNT},
+    [2] = {XCAM_MESSAGE_AEC_STATS_OK, ISP_PARAMS_EFFECT_DELAY_CNT},
+    [3] = {XCAM_MESSAGE_AWB_STATS_OK, ISP_PARAMS_EFFECT_DELAY_CNT},
 };
 static RkAiqGrpConditions_t grp0Conds = {grp_conds_array_info(grp0Cond)};
 
 static RkAiqGrpCondition_t grpDhazCond[] = {
     [0] = {XCAM_MESSAGE_SOF_INFO_OK, 0},
     [1] = {XCAM_MESSAGE_AE_PRE_RES_OK, 0},
-    [2] = {XCAM_MESSAGE_AE_PROC_RES_OK, 0},
-    [3] = {XCAM_MESSAGE_ADEHAZE_STATS_OK, ISP_PARAMS_EFFECT_DELAY_CNT},
-    [4] = {XCAM_MESSAGE_YNR_V3_PROC_RES_OK, 0},
+    [2] = {XCAM_MESSAGE_ADEHAZE_STATS_OK, ISP_PARAMS_EFFECT_DELAY_CNT},
+    [3] = {XCAM_MESSAGE_YNR_V3_PROC_RES_OK, 0},
 };
 static RkAiqGrpConditions_t grpDhazConds = {grp_conds_array_info(grpDhazCond)};
 
@@ -121,6 +121,13 @@ static RkAiqGrpCondition_t otherGrpCondV3x[] = {
     [0] = {XCAM_MESSAGE_SOF_INFO_OK, 0},
 };
 static RkAiqGrpConditions_t otherGrpCondsV3x = {grp_conds_array_info(otherGrpCondV3x)};
+
+static RkAiqGrpCondition_t grpAfdCond[] = {
+    [0] = {XCAM_MESSAGE_SOF_INFO_OK, 0},
+    [1] = {XCAM_MESSAGE_VICAP_POLL_SCL_OK, 0},
+};
+
+static RkAiqGrpConditions_t grpAfdConds = {grp_conds_array_info(grpAfdCond)};
 
 static struct RkAiqAlgoDesCommExt g_default_3a_des[] = {
 // clang-format off
@@ -216,6 +223,9 @@ static struct RkAiqAlgoDesCommExt g_default_3a_des[] = {
 #if RKAIQ_HAVE_FEC_V10
     { &g_RkIspAlgoDescAfec.common,          RK_AIQ_CORE_ANALYZE_OTHER, 0, 0, 0,     otherGrpCondsV3x   },
 #endif
+#if (RKAIQ_HAVE_AFD_V2)
+	{ &g_RkIspAlgoDescAfd.common,			 RK_AIQ_CORE_ANALYZE_AFD,	  0, 1, 0,	  grpAfdConds	   },
+#endif
     { NULL,                                 RK_AIQ_CORE_ANALYZE_ALL,    0, 0, 0,    {0, 0}             },
     // clang-format on
 };
@@ -223,7 +233,7 @@ static struct RkAiqAlgoDesCommExt g_default_3a_des[] = {
 #if RKAIQ_ENABLE_CAMGROUP
 const static struct RkAiqAlgoDesCommExt g_camgroup_algos[] = {
     // clang-format off
-    { &g_RkIspAlgoDescCamgroupAe.common,            RK_AIQ_CORE_ANALYZE_AE,     0,  3,  0, {0, 0} },
+    { &g_RkIspAlgoDescCamgroupAe.common,            RK_AIQ_CORE_ANALYZE_AE,     0,  2,  0, {0, 0} },
     { &g_RkIspAlgoDescCamgroupAblc.common,          RK_AIQ_CORE_ANALYZE_AWB,    0,  0,  0, {0, 0} },
     { &g_RkIspAlgoDescCamgroupAwb.common,           RK_AIQ_CORE_ANALYZE_AWB,    1,  2, 32, {0, 0} },
     { &g_RkIspAlgoDescCamgroupAlsc.common,          RK_AIQ_CORE_ANALYZE_AWB,    0,  0,  0, {0, 0} },
@@ -232,7 +242,7 @@ const static struct RkAiqAlgoDesCommExt g_camgroup_algos[] = {
     // { &g_RkIspAlgoDescCamgroupAdpcc.common,      RK_AIQ_CORE_ANALYZE_AWB,    0,  0,  0, {0, 0} },
     // { &g_RkIspAlgoDescamgroupAgamma.common,      RK_AIQ_CORE_ANALYZE_GRP0,   0,  0,  0, {0, 0} },
     { &g_RkIspAlgoDescCamgroupAdrc.common,          RK_AIQ_CORE_ANALYZE_GRP0,   0,  1,  0, {0, 0} },
-    // { &g_RkIspAlgoDescCamgroupAmerge.common,     RK_AIQ_CORE_ANALYZE_GRP0,   0,  0,  0, {0, 0} },
+    { &g_RkIspAlgoDescCamgroupAmerge.common,        RK_AIQ_CORE_ANALYZE_GRP0,   0,  0,  0, {0, 0} },
     { &g_RkIspAlgoDescCamgroupAynrV3.common,        RK_AIQ_CORE_ANALYZE_OTHER,  3,  3,  3, {0, 0} },
     { &g_RkIspAlgoDescCamgroupAcnrV2.common,        RK_AIQ_CORE_ANALYZE_OTHER,  2,  2,  2, {0, 0} },
     { &g_RkIspAlgoDescCamgroupAbayertnrV2.common,   RK_AIQ_CORE_ANALYZE_OTHER,  2,  2,  2, {0, 0} },

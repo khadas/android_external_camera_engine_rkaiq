@@ -57,10 +57,13 @@ static char log_file_name[LOG_FILE_NAME_MAX_LENGTH] = {0};
  * bit:      39          38       37          36       35       34        33          32
  * meaning:  [ADEGAMMA]  [CAMHW]  [ANALYZER]  [XCORE]  [ASD]    [AFEC]    [ACGC]      [AORB]
  *
- * bit:      47          46       45          44       43       42        41          40
- * meaning:  [U]         [U]      [GROUPAEC] [AWBGROUP]  [CAMGROUP]   [ACAC]    [AMD]       [AMERGE]
+ * bit:      48          46       45          44       43       42        41          40
+ * meaning:  [IPC]   [RKSTREAM] [GROUPAEC] [AWBGROUP]  [CAMGROUP]   [ACAC]    [AMD]   [AMERGE]
  *
- * bit:     [63-48]
+ * bit:                                                                               48
+ * meaning:                                                                           [AFD]
+ *
+ * bit:     [63-49]
  * meaning:  [U]
  *
  * [U] means unused now.
@@ -90,7 +93,7 @@ static char log_file_name[LOG_FILE_NAME_MAX_LENGTH] = {0};
  *    Linux:
  *      export persist_camera_engine_log=0x4014
  */
-static unsigned long long g_cam_engine_log_level = 0xff0;
+static unsigned long long g_cam_engine_log_level = 0xff1;
 
 #if 0
 typedef struct xcore_cam_log_module_info_s {
@@ -136,6 +139,8 @@ xcore_cam_log_module_info_t g_xcore_log_infos[XCORE_LOG_MODULE_MAX] = {
     {"AWBGROUP", XCORE_LOG_LEVEL_ERR, 0xff},      // XCORE_LOG_MODULE_CAMGROUP
     {"GROUPAEC", XCORE_LOG_LEVEL_ERR, 0xff},      // XCORE_LOG_MODULE_GROUPAEC
     {"RKSTREAM", XCORE_LOG_LEVEL_ERR, 0xff},      // XCORE_LOG_MODULE_RKSTREAM
+    {"IPCSERVER", XCORE_LOG_LEVEL_ERR, 0xff},     // XCORE_LOG_MODULE_IPC
+    {"AFD", XCORE_LOG_LEVEL_ERR, 0xff},       // XCORE_LOG_MODULE_AFD
 };
 
 bool xcam_get_enviroment_value(const char* variable, unsigned long long* value)
@@ -155,8 +160,11 @@ bool xcam_get_enviroment_value(const char* variable, unsigned long long* value)
 }
 
 void xcam_get_runtime_log_level() {
+#ifdef ANDROID_OS
+    const char* file_name = "/data/.rkaiq_log";
+#else
     const char* file_name = "/tmp/.rkaiq_log";
-
+#endif
     if (!access(file_name, F_OK)) {
         FILE *fp = fopen(file_name, "r");
         char level[64] = {'\0'};
@@ -187,10 +195,11 @@ void xcam_get_runtime_log_level() {
 int xcam_get_log_level() {
 #ifdef ANDROID_OS
     char property_value[PROPERTY_VALUE_MAX] = {0};
-
-    property_get("persist.vendor.rkisp.log", property_value, "0");
+    char property_value_default[PROPERTY_VALUE_MAX] = {0};
+    sprintf(property_value_default, "%llx", g_cam_engine_log_level);
+    property_get("persist.vendor.rkisp.log", property_value, property_value_default);
     g_cam_engine_log_level = strtoull(property_value, nullptr, 16);
-
+    ALOGI("rkaiq log level %llx\n", g_cam_engine_log_level);
 #else
     xcam_get_enviroment_value("persist_camera_engine_log",
                               &g_cam_engine_log_level);
@@ -220,9 +229,9 @@ char* timeString() {
 }
 
 void xcam_print_log (int module, int sub_modules, int level, const char* format, ...) {
+    if ((g_cam_engine_log_level & 0xf) == 0) return;
     char buffer[XCAM_MAX_STR_SIZE] = {0};
     va_list va_list;
-    if ((g_cam_engine_log_level & 0xf) == 0) return;
     va_start (va_list, format);
     vsnprintf (buffer, XCAM_MAX_STR_SIZE, format, va_list);
     va_end (va_list);
@@ -241,6 +250,9 @@ void xcam_print_log (int module, int sub_modules, int level, const char* format,
 #endif
 #ifdef ANDROID_OS
     switch(level) {
+    case XCORE_LOG_LEVEL_NONE:
+        ALOGI("[%s]:%s", g_xcore_log_infos[module].module_name, buffer);
+        break;
     case XCORE_LOG_LEVEL_ERR:
         ALOGE("[%s]:%s", g_xcore_log_infos[module].module_name, buffer);
         break;

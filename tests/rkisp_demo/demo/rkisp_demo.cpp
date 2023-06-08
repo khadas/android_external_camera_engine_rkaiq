@@ -56,7 +56,7 @@
 #define DEFAULT_CAPTURE_RAW_PATH "/tmp/capture_image"
 #endif
 #define CAPTURE_CNT_FILENAME ".capture_cnt"
-//#define ENABLE_UAPI_TEST
+// #define ENABLE_UAPI_TEST
 #define IQFILE_PATH_MAX_LEN 256
 // #define CUSTOM_AE_DEMO_TEST
 // #define CUSTOM_GROUP_AE_DEMO_TEST
@@ -64,6 +64,30 @@
 // #define TEST_MEMS_SENSOR_INTF
 // #define CUSTOM_AF_DEMO_TEST
 // #define CUSTOM_GROUP_AWB_DEMO_TEST
+#ifdef ISPFEC_API
+#include "IspFec/rk_ispfec_api.h"
+#include <xf86drm.h>
+#include <xf86drmMode.h>
+#include <libdrm/drm_mode.h>
+#include <drm_fourcc.h>
+
+struct drm_buf {
+  int fb_id;
+  uint32_t handle;
+  uint32_t size;
+  uint32_t pitch;
+  char *map;
+  int dmabuf_fd;
+};
+
+static rk_ispfec_ctx_t* g_ispfec_ctx = NULL;
+static rk_ispfec_cfg_t g_ispfec_cfg;
+struct drm_buf g_drm_buf_pic_out;
+struct drm_buf g_drm_buf_xint;
+struct drm_buf g_drm_buf_xfra;
+struct drm_buf g_drm_buf_yint;
+struct drm_buf g_drm_buf_yfra;
+#endif
 
 struct buffer {
     void *start;
@@ -84,6 +108,150 @@ static int silent;
 static demo_context_t *g_main_ctx = NULL,  *g_second_ctx = NULL, *g_third_ctx = NULL, *g_fourth_ctx = NULL;
 static bool _if_quit = false;
 
+#ifdef ISPFEC_API
+int alloc_drm_buffer(int fd, int width, int height,
+		int bpp, struct drm_buf *buf)
+{
+	struct drm_mode_create_dumb alloc_arg;
+	struct drm_mode_map_dumb mmap_arg;
+	struct drm_mode_destroy_dumb destory_arg;
+	void *map;
+	int ret;
+
+	memset(&alloc_arg, 0, sizeof(alloc_arg));
+	alloc_arg.bpp = bpp;
+	alloc_arg.width = width;
+	alloc_arg.height = height;
+
+	ret = drmIoctl(fd, DRM_IOCTL_MODE_CREATE_DUMB, &alloc_arg);
+	if (ret) {
+		printf("failed to create dumb buffer\n");
+		return ret;
+	}
+
+	memset(&mmap_arg, 0, sizeof(mmap_arg));
+	mmap_arg.handle = alloc_arg.handle;
+	ret = drmIoctl(fd, DRM_IOCTL_MODE_MAP_DUMB, &mmap_arg);
+	if (ret) {
+		printf("failed to create map dumb\n");
+		ret = -EINVAL;
+		goto destory_dumb;
+	}
+	map = mmap(0, alloc_arg.size,
+		PROT_READ | PROT_WRITE, MAP_SHARED,
+		fd, mmap_arg.offset);
+	if (map == MAP_FAILED) {
+		printf("failed to mmap buffer\n");
+		ret = -EINVAL;
+		goto destory_dumb;
+	}
+	ret = drmPrimeHandleToFD(fd, alloc_arg.handle, 0,
+			&buf->dmabuf_fd);
+	if (ret) {
+		printf("failed to get dmabuf fd\n");
+		munmap(map, alloc_arg.size);
+		ret = -EINVAL;
+		goto destory_dumb;
+	}
+	buf->size = alloc_arg.size;
+	buf->map = (char*)map;
+
+destory_dumb:
+	memset(&destory_arg, 0, sizeof(destory_arg));
+	destory_arg.handle = alloc_arg.handle;
+	drmIoctl(fd, DRM_IOCTL_MODE_DESTROY_DUMB, &destory_arg);
+	return ret;
+}
+
+int free_drm_buffer(int fd, struct drm_buf *buf)
+{
+	if (buf) {
+		close(buf->dmabuf_fd);
+		return munmap(buf->map, buf->size);
+	}
+	return -EINVAL;
+}
+
+int init_ispfec_bufs(rk_ispfec_cfg_t* cfg)
+{
+    int ret = 0;
+	int drm_fd = drmOpen("rockchip", NULL);
+	if (drm_fd < 0) {
+		printf("failed to open rockchip drm\n");
+        return -1;
+	}
+
+    int mesh_size = rk_ispfec_api_calFecMeshsize(cfg->in_width, cfg->in_height);
+
+	printf("\nmesh_size:%d\n", mesh_size);
+	ret = alloc_drm_buffer(drm_fd, mesh_size * 2, 1, 8, &g_drm_buf_xint);
+	if (ret)
+		goto close_drm_fd;
+	printf("xint fd:%d size:%d\n", g_drm_buf_xint.dmabuf_fd, g_drm_buf_xint.size);
+
+	ret = alloc_drm_buffer(drm_fd, mesh_size, 1, 8, &g_drm_buf_xfra);
+	if (ret)
+		goto free_drm_buf_xint;
+	printf("xfra fd:%d size:%d\n", g_drm_buf_xfra.dmabuf_fd, g_drm_buf_xfra.size);
+
+	ret = alloc_drm_buffer(drm_fd, mesh_size * 2, 1, 8, &g_drm_buf_yint);
+	if (ret)
+		goto free_drm_buf_xfra;
+	printf("yint fd:%d size:%d\n", g_drm_buf_yint.dmabuf_fd, g_drm_buf_yint.size);
+
+	ret = alloc_drm_buffer(drm_fd, mesh_size, 1, 8, &g_drm_buf_yfra);
+	if (ret)
+		goto free_drm_buf_yint;
+	printf("yfra fd:%d size:%d\n", g_drm_buf_yfra.dmabuf_fd, g_drm_buf_yfra.size);
+
+	ret = alloc_drm_buffer(drm_fd, cfg->out_width, cfg->out_height * 3 / 2, 8, &g_drm_buf_pic_out);
+	if (ret)
+		goto free_drm_buf_yfra;
+	printf("out pic fd:%d size:%d\n", g_drm_buf_pic_out.dmabuf_fd, g_drm_buf_pic_out.size);
+
+    cfg->mesh_xint.dmaFd = g_drm_buf_xint.dmabuf_fd;
+    cfg->mesh_xint.size = g_drm_buf_xint.size;
+    cfg->mesh_xint.vir_addr = g_drm_buf_xint.map;
+
+    cfg->mesh_xfra.dmaFd = g_drm_buf_xfra.dmabuf_fd;
+    cfg->mesh_xfra.size = g_drm_buf_xfra.size;
+    cfg->mesh_xfra.vir_addr = g_drm_buf_xfra.map;
+
+    cfg->mesh_yint.dmaFd = g_drm_buf_yint.dmabuf_fd;
+    cfg->mesh_yint.size = g_drm_buf_yint.size;
+    cfg->mesh_yint.vir_addr = g_drm_buf_yint.map;
+
+    cfg->mesh_yfra.dmaFd = g_drm_buf_yfra.dmabuf_fd;
+    cfg->mesh_yfra.size = g_drm_buf_yfra.size;
+    cfg->mesh_yfra.vir_addr = g_drm_buf_yfra.map;
+
+    goto close_drm_fd;
+
+free_drm_buf_pic_out:
+	free_drm_buffer(drm_fd, &g_drm_buf_pic_out);
+free_drm_buf_yfra:
+	free_drm_buffer(drm_fd, &g_drm_buf_yfra);
+free_drm_buf_yint:
+	free_drm_buffer(drm_fd, &g_drm_buf_yfra);
+free_drm_buf_xfra:
+	free_drm_buffer(drm_fd, &g_drm_buf_xfra);
+free_drm_buf_xint:
+	free_drm_buffer(drm_fd, &g_drm_buf_xint);
+close_drm_fd:
+	close(drm_fd);
+
+    return ret;
+}
+
+void deinit_ispfec_bufs()
+{
+	free_drm_buffer(-1, &g_drm_buf_pic_out);
+	free_drm_buffer(-1, &g_drm_buf_yfra);
+	free_drm_buffer(-1, &g_drm_buf_yfra);
+	free_drm_buffer(-1, &g_drm_buf_xfra);
+	free_drm_buffer(-1, &g_drm_buf_xint);
+}
+#endif
 
 //restore terminal settings
 void restore_terminal_settings(void)
@@ -138,7 +306,7 @@ void test_update_iqfile(const demo_context_t* demo_ctx)
     printf("\nspecial an new iqfile:\n");
     strcat(iqfile, demo_ctx->iqpath);
     strcat(iqfile, "/");
-    char* ret = fgets(iqfile + strlen(iqfile), IQFILE_PATH_MAX_LEN, stdin);
+    fgets(iqfile + strlen(iqfile), IQFILE_PATH_MAX_LEN, stdin);
 
     char* json = strstr(iqfile, "json");
 
@@ -972,7 +1140,6 @@ static void process_image(const void *p, int sequence, int size, demo_context_t 
         fclose(ctx->fp);
         ctx->fp = NULL;
     } else if (ctx->writeFileSync) {
-        int ret = 0;
         if (!ctx->is_capture_yuv) {
             char file_name[32] = {0};
             int rawFrameId = 0;
@@ -1038,6 +1205,19 @@ static int read_frame(demo_context_t *ctx)
         bytesused = buf.bytesused;
 
 #if ISPDEMO_ENABLE_DRM
+#ifdef ISPFEC_API
+    int buf_fd = -1;
+    void* buf_addr = NULL;
+
+    buf_fd = ctx->buffers[i].export_fd;
+    buf_addr = ctx->buffers[i].start;
+
+    int dstFd = g_drm_buf_pic_out.dmabuf_fd;
+    buf_fd = dstFd;
+    buf_addr = g_drm_buf_pic_out.map;
+    rk_ispfec_api_process(g_ispfec_ctx, ctx->buffers[i].export_fd, dstFd);
+#endif
+
     if (ctx->vop) {
         int dispWidth, dispHeight;
 
@@ -1053,20 +1233,34 @@ static int read_frame(demo_context_t *ctx)
 
 #if ISPDEMO_ENABLE_RGA
         if (strlen(ctx->dev_name) && strlen(ctx->dev_name2)) {
-            if (ctx->dev_using == 1)
+            if (ctx->dev_using == 1) {
+#ifdef ISPFEC_API
+                display_win1(buf_addr, buf_fd,  RK_FORMAT_YCbCr_420_SP, dispWidth, dispHeight, 0);
+#else
                 display_win1(ctx->buffers[i].start, ctx->buffers[i].export_fd,  RK_FORMAT_YCbCr_420_SP, dispWidth, dispHeight, 0);
-            else
+#endif
+            } else {
+#ifdef ISPFEC_API
+                display_win2(buf_addr, buf_fd,  RK_FORMAT_YCbCr_420_SP, dispWidth, dispHeight, 0);
+#else
                 display_win2(ctx->buffers[i].start, ctx->buffers[i].export_fd,  RK_FORMAT_YCbCr_420_SP, dispWidth, dispHeight, 0);
+#endif
+            }
         } else {
 #else
         {
 #endif
-            drmDspFrame(ctx->width, ctx->height, dispWidth, dispHeight, ctx->buffers[i].export_fd, DRM_FORMAT_NV12);
+            drmDspFrame(ctx->width, ctx->height, dispWidth, dispHeight, ctx->buffers[i].export_fd,
+                       ctx->buffers[i].start, DRM_FORMAT_NV12);
         }
     }
 #endif
 
+#ifdef ISPFEC_API
+    process_image(buf_addr,  buf.sequence, bytesused, ctx);
+#else
     process_image(ctx->buffers[i].start,  buf.sequence, bytesused, ctx);
+#endif
 
     if (-1 == xioctl(ctx->fd, VIDIOC_QBUF, &buf))
         errno_exit(ctx, "VIDIOC_QBUF");
@@ -1370,7 +1564,7 @@ static void init_mmap(int pp_onframe, demo_context_t *ctx)
         if (xioctl(fd_tmp, VIDIOC_EXPBUF, &expbuf) < 0) {
             errno_exit(ctx, "get dma buf failed\n");
         } else {
-            DBG("%s: get dma buf(%d)-fd: %d\n", get_sensor_name(ctx), ctx->n_buffers, expbuf.fd);
+            DBG("%s: get dma buf(%u)-fd: %d\n", get_sensor_name(ctx), ctx->n_buffers, expbuf.fd);
         }
         tmp_buffers[ctx->n_buffers].export_fd = expbuf.fd;
     }
@@ -1643,11 +1837,11 @@ static void parse_args(int argc, char **argv, demo_context_t *ctx)
         {
             // parse raw fmt
             char* raw_dir = strstr(optarg, ",");
-            size_t raw_dir_str_len = raw_dir - optarg;
             if (!raw_dir) {
                 printf("orp dir error ! \n");
                 exit(-1);
             }
+            size_t raw_dir_str_len = raw_dir - optarg;
             strncpy(ctx->orppath, optarg, raw_dir_str_len);
 
             char* raw_fmt_w_start = raw_dir + 1;
@@ -1723,8 +1917,8 @@ static void parse_args(int argc, char **argv, demo_context_t *ctx)
 
 static void deinit(demo_context_t *ctx)
 {
-    if (!ctx->camgroup_ctx)
-        stop_capturing(ctx);
+    //if (!ctx->camgroup_ctx)
+     stop_capturing(ctx);
 
     if (ctx->pponeframe)
         stop_capturing_pp_oneframe(ctx);
@@ -1765,6 +1959,11 @@ static void deinit(demo_context_t *ctx)
             printf("%s:-------- deinit aiq camgroup end -------------\n", get_sensor_name(ctx));
         }
     }
+
+#ifdef ISPFEC_API
+    rk_ispfec_api_deinit(g_ispfec_ctx);
+    g_ispfec_ctx = NULL;
+#endif
 
     uninit_device(ctx);
     if (ctx->pponeframe)
@@ -1929,7 +2128,7 @@ static void print_af_stats(rk_aiq_isp_stats_t *stats_ref)
         return;
 
     sof_time = stats_ref->af_stats.sof_tim / 1000000LL;
-    printf("sof_tim %ld, sharpness roia: 0x%llx-0x%08x roib: 0x%x-0x%08x\n",
+    printf("sof_tim %lu, sharpness roia: 0x%llx-0x%08x roib: 0x%x-0x%08x\n",
            sof_time,
            stats_ref->af_stats.roia_sharpness,
            stats_ref->af_stats.roia_luminance,
@@ -2007,6 +2206,78 @@ static void* stats_thread(void* args) {
 
 void release_buffer(void *addr) {
     printf("release buffer called: addr=%p\n", addr);
+}
+
+static void test_tuning_api(demo_context_t *ctx)
+{
+    /*   Sample code of API rk_aiq_uapi2_sysctl_tuning
+     * This API replaces current iq params through JsonPatch.
+     * 1. Must be called after Api rk_aiq_uapi2_sysctl_init, prefer to be
+     * called before rk_aiq_uapi2_sysctl_prepare
+     * 2. Notice that this API only replaces the current iq params in use, and
+     * the iq file would not be modified.
+     *    Supported path including:
+     * path：/sensor_calib
+     *       /module_calib
+     *       And submodules in node 'scene_isp30' , such as
+     *       /wb_v21  notice that not /main_scene/0/sbu_scene/0/wb_v21, cause
+     *                there is no scene contex for in-use iq params.
+     * 'path' could refer to iq json file
+     * 3.
+     *  3.1 Prefer to replace the all params of same iq node in one JsonPatch
+     *  3.2 prefer to replace the params of diffrent iq node in separate JsonPatch
+     * 4. JsonPatch string format:
+     *    [// '[' start syntax
+     *      {  // each 'op' embraced by '{}'
+              "op": "replace", // Fixed syntax
+              "path":          // node path in Json iq file
+              "value":         // Note: All chidren's valuse should be specified for the 'path', otherwise those unspecified ones
+                               //       may be uninitialzed.
+     *      }, { //  ',' for next 'op'
+
+     *      } // Note: no ',' for last 'op'
+     *    ]// ']' end syntax
+     */
+    // example 1: replace sensor info
+    // 1. Show how to repalce the non-leaf node "sensor_calib/resolution"
+    //    values should be embraced by '{}' for non-leaf node, and all children should be set.
+    // 2. Show how to replace the values for multiple sub nodes of same parent in one JsonPatch
+    std::string json_sensor_str = " \n\
+        [{ \n\
+            \"op\":\"replace\", \n\
+            \"path\": \"/sensor_calib/resolution\", \n\
+            \"value\": \n\
+            { \"width\": 2222, \"height\": 2160} \n\
+        }, { \n\
+            \"op\":\"replace\", \n\
+            \"path\": \"/sensor_calib/CISFlip\", \n\
+            \"value\": 6\n\
+        }]";
+
+    printf("%s\n", json_sensor_str.c_str());
+    rk_aiq_uapi2_sysctl_tuning(ctx->aiq_ctx, const_cast<char*>(json_sensor_str.c_str()));
+
+    // example 2: replace awb info
+    // 1. Show how to replace the values for type array
+    //    value shoulde be embraced by '[]' for type array, and the target
+    //    length of the array should be unchanged.
+    // 2. Show how to replace the value for one array item
+    //    the path for array item is: array name/array index/
+    std::string json_awb_str = " \n\
+        [{ \n\
+            \"op\":\"replace\", \n\
+            \"path\": \"/wb_v21/autoExtPara/wbGainClip/cct\", \n\
+            \"value\": \n\
+            [100,200,300,40,50,60] \n\
+        },{ \n\
+            \"op\":\"replace\", \n\
+            \"path\": \"/wb_v21/autoPara/lightSources/0/name\", \n\
+            \"value\": \"aaaaaaaaa\" \n\
+        }]";
+    printf("%s\n", json_awb_str.c_str());
+    rk_aiq_uapi2_sysctl_tuning(ctx->aiq_ctx, const_cast<char*>(json_awb_str.c_str()));
+
+    printf("%s done ..\n", __func__);
 }
 
 static void rkisp_routine(demo_context_t *ctx)
@@ -2226,6 +2497,9 @@ static void rkisp_routine(demo_context_t *ctx)
             rk_aiq_uapi2_sysctl_regMemsSensorIntf(ctx->aiq_ctx, &g_rkiio_aiq_api);
 #endif
 
+#if 0
+            test_tuning_api(ctx);
+#endif
             XCamReturn ret = rk_aiq_uapi2_sysctl_prepare(ctx->aiq_ctx, ctx->width, ctx->height, work_mode);
 
             if (ret != XCAM_RETURN_NO_ERROR)
@@ -2476,6 +2750,36 @@ int main(int argc, char **argv)
     custom_af_run(main_ctx.aiq_ctx);
 #endif
 
+#ifdef ISPFEC_API
+    g_ispfec_cfg.in_width     = main_ctx.width;
+    g_ispfec_cfg.in_height    = main_ctx.height;
+    g_ispfec_cfg.out_width     = main_ctx.width;
+    g_ispfec_cfg.out_height    = main_ctx.height;
+    g_ispfec_cfg.in_fourcc = 0;
+    g_ispfec_cfg.out_fourcc = 0;
+#if 1
+    g_ispfec_cfg.mesh_upd_mode = RK_ISPFEC_UPDATE_MESH_FROM_FILE;
+    strcpy(g_ispfec_cfg.u.mesh_file_path, "/etc/iqfiles/FEC_mesh_3840_2160_imx415_3.6mm/");
+    strcpy(g_ispfec_cfg.mesh_xint.mesh_file, "meshxi_level0.bin");
+    strcpy(g_ispfec_cfg.mesh_xfra.mesh_file, "meshxf_level0.bin");
+    strcpy(g_ispfec_cfg.mesh_yint.mesh_file, "meshyi_level0.bin");
+    strcpy(g_ispfec_cfg.mesh_yfra.mesh_file, "meshyf_level0.bin");
+#else
+    g_ispfec_cfg.mesh_upd_mode = RK_ISPFEC_UPDATE_MESH_ONLINE;
+    g_ispfec_cfg.u.mesh_online.light_center[0] = 1956.3909119999998438;
+    g_ispfec_cfg.u.mesh_online.light_center[1] = 1140.6355200000000422;
+    g_ispfec_cfg.u.mesh_online.coeff[0] = -2819.4072493821618081;
+    g_ispfec_cfg.u.mesh_online.coeff[1] = 0.0000316126581792;
+    g_ispfec_cfg.u.mesh_online.coeff[2] = 0.0000000688410142;
+    g_ispfec_cfg.u.mesh_online.coeff[3] = -0.0000000000130686;
+    g_ispfec_cfg.u.mesh_online.correct_level = 250;
+    g_ispfec_cfg.u.mesh_online.direction = RK_ISPFEC_CORRECT_DIRECTION_XY;
+    g_ispfec_cfg.u.mesh_online.style = RK_ISPFEC_KEEP_ASPECT_RATIO_REDUCE_FOV;
+#endif
+    init_ispfec_bufs(&g_ispfec_cfg);
+    g_ispfec_ctx = rk_ispfec_api_init(&g_ispfec_cfg);
+#endif
+
     pthread_sigmask(SIG_UNBLOCK, &mask, NULL);
 
     mainloop(&main_ctx);
@@ -2489,9 +2793,11 @@ int main(int argc, char **argv)
     deinit(&main_ctx);
 
 #if ISPDEMO_ENABLE_DRM
+#if ISPDEMO_ENABLE_RGA
     if (strlen(main_ctx.dev_name) && strlen(main_ctx.dev_name2)) {
         display_exit();
     }
+#endif
     deInitDrmDsp();
 #endif
     return 0;

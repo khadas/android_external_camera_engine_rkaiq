@@ -693,10 +693,46 @@
  * - FakeSensorHw: change the id if the enqueue frame id isn't contiguous
  * - rkvi_demo: fix build error in buildroot
  * - rkisp_demo: fix build error in buildroot
+ *
+ * v5.0x1.2-rc4
+ * - afd: add afd algo
+ * - awb: modify apis
+ *
+ * v5.0x1.2-rc5
+ * - optimize cpu usage
+ * - modify blc and sharp api attribs
+ * 
+ * v5.0x1.3
+ * - optimize cpu usage extreamly 
+ * - kernel depandency: MUST contain this patch:
+ *   https://10.10.10.29/c/rk/kernel/+/191593
+ *   media: rockchip: isp: distinguish buf done or subscribed event for param
+ *   poll
+ *
+ *   Change-Id: I9b366a9f47ce24783651c93512125dca7c49917f
+ * 
+ * v5.0x1.3-rc1
+ * - multi isp: isp32 support 4k
+ * - ldch: support multi isp mode
+ * - output ERROR and KEY logs as default
+ * - fix lots of CppCheck errors
+ * - kernel depandency: isp32 use 4k need this patch:
+ *   https://10.10.10.29/c/rk/kernel/+/184947
+ *   media: rockchip: isp: support unite mode for isp32
+ * 
+ *   Change-Id: Iae10911ee0f199210c7913d3e99dd85ec4642f81
+ * 
+ * v5.0x1.3-rc2
+ * - optimize ae stats usage 
+ * - ccm/lsc/dehaze: fix interpolation bugs 
+ * - support 2 cam's online tuning for Android
+ * - add default manual settings for algo's API getAtrrib
+ * - fix tool online tuning bug that params in page sysctl may be overwitten by
+ *   main page.
  */
 
-#define RK_AIQ_VERSION_REAL_V "v5.0x1.2-rc3"
-#define RK_AIQ_RELEASE_DATE "2023-03-07"
+#define RK_AIQ_VERSION_REAL_V "v5.0x1.3-rc2"
+#define RK_AIQ_RELEASE_DATE "2023-09-1"
 
 /******* DO NOT EDIT THE FOLLOWINGS ***********/
 

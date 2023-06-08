@@ -62,6 +62,8 @@ int8_t pixFmt2Bpp(uint32_t pixFmt)
 
 MediaInfo::MediaInfo (){
     LOGD_RKSTREAM ("MediaInfo constructed.");
+    mIsMultiIspMode = false;
+    mMultiIspExtendedPixel = 0;
 }
 
 MediaInfo::~MediaInfo(){
@@ -111,7 +113,6 @@ out:
 static XCamReturn get_sensor_caps(rk_sensor_full_info_t *sensor_info) {
     struct v4l2_subdev_frame_size_enum fsize_enum;
     struct v4l2_subdev_mbus_code_enum  code_enum;
-    std::vector<uint32_t> formats;
     rk_frame_fmt_t frameSize;
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
 
@@ -213,7 +214,6 @@ parse_module_info(rk_sensor_full_info_t *sensor_info)
     return XCAM_RETURN_NO_ERROR;
 }
 
-#if defined(ISP_HW_V20)
 static rk_aiq_ispp_t*
 get_ispp_subdevs(struct media_device *device, const char *devpath, rk_aiq_ispp_t* ispp_info)
 {
@@ -305,6 +305,7 @@ get_ispp_subdevs(struct media_device *device, const char *devpath, rk_aiq_ispp_t
             strncpy(ispp_info[index].pp_scale2_path, entity_name, sizeof(ispp_info[index].pp_scale2_path)-1);
         }
     }
+    /*
     entity = media_get_entity_by_name(device, "rkispp_tnr_params", strlen("rkispp_tnr_params"));
     if(entity) {
         entity_name = media_entity_get_devname (entity);
@@ -333,6 +334,7 @@ get_ispp_subdevs(struct media_device *device, const char *devpath, rk_aiq_ispp_t
             strncpy(ispp_info[index].pp_nr_stats_path, entity_name, sizeof(ispp_info[index].pp_nr_stats_path)-1);
         }
     }
+    */
     entity = media_get_entity_by_name(device, "rkispp_fec_params", strlen("rkispp_fec_params"));
     if(entity) {
         entity_name = media_entity_get_devname (entity);
@@ -354,7 +356,6 @@ get_ispp_subdevs(struct media_device *device, const char *devpath, rk_aiq_ispp_t
 
     return &ispp_info[index];
 }
-#endif
 
 static rk_aiq_isp_t*
 get_isp_subdevs(struct media_device *device, const char *devpath, rk_aiq_isp_t* isp_info)
@@ -960,11 +961,9 @@ MediaInfo::initCamHwInfos()
                 strcmp(device->info.model, "rkispp2") == 0 ||
                 strcmp(device->info.model, "rkispp3") == 0 ||
                 strcmp(device->info.model, "rkispp") == 0) {
-#if defined(ISP_HW_V20)
             rk_aiq_ispp_t* ispp_info = get_ispp_subdevs(device, sys_path, mIspHwInfos.ispp_info);
             if (ispp_info)
                 ispp_info->valid = true;
-#endif
             goto media_unref;
         } else if (strcmp(device->info.model, "rkisp0") == 0 ||
                    strcmp(device->info.model, "rkisp1") == 0 ||
