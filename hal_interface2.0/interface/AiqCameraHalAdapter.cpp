@@ -481,7 +481,7 @@ AiqCameraHalAdapter::updateAeMetaParams(XCamAeParam *aeParams, int reqId){
     uint16_t w_sum = (w_x_end - w_x + 1) * (w_y_end - w_y + 1);
 
     // stExpSwAttr.metering_mode =  aeParams->metering_mode
-    if (aeParams->window.x_end - aeParams->window.x_start > 0) {
+    if ((aeParams->window.x_end - aeParams->window.x_start > 0) && (w_sum < 225)) {
         LOGD(
             "@%s: Update AE ROI weight = %d WinIndex: x:%d, y:%d, x end:%d, y "
             "end:%d,win_sum:%d\n",
