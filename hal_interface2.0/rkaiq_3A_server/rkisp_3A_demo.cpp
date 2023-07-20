@@ -1033,10 +1033,10 @@ static void *engine_thread(void *arg)
         prepare_engine(media_info);
         DBG("%s: prepare engine success...\n", media_info->mdev_path);
 
+        start_engine(media_info);
         DBG("%s: wait stream start event...\n", media_info->mdev_path);
         wait_stream_event(isp_fd, CIFISP_V4L2_EVENT_STREAM_START, -1);
         DBG("%s: wait stream start event success ...\n", media_info->mdev_path);
-        start_engine(media_info);
 
         DBG("%s: wait stream stop event...\n", media_info->mdev_path);
 

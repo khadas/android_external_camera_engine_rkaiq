@@ -527,11 +527,12 @@ int main(int argc, char **argv)
         init_engine();
 
         {
+            start_engine();
             DBG("wait stream start event...\n");
             wait_stream_event(isp_fd, CIFISP_V4L2_EVENT_STREAM_START, -1);
             DBG("wait stream start event success ...\n");
 
-            start_engine();
+            // start_engine();
 
             DBG("wait stream stop event...\n");
             wait_stream_event(isp_fd, CIFISP_V4L2_EVENT_STREAM_STOP, -1);
