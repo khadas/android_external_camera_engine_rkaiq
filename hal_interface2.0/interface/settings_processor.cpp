@@ -161,6 +161,12 @@ SettingsProcessor::fillAeInputParams(const CameraMetadata *settings,
     if (entry.count == 1) {
         aeCtrl->aeLock = entry.data.u8[0];
     }
+    entry = settings->find(ANDROID_CONTROL_CAPTURE_INTENT);
+    uint8_t reqTemplate;
+    if (entry.count == 1) {
+        reqTemplate = entry.data.u8[0];
+        LOGD("%s:%d reqTemplate(%d)!\n ", __FUNCTION__, __LINE__, reqTemplate);
+    }
 
     uint8_t controlMode = ANDROID_CONTROL_MODE_AUTO;
     uint8_t aeMode = ANDROID_CONTROL_AE_MODE_ON;
@@ -363,6 +369,13 @@ SettingsProcessor::fillAeInputParams(const CameraMetadata *settings,
         entry = settings->find(ANDROID_CONTROL_AE_PRECAPTURE_TRIGGER);
         if (entry.count == 1) {
             aeCtrl->aePreCaptureTrigger = entry.data.u8[0];
+            /* no need PreCaptureTrigger for flash off & video snapshot*/
+            if ((aeCtrl->aePreCaptureTrigger == ANDROID_CONTROL_AE_PRECAPTURE_TRIGGER_START) &&
+                ((aeParams->flash_mode == 0) ||
+                (reqTemplate == ANDROID_CONTROL_CAPTURE_INTENT_VIDEO_SNAPSHOT))) {
+                aeCtrl->aePreCaptureTrigger = ANDROID_CONTROL_AE_PRECAPTURE_TRIGGER_IDLE;
+                LOGD("@%s: no need preCaptureTrigger for flash off or snapshot.", __FUNCTION__, __LINE__);
+            }
         }
     }
     return XCAM_RETURN_NO_ERROR;
