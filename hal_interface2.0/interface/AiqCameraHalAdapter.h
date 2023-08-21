@@ -226,6 +226,9 @@ public:
     void updateMetaParams(SmartPtr<AiqInputParams> inputParams);
     void updateAeMetaParams(XCamAeParam *aeParams, int reqId);
     void updateAfMetaParams(XCamAfParam *afParams, int reqId);
+    void updateAwbV21MetaParams(XCamAwbParam *awbParams, int reqId);
+    void updateAwbV30MetaParams(XCamAwbParam *awbParams, int reqId);
+    void updateAwbV32MetaParams(XCamAwbParam *awbParams, int reqId);
     void updateAwbMetaParams(XCamAwbParam *awbParams, int reqId);
     void updateOtherMetaParams();
 

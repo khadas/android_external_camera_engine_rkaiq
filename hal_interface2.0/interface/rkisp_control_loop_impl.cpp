@@ -41,6 +41,7 @@
 
 //test
 #include "rk_aiq_user_api_imgproc.h"
+#include "rk_aiq_user_api2_imgproc.h"
 
 #include "rkaiq.h"
 #include "rk_aiq_api_private.h"
@@ -354,7 +355,7 @@ int rkisp_cl_rkaiq_init(void** cl_ctx, const char* tuning_file_path,
         }
         return XCAM_RETURN_NO_ERROR;
     };
-    aiq_ctx = rk_aiq_uapi_sysctl_init(sns_entity_name, RK_3A_TUNING_FILE_PATH, NULL,sMetas_cb);
+    aiq_ctx = rk_aiq_uapi2_sysctl_init(sns_entity_name, RK_3A_TUNING_FILE_PATH, NULL,sMetas_cb);
     RkCamera3VendorTags::get_vendor_tag_ops(&rkcamera_vendor_tag_ops_instance);
     set_camera_metadata_vendor_ops(&rkcamera_vendor_tag_ops_instance);
 
@@ -392,7 +393,7 @@ int rkisp_cl_prepare(void* cl_ctx,
         work_mode = RK_AIQ_WORKING_MODE_NORMAL;
     }
     rk_aiq_static_info_t s_info;
-    rk_aiq_uapi_sysctl_getStaticMetas(aiq_ctx->_sensor_entity_name, &s_info);
+    rk_aiq_uapi2_sysctl_getStaticMetas(aiq_ctx->_sensor_entity_name, &s_info);
     // check if hdr mode is supported
     if (work_mode != 0) {
         bool b_work_mode_supported = false;
@@ -418,7 +419,7 @@ int rkisp_cl_prepare(void* cl_ctx,
         }
     }
 
-    ret = rk_aiq_uapi_sysctl_prepare(aiq_ctx, prepare_params->width, prepare_params->height, work_mode);
+    ret = rk_aiq_uapi2_sysctl_prepare(aiq_ctx, prepare_params->width, prepare_params->height, work_mode);
     gAiqCameraHalAdapter->set_static_metadata (prepare_params->staticMeta);
     gAiqCameraHalAdapter->set_working_mode(work_mode);
 
@@ -436,7 +437,7 @@ int rkisp_cl_start(void* cl_ctx) {
     AiqCameraHalAdapter * gAiqCameraHalAdapter = AIQ_CONTEXT_CAST (cl_ctx);
     rk_aiq_sys_ctx_t *aiq_ctx = gAiqCameraHalAdapter->get_aiq_ctx();
     gAiqCameraHalAdapter->start();
-    ret = rk_aiq_uapi_sysctl_start(aiq_ctx);
+    ret = rk_aiq_uapi2_sysctl_start(aiq_ctx);
 
     ALOGD("--------------------------rkisp_cl_start done");
     return ret;
@@ -468,7 +469,7 @@ int rkisp_cl_stop(void* cl_ctx) {
 
     gAiqCameraHalAdapter->stop();
 
-    ret = rk_aiq_uapi_sysctl_stop(aiq_ctx, false);
+    ret = rk_aiq_uapi2_sysctl_stop(aiq_ctx, false);
 
     ALOGD("--------------------------rkisp_cl_stop done");
     return 0;
@@ -480,7 +481,7 @@ void rkisp_cl_deinit(void* cl_ctx) {
     AiqCameraHalAdapter * gAiqCameraHalAdapter = AIQ_CONTEXT_CAST (cl_ctx);
     gAiqCameraHalAdapter->deInit();
     rk_aiq_sys_ctx_t *aiq_ctx = gAiqCameraHalAdapter->get_aiq_ctx();
-    rk_aiq_uapi_sysctl_deinit(aiq_ctx);
+    rk_aiq_uapi2_sysctl_deinit(aiq_ctx);
     ALOGD("--------------------------rkisp_cl_deinit done");
     if (gAiqCameraHalAdapter){
         delete gAiqCameraHalAdapter;
@@ -490,38 +491,38 @@ void rkisp_cl_deinit(void* cl_ctx) {
 int rkisp_cl_setBrightness(const void* cl_ctx, unsigned int level) {
     AiqCameraHalAdapter * gAiqCameraHalAdapter = AIQ_CONTEXT_CAST (cl_ctx);
     rk_aiq_sys_ctx_t *aiq_ctx = gAiqCameraHalAdapter->get_aiq_ctx();
-    return (int) rk_aiq_uapi_setBrightness(aiq_ctx, level);
+    return (int) rk_aiq_uapi2_setBrightness(aiq_ctx, level);
 }
 int rkisp_cl_getBrightness(const void* cl_ctx, unsigned int*level) {
     AiqCameraHalAdapter * gAiqCameraHalAdapter = AIQ_CONTEXT_CAST (cl_ctx);
     rk_aiq_sys_ctx_t *aiq_ctx = gAiqCameraHalAdapter->get_aiq_ctx();
-    return (int) rk_aiq_uapi_getBrightness(aiq_ctx, level);
+    return (int) rk_aiq_uapi2_getBrightness(aiq_ctx, level);
 }
 
 int rkisp_cl_setContrast(const void* cl_ctx, unsigned int level) {
     AiqCameraHalAdapter * gAiqCameraHalAdapter = AIQ_CONTEXT_CAST (cl_ctx);
     rk_aiq_sys_ctx_t *aiq_ctx = gAiqCameraHalAdapter->get_aiq_ctx();
-    return (int) rk_aiq_uapi_setContrast(aiq_ctx, level);
+    return (int) rk_aiq_uapi2_setContrast(aiq_ctx, level);
 }
 int rkisp_cl_getContrast(const void* cl_ctx, unsigned int *level) {
     AiqCameraHalAdapter * gAiqCameraHalAdapter = AIQ_CONTEXT_CAST (cl_ctx);
     rk_aiq_sys_ctx_t *aiq_ctx = gAiqCameraHalAdapter->get_aiq_ctx();
-    return (int) rk_aiq_uapi_getContrast(aiq_ctx, level);
+    return (int) rk_aiq_uapi2_getContrast(aiq_ctx, level);
 }
 
 int rkisp_cl_setSaturation(const void* cl_ctx, unsigned int level) {
     AiqCameraHalAdapter * gAiqCameraHalAdapter = AIQ_CONTEXT_CAST (cl_ctx);
     rk_aiq_sys_ctx_t *aiq_ctx = gAiqCameraHalAdapter->get_aiq_ctx();
-    return (int) rk_aiq_uapi_setSaturation(aiq_ctx, level);
+    return (int) rk_aiq_uapi2_setSaturation(aiq_ctx, level);
 }
 int rkisp_cl_getSaturation(const void* cl_ctx, unsigned int *level) {
     AiqCameraHalAdapter * gAiqCameraHalAdapter = AIQ_CONTEXT_CAST (cl_ctx);
     rk_aiq_sys_ctx_t *aiq_ctx = gAiqCameraHalAdapter->get_aiq_ctx();
-    return (int) rk_aiq_uapi_getSaturation(aiq_ctx, level);
+    return (int) rk_aiq_uapi2_getSaturation(aiq_ctx, level);
 }
 
 void setMulCamConc(const void* cl_ctx, bool cc) {
     AiqCameraHalAdapter * gAiqCameraHalAdapter = AIQ_CONTEXT_CAST (cl_ctx);
     rk_aiq_sys_ctx_t *aiq_ctx = gAiqCameraHalAdapter->get_aiq_ctx();
-    rk_aiq_uapi_sysctl_setMulCamConc(aiq_ctx, true);
+    rk_aiq_uapi2_sysctl_setMulCamConc(aiq_ctx, true);
 }
