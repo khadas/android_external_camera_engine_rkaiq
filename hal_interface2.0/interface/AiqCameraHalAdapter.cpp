@@ -94,7 +94,9 @@ AiqCameraHalAdapter::AiqCameraHalAdapter()
     }
     mMessageThread->run();
 #endif
-
+    memset(&mLastAeParam, 0, sizeof(XCamAeParam));
+    memset(&mLastAwbParam, 0, sizeof(XCamAwbParam));
+    memset(&mLastAfParam, 0, sizeof(XCamAfParam));
 }
 
 AiqCameraHalAdapter::~AiqCameraHalAdapter()
@@ -154,6 +156,9 @@ AiqCameraHalAdapter::stop(){
     pthread_mutex_lock(&_aiq_ctx_mutex);
     _state = AIQ_ADAPTER_STATE_STOPED;
     pthread_mutex_unlock(&_aiq_ctx_mutex);
+    memset(&mLastAeParam, 0, sizeof(XCamAeParam));
+    memset(&mLastAwbParam, 0, sizeof(XCamAwbParam));
+    memset(&mLastAfParam, 0, sizeof(XCamAfParam));
 }
 
 void
@@ -361,12 +366,18 @@ AiqCameraHalAdapter::updateMetaParams(SmartPtr<AiqInputParams> inputParams){
         return ;
     }
 
-    if (aeParams)
+    if (aeParams && (memcmp(&mLastAeParam, aeParams, sizeof(XCamAeParam)) != 0)) {
         updateAeMetaParams(aeParams, _updateReqId);
-    if (afParams)
+        memcpy(&mLastAeParam, aeParams, sizeof(XCamAeParam));
+    }
+    if (afParams && (memcmp(&mLastAfParam, afParams, sizeof(XCamAfParam)) != 0)) {
         updateAfMetaParams(afParams, _updateReqId);
-    if (awbParams)
+        memcpy(&mLastAfParam, afParams, sizeof(XCamAfParam));
+    }
+    if (awbParams && (memcmp(&mLastAwbParam, awbParams, sizeof(XCamAwbParam)) != 0)) {
         updateAwbMetaParams(awbParams, _updateReqId);
+        memcpy(&mLastAwbParam, awbParams, sizeof(XCamAwbParam));
+    }
     updateOtherMetaParams();
 
 }

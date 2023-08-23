@@ -157,6 +157,9 @@ private:
     StillLockState_t mAelockstate;
     StillLockState_t mAflockstate;
     StillLockState_t mAwblockstate;
+    XCamAeParam mLastAeParam;
+    XCamAwbParam mLastAwbParam;
+    XCamAfParam mLastAfParam;
 
 private:  /* Members */
     /**
