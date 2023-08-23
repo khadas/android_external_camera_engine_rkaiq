@@ -56,9 +56,12 @@ using ::android::hardware::camera::common::V1_0::helper::CameraMetadata;
 * v1.0.3
 *  - workaround awb state not converged issue.
 *  - fix some mismatched debug info
+* v2.0.1
+*  - adapt to aiq_v5.0x1.3-rc1.
+*  - replace uAPI1 with uAPI2
 */
 
-#define CONFIG_AIQ_ADAPTER_LIB_VERSION "v1.0.3"
+#define CONFIG_AIQ_ADAPTER_LIB_VERSION "v2.0.1"
 
 using namespace RkCam;
 using namespace XCam;
