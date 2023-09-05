@@ -40,7 +40,7 @@ public:
                               SmartPtr<RkAiqIrisParamsProxy> IrisParams);
     virtual ~Isp20StatsBuffer() {};
 
-    XCamReturn getEffectiveExpParams (uint32_t frameId, SmartPtr<RkAiqExpParamsProxy>& expParams) {
+    XCamReturn getEffectiveExpParams (uint32_t frameId, SmartPtr<RkAiqSensorExpParamsProxy>& expParams) {
         XCAM_ASSERT (mSensor.ptr ());
         return mSensor->getEffectiveExpParams(expParams, frameId);
     }
@@ -72,8 +72,8 @@ public:
     ~SofEventData() {}
     virtual uint8_t *map () {return NULL;}
     virtual bool unmap () {return false;}
-    int64_t _timestamp;
-    uint32_t _frameid;
+    int64_t _timestamp{0};
+    uint32_t _frameid{0};
 };
 
 class SofEventBuffer

@@ -166,8 +166,8 @@ static XCamReturn groupAsharpV33Processing(const RkAiqAlgoCom* inparams, RkAiqAl
     }
 
     //group empty
-    if(procParaGroup->camgroupParmasArray == nullptr) {
-        LOGE_ASHARP("camgroupParmasArray is null");
+    if(procParaGroup == nullptr || procParaGroup->camgroupParmasArray == nullptr) {
+        LOGE_ASHARP("procParaGroup or camgroupParmasArray is null");
         return(XCAM_RETURN_ERROR_FAILED);
     }
 
@@ -184,12 +184,10 @@ static XCamReturn groupAsharpV33Processing(const RkAiqAlgoCom* inparams, RkAiqAl
     }
 
     stExpInfoV33.blc_ob_predgain = 1.0f;
-    if(procParaGroup != NULL) {
-        LOGD_ANR(" predgain:%f\n",
-                 procParaGroup->stAblcV32_proc_res.isp_ob_predgain);
-        stExpInfoV33.blc_ob_predgain = procParaGroup->stAblcV32_proc_res.isp_ob_predgain;
+    LOGD_ANR(" predgain:%f\n",
+                procParaGroup->stAblcV32_proc_res.isp_ob_predgain);
+    stExpInfoV33.blc_ob_predgain = procParaGroup->stAblcV32_proc_res.isp_ob_predgain;
 
-    }
     //merge ae result, iso mean value
     rk_aiq_singlecam_3a_result_t* scam_3a_res = procParaGroup->camgroupParmasArray[0];
     if(scam_3a_res->aec._bEffAecExpValid) {
@@ -247,6 +245,9 @@ static XCamReturn groupAsharpV33Processing(const RkAiqAlgoCom* inparams, RkAiqAl
     if(CHECK_ISP_HW_V32() || CHECK_ISP_HW_V32_LITE()) {
         Asharp_Context_V33_t * asharp_contex_v33 = asharp_group_contex->asharp_contex_v33;
         Asharp_ProcResult_V33_t stAsharpResultV33;
+        RK_SHARP_Fix_V33_t stFix;
+        stAsharpResultV33.stFix = &stFix;
+
         deltaIso = abs(stExpInfoV33.arIso[stExpInfoV33.hdr_mode] - asharp_contex_v33->stExpInfo.arIso[stExpInfoV33.hdr_mode]);
         if(deltaIso > ASHARPV33_RECALCULATE_DELTA_ISO) {
             asharp_contex_v33->isReCalculate |= 1;
@@ -261,14 +262,16 @@ static XCamReturn groupAsharpV33Processing(const RkAiqAlgoCom* inparams, RkAiqAl
                 ret = XCAM_RETURN_ERROR_FAILED;
                 LOGE_ASHARP("%s: processing ASHARP failed (%d)\n", __FUNCTION__, ret);
             }
-            stAsharpResultV33.isNeedUpdate = true;
+            outparams->cfg_update = true;
             LOGD_ASHARP("recalculate: %d delta_iso:%d \n ", asharp_contex_v33->isReCalculate, deltaIso);
         } else {
-            stAsharpResultV33.isNeedUpdate = false;
+            outparams->cfg_update = false;
         }
         Asharp_GetProcResult_V33(asharp_contex_v33, &stAsharpResultV33);
         for (int i = 0; i < procResParaGroup->arraySize; i++) {
-            *(procResParaGroup->camgroupParmasArray[i]->asharp._asharp_procRes_v33) = stAsharpResultV33.stFix;
+            *(procResParaGroup->camgroupParmasArray[i]->asharp._asharp_procRes_v33) = *stAsharpResultV33.stFix;
+            IS_UPDATE_MEM((procResParaGroup->camgroupParmasArray[i]->asharp._asharp_procRes_v33), procParaGroup->_offset_is_update) =
+                outparams->cfg_update;
         }
         asharp_contex_v33->isReCalculate = 0;
 

@@ -41,6 +41,9 @@ RkAiqHandle::RkAiqHandle(RkAiqAlgoDesComm* des, RkAiqCore* aiqCore)
     mParentHdl = NULL;
     mIsMulRun = false;
     mPostShared = true;
+    mGroupId      = 0;
+    mAlogsGroupSharedParams = NULL;
+    mSyncFlag = (uint32_t)(-1);
 }
 
 RkAiqHandle::~RkAiqHandle() {
@@ -119,6 +122,9 @@ XCamReturn RkAiqHandle::processing() {
     RkAiqAlgoCom* procParam = mProcInParam;
 
     configInparamsCom(procParam, RKAIQ_CONFIG_COM_PROC);
+
+    if (mProcOutParam)
+        mProcOutParam->cfg_update = false;
 
     EXIT_ANALYZER_FUNCTION();
 

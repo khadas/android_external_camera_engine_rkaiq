@@ -36,6 +36,7 @@ XCamReturn RkAiqAdpccHandleInt::updateConfig(bool needSync) {
     ENTER_ANALYZER_FUNCTION();
 
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
+#ifndef DISABLE_HANDLE_ATTRIB
     if (needSync) mCfgMutex.lock();
     // if something changed
     if (updateAtt) {
@@ -46,6 +47,7 @@ XCamReturn RkAiqAdpccHandleInt::updateConfig(bool needSync) {
     }
 
     if (needSync) mCfgMutex.unlock();
+#endif
 
     EXIT_ANALYZER_FUNCTION();
     return ret;
@@ -57,6 +59,9 @@ XCamReturn RkAiqAdpccHandleInt::setAttrib(rk_aiq_dpcc_attrib_V20_t* att) {
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
     mCfgMutex.lock();
 
+#ifdef DISABLE_HANDLE_ATTRIB
+    ret = rk_aiq_uapi_adpcc_SetAttrib(mAlgoCtx, att, false);
+#else
     // check if there is different between att & mCurAtt(sync)/mNewAtt(async)
     // if something changed, set att to mNewAtt, and
     // the new params will be effective later when updateConfig
@@ -75,6 +80,7 @@ XCamReturn RkAiqAdpccHandleInt::setAttrib(rk_aiq_dpcc_attrib_V20_t* att) {
         updateAtt = true;
         waitSignal(att->sync.sync_mode);
     }
+#endif
 
     mCfgMutex.unlock();
 
@@ -86,7 +92,11 @@ XCamReturn RkAiqAdpccHandleInt::getAttrib(rk_aiq_dpcc_attrib_V20_t* att) {
     ENTER_ANALYZER_FUNCTION();
 
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
-
+#ifdef DISABLE_HANDLE_ATTRIB
+      mCfgMutex.lock();
+      ret = rk_aiq_uapi_adpcc_GetAttrib(mAlgoCtx, att);
+      mCfgMutex.unlock();
+#else
     if (att->sync.sync_mode == RK_AIQ_UAPI_MODE_SYNC) {
       mCfgMutex.lock();
       rk_aiq_uapi_adpcc_GetAttrib(mAlgoCtx, att);
@@ -102,6 +112,7 @@ XCamReturn RkAiqAdpccHandleInt::getAttrib(rk_aiq_dpcc_attrib_V20_t* att) {
         att->sync.done      = true;
       }
     }
+#endif
 
     EXIT_ANALYZER_FUNCTION();
     return ret;
@@ -114,10 +125,6 @@ XCamReturn RkAiqAdpccHandleInt::prepare() {
 
     ret = RkAiqHandle::prepare();
     RKAIQCORE_CHECK_RET(ret, "adpcc handle prepare failed");
-
-    RkAiqAlgoConfigAdpcc* adpcc_config_int = (RkAiqAlgoConfigAdpcc*)mConfig;
-    RkAiqCore::RkAiqAlgosGroupShared_t* shared =
-        (RkAiqCore::RkAiqAlgosGroupShared_t*)(getGroupShared());
 
     RkAiqAlgoDescription* des = (RkAiqAlgoDescription*)mDes;
     ret                       = des->prepare(mConfig);
@@ -160,8 +167,11 @@ XCamReturn RkAiqAdpccHandleInt::processing() {
     RkAiqAlgoProcAdpcc* adpcc_proc_int        = (RkAiqAlgoProcAdpcc*)mProcInParam;
     RkAiqAlgoProcResAdpcc* adpcc_proc_res_int = (RkAiqAlgoProcResAdpcc*)mProcOutParam;
     RkAiqCore::RkAiqAlgosGroupShared_t* shared =
-        (RkAiqCore::RkAiqAlgosGroupShared_t*)(getGroupShared());
+            (RkAiqCore::RkAiqAlgosGroupShared_t*)(getGroupShared());
+
     RkAiqCore::RkAiqAlgosComShared_t* sharedCom = &mAiqCore->mAlogsComSharedParams;
+
+    adpcc_proc_res_int->stAdpccProcResult = &shared->fullParams->mDpccParams->data()->result;
 
     ret = RkAiqHandle::processing();
     if (ret) {
@@ -172,8 +182,14 @@ XCamReturn RkAiqAdpccHandleInt::processing() {
     adpcc_proc_int->iso      = sharedCom->iso;
     adpcc_proc_int->hdr_mode = sharedCom->working_mode;
 
+#ifdef DISABLE_HANDLE_ATTRIB
+    mCfgMutex.lock();
+#endif
     RkAiqAlgoDescription* des = (RkAiqAlgoDescription*)mDes;
     ret                       = des->processing(mProcInParam, mProcOutParam);
+#ifdef DISABLE_HANDLE_ATTRIB
+    mCfgMutex.unlock();
+#endif
     RKAIQCORE_CHECK_RET(ret, "adpcc algo processing failed");
 
     EXIT_ANALYZER_FUNCTION();
@@ -237,10 +253,32 @@ XCamReturn RkAiqAdpccHandleInt::genIspResult(RkAiqFullParams* params, RkAiqFullP
         } else {
             dpcc_param->frame_id = shared->frameId;
         }
-        memcpy(&dpcc_param->result, &adpcc_rk->stAdpccProcResult, sizeof(rk_aiq_isp_dpcc_t));
-    }
 
-    cur_params->mDpccParams = params->mDpccParams;
+        if (adpcc_com->res_com.cfg_update) {
+            mSyncFlag = shared->frameId;
+            dpcc_param->sync_flag = mSyncFlag;
+            // copy from algo result
+            // set as the latest result
+            cur_params->mDpccParams = params->mDpccParams;
+            dpcc_param->is_update = true;
+            LOGD_ADPCC("[%d] params from algo", mSyncFlag);
+        } else if (mSyncFlag != dpcc_param->sync_flag) {
+            dpcc_param->sync_flag = mSyncFlag;
+            // copy from latest result
+            if (cur_params->mDpccParams.ptr()) {
+                dpcc_param->result = cur_params->mDpccParams->data()->result;
+                dpcc_param->is_update = true;
+            } else {
+                LOGE_ADPCC("no latest params !");
+                dpcc_param->is_update = false;
+            }
+            LOGD_ADPCC("[%d] params from latest [%d]", shared->frameId, mSyncFlag);
+        } else {
+            // do nothing, result in buf needn't update
+            dpcc_param->is_update = false;
+            LOGD_ADPCC("[%d] params needn't update", shared->frameId);
+        }
+    }
 
     EXIT_ANALYZER_FUNCTION();
 

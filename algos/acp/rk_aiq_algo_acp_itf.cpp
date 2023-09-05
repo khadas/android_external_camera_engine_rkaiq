@@ -74,6 +74,9 @@ prepare(RkAiqAlgoCom* params)
     RkAiqAlgoConfigAcp* pCfgParam = (RkAiqAlgoConfigAcp*)params;
 
 	if(!!(params->u.prepare.conf_type & RK_AIQ_ALGO_CONFTYPE_UPDATECALIB )){
+        // just update calib ptr
+        if (params->u.prepare.conf_type & RK_AIQ_ALGO_CONFTYPE_UPDATECALIB_PTR)
+            return XCAM_RETURN_NO_ERROR;
 #if RKAIQ_HAVE_ACP_V10
         if (pCfgParam->com.u.prepare.calib) {
             CalibDb_cProc_t *cproc =
@@ -96,6 +99,8 @@ prepare(RkAiqAlgoCom* params)
 #endif
     }
 
+    params->ctx->acpCtx.isReCal_ = true;
+
     return XCAM_RETURN_NO_ERROR;
 }
 
@@ -111,7 +116,13 @@ processing(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outparams)
     RkAiqAlgoProcResAcp* res_com = (RkAiqAlgoProcResAcp*)outparams;
     RkAiqAlgoContext* ctx = inparams->ctx;
 
-    res_com->acp_res = ctx->acpCtx.params;
+    if (ctx->acpCtx.isReCal_) {
+        *res_com->acp_res = ctx->acpCtx.params;
+        outparams->cfg_update = true;
+        ctx->acpCtx.isReCal_ = false;
+    } else {
+        outparams->cfg_update = false;
+    }
 
     return XCAM_RETURN_NO_ERROR;
 }

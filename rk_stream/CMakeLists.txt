@@ -16,33 +16,33 @@ add_compile_options(-DUSE_RAWSTREAM_LIB)
 
 include_directories(
     include
-    ../rk_aiq/xcore
-    ../rk_aiq/xcore/base
-    ../rk_aiq/aiq_core
-    ../rk_aiq/common
-    ../rk_aiq/common/linux
-    ../rk_aiq/include
-    ../rk_aiq/include/common
-    ../rk_aiq/include/common/mediactl
-    ../rk_aiq/include/iq_parser
-    ../rk_aiq/include/iq_parser_v2
-    ../rk_aiq/include/xcore
-    ../rk_aiq/include/xcore/base
-    ../rk_aiq/include/algos
+    ${AIQ_DIR}/xcore
+    ${AIQ_DIR}/xcore/base
+    ${AIQ_DIR}/aiq_core
+    ${AIQ_DIR}/common
+    ${AIQ_DIR}/common/linux
+    ${AIQ_DIR}/include
+    ${AIQ_DIR}/include/common
+    ${AIQ_DIR}/include/common/mediactl
+    ${AIQ_DIR}/include/iq_parser
+    ${AIQ_DIR}/include/iq_parser_v2
+    ${AIQ_DIR}/include/xcore
+    ${AIQ_DIR}/include/xcore/base
+    ${AIQ_DIR}/include/algos
     )
 
 set(XCORE_SRC
-    ../rk_aiq/xcore/xcam_common.cpp
-    ../rk_aiq/xcore/xcam_log.cpp
-    ../rk_aiq/xcore/xcam_thread.cpp
-    ../rk_aiq/xcore/xcam_buffer.cpp
-    ../rk_aiq/xcore/video_buffer.cpp
-    ../rk_aiq/xcore/v4l2_buffer_proxy.cpp
-    ../rk_aiq/xcore/v4l2_device.cpp
-    ../rk_aiq/xcore/fake_v4l2_device.cpp
-    ../rk_aiq/xcore/buffer_pool.cpp
-    ../rk_aiq/xcore/poll_thread.cpp
-    ../rk_aiq/xcore/smart_buffer_priv.cpp
+    ${AIQ_DIR}/xcore/xcam_common.cpp
+    ${AIQ_DIR}/xcore/xcam_log.cpp
+    ${AIQ_DIR}/xcore/xcam_thread.cpp
+    ${AIQ_DIR}/xcore/xcam_buffer.cpp
+    ${AIQ_DIR}/xcore/video_buffer.cpp
+    ${AIQ_DIR}/xcore/v4l2_buffer_proxy.cpp
+    ${AIQ_DIR}/xcore/v4l2_device.cpp
+    ${AIQ_DIR}/xcore/fake_v4l2_device.cpp
+    ${AIQ_DIR}/xcore/buffer_pool.cpp
+    ${AIQ_DIR}/xcore/poll_thread.cpp
+    ${AIQ_DIR}/xcore/smart_buffer_priv.cpp
     )
 
 set(STREAMCFG_SRC
@@ -51,7 +51,7 @@ set(STREAMCFG_SRC
     stream_cfg/RawStreamProcUnit.cpp
     stream_cfg/MediaInfo.cpp
     stream_cfg/Stream.cpp
-    ../rk_aiq/common/mediactl/mediactl.c
+    ${AIQ_DIR}/common/mediactl/mediactl.c
     )
 
 set(RK_VI_STREAM_CFG_LIB rkrawstream)
@@ -62,12 +62,13 @@ target_link_libraries(${RK_VI_STREAM_CFG_LIB} PRIVATE)
 install(TARGETS ${RK_VI_STREAM_CFG_LIB} LIBRARY DESTINATION lib)
 
 
-#set (VI_DEMO_SRCS
-#    ../rkvi_demo/rkvi_demo.cpp
-#    )
+set (VI_DEMO_SRCS
+    rkvi_demo/rkvi_demo.c
+    )
 
 cmake_policy(SET CMP0015 NEW)
 SET(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/all_lib/${CMAKE_BUILD_TYPE})
-link_directories("${LIBRARY_OUTPUT_PATH}" "../rk_aiq/build/linux/output/aarch64/all_lib/RelWithDebInfo")
-#add_executable(rkvi_demo ${VI_DEMO_SRCS})
-#target_link_libraries(rkvi_demo ${RK_VI_STREAM_CFG_LIB} ${RK_AIQ_LIB} pthread)
+SET(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/exe/${CMAKE_BUILD_TYPE})
+link_directories("${LIBRARY_OUTPUT_PATH}" "${AIQ_DIR}/build/linux/output/aarch64/all_lib/RelWithDebInfo")
+add_executable(rkvi_demo ${VI_DEMO_SRCS})
+target_link_libraries(rkvi_demo ${RK_VI_STREAM_CFG_LIB} ${RK_AIQ_LIB} pthread)

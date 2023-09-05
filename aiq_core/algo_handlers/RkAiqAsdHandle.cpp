@@ -39,6 +39,7 @@ XCamReturn RkAiqAsdHandleInt::updateConfig(bool needSync) {
 
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
 
+#ifndef DISABLE_HANDLE_ATTRIB
     if (needSync) mCfgMutex.lock();
     // if something changed
     if (updateAtt) {
@@ -49,6 +50,7 @@ XCamReturn RkAiqAsdHandleInt::updateConfig(bool needSync) {
     }
 
     if (needSync) mCfgMutex.unlock();
+#endif
 
     EXIT_ANALYZER_FUNCTION();
     return ret;
@@ -59,6 +61,9 @@ XCamReturn RkAiqAsdHandleInt::setAttrib(asd_attrib_t att) {
 
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
     mCfgMutex.lock();
+#ifdef DISABLE_HANDLE_ATTRIB
+    ret = rk_aiq_uapi_asd_SetAttrib(mAlgoCtx, att, false);
+#else
     // TODO
     // check if there is different between att & mCurAtt
     // if something changed, set att to mNewAtt, and
@@ -71,6 +76,7 @@ XCamReturn RkAiqAsdHandleInt::setAttrib(asd_attrib_t att) {
         updateAtt = true;
         waitSignal();
     }
+#endif
 
     mCfgMutex.unlock();
 
@@ -97,10 +103,6 @@ XCamReturn RkAiqAsdHandleInt::prepare() {
     ret = RkAiqHandle::prepare();
     RKAIQCORE_CHECK_RET(ret, "asd handle prepare failed");
 
-    RkAiqAlgoConfigAsd* asd_config_int = (RkAiqAlgoConfigAsd*)mConfig;
-    RkAiqCore::RkAiqAlgosGroupShared_t* shared =
-        (RkAiqCore::RkAiqAlgosGroupShared_t*)(getGroupShared());
-
     RkAiqAlgoDescription* des = (RkAiqAlgoDescription*)mDes;
     ret                       = des->prepare(mConfig);
     RKAIQCORE_CHECK_RET(ret, "asd algo prepare failed");
@@ -114,10 +116,7 @@ XCamReturn RkAiqAsdHandleInt::preProcess() {
 
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
 
-    RkAiqAlgoPreAsd* asd_pre_int        = (RkAiqAlgoPreAsd*)mPreInParam;
-    RkAiqAlgoPreResAsd* asd_pre_res_int = (RkAiqAlgoPreResAsd*)mPreOutParam;
-    RkAiqCore::RkAiqAlgosGroupShared_t* shared =
-        (RkAiqCore::RkAiqAlgosGroupShared_t*)(getGroupShared());
+    RkAiqAlgoPreAsd* asd_pre_int                = (RkAiqAlgoPreAsd*)mPreInParam;
     RkAiqCore::RkAiqAlgosComShared_t* sharedCom = &mAiqCore->mAlogsComSharedParams;
 
     ret = RkAiqHandle::preProcess();
@@ -142,19 +141,19 @@ XCamReturn RkAiqAsdHandleInt::processing() {
 
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
 
-    RkAiqAlgoProcAsd* asd_proc_int        = (RkAiqAlgoProcAsd*)mProcInParam;
-    RkAiqAlgoProcResAsd* asd_proc_res_int = (RkAiqAlgoProcResAsd*)mProcOutParam;
-    RkAiqCore::RkAiqAlgosGroupShared_t* shared =
-        (RkAiqCore::RkAiqAlgosGroupShared_t*)(getGroupShared());
-    RkAiqCore::RkAiqAlgosComShared_t* sharedCom = &mAiqCore->mAlogsComSharedParams;
-
     ret = RkAiqHandle::processing();
     if (ret) {
         RKAIQCORE_CHECK_RET(ret, "asd handle processing failed");
     }
 
+#ifdef DISABLE_HANDLE_ATTRIB
+    mCfgMutex.lock();
+#endif
     RkAiqAlgoDescription* des = (RkAiqAlgoDescription*)mDes;
     ret                       = des->processing(mProcInParam, mProcOutParam);
+#ifdef DISABLE_HANDLE_ATTRIB
+    mCfgMutex.unlock();
+#endif
     RKAIQCORE_CHECK_RET(ret, "asd algo processing failed");
 
     EXIT_ANALYZER_FUNCTION();
@@ -191,9 +190,6 @@ XCamReturn RkAiqAsdHandleInt::genIspResult(RkAiqFullParams* params, RkAiqFullPar
     ENTER_ANALYZER_FUNCTION();
 
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
-    RkAiqCore::RkAiqAlgosGroupShared_t* shared =
-        (RkAiqCore::RkAiqAlgosGroupShared_t*)(getGroupShared());
-    RkAiqCore::RkAiqAlgosComShared_t* sharedCom = &mAiqCore->mAlogsComSharedParams;
     RkAiqAlgoPreResAsd* asd_pre_res_int = (RkAiqAlgoPreResAsd*)mPreOutParam;
 
     if (!asd_pre_res_int) {

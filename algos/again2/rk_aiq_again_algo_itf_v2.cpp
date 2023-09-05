@@ -86,6 +86,9 @@ prepare(RkAiqAlgoCom* params)
     pAgainCtx->prepare_type = params->u.prepare.conf_type;
 
     if(!!(params->u.prepare.conf_type & RK_AIQ_ALGO_CONFTYPE_UPDATECALIB )) {
+        // just update calib ptr
+        if (params->u.prepare.conf_type & RK_AIQ_ALGO_CONFTYPE_UPDATECALIB_PTR)
+            return XCAM_RETURN_NO_ERROR;
 #if AGAIN_USE_JSON_FILE_V2
 #if 1
         void *pCalibDbV2 = (void*)(pCfgParam->com.u.prepare.calibv2);
@@ -296,14 +299,12 @@ processing(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outparams)
             result = XCAM_RETURN_ERROR_FAILED;
             LOGE_ANR("%s: processing ANR failed (%d)\n", __FUNCTION__, ret);
         }
-        Again_GetProcResult_V2(pAgainCtx, &pAgainCtx->stProcResult);
-        pAgainCtx->stProcResult.isNeedUpdate = true;
+
+        outparams->cfg_update = true;
     } else {
-        pAgainCtx->stProcResult.isNeedUpdate = false;
+        outparams->cfg_update = false;
     }
-
-    memcpy(&pAgainProcResParams->stAgainProcResult, &pAgainCtx->stProcResult, sizeof(pAgainCtx->stProcResult));
-
+    Again_GetProcResult_V2(pAgainCtx, &pAgainProcResParams->stAgainProcResult);
     pAgainCtx->isReCalculate = 0;
 #endif
 

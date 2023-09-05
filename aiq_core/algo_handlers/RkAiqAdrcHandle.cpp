@@ -59,6 +59,7 @@ XCamReturn RkAiqAdrcHandleInt::updateConfig(bool needSync) {
     ENTER_ANALYZER_FUNCTION();
 
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
+#ifndef DISABLE_HANDLE_ATTRIB
     if (needSync) mCfgMutex.lock();
     // if something changed
     if (updateAtt) {
@@ -89,6 +90,7 @@ XCamReturn RkAiqAdrcHandleInt::updateConfig(bool needSync) {
     }
 
     if (needSync) mCfgMutex.unlock();
+#endif
 
     EXIT_ANALYZER_FUNCTION();
     return ret;
@@ -101,6 +103,9 @@ XCamReturn RkAiqAdrcHandleInt::setAttribV10(const drcAttrV10_t* att) {
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
     mCfgMutex.lock();
 
+#ifdef DISABLE_HANDLE_ATTRIB
+    ret = rk_aiq_uapi_adrc_v10_SetAttrib(mAlgoCtx, att, true);
+#else
     // check if there is different between att & mCurAtt(sync)/mNewAtt(async)
     // if something changed, set att to mNewAtt, and
     // the new params will be effective later when updateConfig
@@ -119,6 +124,7 @@ XCamReturn RkAiqAdrcHandleInt::setAttribV10(const drcAttrV10_t* att) {
         updateAtt  = true;
         waitSignal(att->sync.sync_mode);
     }
+#endif
     mCfgMutex.unlock();
 
     EXIT_ANALYZER_FUNCTION();
@@ -129,6 +135,12 @@ XCamReturn RkAiqAdrcHandleInt::getAttribV10(drcAttrV10_t* att) {
 
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
 
+#ifdef DISABLE_HANDLE_ATTRIB
+    mCfgMutex.lock();
+    rk_aiq_uapi_adrc_v10_GetAttrib(mAlgoCtx, att);
+    att->sync.done = true;
+    mCfgMutex.unlock();
+#else
     if (att->sync.sync_mode == RK_AIQ_UAPI_MODE_SYNC) {
         mCfgMutex.lock();
         rk_aiq_uapi_adrc_v10_GetAttrib(mAlgoCtx, att);
@@ -144,7 +156,7 @@ XCamReturn RkAiqAdrcHandleInt::getAttribV10(drcAttrV10_t* att) {
             att->sync.done      = true;
         }
     }
-
+#endif
     EXIT_ANALYZER_FUNCTION();
     return ret;
 }
@@ -156,6 +168,9 @@ XCamReturn RkAiqAdrcHandleInt::setAttribV11(const drcAttrV11_t* att) {
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
     mCfgMutex.lock();
 
+#ifdef DISABLE_HANDLE_ATTRIB
+    ret = rk_aiq_uapi_adrc_v11_SetAttrib(mAlgoCtx, att, true);
+#else
     // check if there is different between att & mCurAtt(sync)/mNewAtt(async)
     // if something changed, set att to mNewAtt, and
     // the new params will be effective later when updateConfig
@@ -174,6 +189,7 @@ XCamReturn RkAiqAdrcHandleInt::setAttribV11(const drcAttrV11_t* att) {
         updateAtt  = true;
         waitSignal(att->sync.sync_mode);
     }
+#endif
     mCfgMutex.unlock();
 
     EXIT_ANALYZER_FUNCTION();
@@ -184,6 +200,12 @@ XCamReturn RkAiqAdrcHandleInt::getAttribV11(drcAttrV11_t* att) {
 
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
 
+#ifdef DISABLE_HANDLE_ATTRIB
+    mCfgMutex.lock();
+    rk_aiq_uapi_adrc_v11_GetAttrib(mAlgoCtx, att);
+    att->sync.done = true;
+    mCfgMutex.unlock();
+#else
     if (att->sync.sync_mode == RK_AIQ_UAPI_MODE_SYNC) {
         mCfgMutex.lock();
         rk_aiq_uapi_adrc_v11_GetAttrib(mAlgoCtx, att);
@@ -199,7 +221,7 @@ XCamReturn RkAiqAdrcHandleInt::getAttribV11(drcAttrV11_t* att) {
             att->sync.done      = true;
         }
     }
-
+#endif
     EXIT_ANALYZER_FUNCTION();
     return ret;
 }
@@ -211,6 +233,9 @@ XCamReturn RkAiqAdrcHandleInt::setAttribV12(const drcAttrV12_t* att) {
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
     mCfgMutex.lock();
 
+#ifdef DISABLE_HANDLE_ATTRIB
+    ret = rk_aiq_uapi_adrc_v12_SetAttrib(mAlgoCtx, att, true);
+#else
     // check if there is different between att & mCurAtt(sync)/mNewAtt(async)
     // if something changed, set att to mNewAtt, and
     // the new params will be effective later when updateConfig
@@ -229,6 +254,7 @@ XCamReturn RkAiqAdrcHandleInt::setAttribV12(const drcAttrV12_t* att) {
         updateAtt = true;
         waitSignal(att->sync.sync_mode);
     }
+#endif
     mCfgMutex.unlock();
 
     EXIT_ANALYZER_FUNCTION();
@@ -239,6 +265,12 @@ XCamReturn RkAiqAdrcHandleInt::getAttribV12(drcAttrV12_t* att) {
 
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
 
+#ifdef DISABLE_HANDLE_ATTRIB
+    mCfgMutex.lock();
+    rk_aiq_uapi_adrc_v12_GetAttrib(mAlgoCtx, att);
+    att->sync.done = true;
+    mCfgMutex.unlock();
+#else
     if (att->sync.sync_mode == RK_AIQ_UAPI_MODE_SYNC) {
         mCfgMutex.lock();
         rk_aiq_uapi_adrc_v12_GetAttrib(mAlgoCtx, att);
@@ -254,7 +286,7 @@ XCamReturn RkAiqAdrcHandleInt::getAttribV12(drcAttrV12_t* att) {
             att->sync.done      = true;
         }
     }
-
+#endif
     EXIT_ANALYZER_FUNCTION();
     return ret;
 }
@@ -266,6 +298,9 @@ XCamReturn RkAiqAdrcHandleInt::setAttribV12Lite(const drcAttrV12Lite_t* att) {
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
     mCfgMutex.lock();
 
+#ifdef DISABLE_HANDLE_ATTRIB
+    ret = rk_aiq_uapi_adrc_v12_lite_SetAttrib(mAlgoCtx, att, true);
+#else
     // check if there is different between att & mCurAtt(sync)/mNewAtt(async)
     // if something changed, set att to mNewAtt, and
     // the new params will be effective later when updateConfig
@@ -284,6 +319,7 @@ XCamReturn RkAiqAdrcHandleInt::setAttribV12Lite(const drcAttrV12Lite_t* att) {
         updateAtt      = true;
         waitSignal(att->sync.sync_mode);
     }
+#endif
     mCfgMutex.unlock();
 
     EXIT_ANALYZER_FUNCTION();
@@ -294,6 +330,12 @@ XCamReturn RkAiqAdrcHandleInt::getAttribV12Lite(drcAttrV12Lite_t* att) {
 
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
 
+#ifdef DISABLE_HANDLE_ATTRIB
+    mCfgMutex.lock();
+    rk_aiq_uapi_adrc_v12_lite_GetAttrib(mAlgoCtx, att);
+    att->sync.done = true;
+    mCfgMutex.unlock();
+#else
     if (att->sync.sync_mode == RK_AIQ_UAPI_MODE_SYNC) {
         mCfgMutex.lock();
         rk_aiq_uapi_adrc_v12_lite_GetAttrib(mAlgoCtx, att);
@@ -309,6 +351,7 @@ XCamReturn RkAiqAdrcHandleInt::getAttribV12Lite(drcAttrV12Lite_t* att) {
             att->sync.done      = true;
         }
     }
+#endif
 
     EXIT_ANALYZER_FUNCTION();
     return ret;
@@ -349,12 +392,14 @@ XCamReturn RkAiqAdrcHandleInt::processing() {
     RkAiqAlgoProcResAdrc* adrc_proc_res_int = (RkAiqAlgoProcResAdrc*)mProcOutParam;
     RkAiqCore::RkAiqAlgosGroupShared_t* shared =
         (RkAiqCore::RkAiqAlgosGroupShared_t*)(getGroupShared());
-    RkAiqCore::RkAiqAlgosComShared_t* sharedCom = &mAiqCore->mAlogsComSharedParams;
 
-#if RKAIQ_HAVE_DRC_V12
-    adrc_proc_int->ablcV32_proc_res.blc_ob_enable = shared->res_comb.ablcV32_proc_res.blc_ob_enable;
+    adrc_proc_res_int->AdrcProcRes = &shared->fullParams->mDrcParams->data()->result;
+    adrc_proc_int->LongFrmMode = mAeProcRes.LongFrmMode;
+
+#if RKAIQ_HAVE_DRC_V12 || RKAIQ_HAVE_DRC_V12_LITE
+    adrc_proc_int->ablcV32_proc_res.blc_ob_enable = shared->res_comb.ablcV32_proc_res->blc_ob_enable;
     adrc_proc_int->ablcV32_proc_res.isp_ob_predgain =
-        shared->res_comb.ablcV32_proc_res.isp_ob_predgain;
+        shared->res_comb.ablcV32_proc_res->isp_ob_predgain;
 #endif
 
     ret = RkAiqHandle::processing();
@@ -362,8 +407,14 @@ XCamReturn RkAiqAdrcHandleInt::processing() {
         RKAIQCORE_CHECK_RET(ret, "adrc handle processing failed");
     }
 
+#ifdef DISABLE_HANDLE_ATTRIB
+    mCfgMutex.lock();
+#endif
     RkAiqAlgoDescription* des = (RkAiqAlgoDescription*)mDes;
     ret                       = des->processing(mProcInParam, mProcOutParam);
+#ifdef DISABLE_HANDLE_ATTRIB
+    mCfgMutex.unlock();
+#endif
     RKAIQCORE_CHECK_RET(ret, "adrc algo processing failed");
 
     EXIT_ANALYZER_FUNCTION();
@@ -410,7 +461,6 @@ XCamReturn RkAiqAdrcHandleInt::genIspResult(RkAiqFullParams* params, RkAiqFullPa
         return XCAM_RETURN_NO_ERROR;
     }
 
-    RkAiqAlgoProcResAdrc* adrc_rk = (RkAiqAlgoProcResAdrc*)adrc_com;
     if (!this->getAlgoId()) {
         RkAiqAlgoProcResAdrc* ahdr_rk = (RkAiqAlgoProcResAdrc*)adrc_com;
 
@@ -420,13 +470,32 @@ XCamReturn RkAiqAdrcHandleInt::genIspResult(RkAiqFullParams* params, RkAiqFullPa
         } else {
             drc_param->frame_id = shared->frameId;
         }
-        drc_param->result.update = ahdr_rk->AdrcProcRes.update;
-        drc_param->result.bDrcEn = ahdr_rk->AdrcProcRes.bDrcEn;
-        if (drc_param->result.update)
-            drc_param->result.DrcProcRes = ahdr_rk->AdrcProcRes.DrcProcRes;
-    }
 
-    cur_params->mDrcParams = params->mDrcParams;
+        if (adrc_com->res_com.cfg_update) {
+            mSyncFlag = shared->frameId;
+            drc_param->sync_flag = mSyncFlag;
+            // copy from algo result
+            // set as the latest result
+            cur_params->mDrcParams = params->mDrcParams;
+            drc_param->is_update = true;
+            LOGD_ATMO("[%d] params from algo", mSyncFlag);
+        } else if (mSyncFlag != drc_param->sync_flag) {
+            drc_param->sync_flag = mSyncFlag;
+            // copy from latest result
+            if (cur_params->mDrcParams.ptr()) {
+                drc_param->result = cur_params->mDrcParams->data()->result;
+                drc_param->is_update = true;
+            } else {
+                LOGE_ATMO("no latest params !");
+                drc_param->is_update = false;
+            }
+            LOGD_ATMO("[%d] params from latest [%d]", shared->frameId, mSyncFlag);
+        } else {
+            // do nothing, result in buf needn't update
+            drc_param->is_update = false;
+            LOGD_ATMO("[%d] params needn't update", shared->frameId);
+        }
+    }
 
     EXIT_ANALYZER_FUNCTION();
 

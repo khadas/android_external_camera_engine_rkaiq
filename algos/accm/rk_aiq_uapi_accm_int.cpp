@@ -1,5 +1,6 @@
 #include "rk_aiq_uapi_accm_int.h"
 #include "accm/rk_aiq_types_accm_algo_prvt.h"
+#include "accm/rk_aiq_accm_algo.h"
 
 #if RKAIQ_HAVE_CCM_V1
 XCamReturn
@@ -9,7 +10,8 @@ rk_aiq_uapi_accm_SetAttrib(RkAiqAlgoContext *ctx,
 {
 
     accm_context_t* ccm_contex = (accm_context_t*)ctx->accm_para;
-    ccm_contex->mNewAtt = *attr;
+    ccm_contex->invarMode = ccm_contex->mCurAtt.mode & attr->mode;
+    ccm_contex->mCurAtt = *attr;
     ccm_contex->updateAtt = true;
     return XCAM_RETURN_NO_ERROR;
 }
@@ -50,7 +52,8 @@ rk_aiq_uapi_accm_v2_SetAttrib(RkAiqAlgoContext *ctx,
 {
 
     accm_context_t* ccm_contex = (accm_context_t*)ctx->accm_para;
-    ccm_contex->mNewAttV2 = *attr;
+    ccm_contex->invarMode = ccm_contex->mCurAttV2.mode & attr->mode;
+    ccm_contex->mCurAttV2 = *attr;
     ccm_contex->updateAtt = true;
     return XCAM_RETURN_NO_ERROR;
 }
@@ -66,6 +69,8 @@ rk_aiq_uapi_accm_v2_GetAttrib(const RkAiqAlgoContext *ctx,
 
     return XCAM_RETURN_NO_ERROR;
 }
+
+
 #else
 XCamReturn
 rk_aiq_uapi_accm_v2_SetAttrib(RkAiqAlgoContext *ctx,
@@ -97,14 +102,10 @@ rk_aiq_uapi_accm_QueryCcmInfo(const RkAiqAlgoContext *ctx,
     if (ccm_contex->ccmHwConf.ccmEnable && ccm_contex->mCurAtt.mode == RK_AIQ_CCM_MODE_AUTO){
         ccm_querry_info->finalSat = ccm_contex->accmRest.fSaturation;
         if (ccm_contex->accmRest.pCcmProfile1) {
-            if (ccm_contex->accmRest.pCcmProfile1->name) {
-                strcpy(ccm_querry_info->ccmname1, ccm_contex->accmRest.pCcmProfile1->name);
-            }
+            strcpy(ccm_querry_info->ccmname1, ccm_contex->accmRest.pCcmProfile1->name);
         }
         if (ccm_contex->accmRest.pCcmProfile2) {
-            if (ccm_contex->accmRest.pCcmProfile2->name) {
-                strcpy(ccm_querry_info->ccmname2, ccm_contex->accmRest.pCcmProfile2->name);
-            }
+            strcpy(ccm_querry_info->ccmname2, ccm_contex->accmRest.pCcmProfile2->name);
         }
         else
             strcpy(ccm_querry_info->ccmname2, ccm_querry_info->ccmname1);
@@ -123,14 +124,10 @@ rk_aiq_uapi_accm_QueryCcmInfo(const RkAiqAlgoContext *ctx,
     if (ccm_contex->ccmHwConf_v2.ccmEnable && ccm_contex->mCurAttV2.mode == RK_AIQ_CCM_MODE_AUTO){
         ccm_querry_info->finalSat = ccm_contex->accmRest.fSaturation;
         if (ccm_contex->accmRest.pCcmProfile1) {
-            if (ccm_contex->accmRest.pCcmProfile1->name) {
-                strcpy(ccm_querry_info->ccmname1, ccm_contex->accmRest.pCcmProfile1->name);
-            }
+            strcpy(ccm_querry_info->ccmname1, ccm_contex->accmRest.pCcmProfile1->name);
         }
         if (ccm_contex->accmRest.pCcmProfile2) {
-            if (ccm_contex->accmRest.pCcmProfile2->name) {
-                strcpy(ccm_querry_info->ccmname2, ccm_contex->accmRest.pCcmProfile2->name);
-            }
+            strcpy(ccm_querry_info->ccmname2, ccm_contex->accmRest.pCcmProfile2->name);
         }
         else
             strcpy(ccm_querry_info->ccmname2, ccm_querry_info->ccmname1);
@@ -154,4 +151,53 @@ rk_aiq_uapi_accm_QueryCcmInfo(const RkAiqAlgoContext *ctx,
     return XCAM_RETURN_NO_ERROR;
 }
 
+#if RKAIQ_HAVE_CCM_V1
+XCamReturn
+rk_aiq_uapi_accm_SetIqParam(RkAiqAlgoContext *ctx,
+                           const rk_aiq_ccm_calib_attrib_t* attr,
+                           bool need_sync) {
+#elif RKAIQ_HAVE_CCM_V2
+XCamReturn
+rk_aiq_uapi_accm_SetIqParam(RkAiqAlgoContext *ctx,
+                           const rk_aiq_ccm_v2_calib_attrib_t* attr,
+                           bool need_sync) {
+#endif
+    accm_context_t* ccm_contex = (accm_context_t*)ctx->accm_para;
+
+#if RKAIQ_HAVE_CCM_V1
+#if RKAIQ_ACCM_ILLU_VOTE
+    if (ccm_contex->stCalib_v1.aCcmCof_len != attr->aCcmCof_len)
+        clear_list(&hAccm->accmRest.dominateIlluList);
+#endif
+    ccm_contex->stCalib_v1 = attr->iqparam;
+#elif RKAIQ_HAVE_CCM_V2
+#if RKAIQ_ACCM_ILLU_VOTE
+    if (ccm_contex->stCalib_v2.aCcmCof_len != attr->aCcmCof_len)
+        clear_list(&hAccm->accmRest.dominateIlluList);
+#endif
+    ccm_contex->stCalib_v2 = attr->iqparam;
+#endif
+    ConfigbyCalib(ccm_contex);
+
+    return XCAM_RETURN_NO_ERROR;
+}
+
+#if RKAIQ_HAVE_CCM_V1
+XCamReturn
+rk_aiq_uapi_accm_GetIqParam(const RkAiqAlgoContext *ctx,
+                           rk_aiq_ccm_calib_attrib_t* attr) {
+#elif RKAIQ_HAVE_CCM_V2
+XCamReturn
+rk_aiq_uapi_accm_GetIqParam(const RkAiqAlgoContext *ctx,
+                           rk_aiq_ccm_v2_calib_attrib_t* attr) {
+#endif
+
+    accm_context_t* ccm_contex = (accm_context_t*)ctx->accm_para;
+#if RKAIQ_HAVE_CCM_V1
+    attr->iqparam = ccm_contex->stCalib_v1;
+#elif RKAIQ_HAVE_CCM_V2
+    attr->iqparam = ccm_contex->stCalib_v2;
+#endif
+    return XCAM_RETURN_NO_ERROR;
+}
 

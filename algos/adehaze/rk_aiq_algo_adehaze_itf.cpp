@@ -91,6 +91,9 @@ static XCamReturn prepare(RkAiqAlgoCom* params) {
         pAdehazeHandle->FrameNumber = HDR_3X_NUM;
 
     if (!!(params->u.prepare.conf_type & RK_AIQ_ALGO_CONFTYPE_UPDATECALIB)) {
+        // just update calib ptr
+        if (params->u.prepare.conf_type & RK_AIQ_ALGO_CONFTYPE_UPDATECALIB_PTR)
+            return XCAM_RETURN_NO_ERROR;
         LOGD_ADEHAZE("%s: Adehaze Reload Para!\n", __FUNCTION__);
 #if RKAIQ_HAVE_DEHAZE_V10
         CalibDbV2_dehaze_v10_t* calibv2_adehaze_calib_V10 =
@@ -135,6 +138,7 @@ static XCamReturn prepare(RkAiqAlgoCom* params) {
 static XCamReturn processing(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outparams) {
     LOG1_ADEHAZE("ENTER: %s \n", __func__);
     XCamReturn ret                  = XCAM_RETURN_NO_ERROR;
+    bool dehaze_bypass_processing   = true;
     AdehazeHandle_t* pAdehazeHandle = (AdehazeHandle_t*)inparams->ctx;
     RkAiqAlgoProcAdhaz* pProcPara   = (RkAiqAlgoProcAdhaz*)inparams;
     RkAiqAlgoProcResAdhaz* pProcRes = (RkAiqAlgoProcResAdhaz*)outparams;
@@ -143,15 +147,25 @@ static XCamReturn processing(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outp
     LOGD_ADEHAZE("/*************************Adehaze Start******************/ \n");
 
     AdehazeGetCurrData(pAdehazeHandle, pProcPara);
-    AdehazeByPassProcessing(pAdehazeHandle);
+    dehaze_bypass_processing = AdehazeByPassProcessing(pAdehazeHandle);
 
-    bool Enable = DehazeEnableSetting(pAdehazeHandle);
-
-    if (Enable) {
-        AdehazeGetStats(pAdehazeHandle, &pProcPara->stats);
-
-    // process
-    if (!(pAdehazeHandle->byPassProc)) ret = AdehazeProcess(pAdehazeHandle);
+    if (DehazeEnableSetting(pAdehazeHandle, pProcRes->AdehzeProcRes)) {
+        // process
+        if (!dehaze_bypass_processing) {
+#if RKAIQ_HAVE_DEHAZE_V10
+            ret = AdehazeProcess(pAdehazeHandle, pProcPara->dehaze_stats_v10, pProcRes->AdehzeProcRes);
+#endif
+#if RKAIQ_HAVE_DEHAZE_V11
+            ret = AdehazeProcess(pAdehazeHandle, pProcPara->dehaze_stats_v11, pProcRes->AdehzeProcRes);
+#endif
+#if RKAIQ_HAVE_DEHAZE_V11_DUO
+            ret = AdehazeProcess(pAdehazeHandle, pProcPara->dehaze_stats_v11_duo, pProcRes->AdehzeProcRes);
+#endif
+#if RKAIQ_HAVE_DEHAZE_V12
+            ret = AdehazeProcess(pAdehazeHandle, pProcPara->dehaze_stats_v12, pProcPara->stats_true,
+                                 pProcRes->AdehzeProcRes);
+#endif
+        }
     } else {
         LOGD_ADEHAZE("Dehaze Enable is OFF, Bypass Dehaze !!! \n");
     }
@@ -159,29 +173,9 @@ static XCamReturn processing(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outp
     LOGD_ADEHAZE("/*************************Adehaze over******************/ \n");
 
     // proc res
-    pProcRes->AdehzeProcRes.enable = pAdehazeHandle->ProcRes.enable;
-    pProcRes->AdehzeProcRes.update = !(pAdehazeHandle->byPassProc);
-#if RKAIQ_HAVE_DEHAZE_V10
-    pProcRes->AdehzeProcRes.enable = true;
-    if (pProcRes->AdehzeProcRes.update)
-        memcpy(&pProcRes->AdehzeProcRes, &pAdehazeHandle->ProcRes,
-               sizeof(RkAiqAdehazeProcResult_t));
-#endif
-#if RKAIQ_HAVE_DEHAZE_V11
-    if (pProcRes->AdehzeProcRes.update)
-        memcpy(&pProcRes->AdehzeProcRes.ProcResV11, &pAdehazeHandle->ProcRes.ProcResV11,
-               sizeof(AdehazeV11ProcResult_t));
-#endif
-#if RKAIQ_HAVE_DEHAZE_V11_DUO
-    if (pProcRes->AdehzeProcRes.update)
-        memcpy(&pProcRes->AdehzeProcRes.ProcResV11duo, &pAdehazeHandle->ProcRes.ProcResV11duo,
-               sizeof(AdehazeV11duoProcResult_t));
-#endif
-#if RKAIQ_HAVE_DEHAZE_V12
-    if (pProcRes->AdehzeProcRes.update)
-        memcpy(&pProcRes->AdehzeProcRes.ProcResV12, &pAdehazeHandle->ProcRes.ProcResV12,
-               sizeof(AdehazeV12ProcResult_t));
-#endif
+    outparams->cfg_update = !dehaze_bypass_processing || inparams->u.proc.init;
+    if (pAdehazeHandle->ifReCalcStManual) pAdehazeHandle->ifReCalcStManual = false;
+    if (pAdehazeHandle->ifReCalcStAuto) pAdehazeHandle->ifReCalcStAuto = false;
 
     LOG1_ADEHAZE("EIXT: %s \n", __func__);
     return ret;

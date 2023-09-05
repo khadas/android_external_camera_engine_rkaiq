@@ -123,6 +123,14 @@ XCamReturn RkAiqCustomAeHandle::getExpWinAttr(Uapi_ExpWin_t* pExpWinAttr) {
     return XCAM_RETURN_NO_ERROR;
 }
 
+XCamReturn RkAiqCustomAeHandle::setAecStatsCfg(Uapi_AecStatsCfg_t AecStatsCfg) {
+    return XCAM_RETURN_NO_ERROR;
+}
+
+XCamReturn RkAiqCustomAeHandle::getAecStatsCfg(Uapi_AecStatsCfg_t* pAecStatsCfg) {
+    return XCAM_RETURN_NO_ERROR;
+}
+
 XCamReturn RkAiqCustomAeHandle::queryExpInfo(Uapi_ExpQueryInfo_t* pExpQueryInfo) {
     return XCAM_RETURN_NO_ERROR;
 }
@@ -131,13 +139,60 @@ XCamReturn RkAiqCustomAeHandle::setLockAeForAf(bool lock_ae) {
     return XCAM_RETURN_NO_ERROR;
 }
 
+void
+RkAiqCustomAeHandle::init() {
+    if (mIsMulRun) {
+        // reuse parent's resources, contains:
+        // mConfig, mProcInParam, mProcOutParam
+        RkAiqAeHandleInt* parent =  dynamic_cast<RkAiqAeHandleInt*>(mParentHdl);
+        if (!parent)
+            LOGE_AEC("no parent ae handler in multiple handler mode !");
+        mConfig      = parent->mConfig;
+        mPreInParam   = parent->mPreInParam;
+        mProcInParam = parent->mProcInParam;
+        mProcOutParam = parent->mProcOutParam;
+        mPostInParam  = parent->mPostInParam;
+        mPostOutParam = parent->mPostOutParam;
+#if RKAIQ_HAVE_AF
+        mAf_handle = parent->mAf_handle;
+#endif
+#if RKAIQ_HAVE_AFD_V1 || RKAIQ_HAVE_AFD_V2
+        mAfd_handle = parent->mAfd_handle;
+#endif
+        mAmerge_handle = parent->mAmerge_handle;
+        mAdrc_handle = parent->mAdrc_handle;
+    } else {
+        RkAiqAeHandleInt::init();
+    }
+}
+
+void
+RkAiqCustomAeHandle::deInit() {
+    if (mIsMulRun) {
+        mConfig      = NULL;
+        mPreInParam   = NULL;
+        mProcInParam = NULL;
+        mProcOutParam = NULL;
+        mPostInParam  = NULL;
+        mPostOutParam = NULL;
+#if RKAIQ_HAVE_AF
+        mAf_handle = NULL;
+#endif
+#if RKAIQ_HAVE_AFD_V1 || RKAIQ_HAVE_AFD_V2
+        mAfd_handle = NULL;
+#endif
+        mAmerge_handle = NULL;
+        mAdrc_handle = NULL;
+    } else {
+        RkAiqAeHandleInt::deInit();
+    }
+}
+
 XCamReturn RkAiqCustomAeHandle::preProcess() {
     ENTER_ANALYZER_FUNCTION();
 
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
 
-    RkAiqAlgoPreAe* ae_pre_int        = (RkAiqAlgoPreAe*)mPreInParam;
-    bool postMsg = true;
 #ifdef BYPASS_CUSTOM_AE
     if (0) {
 #else
@@ -172,17 +227,7 @@ XCamReturn RkAiqCustomAeHandle::processing() {
 #else
     if (mIsMulRun) {
 #endif
-        // use parent's mem, so child algo results can overwrite parents results
-        RkAiqAeHandleInt* parent =  dynamic_cast<RkAiqAeHandleInt*>(mParentHdl);
-        if (!parent)
-            LOGE_AEC("no parent ae handler in multiple handler mode !");
-        mProcResShared =  parent->mProcResShared ;
     } else {
-        mProcResShared = new RkAiqAlgoProcResAeIntShared();
-        if (!mProcResShared.ptr()) {
-            LOGE("new ae mProcOutParam failed, bypass!");
-            return XCAM_RETURN_BYPASS;
-        }
     }
 
     return RkAiqAeHandleInt::processing();

@@ -87,8 +87,16 @@ void GicV2SelectParam(rkaiq_gic_v2_param_selected_t* selected, int ratio, int in
 void GicV2SelectParam(AgicConfigV21_t* selected, int ratio, int index,
                       const rkaiq_gic_v2_param_selected_t* auto_params, int iso_cnt) {
     float ratioF                            = ratio / 16.0f;
-    const rkaiq_gic_v2_param_selected_t* lo = &auto_params[index];
-    const rkaiq_gic_v2_param_selected_t* hi = &auto_params[index + 1];
+    const rkaiq_gic_v2_param_selected_t* lo;
+    const rkaiq_gic_v2_param_selected_t* hi;
+    if (iso_cnt ==1) {
+        lo = &auto_params[index];
+        hi = &auto_params[index];
+    } else {
+        lo = &auto_params[index];
+        hi = &auto_params[index + 1];
+    }
+
 
     selected->gr_ratio       = lo->gr_ratio;
     selected->regminbusythre = INTERPOLATION(ratio, hi->min_busy_thre, lo->min_busy_thre);
@@ -185,6 +193,8 @@ XCamReturn AgicInit(AgicContext_t* pAgicCtx, CamCalibDbV2Context_t* calib) {
     CalibDbV2_Gic_V21_t* calibv2_agic_calib_V21 =
         (CalibDbV2_Gic_V21_t*)(CALIBDBV2_GET_MODULE_PTR(calib, agic_calib_v21));
     GicV2CalibToAttr(calibv2_agic_calib_V21, &pAgicCtx->attr.v2);
+    //init manula params
+    pAgicCtx->attr.v2.manual_param = pAgicCtx->attr.v2.auto_params[0];
     pAgicCtx->attr.v2.op_mode = RKAIQ_GIC_API_OPMODE_AUTO;
     pAgicCtx->calib_changed   = true;
     pAgicCtx->state           = AGIC_STATE_RUNNING;
@@ -216,79 +226,79 @@ XCamReturn AgicPreProcess(AgicContext_t* pAgicCtx) {
     return XCAM_RETURN_NO_ERROR;
 }
 
-void AgicGetProcResultV21(AgicContext_t* pAgicCtx) {
+void AgicGetProcResultV21(AgicContext_t* pAgicCtx, AgicProcResult_t* pAgicRes) {
     LOG1_AGIC("enter!");
 
-    pAgicCtx->ProcRes.gic_en = pAgicCtx->ConfigData.ConfigV21.gic_en == 0 ? false : true;
-    pAgicCtx->ProcRes.ProcResV21.regmingradthrdark2 =
+    pAgicRes->gic_en = pAgicCtx->ConfigData.ConfigV21.gic_en == 0 ? false : true;
+    pAgicRes->ProcResV21.regmingradthrdark2 =
         pAgicCtx->ConfigData.ConfigV21.regmingradthrdark2;
-    pAgicCtx->ProcRes.ProcResV21.regmingradthrdark1 =
+    pAgicRes->ProcResV21.regmingradthrdark1 =
         pAgicCtx->ConfigData.ConfigV21.regmingradthrdark1;
-    pAgicCtx->ProcRes.ProcResV21.regminbusythre = pAgicCtx->ConfigData.ConfigV21.regminbusythre;
-    pAgicCtx->ProcRes.ProcResV21.regdarkthre    = pAgicCtx->ConfigData.ConfigV21.regdarkthre;
-    pAgicCtx->ProcRes.ProcResV21.regmaxcorvboth = pAgicCtx->ConfigData.ConfigV21.regmaxcorvboth;
-    pAgicCtx->ProcRes.ProcResV21.regdarktthrehi = pAgicCtx->ConfigData.ConfigV21.regdarktthrehi;
-    pAgicCtx->ProcRes.ProcResV21.regkgrad2dark =
+    pAgicRes->ProcResV21.regminbusythre = pAgicCtx->ConfigData.ConfigV21.regminbusythre;
+    pAgicRes->ProcResV21.regdarkthre    = pAgicCtx->ConfigData.ConfigV21.regdarkthre;
+    pAgicRes->ProcResV21.regmaxcorvboth = pAgicCtx->ConfigData.ConfigV21.regmaxcorvboth;
+    pAgicRes->ProcResV21.regdarktthrehi = pAgicCtx->ConfigData.ConfigV21.regdarktthrehi;
+    pAgicRes->ProcResV21.regkgrad2dark =
         (int)(log(double(pAgicCtx->ConfigData.ConfigV21.regkgrad2dark)) / log((double)2) + 0.5f);
-    pAgicCtx->ProcRes.ProcResV21.regkgrad1dark =
+    pAgicRes->ProcResV21.regkgrad1dark =
         (int)(log(double(pAgicCtx->ConfigData.ConfigV21.regkgrad1dark)) / log((double)2) + 0.5f);
 
-    pAgicCtx->ProcRes.ProcResV21.regstrengthglobal_fix =
+    pAgicRes->ProcResV21.regstrengthglobal_fix =
         (int)(pAgicCtx->ConfigData.ConfigV21.globalStrength * (1 << 7));
-    if (pAgicCtx->ProcRes.ProcResV21.regstrengthglobal_fix > (1 << 7) - 1)
-        pAgicCtx->ProcRes.ProcResV21.regstrengthglobal_fix = 7 + 1;
+    if (pAgicRes->ProcResV21.regstrengthglobal_fix > (1 << 7) - 1)
+        pAgicRes->ProcResV21.regstrengthglobal_fix = 7 + 1;
     else
-        pAgicCtx->ProcRes.ProcResV21.regstrengthglobal_fix =
-            int(log(double((1 << 7) - pAgicCtx->ProcRes.ProcResV21.regstrengthglobal_fix)) /
-                    log((double)2) +
+        pAgicRes->ProcResV21.regstrengthglobal_fix =
+            int(log(double((1 << 7) - pAgicRes->ProcResV21.regstrengthglobal_fix)) /
+                log((double)2) +
                 0.5f);
 
-    pAgicCtx->ProcRes.ProcResV21.regdarkthrestep =
+    pAgicRes->ProcResV21.regdarkthrestep =
         int(log(double(pAgicCtx->ConfigData.ConfigV21.regdarktthrehi -
                        pAgicCtx->ConfigData.ConfigV21.regdarkthre)) /
-                log((double)2) +
+            log((double)2) +
             0.5f);
-    pAgicCtx->ProcRes.ProcResV21.regkgrad2 =
+    pAgicRes->ProcResV21.regkgrad2 =
         (int)(log(double(pAgicCtx->ConfigData.ConfigV21.regkgrad2)) / log((double)2) + 0.5f);
-    pAgicCtx->ProcRes.ProcResV21.regkgrad1 =
+    pAgicRes->ProcResV21.regkgrad1 =
         (int)(log(double(pAgicCtx->ConfigData.ConfigV21.regkgrad1)) / log((double)2) + 0.5f);
-    pAgicCtx->ProcRes.ProcResV21.reggbthre =
+    pAgicRes->ProcResV21.reggbthre =
         int(log(double(pAgicCtx->ConfigData.ConfigV21.reggbthre)) / log((double)2) + 0.5f);
-    pAgicCtx->ProcRes.ProcResV21.regmaxcorv     = pAgicCtx->ConfigData.ConfigV21.regmaxcorv;
-    pAgicCtx->ProcRes.ProcResV21.regmingradthr1 = pAgicCtx->ConfigData.ConfigV21.regmingradthr1;
-    pAgicCtx->ProcRes.ProcResV21.regmingradthr2 = pAgicCtx->ConfigData.ConfigV21.regmingradthr2;
-    pAgicCtx->ProcRes.ProcResV21.gr_ratio       = pAgicCtx->ConfigData.ConfigV21.gr_ratio;
-    pAgicCtx->ProcRes.ProcResV21.noise_scale =
+    pAgicRes->ProcResV21.regmaxcorv     = pAgicCtx->ConfigData.ConfigV21.regmaxcorv;
+    pAgicRes->ProcResV21.regmingradthr1 = pAgicCtx->ConfigData.ConfigV21.regmingradthr1;
+    pAgicRes->ProcResV21.regmingradthr2 = pAgicCtx->ConfigData.ConfigV21.regmingradthr2;
+    pAgicRes->ProcResV21.gr_ratio       = pAgicCtx->ConfigData.ConfigV21.gr_ratio;
+    pAgicRes->ProcResV21.noise_scale =
         (pAgicCtx->ConfigData.ConfigV21.noise_scale);
-    pAgicCtx->ProcRes.ProcResV21.noise_base =
+    pAgicRes->ProcResV21.noise_base =
         (int)(pAgicCtx->ConfigData.ConfigV21.noise_base);
 
     for (int i = 0; i < 15; i++) {
-        pAgicCtx->ProcRes.ProcResV21.sigma_y[i] =
+        pAgicRes->ProcResV21.sigma_y[i] =
             (int)(pAgicCtx->ConfigData.ConfigV21.sigma_y[i] * (1 << 7));
     }
 
-    pAgicCtx->ProcRes.ProcResV21.diff_clip = pAgicCtx->ConfigData.ConfigV21.diff_clip;
+    pAgicRes->ProcResV21.diff_clip = pAgicCtx->ConfigData.ConfigV21.diff_clip;
 
-    if (pAgicCtx->ProcRes.ProcResV21.regkgrad2dark < pAgicCtx->ProcRes.ProcResV21.regkgrad2)
-        GIC_SWAP(int, pAgicCtx->ProcRes.ProcResV21.regkgrad2dark,
-                 pAgicCtx->ProcRes.ProcResV21.regkgrad2);
+    if (pAgicRes->ProcResV21.regkgrad2dark < pAgicRes->ProcResV21.regkgrad2)
+        GIC_SWAP(int, pAgicRes->ProcResV21.regkgrad2dark,
+                 pAgicRes->ProcResV21.regkgrad2);
 
-    if (pAgicCtx->ProcRes.ProcResV21.regmingradthrdark1 <
-        pAgicCtx->ProcRes.ProcResV21.regmingradthr1)
-        GIC_SWAP(int, pAgicCtx->ProcRes.ProcResV21.regmingradthrdark1,
-                 pAgicCtx->ProcRes.ProcResV21.regmingradthr1);
+    if (pAgicRes->ProcResV21.regmingradthrdark1 <
+            pAgicRes->ProcResV21.regmingradthr1)
+        GIC_SWAP(int, pAgicRes->ProcResV21.regmingradthrdark1,
+                 pAgicRes->ProcResV21.regmingradthr1);
 
-    if (pAgicCtx->ProcRes.ProcResV21.regmingradthrdark2 <
-        pAgicCtx->ProcRes.ProcResV21.regmingradthr2)
-        GIC_SWAP(int, pAgicCtx->ProcRes.ProcResV21.regmingradthrdark2,
-                 pAgicCtx->ProcRes.ProcResV21.regmingradthr2);
+    if (pAgicRes->ProcResV21.regmingradthrdark2 <
+            pAgicRes->ProcResV21.regmingradthr2)
+        GIC_SWAP(int, pAgicRes->ProcResV21.regmingradthrdark2,
+                 pAgicRes->ProcResV21.regmingradthr2);
 
-    if (pAgicCtx->ProcRes.ProcResV21.regdarktthrehi < pAgicCtx->ProcRes.ProcResV21.regdarkthre)
-        GIC_SWAP(int, pAgicCtx->ProcRes.ProcResV21.regdarktthrehi,
-                 pAgicCtx->ProcRes.ProcResV21.regdarkthre);
+    if (pAgicRes->ProcResV21.regdarktthrehi < pAgicRes->ProcResV21.regdarkthre)
+        GIC_SWAP(int, pAgicRes->ProcResV21.regdarktthrehi,
+                 pAgicRes->ProcResV21.regdarkthre);
 
-    GicV2DumpReg(&pAgicCtx->ProcRes.ProcResV21);
+    GicV2DumpReg(&pAgicRes->ProcResV21);
 
     LOG1_AGIC("exit!");
 }
@@ -299,7 +309,8 @@ void AgicProcessV21(AgicContext_t* pAgicCtx, int ISO) {
     float ave1 = 0.0f, noiseSigma = 0.0f;
     short ratio        = 0;
     short LumaPoints[] = {0,    128,  256,  384,  512,  640,  768, 896,
-                          1024, 1536, 2048, 2560, 3072, 3584, 4096};
+                          1024, 1536, 2048, 2560, 3072, 3584, 4096
+                         };
     int index = 0, iso_hi = 0, iso_lo = 0;
 
     LOGD_AGIC("enter, ISO=%d", ISO);
@@ -314,6 +325,8 @@ void AgicProcessV21(AgicContext_t* pAgicCtx, int ISO) {
         ratio = (1 << 4);
     } else {
         int i = 0;
+        iso_hi = ISO;
+        iso_lo = 50;
         for (i = 0; i < (int)(pAgicCtx->attr.v2.iso_cnt - 2); i++) {
             iso_lo = (int)(pAgicCtx->attr.v2.auto_params[i].iso);
             iso_hi = (int)(pAgicCtx->attr.v2.auto_params[i + 1].iso);
@@ -322,7 +335,11 @@ void AgicProcessV21(AgicContext_t* pAgicCtx, int ISO) {
                 break;
             }
         }
-        ratio = ((ISO - iso_lo) * (1 << 4)) / (iso_hi - iso_lo);
+        if (iso_hi == iso_lo){
+            ratio = 0;
+        } else {
+            ratio = ((ISO - iso_lo) * (1 << 4)) / (iso_hi - iso_lo);
+        }
         index = i;
     }
 
@@ -377,7 +394,7 @@ XCamReturn AgicProcess(AgicContext_t* pAgicCtx, int ISO, int mode) {
     return XCAM_RETURN_NO_ERROR;
 }
 
-XCamReturn AgicGetProcResult(AgicContext_t* pAgicCtx) {
+XCamReturn AgicGetProcResult(AgicContext_t* pAgicCtx, AgicProcResult_t* pAgicRes) {
     LOG1_AGIC("enter!");
 
     if (pAgicCtx == NULL) {
@@ -385,7 +402,7 @@ XCamReturn AgicGetProcResult(AgicContext_t* pAgicCtx) {
         return XCAM_RETURN_ERROR_PARAM;
     }
 
-    AgicGetProcResultV21(pAgicCtx);
+    AgicGetProcResultV21(pAgicCtx, pAgicRes);
 
     LOG1_AGIC("exit!");
     return XCAM_RETURN_NO_ERROR;

@@ -93,9 +93,9 @@ processing(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outparams)
     }
 
     rk_aiq_singlecam_3a_result_t* scam_3a_res = procParaGroup->camgroupParmasArray[0];
-    XCamVideoBuffer* awb_proc_res = scam_3a_res->awb._awbProcRes;
+    RkAiqAlgoProcResAwbShared_t* awb_proc_res = &scam_3a_res->awb._awbProcRes;
     if (awb_proc_res) {
-        RkAiqAlgoProcResAwb* awb_res = (RkAiqAlgoProcResAwb*)awb_proc_res->map(awb_proc_res);
+        RkAiqAlgoProcResAwbShared_t* awb_res = (RkAiqAlgoProcResAwbShared_t*)awb_proc_res;
         if(awb_res) {
             if(awb_res->awb_gain_algo.grgain < DIVMIN ||
                     awb_res->awb_gain_algo.gbgain < DIVMIN ) {
@@ -152,8 +152,18 @@ processing(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outparams)
     AlscConfig(hAlsc);
 
     for (int i = 0; i < procResParaGroup->arraySize; i++) {
-        *(procResParaGroup->camgroupParmasArray[i]->_lscConfig) = hAlsc->lscHwConf;
+        if (hAlsc->isReCal_) {
+            *(procResParaGroup->camgroupParmasArray[i]->_lscConfig) =
+                hAlsc->lscHwConf;
+            outparams->cfg_update = true;
+        } else {
+            outparams->cfg_update = false;
+        }
+        // TODO
+        IS_UPDATE_MEM((procResParaGroup->camgroupParmasArray[i]->_lscConfig), procParaGroup->_offset_is_update) =
+            outparams->cfg_update;
     }
+    hAlsc->isReCal_ = false;
 
     LOG1_ALSC( "%s: (exit)\n", __FUNCTION__);
     return XCAM_RETURN_NO_ERROR;

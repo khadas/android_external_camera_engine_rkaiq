@@ -48,11 +48,16 @@ class RkAiqAmergeHandleInt : virtual public RkAiqHandle {
     XCamReturn getAttribV12(mergeAttrV12_t* att);
 #endif
 
+    void setAeProcRes(RkAiqAlgoProcResAeShared_t* aeProcRes) {
+        mAeProcRes = *aeProcRes;
+    }
+
  protected:
     virtual void init();
     virtual void deInit() { RkAiqHandle::deInit(); };
 
  private:
+#ifndef DISABLE_HANDLE_ATTRIB
 #if RKAIQ_HAVE_MERGE_V10
     mergeAttrV10_t mCurAttV10;
     mergeAttrV10_t mNewAttV10;
@@ -65,6 +70,8 @@ class RkAiqAmergeHandleInt : virtual public RkAiqHandle {
     mergeAttrV12_t mCurAttV12;
     mergeAttrV12_t mNewAttV12;
 #endif
+#endif
+    RkAiqAlgoProcResAeShared_t mAeProcRes;
 
  private:
     DECLARE_HANDLE_REGISTER_TYPE(RkAiqAmergeHandleInt);

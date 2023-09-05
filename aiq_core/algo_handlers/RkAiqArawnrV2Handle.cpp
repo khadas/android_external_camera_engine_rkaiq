@@ -40,6 +40,7 @@ XCamReturn RkAiqArawnrV2HandleInt::updateConfig(bool needSync) {
     ENTER_ANALYZER_FUNCTION();
 
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
+#ifndef DISABLE_HANDLE_ATTRIB
     if (needSync) mCfgMutex.lock();
     // if something changed
     if (updateAtt) {
@@ -73,6 +74,7 @@ XCamReturn RkAiqArawnrV2HandleInt::updateConfig(bool needSync) {
     }
 
     if (needSync) mCfgMutex.unlock();
+#endif
 
     EXIT_ANALYZER_FUNCTION();
     return ret;
@@ -83,6 +85,9 @@ XCamReturn RkAiqArawnrV2HandleInt::setAttrib(rk_aiq_bayernr_attrib_v2_t* att) {
 
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
     mCfgMutex.lock();
+#ifdef DISABLE_HANDLE_ATTRIB
+    ret = rk_aiq_uapi_arawnrV2_SetAttrib(mAlgoCtx, att, false);
+#else
     // TODO
     // check if there is different between att & mCurAtt
     // if something changed, set att to mNewAtt, and
@@ -95,6 +100,7 @@ XCamReturn RkAiqArawnrV2HandleInt::setAttrib(rk_aiq_bayernr_attrib_v2_t* att) {
         updateAtt = true;
         waitSignal();
     }
+#endif
 
     mCfgMutex.unlock();
 
@@ -118,6 +124,9 @@ XCamReturn RkAiqArawnrV2HandleInt::setIQPara(rk_aiq_bayernr_IQPara_V2_t* para) {
 
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
     mCfgMutex.lock();
+#ifdef DISABLE_HANDLE_ATTRIB
+    // TODO
+#else
     // TODO
     // check if there is different between att & mCurAtt
     // if something changed, set att to mNewAtt, and
@@ -130,6 +139,7 @@ XCamReturn RkAiqArawnrV2HandleInt::setIQPara(rk_aiq_bayernr_IQPara_V2_t* para) {
         updateIQpara = true;
         waitSignal();
     }
+#endif
 
     mCfgMutex.unlock();
 
@@ -154,9 +164,13 @@ XCamReturn RkAiqArawnrV2HandleInt::setSFStrength(float fPercent) {
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
     mCfgMutex.lock();
 
+#ifdef DISABLE_HANDLE_ATTRIB
+    ret = rk_aiq_uapi_rawnrV2_SetSFStrength(mAlgoCtx, fPercent);
+#else
     mNew2DStrength   = fPercent;
     update2DStrength = true;
     waitSignal();
+#endif
 
     mCfgMutex.unlock();
     EXIT_ANALYZER_FUNCTION();
@@ -179,10 +193,14 @@ XCamReturn RkAiqArawnrV2HandleInt::setTFStrength(float fPercent) {
 
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
     mCfgMutex.lock();
+#ifdef DISABLE_HANDLE_ATTRIB
+    ret = rk_aiq_uapi_rawnrV2_SetTFStrength(mAlgoCtx, fPercent);
+#else
 
     mNew3DStrength   = fPercent;
     update3DStrength = true;
     waitSignal();
+#endif
 
     mCfgMutex.unlock();
     EXIT_ANALYZER_FUNCTION();
@@ -208,8 +226,6 @@ XCamReturn RkAiqArawnrV2HandleInt::prepare() {
     ret = RkAiqHandle::prepare();
     RKAIQCORE_CHECK_RET(ret, "arawnr handle prepare failed");
 
-    RkAiqAlgoConfigArawnrV2* aynr_config_int = (RkAiqAlgoConfigArawnrV2*)mConfig;
-
     RkAiqAlgoDescription* des = (RkAiqAlgoDescription*)mDes;
     ret                       = des->prepare(mConfig);
     RKAIQCORE_CHECK_RET(ret, "arawnr algo prepare failed");
@@ -222,12 +238,6 @@ XCamReturn RkAiqArawnrV2HandleInt::preProcess() {
     ENTER_ANALYZER_FUNCTION();
 
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
-
-    RkAiqAlgoPreArawnrV2* arawnr_pre_int        = (RkAiqAlgoPreArawnrV2*)mPreInParam;
-    RkAiqAlgoPreResArawnrV2* arawnr_pre_res_int = (RkAiqAlgoPreResArawnrV2*)mPreOutParam;
-    RkAiqCore::RkAiqAlgosGroupShared_t* shared =
-        (RkAiqCore::RkAiqAlgosGroupShared_t*)(getGroupShared());
-    RkAiqCore::RkAiqAlgosComShared_t* sharedCom = &mAiqCore->mAlogsComSharedParams;
 
     ret = RkAiqHandle::preProcess();
     if (ret) {
@@ -247,13 +257,14 @@ XCamReturn RkAiqArawnrV2HandleInt::processing() {
 
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
 
-    RkAiqAlgoProcArawnrV2* arawnr_proc_int        = (RkAiqAlgoProcArawnrV2*)mProcInParam;
+    RkAiqAlgoProcArawnrV2* arawnr_proc_int      = (RkAiqAlgoProcArawnrV2*)mProcInParam;
     RkAiqAlgoProcResArawnrV2* arawnr_proc_res_int = (RkAiqAlgoProcResArawnrV2*)mProcOutParam;
     RkAiqCore::RkAiqAlgosGroupShared_t* shared =
-        (RkAiqCore::RkAiqAlgosGroupShared_t*)(getGroupShared());
+            (RkAiqCore::RkAiqAlgosGroupShared_t*)(getGroupShared());
     RkAiqCore::RkAiqAlgosComShared_t* sharedCom = &mAiqCore->mAlogsComSharedParams;
-    static int arawnr_proc_framecnt             = 0;
-    arawnr_proc_framecnt++;
+
+    arawnr_proc_res_int->stArawnrProcResult.st2DFix = &shared->fullParams->mBaynrV21Params->data()->result.st2DParam;
+    arawnr_proc_res_int->stArawnrProcResult.st3DFix = &shared->fullParams->mBaynrV21Params->data()->result.st3DParam;
 
     ret = RkAiqHandle::processing();
     if (ret) {
@@ -264,8 +275,14 @@ XCamReturn RkAiqArawnrV2HandleInt::processing() {
     arawnr_proc_int->iso      = sharedCom->iso;
     arawnr_proc_int->hdr_mode = sharedCom->working_mode;
 
+#ifdef DISABLE_HANDLE_ATTRIB
+    mCfgMutex.lock();
+#endif
     RkAiqAlgoDescription* des = (RkAiqAlgoDescription*)mDes;
     ret                       = des->processing(mProcInParam, mProcOutParam);
+#ifdef DISABLE_HANDLE_ATTRIB
+    mCfgMutex.unlock();
+#endif
     RKAIQCORE_CHECK_RET(ret, "aynr algo processing failed");
 
     EXIT_ANALYZER_FUNCTION();
@@ -276,12 +293,6 @@ XCamReturn RkAiqArawnrV2HandleInt::postProcess() {
     ENTER_ANALYZER_FUNCTION();
 
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
-
-    RkAiqAlgoPostArawnrV2* arawnr_post_int        = (RkAiqAlgoPostArawnrV2*)mPostInParam;
-    RkAiqAlgoPostResArawnrV2* arawnr_post_res_int = (RkAiqAlgoPostResArawnrV2*)mPostOutParam;
-    RkAiqCore::RkAiqAlgosGroupShared_t* shared =
-        (RkAiqCore::RkAiqAlgosGroupShared_t*)(getGroupShared());
-    RkAiqCore::RkAiqAlgosComShared_t* sharedCom = &mAiqCore->mAlogsComSharedParams;
 
     ret = RkAiqHandle::postProcess();
     if (ret) {
@@ -321,14 +332,33 @@ XCamReturn RkAiqArawnrV2HandleInt::genIspResult(RkAiqFullParams* params,
         } else {
             rawnr_param->frame_id = shared->frameId;
         }
-        memcpy(&rawnr_param->result.st2DParam, &arawnr_rk->stArawnrProcResult.st2DFix,
-               sizeof(RK_Bayernr_2D_Fix_V2_t));
-        memcpy(&rawnr_param->result.st3DParam, &arawnr_rk->stArawnrProcResult.st3DFix,
-               sizeof(RK_Bayernr_3D_Fix_V2_t));
+
+        if (arawnr_rk->res_com.cfg_update) {
+            mSyncFlag = shared->frameId;
+            rawnr_param->sync_flag = mSyncFlag;
+            // copy from algo result
+            // set as the latest result
+            cur_params->mBaynrV21Params = params->mBaynrV21Params;
+            rawnr_param->is_update = true;
+            LOGD_ANR("[%d] params from algo", mSyncFlag);
+        } else if (mSyncFlag != rawnr_param->sync_flag) {
+            rawnr_param->sync_flag = mSyncFlag;
+            // copy from latest result
+            if (cur_params->mBaynrV21Params.ptr()) {
+                rawnr_param->result = cur_params->mBaynrV21Params->data()->result;
+                rawnr_param->is_update = true;
+            } else {
+                LOGE_ANR("no latest params !");
+                rawnr_param->is_update = false;
+            }
+            LOGD_ANR("[%d] params from latest [%d]", shared->frameId, mSyncFlag);
+        } else {
+            // do nothing, result in buf needn't update
+            rawnr_param->is_update = false;
+            LOGD_ANR("[%d] params needn't update", shared->frameId);
+        }
         LOGD_ANR("oyyf: %s:%d output isp param end \n", __FUNCTION__, __LINE__);
     }
-
-    cur_params->mBaynrV21Params = params->mBaynrV21Params;
 
     EXIT_ANALYZER_FUNCTION();
 

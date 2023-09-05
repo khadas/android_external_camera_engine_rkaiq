@@ -36,6 +36,7 @@ XCamReturn RkAiqAdegammaHandleInt::updateConfig(bool needSync) {
     ENTER_ANALYZER_FUNCTION();
 
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
+#ifndef DISABLE_HANDLE_ATTRIB
     if (needSync) mCfgMutex.lock();
     // if something changed
     if (updateAtt) {
@@ -47,7 +48,7 @@ XCamReturn RkAiqAdegammaHandleInt::updateConfig(bool needSync) {
     }
 
     if (needSync) mCfgMutex.unlock();
-
+#endif
     EXIT_ANALYZER_FUNCTION();
     return ret;
 }
@@ -57,6 +58,9 @@ XCamReturn RkAiqAdegammaHandleInt::setAttrib(rk_aiq_degamma_attrib_t att) {
 
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
     mCfgMutex.lock();
+#ifdef DISABLE_HANDLE_ATTRIB
+    ret = rk_aiq_uapi_adegamma_SetAttrib(mAlgoCtx, att, false);
+#else
     // TODO
     // check if there is different between att & mCurAtt
     // if something changed, set att to mNewAtt, and
@@ -69,7 +73,7 @@ XCamReturn RkAiqAdegammaHandleInt::setAttrib(rk_aiq_degamma_attrib_t att) {
         updateAtt = true;
         sendSignal();
     }
-
+#endif
     mCfgMutex.unlock();
 
     EXIT_ANALYZER_FUNCTION();
@@ -143,8 +147,10 @@ XCamReturn RkAiqAdegammaHandleInt::processing() {
     RkAiqAlgoProcAdegamma* adegamma_proc_int        = (RkAiqAlgoProcAdegamma*)mProcInParam;
     RkAiqAlgoProcResAdegamma* adegamma_proc_res_int = (RkAiqAlgoProcResAdegamma*)mProcOutParam;
     RkAiqCore::RkAiqAlgosGroupShared_t* shared =
-        (RkAiqCore::RkAiqAlgosGroupShared_t*)(getGroupShared());
+            (RkAiqCore::RkAiqAlgosGroupShared_t*)(getGroupShared());
     RkAiqCore::RkAiqAlgosComShared_t* sharedCom = &mAiqCore->mAlogsComSharedParams;
+
+    adegamma_proc_res_int->adegamma_proc_res = &shared->fullParams->mAdegammaParams->data()->result;
 
     ret = RkAiqHandle::processing();
     if (ret) {
@@ -155,8 +161,14 @@ XCamReturn RkAiqAdegammaHandleInt::processing() {
     adegamma_proc_int->calib = sharedCom->calib;
 #endif
 
+#ifdef DISABLE_HANDLE_ATTRIB
+    mCfgMutex.lock();
+#endif
     RkAiqAlgoDescription* des = (RkAiqAlgoDescription*)mDes;
     ret                       = des->processing(mProcInParam, mProcOutParam);
+#ifdef DISABLE_HANDLE_ATTRIB
+    mCfgMutex.unlock();
+#endif
     RKAIQCORE_CHECK_RET(ret, "adegamma algo processing failed");
 
     EXIT_ANALYZER_FUNCTION();
@@ -213,20 +225,31 @@ XCamReturn RkAiqAdegammaHandleInt::genIspResult(RkAiqFullParams* params,
             degamma_param->frame_id = shared->frameId;
         }
 
-        degamma_param->result.degamma_en   = adegamma_rk->adegamma_proc_res.degamma_en;
-        degamma_param->result.degamma_X_d0 = adegamma_rk->adegamma_proc_res.degamma_X_d0;
-        degamma_param->result.degamma_X_d1 = adegamma_rk->adegamma_proc_res.degamma_X_d1;
-        for (int i = 0; i < DEGAMMA_CRUVE_Y_KNOTS; i++) {
-            degamma_param->result.degamma_tableR[i] =
-                adegamma_rk->adegamma_proc_res.degamma_tableR[i];
-            degamma_param->result.degamma_tableG[i] =
-                adegamma_rk->adegamma_proc_res.degamma_tableG[i];
-            degamma_param->result.degamma_tableB[i] =
-                adegamma_rk->adegamma_proc_res.degamma_tableB[i];
+        if (adegamma_com->res_com.cfg_update) {
+            mSyncFlag = shared->frameId;
+            degamma_param->sync_flag = mSyncFlag;
+            // copy from algo result
+            // set as the latest result
+            cur_params->mAdegammaParams= params->mAdegammaParams;
+            degamma_param->is_update = true;
+            LOGD_ADEGAMMA("[%d] params from algo", mSyncFlag);
+        } else if (mSyncFlag != degamma_param->sync_flag) {
+            degamma_param->sync_flag = mSyncFlag;
+            // copy from latest result
+            if (cur_params->mAdegammaParams.ptr()) {
+                degamma_param->result = cur_params->mAdegammaParams->data()->result;
+                degamma_param->is_update = true;
+            } else {
+                LOGE_ADEGAMMA("no latest params !");
+                degamma_param->is_update = false;
+            }
+            LOGD_ADEGAMMA("[%d] params from latest [%d]", shared->frameId, mSyncFlag);
+        } else {
+            // do nothing, result in buf needn't update
+            degamma_param->is_update = false;
+            LOGD_ADEGAMMA("[%d] params needn't update", shared->frameId);
         }
     }
-
-    cur_params->mAdegammaParams = params->mAdegammaParams;
 
     EXIT_ANALYZER_FUNCTION();
 

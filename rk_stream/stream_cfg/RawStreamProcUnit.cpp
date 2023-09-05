@@ -153,6 +153,7 @@ int _parse_rk_rawdata(void *rawdata, rkrawstream_rkraw2_t *rkraw2)
         rkraw2->plane[0].addr = uptr;
         rkraw2->plane[0].fd = _st_addr[0].fd;
         rkraw2->plane[0].idx = _st_addr[0].idx;
+        rkraw2->plane[0].size = _st_addr[0].size;
         rkraw2->plane[0].timestamp = _st_addr[0].timestamp;
     }
     if(userptr[0]){
@@ -172,6 +173,7 @@ int _parse_rk_rawdata(void *rawdata, rkrawstream_rkraw2_t *rkraw2)
         rkraw2->plane[1].addr = uptr;
         rkraw2->plane[1].fd = _st_addr[1].fd;
         rkraw2->plane[1].idx = _st_addr[1].idx;
+        rkraw2->plane[1].size = _st_addr[1].size;
         rkraw2->plane[1].timestamp = _st_addr[1].timestamp;
     }
     if(userptr[1]){
@@ -192,6 +194,7 @@ int _parse_rk_rawdata(void *rawdata, rkrawstream_rkraw2_t *rkraw2)
         rkraw2->plane[2].addr = uptr;
         rkraw2->plane[2].fd = _st_addr[2].fd;
         rkraw2->plane[2].idx = _st_addr[2].idx;
+        rkraw2->plane[2].size = _st_addr[2].size;
         rkraw2->plane[2].timestamp = _st_addr[2].timestamp;
     }
     if(userptr[2]){
@@ -255,8 +258,9 @@ int _parse_rk_rawdata(void *rawdata, rkrawstream_rkraw2_t *rkraw2)
     // dummy_dev = new V4l2Device(NULL);
 // }
 
-RawStreamProcUnit::RawStreamProcUnit (const rk_sensor_full_info_t *s_info, uint8_t is_offline, uint8_t buf_memory_type)
+RawStreamProcUnit::RawStreamProcUnit (const rk_sensor_full_info_t *s_info, uint8_t is_offline)
     : _first_trigger(true)
+    , _mipi_dev_max(0)
     , _is_multi_cam_conc(false)
     , user_isp_process_done_cb(NULL)
     , _memory_type(V4L2_MEMORY_DMABUF)
@@ -267,7 +271,6 @@ RawStreamProcUnit::RawStreamProcUnit (const rk_sensor_full_info_t *s_info, uint8
     bool linked_to_isp = s_info->linked_to_isp;
 
     _is_offline_mode = is_offline;
-    _memory_type = (enum v4l2_memory)buf_memory_type;
 
     strncpy(_sns_name, s_info->sensor_name.c_str(), 32);
     //short frame
@@ -372,7 +375,6 @@ XCamReturn RawStreamProcUnit::stop ()
         for (int i = 0; i < _mipi_dev_max; i++) {
             if(_rawbuffer[i]){
                 free(_rawbuffer[i]);
-                printf("free _rawbuffer[%d]\n", i);
             }
         }
     }
@@ -383,17 +385,25 @@ XCamReturn RawStreamProcUnit::stop ()
 }
 
 XCamReturn
-RawStreamProcUnit::prepare(int idx)
+RawStreamProcUnit::prepare(int idx, uint8_t buf_memory_type, uint8_t buf_cnt)
 {
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
+    _memory_type = (enum v4l2_memory)buf_memory_type;
+    LOGE_RKSTREAM("RawStreamProcUnit::prepare idx:%d buf_memory_type: %d\n",idx, buf_memory_type);
     // mipi rx/tx format should match to sensor.
     for (int i = 0; i < 3; i++) {
         if (!(idx & (1 << i)))
             continue;
 
+        if(buf_memory_type)
+            _dev[i]->set_mem_type(_memory_type);
+
+        if(buf_cnt)
+            _dev[i]->set_buffer_count(buf_cnt);
+
         ret = _dev[i]->prepare();
         if (ret < 0)
-            LOGE_RKSTREAM("mipi tx:%d prepare err: %d\n", ret);
+            LOGE_RKSTREAM("mipi tx:%d prepare err: %d\n", i, ret);
 
         _stream[i]->set_device_prepared(true);
          if(_is_offline_mode) {
@@ -434,25 +444,107 @@ RawStreamProcUnit::set_rx_format(uint32_t width, uint32_t height, uint32_t pix_f
             _dev[i]->get_format (format);
 
             int bpp = pixFmt2Bpp(format.fmt.pix.pixelformat);
-            //printf("set_rx_format: fmt 0x%x is_multi_isp_mode %d bpp%d\n", format.fmt.pix.pixelformat, is_multi_isp_mode, bpp);
-
-                int mem_mode = mode;
-                int ret1 = _dev[i]->io_control (RKISP_CMD_SET_CSI_MEMORY_MODE, &mem_mode);
-                if (ret1)
-                    printf("set CSI_MEM_WORD_LITTLE_ALIGN failed !\n");
+            int mem_mode = mode;
+            int ret1 = _dev[i]->io_control (RKISP_CMD_SET_CSI_MEMORY_MODE, &mem_mode);
+            if (ret1)
+                LOGE_RKSTREAM("set CSI_MEM_WORD_LITTLE_ALIGN failed !\n");
 
 
-                    printf("setup fmt %dx%d, 0x%x\n",width, height, format.fmt.pix.pixelformat);
-                if (_dev[i].ptr())
-                    _dev[i]->set_format(width,
-                                        height,
-                                        format.fmt.pix.pixelformat,
-                                        V4L2_FIELD_NONE,
-                                        0);
+            LOGI_RKSTREAM("set_rx_format: setup fmt %dx%d, 0x%x mem_mode %d\n",width, height, format.fmt.pix.pixelformat, mem_mode);
+            if (_dev[i].ptr())
+                _dev[i]->set_format(width,
+                                    height,
+                                    format.fmt.pix.pixelformat,
+                                    V4L2_FIELD_NONE,
+                                    0);
         }
     }
 }
 
+void
+RawStreamProcUnit::setup_pipeline_fmt(uint32_t width, uint32_t height)
+{
+    int ret;
+    // set isp sink fmt, same as sensor bounds - crop
+    struct v4l2_subdev_format isp_sink_fmt;
+
+    memset(&isp_sink_fmt, 0, sizeof(isp_sink_fmt));
+    isp_sink_fmt.pad = 0;
+    isp_sink_fmt.which = V4L2_SUBDEV_FORMAT_ACTIVE;
+    ret = _isp_core_dev->getFormat(isp_sink_fmt);
+    if (ret) {
+        LOGE_RKSTREAM("set mIspCoreDev fmt failed !\n");
+        return;
+    }
+    isp_sink_fmt.format.width = width;
+    isp_sink_fmt.format.height = height;
+    //isp_sink_fmt.format.code = sns_sd_fmt.format.code;
+
+    ret = _isp_core_dev->setFormat(isp_sink_fmt);
+    if (ret) {
+        LOGE_RKSTREAM("set mIspCoreDev fmt failed !\n");
+        return;
+    }
+
+    LOGD_RKSTREAM("isp sink fmt info: fmt 0x%x, %dx%d !",
+                    isp_sink_fmt.format.code, isp_sink_fmt.format.width, isp_sink_fmt.format.height);
+
+    // set selection, isp needn't do the crop
+    struct v4l2_subdev_selection aSelection;
+    memset(&aSelection, 0, sizeof(aSelection));
+
+    aSelection.which = V4L2_SUBDEV_FORMAT_ACTIVE;
+    aSelection.pad = 0;
+    aSelection.flags = 0;
+    aSelection.target = V4L2_SEL_TGT_CROP;
+    aSelection.r.width = width;
+    aSelection.r.height = height;
+    aSelection.r.left = 0;
+    aSelection.r.top = 0;
+    ret = _isp_core_dev->set_selection (aSelection);
+    if (ret) {
+        LOGE_RKSTREAM("set mIspCoreDev crop failed !\n");
+        return;
+    }
+
+    LOGD_RKSTREAM("isp sink crop info: %dx%d@%d,%d !",
+                    aSelection.r.width, aSelection.r.height,
+                    aSelection.r.left, aSelection.r.top);
+
+    // set isp rkisp-isp-subdev src crop
+    aSelection.pad = 2;
+    ret = _isp_core_dev->set_selection (aSelection);
+    if (ret) {
+        LOGE_RKSTREAM("set mIspCoreDev source crop failed !\n");
+        return;
+    }
+    LOGD_RKSTREAM("isp src crop info: %dx%d@%d,%d !",
+                    aSelection.r.width, aSelection.r.height,
+                    aSelection.r.left, aSelection.r.top);
+
+    // set isp rkisp-isp-subdev src pad fmt
+    struct v4l2_subdev_format isp_src_fmt;
+
+    memset(&isp_src_fmt, 0, sizeof(isp_src_fmt));
+    isp_src_fmt.which = V4L2_SUBDEV_FORMAT_ACTIVE;
+    isp_src_fmt.pad = 2;
+    ret = _isp_core_dev->getFormat(isp_src_fmt);
+    if (ret) {
+        LOGE_RKSTREAM("get mIspCoreDev src fmt failed !\n");
+        return;
+    }
+
+    isp_src_fmt.format.width = aSelection.r.width;
+    isp_src_fmt.format.height = aSelection.r.height;
+    ret = _isp_core_dev->setFormat(isp_src_fmt);
+    if (ret) {
+        LOGE_RKSTREAM("set mIspCoreDev src fmt failed !\n");
+        return;
+    }
+
+    LOGD_RKSTREAM("isp src fmt info: fmt 0x%x, %dx%d !",
+                    isp_src_fmt.format.code, isp_src_fmt.format.width, isp_src_fmt.format.height);
+}
 /*
 SmartPtr<V4l2Device>
 RawStreamProcUnit::get_rx_device(int index)
@@ -636,30 +728,31 @@ RawStreamProcUnit::raw_buffer_proc ()
 void
 RawStreamProcUnit::send_sync_buf2(uint8_t *rkraw_data)
 {
+    rkrawstream_rkraw2_t rkraw2;
+    _parse_rk_rawdata(rkraw_data,  &rkraw2);
+    _send_sync_buf(&rkraw2);
+}
 
-
+void
+RawStreamProcUnit::_send_sync_buf(rkrawstream_rkraw2_t *rkraw2)
+{
     SmartPtr<SimpleFdBuf> sbuf_s, sbuf_m, sbuf_l;
     sbuf_s = new SimpleFdBuf();
     sbuf_m = new SimpleFdBuf();
     sbuf_l = new SimpleFdBuf();
-    //rk_aiq_frame_info_t _finfo;
-
-    rkrawstream_rkraw2_t rkraw2;
-    _parse_rk_rawdata(rkraw_data,  &rkraw2);
 
     /*
      * Offline frames has no index and seq,
      * so we assign them here.
      */
-
-    if(rkraw2.plane[0].mode == 0){
-        sbuf_s->_userptr = (uint8_t *)rkraw2.plane[0].addr;
-        sbuf_s->_fd = rkraw2.plane[0].fd;
-        sbuf_s->_index = rkraw2.plane[0].idx;
-        sbuf_s->_seq = rkraw2._rawfmt.frame_id;
-        sbuf_s->_ts = rkraw2.plane[0].timestamp;
+    if(rkraw2->plane[0].mode == 0){
+        sbuf_s->_userptr = (uint8_t *)rkraw2->plane[0].addr;
+        sbuf_s->_fd = rkraw2->plane[0].fd;
+        sbuf_s->_index = rkraw2->plane[0].idx;
+        sbuf_s->_seq = rkraw2->_rawfmt.frame_id;
+        sbuf_s->_ts = rkraw2->plane[0].timestamp;
     } else {
-        memcpy(_rawbuffer[0], (uint8_t *)rkraw2.plane[0].addr, rkraw2.plane[0].size);
+        memcpy(_rawbuffer[0], (uint8_t *)rkraw2->plane[0].addr, rkraw2->plane[0].size);
         sbuf_s->_userptr = _rawbuffer[0];
         sbuf_s->_index = _offline_index;
         sbuf_s->_seq = _offline_seq;
@@ -834,13 +927,14 @@ RawStreamProcUnit::trigger_isp_readback()
             tg.sof_timestamp = tg.frame_timestamp;
             // tg.times = 1;//fixed to three times readback
             LOGI_RKSTREAM(
-                            "camId:%d frame[%d]: sof_ts %" PRId64 "ms, frame_ts %" PRId64 "ms, globalTmo(%d), readback(%d)\n",
+                            "camId:%d frame[%d]: sof_ts %" PRId64 "ms, frame_ts %" PRId64 "ms, globalTmo(%d), readback(%d) fd %d\n",
                             mCamPhyId,
                             sequence,
                             tg.sof_timestamp / 1000 / 1000,
                             tg.frame_timestamp / 1000 / 1000,
                             isHdrGlobalTmo,
-                            tg.times);
+                            tg.times,
+                            simple_buf->_fd);
 
             if (ret == XCAM_RETURN_NO_ERROR)
                 _isp_core_dev->io_control(RKISP_CMD_TRIGGER_READ_BACK, &tg);

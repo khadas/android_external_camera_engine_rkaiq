@@ -84,6 +84,10 @@ prepare(RkAiqAlgoCom* params)
     pAynrCtx->prepare_type = params->u.prepare.conf_type;
 
     if(!!(params->u.prepare.conf_type & RK_AIQ_ALGO_CONFTYPE_UPDATECALIB )) {
+        // just update calib ptr
+        if (params->u.prepare.conf_type & RK_AIQ_ALGO_CONFTYPE_UPDATECALIB_PTR) {
+            return XCAM_RETURN_NO_ERROR;
+        }
 #if AYNR_USE_JSON_FILE_V22
         void *pCalibdbV2 = (void*)(pCfgParam->com.u.prepare.calibv2);
         CalibDbV2_YnrV22_t *ynr_v22 = (CalibDbV2_YnrV22_t*)(CALIBDBV2_GET_MODULE_PTR((void*)pCalibdbV2, ynr_v22));
@@ -149,6 +153,11 @@ processing(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outparams)
     Aynr_ExpInfo_V22_t stExpInfo;
     memset(&stExpInfo, 0x00, sizeof(Aynr_ExpInfo_V22_t));
 
+    if (!pAynrProcParams) {
+        LOGE_ANR("%s:%d null pointer pAynrProcParams", __FUNCTION__, __LINE__);
+        return XCAM_RETURN_BYPASS;
+    }
+
     LOGD_ANR("%s:%d init:%d hdr mode:%d  \n",
              __FUNCTION__, __LINE__,
              inparams->u.proc.init,
@@ -192,11 +201,10 @@ processing(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outparams)
     stExpInfo.snr_mode = 0;
 
     stExpInfo.blc_ob_predgain = 1.0;
-    if(pAynrProcParams != NULL) {
-        stExpInfo.blc_ob_predgain = pAynrProcParams->stAblcV32_proc_res.isp_ob_predgain;
-        if(stExpInfo.blc_ob_predgain != pAynrCtx->stExpInfo.blc_ob_predgain) {
-            pAynrCtx->isReCalculate |= 1;
-        }
+
+    stExpInfo.blc_ob_predgain = pAynrProcParams->stAblcV32_proc_res->isp_ob_predgain;
+    if(stExpInfo.blc_ob_predgain != pAynrCtx->stExpInfo.blc_ob_predgain) {
+        pAynrCtx->isReCalculate |= 1;
     }
 #if 0// TODO Merge:
     XCamVideoBuffer* xCamAePreRes = pAynrProcParams->com.u.proc.res_comb->ae_pre_res;
@@ -316,14 +324,14 @@ processing(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outparams)
             LOGE_ANR("%s: processing ANR failed (%d)\n", __FUNCTION__, ret);
         }
 
-        pAynrProcResParams->stAynrProcResult.isNeedUpdate = true;
+        Aynr_GetProcResult_V22(pAynrCtx, &pAynrProcResParams->stAynrProcResult);
+        outparams->cfg_update = true;
         LOGD_ANR("recalculate: %d delta_iso:%d \n ", pAynrCtx->isReCalculate, deltaIso);
     } else {
-        pAynrProcResParams->stAynrProcResult.isNeedUpdate = false;
+        outparams->cfg_update = false;
     }
 #endif
 
-    Aynr_GetProcResult_V22(pAynrCtx, &pAynrProcResParams->stAynrProcResult);
     pAynrCtx->isReCalculate = 0;
 
     LOGI_ANR("%s: (exit)\n", __FUNCTION__ );

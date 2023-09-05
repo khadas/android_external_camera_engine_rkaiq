@@ -248,22 +248,22 @@ Abayernr_result_t Abayernr_GetProcResult_V2(Abayernr_Context_V2_t *pAbayernrCtx,
         return ABAYERNR_RET_INVALID_PARM;
     }
 
+    RK_Bayernr_2D_Params_V2_Select_t* st2DSelect = NULL;
+    RK_Bayernr_3D_Params_V2_Select_t* st3DSelect = NULL;
     if(pAbayernrCtx->eMode == ABAYERNR_OP_MODE_AUTO) {
-
-        pAbayernrResult->st2DSelect = pAbayernrCtx->stAuto.st2DSelect;
-        pAbayernrResult->st3DSelect = pAbayernrCtx->stAuto.st3DSelect;
-
+        st2DSelect = &pAbayernrCtx->stAuto.st2DSelect;
+        st3DSelect = &pAbayernrCtx->stAuto.st3DSelect;
     } else if(pAbayernrCtx->eMode == ABAYERNR_OP_MODE_MANUAL) {
         //TODO
-        pAbayernrResult->st2DSelect = pAbayernrCtx->stManual.st2DSelect;
-        pAbayernrResult->st3DSelect = pAbayernrCtx->stManual.st3DSelect;
+        st2DSelect = &pAbayernrCtx->stManual.st2DSelect;
+        st3DSelect = &pAbayernrCtx->stManual.st3DSelect;
         pAbayernrCtx->fRawnr_SF_Strength = 1.0;
         pAbayernrCtx->fRawnr_TF_Strength = 1.0;
     }
 
     //transfer to reg value
-    bayernr2D_fix_transfer_V2(&pAbayernrResult->st2DSelect, &pAbayernrResult->st2DFix, pAbayernrCtx->fRawnr_SF_Strength, &pAbayernrCtx->stExpInfo);
-    bayernr3D_fix_transfer_V2(&pAbayernrResult->st3DSelect, &pAbayernrResult->st3DFix, pAbayernrCtx->fRawnr_TF_Strength, &pAbayernrCtx->stExpInfo);
+    bayernr2D_fix_transfer_V2(st2DSelect, pAbayernrResult->st2DFix, pAbayernrCtx->fRawnr_SF_Strength, &pAbayernrCtx->stExpInfo);
+    bayernr3D_fix_transfer_V2(st3DSelect, pAbayernrResult->st3DFix, pAbayernrCtx->fRawnr_TF_Strength, &pAbayernrCtx->stExpInfo);
 
     LOGD_ANR("%s:%d xml:local:%d mode:%d  reg: local gain:%d  mfnr gain:%d mode:%d\n",
              __FUNCTION__, __LINE__);
@@ -320,12 +320,13 @@ Abayernr_result_t Abayernr_ConfigSettingParam_V2(Abayernr_Context_V2_t *pAbayern
 
 Abayernr_result_t Abayernr_ParamModeProcess_V2(Abayernr_Context_V2_t *pAbayernrCtx, Abayernr_ExpInfo_t *pExpInfo, Abayernr_ParamMode_t *mode) {
     Abayernr_result_t res  = ABAYERNR_RET_SUCCESS;
-    *mode = pAbayernrCtx->eParamMode;
 
     if(pAbayernrCtx == NULL) {
         LOGE_ANR("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
         return ABAYERNR_RET_INVALID_PARM;
     }
+
+    *mode = pAbayernrCtx->eParamMode;
 
     if(pAbayernrCtx->isGrayMode) {
         *mode = ABAYERNR_PARAM_MODE_GRAY;

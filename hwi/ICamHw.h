@@ -127,6 +127,7 @@ public:
     virtual XCamReturn FocusCorrection() = 0;
     virtual XCamReturn ZoomCorrection() = 0;
     virtual XCamReturn setAngleZ(float angleZ) = 0;
+    virtual XCamReturn getFocusPosition(int& position) = 0;
     virtual void getShareMemOps(isp_drv_share_mem_ops_t** mem_ops) = 0;
     virtual XCamReturn getEffectiveIspParams(rkisp_effect_params_v20& ispParams, uint32_t frame_id) = 0;
     virtual uint64_t getIspModuleEnState() = 0;
@@ -143,7 +144,6 @@ public:
     virtual XCamReturn rawReproc_genIspParams (uint32_t sequence, rk_aiq_frame_info_t *offline_finfo, int mode) = 0;
     virtual XCamReturn rawReProc_prepare (uint32_t sequence, rk_aiq_frame_info_t *offline_finfo) = 0;
     virtual void setUserSensorFormat(uint16_t width, uint16_t height, uint16_t code) = 0;
-
 private:
     XCAM_DEAD_COPY (ICamHw);
 };

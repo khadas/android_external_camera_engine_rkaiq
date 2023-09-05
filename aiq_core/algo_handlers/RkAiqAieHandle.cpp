@@ -25,6 +25,7 @@ XCamReturn RkAiqAieHandleInt::updateConfig(bool needSync) {
     ENTER_ANALYZER_FUNCTION();
 
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
+#ifndef DISABLE_HANDLE_ATTRIB
     if (needSync) mCfgMutex.lock();
     // if something changed
     if (updateAtt) {
@@ -34,6 +35,7 @@ XCamReturn RkAiqAieHandleInt::updateConfig(bool needSync) {
         updateAtt = false;
     }
     if (needSync) mCfgMutex.unlock();
+#endif
 
     EXIT_ANALYZER_FUNCTION();
     return ret;
@@ -48,6 +50,9 @@ XCamReturn RkAiqAieHandleInt::setAttrib(const aie_attrib_t* att) {
     // if something changed, set att to mNewAtt, and
     // the new params will be effective later when updateConfig
     // called by RkAiqCore
+#ifdef DISABLE_HANDLE_ATTRIB
+    ret = rk_aiq_uapi_aie_SetAttrib(mAlgoCtx, const_cast<aie_attrib_t*>(att), false);
+#else
     bool isChanged = false;
     if (att->sync.sync_mode == RK_AIQ_UAPI_MODE_ASYNC && \
         memcmp(&mNewAtt, att, sizeof(*att)))
@@ -62,6 +67,7 @@ XCamReturn RkAiqAieHandleInt::setAttrib(const aie_attrib_t* att) {
         updateAtt = true;
         waitSignal(att->sync.sync_mode);
     }
+#endif
 
     mCfgMutex.unlock();
 
@@ -73,6 +79,11 @@ XCamReturn RkAiqAieHandleInt::getAttrib(aie_attrib_t* att) {
     ENTER_ANALYZER_FUNCTION();
 
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
+#ifdef DISABLE_HANDLE_ATTRIB
+    mCfgMutex.lock();
+    rk_aiq_uapi_aie_GetAttrib(mAlgoCtx, att);
+    mCfgMutex.unlock();
+#else
 
     if (att->sync.sync_mode == RK_AIQ_UAPI_MODE_SYNC) {
         mCfgMutex.lock();
@@ -89,6 +100,7 @@ XCamReturn RkAiqAieHandleInt::getAttrib(aie_attrib_t* att) {
             att->sync.done      = true;
         }
     }
+#endif
 
     EXIT_ANALYZER_FUNCTION();
     return ret;
@@ -112,10 +124,6 @@ XCamReturn RkAiqAieHandleInt::prepare() {
 
     ret = RkAiqHandle::prepare();
     RKAIQCORE_CHECK_RET(ret, "aie handle prepare failed");
-
-    RkAiqAlgoConfigAie* aie_config_int = (RkAiqAlgoConfigAie*)mConfig;
-    RkAiqCore::RkAiqAlgosGroupShared_t* shared =
-        (RkAiqCore::RkAiqAlgosGroupShared_t*)(getGroupShared());
 
     RkAiqAlgoDescription* des = (RkAiqAlgoDescription*)mDes;
     ret                       = des->prepare(mConfig);
@@ -161,13 +169,21 @@ XCamReturn RkAiqAieHandleInt::processing() {
         (RkAiqCore::RkAiqAlgosGroupShared_t*)(getGroupShared());
     RkAiqCore::RkAiqAlgosComShared_t* sharedCom = &mAiqCore->mAlogsComSharedParams;
 
+    aie_proc_res_int->ieRes = &shared->fullParams->mIeParams->data()->result;
+
     ret = RkAiqHandle::processing();
     if (ret) {
         RKAIQCORE_CHECK_RET(ret, "aie handle processing failed");
     }
 
+#ifdef DISABLE_HANDLE_ATTRIB
+    mCfgMutex.lock();
+#endif
     RkAiqAlgoDescription* des = (RkAiqAlgoDescription*)mDes;
     ret                       = des->processing(mProcInParam, mProcOutParam);
+#ifdef DISABLE_HANDLE_ATTRIB
+    mCfgMutex.unlock();
+#endif
     RKAIQCORE_CHECK_RET(ret, "aie algo processing failed");
 
     EXIT_ANALYZER_FUNCTION();
@@ -221,15 +237,30 @@ XCamReturn RkAiqAieHandleInt::genIspResult(RkAiqFullParams* params, RkAiqFullPar
         return XCAM_RETURN_NO_ERROR;
     }
 
-    rk_aiq_isp_ie_t* isp_ie = &ie_param->result;
-    isp_ie->base            = aie_com->params_com;
-
-    if (!this->getAlgoId()) {
-        RkAiqAlgoProcResAie* aie_rk = (RkAiqAlgoProcResAie*)aie_com;
-        isp_ie->extra = aie_rk->params;
+    if (aie_com->res_com.cfg_update) {
+        mSyncFlag = shared->frameId;
+        ie_param->sync_flag = mSyncFlag;
+        // copy from algo result
+        // set as the latest result
+        cur_params->mIeParams = params->mIeParams;
+        ie_param->is_update = true;
+        LOGD_AIE("[%d] params from algo", mSyncFlag);
+    } else if (mSyncFlag != ie_param->sync_flag) {
+        ie_param->sync_flag = mSyncFlag;
+        // copy from latest result
+        if (cur_params->mIeParams.ptr()) {
+            ie_param->result = cur_params->mIeParams->data()->result;
+            ie_param->is_update = true;
+        } else {
+            LOGE_AIE("no latest params !");
+            ie_param->is_update = false;
+        }
+        LOGD_AIE("[%d] params from latest [%d]", shared->frameId, mSyncFlag);
+    } else {
+        // do nothing, result in buf needn't update
+        ie_param->is_update = false;
+        LOGD_AIE("[%d] params needn't update", shared->frameId);
     }
-
-    cur_params->mIeParams = params->mIeParams;
 
     EXIT_ANALYZER_FUNCTION();
 

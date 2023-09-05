@@ -1,0 +1,29 @@
+cc_library_headers {
+	name: "libsmartIr_headers",
+	export_include_dirs: ["include"],
+	vendor_available: true,
+}
+
+cc_prebuilt_library_shared {
+    name: "libsmartIr",
+    vendor: true,
+
+    arch: {
+        arm: {
+            srcs: ["libs/android/arm/libsmartIr.so"],
+        },
+        arm64: {
+            srcs: ["libs/android/arm64/libsmartIr.so"],
+        },
+    },
+
+	shared_libs: [
+		"libc",
+		"libcutils",
+		"libdl",
+		"liblog",
+		"libm",
+		"librkaiq",
+		"libutils",
+	],
+}

@@ -56,11 +56,10 @@ void CCMV2PrintReg(const rk_aiq_ccm_cfg_v2_t* hw_param) {
 }
 
 void CCMV2PrintDBG(const accm_context_t* accm_context) {
-    const CalibDbV2_Ccm_Para_V32_t* pCcm = accm_context->ccm_v2;
     const float* pMatrixUndamped         = accm_context->accmRest.undampedCcmMatrix;
     const float* pOffsetUndamped         = accm_context->accmRest.undampedCcOffset;
-    const float* pMatrixDamped           = accm_context->accmRest.dampedCcmMatrix;
-    const float* pOffsetDamped           = accm_context->accmRest.dampedCcOffset;
+    const float* pMatrixDamped           = accm_context->ccmHwConf_v2.matrix;
+    const float* pOffsetDamped           = accm_context->ccmHwConf_v2.offs;
 
     LOG1_ACCM(
         "Illu Probability Estimation Enable: %d"
@@ -73,7 +72,7 @@ void CCMV2PrintDBG(const accm_context_t* accm_context) {
         " undampedCcOffset: %f,%f,%f "
         " dampedCcmMatrix: %f,%f,%f,%f,%f,%f,%f,%f,%f"
         " dampedCcOffset:%f,%f,%f",
-        pCcm->TuningPara.illu_estim.interp_enable,
+        accm_context->stIlluestCfg.interp_enable,
         accm_context->mCurAttV2.stAuto.color_inhibition.sensorGain[0],
         accm_context->mCurAttV2.stAuto.color_inhibition.sensorGain[1],
         accm_context->mCurAttV2.stAuto.color_inhibition.sensorGain[2],
@@ -89,13 +88,41 @@ void CCMV2PrintDBG(const accm_context_t* accm_context) {
         accm_context->mCurAttV2.stAuto.color_saturation.level[0],
         accm_context->mCurAttV2.stAuto.color_saturation.level[1],
         accm_context->mCurAttV2.stAuto.color_saturation.level[2],
-        accm_context->mCurAttV2.stAuto.color_saturation.level[3], pCcm->TuningPara.damp_enable,
+        accm_context->mCurAttV2.stAuto.color_saturation.level[3], accm_context->stCalib_v2.damp_enable,
         pMatrixUndamped[0], pMatrixUndamped[1], pMatrixUndamped[2], pMatrixUndamped[3],
         pMatrixUndamped[4], pMatrixUndamped[5], pMatrixUndamped[6], pMatrixUndamped[7],
         pMatrixUndamped[8], pOffsetUndamped[0], pOffsetUndamped[1], pOffsetUndamped[2],
         pMatrixDamped[0], pMatrixDamped[1], pMatrixDamped[2], pMatrixDamped[3], pMatrixDamped[4],
         pMatrixDamped[5], pMatrixDamped[6], pMatrixDamped[7], pMatrixDamped[8], pOffsetDamped[0],
         pOffsetDamped[1], pOffsetDamped[2]);
+}
+
+XCamReturn ConfigHwbyCalib(const rk_aiq_ccm_v2_iqparam_attrib_t* calib_ccm,
+                           rk_aiq_ccm_cfg_v2_t* ccmHwConf) {
+    LOG1_ACCM("%s: (enter)  \n", __FUNCTION__);
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+
+    ccmHwConf->asym_adj_en = calib_ccm->lumaCCM.asym_enable;
+
+    if (calib_ccm->lumaCCM.asym_enable) {
+        ccmHwConf->highy_adj_en = true;
+        ccmHwConf->bound_bit    = calib_ccm->lumaCCM.y_alp_asym.bound_pos_bit;
+        ccmHwConf->right_bit    = calib_ccm->lumaCCM.y_alp_asym.right_pos_bit;
+    } else {
+        ccmHwConf->highy_adj_en = calib_ccm->lumaCCM.y_alp_sym.highy_adj_en;
+        ccmHwConf->bound_bit    = calib_ccm->lumaCCM.y_alp_sym.bound_pos_bit;
+        ccmHwConf->right_bit    = ccmHwConf->bound_bit;
+        ccmHwConf->alp_y[CCM_CURVE_DOT_NUM] = 1024;
+    }
+
+    memcpy(ccmHwConf->rgb2y_para, calib_ccm->lumaCCM.rgb2y_para,
+           sizeof(calib_ccm->lumaCCM.rgb2y_para));
+
+    memcpy(ccmHwConf->enh_rgb2y_para, calib_ccm->enhCCM.enh_rgb2y_para,
+           sizeof(calib_ccm->enhCCM.enh_rgb2y_para));
+
+    LOG1_ACCM("%s: (exit)\n", __FUNCTION__);
+    return (ret);
 }
 
 XCamReturn AccmAutoConfig(accm_handle_t hAccm) {
@@ -107,20 +134,27 @@ XCamReturn AccmAutoConfig(accm_handle_t hAccm) {
         return XCAM_RETURN_ERROR_PARAM;
     }
 
-    const CalibDbV2_Ccm_Para_V32_t* pCcm = NULL;
+    const rk_aiq_ccm_v2_iqparam_attrib_t* pCcm = NULL;
     float sensorGain                     = hAccm->accmSwInfo.sensorGain;
     float fSaturation                    = 0;
-    pCcm = hAccm->ccm_v2;
-    if (hAccm->update || hAccm->updateAtt) {
-        if (pCcm->TuningPara.illu_estim.interp_enable) {
-            ret = interpCCMbywbgain(&pCcm->TuningPara, hAccm, fSaturation);
+    bool  updateMat                      = false;
+    bool  updateYAlp                     = false;
+    bool  updateEnh                      = false;
+    bool  updUndampMat                   = false;
+    pCcm = &hAccm->stCalib_v2;
+    if (hAccm->update) {
+        if (hAccm->stIlluestCfg.interp_enable) {
+            hAccm->isReCal_ = true;
+            ret = interpCCMbywbgain(&hAccm->stIlluestCfg, pCcm->aCcmCof,
+                                    pCcm->aCcmCof_len, hAccm, fSaturation);
             RETURN_RESULT_IF_DIFFERENT(ret, XCAM_RETURN_NO_ERROR);
         } else {
-            ret = selectCCM(&pCcm->TuningPara, hAccm, fSaturation);
+            ret = selectCCM(pCcm->aCcmCof, pCcm->aCcmCof_len, hAccm, fSaturation, &updUndampMat);
             RETURN_RESULT_IF_DIFFERENT(ret, XCAM_RETURN_NO_ERROR);
         }
-
-        // 4) calc scale for y_alpha_curve
+    }
+    // 4) calc scale for y_alpha_curve and
+    if (hAccm->update || hAccm->updateAtt) {
         float fScale = 1.0;
 #if 1
         // real use
@@ -139,84 +173,94 @@ XCamReturn AccmAutoConfig(accm_handle_t hAccm) {
         }
 #endif
         // 5) color inhibition adjust for api
-        float flevel2;
         interpolation(hAccm->mCurAttV2.stAuto.color_inhibition.sensorGain,
                       hAccm->mCurAttV2.stAuto.color_inhibition.level, RK_AIQ_ACCM_COLOR_GAIN_NUM,
-                      sensorGain, &flevel2);
-        hAccm->accmRest.color_inhibition_level = flevel2;
+                      sensorGain, &hAccm->accmRest.color_inhibition_level);
 
-        if (flevel2 > 100 || flevel2 < 0) {
-            LOGE_ACCM("flevel2: %f is out of range [0 100]\n", flevel2);
+        if (hAccm->accmRest.color_inhibition_level > 100 || hAccm->accmRest.color_inhibition_level < 0) {
+            LOGE_ACCM("flevel2: %f is out of range [0 100]\n", hAccm->accmRest.color_inhibition_level);
             return XCAM_RETURN_ERROR_PARAM;
         }
 
-        fScale *= (100 - flevel2) / 100;
+        fScale *= (100 - hAccm->accmRest.color_inhibition_level) / 100;
 
         // 6)   saturation adjust for api
-        float flevel1;
+        float saturation_level = 100;
         interpolation(hAccm->mCurAttV2.stAuto.color_saturation.sensorGain,
                       hAccm->mCurAttV2.stAuto.color_saturation.level, RK_AIQ_ACCM_COLOR_GAIN_NUM,
-                      sensorGain, &flevel1);
+                      sensorGain, &saturation_level);
 
-        if (flevel1 > 100 || flevel1 < 0) {
-            LOGE_ACCM("flevel1: %f is out of range [0 100]\n", flevel1);
+        if (saturation_level > 100 || saturation_level < 0) {
+            LOGE_ACCM("flevel1: %f is out of range [0 100]\n", saturation_level);
             return XCAM_RETURN_ERROR_PARAM;
         }
-        hAccm->accmRest.color_saturation_level = flevel1;
 
-        LOGD_ACCM(
-            "final fScale: %f, color inhibition level: %f, fSaturation: %f, color saturation "
-            "level: %f\n",
-            fScale, flevel2, fSaturation, flevel1);
+        LOGD_ACCM("CcmProfile changed: %d, fScale: %f->%f, sat_level: %f->%f",
+                  updUndampMat, hAccm->accmRest.fScale, fScale,
+                  hAccm->accmRest.color_saturation_level, saturation_level);
 
-        Saturationadjust(fScale, hAccm->accmRest.color_saturation_level, hAccm->accmRest.undampedCcmMatrix);
+        bool flag = updUndampMat ||
+                    fabs(fScale - hAccm->accmRest.fScale) > DIVMIN ||
+                    fabs(saturation_level - hAccm->accmRest.color_saturation_level) > DIVMIN;
 
-        if (pCcm->lumaCCM.asym_enable) {
-            int mid = CCM_CURVE_DOT_NUM_V2 >> 1;
-            for (int i = 0; i < mid; i++) {
-                hAccm->ccmHwConf_v2.alp_y[i] =
-                    fScale * pCcm->lumaCCM.y_alp_asym.y_alpha_left_curve[i];
-                hAccm->ccmHwConf_v2.alp_y[mid + i] =
-                    fScale * pCcm->lumaCCM.y_alp_asym.y_alpha_right_curve[i];
+        if (flag || (!hAccm->invarMode)) {
+            if (flag) {
+                hAccm->accmRest.fScale = fScale;
+                hAccm->accmRest.color_saturation_level = saturation_level;
+                Saturationadjust(fScale, saturation_level, hAccm->accmRest.undampedCcmMatrix);
+                LOGD_ACCM("Adjust ccm by sat: %d, undampedCcmMatrix[0]: %f", hAccm->isReCal_, hAccm->accmRest.undampedCcmMatrix[0]);
             }
-        } else {
-            for (int i = 0; i < CCM_CURVE_DOT_NUM; i++) {  // set to ic  to do bit check
-                hAccm->ccmHwConf_v2.alp_y[i] = fScale * pCcm->lumaCCM.y_alp_sym.y_alpha_curve[i];
+
+            if (!hAccm->invarMode) {
+                ConfigHwbyCalib(&hAccm->stCalib_v2, &hAccm->ccmHwConf_v2);
             }
-            hAccm->ccmHwConf_v2.alp_y[CCM_CURVE_DOT_NUM] = 1024;
+            if (pCcm->lumaCCM.asym_enable) {
+                int mid = CCM_CURVE_DOT_NUM_V2 >> 1;
+                for (int i = 0; i < mid; i++) {
+                    hAccm->ccmHwConf_v2.alp_y[i] =
+                        hAccm->accmRest.fScale * pCcm->lumaCCM.y_alp_asym.y_alpha_left_curve[i];
+                    hAccm->ccmHwConf_v2.alp_y[mid + i] =
+                        hAccm->accmRest.fScale * pCcm->lumaCCM.y_alp_asym.y_alpha_right_curve[i];
+                }
+            } else {
+                for (int i = 0; i < CCM_CURVE_DOT_NUM; i++) {  // set to ic  to do bit check
+                    hAccm->ccmHwConf_v2.alp_y[i] = hAccm->accmRest.fScale *
+                                                   pCcm->lumaCCM.y_alp_sym.y_alpha_curve[i];
+                }
+            }
+            updUndampMat = true;
+            updateYAlp   = true;
         }
+    }
+    // 7) . Damping
+    float dampCoef = (pCcm->damp_enable && hAccm->count > 1 && hAccm->invarMode > 0) ? hAccm->accmSwInfo.awbIIRDampCoef : 0;
+    if (!hAccm->accmSwInfo.ccmConverged || updUndampMat) {
+        ret = Damping(dampCoef,
+                    hAccm->accmRest.undampedCcmMatrix, hAccm->ccmHwConf_v2.matrix,
+                    hAccm->accmRest.undampedCcOffset, hAccm->ccmHwConf_v2.offs,
+                    &hAccm->accmSwInfo.ccmConverged);
+        updateMat = true;
+        LOGD_ACCM(
+            "damping: %f, ccm coef[0]: %f->%f, ccm coef[8]: %f->%f",
+            dampCoef, hAccm->accmRest.undampedCcmMatrix[0], hAccm->ccmHwConf_v2.matrix[0],
+            hAccm->accmRest.undampedCcmMatrix[8], hAccm->ccmHwConf_v2.matrix[8]);
+    }
 
+    if (hAccm->update || (!hAccm->invarMode)) {
+        unsigned short enh_adj_en = 0;
+        float enh_rat_max = 0;
         interpolation(pCcm->enhCCM.enh_ctl.gains, pCcm->enhCCM.enh_ctl.enh_adj_en, 9,
-                      sensorGain, &hAccm->ccmHwConf_v2.enh_adj_en);
-        interpolation(pCcm->enhCCM.enh_ctl.gains, pCcm->enhCCM.enh_ctl.enh_rat_max, 9,
-                      sensorGain, &hAccm->ccmHwConf_v2.enh_rat_max);
+                    sensorGain, &enh_adj_en);
+        if (enh_adj_en) {
+            interpolation(pCcm->enhCCM.enh_ctl.gains, pCcm->enhCCM.enh_ctl.enh_rat_max, 9,
+                            sensorGain, &enh_rat_max);
+        }
+        updateEnh = (enh_adj_en != hAccm->ccmHwConf_v2.enh_adj_en) ||
+                    fabs(enh_rat_max - hAccm->ccmHwConf_v2.enh_rat_max) > DIVMIN;
+    }
+    hAccm->isReCal_ = hAccm->isReCal_ || updateMat || updateYAlp || updateEnh;
 
-    }
-    if (pCcm->TuningPara.damp_enable && (hAccm->count > 1) && (hAccm->accmSwInfo.awbIIRDampCoef > 0.0) &&
-                            ((!hAccm->accmSwInfo.ccmConverged) || hAccm->update || hAccm->updateAtt)) {
-        // 7) . Damping
-        ret = Damping(hAccm->accmSwInfo.awbIIRDampCoef,
-                    hAccm->accmRest.undampedCcmMatrix, hAccm->accmRest.dampedCcmMatrix,
-                    hAccm->accmRest.undampedCcOffset, hAccm->accmRest.dampedCcOffset);
-        hAccm->accmSwInfo.ccmConverged =
-                !(memcmp(hAccm->accmRest.undampedCcmMatrix, hAccm->accmRest.dampedCcmMatrix,
-            sizeof(hAccm->accmRest.dampedCcmMatrix)) ||
-            memcmp(hAccm->accmRest.undampedCcOffset, hAccm->accmRest.dampedCcOffset,
-            sizeof(hAccm->accmRest.dampedCcOffset)));
-    } else {
-        memcpy(hAccm->accmRest.dampedCcmMatrix, hAccm->accmRest.undampedCcmMatrix,
-            sizeof(hAccm->accmRest.dampedCcmMatrix));
-        hAccm->accmRest.dampedCcOffset[0] = hAccm->accmRest.undampedCcOffset[0];
-        hAccm->accmRest.dampedCcOffset[1] = hAccm->accmRest.undampedCcOffset[1];
-        hAccm->accmRest.dampedCcOffset[2] = hAccm->accmRest.undampedCcOffset[2];
-        hAccm->accmSwInfo.ccmConverged = true;
-    }
-    // 8)  set to ic  to do bit check
-    memcpy(hAccm->ccmHwConf_v2.matrix, hAccm->accmRest.dampedCcmMatrix,
-        sizeof(hAccm->accmRest.dampedCcmMatrix));
-    hAccm->ccmHwConf_v2.offs[0] = hAccm->accmRest.dampedCcOffset[0];
-    hAccm->ccmHwConf_v2.offs[1] = hAccm->accmRest.dampedCcOffset[1];
-    hAccm->ccmHwConf_v2.offs[2] = hAccm->accmRest.dampedCcOffset[2];
+    LOGD_ACCM("final isReCal_ = %d \n", hAccm->isReCal_);
 
     LOG1_ACCM("%s: (exit)\n", __FUNCTION__);
 
@@ -253,66 +297,86 @@ XCamReturn AccmConfig(accm_handle_t hAccm) {
 
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
 
-    hAccm->update = JudgeCcmRes3aConverge(&hAccm->accmRest.res3a_info, &hAccm->accmSwInfo,
-                                          hAccm->ccm_v2->control.gain_tolerance,
-                                          hAccm->ccm_v2->control.wbgain_tolerance);
-
-    hAccm->update       = hAccm->update || hAccm->calib_update;
-    hAccm->calib_update = false;
-
-    LOGD_ACCM("%s: updateAtt: %d, CCM update: %d, CCM Converged: %d\n", __FUNCTION__,
-              hAccm->updateAtt, hAccm->update, hAccm->accmSwInfo.ccmConverged);
-
-    if (hAccm->updateAtt) {
-        hAccm->mCurAttV2.mode   = hAccm->mNewAttV2.mode;
-        hAccm->mCurAttV2.byPass = hAccm->mNewAttV2.byPass;
-
-        if (hAccm->mCurAttV2.mode == RK_AIQ_CCM_MODE_AUTO)
-            hAccm->mCurAttV2.stAuto = hAccm->mNewAttV2.stAuto;
-        else
-            hAccm->mCurAttV2.stManual = hAccm->mNewAttV2.stManual;
-    }
-
-    if (hAccm->mCurAttV2.mode == RK_AIQ_CCM_MODE_AUTO) {
-        hAccm->mCurAttV2.byPass = !(hAccm->ccm_v2->control.enable);
-    }
-    LOGD_ACCM("%s: byPass: %d  mode:%d \n", __FUNCTION__, hAccm->mCurAttV2.byPass,
-              hAccm->mCurAttV2.mode);
+    LOGD_ACCM("%s: byPass: %d  mode:%d updateAtt: %d \n", __FUNCTION__, hAccm->mCurAttV2.byPass,
+              hAccm->mCurAttV2.mode, hAccm->updateAtt);
     if (hAccm->mCurAttV2.byPass != true && hAccm->accmSwInfo.grayMode != true) {
         hAccm->ccmHwConf_v2.ccmEnable = true;
 
         if (hAccm->mCurAttV2.mode == RK_AIQ_CCM_MODE_AUTO) {
+            hAccm->update = JudgeCcmRes3aConverge(&hAccm->accmRest.res3a_info, &hAccm->accmSwInfo,
+                                                  hAccm->stCalib_v2.control.gain_tolerance,
+                                                  hAccm->stCalib_v2.control.wbgain_tolerance);
+            hAccm->update = hAccm->update || hAccm->calib_update; // wbgain/gain/calib changed
+            LOGD_ACCM("%s: CCM update (gain/awbgain/calib): %d, CCM Converged: %d\n",
+                __FUNCTION__, hAccm->update, hAccm->accmSwInfo.ccmConverged);
             if (hAccm->updateAtt || hAccm->update || (!hAccm->accmSwInfo.ccmConverged)) {
                 AccmAutoConfig(hAccm);
                 CCMV2PrintDBG(hAccm);
             }
-
         } else if (hAccm->mCurAttV2.mode == RK_AIQ_CCM_MODE_MANUAL) {
-            if (hAccm->updateAtt || hAccm->update) AccmManualConfig(hAccm);
+            if (hAccm->updateAtt) {
+                AccmManualConfig(hAccm);
+                hAccm->isReCal_ = true;
+            }
         } else {
             LOGE_ACCM("%s: hAccm->mCurAttV2.mode(%d) is invalid \n", __FUNCTION__,
                       hAccm->mCurAttV2.mode);
         }
-        memcpy(hAccm->mCurAttV2.stManual.ccMatrix, hAccm->ccmHwConf_v2.matrix,
-               sizeof(hAccm->ccmHwConf_v2.matrix));
-        memcpy(hAccm->mCurAttV2.stManual.ccOffsets, hAccm->ccmHwConf_v2.offs,
-               sizeof(hAccm->ccmHwConf_v2.offs));
-        memcpy(hAccm->mCurAttV2.stManual.y_alpha_curve, hAccm->ccmHwConf_v2.alp_y,
-               sizeof(hAccm->ccmHwConf_v2.alp_y));
-        hAccm->mCurAttV2.stManual.enh_adj_en  = hAccm->ccmHwConf_v2.enh_adj_en;
-        hAccm->mCurAttV2.stManual.enh_rat_max = hAccm->ccmHwConf_v2.enh_rat_max;
 
     } else {
         hAccm->ccmHwConf_v2.ccmEnable = false;
+        // graymode/api/calib changed
+        hAccm->isReCal_ = hAccm->isReCal_ || hAccm->updateAtt || hAccm->calib_update;
     }
     hAccm->updateAtt = false;
-
+    hAccm->calib_update = false;
     hAccm->count = ((hAccm->count + 2) > (65536)) ? 2 : (hAccm->count + 1);
 
     CCMV2PrintReg(&hAccm->ccmHwConf_v2);
 
     LOG1_ACCM("%s: (exit)\n", __FUNCTION__);
     return ret;
+}
+
+XCamReturn ConfigbyCalib(accm_handle_t hAccm) {
+    LOG1_ACCM("%s: (enter)  \n", __FUNCTION__);
+    XCamReturn ret = XCAM_RETURN_NO_ERROR;
+
+    ret = pCcmMatrixAll_init(hAccm->stCalib_v2.aCcmCof,
+                             hAccm->stCalib_v2.aCcmCof_len,
+                             hAccm->stCalib_v2.matrixAll,
+                             hAccm->stCalib_v2.matrixAll_len,
+                             hAccm->pCcmMatrixAll);
+    if (hAccm->mCurAttV2.mode == RK_AIQ_CCM_MODE_AUTO)
+        hAccm->mCurAttV2.byPass = !(hAccm->stCalib_v2.control.enable);
+
+    ConfigHwbyCalib(&hAccm->stCalib_v2, &hAccm->ccmHwConf_v2);
+
+    if (hAccm->stCalib_v2.lumaCCM.asym_enable) {
+        int mid                          = CCM_CURVE_DOT_NUM_V2 >> 1;
+        for (int i = 0; i < mid; i++) {
+            hAccm->ccmHwConf_v2.alp_y[i] = hAccm->stCalib_v2.lumaCCM.y_alp_asym.y_alpha_left_curve[i];
+            hAccm->ccmHwConf_v2.alp_y[mid + i] =
+                hAccm->stCalib_v2.lumaCCM.y_alp_asym.y_alpha_right_curve[i];
+        }
+    } else {
+        hAccm->ccmHwConf_v2.highy_adj_en = hAccm->stCalib_v2.lumaCCM.y_alp_sym.highy_adj_en;
+        hAccm->ccmHwConf_v2.bound_bit    = hAccm->stCalib_v2.lumaCCM.y_alp_sym.bound_pos_bit;
+        hAccm->ccmHwConf_v2.right_bit    = hAccm->ccmHwConf_v2.bound_bit;
+        memcpy(hAccm->ccmHwConf_v2.alp_y, hAccm->stCalib_v2.lumaCCM.y_alp_sym.y_alpha_curve,
+               sizeof(hAccm->stCalib_v2.lumaCCM.y_alp_sym.y_alpha_curve));
+    }
+
+    hAccm->ccmHwConf_v2.enh_adj_en  = hAccm->stCalib_v2.enhCCM.enh_ctl.enh_adj_en[0];
+    hAccm->ccmHwConf_v2.enh_rat_max = hAccm->stCalib_v2.enhCCM.enh_ctl.enh_rat_max[0];
+
+    hAccm->accmSwInfo.ccmConverged = false;
+    hAccm->calib_update            = true;
+
+    clear_list(&hAccm->accmRest.problist);
+
+    LOG1_ACCM("%s: (exit)\n", __FUNCTION__);
+    return (ret);
 }
 
 /**********************************
@@ -327,72 +391,66 @@ static XCamReturn UpdateCcmCalibV2ParaV2(accm_handle_t hAccm) {
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
 
     bool config_calib = !!(hAccm->accmSwInfo.prepare_type & RK_AIQ_ALGO_CONFTYPE_UPDATECALIB);
-    const CalibDbV2_Ccm_Para_V32_t* calib_ccm = hAccm->ccm_v2;
 
     if (!config_calib) {
         return (ret);
     }
 
+    const CalibDbV2_Ccm_Para_V32_t* calib_ccm = hAccm->ccm_v2;
 #if RKAIQ_ACCM_ILLU_VOTE
-    ReloadCCMCalibV2(hAccm, &calib_ccm->TuningPara);
+    if (hAccm->stCalib_v2.aCcmCof_len != calib_ccm->TuningPara.aCcmCof_len)
+        clear_list(&hAccm->accmRest.dominateIlluList);
 #endif
 
-    ret = pCcmMatrixAll_init(hAccm, &calib_ccm->TuningPara);
+    ReloadCCMCalibV2(calib_ccm, &hAccm->stCalib_v2, &hAccm->stIlluestCfg);
 
-    hAccm->mCurAttV2.byPass = !(calib_ccm->control.enable);
-
-    hAccm->ccmHwConf_v2.asym_adj_en = calib_ccm->lumaCCM.asym_enable;
-
-    if (calib_ccm->lumaCCM.asym_enable) {
-        hAccm->ccmHwConf_v2.highy_adj_en = true;
-        hAccm->ccmHwConf_v2.bound_bit    = calib_ccm->lumaCCM.y_alp_asym.bound_pos_bit;
-        hAccm->ccmHwConf_v2.right_bit    = calib_ccm->lumaCCM.y_alp_asym.right_pos_bit;
-        int mid                          = CCM_CURVE_DOT_NUM_V2 >> 1;
-        for (int i = 0; i < mid; i++) {
-            hAccm->ccmHwConf_v2.alp_y[i] = calib_ccm->lumaCCM.y_alp_asym.y_alpha_left_curve[i];
-            hAccm->ccmHwConf_v2.alp_y[mid + i] =
-                calib_ccm->lumaCCM.y_alp_asym.y_alpha_right_curve[i];
-        }
-    } else {
-        hAccm->ccmHwConf_v2.highy_adj_en = calib_ccm->lumaCCM.y_alp_sym.highy_adj_en;
-        hAccm->ccmHwConf_v2.bound_bit    = calib_ccm->lumaCCM.y_alp_sym.bound_pos_bit;
-        hAccm->ccmHwConf_v2.right_bit    = hAccm->ccmHwConf_v2.bound_bit;
-        memcpy(hAccm->ccmHwConf_v2.alp_y, calib_ccm->lumaCCM.y_alp_sym.y_alpha_curve,
-               sizeof(calib_ccm->lumaCCM.y_alp_sym.y_alpha_curve));
-        hAccm->ccmHwConf_v2.alp_y[CCM_CURVE_DOT_NUM] = 1024;
-    }
-
-    memcpy(hAccm->ccmHwConf_v2.rgb2y_para, calib_ccm->lumaCCM.rgb2y_para,
-           sizeof(calib_ccm->lumaCCM.rgb2y_para));
-
-    memcpy(hAccm->ccmHwConf_v2.enh_rgb2y_para, calib_ccm->enhCCM.enh_rgb2y_para,
-           sizeof(calib_ccm->enhCCM.enh_rgb2y_para));
-
-    hAccm->ccmHwConf_v2.enh_adj_en  = calib_ccm->enhCCM.enh_ctl.enh_adj_en[0];
-    hAccm->ccmHwConf_v2.enh_rat_max = calib_ccm->enhCCM.enh_ctl.enh_rat_max[0];
-
-    // config manual ccm
-    memcpy(hAccm->mCurAttV2.stManual.ccMatrix, calib_ccm->manualPara.ccMatrix,
-           sizeof(calib_ccm->manualPara.ccMatrix));
-    memcpy(hAccm->mCurAttV2.stManual.ccOffsets, calib_ccm->manualPara.ccOffsets,
-           sizeof(calib_ccm->manualPara.ccOffsets));
-    memcpy(hAccm->mCurAttV2.stManual.y_alpha_curve, hAccm->ccmHwConf_v2.alp_y,
-           sizeof(hAccm->ccmHwConf_v2.alp_y));
-    hAccm->mCurAttV2.stManual.highy_adj_en  = hAccm->ccmHwConf_v2.highy_adj_en;
-    hAccm->mCurAttV2.stManual.asym_enable   = hAccm->ccmHwConf_v2.asym_adj_en;
-    hAccm->mCurAttV2.stManual.bound_pos_bit = hAccm->ccmHwConf_v2.bound_bit;
-    hAccm->mCurAttV2.stManual.right_pos_bit = hAccm->ccmHwConf_v2.right_bit;
-    hAccm->mCurAttV2.stManual.enh_adj_en    = hAccm->ccmHwConf_v2.enh_adj_en;
-    hAccm->mCurAttV2.stManual.enh_rat_max   = hAccm->ccmHwConf_v2.enh_rat_max;
-    memcpy(hAccm->mCurAttV2.stManual.enh_rgb2y_para, hAccm->ccmHwConf_v2.enh_rgb2y_para,
-           sizeof(hAccm->ccmHwConf_v2.enh_rgb2y_para));
-
-    hAccm->accmSwInfo.ccmConverged = false;
-    hAccm->calib_update            = true;
-
-    ClearList(&hAccm->accmRest.problist);
+    ret = ConfigbyCalib(hAccm);
 
     LOG1_ACCM("%s: (exit)\n", __FUNCTION__);
+    return (ret);
+}
+
+static XCamReturn ApiAttrV2Init(const rk_aiq_ccm_cfg_v2_t*            ccmHwConf,
+                                const rk_aiq_ccm_v2_iqparam_attrib_t* stCalib,
+                                rk_aiq_ccm_v2_attrib_t*               mCurAttV2)
+{
+    LOGI_ACCM("%s: (enter)\n", __FUNCTION__);
+
+    XCamReturn ret               = XCAM_RETURN_NO_ERROR;
+    mCurAttV2->byPass = !(stCalib->control.enable);
+    // StAuto
+    for (int i = 0; i < RK_AIQ_ACCM_COLOR_GAIN_NUM; i++) {
+        mCurAttV2->stAuto.color_inhibition.sensorGain[i] = 1;
+        mCurAttV2->stAuto.color_inhibition.level[i]      = 0;
+        mCurAttV2->stAuto.color_saturation.sensorGain[i] = 1;
+        mCurAttV2->stAuto.color_saturation.level[i]      = 50;
+    }
+    // StManual
+    if (stCalib->matrixAll_len > 0) {
+        memcpy(mCurAttV2->stManual.ccMatrix, stCalib->matrixAll[0].ccMatrix,
+               sizeof(stCalib->matrixAll[0].ccMatrix));
+        memcpy(mCurAttV2->stManual.ccOffsets, stCalib->matrixAll[0].ccOffsets,
+               sizeof(stCalib->matrixAll[0].ccOffsets));
+    } else {
+        memset(mCurAttV2->stManual.ccMatrix, 0, sizeof(mCurAttV2->stManual.ccMatrix));
+        memset(mCurAttV2->stManual.ccOffsets, 0, sizeof(mCurAttV2->stManual.ccOffsets));
+        mCurAttV2->stManual.ccMatrix[0] = 1.0;
+        mCurAttV2->stManual.ccMatrix[4] = 1.0;
+        mCurAttV2->stManual.ccMatrix[8] = 1.0;
+    }
+
+    memcpy(mCurAttV2->stManual.y_alpha_curve, ccmHwConf->alp_y,
+           sizeof(ccmHwConf->alp_y));
+    memcpy(mCurAttV2->stManual.enh_rgb2y_para, ccmHwConf->enh_rgb2y_para,
+            sizeof(ccmHwConf->enh_rgb2y_para));
+    mCurAttV2->stManual.enh_adj_en    = ccmHwConf->enh_adj_en;
+    mCurAttV2->stManual.enh_rat_max   = ccmHwConf->enh_rat_max;
+    mCurAttV2->stManual.highy_adj_en  = ccmHwConf->highy_adj_en;
+    mCurAttV2->stManual.asym_enable   = ccmHwConf->asym_adj_en;
+    mCurAttV2->stManual.bound_pos_bit = ccmHwConf->bound_bit;
+    mCurAttV2->stManual.right_pos_bit = ccmHwConf->right_bit;
+
+    LOGI_ACCM("%s: (exit)\n", __FUNCTION__);
     return (ret);
 }
 
@@ -426,6 +484,8 @@ XCamReturn AccmInit(accm_handle_t* hAccm, const CamCalibDbV2Context_t* calibv2) 
     accm_context->accmRest.res3a_info.awbGain[1] = 1.0;
 
     accm_context->count = 0;
+    accm_context->isReCal_ = 1;
+    accm_context->invarMode = 1;
 
     accm_context->accmSwInfo.prepare_type =
         RK_AIQ_ALGO_CONFTYPE_UPDATECALIB | RK_AIQ_ALGO_CONFTYPE_NEEDRESET;
@@ -433,14 +493,15 @@ XCamReturn AccmInit(accm_handle_t* hAccm, const CamCalibDbV2Context_t* calibv2) 
     // todo whm --- CalibDbV2_Ccm_Para_V2
     accm_context->ccm_v2 = calib_ccm;
     accm_context->mCurAttV2.mode = RK_AIQ_CCM_MODE_AUTO;
-    ret                  = UpdateCcmCalibV2ParaV2(accm_context);
+#if RKAIQ_ACCM_ILLU_VOTE
+    INIT_LIST_HEAD(&accm_context->accmRest.dominateIlluList);
+#endif
+    INIT_LIST_HEAD(&accm_context->accmRest.problist);
+    ret = UpdateCcmCalibV2ParaV2(accm_context);
 
-    for (int i = 0; i < RK_AIQ_ACCM_COLOR_GAIN_NUM; i++) {
-        accm_context->mCurAttV2.stAuto.color_inhibition.sensorGain[i] = 1;
-        accm_context->mCurAttV2.stAuto.color_inhibition.level[i]      = 0;
-        accm_context->mCurAttV2.stAuto.color_saturation.sensorGain[i] = 1;
-        accm_context->mCurAttV2.stAuto.color_saturation.level[i]      = 50;
-    }
+    ApiAttrV2Init(&accm_context->ccmHwConf_v2, &accm_context->stCalib_v2,
+                  &accm_context->mCurAttV2);
+    accm_context->accmRest.fScale = 1;
     accm_context->accmRest.color_inhibition_level = 0;
     accm_context->accmRest.color_saturation_level = 100;
 
@@ -452,10 +513,12 @@ XCamReturn AccmRelease(accm_handle_t hAccm) {
     LOGI_ACCM("%s: (enter)\n", __FUNCTION__);
 
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
+
 #if RKAIQ_ACCM_ILLU_VOTE
-    ClearList(&hAccm->accmRest.dominateIlluList);
+    clear_list(&hAccm->accmRest.dominateIlluList);
 #endif
-    ClearList(&hAccm->accmRest.problist);
+    clear_list(&hAccm->accmRest.problist);
+    free(hAccm->stIlluestCfg.default_illu);
     free(hAccm);
     hAccm = NULL;
 

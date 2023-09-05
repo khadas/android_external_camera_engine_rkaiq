@@ -260,16 +260,17 @@ Acnr_result_t Acnr_GetProcResult_V1(Acnr_Context_V1_t *pAcnrCtx, Acnr_ProcResult
         return ACNR_RET_INVALID_PARM;
     }
 
+    RK_CNR_Params_V1_Select_t* stSelect = NULL;
     if(pAcnrCtx->eMode == ACNR_OP_MODE_AUTO) {
-        pAcnrResult->stSelect = pAcnrCtx->stAuto.stSelect;
+        stSelect = &pAcnrCtx->stAuto.stSelect;
     } else if(pAcnrCtx->eMode == ACNR_OP_MODE_MANUAL) {
         //TODO
-        pAcnrResult->stSelect = pAcnrCtx->stManual.stSelect;
+        stSelect = &pAcnrCtx->stManual.stSelect;
         pAcnrCtx->fCnr_SF_Strength = 1.0;
     }
 
     //transfer to reg value
-    cnr_fix_transfer_V1(&pAcnrResult->stSelect, &pAcnrResult->stFix,  &pAcnrCtx->stExpInfo, pAcnrCtx->fCnr_SF_Strength);
+    cnr_fix_transfer_V1(stSelect, pAcnrResult->stFix,  &pAcnrCtx->stExpInfo, pAcnrCtx->fCnr_SF_Strength);
 
     LOGD_ANR("%s:%d xml:local:%d mode:%d  reg: local gain:%d  mfnr gain:%d mode:%d\n",
              __FUNCTION__, __LINE__);
@@ -324,12 +325,13 @@ Acnr_result_t Acnr_ConfigSettingParam_V1(Acnr_Context_V1_t *pAcnrCtx, Acnr_Param
 
 Acnr_result_t Acnr_ParamModeProcess_V1(Acnr_Context_V1_t *pAcnrCtx, Acnr_ExpInfo_t *pExpInfo, Acnr_ParamMode_t *mode) {
     Acnr_result_t res  = ACNR_RET_SUCCESS;
-    *mode = pAcnrCtx->eParamMode;
 
     if(pAcnrCtx == NULL) {
         LOGE_ANR("%s(%d): null pointer\n", __FUNCTION__, __LINE__);
         return ACNR_RET_INVALID_PARM;
     }
+
+    *mode = pAcnrCtx->eParamMode;
 
     if(pAcnrCtx->isGrayMode) {
         *mode = ACNR_PARAM_MODE_GRAY;

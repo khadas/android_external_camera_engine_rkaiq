@@ -32,8 +32,6 @@ XCamReturn RkAiqAmdHandleInt::prepare() {
     RKAIQCORE_CHECK_RET(ret, "amd handle prepare failed");
 
     RkAiqAlgoConfigAmd* amd_config_int = (RkAiqAlgoConfigAmd*)mConfig;
-    RkAiqCore::RkAiqAlgosGroupShared_t* shared =
-        (RkAiqCore::RkAiqAlgosGroupShared_t*)(getGroupShared());
     RkAiqCore::RkAiqAlgosComShared_t* sharedCom = &mAiqCore->mAlogsComSharedParams;
 
     amd_config_int->spWidth    = sharedCom->spWidth;
@@ -103,7 +101,6 @@ XCamReturn RkAiqAmdHandleInt::processing() {
 
     RkAiqCore::RkAiqAlgosGroupShared_t* shared =
         (RkAiqCore::RkAiqAlgosGroupShared_t*)(getGroupShared());
-    RkAiqCore::RkAiqAlgosComShared_t* sharedCom = &mAiqCore->mAlogsComSharedParams;
 
     ret = RkAiqHandle::processing();
     if (ret) {
@@ -121,10 +118,8 @@ XCamReturn RkAiqAmdHandleInt::processing() {
     MediaBuffer_t* mbuf = amd_proc_res_int->amd_proc_res.st_ratio;
     if (mbuf) {
         MotionBufMetaData_t* metadata = (MotionBufMetaData_t*)mbuf->pMetaData;
-        SmartPtr<BufferProxy> msg_data = new BufferProxy(mProcResShared);
-        msg_data->set_sequence(shared->frameId);
-        SmartPtr<XCamMessage> msg =
-            new RkAiqCoreVdBufMsg(XCAM_MESSAGE_AMD_PROC_RES_OK, metadata->frame_id, msg_data);
+        mProcResShared->set_sequence(shared->frameId);
+        RkAiqCoreVdBufMsg msg(XCAM_MESSAGE_AMD_PROC_RES_OK, metadata->frame_id, mProcResShared);
         mAiqCore->post_message(msg);
     }
 
@@ -180,10 +175,6 @@ XCamReturn RkAiqAmdHandleInt::genIspResult(RkAiqFullParams* params, RkAiqFullPar
     }
 
     md_param->result = amd_com->amd_proc_res;
-
-    if (!this->getAlgoId()) {
-        RkAiqAlgoProcResAmd* amd_rk = (RkAiqAlgoProcResAmd*)amd_com;
-    }
 
     cur_params->mMdParams = params->mMdParams;
 

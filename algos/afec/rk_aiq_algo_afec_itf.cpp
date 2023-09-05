@@ -227,11 +227,11 @@ uint32_t cal_fec_mesh(uint32_t width, uint32_t height, uint32_t mode, uint32_t &
 static XCamReturn
 read_mesh_table(FECContext_t* fecCtx, unsigned int correct_level)
 {
-    bool ret;
 #if OPENCV_SUPPORT
     gen_default_mesh_table(fecCtx->src_width, fecCtx->src_height, fecCtx->mesh_density,
                            fecCtx->meshxi, fecCtx->meshyi, fecCtx->meshxf, fecCtx->meshyf);
 #elif GENMESH_ONLINE
+    bool ret;
     ret = genFECMeshNLevel(fecCtx->fecParams, fecCtx->camCoeff, correct_level, fecCtx->meshxi,
                            fecCtx->meshxf, fecCtx->meshyi, fecCtx->meshyf);
     if (!ret) {
@@ -241,7 +241,7 @@ read_mesh_table(FECContext_t* fecCtx, unsigned int correct_level)
 #else
     FILE* ofp;
     char filename[512];
-    sprintf(filename, "%s/%s/meshxi_level%d.bin",
+    sprintf(filename, "%s/%s/meshxi_level%u.bin",
             fecCtx->resource_path,
             fecCtx->meshfile,
             correct_level);
@@ -259,7 +259,7 @@ read_mesh_table(FECContext_t* fecCtx, unsigned int correct_level)
         fecCtx->fec_en = 0;
     }
 
-    sprintf(filename, "%s/%s/meshxf_level%d.bin",
+    sprintf(filename, "%s/%s/meshxf_level%u.bin",
             fecCtx->resource_path,
             fecCtx->meshfile,
             correct_level);
@@ -276,7 +276,7 @@ read_mesh_table(FECContext_t* fecCtx, unsigned int correct_level)
         fecCtx->fec_en = 0;
     }
 
-    sprintf(filename, "%s/%s/meshyi_level%d.bin",
+    sprintf(filename, "%s/%s/meshyi_level%u.bin",
             fecCtx->resource_path,
             fecCtx->meshfile,
             correct_level);
@@ -293,7 +293,7 @@ read_mesh_table(FECContext_t* fecCtx, unsigned int correct_level)
         fecCtx->fec_en = 0;
     }
 
-    sprintf(filename, "%s/%s/meshyf_level%d.bin",
+    sprintf(filename, "%s/%s/meshyf_level%u.bin",
             fecCtx->resource_path,
             fecCtx->meshfile,
             correct_level);
@@ -494,32 +494,31 @@ processing(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outparams)
 {
     FECHandle_t hFEC = (FECHandle_t)inparams->ctx->hFEC;
     FECContext_t* fecCtx = (FECContext_t*)hFEC;
-    RkAiqAlgoProcAfec* fecProcParams = (RkAiqAlgoProcAfec*)inparams;
     RkAiqAlgoProcResAfec* fecPreOut = (RkAiqAlgoProcResAfec*)outparams;
 
     if (!fecCtx->fec_en)
         return XCAM_RETURN_NO_ERROR;
 
-    fecPreOut->afec_result.sw_fec_en = fecCtx->fec_en;
-    fecPreOut->afec_result.crop_en = 0;
-    fecPreOut->afec_result.crop_width = 0;
-    fecPreOut->afec_result.crop_height = 0;
-    fecPreOut->afec_result.mesh_density = fecCtx->mesh_density;
-    fecPreOut->afec_result.mesh_size = fecCtx->fec_mesh_size;
+    fecPreOut->afec_result->sw_fec_en = fecCtx->fec_en;
+    fecPreOut->afec_result->crop_en = 0;
+    fecPreOut->afec_result->crop_width = 0;
+    fecPreOut->afec_result->crop_height = 0;
+    fecPreOut->afec_result->mesh_density = fecCtx->mesh_density;
+    fecPreOut->afec_result->mesh_size = fecCtx->fec_mesh_size;
     // TODO: should check the fec mode,
     // if mode == RK_AIQ_ISPP_STATIC_FEC_WORKING_MODE_STABLIZATION
     // params may be changed
     fecCtx->eState = FEC_STATE_RUNNING;
 
     if (inparams->u.proc.init) {
-        fecPreOut->afec_result.update = 1;
+        outparams->cfg_update = true;
     } else {
 
         if (fecCtx->isAttribUpdated) {
             fecCtx->isAttribUpdated = false;
-            fecPreOut->afec_result.update = 1;
+            outparams->cfg_update = true;
         } else {
-            fecPreOut->afec_result.update = 0;
+            outparams->cfg_update = false;
         }
 
         LOGV_AFEC("en(%d), bypass(%d), level(%d), direction(%d), result update(%d)\n",
@@ -527,10 +526,10 @@ processing(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outparams)
                 fecCtx->user_config.bypass,
                 fecCtx->correct_level,
                 fecCtx->correct_direction,
-                fecPreOut->afec_result.update);
+                outparams->cfg_update);
     }
 
-    if (fecPreOut->afec_result.update) {
+    if (outparams->cfg_update) {
         //memcpy(fecPreOut->afec_result.meshxi, fecCtx->meshxi,
         //       fecCtx->fec_mesh_size * sizeof(unsigned short));
         //memcpy(fecPreOut->afec_result.meshxf, fecCtx->meshxf,
@@ -542,10 +541,10 @@ processing(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outparams)
 
         if (fecCtx->fec_mem_info == NULL) {
             LOGE_AFEC("%s: no available fec buf!", __FUNCTION__);
-            fecPreOut->afec_result.update = 0;
+            outparams->cfg_update = false;
             return XCAM_RETURN_NO_ERROR;
         }
-        fecPreOut->afec_result.mesh_buf_fd = fecCtx->fec_mem_info->fd;
+        fecPreOut->afec_result->mesh_buf_fd = fecCtx->fec_mem_info->fd;
         fecCtx->fec_mem_info->state[0] = 1; //mark that this buf is using.
     }
 

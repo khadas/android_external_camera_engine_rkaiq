@@ -56,11 +56,6 @@ XCamReturn RkAiqAgainHandleInt::prepare() {
     ret = RkAiqHandle::prepare();
     RKAIQCORE_CHECK_RET(ret, "again handle prepare failed");
 
-    RkAiqAlgoConfigAgain* again_config_int = (RkAiqAlgoConfigAgain*)mConfig;
-    RkAiqCore::RkAiqAlgosGroupShared_t* shared =
-        (RkAiqCore::RkAiqAlgosGroupShared_t*)(getGroupShared());
-    RkAiqCore::RkAiqAlgosComShared_t* sharedCom = &mAiqCore->mAlogsComSharedParams;
-
     RkAiqAlgoDescription* des = (RkAiqAlgoDescription*)mDes;
     ret                       = des->prepare(mConfig);
     RKAIQCORE_CHECK_RET(ret, "again algo prepare failed");
@@ -73,13 +68,6 @@ XCamReturn RkAiqAgainHandleInt::preProcess() {
     ENTER_ANALYZER_FUNCTION();
 
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
-
-    RkAiqAlgoPreAgain* again_pre_int        = (RkAiqAlgoPreAgain*)mPreInParam;
-    RkAiqAlgoPreResAgain* again_pre_res_int = (RkAiqAlgoPreResAgain*)mPreOutParam;
-
-    RkAiqCore::RkAiqAlgosGroupShared_t* shared =
-        (RkAiqCore::RkAiqAlgosGroupShared_t*)(getGroupShared());
-    RkAiqCore::RkAiqAlgosComShared_t* sharedCom = &mAiqCore->mAlogsComSharedParams;
 
     ret = RkAiqHandle::preProcess();
     if (ret) {
@@ -100,14 +88,10 @@ XCamReturn RkAiqAgainHandleInt::processing() {
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
 
     RkAiqAlgoProcAgain* again_proc_int        = (RkAiqAlgoProcAgain*)mProcInParam;
-    RkAiqAlgoProcResAgain* again_proc_res_int = (RkAiqAlgoProcResAgain*)mProcOutParam;
 
-    RkAiqCore::RkAiqAlgosGroupShared_t* shared =
-        (RkAiqCore::RkAiqAlgosGroupShared_t*)(getGroupShared());
     RkAiqCore::RkAiqAlgosComShared_t* sharedCom = &mAiqCore->mAlogsComSharedParams;
 
-    static int auvnr_proc_framecnt = 0;
-    auvnr_proc_framecnt++;
+    again_proc_res_int->stAgainProcResult.stFix = &shared->fullParams->mGainParams->data()->result;
 
     ret = RkAiqHandle::processing();
     if (ret) {
@@ -130,13 +114,6 @@ XCamReturn RkAiqAgainHandleInt::postProcess() {
     ENTER_ANALYZER_FUNCTION();
 
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
-
-    RkAiqAlgoPostAgain* again_post_int        = (RkAiqAlgoPostAgain*)mPostInParam;
-    RkAiqAlgoPostResAgain* again_post_res_int = (RkAiqAlgoPostResAgain*)mPostOutParam;
-
-    RkAiqCore::RkAiqAlgosGroupShared_t* shared =
-        (RkAiqCore::RkAiqAlgosGroupShared_t*)(getGroupShared());
-    RkAiqCore::RkAiqAlgosComShared_t* sharedCom = &mAiqCore->mAlogsComSharedParams;
 
     ret = RkAiqHandle::postProcess();
     if (ret) {
@@ -176,14 +153,35 @@ XCamReturn RkAiqAgainHandleInt::genIspResult(RkAiqFullParams* params, RkAiqFullP
             } else {
                 gain_param->frame_id = shared->frameId;
             }
+
+            if (again_com->res_com.cfg_update) {
+                mSyncFlag = shared->frameId;
+                gain_param->sync_flag = mSyncFlag;
+                // copy from algo result
+                // set as the latest result
+                cur_params->mGainParams = gain_param->mGainParams;
+                gain_param->is_update = true;
+                LOGD_ANR("[%d] params from algo", mSyncFlag);
+            } else if (mSyncFlag != gain_param->sync_flag) {
+                gain_param->sync_flag = mSyncFlag;
+                // copy from latest result
+                if (cur_params->mGainParams.ptr()) {
+                    gain_param->result = cur_params->mGainParams->data()->result;
+                    gain_param->is_update = true;
+                } else {
+                    LOGE_ANR("no latest params !");
+                    gain_param->is_update = false;
+                }
+                LOGD_ANR("[%d] params from latest [%d]", shared->frameId, mSyncFlag);
+            } else {
+                // do nothing, result in buf needn't update
+                gain_param->is_update = false;
+                LOGD_ANR("[%d] params needn't update", shared->frameId);
+            }
             LOGD_ANR("oyyf: %s:%d output isp param start\n", __FUNCTION__, __LINE__);
-            memcpy(&gain_param->result, &again_rk->stAgainProcResult.stFix,
-                   sizeof(RK_GAIN_Fix_V1_t));
         }
         LOGD_ANR("oyyf: %s:%d output isp param end \n", __FUNCTION__, __LINE__);
     }
-
-    cur_params->mGainParams = params->mGainParams;
 
     EXIT_ANALYZER_FUNCTION();
 

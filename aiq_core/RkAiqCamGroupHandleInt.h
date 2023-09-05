@@ -96,10 +96,11 @@ public:
     XCamReturn setHdrAeRouteAttr(Uapi_HdrAeRouteAttr_t HdrAeRouteAttr);
     XCamReturn getHdrAeRouteAttr(Uapi_HdrAeRouteAttr_t* pHdrAeRouteAttr);
 
-
     XCamReturn setSyncTestAttr(Uapi_AecSyncTest_t SyncTestAttr);
-    XCamReturn getSyncTestAttr (Uapi_AecSyncTest_t* pSyncTestAttr);
+    XCamReturn getSyncTestAttr(Uapi_AecSyncTest_t* pSyncTestAttr);
     XCamReturn queryExpInfo(Uapi_ExpQueryInfo_t* pExpQueryInfo);
+    XCamReturn setAecStatsCfg(Uapi_AecStatsCfg_t AecStatsCfg);
+    XCamReturn getAecStatsCfg(Uapi_AecStatsCfg_t* pAecStatsCfg);
 
 protected:
 
@@ -119,6 +120,8 @@ private:
     Uapi_HdrAeRouteAttr_t mNewHdrAeRouteAttr;
     Uapi_AecSyncTest_t    mCurAecSyncTestAttr;
     Uapi_AecSyncTest_t    mNewAecSyncTestAttr;
+    Uapi_AecStatsCfg_t    mCurAecStatsCfg;
+    Uapi_AecStatsCfg_t    mNewAecStatsCfg;
 
     mutable std::atomic<bool> updateExpSwAttrV2;
     mutable std::atomic<bool> updateLinExpAttrV2;
@@ -127,6 +130,7 @@ private:
     mutable std::atomic<bool> updateLinAeRouteAttr;
     mutable std::atomic<bool> updateHdrAeRouteAttr;
     mutable std::atomic<bool> updateSyncTestAttr;
+    mutable std::atomic<bool> updateAecStatsCfg;
 };
 
 // awb
@@ -212,6 +216,10 @@ public:
     XCamReturn getWbV32Attrib(rk_aiq_uapiV2_wbV32_attrib_t* att);
     XCamReturn setWbV32AwbMultiWindowAttrib(rk_aiq_uapiV2_wbV32_awb_mulWindow_t att);
     XCamReturn getWbV32AwbMultiWindowAttrib(rk_aiq_uapiV2_wbV32_awb_mulWindow_t* att);
+    XCamReturn setWbV32IQAutoExtPara(const rk_aiq_uapiV2_Wb_Awb_IqAtExtPa_V32_t* att);
+    XCamReturn getWbV32IQAutoExtPara(rk_aiq_uapiV2_Wb_Awb_IqAtExtPa_V32_t* att);
+    XCamReturn setWbV32IQAutoPara(const rk_aiq_uapiV2_Wb_Awb_IqAtPa_V32_t* att);
+    XCamReturn getWbV32IQAutoPara(rk_aiq_uapiV2_Wb_Awb_IqAtPa_V32_t* att);
 protected:
 
 private:
@@ -257,10 +265,14 @@ public:
 #if RKAIQ_HAVE_CCM_V1
         memset(&mCurAtt, 0, sizeof(rk_aiq_ccm_attrib_t));
         memset(&mNewAtt, 0, sizeof(rk_aiq_ccm_attrib_t));
+        memset(&mCurCalibAtt, 0, sizeof(rk_aiq_ccm_calib_attrib_t));
+        memset(&mNewCalibAtt, 0, sizeof(rk_aiq_ccm_calib_attrib_t));
 #endif
 #if RKAIQ_HAVE_CCM_V2
         memset(&mCurAttV2, 0, sizeof(rk_aiq_ccm_v2_attrib_t));
         memset(&mNewAttV2, 0, sizeof(rk_aiq_ccm_v2_attrib_t));
+        memset(&mCurCalibAttV2, 0, sizeof(rk_aiq_ccm_v2_calib_attrib_t));
+        memset(&mNewCalibAttV2, 0, sizeof(rk_aiq_ccm_v2_calib_attrib_t));
 #endif
     };
     virtual ~RkAiqCamGroupAccmHandleInt() {
@@ -271,10 +283,14 @@ public:
 #if RKAIQ_HAVE_CCM_V1
     XCamReturn setAttrib(const rk_aiq_ccm_attrib_t* att);
     XCamReturn getAttrib(rk_aiq_ccm_attrib_t *att);
+    XCamReturn setIqParam(const rk_aiq_ccm_calib_attrib_t* att);
+    XCamReturn getIqParam(rk_aiq_ccm_calib_attrib_t* att);
 #endif
 #if RKAIQ_HAVE_CCM_V2
     XCamReturn setAttribV2(const rk_aiq_ccm_v2_attrib_t* att);
     XCamReturn getAttribV2(rk_aiq_ccm_v2_attrib_t *att);
+    XCamReturn setIqParamV2(const rk_aiq_ccm_v2_calib_attrib_t* att);
+    XCamReturn getIqParamV2(rk_aiq_ccm_v2_calib_attrib_t* att);
 #endif
     XCamReturn queryCcmInfo(rk_aiq_ccm_querry_info_t* ccm_querry_info);
 
@@ -283,13 +299,18 @@ protected:
 private:
     // TODO
 #if RKAIQ_HAVE_CCM_V1
-    rk_aiq_ccm_attrib_t mCurAtt;
-    rk_aiq_ccm_attrib_t mNewAtt;
+    rk_aiq_ccm_attrib_t          mCurAtt;
+    rk_aiq_ccm_calib_attrib_t    mCurCalibAtt;
+    rk_aiq_ccm_attrib_t          mNewAtt;
+    rk_aiq_ccm_calib_attrib_t    mNewCalibAtt;
 #endif
 #if RKAIQ_HAVE_CCM_V2
-    rk_aiq_ccm_v2_attrib_t mCurAttV2;
-    rk_aiq_ccm_v2_attrib_t mNewAttV2;
+    rk_aiq_ccm_v2_attrib_t       mCurAttV2;
+    rk_aiq_ccm_v2_calib_attrib_t mCurCalibAttV2;
+    rk_aiq_ccm_v2_attrib_t       mNewAttV2;
+    rk_aiq_ccm_v2_calib_attrib_t mNewCalibAttV2;
 #endif
+    mutable std::atomic<bool>    updateCalibAttr;
 };
 
 // a3dlut
@@ -460,8 +481,8 @@ public:
     XCamReturn getAttribV12Lite(drcAttrV12Lite_t* att);
 #endif
 
- protected:
- private:
+protected:
+private:
 // TODO
 #if RKAIQ_HAVE_DRC_V10
     drcAttrV10_t mCurAttV10;

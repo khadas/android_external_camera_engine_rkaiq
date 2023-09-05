@@ -88,6 +88,10 @@ static XCamReturn prepare(RkAiqAlgoCom* params) {
             (CalibDbV2_SharpV33Lite_t*)(CALIBDBV2_GET_MODULE_PTR(pCfgParam->com.u.prepare.calibv2,
                                                                  sharp_v33));
 #endif
+        // just update calib ptr
+        if (params->u.prepare.conf_type & RK_AIQ_ALGO_CONFTYPE_UPDATECALIB_PTR) {
+            return XCAM_RETURN_NO_ERROR;
+        }
         pAsharpCtx->sharp_v33               = *calibv2_sharp;
 #endif
         pAsharpCtx->isIQParaUpdate = true;
@@ -147,6 +151,11 @@ static XCamReturn processing(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outp
     Asharp_ExpInfo_V33_t stExpInfo;
     memset(&stExpInfo, 0x00, sizeof(Asharp_ExpInfo_V33_t));
 
+    if (pAsharpProcParams == NULL) {
+        LOGE_ASHARP("%s:%d pointer pAsharpProcParams is NULL", __FUNCTION__, __LINE__);
+        return XCAM_RETURN_BYPASS;
+    }
+
     LOGD_ASHARP("%s:%d init:%d hdr mode:%d  \n", __FUNCTION__, __LINE__, inparams->u.proc.init,
                 pAsharpProcParams->hdr_mode);
 
@@ -188,11 +197,10 @@ static XCamReturn processing(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outp
     stExpInfo.snr_mode = 0;
 
     stExpInfo.blc_ob_predgain = 1.0;
-    if(pAsharpProcParams != NULL) {
-        stExpInfo.blc_ob_predgain = pAsharpProcParams->stAblcV32_proc_res.isp_ob_predgain;
-        if(stExpInfo.blc_ob_predgain != pAsharpCtx->stExpInfo.blc_ob_predgain) {
-            pAsharpCtx->isReCalculate |= 1;
-        }
+
+    stExpInfo.blc_ob_predgain = pAsharpProcParams->stAblcV32_proc_res->isp_ob_predgain;
+    if(stExpInfo.blc_ob_predgain != pAsharpCtx->stExpInfo.blc_ob_predgain) {
+        pAsharpCtx->isReCalculate |= 1;
     }
 #if 0  // TODO Merge:
     XCamVideoBuffer* xCamAePreRes = pAsharpProcParams->com.u.proc.res_comb->ae_pre_res;
@@ -296,11 +304,11 @@ static XCamReturn processing(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outp
         }
 
         Asharp_GetProcResult_V33(pAsharpCtx, &pAsharpProcResParams->stAsharpProcResult);
-        pAsharpProcResParams->stAsharpProcResult.isNeedUpdate = true;
+        outparams->cfg_update = true;
 
         LOGD_ASHARP("recalculate: %d delta_iso:%d \n ", pAsharpCtx->isReCalculate, DeltaIso);
     } else {
-        pAsharpProcResParams->stAsharpProcResult.isNeedUpdate = false;
+        outparams->cfg_update = false;
     }
 
     pAsharpCtx->isReCalculate = 0;

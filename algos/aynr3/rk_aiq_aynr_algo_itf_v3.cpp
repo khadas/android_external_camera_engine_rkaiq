@@ -84,6 +84,10 @@ prepare(RkAiqAlgoCom* params)
     pAynrCtx->prepare_type = params->u.prepare.conf_type;
 
     if(!!(params->u.prepare.conf_type & RK_AIQ_ALGO_CONFTYPE_UPDATECALIB )) {
+        // just update calib ptr
+        if (params->u.prepare.conf_type & RK_AIQ_ALGO_CONFTYPE_UPDATECALIB_PTR) {
+            return XCAM_RETURN_NO_ERROR;
+        }
 #if AYNR_USE_JSON_FILE_V3
         void *pCalibdbV2 = (void*)(pCfgParam->com.u.prepare.calibv2);
         CalibDbV2_YnrV3_t *ynr_v3 = (CalibDbV2_YnrV3_t*)(CALIBDBV2_GET_MODULE_PTR((void*)pCalibdbV2, ynr_v3));
@@ -279,14 +283,14 @@ processing(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outparams)
             LOGE_ANR("%s: processing ANR failed (%d)\n", __FUNCTION__, ret);
         }
 
-        pAynrProcResParams->stAynrProcResult.isNeedUpdate = true;
+        Aynr_GetProcResult_V3(pAynrCtx, &pAynrProcResParams->stAynrProcResult);
+        outparams->cfg_update = true;
         LOGD_ANR("recalculate: %d delta_iso:%d \n ", pAynrCtx->isReCalculate, deltaIso);
     } else {
-        pAynrProcResParams->stAynrProcResult.isNeedUpdate = false;
+        outparams->cfg_update = false;
     }
 #endif
 
-    Aynr_GetProcResult_V3(pAynrCtx, &pAynrProcResParams->stAynrProcResult);
     pAynrCtx->isReCalculate = 0;
 
     LOGI_ANR("%s: (exit)\n", __FUNCTION__ );

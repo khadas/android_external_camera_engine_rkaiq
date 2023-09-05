@@ -29,9 +29,11 @@ class RkAiqAblcV32HandleInt : virtual public RkAiqHandle {
 public:
     explicit RkAiqAblcV32HandleInt(RkAiqAlgoDesComm* des, RkAiqCore* aiqCore)
         : RkAiqHandle(des, aiqCore) {
+#ifndef DISABLE_HANDLE_ATTRIB
         memset(&mCurAtt, 0, sizeof(mCurAtt));
         memset(&mNewAtt, 0, sizeof(mCurAtt));
         updateAtt = false;
+#endif
     };
     virtual ~RkAiqAblcV32HandleInt() {
         RkAiqHandle::deInit();
@@ -56,9 +58,12 @@ protected:
     SmartPtr<RkAiqAlgoProcResAblcV32IntShared> mProcResShared;
 
 private:
+#ifndef DISABLE_HANDLE_ATTRIB
     // TODO
     rk_aiq_blc_attrib_V32_t mCurAtt;
     rk_aiq_blc_attrib_V32_t mNewAtt;
+#endif
+    rk_aiq_isp_blc_v32_t* mLatestparam; 
 
 private:
     DECLARE_HANDLE_REGISTER_TYPE(RkAiqAblcV32HandleInt);

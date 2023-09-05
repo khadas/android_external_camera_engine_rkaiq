@@ -25,38 +25,36 @@
 
 namespace RkCam {
 
-typedef struct RKAiqAecExpInfoWrapper_s : public XCam::BufferData {
-    RKAiqAecExpInfo_t aecExpInfo;
+typedef struct RKAiqAecExpInfoWrapper_s {
+    rk_aiq_exposure_params_t new_ae_exp;
     RKAiqExpI2cParam_t exp_i2c_params;
-    RKAiqAecExpInfo_t exp_tbl[MAX_AEC_EFFECT_FNUM + 1];
+    AecProcResult_t      ae_proc_res_rk;
     Sensor_dpcc_res_t SensorDpccInfo;
-    int exp_tbl_size;
     int algo_id;
-    uint32_t frame_id;
-    struct RKAiqAecExpInfoWrapper_s& operator=(const struct RKAiqAecExpInfoWrapper_s& set)
-    {
-        this->aecExpInfo = set.aecExpInfo;
-        if (set.exp_i2c_params.bValid)
-            this->exp_i2c_params = set.exp_i2c_params;
-        else
-            this->exp_i2c_params.bValid = false;
-        this->SensorDpccInfo = set.SensorDpccInfo;
-        this->exp_tbl_size = set.exp_tbl_size;
-        this->algo_id = set.algo_id;
-        memcpy(this->exp_tbl, set.exp_tbl, sizeof(set.exp_tbl));
-        return *this;
-    }
+    RKAiqAecExpInfoWrapper_s() {
+        exp_i2c_params.bValid = false;
+    };
 } RKAiqAecExpInfoWrapper_t;
 
-typedef RKAiqAecExpInfoWrapper_t rk_aiq_exposure_params_wrapper_t;
+typedef struct RKAiqSensorExpInfo_t: public XCam::BufferData {
+    rk_aiq_exposure_params_t aecExpInfo;
+    Sensor_dpcc_res_t SensorDpccInfo;
+    RKAiqExpI2cParam_t* exp_i2c_params;
+} RKAiqSensorExpInfo_t;
+
+typedef rk_aiq_isp_params_t<RKAiqAecExpInfoWrapper_t> rk_aiq_exposure_params_wrapper_t;
 typedef SharedItemPool<rk_aiq_exposure_params_wrapper_t> RkAiqExpParamsPool;
 typedef SharedItemProxy<rk_aiq_exposure_params_wrapper_t> RkAiqExpParamsProxy;
 
+typedef RKAiqSensorExpInfo_t rk_aiq_sensor_exp_info_t;
+typedef SharedItemPool<rk_aiq_sensor_exp_info_t> RkAiqSensorExpParamsPool;
+typedef SharedItemProxy<rk_aiq_sensor_exp_info_t> RkAiqSensorExpParamsProxy;
+
 typedef struct RkAiqSofInfoWrapper_s : public XCam::BufferData {
     uint32_t sequence;
-    SmartPtr<RkAiqExpParamsProxy> preExp;
-    SmartPtr<RkAiqExpParamsProxy> curExp;
-    SmartPtr<RkAiqExpParamsProxy> nxtExp;
+    SmartPtr<RkAiqSensorExpParamsProxy> preExp;
+    SmartPtr<RkAiqSensorExpParamsProxy> curExp;
+    SmartPtr<RkAiqSensorExpParamsProxy> nxtExp;
     int64_t sof;
     void reset() {
         preExp.release();
@@ -96,6 +94,7 @@ typedef struct RkAiqIrisInfoWrapper_s : public XCam::BufferData {
     //RkAiqIrisType_t           IrisType;
     RkAiqPirisInfoWrapper_t   PIris;
     RkAiqDCIrisParam_t        DCIris;
+    RkAiqHDCIrisParam_t       HDCIris;
     uint64_t                  sofTime;
 } RkAiqIrisInfoWrapper_t;
 
@@ -157,6 +156,7 @@ typedef enum _cam3aResultType {
     RESULT_TYPE_DRC_PARAM = 0x28,
     // isp3x result
     RESULT_TYPE_CAC_PARAM = 0x29,
+    RESULT_TYPE_AFD_PARAM = 0x2a,
     RESULT_TYPE_MAX_PARAM,
 } cam3aResultType;
 
@@ -206,7 +206,8 @@ static const char* Cam3aResultType2Str[RESULT_TYPE_MAX_PARAM] = {
     [RESULT_TYPE_ORB_PARAM]          = "ORB",
     [RESULT_TYPE_FOCUS_PARAM]        = "FOCUS",
     [RESULT_TYPE_DRC_PARAM]          = "DRC",
-    [RESULT_TYPE_CAC_PARAM]          = "CAC"
+    [RESULT_TYPE_CAC_PARAM]          = "CAC",
+    [RESULT_TYPE_AFD_PARAM]          = "AFD",
 };
 #if defined(__GNUC__) && !defined(__clang__)
 #pragma GCC diagnostic pop
@@ -257,6 +258,8 @@ public:
         awb_stats_valid      = false;
         awb_cfg_effect_valid = false;
         af_stats_valid       = false;
+        atmo_stats_valid     = false;
+        adehaze_stats_valid  = false;
         frame_id             = -1;
     };
     virtual ~RkAiqIspStats() {
@@ -373,6 +376,9 @@ typedef SharedItemProxy<rk_aiq_isp_fec_params_v20_t>        RkAiqIspFecParamsPro
 typedef SharedItemPool<rk_aiq_isp_orb_params_v20_t>         RkAiqIspOrbParamsPool;
 typedef SharedItemProxy<rk_aiq_isp_orb_params_v20_t>        RkAiqIspOrbParamsProxy;
 
+typedef SharedItemPool<rk_aiq_isp_afd_params_t>             RkAiqIspAfdParamsPool;
+typedef SharedItemProxy<rk_aiq_isp_afd_params_t>            RkAiqIspAfdParamsProxy;
+
 //v21 pools
 typedef SharedItemPool<rk_aiq_isp_awb_params_v21_t>         RkAiqIspAwbParamsPoolV21;
 typedef SharedItemProxy<rk_aiq_isp_awb_params_v21_t>        RkAiqIspAwbParamsProxyV21;
@@ -447,7 +453,8 @@ typedef SharedItemProxy<rk_aiq_isp_af_params_v32_lite_t>    RkAiqIspAfParamsProx
 class RkAiqFullParams : public XCam::BufferData {
 public:
     explicit RkAiqFullParams()
-        : mExposureParams(NULL)
+        : mFrmId(0)
+        , mExposureParams(NULL)
         , mFocusParams(NULL)
         , mIrisParams(NULL)
         , mCpslParams(NULL)
@@ -520,13 +527,16 @@ public:
         , mAfV32Params(NULL)
         , mTnrV32Params(NULL)
         , mAwbGainV32Params(NULL)
-        , mAfV32LiteParams(NULL) {
+        , mAfV32LiteParams(NULL)
+        , mAfdParams(NULL) {
     };
     ~RkAiqFullParams() {
         reset();
     };
 
     void reset() {
+#if 0// Do not release to save cpu usage
+        // MUST release, cause some malloc was made in mExposureParams
         mExposureParams.release();
         mFocusParams.release();
         mIrisParams.release();
@@ -610,7 +620,11 @@ public:
 
         // V32 lite differential modules
         mAfV32LiteParams.release();
+
+        mAfdParams.release();
+#endif
     };
+    uint32_t                                mFrmId;
     SmartPtr<RkAiqExpParamsProxy>           mExposureParams;
     SmartPtr<RkAiqFocusParamsProxy>         mFocusParams;
     SmartPtr<RkAiqIrisParamsProxy>          mIrisParams;
@@ -692,6 +706,8 @@ public:
 
     // V32 lite differential modules
     SmartPtr<RkAiqIspAfParamsProxyV32Lite>   mAfV32LiteParams;
+
+    SmartPtr<RkAiqIspAfdParamsProxy>         mAfdParams;
 private:
     XCAM_DEAD_COPY (RkAiqFullParams);
 };
@@ -700,19 +716,21 @@ typedef SharedItemPool<RkAiqFullParams> RkAiqFullParamsPool;
 typedef SharedItemProxy<RkAiqFullParams> RkAiqFullParamsProxy;
 
 template<class T>
-struct AlgoRstShared: public XCam::BufferData {
+struct AlgoRstShared: public XCam::VideoBuffer {
 public:
+    AlgoRstShared () : VideoBuffer() { }
     typedef T value_type;
     T   result;
     virtual uint8_t* map() override {
         return (uint8_t*)(&result);
     }
+    virtual bool unmap () override { return false; }
+    virtual int get_fd () override { return -1; }
 };
 
 using RkAiqAlgoPreResAeIntShared = AlgoRstShared<RkAiqAlgoPreResAe>;
-using RkAiqAlgoProcResAeIntShared = AlgoRstShared<RkAiqAlgoProcResAe>;
-using RkAiqAlgoProcResAwbIntShared = AlgoRstShared<RkAiqAlgoProcResAwb>;
-using RkAiqAlgoProcResAfIntShared = AlgoRstShared<RkAiqAlgoProcResAf>;
+//using RkAiqAlgoProcResAeIntShared = AlgoRstShared<RkAiqAlgoProcResAe>;
+using RkAiqAlgoProcResAwbIntShared = AlgoRstShared<RkAiqAlgoProcResAwbShared_t>;
 using RkAiqAlgoProcResAmdIntShared = AlgoRstShared<RkAiqAlgoProcResAmd>;
 using RkAiqAlgoProcResAblcIntShared = AlgoRstShared<RkAiqAlgoProcResAblc>;
 using RkAiqAlgoProcResAblcV32IntShared = AlgoRstShared<RkAiqAlgoProcResAblcV32>;

@@ -4,23 +4,8 @@
 RKAIQ_BEGIN_DECLARE
 
 #define Math_LOG2(x)    (log((double)x)   / log((double)2))
+#define interp_cnr_v30(value_low, value_high, ratio) (ratio * ((value_high) - (value_low)) + value_low)
 
-float interp_cnr_v30(int ISO_low, int ISO_high, float value_low, float value_high, int ISO)
-{
-    float value = 0.0;
-
-    if (ISO <= ISO_low) {
-        value = value_low;
-    }
-    else if (ISO >= ISO_high) {
-        value = value_high;
-    }
-    else {
-        value = float(ISO - ISO_low) / float(ISO_high - ISO_low) * (value_high - value_low) + value_low;
-    }
-
-    return value;
-}
 
 
 AcnrV30_result_t cnr_select_params_by_ISO_V30(RK_CNR_Params_V30_t *pParams, RK_CNR_Params_V30_Select_t *pSelect, AcnrV30_ExpInfo_t *pExpInfo)
@@ -49,7 +34,6 @@ AcnrV30_result_t cnr_select_params_by_ISO_V30(RK_CNR_Params_V30_t *pParams, RK_C
     //      isogain: 1  2   4   8   16  32   64    128  256
     //     isoindex: 0  1   2   3   4   5    6     7    8
 
-    int isoIndex = 0;
     int isoGainLow = 0;
     int isoGainHigh = 0;
     int isoIndexLow = 0;
@@ -64,7 +48,6 @@ AcnrV30_result_t cnr_select_params_by_ISO_V30(RK_CNR_Params_V30_t *pParams, RK_C
             isoGainHigh = pParams->iso[i + 1];
             isoIndexLow = i;
             isoIndexHigh = i + 1;
-            isoIndex = isoIndexLow;
         }
     }
 
@@ -73,7 +56,6 @@ AcnrV30_result_t cnr_select_params_by_ISO_V30(RK_CNR_Params_V30_t *pParams, RK_C
         isoGainHigh = pParams->iso[1];
         isoIndexLow = 0;
         isoIndexHigh = 1;
-        isoIndex = 0;
     }
 
     if(iso > pParams->iso[max_iso_step - 1] ) {
@@ -81,10 +63,8 @@ AcnrV30_result_t cnr_select_params_by_ISO_V30(RK_CNR_Params_V30_t *pParams, RK_C
         isoGainHigh = pParams->iso[max_iso_step - 1];
         isoIndexLow = max_iso_step - 2;
         isoIndexHigh = max_iso_step - 1;
-        isoIndex = max_iso_step - 1;
     }
 #else
-    isoIndex = int(log(float(iso / iso_div)) / log(2.0f));
 
     for (int i = max_iso_step - 1; i >= 0; i--) {
         if (iso < iso_div * (2 << i)) {
@@ -141,35 +121,37 @@ AcnrV30_result_t cnr_select_params_by_ISO_V30(RK_CNR_Params_V30_t *pParams, RK_C
         }
     }
 
-    pSelect->thumb_sigma = interp_cnr_v30(isoGainLow, isoGainHigh, pLowISO->thumb_sigma, pHighISO->thumb_sigma, iso);
-    pSelect->thumb_bf_ratio = interp_cnr_v30(isoGainLow, isoGainHigh, pLowISO->thumb_bf_ratio, pHighISO->thumb_bf_ratio, iso);
+    float ratio = float(iso - isoGainLow) / float(isoGainHigh - isoGainLow);
 
-    pSelect->chroma_filter_strength = interp_cnr_v30(isoGainLow, isoGainHigh, pLowISO->chroma_filter_strength, pHighISO->chroma_filter_strength, iso);
-    pSelect->chroma_filter_wgt_clip = interp_cnr_v30(isoGainLow, isoGainHigh, pLowISO->chroma_filter_wgt_clip, pHighISO->chroma_filter_wgt_clip, iso);
-    pSelect->anti_chroma_ghost = interp_cnr_v30(isoGainLow, isoGainHigh, pLowISO->anti_chroma_ghost, pHighISO->anti_chroma_ghost, iso);
-    pSelect->chroma_filter_uv_gain = interp_cnr_v30(isoGainLow, isoGainHigh, pLowISO->chroma_filter_uv_gain, pHighISO->chroma_filter_uv_gain, iso);
-    pSelect->wgt_slope = interp_cnr_v30(isoGainLow, isoGainHigh, pLowISO->wgt_slope, pHighISO->wgt_slope, iso);
+    pSelect->thumb_sigma = interp_cnr_v30( pLowISO->thumb_sigma, pHighISO->thumb_sigma, ratio);
+    pSelect->thumb_bf_ratio = interp_cnr_v30(pLowISO->thumb_bf_ratio, pHighISO->thumb_bf_ratio, ratio);
 
-    pSelect->gaus_ratio = interp_cnr_v30(isoGainLow, isoGainHigh, pLowISO->gaus_ratio, pHighISO->gaus_ratio, iso);
+    pSelect->chroma_filter_strength = interp_cnr_v30(pLowISO->chroma_filter_strength, pHighISO->chroma_filter_strength, ratio);
+    pSelect->chroma_filter_wgt_clip = interp_cnr_v30(pLowISO->chroma_filter_wgt_clip, pHighISO->chroma_filter_wgt_clip, ratio);
+    pSelect->anti_chroma_ghost = interp_cnr_v30(pLowISO->anti_chroma_ghost, pHighISO->anti_chroma_ghost, ratio);
+    pSelect->chroma_filter_uv_gain = interp_cnr_v30(pLowISO->chroma_filter_uv_gain, pHighISO->chroma_filter_uv_gain, ratio);
+    pSelect->wgt_slope = interp_cnr_v30(pLowISO->wgt_slope, pHighISO->wgt_slope, ratio);
 
-    pSelect->bf_sigmaR = interp_cnr_v30(isoGainLow, isoGainHigh, pLowISO->bf_sigmaR, pHighISO->bf_sigmaR, iso);
-    pSelect->bf_uvgain = interp_cnr_v30(isoGainLow, isoGainHigh, pLowISO->bf_uvgain, pHighISO->bf_uvgain, iso);
-    pSelect->bf_ratio = interp_cnr_v30(isoGainLow, isoGainHigh, pLowISO->bf_ratio, pHighISO->bf_ratio, iso);
-    pSelect->hbf_wgt_clip = interp_cnr_v30(isoGainLow, isoGainHigh, pLowISO->hbf_wgt_clip, pHighISO->hbf_wgt_clip, iso);
-    pSelect->global_alpha = interp_cnr_v30(isoGainLow, isoGainHigh, pLowISO->global_alpha, pHighISO->global_alpha, iso);
+    pSelect->gaus_ratio = interp_cnr_v30(pLowISO->gaus_ratio, pHighISO->gaus_ratio, ratio);
 
-    pSelect->saturation_adj_offset = interp_cnr_v30(isoGainLow, isoGainHigh, pLowISO->saturation_adj_offset, pHighISO->saturation_adj_offset, iso);
-    pSelect->saturation_adj_ratio = interp_cnr_v30(isoGainLow, isoGainHigh, pLowISO->saturation_adj_ratio, pHighISO->saturation_adj_ratio, iso);
+    pSelect->bf_sigmaR = interp_cnr_v30(pLowISO->bf_sigmaR, pHighISO->bf_sigmaR, ratio);
+    pSelect->bf_uvgain = interp_cnr_v30(pLowISO->bf_uvgain, pHighISO->bf_uvgain, ratio);
+    pSelect->bf_ratio = interp_cnr_v30(pLowISO->bf_ratio, pHighISO->bf_ratio, ratio);
+    pSelect->hbf_wgt_clip = interp_cnr_v30(pLowISO->hbf_wgt_clip, pHighISO->hbf_wgt_clip, ratio);
+    pSelect->global_alpha = interp_cnr_v30(pLowISO->global_alpha, pHighISO->global_alpha, ratio);
 
-    pSelect->global_gain = interp_cnr_v30(isoGainLow, isoGainHigh, pLowISO->global_gain, pHighISO->global_gain, iso);
-    pSelect->global_gain_alpha = interp_cnr_v30(isoGainLow, isoGainHigh, pLowISO->global_gain_alpha, pHighISO->global_gain_alpha, iso);
-    pSelect->local_gain_scale = interp_cnr_v30(isoGainLow, isoGainHigh, pLowISO->local_gain_scale, pHighISO->local_gain_scale, iso);
-    pSelect->global_gain_thumb = interp_cnr_v30(isoGainLow, isoGainHigh, pLowISO->global_gain_thumb, pHighISO->global_gain_thumb, iso);
-    pSelect->global_gain_alpha_thumb = interp_cnr_v30(isoGainLow, isoGainHigh, pLowISO->global_gain_alpha_thumb, pHighISO->global_gain_alpha_thumb, iso);
+    pSelect->saturation_adj_offset = interp_cnr_v30(pLowISO->saturation_adj_offset, pHighISO->saturation_adj_offset, ratio);
+    pSelect->saturation_adj_ratio = interp_cnr_v30(pLowISO->saturation_adj_ratio, pHighISO->saturation_adj_ratio, ratio);
+
+    pSelect->global_gain = interp_cnr_v30(pLowISO->global_gain, pHighISO->global_gain, ratio);
+    pSelect->global_gain_alpha = interp_cnr_v30(pLowISO->global_gain_alpha, pHighISO->global_gain_alpha, ratio);
+    pSelect->local_gain_scale = interp_cnr_v30(pLowISO->local_gain_scale, pHighISO->local_gain_scale, ratio);
+    pSelect->global_gain_thumb = interp_cnr_v30(pLowISO->global_gain_thumb, pHighISO->global_gain_thumb, ratio);
+    pSelect->global_gain_alpha_thumb = interp_cnr_v30(pLowISO->global_gain_alpha_thumb, pHighISO->global_gain_alpha_thumb, ratio);
 
     for (int i = 0; i < 13; i++)
     {
-        pSelect->gain_adj_strength_ratio[i] = interp_cnr_v30(isoGainLow, isoGainHigh, pLowISO->gain_adj_strength_ratio[i], pHighISO->gain_adj_strength_ratio[i], iso);
+        pSelect->gain_adj_strength_ratio[i] = interp_cnr_v30(pLowISO->gain_adj_strength_ratio[i], pHighISO->gain_adj_strength_ratio[i], ratio);
     }
 
     return ACNRV30_RET_SUCCESS;
@@ -270,12 +252,11 @@ AcnrV30_result_t cnr_fix_transfer_V30(RK_CNR_Params_V30_Select_t *pSelect, RK_CN
 
 
     /* CNR_THUMB_BF_RATIO */
-    uint16_t thumb_bf_ratio;
     tmp = ROUND_F((1 << RKCNR_V30_FIX_BIT_BF_RATIO) * pSelect->thumb_bf_ratio * fStrength);
     pFix->thumb_bf_ratio = CLIP(tmp, 0, 0x7ff);
 
     /* CNR_LBF_WEITD */
-    for(int i = 0; i < RKCNR_V30_THUMB_BF_RADIUS + 1; i++) {
+    for(i = 0; i < RKCNR_V30_THUMB_BF_RADIUS + 1; i++) {
         tmp = ROUND_F(pSelect->thumb_filter_wgt_coeff[i] * (1 << RKCNR_V30_exp2_lut_y));
         pFix->lbf1x7_weit_d[i] = CLIP(tmp, 0, 0xff);
     }
@@ -309,7 +290,7 @@ AcnrV30_result_t cnr_fix_transfer_V30(RK_CNR_Params_V30_Select_t *pSelect, RK_CN
     pFix->iir_uv_clip = CLIP(tmp, 0, 0x7f);
 
     /* CNR_GAUS_COE */
-    for(int i = 0; i < 6; i++) {
+    for(i = 0; i < 6; i++) {
         tmp = pSelect->gaus_coeff[5 - i];
         pFix->gaus_coe[i] = CLIP(tmp, 0, 0x7f);
     }
@@ -337,8 +318,7 @@ AcnrV30_result_t cnr_fix_transfer_V30(RK_CNR_Params_V30_Select_t *pSelect, RK_CN
     pFix->adj_ratio = CLIP(tmp, 0, 0x7fff);
 
     /* CNR_SIGMA */
-    uint8_t  sigma_y[13];
-    for(int i = 0; i < 13; i++) {
+    for(i = 0; i < 13; i++) {
         tmp = ROUND_F(pSelect->gain_adj_strength_ratio[i] * (1 << RKCNR_V30_sgmRatio));
         pFix->sigma_y[i] = CLIP(tmp, 0, 0xff);
     }
@@ -414,7 +394,7 @@ AcnrV30_result_t cnr_fix_printf_V30(RK_CNR_Fix_V30_t  * pFix)
              pFix->iir_uv_clip);
 
     // CNR_GAUS_COE (0x001c - 0x0020)
-    for(int i = 0; i < 6; i++) {
+    for(i = 0; i < 6; i++) {
         LOGD_ANR("(0x001c - 0x0020) gaus_coe[%d]:0x%x \n",
                  i, pFix->gaus_coe[i]);
     }
@@ -437,7 +417,7 @@ AcnrV30_result_t cnr_fix_printf_V30(RK_CNR_Fix_V30_t  * pFix)
              pFix->adj_ratio);
 
     // CNR_SIGMA (0x0030 - 0x003c)
-    for(int i = 0; i < 13; i++) {
+    for(i = 0; i < 13; i++) {
         LOGD_ANR("(0x0030 - 0x003c) sigma_y[%d]:0x%x \n", i, pFix->sigma_y[i]);
     }
 

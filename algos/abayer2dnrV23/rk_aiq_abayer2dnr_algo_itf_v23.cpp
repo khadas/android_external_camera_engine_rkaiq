@@ -91,6 +91,10 @@ prepare(RkAiqAlgoCom* params)
         CalibDbV2_Bayer2dnrV23_t *bayernr_v23 = (CalibDbV2_Bayer2dnrV23_t*)(CALIBDBV2_GET_MODULE_PTR((void*)pCalibDbV2, bayer2dnr_v23));
         pAbayernrCtx->bayernr_v23 = *bayernr_v23;
 #endif
+        // just update calib ptr
+        if (params->u.prepare.conf_type & RK_AIQ_ALGO_CONFTYPE_UPDATECALIB_PTR)
+            return XCAM_RETURN_NO_ERROR;
+
         pAbayernrCtx->isIQParaUpdate = true;
         pAbayernrCtx->isReCalculate |= 1;
     }
@@ -170,6 +174,11 @@ processing(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outparams)
         LOGE_ANR("%s: ANRPreProcess failed (%d)\n", __FUNCTION__, ret);
     }
 
+    if (pAbayernrProcParams == NULL) {
+            LOGE_ANR("%s: ANRProcessing pAbayernrProcParams is NULL\n", __FUNCTION__);
+        return XCAM_RETURN_BYPASS;
+    }
+
     LOGD_ANR("%s:%d init:%d hdr mode:%d  \n",
              __FUNCTION__, __LINE__,
              inparams->u.proc.init,
@@ -186,7 +195,7 @@ processing(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outparams)
     stExpInfo.bayertnr_en = 1;
 
     if(pAbayernrProcParams != NULL) {
-        stExpInfo.blc_ob_predgain = pAbayernrProcParams->stAblcV32_proc_res.isp_ob_predgain;
+        stExpInfo.blc_ob_predgain = pAbayernrProcParams->stAblcV32_proc_res->isp_ob_predgain;
         stExpInfo.bayertnr_en = pAbayernrProcParams->bayertnr_en;
         if(stExpInfo.blc_ob_predgain != pAbayernrCtx->stExpInfo.blc_ob_predgain
                 || stExpInfo.bayertnr_en != pAbayernrCtx->stExpInfo.bayertnr_en) {
@@ -324,9 +333,9 @@ processing(const RkAiqAlgoCom* inparams, RkAiqAlgoResCom* outparams)
 
         LOGD_ANR("recalculate: %d delta_iso:%d \n ", pAbayernrCtx->isReCalculate, delta_iso);
 
-        pAbayernrProcResParams->stArawnrProcResult.isNeedUpdate = true;
+        pAbayernrProcResParams->res_com.cfg_update = true;
     } else {
-        pAbayernrProcResParams->stArawnrProcResult.isNeedUpdate = false;
+        pAbayernrProcResParams->res_com.cfg_update = false;
     }
 
     pAbayernrCtx->isReCalculate = 0;

@@ -60,7 +60,9 @@
 #define RATIO_DEFAULT         (1.0f)
 #define LONG_FRAME_MODE_RATIO (1.0f)
 #define ISP_PREDGAIN_DEFAULT  (1.0f)
-#define LIMIT_VALUE(value,max_value,min_value)      (value > max_value? max_value : value < min_value ? min_value : value)
+#define INIT_CALC_PARAMS_NUM  (2)
+#define LIMIT_VALUE(value, max_value, min_value) \
+    (value > max_value ? max_value : value > min_value ? value : min_value)
 #define LIMIT_VALUE_UNSIGNED(value, max_value) (value > max_value ? max_value : value)
 #define LIMIT_PARA(a,b,c,d,e)      (c+(a-e)*(b-c)/(d -e))
 
@@ -220,7 +222,6 @@ typedef struct AmergeContext_s {
     AmergeState_t state;
     AmergeCurrData_t CurrData;
     AmergeNextData_t NextData;
-    RkAiqAmergeProcResult_t ProcRes;
     FrameNumber_t FrameNumber;
 } AmergeContext_t;
 

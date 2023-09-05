@@ -8,11 +8,6 @@
 #include <cutils/sockets.h>
 #endif
 
-#ifdef LOG_TAG
-#undef LOG_TAG
-#endif
-#define LOG_TAG "socket_server.cpp"
-
 #ifdef __ANDROID__
 #define UNIX_DOMAIN "/dev/socket/camera_tool"
 #else
@@ -47,7 +42,7 @@ SocketServer::~SocketServer() {
 }
 
 void SocketServer::SaveEixt() {
-  LOGD("socket in aiq uit");
+  LOGV_IPC("SocketServer::%s enter", __func__);
   quit_ = 1;
   if (_stop_fds[1] != -1) {
     char buf = 0xf; // random value to write to flush fd.
@@ -61,7 +56,7 @@ void SocketServer::SaveEixt() {
 void hexdump2(char *buf, const int num) {
   int i;
   for (i = 0; i < num; i++) {
-    LOGE("%02X ", buf[i]);
+    LOGD_IPC("%02X ", buf[i]);
     if ((i + 1) % 32 == 0) {
     }
   }
@@ -97,7 +92,7 @@ int ProcessText(int client_socket, rk_aiq_sys_ctx_t *ctx,
     offset += sizeof(dataReply.dataSize);
     memcpy(dataToSend + offset, dataReply.data, dataReply.dataSize);
     offset += dataReply.dataSize;
-    // LOGE("offset is %d,packetsize is %d",offset,packetSize);
+    // LOGE_IPC("offset is %d,packetsize is %d",offset,packetSize);
     memcpy(dataToSend + offset, (void *)&dataReply.dataHash,
            sizeof(dataReply.dataHash));
     send(client_socket, dataToSend, packetSize, 0);
@@ -145,7 +140,6 @@ int rkaiq_ipc_send(int sockfd, int id, int ack, int seqn, void *data,
   char *out_data = (char *)malloc(out_len);
   RkAiqSocketPacket_t *out_res = (RkAiqSocketPacket_t *)out_data;
   const std::lock_guard<std::mutex> lock(SocketServer::send_mutex);
-  int ret = 0;
 
   out_res->magic[0] = 'R';
   out_res->magic[1] = 0xAA;
@@ -160,51 +154,11 @@ int rkaiq_ipc_send(int sockfd, int id, int ack, int seqn, void *data,
 
   memcpy(&out_res->data, data, data_len);
 
-  ret = send(sockfd, out_data, out_len, 0);
+  send(sockfd, out_data, out_len, 0);
 
   free(out_data);
 
   return 0;
-}
-
-// return 0 if a sigle packet or payload size
-int rkaiq_packet_parse_old(RkAiqSocketPacket *aiq_data, uint8_t *buffer,
-                           int len) {
-  uint8_t *start_pos = NULL;
-  uint32_t packet_size = 0;
-  uint32_t valid_size = 0;
-  RkAiqSocketPacket *aiq_pkt = NULL;
-
-  if (buffer[0] == 'R' && buffer[1] == 'K') {
-    start_pos = buffer;
-  }
-
-  if (start_pos) {
-    if ((len - (start_pos - buffer)) < (int)sizeof(RkAiqSocketPacket)) {
-      LOGE("Not a complete packet [%d], discard!\n", len);
-      return -1;
-    }
-
-    aiq_pkt = (RkAiqSocketPacket *)start_pos;
-    memcpy(aiq_data, aiq_pkt, sizeof(RkAiqSocketPacket));
-
-    packet_size = (start_pos[2] & 0xff) | ((start_pos[3] & 0xff) << 8) |
-                  ((start_pos[4] & 0xff) << 16) | ((start_pos[5] & 0xff) << 24);
-
-    // refer to the real offset of data
-    aiq_data->data = (char *)(&start_pos);
-    aiq_data->dataSize = packet_size;
-    valid_size = (buffer + len) - start_pos;
-
-    // sigle packet : HEAD:24byte + PAYLOAD + CRC:1byte
-    if (valid_size == packet_size) {
-      return 0;
-    }
-    return packet_size;
-  } else {
-    // may be fragment packet, head already parsed just return full size
-    return -1;
-  }
 }
 
 // return 0 if a sigle packet or payload size
@@ -219,7 +173,7 @@ int rkaiq_packet_parse(RkAiqSocketPacket_t *aiq_data, uint8_t *buffer,
 
   if (start_pos) {
     if ((len - (start_pos - buffer)) < (int)sizeof(RkAiqSocketPacket_t)) {
-      LOGE("Not a complete packet [%d], discard!\n", len);
+      LOGE_IPC("Not a complete packet [%d], discard!\n", len);
       return -1;
     }
 
@@ -251,6 +205,7 @@ int rkaiq_is_uapi(const char *cmd_str) {
 }
 
 void rkaiq_params_tuning(aiq_tunning_ctx *tunning_ctx) {
+  LOGV_IPC("SocketServer::%s enter", __func__);
   int sockfd = -1;
   rk_aiq_sys_ctx_t *aiq_ctx = NULL;
   RkAiqSocketPacket_t *aiq_data = NULL;
@@ -263,10 +218,8 @@ void rkaiq_params_tuning(aiq_tunning_ctx *tunning_ctx) {
   aiq_ctx = tunning_ctx->aiq_ctx;
   aiq_data = tunning_ctx->aiq_data;
 
-#if 1
-  printf("[TCP]%d,%d,%d--->PC CMD STRING:\n%s\n", sockfd, aiq_data->cmd_id,
+  LOGI_IPC("[TCP]%d,%d,%d--->PC CMD STRING:\n%s\n", sockfd, aiq_data->cmd_id,
          aiq_data->payload_size, aiq_data->data);
-#endif
 
   switch (aiq_data->cmd_id) {
   case AIQ_IPC_CMD_WRITE: {
@@ -286,12 +239,10 @@ void rkaiq_params_tuning(aiq_tunning_ctx *tunning_ctx) {
     }
 
     if (!out_data) {
-      LOGE("[Tuning]: aiq return NULL!\n");
+      LOGE_IPC("[Tuning]: aiq return NULL!\n");
       break;
     }
-#if 1
-    printf("---> read:\n%s\n", out_data);
-#endif
+    LOGI_IPC("---> read:\n%s\n", out_data);
     rkaiq_ipc_send(sockfd, AIQ_IPC_CMD_READ, 0, 0, out_data, strlen(out_data));
     if (out_data)
       free(out_data);
@@ -308,6 +259,7 @@ void rkaiq_params_tuning(aiq_tunning_ctx *tunning_ctx) {
 }
 
 int SocketServer::packetHandle(void *packet, MessageType type) {
+  LOGV_IPC("SocketServer::%s enter", __func__);
   if (type == RKAIQ_MESSAGE_NEW) {
     RkAiqSocketPacket_t *aiq_data = (RkAiqSocketPacket_t *)packet;
 
@@ -334,6 +286,7 @@ int SocketServer::packetHandle(void *packet, MessageType type) {
 }
 
 int onPacketHandle(void *pri, void *packet, MessageType type) {
+  LOGV_IPC("SocketServer::%s enter", __func__);
   SocketServer *server = (SocketServer *)pri;
   if (server) {
     server->packetHandle(packet, type);
@@ -343,6 +296,7 @@ int onPacketHandle(void *pri, void *packet, MessageType type) {
 }
 
 int SocketServer::Recvieve(int sync) {
+  LOGV_IPC("SocketServer::%s enter", __func__);
   uint8_t buffer[MAXPACKETSIZE];
   struct timeval interval = {3, 0};
 
@@ -356,6 +310,7 @@ int SocketServer::Recvieve(int sync) {
     // 1. recv MAX SIZE every timne.
     recv_len = recv(client_socket, buffer, MAXPACKETSIZE, 0);
 
+    LOGK_IPC("cid[%d] SocketServer::%s recv_len %d",camId_, __func__, recv_len);
     if (recv_len == 0) {
       break;
     }
@@ -393,13 +348,13 @@ int SocketServer::poll_event(int timeout_msec, int fds[]) {
   ret = poll(poll_fds, num_fds, timeout_msec);
   if (fds[1] != -1) {
     if ((poll_fds[1].revents & POLLIN) || (poll_fds[1].revents & POLLPRI)) {
-      LOGD("%s: Poll returning from flush", __FUNCTION__);
+      LOGD_IPC("%s: Poll returning from flush", __FUNCTION__);
       return POLL_STOP_RET;
     }
   }
 
   if (ret > 0 && (poll_fds[0].revents & (POLLERR | POLLNVAL | POLLHUP))) {
-    LOGE("polled error");
+    LOGE_IPC("polled error");
     return -1;
   }
 
@@ -407,6 +362,7 @@ int SocketServer::poll_event(int timeout_msec, int fds[]) {
 }
 
 void SocketServer::Accepted() {
+  LOGV_IPC("SocketServer::%s enter", __func__);
   struct timeval interval = {3, 0};
   setsockopt(sockfd, SOL_SOCKET, SO_RCVTIMEO, (char *)&interval,
              sizeof(struct timeval));
@@ -426,10 +382,11 @@ void SocketServer::Accepted() {
     client_socket = accept(sockfd, (struct sockaddr *)&clientAddress, &sosize);
     if (client_socket < 0) {
       if (errno != EAGAIN)
-        LOGE("Error socket accept failed %d %d\n", client_socket, errno);
+        LOGE_IPC("Error socket accept failed %d %d\n", client_socket, errno);
       continue;
     }
-    LOGD("socket accept ip %s\n", serverAddress);
+    LOGK_IPC("cid[%d] socket accept server:%s, client:%s\n",
+             camId_, serverAddress.sun_path, clientAddress.sun_path);
     tool_mode_set(true);
 
     // std::shared_ptr<std::thread> recv_thread;
@@ -437,17 +394,19 @@ void SocketServer::Accepted() {
     // client_socket); recv_thread->join(); recv_thread = nullptr;
     this->Recvieve(0);
     close(client_socket);
-    LOGD("socket accept close\n");
+    LOGK_IPC("cid[%d], socket accept close\n", camId_);
     tool_mode_set(false);
   }
-  LOGD("socket accept exit\n");
+  LOGD_IPC("socket accept exit\n");
 }
 
 #ifdef __ANDROID__
-int SocketServer::getAndroidLocalSocket() {
-  static const char socketName[] = "camera_tool";
+int SocketServer::getAndroidLocalSocket(int camid) {
+  char socketName[16] = {0};
+  sprintf(socketName, "camera_tool%d", camid);
   int sock = android_get_control_socket(socketName);
 
+  LOGK_IPC("cid[%d] %s path:%s, sockfd:%d", camId_, __func__, socketName, sockfd);
   if (sock < 0) {
     // TODO(Cody): will always failed with permission denied
     // Should let init to create socket
@@ -460,14 +419,13 @@ int SocketServer::getAndroidLocalSocket() {
 #endif
 
 int SocketServer::Process(rk_aiq_sys_ctx_t *ctx, int camid) {
-  LOGW("SocketServer::Process\n");
-  int opt = 1;
+  LOGV_IPC("SocketServer::%s enter", __func__);
   aiq_ctx = ctx;
-
+  camId_ = camid;
 #ifdef __ANDROID__
-  sockfd = getAndroidLocalSocket();
+  sockfd = getAndroidLocalSocket(camid);
   if (sockfd < 0) {
-    LOGE("Error get socket %s\n", strerror(errno));
+    LOGE_IPC("cid[%d] Error get socket %s\n", camid, strerror(errno));
     return -1;
   }
   fcntl(sockfd, F_SETFD, FD_CLOEXEC);
@@ -482,20 +440,22 @@ int SocketServer::Process(rk_aiq_sys_ctx_t *ctx, int camid) {
 
   if ((::bind(sockfd, (struct sockaddr *)&serverAddress,
               sizeof(serverAddress))) < 0) {
-    LOGE("Error bind %s\n", strerror(errno));
+    LOGE_IPC("Error bind %s\n", strerror(errno));
     return -1;
   }
+  LOGK_IPC("cid[%d] %s path:%s, sockfd:%d", camid, __func__,
+           serverAddress.sun_path, sockfd);
 #endif
   if (listen(sockfd, 5) < 0) {
-    LOGE("Error listen\n");
+    LOGE_IPC("Error listen\n");
     return -1;
   }
 
   if (pipe(_stop_fds) < 0) {
-    LOGE("poll stop pipe error: %s", strerror(errno));
+    LOGE_IPC("poll stop pipe error: %s", strerror(errno));
   } else {
     if (fcntl(_stop_fds[0], F_SETFL, O_NONBLOCK)) {
-      LOGE("Fail to set stop pipe flag: %s", strerror(errno));
+      LOGE_IPC("Fail to set stop pipe flag: %s", strerror(errno));
     }
   }
 
@@ -506,9 +466,10 @@ int SocketServer::Process(rk_aiq_sys_ctx_t *ctx, int camid) {
 }
 
 void SocketServer::Deinit() {
-  struct linger so_linger;
-  so_linger.l_onoff = 1;
-  so_linger.l_linger = 0;
+  LOGV_IPC("SocketServer::%s enter", __func__);
+  // struct linger so_linger;
+  // so_linger.l_onoff = 1;
+  // so_linger.l_linger = 0;
   this->SaveEixt();
   // setsockopt(client_socket,SOL_SOCKET,SO_LINGER,&so_linger,sizeof(so_linger));
   // struct timeval interval = {0, 0};
@@ -520,16 +481,18 @@ void SocketServer::Deinit() {
     this->tunning_thread->join();
   // shutdown(client_socket, SHUT_RDWR);
   // close(client_socket);
+#ifndef __ANDROID__
   unlink(serverAddress.sun_path);
   close(sockfd);
+#endif
   this->accept_threads_ = nullptr;
   this->tunning_thread = nullptr;
   if (_stop_fds[0] != -1)
     close(_stop_fds[0]);
   if (_stop_fds[1] != -1)
     close(_stop_fds[1]);
-  LOGD("socekt stop in aiq");
   if (msg_parser) {
     msg_parser->stop();
   }
+  LOGK_IPC("cid[%d] %s success", camId_, __func__);
 }

@@ -40,6 +40,7 @@ XCamReturn RkAiqAmfnrHandleInt::updateConfig(bool needSync) {
     ENTER_ANALYZER_FUNCTION();
 
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
+#ifndef DISABLE_HANDLE_ATTRIB
     if (needSync) mCfgMutex.lock();
     // if something changed
     if (updateAtt) {
@@ -67,6 +68,7 @@ XCamReturn RkAiqAmfnrHandleInt::updateConfig(bool needSync) {
     }
 
     if (needSync) mCfgMutex.unlock();
+#endif
 
     EXIT_ANALYZER_FUNCTION();
     return ret;
@@ -77,6 +79,9 @@ XCamReturn RkAiqAmfnrHandleInt::setAttrib(rk_aiq_mfnr_attrib_v1_t* att) {
 
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
     mCfgMutex.lock();
+#ifdef DISABLE_HANDLE_ATTRIB
+    ret = rk_aiq_uapi_amfnr_SetAttrib_v1(mAlgoCtx, att, false);
+#else
     // TODO
     // check if there is different between att & mCurAtt
     // if something changed, set att to mNewAtt, and
@@ -89,6 +94,7 @@ XCamReturn RkAiqAmfnrHandleInt::setAttrib(rk_aiq_mfnr_attrib_v1_t* att) {
         updateAtt = true;
         waitSignal();
     }
+#endif
 
     mCfgMutex.unlock();
 
@@ -112,6 +118,9 @@ XCamReturn RkAiqAmfnrHandleInt::setIQPara(rk_aiq_mfnr_IQPara_V1_t* para) {
 
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
     mCfgMutex.lock();
+#ifdef DISABLE_HANDLE_ATTRIB
+    ret = rk_aiq_uapi_amfnr_SetIQPara_v1(mAlgoCtx, para, false);
+#else
     // TODO
     // check if there is different between att & mCurAtt
     // if something changed, set att to mNewAtt, and
@@ -124,6 +133,7 @@ XCamReturn RkAiqAmfnrHandleInt::setIQPara(rk_aiq_mfnr_IQPara_V1_t* para) {
         updateIQpara = true;
         waitSignal();
     }
+#endif
 
     mCfgMutex.unlock();
 
@@ -147,6 +157,9 @@ XCamReturn RkAiqAmfnrHandleInt::setJsonPara(rk_aiq_mfnr_JsonPara_V1_t* para) {
 
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
     mCfgMutex.lock();
+#ifdef DISABLE_HANDLE_ATTRIB
+    ret = rk_aiq_uapi_amfnr_SetJsonPara_v1(mAlgoCtx, para, false);
+#else
     // TODO
     // check if there is different between att & mCurAtt
     // if something changed, set att to mNewAtt, and
@@ -159,7 +172,7 @@ XCamReturn RkAiqAmfnrHandleInt::setJsonPara(rk_aiq_mfnr_JsonPara_V1_t* para) {
         updateJsonpara = true;
         waitSignal();
     }
-
+#endif
     mCfgMutex.unlock();
 
     EXIT_ANALYZER_FUNCTION();
@@ -229,11 +242,6 @@ XCamReturn RkAiqAmfnrHandleInt::prepare() {
     ret = RkAiqHandle::prepare();
     RKAIQCORE_CHECK_RET(ret, "amfnr handle prepare failed");
 
-    RkAiqAlgoConfigAmfnr* amfnr_config_int = (RkAiqAlgoConfigAmfnr*)mConfig;
-
-    RkAiqCore::RkAiqAlgosGroupShared_t* shared =
-        (RkAiqCore::RkAiqAlgosGroupShared_t*)(getGroupShared());
-
     RkAiqAlgoDescription* des = (RkAiqAlgoDescription*)mDes;
     ret                       = des->prepare(mConfig);
     RKAIQCORE_CHECK_RET(ret, "amfnr algo prepare failed");
@@ -246,13 +254,6 @@ XCamReturn RkAiqAmfnrHandleInt::preProcess() {
     ENTER_ANALYZER_FUNCTION();
 
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
-
-    RkAiqAlgoPreAmfnr* amfnr_pre_int        = (RkAiqAlgoPreAmfnr*)mPreInParam;
-    RkAiqAlgoPreResAmfnr* amfnr_pre_res_int = (RkAiqAlgoPreResAmfnr*)mPreOutParam;
-
-    RkAiqCore::RkAiqAlgosGroupShared_t* shared =
-        (RkAiqCore::RkAiqAlgosGroupShared_t*)(getGroupShared());
-    RkAiqCore::RkAiqAlgosComShared_t* sharedCom = &mAiqCore->mAlogsComSharedParams;
 
     ret = RkAiqHandle::preProcess();
     if (ret) {
@@ -272,20 +273,19 @@ XCamReturn RkAiqAmfnrHandleInt::processing() {
 
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
 
-    RkAiqAlgoProcAmfnr* amfnr_proc_int        = (RkAiqAlgoProcAmfnr*)mProcInParam;
-    RkAiqAlgoProcResAmfnr* amfnr_proc_res_int = (RkAiqAlgoProcResAmfnr*)mProcOutParam;
-
-    RkAiqCore::RkAiqAlgosGroupShared_t* shared =
-        (RkAiqCore::RkAiqAlgosGroupShared_t*)(getGroupShared());
-    RkAiqCore::RkAiqAlgosComShared_t* sharedCom = &mAiqCore->mAlogsComSharedParams;
-
     ret = RkAiqHandle::processing();
     if (ret) {
         RKAIQCORE_CHECK_RET(ret, "amfnr handle processing failed");
     }
 
+#ifdef DISABLE_HANDLE_ATTRIB
+    mCfgMutex.lock();
+#endif
     RkAiqAlgoDescription* des = (RkAiqAlgoDescription*)mDes;
     ret                       = des->processing(mProcInParam, mProcOutParam);
+#ifdef DISABLE_HANDLE_ATTRIB
+    mCfgMutex.unlock();
+#endif
     RKAIQCORE_CHECK_RET(ret, "amfnr algo processing failed");
 
     EXIT_ANALYZER_FUNCTION();
@@ -296,13 +296,6 @@ XCamReturn RkAiqAmfnrHandleInt::postProcess() {
     ENTER_ANALYZER_FUNCTION();
 
     XCamReturn ret = XCAM_RETURN_NO_ERROR;
-
-    RkAiqAlgoPostAmfnr* amfnr_post_int        = (RkAiqAlgoPostAmfnr*)mPostInParam;
-    RkAiqAlgoPostResAmfnr* amfnr_post_res_int = (RkAiqAlgoPostResAmfnr*)mPostOutParam;
-
-    RkAiqCore::RkAiqAlgosGroupShared_t* shared =
-        (RkAiqCore::RkAiqAlgosGroupShared_t*)(getGroupShared());
-    RkAiqCore::RkAiqAlgosComShared_t* sharedCom = &mAiqCore->mAlogsComSharedParams;
 
     ret = RkAiqHandle::postProcess();
     if (ret) {
